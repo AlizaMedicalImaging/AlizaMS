@@ -52,7 +52,7 @@ public:
 	static void generate_spectroscopyslice(
 		std::vector<SpectroscopySlice*> &,
 		const QString&,
-		const bool,
+		const bool, GLWidget*,
 		const float, const float, const float,
 		const float, const float, const float,
 		const float, const float, const float,

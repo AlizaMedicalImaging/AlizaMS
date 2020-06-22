@@ -125,12 +125,11 @@ int ContourUtils::get_new_roi_id(const ImageVariant * ivariant)
 	return (tmp0 + 1);
 }
 
-// FIXME
 void ContourUtils::generate_roi_vbos(
+	GLWidget * gl,
 	ROI & roi,
 	bool delete_after)
 {
-/*
 	QMap< int, Contour* >::iterator it =
 		roi.contours.begin();
 	while (it != roi.contours.end())
@@ -170,15 +169,15 @@ void ContourUtils::generate_roi_vbos(
 					delete [] v;
 					return;
 				}
-				glGenBuffers(1, &(c->vboid));
+				gl->glGenBuffers(1, &(c->vboid));
 				GLWidget::increment_count_vbos(1);
-				glBindBuffer(GL_ARRAY_BUFFER, c->vboid);
-				glBufferData(
+				gl->glBindBuffer(GL_ARRAY_BUFFER, c->vboid);
+				gl->glBufferData(
 					GL_ARRAY_BUFFER,
 					s*sizeof(GLfloat),
 					v,
 					GL_STATIC_DRAW);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
+				gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
 				delete [] v;
 				c->vbo_initialized = true;
 				if (delete_after) c->dpoints.clear();
@@ -186,7 +185,6 @@ void ContourUtils::generate_roi_vbos(
 		}
 		++it;
 	}
-*/
 }
 
 void ContourUtils::copy_roi(

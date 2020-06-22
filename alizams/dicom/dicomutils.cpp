@@ -2227,7 +2227,7 @@ bool DicomUtils::read_slices(
 			values,
 			rows, columns,
 			spacing_x, spacing_y, &spacing_z,
-			ok3d, ivariant->di->skip_texture,
+			ok3d, ivariant->di->skip_texture, gl,
 			&ivariant->equi, &ivariant->one_direction,
 			&origin_x, &origin_y, &origin_z,
 			dircos,
@@ -2513,7 +2513,7 @@ bool DicomUtils::read_slices_uihgrid(
 			values,
 			rows, columns,
 			spacing_x, spacing_y, &spacing_z,
-			ok3d, ivariant->di->skip_texture,
+			ok3d, ivariant->di->skip_texture, gl,
 			&ivariant->equi, &ivariant->one_direction,
 			&origin_x, &origin_y, &origin_z,
 			dircos,
@@ -2631,7 +2631,7 @@ bool DicomUtils::read_slices_rtdose(
 			values,
 			rows, columns,
 			spacing_x, spacing_y, &spacing_z,
-			ok3d, ivariant->di->skip_texture,
+			ok3d, ivariant->di->skip_texture, gl,
 			&ivariant->equi,
 			&ivariant->one_direction,
 			&origin_x, &origin_y, &origin_z,
@@ -3890,8 +3890,7 @@ bool DicomUtils::generate_geometry(
 		const std::vector<double*> & values,
 		const unsigned int rows_, const unsigned int columns_,
 		const double spacing_x, const double spacing_y, double * spacing_z,
-		const bool ok3d,
-		const bool skip_texture,
+		const bool ok3d, const bool skip_texture, GLWidget * gl,
 		bool * equi_,
 		bool * one_direction_,
 		double * origin_x,  double * origin_y,  double * origin_z,
@@ -3977,7 +3976,7 @@ bool DicomUtils::generate_geometry(
 			CommonUtils::generate_spectroscopyslice(
 				spectorscopyslices,
 				orientation_string,
-				ok3d,
+				ok3d, gl,
 				x0, y0, z0, x1, y1, z1, x2, y2, z2, x3, y3, z3,
 				columns_, rows_);
 		}
@@ -8150,7 +8149,7 @@ QString DicomUtils::read_enhanced_common(
 					tmp4,
 					rows_, columns_,
 					spacing_x, spacing_y, &spacing_z_tmp,
-					enable_gl, skip_texture,
+					enable_gl, skip_texture, gl,
 					&equi_, &one_direction_,
 					&origin_x_gen, &origin_y_gen, &origin_z_gen,
 					dircos_gen,
@@ -11743,7 +11742,7 @@ QString DicomUtils::read_dicom(
 				gl->makeCurrent();
 				for (int z = 0; z < v->di->rois.size(); z++)
 				{
-					ContourUtils::generate_roi_vbos(v->di->rois[z],false);
+					ContourUtils::generate_roi_vbos(gl, v->di->rois[z],false);
 				}
 			}
 			ContourUtils::map_contours_all(v);

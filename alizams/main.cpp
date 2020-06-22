@@ -16,10 +16,8 @@
 #include <iostream>
 
 #if (defined LOG_STDOUT_TO_FILE && LOG_STDOUT_TO_FILE==1)
-#if (QT_VERSION >= 0x050000)
 #include <QMessageLogContext>
 #include <QDebug>
-#endif
 #endif
 
 #if (defined USE_SPLASH_SCREEN && USE_SPLASH_SCREEN==1)
@@ -51,7 +49,6 @@ static void close_log()
 	fclose(stdout);
 }
 
-#if (QT_VERSION >= 0x050000)
 void redirect_qdebug(
 	QtMsgType type,
 	const QMessageLogContext & context,
@@ -75,7 +72,6 @@ void redirect_qdebug(
 		break;
 	}
 }
-#endif
 #endif
 
 int main(int argc, char *argv[])
@@ -111,9 +107,7 @@ int main(int argc, char *argv[])
 #if (defined LOG_STDOUT_TO_FILE && LOG_STDOUT_TO_FILE==1)
 	if (freopen("log.txt", "w", stdout))
 	{
-#if (QT_VERSION >= 0x050000)
 		qInstallMessageHandler(redirect_qdebug);
-#endif
 		atexit(close_log);
 	}
 #endif
@@ -172,20 +166,21 @@ int main(int argc, char *argv[])
 	bool ok3d = false;
 	bool hide_zoom = true;
 	QString opengl_info_;
-#if (QT_VERSION >= 0x050500)
 	QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
-#endif
+	if (!metadata_only)
+	{
 #if 1
-    QSurfaceFormat format;
-	format.setRenderableType(QSurfaceFormat::OpenGL);
-    format.setRedBufferSize(8);
-    format.setGreenBufferSize(8);
-    format.setBlueBufferSize(8);
-    format.setAlphaBufferSize(8);
-    format.setDepthBufferSize(24);
-    format.setSamples(4);
-	format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+    	QSurfaceFormat format;
+		format.setRenderableType(QSurfaceFormat::OpenGL);
+    	format.setRedBufferSize(8);
+    	format.setGreenBufferSize(8);
+    	format.setBlueBufferSize(8);
+    	format.setAlphaBufferSize(8);
+    	format.setDepthBufferSize(24);
+    	format.setSamples(4);
+		format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
 #endif
+	}
 	QApplication app(argc, argv);
 	app.setOrganizationName(QString("Aliza"));
 	app.setOrganizationDomain(QString("aliza-dicom-viewer.com"));
@@ -195,7 +190,6 @@ int main(int argc, char *argv[])
 	{
 		const int hide_zoom_ = 1;
 		hide_zoom = (hide_zoom_==1) ? true : false;
-		QString saved_style = QString("Dark Fusion");
 		double app_font_pt   = 0.0;
 #ifdef USE_WORKSTATION_MODE
 		QSettings settings(
@@ -230,37 +224,31 @@ int main(int argc, char *argv[])
 		}
 		app.setFont(f);
 		//
-		if (saved_style==QString("Dark Fusion"))
+		if (true)
 		{
-			const bool nd = true;
 			QColor bg(0x53, 0x59, 0x60);
 			QColor tt(0x30, 0x39, 0x47);
 			QPalette p;
-			p.setColor(QPalette::Window,          (nd ? bg            : Qt::darkRed));
-			p.setColor(QPalette::WindowText,      (nd ? Qt::white     : Qt::black));
-			p.setColor(QPalette::Text,            (nd ? Qt::white     : Qt::black));
-			p.setColor(QPalette::Disabled,        QPalette::WindowText, (nd ? Qt::gray : Qt::green));
-			p.setColor(QPalette::Disabled,        QPalette::Text,       (nd ? Qt::gray : Qt::green));
-			p.setColor(QPalette::Base,            (nd ? bg            : Qt::darkBlue));
-			p.setColor(QPalette::AlternateBase,   (nd ? bg            : Qt::darkGreen));
-			p.setColor(QPalette::ToolTipBase,     (nd ? tt            : Qt::cyan));
-			p.setColor(QPalette::ToolTipText,     (nd ? Qt::white     : Qt::black));
-			p.setColor(QPalette::Button,          (nd ? bg            : Qt::green));
-			p.setColor(QPalette::ButtonText,      (nd ? Qt::white     : Qt::black));
-			p.setColor(QPalette::BrightText,      (nd ? Qt::white     : Qt::black));
-			p.setColor(QPalette::Link,            (nd ? Qt::darkBlue  : Qt::blue));
-			p.setColor(QPalette::Highlight,       (nd ? Qt::lightGray : Qt::red));
-			p.setColor(QPalette::HighlightedText, (nd ? Qt::black     : Qt::darkYellow));
-#if (QT_VERSION >= 0x050000)
+			p.setColor(QPalette::Window,          bg);
+			p.setColor(QPalette::WindowText,      Qt::white);
+			p.setColor(QPalette::Text,            Qt::white);
+			p.setColor(QPalette::Disabled,        QPalette::WindowText, Qt::gray);
+			p.setColor(QPalette::Disabled,        QPalette::Text,       Qt::gray);
+			p.setColor(QPalette::Base,            bg);
+			p.setColor(QPalette::AlternateBase,   bg);
+			p.setColor(QPalette::ToolTipBase,     tt);
+			p.setColor(QPalette::ToolTipText,     Qt::white);
+			p.setColor(QPalette::Button,          bg);
+			p.setColor(QPalette::ButtonText,      Qt::white);
+			p.setColor(QPalette::BrightText,      Qt::white);
+			p.setColor(QPalette::Link,            Qt::darkBlue);
+			p.setColor(QPalette::Highlight,       Qt::lightGray);
+			p.setColor(QPalette::HighlightedText, Qt::black);
 			app.setStyle(QString("Fusion"));
-#else
-			app.setStyle(QString("Plastique"));
-#endif
 			app.setPalette(p);
 		}
-		//
-		if (!force_disable_opengl) ok3d = true;
 	}
+	if (!force_disable_opengl) ok3d = true;
 	//
 #if (defined USE_SPLASH_SCREEN && USE_SPLASH_SCREEN==1)
 	const QString splash_info =
@@ -348,7 +336,6 @@ int main(int argc, char *argv[])
 		}
 		return app.exec();
 	}
-	return 0;
 }
 
 #ifdef USE_SPLASH_SCREEN

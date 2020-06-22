@@ -3,6 +3,8 @@
 
 #include "structures.h"
 
+class GLWidget;
+
 class ContourUtils
 {
 public:
@@ -13,7 +15,7 @@ public:
 	static long get_next_contour_tmpid();
 	static void calculate_rois_center(ImageVariant*);
 	static int  get_new_roi_id(const ImageVariant*);
-	static void generate_roi_vbos(ROI&, bool);
+	static void generate_roi_vbos(GLWidget*, ROI&, bool);
 	static void copy_roi(ROI&, const ROI&);
 	static void calculate_uvt_nonuniform(ImageVariant*);
 	static void calculate_contours_uv(ImageVariant*);

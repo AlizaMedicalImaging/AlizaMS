@@ -1836,18 +1836,16 @@ void CommonUtils::generate_cubeslice(
 	slices.push_back(cs);
 }
 
-//FIXME
 void CommonUtils::generate_spectroscopyslice(
 			std::vector<SpectroscopySlice*> & slices,
 			const QString & orient,
-			const bool ok3d,
+			const bool ok3d, GLWidget * gl,
 			const float x0, const float y0, const float z0,
 			const float x1, const float y1, const float z1,
 			const float x3, const float y3, const float z3,
 			const float x2, const float y2, const float z2,
 			unsigned int columns_, unsigned int rows_)
 {
-/*
 	SpectroscopySlice * cs = new SpectroscopySlice;
 	cs->fv[ 0] = x0;
 	cs->fv[ 1] = y0;
@@ -1950,7 +1948,6 @@ void CommonUtils::generate_spectroscopyslice(
 	}
 	cs->slice_orientation_string = orient;
 	slices.push_back(cs);
-*/
 }
 
 void CommonUtils::calculate_rgb_minmax(ImageVariant * ivariant)
