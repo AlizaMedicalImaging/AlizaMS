@@ -165,7 +165,9 @@ int main(int argc, char *argv[])
 	//
 	bool ok3d = false;
 	bool hide_zoom = true;
-	QString opengl_info_;
+#if 1 
+	QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
+#endif
 	QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
 	if (!metadata_only)
 	{
@@ -224,7 +226,7 @@ int main(int argc, char *argv[])
 		}
 		app.setFont(f);
 		//
-		if (true)
+		if (false)
 		{
 			QColor bg(0x53, 0x59, 0x60);
 			QColor tt(0x30, 0x39, 0x47);
@@ -272,7 +274,7 @@ int main(int argc, char *argv[])
 	//
 	if (!metadata_only)
 	{
-		MainWindow mainWin(ok3d, hide_zoom, opengl_info_);
+		MainWindow mainWin(ok3d, hide_zoom);
 		mainWin.show();
 		app.processEvents();
 #if (defined USE_SPLASH_SCREEN && USE_SPLASH_SCREEN==1)

@@ -93,7 +93,7 @@ class BrowserWidget2: public QWidget, public Ui::BrowserWidget2
 {
 	Q_OBJECT
 public:
-	BrowserWidget2(QWidget(*)=NULL);
+	BrowserWidget2(float, QWidget(*)=NULL);
 	~BrowserWidget2();
 	bool  is_first_run()  const;
 	const QString read_DICOMDIR(const QString&);

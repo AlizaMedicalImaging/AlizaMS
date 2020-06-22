@@ -31,8 +31,7 @@ QMutex mutex;
 
 MainWindow::MainWindow(
 	bool ok3d,
-	bool hide_zoom_,
-	const QString & testgl_info_)
+	bool hide_zoom_)
 {
 	glwidget = NULL;
 	saved_ok3d = false;
@@ -46,13 +45,28 @@ MainWindow::MainWindow(
 	view2d_frame->hide();
 	view3d_frame->hide();
 	annotations_frame->hide();
+	info_line->hide();
 	view2d_label = new QLabel(this);
 	view3d_label = new QLabel(this);
 	//
 	histogram_frame->hide();
 	//
 	hide_zoom = hide_zoom_;
-	testgl_info = testgl_info_;
+	//
+	scale_icons = 1.0f;
+	adjust_scale_icons = 1.0f;
+#ifdef USE_WORKSTATION_MODE
+	{
+		QSettings settings(
+			QSettings::IniFormat, QSettings::UserScope,
+			QApplication::organizationName(), QApplication::applicationName());
+		settings.setFallbacksEnabled(true);
+		settings.beginGroup(QString("GlobalSettings"));
+		adjust_scale_icons =
+			(float)settings.value(QString("scale_ui_icons"), 1.0).toDouble();
+		settings.endGroup();
+	}
+#endif
 	//
 	const bool force_vertical = false;
 	const QRect srec = qApp->desktop()->screenGeometry();
@@ -63,6 +77,9 @@ MainWindow::MainWindow(
 		vl991->setSpacing(0);
 		vl991->addWidget(frame2D);
 		vl991->addWidget(frame3D);
+#if 1
+		if (srec.height() > 1920.0) scale_icons = srec.height()/1920.0f;
+#endif
 	}
 	else
 	{
@@ -71,6 +88,9 @@ MainWindow::MainWindow(
 		vl991->setSpacing(0);
 		vl991->addWidget(frame2D);
 		vl991->addWidget(frame3D);
+#if 1
+		if (srec.width() > 1920.0) scale_icons = srec.width()/1920.0f;
+#endif
 	}
 	//
 	toolbox = new ToolBox(this);
@@ -81,14 +101,14 @@ MainWindow::MainWindow(
 	//
 	labelwidget = new LabelWidget(this);
 	//
-	anim3Dwidget = new AnimWidget(this);
+	anim3Dwidget = new AnimWidget(scale_icons*adjust_scale_icons, this);
 	anim3Dwidget->label->setText(QString("3D+t"));
 	QVBoxLayout * vl98 = new QVBoxLayout(anim3D_frame);
 	vl98->setContentsMargins(0,0,0,0);
 	vl98->setSpacing(0);
 	vl98->addWidget(anim3Dwidget);
 	//
-	anim2Dwidget = new AnimWidget(this);
+	anim2Dwidget = new AnimWidget(scale_icons*adjust_scale_icons, this);
 	anim2Dwidget->label->setText(QString("2D+t"));
 	anim2Dwidget->group_pushButton->hide();
 	anim2Dwidget->remove_pushButton->hide();
@@ -98,19 +118,19 @@ MainWindow::MainWindow(
 	vl99->setSpacing(0);
 	vl99->addWidget(anim2Dwidget);
 	//
-	imagesbox = new ImagesBox(this);
+	imagesbox = new ImagesBox(scale_icons*adjust_scale_icons, this);
 	QVBoxLayout * l1 = new QVBoxLayout(imagesbox_frame);
 	l1->setSpacing(0);
 	l1->setContentsMargins(0,0,0,0);
 	l1->addWidget(imagesbox);
 	//
-	toolbox2D = new ToolBox2D(this);
+	toolbox2D = new ToolBox2D(scale_icons*adjust_scale_icons, this);
 	QVBoxLayout * l2 = new QVBoxLayout(level_frame);
 	l2->setSpacing(0);
 	l2->setContentsMargins(0,0,0,0);
 	l2->addWidget(toolbox2D);
 	//
-	lutwidget2 = new LUTWidget(this);
+	lutwidget2 = new LUTWidget(scale_icons*adjust_scale_icons, this);
 	lutwidget2->add_items1();
 	//
 	if (hide_zoom)
@@ -120,8 +140,8 @@ MainWindow::MainWindow(
 	}
 	else
 	{
-		zoomwidget2D = new ZoomWidget(this);
-		zoomwidget3D = new ZoomWidget(this);
+		zoomwidget2D = new ZoomWidget(scale_icons*adjust_scale_icons, this);
+		zoomwidget3D = new ZoomWidget(scale_icons*adjust_scale_icons, this);
 	}
 	//
 	frame2D_viewer_layout = new QVBoxLayout(frame2D_viewer);
@@ -247,13 +267,13 @@ MainWindow::MainWindow(
 	vl296->setSpacing(0);
 	vl296->addWidget(sqtree);
 	//
-	browser2 = new BrowserWidget2(this);
+	browser2 = new BrowserWidget2(scale_icons*adjust_scale_icons, this);
 	QVBoxLayout * vl396 = new QVBoxLayout(browser2_frame);
 	vl396->setContentsMargins(0,0,0,0);
 	vl396->setSpacing(0);
 	vl396->addWidget(browser2);
 	//
-	settingswidget = new SettingsWidget(this);
+	settingswidget = new SettingsWidget(scale_icons, this);
 	QVBoxLayout * vl496 = new QVBoxLayout(settings_frame);
 	vl496->setContentsMargins(0,0,0,0);
 	vl496->setSpacing(0);
@@ -529,9 +549,7 @@ void MainWindow::exit_null()
 
 void MainWindow::about()
 {
-	QString tmp0;
-	if (testgl_info.isEmpty()) tmp0 = aliza->get_opengl_info();
-	else tmp0 = testgl_info;
+	const QString tmp0 = aliza->get_opengl_info();
 	aboutwidget->set_opengl_info(tmp0);
 	aboutwidget->set_info();
 	aboutwidget->exec();
@@ -783,14 +801,16 @@ void MainWindow::createMenus()
 void MainWindow::createToolBars()
 {
 	toolbar4 = new QToolBar(this);
-	toolbar4->setIconSize(QSize(14,14));
+	toolbar4->setIconSize(
+		QSize((int)(18*scale_icons*adjust_scale_icons),(int)(18*scale_icons*adjust_scale_icons)));
 	if (toolbar4->layout())
 	{
 		toolbar4->layout()->setContentsMargins(0,0,0,0);
 		toolbar4->layout()->setSpacing(2);
 	}
 	QHBoxLayout * l4 = new QHBoxLayout(view2d_frame);
-	l4->setContentsMargins(0,0,0,0); l4->setSpacing(0);
+	l4->setContentsMargins(0,0,0,0);
+	l4->setSpacing(0);
 	l4->addWidget(toolbar4);
 	view2d_label->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
 	view2d_label->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
@@ -806,14 +826,16 @@ void MainWindow::createToolBars()
 	//
 	//
 	toolbar5 = new QToolBar(this);
-	toolbar5->setIconSize(QSize(14,14));
+	toolbar5->setIconSize(
+		QSize((int)(18*scale_icons*adjust_scale_icons),(int)(18*scale_icons*adjust_scale_icons)));
 	if (toolbar5->layout())
 	{
 		toolbar5->layout()->setContentsMargins(0,0,0,0);
 		toolbar5->layout()->setSpacing(2);
 	}
 	QHBoxLayout * l5 = new QHBoxLayout(view3d_frame);
-	l5->setContentsMargins(0,0,0,0); l5->setSpacing(0);
+	l5->setContentsMargins(0,0,0,0);
+	l5->setSpacing(0);
 	l5->addWidget(toolbar5);
 	view3d_label->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
 	view3d_label->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
@@ -827,21 +849,21 @@ void MainWindow::createToolBars()
 	//
 	//
 	toolbar2 = new QToolBar(this);
-	toolbar2->setIconSize(QSize(18,18));
+	toolbar2->setIconSize(
+		QSize((int)(18*scale_icons*adjust_scale_icons),(int)(18*scale_icons*adjust_scale_icons)));
 	if (toolbar2->layout())
 	{
 		toolbar2->layout()->setContentsMargins(0,0,0,0);
 		toolbar2->layout()->setSpacing(2);
 	}
 	QHBoxLayout * l2 = new QHBoxLayout(toolbar2D_frame);
-	l2->setContentsMargins(0,0,0,0); l2->setSpacing(0);
+	l2->setContentsMargins(0,0,0,0);
+	l2->setSpacing(0);
 	l2->addWidget(toolbar2);
 	toolbar2->addAction(animAct2d);
 	toolbar2->addAction(animAct3d);
 	if (!hide_zoom && zoomwidget2D)
 	{
-		zoomwidget2D->plus_pushButton->setIconSize(QSize(18,18));
-		zoomwidget2D->minus_pushButton->setIconSize(QSize(18,18));
 		toolbar2->addWidget(zoomwidget2D);
 	}
 	toolbar2->addWidget(lutwidget2);
@@ -868,19 +890,19 @@ void MainWindow::createToolBars()
 	//
 	//
 	toolbar3 = new QToolBar(this);
-	toolbar3->setIconSize(QSize(18,18));
+	toolbar3->setIconSize(
+		QSize((int)(18*scale_icons*adjust_scale_icons),(int)(18*scale_icons*adjust_scale_icons)));
 	if (toolbar3->layout())
 	{
 		toolbar3->layout()->setContentsMargins(0,0,0,0);
 		toolbar3->layout()->setSpacing(2);
 	}
 	QHBoxLayout * l3 = new QHBoxLayout(toolbar3D_frame);
-	l3->setContentsMargins(0,0,0,0); l3->setSpacing(0);
+	l3->setContentsMargins(0,0,0,0);
+	l3->setSpacing(0);
 	l3->addWidget(toolbar3);
 	if (!hide_zoom && zoomwidget3D)
 	{
-		zoomwidget3D->plus_pushButton->setIconSize(QSize(18,18));
-		zoomwidget3D->minus_pushButton->setIconSize(QSize(18,18));
 		toolbar3->addWidget(zoomwidget3D);
 	}
 	toolbar3->addAction(zlockAct);
@@ -1364,6 +1386,7 @@ void MainWindow::set_ui()
 		zrange_frame->show();
 		slider_frame->show();
 		view2d_frame->show();
+		info_line->show();
 		view2d_label->setText("Slice view (Z)");
 		actionViews2DMenu->setEnabled(true);
 		if (saved_ok3d)

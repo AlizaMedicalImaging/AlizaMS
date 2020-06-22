@@ -128,7 +128,7 @@ const QString head = QString(
 	" type='text/css' href='format.css'></head><body>");
 const QString foot = QString("</body></html>");
 
-ImagesBox::ImagesBox(QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
+ImagesBox::ImagesBox(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
 {
 	setupUi(this);
 	//
@@ -159,7 +159,7 @@ ImagesBox::ImagesBox(QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
 	//
 	QToolBar * toolbar = new QToolBar(this);
 	toolbar->setOrientation(Qt::Horizontal);
-	toolbar->setIconSize(QSize(18,18));
+	toolbar->setIconSize(QSize((int)(18*si),(int)(18*si)));
 	toolbar->setSizePolicy(
 		QSizePolicy::Fixed,QSizePolicy::Fixed);
 	if (toolbar->layout())
@@ -181,7 +181,7 @@ ImagesBox::ImagesBox(QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
 	//
 	QToolBar * toolbar2 = new QToolBar(this);
 	toolbar2->setOrientation(Qt::Horizontal);
-	toolbar2->setIconSize(QSize(18,18));
+	toolbar2->setIconSize(QSize((int)(18*si),(int)(18*si)));
 	toolbar2->setSizePolicy(
 		QSizePolicy::Fixed,QSizePolicy::Fixed);
 	toolbar2->setLayoutDirection(Qt::RightToLeft);

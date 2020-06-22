@@ -44,7 +44,7 @@
             <x>0</x>
             <y>0</y>
             <width>991</width>
-            <height>677</height>
+            <height>683</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_14">
@@ -227,13 +227,81 @@
             <x>0</x>
             <y>0</y>
             <width>991</width>
-            <height>677</height>
+            <height>683</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <property name="margin">
             <number>6</number>
            </property>
+           <item>
+            <widget class="QCheckBox" name="dark_checkBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Dark theme</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <widget class="QLabel" name="si_label">
+               <property name="text">
+                <string>Scale UI icons (restart is required)</string>
+               </property>
+               <property name="textFormat">
+                <enum>Qt::PlainText</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="si_doubleSpinBox">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="decimals">
+                <number>1</number>
+               </property>
+               <property name="minimum">
+                <double>0.500000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>5.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.500000000000000</double>
+               </property>
+               <property name="value">
+                <double>1.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_8">
              <item>
@@ -338,8 +406,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>991</width>
-            <height>677</height>
+            <width>482</width>
+            <height>244</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -621,11 +689,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string notr="true"/>
-     </property>
-     <property name="icon">
-      <iconset resource="../alizams.qrc">
-       <normaloff>:/bitmaps/reload.svg</normaloff>:/bitmaps/reload.svg</iconset>
+      <string notr="true">Reset to default</string>
      </property>
     </widget>
    </item>
@@ -641,6 +705,8 @@
   <tabstop>time_s__checkBox</tabstop>
   <tabstop>rescale_checkBox</tabstop>
   <tabstop>scrollArea</tabstop>
+  <tabstop>dark_checkBox</tabstop>
+  <tabstop>si_doubleSpinBox</tabstop>
   <tabstop>pt_doubleSpinBox</tabstop>
   <tabstop>scrollArea_2</tabstop>
   <tabstop>textureoptions_groupBox</tabstop>

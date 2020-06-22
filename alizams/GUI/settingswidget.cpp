@@ -9,9 +9,11 @@
 #include "commonutils.h"
 #include "dicomutils.h"
 
-SettingsWidget::SettingsWidget(QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
+SettingsWidget::SettingsWidget(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
 {
 	setupUi(this);
+	dark_checkBox->hide(); // TODO
+	scale_icons = si;
 	x_comboBox->addItem(QString("256"));
 	x_comboBox->addItem(QString("128"));
 	x_comboBox->addItem(QString("64"));
@@ -89,6 +91,8 @@ void SettingsWidget::set_enable_texture_groupbox(bool t)
 
 void SettingsWidget::set_default()
 {
+	dark_checkBox->setChecked(true);
+	si_doubleSpinBox->setValue(1.0);
 	pt_doubleSpinBox->setValue(12.0);
 	//
 	original_radioButton->setChecked(true);
@@ -201,22 +205,34 @@ void SettingsWidget::readSettings()
 		QApplication::applicationName());
 	settings.setFallbacksEnabled(true);
 	settings.beginGroup(QString("GlobalSettings"));
-	double tmp1 = settings.value(QString("app_font_pt"), 0.0).toDouble();
+	double tmp1 = settings.value(QString("scale_ui_icons"), 1.0).toDouble();
+	double tmp2 = settings.value(QString("app_font_pt"), 0.0).toDouble();
 	settings.endGroup();
-	if (tmp1 <= 0.0) tmp1 = 12.0;
-	pt_doubleSpinBox->setValue(tmp1);
+	si_doubleSpinBox->setValue(tmp1);
+	if (tmp2 <= 0.0) tmp2 = 12.0;
+	pt_doubleSpinBox->setValue(tmp2);
 #endif
 }
 
 void SettingsWidget::writeSettings(QSettings & settings)
 {
 #ifdef USE_WORKSTATION_MODE
+	const double scale_ui_icons = si_doubleSpinBox->value();
 	const double x =
 		pt_doubleSpinBox->value() < 6.0 ? 6.0 : pt_doubleSpinBox->value();
 	settings.beginGroup(QString("GlobalSettings"));
+	settings.setValue(QString("scale_ui_icons"),   QVariant(scale_ui_icons));
 	settings.setValue(QString("app_font_pt"), QVariant(x));
 	settings.endGroup();
 #endif
 }
 
+float SettingsWidget::get_scale_icons() const
+{
+	return scale_icons*(float)si_doubleSpinBox->value();
+}
 
+bool SettingsWidget::get_dark_theme() const
+{
+	return dark_checkBox->isChecked();
+}

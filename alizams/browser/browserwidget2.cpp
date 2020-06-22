@@ -86,12 +86,20 @@ void BrowserWidget2::compute_offsets(const mdcm::SequenceOfItems * sq, mdcm::VL 
 	}
 }
 
-BrowserWidget2::BrowserWidget2(QWidget * p) : QWidget(p)
+BrowserWidget2::BrowserWidget2(float si, QWidget * p) : QWidget(p)
 {
 	once = false;
 	eye_icon  = QIcon(":/bitmaps/eye.svg");
 	eye2_icon = QIcon(":/bitmaps/eye2.svg");
 	setupUi(this);
+	const QSize s = QSize((int)(24*si),(int)(24*si));
+	opendir1_pushButton->setIconSize(s);
+	dicomdir_pushButton->setIconSize(s);
+	ctk_pushButton->setIconSize(s);
+	reload_pushButton->setIconSize(s);
+	meta_pushButton->setIconSize(s);
+	copy_pushButton->setIconSize(s);
+	load_pushButton->setIconSize(s);
 	//
 	tableWidget->hideColumn(0);
 	tableWidget->setColumnWidth(1, 24);

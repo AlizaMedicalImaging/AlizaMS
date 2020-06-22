@@ -1,8 +1,11 @@
 #include "toolbox2D.h"
 
-ToolBox2D::ToolBox2D(QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
+ToolBox2D::ToolBox2D(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
 {
 	setupUi(this);
+	const QSize s = QSize((int)(18*si),(int)(18*si));
+	resetlevel_pushButton->setIconSize(s);
+	maxwin_pushButton->setIconSize(s);
 	set_style_sheet();
 	red   = QPixmap(":/bitmaps/red.svg");
 	green = QPixmap(":/bitmaps/green.svg");

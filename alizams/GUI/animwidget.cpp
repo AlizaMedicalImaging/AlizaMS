@@ -1,8 +1,13 @@
 #include "animwidget.h"
 
-AnimWidget::AnimWidget(QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
+AnimWidget::AnimWidget(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
 {
 	setupUi(this);
+	const QSize s = QSize((int)(18*si),(int)(18*si));
+	start_pushButton->setIconSize(s);
+	stop_pushButton->setIconSize(s);
+	group_pushButton->setIconSize(s);
+	remove_pushButton->setIconSize(s);
 	stop_pushButton->setEnabled(false);
 	acq_spinBox->hide();
 	acq_spinBox->clear();

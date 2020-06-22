@@ -7,7 +7,7 @@ class AnimWidget: public QWidget, public Ui::AnimWidget
 {
 	Q_OBJECT
 public:
-	AnimWidget(QWidget(*)=NULL, Qt::WindowFlags=0);
+	AnimWidget(float, QWidget(*)=NULL, Qt::WindowFlags=0);
 	~AnimWidget();
 private:
 };

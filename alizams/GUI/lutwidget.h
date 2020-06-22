@@ -8,7 +8,7 @@ class LUTWidget: public QWidget
 {
 	Q_OBJECT
 public:
-	LUTWidget(QWidget(*)=NULL, Qt::WindowFlags=0);
+	LUTWidget(float, QWidget(*)=NULL, Qt::WindowFlags=0);
 	~LUTWidget();
 	void add_items1();
 	void add_items2();
@@ -16,6 +16,8 @@ public:
 	QComboBox * comboBox;
 public slots:
 	void set_lut(int);
+private:
+	float scale_icons;
 };
 
 #endif // LUTWIDGET_H

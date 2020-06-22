@@ -36,18 +36,6 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="minimumSize">
-        <size>
-         <width>36</width>
-         <height>36</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>36</width>
-         <height>36</height>
-        </size>
-       </property>
        <property name="toolTip">
         <string>Select directory</string>
        </property>
@@ -73,18 +61,6 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>36</width>
-         <height>36</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>36</width>
-         <height>36</height>
-        </size>
        </property>
        <property name="toolTip">
         <string>Open DICOMDIR</string>
@@ -112,18 +88,6 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="minimumSize">
-        <size>
-         <width>36</width>
-         <height>36</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>36</width>
-         <height>36</height>
-        </size>
-       </property>
        <property name="toolTip">
         <string>Open DICOMDIR</string>
        </property>
@@ -149,18 +113,6 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>36</width>
-         <height>36</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>36</width>
-         <height>36</height>
-        </size>
        </property>
        <property name="mouseTracking">
         <bool>false</bool>
@@ -193,18 +145,6 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>36</width>
-         <height>36</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>36</width>
-         <height>36</height>
-        </size>
        </property>
        <property name="mouseTracking">
         <bool>false</bool>
@@ -239,18 +179,6 @@ Click to update</string>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="minimumSize">
-        <size>
-         <width>36</width>
-         <height>36</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>36</width>
-         <height>36</height>
-        </size>
-       </property>
        <property name="mouseTracking">
         <bool>false</bool>
        </property>
@@ -282,18 +210,6 @@ Click to update</string>
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>36</width>
-         <height>36</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>36</width>
-         <height>36</height>
-        </size>
        </property>
        <property name="mouseTracking">
         <bool>false</bool>

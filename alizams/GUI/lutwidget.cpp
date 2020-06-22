@@ -4,7 +4,7 @@
 #include <QSizePolicy>
 #include <QFont>
 
-LUTWidget::LUTWidget(QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
+LUTWidget::LUTWidget(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
 {
 	QFont small(QString("Arial"), 8);
 	setFont(small);
@@ -56,7 +56,7 @@ void LUTWidget::add_items1()
     sizePolicy.setVerticalStretch(0);
     sizePolicy.setHeightForWidth(comboBox->sizePolicy().hasHeightForWidth());
     comboBox->setSizePolicy(sizePolicy);
-    comboBox->setIconSize(QSize(18, 18));
+    comboBox->setIconSize(QSize((int)(18*scale_icons),(int)(18*scale_icons)));
     comboBox->setFrame(true);
 	comboBox->setCurrentIndex(0);
 }
@@ -93,7 +93,7 @@ void LUTWidget::add_items2()
     sizePolicy.setVerticalStretch(0);
     sizePolicy.setHeightForWidth(comboBox->sizePolicy().hasHeightForWidth());
     comboBox->setSizePolicy(sizePolicy);
-    comboBox->setIconSize(QSize(18, 18));
+    comboBox->setIconSize(QSize((int)(18*scale_icons),(int)(18*scale_icons)));
     comboBox->setFrame(true);
 	comboBox->setCurrentIndex(0);
 }

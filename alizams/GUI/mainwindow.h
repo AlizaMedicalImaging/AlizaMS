@@ -29,8 +29,7 @@ class MainWindow : public QMainWindow, private Ui::MainWindow
 public:
     MainWindow(
 		bool /*3D*/,
-		bool /*hide zoom*/,
-		const QString& /*OpenGL info*/
+		bool /*hide zoom*/
 		);
 	~MainWindow();
 	void open_args(const QStringList&);
@@ -117,6 +116,8 @@ private:
 	//
 	QSize  mainwindow_size;
 	QPoint mainwindow_pos;
+	float  scale_icons;
+	float  adjust_scale_icons;
 	//
 	Aliza            * aliza;
 	GLWidget         * glwidget;
@@ -199,7 +200,6 @@ private:
 	QVBoxLayout * slider_frame_layout;
 	QVBoxLayout * slider_frame_layoutZ;
 	QLabel  * anim_label;
-	QString testgl_info;
 };
 
 #endif

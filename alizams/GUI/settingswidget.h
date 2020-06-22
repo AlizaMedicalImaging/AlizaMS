@@ -10,7 +10,7 @@ class SettingsWidget: public QWidget, public Ui::SettingsWidget
 	Q_OBJECT
 
 public:
-	SettingsWidget(QWidget(*)=NULL, Qt::WindowFlags=0);
+	SettingsWidget(float, QWidget(*)=NULL, Qt::WindowFlags=0);
 	~SettingsWidget();
 	short   get_filtering() const;
 	bool    get_resize() const;
@@ -31,9 +31,12 @@ public:
 	bool    get_level_for_PET() const;
 	bool    get_clean_unused_bits() const;
 	void    writeSettings(QSettings&);
+	float   get_scale_icons() const;
+	bool    get_dark_theme() const;
 
 private:
 	bool vbos65535warn;
+	float scale_icons;
 
 private slots:
 	void set_default();
