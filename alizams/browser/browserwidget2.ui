@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>BrowserWidget2</class>
+ <widget class="QWidget" name="BrowserWidget2">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1020</width>
+    <height>520</height>
+   </rect>
+  </property>
+  <property name="acceptDrops">
+   <bool>true</bool>
+  </property>
+  <property name="windowTitle">
+   <string>DICOM Browser</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>2</number>
+   </property>
+   <property name="margin">
+    <number>2</number>
+   </property>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_8">
+     <property name="spacing">
+      <number>7</number>
+     </property>
+     <item>
+      <widget class="QPushButton" name="opendir1_pushButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>36</width>
+         <height>36</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>36</width>
+         <height>36</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>Select directory</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../alizams.qrc">
+         <normaloff>:/bitmaps/folder.svg</normaloff>:/bitmaps/folder.svg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="dicomdir_pushButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>36</width>
+         <height>36</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>36</width>
+         <height>36</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>Open DICOMDIR</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../alizams.qrc">
+         <normaloff>:/bitmaps/dcmdir.svg</normaloff>:/bitmaps/dcmdir.svg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="ctk_pushButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>36</width>
+         <height>36</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>36</width>
+         <height>36</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>Open DICOMDIR</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../alizams.qrc">
+         <normaloff>:/bitmaps/ctk.svg</normaloff>:/bitmaps/ctk.svg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="reload_pushButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>36</width>
+         <height>36</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>36</width>
+         <height>36</height>
+        </size>
+       </property>
+       <property name="mouseTracking">
+        <bool>false</bool>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Refresh</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../alizams.qrc">
+         <normaloff>:/bitmaps/reload.svg</normaloff>:/bitmaps/reload.svg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="meta_pushButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>36</width>
+         <height>36</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>36</width>
+         <height>36</height>
+        </size>
+       </property>
+       <property name="mouseTracking">
+        <bool>false</bool>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Metadata (first file if series)
+Click to update</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../alizams.qrc">
+         <normaloff>:/bitmaps/meta.svg</normaloff>:/bitmaps/meta.svg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="copy_pushButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>36</width>
+         <height>36</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>36</width>
+         <height>36</height>
+        </size>
+       </property>
+       <property name="mouseTracking">
+        <bool>false</bool>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Copy to folder</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../alizams.qrc">
+         <normaloff>:/bitmaps/copy2.svg</normaloff>:/bitmaps/copy2.svg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="load_pushButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>36</width>
+         <height>36</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>36</width>
+         <height>36</height>
+        </size>
+       </property>
+       <property name="mouseTracking">
+        <bool>false</bool>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Load</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../alizams.qrc">
+         <normaloff>:/bitmaps/right0.svg</normaloff>:/bitmaps/right0.svg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="directory_lineEdit">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>24</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="acceptDrops">
+      <bool>false</bool>
+     </property>
+     <property name="frame">
+      <bool>false</bool>
+     </property>
+     <property name="echoMode">
+      <enum>QLineEdit::Normal</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>2</number>
+     </property>
+     <item>
+      <widget class="QTableWidget" name="tableWidget">
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
+       <property name="showDropIndicator" stdset="0">
+        <bool>true</bool>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::ExtendedSelection</enum>
+       </property>
+       <property name="selectionBehavior">
+        <enum>QAbstractItemView::SelectRows</enum>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>18</width>
+         <height>18</height>
+        </size>
+       </property>
+       <property name="sortingEnabled">
+        <bool>false</bool>
+       </property>
+       <column>
+        <property name="text">
+         <string notr="true">ID</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string notr="true"/>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string notr="true">Modality</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string notr="true">Patient</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string notr="true">Birthdate</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string notr="true">Study</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string notr="true">Date</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string notr="true">Series</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Date</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string notr="true">Files</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>opendir1_pushButton</tabstop>
+  <tabstop>dicomdir_pushButton</tabstop>
+  <tabstop>ctk_pushButton</tabstop>
+  <tabstop>reload_pushButton</tabstop>
+  <tabstop>meta_pushButton</tabstop>
+  <tabstop>copy_pushButton</tabstop>
+  <tabstop>load_pushButton</tabstop>
+  <tabstop>tableWidget</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../alizams.qrc"/>
+ </resources>
+ <connections/>
+</ui>

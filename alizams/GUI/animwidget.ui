@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AnimWidget</class>
+ <widget class="QWidget" name="AnimWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>633</width>
+    <height>38</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="spacing">
+    <number>4</number>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>.....</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="start_pushButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>Play animation</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../alizams.qrc">
+       <normaloff>:/bitmaps/play.svg</normaloff>:/bitmaps/play.svg</iconset>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="stop_pushButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>Stop animation</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../alizams.qrc">
+       <normaloff>:/bitmaps/stop.svg</normaloff>:/bitmaps/stop.svg</iconset>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
+     </property>
+     <property name="textInteractionFlags">
+      <set>Qt::NoTextInteraction</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="group_pushButton">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create 4D image group&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string notr="true"/>
+     </property>
+     <property name="icon">
+      <iconset resource="../alizams.qrc">
+       <normaloff>:/bitmaps/group.svg</normaloff>:/bitmaps/group.svg</iconset>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="remove_pushButton">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remove 4D groups&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string notr="true"/>
+     </property>
+     <property name="icon">
+      <iconset resource="../alizams.qrc">
+       <normaloff>:/bitmaps/delete.svg</normaloff>:/bitmaps/delete.svg</iconset>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QSpinBox" name="acq_spinBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>Frame time from DICOM acq. times</string>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="buttonSymbols">
+      <enum>QAbstractSpinBox::NoButtons</enum>
+     </property>
+     <property name="suffix">
+      <string notr="true"> ms</string>
+     </property>
+     <property name="prefix">
+      <string notr="true"/>
+     </property>
+     <property name="maximum">
+      <number>999999999</number>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSpinBox" name="frametime_spinBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>Frame time</string>
+     </property>
+     <property name="accelerated">
+      <bool>true</bool>
+     </property>
+     <property name="suffix">
+      <string notr="true"> ms</string>
+     </property>
+     <property name="prefix">
+      <string notr="true"/>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
+     </property>
+     <property name="value">
+      <number>120</number>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="t_checkBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>Use DICOM acquisition times</string>
+     </property>
+     <property name="text">
+      <string>Acq.</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>start_pushButton</tabstop>
+  <tabstop>stop_pushButton</tabstop>
+  <tabstop>group_pushButton</tabstop>
+  <tabstop>remove_pushButton</tabstop>
+  <tabstop>acq_spinBox</tabstop>
+  <tabstop>frametime_spinBox</tabstop>
+  <tabstop>t_checkBox</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../alizams.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>t_checkBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>frametime_spinBox</receiver>
+   <slot>setHidden(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>536</x>
+     <y>29</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>568</x>
+     <y>28</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>t_checkBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>acq_spinBox</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>536</x>
+     <y>29</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>472</x>
+     <y>28</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

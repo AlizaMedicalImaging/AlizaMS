@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SQtree</class>
+ <widget class="QWidget" name="SQtree">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>962</width>
+    <height>594</height>
+   </rect>
+  </property>
+  <property name="focusPolicy">
+   <enum>Qt::NoFocus</enum>
+  </property>
+  <property name="acceptDrops">
+   <bool>true</bool>
+  </property>
+  <property name="windowTitle">
+   <string>DICOM Metadata</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="margin">
+    <number>6</number>
+   </property>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>Open file</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../alizams.qrc">
+         <normaloff>:/bitmaps/file.svg</normaloff>:/bitmaps/file.svg</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lineEdit">
+       <property name="toolTip">
+        <string>Read during a loading. Drop any DICOM file.</string>
+       </property>
+       <property name="frame">
+        <bool>false</bool>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="options_toolButton">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../alizams.qrc">
+         <normaloff>:/bitmaps/tool.svg</normaloff>:/bitmaps/tool.svg</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QSlider" name="horizontalSlider">
+     <property name="pageStep">
+      <number>1</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="ms_lineEdit">
+     <property name="frame">
+      <bool>false</bool>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="ts_lineEdit">
+     <property name="frame">
+      <bool>false</bool>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <widget class="QTreeWidget" name="treeWidget">
+      <property name="contextMenuPolicy">
+       <enum>Qt::ActionsContextMenu</enum>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::SingleSelection</enum>
+      </property>
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectItems</enum>
+      </property>
+      <property name="sortingEnabled">
+       <bool>false</bool>
+      </property>
+      <property name="animated">
+       <bool>false</bool>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+      <property name="headerHidden">
+       <bool>false</bool>
+      </property>
+      <property name="columnCount">
+       <number>5</number>
+      </property>
+      <attribute name="headerVisible">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="headerCascadingSectionResizes">
+       <bool>false</bool>
+      </attribute>
+      <column>
+       <property name="text">
+        <string notr="true">Tag</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string notr="true">Description</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string notr="true">VR</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string notr="true">Size</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string notr="true">Value</string>
+       </property>
+      </column>
+     </widget>
+     <widget class="QTextEdit" name="textEdit">
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>pushButton</tabstop>
+  <tabstop>lineEdit</tabstop>
+  <tabstop>options_toolButton</tabstop>
+  <tabstop>horizontalSlider</tabstop>
+  <tabstop>ms_lineEdit</tabstop>
+  <tabstop>ts_lineEdit</tabstop>
+  <tabstop>treeWidget</tabstop>
+  <tabstop>textEdit</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../alizams.qrc"/>
+ </resources>
+ <connections/>
+</ui>
