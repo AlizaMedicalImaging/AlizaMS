@@ -169,20 +169,13 @@ int main(int argc, char *argv[])
 	QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
 #endif
 	QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
+/*
 	if (!metadata_only)
 	{
-#if 1
     	QSurfaceFormat format;
-		format.setRenderableType(QSurfaceFormat::OpenGL);
-    	format.setRedBufferSize(8);
-    	format.setGreenBufferSize(8);
-    	format.setBlueBufferSize(8);
-    	format.setAlphaBufferSize(8);
-    	format.setDepthBufferSize(24);
-    	format.setSamples(4);
-		format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-#endif
+		QSurfaceFormat::setDefaultFormat(format);
 	}
+*/
 	QApplication app(argc, argv);
 	app.setOrganizationName(QString("Aliza"));
 	app.setOrganizationDomain(QString("aliza-dicom-viewer.com"));

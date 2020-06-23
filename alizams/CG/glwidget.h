@@ -104,9 +104,9 @@ public:
 
 	MY_DECLARE_NEW()
 
-	GLWidget(QWidget(*)=NULL, Qt::WindowFlags=0);
+	GLWidget(QWidget(*)=nullptr, Qt::WindowFlags=0);
 	~GLWidget();
-	void updateGL() { makeCurrent(); update(); }
+	void updateGL() { update(); }
 	void init_();
 	void close_();
 	void zoom_in();
@@ -130,7 +130,6 @@ public:
 	void set_forward();
 	void set_backward();
 	QString get_system_info() const;
-	void  close();
 	float mparams[16];
 	float sparams[9];
 	btCollisionWorld * m_collisionWorld;
@@ -387,14 +386,14 @@ public slots:
 	void set_contours_width(float);
 
 protected:
-	void initializeGL();
-	void paintGL();
-	void resizeGL(int, int);
-	void mousePressEvent(QMouseEvent*);
-	void mouseReleaseEvent(QMouseEvent*);
-	void mouseMoveEvent(QMouseEvent*);
-	void wheelEvent(QWheelEvent*);
-	void keyPressEvent(QKeyEvent*);
+	void initializeGL() override;
+	void paintGL() override;
+	void resizeGL(int, int) override;
+	void mousePressEvent(QMouseEvent*) override;
+	void mouseReleaseEvent(QMouseEvent*) override;
+	void mouseMoveEvent(QMouseEvent*) override;
+	void wheelEvent(QWheelEvent*) override;
+	void keyPressEvent(QKeyEvent*) override;
 	QPoint lastPos;
 	QPoint lastPanPos;
 	QPoint lastPosScale;

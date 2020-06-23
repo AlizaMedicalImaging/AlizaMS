@@ -178,7 +178,7 @@ GLWidget::GLWidget(QWidget * p, Qt::WindowFlags f)
 {
 	setMinimumSize(64,64);
 	setFocusPolicy(Qt::WheelFocus);
-#if 0
+#if 1
     QSurfaceFormat format;
 	format.setRenderableType(QSurfaceFormat::OpenGL);
     format.setRedBufferSize(8);
@@ -191,12 +191,6 @@ GLWidget::GLWidget(QWidget * p, Qt::WindowFlags f)
     setFormat(format);
 #endif
 	init_();
-}
-
-void GLWidget::close_()
-{
-	makeCurrent();
-	close();
 }
 
 void GLWidget::initializeGL()
@@ -215,7 +209,6 @@ void GLWidget::paintGL()
 void GLWidget::resizeGL(int width, int height)
 {
 	resize(width,height);
-	updateGL();
 }
 
 void GLWidget::mousePressEvent(QMouseEvent * e)
@@ -592,10 +585,11 @@ GLWidget::~GLWidget()
 	selected_images__ = NULL; 
 }
 
-void GLWidget::close()
+void GLWidget::close_()
 {
 	if (no_opengl3) return;
 	if (!opengl_init_done) return;
+	makeCurrent();
 	if (gradient1>0) {glDeleteTextures(1,&gradient1);gradient1=0;increment_count_tex(-1);}
 	if (gradient2>0) {glDeleteTextures(1,&gradient2);gradient2=0;increment_count_tex(-1);}
 	if (gradient3>0) {glDeleteTextures(1,&gradient3);gradient3=0;increment_count_tex(-1);}
@@ -666,7 +660,6 @@ void GLWidget::close()
 
 void GLWidget::init_opengl(int w, int h)
 {
-	makeCurrent();
 	if (opengl_init_done) return;
 	opengl_init_done = true;
 	for (int i = 0; i < 16; i++) mparams[i] = 0.0f;
