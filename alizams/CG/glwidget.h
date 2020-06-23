@@ -3,7 +3,6 @@
 
 #include "camera.h"
 #include <QOpenGLWidget>
-//#include <QOpenGLFunctions>
 #include <QOpenGLFunctions_3_0>
 #include <QPoint>
 #include <QModelIndex>
@@ -20,8 +19,7 @@
 #define SCENE_POS_Z 400
 #define SCENE_FOV 45
 #define SCENE_FAR_PLANE 10000
-#define SCENE_ALPHA 0.55
-
+#define SCENE_ALPHA 1.0
 #define VBOIDS_SIZE 4
 #define TEXTURES_SIZE 8
 #define MAX_SHADOWS_ 1
@@ -168,9 +166,6 @@ public:
 	GLuint gradient6;
 	GLuint gradient7;
 	void gen_lut_tex(const unsigned char*, const int, GLuint*);
-#if 0
-	void load_lut_tex(const QString&, GLuint*);
-#endif
 	bool ortho_proj;
 	float fov;
 	float far_plane;

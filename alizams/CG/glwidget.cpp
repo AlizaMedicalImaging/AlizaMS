@@ -569,7 +569,7 @@ void GLWidget::init_()
 	alpha = (float)SCENE_ALPHA;
 	brightness = 1.0f;
 	m_collisionWorld = NULL;
-	draw_frames_3d = true;
+	draw_frames_3d = false;
 	display_contours = true;
 	old_win_pos_x  = 0;
 	old_win_pos_y  = 0;
@@ -2765,7 +2765,7 @@ void GLWidget::gen_lut_tex(const unsigned char * lut, const int size, GLuint * t
 	if (glerror!=0)
 	{
 		std::cout
-			<< "load_lut_tex() : OpenGL Error "
+			<< "gen_lut_tex() : OpenGL Error "
 			<< glerror
 			<< std::endl;
 	}

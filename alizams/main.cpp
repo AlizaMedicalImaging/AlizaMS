@@ -27,7 +27,7 @@
 #include <QTimer>
 #endif
 
-#ifdef USE_WORKSTATION_MODE
+#if 1
 #include <QSettings>
 #endif
 
@@ -193,7 +193,7 @@ int main(int argc, char *argv[])
 		const int hide_zoom_ = 1;
 		hide_zoom = (hide_zoom_==1) ? true : false;
 		double app_font_pt   = 0.0;
-#ifdef USE_WORKSTATION_MODE
+#if 1
 		QSettings settings(
 			QSettings::IniFormat,
 			QSettings::UserScope,
@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
 			{
 				f.setPointSizeF(app_font_pt);
 				app.setFont(f);
-#ifdef USE_WORKSTATION_MODE
+#if 1
 				settings.beginGroup(QString("GlobalSettings"));
 				settings.setValue(QString("app_font_pt"), QVariant(app_font_pt));
 				settings.endGroup();
@@ -226,7 +226,7 @@ int main(int argc, char *argv[])
 		}
 		app.setFont(f);
 		//
-		if (false)
+		if (true)
 		{
 			QColor bg(0x53, 0x59, 0x60);
 			QColor tt(0x30, 0x39, 0x47);

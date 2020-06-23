@@ -63,7 +63,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>680</width>
+        <width>623</width>
         <height>96</height>
        </rect>
       </property>
@@ -344,16 +344,16 @@
             <number>3</number>
            </property>
            <property name="minimum">
-            <double>0.005000000000000</double>
+            <double>0.025000000000000</double>
            </property>
            <property name="maximum">
             <double>10.000000000000000</double>
            </property>
            <property name="singleStep">
-            <double>0.010000000000000</double>
+            <double>0.025000000000000</double>
            </property>
            <property name="value">
-            <double>0.550000000000000</double>
+            <double>1.000000000000000</double>
            </property>
           </widget>
          </item>

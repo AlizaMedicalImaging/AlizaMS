@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include <QtGlobal>
 #include <QApplication>
-#ifdef USE_WORKSTATION_MODE
+#if 1
 #include <QSettings>
 #endif
 #include <QMessageBox>
@@ -55,7 +55,7 @@ MainWindow::MainWindow(
 	//
 	scale_icons = 1.0f;
 	adjust_scale_icons = 1.0f;
-#ifdef USE_WORKSTATION_MODE
+#if 1
 	{
 		QSettings settings(
 			QSettings::IniFormat, QSettings::UserScope,
@@ -562,7 +562,7 @@ void MainWindow::createActions()
 	openanyAct    = new QAction(QIcon(":/bitmaps/file.svg"),  QString("Open file"),            this);
 	showMetadata  = new QAction(QIcon(":/bitmaps/meta.svg"),  QString("View DICOM Metadata"),  this);
 	exitAct       = new QAction(QIcon(":/bitmaps/delete.svg"),QString("Exit"),                 this);
-	aboutAct      = new QAction(QIcon(":/bitmaps/info.svg"),  QString("About / License"),      this);
+	aboutAct      = new QAction(QIcon(":/bitmaps/info.svg"),  QString("About"),      this);
 	settingsAct   = new QAction(QIcon(":/bitmaps/tool.svg"),  QString("Settings"),             this);
 	exitAct->setShortcuts(QKeySequence::Quit);
 	axis_group = new QActionGroup(this);
@@ -639,7 +639,7 @@ void MainWindow::createActions()
 	frames3DAct = new QAction(QIcon(":/bitmaps/square.svg"),
 		QString("Show frames"), this);
 	frames3DAct->setCheckable(true);
-	frames3DAct->setChecked(true);
+	frames3DAct->setChecked(false);
 	resetRectAct2 = new QAction(QIcon(":/bitmaps/reload.svg"),
 		QString("Reset 2D view"), this);
 	resetRectAct2->setEnabled(true);

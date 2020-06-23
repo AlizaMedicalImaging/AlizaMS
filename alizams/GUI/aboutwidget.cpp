@@ -65,15 +65,15 @@ QString AboutWidget::get_build_info()
 	s.append(QString(" 32 Bit"));
 #endif
 #endif
-#if 1
+#if 0
 	s.append(QString("\nMDCM ") +
 		QString::fromLatin1(mdcm::Version::GetVersion()));
 #endif
-#if 1
+#if 0
 	s.append(QString("\nITK ") +
 		QString::fromLatin1(itk::Version::GetITKVersion()));
 #endif
-#if 1
+#if 0
 	s.append(QString("\nQt ") + QVariant(QT_VERSION_STR).toString());
 #endif
 	return s;

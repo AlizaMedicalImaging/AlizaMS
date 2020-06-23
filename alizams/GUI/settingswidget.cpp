@@ -20,7 +20,7 @@ SettingsWidget::SettingsWidget(float si, QWidget * p, Qt::WindowFlags f) : QWidg
 	y_comboBox->addItem(QString("256"));
 	y_comboBox->addItem(QString("128"));
 	y_comboBox->addItem(QString("64"));
-#ifdef USE_WORKSTATION_MODE
+#if 1
 	readSettings();
 #else
 	{
@@ -197,7 +197,7 @@ bool SettingsWidget::get_clean_unused_bits() const
 
 void SettingsWidget::readSettings()
 {
-#ifdef USE_WORKSTATION_MODE
+#if 1
 	QSettings settings(
 		QSettings::IniFormat,
 		QSettings::UserScope,
@@ -216,7 +216,7 @@ void SettingsWidget::readSettings()
 
 void SettingsWidget::writeSettings(QSettings & settings)
 {
-#ifdef USE_WORKSTATION_MODE
+#if 1
 	const double scale_ui_icons = si_doubleSpinBox->value();
 	const double x =
 		pt_doubleSpinBox->value() < 6.0 ? 6.0 : pt_doubleSpinBox->value();

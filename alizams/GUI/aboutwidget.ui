@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>About</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
@@ -25,7 +25,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap resource="../alizams.qrc">:/bitmaps/alizams.png</pixmap>
+        <pixmap resource="../alizams.qrc">:/bitmaps/alizams2.svg</pixmap>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -168,8 +168,6 @@
   </layout>
  </widget>
  <resources>
-  <include location="../alizams.qrc"/>
-  <include location="../alizams.qrc"/>
   <include location="../alizams.qrc"/>
  </resources>
  <connections>
