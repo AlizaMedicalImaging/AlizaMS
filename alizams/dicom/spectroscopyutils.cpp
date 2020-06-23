@@ -422,8 +422,6 @@ QString SpectroscopyUtils::ProcessData(
 #endif
 				continue;
 			}
-
-			if (ok3d && gl) gl->makeCurrent();
 			const bool geom_ok = DicomUtils::generate_geometry(
 						empty__,
 						slices,

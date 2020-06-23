@@ -3398,7 +3398,6 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		else
 		{
 			std::cout << error.toStdString() << std::endl;
-			if (ok3d && gl) gl->makeCurrent();
 			delete v;
 			return NULL;
 		}
@@ -3488,7 +3487,6 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 			else
 			{
 				std::cout << error.toStdString() << std::endl;
-				if (ok3d && gl) gl->makeCurrent();
 				delete v;
 				return NULL;
 			}
@@ -3820,7 +3818,6 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 					if (!error.isEmpty())
 					{
 						std::cout << error.toStdString() << std::endl;
-						if (ok3d && gl) gl->makeCurrent();
 						delete v;
 						return NULL;
 					}

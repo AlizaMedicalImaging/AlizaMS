@@ -668,8 +668,7 @@ quit__:
 
 template<typename T> void read_geometry_from_image(
 	ImageVariant * ivariant,
-	const typename T::Pointer & image,
-	const bool ok3d, GLWidget * gl)
+	const typename T::Pointer & image)
 {
 	if (!ivariant) return;
 	if (image.IsNull()) return;
@@ -687,7 +686,6 @@ template<typename T> void read_geometry_from_image(
 	const double d4 = (double)dircos[0][1];
 	const double d5 = (double)dircos[1][1];
 	const double d6 = (double)dircos[2][1];
-	if (ok3d && gl) gl->makeCurrent();
 	for (unsigned int z=0; z < size[2]; z++)
 	{
 		typename T::IndexType idx0, idx1, idx2, idx3;
@@ -729,7 +727,7 @@ template<typename T> void read_geometry_from_image(
 		CommonUtils::generate_cubeslice(
 			ivariant->di->image_slices,
 			QString(""),
-			size[2], z, ok3d,
+			size[2], z,
 			x0, y0, z0, x1, y1, z1, x2, y2, z2, x3, y3, z3,
 			ipp_iop);
 	}
@@ -827,8 +825,7 @@ template <typename T> bool reload_monochrome_image(
 		&& gl);
 	//
 	if (generate_slices)
-		read_geometry_from_image<T>(
-			ivariant,image, ok3d, gl);
+		read_geometry_from_image<T>(ivariant,image);
 	if (calc_center)
 		calc_center_from_image<T>(ivariant,image);
 	//
@@ -970,8 +967,7 @@ template<typename T> bool reload_rgb_image(
 		&(ivariant->di->iz_origin));
 	//
 	if (generate_slices)
-		read_geometry_from_image<T>(
-			ivariant, image, false, NULL);
+		read_geometry_from_image<T>(ivariant, image);
 	if (calc_center)
 		calc_center_from_image<T>(ivariant,image);
 	//
@@ -1015,8 +1011,7 @@ template<typename T> bool reload_rgba_image(
 		&(ivariant->di->iz_origin));
 	//
 	if (generate_slices)
-		read_geometry_from_image<T>(
-			ivariant, image, false, NULL);
+		read_geometry_from_image<T>(ivariant, image);
 	if (calc_center)
 		calc_center_from_image<T>(ivariant,image);
 	//
@@ -1775,7 +1770,6 @@ void CommonUtils::generate_cubeslice(
 			std::vector<ImageSlice*> & slices,
 			const QString & orient,
 			const unsigned int dimz, const unsigned int z,
-			const bool ok3d,
 			const float x0, const float y0, const float z0,
 			const float x1, const float y1, const float z1,
 			const float x2, const float y2, const float z2,
@@ -1828,10 +1822,6 @@ void CommonUtils::generate_cubeslice(
 	cs->ipp_iop[6] = ipp_iop[6];
 	cs->ipp_iop[7] = ipp_iop[7];
 	cs->ipp_iop[8] = ipp_iop[8];
-	if (ok3d)
-	{
-		;;
-	}
 	cs->slice_orientation_string = orient;
 	slices.push_back(cs);
 }
@@ -1859,8 +1849,9 @@ void CommonUtils::generate_spectroscopyslice(
 	cs->fv[ 9] = x3;
 	cs->fv[10] = y3;
 	cs->fv[11] = z3;
-	if (ok3d)
+	if (ok3d && gl)
 	{
+		gl->makeCurrent();
 		if (columns_ >= 2 || rows_ >= 2)
 		{
 			gl->glGenBuffers(1, &(cs->fvboid));
@@ -2024,8 +2015,7 @@ void CommonUtils::copy_slices(
 		x < source->di->image_slices.size();
 		x++)
 	{
-		const ImageSlice * scs =
-			source->di->image_slices.at(x);
+		const ImageSlice * scs = source->di->image_slices.at(x);
 		if (scs)
 		{
 			ImageSlice * cs = new ImageSlice;
@@ -2097,13 +2087,12 @@ void CommonUtils::copy_slices(
 		dest->di->image_slices.clear();
 		return;
 	}
-	dest->di->ix_origin   = source->di->ix_origin;
-	dest->di->iy_origin   = source->di->iy_origin;
-	dest->di->iz_origin   = source->di->iz_origin;
+	dest->di->ix_origin = source->di->ix_origin;
+	dest->di->iy_origin = source->di->iy_origin;
+	dest->di->iz_origin = source->di->iz_origin;
 	for (int j = 0; j < 6; j++)
 	{
-		dest->di->dircos[j] =
-			source->di->dircos[j];
+		dest->di->dircos[j] = source->di->dircos[j];
 	}
 	dest->di->slices_direction_x = source->di->slices_direction_x;
 	dest->di->slices_direction_y = source->di->slices_direction_y;
@@ -2123,8 +2112,7 @@ void CommonUtils::copy_slices(
 	copy_essential(dest, source);
 	for (int j = 0; j < 3; j++)
 	{
-		dest->di->origin[j] =
-			source->di->origin[j];
+		dest->di->origin[j] = source->di->origin[j];
 	}
 	dest->di->origin_ok = source->di->origin_ok;
 }
@@ -3694,83 +3682,57 @@ QString CommonUtils::gen_itk_image(bool * ok,
 	return error;
 }
 
-void CommonUtils::read_geometry_from_image_(
-	ImageVariant * ivariant,
-	const bool ok3d,
-	GLWidget * gl)
+void CommonUtils::read_geometry_from_image_(ImageVariant * v)
 {
-	if (!ivariant) return;
-	const short image_type = ivariant->image_type;
+	if (!v) return;
+	const short image_type = v->image_type;
 	switch (image_type)
 	{
-	case  0: read_geometry_from_image<ImageTypeSS>(
-		ivariant, ivariant->pSS, ok3d, gl);
+	case  0: read_geometry_from_image<ImageTypeSS>(v, v->pSS);
 		break;
-	case  1: read_geometry_from_image<ImageTypeUS>(
-		ivariant, ivariant->pUS, ok3d, gl);
+	case  1: read_geometry_from_image<ImageTypeUS>(v, v->pUS);
 		break;
-	case  2: read_geometry_from_image<ImageTypeSI>(
-		ivariant, ivariant->pSI, ok3d, gl);
+	case  2: read_geometry_from_image<ImageTypeSI>(v, v->pSI);
 		break;
-	case  3: read_geometry_from_image<ImageTypeUI>(
-		ivariant, ivariant->pUI, ok3d, gl);
+	case  3: read_geometry_from_image<ImageTypeUI>(v, v->pUI);
 		break;
-	case  4: read_geometry_from_image<ImageTypeUC>(
-		ivariant, ivariant->pUC, ok3d, gl);
+	case  4: read_geometry_from_image<ImageTypeUC>(v, v->pUC);
 		break;
-	case  5: read_geometry_from_image<ImageTypeF>(
-		ivariant, ivariant->pF,  ok3d, gl);
+	case  5: read_geometry_from_image<ImageTypeF>(v, v->pF);
 		break;
-	case  6: read_geometry_from_image<ImageTypeD>(
-		ivariant, ivariant->pD,  ok3d, gl);
+	case  6: read_geometry_from_image<ImageTypeD>(v, v->pD);
 		break;
-	case  7: read_geometry_from_image<ImageTypeSLL>(
-		ivariant, ivariant->pSLL,  ok3d, gl);
+	case  7: read_geometry_from_image<ImageTypeSLL>(v, v->pSLL);
 		break;
-	case  8: read_geometry_from_image<ImageTypeULL>(
-		ivariant, ivariant->pULL,  ok3d, gl);
+	case  8: read_geometry_from_image<ImageTypeULL>(v, v->pULL);
 		break;
-	case 10: read_geometry_from_image<RGBImageTypeSS>(
-		ivariant, ivariant->pSS_rgb, ok3d, gl);
+	case 10: read_geometry_from_image<RGBImageTypeSS>(v, v->pSS_rgb);
 		break;
-	case 11: read_geometry_from_image<RGBImageTypeUS>(
-		ivariant, ivariant->pUS_rgb, ok3d, gl);
+	case 11: read_geometry_from_image<RGBImageTypeUS>(v, v->pUS_rgb);
 		break;
-	case 12: read_geometry_from_image<RGBImageTypeSI>(
-		ivariant, ivariant->pSI_rgb, ok3d, gl);
+	case 12: read_geometry_from_image<RGBImageTypeSI>(v, v->pSI_rgb);
 		break;
-	case 13: read_geometry_from_image<RGBImageTypeUI>(
-		ivariant, ivariant->pUI_rgb, ok3d, gl);
+	case 13: read_geometry_from_image<RGBImageTypeUI>(v, v->pUI_rgb);
 		break;
-	case 14: read_geometry_from_image<RGBImageTypeUC>(
-		ivariant, ivariant->pUC_rgb, ok3d, gl);
+	case 14: read_geometry_from_image<RGBImageTypeUC>(v, v->pUC_rgb);
 		break;
-	case 15: read_geometry_from_image<RGBImageTypeF>(
-		ivariant, ivariant->pF_rgb,  ok3d, gl);
+	case 15: read_geometry_from_image<RGBImageTypeF>(v, v->pF_rgb);
 		break;
-	case 16: read_geometry_from_image<RGBImageTypeD>(
-		ivariant, ivariant->pD_rgb,  ok3d, gl);
+	case 16: read_geometry_from_image<RGBImageTypeD>(v, v->pD_rgb);
 		break;
-	case 20: read_geometry_from_image<RGBAImageTypeSS>(
-		ivariant, ivariant->pSS_rgba, ok3d, gl);
+	case 20: read_geometry_from_image<RGBAImageTypeSS>(v, v->pSS_rgba);
 		break;
-	case 21: read_geometry_from_image<RGBAImageTypeUS>(
-		ivariant, ivariant->pUS_rgba, ok3d, gl);
+	case 21: read_geometry_from_image<RGBAImageTypeUS>(v, v->pUS_rgba);
 		break;
-	case 22: read_geometry_from_image<RGBAImageTypeSI>(
-		ivariant, ivariant->pSI_rgba, ok3d, gl);
+	case 22: read_geometry_from_image<RGBAImageTypeSI>(v, v->pSI_rgba);
 		break;
-	case 23: read_geometry_from_image<RGBAImageTypeUI>(
-		ivariant, ivariant->pUI_rgba, ok3d, gl);
+	case 23: read_geometry_from_image<RGBAImageTypeUI>(v, v->pUI_rgba);
 		break;
-	case 24: read_geometry_from_image<RGBAImageTypeUC>(
-		ivariant, ivariant->pUC_rgba, ok3d, gl);
+	case 24: read_geometry_from_image<RGBAImageTypeUC>(v, v->pUC_rgba);
 		break;
-	case 25: read_geometry_from_image<RGBAImageTypeF>(
-		ivariant, ivariant->pF_rgba,  ok3d, gl);
+	case 25: read_geometry_from_image<RGBAImageTypeF>(v, v->pF_rgba);
 		break;
-	case 26: read_geometry_from_image<RGBAImageTypeD>(
-		ivariant, ivariant->pD_rgba,  ok3d, gl);
+	case 26: read_geometry_from_image<RGBAImageTypeD>(v, v->pD_rgba);
 		break;
 	default: break;
 	}

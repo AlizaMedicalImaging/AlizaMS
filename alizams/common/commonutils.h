@@ -43,7 +43,6 @@ public:
 		std::vector<ImageSlice*> &,
 		const QString &,
 		const unsigned int, const unsigned int,
-		const bool,
 		const float, const float, const float,
 		const float, const float, const float,
 		const float, const float, const float,
@@ -96,8 +95,7 @@ public:
 		bool,
 		int, GLWidget*, QProgressDialog*,
 		bool=false);
-	static void read_geometry_from_image_(
-		ImageVariant*, const bool, GLWidget*);
+	static void read_geometry_from_image_(ImageVariant*);
 	static QString get_screenshot_dir();
 	static void set_screenshot_dir(const QString&);
 	static QString get_screenshot_name(const QString&);

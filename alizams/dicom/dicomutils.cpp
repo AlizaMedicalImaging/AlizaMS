@@ -2220,7 +2220,6 @@ bool DicomUtils::read_slices(
 	}
 	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
-	if (ok3d && gl) gl->makeCurrent();
 	ok = generate_geometry(
 			ivariant->di->image_slices,
 			ivariant->di->spectroscopy_slices,
@@ -2506,7 +2505,6 @@ bool DicomUtils::read_slices_uihgrid(
 		up_dir_z;
 	float center_x, center_y, center_z;
 	double dircos[] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-	if (ok3d && gl) gl->makeCurrent();
 	const bool ok = generate_geometry(
 			ivariant->di->image_slices,
 			ivariant->di->spectroscopy_slices,
@@ -2624,7 +2622,6 @@ bool DicomUtils::read_slices_rtdose(
 	}
 	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
-	if (ok3d && gl) gl->makeCurrent();
 	ok = generate_geometry(
 			ivariant->di->image_slices,
 			ivariant->di->spectroscopy_slices,
@@ -3985,7 +3982,7 @@ bool DicomUtils::generate_geometry(
 			CommonUtils::generate_cubeslice(
 				cubeslices,
 				orientation_string,
-				size_, i, (ok3d && !skip_texture),
+				size_, i,
 				x0, y0, z0, x1, y1, z1, x2, y2, z2, x3, y3, z3,
 				ipp_iop);
 		}
@@ -8142,7 +8139,6 @@ QString DicomUtils::read_enhanced_common(
 			//
 			if (tmp4_ok)
 			{
-				if (ok3d && gl) gl->makeCurrent();
 				std::vector<SpectroscopySlice*> empty__;
 				geom_ok = generate_geometry(
 					slices, empty__,
@@ -8567,7 +8563,6 @@ QString DicomUtils::read_enhanced_common(
 			}
 			else
 			{
-				if (ok3d && gl) gl->makeCurrent();
 				delete ivariant;
 			}
 		}
@@ -10943,7 +10938,6 @@ QString DicomUtils::read_dicom(
 				}
 				else
 				{
-					if (ok3d && gl) gl->makeCurrent();
 					delete ivariant;
 				}
 			}
@@ -11011,7 +11005,6 @@ QString DicomUtils::read_dicom(
 								supp_color_images[jjj] = NULL;
 							}
 							supp_color_images.clear();
-							if (ok3d && gl) gl->makeCurrent();
 							for (unsigned int jjj = 0; jjj < supp_grey_images.size(); jjj++)
 							{
 								delete supp_grey_images[jjj];
@@ -11044,7 +11037,6 @@ QString DicomUtils::read_dicom(
 									{
 										delete supp_color_images[zzz];
 									}
-									if (ok3d && gl) gl->makeCurrent();
 									for (unsigned int zzz = 0; zzz < supp_grey_images.size(); zzz++)
 									{
 										delete supp_grey_images[zzz];
@@ -11081,7 +11073,6 @@ QString DicomUtils::read_dicom(
 									{
 										delete supp_color_images[zzz];
 									}
-									if (ok3d && gl) gl->makeCurrent();
 									for (unsigned int zzz = 0; zzz < supp_grey_images.size(); zzz++)
 									{
 										delete supp_grey_images[zzz];
@@ -11094,7 +11085,6 @@ QString DicomUtils::read_dicom(
 									{
 										delete supp_color_images[zzz];
 									}
-									if (ok3d && gl) gl->makeCurrent();
 									for (unsigned int zzz = 0;
 										zzz < supp_grey_images.size();
 										zzz++)
@@ -11200,7 +11190,6 @@ QString DicomUtils::read_dicom(
 				if (ok) { ivariants.push_back(ivariant); }
 				else
 				{
-					if (ok3d && gl) gl->makeCurrent();
 					delete ivariant;
 				}
 			}
@@ -11244,7 +11233,6 @@ QString DicomUtils::read_dicom(
 				if (ok) { ivariants.push_back(ivariant); }
 				else
 				{
-					if (ok3d && gl) gl->makeCurrent();
 					delete ivariant;
 				}
 			}
@@ -11380,7 +11368,6 @@ QString DicomUtils::read_dicom(
 				if (ok) { ivariants.push_back(ivariant); }
 				else
 				{
-					if (ok3d && gl) gl->makeCurrent();
 					delete ivariant;
 				}
 			}
@@ -11409,11 +11396,7 @@ QString DicomUtils::read_dicom(
 					tolerance,
 					false);
 				if (ok) { ivariants.push_back(ivariant); }
-				else
-				{
-					if (ok3d && gl) gl->makeCurrent();
-					delete ivariant;
-				}
+				else { delete ivariant; }
 			}
 		}
 	}
@@ -11463,7 +11446,6 @@ QString DicomUtils::read_dicom(
 				}
 				else
 				{
-					if (ok3d && gl) gl->makeCurrent();
 					delete ivariant;
 				}
 			}
@@ -11505,7 +11487,6 @@ QString DicomUtils::read_dicom(
 				}
 				else
 				{
-					if (ok3d && gl) gl->makeCurrent();
 					delete ivariant;
 				}
 			}
@@ -11564,11 +11545,7 @@ QString DicomUtils::read_dicom(
 					tolerance,
 					true);
 				if (ok) { ivariants.push_back(ivariant); }
-				else
-				{
-					if (ok3d && gl) gl->makeCurrent();
-					delete ivariant;
-				}
+				else { delete ivariant; }
 			}
 			else
 			{
@@ -11595,11 +11572,7 @@ QString DicomUtils::read_dicom(
 					tolerance,
 					false);
 				if (ok) { ivariants.push_back(ivariant); }
-				else
-				{
-					if (ok3d && gl) gl->makeCurrent();
-					delete ivariant;
-				}
+				else { delete ivariant; }
 			}
 		}
 	}
@@ -11739,7 +11712,6 @@ QString DicomUtils::read_dicom(
 						++ic;
 					}
 				}
-				gl->makeCurrent();
 				for (int z = 0; z < v->di->rois.size(); z++)
 				{
 					ContourUtils::generate_roi_vbos(gl, v->di->rois[z],false);
@@ -11903,7 +11875,6 @@ QString DicomUtils::read_dicom(
 					{
 						if (ref_ivariants.at(z)->di->slices_generated)
 						{
-							if (ok3d && gl) gl->makeCurrent();
 							CommonUtils::copy_slices(
 								pr_image,
 								ref_ivariants.at(z));
@@ -11968,14 +11939,12 @@ QString DicomUtils::read_dicom(
 						}
 						else
 						{
-							if (ok3d && gl) gl->makeCurrent();
 							delete pr_image;
 							pr_image = NULL;
 						}
 					}
 					if (ref_ivariants.at(z))
 					{
-						if (ok3d && gl) gl->makeCurrent();
 						delete ref_ivariants[z];
 						ref_ivariants[z] = NULL;
 					}
@@ -12065,7 +12034,6 @@ QString DicomUtils::read_dicom(
 						{
 							if (ref_ivariants.at(z)->di->slices_generated)
 							{
-								if (ok3d && gl) gl->makeCurrent();
 								CommonUtils::copy_slices(
 									pr_image,
 									ref_ivariants.at(z));
@@ -12130,14 +12098,12 @@ QString DicomUtils::read_dicom(
 							}
 							else
 							{
-								if (ok3d && gl) gl->makeCurrent();
 								delete pr_image;
 								pr_image = NULL;
 							}
 						}
 						if (ref_ivariants.at(z))
 						{
-							if (ok3d && gl) gl->makeCurrent();
 							delete ref_ivariants[z];
 							ref_ivariants[z] = NULL;
 						}

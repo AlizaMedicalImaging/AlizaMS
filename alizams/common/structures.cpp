@@ -254,8 +254,6 @@ ImageVariant::~ImageVariant()
 	//
 	di->close();
 	delete di;
-	image_instance_uids.clear();
-	frame_times.clear();
 	icon      = QPixmap();
 	histogram = QPixmap();
 }

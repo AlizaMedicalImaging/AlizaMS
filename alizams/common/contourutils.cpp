@@ -130,6 +130,7 @@ void ContourUtils::generate_roi_vbos(
 	ROI & roi,
 	bool delete_after)
 {
+	gl->makeCurrent();
 	QMap< int, Contour* >::iterator it =
 		roi.contours.begin();
 	while (it != roi.contours.end())

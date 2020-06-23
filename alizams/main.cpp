@@ -181,12 +181,10 @@ int main(int argc, char *argv[])
 	app.setOrganizationDomain(QString("aliza-dicom-viewer.com"));
 	app.setApplicationName(QString("AlizaMS"));
 	//
-	//
 	{
 		const int hide_zoom_ = 1;
 		hide_zoom = (hide_zoom_==1) ? true : false;
 		double app_font_pt   = 0.0;
-#if 1
 		QSettings settings(
 			QSettings::IniFormat,
 			QSettings::UserScope,
@@ -196,7 +194,6 @@ int main(int argc, char *argv[])
 		settings.beginGroup(QString("GlobalSettings"));
 		app_font_pt = settings.value(QString("app_font_pt"), 0.0).toDouble();
 		settings.endGroup();
-#endif
 		QFont f = QApplication::font();
 		if (app_font_pt <= 0.0)
 		{
@@ -205,12 +202,10 @@ int main(int argc, char *argv[])
 			{
 				f.setPointSizeF(app_font_pt);
 				app.setFont(f);
-#if 1
 				settings.beginGroup(QString("GlobalSettings"));
 				settings.setValue(QString("app_font_pt"), QVariant(app_font_pt));
 				settings.endGroup();
 				settings.sync();
-#endif
 			}
 		}
 		else
