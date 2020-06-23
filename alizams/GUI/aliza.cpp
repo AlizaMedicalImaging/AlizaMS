@@ -505,7 +505,6 @@ void Aliza::close_()
 	graphicswidget_x->clear_();
 	histogramview->clear__();
 	selected_images.clear();
-	if (check_3d()) glwidget->makeCurrent();
 	Scene3DImagesMap::iterator iv = scene3dimages.begin();
 	while (iv != scene3dimages.end())
 	{
@@ -634,7 +633,6 @@ quit__:
 				<< "ivariants.at(" << x
 				<< ")->di->idimz!=ivariants.at(" << x
 				<< ")->di->image_slices.size()" << std::endl;
-			if (ok3d) glwidget->makeCurrent();
 			ivariants[x]->di->close();
 			ivariants[x]->di->skip_texture=true;
 		}
@@ -722,7 +720,6 @@ void Aliza::clear_ram()
 	imagesbox->listWidget->clear();
 	imagesbox->set_html(NULL);
 	selected_images.clear();
-	if (ok3d) glwidget->makeCurrent();
 	Scene3DImagesMap::iterator iv = scene3dimages.begin();
 	while (iv != scene3dimages.end())
 	{
@@ -770,7 +767,6 @@ void Aliza::delete_image()
 	if (ivariant)
 	{
 		scene3dimages.remove(ivariant->id);
-		if (check_3d()) glwidget->makeCurrent();
 		delete ivariant;
 	}
 	update_selection();
@@ -817,7 +813,6 @@ void Aliza::delete_image2(ImageVariant * v)
 	if (v)
 	{
 		scene3dimages.remove(v->id);
-		if (check_3d()) glwidget->makeCurrent();
 		delete v;
 		v = NULL;
 	}
@@ -1043,7 +1038,6 @@ bool Aliza::load_3d(
 			"ivariant->di->idimz!="
 			"ivariant->di->image_slices.size()"
 			<< std::endl;
-		if (ok3d) glwidget->makeCurrent();
 		ivariant->di->close();
 		ivariant->di->skip_texture=true;
 	}
@@ -3698,7 +3692,6 @@ void Aliza::delete_cheched_unchecked(bool t)
 		if (ivariant)
 		{
 			scene3dimages.remove(ivariant->id);
-			if (ok3d) glwidget->makeCurrent();
 			delete ivariant;
 		}
 	}
@@ -3782,7 +3775,6 @@ quit__:
 					<< "ivariants.at(j)->di->idimz!="
 						"ivariants.at(j)->di->image_slices.size()"
 					<< std::endl;
-				if (ok3d) glwidget->makeCurrent();
 				ivariants[j]->di->close();
 				ivariants[j]->di->skip_texture=true;
 			}
@@ -3833,7 +3825,6 @@ quit__:
 	}
 	else
 	{
-		if (check_3d()) glwidget->makeCurrent();
 		for (unsigned int x = 0; x < ivariants.size(); x++)
 		{
 			if (ivariants.at(x)) delete ivariants[x];

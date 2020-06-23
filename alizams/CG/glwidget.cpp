@@ -22,7 +22,6 @@
 
 #define FBO_SIZE__0  512
 #define FBO_SIZE__1 1024
-
 //#define ALWAYS_SHOW_GL_ERROR
 
 #ifndef DISABLE_SIMDMATH

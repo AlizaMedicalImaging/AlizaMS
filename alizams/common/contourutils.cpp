@@ -130,7 +130,7 @@ void ContourUtils::generate_roi_vbos(
 	ROI & roi,
 	bool delete_after)
 {
-	gl->makeCurrent();
+	if (gl) gl->makeCurrent();
 	QMap< int, Contour* >::iterator it =
 		roi.contours.begin();
 	while (it != roi.contours.end())
@@ -170,17 +170,20 @@ void ContourUtils::generate_roi_vbos(
 					delete [] v;
 					return;
 				}
-				gl->glGenBuffers(1, &(c->vboid));
-				GLWidget::increment_count_vbos(1);
-				gl->glBindBuffer(GL_ARRAY_BUFFER, c->vboid);
-				gl->glBufferData(
-					GL_ARRAY_BUFFER,
-					s*sizeof(GLfloat),
-					v,
-					GL_STATIC_DRAW);
-				gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
-				delete [] v;
-				c->vbo_initialized = true;
+				if (gl)
+				{
+					gl->glGenBuffers(1, &(c->vboid));
+					GLWidget::increment_count_vbos(1);
+					gl->glBindBuffer(GL_ARRAY_BUFFER, c->vboid);
+					gl->glBufferData(
+						GL_ARRAY_BUFFER,
+						s*sizeof(GLfloat),
+						v,
+						GL_STATIC_DRAW);
+					gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
+					delete [] v;
+					c->vbo_initialized = true;
+				}
 				if (delete_after) c->dpoints.clear();
 			}
 		}
