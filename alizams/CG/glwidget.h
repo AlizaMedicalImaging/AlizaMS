@@ -147,7 +147,11 @@ public:
 	int   x_rotation, y_rotation, z_rotation;
 	float ortho_size;
 	double position_z;
-	void draw_3d_tex2(const GLfloat*,const GLfloat*,const ShaderObj&);
+	void draw_3d_tex1(
+		GLuint*,
+		GLuint*,
+		const GLfloat*,
+		const GLfloat*);
 	void draw_frame(const GLuint*);
 	void draw_frame2(const GLfloat*);
 	void draw_lines(unsigned long, const GLuint*);
@@ -255,6 +259,54 @@ public:
 	ShaderObj c3d_shader_gradient_sigm;
 	ShaderObj c3d_shader_bb_sigm;
 	ShaderObj c3d_shader_gradient_bb_sigm;
+	GLuint  * raycast_shader_vbo;
+	GLuint  * raycast_color_shader_vbo;
+	GLuint  * raycast_shader_bb_vbo;
+	GLuint  * raycast_color_shader_bb_vbo;
+	GLuint  * raycast_shader_sigm_vbo;
+	GLuint  * raycast_color_shader_sigm_vbo;
+	GLuint  * raycast_shader_bb_sigm_vbo;
+	GLuint  * raycast_color_shader_bb_sigm_vbo;
+	GLuint  * c3d_shader_clamp_vbo;
+	GLuint  * c3d_shader_gradient_clamp_vbo;
+	GLuint  * c3d_shader_bb_clamp_vbo;
+	GLuint  * c3d_shader_gradient_bb_clamp_vbo;
+	GLuint  * c3d_shader_vbo;
+	GLuint  * c3d_shader_gradient_vbo;
+	GLuint  * c3d_shader_bb_vbo;
+	GLuint  * c3d_shader_gradient_bb_vbo;
+	GLuint  * c3d_shader_clamp_sigm_vbo;
+	GLuint  * c3d_shader_gradient_clamp_sigm_vbo;
+	GLuint  * c3d_shader_bb_clamp_sigm_vbo;
+	GLuint  * c3d_shader_gradient_bb_clamp_sigm_vbo;
+	GLuint  * c3d_shader_sigm_vbo;
+	GLuint  * c3d_shader_gradient_sigm_vbo;
+	GLuint  * c3d_shader_bb_sigm_vbo;
+	GLuint  * c3d_shader_gradient_bb_sigm_vbo;
+	GLuint raycast_shader_vao;
+	GLuint raycast_color_shader_vao;
+	GLuint raycast_shader_bb_vao;
+	GLuint raycast_color_shader_bb_vao;
+	GLuint raycast_shader_sigm_vao;
+	GLuint raycast_color_shader_sigm_vao;
+	GLuint raycast_shader_bb_sigm_vao;
+	GLuint raycast_color_shader_bb_sigm_vao;
+	GLuint c3d_shader_clamp_vao;
+	GLuint c3d_shader_gradient_clamp_vao;
+	GLuint c3d_shader_bb_clamp_vao;
+	GLuint c3d_shader_gradient_bb_clamp_vao;
+	GLuint c3d_shader_vao;
+	GLuint c3d_shader_gradient_vao;
+	GLuint c3d_shader_bb_vao;
+	GLuint c3d_shader_gradient_bb_vao;
+	GLuint c3d_shader_clamp_sigm_vao;
+	GLuint c3d_shader_gradient_clamp_sigm_vao;
+	GLuint c3d_shader_bb_clamp_sigm_vao;
+	GLuint c3d_shader_gradient_bb_clamp_sigm_vao;
+	GLuint c3d_shader_sigm_vao;
+	GLuint c3d_shader_gradient_sigm_vao;
+	GLuint c3d_shader_bb_sigm_vao;
+	GLuint c3d_shader_gradient_bb_sigm_vao;
 	ShaderObj frame_shader;
 	ShaderObj simple_tex_shader;
 	ShaderObj sphere0_shader;
@@ -278,6 +330,7 @@ public:
 	qMeshData * letterr;
 	qMeshData * letterl;
 
+	void generate_vao1(GLuint*, GLuint*, GLuint*, GLuint*);
 	void generate_quad(
 		GLfloat*, GLfloat*, GLfloat*, GLfloat*, GLuint*);
 	GLuint load_shader(GLenum, const char*);

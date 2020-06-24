@@ -628,6 +628,57 @@ void GLWidget::init_()
 	c3d_shader_gradient_sigm.program = 0;
 	c3d_shader_bb_sigm.program = 0;
 	c3d_shader_gradient_bb_sigm.program = 0;
+	raycast_shader_vbo = new GLuint[2];
+	raycast_color_shader_vbo = new GLuint[2];
+	raycast_shader_bb_vbo = new GLuint[2];
+	raycast_color_shader_bb_vbo = new GLuint[2];
+	raycast_shader_sigm_vbo = new GLuint[2];
+	raycast_color_shader_sigm_vbo = new GLuint[2];
+	raycast_shader_bb_sigm_vbo = new GLuint[2];
+	raycast_color_shader_bb_sigm_vbo = new GLuint[2];
+	c3d_shader_clamp_vbo = new GLuint[2];
+	c3d_shader_gradient_clamp_vbo = new GLuint[2];
+	c3d_shader_bb_clamp_vbo = new GLuint[2];
+	c3d_shader_gradient_bb_clamp_vbo = new GLuint[2];
+	c3d_shader_vbo = new GLuint[2];
+	c3d_shader_gradient_vbo = new GLuint[2];
+	c3d_shader_bb_vbo = new GLuint[2];
+	c3d_shader_gradient_bb_vbo = new GLuint[2];
+	c3d_shader_clamp_sigm_vbo = new GLuint[2];
+	c3d_shader_gradient_clamp_sigm_vbo = new GLuint[2];
+	c3d_shader_bb_clamp_sigm_vbo = new GLuint[2];
+	c3d_shader_gradient_bb_clamp_sigm_vbo = new GLuint[2];
+	c3d_shader_sigm_vbo = new GLuint[2];
+	c3d_shader_gradient_sigm_vbo = new GLuint[2];
+	c3d_shader_bb_sigm_vbo = new GLuint[2];
+	c3d_shader_gradient_bb_sigm_vbo = new GLuint[2];
+	raycast_shader_vao = 0;
+	raycast_color_shader_vao = 0;
+	raycast_shader_bb_vao = 0;
+	raycast_color_shader_bb_vao = 0;
+	raycast_shader_sigm_vao = 0;
+	raycast_color_shader_sigm_vao = 0;
+	raycast_shader_bb_sigm_vao = 0;
+	raycast_color_shader_bb_sigm_vao = 0;
+	c3d_shader_clamp_vao = 0;
+	c3d_shader_gradient_clamp_vao = 0;
+	c3d_shader_bb_clamp_vao = 0;
+	c3d_shader_gradient_bb_clamp_vao = 0;
+	c3d_shader_vao = 0;
+	c3d_shader_gradient_vao = 0;
+	c3d_shader_bb_vao = 0;
+	c3d_shader_gradient_bb_vao = 0;
+	c3d_shader_clamp_sigm_vao = 0;
+	c3d_shader_gradient_clamp_sigm_vao = 0;
+	c3d_shader_bb_clamp_sigm_vao = 0;
+	c3d_shader_gradient_bb_clamp_sigm_vao = 0;
+	c3d_shader_sigm_vao = 0;
+	c3d_shader_gradient_sigm_vao = 0;
+	c3d_shader_bb_sigm_vao = 0;
+	c3d_shader_gradient_bb_sigm_vao = 0;
+
+
+
 	frame_shader.program = 0;
 	simple_tex_shader.program = 0;
 	sphere0_shader.program = 0;
@@ -842,6 +893,11 @@ void GLWidget::init_opengl(int w, int h)
 	c3d_shader.texture_handle[0]   = glGetAttribLocation (c3d_shader.program, "v_texcoord0");
 	c3d_shader.location_mparams    = glGetUniformLocation(c3d_shader.program, "mparams");
 	shaders.push_back(&c3d_shader);
+	generate_vao1(
+		&c3d_shader_vao,
+		c3d_shader_vbo,
+		&(c3d_shader.position_handle),
+		&(c3d_shader.texture_handle[0]));
 	//
 	create_program(c3d_vs, c3d_fs_bb, &c3d_shader_bb);
 	c3d_shader_bb.location_mvp        = glGetUniformLocation(c3d_shader_bb.program, "mvp");
@@ -850,6 +906,11 @@ void GLWidget::init_opengl(int w, int h)
 	c3d_shader_bb.texture_handle[0]   = glGetAttribLocation (c3d_shader_bb.program, "v_texcoord0");
 	c3d_shader_bb.location_mparams    = glGetUniformLocation(c3d_shader_bb.program, "mparams");
 	shaders.push_back(&c3d_shader_bb);
+	generate_vao1(
+		&c3d_shader_bb_vao,
+		c3d_shader_bb_vbo,
+		&(c3d_shader_bb.position_handle),
+		&(c3d_shader_bb.texture_handle[0]));
 	//
 	create_program(c3d_vs, c3d_fs_clamp, &c3d_shader_clamp);
 	c3d_shader_clamp.location_mvp        = glGetUniformLocation(c3d_shader_clamp.program, "mvp");
@@ -858,7 +919,11 @@ void GLWidget::init_opengl(int w, int h)
 	c3d_shader_clamp.texture_handle[0]   = glGetAttribLocation (c3d_shader_clamp.program, "v_texcoord0");
 	c3d_shader_clamp.location_mparams    = glGetUniformLocation(c3d_shader_clamp.program, "mparams");
 	shaders.push_back(&c3d_shader_clamp);
-
+	generate_vao1(
+		&c3d_shader_clamp_vao,
+		c3d_shader_clamp_vbo,
+		&(c3d_shader_clamp.position_handle),
+		&(c3d_shader_clamp.texture_handle[0]));
 	//
 	create_program(c3d_vs, c3d_fs_bb_clamp, &c3d_shader_bb_clamp);
 	c3d_shader_bb_clamp.location_mvp        = glGetUniformLocation(c3d_shader_bb_clamp.program, "mvp");
@@ -867,6 +932,11 @@ void GLWidget::init_opengl(int w, int h)
 	c3d_shader_bb_clamp.texture_handle[0]   = glGetAttribLocation (c3d_shader_bb_clamp.program, "v_texcoord0");
 	c3d_shader_bb_clamp.location_mparams    = glGetUniformLocation(c3d_shader_bb_clamp.program, "mparams");
 	shaders.push_back(&c3d_shader_bb_clamp);
+	generate_vao1(
+		&c3d_shader_bb_clamp_vao,
+		c3d_shader_bb_clamp_vbo,
+		&(c3d_shader_bb_clamp.position_handle),
+		&(c3d_shader_bb_clamp.texture_handle[0]));
 	//
 	create_program(c3d_vs, c3d_fs_gradient, &c3d_shader_gradient);
 	c3d_shader_gradient.location_mvp        = glGetUniformLocation(c3d_shader_gradient.program, "mvp");
@@ -876,6 +946,11 @@ void GLWidget::init_opengl(int w, int h)
 	c3d_shader_gradient.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient.program, "v_texcoord0");
 	c3d_shader_gradient.location_mparams    = glGetUniformLocation(c3d_shader_gradient.program, "mparams");
 	shaders.push_back(&c3d_shader_gradient);
+	generate_vao1(
+		&c3d_shader_gradient_vao,
+		c3d_shader_gradient_vbo,
+		&(c3d_shader_gradient.position_handle),
+		&(c3d_shader_gradient.texture_handle[0]));
 	//
 	create_program(c3d_vs, c3d_fs_gradient_bb, &c3d_shader_gradient_bb);
 	c3d_shader_gradient_bb.location_mvp        = glGetUniformLocation(c3d_shader_gradient_bb.program, "mvp");
@@ -885,6 +960,11 @@ void GLWidget::init_opengl(int w, int h)
 	c3d_shader_gradient_bb.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient_bb.program, "v_texcoord0");
 	c3d_shader_gradient_bb.location_mparams    = glGetUniformLocation(c3d_shader_gradient_bb.program, "mparams");
 	shaders.push_back(&c3d_shader_gradient_bb);
+	generate_vao1(
+		&c3d_shader_gradient_bb_vao,
+		c3d_shader_gradient_bb_vbo,
+		&(c3d_shader_gradient_bb.position_handle),
+		&(c3d_shader_gradient_bb.texture_handle[0]));
 	//
 	create_program(c3d_vs, c3d_fs_gradient_clamp, &c3d_shader_gradient_clamp);
 	c3d_shader_gradient_clamp.location_mvp        = glGetUniformLocation(c3d_shader_gradient_clamp.program, "mvp");
@@ -894,6 +974,11 @@ void GLWidget::init_opengl(int w, int h)
 	c3d_shader_gradient_clamp.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient_clamp.program, "v_texcoord0");
 	c3d_shader_gradient_clamp.location_mparams    = glGetUniformLocation(c3d_shader_gradient_clamp.program, "mparams");
 	shaders.push_back(&c3d_shader_gradient_clamp);
+	generate_vao1(
+		&c3d_shader_gradient_clamp_vao,
+		c3d_shader_gradient_clamp_vbo,
+		&(c3d_shader_gradient_clamp.position_handle),
+		&(c3d_shader_gradient_clamp.texture_handle[0]));
 	//
 	create_program(c3d_vs, c3d_fs_gradient_bb_clamp, &c3d_shader_gradient_bb_clamp);
 	c3d_shader_gradient_bb_clamp.location_mvp        = glGetUniformLocation(c3d_shader_gradient_bb_clamp.program, "mvp");
@@ -903,6 +988,11 @@ void GLWidget::init_opengl(int w, int h)
 	c3d_shader_gradient_bb_clamp.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient_bb_clamp.program, "v_texcoord0");
 	c3d_shader_gradient_bb_clamp.location_mparams    = glGetUniformLocation(c3d_shader_gradient_bb_clamp.program, "mparams");
 	shaders.push_back(&c3d_shader_gradient_bb_clamp);
+	generate_vao1(
+		&c3d_shader_gradient_bb_clamp_vao,
+		c3d_shader_gradient_bb_clamp_vbo,
+		&(c3d_shader_gradient_bb_clamp.position_handle),
+		&(c3d_shader_gradient_bb_clamp.texture_handle[0]));
 	//
 	create_program(c3d_vs, c3d_fs_sigm, &c3d_shader_sigm);
 	c3d_shader_sigm.location_mvp        = glGetUniformLocation(c3d_shader_sigm.program, "mvp");
@@ -911,6 +1001,11 @@ void GLWidget::init_opengl(int w, int h)
 	c3d_shader_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_sigm.program, "v_texcoord0");
 	c3d_shader_sigm.location_mparams    = glGetUniformLocation(c3d_shader_sigm.program, "mparams");
 	shaders.push_back(&c3d_shader_sigm);
+	generate_vao1(
+		&c3d_shader_sigm_vao,
+		c3d_shader_sigm_vbo,
+		&(c3d_shader_sigm.position_handle),
+		&(c3d_shader_sigm.texture_handle[0]));
 	//
 	create_program(c3d_vs, c3d_fs_bb_sigm, &c3d_shader_bb_sigm);
 	c3d_shader_bb_sigm.location_mvp        = glGetUniformLocation(c3d_shader_bb_sigm.program, "mvp");
@@ -919,6 +1014,11 @@ void GLWidget::init_opengl(int w, int h)
 	c3d_shader_bb_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_bb_sigm.program, "v_texcoord0");
 	c3d_shader_bb_sigm.location_mparams    = glGetUniformLocation(c3d_shader_bb_sigm.program, "mparams");
 	shaders.push_back(&c3d_shader_bb_sigm);
+	generate_vao1(
+		&c3d_shader_bb_sigm_vao,
+		c3d_shader_bb_sigm_vbo,
+		&(c3d_shader_bb_sigm.position_handle),
+		&(c3d_shader_bb_sigm.texture_handle[0]));
 	//
 	create_program(c3d_vs, c3d_fs_clamp_sigm, &c3d_shader_clamp_sigm);
 	c3d_shader_clamp_sigm.location_mvp        = glGetUniformLocation(c3d_shader_clamp_sigm.program, "mvp");
@@ -927,6 +1027,11 @@ void GLWidget::init_opengl(int w, int h)
 	c3d_shader_clamp_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_clamp_sigm.program, "v_texcoord0");
 	c3d_shader_clamp_sigm.location_mparams    = glGetUniformLocation(c3d_shader_clamp_sigm.program, "mparams");
 	shaders.push_back(&c3d_shader_clamp_sigm);
+	generate_vao1(
+		&c3d_shader_clamp_sigm_vao,
+		c3d_shader_clamp_sigm_vbo,
+		&(c3d_shader_clamp_sigm.position_handle),
+		&(c3d_shader_clamp_sigm.texture_handle[0]));
 	//
 	create_program(c3d_vs, c3d_fs_bb_clamp_sigm, &c3d_shader_bb_clamp_sigm);
 	c3d_shader_bb_clamp_sigm.location_mvp        = glGetUniformLocation(c3d_shader_bb_clamp_sigm.program, "mvp");
@@ -935,6 +1040,11 @@ void GLWidget::init_opengl(int w, int h)
 	c3d_shader_bb_clamp_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_bb_clamp_sigm.program, "v_texcoord0");
 	c3d_shader_bb_clamp_sigm.location_mparams    = glGetUniformLocation(c3d_shader_bb_clamp_sigm.program, "mparams");
 	shaders.push_back(&c3d_shader_bb_clamp_sigm);
+	generate_vao1(
+		&c3d_shader_bb_clamp_sigm_vao,
+		c3d_shader_bb_clamp_sigm_vbo,
+		&(c3d_shader_bb_clamp_sigm.position_handle),
+		&(c3d_shader_bb_clamp_sigm.texture_handle[0]));
 	//
 	create_program(c3d_vs, c3d_fs_gradient_sigm, &c3d_shader_gradient_sigm);
 	c3d_shader_gradient_sigm.location_mvp        = glGetUniformLocation(c3d_shader_gradient_sigm.program, "mvp");
@@ -944,6 +1054,11 @@ void GLWidget::init_opengl(int w, int h)
 	c3d_shader_gradient_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient_sigm.program, "v_texcoord0");
 	c3d_shader_gradient_sigm.location_mparams    = glGetUniformLocation(c3d_shader_gradient_sigm.program, "mparams");
 	shaders.push_back(&c3d_shader_gradient_sigm);
+	generate_vao1(
+		&c3d_shader_gradient_sigm_vao,
+		c3d_shader_gradient_sigm_vbo,
+		&(c3d_shader_gradient_sigm.position_handle),
+		&(c3d_shader_gradient_sigm.texture_handle[0]));
 	//
 	create_program(c3d_vs, c3d_fs_gradient_bb_sigm, &c3d_shader_gradient_bb_sigm);
 	c3d_shader_gradient_bb_sigm.location_mvp        = glGetUniformLocation(c3d_shader_gradient_bb_sigm.program, "mvp");
@@ -953,6 +1068,11 @@ void GLWidget::init_opengl(int w, int h)
 	c3d_shader_gradient_bb_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient_bb_sigm.program, "v_texcoord0");
 	c3d_shader_gradient_bb_sigm.location_mparams    = glGetUniformLocation(c3d_shader_gradient_bb_sigm.program, "mparams");
 	shaders.push_back(&c3d_shader_gradient_bb_sigm);
+	generate_vao1(
+		&c3d_shader_gradient_bb_sigm_vao,
+		c3d_shader_gradient_bb_sigm_vbo,
+		&(c3d_shader_gradient_bb_sigm.position_handle),
+		&(c3d_shader_gradient_bb_sigm.texture_handle[0]));
 	//
 	create_program(c3d_vs, c3d_fs_gradient_clamp_sigm, &c3d_shader_gradient_clamp_sigm);
 	c3d_shader_gradient_clamp_sigm.location_mvp        = glGetUniformLocation(c3d_shader_gradient_clamp_sigm.program, "mvp");
@@ -962,6 +1082,11 @@ void GLWidget::init_opengl(int w, int h)
 	c3d_shader_gradient_clamp_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient_clamp_sigm.program, "v_texcoord0");
 	c3d_shader_gradient_clamp_sigm.location_mparams    = glGetUniformLocation(c3d_shader_gradient_clamp_sigm.program, "mparams");
 	shaders.push_back(&c3d_shader_gradient_clamp_sigm);
+		generate_vao1(
+		&c3d_shader_gradient_clamp_sigm_vao,
+		c3d_shader_gradient_clamp_sigm_vbo,
+		&(c3d_shader_gradient_clamp_sigm.position_handle),
+		&(c3d_shader_gradient_clamp_sigm.texture_handle[0]));
 	//
 	create_program(c3d_vs, c3d_fs_gradient_bb_clamp_sigm, &c3d_shader_gradient_bb_clamp_sigm);
 	c3d_shader_gradient_bb_clamp_sigm.location_mvp        = glGetUniformLocation(c3d_shader_gradient_bb_clamp_sigm.program, "mvp");
@@ -971,6 +1096,11 @@ void GLWidget::init_opengl(int w, int h)
 	c3d_shader_gradient_bb_clamp_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient_bb_clamp_sigm.program, "v_texcoord0");
 	c3d_shader_gradient_bb_clamp_sigm.location_mparams    = glGetUniformLocation(c3d_shader_gradient_bb_clamp_sigm.program, "mparams");
 	shaders.push_back(&c3d_shader_gradient_bb_clamp_sigm);
+		generate_vao1(
+		&c3d_shader_gradient_bb_clamp_sigm_vao,
+		c3d_shader_gradient_bb_clamp_sigm_vbo,
+		&(c3d_shader_gradient_bb_clamp_sigm.position_handle),
+		&(c3d_shader_gradient_bb_clamp_sigm.texture_handle[0]));
 	//
 	create_program(frame_vs, frame_fs, &frame_shader);
 	frame_shader.location_mvp        = glGetUniformLocation(frame_shader.program, "mvp");
@@ -1407,20 +1537,17 @@ QString GLWidget::get_system_info() const
 	return opengl_info;
 }
 
-void GLWidget::draw_3d_tex2(
-	const GLfloat * v,
-	const GLfloat * t,
-	const ShaderObj & shader)
+void GLWidget::draw_3d_tex1(
+	GLuint * vao,
+	GLuint * vbo,
+	const float * v,
+	const float * t)
 {
-	glBindVertexArray(slice_v_vao);
-	glBindBuffer(GL_ARRAY_BUFFER, slice_v_vbo);
-	glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), v, GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, slice_t_vbo);
-	glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), t, GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(shader.texture_handle[0], 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(shader.position_handle);
-	glEnableVertexAttribArray(shader.texture_handle[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+	glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(float), v, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+	glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(float), t, GL_DYNAMIC_DRAW);
+	glBindVertexArray(*vao);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -2578,12 +2705,20 @@ checkGLerror(" GLWidget::paint_volume 1h\n");
 						if (dotv<0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; x++)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_bb_clamp_sigm);
+								draw_3d_tex1(
+									&c3d_shader_bb_clamp_sigm_vao,
+									c3d_shader_bb_clamp_sigm_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 						else
 						{
 							for (int x = di->to_slice; x >= di->from_slice; x--)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_bb_clamp_sigm);
+								draw_3d_tex1(
+									&c3d_shader_bb_clamp_sigm_vao,
+									c3d_shader_bb_clamp_sigm_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 					}
 					else
@@ -2595,12 +2730,20 @@ checkGLerror(" GLWidget::paint_volume 1h\n");
 						if (dotv<0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; x++)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_bb_sigm);
+								draw_3d_tex1(
+									&c3d_shader_bb_sigm_vao,
+									c3d_shader_bb_sigm_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 						else
 						{
 							for (int x = di->to_slice; x >= di->from_slice; x--)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_bb_sigm);
+								draw_3d_tex1(
+									&c3d_shader_bb_sigm_vao,
+									c3d_shader_bb_sigm_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 					}
 				}
@@ -2615,12 +2758,20 @@ checkGLerror(" GLWidget::paint_volume 1h\n");
 						if (dotv<0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; x++)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_bb_clamp);
+								draw_3d_tex1(
+									&c3d_shader_bb_clamp_vao,
+									c3d_shader_bb_clamp_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 						else
 						{
 							for (int x = di->to_slice; x >= di->from_slice; x--)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_bb_clamp);
+								draw_3d_tex1(
+									&c3d_shader_bb_clamp_vao,
+									c3d_shader_bb_clamp_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 					}
 					else
@@ -2632,12 +2783,20 @@ checkGLerror(" GLWidget::paint_volume 1h\n");
 						if (dotv<0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; x++)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_bb);
+								draw_3d_tex1(
+									&c3d_shader_bb_vao,
+									c3d_shader_bb_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 						else
 						{
 							for (int x = di->to_slice; x >= di->from_slice; x--)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_bb);
+								draw_3d_tex1(
+									&c3d_shader_bb_vao,
+									c3d_shader_bb_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 					}
 				}
@@ -2655,12 +2814,20 @@ checkGLerror(" GLWidget::paint_volume 1h\n");
 						if (dotv<0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; x++)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_clamp_sigm);
+								draw_3d_tex1(
+									&c3d_shader_clamp_sigm_vao,
+									c3d_shader_clamp_sigm_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 						else
 						{
 							for (int x = di->to_slice; x >= di->from_slice; x--)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_clamp_sigm);
+								draw_3d_tex1(
+									&c3d_shader_clamp_sigm_vao,
+									c3d_shader_clamp_sigm_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 					}
 					else
@@ -2672,12 +2839,20 @@ checkGLerror(" GLWidget::paint_volume 1h\n");
 						if (dotv<0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; x++)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_sigm);
+								draw_3d_tex1(
+									&c3d_shader_sigm_vao,
+									c3d_shader_sigm_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 						else
 						{
 							for (int x = di->to_slice; x >= di->from_slice; x--)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_sigm);
+								draw_3d_tex1(
+									&c3d_shader_sigm_vao,
+									c3d_shader_sigm_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 					}
 				}
@@ -2692,12 +2867,20 @@ checkGLerror(" GLWidget::paint_volume 1h\n");
 						if (dotv<0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; x++)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_clamp);
+								draw_3d_tex1(
+									&c3d_shader_clamp_vao,
+									c3d_shader_clamp_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 						else
 						{
 							for (int x = di->to_slice; x >= di->from_slice; x--)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_clamp);
+								draw_3d_tex1(
+									&c3d_shader_clamp_vao,
+									c3d_shader_clamp_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 					}
 					else
@@ -2709,12 +2892,20 @@ checkGLerror(" GLWidget::paint_volume 1h\n");
 						if (dotv<0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; x++)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader);
+								draw_3d_tex1(
+									&c3d_shader_vao,
+									c3d_shader_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 						else
 						{
 							for (int x = di->to_slice; x >= di->from_slice; x--)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader);
+								draw_3d_tex1(
+									&c3d_shader_vao,
+									c3d_shader_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 					}
 				}
@@ -2748,12 +2939,20 @@ checkGLerror(" GLWidget::paint_volume 1h\n");
 						if (dotv<0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; x++)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_gradient_bb_clamp_sigm);
+								draw_3d_tex1(
+									&c3d_shader_gradient_bb_clamp_sigm_vao,
+									c3d_shader_gradient_bb_clamp_sigm_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 						else
 						{
 							for (int x = di->to_slice; x >= di->from_slice; x--)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_gradient_bb_clamp_sigm);
+								draw_3d_tex1(
+									&c3d_shader_gradient_bb_clamp_sigm_vao,
+									c3d_shader_gradient_bb_clamp_sigm_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 					}
 					else
@@ -2766,12 +2965,20 @@ checkGLerror(" GLWidget::paint_volume 1h\n");
 						if (dotv<0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; x++)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_gradient_bb_sigm);
+								draw_3d_tex1(
+									&c3d_shader_gradient_bb_sigm_vao,
+									c3d_shader_gradient_bb_sigm_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 						else
 						{
 							for (int x = di->to_slice; x >= di->from_slice; x--)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_gradient_bb_sigm);
+								draw_3d_tex1(
+									&c3d_shader_gradient_bb_sigm_vao,
+									c3d_shader_gradient_bb_sigm_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 					}
 				}
@@ -2787,12 +2994,20 @@ checkGLerror(" GLWidget::paint_volume 1h\n");
 						if (dotv<0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; x++)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_gradient_bb_clamp);
+								draw_3d_tex1(
+									&c3d_shader_gradient_bb_clamp_vao,
+									c3d_shader_gradient_bb_clamp_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 						else
 						{
 							for (int x = di->to_slice; x >= di->from_slice; x--)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_gradient_bb_clamp);
+								draw_3d_tex1(
+									&c3d_shader_gradient_bb_clamp_vao,
+									c3d_shader_gradient_bb_clamp_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 					}
 					else
@@ -2805,12 +3020,20 @@ checkGLerror(" GLWidget::paint_volume 1h\n");
 						if (dotv<0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; x++)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_gradient_bb);
+								draw_3d_tex1(
+									&c3d_shader_gradient_bb_vao,
+									c3d_shader_gradient_bb_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 						else
 						{
 							for (int x = di->to_slice; x >= di->from_slice; x--)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_gradient_bb);
+								draw_3d_tex1(
+									&c3d_shader_gradient_bb_vao,
+									c3d_shader_gradient_bb_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 					}
 				}
@@ -2829,12 +3052,20 @@ checkGLerror(" GLWidget::paint_volume 1h\n");
 						if (dotv<0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; x++)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_gradient_clamp_sigm);
+								draw_3d_tex1(
+									&c3d_shader_gradient_clamp_sigm_vao,
+									c3d_shader_gradient_clamp_sigm_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 						else
 						{
 							for (int x = di->to_slice; x >= di->from_slice; x--)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_gradient_clamp_sigm);
+								draw_3d_tex1(
+									&c3d_shader_gradient_clamp_sigm_vao,
+									c3d_shader_gradient_clamp_sigm_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 					}
 					else
@@ -2847,12 +3078,20 @@ checkGLerror(" GLWidget::paint_volume 1h\n");
 						if (dotv<0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; x++)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_gradient_sigm);
+								draw_3d_tex1(
+									&c3d_shader_gradient_sigm_vao,
+									c3d_shader_gradient_sigm_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 						else
 						{
 							for (int x = di->to_slice; x >= di->from_slice; x--)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_gradient_sigm);
+								draw_3d_tex1(
+									&c3d_shader_gradient_sigm_vao,
+									c3d_shader_gradient_sigm_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 					}
 				}
@@ -2868,12 +3107,20 @@ checkGLerror(" GLWidget::paint_volume 1h\n");
 						if (dotv<0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; x++)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_gradient_clamp);
+								draw_3d_tex1(
+									&c3d_shader_gradient_clamp_vao,
+									c3d_shader_gradient_clamp_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 						else
 						{
 							for (int x = di->to_slice; x >= di->from_slice; x--)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_gradient_clamp);
+								draw_3d_tex1(
+									&c3d_shader_gradient_clamp_vao,
+									c3d_shader_gradient_clamp_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 					}
 					else
@@ -2886,12 +3133,20 @@ checkGLerror(" GLWidget::paint_volume 1h\n");
 						if (dotv<0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; x++)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_gradient);
+								draw_3d_tex1(
+									&c3d_shader_gradient_vao,
+									c3d_shader_gradient_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 						else
 						{
 							for (int x = di->to_slice; x >= di->from_slice; x--)
-								draw_3d_tex2(di->image_slices.at(x)->v,di->image_slices.at(x)->tc,c3d_shader_gradient);
+								draw_3d_tex1(
+									&c3d_shader_gradient_vao,
+									c3d_shader_gradient_vbo,
+									di->image_slices.at(x)->v,
+									di->image_slices.at(x)->tc);
 						}
 					}
 				}
@@ -3353,6 +3608,37 @@ void GLWidget::set_max_tex_65535(bool t)
 bool GLWidget::get_max_tex_65535()
 {
 	return GLWidget_max_tex_65535;
+}
+
+void GLWidget::generate_vao1(GLuint * vao, GLuint * vbo, GLuint * attr_v, GLuint * attr_t)
+{
+	*vao = 0;
+	vbo[0] = 0;
+	vbo[1] = 0;
+	GLfloat * v = new GLfloat[12];
+	GLfloat * t = new GLfloat[12];
+	for (int x = 0; x < 12; x++)
+	{
+		v[x] = 0.0f;
+		t[x] = 0.0f;
+	}
+	glGenVertexArrays(1, vao);
+	glBindVertexArray(*vao);
+	glGenBuffers(2, vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+	glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), v, GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(*attr_v,3, GL_FLOAT, GL_FALSE, 0, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+	glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), t, GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(*attr_t, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(*attr_v);
+	glEnableVertexAttribArray(*attr_t);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	vaoids.push_back(*vao);
+	vboids.push_back(vbo);
+	delete [] v;
+	delete [] t;
 }
 
 void GLWidget::generate_quad(
