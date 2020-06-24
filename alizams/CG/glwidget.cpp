@@ -22,7 +22,7 @@
 
 #define FBO_SIZE__0  512
 #define FBO_SIZE__1 1024
-//#define ALWAYS_SHOW_GL_ERROR
+#define ALWAYS_SHOW_GL_ERROR
 
 #ifndef DISABLE_SIMDMATH
 using namespace Vectormath::SSE;
@@ -131,7 +131,8 @@ const float color_letters[]  = {0.5f,0.5f,0.5f,0.8f,0.8f,0.8f};
 
 // to clear pointers
 static std::vector<ShaderObj*> shaders;
-static std::vector<GLuint*>    vboids;
+static std::vector<GLuint*>    vboids; // size 2
+static std::vector<GLuint>     vaoids;
 static std::vector<GLuint*>    textures;
 static std::vector<qMeshData*> qmeshes;
 
@@ -179,14 +180,17 @@ GLWidget::GLWidget(QWidget * p, Qt::WindowFlags f)
 	setFocusPolicy(Qt::WheelFocus);
 #if 1
     QSurfaceFormat format;
-	format.setRenderableType(QSurfaceFormat::OpenGL);
+	format.setProfile(QSurfaceFormat::CoreProfile);
+	format.setVersion(3, 2);
     format.setRedBufferSize(8);
     format.setGreenBufferSize(8);
     format.setBlueBufferSize(8);
     format.setAlphaBufferSize(8);
     format.setDepthBufferSize(24);
-    format.setSamples(4);
+	format.setRenderableType(QSurfaceFormat::OpenGL);
 	format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+	format.setSwapInterval(0);
+    //format.setSamples(4);
     setFormat(format);
 #endif
 	init_();
@@ -195,6 +199,96 @@ GLWidget::GLWidget(QWidget * p, Qt::WindowFlags f)
 void GLWidget::initializeGL()
 {
 	initializeOpenGLFunctions();
+#if 1
+	const QSurfaceFormat & f = format();
+	std::cout << "Major " << f.majorVersion() << std::endl;
+	std::cout << "Minor " << f.minorVersion() << std::endl;
+	std::cout << "Red buffer size "     << f.redBufferSize()     << std::endl;
+	std::cout << "Green buffer size "   << f.greenBufferSize()   << std::endl;
+	std::cout << "Blue buffer size "    << f.blueBufferSize()    << std::endl;
+	std::cout << "Stencil buffer size " << f.stencilBufferSize() << std::endl;
+	std::cout << "Depth buffer size "   << f.depthBufferSize()   << std::endl;
+	const int profile = (int)f.profile();
+	switch (profile)
+	{
+	case 0:
+		std::cout << "QSurfaceFormat::NoProfile" << std::endl;
+		break;
+	case 1:
+		std::cout << "QSurfaceFormat::CoreProfile" << std::endl;
+		break;
+	case 2:
+		std::cout << "QSurfaceFormat::CompatibilityProfile" << std::endl;
+		break;
+	default:
+		std::cout << "OpenGL profile ??" << std::endl;
+		break;
+	}
+	const int render = (int)f.renderableType();
+	switch (render)
+	{
+	case 0x0:
+		std::cout << "QSurfaceFormat::DefaultRenderableType" << std::endl;
+		break;
+	case 0x1:
+		std::cout << "QSurfaceFormat::OpenGL" << std::endl;
+		break;
+	case 0x2:
+		std::cout << "QSurfaceFormat::OpenGLES" << std::endl;
+		break;
+	case 0x4:
+		std::cout << "QSurfaceFormat::OpenVG" << std::endl;
+		break;
+	default:
+		std::cout << "Renderable type ??" << std::endl;
+		break;
+	}
+	const int swap = (int)f.swapBehavior();
+	switch (swap)
+	{
+	case 0:
+		std::cout << "QSurfaceFormat::DefaultSwapBehavior" << std::endl;
+		break;
+	case 1:
+		std::cout << "QSurfaceFormat::SingleBuffer" << std::endl;
+		break;
+	case 2:
+		std::cout << "QSurfaceFormat::DoubleBuffer" << std::endl;
+		break;
+	case 3:
+		std::cout << "QSurfaceFormat::TripleBuffer" << std::endl;
+		break;
+	default:
+		std::cout << "Swap behavior ??" << std::endl;
+		break;
+	}
+	std::cout << "Swap interval " << f.swapInterval() << std::endl;
+	std::cout << "Samples " << f.samples() << std::endl;
+	//
+	const QOpenGLContext * c = context();
+	if (!c)
+	{
+		std::cout << "QOpenGLContext is NULL " << std::endl;
+		return;
+	}
+	else
+	{
+		if (!c->isValid())
+		{
+			std::cout << "QOpenGLContext is invalid" << std::endl;
+			return;
+		}
+		else
+		{
+			QOpenGLFunctions_3_2_Core * funcs = c->versionFunctions<QOpenGLFunctions_3_2_Core>();
+			if (!funcs)
+			{
+			    std::cout << "Could not obtain required OpenGL context version" << std::endl;
+				return;
+			}
+		}
+	}
+#endif
 	update_clear_color();
 	if (!opengl_init_done)
 		init_opengl(this->size().width(), this->size().height());
@@ -616,12 +710,16 @@ void GLWidget::close_()
 	qmeshes.clear();
 	for (unsigned int x = 0; x < vboids.size(); x++)
 	{
-		// size 2!!
-		glDeleteBuffers(2, vboids[x]);
+		glDeleteBuffers(2, vboids[x]); // size 2
 		increment_count_vbos(-2);
 		delete[] vboids[x];
 	}
 	vboids.clear();
+	for (unsigned int x = 0; x < vaoids.size(); x++)
+	{
+		glDeleteVertexArrays(1, &(vaoids[x]));
+	}
+	vaoids.clear();
 	for (unsigned int x = 0; x < textures.size(); x++)
 	{
 		glDeleteTextures(1, textures[x]);
@@ -632,6 +730,10 @@ void GLWidget::close_()
 	free_fbos0(&cubebuffer,     &cube_tex,     &cube_depth);
 	free_fbos1(&backfacebuffer, &backface_tex, &backface_depth);
 	free_fbos1(&frontfacebuffer,&frontface_tex,&frontface_depth);
+	glDeleteVertexArrays(1, &scene_vao);
+	glDeleteVertexArrays(1, &frames_vao);
+	glDeleteVertexArrays(1, &slice_v_vao);
+	glDeleteVertexArrays(1, &slice_t_vao);
 	glDeleteBuffers(1, &scene_vbo);
 	glDeleteBuffers(1, &frames_vbo);
 	glDeleteBuffers(1, &slice_v_vbo);
@@ -659,6 +761,7 @@ void GLWidget::close_()
 
 void GLWidget::init_opengl(int w, int h)
 {
+	srand(time(NULL));
 	if (opengl_init_done) return;
 	opengl_init_done = true;
 	for (int i = 0; i < 16; i++) mparams[i] = 0.0f;
@@ -706,521 +809,592 @@ void GLWidget::init_opengl(int w, int h)
 	if (no_opengl3)
 	{
 		opengl_info.append(QString("\nOpenGL modules disabled"));
+		return;
 	}
-	else
-	{
-		camera->set_heading(0.0f);
-		camera->set_pitch(0.0f);
-		camera->set_position(0.0f,0.0f,(float)SCENE_POS_Z);
-		//
-		glEnable(GL_DEPTH_TEST);
-		glDisable(GL_CULL_FACE);
- 		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glViewport(0,0,win_w,win_h);
-		glLineWidth(1.0f);
-		glActiveTexture(GL_TEXTURE1);
+	camera->set_heading(0.0f);
+	camera->set_pitch(0.0f);
+	camera->set_position(0.0f,0.0f,(float)SCENE_POS_Z);
+	//
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+ 	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glViewport(0,0,win_w,win_h);
+	glLineWidth(1.0f);
+	glActiveTexture(GL_TEXTURE1);
 /*
-		GLint max_samples_;
-		glGetIntegerv(GL_MAX_INTEGER_SAMPLES, &max_samples_);
-		std::cout << "GL_MAX_INTEGER_SAMPLES " << max_samples_ << std::endl;
+	GLint max_samples_;
+	glGetIntegerv(GL_MAX_INTEGER_SAMPLES, &max_samples_);
+	std::cout << "GL_MAX_INTEGER_SAMPLES " << max_samples_ << std::endl;
 
-		GLfloat sample_coverage_;
-		glGetFloatv(GL_SAMPLE_COVERAGE_VALUE, &sample_coverage_);
-		std::cout << "GL_SAMPLE_COVERAGE_VALUE " << sample_coverage_ << std::endl;
+	GLfloat sample_coverage_;
+	glGetFloatv(GL_SAMPLE_COVERAGE_VALUE, &sample_coverage_);
+	std::cout << "GL_SAMPLE_COVERAGE_VALUE " << sample_coverage_ << std::endl;
 
-		GLint samples_;
-		glGetIntegerv(GL_SAMPLES, &samples_);
-		std::cout << "GL_SAMPLES " << samples_ << std::endl;
+	GLint samples_;
+	glGetIntegerv(GL_SAMPLES, &samples_);
+	std::cout << "GL_SAMPLES " << samples_ << std::endl;
 */
-		create_program(c3d_vs, c3d_fs, &c3d_shader);
-		c3d_shader.location_mvp        = glGetUniformLocation(c3d_shader.program, "mvp");
-		c3d_shader.location_sampler[0] = glGetUniformLocation(c3d_shader.program, "sampler0");
-		c3d_shader.position_handle     = glGetAttribLocation (c3d_shader.program, "v_position");
-		c3d_shader.texture_handle[0]   = glGetAttribLocation (c3d_shader.program, "v_texcoord0");
-		c3d_shader.location_mparams    = glGetUniformLocation(c3d_shader.program, "mparams");
-		shaders.push_back(&c3d_shader);
+	create_program(c3d_vs, c3d_fs, &c3d_shader);
+	c3d_shader.location_mvp        = glGetUniformLocation(c3d_shader.program, "mvp");
+	c3d_shader.location_sampler[0] = glGetUniformLocation(c3d_shader.program, "sampler0");
+	c3d_shader.position_handle     = glGetAttribLocation (c3d_shader.program, "v_position");
+	c3d_shader.texture_handle[0]   = glGetAttribLocation (c3d_shader.program, "v_texcoord0");
+	c3d_shader.location_mparams    = glGetUniformLocation(c3d_shader.program, "mparams");
+	shaders.push_back(&c3d_shader);
+	//
+	create_program(c3d_vs, c3d_fs_bb, &c3d_shader_bb);
+	c3d_shader_bb.location_mvp        = glGetUniformLocation(c3d_shader_bb.program, "mvp");
+	c3d_shader_bb.location_sampler[0] = glGetUniformLocation(c3d_shader_bb.program, "sampler0");
+	c3d_shader_bb.position_handle     = glGetAttribLocation (c3d_shader_bb.program, "v_position");
+	c3d_shader_bb.texture_handle[0]   = glGetAttribLocation (c3d_shader_bb.program, "v_texcoord0");
+	c3d_shader_bb.location_mparams    = glGetUniformLocation(c3d_shader_bb.program, "mparams");
+	shaders.push_back(&c3d_shader_bb);
+	//
+	create_program(c3d_vs, c3d_fs_clamp, &c3d_shader_clamp);
+	c3d_shader_clamp.location_mvp        = glGetUniformLocation(c3d_shader_clamp.program, "mvp");
+	c3d_shader_clamp.location_sampler[0] = glGetUniformLocation(c3d_shader_clamp.program, "sampler0");
+	c3d_shader_clamp.position_handle     = glGetAttribLocation (c3d_shader_clamp.program, "v_position");
+	c3d_shader_clamp.texture_handle[0]   = glGetAttribLocation (c3d_shader_clamp.program, "v_texcoord0");
+	c3d_shader_clamp.location_mparams    = glGetUniformLocation(c3d_shader_clamp.program, "mparams");
+	shaders.push_back(&c3d_shader_clamp);
+
+	//
+	create_program(c3d_vs, c3d_fs_bb_clamp, &c3d_shader_bb_clamp);
+	c3d_shader_bb_clamp.location_mvp        = glGetUniformLocation(c3d_shader_bb_clamp.program, "mvp");
+	c3d_shader_bb_clamp.location_sampler[0] = glGetUniformLocation(c3d_shader_bb_clamp.program, "sampler0");
+	c3d_shader_bb_clamp.position_handle     = glGetAttribLocation (c3d_shader_bb_clamp.program, "v_position");
+	c3d_shader_bb_clamp.texture_handle[0]   = glGetAttribLocation (c3d_shader_bb_clamp.program, "v_texcoord0");
+	c3d_shader_bb_clamp.location_mparams    = glGetUniformLocation(c3d_shader_bb_clamp.program, "mparams");
+	shaders.push_back(&c3d_shader_bb_clamp);
+	//
+	create_program(c3d_vs, c3d_fs_gradient, &c3d_shader_gradient);
+	c3d_shader_gradient.location_mvp        = glGetUniformLocation(c3d_shader_gradient.program, "mvp");
+	c3d_shader_gradient.location_sampler[0] = glGetUniformLocation(c3d_shader_gradient.program, "sampler0");
+	c3d_shader_gradient.location_sampler[1] = glGetUniformLocation(c3d_shader_gradient.program, "sampler1");
+	c3d_shader_gradient.position_handle     = glGetAttribLocation (c3d_shader_gradient.program, "v_position");
+	c3d_shader_gradient.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient.program, "v_texcoord0");
+	c3d_shader_gradient.location_mparams    = glGetUniformLocation(c3d_shader_gradient.program, "mparams");
+	shaders.push_back(&c3d_shader_gradient);
+	//
+	create_program(c3d_vs, c3d_fs_gradient_bb, &c3d_shader_gradient_bb);
+	c3d_shader_gradient_bb.location_mvp        = glGetUniformLocation(c3d_shader_gradient_bb.program, "mvp");
+	c3d_shader_gradient_bb.location_sampler[0] = glGetUniformLocation(c3d_shader_gradient_bb.program, "sampler0");
+	c3d_shader_gradient_bb.location_sampler[1] = glGetUniformLocation(c3d_shader_gradient_bb.program, "sampler1");
+	c3d_shader_gradient_bb.position_handle     = glGetAttribLocation (c3d_shader_gradient_bb.program, "v_position");
+	c3d_shader_gradient_bb.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient_bb.program, "v_texcoord0");
+	c3d_shader_gradient_bb.location_mparams    = glGetUniformLocation(c3d_shader_gradient_bb.program, "mparams");
+	shaders.push_back(&c3d_shader_gradient_bb);
+	//
+	create_program(c3d_vs, c3d_fs_gradient_clamp, &c3d_shader_gradient_clamp);
+	c3d_shader_gradient_clamp.location_mvp        = glGetUniformLocation(c3d_shader_gradient_clamp.program, "mvp");
+	c3d_shader_gradient_clamp.location_sampler[0] = glGetUniformLocation(c3d_shader_gradient_clamp.program, "sampler0");
+	c3d_shader_gradient_clamp.location_sampler[1] = glGetUniformLocation(c3d_shader_gradient_clamp.program, "sampler1");
+	c3d_shader_gradient_clamp.position_handle     = glGetAttribLocation (c3d_shader_gradient_clamp.program, "v_position");
+	c3d_shader_gradient_clamp.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient_clamp.program, "v_texcoord0");
+	c3d_shader_gradient_clamp.location_mparams    = glGetUniformLocation(c3d_shader_gradient_clamp.program, "mparams");
+	shaders.push_back(&c3d_shader_gradient_clamp);
+	//
+	create_program(c3d_vs, c3d_fs_gradient_bb_clamp, &c3d_shader_gradient_bb_clamp);
+	c3d_shader_gradient_bb_clamp.location_mvp        = glGetUniformLocation(c3d_shader_gradient_bb_clamp.program, "mvp");
+	c3d_shader_gradient_bb_clamp.location_sampler[0] = glGetUniformLocation(c3d_shader_gradient_bb_clamp.program, "sampler0");
+	c3d_shader_gradient_bb_clamp.location_sampler[1] = glGetUniformLocation(c3d_shader_gradient_bb_clamp.program, "sampler1");
+	c3d_shader_gradient_bb_clamp.position_handle     = glGetAttribLocation (c3d_shader_gradient_bb_clamp.program, "v_position");
+	c3d_shader_gradient_bb_clamp.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient_bb_clamp.program, "v_texcoord0");
+	c3d_shader_gradient_bb_clamp.location_mparams    = glGetUniformLocation(c3d_shader_gradient_bb_clamp.program, "mparams");
+	shaders.push_back(&c3d_shader_gradient_bb_clamp);
+	//
+	create_program(c3d_vs, c3d_fs_sigm, &c3d_shader_sigm);
+	c3d_shader_sigm.location_mvp        = glGetUniformLocation(c3d_shader_sigm.program, "mvp");
+	c3d_shader_sigm.location_sampler[0] = glGetUniformLocation(c3d_shader_sigm.program, "sampler0");
+	c3d_shader_sigm.position_handle     = glGetAttribLocation (c3d_shader_sigm.program, "v_position");
+	c3d_shader_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_sigm.program, "v_texcoord0");
+	c3d_shader_sigm.location_mparams    = glGetUniformLocation(c3d_shader_sigm.program, "mparams");
+	shaders.push_back(&c3d_shader_sigm);
+	//
+	create_program(c3d_vs, c3d_fs_bb_sigm, &c3d_shader_bb_sigm);
+	c3d_shader_bb_sigm.location_mvp        = glGetUniformLocation(c3d_shader_bb_sigm.program, "mvp");
+	c3d_shader_bb_sigm.location_sampler[0] = glGetUniformLocation(c3d_shader_bb_sigm.program, "sampler0");
+	c3d_shader_bb_sigm.position_handle     = glGetAttribLocation (c3d_shader_bb_sigm.program, "v_position");
+	c3d_shader_bb_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_bb_sigm.program, "v_texcoord0");
+	c3d_shader_bb_sigm.location_mparams    = glGetUniformLocation(c3d_shader_bb_sigm.program, "mparams");
+	shaders.push_back(&c3d_shader_bb_sigm);
+	//
+	create_program(c3d_vs, c3d_fs_clamp_sigm, &c3d_shader_clamp_sigm);
+	c3d_shader_clamp_sigm.location_mvp        = glGetUniformLocation(c3d_shader_clamp_sigm.program, "mvp");
+	c3d_shader_clamp_sigm.location_sampler[0] = glGetUniformLocation(c3d_shader_clamp_sigm.program, "sampler0");
+	c3d_shader_clamp_sigm.position_handle     = glGetAttribLocation (c3d_shader_clamp_sigm.program, "v_position");
+	c3d_shader_clamp_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_clamp_sigm.program, "v_texcoord0");
+	c3d_shader_clamp_sigm.location_mparams    = glGetUniformLocation(c3d_shader_clamp_sigm.program, "mparams");
+	shaders.push_back(&c3d_shader_clamp_sigm);
+	//
+	create_program(c3d_vs, c3d_fs_bb_clamp_sigm, &c3d_shader_bb_clamp_sigm);
+	c3d_shader_bb_clamp_sigm.location_mvp        = glGetUniformLocation(c3d_shader_bb_clamp_sigm.program, "mvp");
+	c3d_shader_bb_clamp_sigm.location_sampler[0] = glGetUniformLocation(c3d_shader_bb_clamp_sigm.program, "sampler0");
+	c3d_shader_bb_clamp_sigm.position_handle     = glGetAttribLocation (c3d_shader_bb_clamp_sigm.program, "v_position");
+	c3d_shader_bb_clamp_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_bb_clamp_sigm.program, "v_texcoord0");
+	c3d_shader_bb_clamp_sigm.location_mparams    = glGetUniformLocation(c3d_shader_bb_clamp_sigm.program, "mparams");
+	shaders.push_back(&c3d_shader_bb_clamp_sigm);
+	//
+	create_program(c3d_vs, c3d_fs_gradient_sigm, &c3d_shader_gradient_sigm);
+	c3d_shader_gradient_sigm.location_mvp        = glGetUniformLocation(c3d_shader_gradient_sigm.program, "mvp");
+	c3d_shader_gradient_sigm.location_sampler[0] = glGetUniformLocation(c3d_shader_gradient_sigm.program, "sampler0");
+	c3d_shader_gradient_sigm.location_sampler[1] = glGetUniformLocation(c3d_shader_gradient_sigm.program, "sampler1");
+	c3d_shader_gradient_sigm.position_handle     = glGetAttribLocation (c3d_shader_gradient_sigm.program, "v_position");
+	c3d_shader_gradient_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient_sigm.program, "v_texcoord0");
+	c3d_shader_gradient_sigm.location_mparams    = glGetUniformLocation(c3d_shader_gradient_sigm.program, "mparams");
+	shaders.push_back(&c3d_shader_gradient_sigm);
+	//
+	create_program(c3d_vs, c3d_fs_gradient_bb_sigm, &c3d_shader_gradient_bb_sigm);
+	c3d_shader_gradient_bb_sigm.location_mvp        = glGetUniformLocation(c3d_shader_gradient_bb_sigm.program, "mvp");
+	c3d_shader_gradient_bb_sigm.location_sampler[0] = glGetUniformLocation(c3d_shader_gradient_bb_sigm.program, "sampler0");
+	c3d_shader_gradient_bb_sigm.location_sampler[1] = glGetUniformLocation(c3d_shader_gradient_bb_sigm.program, "sampler1");
+	c3d_shader_gradient_bb_sigm.position_handle     = glGetAttribLocation (c3d_shader_gradient_bb_sigm.program, "v_position");
+	c3d_shader_gradient_bb_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient_bb_sigm.program, "v_texcoord0");
+	c3d_shader_gradient_bb_sigm.location_mparams    = glGetUniformLocation(c3d_shader_gradient_bb_sigm.program, "mparams");
+	shaders.push_back(&c3d_shader_gradient_bb_sigm);
+	//
+	create_program(c3d_vs, c3d_fs_gradient_clamp_sigm, &c3d_shader_gradient_clamp_sigm);
+	c3d_shader_gradient_clamp_sigm.location_mvp        = glGetUniformLocation(c3d_shader_gradient_clamp_sigm.program, "mvp");
+	c3d_shader_gradient_clamp_sigm.location_sampler[0] = glGetUniformLocation(c3d_shader_gradient_clamp_sigm.program, "sampler0");
+	c3d_shader_gradient_clamp_sigm.location_sampler[1] = glGetUniformLocation(c3d_shader_gradient_clamp_sigm.program, "sampler1");
+	c3d_shader_gradient_clamp_sigm.position_handle     = glGetAttribLocation (c3d_shader_gradient_clamp_sigm.program, "v_position");
+	c3d_shader_gradient_clamp_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient_clamp_sigm.program, "v_texcoord0");
+	c3d_shader_gradient_clamp_sigm.location_mparams    = glGetUniformLocation(c3d_shader_gradient_clamp_sigm.program, "mparams");
+	shaders.push_back(&c3d_shader_gradient_clamp_sigm);
+	//
+	create_program(c3d_vs, c3d_fs_gradient_bb_clamp_sigm, &c3d_shader_gradient_bb_clamp_sigm);
+	c3d_shader_gradient_bb_clamp_sigm.location_mvp        = glGetUniformLocation(c3d_shader_gradient_bb_clamp_sigm.program, "mvp");
+	c3d_shader_gradient_bb_clamp_sigm.location_sampler[0] = glGetUniformLocation(c3d_shader_gradient_bb_clamp_sigm.program, "sampler0");
+	c3d_shader_gradient_bb_clamp_sigm.location_sampler[1] = glGetUniformLocation(c3d_shader_gradient_bb_clamp_sigm.program, "sampler1");
+	c3d_shader_gradient_bb_clamp_sigm.position_handle     = glGetAttribLocation (c3d_shader_gradient_bb_clamp_sigm.program, "v_position");
+	c3d_shader_gradient_bb_clamp_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient_bb_clamp_sigm.program, "v_texcoord0");
+	c3d_shader_gradient_bb_clamp_sigm.location_mparams    = glGetUniformLocation(c3d_shader_gradient_bb_clamp_sigm.program, "mparams");
+	shaders.push_back(&c3d_shader_gradient_bb_clamp_sigm);
+	//
+	create_program(frame_vs, frame_fs, &frame_shader);
+	frame_shader.location_mvp        = glGetUniformLocation(frame_shader.program, "mvp");
+	frame_shader.location_K          = glGetUniformLocation(frame_shader.program, "K");
+	frame_shader.position_handle     = glGetAttribLocation (frame_shader.program, "v_position");
+	shaders.push_back(&frame_shader);
+	//
+	create_program(simple_tex_vs, simple_tex_fs, &simple_tex_shader);
+	simple_tex_shader.location_mvp        = glGetUniformLocation(simple_tex_shader.program, "mvp");
+	simple_tex_shader.location_sampler[0] = glGetUniformLocation(simple_tex_shader.program, "sampler0");
+	simple_tex_shader.position_handle     = glGetAttribLocation (simple_tex_shader.program, "v_position");
+	simple_tex_shader.texture_handle[0]   = glGetAttribLocation (simple_tex_shader.program, "v_texcoord0");
+	shaders.push_back(&simple_tex_shader);
+	//
+	/*
+    create_program(TBNf_vs0, TBNf_fs0, &sphere0_shader);    
+    sphere0_shader.position_handle         = glGetAttribLocation (sphere0_shader.program, "v_position");
+    sphere0_shader.normal_handle           = glGetAttribLocation (sphere0_shader.program, "v_normal");
+    sphere0_shader.texture_handle[0]       = glGetAttribLocation (sphere0_shader.program, "v_texcoord0");
+    sphere0_shader.tangent_handle          = glGetAttribLocation (sphere0_shader.program, "v_tangent");
+    sphere0_shader.location_shininess      = glGetUniformLocation(sphere0_shader.program, "shininess");
+    sphere0_shader.location_mvp            = glGetUniformLocation(sphere0_shader.program, "mvp");
+    sphere0_shader.location_modeling       = glGetUniformLocation(sphere0_shader.program, "modeling");
+    sphere0_shader.location_modeling_inv_t = glGetUniformLocation(sphere0_shader.program, "modeling_inv_t");
+    sphere0_shader.location_sparams        = glGetUniformLocation(sphere0_shader.program, "sparams");
+    sphere0_shader.location_sampler[0]     = glGetUniformLocation(sphere0_shader.program, "sampler0");
+    sphere0_shader.location_sampler[1]     = glGetUniformLocation(sphere0_shader.program, "sampler1");  
+    shaders.push_back(&sphere0_shader);
+	//
+	create_program(color_vs, color_fs, &color_shader);
+	color_shader.position_handle         = glGetAttribLocation (color_shader.program, "v_position");
+	color_shader.normal_handle           = glGetAttribLocation (color_shader.program, "v_normal");
+	color_shader.location_K              = glGetUniformLocation(color_shader.program, "K");
+	color_shader.location_shininess      = glGetUniformLocation(color_shader.program, "shininess");
+	color_shader.location_mvp            = glGetUniformLocation(color_shader.program, "mvp");
+	color_shader.location_modeling       = glGetUniformLocation(color_shader.program, "modeling");
+	color_shader.location_modeling_inv_t = glGetUniformLocation(color_shader.program, "modeling_inv_t");
+	color_shader.location_sparams        = glGetUniformLocation(color_shader.program, "sparams");
+	shaders.push_back(&color_shader);
+	*/
+	create_program(color_vs, orientcube_fs, &orientcube_shader);
+	orientcube_shader.position_handle         = glGetAttribLocation (orientcube_shader.program, "v_position");
+	orientcube_shader.normal_handle           = glGetAttribLocation (orientcube_shader.program, "v_normal");
+	orientcube_shader.location_K              = glGetUniformLocation(orientcube_shader.program, "K");
+	orientcube_shader.location_mvp            = glGetUniformLocation(orientcube_shader.program, "mvp");
+	orientcube_shader.location_sparams        = glGetUniformLocation(orientcube_shader.program, "sparams");
+	shaders.push_back(&orientcube_shader);
+	//
+	create_program(color_vs, mesh_fs, &mesh_shader);
+	mesh_shader.position_handle         = glGetAttribLocation (mesh_shader.program, "v_position");
+	mesh_shader.normal_handle           = glGetAttribLocation (mesh_shader.program, "v_normal");
+	mesh_shader.location_K              = glGetUniformLocation(mesh_shader.program, "K");
+	mesh_shader.location_mvp            = glGetUniformLocation(mesh_shader.program, "mvp");
+	mesh_shader.location_sparams        = glGetUniformLocation(mesh_shader.program, "sparams");
+	shaders.push_back(&mesh_shader);
+	//
+#if 1
+	checkGLerror(" after shaders creation\n");
+#endif
+	gen_lut_tex(default_lut,default_lut_size,&gradient1);
+	gen_lut_tex(black_rainbow_lut,black_rainbow_size,&gradient2);
+	gen_lut_tex(syngo_lut,syngo_lut_size,&gradient3);
+	gen_lut_tex(hot_iron,hot_iron_size,&gradient4);
+	gen_lut_tex(hot_metal_blue,hot_metal_blue_size,&gradient5);
+	gen_lut_tex(pet_dicom_lut,pet_dicom_lut_size,&gradient6);
+	gen_lut_tex(pet20_dicom_lut,pet20_dicom_lut_size,&gradient7);
+#if 1
+	checkGLerror(" after gen_lut_tex\n");
+#endif
+	//
+	bool ok = create_fbos0(FBO_SIZE__0, FBO_SIZE__0,
+			&framebuffer,
+			&fbo_tex,
+			&fbo_depth);
+	if (!ok) { std::cout << "create_fbos0() failed"<< std::endl; }
+#if 1
+	checkGLerror(" after create_fbos0\n");
+#endif
+	create_program(fsquad_vs, fsquad_fs, &fsquad_shader);
+	fsquad_shader.location_sampler[0] = glGetUniformLocation(fsquad_shader.program, "sampler0");
+	fsquad_shader.position_handle     = glGetAttribLocation (fsquad_shader.program, "v_position");
+	shaders.push_back(&fsquad_shader);
+	generate_screen_quad(&scene_vbo, &scene_vao, &(fsquad_shader.position_handle));
+#if 1
+	checkGLerror(" after generate_screen_quad\n");
+#endif
+	//
+#if 1
+	checkGLerror(" after n1\n");
+#endif
+	{
+		float * tmp99 = new float[12];
+		for (int x = 0; x < 12; x++) tmp99[x] = 0.0f;
+		glGenVertexArrays(1, &frames_vao);
+		glBindVertexArray(frames_vao);
+		glGenBuffers(1, &frames_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, frames_vbo);
+		glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
+		glEnableVertexAttribArray(frame_shader.position_handle);
+		glVertexAttribPointer(frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
+		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		//
-		create_program(c3d_vs, c3d_fs_bb, &c3d_shader_bb);
-		c3d_shader_bb.location_mvp        = glGetUniformLocation(c3d_shader_bb.program, "mvp");
-		c3d_shader_bb.location_sampler[0] = glGetUniformLocation(c3d_shader_bb.program, "sampler0");
-		c3d_shader_bb.position_handle     = glGetAttribLocation (c3d_shader_bb.program, "v_position");
-		c3d_shader_bb.texture_handle[0]   = glGetAttribLocation (c3d_shader_bb.program, "v_texcoord0");
-		c3d_shader_bb.location_mparams    = glGetUniformLocation(c3d_shader_bb.program, "mparams");
-		shaders.push_back(&c3d_shader_bb);
-		//
-		create_program(c3d_vs, c3d_fs_clamp, &c3d_shader_clamp);
-		c3d_shader_clamp.location_mvp        = glGetUniformLocation(c3d_shader_clamp.program, "mvp");
-		c3d_shader_clamp.location_sampler[0] = glGetUniformLocation(c3d_shader_clamp.program, "sampler0");
-		c3d_shader_clamp.position_handle     = glGetAttribLocation (c3d_shader_clamp.program, "v_position");
-		c3d_shader_clamp.texture_handle[0]   = glGetAttribLocation (c3d_shader_clamp.program, "v_texcoord0");
-		c3d_shader_clamp.location_mparams    = glGetUniformLocation(c3d_shader_clamp.program, "mparams");
-		shaders.push_back(&c3d_shader_clamp);
-		//
-		create_program(c3d_vs, c3d_fs_bb_clamp, &c3d_shader_bb_clamp);
-		c3d_shader_bb_clamp.location_mvp        = glGetUniformLocation(c3d_shader_bb_clamp.program, "mvp");
-		c3d_shader_bb_clamp.location_sampler[0] = glGetUniformLocation(c3d_shader_bb_clamp.program, "sampler0");
-		c3d_shader_bb_clamp.position_handle     = glGetAttribLocation (c3d_shader_bb_clamp.program, "v_position");
-		c3d_shader_bb_clamp.texture_handle[0]   = glGetAttribLocation (c3d_shader_bb_clamp.program, "v_texcoord0");
-		c3d_shader_bb_clamp.location_mparams    = glGetUniformLocation(c3d_shader_bb_clamp.program, "mparams");
-		shaders.push_back(&c3d_shader_bb_clamp);
-		//
-		create_program(c3d_vs, c3d_fs_gradient, &c3d_shader_gradient);
-		c3d_shader_gradient.location_mvp        = glGetUniformLocation(c3d_shader_gradient.program, "mvp");
-		c3d_shader_gradient.location_sampler[0] = glGetUniformLocation(c3d_shader_gradient.program, "sampler0");
-		c3d_shader_gradient.location_sampler[1] = glGetUniformLocation(c3d_shader_gradient.program, "sampler1");
-		c3d_shader_gradient.position_handle     = glGetAttribLocation (c3d_shader_gradient.program, "v_position");
-		c3d_shader_gradient.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient.program, "v_texcoord0");
-		c3d_shader_gradient.location_mparams    = glGetUniformLocation(c3d_shader_gradient.program, "mparams");
-		shaders.push_back(&c3d_shader_gradient);
-		//
-		create_program(c3d_vs, c3d_fs_gradient_bb, &c3d_shader_gradient_bb);
-		c3d_shader_gradient_bb.location_mvp        = glGetUniformLocation(c3d_shader_gradient_bb.program, "mvp");
-		c3d_shader_gradient_bb.location_sampler[0] = glGetUniformLocation(c3d_shader_gradient_bb.program, "sampler0");
-		c3d_shader_gradient_bb.location_sampler[1] = glGetUniformLocation(c3d_shader_gradient_bb.program, "sampler1");
-		c3d_shader_gradient_bb.position_handle     = glGetAttribLocation (c3d_shader_gradient_bb.program, "v_position");
-		c3d_shader_gradient_bb.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient_bb.program, "v_texcoord0");
-		c3d_shader_gradient_bb.location_mparams    = glGetUniformLocation(c3d_shader_gradient_bb.program, "mparams");
-		shaders.push_back(&c3d_shader_gradient_bb);
-		//
-		create_program(c3d_vs, c3d_fs_gradient_clamp, &c3d_shader_gradient_clamp);
-		c3d_shader_gradient_clamp.location_mvp        = glGetUniformLocation(c3d_shader_gradient_clamp.program, "mvp");
-		c3d_shader_gradient_clamp.location_sampler[0] = glGetUniformLocation(c3d_shader_gradient_clamp.program, "sampler0");
-		c3d_shader_gradient_clamp.location_sampler[1] = glGetUniformLocation(c3d_shader_gradient_clamp.program, "sampler1");
-		c3d_shader_gradient_clamp.position_handle     = glGetAttribLocation (c3d_shader_gradient_clamp.program, "v_position");
-		c3d_shader_gradient_clamp.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient_clamp.program, "v_texcoord0");
-		c3d_shader_gradient_clamp.location_mparams    = glGetUniformLocation(c3d_shader_gradient_clamp.program, "mparams");
-		shaders.push_back(&c3d_shader_gradient_clamp);
-		//
-		create_program(c3d_vs, c3d_fs_gradient_bb_clamp, &c3d_shader_gradient_bb_clamp);
-		c3d_shader_gradient_bb_clamp.location_mvp        = glGetUniformLocation(c3d_shader_gradient_bb_clamp.program, "mvp");
-		c3d_shader_gradient_bb_clamp.location_sampler[0] = glGetUniformLocation(c3d_shader_gradient_bb_clamp.program, "sampler0");
-		c3d_shader_gradient_bb_clamp.location_sampler[1] = glGetUniformLocation(c3d_shader_gradient_bb_clamp.program, "sampler1");
-		c3d_shader_gradient_bb_clamp.position_handle     = glGetAttribLocation (c3d_shader_gradient_bb_clamp.program, "v_position");
-		c3d_shader_gradient_bb_clamp.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient_bb_clamp.program, "v_texcoord0");
-		c3d_shader_gradient_bb_clamp.location_mparams    = glGetUniformLocation(c3d_shader_gradient_bb_clamp.program, "mparams");
-		shaders.push_back(&c3d_shader_gradient_bb_clamp);
-		//
-		create_program(c3d_vs, c3d_fs_sigm, &c3d_shader_sigm);
-		c3d_shader_sigm.location_mvp        = glGetUniformLocation(c3d_shader_sigm.program, "mvp");
-		c3d_shader_sigm.location_sampler[0] = glGetUniformLocation(c3d_shader_sigm.program, "sampler0");
-		c3d_shader_sigm.position_handle     = glGetAttribLocation (c3d_shader_sigm.program, "v_position");
-		c3d_shader_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_sigm.program, "v_texcoord0");
-		c3d_shader_sigm.location_mparams    = glGetUniformLocation(c3d_shader_sigm.program, "mparams");
-		shaders.push_back(&c3d_shader_sigm);
-		//
-		create_program(c3d_vs, c3d_fs_bb_sigm, &c3d_shader_bb_sigm);
-		c3d_shader_bb_sigm.location_mvp        = glGetUniformLocation(c3d_shader_bb_sigm.program, "mvp");
-		c3d_shader_bb_sigm.location_sampler[0] = glGetUniformLocation(c3d_shader_bb_sigm.program, "sampler0");
-		c3d_shader_bb_sigm.position_handle     = glGetAttribLocation (c3d_shader_bb_sigm.program, "v_position");
-		c3d_shader_bb_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_bb_sigm.program, "v_texcoord0");
-		c3d_shader_bb_sigm.location_mparams    = glGetUniformLocation(c3d_shader_bb_sigm.program, "mparams");
-		shaders.push_back(&c3d_shader_bb_sigm);
-		//
-		create_program(c3d_vs, c3d_fs_clamp_sigm, &c3d_shader_clamp_sigm);
-		c3d_shader_clamp_sigm.location_mvp        = glGetUniformLocation(c3d_shader_clamp_sigm.program, "mvp");
-		c3d_shader_clamp_sigm.location_sampler[0] = glGetUniformLocation(c3d_shader_clamp_sigm.program, "sampler0");
-		c3d_shader_clamp_sigm.position_handle     = glGetAttribLocation (c3d_shader_clamp_sigm.program, "v_position");
-		c3d_shader_clamp_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_clamp_sigm.program, "v_texcoord0");
-		c3d_shader_clamp_sigm.location_mparams    = glGetUniformLocation(c3d_shader_clamp_sigm.program, "mparams");
-		shaders.push_back(&c3d_shader_clamp_sigm);
-		//
-		create_program(c3d_vs, c3d_fs_bb_clamp_sigm, &c3d_shader_bb_clamp_sigm);
-		c3d_shader_bb_clamp_sigm.location_mvp        = glGetUniformLocation(c3d_shader_bb_clamp_sigm.program, "mvp");
-		c3d_shader_bb_clamp_sigm.location_sampler[0] = glGetUniformLocation(c3d_shader_bb_clamp_sigm.program, "sampler0");
-		c3d_shader_bb_clamp_sigm.position_handle     = glGetAttribLocation (c3d_shader_bb_clamp_sigm.program, "v_position");
-		c3d_shader_bb_clamp_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_bb_clamp_sigm.program, "v_texcoord0");
-		c3d_shader_bb_clamp_sigm.location_mparams    = glGetUniformLocation(c3d_shader_bb_clamp_sigm.program, "mparams");
-		shaders.push_back(&c3d_shader_bb_clamp_sigm);
-		//
-		create_program(c3d_vs, c3d_fs_gradient_sigm, &c3d_shader_gradient_sigm);
-		c3d_shader_gradient_sigm.location_mvp        = glGetUniformLocation(c3d_shader_gradient_sigm.program, "mvp");
-		c3d_shader_gradient_sigm.location_sampler[0] = glGetUniformLocation(c3d_shader_gradient_sigm.program, "sampler0");
-		c3d_shader_gradient_sigm.location_sampler[1] = glGetUniformLocation(c3d_shader_gradient_sigm.program, "sampler1");
-		c3d_shader_gradient_sigm.position_handle     = glGetAttribLocation (c3d_shader_gradient_sigm.program, "v_position");
-		c3d_shader_gradient_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient_sigm.program, "v_texcoord0");
-		c3d_shader_gradient_sigm.location_mparams    = glGetUniformLocation(c3d_shader_gradient_sigm.program, "mparams");
-		shaders.push_back(&c3d_shader_gradient_sigm);
-		//
-		create_program(c3d_vs, c3d_fs_gradient_bb_sigm, &c3d_shader_gradient_bb_sigm);
-		c3d_shader_gradient_bb_sigm.location_mvp        = glGetUniformLocation(c3d_shader_gradient_bb_sigm.program, "mvp");
-		c3d_shader_gradient_bb_sigm.location_sampler[0] = glGetUniformLocation(c3d_shader_gradient_bb_sigm.program, "sampler0");
-		c3d_shader_gradient_bb_sigm.location_sampler[1] = glGetUniformLocation(c3d_shader_gradient_bb_sigm.program, "sampler1");
-		c3d_shader_gradient_bb_sigm.position_handle     = glGetAttribLocation (c3d_shader_gradient_bb_sigm.program, "v_position");
-		c3d_shader_gradient_bb_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient_bb_sigm.program, "v_texcoord0");
-		c3d_shader_gradient_bb_sigm.location_mparams    = glGetUniformLocation(c3d_shader_gradient_bb_sigm.program, "mparams");
-		shaders.push_back(&c3d_shader_gradient_bb_sigm);
-		//
-		create_program(c3d_vs, c3d_fs_gradient_clamp_sigm, &c3d_shader_gradient_clamp_sigm);
-		c3d_shader_gradient_clamp_sigm.location_mvp        = glGetUniformLocation(c3d_shader_gradient_clamp_sigm.program, "mvp");
-		c3d_shader_gradient_clamp_sigm.location_sampler[0] = glGetUniformLocation(c3d_shader_gradient_clamp_sigm.program, "sampler0");
-		c3d_shader_gradient_clamp_sigm.location_sampler[1] = glGetUniformLocation(c3d_shader_gradient_clamp_sigm.program, "sampler1");
-		c3d_shader_gradient_clamp_sigm.position_handle     = glGetAttribLocation (c3d_shader_gradient_clamp_sigm.program, "v_position");
-		c3d_shader_gradient_clamp_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient_clamp_sigm.program, "v_texcoord0");
-		c3d_shader_gradient_clamp_sigm.location_mparams    = glGetUniformLocation(c3d_shader_gradient_clamp_sigm.program, "mparams");
-		shaders.push_back(&c3d_shader_gradient_clamp_sigm);
-		//
-		create_program(c3d_vs, c3d_fs_gradient_bb_clamp_sigm, &c3d_shader_gradient_bb_clamp_sigm);
-		c3d_shader_gradient_bb_clamp_sigm.location_mvp        = glGetUniformLocation(c3d_shader_gradient_bb_clamp_sigm.program, "mvp");
-		c3d_shader_gradient_bb_clamp_sigm.location_sampler[0] = glGetUniformLocation(c3d_shader_gradient_bb_clamp_sigm.program, "sampler0");
-		c3d_shader_gradient_bb_clamp_sigm.location_sampler[1] = glGetUniformLocation(c3d_shader_gradient_bb_clamp_sigm.program, "sampler1");
-		c3d_shader_gradient_bb_clamp_sigm.position_handle     = glGetAttribLocation (c3d_shader_gradient_bb_clamp_sigm.program, "v_position");
-		c3d_shader_gradient_bb_clamp_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient_bb_clamp_sigm.program, "v_texcoord0");
-		c3d_shader_gradient_bb_clamp_sigm.location_mparams    = glGetUniformLocation(c3d_shader_gradient_bb_clamp_sigm.program, "mparams");
-		shaders.push_back(&c3d_shader_gradient_bb_clamp_sigm);
-		//
-		create_program(frame_vs, frame_fs, &frame_shader);
-		frame_shader.location_mvp        = glGetUniformLocation(frame_shader.program, "mvp");
-		frame_shader.location_K          = glGetUniformLocation(frame_shader.program, "K");
-		frame_shader.position_handle     = glGetAttribLocation (frame_shader.program, "v_position");
-		shaders.push_back(&frame_shader);
-		//
-		create_program(simple_tex_vs, simple_tex_fs, &simple_tex_shader);
-		simple_tex_shader.location_mvp        = glGetUniformLocation(simple_tex_shader.program, "mvp");
-		simple_tex_shader.location_sampler[0] = glGetUniformLocation(simple_tex_shader.program, "sampler0");
-		simple_tex_shader.position_handle     = glGetAttribLocation (simple_tex_shader.program, "v_position");
-		simple_tex_shader.texture_handle[0]   = glGetAttribLocation (simple_tex_shader.program, "v_texcoord0");
-		shaders.push_back(&simple_tex_shader);
-		//
-		/*
-        create_program(TBNf_vs0, TBNf_fs0, &sphere0_shader);    
-        sphere0_shader.position_handle         = glGetAttribLocation (sphere0_shader.program, "v_position");
-        sphere0_shader.normal_handle           = glGetAttribLocation (sphere0_shader.program, "v_normal");
-        sphere0_shader.texture_handle[0]       = glGetAttribLocation (sphere0_shader.program, "v_texcoord0");
-        sphere0_shader.tangent_handle          = glGetAttribLocation (sphere0_shader.program, "v_tangent");
-        sphere0_shader.location_shininess      = glGetUniformLocation(sphere0_shader.program, "shininess");
-        sphere0_shader.location_mvp            = glGetUniformLocation(sphere0_shader.program, "mvp");
-        sphere0_shader.location_modeling       = glGetUniformLocation(sphere0_shader.program, "modeling");
-        sphere0_shader.location_modeling_inv_t = glGetUniformLocation(sphere0_shader.program, "modeling_inv_t");
-        sphere0_shader.location_sparams        = glGetUniformLocation(sphere0_shader.program, "sparams");
-        sphere0_shader.location_sampler[0]     = glGetUniformLocation(sphere0_shader.program, "sampler0");
-        sphere0_shader.location_sampler[1]     = glGetUniformLocation(sphere0_shader.program, "sampler1");  
-        shaders.push_back(&sphere0_shader);
-		//
-		create_program(color_vs, color_fs, &color_shader);
-		color_shader.position_handle         = glGetAttribLocation (color_shader.program, "v_position");
-		color_shader.normal_handle           = glGetAttribLocation (color_shader.program, "v_normal");
-		color_shader.location_K              = glGetUniformLocation(color_shader.program, "K");
-		color_shader.location_shininess      = glGetUniformLocation(color_shader.program, "shininess");
-		color_shader.location_mvp            = glGetUniformLocation(color_shader.program, "mvp");
-		color_shader.location_modeling       = glGetUniformLocation(color_shader.program, "modeling");
-		color_shader.location_modeling_inv_t = glGetUniformLocation(color_shader.program, "modeling_inv_t");
-		color_shader.location_sparams        = glGetUniformLocation(color_shader.program, "sparams");
-		shaders.push_back(&color_shader);
-		*/
-		create_program(color_vs, orientcube_fs, &orientcube_shader);
-		orientcube_shader.position_handle         = glGetAttribLocation (orientcube_shader.program, "v_position");
-		orientcube_shader.normal_handle           = glGetAttribLocation (orientcube_shader.program, "v_normal");
-		orientcube_shader.location_K              = glGetUniformLocation(orientcube_shader.program, "K");
-		orientcube_shader.location_mvp            = glGetUniformLocation(orientcube_shader.program, "mvp");
-		orientcube_shader.location_sparams        = glGetUniformLocation(orientcube_shader.program, "sparams");
-		shaders.push_back(&orientcube_shader);
-		//
-		create_program(color_vs, mesh_fs, &mesh_shader);
-		mesh_shader.position_handle         = glGetAttribLocation (mesh_shader.program, "v_position");
-		mesh_shader.normal_handle           = glGetAttribLocation (mesh_shader.program, "v_normal");
-		mesh_shader.location_K              = glGetUniformLocation(mesh_shader.program, "K");
-		mesh_shader.location_mvp            = glGetUniformLocation(mesh_shader.program, "mvp");
-		mesh_shader.location_sparams        = glGetUniformLocation(mesh_shader.program, "sparams");
-		shaders.push_back(&mesh_shader);
-		//
-		gen_lut_tex(default_lut,default_lut_size,&gradient1);
-		gen_lut_tex(black_rainbow_lut,black_rainbow_size,&gradient2);
-		gen_lut_tex(syngo_lut,syngo_lut_size,&gradient3);
-		gen_lut_tex(hot_iron,hot_iron_size,&gradient4);
-		gen_lut_tex(hot_metal_blue,hot_metal_blue_size,&gradient5);
-		gen_lut_tex(pet_dicom_lut,pet_dicom_lut_size,&gradient6);
-		gen_lut_tex(pet20_dicom_lut,pet20_dicom_lut_size,&gradient7);
-		//
-		generate_screen_quad(&scene_vbo);
-		bool ok = create_fbos0(FBO_SIZE__0, FBO_SIZE__0,
-				&framebuffer,
-				&fbo_tex,
-				&fbo_depth);
-		if (!ok) { std::cout << "create_fbos0() failed"<< std::endl; }
-		create_program(fsquad_vs, fsquad_fs, &fsquad_shader);
-		fsquad_shader.location_sampler[0] = glGetUniformLocation(fsquad_shader.program, "sampler0");
-		fsquad_shader.position_handle     = glGetAttribLocation (fsquad_shader.program, "v_position");
-		shaders.push_back(&fsquad_shader);
-		//
-		{
-			float * tmp99 = new float[12];
-			for (int x = 0; x < 12; x++) tmp99[x] = 0.0f;
-			glGenBuffers(1, &frames_vbo);
-			glBindBuffer(GL_ARRAY_BUFFER, frames_vbo);
-			glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			glGenBuffers(1, &slice_v_vbo);
-			glBindBuffer(GL_ARRAY_BUFFER, slice_v_vbo);
-			glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			glGenBuffers(1, &slice_t_vbo);
-			glBindBuffer(GL_ARRAY_BUFFER, slice_t_vbo);
-			glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			glGenBuffers(1, &origin_vbo);
-			glBindBuffer(GL_ARRAY_BUFFER, origin_vbo);
-			glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			delete [] tmp99;
-			increment_count_vbos(4);
-		}
-		//
-		create_program(zero_vs, zero_fs, &zero_shader);
-		zero_shader.location_mvp        = glGetUniformLocation(zero_shader.program, "mvp");
-		zero_shader.position_handle     = glGetAttribLocation (zero_shader.program, "v_position");
-		zero_shader.color_handle        = glGetAttribLocation (zero_shader.program, "v_color");
-		shaders.push_back(&zero_shader);
-		raycast_cube(true, 100.0f,100.0f,100.0f,raycastcube0,raycastcube1,raycastcube2);
-		ok = create_fbos1(FBO_SIZE__1, FBO_SIZE__1,
-				&backfacebuffer,
-				&backface_tex,
-				&backface_depth);
-		if (!ok) { std::cout << "create_fbos1() failed (1)"<< std::endl; }
-		ok = create_fbos1(FBO_SIZE__1, FBO_SIZE__1,
-				&frontfacebuffer,
-				&frontface_tex,
-				&frontface_depth);
-		if (!ok) { std::cout << "create_fbos1() failed (2)"<< std::endl; }
-		create_program(raycast_vs, raycast_fs_bb, &raycast_shader_bb);
-		raycast_shader_bb.location_mvp        = glGetUniformLocation(raycast_shader_bb.program, "mvp");
-		raycast_shader_bb.position_handle     = glGetAttribLocation (raycast_shader_bb.program, "v_position");
-        raycast_shader_bb.location_sampler[0] = glGetUniformLocation(raycast_shader_bb.program, "sampler0");
-        raycast_shader_bb.location_sampler[1] = glGetUniformLocation(raycast_shader_bb.program, "sampler1");
-        raycast_shader_bb.location_sampler[2] = glGetUniformLocation(raycast_shader_bb.program, "sampler2");
-		raycast_shader_bb.location_mparams    = glGetUniformLocation(raycast_shader_bb.program, "mparams");
-		shaders.push_back(&raycast_shader_bb);
-		//
-		create_program(raycast_vs, raycast_color_fs_bb, &raycast_color_shader_bb);
-		raycast_color_shader_bb.location_mvp        = glGetUniformLocation(raycast_color_shader_bb.program, "mvp");
-		raycast_color_shader_bb.position_handle     = glGetAttribLocation (raycast_color_shader_bb.program, "v_position");
-        raycast_color_shader_bb.location_sampler[0] = glGetUniformLocation(raycast_color_shader_bb.program, "sampler0");
-        raycast_color_shader_bb.location_sampler[1] = glGetUniformLocation(raycast_color_shader_bb.program, "sampler1");
-        raycast_color_shader_bb.location_sampler[2] = glGetUniformLocation(raycast_color_shader_bb.program, "sampler2");
-        raycast_color_shader_bb.location_sampler[3] = glGetUniformLocation(raycast_color_shader_bb.program, "sampler3");
-		raycast_color_shader_bb.location_mparams    = glGetUniformLocation(raycast_color_shader_bb.program, "mparams");
-		shaders.push_back(&raycast_color_shader_bb);
-		//
-		create_program(raycast_vs, raycast_fs, &raycast_shader);
-		raycast_shader.location_mvp        = glGetUniformLocation(raycast_shader.program, "mvp");
-		raycast_shader.position_handle     = glGetAttribLocation (raycast_shader.program, "v_position");
-        raycast_shader.location_sampler[0] = glGetUniformLocation(raycast_shader.program, "sampler0");
-        raycast_shader.location_sampler[1] = glGetUniformLocation(raycast_shader.program, "sampler1");
-        raycast_shader.location_sampler[2] = glGetUniformLocation(raycast_shader.program, "sampler2");
-		raycast_shader.location_mparams    = glGetUniformLocation(raycast_shader.program, "mparams");
-		shaders.push_back(&raycast_shader);
-		//
-		create_program(raycast_vs, raycast_color_fs, &raycast_color_shader);
-		raycast_color_shader.location_mvp        = glGetUniformLocation(raycast_color_shader.program, "mvp");
-		raycast_color_shader.position_handle     = glGetAttribLocation (raycast_color_shader.program, "v_position");
-        raycast_color_shader.location_sampler[0] = glGetUniformLocation(raycast_color_shader.program, "sampler0");
-        raycast_color_shader.location_sampler[1] = glGetUniformLocation(raycast_color_shader.program, "sampler1");
-        raycast_color_shader.location_sampler[2] = glGetUniformLocation(raycast_color_shader.program, "sampler2");
-        raycast_color_shader.location_sampler[3] = glGetUniformLocation(raycast_color_shader.program, "sampler3");
-		raycast_color_shader.location_mparams    = glGetUniformLocation(raycast_color_shader.program, "mparams");
-		shaders.push_back(&raycast_color_shader);
-		//
-		create_program(raycast_vs, raycast_fs_bb_sigm, &raycast_shader_bb_sigm);
-		raycast_shader_bb_sigm.location_mvp        = glGetUniformLocation(raycast_shader_bb_sigm.program, "mvp");
-		raycast_shader_bb_sigm.position_handle     = glGetAttribLocation (raycast_shader_bb_sigm.program, "v_position");
-        raycast_shader_bb_sigm.location_sampler[0] = glGetUniformLocation(raycast_shader_bb_sigm.program, "sampler0");
-        raycast_shader_bb_sigm.location_sampler[1] = glGetUniformLocation(raycast_shader_bb_sigm.program, "sampler1");
-        raycast_shader_bb_sigm.location_sampler[2] = glGetUniformLocation(raycast_shader_bb_sigm.program, "sampler2");
-		raycast_shader_bb_sigm.location_mparams    = glGetUniformLocation(raycast_shader_bb_sigm.program, "mparams");
-		shaders.push_back(&raycast_shader_bb_sigm);
-		//
-		create_program(raycast_vs, raycast_color_fs_bb_sigm, &raycast_color_shader_bb_sigm);
-		raycast_color_shader_bb_sigm.location_mvp        = glGetUniformLocation(raycast_color_shader_bb_sigm.program, "mvp");
-		raycast_color_shader_bb_sigm.position_handle     = glGetAttribLocation (raycast_color_shader_bb_sigm.program, "v_position");
-        raycast_color_shader_bb_sigm.location_sampler[0] = glGetUniformLocation(raycast_color_shader_bb_sigm.program, "sampler0");
-        raycast_color_shader_bb_sigm.location_sampler[1] = glGetUniformLocation(raycast_color_shader_bb_sigm.program, "sampler1");
-        raycast_color_shader_bb_sigm.location_sampler[2] = glGetUniformLocation(raycast_color_shader_bb_sigm.program, "sampler2");
-        raycast_color_shader_bb_sigm.location_sampler[3] = glGetUniformLocation(raycast_color_shader_bb_sigm.program, "sampler3");
-		raycast_color_shader_bb_sigm.location_mparams    = glGetUniformLocation(raycast_color_shader_bb_sigm.program, "mparams");
-		shaders.push_back(&raycast_color_shader_bb_sigm);
-		//
-		create_program(raycast_vs, raycast_fs_sigm, &raycast_shader_sigm);
-		raycast_shader_sigm.location_mvp        = glGetUniformLocation(raycast_shader_sigm.program, "mvp");
-		raycast_shader_sigm.position_handle     = glGetAttribLocation (raycast_shader_sigm.program, "v_position");
-        raycast_shader_sigm.location_sampler[0] = glGetUniformLocation(raycast_shader_sigm.program, "sampler0");
-        raycast_shader_sigm.location_sampler[1] = glGetUniformLocation(raycast_shader_sigm.program, "sampler1");
-        raycast_shader_sigm.location_sampler[2] = glGetUniformLocation(raycast_shader_sigm.program, "sampler2");
-		raycast_shader_sigm.location_mparams    = glGetUniformLocation(raycast_shader_sigm.program, "mparams");
-		shaders.push_back(&raycast_shader_sigm);
-		//
-		create_program(raycast_vs, raycast_color_fs_sigm, &raycast_color_shader_sigm);
-		raycast_color_shader_sigm.location_mvp        = glGetUniformLocation(raycast_color_shader_sigm.program, "mvp");
-		raycast_color_shader_sigm.position_handle     = glGetAttribLocation (raycast_color_shader_sigm.program, "v_position");
-        raycast_color_shader_sigm.location_sampler[0] = glGetUniformLocation(raycast_color_shader_sigm.program, "sampler0");
-        raycast_color_shader_sigm.location_sampler[1] = glGetUniformLocation(raycast_color_shader_sigm.program, "sampler1");
-        raycast_color_shader_sigm.location_sampler[2] = glGetUniformLocation(raycast_color_shader_sigm.program, "sampler2");
-        raycast_color_shader_sigm.location_sampler[3] = glGetUniformLocation(raycast_color_shader_sigm.program, "sampler3");
-		raycast_color_shader_sigm.location_mparams    = glGetUniformLocation(raycast_color_shader_sigm.program, "mparams");
-		shaders.push_back(&raycast_color_shader_sigm);
-		//
-		////////////////////////////
-		// orient. cube
-		ok = create_fbos0(
-			256,
-			256,
-			&cubebuffer,
-			&cube_tex,
-			&cube_depth);
-		if (!ok)
-		{
-			std::cout << "create_fbos0() failed (cube)"<< std::endl;
-		}
-		//
-		cube = new qMeshData;
-		GLuint * vboid000 = new GLuint[2];
-		glGenBuffers(2, vboid000);
-		increment_count_vbos(2);
-    	makeModelVBO_ArraysT(
-			vboid000,
-    	    p_vertices_cube,
-    	    p_normals_cube,
-    	    NULL,
-    	    NULL,
-    	    p_faces_cube,
-    	    faces_size_cube,
-    	    GL_STATIC_DRAW,
-    	    10.0f);
-    	cube->faces_size = faces_size_cube/12;
-		cube->vboid[0] = vboid000[0];
-		cube->vboid[1] = vboid000[1];
-		cube->shader = &orientcube_shader;
-		vboids.push_back(vboid000);
-		qmeshes.push_back(cube);
-		//
-		letters = new qMeshData;
-		GLuint * vboid001 = new GLuint[2];
-		glGenBuffers(2, vboid001);
-		increment_count_vbos(2);
-    	makeModelVBO_ArraysT(
-			vboid001,
-    	    p_vertices_letters,
-    	    p_normals_letters,
-    	    NULL,
-    	    NULL,
-    	    p_faces_letters,
-    	    faces_size_letters,
-    	    GL_STATIC_DRAW,
-    	    10.0f);
-    	letters->faces_size = faces_size_letters/12;
-		letters->vboid[0] = vboid001[0];
-		letters->vboid[1] = vboid001[1];
-		letters->shader = &orientcube_shader;
-		vboids.push_back(vboid001);
-		qmeshes.push_back(letters);
-		//
-		letteri = new qMeshData;
-		GLuint * vboid002 = new GLuint[2];
-		glGenBuffers(2, vboid002);
-		increment_count_vbos(2);
-    	makeModelVBO_ArraysT(
-			vboid002,
-    	    p_vertices_letteri,
-    	    p_normals_letteri,
-    	    NULL,
-    	    NULL,
-    	    p_faces_letteri,
-    	    faces_size_letteri,
-    	    GL_STATIC_DRAW,
-    	    10.0f);
-    	letteri->faces_size = faces_size_letteri/12;
-		letteri->vboid[0] = vboid002[0];
-		letteri->vboid[1] = vboid002[1];
-		letteri->shader = &orientcube_shader;
-		vboids.push_back(vboid002);
-		qmeshes.push_back(letteri);
-		//
-		lettera = new qMeshData;
-		GLuint * vboid003 = new GLuint[2];
-		glGenBuffers(2, vboid003);
-		increment_count_vbos(2);
-    	makeModelVBO_ArraysT(
-			vboid003,
-    	    p_vertices_lettera,
-    	    p_normals_lettera,
-    	    NULL,
-    	    NULL,
-    	    p_faces_lettera,
-    	    faces_size_lettera,
-    	    GL_STATIC_DRAW,
-    	    10.0f);
-    	lettera->faces_size = faces_size_lettera/12;
-		lettera->vboid[0] = vboid003[0];
-		lettera->vboid[1] = vboid003[1];
-		lettera->shader = &orientcube_shader;
-		vboids.push_back(vboid003);
-		qmeshes.push_back(lettera);
-		//
-		letterp = new qMeshData;
-		GLuint * vboid004 = new GLuint[2];
-		glGenBuffers(2, vboid004);
-		increment_count_vbos(2);
-    	makeModelVBO_ArraysT(
-			vboid004,
-    	    p_vertices_letterp,
-    	    p_normals_letterp,
-    	    NULL,
-    	    NULL,
-    	    p_faces_letterp,
-    	    faces_size_letterp,
-    	    GL_STATIC_DRAW,
-    	    10.0f);
-    	letterp->faces_size = faces_size_letterp/12;
-		letterp->vboid[0] = vboid004[0];
-		letterp->vboid[1] = vboid004[1];
-		letterp->shader = &orientcube_shader;
-		vboids.push_back(vboid004);
-		qmeshes.push_back(letterp);
-		//
-		letterr = new qMeshData;
-		GLuint * vboid005 = new GLuint[2];
-		glGenBuffers(2, vboid005);
-		increment_count_vbos(2);
-    	makeModelVBO_ArraysT(
-			vboid005,
-    	    p_vertices_letterr,
-    	    p_normals_letterr,
-    	    NULL,
-    	    NULL,
-    	    p_faces_letterr,
-    	    faces_size_letterr,
-    	    GL_STATIC_DRAW,
-    	    10.0f);
-    	letterr->faces_size = faces_size_letterr/12;
-		letterr->vboid[0] = vboid005[0];
-		letterr->vboid[1] = vboid005[1];
-		letterr->shader = &orientcube_shader;
-		vboids.push_back(vboid005);
-		qmeshes.push_back(letterr);
-		//
-		letterl = new qMeshData;
-		GLuint * vboid006 = new GLuint[2];
-		glGenBuffers(2, vboid006);
-		increment_count_vbos(2);
-    	makeModelVBO_ArraysT(
-			vboid006,
-    	    p_vertices_letterl,
-    	    p_normals_letterl,
-    	    NULL,
-    	    NULL,
-    	    p_faces_letterl,
-    	    faces_size_letterl,
-    	    GL_STATIC_DRAW,
-    	    10.0f);
-    	letterl->faces_size = faces_size_letterl/12;
-		letterl->vboid[0] = vboid006[0];
-		letterl->vboid[1] = vboid006[1];
-		letterl->shader = &orientcube_shader;
-		vboids.push_back(vboid006);
-		qmeshes.push_back(letterl);
-		//
-		checkGLerror("OpenGL error after init\n");
+		glGenVertexArrays(1, &slice_v_vao);
+		glBindVertexArray(slice_v_vao);
+		glGenBuffers(1, &slice_v_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, slice_v_vbo);
+		glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
+		glGenBuffers(1, &slice_t_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, slice_t_vbo);
+		glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
+		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
+
+
+		glGenBuffers(1, &origin_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, origin_vbo);
+		glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		delete [] tmp99;
+		increment_count_vbos(4);
 	}
-	srand(time(NULL));
+#if 1
+	checkGLerror(" after n2\n");
+#endif
+	//
+	create_program(zero_vs, zero_fs, &zero_shader);
+	zero_shader.location_mvp        = glGetUniformLocation(zero_shader.program, "mvp");
+	zero_shader.position_handle     = glGetAttribLocation (zero_shader.program, "v_position");
+	zero_shader.color_handle        = glGetAttribLocation (zero_shader.program, "v_color");
+	shaders.push_back(&zero_shader);
+	raycast_cube(true, 100.0f,100.0f,100.0f,raycastcube0,raycastcube1,raycastcube2);
+#if 1
+	checkGLerror(" after n3\n");
+#endif
+	ok = create_fbos1(FBO_SIZE__1, FBO_SIZE__1,
+			&backfacebuffer,
+			&backface_tex,
+			&backface_depth);
+	if (!ok) { std::cout << "create_fbos1() failed (1)"<< std::endl; }
+	ok = create_fbos1(FBO_SIZE__1, FBO_SIZE__1,
+			&frontfacebuffer,
+			&frontface_tex,
+			&frontface_depth);
+	if (!ok) { std::cout << "create_fbos1() failed (2)"<< std::endl; }
+#if 1
+	checkGLerror(" after create_fbos1\n");
+#endif
+	create_program(raycast_vs, raycast_fs_bb, &raycast_shader_bb);
+	raycast_shader_bb.location_mvp        = glGetUniformLocation(raycast_shader_bb.program, "mvp");
+	raycast_shader_bb.position_handle     = glGetAttribLocation (raycast_shader_bb.program, "v_position");
+    raycast_shader_bb.location_sampler[0] = glGetUniformLocation(raycast_shader_bb.program, "sampler0");
+    raycast_shader_bb.location_sampler[1] = glGetUniformLocation(raycast_shader_bb.program, "sampler1");
+    raycast_shader_bb.location_sampler[2] = glGetUniformLocation(raycast_shader_bb.program, "sampler2");
+	raycast_shader_bb.location_mparams    = glGetUniformLocation(raycast_shader_bb.program, "mparams");
+	shaders.push_back(&raycast_shader_bb);
+	//
+	create_program(raycast_vs, raycast_color_fs_bb, &raycast_color_shader_bb);
+	raycast_color_shader_bb.location_mvp        = glGetUniformLocation(raycast_color_shader_bb.program, "mvp");
+	raycast_color_shader_bb.position_handle     = glGetAttribLocation (raycast_color_shader_bb.program, "v_position");
+    raycast_color_shader_bb.location_sampler[0] = glGetUniformLocation(raycast_color_shader_bb.program, "sampler0");
+    raycast_color_shader_bb.location_sampler[1] = glGetUniformLocation(raycast_color_shader_bb.program, "sampler1");
+    raycast_color_shader_bb.location_sampler[2] = glGetUniformLocation(raycast_color_shader_bb.program, "sampler2");
+    raycast_color_shader_bb.location_sampler[3] = glGetUniformLocation(raycast_color_shader_bb.program, "sampler3");
+	raycast_color_shader_bb.location_mparams    = glGetUniformLocation(raycast_color_shader_bb.program, "mparams");
+	shaders.push_back(&raycast_color_shader_bb);
+	//
+	create_program(raycast_vs, raycast_fs, &raycast_shader);
+	raycast_shader.location_mvp        = glGetUniformLocation(raycast_shader.program, "mvp");
+	raycast_shader.position_handle     = glGetAttribLocation (raycast_shader.program, "v_position");
+    raycast_shader.location_sampler[0] = glGetUniformLocation(raycast_shader.program, "sampler0");
+    raycast_shader.location_sampler[1] = glGetUniformLocation(raycast_shader.program, "sampler1");
+    raycast_shader.location_sampler[2] = glGetUniformLocation(raycast_shader.program, "sampler2");
+	raycast_shader.location_mparams    = glGetUniformLocation(raycast_shader.program, "mparams");
+	shaders.push_back(&raycast_shader);
+	//
+	create_program(raycast_vs, raycast_color_fs, &raycast_color_shader);
+	raycast_color_shader.location_mvp        = glGetUniformLocation(raycast_color_shader.program, "mvp");
+	raycast_color_shader.position_handle     = glGetAttribLocation (raycast_color_shader.program, "v_position");
+    raycast_color_shader.location_sampler[0] = glGetUniformLocation(raycast_color_shader.program, "sampler0");
+    raycast_color_shader.location_sampler[1] = glGetUniformLocation(raycast_color_shader.program, "sampler1");
+    raycast_color_shader.location_sampler[2] = glGetUniformLocation(raycast_color_shader.program, "sampler2");
+    raycast_color_shader.location_sampler[3] = glGetUniformLocation(raycast_color_shader.program, "sampler3");
+	raycast_color_shader.location_mparams    = glGetUniformLocation(raycast_color_shader.program, "mparams");
+	shaders.push_back(&raycast_color_shader);
+	//
+	create_program(raycast_vs, raycast_fs_bb_sigm, &raycast_shader_bb_sigm);
+	raycast_shader_bb_sigm.location_mvp        = glGetUniformLocation(raycast_shader_bb_sigm.program, "mvp");
+	raycast_shader_bb_sigm.position_handle     = glGetAttribLocation (raycast_shader_bb_sigm.program, "v_position");
+    raycast_shader_bb_sigm.location_sampler[0] = glGetUniformLocation(raycast_shader_bb_sigm.program, "sampler0");
+    raycast_shader_bb_sigm.location_sampler[1] = glGetUniformLocation(raycast_shader_bb_sigm.program, "sampler1");
+    raycast_shader_bb_sigm.location_sampler[2] = glGetUniformLocation(raycast_shader_bb_sigm.program, "sampler2");
+	raycast_shader_bb_sigm.location_mparams    = glGetUniformLocation(raycast_shader_bb_sigm.program, "mparams");
+	shaders.push_back(&raycast_shader_bb_sigm);
+	//
+	create_program(raycast_vs, raycast_color_fs_bb_sigm, &raycast_color_shader_bb_sigm);
+	raycast_color_shader_bb_sigm.location_mvp        = glGetUniformLocation(raycast_color_shader_bb_sigm.program, "mvp");
+	raycast_color_shader_bb_sigm.position_handle     = glGetAttribLocation (raycast_color_shader_bb_sigm.program, "v_position");
+    raycast_color_shader_bb_sigm.location_sampler[0] = glGetUniformLocation(raycast_color_shader_bb_sigm.program, "sampler0");
+    raycast_color_shader_bb_sigm.location_sampler[1] = glGetUniformLocation(raycast_color_shader_bb_sigm.program, "sampler1");
+    raycast_color_shader_bb_sigm.location_sampler[2] = glGetUniformLocation(raycast_color_shader_bb_sigm.program, "sampler2");
+    raycast_color_shader_bb_sigm.location_sampler[3] = glGetUniformLocation(raycast_color_shader_bb_sigm.program, "sampler3");
+	raycast_color_shader_bb_sigm.location_mparams    = glGetUniformLocation(raycast_color_shader_bb_sigm.program, "mparams");
+	shaders.push_back(&raycast_color_shader_bb_sigm);
+	//
+	create_program(raycast_vs, raycast_fs_sigm, &raycast_shader_sigm);
+	raycast_shader_sigm.location_mvp        = glGetUniformLocation(raycast_shader_sigm.program, "mvp");
+	raycast_shader_sigm.position_handle     = glGetAttribLocation (raycast_shader_sigm.program, "v_position");
+    raycast_shader_sigm.location_sampler[0] = glGetUniformLocation(raycast_shader_sigm.program, "sampler0");
+    raycast_shader_sigm.location_sampler[1] = glGetUniformLocation(raycast_shader_sigm.program, "sampler1");
+    raycast_shader_sigm.location_sampler[2] = glGetUniformLocation(raycast_shader_sigm.program, "sampler2");
+	raycast_shader_sigm.location_mparams    = glGetUniformLocation(raycast_shader_sigm.program, "mparams");
+	shaders.push_back(&raycast_shader_sigm);
+	//
+	create_program(raycast_vs, raycast_color_fs_sigm, &raycast_color_shader_sigm);
+	raycast_color_shader_sigm.location_mvp        = glGetUniformLocation(raycast_color_shader_sigm.program, "mvp");
+	raycast_color_shader_sigm.position_handle     = glGetAttribLocation (raycast_color_shader_sigm.program, "v_position");
+    raycast_color_shader_sigm.location_sampler[0] = glGetUniformLocation(raycast_color_shader_sigm.program, "sampler0");
+    raycast_color_shader_sigm.location_sampler[1] = glGetUniformLocation(raycast_color_shader_sigm.program, "sampler1");
+    raycast_color_shader_sigm.location_sampler[2] = glGetUniformLocation(raycast_color_shader_sigm.program, "sampler2");
+    raycast_color_shader_sigm.location_sampler[3] = glGetUniformLocation(raycast_color_shader_sigm.program, "sampler3");
+	raycast_color_shader_sigm.location_mparams    = glGetUniformLocation(raycast_color_shader_sigm.program, "mparams");
+	shaders.push_back(&raycast_color_shader_sigm);
+	//
+	////////////////////////////
+#if 1
+	checkGLerror(" after n4\n");
+#endif
+	// orient. cube
+	ok = create_fbos0(
+		256,
+		256,
+		&cubebuffer,
+		&cube_tex,
+		&cube_depth);
+	if (!ok)
+	{
+		std::cout << "create_fbos0() failed (cube)"<< std::endl;
+	}
+#if 1
+	checkGLerror(" after n5\n");
+#endif
+	//
+	cube = new qMeshData;
+	GLuint * vboid000 = new GLuint[4];
+	GLuint vaoid000 = 0;
+    makeModelVBO_ArraysT(
+		vboid000,
+		&vaoid000,
+		&(orientcube_shader.position_handle),
+		&(orientcube_shader.normal_handle),
+		NULL,
+		NULL,
+        p_vertices_cube,
+        p_normals_cube,
+        NULL,
+        NULL,
+        p_faces_cube,
+        faces_size_cube,
+        GL_STATIC_DRAW,
+        10.0f);
+    cube->faces_size = faces_size_cube/12;
+	cube->vboid[0] = vboid000[0];
+	cube->vboid[1] = vboid000[1];
+	cube->vaoid    = vaoid000;
+	cube->shader   = &orientcube_shader;
+	qmeshes.push_back(cube);
+	//
+	letters = new qMeshData;
+	GLuint * vboid001 = new GLuint[4];
+	GLuint vaoid001 = 0;
+    makeModelVBO_ArraysT(
+		vboid001,
+		&vaoid001,
+		&(orientcube_shader.position_handle),
+		&(orientcube_shader.normal_handle),
+		NULL,
+		NULL,
+        p_vertices_letters,
+        p_normals_letters,
+        NULL,
+        NULL,
+        p_faces_letters,
+        faces_size_letters,
+        GL_STATIC_DRAW,
+        10.0f);
+    letters->faces_size = faces_size_letters/12;
+	letters->vboid[0] = vboid001[0];
+	letters->vboid[1] = vboid001[1];
+	letters->vaoid    = vaoid001;
+	letters->shader = &orientcube_shader;
+	qmeshes.push_back(letters);
+	//
+	letteri = new qMeshData;
+	GLuint * vboid002 = new GLuint[4];
+	GLuint vaoid002 = 0;
+    makeModelVBO_ArraysT(
+		vboid002,
+		&vaoid002,
+		&(orientcube_shader.position_handle),
+		&(orientcube_shader.normal_handle),
+		NULL,
+		NULL,
+        p_vertices_letteri,
+        p_normals_letteri,
+        NULL,
+        NULL,
+        p_faces_letteri,
+        faces_size_letteri,
+        GL_STATIC_DRAW,
+        10.0f);
+    letteri->faces_size = faces_size_letteri/12;
+	letteri->vboid[0] = vboid002[0];
+	letteri->vboid[1] = vboid002[1];
+	letteri->vaoid = vaoid002;
+	letteri->shader = &orientcube_shader;
+	qmeshes.push_back(letteri);
+	//
+	lettera = new qMeshData;
+	GLuint * vboid003 = new GLuint[4];
+	GLuint vaoid003 = 0;
+    makeModelVBO_ArraysT(
+		vboid003,
+		&vaoid003,
+		&(orientcube_shader.position_handle),
+		&(orientcube_shader.normal_handle),
+		NULL,
+		NULL,
+        p_vertices_lettera,
+        p_normals_lettera,
+        NULL,
+        NULL,
+        p_faces_lettera,
+        faces_size_lettera,
+        GL_STATIC_DRAW,
+        10.0f);
+    lettera->faces_size = faces_size_lettera/12;
+	lettera->vboid[0] = vboid003[0];
+	lettera->vboid[1] = vboid003[1];
+	lettera->vaoid = vaoid003;
+	lettera->shader = &orientcube_shader;
+	qmeshes.push_back(lettera);
+	//
+	letterp = new qMeshData;
+	GLuint * vboid004 = new GLuint[4];
+	GLuint vaoid004 = 0;
+    makeModelVBO_ArraysT(
+		vboid004,
+		&vaoid004,
+		&(orientcube_shader.position_handle),
+		&(orientcube_shader.normal_handle),
+		NULL,
+		NULL,
+        p_vertices_letterp,
+        p_normals_letterp,
+        NULL,
+        NULL,
+        p_faces_letterp,
+        faces_size_letterp,
+        GL_STATIC_DRAW,
+        10.0f);
+    letterp->faces_size = faces_size_letterp/12;
+	letterp->vboid[0] = vboid004[0];
+	letterp->vboid[1] = vboid004[1];
+	letterp->vaoid    = vaoid004;
+	letterp->shader = &orientcube_shader;
+	qmeshes.push_back(letterp);
+	//
+	letterr = new qMeshData;
+	GLuint * vboid005 = new GLuint[4];
+	GLuint vaoid005 = 0;
+    makeModelVBO_ArraysT(
+		vboid005,
+		&vaoid005,
+		&(orientcube_shader.position_handle),
+		&(orientcube_shader.normal_handle),
+		NULL,
+		NULL,
+        p_vertices_letterr,
+        p_normals_letterr,
+        NULL,
+        NULL,
+        p_faces_letterr,
+        faces_size_letterr,
+        GL_STATIC_DRAW,
+        10.0f);
+    letterr->faces_size = faces_size_letterr/12;
+	letterr->vboid[0] = vboid005[0];
+	letterr->vboid[1] = vboid005[1];
+	letterr->vaoid    = vaoid005;
+	letterr->shader = &orientcube_shader;
+	qmeshes.push_back(letterr);
+	//
+	letterl = new qMeshData;
+	GLuint * vboid006 = new GLuint[4];
+	GLuint vaoid006 = 0;
+    makeModelVBO_ArraysT(
+		vboid006,
+		&vaoid006,
+		&(orientcube_shader.position_handle),
+		&(orientcube_shader.normal_handle),
+		NULL,
+		NULL,
+        p_vertices_letterl,
+        p_normals_letterl,
+        NULL,
+        NULL,
+        p_faces_letterl,
+        faces_size_letterl,
+        GL_STATIC_DRAW,
+        10.0f);
+    letterl->faces_size = faces_size_letterl/12;
+	letterl->vboid[0] = vboid006[0];
+	letterl->vboid[1] = vboid006[1];
+	letterl->vaoid    = vaoid006;
+	letterl->shader = &orientcube_shader;
+	qmeshes.push_back(letterl);
+#if 1
+	checkGLerror(" after n6\n");
+#endif
+	//
+	checkGLerror("OpenGL error after init\n");
 }
 
 void GLWidget::init_physics(btCollisionWorld * w)
@@ -1238,6 +1412,7 @@ void GLWidget::draw_3d_tex2(
 	const GLfloat * t,
 	const ShaderObj & shader)
 {
+	glBindVertexArray(slice_v_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, slice_v_vbo);
 	glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), v, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -1247,8 +1422,7 @@ void GLWidget::draw_3d_tex2(
 	glEnableVertexAttribArray(shader.position_handle);
 	glEnableVertexAttribArray(shader.texture_handle[0]);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glDisableVertexAttribArray(shader.position_handle);
-	glDisableVertexAttribArray(shader.texture_handle[0]);
+	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -1266,11 +1440,9 @@ void GLWidget::draw_frame2(const GLfloat * v)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, frames_vbo);
 	glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), v, GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(frame_shader.position_handle);
+	glBindVertexArray(frames_vao);
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
-	glDisableVertexAttribArray(frame_shader.position_handle);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 }
 
 void GLWidget::draw_lines(unsigned long s, const GLuint * vboid)
@@ -2103,11 +2275,9 @@ void GLWidget::paint_raycaster()
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, fbo_tex);
 		glUniform1i(fsquad_shader.location_sampler[0], 2);
-		glBindBuffer(GL_ARRAY_BUFFER, scene_vbo);
-		glVertexAttribPointer(fsquad_shader.position_handle, 2, GL_FLOAT, GL_FALSE, 0, 0);
-		glEnableVertexAttribArray(fsquad_shader.position_handle);
+		glBindVertexArray(scene_vao);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		glDisableVertexAttribArray(fsquad_shader.position_handle);
+		glBindVertexArray(0);
 		glBindTexture(GL_TEXTURE_2D, 0);
 		glEnable(GL_DEPTH_TEST);
 	}
@@ -2143,6 +2313,9 @@ void GLWidget::paint_volume()
 	{
 		render_orient_cube1(fold_win_pos_x,fold_win_pos_y,fnew_win_pos_x,fnew_win_pos_y);
 	}
+#if 1
+	checkGLerror(" GLWidget::paint_volume 1\n");
+#endif
 	//
 	const float asp = (win_h>0) ? (float)win_w/(float)win_h : 1;
 	float dx__ = 0.0f, dy__ = 0.0f;
@@ -2190,9 +2363,13 @@ void GLWidget::paint_volume()
 		{
 			const DisplayInterface * di = selected_images__->at(iii)->di;
 			glUseProgram(frame_shader.program);
+checkGLerror(" GLWidget::paint_volume 1a\n");
 			glUniformMatrix4fv(frame_shader.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-			glLineWidth(2.5f);
-			glPointSize(6.5f);
+checkGLerror(" GLWidget::paint_volume 1b\n");
+			//glLineWidth(2.5f);
+//checkGLerror(" GLWidget::paint_volume 1c\n");
+//			glPointSize(6.5f);
+//checkGLerror(" GLWidget::paint_volume 1d\n");
 			for (unsigned long x = 0; x < di->spectroscopy_slices.size(); x++)
 			{
 				glUniform4f(
@@ -2201,6 +2378,7 @@ void GLWidget::paint_volume()
 					color_spectro0[1],
 					color_spectro0[2],
 					color_spectro0[3]);
+checkGLerror(" GLWidget::paint_volume 1e\n");
 				if (di->spectroscopy_slices.at(x)->lsize > 0)
 				{
 					draw_lines(
@@ -2214,19 +2392,25 @@ void GLWidget::paint_volume()
 						color_spectro1[1],
 						color_spectro1[2],
 						color_spectro1[3]);
+checkGLerror(" GLWidget::paint_volume 1f\n");
 				if (di->spectroscopy_slices.at(x)->psize > 0)
 				{
 					draw_points(
 						di->spectroscopy_slices.at(x)->psize,
 						&(di->spectroscopy_slices.at(x)->pvboid));
+checkGLerror(" GLWidget::paint_volume 1g\n");
 				}
 				if (di->spectroscopy_slices.at(x)->fvboid > 0)
 				{
 					draw_frame(&(di->spectroscopy_slices.at(x)->fvboid));
+checkGLerror(" GLWidget::paint_volume 1h\n");
 				}
 			}
 			count += 1;
 		}
+#if 1
+	checkGLerror(" GLWidget::paint_volume 2\n");
+#endif
 		//
 		if (display_contours && !selected_images__->at(iii)->di->rois.empty())
 		{
@@ -2282,6 +2466,9 @@ void GLWidget::paint_volume()
 			count += 1;
 		}
 	}
+#if 1
+	checkGLerror(" GLWidget::paint_volume 3\n");
+#endif
 	//
 	for (int iii = 0; iii < selected_images_size; iii++)
 	{
@@ -2344,6 +2531,7 @@ void GLWidget::paint_volume()
 				for (int x = di->to_slice; x >= di->from_slice; x--)
 					draw_frame2(di->image_slices.at(x)->fv);
 			}
+/*
 			if (di->origin_ok)
 			{
 				glPointSize(9.0f);
@@ -2363,7 +2551,11 @@ void GLWidget::paint_volume()
 				glDisableVertexAttribArray(frame_shader.position_handle);
 				glBindBuffer(GL_ARRAY_BUFFER, 0);
 			}
+			*/
 		}
+#if 1
+	checkGLerror(" GLWidget::paint_volume 4\n");
+#endif
 		//
 #if 0
 		if (count_images > 10) break;
@@ -2714,8 +2906,12 @@ void GLWidget::paint_volume()
 			count_images += 1;
 		}
 	}
+#if 1
+	checkGLerror(" GLWidget::paint_volume 5\n");
+#endif
 	//
-	if ((count > 0) && show_cube)
+	//if ((count > 0) && show_cube)
+	if (show_cube)
 	{
 		render_orient_cube2();
 	}
@@ -3049,12 +3245,9 @@ void GLWidget::render_orient_cube2()
 	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, cube_tex);
 	glUniform1i(fsquad_shader.location_sampler[0], 4);
-	glBindBuffer(GL_ARRAY_BUFFER, scene_vbo);
-	glVertexAttribPointer(
-		fsquad_shader.position_handle, 2, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(fsquad_shader.position_handle);
+	glBindVertexArray(scene_vao);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glDisableVertexAttribArray(fsquad_shader.position_handle);
+	glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glEnable(GL_DEPTH_TEST);
 }
@@ -3209,7 +3402,8 @@ GLuint GLWidget::load_shader(GLenum shaderType, const char * pSource)
 	if (shader)
 	{
 		glShaderSource(shader, 1, &pSource, NULL);
-		glCompileShader(shader); GLint compiled = 0;
+		glCompileShader(shader);
+		GLint compiled = 0;
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
 		if (!compiled)
 		{
@@ -3282,13 +3476,52 @@ bool GLWidget::create_program(
 
 void GLWidget::checkGLerror(const char * op)
 {
-	const GLenum error__ = glGetError();
-	if (error__!=0)
-		printf("after %s() glError (0x%x)\n", op, error__);
+	const int error__ = (int)glGetError();
+	if (error__ == 0) return;
+	QString e;
+	switch(error__)
+	{
+	case 0x0500:
+		e = QString("GL_INVALID_ENUM");
+		break;
+	case 0x0501:
+		e = QString("GL_INVALID_VALUE");
+		break;
+	case 0x0502:
+		e = QString("GL_INVALID_OPERATION");
+		break;
+	case 0x0503:
+		e = QString("GL_STACK_OVERFLOW");
+		break;
+	case 0x0504:
+		e = QString("GL_STACK_UNDERFLOW");
+		break;
+	case 0x0505:
+		e = QString("GL_OUT_OF_MEMORY");
+		break;
+	case 0x0506:
+		e = QString("GL_INVALID_FRAMEBUFFER_OPERATION");
+		break;
+	case 0x0507:
+		e = QString("GL_CONTEXT_LOST");
+		break;
+	case 0x8031:
+		e = QString("GL_TABLE_TOO_LARGE");
+		break;
+	default:
+		e = QString("Error ") + QVariant(error__).toString();
+		break;
+	}
+	std::cout << e.toStdString() << " after " << op << std::endl;
 }
 
 void GLWidget::makeModelVBO_ArraysT(
 	GLuint * vboid,
+	GLuint * vaoid,
+	GLuint * v_attr,
+	GLuint * n_attr,
+	GLuint * t_attr,
+	GLuint * ta_attr,
 	const float * vertices,
 	const float * normals,
 	const float * textures,
@@ -3297,7 +3530,6 @@ void GLWidget::makeModelVBO_ArraysT(
 	const int faces_size,
 	GLenum usage,
 	float scale)
-
 {
 	float * v;
 	try { v = new float[(faces_size/12)*3*3]; }
@@ -3425,38 +3657,61 @@ void GLWidget::makeModelVBO_ArraysT(
 		idx += 9;
 	}
 
+	vboid[0] = 0;
+	vboid[1] = 0;
+	vboid[2] = 0;
+	vboid[3] = 0;
+
+	glGenVertexArrays(1, vaoid);
+	glBindVertexArray(*vaoid);
+
+	glGenBuffers(4, vboid);
+
 	glBindBuffer(GL_ARRAY_BUFFER, vboid[0]);
 	glBufferData(GL_ARRAY_BUFFER, (faces_size/12)*3*3*sizeof(float), v, usage);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	delete [] v;
+	glEnableVertexAttribArray(*v_attr);
+	glVertexAttribPointer(*v_attr, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	if (normals)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vboid[1]);
 		glBufferData(GL_ARRAY_BUFFER, (faces_size/12)*3*3*sizeof(float), n, usage);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		delete [] n;
+		glEnableVertexAttribArray(*n_attr);
+		glVertexAttribPointer(*n_attr, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	}
 
 	if (textures)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vboid[2]);
 		glBufferData(GL_ARRAY_BUFFER, (faces_size/12)*3*3*sizeof(float), t, usage);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		delete [] t;
+		glEnableVertexAttribArray(*t_attr);
+		glVertexAttribPointer(*t_attr, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	}
 
 	if (tangents)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vboid[3]);
 		glBufferData(GL_ARRAY_BUFFER, (faces_size/12)*3*3*sizeof(float), ta, usage);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		delete [] ta;
+		glEnableVertexAttribArray(*ta_attr);
+		glVertexAttribPointer(*ta_attr, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	}
+
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	increment_count_vbos(4);
+	vboids.push_back(vboid);
+	vaoids.push_back(*vaoid);
+
+	delete [] v;
+	if (normals)  delete [] n;
+	if (textures) delete [] t;
+	if (tangents) delete [] ta;
 }
 
 void GLWidget::generate_point_vbo(
-	GLuint * b,
+	GLuint * vbo,
+	GLuint * vao,
 	const float x,
 	const float y,
 	const float z)
@@ -3465,16 +3720,16 @@ void GLWidget::generate_point_vbo(
 	v[0] = x;
 	v[1] = y;
 	v[2] = z;
-	glGenBuffers(1, b);
+	glGenBuffers(1, vbo);
 	increment_count_vbos(1);
-	glBindBuffer(GL_ARRAY_BUFFER, *b);
+	glBindBuffer(GL_ARRAY_BUFFER, *vbo);
 	glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat), v, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	delete [] v;
 }
 
 
-void GLWidget::generate_screen_quad(unsigned int * vboid)
+void GLWidget::generate_screen_quad(GLuint * vbo, GLuint * vao, GLuint * attr)
 {
 // Full Screen Quad
 //
@@ -3503,10 +3758,16 @@ void GLWidget::generate_screen_quad(unsigned int * vboid)
 		-1.0f, -1.0f,   // 1
 		 1.0f,  1.0f,   // 2
 		 1.0f, -1.0f }; // 3
-	glGenBuffers(1, vboid);
+	glGenVertexArrays(1, vao);
+	glBindVertexArray(*vao);
+	glGenBuffers(1, vbo);
 	increment_count_vbos(1);
-	glBindBuffer(GL_ARRAY_BUFFER, *vboid);
+	glBindBuffer(GL_ARRAY_BUFFER, *vbo);
 	glBufferData(GL_ARRAY_BUFFER, (4*2)*sizeof(GLfloat), quad_v, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(*attr);
+	glVertexAttribPointer(*attr, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	//
+	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -7539,16 +7800,9 @@ void GLWidget::d_orientcube(
     qMeshData * s  = static_cast<qMeshData*>(vs);
     glUniformMatrix4fv(s->shader->location_mvp, 1, GL_FALSE, mvp);
     glUniform3fv(s->shader->location_sparams, 2, sparams);
-    glBindBuffer(GL_ARRAY_BUFFER, s->vboid[0]);
-    glVertexAttribPointer(s->shader->position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
-    glBindBuffer(GL_ARRAY_BUFFER, s->vboid[1]);
-    glVertexAttribPointer(s->shader->normal_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(s->shader->position_handle);
-    glEnableVertexAttribArray(s->shader->normal_handle);
+	glBindVertexArray(s->vaoid);
     glDrawArrays(GL_TRIANGLES, 0, s->faces_size*3);
-    glDisableVertexAttribArray(s->shader->position_handle);
-    glDisableVertexAttribArray(s->shader->normal_handle);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 

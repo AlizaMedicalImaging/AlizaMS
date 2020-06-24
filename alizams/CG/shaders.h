@@ -2,6 +2,7 @@
 #define SHADERS____H____
 
 const char c3d_vs[] =
+"#version 130\n"
 "attribute vec3 v_position;\n"
 "attribute vec3 v_texcoord0;\n"
 "varying vec3 texcoord0;\n"
@@ -13,43 +14,49 @@ const char c3d_vs[] =
 "}\n";
 
 const char c3d_fs[] =
+"#version 130\n"
 "varying vec3 texcoord0;\n"
 "uniform sampler3D sampler0;\n"
 "uniform vec4 mparams[4];\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	float t = texture3D(sampler0,texcoord0).r;\n"
 "	if (t >= mparams[0].y && t <= mparams[0].z)\n"
 "	{\n"
 "		float r = (t+(-mparams[0].y))/mparams[0].w;\n"
-"		gl_FragColor=vec4(r*mparams[3].y,r*mparams[3].y,r*mparams[3].y,r*mparams[3].x);\n"
+"		fragColor=vec4(r*mparams[3].y,r*mparams[3].y,r*mparams[3].y,r*mparams[3].x);\n"
 "	}\n"
 "	else { discard; }\n"
 "}\n";
 
 const char c3d_fs_clamp[] =
+"#version 130\n"
 "varying vec3 texcoord0;\n"
 "uniform sampler3D sampler0;\n"
 "uniform vec4 mparams[4];\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	float t = texture3D(sampler0,texcoord0).r;\n"
 "	if (t >= mparams[0].y && t <= mparams[0].z)\n"
 "	{\n"
 "		float r = (t+(-mparams[0].y))/mparams[0].w;\n"
-"		gl_FragColor=vec4(r*mparams[3].y,r*mparams[3].y,r*mparams[3].y,1.0);\n"
+"		fragColor=vec4(r*mparams[3].y,r*mparams[3].y,r*mparams[3].y,1.0);\n"
 "	}\n"
 "	else if (t > mparams[0].z)\n"
 "	{\n"
-"		gl_FragColor=vec4(mparams[3].y,mparams[3].y,mparams[3].y,1.0);\n"
+"		fragColor=vec4(mparams[3].y,mparams[3].y,mparams[3].y,1.0);\n"
 "	}\n"
 "	else { discard; }\n"
 "}\n";
 
 const char c3d_fs_bb[] =
+"#version 130\n"
 "varying vec3 texcoord0;\n"
 "uniform sampler3D sampler0;\n"
 "uniform vec4 mparams[4];\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	if ((texcoord0.y >= mparams[1].w && texcoord0.y <= mparams[2].x) &&\n"
@@ -59,7 +66,7 @@ const char c3d_fs_bb[] =
 "		if (t >= mparams[0].y && t <= mparams[0].z)\n"
 "		{\n"
 "			float r = (t+(-mparams[0].y))/mparams[0].w;\n"
-"			gl_FragColor=vec4(r*mparams[3].y,r*mparams[3].y,r*mparams[3].y,r*mparams[3].x);\n"
+"			fragColor=vec4(r*mparams[3].y,r*mparams[3].y,r*mparams[3].y,r*mparams[3].x);\n"
 "		}\n"
 "		else { discard; }\n"
 "	}\n"
@@ -67,9 +74,11 @@ const char c3d_fs_bb[] =
 "}\n";
 
 const char c3d_fs_bb_clamp[] =
+"#version 130\n"
 "varying vec3 texcoord0;\n"
 "uniform sampler3D sampler0;\n"
 "uniform vec4 mparams[4];\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	if ((texcoord0.y >= mparams[1].w && texcoord0.y <= mparams[2].x) &&\n"
@@ -79,11 +88,11 @@ const char c3d_fs_bb_clamp[] =
 "		if (t >= mparams[0].y && t <= mparams[0].z)\n"
 "		{\n"
 "			float r = (t+(-mparams[0].y))/mparams[0].w;\n"
-"			gl_FragColor=vec4(r*mparams[3].y,r*mparams[3].y,r*mparams[3].y,1.0);\n"
+"			fragColor=vec4(r*mparams[3].y,r*mparams[3].y,r*mparams[3].y,1.0);\n"
 "		}\n"
 "		else if (t > mparams[0].z)\n"
 "		{\n"
-"			gl_FragColor=vec4(mparams[3].y,mparams[3].y,mparams[3].y,1.0);\n"
+"			fragColor=vec4(mparams[3].y,mparams[3].y,mparams[3].y,1.0);\n"
 "		}\n"
 "		else { discard; }\n"
 "	}\n"
@@ -91,10 +100,12 @@ const char c3d_fs_bb_clamp[] =
 "}\n";
 
 const char c3d_fs_gradient[] =
+"#version 130\n"
 "varying vec3 texcoord0;\n"
 "uniform sampler3D sampler0;\n"
 "uniform sampler1D sampler1;\n"
 "uniform vec4 mparams[4];\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	float t = texture3D(sampler0,texcoord0).r;\n"
@@ -102,16 +113,18 @@ const char c3d_fs_gradient[] =
 "	{\n"
 "		float r = (t+(-mparams[0].y))/mparams[0].w;\n"
 "		vec4 color = texture1D(sampler1, r);\n"
-"		gl_FragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,r*mparams[3].x);\n"
+"		fragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,r*mparams[3].x);\n"
 "	}\n"
 "	else { discard; }\n"
 "}\n";
 
 const char c3d_fs_gradient_clamp[] =
+"#version 130\n"
 "varying vec3 texcoord0;\n"
 "uniform sampler3D sampler0;\n"
 "uniform sampler1D sampler1;\n"
 "uniform vec4 mparams[4];\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "float t = texture3D(sampler0,texcoord0).r;\n"
@@ -119,21 +132,23 @@ const char c3d_fs_gradient_clamp[] =
 "	{\n"
 "		float r = (t+(-mparams[0].y))/mparams[0].w;\n"
 "		vec4 color = texture1D(sampler1, r);\n"
-"		gl_FragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,1.0);\n"
+"		fragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,1.0);\n"
 "	}\n"
 "	else if (t > mparams[0].z)\n"
 "	{\n"
 "		vec4 color = texture1D(sampler1, 0.999);\n"
-"		gl_FragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,1.0);\n"
+"		fragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,1.0);\n"
 "	}\n"
 "	else { discard; }\n"
 "}\n";
 
 const char c3d_fs_gradient_bb[] =
+"#version 130\n"
 "varying vec3 texcoord0;\n"
 "uniform sampler3D sampler0;\n"
 "uniform sampler1D sampler1;\n"
 "uniform vec4 mparams[4];\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "		if ((texcoord0.y >= mparams[1].w && texcoord0.y <= mparams[2].x) &&\n"
@@ -144,7 +159,7 @@ const char c3d_fs_gradient_bb[] =
 "			{\n"
 "				float r = (t+(-mparams[0].y))/mparams[0].w;\n"
 "				vec4 color = texture1D(sampler1, r);\n"
-"				gl_FragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,r*mparams[3].x);\n"
+"				fragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,r*mparams[3].x);\n"
 "			}\n"
 "			else { discard; }\n"
 "		}\n"
@@ -152,10 +167,12 @@ const char c3d_fs_gradient_bb[] =
 "}\n";
 
 const char c3d_fs_gradient_bb_clamp[] =
+"#version 130\n"
 "varying vec3 texcoord0;\n"
 "uniform sampler3D sampler0;\n"
 "uniform sampler1D sampler1;\n"
 "uniform vec4 mparams[4];\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	if ((texcoord0.y >= mparams[1].w && texcoord0.y <= mparams[2].x) &&\n"
@@ -166,12 +183,12 @@ const char c3d_fs_gradient_bb_clamp[] =
 "		{\n"
 "			float r = (t+(-mparams[0].y))/mparams[0].w;\n"
 "			vec4 color = texture1D(sampler1, r);\n"
-"			gl_FragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,1.0);\n"
+"			fragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,1.0);\n"
 "		}\n"
 "		else if (t > mparams[0].z)\n"
 "		{\n"
 "			vec4 color = texture1D(sampler1, 0.999);\n"
-"			gl_FragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,1.0);\n"
+"			fragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,1.0);\n"
 "		}\n"
 "		else { discard; }\n"
 "	}\n"
@@ -181,43 +198,49 @@ const char c3d_fs_gradient_bb_clamp[] =
 /////////////////////////////////////////
 
 const char c3d_fs_sigm[] =
+"#version 130\n"
 "varying vec3 texcoord0;\n"
 "uniform sampler3D sampler0;\n"
 "uniform vec4 mparams[4];\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	float t = texture3D(sampler0,texcoord0).r;\n"
 "	if (t >= mparams[0].y && t <= mparams[0].z)\n"
 "	{\n"
 "		float r = 1.0 / (1.0 + exp(-6.0*((t-mparams[3].z)/mparams[0].w)));\n"
-"		gl_FragColor=vec4(r*mparams[3].y,r*mparams[3].y,r*mparams[3].y,r*mparams[3].x);\n"
+"		fragColor=vec4(r*mparams[3].y,r*mparams[3].y,r*mparams[3].y,r*mparams[3].x);\n"
 "	}\n"
 "	else { discard; }\n"
 "}\n";
 
 const char c3d_fs_clamp_sigm[] =
+"#version 130\n"
 "varying vec3 texcoord0;\n"
 "uniform sampler3D sampler0;\n"
 "uniform vec4 mparams[4];\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	float t = texture3D(sampler0,texcoord0).r;\n"
 "	if (t >= mparams[0].y && t <= mparams[0].z)\n"
 "	{\n"
 "		float r = 1.0 / (1.0 + exp(-6.0*((t-mparams[3].z)/mparams[0].w)));\n"
-"		gl_FragColor=vec4(r*mparams[3].y,r*mparams[3].y,r*mparams[3].y,1.0);\n"
+"		fragColor=vec4(r*mparams[3].y,r*mparams[3].y,r*mparams[3].y,1.0);\n"
 "	}\n"
 "	else if (t > mparams[0].z)\n"
 "	{\n"
-"		gl_FragColor=vec4(mparams[3].y,mparams[3].y,mparams[3].y,1.0);\n"
+"		fragColor=vec4(mparams[3].y,mparams[3].y,mparams[3].y,1.0);\n"
 "	}\n"
 "	else { discard; }\n"
 "}\n";
 
 const char c3d_fs_bb_sigm[] =
+"#version 130\n"
 "varying vec3 texcoord0;\n"
 "uniform sampler3D sampler0;\n"
 "uniform vec4 mparams[4];\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	if ((texcoord0.y >= mparams[1].w && texcoord0.y <= mparams[2].x) &&\n"
@@ -227,7 +250,7 @@ const char c3d_fs_bb_sigm[] =
 "		if (t >= mparams[0].y && t <= mparams[0].z)\n"
 "		{\n"
 "			float r = 1.0 / (1.0 + exp(-6.0*((t-mparams[3].z)/mparams[0].w)));\n"
-"			gl_FragColor=vec4(r*mparams[3].y,r*mparams[3].y,r*mparams[3].y,r*mparams[3].x);\n"
+"			fragColor=vec4(r*mparams[3].y,r*mparams[3].y,r*mparams[3].y,r*mparams[3].x);\n"
 "		}\n"
 "		else { discard; }\n"
 "	}\n"
@@ -235,9 +258,11 @@ const char c3d_fs_bb_sigm[] =
 "}\n";
 
 const char c3d_fs_bb_clamp_sigm[] =
+"#version 130\n"
 "varying vec3 texcoord0;\n"
 "uniform sampler3D sampler0;\n"
 "uniform vec4 mparams[4];\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	if ((texcoord0.y >= mparams[1].w && texcoord0.y <= mparams[2].x) &&\n"
@@ -247,11 +272,11 @@ const char c3d_fs_bb_clamp_sigm[] =
 "		if (t >= mparams[0].y && t <= mparams[0].z)\n"
 "		{\n"
 "			float r = 1.0 / (1.0 + exp(-6.0*((t-mparams[3].z)/mparams[0].w)));\n"
-"			gl_FragColor=vec4(r*mparams[3].y,r*mparams[3].y,r*mparams[3].y,1.0);\n"
+"			fragColor=vec4(r*mparams[3].y,r*mparams[3].y,r*mparams[3].y,1.0);\n"
 "		}\n"
 "		else if (t > mparams[0].z)\n"
 "		{\n"
-"			gl_FragColor=vec4(mparams[3].y,mparams[3].y,mparams[3].y,1.0);\n"
+"			fragColor=vec4(mparams[3].y,mparams[3].y,mparams[3].y,1.0);\n"
 "		}\n"
 "		else { discard; }\n"
 "	}\n"
@@ -259,10 +284,12 @@ const char c3d_fs_bb_clamp_sigm[] =
 "}\n";
 
 const char c3d_fs_gradient_sigm[] =
+"#version 130\n"
 "varying vec3 texcoord0;\n"
 "uniform sampler3D sampler0;\n"
 "uniform sampler1D sampler1;\n"
 "uniform vec4 mparams[4];\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	float t = texture3D(sampler0,texcoord0).r;\n"
@@ -270,16 +297,18 @@ const char c3d_fs_gradient_sigm[] =
 "	{\n"
 "		float r = 1.0 / (1.0 + exp(-6.0*((t-mparams[3].z)/mparams[0].w)));\n"
 "		vec4 color = texture1D(sampler1, r);\n"
-"		gl_FragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,r*mparams[3].x);\n"
+"		fragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,r*mparams[3].x);\n"
 "	}\n"
 "	else { discard; }\n"
 "}\n";
 
 const char c3d_fs_gradient_clamp_sigm[] =
+"#version 130\n"
 "varying vec3 texcoord0;\n"
 "uniform sampler3D sampler0;\n"
 "uniform sampler1D sampler1;\n"
 "uniform vec4 mparams[4];\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "float t = texture3D(sampler0,texcoord0).r;\n"
@@ -287,21 +316,23 @@ const char c3d_fs_gradient_clamp_sigm[] =
 "	{\n"
 "		float r = 1.0 / (1.0 + exp(-6.0*((t-mparams[3].z)/mparams[0].w)));\n"
 "		vec4 color = texture1D(sampler1, r);\n"
-"		gl_FragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,1.0);\n"
+"		fragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,1.0);\n"
 "	}\n"
 "	else if (t > mparams[0].z)\n"
 "	{\n"
 "		vec4 color = texture1D(sampler1, 0.999);\n"
-"		gl_FragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,1.0);\n"
+"		fragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,1.0);\n"
 "	}\n"
 "	else { discard; }\n"
 "}\n";
 
 const char c3d_fs_gradient_bb_sigm[] =
+"#version 130\n"
 "varying vec3 texcoord0;\n"
 "uniform sampler3D sampler0;\n"
 "uniform sampler1D sampler1;\n"
 "uniform vec4 mparams[4];\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "		if ((texcoord0.y >= mparams[1].w && texcoord0.y <= mparams[2].x) &&\n"
@@ -312,7 +343,7 @@ const char c3d_fs_gradient_bb_sigm[] =
 "			{\n"
 "				float r = 1.0 / (1.0 + exp(-6.0*((t-mparams[3].z)/mparams[0].w)));\n"
 "				vec4 color = texture1D(sampler1, r);\n"
-"				gl_FragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,r*mparams[3].x);\n"
+"				fragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,r*mparams[3].x);\n"
 "			}\n"
 "			else { discard; }\n"
 "		}\n"
@@ -320,10 +351,12 @@ const char c3d_fs_gradient_bb_sigm[] =
 "}\n";
 
 const char c3d_fs_gradient_bb_clamp_sigm[] =
+"#version 130\n"
 "varying vec3 texcoord0;\n"
 "uniform sampler3D sampler0;\n"
 "uniform sampler1D sampler1;\n"
 "uniform vec4 mparams[4];\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	if ((texcoord0.y >= mparams[1].w && texcoord0.y <= mparams[2].x) &&\n"
@@ -334,12 +367,12 @@ const char c3d_fs_gradient_bb_clamp_sigm[] =
 "		{\n"
 "			float r = 1.0 / (1.0 + exp(-6.0*((t-mparams[3].z)/mparams[0].w)));\n"
 "			vec4 color = texture1D(sampler1, r);\n"
-"			gl_FragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,1.0);\n"
+"			fragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,1.0);\n"
 "		}\n"
 "		else if (t > mparams[0].z)\n"
 "		{\n"
 "			vec4 color = texture1D(sampler1, 0.999);\n"
-"			gl_FragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,1.0);\n"
+"			fragColor=vec4(color.x*mparams[3].y,color.y*mparams[3].y,color.z*mparams[3].y,1.0);\n"
 "		}\n"
 "		else { discard; }\n"
 "	}\n"
@@ -349,6 +382,7 @@ const char c3d_fs_gradient_bb_clamp_sigm[] =
 /////////////////////////////////////////
 
 const char frame_vs[] =
+"#version 130\n"
 "attribute vec3 v_position;\n"
 "uniform mat4 mvp;\n"
 "void main()\n"
@@ -357,17 +391,21 @@ const char frame_vs[] =
 "}\n";
 
 const char frame_fs[] =
+"#version 130\n"
 "uniform vec4 K;\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
-"	gl_FragColor=K;\n"
+"	fragColor=K;\n"
 "}\n";
 
 const char simple_tex_vs[] =
+"#version 130\n"
 "attribute vec3 v_position;\n"
 "attribute vec3 v_texcoord0;\n"
 "varying vec2 texcoord0;\n"
 "uniform mat4 mvp;\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	texcoord0=v_texcoord0.xy;\n"
@@ -375,17 +413,20 @@ const char simple_tex_vs[] =
 "}\n";
 
 const char simple_tex_fs[] =
+"#version 130\n"
 "varying vec2 texcoord0;\n"
 "uniform sampler2D sampler0;\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	float color=texture2D(sampler0,texcoord0).r;\n"
-"	gl_FragColor=vec4(color,color,color,1.0);\n"
+"	fragColor=vec4(color,color,color,1.0);\n"
 "}\n";
 
 // sparams[0] eye position
 // sparams[1] light direction
 const char TBNf_vs0[] =
+"#version 130\n"
 "attribute vec3 v_position;\n"
 "attribute vec3 v_normal;\n"
 "attribute vec3 v_texcoord0;\n"
@@ -405,6 +446,7 @@ const char TBNf_vs0[] =
 "}\n";
 
 const char TBNf_fs0[] =
+"#version 130\n"
 "uniform float shininess;\n"
 "uniform vec3 sparams[2];\n"
 "uniform mat3 modeling;\n"
@@ -416,6 +458,7 @@ const char TBNf_fs0[] =
 "varying vec3 tangent;\n"
 "varying vec3 normal;\n"
 "const vec4 L0c=vec4(1.0,1.0,0.75,1.0);\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "vec4 texcolor=texture2D(sampler0,texcoord0);\n"
@@ -441,12 +484,13 @@ const char TBNf_fs0[] =
 "	float specular0=pow(clamp(dot(normalize(L0tbn+Vtbn),Ntbn),0.0,1.0),shininess);\n"
 "	color+=L0c*texcolor*diffuse0+L0c*texcolor*specular0;\n"
 "}\n"
-"gl_FragColor=color;\n"
+"fragColor=color;\n"
 "}\n";
 
 // sparams[0] eye position
 // sparams[1] light direction
 const char color_vs[] =
+"#version 130\n"
 "attribute vec3 v_position;\n"
 "attribute vec3 v_normal; \n"
 "uniform mat4 mvp; \n"
@@ -460,6 +504,7 @@ const char color_vs[] =
 "}\n";
 
 const char color_fs[] =
+"#version 130\n"
 "uniform vec4 K[2];\n"
 "uniform float shininess;\n"
 "uniform vec3 sparams[2];\n"
@@ -467,6 +512,7 @@ const char color_fs[] =
 "uniform mat3 modeling_inv_t;\n"
 "varying vec4 position;\n"
 "varying vec3 normal;\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	vec3 Pm=modeling*position.xyz;\n"
@@ -481,14 +527,16 @@ const char color_fs[] =
 "		color+=(K[0]*diffuse0+K[1]*specular0);\n"
 "	}\n"
 "	color.a=1.0;\n"
-"	gl_FragColor=color;\n"
+"	fragColor=color;\n"
 "}\n";
 
 const char orientcube_fs[] =
+"#version 130\n"
 "uniform vec3 K[2];\n"
 "uniform vec3 sparams[2];\n"
 "varying vec4 position;\n"
 "varying vec3 normal;\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	vec3 Pm=position.xyz;\n"
@@ -503,14 +551,16 @@ const char orientcube_fs[] =
 "		float specular0=pow(max(dot(Hm0,Nm),0.0),10.0);\n"
 "		color+=(K[0]*diffuse0+K[1]*specular0);\n"
 "	}\n"
-"	gl_FragColor=vec4(color.r,color.g,color.b,1.0);\n"
+"	fragColor=vec4(color.r,color.g,color.b,1.0);\n"
 "}\n";
 
 const char mesh_fs[] =
+"#version 130\n"
 "uniform vec4 K[2];\n"
 "uniform vec3 sparams[2];\n"
 "varying vec4 position;\n"
 "varying vec3 normal;\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	vec3 Pm=position.xyz;\n"
@@ -529,10 +579,11 @@ const char mesh_fs[] =
 "		float diffuse1=max(dot(L,-Nm),0.0);\n"
 "		color+=(K[1]*diffuse1);\n"
 "	}\n"
-"	gl_FragColor=vec4(color.r,color.g,color.b,K[0][3]);\n"
+"	fragColor=vec4(color.r,color.g,color.b,K[0][3]);\n"
 "}\n";
 
 const char quad_vs[] =
+"#version 130\n"
 "attribute vec2 v_position;\n"
 "attribute vec3 v_texcoord0;\n"
 "varying vec3 texcoord0;\n"
@@ -543,6 +594,7 @@ const char quad_vs[] =
 "}\n";
 
 const char fsquad_vs[] =
+"#version 130\n"
 "attribute vec2 v_position;\n"
 "varying   vec2 texcoord0;\n"
 "void main()\n"
@@ -552,14 +604,17 @@ const char fsquad_vs[] =
 "}\n";
 
 const char fsquad_fs[] =
+"#version 130\n"
 "uniform sampler2D sampler0;\n"
 "varying vec2 texcoord0;\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
-"	gl_FragColor=texture2D(sampler0,texcoord0);\n"
+"	fragColor=texture2D(sampler0,texcoord0);\n"
 "}\n";
 
 const char zero_vs[] =
+"#version 130\n"
 "attribute vec3 v_position;\n"
 "attribute vec3 v_color;\n"
 "varying vec4 color;\n"
@@ -571,14 +626,17 @@ const char zero_vs[] =
 "}\n";
 
 const char zero_fs[] =
+"#version 130\n"
 "varying vec4 color;\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
-"	gl_FragColor=color;\n"
+"	fragColor=color;\n"
 "}\n";
 
 ////////////
 const char raycast_vs[] =
+"#version 130\n"
 "attribute vec3 v_position;\n"
 "uniform mat4 mvp;\n"
 "varying vec4 position;\n"
@@ -589,11 +647,13 @@ const char raycast_vs[] =
 "}\n";
 
 const char raycast_fs[] =
+"#version 130\n"
 "uniform sampler2D sampler0;\n"
 "uniform sampler2D sampler1;\n"
 "uniform sampler3D sampler2;\n"
 "uniform vec4 mparams[4];\n"
 "varying vec4 position;\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	vec2 tc = ((position.xy/position.w)+1.0)/2.0;\n"
@@ -622,15 +682,17 @@ const char raycast_fs[] =
 "		}\n"
 "		ray += delta;\n"
 "	}\n"
-"	gl_FragColor = acc;\n"
+"	fragColor = acc;\n"
 "}\n";
 
 const char raycast_fs_bb[] =
+"#version 130\n"
 "uniform sampler2D sampler0;\n"
 "uniform sampler2D sampler1;\n"
 "uniform sampler3D sampler2;\n"
 "uniform vec4 mparams[4];\n"
 "varying vec4 position;\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	vec2 tc = ((position.xy/position.w)+1.0)/2.0;\n"
@@ -661,16 +723,18 @@ const char raycast_fs_bb[] =
 "		}\n"
 "		ray += delta;\n"
 "	}\n"
-"	gl_FragColor = acc;\n"
+"	fragColor = acc;\n"
 "}\n";
 
 const char raycast_color_fs[] =
+"#version 130\n"
 "uniform sampler2D sampler0;\n"
 "uniform sampler2D sampler1;\n"
 "uniform sampler3D sampler2;\n"
 "uniform sampler1D sampler3;\n"
 "uniform vec4 mparams[4];\n"
 "varying vec4 position;\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	vec2 tc = ((position.xy/position.w)+1.0)/2.0;\n"
@@ -700,16 +764,18 @@ const char raycast_color_fs[] =
 "		}\n"
 "		ray += delta;\n"
 "	}\n"
-"	gl_FragColor = acc;\n"
+"	fragColor = acc;\n"
 "}\n";
 
 const char raycast_color_fs_bb[] =
+"#version 130\n"
 "uniform sampler2D sampler0;\n"
 "uniform sampler2D sampler1;\n"
 "uniform sampler3D sampler2;\n"
 "uniform sampler1D sampler3;\n"
 "uniform vec4 mparams[4];\n"
 "varying vec4 position;\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	vec2 tc = ((position.xy/position.w)+1.0)/2.0;\n"
@@ -741,16 +807,18 @@ const char raycast_color_fs_bb[] =
 "		}\n"
 "		ray += delta;\n"
 "	}\n"
-"	gl_FragColor=acc;\n"
+"	fragColor=acc;\n"
 "}\n";
 //////////////////////
 
 const char raycast_fs_sigm[] =
+"#version 130\n"
 "uniform sampler2D sampler0;\n"
 "uniform sampler2D sampler1;\n"
 "uniform sampler3D sampler2;\n"
 "uniform vec4 mparams[4];\n"
 "varying vec4 position;\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	vec2 tc = ((position.xy/position.w)+1.0)/2.0;\n"
@@ -779,15 +847,17 @@ const char raycast_fs_sigm[] =
 "		}\n"
 "		ray += delta;\n"
 "	}\n"
-"	gl_FragColor = acc;\n"
+"	fragColor = acc;\n"
 "}\n";
 
 const char raycast_fs_bb_sigm[] =
+"#version 130\n"
 "uniform sampler2D sampler0;\n"
 "uniform sampler2D sampler1;\n"
 "uniform sampler3D sampler2;\n"
 "uniform vec4 mparams[4];\n"
 "varying vec4 position;\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	vec2 tc = ((position.xy/position.w)+1.0)/2.0;\n"
@@ -818,16 +888,18 @@ const char raycast_fs_bb_sigm[] =
 "		}\n"
 "		ray += delta;\n"
 "	}\n"
-"	gl_FragColor = acc;\n"
+"	fragColor = acc;\n"
 "}\n";
 
 const char raycast_color_fs_sigm[] =
+"#version 130\n"
 "uniform sampler2D sampler0;\n"
 "uniform sampler2D sampler1;\n"
 "uniform sampler3D sampler2;\n"
 "uniform sampler1D sampler3;\n"
 "uniform vec4 mparams[4];\n"
 "varying vec4 position;\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	vec2 tc = ((position.xy/position.w)+1.0)/2.0;\n"
@@ -857,16 +929,18 @@ const char raycast_color_fs_sigm[] =
 "		}\n"
 "		ray += delta;\n"
 "	}\n"
-"	gl_FragColor = acc;\n"
+"	fragColor = acc;\n"
 "}\n";
 
 const char raycast_color_fs_bb_sigm[] =
+"#version 130\n"
 "uniform sampler2D sampler0;\n"
 "uniform sampler2D sampler1;\n"
 "uniform sampler3D sampler2;\n"
 "uniform sampler1D sampler3;\n"
 "uniform vec4 mparams[4];\n"
 "varying vec4 position;\n"
+"out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
 "	vec2 tc = ((position.xy/position.w)+1.0)/2.0;\n"
@@ -898,7 +972,7 @@ const char raycast_color_fs_bb_sigm[] =
 "		}\n"
 "		ray += delta;\n"
 "	}\n"
-"	gl_FragColor=acc;\n"
+"	fragColor=acc;\n"
 "}\n";
 
 #endif

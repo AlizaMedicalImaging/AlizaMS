@@ -169,18 +169,26 @@ int main(int argc, char *argv[])
 	QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
 #endif
 	QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
-/*
-	if (!metadata_only)
-	{
-    	QSurfaceFormat format;
-		QSurfaceFormat::setDefaultFormat(format);
-	}
-*/
 	QApplication app(argc, argv);
 	app.setOrganizationName(QString("Aliza"));
 	app.setOrganizationDomain(QString("aliza-dicom-viewer.com"));
 	app.setApplicationName(QString("AlizaMS"));
 	//
+#if 0
+	if (!metadata_only)
+	{
+    	QSurfaceFormat format;
+    	format.setRedBufferSize(8);
+    	format.setGreenBufferSize(8);
+    	format.setBlueBufferSize(8);
+    	format.setAlphaBufferSize(8);
+    	format.setDepthBufferSize(24);
+		//format.setRenderableType(QSurfaceFormat::OpenGL);
+    	//format.setSamples(4);
+		//format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+		QSurfaceFormat::setDefaultFormat(format);
+	}
+#endif
 	{
 		const int hide_zoom_ = 1;
 		hide_zoom = (hide_zoom_==1) ? true : false;

@@ -3,7 +3,7 @@
 
 #include "camera.h"
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions_3_0>
+#include <QOpenGLFunctions_3_2_Core>
 #include <QPoint>
 #include <QModelIndex>
 #include <QMouseEvent>
@@ -64,6 +64,7 @@ public:
 	float   shininess;
 	unsigned int faces_size;
 	GLuint * vboid;
+	GLuint   vaoid;
 	int	   * get_shadows;
 	int	   * cast_shadows;
 	GLuint * textures;
@@ -95,7 +96,7 @@ public:
 } ALIGN16_POST;
 
 ALIGN16_PRE
-class GLWidget : public QOpenGLWidget, public QOpenGLFunctions_3_0
+class GLWidget : public QOpenGLWidget, public QOpenGLFunctions_3_2_Core
 {
 
 	Q_OBJECT
@@ -219,16 +220,25 @@ public:
 	GLuint frontface_tex;
 	GLuint frontface_depth;
     GLuint scene_vbo;
+    GLuint scene_vao;
     GLuint frames_vbo;
+    GLuint frames_vao;
     GLuint slice_v_vbo;
+    GLuint slice_v_vao;
     GLuint slice_t_vbo;
+    GLuint slice_t_vao;
 	GLuint origin_vbo;
+	GLuint origin_vao;
     ShaderObj fsquad_shader;
 	ShaderObj zero_shader;
 	ShaderObj raycast_shader;
 	ShaderObj raycast_color_shader;
 	ShaderObj raycast_shader_bb;
 	ShaderObj raycast_color_shader_bb;
+	ShaderObj raycast_shader_sigm;
+	ShaderObj raycast_color_shader_sigm;
+	ShaderObj raycast_shader_bb_sigm;
+	ShaderObj raycast_color_shader_bb_sigm;
 	ShaderObj c3d_shader_clamp;
 	ShaderObj c3d_shader_gradient_clamp;
 	ShaderObj c3d_shader_bb_clamp;
@@ -237,10 +247,6 @@ public:
 	ShaderObj c3d_shader_gradient;
 	ShaderObj c3d_shader_bb;
 	ShaderObj c3d_shader_gradient_bb;
-	ShaderObj raycast_shader_sigm;
-	ShaderObj raycast_color_shader_sigm;
-	ShaderObj raycast_shader_bb_sigm;
-	ShaderObj raycast_color_shader_bb_sigm;
 	ShaderObj c3d_shader_clamp_sigm;
 	ShaderObj c3d_shader_gradient_clamp_sigm;
 	ShaderObj c3d_shader_bb_clamp_sigm;
@@ -256,8 +262,11 @@ public:
 	ShaderObj orientcube_shader;
 	ShaderObj mesh_shader;
 	GLuint raycastcube0[2];
+	GLuint raycastcube0_vao;
 	GLuint raycastcube1[2];
+	GLuint raycastcube1_vao;
 	GLuint raycastcube2[2];
+	GLuint raycastcube2_vao;
 	GLuint cubebuffer;
 	GLuint cube_tex;
 	GLuint cube_depth;
@@ -275,15 +284,17 @@ public:
 	bool create_program(
 		const char*, const char*, ShaderObj*, bool=false);
 	void checkGLerror(const char*);
-	void makeModelVBO_ArraysT(GLuint*,
-		 const float*, const float*, const float*, const float*,
-		 const unsigned int*, const int,
-		 GLenum=GL_STATIC_DRAW,
-		 float=1.0f);
+	void makeModelVBO_ArraysT(
+		GLuint*, GLuint*,
+		GLuint*, GLuint*,GLuint*, GLuint*,
+		const float*, const float*, const float*, const float*,
+		const unsigned int*, const int,
+		GLenum=GL_STATIC_DRAW,
+		float=1.0f);
 	void generate_point_vbo(
-		GLuint*,
+		GLuint*, GLuint*,
 		const float, const float, const float);
-	void generate_screen_quad(unsigned int*);
+	void generate_screen_quad(GLuint*, GLuint*, GLuint*);
 	void free_fbos0(
 		GLuint * framebuffer,
 		GLuint * color_texture,

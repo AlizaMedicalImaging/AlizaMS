@@ -24,6 +24,7 @@
 #include "dicom/spectroscopydata.h"
 
 class GLWidget;
+class qMeshData;
 
 typedef itk::Image<signed short,       3> ImageTypeSS;
 typedef itk::Image<unsigned short,     3> ImageTypeUS;
@@ -250,6 +251,31 @@ public:
 	ContoursMap map;
 };
 typedef QList<ROI> ROIs;
+
+class TriMesh
+{
+public:
+	TriMesh()
+	:
+	id(-1),
+	visible(true),
+	qmesh(NULL),
+	initialized(false),
+	max_delta(0),
+	R(0.9),
+	G(0.9),
+	B(0.9) {}
+	~TriMesh() {}
+	int id;
+	bool visible;
+	qMeshData * qmesh;
+	bool initialized;
+	double max_delta;
+	double R;
+	double G;
+	double B;
+};
+typedef QMap<int, TriMesh*> TriMeshes;
 
 class AnatomyDesc
 {
@@ -722,6 +748,7 @@ public:
 	SlicesVector image_slices;
 	SpectroscopySlicesVector spectroscopy_slices;
 	ROIs rois;
+	TriMeshes trimeshes;
 	void close(bool=true);
 };
 

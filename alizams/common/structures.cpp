@@ -94,7 +94,10 @@ void DisplayInterface::close(bool clear_geometry)
 	tex_info = -1;
 	x_spacing = y_spacing = 0.0;
 	dimx = dimy = 0;
+	TriMeshes::iterator mi;
 	if(!clear_geometry) goto quit__;
+	//
+	//
 	//
 	for (unsigned int x = 0; x < image_slices.size(); x++)
 	{
@@ -148,7 +151,6 @@ void DisplayInterface::close(bool clear_geometry)
 		spect_vol_vbo = 0;
 		spect_vol_vbo_size = 0;
 	}
-	//
 	for (int k = 0; k < rois.size(); k++)
 	{
 		QList<int> keys;
@@ -182,7 +184,26 @@ void DisplayInterface::close(bool clear_geometry)
 		rois[k].map.clear();
 	}
 	rois.clear();
-	//
+	mi = trimeshes.begin();
+	while (mi != trimeshes.end())
+	{
+		TriMesh * trimesh = mi.value();
+		++mi;
+		if (trimesh &&
+			opengl_ok && gl &&
+			trimesh->initialized &&
+			trimesh->qmesh)
+		{
+			if (trimesh->qmesh->vboid)
+			{
+				gl->glDeleteBuffers(2, trimesh->qmesh->vboid);
+				GLWidget::increment_count_vbos(-2);
+			}
+			delete trimesh->qmesh;
+		}
+		if (trimesh) delete trimesh;
+	}
+	trimeshes.clear();
 	center_x = center_y = center_z = 0.0f;
 	slices_direction_x = slices_direction_y = 0.0f;
 	slices_direction_z = 1.0;
