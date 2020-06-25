@@ -652,6 +652,12 @@ void GLWidget::init_()
 	c3d_shader_gradient_sigm_vbo = new GLuint[2];
 	c3d_shader_bb_sigm_vbo = new GLuint[2];
 	c3d_shader_gradient_bb_sigm_vbo = new GLuint[2];
+	raycastcube0 = new GLuint[2];
+	raycastcube0_vao = 0;
+	raycastcube1 = new GLuint[2];
+	raycastcube1_vao = 0;
+	raycastcube2 = new GLuint[2];
+	raycastcube2_vao = 0;
 	raycast_shader_vao = 0;
 	raycast_color_shader_vao = 0;
 	raycast_shader_bb_vao = 0;
@@ -676,16 +682,12 @@ void GLWidget::init_()
 	c3d_shader_gradient_sigm_vao = 0;
 	c3d_shader_bb_sigm_vao = 0;
 	c3d_shader_gradient_bb_sigm_vao = 0;
-
-
-
 	frame_shader.program = 0;
 	simple_tex_shader.program = 0;
 	sphere0_shader.program = 0;
 	color_shader.program = 0;
 	orientcube_shader.program = 0;
 	mesh_shader.program = 0;
-	trilinear = false;
 	view = 0;
 	axis = 2;
 	gradient1  = 0;
@@ -783,17 +785,10 @@ void GLWidget::close_()
 	free_fbos1(&frontfacebuffer,&frontface_tex,&frontface_depth);
 	glDeleteVertexArrays(1, &scene_vao);
 	glDeleteVertexArrays(1, &frames_vao);
-	glDeleteVertexArrays(1, &slice_v_vao);
-	glDeleteVertexArrays(1, &slice_t_vao);
 	glDeleteBuffers(1, &scene_vbo);
 	glDeleteBuffers(1, &frames_vbo);
-	glDeleteBuffers(1, &slice_v_vbo);
-	glDeleteBuffers(1, &slice_t_vbo);
 	glDeleteBuffers(1, &origin_vbo);
-	glDeleteBuffers(2, raycastcube0);
-	glDeleteBuffers(2, raycastcube1);
-	glDeleteBuffers(2, raycastcube2);
-	increment_count_vbos(-11);
+	increment_count_vbos(-3);
 	if (camera)
 	{
 		delete camera;
@@ -1108,6 +1103,15 @@ void GLWidget::init_opengl(int w, int h)
 	frame_shader.position_handle     = glGetAttribLocation (frame_shader.program, "v_position");
 	shaders.push_back(&frame_shader);
 	//
+	create_program(color_vs, orientcube_fs, &orientcube_shader);
+	orientcube_shader.position_handle         = glGetAttribLocation (orientcube_shader.program, "v_position");
+	orientcube_shader.normal_handle           = glGetAttribLocation (orientcube_shader.program, "v_normal");
+	orientcube_shader.location_K              = glGetUniformLocation(orientcube_shader.program, "K");
+	orientcube_shader.location_mvp            = glGetUniformLocation(orientcube_shader.program, "mvp");
+	orientcube_shader.location_sparams        = glGetUniformLocation(orientcube_shader.program, "sparams");
+	shaders.push_back(&orientcube_shader);
+	//
+	/*
 	create_program(simple_tex_vs, simple_tex_fs, &simple_tex_shader);
 	simple_tex_shader.location_mvp        = glGetUniformLocation(simple_tex_shader.program, "mvp");
 	simple_tex_shader.location_sampler[0] = glGetUniformLocation(simple_tex_shader.program, "sampler0");
@@ -1115,7 +1119,6 @@ void GLWidget::init_opengl(int w, int h)
 	simple_tex_shader.texture_handle[0]   = glGetAttribLocation (simple_tex_shader.program, "v_texcoord0");
 	shaders.push_back(&simple_tex_shader);
 	//
-	/*
     create_program(TBNf_vs0, TBNf_fs0, &sphere0_shader);    
     sphere0_shader.position_handle         = glGetAttribLocation (sphere0_shader.program, "v_position");
     sphere0_shader.normal_handle           = glGetAttribLocation (sphere0_shader.program, "v_normal");
@@ -1140,14 +1143,6 @@ void GLWidget::init_opengl(int w, int h)
 	color_shader.location_modeling_inv_t = glGetUniformLocation(color_shader.program, "modeling_inv_t");
 	color_shader.location_sparams        = glGetUniformLocation(color_shader.program, "sparams");
 	shaders.push_back(&color_shader);
-	*/
-	create_program(color_vs, orientcube_fs, &orientcube_shader);
-	orientcube_shader.position_handle         = glGetAttribLocation (orientcube_shader.program, "v_position");
-	orientcube_shader.normal_handle           = glGetAttribLocation (orientcube_shader.program, "v_normal");
-	orientcube_shader.location_K              = glGetUniformLocation(orientcube_shader.program, "K");
-	orientcube_shader.location_mvp            = glGetUniformLocation(orientcube_shader.program, "mvp");
-	orientcube_shader.location_sparams        = glGetUniformLocation(orientcube_shader.program, "sparams");
-	shaders.push_back(&orientcube_shader);
 	//
 	create_program(color_vs, mesh_fs, &mesh_shader);
 	mesh_shader.position_handle         = glGetAttribLocation (mesh_shader.program, "v_position");
@@ -1157,6 +1152,7 @@ void GLWidget::init_opengl(int w, int h)
 	mesh_shader.location_sparams        = glGetUniformLocation(mesh_shader.program, "sparams");
 	shaders.push_back(&mesh_shader);
 	//
+	*/
 #if 1
 	checkGLerror(" after shaders creation\n");
 #endif
@@ -1204,16 +1200,6 @@ void GLWidget::init_opengl(int w, int h)
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		//
-		glGenVertexArrays(1, &slice_v_vao);
-		glBindVertexArray(slice_v_vao);
-		glGenBuffers(1, &slice_v_vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, slice_v_vbo);
-		glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
-		glGenBuffers(1, &slice_t_vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, slice_t_vbo);
-		glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
-		glBindVertexArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 
 
@@ -1234,7 +1220,15 @@ void GLWidget::init_opengl(int w, int h)
 	zero_shader.position_handle     = glGetAttribLocation (zero_shader.program, "v_position");
 	zero_shader.color_handle        = glGetAttribLocation (zero_shader.program, "v_color");
 	shaders.push_back(&zero_shader);
-	raycast_cube(true, 100.0f,100.0f,100.0f,raycastcube0,raycastcube1,raycastcube2);
+	generate_raycastcube0_vao(
+		&raycastcube0_vao, raycastcube0,
+		&(zero_shader.position_handle), &(zero_shader.color_handle));
+	generate_raycastcube1_vao(
+		&raycastcube1_vao, raycastcube1,
+		&(zero_shader.position_handle), &(zero_shader.color_handle));
+	generate_raycastcube2_vao(
+		&raycastcube2_vao, raycastcube2,
+		&(zero_shader.position_handle), &(zero_shader.color_handle));
 #if 1
 	checkGLerror(" after n3\n");
 #endif
@@ -1813,7 +1807,7 @@ void GLWidget::paint_raycaster()
 		break;
 	default:
 		force_skip_cube = true;
-		raycast_cube(false,x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
 		break;
 	}
 	//
@@ -1899,42 +1893,16 @@ void GLWidget::paint_raycaster()
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, backface_tex, 0);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, backface_depth);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		glCullFace(GL_FRONT);
-
 		glUniformMatrix4fv(zero_shader.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-
-		glBindBuffer(GL_ARRAY_BUFFER, raycastcube0[0]);
-		glVertexAttribPointer(zero_shader.position_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, raycastcube0[1]);
-		glVertexAttribPointer(zero_shader.color_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glEnableVertexAttribArray(zero_shader.position_handle);
-		glEnableVertexAttribArray(zero_shader.color_handle);
+		glBindVertexArray(raycastcube0_vao);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
-		glDisableVertexAttribArray(zero_shader.position_handle);
-		glDisableVertexAttribArray(zero_shader.color_handle);
-
-		glBindBuffer(GL_ARRAY_BUFFER, raycastcube1[0]);
-		glVertexAttribPointer(zero_shader.position_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, raycastcube1[1]);
-		glVertexAttribPointer(zero_shader.color_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glEnableVertexAttribArray(zero_shader.position_handle);
-		glEnableVertexAttribArray(zero_shader.color_handle);
+		glBindVertexArray(raycastcube1_vao);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		glDisableVertexAttribArray(zero_shader.position_handle);
-		glDisableVertexAttribArray(zero_shader.color_handle);
-
-		glBindBuffer(GL_ARRAY_BUFFER, raycastcube2[0]);
-		glVertexAttribPointer(zero_shader.position_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, raycastcube2[1]);
-		glVertexAttribPointer(zero_shader.color_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glEnableVertexAttribArray(zero_shader.position_handle);
-		glEnableVertexAttribArray(zero_shader.color_handle);
+		glBindVertexArray(raycastcube2_vao);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		glDisableVertexAttribArray(zero_shader.position_handle);
-		glDisableVertexAttribArray(zero_shader.color_handle);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+		//glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
 	// frontfacebuffer
@@ -1944,46 +1912,20 @@ void GLWidget::paint_raycaster()
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, frontface_tex, 0);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, frontface_depth);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		glCullFace(GL_BACK);
-
 		glUniformMatrix4fv(zero_shader.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-
-		glBindBuffer(GL_ARRAY_BUFFER, raycastcube0[0]);
-		glVertexAttribPointer(zero_shader.position_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, raycastcube0[1]);
-		glVertexAttribPointer(zero_shader.color_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glEnableVertexAttribArray(zero_shader.position_handle);
-		glEnableVertexAttribArray(zero_shader.color_handle);
+		glBindVertexArray(raycastcube0_vao);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
-		glDisableVertexAttribArray(zero_shader.position_handle);
-		glDisableVertexAttribArray(zero_shader.color_handle);
-
-		glBindBuffer(GL_ARRAY_BUFFER, raycastcube1[0]);
-		glVertexAttribPointer(zero_shader.position_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, raycastcube1[1]);
-		glVertexAttribPointer(zero_shader.color_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glEnableVertexAttribArray(zero_shader.position_handle);
-		glEnableVertexAttribArray(zero_shader.color_handle);
+		glBindVertexArray(raycastcube1_vao);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		glDisableVertexAttribArray(zero_shader.position_handle);
-		glDisableVertexAttribArray(zero_shader.color_handle);
-
-		glBindBuffer(GL_ARRAY_BUFFER, raycastcube2[0]);
-		glVertexAttribPointer(zero_shader.position_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, raycastcube2[1]);
-		glVertexAttribPointer(zero_shader.color_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glEnableVertexAttribArray(zero_shader.position_handle);
-		glEnableVertexAttribArray(zero_shader.color_handle);
+		glBindVertexArray(raycastcube2_vao);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		glDisableVertexAttribArray(zero_shader.position_handle);
-		glDisableVertexAttribArray(zero_shader.color_handle);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+		//glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
 	glDisable(GL_CULL_FACE);
-
+/*
 	if (di->lut_function == 2)
 	{
 		if (di->selected_lut==0)
@@ -2392,6 +2334,7 @@ void GLWidget::paint_raycaster()
 			}
 		}
 	}
+*/
 //////////////// final scene quad
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
@@ -3641,6 +3584,132 @@ void GLWidget::generate_vao1(GLuint * vao, GLuint * vbo, GLuint * attr_v, GLuint
 	delete [] t;
 }
 
+void GLWidget::generate_raycastcube0_vao(
+	GLuint * vao, GLuint * vbo,
+	GLuint * attr_v, GLuint * attr_c)
+{
+	*vao = 0;
+	vbo[0] = 0;
+	vbo[1] = 0;
+	const float x = 100.0f;
+	const float y = 100.0f;
+	const float z = 100.0f;
+	GLfloat v[] = {
+		-x,  y, z,
+		-x, -y, z,
+		 x,  y, z,
+		 x, -y, z,
+		 x,  y, -z,
+		 x, -y, -z,
+		-x,  y, -z,
+		-x, -y, -z,
+		-x,  y, z,
+		-x, -y, z };
+	GLfloat c[] = {
+		0.0f, 1.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 0.0f, 1.0f,
+		1.0f, 1.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 1.0f,
+		0.0f, 0.0f, 1.0f };
+	glGenVertexArrays(1, vao);
+	glBindVertexArray(*vao);
+	glGenBuffers(2, vbo);
+	increment_count_vbos(2);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+	glBufferData(GL_ARRAY_BUFFER, 30*sizeof(GLfloat), v, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+	glBufferData(GL_ARRAY_BUFFER, 30*sizeof(GLfloat), c, GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(*attr_v, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(*attr_c, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(*attr_c);
+	glEnableVertexAttribArray(*attr_v);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	vaoids.push_back(*vao);
+	vboids.push_back(vbo);
+}
+
+void GLWidget::generate_raycastcube1_vao(
+	GLuint * vao, GLuint * vbo,
+	GLuint * attr_v, GLuint * attr_c)
+{
+	*vao = 0;
+	vbo[0] = 0;
+	vbo[1] = 0;
+	const float x = 100.0f;
+	const float y = 100.0f;
+	const float z = 100.0f;
+	GLfloat v[] = {
+		-x, y, -z,
+		-x, y,  z,
+		 x, y, -z,
+		 x, y,  z };
+	GLfloat c[] = {
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 0.0f,
+		1.0f, 1.0f, 1.0f };
+	glGenVertexArrays(1, vao);
+	glBindVertexArray(*vao);
+	glGenBuffers(2, vbo);
+	increment_count_vbos(2);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), v, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), c, GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(*attr_v, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(*attr_c, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(*attr_c);
+	glEnableVertexAttribArray(*attr_v);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	vaoids.push_back(*vao);
+	vboids.push_back(vbo);
+}
+
+void GLWidget::generate_raycastcube2_vao(
+	GLuint * vao, GLuint * vbo,
+	GLuint * attr_v, GLuint * attr_c)
+{
+	*vao = 0;
+	vbo[0] = 0;
+	vbo[1] = 0;
+	const float x = 100.0f;
+	const float y = 100.0f;
+	const float z = 100.0f;
+	GLfloat v[] = {
+		-x, -y,  z,
+		-x, -y, -z,
+		 x, -y,  z,
+		 x, -y, -z };
+	GLfloat c[] = {
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 1.0f,
+		1.0f, 0.0f, 0.0f };
+	glGenVertexArrays(1, vao);
+	glBindVertexArray(*vao);
+	glGenBuffers(2, vbo);
+	increment_count_vbos(2);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), v, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), c, GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(*attr_v, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(*attr_c, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(*attr_c);
+	glEnableVertexAttribArray(*attr_v);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	vaoids.push_back(*vao);
+	vboids.push_back(vbo);
+}
+
 void GLWidget::generate_quad(
 	GLfloat * v,
 	GLfloat * t,
@@ -4174,7 +4243,6 @@ bool GLWidget::create_fbos1(
 }
 
 void GLWidget::raycast_cube(
-	bool generate,
 	float x, float y, float z,
 	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
 {
@@ -4234,33 +4302,18 @@ void GLWidget::raycast_cube(
 			 x, -y,  z,
 			 x, -y, -z };
 	//
-	if (generate)
-	{
-		glGenBuffers(2, vboid0);
-		increment_count_vbos(2);
-	}
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
 	glBufferData(GL_ARRAY_BUFFER, 30*sizeof(GLfloat), va0, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
 	glBufferData(GL_ARRAY_BUFFER, 30*sizeof(GLfloat), ca0, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	//
-	if (generate)
-	{
-		glGenBuffers(2, vboid1);
-		increment_count_vbos(2);
-	}
 	glBindBuffer(GL_ARRAY_BUFFER, vboid1[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid1[1]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), ca1, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	//
-	if (generate)
-	{
-		glGenBuffers(2, vboid2);
-		increment_count_vbos(2);
-	}
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[1]);

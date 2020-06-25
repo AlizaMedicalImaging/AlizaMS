@@ -178,14 +178,8 @@ int main(int argc, char *argv[])
 	if (!metadata_only)
 	{
     	QSurfaceFormat format;
-    	format.setRedBufferSize(8);
-    	format.setGreenBufferSize(8);
-    	format.setBlueBufferSize(8);
-    	format.setAlphaBufferSize(8);
     	format.setDepthBufferSize(24);
 		//format.setRenderableType(QSurfaceFormat::OpenGL);
-    	//format.setSamples(4);
-		//format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
 		QSurfaceFormat::setDefaultFormat(format);
 	}
 #endif
