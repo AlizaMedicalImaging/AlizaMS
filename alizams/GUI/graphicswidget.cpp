@@ -304,7 +304,7 @@ template<typename T> QString contour_from_path(
 		c->type = item->get_type();
 	else
 		c->type = 0;
-	c->vbo_initialized = false;
+	c->vao_initialized = false;
 	roi->contours[c->id] = c;
 	return QString("");
 }
@@ -379,7 +379,7 @@ static QString contour_from_path_nonuniform(
 		c->type = item->get_type();
 	else
 		c->type = 0;
-	c->vbo_initialized = false;
+	c->vao_initialized = false;
 	roi->contours[c->id] = c;
 	return QString("");
 }

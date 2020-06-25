@@ -152,10 +152,7 @@ public:
 		GLuint*,
 		const GLfloat*,
 		const GLfloat*);
-	void draw_frame(const GLuint*);
 	void draw_frame2(const GLfloat*);
-	void draw_lines(unsigned long, const GLuint*);
-	void draw_points(unsigned long, const GLuint*);
 	int win_w, win_h;
 	Camera * camera;
 	bool   no_opengl3;

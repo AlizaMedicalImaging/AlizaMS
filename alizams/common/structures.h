@@ -23,6 +23,9 @@
 #include "dicom/ultrasoundregiondata.h"
 #include "dicom/spectroscopydata.h"
 
+// unsigned int has to be 32 bit for compat. with GLuint
+// float has to be 32 bit for compat. with GLfloat
+
 class GLWidget;
 class qMeshData;
 
@@ -197,15 +200,16 @@ class Contour
 public:
 	Contour()
 	:
-	id(-1), roiid(-1), vboid(0), vbo_initialized(false), type(0)
+	id(-1), roiid(-1), vaoid(0), vboid(0), vao_initialized(false), type(0)
 	{
 		color.r = 0; color.g = 0; color.b = 0;
 	}
 	~Contour() {}
 	int id;
 	int roiid;
-	unsigned int vboid;
-	bool vbo_initialized;
+	unsigned int vaoid; // have to be 32 bit (GLuint)
+	unsigned int vboid; // have to be 32 bit (GLuint)
+	bool vao_initialized;
 	// type:
 	// 0 - not set
 	// 1 - CLOSED_PLANAR
@@ -252,6 +256,7 @@ public:
 };
 typedef QList<ROI> ROIs;
 
+/*
 class TriMesh
 {
 public:
@@ -276,6 +281,7 @@ public:
 	double B;
 };
 typedef QMap<int, TriMesh*> TriMeshes;
+*/
 
 class AnatomyDesc
 {
@@ -327,8 +333,11 @@ class SpectroscopySlice
 public:
 	SpectroscopySlice()
 	{
+		fvaoid  = 0;
 		fvboid  = 0;
+		lvaoid  = 0;
 		lvboid  = 0;
+		pvaoid  = 0;
 		pvboid  = 0;
 		fv      = new float[12];
 		for (int x = 0; x < 12; x++) { fv[x] = 0.0f; }
@@ -339,8 +348,11 @@ public:
 	{
 		delete [] fv;
 	}
+	unsigned int fvaoid;
 	unsigned int fvboid;
+	unsigned int lvaoid;
 	unsigned int lvboid;
+	unsigned int pvaoid;
 	unsigned int pvboid;
 	float * fv;
 	unsigned long lsize;
@@ -748,7 +760,7 @@ public:
 	SlicesVector image_slices;
 	SpectroscopySlicesVector spectroscopy_slices;
 	ROIs rois;
-	TriMeshes trimeshes;
+	//TriMeshes trimeshes;
 	void close(bool=true);
 };
 

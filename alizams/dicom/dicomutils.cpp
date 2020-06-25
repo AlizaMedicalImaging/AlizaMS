@@ -2024,7 +2024,7 @@ void DicomUtils::load_contour(
 			//
 			// may be TODO : Contour Slab Thickness, Contour Offset Vector
 			//
-			contour->vbo_initialized = false;
+			contour->vao_initialized = false;
 			roi.contours[contour->id] = contour;
 		}
 		if (ivariant) ivariant->di->rois.push_back(roi);

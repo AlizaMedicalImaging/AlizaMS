@@ -146,7 +146,7 @@ void ContourUtils::generate_roi_vbos(
 				ok = false;
 			}
 			unsigned long ind = 0;
-			if (ok && !c->vbo_initialized)
+			if (ok && !c->vao_initialized)
 			{
 				const unsigned long s = 3*c->dpoints.size();
 				GLfloat * v;
@@ -172,17 +172,18 @@ void ContourUtils::generate_roi_vbos(
 				}
 				if (gl)
 				{
+					gl->glGenVertexArrays(1, &(c->vaoid));
+					gl->glBindVertexArray(c->vaoid);
 					gl->glGenBuffers(1, &(c->vboid));
 					GLWidget::increment_count_vbos(1);
 					gl->glBindBuffer(GL_ARRAY_BUFFER, c->vboid);
-					gl->glBufferData(
-						GL_ARRAY_BUFFER,
-						s*sizeof(GLfloat),
-						v,
-						GL_STATIC_DRAW);
+					gl->glBufferData(GL_ARRAY_BUFFER, s*sizeof(GLfloat), v, GL_STATIC_DRAW);
+					gl->glEnableVertexAttribArray(gl->frame_shader.position_handle);
+					gl->glVertexAttribPointer(gl->frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
+					gl->glBindVertexArray(0);
 					gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
 					delete [] v;
-					c->vbo_initialized = true;
+					c->vao_initialized = true;
 				}
 				if (delete_after) c->dpoints.clear();
 			}
@@ -214,7 +215,7 @@ void ContourUtils::copy_roi(
 			contour->id = c->id;
 			contour->roiid = id; 
 			contour->type = c->type;
-			contour->vbo_initialized = false;
+			contour->vao_initialized = false;
 			for (int i = 0; i < c->dpoints.size(); i++)
 				contour->dpoints.push_back(c->dpoints[i]);
 			for (

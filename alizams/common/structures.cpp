@@ -94,7 +94,7 @@ void DisplayInterface::close(bool clear_geometry)
 	tex_info = -1;
 	x_spacing = y_spacing = 0.0;
 	dimx = dimy = 0;
-	TriMeshes::iterator mi;
+	//TriMeshes::iterator mi;
 	if(!clear_geometry) goto quit__;
 	//
 	//
@@ -114,20 +114,26 @@ void DisplayInterface::close(bool clear_geometry)
 		{
 			if (opengl_ok)
 			{
-				if (spectroscopy_slices.at(x)->fvboid > 0)
+				if (spectroscopy_slices.at(x)->fvaoid > 0)
 				{
+					gl->glDeleteVertexArrays(
+						1, &(spectroscopy_slices[x]->fvaoid));
 					gl->glDeleteBuffers(
 						1, &(spectroscopy_slices[x]->fvboid));
 					GLWidget::increment_count_vbos(-1);
 				}
-				if (spectroscopy_slices.at(x)->lvboid > 0)
+				if (spectroscopy_slices.at(x)->lvaoid > 0)
 				{
+					gl->glDeleteVertexArrays(
+						1, &(spectroscopy_slices[x]->lvaoid));
 					gl->glDeleteBuffers(
 						1, &(spectroscopy_slices[x]->lvboid));
 					GLWidget::increment_count_vbos(-1);
 				}
 				if (spectroscopy_slices.at(x)->pvboid > 0)
 				{
+					gl->glDeleteVertexArrays(
+						1, &(spectroscopy_slices[x]->pvaoid));
 					gl->glDeleteBuffers(
 						1, &(spectroscopy_slices[x]->pvboid));
 					GLWidget::increment_count_vbos(-1);
@@ -171,8 +177,9 @@ void DisplayInterface::close(bool clear_geometry)
 				c->dpoints.clear();
 				c->path = QPainterPath();
 				c->ref_sop_instance_uids.clear();
-				if (opengl_ok && c->vbo_initialized)
+				if (opengl_ok && c->vao_initialized)
 				{
+					gl->glDeleteVertexArrays(1, &(c->vaoid));
 					gl->glDeleteBuffers(1, &(c->vboid));
 					GLWidget::increment_count_vbos(-1);
 				}
@@ -184,6 +191,7 @@ void DisplayInterface::close(bool clear_geometry)
 		rois[k].map.clear();
 	}
 	rois.clear();
+/*
 	mi = trimeshes.begin();
 	while (mi != trimeshes.end())
 	{
@@ -194,6 +202,7 @@ void DisplayInterface::close(bool clear_geometry)
 			trimesh->initialized &&
 			trimesh->qmesh)
 		{
+			gl->glDeleteVertexArrays(1, &(trimesh->qmesh->vaoid));
 			if (trimesh->qmesh->vboid)
 			{
 				gl->glDeleteBuffers(2, trimesh->qmesh->vboid);
@@ -204,6 +213,7 @@ void DisplayInterface::close(bool clear_geometry)
 		if (trimesh) delete trimesh;
 	}
 	trimeshes.clear();
+*/
 	center_x = center_y = center_z = 0.0f;
 	slices_direction_x = slices_direction_y = 0.0f;
 	slices_direction_z = 1.0;

@@ -199,7 +199,7 @@ GLWidget::GLWidget(QWidget * p, Qt::WindowFlags f)
 void GLWidget::initializeGL()
 {
 	initializeOpenGLFunctions();
-#if 1
+#if 0
 	const QSurfaceFormat & f = format();
 	std::cout << "Major " << f.majorVersion() << std::endl;
 	std::cout << "Minor " << f.minorVersion() << std::endl;
@@ -789,6 +789,47 @@ void GLWidget::close_()
 		glDeleteVertexArrays(1, &(vaoids[x]));
 	}
 	vaoids.clear();
+	glDeleteVertexArrays(3, raycast_shader_vao);
+	delete [] raycast_shader_vao;
+	glDeleteVertexArrays(3, raycast_color_shader_vao);
+	delete [] raycast_color_shader_vao;
+	glDeleteVertexArrays(3, raycast_shader_bb_vao);
+	delete [] raycast_shader_bb_vao;
+	glDeleteVertexArrays(3, raycast_color_shader_bb_vao);
+	delete [] raycast_color_shader_bb_vao;
+	glDeleteVertexArrays(3, raycast_shader_sigm_vao);
+	delete [] raycast_shader_sigm_vao;
+	glDeleteVertexArrays(3, raycast_color_shader_sigm_vao);
+	delete [] raycast_color_shader_sigm_vao;
+	glDeleteVertexArrays(3, raycast_shader_bb_sigm_vao);
+	delete [] raycast_shader_bb_sigm_vao;
+	glDeleteVertexArrays(3, raycast_color_shader_bb_sigm_vao);
+	delete [] raycast_color_shader_bb_sigm_vao;
+	glDeleteBuffers(1, &raycast_shader_vbo0);
+	glDeleteBuffers(1, &raycast_shader_vbo1);
+	glDeleteBuffers(1, &raycast_shader_vbo2);
+	glDeleteBuffers(1, &raycast_color_shader_vbo0);
+	glDeleteBuffers(1, &raycast_color_shader_vbo1);
+	glDeleteBuffers(1, &raycast_color_shader_vbo2);
+	glDeleteBuffers(1, &raycast_shader_bb_vbo0);
+	glDeleteBuffers(1, &raycast_shader_bb_vbo1);
+	glDeleteBuffers(1, &raycast_shader_bb_vbo2);
+	glDeleteBuffers(1, &raycast_color_shader_bb_vbo0);
+	glDeleteBuffers(1, &raycast_color_shader_bb_vbo1);
+	glDeleteBuffers(1, &raycast_color_shader_bb_vbo2);
+	glDeleteBuffers(1, &raycast_shader_sigm_vbo0);
+	glDeleteBuffers(1, &raycast_shader_sigm_vbo1);
+	glDeleteBuffers(1, &raycast_shader_sigm_vbo2);
+	glDeleteBuffers(1, &raycast_color_shader_sigm_vbo0);
+	glDeleteBuffers(1, &raycast_color_shader_sigm_vbo1);
+	glDeleteBuffers(1, &raycast_color_shader_sigm_vbo2);
+	glDeleteBuffers(1, &raycast_shader_bb_sigm_vbo0);
+	glDeleteBuffers(1, &raycast_shader_bb_sigm_vbo1);
+	glDeleteBuffers(1, &raycast_shader_bb_sigm_vbo2);
+	glDeleteBuffers(1, &raycast_color_shader_bb_sigm_vbo0);
+	glDeleteBuffers(1, &raycast_color_shader_bb_sigm_vbo1);
+	glDeleteBuffers(1, &raycast_color_shader_bb_sigm_vbo2);
+	increment_count_vbos(-24);
 	for (unsigned int x = 0; x < textures.size(); x++)
 	{
 		glDeleteTextures(1, textures[x]);
@@ -800,11 +841,14 @@ void GLWidget::close_()
 	free_fbos1(&backfacebuffer, &backface_tex, &backface_depth);
 	free_fbos1(&frontfacebuffer,&frontface_tex,&frontface_depth);
 	glDeleteVertexArrays(1, &scene_vao);
-	glDeleteVertexArrays(1, &frames_vao);
 	glDeleteBuffers(1, &scene_vbo);
+	increment_count_vbos(-1);
+	glDeleteVertexArrays(1, &frames_vao);
 	glDeleteBuffers(1, &frames_vbo);
+	increment_count_vbos(-1);
+	glDeleteVertexArrays(1, &origin_vao);
 	glDeleteBuffers(1, &origin_vbo);
-	increment_count_vbos(-3);
+	increment_count_vbos(-1);
 	if (camera)
 	{
 		delete camera;
@@ -859,8 +903,7 @@ void GLWidget::init_opengl(int w, int h)
 		QString(", ") +
 		QVariant(max_3d_texture_size).toString());
 	//
-	if (renderer_str.contains(
-			QString("Gallium"),Qt::CaseInsensitive))
+	if (renderer_str.contains(QString("Gallium"),Qt::CaseInsensitive))
 	{
 		gallium = true;
 	}
@@ -883,8 +926,9 @@ void GLWidget::init_opengl(int w, int h)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glViewport(0,0,win_w,win_h);
 	glLineWidth(1.0f);
+	glEnable( GL_LINE_SMOOTH);
 	glActiveTexture(GL_TEXTURE1);
-/*
+#if 0
 	GLint max_samples_;
 	glGetIntegerv(GL_MAX_INTEGER_SAMPLES, &max_samples_);
 	std::cout << "GL_MAX_INTEGER_SAMPLES " << max_samples_ << std::endl;
@@ -896,7 +940,7 @@ void GLWidget::init_opengl(int w, int h)
 	GLint samples_;
 	glGetIntegerv(GL_SAMPLES, &samples_);
 	std::cout << "GL_SAMPLES " << samples_ << std::endl;
-*/
+#endif
 	create_program(c3d_vs, c3d_fs, &c3d_shader);
 	c3d_shader.location_mvp        = glGetUniformLocation(c3d_shader.program, "mvp");
 	c3d_shader.location_sampler[0] = glGetUniformLocation(c3d_shader.program, "sampler0");
@@ -1169,9 +1213,6 @@ void GLWidget::init_opengl(int w, int h)
 	shaders.push_back(&mesh_shader);
 	//
 	*/
-#if 1
-	checkGLerror(" after shaders creation\n");
-#endif
 	gen_lut_tex(default_lut,default_lut_size,&gradient1);
 	gen_lut_tex(black_rainbow_lut,black_rainbow_size,&gradient2);
 	gen_lut_tex(syngo_lut,syngo_lut_size,&gradient3);
@@ -1179,36 +1220,25 @@ void GLWidget::init_opengl(int w, int h)
 	gen_lut_tex(hot_metal_blue,hot_metal_blue_size,&gradient5);
 	gen_lut_tex(pet_dicom_lut,pet_dicom_lut_size,&gradient6);
 	gen_lut_tex(pet20_dicom_lut,pet20_dicom_lut_size,&gradient7);
-#if 1
-	checkGLerror(" after gen_lut_tex\n");
-#endif
 	//
 	bool ok = create_fbos0(FBO_SIZE__0, FBO_SIZE__0,
 			&framebuffer,
 			&fbo_tex,
 			&fbo_depth);
 	if (!ok) { std::cout << "create_fbos0() failed"<< std::endl; }
-#if 1
-	checkGLerror(" after create_fbos0\n");
-#endif
 	create_program(fsquad_vs, fsquad_fs, &fsquad_shader);
 	fsquad_shader.location_sampler[0] = glGetUniformLocation(fsquad_shader.program, "sampler0");
 	fsquad_shader.position_handle     = glGetAttribLocation (fsquad_shader.program, "v_position");
 	shaders.push_back(&fsquad_shader);
 	generate_screen_quad(&scene_vbo, &scene_vao, &(fsquad_shader.position_handle));
-#if 1
-	checkGLerror(" after generate_screen_quad\n");
-#endif
 	//
-#if 1
-	checkGLerror(" after n1\n");
-#endif
 	{
 		float * tmp99 = new float[12];
 		for (int x = 0; x < 12; x++) tmp99[x] = 0.0f;
 		glGenVertexArrays(1, &frames_vao);
 		glBindVertexArray(frames_vao);
 		glGenBuffers(1, &frames_vbo);
+		increment_count_vbos(1);
 		glBindBuffer(GL_ARRAY_BUFFER, frames_vbo);
 		glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
 		glEnableVertexAttribArray(frame_shader.position_handle);
@@ -1216,20 +1246,18 @@ void GLWidget::init_opengl(int w, int h)
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		//
-
-
-
-
+		glGenVertexArrays(1, &origin_vao);
+		glBindVertexArray(origin_vao);
 		glGenBuffers(1, &origin_vbo);
+		increment_count_vbos(1);
 		glBindBuffer(GL_ARRAY_BUFFER, origin_vbo);
 		glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
+		glEnableVertexAttribArray(frame_shader.position_handle);
+		glVertexAttribPointer(frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
+		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		delete [] tmp99;
-		increment_count_vbos(4);
 	}
-#if 1
-	checkGLerror(" after n2\n");
-#endif
 	//
 	create_program(zero_vs, zero_fs, &zero_shader);
 	zero_shader.location_mvp        = glGetUniformLocation(zero_shader.program, "mvp");
@@ -1245,9 +1273,6 @@ void GLWidget::init_opengl(int w, int h)
 	generate_raycastcube2_vao(
 		&raycastcube2_vao, raycastcube2,
 		&(zero_shader.position_handle), &(zero_shader.color_handle));
-#if 1
-	checkGLerror(" after n3\n");
-#endif
 	ok = create_fbos1(FBO_SIZE__1, FBO_SIZE__1,
 			&backfacebuffer,
 			&backface_tex,
@@ -1258,9 +1283,6 @@ void GLWidget::init_opengl(int w, int h)
 			&frontface_tex,
 			&frontface_depth);
 	if (!ok) { std::cout << "create_fbos1() failed (2)"<< std::endl; }
-#if 1
-	checkGLerror(" after create_fbos1\n");
-#endif
 	create_program(raycast_vs, raycast_fs_bb, &raycast_shader_bb);
 	raycast_shader_bb.location_mvp        = glGetUniformLocation(raycast_shader_bb.program, "mvp");
 	raycast_shader_bb.position_handle     = glGetAttribLocation (raycast_shader_bb.program, "v_position");
@@ -1370,9 +1392,6 @@ void GLWidget::init_opengl(int w, int h)
 		&(raycast_color_shader_sigm.position_handle));
 	//
 	////////////////////////////
-#if 1
-	checkGLerror(" after n4\n");
-#endif
 	// orient. cube
 	ok = create_fbos0(
 		256,
@@ -1384,9 +1403,6 @@ void GLWidget::init_opengl(int w, int h)
 	{
 		std::cout << "create_fbos0() failed (cube)"<< std::endl;
 	}
-#if 1
-	checkGLerror(" after n5\n");
-#endif
 	//
 	cube = new qMeshData;
 	GLuint * vboid000 = new GLuint[4];
@@ -1562,9 +1578,6 @@ void GLWidget::init_opengl(int w, int h)
 	letterl->vaoid    = vaoid006;
 	letterl->shader = &orientcube_shader;
 	qmeshes.push_back(letterl);
-#if 1
-	checkGLerror(" after n6\n");
-#endif
 	//
 	checkGLerror("OpenGL error after init\n");
 }
@@ -1591,18 +1604,6 @@ void GLWidget::draw_3d_tex1(
 	glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(float), t, GL_DYNAMIC_DRAW);
 	glBindVertexArray(*vao);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void GLWidget::draw_frame(const GLuint * vboid)
-{
-	glBindBuffer(GL_ARRAY_BUFFER, vboid[0]);
-	glVertexAttribPointer(frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(frame_shader.position_handle);
-	glDrawArrays(GL_LINE_LOOP, 0, 4);
-	glDisableVertexAttribArray(frame_shader.position_handle);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void GLWidget::draw_frame2(const GLfloat * v)
@@ -1611,27 +1612,6 @@ void GLWidget::draw_frame2(const GLfloat * v)
 	glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), v, GL_DYNAMIC_DRAW);
 	glBindVertexArray(frames_vao);
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
-	glBindVertexArray(0);
-}
-
-void GLWidget::draw_lines(unsigned long s, const GLuint * vboid)
-{
-	glBindBuffer(GL_ARRAY_BUFFER, vboid[0]);
-	glVertexAttribPointer(frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(frame_shader.position_handle);
-	glDrawArrays(GL_LINES, 0, s);
-	glDisableVertexAttribArray(frame_shader.position_handle);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void GLWidget::draw_points(unsigned long s, const GLuint * vboid)
-{
-	glBindBuffer(GL_ARRAY_BUFFER, vboid[0]);
-	glVertexAttribPointer(frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(frame_shader.position_handle);
-	glDrawArrays(GL_POINTS, 0, s);
-	glDisableVertexAttribArray(frame_shader.position_handle);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void GLWidget::paint()
@@ -1803,8 +1783,6 @@ void GLWidget::paint_raycaster()
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		glBindVertexArray(raycastcube2_vao);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		glBindVertexArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
 	// frontfacebuffer
@@ -1822,8 +1800,6 @@ void GLWidget::paint_raycaster()
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		glBindVertexArray(raycastcube2_vao);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		glBindVertexArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 	glDisable(GL_CULL_FACE);
 	//
@@ -1863,18 +1839,12 @@ void GLWidget::paint_raycaster()
 
 				glBindVertexArray(raycast_shader_bb_sigm_vao[0]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 				glBindVertexArray(raycast_shader_bb_sigm_vao[1]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 				glBindVertexArray(raycast_shader_bb_sigm_vao[2]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			}
 			else
@@ -1904,18 +1874,12 @@ void GLWidget::paint_raycaster()
 
 				glBindVertexArray(raycast_shader_sigm_vao[0]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 				glBindVertexArray(raycast_shader_sigm_vao[1]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 				glBindVertexArray(raycast_shader_sigm_vao[2]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 			}
 		}
 		else
@@ -1967,18 +1931,12 @@ void GLWidget::paint_raycaster()
 
 				glBindVertexArray(raycast_color_shader_bb_sigm_vao[0]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 				glBindVertexArray(raycast_color_shader_bb_sigm_vao[1]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 				glBindVertexArray(raycast_color_shader_bb_sigm_vao[2]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 			}
 			else
 			{
@@ -2021,18 +1979,12 @@ void GLWidget::paint_raycaster()
 
 				glBindVertexArray(raycast_color_shader_sigm_vao[0]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 				glBindVertexArray(raycast_color_shader_sigm_vao[1]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 				glBindVertexArray(raycast_color_shader_sigm_vao[2]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 			}
 		}
 	}
@@ -2072,18 +2024,12 @@ void GLWidget::paint_raycaster()
 
 				glBindVertexArray(raycast_shader_bb_vao[0]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 				glBindVertexArray(raycast_shader_bb_vao[1]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 				glBindVertexArray(raycast_shader_bb_vao[2]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 			}
 			else
 			{
@@ -2112,18 +2058,12 @@ void GLWidget::paint_raycaster()
 
 				glBindVertexArray(raycast_shader_vao[0]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 				glBindVertexArray(raycast_shader_vao[1]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 				glBindVertexArray(raycast_shader_vao[2]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 			}
 		}
 		else
@@ -2175,18 +2115,12 @@ void GLWidget::paint_raycaster()
 
 				glBindVertexArray(raycast_color_shader_bb_vao[0]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 				glBindVertexArray(raycast_color_shader_bb_vao[1]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 				glBindVertexArray(raycast_color_shader_bb_vao[2]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 			}
 			else
 			{
@@ -2229,18 +2163,12 @@ void GLWidget::paint_raycaster()
 
 				glBindVertexArray(raycast_color_shader_vao[0]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 				glBindVertexArray(raycast_color_shader_vao[1]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 				glBindVertexArray(raycast_color_shader_vao[2]);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 			}
 		}
 	}
@@ -2256,8 +2184,6 @@ void GLWidget::paint_raycaster()
 		glUniform1i(fsquad_shader.location_sampler[0], 2);
 		glBindVertexArray(scene_vao);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		glBindVertexArray(0);
-		glBindTexture(GL_TEXTURE_2D, 0);
 		glEnable(GL_DEPTH_TEST);
 	}
 ////////////////
@@ -2292,9 +2218,6 @@ void GLWidget::paint_volume()
 	{
 		render_orient_cube1(fold_win_pos_x,fold_win_pos_y,fnew_win_pos_x,fnew_win_pos_y);
 	}
-#if 1
-	checkGLerror(" GLWidget::paint_volume 1\n");
-#endif
 	//
 	const float asp = (win_h>0) ? (float)win_w/(float)win_h : 1;
 	float dx__ = 0.0f, dy__ = 0.0f;
@@ -2342,13 +2265,8 @@ void GLWidget::paint_volume()
 		{
 			const DisplayInterface * di = selected_images__->at(iii)->di;
 			glUseProgram(frame_shader.program);
-checkGLerror(" GLWidget::paint_volume 1a\n");
 			glUniformMatrix4fv(frame_shader.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-checkGLerror(" GLWidget::paint_volume 1b\n");
-			//glLineWidth(2.5f);
-//checkGLerror(" GLWidget::paint_volume 1c\n");
-//			glPointSize(6.5f);
-//checkGLerror(" GLWidget::paint_volume 1d\n");
+			glPointSize(2.0f);
 			for (unsigned long x = 0; x < di->spectroscopy_slices.size(); x++)
 			{
 				glUniform4f(
@@ -2357,12 +2275,10 @@ checkGLerror(" GLWidget::paint_volume 1b\n");
 					color_spectro0[1],
 					color_spectro0[2],
 					color_spectro0[3]);
-checkGLerror(" GLWidget::paint_volume 1e\n");
 				if (di->spectroscopy_slices.at(x)->lsize > 0)
 				{
-					draw_lines(
-						di->spectroscopy_slices.at(x)->lsize,
-						&(di->spectroscopy_slices.at(x)->lvboid));
+					glBindVertexArray(di->spectroscopy_slices.at(x)->lvaoid);
+					glDrawArrays(GL_LINES, 0, di->spectroscopy_slices.at(x)->lsize);
 				}
 				if (di->spectroscopy_ref == 1)
 					glUniform4f(
@@ -2371,30 +2287,23 @@ checkGLerror(" GLWidget::paint_volume 1e\n");
 						color_spectro1[1],
 						color_spectro1[2],
 						color_spectro1[3]);
-checkGLerror(" GLWidget::paint_volume 1f\n");
 				if (di->spectroscopy_slices.at(x)->psize > 0)
 				{
-					draw_points(
-						di->spectroscopy_slices.at(x)->psize,
-						&(di->spectroscopy_slices.at(x)->pvboid));
-checkGLerror(" GLWidget::paint_volume 1g\n");
+					glBindVertexArray(di->spectroscopy_slices.at(x)->pvaoid);
+					glDrawArrays(GL_POINTS, 0, di->spectroscopy_slices.at(x)->psize);
 				}
 				if (di->spectroscopy_slices.at(x)->fvboid > 0)
 				{
-					draw_frame(&(di->spectroscopy_slices.at(x)->fvboid));
-checkGLerror(" GLWidget::paint_volume 1h\n");
+					glBindVertexArray(di->spectroscopy_slices.at(x)->fvaoid);
+					glDrawArrays(GL_LINE_LOOP, 0, 4);
 				}
 			}
 			count += 1;
 		}
-#if 1
-	checkGLerror(" GLWidget::paint_volume 2\n");
-#endif
 		//
 		if (display_contours && !selected_images__->at(iii)->di->rois.empty())
 		{
-			glPointSize(1.5f*contours_width);
-			glLineWidth(contours_width);
+			glPointSize(1.5f);
 			glUseProgram(frame_shader.program);
 			glUniformMatrix4fv(frame_shader.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
 			for (int i = 0; i < selected_images__->at(iii)->di->rois.size(); i++)
@@ -2418,16 +2327,14 @@ checkGLerror(" GLWidget::paint_volume 1h\n");
 					while (it != selected_images__->at(iii)->di->rois.at(i).contours.constEnd())
 					{
 						const Contour * c = it.value();
-						if (c && c->vbo_initialized)
+						if (c && c->vao_initialized)
 						{
 							if (random_color)
 							{
 								const float rcolor[] = { c->color.r, c->color.g, c->color.b, 1.0f };
 								glUniform4fv(frame_shader.location_K, 1, rcolor);
 							}
-							glBindBuffer(GL_ARRAY_BUFFER, c->vboid);
-							glVertexAttribPointer(frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
-							glEnableVertexAttribArray(frame_shader.position_handle);
+							glBindVertexArray(c->vaoid);
 							switch (c->type)
 							{
 							case 1:  glDrawArrays(GL_LINE_LOOP,  0, c->dpoints.size()); break;
@@ -2435,8 +2342,6 @@ checkGLerror(" GLWidget::paint_volume 1h\n");
 							case 3:  glDrawArrays(GL_LINE_STRIP, 0, c->dpoints.size()); break;
 							default: glDrawArrays(GL_POINTS,     0, c->dpoints.size()); break;
 							}
-							glDisableVertexAttribArray(frame_shader.position_handle);
-							glBindBuffer(GL_ARRAY_BUFFER, 0);
 						}
 						++it;
 					}
@@ -2445,9 +2350,6 @@ checkGLerror(" GLWidget::paint_volume 1h\n");
 			count += 1;
 		}
 	}
-#if 1
-	checkGLerror(" GLWidget::paint_volume 3\n");
-#endif
 	//
 	for (int iii = 0; iii < selected_images_size; iii++)
 	{
@@ -2499,7 +2401,6 @@ checkGLerror(" GLWidget::paint_volume 1h\n");
 				di->G,
 				di->B,
 				1.0f);
-			glLineWidth(1.0f);
 			if (dotv<0)
 			{
 				for (int x = di->from_slice; x <= di->to_slice; x++)
@@ -2510,31 +2411,17 @@ checkGLerror(" GLWidget::paint_volume 1h\n");
 				for (int x = di->to_slice; x >= di->from_slice; x--)
 					draw_frame2(di->image_slices.at(x)->fv);
 			}
-/*
 			if (di->origin_ok)
 			{
-				glPointSize(9.0f);
+				glPointSize(3.0f);
 				if (iii == 0)
-				{
-					glUniform4f(
-						frame_shader.location_K,
-						0.85f, 0.85f, 0.85f, 1.0f);
-				}
+					glUniform4f(frame_shader.location_K, 0.85f, 0.85f, 0.85f, 1.0f);
     			glBindBuffer(GL_ARRAY_BUFFER, origin_vbo);
 				glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat), di->origin, GL_DYNAMIC_DRAW);
-				glVertexAttribPointer(
-					frame_shader.position_handle,
-					3, GL_FLOAT, GL_FALSE, 0, 0);
-				glEnableVertexAttribArray(frame_shader.position_handle);
+				glBindVertexArray(origin_vao);
 				glDrawArrays(GL_POINTS, 0, 1);
-				glDisableVertexAttribArray(frame_shader.position_handle);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
 			}
-			*/
 		}
-#if 1
-	checkGLerror(" GLWidget::paint_volume 4\n");
-#endif
 		//
 #if 0
 		if (count_images > 10) break;
@@ -3013,12 +2900,7 @@ checkGLerror(" GLWidget::paint_volume 1h\n");
 			count_images += 1;
 		}
 	}
-#if 1
-	checkGLerror(" GLWidget::paint_volume 5\n");
-#endif
-	//
-	//if ((count > 0) && show_cube)
-	if (show_cube)
+	if ((count > 0) && show_cube)
 	{
 		render_orient_cube2();
 	}
@@ -3354,7 +3236,6 @@ void GLWidget::render_orient_cube2()
 	glUniform1i(fsquad_shader.location_sampler[0], 4);
 	glBindVertexArray(scene_vao);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glEnable(GL_DEPTH_TEST);
 }
@@ -3661,7 +3542,6 @@ void GLWidget::generate_raycast_shader_vao(
 	glEnableVertexAttribArray(*attr_v);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glDisableVertexAttribArray(*attr_v);
 	//
 	glGenVertexArrays(1, &(vao[1]));
 	glBindVertexArray(vao[1]);
@@ -3672,7 +3552,6 @@ void GLWidget::generate_raycast_shader_vao(
 	glEnableVertexAttribArray(*attr_v);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glDisableVertexAttribArray(*attr_v);
 	//
 	glGenVertexArrays(1, &(vao[2]));
 	glBindVertexArray(vao[2]);
@@ -3683,7 +3562,6 @@ void GLWidget::generate_raycast_shader_vao(
 	glEnableVertexAttribArray(*attr_v);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glDisableVertexAttribArray(*attr_v);
 	//
 	increment_count_vbos(3);
 }
@@ -7599,7 +7477,6 @@ void GLWidget::d_orientcube(
     glUniform3fv(s->shader->location_sparams, 2, sparams);
 	glBindVertexArray(s->vaoid);
     glDrawArrays(GL_TRIANGLES, 0, s->faces_size*3);
-    glBindVertexArray(0);
 }
 
 
