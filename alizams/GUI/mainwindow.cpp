@@ -33,7 +33,6 @@ MainWindow::MainWindow(
 	bool ok3d,
 	bool hide_zoom_)
 {
-	glwidget = NULL;
 	saved_ok3d = false;
 	setupUi(this);
 	setAnimated(true);

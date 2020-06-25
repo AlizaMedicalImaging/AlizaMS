@@ -1,9 +1,15 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
+#define USE_CORE_3_2
+
 #include "camera.h"
 #include <QOpenGLWidget>
+#ifdef USE_CORE_3_2
 #include <QOpenGLFunctions_3_2_Core>
+#else
+#include <QOpenGLFunctions_3_0>
+#endif
 #include <QPoint>
 #include <QModelIndex>
 #include <QMouseEvent>
@@ -96,7 +102,11 @@ public:
 } ALIGN16_POST;
 
 ALIGN16_PRE
+#ifdef USE_CORE_3_2
 class GLWidget : public QOpenGLWidget, public QOpenGLFunctions_3_2_Core
+#else
+class GLWidget : public QOpenGLWidget, public QOpenGLFunctions_3_0
+#endif
 {
 
 	Q_OBJECT
@@ -142,7 +152,7 @@ public:
 	void  paint();
 	void  paint_volume();
 	void  paint_raycaster();
-	void  resize(int, int);
+	void  resize__(int, int);
 	int   normalize_angle(int);
 	int   x_rotation, y_rotation, z_rotation;
 	float ortho_size;

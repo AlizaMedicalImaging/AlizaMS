@@ -561,12 +561,13 @@ template<typename T> int generate_tex3d(
 	//
 	gl->makeCurrent();
 	glerror__ = glGetError();
+#if 0
 	if (glerror__ != 0)
 		std::cout
 			<< "warning : OpenGL error (before texture generation)\n"
 			<< glerror__ << std::endl;
+#endif
 	gl->glGenTextures(1, &(ivariant->di->cube_3dtex));
-	GLWidget::increment_count_tex(1);
 	glBindTexture(GL_TEXTURE_3D, ivariant->di->cube_3dtex);
 	switch(ivariant->di->filtering)
 	{
@@ -638,9 +639,11 @@ template<typename T> int generate_tex3d(
 	glerror__ = gl->glGetError();
 	if (glerror__ == 0x505)
 	{
+#if 0
 		std::cout
 			<< "error : OpenGL error 0x505\n"
 			<< glerror__ << std::endl;
+#endif
 		gl->glBindTexture(GL_TEXTURE_3D, 0);
 		gl->glDeleteTextures(1, &(ivariant->di->cube_3dtex));
 		ivariant->di->cube_3dtex = 0;
@@ -648,13 +651,14 @@ template<typename T> int generate_tex3d(
 		error__=3;
 		goto quit__;
 	}
-	else if (glerror__ != 0)
+	GLWidget::increment_count_tex(1);
+	gl->doneCurrent();
+	if (glerror__ != 0)
 	{
 		std::cout
 			<< "warning : OpenGL error\n"
 			<< glerror__ << std::endl;
 	}
-	else { ;; }
 	//
 	if (pb) pb->setValue(-1);
 	qApp->processEvents();
@@ -899,7 +903,6 @@ template <typename T> bool reload_monochrome_image(
 				isize[1]    *= 0.5;
 				dspacing[0] *= 2.0;
 				dspacing[1] *= 2.0;
-				if (gl) gl->makeCurrent();
 				ivariant->di->close(generate_slices);
 				if (count__>64)
 				{
@@ -1851,9 +1854,9 @@ void CommonUtils::generate_spectroscopyslice(
 	cs->fv[11] = z3;
 	if (ok3d && gl)
 	{
-		gl->makeCurrent();
 		if (columns_ >= 2 || rows_ >= 2)
 		{
+			gl->makeCurrent();
 			gl->glGenVertexArrays(1, &(cs->fvaoid));
 			gl->glBindVertexArray(cs->fvaoid);
 			gl->glGenBuffers(1, &(cs->fvboid));
@@ -1909,7 +1912,6 @@ void CommonUtils::generate_spectroscopyslice(
 				gl->glGenVertexArrays(1, &(cs->lvaoid));
 				gl->glBindVertexArray(cs->lvaoid);
 				gl->glGenBuffers(1, &(cs->lvboid));
-				GLWidget::increment_count_vbos(1);
 				gl->glBindBuffer(GL_ARRAY_BUFFER, cs->lvboid);
 				gl->glBufferData(GL_ARRAY_BUFFER, lines_size*sizeof(GLfloat), v, GL_STATIC_DRAW);
 				gl->glVertexAttribPointer(gl->frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -1928,18 +1930,20 @@ void CommonUtils::generate_spectroscopyslice(
 				gl->glGenVertexArrays(1, &(cs->pvaoid));
 				gl->glBindVertexArray(cs->pvaoid);
 				gl->glGenBuffers(1, &(cs->pvboid));
-				GLWidget::increment_count_vbos(1);
 				gl->glBindBuffer(GL_ARRAY_BUFFER, cs->pvboid);
 				gl->glBufferData(GL_ARRAY_BUFFER, 6*sizeof(GLfloat), v1, GL_STATIC_DRAW);
 				gl->glVertexAttribPointer(gl->frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
 				gl->glEnableVertexAttribArray(gl->frame_shader.position_handle);
 				gl->glBindVertexArray(0);
 				gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
+				gl->doneCurrent();
 				delete [] v1;
+				GLWidget::increment_count_vbos(2);
 			}
 		}
 		else if (columns_ == 1 && rows_ == 1)
 		{
+			gl->makeCurrent();
 			cs->psize = 1;
 			GLfloat * v1 = new GLfloat[3];
 			v1[0] = x1;
@@ -1949,6 +1953,7 @@ void CommonUtils::generate_spectroscopyslice(
 			gl->glBindBuffer(GL_ARRAY_BUFFER, cs->pvboid);
 			gl->glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat), v1, GL_STATIC_DRAW);
 			gl->glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
+			gl->doneCurrent();
 			delete [] v1;
 			GLWidget::increment_count_vbos(1);
 		}
