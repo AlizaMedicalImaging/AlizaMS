@@ -658,30 +658,30 @@ void GLWidget::init_()
 	raycast_color_shader_sigm_vao = new GLuint[3];
 	raycast_shader_bb_sigm_vao = new GLuint[3];
 	raycast_color_shader_bb_sigm_vao = new GLuint[3];
-	raycast_shader_vbo0 = new GLuint[2];
-	raycast_shader_vbo1 = new GLuint[2];
-	raycast_shader_vbo2 = new GLuint[2];
-	raycast_color_shader_vbo0 = new GLuint[2];
-	raycast_color_shader_vbo1 = new GLuint[2];
-	raycast_color_shader_vbo2 = new GLuint[2];
-	raycast_shader_bb_vbo0 = new GLuint[2];
-	raycast_shader_bb_vbo1 = new GLuint[2];
-	raycast_shader_bb_vbo2 = new GLuint[2];
-	raycast_color_shader_bb_vbo0 = new GLuint[2];
-	raycast_color_shader_bb_vbo1 = new GLuint[2];
-	raycast_color_shader_bb_vbo2 = new GLuint[2];
-	raycast_shader_sigm_vbo0 = new GLuint[2];
-	raycast_shader_sigm_vbo1 = new GLuint[2];
-	raycast_shader_sigm_vbo2 = new GLuint[2];
-	raycast_color_shader_sigm_vbo0 = new GLuint[2];
-	raycast_color_shader_sigm_vbo1 = new GLuint[2];
-	raycast_color_shader_sigm_vbo2 = new GLuint[2];
-	raycast_shader_bb_sigm_vbo0 = new GLuint[2];
-	raycast_shader_bb_sigm_vbo1 = new GLuint[2];
-	raycast_shader_bb_sigm_vbo2 = new GLuint[2];
-	raycast_color_shader_bb_sigm_vbo0 = new GLuint[2];
-	raycast_color_shader_bb_sigm_vbo1 = new GLuint[2];
-	raycast_color_shader_bb_sigm_vbo2 = new GLuint[2];
+	raycast_shader_vbo0 = 0;
+	raycast_shader_vbo1 = 0;
+	raycast_shader_vbo2 = 0;
+	raycast_color_shader_vbo0 = 0;
+	raycast_color_shader_vbo1 = 0;
+	raycast_color_shader_vbo2 = 0;
+	raycast_shader_bb_vbo0 = 0;
+	raycast_shader_bb_vbo1 = 0;
+	raycast_shader_bb_vbo2 = 0;
+	raycast_color_shader_bb_vbo0 = 0;
+	raycast_color_shader_bb_vbo1 = 0;
+	raycast_color_shader_bb_vbo2 = 0;
+	raycast_shader_sigm_vbo0 = 0;
+	raycast_shader_sigm_vbo1 = 0;
+	raycast_shader_sigm_vbo2 = 0;
+	raycast_color_shader_sigm_vbo0 = 0;
+	raycast_color_shader_sigm_vbo1 = 0;
+	raycast_color_shader_sigm_vbo2 = 0;
+	raycast_shader_bb_sigm_vbo0 = 0;
+	raycast_shader_bb_sigm_vbo1 = 0;
+	raycast_shader_bb_sigm_vbo2 = 0;
+	raycast_color_shader_bb_sigm_vbo0 = 0;
+	raycast_color_shader_bb_sigm_vbo1 = 0;
+	raycast_color_shader_bb_sigm_vbo2 = 0;
 	c3d_shader_clamp_vao = 0;
 	c3d_shader_gradient_clamp_vao = 0;
 	c3d_shader_bb_clamp_vao = 0;
@@ -1271,7 +1271,7 @@ void GLWidget::init_opengl(int w, int h)
 	shaders.push_back(&raycast_shader_bb);
 	generate_raycast_shader_vao(
 		raycast_shader_bb_vao,
-		raycast_shader_bb_vbo0, raycast_shader_bb_vbo1, raycast_shader_bb_vbo2,
+		&raycast_shader_bb_vbo0, &raycast_shader_bb_vbo1, &raycast_shader_bb_vbo2,
 		&(raycast_shader_bb.position_handle));
 	//
 	create_program(raycast_vs, raycast_color_fs_bb, &raycast_color_shader_bb);
@@ -1285,7 +1285,7 @@ void GLWidget::init_opengl(int w, int h)
 	shaders.push_back(&raycast_color_shader_bb);
 	generate_raycast_shader_vao(
 		raycast_color_shader_bb_vao,
-		raycast_color_shader_bb_vbo0, raycast_color_shader_bb_vbo1, raycast_color_shader_bb_vbo2,
+		&raycast_color_shader_bb_vbo0, &raycast_color_shader_bb_vbo1, &raycast_color_shader_bb_vbo2,
 		&(raycast_color_shader_bb.position_handle));
 	//
 	create_program(raycast_vs, raycast_fs, &raycast_shader);
@@ -1298,7 +1298,7 @@ void GLWidget::init_opengl(int w, int h)
 	shaders.push_back(&raycast_shader);
 	generate_raycast_shader_vao(
 		raycast_shader_vao,
-		raycast_shader_vbo0, raycast_shader_vbo1, raycast_shader_vbo2,
+		&raycast_shader_vbo0, &raycast_shader_vbo1, &raycast_shader_vbo2,
 		&(raycast_shader.position_handle));
 	//
 	create_program(raycast_vs, raycast_color_fs, &raycast_color_shader);
@@ -1312,7 +1312,7 @@ void GLWidget::init_opengl(int w, int h)
 	shaders.push_back(&raycast_color_shader);
 	generate_raycast_shader_vao(
 		raycast_color_shader_vao,
-		raycast_color_shader_vbo0, raycast_color_shader_vbo1, raycast_color_shader_vbo2,
+		&raycast_color_shader_vbo0, &raycast_color_shader_vbo1, &raycast_color_shader_vbo2,
 		&(raycast_color_shader.position_handle));
 	//
 	create_program(raycast_vs, raycast_fs_bb_sigm, &raycast_shader_bb_sigm);
@@ -1325,7 +1325,7 @@ void GLWidget::init_opengl(int w, int h)
 	shaders.push_back(&raycast_shader_bb_sigm);
 	generate_raycast_shader_vao(
 		raycast_shader_bb_sigm_vao,
-		raycast_shader_bb_sigm_vbo0, raycast_shader_bb_sigm_vbo1, raycast_shader_bb_sigm_vbo2,
+		&raycast_shader_bb_sigm_vbo0, &raycast_shader_bb_sigm_vbo1, &raycast_shader_bb_sigm_vbo2,
 		&(raycast_shader_bb_sigm.position_handle));
 	//
 	create_program(raycast_vs, raycast_color_fs_bb_sigm, &raycast_color_shader_bb_sigm);
@@ -1339,7 +1339,7 @@ void GLWidget::init_opengl(int w, int h)
 	shaders.push_back(&raycast_color_shader_bb_sigm);
 	generate_raycast_shader_vao(
 		raycast_color_shader_bb_sigm_vao,
-		raycast_color_shader_bb_sigm_vbo0, raycast_color_shader_bb_sigm_vbo1, raycast_color_shader_bb_sigm_vbo2,
+		&raycast_color_shader_bb_sigm_vbo0, &raycast_color_shader_bb_sigm_vbo1, &raycast_color_shader_bb_sigm_vbo2,
 		&(raycast_color_shader_bb_sigm.position_handle));
 	//
 	create_program(raycast_vs, raycast_fs_sigm, &raycast_shader_sigm);
@@ -1352,7 +1352,7 @@ void GLWidget::init_opengl(int w, int h)
 	shaders.push_back(&raycast_shader_sigm);
 	generate_raycast_shader_vao(
 		raycast_shader_sigm_vao,
-		raycast_shader_sigm_vbo0, raycast_shader_sigm_vbo1, raycast_shader_sigm_vbo2,
+		&raycast_shader_sigm_vbo0, &raycast_shader_sigm_vbo1, &raycast_shader_sigm_vbo2,
 		&(raycast_shader_sigm.position_handle));
 	//
 	create_program(raycast_vs, raycast_color_fs_sigm, &raycast_color_shader_sigm);
@@ -1366,7 +1366,7 @@ void GLWidget::init_opengl(int w, int h)
 	shaders.push_back(&raycast_color_shader_sigm);
 	generate_raycast_shader_vao(
 		raycast_color_shader_sigm_vao,
-		raycast_color_shader_sigm_vbo0, raycast_color_shader_sigm_vbo1, raycast_color_shader_sigm_vbo2,
+		&raycast_color_shader_sigm_vbo0, &raycast_color_shader_sigm_vbo1, &raycast_color_shader_sigm_vbo2,
 		&(raycast_color_shader_sigm.position_handle));
 	//
 	////////////////////////////
@@ -1710,7 +1710,8 @@ void GLWidget::paint_raycaster()
 	const bool force_skip_cube = update_raycast_shader_vbo(
 		orientation,
 		x__, y__, z__,
-		raycastcube0, raycastcube1, raycastcube2);
+		raycastcube0, raycastcube1, raycastcube2,
+		true);
 	//
 	const float asp = (win_h>0) ? (float)win_w/(float)win_h : 1;
 	const float fold_win_pos_x =  2.0f * (((float)old_win_pos_x/(float)win_w) - 0.5f);
@@ -1840,7 +1841,8 @@ void GLWidget::paint_raycaster()
 				update_raycast_shader_vbo(
 					orientation,
 					x__, y__, z__,
-					raycast_shader_bb_sigm_vbo0, raycast_shader_bb_sigm_vbo1, raycast_shader_bb_sigm_vbo2);
+					&raycast_shader_bb_sigm_vbo0, &raycast_shader_bb_sigm_vbo1, &raycast_shader_bb_sigm_vbo2,
+					false);
 
 				glUseProgram(raycast_shader_bb_sigm.program);
 
@@ -1880,7 +1882,8 @@ void GLWidget::paint_raycaster()
 				update_raycast_shader_vbo(
 					orientation,
 					x__, y__, z__,
-					raycast_shader_sigm_vbo0, raycast_shader_sigm_vbo1, raycast_shader_sigm_vbo2);
+					&raycast_shader_sigm_vbo0, &raycast_shader_sigm_vbo1, &raycast_shader_sigm_vbo2,
+					false);
 
 				glUseProgram(raycast_shader_sigm.program);
 
@@ -1928,7 +1931,8 @@ void GLWidget::paint_raycaster()
 				update_raycast_shader_vbo(
 					orientation,
 					x__, y__, z__,
-					raycast_color_shader_bb_sigm_vbo0, raycast_color_shader_bb_sigm_vbo1, raycast_color_shader_bb_sigm_vbo2);
+					&raycast_color_shader_bb_sigm_vbo0, &raycast_color_shader_bb_sigm_vbo1, &raycast_color_shader_bb_sigm_vbo2,
+					false);
 
 				glUseProgram(raycast_color_shader_bb_sigm.program);
 
@@ -1981,7 +1985,8 @@ void GLWidget::paint_raycaster()
 				update_raycast_shader_vbo(
 					orientation,
 					x__, y__, z__,
-					raycast_color_shader_sigm_vbo0, raycast_color_shader_sigm_vbo1, raycast_color_shader_sigm_vbo2);
+					&raycast_color_shader_sigm_vbo0, &raycast_color_shader_sigm_vbo1, &raycast_color_shader_sigm_vbo2,
+					false);
 
 				glUseProgram(raycast_color_shader_sigm.program);
 
@@ -2045,7 +2050,8 @@ void GLWidget::paint_raycaster()
 				update_raycast_shader_vbo(
 					orientation,
 					x__, y__, z__,
-					raycast_shader_bb_vbo0, raycast_shader_bb_vbo1, raycast_shader_bb_vbo2);
+					&raycast_shader_bb_vbo0, &raycast_shader_bb_vbo1, &raycast_shader_bb_vbo2,
+					false);
 
 				glUseProgram(raycast_shader_bb.program);
 
@@ -2084,7 +2090,8 @@ void GLWidget::paint_raycaster()
 				update_raycast_shader_vbo(
 					orientation,
 					x__, y__, z__,
-					raycast_shader_vbo0, raycast_shader_vbo1, raycast_shader_vbo2);
+					&raycast_shader_vbo0, &raycast_shader_vbo1, &raycast_shader_vbo2,
+					false);
 
 				glUseProgram(raycast_shader.program);
 
@@ -2132,7 +2139,8 @@ void GLWidget::paint_raycaster()
 				update_raycast_shader_vbo(
 					orientation,
 					x__, y__, z__,
-					raycast_color_shader_bb_vbo0, raycast_color_shader_bb_vbo1, raycast_color_shader_bb_vbo2);
+					&raycast_color_shader_bb_vbo0, &raycast_color_shader_bb_vbo1, &raycast_color_shader_bb_vbo2,
+					false);
 
 				glUseProgram(raycast_color_shader_bb.program);
 
@@ -2185,7 +2193,8 @@ void GLWidget::paint_raycaster()
 				update_raycast_shader_vbo(
 					orientation,
 					x__, y__, z__,
-					raycast_color_shader_vbo0, raycast_color_shader_vbo1, raycast_color_shader_vbo2);
+					&raycast_color_shader_vbo0, &raycast_color_shader_vbo1, &raycast_color_shader_vbo2,
+					false);
 
 				glUseProgram(raycast_color_shader.program);
 
@@ -3645,8 +3654,8 @@ void GLWidget::generate_raycast_shader_vao(
 	//
 	glGenVertexArrays(1, &(vao[0]));
 	glBindVertexArray(vao[0]);
-	glGenBuffers(1, &(vbo0[0]));
-	glBindBuffer(GL_ARRAY_BUFFER, vbo0[0]);
+	glGenBuffers(1, vbo0);
+	glBindBuffer(GL_ARRAY_BUFFER, *vbo0);
 	glBufferData(GL_ARRAY_BUFFER, 30*sizeof(GLfloat), v0, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(*attr_v, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_v);
@@ -3656,8 +3665,8 @@ void GLWidget::generate_raycast_shader_vao(
 	//
 	glGenVertexArrays(1, &(vao[1]));
 	glBindVertexArray(vao[1]);
-	glGenBuffers(1, &(vbo1[0]));
-	glBindBuffer(GL_ARRAY_BUFFER, vbo1[0]);
+	glGenBuffers(1, vbo1);
+	glBindBuffer(GL_ARRAY_BUFFER, *vbo1);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), v1, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(*attr_v, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_v);
@@ -3667,8 +3676,8 @@ void GLWidget::generate_raycast_shader_vao(
 	//
 	glGenVertexArrays(1, &(vao[2]));
 	glBindVertexArray(vao[2]);
-	glGenBuffers(1, &(vbo2[0]));
-	glBindBuffer(GL_ARRAY_BUFFER, vbo2[0]);
+	glGenBuffers(1, vbo2);
+	glBindBuffer(GL_ARRAY_BUFFER, *vbo2);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), v2, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(*attr_v, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_v);
@@ -3680,160 +3689,161 @@ void GLWidget::generate_raycast_shader_vao(
 }
 
 bool GLWidget::update_raycast_shader_vbo(
-	const unsigned int orientation,
-	const float x__, const float y__, const float z__,
-	GLuint * raycastcube0, GLuint * raycastcube1, GLuint * raycastcube2)
+	unsigned int orientation,
+	float x__, float y__, float z__,
+	GLuint * raycastcube0, GLuint * raycastcube1, GLuint * raycastcube2,
+	bool both)
 {
 	bool force_skip_cube = false;
 	switch (orientation)
 	{
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIP:
-		raycast_cube_RIP(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_RIP(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LIP:
-		raycast_cube_LIP(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_LIP(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSP:
-		raycast_cube_RSP(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_RSP(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LSP:
-		raycast_cube_LSP(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_LSP(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIA:
-		raycast_cube_RIA(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_RIA(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LIA:
-		raycast_cube_LIA(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_LIA(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSA:
-		raycast_cube_RSA(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_RSA(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LSA:
-		raycast_cube_LSA(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_LSA(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IRP:
-		raycast_cube_IRP(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_IRP(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ILP:
-		raycast_cube_ILP(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_ILP(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SRP:
-		raycast_cube_SRP(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_SRP(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SLP:
-		raycast_cube_SLP(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_SLP(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IRA:
-		raycast_cube_IRA(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_IRA(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ILA:
-		raycast_cube_ILA(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_ILA(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SRA:
-		raycast_cube_SRA(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_SRA(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SLA:
-		raycast_cube_SLA(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_SLA(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RPI:
-		raycast_cube_RPI(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_RPI(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LPI:
-		raycast_cube_LPI(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_LPI(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI:
-		raycast_cube_RAI(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_RAI(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LAI:
-		raycast_cube_LAI(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_LAI(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RPS:
-		raycast_cube_RPS(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_RPS(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LPS:
-		raycast_cube_LPS(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_LPS(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAS:
-		raycast_cube_RAS(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_RAS(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LAS:
-		raycast_cube_LAS(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_LAS(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PRI:
-		raycast_cube_PRI(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_PRI(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PLI:
-		raycast_cube_PLI(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_PLI(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ARI:
-		raycast_cube_ARI(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_ARI(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ALI:
-		raycast_cube_ALI(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_ALI(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PRS:
-		raycast_cube_PRS(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_PRS(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PLS:
-		raycast_cube_PLS(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_PLS(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ARS:
-		raycast_cube_ARS(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_ARS(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ALS:
-		raycast_cube_ALS(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_ALS(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IPR:
-		raycast_cube_IPR(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_IPR(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SPR:
-		raycast_cube_SPR(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_SPR(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IAR:
-		raycast_cube_IAR(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_IAR(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SAR:
-		raycast_cube_SAR(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_SAR(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IPL:
-		raycast_cube_IPL(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_IPL(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SPL:
-		raycast_cube_SPL(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_SPL(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IAL:
-		raycast_cube_IAL(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_IAL(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SAL:
-		raycast_cube_SAL(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_SAL(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PIR:
-		raycast_cube_PIR(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_PIR(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PSR:
-		raycast_cube_PSR(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_PSR(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_AIR:
-		raycast_cube_AIR(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_AIR(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASR:
-		raycast_cube_ASR(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_ASR(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PIL:
-		raycast_cube_PIL(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_PIL(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PSL:
-		raycast_cube_PSL(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_PSL(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_AIL:
-		raycast_cube_AIL(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_AIL(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASL:
-		raycast_cube_ASL(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube_ASL(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	default:
 		force_skip_cube = true;
-		raycast_cube(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2);
+		raycast_cube(x__,y__,z__,raycastcube0,raycastcube1,raycastcube2,both);
 		break;
 	}
 	return force_skip_cube;
@@ -4373,7 +4383,7 @@ bool GLWidget::create_fbos1(
 
 void GLWidget::raycast_cube(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0[] = {
 			-x,  y, z,
@@ -4402,9 +4412,9 @@ void GLWidget::raycast_cube(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0[] = {
+		 GLfloat ca0[] = {
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f,
@@ -4415,12 +4425,12 @@ void GLWidget::raycast_cube(
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f };
-		const GLfloat ca1[] = {
+		 GLfloat ca1[] = {
 					0.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f };
-		const GLfloat ca2[] = {
+		 GLfloat ca2[] = {
 					0.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
@@ -4437,7 +4447,7 @@ void GLWidget::raycast_cube(
 
 void GLWidget::raycast_cube_RIP(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_rip[] = {
 			-x,  z, y,
@@ -4466,9 +4476,9 @@ void GLWidget::raycast_cube_RIP(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_rip, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_rip, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_rip[] = {
+		 GLfloat ca0_rip[] = {
 					0.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
@@ -4479,12 +4489,12 @@ void GLWidget::raycast_cube_RIP(
 					0.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f };
-		const GLfloat ca1_rip[] = {
+		 GLfloat ca1_rip[] = {
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 0.0f };
-		const GLfloat ca2_rip[] = {
+		 GLfloat ca2_rip[] = {
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f,
@@ -4501,7 +4511,7 @@ void GLWidget::raycast_cube_RIP(
 
 void GLWidget::raycast_cube_LIP(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_lip[] = {
 			-x,  z, y,
@@ -4530,9 +4540,9 @@ void GLWidget::raycast_cube_LIP(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_lip, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_lip, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_lip[] = {
+		 GLfloat ca0_lip[] = {
 					1.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 0.0f,
@@ -4543,12 +4553,12 @@ void GLWidget::raycast_cube_LIP(
 					1.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f };
-		const GLfloat ca1_lip[] = {
+		 GLfloat ca1_lip[] = {
 					1.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f };
-		const GLfloat ca2_lip[] = {
+		 GLfloat ca2_lip[] = {
 					1.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 1.0f,
@@ -4565,7 +4575,7 @@ void GLWidget::raycast_cube_LIP(
 
 void GLWidget::raycast_cube_RSP(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 
 	GLfloat va0_rsp[] = {
@@ -4595,9 +4605,9 @@ void GLWidget::raycast_cube_RSP(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_rsp, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_rsp, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_rsp[] = {
+		 GLfloat ca0_rsp[] = {
 					0.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f,
@@ -4608,12 +4618,12 @@ void GLWidget::raycast_cube_RSP(
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f };
-		const GLfloat ca1_rsp[] = {
+		 GLfloat ca1_rsp[] = {
 					0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f };
-		const GLfloat ca2_rsp[] = {
+		 GLfloat ca2_rsp[] = {
 					0.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 1.0f,
@@ -4630,7 +4640,7 @@ void GLWidget::raycast_cube_RSP(
 
 void GLWidget::raycast_cube_LSP(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 
 	GLfloat va0_lsp[] = {
@@ -4660,9 +4670,9 @@ void GLWidget::raycast_cube_LSP(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_lsp, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_lsp, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_lsp[] = {
+		 GLfloat ca0_lsp[] = {
 					1.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
@@ -4673,12 +4683,12 @@ void GLWidget::raycast_cube_LSP(
 					1.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f };
-		const GLfloat ca1_lsp[] = {
+		 GLfloat ca1_lsp[] = {
 					1.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 0.0f };
-		const GLfloat ca2_lsp[] = {
+		 GLfloat ca2_lsp[] = {
 					1.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
@@ -4695,7 +4705,7 @@ void GLWidget::raycast_cube_LSP(
 
 void GLWidget::raycast_cube_RIA(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_ria[] = {
 			-x,  z, y,
@@ -4724,9 +4734,9 @@ void GLWidget::raycast_cube_RIA(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_ria, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_ria, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_ria[] = {
+		 GLfloat ca0_ria[] = {
 					0.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f,
@@ -4737,12 +4747,12 @@ void GLWidget::raycast_cube_RIA(
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 0.0f };
-		const GLfloat ca1_ria[] = {
+		 GLfloat ca1_ria[] = {
 					0.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f };
-		const GLfloat ca2_ria[] = {
+		 GLfloat ca2_ria[] = {
 					0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 0.0f,
@@ -4759,7 +4769,7 @@ void GLWidget::raycast_cube_RIA(
 
 void GLWidget::raycast_cube_LIA(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_lia[] = {
 			-x,  z, y,
@@ -4788,9 +4798,9 @@ void GLWidget::raycast_cube_LIA(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_lia, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_lia, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_lia[] = {
+		 GLfloat ca0_lia[] = {
 					1.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
@@ -4801,12 +4811,12 @@ void GLWidget::raycast_cube_LIA(
 					1.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f };
-		const GLfloat ca1_lia[] = {
+		 GLfloat ca1_lia[] = {
 					1.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 1.0f };
-		const GLfloat ca2_lia[] = {
+		 GLfloat ca2_lia[] = {
 					1.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
@@ -4823,7 +4833,7 @@ void GLWidget::raycast_cube_LIA(
 
 void GLWidget::raycast_cube_RSA(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_rsa[] = {
 			-x,  z, y,
@@ -4852,9 +4862,9 @@ void GLWidget::raycast_cube_RSA(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_rsa, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_rsa, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_rsa[] = {
+		 GLfloat ca0_rsa[] = {
 					0.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
@@ -4865,12 +4875,12 @@ void GLWidget::raycast_cube_RSA(
 					0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f };
-		const GLfloat ca1_rsa[] = {
+		 GLfloat ca1_rsa[] = {
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 1.0f };
-		const GLfloat ca2_rsa[] = {
+		 GLfloat ca2_rsa[] = {
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
@@ -4887,7 +4897,7 @@ void GLWidget::raycast_cube_RSA(
 
 void GLWidget::raycast_cube_LSA(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_lsa[] = {
 			-x,  z, y,
@@ -4916,9 +4926,9 @@ void GLWidget::raycast_cube_LSA(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_lsa, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_lsa, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_lsa[] = {
+		 GLfloat ca0_lsa[] = {
 					1.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f,
@@ -4929,12 +4939,12 @@ void GLWidget::raycast_cube_LSA(
 					1.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f };
-		const GLfloat ca1_lsa[] = {
+		 GLfloat ca1_lsa[] = {
 					1.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f };
-		const GLfloat ca2_lsa[] = {
+		 GLfloat ca2_lsa[] = {
 					1.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 0.0f,
@@ -4951,7 +4961,7 @@ void GLWidget::raycast_cube_LSA(
 
 void GLWidget::raycast_cube_IRP(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_irp[] = {
 			-y,  z, x,
@@ -4980,9 +4990,9 @@ void GLWidget::raycast_cube_IRP(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_irp, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_irp, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_irp[] = {
+		 GLfloat ca0_irp[] = {
 					1.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
@@ -4993,12 +5003,12 @@ void GLWidget::raycast_cube_IRP(
 					0.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f };
-		const GLfloat ca1_irp[] = {
+		 GLfloat ca1_irp[] = {
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 0.0f };
-		const GLfloat ca2_irp[] = {
+		 GLfloat ca2_irp[] = {
 					1.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f,
@@ -5016,7 +5026,7 @@ void GLWidget::raycast_cube_IRP(
 
 void GLWidget::raycast_cube_ILP(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_ilp[] = {
 			-y,  z, x,
@@ -5045,9 +5055,9 @@ void GLWidget::raycast_cube_ILP(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_ilp, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_ilp, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_ilp[] = {
+		 GLfloat ca0_ilp[] = {
 					1.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 0.0f,
@@ -5058,12 +5068,12 @@ void GLWidget::raycast_cube_ILP(
 					0.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f };
-		const GLfloat ca1_ilp[] = {
+		 GLfloat ca1_ilp[] = {
 					0.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 0.0f };
-		const GLfloat ca2_ilp[] = {
+		 GLfloat ca2_ilp[] = {
 					1.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 1.0f,
@@ -5081,7 +5091,7 @@ void GLWidget::raycast_cube_ILP(
 
 void GLWidget::raycast_cube_SRP(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_srp[] = {
 			-y,  z, x,
@@ -5110,9 +5120,9 @@ void GLWidget::raycast_cube_SRP(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_srp, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_srp, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_srp[] = {
+		 GLfloat ca0_srp[] = {
 					0.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 0.0f,
@@ -5123,12 +5133,12 @@ void GLWidget::raycast_cube_SRP(
 					1.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f };
-		const GLfloat ca1_srp[] = {
+		 GLfloat ca1_srp[] = {
 					1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 0.0f };
-		const GLfloat ca2_srp[] = {
+		 GLfloat ca2_srp[] = {
 					0.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 1.0f,
@@ -5146,7 +5156,7 @@ void GLWidget::raycast_cube_SRP(
 
 void GLWidget::raycast_cube_SLP(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_slp[] = {
 			-y,  z, x,
@@ -5175,9 +5185,9 @@ void GLWidget::raycast_cube_SLP(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_slp, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_slp, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_slp[] = {
+		 GLfloat ca0_slp[] = {
 					0.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
@@ -5188,12 +5198,12 @@ void GLWidget::raycast_cube_SLP(
 					1.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f };
-		const GLfloat ca1_slp[] = {
+		 GLfloat ca1_slp[] = {
 					1.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 0.0f };
-		const GLfloat ca2_slp[] = {
+		 GLfloat ca2_slp[] = {
 					0.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
@@ -5211,7 +5221,7 @@ void GLWidget::raycast_cube_SLP(
 
 void GLWidget::raycast_cube_IRA(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_ira[] = {
 			-y,  z, x,
@@ -5240,9 +5250,9 @@ void GLWidget::raycast_cube_IRA(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_ira, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_ira, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_ira[] = {
+		 GLfloat ca0_ira[] = {
 					1.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 1.0f,
@@ -5253,12 +5263,12 @@ void GLWidget::raycast_cube_IRA(
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f };
-		const GLfloat ca1_ira[] = {
+		 GLfloat ca1_ira[] = {
 					0.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 1.0f };
-		const GLfloat ca2_ira[] = {
+		 GLfloat ca2_ira[] = {
 					1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 0.0f,
@@ -5275,7 +5285,7 @@ void GLWidget::raycast_cube_IRA(
 
 void GLWidget::raycast_cube_ILA(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_ila[] = {
 			-y,  z, x,
@@ -5304,9 +5314,9 @@ void GLWidget::raycast_cube_ILA(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_ila, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_ila, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_ila[] = {
+		 GLfloat ca0_ila[] = {
 					1.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
@@ -5317,12 +5327,12 @@ void GLWidget::raycast_cube_ILA(
 					0.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f };
-		const GLfloat ca1_ila[] = {
+		 GLfloat ca1_ila[] = {
 					0.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 1.0f };
-		const GLfloat ca2_ila[] = {
+		 GLfloat ca2_ila[] = {
 					1.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
@@ -5339,7 +5349,7 @@ void GLWidget::raycast_cube_ILA(
 
 void GLWidget::raycast_cube_SRA(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_sra[] = {
 			-y,  z, x,
@@ -5368,9 +5378,9 @@ void GLWidget::raycast_cube_SRA(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_sra, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_sra, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_sra[] = {
+		 GLfloat ca0_sra[] = {
 					0.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
@@ -5381,12 +5391,12 @@ void GLWidget::raycast_cube_SRA(
 					1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f };
-		const GLfloat ca1_sra[] = {
+		 GLfloat ca1_sra[] = {
 					1.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 1.0f };
-		const GLfloat ca2_sra[] = {
+		 GLfloat ca2_sra[] = {
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
@@ -5403,7 +5413,7 @@ void GLWidget::raycast_cube_SRA(
 
 void GLWidget::raycast_cube_SLA(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_sla[] = {
 			-y,  z, x,
@@ -5432,9 +5442,9 @@ void GLWidget::raycast_cube_SLA(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_sla, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_sla, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_sla[] = {
+		 GLfloat ca0_sla[] = {
 					0.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 1.0f,
@@ -5445,12 +5455,12 @@ void GLWidget::raycast_cube_SLA(
 					1.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 0.0f };
-		const GLfloat ca1_sla[] = {
+		 GLfloat ca1_sla[] = {
 					1.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 1.0f };
-		const GLfloat ca2_sla[] = {
+		 GLfloat ca2_sla[] = {
 					0.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 0.0f,
@@ -5467,7 +5477,7 @@ void GLWidget::raycast_cube_SLA(
 
 void GLWidget::raycast_cube_RPI(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_rpi[] = {
 			-x,  y, z,
@@ -5496,9 +5506,9 @@ void GLWidget::raycast_cube_RPI(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_rpi, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_rpi, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_rpi[] = {
+		 GLfloat ca0_rpi[] = {
 					0.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 1.0f,
@@ -5509,12 +5519,12 @@ void GLWidget::raycast_cube_RPI(
 					0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 1.0f };
-		const GLfloat ca1_rpi[] = {
+		 GLfloat ca1_rpi[] = {
 					0.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f };
-		const GLfloat ca2_rpi[] = {
+		 GLfloat ca2_rpi[] = {
 					0.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f,
@@ -5531,7 +5541,7 @@ void GLWidget::raycast_cube_RPI(
 
 void GLWidget::raycast_cube_LPI(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_lpi[] = {
 			-x,  y, z,
@@ -5560,9 +5570,9 @@ void GLWidget::raycast_cube_LPI(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_lpi, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_lpi, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_lpi[] = {
+		 GLfloat ca0_lpi[] = {
 					1.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
@@ -5573,12 +5583,12 @@ void GLWidget::raycast_cube_LPI(
 					1.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f };
-		const GLfloat ca1_lpi[] = {
+		 GLfloat ca1_lpi[] = {
 					1.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f };
-		const GLfloat ca2_lpi[] = {
+		 GLfloat ca2_lpi[] = {
 					1.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
@@ -5595,7 +5605,7 @@ void GLWidget::raycast_cube_LPI(
 
 void GLWidget::raycast_cube_RAI(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_rai[] = {
 			-x,  y, z,
@@ -5624,9 +5634,9 @@ void GLWidget::raycast_cube_RAI(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_rai, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_rai, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_rai[] = {
+		 GLfloat ca0_rai[] = {
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f,
@@ -5637,12 +5647,12 @@ void GLWidget::raycast_cube_RAI(
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f };
-		const GLfloat ca1_rai[] = {
+		 GLfloat ca1_rai[] = {
 					0.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f };
-		const GLfloat ca2_rai[] = {
+		 GLfloat ca2_rai[] = {
 					0.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
@@ -5659,7 +5669,7 @@ void GLWidget::raycast_cube_RAI(
 
 void GLWidget::raycast_cube_LAI(
 	float x, float y , float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_lai[] = {
 			-x,  y, z,
@@ -5688,9 +5698,9 @@ void GLWidget::raycast_cube_LAI(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_lai, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_lai, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_lai[] = {
+		 GLfloat ca0_lai[] = {
 					1.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 1.0f,
@@ -5701,12 +5711,12 @@ void GLWidget::raycast_cube_LAI(
 					1.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 1.0f };
-		const GLfloat ca1_lai[] = {
+		 GLfloat ca1_lai[] = {
 					1.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f };
-		const GLfloat ca2_lai[] = {
+		 GLfloat ca2_lai[] = {
 					1.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f,
@@ -5723,7 +5733,7 @@ void GLWidget::raycast_cube_LAI(
 
 void GLWidget::raycast_cube_RPS(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_rps[] = {
 			-x,  y, z,
@@ -5752,9 +5762,9 @@ void GLWidget::raycast_cube_RPS(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_rps, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_rps, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_rps[] = {
+		 GLfloat ca0_rps[] = {
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
@@ -5765,12 +5775,12 @@ void GLWidget::raycast_cube_RPS(
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f };
-		const GLfloat ca1_rps[] = {
+		 GLfloat ca1_rps[] = {
 					0.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f };
-		const GLfloat ca2_rps[] = {
+		 GLfloat ca2_rps[] = {
 					0.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
@@ -5787,7 +5797,7 @@ void GLWidget::raycast_cube_RPS(
 
 void GLWidget::raycast_cube_LPS(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_lps[] = {
 			-x,  y, z,
@@ -5816,9 +5826,9 @@ void GLWidget::raycast_cube_LPS(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_lps, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_lps, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_lps[] = {
+		 GLfloat ca0_lps[] = {
 					1.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 0.0f,
@@ -5829,12 +5839,12 @@ void GLWidget::raycast_cube_LPS(
 					1.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 0.0f };
-		const GLfloat ca1_lps[] = {
+		 GLfloat ca1_lps[] = {
 					1.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f };
-		const GLfloat ca2_lps[] = {
+		 GLfloat ca2_lps[] = {
 					1.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 0.0f,
@@ -5851,7 +5861,7 @@ void GLWidget::raycast_cube_LPS(
 
 void GLWidget::raycast_cube_RAS(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_ras[] = {
 			-x,  y, z,
@@ -5880,9 +5890,9 @@ void GLWidget::raycast_cube_RAS(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_ras, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_ras, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_ras[] = {
+		 GLfloat ca0_ras[] = {
 					0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 0.0f,
@@ -5893,12 +5903,12 @@ void GLWidget::raycast_cube_RAS(
 					0.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 0.0f };
-		const GLfloat ca1_ras[] = {
+		 GLfloat ca1_ras[] = {
 					0.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f };
-		const GLfloat ca2_ras[] = {
+		 GLfloat ca2_ras[] = {
 					0.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f,
@@ -5915,7 +5925,7 @@ void GLWidget::raycast_cube_RAS(
 
 void GLWidget::raycast_cube_LAS(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_las[] = {
 			-x,  y, z,
@@ -5944,9 +5954,9 @@ void GLWidget::raycast_cube_LAS(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_las, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_las, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_las[] = {
+		 GLfloat ca0_las[] = {
 					1.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
@@ -5957,12 +5967,12 @@ void GLWidget::raycast_cube_LAS(
 					1.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f };
-		const GLfloat ca1_las[] = {
+		 GLfloat ca1_las[] = {
 					1.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 0.0f };
-		const GLfloat ca2_las[] = {
+		 GLfloat ca2_las[] = {
 					1.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
@@ -5979,7 +5989,7 @@ void GLWidget::raycast_cube_LAS(
 
 void GLWidget::raycast_cube_PRI(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_pri[] = {
 			-y,  x, z,
@@ -6008,9 +6018,9 @@ void GLWidget::raycast_cube_PRI(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_pri, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_pri, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_pri[] = {
+		 GLfloat ca0_pri[] = {
 					0.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 1.0f,
@@ -6021,12 +6031,12 @@ void GLWidget::raycast_cube_PRI(
 					1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 1.0f };
-		const GLfloat ca1_pri[] = {
+		 GLfloat ca1_pri[] = {
 					0.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f };
-		const GLfloat ca2_pri[] = {
+		 GLfloat ca2_pri[] = {
 					1.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 1.0f,
@@ -6043,7 +6053,7 @@ void GLWidget::raycast_cube_PRI(
 
 void GLWidget::raycast_cube_PLI(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_pli[] = {
 			-y,  x, z,
@@ -6072,9 +6082,9 @@ void GLWidget::raycast_cube_PLI(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_pli, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_pli, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_pli[] = {
+		 GLfloat ca0_pli[] = {
 					0.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
@@ -6085,12 +6095,12 @@ void GLWidget::raycast_cube_PLI(
 					1.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 1.0f };
-		const GLfloat ca1_pli[] = {
+		 GLfloat ca1_pli[] = {
 					0.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f };
-		const GLfloat ca2_pli[] = {
+		 GLfloat ca2_pli[] = {
 					1.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
@@ -6107,7 +6117,7 @@ void GLWidget::raycast_cube_PLI(
 
 void GLWidget::raycast_cube_ARI(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_ari[] = {
 			-y,  x, z,
@@ -6136,9 +6146,9 @@ void GLWidget::raycast_cube_ARI(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_ari, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_ari, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_ari[] = {
+		 GLfloat ca0_ari[] = {
 					1.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f,
@@ -6149,12 +6159,12 @@ void GLWidget::raycast_cube_ARI(
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 1.0f };
-		const GLfloat ca1_ari[] = {
+		 GLfloat ca1_ari[] = {
 					1.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f };
-		const GLfloat ca2_ari[] = {
+		 GLfloat ca2_ari[] = {
 					0.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
@@ -6171,7 +6181,7 @@ void GLWidget::raycast_cube_ARI(
 
 void GLWidget::raycast_cube_ALI(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_ali[] = {
 			-y,  x, z,
@@ -6200,9 +6210,9 @@ void GLWidget::raycast_cube_ALI(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_ali, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_ali, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_ali[] = {
+		 GLfloat ca0_ali[] = {
 					1.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 1.0f,
@@ -6213,12 +6223,12 @@ void GLWidget::raycast_cube_ALI(
 					0.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 1.0f };
-		const GLfloat ca1_ali[] = {
+		 GLfloat ca1_ali[] = {
 					1.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f };
-		const GLfloat ca2_ali[] = {
+		 GLfloat ca2_ali[] = {
 					0.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 1.0f,
@@ -6235,7 +6245,7 @@ void GLWidget::raycast_cube_ALI(
 
 void GLWidget::raycast_cube_PRS(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_prs[] = {
 			-y,  x, z,
@@ -6264,9 +6274,9 @@ void GLWidget::raycast_cube_PRS(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_prs, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_prs, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_prs[] = {
+		 GLfloat ca0_prs[] = {
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
@@ -6277,12 +6287,12 @@ void GLWidget::raycast_cube_PRS(
 					1.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 0.0f };
-		const GLfloat ca1_prs[] = {
+		 GLfloat ca1_prs[] = {
 					0.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 0.0f };
-		const GLfloat ca2_prs[] = {
+		 GLfloat ca2_prs[] = {
 					1.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
@@ -6299,7 +6309,7 @@ void GLWidget::raycast_cube_PRS(
 
 void GLWidget::raycast_cube_PLS(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_pls[] = {
 			-y,  x, z,
@@ -6328,9 +6338,9 @@ void GLWidget::raycast_cube_PLS(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_pls, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_pls, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_pls[] = {
+		 GLfloat ca0_pls[] = {
 					0.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 0.0f,
@@ -6341,12 +6351,12 @@ void GLWidget::raycast_cube_PLS(
 					1.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 0.0f };
-		const GLfloat ca1_pls[] = {
+		 GLfloat ca1_pls[] = {
 					0.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f };
-		const GLfloat ca2_pls[] = {
+		 GLfloat ca2_pls[] = {
 					1.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 0.0f,
@@ -6363,7 +6373,7 @@ void GLWidget::raycast_cube_PLS(
 
 void GLWidget::raycast_cube_ARS(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_ars[] = {
 			-y,  x, z,
@@ -6392,9 +6402,9 @@ void GLWidget::raycast_cube_ARS(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_ars, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_ars, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_ars[] = {
+		 GLfloat ca0_ars[] = {
 					1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 0.0f,
@@ -6405,12 +6415,12 @@ void GLWidget::raycast_cube_ARS(
 					0.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 0.0f };
-		const GLfloat ca1_ars[] = {
+		 GLfloat ca1_ars[] = {
 					1.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f };
-		const GLfloat ca2_ars[] = {
+		 GLfloat ca2_ars[] = {
 					0.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 0.0f,
@@ -6427,7 +6437,7 @@ void GLWidget::raycast_cube_ARS(
 
 void GLWidget::raycast_cube_ALS(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_als[] = {
 			-y,  x, z,
@@ -6456,9 +6466,9 @@ void GLWidget::raycast_cube_ALS(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_als, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_als, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_als[] = {
+		 GLfloat ca0_als[] = {
 					1.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
@@ -6469,12 +6479,12 @@ void GLWidget::raycast_cube_ALS(
 					0.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 0.0f };
-		const GLfloat ca1_als[] = {
+		 GLfloat ca1_als[] = {
 					1.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f };
-		const GLfloat ca2_als[] = {
+		 GLfloat ca2_als[] = {
 					0.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
@@ -6491,7 +6501,7 @@ void GLWidget::raycast_cube_ALS(
 
 void GLWidget::raycast_cube_IPR(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_ipr[] = {
 			-z,  y, x,
@@ -6520,9 +6530,9 @@ void GLWidget::raycast_cube_IPR(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_ipr, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_ipr, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_ipr[] = {
+		 GLfloat ca0_ipr[] = {
 					1.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
@@ -6533,12 +6543,12 @@ void GLWidget::raycast_cube_IPR(
 					0.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 0.0f };
-		const GLfloat ca1_ipr[] = {
+		 GLfloat ca1_ipr[] = {
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 1.0f };
-		const GLfloat ca2_ipr[] = {
+		 GLfloat ca2_ipr[] = {
 					1.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f,
@@ -6555,7 +6565,7 @@ void GLWidget::raycast_cube_IPR(
 
 void GLWidget::raycast_cube_SPR(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_spr[] = {
 			-z,  y, x,
@@ -6584,9 +6594,9 @@ void GLWidget::raycast_cube_SPR(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_spr, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_spr, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_spr[] = {
+		 GLfloat ca0_spr[] = {
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 1.0f,
@@ -6597,12 +6607,12 @@ void GLWidget::raycast_cube_SPR(
 					1.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f };
-		const GLfloat ca1_spr[] = {
+		 GLfloat ca1_spr[] = {
 					1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 1.0f };
-		const GLfloat ca2_spr[] = {
+		 GLfloat ca2_spr[] = {
 					0.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
@@ -6619,7 +6629,7 @@ void GLWidget::raycast_cube_SPR(
 
 void GLWidget::raycast_cube_IAR(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_iar[] = {
 			-z,  y, x,
@@ -6648,9 +6658,9 @@ void GLWidget::raycast_cube_IAR(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_iar, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_iar, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_iar[] = {
+		 GLfloat ca0_iar[] = {
 					1.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 1.0f,
@@ -6661,12 +6671,12 @@ void GLWidget::raycast_cube_IAR(
 					0.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f };
-		const GLfloat ca1_iar[] = {
+		 GLfloat ca1_iar[] = {
 					0.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 1.0f };
-		const GLfloat ca2_iar[] = {
+		 GLfloat ca2_iar[] = {
 					1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
@@ -6683,7 +6693,7 @@ void GLWidget::raycast_cube_IAR(
 
 void GLWidget::raycast_cube_SAR(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_sar[] = {
 			-z,  y, x,
@@ -6712,9 +6722,9 @@ void GLWidget::raycast_cube_SAR(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_sar, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_sar, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_sar[] = {
+		 GLfloat ca0_sar[] = {
 					0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
@@ -6725,12 +6735,12 @@ void GLWidget::raycast_cube_SAR(
 					1.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 0.0f };
-		const GLfloat ca1_sar[] = {
+		 GLfloat ca1_sar[] = {
 					1.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 1.0f };
-		const GLfloat ca2_sar[] = {
+		 GLfloat ca2_sar[] = {
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f,
@@ -6747,7 +6757,7 @@ void GLWidget::raycast_cube_SAR(
 
 void GLWidget::raycast_cube_IPL(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_ipl[] = {
 			-z,  y, x,
@@ -6776,9 +6786,9 @@ void GLWidget::raycast_cube_IPL(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_ipl, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_ipl, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_ipl[] = {
+		 GLfloat ca0_ipl[] = {
 					1.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 0.0f,
@@ -6789,12 +6799,12 @@ void GLWidget::raycast_cube_IPL(
 					0.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f };
-		const GLfloat ca1_ipl[] = {
+		 GLfloat ca1_ipl[] = {
 					0.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 0.0f };
-		const GLfloat ca2_ipl[] = {
+		 GLfloat ca2_ipl[] = {
 					1.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
@@ -6811,7 +6821,7 @@ void GLWidget::raycast_cube_IPL(
 
 void GLWidget::raycast_cube_SPL(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_spl[] = {
 			-z,  y, x,
@@ -6840,9 +6850,9 @@ void GLWidget::raycast_cube_SPL(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_spl, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_spl, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_spl[] = {
+		 GLfloat ca0_spl[] = {
 					0.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
@@ -6853,12 +6863,12 @@ void GLWidget::raycast_cube_SPL(
 					1.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 1.0f };
-		const GLfloat ca1_spl[] = {
+		 GLfloat ca1_spl[] = {
 					1.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 0.0f };
-		const GLfloat ca2_spl[] = {
+		 GLfloat ca2_spl[] = {
 					0.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 0.0f,
@@ -6875,7 +6885,7 @@ void GLWidget::raycast_cube_SPL(
 
 void GLWidget::raycast_cube_IAL(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_ial[] = {
 			-z,  y, x,
@@ -6904,9 +6914,9 @@ void GLWidget::raycast_cube_IAL(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_ial, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_ial, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_ial[] = {
+		 GLfloat ca0_ial[] = {
 					1.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
@@ -6917,12 +6927,12 @@ void GLWidget::raycast_cube_IAL(
 					0.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 1.0f };
-		const GLfloat ca1_ial[] = {
+		 GLfloat ca1_ial[] = {
 					0.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 0.0f };
-		const GLfloat ca2_ial[] = {
+		 GLfloat ca2_ial[] = {
 					1.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f,
@@ -6939,7 +6949,7 @@ void GLWidget::raycast_cube_IAL(
 
 void GLWidget::raycast_cube_SAL(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_sal[] = {
 			-z,  y, x,
@@ -6968,9 +6978,9 @@ void GLWidget::raycast_cube_SAL(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_sal, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_sal, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_sal[] = {
+		 GLfloat ca0_sal[] = {
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 0.0f,
@@ -6981,12 +6991,12 @@ void GLWidget::raycast_cube_SAL(
 					1.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f };
-		const GLfloat ca1_sal[] = {
+		 GLfloat ca1_sal[] = {
 					1.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 0.0f };
-		const GLfloat ca2_sal[] = {
+		 GLfloat ca2_sal[] = {
 					0.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
@@ -7003,7 +7013,7 @@ void GLWidget::raycast_cube_SAL(
 
 void GLWidget::raycast_cube_PIR(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_pir[] = {
 			-z,  x, y,
@@ -7032,9 +7042,9 @@ void GLWidget::raycast_cube_PIR(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_pir, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_pir, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_pir[] = {
+		 GLfloat ca0_pir[] = {
 					0.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
@@ -7045,12 +7055,12 @@ void GLWidget::raycast_cube_PIR(
 					1.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 0.0f };
-		const GLfloat ca1_pir[] = {
+		 GLfloat ca1_pir[] = {
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 1.0f };
-		const GLfloat ca2_pir[] = {
+		 GLfloat ca2_pir[] = {
 					1.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 1.0f,
@@ -7067,7 +7077,7 @@ void GLWidget::raycast_cube_PIR(
 
 void GLWidget::raycast_cube_PSR(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_psr[] = {
 			-z,  x, y,
@@ -7096,9 +7106,9 @@ void GLWidget::raycast_cube_PSR(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_psr, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_psr, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_psr[] = {
+		 GLfloat ca0_psr[] = {
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f,
@@ -7109,12 +7119,12 @@ void GLWidget::raycast_cube_PSR(
 					1.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 0.0f };
-		const GLfloat ca1_psr[] = {
+		 GLfloat ca1_psr[] = {
 					0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f };
-		const GLfloat ca2_psr[] = {
+		 GLfloat ca2_psr[] = {
 					1.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
@@ -7131,7 +7141,7 @@ void GLWidget::raycast_cube_PSR(
 
 void GLWidget::raycast_cube_AIR(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_air[] = {
 			-z,  x, y,
@@ -7160,9 +7170,9 @@ void GLWidget::raycast_cube_AIR(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_air, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_air, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_air[] = {
+		 GLfloat ca0_air[] = {
 					1.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f,
@@ -7173,12 +7183,12 @@ void GLWidget::raycast_cube_AIR(
 					0.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 0.0f };
-		const GLfloat ca1_air[] = {
+		 GLfloat ca1_air[] = {
 					1.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f };
-		const GLfloat ca2_air[] = {
+		 GLfloat ca2_air[] = {
 					0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
@@ -7195,7 +7205,7 @@ void GLWidget::raycast_cube_AIR(
 
 void GLWidget::raycast_cube_ASR(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_asr[] = {
 			-z,  x, y,
@@ -7224,9 +7234,9 @@ void GLWidget::raycast_cube_ASR(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_asr, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_asr, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_asr[] = {
+		 GLfloat ca0_asr[] = {
 					1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
@@ -7237,12 +7247,12 @@ void GLWidget::raycast_cube_ASR(
 					0.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 0.0f };
-		const GLfloat ca1_asr[] = {
+		 GLfloat ca1_asr[] = {
 					1.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 1.0f };
-		const GLfloat ca2_asr[] = {
+		 GLfloat ca2_asr[] = {
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 1.0f,
@@ -7259,7 +7269,7 @@ void GLWidget::raycast_cube_ASR(
 
 void GLWidget::raycast_cube_PIL(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_pil[] = {
 			-z,  x, y,
@@ -7288,9 +7298,9 @@ void GLWidget::raycast_cube_PIL(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_pil, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_pil, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_pil[] = {
+		 GLfloat ca0_pil[] = {
 					0.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 0.0f,
@@ -7301,12 +7311,12 @@ void GLWidget::raycast_cube_PIL(
 					1.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 1.0f };
-		const GLfloat ca1_pil[] = {
+		 GLfloat ca1_pil[] = {
 					0.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f };
-		const GLfloat ca2_pil[] = {
+		 GLfloat ca2_pil[] = {
 					1.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
@@ -7323,7 +7333,7 @@ void GLWidget::raycast_cube_PIL(
 
 void GLWidget::raycast_cube_PSL(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_psl[] = {
 			-z,  x, y,
@@ -7352,9 +7362,9 @@ void GLWidget::raycast_cube_PSL(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_psl, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_psl, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_psl[] = {
+		 GLfloat ca0_psl[] = {
 					0.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
@@ -7365,12 +7375,12 @@ void GLWidget::raycast_cube_PSL(
 					1.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 1.0f };
-		const GLfloat ca1_psl[] = {
+		 GLfloat ca1_psl[] = {
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 0.0f };
-		const GLfloat ca2_psl[] = {
+		 GLfloat ca2_psl[] = {
 					1.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 0.0f,
@@ -7387,7 +7397,7 @@ void GLWidget::raycast_cube_PSL(
 
 void GLWidget::raycast_cube_AIL(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_ail[] = {
 			-z,  x, y,
@@ -7416,9 +7426,9 @@ void GLWidget::raycast_cube_AIL(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_ail, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_ail, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_ail[] = {
+		 GLfloat ca0_ail[] = {
 					1.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
@@ -7429,12 +7439,12 @@ void GLWidget::raycast_cube_AIL(
 					0.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 1.0f };
-		const GLfloat ca1_ail[] = {
+		 GLfloat ca1_ail[] = {
 					1.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 0.0f };
-		const GLfloat ca2_ail[] = {
+		 GLfloat ca2_ail[] = {
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 0.0f,
@@ -7451,7 +7461,7 @@ void GLWidget::raycast_cube_AIL(
 
 void GLWidget::raycast_cube_ASL(
 	float x, float y, float z,
-	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2)
+	GLuint * vboid0, GLuint * vboid1, GLuint * vboid2, bool b)
 {
 	GLfloat va0_asl[] = {
 			-z,  x, y,
@@ -7480,9 +7490,9 @@ void GLWidget::raycast_cube_ASL(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va1_asl, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid2[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), va2_asl, GL_DYNAMIC_DRAW);
-	if (true)
+	if (b)
 	{
-		const GLfloat ca0_asl[] = {
+		 GLfloat ca0_asl[] = {
 					1.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f,
@@ -7493,12 +7503,12 @@ void GLWidget::raycast_cube_ASL(
 					0.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 1.0f };
-		const GLfloat ca1_asl[] = {
+		 GLfloat ca1_asl[] = {
 					1.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f };
-		const GLfloat ca2_asl[] = {
+		 GLfloat ca2_asl[] = {
 					0.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
