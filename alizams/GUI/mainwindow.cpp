@@ -265,6 +265,10 @@ MainWindow::MainWindow(
 		vl2->setContentsMargins(0,0,0,0);
 		vl2->addWidget(glwidget);
 	}
+	else
+	{
+		glwidget = NULL;
+	}
 	//
 	sqtree = new SQtree(this, true);
 	QVBoxLayout * vl296 = new QVBoxLayout(metadata_frame);
