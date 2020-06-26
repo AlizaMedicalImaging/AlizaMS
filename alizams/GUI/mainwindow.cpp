@@ -1,9 +1,6 @@
 #include "mainwindow.h"
-#include <QtGlobal>
 #include <QApplication>
-#if 1
 #include <QSettings>
-#endif
 #include <QMessageBox>
 #include <QTextStream>
 #include <QHBoxLayout>

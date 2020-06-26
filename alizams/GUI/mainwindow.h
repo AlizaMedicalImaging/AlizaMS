@@ -1,7 +1,14 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QtGlobal>
 #include "ui_mainwindow.h"
+#if QT_VERSION >= 0x050000
+#include "CG/glwidget-qt5.h"
+#else
+#include "CG/glwidget-qt4.h"
+#include <QGLFormat>
+#endif
 #include "aliza.h"
 #include <QMainWindow>
 #include <QStringList>
