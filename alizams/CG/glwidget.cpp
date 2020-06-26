@@ -176,17 +176,17 @@ struct  MyClosestRayResultCallback0 : public btCollisionWorld::ClosestRayResultC
 GLWidget::GLWidget(QWidget * p, Qt::WindowFlags f)
 	: QOpenGLWidget(p, f)
 {
-#if 1
+#if 0
 	QSurfaceFormat format;
 	format.setRenderableType(QSurfaceFormat::OpenGL);
-#ifdef USE_CORE_3_2
+#if 0
 	format.setVersion(3, 2);
 	format.setProfile(QSurfaceFormat::CoreProfile);
 #endif
 	format.setRedBufferSize(8);
 	format.setGreenBufferSize(8);
 	format.setBlueBufferSize(8);
-	format.setAlphaBufferSize(0);
+	format.setAlphaBufferSize(8);
 	format.setDepthBufferSize(24);
 	format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
 	format.setSwapInterval(0);
@@ -284,7 +284,7 @@ void GLWidget::initializeGL()
 		}
 		else
 		{
-#ifdef USE_CORE_3_2
+#ifdef USE_CORE_3_2_FUNCTIONS
 			QOpenGLFunctions_3_2_Core * funcs = c->versionFunctions<QOpenGLFunctions_3_2_Core>();
 #else
 			QOpenGLFunctions_3_0 * funcs = c->versionFunctions<QOpenGLFunctions_3_0>();
@@ -1247,10 +1247,8 @@ void GLWidget::init_opengl(int w, int h)
 		increment_count_vbos(1);
 		glBindBuffer(GL_ARRAY_BUFFER, frames_vbo);
 		glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
-		glEnableVertexAttribArray(frame_shader.position_handle);
 		glVertexAttribPointer(frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
-		glBindVertexArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glEnableVertexAttribArray(frame_shader.position_handle);
 		//
 		glGenVertexArrays(1, &origin_vao);
 		glBindVertexArray(origin_vao);
@@ -1258,10 +1256,8 @@ void GLWidget::init_opengl(int w, int h)
 		increment_count_vbos(1);
 		glBindBuffer(GL_ARRAY_BUFFER, origin_vbo);
 		glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
-		glEnableVertexAttribArray(frame_shader.position_handle);
 		glVertexAttribPointer(frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
-		glBindVertexArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glEnableVertexAttribArray(frame_shader.position_handle);
 		delete [] tmp99;
 	}
 	//
@@ -2190,12 +2186,15 @@ void GLWidget::paint_raycaster()
 		glUniform1i(fsquad_shader.location_sampler[0], 2);
 		glBindVertexArray(scene_vao);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		glEnable(GL_DEPTH_TEST);
 	}
 ////////////////
 	if (show_cube_tmp)
 	{
 		render_orient_cube2();
+	}
+	else
+	{
+		glEnable(GL_DEPTH_TEST);
 	}
 ////////////////
 	if (warn1)
@@ -3372,8 +3371,6 @@ void GLWidget::generate_vao1(GLuint * vao, GLuint * vbo, GLuint * attr_v, GLuint
 	glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), t, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(*attr_t, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_t);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	vaoids.push_back(*vao);
 	vboids.push_back(vbo);
 	delete [] v;
@@ -3424,8 +3421,6 @@ void GLWidget::generate_raycastcube0_vao(
 	glBufferData(GL_ARRAY_BUFFER, 30*sizeof(GLfloat), c, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(*attr_c, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_c);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	vaoids.push_back(*vao);
 	vboids.push_back(vbo);
 }
@@ -3462,8 +3457,6 @@ void GLWidget::generate_raycastcube1_vao(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), c, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(*attr_c, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_c);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	vaoids.push_back(*vao);
 	vboids.push_back(vbo);
 }
@@ -3500,8 +3493,6 @@ void GLWidget::generate_raycastcube2_vao(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), c, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(*attr_c, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_c);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	vaoids.push_back(*vao);
 	vboids.push_back(vbo);
 }
@@ -3546,8 +3537,6 @@ void GLWidget::generate_raycast_shader_vao(
 	glBufferData(GL_ARRAY_BUFFER, 30*sizeof(GLfloat), v0, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(*attr_v, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_v);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	//
 	glGenVertexArrays(1, &(vao[1]));
 	glBindVertexArray(vao[1]);
@@ -3556,8 +3545,6 @@ void GLWidget::generate_raycast_shader_vao(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), v1, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(*attr_v, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_v);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	//
 	glGenVertexArrays(1, &(vao[2]));
 	glBindVertexArray(vao[2]);
@@ -3566,8 +3553,6 @@ void GLWidget::generate_raycast_shader_vao(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), v2, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(*attr_v, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_v);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	//
 	increment_count_vbos(3);
 }
@@ -4040,44 +4025,46 @@ void GLWidget::makeModelVBO_ArraysT(
 	vboid[2] = 0;
 	vboid[3] = 0;
 
+	unsigned int count_buffers = 1;
+
+	if (normals)  count_buffers++;
+	if (textures) count_buffers++;
+	if (tangents) count_buffers++;
+
 	glGenVertexArrays(1, vaoid);
 	glBindVertexArray(*vaoid);
-
-	glGenBuffers(4, vboid);
+	glGenBuffers(count_buffers, vboid);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vboid[0]);
 	glBufferData(GL_ARRAY_BUFFER, (faces_size/12)*3*3*sizeof(float), v, usage);
-	glEnableVertexAttribArray(*v_attr);
 	glVertexAttribPointer(*v_attr, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(*v_attr);
 
 	if (normals)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vboid[1]);
 		glBufferData(GL_ARRAY_BUFFER, (faces_size/12)*3*3*sizeof(float), n, usage);
-		glEnableVertexAttribArray(*n_attr);
 		glVertexAttribPointer(*n_attr, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(*n_attr);
 	}
 
 	if (textures)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vboid[2]);
 		glBufferData(GL_ARRAY_BUFFER, (faces_size/12)*3*3*sizeof(float), t, usage);
-		glEnableVertexAttribArray(*t_attr);
 		glVertexAttribPointer(*t_attr, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(*t_attr);
 	}
 
 	if (tangents)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vboid[3]);
 		glBufferData(GL_ARRAY_BUFFER, (faces_size/12)*3*3*sizeof(float), ta, usage);
-		glEnableVertexAttribArray(*ta_attr);
 		glVertexAttribPointer(*ta_attr, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(*ta_attr);
 	}
 
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	increment_count_vbos(4);
+	increment_count_vbos(count_buffers);
 	vboids.push_back(vboid);
 	vaoids.push_back(*vaoid);
 
@@ -4142,11 +4129,8 @@ void GLWidget::generate_screen_quad(GLuint * vbo, GLuint * vao, GLuint * attr)
 	increment_count_vbos(1);
 	glBindBuffer(GL_ARRAY_BUFFER, *vbo);
 	glBufferData(GL_ARRAY_BUFFER, (4*2)*sizeof(GLfloat), quad_v, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(*attr);
 	glVertexAttribPointer(*attr, 2, GL_FLOAT, GL_FALSE, 0, 0);
-	//
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glEnableVertexAttribArray(*attr);
 }
 
 void GLWidget::free_fbos0(

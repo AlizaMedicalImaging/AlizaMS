@@ -225,7 +225,7 @@ quit__:
 	if (opengl_ok)
 		GLWidget::checkGLerror(" DisplayInterface::close()\n");
 #endif
-	return;
+	if (gl) gl->doneCurrent();
 }
 
 ImageVariant::ImageVariant(

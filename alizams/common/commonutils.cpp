@@ -1865,8 +1865,6 @@ void CommonUtils::generate_spectroscopyslice(
 			gl->glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), cs->fv, GL_STATIC_DRAW);
 			gl->glVertexAttribPointer(gl->frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
 			gl->glEnableVertexAttribArray(gl->frame_shader.position_handle);
-			gl->glBindVertexArray(0);
-			gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
 			//
 			if (columns_ > 2 && rows_ > 2)
 			{
@@ -1916,8 +1914,6 @@ void CommonUtils::generate_spectroscopyslice(
 				gl->glBufferData(GL_ARRAY_BUFFER, lines_size*sizeof(GLfloat), v, GL_STATIC_DRAW);
 				gl->glVertexAttribPointer(gl->frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
 				gl->glEnableVertexAttribArray(gl->frame_shader.position_handle);
-				gl->glBindVertexArray(0);
-				gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
 				delete [] v;
 				cs->psize = 2;
 				GLfloat * v1 = new GLfloat[6];
@@ -1934,8 +1930,6 @@ void CommonUtils::generate_spectroscopyslice(
 				gl->glBufferData(GL_ARRAY_BUFFER, 6*sizeof(GLfloat), v1, GL_STATIC_DRAW);
 				gl->glVertexAttribPointer(gl->frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
 				gl->glEnableVertexAttribArray(gl->frame_shader.position_handle);
-				gl->glBindVertexArray(0);
-				gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
 				gl->doneCurrent();
 				delete [] v1;
 				GLWidget::increment_count_vbos(2);
@@ -1949,10 +1943,14 @@ void CommonUtils::generate_spectroscopyslice(
 			v1[0] = x1;
 			v1[1] = y1;
 			v1[2] = z1;
+			gl->glGenVertexArrays(1, &(cs->pvaoid));
+			gl->glBindVertexArray(cs->pvaoid);
 			gl->glGenBuffers(1, &(cs->pvboid));
 			gl->glBindBuffer(GL_ARRAY_BUFFER, cs->pvboid);
 			gl->glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat), v1, GL_STATIC_DRAW);
 			gl->glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
+			gl->glVertexAttribPointer(gl->frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
+			gl->glEnableVertexAttribArray(gl->frame_shader.position_handle);
 			gl->doneCurrent();
 			delete [] v1;
 			GLWidget::increment_count_vbos(1);

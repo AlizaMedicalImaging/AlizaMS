@@ -1,11 +1,11 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
-#define USE_CORE_3_2
+//#define USE_CORE_3_2_FUNCTIONS
 
 #include "camera.h"
 #include <QOpenGLWidget>
-#ifdef USE_CORE_3_2
+#ifdef USE_CORE_3_2_FUNCTIONS
 #include <QOpenGLFunctions_3_2_Core>
 #else
 #include <QOpenGLFunctions_3_0>
@@ -102,7 +102,7 @@ public:
 } ALIGN16_POST;
 
 ALIGN16_PRE
-#ifdef USE_CORE_3_2
+#ifdef USE_CORE_3_2_FUNCTIONS
 class GLWidget : public QOpenGLWidget, public QOpenGLFunctions_3_2_Core
 #else
 class GLWidget : public QOpenGLWidget, public QOpenGLFunctions_3_0

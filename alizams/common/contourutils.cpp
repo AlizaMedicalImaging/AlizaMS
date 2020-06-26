@@ -178,10 +178,8 @@ void ContourUtils::generate_roi_vbos(
 					GLWidget::increment_count_vbos(1);
 					gl->glBindBuffer(GL_ARRAY_BUFFER, c->vboid);
 					gl->glBufferData(GL_ARRAY_BUFFER, s*sizeof(GLfloat), v, GL_STATIC_DRAW);
-					gl->glEnableVertexAttribArray(gl->frame_shader.position_handle);
 					gl->glVertexAttribPointer(gl->frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
-					gl->glBindVertexArray(0);
-					gl->glBindBuffer(GL_ARRAY_BUFFER, 0);
+					gl->glEnableVertexAttribArray(gl->frame_shader.position_handle);
 					delete [] v;
 					c->vao_initialized = true;
 				}
