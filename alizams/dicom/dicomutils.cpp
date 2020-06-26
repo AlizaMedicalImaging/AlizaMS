@@ -64,11 +64,16 @@
 #include <string>
 #include <set>
 #include <algorithm>
+#if QT_VERSION >= 0x050000
+#include "CG/glwidget-qt5.h"
+#else
+#include "CG/glwidget-qt4.h"
+#endif
+
 #include "vectormath/scalar/vectormath.h"
 typedef Vectormath::Scalar::Vector3 sVector3;
 typedef Vectormath::Scalar::Vector4 sVector4;
 typedef Vectormath::Scalar::Matrix4 sMatrix4;
-#include "CG/glwidget.h"
 
 namespace mdcm
 {
@@ -9068,7 +9073,7 @@ bool DicomUtils::process_contrours_ref(
 	std::vector<ImageVariant*> & tmp_ivariants,
 	int max_3d_tex_size, GLWidget * gl, bool ok3d,
 	const QWidget * settings,
-	const Scene3DImagesMap & scene3dimages,
+	const QMap<int, ImageVariant*> & scene3dimages,
 	QProgressDialog * pb)
 {
 	unsigned short count_ = 0;
@@ -10137,7 +10142,7 @@ QString DicomUtils::read_dicom(
 	ShaderObj * mesh_shader,
 	bool ok3d,
 	const QWidget * settings,
-	const Scene3DImagesMap & scene3dimages,
+	const QMap<int, ImageVariant*> & scene3dimages,
 	QProgressDialog * pb,
 	bool pr_ref,
 	bool rt_ref)

@@ -13,7 +13,11 @@
 #include <QTimer>
 #include <vector>
 #include "structures.h"
-#include "CG/glwidget.h"
+#if QT_VERSION >= 0x050000
+#include "CG/glwidget-qt5.h"
+#else
+#include "CG/glwidget-qt4.h"
+#endif
 #include "toolbox.h"
 #include "imagesbox.h"
 #include "toolbox.h"
@@ -219,7 +223,7 @@ private:
 	void update_selection_common2(QListWidgetItem*);
 	void clear_views();
 	void sort_4d(
-		Scene3DImages &,
+		QList<ImageVariant*> &,
 		QList<double> &,
 		QMap<int, ImageVariant*> &,
 		QMap<int, ImageVariant*> &,

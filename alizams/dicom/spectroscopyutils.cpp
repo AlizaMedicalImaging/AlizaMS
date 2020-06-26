@@ -11,7 +11,11 @@
 #include "commonutils.h"
 #include "dicomutils.h"
 #include <QProgressDialog>
-#include <CG/glwidget.h>
+#if QT_VERSION >= 0x050000
+#include "CG/glwidget-qt5.h"
+#else
+#include "CG/glwidget-qt4.h"
+#endif
 
 //#define LOAD_SPECT_DATA___
  

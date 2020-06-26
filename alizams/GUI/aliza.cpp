@@ -41,9 +41,9 @@ static QMutex mutex0; // scene images
 static QMutex mutex2; // 2D animation
 static QMutex mutex3; // 3D animation
 
-static Scene3DImagesMap scene3dimages;
-static Scene3DImages selected_images;
-static Scene3DImages animation_images;
+static QMap<int, ImageVariant*> scene3dimages;
+static QList<ImageVariant*> selected_images;
+static QList<ImageVariant*> animation_images;
 static QList<double> anim3d_times;
 
 #include "b/btBulletCollisionCommon.h"
@@ -60,7 +60,7 @@ static void search_frame_of_ref(
 	const QString & study_uid,
 	QList<const ImageVariant*> & l)
 {
-	Scene3DImagesMap::const_iterator it = scene3dimages.begin();
+	QMap<int, ImageVariant*>::const_iterator it = scene3dimages.begin();
 	while (it != scene3dimages.end())
 	{
 		const ImageVariant * v = it.value();
@@ -505,7 +505,7 @@ void Aliza::close_()
 	graphicswidget_x->clear_();
 	histogramview->clear__();
 	selected_images.clear();
-	Scene3DImagesMap::iterator iv = scene3dimages.begin();
+	QMap<int, ImageVariant*>::iterator iv = scene3dimages.begin();
 	while (iv != scene3dimages.end())
 	{
 		if (iv.value()) { delete iv.value(); }
@@ -720,7 +720,7 @@ void Aliza::clear_ram()
 	imagesbox->listWidget->clear();
 	imagesbox->set_html(NULL);
 	selected_images.clear();
-	Scene3DImagesMap::iterator iv = scene3dimages.begin();
+	QMap<int, ImageVariant*>::iterator iv = scene3dimages.begin();
 	while (iv != scene3dimages.end())
 	{
 		if (iv.value())
@@ -1224,7 +1224,7 @@ void Aliza::set_lut(int i)
 	v->di->selected_lut = (short)i;
 	if (v->group_id >= 0)
 	{
-		Scene3DImagesMap::const_iterator iv =
+		QMap<int, ImageVariant*>::const_iterator iv =
 			scene3dimages.constBegin();
 		while (iv != scene3dimages.constEnd())
 		{
@@ -1638,7 +1638,7 @@ void Aliza::set_selected_slice2D_m(int j)
 		}
 		if (v->group_id>=0)
 		{
-			Scene3DImagesMap::const_iterator iv =
+			QMap<int, ImageVariant*>::const_iterator iv =
 				scene3dimages.constBegin();
 			while (iv != scene3dimages.constEnd())
 			{
@@ -1722,7 +1722,7 @@ void Aliza::set_selected_slice2D_y(int j)
 		v->di->selected_y_slice = j;
 		if (v->group_id>=0)
 		{
-			Scene3DImagesMap::const_iterator iv =
+			QMap<int, ImageVariant*>::const_iterator iv =
 				scene3dimages.constBegin();
 			while (iv != scene3dimages.constEnd())
 			{
@@ -1751,7 +1751,7 @@ void Aliza::set_selected_slice2D_x(int j)
 		v->di->selected_x_slice = j;
 		if (v->group_id>=0)
 		{
-			Scene3DImagesMap::const_iterator iv =
+			QMap<int, ImageVariant*>::const_iterator iv =
 				scene3dimages.constBegin();
 			while (iv != scene3dimages.constEnd())
 			{
@@ -1964,7 +1964,7 @@ void Aliza::calculate_bb()
 		graphicswidget_m->set_info_line_text(info_text);
 		if (v->group_id >= 0)
 		{
-			Scene3DImagesMap::const_iterator iv =
+			QMap<int, ImageVariant*>::const_iterator iv =
 				scene3dimages.constBegin();
 			while (iv != scene3dimages.constEnd())
 			{
@@ -1988,7 +1988,7 @@ void Aliza::calculate_bb()
 	{
 		if (v->group_id>=0)
 		{
-			Scene3DImagesMap::const_iterator iv =
+			QMap<int, ImageVariant*>::const_iterator iv =
 				scene3dimages.constBegin();
 			while (iv != scene3dimages.constEnd())
 			{
@@ -2033,7 +2033,7 @@ void Aliza::calculate_bb()
 			update_center(v);
 			if (v->group_id>=0)
 			{
-				Scene3DImagesMap::const_iterator iv =
+				QMap<int, ImageVariant*>::const_iterator iv =
 					scene3dimages.constBegin();
 				while (iv != scene3dimages.constEnd())
 				{
@@ -2244,7 +2244,7 @@ void Aliza::set_transparency(bool t)
 		v->di->transparency = t;
 		if (v->group_id>=0)
 		{
-			Scene3DImagesMap::const_iterator iv =
+			QMap<int, ImageVariant*>::const_iterator iv =
 				scene3dimages.constBegin();
 			while (iv != scene3dimages.constEnd())
 			{
@@ -2803,8 +2803,8 @@ QString Aliza::create_group_(bool * ok, bool lock_mutex)
 	int group_id = -1;
 	int dimx, dimy, dimz;
 	short image_type;
-	Scene3DImages tmp_images;
-	Scene3DImages group_images;
+	QList<ImageVariant*> tmp_images;
+	QList<ImageVariant*> group_images;
 	ImageVariant * v;
 	QMap<int, ImageVariant*> map;
 	if (lock_mutex)
@@ -2816,7 +2816,7 @@ QString Aliza::create_group_(bool * ok, bool lock_mutex)
 			return QString("");
 		}
 	}
-	Scene3DImagesMap::const_iterator iv = scene3dimages.constBegin();
+	QMap<int, ImageVariant*>::const_iterator iv = scene3dimages.constBegin();
 	if (scene3dimages.size()<2)
 	{
 		message_ = QString(
@@ -2954,7 +2954,7 @@ void Aliza::remove_group()
 	qApp->processEvents();
 	if (q == QMessageBox::YesToAll)
 	{
-		Scene3DImagesMap::iterator iv =
+		QMap<int, ImageVariant*>::iterator iv =
 			scene3dimages.begin();
 		while (iv != scene3dimages.end())
 		{
@@ -2971,7 +2971,7 @@ void Aliza::remove_group()
 	else if (q == QMessageBox::Yes)
 	{
 		const int group_id = v->group_id;
-		Scene3DImagesMap::iterator iv =
+		QMap<int, ImageVariant*>::iterator iv =
 			scene3dimages.begin();
 		while (iv != scene3dimages.end())
 		{
@@ -3175,7 +3175,7 @@ void Aliza::update_group_width(const ImageVariant * v)
 {
 	if (v)
 	{
-		Scene3DImagesMap::const_iterator iv =
+		QMap<int, ImageVariant*>::const_iterator iv =
 			scene3dimages.constBegin();
 		while (iv != scene3dimages.constEnd())
 		{
@@ -3209,7 +3209,7 @@ void Aliza::update_group_center(const ImageVariant * v)
 {
 	if (v)
 	{
-		Scene3DImagesMap::const_iterator iv =
+		QMap<int, ImageVariant*>::const_iterator iv =
 			scene3dimages.constBegin();
 		while (iv != scene3dimages.constEnd())
 		{
@@ -3377,7 +3377,7 @@ void Aliza::trigger_tmp()
 }
 
 void Aliza::sort_4d(
-	Scene3DImages & images,
+	QList<ImageVariant*> & images,
 	QList<double> & times,
 	QMap<int, ImageVariant*> &map,
 	QMap<int, ImageVariant*>  & instance_numbers_tmp,
@@ -3388,7 +3388,7 @@ void Aliza::sort_4d(
 	const int selected_y_slice,
 	const int selected_z_slice)
 {
-	Scene3DImagesMap::const_iterator iv =
+	QMap<int, ImageVariant*>::const_iterator iv =
 		scene3dimages.constBegin();
 	while (iv != scene3dimages.constEnd())
 	{
@@ -3536,7 +3536,7 @@ void Aliza::toggle_zlock(bool t)
 	if (!v) return;
 	if (v->group_id >= 0)
 	{
-		Scene3DImagesMap::const_iterator iv =
+		QMap<int, ImageVariant*>::const_iterator iv =
 			scene3dimages.constBegin();
 		while (iv != scene3dimages.constEnd())
 		{
@@ -3581,7 +3581,7 @@ void Aliza::toggle_zlock_one(bool t)
 	if (!v) return;
 	if (v->group_id >= 0)
 	{
-		Scene3DImagesMap::const_iterator iv =
+		QMap<int, ImageVariant*>::const_iterator iv =
 			scene3dimages.constBegin();
 		while (iv != scene3dimages.constEnd())
 		{

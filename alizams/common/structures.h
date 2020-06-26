@@ -1,6 +1,10 @@
 #ifndef STRUCTURES___H
 #define STRUCTURES___H
 
+#include <QtGlobal>
+#if QT_VERSION < 0x050000
+#include "CG/glew/include/GL/glew.h"
+#endif
 #include "itkImage.h"
 #include "itkSpatialOrientation.h"
 #include "itkSpatialObjectPoint.h"
@@ -917,9 +921,6 @@ public:
 	double us_window_width_ext;
 	short selected_lut;
 };
-
-typedef QList<ImageVariant*> Scene3DImages;
-typedef QMap<int, ImageVariant*> Scene3DImagesMap;
 
 class ProcessImageThread_ : public QThread
 {

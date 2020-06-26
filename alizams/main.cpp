@@ -7,7 +7,9 @@
 #include "browser/sqtree.h"
 #include <QtGlobal>
 #include <QApplication>
+#if QT_VERSION >= 0x050000
 #include <QSurfaceFormat>
+#endif
 #include <QStyle>
 #include <QPalette>
 #include <QMessageBox>
@@ -165,6 +167,7 @@ int main(int argc, char *argv[])
 	//
 	bool ok3d = false;
 	bool hide_zoom = true;
+#if QT_VERSION >= 0x050000
 #if 1 
 	QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
 #endif
@@ -175,6 +178,7 @@ int main(int argc, char *argv[])
 		QSurfaceFormat format;
 		QSurfaceFormat::setDefaultFormat(format);
 	}
+#endif
 #endif
 	QApplication app(argc, argv);
 	app.setOrganizationName(QString("Aliza"));
@@ -234,7 +238,11 @@ int main(int argc, char *argv[])
 			p.setColor(QPalette::Link,            Qt::darkBlue);
 			p.setColor(QPalette::Highlight,       Qt::lightGray);
 			p.setColor(QPalette::HighlightedText, Qt::black);
+#if (QT_VERSION >= 0x050000)
 			app.setStyle(QString("Fusion"));
+#else
+			app.setStyle(QString("Plastique"));
+#endif
 			app.setPalette(p);
 		}
 	}

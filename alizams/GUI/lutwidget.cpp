@@ -8,6 +8,7 @@ LUTWidget::LUTWidget(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
 {
 	QFont small(QString("Arial"), 8);
 	setFont(small);
+	scale_icons = si;
 	QHBoxLayout * l = new QHBoxLayout(this);
 	l->setContentsMargins(0,0,0,0);
 	l->setSpacing(0);

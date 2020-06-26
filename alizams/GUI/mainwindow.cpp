@@ -243,21 +243,27 @@ MainWindow::MainWindow(
 	//
 	if (ok3d)
 	{
+#if QT_VERSION >= 0x050000
 		glwidget = new GLWidget(this);
+#else
+		QGLFormat fmt;
+		fmt.setDirectRendering(true);
+		fmt.setSampleBuffers(true);
+		fmt.setSamples(4);
+		fmt.setDoubleBuffer(true);
+		fmt.setRgba(true);
+		fmt.setAlpha(true);
+		fmt.setRedBufferSize(8);
+		fmt.setGreenBufferSize(8);
+		fmt.setBlueBufferSize(8);
+		fmt.setAlphaBufferSize(8);
+		fmt.setDepth(true);
+		fmt.setDepthBufferSize(24);
+		glwidget = new GLWidget(fmt, this);
+#endif
 		QVBoxLayout * vl2 = new QVBoxLayout(gl_frame);
 		vl2->setContentsMargins(0,0,0,0);
 		vl2->addWidget(glwidget);
-#if 0
-		QGLFormat fmt1 = glwidget->format();
-		if (fmt1.redBufferSize() != 10)
-		{
-			std::cout
-				<< "Grayscale format failed: redBufferSize()="
-				<< fmt1.redBufferSize()
-				<< " alphaBufferSize()="
-				<< fmt1.alphaBufferSize() << std::endl;
-		}
-#endif
 	}
 	//
 	sqtree = new SQtree(this, true);

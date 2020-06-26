@@ -1,6 +1,11 @@
-#include "glwidget.h"
+#include "structures.h"
+#if QT_VERSION >= 0x050000
 #include <QOpenGLContext>
 #include <QSurfaceFormat>
+#include "glwidget-qt5.h"
+#else
+#include "glwidget-qt4.h"
+#endif
 #include <QApplication>
 #include <QMessageBox>
 #include <QFileDialog>
@@ -120,7 +125,7 @@ static long long GLWidget_count_tex  = 0;
 static bool GLWidget_max_vbos_65535  = false;
 static bool GLWidget_max_tex_65535   = false;
 
-static Scene3DImages * selected_images__ = NULL;
+static QList<ImageVariant*> * selected_images__ = NULL;
 
 const float color_spectro0[] = {(float)0x10/(float)0xff,(float)0x10/(float)0xff,(float)0xf0/(float)0xff,1.0f};
 const float color_spectro1[] = {(float)0x10/(float)0xff,(float)0xe8/(float)0xff,(float)0x10/(float)0xff,1.0f};
@@ -173,9 +178,16 @@ struct  MyClosestRayResultCallback0 : public btCollisionWorld::ClosestRayResultC
 	}    
 };
 
-GLWidget::GLWidget(QWidget * p, Qt::WindowFlags f)
-	: QOpenGLWidget(p, f)
+#if QT_VERSION >= 0x050000
+GLWidget::GLWidget(QWidget * p, Qt::WindowFlags f) : QOpenGLWidget(p, f)
+#else
+GLWidget::GLWidget(
+	const QGLFormat & frm,
+	QWidget * p,
+	const QGLWidget * s, Qt::WindowFlags f) : QGLWidget(frm,p,s,f)
+#endif
 {
+#if QT_VERSION >= 0x050000
 #if 0
 	QSurfaceFormat format;
 	format.setRenderableType(QSurfaceFormat::OpenGL);
@@ -193,6 +205,7 @@ GLWidget::GLWidget(QWidget * p, Qt::WindowFlags f)
 	//format.setSamples(4);
 	setFormat(format);
 #endif
+#endif
 	setMinimumSize(64,64);
 	setFocusPolicy(Qt::WheelFocus);
 	init_();
@@ -200,6 +213,7 @@ GLWidget::GLWidget(QWidget * p, Qt::WindowFlags f)
 
 void GLWidget::initializeGL()
 {
+#if QT_VERSION >= 0x050000
 	initializeOpenGLFunctions();
 #if 1
 #if 1
@@ -296,6 +310,7 @@ void GLWidget::initializeGL()
 			}
 		}
 	}
+#endif
 #endif
 	update_clear_color();
 	if (!opengl_init_done)
@@ -882,6 +897,24 @@ void GLWidget::init_opengl(int w, int h)
 	win_h = h;
 	opengl_info.clear();
 	//
+#if QT_VERSION < 0x050000
+	GLenum err = glewInit();
+	if (GLEW_OK != err)
+	{
+		return;
+	}
+	if (glewIsSupported("GL_VERSION_3_0"))
+	{
+		no_opengl3 = false;
+	}
+	else
+	{
+		no_opengl3 = true;
+		opengl_info.append(QString("\nOpenGL modules disabled"));
+		return;
+	}
+#endif
+	//
 	GLint major, minor;
 	glGetIntegerv(GL_MAJOR_VERSION, &major);
 	glGetIntegerv(GL_MINOR_VERSION, &minor);
@@ -917,11 +950,13 @@ void GLWidget::init_opengl(int w, int h)
 	//
 	//
 	if (major >= 3) no_opengl3 = false;
+#if QT_VERSION >= 0x050000
 	if (no_opengl3)
 	{
 		opengl_info.append(QString("\nOpenGL modules disabled"));
 		return;
 	}
+#endif
 	camera->set_heading(0.0f);
 	camera->set_pitch(0.0f);
 	camera->set_position(0.0f,0.0f,(float)SCENE_POS_Z);
@@ -932,7 +967,7 @@ void GLWidget::init_opengl(int w, int h)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glViewport(0,0,win_w,win_h);
 	glLineWidth(1.0f);
-	glEnable( GL_LINE_SMOOTH);
+	glEnable(GL_LINE_SMOOTH);
 	glActiveTexture(GL_TEXTURE1);
 #if 0
 	GLint max_samples_;
@@ -2176,7 +2211,11 @@ void GLWidget::paint_raycaster()
 	}
 //////////////// final scene quad
 	{
+#if QT_VERSION >= 0x050000
 		glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
+#else
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
 		glViewport(0, 0, win_w, win_h);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST);
@@ -3056,7 +3095,7 @@ void GLWidget::set_pan_delta(int dx, int dy)
 	pan_y += dy;
 }
 
-void GLWidget::set_selected_images_ptr(Scene3DImages * i)
+void GLWidget::set_selected_images_ptr(QList<ImageVariant*> * i)
 {
 	selected_images__ = i;
 }
@@ -3223,7 +3262,11 @@ void GLWidget::render_orient_cube1(
 				 sparams,
 				 NULL);
 	//
+#if QT_VERSION >= 0x050000
 	glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
+#else
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
 	glClearColor(clear_color_r, clear_color_g, clear_color_b, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_CULL_FACE);
@@ -4141,7 +4184,11 @@ void GLWidget::free_fbos0(
 	glBindFramebuffer(GL_FRAMEBUFFER, *framebuffer);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,  GL_TEXTURE_2D, 0, 0);
+#if QT_VERSION >= 0x050000
 	glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
+#else
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
 	glDeleteFramebuffers(1, framebuffer);
 	glDeleteTextures(1, color_texture);
 	glDeleteTextures(1, depth_texture);
@@ -4193,7 +4240,11 @@ bool GLWidget::create_fbos0(
 	case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT : break;
 	default: break;
 	}
+#if QT_VERSION >= 0x050000
 	glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
+#else
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
 	increment_count_tex(2);
 	return ok;
 }
@@ -4205,7 +4256,11 @@ void GLWidget::free_fbos1(
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, *framebuffer);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
+#if QT_VERSION >= 0x050000
 	glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
+#else
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
 	glDeleteFramebuffers(1, framebuffer);
 	glDeleteTextures(1, color_texture);
 	glDeleteRenderbuffers(1, depth_rb);
@@ -4244,7 +4299,11 @@ bool GLWidget::create_fbos1(
 	case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT : break;
 	default: break;
 	}
+#if QT_VERSION >= 0x050000
 	glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
+#else
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
 	increment_count_tex(1);
 	return ok;
 }

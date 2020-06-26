@@ -1,15 +1,17 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
-//#define USE_CORE_3_2_FUNCTIONS
+#include <QtGlobal>
 
-#include "camera.h"
+//#define USE_CORE_3_2_FUNCTIONS
 #include <QOpenGLWidget>
 #ifdef USE_CORE_3_2_FUNCTIONS
 #include <QOpenGLFunctions_3_2_Core>
 #else
 #include <QOpenGLFunctions_3_0>
 #endif
+
+#include "camera.h"
 #include <QPoint>
 #include <QModelIndex>
 #include <QMouseEvent>
@@ -17,7 +19,6 @@
 #include <QCloseEvent>
 #include <QKeyEvent>
 #include <QColor>
-#include "structures.h"
 #include <QString>
 #include "btBulletCollisionCommon.h"
 
@@ -29,6 +30,8 @@
 #define VBOIDS_SIZE 4
 #define TEXTURES_SIZE 8
 #define MAX_SHADOWS_ 1
+
+class ImageVariant;
 
 class ShaderObj
 {
@@ -101,11 +104,10 @@ public:
 	qMeshData		  * mesh_data;
 } ALIGN16_POST;
 
-ALIGN16_PRE
 #ifdef USE_CORE_3_2_FUNCTIONS
-class GLWidget : public QOpenGLWidget, public QOpenGLFunctions_3_2_Core
+ALIGN16_PRE class GLWidget : public QOpenGLWidget, public QOpenGLFunctions_3_2_Core
 #else
-class GLWidget : public QOpenGLWidget, public QOpenGLFunctions_3_0
+ALIGN16_PRE class GLWidget : public QOpenGLWidget, public QOpenGLFunctions_3_0
 #endif
 {
 
@@ -209,7 +211,7 @@ public:
 	void update_far_plane(float);
 	void fit_to_screen(const ImageVariant*);
 	//
-	void set_selected_images_ptr(Scene3DImages*);
+	void set_selected_images_ptr(QList<ImageVariant*>*);
 	void set_view_3d();
 	void set_view_rc();
 	bool rect_selection;
@@ -486,8 +488,6 @@ protected:
 	QPoint lastPos;
 	QPoint lastPanPos;
 	QPoint lastPosScale;
-}
-ALIGN16_POST
-;
+} ALIGN16_POST;
 
 #endif

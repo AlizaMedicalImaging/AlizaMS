@@ -2,8 +2,13 @@
 #include <QMessageBox>
 #include <QApplication>
 #include <itkContinuousIndex.h>
-#include "CG/glwidget.h"
+#if QT_VERSION >= 0x050000
+#include "CG/glwidget-qt5.h"
+#else
+#include "CG/glwidget-qt4.h"
+#endif
 #include "vectormath/scalar/vectormath.h"
+
 typedef Vectormath::Scalar::Vector3 sVector3;
 
 template <typename T> void calculate_uvt(
@@ -172,14 +177,24 @@ void ContourUtils::generate_roi_vbos(
 				if (gl)
 				{
 					gl->makeCurrent();
+#if QT_VERSION >= 0x050000
 					gl->glGenVertexArrays(1, &(c->vaoid));
 					gl->glBindVertexArray(c->vaoid);
 					gl->glGenBuffers(1, &(c->vboid));
-					GLWidget::increment_count_vbos(1);
 					gl->glBindBuffer(GL_ARRAY_BUFFER, c->vboid);
 					gl->glBufferData(GL_ARRAY_BUFFER, s*sizeof(GLfloat), v, GL_STATIC_DRAW);
 					gl->glVertexAttribPointer(gl->frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
 					gl->glEnableVertexAttribArray(gl->frame_shader.position_handle);
+#else
+					glGenVertexArrays(1, &(c->vaoid));
+					glBindVertexArray(c->vaoid);
+					glGenBuffers(1, &(c->vboid));
+					glBindBuffer(GL_ARRAY_BUFFER, c->vboid);
+					glBufferData(GL_ARRAY_BUFFER, s*sizeof(GLfloat), v, GL_STATIC_DRAW);
+					glVertexAttribPointer(gl->frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
+					glEnableVertexAttribArray(gl->frame_shader.position_handle);
+#endif
+					GLWidget::increment_count_vbos(1);
 					delete [] v;
 					c->vao_initialized = true;
 				}

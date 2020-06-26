@@ -1,5 +1,9 @@
 #include "structures.h"
-#include "CG/glwidget.h"
+#if QT_VERSION >= 0x050000
+#include "CG/glwidget-qt5.h"
+#else
+#include "CG/glwidget-qt4.h"
+#endif
 #include "commonutils.h"
 #include <climits>
 
@@ -86,7 +90,11 @@ void DisplayInterface::close(bool clear_geometry)
 	{
 		if (opengl_ok)
 		{
+#if QT_VERSION >= 0x050000
 			gl->glDeleteTextures(1, &cube_3dtex);
+#else
+			glDeleteTextures(1, &cube_3dtex);
+#endif
 			GLWidget::increment_count_tex(-1);
 		}
 		cube_3dtex =  0;
@@ -116,26 +124,47 @@ void DisplayInterface::close(bool clear_geometry)
 			{
 				if (spectroscopy_slices.at(x)->fvaoid > 0)
 				{
+#if QT_VERSION >= 0x050000
 					gl->glDeleteVertexArrays(
 						1, &(spectroscopy_slices[x]->fvaoid));
 					gl->glDeleteBuffers(
 						1, &(spectroscopy_slices[x]->fvboid));
+#else
+					glDeleteVertexArrays(
+						1, &(spectroscopy_slices[x]->fvaoid));
+					glDeleteBuffers(
+						1, &(spectroscopy_slices[x]->fvboid));
+#endif
 					GLWidget::increment_count_vbos(-1);
 				}
 				if (spectroscopy_slices.at(x)->lvaoid > 0)
 				{
+#if QT_VERSION >= 0x050000
 					gl->glDeleteVertexArrays(
 						1, &(spectroscopy_slices[x]->lvaoid));
 					gl->glDeleteBuffers(
 						1, &(spectroscopy_slices[x]->lvboid));
+#else
+					glDeleteVertexArrays(
+						1, &(spectroscopy_slices[x]->lvaoid));
+					glDeleteBuffers(
+						1, &(spectroscopy_slices[x]->lvboid));
+#endif
 					GLWidget::increment_count_vbos(-1);
 				}
 				if (spectroscopy_slices.at(x)->pvboid > 0)
 				{
+#if QT_VERSION >= 0x050000
 					gl->glDeleteVertexArrays(
 						1, &(spectroscopy_slices[x]->pvaoid));
 					gl->glDeleteBuffers(
 						1, &(spectroscopy_slices[x]->pvboid));
+#else
+					glDeleteVertexArrays(
+						1, &(spectroscopy_slices[x]->pvaoid));
+					glDeleteBuffers(
+						1, &(spectroscopy_slices[x]->pvboid));
+#endif
 					GLWidget::increment_count_vbos(-1);
 				}
 			}
@@ -151,7 +180,11 @@ void DisplayInterface::close(bool clear_geometry)
 	{
 		if (opengl_ok)
 		{
+#if QT_VERSION >= 0x050000
 			gl->glDeleteBuffers(1, &spect_vol_vbo);
+#else
+			glDeleteBuffers(1, &spect_vol_vbo);
+#endif
 			GLWidget::increment_count_vbos(-1);
 		}
 		spect_vol_vbo = 0;
@@ -179,8 +212,13 @@ void DisplayInterface::close(bool clear_geometry)
 				c->ref_sop_instance_uids.clear();
 				if (opengl_ok && c->vao_initialized)
 				{
+#if QT_VERSION >= 0x050000
 					gl->glDeleteVertexArrays(1, &(c->vaoid));
 					gl->glDeleteBuffers(1, &(c->vboid));
+#else
+					glDeleteVertexArrays(1, &(c->vaoid));
+					glDeleteBuffers(1, &(c->vboid));
+#endif
 					GLWidget::increment_count_vbos(-1);
 				}
 				delete c;
@@ -205,7 +243,11 @@ void DisplayInterface::close(bool clear_geometry)
 			gl->glDeleteVertexArrays(1, &(trimesh->qmesh->vaoid));
 			if (trimesh->qmesh->vboid)
 			{
+#if QT_VERSION >= 0x050000
 				gl->glDeleteBuffers(2, trimesh->qmesh->vboid);
+#else
+				glDeleteBuffers(2, trimesh->qmesh->vboid);
+#endif
 				GLWidget::increment_count_vbos(-2);
 			}
 			delete trimesh->qmesh;
@@ -222,10 +264,10 @@ void DisplayInterface::close(bool clear_geometry)
 	from_slice = 0; to_slice = (idimz > 0) ? idimz-1 : 0;
 quit__:
 #ifdef ALWAYS_SHOW_GL_ERROR
-	if (opengl_ok)
+	if (opengl_ok && gl)
 		GLWidget::checkGLerror(" DisplayInterface::close()\n");
 #endif
-	if (gl) gl->doneCurrent();
+	return;
 }
 
 ImageVariant::ImageVariant(

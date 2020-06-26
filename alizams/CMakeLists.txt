@@ -7,6 +7,8 @@ set(CMAKE_CXX_STANDARD 11)
 
 ####################################################################
 #
+# set USE_QT_V_5
+# set USE_LOCAL_GLEW TRUE (only for Qt4)
 #
 # set USE_WORKSTATION_MODE (access CTK SQLite database)
 #
@@ -14,6 +16,8 @@ set(CMAKE_CXX_STANDARD 11)
 #
 #
 ####################################################################
+set(USE_QT_V_5 TRUE)
+set(USE_LOCAL_GLEW TRUE)
 set(USE_WORKSTATION_MODE TRUE)
 set(USE_GLVND FALSE)
 
@@ -28,9 +32,11 @@ if(NOT WIN32)
   endif()
 endif()
 
-if(WIN32)
-  if(POLICY CMP0020)
-    CMAKE_POLICY(SET CMP0020 NEW)
+if(USE_QT_V_5)
+  if(WIN32)
+    if(POLICY CMP0020)
+      CMAKE_POLICY(SET CMP0020 NEW)
+    endif()
   endif()
 endif()
 
@@ -47,12 +53,30 @@ include(${ITK_USE_FILE})
 find_package(MDCM REQUIRED)
 include(${MDCM_USE_FILE})
 
-find_package(Qt5Core REQUIRED)
-find_package(Qt5Gui REQUIRED)
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5Svg REQUIRED)
-if(USE_WORKSTATION_MODE)
-  find_package(Qt5Sql REQUIRED)
+if(USE_QT_V_5)
+  find_package(Qt5Core REQUIRED)
+  find_package(Qt5Gui REQUIRED)
+  find_package(Qt5Widgets REQUIRED)
+  find_package(Qt5Svg REQUIRED)
+  if(USE_WORKSTATION_MODE)
+    find_package(Qt5Sql REQUIRED)
+  endif()
+else()
+  find_package(Qt4 REQUIRED)
+  set(QT_USE_QTMAIN TRUE)
+  set(QT_USE_QTGUI TRUE)
+  set(QT_USE_QTOPENGL TRUE)
+  set(QT_USE_QTSVG TRUE)
+  if(USE_WORKSTATION_MODE)
+    set(QT_USE_QTSQL TRUE)
+  endif()
+  include(${QT_USE_FILE})
+  if(USE_LOCAL_GLEW)
+    set(LOCAL_GLEW_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CG/glew")
+    add_definitions(-DGLEW_STATIC)
+  else()
+    set(LOCAL_GLEW_PATH "")
+  endif()
 endif()
 
 add_definitions(${QT_DEFINITIONS})
@@ -214,6 +238,12 @@ if(USE_WORKSTATION_MODE)
   set(ALIZAMS_SRCS ${ALIZAMS_SRCS} browser/ctkdialog.cpp)
 endif()
 
+if(NOT USE_QT_V_5)
+  if(USE_LOCAL_GLEW)
+    set(ALIZAMS_SRCS ${ALIZAMS_SRCS} "${LOCAL_GLEW_PATH}/src/glew.c")
+  endif()
+endif()
+
 if(WIN32)
   set(ALIZAMS_SRCS ${ALIZAMS_SRCS} alizams.rc)
 endif()
@@ -222,7 +252,6 @@ set(ALIZAMS_QRCS alizams.qrc)
 
 set(ALIZAMS_MOC_HRDS
   GUI/mainwindow.h
-  CG/glwidget.h
   browser/sqtree.h
   browser/browserwidget2.h
   GUI/findrefdialog.h
@@ -244,6 +273,12 @@ set(ALIZAMS_MOC_HRDS
   GUI/zoomwidget.h
   GUI/aboutwidget.h
   GUI/aliza.h)
+
+if(USE_QT_V_5)
+  set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} CG/glwidget-qt5.h)
+else()
+  set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} CG/glwidget-qt4.h)
+endif()
 
 if(USE_WORKSTATION_MODE)
   set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} browser/ctkdialog.h)
@@ -297,20 +332,32 @@ if(NOT WIN32)
 endif()
 set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} ${ITK_LIBRARIES})
 
-QT5_WRAP_CPP(ALIZAMS_MOC_SRCS ${ALIZAMS_MOC_HRDS})
-QT5_WRAP_UI(ALIZAMS_UI ${ALIZAMS_UIS})
-QT5_ADD_RESOURCES(ALIZAMS_QRCS_RCC ${ALIZAMS_QRCS})
-set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES}
-  Qt5::Core
-  Qt5::Gui
-  Qt5::Widgets
-  Qt5::Svg)
-if(USE_WORKSTATION_MODE)
-  set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} Qt5::Sql)
+if(USE_QT_V_5)
+  QT5_WRAP_CPP(ALIZAMS_MOC_SRCS ${ALIZAMS_MOC_HRDS})
+  QT5_WRAP_UI(ALIZAMS_UI ${ALIZAMS_UIS})
+  QT5_ADD_RESOURCES(ALIZAMS_QRCS_RCC ${ALIZAMS_QRCS})
+  set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES}
+    Qt5::Core
+    Qt5::Gui
+    Qt5::Widgets
+    Qt5::Svg)
+  if(USE_WORKSTATION_MODE)
+    set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} Qt5::Sql)
+  endif()
+else()
+  QT4_WRAP_CPP(ALIZAMS_MOC_SRCS ${ALIZAMS_MOC_HRDS})
+  QT4_WRAP_UI(ALIZAMS_UI ${ALIZAMS_UIS})
+  QT4_ADD_RESOURCES(ALIZAMS_QRCS_RCC ${ALIZAMS_QRCS})
+  set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} ${QT_LIBRARIES})
 endif()
 
 if(WIN32)
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} opengl32)
+  if(NOT USE_QT_V_5)
+    if(NOT USE_LOCAL_GLEW)
+      set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} glew32)
+    endif()
+  endif()
   add_executable(alizams WIN32
     ${ALIZAMS_SRCS}
     ${ALIZAMS_MOC_SRCS}
@@ -322,6 +369,9 @@ else()
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} OpenGL GLX)
   else()
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GL)
+  endif()
+  if(NOT USE_QT_V_5 AND NOT USE_LOCAL_GLEW)
+      set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GLEW)
   endif()
   add_executable(alizams
     ${ALIZAMS_SRCS}
