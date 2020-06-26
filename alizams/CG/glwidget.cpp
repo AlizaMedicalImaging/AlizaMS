@@ -4,6 +4,7 @@
 #include <QSurfaceFormat>
 #include "glwidget-qt5.h"
 #else
+#include <QGLContext>
 #include "glwidget-qt4.h"
 #endif
 #include <QApplication>
@@ -180,14 +181,7 @@ struct  MyClosestRayResultCallback0 : public btCollisionWorld::ClosestRayResultC
 
 #if QT_VERSION >= 0x050000
 GLWidget::GLWidget(QWidget * p, Qt::WindowFlags f) : QOpenGLWidget(p, f)
-#else
-GLWidget::GLWidget(
-	const QGLFormat & frm,
-	QWidget * p,
-	const QGLWidget * s, Qt::WindowFlags f) : QGLWidget(frm,p,s,f)
-#endif
 {
-#if QT_VERSION >= 0x050000
 #if 0
 	QSurfaceFormat format;
 	format.setRenderableType(QSurfaceFormat::OpenGL);
@@ -205,11 +199,25 @@ GLWidget::GLWidget(
 	//format.setSamples(4);
 	setFormat(format);
 #endif
-#endif
 	setMinimumSize(64,64);
 	setFocusPolicy(Qt::WheelFocus);
 	init_();
 }
+#else
+GLWidget::GLWidget(QWidget * p) : QGLWidget(p)
+{
+	setMinimumSize(64,64);
+	setFocusPolicy(Qt::WheelFocus);
+	init_();
+}
+
+GLWidget::GLWidget(const QGLFormat & frm, QWidget * p) : QGLWidget(frm,p)
+{
+	setMinimumSize(64,64);
+	setFocusPolicy(Qt::WheelFocus);
+	init_();
+}
+#endif
 
 void GLWidget::initializeGL()
 {
@@ -311,6 +319,34 @@ void GLWidget::initializeGL()
 		}
 	}
 #endif
+#else
+	const QGLContext * c = context();
+	if (!c->isValid())
+	{
+		std::cout << "GLContext is invalid" << std::endl;
+		return;
+	}
+#if 0
+	QGLFormat f = c->format();
+	const int profile = (int)f.profile();
+	switch (profile)
+	{
+	case 0:
+		std::cout << "QGLFormat::NoProfile" << std::endl;
+		break;
+	case 1:
+		std::cout << "QGLFormat::CoreProfile" << std::endl;
+		break;
+	case 2:
+		std::cout << "QGLFormat::CompatibilityProfile" << std::endl;
+		break;
+	default:
+		std::cout << "OpenGL profile ??" << std::endl;
+		break;
+	}
+	std::cout << "Direct rendering " << f.directRendering() << std::endl;
+	std::cout << "Depth " << f.depthBufferSize() << std::endl;
+#endif
 #endif
 	update_clear_color();
 	if (!opengl_init_done)
@@ -319,7 +355,7 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
-	paint();
+	paint__();
 }
 
 void GLWidget::resizeGL(int width, int height)
@@ -1635,23 +1671,23 @@ void GLWidget::draw_3d_tex1(
 	const float * v,
 	const float * t)
 {
+	glBindVertexArray(*vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
 	glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(float), v, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
 	glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(float), t, GL_DYNAMIC_DRAW);
-	glBindVertexArray(*vao);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 void GLWidget::draw_frame2(const GLfloat * v)
 {
+	glBindVertexArray(frames_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, frames_vbo);
 	glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), v, GL_DYNAMIC_DRAW);
-	glBindVertexArray(frames_vao);
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
 }
 
-void GLWidget::paint()
+void GLWidget::paint__()
 {
 	static unsigned long int count = 0;
 
@@ -1678,7 +1714,7 @@ void GLWidget::paint()
 	}
 
 #ifdef ALWAYS_SHOW_GL_ERROR
-	checkGLerror(" GLWidget::paint()\n");
+	checkGLerror(" GLWidget::paint__()\n");
 #endif
 }
 
@@ -2460,9 +2496,9 @@ void GLWidget::paint_volume()
 				glPointSize(3.0f);
 				if (iii == 0)
 					glUniform4f(frame_shader.location_K, 0.85f, 0.85f, 0.85f, 1.0f);
+				glBindVertexArray(origin_vao);
 				glBindBuffer(GL_ARRAY_BUFFER, origin_vbo);
 				glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat), di->origin, GL_DYNAMIC_DRAW);
-				glBindVertexArray(origin_vao);
 				glDrawArrays(GL_POINTS, 0, 1);
 			}
 		}
@@ -3162,7 +3198,11 @@ void GLWidget::render_orient_cube1(
 		GL_DEPTH_ATTACHMENT,
 		GL_TEXTURE_2D, cube_depth,
 		0);
+#if 1
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+#else
+	glClearColor(0.0f, 0.0f, 1.0f, 0.5f);
+#endif
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
@@ -3267,7 +3307,11 @@ void GLWidget::render_orient_cube1(
 #else
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #endif
+#if 1
 	glClearColor(clear_color_r, clear_color_g, clear_color_b, 1.0f);
+#else
+	glClearColor(0.7f, 0.6f, 0.3f, 0.5f);
+#endif
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_CULL_FACE);
 }

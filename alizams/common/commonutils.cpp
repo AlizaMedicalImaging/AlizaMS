@@ -565,12 +565,20 @@ template<typename T> int generate_tex3d(
 	qApp->processEvents();
 	//
 	gl->makeCurrent();
+#if 0
+	if (!gl->isValid())
+	{
+		std::cout << "gl->isValid()=" << std::endl;
+	}
+#endif
 	glerror__ = glGetError();
 #if 0
 	if (glerror__ != 0)
+	{
 		std::cout
 			<< "warning : OpenGL error (before texture generation)\n"
 			<< glerror__ << std::endl;
+	}
 #endif
 #if QT_VERSION >= 0x050000
 	gl->glGenTextures(1, &(ivariant->di->cube_3dtex));

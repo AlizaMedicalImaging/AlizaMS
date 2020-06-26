@@ -151,7 +151,7 @@ public:
 	btVector3 get_ray_to(float x, float y);
 	btVector3 get_ray_from(float x, float y);
 	void  init_opengl(int,int);
-	void  paint();
+	void  paint__();
 	void  paint_volume();
 	void  paint_raycaster();
 	void  resize__(int, int);

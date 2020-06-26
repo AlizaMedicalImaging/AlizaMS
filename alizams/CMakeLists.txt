@@ -12,25 +12,11 @@ set(CMAKE_CXX_STANDARD 11)
 #
 # set USE_WORKSTATION_MODE (access CTK SQLite database)
 #
-# set USE_GLVND
-#
 #
 ####################################################################
 set(USE_QT_V_5 TRUE)
 set(USE_LOCAL_GLEW TRUE)
 set(USE_WORKSTATION_MODE TRUE)
-set(USE_GLVND FALSE)
-
-if(NOT WIN32)
-  if(POLICY CMP0072)
-    CMAKE_POLICY(SET CMP0072 NEW)
-    if (USE_GLVND)
-      set(OpenGL_GL_PREFERENCE "GLVND")
-    else()
-      set(OpenGL_GL_PREFERENCE "LEGACY")
-    endif()
-  endif()
-endif()
 
 if(USE_QT_V_5)
   if(WIN32)
@@ -363,11 +349,7 @@ if(WIN32)
     ${ALIZAMS_QRCS_RCC})
   target_link_libraries(alizams ${ALIZAMS_LINK_LIBRARIES})
 else()
-  if (USE_GLVND)
-    set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} OpenGL GLX)
-  else()
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GL)
-  endif()
   if(NOT USE_QT_V_5 AND NOT USE_LOCAL_GLEW)
       set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GLEW)
   endif()

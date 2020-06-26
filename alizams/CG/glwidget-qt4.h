@@ -106,11 +106,8 @@ public:
 
 	MY_DECLARE_NEW()
 
-	GLWidget(
-		const QGLFormat&,
-		QWidget(*)=NULL,
-		const QGLWidget(*)=NULL,
-		Qt::WindowFlags=0);
+	GLWidget(QWidget(*)=NULL);
+	GLWidget(const QGLFormat&, QWidget(*)=NULL);
 	~GLWidget();
 	void init_();
 	void close_();
@@ -143,7 +140,7 @@ public:
 	btVector3 get_ray_to(float x, float y);
 	btVector3 get_ray_from(float x, float y);
 	void  init_opengl(int,int);
-	void  paint();
+	void  paint__();
 	void  paint_volume();
 	void  paint_raycaster();
 	void  resize__(int, int);

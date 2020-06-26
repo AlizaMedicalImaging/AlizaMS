@@ -241,7 +241,7 @@ MainWindow::MainWindow(
 	if (ok3d)
 	{
 #if QT_VERSION >= 0x050000
-		glwidget = new GLWidget(this);
+		glwidget = new GLWidget();
 #else
 		QGLFormat fmt;
 		fmt.setDirectRendering(true);
@@ -256,7 +256,7 @@ MainWindow::MainWindow(
 		fmt.setAlphaBufferSize(8);
 		fmt.setDepth(true);
 		fmt.setDepthBufferSize(24);
-		glwidget = new GLWidget(fmt, this);
+		glwidget = new GLWidget(fmt);
 #endif
 		QVBoxLayout * vl2 = new QVBoxLayout(gl_frame);
 		vl2->setContentsMargins(0,0,0,0);
