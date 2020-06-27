@@ -6517,7 +6517,7 @@ QString DicomUtils::read_series(
 				ivariant->di->us_window_center = levels_.at(0);
 			ivariant->di->default_us_window_width  =
 				ivariant->di->us_window_width = windows_.at(0);
-			ivariant->di->lut_function = windows_.at(0);
+			ivariant->di->lut_function = luts_.at(0);
 		}
 		else if (levels_size > 1)
 		{

@@ -1459,6 +1459,7 @@ void Aliza::update_toolbox(const ImageVariant * v)
 		toolbox2D->width_horizontalSlider->setValue(
 			static_cast<int>(v->di->us_window_width));
 	}
+	// FIXME
 	if (v->di->lut_function == 2)
 	{
 		toolbox2D->set_lut_function(1);
@@ -1469,6 +1470,7 @@ void Aliza::update_toolbox(const ImageVariant * v)
 		toolbox2D->set_lut_function(0);
 		set_lut_function0(0);
 	}
+	//
 	const int tmpx = ((v->di->idimx-1) <0) ? 0 : (v->di->idimx-1);
 	const int tmpy = ((v->di->idimy-1) <0) ? 0 : (v->di->idimy-1);
 	const int tmpz = ((v->di->idimz-1) <0) ? 0 : (v->di->idimz-1);
