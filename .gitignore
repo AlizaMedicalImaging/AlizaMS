@@ -1,3 +1,4 @@
 *.swp
 alizams/tags
 alizams/update_tags.sh
+*.bak
