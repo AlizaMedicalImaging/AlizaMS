@@ -1387,21 +1387,13 @@ void BrowserWidget2::readSettings()
 		QDir::toNativeSeparators(
 			QString(".") +
 			QDir::separator() +
-			QString("datasets") +
-			QDir::separator() +
-			QString("DICOM"));
-#elif (defined __FreeBSD__)
-	const QString d =
-		QDir::toNativeSeparators(
-			QString(".") +
-			QDir::separator() +
-			QString("datasets") +
-			QDir::separator() +
 			QString("DICOM"));
 #else
 	const QString d =
 		QDir::toNativeSeparators(
-			QString("/usr/share/aliza/datasets/DICOM"));
+			QApplication::applicationDirPath() +
+			QDir::separator() + QString("..") + QDir::separator() +
+			QString("DICOM"));
 #endif
 	settings.beginGroup(QString("BrowserWidget2"));
 	directory_lineEdit->setText(settings.value(QString("saved_user_dir"), d).toString());
@@ -1419,7 +1411,9 @@ void BrowserWidget2::readSettings()
 	{
 		const QString f1_ = QDir::toNativeSeparators(
 			QApplication::applicationDirPath() +
+#ifndef _WIN32
 			QDir::separator() + QString("..") +
+#endif
 			QDir::separator() + QString("DICOMDIR"));
 		QFileInfo fi1 = QFileInfo(f1_);
 		if (fi1.exists() && fi1.isFile())
@@ -1430,7 +1424,9 @@ void BrowserWidget2::readSettings()
 		{
 			const QString f2_ = QDir::toNativeSeparators(
 				QApplication::applicationDirPath() +
+#ifndef _WIN32
 				QDir::separator() + QString("..") +
+#endif
 				QDir::separator() + QString("DICOM"));
 				QFileInfo fi2 = QFileInfo(f2_);
 			if (fi2.exists() && fi2.isDir())
