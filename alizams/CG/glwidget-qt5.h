@@ -1,16 +1,17 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
-#include <QtGlobal>
+//#define USE_SET_GL_FORMAT
+// USE_SET_FORMAT is required for USE_CORE_3_2_PROFILE
+//#define USE_CORE_3_2_PROFILE
 
-//#define USE_CORE_3_2_FUNCTIONS
+#include <QtGlobal>
 #include <QOpenGLWidget>
-#ifdef USE_CORE_3_2_FUNCTIONS
+#ifdef USE_CORE_3_2_PROFILE
 #include <QOpenGLFunctions_3_2_Core>
 #else
 #include <QOpenGLFunctions_3_0>
 #endif
-
 #include "camera.h"
 #include <QPoint>
 #include <QModelIndex>
@@ -104,7 +105,7 @@ public:
 	qMeshData		  * mesh_data;
 } ALIGN16_POST;
 
-#ifdef USE_CORE_3_2_FUNCTIONS
+#ifdef USE_CORE_3_2_PROFILE
 ALIGN16_PRE class GLWidget : public QOpenGLWidget, public QOpenGLFunctions_3_2_Core
 #else
 ALIGN16_PRE class GLWidget : public QOpenGLWidget, public QOpenGLFunctions_3_0

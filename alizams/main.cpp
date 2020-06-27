@@ -176,6 +176,8 @@ int main(int argc, char *argv[])
 	if (!metadata_only)
 	{
 		QSurfaceFormat format;
+#ifdef USE_CORE_3_2_PROFILE
+#endif
 		QSurfaceFormat::setDefaultFormat(format);
 	}
 #endif

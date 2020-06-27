@@ -1,6 +1,8 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
+//#define USE_CORE_3_2_PROFILE
+
 #include <QtGlobal>
 #include "CG/glew/include/GL/glew.h"
 #include <QGLWidget>

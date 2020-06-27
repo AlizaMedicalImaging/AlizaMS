@@ -244,11 +244,14 @@ MainWindow::MainWindow(
 		glwidget = new GLWidget();
 #else
 		QGLFormat fmt;
+#ifdef USE_CORE_3_2_PROFILE
+		fmt.setVersion(3, 2);
+		fmt.setProfile(QGLFormat::CoreProfile);
+#endif
 		fmt.setDirectRendering(true);
 		fmt.setSampleBuffers(true);
 		fmt.setSamples(4);
 		fmt.setDoubleBuffer(true);
-		fmt.setRgba(true);
 		fmt.setAlpha(true);
 		fmt.setRedBufferSize(8);
 		fmt.setGreenBufferSize(8);

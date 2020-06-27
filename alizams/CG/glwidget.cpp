@@ -182,10 +182,10 @@ struct  MyClosestRayResultCallback0 : public btCollisionWorld::ClosestRayResultC
 #if QT_VERSION >= 0x050000
 GLWidget::GLWidget(QWidget * p, Qt::WindowFlags f) : QOpenGLWidget(p, f)
 {
-#if 0
+#ifdef USE_SET_GL_FORMAT
 	QSurfaceFormat format;
 	format.setRenderableType(QSurfaceFormat::OpenGL);
-#if 0
+#ifdef USE_CORE_3_2_PROFILE
 	format.setVersion(3, 2);
 	format.setProfile(QSurfaceFormat::CoreProfile);
 #endif
@@ -203,6 +203,7 @@ GLWidget::GLWidget(QWidget * p, Qt::WindowFlags f) : QOpenGLWidget(p, f)
 	setFocusPolicy(Qt::WheelFocus);
 	init_();
 }
+
 #else
 
 GLWidget::GLWidget(QWidget * p) : QGLWidget(p)
@@ -224,8 +225,7 @@ void GLWidget::initializeGL()
 {
 #if QT_VERSION >= 0x050000
 	initializeOpenGLFunctions();
-#if 1
-#if 1
+#if 0
 	const QSurfaceFormat & f = format();
 	std::cout << "Major " << f.majorVersion() << std::endl;
 	std::cout << "Minor " << f.minorVersion() << std::endl;
@@ -307,7 +307,7 @@ void GLWidget::initializeGL()
 		}
 		else
 		{
-#ifdef USE_CORE_3_2_FUNCTIONS
+#ifdef USE_CORE_3_2_PROFILE
 			QOpenGLFunctions_3_2_Core * funcs = c->versionFunctions<QOpenGLFunctions_3_2_Core>();
 #else
 			QOpenGLFunctions_3_0 * funcs = c->versionFunctions<QOpenGLFunctions_3_0>();
@@ -319,7 +319,6 @@ void GLWidget::initializeGL()
 			}
 		}
 	}
-#endif
 #else
 	const QGLContext * c = context();
 	if (!c->isValid())
