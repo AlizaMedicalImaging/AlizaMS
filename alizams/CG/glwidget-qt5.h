@@ -2,8 +2,10 @@
 #define GLWIDGET_H
 
 //#define USE_SET_GL_FORMAT
-// USE_SET_FORMAT is required for USE_CORE_3_2_PROFILE
+#ifdef USE_SET_GL_FORMAT
+//#define USE_SET_DEFAULT_GL_FORMAT
 //#define USE_CORE_3_2_PROFILE
+#endif
 
 #include <QtGlobal>
 #include <QOpenGLWidget>

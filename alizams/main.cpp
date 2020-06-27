@@ -172,12 +172,23 @@ int main(int argc, char *argv[])
 	QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
 #endif
 	QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
-#if 0
+#ifdef USE_SET_DEFAULT_GL_FORMAT
 	if (!metadata_only)
 	{
 		QSurfaceFormat format;
+		format.setRenderableType(QSurfaceFormat::OpenGL);
 #ifdef USE_CORE_3_2_PROFILE
+		//format.setVersion(3, 2); // may be required sometimes, e.g. Intel on Linux
+		format.setProfile(QSurfaceFormat::CoreProfile);
 #endif
+		format.setRedBufferSize(8);
+		format.setGreenBufferSize(8);
+		format.setBlueBufferSize(8);
+		format.setAlphaBufferSize(8);
+		format.setDepthBufferSize(24);
+		//format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+		//format.setSwapInterval(0);
+		//format.setSamples(4);
 		QSurfaceFormat::setDefaultFormat(format);
 	}
 #endif

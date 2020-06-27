@@ -243,9 +243,10 @@ MainWindow::MainWindow(
 #if QT_VERSION >= 0x050000
 		glwidget = new GLWidget();
 #else
+#ifdef USE_SET_GL_FORMAT
 		QGLFormat fmt;
 #ifdef USE_CORE_3_2_PROFILE
-		fmt.setVersion(3, 2);
+		//fmt.setVersion(3, 2); // may be required sometimes, e.g. Intel on Linux
 		fmt.setProfile(QGLFormat::CoreProfile);
 #endif
 		fmt.setDirectRendering(true);
@@ -260,6 +261,9 @@ MainWindow::MainWindow(
 		fmt.setDepth(true);
 		fmt.setDepthBufferSize(24);
 		glwidget = new GLWidget(fmt);
+#else
+		glwidget = new GLWidget();
+#endif
 #endif
 		QVBoxLayout * vl2 = new QVBoxLayout(gl_frame);
 		vl2->setContentsMargins(0,0,0,0);

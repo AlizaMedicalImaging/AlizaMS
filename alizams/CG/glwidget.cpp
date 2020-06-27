@@ -183,10 +183,11 @@ struct  MyClosestRayResultCallback0 : public btCollisionWorld::ClosestRayResultC
 GLWidget::GLWidget(QWidget * p, Qt::WindowFlags f) : QOpenGLWidget(p, f)
 {
 #ifdef USE_SET_GL_FORMAT
+#ifndef USE_SET_DEFAULT_GL_FORMAT
 	QSurfaceFormat format;
 	format.setRenderableType(QSurfaceFormat::OpenGL);
 #ifdef USE_CORE_3_2_PROFILE
-	format.setVersion(3, 2);
+	//format.setVersion(3, 2); // may be required sometimes, e.g. Intel on Linux
 	format.setProfile(QSurfaceFormat::CoreProfile);
 #endif
 	format.setRedBufferSize(8);
@@ -194,18 +195,17 @@ GLWidget::GLWidget(QWidget * p, Qt::WindowFlags f) : QOpenGLWidget(p, f)
 	format.setBlueBufferSize(8);
 	format.setAlphaBufferSize(8);
 	format.setDepthBufferSize(24);
-	format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-	format.setSwapInterval(0);
+	//format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+	//format.setSwapInterval(0);
 	//format.setSamples(4);
 	setFormat(format);
+#endif
 #endif
 	setMinimumSize(64,64);
 	setFocusPolicy(Qt::WheelFocus);
 	init_();
 }
-
 #else
-
 GLWidget::GLWidget(QWidget * p) : QGLWidget(p)
 {
 	setMinimumSize(64,64);
@@ -319,7 +319,7 @@ void GLWidget::initializeGL()
 			}
 		}
 	}
-#else
+#else // Qt4
 	const QGLContext * c = context();
 	if (!c->isValid())
 	{
