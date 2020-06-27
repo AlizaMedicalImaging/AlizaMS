@@ -364,9 +364,6 @@ public:
 		const unsigned int*, const int,
 		GLenum=GL_STATIC_DRAW,
 		float=1.0f);
-	void generate_point_vbo(
-		GLuint*, GLuint*,
-		const float, const float, const float);
 	void generate_screen_quad(GLuint*, GLuint*, GLuint*);
 	void free_fbos0(
 		GLuint * framebuffer,

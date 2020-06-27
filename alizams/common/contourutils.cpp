@@ -185,6 +185,7 @@ void ContourUtils::generate_roi_vbos(
 					gl->glBufferData(GL_ARRAY_BUFFER, s*sizeof(GLfloat), v, GL_STATIC_DRAW);
 					gl->glVertexAttribPointer(gl->frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
 					gl->glEnableVertexAttribArray(gl->frame_shader.position_handle);
+					gl->glBindVertexArray(0);
 #else
 					glGenVertexArrays(1, &(c->vaoid));
 					glBindVertexArray(c->vaoid);
@@ -193,6 +194,7 @@ void ContourUtils::generate_roi_vbos(
 					glBufferData(GL_ARRAY_BUFFER, s*sizeof(GLfloat), v, GL_STATIC_DRAW);
 					glVertexAttribPointer(gl->frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
 					glEnableVertexAttribArray(gl->frame_shader.position_handle);
+					glBindVertexArray(0);
 #endif
 					GLWidget::increment_count_vbos(1);
 					delete [] v;

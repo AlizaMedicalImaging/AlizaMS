@@ -14,7 +14,7 @@ set(CMAKE_CXX_STANDARD 11)
 #
 #
 ####################################################################
-set(USE_QT_V_5 TRUE)
+set(USE_QT_V_5 FALSE)
 set(USE_LOCAL_GLEW TRUE)
 set(USE_WORKSTATION_MODE TRUE)
 

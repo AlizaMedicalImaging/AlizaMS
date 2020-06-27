@@ -204,6 +204,7 @@ GLWidget::GLWidget(QWidget * p, Qt::WindowFlags f) : QOpenGLWidget(p, f)
 	init_();
 }
 #else
+
 GLWidget::GLWidget(QWidget * p) : QGLWidget(p)
 {
 	setMinimumSize(64,64);
@@ -654,6 +655,7 @@ void GLWidget::set_contours_width(float f)
 
 void GLWidget::init_()
 {
+	skip_draw = false;
 	no_opengl3 = true;
 	max_tex_size = 0;
 	max_3d_texture_size = 0;
@@ -1001,10 +1003,8 @@ void GLWidget::init_opengl(int w, int h)
 	glDisable(GL_CULL_FACE);
  	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glViewport(0,0,win_w,win_h);
-	glLineWidth(1.0f);
 	glEnable(GL_LINE_SMOOTH);
-	glActiveTexture(GL_TEXTURE1);
+	glLineWidth(1.0f);
 #if 0
 	GLint max_samples_;
 	glGetIntegerv(GL_MAX_INTEGER_SAMPLES, &max_samples_);
@@ -1320,6 +1320,7 @@ void GLWidget::init_opengl(int w, int h)
 		glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
 		glVertexAttribPointer(frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(frame_shader.position_handle);
+		glBindVertexArray(0);
 		//
 		glGenVertexArrays(1, &origin_vao);
 		glBindVertexArray(origin_vao);
@@ -1329,6 +1330,7 @@ void GLWidget::init_opengl(int w, int h)
 		glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
 		glVertexAttribPointer(frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(frame_shader.position_handle);
+		glBindVertexArray(0);
 		delete [] tmp99;
 	}
 	//
@@ -1689,18 +1691,17 @@ void GLWidget::draw_frame2(const GLfloat * v)
 
 void GLWidget::paint__()
 {
-	static unsigned long int count = 0;
-
+	static unsigned long int count_frames = 0;
 	if (no_opengl3) return;
-
+#if 1
 	glClearColor(clear_color_r, clear_color_g, clear_color_b, 1.0f);
+#else
+	glClearColor(0.0f, 1.0f, 0.0f, 0.5f);
+#endif
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	if (skip_draw) return;
 	if (!selected_images__) return;
-
-	count += 1;
-
+	count_frames += 1;
 	switch(view)
 	{
 	case 0:
@@ -1712,7 +1713,6 @@ void GLWidget::paint__()
 	default:
 		break;
 	}
-
 #ifdef ALWAYS_SHOW_GL_ERROR
 	checkGLerror(" GLWidget::paint__()\n");
 #endif
@@ -2971,8 +2971,6 @@ void GLWidget::paint_volume()
 				}
 			}
 		}
-		glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_3D, 0);
-		glActiveTexture(GL_TEXTURE3); glBindTexture(GL_TEXTURE_1D, 0);
 		//
 		if (!di->hide_orientation)
 		{
@@ -3458,6 +3456,7 @@ void GLWidget::generate_vao1(GLuint * vao, GLuint * vbo, GLuint * attr_v, GLuint
 	glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), t, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(*attr_t, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_t);
+	glBindVertexArray(0);
 	vaoids.push_back(*vao);
 	vboids.push_back(vbo);
 	delete [] v;
@@ -3508,6 +3507,7 @@ void GLWidget::generate_raycastcube0_vao(
 	glBufferData(GL_ARRAY_BUFFER, 30*sizeof(GLfloat), c, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(*attr_c, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_c);
+	glBindVertexArray(0);
 	vaoids.push_back(*vao);
 	vboids.push_back(vbo);
 }
@@ -3544,6 +3544,7 @@ void GLWidget::generate_raycastcube1_vao(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), c, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(*attr_c, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_c);
+	glBindVertexArray(0);
 	vaoids.push_back(*vao);
 	vboids.push_back(vbo);
 }
@@ -3580,6 +3581,7 @@ void GLWidget::generate_raycastcube2_vao(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), c, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(*attr_c, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_c);
+	glBindVertexArray(0);
 	vaoids.push_back(*vao);
 	vboids.push_back(vbo);
 }
@@ -3624,6 +3626,7 @@ void GLWidget::generate_raycast_shader_vao(
 	glBufferData(GL_ARRAY_BUFFER, 30*sizeof(GLfloat), v0, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(*attr_v, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_v);
+	glBindVertexArray(0);
 	//
 	glGenVertexArrays(1, &(vao[1]));
 	glBindVertexArray(vao[1]);
@@ -3632,6 +3635,7 @@ void GLWidget::generate_raycast_shader_vao(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), v1, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(*attr_v, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_v);
+	glBindVertexArray(0);
 	//
 	glGenVertexArrays(1, &(vao[2]));
 	glBindVertexArray(vao[2]);
@@ -3640,6 +3644,7 @@ void GLWidget::generate_raycast_shader_vao(
 	glBufferData(GL_ARRAY_BUFFER, 12*sizeof(GLfloat), v2, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(*attr_v, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_v);
+	glBindVertexArray(0);
 	//
 	increment_count_vbos(3);
 }
@@ -4150,6 +4155,7 @@ void GLWidget::makeModelVBO_ArraysT(
 		glVertexAttribPointer(*ta_attr, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(*ta_attr);
 	}
+	glBindVertexArray(0);
 
 	increment_count_vbos(count_buffers);
 	vboids.push_back(vboid);
@@ -4160,26 +4166,6 @@ void GLWidget::makeModelVBO_ArraysT(
 	if (textures) delete [] t;
 	if (tangents) delete [] ta;
 }
-
-void GLWidget::generate_point_vbo(
-	GLuint * vbo,
-	GLuint * vao,
-	const float x,
-	const float y,
-	const float z)
-{
-	GLfloat * v = new GLfloat[3];
-	v[0] = x;
-	v[1] = y;
-	v[2] = z;
-	glGenBuffers(1, vbo);
-	increment_count_vbos(1);
-	glBindBuffer(GL_ARRAY_BUFFER, *vbo);
-	glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat), v, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	delete [] v;
-}
-
 
 void GLWidget::generate_screen_quad(GLuint * vbo, GLuint * vao, GLuint * attr)
 {
@@ -4205,19 +4191,20 @@ void GLWidget::generate_screen_quad(GLuint * vbo, GLuint * vao, GLuint * attr)
 //
 //
 //
-	GLfloat quad_v[] = {
+	GLfloat v[] = {
 		-1.0f,  1.0f,   // 0
 		-1.0f, -1.0f,   // 1
-		1.0f,  1.0f,   // 2
-		1.0f, -1.0f }; // 3
+		 1.0f,  1.0f,   // 2
+		 1.0f, -1.0f }; // 3
 	glGenVertexArrays(1, vao);
 	glBindVertexArray(*vao);
 	glGenBuffers(1, vbo);
 	increment_count_vbos(1);
 	glBindBuffer(GL_ARRAY_BUFFER, *vbo);
-	glBufferData(GL_ARRAY_BUFFER, (4*2)*sizeof(GLfloat), quad_v, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, (4*2)*sizeof(GLfloat), v, GL_STATIC_DRAW);
 	glVertexAttribPointer(*attr, 2, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr);
+	glBindVertexArray(0);
 }
 
 void GLWidget::free_fbos0(
