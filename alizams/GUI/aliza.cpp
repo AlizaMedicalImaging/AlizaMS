@@ -2320,8 +2320,7 @@ void Aliza::update_selection2()
 			if (graphicswidget_m->get_mouse_modus() == 2)
 				graphicswidget_m->set_slice_2D(v,1,true);
 			else
-				graphicswidget_m->set_slice_2D(
-					v,1,true);
+				graphicswidget_m->set_slice_2D(v,1,true);
 			if (multiview) graphicswidget_y->set_slice_2D(v, 1, false);
 			if (multiview) graphicswidget_x->set_slice_2D(v, 1, false);
 			update_selection_common1(v);

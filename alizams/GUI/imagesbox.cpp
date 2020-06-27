@@ -160,8 +160,7 @@ ImagesBox::ImagesBox(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
 	QToolBar * toolbar = new QToolBar(this);
 	toolbar->setOrientation(Qt::Horizontal);
 	toolbar->setIconSize(QSize((int)(18*si),(int)(18*si)));
-	toolbar->setSizePolicy(
-		QSizePolicy::Fixed,QSizePolicy::Fixed);
+	toolbar->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
 	if (toolbar->layout())
 	{
 		toolbar->layout()->setContentsMargins(0,0,0,0);
@@ -175,15 +174,16 @@ ImagesBox::ImagesBox(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
 	toolbar->addAction(actionClear);
 	toolbar->addAction(actionClearAll);
 	QWidget * spacer = new QWidget(this);
-	spacer->setSizePolicy(
-		QSizePolicy::Expanding,QSizePolicy::Preferred);
+	spacer->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+#if QT_VERSION < 0x050000
+	spacer->setMinimumSize(96,0);
+#endif
 	toolbar->addWidget(spacer);
 	//
 	QToolBar * toolbar2 = new QToolBar(this);
 	toolbar2->setOrientation(Qt::Horizontal);
 	toolbar2->setIconSize(QSize((int)(18*si),(int)(18*si)));
-	toolbar2->setSizePolicy(
-		QSizePolicy::Fixed,QSizePolicy::Fixed);
+	toolbar2->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
 	toolbar2->setLayoutDirection(Qt::RightToLeft);
 	if (toolbar2->layout())
 	{
@@ -195,8 +195,7 @@ ImagesBox::ImagesBox(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
 	l2->setSpacing(0);
 	l2->addWidget(toolbar2);
 	QWidget * spacer2 = new QWidget(this);
-	spacer2->setSizePolicy(
-		QSizePolicy::Expanding,QSizePolicy::Preferred);
+	spacer2->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
 	toolbar2->addWidget(spacer2);
 	toolbar2->addAction(actionInfo);
 	//

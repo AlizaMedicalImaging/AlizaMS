@@ -146,20 +146,6 @@ bool SettingsWidget::get_vbos_max_65535() const
 
 void SettingsWidget::update_vbos_max_65535(bool t)
 {
-	if (!t && vbos65535warn)
-	{
-		QMessageBox mbox;
-		mbox.setWindowModality(Qt::ApplicationModal);
-		mbox.addButton(QMessageBox::Close);
-		mbox.setIcon(QMessageBox::Warning);
-		mbox.setText(QString(
-			"Some drivers (e.g some Gallium versions)\n"
-			"can crash if number of VBOs exceeds 65535.\n"
-			"Applicable to contours, meshes.\n"
-			"Proprietary drivers (AMD, Nvidia) are OK"));
-		qApp->processEvents();
-		mbox.exec();
-	}	
 	GLWidget::set_max_vbos_65535(t);
 }
 

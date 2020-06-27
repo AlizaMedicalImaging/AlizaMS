@@ -1,3 +1,5 @@
+//#define ALWAYS_SHOW_GL_ERROR
+
 #include "structures.h"
 #if QT_VERSION >= 0x050000
 #include <QOpenGLContext>
@@ -28,7 +30,6 @@
 
 #define FBO_SIZE__0  512
 #define FBO_SIZE__1 1024
-#define ALWAYS_SHOW_GL_ERROR
 
 #ifndef DISABLE_SIMDMATH
 using namespace Vectormath::SSE;
@@ -122,9 +123,7 @@ qMeshData * CollisionObject::get_mesh_data()
 }
 
 static long long GLWidget_count_vbos = 0;
-static long long GLWidget_count_tex  = 0;
 static bool GLWidget_max_vbos_65535  = false;
-static bool GLWidget_max_tex_65535   = false;
 
 static QList<ImageVariant*> * selected_images__ = NULL;
 
@@ -810,13 +809,13 @@ void GLWidget::close_()
 	if (no_opengl3) return;
 	if (!opengl_init_done) return;
 	makeCurrent();
-	if (gradient1>0) {glDeleteTextures(1,&gradient1);gradient1=0;increment_count_tex(-1);}
-	if (gradient2>0) {glDeleteTextures(1,&gradient2);gradient2=0;increment_count_tex(-1);}
-	if (gradient3>0) {glDeleteTextures(1,&gradient3);gradient3=0;increment_count_tex(-1);}
-	if (gradient4>0) {glDeleteTextures(1,&gradient4);gradient4=0;increment_count_tex(-1);}
-	if (gradient5>0) {glDeleteTextures(1,&gradient5);gradient5=0;increment_count_tex(-1);}
-	if (gradient6>0) {glDeleteTextures(1,&gradient6);gradient6=0;increment_count_tex(-1);}
-	if (gradient7>0) {glDeleteTextures(1,&gradient7);gradient7=0;increment_count_tex(-1);}
+	if (gradient1>0) {glDeleteTextures(1,&gradient1);gradient1=0;}
+	if (gradient2>0) {glDeleteTextures(1,&gradient2);gradient2=0;}
+	if (gradient3>0) {glDeleteTextures(1,&gradient3);gradient3=0;}
+	if (gradient4>0) {glDeleteTextures(1,&gradient4);gradient4=0;}
+	if (gradient5>0) {glDeleteTextures(1,&gradient5);gradient5=0;}
+	if (gradient6>0) {glDeleteTextures(1,&gradient6);gradient6=0;}
+	if (gradient7>0) {glDeleteTextures(1,&gradient7);gradient7=0;}
 	for (unsigned int x = 0; x < shaders.size(); x++)
 	{
 		if (shaders.at(x)->program != 0)
@@ -891,7 +890,6 @@ void GLWidget::close_()
 	for (unsigned int x = 0; x < textures.size(); x++)
 	{
 		glDeleteTextures(1, textures[x]);
-		increment_count_tex(-1);
 	}
 	textures.clear();
 	free_fbos0(&framebuffer,    &fbo_tex,      &fbo_depth);
@@ -917,8 +915,6 @@ void GLWidget::close_()
 	std::cout
 		<< "Num VBOs at exit "
 		<< get_count_vbos()
-		<< "\nNum textures at exit "
-		<< get_count_tex()
 		<< std::endl;
 #endif
 }
@@ -2997,7 +2993,6 @@ void GLWidget::gen_lut_tex(const unsigned char * lut, const int size, GLuint * t
 	{
 		glDeleteTextures(1, tex);
 		*tex = 0;
-		increment_count_tex(-1);
 	}
 	glGenTextures(1, tex);
 	glBindTexture(GL_TEXTURE_1D, *tex);
@@ -3015,7 +3010,6 @@ void GLWidget::gen_lut_tex(const unsigned char * lut, const int size, GLuint * t
 	//
 	glBindTexture(GL_TEXTURE_1D, 0);
 	const int glerror = glGetError();
-	increment_count_tex(1);
 	if (glerror!=0)
 	{
 		std::cout
@@ -3402,16 +3396,6 @@ void GLWidget::increment_count_vbos(long long x)
 	GLWidget_count_vbos += x;
 }
 
-long long GLWidget::get_count_tex()
-{
-	return GLWidget_count_tex;
-}
-
-void GLWidget::increment_count_tex(long long x)
-{
-	GLWidget_count_tex += x;
-}
-
 void GLWidget::set_max_vbos_65535(bool t)
 {
 	GLWidget_max_vbos_65535 = t;
@@ -3420,16 +3404,6 @@ void GLWidget::set_max_vbos_65535(bool t)
 bool GLWidget::get_max_vbos_65535()
 {
 	return GLWidget_max_vbos_65535;
-}
-
-void GLWidget::set_max_tex_65535(bool t)
-{
-	GLWidget_max_tex_65535 = t;
-}
-
-bool GLWidget::get_max_tex_65535()
-{
-	return GLWidget_max_tex_65535;
 }
 
 void GLWidget::generate_vao1(GLuint * vao, GLuint * vbo, GLuint * attr_v, GLuint * attr_t)
@@ -3456,6 +3430,7 @@ void GLWidget::generate_vao1(GLuint * vao, GLuint * vbo, GLuint * attr_v, GLuint
 	glVertexAttribPointer(*attr_t, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_t);
 	glBindVertexArray(0);
+	increment_count_vbos(2);
 	vaoids.push_back(*vao);
 	vboids.push_back(vbo);
 	delete [] v;
@@ -4222,7 +4197,6 @@ void GLWidget::free_fbos0(
 	glDeleteFramebuffers(1, framebuffer);
 	glDeleteTextures(1, color_texture);
 	glDeleteTextures(1, depth_texture);
-	increment_count_tex(-2);
 }
 
 bool GLWidget::create_fbos0(
@@ -4275,7 +4249,6 @@ bool GLWidget::create_fbos0(
 #else
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #endif
-	increment_count_tex(2);
 	return ok;
 }
 
@@ -4294,7 +4267,6 @@ void GLWidget::free_fbos1(
 	glDeleteFramebuffers(1, framebuffer);
 	glDeleteTextures(1, color_texture);
 	glDeleteRenderbuffers(1, depth_rb);
-	increment_count_tex(-1);
 }
 
 bool GLWidget::create_fbos1(
@@ -4334,7 +4306,6 @@ bool GLWidget::create_fbos1(
 #else
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #endif
-	increment_count_tex(1);
 	return ok;
 }
 

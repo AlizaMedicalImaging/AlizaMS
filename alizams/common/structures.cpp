@@ -95,7 +95,6 @@ void DisplayInterface::close(bool clear_geometry)
 #else
 			glDeleteTextures(1, &cube_3dtex);
 #endif
-			GLWidget::increment_count_tex(-1);
 		}
 		cube_3dtex =  0;
 	}
@@ -263,7 +262,7 @@ void DisplayInterface::close(bool clear_geometry)
 	up_direction_y = 1.0f;
 	from_slice = 0; to_slice = (idimz > 0) ? idimz-1 : 0;
 quit__:
-#ifdef ALWAYS_SHOW_GL_ERROR
+#if 0
 	if (opengl_ok && gl)
 		GLWidget::checkGLerror(" DisplayInterface::close()\n");
 #endif

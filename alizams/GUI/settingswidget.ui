@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1005</width>
-    <height>763</height>
+    <height>620</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -44,7 +44,7 @@
             <x>0</x>
             <y>0</y>
             <width>991</width>
-            <height>683</height>
+            <height>540</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_14">
@@ -251,6 +251,73 @@
             </widget>
            </item>
            <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_8">
+             <item>
+              <widget class="QDoubleSpinBox" name="pt_doubleSpinBox">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="frame">
+                <bool>true</bool>
+               </property>
+               <property name="buttonSymbols">
+                <enum>QAbstractSpinBox::PlusMinus</enum>
+               </property>
+               <property name="specialValueText">
+                <string/>
+               </property>
+               <property name="suffix">
+                <string> pt</string>
+               </property>
+               <property name="decimals">
+                <number>1</number>
+               </property>
+               <property name="minimum">
+                <double>5.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>50.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.200000000000000</double>
+               </property>
+               <property name="value">
+                <double>12.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>size for application font</string>
+               </property>
+               <property name="textFormat">
+                <enum>Qt::PlainText</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
             <layout class="QHBoxLayout" name="horizontalLayout_2">
              <item>
               <widget class="QLabel" name="si_label">
@@ -303,73 +370,6 @@
             </layout>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_8">
-             <item>
-              <widget class="QLabel" name="label">
-               <property name="text">
-                <string>Font size in points</string>
-               </property>
-               <property name="textFormat">
-                <enum>Qt::PlainText</enum>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QDoubleSpinBox" name="pt_doubleSpinBox">
-               <property name="enabled">
-                <bool>true</bool>
-               </property>
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="frame">
-                <bool>true</bool>
-               </property>
-               <property name="buttonSymbols">
-                <enum>QAbstractSpinBox::PlusMinus</enum>
-               </property>
-               <property name="specialValueText">
-                <string/>
-               </property>
-               <property name="suffix">
-                <string> pt</string>
-               </property>
-               <property name="decimals">
-                <number>1</number>
-               </property>
-               <property name="minimum">
-                <double>1.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>99.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.200000000000000</double>
-               </property>
-               <property name="value">
-                <double>12.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_3">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </item>
-           <item>
             <spacer name="verticalSpacer">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -406,8 +406,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>482</width>
-            <height>244</height>
+            <width>991</width>
+            <height>683</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -654,6 +654,9 @@
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Applicable only to contours!&lt;/span&gt;&lt;/p&gt;&lt;p&gt;To avoid bug with some drivers Gallium versions on Linux.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
               <string>Max OpenGL VBOs 65535</string>
              </property>
@@ -706,8 +709,8 @@
   <tabstop>rescale_checkBox</tabstop>
   <tabstop>scrollArea</tabstop>
   <tabstop>dark_checkBox</tabstop>
-  <tabstop>si_doubleSpinBox</tabstop>
   <tabstop>pt_doubleSpinBox</tabstop>
+  <tabstop>si_doubleSpinBox</tabstop>
   <tabstop>scrollArea_2</tabstop>
   <tabstop>textureoptions_groupBox</tabstop>
   <tabstop>original_radioButton</tabstop>

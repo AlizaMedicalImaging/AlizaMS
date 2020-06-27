@@ -119,12 +119,8 @@ public:
 	void update_clear_color();
 	static long long get_count_vbos();
 	static void increment_count_vbos(long long);
-	static long long get_count_tex();
-	static void increment_count_tex(long long);
 	static void set_max_vbos_65535(bool);
 	static bool get_max_vbos_65535();
-	static void set_max_tex_65535(bool);
-	static bool get_max_tex_65535();
 	bool skip_draw;
 	int  max_tex_size;
 	int  max_3d_texture_size;

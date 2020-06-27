@@ -731,7 +731,6 @@ template<typename T> int generate_tex3d(
 		error__=3;
 		goto quit__;
 	}
-	GLWidget::increment_count_tex(1);
 	if (glerror__ != 0)
 	{
 		std::cout
