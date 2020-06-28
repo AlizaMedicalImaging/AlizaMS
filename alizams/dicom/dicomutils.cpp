@@ -5303,7 +5303,7 @@ QString DicomUtils::read_enhanced(
 	}
 #endif
 	message_ = read_enhanced_3d_6d(
-		&tmp17, ivariants, sop,
+		&tmp17, ivariants, sop, f,
 		data,
 		image_overlays,
 		rows_, columns_, pixelformat, pi,
@@ -5337,7 +5337,7 @@ QString DicomUtils::read_enhanced(
 			std::cout << "  Fallback" << std::endl;
 #endif
 		message_ = read_enhanced_3d_6d(
-			&tmp17, ivariants, sop,
+			&tmp17, ivariants, sop, f,
 			data,
 			image_overlays,
 			rows_, columns_, pixelformat, pi,
@@ -5616,7 +5616,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 	}
 #endif
 	message_ = read_enhanced_3d_6d(
-		&tmp17, ivariants, sop,
+		&tmp17, ivariants, sop, f,
 		data, 
 		image_overlays,
 		rows_, columns_, pixelformat, pi,
@@ -5650,7 +5650,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 			std::cout << "  Fallback" << std::endl;
 #endif
 		message_ = read_enhanced_3d_6d(
-			&tmp17, ivariants, sop,
+			&tmp17, ivariants, sop, f,
 			data,
 			image_overlays,
 			rows_, columns_, pixelformat, pi,
@@ -7764,6 +7764,7 @@ QString DicomUtils::read_enhanced_common(
 	bool * ok,
 	std::vector<ImageVariant*> & ivariants,
 	const QString & sop,
+	const QString & efilename,
 	const std::vector<char*> & data,
 	const ImageOverlays & image_overlays,
 	const unsigned int rows_,
@@ -8564,6 +8565,7 @@ QString DicomUtils::read_enhanced_common(
 				}
 				CommonUtils::reset_bb(ivariant);
 				IconUtils::icon(ivariant);
+				ivariant->filenames = QStringList(efilename);
 				ivariants.push_back(ivariant);
 			}
 			else
@@ -8715,7 +8717,9 @@ bool DicomUtils::enhanced_process_indices(
 }
 
 QString DicomUtils::read_enhanced_3d_6d(
-	bool * ok, std::vector<ImageVariant*> & ivariants, const QString & sop,
+	bool * ok, std::vector<ImageVariant*> & ivariants,
+	const QString & sop,
+	const QString & efilename,
 	const std::vector<char*> & data,
 	const ImageOverlays & image_overlays,
 	const unsigned int rows_, const unsigned int columns_,
@@ -8741,7 +8745,10 @@ QString DicomUtils::read_enhanced_3d_6d(
 		tmp0, idx_values, values,
 		dim6th, dim5th, dim4th, dim3rd);
 	if (*ok)
-		message_ = read_enhanced_common(ok, ivariants, sop,
+		message_ = read_enhanced_common(
+			ok, ivariants,
+			sop,
+			efilename,
 			data,
 			image_overlays,
 			rows_, columns_,
@@ -10878,8 +10885,15 @@ QString DicomUtils::read_dicom(
 				images_tmp,
 				settings,
 				pb);
-			if (ok) { ivariants.push_back(ivariant); }
-			else { delete ivariant; }
+			if (ok)
+			{
+				ivariant->filenames = QStringList(images_tmp);
+				ivariants.push_back(ivariant);
+			}
+			else
+			{
+				delete ivariant;
+			}
 		}
 	}
 	else if (multiseries)
@@ -10939,6 +10953,7 @@ QString DicomUtils::read_dicom(
 					true);
 				if (ok)
 				{
+					ivariant->filenames = QStringList(images_tmp);
 					ivariants.push_back(ivariant);
 				}
 				else
@@ -11103,17 +11118,16 @@ QString DicomUtils::read_dicom(
 								CommonUtils::reload_rgb_rgba(v);
 								if (v->equi)
 								{
-									if (v->di->idimz < 7)
-										v->di->transparency = false;
+									if (v->di->idimz < 7) v->di->transparency = false;
 								}
 								else
 								{
-									if (!v->one_direction)
-										v->di->transparency = false;
+									if (!v->one_direction) v->di->transparency = false;
 									v->di->filtering = 0;
 								}
 								CommonUtils::reset_bb(v);
 								IconUtils::icon(v);
+								v->filenames = QStringList(supp_color_images.at(jjj)->filenames);
 								ivariants.push_back(v);
 								delete supp_grey_images[jjj];
 								supp_grey_images[jjj] = NULL;
@@ -11192,7 +11206,11 @@ QString DicomUtils::read_dicom(
 					pb,
 					tolerance,
 					true);
-				if (ok) { ivariants.push_back(ivariant); }
+				if (ok)
+				{
+					ivariant->filenames = QStringList(images_tmp);
+					ivariants.push_back(ivariant);
+				}
 				else
 				{
 					delete ivariant;
@@ -11235,7 +11253,105 @@ QString DicomUtils::read_dicom(
 					pb,
 					tolerance,
 					true);
-				if (ok) { ivariants.push_back(ivariant); }
+				if (ok)
+				{
+					ivariant->filenames = QStringList(images_tmp);
+					ivariants.push_back(ivariant);
+				}
+				else
+				{
+					delete ivariant;
+				}
+			}
+		}
+	}
+	else if (multiframe)
+	{
+		for (int x = 0; x < images.size(); x++)
+		{
+			if (pb) pb->setValue(-1);
+			QApplication::processEvents();
+			QStringList images_tmp;
+			images_tmp << images.at(x);
+			if (not_pr_ref)
+			{
+				ImageVariant * ivariant = new ImageVariant(
+					CommonUtils::get_next_id(),
+					ok3d,
+					!wsettings->get_3d(),
+					gl,
+					0);
+				ivariant->di->filtering = wsettings->get_filtering();
+				message_ = read_series(
+					&ok,
+					false,
+					false,
+					false,
+					false,
+					ivariant,
+					images_tmp,
+					max_3d_tex_size,
+					gl,
+					ok3d,
+					settings,
+					pb,
+					tolerance,
+					true);
+				if (ok)
+				{
+					QString sop_instance_uid("");
+					read_sop_instance_uid(
+						images.at(x),
+						sop_instance_uid);
+					for (int z = 0; z < ivariant->di->idimz; z++)
+					{
+						ivariant->image_instance_uids[z] = sop_instance_uid;
+					}
+					ivariant->filenames = QStringList(images_tmp);
+					ivariants.push_back(ivariant);
+				}
+				else
+				{
+					delete ivariant;
+				}
+			}
+			else
+			{
+				// don't load OpenGL for intermediate image
+				ImageVariant * ivariant = new ImageVariant(
+					CommonUtils::get_next_id(),
+					false,
+					true,
+					NULL,
+					0);
+				message_ = read_series(
+					&ok,
+					false,
+					false,
+					false,
+					false,
+					ivariant,
+					images_tmp,
+					0,
+					NULL,
+					false,
+					settings,
+					pb,
+					tolerance,
+					false);
+				if (ok)
+				{
+					QString sop_instance_uid("");
+					read_sop_instance_uid(
+						images.at(x),
+						sop_instance_uid);
+					for (int z = 0; z < ivariant->di->idimz; z++)
+					{
+						ivariant->image_instance_uids[z] = sop_instance_uid;
+					}
+					ivariant->filenames = QStringList(images_tmp);
+					ivariants.push_back(ivariant);
+				}
 				else
 				{
 					delete ivariant;
@@ -11370,7 +11486,11 @@ QString DicomUtils::read_dicom(
 					pb,
 					tolerance,
 					true);
-				if (ok) { ivariants.push_back(ivariant); }
+				if (ok)
+				{
+					ivariant->filenames = QStringList(images_tmp);
+					ivariants.push_back(ivariant);
+				}
 				else
 				{
 					delete ivariant;
@@ -11400,94 +11520,9 @@ QString DicomUtils::read_dicom(
 					pb,
 					tolerance,
 					false);
-				if (ok) { ivariants.push_back(ivariant); }
-				else { delete ivariant; }
-			}
-		}
-	}
-	else if (multiframe)
-	{
-		for (int x = 0; x < images.size(); x++)
-		{
-			if (pb) pb->setValue(-1);
-			QApplication::processEvents();
-			QStringList images_tmp;
-			images_tmp << images.at(x);
-			if (not_pr_ref)
-			{
-				ImageVariant * ivariant = new ImageVariant(
-					CommonUtils::get_next_id(),
-					ok3d,
-					!wsettings->get_3d(),
-					gl,
-					0);
-				ivariant->di->filtering = wsettings->get_filtering();
-				message_ = read_series(
-					&ok,
-					false,
-					false,
-					false,
-					false,
-					ivariant,
-					images_tmp,
-					max_3d_tex_size,
-					gl,
-					ok3d,
-					settings,
-					pb,
-					tolerance,
-					true);
 				if (ok)
 				{
-					QString sop_instance_uid("");
-					read_sop_instance_uid(
-						images.at(x),
-						sop_instance_uid);
-					for (int z = 0; z < ivariant->di->idimz; z++)
-					{
-						ivariant->image_instance_uids[z] = sop_instance_uid;
-					}
-					ivariants.push_back(ivariant);
-				}
-				else
-				{
-					delete ivariant;
-				}
-			}
-			else
-			{
-				// don't load OpenGL for intermediate image
-				ImageVariant * ivariant = new ImageVariant(
-					CommonUtils::get_next_id(),
-					false,
-					true,
-					NULL,
-					0);
-				message_ = read_series(
-					&ok,
-					false,
-					false,
-					false,
-					false,
-					ivariant,
-					images_tmp,
-					0,
-					NULL,
-					false,
-					settings,
-					pb,
-					tolerance,
-					false);
-				if (ok)
-				{
-					QString sop_instance_uid("");
-					read_sop_instance_uid(
-						images.at(x),
-						sop_instance_uid);
-					for (int z = 0; z < ivariant->di->idimz; z++)
-					{
-						ivariant->image_instance_uids[z] = sop_instance_uid;
-					}
+					ivariant->filenames = QStringList(images_tmp);
 					ivariants.push_back(ivariant);
 				}
 				else
@@ -11549,8 +11584,15 @@ QString DicomUtils::read_dicom(
 					pb,
 					tolerance,
 					true);
-				if (ok) { ivariants.push_back(ivariant); }
-				else { delete ivariant; }
+				if (ok)
+				{
+					ivariant->filenames = QStringList(images_tmp);
+					ivariants.push_back(ivariant);
+				}
+				else
+				{
+					delete ivariant;
+				}
 			}
 			else
 			{
@@ -11576,8 +11618,15 @@ QString DicomUtils::read_dicom(
 					pb,
 					tolerance,
 					false);
-				if (ok) { ivariants.push_back(ivariant); }
-				else { delete ivariant; }
+				if (ok)
+				{
+					ivariant->filenames = QStringList(images_tmp);
+					ivariants.push_back(ivariant);
+				}
+				else
+				{
+					delete ivariant;
+				}
 			}
 		}
 	}

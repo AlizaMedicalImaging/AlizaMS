@@ -822,6 +822,7 @@ public:
 	PRTextAnnotations pr_text_annotations;
 	PRGraphicObjects  pr_graphicobjects;
 	PRDisplayShutters pr_display_shutters;
+	QStringList filenames;
 	QPixmap icon;
 	QPixmap histogram;
 	bool rescale_disabled;

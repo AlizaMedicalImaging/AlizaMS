@@ -725,6 +725,14 @@ void GraphicsUtils::print_image_info(
 	default:
 		break;
 	}
+	if (!v->filenames.empty())
+	{
+		s.append(QString("\n\nSource files:\n"));
+		for (int x = 0; x < v->filenames.size(); x++)
+		{
+			s.append(v->filenames.at(x) + QString("\n"));
+		}
+	}
 	ImageInfoDialog * d = new ImageInfoDialog;
 	d->set_label0(s0);
 	d->set_label1(s1);

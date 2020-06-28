@@ -249,6 +249,7 @@ public:
 		bool*,
 		std::vector<ImageVariant*> &,
 		const QString&,
+		const QString&,
 		const std::vector<char*> &,
 		const ImageOverlays&,
 		const unsigned int,
@@ -292,6 +293,7 @@ public:
 	static QString read_enhanced_3d_6d(
 		bool*,
 		std::vector<ImageVariant*> &,
+		const QString &,
 		const QString &,
 		const std::vector<char*> &,
 		const ImageOverlays&,
