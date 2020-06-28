@@ -571,9 +571,9 @@ void MainWindow::about()
 
 void MainWindow::createActions()
 {
-	openAct       = new QAction(QIcon(":/bitmaps/dcm.svg"),   QString("DICOM browser"),        this);
+	openAct       = new QAction(QIcon(":/bitmaps/dcm.svg"),   QString("DICOM scanner"),        this);
 	openanyAct    = new QAction(QIcon(":/bitmaps/file.svg"),  QString("Open file"),            this);
-	showMetadata  = new QAction(QIcon(":/bitmaps/meta.svg"),  QString("View DICOM Metadata"),  this);
+	showMetadata  = new QAction(QIcon(":/bitmaps/meta.svg"),  QString("View DICOM metadata"),  this);
 	exitAct       = new QAction(QIcon(":/bitmaps/delete.svg"),QString("Exit"),                 this);
 	aboutAct      = new QAction(QIcon(":/bitmaps/info.svg"),  QString("About"),      this);
 	settingsAct   = new QAction(QIcon(":/bitmaps/tool.svg"),  QString("Settings"),             this);
@@ -802,7 +802,7 @@ void MainWindow::createMenus()
 	browser_menu->addAction(browser_load_act);
 	browser_menu->menuAction()->setVisible(false);
 	//
-	metadata_menu = menuBar()->addMenu(QString("DICOM Metadata"));
+	metadata_menu = menuBar()->addMenu(QString("DICOM metadata"));
 	metadata_menu->addAction(meta_open_act);
 	metadata_menu->menuAction()->setVisible(false);
 	//

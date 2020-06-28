@@ -20,7 +20,7 @@ AboutWidget::AboutWidget(QDialog * p, Qt::WindowFlags f) : QDialog(p,f)
 			QVariant(ALIZAMS_VERSION).toByteArray().constData());
 	const QString link0 =
 		QString(
-			"<html><body><h3><a href=\"http://www.aliza-dicom-viewer.com\""
+			"<html><body><h3><a href=\"http://www.aliza-dicom-viewer.com\" style=\"color: #00795a;\""
 			" target=\"_blank\">");
 	const QString link1 = QString("Aliza MS ")+aliza_version+QString("</a>");
 	const QString link2 = QString("</h3></body></html>");

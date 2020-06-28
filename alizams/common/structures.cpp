@@ -30,8 +30,8 @@ DisplayInterface::DisplayInterface(
 	cube_3dtex = 0;
 	for (int x=0;x<3;x++) origin[x]=0.0f;
 	origin_ok = false;
-	spect_vol_vbo = 0;
-	spect_vol_vbo_size = 0;
+//	spect_vol_vbo = 0;
+//	spect_vol_vbo_size = 0;
 	tex_info = -1;
 	idimx = idimy = idimz = 0;
 	ix_origin = iy_origin = iz_origin = 0.0f;
@@ -88,7 +88,7 @@ void DisplayInterface::close(bool clear_geometry)
 	if (opengl_ok && gl) gl->makeCurrent();
 	if (cube_3dtex > 0)
 	{
-		if (opengl_ok)
+		if (opengl_ok && gl)
 		{
 #if QT_VERSION >= 0x050000
 			gl->glDeleteTextures(1, &cube_3dtex);
@@ -119,7 +119,7 @@ void DisplayInterface::close(bool clear_geometry)
 	{
 		if (spectroscopy_slices.at(x))
 		{
-			if (opengl_ok)
+			if (opengl_ok && gl)
 			{
 				if (spectroscopy_slices.at(x)->fvaoid > 0)
 				{
@@ -175,20 +175,6 @@ void DisplayInterface::close(bool clear_geometry)
 	for (int x=0;x<6;x++) dircos[x]=0.0f;
 	for (int x=0;x<3;x++) origin[x]=0.0f;
 	origin_ok = false;
-	if (spect_vol_vbo > 0)
-	{
-		if (opengl_ok)
-		{
-#if QT_VERSION >= 0x050000
-			gl->glDeleteBuffers(1, &spect_vol_vbo);
-#else
-			glDeleteBuffers(1, &spect_vol_vbo);
-#endif
-			GLWidget::increment_count_vbos(-1);
-		}
-		spect_vol_vbo = 0;
-		spect_vol_vbo_size = 0;
-	}
 	for (int k = 0; k < rois.size(); k++)
 	{
 		QList<int> keys;
@@ -209,7 +195,7 @@ void DisplayInterface::close(bool clear_geometry)
 				c->dpoints.clear();
 				c->path = QPainterPath();
 				c->ref_sop_instance_uids.clear();
-				if (opengl_ok && c->vao_initialized)
+				if (opengl_ok && gl && c->vao_initialized)
 				{
 #if QT_VERSION >= 0x050000
 					gl->glDeleteVertexArrays(1, &(c->vaoid));
@@ -240,15 +226,12 @@ void DisplayInterface::close(bool clear_geometry)
 			trimesh->qmesh)
 		{
 			gl->glDeleteVertexArrays(1, &(trimesh->qmesh->vaoid));
-			if (trimesh->qmesh->vboid)
-			{
 #if QT_VERSION >= 0x050000
-				gl->glDeleteBuffers(2, trimesh->qmesh->vboid);
+			gl->glDeleteBuffers(2, trimesh->qmesh->vboid);
 #else
-				glDeleteBuffers(2, trimesh->qmesh->vboid);
+			glDeleteBuffers(2, trimesh->qmesh->vboid);
 #endif
-				GLWidget::increment_count_vbos(-2);
-			}
+			GLWidget::increment_count_vbos(-2);
 			delete trimesh->qmesh;
 		}
 		if (trimesh) delete trimesh;

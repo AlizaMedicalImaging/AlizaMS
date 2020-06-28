@@ -724,8 +724,6 @@ public:
 	unsigned int cube_3dtex;
 	float origin[3];
 	bool  origin_ok;
-	unsigned int spect_vol_vbo;
-	unsigned long spect_vol_vbo_size;
 	short tex_info;
 	int idimx, idimy, idimz;
 	float ix_origin, iy_origin, iz_origin;

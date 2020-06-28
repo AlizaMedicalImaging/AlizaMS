@@ -1,6 +1,12 @@
 #ifndef ALIZA_H
 #define ALIZA_H
 
+#include "structures.h"
+#if QT_VERSION >= 0x050000
+#include "CG/glwidget-qt5.h"
+#else
+#include "CG/glwidget-qt4.h"
+#endif
 #include <QThread>
 #include <QString>
 #include <QStringList>
@@ -12,12 +18,6 @@
 #include <QProgressDialog>
 #include <QTimer>
 #include <vector>
-#include "structures.h"
-#if QT_VERSION >= 0x050000
-#include "CG/glwidget-qt5.h"
-#else
-#include "CG/glwidget-qt4.h"
-#endif
 #include "toolbox.h"
 #include "imagesbox.h"
 #include "toolbox.h"
