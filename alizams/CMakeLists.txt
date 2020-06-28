@@ -7,10 +7,10 @@ set(CMAKE_CXX_STANDARD 11)
 
 ####################################################################
 #
-# set USE_QT_V_5
-# set USE_LOCAL_GLEW TRUE (only for Qt4)
+# set USE_QT_V_5 to TRUE to use Qt5 (default), FALSE to use Qt4
+# set USE_LOCAL_GLEW (only for Qt4)
 #
-# set USE_WORKSTATION_MODE (access CTK SQLite database)
+# set USE_WORKSTATION_MODE for read-only access to CTK database
 #
 #
 ####################################################################
