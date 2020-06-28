@@ -7,7 +7,7 @@ Quick start:
 
 Select 'DICOM scanner' tab, open directory with DICOM files or DICOMDIR file (or drag-and-drop)
 
-Select one or more series and click arrow action (or double-click selected row) to load
+Select one or more series and click 'arrow' action (or double-click selected row) to load
 
 
 ![Open](alizams/package/art/start0.png)
