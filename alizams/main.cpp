@@ -2,14 +2,15 @@
 #define LOG_STDOUT_TO_FILE 0
 #define PRINT_HOST_INFO 0
 
+#include <QtGlobal>
+#include <QApplication>
 #include "alizams_version.h"
 #include "GUI/mainwindow.h"
 #include "browser/sqtree.h"
-#include <QtGlobal>
-#include <QApplication>
 #if QT_VERSION >= 0x050000
 #include <QSurfaceFormat>
 #endif
+#include <QSettings>
 #include <QStyle>
 #include <QPalette>
 #include <QMessageBox>
@@ -27,10 +28,6 @@
 #include <QSplashScreen>
 #include <QPixmap>
 #include <QTimer>
-#endif
-
-#if 1
-#include <QSettings>
 #endif
 
 #ifdef _WIN32
