@@ -2,14 +2,16 @@
 #define LOG_STDOUT_TO_FILE 0
 #define PRINT_HOST_INFO 0
 
-#include <QtGlobal>
-#include <QApplication>
 #include "alizams_version.h"
-#include "GUI/mainwindow.h"
-#include "browser/sqtree.h"
+#include <QtGlobal>
 #if QT_VERSION >= 0x050000
+#include "CG/glwidget-qt5.h"
 #include <QSurfaceFormat>
+#else
+#include "CG/glwidget-qt4.h"
 #endif
+#include "GUI/mainwindow.h"
+#include <QApplication>
 #include <QSettings>
 #include <QStyle>
 #include <QPalette>
@@ -17,6 +19,7 @@
 #include <QDir>
 #include <QFont>
 #include <iostream>
+#include "browser/sqtree.h"
 
 #if (defined LOG_STDOUT_TO_FILE && LOG_STDOUT_TO_FILE==1)
 #include <QMessageLogContext>
@@ -175,7 +178,9 @@ int main(int argc, char *argv[])
 		QSurfaceFormat format;
 		format.setRenderableType(QSurfaceFormat::OpenGL);
 #ifdef USE_CORE_3_2_PROFILE
+#ifdef USE_GL_MAJOR_3_MINOR_2
 		//format.setVersion(3, 2); // may be required sometimes, e.g. Intel on Linux
+#endif
 		format.setProfile(QSurfaceFormat::CoreProfile);
 #endif
 		format.setRedBufferSize(8);
