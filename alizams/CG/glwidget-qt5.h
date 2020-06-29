@@ -445,7 +445,7 @@ public:
 	void raycast_cube_ASL(float, float, float, GLuint*, GLuint*, GLuint*,bool);
 	void generateAnisoTexture(GLuint*, const unsigned int, const unsigned int);
 	void d_orientcube(
-		void  * ,
+		qMeshData * ,
     	void  * ,
     	int   * ,
     	float * ,

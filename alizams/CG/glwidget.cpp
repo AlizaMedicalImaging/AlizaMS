@@ -7508,7 +7508,7 @@ void GLWidget::generateAnisoTexture(
 }
 
 void GLWidget::d_orientcube(
-	void  * vs,
+	qMeshData * s,
 	void  * ,
 	int   * ,
 	float * mvp,
@@ -7522,7 +7522,6 @@ void GLWidget::d_orientcube(
 	float * sparams,
 	void  * )
 {
-	qMeshData * s  = static_cast<qMeshData*>(vs);
 	glUniformMatrix4fv(s->shader->location_mvp, 1, GL_FALSE, mvp);
 	glUniform3fv(s->shader->location_sparams, 2, sparams);
 	glBindVertexArray(s->vaoid);
