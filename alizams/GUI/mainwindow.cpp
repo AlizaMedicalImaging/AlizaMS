@@ -240,7 +240,7 @@ MainWindow::MainWindow(
 	//
 	if (ok3d)
 	{
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		glwidget = new GLWidget();
 #else
 #ifdef USE_SET_GL_FORMAT

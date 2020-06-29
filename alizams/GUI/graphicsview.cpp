@@ -231,7 +231,7 @@ void GraphicsView::keyReleaseEvent(QKeyEvent * e)
 
 void GraphicsView::wheelEvent(QWheelEvent * e)
 {
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	scale_view(pow(2.0, -e->angleDelta().y() / 480.0));
 #else
 	scale_view(pow(2.0, -e->delta() / 480.0));

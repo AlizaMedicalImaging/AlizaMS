@@ -2,7 +2,7 @@
 #define STRUCTURES___H
 
 #include <QtGlobal>
-#if QT_VERSION < 0x050000
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 #include "CG/glew/include/GL/glew.h"
 #endif
 #include "itkImage.h"
@@ -27,8 +27,9 @@
 #include "dicom/ultrasoundregiondata.h"
 #include "dicom/spectroscopydata.h"
 
-// unsigned int has to be 32 bit for compat. with GLuint
-// float has to be 32 bit for compat. with GLfloat
+// Assumed is size of 'int' is 32 bit.
+// Not tested on platform with different size of 'int'.
+// Not tested on big endian platroms (specially MDCM).
 
 class GLWidget;
 class qMeshData;
@@ -211,8 +212,8 @@ public:
 	~Contour() {}
 	int id;
 	int roiid;
-	unsigned int vaoid; // have to be 32 bit (GLuint)
-	unsigned int vboid; // have to be 32 bit (GLuint)
+	quint32 vaoid; // have to be 32 bit (GLuint)
+	quint32 vboid; // have to be 32 bit (GLuint)
 	bool vao_initialized;
 	// type:
 	// 0 - not set
@@ -350,12 +351,12 @@ public:
 	{
 		delete [] fv;
 	}
-	unsigned int fvaoid;
-	unsigned int fvboid;
-	unsigned int lvaoid;
-	unsigned int lvboid;
-	unsigned int pvaoid;
-	unsigned int pvboid;
+	quint32 fvaoid;
+	quint32 fvboid;
+	quint32 lvaoid;
+	quint32 lvboid;
+	quint32 pvaoid;
+	quint32 pvboid;
 	float * fv;
 	unsigned long lsize;
 	unsigned long psize;
@@ -719,7 +720,7 @@ public:
 	bool transparency;
 	bool lock_2Dview;
 	bool lock_single;
-	unsigned int cube_3dtex;
+	quint32 cube_3dtex;
 	float origin[3];
 	bool  origin_ok;
 	short tex_info;

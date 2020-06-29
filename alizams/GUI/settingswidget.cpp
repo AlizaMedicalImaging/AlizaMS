@@ -1,15 +1,15 @@
 #include "settingswidget.h"
 #include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#include "CG/glwidget-qt5.h"
+#else
+#include "CG/glwidget-qt4.h"
+#endif
 #include <QStyleFactory>
 #include <QApplication>
 #include <QDir>
 #include <QFont>
 #include <QMessageBox>
-#if QT_VERSION >= 0x050000
-#include "CG/glwidget-qt5.h"
-#else
-#include "CG/glwidget-qt4.h"
-#endif
 #include "commonutils.h"
 #include "dicomutils.h"
 
@@ -101,7 +101,7 @@ void SettingsWidget::set_default()
 	//
 	original_radioButton->setChecked(true);
 	resample_radioButton->setChecked(false);
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	x_comboBox->setCurrentText(QString("256"));
 	y_comboBox->setCurrentText(QString("256"));
 #else

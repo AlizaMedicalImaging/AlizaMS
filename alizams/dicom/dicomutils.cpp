@@ -1,4 +1,11 @@
 //#define ENHANCED_PRINT_INFO
+
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#include "CG/glwidget-qt5.h"
+#else
+#include "CG/glwidget-qt4.h"
+#endif
 #include "structures.h"
 #include "dicomutils.h"
 #include "commonutils.h"
@@ -64,11 +71,6 @@
 #include <string>
 #include <set>
 #include <algorithm>
-#if QT_VERSION >= 0x050000
-#include "CG/glwidget-qt5.h"
-#else
-#include "CG/glwidget-qt4.h"
-#endif
 
 #include "vectormath/scalar/vectormath.h"
 typedef Vectormath::Scalar::Vector3 sVector3;

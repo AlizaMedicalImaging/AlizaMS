@@ -1,7 +1,7 @@
 //#define ALWAYS_SHOW_GL_ERROR
 
 #include "structures.h"
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #include <QOpenGLContext>
 #include <QSurfaceFormat>
 #include "glwidget-qt5.h"
@@ -178,7 +178,7 @@ struct  MyClosestRayResultCallback0 : public btCollisionWorld::ClosestRayResultC
 	}    
 };
 
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 GLWidget::GLWidget(QWidget * p, Qt::WindowFlags f) : QOpenGLWidget(p, f)
 {
 #ifdef USE_SET_GL_FORMAT
@@ -224,7 +224,7 @@ GLWidget::GLWidget(const QGLFormat & frm, QWidget * p) : QGLWidget(frm,p)
 
 void GLWidget::initializeGL()
 {
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	initializeOpenGLFunctions();
 #if 0
 	const QSurfaceFormat & f = format();
@@ -493,7 +493,10 @@ void GLWidget::keyPressEvent(QKeyEvent * e)
 		break;
 	case Qt::Key_G:
 		{
-			get_screen();
+			if (Qt::ShiftModifier == QApplication::keyboardModifiers())
+				get_screen(true);
+			else
+				get_screen(false);
 		}
 		break;
 	case Qt::Key_W:
@@ -608,45 +611,60 @@ void GLWidget::set_cube(bool t)
 	updateGL();
 }
 
-// FIXME
-void GLWidget::get_screen()
+void GLWidget::get_screen(bool white_bg)
 {
-/*
-	QImage p = grabFrameBuffer();
-	if (p.isNull())
+	const float r = clear_color_r;
+	const float g = clear_color_g;
+	const float b = clear_color_b;
+	if (white_bg)
 	{
-		std::cout << "could not grab screen" << std::endl;
-		return;
+		set_clear_color(1.0, 1.0, 1.0);
+		updateGL();
 	}
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+	QImage p = grabFramebuffer();
+#else
+	QImage p = grabFrameBuffer(false);
+#endif
+	if (white_bg)
+	{
+		set_clear_color(r, g, b);
+		updateGL();
+	}
+	if (p.isNull()) return;
 	const QString saved_dir = CommonUtils::get_screenshot_dir();
 	const QString d = CommonUtils::get_screenshot_name(saved_dir);
 	const QString f = QFileDialog::getSaveFileName(
 		NULL,
-		QString(
-			"Select file: format by extension"),
+		QString("Save PNG file"),
 		d,
 		QString("All Files (*)"),
 		(QString*)NULL
 		//,QFileDialog::DontUseNativeDialog
 		);
 	if (f.isEmpty()) return;
-	QString file;
+	QString f__;
 	QFileInfo fi(f);
 	CommonUtils::set_screenshot_dir(
-		QDir::toNativeSeparators(
-			fi.absolutePath()));
+		QDir::toNativeSeparators(fi.absolutePath()));
 	QString ext = fi.suffix();
 	if (ext.isEmpty())
 	{
-		file = QDir::toNativeSeparators(f + QString(".png"));
-		ext = QString("PNG");
+		f__ = QDir::toNativeSeparators(f + QString(".png"));
+	}
+	else if ((ext.toUpper() != QString("PNG")))
+	{
+		f__ = QDir::toNativeSeparators(
+			fi.absolutePath() +
+			QDir::separator() +
+			fi.baseName() +
+			QString(".png"));
 	}
 	else
 	{
-		file = QDir::toNativeSeparators(f);
-		ext = ext.trimmed().toUpper();
+		f__ = QDir::toNativeSeparators(f);
 	}
-	if (!p.save(file, ext.toLocal8Bit().constData()))
+	if (!p.save(f__, "PNG"))
 	{
 		QMessageBox mbox;
 		mbox.setWindowModality(Qt::ApplicationModal);
@@ -655,7 +673,6 @@ void GLWidget::get_screen()
 		mbox.setText(QString("Could not save file"));
 		mbox.exec();
 	}
-*/
 }
 
 void GLWidget::set_contours_width(float f)
@@ -944,7 +961,7 @@ void GLWidget::init_opengl(int w, int h)
 	win_h = h;
 	opengl_info.clear();
 	//
-#if QT_VERSION < 0x050000
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 	GLenum err = glewInit();
 	if (GLEW_OK != err)
 	{
@@ -997,7 +1014,7 @@ void GLWidget::init_opengl(int w, int h)
 	//
 	//
 	if (major >= 3) no_opengl3 = false;
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	if (no_opengl3)
 	{
 		opengl_info.append(QString("\nOpenGL modules disabled"));
@@ -2256,7 +2273,7 @@ void GLWidget::paint_raycaster()
 	}
 //////////////// final scene quad
 	{
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
 #else
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -3344,7 +3361,7 @@ void GLWidget::render_orient_cube1(
 				 sparams,
 				 NULL);
 	//
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
 #else
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -4252,7 +4269,7 @@ void GLWidget::free_fbos0(
 	glBindFramebuffer(GL_FRAMEBUFFER, *framebuffer);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,  GL_TEXTURE_2D, 0, 0);
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
 #else
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -4307,7 +4324,7 @@ bool GLWidget::create_fbos0(
 	case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT : break;
 	default: break;
 	}
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
 #else
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -4322,7 +4339,7 @@ void GLWidget::free_fbos1(
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, *framebuffer);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
 #else
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -4364,7 +4381,7 @@ bool GLWidget::create_fbos1(
 	case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT : break;
 	default: break;
 	}
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
 #else
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

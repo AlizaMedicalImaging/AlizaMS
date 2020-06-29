@@ -4,7 +4,7 @@
 
 #include "alizams_version.h"
 #include <QtGlobal>
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #include "CG/glwidget-qt5.h"
 #include <QSurfaceFormat>
 #else
@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
 	//
 	bool ok3d = false;
 	bool hide_zoom = true;
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #if 1 
 	QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
 #endif
@@ -253,7 +253,7 @@ int main(int argc, char *argv[])
 			p.setColor(QPalette::Link,            Qt::darkBlue);
 			p.setColor(QPalette::Highlight,       Qt::lightGray);
 			p.setColor(QPalette::HighlightedText, Qt::black);
-#if (QT_VERSION >= 0x050000)
+#if (QT_VERSION >= QT_VERSION_CHECK(5,0,0))
 			app.setStyle(QString("Fusion"));
 #else
 			app.setStyle(QString("Plastique"));

@@ -175,7 +175,7 @@ ImagesBox::ImagesBox(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
 	toolbar->addAction(actionClearAll);
 	QWidget * spacer = new QWidget(this);
 	spacer->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
-#if QT_VERSION < 0x050000
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 	spacer->setMinimumSize(96,0);
 #endif
 	toolbar->addWidget(spacer);

@@ -619,7 +619,7 @@ template<typename T> void load_rgba_image(
 	const unsigned short high_bit         = ivariant->di->high_bit;
 	const bool           hide_orientation = ivariant->di->hide_orientation;
 	//
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	if (image_type == 21)
 	{
 		const double tmp_max
@@ -975,7 +975,7 @@ template<typename T> void load_rgba_char_image(
 	QImage tmpi;
 	if (image_type == 24)
 	{
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		try { p = reinterpret_cast<unsigned char *>(image->GetBufferPointer()); }
 		catch (itk::ExceptionObject & ex) { std::cout << ex << std::endl; return; }
 		if (!p) return;
@@ -1032,7 +1032,7 @@ template<typename T> void load_rgba_char_image(
 	//
 	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(tmpi));
 	//
-#if QT_VERSION < 0x050000
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 	delete [] p;
 #endif
 	//

@@ -1,4 +1,11 @@
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#include "CG/glwidget-qt5.h"
+#else
+#include "CG/glwidget-qt4.h"
+#endif
 #include "structures.h"
+#include "vectormath/scalar/vectormath.h"
 #include "commonutils.h"
 #include "itkVersion.h"
 #include "itkIndex.h"
@@ -32,12 +39,6 @@
 #elif (defined  __GNUC__)
 #include <sys/sysinfo.h>
 #endif
-#if QT_VERSION >= 0x050000
-#include "CG/glwidget-qt5.h"
-#else
-#include "CG/glwidget-qt4.h"
-#endif
-#include "vectormath/scalar/vectormath.h"
 
 typedef Vectormath::Scalar::Vector3 sVector3;
 typedef Vectormath::Scalar::Point3  sPoint3;
@@ -580,7 +581,7 @@ template<typename T> int generate_tex3d(
 			<< glerror__ << std::endl;
 	}
 #endif
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	gl->glGenTextures(1, &(ivariant->di->cube_3dtex));
 	glBindTexture(GL_TEXTURE_3D, ivariant->di->cube_3dtex);
 	switch(ivariant->di->filtering)
@@ -650,7 +651,7 @@ template<typename T> int generate_tex3d(
 	case 0:
 		{
 			ivariant->di->tex_info = 0;
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			gl->glPixelStorei(GL_UNPACK_ALIGNMENT, 2);
 			gl->glTexImage3D(
 				GL_TEXTURE_3D, 0, GL_R16F,
@@ -669,7 +670,7 @@ template<typename T> int generate_tex3d(
 	case 1:
 		{
 			ivariant->di->tex_info = 1;
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			gl->glPixelStorei(GL_UNPACK_ALIGNMENT, 2);
 			gl->glTexImage3D(
 				GL_TEXTURE_3D, 0, GL_R16,
@@ -687,7 +688,7 @@ template<typename T> int generate_tex3d(
 	case 2:
 		{
 			ivariant->di->tex_info = 2;
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			gl->glPixelStorei(
 				GL_UNPACK_ALIGNMENT, 1);
 			gl->glTexImage3D(
@@ -707,7 +708,7 @@ template<typename T> int generate_tex3d(
 	default: break;
 	}
 	//
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	glerror__ = gl->glGetError();
 #else
 	glerror__ = glGetError();
@@ -719,7 +720,7 @@ template<typename T> int generate_tex3d(
 			<< "error : OpenGL error 0x505\n"
 			<< glerror__ << std::endl;
 #endif
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		gl->glBindTexture(GL_TEXTURE_3D, 0);
 		gl->glDeleteTextures(1, &(ivariant->di->cube_3dtex));
 #else
@@ -1934,7 +1935,7 @@ void CommonUtils::generate_spectroscopyslice(
 	{
 		if (columns_ >= 2 || rows_ >= 2)
 		{
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			gl->makeCurrent();
 			gl->glGenVertexArrays(1, &(cs->fvaoid));
 			gl->glBindVertexArray(cs->fvaoid);
@@ -1998,7 +1999,7 @@ void CommonUtils::generate_spectroscopyslice(
 					v[j+5] =   to.getZ();
 					j+=6;
 				}
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 				gl->glGenVertexArrays(1, &(cs->lvaoid));
 				gl->glBindVertexArray(cs->lvaoid);
 				gl->glGenBuffers(1, &(cs->lvboid));
@@ -2026,7 +2027,7 @@ void CommonUtils::generate_spectroscopyslice(
 				v1[3] = p.getX();
 				v1[4] = p.getY();
 				v1[5] = p.getZ();
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 				gl->glGenVertexArrays(1, &(cs->pvaoid));
 				gl->glBindVertexArray(cs->pvaoid);
 				gl->glGenBuffers(1, &(cs->pvboid));
@@ -2057,7 +2058,7 @@ void CommonUtils::generate_spectroscopyslice(
 			v1[0] = x1;
 			v1[1] = y1;
 			v1[2] = z1;
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			gl->glGenVertexArrays(1, &(cs->pvaoid));
 			gl->glBindVertexArray(cs->pvaoid);
 			gl->glGenBuffers(1, &(cs->pvboid));

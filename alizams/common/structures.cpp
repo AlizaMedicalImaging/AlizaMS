@@ -1,5 +1,5 @@
 #include "structures.h"
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #include "CG/glwidget-qt5.h"
 #else
 #include "CG/glwidget-qt4.h"
@@ -88,7 +88,7 @@ void DisplayInterface::close(bool clear_geometry)
 	{
 		if (opengl_ok && gl)
 		{
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			gl->glDeleteTextures(1, &cube_3dtex);
 #else
 			glDeleteTextures(1, &cube_3dtex);
@@ -121,7 +121,7 @@ void DisplayInterface::close(bool clear_geometry)
 			{
 				if (spectroscopy_slices.at(x)->fvaoid > 0)
 				{
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 					gl->glDeleteVertexArrays(
 						1, &(spectroscopy_slices[x]->fvaoid));
 					gl->glDeleteBuffers(
@@ -136,7 +136,7 @@ void DisplayInterface::close(bool clear_geometry)
 				}
 				if (spectroscopy_slices.at(x)->lvaoid > 0)
 				{
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 					gl->glDeleteVertexArrays(
 						1, &(spectroscopy_slices[x]->lvaoid));
 					gl->glDeleteBuffers(
@@ -151,7 +151,7 @@ void DisplayInterface::close(bool clear_geometry)
 				}
 				if (spectroscopy_slices.at(x)->pvboid > 0)
 				{
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 					gl->glDeleteVertexArrays(
 						1, &(spectroscopy_slices[x]->pvaoid));
 					gl->glDeleteBuffers(
@@ -195,7 +195,7 @@ void DisplayInterface::close(bool clear_geometry)
 				c->ref_sop_instance_uids.clear();
 				if (opengl_ok && gl && c->vao_initialized)
 				{
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 					gl->glDeleteVertexArrays(1, &(c->vaoid));
 					gl->glDeleteBuffers(1, &(c->vboid));
 #else
@@ -222,7 +222,7 @@ void DisplayInterface::close(bool clear_geometry)
 			trimesh->initialized &&
 			trimesh->qmesh)
 		{
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			gl->glDeleteVertexArrays(1, &(trimesh->qmesh->vaoid));
 			gl->glDeleteBuffers(2, trimesh->qmesh->vboid);
 #else

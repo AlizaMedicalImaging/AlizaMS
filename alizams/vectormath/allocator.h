@@ -2,13 +2,12 @@
 #define ALIGNED_ALLOCATOR__H
 
 #include <stdlib.h>
-#include <stdint.h>
-
 #if defined _MSC_VER
 #define ALIGN16(a) __declspec(align(16)) a
 #define ALIGN16_PRE __declspec(align(16))
 #define ALIGN16_POST
 #else
+#include <stdint.h>
 #define ALIGN16(a) a __attribute__((aligned(16)))
 #define ALIGN16_PRE
 #define ALIGN16_POST __attribute__((aligned(16)))

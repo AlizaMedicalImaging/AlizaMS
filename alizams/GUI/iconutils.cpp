@@ -535,7 +535,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		spacing_y = spacing_[1];
 		size_x = size_[0];
 		size_y = size_[1];
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		unsigned char * p = NULL;
 		try { p = new unsigned char[size[0] * size[1] * 4]; }
 		catch (std::bad_alloc&) { p = NULL; }
@@ -641,7 +641,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		spacing_y = spacing_[1];
 		size_x = size_[0];
 		size_y = size_[1];
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		unsigned char * p_ = NULL;
 		try { p_ = reinterpret_cast<unsigned char *>(tmp0->GetBufferPointer()); }
 		catch (itk::ExceptionObject & ex) { std::cout << ex << std::endl; return; }
@@ -734,7 +734,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		const double vmax = ivariant->di->vmax;
 		const double vrange = vmax - vmin;
 		if (!(vrange!=0)) return;
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		unsigned char * p = NULL;
 		try { p = new unsigned char[size[0]*size[1]*4]; }
 		catch(std::bad_alloc&) { p = NULL; }

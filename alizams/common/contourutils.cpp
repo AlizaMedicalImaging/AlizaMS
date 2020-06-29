@@ -1,12 +1,14 @@
-#include "contourutils.h"
-#include <QMessageBox>
-#include <QApplication>
-#include <itkContinuousIndex.h>
-#if QT_VERSION >= 0x050000
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #include "CG/glwidget-qt5.h"
 #else
 #include "CG/glwidget-qt4.h"
 #endif
+#include "contourutils.h"
+#include <QMessageBox>
+#include <QApplication>
+#include <itkContinuousIndex.h>
+
 #include "vectormath/scalar/vectormath.h"
 
 typedef Vectormath::Scalar::Vector3 sVector3;
@@ -177,7 +179,7 @@ void ContourUtils::generate_roi_vbos(
 				if (gl)
 				{
 					gl->makeCurrent();
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 					gl->glGenVertexArrays(1, &(c->vaoid));
 					gl->glBindVertexArray(c->vaoid);
 					gl->glGenBuffers(1, &(c->vboid));

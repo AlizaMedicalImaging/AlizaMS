@@ -8,8 +8,8 @@
 //#define USE_GL_MAJOR_3_MINOR_2
 #endif
 
-#include <QtGlobal>
 #include "CG/glew/include/GL/glew.h"
+#include <QtGlobal>
 #include <QGLWidget>
 #include "camera.h"
 #include <QPoint>
@@ -122,6 +122,7 @@ public:
 	void zoom_out();
 	void update_clear_color();
 	void set_wireframe(bool);
+	void get_screen(bool);
 	static long long get_count_vbos();
 	static void increment_count_vbos(long long);
 	static void set_max_vbos_65535(bool);
@@ -478,7 +479,6 @@ public slots:
 	void set_alpha(double);
 	void set_brightness(double);
 	void set_cube(bool);
-	void get_screen();
 	void set_contours_width(float);
 
 protected:

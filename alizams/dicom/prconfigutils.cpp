@@ -1,3 +1,9 @@
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#include "CG/glwidget-qt5.h"
+#else
+#include "CG/glwidget-qt4.h"
+#endif
 #include "structures.h"
 #include "prconfigutils.h"
 #include "settingswidget.h"
@@ -28,11 +34,6 @@
 #include "mdcmSequenceOfItems.h"
 #include "mdcmItem.h"
 #include "mdcmOverlay.h"
-#if QT_VERSION >= 0x050000
-#include "CG/glwidget-qt5.h"
-#else
-#include "CG/glwidget-qt4.h"
-#endif
 
 template<typename T> void set_spacing(
 	typename T::Pointer & image,
