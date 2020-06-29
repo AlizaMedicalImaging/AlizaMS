@@ -636,12 +636,21 @@ quit__:
 			ivariants[x]->di->skip_texture=true;
 		}
 #if 0
-		QMap<int, QString>::const_iterator it = ivariants.at(x)->image_instance_uids.constBegin();
-		std::cout << "Instance UIDs (dimZ=" << ivariants.at(x)->di->idimz <<") :" << std::endl;
-		while (it != ivariants.at(x)->image_instance_uids.constEnd())
 		{
-			std::cout << " " << it.key() << " " << it.value().toStdString() << std::endl;
-			++it;
+			QMap<int, QString>::const_iterator it =
+				ivariants.at(x)->image_instance_uids.constBegin();
+			std::cout
+				<< "Instance UIDs (dimZ="
+				<< ivariants.at(x)->di->idimz <<") :"
+				<< std::endl;
+			while (it != ivariants.at(x)->image_instance_uids.constEnd())
+			{
+				std::cout
+					<< " " << it.key() << " "
+					<< it.value().toStdString()
+					<< std::endl;
+				++it;
+			}
 		}
 #endif
 		add_histogram(ivariants.at(x), pb);
@@ -681,7 +690,6 @@ quit__:
 	if (ok3d) glwidget->set_skip_draw(false);
 #ifdef ALIZA_PRINT_COUNT_GL_OBJ
 	std::cout << "Num VBOs " << GLWidget::get_count_vbos() << std::endl;
-	std::cout << "Num textures " << GLWidget::get_count_tex() << std::endl;
 #endif
 }
 
@@ -737,7 +745,6 @@ void Aliza::clear_ram()
 	if (ok3d) glwidget->set_skip_draw(false);
 #ifdef ALIZA_PRINT_COUNT_GL_OBJ
 	std::cout << "Num VBOs " << GLWidget::get_count_vbos() << std::endl;
-	std::cout << "Num textures " << GLWidget::get_count_tex() << std::endl;
 #endif
 }
 
@@ -775,7 +782,6 @@ quit__:
 	if (check_3d()) glwidget->set_skip_draw(false);
 #ifdef ALIZA_PRINT_COUNT_GL_OBJ
 	std::cout << "Num VBOs " << GLWidget::get_count_vbos() << std::endl;
-	std::cout << "Num textures " << GLWidget::get_count_tex() << std::endl;
 #endif
 }
 
@@ -818,7 +824,6 @@ void Aliza::delete_image2(ImageVariant * v)
 	connect(imagesbox->listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(update_selection()));
 #ifdef ALIZA_PRINT_COUNT_GL_OBJ
 	std::cout << "Num VBOs " << GLWidget::get_count_vbos() << std::endl;
-	std::cout << "Num textures " << GLWidget::get_count_tex() << std::endl;
 #endif
 }
 
@@ -3704,7 +3709,6 @@ quit__:
 	QApplication::restoreOverrideCursor();
 #ifdef ALIZA_PRINT_COUNT_GL_OBJ
 	std::cout << "Num VBOs " << GLWidget::get_count_vbos() << std::endl;
-	std::cout << "Num textures " << GLWidget::get_count_tex() << std::endl;
 #endif
 }
 
@@ -3847,7 +3851,6 @@ quit__:
 	qApp->processEvents();
 #ifdef ALIZA_PRINT_COUNT_GL_OBJ
 	std::cout << "Num VBOs " << GLWidget::get_count_vbos() << std::endl;
-	std::cout << "Num textures " << GLWidget::get_count_tex() << std::endl;
 #endif
 }
 

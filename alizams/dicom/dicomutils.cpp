@@ -4151,7 +4151,7 @@ void DicomUtils::enhanced_get_indices(
 	int datatype_idx      = -1;
 	int mr_frame_type_idx = -1;
 	int mr_eff_echo_idx   = -1;
-	const unsigned long sq_size = sq.size();
+	const size_t sq_size = sq.size();
 	for (unsigned int x = 0; x < sq_size; x++)
 	{
 		if (
@@ -4747,7 +4747,7 @@ void DicomUtils::print_sq(const DimIndexSq & sq)
 	{
 		std::cout << "DimIndexSq is empty" << std::endl;
 	}
-	for (unsigned long x = 0; x < sq.size(); x++)
+	for (size_t x = 0; x < sq.size(); x++)
 	{
 		std::cout
 			<< " " << x << " "
@@ -5119,7 +5119,7 @@ QString DicomUtils::read_enhanced(
 	}
 	read_dimension_index_sq(ds, sq);
 	//
-	const unsigned long sq_size = sq.size();
+	const size_t sq_size = sq.size();
 	const bool ok_f =
 		read_group_sq(
 			ds,
@@ -5138,10 +5138,10 @@ QString DicomUtils::read_enhanced(
 	}
 	if (ok_f && idx_values.size()==values.size())
 	{
-		for (unsigned long x = 0; x < sq_size; x++)
+		for (size_t x = 0; x < sq_size; x++)
 		{
 			std::list<unsigned int> tmpl;
-			for (unsigned long j = 0; j < idx_values.size(); j++)
+			for (size_t j = 0; j < idx_values.size(); j++)
 				tmpl.push_back(idx_values.at(j).idx.at(x));
 			tmpl.sort();
 			tmpl.unique();
@@ -5433,7 +5433,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 	}
 	read_dimension_index_sq(ds, sq);
 	//
-	const unsigned long sq_size = sq.size();
+	const size_t sq_size = sq.size();
 	const bool ok_f =
 		read_group_sq(
 			ds,
@@ -5452,10 +5452,10 @@ QString DicomUtils::read_enhanced_supp_palette(
 	}
 	if (ok_f && idx_values.size()==values.size())
 	{
-		for (unsigned long x = 0; x < sq_size; x++)
+		for (size_t x = 0; x < sq_size; x++)
 		{
 			std::list<unsigned int> tmpl;
-			for (unsigned long j = 0; j < idx_values.size(); j++)
+			for (size_t j = 0; j < idx_values.size(); j++)
 				tmpl.push_back(idx_values.at(j).idx.at(x));
 			tmpl.sort();
 			tmpl.unique();
@@ -7336,10 +7336,10 @@ QString DicomUtils::read_buffer(
 	}
 	//
 	bool rescale_ = false;
-	unsigned long rescaled_buffer_size = 0;
-	unsigned long supp_rescaled_buffer_size = 0;
-	unsigned long not_rescaled_buffer_size = 0;
-	unsigned long buffer_size = 0;
+	size_t rescaled_buffer_size = 0;
+	size_t supp_rescaled_buffer_size = 0;
+	size_t not_rescaled_buffer_size = 0;
+	size_t buffer_size = 0;
 	char * rescaled_buffer = NULL;
 	char * supp_rescaled_buffer = NULL;
 	char * not_rescaled_buffer = NULL;
@@ -7541,7 +7541,7 @@ QString DicomUtils::read_buffer(
 	}
 	if (singlebit)
 	{
-		const unsigned long singlebit_buffer_size = image.GetBufferLength();
+		const size_t singlebit_buffer_size = image.GetBufferLength();
 		unsigned char * singlebit_buffer;
 		try
 		{
@@ -7584,8 +7584,8 @@ QString DicomUtils::read_buffer(
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return QString("Buffer allocation error");
 		}
-		unsigned long j = 0;
-		for (unsigned long x = 0; x < singlebit_buffer_size; x++)
+		size_t j = 0;
+		for (size_t x = 0; x < singlebit_buffer_size; x++)
 		{
 			const unsigned char c = singlebit_buffer[x];
 			bool bit1, bit2, bit3, bit4, bit5, bit6, bit7, bit8;
@@ -7744,7 +7744,7 @@ QString DicomUtils::read_buffer(
 				"can not apply Supplemental LUT");
 		}
 	}
-	const unsigned long xy = buffer_size/dimz;
+	const size_t xy = buffer_size/dimz;
 	for (unsigned int j = 0; j < dimz; j++)
 	{
 		char * p__ = new char[xy];
@@ -8689,12 +8689,12 @@ bool DicomUtils::enhanced_process_indices(
 							}
 						}
 					}
-					const unsigned long tmp2_test_size0 = tmp2_test.size();
+					const size_t tmp2_test_size0 = tmp2_test.size();
 					if (tmp2_test_size0 > 0)
 					{
 						tmp2_test.sort();
 						tmp2_test.unique();
-						const unsigned long tmp2_test_size1 = tmp2_test.size();
+						const size_t tmp2_test_size1 = tmp2_test.size();
 						if (tmp2_test_size0!=tmp2_test_size1)
 						{
 							error = true;
@@ -10667,12 +10667,12 @@ QString DicomUtils::read_dicom(
 		!mosaic &&
 		!uihgrid)
 	{
-		const unsigned long size0 = slice_pos_list.size();
+		const size_t size0 = slice_pos_list.size();
 		slice_pos_list.sort();
 		slice_pos_list.unique();
-		const unsigned long size1 = slice_pos_list.size();
+		const size_t size1 = slice_pos_list.size();
 		if (size0 != size1 &&
-			size0 == (unsigned long)images.size() &&
+			size0 == (size_t)images.size() &&
 			images.size()%size1 == 0)
 		{
 			multiseries = true;
@@ -10695,12 +10695,12 @@ QString DicomUtils::read_dicom(
 						slices_instance_nums.push_back(si.instance_number);
 					}
 				}
-				const unsigned long inst_size0 = slices_instance_nums.size();
+				const size_t inst_size0 = slices_instance_nums.size();
 				slices_instance_nums.sort();
 				slices_instance_nums.unique();
-				const unsigned long inst_size1 = slices_instance_nums.size();
+				const size_t inst_size1 = slices_instance_nums.size();
 				if (inst_size0==inst_size1 &&
-					inst_size0==(unsigned long)images.size())
+					inst_size0==(size_t)images.size())
 				{
 					unique_instance_nums = true;
 				}
@@ -10768,7 +10768,7 @@ QString DicomUtils::read_dicom(
 					// find unique slice positions
 					slices_pos_list2.sort();
 					slices_pos_list2.unique();
-					const unsigned long unique_slice_pos_size =
+					const size_t unique_slice_pos_size =
 						slices_pos_list2.size();
 					unsigned int g = 0;
 					// assign id for every unique slice postion
@@ -10926,7 +10926,7 @@ QString DicomUtils::read_dicom(
 				images_ipp.push_back(images__.at(0));
 			}
 			QStringList images_tmp;
-			for (unsigned long j = 0; j < images_ipp.size(); j++)
+			for (size_t j = 0; j < images_ipp.size(); j++)
 			{
 				images_tmp << images_ipp.at(j);
 			}
@@ -11460,7 +11460,7 @@ QString DicomUtils::read_dicom(
 				images_ipp.push_back(images__.at(0));
 			}
 			QStringList images_tmp;
-			for (unsigned long j = 0; j < images_ipp.size(); j++)
+			for (size_t j = 0; j < images_ipp.size(); j++)
 			{
 				images_tmp << images_ipp.at(j);
 			}
@@ -11558,7 +11558,7 @@ QString DicomUtils::read_dicom(
 				images_ipp.push_back(images__.at(0));
 			}
 			QStringList images_tmp;
-			for (unsigned long j = 0; j < images_ipp.size(); j++)
+			for (size_t j = 0; j < images_ipp.size(); j++)
 			{
 				images_tmp << images_ipp.at(j);
 			}
@@ -11632,15 +11632,41 @@ QString DicomUtils::read_dicom(
 			}
 		}
 	}
+	if (!(enhanced||mosaic||uihgrid||ultrasound||multiframe)) // TODO
+	{
+		int count_uid_errors = 0;
+		for (size_t x = 0; x < ivariants.size(); x++)
+		{
+			QList<QString> l_uids =
+				ivariants.at(x)->image_instance_uids.values();
+			if (!l_uids.empty())
+			{
+				const size_t l_size = l_uids.size();
+				if (l_size > 1)
+				{
+					QSet<QString> s_uids = l_uids.toSet();
+					const size_t s_size = s_uids.size();
+					if (l_size > s_size) count_uid_errors++;
+
+				}
+			}
+			if (count_uid_errors > 0)
+			{
+				if (!message_.isEmpty())
+					message_.append(QString("\n"));
+				message_.append(QString("Warning: UIDs are not unique"));
+			}
+		}
+	}
 	//
 	//
 	if (pr_ref||rt_ref) { return message_; }
 	//
-	for (unsigned long x = 0; x < rtstructs.size(); x++)
+	for (size_t x = 0; x < rtstructs.size(); x++)
 		ivariants.push_back(rtstructs[x]);
-	for (unsigned long x = 0; x < spectroscopy_images.size(); x++)
+	for (size_t x = 0; x < spectroscopy_images.size(); x++)
 		ivariants.push_back(spectroscopy_images[x]);
-	for (unsigned long x = 0; x < meshes.size(); x++)
+	for (size_t x = 0; x < meshes.size(); x++)
 		ivariants.push_back(meshes[x]);
 	//
 	if (!rtstruct_ref_search.empty())
