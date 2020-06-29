@@ -212,6 +212,9 @@ int main(int argc, char *argv[])
 		settings.setFallbacksEnabled(true);
 		settings.beginGroup(QString("GlobalSettings"));
 		app_font_pt = settings.value(QString("app_font_pt"), 0.0).toDouble();
+		QString saved_style = settings.value(
+			QString("stylename"),
+			QVariant(QString("Dark Fusion"))).toString();
 		settings.endGroup();
 		QFont f = QApplication::font();
 		if (app_font_pt <= 0.0)
@@ -233,7 +236,7 @@ int main(int argc, char *argv[])
 		}
 		app.setFont(f);
 		//
-		if (true)
+		if (saved_style==QString("Dark Fusion"))
 		{
 			QColor bg(0x53, 0x59, 0x60);
 			QColor tt(0x30, 0x39, 0x47);
@@ -259,6 +262,11 @@ int main(int argc, char *argv[])
 			app.setStyle(QString("Plastique"));
 #endif
 			app.setPalette(p);
+		}
+		else
+		{
+			app.setStyle(saved_style);
+			app.setPalette(app.style()->standardPalette());
 		}
 	}
 	if (!force_disable_opengl) ok3d = true;

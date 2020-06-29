@@ -40,6 +40,7 @@ public:
 		);
 	~MainWindow();
 	void open_args(const QStringList&);
+	void change_style(const QString&);
 	QAction * graphicsAct_Z;
 	QAction * graphicsAct_Y;
 	QAction * graphicsAct_X;
@@ -64,6 +65,7 @@ protected:
 
 public slots:
 	void exit_null();
+	void set_style(QString);
 
 private slots:
 	void about();

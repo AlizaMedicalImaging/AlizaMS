@@ -5,18 +5,17 @@
 #else
 #include "CG/glwidget-qt4.h"
 #endif
-#include <QStyleFactory>
 #include <QApplication>
+#include <QStyleFactory>
 #include <QDir>
 #include <QFont>
-#include <QMessageBox>
 #include "commonutils.h"
 #include "dicomutils.h"
 
 SettingsWidget::SettingsWidget(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
 {
 	setupUi(this);
-	dark_checkBox->hide(); // TODO
+	saved_idx = 0;
 	scale_icons = si;
 	x_comboBox->addItem(QString("256"));
 	x_comboBox->addItem(QString("128"));
@@ -24,19 +23,17 @@ SettingsWidget::SettingsWidget(float si, QWidget * p, Qt::WindowFlags f) : QWidg
 	y_comboBox->addItem(QString("256"));
 	y_comboBox->addItem(QString("128"));
 	y_comboBox->addItem(QString("64"));
+	{
+		QStringList keys = QStyleFactory::keys();
+		styleComboBox->addItem(QString("Dark Fusion"));
+		styleComboBox->addItems(keys);
+	}
 #if 1
 	readSettings();
 #else
-	{
-		QFont f = QApplication::font();
-		const double app_font_pt = f.pointSizeF();
-		if (app_font_pt > 0 && (f.pointSize() != -1))
-		{
-			pt_doubleSpinBox->setValue(app_font_pt);
-		}
-	}
+
 #endif
-	vbos65535warn = true;
+	styleComboBox->setCurrentIndex(saved_idx);
 	connect(reload_pushButton,SIGNAL(clicked()),this,SLOT(set_default()));
 	connect(maxvbos_checkBox,SIGNAL(toggled(bool)),this,SLOT(update_vbos_max_65535(bool)));
 	connect(pt_doubleSpinBox,SIGNAL(valueChanged(double)),this,SLOT(update_font_pt(double)));
@@ -95,10 +92,9 @@ void SettingsWidget::set_enable_texture_groupbox(bool t)
 
 void SettingsWidget::set_default()
 {
-	dark_checkBox->setChecked(true);
+	styleComboBox->setCurrentIndex(0);
 	si_doubleSpinBox->setValue(1.0);
 	pt_doubleSpinBox->setValue(12.0);
-	//
 	original_radioButton->setChecked(true);
 	resample_radioButton->setChecked(false);
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -113,13 +109,11 @@ void SettingsWidget::set_default()
 	textureoptions_groupBox->setEnabled(true);
 	textureoptions_groupBox->setChecked(true);
 	maxvbos_checkBox->setChecked(false);
-	//
 	rescale_checkBox->setChecked(true);
 	mosaic_checkBox->setChecked(true);
 	time_s__checkBox->setChecked(false);
 	overlays_checkBox->setChecked(true);
 	clean_unused_checkBox->setChecked(false);
-	//
 	pet_no_level_checkBox->setChecked(false);
 }
 
@@ -147,16 +141,6 @@ bool SettingsWidget::get_vbos_max_65535() const
 void SettingsWidget::update_vbos_max_65535(bool t)
 {
 	GLWidget::set_max_vbos_65535(t);
-}
-
-void SettingsWidget::set_vbos65535_warn(bool t)
-{
-	vbos65535warn = t;
-}
-
-bool SettingsWidget::get_vbos65535_warn() const
-{
-	return vbos65535warn;
 }
 
 double SettingsWidget::get_font_pt() const
@@ -187,7 +171,6 @@ bool SettingsWidget::get_clean_unused_bits() const
 
 void SettingsWidget::readSettings()
 {
-#if 1
 	QSettings settings(
 		QSettings::IniFormat,
 		QSettings::UserScope,
@@ -198,23 +181,36 @@ void SettingsWidget::readSettings()
 	double tmp1 = settings.value(QString("scale_ui_icons"), 1.0).toDouble();
 	double tmp2 = settings.value(QString("app_font_pt"), 0.0).toDouble();
 	settings.endGroup();
+	settings.beginGroup(QString("StyleDialog"));
+	saved_idx = settings.value(QString("saved_idx"), 0).toInt();
+	settings.endGroup();
 	si_doubleSpinBox->setValue(tmp1);
-	if (tmp2 <= 0.0) tmp2 = 12.0;
+	if (tmp2 <= 0.0) 
+	{
+		QFont f = QApplication::font();
+		tmp2 = f.pointSizeF();
+		if (tmp2 <= 0) tmp2 = 12.0;
+	}
 	pt_doubleSpinBox->setValue(tmp2);
-#endif
 }
 
 void SettingsWidget::writeSettings(QSettings & settings)
 {
-#if 1
 	const double scale_ui_icons = si_doubleSpinBox->value();
 	const double x =
 		pt_doubleSpinBox->value() < 6.0 ? 6.0 : pt_doubleSpinBox->value();
 	settings.beginGroup(QString("GlobalSettings"));
 	settings.setValue(QString("scale_ui_icons"),   QVariant(scale_ui_icons));
 	settings.setValue(QString("app_font_pt"), QVariant(x));
+	settings.setValue(
+		QString("stylename"),
+		QVariant(styleComboBox->currentText().trimmed()));
 	settings.endGroup();
-#endif
+	settings.beginGroup(QString("StyleDialog"));
+	settings.setValue(
+		QString("saved_idx"),
+		QVariant(styleComboBox->currentIndex()));
+	settings.endGroup();
 }
 
 float SettingsWidget::get_scale_icons() const
@@ -222,7 +218,4 @@ float SettingsWidget::get_scale_icons() const
 	return scale_icons*(float)si_doubleSpinBox->value();
 }
 
-bool SettingsWidget::get_dark_theme() const
-{
-	return dark_checkBox->isChecked();
-}
+

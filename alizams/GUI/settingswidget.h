@@ -32,10 +32,9 @@ public:
 	bool    get_clean_unused_bits() const;
 	void    writeSettings(QSettings&);
 	float   get_scale_icons() const;
-	bool    get_dark_theme() const;
 
 private:
-	bool vbos65535warn;
+	int   saved_idx;
 	float scale_icons;
 
 private slots:

@@ -451,6 +451,8 @@ MainWindow::MainWindow(
 	connect(meta_open_act,                  SIGNAL(triggered()),         sqtree,  SLOT(open_file()));
     connect(tabWidget,                      SIGNAL(currentChanged(int)), this,    SLOT(tab_ind_changed(int)));
 	//
+	connect(settingswidget->styleComboBox,  SIGNAL(currentIndexChanged(QString)),this,SLOT(set_style(QString)));
+	//
 	setAcceptDrops(true);
 }
 
@@ -1731,3 +1733,53 @@ void MainWindow::readSettings()
 #endif
 }
 
+void MainWindow::set_style(QString s)
+{
+	if (settingswidget) change_style(s.trimmed());
+}
+
+void MainWindow::change_style(const QString & s)
+{
+	if (s.isEmpty()) return;
+	if (s==QString("Dark Fusion"))
+	{
+		QColor bg(0x53, 0x59, 0x60);
+		QColor tt(0x30, 0x39, 0x47);	
+		QPalette p;
+		p.setColor(QPalette::Window, bg); 
+		p.setColor(QPalette::WindowText, Qt::white);
+		p.setColor(QPalette::Text, Qt::white);
+		p.setColor(QPalette::Disabled, QPalette::WindowText, Qt::gray);
+		p.setColor(QPalette::Disabled, QPalette::Text, Qt::gray);
+		p.setColor(QPalette::Base, bg);
+		p.setColor(QPalette::AlternateBase, bg);
+		p.setColor(QPalette::ToolTipBase, tt);
+		p.setColor(QPalette::ToolTipText, Qt::white);
+		p.setColor(QPalette::Button, bg);
+		p.setColor(QPalette::ButtonText, Qt::white);
+		p.setColor(QPalette::BrightText, Qt::white);
+		p.setColor(QPalette::Link, Qt::darkBlue); 
+		p.setColor(QPalette::Highlight, Qt::lightGray);
+		p.setColor(QPalette::HighlightedText, Qt::black);
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+		QApplication::setStyle(QString("Fusion"));
+#else
+		QApplication::setStyle(QString("Plastique"));
+#endif
+		QApplication::setPalette(p);
+	}
+	else
+	{
+		QApplication::setStyle(s);
+		QApplication::setPalette(QApplication::style()->standardPalette());
+	}
+	if (glwidget)         glwidget->update_clear_color();
+	if (graphicswidget_m) graphicswidget_m->update_background_color();
+	if (graphicswidget_y) graphicswidget_y->update_background_color();
+	if (graphicswidget_x) graphicswidget_x->update_background_color();
+	if (toolbox2D)        toolbox2D->set_style_sheet();
+	if (slider_m)         slider_m->set_style_sheet();
+	if (slider_y)         slider_y->set_style_sheet();
+	if (slider_x)         slider_x->set_style_sheet();
+	if (histogramview)    histogramview->update_bgcolor();
+}

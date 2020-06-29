@@ -658,7 +658,7 @@ void GraphicsView::set_win_last_position(int x, int y)
 
 void GraphicsView::update_background_color()
 {
-	QColor bc = qApp->palette().color(QPalette::Window);
+	QColor bc = QApplication::palette().color(QPalette::Window);
 	setBackgroundBrush(QBrush(bc));
 	shutter_color = bc;
 }
