@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
 		format.setRenderableType(QSurfaceFormat::OpenGL);
 #ifdef USE_CORE_3_2_PROFILE
 #ifdef USE_GL_MAJOR_3_MINOR_2
-		//format.setVersion(3, 2); // may be required sometimes, e.g. Intel on Linux
+		format.setVersion(3, 2); // may be required sometimes, e.g. Intel on Linux
 #endif
 		format.setProfile(QSurfaceFormat::CoreProfile);
 #endif

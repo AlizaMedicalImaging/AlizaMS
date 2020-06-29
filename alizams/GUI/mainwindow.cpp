@@ -250,8 +250,6 @@ MainWindow::MainWindow(
 		fmt.setProfile(QGLFormat::CoreProfile);
 #endif
 		fmt.setDirectRendering(true);
-		fmt.setSampleBuffers(true);
-		fmt.setSamples(4);
 		fmt.setDoubleBuffer(true);
 		fmt.setAlpha(true);
 		fmt.setRedBufferSize(8);
@@ -260,6 +258,8 @@ MainWindow::MainWindow(
 		fmt.setAlphaBufferSize(8);
 		fmt.setDepth(true);
 		fmt.setDepthBufferSize(24);
+		//fmt.setSampleBuffers(true);
+		//fmt.setSamples(4);
 		glwidget = new GLWidget(fmt);
 #else
 		glwidget = new GLWidget();
