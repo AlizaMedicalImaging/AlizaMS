@@ -222,10 +222,11 @@ void DisplayInterface::close(bool clear_geometry)
 			trimesh->initialized &&
 			trimesh->qmesh)
 		{
-			gl->glDeleteVertexArrays(1, &(trimesh->qmesh->vaoid));
 #if QT_VERSION >= 0x050000
+			gl->glDeleteVertexArrays(1, &(trimesh->qmesh->vaoid));
 			gl->glDeleteBuffers(2, trimesh->qmesh->vboid);
 #else
+			glDeleteVertexArrays(1, &(trimesh->qmesh->vaoid));
 			glDeleteBuffers(2, trimesh->qmesh->vboid);
 #endif
 			GLWidget::increment_count_vbos(-2);
