@@ -494,6 +494,11 @@ void GLWidget::keyPressEvent(QKeyEvent * e)
 			get_screen();
 		}
 		break;
+	case Qt::Key_W:
+		{
+			set_wireframe(!wireframe);
+		}
+		break;
 	default:
 		break;
 	}
@@ -570,6 +575,12 @@ void GLWidget::update_clear_color()
 {
 	QColor color0 = qApp->palette().color(QPalette::Window);
 	set_clear_color((float)color0.redF(),(float)color0.greenF(),(float)color0.blueF());
+}
+
+void GLWidget::set_wireframe(bool t)
+{
+	wireframe = t;
+	updateGL();
 }
 
 void GLWidget::set_skip_draw(bool t)
@@ -789,6 +800,7 @@ void GLWidget::init_()
 	new_win_pos_y  = 0;
 	rect_selection = false;
 	show_cube = true;
+	wireframe = false;
 	contours_width = 2.0f;
 	pan_x  = 0;
 	pan_y  = 0;
@@ -1275,6 +1287,7 @@ void GLWidget::init_opengl(int w, int h)
 	color_shader.location_modeling_inv_t = glGetUniformLocation(color_shader.program, "modeling_inv_t");
 	color_shader.location_sparams        = glGetUniformLocation(color_shader.program, "sparams");
 	shaders.push_back(&color_shader);
+	*/
 	//
 	create_program(color_vs, mesh_fs, &mesh_shader);
 	mesh_shader.position_handle         = glGetAttribLocation (mesh_shader.program, "v_position");
@@ -1284,7 +1297,6 @@ void GLWidget::init_opengl(int w, int h)
 	mesh_shader.location_sparams        = glGetUniformLocation(mesh_shader.program, "sparams");
 	shaders.push_back(&mesh_shader);
 	//
-	*/
 	gen_lut_tex(default_lut,default_lut_size,&gradient1);
 	gen_lut_tex(black_rainbow_lut,black_rainbow_size,&gradient2);
 	gen_lut_tex(syngo_lut,syngo_lut_size,&gradient3);
@@ -2286,9 +2298,10 @@ void GLWidget::paint_volume()
 	const float fold_win_pos_y = -2.0f * (((float)old_win_pos_y/(float)win_h) - 0.5f);
 	const float fnew_win_pos_x =  2.0f * (((float)new_win_pos_x/(float)win_w) - 0.5f);
 	const float fnew_win_pos_y = -2.0f * (((float)new_win_pos_y/(float)win_h) - 0.5f);
-	//
 	unsigned int count = 0;
 	unsigned int count_images = 0;
+	const bool wireframe_ = wireframe;
+	//
 	if (show_cube)
 	{
 		render_orient_cube1(fold_win_pos_x,fold_win_pos_y,fnew_win_pos_x,fnew_win_pos_y);
@@ -2374,6 +2387,42 @@ void GLWidget::paint_volume()
 				}
 			}
 			count += 1;
+		}
+		//
+		if (!selected_images__->at(iii)->di->trimeshes.empty())
+		{
+			if (wireframe_) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			// eye position and light direction
+			sparams[0] = light_x;
+			sparams[1] = light_y;
+			sparams[2] = light_z;
+			sparams[3] = sparams[0];
+			sparams[4] = sparams[1];
+			sparams[5] = sparams[2];
+			glUseProgram(mesh_shader.program); // all meshes currently using 'mesh_shader'
+			TriMeshes::const_iterator mi = selected_images__->at(iii)->di->trimeshes.begin();
+			while (mi != selected_images__->at(iii)->di->trimeshes.end())
+			{
+				TriMesh * tm = mi.value();
+				if (tm && tm->initialized && tm->visible && tm->qmesh)
+				{
+					d_mesh(tm->qmesh,
+						NULL,
+						NULL,
+						mvp_aos_ptr,
+						NULL,
+						NULL,
+						NULL,
+						NULL,
+						NULL,
+						NULL,
+						NULL,
+						sparams,
+						NULL);
+				}
+				++mi;
+			}
+			if (wireframe_) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
 		//
 		if (display_contours && !selected_images__->at(iii)->di->rois.empty())
@@ -3356,7 +3405,19 @@ void GLWidget::fit_to_screen(const ImageVariant * ivariant)
 		update_screen_size(-1);
 		return;
 	}
-	if (ivariant->image_type==100)
+	if (ivariant->image_type==200)
+	{
+		double max_delta = 0;
+		TriMeshes::const_iterator mi = ivariant->di->trimeshes.begin();
+		while (mi != ivariant->di->trimeshes.end())
+		{
+			if (mi.value() && mi.value()->max_delta > max_delta)
+				max_delta = mi.value()->max_delta;
+			++mi;
+		}
+		update_screen_size(max_delta);
+	}
+	else if (ivariant->image_type==100)
 	{
 		double max_delta = 0;
 		for (int x = 0; x < ivariant->di->rois.size(); x++)
@@ -7508,7 +7569,7 @@ void GLWidget::generateAnisoTexture(
 }
 
 void GLWidget::d_orientcube(
-	qMeshData * s,
+	qMeshData  * s,
 	void  * ,
 	int   * ,
 	float * mvp,
@@ -7528,4 +7589,24 @@ void GLWidget::d_orientcube(
 	glDrawArrays(GL_TRIANGLES, 0, s->faces_size*3);
 }
 
-
+void GLWidget::d_mesh(
+	qMeshData * s,
+    void  * ,
+    int   * ,
+    float * mvp,
+    float * ,
+    float * ,
+    float * ,
+    float * ,
+    float * ,
+    float * ,
+    float * ,
+    float * sparams,
+    void  * )
+{
+    glUniformMatrix4fv(s->shader->location_mvp, 1, GL_FALSE, mvp);
+    glUniform3fv(s->shader->location_sparams, 2, sparams);
+	glUniform4fv(s->shader->location_K, 2, s->K);
+    glBindVertexArray(s->vaoid);
+    glDrawArrays(GL_TRIANGLES, 0, s->faces_size*3);
+}

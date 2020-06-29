@@ -117,6 +117,7 @@ public:
 	void zoom_in();
 	void zoom_out();
 	void update_clear_color();
+	void set_wireframe(bool);
 	static long long get_count_vbos();
 	static void increment_count_vbos(long long);
 	static void set_max_vbos_65535(bool);
@@ -205,6 +206,7 @@ public:
 	bool rect_selection;
 	bool show_cube;
 	bool gpu_shader4;
+	bool wireframe;
 	float contours_width;
 	//
 	float  clear_color_r;
@@ -434,19 +436,33 @@ public:
 	void raycast_cube_ASL(float, float, float, GLuint*, GLuint*, GLuint*,bool);
 	void generateAnisoTexture(GLuint*, const unsigned int, const unsigned int);
 	void d_orientcube(
-		qMeshData * ,
-    	void  * ,
-    	int   * ,
-    	float * ,
-    	float * ,
-    	float * ,
-    	float * ,
-    	float * ,
-    	float * ,
-    	float * ,
-    	float * ,
-    	float * ,
-    	void  *);
+		qMeshData  * ,
+			void  * ,
+			int   * ,
+			float * ,
+			float * ,
+			float * ,
+			float * ,
+			float * ,
+			float * ,
+			float * ,
+			float * ,
+			float * ,
+			void  *);
+	void d_mesh(
+		qMeshData  * ,
+			void  * ,
+			int   * ,
+			float * ,
+			float * ,
+			float * ,
+			float * ,
+			float * ,
+			float * ,
+			float * ,
+			float * ,
+			float * ,
+			void  *);
 
 public slots:
 	void set_ortho(bool);

@@ -260,7 +260,6 @@ public:
 };
 typedef QList<ROI> ROIs;
 
-/*
 class TriMesh
 {
 public:
@@ -285,7 +284,6 @@ public:
 	double B;
 };
 typedef QMap<int, TriMesh*> TriMeshes;
-*/
 
 class AnatomyDesc
 {
@@ -762,7 +760,7 @@ public:
 	SlicesVector image_slices;
 	SpectroscopySlicesVector spectroscopy_slices;
 	ROIs rois;
-	//TriMeshes trimeshes;
+	TriMeshes trimeshes;
 	void close(bool=true);
 };
 

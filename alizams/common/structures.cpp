@@ -30,8 +30,6 @@ DisplayInterface::DisplayInterface(
 	cube_3dtex = 0;
 	for (int x=0;x<3;x++) origin[x]=0.0f;
 	origin_ok = false;
-//	spect_vol_vbo = 0;
-//	spect_vol_vbo_size = 0;
 	tex_info = -1;
 	idimx = idimy = idimz = 0;
 	ix_origin = iy_origin = iz_origin = 0.0f;
@@ -101,7 +99,7 @@ void DisplayInterface::close(bool clear_geometry)
 	tex_info = -1;
 	x_spacing = y_spacing = 0.0;
 	dimx = dimy = 0;
-	//TriMeshes::iterator mi;
+	TriMeshes::iterator mi;
 	if(!clear_geometry) goto quit__;
 	//
 	//
@@ -214,7 +212,6 @@ void DisplayInterface::close(bool clear_geometry)
 		rois[k].map.clear();
 	}
 	rois.clear();
-/*
 	mi = trimeshes.begin();
 	while (mi != trimeshes.end())
 	{
@@ -237,7 +234,6 @@ void DisplayInterface::close(bool clear_geometry)
 		if (trimesh) delete trimesh;
 	}
 	trimeshes.clear();
-*/
 	center_x = center_y = center_z = 0.0f;
 	slices_direction_x = slices_direction_y = 0.0f;
 	slices_direction_z = 1.0;
