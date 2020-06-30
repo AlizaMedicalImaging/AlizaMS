@@ -3,7 +3,8 @@
 Aliza MS - DICOM Viewer
 =======================
 
-Quick start:
+Quick start
+-----------
 
 Select 'DICOM scanner' tab, open directory with DICOM files or DICOMDIR file (or drag-and-drop)
 
@@ -13,6 +14,9 @@ Select one or more series and click 'arrow' action (or double-click selected row
 ![Open](alizams/package/art/start0.png)
 
 
+
+Features
+--------
  * Directory scanner
  * DICOMDIR
  * 3D views with many tools
