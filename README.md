@@ -38,7 +38,7 @@ Data sets
 
 
 Build
-=====
+-----
 
 [Linux example](https://github.com/AlizaMedicalImaging/AlizaMS/wiki)
 
