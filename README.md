@@ -30,3 +30,15 @@ Features
  * Elscint ELSCINT1 PMSCT_RLE1 and PMSCT_RGB1
  * Grayscale softcopy presentation (partial)
  * etc.
+
+Data sets
+---------
+
+[Aliza Medical Imaging collection](https://www.aliza-dicom-viewer.com/download/datasets)
+
+
+Build
+-----
+
+[Linux example](https://github.com/AlizaMedicalImaging/AlizaMS/wiki)
+
