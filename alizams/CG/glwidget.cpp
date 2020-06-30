@@ -7610,22 +7610,22 @@ void GLWidget::d_orientcube(
 
 void GLWidget::d_mesh(
 	qMeshData * s,
-    void  * ,
-    int   * ,
-    float * mvp,
-    float * ,
-    float * ,
-    float * ,
-    float * ,
-    float * ,
-    float * ,
-    float * ,
-    float * sparams,
-    void  * )
+	void  * ,
+	int   * ,
+	float * mvp,
+	float * ,
+	float * ,
+	float * ,
+	float * ,
+	float * ,
+	float * ,
+	float * ,
+	float * sparams,
+	void  * )
 {
-    glUniformMatrix4fv(s->shader->location_mvp, 1, GL_FALSE, mvp);
-    glUniform3fv(s->shader->location_sparams, 2, sparams);
+	glUniformMatrix4fv(s->shader->location_mvp, 1, GL_FALSE, mvp);
+	glUniform3fv(s->shader->location_sparams, 2, sparams);
 	glUniform4fv(s->shader->location_K, 2, s->K);
-    glBindVertexArray(s->vaoid);
-    glDrawArrays(GL_TRIANGLES, 0, s->faces_size*3);
+	glBindVertexArray(s->vaoid);
+	glDrawArrays(GL_TRIANGLES, 0, s->faces_size*3);
 }
