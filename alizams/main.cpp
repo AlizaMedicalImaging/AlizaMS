@@ -171,12 +171,16 @@ int main(int argc, char *argv[])
 #if 1 
 	QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
 #endif
+#ifndef __arm__
 	QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
+#endif
 #ifdef USE_SET_DEFAULT_GL_FORMAT
 	if (!metadata_only)
 	{
 		QSurfaceFormat format;
+#ifndef __arm__
 		format.setRenderableType(QSurfaceFormat::OpenGL);
+#endif
 #ifdef USE_CORE_3_2_PROFILE
 #ifdef USE_GL_MAJOR_3_MINOR_2
 		format.setVersion(3, 2); // may be required sometimes, e.g. Intel on Linux

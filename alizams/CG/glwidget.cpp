@@ -184,7 +184,9 @@ GLWidget::GLWidget(QWidget * p, Qt::WindowFlags f) : QOpenGLWidget(p, f)
 #ifdef USE_SET_GL_FORMAT
 #ifndef USE_SET_DEFAULT_GL_FORMAT
 	QSurfaceFormat format;
+#ifndef __arm__
 	format.setRenderableType(QSurfaceFormat::OpenGL);
+#endif
 #ifdef USE_CORE_3_2_PROFILE
 #ifdef USE_GL_MAJOR_3_MINOR_2
 	format.setVersion(3, 2); // may be required sometimes, e.g. Intel on Linux
