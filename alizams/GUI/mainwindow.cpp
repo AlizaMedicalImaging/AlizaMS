@@ -246,7 +246,9 @@ MainWindow::MainWindow(
 #ifdef USE_SET_GL_FORMAT
 		QGLFormat fmt;
 #ifdef USE_CORE_3_2_PROFILE
-		//fmt.setVersion(3, 2); // may be required sometimes, e.g. Intel on Linux
+#ifdef USE_GL_MAJOR_3_MINOR_2
+		fmt.setVersion(3, 2); // may be required sometimes, e.g. Intel on Linux
+#endif
 		fmt.setProfile(QGLFormat::CoreProfile);
 #endif
 		fmt.setDirectRendering(true);
