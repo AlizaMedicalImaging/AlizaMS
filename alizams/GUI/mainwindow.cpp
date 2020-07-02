@@ -238,26 +238,6 @@ MainWindow::MainWindow(
 	l13->setContentsMargins(0,0,0,0);
 	l13->addWidget(zrangewidget);
 	//
-	sqtree = new SQtree(this, true);
-	QVBoxLayout * vl296 = new QVBoxLayout(metadata_frame);
-	vl296->setContentsMargins(0,0,0,0);
-	vl296->setSpacing(0);
-	vl296->addWidget(sqtree);
-	//
-	browser2 = new BrowserWidget2(scale_icons*adjust_scale_icons, this);
-	QVBoxLayout * vl396 = new QVBoxLayout(browser2_frame);
-	vl396->setContentsMargins(0,0,0,0);
-	vl396->setSpacing(0);
-	vl396->addWidget(browser2);
-	//
-	settingswidget = new SettingsWidget(scale_icons, this);
-	QVBoxLayout * vl496 = new QVBoxLayout(settings_frame);
-	vl496->setContentsMargins(0,0,0,0);
-	vl496->setSpacing(0);
-	vl496->addWidget(settingswidget);
-	//
-	aboutwidget = new AboutWidget();
-	//
 	if (ok3d)
 	{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -296,11 +276,25 @@ MainWindow::MainWindow(
 		glwidget = NULL;
 	}
 	//
-	if (ok3d && glwidget)
-	{
-		connect(glwidget,SIGNAL(opengl3_not_available()),this,SLOT(update_no_opengl3()));
-		connect(glwidget,SIGNAL(set_gallium()),settingswidget,SLOT(set_gallium_true()));
-	}
+	sqtree = new SQtree(this, true);
+	QVBoxLayout * vl296 = new QVBoxLayout(metadata_frame);
+	vl296->setContentsMargins(0,0,0,0);
+	vl296->setSpacing(0);
+	vl296->addWidget(sqtree);
+	//
+	browser2 = new BrowserWidget2(scale_icons*adjust_scale_icons, this);
+	QVBoxLayout * vl396 = new QVBoxLayout(browser2_frame);
+	vl396->setContentsMargins(0,0,0,0);
+	vl396->setSpacing(0);
+	vl396->addWidget(browser2);
+	//
+	settingswidget = new SettingsWidget(scale_icons, this);
+	QVBoxLayout * vl496 = new QVBoxLayout(settings_frame);
+	vl496->setContentsMargins(0,0,0,0);
+	vl496->setSpacing(0);
+	vl496->addWidget(settingswidget);
+	//
+	aboutwidget = new AboutWidget();
 	//
 	aliza = new Aliza();
 	//
@@ -379,7 +373,14 @@ MainWindow::MainWindow(
 	}
 	else
 	{
-		update_no_opengl3();
+		gl_frame->hide();
+		slicesAct->setChecked(false);
+		raycastAct->setChecked(false);
+		trans3DAct->setEnabled(false);
+		gloptionsAct->setEnabled(false);
+		frames3DAct->setEnabled(false);
+		frame3D->hide();
+		settingswidget->set_enable_texture_groupbox(false);
 	}
 	//
 	toolbar2D_frame->hide();
@@ -1785,33 +1786,3 @@ void MainWindow::change_style(const QString & s)
 	if (histogramview)    histogramview->update_bgcolor();
 }
 
-void MainWindow::update_no_opengl3()
-{
-	if (glwidget)
-	{
-		if (gl_frame->layout())
-		{
-			gl_frame->layout->removeWidget(glwidget);
-		}
-		glwidget->hide();
-		saved_ok3d = false;
-	}
-	saved_ok3d = false;
-	settingswidget->set_enable_texture_groupbox(false);
-	gl_frame->hide();
-	slicesAct->setChecked(false);
-	slicesAct->setEnabled(false);
-	raycastAct->setChecked(false);
-	raycastAct->setEnabled(false);
-	trans3DAct->setEnabled(false);
-	gloptionsAct->setEnabled(false);
-	frames3DAct->setEnabled(false);
-	disconnect(show3DAct, SIGNAL(toggled(bool)), this,SLOT(toggle_showgl(bool)));
-	show3DAct->setChecked(false);
-	show3DAct->setCheckable(false);
-	show3DAct->setEnabled(false);
-	toolbar3D_frame->hide();
-	toolbox3D_frame->hide();
-	view3d_frame->hide();
-	frame3D->hide();
-}

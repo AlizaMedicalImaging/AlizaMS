@@ -304,7 +304,9 @@ void GLWidget::initializeGL()
 	if (!c)
 	{
 		std::cout << "QOpenGLContext is NULL " << std::endl;
+#if 0
 		emit opengl3_not_available();
+#endif
 		return;
 	}
 	else
@@ -312,7 +314,9 @@ void GLWidget::initializeGL()
 		if (!c->isValid())
 		{
 			std::cout << "QOpenGLContext is invalid" << std::endl;
+#if 0
 			emit opengl3_not_available();
+#endif
 			return;
 		}
 		else
@@ -325,7 +329,9 @@ void GLWidget::initializeGL()
 			if (!funcs)
 			{
 				std::cout << "Could not obtain required OpenGL context version" << std::endl;
+#if 0
 				emit opengl3_not_available();
+#endif
 				return;
 			}
 		}
