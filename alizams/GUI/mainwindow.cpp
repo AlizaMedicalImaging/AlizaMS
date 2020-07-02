@@ -1789,7 +1789,10 @@ void MainWindow::update_no_opengl3()
 {
 	saved_ok3d = false;
 	settingswidget->set_enable_texture_groupbox(false);
-	glwidget->hide();
+	if (glwidget)
+	{
+		glwidget->doneCurrent();
+	}
 	gl_frame->hide();
 	slicesAct->setChecked(false);
 	slicesAct->setEnabled(false);
