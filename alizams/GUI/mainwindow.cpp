@@ -293,6 +293,7 @@ MainWindow::MainWindow(
 	}
 	else
 	{
+		ok3d = false;
 		glwidget = NULL;
 	}
 	//
