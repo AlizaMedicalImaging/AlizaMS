@@ -17,6 +17,7 @@ SettingsWidget::SettingsWidget(float si, QWidget * p, Qt::WindowFlags f) : QWidg
 	setupUi(this);
 	saved_idx = 0;
 	scale_icons = si;
+	gallium = false;
 	x_comboBox->addItem(QString("256"));
 	x_comboBox->addItem(QString("128"));
 	x_comboBox->addItem(QString("64"));
@@ -94,7 +95,6 @@ void SettingsWidget::set_default()
 {
 	styleComboBox->setCurrentIndex(0);
 	si_doubleSpinBox->setValue(1.0);
-	pt_doubleSpinBox->setValue(12.0);
 	original_radioButton->setChecked(true);
 	resample_radioButton->setChecked(false);
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -108,13 +108,17 @@ void SettingsWidget::set_default()
 	f_no_radioButton->setChecked(true);
 	textureoptions_groupBox->setEnabled(true);
 	textureoptions_groupBox->setChecked(true);
-	maxvbos_checkBox->setChecked(false);
+	if (gallium) maxvbos_checkBox->setChecked(true);
+	else maxvbos_checkBox->setChecked(false);
 	rescale_checkBox->setChecked(true);
 	mosaic_checkBox->setChecked(true);
 	time_s__checkBox->setChecked(false);
 	overlays_checkBox->setChecked(true);
 	clean_unused_checkBox->setChecked(false);
 	pet_no_level_checkBox->setChecked(false);
+	pt_doubleSpinBox->setEnabled(false);
+	disconnect(pt_doubleSpinBox,SIGNAL(valueChanged(double)),this,SLOT(update_font_pt(double)));
+	pt_doubleSpinBox->setValue(0.0);
 }
 
 int SettingsWidget::get_time_unit() const
@@ -143,6 +147,13 @@ void SettingsWidget::update_vbos_max_65535(bool t)
 	GLWidget::set_max_vbos_65535(t);
 }
 
+void SettingsWidget::set_gallium_true()
+{
+	gallium = true;
+	maxvbos_checkBox->setChecked(true);
+	GLWidget::set_max_vbos_65535(true);
+}
+
 double SettingsWidget::get_font_pt() const
 {
 	return pt_doubleSpinBox->value();
@@ -151,12 +162,19 @@ double SettingsWidget::get_font_pt() const
 void SettingsWidget::update_font_pt(double x)
 {
 	QFont f = QApplication::font();
-	if (f.pointSize() != -1)
+	if (x < 6.0)
+	{
+		pt_doubleSpinBox->blockSignals(true);
+		pt_doubleSpinBox->setValue(6.0);
+		f.setPointSizeF(6.0);
+		pt_doubleSpinBox->blockSignals(false);
+	}
+	else
 	{
 		f.setPointSizeF(x);
-		QApplication::setFont(f);
-		QApplication::processEvents();
 	}
+	QApplication::setFont(f);
+	QApplication::processEvents();
 }
 
 bool SettingsWidget::get_level_for_PET() const
@@ -185,23 +203,18 @@ void SettingsWidget::readSettings()
 	saved_idx = settings.value(QString("saved_idx"), 0).toInt();
 	settings.endGroup();
 	si_doubleSpinBox->setValue(tmp1);
-	if (tmp2 <= 0.0) 
-	{
-		QFont f = QApplication::font();
-		tmp2 = f.pointSizeF();
-		if (tmp2 <= 0) tmp2 = 12.0;
-	}
+	QFont f = QApplication::font();
+	if (tmp2 < 6.0) tmp2 = 6.0; 
+	else tmp2 = f.pointSizeF();
 	pt_doubleSpinBox->setValue(tmp2);
 }
 
 void SettingsWidget::writeSettings(QSettings & settings)
 {
 	const double scale_ui_icons = si_doubleSpinBox->value();
-	const double x =
-		pt_doubleSpinBox->value() < 6.0 ? 6.0 : pt_doubleSpinBox->value();
 	settings.beginGroup(QString("GlobalSettings"));
 	settings.setValue(QString("scale_ui_icons"),   QVariant(scale_ui_icons));
-	settings.setValue(QString("app_font_pt"), QVariant(x));
+	settings.setValue(QString("app_font_pt"), QVariant(pt_doubleSpinBox->value()));
 	settings.setValue(
 		QString("stylename"),
 		QVariant(styleComboBox->currentText().trimmed()));

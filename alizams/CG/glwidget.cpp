@@ -184,7 +184,9 @@ GLWidget::GLWidget(QWidget * p, Qt::WindowFlags f) : QOpenGLWidget(p, f)
 #ifdef USE_SET_GL_FORMAT
 #ifndef USE_SET_DEFAULT_GL_FORMAT
 	QSurfaceFormat format;
-#ifndef __arm__
+#ifdef __arm__
+	format.setRenderableType(QSurfaceFormat::OpenGLES);
+#else
 	format.setRenderableType(QSurfaceFormat::OpenGL);
 #endif
 #ifdef USE_CORE_3_2_PROFILE
@@ -207,6 +209,7 @@ GLWidget::GLWidget(QWidget * p, Qt::WindowFlags f) : QOpenGLWidget(p, f)
 	setMinimumSize(64,64);
 	setFocusPolicy(Qt::WheelFocus);
 	init_();
+	srand(time(NULL));
 }
 #else
 GLWidget::GLWidget(QWidget * p) : QGLWidget(p)
@@ -214,6 +217,7 @@ GLWidget::GLWidget(QWidget * p) : QGLWidget(p)
 	setMinimumSize(64,64);
 	setFocusPolicy(Qt::WheelFocus);
 	init_();
+	srand(time(NULL));
 }
 
 GLWidget::GLWidget(const QGLFormat & frm, QWidget * p) : QGLWidget(frm,p)
@@ -221,6 +225,7 @@ GLWidget::GLWidget(const QGLFormat & frm, QWidget * p) : QGLWidget(frm,p)
 	setMinimumSize(64,64);
 	setFocusPolicy(Qt::WheelFocus);
 	init_();
+	srand(time(NULL));
 }
 #endif
 
@@ -299,6 +304,7 @@ void GLWidget::initializeGL()
 	if (!c)
 	{
 		std::cout << "QOpenGLContext is NULL " << std::endl;
+		emit opengl3_not_available();
 		return;
 	}
 	else
@@ -306,6 +312,7 @@ void GLWidget::initializeGL()
 		if (!c->isValid())
 		{
 			std::cout << "QOpenGLContext is invalid" << std::endl;
+			emit opengl3_not_available();
 			return;
 		}
 		else
@@ -318,6 +325,7 @@ void GLWidget::initializeGL()
 			if (!funcs)
 			{
 				std::cout << "Could not obtain required OpenGL context version" << std::endl;
+				emit opengl3_not_available();
 				return;
 			}
 		}
@@ -326,6 +334,7 @@ void GLWidget::initializeGL()
 	const QGLContext * c = context();
 	if (!c->isValid())
 	{
+		emit opengl3_not_available();
 		std::cout << "GLContext is invalid" << std::endl;
 		return;
 	}
@@ -690,7 +699,6 @@ void GLWidget::init_()
 	max_tex_size = 0;
 	max_3d_texture_size = 0;
 	opengl_init_done = false;
-	gallium = false;
 	fsquad_shader.program = 0;
 	zero_shader.program = 0;
 	raycast_shader.program = 0;
@@ -954,7 +962,6 @@ void GLWidget::close_()
 
 void GLWidget::init_opengl(int w, int h)
 {
-	srand(time(NULL));
 	if (opengl_init_done) return;
 	opengl_init_done = true;
 	for (int i = 0; i < 16; i++) mparams[i] = 0.0f;
@@ -967,6 +974,7 @@ void GLWidget::init_opengl(int w, int h)
 	GLenum err = glewInit();
 	if (GLEW_OK != err)
 	{
+		emit opengl3_not_available();
 		return;
 	}
 	if (glewIsSupported("GL_VERSION_3_0"))
@@ -977,6 +985,7 @@ void GLWidget::init_opengl(int w, int h)
 	{
 		no_opengl3 = true;
 		opengl_info.append(QString("\nOpenGL modules disabled"));
+		emit opengl3_not_available();
 		return;
 	}
 #endif
@@ -1010,7 +1019,7 @@ void GLWidget::init_opengl(int w, int h)
 	//
 	if (renderer_str.contains(QString("Gallium"),Qt::CaseInsensitive))
 	{
-		gallium = true;
+		emit set_gallium();
 	}
 	//
 	//
@@ -1020,6 +1029,7 @@ void GLWidget::init_opengl(int w, int h)
 	if (no_opengl3)
 	{
 		opengl_info.append(QString("\nOpenGL modules disabled"));
+		emit opengl3_not_available();
 		return;
 	}
 #endif

@@ -66,6 +66,7 @@ protected:
 public slots:
 	void exit_null();
 	void set_style(QString);
+	void update_no_opengl3();
 
 private slots:
 	void about();

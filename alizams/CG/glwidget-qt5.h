@@ -140,7 +140,6 @@ public:
 	int  max_tex_size;
 	int  max_3d_texture_size;
 	bool opengl_init_done;
-	bool gallium;
 	void set_left();
 	void set_right();
 	void set_forward();
@@ -489,6 +488,10 @@ public slots:
 	void set_brightness(double);
 	void set_cube(bool);
 	void set_contours_width(float);
+
+signals:
+	void opengl3_not_available();
+	void set_gallium();
 
 protected:
 	void initializeGL() override;

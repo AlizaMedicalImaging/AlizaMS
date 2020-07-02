@@ -226,8 +226,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>991</width>
-            <height>540</height>
+            <width>355</width>
+            <height>124</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -315,7 +315,7 @@
                 <number>1</number>
                </property>
                <property name="minimum">
-                <double>5.000000000000000</double>
+                <double>0.000000000000000</double>
                </property>
                <property name="maximum">
                 <double>50.000000000000000</double>
@@ -442,8 +442,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>482</width>
-            <height>244</height>
+            <width>991</width>
+            <height>540</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -691,10 +691,10 @@
               </sizepolicy>
              </property>
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Applicable only to contours!&lt;/span&gt;&lt;/p&gt;&lt;p&gt;To avoid bug with some drivers Gallium versions on Linux.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To avoid bug with some drivers &lt;span style=&quot; font-style:italic;&quot;&gt;Gallium&lt;/span&gt; versions on Linux&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
-              <string>Max OpenGL VBOs 65535</string>
+              <string>Max OpenGL VBOs</string>
              </property>
             </widget>
            </item>
@@ -728,7 +728,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string notr="true">Reset to default</string>
+      <string notr="true">Reset to default (restart is required)</string>
      </property>
     </widget>
    </item>
@@ -766,12 +766,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>135</x>
-     <y>134</y>
+     <x>157</x>
+     <y>128</y>
     </hint>
     <hint type="destinationlabel">
-     <x>222</x>
-     <y>139</y>
+     <x>186</x>
+     <y>133</y>
     </hint>
    </hints>
   </connection>
@@ -782,8 +782,8 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>60</x>
-     <y>140</y>
+     <x>82</x>
+     <y>128</y>
     </hint>
     <hint type="destinationlabel">
      <x>271</x>
@@ -802,8 +802,8 @@
      <y>114</y>
     </hint>
     <hint type="destinationlabel">
-     <x>374</x>
-     <y>139</y>
+     <x>306</x>
+     <y>133</y>
     </hint>
    </hints>
   </connection>
@@ -818,8 +818,8 @@
      <y>117</y>
     </hint>
     <hint type="destinationlabel">
-     <x>413</x>
-     <y>114</y>
+     <x>407</x>
+     <y>133</y>
     </hint>
    </hints>
   </connection>

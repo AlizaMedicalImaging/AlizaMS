@@ -171,14 +171,18 @@ int main(int argc, char *argv[])
 #if 1 
 	QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
 #endif
-#ifndef __arm__
+#ifdef __arm__
+	QApplication::setAttribute(Qt::AA_UseDesktopOpenGLES);
+#else
 	QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
 #endif
 #ifdef USE_SET_DEFAULT_GL_FORMAT
 	if (!metadata_only)
 	{
 		QSurfaceFormat format;
-#ifndef __arm__
+#ifdef __arm__
+		format.setRenderableType(QSurfaceFormat::OpenGLES);
+#else
 		format.setRenderableType(QSurfaceFormat::OpenGL);
 #endif
 #ifdef USE_CORE_3_2_PROFILE
@@ -205,8 +209,6 @@ int main(int argc, char *argv[])
 	app.setApplicationName(QString("AlizaMS"));
 	//
 	{
-		const int hide_zoom_ = 1;
-		hide_zoom = (hide_zoom_==1) ? true : false;
 		double app_font_pt   = 0.0;
 		QSettings settings(
 			QSettings::IniFormat,
@@ -219,26 +221,25 @@ int main(int argc, char *argv[])
 		QString saved_style = settings.value(
 			QString("stylename"),
 			QVariant(QString("Dark Fusion"))).toString();
+		const int hide_zoom_ =
+			settings.value(QString("hide_zoom"), 1).toInt();
 		settings.endGroup();
+		hide_zoom = (hide_zoom_==1) ? true : false;
 		QFont f = QApplication::font();
 		if (app_font_pt <= 0.0)
 		{
 			app_font_pt = f.pointSizeF();
-			if (app_font_pt > 0.0)
-			{
-				f.setPointSizeF(app_font_pt);
-				app.setFont(f);
-				settings.beginGroup(QString("GlobalSettings"));
-				settings.setValue(QString("app_font_pt"), QVariant(app_font_pt));
-				settings.endGroup();
-				settings.sync();
-			}
 		}
 		else
 		{
-			f.setPointSizeF(app_font_pt);
+			if (app_font_pt < 6.0) app_font_pt = 6.0;
 		}
+		f.setPointSizeF(app_font_pt);
 		app.setFont(f);
+		settings.beginGroup(QString("GlobalSettings"));
+		settings.setValue(QString("app_font_pt"), QVariant(app_font_pt));
+		settings.endGroup();
+		settings.sync();
 		//
 		if (saved_style==QString("Dark Fusion"))
 		{

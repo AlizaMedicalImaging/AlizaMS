@@ -36,6 +36,7 @@ public:
 private:
 	int   saved_idx;
 	float scale_icons;
+	bool  gallium;
 
 private slots:
 	void set_default();
@@ -43,6 +44,8 @@ private slots:
 
 public slots:
 	void update_font_pt(double);
+	void set_gallium_true();
+
 
 protected:
 	void readSettings();
