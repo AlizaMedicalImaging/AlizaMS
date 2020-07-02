@@ -296,7 +296,7 @@ MainWindow::MainWindow(
 		glwidget = NULL;
 	}
 	//
-	if (glwidget)
+	if (ok3d && glwidget)
 	{
 		connect(glwidget,SIGNAL(opengl3_not_available()),this,SLOT(update_no_opengl3()));
 		connect(glwidget,SIGNAL(set_gallium()),settingswidget,SLOT(set_gallium_true()));
