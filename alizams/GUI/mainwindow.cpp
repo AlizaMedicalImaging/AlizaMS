@@ -1787,7 +1787,7 @@ void MainWindow::change_style(const QString & s)
 
 void MainWindow::update_no_opengl3()
 {
-	glwidget->hide();
+	glwidget->close();
 	gl_frame->hide();
 	slicesAct->setChecked(false);
 	slicesAct->setEnabled(false);
