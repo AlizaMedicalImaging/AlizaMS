@@ -1787,7 +1787,7 @@ void MainWindow::change_style(const QString & s)
 
 void MainWindow::update_no_opengl3()
 {
-	glwidget->close();
+
 	gl_frame->hide();
 	slicesAct->setChecked(false);
 	slicesAct->setEnabled(false);
@@ -1802,4 +1802,7 @@ void MainWindow::update_no_opengl3()
 	show3DAct->setEnabled(false);
 	frame3D->hide();
 	settingswidget->set_enable_texture_groupbox(false);
+	glwidget->doneCurrent();
+	glwidget->close();
+	glwidget->hide();
 }
