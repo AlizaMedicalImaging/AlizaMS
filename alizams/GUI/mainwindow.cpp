@@ -1787,14 +1787,17 @@ void MainWindow::change_style(const QString & s)
 
 void MainWindow::update_no_opengl3()
 {
-	saved_ok3d = false;
-	settingswidget->set_enable_texture_groupbox(false);
 	if (glwidget)
 	{
-		glwidget->close();
-		glwidget->doneCurrent();
+		if (gl_frame->layout())
+		{
+			gl_frame->layout->removeWidget(glwidget);
+		}
 		glwidget->hide();
+		saved_ok3d = false;
 	}
+	saved_ok3d = false;
+	settingswidget->set_enable_texture_groupbox(false);
 	gl_frame->hide();
 	slicesAct->setChecked(false);
 	slicesAct->setEnabled(false);
@@ -1807,5 +1810,8 @@ void MainWindow::update_no_opengl3()
 	show3DAct->setChecked(false);
 	show3DAct->setCheckable(false);
 	show3DAct->setEnabled(false);
+	toolbar3D_frame->hide();
+	toolbox3D_frame->hide();
+	view3d_frame->hide();
 	frame3D->hide();
 }
