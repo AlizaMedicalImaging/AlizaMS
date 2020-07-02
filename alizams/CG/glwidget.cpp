@@ -4244,6 +4244,7 @@ void GLWidget::raycast_cube(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0[] = {
+			// triangle strip
 			-x,  y, z,
 			-x, -y, z,
 			 x,  y, z,
@@ -4254,10 +4255,12 @@ void GLWidget::raycast_cube(
 			-x, -y, -z,
 			-x,  y, z,
 			-x, -y, z,
+			// triangle strip
 			-x, y, -z,
 			-x, y,  z,
 			 x, y, -z,
 			 x, y,  z,
+			 // triangle strip
 			-x, -y,  z,
 			-x, -y, -z,
 			 x, -y,  z,
@@ -4267,6 +4270,7 @@ void GLWidget::raycast_cube(
 	if (b)
 	{
 		GLfloat ca0[] = {
+					// triangle strip
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f,
@@ -4277,10 +4281,12 @@ void GLWidget::raycast_cube(
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
+					// triangle strip
 					0.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f,
+					// triangle strip
 					0.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f,
