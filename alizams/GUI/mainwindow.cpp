@@ -1411,16 +1411,8 @@ void MainWindow::set_ui()
 		view2d_label->setText("Slice view (Z)");
 		actionViews2DMenu->setEnabled(true);
 		actionViews3DMenu->setEnabled(true);
-		if (show3DAct->isChecked())
-		{
-			toolbar3D_frame->show();
-			view3d_frame->show();
-		}
-		else
-		{
-			toolbar3D_frame->hide();
-			view3d_frame->hide();
-		}
+		toolbar3D_frame->show();
+		view3d_frame->show();
 		first_image_loaded = true;
 	}
 }
