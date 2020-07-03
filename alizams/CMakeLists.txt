@@ -8,15 +8,15 @@ set(CMAKE_CXX_STANDARD 11)
 ####################################################################
 #
 # set USE_QT_V_5 to TRUE to use Qt5 (default), FALSE to use Qt4
-# set USE_LOCAL_GLEW (only for Qt4)
+# set USE_INCLUDED_GLEW_QT4 (only for Qt4)
 #
 # set USE_WORKSTATION_MODE for read-only access to CTK database
 #
 #
 ####################################################################
-set(USE_QT_V_5 TRUE)
-set(USE_LOCAL_GLEW TRUE)
-set(USE_WORKSTATION_MODE TRUE)
+option(USE_QT_V_5 "Use Qt5" ON)
+option(USE_INCLUDED_GLEW_QT4 "Use included GLEW library for Qt4" ON)
+option(USE_WORKSTATION_MODE "Build SQL for CTK access" ON)
 
 if(USE_QT_V_5)
   if(WIN32)
@@ -57,7 +57,7 @@ else()
     set(QT_USE_QTSQL TRUE)
   endif()
   include(${QT_USE_FILE})
-  if(USE_LOCAL_GLEW)
+  if(USE_INCLUDED_GLEW_QT4)
     set(LOCAL_GLEW_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CG/glew")
     add_definitions(-DGLEW_STATIC)
   else()
@@ -225,7 +225,7 @@ if(USE_WORKSTATION_MODE)
 endif()
 
 if(NOT USE_QT_V_5)
-  if(USE_LOCAL_GLEW)
+  if(USE_INCLUDED_GLEW_QT4)
     set(ALIZAMS_SRCS ${ALIZAMS_SRCS} "${LOCAL_GLEW_PATH}/src/glew.c")
   endif()
 endif()
@@ -339,7 +339,7 @@ endif()
 
 if(WIN32)
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} opengl32)
-  if(NOT USE_QT_V_5 AND NOT USE_LOCAL_GLEW)
+  if(NOT USE_QT_V_5 AND NOT USE_INCLUDED_GLEW_QT4)
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} glew32)
   endif()
   add_executable(alizams WIN32
@@ -354,7 +354,7 @@ else()
   else()
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GL)
   endif()
-  if(NOT USE_QT_V_5 AND NOT USE_LOCAL_GLEW)
+  if(NOT USE_QT_V_5 AND NOT USE_INCLUDED_GLEW_QT4)
       set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GLEW)
   endif()
   add_executable(alizams

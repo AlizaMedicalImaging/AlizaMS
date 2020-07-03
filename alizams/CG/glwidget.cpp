@@ -1846,21 +1846,21 @@ void GLWidget::paint_raycaster()
 	}
 	glDisable(GL_CULL_FACE);
 	//
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	glViewport(0, 0, FBO_SIZE__0, FBO_SIZE__0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbo_tex, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,  GL_TEXTURE_2D, fbo_depth, 0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, backface_tex);
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_2D, frontface_tex);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_3D, di->cube_3dtex);
 	if (di->lut_function == 2)
 	{
 		if (di->selected_lut==0)
 		{
-			glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-			glViewport(0, 0, FBO_SIZE__0, FBO_SIZE__0);
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbo_tex, 0);
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,  GL_TEXTURE_2D, fbo_depth, 0);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glActiveTexture(GL_TEXTURE2);
-			glBindTexture(GL_TEXTURE_2D, backface_tex);
-			glActiveTexture(GL_TEXTURE5);
-			glBindTexture(GL_TEXTURE_2D, frontface_tex);
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_3D, di->cube_3dtex);
 			if (rect_selection)
 			{
 				glUseProgram(raycast_shader_bb_sigm.program);
@@ -1873,7 +1873,6 @@ void GLWidget::paint_raycaster()
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
 				glDrawArrays(GL_TRIANGLE_STRIP, 10, 4);
 				glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
-
 			}
 			else
 			{
@@ -1891,17 +1890,6 @@ void GLWidget::paint_raycaster()
 		}
 		else
 		{
-			glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-			glViewport(0, 0, FBO_SIZE__0, FBO_SIZE__0);
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbo_tex, 0);
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,  GL_TEXTURE_2D, fbo_depth, 0);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glActiveTexture(GL_TEXTURE2);
-			glBindTexture(GL_TEXTURE_2D, backface_tex);
-			glActiveTexture(GL_TEXTURE5);
-			glBindTexture(GL_TEXTURE_2D, frontface_tex);
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_3D, di->cube_3dtex);
 			glActiveTexture(GL_TEXTURE3);
 			switch(di->selected_lut)
 			{
@@ -1948,18 +1936,6 @@ void GLWidget::paint_raycaster()
 	{
 		if (di->selected_lut==0)
 		{
-			glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-			glViewport(0, 0, FBO_SIZE__0, FBO_SIZE__0);
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbo_tex, 0);
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,  GL_TEXTURE_2D, fbo_depth, 0);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glActiveTexture(GL_TEXTURE2);
-			glBindTexture(GL_TEXTURE_2D, backface_tex);
-			glActiveTexture(GL_TEXTURE5);
-			glBindTexture(GL_TEXTURE_2D, frontface_tex);
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_3D, di->cube_3dtex);
-			glActiveTexture(GL_TEXTURE3);
 			if (rect_selection)
 			{
 				glUseProgram(raycast_shader_bb.program);
@@ -1989,17 +1965,6 @@ void GLWidget::paint_raycaster()
 		}
 		else
 		{
-			glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-			glViewport(0, 0, FBO_SIZE__0, FBO_SIZE__0);
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbo_tex, 0);
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,  GL_TEXTURE_2D, fbo_depth, 0);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glActiveTexture(GL_TEXTURE2);
-			glBindTexture(GL_TEXTURE_2D, backface_tex);
-			glActiveTexture(GL_TEXTURE5);
-			glBindTexture(GL_TEXTURE_2D, frontface_tex);
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_3D, di->cube_3dtex);
 			glActiveTexture(GL_TEXTURE3);
 			switch(di->selected_lut)
 			{
