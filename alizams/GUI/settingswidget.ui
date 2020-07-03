@@ -226,8 +226,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>355</width>
-            <height>124</height>
+            <width>991</width>
+            <height>540</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -308,6 +308,12 @@
                <property name="specialValueText">
                 <string/>
                </property>
+               <property name="correctionMode">
+                <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
+               </property>
+               <property name="keyboardTracking">
+                <bool>false</bool>
+               </property>
                <property name="suffix">
                 <string> pt</string>
                </property>
@@ -372,6 +378,12 @@
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
+               </property>
+               <property name="correctionMode">
+                <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
+               </property>
+               <property name="keyboardTracking">
+                <bool>false</bool>
                </property>
                <property name="decimals">
                 <number>1</number>
@@ -442,8 +454,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>991</width>
-            <height>540</height>
+            <width>482</width>
+            <height>244</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
