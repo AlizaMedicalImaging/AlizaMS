@@ -51,6 +51,7 @@ MainWindow::MainWindow(
 	//
 	scale_icons = 1.0f;
 	adjust_scale_icons = 1.0f;
+	hide_gl3_frame_later = false;
 #if 1
 	{
 		QSettings settings(
@@ -1781,11 +1782,40 @@ void MainWindow::change_style(const QString & s)
 void MainWindow::set_no_gl3()
 {
 	settingswidget->force_no_gl3();
+	hide_gl3_frame_later = true;
 #if 1
 	QString a(
-		"\n\n  Failed to initialize OpenGL 3, "
-		"disabled OpenGL (restart required)\n\n");
+		"\nFailed to initialize OpenGL 3\n");
 	std::cout << a.toStdString() << std::endl;
 #endif
 }
 
+void MainWindow::check_3d_frame()
+{
+	if (hide_gl3_frame_later)
+	{
+		show3DAct->blockSignals(true);
+		frame3D->hide();
+		show3DAct->setChecked(false);
+		show3DAct->blockSignals(false);
+	}
+/*
+	QSettings settings(
+		QSettings::IniFormat,
+		QSettings::UserScope,
+		QApplication::organizationName(),
+		QApplication::applicationName());
+	settings.setFallbacksEnabled(true);
+	settings.beginGroup(QString("MainWindow"));
+	const QString s = settings.value(
+		QString("hide_3d_frame"), QString("N")).toString();
+	settings.endGroup();
+	if (s == QString("Y"))
+	{
+		show3DAct->blockSignals(true);
+		frame3D->hide();
+		show3DAct->setChecked(false);
+		show3DAct->blockSignals(false);
+	}
+*/
+}

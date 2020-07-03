@@ -41,6 +41,7 @@ public:
 	~MainWindow();
 	void open_args(const QStringList&);
 	void change_style(const QString&);
+	void check_3d_frame();
 	QAction * graphicsAct_Z;
 	QAction * graphicsAct_Y;
 	QAction * graphicsAct_X;
@@ -128,6 +129,7 @@ private:
 	QPoint mainwindow_pos;
 	float  scale_icons;
 	float  adjust_scale_icons;
+	bool   hide_gl3_frame_later;
 	//
 	Aliza            * aliza;
 	GLWidget         * glwidget;

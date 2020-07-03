@@ -308,6 +308,7 @@ int main(int argc, char *argv[])
 		app.processEvents();
 		QTimer::singleShot(1500, splash, SLOT(close()));
 #endif
+		mainWin.check_3d_frame();
 		if (argc > 1)
 		{
 			QStringList l;
