@@ -450,7 +450,6 @@ public slots:
 
 signals:
 	void opengl3_not_available();
-	void set_gallium();
 
 protected:
 	void initializeGL();

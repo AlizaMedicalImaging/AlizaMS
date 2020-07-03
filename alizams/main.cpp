@@ -221,9 +221,12 @@ int main(int argc, char *argv[])
 		QString saved_style = settings.value(
 			QString("stylename"),
 			QVariant(QString("Dark Fusion"))).toString();
+		const int enable_gl_3d_  =
+			settings.value(QString("enable_gl_3D"), 1).toInt();
 		const int hide_zoom_ =
 			settings.value(QString("hide_zoom"), 1).toInt();
 		settings.endGroup();
+		ok3d = !force_disable_opengl && (enable_gl_3d_ == 1);
 		hide_zoom = (hide_zoom_==1) ? true : false;
 		QFont f = QApplication::font();
 		if (app_font_pt <= 0.0)
@@ -274,7 +277,6 @@ int main(int argc, char *argv[])
 			app.setPalette(app.style()->standardPalette());
 		}
 	}
-	if (!force_disable_opengl) ok3d = true;
 	//
 #if (defined USE_SPLASH_SCREEN && USE_SPLASH_SCREEN==1)
 	const QString splash_info =

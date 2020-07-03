@@ -380,7 +380,7 @@ MainWindow::MainWindow(
 		gloptionsAct->setEnabled(false);
 		frames3DAct->setEnabled(false);
 		frame3D->hide();
-		settingswidget->set_enable_texture_groupbox(false);
+		settingswidget->set_gl_visible(false);
 	}
 	//
 	toolbar2D_frame->hide();

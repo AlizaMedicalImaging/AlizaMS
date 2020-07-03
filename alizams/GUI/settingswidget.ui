@@ -451,6 +451,25 @@
             <number>6</number>
            </property>
            <item>
+            <widget class="QCheckBox" name="gl3D_checkBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="mouseTracking">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Enable OpenGL modules (restart is required)</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QGroupBox" name="textureoptions_groupBox">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -683,22 +702,6 @@
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="maxvbos_checkBox">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To avoid bug with some drivers &lt;span style=&quot; font-style:italic;&quot;&gt;Gallium&lt;/span&gt; versions on Linux&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>Max OpenGL VBOs</string>
-             </property>
-            </widget>
-           </item>
-           <item>
             <spacer name="verticalSpacer_2">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -747,12 +750,12 @@
   <tabstop>pt_doubleSpinBox</tabstop>
   <tabstop>si_doubleSpinBox</tabstop>
   <tabstop>scrollArea_2</tabstop>
+  <tabstop>gl3D_checkBox</tabstop>
   <tabstop>textureoptions_groupBox</tabstop>
   <tabstop>original_radioButton</tabstop>
   <tabstop>resample_radioButton</tabstop>
   <tabstop>f_no_radioButton</tabstop>
   <tabstop>f_bilinear_radioButton</tabstop>
-  <tabstop>maxvbos_checkBox</tabstop>
   <tabstop>reload_pushButton</tabstop>
  </tabstops>
  <resources>
@@ -766,8 +769,8 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>157</x>
-     <y>128</y>
+     <x>167</x>
+     <y>161</y>
     </hint>
     <hint type="destinationlabel">
      <x>186</x>
@@ -782,12 +785,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>82</x>
-     <y>128</y>
+     <x>104</x>
+     <y>161</y>
     </hint>
     <hint type="destinationlabel">
-     <x>271</x>
-     <y>109</y>
+     <x>287</x>
+     <y>166</y>
     </hint>
    </hints>
   </connection>
@@ -798,8 +801,8 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>71</x>
-     <y>114</y>
+     <x>93</x>
+     <y>161</y>
     </hint>
     <hint type="destinationlabel">
      <x>306</x>
@@ -814,12 +817,28 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>140</x>
-     <y>117</y>
+     <x>162</x>
+     <y>161</y>
     </hint>
     <hint type="destinationlabel">
      <x>407</x>
      <y>133</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>gl3D_checkBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>textureoptions_groupBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>58</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>23</x>
+     <y>128</y>
     </hint>
    </hints>
   </connection>

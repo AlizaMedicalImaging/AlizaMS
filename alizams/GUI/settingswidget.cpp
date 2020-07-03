@@ -17,7 +17,6 @@ SettingsWidget::SettingsWidget(float si, QWidget * p, Qt::WindowFlags f) : QWidg
 	setupUi(this);
 	saved_idx = 0;
 	scale_icons = si;
-	gallium = false;
 	x_comboBox->addItem(QString("256"));
 	x_comboBox->addItem(QString("128"));
 	x_comboBox->addItem(QString("64"));
@@ -36,7 +35,6 @@ SettingsWidget::SettingsWidget(float si, QWidget * p, Qt::WindowFlags f) : QWidg
 #endif
 	styleComboBox->setCurrentIndex(saved_idx);
 	connect(reload_pushButton,SIGNAL(clicked()),this,SLOT(set_default()));
-	connect(maxvbos_checkBox,SIGNAL(toggled(bool)),this,SLOT(update_vbos_max_65535(bool)));
 	connect(pt_doubleSpinBox,SIGNAL(valueChanged(double)),this,SLOT(update_font_pt(double)));
 }
 
@@ -79,21 +77,19 @@ bool SettingsWidget::get_rescale() const
 bool SettingsWidget::get_3d() const
 {
 	return (
-		textureoptions_groupBox->isEnabled() &&
+		gl3D_checkBox->isChecked() &&
 		textureoptions_groupBox->isChecked());
 }
 
-void SettingsWidget::set_enable_texture_groupbox(bool t)
+void SettingsWidget::set_gl_visible(bool t)
 {
-	textureoptions_groupBox->setEnabled(t);
 	textureoptions_groupBox->setVisible(t);
-	maxvbos_checkBox->setEnabled(t);
-	maxvbos_checkBox->setVisible(t);
 }
 
 void SettingsWidget::set_default()
 {
 	styleComboBox->setCurrentIndex(0);
+	gl3D_checkBox->setChecked(true);
 	si_doubleSpinBox->setValue(1.0);
 	original_radioButton->setChecked(true);
 	resample_radioButton->setChecked(false);
@@ -106,10 +102,9 @@ void SettingsWidget::set_default()
 #endif
 	f_bilinear_radioButton->setChecked(false);
 	f_no_radioButton->setChecked(true);
+	textureoptions_groupBox->setVisible(true);
 	textureoptions_groupBox->setEnabled(true);
 	textureoptions_groupBox->setChecked(true);
-	if (gallium) maxvbos_checkBox->setChecked(true);
-	else maxvbos_checkBox->setChecked(false);
 	rescale_checkBox->setChecked(true);
 	mosaic_checkBox->setChecked(true);
 	time_s__checkBox->setChecked(false);
@@ -135,23 +130,6 @@ bool SettingsWidget::get_mosaic() const
 bool SettingsWidget::get_overlays() const
 {
 	return overlays_checkBox->isChecked();
-}
-
-bool SettingsWidget::get_vbos_max_65535() const
-{
-	return maxvbos_checkBox->isChecked();
-}
-
-void SettingsWidget::update_vbos_max_65535(bool t)
-{
-	GLWidget::set_max_vbos_65535(t);
-}
-
-void SettingsWidget::set_gallium_true()
-{
-	gallium = true;
-	maxvbos_checkBox->setChecked(true);
-	GLWidget::set_max_vbos_65535(true);
 }
 
 double SettingsWidget::get_font_pt() const
@@ -196,6 +174,7 @@ void SettingsWidget::readSettings()
 		QApplication::applicationName());
 	settings.setFallbacksEnabled(true);
 	settings.beginGroup(QString("GlobalSettings"));
+	double tmp0 = settings.value(QString("enable_gl_3D"), 1).toInt();
 	double tmp1 = settings.value(QString("scale_ui_icons"), 1.0).toDouble();
 	double tmp2 = settings.value(QString("app_font_pt"), 0.0).toDouble();
 	settings.endGroup();
@@ -204,6 +183,8 @@ void SettingsWidget::readSettings()
 	settings.endGroup();
 	si_doubleSpinBox->setValue(tmp1);
 	QFont f = QApplication::font();
+	if (tmp0==1)gl3D_checkBox->setChecked(true);
+	else        gl3D_checkBox->setChecked(false);
 	if (tmp2 < 6.0) tmp2 = 6.0; 
 	else tmp2 = f.pointSizeF();
 	pt_doubleSpinBox->setValue(tmp2);
@@ -211,18 +192,14 @@ void SettingsWidget::readSettings()
 
 void SettingsWidget::writeSettings(QSettings & settings)
 {
-	const double scale_ui_icons = si_doubleSpinBox->value();
 	settings.beginGroup(QString("GlobalSettings"));
-	settings.setValue(QString("scale_ui_icons"),   QVariant(scale_ui_icons));
+	settings.setValue(QString("enable_gl_3D"), QVariant(gl3D_checkBox->isChecked() ? 1 : 0));
+	settings.setValue(QString("scale_ui_icons"), QVariant(si_doubleSpinBox->value()));
 	settings.setValue(QString("app_font_pt"), QVariant(pt_doubleSpinBox->value()));
-	settings.setValue(
-		QString("stylename"),
-		QVariant(styleComboBox->currentText().trimmed()));
+	settings.setValue( QString("stylename"), QVariant(styleComboBox->currentText().trimmed()));
 	settings.endGroup();
 	settings.beginGroup(QString("StyleDialog"));
-	settings.setValue(
-		QString("saved_idx"),
-		QVariant(styleComboBox->currentIndex()));
+	settings.setValue( QString("saved_idx"), QVariant(styleComboBox->currentIndex()));
 	settings.endGroup();
 }
 

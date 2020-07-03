@@ -957,9 +957,9 @@ void GLWidget::init_opengl(int w, int h)
 		QVariant(max_3d_texture_size).toString());
 	//
 	if (renderer_str.contains(QString("Gallium"),Qt::CaseInsensitive))
-	{
-		emit set_gallium();
-	}
+		set_max_vbos_65535(true);
+	else
+		set_max_vbos_65535(false);
 	//
 	//
 	//
