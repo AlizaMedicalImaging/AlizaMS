@@ -155,7 +155,6 @@ private:
 	AnimWidget       * anim3Dwidget;
 	AnimWidget       * anim2Dwidget;
 	AboutWidget      * aboutwidget;
-	bool saved_ok3d;
 	bool first_image_loaded;
 	bool hide_zoom;
 	QMenu * file_menu;

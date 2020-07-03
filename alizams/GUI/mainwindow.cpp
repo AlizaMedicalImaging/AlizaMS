@@ -30,7 +30,6 @@ MainWindow::MainWindow(
 	bool ok3d,
 	bool hide_zoom_)
 {
-	saved_ok3d = false;
 	setupUi(this);
 	setAnimated(true);
 	setDocumentMode(false);
@@ -365,7 +364,6 @@ MainWindow::MainWindow(
 	if (ok3d && glwidget)
 	{
 		connect(glwidget,SIGNAL(opengl3_not_available()),this,SLOT(set_no_gl3()));
-		saved_ok3d = true;
 		gl_frame->show();
 		glwidget->show();
 		view3d_label->setText(QString(
@@ -383,6 +381,9 @@ MainWindow::MainWindow(
 		frames3DAct->setEnabled(false);
 		frame3D->hide();
 		settingswidget->set_gl_visible(false);
+		show3DAct->blockSignals(true);
+		show3DAct->setChecked(false);
+		show3DAct->blockSignals(false);
 	}
 	//
 	toolbar2D_frame->hide();
@@ -1399,22 +1400,19 @@ void MainWindow::set_ui()
 	if (!first_image_loaded)
 	{
 		show2DAct->setEnabled(true);
+		show3DAct->setEnabled(true);
 		toolbar2D_frame->show();
+		toolbar3D_frame->show();
 		level_frame->show();
 		imagesbox_frame->show();
 		zrange_frame->show();
 		slider_frame->show();
 		view2d_frame->show();
+		view3d_frame->show();
 		info_line->show();
 		view2d_label->setText("Slice view (Z)");
 		actionViews2DMenu->setEnabled(true);
-		if (saved_ok3d)
-		{
-			show3DAct->setEnabled(true);
-			toolbar3D_frame->show();
-			view3d_frame->show();
-			actionViews3DMenu->setEnabled(true);
-		}
+		actionViews3DMenu->setEnabled(true);
 		first_image_loaded = true;
 	}
 }
@@ -1704,6 +1702,10 @@ void MainWindow::writeSettings()
 #ifdef USE_WORKSTATION_MODE
 	settings.setValue(QString("open_dir"),QVariant(CommonUtils::get_open_dir()));
 #endif
+	if (!show3DAct->isChecked())
+		settings.setValue(QString("hide_3d_frame"),QVariant(QString("Y")));
+	else
+		settings.setValue(QString("hide_3d_frame"),QVariant(QString("N")));
 	settings.endGroup();
 	if (browser2) browser2->writeSettings(settings);
 	if (settingswidget) settingswidget->writeSettings(settings);
@@ -1799,23 +1801,24 @@ void MainWindow::check_3d_frame()
 		show3DAct->setChecked(false);
 		show3DAct->blockSignals(false);
 	}
-/*
-	QSettings settings(
-		QSettings::IniFormat,
-		QSettings::UserScope,
-		QApplication::organizationName(),
-		QApplication::applicationName());
-	settings.setFallbacksEnabled(true);
-	settings.beginGroup(QString("MainWindow"));
-	const QString s = settings.value(
-		QString("hide_3d_frame"), QString("N")).toString();
-	settings.endGroup();
-	if (s == QString("Y"))
+	else
 	{
-		show3DAct->blockSignals(true);
-		frame3D->hide();
-		show3DAct->setChecked(false);
-		show3DAct->blockSignals(false);
+		QSettings settings(
+			QSettings::IniFormat,
+			QSettings::UserScope,
+			QApplication::organizationName(),
+			QApplication::applicationName());
+		settings.setFallbacksEnabled(true);
+		settings.beginGroup(QString("MainWindow"));
+		const QString s = settings.value(
+			QString("hide_3d_frame"), QString("N")).toString();
+		settings.endGroup();
+		if (s == QString("Y"))
+		{
+			show3DAct->blockSignals(true);
+			frame3D->hide();
+			show3DAct->setChecked(false);
+			show3DAct->blockSignals(false);
+		}
 	}
-*/
 }
