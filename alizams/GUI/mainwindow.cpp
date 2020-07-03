@@ -1781,11 +1781,7 @@ void MainWindow::change_style(const QString & s)
 void MainWindow::set_no_gl3()
 {
 	settingswidget->force_no_gl3();
-	show3DAct->blockSignals(true);
-	show3DAct->setChecked(false);
-	toggle_showgl(bool t);
-	show3DAct->blockSignals(false);
-#if 0
+#if 1
 	QString a(
 		"\n\n  Failed to initialize OpenGL 3, "
 		"disabled OpenGL (restart required)\n\n");
