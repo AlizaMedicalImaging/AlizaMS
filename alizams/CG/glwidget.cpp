@@ -757,14 +757,6 @@ void GLWidget::init_()
 	raycast_color_shader_sigm_vao = 0;
 	raycast_shader_bb_sigm_vao = 0;
 	raycast_color_shader_bb_sigm_vao = 0;
-	raycast_shader_vbo0 = 0;
-	raycast_color_shader_vbo0 = 0;
-	raycast_shader_bb_vbo0 = 0;
-	raycast_color_shader_bb_vbo0 = 0;
-	raycast_shader_sigm_vbo0 = 0;
-	raycast_color_shader_sigm_vbo0 = 0;
-	raycast_shader_bb_sigm_vbo0 = 0;
-	raycast_color_shader_bb_sigm_vbo0 = 0;
 	c3d_shader_clamp_vao = 0;
 	c3d_shader_gradient_clamp_vao = 0;
 	c3d_shader_bb_clamp_vao = 0;
@@ -881,15 +873,6 @@ void GLWidget::close_()
 	glDeleteVertexArrays(1, &raycast_color_shader_sigm_vao);
 	glDeleteVertexArrays(1, &raycast_shader_bb_sigm_vao);
 	glDeleteVertexArrays(1, &raycast_color_shader_bb_sigm_vao);
-	glDeleteBuffers(1, &raycast_shader_vbo0);
-	glDeleteBuffers(1, &raycast_color_shader_vbo0);
-	glDeleteBuffers(1, &raycast_shader_bb_vbo0);
-	glDeleteBuffers(1, &raycast_color_shader_bb_vbo0);
-	glDeleteBuffers(1, &raycast_shader_sigm_vbo0);
-	glDeleteBuffers(1, &raycast_color_shader_sigm_vbo0);
-	glDeleteBuffers(1, &raycast_shader_bb_sigm_vbo0);
-	glDeleteBuffers(1, &raycast_color_shader_bb_sigm_vbo0);
-	increment_count_vbos(-24);
 	for (unsigned int x = 0; x < textures.size(); x++)
 	{
 		glDeleteTextures(1, textures[x]);
@@ -1339,7 +1322,7 @@ void GLWidget::init_opengl(int w, int h)
 	zero_shader.position_handle     = glGetAttribLocation (zero_shader.program, "v_position");
 	zero_shader.color_handle        = glGetAttribLocation (zero_shader.program, "v_color");
 	shaders.push_back(&zero_shader);
-	generate_raycastcube0_vao(
+	generate_raycastcube_vao(
 		&raycastcube0_vao, raycastcube0,
 		&(zero_shader.position_handle), &(zero_shader.color_handle));
 	ok = create_fbos1(FBO_SIZE__1, FBO_SIZE__1,
@@ -1361,7 +1344,7 @@ void GLWidget::init_opengl(int w, int h)
 	raycast_shader_bb.location_mparams    = glGetUniformLocation(raycast_shader_bb.program, "mparams");
 	shaders.push_back(&raycast_shader_bb);
 	generate_raycast_shader_vao(
-		&raycast_shader_bb_vao, &raycast_shader_bb_vbo0, &(raycast_shader_bb.position_handle));
+		&raycast_shader_bb_vao, raycastcube0, &(raycast_shader_bb.position_handle));
 	//
 	create_program(raycast_vs, raycast_color_fs_bb, &raycast_color_shader_bb);
 	raycast_color_shader_bb.location_mvp        = glGetUniformLocation(raycast_color_shader_bb.program, "mvp");
@@ -1374,7 +1357,7 @@ void GLWidget::init_opengl(int w, int h)
 	shaders.push_back(&raycast_color_shader_bb);
 	generate_raycast_shader_vao(
 		&raycast_color_shader_bb_vao,
-		&raycast_color_shader_bb_vbo0,
+		raycastcube0,
 		&(raycast_color_shader_bb.position_handle));
 	//
 	create_program(raycast_vs, raycast_fs, &raycast_shader);
@@ -1387,7 +1370,7 @@ void GLWidget::init_opengl(int w, int h)
 	shaders.push_back(&raycast_shader);
 	generate_raycast_shader_vao(
 		&raycast_shader_vao,
-		&raycast_shader_vbo0,
+		raycastcube0,
 		&(raycast_shader.position_handle));
 	//
 	create_program(raycast_vs, raycast_color_fs, &raycast_color_shader);
@@ -1401,7 +1384,7 @@ void GLWidget::init_opengl(int w, int h)
 	shaders.push_back(&raycast_color_shader);
 	generate_raycast_shader_vao(
 		&raycast_color_shader_vao,
-		&raycast_color_shader_vbo0,
+		raycastcube0,
 		&(raycast_color_shader.position_handle));
 	//
 	create_program(raycast_vs, raycast_fs_bb_sigm, &raycast_shader_bb_sigm);
@@ -1414,7 +1397,7 @@ void GLWidget::init_opengl(int w, int h)
 	shaders.push_back(&raycast_shader_bb_sigm);
 	generate_raycast_shader_vao(
 		&raycast_shader_bb_sigm_vao,
-		&raycast_shader_bb_sigm_vbo0,
+		raycastcube0,
 		&(raycast_shader_bb_sigm.position_handle));
 	//
 	create_program(raycast_vs, raycast_color_fs_bb_sigm, &raycast_color_shader_bb_sigm);
@@ -1428,7 +1411,7 @@ void GLWidget::init_opengl(int w, int h)
 	shaders.push_back(&raycast_color_shader_bb_sigm);
 	generate_raycast_shader_vao(
 		&raycast_color_shader_bb_sigm_vao,
-		&raycast_color_shader_bb_sigm_vbo0,
+		raycastcube0,
 		&(raycast_color_shader_bb_sigm.position_handle));
 	//
 	create_program(raycast_vs, raycast_fs_sigm, &raycast_shader_sigm);
@@ -1441,7 +1424,7 @@ void GLWidget::init_opengl(int w, int h)
 	shaders.push_back(&raycast_shader_sigm);
 	generate_raycast_shader_vao(
 		&raycast_shader_sigm_vao,
-		&raycast_shader_sigm_vbo0,
+		raycastcube0,
 		&(raycast_shader_sigm.position_handle));
 	//
 	create_program(raycast_vs, raycast_color_fs_sigm, &raycast_color_shader_sigm);
@@ -1455,7 +1438,7 @@ void GLWidget::init_opengl(int w, int h)
 	shaders.push_back(&raycast_color_shader_sigm);
 	generate_raycast_shader_vao(
 		&raycast_color_shader_sigm_vao,
-		&raycast_color_shader_sigm_vbo0,
+		raycastcube0,
 		&(raycast_color_shader_sigm.position_handle));
 	//
 	////////////////////////////
@@ -1847,7 +1830,6 @@ void GLWidget::paint_raycaster()
 		glDrawArrays(GL_TRIANGLE_STRIP, 10, 4);
 		glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
 	}
-
 	// frontfacebuffer
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, frontfacebuffer);
@@ -1873,31 +1855,20 @@ void GLWidget::paint_raycaster()
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbo_tex, 0);
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,  GL_TEXTURE_2D, fbo_depth, 0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, backface_tex);
+			glActiveTexture(GL_TEXTURE5);
+			glBindTexture(GL_TEXTURE_2D, frontface_tex);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_3D, di->cube_3dtex);
 			if (rect_selection)
 			{
-				update_raycast_shader_vbo(
-					orientation,
-					x__, y__, z__,
-					&raycast_shader_bb_sigm_vbo0,
-					false);
-
 				glUseProgram(raycast_shader_bb_sigm.program);
-
 				glUniform4fv(raycast_shader_bb_sigm.location_mparams, 16/4, mparams);
 				glUniformMatrix4fv(raycast_shader_bb_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-
-				glActiveTexture(GL_TEXTURE2);
-				glBindTexture(GL_TEXTURE_2D, backface_tex);
 				glUniform1i(raycast_shader_bb_sigm.location_sampler[0], 2);
-
-				glActiveTexture(GL_TEXTURE5);
-				glBindTexture(GL_TEXTURE_2D, frontface_tex);
 				glUniform1i(raycast_shader_bb_sigm.location_sampler[1], 5);
-
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_3D, di->cube_3dtex);
 				glUniform1i(raycast_shader_bb_sigm.location_sampler[2], 0);
-
 				glBindVertexArray(raycast_shader_bb_sigm_vao);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
 				glDrawArrays(GL_TRIANGLE_STRIP, 10, 4);
@@ -1906,29 +1877,12 @@ void GLWidget::paint_raycaster()
 			}
 			else
 			{
-				update_raycast_shader_vbo(
-					orientation,
-					x__, y__, z__,
-					&raycast_shader_sigm_vbo0,
-					false);
-
 				glUseProgram(raycast_shader_sigm.program);
-
 				glUniform4fv(raycast_shader_sigm.location_mparams, 16/4, mparams);
 				glUniformMatrix4fv(raycast_shader_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-
-				glActiveTexture(GL_TEXTURE2);
-				glBindTexture(GL_TEXTURE_2D, backface_tex);
 				glUniform1i(raycast_shader_sigm.location_sampler[0], 2);
-
-				glActiveTexture(GL_TEXTURE5);
-				glBindTexture(GL_TEXTURE_2D, frontface_tex);
 				glUniform1i(raycast_shader_sigm.location_sampler[1], 5);
-
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_3D, di->cube_3dtex);
 				glUniform1i(raycast_shader_sigm.location_sampler[2], 0);
-
 				glBindVertexArray(raycast_shader_sigm_vao);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
 				glDrawArrays(GL_TRIANGLE_STRIP, 10, 4);
@@ -1942,46 +1896,33 @@ void GLWidget::paint_raycaster()
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbo_tex, 0);
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,  GL_TEXTURE_2D, fbo_depth, 0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, backface_tex);
+			glActiveTexture(GL_TEXTURE5);
+			glBindTexture(GL_TEXTURE_2D, frontface_tex);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_3D, di->cube_3dtex);
+			glActiveTexture(GL_TEXTURE3);
+			switch(di->selected_lut)
+			{
+			case  1: glBindTexture(GL_TEXTURE_1D, gradient1);  break;
+			case  2: glBindTexture(GL_TEXTURE_1D, gradient2);  break;
+			case  3: glBindTexture(GL_TEXTURE_1D, gradient3);  break;
+			case  4: glBindTexture(GL_TEXTURE_1D, gradient4);  break;
+			case  5: glBindTexture(GL_TEXTURE_1D, gradient5);  break;
+			case  6: glBindTexture(GL_TEXTURE_1D, gradient6);  break;
+			case  7: glBindTexture(GL_TEXTURE_1D, gradient7);  break;
+			default: break;
+			}
 			if (rect_selection)
 			{
-				update_raycast_shader_vbo(
-					orientation,
-					x__, y__, z__,
-					&raycast_color_shader_bb_sigm_vbo0,
-					false);
-
 				glUseProgram(raycast_color_shader_bb_sigm.program);
-
 				glUniform4fv(raycast_color_shader_bb_sigm.location_mparams, 16/4, mparams);
 				glUniformMatrix4fv(raycast_color_shader_bb_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-
-				glActiveTexture(GL_TEXTURE2);
-				glBindTexture(GL_TEXTURE_2D, backface_tex);
 				glUniform1i(raycast_color_shader_bb_sigm.location_sampler[0], 2);
-
-				glActiveTexture(GL_TEXTURE5);
-				glBindTexture(GL_TEXTURE_2D, frontface_tex);
 				glUniform1i(raycast_color_shader_bb_sigm.location_sampler[1], 5);
-
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_3D, di->cube_3dtex);
 				glUniform1i(raycast_color_shader_bb_sigm.location_sampler[2], 0);
-
-				glActiveTexture(GL_TEXTURE3);
-				switch(di->selected_lut)
-				{
-				case  1: glBindTexture(GL_TEXTURE_1D, gradient1);  break;
-				case  2: glBindTexture(GL_TEXTURE_1D, gradient2);  break;
-				case  3: glBindTexture(GL_TEXTURE_1D, gradient3);  break;
-				case  4: glBindTexture(GL_TEXTURE_1D, gradient4);  break;
-				case  5: glBindTexture(GL_TEXTURE_1D, gradient5);  break;
-				case  6: glBindTexture(GL_TEXTURE_1D, gradient6);  break;
-				case  7: glBindTexture(GL_TEXTURE_1D, gradient7);  break;
-				default: break;
-				}
 				glUniform1i(raycast_color_shader_bb_sigm.location_sampler[3], 3);
-
 				glBindVertexArray(raycast_color_shader_bb_sigm_vao);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
 				glDrawArrays(GL_TRIANGLE_STRIP, 10, 4);
@@ -1989,43 +1930,13 @@ void GLWidget::paint_raycaster()
 			}
 			else
 			{
-				update_raycast_shader_vbo(
-					orientation,
-					x__, y__, z__,
-					&raycast_color_shader_sigm_vbo0,
-					false);
-
 				glUseProgram(raycast_color_shader_sigm.program);
-
 				glUniform4fv(raycast_color_shader_sigm.location_mparams, 16/4, mparams);
 				glUniformMatrix4fv(raycast_color_shader_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-
-				glActiveTexture(GL_TEXTURE2);
-				glBindTexture(GL_TEXTURE_2D, backface_tex);
 				glUniform1i(raycast_color_shader_sigm.location_sampler[0], 2);
-
-				glActiveTexture(GL_TEXTURE5);
-				glBindTexture(GL_TEXTURE_2D, frontface_tex);
 				glUniform1i(raycast_color_shader_sigm.location_sampler[1], 5);
-
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_3D, di->cube_3dtex);
 				glUniform1i(raycast_color_shader_sigm.location_sampler[2], 0);
-
-				glActiveTexture(GL_TEXTURE3);
-				switch(di->selected_lut)
-				{
-				case  1: glBindTexture(GL_TEXTURE_1D, gradient1);  break;
-				case  2: glBindTexture(GL_TEXTURE_1D, gradient2);  break;
-				case  3: glBindTexture(GL_TEXTURE_1D, gradient3);  break;
-				case  4: glBindTexture(GL_TEXTURE_1D, gradient4);  break;
-				case  5: glBindTexture(GL_TEXTURE_1D, gradient5);  break;
-				case  6: glBindTexture(GL_TEXTURE_1D, gradient6);  break;
-				case  7: glBindTexture(GL_TEXTURE_1D, gradient7);  break;
-				default: break;
-				}
 				glUniform1i(raycast_color_shader_sigm.location_sampler[3], 3);
-
 				glBindVertexArray(raycast_color_shader_sigm_vao);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
 				glDrawArrays(GL_TRIANGLE_STRIP, 10, 4);
@@ -2042,31 +1953,21 @@ void GLWidget::paint_raycaster()
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbo_tex, 0);
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,  GL_TEXTURE_2D, fbo_depth, 0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, backface_tex);
+			glActiveTexture(GL_TEXTURE5);
+			glBindTexture(GL_TEXTURE_2D, frontface_tex);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_3D, di->cube_3dtex);
+			glActiveTexture(GL_TEXTURE3);
 			if (rect_selection)
 			{
-				update_raycast_shader_vbo(
-					orientation,
-					x__, y__, z__,
-					&raycast_shader_bb_vbo0,
-					false);
-
 				glUseProgram(raycast_shader_bb.program);
-
 				glUniform4fv(raycast_shader_bb.location_mparams, 16/4, mparams);
 				glUniformMatrix4fv(raycast_shader_bb.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-
-				glActiveTexture(GL_TEXTURE2);
-				glBindTexture(GL_TEXTURE_2D, backface_tex);
 				glUniform1i(raycast_shader_bb.location_sampler[0], 2);
-
-				glActiveTexture(GL_TEXTURE5);
-				glBindTexture(GL_TEXTURE_2D, frontface_tex);
 				glUniform1i(raycast_shader_bb.location_sampler[1], 5);
-
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_3D, di->cube_3dtex);
 				glUniform1i(raycast_shader_bb.location_sampler[2], 0);
-
 				glBindVertexArray(raycast_shader_bb_vao);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
 				glDrawArrays(GL_TRIANGLE_STRIP, 10, 4);
@@ -2074,29 +1975,12 @@ void GLWidget::paint_raycaster()
 			}
 			else
 			{
-				update_raycast_shader_vbo(
-					orientation,
-					x__, y__, z__,
-					&raycast_shader_vbo0,
-					false);
-
 				glUseProgram(raycast_shader.program);
-
 				glUniform4fv(raycast_shader.location_mparams, 16/4, mparams);
 				glUniformMatrix4fv(raycast_shader.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-
-				glActiveTexture(GL_TEXTURE2);
-				glBindTexture(GL_TEXTURE_2D, backface_tex);
 				glUniform1i(raycast_shader.location_sampler[0], 2);
-
-				glActiveTexture(GL_TEXTURE5);
-				glBindTexture(GL_TEXTURE_2D, frontface_tex);
 				glUniform1i(raycast_shader.location_sampler[1], 5);
-
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_3D, di->cube_3dtex);
 				glUniform1i(raycast_shader.location_sampler[2], 0);
-
 				glBindVertexArray(raycast_shader_vao);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
 				glDrawArrays(GL_TRIANGLE_STRIP, 10, 4);
@@ -2110,46 +1994,33 @@ void GLWidget::paint_raycaster()
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbo_tex, 0);
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,  GL_TEXTURE_2D, fbo_depth, 0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, backface_tex);
+			glActiveTexture(GL_TEXTURE5);
+			glBindTexture(GL_TEXTURE_2D, frontface_tex);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_3D, di->cube_3dtex);
+			glActiveTexture(GL_TEXTURE3);
+			switch(di->selected_lut)
+			{
+			case  1: glBindTexture(GL_TEXTURE_1D, gradient1);  break;
+			case  2: glBindTexture(GL_TEXTURE_1D, gradient2);  break;
+			case  3: glBindTexture(GL_TEXTURE_1D, gradient3);  break;
+			case  4: glBindTexture(GL_TEXTURE_1D, gradient4);  break;
+			case  5: glBindTexture(GL_TEXTURE_1D, gradient5);  break;
+			case  6: glBindTexture(GL_TEXTURE_1D, gradient6);  break;
+			case  7: glBindTexture(GL_TEXTURE_1D, gradient7);  break;
+			default: break;
+			}
 			if (rect_selection)
 			{
-				update_raycast_shader_vbo(
-					orientation,
-					x__, y__, z__,
-					&raycast_color_shader_bb_vbo0,
-					false);
-
 				glUseProgram(raycast_color_shader_bb.program);
-
 				glUniform4fv(raycast_color_shader_bb.location_mparams, 16/4, mparams);
 				glUniformMatrix4fv(raycast_color_shader_bb.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-
-				glActiveTexture(GL_TEXTURE2);
-				glBindTexture(GL_TEXTURE_2D, backface_tex);
 				glUniform1i(raycast_color_shader_bb.location_sampler[0], 2);
-
-				glActiveTexture(GL_TEXTURE5);
-				glBindTexture(GL_TEXTURE_2D, frontface_tex);
 				glUniform1i(raycast_color_shader_bb.location_sampler[1], 5);
-
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_3D, di->cube_3dtex);
 				glUniform1i(raycast_color_shader_bb.location_sampler[2], 0);
-
-				glActiveTexture(GL_TEXTURE3);
-				switch(di->selected_lut)
-				{
-				case  1: glBindTexture(GL_TEXTURE_1D, gradient1);  break;
-				case  2: glBindTexture(GL_TEXTURE_1D, gradient2);  break;
-				case  3: glBindTexture(GL_TEXTURE_1D, gradient3);  break;
-				case  4: glBindTexture(GL_TEXTURE_1D, gradient4);  break;
-				case  5: glBindTexture(GL_TEXTURE_1D, gradient5);  break;
-				case  6: glBindTexture(GL_TEXTURE_1D, gradient6);  break;
-				case  7: glBindTexture(GL_TEXTURE_1D, gradient7);  break;
-				default: break;
-				}
 				glUniform1i(raycast_color_shader_bb.location_sampler[3], 3);
-
 				glBindVertexArray(raycast_color_shader_bb_vao);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
 				glDrawArrays(GL_TRIANGLE_STRIP, 10, 4);
@@ -2157,43 +2028,13 @@ void GLWidget::paint_raycaster()
 			}
 			else
 			{
-				update_raycast_shader_vbo(
-					orientation,
-					x__, y__, z__,
-					&raycast_color_shader_vbo0,
-					false);
-
 				glUseProgram(raycast_color_shader.program);
-
 				glUniform4fv(raycast_color_shader.location_mparams, 16/4, mparams);
 				glUniformMatrix4fv(raycast_color_shader.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-
-				glActiveTexture(GL_TEXTURE2);
-				glBindTexture(GL_TEXTURE_2D, backface_tex);
 				glUniform1i(raycast_color_shader.location_sampler[0], 2);
-
-				glActiveTexture(GL_TEXTURE5);
-				glBindTexture(GL_TEXTURE_2D, frontface_tex);
 				glUniform1i(raycast_color_shader.location_sampler[1], 5);
-
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_3D, di->cube_3dtex);
 				glUniform1i(raycast_color_shader.location_sampler[2], 0);
-
-				glActiveTexture(GL_TEXTURE3);
-				switch(di->selected_lut)
-				{
-				case  1: glBindTexture(GL_TEXTURE_1D, gradient1);  break;
-				case  2: glBindTexture(GL_TEXTURE_1D, gradient2);  break;
-				case  3: glBindTexture(GL_TEXTURE_1D, gradient3);  break;
-				case  4: glBindTexture(GL_TEXTURE_1D, gradient4);  break;
-				case  5: glBindTexture(GL_TEXTURE_1D, gradient5);  break;
-				case  6: glBindTexture(GL_TEXTURE_1D, gradient6);  break;
-				case  7: glBindTexture(GL_TEXTURE_1D, gradient7);  break;
-				default: break;
-				}
 				glUniform1i(raycast_color_shader.location_sampler[3], 3);
-
 				glBindVertexArray(raycast_color_shader_vao);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
 				glDrawArrays(GL_TRIANGLE_STRIP, 10, 4);
@@ -3448,7 +3289,7 @@ void GLWidget::generate_vao1(GLuint * vao, GLuint * vbo, GLuint * attr_v, GLuint
 	delete [] t;
 }
 
-void GLWidget::generate_raycastcube0_vao(
+void GLWidget::generate_raycastcube_vao(
 	GLuint * vao, GLuint * vbo,
 	GLuint * attr_v, GLuint * attr_c)
 {
@@ -3519,38 +3360,12 @@ void GLWidget::generate_raycast_shader_vao(
 	GLuint * attr_v)
 {
 	vao[0] = 0;
-	const float x = 100.0f;
-	const float y = 100.0f;
-	const float z = 100.0f;
-	GLfloat v0[] = {
-		-x,  y, z,
-		-x, -y, z,
-		x,  y, z,
-		x, -y, z,
-		x,  y, -z,
-		x, -y, -z,
-		-x,  y, -z,
-		-x, -y, -z,
-		-x,  y, z,
-		-x, -y, z,
-		-x, y, -z,
-		-x, y,  z,
-		x, y, -z,
-		x, y,  z,
-		-x, -y,  z,
-		-x, -y, -z,
-		x, -y,  z,
-		x, -y, -z };
 	glGenVertexArrays(1, &(vao[0]));
 	glBindVertexArray(vao[0]);
-	glGenBuffers(1, vbo0);
 	glBindBuffer(GL_ARRAY_BUFFER, *vbo0);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), v0, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(*attr_v, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_v);
 	glBindVertexArray(0);
-	//
-	increment_count_vbos(1);
 }
 
 bool GLWidget::update_raycast_shader_vbo(

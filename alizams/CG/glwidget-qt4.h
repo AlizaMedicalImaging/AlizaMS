@@ -257,14 +257,6 @@ public:
 	ShaderObj c3d_shader_gradient_sigm;
 	ShaderObj c3d_shader_bb_sigm;
 	ShaderObj c3d_shader_gradient_bb_sigm;
-	GLuint raycast_shader_vbo0;
-	GLuint raycast_color_shader_vbo0;
-	GLuint raycast_shader_bb_vbo0;
-	GLuint raycast_color_shader_bb_vbo0;
-	GLuint raycast_shader_sigm_vbo0;
-	GLuint raycast_color_shader_sigm_vbo0;
-	GLuint raycast_shader_bb_sigm_vbo0;
-	GLuint raycast_color_shader_bb_sigm_vbo0;
 	GLuint * c3d_shader_clamp_vbo;
 	GLuint * c3d_shader_gradient_clamp_vbo;
 	GLuint * c3d_shader_bb_clamp_vbo;
@@ -361,13 +353,10 @@ public:
 		GLenum   format = GL_RGBA,
 		GLenum   type   = GL_UNSIGNED_BYTE,
 		GLenum   target = GL_TEXTURE_2D);
-	void generate_raycastcube0_vao(GLuint*, GLuint*, GLuint*, GLuint*);
+	void generate_raycastcube_vao(GLuint*, GLuint*, GLuint*, GLuint*);
 	void generate_raycast_shader_vao(GLuint*, GLuint*, GLuint*);
 	bool update_raycast_shader_vbo(
-		unsigned int,
-		float, float, float,
-		GLuint*,
-		bool);
+		unsigned int, float, float, float, GLuint*, bool);
 	void raycast_cube(float, float, float, GLuint*, bool);
   	void raycast_cube_RIP(float, float, float, GLuint*, bool);
 	void raycast_cube_LIP(float, float, float, GLuint*, bool);
