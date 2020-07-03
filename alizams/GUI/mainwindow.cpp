@@ -1690,7 +1690,6 @@ void MainWindow::set_zlock_one(bool t)
 
 void MainWindow::writeSettings()
 {
-#ifdef USE_WORKSTATION_MODE
 	QSettings settings(
 		QSettings::IniFormat, QSettings::UserScope,
 		QApplication::organizationName(), QApplication::applicationName());
@@ -1698,20 +1697,15 @@ void MainWindow::writeSettings()
 	settings.beginGroup(QString("MainWindow"));
 	if (!isMaximized())
 	{
-		settings.setValue(QString("size"),    QVariant(size()));
-		settings.setValue(QString("pos"),     QVariant(pos()));
-		settings.setValue(QString("open_dir"),QVariant(CommonUtils::get_open_dir()));
+		settings.setValue(QString("size"), QVariant(size()));
+		settings.setValue(QString("pos"),  QVariant(pos()));
 	}
-/* TODO
-	if (!show3DAct->isChecked())
-		settings.setValue(QString("hide_3d_frame"),QVariant(QString("Y")));
-	else
-		settings.setValue(QString("hide_3d_frame"),QVariant(QString("N")));
-*/
+#ifdef USE_WORKSTATION_MODE
+	settings.setValue(QString("open_dir"),QVariant(CommonUtils::get_open_dir()));
+#endif
 	settings.endGroup();
 	if (browser2) browser2->writeSettings(settings);
 	if (settingswidget) settingswidget->writeSettings(settings);
-#endif
 }
 
 void MainWindow::readSettings()
@@ -1720,7 +1714,6 @@ void MainWindow::readSettings()
 	desktop_layout(&width_,&height_);
 	const int w = static_cast<int>(static_cast<double>(width_)*0.7);
 	const int h = static_cast<int>(static_cast<double>(height_)*0.7);
-#ifdef USE_WORKSTATION_MODE
 	QSettings settings(
 		QSettings::IniFormat, QSettings::UserScope,
 		QApplication::organizationName(), QApplication::applicationName());
@@ -1728,12 +1721,10 @@ void MainWindow::readSettings()
 	settings.beginGroup(QString("MainWindow"));
 	resize(settings.value(QString("size"), QSize(w,h)).toSize());
 	move(settings.value(QString("pos"), QPoint(50,50)).toPoint());
+#ifdef USE_WORKSTATION_MODE
 	CommonUtils::set_open_dir(settings.value(QString("open_dir"), QString("")).toString());
-	settings.endGroup();
-#else
-	resize(QSize(w,h));
-	move(QPoint(50,50));
 #endif
+	settings.endGroup();
 }
 
 void MainWindow::set_style(QString s)
@@ -1790,7 +1781,7 @@ void MainWindow::change_style(const QString & s)
 void MainWindow::set_no_gl3()
 {
 	settingswidget->force_no_gl3();
-#if 1
+#if 0
 	QString a(
 		"\n\n  Failed to initialize OpenGL 3, "
 		"disabled OpenGL (restart required)\n\n");
