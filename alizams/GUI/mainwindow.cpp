@@ -238,6 +238,26 @@ MainWindow::MainWindow(
 	l13->setContentsMargins(0,0,0,0);
 	l13->addWidget(zrangewidget);
 	//
+	sqtree = new SQtree(this, true);
+	QVBoxLayout * vl296 = new QVBoxLayout(metadata_frame);
+	vl296->setContentsMargins(0,0,0,0);
+	vl296->setSpacing(0);
+	vl296->addWidget(sqtree);
+	//
+	browser2 = new BrowserWidget2(scale_icons*adjust_scale_icons, this);
+	QVBoxLayout * vl396 = new QVBoxLayout(browser2_frame);
+	vl396->setContentsMargins(0,0,0,0);
+	vl396->setSpacing(0);
+	vl396->addWidget(browser2);
+	//
+	settingswidget = new SettingsWidget(scale_icons, this);
+	QVBoxLayout * vl496 = new QVBoxLayout(settings_frame);
+	vl496->setContentsMargins(0,0,0,0);
+	vl496->setSpacing(0);
+	vl496->addWidget(settingswidget);
+	//
+	aboutwidget = new AboutWidget();
+	//
 	if (ok3d)
 	{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -275,26 +295,6 @@ MainWindow::MainWindow(
 	{
 		glwidget = NULL;
 	}
-	//
-	sqtree = new SQtree(this, true);
-	QVBoxLayout * vl296 = new QVBoxLayout(metadata_frame);
-	vl296->setContentsMargins(0,0,0,0);
-	vl296->setSpacing(0);
-	vl296->addWidget(sqtree);
-	//
-	browser2 = new BrowserWidget2(scale_icons*adjust_scale_icons, this);
-	QVBoxLayout * vl396 = new QVBoxLayout(browser2_frame);
-	vl396->setContentsMargins(0,0,0,0);
-	vl396->setSpacing(0);
-	vl396->addWidget(browser2);
-	//
-	settingswidget = new SettingsWidget(scale_icons, this);
-	QVBoxLayout * vl496 = new QVBoxLayout(settings_frame);
-	vl496->setContentsMargins(0,0,0,0);
-	vl496->setSpacing(0);
-	vl496->addWidget(settingswidget);
-	//
-	aboutwidget = new AboutWidget();
 	//
 	aliza = new Aliza();
 	//
@@ -363,6 +363,7 @@ MainWindow::MainWindow(
 	//
 	if (ok3d && glwidget)
 	{
+		connect(glwidget,SIGNAL(opengl3_not_available()),this,SLOT(set_no_gl3()));
 		saved_ok3d = true;
 		gl_frame->show();
 		glwidget->show();
@@ -1784,5 +1785,16 @@ void MainWindow::change_style(const QString & s)
 	if (slider_y)         slider_y->set_style_sheet();
 	if (slider_x)         slider_x->set_style_sheet();
 	if (histogramview)    histogramview->update_bgcolor();
+}
+
+void MainWindow::set_no_gl3()
+{
+	settingswidget->force_no_gl3();
+#if 1
+	QString a(
+		"\n\n  Failed to initialize OpenGL 3, "
+		"disabled OpenGL (restart required)\n\n");
+	std::cout << a.toStdString() << std::endl;
+#endif
 }
 

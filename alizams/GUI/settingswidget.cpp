@@ -208,4 +208,7 @@ float SettingsWidget::get_scale_icons() const
 	return scale_icons*(float)si_doubleSpinBox->value();
 }
 
-
+void SettingsWidget::force_no_gl3()
+{
+	gl3D_checkBox->setChecked(false);
+}

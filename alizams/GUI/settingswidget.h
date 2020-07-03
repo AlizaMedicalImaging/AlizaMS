@@ -39,6 +39,7 @@ private slots:
 
 public slots:
 	void update_font_pt(double);
+	void force_no_gl3();
 
 
 protected:
