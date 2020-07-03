@@ -1648,19 +1648,19 @@ void GLWidget::draw_3d_tex1(
 	const float * v,
 	const float * t)
 {
-	glBindVertexArray(*vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-	glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(float), v, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 4*3*sizeof(float), v);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-	glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(float), t, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 4*3*sizeof(float), t);
+	glBindVertexArray(*vao);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 void GLWidget::draw_frame2(const GLfloat * v)
 {
-	glBindVertexArray(frames_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, frames_vbo);
-	glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), v, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 4*3*sizeof(float), v);
+	glBindVertexArray(frames_vao);
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
 }
 
@@ -2331,9 +2331,9 @@ void GLWidget::paint_volume()
 				glPointSize(3.0f);
 				if (iii == 0)
 					glUniform4f(frame_shader.location_K, 0.85f, 0.85f, 0.85f, 1.0f);
-				glBindVertexArray(origin_vao);
 				glBindBuffer(GL_ARRAY_BUFFER, origin_vbo);
-				glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat), di->origin, GL_DYNAMIC_DRAW);
+				glBufferSubData(GL_ARRAY_BUFFER, 0, 3*sizeof(GLfloat), di->origin);
+				glBindVertexArray(origin_vao);
 				glDrawArrays(GL_POINTS, 0, 1);
 			}
 		}
@@ -4081,7 +4081,7 @@ void GLWidget::raycast_cube(
 			 x, -y,  z,
 			 x, -y, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0);
 	if (b)
 	{
 		GLfloat ca0[] = {
@@ -4107,7 +4107,7 @@ void GLWidget::raycast_cube(
 					1.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4136,7 +4136,7 @@ void GLWidget::raycast_cube_RIP(
 			 x, -z,  y,
 			 x, -z, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_rip, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_rip);
 	if (b)
 	{
 		GLfloat ca0_rip[] = {
@@ -4159,7 +4159,7 @@ void GLWidget::raycast_cube_RIP(
 					1.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_rip, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_rip);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4188,7 +4188,7 @@ void GLWidget::raycast_cube_LIP(
 			 x, -z,  y,
 			 x, -z, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_lip, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_lip);
 	if (b)
 	{
 		GLfloat ca0_lip[] = {
@@ -4211,7 +4211,7 @@ void GLWidget::raycast_cube_LIP(
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_lip, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_lip);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4241,7 +4241,7 @@ void GLWidget::raycast_cube_RSP(
 			 x, -z,  y,
 			 x, -z, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_rsp, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_rsp);
 	if (b)
 	{
 		GLfloat ca0_rsp[] = {
@@ -4264,7 +4264,7 @@ void GLWidget::raycast_cube_RSP(
 					1.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_rsp, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_rsp);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4294,7 +4294,7 @@ void GLWidget::raycast_cube_LSP(
 			 x, -z,  y,
 			 x, -z, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_lsp, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_lsp);
 	if (b)
 	{
 		GLfloat ca0_lsp[] = {
@@ -4317,7 +4317,7 @@ void GLWidget::raycast_cube_LSP(
 					0.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_lsp, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_lsp);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4346,7 +4346,7 @@ void GLWidget::raycast_cube_RIA(
 			 x, -z,  y,
 			 x, -z, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_ria, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ria);
 	if (b)
 	{
 		GLfloat ca0_ria[] = {
@@ -4369,7 +4369,7 @@ void GLWidget::raycast_cube_RIA(
 					1.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_ria, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ria);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4398,7 +4398,7 @@ void GLWidget::raycast_cube_LIA(
 			 x, -z,  y,
 			 x, -z, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_lia, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_lia);
 	if (b)
 	{
 		GLfloat ca0_lia[] = {
@@ -4421,7 +4421,7 @@ void GLWidget::raycast_cube_LIA(
 					0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_lia, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_lia);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4450,7 +4450,7 @@ void GLWidget::raycast_cube_RSA(
 			 x, -z,  y,
 			 x, -z, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_rsa, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_rsa);
 	if (b)
 	{
 		GLfloat ca0_rsa[] = {
@@ -4473,7 +4473,7 @@ void GLWidget::raycast_cube_RSA(
 					1.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_rsa, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_rsa);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4502,7 +4502,7 @@ void GLWidget::raycast_cube_LSA(
 			 x, -z,  y,
 			 x, -z, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_lsa, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_lsa);
 	if (b)
 	{
 		GLfloat ca0_lsa[] = {
@@ -4525,7 +4525,7 @@ void GLWidget::raycast_cube_LSA(
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_lsa, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_lsa);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4554,7 +4554,7 @@ void GLWidget::raycast_cube_IRP(
 			 y, -z,  x,
 			 y, -z, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_irp, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_irp);
 	if (b)
 	{
 		GLfloat ca0_irp[] = {
@@ -4578,7 +4578,7 @@ void GLWidget::raycast_cube_IRP(
 					0.0f, 1.0f, 1.0f };
 
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_irp, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_irp);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4607,7 +4607,7 @@ void GLWidget::raycast_cube_ILP(
 			 y, -z,  x,
 			 y, -z, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_ilp, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ilp);
 	if (b)
 	{
 		GLfloat ca0_ilp[] = {
@@ -4631,7 +4631,7 @@ void GLWidget::raycast_cube_ILP(
 					0.0f, 0.0f, 1.0f };
 
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_ilp, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ilp);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4660,7 +4660,7 @@ void GLWidget::raycast_cube_SRP(
 			 y, -z,  x,
 			 y, -z, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_srp, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_srp);
 	if (b)
 	{
 		GLfloat ca0_srp[] = {
@@ -4684,7 +4684,7 @@ void GLWidget::raycast_cube_SRP(
 					1.0f, 1.0f, 1.0f };
 
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_srp, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_srp);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4713,7 +4713,7 @@ void GLWidget::raycast_cube_SLP(
 			 y, -z,  x,
 			 y, -z, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_slp, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_slp);
 	if (b)
 	{
 		GLfloat ca0_slp[] = {
@@ -4737,7 +4737,7 @@ void GLWidget::raycast_cube_SLP(
 					1.0f, 0.0f, 1.0f };
 
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_slp, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_slp);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4766,7 +4766,7 @@ void GLWidget::raycast_cube_IRA(
 			 y, -z,  x,
 			 y, -z, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_ira, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ira);
 	if (b)
 	{
 		GLfloat ca0_ira[] = {
@@ -4789,7 +4789,7 @@ void GLWidget::raycast_cube_IRA(
 					1.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_ira, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ira);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4818,7 +4818,7 @@ void GLWidget::raycast_cube_ILA(
 			 y, -z,  x,
 			 y, -z, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_ila, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ila);
 	if (b)
 	{
 		GLfloat ca0_ila[] = {
@@ -4841,7 +4841,7 @@ void GLWidget::raycast_cube_ILA(
 					1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_ila, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ila);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4870,7 +4870,7 @@ void GLWidget::raycast_cube_SRA(
 			 y, -z,  x,
 			 y, -z, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_sra, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_sra);
 	if (b)
 	{
 		GLfloat ca0_sra[] = {
@@ -4893,7 +4893,7 @@ void GLWidget::raycast_cube_SRA(
 					0.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_sra, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_sra);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4922,7 +4922,7 @@ void GLWidget::raycast_cube_SLA(
 			 y, -z,  x,
 			 y, -z, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_sla, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_sla);
 	if (b)
 	{
 		GLfloat ca0_sla[] = {
@@ -4945,7 +4945,7 @@ void GLWidget::raycast_cube_SLA(
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_sla, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_sla);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4974,7 +4974,7 @@ void GLWidget::raycast_cube_RPI(
 			 x, -y,  z,
 			 x, -y, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_rpi, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_rpi);
 	if (b)
 	{
 		GLfloat ca0_rpi[] = {
@@ -4997,7 +4997,7 @@ void GLWidget::raycast_cube_RPI(
 					1.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_rpi, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_rpi);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5026,7 +5026,7 @@ void GLWidget::raycast_cube_LPI(
 			 x, -y,  z,
 			 x, -y, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_lpi, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_lpi);
 	if (b)
 	{
 		GLfloat ca0_lpi[] = {
@@ -5049,7 +5049,7 @@ void GLWidget::raycast_cube_LPI(
 					0.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_lpi, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_lpi);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5078,7 +5078,7 @@ void GLWidget::raycast_cube_RAI(
 			 x, -y,  z,
 			 x, -y, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_rai, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_rai);
 	if (b)
 	{
 		GLfloat ca0_rai[] = {
@@ -5101,7 +5101,7 @@ void GLWidget::raycast_cube_RAI(
 					1.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_rai, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_rai);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5130,7 +5130,7 @@ void GLWidget::raycast_cube_LAI(
 			 x, -y,  z,
 			 x, -y, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_lai, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_lai);
 	if (b)
 	{
 		GLfloat ca0_lai[] = {
@@ -5153,7 +5153,7 @@ void GLWidget::raycast_cube_LAI(
 					0.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_lai, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_lai);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5182,7 +5182,7 @@ void GLWidget::raycast_cube_RPS(
 			 x, -y,  z,
 			 x, -y, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_rps, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_rps);
 	if (b)
 	{
 		GLfloat ca0_rps[] = {
@@ -5205,7 +5205,7 @@ void GLWidget::raycast_cube_RPS(
 					1.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_rps, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_rps);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5234,7 +5234,7 @@ void GLWidget::raycast_cube_LPS(
 			 x, -y,  z,
 			 x, -y, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_lps, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_lps);
 	if (b)
 	{
 		GLfloat ca0_lps[] = {
@@ -5257,7 +5257,7 @@ void GLWidget::raycast_cube_LPS(
 					0.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_lps, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_lps);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5286,7 +5286,7 @@ void GLWidget::raycast_cube_RAS(
 			 x, -y,  z,
 			 x, -y, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_ras, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ras);
 	if (b)
 	{
 		GLfloat ca0_ras[] = {
@@ -5309,7 +5309,7 @@ void GLWidget::raycast_cube_RAS(
 					1.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_ras, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ras);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5338,7 +5338,7 @@ void GLWidget::raycast_cube_LAS(
 			 x, -y,  z,
 			 x, -y, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_las, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_las);
 	if (b)
 	{
 		GLfloat ca0_las[] = {
@@ -5361,7 +5361,7 @@ void GLWidget::raycast_cube_LAS(
 					0.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_las, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_las);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5390,7 +5390,7 @@ void GLWidget::raycast_cube_PRI(
 			 y, -x,  z,
 			 y, -x, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_pri, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_pri);
 	if (b)
 	{
 		GLfloat ca0_pri[] = {
@@ -5413,7 +5413,7 @@ void GLWidget::raycast_cube_PRI(
 					1.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_pri, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_pri);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5442,7 +5442,7 @@ void GLWidget::raycast_cube_PLI(
 			 y, -x,  z,
 			 y, -x, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_pli, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_pli);
 	if (b)
 	{
 		GLfloat ca0_pli[] = {
@@ -5465,7 +5465,7 @@ void GLWidget::raycast_cube_PLI(
 					1.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_pli, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_pli);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5494,7 +5494,7 @@ void GLWidget::raycast_cube_ARI(
 			 y, -x,  z,
 			 y, -x, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_ari, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ari);
 	if (b)
 	{
 		GLfloat ca0_ari[] = {
@@ -5517,7 +5517,7 @@ void GLWidget::raycast_cube_ARI(
 					0.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_ari, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ari);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5546,7 +5546,7 @@ void GLWidget::raycast_cube_ALI(
 			 y, -x,  z,
 			 y, -x, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_ali, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ali);
 	if (b)
 	{
 		GLfloat ca0_ali[] = {
@@ -5569,7 +5569,7 @@ void GLWidget::raycast_cube_ALI(
 					0.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_ali, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ali);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5598,7 +5598,7 @@ void GLWidget::raycast_cube_PRS(
 			 y, -x,  z,
 			 y, -x, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_prs, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_prs);
 	if (b)
 	{
 		GLfloat ca0_prs[] = {
@@ -5621,7 +5621,7 @@ void GLWidget::raycast_cube_PRS(
 					1.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_prs, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_prs);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5650,7 +5650,7 @@ void GLWidget::raycast_cube_PLS(
 			 y, -x,  z,
 			 y, -x, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_pls, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_pls);
 	if (b)
 	{
 		GLfloat ca0_pls[] = {
@@ -5673,7 +5673,7 @@ void GLWidget::raycast_cube_PLS(
 					1.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_pls, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_pls);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5702,7 +5702,7 @@ void GLWidget::raycast_cube_ARS(
 			 y, -x,  z,
 			 y, -x, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_ars, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ars);
 	if (b)
 	{
 		GLfloat ca0_ars[] = {
@@ -5725,7 +5725,7 @@ void GLWidget::raycast_cube_ARS(
 					0.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_ars, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ars);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5754,7 +5754,7 @@ void GLWidget::raycast_cube_ALS(
 			 y, -x,  z,
 			 y, -x, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_als, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_als);
 	if (b)
 	{
 		GLfloat ca0_als[] = {
@@ -5777,7 +5777,7 @@ void GLWidget::raycast_cube_ALS(
 					0.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_als, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_als);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5806,7 +5806,7 @@ void GLWidget::raycast_cube_IPR(
 			 z, -y,  x,
 			 z, -y, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_ipr, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ipr);
 	if (b)
 	{
 		GLfloat ca0_ipr[] = {
@@ -5829,7 +5829,7 @@ void GLWidget::raycast_cube_IPR(
 					1.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_ipr, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ipr);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5858,7 +5858,7 @@ void GLWidget::raycast_cube_SPR(
 			 z, -y,  x,
 			 z, -y, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_spr, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_spr);
 	if (b)
 	{
 		GLfloat ca0_spr[] = {
@@ -5881,7 +5881,7 @@ void GLWidget::raycast_cube_SPR(
 					0.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_spr, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_spr);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5910,7 +5910,7 @@ void GLWidget::raycast_cube_IAR(
 			 z, -y,  x,
 			 z, -y, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_iar, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_iar);
 	if (b)
 	{
 		GLfloat ca0_iar[] = {
@@ -5933,7 +5933,7 @@ void GLWidget::raycast_cube_IAR(
 					1.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_iar, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_iar);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5962,7 +5962,7 @@ void GLWidget::raycast_cube_SAR(
 			 z, -y,  x,
 			 z, -y, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_sar, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_sar);
 	if (b)
 	{
 		GLfloat ca0_sar[] = {
@@ -5985,7 +5985,7 @@ void GLWidget::raycast_cube_SAR(
 					0.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_sar, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_sar);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6014,7 +6014,7 @@ void GLWidget::raycast_cube_IPL(
 			 z, -y,  x,
 			 z, -y, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_ipl, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ipl);
 	if (b)
 	{
 		GLfloat ca0_ipl[] = {
@@ -6037,7 +6037,7 @@ void GLWidget::raycast_cube_IPL(
 					1.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_ipl, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ipl);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6066,7 +6066,7 @@ void GLWidget::raycast_cube_SPL(
 			 z, -y,  x,
 			 z, -y, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_spl, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_spl);
 	if (b)
 	{
 		GLfloat ca0_spl[] = {
@@ -6089,7 +6089,7 @@ void GLWidget::raycast_cube_SPL(
 					0.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_spl, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_spl);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6118,7 +6118,7 @@ void GLWidget::raycast_cube_IAL(
 			 z, -y,  x,
 			 z, -y, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_ial, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ial);
 	if (b)
 	{
 		GLfloat ca0_ial[] = {
@@ -6141,7 +6141,7 @@ void GLWidget::raycast_cube_IAL(
 					1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_ial, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ial);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6170,7 +6170,7 @@ void GLWidget::raycast_cube_SAL(
 			 z, -y,  x,
 			 z, -y, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_sal, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_sal);
 	if (b)
 	{
 		GLfloat ca0_sal[] = {
@@ -6193,7 +6193,7 @@ void GLWidget::raycast_cube_SAL(
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_sal, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_sal);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6222,7 +6222,7 @@ void GLWidget::raycast_cube_PIR(
 			 z, -x,  y,
 			 z, -x, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_pir, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_pir);
 	if (b)
 	{
 		GLfloat ca0_pir[] = {
@@ -6245,7 +6245,7 @@ void GLWidget::raycast_cube_PIR(
 					1.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_pir, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_pir);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6274,7 +6274,7 @@ void GLWidget::raycast_cube_PSR(
 			 z, -x,  y,
 			 z, -x, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_psr, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_psr);
 	if (b)
 	{
 		GLfloat ca0_psr[] = {
@@ -6297,7 +6297,7 @@ void GLWidget::raycast_cube_PSR(
 					1.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_psr, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_psr);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6326,7 +6326,7 @@ void GLWidget::raycast_cube_AIR(
 			 z, -x,  y,
 			 z, -x, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_air, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_air);
 	if (b)
 	{
 		GLfloat ca0_air[] = {
@@ -6349,7 +6349,7 @@ void GLWidget::raycast_cube_AIR(
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_air, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_air);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6378,7 +6378,7 @@ void GLWidget::raycast_cube_ASR(
 			 z, -x,  y,
 			 z, -x, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_asr, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_asr);
 	if (b)
 	{
 		GLfloat ca0_asr[] = {
@@ -6401,7 +6401,7 @@ void GLWidget::raycast_cube_ASR(
 					0.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_asr, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_asr);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6430,7 +6430,7 @@ void GLWidget::raycast_cube_PIL(
 			 z, -x,  y,
 			 z, -x, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_pil, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_pil);
 	if (b)
 	{
 		GLfloat ca0_pil[] = {
@@ -6453,7 +6453,7 @@ void GLWidget::raycast_cube_PIL(
 					1.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_pil, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_pil);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6482,7 +6482,7 @@ void GLWidget::raycast_cube_PSL(
 			 z, -x,  y,
 			 z, -x, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_psl, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_psl);
 	if (b)
 	{
 		GLfloat ca0_psl[] = {
@@ -6505,7 +6505,7 @@ void GLWidget::raycast_cube_PSL(
 					1.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_psl, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_psl);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6534,7 +6534,7 @@ void GLWidget::raycast_cube_AIL(
 			 z, -x,  y,
 			 z, -x, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_ail, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ail);
 	if (b)
 	{
 		GLfloat ca0_ail[] = {
@@ -6557,7 +6557,7 @@ void GLWidget::raycast_cube_AIL(
 					0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_ail, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ail);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6586,7 +6586,7 @@ void GLWidget::raycast_cube_ASL(
 			 z, -x,  y,
 			 z, -x, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), va0_asl, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_asl);
 	if (b)
 	{
 		GLfloat ca0_asl[] = {
@@ -6609,7 +6609,7 @@ void GLWidget::raycast_cube_ASL(
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), ca0_asl, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_asl);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
