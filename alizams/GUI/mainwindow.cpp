@@ -51,6 +51,7 @@ MainWindow::MainWindow(
 	scale_icons = 1.0f;
 	adjust_scale_icons = 1.0f;
 	hide_gl3_frame_later = false;
+	saved_ok3d = false;
 #if 1
 	{
 		QSettings settings(
@@ -363,6 +364,7 @@ MainWindow::MainWindow(
 	//
 	if (ok3d && glwidget)
 	{
+		saved_ok3d = true;
 		connect(glwidget,SIGNAL(opengl3_not_available()),this,SLOT(set_no_gl3()));
 		gl_frame->show();
 		glwidget->show();
@@ -373,6 +375,7 @@ MainWindow::MainWindow(
 	}
 	else
 	{
+		saved_ok3d = false;
 		gl_frame->hide();
 		slicesAct->setChecked(false);
 		raycastAct->setChecked(false);
@@ -951,6 +954,16 @@ void MainWindow::toggle_showgl(bool t)
 	if (t)
 	{
 		frame3D->show();
+		if (saved_ok3d)
+		{
+			toolbar3D_frame->show();
+			view3d_frame->show();
+		}
+		else
+		{
+			toolbar3D_frame->hide();
+			view3d_frame->hide();
+		}
 	}
 	else
 	{
@@ -1400,7 +1413,6 @@ void MainWindow::set_ui()
 	if (!first_image_loaded)
 	{
 		show2DAct->setEnabled(true);
-		show3DAct->setEnabled(true);
 		toolbar2D_frame->show();
 		level_frame->show();
 		imagesbox_frame->show();
@@ -1410,9 +1422,13 @@ void MainWindow::set_ui()
 		info_line->show();
 		view2d_label->setText("Slice view (Z)");
 		actionViews2DMenu->setEnabled(true);
-		actionViews3DMenu->setEnabled(true);
-		toolbar3D_frame->show();
-		view3d_frame->show();
+		if (saved_ok3d)
+		{
+			show3DAct->setEnabled(true);
+			actionViews3DMenu->setEnabled(true);
+			toolbar3D_frame->show();
+			view3d_frame->show();
+		}
 		first_image_loaded = true;
 	}
 }
@@ -1784,7 +1800,9 @@ void MainWindow::change_style(const QString & s)
 void MainWindow::set_no_gl3()
 {
 	settingswidget->force_no_gl3();
+	settingswidget->set_gl_visible(false);
 	hide_gl3_frame_later = true;
+	saved_ok3d = false;
 #if 1
 	QString a(
 		"\nFailed to initialize OpenGL 3\n");
@@ -1797,7 +1815,7 @@ void MainWindow::check_3d_frame()
 	if (hide_gl3_frame_later)
 	{
 		show3DAct->blockSignals(true);
-		frame3D->hide();
+		toggle_showgl(false);
 		show3DAct->setChecked(false);
 		show3DAct->blockSignals(false);
 	}
@@ -1816,7 +1834,7 @@ void MainWindow::check_3d_frame()
 		if (s == QString("Y"))
 		{
 			show3DAct->blockSignals(true);
-			frame3D->hide();
+			toggle_showgl(false);
 			show3DAct->setChecked(false);
 			show3DAct->blockSignals(false);
 		}
