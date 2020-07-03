@@ -1402,17 +1402,25 @@ void MainWindow::set_ui()
 		show2DAct->setEnabled(true);
 		show3DAct->setEnabled(true);
 		toolbar2D_frame->show();
-		toolbar3D_frame->show();
 		level_frame->show();
 		imagesbox_frame->show();
 		zrange_frame->show();
 		slider_frame->show();
 		view2d_frame->show();
-		view3d_frame->show();
 		info_line->show();
 		view2d_label->setText("Slice view (Z)");
 		actionViews2DMenu->setEnabled(true);
 		actionViews3DMenu->setEnabled(true);
+		if (show3DAct->isChecked())
+		{
+			toolbar3D_frame->show();
+			view3d_frame->show();
+		}
+		else
+		{
+			toolbar3D_frame->hide();
+			view3d_frame->hide();
+		}
 		first_image_loaded = true;
 	}
 }
