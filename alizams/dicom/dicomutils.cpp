@@ -10205,6 +10205,7 @@ QString DicomUtils::read_dicom(
 	const float tolerance = 0.01f;
 	const bool not_pr_ref = !pr_ref;
 	int count_images = 0;
+	int count_uid_errors = 0;
 	//
 	//
 	//
@@ -11589,6 +11590,20 @@ QString DicomUtils::read_dicom(
 				if (ok)
 				{
 					ivariant->filenames = QStringList(images_tmp);
+					{
+						QList<QString> l_uids =
+							ivariant->image_instance_uids.values();
+						if (!l_uids.empty())
+						{
+							const size_t l_size = l_uids.size();
+							if (l_size > 1)
+							{
+								QSet<QString> s_uids = l_uids.toSet();
+								const size_t s_size = s_uids.size();
+								if (l_size > s_size) count_uid_errors++;
+							}
+						}
+					}
 					ivariants.push_back(ivariant);
 				}
 				else
@@ -11623,6 +11638,20 @@ QString DicomUtils::read_dicom(
 				if (ok)
 				{
 					ivariant->filenames = QStringList(images_tmp);
+					{
+						QList<QString> l_uids =
+							ivariant->image_instance_uids.values();
+						if (!l_uids.empty())
+						{
+							const size_t l_size = l_uids.size();
+							if (l_size > 1)
+							{
+								QSet<QString> s_uids = l_uids.toSet();
+								const size_t s_size = s_uids.size();
+								if (l_size > s_size) count_uid_errors++;
+							}
+						}
+					}
 					ivariants.push_back(ivariant);
 				}
 				else
@@ -11632,31 +11661,13 @@ QString DicomUtils::read_dicom(
 			}
 		}
 	}
-	if (!(enhanced||mosaic||uihgrid||ultrasound||multiframe)) // TODO
+	if (count_uid_errors > 0)
 	{
-		int count_uid_errors = 0;
-		for (size_t x = 0; x < ivariants.size(); x++)
-		{
-			QList<QString> l_uids =
-				ivariants.at(x)->image_instance_uids.values();
-			if (!l_uids.empty())
-			{
-				const size_t l_size = l_uids.size();
-				if (l_size > 1)
-				{
-					QSet<QString> s_uids = l_uids.toSet();
-					const size_t s_size = s_uids.size();
-					if (l_size > s_size) count_uid_errors++;
-
-				}
-			}
-			if (count_uid_errors > 0)
-			{
-				if (!message_.isEmpty())
-					message_.append(QString("\n"));
-				message_.append(QString("Warning: UIDs are not unique"));
-			}
-		}
+		if (!message_.isEmpty()) message_.append(QString("\n"));
+		message_.append(
+			QString("Warning: UIDs are not unique (") +
+			QVariant(count_uid_errors).toString() +
+			QString(")"));
 	}
 	//
 	//
