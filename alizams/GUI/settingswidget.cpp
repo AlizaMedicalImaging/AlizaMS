@@ -103,7 +103,6 @@ void SettingsWidget::set_default()
 	f_bilinear_radioButton->setChecked(false);
 	f_no_radioButton->setChecked(true);
 	textureoptions_groupBox->setVisible(true);
-	textureoptions_groupBox->setEnabled(true);
 	textureoptions_groupBox->setChecked(true);
 	rescale_checkBox->setChecked(true);
 	mosaic_checkBox->setChecked(true);
