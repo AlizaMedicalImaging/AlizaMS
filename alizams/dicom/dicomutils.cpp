@@ -7749,7 +7749,7 @@ QString DicomUtils::read_buffer(
 	{
 		char * p__ = NULL;
 		bool badalloc = false;
-		try() { p__ = new char[xy]; }
+		try { p__ = new char[xy]; }
 		catch(std::bad_alloc&) { badalloc = true; }
 		if (p__ && !badalloc)
 		{
