@@ -7747,9 +7747,24 @@ QString DicomUtils::read_buffer(
 	const size_t xy = buffer_size/dimz;
 	for (unsigned int j = 0; j < dimz; j++)
 	{
-		char * p__ = new char[xy];
-		memcpy(p__,&(buffer[j*xy]),xy);
-		data.push_back(p__);
+		char * p__ = NULL;
+		bool badalloc = false;
+		try() { p__ = new char[xy]; }
+		catch(std::bad_alloc&) { badalloc = true; }
+		if (p__ && !badalloc)
+		{
+			memcpy(p__,&(buffer[j*xy]),xy);
+			data.push_back(p__);
+		}
+		else
+		{
+			if (not_rescaled_buffer)  delete [] not_rescaled_buffer;
+			if (rescaled_buffer)      delete [] rescaled_buffer;
+			if (supp_rescaled_buffer) delete [] supp_rescaled_buffer;
+			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
+			*ok = false;
+			return QString("Memory allocation error");
+		}
 	}
 	if (not_rescaled_buffer)  delete [] not_rescaled_buffer;
 	if (rescaled_buffer)      delete [] rescaled_buffer;
