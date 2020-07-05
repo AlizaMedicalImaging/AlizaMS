@@ -3255,47 +3255,13 @@ void GLWidget::generate_raycastcube_vao(
 	*vao = 0;
 	vbo[0] = 0;
 	vbo[1] = 0;
-	const float x = 100.0f;
-	const float y = 100.0f;
-	const float z = 100.0f;
-	GLfloat v[] = {
-		-x,  y, z,
-		-x, -y, z,
-		x,  y, z,
-		x, -y, z,
-		x,  y, -z,
-		x, -y, -z,
-		-x,  y, -z,
-		-x, -y, -z,
-		-x,  y, z,
-		-x, -y, z,
-		-x, y, -z,
-		-x, y,  z,
-		x, y, -z,
-		x, y,  z,
-		-x, -y,  z,
-		-x, -y, -z,
-		x, -y,  z,
-		x, -y, -z };
-	GLfloat c[] = {
-		0.0f, 1.0f, 1.0f,
-		0.0f, 0.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-		1.0f, 0.0f, 1.0f,
-		1.0f, 1.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 1.0f,
-		0.0f, 0.0f, 1.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 0.0f,
-		1.0f, 1.0f, 1.0f,
-		0.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 1.0f,
-		1.0f, 0.0f, 0.0f };
+	GLfloat * v = new GLfloat[54];
+	GLfloat * c = new GLfloat[54];
+	for (int x  = 0; x < 54; x++)
+	{
+		v[x] = 0.0f;
+		c[x] = 0.0f;
+	}
 	glGenVertexArrays(1, vao);
 	glBindVertexArray(*vao);
 	glGenBuffers(2, vbo);
@@ -3309,6 +3275,8 @@ void GLWidget::generate_raycastcube_vao(
 	glVertexAttribPointer(*attr_c, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_c);
 	glBindVertexArray(0);
+	delete [] v;
+	delete [] c;
 	vaoids.push_back(*vao);
 	vboids.push_back(vbo);
 }
