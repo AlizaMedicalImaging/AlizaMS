@@ -31,11 +31,6 @@ Features
  * Grayscale softcopy presentation (partial)
  * etc.
 
-Data sets
----------
-
-[Aliza Medical Imaging collection](https://www.aliza-dicom-viewer.com/download/datasets)
-
 
 Build
 -----
