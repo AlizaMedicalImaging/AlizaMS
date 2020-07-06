@@ -8,8 +8,10 @@
 #include "CG/glwidget-qt5.h"
 #include <QSurfaceFormat>
 #else
+#include "CG/glew/include/GL/glew.h"
 #include "CG/glwidget-qt4.h"
 #endif
+#include "CG/testgl.h"
 #include "GUI/mainwindow.h"
 #include <QApplication>
 #include <QSettings>
@@ -209,7 +211,7 @@ int main(int argc, char *argv[])
 	app.setApplicationName(QString("AlizaMS"));
 	//
 	{
-		double app_font_pt   = 0.0;
+		double app_font_pt = 0.0;
 		QSettings settings(
 			QSettings::IniFormat,
 			QSettings::UserScope,
@@ -221,12 +223,13 @@ int main(int argc, char *argv[])
 		QString saved_style = settings.value(
 			QString("stylename"),
 			QVariant(QString("Dark Fusion"))).toString();
-		const int enable_gl_3d_  =
+		const int enable_gltest =
+			settings.value(QString("enable_gltest"), 1).toInt();
+		const int enable_gl_3d_ =
 			settings.value(QString("enable_gl_3D"), 1).toInt();
 		const int hide_zoom_ =
 			settings.value(QString("hide_zoom"), 1).toInt();
 		settings.endGroup();
-		ok3d = !force_disable_opengl && (enable_gl_3d_ == 1);
 		hide_zoom = (hide_zoom_==1) ? true : false;
 		QFont f = QApplication::font();
 		if (app_font_pt <= 0.0)
@@ -243,6 +246,42 @@ int main(int argc, char *argv[])
 		settings.setValue(QString("app_font_pt"), QVariant(app_font_pt));
 		settings.endGroup();
 		settings.sync();
+		//
+		if (!metadata_only && !force_disable_opengl)
+		{
+			if ((enable_gl_3d_ == 1) && (enable_gltest == 1))
+			{
+				TestGL * testgl = new TestGL();
+				testgl->show();
+				testgl->updateGL();
+				app.processEvents();
+				if (testgl->isValid())
+				{
+					ok3d = (testgl->opengl_init_done && !testgl->no_opengl3);
+				}
+				if (ok3d)
+				{
+					settings.beginGroup(QString("GlobalSettings"));
+					settings.setValue(QString("enable_gltest"), QVariant((int)0));
+					settings.endGroup();
+					settings.sync();
+				}
+				else
+				{
+					std::cout << "Test OpenGL 3.0 failed\n" << std::endl;
+					settings.beginGroup(QString("GlobalSettings"));
+					settings.setValue(QString("enable_gl_3D"), QVariant((int)0));
+					settings.endGroup();
+					settings.sync();
+				}
+				testgl->close();
+				delete testgl;
+			}
+			else if (enable_gl_3d_ == 1)
+			{
+				ok3d = true;
+			}
+		}
 		//
 		if (saved_style==QString("Dark Fusion"))
 		{

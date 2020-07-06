@@ -8,7 +8,7 @@
 //#define USE_GL_MAJOR_3_MINOR_2
 #endif
 
-#include "CG/glew/include/GL/glew.h"
+#include "glew/include/GL/glew.h"
 #include <QtGlobal>
 #include <QGLWidget>
 #include "camera.h"

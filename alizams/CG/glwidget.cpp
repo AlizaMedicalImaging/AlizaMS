@@ -304,6 +304,7 @@ void GLWidget::initializeGL()
 	if (!c)
 	{
 		std::cout << "QOpenGLContext is NULL " << std::endl;
+		opengl_init_done = true;
 		emit opengl3_not_available();
 		return;
 	}
@@ -312,6 +313,7 @@ void GLWidget::initializeGL()
 		if (!c->isValid())
 		{
 			std::cout << "QOpenGLContext is invalid" << std::endl;
+			opengl_init_done = true;
 			emit opengl3_not_available();
 			return;
 		}
@@ -325,6 +327,7 @@ void GLWidget::initializeGL()
 			if (!funcs)
 			{
 				std::cout << "Could not obtain required OpenGL context version" << std::endl;
+				opengl_init_done = true;
 				emit opengl3_not_available();
 				return;
 			}
@@ -332,9 +335,17 @@ void GLWidget::initializeGL()
 	}
 #else // Qt4
 	const QGLContext * c = context();
+	if (!c)
+	{
+		std::cout << "QOpenGLContext is NULL " << std::endl;
+		opengl_init_done = true;
+		emit opengl3_not_available();
+		return;
+	}
 	if (!c->isValid())
 	{
 		emit opengl3_not_available();
+		opengl_init_done = true;
 		std::cout << "GLContext is invalid" << std::endl;
 		return;
 	}
@@ -913,6 +924,7 @@ void GLWidget::init_opengl(int w, int h)
 	GLenum err = glewInit();
 	if (GLEW_OK != err)
 	{
+		opengl_info.append(QString("\nOpenGL modules disabled (1)"));
 		emit opengl3_not_available();
 		return;
 	}
@@ -922,12 +934,35 @@ void GLWidget::init_opengl(int w, int h)
 	}
 	else
 	{
-		no_opengl3 = true;
-		opengl_info.append(QString("\nOpenGL modules disabled"));
+		opengl_info.append(QString("\nOpenGL modules disabled (2)"));
+		emit opengl3_not_available();
+		return;
+	}
+#else
+	QOpenGLContext * c = QOpenGLContext::currentContext();
+	if (c)
+	{
+		const QSurfaceFormat & f = c->format();
+		if (f.majorVersion() >= 3)
+		{
+			no_opengl3 = false;
+		}
+		else
+		{
+			opengl_info.append(QString("\nOpenGL modules disabled (1)"));
+			emit opengl3_not_available();
+			return;
+		}
+	}
+	else
+	{
+		opengl_info.append(QString("\nOpenGL modules disabled (2)"));
 		emit opengl3_not_available();
 		return;
 	}
 #endif
+	//
+	//
 	//
 	GLint major, minor;
 	glGetIntegerv(GL_MAJOR_VERSION, &major);
@@ -961,17 +996,6 @@ void GLWidget::init_opengl(int w, int h)
 	else
 		set_max_vbos_65535(false);
 	//
-	//
-	//
-	if (major >= 3) no_opengl3 = false;
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	if (no_opengl3)
-	{
-		opengl_info.append(QString("\nOpenGL modules disabled"));
-		emit opengl3_not_available();
-		return;
-	}
-#endif
 	camera->set_heading(0.0f);
 	camera->set_pitch(0.0f);
 	camera->set_position(0.0f,0.0f,(float)SCENE_POS_Z);

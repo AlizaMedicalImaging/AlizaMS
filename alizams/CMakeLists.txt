@@ -190,6 +190,7 @@ set(ALIZAMS_SRCS ${ALIZAMS_SRCS}
   dicom/spectroscopyutils.cpp
   CG/camera.cpp
   CG/glwidget.cpp
+  CG/testgl.cpp
   GUI/mainwindow.cpp
   GUI/labelwidget.cpp
   GUI/updateqtcommand.cpp
