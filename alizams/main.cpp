@@ -225,7 +225,7 @@ int main(int argc, char *argv[])
 			QVariant(QString("Dark Fusion"))).toString();
 		const int enable_gltest =
 			settings.value(QString("enable_gltest"), 1).toInt();
-		const int enable_gl_3d_ =
+		int enable_gl_3d_ =
 			settings.value(QString("enable_gl_3D"), 1).toInt();
 		const int hide_zoom_ =
 			settings.value(QString("hide_zoom"), 1).toInt();
@@ -268,16 +268,17 @@ int main(int argc, char *argv[])
 				}
 				else
 				{
-					std::cout << "Test OpenGL 3.0 failed\n" << std::endl;
+					enable_gl_3d_ = 0;
 					settings.beginGroup(QString("GlobalSettings"));
 					settings.setValue(QString("enable_gl_3D"), QVariant((int)0));
 					settings.endGroup();
 					settings.sync();
+					std::cout << "Test OpenGL 3.0 failed\n" << std::endl;
 				}
 				testgl->close();
 				delete testgl;
 			}
-			else if (enable_gl_3d_ == 1)
+			if (enable_gl_3d_ == 1)
 			{
 				ok3d = true;
 			}
