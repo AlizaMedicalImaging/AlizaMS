@@ -18,7 +18,7 @@ class TestGL : public QGLWidget
 public:
 	TestGL();
 	~TestGL() {}
-	bool opengl_init_done;	
+	bool opengl_init_done;
 	bool no_opengl3;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	void updateGL() { update(); }
