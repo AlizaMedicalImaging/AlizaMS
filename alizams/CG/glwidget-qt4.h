@@ -463,6 +463,9 @@ protected:
 	QPoint lastPos;
 	QPoint lastPanPos;
 	QPoint lastPosScale;
+
+private:
+	void disable_gl_in_settings();
 } ALIGN16_POST;
 
 #endif

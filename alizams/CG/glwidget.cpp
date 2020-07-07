@@ -10,6 +10,7 @@
 #include "glwidget-qt4.h"
 #endif
 #include <QApplication>
+#include <QSettings>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -232,144 +233,66 @@ GLWidget::GLWidget(const QGLFormat & frm, QWidget * p) : QGLWidget(frm,p)
 void GLWidget::initializeGL()
 {
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	initializeOpenGLFunctions();
-#if 0
-	const QSurfaceFormat & f = format();
-	std::cout << "Major " << f.majorVersion() << std::endl;
-	std::cout << "Minor " << f.minorVersion() << std::endl;
-	std::cout << "Red buffer size "     << f.redBufferSize()     << std::endl;
-	std::cout << "Green buffer size "   << f.greenBufferSize()   << std::endl;
-	std::cout << "Blue buffer size "    << f.blueBufferSize()    << std::endl;
-	std::cout << "Alpha buffer size "   << f.alphaBufferSize()   << std::endl;
-	std::cout << "Stencil buffer size " << f.stencilBufferSize() << std::endl;
-	std::cout << "Depth buffer size "   << f.depthBufferSize()   << std::endl;
-	const int profile = (int)f.profile();
-	switch (profile)
-	{
-	case 0:
-		std::cout << "QSurfaceFormat::NoProfile" << std::endl;
-		break;
-	case 1:
-		std::cout << "QSurfaceFormat::CoreProfile" << std::endl;
-		break;
-	case 2:
-		std::cout << "QSurfaceFormat::CompatibilityProfile" << std::endl;
-		break;
-	default:
-		std::cout << "OpenGL profile ??" << std::endl;
-		break;
-	}
-	const int render = (int)f.renderableType();
-	switch (render)
-	{
-	case 0x0:
-		std::cout << "QSurfaceFormat::DefaultRenderableType" << std::endl;
-		break;
-	case 0x1:
-		std::cout << "QSurfaceFormat::OpenGL" << std::endl;
-		break;
-	case 0x2:
-		std::cout << "QSurfaceFormat::OpenGLES" << std::endl;
-		break;
-	case 0x4:
-		std::cout << "QSurfaceFormat::OpenVG" << std::endl;
-		break;
-	default:
-		std::cout << "Renderable type ??" << std::endl;
-		break;
-	}
-	const int swap = (int)f.swapBehavior();
-	switch (swap)
-	{
-	case 0:
-		std::cout << "QSurfaceFormat::DefaultSwapBehavior" << std::endl;
-		break;
-	case 1:
-		std::cout << "QSurfaceFormat::SingleBuffer" << std::endl;
-		break;
-	case 2:
-		std::cout << "QSurfaceFormat::DoubleBuffer" << std::endl;
-		break;
-	case 3:
-		std::cout << "QSurfaceFormat::TripleBuffer" << std::endl;
-		break;
-	default:
-		std::cout << "Swap behavior ??" << std::endl;
-		break;
-	}
-	std::cout << "Swap interval " << f.swapInterval() << std::endl;
-	std::cout << "Samples " << f.samples() << std::endl;
-#endif
-	const QOpenGLContext * c = context();
-	if (!c)
-	{
-		std::cout << "QOpenGLContext is NULL " << std::endl;
-		opengl_init_done = true;
-		emit opengl3_not_available();
-		return;
-	}
-	else
-	{
-		if (!c->isValid())
-		{
-			std::cout << "QOpenGLContext is invalid" << std::endl;
-			opengl_init_done = true;
-			emit opengl3_not_available();
-			return;
-		}
-		else
-		{
-#ifdef USE_CORE_3_2_PROFILE
-			QOpenGLFunctions_3_2_Core * funcs = c->versionFunctions<QOpenGLFunctions_3_2_Core>();
-#else
-			QOpenGLFunctions_3_0 * funcs = c->versionFunctions<QOpenGLFunctions_3_0>();
-#endif
-			if (!funcs)
-			{
-				opengl_init_done = true;
-				emit opengl3_not_available();
-				std::cout << "Could not obtain required OpenGL context version" << std::endl;
-				return;
-			}
-		}
-	}
-#else // Qt4
-	const QGLContext * c = context();
+	const QOpenGLContext * c = QOpenGLContext::currentContext();
 	if (!c)
 	{
 		opengl_init_done = true;
+		disable_gl_in_settings();
 		emit opengl3_not_available();
-		std::cout << "QOpenGLContext is NULL " << std::endl;
+		std::cout << "OpenGL context is NULL " << std::endl;
 		return;
 	}
 	if (!c->isValid())
 	{
 		opengl_init_done = true;
+		disable_gl_in_settings();
 		emit opengl3_not_available();
-		std::cout << "GLContext is invalid" << std::endl;
+		std::cout << "OpenGL context is invalid" << std::endl;
 		return;
 	}
-#if 0
-	QGLFormat f = c->format();
-	const int profile = (int)f.profile();
-	switch (profile)
 	{
-	case 0:
-		std::cout << "QGLFormat::NoProfile" << std::endl;
-		break;
-	case 1:
-		std::cout << "QGLFormat::CoreProfile" << std::endl;
-		break;
-	case 2:
-		std::cout << "QGLFormat::CompatibilityProfile" << std::endl;
-		break;
-	default:
-		std::cout << "OpenGL profile ??" << std::endl;
-		break;
+		const QSurfaceFormat & f = c->format();
+		if (f.majorVersion() < 3)
+		{
+			opengl_init_done = true;
+			disable_gl_in_settings();
+			emit opengl3_not_available();
+			std::cout << "OpenGL context's major version < 3" << std::endl;
+			return;
+		}
 	}
-	std::cout << "Direct rendering " << f.directRendering() << std::endl;
-	std::cout << "Depth " << f.depthBufferSize() << std::endl;
+	initializeOpenGLFunctions();
+#ifdef USE_CORE_3_2_PROFILE
+	QOpenGLFunctions_3_2_Core * funcs = c->versionFunctions<QOpenGLFunctions_3_2_Core>();
+#else
+	QOpenGLFunctions_3_0 * funcs = c->versionFunctions<QOpenGLFunctions_3_0>();
 #endif
+	if (!funcs)
+	{
+		opengl_init_done = true;
+		disable_gl_in_settings();
+		emit opengl3_not_available();
+		std::cout << "Could not initialize OpenGL funtions" << std::endl;
+		return;
+	}
+#else // Qt4
+	const QGLContext * c = QGLContext::currentContext();
+	if (!c)
+	{
+		opengl_init_done = true;
+		disable_gl_in_settings();
+		emit opengl3_not_available();
+		std::cout << "OpenGL context is NULL " << std::endl;
+		return;
+	}
+	if (!c->isValid())
+	{
+		opengl_init_done = true;
+		disable_gl_in_settings();
+		emit opengl3_not_available();
+		std::cout << "OpenGL context is invalid" << std::endl;
+		return;
+	}
 #endif
 	update_clear_color();
 	if (!opengl_init_done)
@@ -925,6 +848,7 @@ void GLWidget::init_opengl(int w, int h)
 	if (GLEW_OK != err)
 	{
 		opengl_info.append(QString("\nOpenGL modules disabled (1)"));
+		disable_gl_in_settings();
 		emit opengl3_not_available();
 		return;
 	}
@@ -935,6 +859,7 @@ void GLWidget::init_opengl(int w, int h)
 	else
 	{
 		opengl_info.append(QString("\nOpenGL modules disabled (2)"));
+		disable_gl_in_settings();
 		emit opengl3_not_available();
 		return;
 	}
@@ -950,6 +875,7 @@ void GLWidget::init_opengl(int w, int h)
 		else
 		{
 			opengl_info.append(QString("\nOpenGL modules disabled (1)"));
+			disable_gl_in_settings();
 			emit opengl3_not_available();
 			return;
 		}
@@ -957,6 +883,7 @@ void GLWidget::init_opengl(int w, int h)
 	else
 	{
 		opengl_info.append(QString("\nOpenGL modules disabled (2)"));
+		disable_gl_in_settings();
 		emit opengl3_not_available();
 		return;
 	}
@@ -6662,6 +6589,22 @@ void GLWidget::d_mesh(
 	glUniform4fv(s->shader->location_K, 2, s->K);
 	glBindVertexArray(s->vaoid);
 	glDrawArrays(GL_TRIANGLES, 0, s->faces_size*3);
+}
+
+void GLWidget::disable_gl_in_settings()
+{
+	// Bad if program is here
+#if 1
+	QSettings settings(
+		QSettings::IniFormat,
+		QSettings::UserScope,
+		QApplication::organizationName(),
+		QApplication::applicationName());
+	settings.beginGroup(QString("GlobalSettings"));
+	settings.setValue(QString("enable_gl_3D"), QVariant((int)0));
+	settings.endGroup();
+    settings.sync();
+#endif
 }
 
 #ifdef ALWAYS_SHOW_GL_ERROR

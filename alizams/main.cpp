@@ -1,6 +1,7 @@
 #define USE_SPLASH_SCREEN 0
 #define LOG_STDOUT_TO_FILE 0
 #define PRINT_HOST_INFO 0
+#define TMP_USE_GL_TEST
 
 #include "alizams_version.h"
 #include <QtGlobal>
@@ -11,7 +12,9 @@
 #include "CG/glew/include/GL/glew.h"
 #include "CG/glwidget-qt4.h"
 #endif
+#ifdef TMP_USE_GL_TEST
 #include "CG/testgl.h"
+#endif
 #include "GUI/mainwindow.h"
 #include <QApplication>
 #include <QSettings>
@@ -179,7 +182,7 @@ int main(int argc, char *argv[])
 	QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
 #endif
 #ifdef USE_SET_DEFAULT_GL_FORMAT
-	if (!metadata_only)
+	if (!metadata_only && !force_disable_opengl)
 	{
 		QSurfaceFormat format;
 #ifdef __arm__
@@ -223,8 +226,10 @@ int main(int argc, char *argv[])
 		QString saved_style = settings.value(
 			QString("stylename"),
 			QVariant(QString("Dark Fusion"))).toString();
+#ifdef TMP_USE_GL_TEST
 		const int enable_gltest =
 			settings.value(QString("enable_gltest"), 1).toInt();
+#endif
 		int enable_gl_3d_ =
 			settings.value(QString("enable_gl_3D"), 1).toInt();
 		const int hide_zoom_ =
@@ -249,15 +254,16 @@ int main(int argc, char *argv[])
 		//
 		if (!metadata_only && !force_disable_opengl)
 		{
+#ifdef TMP_USE_GL_TEST
 			if ((enable_gl_3d_ == 1) && (enable_gltest == 1))
 			{
 				TestGL * testgl = new TestGL();
 				testgl->show();
-				testgl->updateGL();
-				app.processEvents();
 				if (testgl->isValid())
 				{
 					ok3d = (testgl->opengl_init_done && !testgl->no_opengl3);
+					testgl->hide();
+					testgl->doneCurrent();
 				}
 				if (ok3d)
 				{
@@ -265,19 +271,23 @@ int main(int argc, char *argv[])
 					settings.setValue(QString("enable_gltest"), QVariant((int)0));
 					settings.endGroup();
 					settings.sync();
+                    delete testgl;
 				}
 				else
 				{
-					enable_gl_3d_ = 0;
 					settings.beginGroup(QString("GlobalSettings"));
 					settings.setValue(QString("enable_gl_3D"), QVariant((int)0));
 					settings.endGroup();
 					settings.sync();
-					std::cout << "Test OpenGL 3.0 failed\n" << std::endl;
+					QMessageBox::warning(
+						NULL,
+						QString("Warning"),
+						QString("OpenGL 3 is not available,\nplease restart."));
+					delete testgl;
+					return 0;
 				}
-				testgl->close();
-				delete testgl;
 			}
+#endif
 			if (enable_gl_3d_ == 1)
 			{
 				ok3d = true;

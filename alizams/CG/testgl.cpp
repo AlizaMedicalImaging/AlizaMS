@@ -18,10 +18,10 @@ void TestGL::initializeGL()
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 	GLenum err = glewInit();
 	if (GLEW_OK != err) return;
-	if (glewIsSupported("GL_VERSION_3_0")) { no_opengl3 = false; }
+	if (glewIsSupported("GL_VERSION_3_0")) no_opengl3 = false;
 #else
 	QOpenGLContext * c = QOpenGLContext::currentContext();
-	if (c)
+	if (c && c->isValid())
 	{
 		const QSurfaceFormat & f = c->format();
 		if (f.majorVersion() >= 3) no_opengl3 = false;

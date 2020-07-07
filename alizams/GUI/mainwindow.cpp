@@ -1804,8 +1804,7 @@ void MainWindow::set_no_gl3()
 	hide_gl3_frame_later = true;
 	saved_ok3d = false;
 #if 1
-	QString a(
-		"\nFailed to initialize OpenGL 3\n");
+	const QString a("\nFailed to initialize OpenGL 3\n");
 	std::cout << a.toStdString() << std::endl;
 #endif
 }
