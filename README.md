@@ -3,8 +3,24 @@
 Aliza MS - DICOM Viewer
 =======================
 
-Quick start
------------
+Start on Linux
+--------------
+
+To start on Linux extract archive and run alizams.sh
+
+![Run](alizams/package/art/s0.png)
+
+Optionally install local desktop menu entry
+
+![Menu](alizams/package/art/s1.png)
+
+Start on Windows
+----------------
+
+Click or run from terminal aliza.exe
+
+View
+----
 
 Select 'DICOM scanner' tab, open directory with DICOM files or DICOMDIR file (or drag-and-drop)
 
@@ -15,21 +31,20 @@ Select one or more series and click 'arrow' action (or double-click selected row
 
 
 
-Features
---------
- * Fast directory scanner, DICOMDIR
- * Compressed images
- * 2D and 3D views with many tools
+Highlights
+----------
  * View non-uniform series in physical space
- * 2D+t, 3D+t animations
- * Intersections in study
  * Ultrasound incl. proper measurement in regions, cine
+ * Intersections in study
+ * 2D+t, 3D+t animations
+ * Very fast directory scanner, DICOMDIR
+ * Compressed images
  * RTSTRUCT contours
+ * 2D and 3D views with many tools
  * Siemens Mosaic format
  * United Imaging Healthcare (UIH) Grid / VFrame format
  * Elscint ELSCINT1 PMSCT_RLE1 and PMSCT_RGB1
  * Grayscale softcopy presentation (partial)
- * etc.
 
 
 Build
