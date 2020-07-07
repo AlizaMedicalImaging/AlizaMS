@@ -3,10 +3,13 @@
 Aliza MS - DICOM Viewer
 =======================
 
-Start on Linux
---------------
+Quick start
+-----------
 
-To start on Linux extract archive and run alizams.sh
+Linux
+-----
+
+To start on Linux extract archive and run _alizams.sh_
 
 ![Run](alizams/package/art/s0.png)
 
@@ -14,10 +17,10 @@ Optionally install local desktop menu entry
 
 ![Menu](alizams/package/art/s1.png)
 
-Start on Windows
-----------------
+Windows
+-------
 
-Click or run from terminal aliza.exe
+Click or run from terminal _aliza.exe_
 
 View
 ----
