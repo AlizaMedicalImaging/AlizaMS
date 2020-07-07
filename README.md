@@ -20,7 +20,7 @@ Optionally install local desktop menu entry
 Windows
 -------
 
-Click or run from terminal _aliza.exe_
+Click or run from terminal _alizams.exe_
 
 View
 ----
