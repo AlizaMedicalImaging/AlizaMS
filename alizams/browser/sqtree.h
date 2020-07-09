@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
+#include <QStringList>
 #include <QMutex>
 #include <QCloseEvent>
 #include <QDropEvent>
@@ -28,12 +29,14 @@ public:
 	~SQtree();
 	void read_file(const QString&);
 	void clear_tree();
+	void set_list_of_files(const QStringList&);
 
 public slots:
 	void copy_to_clipboard();
 	void collapse_item();
 	void expand_item();
 	void open_file();
+	void file_from_slider(int);
 
 protected:
 	void closeEvent(QCloseEvent*);
@@ -60,6 +63,7 @@ private:
 	QAction * collapseAct;
 	QAction * expandAct;
 	bool skip_settings_pos;
+	QStringList list_of_files;
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
 	QMutex mutex;
 #endif

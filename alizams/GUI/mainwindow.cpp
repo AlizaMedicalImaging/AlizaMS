@@ -418,7 +418,6 @@ MainWindow::MainWindow(
 	connect(openanyAct,                     SIGNAL(triggered()),         this,SLOT(load_any()));
 	connect(exitAct,                        SIGNAL(triggered()),         this,SLOT(close()));
 	connect(aboutAct,                       SIGNAL(triggered()),         this,SLOT(about()));
-	connect(showMetadata,                   SIGNAL(triggered()),         this,SLOT(toggle_meta()));
 	connect(graphicsAct_Z,                  SIGNAL(toggled(bool)),       this,SLOT(toggle_graphicswidget_m_z(bool)));
 	connect(graphicsAct_Y,                  SIGNAL(toggled(bool)),       this,SLOT(toggle_graphicswidget_m_y(bool)));
 	connect(graphicsAct_X,                  SIGNAL(toggled(bool)),       this,SLOT(toggle_graphicswidget_m_x(bool)));
@@ -583,7 +582,6 @@ void MainWindow::createActions()
 {
 	openAct       = new QAction(QIcon(":/bitmaps/dcm.svg"),   QString("DICOM scanner"),        this);
 	openanyAct    = new QAction(QIcon(":/bitmaps/file.svg"),  QString("Open file"),            this);
-	showMetadata  = new QAction(QIcon(":/bitmaps/meta.svg"),  QString("View DICOM metadata"),  this);
 	exitAct       = new QAction(QIcon(":/bitmaps/delete.svg"),QString("Exit"),                 this);
 	aboutAct      = new QAction(QIcon(":/bitmaps/info.svg"),  QString("About"),      this);
 	settingsAct   = new QAction(QIcon(":/bitmaps/tool.svg"),  QString("Settings"),             this);
@@ -723,7 +721,6 @@ void MainWindow::createMenus()
 	file_menu = menuBar()->addMenu(QString("Application"));
 	file_menu->addAction(openAct);
 	file_menu->addAction(openanyAct);
-	file_menu->addAction(showMetadata);
 	file_menu->addAction(settingsAct);
 	file_menu->addAction(show2DAct);
 	file_menu->addAction(show3DAct);
@@ -1141,20 +1138,14 @@ void MainWindow::toggle_toolbox()
 	else toolbox3D_frame->show();
 }
 
-void MainWindow::toggle_meta()
-{
-	tabWidget->setCurrentIndex(2);
-}
-
 void MainWindow::toggle_meta2()
 {
-	const QString x = browser2->get_file_for_meta();
-	if (!x.isEmpty())
-	{
-		tabWidget->setCurrentIndex(2);
-		qApp->processEvents();
-		sqtree->read_file(x);
-	}
+	const QStringList & l = browser2->get_files_of_1st();
+	if (l.empty()) return;
+	sqtree->set_list_of_files(l);
+	tabWidget->setCurrentIndex(2);
+	qApp->processEvents();
+	sqtree->read_file(l.at(0));
 }
 
 void MainWindow::toggle_animwidget3d(bool t)

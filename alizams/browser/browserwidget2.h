@@ -95,10 +95,10 @@ class BrowserWidget2: public QWidget, public Ui::BrowserWidget2
 public:
 	BrowserWidget2(float, QWidget(*)=NULL);
 	~BrowserWidget2();
-	bool  is_first_run()  const;
+	bool          is_first_run()  const;
 	const QString read_DICOMDIR(const QString&);
-	const QString get_file_for_meta();
-	void writeSettings(QSettings&);
+	QStringList   get_files_of_1st();
+	void          writeSettings(QSettings&);
 
 protected:
 	void closeEvent(QCloseEvent*);

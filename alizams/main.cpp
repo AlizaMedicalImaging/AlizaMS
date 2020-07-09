@@ -23,6 +23,7 @@
 #include <QMessageBox>
 #include <QDir>
 #include <QFont>
+#include <QProcess>
 #include <iostream>
 #include "browser/sqtree.h"
 
@@ -279,11 +280,31 @@ int main(int argc, char *argv[])
 					settings.setValue(QString("enable_gl_3D"), QVariant((int)0));
 					settings.endGroup();
 					settings.sync();
-					QMessageBox::warning(
+#if 0
+					QMessageBox::information(
 						NULL,
-						QString("Warning"),
-						QString("OpenGL 3 is not available,\nplease restart."));
+						QString("Aliza MS"),
+						QString("OpenGL 3 is not available"));
+#else
+					std::cout << "Aliza MS: OpenGL 3 is not available" << std::endl;
+#endif
 					delete testgl;
+					//
+					QStringList aa;
+					const QStringList aa_ = QApplication::arguments();
+					const size_t aa_size = aa_.size();
+					if (aa_size > 1)
+					{
+						for (size_t y = 1; y < aa_size; y++) aa.push_back(aa_.at(y));
+					}
+#if QT_VERSION < QT_VERSION_CHECK(4,8,1)
+					app.quit();
+#else
+					app.closeAllWindows();
+#endif
+#if 1
+					QProcess::startDetached(aa_.at(0), aa);
+#endif
 					return 0;
 				}
 			}

@@ -864,7 +864,7 @@ void GLWidget::init_opengl(int w, int h)
 		return;
 	}
 #else
-	QOpenGLContext * c = QOpenGLContext::currentContext();
+	const QOpenGLContext * c = QOpenGLContext::currentContext();
 	if (c)
 	{
 		const QSurfaceFormat & f = c->format();

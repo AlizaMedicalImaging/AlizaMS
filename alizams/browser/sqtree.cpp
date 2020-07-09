@@ -95,10 +95,11 @@ SQtree::SQtree(QWidget * p, bool t) : QWidget(p), skip_settings_pos(t)
 	treeWidget->setColumnWidth(1, 300);
 	treeWidget->setColumnWidth(2,  60);
 	treeWidget->setRootIsDecorated(true);
-	connect(copyAct,     SIGNAL(triggered()), this, SLOT(copy_to_clipboard()));
-	connect(collapseAct, SIGNAL(triggered()), this, SLOT(collapse_item()));
-	connect(expandAct,   SIGNAL(triggered()), this, SLOT(expand_item()));
-	connect(pushButton,  SIGNAL(clicked()),   this, SLOT(open_file()));
+	connect(copyAct,         SIGNAL(triggered()),      this,SLOT(copy_to_clipboard()));
+	connect(collapseAct,     SIGNAL(triggered()),      this,SLOT(collapse_item()));
+	connect(expandAct,       SIGNAL(triggered()),      this,SLOT(expand_item()));
+	connect(pushButton,      SIGNAL(clicked()),        this,SLOT(open_file()));
+	connect(horizontalSlider,SIGNAL(valueChanged(int)),this,SLOT(file_from_slider(int)));
 }
 
 SQtree::~SQtree()
@@ -1000,8 +1001,17 @@ void SQtree::dropEvent(QDropEvent * e)
 		urls = mimeData->urls();
 		for (int i = 0; i < urls.size(); i++)
 			l.push_back(urls.at(i).toLocalFile());
-		if (l.size()>0)
+		if (!l.empty())
+		{
+			list_of_files = QStringList(l.at(0));
+			horizontalSlider->blockSignals(true);
+			horizontalSlider->setMinimum(0);
+			horizontalSlider->setMaximum(0);
+			horizontalSlider->setValue(0);
+			horizontalSlider->hide();
+			horizontalSlider->blockSignals(false);
 			read_file(QDir::toNativeSeparators(l.at(0)));
+		}
 	}
 	else
 	{
@@ -1057,10 +1067,45 @@ void SQtree::open_file()
 		));
 	QFileInfo fi(f);
 	if (fi.isFile())
+	{
+		list_of_files = QStringList(f);
+		horizontalSlider->blockSignals(true);
+		horizontalSlider->setMinimum(0);
+		horizontalSlider->setMaximum(0);
+		horizontalSlider->setValue(0);
+		horizontalSlider->hide();
+		horizontalSlider->blockSignals(false);
 		read_file(QDir::toNativeSeparators(f));
+	}
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
 	mutex.unlock();
 #endif
+}
+
+void SQtree::set_list_of_files(const QStringList & l)
+{
+#if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
+	const bool lock = mutex.tryLock();
+	if (!lock) return;
+#endif
+	list_of_files = QStringList(l);
+	const size_t x = list_of_files.size();
+	horizontalSlider->blockSignals(true);
+	horizontalSlider->setMinimum(0);
+	horizontalSlider->setMaximum(x > 0 ? x-1 : 0);
+	horizontalSlider->setValue(0);
+	if (x > 1) horizontalSlider->show();
+	else       horizontalSlider->hide();
+	horizontalSlider->blockSignals(false);
+#if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
+	mutex.unlock();
+#endif
+}
+
+void SQtree::file_from_slider(int x)
+{
+	if (x >= list_of_files.size()) return;
+	read_file(list_of_files.at(x));
 }
 
 #if 0

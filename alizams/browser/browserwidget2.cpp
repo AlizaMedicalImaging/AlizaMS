@@ -516,19 +516,19 @@ void BrowserWidget2::reload_dir()
 	}
 }
 
-const QString BrowserWidget2::get_file_for_meta()
+QStringList BrowserWidget2::get_files_of_1st()
 {
 	const QList<QTableWidgetItem *> selected_items =
 		tableWidget->selectedItems();
-	if (selected_items.size() < 1) return QString("");
-	if (!selected_items.at(0))   return QString("");
+	if (selected_items.empty()) return QStringList();
+	if (!selected_items.at(0))  return QStringList();
 	const int current_row = selected_items.at(0)->row();
-	if (current_row < 0) return QString("");
+	if (current_row < 0) return QStringList();
 	const TableWidgetItem * current_item =
 		static_cast<TableWidgetItem *>(tableWidget->item(current_row, 0));
-	if (!current_item) return QString("");
-	if ((current_item->files.size() < 1)) return QString("");
-	return current_item->files.at(0);
+	if (!current_item) return QStringList();
+	if (current_item->files.empty()) return QStringList();
+	return current_item->files;
 }
 
 void BrowserWidget2::copy_files()

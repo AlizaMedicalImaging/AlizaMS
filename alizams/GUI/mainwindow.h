@@ -82,7 +82,6 @@ private slots:
 	void toggle_graphicswidget_zyx(bool);
 	void load_any();
 	void toggle_toolbox();
-	void toggle_meta();
 	void toggle_meta2();
 	void toggle_rect(bool);
 	void toggle_cursor(bool);
@@ -190,7 +189,6 @@ private:
 	QAction  * flipXAct;
 	QAction  * flipYAct;
 	QAction  * reset3DAct;
-	QAction  * showMetadata;
 	QAction  * zrangeAct;
 	QAction  * setLevelAct;
 	QAction  * setSeedsAct;
