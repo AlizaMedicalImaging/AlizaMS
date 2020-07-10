@@ -36,7 +36,7 @@ Select one or more series and click 'arrow' action (or double-click selected row
 
 Highlights
 ----------
- * View non-uniform series in physical space
+ * View uniform and non-uniform series in physical space
  * Ultrasound incl. proper measurement in regions, cine
  * Intersections in study
  * 2D+t, 3D+t animations
