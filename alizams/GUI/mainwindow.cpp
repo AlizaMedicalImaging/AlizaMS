@@ -457,6 +457,7 @@ MainWindow::MainWindow(
 	connect(browser_load_act,               SIGNAL(triggered()),         this,    SLOT(load_dicom_series2()));
 	connect(meta_open_act,                  SIGNAL(triggered()),         sqtree,  SLOT(open_file()));
     connect(tabWidget,                      SIGNAL(currentChanged(int)), this,    SLOT(tab_ind_changed(int)));
+	connect(imagesbox->actionDICOMMeta,     SIGNAL(triggered()),         this,    SLOT(trigger_image_dicom_meta()));
 	//
 	connect(settingswidget->styleComboBox,  SIGNAL(currentIndexChanged(QString)),this,SLOT(set_style(QString)));
 	//
@@ -757,6 +758,7 @@ void MainWindow::createMenus()
 	tools_menu->addAction(imagesbox->actionClearChecked);
 	tools_menu->addAction(imagesbox->actionClearUnChek);
 	tools_menu->addAction(imagesbox->actionColor);
+	tools_menu->addAction(imagesbox->actionDICOMMeta);
 	tools_menu->addSeparator();
 	tools_menu->addAction(imagesbox->actionReloadHistogram);
 	tools_menu->addAction(animAct2d);
@@ -1142,10 +1144,13 @@ void MainWindow::toggle_meta2()
 {
 	const QStringList & l = browser2->get_files_of_1st();
 	if (l.empty()) return;
-	sqtree->set_list_of_files(l);
-	tabWidget->setCurrentIndex(2);
+	qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
 	qApp->processEvents();
+	sqtree->set_list_of_files(l);
 	sqtree->read_file(l.at(0));
+	tabWidget->setCurrentIndex(2);
+	qApp->restoreOverrideCursor();
+	qApp->processEvents();
 }
 
 void MainWindow::toggle_animwidget3d(bool t)
@@ -1830,3 +1835,19 @@ void MainWindow::check_3d_frame()
 		}
 	}
 }
+
+void MainWindow::trigger_image_dicom_meta()
+{
+	const ImageVariant * v = aliza->get_selected_image_const();
+	if (!v) return;
+	const QStringList & l = v->filenames;
+	if (l.empty()) return;
+	qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
+	qApp->processEvents();
+	sqtree->set_list_of_files(l);
+	sqtree->read_file(l.at(0));
+	tabWidget->setCurrentIndex(2);
+	qApp->restoreOverrideCursor();
+	qApp->processEvents();
+}
+

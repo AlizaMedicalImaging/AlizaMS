@@ -64,6 +64,7 @@ public:
 	QAction * actionReloadHistogram;
 	QAction * actionTmp;
 	QAction * actionColor;
+	QAction * actionDICOMMeta;
 
 private slots:
 	void toggle_info(bool);

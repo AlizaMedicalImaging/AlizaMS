@@ -147,6 +147,7 @@ ImagesBox::ImagesBox(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
 	actionUncheck      = new QAction(QIcon(":/bitmaps/unchecked.svg"),QString("Set all to un-checked (list)"),this);
 	actionReloadHistogram = new QAction(QIcon(":/bitmaps/chart0.svg"),QString("Calculate histogram"),this);
 	actionColor        = new QAction(QIcon(":/bitmaps/rgb.svg"),QString("Image color in UI"),this);
+	actionDICOMMeta    = new QAction(QIcon(":/bitmaps/meta.svg"),QString("Image DICOM Metadata"),this);
 	actionTmp          = new QAction(QString("TMP"),this);
 	//
 	listWidget->addAction(actionNone);
@@ -155,7 +156,10 @@ ImagesBox::ImagesBox(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
 	listWidget->addAction(actionClearChecked);
 	listWidget->addAction(actionClearUnChek);
 	listWidget->addAction(actionColor);
+	listWidget->addAction(actionDICOMMeta);
+#if 0
 	listWidget->addAction(actionTmp);
+#endif
 	//
 	QToolBar * toolbar = new QToolBar(this);
 	toolbar->setOrientation(Qt::Horizontal);

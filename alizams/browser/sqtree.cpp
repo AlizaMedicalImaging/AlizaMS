@@ -65,6 +65,55 @@ void get_bin_values(
 	}
 }
 
+static void get_series_files(
+	const QString & f,
+	const QString & uid,
+	QStringList & result)
+{
+	QFileInfo fi(f);
+	const QString p = fi.absolutePath();
+	std::vector<std::string> files;
+	{
+		QDir dir(p);
+		const QStringList l =
+			dir.entryList(QDir::Files|QDir::Readable, QDir::Name);
+		for (int x = 0; x < l.size(); x++)
+		{
+			const QString tmp0 = QDir::toNativeSeparators(
+				dir.absolutePath() + QDir::separator() + l.at(x));
+			if (DicomUtils::is_dicom_file(tmp0))
+			{
+				files.push_back(
+					std::string(
+						tmp0.toLocal8Bit().constData()));
+			}
+		}
+	}
+	const mdcm::Tag t(0x0020,0x000e);
+	mdcm::Scanner s;
+	s.AddTag(t);
+	if(!s.Scan(files)) return;
+	mdcm::Scanner::ValuesType v = s.GetValues();
+	mdcm::Scanner::ValuesType::iterator it = v.begin();
+	while (it != v.end())
+	{
+		const QString tmp0 = QString::fromLatin1((*it).c_str());
+		if (
+			tmp0.trimmed().remove(QChar('\0')) ==
+				uid.trimmed().remove(QChar('\0')))
+		{
+			std::vector<std::string> f__ =
+				s.GetAllFilenamesFromTagToValue(t, (*it).c_str());
+			for (unsigned int j = 0; j < f__.size(); j++)
+			{
+				result.push_back(QString::fromLocal8Bit(f__[j].c_str()));
+			}
+			break;
+		}
+		++it;
+	}
+}
+
 const QString css1 =
 	QString(
 		"span.y4 { color:#050505; font-size: medium; font-weight: bold;}\n"
@@ -79,9 +128,7 @@ SQtree::SQtree(QWidget * p, bool t) : QWidget(p), skip_settings_pos(t)
 	setupUi(this);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	textEdit->hide();
-	// TODO
 	horizontalSlider->hide();
-	//
 #if 1
 	options_toolButton->hide();
 #endif
@@ -99,6 +146,7 @@ SQtree::SQtree(QWidget * p, bool t) : QWidget(p), skip_settings_pos(t)
 	connect(collapseAct,     SIGNAL(triggered()),      this,SLOT(collapse_item()));
 	connect(expandAct,       SIGNAL(triggered()),      this,SLOT(expand_item()));
 	connect(pushButton,      SIGNAL(clicked()),        this,SLOT(open_file()));
+	connect(scan_pushButton, SIGNAL(clicked()),        this,SLOT(open_file_and_series()));
 	connect(horizontalSlider,SIGNAL(valueChanged(int)),this,SLOT(file_from_slider(int)));
 }
 
@@ -1108,54 +1156,88 @@ void SQtree::file_from_slider(int x)
 	read_file(list_of_files.at(x));
 }
 
-#if 0
-static void get_series_files(
-	const QString & f,
-	const QString & uid,
-	QStringList & result)
+void SQtree::open_file_and_series()
 {
-	QFileInfo fi(f);
-	const QString p = fi.absolutePath();
-	std::vector<std::string> files;
-	{
-		QDir dir(p);
-		const QStringList l =
-			dir.entryList(QDir::Files|QDir::Readable, QDir::Name);
-		for (int x = 0; x < l.size(); x++)
-		{
-			const QString tmp0 = QDir::toNativeSeparators(
-				dir.absolutePath() + QDir::separator() + l.at(x));
-			if (DicomUtils::is_dicom_file(tmp0))
-			{
-				files.push_back(
-					std::string(
-						tmp0.toLocal8Bit().constData()));
-			}
-		}
-	}
-	const mdcm::Tag t(0x0020,0x000e);
-	mdcm::Scanner s;
-	s.AddTag(t);
-	if(!s.Scan(files)) return;
-	mdcm::Scanner::ValuesType v = s.GetValues();
-	mdcm::Scanner::ValuesType::iterator it = v.begin();
-	while (it != v.end())
-	{
-		const QString tmp0 = QString::fromLatin1((*it).c_str());
-		if (
-			tmp0.trimmed().remove(QChar('\0')) ==
-				uid.trimmed().remove(QChar('\0')))
-		{
-			std::vector<std::string> f__ =
-				s.GetAllFilenamesFromTagToValue(t, (*it).c_str());
-			for (unsigned int j = 0; j < f__.size(); j++)
-			{
-				result.push_back(QString::fromLocal8Bit(f__[j].c_str()));
-			}
-			break;
-		}
-		++it;
-	}
-}
+#if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
+	const bool lock = mutex.tryLock();
+	if (!lock) return;
 #endif
-
+	clear_tree();
+	QString f = QFileDialog::getOpenFileName(
+		this,
+		tr("Open file and scan series"),
+		saved_dir,
+		QString(),
+		(QString*)NULL,
+		(QFileDialog::ReadOnly
+		/*| QFileDialog::DontUseNativeDialog*/
+		));
+	QFileInfo fi(f);
+	if (!fi.isFile())
+	{
+#if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
+		mutex.unlock();
+#endif
+		return;
+	}
+	f = QDir::toNativeSeparators(fi.absoluteFilePath());
+	QString series_uid;
+	QStringList files;
+	bool series_uid_ok = false;
+	{
+		std::set<mdcm::Tag> tags;
+		tags.insert(mdcm::Tag(0x0020,0x000e));
+		mdcm::Reader reader;
+		reader.SetFileName(f.toLocal8Bit().constData());
+		if (reader.ReadSelectedTags(tags))
+		{
+			const mdcm::File & file = reader.GetFile();
+			const mdcm::DataSet & ds = file.GetDataSet();
+			series_uid_ok =
+				DicomUtils::get_string_value(
+					ds,
+					mdcm::Tag(0x0020,0x000e),
+					series_uid);
+		}
+	}
+	if (series_uid_ok)
+	{
+		get_series_files(f, series_uid, files);
+	}
+	int idx = -1;
+	const int files_size = files.size();
+	if (files_size > 1)
+	{
+		for (int x = 0; x < files_size; x++)
+		{
+			QFileInfo fi0(files.at(x));
+			if (QDir::toNativeSeparators(fi0.absoluteFilePath()) == f)
+			{
+				idx = x;
+				break;
+			}
+		}
+	}
+	//
+	horizontalSlider->blockSignals(true);
+	horizontalSlider->setMinimum(0);
+	if (idx >= 0)
+	{
+		list_of_files = QStringList(files);
+		horizontalSlider->setMaximum(files_size-1);
+		horizontalSlider->setValue(idx);
+		horizontalSlider->show();
+	}
+	else
+	{
+		list_of_files = QStringList(f);
+		horizontalSlider->setMaximum(0);
+		horizontalSlider->setValue(0);
+		horizontalSlider->hide();
+	}
+	horizontalSlider->blockSignals(false);
+	read_file(QDir::toNativeSeparators(f));
+#if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
+	mutex.unlock();
+#endif
+}

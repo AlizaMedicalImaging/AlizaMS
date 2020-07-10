@@ -10301,7 +10301,8 @@ QString DicomUtils::read_dicom(
 			if (!(pr_ref||rt_ref))
 			{
 				QFileInfo reffi(filenames.at(x));
-				rtstruct_ref_search_path = QDir::toNativeSeparators(reffi.absolutePath());
+				rtstruct_ref_search_path =
+					QDir::toNativeSeparators(reffi.absolutePath());
 				load_image_ref_contour = true;
 				if (!load_image_ref_contour)
 				{
@@ -10314,6 +10315,9 @@ QString DicomUtils::read_dicom(
 							!wsettings->get_3d(),
 							gl,
 							0);
+					ivariant->filenames =
+						QStringList(
+							QDir::toNativeSeparators(filenames.at(x)));
 					load_contour(ds,ivariant);
 					ContourUtils::calculate_rois_center(ivariant);
 					rtstructs.push_back(ivariant);
@@ -11715,7 +11719,13 @@ QString DicomUtils::read_dicom(
 				for (unsigned int y = 0;
 					y < tmp_ivariants_rtstruct.size();
 					y++)
+				{
+					tmp_ivariants_rtstruct[y]->filenames =
+						QStringList(
+							QDir::toNativeSeparators(
+								rtstruct_ref_search.at(x)));
 					ivariants.push_back(tmp_ivariants_rtstruct[y]);
+				}
 			}
 			else
 			{
@@ -11733,7 +11743,13 @@ QString DicomUtils::read_dicom(
 					for (unsigned int y = 0;
 						y < tmp_ivariants_rtstruct.size();
 						y++)
+					{
+						tmp_ivariants_rtstruct[y]->filenames =
+							QStringList(
+								QDir::toNativeSeparators(
+									rtstruct_ref_search.at(x)));
 						ivariants.push_back(tmp_ivariants_rtstruct[y]);
+					}
 				}
 #else
 				bool ok22 = false;
@@ -11770,7 +11786,13 @@ QString DicomUtils::read_dicom(
 						for (unsigned int y = 0;
 							y < tmp_ivariants_rtstruct.size();
 							y++)
+						{
+							tmp_ivariants_rtstruct[y]->filenames =
+								QStringList(
+									QDir::toNativeSeparators(
+										rtstruct_ref_search.at(x)));
 							ivariants.push_back(tmp_ivariants_rtstruct[y]);
+						}
 					}
 				}
 #endif
@@ -11787,6 +11809,9 @@ QString DicomUtils::read_dicom(
 					ImageVariant * ivariant = new ImageVariant(
 						CommonUtils::get_next_id(),
 						ok3d, !wsettings->get_3d(), gl, 0);
+					ivariant->filenames = QStringList(
+						QDir::toNativeSeparators(
+							rtstruct_ref_search.at(x)));
 					const mdcm::File & file = reader.GetFile();
 					const mdcm::DataSet & ds = file.GetDataSet();
 					load_contour(ds,ivariant);
@@ -11981,6 +12006,9 @@ QString DicomUtils::read_dicom(
 							&spatial_transform);
 					if (pr_image)
 					{
+						pr_image->filenames = QStringList(
+							QDir::toNativeSeparators(
+								grey_softcopy_pr_files.at(x)));
 						if (ref_ivariants.at(z)->di->slices_generated)
 						{
 							CommonUtils::copy_slices(

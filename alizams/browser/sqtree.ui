@@ -26,7 +26,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <property name="spacing">
-      <number>0</number>
+      <number>6</number>
      </property>
      <item>
       <widget class="QPushButton" name="pushButton">
@@ -45,6 +45,23 @@
        <property name="icon">
         <iconset resource="../alizams.qrc">
          <normaloff>:/bitmaps/file.svg</normaloff>:/bitmaps/file.svg</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="scan_pushButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../alizams.qrc">
+         <normaloff>:/bitmaps/align.svg</normaloff>:/bitmaps/align.svg</iconset>
        </property>
       </widget>
      </item>
@@ -180,6 +197,7 @@
  </widget>
  <tabstops>
   <tabstop>pushButton</tabstop>
+  <tabstop>scan_pushButton</tabstop>
   <tabstop>lineEdit</tabstop>
   <tabstop>options_toolButton</tabstop>
   <tabstop>horizontalSlider</tabstop>

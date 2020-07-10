@@ -112,6 +112,7 @@ private slots:
 	void tab_ind_changed(int);
 	void set_zlock(bool);
 	void set_zlock_one(bool);
+	void trigger_image_dicom_meta();
 
 private:
 	void createActions();

@@ -37,6 +37,7 @@ public slots:
 	void expand_item();
 	void open_file();
 	void file_from_slider(int);
+	void open_file_and_series();
 
 protected:
 	void closeEvent(QCloseEvent*);
