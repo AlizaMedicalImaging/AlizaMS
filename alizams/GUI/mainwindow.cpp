@@ -1841,7 +1841,14 @@ void MainWindow::trigger_image_dicom_meta()
 	const ImageVariant * v = aliza->get_selected_image_const();
 	if (!v) return;
 	const QStringList & l = v->filenames;
-	if (l.empty()) return;
+	if (l.empty())
+	{
+		QMessageBox::information(
+			NULL,
+			QString("Information"),
+			QString("DICOM source files are not available"));
+		return;
+	}
 	qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
 	qApp->processEvents();
 	sqtree->set_list_of_files(l);
