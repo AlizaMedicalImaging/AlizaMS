@@ -108,19 +108,19 @@ static void g_close_physics()
 {
 	if(g_collisionWorld)
 	{
-        for (int x = g_collisionWorld->getNumCollisionObjects() - 1; x >= 0; x--)
-        {
-            btCollisionObject * o = g_collisionWorld->getCollisionObjectArray()[x];
-            if (!o) continue;
+		for (int x = g_collisionWorld->getNumCollisionObjects() - 1; x >= 0; x--)
+		{
+			btCollisionObject * o = g_collisionWorld->getCollisionObjectArray()[x];
+			if (!o) continue;
 			if(o->getUserPointer())
 			{
 				int * p = static_cast<int*>(o->getUserPointer());
 				delete [] p;
 			}
-            g_collisionWorld->removeCollisionObject(o);
-            delete o;
+			g_collisionWorld->removeCollisionObject(o);
+			delete o;
 			o = NULL;
-        }
+		}
 	}
 	for (int x = 0; x < g_collision_shapes.size(); x++)
 	{
@@ -260,14 +260,14 @@ struct ClosestRayResultCallback1 : public btCollisionWorld::ClosestRayResultCall
 	ClosestRayResultCallback1 (const btVector3 & rayFrom,const btVector3 & rayTo)
 		: btCollisionWorld::ClosestRayResultCallback(rayFrom, rayTo) {}
 	virtual ~ClosestRayResultCallback1() {}
-    bool needsCollision(btBroadphaseProxy * proxy0) const
-    {
-        btCollisionObject * b =
+	bool needsCollision(btBroadphaseProxy * proxy0) const
+	{
+		btCollisionObject * b =
 			static_cast<btCollisionObject *>(proxy0->m_clientObject);
 		const int * p = static_cast<int*>(b->getUserPointer());
-        if (p && (p[2] == 2)) return true;
-        return false;
-    }    
+		if (p && (p[2] == 2)) return true;
+		return false;
+	}
 };
 
 static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
@@ -360,8 +360,8 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 				refs.at(u)->di->image_slices.at(z1)->fv[k3],
 				refs.at(u)->di->image_slices.at(z1)->fv[k4],
 				refs.at(u)->di->image_slices.at(z1)->fv[k5]);
-	    	ClosestRayResultCallback1 rayResult(from,to);
-	    	g_collisionWorld->rayTest(from, to, rayResult);
+			ClosestRayResultCallback1 rayResult(from,to);
+			g_collisionWorld->rayTest(from, to, rayResult);
 			if (rayResult.hasHit())
 			{
 				const btCollisionObject * o = rayResult.m_collisionObject;
@@ -3625,14 +3625,14 @@ void Aliza::trigger_image_color()
 	const bool ok3d = check_3d();
 	if (ok3d) glwidget->set_skip_draw(true);
 	ImageVariant * v = get_selected_image();
-	if (!v)  goto quit__;
+	if (!v) goto quit__;
 	old_color = QColor(
 		round(v->di->R*255.0),
 		round(v->di->G*255.0),
 		round(v->di->B*255.0));
-    new_color = QColorDialog::getColor(old_color);
-    if(new_color.isValid())
-    {
+	new_color = QColorDialog::getColor(old_color);
+	if(new_color.isValid())
+	{
 		v->di->R = (double)(new_color.red()  /255.0);
 		v->di->G = (double)(new_color.green()/255.0);
 		v->di->B = (double)(new_color.blue() /255.0);
@@ -3642,7 +3642,7 @@ void Aliza::trigger_image_color()
 		{
 			if (l.at(0)) l[0]->setIcon(v->icon);
 		}
-    }
+	}
 quit__:
 	if (ok3d) glwidget->set_skip_draw(false);
 	mutex0.unlock();
