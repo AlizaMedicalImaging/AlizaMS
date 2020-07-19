@@ -120,10 +120,10 @@ void Camera::look_at(
 		Point3(camera_targetX, camera_targetY, camera_targetZ);
 	m_up_axis = Vector3(upAxisX, upAxisY, upAxisZ);
 	m_view = Matrix4::lookAt(m_position, camera_target, m_up_axis);
-	
+
 	if (calculate_direction)
 		m_direction_vector = normalize(camera_target - m_position);
-	
+
 #ifdef ENABLE_INVTRANS
 	// calculate inverse of view matrix
 	const Matrix3 mbasis = m_view.getUpper3x3();
@@ -159,7 +159,7 @@ void Camera::orthographic(
 			_top,
 			_near,
 			_far);
-}	
+}
 
 void Camera::project(
 	Point3 & pos,
@@ -236,13 +236,13 @@ float Camera::project_to_sphere(float radius, float x, float y)
 	float result;
 	const float tmp0 = sqrt(x*x + y*y);
 	// inside sphere or on hyperbola
-	if (tmp0 < radius * 0.70710678118654752440f) 
+	if (tmp0 < radius * 0.70710678118654752440f)
 	{
 		result = sqrt(radius*radius - tmp0*tmp0);
 	}
 	else
 	{
-		const float tmp1 = radius / 1.41421356237309504880f; 
+		const float tmp1 = radius / 1.41421356237309504880f;
 		result = tmp1*tmp1 / tmp0;
 	}
 	return result;
@@ -404,7 +404,7 @@ void Camera::set_heading(float radians)
 	{
 		m_heading += 6.283185307179586476925286766559f;
 	}
-}	
+}
 
 void Camera::change_pitch(float radians)
 {
@@ -447,17 +447,17 @@ void Camera::set_viewer_matrix(float elapsed_time)
 	// calculate direction
 	const Vector3 axis_head = Vector3(0.0f,1.0f,0.0f);
 	const Matrix4 mhead = mhead.rotation(m_heading,axis_head);
-	
+
 	const Vector3 axis_pitch = Vector3(1.0f,0.0f,0.0f);
 	const Matrix4 mpitch = mpitch.rotation(m_pitch,axis_pitch);
-	
+
 	const Matrix4 m_get_direction = mhead * mpitch;
 	m_direction_vector = Vector3(
 		m_get_direction.getElem(2,0),
 		m_get_direction.getElem(2,1),
 		-m_get_direction.getElem(2,2));
 	m_direction_vector = normalize(m_direction_vector);
-	
+
 	// calculate position, up axis, view matrix
 	m_up_axis = m_get_direction.getUpper3x3().getRow(1);
 	m_position += m_forward_vel*elapsed_time*m_direction_vector;
@@ -465,9 +465,9 @@ void Camera::set_viewer_matrix(float elapsed_time)
 		-1.0f*m_direction_vector.getZ()*m_side_vel*elapsed_time;
 	m_position[1] += 0.0f;
 	m_position[2] += m_direction_vector.getX()*m_side_vel*elapsed_time;
-	
+
 	const Matrix4 mres = mpitch * mhead;
-	
+
 	Matrix4 mtransl = Matrix4::identity();
 	Vector4 c3 = Vector4(
 		-m_position.getX(),
@@ -475,9 +475,9 @@ void Camera::set_viewer_matrix(float elapsed_time)
 		-m_position.getZ(),
 		1.0f);
 	mtransl.setCol(3, c3);
-	
+
 	m_view = mres * mtransl;
-	
+
 #ifdef ENABLE_INVTRANS
 	// calculate inverse of view matrix
 	const Matrix3 mbasis = m_view.getUpper3x3();
@@ -519,9 +519,9 @@ void Camera::calculate_light_matrices(
 	const float _far = light_params[12];
 	const float _fov_radians = light_params[13];
 	const float _aspect = light_params[14];
-	
-	const Point3 target = Point3(target_x, target_y, target_z); 
-	const Point3 eye = Point3(eye_x, eye_y, eye_z); 
+
+	const Point3 target = Point3(target_x, target_y, target_z);
+	const Point3 eye = Point3(eye_x, eye_y, eye_z);
 
 	if (proj_matrix_type == 0) // orthographic
 	{
@@ -558,7 +558,7 @@ void Camera::calculate_light_matrices(
 	{
 		m_light_projection[id] = Matrix4::identity();
 	}
-	
+
 	const Vector3 light_up_axis =
 		Vector3(light_up_x,light_up_y,light_up_z);
 	m_light_modelview[id] =

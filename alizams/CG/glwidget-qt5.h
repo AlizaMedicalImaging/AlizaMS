@@ -79,8 +79,8 @@ public:
 	unsigned int faces_size;
 	GLuint * vboid;
 	GLuint   vaoid;
-	int	   * get_shadows;
-	int	   * cast_shadows;
+	int    * get_shadows;
+	int    * cast_shadows;
 	GLuint * textures;
 	GLuint * tex_units;
 	ShaderObj * shader;
@@ -100,13 +100,13 @@ public:
 	void set_collision_object(btCollisionObject * o);
 	btCollisionObject * get_collision_object();
 	unsigned int get_id() const;
-	void set_id(unsigned int i); 
+	void set_id(unsigned int i);
 	void set_mesh_data(qMeshData * q);
 	qMeshData * get_mesh_data();
 	btCollisionObject * collision_object;
-	unsigned int		id;
+	unsigned int id;
 	btCollisionShape  * shape;
-	qMeshData		  * mesh_data;
+	qMeshData * mesh_data;
 } ALIGN16_POST;
 
 #ifdef USE_CORE_3_2_PROFILE
@@ -234,13 +234,13 @@ public:
 	GLuint frontfacebuffer;
 	GLuint frontface_tex;
 	GLuint frontface_depth;
-    GLuint scene_vbo;
-    GLuint scene_vao;
-    GLuint frames_vbo;
-    GLuint frames_vao;
+	GLuint scene_vbo;
+	GLuint scene_vao;
+	GLuint frames_vbo;
+	GLuint frames_vao;
 	GLuint origin_vbo;
 	GLuint origin_vao;
-    ShaderObj fsquad_shader;
+	ShaderObj fsquad_shader;
 	ShaderObj zero_shader;
 	ShaderObj raycast_shader;
 	ShaderObj raycast_color_shader;
@@ -367,7 +367,7 @@ public:
 	bool update_raycast_shader_vbo(
 		unsigned int, float, float, float, GLuint*, bool);
 	void raycast_cube(float, float, float, GLuint*, bool);
-  	void raycast_cube_RIP(float, float, float, GLuint*, bool);
+	void raycast_cube_RIP(float, float, float, GLuint*, bool);
 	void raycast_cube_LIP(float, float, float, GLuint*, bool);
 	void raycast_cube_RSP(float, float, float, GLuint*, bool);
 	void raycast_cube_LSP(float, float, float, GLuint*, bool);

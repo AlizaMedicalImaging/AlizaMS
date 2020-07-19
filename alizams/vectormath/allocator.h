@@ -7,13 +7,13 @@
 #define ALIGN16_PRE __declspec(align(16))
 #define ALIGN16_POST
 #else
-#include <stdint.h>
 #define ALIGN16(a) a __attribute__((aligned(16)))
 #define ALIGN16_PRE
 #define ALIGN16_POST __attribute__((aligned(16)))
 #endif
 
 #if !(defined _MSC_VER && _MSC_VER >= 1400)
+#include <stdint.h>
 static char * align__pointer__(char * p, size_t x) // x = alignment - 1
 {
   struct PtrSizeT
@@ -67,5 +67,4 @@ inline void* operator new[](size_t, void* ptr) {return ptr;} \
 inline void  operator delete[](void*, void*) {}
 
 #endif // ALIGNED_ALLOCATOR__H
-
 

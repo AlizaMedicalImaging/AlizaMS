@@ -159,7 +159,7 @@ struct  MyRayResultCallback : public btCollisionWorld::AllHitsRayResultCallback
 			return true;
 		}
 		return false;
-	}    
+	}
 };
 
 struct  MyClosestRayResultCallback0 : public btCollisionWorld::ClosestRayResultCallback
@@ -176,7 +176,7 @@ struct  MyClosestRayResultCallback0 : public btCollisionWorld::ClosestRayResultC
 			return true;
 		}
 		return false;
-	}    
+	}
 };
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -748,7 +748,7 @@ void GLWidget::init_()
 
 GLWidget::~GLWidget()
 {
-	selected_images__ = NULL; 
+	selected_images__ = NULL;
 }
 
 void GLWidget::close_()
@@ -1184,7 +1184,7 @@ void GLWidget::init_opengl(int w, int h)
 	simple_tex_shader.texture_handle[0]   = glGetAttribLocation (simple_tex_shader.program, "v_texcoord0");
 	shaders.push_back(&simple_tex_shader);
 	//
-	create_program(TBNf_vs0, TBNf_fs0, &sphere0_shader);    
+	create_program(TBNf_vs0, TBNf_fs0, &sphere0_shader);
 	sphere0_shader.position_handle         = glGetAttribLocation (sphere0_shader.program, "v_position");
 	sphere0_shader.normal_handle           = glGetAttribLocation (sphere0_shader.program, "v_normal");
 	sphere0_shader.texture_handle[0]       = glGetAttribLocation (sphere0_shader.program, "v_texcoord0");
@@ -1195,7 +1195,7 @@ void GLWidget::init_opengl(int w, int h)
 	sphere0_shader.location_modeling_inv_t = glGetUniformLocation(sphere0_shader.program, "modeling_inv_t");
 	sphere0_shader.location_sparams        = glGetUniformLocation(sphere0_shader.program, "sparams");
 	sphere0_shader.location_sampler[0]     = glGetUniformLocation(sphere0_shader.program, "sampler0");
-	sphere0_shader.location_sampler[1]     = glGetUniformLocation(sphere0_shader.program, "sampler1");  
+	sphere0_shader.location_sampler[1]     = glGetUniformLocation(sphere0_shader.program, "sampler1");
 	shaders.push_back(&sphere0_shader);
 	//
 	create_program(color_vs, color_fs, &color_shader);
@@ -2199,7 +2199,7 @@ void GLWidget::paint_volume()
 		mparams[2]  = (float)(di->window_center + di->window_width*0.5);
 		mparams[3]  = (float)di->window_width;
 		// [1]
-		mparams[4]  = 0.0f; // unused 
+		mparams[4]  = 0.0f; // unused
 		mparams[5]  = 0.0f; // unused
 		mparams[6]  = 0.0f; // unused
 		mparams[7]  = (float)di->bb_y_min; // y
@@ -2215,7 +2215,7 @@ void GLWidget::paint_volume()
 		mparams[15] = 0.0f; // unused
 		//
 		if (draw_frames_3d)
-		{	
+		{
 			glUseProgram(frame_shader.program);
 			glUniformMatrix4fv(
 				frame_shader.location_mvp,
@@ -2264,7 +2264,7 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_bb_clamp_sigm.program);
 						glUniformMatrix4fv(c3d_shader_bb_clamp_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_bb_clamp_sigm.location_mparams, 16/4, mparams);	
+						glUniform4fv(c3d_shader_bb_clamp_sigm.location_mparams, 16/4, mparams);
 						glUniform1i(c3d_shader_bb_clamp_sigm.location_sampler[0], 0);
 						if (dotv<0)
 						{
@@ -2317,7 +2317,7 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_bb_clamp.program);
 						glUniformMatrix4fv(c3d_shader_bb_clamp.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_bb_clamp.location_mparams, 16/4, mparams);	
+						glUniform4fv(c3d_shader_bb_clamp.location_mparams, 16/4, mparams);
 						glUniform1i(c3d_shader_bb_clamp.location_sampler[0], 0);
 						if (dotv<0)
 						{
@@ -2373,7 +2373,7 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_clamp_sigm.program);
 						glUniformMatrix4fv(c3d_shader_clamp_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_clamp_sigm.location_mparams, 16/4, mparams);	
+						glUniform4fv(c3d_shader_clamp_sigm.location_mparams, 16/4, mparams);
 						glUniform1i(c3d_shader_clamp_sigm.location_sampler[0], 0);
 						if (dotv<0)
 						{
@@ -2398,7 +2398,7 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_sigm.program);
 						glUniformMatrix4fv(c3d_shader_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_sigm.location_mparams, 16/4, mparams);	
+						glUniform4fv(c3d_shader_sigm.location_mparams, 16/4, mparams);
 						glUniform1i(c3d_shader_sigm.location_sampler[0], 0);
 						if (dotv<0)
 						{
@@ -2426,7 +2426,7 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_clamp.program);
 						glUniformMatrix4fv(c3d_shader_clamp.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_clamp.location_mparams, 16/4, mparams);	
+						glUniform4fv(c3d_shader_clamp.location_mparams, 16/4, mparams);
 						glUniform1i(c3d_shader_clamp.location_sampler[0], 0);
 						if (dotv<0)
 						{
@@ -2451,7 +2451,7 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader.program);
 						glUniformMatrix4fv(c3d_shader.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader.location_mparams, 16/4, mparams);	
+						glUniform4fv(c3d_shader.location_mparams, 16/4, mparams);
 						glUniform1i(c3d_shader.location_sampler[0], 0);
 						if (dotv<0)
 						{
@@ -2497,7 +2497,7 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_gradient_bb_clamp_sigm.program);
 						glUniformMatrix4fv(c3d_shader_gradient_bb_clamp_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_gradient_bb_clamp_sigm.location_mparams, 16/4, mparams);	
+						glUniform4fv(c3d_shader_gradient_bb_clamp_sigm.location_mparams, 16/4, mparams);
 						glUniform1i(c3d_shader_gradient_bb_clamp_sigm.location_sampler[0], 0);
 						glUniform1i(c3d_shader_gradient_bb_clamp_sigm.location_sampler[1], 3);
 						if (dotv<0)
@@ -2523,7 +2523,7 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_gradient_bb_sigm.program);
 						glUniformMatrix4fv(c3d_shader_gradient_bb_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_gradient_bb_sigm.location_mparams, 16/4, mparams);	
+						glUniform4fv(c3d_shader_gradient_bb_sigm.location_mparams, 16/4, mparams);
 						glUniform1i(c3d_shader_gradient_bb_sigm.location_sampler[0], 0);
 						glUniform1i(c3d_shader_gradient_bb_sigm.location_sampler[1], 3);
 						if (dotv<0)
@@ -2552,7 +2552,7 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_gradient_bb_clamp.program);
 						glUniformMatrix4fv(c3d_shader_gradient_bb_clamp.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_gradient_bb_clamp.location_mparams, 16/4, mparams);	
+						glUniform4fv(c3d_shader_gradient_bb_clamp.location_mparams, 16/4, mparams);
 						glUniform1i(c3d_shader_gradient_bb_clamp.location_sampler[0], 0);
 						glUniform1i(c3d_shader_gradient_bb_clamp.location_sampler[1], 3);
 						if (dotv<0)
@@ -2578,7 +2578,7 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_gradient_bb.program);
 						glUniformMatrix4fv(c3d_shader_gradient_bb.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_gradient_bb.location_mparams, 16/4, mparams);	
+						glUniform4fv(c3d_shader_gradient_bb.location_mparams, 16/4, mparams);
 						glUniform1i(c3d_shader_gradient_bb.location_sampler[0], 0);
 						glUniform1i(c3d_shader_gradient_bb.location_sampler[1], 3);
 						if (dotv<0)
@@ -2610,7 +2610,7 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_gradient_clamp_sigm.program);
 						glUniformMatrix4fv(c3d_shader_gradient_clamp_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_gradient_clamp_sigm.location_mparams, 16/4, mparams);	
+						glUniform4fv(c3d_shader_gradient_clamp_sigm.location_mparams, 16/4, mparams);
 						glUniform1i(c3d_shader_gradient_clamp_sigm.location_sampler[0], 0);
 						glUniform1i(c3d_shader_gradient_clamp_sigm.location_sampler[1], 3);
 						if (dotv<0)
@@ -2636,7 +2636,7 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_gradient_sigm.program);
 						glUniformMatrix4fv(c3d_shader_gradient_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_gradient_sigm.location_mparams, 16/4, mparams);	
+						glUniform4fv(c3d_shader_gradient_sigm.location_mparams, 16/4, mparams);
 						glUniform1i(c3d_shader_gradient_sigm.location_sampler[0], 0);
 						glUniform1i(c3d_shader_gradient_sigm.location_sampler[1], 3);
 						if (dotv<0)
@@ -2665,7 +2665,7 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_gradient_clamp.program);
 						glUniformMatrix4fv(c3d_shader_gradient_clamp.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_gradient_clamp.location_mparams, 16/4, mparams);	
+						glUniform4fv(c3d_shader_gradient_clamp.location_mparams, 16/4, mparams);
 						glUniform1i(c3d_shader_gradient_clamp.location_sampler[0], 0);
 						glUniform1i(c3d_shader_gradient_clamp.location_sampler[1], 3);
 						if (dotv<0)
@@ -2691,7 +2691,7 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_gradient.program);
 						glUniformMatrix4fv(c3d_shader_gradient.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_gradient.location_mparams, 16/4, mparams);	
+						glUniform4fv(c3d_shader_gradient.location_mparams, 16/4, mparams);
 						glUniform1i(c3d_shader_gradient.location_sampler[0], 0);
 						glUniform1i(c3d_shader_gradient.location_sampler[1], 3);
 						if (dotv<0)
@@ -2754,7 +2754,7 @@ void GLWidget::gen_lut_tex(const unsigned char * lut, const int size, GLuint * t
 	// 2 rows aligned to even-numbered bytes
 	// 4 word-alignment
 	// 8 rows start on double-word boundaries
-	//               
+	//
 	glPixelStorei(GL_UNPACK_ALIGNMENT,1);
 	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB8, size, 0, GL_RGB, GL_UNSIGNED_BYTE, lut);
 	//
@@ -3057,10 +3057,10 @@ void GLWidget::render_orient_cube1(
 	glDisable(GL_CULL_FACE);
 }
 
-void GLWidget::render_orient_cube2() 
+void GLWidget::render_orient_cube2()
 {
 	const GLsizei cube_viewport_size =
-		win_w < win_h ? win_w/9 : win_h/9; 
+		win_w < win_h ? win_w/9 : win_h/9;
 	glViewport(0,0,cube_viewport_size,cube_viewport_size);
 	glDisable(GL_DEPTH_TEST);
 	glUseProgram(fsquad_shader.program);
@@ -3425,21 +3425,21 @@ void GLWidget::generate_quad(
 	glBindBuffer(GL_ARRAY_BUFFER, vboid[0]);
 	glBufferData(GL_ARRAY_BUFFER, (4*3)*sizeof(GLfloat), v, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	
+
 	if (t)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vboid[1]);
 		glBufferData(GL_ARRAY_BUFFER, (4*3)*sizeof(GLfloat), t, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
-	
+
 	if (n)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vboid[2]);
 		glBufferData(GL_ARRAY_BUFFER, (4*3)*sizeof(GLfloat), n, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
-	
+
 	if (tan)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vboid[3]);
@@ -3839,12 +3839,12 @@ bool GLWidget::create_fbos0(
 	glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexImage2D(target,
-				0, 
+				0,
 				GL_DEPTH_COMPONENT24, //GL_DEPTH_COMPONENT16
 				w,
 				h,
-				0, 
-				GL_DEPTH_COMPONENT, 
+				0,
+				GL_DEPTH_COMPONENT,
 				GL_UNSIGNED_INT, //GL_UNSIGNED_SHORT,
 				NULL);
 	glGenTextures(1, color_texture);
@@ -6603,7 +6603,7 @@ void GLWidget::disable_gl_in_settings()
 	settings.beginGroup(QString("GlobalSettings"));
 	settings.setValue(QString("enable_gl_3D"), QVariant((int)0));
 	settings.endGroup();
-    settings.sync();
+	settings.sync();
 #endif
 }
 
