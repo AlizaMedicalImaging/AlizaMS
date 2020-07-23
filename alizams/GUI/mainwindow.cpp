@@ -414,7 +414,6 @@ MainWindow::MainWindow(
 	readSettings();
 	//
 	connect(openAct,                        SIGNAL(triggered()),         this,SLOT(toggle_browser()));
-	connect(settingsAct,                    SIGNAL(triggered()),         this,SLOT(toggle_settingswidget()));
 	connect(openanyAct,                     SIGNAL(triggered()),         this,SLOT(load_any()));
 	connect(exitAct,                        SIGNAL(triggered()),         this,SLOT(close()));
 	connect(aboutAct,                       SIGNAL(triggered()),         this,SLOT(about()));
@@ -585,7 +584,6 @@ void MainWindow::createActions()
 	openanyAct    = new QAction(QIcon(":/bitmaps/file.svg"),  QString("Open file"),            this);
 	exitAct       = new QAction(QIcon(":/bitmaps/delete.svg"),QString("Exit"),                 this);
 	aboutAct      = new QAction(QIcon(":/bitmaps/info.svg"),  QString("About"),      this);
-	settingsAct   = new QAction(QIcon(":/bitmaps/tool.svg"),  QString("Settings"),             this);
 	exitAct->setShortcuts(QKeySequence::Quit);
 	axis_group = new QActionGroup(this);
 	graphicsAct_Z = new QAction(QIcon(":/bitmaps/align.svg"),
@@ -609,13 +607,11 @@ void MainWindow::createActions()
 		QString("Z, MPR Y, MPR X, Histogram"), this);
 	zyxAct->setCheckable(true);
 	axis_group->addAction(zyxAct);
-	show3DAct = new QAction(QIcon(":/bitmaps/3d.svg"),
-		QString("3D Views"), this);
+	show3DAct = new QAction(QString("3D Window"), this); // QIcon(":/bitmaps/3d.svg")
 	show3DAct->setCheckable(true);
 	show3DAct->setChecked(true);
 	show3DAct->setEnabled(false);
-	show2DAct = new QAction(QIcon(":/bitmaps/2d.svg"),
-		QString("2D Views"), this);
+	show2DAct = new QAction(QString("2D Window"), this); // QIcon(":/bitmaps/2d.svg")
 	show2DAct->setCheckable(true);
 	show2DAct->setChecked(true);
 	show2DAct->setEnabled(false);
@@ -653,8 +649,6 @@ void MainWindow::createActions()
 		QString("Intensity projection, OpenGL"), this);
 	raycastAct->setCheckable(true);
 	view_group->addAction(raycastAct);
-	settingsAct = new QAction(QIcon(":/bitmaps/tool.svg"),
-		QString("Settings"), this);
 	frames2DAct = new QAction(QIcon(":/bitmaps/cross.svg"),
 		QString("MPR set position"), this);
 	frames2DAct->setCheckable(true);
@@ -722,13 +716,11 @@ void MainWindow::createMenus()
 	file_menu = menuBar()->addMenu(QString("Application"));
 	file_menu->addAction(openAct);
 	file_menu->addAction(openanyAct);
-	file_menu->addAction(settingsAct);
-	file_menu->addAction(show2DAct);
-	file_menu->addAction(show3DAct);
 	file_menu->addAction(aboutAct);
 	file_menu->addAction(exitAct);
 	//
 	views_menu = menuBar()->addMenu(QString("Views"));
+	views_menu->addAction(show2DAct);
 	actionViews2DMenu  = new QAction(
 		QString("2D Views"),this);
 	QMenu * views2d_menu = new QMenu(this);
@@ -741,6 +733,7 @@ void MainWindow::createMenus()
 	actionViews2DMenu->setEnabled(false);
 	views_menu->addAction(actionViews2DMenu);
 	//
+	views_menu->addAction(show3DAct);
 	actionViews3DMenu  = new QAction(
 		QString("3D Views"),this);
 	QMenu * views3d_menu = new QMenu(this);
@@ -941,11 +934,6 @@ void MainWindow::createToolBars()
 void MainWindow::toggle_browser()
 {
 	tabWidget->setCurrentIndex(1);
-}
-
-void MainWindow::toggle_settingswidget()
-{
-	tabWidget->setCurrentIndex(3);
 }
 
 void MainWindow::toggle_showgl(bool t)

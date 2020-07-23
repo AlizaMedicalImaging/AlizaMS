@@ -49,7 +49,6 @@ public:
 	QAction * zyxAct;
 	QAction * slicesAct;
 	QAction * trans3DAct;
-	QAction * settingsAct;
 	QAction * gloptionsAct;
 	QAction * animAct2d;
 	QAction * animAct3d;
@@ -72,7 +71,6 @@ public slots:
 private slots:
 	void about();
 	void toggle_browser();
-	void toggle_settingswidget();
 	void toggle_showgl(bool);
 	void toggle_show2D(bool);
 	void toggle_graphicswidget_m_x(bool);
