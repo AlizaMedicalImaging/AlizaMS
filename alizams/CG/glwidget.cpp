@@ -561,25 +561,27 @@ void GLWidget::get_screen(bool white_bg)
 	const float r = clear_color_r;
 	const float g = clear_color_g;
 	const float b = clear_color_b;
+	QString saved_dir;
+	QString d;
+	QString f;
+	QString f__;
+	QString ext;
+	QFileInfo fi;
 	if (white_bg)
 	{
 		set_clear_color(1.0, 1.0, 1.0);
 		updateGL();
+		QApplication::processEvents();
 	}
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	QImage p = grabFramebuffer();
 #else
 	QImage p = grabFrameBuffer(false);
 #endif
-	if (white_bg)
-	{
-		set_clear_color(r, g, b);
-		updateGL();
-	}
-	if (p.isNull()) return;
-	const QString saved_dir = CommonUtils::get_screenshot_dir();
-	const QString d = CommonUtils::get_screenshot_name(saved_dir);
-	const QString f = QFileDialog::getSaveFileName(
+	if (p.isNull()) goto quit__;
+	saved_dir = CommonUtils::get_screenshot_dir();
+	d = CommonUtils::get_screenshot_name(saved_dir);
+	f = QFileDialog::getSaveFileName(
 		NULL,
 		QString("Save PNG file"),
 		d,
@@ -587,12 +589,11 @@ void GLWidget::get_screen(bool white_bg)
 		(QString*)NULL
 		//,QFileDialog::DontUseNativeDialog
 		);
-	if (f.isEmpty()) return;
-	QString f__;
-	QFileInfo fi(f);
+	if (f.isEmpty()) goto quit__;
+	fi = QFileInfo(f);
 	CommonUtils::set_screenshot_dir(
 		QDir::toNativeSeparators(fi.absolutePath()));
-	QString ext = fi.suffix();
+	ext = fi.suffix();
 	if (ext.isEmpty())
 	{
 		f__ = QDir::toNativeSeparators(f + QString(".png"));
@@ -617,6 +618,12 @@ void GLWidget::get_screen(bool white_bg)
 		mbox.setIcon(QMessageBox::Warning);
 		mbox.setText(QString("Could not save file"));
 		mbox.exec();
+	}
+quit__:
+	if (white_bg)
+	{
+		set_clear_color(r, g, b);
+		updateGL();
 	}
 }
 
@@ -743,12 +750,12 @@ void GLWidget::init_()
 	clear_color_g = 0.9f;
 	clear_color_b = 0.9f;
 	camera = new Camera;
-	camera->reset();
 }
 
 GLWidget::~GLWidget()
 {
 	selected_images__ = NULL;
+	delete camera;
 }
 
 void GLWidget::close_()
@@ -819,11 +826,6 @@ void GLWidget::close_()
 	glDeleteVertexArrays(1, &origin_vao);
 	glDeleteBuffers(1, &origin_vbo);
 	increment_count_vbos(-1);
-	if (camera)
-	{
-		delete camera;
-		camera = NULL;
-	}
 	opengl_init_done = false;
 #if 0
 	std::cout
@@ -923,6 +925,7 @@ void GLWidget::init_opengl(int w, int h)
 	else
 		set_max_vbos_65535(false);
 	//
+	camera->reset();
 	camera->set_heading(0.0f);
 	camera->set_pitch(0.0f);
 	camera->set_position(0.0f,0.0f,(float)SCENE_POS_Z);
