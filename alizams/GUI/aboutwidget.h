@@ -17,9 +17,9 @@ public:
 
 protected:
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-	void mousePressEvent(QMouseEvent*);
+	void mouseReleaseEvent(QMouseEvent*);
 #else
-	void mousePressEvent(QMouseEvent*) override;
+	void mouseReleaseEvent(QMouseEvent*) override;
 #endif
 
 private:

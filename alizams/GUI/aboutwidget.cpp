@@ -34,7 +34,7 @@ AboutWidget::~AboutWidget()
 {
 }
 
-void AboutWidget::mousePressEvent(QMouseEvent * e)
+void AboutWidget::mouseReleaseEvent(QMouseEvent * e)
 {
 	close();
 }
