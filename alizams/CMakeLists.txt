@@ -16,7 +16,7 @@ set(CMAKE_CXX_STANDARD 11)
 ####################################################################
 option(USE_QT_V_5 "Use Qt5" ON)
 option(USE_INCLUDED_GLEW_QT4 "Use included GLEW library for Qt4" ON)
-option(USE_WORKSTATION_MODE "Build SQL for CTK access" ON)
+option(USE_WORKSTATION_MODE "Build workstation" ON)
 
 if(USE_QT_V_5)
   if(WIN32)
