@@ -11726,9 +11726,16 @@ QString DicomUtils::read_dicom(
 			else
 			{
 #ifndef USE_WORKSTATION_MODE
+				const QString tmpp = QString(
+#ifdef _WIN32
+					"DICOM/"
+#else
+					"../DICOM/"
+#endif
+				);
 				ref2_ok = process_contrours_ref(
 					rtstruct_ref_search.at(x),
-					QString("../DICOM/"), // FIXME
+					tmpp,
 					tmp_ivariants_rtstruct,
 					max_3d_tex_size, gl, ok3d,
 					settings,
@@ -12117,7 +12124,13 @@ QString DicomUtils::read_dicom(
 				return QString("");
 			}
 #else
-			p = "../DICOM/"; // FIXME
+			p = QString(
+#ifdef _WIN32
+				"DICOM/"
+#else
+				"../DICOM/"
+#endif
+				);
 #endif
 			for (int x = 0; x < grey_softcopy_pr_files.size(); x++)
 			{
