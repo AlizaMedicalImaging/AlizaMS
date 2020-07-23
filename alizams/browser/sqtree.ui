@@ -56,6 +56,9 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="toolTip">
+        <string>Open file and scan series</string>
+       </property>
        <property name="text">
         <string/>
        </property>
