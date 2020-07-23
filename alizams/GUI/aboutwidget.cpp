@@ -8,7 +8,7 @@
 #include <cpuid.h>
 #endif
 
-AboutWidget::AboutWidget(QDialog * p, Qt::WindowFlags f) : QDialog(p,f)
+AboutWidget::AboutWidget(QWidget * p, Qt::WindowFlags f) : QWidget(p,f)
 {
 	setupUi(this);
 	setStyleSheet(
@@ -32,6 +32,11 @@ AboutWidget::AboutWidget(QDialog * p, Qt::WindowFlags f) : QDialog(p,f)
 
 AboutWidget::~AboutWidget()
 {
+}
+
+void AboutWidget::mousePressEvent(QMouseEvent * e)
+{
+	close();
 }
 
 void AboutWidget::set_opengl_info(const QString & s)

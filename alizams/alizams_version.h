@@ -1,4 +1,4 @@
 #ifndef ALIZAMS_VERSION
-#define ALIZAMS_VERSION "1.0.5"
+#define ALIZAMS_VERSION "1.0.7"
 #endif
 

@@ -2,18 +2,26 @@
 #define ABOUTWIDGET_H__
 
 #include "ui_aboutwidget.h"
-#include <QDialog>
 #include <QString>
+#include <QMouseEvent>
 
-class AboutWidget : public QDialog, public Ui::AboutWidget
+class AboutWidget : public QWidget, public Ui::AboutWidget
 {
 Q_OBJECT
 public:
-	AboutWidget(QDialog(*)=NULL,Qt::WindowFlags=0);
+	AboutWidget(QWidget(*)=NULL,Qt::WindowFlags=0);
 	~AboutWidget();
 	bool has_opengl_info() const;
 	void set_opengl_info(const QString&);
 	void set_info();
+
+protected:
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+	void mousePressEvent(QMouseEvent*);
+#else
+	void mousePressEvent(QMouseEvent*) override;
+#endif
+
 private:
 	QString get_build_info();
 	QString opengl_info;

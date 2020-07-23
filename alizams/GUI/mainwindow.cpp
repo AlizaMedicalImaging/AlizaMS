@@ -574,7 +574,7 @@ void MainWindow::about()
 	const QString tmp0 = aliza->get_opengl_info();
 	aboutwidget->set_opengl_info(tmp0);
 	aboutwidget->set_info();
-	aboutwidget->exec();
+	aboutwidget->show();
 	aboutwidget->raise();
 }
 

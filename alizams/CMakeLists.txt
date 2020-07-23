@@ -81,6 +81,7 @@ SET(BULLET_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/b/LinearMath/btGeometryUtil.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/b/LinearMath/btPolarDecomposition.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/b/LinearMath/btQuickprof.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/b/LinearMath/btReducedVector.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/b/LinearMath/btSerializer.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/b/LinearMath/btSerializer64.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/b/LinearMath/btThreads.cpp
