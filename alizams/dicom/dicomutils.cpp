@@ -5888,7 +5888,6 @@ QString DicomUtils::read_ultrasound(
 	return QString("");
 }
 
-#define CHECK_DWI_SERIES_CONSISTENCY
 QString DicomUtils::read_series(
 	bool * ok,
 	const bool min_load,
@@ -6616,9 +6615,6 @@ QString DicomUtils::read_series(
 		ivariant->di->selected_z_slice = 0;
 	return QString("");
 }
-#ifdef CHECK_DWI_SERIES_CONSISTENCY
-#undef CHECK_DWI_SERIES_CONSISTENCY
-#endif
 
 #if 1 // no example file
 static void delta_decode_rgb(
