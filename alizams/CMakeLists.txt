@@ -307,9 +307,11 @@ else()
   set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Wall")
   if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
     link_directories(/usr/local/lib)
-    # may be not required
-    add_definitions(-DDISABLE_SIMDMATH)
   endif()
+endif()
+
+if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
+  add_definitions(-DDISABLE_SIMDMATH)
 endif()
 
 set(ALIZAMS_LINK_LIBRARIES mdcmMSFF mdcmDICT mdcmDSED)
