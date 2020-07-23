@@ -28,7 +28,6 @@
 #include "dicom/spectroscopydata.h"
 
 // Assumed is size of 'int' is 32 bit.
-// Not tested on platform with different size of 'int'.
 // Not tested on big endian platroms (specially MDCM).
 
 class GLWidget;
