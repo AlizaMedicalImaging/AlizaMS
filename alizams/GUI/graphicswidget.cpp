@@ -1176,6 +1176,7 @@ template<typename T> void load_image(const typename T::Pointer & image,
 			if (widget->threadsLUT_.at(i)->isFinished()) { b__++; }
 		}
 		if (b__==threadsLUT_size) break;
+/*
 		if (b__==0)
 		{
 #ifdef WIN32
@@ -1192,6 +1193,7 @@ template<typename T> void load_image(const typename T::Pointer & image,
 			usleep(1000);
 #endif
 		}
+*/
 	}
 	for (int i=0; i < threadsLUT_size; i++)
 	{
