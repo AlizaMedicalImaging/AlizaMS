@@ -1,6 +1,7 @@
 #include "aboutwidget.h"
 #include <QStyle>
 #include <QDate>
+#include <QPoint>
 #include "alizams_version.h"
 #include "mdcmVersion.h"
 #include "itkVersion.h"
@@ -8,8 +9,9 @@
 #include <cpuid.h>
 #endif
 
-AboutWidget::AboutWidget(QWidget * p, Qt::WindowFlags f) : QWidget(p,f)
+AboutWidget::AboutWidget(int w, int h)
 {
+	setWindowFlags(Qt::FramelessWindowHint);
 	setupUi(this);
 	setStyleSheet(
 		"QWidget { background-color : rgba(255,255,255,255);"
@@ -28,6 +30,7 @@ AboutWidget::AboutWidget(QWidget * p, Qt::WindowFlags f) : QWidget(p,f)
 	link_label->setOpenExternalLinks(true);
 	//
 	adjustSize();
+	move(QPoint((w/2) - (width()/2),(h/2) - (height()/2)));
 }
 
 AboutWidget::~AboutWidget()

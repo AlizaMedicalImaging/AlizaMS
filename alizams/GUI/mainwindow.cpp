@@ -89,6 +89,8 @@ MainWindow::MainWindow(
 		if (srec.width() > 1920.0) scale_icons = srec.width()/1920.0f;
 #endif
 	}
+	aboutwidget = new AboutWidget(srec.width(), srec.height());
+	aboutwidget->hide();
 	//
 	toolbox = new ToolBox(this);
 	QVBoxLayout * vl0 = new QVBoxLayout(toolbox3D_frame);
@@ -256,8 +258,6 @@ MainWindow::MainWindow(
 	vl496->setContentsMargins(0,0,0,0);
 	vl496->setSpacing(0);
 	vl496->addWidget(settingswidget);
-	//
-	aboutwidget = new AboutWidget();
 	//
 	if (ok3d)
 	{
@@ -547,10 +547,9 @@ void MainWindow::open_args(const QStringList & l)
 void MainWindow::closeEvent(QCloseEvent * e)
 {
 	writeSettings();
-	aboutwidget->close();
-	delete aboutwidget;
 	aliza->close_();
 	delete aliza;
+	delete aboutwidget;
 #if QT_VERSION < QT_VERSION_CHECK(4,8,1)
 	qApp->quit();
 #else
