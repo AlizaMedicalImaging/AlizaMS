@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
 	bool ok3d = false;
 	bool hide_zoom = true;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-#if 1 
+#if 1
 	QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
 #endif
 #ifdef __arm__
@@ -272,7 +272,7 @@ int main(int argc, char *argv[])
 					settings.setValue(QString("enable_gltest"), QVariant((int)0));
 					settings.endGroup();
 					settings.sync();
-                    delete testgl;
+					delete testgl;
 				}
 				else
 				{
