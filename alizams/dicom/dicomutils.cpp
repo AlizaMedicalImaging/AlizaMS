@@ -9093,7 +9093,6 @@ bool DicomUtils::process_contrours_ref(
 	std::vector<ImageVariant*> & tmp_ivariants,
 	int max_3d_tex_size, GLWidget * gl, bool ok3d,
 	const QWidget * settings,
-	const QMap<int, ImageVariant*> & scene3dimages,
 	QProgressDialog * pb)
 {
 	unsigned short count_ = 0;
@@ -9213,7 +9212,7 @@ bool DicomUtils::process_contrours_ref(
 					read_dicom(
 						ivariants, detected_files_tmp,
 						max_3d_tex_size, gl, NULL, ok3d,
-						settings, scene3dimages,
+						settings,
 						pb, false, true);
 				if (!message_.isEmpty())
 				{
@@ -10162,7 +10161,6 @@ QString DicomUtils::read_dicom(
 	ShaderObj * mesh_shader,
 	bool ok3d,
 	const QWidget * settings,
-	const QMap<int, ImageVariant*> & scene3dimages,
 	QProgressDialog * pb,
 	bool pr_ref,
 	bool rt_ref)
@@ -11707,7 +11705,6 @@ QString DicomUtils::read_dicom(
 					tmp_ivariants_rtstruct,
 					max_3d_tex_size, gl, ok3d,
 					settings,
-					scene3dimages,
 					pb);
 			bool ref2_ok = false;
 			if (ref_ok)
@@ -11739,7 +11736,6 @@ QString DicomUtils::read_dicom(
 					tmp_ivariants_rtstruct,
 					max_3d_tex_size, gl, ok3d,
 					settings,
-					scene3dimages,
 					pb);
 				if (ref2_ok)
 				{
@@ -11782,7 +11778,6 @@ QString DicomUtils::read_dicom(
 						tmp_ivariants_rtstruct,
 						max_3d_tex_size, gl, ok3d,
 						settings,
-						scene3dimages,
 						pb);
 					if (ref2_ok)
 					{
@@ -11989,7 +11984,6 @@ QString DicomUtils::read_dicom(
 						mesh_shader,
 						ok3d,
 						settings,
-						scene3dimages,
 						pb,
 						true,
 						false);
@@ -12157,7 +12151,6 @@ QString DicomUtils::read_dicom(
 							mesh_shader,
 							ok3d,
 							settings,
-							scene3dimages,
 							pb,
 							true,
 							false);

@@ -613,7 +613,6 @@ void Aliza::load_dicom_series(QProgressDialog * pb)
 			mesh_shader,
 			ok3d,
 			static_cast<QWidget*>(settingswidget),
-			scene3dimages,
 			pb,
 			false,
 			false);
@@ -3750,7 +3749,6 @@ void Aliza::load_dicom_file(int * image_id,
 			mesh_shader,
 			ok3d,
 			static_cast<QWidget*>(settingswidget),
-			scene3dimages,
 			pb,
 			false,
 			false);

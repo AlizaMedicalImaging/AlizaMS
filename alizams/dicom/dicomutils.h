@@ -333,7 +333,6 @@ public:
 		std::vector<ImageVariant*> &,
 		int, GLWidget*, bool,
 		const QWidget*,
-		const QMap<int, ImageVariant*> &,
 		QProgressDialog*);
 	static QString find_file_from_uid(
 		const QString&,
@@ -363,7 +362,6 @@ public:
 		int, GLWidget*,
 		ShaderObj*, bool,
 		const QWidget*,
-		const QMap<int, ImageVariant*> &,
 		QProgressDialog*,
 		bool, bool);
 };
