@@ -42,6 +42,14 @@
 
 #include <limits>
 
+void gImageCleanupHandler(void * info)
+{
+	if (!info) return;
+	unsigned char * p = (unsigned char*)info;
+	delete [] p;
+	info = NULL;
+}
+
 static void draw_contours(
 	const ImageVariant * ivariant,
 	GraphicsWidget * widget)
@@ -504,7 +512,11 @@ template<typename T> void load_rgb_image(
 			}
 		}
 	}
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+	QImage tmpi(p__,size[0],size[1],3*size[0],QImage::Format_RGB888,gImageCleanupHandler,p__);
+#else
 	QImage tmpi(p__,size[0],size[1],3*size[0],QImage::Format_RGB888);
+#endif
 	//
 	if (axis==2)
 	{
@@ -550,7 +562,10 @@ template<typename T> void load_rgb_image(
 	widget->set_left_label_text(left_string);
 	widget->graphicsview->setTransform(t);
 	//
-	delete [] p__;
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+	tmpi = QImage();
+	if (p__) delete [] p__;
+#endif
 }
 
 template<typename T> void load_rgba_image(
@@ -675,7 +690,7 @@ template<typename T> void load_rgba_image(
  			++iterator;
 		}
 	}
-	QImage tmpi(p__,size[0],size[1],4*size[0],QImage::Format_RGBA8888);
+	QImage tmpi(p__,size[0],size[1],4*size[0],QImage::Format_RGBA8888,gImageCleanupHandler,p__);
 #else
 	if (image_type == 21)
 	{
@@ -792,7 +807,10 @@ template<typename T> void load_rgba_image(
 	widget->set_left_label_text(left_string);
 	widget->graphicsview->setTransform(t);
 	//
-	delete [] p__;
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+	tmpi = QImage();
+	if (p__) delete [] p__;
+#endif
 }
 
 template<typename T> void load_rgb_char_image(
@@ -1029,12 +1047,7 @@ template<typename T> void load_rgba_char_image(
 		if (!ivariant->equi||ivariant->orientation_string.isEmpty())
 			GraphicsUtils::draw_cross_out(tmpi);
 	}
-	//
 	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(tmpi));
-	//
-#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-	delete [] p;
-#endif
 	//
 	const bool hide_orientation = ivariant->di->hide_orientation;
 	GraphicsUtils::gen_labels(
@@ -1067,6 +1080,11 @@ template<typename T> void load_rgba_char_image(
 	widget->set_top_label_text(top_string);
 	widget->set_left_label_text(left_string);
 	widget->graphicsview->setTransform(t);
+	//
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+	tmpi = QImage();
+	if (p) delete [] p;
+#endif
 }
 
 template<typename T> void load_image(const typename T::Pointer & image,
@@ -1167,6 +1185,15 @@ template<typename T> void load_image(const typename T::Pointer & image,
 			lt__->start();
 		}
 	}
+	//
+#if 0
+#ifdef _WIN32
+	Sleep(1);
+#else
+	usleep(1000);
+#endif
+#endif
+	//
 	const unsigned short threadsLUT_size = widget->threadsLUT_.size();
 	while (true)
 	{
@@ -1215,7 +1242,11 @@ template<typename T> void load_image(const typename T::Pointer & image,
 	widget->graphicsview->image_item->setZValue(-1.0);
 	widget->graphicsview->scene()->addItem(widget->graphicsview->image_item);
 #endif
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+	QImage tmpi(p,size[0],size[1],3*size[0],QImage::Format_RGB888,gImageCleanupHandler,p);
+#else
 	QImage tmpi(p,size[0],size[1],3*size[0],QImage::Format_RGB888);
+#endif
 	//
 	if (axis==2)
 	{
@@ -1270,7 +1301,11 @@ template<typename T> void load_image(const typename T::Pointer & image,
 	widget->graphicsview->draw_prtexts(ivariant);
 	//
 	widget->graphicsview->setTransform(t);
-	delete [] p;
+	//
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+	tmpi = QImage();
+	if (p) delete [] p;
+#endif
 }
 
 static double get_distance2(
