@@ -48,7 +48,7 @@ public:
 		const mdcm::DataSet&, const mdcm::Tag&,
 		std::vector<unsigned short> &);
 	static bool get_sl_values(
-		const mdcm::DataSet&, const mdcm::Tag&, 
+		const mdcm::DataSet&, const mdcm::Tag&,
 		std::vector<int> &);
 	static bool get_ul_values(
 		const mdcm::DataSet&, const mdcm::Tag&,
@@ -197,14 +197,18 @@ public:
 		const mdcm::DataSet&,
 		PRDisplayShutter&);
 	static QString read_enhanced(
-		bool*, const QString&, std::vector<ImageVariant*> &, 
-		int, GLWidget*, bool, bool,
+		bool*, const QString&, std::vector<ImageVariant*> &,
+		int, GLWidget*, bool,
+		bool, // min. load
+		bool, // skip dimensions organization for enh, orig. frames
 		const QWidget*, QProgressDialog*,
 		float,
 		bool);
 	static QString read_enhanced_supp_palette(
-		bool*, const QString&, std::vector<ImageVariant*> &, 
-		int, GLWidget*, bool, bool,
+		bool*, const QString&, std::vector<ImageVariant*> &,
+		int, GLWidget*, bool,
+		bool, // min. load
+		bool, // skip dimensions organization for enh, orig. frames
 		const QWidget*, QProgressDialog*,
 		float);
 	static QString read_ultrasound(
@@ -363,7 +367,9 @@ public:
 		ShaderObj*, bool,
 		const QWidget*,
 		QProgressDialog*,
-		bool, bool);
+		bool,        // referenced in PR
+		bool,        // referenced in RT
+		bool=false); // skip dimensions organization for enh, orig. frames
 };
 
 #endif // DICOMUTILS__H_

@@ -120,8 +120,8 @@ public:
 class FileWithQString : public File
 {
 public:
-  FileWithQString(File & f) : File(f), filename(QString("")) {}
-  QString filename;
+	FileWithQString(File & f) : File(f), filename(QString("")) {}
+	QString filename;
 };
 
 Sorter2::Sorter2() { SortFunc = 0; }
@@ -156,9 +156,9 @@ bool Sorter2::StableSort(
 	for(
 		std::vector<QString>::const_iterator it =
 			filenames.begin();
-    	it != filenames.end() && it2 != filelist.end();
+		it != filenames.end() && it2 != filelist.end();
 		++it, ++it2)
-    {
+	{
 		Reader reader;
 		reader.SetFileName(it->toLocal8Bit().constData());
 		SmartPointer<FileWithQString> & f = *it2;
@@ -1894,7 +1894,7 @@ void DicomUtils::load_contour(
 				!erefframeofref.IsUndefinedLength() &&
 				erefframeofref.GetByteValue())
 				roi.ref_frame_of_ref =
- 					QString::fromLatin1(
+					QString::fromLatin1(
 						erefframeofref.GetByteValue()->GetPointer(),
 						erefframeofref.GetByteValue()->GetLength()).
 							trimmed().remove(QChar('\0'));
@@ -1959,7 +1959,7 @@ void DicomUtils::load_contour(
 			QString qtr_contour_geometric_type;
 			if (!contour_geometric_type.IsEmpty() &&
 				!contour_geometric_type.IsUndefinedLength() &&
-				contour_geometric_type.GetByteValue())	
+				contour_geometric_type.GetByteValue())
 				qtr_contour_geometric_type = QString::fromLatin1(
 					contour_geometric_type.GetByteValue()->GetPointer(),
 					contour_geometric_type.GetByteValue()->GetLength()).
@@ -2308,7 +2308,7 @@ bool DicomUtils::read_slices_uihgrid(
 		std::vector<double> result;
 		if (DicomUtils::priv_get_ds_values(
 			ds,tMRNumberOfSliceInVolume,result))
-			num_slices = (int)result[0];	
+			num_slices = (int)result[0];
 	}
 	else if (ds.FindDataElement(mdcm::Tag(0x0065,0x1050)))
 	{
@@ -2612,7 +2612,7 @@ bool DicomUtils::read_slices_rtdose(
 	if (z_offsets.empty()) goto quit_;
 	if (numframes!=z_offsets.size()) goto quit_;
 	spacing_x = pix_spacing[0];
-	spacing_y = pix_spacing[1];	
+	spacing_y = pix_spacing[1];
 	for (unsigned int i = 0; i < numframes; i++)
 	{
 		double * p = new double[9];
@@ -5066,6 +5066,7 @@ QString DicomUtils::read_enhanced(
 	std::vector<ImageVariant*> & ivariants,
 	int max_3d_tex_size, GLWidget * gl, bool ok3d,
 	bool min_load,
+	bool enh_original_frames,
 	const QWidget * settings, QProgressDialog * pb,
 	float tolerance,
 	bool apply_rescale)
@@ -5377,6 +5378,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 	std::vector<ImageVariant*> & ivariants,
 	int max_3d_tex_size, GLWidget * gl, bool ok3d,
 	bool min_load,
+	bool enh_original_frames,
 	const QWidget * settings, QProgressDialog * pb,
 	float tolerance)
 {
@@ -5884,7 +5886,7 @@ QString DicomUtils::read_ultrasound(
 	}
 	//
 	CommonUtils::reset_bb(ivariant);
-	ivariant->di->selected_z_slice = 0;	
+	ivariant->di->selected_z_slice = 0;
 	return QString("");
 }
 
@@ -6757,9 +6759,9 @@ static void delta_decode_rgb(
 #endif
 
 static void delta_decode(
-  const char * inbuffer,
-  size_t length,
-  std::vector<unsigned short> & output)
+	const char * inbuffer,
+	size_t length,
+	std::vector<unsigned short> & output)
 {
 	// RLE pass
 	std::vector<char> temp;
@@ -8908,7 +8910,7 @@ void DicomUtils::write_encapsulated(
 	if(!ds.FindDataElement(t)) return;
 	const mdcm::DataElement & e = ds.GetDataElement(t);
 	if (e.IsEmpty()||e.IsUndefinedLength()) return;
-  	const mdcm::ByteValue * bv = e.GetByteValue();
+	const mdcm::ByteValue * bv = e.GetByteValue();
 	if (bv && bv->GetPointer() &&bv->GetLength()>0)
 	{
 		std::ofstream o(
@@ -9017,7 +9019,7 @@ void DicomUtils::scan_dir_for_rtstruct_image(
 	if (p.isEmpty()) return;
 	scan_files_for_rtstruct_image(p, ref_files);
 	QDirIterator it(p, QDir::Dirs|QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-    while(it.hasNext())
+	while(it.hasNext())
 	{
 		scan_files_for_rtstruct_image(it.next(), ref_files);
 	}
@@ -9244,7 +9246,7 @@ bool DicomUtils::process_contrours_ref(
 					tmp_ivariants.push_back(ivariants[j]);
 					count_ += 1;
 				}
- 				break;
+				break;
 			}
 		}
 	}
@@ -9261,7 +9263,7 @@ QString DicomUtils::find_file_from_uid(const QString & p, const QString & uid)
 	bool ok = scan_files_for_pr_image(p, uid, f);
 	if (ok) return f;
 	QDirIterator it(p, QDir::Dirs|QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-    while (it.hasNext())
+	while (it.hasNext())
 	{
 		ok = scan_files_for_pr_image(it.next(), uid, f);
 		if (ok) break;
@@ -10163,7 +10165,8 @@ QString DicomUtils::read_dicom(
 	const QWidget * settings,
 	QProgressDialog * pb,
 	bool pr_ref,
-	bool rt_ref)
+	bool rt_ref,
+	bool enh_original_frames)
 {
 	bool ok = false;
 	QString message_;
@@ -10381,8 +10384,8 @@ QString DicomUtils::read_dicom(
 		{
 			// Spectroscopy
 			if (!(pr_ref||rt_ref))
-			{	
-	    		const QString spect_message =
+			{
+				const QString spect_message =
 					SpectroscopyUtils::ProcessData(
 						ds, spectroscopy_images,
 						max_3d_tex_size, gl, ok3d, pb, tolerance);
@@ -10827,7 +10830,7 @@ QString DicomUtils::read_dicom(
 							{
 								if (k<slices_.size() && j<slices_.at(k).size())
 								{
-									const unsigned int id_0_ = slices_.at(k).at(j);				
+									const unsigned int id_0_ = slices_.at(k).at(j);
 									if (slices_instance_map.count(id_0_)>0)
 									{
 										const unsigned int id_1_ =
@@ -10995,10 +10998,9 @@ QString DicomUtils::read_dicom(
 						&ok,
 						images.at(x),
 						supp_color_images,
-						0,
-						NULL,
+						0, NULL, false,
 						false,
-						false,
+						enh_original_frames,
 						settings,
 						pb,
 						tolerance);
@@ -11022,10 +11024,9 @@ QString DicomUtils::read_dicom(
 							&ok,
 							images.at(x),
 							supp_grey_images,
-							max_3d_tex_size,
-							gl,
-							ok3d,
+							max_3d_tex_size, gl, ok3d,
 							false,
+							enh_original_frames,
 							settings,
 							pb,
 							tolerance,
@@ -11160,10 +11161,9 @@ QString DicomUtils::read_dicom(
 						&ok,
 						images.at(x),
 						ivariants,
-						max_3d_tex_size,
-						gl,
-						ok3d,
+						max_3d_tex_size, gl, ok3d,
 						false,
+						enh_original_frames,
 						settings,
 						pb,
 						tolerance,
@@ -11176,10 +11176,9 @@ QString DicomUtils::read_dicom(
 					&ok,
 					images.at(x),
 					ivariants,
-					0,
-					NULL,
+					0, NULL, false,
 					false,
-					false,
+					enh_original_frames,
 					settings,
 					pb,
 					tolerance,
