@@ -14,7 +14,7 @@
 #include "itkIntensityWindowingImageFilter.h"
 #include "itkMath.h"
 #include "contourutils.h"
-#include "colorspace/colorspace.h" 
+#include "colorspace/colorspace.h"
 
 GraphicsView::GraphicsView(QWidget * p) : QGraphicsView()
 {
@@ -84,13 +84,13 @@ GraphicsView::GraphicsView(QWidget * p) : QGraphicsView()
 	bottomHandle = new HandleItem(
 		this, handle_rect, HandleItem::BottomHandle);
 	bottomHandle->setParentItem(handle_rect);
-    handle_rect->setZValue(1e+19-5);
+	handle_rect->setZValue(1e+19-5);
 	handle_rect->hide();
 	scene_->addItem(handle_rect);
 	//
 	selection_item = new RectItem(0, 0, 100, 100);
 	selection_item->set_pen2(1.0);
-    selection_item->setZValue(1e+19-5);
+	selection_item->setZValue(1e+19-5);
 	scene_->addItem(selection_item);
 	selection_item->hide();
 	//
@@ -99,7 +99,7 @@ GraphicsView::GraphicsView(QWidget * p) : QGraphicsView()
 	xpen.setWidth(0);
 	line_x = new QGraphicsPathItem();
 	line_x->setPen(xpen);
-    line_x->setZValue(1e+19-4);
+	line_x->setZValue(1e+19-4);
 	scene_->addItem(line_x);
 	//
 	QPen ypen;
@@ -107,7 +107,7 @@ GraphicsView::GraphicsView(QWidget * p) : QGraphicsView()
 	ypen.setWidth(0);
 	line_y = new QGraphicsPathItem();
 	line_y->setPen(ypen);
-    line_y->setZValue(1e+19-3);
+	line_y->setZValue(1e+19-3);
 	scene_->addItem(line_y);
 	//
 	QPen zpen;
@@ -115,34 +115,34 @@ GraphicsView::GraphicsView(QWidget * p) : QGraphicsView()
 	zpen.setWidth(0);
 	line_z = new QGraphicsPathItem();
 	line_z->setPen(zpen);
-    line_z->setZValue(1e+19-2);
+	line_z->setZValue(1e+19-2);
 	scene_->addItem(line_z);
 	//
 	measurment_line = new QGraphicsPathItem();
-    measurment_line->setZValue(1e+19-1);
+	measurment_line->setZValue(1e+19-1);
 	scene_->addItem(measurment_line);
 	//
 	pr_area = new QGraphicsRectItem(0,0,100,100);
-    pr_area->setFlag(QGraphicsItem::ItemIsMovable, false);
-    pr_area->setFlag(QGraphicsItem::ItemIsFocusable, false);
-    pr_area->setAcceptHoverEvents(false);
-    pr_area->setAcceptedMouseButtons(0);
-    pr_area->setZValue(1e+19-6);
-    pr_area->hide();
+	pr_area->setFlag(QGraphicsItem::ItemIsMovable, false);
+	pr_area->setFlag(QGraphicsItem::ItemIsFocusable, false);
+	pr_area->setAcceptHoverEvents(false);
+	pr_area->setAcceptedMouseButtons(0);
+	pr_area->setZValue(1e+19-6);
+	pr_area->hide();
 	//QBrush pbrush(QColor(73, 45, 124));
 	QBrush pbrush(QColor(146, 90, 248));
 	QPen ppen;
 	ppen.setBrush(pbrush);
 	ppen.setWidth(0);
 	ppen.setStyle(Qt::SolidLine);
-    pr_area->setPen(ppen);
+	pr_area->setPen(ppen);
 	scene_->addItem(pr_area);
 	//
 	paint_brush = new QGraphicsPathItem();
-    paint_brush->setFlag(QGraphicsItem::ItemIsMovable, false);
-    paint_brush->setFlag(QGraphicsItem::ItemIsFocusable, false);
-    paint_brush->setAcceptHoverEvents(false);
-    paint_brush->setAcceptedMouseButtons(0);
+	paint_brush->setFlag(QGraphicsItem::ItemIsMovable, false);
+	paint_brush->setFlag(QGraphicsItem::ItemIsFocusable, false);
+	paint_brush->setAcceptHoverEvents(false);
+	paint_brush->setAcceptedMouseButtons(0);
 	QPen bpen;
 	bpen.setBrush(QBrush(QColor(Qt::blue))); //0xbc,0x86,0x2b
 	bpen.setWidth(0);
@@ -150,8 +150,8 @@ GraphicsView::GraphicsView(QWidget * p) : QGraphicsView()
 	bpen.setCapStyle(Qt::RoundCap);
 	bpen.setJoinStyle(Qt::RoundJoin);
 	paint_brush->setPen(bpen);
-    paint_brush->setZValue(1e+19);
-    paint_brush->hide();
+	paint_brush->setZValue(1e+19);
+	paint_brush->hide();
 	scene_->addItem(paint_brush);
 }
 
@@ -623,8 +623,8 @@ void GraphicsView::flip()
 void GraphicsView::animate_flip()
 {
 	if (!image_item) return;
-    if (m_angle >= 360) return;
-    m_angle += 10;
+	if (m_angle >= 360) return;
+	m_angle += 10;
 	QRectF r = image_item->boundingRect();
 	image_item->setTransform(QTransform()
 		.translate(r.width()/2.0, r.height()/2.0)
@@ -1549,9 +1549,8 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				prpolylines.push_back(i);
 			}
 		}
-		else if (t == QString("ELLIPSE"))
+		else if (t == QString("ELLIPSE")) // TODO more testing
 		{
-/*
 			if (l.at(x).GraphicData.size()!=8) continue;
 			double major0_x = 0.0;
 			double major0_y = 0.0;
@@ -1673,25 +1672,37 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				continue;
 			}
 			{
-				// TODO
-				// bb upper, lower
-				// center
-				// angle major-X
-
 				const double mid_major_x = (major0_x + major1_x)*0.5;
 				const double mid_major_y = (major0_y + major1_y)*0.5;
 				const double x0__ = major1_x - major0_x;
 				const double y0__ = major1_y - major0_y;
 				const double x1__ = minor1_x - minor0_x;
 				const double y1__ = minor1_y - minor0_y;
-				const double r0   = sqrt(x0__*x0__ + y0__*y0__)/2.0;
-				const double r1   = sqrt(x1__*x1__ + y1__*y1__)/2.0;
-				QGraphicsEllipseItem * i =
-					new QGraphicsEllipseItem(
-						mid_major_x - r0,
-						mid_major_y - r1,
-						2*r0,
-						2*r1);
+				const double d0 = 0.5*sqrt(x0__*x0__ + y0__*y0__);
+				const double d1 = 0.5*sqrt(x1__*x1__ + y1__*y1__);
+				const double ma_j = 1.0/(sqrt((x0__*x0__) + (y0__*y0__)));
+				const double ma_nx = x0__ * ma_j;
+				const double ma_ny = y0__ * ma_j;
+				const double mi_j = 1.0/(sqrt((x1__*x1__) + (y1__*y1__)));
+				const double mi_nx = x1__ * mi_j;
+				const double mi_ny = y1__ * mi_j;
+				const double start = 0.0;
+				const double span  = 360.0;
+				QGraphicsPathItem * i = new QGraphicsPathItem();
+				{
+					QTransform ttt;
+					ttt.translate(mid_major_x, mid_major_y);
+					i->setTransform(ttt, true);
+				}
+				{
+					QTransform ttt;
+					ttt.setMatrix(ma_nx, ma_ny, 0, -mi_nx, -mi_ny, 0, 0, 0, 1);
+					i->setTransform(ttt, true);
+				}
+				QRectF r___(-d0, -d1, 2.0*d0, 2.0*d1);
+				QPainterPath path;
+				path.arcMoveTo(r___, start);
+				path.arcTo(r___, start, span);
 #if 1
 				i->setFlag(QGraphicsItem::ItemIsMovable, false);
 #else
@@ -1717,11 +1728,11 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 					pen.setJoinStyle(Qt::RoundJoin);
 					i->setPen(pen);
 				}
+				i->setPath(path);
 				i->setZValue(1e+17);
 				scene()->addItem(static_cast<QGraphicsItem*>(i));
-				prcircles.push_back(i);
+				prellipses.push_back(i);
 			}
-*/
 		}
 		else if (t == QString("CIRCLE"))
 		{

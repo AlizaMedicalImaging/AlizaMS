@@ -455,7 +455,7 @@ MainWindow::MainWindow(
 	connect(browser_copy_act,               SIGNAL(triggered()),         browser2,SLOT(copy_files()));
 	connect(browser_load_act,               SIGNAL(triggered()),         this,    SLOT(load_dicom_series2()));
 	connect(meta_open_act,                  SIGNAL(triggered()),         sqtree,  SLOT(open_file()));
-    connect(tabWidget,                      SIGNAL(currentChanged(int)), this,    SLOT(tab_ind_changed(int)));
+	connect(tabWidget,                      SIGNAL(currentChanged(int)), this,    SLOT(tab_ind_changed(int)));
 	connect(imagesbox->actionDICOMMeta,     SIGNAL(triggered()),         this,    SLOT(trigger_image_dicom_meta()));
 	//
 	connect(settingswidget->styleComboBox,  SIGNAL(currentIndexChanged(QString)),this,SLOT(set_style(QString)));
@@ -957,30 +957,32 @@ void MainWindow::toggle_showgl(bool t)
 	}
 	if (frame2D->isHidden() && frame3D->isHidden())
 	{
-		if (!level_frame->isHidden())  level_frame->hide();
-		if (!zrange_frame->isHidden()) zrange_frame->hide();
+		level_frame->hide();
+		zrange_frame->hide();
 	}
 	else
 	{
-		if (level_frame->isHidden())  level_frame->show();
-		if (zrange_frame->isHidden()) zrange_frame->show();
+		level_frame->show();
+		zrange_frame->show();
 	}
+	qApp->processEvents();
 }
 
 void MainWindow::toggle_show2D(bool t)
 {
-	if (t) { frame2D->show(); }
-	else frame2D->hide();
+	if (t) frame2D->show();
+	else   frame2D->hide();
 	if (frame2D->isHidden() && frame3D->isHidden())
 	{
-		if (!level_frame->isHidden()) level_frame->hide();
-		if (!zrange_frame->isHidden()) zrange_frame->hide();
+		level_frame->hide();
+		zrange_frame->hide();
 	}
 	else
 	{
-		if (level_frame->isHidden()) level_frame->show();
-		if (zrange_frame->isHidden()) zrange_frame->show();
+		level_frame->show();
+		zrange_frame->show();
 	}
+	qApp->processEvents();
 }
 
 void MainWindow::toggle_graphicswidget_m_x(bool t)
@@ -1233,7 +1235,7 @@ void MainWindow::dropEvent(QDropEvent * e)
 			disconnect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
 			pb->close();
 			delete pb;
-			if (tabWidget->currentIndex()!=0) tabWidget->setCurrentIndex(0);	
+			if (tabWidget->currentIndex()!=0) tabWidget->setCurrentIndex(0);
 		}
 	}
 	mutex.unlock();
@@ -1243,7 +1245,7 @@ void MainWindow::dragEnterEvent(QDragEnterEvent * e)
 {
 	e->acceptProposedAction();
 }
- 
+
 void MainWindow::dragMoveEvent(QDragMoveEvent * e)
 {
 	e->acceptProposedAction();
@@ -1433,7 +1435,7 @@ void MainWindow::load_dicom_series2()
 	disconnect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
 	pb->close();
 	delete pb;
-	if (tabWidget->currentIndex()!=0) tabWidget->setCurrentIndex(0);	
+	if (tabWidget->currentIndex()!=0) tabWidget->setCurrentIndex(0);
 	qApp->processEvents();
 	mutex.unlock();
 }
@@ -1740,9 +1742,9 @@ void MainWindow::change_style(const QString & s)
 	if (s==QString("Dark Fusion"))
 	{
 		QColor bg(0x53, 0x59, 0x60);
-		QColor tt(0x30, 0x39, 0x47);	
+		QColor tt(0x30, 0x39, 0x47);
 		QPalette p;
-		p.setColor(QPalette::Window, bg); 
+		p.setColor(QPalette::Window, bg);
 		p.setColor(QPalette::WindowText, Qt::white);
 		p.setColor(QPalette::Text, Qt::white);
 		p.setColor(QPalette::Disabled, QPalette::WindowText, Qt::gray);
@@ -1754,7 +1756,7 @@ void MainWindow::change_style(const QString & s)
 		p.setColor(QPalette::Button, bg);
 		p.setColor(QPalette::ButtonText, Qt::white);
 		p.setColor(QPalette::BrightText, Qt::white);
-		p.setColor(QPalette::Link, Qt::darkBlue); 
+		p.setColor(QPalette::Link, Qt::darkBlue);
 		p.setColor(QPalette::Highlight, Qt::lightGray);
 		p.setColor(QPalette::HighlightedText, Qt::black);
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)

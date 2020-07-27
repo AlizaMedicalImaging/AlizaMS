@@ -48,7 +48,7 @@ public:
 	QList<QGraphicsPathItem*>    prpolylines;
 	QList<QGraphicsPathItem*>    printerpolated;
 	QList<QGraphicsEllipseItem*> prcircles;
-	QList<QGraphicsEllipseItem*> prellipses;
+	QList<QGraphicsPathItem*>    prellipses;
 	QList<QGraphicsEllipseItem*> prpoints;
 	QList<QGraphicsPathItem*>    display_shutters;
     void scale_view(double);
