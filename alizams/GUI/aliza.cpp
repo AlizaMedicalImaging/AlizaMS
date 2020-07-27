@@ -671,6 +671,7 @@ quit__:
 			imagesbox->listWidget->setCurrentRow(r);
 			update_selection2();
 			if (ok3d) glwidget->fit_to_screen(ivariants.at(x));
+			emit image_opened();
 		}
 		connect(imagesbox->listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(update_selection()));
 	}

@@ -457,7 +457,7 @@ MainWindow::MainWindow(
 	connect(meta_open_act,                  SIGNAL(triggered()),         sqtree,  SLOT(open_file()));
 	connect(tabWidget,                      SIGNAL(currentChanged(int)), this,    SLOT(tab_ind_changed(int)));
 	connect(imagesbox->actionDICOMMeta,     SIGNAL(triggered()),         this,    SLOT(trigger_image_dicom_meta()));
-	//
+	connect(aliza,                          SIGNAL(image_opened()),      this,    SLOT(set_image_view()));
 	connect(settingswidget->styleComboBox,  SIGNAL(currentIndexChanged(QString)),this,SLOT(set_style(QString)));
 	//
 	setAcceptDrops(true);
@@ -1235,7 +1235,6 @@ void MainWindow::dropEvent(QDropEvent * e)
 			disconnect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
 			pb->close();
 			delete pb;
-			if (tabWidget->currentIndex()!=0) tabWidget->setCurrentIndex(0);
 		}
 	}
 	mutex.unlock();
@@ -1300,10 +1299,6 @@ void MainWindow::load_any()
 	if (is_dicomdir)
 	{
 		if (tabWidget->currentIndex()!=1) tabWidget->setCurrentIndex(1);
-	}
-	else
-	{
-		if (tabWidget->currentIndex()!=0) tabWidget->setCurrentIndex(0);
 	}
 	qApp->processEvents();
 	mutex.unlock();
@@ -1435,7 +1430,6 @@ void MainWindow::load_dicom_series2()
 	disconnect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
 	pb->close();
 	delete pb;
-	if (tabWidget->currentIndex()!=0) tabWidget->setCurrentIndex(0);
 	qApp->processEvents();
 	mutex.unlock();
 }
@@ -1845,5 +1839,13 @@ void MainWindow::trigger_image_dicom_meta()
 	tabWidget->setCurrentIndex(2);
 	qApp->restoreOverrideCursor();
 	qApp->processEvents();
+}
+
+void MainWindow::set_image_view()
+{
+	if (tabWidget->currentIndex() != 0)
+	{
+		tabWidget->setCurrentIndex(0);
+	}
 }
 

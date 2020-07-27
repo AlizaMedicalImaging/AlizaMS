@@ -149,6 +149,7 @@ public slots:
 
 signals:
 	void report_load_to_mainwin();
+	void image_opened();
 
 private:
 	GLWidget       * glwidget;
