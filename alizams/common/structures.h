@@ -764,6 +764,32 @@ public:
 	void close(bool=true);
 };
 
+class SRImage
+{
+public:
+	SRImage() : sx(1.0), sy(1.0), p(NULL) {}
+	double sx;
+	double sy;
+	unsigned char * p;
+	QImage i;
+	SRImage & operator=(const SRImage & j)
+	{
+		sx = j.sx;
+		sy = j.sy;
+		p  = j.p;
+		i  = j.i;
+		return *this;
+	}
+	SRImage & operator=(SRImage & j)
+	{
+		sx = j.sx;
+		sy = j.sy;
+		p  = j.p;
+		i  = j.i;
+		return *this;
+	}
+};
+
 class ImageVariant
 {
 public:

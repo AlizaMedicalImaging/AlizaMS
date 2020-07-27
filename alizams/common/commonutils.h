@@ -100,6 +100,9 @@ public:
 	static void set_screenshot_dir(const QString&);
 	static QString get_screenshot_name(const QString&);
 	static QString get_screenshot_name2();
+	static QString get_save_dir();
+	static void set_save_dir(const QString&);
+	static QString get_save_name();
 	static QString get_open_dir();
 	static void set_open_dir(const QString&);
 	static QString apply_per_slice_rescale(

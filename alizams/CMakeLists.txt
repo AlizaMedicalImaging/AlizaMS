@@ -43,6 +43,7 @@ if(USE_QT_V_5)
   find_package(Qt5Core REQUIRED)
   find_package(Qt5Gui REQUIRED)
   find_package(Qt5Widgets REQUIRED)
+  find_package(Qt5PrintSupport REQUIRED)
   find_package(Qt5Svg REQUIRED)
   if(USE_WORKSTATION_MODE)
     find_package(Qt5Sql REQUIRED)
@@ -189,6 +190,7 @@ set(ALIZAMS_SRCS ${ALIZAMS_SRCS}
   dicom/prconfigutils.cpp
   dicom/splituihgridfilter.cpp
   dicom/spectroscopyutils.cpp
+  dicom/srutils.cpp
   CG/camera.cpp
   CG/glwidget.cpp
   CG/testgl.cpp
@@ -218,6 +220,7 @@ set(ALIZAMS_SRCS ${ALIZAMS_SRCS}
   GUI/zoomwidget.cpp
   GUI/findrefdialog.cpp
   GUI/imageinfodialog.cpp
+  GUI/srwidget.cpp
   browser/sqtree.cpp
   browser/browserwidget2.cpp
   GUI/aliza.cpp)
@@ -260,6 +263,7 @@ set(ALIZAMS_MOC_HRDS
   GUI/histogramview.h
   GUI/zoomwidget.h
   GUI/aboutwidget.h
+  GUI/srwidget.h
   GUI/aliza.h)
 
 if(USE_QT_V_5)
@@ -284,6 +288,7 @@ set(ALIZAMS_UIS
   GUI/animwidget.ui
   GUI/toolbox2D.ui
   GUI/sliderwidget.ui
+  GUI/srwidget.ui
   GUI/imageinfodialog.ui)
 
 if(USE_WORKSTATION_MODE)
@@ -330,6 +335,7 @@ if(USE_QT_V_5)
     Qt5::Core
     Qt5::Gui
     Qt5::Widgets
+	Qt5::PrintSupport
     Qt5::Svg)
   if(USE_WORKSTATION_MODE)
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} Qt5::Sql)

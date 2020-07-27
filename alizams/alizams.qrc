@@ -64,6 +64,8 @@
 		<file>bitmaps/collisions.svg</file>
 		<file>bitmaps/one.svg</file>
 		<file>bitmaps/ctk.svg</file>
+		<file>bitmaps/printer.svg</file>
+		<file>bitmaps/save2.svg</file>
     </qresource>
 </RCC>
 

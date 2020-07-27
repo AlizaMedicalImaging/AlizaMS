@@ -29,6 +29,8 @@ public:
 	bool    get_clean_unused_bits() const;
 	void    writeSettings(QSettings&);
 	float   get_scale_icons() const;
+	bool    get_sr_info() const;
+	int     get_sr_image_width() const;
 
 private:
 	int   saved_idx;

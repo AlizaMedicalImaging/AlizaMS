@@ -48,7 +48,6 @@ typedef itk::Image<RGBPixelUS,4> RGBImage4DTypeUS;
 typedef itk::Image<RGBPixelUC,4> RGBImage4DTypeUC;
 typedef itk::Image<RGBPixelF, 4> RGBImage4DTypeF;
 typedef itk::Image<RGBPixelD, 4> RGBImage4DTypeD;
-
 static QString screenshot_dir("");
 static QString save_dir("");
 static QString open_dir("");
@@ -3929,6 +3928,35 @@ QString CommonUtils::get_screenshot_name2()
 	return
 		QDateTime::currentDateTime().toString(
 			QString("yyyyMMdd-hhmmss"));
+}
+
+QString CommonUtils::get_save_dir()
+{
+	return QDir::toNativeSeparators(save_dir);
+}
+
+void CommonUtils::set_save_dir(const QString & s)
+{
+	if (s.isEmpty())
+#ifdef _WIN32
+		save_dir =
+			QDir::toNativeSeparators(
+				QDir::homePath() +
+				QDir::separator() +
+				QString("Desktop"));
+#else
+		save_dir =
+			QDir::toNativeSeparators(QDir::homePath());
+#endif
+	else
+		save_dir = QDir::toNativeSeparators(s);
+
+}
+
+QString CommonUtils::get_save_name()
+{
+	return QDateTime::currentDateTime().
+		toString(QString("yyyyMMdd-hhmmss"));
 }
 
 QString CommonUtils::get_open_dir()

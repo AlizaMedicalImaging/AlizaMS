@@ -96,6 +96,107 @@
             </widget>
            </item>
            <item>
+            <widget class="QGroupBox" name="groupBox_4">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="title">
+              <string>Structured Report</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_10">
+              <property name="margin">
+               <number>6</number>
+              </property>
+              <item>
+               <widget class="QCheckBox" name="srinfo_checkBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show internals of Structured Report (displayed green)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>Debug SR document</string>
+                </property>
+                <property name="checked">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_4">
+                <item>
+                 <widget class="QCheckBox" name="srscale_checkBox">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="toolTip">
+                   <string>Set SR image maximum width (px)</string>
+                  </property>
+                  <property name="text">
+                   <string>SR image max. width</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="srwidth_spinBox">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="toolTip">
+                   <string>Set SR image maximum width (px)</string>
+                  </property>
+                  <property name="frame">
+                   <bool>false</bool>
+                  </property>
+                  <property name="buttonSymbols">
+                   <enum>QAbstractSpinBox::PlusMinus</enum>
+                  </property>
+                  <property name="suffix">
+                   <string> px</string>
+                  </property>
+                  <property name="minimum">
+                   <number>64</number>
+                  </property>
+                  <property name="maximum">
+                   <number>16384</number>
+                  </property>
+                  <property name="value">
+                   <number>512</number>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_7">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
             <widget class="QGroupBox" name="groupBox_2">
              <property name="title">
               <string>Advanced</string>
@@ -226,8 +327,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>991</width>
-            <height>540</height>
+            <width>355</width>
+            <height>124</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -754,6 +855,8 @@
   <tabstop>scrollArea_3</tabstop>
   <tabstop>overlays_checkBox</tabstop>
   <tabstop>mosaic_checkBox</tabstop>
+  <tabstop>srscale_checkBox</tabstop>
+  <tabstop>srwidth_spinBox</tabstop>
   <tabstop>clean_unused_checkBox</tabstop>
   <tabstop>pet_no_level_checkBox</tabstop>
   <tabstop>time_s__checkBox</tabstop>
@@ -769,6 +872,7 @@
   <tabstop>f_no_radioButton</tabstop>
   <tabstop>f_bilinear_radioButton</tabstop>
   <tabstop>reload_pushButton</tabstop>
+  <tabstop>srinfo_checkBox</tabstop>
  </tabstops>
  <resources>
   <include location="../alizams.qrc"/>
@@ -851,6 +955,22 @@
     <hint type="destinationlabel">
      <x>23</x>
      <y>128</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>srscale_checkBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>srwidth_spinBox</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>181</x>
+     <y>184</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>249</x>
+     <y>181</y>
     </hint>
    </hints>
   </connection>

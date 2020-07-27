@@ -110,8 +110,17 @@ void SettingsWidget::set_default()
 	overlays_checkBox->setChecked(true);
 	clean_unused_checkBox->setChecked(false);
 	pet_no_level_checkBox->setChecked(false);
+	srinfo_checkBox->setChecked(false);
+	srscale_checkBox->blockSignals(true);
+	srscale_checkBox->setChecked(false);
+	srwidth_spinBox->setValue(512);
+	srwidth_spinBox->hide();
+	srscale_checkBox->blockSignals(false);
+	//
 	pt_doubleSpinBox->setEnabled(false);
-	disconnect(pt_doubleSpinBox,SIGNAL(valueChanged(double)),this,SLOT(update_font_pt(double)));
+	disconnect(
+		pt_doubleSpinBox,SIGNAL(valueChanged(double)),
+		this,SLOT(update_font_pt(double)));
 	pt_doubleSpinBox->setValue(0.0);
 }
 
@@ -176,6 +185,9 @@ void SettingsWidget::readSettings()
 	double tmp0 = settings.value(QString("enable_gl_3D"), 1).toInt();
 	double tmp1 = settings.value(QString("scale_ui_icons"), 1.0).toDouble();
 	double tmp2 = settings.value(QString("app_font_pt"), 0.0).toDouble();
+	const int tmp3  = settings.value(QString("sr_i_scale"), 0).toInt();
+	const int tmp4  = settings.value(QString("sr_i_width"), 512).toInt();
+	const int tmp5  = settings.value(QString("sr_info2"), 0).toInt();
 	settings.endGroup();
 	settings.beginGroup(QString("StyleDialog"));
 	saved_idx = settings.value(QString("saved_idx"), 0).toInt();
@@ -185,21 +197,41 @@ void SettingsWidget::readSettings()
 	if (tmp0==1)gl3D_checkBox->setChecked(true);
 	else        gl3D_checkBox->setChecked(false);
 	if (tmp2 < 6.0) tmp2 = 6.0; 
-	else tmp2 = f.pointSizeF();
+	else            tmp2 = f.pointSizeF();
 	pt_doubleSpinBox->setValue(tmp2);
+	if (tmp4 >= 64) srwidth_spinBox->setValue(tmp4);
+	else            srwidth_spinBox->setValue(512);
+	if (tmp3 == 1)
+	{
+		srscale_checkBox->blockSignals(true);
+		srscale_checkBox->setChecked(true);
+		srscale_checkBox->blockSignals(false);
+	}
+	else
+	{
+		srscale_checkBox->blockSignals(true);
+		srscale_checkBox->setChecked(false);
+		srwidth_spinBox->hide();
+		srscale_checkBox->blockSignals(false);
+	}
+	if (tmp5 == 1) srinfo_checkBox->setChecked(true);
+	else           srinfo_checkBox->setChecked(false);
 }
 
-void SettingsWidget::writeSettings(QSettings & settings)
+void SettingsWidget::writeSettings(QSettings & s)
 {
-	settings.beginGroup(QString("GlobalSettings"));
-	settings.setValue(QString("enable_gl_3D"), QVariant(gl3D_checkBox->isChecked() ? 1 : 0));
-	settings.setValue(QString("scale_ui_icons"), QVariant(si_doubleSpinBox->value()));
-	settings.setValue(QString("app_font_pt"), QVariant(pt_doubleSpinBox->value()));
-	settings.setValue( QString("stylename"), QVariant(styleComboBox->currentText().trimmed()));
-	settings.endGroup();
-	settings.beginGroup(QString("StyleDialog"));
-	settings.setValue( QString("saved_idx"), QVariant(styleComboBox->currentIndex()));
-	settings.endGroup();
+	s.beginGroup(QString("GlobalSettings"));
+	s.setValue(QString("enable_gl_3D"),  QVariant((int)(gl3D_checkBox->isChecked()?1:0)));
+	s.setValue(QString("scale_ui_icons"),QVariant(si_doubleSpinBox->value()));
+	s.setValue(QString("app_font_pt"),   QVariant(pt_doubleSpinBox->value()));
+	s.setValue(QString("stylename"),     QVariant(styleComboBox->currentText().trimmed()));
+	s.setValue(QString("sr_info2"),      QVariant((int)(srinfo_checkBox->isChecked() ?1:0)));
+	s.setValue(QString("sr_i_scale"),    QVariant((int)(srscale_checkBox->isChecked()?1:0)));
+	s.setValue(QString("sr_i_width"),    QVariant(srwidth_spinBox->value()));
+	s.endGroup();
+	s.beginGroup(QString("StyleDialog"));
+	s.setValue(QString("saved_idx"), QVariant(styleComboBox->currentIndex()));
+	s.endGroup();
 }
 
 float SettingsWidget::get_scale_icons() const
@@ -210,4 +242,15 @@ float SettingsWidget::get_scale_icons() const
 void SettingsWidget::force_no_gl3()
 {
 	gl3D_checkBox->setChecked(false);
+}
+
+bool SettingsWidget::get_sr_info() const
+{
+	return srinfo_checkBox->isChecked();
+}
+
+int SettingsWidget::get_sr_image_width() const
+{
+	if (!srscale_checkBox->isChecked()) return 0;
+	return srwidth_spinBox->value();
 }

@@ -12,6 +12,11 @@
 #include "codecutils.h"
 #include "contourutils.h"
 #include "prconfigutils.h"
+#include "srutils.h"
+#include "ultrasoundregiondata.h"
+#include "ultrasoundregionutils.h"
+#include "spectroscopydata.h"
+#include "spectroscopyutils.h"
 #include <itkImageSliceIteratorWithIndex.h>
 #include <itkImageRegionIterator.h>
 #include <itkImageRegionConstIterator.h>
@@ -61,10 +66,7 @@
 #include "iconutils.h"
 #include "updateqtcommand.h"
 #include "findrefdialog.h"
-#include "ultrasoundregiondata.h"
-#include "ultrasoundregionutils.h"
-#include "spectroscopydata.h"
-#include "spectroscopyutils.h"
+#include "srwidget.h"
 #include <iostream>
 #include <vector>
 #include <list>
@@ -10240,6 +10242,7 @@ QString DicomUtils::read_dicom(
 		unsigned short ba_ = 0, bs_ = 0, hb_ = 0;
 		short pr_ = -1;
 		bool localizer_ = false;
+		QFileInfo fi(filenames.at(x));
 		mdcm::Reader reader;
 		reader.SetFileName(
 			filenames.at(x).toLocal8Bit().constData());
@@ -10467,7 +10470,39 @@ QString DicomUtils::read_dicom(
 		{
 			if (!(pr_ref||rt_ref))
 			{
-				;;
+				const QString head3 = QString(
+					"<html><head><link rel='stylesheet'"
+					" type='text/css' href='format.css'></head><body>");
+				const QString foot3 = QString("</body></html>");
+				const bool srinfo = wsettings->get_sr_info();
+				QString t00080005;
+				get_string_value(
+					ds, mdcm::Tag(0x0008,0x0005), t00080005);
+				const QString s0 =
+					SRUtils::read_sr_title1(ds, t00080005);
+				if (pb) pb->hide();
+				SRWidget * sr =
+					new SRWidget(wsettings->get_scale_icons());
+				sr->setAttribute(Qt::WA_DeleteOnClose);
+				sr->setWindowTitle(s0);
+				const QString s1 =
+					head3 +
+					SRUtils::read_sr_content_sq(
+						ds,
+						t00080005,
+						fi.absolutePath(),
+						settings,
+						sr->textEdit,
+						pb,
+						sr->tmpfiles,
+						sr->srimages,
+						0,
+						srinfo,
+						true) +
+					foot3;
+				sr->textEdit->setHtml(s1);
+				sr->show();
+				sr->raise();
 			}
 			continue;
 		}
