@@ -360,6 +360,13 @@ public:
 	static void global_force_suppllut(
 		short);
 	static QString generate_id();
+	//
+	// Type of object processing
+	//
+	// 0
+	// 1 referenced in PR
+	// 2 referenced in RT
+	// 3 referenced in SR
 	static QString read_dicom(
 		std::vector<ImageVariant*> & ,
 		const QStringList&,
@@ -367,8 +374,7 @@ public:
 		ShaderObj*, bool,
 		const QWidget*,
 		QProgressDialog*,
-		bool,        // referenced in PR
-		bool,        // referenced in RT
+		short=0, // type of object processing
 		bool=false); // skip dimensions organization for enh, orig. frames
 };
 

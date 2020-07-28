@@ -358,8 +358,9 @@ void SRUtils::read_IMAGE(
 				ReferencedSOPInstanceUID.trimmed());
 			if (sf.isEmpty())
 			{
+				// FIXME
 				sf = DicomUtils::find_file_from_uid(
-					QDir::toNativeSeparators(path+QString("/..")), // FIXME
+					QDir::toNativeSeparators(path+QString("/..")),
 					ReferencedSOPInstanceUID);
 			}
 			if (info)
@@ -379,8 +380,7 @@ void SRUtils::read_IMAGE(
 				false,
 				wsettings,
 				pb,
-				false,
-				false,
+				3,
 				true);
 			if (e_.isEmpty() && ivariants.size()==1 && ivariants.at(0))
 			{
@@ -654,12 +654,12 @@ endpoints of the minor axis of an ellipse
 								const double y0__ = major1_y - major0_y;
 								const double x1__ = minor1_x - minor0_x;
 								const double y1__ = minor1_y - minor0_y;
-								const double d0 = 0.5*sqrt(x0__*x0__ + y0__*y0__);
-								const double d1 = 0.5*sqrt(x1__*x1__ + y1__*y1__);
-								const double ma_j = 1.0/(sqrt((x0__*x0__) + (y0__*y0__)));
+								const double d0   = sqrt(x0__*x0__ + y0__*y0__);
+								const double d1   = sqrt(x1__*x1__ + y1__*y1__);
+								const double ma_j = 1.0/d0;
 								const double ma_nx = x0__ * ma_j;
 								const double ma_ny = y0__ * ma_j;
-								const double mi_j = 1.0/(sqrt((x1__*x1__) + (y1__*y1__)));
+								const double mi_j = 1.0/d1;
 								const double mi_nx = x1__ * mi_j;
 								const double mi_ny = y1__ * mi_j;
 								const double start = 0.0;
@@ -680,7 +680,7 @@ endpoints of the minor axis of an ellipse
 										ttt.setMatrix(ma_nx, ma_ny, 0, -mi_nx, -mi_ny, 0, 0, 0, 1);
 										painter.setTransform(ttt, true);
 									}
-									QRectF r___(-d0, -d1, 2.0*d0, 2.0*d1);
+									QRectF r___(-0.5*d0, -0.5*d1, d0, d1);
 									QPainterPath path;
 									path.arcMoveTo(r___, start);
 									path.arcTo(r___, start, span);
@@ -758,21 +758,26 @@ endpoints of the minor axis of an ellipse
 					if (pm.p) delete [] pm.p;
 #endif
 #endif
-					s += QString("<img src=\"") + tmpfile +
-						QString("\" /><br />");
+					s += QString("<p style=\"margin-left: 0px\">") +
+						QString("<img src=\"") + tmpfile +
+						QString("\" /></p>");
 				}
 				else
 				{
-					std::cout
-						<< "SR IMAGE: error (1) "
-						<< e_.toStdString() << std::endl;
+					s += QString(
+						"<span class='red2'>"
+						"SR IMAGE: error (1) ") +
+						e_.trimmed() +
+						QString("</span><br />");
 				}
 			}
 			else
 			{
-				std::cout
-					<< "SR IMAGE: error (2) "
-					<< e_.toStdString() << std::endl;
+					s += QString(
+						"<span class='red2'>"
+						"SR IMAGE: error (1) ") +
+						e_.trimmed() +
+						QString("</span><br />");
 			}
 			for (size_t yy = 0; yy < ivariants.size(); yy++)
 			{
@@ -922,7 +927,8 @@ void SRUtils::read_PNAME(
 	const QString & charset,
 	QString & s)
 {
-	if(!nds.FindDataElement(mdcm::Tag(0x0040,0xa123))) return;
+	if(!nds.FindDataElement(mdcm::Tag(0x0040,0xa123)))
+		return;
 	const mdcm::DataElement & e2 =
 		nds.GetDataElement(mdcm::Tag(0x0040,0xa123));
 	if (
@@ -934,9 +940,13 @@ void SRUtils::read_PNAME(
 			e2.GetByteValue()->GetPointer(),
 			e2.GetByteValue()->GetLength());
 		QString TextValue =
-			CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
+			CodecUtils::toUTF8(
+				&ba,
+				charset.toLatin1().constData());
 		TextValue = TextValue.trimmed();
-		s += DicomUtils::convert_pn_value(TextValue) + QString("<br />");
+		s += QString("<span class='y'>") +
+			DicomUtils::convert_pn_value(TextValue) +
+			QString("</span><br />");
 	}
 }
 
@@ -945,7 +955,8 @@ void SRUtils::read_TEXT(
 	const QString & charset,
 	QString & s)
 {
-	if(!nds.FindDataElement(mdcm::Tag(0x0040,0xa160))) return;
+	if(!nds.FindDataElement(mdcm::Tag(0x0040,0xa160)))
+		return;
 	const mdcm::DataElement & e2 =
 		nds.GetDataElement(mdcm::Tag(0x0040,0xa160));
 	if (
@@ -959,7 +970,9 @@ void SRUtils::read_TEXT(
 		const QString TextValue =
 			CodecUtils::toUTF8(
 				&ba, charset.toLatin1().constData());
-		s += TextValue.trimmed() + QString("<br />");
+		s += QString("<span class='y'>") +
+			TextValue.trimmed() +
+			QString("</span><br />");
 	}
 }
 
@@ -968,99 +981,100 @@ void SRUtils::read_NUM(
 	const QString & charset,
 	QString & s)
 {
-	if (!nds.FindDataElement(mdcm::Tag(0x0040,0xa300))) return;
+	if (!nds.FindDataElement(mdcm::Tag(0x0040,0xa300)))
+		return;
 	const mdcm::DataElement & e3  =
 		nds.GetDataElement(mdcm::Tag(0x0040,0xa300));
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sq3 =
 		e3.GetValueAsSQ();
-	if (sq3)
+	if (!sq3) return;
+	for(unsigned int i3 = 0;
+		i3 < sq3->GetNumberOfItems();
+		i3++)
 	{
-		for(unsigned int i3 = 0;
-			i3 < sq3->GetNumberOfItems();
-			i3++)
+		const mdcm::Item & item3 = sq3->GetItem(i3+1);
+		const mdcm::DataSet & nds3 =
+			item3.GetNestedDataSet();
+		QString NumericValue;
+		if (DicomUtils::get_string_value(
+				nds3,
+				mdcm::Tag(0x0040,0xa30a),
+				NumericValue))
 		{
-			const mdcm::Item & item3 = sq3->GetItem(i3+1);
-			const mdcm::DataSet & nds3 =
-				item3.GetNestedDataSet();
-			QString NumericValue;
-			if (DicomUtils::get_string_value(
-					nds3,
-					mdcm::Tag(0x0040,0xa30a),
-					NumericValue))
+			QString unit("");
+			if (nds3.FindDataElement(
+					mdcm::Tag(0x0040,0x08ea)))
 			{
-				QString unit("");
-				if (nds3.FindDataElement(
-						mdcm::Tag(0x0040,0x08ea)))
+				const mdcm::DataElement & e5  =
+					nds3.GetDataElement(
+						mdcm::Tag(0x0040,0x08ea));
+				mdcm::SmartPointer<mdcm::SequenceOfItems>
+					sq5 =
+						e5.GetValueAsSQ();
+				if (sq5 && (sq5->GetNumberOfItems()==1))
 				{
-					const mdcm::DataElement & e5  =
-						nds3.GetDataElement(
-							mdcm::Tag(0x0040,0x08ea));
-					mdcm::SmartPointer<mdcm::SequenceOfItems>
-						sq5 =
-							e5.GetValueAsSQ();
-					if (sq5 && (sq5->GetNumberOfItems()==1))
+					const mdcm::Item & item5 =
+						sq5->GetItem(1);
+					const mdcm::DataSet & nds5 =
+						item5.GetNestedDataSet();
+					if (nds5.FindDataElement(
+							mdcm::Tag(0x0008,0x0104)))
 					{
-						const mdcm::Item & item5 =
-							sq5->GetItem(1);
-						const mdcm::DataSet & nds5 =
-							item5.GetNestedDataSet();
-						if (nds5.FindDataElement(
-								mdcm::Tag(0x0008,0x0104)))
+						const mdcm::DataElement & e7  =
+							nds5.GetDataElement(
+								mdcm::Tag(0x0008,0x0104));
+						if (
+							!e7.IsEmpty() &&
+							!e7.IsUndefinedLength() &&
+							e7.GetByteValue())
 						{
-							const mdcm::DataElement & e7  =
-								nds5.GetDataElement(
-									mdcm::Tag(0x0008,0x0104));
-							if (
-								!e7.IsEmpty() &&
-								!e7.IsUndefinedLength() &&
-								e7.GetByteValue())
-							{
-								QByteArray ba7(
-									e7.GetByteValue()->
-										GetPointer(),
-									e7.GetByteValue()->
-										GetLength());
-								const QString tmp5 =
-									CodecUtils::toUTF8(
-										&ba7,
-										charset
-											.toLatin1()
-											.constData());
-								unit = tmp5
-									.trimmed();
-							}
+							QByteArray ba7(
+								e7.GetByteValue()->
+									GetPointer(),
+								e7.GetByteValue()->
+									GetLength());
+							const QString tmp5 =
+								CodecUtils::toUTF8(
+									&ba7,
+									charset
+										.toLatin1()
+										.constData());
+							unit = tmp5
+								.trimmed();
 						}
-						if (nds5.FindDataElement(
-								mdcm::Tag(0x0008,0x0100)))
+					}
+					if (nds5.FindDataElement(
+							mdcm::Tag(0x0008,0x0100)))
+					{
+						const mdcm::DataElement & e7  =
+							nds5.GetDataElement(
+								mdcm::Tag(0x0008,0x0100));
+						if (
+							!e7.IsEmpty() &&
+							!e7.IsUndefinedLength() &&
+							e7.GetByteValue())
 						{
-							const mdcm::DataElement & e7  =
-								nds5.GetDataElement(
-									mdcm::Tag(0x0008,0x0100));
-							if (
-								!e7.IsEmpty() &&
-								!e7.IsUndefinedLength() &&
-								e7.GetByteValue())
-							{
-								QByteArray ba7(
-									e7.GetByteValue()->
-										GetPointer(),
-									e7.GetByteValue()->
-										GetLength());
-								const QString tmp5 =
-									CodecUtils::toUTF8(
-										&ba7,
-										charset
-											.toLatin1()
-											.constData());
-								unit += QString(" (") +
-									tmp5.trimmed() + QString(")");
-							}
+							QByteArray ba7(
+								e7.GetByteValue()->
+									GetPointer(),
+								e7.GetByteValue()->
+									GetLength());
+							const QString tmp5 =
+								CodecUtils::toUTF8(
+									&ba7,
+									charset
+										.toLatin1()
+										.constData());
+							unit += QString(" (") +
+								tmp5.trimmed() + QString(")");
 						}
 					}
 				}
-				s += NumericValue.trimmed() +
-					QString(" ") + unit + QString("<br />");
 			}
+			s += QString("<span class='y'>") +
+				NumericValue.trimmed() +
+				QString(" ") + unit +
+				QString("</span><br />");
 		}
 	}
 }
@@ -1110,8 +1124,12 @@ void SRUtils::read_CODE(
 			}
 		}
 	}
-	if (!CodeMeaning2.isEmpty()) s +=
-		CodeMeaning2 + QString("<br />");
+	if (!CodeMeaning2.isEmpty())
+	{
+		s += QString("<span class='y'>") +
+			CodeMeaning2 +
+			QString("</span><br />");
+	}
 }
 
 void SRUtils::read_DATE(const mdcm::DataSet & nds, QString & s)
@@ -1125,8 +1143,9 @@ void SRUtils::read_DATE(const mdcm::DataSet & nds, QString & s)
 		Date = Date.trimmed();
 		const QDate date_ =
 			QDate::fromString(Date, QString("yyyyMMdd"));
-		s +=  date_.toString(QString("d MMM yyyy"))
-			+ QString("<br />");
+		s += QString("<span class='y'>") +
+			date_.toString(QString("d MMM yyyy")) +
+			QString("</span><br />");
 	}
 }
 
@@ -1165,7 +1184,8 @@ void SRUtils::read_DATETIME(const mdcm::DataSet & nds, QString & s)
 			tmp0 = DateTime;
 		}
 	}
-	s += tmp0 + QString("<br />");
+	s += QString("<span class='y'>") +
+		tmp0 + QString("</span><br />");
 }
 
 void SRUtils::read_TIME(const mdcm::DataSet & nds, QString & s)
@@ -1203,7 +1223,8 @@ void SRUtils::read_TIME(const mdcm::DataSet & nds, QString & s)
 			tmp0 = Time;
 		}
 	}
-	s += tmp0 + QString("<br />");
+	s += QString("<span class='y'>") +
+		tmp0 + QString("</span><br />");
 }
 
 void SRUtils::read_SCOORD3D(const mdcm::DataSet & nds, QString & s)
@@ -1232,7 +1253,7 @@ void SRUtils::read_SCOORD3D(const mdcm::DataSet & nds, QString & s)
 			ReferencedFrameofReferenceUID))
 	{
 		ReferencedFrameofReferenceUID =
-			ReferencedFrameofReferenceUID.trimmed().remove(QChar('\0'));
+			ReferencedFrameofReferenceUID.trimmed();
 		s += QString("<span class='y'>") + ReferencedFrameofReferenceUID +
 			QString("</span><br />");
 	}
@@ -1242,7 +1263,7 @@ void SRUtils::read_SCOORD3D(const mdcm::DataSet & nds, QString & s)
 			mdcm::Tag(0x0070,0x031A),
 			FiducialUID))
 	{
-		FiducialUID = FiducialUID.trimmed().remove(QChar('\0'));
+		FiducialUID = FiducialUID.trimmed();
 		s += QString("<span class='y'>") +
 			FiducialUID +
 			QString("</span><br />");
@@ -1257,7 +1278,9 @@ QString SRUtils::read_UIDREF(const mdcm::DataSet & nds, QString & s)
 	{
 		return QString("");
 	}
-	s += UID.trimmed().remove(QChar('\0')) + QString("<br />");
+	s += QString("<span class='y'>") +
+		UID.trimmed().remove(QChar('\0')) +
+		QString("</span><br />");
 	return UID.trimmed();
 }
 
@@ -1343,14 +1366,18 @@ QStringList SRUtils::read_referenced(
 			if (!uidname.isEmpty())
 			{
 				uidname = uidname.trimmed();
-				s += QString("<span class='y'>") + uidname +
+				s += QString("<span class='y'>") +
+					uidname +
 					QString("</span><br />");
 			}
 			else
 			{
 				ReferencedSOPClassUID =
-					ReferencedSOPClassUID.trimmed().remove(QChar('\0'));
-				s += QString("<span class='y'>") + ReferencedSOPClassUID +
+					ReferencedSOPClassUID
+						.trimmed()
+						.remove(QChar('\0'));
+				s += QString("<span class='y'>") +
+					ReferencedSOPClassUID +
 					QString("</span><br />");
 			}
 		}
@@ -1414,6 +1441,12 @@ QString SRUtils::read_sr_content_sq(
 	const unsigned int nitems = sq->GetNumberOfItems();
 	for(unsigned int i = 0; i < nitems; ++i)
 	{
+		//
+		//
+		s += QString("<p style=\"margin-left: ") +
+			QVariant(indent).toString() +
+			QString("px\">");
+		//
 		//
 		QString ValueType;
 		QString RelationshipType;
@@ -1495,9 +1528,9 @@ QString SRUtils::read_sr_content_sq(
 			}
 			if (!CodeMeaning.isEmpty())
 			{
-				s +=
-					QString("<span class='y9'>") + CodeMeaning +
-						QString("</span><br />");
+				s += QString("<span class='y9'>") +
+					CodeMeaning +
+					QString("</span><br />");
 			}
 		}
 		if (DicomUtils::get_ul_values(
@@ -1522,7 +1555,8 @@ QString SRUtils::read_sr_content_sq(
 				s += QString(
 						"<span class='y3'>"
 						"Referenced Content Item Identifier: ") +
-					identifiers + QString("</span><br />");
+					identifiers +
+					QString("</span><br />");
 			}
 		}
 
@@ -1606,7 +1640,15 @@ QString SRUtils::read_sr_content_sq(
 				info,
 				wsettings,
 				pb);
-			if (continue_) continue;
+			if (continue_)
+			{
+				//
+				//
+				s += QString("</p>");
+				//
+				//
+				continue;
+			}
 		}
 		else if (ValueType == QString("SCOORD3D"))
 		{
@@ -1623,6 +1665,11 @@ QString SRUtils::read_sr_content_sq(
 					QString(" is skipped</span><br />");
 			}
 		}
+		//
+		//
+		s += QString("</p>");
+		//
+		//
 //
 //
 //
@@ -1638,10 +1685,7 @@ QString SRUtils::read_sr_content_sq(
 //
 		if (nds.FindDataElement(mdcm::Tag(0x0040,0xa730)))
 		{
-			const int x = indent + 16;
-			const QString xs = QVariant(x).toString();
-			s += QString("<p style=\"margin-left: ") + xs +
-				QString("px\">");
+			const int x = indent + 12;
 			s += read_sr_content_sq(
 				nds,
 				charset,
@@ -1653,7 +1697,6 @@ QString SRUtils::read_sr_content_sq(
 				srimages,
 				x,
 				info);
-			s += QString("</p>");
 		}
 //
 //

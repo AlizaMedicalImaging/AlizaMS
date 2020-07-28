@@ -1678,12 +1678,12 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				const double y0__ = major1_y - major0_y;
 				const double x1__ = minor1_x - minor0_x;
 				const double y1__ = minor1_y - minor0_y;
-				const double d0 = 0.5*sqrt(x0__*x0__ + y0__*y0__);
-				const double d1 = 0.5*sqrt(x1__*x1__ + y1__*y1__);
-				const double ma_j = 1.0/(sqrt((x0__*x0__) + (y0__*y0__)));
+				const double d0   = sqrt(x0__*x0__ + y0__*y0__);
+				const double d1   = sqrt(x1__*x1__ + y1__*y1__);
+				const double ma_j = 1.0/d0;
 				const double ma_nx = x0__ * ma_j;
 				const double ma_ny = y0__ * ma_j;
-				const double mi_j = 1.0/(sqrt((x1__*x1__) + (y1__*y1__)));
+				const double mi_j = 1.0/d1;
 				const double mi_nx = x1__ * mi_j;
 				const double mi_ny = y1__ * mi_j;
 				const double start = 0.0;
@@ -1699,7 +1699,7 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 					ttt.setMatrix(ma_nx, ma_ny, 0, -mi_nx, -mi_ny, 0, 0, 0, 1);
 					i->setTransform(ttt, true);
 				}
-				QRectF r___(-d0, -d1, 2.0*d0, 2.0*d1);
+				QRectF r___(-0.5*d0, -0.5*d1, d0, d1);
 				QPainterPath path;
 				path.arcMoveTo(r___, start);
 				path.arcTo(r___, start, span);

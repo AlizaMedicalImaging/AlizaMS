@@ -16,11 +16,13 @@
 
 const QString css3 = QString(
 	"span.red2 { color:#aa0505; font-size: small; font-weight: bold; }\n"
-	"span.y    { color:#050505; font-size: small; font-weight: bold; }\n"
+	"span.y    { color:#050505; }\n"
+	"span.yy   { color:#050505; font-size: small; font-weight: bold; }\n"
 	"span.y3   { color:#053005; font-size: small; font-style: italic; }\n"
 	"span.t1   { color:#050505; font-size: large; font-weight: bold; }\n"
 	"span.t2   { color:#050505; font-size: large; font-style: italic; }\n"
-	"span.y9   { color:#0d0d76; font-size: small; font-weight: bold; font-style: italic; }");
+	"span.y9   { color:#0d0d76; font-weight: bold; font-style: italic; }"
+	"span.yy9  { color:#0d0d76; font-size: small; font-weight: bold; font-style: italic; }");
 
 SRWidget::SRWidget(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
 {

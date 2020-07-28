@@ -9217,7 +9217,8 @@ bool DicomUtils::process_contrours_ref(
 						ivariants, detected_files_tmp,
 						max_3d_tex_size, gl, NULL, ok3d,
 						settings,
-						pb, false, true);
+						pb,
+						2);
 				if (!message_.isEmpty())
 				{
 					std::cout << message_.toStdString() << std::endl;
@@ -10166,8 +10167,7 @@ QString DicomUtils::read_dicom(
 	bool ok3d,
 	const QWidget * settings,
 	QProgressDialog * pb,
-	bool pr_ref,
-	bool rt_ref,
+	short load_type,
 	bool enh_original_frames)
 {
 	bool ok = false;
@@ -10217,7 +10217,6 @@ QString DicomUtils::read_dicom(
 	bool asked_about_modality_lut = false;
 	bool load_image_ref_contour = false;
 	const float tolerance = 0.01f;
-	const bool not_pr_ref = !pr_ref;
 	int count_images = 0;
 	int count_uid_errors = 0;
 	//
@@ -10279,7 +10278,7 @@ QString DicomUtils::read_dicom(
 #endif
 		{
 			// VL Whole Slide Microscopy Image Storage
-			if (!(pr_ref||rt_ref))
+			if (load_type == 0)
 			{
 				if (pb) pb->hide();
 				QMessageBox mbox;
@@ -10298,7 +10297,7 @@ QString DicomUtils::read_dicom(
 		else if (sop==QString("1.2.840.10008.5.1.4.1.1.481.3"))
 		{
 			// RTSTRUCT
-			if (!(pr_ref||rt_ref))
+			if (load_type == 0)
 			{
 				QFileInfo reffi(filenames.at(x));
 				rtstruct_ref_search_path =
@@ -10332,7 +10331,7 @@ QString DicomUtils::read_dicom(
 		else if (sop==QString("1.2.840.10008.5.1.4.1.1.11.1"))
 		{
 			// Grayscale Softcopy presentation
-			if (!(pr_ref||rt_ref))
+			if (load_type == 0)
 			{
 				grey_softcopy_pr_files.push_back(filenames.at(x));
 			}
@@ -10341,7 +10340,7 @@ QString DicomUtils::read_dicom(
 		else if (sop==QString("1.2.840.10008.5.1.4.1.1.11.2"))
 		{
 			// Color Softcopy presentation
-			if (!(pr_ref||rt_ref))
+			if (load_type == 0)
 			{
 				color_softcopy_pr_files.push_back(filenames.at(x));
 			}
@@ -10350,7 +10349,7 @@ QString DicomUtils::read_dicom(
 		else if (sop==QString("1.2.840.10008.5.1.4.1.1.11.3"))
 		{
 			// Pseudo-color Softcopy presentation
-			if (!(pr_ref||rt_ref))
+			if (load_type == 0)
 			{
 				pseudo_color_softcopy_pr_files.push_back(filenames.at(x));
 			}
@@ -10359,7 +10358,7 @@ QString DicomUtils::read_dicom(
 		else if (sop==QString("1.2.840.10008.5.1.4.1.1.11.4"))
 		{
 			// Blending Softcopy presentation
-			if (!(pr_ref||rt_ref))
+			if (load_type == 0)
 			{
 				blending_softcopy_pr_files.push_back(filenames.at(x));
 			}
@@ -10368,7 +10367,7 @@ QString DicomUtils::read_dicom(
 		else if (sop==QString("1.2.840.10008.5.1.4.1.1.11.5"))
 		{
 			// XA/XRF Softcopy presentation
-			if (!(pr_ref||rt_ref))
+			if (load_type == 0)
 			{
 				xaxrf_softcopy_pr_files.push_back(filenames.at(x));
 			}
@@ -10377,7 +10376,7 @@ QString DicomUtils::read_dicom(
 		else if (sop==QString("1.2.840.10008.5.1.4.1.1.11.8"))
 		{
 			// Advanced Blending Softcopy presentation
-			if (!(pr_ref||rt_ref))
+			if (load_type == 0)
 			{
 				advanced_blending_softcopy_pr_files.push_back(filenames.at(x));
 			}
@@ -10386,7 +10385,7 @@ QString DicomUtils::read_dicom(
 		else if (sop==QString("1.2.840.10008.5.1.4.1.1.4.2"))
 		{
 			// Spectroscopy
-			if (!(pr_ref||rt_ref))
+			if (load_type == 0)
 			{
 				const QString spect_message =
 					SpectroscopyUtils::ProcessData(
@@ -10417,7 +10416,7 @@ QString DicomUtils::read_dicom(
 		else if (sop==QString("1.2.840.10008.5.1.4.1.1.104.1"))
 		{
 			// PDF
-			if (!(pr_ref||rt_ref))
+			if (load_type == 0)
 			{
 				if (check_encapsulated(ds))
 					pdf_files.push_back(filenames.at(x));
@@ -10427,7 +10426,7 @@ QString DicomUtils::read_dicom(
 		else if (sop==QString("1.2.840.10008.5.1.4.1.1.104.3"))
 		{
 			// STL
-			if (!(pr_ref||rt_ref))
+			if (load_type == 0)
 			{
 				if (check_encapsulated(ds))
 					stl_files.push_back(filenames.at(x));
@@ -10440,7 +10439,7 @@ QString DicomUtils::read_dicom(
 		{
 			// Video Endoscopic Image Storage
 			// Video Photographic Image Storage
-			if (!(pr_ref||rt_ref))
+			if (load_type == 0)
 			{
 				video_files.push_back(filenames.at(x));
 			}
@@ -10468,7 +10467,7 @@ QString DicomUtils::read_dicom(
 			|| sop==QString("1.2.840.10008.5.1.4.1.1.88.75") // Performed Imaging Agent Administration SR Storage
 			)
 		{
-			if (!(pr_ref||rt_ref))
+			if (load_type == 0)
 			{
 				const QString head3 = QString(
 					"<html><head><link rel='stylesheet'"
@@ -10598,7 +10597,7 @@ QString DicomUtils::read_dicom(
 				{
 					if (force_suppllut == 0)
 					{
-						if (!pr_ref && has_supp_palette(ds))
+						if ((load_type == 0||load_type == 2) && has_supp_palette(ds))
 						{
 							if (!asked_about_supp_palette)
 							{
@@ -10915,12 +10914,9 @@ QString DicomUtils::read_dicom(
 		}
 	}
 	//
-	if (ultrasound)
+	if (ultrasound && (load_type == 0 || load_type == 3))
 	{
-		if (pr_ref) return QString(
-			"Presentation State is\n"
-			"not supported for Ultrasound");
-		if (rt_ref) return QString("");
+		// TODO PR for ultrasound
 		for (int x = 0; x < images.size(); x++)
 		{
 			if (pb) pb->setValue(-1);
@@ -10950,12 +10946,9 @@ QString DicomUtils::read_dicom(
 			}
 		}
 	}
-	else if (multiseries)
+	else if (multiseries && (load_type == 0))
 	{
-		if (pr_ref) return QString(
-			"Presentation State is\n"
-			"not supported for multiseries");
-		if (rt_ref) return QString("");
+		// TODO
 		for (int k = 0; k < extracted_images.size(); k++)
 		{
 			if (pb) pb->setValue(-1);
@@ -11023,7 +11016,7 @@ QString DicomUtils::read_dicom(
 		{
 			if (pb) pb->setValue(-1);
 			QApplication::processEvents();
-			if (not_pr_ref)
+			if (load_type == 0||load_type == 2)
 			{
 				bool supp_palette_failed = false;
 				if (supp_palette)
@@ -11221,97 +11214,87 @@ QString DicomUtils::read_dicom(
 			}
 		}
 	}
-	else if (mosaic)
+	else if (mosaic && (load_type == 0))
 	{
-		if (pr_ref) return QString(
-			"Presentation State is\n"
-			"not supported for mosaic image");
-		if (rt_ref) return QString("");
+		// TODO
+		for (int x = 0; x < images.size(); x++)
 		{
-			for (int x = 0; x < images.size(); x++)
+			if (pb) pb->setValue(-1);
+			QApplication::processEvents();
+			QStringList images_tmp;
+			images_tmp << images.at(x);
+			ImageVariant * ivariant = new ImageVariant(
+				CommonUtils::get_next_id(),
+				ok3d,
+				!wsettings->get_3d(),
+				gl,
+				0);
+			ivariant->di->filtering = wsettings->get_filtering();
+			message_ = read_series(
+				&ok,
+				false,
+				true,
+				false,
+				false,
+				ivariant,
+				images_tmp,
+				max_3d_tex_size,
+				gl,
+				ok3d,
+				settings,
+				pb,
+				tolerance,
+				true);
+			if (ok)
 			{
-				if (pb) pb->setValue(-1);
-				QApplication::processEvents();
-				QStringList images_tmp;
-				images_tmp << images.at(x);
-				ImageVariant * ivariant = new ImageVariant(
-					CommonUtils::get_next_id(),
-					ok3d,
-					!wsettings->get_3d(),
-					gl,
-					0);
-				ivariant->di->filtering = wsettings->get_filtering();
-				message_ = read_series(
-					&ok,
-					false,
-					true,
-					false,
-					false,
-					ivariant,
-					images_tmp,
-					max_3d_tex_size,
-					gl,
-					ok3d,
-					settings,
-					pb,
-					tolerance,
-					true);
-				if (ok)
-				{
-					ivariant->filenames = QStringList(images_tmp);
-					ivariants.push_back(ivariant);
-				}
-				else
-				{
-					delete ivariant;
-				}
+				ivariant->filenames = QStringList(images_tmp);
+				ivariants.push_back(ivariant);
+			}
+			else
+			{
+				delete ivariant;
 			}
 		}
 	}
-	else if (uihgrid)
+	else if (uihgrid && (load_type == 0))
 	{
-		if (pr_ref) return QString(
-			"Presentation State is\n"
-			"not supported for UIH Grid image");
-		if (rt_ref) return QString("");
+		// TODO
+		for (int x = 0; x < images.size(); x++)
 		{
-			for (int x = 0; x < images.size(); x++)
+			if (pb) pb->setValue(-1);
+			QApplication::processEvents();
+			QStringList images_tmp;
+			images_tmp << images.at(x);
+			ImageVariant * ivariant = new ImageVariant(
+				CommonUtils::get_next_id(),
+				ok3d,
+				!wsettings->get_3d(),
+				gl,
+				0);
+			ivariant->di->filtering = wsettings->get_filtering();
+			message_ = read_series(
+				&ok,
+				false,
+				false,
+				true,
+				false,
+				ivariant,
+				images_tmp,
+				max_3d_tex_size,
+				gl,
+				ok3d,
+				settings,
+				pb,
+				tolerance,
+				true);
+			if (ok)
 			{
-				if (pb) pb->setValue(-1);
-				QApplication::processEvents();
-				QStringList images_tmp;
-				images_tmp << images.at(x);
-				ImageVariant * ivariant = new ImageVariant(
-					CommonUtils::get_next_id(),
-					ok3d,
-					!wsettings->get_3d(),
-					gl,
-					0);
-				ivariant->di->filtering = wsettings->get_filtering();
-				message_ = read_series(
-					&ok,
-					false,
-					false,
-					true,
-					false,
-					ivariant,
-					images_tmp,
-					max_3d_tex_size,
-					gl,
-					ok3d,
-					settings,
-					pb,
-					tolerance,
-					true);
-				if (ok)
-				{
-					ivariant->filenames = QStringList(images_tmp);
-					ivariants.push_back(ivariant);
-				}
-				else
-				{
-					delete ivariant;
-				}
+				ivariant->filenames = QStringList(images_tmp);
+				ivariants.push_back(ivariant);
+			}
+			else
+			{
+				delete ivariant;
 			}
 		}
 	}
@@ -11323,7 +11306,7 @@ QString DicomUtils::read_dicom(
 			QApplication::processEvents();
 			QStringList images_tmp;
 			images_tmp << images.at(x);
-			if (not_pr_ref)
+			if (load_type == 0||load_type == 2)
 			{
 				ImageVariant * ivariant = new ImageVariant(
 					CommonUtils::get_next_id(),
@@ -11409,11 +11392,9 @@ QString DicomUtils::read_dicom(
 			}
 		}
 	}
-	else if (mixed)
+	else if (mixed && (load_type == 0||load_type == 2))
 	{
-		if (pr_ref) return QString(
-			"Presentation State is\n"
-			"not supported for mixed series");
+		// TODO
 		const mdcm::Tag tt(0x0008,0x0008);
 		const mdcm::Tag tr(0x0028,0x0010);
 		const mdcm::Tag tc(0x0028,0x0011);
@@ -11512,7 +11493,7 @@ QString DicomUtils::read_dicom(
 			{
 				images_tmp << images_ipp.at(j);
 			}
-			if (not_pr_ref)
+			if (load_type == 0||load_type == 2)
 			{
 				ImageVariant * ivariant = new ImageVariant(
 					CommonUtils::get_next_id(),
@@ -11610,7 +11591,7 @@ QString DicomUtils::read_dicom(
 			{
 				images_tmp << images_ipp.at(j);
 			}
-			if (not_pr_ref)
+			if (load_type == 0||load_type == 2)
 			{
 				ImageVariant * ivariant = new ImageVariant(
 					CommonUtils::get_next_id(),
@@ -11718,7 +11699,7 @@ QString DicomUtils::read_dicom(
 	}
 	//
 	//
-	if (pr_ref||rt_ref) { return message_; }
+	if (load_type != 0) return message_;
 	//
 	for (size_t x = 0; x < rtstructs.size(); x++)
 		ivariants.push_back(rtstructs[x]);
@@ -12019,8 +12000,7 @@ QString DicomUtils::read_dicom(
 						ok3d,
 						settings,
 						pb,
-						true,
-						false);
+						1);
 				for (unsigned int z = 0; z < ref_ivariants.size(); z++)
 				{
 					if (pb) pb->setValue(-1);
@@ -12186,8 +12166,7 @@ QString DicomUtils::read_dicom(
 							ok3d,
 							settings,
 							pb,
-							true,
-							false);
+							1);
 					for (unsigned int z = 0; z < ref_ivariants.size(); z++)
 					{
 						if (pb) pb->setValue(-1);
