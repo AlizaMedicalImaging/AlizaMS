@@ -21,8 +21,10 @@ public:
 	DicomUtils();
 	~DicomUtils();
 	static QString convert_pn_value(const QString&);
-	static QString get_pn_value(
-		const mdcm::DataSet&, const mdcm::Tag&);
+	static QString get_pn_value2(
+		const mdcm::DataSet&,
+		const mdcm::Tag&,
+		const char*);
 	static bool get_us_value(
 		const mdcm::DataSet&, const mdcm::Tag&,
 		unsigned short*);

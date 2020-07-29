@@ -1,3 +1,4 @@
+//
 #include "browserwidget2.h"
 #include <QFileDialog>
 #include <QFileInfo>
@@ -58,7 +59,7 @@ mdcm::VL BrowserWidget2::compute_offset0(const mdcm::DataSet & ds)
 {
 	mdcm::VL len = 0;
 	mdcm::DataSet::ConstIterator it = ds.Begin();
-	for(; it != ds.End() && it->GetTag() != mdcm::Tag(0x0004,0x1220); ++it)
+	for(; it != ds.End() && it->GetTag() != tDirectoryRecordSequence; ++it)
 	{
 		const mdcm::DataElement &de = *it;
 		len += de.GetLength<mdcm::ExplicitDataElement>();
@@ -674,8 +675,6 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 	QMap<unsigned int, EntryDICOMDIR> m;
 	const mdcm::FileMetaInformation & header = file.GetHeader();
 	const mdcm::DataSet & ds = file.GetDataSet();
-	// header.GetFullLength() includes Preamble(128) + Prefix (4)
-	const mdcm::VL start = header.GetFullLength() + compute_offset0(ds);
 	//
 	if (!ds.FindDataElement(tDirectoryRecordSequence))
 	{
@@ -691,6 +690,8 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 		QApplication::restoreOverrideCursor();
 		return QString("Directory Record Sequence is empty.");
 	}
+	// header.GetFullLength() includes Preamble(128) + Prefix (4)
+	const mdcm::VL start = header.GetFullLength() + compute_offset0(ds);
 	std::vector<unsigned int> offsets;
 	compute_offsets(sqDirectoryRecordSequence,start,offsets);
 	//
@@ -1126,7 +1127,9 @@ unsigned int BrowserWidget2::add_file(
 	{
 		s.eye = true;
 	}
-	else if(e.directoryRecordType==QString("PRESENTATION"))
+	else if(
+		e.directoryRecordType==QString("PRESENTATION") ||
+		e.directoryRecordType==QString("SR DOCUMENT"))
 	{
 		s.eye2 = true;
 	}
@@ -1278,15 +1281,45 @@ void BrowserWidget2::read_tags_(
 	bool is_image_tmp = has_rows && has_colums && has_bitallocated;
 	//
 	// RTSTRUCT, spectroscopy, meshes
-	if (sop == QString("1.2.840.10008.5.1.4.1.1.481.3") ||
-		sop == QString("1.2.840.10008.5.1.4.1.1.4.2")   ||
-		sop == QString("1.2.840.10008.5.1.4.1.1.68.1")  ||
-		sop == QString("1.2.840.10008.5.1.4.1.1.66.5"))
+	if (sop==QString("1.2.840.10008.5.1.4.1.1.481.3") ||
+		sop==QString("1.2.840.10008.5.1.4.1.1.4.2")   ||
+		sop==QString("1.2.840.10008.5.1.4.1.1.68.1")  ||
+		sop==QString("1.2.840.10008.5.1.4.1.1.66.5"))
 		is_image_tmp = true;
 	*is_image = is_image_tmp;
-	// Softcopy
-	if (sop == QString("1.2.840.10008.5.1.4.1.1.11.1") ||
-		sop == QString("1.2.840.10008.5.1.4.1.1.11.2"))
+	// Presentation, SR
+	if (   sop==QString("1.2.840.10008.5.1.4.1.1.11.1")  // Grayscale Softcopy Presentation State Storage
+#if 0
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.11.2")  // Color Softcopy Presentation State Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.11.3")  // Pseudo-Color Softcopy Presentation State Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.11.4")  // Blending Softcopy Presentation State Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.11.5")  // XA/XRF Grayscale Softcopy Presentation State Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.11.6")  // Grayscale Planar MPR Volumetric Presentation State Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.11.7")  // Compositing Planar MPR Volumetric Presentation State Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.11.8")  // Advanced Blending Presentation State Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.11.9")  // Volume Rendering Volumetric Presentation State Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.11.10") // Segmented Volume Rendering Volumetric Presentation State Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.11.11") // Multiple Volume Rendering Volumetric Presentation State Storage
+#endif
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.11") // Basic Text SR Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.22") // Enhanced SR Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.33") // Comprehensive SR Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.34") // Comprehensive 3D SR Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.35") // Extensible SR Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.40") // Procedure Log Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.50") // Mammography CAD SR Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.59") // Key Object Selection Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.65") // Chest CAD SR Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.67") // X-Ray Radiation Dose SR Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.68") // Radiopharmaceutical Radiation Dose SR Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.69") // Colon CAD SR Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.70") // Implantation Plan SR Document Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.71") // Acquisition Context SR Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.72") // Simplified Adult Echo SR Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.73") // Patient Radiation Dose SR Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.74") // Planned Imaging Agent Administration SR Storage
+		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.75") // Performed Imaging Agent Administration SR Storage
+		)
 		*is_softcopy = true;
 }
 

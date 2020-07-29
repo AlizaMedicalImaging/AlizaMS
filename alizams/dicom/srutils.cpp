@@ -766,7 +766,7 @@ endpoints of the minor axis of an ellipse
 				{
 					s += QString(
 						"<span class='red2'>"
-						"SR IMAGE: error (1) ") +
+						"IMAGE: error (1) ") +
 						e_.trimmed() +
 						QString("</span><br />");
 				}
@@ -775,7 +775,7 @@ endpoints of the minor axis of an ellipse
 			{
 					s += QString(
 						"<span class='red2'>"
-						"SR IMAGE: error (1) ") +
+						"IMAGE: error (1) ") +
 						e_.trimmed() +
 						QString("</span><br />");
 			}
@@ -1065,15 +1065,23 @@ void SRUtils::read_NUM(
 									charset
 										.toLatin1()
 										.constData());
-							unit += QString(" (") +
-								tmp5.trimmed() + QString(")");
+							if (unit.trimmed().toUpper() !=
+									QString("NO UNITS"))
+							{
+								unit += QString(" (") +
+									tmp5.trimmed() + QString(")");
+							}
 						}
 					}
 				}
 			}
+			const QString u =
+				(unit.trimmed().toUpper() !=
+					QString("NO UNITS"))
+				? unit : QString("");
 			s += QString("<span class='y'>") +
 				NumericValue.trimmed() +
-				QString(" ") + unit +
+				QString(" ") + u +
 				QString("</span><br />");
 		}
 	}
@@ -1288,23 +1296,11 @@ QString SRUtils::read_sr_title1(
 	const mdcm::DataSet & ds,
 	const QString & charset)
 {
-	const mdcm::Tag tpatientname(0x0010,0x0010);
-#if 1
-	QString s = DicomUtils::get_pn_value(ds, tpatientname);
-#else
-	QString s("<b>");
-	s += DicomUtils::get_pn_value(ds, tpatientname) + QString("</b>");
-	QString birthdate;
-	if (DicomUtils::get_string_value(ds,tbirthdate,birthdate))
-	{
-		birthdate = birthdate.trimmed();
-		const QDate qd =
-			QDate::fromString(birthdate, QString("yyyyMMdd"));
-		s += QString("    <i>") +
-				qd.toString(QString("d MMM yyyy")) +
-				QString("</i>");
-	}
-#endif
+	const QString s =
+		DicomUtils::get_pn_value2(
+			ds,
+			mdcm::Tag(0x0010,0x0010),
+			charset.toLatin1().constData());
 	return s;
 }
 
@@ -1312,21 +1308,50 @@ QString SRUtils::read_sr_title2(
 	const mdcm::DataSet & ds,
 	const QString & charset)
 {
-	QString s("");
-	const mdcm::Tag tpatientname(0x0010,0x0010);
-	const mdcm::Tag tbirthdate(0x0010,0x0030);
-	s += QString("<p><span class='t1'>") +
-		DicomUtils::get_pn_value(ds, tpatientname) +
-		QString("</span>");
-	QString birthdate;
-	if (DicomUtils::get_string_value(ds,tbirthdate,birthdate))
+	QString s("<p>");
+	if (ds.FindDataElement(
+		mdcm::Tag(0x0010,0x0010)))
 	{
-		birthdate = birthdate.trimmed();
+		s += QString("<span class='t1'>") +
+			DicomUtils::get_pn_value2(
+				ds,
+				mdcm::Tag(0x0010,0x0010),
+				charset.toLatin1().constData()) +
+			QString("</span>");
+	}
+	QString d;
+	if (DicomUtils::get_string_value(
+			ds,
+			mdcm::Tag(0x0010,0x0030),
+			d))
+	{
 		const QDate qd =
-			QDate::fromString(birthdate, QString("yyyyMMdd"));
-		s += QString(" <span class='t2'>") +
-				qd.toString(QString("d MMM yyyy")) +
-				QString("</span>");
+			QDate::fromString(
+				d.trimmed(),
+				QString("yyyyMMdd"));
+		s += QString("<br /><span class='yy'>") +
+			qd.toString(QString("d MMM yyyy")) +
+			QString("</span>");
+	}
+	QString id;
+	if (DicomUtils::get_string_value(
+			ds,
+			mdcm::Tag(0x0010,0x0020),
+			id))
+	{
+		s += QString("<br /><span class='yy'>") +
+			id.trimmed() +
+			QString("</span>");
+	}
+	if (ds.FindDataElement(
+		mdcm::Tag(0x0008,0x0090)))
+	{
+		s += QString("<br /><span class='yy'>Referring ") +
+			DicomUtils::get_pn_value2(
+				ds,
+				mdcm::Tag(0x0008,0x0090),
+				charset.toLatin1().constData()) +
+			QString("</span>");
 	}
 	s += QString("</p>");
 	return s;

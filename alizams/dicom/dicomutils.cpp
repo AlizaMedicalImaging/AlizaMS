@@ -185,36 +185,6 @@ bool Sorter2::StableSort(
 
 } // mdcm
 
-static QString save_dir = QString("");
-static QString get_save_dir()
-{
-	return QDir::toNativeSeparators(save_dir);
-}
-
-static void set_save_dir(const QString & s)
-{
-	if (s.isEmpty())
-#ifdef _WIN32
-		save_dir =
-			QDir::toNativeSeparators(
-				QDir::homePath() +
-				QDir::separator() +
-				QString("Desktop"));
-#else
-		save_dir =
-			QDir::toNativeSeparators(QDir::homePath());
-#endif
-	else
-		save_dir = QDir::toNativeSeparators(s);
-
-}
-
-static QString get_save_name()
-{
-	return QDateTime::currentDateTime().
-		toString(QString("yyyyMMdd-hhmmss"));
-}
-
 static bool sort0_(
 	mdcm::DataSet const & ds1,
 	mdcm::DataSet const & ds2)
@@ -1121,12 +1091,11 @@ QString DicomUtils::convert_pn_value(const QString & n)
 	return s;
 }
 
-QString DicomUtils::get_pn_value(
-	const mdcm::DataSet & ds, const mdcm::Tag & t)
+QString DicomUtils::get_pn_value2(
+	const mdcm::DataSet & ds,
+	const mdcm::Tag & t,
+	const char * charset)
 {
-	if(!ds.FindDataElement(t)) return QString("");
-	QString t00080005("");
-	get_string_value(ds, mdcm::Tag(0x0008,0x0005), t00080005);
 	const mdcm::DataElement & e = ds.GetDataElement(t);
 	if (e.IsEmpty()||e.IsUndefinedLength()) return QString("");
 	const mdcm::ByteValue * bv = e.GetByteValue();
@@ -1134,7 +1103,7 @@ QString DicomUtils::get_pn_value(
 	const QByteArray ba(bv->GetPointer(), bv->GetLength());
 	const QString tmp0 = CodecUtils::toUTF8(
 		&ba,
-		t00080005.toLatin1().constData());
+		charset);
 	return convert_pn_value(tmp0);
 }
 
@@ -11877,9 +11846,9 @@ QString DicomUtils::read_dicom(
 				NULL,
 				QString("Select file"),
 				QDir::toNativeSeparators(
-					get_save_dir() +
+					CommonUtils::get_save_dir() +
 					QDir::separator() +
-					get_save_name() +
+					CommonUtils::get_save_name() +
 					QString(".pdf")),
 				QString("All Files (*)"),
 				(QString*)NULL
@@ -11888,7 +11857,7 @@ QString DicomUtils::read_dicom(
 			if (!pdff.isEmpty())
 			{
 				QFileInfo fi(pdff);
-				set_save_dir(
+				CommonUtils::set_save_dir(
 					QDir::toNativeSeparators(fi.absolutePath()));
 				write_encapsulated(
 					QDir::toNativeSeparators(pdf_files.at(x)),
@@ -11908,9 +11877,9 @@ QString DicomUtils::read_dicom(
 				NULL,
 				QString("Select file"),
 				QDir::toNativeSeparators(
-					get_save_dir() +
+					CommonUtils::get_save_dir() +
 					QDir::separator() +
-					get_save_name() +
+					CommonUtils::get_save_name() +
 					QString(".stl")),
 				QString("All Files (*)"),
 				(QString*)NULL
@@ -11919,7 +11888,7 @@ QString DicomUtils::read_dicom(
 			if (!stlf.isEmpty())
 			{
 				QFileInfo fi(stlf);
-				set_save_dir(
+				CommonUtils::set_save_dir(
 					QDir::toNativeSeparators(fi.absolutePath()));
 				write_encapsulated(
 					QDir::toNativeSeparators(stl_files.at(x)),
@@ -11944,9 +11913,9 @@ QString DicomUtils::read_dicom(
 					NULL,
 					QString("Select file"),
 					QDir::toNativeSeparators(
-						get_save_dir() +
+						CommonUtils::get_save_dir() +
 						QDir::separator() +
-						get_save_name() +
+						CommonUtils::get_save_name() +
 						suf),
 					QString("All Files (*)"),
 					(QString*)NULL
@@ -11955,7 +11924,7 @@ QString DicomUtils::read_dicom(
 			if (!video_file_name.isEmpty())
 			{
 				QFileInfo fi(video_file_name);
-				set_save_dir(
+				CommonUtils::set_save_dir(
 					QDir::toNativeSeparators(fi.absolutePath()));
 				write_mpeg(
 					tmp943,
