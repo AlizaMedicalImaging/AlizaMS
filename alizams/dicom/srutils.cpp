@@ -287,6 +287,9 @@ void SRUtils::read_IMAGE(
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sq8 =
 		e8.GetValueAsSQ();
 	if (!sq8) return;
+	const SettingsWidget * settings =
+		static_cast<const SettingsWidget*>(wsettings);
+	const bool skip_images = settings->get_sr_skip_images();
 	const unsigned int nitems8 = sq8->GetNumberOfItems();
 	for(unsigned int i8 = 0; i8 < nitems8; ++i8)
 	{
@@ -340,6 +343,13 @@ void SRUtils::read_IMAGE(
 					ReferencedSOPInstanceUID.trimmed() +
 					QString("</span><br />");
 			}
+			else if (skip_images)
+			{
+				s += QString("<span class='yy'>IMAGE: ") +
+					ReferencedSOPInstanceUID.trimmed() +
+					QString("</span><br />");
+			}
+			if (skip_images) continue;
 			int idx = 0;
 			std::vector<int> refframes;
 			if (DicomUtils::get_is_values(
@@ -576,13 +586,6 @@ endpoints of the minor axis of an ellipse
 									painter.drawPath(pp);
 									painter.end();
 								}
-								if (info)
-								{
-									s += QString(
-										"<span class='y3'>"
-										"POLYLINE</span><br />");
-								}
-
 							}
 							else if (
 								sg.GraphicType == QString("POINT") ||
@@ -601,12 +604,6 @@ endpoints of the minor axis of an ellipse
 										6);
 								}
 								painter.end();
-								if (info)
-								{
-									s += QString("<span class='y3'>") +
-										sg.GraphicType.trimmed() +
-										QString("CIRCLE</span><br />");
-								}
 							}
 							else if (sg.GraphicType == QString("CIRCLE"))
 							{
@@ -631,12 +628,6 @@ endpoints of the minor axis of an ellipse
 									2*distance,
 									2*distance);
 								painter.end();
-								if (info)
-								{
-									s += QString(
-										"<span class='y3'>"
-										"CIRCLE</span><br />");
-								}
 							}
 							else if (sg.GraphicType == QString("ELLIPSE"))
 							{
@@ -688,18 +679,12 @@ endpoints of the minor axis of an ellipse
 									painter.restore();
 								}
 								painter.end();
-								if (info)
-								{
-									s += QString(
-										"<span class='y3'>"
-										"ELLIPSE</span><br />");
-								}
 							}
 							else // error
 							{
 								s += QString("<span class='red2'>") +
 									sg.GraphicType +
-									QString("</span><br />");
+									QString(" skipped</span><br />");
 							}
 						}
 					}
@@ -720,8 +705,6 @@ endpoints of the minor axis of an ellipse
 							Qt::SmoothTransformation);
 						pm.i = si;
 					}
-					const SettingsWidget * settings =
-						static_cast<const SettingsWidget*>(wsettings);
 					const int max_width = settings->get_sr_image_width();
 					if (max_width >= 64 && pm.i.width() > max_width)
 					{
@@ -764,20 +747,24 @@ endpoints of the minor axis of an ellipse
 				}
 				else
 				{
-					s += QString(
-						"<span class='red2'>"
-						"IMAGE: error (1) ") +
+					s += QString("<span class='yy'>") +
+						QString("IMAGE: ") + ReferencedSOPInstanceUID +
+						QString(
+							"</span><br /><span class='red2'>"
+							"IMAGE: error (1) ") +
 						e_.trimmed() +
 						QString("</span><br />");
 				}
 			}
 			else
 			{
-					s += QString(
-						"<span class='red2'>"
-						"IMAGE: error (1) ") +
-						e_.trimmed() +
-						QString("</span><br />");
+				s += QString("<span class='yy'>") +
+					QString("IMAGE: ") + ReferencedSOPInstanceUID +
+					QString(
+						"</span><br /><span class='red2'>"
+						"IMAGE: error (2) ") +
+					e_.trimmed() +
+					QString("</span><br />");
 			}
 			for (size_t yy = 0; yy < ivariants.size(); yy++)
 			{
@@ -805,6 +792,9 @@ bool SRUtils::read_SCOORD(
 	const QWidget * wsettings,
 	QProgressDialog * pb)
 {
+	const SettingsWidget * settings =
+		static_cast<const SettingsWidget*>(wsettings);
+	const bool skip_images = settings->get_sr_skip_images();
 	QString GraphicType;
 	if (DicomUtils::get_string_value(
 			nds,
@@ -812,6 +802,9 @@ bool SRUtils::read_SCOORD(
 			GraphicType))
 	{
 		GraphicType = GraphicType.trimmed();
+		s += QString("<span class='yy'>") +
+			GraphicType +
+			QString("</span><br />");
 	}
 	std::vector<float> GraphicData;
 	DicomUtils::get_fl_values(
@@ -876,7 +869,7 @@ bool SRUtils::read_SCOORD(
 				{
 					RelationshipType = RelationshipType.trimmed().toUpper();
 				}
-				if (
+				if (!skip_images &&
 					ValueType == QString("IMAGE")
 #if 1
 					&& RelationshipType == QString("SELECTED FROM")

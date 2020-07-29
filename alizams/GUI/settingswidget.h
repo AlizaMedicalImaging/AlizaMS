@@ -32,6 +32,7 @@ public:
 	bool    get_sr_info() const;
 	int     get_sr_image_width() const;
 	bool    get_sr_chapters() const;
+	bool    get_sr_skip_images() const;
 
 private:
 	int   saved_idx;

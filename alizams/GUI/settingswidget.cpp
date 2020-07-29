@@ -116,6 +116,8 @@ void SettingsWidget::set_default()
 	srwidth_spinBox->setValue(512);
 	srwidth_spinBox->hide();
 	srscale_checkBox->blockSignals(false);
+	srchapters_checkBox->setChecked(false);
+	srskipimage_checkBox->setChecked(false);
 	//
 	pt_doubleSpinBox->setEnabled(false);
 	disconnect(
@@ -182,20 +184,21 @@ void SettingsWidget::readSettings()
 		QApplication::applicationName());
 	settings.setFallbacksEnabled(true);
 	settings.beginGroup(QString("GlobalSettings"));
-	double tmp0 = settings.value(QString("enable_gl_3D"), 1).toInt();
-	double tmp1 = settings.value(QString("scale_ui_icons"), 1.0).toDouble();
-	double tmp2 = settings.value(QString("app_font_pt"), 0.0).toDouble();
-	const int tmp3  = settings.value(QString("sr_i_scale"), 0).toInt();
-	const int tmp4  = settings.value(QString("sr_i_width"), 512).toInt();
-	const int tmp5  = settings.value(QString("sr_info2"), 0).toInt();
+	const int tmp0  = settings.value(QString("enable_gl_3D"),    1).toInt();
+	double tmp1     = settings.value(QString("scale_ui_icons"),1.0).toDouble();
+	double tmp2     = settings.value(QString("app_font_pt"),   0.0).toDouble();
+	const int tmp3  = settings.value(QString("sr_i_scale"),      0).toInt();
+	const int tmp4  = settings.value(QString("sr_i_width"),    512).toInt();
+	const int tmp5  = settings.value(QString("sr_info2"),        0).toInt();
+	const int tmp6  = settings.value(QString("sr_chapters"),     0).toInt();
+	const int tmp7  = settings.value(QString("sr_skip_images"),  0).toInt();
 	settings.endGroup();
 	settings.beginGroup(QString("StyleDialog"));
 	saved_idx = settings.value(QString("saved_idx"), 0).toInt();
 	settings.endGroup();
 	si_doubleSpinBox->setValue(tmp1);
 	QFont f = QApplication::font();
-	if (tmp0==1)gl3D_checkBox->setChecked(true);
-	else        gl3D_checkBox->setChecked(false);
+	gl3D_checkBox->setChecked((tmp0==1));
 	if (tmp2 < 6.0) tmp2 = 6.0; 
 	else            tmp2 = f.pointSizeF();
 	pt_doubleSpinBox->setValue(tmp2);
@@ -214,8 +217,9 @@ void SettingsWidget::readSettings()
 		srwidth_spinBox->hide();
 		srscale_checkBox->blockSignals(false);
 	}
-	if (tmp5 == 1) srinfo_checkBox->setChecked(true);
-	else           srinfo_checkBox->setChecked(false);
+	srinfo_checkBox->setChecked((tmp5 == 1));
+	srchapters_checkBox->setChecked((tmp6 == 1));
+	srskipimage_checkBox->setChecked((tmp7 == 1));
 }
 
 void SettingsWidget::writeSettings(QSettings & s)
@@ -228,6 +232,8 @@ void SettingsWidget::writeSettings(QSettings & s)
 	s.setValue(QString("sr_info2"),      QVariant((int)(srinfo_checkBox->isChecked() ?1:0)));
 	s.setValue(QString("sr_i_scale"),    QVariant((int)(srscale_checkBox->isChecked()?1:0)));
 	s.setValue(QString("sr_i_width"),    QVariant(srwidth_spinBox->value()));
+	s.setValue(QString("sr_chapters"),   QVariant((int)(srchapters_checkBox->isChecked()?1:0)));
+	s.setValue(QString("sr_skip_images"),QVariant((int)(srskipimage_checkBox->isChecked()?1:0)));
 	s.endGroup();
 	s.beginGroup(QString("StyleDialog"));
 	s.setValue(QString("saved_idx"), QVariant(styleComboBox->currentIndex()));
@@ -258,4 +264,9 @@ int SettingsWidget::get_sr_image_width() const
 bool SettingsWidget::get_sr_chapters() const
 {
 	return srchapters_checkBox->isChecked();
+}
+
+bool SettingsWidget::get_sr_skip_images() const
+{
+	return srskipimage_checkBox->isChecked();
 }
