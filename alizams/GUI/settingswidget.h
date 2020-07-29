@@ -31,6 +31,7 @@ public:
 	float   get_scale_icons() const;
 	bool    get_sr_info() const;
 	int     get_sr_image_width() const;
+	bool    get_sr_chapters() const;
 
 private:
 	int   saved_idx;

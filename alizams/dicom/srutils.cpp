@@ -1346,12 +1346,17 @@ QString SRUtils::read_sr_title2(
 	if (ds.FindDataElement(
 		mdcm::Tag(0x0008,0x0090)))
 	{
-		s += QString("<br /><span class='yy'>Referring ") +
+		const QString tmp0 =
 			DicomUtils::get_pn_value2(
 				ds,
 				mdcm::Tag(0x0008,0x0090),
-				charset.toLatin1().constData()) +
-			QString("</span>");
+				charset.toLatin1().constData());
+		if (!tmp0.isEmpty())
+		{
+			s += QString("<br /><span class='yy'>Referring ") +
+				tmp0 +
+				QString("</span>");
+		}
 	}
 	s += QString("</p>");
 	return s;
@@ -1449,6 +1454,7 @@ QString SRUtils::read_sr_content_sq(
 	std::vector<SRImage> & srimages,
 	int indent,
 	bool info,
+	const QString & chapter,
 	bool title)
 {
 	if (!ds.FindDataElement(mdcm::Tag(0x0040,0xa730)))
@@ -1459,13 +1465,18 @@ QString SRUtils::read_sr_content_sq(
 		e.GetValueAsSQ();
 	if (!sq) return QString("");
 	QString s("");
-	if (title)
-	{
-		s += read_sr_title2(ds, charset);
-	}
+	if (title) s += read_sr_title2(ds, charset);
+	QString tmp_chapter("");
+	const SettingsWidget * settings =
+		static_cast<const SettingsWidget*>(wsettings);
+	const bool print_chapters = settings->get_sr_chapters();
 	const unsigned int nitems = sq->GetNumberOfItems();
 	for(unsigned int i = 0; i < nitems; ++i)
 	{
+		const QString cs =
+			(!chapter.isEmpty())
+			? (chapter + QString(".") + QVariant(i+1).toString())
+			: (QVariant(i+1).toString());
 		//
 		//
 		s += QString("<p style=\"margin-left: ") +
@@ -1473,6 +1484,12 @@ QString SRUtils::read_sr_content_sq(
 			QString("px\">");
 		//
 		//
+		if (print_chapters)
+		{
+			s += QString("<span class='yy'>") +
+				cs +
+				QString("</span><br />");
+		}
 		QString ValueType;
 		QString RelationshipType;
 		QString ContinuityOfContent;
@@ -1710,7 +1727,7 @@ QString SRUtils::read_sr_content_sq(
 //
 		if (nds.FindDataElement(mdcm::Tag(0x0040,0xa730)))
 		{
-			const int x = indent + 12;
+			const int x = indent + 16;
 			s += read_sr_content_sq(
 				nds,
 				charset,
@@ -1721,7 +1738,8 @@ QString SRUtils::read_sr_content_sq(
 				tmpfiles,
 				srimages,
 				x,
-				info);
+				info,
+				cs);
 		}
 //
 //

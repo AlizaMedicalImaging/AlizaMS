@@ -254,3 +254,8 @@ int SettingsWidget::get_sr_image_width() const
 	if (!srscale_checkBox->isChecked()) return 0;
 	return srwidth_spinBox->value();
 }
+
+bool SettingsWidget::get_sr_chapters() const
+{
+	return srchapters_checkBox->isChecked();
+}

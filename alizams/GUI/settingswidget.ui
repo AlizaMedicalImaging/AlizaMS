@@ -111,6 +111,22 @@
                <number>6</number>
               </property>
               <item>
+               <widget class="QCheckBox" name="srchapters_checkBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show numbers for sections of tree&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>Show chapters</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QCheckBox" name="srinfo_checkBox">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -327,8 +343,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>355</width>
-            <height>124</height>
+            <width>991</width>
+            <height>540</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -555,8 +571,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>482</width>
-            <height>244</height>
+            <width>991</width>
+            <height>540</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -855,6 +871,8 @@
   <tabstop>scrollArea_3</tabstop>
   <tabstop>overlays_checkBox</tabstop>
   <tabstop>mosaic_checkBox</tabstop>
+  <tabstop>srchapters_checkBox</tabstop>
+  <tabstop>srinfo_checkBox</tabstop>
   <tabstop>srscale_checkBox</tabstop>
   <tabstop>srwidth_spinBox</tabstop>
   <tabstop>clean_unused_checkBox</tabstop>
@@ -872,7 +890,6 @@
   <tabstop>f_no_radioButton</tabstop>
   <tabstop>f_bilinear_radioButton</tabstop>
   <tabstop>reload_pushButton</tabstop>
-  <tabstop>srinfo_checkBox</tabstop>
  </tabstops>
  <resources>
   <include location="../alizams.qrc"/>

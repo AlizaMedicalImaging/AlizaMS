@@ -10414,7 +10414,6 @@ QString DicomUtils::read_dicom(
 			}
 			continue;
 		}
-#if 1
 		else if (
 			   sop==QString("1.2.840.10008.5.1.4.1.1.88.11") // Basic Text SR Storage
 			|| sop==QString("1.2.840.10008.5.1.4.1.1.88.22") // Enhanced SR Storage
@@ -10466,6 +10465,7 @@ QString DicomUtils::read_dicom(
 						sr->srimages,
 						0,
 						srinfo,
+						QString(""),
 						true) +
 					foot3;
 				sr->textEdit->setHtml(s1);
@@ -10474,7 +10474,6 @@ QString DicomUtils::read_dicom(
 			}
 			continue;
 		}
-#endif
 		//
 		if (is_image(
 				ds,

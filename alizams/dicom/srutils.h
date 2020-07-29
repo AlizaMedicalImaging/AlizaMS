@@ -73,6 +73,7 @@ public:
 		std::vector<SRImage>&,
 		int,
 		bool,
+		const QString&,
 		bool=false);
 };
 

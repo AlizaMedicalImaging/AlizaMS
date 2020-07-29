@@ -107,7 +107,7 @@ void SRWidget::preview_print(QPrinter * p)
 
 void SRWidget::printSR()
 {
-	QPrinter * p = new QPrinter(QPrinter::HighResolution);
+	QPrinter * p = new QPrinter();
 	QPrintPreviewDialog * v = new QPrintPreviewDialog(p);
 	connect(
 		v,    SIGNAL(paintRequested(QPrinter*)),
