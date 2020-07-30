@@ -342,15 +342,18 @@ public:
 		QProgressDialog*);
 	static QString find_file_from_uid(
 		const QString&,
-		const QString&);
+		const QString&,
+		QProgressDialog*);
 	static bool scan_files_for_pr_image(
 		const QString&,
 		const QString&,
-		QString&);
+		QString&,
+		QProgressDialog*);
 	static void read_pr_ref(
 		const QString&,
 		const QString&,
-		QList<PrRefSeries> &);
+		QList<PrRefSeries> &,
+		QProgressDialog*);
 	static QString read_enhmr_spectro_info(
 		const mdcm::DataSet&,
 		bool);

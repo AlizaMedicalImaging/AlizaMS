@@ -27,6 +27,7 @@ class SRUtils
 public:
 	SRUtils()  {}
 	~SRUtils() {}
+	static void set_asked_for_path_once(bool);
 	static void read_IMAGE(
 		const mdcm::DataSet&,
 		const QString&,

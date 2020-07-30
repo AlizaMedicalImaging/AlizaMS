@@ -9227,17 +9227,20 @@ bool DicomUtils::process_contrours_ref(
 	return false;
 }
 
-QString DicomUtils::find_file_from_uid(const QString & p, const QString & uid)
+QString DicomUtils::find_file_from_uid(
+	const QString & p,
+	const QString & uid,
+	QProgressDialog * pb)
 {
 	QString f("");
 	if (p.isEmpty())   return f;
 	if (uid.isEmpty()) return f;
-	bool ok = scan_files_for_pr_image(p, uid, f);
+	bool ok = scan_files_for_pr_image(p, uid, f, pb);
 	if (ok) return f;
 	QDirIterator it(p, QDir::Dirs|QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
 	while (it.hasNext())
 	{
-		ok = scan_files_for_pr_image(it.next(), uid, f);
+		ok = scan_files_for_pr_image(it.next(), uid, f, pb);
 		if (ok) break;
 	}
 	QApplication::processEvents();
@@ -9247,7 +9250,8 @@ QString DicomUtils::find_file_from_uid(const QString & p, const QString & uid)
 bool DicomUtils::scan_files_for_pr_image(
 	const QString & p,
 	const QString & uid,
-	QString & file)
+	QString & file,
+	QProgressDialog * pb)
 {
 	if (p.isEmpty())   return false;
 	if (uid.isEmpty()) return false;
@@ -9261,6 +9265,7 @@ bool DicomUtils::scan_files_for_pr_image(
 	std::vector<std::string> filenames;
 	for (int x = 0; x < flist.size(); x++)
 	{
+		if (pb) pb->setValue(-1);
 		QApplication::processEvents();
 		const QString tmp0 =
 			QDir::toNativeSeparators(
@@ -9288,7 +9293,8 @@ bool DicomUtils::scan_files_for_pr_image(
 void DicomUtils::read_pr_ref(
 	const QString & p,
 	const QString & f,
-	QList<PrRefSeries> & refs)
+	QList<PrRefSeries> & refs,
+	QProgressDialog * pb)
 {
 	if (f.isEmpty()) return;
 	const mdcm::Tag tReferencedSeriesSequence(0x0008,0x1115);
@@ -9356,7 +9362,7 @@ void DicomUtils::read_pr_ref(
 			{
 				PrRefImage ref;
 				ref.uid = s0;
-				ref.file = find_file_from_uid(p, ref.uid);
+				ref.file = find_file_from_uid(p, ref.uid, pb);
 				if (ref.file.isEmpty()) continue;
 				std::vector<int> frames;
 				const bool ok1 = get_is_values(
@@ -10448,6 +10454,7 @@ QString DicomUtils::read_dicom(
 				const QString s0 =
 					SRUtils::read_sr_title1(ds, t00080005);
 				if (pb) pb->hide();
+				SRUtils::set_asked_for_path_once(false);
 				SRWidget * sr =
 					new SRWidget(wsettings->get_scale_icons());
 				sr->setAttribute(Qt::WA_DeleteOnClose);
@@ -11733,50 +11740,52 @@ QString DicomUtils::read_dicom(
 						ivariants.push_back(tmp_ivariants_rtstruct[y]);
 					}
 				}
-#else
-				bool ok22 = false;
-				if (pb) pb->hide();
-				const QString s(
-					"<html><head/><body><p align=\"center\">"
-					"<p>Select directory to start recursive "
-					"search.</body></html>");
-				if (pb) pb->hide();
-				QFileInfo reffi(filenames.at(x));
-				FindRefDialog * d = new FindRefDialog();
-				d->set_text(s);
-				d->set_path(QDir::toNativeSeparators(reffi.absolutePath()));
-				if (d->exec() == QDialog::Accepted)
+				if (!ref2_ok)
+#endif
 				{
-					rtstruct_ref_search_path = d->get_path();
-					ok22 = true;
-				}
-				delete d;
-				if (pb) pb->show();
-				QApplication::processEvents();
-				if (ok22)
-				{
-					ref2_ok = process_contrours_ref(
-						rtstruct_ref_search.at(x),
-						rtstruct_ref_search_path,
-						tmp_ivariants_rtstruct,
-						max_3d_tex_size, gl, ok3d,
-						settings,
-						pb);
-					if (ref2_ok)
+					bool ok22 = false;
+					const QString s(
+						"<html><head/><body><p align=\"center\">"
+						"<p>Select directory to start recursive "
+						"search.</body></html>");
+					if (pb) pb->hide();
+					QFileInfo reffi(filenames.at(x));
+					FindRefDialog * d =
+						new FindRefDialog(wsettings->get_scale_icons());
+					d->set_text(s);
+					d->set_path(QDir::toNativeSeparators(reffi.absolutePath()));
+					if (d->exec() == QDialog::Accepted)
 					{
-						for (unsigned int y = 0;
-							y < tmp_ivariants_rtstruct.size();
-							y++)
+						rtstruct_ref_search_path = d->get_path();
+						ok22 = true;
+					}
+					delete d;
+					if (pb) pb->show();
+					QApplication::processEvents();
+					if (ok22)
+					{
+						ref2_ok = process_contrours_ref(
+							rtstruct_ref_search.at(x),
+							rtstruct_ref_search_path,
+							tmp_ivariants_rtstruct,
+							max_3d_tex_size, gl, ok3d,
+							settings,
+							pb);
+						if (ref2_ok)
 						{
-							tmp_ivariants_rtstruct[y]->filenames =
-								QStringList(
-									QDir::toNativeSeparators(
-										rtstruct_ref_search.at(x)));
-							ivariants.push_back(tmp_ivariants_rtstruct[y]);
+							for (unsigned int y = 0;
+								y < tmp_ivariants_rtstruct.size();
+								y++)
+							{
+								tmp_ivariants_rtstruct[y]->filenames =
+									QStringList(
+										QDir::toNativeSeparators(
+											rtstruct_ref_search.at(x)));
+								ivariants.push_back(tmp_ivariants_rtstruct[y]);
+							}
 						}
 					}
 				}
-#endif
 			}
 			if (!(ref_ok || ref2_ok))
 			{
@@ -11940,16 +11949,36 @@ QString DicomUtils::read_dicom(
 		unsigned int count = 0;
 		const QString file0 = grey_softcopy_pr_files.at(0);
 		QFileInfo p0(file0);
+#ifdef USE_WORKSTATION_MODE
 		QString p = QDir::toNativeSeparators(p0.absolutePath());
+#else
+		QString p = QString(
+#ifdef _WIN32
+			"DICOM/"
+#else
+			"../DICOM/"
+#endif
+			);
+#endif
 		for (int x = 0; x < grey_softcopy_pr_files.size(); x++)
 		{
-			if (pb) pb->setValue(-1);
+			if (pb)
+			{
+				pb->setLabelText(
+					QString("Searching referenced files"));
+				pb->setValue(-1);
+			}
 			QApplication::processEvents();
 			QList<PrRefSeries> refs;
-			read_pr_ref(p, grey_softcopy_pr_files.at(x), refs);
+			read_pr_ref(p, grey_softcopy_pr_files.at(x), refs, pb);
+			QApplication::processEvents();
 			for (int y = 0; y < refs.size(); y++)
 			{
-				if (pb) pb->setValue(-1);
+				if (pb)
+				{
+					pb->setLabelText(QString("Loading ... "));
+					pb->setValue(-1);
+				}
 				QApplication::processEvents();
 				QStringList ref_files;
 				for (int z = 0; z < refs.at(y).images.size(); z++)
@@ -12073,6 +12102,9 @@ QString DicomUtils::read_dicom(
 #ifdef USE_WORKSTATION_MODE
 			QFileInfo fi99(QDir::toNativeSeparators(p));
 			p = QDir::toNativeSeparators(fi99.absolutePath());
+#else
+			p = QString();
+#endif
 			const QString s(
 				"<html><head/><body>"
 				"<span style=\"font-style:italic;\">"
@@ -12083,7 +12115,8 @@ QString DicomUtils::read_dicom(
 				"</body></html>");
 			if (pb) pb->hide();
 			QApplication::processEvents();
-			FindRefDialog * d = new FindRefDialog();
+			FindRefDialog * d =
+				new FindRefDialog(wsettings->get_scale_icons());
 			d->set_text(s);
 			d->set_path(p);
 			bool _ok = false;
@@ -12091,7 +12124,6 @@ QString DicomUtils::read_dicom(
 			{
 				_ok = true;
 				p = d->get_path();
-				d->close();
 			}
 			delete d;
 			if (pb) pb->show();
@@ -12099,24 +12131,24 @@ QString DicomUtils::read_dicom(
 			{
 				return QString("");
 			}
-#else
-			p = QString(
-#ifdef _WIN32
-				"DICOM/"
-#else
-				"../DICOM/"
-#endif
-				);
-#endif
 			for (int x = 0; x < grey_softcopy_pr_files.size(); x++)
 			{
-				if (pb) pb->setValue(-1);
+				if (pb)
+				{
+					pb->setLabelText(QString("Searching referenced files"));
+					pb->setValue(-1);
+				}
 				QApplication::processEvents();
 				QList<PrRefSeries> refs;
-				read_pr_ref(p, grey_softcopy_pr_files.at(x), refs);
+				read_pr_ref(p, grey_softcopy_pr_files.at(x), refs, pb);
+				QApplication::processEvents();
 				for (int y = 0; y < refs.size(); y++)
 				{
-					if (pb) pb->setValue(-1);
+					if (pb)
+					{
+						pb->setLabelText(QString("Loading ... "));
+						pb->setValue(-1);
+					}
 					QApplication::processEvents();
 					QStringList ref_files;
 					for (int z = 0; z < refs.at(y).images.size(); z++)

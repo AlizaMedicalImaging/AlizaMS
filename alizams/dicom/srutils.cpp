@@ -23,6 +23,7 @@
 #include <QBrush>
 #include "processimagethreadLUT.hxx"
 #include "settingswidget.h"
+#include "findrefdialog.h"
 #include "itkExtractImageFilter.h"
 #include "itkMath.h"
 
@@ -268,6 +269,14 @@ template<typename T> SRImage lrgb3(
 	return sr;
 }
 
+static bool SRUtils_asked_for_path_once = false;
+static QString SRUtils_selected_path("");
+void SRUtils::set_asked_for_path_once(bool t)
+{
+	SRUtils_asked_for_path_once = t;
+	if (!t) SRUtils_selected_path = QString("");
+}
+
 void SRUtils::read_IMAGE(
 	const mdcm::DataSet & nds,
 	const QString & charset,
@@ -363,21 +372,88 @@ void SRUtils::read_IMAGE(
 					if (refframe >= 1) idx = refframe - 1;
 				}
 			}
+			if (pb)
+			{
+				pb->setLabelText(QString("Searching referenced files"));
+			}
 			QString sf = DicomUtils::find_file_from_uid(
 				QDir::toNativeSeparators(path),
-				ReferencedSOPInstanceUID.trimmed());
+				ReferencedSOPInstanceUID.trimmed(),
+				pb);
+#ifndef USE_WORKSTATION_MODE
 			if (sf.isEmpty())
 			{
-				// FIXME
 				sf = DicomUtils::find_file_from_uid(
-					QDir::toNativeSeparators(path+QString("/..")),
-					ReferencedSOPInstanceUID);
+					path + QString("/.."),
+					ReferencedSOPInstanceUID.trimmed(),
+					pb);
+			}
+			if (sf.isEmpty())
+			{
+				const QString tmpp = QString(
+#ifdef _WIN32
+					"DICOM/"
+#else
+					"../DICOM/"
+#endif
+					);
+				sf = DicomUtils::find_file_from_uid(
+					tmpp,
+					ReferencedSOPInstanceUID.trimmed(),
+					pb);
+			}
+#endif
+			if (sf.isEmpty())
+			{
+				if (!SRUtils_asked_for_path_once)
+				{
+					set_asked_for_path_once(true);
+					const QString s22(
+						"<html><head/><body><p align=\"center\">"
+						"<p>Select directory to start recursive "
+						"search.</body></html>");
+					QFileInfo fi22(path+QString("/.."));
+					if (pb) pb->hide();
+					FindRefDialog * d =
+						new FindRefDialog(settings->get_scale_icons());
+					d->set_text(s22);
+					d->set_path(
+						QDir::toNativeSeparators(
+							fi22.absoluteFilePath()));
+					if (d->exec() == QDialog::Accepted)
+					{
+						SRUtils_selected_path = d->get_path();
+					}
+					else
+					{
+						SRUtils_selected_path = QString("");
+					}
+					delete d;
+					if (pb) pb->show();
+				}
+				QApplication::processEvents();
+				if (SRUtils_asked_for_path_once &&
+					(!SRUtils_selected_path.isEmpty()))
+				{
+					sf = DicomUtils::find_file_from_uid(
+						QDir::toNativeSeparators(SRUtils_selected_path),
+						ReferencedSOPInstanceUID,
+						pb);
+				}
+				else
+				{
+					continue;
+				}
 			}
 			if (info)
 			{
 				s += QString("<span class='y3'>IMAGE: ") +
 					QDir::toNativeSeparators(sf) +
 					QString("</span><br />");
+			}
+			if (pb)
+			{
+				pb->setLabelText(QString("Loading ..."));
 			}
 			std::vector<ImageVariant*> ivariants;
 			std::vector<ImageVariant2D*> ivariants2;

@@ -2,10 +2,12 @@
 #include <QFileDialog>
 #include <QDir>
 
-FindRefDialog::FindRefDialog(QWidget * p, Qt::WindowFlags f)
+FindRefDialog::FindRefDialog(float si, QWidget * p, Qt::WindowFlags f)
 	: QDialog(p, f)
 {
 	setupUi(this);
+	const QSize s = QSize((int)(24*si),(int)(24*si));
+	toolButton->setIconSize(s);
 	connect(toolButton, SIGNAL(clicked()), this, SLOT(select_dir()));
 }
 
