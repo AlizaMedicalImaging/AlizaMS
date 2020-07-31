@@ -10466,16 +10466,16 @@ QString DicomUtils::read_dicom(
 						t00080005,
 						fi.absolutePath(),
 						settings,
-						sr->textEdit,
+						sr->textBrowser,
 						pb,
 						sr->tmpfiles,
 						sr->srimages,
 						0,
 						srinfo,
-						QString(""),
+						QString("1"),
 						true) +
 					foot3;
-				sr->textEdit->setHtml(s1);
+				sr->textBrowser->setHtml(s1);
 				sr->show();
 				sr->raise();
 			}

@@ -253,7 +253,7 @@ template<typename T> SRImage lrgb3(
 				p__[j_+1] = static_cast<unsigned char>(255.0*((g+(-vmin))/vrange));
 				p__[j_+0] = static_cast<unsigned char>(255.0*((r+(-vmin))/vrange));
 				j_ += 3;
- 				++iterator;
+				++iterator;
 			}
 		}
 	}
@@ -284,7 +284,7 @@ void SRUtils::read_IMAGE(
 	QString & s,
 	QStringList & tmpfiles,
 	std::vector<SRImage> & srimages,
-	QTextEdit * textEdit,
+	QTextBrowser * textBrowser,
 	const std::vector<SRGraphic> & grobjects,
 	bool info,
 	const QWidget * wsettings,
@@ -760,7 +760,7 @@ endpoints of the minor axis of an ellipse
 							{
 								s += QString("<span class='red2'>") +
 									sg.GraphicType +
-									QString(" skipped</span><br />");
+									QString("</span><br />");
 							}
 						}
 					}
@@ -796,7 +796,7 @@ endpoints of the minor axis of an ellipse
 							(qulonglong)
 								QDateTime::currentMSecsSinceEpoch())
 									.toString();
-					textEdit->document()->addResource(
+					textBrowser->document()->addResource(
 						QTextDocument::ImageResource,
 						QUrl(tmpfile),
 						pm.i);
@@ -817,6 +817,7 @@ endpoints of the minor axis of an ellipse
 					if (pm.p) delete [] pm.p;
 #endif
 #endif
+					if (s.endsWith(QString("<br />"))) s.chop(6);
 					s += QString("<p style=\"margin-left: 0px\">") +
 						QString("<img src=\"") + tmpfile +
 						QString("\" /></p>");
@@ -863,7 +864,7 @@ bool SRUtils::read_SCOORD(
 	QString & s,
 	QStringList & tmpfiles,
 	std::vector<SRImage> & srimages,
-	QTextEdit * textEdit,
+	QTextBrowser * textBrowser,
 	bool info,
 	const QWidget * wsettings,
 	QProgressDialog * pb)
@@ -967,11 +968,11 @@ bool SRUtils::read_SCOORD(
 						s,
 						tmpfiles,
 						srimages,
-						textEdit,
+						textBrowser,
 						tmp001,
 						info,
 						wsettings,
-						pb);	
+						pb);
 				}
 				else
 				{
@@ -1129,16 +1130,18 @@ void SRUtils::read_NUM(
 								e7.GetByteValue()->
 									GetLength());
 							const QString tmp5 =
-								CodecUtils::toUTF8(
+								(CodecUtils::toUTF8(
 									&ba7,
 									charset
 										.toLatin1()
-										.constData());
-							if (unit.trimmed().toUpper() !=
-									QString("NO UNITS"))
+										.constData())).trimmed();
+							if ((unit.trimmed().toUpper() !=
+									QString("NO UNITS")) &&
+								(!tmp5.isEmpty()) &&
+								(tmp5 != QString("1")))
 							{
 								unit += QString(" (") +
-									tmp5.trimmed() + QString(")");
+									tmp5 + QString(")");
 							}
 						}
 					}
@@ -1365,11 +1368,8 @@ QString SRUtils::read_sr_title1(
 	const mdcm::DataSet & ds,
 	const QString & charset)
 {
-	const QString s =
-		DicomUtils::get_pn_value2(
-			ds,
-			mdcm::Tag(0x0010,0x0010),
-			charset.toLatin1().constData());
+	QString s = get_concept_code_meaning(ds, charset);
+	if (s.isEmpty()) s = QString("Structured Report");
 	return s;
 }
 
@@ -1377,7 +1377,7 @@ QString SRUtils::read_sr_title2(
 	const mdcm::DataSet & ds,
 	const QString & charset)
 {
-	QString s("<p>");
+	QString s("<p id=\"1a\" align=\"center\">");
 	if (ds.FindDataElement(
 		mdcm::Tag(0x0010,0x0010)))
 	{
@@ -1398,19 +1398,38 @@ QString SRUtils::read_sr_title2(
 			QDate::fromString(
 				d.trimmed(),
 				QString("yyyyMMdd"));
-		s += QString("<br /><span class='yy'>") +
+		s += QString("<br /><span class='t2'>") +
 			qd.toString(QString("d MMM yyyy")) +
 			QString("</span>");
 	}
+	s += QString("</p><p id=\"1b\" ><ul>");
 	QString id;
 	if (DicomUtils::get_string_value(
 			ds,
 			mdcm::Tag(0x0010,0x0020),
 			id))
 	{
-		s += QString("<br /><span class='yy'>") +
+		s += QString(
+				"<li><span class='y'>Patient ID: "
+				"</span><span class='y'>") +
 			id.trimmed() +
-			QString("</span>");
+			QString("</span></li>");
+	}
+	QString StudyDate;
+	if (DicomUtils::get_string_value(
+			ds,
+			mdcm::Tag(0x0008,0x0020),
+			StudyDate))
+	{
+		const QDate qd =
+			QDate::fromString(
+				StudyDate.trimmed(),
+				QString("yyyyMMdd"));
+		s += QString(
+				"<li><span class='y'>Study date: "
+				"</span><span class='y'>") +
+			qd.toString(QString("d MMM yyyy")) +
+			QString("</span></li>");
 	}
 	if (ds.FindDataElement(
 		mdcm::Tag(0x0008,0x0090)))
@@ -1422,12 +1441,40 @@ QString SRUtils::read_sr_title2(
 				charset.toLatin1().constData());
 		if (!tmp0.isEmpty())
 		{
-			s += QString("<br /><span class='yy'>Referring ") +
+			s += QString(
+					"<li><span class='y'>Referring: "
+					"</span><span class='y'>") +
 				tmp0 +
-				QString("</span>");
+				QString("</span></li>");
 		}
 	}
-	s += QString("</p>");
+	QString CompletionFlag;
+	if (DicomUtils::get_string_value(
+			ds,
+			mdcm::Tag(0x0040,0xa491),
+			CompletionFlag))
+	{
+		s += QString(
+			"<li><span class='y'>Completion: "
+			"</span><span class='y'>") +
+			CompletionFlag.toLower() +
+			QString("</span></li>");
+	}
+	QString VerificationFlag;
+	if (DicomUtils::get_string_value(
+			ds,
+			mdcm::Tag(0x0040,0xa493),
+			VerificationFlag))
+	{
+		s += QString(
+			"<li><span class='y'>Verification: "
+			"</span><span class='y'>") +
+			VerificationFlag.toLower() +
+			QString("</span></li>");
+	}
+	//
+	//
+	s += QString("</ul></p>");
 	return s;
 }
 
@@ -1512,12 +1559,59 @@ QStringList SRUtils::read_referenced(
 	return l;
 }
 
+QString SRUtils::get_concept_code_meaning(
+	const mdcm::DataSet & ds,
+	const QString & charset)
+{
+	QString CodeMeaning("");
+	if (ds.FindDataElement(mdcm::Tag(0x0040,0xa043)))
+	{
+		const mdcm::DataElement & e4  =
+			ds.GetDataElement(mdcm::Tag(0x0040,0xa043));
+		mdcm::SmartPointer<mdcm::SequenceOfItems> sq4 =
+			e4.GetValueAsSQ();
+		if (sq4)
+		{
+			const unsigned int nitems4 = sq4->GetNumberOfItems();
+			for(unsigned int i4 = 0; i4 < nitems4; ++i4)
+			{
+				const mdcm::Item & item4 = sq4->GetItem(i4+1);
+				const mdcm::DataSet & nds4 =
+					item4.GetNestedDataSet();
+				if (nds4.FindDataElement(mdcm::Tag(0x0008,0x0104)))
+				{
+					const mdcm::DataElement & e5 =
+						nds4.GetDataElement(mdcm::Tag(0x0008,0x0104));
+					if (
+						!e5.IsEmpty() &&
+						!e5.IsUndefinedLength() &&
+						e5.GetByteValue())
+					{
+						QByteArray ba5(
+							e5.GetByteValue()->GetPointer(),
+							e5.GetByteValue()->GetLength());
+						QString tmp5 =
+							CodecUtils::toUTF8(
+								&ba5, charset.toLatin1().constData());
+						if (!CodeMeaning.isEmpty())
+						{
+							CodeMeaning += QString(" ");
+						}
+						CodeMeaning += tmp5.trimmed();
+					}
+				}
+			}
+		}
+	}
+	return CodeMeaning;
+}
+
 QString SRUtils::read_sr_content_sq(
 	const mdcm::DataSet & ds,
 	const QString & charset,
 	const QString & path,
 	const QWidget * wsettings,
-	QTextEdit * textEdit,
+	QTextBrowser * textBrowser,
 	QProgressDialog * pb,
 	QStringList & tmpfiles,
 	std::vector<SRImage> & srimages,
@@ -1548,16 +1642,26 @@ QString SRUtils::read_sr_content_sq(
 			: (QVariant(i+1).toString());
 		//
 		//
+#if 1
+		s += QString("<p id=\"") +
+			cs +
+			QString("\" style=\"margin-left: ") +
+			QVariant(indent).toString() +
+			QString("px\">");
+#else
+		s += QString("<a id=\"") +
+			cs +
+			QString("\"></a>");
 		s += QString("<p style=\"margin-left: ") +
 			QVariant(indent).toString() +
 			QString("px\">");
+#endif
 		//
 		//
 		if (print_chapters)
 		{
 			s += QString("<span class='yy'>") +
-				cs +
-				QString("</span><br />");
+				cs + QString("</span><br />");
 		}
 		QString ValueType;
 		QString RelationshipType;
@@ -1581,7 +1685,6 @@ QString SRUtils::read_sr_content_sq(
 		if (DicomUtils::get_string_value(
 				nds, mdcm::Tag(0x0040,0xa010), RelationshipType))
 		{
-			// TODO
 			RelationshipType = RelationshipType.trimmed().toUpper();
 			if (info)
 			{
@@ -1599,77 +1702,46 @@ QString SRUtils::read_sr_content_sq(
 					ContinuityOfContent + QString("</span><br />");
 			}
 		}
-		if (nds.FindDataElement(mdcm::Tag(0x0040,0xa043)))
-		{
-			const mdcm::DataElement & e4  =
-				nds.GetDataElement(mdcm::Tag(0x0040,0xa043));
-			mdcm::SmartPointer<mdcm::SequenceOfItems> sq4 =
-				e4.GetValueAsSQ();
-			if (sq4)
-			{
-				const unsigned int nitems4 = sq4->GetNumberOfItems();
-				for(unsigned int i4 = 0; i4 < nitems4; ++i4)
-				{
-					const mdcm::Item & item4 = sq4->GetItem(i4+1);
-					const mdcm::DataSet & nds4 =
-						item4.GetNestedDataSet();
-					if (nds4.FindDataElement(mdcm::Tag(0x0008,0x0104)))
-					{
-						const mdcm::DataElement & e5 =
-							nds4.GetDataElement(mdcm::Tag(0x0008,0x0104));
-						if (
-							!e5.IsEmpty() &&
-							!e5.IsUndefinedLength() &&
-							e5.GetByteValue())
-						{
-							QByteArray ba5(
-								e5.GetByteValue()->GetPointer(),
-								e5.GetByteValue()->GetLength());
-							QString tmp5 =
-								CodecUtils::toUTF8(
-									&ba5, charset.toLatin1().constData());
-							if (!CodeMeaning.isEmpty())
-							{
-								CodeMeaning += QString(" ");
-							}
-							CodeMeaning += tmp5.trimmed();
-						}
-					}
-				}
-			}
-			if (!CodeMeaning.isEmpty())
-			{
-				s += QString("<span class='y9'>") +
-					CodeMeaning +
-					QString("</span><br />");
-			}
-		}
 		if (DicomUtils::get_ul_values(
 				nds,
 				mdcm::Tag(0x0040,0xdb73),
 				ReferencedContentItemIdentifier))
 		{
-			// TODO
-			if (info)
+			QString identifiers("");
+			const size_t s___ =
+				ReferencedContentItemIdentifier.size();
+			for (
+				unsigned int z = 0;
+				z < s___;
+				z++)
 			{
-				QString identifiers("");
-				for (
-					unsigned int z = 0;
-					z < ReferencedContentItemIdentifier.size();
-					z++)
-				{
-					identifiers +=
-						QVariant(
-							(int)ReferencedContentItemIdentifier.at(z))
-								.toString() + QString(" " );
-				}
-				s += QString(
-						"<span class='y3'>"
-						"Referenced Content Item Identifier: ") +
-					identifiers +
-					QString("</span><br />");
+				identifiers +=
+					QVariant(
+						(int)ReferencedContentItemIdentifier.at(z))
+							.toString();
+				if (z != (s___ - 1)) identifiers += QString(".");
+			}
+			s += QString(
+					"<span class='yy9'>"
+					"Referenced Content Item Identifier: "
+					"</span><span class='yy'><a href=\"#") +
+				identifiers +
+				QString("\" >") +
+				identifiers +
+				QString("</a></span><br />");
+		}
+		if (nds.FindDataElement(mdcm::Tag(0x0040,0xa043)))
+		{
+			const QString CodeMeaning =
+				get_concept_code_meaning(nds, charset);
+			if (!CodeMeaning.isEmpty())
+			{
+				s += QString("<span class='y9'>") +
+					CodeMeaning +
+					QString("</span><span class='t1'> </span>");
 			}
 		}
+
 
 //////////////////////////////////////////////////////////////////
 //
@@ -1713,6 +1785,30 @@ QString SRUtils::read_sr_content_sq(
 		{
 			read_TIME(nds, s);
 		}
+		else if (ValueType == QString("SCOORD"))
+		{
+			const bool continue_ = read_SCOORD(
+				nds,
+				charset,
+				path,
+				s,
+				tmpfiles,
+				srimages,
+				textBrowser,
+				info,
+				wsettings,
+				pb);
+			if (continue_)
+			{
+				//
+				//
+				if (s.endsWith(QString("<br />"))) s.chop(6);
+				s += QString("</p>");
+				//
+				//
+				continue;
+			}
+		}
 		else if (ValueType == QString("IMAGE"))
 		{
 			std::vector<SRGraphic> tmp001;
@@ -1723,43 +1819,27 @@ QString SRUtils::read_sr_content_sq(
 				s,
 				tmpfiles,
 				srimages,
-				textEdit,
+				textBrowser,
 				tmp001,
 				info,
 				wsettings,
 				pb);
 		}
-		else if (
-			ValueType == QString("COMPOSITE") ||
-			ValueType == QString("WAVEFORM"))
+		else if (ValueType == QString("COMPOSITE"))
 		{
 			// TODO
-			s += QString("<span class='red2'>") +
-				ValueType + QString("</span><br />");
+			s += QString(
+					"<span class='red2'>COMPOSITE"
+					"</span><br />");
 			const QStringList & l = read_referenced(nds, s);
 		}
-		else if (ValueType == QString("SCOORD"))
+		else if (ValueType == QString("WAVEFORM"))
 		{
-			const bool continue_ = read_SCOORD(
-				nds,
-				charset,
-				path,
-				s,
-				tmpfiles,
-				srimages,
-				textEdit,
-				info,
-				wsettings,
-				pb);
-			if (continue_)
-			{
-				//
-				//
-				s += QString("</p>");
-				//
-				//
-				continue;
-			}
+			// TODO
+			s += QString(
+					"<span class='red2'>WAVEFORM"
+					"</span><br />");
+			const QStringList & l = read_referenced(nds, s);
 		}
 		else if (ValueType == QString("SCOORD3D"))
 		{
@@ -1773,11 +1853,12 @@ QString SRUtils::read_sr_content_sq(
 			{
 				s += QString("<span class='red2'>Value ") +
 					ValueType +
-					QString(" is skipped</span><br />");
+					QString("</span><br />");
 			}
 		}
 		//
 		//
+		if (s.endsWith(QString("<br />"))) s.chop(6);
 		s += QString("</p>");
 		//
 		//
@@ -1802,7 +1883,7 @@ QString SRUtils::read_sr_content_sq(
 				charset,
 				path,
 				wsettings,
-				textEdit,
+				textBrowser,
 				pb,
 				tmpfiles,
 				srimages,

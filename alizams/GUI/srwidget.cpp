@@ -31,12 +31,24 @@ SRWidget::SRWidget(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
 	print_toolButton->setIconSize(s);
 	toolButton->setIconSize(s);
 	readSettings();
-	textEdit->document()->addResource(
+	textBrowser->document()->addResource(
 		QTextDocument::StyleSheetResource,
 		QUrl("format.css"),
 		css3);
-	connect(print_toolButton,SIGNAL(pressed()),this,SLOT(printSR()));
-	connect(save_toolButton, SIGNAL(pressed()),this,SLOT(saveSR()));
+	connect(print_toolButton,    SIGNAL(pressed()),               this,                SLOT(printSR()));
+	connect(save_toolButton,     SIGNAL(pressed()),               this,                SLOT(saveSR()));
+	// FIXME
+#if 0
+	backward_toolButton->setEnabled(false);
+	forward_toolButton->setEnabled(false);
+	connect(backward_toolButton, SIGNAL(pressed()),               textBrowser,         SLOT(backward()));
+	connect(forward_toolButton,  SIGNAL(pressed()),               textBrowser,         SLOT(forward()));
+	connect(textBrowser,         SIGNAL(backwardAvailable(bool)), backward_toolButton, SLOT(setEnabled(bool)));
+	connect(textBrowser,         SIGNAL(forwardAvailable(bool)),  forward_toolButton,  SLOT(setEnabled(bool)));
+#else
+	backward_toolButton->hide();
+	forward_toolButton->hide();
+#endif
 }
 
 SRWidget::~SRWidget()
@@ -46,11 +58,11 @@ SRWidget::~SRWidget()
 void SRWidget::closeEvent(QCloseEvent * e)
 {
 	writeSettings();
-	if (textEdit->document())
+	if (textBrowser->document())
 	{
-		textEdit->document()->clear();
+		textBrowser->document()->clear();
 	}
-	textEdit->clear();
+	textBrowser->clear();
 	for (int k = 0; k < tmpfiles.size(); k++)
 	{
 		QFile::remove(tmpfiles.at(k));
@@ -102,7 +114,7 @@ void SRWidget::writeSettings()
 
 void SRWidget::preview_print(QPrinter * p)
 {
-	textEdit->print(p);
+	textBrowser->print(p);
 }
 
 void SRWidget::printSR()
@@ -140,6 +152,6 @@ void SRWidget::saveSR()
 	}
 	QTextDocumentWriter writer(f);
 	writer.setFormat("ODT");
-	writer.write(textEdit->document());
+	writer.write(textBrowser->document());
 	QApplication::restoreOverrideCursor();
 }

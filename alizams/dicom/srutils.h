@@ -4,7 +4,7 @@
 #include <mdcmDataSet.h>
 #include <QString>
 #include <QWidget>
-#include <QTextEdit>
+#include <QTextBrowser>
 #include <QProgressDialog>
 #include <QStringList>
 #include <vector>
@@ -35,7 +35,7 @@ public:
 		QString&,
 		QStringList&,
 		std::vector<SRImage>&,
-		QTextEdit*,
+		QTextBrowser*,
 		const std::vector<SRGraphic>&,
 		bool,
 		const QWidget*,
@@ -47,7 +47,7 @@ public:
 		QString&,
 		QStringList&,
 		std::vector<SRImage>&,
-		QTextEdit*,
+		QTextBrowser*,
 		bool,
 		const QWidget*,
 		QProgressDialog*);
@@ -63,12 +63,15 @@ public:
 	static QString read_sr_title1(const mdcm::DataSet&, const QString&);
 	static QString read_sr_title2(const mdcm::DataSet&, const QString&);
 	static QStringList read_referenced(const mdcm::DataSet&, QString&);
+	static QString get_concept_code_meaning(
+		const mdcm::DataSet&,
+		const QString&);
 	static QString read_sr_content_sq(
 		const mdcm::DataSet&,
 		const QString&,
 		const QString&,
 		const QWidget*,
-		QTextEdit*,
+		QTextBrowser*,
 		QProgressDialog*,
 		QStringList&,
 		std::vector<SRImage>&,

@@ -116,7 +116,7 @@ void SettingsWidget::set_default()
 	srwidth_spinBox->setValue(512);
 	srwidth_spinBox->hide();
 	srscale_checkBox->blockSignals(false);
-	srchapters_checkBox->setChecked(false);
+	srchapters_checkBox->setChecked(true);
 	srskipimage_checkBox->setChecked(false);
 	//
 	pt_doubleSpinBox->setEnabled(false);
@@ -190,7 +190,7 @@ void SettingsWidget::readSettings()
 	const int tmp3  = settings.value(QString("sr_i_scale"),      0).toInt();
 	const int tmp4  = settings.value(QString("sr_i_width"),    512).toInt();
 	const int tmp5  = settings.value(QString("sr_info2"),        0).toInt();
-	const int tmp6  = settings.value(QString("sr_chapters"),     0).toInt();
+	const int tmp6  = settings.value(QString("sr_chapters"),     1).toInt();
 	const int tmp7  = settings.value(QString("sr_skip_images"),  0).toInt();
 	settings.endGroup();
 	settings.beginGroup(QString("StyleDialog"));
