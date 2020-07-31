@@ -14,6 +14,7 @@ class SRWidget: public QWidget, public Ui::SRWidget
 public:
 	SRWidget(float, QWidget(*)=NULL, Qt::WindowFlags=0);
 	~SRWidget();
+	void initSR(const QString&);
 	QStringList tmpfiles;
 	std::vector<SRImage> srimages;
 

@@ -27,6 +27,10 @@ const QString css3 = QString(
 SRWidget::SRWidget(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
 {
 	setupUi(this);
+#if 1
+	backward_toolButton->hide();
+	forward_toolButton->hide();
+#endif
 	const QSize s = QSize((int)(18*si),(int)(18*si));
 	print_toolButton->setIconSize(s);
 	toolButton->setIconSize(s);
@@ -35,20 +39,22 @@ SRWidget::SRWidget(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
 		QTextDocument::StyleSheetResource,
 		QUrl("format.css"),
 		css3);
-	connect(print_toolButton,    SIGNAL(pressed()),               this,                SLOT(printSR()));
-	connect(save_toolButton,     SIGNAL(pressed()),               this,                SLOT(saveSR()));
+	connect(print_toolButton, SIGNAL(pressed()), this, SLOT(printSR()));
+	connect(save_toolButton,  SIGNAL(pressed()), this, SLOT(saveSR()));
+}
+
+void SRWidget::initSR(const QString & s)
+{
 	// FIXME
 #if 0
 	backward_toolButton->setEnabled(false);
 	forward_toolButton->setEnabled(false);
-	connect(backward_toolButton, SIGNAL(pressed()),               textBrowser,         SLOT(backward()));
-	connect(forward_toolButton,  SIGNAL(pressed()),               textBrowser,         SLOT(forward()));
-	connect(textBrowser,         SIGNAL(backwardAvailable(bool)), backward_toolButton, SLOT(setEnabled(bool)));
-	connect(textBrowser,         SIGNAL(forwardAvailable(bool)),  forward_toolButton,  SLOT(setEnabled(bool)));
-#else
-	backward_toolButton->hide();
-	forward_toolButton->hide();
+	connect(textBrowser, SIGNAL(backwardAvailable(bool)), backward_toolButton, SLOT(setEnabled(bool)));
+	connect(textBrowser, SIGNAL(forwardAvailable(bool)),  forward_toolButton,  SLOT(setEnabled(bool)));
+	connect(backward_toolButton, SIGNAL(pressed()), textBrowser, SLOT(backward()));
+	connect(forward_toolButton,  SIGNAL(pressed()), textBrowser, SLOT(forward()));
 #endif
+	textBrowser->setHtml(s);
 }
 
 SRWidget::~SRWidget()

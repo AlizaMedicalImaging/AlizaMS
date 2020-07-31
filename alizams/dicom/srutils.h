@@ -60,6 +60,7 @@ public:
 	static void    read_TIME    (const mdcm::DataSet&, QString&);
 	static void    read_SCOORD3D(const mdcm::DataSet&, QString&);
 	static QString read_UIDREF  (const mdcm::DataSet&, QString&);
+	static void    read_TCOORD  (const mdcm::DataSet&, QString&, bool);
 	static QString read_sr_title1(const mdcm::DataSet&, const QString&);
 	static QString read_sr_title2(const mdcm::DataSet&, const QString&);
 	static QStringList read_referenced(const mdcm::DataSet&, QString&);

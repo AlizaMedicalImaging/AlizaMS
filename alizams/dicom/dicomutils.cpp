@@ -10475,7 +10475,7 @@ QString DicomUtils::read_dicom(
 						QString("1"),
 						true) +
 					foot3;
-				sr->textBrowser->setHtml(s1);
+				sr->initSR(s1);
 				sr->show();
 				sr->raise();
 			}

@@ -278,7 +278,7 @@ void SRUtils::set_asked_for_path_once(bool t)
 }
 
 void SRUtils::read_IMAGE(
-	const mdcm::DataSet & nds,
+	const mdcm::DataSet & ds,
 	const QString & charset,
 	const QString & path,
 	QString & s,
@@ -292,10 +292,11 @@ void SRUtils::read_IMAGE(
 {
 	QString tmpfile("");
 	const mdcm::DataElement & e8  =
-		nds.GetDataElement(mdcm::Tag(0x0008,0x1199));
+		ds.GetDataElement(mdcm::Tag(0x0008,0x1199));
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sq8 =
 		e8.GetValueAsSQ();
 	if (!sq8) return;
+	if (info) s += QString("<br />");
 	const SettingsWidget * settings =
 		static_cast<const SettingsWidget*>(wsettings);
 	const bool skip_images = settings->get_sr_skip_images();
@@ -858,7 +859,7 @@ endpoints of the minor axis of an ellipse
 }
 
 bool SRUtils::read_SCOORD(
-	const mdcm::DataSet & nds,
+	const mdcm::DataSet & ds,
 	const QString & charset,
 	const QString & path,
 	QString & s,
@@ -872,9 +873,10 @@ bool SRUtils::read_SCOORD(
 	const SettingsWidget * settings =
 		static_cast<const SettingsWidget*>(wsettings);
 	const bool skip_images = settings->get_sr_skip_images();
+	s += QString("<br />");
 	QString GraphicType;
 	if (DicomUtils::get_string_value(
-			nds,
+			ds,
 			mdcm::Tag(0x0070,0x0023),
 			GraphicType))
 	{
@@ -882,15 +884,23 @@ bool SRUtils::read_SCOORD(
 		s += QString("<span class='yy'>") +
 			GraphicType +
 			QString("</span><br />");
+		if (info)
+		{
+			s += QString(
+					"<span class='y3'>"
+					"Graphic Type: ") +
+				GraphicType +
+				QString("</span><br />");
+		}
 	}
 	std::vector<float> GraphicData;
 	DicomUtils::get_fl_values(
-		nds,
+		ds,
 		mdcm::Tag(0x0070,0x0022),
 		GraphicData);
 	QString PixelOriginInterpretation;
 	if (DicomUtils::get_string_value(
-			nds,
+			ds,
 			mdcm::Tag(0x0048,0x0301),
 			PixelOriginInterpretation))
 	{
@@ -906,7 +916,7 @@ bool SRUtils::read_SCOORD(
 	}
 	QString FiducialUID;
 	if (DicomUtils::get_string_value(
-			nds,
+			ds,
 			mdcm::Tag(0x0070,0x031A),
 			FiducialUID))
 	{
@@ -921,10 +931,10 @@ bool SRUtils::read_SCOORD(
 
 /////////////////////
 	size_t other_ = 0;
-	if (nds.FindDataElement(mdcm::Tag(0x0040,0xa730)))
+	if (ds.FindDataElement(mdcm::Tag(0x0040,0xa730)))
 	{
 		const mdcm::DataElement & e  =
-			nds.GetDataElement(mdcm::Tag(0x0040,0xa730));
+			ds.GetDataElement(mdcm::Tag(0x0040,0xa730));
 		mdcm::SmartPointer<mdcm::SequenceOfItems> sq =
 			e.GetValueAsSQ();
 		if (sq)
@@ -993,14 +1003,14 @@ bool SRUtils::read_SCOORD(
 }
 
 void SRUtils::read_PNAME(
-	const mdcm::DataSet & nds,
+	const mdcm::DataSet & ds,
 	const QString & charset,
 	QString & s)
 {
-	if(!nds.FindDataElement(mdcm::Tag(0x0040,0xa123)))
+	if(!ds.FindDataElement(mdcm::Tag(0x0040,0xa123)))
 		return;
 	const mdcm::DataElement & e2 =
-		nds.GetDataElement(mdcm::Tag(0x0040,0xa123));
+		ds.GetDataElement(mdcm::Tag(0x0040,0xa123));
 	if (
 		!e2.IsEmpty() &&
 		!e2.IsUndefinedLength() &&
@@ -1021,14 +1031,14 @@ void SRUtils::read_PNAME(
 }
 
 void SRUtils::read_TEXT(
-	const mdcm::DataSet & nds,
+	const mdcm::DataSet & ds,
 	const QString & charset,
 	QString & s)
 {
-	if(!nds.FindDataElement(mdcm::Tag(0x0040,0xa160)))
+	if(!ds.FindDataElement(mdcm::Tag(0x0040,0xa160)))
 		return;
 	const mdcm::DataElement & e2 =
-		nds.GetDataElement(mdcm::Tag(0x0040,0xa160));
+		ds.GetDataElement(mdcm::Tag(0x0040,0xa160));
 	if (
 		!e2.IsEmpty() &&
 		!e2.IsUndefinedLength() &&
@@ -1047,14 +1057,14 @@ void SRUtils::read_TEXT(
 }
 
 void SRUtils::read_NUM(
-	const mdcm::DataSet & nds,
+	const mdcm::DataSet & ds,
 	const QString & charset,
 	QString & s)
 {
-	if (!nds.FindDataElement(mdcm::Tag(0x0040,0xa300)))
+	if (!ds.FindDataElement(mdcm::Tag(0x0040,0xa300)))
 		return;
 	const mdcm::DataElement & e3  =
-		nds.GetDataElement(mdcm::Tag(0x0040,0xa300));
+		ds.GetDataElement(mdcm::Tag(0x0040,0xa300));
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sq3 =
 		e3.GetValueAsSQ();
 	if (!sq3) return;
@@ -1160,14 +1170,14 @@ void SRUtils::read_NUM(
 }
 
 void SRUtils::read_CODE(
-	const mdcm::DataSet & nds,
+	const mdcm::DataSet & ds,
 	const QString & charset,
 	QString & s)
 {
-	if (!nds.FindDataElement(mdcm::Tag(0x0040,0xa168))) return;
+	if (!ds.FindDataElement(mdcm::Tag(0x0040,0xa168))) return;
 	QString CodeMeaning2;
 	const mdcm::DataElement & e4  =
-		nds.GetDataElement(mdcm::Tag(0x0040,0xa168));
+		ds.GetDataElement(mdcm::Tag(0x0040,0xa168));
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sq4 =
 		e4.GetValueAsSQ();
 	if (sq4)
@@ -1212,11 +1222,11 @@ void SRUtils::read_CODE(
 	}
 }
 
-void SRUtils::read_DATE(const mdcm::DataSet & nds, QString & s)
+void SRUtils::read_DATE(const mdcm::DataSet & ds, QString & s)
 {
 	QString Date;
 	if (DicomUtils::get_string_value(
-			nds,
+			ds,
 			mdcm::Tag(0x0040,0xa121),
 			Date))
 	{
@@ -1229,11 +1239,11 @@ void SRUtils::read_DATE(const mdcm::DataSet & nds, QString & s)
 	}
 }
 
-void SRUtils::read_DATETIME(const mdcm::DataSet & nds, QString & s)
+void SRUtils::read_DATETIME(const mdcm::DataSet & ds, QString & s)
 {
 	QString DateTime;
 	if (!DicomUtils::get_string_value(
-			nds,
+			ds,
 			mdcm::Tag(0x0040,0xa120),
 			DateTime)) return;
 	DateTime = DateTime.trimmed();
@@ -1268,11 +1278,11 @@ void SRUtils::read_DATETIME(const mdcm::DataSet & nds, QString & s)
 		tmp0 + QString("</span><br />");
 }
 
-void SRUtils::read_TIME(const mdcm::DataSet & nds, QString & s)
+void SRUtils::read_TIME(const mdcm::DataSet & ds, QString & s)
 {
 	QString Time;
 	if (!DicomUtils::get_string_value(
-			nds,
+			ds,
 			mdcm::Tag(0x0040,0xa122),
 			Time)) return;
 	Time = Time.trimmed();
@@ -1307,12 +1317,12 @@ void SRUtils::read_TIME(const mdcm::DataSet & nds, QString & s)
 		tmp0 + QString("</span><br />");
 }
 
-void SRUtils::read_SCOORD3D(const mdcm::DataSet & nds, QString & s)
+void SRUtils::read_SCOORD3D(const mdcm::DataSet & ds, QString & s)
 {
 	// TODO
 	QString GraphicType;
 	if (DicomUtils::get_string_value(
-			nds,
+			ds,
 			mdcm::Tag(0x0070,0x0023),
 			GraphicType))
 	{
@@ -1323,12 +1333,12 @@ void SRUtils::read_SCOORD3D(const mdcm::DataSet & nds, QString & s)
 	}
 	std::vector<float> graphic_data;
 	DicomUtils::get_fl_values(
-		nds,
+		ds,
 		mdcm::Tag(0x0070,0x0022),
 		graphic_data);
 	QString ReferencedFrameofReferenceUID;
 	if (DicomUtils::get_string_value(
-			nds,
+			ds,
 			mdcm::Tag(0x3006,0x0024),
 			ReferencedFrameofReferenceUID))
 	{
@@ -1339,7 +1349,7 @@ void SRUtils::read_SCOORD3D(const mdcm::DataSet & nds, QString & s)
 	}
 	QString FiducialUID;
 	if (DicomUtils::get_string_value(
-			nds,
+			ds,
 			mdcm::Tag(0x0070,0x031A),
 			FiducialUID))
 	{
@@ -1350,11 +1360,11 @@ void SRUtils::read_SCOORD3D(const mdcm::DataSet & nds, QString & s)
 	}
 }
 
-QString SRUtils::read_UIDREF(const mdcm::DataSet & nds, QString & s)
+QString SRUtils::read_UIDREF(const mdcm::DataSet & ds, QString & s)
 {
 	QString UID;
 	if (!DicomUtils::get_string_value(
-		nds, mdcm::Tag(0x0040,0xa124), UID))
+		ds, mdcm::Tag(0x0040,0xa124), UID))
 	{
 		return QString("");
 	}
@@ -1362,6 +1372,58 @@ QString SRUtils::read_UIDREF(const mdcm::DataSet & nds, QString & s)
 		UID.trimmed().remove(QChar('\0')) +
 		QString("</span><br />");
 	return UID.trimmed();
+}
+
+void SRUtils::read_TCOORD(
+	const mdcm::DataSet & ds,
+	QString & s,
+	bool info)
+{
+	// TODO
+	QString TemporalRangeType;
+	if (DicomUtils::get_string_value(
+			ds, mdcm::Tag(0x0040,0xa130), TemporalRangeType))
+	{
+		TemporalRangeType = TemporalRangeType.trimmed();
+		s += QString("<span class='yy'>") +
+			TemporalRangeType +
+			QString("</span><br />");
+		if (info)
+		{
+			s += QString(
+					"<span class='y3'>"
+					"Temporal Range Type: ") +
+				TemporalRangeType +
+				QString("</span><br />");
+		}
+	}
+/*
+--- Referenced Sample Positions (0040,A132) 1C
+
+  List of samples within a multiplex group specifying
+temporal points of the referenced data. Position of
+first sample is 1.
+  Required if the Referenced SOP Instance is a Waveform
+and Referenced Time Offsets (0040,A138) and Referenced
+DateTime (0040,A13A) are not present.
+  May be used only if Referenced Channels (0040,A0B0)
+refers to channels within a single multiplex group.
+
+--- Referenced Time Offsets (0040,A138) 1C
+
+  Specifies temporal points for reference by number of
+seconds after start of data.
+  Required if Referenced Sample Positions (0040,A132)
+and Referenced DateTime (0040,A13A) are not present.
+
+--- Referenced DateTime (0040,A13A) 1C
+
+  Specifies temporal points for reference by absolute
+time.
+  Required if Referenced Sample Positions (0040,A132)
+and Referenced Time Offsets (0040,A138) are not
+present.
+*/
 }
 
 QString SRUtils::read_sr_title1(
@@ -1667,6 +1729,7 @@ QString SRUtils::read_sr_content_sq(
 		QString RelationshipType;
 		QString ContinuityOfContent;
 		QString CodeMeaning;
+		QString TemporalRangeType;
 		std::vector<unsigned int> ReferencedContentItemIdentifier;
 		//
 		const mdcm::Item & item = sq->GetItem(i+1);
@@ -1695,6 +1758,7 @@ QString SRUtils::read_sr_content_sq(
 		if (DicomUtils::get_string_value(
 				nds, mdcm::Tag(0x0040,0xa050), ContinuityOfContent))
 		{
+			// TODO
 			ContinuityOfContent = ContinuityOfContent.trimmed().toUpper();
 			if (info)
 			{
@@ -1829,7 +1893,7 @@ QString SRUtils::read_sr_content_sq(
 		{
 			// TODO
 			s += QString(
-					"<span class='red2'>COMPOSITE"
+					"<br /><span class='red2'>COMPOSITE"
 					"</span><br />");
 			const QStringList & l = read_referenced(nds, s);
 		}
@@ -1837,21 +1901,29 @@ QString SRUtils::read_sr_content_sq(
 		{
 			// TODO
 			s += QString(
-					"<span class='red2'>WAVEFORM"
+					"<br /><span class='red2'>WAVEFORM"
 					"</span><br />");
 			const QStringList & l = read_referenced(nds, s);
 		}
 		else if (ValueType == QString("SCOORD3D"))
 		{
 			// TODO
-			s += QString("<span class='red2'>SCOORD3D</span><br />");
+			s += QString(
+				"<br /><span class='red2'>SCOORD3D"
+				"</span><br />");
 			read_SCOORD3D(nds, s);
+		}
+		else if (ValueType == QString("TCOORD"))
+		{
+			// TODO
+			s += QString("<br /><span class='red2'>TCOORD</span><br />");
+			read_TCOORD(nds, s, info);
 		}
 		else
 		{
 			if (!ValueType.isEmpty())
 			{
-				s += QString("<span class='red2'>Value ") +
+				s += QString("<br /><span class='red2'>Value ") +
 					ValueType +
 					QString("</span><br />");
 			}
