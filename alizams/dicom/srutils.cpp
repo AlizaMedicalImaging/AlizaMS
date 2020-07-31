@@ -296,7 +296,6 @@ void SRUtils::read_IMAGE(
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sq8 =
 		e8.GetValueAsSQ();
 	if (!sq8) return;
-	if (info) s += QString("<br />");
 	const SettingsWidget * settings =
 		static_cast<const SettingsWidget*>(wsettings);
 	const bool skip_images = settings->get_sr_skip_images();
@@ -448,7 +447,7 @@ void SRUtils::read_IMAGE(
 			}
 			if (info)
 			{
-				s += QString("<span class='y3'>IMAGE: ") +
+				s += QString("<span class='y3'>Image file: ") +
 					QDir::toNativeSeparators(sf) +
 					QString("</span><br />");
 			}
@@ -873,7 +872,6 @@ bool SRUtils::read_SCOORD(
 	const SettingsWidget * settings =
 		static_cast<const SettingsWidget*>(wsettings);
 	const bool skip_images = settings->get_sr_skip_images();
-	s += QString("<br />");
 	QString GraphicType;
 	if (DicomUtils::get_string_value(
 			ds,
