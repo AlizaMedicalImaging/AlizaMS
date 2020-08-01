@@ -53,11 +53,11 @@ Highlights
  * 2D+t, 3D+t animations
  * Very fast directory scanner, DICOMDIR
  * Grayscale softcopy presentation
- * Structured Report
+ * Structured report
  * Compressed images
  * RTSTRUCT contours
  * 2D and 3D views with many tools
- * Siemens Mosaic format
+ * Siemens mosaic format
  * United Imaging Healthcare (UIH) Grid / VFrame format
  * Elscint ELSCINT1 PMSCT_RLE1 and PMSCT_RGB1
 
