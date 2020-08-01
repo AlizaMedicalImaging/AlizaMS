@@ -11,11 +11,20 @@ Linux
 
 To start on Linux extract archive and run _alizams.sh_
 
-![Run](alizams/package/art/s0.png)
+__$cd alizams-1.1.0__
+
+__$./alizams.sh__
 
 Optionally install local desktop menu entry
 
-![Menu](alizams/package/art/s1.png)
+__$cd alizams-1.1.0/install_menu___
+__$./install_menu.sh__
+
+To remove local menu entry
+
+__$cd alizams-1.1.0/install_menu___
+__$./uninstall_menu.sh__
+
 
 Windows
 -------
@@ -41,13 +50,14 @@ Highlights
  * Intersections in study
  * 2D+t, 3D+t animations
  * Very fast directory scanner, DICOMDIR
+ * Grayscale softcopy presentation
+ * Structured Report
  * Compressed images
  * RTSTRUCT contours
  * 2D and 3D views with many tools
  * Siemens Mosaic format
  * United Imaging Healthcare (UIH) Grid / VFrame format
  * Elscint ELSCINT1 PMSCT_RLE1 and PMSCT_RGB1
- * Grayscale softcopy presentation (partial)
 
 
 Build
