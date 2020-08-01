@@ -11,7 +11,7 @@ Linux
 
 To start on Linux extract archive and run _alizams.sh_
 
-__$cd alizams-1.1.0__
+__$cd alizams-1.1.0_linux__
 
 __$./alizams.sh__
 
