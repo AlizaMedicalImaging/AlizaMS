@@ -17,12 +17,12 @@ __$./alizams.sh__
 
 Optionally install local desktop menu entry
 
-__$cd alizams-1.1.0/install_menu___
+__$cd alizams-1.1.0_linux/install_menu___
 __$./install_menu.sh__
 
 To remove local menu entry
 
-__$cd alizams-1.1.0/install_menu___
+__$cd alizams-1.1.0_linux/install_menu___
 __$./uninstall_menu.sh__
 
 
