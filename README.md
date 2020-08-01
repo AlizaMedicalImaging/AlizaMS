@@ -29,7 +29,7 @@ __$./uninstall_menu.sh__
 Windows
 -------
 
-Click or run from terminal _alizams.exe_
+Extract archive, click or run from terminal _alizams.exe_
 
 View
 ----
