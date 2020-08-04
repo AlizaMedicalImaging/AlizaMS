@@ -11,22 +11,24 @@ Linux
 
 To start on Linux extract archive and run _alizams.sh_
 
-__$cd alizams-1.1.0_linux__
-
-__$./alizams.sh__
+```
+cd alizams-1.1.0_linux__
+./alizams.sh
+```
 
 Optionally install local desktop menu entry
 
-__$cd alizams-1.1.0_linux/install_menu__
-
-__$./install_menu.sh__
+```
+$cd alizams-1.1.0_linux/install_menu
+$./install_menu.sh
+```
 
 To remove local menu entry
 
-__$cd alizams-1.1.0_linux/install_menu__
-
-__$./uninstall_menu.sh__
-
+```
+$cd alizams-1.1.0_linux/install_menu
+$./uninstall_menu.sh
+```
 
 Windows
 -------
@@ -36,31 +38,31 @@ Extract archive, click or run from terminal _alizams.exe_
 View
 ----
 
-Select 'DICOM scanner' tab, open directory with DICOM files or DICOMDIR file (or drag-and-drop)
+Select _DICOM scanner_ tab, open directory with DICOM files or DICOMDIR file (or drag-and-drop)
 
-Select one or more series and click 'arrow' action (or double-click selected row) to load
+Select one or more series and click _arrow_ action (or double-click selected row) to load
 
 
 ![Open](alizams/package/art/start0.png)
 
 
-
 Highlights
 ----------
- * View uniform and non-uniform series in physical space
- * Ultrasound incl. proper measurement in regions, cine
- * Intersections in study
- * 2D+t, 3D+t animations
+
  * Very fast directory scanner, DICOMDIR
+ * 2D and 3D views with many tools
+ * View uniform and non-uniform series in physical space
+ * 2D+t, 3D+t animations
+ * Ultrasound incl. proper measurement in regions, cine
+ * Scout (localizer) line 
  * Grayscale softcopy presentation
  * Structured report
  * Compressed images
  * RTSTRUCT contours
- * 2D and 3D views with many tools
  * Siemens mosaic format
  * United Imaging Healthcare (UIH) Grid / VFrame format
  * Elscint ELSCINT1 PMSCT_RLE1 and PMSCT_RGB1
-
+ * DICOM metadata
 
 Build
 -----
