@@ -12,7 +12,7 @@ Linux
 To start on Linux extract archive and run _alizams.sh_
 
 ```
-cd alizams-1.1.0_linux__
+cd alizams-1.1.0_linux
 ./alizams.sh
 ```
 
