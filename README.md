@@ -54,7 +54,7 @@ Highlights
  * View uniform and non-uniform series in physical space
  * 2D+t, 3D+t animations
  * Ultrasound incl. proper measurement in regions, cine
- * Scout (localizer) line 
+ * Scout (localizer) lines
  * Grayscale softcopy presentation
  * Structured report
  * Compressed images
