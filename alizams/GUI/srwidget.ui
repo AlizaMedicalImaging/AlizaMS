@@ -50,6 +50,12 @@ p, li { white-space: pre-wrap; }
      <property name="textInteractionFlags">
       <set>Qt::TextBrowserInteraction</set>
      </property>
+     <property name="searchPaths">
+      <stringlist/>
+     </property>
+     <property name="openExternalLinks">
+      <bool>false</bool>
+     </property>
     </widget>
    </item>
    <item>

@@ -3,6 +3,7 @@
 #include <QtGlobal>
 #include <QTextDocument>
 #include <QFile>
+#include <QTextStream>
 #include <QUrl>
 #include <QSettings>
 #include <QApplication>
@@ -12,21 +13,14 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QPrintPreviewDialog>
+#include <QDateTime>
+#include <QDir>
 #include "commonutils.h"
-
-const QString css3 = QString(
-	"span.red2 { color:#aa0505; font-size: small; font-weight: bold; }\n"
-	"span.y    { color:#050505; }\n"
-	"span.yy   { color:#050505; font-size: small; font-weight: bold; }\n"
-	"span.y3   { color:#053005; font-size: small; font-style: italic; }\n"
-	"span.t1   { color:#050505; font-size: large; font-weight: bold; }\n"
-	"span.t2   { color:#050505; font-size: large; font-style: italic; }\n"
-	"span.y9   { color:#0d0d76; font-weight: bold; font-style: italic; }"
-	"span.yy9  { color:#0d0d76; font-size: small; font-weight: bold; font-style: italic; }");
 
 SRWidget::SRWidget(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
 {
 	setupUi(this);
+	tmpfile = QString("");
 #if 1
 	backward_toolButton->hide();
 	forward_toolButton->hide();
@@ -35,17 +29,31 @@ SRWidget::SRWidget(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
 	print_toolButton->setIconSize(s);
 	toolButton->setIconSize(s);
 	readSettings();
-	textBrowser->document()->addResource(
-		QTextDocument::StyleSheetResource,
-		QUrl("format.css"),
-		css3);
 	connect(print_toolButton, SIGNAL(pressed()), this, SLOT(printSR()));
 	connect(save_toolButton,  SIGNAL(pressed()), this, SLOT(saveSR()));
 }
 
+SRWidget::~SRWidget()
+{
+}
+
 void SRWidget::initSR(const QString & s)
 {
-	// FIXME
+	QString s1 = QString(
+"<html><head>"
+"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />"
+"<style type='text/css'>\n"
+"span.t1   { color:#000000; font-size:large; font-weight:bold; }\n"
+"span.t2   { color:#000000; font-size:large; font-style:italic; }\n"
+"span.y    { color:#000000; font-style:normal;}\n"
+"span.yy   { color:#000000; font-size:small; font-weight:bold; }\n"
+"span.y9   { color:#0d0d76; font-weight:bold; font-style:italic; }\n"
+"span.yy9  { color:#0d0d76; font-size:small; font-weight:bold; font-style:italic; }\n"
+"span.y3   { color:#053005; font-size:small; font-style:italic; }\n"
+"span.red2 { color:#aa0505; font-size:small; font-weight:bold; }\n"
+"</style></head><body>");
+	s1 += s;
+	s1 += QString("</body></html>");
 #if 0
 	backward_toolButton->setEnabled(false);
 	forward_toolButton->setEnabled(false);
@@ -54,11 +62,27 @@ void SRWidget::initSR(const QString & s)
 	connect(backward_toolButton, SIGNAL(pressed()), textBrowser, SLOT(backward()));
 	connect(forward_toolButton,  SIGNAL(pressed()), textBrowser, SLOT(forward()));
 #endif
-	textBrowser->setHtml(s);
-}
-
-SRWidget::~SRWidget()
-{
+#if 1
+	textBrowser->setHtml(s1);
+#else
+	tmpfile = QDir::toNativeSeparators(
+		QDir::tempPath() +
+		QString("/sr")+
+		QVariant(
+			(qulonglong)
+				QDateTime::currentMSecsSinceEpoch())
+					.toString() +
+		QString(".html"));
+	QFile f(tmpfile);
+	if (f.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		QTextStream o(&f);
+		o << s1;
+		f.flush();
+		f.close();
+	}
+	textBrowser->setSource(tmpfile);
+#endif
 }
 
 void SRWidget::closeEvent(QCloseEvent * e)
@@ -82,6 +106,7 @@ void SRWidget::closeEvent(QCloseEvent * e)
 		if (srimages.at(k).p) delete [] (srimages[k].p);
 	}
 	srimages.clear();
+	if (!tmpfile.isEmpty()) QFile::remove(tmpfile);
 	e->accept();
 }
 
@@ -161,3 +186,4 @@ void SRWidget::saveSR()
 	writer.write(textBrowser->document());
 	QApplication::restoreOverrideCursor();
 }
+

@@ -325,7 +325,7 @@ void SRUtils::read_IMAGE(
 				{
 					s += QString("<span class='y3'>IMAGE: ") +
 						uidname +
-						QString("</span><br />");
+						QString("</span><br />\n");
 				}
 			}
 			else
@@ -336,7 +336,7 @@ void SRUtils::read_IMAGE(
 				{
 					s += QString("<span class='y3'>IMAGE: ") +
 						ReferencedSOPClassUID +
-						QString("</span><br />");
+						QString("</span><br />\n");
 				}
 			}
 		}
@@ -350,13 +350,13 @@ void SRUtils::read_IMAGE(
 			{
 				s += QString("<span class='y3'>IMAGE: ") +
 					ReferencedSOPInstanceUID.trimmed() +
-					QString("</span><br />");
+					QString("</span><br />\n");
 			}
 			else if (skip_images)
 			{
 				s += QString("<span class='yy'>IMAGE: ") +
 					ReferencedSOPInstanceUID.trimmed() +
-					QString("</span><br />");
+					QString("</span><br />\n");
 			}
 			if (skip_images) continue;
 			int idx = 0;
@@ -449,7 +449,7 @@ void SRUtils::read_IMAGE(
 			{
 				s += QString("<span class='y3'>Image file: ") +
 					QDir::toNativeSeparators(sf) +
-					QString("</span><br />");
+					QString("</span><br />\n");
 			}
 			if (pb)
 			{
@@ -760,7 +760,7 @@ endpoints of the minor axis of an ellipse
 							{
 								s += QString("<span class='red2'>") +
 									sg.GraphicType +
-									QString("</span><br />");
+									QString("</span><br />\n");
 							}
 						}
 					}
@@ -817,20 +817,20 @@ endpoints of the minor axis of an ellipse
 					if (pm.p) delete [] pm.p;
 #endif
 #endif
-					if (s.endsWith(QString("<br />"))) s.chop(6);
+					if (s.endsWith(QString("<br />\n"))) s.chop(7);
 					s += QString("<p style=\"margin-left: 0px\">") +
 						QString("<img src=\"") + tmpfile +
-						QString("\" /></p>");
+						QString("\" /></p>\n");
 				}
 				else
 				{
 					s += QString("<span class='yy'>") +
 						QString("IMAGE: ") + ReferencedSOPInstanceUID +
 						QString(
-							"</span><br /><span class='red2'>"
+							"</span><br />\n<span class='red2'>"
 							"IMAGE: error (1) ") +
 						e_.trimmed() +
-						QString("</span><br />");
+						QString("</span><br />\n");
 				}
 			}
 			else
@@ -838,10 +838,10 @@ endpoints of the minor axis of an ellipse
 				s += QString("<span class='yy'>") +
 					QString("IMAGE: ") + ReferencedSOPInstanceUID +
 					QString(
-						"</span><br /><span class='red2'>"
+						"</span><br />\n<span class='red2'>"
 						"IMAGE: error (2) ") +
 					e_.trimmed() +
-					QString("</span><br />");
+					QString("</span><br />\n");
 			}
 			for (size_t yy = 0; yy < ivariants.size(); yy++)
 			{
@@ -881,14 +881,14 @@ bool SRUtils::read_SCOORD(
 		GraphicType = GraphicType.trimmed();
 		s += QString("<span class='yy'>") +
 			GraphicType +
-			QString("</span><br />");
+			QString("</span><br />\n");
 		if (info)
 		{
 			s += QString(
 					"<span class='y3'>"
 					"Graphic Type: ") +
 				GraphicType +
-				QString("</span><br />");
+				QString("</span><br />\n");
 		}
 	}
 	std::vector<float> GraphicData;
@@ -909,7 +909,7 @@ bool SRUtils::read_SCOORD(
 		{
 			s += QString("<span class='y3'>") +
 				PixelOriginInterpretation +
-				QString("</span><br />");
+				QString("</span><br />\n");
 		}
 	}
 	QString FiducialUID;
@@ -923,7 +923,7 @@ bool SRUtils::read_SCOORD(
 		{
 			s += QString("<span class='y3'>") +
 				FiducialUID +
-				QString("</span><br />");
+				QString("</span><br />\n");
 		}
 	}
 
@@ -1024,7 +1024,7 @@ void SRUtils::read_PNAME(
 		TextValue = TextValue.trimmed();
 		s += QString("<span class='y'>") +
 			DicomUtils::convert_pn_value(TextValue) +
-			QString("</span><br />");
+			QString("</span><br />\n");
 	}
 }
 
@@ -1050,7 +1050,7 @@ void SRUtils::read_TEXT(
 				&ba, charset.toLatin1().constData());
 		s += QString("<span class='y'>") +
 			TextValue.trimmed() +
-			QString("</span><br />");
+			QString("</span><br />\n");
 	}
 }
 
@@ -1162,7 +1162,7 @@ void SRUtils::read_NUM(
 			s += QString("<span class='y'>") +
 				NumericValue.trimmed() +
 				QString(" ") + u +
-				QString("</span><br />");
+				QString("</span><br />\n");
 		}
 	}
 }
@@ -1216,7 +1216,7 @@ void SRUtils::read_CODE(
 	{
 		s += QString("<span class='y'>") +
 			CodeMeaning2 +
-			QString("</span><br />");
+			QString("</span><br />\n");
 	}
 }
 
@@ -1233,7 +1233,7 @@ void SRUtils::read_DATE(const mdcm::DataSet & ds, QString & s)
 			QDate::fromString(Date, QString("yyyyMMdd"));
 		s += QString("<span class='y'>") +
 			date_.toString(QString("d MMM yyyy")) +
-			QString("</span><br />");
+			QString("</span><br />\n");
 	}
 }
 
@@ -1273,7 +1273,7 @@ void SRUtils::read_DATETIME(const mdcm::DataSet & ds, QString & s)
 		}
 	}
 	s += QString("<span class='y'>") +
-		tmp0 + QString("</span><br />");
+		tmp0 + QString("</span><br />\n");
 }
 
 void SRUtils::read_TIME(const mdcm::DataSet & ds, QString & s)
@@ -1312,7 +1312,7 @@ void SRUtils::read_TIME(const mdcm::DataSet & ds, QString & s)
 		}
 	}
 	s += QString("<span class='y'>") +
-		tmp0 + QString("</span><br />");
+		tmp0 + QString("</span><br />\n");
 }
 
 void SRUtils::read_SCOORD3D(const mdcm::DataSet & ds, QString & s)
@@ -1327,7 +1327,7 @@ void SRUtils::read_SCOORD3D(const mdcm::DataSet & ds, QString & s)
 		GraphicType = GraphicType.trimmed();
 		s += QString("<span class='y'>") +
 			GraphicType +
-			QString("</span><br />");
+			QString("</span><br />\n");
 	}
 	std::vector<float> graphic_data;
 	DicomUtils::get_fl_values(
@@ -1343,7 +1343,7 @@ void SRUtils::read_SCOORD3D(const mdcm::DataSet & ds, QString & s)
 		ReferencedFrameofReferenceUID =
 			ReferencedFrameofReferenceUID.trimmed();
 		s += QString("<span class='y'>") + ReferencedFrameofReferenceUID +
-			QString("</span><br />");
+			QString("</span><br />\n");
 	}
 	QString FiducialUID;
 	if (DicomUtils::get_string_value(
@@ -1354,7 +1354,7 @@ void SRUtils::read_SCOORD3D(const mdcm::DataSet & ds, QString & s)
 		FiducialUID = FiducialUID.trimmed();
 		s += QString("<span class='y'>") +
 			FiducialUID +
-			QString("</span><br />");
+			QString("</span><br />\n");
 	}
 }
 
@@ -1368,7 +1368,7 @@ QString SRUtils::read_UIDREF(const mdcm::DataSet & ds, QString & s)
 	}
 	s += QString("<span class='y'>") +
 		UID.trimmed().remove(QChar('\0')) +
-		QString("</span><br />");
+		QString("</span><br />\n");
 	return UID.trimmed();
 }
 
@@ -1385,14 +1385,14 @@ void SRUtils::read_TCOORD(
 		TemporalRangeType = TemporalRangeType.trimmed();
 		s += QString("<span class='yy'>") +
 			TemporalRangeType +
-			QString("</span><br />");
+			QString("</span><br />\n");
 		if (info)
 		{
 			s += QString(
 					"<span class='y3'>"
 					"Temporal Range Type: ") +
 				TemporalRangeType +
-				QString("</span><br />");
+				QString("</span><br />\n");
 		}
 	}
 /*
@@ -1437,16 +1437,30 @@ QString SRUtils::read_sr_title2(
 	const mdcm::DataSet & ds,
 	const QString & charset)
 {
-	QString s("<p id=\"1a\" align=\"center\">");
+	QString s("");
 	if (ds.FindDataElement(
 		mdcm::Tag(0x0010,0x0010)))
 	{
-		s += QString("<span class='t1'>") +
+		const QString pn =
 			DicomUtils::get_pn_value2(
 				ds,
 				mdcm::Tag(0x0010,0x0010),
-				charset.toLatin1().constData()) +
-			QString("</span>");
+				charset.toLatin1().constData());
+		if (!pn.isEmpty())
+		{
+			s += QString(
+				"<h1 id=\"1\" align=\"center\">"
+				"<span class='t1'>") +
+				pn +
+				QString("</span></h1>\n");
+		}
+	}
+	if (s.isEmpty())
+	{
+		s += QString(
+				"<h1 id=\"1\" align=\"center\">"
+				"<span class='t1'>"
+				"Anonymous</span></h1>\n");
 	}
 	QString d;
 	if (DicomUtils::get_string_value(
@@ -1458,22 +1472,20 @@ QString SRUtils::read_sr_title2(
 			QDate::fromString(
 				d.trimmed(),
 				QString("yyyyMMdd"));
-		s += QString("<br /><span class='t2'>") +
+		s += QString("<p id=\"1a\" align=\"center\"><span class='t2'>") +
 			qd.toString(QString("d MMM yyyy")) +
-			QString("</span>");
+			QString("</span></p>\n");
 	}
-	s += QString("</p><p id=\"1b\" ><ul>");
+	s += QString("<span class='y'><p id=\"1b\"><ul>");
 	QString id;
 	if (DicomUtils::get_string_value(
 			ds,
 			mdcm::Tag(0x0010,0x0020),
 			id))
 	{
-		s += QString(
-				"<li><span class='y'>Patient ID: "
-				"</span><span class='y'>") +
+		s += QString("<li>Patient ID: ") +
 			id.trimmed() +
-			QString("</span></li>");
+			QString("</li>");
 	}
 	QString StudyDate;
 	if (DicomUtils::get_string_value(
@@ -1485,11 +1497,9 @@ QString SRUtils::read_sr_title2(
 			QDate::fromString(
 				StudyDate.trimmed(),
 				QString("yyyyMMdd"));
-		s += QString(
-				"<li><span class='y'>Study date: "
-				"</span><span class='y'>") +
+		s += QString("<li>Study date: ") +
 			qd.toString(QString("d MMM yyyy")) +
-			QString("</span></li>");
+			QString("</li>");
 	}
 	if (ds.FindDataElement(
 		mdcm::Tag(0x0008,0x0090)))
@@ -1501,11 +1511,9 @@ QString SRUtils::read_sr_title2(
 				charset.toLatin1().constData());
 		if (!tmp0.isEmpty())
 		{
-			s += QString(
-					"<li><span class='y'>Referring: "
-					"</span><span class='y'>") +
+			s += QString("<li>Referring: ") +
 				tmp0 +
-				QString("</span></li>");
+				QString("</li>");
 		}
 	}
 	QString CompletionFlag;
@@ -1514,11 +1522,9 @@ QString SRUtils::read_sr_title2(
 			mdcm::Tag(0x0040,0xa491),
 			CompletionFlag))
 	{
-		s += QString(
-			"<li><span class='y'>Completion: "
-			"</span><span class='y'>") +
+		s += QString("<li>Completion: ") +
 			CompletionFlag.toLower() +
-			QString("</span></li>");
+			QString("</li>");
 	}
 	QString VerificationFlag;
 	if (DicomUtils::get_string_value(
@@ -1526,15 +1532,13 @@ QString SRUtils::read_sr_title2(
 			mdcm::Tag(0x0040,0xa493),
 			VerificationFlag))
 	{
-		s += QString(
-			"<li><span class='y'>Verification: "
-			"</span><span class='y'>") +
+		s += QString("<li>Verification: ") +
 			VerificationFlag.toLower() +
-			QString("</span></li>");
+			QString("</li>");
 	}
 	//
 	//
-	s += QString("</ul></p>");
+	s += QString("</ul></p>\n</span>");
 	return s;
 }
 
@@ -1574,7 +1578,7 @@ QStringList SRUtils::read_referenced(
 				uidname = uidname.trimmed();
 				s += QString("<span class='y'>") +
 					uidname +
-					QString("</span><br />");
+					QString("</span><br />\n");
 			}
 			else
 			{
@@ -1584,7 +1588,7 @@ QStringList SRUtils::read_referenced(
 						.remove(QChar('\0'));
 				s += QString("<span class='y'>") +
 					ReferencedSOPClassUID +
-					QString("</span><br />");
+					QString("</span><br />\n");
 			}
 		}
 		QString ReferencedSOPInstanceUID;
@@ -1596,7 +1600,7 @@ QStringList SRUtils::read_referenced(
 			l.push_back(ReferencedSOPInstanceUID.trimmed());
 			s += QString("<span class='y'>") +
 				ReferencedSOPInstanceUID.trimmed().remove(QChar('\0')) +
-				QString("</span><br />");
+				QString("</span><br />\n");
 		}
 		std::vector<int> refframes;
 		if (DicomUtils::get_is_values(
@@ -1613,7 +1617,7 @@ QStringList SRUtils::read_referenced(
 			}
 			s += QString("<span class='y'>") +
 				ff.trimmed() +
-				QString("</span><br />");
+				QString("</span><br />\n");
 		}
 	}
 	return l;
@@ -1721,7 +1725,7 @@ QString SRUtils::read_sr_content_sq(
 		if (print_chapters)
 		{
 			s += QString("<span class='yy'>") +
-				cs + QString("</span><br />");
+				cs + QString("</span><br />\n");
 		}
 		QString ValueType;
 		QString RelationshipType;
@@ -1740,7 +1744,7 @@ QString SRUtils::read_sr_content_sq(
 			if (info)
 			{
 				s += QString("<span class='y3'>Value Type: ") +
-					ValueType + QString("</span><br />");
+					ValueType + QString("</span><br />\n");
 			}
 		}
 		if (DicomUtils::get_string_value(
@@ -1750,7 +1754,7 @@ QString SRUtils::read_sr_content_sq(
 			if (info)
 			{
 				s += QString("<span class='y3'>Relationship Type: ") +
-					RelationshipType + QString("</span><br />");
+					RelationshipType + QString("</span><br />\n");
 			}
 		}
 		if (DicomUtils::get_string_value(
@@ -1761,7 +1765,7 @@ QString SRUtils::read_sr_content_sq(
 			if (info)
 			{
 				s += QString("<span class='y3'>Continuity Of Content: ") +
-					ContinuityOfContent + QString("</span><br />");
+					ContinuityOfContent + QString("</span><br />\n");
 			}
 		}
 		if (DicomUtils::get_ul_values(
@@ -1790,7 +1794,7 @@ QString SRUtils::read_sr_content_sq(
 				identifiers +
 				QString("\" >") +
 				identifiers +
-				QString("</a></span><br />");
+				QString("</a></span><br />\n");
 		}
 		if (nds.FindDataElement(mdcm::Tag(0x0040,0xa043)))
 		{
@@ -1864,8 +1868,8 @@ QString SRUtils::read_sr_content_sq(
 			{
 				//
 				//
-				if (s.endsWith(QString("<br />"))) s.chop(6);
-				s += QString("</p>");
+				if (s.endsWith(QString("<br />\n"))) s.chop(7);
+				s += QString("</p>\n");
 				//
 				//
 				continue;
@@ -1891,45 +1895,45 @@ QString SRUtils::read_sr_content_sq(
 		{
 			// TODO
 			s += QString(
-					"<br /><span class='red2'>COMPOSITE"
-					"</span><br />");
+					"<br />\n<span class='red2'>COMPOSITE"
+					"</span><br />\n");
 			const QStringList & l = read_referenced(nds, s);
 		}
 		else if (ValueType == QString("WAVEFORM"))
 		{
 			// TODO
 			s += QString(
-					"<br /><span class='red2'>WAVEFORM"
-					"</span><br />");
+					"<br />\n<span class='red2'>WAVEFORM"
+					"</span><br />\n");
 			const QStringList & l = read_referenced(nds, s);
 		}
 		else if (ValueType == QString("SCOORD3D"))
 		{
 			// TODO
 			s += QString(
-				"<br /><span class='red2'>SCOORD3D"
-				"</span><br />");
+				"<br />\n<span class='red2'>SCOORD3D"
+				"</span><br />\n");
 			read_SCOORD3D(nds, s);
 		}
 		else if (ValueType == QString("TCOORD"))
 		{
 			// TODO
-			s += QString("<br /><span class='red2'>TCOORD</span><br />");
+			s += QString("<br />\n<span class='red2'>TCOORD</span><br />\n");
 			read_TCOORD(nds, s, info);
 		}
 		else
 		{
 			if (!ValueType.isEmpty())
 			{
-				s += QString("<br /><span class='red2'>Value ") +
+				s += QString("<br />\n<span class='red2'>Value ") +
 					ValueType +
-					QString("</span><br />");
+					QString("</span><br />\n");
 			}
 		}
 		//
 		//
-		if (s.endsWith(QString("<br />"))) s.chop(6);
-		s += QString("</p>");
+		if (s.endsWith(QString("<br />\n"))) s.chop(7);
+		s += QString("</p>\n");
 		//
 		//
 //

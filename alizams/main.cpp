@@ -373,10 +373,8 @@ int main(int argc, char *argv[])
 	{
 		MainWindow mainWin(ok3d, hide_zoom);
 		mainWin.show();
-		app.processEvents();
 #if (defined USE_SPLASH_SCREEN && USE_SPLASH_SCREEN==1)
 		splash->showMessage(splash_info);
-		app.processEvents();
 		QTimer::singleShot(1500, splash, SLOT(close()));
 #endif
 		mainWin.check_3d_frame();
@@ -391,10 +389,8 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
-		app.processEvents();
 #if (defined USE_SPLASH_SCREEN && USE_SPLASH_SCREEN==1)
 		splash->showMessage(splash_info);
-		app.processEvents();
 		QTimer::singleShot(500, splash, SLOT(close()));
 #endif
 		QStringList l;
@@ -423,7 +419,6 @@ int main(int argc, char *argv[])
 				SQtree * sqtree = new SQtree(NULL, false);
 				sqtree->setAttribute(Qt::WA_DeleteOnClose);
 				sqtree->show();
-				app.processEvents();
 				sqtree->read_file(l.at(x));
 			}
 		}
@@ -432,7 +427,6 @@ int main(int argc, char *argv[])
 			SQtree * sqtree = new SQtree(NULL, false);
 			sqtree->setAttribute(Qt::WA_DeleteOnClose);
 			sqtree->show();
-			app.processEvents();
 		}
 		return app.exec();
 	}

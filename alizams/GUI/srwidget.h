@@ -27,6 +27,9 @@ public slots:
 	void preview_print(QPrinter*);
 	void printSR();
 	void saveSR();
+
+private:
+	QString tmpfile;
 };
 
 #endif // SRWIDGET_H

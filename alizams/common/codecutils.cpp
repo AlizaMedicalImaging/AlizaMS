@@ -16,6 +16,7 @@
 
 =========================================================================*/
 
+#include <QtGlobal>
 #include <QStringList>
 #include <QRegExp>
 #include <QTextCodec>
@@ -42,7 +43,11 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
     if (ok) *ok = true;
     return QString::fromLatin1(ba->constData());
   }
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+  const QStringList l = cs.split(QString("\\"), Qt::KeepEmptyParts);
+#else
   const QStringList l = cs.split(QString("\\"), QString::KeepEmptyParts);
+#endif
   bool iso2022 = false;
   for (int x = 0; x < l.size(); x++)
   {

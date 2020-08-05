@@ -10443,10 +10443,6 @@ QString DicomUtils::read_dicom(
 		{
 			if (load_type == 0)
 			{
-				const QString head3 = QString(
-					"<html><head><link rel='stylesheet'"
-					" type='text/css' href='format.css'></head><body>");
-				const QString foot3 = QString("</body></html>");
 				const bool srinfo = wsettings->get_sr_info();
 				QString t00080005;
 				get_string_value(
@@ -10460,21 +10456,19 @@ QString DicomUtils::read_dicom(
 				sr->setAttribute(Qt::WA_DeleteOnClose);
 				sr->setWindowTitle(s0);
 				const QString s1 =
-					head3 +
 					SRUtils::read_sr_content_sq(
-						ds,
-						t00080005,
-						fi.absolutePath(),
-						settings,
-						sr->textBrowser,
-						pb,
-						sr->tmpfiles,
-						sr->srimages,
-						0,
-						srinfo,
-						QString("1"),
-						true) +
-					foot3;
+					ds,
+					t00080005,
+					fi.absolutePath(),
+					settings,
+					sr->textBrowser,
+					pb,
+					sr->tmpfiles,
+					sr->srimages,
+					0,
+					srinfo,
+					QString("1"),
+					true);
 				sr->initSR(s1);
 				sr->show();
 				sr->raise();

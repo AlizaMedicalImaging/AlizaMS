@@ -1,23 +1,24 @@
-cmake_minimum_required(VERSION 3.11.0)
-CMAKE_POLICY(SET CMP0003 NEW)
+####################################################################
+#
+# Aliza MS
+#
+# set USE_QT_V_5 to TRUE to use Qt5 (default)
+# set USE_SYSTEM_GLEW_QT4 (only Qt4)
+# set USE_MEDIASTORAGE_MODE to build for media (no SQL, paths)
+#
+####################################################################
 
+cmake_minimum_required(VERSION 3.11.0)
 project(ALIZAMS)
+
 set(CMAKE_CXX_STANDARD 11)
 
-
-####################################################################
-#
-# set USE_QT_V_5 to TRUE to use Qt5 (default), FALSE to use Qt4
-# set USE_INCLUDED_GLEW_QT4 (only for Qt4)
-#
-# set USE_WORKSTATION_MODE for read-only access to CTK database
-#
-#
-####################################################################
 option(USE_QT_V_5 "Use Qt5" ON)
-option(USE_INCLUDED_GLEW_QT4 "Use included GLEW library for Qt4" ON)
-option(USE_WORKSTATION_MODE "Build workstation" ON)
+option(USE_SYSTEM_GLEW_QT4 "Use system GLEW (only Qt4)" OFF)
+option(USE_SYSTEM_MDCM "Use system MDCM" OFF)
+option(USE_MEDIASTORAGE_MODE "Build for media storage" OFF)
 
+CMAKE_POLICY(SET CMP0003 NEW)
 if(USE_QT_V_5)
   if(WIN32)
     if(POLICY CMP0020)
@@ -45,7 +46,7 @@ if(USE_QT_V_5)
   find_package(Qt5Widgets REQUIRED)
   find_package(Qt5PrintSupport REQUIRED)
   find_package(Qt5Svg REQUIRED)
-  if(USE_WORKSTATION_MODE)
+  if(NOT USE_MEDIASTORAGE_MODE)
     find_package(Qt5Sql REQUIRED)
   endif()
 else()
@@ -54,21 +55,21 @@ else()
   set(QT_USE_QTGUI TRUE)
   set(QT_USE_QTOPENGL TRUE)
   set(QT_USE_QTSVG TRUE)
-  if(USE_WORKSTATION_MODE)
+  if(NOT USE_MEDIASTORAGE_MODE)
     set(QT_USE_QTSQL TRUE)
   endif()
   include(${QT_USE_FILE})
-  if(USE_INCLUDED_GLEW_QT4)
+  if(USE_SYSTEM_GLEW_QT4)
+    set(LOCAL_GLEW_PATH "")
+  else()
     set(LOCAL_GLEW_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CG/glew")
     add_definitions(-DGLEW_STATIC)
-  else()
-    set(LOCAL_GLEW_PATH "")
   endif()
 endif()
 
 add_definitions(${QT_DEFINITIONS})
 
-if(USE_WORKSTATION_MODE)
+if(NOT USE_MEDIASTORAGE_MODE)
   add_definitions(-DUSE_WORKSTATION_MODE)
 endif()
 
@@ -225,14 +226,12 @@ set(ALIZAMS_SRCS ${ALIZAMS_SRCS}
   browser/browserwidget2.cpp
   GUI/aliza.cpp)
 
-if(USE_WORKSTATION_MODE)
+if(NOT USE_MEDIASTORAGE_MODE)
   set(ALIZAMS_SRCS ${ALIZAMS_SRCS} browser/ctkdialog.cpp)
 endif()
 
-if(NOT USE_QT_V_5)
-  if(USE_INCLUDED_GLEW_QT4)
-    set(ALIZAMS_SRCS ${ALIZAMS_SRCS} "${LOCAL_GLEW_PATH}/src/glew.c")
-  endif()
+if(NOT USE_QT_V_5 AND NOT USE_SYSTEM_GLEW_QT4)
+  set(ALIZAMS_SRCS ${ALIZAMS_SRCS} "${LOCAL_GLEW_PATH}/src/glew.c")
 endif()
 
 if(WIN32)
@@ -272,7 +271,7 @@ else()
   set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} CG/glwidget-qt4.h)
 endif()
 
-if(USE_WORKSTATION_MODE)
+if(NOT USE_MEDIASTORAGE_MODE)
   set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} browser/ctkdialog.h)
 endif()
 
@@ -291,7 +290,7 @@ set(ALIZAMS_UIS
   GUI/srwidget.ui
   GUI/imageinfodialog.ui)
 
-if(USE_WORKSTATION_MODE)
+if(NOT USE_MEDIASTORAGE_MODE)
   set(ALIZAMS_UIS ${ALIZAMS_UIS} browser/ctkdialog.ui)
 endif()
 
@@ -306,10 +305,10 @@ include_directories(
 if(WIN32)
   add_definitions(-D_CRT_SECURE_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
 else()
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -D_DEBUG")
-  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -D_DEBUG")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall")
-  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Wall")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D_DEBUG")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
   if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
     link_directories(/usr/local/lib)
   endif()
@@ -319,12 +318,19 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
   add_definitions(-DDISABLE_SIMDMATH)
 endif()
 
-set(ALIZAMS_LINK_LIBRARIES mdcmMSFF mdcmDICT mdcmDSED)
-set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} mdcmopenjp2 mdcmcharls mdcmjpeg8 mdcmjpeg12 mdcmjpeg16)
-#set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} openjp2 mdcmcharls mdcmjpeg8 mdcmjpeg12 mdcmjpeg16)
-if(NOT WIN32)
-  set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} mdcmuuid)
+set(ALIZAMS_LINK_LIBRARIES mdcmMSFF mdcmDICT mdcmDSED mdcmjpeg8 mdcmjpeg12 mdcmjpeg16)
+if(USE_SYSTEM_MDCM)
+  set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} openjp2 CharLS)
+  if(NOT WIN32)
+    set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} uuid)
+  endif()
+else()
+  set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} mdcmopenjp2 mdcmcharls)
+  if(NOT WIN32)
+    set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} mdcmuuid)
+  endif()
 endif()
+
 set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} ${ITK_LIBRARIES})
 
 if(USE_QT_V_5)
@@ -335,9 +341,9 @@ if(USE_QT_V_5)
     Qt5::Core
     Qt5::Gui
     Qt5::Widgets
-	Qt5::PrintSupport
+    Qt5::PrintSupport
     Qt5::Svg)
-  if(USE_WORKSTATION_MODE)
+  if(NOT USE_MEDIASTORAGE_MODE)
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} Qt5::Sql)
   endif()
 else()
@@ -349,7 +355,7 @@ endif()
 
 if(WIN32)
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} opengl32)
-  if(NOT USE_QT_V_5 AND NOT USE_INCLUDED_GLEW_QT4)
+  if(NOT USE_QT_V_5 AND USE_SYSTEM_GLEW_QT4)
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} glew32)
   endif()
   add_executable(alizams WIN32
@@ -364,8 +370,8 @@ else()
   else()
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GL)
   endif()
-  if(NOT USE_QT_V_5 AND NOT USE_INCLUDED_GLEW_QT4)
-      set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GLEW)
+  if(NOT USE_QT_V_5 AND USE_SYSTEM_GLEW_QT4)
+    set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GLEW)
   endif()
   add_executable(alizams
     ${ALIZAMS_SRCS}
