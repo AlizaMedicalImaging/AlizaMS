@@ -9,7 +9,6 @@ project(ALIZAMS)
 
 option(USE_QT_V_5 "Use Qt5" ON)
 option(USE_SYSTEM_GLEW_QT4 "Use system GLEW (only Qt4)" OFF)
-option(USE_SYSTEM_MDCM "Use system MDCM" OFF)
 option(USE_MEDIASTORAGE_MODE "Build for media storage" OFF)
 
 CMAKE_POLICY(SET CMP0003 NEW)
@@ -30,9 +29,11 @@ find_package(ITK COMPONENTS
   ITKSpatialObjects
   ITKStatistics)
 include(${ITK_USE_FILE})
+message("ITK: ${ITK_LIBRARIES}")
 
-find_package(MDCM REQUIRED)
+find_package(MDCM 1.0.28 REQUIRED)
 include(${MDCM_USE_FILE})
+message("MDCM: ${MDCM_LIBRARIES}")
 
 if(USE_QT_V_5)
   find_package(Qt5Core REQUIRED)
@@ -62,6 +63,8 @@ else()
 endif()
 
 add_definitions(${QT_DEFINITIONS})
+#TODO is required?
+#message("QT_DEFINITIONS: ${QT_DEFINITIONS}")
 
 if(NOT USE_MEDIASTORAGE_MODE)
   add_definitions(-DUSE_WORKSTATION_MODE)
@@ -311,20 +314,7 @@ else()
   endif()
 endif()
 
-set(ALIZAMS_LINK_LIBRARIES mdcmMSFF mdcmDICT mdcmDSED mdcmjpeg8 mdcmjpeg12 mdcmjpeg16)
-if(USE_SYSTEM_MDCM)
-  set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} openjp2 CharLS)
-  if(NOT WIN32)
-    set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} uuid)
-  endif()
-else()
-  set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} mdcmopenjp2 mdcmcharls)
-  if(NOT WIN32)
-    set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} mdcmuuid)
-  endif()
-endif()
-
-set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} ${ITK_LIBRARIES})
+set(ALIZAMS_LINK_LIBRARIES ${MDCM_LIBRARIES} ${ITK_LIBRARIES})
 
 if(USE_QT_V_5)
   QT5_WRAP_CPP(ALIZAMS_MOC_SRCS ${ALIZAMS_MOC_HRDS})
