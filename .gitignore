@@ -1,4 +1,4 @@
 *.swp
-alizams/tags
-alizams/update_tags.sh
+tags
+update_tags.sh
 *.bak

@@ -2,16 +2,10 @@
 #
 # Aliza MS
 #
-# set USE_QT_V_5 to TRUE to use Qt5 (default)
-# set USE_SYSTEM_GLEW_QT4 (only Qt4)
-# set USE_MEDIASTORAGE_MODE to build for media (no SQL, paths)
-#
 ####################################################################
-
 cmake_minimum_required(VERSION 3.11.0)
 project(ALIZAMS)
-
-set(CMAKE_CXX_STANDARD 11)
+#set(CMAKE_CXX_STANDARD 11)
 
 option(USE_QT_V_5 "Use Qt5" ON)
 option(USE_SYSTEM_GLEW_QT4 "Use system GLEW (only Qt4)" OFF)
@@ -301,21 +295,20 @@ include_directories(
   "${CMAKE_CURRENT_SOURCE_DIR}/dicom"
   ${CMAKE_CURRENT_BINARY_DIR})
 
-# Available defs: -DDISABLE_SIMDMATH
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D_DEBUG")
+
+# Available defs: -DDISABLE_SIMDMATH to disable SSE2 math
+if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
+  add_definitions(-DDISABLE_SIMDMATH)
+endif()
+
 if(WIN32)
   add_definitions(-D_CRT_SECURE_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
 else()
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
-  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D_DEBUG")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
   if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
     link_directories(/usr/local/lib)
   endif()
-endif()
-
-if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
-  add_definitions(-DDISABLE_SIMDMATH)
 endif()
 
 set(ALIZAMS_LINK_LIBRARIES mdcmMSFF mdcmDICT mdcmDSED mdcmjpeg8 mdcmjpeg12 mdcmjpeg16)
