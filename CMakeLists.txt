@@ -76,6 +76,13 @@ if(NOT USE_MEDIASTORAGE_MODE)
   add_definitions(-DUSE_WORKSTATION_MODE)
 endif()
 
+string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE)
+if(${BTYPE} STREQUAL "DEBUG")
+  add_definitions(-D_DEBUG)
+else()
+  add_definitions(-DNDEBUG)
+endif()
+
 set(ALIZAMS_SRCS common/structures.cpp main.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/b)
@@ -303,9 +310,6 @@ include_directories(
   "${CMAKE_CURRENT_SOURCE_DIR}/GUI"
   "${CMAKE_CURRENT_SOURCE_DIR}/dicom"
   ${CMAKE_CURRENT_BINARY_DIR})
-
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D_DEBUG")
 
 # Available defs: -DDISABLE_SIMDMATH to disable SSE2 math
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
