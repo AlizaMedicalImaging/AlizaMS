@@ -1,4 +1,4 @@
-![Aliza MS](alizams/package/archive/install_menu/icons/hicolor/128x128/apps/alizams.png)
+![Aliza MS](package/archive/install_menu/icons/hicolor/128x128/apps/alizams.png)
 
 Aliza MS - DICOM Viewer
 =======================
@@ -43,7 +43,7 @@ Select _DICOM scanner_ tab, open directory with DICOM files or DICOMDIR file (or
 Select one or more series and click _arrow_ action (or double-click selected row) to load
 
 
-![Open](alizams/package/art/start0.png)
+![Open](package/art/start0.png)
 
 
 Highlights
