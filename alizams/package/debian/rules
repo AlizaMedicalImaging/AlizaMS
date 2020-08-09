@@ -1,0 +1,20 @@
+#!/usr/bin/make -f
+#export DH_VERBOSE=1
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+
+%:
+	dh $@ --buildsystem=cmake+ninja
+
+CMAKE_EXTRA_FLAGS += -DCMAKE_BUILD_TYPE:STRING=Release \
+  -DCMAKE_SKIP_RPATH:BOOL=ON \
+  -DCMAKE_INSTALL_DIR:STRING=/usr
+
+override_dh_auto_configure:
+	dh_auto_configure -- $(CMAKE_EXTRA_FLAGS)
+
+override_dh_auto_test-arch:
+
+
