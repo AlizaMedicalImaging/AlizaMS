@@ -8,6 +8,7 @@ export DEB_CFLAGS_MAINT_APPEND = -Wall -pedantic
 	dh $@ --buildsystem=cmake+ninja
 
 CMAKE_FLAGS = -DCMAKE_BUILD_TYPE:STRING=Release \
+ -DUSE_FORCE_CXX14:BOOL=ON \
  -DCMAKE_SKIP_RPATH:BOOL=ON \
  -DCMAKE_INSTALL_DIR:STRING=/usr
 
