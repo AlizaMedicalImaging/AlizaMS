@@ -5,11 +5,17 @@
 ####################################################################
 cmake_minimum_required(VERSION 3.11.0)
 project(ALIZAMS)
-#set(CMAKE_CXX_STANDARD 11)
 
 option(USE_QT_V_5 "Use Qt5" ON)
 option(USE_SYSTEM_GLEW_QT4 "Use system GLEW (only Qt4)" OFF)
 option(USE_MEDIASTORAGE_MODE "Build for media storage" OFF)
+
+# set "ON" to workaround debian 10 ITK-4.12 package warning
+option(USE_FORCE_CXX14 "Set C++14" OFF)
+if(USE_FORCE_CXX14)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
+#
 
 CMAKE_POLICY(SET CMP0003 NEW)
 if(USE_QT_V_5)
@@ -29,11 +35,11 @@ find_package(ITK COMPONENTS
   ITKSpatialObjects
   ITKStatistics)
 include(${ITK_USE_FILE})
-message("ITK: ${ITK_LIBRARIES}")
+message(STATUS "ITK: ${ITK_LIBRARIES}")
 
 find_package(MDCM 1.0.28 REQUIRED)
 include(${MDCM_USE_FILE})
-message("MDCM: ${MDCM_LIBRARIES}")
+message(STATUS "MDCM: ${MDCM_LIBRARIES}")
 
 if(USE_QT_V_5)
   find_package(Qt5Core REQUIRED)
@@ -62,9 +68,9 @@ else()
   endif()
 endif()
 
+#TODO
 add_definitions(${QT_DEFINITIONS})
-#TODO is required?
-#message("QT_DEFINITIONS: ${QT_DEFINITIONS}")
+#message(STATUS "QT_DEFINITIONS: ${QT_DEFINITIONS}")
 
 if(NOT USE_MEDIASTORAGE_MODE)
   add_definitions(-DUSE_WORKSTATION_MODE)
