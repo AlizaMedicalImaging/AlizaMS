@@ -387,6 +387,7 @@ else()
   target_link_libraries(alizams ${ALIZAMS_LINK_LIBRARIES})
 endif()
 
-install(TARGETS alizams EXPORT ${ALIZAMS_TARGETS_NAME} RUNTIME DESTINATION "bin")
-install(DIRECTORY "${CMAKE_SOURCE_DIR}/package/archive/install_menu/icons" DESTINATION "share")
+install(TARGETS alizams RUNTIME DESTINATION "bin")
+install(DIRECTORY "${CMAKE_SOURCE_DIR}/package/archive/usr/share/icons" DESTINATION "share")
+install(DIRECTORY "${CMAKE_SOURCE_DIR}/package/archive/usr/share/applications" DESTINATION "share")
 
