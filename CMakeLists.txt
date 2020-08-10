@@ -81,7 +81,7 @@ else()
   endif()
 endif()
 
-#TODO
+#required?
 add_definitions(${QT_DEFINITIONS})
 #message(STATUS "QT_DEFINITIONS: ${QT_DEFINITIONS}")
 
@@ -89,8 +89,12 @@ if(NOT USE_MEDIASTORAGE_MODE)
   add_definitions(-DUSE_WORKSTATION_MODE)
 endif()
 
-string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE)
-if(${BTYPE} STREQUAL "DEBUG")
+set(tmp0_build_type "None")
+if(CMAKE_BUILD_TYPE)
+  set(tmp0_build_type "${CMAKE_BUILD_TYPE}")
+endif()
+string(TOUPPER ${tmp0_build_type} tmp1_build_type)
+if(${tmp1_build_type} STREQUAL "DEBUG")
   add_definitions(-D_DEBUG)
 else()
   add_definitions(-DNDEBUG)
