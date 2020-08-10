@@ -10,10 +10,23 @@ option(USE_QT_V_5 "Use Qt5" ON)
 option(USE_SYSTEM_GLEW_QT4 "Use system GLEW (only Qt4)" OFF)
 option(USE_MEDIASTORAGE_MODE "Build for media storage" OFF)
 
-# set "ON" to workaround debian 10 ITK-4.12 package warning
-option(USE_FORCE_CXX14 "Set C++14" OFF)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# TMP
+# set "ON" to workaround Debian 10 ITK-4.12 package VNL warning
+option(USE_FORCE_CXX14 "Set standard to C++14" OFF)
+mark_as_advanced(USE_FORCE_CXX14)
 if(USE_FORCE_CXX14)
   set(CMAKE_CXX_STANDARD 14)
+endif()
+#
+
+# TMP
+# set "ON" to build with GCC 4.8
+option(USE_FORCE_CXX11 "Set standard to C++11" OFF)
+mark_as_advanced(USE_FORCE_CXX11)
+if(USE_FORCE_CXX11)
+  set(CMAKE_CXX_STANDARD 11)
 endif()
 #
 
@@ -373,4 +386,7 @@ else()
     ${ALIZAMS_QRCS_RCC})
   target_link_libraries(alizams ${ALIZAMS_LINK_LIBRARIES})
 endif()
+
+install(TARGETS alizams EXPORT ${ALIZAMS_TARGETS_NAME} RUNTIME DESTINATION "bin")
+install(DIRECTORY "${CMAKE_SOURCE_DIR}/package/archive/install_menu/icons" DESTINATION "share")
 
