@@ -8,11 +8,30 @@ cmake_minimum_required(VERSION 3.11.0)
 project(ALIZAMS)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
+if(NOT EXECUTABLE_OUTPUT_PATH)
+  set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/bin CACHE PATH "Output directory for executables")
+  mark_as_advanced(EXECUTABLE_OUTPUT_PATH)
+endif()
+if(NOT LIBRARY_OUTPUT_PATH)
+  set(LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/bin CACHE PATH "Output directory for libraries")
+  mark_as_advanced(LIBRARY_OUTPUT_PATH)
+endif()
 
 option(USE_QT_V_5 "Use Qt5" ON)
 option(USE_SYSTEM_GLEW_QT4 "Use system GLEW (only Qt4)" OFF)
 option(USE_MEDIASTORAGE_MODE "Build for media storage" OFF)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+set(tmp0_build_type "None")
+if(CMAKE_BUILD_TYPE)
+  set(tmp0_build_type "${CMAKE_BUILD_TYPE}")
+endif()
+string(TOUPPER ${tmp0_build_type} tmp1_build_type)
+if(${tmp1_build_type} STREQUAL "DEBUG")
+  add_definitions(-D_DEBUG)
+else()
+  add_definitions(-DNDEBUG)
+endif()
 
 # TMP
 # set "ON" to workaround Debian 10 ITK-4.12 package VNL warning
@@ -117,9 +136,15 @@ else()
   set(MDCM_UUID_LIBRARIES "mdcmuuid")
 endif()
 
+set(MDCM_LIBRARIES
+  ${MDCM_LJPEG_LIBRARIES}
+  ${MDCM_OPENJPEG_LIBRARIES}
+  ${MDCM_CHARLS_LIBRARIES}
+  ${MDCM_UUID_LIBRARIES}
+  ${MDCM_ZLIB_LIBRARIES})
+
 include(${CMAKE_ROOT}/Modules/TestBigEndian.cmake)
 TEST_BIG_ENDIAN(MDCM_WORDS_BIGENDIAN)
-message(STATUS "TEST_BIG_ENDIAN=${MDCM_WORDS_BIGENDIAN}")
 
 include(${CMAKE_ROOT}/Modules/CheckIncludeFile.cmake)
 include(${CMAKE_ROOT}/Modules/CheckIncludeFiles.cmake)
@@ -132,15 +157,6 @@ macro(CHECK_INCLUDE_FILE_CONCAT FILE VARIABLE)
   endif()
 endmacro()
 #
-
-if(NOT EXECUTABLE_OUTPUT_PATH)
-  set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/bin CACHE PATH "Output directory for executables")
-  mark_as_advanced(EXECUTABLE_OUTPUT_PATH)
-endif()
-if(NOT LIBRARY_OUTPUT_PATH)
-  set(LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/bin CACHE PATH "Output directory for libraries")
-  mark_as_advanced(LIBRARY_OUTPUT_PATH)
-endif()
 
 set(MDCM_MAJOR_VERSION 1)
 set(MDCM_MINOR_VERSION 0)
@@ -247,9 +263,18 @@ endif()
 
 configure_file("mdcm/Source/Common/mdcmConfigure.h.in" "${CMAKE_CURRENT_BINARY_DIR}/mdcm/Source/Common/mdcmConfigure.h")
 
-#include_regular_expression("mdcm/Source/Common/mdcm.*$")
-
+#
+#
+#
+#
+#
+#
 add_subdirectory(mdcm/Utilities)
+#
+#
+#
+#
+#
 
 set(MDCM_COMMON_SRCS
   mdcm/Source/Common/mdcmVersion.cxx
@@ -423,7 +448,7 @@ set(MDCM_MSFF_SRCS
   mdcm/Source/MediaStorageAndFileFormat/mdcmPixelFormat.cxx
   mdcm/Source/MediaStorageAndFileFormat/mdcmSegmentedPaletteColorLookupTable.cxx
   mdcm/Source/MediaStorageAndFileFormat/mdcmStreamImageReader.cxx
-  mdcm/Source/MediaStorageAndFileFormat/#mdcmImageRegionReader.cxx
+  #mdcm/Source/MediaStorageAndFileFormat/mdcmImageRegionReader.cxx
   mdcm/Source/MediaStorageAndFileFormat/mdcmDirectoryHelper.cxx
   mdcm/Source/MediaStorageAndFileFormat/mdcmSegment.cxx
   mdcm/Source/MediaStorageAndFileFormat/mdcmSurface.cxx
@@ -441,13 +466,13 @@ set(MDCM_MSFF_SRCS
   mdcm/Utilities/mdcmrle/io.cxx)
 
 if(NOT MDCM_USE_SYSTEM_OPENJPEG)
-  set_source_files_properties(mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG2000Codec.cxx PROPERTIES COMPILE_FLAGS -DOPJ_STATIC)
+  set_source_files_properties(mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG2000Codec.cxx PROPERTIES COMPILE_DEFINITIONS OPJ_STATIC)
 endif()
 
 if(NOT MDCM_USE_SYSTEM_CHARLS)
   set_source_files_properties(mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGLSCodec.cxx PROPERTIES COMPILE_DEFINITIONS CHARLS_STATIC)
 else()
-  set_source_files_properties(mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGLSCodec.cxx PROPERTIES COMPILE_FLAGS -DCHARLS_DLL)
+  set_source_files_properties(mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGLSCodec.cxx PROPERTIES COMPILE_DEFINITIONS CHARLS_DLL)
 endif()
 
 #if(CMAKE_COMPILER_IS_GNUCXX AND MINGW)
@@ -515,17 +540,6 @@ add_definitions(${QT_DEFINITIONS})
 
 if(NOT USE_MEDIASTORAGE_MODE)
   add_definitions(-DUSE_WORKSTATION_MODE)
-endif()
-
-set(tmp0_build_type "None")
-if(CMAKE_BUILD_TYPE)
-  set(tmp0_build_type "${CMAKE_BUILD_TYPE}")
-endif()
-string(TOUPPER ${tmp0_build_type} tmp1_build_type)
-if(${tmp1_build_type} STREQUAL "DEBUG")
-  add_definitions(-D_DEBUG)
-else()
-  add_definitions(-DNDEBUG)
 endif()
 
 set(ALIZAMS_SRCS common/structures.cpp main.cpp)
@@ -775,15 +789,9 @@ else()
   endif()
 endif()
 
-
-
-
-
-
 set(ALIZAMS_SRCS ${ALIZAMS_SRCS} ${MDCM_COMMON_SRCS} ${MDCM_DICT_SRCS} ${MDCM_DSED_SRCS} ${MDCM_MSFF_SRCS})
 
-#set(ALIZAMS_LINK_LIBRARIES ${MDCM_LIBRARIES} ${ITK_LIBRARIES})
-set(ALIZAMS_LINK_LIBRARIES ${ITK_LIBRARIES})
+set(ALIZAMS_LINK_LIBRARIES ${MDCM_LIBRARIES} ${ITK_LIBRARIES})
 
 if(USE_QT_V_5)
   QT5_WRAP_CPP(ALIZAMS_MOC_SRCS ${ALIZAMS_MOC_HRDS})
@@ -804,6 +812,8 @@ else()
   QT4_ADD_RESOURCES(ALIZAMS_QRCS_RCC ${ALIZAMS_QRCS})
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} ${QT_LIBRARIES})
 endif()
+
+link_directories("bin")
 
 if(WIN32)
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} opengl32)
@@ -830,8 +840,7 @@ else()
     ${ALIZAMS_MOC_SRCS}
     ${ALIZAMS_UIS}
     ${ALIZAMS_QRCS_RCC})
-  link_directories("bin")
-  target_link_libraries(alizams ${ALIZAMS_LINK_LIBRARIES} mdcmjpeg8 mdcmjpeg12 mdcmjpeg16 mdcmopenjp2 mdcmzlib mdcmuuid mdcmcharls)
+  target_link_libraries(alizams ${ALIZAMS_LINK_LIBRARIES})
 endif()
 
 install(TARGETS alizams RUNTIME DESTINATION "bin")
