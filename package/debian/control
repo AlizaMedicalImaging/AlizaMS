@@ -2,7 +2,18 @@ Source: alizams
 Maintainer: Mikhail Isakov <mihail.isakov@gmail.com>
 Section: science
 Priority: optional
-Build-Depends: cmake, debhelper-compat (= 12), dh-strip-nondeterminism, ninja-build, qtbase5-dev-tools, libmdcm-dev, qt5-qmake-bin, qtbase5-dev, libqt5svg5-dev, libinsighttoolkit4-dev
+Build-Depends: cmake,
+ debhelper-compat (= 12),
+ dh-strip-nondeterminism,
+ qtbase5-dev-tools,
+ qt5-qmake-bin,
+ qtbase5-dev,
+ libqt5svg5-dev,
+ uuid-dev,
+ libz-dev,
+ libcharls-dev (>= 2.0.0),
+ libopenjp2-7-dev,
+ libinsighttoolkit4-dev
 Build-Depends-Indep:
 Build-Conflicts:
 Standards-Version: 4.3.0
@@ -10,7 +21,7 @@ Homepage: https://github.com/AlizaMedicalImaging/AlizaMS
 
 Package: alizams
 Architecture: amd64 i386
-Multi-Arch: same
+Multi-Arch: no
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Pre-Depends: ${misc:Pre-Depends}
 Description: Aliza MS DICOM Viewer

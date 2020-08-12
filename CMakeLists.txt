@@ -5,9 +5,63 @@
 ####################################################################
 cmake_minimum_required(VERSION 3.11.0)
 
+#######################################################
+#
+#
+#
+#
+
+# https://cmake.org/cmake/help/v3.0/policy/CMP0003.html
+# Libraries linked via full path no longer produce linker search paths
+CMAKE_POLICY(SET CMP0003 NEW)
+if(USE_QT_V_5)
+  if(WIN32)
+# https://cmake.org/cmake/help/v3.0/policy/CMP0020.html
+# Automatically link Qt executables to qtmain target on Windows
+    CMAKE_POLICY(SET CMP0020 NEW)
+  endif()
+endif()
+
+# https://cmake.org/cmake/help/v3.0/policy/CMP0022.html
+# Link
+if(POLICY CMP0022)
+  cmake_policy(SET CMP0022 NEW)
+endif()
+
+# https://cmake.org/cmake/help/v3.0/policy/CMP0025.html
+# AppleClang
+if(POLICY CMP0025)
+  cmake_policy(SET CMP0025 NEW)
+endif()
+
+# https://cmake.org/cmake/help/v3.6/policy/CMP0026.html
+# Disallow LOCATION property
+if(POLICY CMP0026)
+  cmake_policy(SET CMP0026 NEW)
+endif()
+
+# https://cmake.org/cmake/help/v3.0/policy/CMP0042.html
+# MACOSX_RPATH is enabled by default
+if(POLICY CMP0042)
+  cmake_policy(SET CMP0042 NEW)
+endif()
+
+# https://cmake.org/cmake/help/v3.3/policy/CMP0063.html
+# Honor visibility properties for all target types.
+if(POLICY CMP0063 )
+  cmake_policy(SET CMP0063 NEW)
+endif()
+
+#
+#
+#
+#
+#######################################################
+
 project(ALIZAMS)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
+
 if(NOT EXECUTABLE_OUTPUT_PATH)
   set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/bin CACHE PATH "Output directory for executables")
   mark_as_advanced(EXECUTABLE_OUTPUT_PATH)
@@ -51,15 +105,6 @@ if(USE_FORCE_CXX11)
 endif()
 #
 
-CMAKE_POLICY(SET CMP0003 NEW)
-if(USE_QT_V_5)
-  if(WIN32)
-    if(POLICY CMP0020)
-      CMAKE_POLICY(SET CMP0020 NEW)
-    endif()
-  endif()
-endif()
-
 option(MDCM_USE_SYSTEM_ZLIB "Use system zlib" OFF)
 
 #option(MDCM_USE_SYSTEM_OPENSSL "Use system OpenSSL" OFF)
@@ -73,15 +118,8 @@ option(MDCM_USE_SYSTEM_OPENJPEG "Use system OpenJPEG" OFF)
 
 option(MDCM_USE_SYSTEM_CHARLS "Use system CharLS" OFF)
 
-#TODO
-#option(MDCM_USE_SYSTEM_LJPEG "Use system JPEG (IJG)" OFF)
-#mark_as_advanced(MDCM_USE_SYSTEM_LJPEG)
-#if(MDCM_USE_SYSTEM_LJPEG)
-#  find_package(LJPEG REQUIRED)
-#  set(MDCM_LJPEG_LIBRARIES ${LJPEG_LIBRARIES})
-#else()
-  set(MDCM_LJPEG_LIBRARIES mdcmjpeg8 mdcmjpeg12 mdcmjpeg16)
-#endif()
+# TODO try system, if possible
+set(MDCM_LJPEG_LIBRARIES mdcmjpeg8 mdcmjpeg12 mdcmjpeg16)
 
 if(MDCM_USE_SYSTEM_CHARLS)
   find_package(CharLS REQUIRED)
@@ -142,6 +180,7 @@ set(MDCM_LIBRARIES
   ${MDCM_CHARLS_LIBRARIES}
   ${MDCM_UUID_LIBRARIES}
   ${MDCM_ZLIB_LIBRARIES})
+message(STATUS "MDCM: ${MDCM_LIBRARIES}")
 
 include(${CMAKE_ROOT}/Modules/TestBigEndian.cmake)
 TEST_BIG_ENDIAN(MDCM_WORDS_BIGENDIAN)
@@ -181,8 +220,8 @@ CHECK_INCLUDE_FILE("langinfo.h" MDCM_HAVE_LANGINFO_H)
 include(CheckFunctionExists)
 include(CheckSymbolExists)
 #FIXME
-set(CMAKE_REQUIRED_INCLUDES math.h)
-set(CMAKE_REQUIRED_LIBRARIES m)
+#set(CMAKE_REQUIRED_INCLUDES math.h)
+#set(CMAKE_REQUIRED_LIBRARIES m)
 CHECK_SYMBOL_EXISTS(nl_langinfo "langinfo.h" MDCM_HAVE_NL_LANGINFO)
 #CHECK_FUNCTION_EXISTS(strcasecmp MDCM_HAVE_STRCASECMP)
 CHECK_SYMBOL_EXISTS(strcasecmp "strings.h" MDCM_HAVE_STRCASECMP)
@@ -261,15 +300,16 @@ if(NOT MDCM_USE_SYSTEM_ZLIB)
   include_directories("${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities/mdcmzlib")
 endif()
 
-configure_file("mdcm/Source/Common/mdcmConfigure.h.in" "${CMAKE_CURRENT_BINARY_DIR}/mdcm/Source/Common/mdcmConfigure.h")
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmConfigure.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/mdcm/Source/Common/mdcmConfigure.h")
 
 #
 #
 #
 #
 #
-#
-add_subdirectory(mdcm/Utilities)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities)
 #
 #
 #
@@ -277,40 +317,40 @@ add_subdirectory(mdcm/Utilities)
 #
 
 set(MDCM_COMMON_SRCS
-  mdcm/Source/Common/mdcmVersion.cxx
-  mdcm/Source/Common/mdcmRegion.cxx
-  mdcm/Source/Common/mdcmBoxRegion.cxx
-  mdcm/Source/Common/mdcmEvent.cxx
-  mdcm/Source/Common/mdcmMD5.cxx
-  mdcm/Source/Common/mdcmBase64.cxx
-  mdcm/Source/Common/mdcmSHA1.cxx
-  mdcm/Source/Common/mdcmDummyValueGenerator.cxx
-  mdcm/Source/Common/mdcmCryptoFactory.cxx
-  mdcm/Source/Common/mdcmASN1.cxx
-  mdcm/Source/Common/mdcmSubject.cxx
-  mdcm/Source/Common/mdcmDirectory.cxx
-  mdcm/Source/Common/mdcmFilename.cxx
-  mdcm/Source/Common/mdcmFilenameGenerator.cxx
-  mdcm/Source/Common/mdcmSwapCode.cxx
-  mdcm/Source/Common/mdcmSystem.cxx
-  mdcm/Source/Common/mdcmTrace.cxx
-  mdcm/Source/Common/mdcmUnpacker12Bits.cxx)
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmVersion.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmRegion.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmBoxRegion.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmEvent.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmMD5.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmBase64.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmSHA1.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmDummyValueGenerator.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmCryptoFactory.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmASN1.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmSubject.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmDirectory.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmFilename.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmFilenameGenerator.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmSwapCode.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmSystem.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmTrace.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmUnpacker12Bits.cxx)
 
 if(WIN32)
   set(MDCM_COMMON_SRCS ${MDCM_COMMON_SRCS}
-    mdcm/Source/Common/mdcmCAPICryptographicMessageSyntax.cxx
-    mdcm/Source/Common/mdcmCAPICryptoFactory.cxx)
+    ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmCAPICryptographicMessageSyntax.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmCAPICryptoFactory.cxx)
 endif()
 
 if(MDCM_USE_SYSTEM_OPENSSL)
   set(MDCM_COMMON_SRCS ${MDCM_COMMON_SRCS}
-    mdcm/Source/Common/mdcmOpenSSLP7CryptographicMessageSyntax.cxx)
+    ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmOpenSSLP7CryptographicMessageSyntax.cxx)
 endif()
 
 if(MDCM_USE_SYSTEM_OPENSSL AND MDCM_HAVE_CMS_RECIPIENT_PASSWORD)
   set(MDCM_COMMON_SRCS ${MDCM_COMMON_SRCS}
-    mdcm/Source/Common/mdcmOpenSSLCryptoFactory.cxx
-	mdcm/Source/Common/mdcmOpenSSLCryptographicMessageSyntax.cxx)
+    ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmOpenSSLCryptoFactory.cxx
+	${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmOpenSSLCryptographicMessageSyntax.cxx)
 endif()
 
 if(MDCM_USE_SYSTEM_OPENSSL)
@@ -318,15 +358,15 @@ if(MDCM_USE_SYSTEM_OPENSSL)
 endif()
 
 set(MDCM_DICT_SRCS
-  mdcm/Source/DataDictionary/mdcmDicts.cxx
-  mdcm/Source/DataDictionary/mdcmDictEntry.cxx
-  mdcm/Source/DataDictionary/mdcmDefaultDicts.cxx
-  mdcm/Source/DataDictionary/mdcmPrivateDefaultDicts.cxx
-  mdcm/Source/DataDictionary/mdcmGlobal.cxx
-  mdcm/Source/DataDictionary/mdcmGroupDict.cxx
-  mdcm/Source/DataDictionary/mdcmDefaultGroupNames.cxx
-  mdcm/Source/DataDictionary/mdcmUIDs.cxx
-  mdcm/Source/DataDictionary/mdcmCSAHeaderDefaultDicts.cxx)
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmDicts.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmDictEntry.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmDefaultDicts.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmPrivateDefaultDicts.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmGlobal.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmGroupDict.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmDefaultGroupNames.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmUIDs.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmCSAHeaderDefaultDicts.cxx)
 
 
 #FIXME
@@ -369,132 +409,117 @@ endforeach()
 # MDCM_SUPPORT_BROKEN_IMPLEMENTATION
 set(MDCM_DSED_SRCS
   ${MDCM_DSED4_SRCS}
-  mdcm/Source/DataStructureAndEncodingDefinition/mdcmReader.strict.cxx # hook to call mdcmstrict API
-  mdcm/Source/DataStructureAndEncodingDefinition/mdcmTag.cxx
-  mdcm/Source/DataStructureAndEncodingDefinition/mdcmTagToVR.cxx
-  mdcm/Source/DataStructureAndEncodingDefinition/mdcmCodeString.cxx
-  mdcm/Source/DataStructureAndEncodingDefinition/mdcmFileSet.cxx
-  mdcm/Source/DataStructureAndEncodingDefinition/mdcmByteSwapFilter.cxx
-  mdcm/Source/DataStructureAndEncodingDefinition/mdcmUNExplicitImplicitDataElement.cxx
-  mdcm/Source/DataStructureAndEncodingDefinition/mdcmWriter.cxx
-  mdcm/Source/DataStructureAndEncodingDefinition/mdcmCSAHeader.cxx
-  mdcm/Source/DataStructureAndEncodingDefinition/mdcmMrProtocol.cxx
-  mdcm/Source/DataStructureAndEncodingDefinition/mdcmTransferSyntax.cxx
-  mdcm/Source/DataStructureAndEncodingDefinition/mdcmVM.cxx
-  mdcm/Source/DataStructureAndEncodingDefinition/mdcmVR.cxx
-  mdcm/Source/DataStructureAndEncodingDefinition/mdcmPreamble.cxx
-  mdcm/Source/DataStructureAndEncodingDefinition/mdcmUNExplicitDataElement.cxx
-  mdcm/Source/DataStructureAndEncodingDefinition/mdcmCP246ExplicitDataElement.cxx
-  mdcm/Source/DataStructureAndEncodingDefinition/mdcmExplicitImplicitDataElement.cxx
-  mdcm/Source/DataStructureAndEncodingDefinition/mdcmVR16ExplicitDataElement.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmReader.strict.cxx # hook to call mdcmstrict API
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmTag.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmTagToVR.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmCodeString.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmFileSet.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmByteSwapFilter.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmUNExplicitImplicitDataElement.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmWriter.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmCSAHeader.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmMrProtocol.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmTransferSyntax.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmVM.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmVR.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmPreamble.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmUNExplicitDataElement.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmCP246ExplicitDataElement.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmExplicitImplicitDataElement.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmVR16ExplicitDataElement.cxx
   ${MDCM_DSED3_SRCS})
 
 set(MDCM_MSFF_SRCS
-  mdcm/Source/MediaStorageAndFileFormat/mdcmFileStreamer.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmIconImageFilter.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmIconImageGenerator.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmDICOMDIRGenerator.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmFileExplicitFilter.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmFileDerivation.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmImageFragmentSplitter.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmTagPath.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmSimpleSubjectWatcher.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmPixmap.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmBitmap.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmRescaler.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmImageToImageFilter.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmBitmapToBitmapFilter.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmPixmapToPixmapFilter.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmImageChangeTransferSyntax.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmImageApplyLookupTable.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmApplySupplementalLUT.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmFileDecompressLookupTable.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmOrientation.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmDataSetHelper.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmImageChangePlanarConfiguration.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmDirectionCosines.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmSorter.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmIPPSorter.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmSplitMosaicFilter.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmUIDGenerator.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmUUIDGenerator.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmScanner.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmStrictScanner.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmPixmapReader.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmImageReader.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmPixmapWriter.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmImageWriter.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmStringFilter.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmImageHelper.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmValidate.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmImage.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmImageConverter.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmImageCodec.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG12Codec.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmRLECodec.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG16Codec.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGLSCodec.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG8Codec.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGCodec.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmPVRGCodec.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmKAKADUCodec.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmPNMCodec.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmPGXCodec.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmRAWCodec.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmLookupTable.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmOverlay.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmCurve.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmPhotometricInterpretation.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmPixelFormat.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmSegmentedPaletteColorLookupTable.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmStreamImageReader.cxx
-  #mdcm/Source/MediaStorageAndFileFormat/mdcmImageRegionReader.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmDirectoryHelper.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmSegment.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmSurface.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmMeshPrimitive.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmSegmentWriter.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmSurfaceWriter.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmSegmentReader.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmSurfaceReader.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmSurfaceHelper.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmSegmentHelper.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG2000Codec.cxx
-  mdcm/Source/MediaStorageAndFileFormat/mdcmSerieHelper.cxx
-  mdcm/Utilities/mdcmrle/rle.cxx
-  mdcm/Utilities/mdcmrle/info.cxx
-  mdcm/Utilities/mdcmrle/io.cxx)
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmFileStreamer.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmIconImageFilter.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmIconImageGenerator.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmDICOMDIRGenerator.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmFileExplicitFilter.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmFileDerivation.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageFragmentSplitter.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmTagPath.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSimpleSubjectWatcher.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPixmap.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmBitmap.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmRescaler.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageToImageFilter.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmBitmapToBitmapFilter.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPixmapToPixmapFilter.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageChangeTransferSyntax.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageApplyLookupTable.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmApplySupplementalLUT.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmFileDecompressLookupTable.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmOrientation.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmDataSetHelper.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageChangePlanarConfiguration.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmDirectionCosines.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSorter.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmIPPSorter.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSplitMosaicFilter.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmUIDGenerator.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmUUIDGenerator.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmScanner.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmStrictScanner.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPixmapReader.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageReader.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPixmapWriter.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageWriter.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmStringFilter.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageHelper.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmValidate.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImage.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageConverter.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageCodec.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG12Codec.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmRLECodec.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG16Codec.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGLSCodec.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG8Codec.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGCodec.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPVRGCodec.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmKAKADUCodec.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPNMCodec.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPGXCodec.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmRAWCodec.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmLookupTable.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmOverlay.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmCurve.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPhotometricInterpretation.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPixelFormat.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSegmentedPaletteColorLookupTable.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmStreamImageReader.cxx
+  #${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageRegionReader.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmDirectoryHelper.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSegment.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSurface.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmMeshPrimitive.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSegmentWriter.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSurfaceWriter.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSegmentReader.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSurfaceReader.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSurfaceHelper.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSegmentHelper.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG2000Codec.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSerieHelper.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmrle/rle.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmrle/info.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmrle/io.cxx)
 
 if(NOT MDCM_USE_SYSTEM_OPENJPEG)
-  set_source_files_properties(mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG2000Codec.cxx PROPERTIES COMPILE_DEFINITIONS OPJ_STATIC)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG2000Codec.cxx PROPERTIES COMPILE_DEFINITIONS OPJ_STATIC)
 endif()
 
 if(NOT MDCM_USE_SYSTEM_CHARLS)
-  set_source_files_properties(mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGLSCodec.cxx PROPERTIES COMPILE_DEFINITIONS CHARLS_STATIC)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGLSCodec.cxx PROPERTIES COMPILE_DEFINITIONS CHARLS_STATIC)
 else()
-  set_source_files_properties(mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGLSCodec.cxx PROPERTIES COMPILE_DEFINITIONS CHARLS_DLL)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGLSCodec.cxx PROPERTIES COMPILE_DEFINITIONS CHARLS_DLL)
 endif()
 
-#if(CMAKE_COMPILER_IS_GNUCXX AND MINGW)
-#  set_target_properties(xxx PROPERTIES LINK_FLAGS "-Wl,--enable-runtime-pseudo-reloc")
-#endif()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#
+#
+#
+#
+#
 
 find_package(ITK COMPONENTS
   ITKCommon
@@ -542,7 +567,7 @@ if(NOT USE_MEDIASTORAGE_MODE)
   add_definitions(-DUSE_WORKSTATION_MODE)
 endif()
 
-set(ALIZAMS_SRCS common/structures.cpp main.cpp)
+set(ALIZAMS_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/common/structures.cpp ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/b)
 SET(BULLET_SRCS
@@ -650,53 +675,53 @@ SET(BULLET_SRCS
 set(ALIZAMS_SRCS ${ALIZAMS_SRCS} ${BULLET_SRCS})
 
 set(ALIZAMS_SRCS ${ALIZAMS_SRCS}
-  common/commonutils.cpp
-  common/contourutils.cpp
-  common/colorspace/colorspace.cpp
-  common/filepath.cpp
-  common/codecutils.cpp
-  dicom/ultrasoundregionutils.cpp
-  dicom/dicomutils.cpp
-  dicom/prconfigutils.cpp
-  dicom/splituihgridfilter.cpp
-  dicom/spectroscopyutils.cpp
-  dicom/srutils.cpp
-  CG/camera.cpp
-  CG/glwidget.cpp
-  CG/testgl.cpp
-  GUI/mainwindow.cpp
-  GUI/labelwidget.cpp
-  GUI/updateqtcommand.cpp
-  GUI/iconutils.cpp
-  GUI/histogramgen.cpp
-  GUI/settingswidget.cpp
-  GUI/qxtspanslider.cpp
-  GUI/imagesbox.cpp
-  GUI/toolbox.cpp
-  GUI/animwidget.cpp
-  GUI/toolbox2D.cpp
-  GUI/sliderwidget.cpp
-  GUI/zrangewidget.cpp
-  GUI/lutwidget.cpp
-  GUI/handleitem.cpp
-  GUI/levelitem.cpp
-  GUI/rectitem.cpp
-  GUI/graphicsutils.cpp
-  GUI/graphicspathitem.cpp
-  GUI/graphicsview.cpp
-  GUI/graphicswidget.cpp
-  GUI/histogramview.cpp
-  GUI/aboutwidget.cpp
-  GUI/zoomwidget.cpp
-  GUI/findrefdialog.cpp
-  GUI/imageinfodialog.cpp
-  GUI/srwidget.cpp
-  browser/sqtree.cpp
-  browser/browserwidget2.cpp
-  GUI/aliza.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/common/commonutils.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/common/contourutils.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/common/colorspace/colorspace.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/common/filepath.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/common/codecutils.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/dicom/ultrasoundregionutils.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/dicom/dicomutils.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/dicom/prconfigutils.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/dicom/splituihgridfilter.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/dicom/spectroscopyutils.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/dicom/srutils.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/CG/camera.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/CG/testgl.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/mainwindow.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/labelwidget.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/updateqtcommand.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/iconutils.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/histogramgen.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/settingswidget.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/qxtspanslider.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/imagesbox.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/toolbox.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/animwidget.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/toolbox2D.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/sliderwidget.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/zrangewidget.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/lutwidget.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/handleitem.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/levelitem.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/rectitem.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/graphicsutils.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/graphicspathitem.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/graphicsview.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/graphicswidget.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/histogramview.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/aboutwidget.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/zoomwidget.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/findrefdialog.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/imageinfodialog.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/srwidget.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/browser/sqtree.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/browser/browserwidget2.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/aliza.cpp)
 
 if(NOT USE_MEDIASTORAGE_MODE)
-  set(ALIZAMS_SRCS ${ALIZAMS_SRCS} browser/ctkdialog.cpp)
+  set(ALIZAMS_SRCS ${ALIZAMS_SRCS} ${CMAKE_CURRENT_SOURCE_DIR}/browser/ctkdialog.cpp)
 endif()
 
 if(NOT USE_QT_V_5 AND NOT USE_SYSTEM_GLEW_QT4)
@@ -704,63 +729,63 @@ if(NOT USE_QT_V_5 AND NOT USE_SYSTEM_GLEW_QT4)
 endif()
 
 if(WIN32)
-  set(ALIZAMS_SRCS ${ALIZAMS_SRCS} alizams.rc)
+  set(ALIZAMS_SRCS ${ALIZAMS_SRCS} ${CMAKE_CURRENT_SOURCE_DIR}/alizams.rc)
 endif()
 
-set(ALIZAMS_QRCS alizams.qrc)
+set(ALIZAMS_QRCS ${CMAKE_CURRENT_SOURCE_DIR}/alizams.qrc)
 
 set(ALIZAMS_MOC_HRDS
-  GUI/mainwindow.h
-  browser/sqtree.h
-  browser/browserwidget2.h
-  GUI/findrefdialog.h
-  GUI/imageinfodialog.h
-  GUI/settingswidget.h
-  GUI/qxtspanslider_p.h
-  GUI/qxtspanslider.h
-  GUI/imagesbox.h
-  GUI/toolbox.h
-  GUI/animwidget.h
-  GUI/toolbox2D.h
-  GUI/sliderwidget.h
-  GUI/labelwidget.h
-  GUI/zrangewidget.h
-  GUI/lutwidget.h
-  GUI/graphicsview.h
-  GUI/graphicswidget.h
-  GUI/histogramview.h
-  GUI/zoomwidget.h
-  GUI/aboutwidget.h
-  GUI/srwidget.h
-  GUI/aliza.h)
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/mainwindow.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/browser/sqtree.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/browser/browserwidget2.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/findrefdialog.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/imageinfodialog.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/settingswidget.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/qxtspanslider_p.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/qxtspanslider.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/imagesbox.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/toolbox.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/animwidget.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/toolbox2D.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/sliderwidget.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/labelwidget.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/zrangewidget.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/lutwidget.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/graphicsview.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/graphicswidget.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/histogramview.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/zoomwidget.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/aboutwidget.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/srwidget.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/aliza.h)
 
 if(USE_QT_V_5)
-  set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} CG/glwidget-qt5.h)
+  set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5.h)
 else()
-  set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} CG/glwidget-qt4.h)
+  set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt4.h)
 endif()
 
 if(NOT USE_MEDIASTORAGE_MODE)
-  set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} browser/ctkdialog.h)
+  set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/browser/ctkdialog.h)
 endif()
 
 set(ALIZAMS_UIS
-  GUI/settingswidget.ui
-  GUI/mainwindow.ui
-  GUI/aboutwidget.ui
-  browser/sqtree.ui
-  browser/browserwidget2.ui
-  GUI/findrefdialog.ui
-  GUI/imagesbox.ui
-  GUI/toolbox.ui
-  GUI/animwidget.ui
-  GUI/toolbox2D.ui
-  GUI/sliderwidget.ui
-  GUI/srwidget.ui
-  GUI/imageinfodialog.ui)
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/settingswidget.ui
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/mainwindow.ui
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/aboutwidget.ui
+  ${CMAKE_CURRENT_SOURCE_DIR}/browser/sqtree.ui
+  ${CMAKE_CURRENT_SOURCE_DIR}/browser/browserwidget2.ui
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/findrefdialog.ui
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/imagesbox.ui
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/toolbox.ui
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/animwidget.ui
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/toolbox2D.ui
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/sliderwidget.ui
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/srwidget.ui
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/imageinfodialog.ui)
 
 if(NOT USE_MEDIASTORAGE_MODE)
-  set(ALIZAMS_UIS ${ALIZAMS_UIS} browser/ctkdialog.ui)
+  set(ALIZAMS_UIS ${ALIZAMS_UIS} ${CMAKE_CURRENT_SOURCE_DIR}/browser/ctkdialog.ui)
 endif()
 
 include_directories(
@@ -846,4 +871,4 @@ endif()
 install(TARGETS alizams RUNTIME DESTINATION "bin")
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/package/archive/usr/share/icons" DESTINATION "share")
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/package/archive/usr/share/applications" DESTINATION "share")
-
+install(DIRECTORY "${CMAKE_SOURCE_DIR}/package/archive/usr/share/man" DESTINATION "share")

@@ -9,11 +9,18 @@ export DEB_CFLAGS_MAINT_APPEND = -Wall -pedantic
 
 # -DUSE_FORCE_CXX14:BOOL=ON is workaround on Debian 10
 # to get rid of ITK-4.12 package VNL warnings
-CMAKEFLAGS = -DCMAKE_SKIP_RPATH:BOOL=ON -DUSE_FORCE_CXX14:BOOL=ON
+CMAKEFLAGS = -DCMAKE_SKIP_RPATH:BOOL=ON -DUSE_FORCE_CXX14:BOOL=ON \
+ -DMDCM_USE_SYSTEM_UUID:BOOL=ON \
+ -DMDCM_USE_SYSTEM_ZLIB:BOOL=ON \
+ -DMDCM_USE_SYSTEM_OPENJPEG:BOOL=ON \
+ -DMDCM_USE_SYSTEM_CHARLS:BOOL=ON
 
 override_dh_auto_configure:
 	dh_auto_configure -- $(CMAKEFLAGS)
 
-override_dh_auto_test-arch:
+override_dh_auto_test:
 	echo "No tests for this package"
 
+override_dh_auto_install:
+	dh_auto_install
+	mv debian/alizams debian/tmp

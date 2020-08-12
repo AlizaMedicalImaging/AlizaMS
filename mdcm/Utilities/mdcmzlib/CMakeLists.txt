@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 2.8.7)
-
 if(NOT ZLIB_NAMESPACE)
   set(ZLIB_NAMESPACE "ZLIB")
   set(ZLIB_STANDALONE 1)
