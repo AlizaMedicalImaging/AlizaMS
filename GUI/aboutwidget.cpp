@@ -50,13 +50,19 @@ void AboutWidget::set_opengl_info(const QString & s)
 void AboutWidget::set_info()
 {
 	info_label->setText(
-		get_build_info() + QString("\n\n") +
+#if 0
+		get_build_info() +
+		QString("\n\n") +
+#else
+		QString("OpenGL:\n") +
+#endif
 		opengl_info);
 }
 
 QString AboutWidget::get_build_info()
 {
 	QString s;
+#if 0
 	s.append(QVariant(__DATE__).toString());
 	s.append(QString(" "));
 #if (defined _MSC_VER)
@@ -71,6 +77,7 @@ QString AboutWidget::get_build_info()
 	s.append(QString(" 64 Bit"));
 #else
 	s.append(QString(" 32 Bit"));
+#endif
 #endif
 #endif
 #if 0
