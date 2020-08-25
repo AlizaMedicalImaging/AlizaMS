@@ -167,19 +167,23 @@ else()
   set(MDCM_ZLIB_LIBRARIES "mdcmzlib")
 endif()
 
-if(MDCM_USE_SYSTEM_UUID)
-  find_package(UUID REQUIRED)
-  set(MDCM_UUID_LIBRARIES ${UUID_LIBRARIES})
-else()
-  set(MDCM_UUID_LIBRARIES "mdcmuuid")
+if(NOT WIN32)
+  if(MDCM_USE_SYSTEM_UUID)
+    find_package(UUID REQUIRED)
+    set(MDCM_UUID_LIBRARIES ${UUID_LIBRARIES})
+  else()
+    set(MDCM_UUID_LIBRARIES "mdcmuuid")
+  endif()
 endif()
 
 set(MDCM_LIBRARIES
   ${MDCM_LJPEG_LIBRARIES}
   ${MDCM_OPENJPEG_LIBRARIES}
   ${MDCM_CHARLS_LIBRARIES}
-  ${MDCM_UUID_LIBRARIES}
   ${MDCM_ZLIB_LIBRARIES})
+if(NOT WIN32)
+  set(MDCM_LIBRARIES ${MDCM_LIBRARIES} ${MDCM_UUID_LIBRARIES})
+endif()
 message(STATUS "MDCM: ${MDCM_LIBRARIES}")
 
 include(${CMAKE_ROOT}/Modules/TestBigEndian.cmake)
@@ -285,6 +289,7 @@ endif()
 
 if(NOT MDCM_USE_SYSTEM_ZLIB)
   include_directories("${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities/mdcmzlib")
+  include_directories("${CMAKE_CURRENT_BINARY_DIR}/mdcm/Utilities/mdcmzlib")
 endif()
 
 if(MDCM_USE_SYSTEM_UUID)
@@ -350,7 +355,7 @@ endif()
 if(MDCM_USE_SYSTEM_OPENSSL AND MDCM_HAVE_CMS_RECIPIENT_PASSWORD)
   set(MDCM_COMMON_SRCS ${MDCM_COMMON_SRCS}
     ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmOpenSSLCryptoFactory.cxx
-	${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmOpenSSLCryptographicMessageSyntax.cxx)
+    ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmOpenSSLCryptographicMessageSyntax.cxx)
 endif()
 
 if(MDCM_USE_SYSTEM_OPENSSL)
@@ -565,6 +570,17 @@ add_definitions(${QT_DEFINITIONS})
 
 if(NOT USE_MEDIASTORAGE_MODE)
   add_definitions(-DUSE_WORKSTATION_MODE)
+endif()
+
+if(WIN32)
+  if(MSVC_VERSION EQUAL 1400 OR MSVC_VERSION GREATER 1400)
+    add_definitions(
+     -D_CRT_SECURE_NO_DEPRECATE
+     -D_CRT_NONSTDC_NO_DEPRECATE
+     -D_CRT_SECURE_NO_WARNINGS
+     -D_SCL_SECURE_NO_DEPRECATE
+     -D_SCL_SECURE_NO_WARNINGS)
+  endif()
 endif()
 
 set(ALIZAMS_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/common/structures.cpp ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
@@ -796,22 +812,11 @@ include_directories(
   ${CMAKE_CURRENT_BINARY_DIR})
 
 # Available defs: -DDISABLE_SIMDMATH to disable SSE2 math
-if(WIN32)
-  if(MSVC_VERSION EQUAL 1400 OR MSVC_VERSION GREATER 1400)
-    add_definitions(
-     -D_CRT_SECURE_NO_DEPRECATE
-     -D_CRT_NONSTDC_NO_DEPRECATE
-     -D_CRT_SECURE_NO_WARNINGS
-     -D_SCL_SECURE_NO_DEPRECATE
-     -D_SCL_SECURE_NO_WARNINGS)
-  endif()
-else()
-  if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
-    link_directories(/usr/local/lib)
-  endif()
-  if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
-    add_definitions(-DDISABLE_SIMDMATH)
-  endif()
+if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
+  link_directories(/usr/local/lib)
+endif()
+if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
+  add_definitions(-DDISABLE_SIMDMATH)
 endif()
 
 set(ALIZAMS_SRCS ${ALIZAMS_SRCS} ${MDCM_COMMON_SRCS} ${MDCM_DICT_SRCS} ${MDCM_DSED_SRCS} ${MDCM_MSFF_SRCS})
@@ -850,7 +855,7 @@ if(WIN32)
     ${ALIZAMS_MOC_SRCS}
     ${ALIZAMS_UIS}
     ${ALIZAMS_QRCS_RCC})
-  target_link_libraries(alizams ${ALIZAMS_LINK_LIBRARIES})
+  target_link_libraries(alizams ${ALIZAMS_LINK_LIBRARIES} crypt32 rpcrt4)
 else()
   if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GLES)
