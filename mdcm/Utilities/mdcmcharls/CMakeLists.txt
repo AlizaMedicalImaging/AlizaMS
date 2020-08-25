@@ -22,6 +22,9 @@ set(CHARLS_BUILD_VERSION 0)
 set(CHARLS_VERSION "${CHARLS_MAJOR_VERSION}.${CHARLS_MINOR_VERSION}.${CHARLS_BUILD_VERSION}")
 
 add_definitions(-DCHARLS_STATIC)
+if(WIN32)
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif()
 
 add_library(${CHARLS_LIBRARY_NAME}
   interface.cpp  jpegls.cpp  jpegmarkersegment.cpp  jpegstreamreader.cpp  jpegstreamwriter.cpp)
