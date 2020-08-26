@@ -31,8 +31,8 @@
 #include <sys/time.h>
 #endif
 #include <time.h>
-#ifdef MDCM_HAVE_WINSOCK_H
-#include <winsock.h>
+#ifdef _WIN32
+#include <windows.h>
 #endif
 #if defined(MDCM_HAVE_SNPRINTF)
 #elif defined(MDCM_HAVE__SNPRINTF)
