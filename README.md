@@ -3,6 +3,8 @@
 Aliza MS - DICOM Viewer
 =======================
 
+[![Coverity Scan Build Status](https://scan.coverity.com/projects/21553/badge.svg)](https://scan.coverity.com/projects/alizams)
+
 Quick start
 -----------
 
