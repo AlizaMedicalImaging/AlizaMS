@@ -19,6 +19,7 @@
 #include "itkResampleImageFilter.h"
 #include "itkIdentityTransform.h"
 #include <vnl/vnl_vector_fixed.h>
+#include <vnl/vnl_matrix_fixed.h>
 #include <QSet>
 #include <QApplication>
 #include <QFileInfo>
@@ -1739,9 +1740,9 @@ QString CommonUtils::get_orientation2(const double * pat_orientation)
 	const vnl_vector_fixed<double,3> c0(row_dircos_x,row_dircos_y,row_dircos_z);
 	const vnl_vector_fixed<double,3> c1(col_dircos_x,col_dircos_y,col_dircos_z);
 	const vnl_vector_fixed<double,3> c2(nrm_dircos_x,nrm_dircos_y,nrm_dircos_z);
-	dir.set_column(0,c0);
-	dir.set_column(1,c1);
-	dir.set_column(2,c2);
+	dir.set_column(0, c0);
+	dir.set_column(1, c1);
+	dir.set_column(2, c2);
 	for (int i = 0; i < 3; i++)
 	{
 		vnl_vector_fixed<double,3> dcos = dir.get_column(i);
@@ -1762,8 +1763,10 @@ QString CommonUtils::get_orientation2(const double * pat_orientation)
 		}
 	}
 	if (print_oblique && oblique)
+	{
 		std::cout << "Oblique, closest to " << rai
 			<< std::endl;
+	}
 	s = QString::fromLatin1(rai);
 	s.remove(QChar('\0'));
 	return s;
@@ -1913,8 +1916,8 @@ void CommonUtils::generate_spectroscopyslice(
 			const bool ok3d, GLWidget * gl,
 			const float x0, const float y0, const float z0,
 			const float x1, const float y1, const float z1,
-			const float x3, const float y3, const float z3,
 			const float x2, const float y2, const float z2,
+			const float x3, const float y3, const float z3,
 			unsigned int columns_, unsigned int rows_)
 {
 	SpectroscopySlice * cs = new SpectroscopySlice;
@@ -1924,12 +1927,12 @@ void CommonUtils::generate_spectroscopyslice(
 	cs->fv[ 3] = x1;
 	cs->fv[ 4] = y1;
 	cs->fv[ 5] = z1;
-	cs->fv[ 6] = x2;
-	cs->fv[ 7] = y2;
-	cs->fv[ 8] = z2;
-	cs->fv[ 9] = x3;
-	cs->fv[10] = y3;
-	cs->fv[11] = z3;
+	cs->fv[ 6] = x3;
+	cs->fv[ 7] = y3;
+	cs->fv[ 8] = z3;
+	cs->fv[ 9] = x2;
+	cs->fv[10] = y2;
+	cs->fv[11] = z2;
 	if (ok3d && gl)
 	{
 		if (columns_ >= 2 || rows_ >= 2)
@@ -1965,7 +1968,7 @@ void CommonUtils::generate_spectroscopyslice(
 				const sVector3 X0(x0,y0,z0);
 				const sVector3 X1(x1,y1,z1);
 				const sVector3 YN(x1,y1,z1);
-				const sVector3 XN(x3,y3,z3);
+				const sVector3 XN(x2,y2,z2);
 				const float    Xd = length(XN-X0);
 				const float    Yd = length(YN-X0);
 				const sVector3 Xn = sVector3(normalize(XN-X0));

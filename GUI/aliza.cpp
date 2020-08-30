@@ -2563,8 +2563,7 @@ void Aliza::stop_anim()
 	graphicswidget_m->stop_animation();
 	graphicsAct_Z->setEnabled(true);
 	histogramAct->setEnabled(true);
-	const bool tmp0 =
-		(settingswidget) ? true : false;
+	const bool tmp0 = (settingswidget) ? true : false;
 	graphicswidget_m->set_mouse_modus(saved_mouse_modus, tmp0);
 	graphicswidget_y->set_mouse_modus(saved_mouse_modus, false);
 	graphicswidget_x->set_mouse_modus(saved_mouse_modus, false);
@@ -2602,11 +2601,8 @@ void Aliza::stop_anim()
 	connect(
 		slider_m->slices_slider, SIGNAL(valueChanged(int)),
 		this, SLOT(set_selected_slice2D_m(int)));
-	// FIXME
-	if (!mutex2.tryLock()) mutex2.unlock();
-	else mutex2.unlock();
-	if (!mutex0.tryLock()) mutex0.unlock();
-	else mutex0.unlock();
+	mutex2.unlock();
+	mutex0.unlock();
 }
 
 void Aliza::zoom_plus_3d()
@@ -3080,11 +3076,8 @@ void Aliza::stop_3D_anim()
 	if (zlockAct->isChecked()) oneAct->setEnabled(true);
 	toolbox2D->maxwin_pushButton->show();
 	update_selection();
-	// FIXME
-	if (!mutex3.tryLock()) mutex3.unlock();
-	else mutex3.unlock();
-	if (!mutex0.tryLock()) mutex0.unlock();
-	else mutex0.unlock();
+	mutex3.unlock();
+	mutex0.unlock();
 	if (ok3d) glwidget->set_skip_draw(false);
 }
 

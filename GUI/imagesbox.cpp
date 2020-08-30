@@ -13,7 +13,6 @@
 #include "commonutils.h"
 #include "dicomutils.h"
 #include <vnl/vnl_vector_fixed.h>
-#include <vnl/vnl_matrix_fixed.h>
 
 ListWidgetItem2::ListWidgetItem2(QListWidget * p, int t)
 	: QListWidgetItem(p, t)
