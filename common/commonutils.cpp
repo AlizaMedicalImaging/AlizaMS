@@ -1746,7 +1746,7 @@ QString CommonUtils::get_orientation2(const double * pat_orientation)
 	for (int i = 0; i < 3; i++)
 	{
 		vnl_vector_fixed<double,3> dcos = dir.get_column(i);
-    	const double dabsmax = dcos.inf_norm();
+		const double dabsmax = dcos.inf_norm();
 		for(int j = 0; j < 3; j++)
 		{
 			double dabs = fabs(dcos[j]);

@@ -4689,8 +4689,11 @@ void DicomUtils::enhanced_check_rescale(
 	bool rescale_miss = false;
 	for (unsigned int x = 0; x < v.size(); x++)
 	{
-		if (!v.at(x).rescale_ok) rescale_miss = true;
-		break;
+		if (!v.at(x).rescale_ok)
+		{
+			rescale_miss = true;
+			break;
+		}
 	}
 	if (!rescale_miss) return;
 	const mdcm::Tag tRescaleIntercept(0x0028,0x1052);
@@ -6954,12 +6957,12 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 		mdcm::DataElement pixeldata;
 		if (isrle)
 		{
-			mdcm::VL bv2l = bv2->GetLength();
+			const size_t bv2l = bv2->GetLength();
 			mdcm::Attribute<0x0028,0x0010> at1;
 			at1.SetFromDataSet(ds);
 			mdcm::Attribute<0x0028,0x0011> at2;
 			at2.SetFromDataSet(ds);
-			mdcm::VL at1l =
+			const size_t at1l =
 				at1.GetValue() * at2.GetValue() * sizeof(unsigned short);
 			if(bv2l == at1l)
 			{
@@ -6996,7 +6999,6 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 				std::cout
 					<< "Warning: Elscint data seems to be not compressed"
 					<< std::endl;
-
 			}
 			else
 			{
