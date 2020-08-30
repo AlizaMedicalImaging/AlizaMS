@@ -3010,6 +3010,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						if (!data.at(z_))
 						{
+							delete [] p__;
 							return QString(
 								QString("!data.at(") +
 								QVariant((int)z_).toString() +
@@ -3066,6 +3067,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						if (!data.at(z_))
 						{
+							delete [] p__;
 							return QString(
 								QString("!data.at(") +
 								QVariant((int)z_).toString() +
@@ -3121,6 +3123,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						if (!data.at(z_))
 						{
+							delete [] p__;
 							return QString(
 								QString("!data.at(") +
 								QVariant((int)z_).toString() +
@@ -3176,6 +3179,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						if (!data.at(z_))
 						{
+							delete [] p__;
 							return QString(
 								QString("!data.at(") +
 								QVariant((int)z_).toString() +
@@ -3231,6 +3235,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						if (!data.at(z_))
 						{
+							delete [] p__;
 							return QString(
 								QString("!data.at(") +
 								QVariant((int)z_).toString() +
@@ -3286,6 +3291,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						if (!data.at(z_))
 						{
+							delete [] p__;
 							return QString(
 								QString("!data.at(") +
 								QVariant((int)z_).toString() +
@@ -3343,6 +3349,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						if (!data.at(z_))
 						{
+							delete [] p__;
 							return QString(
 								QString("!data.at(") +
 								QVariant((int)z_).toString() +
@@ -3401,6 +3408,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						if (!data.at(z_))
 						{
+							delete [] p__;
 							return QString(
 								QString("!data.at(") +
 								QVariant((int)z_).toString() +
@@ -3456,6 +3464,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						if (!data.at(z_))
 						{
+							delete [] p__;
 							return QString(
 								QString("!data.at(") +
 								QVariant((int)z_).toString() +
@@ -3520,6 +3529,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				{
 					if (!data.at(z_))
 					{
+						delete [] p__;
 						return QString(
 							QString("!data.at(") +
 							QVariant((int)z_).toString() +
@@ -3577,6 +3587,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				{
 					if (!data.at(z_))
 					{
+						delete [] p__;
 						return QString(
 							QString("!data.at(") +
 							QVariant((int)z_).toString() +
@@ -3634,6 +3645,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				{
 					if (!data.at(z_))
 					{
+						delete [] p__;
 						return QString(
 							QString("!data.at(") +
 							QVariant((int)z_).toString() +
@@ -3689,6 +3701,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				{
 					if (!data.at(z_))
 					{
+						delete [] p__;
 						return QString(
 							QString("!data.at(") +
 							QVariant((int)z_).toString() +
@@ -3764,6 +3777,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				{
 					if (!data.at(z_))
 					{
+						delete [] p__;
 						return QString(
 							QString("!data.at(") +
 							QVariant((int)z_).toString() +
@@ -3975,8 +3989,7 @@ QString CommonUtils::apply_per_slice_rescale(
 {
 	if (!ivariant) return QString("!ivariant");
 	const short image_type = ivariant->image_type;
-	if (!(image_type >= 0 && image_type < 10))
-		return QString("");
+	if (!(image_type >= 0 && image_type < 10)) return QString("");
 	bool float64 = false;
 	for (int x = 0; x < rescale_values.size(); x++)
 	{
@@ -4046,7 +4059,6 @@ QString CommonUtils::apply_per_slice_rescale(
 			s = apply_per_slice_rescale_<ImageTypeD,ImageTypeD>(
 				ivariant->pD, ivariant->pD, rescale_values);
 		else
-		if (float64)
 			s = apply_per_slice_rescale_<ImageTypeD,ImageTypeF>(
 				ivariant->pD, ivariant->pF, rescale_values);
 		break;
@@ -4066,20 +4078,6 @@ QString CommonUtils::apply_per_slice_rescale(
 			s = apply_per_slice_rescale_<ImageTypeULL,ImageTypeF>(
 				ivariant->pULL, ivariant->pF, rescale_values);
 		break;
-	case 10:
-	case 11:
-	case 12:
-	case 13:
-	case 14:
-	case 15:
-	case 16:
-	case 20:
-	case 21:
-	case 22:
-	case 23:
-	case 24:
-	case 25:
-	case 26:
 	default:
 		return QString("");
 	}

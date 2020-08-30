@@ -199,9 +199,9 @@ void ContourUtils::generate_roi_vbos(
 					glBindVertexArray(0);
 #endif
 					GLWidget::increment_count_vbos(1);
-					delete [] v;
 					c->vao_initialized = true;
 				}
+				delete [] v;
 				if (delete_after) c->dpoints.clear();
 			}
 		}

@@ -440,6 +440,7 @@ Aliza::Aliza(QObject * parent) : QObject(parent)
 	imagesbox = NULL;
 	toolbox = NULL;
 	toolbox2D = NULL;
+	labelwidget = NULL;
 	browser2  = NULL;
 	settingswidget = NULL;
 	graphicswidget_m = NULL;
@@ -467,12 +468,14 @@ Aliza::Aliza(QObject * parent) : QObject(parent)
 	rectAct = NULL;
 	cursorAct = NULL;
 	collisionAct = NULL;
+	segmentAct = NULL;
 	rect_selection = false;
 	hide_zoom = false;
 	multiview = false;
 	histogram_mode = false;
 	run__ = false;
 	load_reported_to_mainwin = false;
+	anim_idx = -1;
 	saved_mouse_modus = 0;
 	saved_show_cursor = false;
 	frametime_3D = 120;
@@ -2320,10 +2323,7 @@ void Aliza::update_selection2()
 			graphicswidget_x->graphicsview->global_flip_y = false;
 			graphicswidget_y->graphicsview->global_flip_x = false;
 			graphicswidget_y->graphicsview->global_flip_y = false;
-			if (graphicswidget_m->get_mouse_modus() == 2)
-				graphicswidget_m->set_slice_2D(v,1,true);
-			else
-				graphicswidget_m->set_slice_2D(v,1,true);
+			graphicswidget_m->set_slice_2D(v,1,true);
 			if (multiview) graphicswidget_y->set_slice_2D(v, 1, false);
 			if (multiview) graphicswidget_x->set_slice_2D(v, 1, false);
 			update_selection_common1(v);
@@ -2363,7 +2363,7 @@ void Aliza::update_selection_common2(QListWidgetItem * s)
 	QList<const ImageVariant*> tmp_images;
 	QList<double> deltas;
 	ListWidgetItem2 * k = static_cast<ListWidgetItem2*>(s);
-	ImageVariant    * v = k ? k->get_image_from_item() : NULL;
+	ImageVariant    * v = k->get_image_from_item();
 	if (v)
 	{
  		selected_images.push_back(v);
@@ -2602,6 +2602,7 @@ void Aliza::stop_anim()
 	connect(
 		slider_m->slices_slider, SIGNAL(valueChanged(int)),
 		this, SLOT(set_selected_slice2D_m(int)));
+	// FIXME
 	if (!mutex2.tryLock()) mutex2.unlock();
 	else mutex2.unlock();
 	if (!mutex0.tryLock()) mutex0.unlock();
@@ -3079,6 +3080,7 @@ void Aliza::stop_3D_anim()
 	if (zlockAct->isChecked()) oneAct->setEnabled(true);
 	toolbox2D->maxwin_pushButton->show();
 	update_selection();
+	// FIXME
 	if (!mutex3.tryLock()) mutex3.unlock();
 	else mutex3.unlock();
 	if (!mutex0.tryLock()) mutex0.unlock();

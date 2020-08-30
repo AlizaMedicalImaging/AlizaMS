@@ -7,7 +7,10 @@ using namespace Vectormath::Scalar;
 using namespace Vectormath::SSE;
 #endif
 
-Camera::Camera() {}
+Camera::Camera()
+{
+	reset();
+}
 
 Camera::~Camera() {}
 

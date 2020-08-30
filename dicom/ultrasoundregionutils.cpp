@@ -197,7 +197,7 @@ void UltrasoundRegionUtils::Read(const mdcm::DataSet & ds, QList<UltrasoundRegio
 				r.m_UnitYString = QString("cm") + QString(QChar(0x00B3));
 				break;
 			case 0xb:
-				r.m_UnitXString = QString("cm") + QString(QChar(0x00B3)) + QString("/s");
+				r.m_UnitYString = QString("cm") + QString(QChar(0x00B3)) + QString("/s");
 				break;
 			case 0xc:
 				r.m_UnitYString = QString(QChar(0x00B0));

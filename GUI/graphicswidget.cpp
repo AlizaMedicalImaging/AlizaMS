@@ -292,9 +292,8 @@ template<typename T> QString contour_from_path(
 			break;
 		default:
 			{
-				return
-					QString(
-						"item->get_axis() - unknown value");
+				delete c;
+				return QString("item->get_axis() - unknown value");
 			}
 		}
 		itk::Point<float,3> j;
@@ -1427,6 +1426,7 @@ GraphicsWidget::GraphicsWidget(
 	run__ = false;
 	axis = a;
 	main = false;
+	multi = false;
 	bb = false;
 	gl = false;
 	smooth_ = true;
@@ -1434,6 +1434,7 @@ GraphicsWidget::GraphicsWidget(
 	left_label = left_label_;
 	measure_label = measure_label_;
 	info_line = info_line_;
+	aliza = NULL;
 	single_frame_ptr = single_frame;
 	multi_frame_ptr = multi_frame;
 	alt_mode = false;

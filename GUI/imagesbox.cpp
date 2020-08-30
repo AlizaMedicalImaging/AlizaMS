@@ -18,6 +18,8 @@
 ListWidgetItem2::ListWidgetItem2(QListWidget * p, int t)
 	: QListWidgetItem(p, t)
 {
+	id = -1;
+	ivariant = NULL;
 	setFlags(flags()|Qt::ItemIsUserCheckable);
 	setCheckState(Qt::Unchecked);
 }
@@ -28,6 +30,8 @@ ListWidgetItem2::ListWidgetItem2(
 	int t)
 	: QListWidgetItem(p, t)
 {
+	id = -1;
+	ivariant = NULL;
 	setFlags(flags()|Qt::ItemIsUserCheckable);
 	setCheckState(Qt::Unchecked);
 }
@@ -39,6 +43,8 @@ ListWidgetItem2::ListWidgetItem2(
 	int t)
 	: QListWidgetItem(p, t)
 {
+	id = -1;
+	ivariant = NULL;
 	setFlags(flags()|Qt::ItemIsUserCheckable);
 	setCheckState(Qt::Unchecked);
 }

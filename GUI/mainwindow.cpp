@@ -219,17 +219,17 @@ MainWindow::MainWindow(
 	graphicswidget_x->set_sliderwidget(slider_x);
 	graphicswidget_x->set_toolbox2D_widget(toolbox2D);
 	//
-	if (graphicswidget_m && graphicswidget_m->graphicsview)
+	if (graphicswidget_m->graphicsview)
 	{
 		graphicswidget_m->graphicsview->set_widget_y(graphicswidget_y);
 		graphicswidget_m->graphicsview->set_widget_x(graphicswidget_x);
 	}
-	if (graphicswidget_y && graphicswidget_y->graphicsview)
+	if (graphicswidget_y->graphicsview)
 	{
 		graphicswidget_y->graphicsview->set_widget_m(graphicswidget_m);
 		graphicswidget_y->graphicsview->set_widget_x(graphicswidget_x);
 	}
-	if (graphicswidget_x && graphicswidget_x->graphicsview)
+	if (graphicswidget_x->graphicsview)
 	{
 		graphicswidget_x->graphicsview->set_widget_m(graphicswidget_m);
 		graphicswidget_x->graphicsview->set_widget_y(graphicswidget_y);

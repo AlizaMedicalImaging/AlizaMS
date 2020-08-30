@@ -215,21 +215,28 @@ template<typename T> SRImage lrgb3(
 		try { p__ = new unsigned char[size[0] * size[1] * 3]; }
 		catch (std::bad_alloc&) { p__ = NULL; }
 		if (!p__) return SRImage();
-		itk::ImageRegionConstIterator<T> iterator(image, region);
-		iterator.GoToBegin();
-		while (!iterator.IsAtEnd())
+		try
 		{
-			p__[j_ + 2] =
-				static_cast<unsigned char>(
-					((double)iterator.Get().GetBlue()  / tmp_max) * 255.0);
-			p__[j_ + 1] =
-				static_cast<unsigned char>(
-					((double)iterator.Get().GetGreen() / tmp_max) * 255.0);
-			p__[j_ + 0] =
-				static_cast<unsigned char>(
-					((double)iterator.Get().GetRed()   / tmp_max) * 255.0);
-			j_ += 3;
-			++iterator;
+			itk::ImageRegionConstIterator<T> iterator(image, region);
+			iterator.GoToBegin();
+			while (!iterator.IsAtEnd())
+			{
+				p__[j_ + 2] =
+					static_cast<unsigned char>(
+						((double)iterator.Get().GetBlue()  / tmp_max) * 255.0);
+				p__[j_ + 1] =
+					static_cast<unsigned char>(
+						((double)iterator.Get().GetGreen() / tmp_max) * 255.0);
+				p__[j_ + 0] =
+					static_cast<unsigned char>(
+						((double)iterator.Get().GetRed()   / tmp_max) * 255.0);
+				j_ += 3;
+				++iterator;
+			}
+		}
+		catch(itk::ExceptionObject &)
+		{
+			;;
 		}
 	}
 	else
@@ -242,18 +249,25 @@ template<typename T> SRImage lrgb3(
 		const double vrange = vmax - vmin;
 		if (vrange!=0)
 		{
-			itk::ImageRegionConstIterator<T> iterator(image, region);
-			iterator.GoToBegin();
-			while(!iterator.IsAtEnd())
+			try
 			{
-				const double b = static_cast<double>(iterator.Get().GetBlue());
-				const double g = static_cast<double>(iterator.Get().GetGreen());
-				const double r = static_cast<double>(iterator.Get().GetRed());
-				p__[j_+2] = static_cast<unsigned char>(255.0*((b+(-vmin))/vrange));
-				p__[j_+1] = static_cast<unsigned char>(255.0*((g+(-vmin))/vrange));
-				p__[j_+0] = static_cast<unsigned char>(255.0*((r+(-vmin))/vrange));
-				j_ += 3;
-				++iterator;
+				itk::ImageRegionConstIterator<T> iterator(image, region);
+				iterator.GoToBegin();
+				while(!iterator.IsAtEnd())
+				{
+					const double b = static_cast<double>(iterator.Get().GetBlue());
+					const double g = static_cast<double>(iterator.Get().GetGreen());
+					const double r = static_cast<double>(iterator.Get().GetRed());
+					p__[j_+2] = static_cast<unsigned char>(255.0*((b+(-vmin))/vrange));
+					p__[j_+1] = static_cast<unsigned char>(255.0*((g+(-vmin))/vrange));
+					p__[j_+0] = static_cast<unsigned char>(255.0*((r+(-vmin))/vrange));
+					j_ += 3;
+					++iterator;
+				}
+			}
+			catch(itk::ExceptionObject &)
+			{
+				;;
 			}
 		}
 	}

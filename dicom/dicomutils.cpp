@@ -1628,8 +1628,12 @@ void DicomUtils::read_image_info(
 	const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
 	if (ds.IsEmpty()) return;
 	//
-	get_us_value(ds,trows,rows_);
-	get_us_value(ds,tcolumns,columns_);
+	const bool b0 = get_us_value(ds,trows,rows_);
+	const bool b1 = get_us_value(ds,tcolumns,columns_);
+	if (!(b0 && b1))
+	{
+		;;
+	}
 	//
 	{
 		QString sop_instance_uid_;
@@ -1715,9 +1719,13 @@ void DicomUtils::read_image_info_rtdose(const QString & f,
 	const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
 	if (ds.IsEmpty()) return;
 	//
-	get_us_value(ds,trows,rows_);
-	get_us_value(ds,tcolumns,columns_);
-	get_ds_values(ds,tframeoffset,z_offsets);
+	const bool b0 = get_us_value(ds,trows,rows_);
+	const bool b1 = get_us_value(ds,tcolumns,columns_);
+	const bool b2 = get_ds_values(ds,tframeoffset,z_offsets);
+	if (!(b0 && b1 && b2))
+	{
+		std::cout << "read_image_info_rtdose warning (1)" << std::endl;
+	}
 	//
 	{
 		QString numframes;
@@ -4110,6 +4118,7 @@ void DicomUtils::enhanced_get_indices(
 	int * dim3rd,
 	int * enh_id)
 {
+	const unsigned int sq_size = sq.size();
 	int stack_id_idx      = -1;
 	int in_stack_pos_idx  = -1;
 	int temporal_pos_idx  = -1;
@@ -4122,7 +4131,6 @@ void DicomUtils::enhanced_get_indices(
 	int datatype_idx      = -1;
 	int mr_frame_type_idx = -1;
 	int mr_eff_echo_idx   = -1;
-	const size_t sq_size = sq.size();
 	for (unsigned int x = 0; x < sq_size; x++)
 	{
 		if (
@@ -6066,9 +6074,9 @@ QString DicomUtils::read_series(
 		}
 		//
 		double dircos_[] = {0.0,0.0,0.0,0.0,0.0,0.0};
-		unsigned int dimx_, dimy_, dimz_;
-		double origin_x_, origin_y_, origin_z_;
-		double spacing_x_, spacing_y_, spacing_z_;
+		unsigned int dimx_ = 0, dimy_ = 0, dimz_ = 0;
+		double origin_x_ = 0.0, origin_y_ = 0.0, origin_z_ = 0.0;
+		double spacing_x_ = 0.0, spacing_y_ = 0.0, spacing_z_ = 0.0;
 		double shift_tmp = 0.0, scale_tmp = 1.0;
 		QString buff_error;
 		const int overlays_idx = overlays_enabled ? j : -2;
@@ -6844,12 +6852,12 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 				pixeldata = reader.GetFile().GetDataSet().GetDataElement(tpixeldata);
 			}
 			pixeldata.SetVR(mdcm::VR::OW);
-			mdcm::VL bv2l = bv2->GetLength();
+			const size_t bv2l = bv2->GetLength();
 			mdcm::Attribute<0x0028,0x0010> at1;
 			at1.SetFromDataSet(ds);
 			mdcm::Attribute<0x0028,0x0011> at2;
 			at2.SetFromDataSet(ds);
-			mdcm::VL at1l =
+			const size_t at1l =
 				at1.GetValue() * at2.GetValue() * sizeof(unsigned short);
 			if(bv2l == at1l)
 			{
@@ -6905,10 +6913,6 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 					at0.GetValue(), w, h);
 				pixeldata.SetByteValue((char*)&buffer[0], (uint32_t)buffer.size());
 			}
-		}
-		else
-		{
-			return false;
 		}
 		// Add the pixel data element
 		if(reader.GetFile().GetDataSet().FindDataElement(tpixeldata))
@@ -7004,10 +7008,6 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 					at0.GetValue(), w, h);
 				pixeldata.SetByteValue((char*)&buffer[0], (uint32_t)buffer.size());
 			}
-		}
-		else
-		{
-			return false;
 		}
 		// Add the pixel data element
 		reader.GetFile().GetDataSet().Replace(pixeldata);
@@ -7187,7 +7187,11 @@ QString DicomUtils::read_buffer(
 					if (!tmp0) continue;
 					const bool obuffer_ok = o.GetUnpackBuffer(
 						tmp0, obuffer_size);
-					if (!obuffer_ok) continue;
+					if (!obuffer_ok)
+					{
+						delete [] tmp0;
+						continue;
+					}
 					int idx = FrameOrigin - 1;
 					for (unsigned int y = 0; y < NumberOfFrames; y++)
 					{
@@ -7201,14 +7205,17 @@ QString DicomUtils::read_buffer(
 						for (size_t j = 0; j < fbuffer_size; j++)
 						{
 							const size_t jj = p + j;
-							if (!(jj < obuffer_size))
+							if (jj < obuffer_size)
+							{
+								overlay.data.push_back(tmp0[jj]);
+							}
+							else
 							{
 								std::cout
 									<< "warning: read_buffer() jj="
 									<< jj << " obuffer_size"
 									<< obuffer_size << std::endl;
 							}
-							overlay.data.push_back(tmp0[jj]);
 						}
 						slice_overlays.insert(idx-1, overlay);
 #if 0
@@ -7236,7 +7243,11 @@ QString DicomUtils::read_buffer(
 					if (!tmp0) continue;
 					const bool obuffer_ok = o.GetUnpackBuffer(
 						tmp0, obuffer_size);
-					if (!obuffer_ok) continue;
+					if (!obuffer_ok)
+					{
+						delete [] tmp0;
+						continue;
+					}
 					for (size_t j = 0; j < obuffer_size; j++)
 					{
 						overlay.data.push_back(tmp0[j]);
@@ -11125,7 +11136,7 @@ QString DicomUtils::read_dicom(
 									{
 										delete supp_grey_images[zzz];
 									}
-									if (v) delete v;
+									delete v;
 									return QString("Internal error,\n") + supp_palette_error;
 								}
 								CommonUtils::copy_slices(v,supp_grey_images.at(jjj));

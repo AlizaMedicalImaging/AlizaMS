@@ -40,6 +40,28 @@ using namespace Vectormath::Scalar;
 
 ShaderObj::ShaderObj()
 {
+	program = 0;
+	vshader = 0;
+	fshader = 0;
+	position_handle = 0;
+	normal_handle = 0;
+	tangent_handle = 0;
+	random_handle = 0;
+	color_handle = 0;
+	time_handle = 0;
+	velocity_handle = 0;
+	location_mvp = 0;
+	location_mv = 0;
+	location_modeling = 0;
+	location_modeling_inv_t = 0;
+	location_K = 0;
+	location_shininess = 0;
+	location_mparams = 0;
+	location_fparams = 0;
+	location_sparams = 0;
+	location_iparams = 0;
+	location_coparams = 0;
+	location_pparams = 0;
 	texture_handle   = new GLuint[TEXTURES_SIZE];
 	location_sampler = new GLuint[TEXTURES_SIZE];
 	for (int x = 0; x < TEXTURES_SIZE; x++) texture_handle[x] = 0;
@@ -55,7 +77,10 @@ ShaderObj::~ShaderObj()
 qMeshData::qMeshData() : shader(NULL)
 {
 	K            = new float[12];
+	shininess    = 0.0f;
+	faces_size   = 0;
 	vboid        = new GLuint[VBOIDS_SIZE];
+	vaoid        = 0;
 	get_shadows  = new int[MAX_SHADOWS_];
 	cast_shadows = new int[MAX_SHADOWS_];
 	textures     = new GLuint[TEXTURES_SIZE];
@@ -925,9 +950,6 @@ void GLWidget::init_opengl(int w, int h)
 	else
 		set_max_vbos_65535(false);
 	//
-	camera->reset();
-	camera->set_heading(0.0f);
-	camera->set_pitch(0.0f);
 	camera->set_position(0.0f,0.0f,(float)SCENE_POS_Z);
 	//
 	glEnable(GL_DEPTH_TEST);

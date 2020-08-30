@@ -2363,7 +2363,11 @@ static void read_overlays(
 			if (!tmp0) continue;
 			const bool obuffer_ok = o.GetUnpackBuffer(
 				tmp0, obuffer_size);
-			if (!obuffer_ok) continue;
+			if (!obuffer_ok)
+			{
+				delete [] tmp0;
+				continue;
+			}
 			int idx = FrameOrigin - 1;
 			for (unsigned int y = 0; y < NumberOfFrames; y++)
 			{
@@ -2377,14 +2381,17 @@ static void read_overlays(
 				for (size_t j = 0; j < fbuffer_size; j++)
 				{
 					const size_t jj = p + j;
-					if (!(jj < obuffer_size))
+					if (jj < obuffer_size)
+					{
+						overlay.data.push_back(tmp0[jj]);
+					}
+					else
 					{
 						std::cout
 							<< "warning: read_buffer() jj="
 							<< jj << " obuffer_size"
 							<< obuffer_size << std::endl;
 					}
-					overlay.data.push_back(tmp0[jj]);
 				}
 				slice_overlays.insert(idx-1, overlay);
 #if 0
@@ -2412,7 +2419,11 @@ static void read_overlays(
 			if (!tmp0) continue;
 			const bool obuffer_ok = o.GetUnpackBuffer(
 				tmp0, obuffer_size);
-			if (!obuffer_ok) continue;
+			if (!obuffer_ok)
+			{
+				delete [] tmp0;
+				continue;
+			}
 			for (size_t j = 0; j < obuffer_size; j++)
 			{
 				overlay.data.push_back(tmp0[j]);
