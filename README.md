@@ -1,7 +1,9 @@
-![Aliza MS](package/archive/install_menu/icons/hicolor/128x128/apps/alizams.png)
+![Aliza MS](package/archive/usr/share/icons/hicolor/128x128/apps/alizams.png)
 
 Aliza MS - DICOM Viewer
 =======================
+
+[![Coverity Scan Build Status](https://scan.coverity.com/projects/21553/badge.svg)](https://scan.coverity.com/projects/alizams)
 
 Quick start
 -----------
