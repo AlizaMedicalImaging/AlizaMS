@@ -92,7 +92,6 @@ bool Scanner::Scan(Directory::FilenamesType const & filenames)
   {
     Mappings.clear();
     Mappings[""]; // Create a fake table for dummy file
-    // Make our own copy
     Filenames = filenames;
     // Find the tag with the highest value (get the one from the end of the std::set)
     Tag last;
@@ -122,34 +121,25 @@ bool Scanner::Scan(Directory::FilenamesType const & filenames)
       bool read = false;
       try
       {
-        // Start reading all tags, including the last one
         read = reader.ReadUpToTag(last, SkipTags);
-      }
-      catch(std::exception & ex)
-      {
-        (void)ex;
-        mdcmWarningMacro("Failed to read:" << filename << " with ex:" << ex.what());
       }
       catch(...)
       {
-        mdcmWarningMacro("Failed to read:" << filename  << " with unknown error");
+        mdcmWarningMacro("Failed to read:" << filename);
       }
       if(read)
       {
         sf.SetFile(reader.GetFile());
         Scanner::ProcessPublicTag(sf, filename);
       }
-      // Update progress
       Progress += progresstick;
       ProgressEvent pe;
       pe.SetProgress(Progress);
       this->InvokeEvent(pe);
-      // For outside application tell which file is being processed
       FileNameEvent fe(filename);
       this->InvokeEvent(fe);
     }
   }
-
   this->InvokeEvent(EndEvent());
   return true;
 }
@@ -235,7 +225,7 @@ const char *Scanner::GetFilenameFromTagToValue(Tag const & t, const char * value
   {
     Directory::FilenamesType::const_iterator file = Filenames.begin();
     size_t len = strlen(valueref);
-    if(len && valueref[ len - 1 ] == ' ')
+    if(len && valueref[len - 1] == ' ')
     {
       --len;
     }
