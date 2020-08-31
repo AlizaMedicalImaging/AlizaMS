@@ -578,7 +578,7 @@ bool RLECodec::DecodeExtent(
     frag.ReadPreValue<SwapperNoOp>(is);
     std::streampos start = is.tellg();
 
-    SetLength(dimensions[0] * dimensions[1] * pf.GetPixelSize());
+    SetLength((unsigned long long)dimensions[0] * (unsigned long long)dimensions[1] * pf.GetPixelSize());
     const bool r = DecodeByStreams(is, os); (void)r;
     if(!r) return false;
     assert(r);

@@ -894,7 +894,7 @@ bool SurfaceWriter::PrepareWritePointMacro(SmartPointer< Surface > surface,
     // Number Of Surface Points
     Attribute<0x0066, 0x0015> numberOfSurfacePointsAt;
     unsigned long numberOfSurfacePoints = surface->GetNumberOfSurfacePoints();
-    if (numberOfSurfacePoints == 0)
+    if (bv && numberOfSurfacePoints == 0)
       numberOfSurfacePoints = bv->GetLength() / (VR::GetLength(VR::OF) * 3);
     numberOfSurfacePointsAt.SetValue( (unsigned int)numberOfSurfacePoints );
     surfacePointsDs.Replace( numberOfSurfacePointsAt.GetAsDataElement() );

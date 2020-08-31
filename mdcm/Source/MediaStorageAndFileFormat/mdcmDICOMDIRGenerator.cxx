@@ -236,9 +236,10 @@ bool DICOMDIRGenerator::ImageBelongToSameSeries(const char * sopuid1, const char
   {
     seriesuid2 = ttv2.find(tseriesuid)->second;
   }
-  assert(seriesuid1);
-  assert(seriesuid2);
-  b = strcmp(seriesuid1, seriesuid2) == 0;
+  if(seriesuid1 && seriesuid2)
+  {
+    b = strcmp(seriesuid1, seriesuid2) == 0;
+  }
   return b;
 }
 

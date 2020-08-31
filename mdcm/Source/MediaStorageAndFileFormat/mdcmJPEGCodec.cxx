@@ -227,8 +227,8 @@ bool JPEGCodec::Decode(DataElement const &in, DataElement &out)
         assert(b); (void)b;
         is.write(mybuffer, bv.GetLength());
         delete[] mybuffer;
-        bool r2 = DecodeByStreams(is, os);
-        if(!r2) return false;
+        const bool r2 = DecodeByStreams(is, os);
+        if(!r2)
         {
           mdcmAlwaysWarnMacro("JPEG: !r2");
           return false;

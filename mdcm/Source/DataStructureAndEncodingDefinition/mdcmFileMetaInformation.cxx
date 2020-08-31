@@ -760,8 +760,7 @@ std::istream &FileMetaInformation::ReadCompatInternal(std::istream &is)
 //  //InternalTS = ts;
 //}
 
-// FIXME: If any boozoo ever write a SQ in the meta header
-// we are in bad shape...
+// FIXME if write a SQ in the meta header ?
 void FileMetaInformation::ComputeDataSetTransferSyntax()
 {
   const Tag t(0x0002,0x0010);
@@ -780,7 +779,8 @@ void FileMetaInformation::ComputeDataSetTransferSyntax()
     throw Exception("Unknown Transfer syntax");
   }
   DataSetTS = tst;
-  DataSetTS.IsValid();
+  const bool b = DataSetTS.IsValid();
+  (void)b;
 }
 
 void FileMetaInformation::SetDataSetTransferSyntax(const TransferSyntax &ts)

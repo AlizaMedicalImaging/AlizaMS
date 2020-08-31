@@ -96,7 +96,11 @@ bool RAWCodec::DecodeBytes(
     const size_t len = str.size() * 16 / 12;
     char * copy = new char[len];
     const bool b = Unpacker12Bits::Unpack(copy, &str[0], str.size());
-    if (!b) return false;
+    if (!b)
+    {
+      delete [] copy;
+      return false;
+    }
     memcpy(outBytes, copy, len);
     delete [] copy;
     this->GetPixelFormat().SetBitsAllocated(16);
@@ -135,7 +139,11 @@ bool RAWCodec::Decode(DataElement const & in, DataElement & out)
     const size_t len = str.size() * 16 / 12;
     char * copy = new char[len];
     const bool b = Unpacker12Bits::Unpack(copy, &str[0], str.size());
-    if (!b) return false;
+    if (!b)
+    {
+      delete [] copy;
+      return false;
+    }
     VL::Type lenSize = (VL::Type)len;
     out.SetByteValue(copy, lenSize);
     delete [] copy;
