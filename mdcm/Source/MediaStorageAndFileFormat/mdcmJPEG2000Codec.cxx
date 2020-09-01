@@ -1498,7 +1498,7 @@ bool JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size, Tr
   }
 #endif
   assert(PI != PhotometricInterpretation::UNKNOWN);
-  bool bmct = false;
+  const bool bmct = false; // FIXME
   if(bmct)
   {
     if(reversible)
