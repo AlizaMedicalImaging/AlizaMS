@@ -100,15 +100,12 @@ private:
 	int new_win_pos_y;
 	int last_win_pos_x;
 	int last_win_pos_y;
-	bool mainview;
 	double m0_win_pos_x;
 	double m0_win_pos_y;
 	double m1_win_pos_x;
 	double m1_win_pos_y;
 	bool m0_set;
 	bool m1_set;
-	bool painting;
-	long current_drawing;
 	GraphicsWidget * parent;
 	GraphicsWidget * widget_m;
 	GraphicsWidget * widget_y;

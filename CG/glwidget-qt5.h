@@ -218,7 +218,6 @@ public:
 	void set_view_rc();
 	bool rect_selection;
 	bool show_cube;
-	bool gpu_shader4;
 	bool wireframe;
 	float contours_width;
 	//

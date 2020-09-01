@@ -60,7 +60,6 @@ private:
 	void process_attribure(const short);
 	QString saved_dir;
 	QAction * copyAct;
-	QAction * itemAct;
 	QAction * collapseAct;
 	QAction * expandAct;
 	bool skip_settings_pos;

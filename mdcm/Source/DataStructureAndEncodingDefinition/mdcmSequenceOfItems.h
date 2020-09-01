@@ -24,13 +24,13 @@ namespace mdcm_ns
 {
 
 /**
- * \brief Class to represent a Sequence Of Items
- * \details (value representation : SQ)
+ * Class to represent a Sequence Of Items
+ * (value representation : SQ)
  *  - a Value Representation for Data Elements that contains a sequence of Data Sets.
  *  - Sequence of Item allows for Nested Data Sets
  *
  * See PS 3.5, 7.4.6 Data Element Type Within a Sequence
- * \note
+ *
  * SEQUENCE OF ITEMS (VALUE REPRESENTATION SQ)
  * A Value Representation for Data Elements that contain a sequence of
  * Data Sets. Sequence of Items allows for Nested Data Sets.

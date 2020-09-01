@@ -4118,7 +4118,6 @@ void DicomUtils::enhanced_get_indices(
 	int * dim3rd,
 	int * enh_id)
 {
-	const unsigned int sq_size = sq.size();
 	int stack_id_idx      = -1;
 	int in_stack_pos_idx  = -1;
 	int temporal_pos_idx  = -1;
@@ -4131,7 +4130,9 @@ void DicomUtils::enhanced_get_indices(
 	int datatype_idx      = -1;
 	int mr_frame_type_idx = -1;
 	int mr_eff_echo_idx   = -1;
-	for (unsigned int x = 0; x < sq_size; x++)
+	const unsigned int sq_size = sq.size();
+	unsigned int x = 0;
+	for (; x < sq_size; x++)
 	{
 		if (
 			sq.at(x).group_pointer==mdcm::Tag(0x0020,0x9111) &&
@@ -4205,7 +4206,8 @@ void DicomUtils::enhanced_get_indices(
 			mr_eff_echo_idx = x;
 		}
 	}
-	// ultrasound
+	//
+	// e.g. ultrasound
 	if (
 		sq_size==3 &&
 		temporal_idx<0 &&
@@ -4215,6 +4217,7 @@ void DicomUtils::enhanced_get_indices(
 		// may point to any temporal tag
 		temporal_idx = 0;
 	}
+	//
 	//
 	if (
 		sq_size==3 &&
@@ -4469,7 +4472,7 @@ void DicomUtils::enhanced_get_indices(
 			in_stack_pos_idx>=0)
 		{
 			int dim5th_tmp = -1;
-			for (unsigned int x = 0; x < 3; x++)
+			for (x = 0; x < 3; x++)
 			{
 				if (
 					sq.at(x).group_pointer==mdcm::Tag(0x0020,0x9111) &&
@@ -4501,7 +4504,7 @@ void DicomUtils::enhanced_get_indices(
 			temporal_pos_idx>=0)
 		{
 			int dim6th_tmp = -1;
-			for (unsigned int x = 0; x < 4; x++)
+			for (x = 0; x < 4; x++)
 			{
 				if (
 					sq.at(x).group_pointer==mdcm::Tag(0x0020,0x9111) &&

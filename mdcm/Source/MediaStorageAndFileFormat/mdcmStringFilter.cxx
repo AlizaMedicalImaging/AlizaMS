@@ -149,8 +149,12 @@ bool StringFilter::ExecuteQuery(std::string const & query_const,
     else if(subtokens[0] == "Item")
     {
       assert(state == 1);
-      assert(curde);
       assert(subtokens[1] == "number");
+      if (!curde)
+      {
+        state = -1;
+        break;
+      }
       sqi = curde->GetValueAsSQ();
       if(!sqi)
       {
