@@ -155,6 +155,14 @@ class FrameGroup
 {
 public:
 	FrameGroup() :
+		id(-1),
+		stack_id(-1),
+		in_stack_pos_num(-1),
+		temp_pos_idx(-1),
+		temp_pos_off(0.0),
+		us_temp_pos_unknown(0.0),
+		rescale_intercept(0.0),
+		rescale_slope(1.0),
 		stack_id_ok(false),
 		in_stack_pos_num_ok(false),
 		temp_pos_idx_ok(false),
@@ -164,10 +172,10 @@ public:
 		us_temp_pos_unknown_ok(false),
 		rescale_ok(false) {}
 	~FrameGroup() {}
-	unsigned int id;
-	unsigned int stack_id;
-	unsigned int in_stack_pos_num;
-	unsigned int temp_pos_idx;
+	int    id;
+	int    stack_id;
+	int    in_stack_pos_num;
+	int    temp_pos_idx;
 	double vol_pos[3];
 	double vol_orient[6];
 	double temp_pos_off;
@@ -927,10 +935,24 @@ class ImageContainer
 {
 public:
 	ImageContainer() :
-		slice(-1), image3D(NULL), image2D(NULL) {}
+		axis(-1),
+		slice(-1),
+		image3D(NULL),
+		image2D(NULL),
+		selected_x_slice_ext(-1),
+		selected_y_slice_ext(-1),
+		selected_z_slice_ext(-1),
+		us_window_center_ext(0.0),
+		us_window_width_ext(1e-6),
+		selected_lut(0)
+		{}
 	~ImageContainer()
 	{
-		if (image2D) { delete image2D; image2D = NULL; }
+		if (image2D)
+		{
+			delete image2D;
+			image2D = NULL;
+		}
 		image3D = NULL;
 	}
 	short            axis;

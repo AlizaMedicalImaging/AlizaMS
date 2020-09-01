@@ -739,6 +739,8 @@ void GLWidget::init_()
 	color_shader.program = 0;
 	orientcube_shader.program = 0;
 	mesh_shader.program = 0;
+	win_w = 0;
+	win_h = 0;
 	view = 0;
 	axis = 2;
 	gradient1  = 0;
@@ -761,6 +763,10 @@ void GLWidget::init_()
 	m_collisionWorld = NULL;
 	draw_frames_3d = false;
 	display_contours = true;
+	m_left = 0;
+	m_right = 0;
+	m_forw = 0;
+	m_back = 0;
 	old_win_pos_x  = 0;
 	old_win_pos_y  = 0;
 	new_win_pos_x  = 0;
@@ -782,6 +788,7 @@ void GLWidget::init_()
 	scene_vao = 0;
 	frames_vbo = 0;
 	frames_vao = 0;
+	origin_vbo = 0;
 	origin_vao = 0;
 	cubebuffer = 0;
 	cube_tex = 0;
