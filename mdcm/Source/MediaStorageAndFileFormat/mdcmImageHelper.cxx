@@ -2486,10 +2486,11 @@ SmartPointer<LookupTable> ImageHelper::GetLUT(File const& f)
       {
         lut->Clear();
       }
-      unsigned long check =
-        (el_us3.GetValue(0) ? el_us3.GetValue(0) : 65536)
-        * el_us3.GetValue(2) / 8;
-      assert(!lut->Initialized() || check == lut_raw->GetLength()); (void)check;
+      const size_t tmp1 = el_us3.GetValue(0);
+      const size_t tmp2 = el_us3.GetValue(2);
+      const size_t tmp3 = (tmp1 ? tmp1 : 65536) * tmp2 / 8;
+      assert(!lut->Initialized() || tmp3 == lut_raw->GetLength());
+      (void)tmp3;
     }
     else if(ds.FindDataElement(seglut))
     {

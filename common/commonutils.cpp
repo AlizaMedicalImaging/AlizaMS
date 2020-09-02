@@ -1179,7 +1179,7 @@ template<typename T> QString process_dicom_monochrome_image(
 		image->SetSpacing(spacing);
 		if (!bad_direction) image->SetDirection(direction);
 	}
-	catch (itk::ExceptionObject & ex)
+	catch(itk::ExceptionObject & ex)
 	{
 		*ok = false;
 		return QString(ex.GetDescription());
@@ -1189,24 +1189,32 @@ template<typename T> QString process_dicom_monochrome_image(
 	const typename T::PixelType * p__ =
 		reinterpret_cast<typename T::PixelType*>(buffer);
 	//
-	SliceIterator it(image, image->GetLargestPossibleRegion());
-	it.SetFirstDirection(0);
-	it.SetSecondDirection(1);
-	it.GoToBegin();
-	int j = 0;	
-	while(!it.IsAtEnd())
+	try
 	{
-		while (!it.IsAtEndOfSlice())
+		SliceIterator it(image, image->GetLargestPossibleRegion());
+		it.SetFirstDirection(0);
+		it.SetSecondDirection(1);
+		it.GoToBegin();
+		int j = 0;	
+		while(!it.IsAtEnd())
 		{
-			while (!it.IsAtEndOfLine())
+			while (!it.IsAtEndOfSlice())
 			{
-				it.Set(p__[j]);
-				j+=1;
-				++it;
+				while (!it.IsAtEndOfLine())
+				{
+					it.Set(p__[j]);
+					j+=1;
+					++it;
+				}
+				it.NextLine();
 			}
-			it.NextLine();
+			it.NextSlice();
 		}
-		it.NextSlice();
+	}
+	catch(itk::ExceptionObject & ex)
+	{
+		*ok = false;
+		return QString(ex.GetDescription());
 	}
 	*ok = reload_monochrome_image<T>(
 		ivariant,
@@ -1303,46 +1311,54 @@ template<typename T> QString process_dicom_rgb_image(
 		reinterpret_cast<typename T::PixelType::ValueType*>(buffer);
 	ivariant->image_type = image_type;
 	//
-	SliceIterator it(image, image->GetLargestPossibleRegion());
-	it.SetFirstDirection(0);
-	it.SetSecondDirection(1);
-	it.GoToBegin();
-	int j = 0;
-	while(!it.IsAtEnd())
+	try
 	{
-		while (!it.IsAtEndOfSlice())
+		SliceIterator it(image, image->GetLargestPossibleRegion());
+		it.SetFirstDirection(0);
+		it.SetSecondDirection(1);
+		it.GoToBegin();
+		int j = 0;
+		while(!it.IsAtEnd())
 		{
-			while (!it.IsAtEndOfLine())
+			while (!it.IsAtEndOfSlice())
 			{
-				typename T::PixelType p;
-				if (ybr)
+				while (!it.IsAtEndOfLine())
 				{
-					const double Y  = static_cast<double>(p__[j  ]);
-					const double Cb = static_cast<double>(p__[j+1]);
-					const double Cr = static_cast<double>(p__[j+2]);
-					int R = static_cast<int>((Y + 1.402*(Cr-128)) + 0.5);
-					int G = static_cast<int>((Y - (0.114*1.772*(Cb-128) + 0.299*1.402*(Cr-128))/0.587) + 0.5);
-					int B = static_cast<int>((Y + 1.772*(Cb-128)) + 0.5);
-					if (R < 0) { R = 0; }; if (R > 255) { R = 255; }
-					if (G < 0) { G = 0; }; if (G > 255) { G = 255; }
-					if (B < 0) { B = 0; }; if (B > 255) { B = 255; }
-					p[0]=static_cast<typename T::PixelType::ValueType>(R);
-					p[1]=static_cast<typename T::PixelType::ValueType>(G);
-					p[2]=static_cast<typename T::PixelType::ValueType>(B);
+					typename T::PixelType p;
+					if (ybr)
+					{
+						const double Y  = static_cast<double>(p__[j  ]);
+						const double Cb = static_cast<double>(p__[j+1]);
+						const double Cr = static_cast<double>(p__[j+2]);
+						int R = static_cast<int>((Y + 1.402*(Cr-128)) + 0.5);
+						int G = static_cast<int>((Y - (0.114*1.772*(Cb-128) + 0.299*1.402*(Cr-128))/0.587) + 0.5);
+						int B = static_cast<int>((Y + 1.772*(Cb-128)) + 0.5);
+						if (R < 0) { R = 0; }; if (R > 255) { R = 255; }
+						if (G < 0) { G = 0; }; if (G > 255) { G = 255; }
+						if (B < 0) { B = 0; }; if (B > 255) { B = 255; }
+						p[0]=static_cast<typename T::PixelType::ValueType>(R);
+						p[1]=static_cast<typename T::PixelType::ValueType>(G);
+						p[2]=static_cast<typename T::PixelType::ValueType>(B);
+					}
+					else
+					{
+						p[0]=static_cast<typename T::PixelType::ValueType>(p__[j  ]);
+						p[1]=static_cast<typename T::PixelType::ValueType>(p__[j+1]);
+						p[2]=static_cast<typename T::PixelType::ValueType>(p__[j+2]);
+					}
+					it.Set(p);
+					j+=3;
+					++it;
 				}
-				else
-				{
-					p[0]=static_cast<typename T::PixelType::ValueType>(p__[j  ]);
-					p[1]=static_cast<typename T::PixelType::ValueType>(p__[j+1]);
-					p[2]=static_cast<typename T::PixelType::ValueType>(p__[j+2]);
-				}
-				it.Set(p);
-				j+=3;
-				++it;
+				it.NextLine();
 			}
-			it.NextLine();
+			it.NextSlice();
 		}
-		it.NextSlice();
+	}
+	catch(itk::ExceptionObject & ex)
+	{
+		*ok = false;
+		return QString(ex.GetDescription());
 	}
 	*ok = reload_rgb_image<T>(
 		image, ivariant, !gen_vertices);
@@ -1431,81 +1447,89 @@ template<typename T> QString process_dicom_rgba_image(
 		reinterpret_cast<typename T::PixelType::ValueType*>(buffer);
 	ivariant->image_type = image_type;
 	//
-	SliceIterator it(image, image->GetLargestPossibleRegion());
-	it.SetFirstDirection(0);
-	it.SetSecondDirection(1);
-	it.GoToBegin();
-	int j = 0;
-	while(!it.IsAtEnd())
+	try
 	{
-		while (!it.IsAtEndOfSlice())
+		SliceIterator it(image, image->GetLargestPossibleRegion());
+		it.SetFirstDirection(0);
+		it.SetSecondDirection(1);
+		it.GoToBegin();
+		int j = 0;
+		while(!it.IsAtEnd())
 		{
-			while (!it.IsAtEndOfLine())
+			while (!it.IsAtEndOfSlice())
 			{
-				typename T::PixelType p;
+				while (!it.IsAtEndOfLine())
 				{
-					if (cmyk)
+					typename T::PixelType p;
 					{
-						// TODO
-						const float C = (float)p__[j  ];
-						const float M = (float)p__[j+1];
-						const float Y = (float)p__[j+2];
-						const float K = (float)p__[j+3];
-						if (p__[j+3]!=255)
+						if (cmyk)
 						{
-							p[0]=static_cast<typename T::PixelType::ValueType>(((255.0f-C)*(255.0f-K))/255.0f); 
-							p[1]=static_cast<typename T::PixelType::ValueType>(((255.0f-M)*(255.0f-K))/255.0f); 
-							p[2]=static_cast<typename T::PixelType::ValueType>(((255.0f-Y)*(255.0f-K))/255.0f);
+							// TODO
+							const float C = (float)p__[j  ];
+							const float M = (float)p__[j+1];
+							const float Y = (float)p__[j+2];
+							const float K = (float)p__[j+3];
+							if (p__[j+3]!=255)
+							{
+								p[0]=static_cast<typename T::PixelType::ValueType>(((255.0f-C)*(255.0f-K))/255.0f); 
+								p[1]=static_cast<typename T::PixelType::ValueType>(((255.0f-M)*(255.0f-K))/255.0f); 
+								p[2]=static_cast<typename T::PixelType::ValueType>(((255.0f-Y)*(255.0f-K))/255.0f);
+								p[3]=255;
+							}
+							else
+							{
+								p[0]=static_cast<typename T::PixelType::ValueType>(255.0f-C);
+								p[1]=static_cast<typename T::PixelType::ValueType>(255.0f-M);
+								p[2]=static_cast<typename T::PixelType::ValueType>(255.0f-Y);
+								p[3]=255;
+							}
+						}
+						else if (argb)
+						{
+							// TODO
+							// ARGB = Pixel data represent a color image
+							// described by red, green, blue, and alpha
+							// image planes. The minimum sample value for each
+							// RGB plane represents minimum intensity of the
+							// color. The alpha plane is passed through
+							// Palette Color Lookup Tables. If the alpha pixel
+							// value is greater than 0, the red, green, and blue
+							// lookup table values override the red, green, and
+							// blue, pixel plane colors.
+							//
+							const float tmp_max = 255.0f;
+							const float alpha = (float)p__[j+3]/tmp_max;
+							const float one_minus_alpha = 1.0f - alpha;
+							const float tmp_oth = one_minus_alpha*0;
+							const float tmp_red = tmp_oth + alpha*(float)(p__[j+0]);
+							const float tmp_gre = tmp_oth + alpha*(float)(p__[j+1]);
+							const float tmp_blu = tmp_oth + alpha*(float)(p__[j+2]);
+							p[0]=static_cast<typename T::PixelType::ValueType>((tmp_red/tmp_max)*255.0f);
+							p[1]=static_cast<typename T::PixelType::ValueType>((tmp_gre/tmp_max)*255.0f);
+							p[2]=static_cast<typename T::PixelType::ValueType>((tmp_blu/tmp_max)*255.0f);
 							p[3]=255;
 						}
 						else
 						{
-							p[0]=static_cast<typename T::PixelType::ValueType>(255.0f-C);
-							p[1]=static_cast<typename T::PixelType::ValueType>(255.0f-M);
-							p[2]=static_cast<typename T::PixelType::ValueType>(255.0f-Y);
-							p[3]=255;
+							p[0]=static_cast<typename T::PixelType::ValueType>(p__[j  ]);
+							p[1]=static_cast<typename T::PixelType::ValueType>(p__[j+1]);
+							p[2]=static_cast<typename T::PixelType::ValueType>(p__[j+2]);
+							p[3]=static_cast<typename T::PixelType::ValueType>(p__[j+3]);
 						}
 					}
-					else if (argb)
-					{
-						// TODO
-						// ARGB = Pixel data represent a color image
-						// described by red, green, blue, and alpha
-						// image planes. The minimum sample value for each
-						// RGB plane represents minimum intensity of the
-						// color. The alpha plane is passed through
-						// Palette Color Lookup Tables. If the alpha pixel
-						// value is greater than 0, the red, green, and blue
-						// lookup table values override the red, green, and
-						// blue, pixel plane colors.
-						//
-						const float tmp_max = 255.0f;
-						const float alpha = (float)p__[j+3]/tmp_max;
-						const float one_minus_alpha = 1.0f - alpha;
-						const float tmp_oth = one_minus_alpha*0;
-						const float tmp_red = tmp_oth + alpha*(float)(p__[j+0]);
-						const float tmp_gre = tmp_oth + alpha*(float)(p__[j+1]);
-						const float tmp_blu = tmp_oth + alpha*(float)(p__[j+2]);
-						p[0]=static_cast<typename T::PixelType::ValueType>((tmp_red/tmp_max)*255.0f);
-						p[1]=static_cast<typename T::PixelType::ValueType>((tmp_gre/tmp_max)*255.0f);
-						p[2]=static_cast<typename T::PixelType::ValueType>((tmp_blu/tmp_max)*255.0f);
-						p[3]=255;
-					}
-					else
-					{
-						p[0]=static_cast<typename T::PixelType::ValueType>(p__[j  ]);
-						p[1]=static_cast<typename T::PixelType::ValueType>(p__[j+1]);
-						p[2]=static_cast<typename T::PixelType::ValueType>(p__[j+2]);
-						p[3]=static_cast<typename T::PixelType::ValueType>(p__[j+3]);
-					}
+					it.Set(p);
+					j+=4;
+					++it;
 				}
-				it.Set(p);
-				j+=4;
-				++it;
+				it.NextLine();
 			}
-			it.NextLine();
+			it.NextSlice();
 		}
-		it.NextSlice();
+	}
+	catch(itk::ExceptionObject & ex)
+	{
+		*ok = false;
+		return QString(ex.GetDescription());
 	}
 	*ok = reload_rgba_image<T>(
 		image, ivariant, !gen_vertices);

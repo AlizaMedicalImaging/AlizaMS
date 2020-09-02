@@ -443,11 +443,13 @@ static void x16printf(char * buf, int size, Float f)
     {
       buf[j+1] = '0';
     }
+/* FIXME dead code
     if ((i == 1) && (iexp != -1))
     {
       buf[-iexp] = '1';
       buf++;
     }
+*/
     strncpy(buf - iexp, mant, size + 1 + iexp);
     buf[size] = 0;
     clean(buf);

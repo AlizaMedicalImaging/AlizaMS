@@ -54,7 +54,8 @@ Item & SequenceOfItems::GetItem(SizeType position)
 {
   if(position < 1 || position > Items.size())
   {
-    throw Exception("Out of Range");
+    mdcmAlwaysWarnMacro("SQ: invalid index");
+    return empty;
   }
   return Items[position-1];
 }
@@ -63,7 +64,8 @@ const Item & SequenceOfItems::GetItem(SizeType position) const
 {
   if(position < 1 || position > Items.size())
   {
-    throw Exception("Out of Range");
+    mdcmAlwaysWarnMacro("SQ: invalid index");
+    return empty;
   }
   return Items[position-1];
 }

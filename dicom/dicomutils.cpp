@@ -4169,7 +4169,7 @@ void DicomUtils::enhanced_get_indices(
 			gradients_idx = (int)idx;
 		}
 		else if (
-			sq.at(idx).group_pointer==mdcm::Tag(0x0018,0x9341)) // FIXME
+			sq.at(idx).group_pointer==mdcm::Tag(0x0018,0x9341)) // TODO check
 		{
 			contrast_idx = (int)idx;
 		}
@@ -4209,20 +4209,26 @@ void DicomUtils::enhanced_get_indices(
 		{
 			mr_eff_echo_idx = (int)idx;
 		}
+		else
+		{
+			;;
+		}
 	}
 	//
-	// e.g. ultrasound
+	//
+	// workaround to guess temporar tag, e.g. ultrasound
 	if (
 		sq_size==3 &&
 		temporal_idx<0 &&
 		plane_pos_idx==1 &&
 		datatype_idx==2)
 	{
-		// may point to any temporal tag
 		temporal_idx = 0;
 	}
 	//
 	//
+	//
+	// well-known combinations
 	if (
 		sq_size==3 &&
 		temporal_idx>=0 &&
@@ -4467,7 +4473,11 @@ void DicomUtils::enhanced_get_indices(
 		*dim4th = temporal_pos_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
-	// not recognized
+	else
+	{
+		;;
+	}
+	// not recognized, try generic approach
 	if (*enh_id<0)
 	{
 		if (
@@ -6969,8 +6979,9 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 			at1.SetFromDataSet(ds);
 			mdcm::Attribute<0x0028,0x0011> at2;
 			at2.SetFromDataSet(ds);
-			const size_t at1l =
-				at1.GetValue() * at2.GetValue() * sizeof(unsigned short);
+			const size_t w = at1.GetValue();
+			const size_t h = at2.GetValue();
+			const size_t at1l =	w*h*sizeof(unsigned short);
 			if(bv2l == at1l)
 			{
 				std::cout

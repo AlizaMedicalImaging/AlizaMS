@@ -309,7 +309,7 @@ bool ImageChangeTransferSyntax::Change()
     {
       Bitmap & outbitmap = *Output;
       Pixmap * outpixmap = dynamic_cast<Pixmap*>(&outbitmap);
-      assert(outpixmap != NULL);
+	  if (!outpixmap) return false;
       if(!pixmap->GetIconImage().IsEmpty())
       {
         ByteValue * bv = new ByteValue();
@@ -356,6 +356,7 @@ bool ImageChangeTransferSyntax::Change()
     {
       Bitmap & outbitmap = *Output;
       Pixmap * outpixmap = dynamic_cast<Pixmap*>(&outbitmap);
+	  if (!outpixmap) return false;
       success = false;
       if(!success) success = TryRAWCodec     (pixmap->GetIconImage().GetDataElement(), pixmap->GetIconImage(), outpixmap->GetIconImage());
       if(!success) success = TryJPEGCodec    (pixmap->GetIconImage().GetDataElement(), pixmap->GetIconImage(), outpixmap->GetIconImage());

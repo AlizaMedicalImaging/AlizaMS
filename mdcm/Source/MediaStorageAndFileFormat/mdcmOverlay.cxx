@@ -392,10 +392,13 @@ void Overlay::SetOverlay(const char *array, size_t length)
 {
   if(!array || !length) return;
   size_t computed_length = 0;
-  if (Internal->NumberOfFrames > 0)
-    computed_length = (Internal->Rows*Internal->Columns*Internal->NumberOfFrames + 7) / 8;
+  const size_t tmp1 = Internal->Rows;
+  const size_t tmp2 = Internal->Columns;
+  const size_t tmp3 = Internal->NumberOfFrames;
+  if (tmp3 > 0)
+    computed_length = (tmp1*tmp2*tmp3 + 7) / 8;
   else
-    computed_length = (Internal->Rows*Internal->Columns + 7) / 8;
+    computed_length = (tmp1*tmp2 + 7) / 8;
   Internal->Data.resize(computed_length); // filled with 0 if length < computed_length
   if(length < computed_length)
   {

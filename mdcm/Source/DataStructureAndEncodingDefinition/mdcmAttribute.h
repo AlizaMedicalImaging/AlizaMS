@@ -66,7 +66,7 @@ public:
 };
 
 /**
- * \brief Attribute class
+ * Attribute class
  * This class use template metaprograming tricks to let the user know when the template
  * instanciation does not match the public dictionary.
  *
