@@ -6877,8 +6877,9 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 			at1.SetFromDataSet(ds);
 			mdcm::Attribute<0x0028,0x0011> at2;
 			at2.SetFromDataSet(ds);
-			const size_t at1l =
-				at1.GetValue() * at2.GetValue() * sizeof(unsigned short);
+			const size_t w = at1.GetValue();
+			const size_t h = at2.GetValue();
+			const size_t at1l = w*h*sizeof(unsigned short);
 			if(bv2l == at1l)
 			{
 				std::cout << "Warning: Elscint data seems to be not compressed"

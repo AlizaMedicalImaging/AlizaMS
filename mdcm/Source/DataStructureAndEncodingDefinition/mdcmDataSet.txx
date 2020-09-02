@@ -30,9 +30,8 @@ std::istream & DataSet::ReadNested(std::istream & is)
   assert(de.GetTag() != itemDelItem);
   try
   {
-    while(de.Read<TDE,TSwap>(is) && de.GetTag() != itemDelItem ) // Keep that order please !
+    while(de.Read<TDE,TSwap>(is) && de.GetTag() != itemDelItem ) // Keep that order!
     {
-      //std::cerr << "DEBUG Nested: " << de << std::endl;
       InsertDataElement(de);
     }
   }
@@ -40,7 +39,7 @@ std::istream & DataSet::ReadNested(std::istream & is)
   {
     if(pe.GetLastElement().GetTag() == Tag(0xfffe,0xe0dd))
     {
-      //  BogusItemStartItemEnd.dcm
+      // BogusItemStartItemEnd.dcm
       mdcmWarningMacro("SQ End found but no Item end found");
       de.SetTag(itemDelItem);
       is.seekg(-4, std::ios::cur);
@@ -48,8 +47,9 @@ std::istream & DataSet::ReadNested(std::istream & is)
     else
     {
       // MR_Philips_Intera_PrivateSequenceExplicitVR_in_SQ_2001_e05f_item_wrong_lgt_use_NOSHADOWSEQ.dcm
-      // Need to rethrow the exception...sigh
+#if 0
       throw pe;
+#endif
     }
   }
   assert(de.GetTag() == itemDelItem);
@@ -108,7 +108,7 @@ std::istream & DataSet::ReadUpToTagWithLength(
   DataElement de;
   while(!is.eof() && de.template ReadPreValue<TDE,TSwap>(is, skiptags))
   {
-    // If tag read was in skiptags then we should NOT add it:
+    // If tag read was in skiptags then we should NOT add it.
     if(skiptags.count(de.GetTag()) == 0)
     {
       de.template ReadValueWithLength<TDE,TSwap>(is, length, skiptags);
@@ -120,7 +120,7 @@ std::istream & DataSet::ReadUpToTagWithLength(
       if(de.GetTag() != t)
         is.seekg(de.GetVL(), std::ios::cur);
     }
-    // tag was found, we can exit the loop:
+    // tag was found, we can exit the loop.
     if (t <= de.GetTag())
     {
       assert(is.good());
@@ -173,14 +173,14 @@ std::istream & DataSet::ReadSelectedTags(
 
         if (tags.empty())
         {
-          // All selected tags were found, we can exit the loop:
+          // All selected tags were found, we can exit the loop.
           break;
         }
       }
       if (!(tag < maxTag))
       {
         // The maximum tag was encountered, and as we assume
-        // ascending tag ordering, we can exit the loop:
+        // ascending tag ordering, we can exit the loop.
         break;
       }
     }
@@ -201,7 +201,7 @@ std::istream & DataSet::ReadSelectedPrivateTags(
     const PrivateTag refPTag = *(selectedPTags.rbegin());
     PrivateTag nextPTag = refPTag;
     nextPTag.SetElement((uint16_t)(nextPTag.GetElement() + 0x1));
-    assert(nextPTag.GetElement() & 0x00ff); // no wrap please
+    assert(nextPTag.GetElement() & 0x00ff); // no wrap
     Tag maxTag;
     maxTag.SetPrivateCreator(nextPTag);
     DataElement dataElem;
@@ -230,7 +230,6 @@ std::istream & DataSet::ReadSelectedPrivateTags(
 
       if (inputStream.fail())
       {
-        // Failed to read the value.
         break;
       }
 
@@ -241,7 +240,7 @@ std::istream & DataSet::ReadSelectedPrivateTags(
       if (! (tag < maxTag))
       {
         // The maximum group was encountered, and as we assume
-        // ascending tag ordering, we can exit the loop:
+        // ascending tag ordering, we can exit the loop.
         break;
       }
     }
@@ -287,7 +286,6 @@ std::istream & DataSet::ReadSelectedTagsWithLength(
 
       if (inputStream.fail())
       {
-        // Failed to read the value.
         break;
       }
 
@@ -300,14 +298,14 @@ std::istream & DataSet::ReadSelectedTagsWithLength(
 
         if (tags.empty())
         {
-          // All selected tags were found, we can exit the loop:
+          // All selected tags were found, we can exit the loop.
           break;
         }
       }
-      if (! (tag < maxTag))
+      if (!(tag < maxTag))
       {
         // The maximum tag was encountered, and as we assume
-        // ascending tag ordering, we can exit the loop:
+        // ascending tag ordering, we can exit the loop.
         break;
       }
     }
@@ -329,7 +327,7 @@ std::istream & DataSet::ReadSelectedPrivateTagsWithLength(
     const PrivateTag refPTag = *(selectedPTags.rbegin());
     PrivateTag nextPTag = refPTag;
     nextPTag.SetElement((uint16_t)(nextPTag.GetElement() + 0x1));
-    assert(nextPTag.GetElement()); // no wrap please
+    assert(nextPTag.GetElement()); // no wrap
     Tag maxTag;
     maxTag.SetPrivateCreator(nextPTag);
     DataElement dataElem;
@@ -358,13 +356,9 @@ std::istream & DataSet::ReadSelectedPrivateTagsWithLength(
 
       if (inputStream.fail())
       {
-        // Failed to read the value.
         break;
       }
 
-      //const std::set<uint16_t>::iterator found = selectedPTags.find(tag.GetGroup());
-
-      //if (found != groups.end())
       if(tag.GetPrivateCreator() == refPTag)
       {
         InsertDataElement(dataElem);
@@ -372,7 +366,7 @@ std::istream & DataSet::ReadSelectedPrivateTagsWithLength(
       if (! (tag < maxTag))
       {
         // The maximum group was encountered, and as we assume
-        // ascending tag ordering, we can exit the loop:
+        // ascending tag ordering, we can exit the loop.
         break;
       }
     }
@@ -385,29 +379,20 @@ std::istream & DataSet::ReadWithLength(std::istream & is, VL & length)
 {
   DataElement de;
   VL l = 0;
-  //std::cout << "ReadWithLength Length: " << length << std::endl;
   VL locallength = length;
   const std::streampos startpos = is.tellg();
   try
   {
     while(l != locallength && de.ReadWithLength<TDE,TSwap>(is, locallength))
     {
-      //std::cout << "Nested: " << de << std::endl;
 #ifndef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
-      assert(de.GetTag() != Tag(0xfffe,0xe000)); // We should not be reading the next item...
+      assert(de.GetTag() != Tag(0xfffe,0xe000)); // We should not read the next item
 #endif
       InsertDataElement(de);
       const VL oflen = de.GetLength<TDE>();
       l += oflen;
       const std::streampos curpos = is.tellg();
-      //assert((curpos - startpos) == l || (curpos - startpos) + 1 == l);
-
-      //std::cout << "l:" << l << std::endl;
-      //assert(!de.GetVL().IsUndefined());
-      //std::cerr << "DEBUG: " << de.GetTag() << " "<< de.GetLength() <<
-      //  "," << de.GetVL() << "," << l << std::endl;
-      // Bug_Philips_ItemTag_3F3F
-      //  (0x2005, 0x1080): for some reason computation of length fails...
+      // Bug_Philips_ItemTag_3F3F (0x2005, 0x1080): for some reason computation of fails
       if(l == 70 && locallength == 63)
       {
         mdcmWarningMacro("PMS: Super bad hack. Changing length");
@@ -416,7 +401,9 @@ std::istream & DataSet::ReadWithLength(std::istream & is, VL & length)
       if((curpos - startpos) + 1 == l)
       {
         mdcmDebugMacro("Papyrus odd padding detected");
+#if 0
         throw Exception("Papyrus odd padding");
+#endif
       }
       if(l > locallength)
       {
@@ -426,12 +413,16 @@ std::istream & DataSet::ReadWithLength(std::istream & is, VL & length)
           // we found a discrepandy with own vendor made its layout.
           // update the length directly
           locallength = length = l;
+#if 0
           throw Exception("Changed Length");
+#endif
         }
         else
         {
           mdcmDebugMacro("Out of Range SQ detected: " << l << " while max: " << locallength);
+#if 0
           throw Exception("Out of Range");
+#endif
         }
       }
     }
@@ -445,8 +436,7 @@ std::istream & DataSet::ReadWithLength(std::istream & is, VL & length)
       is.seekg(-6, std::ios::cur);
       length = locallength = l;
     }
-    else if(/*pe.GetLastElement().GetTag() == Tag(0xffd8,0xffe0) &&*/
-            de.GetTag() == Tag(0x7fe0,0x0010) && de.IsUndefinedLength())
+    else if(de.GetTag() == Tag(0x7fe0,0x0010) && de.IsUndefinedLength())
     {
       // Some bozo crafted an undefined length Pixel Data, but is actually
       // defined length. Since inside SQ/Item it should be possible to
@@ -458,7 +448,10 @@ std::istream & DataSet::ReadWithLength(std::istream & is, VL & length)
           (pd.GetVR() != VR::OB) ||
           !pd.IsUndefinedLength())
       {
+        mdcmAlwaysWarnMacro("");
+#if 0
         throw Exception("Exception");
+#endif
       }
       const VL pdlen = locallength - l - 12;
       pd.SetVL(pdlen);
@@ -470,7 +463,9 @@ std::istream & DataSet::ReadWithLength(std::istream & is, VL & length)
     {
       // mdcmDataExtra/mdcmBreakers/BuggedDicomWorksImage_Hopeless.dcm
       mdcmErrorMacro("Last Tag is : " << pe.GetLastElement().GetTag());
+#if 0
       throw Exception("Unhandled");
+#endif
     }
   }
   catch(Exception &pe)
@@ -499,16 +494,22 @@ std::istream & DataSet::ReadWithLength(std::istream & is, VL & length)
       // fix the length now
       length = locallength = l;
       mdcmWarningMacro("Item length is wrong");
+#if 0
       throw Exception("Changed Length");
+#endif
     }
     else if(strcmp(pe.GetDescription(), "Papyrus odd padding") == 0)
     {
       is.get();
+#if 0
       throw Exception("Changed Length");
+#endif
     }
     else
     {
+#if 0
       throw pe;
+#endif
     }
   }
   assert(l <= locallength);

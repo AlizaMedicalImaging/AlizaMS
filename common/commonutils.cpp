@@ -524,6 +524,7 @@ template<typename T> int generate_tex3d(
 	if (pb) pb->setValue(-1);
 	qApp->processEvents();
 	//
+	try
 	{
 		SliceConstIteratorType inIterator(
 			out_image,
@@ -560,6 +561,12 @@ template<typename T> int generate_tex3d(
 			}
 			inIterator.NextSlice();
 		}
+	}
+	catch(itk::ExceptionObject & ex)
+	{
+		std::cout << ex.GetDescription() << std::endl;
+		error__ = 4;
+		goto quit__;
 	}
 	//
 	if (pb) pb->setValue(-1);

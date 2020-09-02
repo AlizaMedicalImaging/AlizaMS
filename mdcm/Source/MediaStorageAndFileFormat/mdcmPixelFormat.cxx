@@ -152,12 +152,11 @@ PixelFormat::ScalarType PixelFormat::GetScalarType() const
     type = PixelFormat::UINT64;
     break;
   case 24:
-    mdcmDebugMacro("This is illegal in DICOM, assuming a RGB image");
+    mdcmDebugMacro("Illegal in DICOM, assuming a RGB image");
     type = PixelFormat::UINT8;
     break;
   default:
-    mdcmErrorMacro("I have never seen this before BitsAllocated "
-      << BitsAllocated);
+    mdcmErrorMacro("BitsAllocated " << BitsAllocated);
     type = PixelFormat::UNKNOWN;
   }
   if(type != PixelFormat::UNKNOWN)
@@ -169,7 +168,7 @@ PixelFormat::ScalarType PixelFormat::GetScalarType() const
     else if(PixelRepresentation == 1)
     {
       assert(type <= INT64);
-      // That's why you need to order properly type in ScalarType
+      // Order properly type in ScalarType
       type = ScalarType(int(type)+1);
     }
     else if(PixelRepresentation == 2)
@@ -218,7 +217,7 @@ uint8_t PixelFormat::GetPixelSize() const
 double PixelFormat::GetMin() const
 {
   assert(BitsAllocated);
-  if(BitsStored <= 64)
+  if(BitsStored < 64)
   {
     if(PixelRepresentation == 1)
     {
@@ -231,6 +230,17 @@ double PixelFormat::GetMin() const
     else if(PixelRepresentation == 3)
     {
       return -(double)std::numeric_limits<float>::max();
+    }
+    else if(PixelRepresentation == 0)
+    {
+      return 0;
+    }
+  }
+  else if(BitsStored == 64)
+  {
+    if(PixelRepresentation == 1)
+    {
+      return (double)std::numeric_limits<signed long long>::min();
     }
     else if(PixelRepresentation == 4)
     {
@@ -247,19 +257,30 @@ double PixelFormat::GetMin() const
 double PixelFormat::GetMax() const
 {
   assert(BitsAllocated);
-  if(BitsStored <= 64)
+  if(BitsStored < 64)
   {
     if(PixelRepresentation == 1)
     {
-      return (double)((int64_t)((((1ull << BitsStored) - 1) >> 1)));
+      return (double)((int64_t)((((1ULL << BitsStored) - 1) >> 1)));
     }
     else if(PixelRepresentation == 2)
     {
-      return (double)((int64_t)((1ull << 16) - 1));
+      return (double)((int64_t)((1ULL << 16) - 1));
     }
     else if(PixelRepresentation == 3)
     {
       return (double)std::numeric_limits<float>::max();
+    }
+    else if(PixelRepresentation == 0)
+    {
+      return (double)((int64_t)((1ull << BitsStored) - 1));
+    }
+  }
+  else if(BitsStored == 64)
+  {
+    if(PixelRepresentation == 1)
+    {
+      return (double)std::numeric_limits<signed long long>::max();
     }
     else if(PixelRepresentation == 4)
     {
@@ -267,7 +288,7 @@ double PixelFormat::GetMax() const
     }
     else if(PixelRepresentation == 0)
     {
-      return (double)((int64_t)((1ull << BitsStored) - 1));
+      return (double)std::numeric_limits<unsigned long long>::max();
     }
   }
   return 0;
