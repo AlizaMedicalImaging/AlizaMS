@@ -221,11 +221,11 @@ double PixelFormat::GetMin() const
   {
     if(PixelRepresentation == 1)
     {
-      return (double)((int64_t)(~(((1ull << BitsStored) - 1) >> 1)));
+      return (double)((int64_t)(~(((1ULL << BitsStored) - 1) >> 1)));
     }
     else if(PixelRepresentation == 2)
     {
-      return (double)((int64_t)(~(((1ull << 16) - 1) >> 1)));
+      return (double)((int64_t)(~(((1ULL << 16) - 1) >> 1)));
     }
     else if(PixelRepresentation == 3)
     {
@@ -273,7 +273,7 @@ double PixelFormat::GetMax() const
     }
     else if(PixelRepresentation == 0)
     {
-      return (double)((int64_t)((1ull << BitsStored) - 1));
+      return (double)((int64_t)((1ULL << BitsStored) - 1));
     }
   }
   else if(BitsStored == 64)
