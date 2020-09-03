@@ -469,21 +469,28 @@ template<typename T> void load_rgb_image(
 		try { p__ = new unsigned char[size[0] * size[1] * 3]; }
 		catch (std::bad_alloc&) { p__ = NULL; }
 		if (!p__) return;
-		itk::ImageRegionConstIterator<T> iterator(image, region);
-		iterator.GoToBegin();
-		while (!iterator.IsAtEnd())
+		try
 		{
-			p__[j_ + 2] =
-				static_cast<unsigned char>(
-					((double)iterator.Get().GetBlue()  / tmp_max) * 255.0);
-			p__[j_ + 1] =
-				static_cast<unsigned char>(
-					((double)iterator.Get().GetGreen() / tmp_max) * 255.0);
-			p__[j_ + 0] =
-				static_cast<unsigned char>(
-					((double)iterator.Get().GetRed()   / tmp_max) * 255.0);
-			j_ += 3;
-			++iterator;
+			itk::ImageRegionConstIterator<T> iterator(image, region);
+			iterator.GoToBegin();
+			while (!iterator.IsAtEnd())
+			{
+				p__[j_ + 2] =
+					static_cast<unsigned char>(
+						((double)iterator.Get().GetBlue()  / tmp_max) * 255.0);
+				p__[j_ + 1] =
+					static_cast<unsigned char>(
+						((double)iterator.Get().GetGreen() / tmp_max) * 255.0);
+				p__[j_ + 0] =
+					static_cast<unsigned char>(
+						((double)iterator.Get().GetRed()   / tmp_max) * 255.0);
+				j_ += 3;
+				++iterator;
+			}
+		}
+		catch(itk::ExceptionObject &)
+		{
+			return;
 		}
 	}
 	else
@@ -496,18 +503,25 @@ template<typename T> void load_rgb_image(
 		const double vrange = vmax - vmin;
 		if (vrange!=0)
 		{
-			itk::ImageRegionConstIterator<T> iterator(image, region);
-			iterator.GoToBegin();
-			while(!iterator.IsAtEnd())
+			try
 			{
-				const double b = static_cast<double>(iterator.Get().GetBlue());
-				const double g = static_cast<double>(iterator.Get().GetGreen());
-				const double r = static_cast<double>(iterator.Get().GetRed());
-				p__[j_+2] = static_cast<unsigned char>(255.0*((b+(-vmin))/vrange));
-				p__[j_+1] = static_cast<unsigned char>(255.0*((g+(-vmin))/vrange));
-				p__[j_+0] = static_cast<unsigned char>(255.0*((r+(-vmin))/vrange));
-				j_ += 3;
- 				++iterator;
+				itk::ImageRegionConstIterator<T> iterator(image, region);
+				iterator.GoToBegin();
+				while(!iterator.IsAtEnd())
+				{
+					const double b = static_cast<double>(iterator.Get().GetBlue());
+					const double g = static_cast<double>(iterator.Get().GetGreen());
+					const double r = static_cast<double>(iterator.Get().GetRed());
+					p__[j_+2] = static_cast<unsigned char>(255.0*((b+(-vmin))/vrange));
+					p__[j_+1] = static_cast<unsigned char>(255.0*((g+(-vmin))/vrange));
+					p__[j_+0] = static_cast<unsigned char>(255.0*((r+(-vmin))/vrange));
+					j_ += 3;
+ 					++iterator;
+				}
+			}
+			catch(itk::ExceptionObject &)
+			{
+				return;
 			}
 		}
 	}
@@ -644,24 +658,31 @@ template<typename T> void load_rgba_image(
 		try { p__ = new unsigned char[size[0] * size[1] * 4]; }
 		catch (std::bad_alloc&) { p__ = NULL; }
 		if (!p__) return;
-		itk::ImageRegionConstIterator<T> iterator(image, region);
-		iterator.GoToBegin();
-		while (!iterator.IsAtEnd())
+		try
 		{
-			p__[j_ + 3] =
-				static_cast<unsigned char>(
-					((double)iterator.Get().GetAlpha() / tmp_max) * 255.0);
-			p__[j_ + 2] =
-				static_cast<unsigned char>(
-					((double)iterator.Get().GetBlue()  / tmp_max) * 255.0);
-			p__[j_ + 1] =
-				static_cast<unsigned char>(
-					((double)iterator.Get().GetGreen() / tmp_max) * 255.0);
-			p__[j_ + 0] =
-				static_cast<unsigned char>(
-					((double)iterator.Get().GetRed()   / tmp_max) * 255.0);
-			j_ += 4;
-			++iterator;
+			itk::ImageRegionConstIterator<T> iterator(image, region);
+			iterator.GoToBegin();
+			while (!iterator.IsAtEnd())
+			{
+				p__[j_ + 3] =
+					static_cast<unsigned char>(
+						((double)iterator.Get().GetAlpha() / tmp_max) * 255.0);
+				p__[j_ + 2] =
+					static_cast<unsigned char>(
+						((double)iterator.Get().GetBlue()  / tmp_max) * 255.0);
+				p__[j_ + 1] =
+					static_cast<unsigned char>(
+						((double)iterator.Get().GetGreen() / tmp_max) * 255.0);
+				p__[j_ + 0] =
+					static_cast<unsigned char>(
+						((double)iterator.Get().GetRed()   / tmp_max) * 255.0);
+				j_ += 4;
+				++iterator;
+			}
+		}
+		catch(itk::ExceptionObject &)
+		{
+			return;
 		}
 	}
 	else
@@ -673,20 +694,27 @@ template<typename T> void load_rgba_image(
 		try { p__ = new unsigned char[size[0]*size[1]*4]; }
 		catch(std::bad_alloc&) { p__ = NULL; }
 		if (!p__) return;
-		itk::ImageRegionConstIterator<T> iterator(image, region);
-		iterator.GoToBegin();
-		while(!iterator.IsAtEnd())
+		try
 		{
-			const double a = static_cast<double>(iterator.Get().GetAlpha());
-			const double b = static_cast<double>(iterator.Get().GetBlue());
-			const double g = static_cast<double>(iterator.Get().GetGreen());
-			const double r = static_cast<double>(iterator.Get().GetRed());
-			p__[j_+3] = static_cast<unsigned char>(255.0*((a+(-vmin))/vrange));
-			p__[j_+2] = static_cast<unsigned char>(255.0*((b+(-vmin))/vrange));
-			p__[j_+1] = static_cast<unsigned char>(255.0*((g+(-vmin))/vrange));
-			p__[j_+0] = static_cast<unsigned char>(255.0*((r+(-vmin))/vrange));
-			j_ += 4;
- 			++iterator;
+			itk::ImageRegionConstIterator<T> iterator(image, region);
+			iterator.GoToBegin();
+			while(!iterator.IsAtEnd())
+			{
+				const double a = static_cast<double>(iterator.Get().GetAlpha());
+				const double b = static_cast<double>(iterator.Get().GetBlue());
+				const double g = static_cast<double>(iterator.Get().GetGreen());
+				const double r = static_cast<double>(iterator.Get().GetRed());
+				p__[j_+3] = static_cast<unsigned char>(255.0*((a+(-vmin))/vrange));
+				p__[j_+2] = static_cast<unsigned char>(255.0*((b+(-vmin))/vrange));
+				p__[j_+1] = static_cast<unsigned char>(255.0*((g+(-vmin))/vrange));
+				p__[j_+0] = static_cast<unsigned char>(255.0*((r+(-vmin))/vrange));
+				j_ += 4;
+ 				++iterator;
+			}
+		}
+		catch(itk::ExceptionObject &)
+		{
+			return;
 		}
 	}
 	QImage tmpi(p__,size[0],size[1],4*size[0],QImage::Format_RGBA8888,gImageCleanupHandler,p__);
@@ -701,33 +729,40 @@ template<typename T> void load_rgba_image(
 		try { p__ = new unsigned char[size[0] * size[1] * 3]; }
 		catch (std::bad_alloc&) { p__ = NULL; }
 		if (!p__) return;
-		itk::ImageRegionConstIterator<T> iterator(image, region);
-		iterator.GoToBegin();
-		while (!iterator.IsAtEnd())
+		try
 		{
-			if (iterator.Get().GetAlpha()>0)
+			itk::ImageRegionConstIterator<T> iterator(image, region);
+			iterator.GoToBegin();
+			while (!iterator.IsAtEnd())
 			{
-				const double alpha = static_cast<double>(iterator.Get().GetAlpha())/tmp_max;
-				const double one_minus_alpha = 1.0 - alpha;
-				const double tmp_whi = one_minus_alpha*USHRT_MAX;
-				const double tmp_red =
-					tmp_whi + alpha*static_cast<double>(iterator.Get().GetRed());
-				const double tmp_gre =
-					tmp_whi + alpha*static_cast<double>(iterator.Get().GetGreen());
-				const double tmp_blu =
-					tmp_whi + alpha*static_cast<double>(iterator.Get().GetBlue());
-				p__[j_ + 2] = static_cast<unsigned char>((tmp_blu/tmp_max) * 255.0);
-				p__[j_ + 1] = static_cast<unsigned char>((tmp_gre/tmp_max) * 255.0);
-				p__[j_ + 0] = static_cast<unsigned char>((tmp_red/tmp_max) * 255.0);
+				if (iterator.Get().GetAlpha()>0)
+				{
+					const double alpha = static_cast<double>(iterator.Get().GetAlpha())/tmp_max;
+					const double one_minus_alpha = 1.0 - alpha;
+					const double tmp_whi = one_minus_alpha*USHRT_MAX;
+					const double tmp_red =
+						tmp_whi + alpha*static_cast<double>(iterator.Get().GetRed());
+					const double tmp_gre =
+						tmp_whi + alpha*static_cast<double>(iterator.Get().GetGreen());
+					const double tmp_blu =
+						tmp_whi + alpha*static_cast<double>(iterator.Get().GetBlue());
+					p__[j_ + 2] = static_cast<unsigned char>((tmp_blu/tmp_max) * 255.0);
+					p__[j_ + 1] = static_cast<unsigned char>((tmp_gre/tmp_max) * 255.0);
+					p__[j_ + 0] = static_cast<unsigned char>((tmp_red/tmp_max) * 255.0);
+				}
+				else
+				{
+					p__[j_ + 2] = 255;
+					p__[j_ + 1] = 255;
+					p__[j_ + 0] = 255;
+				}
+				j_ += 3;
+				++iterator;
 			}
-			else
-			{
-				p__[j_ + 2] = 255;
-				p__[j_ + 1] = 255;
-				p__[j_ + 0] = 255;
-			}
-			j_ += 3;
-			++iterator;
+		}
+		catch(itk::ExceptionObject &)
+		{
+			return;
 		}
 	}
 	else
@@ -739,24 +774,31 @@ template<typename T> void load_rgba_image(
 		try { p__ = new unsigned char[size[0]*size[1]*3]; }
 		catch(std::bad_alloc&) { p__ = NULL; }
 		if (!p__) return;
-		itk::ImageRegionConstIterator<T> iterator(image, region);
-		iterator.GoToBegin();
-		while(!iterator.IsAtEnd())
+		try
 		{
-			const double a = static_cast<double>(iterator.Get().GetAlpha());
-			const double b = static_cast<double>(iterator.Get().GetBlue());
-			const double g = static_cast<double>(iterator.Get().GetGreen());
-			const double r = static_cast<double>(iterator.Get().GetRed());
-			const double one_minus_alpha = 1.0 - ((a+(-vmin))/vrange);
-			const double tmp_whi = one_minus_alpha * 255.0;
-			const double tmp_red = tmp_whi + a*(255.0*((r+(-vmin))/vrange));
-			const double tmp_gre = tmp_whi + a*(255.0*((g+(-vmin))/vrange));
-			const double tmp_blu = tmp_whi + a*(255.0*((b+(-vmin))/vrange));
-			p__[j_+2] = static_cast<unsigned char>(tmp_blu);
-			p__[j_+1] = static_cast<unsigned char>(tmp_gre);
-			p__[j_+0] = static_cast<unsigned char>(tmp_red);
-			j_ += 3;
- 			++iterator;
+			itk::ImageRegionConstIterator<T> iterator(image, region);
+			iterator.GoToBegin();
+			while(!iterator.IsAtEnd())
+			{
+				const double a = static_cast<double>(iterator.Get().GetAlpha());
+				const double b = static_cast<double>(iterator.Get().GetBlue());
+				const double g = static_cast<double>(iterator.Get().GetGreen());
+				const double r = static_cast<double>(iterator.Get().GetRed());
+				const double one_minus_alpha = 1.0 - ((a+(-vmin))/vrange);
+				const double tmp_whi = one_minus_alpha * 255.0;
+				const double tmp_red = tmp_whi + a*(255.0*((r+(-vmin))/vrange));
+				const double tmp_gre = tmp_whi + a*(255.0*((g+(-vmin))/vrange));
+				const double tmp_blu = tmp_whi + a*(255.0*((b+(-vmin))/vrange));
+				p__[j_+2] = static_cast<unsigned char>(tmp_blu);
+				p__[j_+1] = static_cast<unsigned char>(tmp_gre);
+				p__[j_+0] = static_cast<unsigned char>(tmp_red);
+				j_ += 3;
+ 				++iterator;
+			}
+		}
+		catch(itk::ExceptionObject &)
+		{
+			return;
 		}
 	}
 	QImage tmpi(p__,size[0],size[1],3*size[0],QImage::Format_RGB888);
@@ -1002,34 +1044,41 @@ template<typename T> void load_rgba_char_image(
 		catch (std::bad_alloc&) { p = NULL; }
 		if (!p) return;
 		unsigned long j_ = 0;
-		itk::ImageRegionConstIterator<T> iterator(image, region);
-		iterator.GoToBegin();
-		while (!iterator.IsAtEnd())
+		try
 		{
-			if (iterator.Get().GetAlpha()>0)
+			itk::ImageRegionConstIterator<T> iterator(image, region);
+			iterator.GoToBegin();
+			while (!iterator.IsAtEnd())
 			{
-				const double alpha =
-					static_cast<double>(iterator.Get().GetAlpha())/255.0;
-				const double one_minus_alpha = 1.0 - alpha;
-				const double tmp_whi = one_minus_alpha * 255.0;
-				const double tmp_red =
-					tmp_whi + alpha*static_cast<double>(iterator.Get().GetRed());
-				const double tmp_gre =
-					tmp_whi + alpha*static_cast<double>(iterator.Get().GetGreen());
-				const double tmp_blu =
-					tmp_whi + alpha*static_cast<double>(iterator.Get().GetBlue());
-				p[j_+2] = static_cast<unsigned char>(tmp_blu);
-				p[j_+1] = static_cast<unsigned char>(tmp_gre);
-				p[j_+0] = static_cast<unsigned char>(tmp_red);
+				if (iterator.Get().GetAlpha()>0)
+				{
+					const double alpha =
+						static_cast<double>(iterator.Get().GetAlpha())/255.0;
+					const double one_minus_alpha = 1.0 - alpha;
+					const double tmp_whi = one_minus_alpha * 255.0;
+					const double tmp_red =
+						tmp_whi + alpha*static_cast<double>(iterator.Get().GetRed());
+					const double tmp_gre =
+						tmp_whi + alpha*static_cast<double>(iterator.Get().GetGreen());
+					const double tmp_blu =
+						tmp_whi + alpha*static_cast<double>(iterator.Get().GetBlue());
+					p[j_+2] = static_cast<unsigned char>(tmp_blu);
+					p[j_+1] = static_cast<unsigned char>(tmp_gre);
+					p[j_+0] = static_cast<unsigned char>(tmp_red);
+				}
+				else
+				{
+					p[j_+2] = 255;
+					p[j_+1] = 255;
+					p[j_+0] = 255;
+				}
+				j_ += 3;
+				++iterator;
 			}
-			else
-			{
-				p[j_+2] = 255;
-				p[j_+1] = 255;
-				p[j_+0] = 255;
-			}
-			j_ += 3;
-			++iterator;
+		}
+		catch(itk::ExceptionObject &)
+		{
+			return;
 		}
 		tmpi = QImage(p,size[0],size[1],3*size[0],QImage::Format_RGB888);
 #endif
