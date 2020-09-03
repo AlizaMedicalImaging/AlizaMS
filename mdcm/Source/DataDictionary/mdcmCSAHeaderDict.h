@@ -59,7 +59,9 @@ public:
     {
       return *it;
     }
+#ifndef MDCM_DONT_THROW
     throw CSAHeaderDictException();
+#endif
   }
 
 protected:

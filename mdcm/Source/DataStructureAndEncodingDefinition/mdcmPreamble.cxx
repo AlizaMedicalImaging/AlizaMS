@@ -43,7 +43,9 @@ std::istream &Preamble::Read(std::istream &is)
   }
   delete[] Internal;
   Internal = 0;
+#ifndef MDCM_DONT_THROW
   throw Exception("Not a DICOM V3 file (No Preamble)");
+#endif
 }
 
 void Preamble::Valid()

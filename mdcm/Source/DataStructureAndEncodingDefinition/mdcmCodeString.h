@@ -20,11 +20,11 @@ namespace mdcm
 {
 
 /**
- * \brief CodeString
- * \details This is an implementation of DICOM VR: CS
+ * CodeString
+ * This is an implementation of DICOM VR: CS
  * The cstor will properly Trim so that operator== is correct.
  *
- * \note the cstor of CodeString will Trim the string on the fly so as
+ * The cstor of CodeString will Trim the string on the fly so as
  * to remove the extra leading and ending spaces. However it will not
  * perform validation on the fly (CodeString obj can contains invalid
  * char such as lower cases). This design was chosen to be a little tolerant
@@ -36,8 +36,6 @@ namespace mdcm
  * the IsValid() call, at least to check that the length of the string match
  * the definition in the standard.
  */
-// Note: because note all wrapped language support exception
-// we could not support throwing an exception during object construction.
 class MDCM_EXPORT CodeString
 {
   friend std::ostream& operator<< (std::ostream & os, const CodeString & str);

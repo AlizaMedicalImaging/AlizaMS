@@ -22,13 +22,21 @@ namespace rle
 // byte stored first on a big-endian system or last on a little-endian
 // system.
 
-pixel_info::pixel_info( unsigned char nc, unsigned char bpp)
+pixel_info::pixel_info(unsigned char nc, unsigned char bpp)
   : number_components(nc), bits_per_pixel(bpp)
 {
   if (nc != 1 && nc != 3)
-    throw std::runtime_error("invalid samples per pixel");
+  {
+#ifndef MDCM_DONT_THROW
+    throw std::runtime_error("RLE: invalid samples per pixel");
+#endif
+  }
   if(bpp != 8 && bpp != 16 && bpp != 32)
-    throw std::runtime_error("invalid bits per pixel");
+  {
+#ifndef MDCM_DONT_THROW
+    throw std::runtime_error("RLE: invalid bits per pixel");
+#endif
+  }
 }
 
 static inline int compute_num_segments_impl(int nc, int bpp)
@@ -125,9 +133,17 @@ image_info::image_info(int w, int h, pixel_info const & pi, bool pc, bool le):
   littleendian(le)
 {
   if(width < 0 || height < 0)
-    throw std::runtime_error("invalid dimensions");
+  {
+#ifndef MDCM_DONT_THROW
+    throw std::runtime_error("RLE: invalid dimensions");
+#endif
+  }
   if(pc && pix.get_number_of_components() != 3)
-    throw std::runtime_error("invalid planar configuration");
+  {
+#ifndef MDCM_DONT_THROW
+    throw std::runtime_error("RLE: invalid planar configuration");
+#endif
+  }
 }
 
 

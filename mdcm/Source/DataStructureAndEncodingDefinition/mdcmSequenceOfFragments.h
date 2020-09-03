@@ -81,7 +81,6 @@ std::istream& ReadPreValue(std::istream &is)
   }
   catch(...)
   {
-    // throw "SIEMENS Icon thingy";
     // Bug_Siemens_PrivateIconNoItem.dcm
     // First thing first let's rewind
     is.seekg(-4, std::ios::cur);
@@ -99,7 +98,9 @@ std::istream& ReadPreValue(std::istream &is)
     }
     else
     {
-      throw "Catch me if you can";
+#ifndef MDCM_DONT_THROW
+      throw "Seq. of frag. : ReadPreValue exception";
+#endif
     }
   }
   return is;

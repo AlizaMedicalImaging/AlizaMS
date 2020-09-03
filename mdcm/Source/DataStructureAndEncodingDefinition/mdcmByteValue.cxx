@@ -24,7 +24,12 @@ void ByteValue::SetLength(VL vl)
   VL l(vl);
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
   // CompressedLossy.dcm
-  if(l.IsUndefined()) throw Exception("Impossible");
+  if(l.IsUndefined())
+  {
+#ifndef MDCM_DONT_THROW
+    throw Exception("Impossible");
+#endif
+  }
   if(l.IsOdd())
   {
     mdcmDebugMacro("BUGGY HEADER: Your dicom contain odd length value field.");
@@ -47,7 +52,9 @@ void ByteValue::SetLength(VL vl)
   }
   catch(...)
   {
+#ifndef MDCM_DONT_THROW
     throw Exception("Impossible to allocate");
+#endif
   }
   Length = vl;
 }

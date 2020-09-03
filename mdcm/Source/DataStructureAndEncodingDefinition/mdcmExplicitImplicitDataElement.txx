@@ -48,7 +48,7 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
   }
   if(TagField == Tag(0xfffe,0xe0dd))
   {
-#if 0
+#ifndef MDCM_DONT_THROW
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
@@ -88,7 +88,7 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
     const bool failed = !ValueIO<ExplicitDataElement,TSwap,uint16_t>::Read(is,*ValueField,true);
     if (failed)
     {
-#if 0
+#ifndef MDCM_DONT_THROW
       throw Exception("Exception");
 #endif
     }
@@ -140,7 +140,7 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
 
     if(!ValueLengthField.Read<TSwap>(is))
     {
-#if 0
+#ifndef MDCM_DONT_THROW
       throw Exception("Impossible");
 #endif
       return is;
@@ -274,7 +274,7 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
       else
 #endif
       {
-#if 0
+#ifndef MDCM_DONT_THROW
         throw Exception("Should not happen (imp)");
 #endif
       }
@@ -300,7 +300,7 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
   // chances is that 99% of times there is now way we can reach here, so safely throw an exception
   if(TagField == Tag(0x0000,0x0000) && ValueLengthField == 0 && VRField == VR::INVALID)
   {
-#if 0
+#ifndef MDCM_DONT_THROW
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
@@ -359,7 +359,7 @@ std::istream &ExplicitImplicitDataElement::ReadValue(std::istream &is, bool read
         // Must be one of those non-cp246 file,
         // but for some reason seekg back to previous offset + Read
         // as Explicit does not work
-#if 0
+#ifndef MDCM_DONT_THROW
         ParseException pe;
         pe.SetLastElement(*this);
         throw pe;
@@ -466,7 +466,7 @@ std::istream &ExplicitImplicitDataElement::ReadValue(std::istream &is, bool read
 #endif
     {
       // Might be the famous UN 16bits
-#if 0
+#ifndef MDCM_DONT_THROW
       ParseException pe;
       pe.SetLastElement(*this);
       throw pe;

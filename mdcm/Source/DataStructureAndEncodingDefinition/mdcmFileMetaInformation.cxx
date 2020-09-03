@@ -192,7 +192,9 @@ void FileMetaInformation::FillFromDataSet(DataSet const &ds)
         }
         else
         {
+#ifndef MDCM_DONT_THROW
           throw mdcm::Exception("SOP Class is empty sorry");
+#endif
         }
         Replace(mssopclass);
       }
@@ -215,7 +217,9 @@ void FileMetaInformation::FillFromDataSet(DataSet const &ds)
     }
     else
     {
+#ifndef MDCM_DONT_THROW
       throw mdcm::Exception("No 2,3 and 8,18 element sorry");
+#endif
     }
   }
   else // Ok there is a value in (0002,0003) let see if it match (0008,0018)
@@ -228,7 +232,9 @@ void FileMetaInformation::FillFromDataSet(DataSet const &ds)
     {
       if(!ds.FindDataElement(Tag(0x0008, 0x0018)) || ds.GetDataElement(Tag(0x0008, 0x0018)).IsEmpty())
       {
+#ifndef MDCM_DONT_THROW
         throw mdcm::Exception("No 8,18 element sorry");
+#endif
       }
       const DataElement& sopinst = ds.GetDataElement(Tag(0x0008, 0x0018));
       assert(!GetDataElement(Tag(0x0002, 0x0003)).IsEmpty());
@@ -268,7 +274,9 @@ void FileMetaInformation::FillFromDataSet(DataSet const &ds)
     // Constuct it from DataSetTS
     if(DataSetTS == TransferSyntax::TS_END)
     {
+#ifndef MDCM_DONT_THROW
       throw mdcm::Exception("No TransferSyntax specified.");
+#endif
     }
     const char* str = TransferSyntax::GetTSString(DataSetTS);
     VL::Type strlenStr = (VL::Type) strlen(str);
@@ -479,45 +487,66 @@ std::istream &FileMetaInformation::Read(std::istream &is)
   ExplicitDataElement xde;
   Tag gl;
   gl.Read<SwapperNoOp>(is);
-  if(gl.GetGroup() != 0x2) throw Exception("INVALID");
-  if(gl.GetElement() != 0x0) throw Exception("INVALID");
+  if(gl.GetGroup() != 0x2)
+  {
+#ifndef MDCM_DONT_THROW
+    throw Exception("INVALID");
+#endif
+  }
+  if(gl.GetElement() != 0x0)
+  {
+#ifndef MDCM_DONT_THROW
+    throw Exception("INVALID");
+#endif
+  }
   VR vr;
   vr.Read(is);
-  if(vr == VR::INVALID) throw Exception("INVALID");
-  if(vr != VR::UL) throw Exception("INVALID");
+  if(vr == VR::INVALID)
+  {
+#ifndef MDCM_DONT_THROW
+    throw Exception("INVALID");
+#endif
+  }
+  if(vr != VR::UL)
+  {
+#ifndef MDCM_DONT_THROW
+    throw Exception("INVALID");
+#endif
+  }
   // TODO FIXME: I should not do seekg for valid file this is costly
   is.seekg(-6,std::ios::cur);
   xde.Read<SwapperNoOp>(is);
   Insert(xde);
   // See PS 3.5, Data Element Structure With Explicit VR
-  try {
-  // MDCM is a hack, so let's read all possible group 2 element, until the last one
-  // and leave the group length value aside.
-  while(ReadExplicitDataElement<SwapperNoOp>(is, xde))
+  try
   {
-    Insert(xde);
+    // MDCM is a hack, so let's read all possible group 2 element, until the last one
+    // and leave the group length value aside.
+    while(ReadExplicitDataElement<SwapperNoOp>(is, xde))
+    {
+      Insert(xde);
+    }
   }
-}
   catch(std::exception & ex)
-{
-(void)ex;
+  {
+    (void)ex;
     // we've read a little bit too much. We are possibly in the case where an
     // implicit dataelement with group 2 (technically impossible) was found
     // (first dataelement). Let's start over again, but this time use group
     // length as the sentinel for the last group 2 element:
-  is.seekg(start,std::ios::beg);
-  // Group Length:
-  ReadExplicitDataElement<SwapperNoOp>(is, xde);
-  Attribute<0x0002, 0x0000> filemetagrouplength;
-  filemetagrouplength.SetFromDataElement(xde);
-  const unsigned int glen = filemetagrouplength.GetValue();
-  unsigned int cur_len = 0;
+    is.seekg(start,std::ios::beg);
+    // Group Length:
+    ReadExplicitDataElement<SwapperNoOp>(is, xde);
+    Attribute<0x0002, 0x0000> filemetagrouplength;
+    filemetagrouplength.SetFromDataElement(xde);
+    const unsigned int glen = filemetagrouplength.GetValue();
+    unsigned int cur_len = 0;
     while(cur_len < glen && ReadExplicitDataElement<SwapperNoOp>(is, xde))
- {
-    Insert(xde);
-    cur_len += xde.GetLength();
+    {
+      Insert(xde);
+      cur_len += xde.GetLength();
+    }
   }
-}
   // Now is a good time to compute the transfer syntax:
   ComputeDataSetTransferSyntax();
   // we are at the end of the meta file information and before the dataset
@@ -531,12 +560,16 @@ std::istream &FileMetaInformation::ReadCompat(std::istream &is)
   // See PS 3.5, Data Element Structure With Explicit VR
   if(!IsEmpty())
   {
+#ifndef MDCM_DONT_THROW
     throw Exception("Serious bug");
+#endif
   }
   Tag t;
   if(!t.Read<SwapperNoOp>(is))
   {
+#ifndef MDCM_DONT_THROW
     throw Exception("Cannot read very first tag");
+#endif
   }
   if(t.GetGroup() == 0x0002)
   {
@@ -606,7 +639,9 @@ std::istream &FileMetaInformation::ReadCompat(std::istream &is)
     }
     else
     {
+#ifndef MDCM_DONT_THROW
       throw Exception("Impossible: cannot read 2bytes for VR");
+#endif
     }
     is.seekg(-6, std::ios::cur); // Seek back
     if(vr != VR::VR_END)
@@ -632,7 +667,9 @@ std::istream &FileMetaInformation::ReadCompat(std::istream &is)
         is.seekg(-12, std::ios::cur); // Seek back
         return is;
       }
+#ifndef MDCM_DONT_THROW
       throw Exception("Cannot find DICOM type. Giving up.");
+#endif
     }
   }
   return is;
@@ -666,7 +703,6 @@ bool AddVRToDataElement(DataElement &de)
 template <typename TSwap>
 std::istream &FileMetaInformation::ReadCompatInternal(std::istream &is)
 {
-//  if(t.GetGroup() == 0x0002)
   {
     // Purposely not Re-use ReadVR since we can read VR_END
     char vr_str0[2];
@@ -674,15 +710,11 @@ std::istream &FileMetaInformation::ReadCompatInternal(std::istream &is)
     if(VR::IsValid(vr_str0))
     {
       MetaInformationTS = TransferSyntax::Explicit;
-      // Hourah !
-      // Looks like an Explicit File Meta Information Header.
+      // Looks like an Explicit File Meta Information Header
       is.seekg(-6, std::ios::cur); // Seek back
-      //is.seekg(start, std::ios::beg); // Seek back
-      //std::streampos dpos = is.tellg();
       ExplicitDataElement xde;
       while(ReadExplicitDataElement<SwapperNoOp>(is, xde))
       {
-        //std::cout << xde << std::endl;
         if(xde.GetVR() == VR::UN)
         {
           mdcmWarningMacro("VR::UN found in file Meta header. "
@@ -691,14 +723,14 @@ std::istream &FileMetaInformation::ReadCompatInternal(std::istream &is)
         }
         Insert(xde);
       }
-      // Now is a good time to find out the dataset transfer syntax
+      // find out the dataset transfer syntax
       ComputeDataSetTransferSyntax();
     }
     else
     {
       MetaInformationTS = TransferSyntax::Implicit;
       mdcmWarningMacro("File Meta Information is implicit. VR will be explicitly added");
-      // Ok this might be an implicit encoded Meta File Information header...
+      // might be an implicit encoded Meta File Information header
       // GE_DLX-8-MONO2-PrivateSyntax.dcm
       is.seekg(-6, std::ios::cur); // Seek back
       ImplicitDataElement ide;
@@ -713,7 +745,7 @@ std::istream &FileMetaInformation::ReadCompatInternal(std::istream &is)
           mdcmWarningMacro("Unknown element found in Meta Header: " << ide.GetTag());
         }
       }
-      // Now is a good time to find out the dataset transfer syntax
+      // find out the dataset transfer syntax
       try
       {
         ComputeDataSetTransferSyntax();
@@ -721,12 +753,14 @@ std::istream &FileMetaInformation::ReadCompatInternal(std::istream &is)
       catch(mdcm::Exception &)
       {
         // We were able to read some of the Meta Header, but failed to compute the DataSetTS
-        // technically MDCM is able to cope with any value here. But be kind and try to have a good guess:
+        // technically MDCM is able to cope with any value here. But be kind and try to have a good guess
         mdcmWarningMacro("Meta Header is bogus. Guessing DataSet TS.");
         Tag t;
         if(!t.Read<SwapperNoOp>(is))
         {
+#ifndef MDCM_DONT_THROW
           throw Exception("Cannot read very first tag");
+#endif
         }
         char vr_str[3];
         is.read(vr_str, 2);
@@ -744,23 +778,10 @@ std::istream &FileMetaInformation::ReadCompatInternal(std::istream &is)
       }
     }
   }
-//  else
-//  {
-//    mdcmDebugMacro("No File Meta Information. Start with Tag: " << t);
-//    is.seekg(-4, std::ios::cur); // Seek back
-//  }
-  //
-  // we are at the end of the meta file information and before the dataset
   return is;
 }
 
-//void FileMetaInformation::SetTransferSyntaxType(TS const &ts)
-//{
-//  //assert(DS == 0);
-//  //InternalTS = ts;
-//}
-
-// FIXME if write a SQ in the meta header ?
+// if write a SQ in the meta header?
 void FileMetaInformation::ComputeDataSetTransferSyntax()
 {
   const Tag t(0x0002,0x0010);
@@ -769,14 +790,18 @@ void FileMetaInformation::ComputeDataSetTransferSyntax()
   const ByteValue *bv = de.GetByteValue();
   if(!bv)
   {
+#ifndef MDCM_DONT_THROW
     throw Exception("Unknown Transfer syntax");
+#endif
   }
   // Pad string with a \0
   ts = std::string(bv->GetPointer(), bv->GetLength());
   TransferSyntax tst(TransferSyntax::GetTSType(ts.c_str()));
   if(tst == TransferSyntax::TS_END)
   {
+#ifndef MDCM_DONT_THROW
     throw Exception("Unknown Transfer syntax");
+#endif
   }
   DataSetTS = tst;
   const bool b = DataSetTS.IsValid();
@@ -843,46 +868,9 @@ void FileMetaInformation::Default()
 std::ostream &FileMetaInformation::Write(std::ostream &os) const
 {
   P.Write(os);
-
-//  if(IsEmpty())
-//{
-//    std::cerr << "IsEmpty" << std::endl;
-//    FileMetaInformation fmi;
-//    fmi.Default();
-//    //fmi.Write(os);
-//    IOSerialize<SwapperNoOp>::Write(os,fmi);
-//}
-//  else if(IsValid())
   {
     this->DataSet::Write<ExplicitDataElement,SwapperNoOp>(os);
   }
-//  else
-//{
-//    assert(0);
-//}
-#if 0
-    // At least make sure to have group length
-    //if(!DS->FindDataElement(Tag(0x0002, 0x0000)))
-    {
-      //if(DS->GetNegociatedType() == TransferSyntax::Explicit)
-      {
-        ExplicitDataElement xde(Tag(0x0002, 0x0000), 4, VR::UL);
-        SmartPointer<ByteValue> bv = new ByteValue;
-        bv->SetLength(4);
-        uint32_t len = DS->GetLength();
-        Element<VR::UL, VM::VM1> el =
-          reinterpret_cast< Element<VR::UL, VM::VM1>& > (len);
-        std::stringstream ss;
-        el.Write(ss);
-        bv->Read(ss);
-        xde.SetValue(*bv);
-        // This is the first element, so simply write the element and
-        // then start writing the remaining of the File Meta Information
-        xde.Write(os);
-      }
-    }
-
-#endif
   return os;
 }
 

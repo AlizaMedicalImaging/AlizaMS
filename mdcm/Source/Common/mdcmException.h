@@ -37,9 +37,9 @@ namespace mdcm
 class Exception : public std::exception
 {
 
-  /// std::logic_error is used to internally hold a string.
-  /// It has the nice property of having a copy-constructor
-  /// that never fails.
+  // std::logic_error is used to internally hold a string.
+  // It has the nice property of having a copy-constructor
+  // that never fails.
   typedef std::logic_error StringHolder;
 
   static StringHolder CreateWhat(
@@ -58,11 +58,11 @@ class Exception : public std::exception
   }
 
 public:
-  /// Explicit constructor, initializing the description and the
-  /// text returned by what().
-  /// \note The last parameter is ignored for the time being.
-  /// It may be used to specify the function where the exception
-  /// was thrown.
+  // Explicit constructor, initializing the description and the
+  // text returned by what().
+  // The last parameter is ignored for the time being.
+  // It may be used to specify the function where the exception
+  // was thrown.
   explicit Exception(
     const char * desc = "None",
     const char * file = __FILE__,
@@ -71,7 +71,7 @@ public:
     // for __GNUC__ compiler
     const char * func = "" /*__FUNCTION__*/)
     :
-    What( CreateWhat(desc, file, lineNumber, func) ),
+    What(CreateWhat(desc, file, lineNumber, func)),
     Description(desc)  {}
 
   virtual ~Exception() throw() {}

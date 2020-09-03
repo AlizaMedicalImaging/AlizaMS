@@ -410,7 +410,9 @@ bool Reader::InternalReadCommon(const T_Caller &caller)
     const TransferSyntax &ts = F->GetHeader().GetDataSetTransferSyntax();
     if(!ts.IsValid())
     {
+#ifndef MDCM_DONT_THROW
       throw Exception("Meta Header issue");
+#endif
     }
 
     // Special case where the dataset was compressed using the deflate
@@ -442,7 +444,9 @@ bool Reader::InternalReadCommon(const T_Caller &caller)
           //F->GetDataSet().ReadUpToTag<ImplicitDataElement,SwapperDoOp>(is,tag, skiptags);
           //caller.template ReadCommon<ImplicitDataElement,SwapperDoOp>(is);
           mdcmErrorMacro("VirtualBigEndianNotHandled");
+#ifndef MDCM_DONT_THROW
           throw "Virtual Big Endian Implicit is not defined by DICOM";
+#endif
         }
         else
         {
@@ -626,7 +630,9 @@ bool Reader::InternalReadCommon(const T_Caller &caller)
               // mdcmData/TheralysMDCM120Bug.dcm, instead the code path goes into
               // ExplicitImplicitDataElement class instead.
               // Simply rethrow the exception for now.
+#ifndef MDCM_DONT_THROW
               throw;
+#endif
             }
           }
         }
@@ -863,11 +869,11 @@ void Reader::SetFileNameUTF8(const char * uft8)
   Ifstream = new std::ifstream();
   Ifstream->open(
 #ifdef _MSC_VER
-    ToUtf16(uft8).c_str(),
+  ToUtf16(uft8).c_str(),
 #else
-    uft8,
+  uft8,
 #endif
-	std::ios::binary);
+  std::ios::binary);
   if(Ifstream->is_open())
   {
     Stream = Ifstream;

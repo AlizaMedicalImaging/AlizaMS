@@ -138,7 +138,9 @@ public:
     assert(VRField != VR_END);
     if (VRField == INVALID)
     {
+#ifndef MDCM_DONT_THROW
       throw Exception("INVALID VR");
+#endif
     }
     if (VRField & VL32)
     {

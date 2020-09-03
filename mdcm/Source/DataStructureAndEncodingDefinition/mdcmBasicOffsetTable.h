@@ -39,7 +39,9 @@ public:
     }
     if(TagField != itemStart)
     {
+#ifndef MDCM_DONT_THROW
       throw "SIEMENS Icon thingy";
+#endif
     }
     if(!ValueLengthField.Read<TSwap>(is))
     {

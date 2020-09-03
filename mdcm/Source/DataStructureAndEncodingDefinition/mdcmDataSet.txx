@@ -47,7 +47,7 @@ std::istream & DataSet::ReadNested(std::istream & is)
     else
     {
       // MR_Philips_Intera_PrivateSequenceExplicitVR_in_SQ_2001_e05f_item_wrong_lgt_use_NOSHADOWSEQ.dcm
-#if 0
+#ifndef MDCM_DONT_THROW
       throw pe;
 #endif
     }
@@ -401,7 +401,7 @@ std::istream & DataSet::ReadWithLength(std::istream & is, VL & length)
       if((curpos - startpos) + 1 == l)
       {
         mdcmDebugMacro("Papyrus odd padding detected");
-#if 0
+#ifndef MDCM_DONT_THROW
         throw Exception("Papyrus odd padding");
 #endif
       }
@@ -413,14 +413,14 @@ std::istream & DataSet::ReadWithLength(std::istream & is, VL & length)
           // we found a discrepandy with own vendor made its layout.
           // update the length directly
           locallength = length = l;
-#if 0
+#ifndef MDCM_DONT_THROW
           throw Exception("Changed Length");
 #endif
         }
         else
         {
           mdcmDebugMacro("Out of Range SQ detected: " << l << " while max: " << locallength);
-#if 0
+#ifndef MDCM_DONT_THROW
           throw Exception("Out of Range");
 #endif
         }
@@ -449,7 +449,7 @@ std::istream & DataSet::ReadWithLength(std::istream & is, VL & length)
           !pd.IsUndefinedLength())
       {
         mdcmAlwaysWarnMacro("");
-#if 0
+#ifndef MDCM_DONT_THROW
         throw Exception("Exception");
 #endif
       }
@@ -463,7 +463,7 @@ std::istream & DataSet::ReadWithLength(std::istream & is, VL & length)
     {
       // mdcmDataExtra/mdcmBreakers/BuggedDicomWorksImage_Hopeless.dcm
       mdcmErrorMacro("Last Tag is : " << pe.GetLastElement().GetTag());
-#if 0
+#ifndef MDCM_DONT_THROW
       throw Exception("Unhandled");
 #endif
     }
@@ -494,20 +494,20 @@ std::istream & DataSet::ReadWithLength(std::istream & is, VL & length)
       // fix the length now
       length = locallength = l;
       mdcmWarningMacro("Item length is wrong");
-#if 0
+#ifndef MDCM_DONT_THROW
       throw Exception("Changed Length");
 #endif
     }
     else if(strcmp(pe.GetDescription(), "Papyrus odd padding") == 0)
     {
       is.get();
-#if 0
+#ifndef MDCM_DONT_THROW
       throw Exception("Changed Length");
 #endif
     }
     else
     {
-#if 0
+#ifndef MDCM_DONT_THROW
       throw pe;
 #endif
     }

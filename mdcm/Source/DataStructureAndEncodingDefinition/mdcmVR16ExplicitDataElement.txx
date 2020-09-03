@@ -90,9 +90,11 @@ std::istream & VR16ExplicitDataElement::ReadPreValue(std::istream & is)
     if(TagField == Tag(0xfffe, 0xe000))
     {
       mdcmWarningMacro("Found item delimitor in item");
+#ifndef MDCM_DONT_THROW
       ParseException pe;
       pe.SetLastElement(*this);
       throw pe;
+#endif
     }
     // -> For some reason VR is written as {44,0} well I guess this is a VR...
     // Technically there is a second bug, dcmtk assume other things when reading this tag,
@@ -153,9 +155,11 @@ std::istream & VR16ExplicitDataElement::ReadPreValue(std::istream & is)
   if(TagField == Tag(0x0000,0x0000) && ValueLengthField == 0 && VRField == VR::INVALID)
   {
     // This handles DMCPACS_ExplicitImplicit_BogusIOP.dcm
+#ifndef MDCM_DONT_THROW
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
+#endif
   }
   return is;
 }
@@ -199,9 +203,11 @@ std::istream & VR16ExplicitDataElement::ReadValue(std::istream & is, bool readva
         // Must be one of those non-cp246 file...
         // but for some reason seekg back to previous offset + Read
         // as Explicit does not work
+#ifndef MDCM_DONT_THROW
         ParseException pe;
         pe.SetLastElement(*this);
         throw pe;
+#endif
       }
       return is;
     }
@@ -210,9 +216,11 @@ std::istream & VR16ExplicitDataElement::ReadValue(std::istream & is, bool readva
       if(TagField != Tag(0x7fe0,0x0010))
       {
         // mdcmSampleData/ForSeriesTesting/Perfusion/DICOMDIR
+#ifndef MDCM_DONT_THROW
         ParseException pe;
         pe.SetLastElement(*this);
         throw pe;
+#endif
       }
       // Ok this is Pixel Data fragmented
       assert(TagField == Tag(0x7fe0,0x0010));
@@ -269,10 +277,11 @@ std::istream & VR16ExplicitDataElement::ReadValue(std::istream & is, bool readva
   if(!ValueIO<VR16ExplicitDataElement,TSwap>::Read(is,*ValueField,readvalues))
   {
     // Might be the famous UN 16bits
+#ifndef MDCM_DONT_THROW
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
-    return is;
+#endif
   }
   return is;
 }

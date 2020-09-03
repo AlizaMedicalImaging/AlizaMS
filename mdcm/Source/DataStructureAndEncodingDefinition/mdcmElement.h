@@ -296,7 +296,9 @@ std::string to_string (Float data) {
   }
   else
   {
+#ifndef MDCM_DONT_THROW
     throw "Impossible Conversion";
+#endif
   }
 }
 #else

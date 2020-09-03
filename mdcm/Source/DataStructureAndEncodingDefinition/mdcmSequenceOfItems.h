@@ -122,12 +122,12 @@ public:
               SequenceLengthField = newlength;
             }
           }
-#if 0
           else
           {
+#ifndef MDCM_DONT_THROW
             throw ex;
-          }
 #endif
+          }
         }
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
         if(item.GetTag() == seqDelItem)
@@ -151,7 +151,7 @@ public:
         if(l > SequenceLengthField)
         {
           mdcmDebugMacro("Found: Length of Item larger than expected")
-#if 0
+#ifndef MDCM_DONT_THROW
           throw "Length of Item larger than expected";
 #endif
         }
@@ -163,7 +163,7 @@ public:
         {
           mdcmWarningMacro("PMS: Super bad hack");
           SequenceLengthField = l;
-#if 0
+#ifndef MDCM_DONT_THROW
           throw Exception("Wrong Length");
 #endif
         }

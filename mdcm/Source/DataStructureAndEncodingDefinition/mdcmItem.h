@@ -102,7 +102,9 @@ public:
     }
     if(!TagField.Read<TSwap>(is))
     {
+#ifndef MDCM_DONT_THROW
       throw Exception("Should not happen (item)");
+#endif
       return is;
     }
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
@@ -161,7 +163,11 @@ public:
         catch(Exception & e)
         {
           // MR_Philips_Intera_No_PrivateSequenceImplicitVR.dcm
+#ifndef MDCM_DONT_THROW
           throw e;
+#else
+          (void)e;
+#endif
         }
         catch(...)
         {
@@ -191,7 +197,9 @@ public:
        TagField != Tag(0xfffe, 0xe0dd))
     {
       mdcmDebugMacro("Invalid Item, found tag: " << TagField);
+#ifndef MDCM_DONT_THROW
       throw Exception("Not a valid Item");
+#endif
     }
     assert(TagField == Tag(0xfffe, 0xe000) ||
            TagField == Tag(0xfffe, 0xe0dd));

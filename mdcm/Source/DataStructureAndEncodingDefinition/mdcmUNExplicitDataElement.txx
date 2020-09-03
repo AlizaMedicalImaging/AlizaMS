@@ -47,9 +47,11 @@ std::istream & UNExplicitDataElement::ReadPreValue(std::istream & is)
   }
   if(TagField == Tag(0xfffe,0xe0dd))
   {
+#ifndef MDCM_DONT_THROW
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
+#endif
   }
   assert(TagField != Tag(0xfffe,0xe0dd));
   const Tag itemDelItem(0xfffe,0xe00d);
@@ -79,6 +81,7 @@ std::istream & UNExplicitDataElement::ReadPreValue(std::istream & is)
   }
   catch(Exception &)
   {
+#ifndef MDCM_DONT_THROW
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
     // mdcm-MR-PHILIPS-16-Multi-Seq.dcm
     // assert(TagField == Tag(0xfffe, 0xe000));
@@ -95,7 +98,8 @@ std::istream & UNExplicitDataElement::ReadPreValue(std::istream & is)
     pe.SetLastElement(*this);
     throw pe;
 #else
-  throw ex;
+    throw ex;
+#endif
 #endif
   }
   if(VRField == VR::UN)
@@ -163,7 +167,9 @@ std::istream & UNExplicitDataElement::ReadValue(std::istream & is, bool readvalu
         // Must be one of those non-cp246 file...
         // but for some reason seekg back to previous offset + Read
         // as UNExplicit does not work
+#ifndef MDCM_DONT_THROW
         throw Exception("CP 246");
+#endif
       }
       return is;
     }
@@ -195,9 +201,11 @@ std::istream & UNExplicitDataElement::ReadValue(std::istream & is, bool readvalu
   }
   if(!ValueIO<UNExplicitDataElement,TSwap>::Read(is,*ValueField,readvalues))
   {
+#ifndef MDCM_DONT_THROW
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
+#endif
     return is;
   }
   return is;

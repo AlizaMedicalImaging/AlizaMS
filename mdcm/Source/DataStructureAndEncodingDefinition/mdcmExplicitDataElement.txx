@@ -46,7 +46,7 @@ std::istream &ExplicitDataElement::ReadPreValue(std::istream &is)
   }
   if(TagField == Tag(0xfffe,0xe0dd))
   {
-#if 0
+#ifndef MDCM_DONT_THROW
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
@@ -90,7 +90,7 @@ std::istream &ExplicitDataElement::ReadPreValue(std::istream &is)
     const bool failed = !ValueIO<ExplicitDataElement,TSwap,uint16_t>::Read(is,*ValueField,true);
     if (failed)
     {
-#if 0
+#ifndef MDCM_DONT_THROW
       throw Exception("Exception");
 #endif
     }
@@ -107,6 +107,7 @@ std::istream &ExplicitDataElement::ReadPreValue(std::istream &is)
   }
   catch(Exception &ex)
   {
+#ifndef MDCM_DONT_THROW
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
     // mdcm-MR-PHILIPS-16-Multi-Seq.dcm
     // assert(TagField == Tag(0xfffe, 0xe000));
@@ -120,13 +121,10 @@ std::istream &ExplicitDataElement::ReadPreValue(std::istream &is)
     //  TagField << " in order to read a buggy DICOM file.");
     //VRField = VR::INVALID;
     (void)ex;
-#if 0
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
-#endif
 #else
-#if 0
     throw ex;
 #endif
 #endif
@@ -164,7 +162,7 @@ std::istream &ExplicitDataElement::ReadPreValue(std::istream &is)
   // chances is that 99% of times there is now way we can reach here, so safely throw an exception
   if(TagField == Tag(0x0000,0x0000) && ValueLengthField == 0 && VRField == VR::INVALID)
   {
-#if 0
+#ifndef MDCM_DONT_THROW
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
@@ -227,7 +225,7 @@ std::istream &ExplicitDataElement::ReadValue(std::istream &is, bool readvalues)
         // Must be one of those non-cp246 file...
         // but for some reason seekg back to previous offset + Read
         // as Explicit does not work...
-#if 0
+#ifndef MDCM_DONT_THROW
         ParseException pe;
         pe.SetLastElement(*this);
         throw pe;
@@ -330,7 +328,7 @@ std::istream &ExplicitDataElement::ReadValue(std::istream &is, bool readvalues)
 #endif
     {
       // Might be the famous UN 16bits
-#if 0
+#ifndef MDCM_DONT_THROW
       ParseException pe;
       pe.SetLastElement(*this);
       throw pe;
@@ -378,7 +376,7 @@ const std::ostream &ExplicitDataElement::Write(std::ostream &os) const
 {
   if(TagField == Tag(0xfffe,0xe0dd))
   {
-#if 0
+#ifndef MDCM_DONT_THROW
     throw Exception("Impossible");
 #endif
   }

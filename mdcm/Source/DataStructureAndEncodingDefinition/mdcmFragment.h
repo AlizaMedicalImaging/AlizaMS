@@ -51,18 +51,24 @@ public:
     TagField.Read<TSwap>(is);
     if(!is)
     {
+#ifndef MDCM_DONT_THROW
       throw Exception("Problem #1");
+#endif
       return is;
     }
     if(!ValueLengthField.Read<TSwap>(is))
     {
+#ifndef MDCM_DONT_THROW
       throw Exception("Problem #2");
+#endif
       return is;
     }
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
     if(TagField != itemStart && TagField != seqDelItem)
     {
+#ifndef MDCM_DONT_THROW
       throw Exception("Problem #3");
+#endif
     }
 #endif
     return is;
@@ -80,9 +86,11 @@ public:
       // Fragment is incomplete, but is a itemStart, let's try to push it anyway
       mdcmWarningMacro("Fragment could not be read");
       ValueField = bv;
+#ifndef MDCM_DONT_THROW
       ParseException pe;
       pe.SetLastElement(*this);
       throw pe;
+#endif
       return is;
     }
     ValueField = bv;
@@ -111,7 +119,9 @@ public:
         if(offset > max)
         {
           mdcmErrorMacro("Giving up");
+#ifndef MDCM_DONT_THROW
           throw "Impossible to backtrack";
+#endif
           return is;
         }
       }
@@ -133,15 +143,16 @@ public:
       // Fragment is incomplete, but is a itemStart, let's try to push it anyway
       mdcmWarningMacro("Fragment could not be read");
       ValueField = bv;
+#ifndef MDCM_DONT_THROW
       ParseException pe;
       pe.SetLastElement(*this);
       throw pe;
+#endif
       return is;
     }
     ValueField = bv;
     return is;
   }
-
 
   template <typename TSwap>
   std::ostream & Write(std::ostream &os) const

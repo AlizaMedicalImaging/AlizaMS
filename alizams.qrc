@@ -1,32 +1,32 @@
 <RCC>
-    <qresource prefix="/">
-        <file>bitmaps/empty_splash.png</file>
-        <file>bitmaps/tool.svg</file>
-        <file>bitmaps/reload.svg</file>
-        <file>bitmaps/2dx2.svg</file>
-        <file>bitmaps/2dy2.svg</file>
-        <file>bitmaps/2dz2.svg</file>
-        <file>bitmaps/2d.svg</file>
-        <file>bitmaps/3d.svg</file>
-        <file>bitmaps/delete.svg</file>
-        <file>bitmaps/delete2.svg</file>
-        <file>bitmaps/add.svg</file>
-        <file>bitmaps/remove.svg</file>
-        <file>bitmaps/trans1.svg</file>
-        <file>bitmaps/notrans1.svg</file>
-        <file>bitmaps/right0.svg</file>
-        <file>bitmaps/left0.svg</file>
-        <file>bitmaps/grey0.png</file>
-        <file>bitmaps/lut1.png</file>
-        <file>bitmaps/lut2.png</file>
-        <file>bitmaps/lut3.png</file>
-        <file>bitmaps/lut4.png</file>
-        <file>bitmaps/lut5.png</file>
-        <file>bitmaps/lut6.png</file>
-        <file>bitmaps/lut7.png</file>
-        <file>bitmaps/square.svg</file>
-        <file>bitmaps/info.svg</file>
-        <file>bitmaps/info2.svg</file>
+	<qresource prefix="/">
+		<file>bitmaps/empty_splash.png</file>
+		<file>bitmaps/tool.svg</file>
+		<file>bitmaps/reload.svg</file>
+		<file>bitmaps/2dx2.svg</file>
+		<file>bitmaps/2dy2.svg</file>
+		<file>bitmaps/2dz2.svg</file>
+		<file>bitmaps/2d.svg</file>
+		<file>bitmaps/3d.svg</file>
+		<file>bitmaps/delete.svg</file>
+		<file>bitmaps/delete2.svg</file>
+		<file>bitmaps/add.svg</file>
+		<file>bitmaps/remove.svg</file>
+		<file>bitmaps/trans1.svg</file>
+		<file>bitmaps/notrans1.svg</file>
+		<file>bitmaps/right0.svg</file>
+		<file>bitmaps/left0.svg</file>
+		<file>bitmaps/grey0.png</file>
+		<file>bitmaps/lut1.png</file>
+		<file>bitmaps/lut2.png</file>
+		<file>bitmaps/lut3.png</file>
+		<file>bitmaps/lut4.png</file>
+		<file>bitmaps/lut5.png</file>
+		<file>bitmaps/lut6.png</file>
+		<file>bitmaps/lut7.png</file>
+		<file>bitmaps/square.svg</file>
+		<file>bitmaps/info.svg</file>
+		<file>bitmaps/info2.svg</file>
 		<file>bitmaps/file.svg</file>
 		<file>bitmaps/cut.svg</file>
 		<file>bitmaps/nocut.svg</file>
@@ -67,6 +67,6 @@
 		<file>bitmaps/ctk.svg</file>
 		<file>bitmaps/printer.svg</file>
 		<file>bitmaps/save2.svg</file>
-    </qresource>
+	</qresource>
 </RCC>
 

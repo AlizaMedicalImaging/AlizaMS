@@ -105,7 +105,9 @@ std::istream &CP246ExplicitDataElement::ReadPreValue(std::istream &is)
       // The following is occurs with mdcm 2.0.17 when two
       // seq del item marker are found
       // See UnexpectedSequenceDelimiterInFixedLengthSequence.dcm
+#ifndef MDCM_DONT_THROW
       throw Exception("Should not happen CP246");
+#endif
       return is;
     }
   }
@@ -153,9 +155,11 @@ std::istream &CP246ExplicitDataElement::ReadValue(std::istream &is, bool readval
         // Must be one of those non-cp246 file...
         // but for some reason seekg back to previous offset + Read
         // as CP246Explicit does not work...
+#ifndef MDCM_DONT_THROW
         ParseException pe;
         pe.SetLastElement(*this);
         throw pe;
+#endif
       }
       return is;
     }
@@ -204,8 +208,9 @@ std::istream &CP246ExplicitDataElement::ReadValue(std::istream &is, bool readval
     // Might be the famous UN 16bits
     ParseException pe;
     pe.SetLastElement(*this);
+#ifndef MDCM_DONT_THROW
     throw pe;
-    return is;
+#endif
   }
 
   return is;

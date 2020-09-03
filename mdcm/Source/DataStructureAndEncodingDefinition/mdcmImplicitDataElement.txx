@@ -49,8 +49,9 @@ std::istream &ImplicitDataElement::ReadPreValue(std::istream& is)
   // Read Value Length
   if(!ValueLengthField.Read<TSwap>(is))
   {
+#ifndef MDCM_DONT_THROW
     throw Exception("Impossible ValueLengthField");
-    return is;
+#endif
   }
   return is;
 }
@@ -252,7 +253,9 @@ std::istream &ImplicitDataElement::ReadValue(std::istream &is, bool readvalues)
     else
 #endif /* MDCM_SUPPORT_BROKEN_IMPLEMENTATION */
     {
+#ifndef MDCM_DONT_THROW
       throw Exception("Should not happen (imp)");
+#endif
     }
     return is;
   }
@@ -305,7 +308,9 @@ std::istream &ImplicitDataElement::ReadValueWithLength(std::istream& is, VL & le
   if(ValueLengthField > length && !ValueLengthField.IsUndefined())
   {
     mdcmWarningMacro("Cannot read more length than what is remaining in the file");
+#ifndef MDCM_DONT_THROW
     throw Exception("Impossible (more)");
+#endif
   }
   if(ValueLengthField == 0)
   {
@@ -484,7 +489,9 @@ std::istream &ImplicitDataElement::ReadValueWithLength(std::istream& is, VL & le
     else
 #endif
     {
+#ifndef MDCM_DONT_THROW
       throw Exception("Should not happen (imp)");
+#endif
     }
     return is;
   }
@@ -533,7 +540,12 @@ const std::ostream &ImplicitDataElement::Write(std::ostream &os) const
   else // It should be safe to simply use the ValueLengthField as stored:
   {
     // Do not allow writing file such as: dcm4che_UndefinedValueLengthInImplicitTS.dcm
-    if(TagField == Tag(0x7fe0,0x0010) && ValueLengthField.IsUndefined()) throw Exception( "VL u/f Impossible" );
+    if(TagField == Tag(0x7fe0,0x0010) && ValueLengthField.IsUndefined())
+    {
+#ifndef MDCM_DONT_THROW
+      throw Exception( "VL u/f Impossible" );
+#endif
+    }
     if(!ValueLengthField.Write<TSwap>(os))
     {
       assert(0 && "Should not happen");
