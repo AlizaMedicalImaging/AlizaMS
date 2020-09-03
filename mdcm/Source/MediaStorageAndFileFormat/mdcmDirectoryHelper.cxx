@@ -161,8 +161,8 @@ std::vector<DataSet> DirectoryHelper::LoadImageFromFiles(const std::string& inDi
         {
           Reader theReader;
           theReader.SetFileName(theSortedFiles[j].c_str());
-          theReader.Read();
-          theReturn.push_back(theReader.GetFile().GetDataSet());
+          const bool b = theReader.Read();
+		  if (b) theReturn.push_back(theReader.GetFile().GetDataSet());
         }
         return theReturn;
       }

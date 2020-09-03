@@ -102,26 +102,28 @@ template<typename T> QString to_rgb(
 			static_cast<typename RGBImageTypeUC::DirectionType>(
 				image->GetDirection()));
 		rgb_image->Allocate();
+		typename itk::ImageRegionConstIterator<T> iterator(
+			image, image->GetLargestPossibleRegion());
+		typename itk::ImageRegionIterator<RGBImageTypeUC> rgb_iterator(
+			rgb_image, rgb_image->GetLargestPossibleRegion());
+		iterator.GoToBegin();
+		rgb_iterator.GoToBegin();
+		while(!iterator.IsAtEnd())
+		{
+			const unsigned char c =
+				static_cast<unsigned char>(iterator.Get());
+			RGBPixelUC pixel;
+			pixel.SetRed(c);
+			pixel.SetGreen(c);
+			pixel.SetBlue(c);
+			rgb_iterator.Set(pixel);
+			++rgb_iterator;
+			++iterator;
+		}
 	}
 	catch (itk::ExceptionObject & ex)
-	{ return QString(ex.GetDescription()); }
-	typename itk::ImageRegionConstIterator<T> iterator(
-		image, image->GetLargestPossibleRegion());
-	typename itk::ImageRegionIterator<RGBImageTypeUC> rgb_iterator(
-		rgb_image, rgb_image->GetLargestPossibleRegion());
-	iterator.GoToBegin();
-	rgb_iterator.GoToBegin();
-	while(!iterator.IsAtEnd())
 	{
-		const unsigned char c =
-			static_cast<unsigned char>(iterator.Get());
-		RGBPixelUC pixel;
-		pixel.SetRed(c);
-		pixel.SetGreen(c);
-		pixel.SetBlue(c);
-		rgb_iterator.Set(pixel);
-		++rgb_iterator;
-		++iterator;
+		return QString(ex.GetDescription());
 	}
 	return QString("");
 }
@@ -1170,72 +1172,72 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 							duplicator->SetInputImage(tmp1);
 							duplicator->Update();
 							tmp2 = duplicator->GetOutput();
+							LinearIterator it(
+								tmp1,
+								tmp1->GetLargestPossibleRegion());
+							it.SetDirection(0);
+							it.GoToBegin();
+							const int j__ = px + ax/2;
+							int x__ = 0;
+							int y__ = 0;
+							const int idimx =
+								tmp1->GetLargestPossibleRegion().GetSize()[0];
+							while(!it.IsAtEnd())
+							{
+								while(!it.IsAtEndOfLine())
+								{
+									if (x__ < j__)
+									{
+										const int ix = x__ + 2*(j__ - x__);
+										if (ix >= idimx || ix < 0)
+										{
+											it.Set(itk::NumericTraits<
+												typename
+													T2d::PixelType>::Zero);
+										}
+										else
+										{
+											typename T2d::IndexType i;
+											i[0] = ix;
+											i[1] =  y__;
+											it.Set(tmp2->GetPixel(i));
+										}
+									}
+									else if (x__ > j__)
+									{
+										const int ix = x__ - 2*(x__ - j__);
+										if (ix >= idimx || ix < 0)
+										{
+											it.Set(itk::NumericTraits<
+												typename
+													T2d::PixelType>::Zero);
+										}
+										else
+										{
+											typename T2d::IndexType i;
+											i[0] = ix;
+											i[1] =  y__;
+											it.Set(tmp2->GetPixel(i));
+										}
+									}
+									else
+									{
+										typename T2d::IndexType i;
+										i[0] = x__;
+										i[1] = y__;
+										it.Set(tmp2->GetPixel(i));
+									}
+									x__++;
+									++it;
+								}
+								x__ = 0;
+								y__++;
+								it.NextLine();
+							}
 						}
 						catch(itk::ExceptionObject & ex)
 						{
 							return QString(ex.GetDescription());
-						}
-						LinearIterator it(
-							tmp1,
-							tmp1->GetLargestPossibleRegion());
-						it.SetDirection(0);
-						it.GoToBegin();
-						const int j__ = px + ax/2;
-						int x__ = 0;
-						int y__ = 0;
-						const int idimx =
-							tmp1->GetLargestPossibleRegion().GetSize()[0];
-						while(!it.IsAtEnd())
-						{
-							while(!it.IsAtEndOfLine())
-							{
-								if (x__ < j__)
-								{
-									const int ix = x__ + 2*(j__ - x__);
-									if (ix >= idimx || ix < 0)
-									{
-										it.Set(itk::NumericTraits<
-											typename
-												T2d::PixelType>::Zero);
-									}
-									else
-									{
-										typename T2d::IndexType i;
-										i[0] = ix;
-										i[1] =  y__;
-										it.Set(tmp2->GetPixel(i));
-									}
-								}
-								else if (x__ > j__)
-								{
-									const int ix = x__ - 2*(x__ - j__);
-									if (ix >= idimx || ix < 0)
-									{
-										it.Set(itk::NumericTraits<
-											typename
-												T2d::PixelType>::Zero);
-									}
-									else
-									{
-										typename T2d::IndexType i;
-										i[0] = ix;
-										i[1] =  y__;
-										it.Set(tmp2->GetPixel(i));
-									}
-								}
-								else
-								{
-									typename T2d::IndexType i;
-									i[0] = x__;
-									i[1] = y__;
-									it.Set(tmp2->GetPixel(i));
-								}
-								x__++;
-								++it;
-							}
-							x__ = 0;
-							y__++;
-							it.NextLine();
 						}
 					}
 				}
@@ -1251,45 +1253,55 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 				return QString("Internal error");
 			}
 			QApplication::processEvents();
-			ConstIterator it0(
-				tmp1,
-				tmp1->GetLargestPossibleRegion());
-			it0.SetDirection(0);
-			SliceIterator it2(
-				out_image,
-				out_image->GetLargestPossibleRegion());
-			it2.SetFirstDirection(0);
-			it2.SetSecondDirection(1);
-			int j = 0;
-			it0.GoToBegin();
-			it2.GoToBegin();
-			while(!(it2.IsAtEnd() || it0.IsAtEnd()))
+			try
 			{
-				if (j == z)
+				ConstIterator it0(
+					tmp1,
+					tmp1->GetLargestPossibleRegion());
+				it0.SetDirection(0);
+				SliceIterator it2(
+					out_image,
+					out_image->GetLargestPossibleRegion());
+				it2.SetFirstDirection(0);
+				it2.SetSecondDirection(1);
+				int j = 0;
+				it0.GoToBegin();
+				it2.GoToBegin();
+				while(!(it2.IsAtEnd() || it0.IsAtEnd()))
 				{
-					while (!(it2.IsAtEndOfSlice() || it0.IsAtEnd()))
+					if (j == z)
 					{
-						while (!it2.IsAtEndOfLine())
+						while (!(it2.IsAtEndOfSlice() || it0.IsAtEnd()))
 						{
-							if (!it0.IsAtEnd())
+							while (!it2.IsAtEndOfLine())
 							{
-								it2.Set(static_cast<
-									typename T::PixelType>(
-										it0.Get()));
-								++it0;
+								if (!it0.IsAtEnd())
+								{
+									it2.Set(static_cast<
+										typename T::PixelType>(
+											it0.Get()));
+									++it0;
+								}
+								++it2;
 							}
-							++it2;
+							it0.NextLine();
+							it2.NextLine();
 						}
-						it0.NextLine();
-						it2.NextLine();
 					}
+					it2.NextSlice();
+					j++;
 				}
-				it2.NextSlice();
-				j++;
-				QApplication::processEvents();
 			}
+			catch(itk::ExceptionObject & ex)
+			{
+				return QString(ex.GetDescription());
+			}
+			QApplication::processEvents();
 		}
-		else { return error; }
+		else
+		{
+			return error;
+		}
 	}
 	if (out_image.IsNotNull()) out_image->DisconnectPipeline();
 	else return QString("Output image is NULL");
@@ -1325,7 +1337,9 @@ template<typename T, typename T2d> QString levels_slice_by_slice(
 		out_image->FillBuffer(0);
 	}
 	catch (itk::ExceptionObject & ex)
-	{ return QString(ex.GetDescription()); }
+	{
+		return QString(ex.GetDescription());
+	}
 	typedef itk::IntensityWindowingImageFilter<T2d, Image2DTypeUC>
 		LinearFilterType;
 	typedef itk::Sigmoid2ImageFilter<T2d, Image2DTypeUC>
@@ -1482,49 +1496,59 @@ template<typename T, typename T2d> QString levels_slice_by_slice(
 						//
 						QApplication::processEvents();
 						//
-						ConstIterator it0(
-							tmp1,
-							tmp1->GetLargestPossibleRegion());
-						it0.SetDirection(0);
-						SliceIterator it2(
-							out_image,
-							out_image->GetLargestPossibleRegion());
-						it2.SetFirstDirection(0);
-						it2.SetSecondDirection(1);
-						int j = 0;
-						it0.GoToBegin();
-						it2.GoToBegin();
-						while(!(it2.IsAtEnd() || it0.IsAtEnd()))
+						try
 						{
-							if (j == idxs.at(x))
+							ConstIterator it0(
+								tmp1,
+								tmp1->GetLargestPossibleRegion());
+							it0.SetDirection(0);
+							SliceIterator it2(
+								out_image,
+								out_image->GetLargestPossibleRegion());
+							it2.SetFirstDirection(0);
+							it2.SetSecondDirection(1);
+							int j = 0;
+							it0.GoToBegin();
+							it2.GoToBegin();
+							while(!(it2.IsAtEnd() || it0.IsAtEnd()))
 							{
-								while (!(it2.IsAtEndOfSlice() ||
-									it0.IsAtEnd()))
+								if (j == idxs.at(x))
 								{
-									while (!it2.IsAtEndOfLine())
+									while (!(it2.IsAtEndOfSlice() ||
+										it0.IsAtEnd()))
 									{
-										if (!it0.IsAtEnd())
+										while (!it2.IsAtEndOfLine())
 										{
-											it2.Set(
-												static_cast<
-													typename
-														ImageTypeUC::
-															PixelType>(
-												it0.Get()));
-											++it0;
+											if (!it0.IsAtEnd())
+											{
+												it2.Set(
+													static_cast<
+														typename
+															ImageTypeUC::
+																PixelType>(
+													it0.Get()));
+												++it0;
+											}
+											++it2;
 										}
-										++it2;
+										it0.NextLine();
+										it2.NextLine();
 									}
-									it0.NextLine();
-									it2.NextLine();
 								}
+								it2.NextSlice();
+								j++;
 							}
-							it2.NextSlice();
-							j++;
-							QApplication::processEvents();
 						}
+						catch(itk::ExceptionObject & ex)
+						{
+							return QString(ex.GetDescription());
+						}
+						QApplication::processEvents();
 					}
-					else { return error; }
+					else
+					{
+						return error;
+					}
 				}
 			}
 		}

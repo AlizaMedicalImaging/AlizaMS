@@ -46,9 +46,11 @@ std::istream &ExplicitDataElement::ReadPreValue(std::istream &is)
   }
   if(TagField == Tag(0xfffe,0xe0dd))
   {
+#if 0
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
+#endif
   }
   const Tag itemDelItem(0xfffe,0xe00d);
   if(TagField == itemDelItem)
@@ -86,7 +88,12 @@ std::istream &ExplicitDataElement::ReadPreValue(std::istream &is)
     ValueField->SetLength((int32_t)(e - s));
     ValueLengthField = ValueField->GetLength();
     const bool failed = !ValueIO<ExplicitDataElement,TSwap,uint16_t>::Read(is,*ValueField,true);
-    if (failed) { throw Exception("Exception"); }
+    if (failed)
+    {
+#if 0
+      throw Exception("Exception");
+#endif
+    }
     return is;
   }
 #endif
@@ -113,11 +120,15 @@ std::istream &ExplicitDataElement::ReadPreValue(std::istream &is)
     //  TagField << " in order to read a buggy DICOM file.");
     //VRField = VR::INVALID;
     (void)ex;
+#if 0
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
+#endif
 #else
-  throw ex;
+#if 0
+    throw ex;
+#endif
 #endif
   }
   // Read Value Length
@@ -153,9 +164,11 @@ std::istream &ExplicitDataElement::ReadPreValue(std::istream &is)
   // chances is that 99% of times there is now way we can reach here, so safely throw an exception
   if(TagField == Tag(0x0000,0x0000) && ValueLengthField == 0 && VRField == VR::INVALID)
   {
+#if 0
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
+#endif
   }
 
 #ifdef ELSCINT1_01F7_1070
@@ -214,9 +227,11 @@ std::istream &ExplicitDataElement::ReadValue(std::istream &is, bool readvalues)
         // Must be one of those non-cp246 file...
         // but for some reason seekg back to previous offset + Read
         // as Explicit does not work...
+#if 0
         ParseException pe;
         pe.SetLastElement(*this);
         throw pe;
+#endif
       }
       return is;
     }
@@ -315,9 +330,11 @@ std::istream &ExplicitDataElement::ReadValue(std::istream &is, bool readvalues)
 #endif
     {
       // Might be the famous UN 16bits
+#if 0
       ParseException pe;
       pe.SetLastElement(*this);
       throw pe;
+#endif
     }
     return is;
   }
@@ -359,7 +376,12 @@ std::istream &ExplicitDataElement::ReadWithLength(std::istream &is, VL & length)
 template <typename TSwap>
 const std::ostream &ExplicitDataElement::Write(std::ostream &os) const
 {
-  if(TagField == Tag(0xfffe,0xe0dd)) throw Exception("Impossible");
+  if(TagField == Tag(0xfffe,0xe0dd))
+  {
+#if 0
+    throw Exception("Impossible");
+#endif
+  }
   if(!TagField.Write<TSwap>(os))
   {
     assert(0 && "Should not happen");

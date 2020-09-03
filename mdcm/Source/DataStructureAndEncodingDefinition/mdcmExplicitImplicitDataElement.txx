@@ -87,11 +87,11 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
     ValueLengthField = ValueField->GetLength();
     const bool failed = !ValueIO<ExplicitDataElement,TSwap,uint16_t>::Read(is,*ValueField,true);
     if (failed)
-	{
+    {
 #if 0
-		throw Exception("Exception");
+      throw Exception("Exception");
 #endif
-	}
+    }
     return is;
   }
 #endif
@@ -287,7 +287,7 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
     if(ValueLengthField != dummy)
     {
       mdcmWarningMacro("ValueLengthField was bogus");
-	  assert(0);
+      assert(0);
       ValueLengthField = dummy;
     }
 #else
