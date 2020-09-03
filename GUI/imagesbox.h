@@ -71,7 +71,6 @@ private slots:
 
 private:
 	QMap<char,QString> map;
-	int     get_orientation_image_index(const QString&);
 	QString get_orientation_image(const QString&);
 };
 

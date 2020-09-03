@@ -96,7 +96,7 @@ public:
   MDCM_STATIC_ASSERT(((((VR::VRType)TVR & VR::VR_VM1) && ((VM::VMType)TVM == VM::VM1)) || !((VR::VRType)TVR & VR::VR_VM1)));
   static Tag GetTag() { return Tag(Group,Element); }
   static VR  GetVR()  { return (VR::VRType)TVR; }
-  static VM  GetVM(  ){ return (VM::VMType)TVM; }
+  static VM  GetVM()  { return (VM::VMType)TVM; }
   // The following two methods do make sense only in case of public element,
   // when the template is intanciated with private element the VR/VM are simply
   // defaulted to allow everything (see mdcmTagToType.h default template for TagToType)
@@ -268,8 +268,8 @@ public:
   // The following two methods do make sense only in case of public element,
   // when the template is intanciated with private element the VR/VM are simply
   // defaulted to allow everything (see mdcmTagToType.h default template for TagToType)
-  static VR  GetDictVR() { return (VR::VRType)(TagToType<Group, Element>::VRType); }
-  static VM  GetDictVM() { return (VM::VMType)(TagToType<Group, Element>::VMType); }
+  static VR GetDictVR() { return (VR::VRType)(TagToType<Group, Element>::VRType); }
+  static VM GetDictVM() { return (VM::VMType)(TagToType<Group, Element>::VMType); }
   unsigned int GetNumberOfValues() const {
     return VMToLength<VM::VM1>::Length;
 }
@@ -577,42 +577,42 @@ template<uint16_t Group, uint16_t Element, long long TVR>
 class Attribute<Group,Element,TVR,VM::VM1_3> : public Attribute<Group,Element,TVR,VM::VM1_n>
 {
 public:
-  VM  GetVM() const { return VM::VM1_3; }
+  VM GetVM() const { return VM::VM1_3; }
 };
 
 template<uint16_t Group, uint16_t Element, long long TVR>
 class Attribute<Group,Element,TVR,VM::VM1_8> : public Attribute<Group,Element,TVR,VM::VM1_n>
 {
 public:
-  VM  GetVM() const { return VM::VM1_8; }
+  VM GetVM() const { return VM::VM1_8; }
 };
 
 template<uint16_t Group, uint16_t Element, long long TVR>
 class Attribute<Group,Element,TVR,VM::VM2_n> : public Attribute<Group,Element,TVR,VM::VM1_n>
 {
 public:
-  VM  GetVM() const { return VM::VM2_n; }
+  VM GetVM() const { return VM::VM2_n; }
 };
 
 template<uint16_t Group, uint16_t Element, long long TVR>
 class Attribute<Group,Element,TVR,VM::VM2_2n> : public Attribute<Group,Element,TVR,VM::VM2_n>
 {
 public:
-  static VM  GetVM() { return VM::VM2_2n; }
+  static VM GetVM() { return VM::VM2_2n; }
 };
 
 template<uint16_t Group, uint16_t Element, long long TVR>
 class Attribute<Group,Element,TVR,VM::VM3_n> : public Attribute<Group,Element,TVR,VM::VM1_n>
 {
 public:
-  static VM  GetVM() { return VM::VM3_n; }
+  static VM GetVM() { return VM::VM3_n; }
 };
 
 template<uint16_t Group, uint16_t Element, long long TVR>
 class Attribute<Group,Element,TVR,VM::VM3_3n> : public Attribute<Group,Element,TVR,VM::VM3_n>
 {
 public:
-  static VM  GetVM() { return VM::VM3_3n; }
+  static VM GetVM() { return VM::VM3_3n; }
 };
 
 } // namespace mdcm_ns

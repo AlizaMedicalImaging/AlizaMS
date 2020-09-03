@@ -18,8 +18,6 @@
 #include "itkImageSliceIteratorWithIndex.h"
 #include "itkResampleImageFilter.h"
 #include "itkIdentityTransform.h"
-#include <vnl/vnl_vector_fixed.h>
-#include <vnl/vnl_matrix_fixed.h>
 #include <QSet>
 #include <QApplication>
 #include <QFileInfo>
@@ -52,6 +50,17 @@ typedef itk::Image<RGBPixelD, 4> RGBImage4DTypeD;
 static QString screenshot_dir("");
 static QString save_dir("");
 static QString open_dir("");
+
+static double abs_max(double x, double y, double z)
+{
+	const double x_ = fabs(x);
+	const double y_ = fabs(y);
+	const double z_ = fabs(z);
+    double r;
+    r = (x_ > y_) ? x_ : y_;
+    r = (z_ > r)  ? z_ : r;
+    return r;
+}
 
 template<typename T> void calculate_min_max(
 	const typename T::Pointer & image,
@@ -199,23 +208,30 @@ template <typename T> void calculate_rgb_minmax_(
 	double min_r = std::numeric_limits<double>::max();
 	double min_g = std::numeric_limits<double>::max();
 	double min_b = std::numeric_limits<double>::max();
-	itk::ImageRegionConstIterator<T> iterator(image, region);
-	iterator.GoToBegin();
-	while(!iterator.IsAtEnd())
+	try
 	{
-		const double b =
-			static_cast<double>(iterator.Get().GetBlue());
-		const double g =
-			static_cast<double>(iterator.Get().GetGreen());
-		const double r =
-			static_cast<double>(iterator.Get().GetRed());
-		if (b > max_b) max_b = b;
-		if (g > max_g) max_g = g;
-		if (r > max_r) max_r = r;
-		if (b < min_b) min_b = b;
-		if (g < min_g) min_g = g;
-		if (r < min_r) min_r = r;
- 		++iterator;
+		itk::ImageRegionConstIterator<T> iterator(image, region);
+		iterator.GoToBegin();
+		while(!iterator.IsAtEnd())
+		{
+			const double b =
+				static_cast<double>(iterator.Get().GetBlue());
+			const double g =
+				static_cast<double>(iterator.Get().GetGreen());
+			const double r =
+				static_cast<double>(iterator.Get().GetRed());
+			if (b > max_b) max_b = b;
+			if (g > max_g) max_g = g;
+			if (r > max_r) max_r = r;
+			if (b < min_b) min_b = b;
+			if (g < min_g) min_g = g;
+			if (r < min_r) min_r = r;
+ 			++iterator;
+		}
+	}
+	catch (itk::ExceptionObject & ex)
+	{
+		std::cout << ex.GetDescription() << std::endl;
 	}
 	double min_ = std::numeric_limits<double>::max();
 	double mins[3];
@@ -254,27 +270,34 @@ template <typename T> void calculate_rgba_minmax_(
 	double min_g = std::numeric_limits<double>::max();
 	double min_b = std::numeric_limits<double>::max();
 	double min_a = std::numeric_limits<double>::max();
-	itk::ImageRegionConstIterator<T> iterator(image, region);
-	iterator.GoToBegin();
-	while(!iterator.IsAtEnd())
+	try
 	{
-		const double a =
-			static_cast<double>(iterator.Get().GetAlpha());
-		const double b =
-			static_cast<double>(iterator.Get().GetBlue());
-		const double g =
-			static_cast<double>(iterator.Get().GetGreen());
-		const double r =
-			static_cast<double>(iterator.Get().GetRed());
-		if (a > max_a) max_a = a;
-		if (b > max_b) max_b = b;
-		if (g > max_g) max_g = g;
-		if (r > max_r) max_r = r;
-		if (a < min_a) min_a = a;
-		if (b < min_b) min_b = b;
-		if (g < min_g) min_g = g;
-		if (r < min_r) min_r = r;
- 		++iterator;
+		itk::ImageRegionConstIterator<T> iterator(image, region);
+		iterator.GoToBegin();
+		while(!iterator.IsAtEnd())
+		{
+			const double a =
+				static_cast<double>(iterator.Get().GetAlpha());
+			const double b =
+				static_cast<double>(iterator.Get().GetBlue());
+			const double g =
+				static_cast<double>(iterator.Get().GetGreen());
+			const double r =
+				static_cast<double>(iterator.Get().GetRed());
+			if (a > max_a) max_a = a;
+			if (b > max_b) max_b = b;
+			if (g > max_g) max_g = g;
+			if (r > max_r) max_r = r;
+			if (a < min_a) min_a = a;
+			if (b < min_b) min_b = b;
+			if (g < min_g) min_g = g;
+			if (r < min_r) min_r = r;
+ 			++iterator;
+		}
+	}
+	catch (itk::ExceptionObject & ex)
+	{
+		std::cout << ex.GetDescription() << std::endl;
 	}
 	double min_ = std::numeric_limits<double>::max();
 	double mins[4];
@@ -1756,7 +1779,11 @@ QString CommonUtils::get_orientation2(const double * pat_orientation)
 	const bool print_oblique = false;
 	const char RAI_codes[3][2] = { {'R', 'L'}, {'A', 'P'}, {'I', 'S'} };
 	QString s("");
-	char rai[4]; rai[0] = 'x'; rai[1]= 'x'; rai[2]= 'x'; rai[3] = '\0';
+	char rai[4];
+	rai[0] = 'x';
+	rai[1] = 'x';
+	rai[2] = 'x';
+	rai[3] = '\0';
 	const double row_dircos_x = pat_orientation[0];
 	const double row_dircos_y = pat_orientation[1];
 	const double row_dircos_z = pat_orientation[2];
@@ -1767,17 +1794,31 @@ QString CommonUtils::get_orientation2(const double * pat_orientation)
 	const double nrm_dircos_y = row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
 	const double nrm_dircos_z = row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
 	bool oblique = false;
-	vnl_matrix_fixed<double, 3, 3> dir;
-	const vnl_vector_fixed<double,3> c0(row_dircos_x,row_dircos_y,row_dircos_z);
-	const vnl_vector_fixed<double,3> c1(col_dircos_x,col_dircos_y,col_dircos_z);
-	const vnl_vector_fixed<double,3> c2(nrm_dircos_x,nrm_dircos_y,nrm_dircos_z);
-	dir.set_column(0, c0);
-	dir.set_column(1, c1);
-	dir.set_column(2, c2);
 	for (int i = 0; i < 3; i++)
 	{
-		vnl_vector_fixed<double,3> dcos = dir.get_column(i);
-		const double dabsmax = dcos.inf_norm();
+		double dcos[] = { 0.0, 0.0, 0.0 };
+		double dabsmax = 0.0;
+		switch(i)
+		{
+		case 0:
+			dcos[0] = row_dircos_x;
+			dcos[1] = row_dircos_y;
+			dcos[2] = row_dircos_z;
+			dabsmax = abs_max(row_dircos_x,row_dircos_y,row_dircos_z);
+			break;
+		case 1:
+			dcos[0] = col_dircos_x;
+			dcos[1] = col_dircos_y;
+			dcos[2] = col_dircos_z;
+			dabsmax = abs_max(col_dircos_x,col_dircos_y,col_dircos_z);
+			break;
+		case 2:
+			dcos[0] = nrm_dircos_x;
+			dcos[1] = nrm_dircos_y;
+			dcos[2] = nrm_dircos_z;
+			dabsmax = abs_max(nrm_dircos_x,nrm_dircos_y,nrm_dircos_z);
+			break;
+		}
 		for(int j = 0; j < 3; j++)
 		{
 			double dabs = fabs(dcos[j]);

@@ -646,49 +646,6 @@ void ImagesBox::set_html(const ImageVariant * v)
 	textBrowser->ensureCursorVisible();
 }
 
-int ImagesBox::get_orientation_image_index(const QString & x)
-{
-	int j = -1;
-	if (x.isEmpty()) return -1;
-	const QByteArray rai = x.toUpper().toLatin1();
-	if (rai.size() < 3) return -1;
-	int tmap[3][3][3];
-	tmap[0][1][2] = 0; // RAI
-	tmap[0][2][1] = 1; // RIA
-	tmap[1][0][2] = 2; // ARI
-	tmap[1][2][0] = 3; // AIR
-	tmap[2][0][1] = 4; // IRA
-	tmap[2][1][0] = 5; // IAR
-	vnl_vector_fixed<int,3> rn;
-	vnl_vector_fixed<int,3> ra;
-	for (unsigned int i = 0; i < 3; i++)
-    {
-		switch(rai[i])
-		{
-		case 'R' : rn[i] =  1; break;
-		case 'L' : rn[i] = -1; break;
-		case 'A' : rn[i] =  2; break;
-		case 'P' : rn[i] = -2; break;
-		case 'I' : rn[i] =  3; break;
-		case 'S' : rn[i] = -3; break;
-		default: return -1;
-		}
-	}
-	ra = rn.apply(abs);
-	const int ra_0 = ra[0]-1;
-	const int ra_1 = ra[1]-1;
-	const int ra_2 = ra[2]-1;
-	if (
-		(ra_0 >= 0 && ra_0 < 3) &&
-		(ra_1 >= 0 && ra_1 < 3) &&
-		(ra_2 >= 0 && ra_2 < 3))
-	{
-		j = tmap[ra[0]-1][ra[1]-1][ra[2]-1];
-	}
-	else j = -1;
-	return j;
-}
-
 QString ImagesBox::get_orientation_image(const QString & rai)
 {
 	if (rai.isEmpty()) return QString("");

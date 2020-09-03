@@ -32,14 +32,14 @@ namespace mdcm_ns
 {
 
 /**
- * \brief EncodingImplementation
+ * EncodingImplementation
  *
  */
 
 template<long long T> class EncodingImplementation;
 
 /**
- *  \brief A class which is used to produce compile errors for an
+ * Class which is used to produce compile errors for an
  * invalid combination of template parameters.
  *
  * Invalid combinations have specialized declarations with no
@@ -48,11 +48,11 @@ template<long long T> class EncodingImplementation;
 template <long long TVR, int TVM>
 class ElementDisableCombinations {};
 template <>
-class  ElementDisableCombinations<VR::OB, VM::VM1_n> {};
+class ElementDisableCombinations<VR::OB, VM::VM1_n> {};
 template <>
-class  ElementDisableCombinations<VR::OW, VM::VM1_n> {};
+class ElementDisableCombinations<VR::OW, VM::VM1_n> {};
 template <int TVM>
-class  ElementDisableCombinations<VR::OB, TVM>;
+class ElementDisableCombinations<VR::OB, TVM>;
 template <int TVM>
 class ElementDisableCombinations<VR::OW, TVM>;
 
@@ -72,8 +72,8 @@ public:
   typename VRToType<TVR>::Type Internal[VMToLength<TVM>::Length];
   typedef typename VRToType<TVR>::Type Type;
 
-  static VR  GetVR()  { return (VR::VRType)TVR; }
-  static VM  GetVM()  { return (VM::VMType)TVM; }
+  static VR GetVR() { return (VR::VRType)TVR; }
+  static VM GetVM() { return (VM::VMType)TVM; }
 
   unsigned long GetLength() const
   {
