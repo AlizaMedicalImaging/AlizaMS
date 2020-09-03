@@ -4135,9 +4135,9 @@ void DicomUtils::enhanced_get_indices(
 	int mr_frame_type_idx = -1;
 	int mr_eff_echo_idx   = -1;
 	const size_t sq_size = sq.size();
-	size_t idx = 0;
-	for (; idx < sq_size; idx++)
+	for (int x = 0; x < (int)sq_size; x++)
 	{
+		const size_t idx = (size_t)x;
 		if (
 			sq.at(idx).group_pointer==mdcm::Tag(0x0020,0x9111) &&
 			sq.at(idx).index_pointer==mdcm::Tag(0x0020,0x9056))
@@ -4486,8 +4486,9 @@ void DicomUtils::enhanced_get_indices(
 			in_stack_pos_idx>=0)
 		{
 			int dim5th_tmp = -1;
-			for (idx = 0; idx < 3; idx++)
+			for (int x = 0; x < 3; x++)
 			{
+				const size_t idx = (size_t)x;
 				if (
 					sq.at(idx).group_pointer==mdcm::Tag(0x0020,0x9111) &&
 					sq.at(idx).index_pointer==mdcm::Tag(0x0020,0x9056))
@@ -4518,8 +4519,9 @@ void DicomUtils::enhanced_get_indices(
 			temporal_pos_idx>=0)
 		{
 			int dim6th_tmp = -1;
-			for (idx = 0; idx < 4; idx++)
+			for (int x = 0; x < 4; x++)
 			{
+				const size_t idx = (size_t)x;
 				if (
 					sq.at(idx).group_pointer==mdcm::Tag(0x0020,0x9111) &&
 					sq.at(idx).index_pointer==mdcm::Tag(0x0020,0x9056))

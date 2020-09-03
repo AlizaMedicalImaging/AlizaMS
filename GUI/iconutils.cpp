@@ -316,19 +316,27 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 		try { p = new unsigned char[size[0] * size[1] * 3]; }
 		catch (std::bad_alloc&) { p = NULL; }
 		if (!p) return;
-		unsigned long j_ = 0;
-		itk::ImageRegionConstIterator<Tout> iterator(tmp0, region);
-		iterator.GoToBegin();
-		while (!iterator.IsAtEnd())
+		try
 		{
-			p[j_ + 2] = static_cast<unsigned char>(
-				((double)iterator.Get().GetBlue()  / tmp_max) * 255.0);
-			p[j_ + 1] = static_cast<unsigned char>(
-				((double)iterator.Get().GetGreen() / tmp_max) * 255.0);
-			p[j_ + 0] = static_cast<unsigned char>(
-				((double)iterator.Get().GetRed()   / tmp_max) * 255.0);
-			j_ += 3;
-			++iterator;
+			unsigned long j_ = 0;
+			itk::ImageRegionConstIterator<Tout> iterator(tmp0, region);
+			iterator.GoToBegin();
+			while (!iterator.IsAtEnd())
+			{
+				p[j_ + 2] = static_cast<unsigned char>(
+					((double)iterator.Get().GetBlue()  / tmp_max) * 255.0);
+				p[j_ + 1] = static_cast<unsigned char>(
+					((double)iterator.Get().GetGreen() / tmp_max) * 255.0);
+				p[j_ + 0] = static_cast<unsigned char>(
+					((double)iterator.Get().GetRed()   / tmp_max) * 255.0);
+				j_ += 3;
+				++iterator;
+			}
+		}
+		catch(itk::ExceptionObject & ex)
+		{
+			std::cout << ex.GetDescription() << std::endl;
+			return;
 		}
 		QImage tmpi(p,size_[0],size_[1],3*size_[0],QImage::Format_RGB888);
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true,true);
@@ -401,19 +409,27 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 		try { p = new unsigned char[size_[0]*size_[1]*3]; }
 		catch(std::bad_alloc&) { p = NULL; }
 		if (!p) return;
-		unsigned long j_ = 0;
-		typename itk::ImageRegionConstIterator<Tout> iterator(tmp0, region);
-		iterator.GoToBegin();
-		while(!iterator.IsAtEnd())
+		try
 		{
-			const double b = static_cast<double>(iterator.Get().GetBlue());
-			const double g = static_cast<double>(iterator.Get().GetGreen());
-			const double r = static_cast<double>(iterator.Get().GetRed());
-			p[j_+2] = static_cast<unsigned char>(255.0*((b+(-vmin))/vrange));
-			p[j_+1] = static_cast<unsigned char>(255.0*((g+(-vmin))/vrange));
-			p[j_+0] = static_cast<unsigned char>(255.0*((r+(-vmin))/vrange));
-			j_ += 3;
- 			++iterator;
+			unsigned long j_ = 0;
+			itk::ImageRegionConstIterator<Tout> iterator(tmp0, region);
+			iterator.GoToBegin();
+			while(!iterator.IsAtEnd())
+			{
+				const double b = static_cast<double>(iterator.Get().GetBlue());
+				const double g = static_cast<double>(iterator.Get().GetGreen());
+				const double r = static_cast<double>(iterator.Get().GetRed());
+				p[j_+2] = static_cast<unsigned char>(255.0*((b+(-vmin))/vrange));
+				p[j_+1] = static_cast<unsigned char>(255.0*((g+(-vmin))/vrange));
+				p[j_+0] = static_cast<unsigned char>(255.0*((r+(-vmin))/vrange));
+				j_ += 3;
+ 				++iterator;
+			}
+		}
+		catch(itk::ExceptionObject & ex)
+		{
+			std::cout << ex.GetDescription() << std::endl;
+			return;
 		}
 		QImage tmpi(p,size_[0],size_[1],3*size_[0],QImage::Format_RGB888);
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true,true);
@@ -540,21 +556,29 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		try { p = new unsigned char[size[0] * size[1] * 4]; }
 		catch (std::bad_alloc&) { p = NULL; }
 		if (!p) return;
-		unsigned long j_ = 0;
-		itk::ImageRegionConstIterator<Tout> iterator(tmp0, region);
-		iterator.GoToBegin();
-		while (!iterator.IsAtEnd())
+		try
 		{
-			p[j_ + 3] = static_cast<unsigned char>(
-				((double)iterator.Get().GetAlpha() / tmp_max) * 255.0);
-			p[j_ + 2] = static_cast<unsigned char>(
-				((double)iterator.Get().GetBlue()  / tmp_max) * 255.0);
-			p[j_ + 1] = static_cast<unsigned char>(
-				((double)iterator.Get().GetGreen() / tmp_max) * 255.0);
-			p[j_ + 0] = static_cast<unsigned char>(
-				((double)iterator.Get().GetRed()   / tmp_max) * 255.0);
-			j_ += 4;
-			++iterator;
+			unsigned long j_ = 0;
+			itk::ImageRegionConstIterator<Tout> iterator(tmp0, region);
+			iterator.GoToBegin();
+			while (!iterator.IsAtEnd())
+			{
+				p[j_ + 3] = static_cast<unsigned char>(
+					((double)iterator.Get().GetAlpha() / tmp_max) * 255.0);
+				p[j_ + 2] = static_cast<unsigned char>(
+					((double)iterator.Get().GetBlue()  / tmp_max) * 255.0);
+				p[j_ + 1] = static_cast<unsigned char>(
+					((double)iterator.Get().GetGreen() / tmp_max) * 255.0);
+				p[j_ + 0] = static_cast<unsigned char>(
+					((double)iterator.Get().GetRed()   / tmp_max) * 255.0);
+				j_ += 4;
+				++iterator;
+			}
+		}
+		catch(itk::ExceptionObject & ex)
+		{
+			std::cout << ex.GetDescription() << std::endl;
+			return;
 		}
 		QImage tmpi(p,size_[0],size_[1],4*size_[0],QImage::Format_RGBA8888);
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true,true);
@@ -581,34 +605,42 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		try { p = new unsigned char[size[0] * size[1] * 3]; }
 		catch (std::bad_alloc&) { p = NULL; }
 		if (!p) return;
-		unsigned long j_ = 0;
-		itk::ImageRegionConstIterator<Tout> iterator(tmp0, region);
-		iterator.GoToBegin();
-		while (!iterator.IsAtEnd())
+		try
 		{
-			if (iterator.Get().GetAlpha()>0)
+			unsigned long j_ = 0;
+			itk::ImageRegionConstIterator<Tout> iterator(tmp0, region);
+			iterator.GoToBegin();
+			while (!iterator.IsAtEnd())
 			{
-				const double alpha = static_cast<double>(iterator.Get().GetAlpha())/tmp_max;
-				const double one_minus_alpha = 1.0 - alpha;
-				const double tmp_whi = one_minus_alpha*USHRT_MAX;
-				const double tmp_red = tmp_whi +
-					alpha*static_cast<double>(iterator.Get().GetRed());
-				const double tmp_gre = tmp_whi +
-					alpha*static_cast<double>(iterator.Get().GetGreen());
-				const double tmp_blu = tmp_whi +
-					alpha*static_cast<double>(iterator.Get().GetBlue());
-				p[j_ + 2] = static_cast<unsigned char>((tmp_blu/tmp_max) * 255.0);
-				p[j_ + 1] = static_cast<unsigned char>((tmp_gre/tmp_max) * 255.0);
-				p[j_ + 0] = static_cast<unsigned char>((tmp_red/tmp_max) * 255.0);
+				if (iterator.Get().GetAlpha()>0)
+				{
+					const double alpha = static_cast<double>(iterator.Get().GetAlpha())/tmp_max;
+					const double one_minus_alpha = 1.0 - alpha;
+					const double tmp_whi = one_minus_alpha*USHRT_MAX;
+					const double tmp_red = tmp_whi +
+						alpha*static_cast<double>(iterator.Get().GetRed());
+					const double tmp_gre = tmp_whi +
+						alpha*static_cast<double>(iterator.Get().GetGreen());
+					const double tmp_blu = tmp_whi +
+						alpha*static_cast<double>(iterator.Get().GetBlue());
+					p[j_ + 2] = static_cast<unsigned char>((tmp_blu/tmp_max) * 255.0);
+					p[j_ + 1] = static_cast<unsigned char>((tmp_gre/tmp_max) * 255.0);
+					p[j_ + 0] = static_cast<unsigned char>((tmp_red/tmp_max) * 255.0);
+				}
+				else
+				{
+					p[j_ + 2] = 255;
+					p[j_ + 1] = 255;
+					p[j_ + 0] = 255;
+				}
+				j_ += 3;
+				++iterator;
 			}
-			else
-			{
-				p[j_ + 2] = 255;
-				p[j_ + 1] = 255;
-				p[j_ + 0] = 255;
-			}
-			j_ += 3;
-			++iterator;
+		}
+		catch(itk::ExceptionObject & ex)
+		{
+			std::cout << ex.GetDescription() << std::endl;
+			return;
 		}
 		QImage tmpi(p,size_[0],size_[1],3*size_[0],QImage::Format_RGB888);
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true,true);
@@ -670,34 +702,42 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		try { p = new unsigned char[size[0]*size[1]*3]; }
 		catch (std::bad_alloc&) { p = NULL; }
 		if (!p) return;
-		unsigned long j_ = 0;
-		typename itk::ImageRegionConstIterator<Tout> iterator(tmp0, region);
-		iterator.GoToBegin();
-		while (!iterator.IsAtEnd())
+		try
 		{
-			if (iterator.Get().GetAlpha()>0)
+			unsigned long j_ = 0;
+			itk::ImageRegionConstIterator<Tout> iterator(tmp0, region);
+			iterator.GoToBegin();
+			while (!iterator.IsAtEnd())
 			{
-				const double a = static_cast<double>(iterator.Get().GetAlpha())/255.0;
-				const double one_minus_alpha = 1.0 - a;
-				const double tmp_whi = one_minus_alpha * 255.0;
-				const double tmp_red = tmp_whi +
-					a*static_cast<double>(iterator.Get().GetRed());
-				const double tmp_gre = tmp_whi +
-					a*static_cast<double>(iterator.Get().GetGreen());
-				const double tmp_blu = tmp_whi +
-					a*static_cast<double>(iterator.Get().GetBlue());
-				p[j_ + 2] = static_cast<unsigned char>(tmp_blu);
-				p[j_ + 1] = static_cast<unsigned char>(tmp_gre);
-				p[j_ + 0] = static_cast<unsigned char>(tmp_red);
+				if (iterator.Get().GetAlpha()>0)
+				{
+					const double a = static_cast<double>(iterator.Get().GetAlpha())/255.0;
+					const double one_minus_alpha = 1.0 - a;
+					const double tmp_whi = one_minus_alpha * 255.0;
+					const double tmp_red = tmp_whi +
+						a*static_cast<double>(iterator.Get().GetRed());
+					const double tmp_gre = tmp_whi +
+						a*static_cast<double>(iterator.Get().GetGreen());
+					const double tmp_blu = tmp_whi +
+						a*static_cast<double>(iterator.Get().GetBlue());
+					p[j_ + 2] = static_cast<unsigned char>(tmp_blu);
+					p[j_ + 1] = static_cast<unsigned char>(tmp_gre);
+					p[j_ + 0] = static_cast<unsigned char>(tmp_red);
+				}
+				else
+				{
+					p[j_ + 2] = 255;
+					p[j_ + 1] = 255;
+					p[j_ + 0] = 255;
+				}
+				j_ += 3;
+				++iterator;
 			}
-			else
-			{
-				p[j_ + 2] = 255;
-				p[j_ + 1] = 255;
-				p[j_ + 0] = 255;
-			}
-			j_ += 3;
-			++iterator;
+		}
+		catch(itk::ExceptionObject & ex)
+		{
+			std::cout << ex.GetDescription() << std::endl;
+			return;
 		}
 		QImage tmpi(p,size[0],size[1],3*size[0],QImage::Format_RGB888);
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true,true);
@@ -739,21 +779,29 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		try { p = new unsigned char[size[0]*size[1]*4]; }
 		catch(std::bad_alloc&) { p = NULL; }
 		if (!p) return;
-		unsigned long j_ = 0;
-		itk::ImageRegionConstIterator<Tout> iterator(tmp0, region);
-		iterator.GoToBegin();
-		while(!iterator.IsAtEnd())
+		try
 		{
-			const double a = static_cast<double>(iterator.Get().GetAlpha());
-			const double b = static_cast<double>(iterator.Get().GetBlue());
-			const double g = static_cast<double>(iterator.Get().GetGreen());
-			const double r = static_cast<double>(iterator.Get().GetRed());
-			p[j_+3] = static_cast<unsigned char>(255.0*((a+(-vmin))/vrange));
-			p[j_+2] = static_cast<unsigned char>(255.0*((b+(-vmin))/vrange));
-			p[j_+1] = static_cast<unsigned char>(255.0*((g+(-vmin))/vrange));
-			p[j_+0] = static_cast<unsigned char>(255.0*((r+(-vmin))/vrange));
-			j_ += 4;
- 			++iterator;
+			unsigned long j_ = 0;
+			itk::ImageRegionConstIterator<Tout> iterator(tmp0, region);
+			iterator.GoToBegin();
+			while(!iterator.IsAtEnd())
+			{
+				const double a = static_cast<double>(iterator.Get().GetAlpha());
+				const double b = static_cast<double>(iterator.Get().GetBlue());
+				const double g = static_cast<double>(iterator.Get().GetGreen());
+				const double r = static_cast<double>(iterator.Get().GetRed());
+				p[j_+3] = static_cast<unsigned char>(255.0*((a+(-vmin))/vrange));
+				p[j_+2] = static_cast<unsigned char>(255.0*((b+(-vmin))/vrange));
+				p[j_+1] = static_cast<unsigned char>(255.0*((g+(-vmin))/vrange));
+				p[j_+0] = static_cast<unsigned char>(255.0*((r+(-vmin))/vrange));
+				j_ += 4;
+ 				++iterator;
+			}
+		}
+		catch(itk::ExceptionObject & ex)
+		{
+			std::cout << ex.GetDescription() << std::endl;
+			return;
 		}
 		QImage tmpi(p,size[0],size[1],4*size[0],QImage::Format_RGBA8888);
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true,true);
@@ -780,25 +828,33 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		try { p = new unsigned char[size[0]*size[1]*3]; }
 		catch(std::bad_alloc&) { p = NULL; }
 		if (!p) return;
-		unsigned long j_ = 0;
-		itk::ImageRegionConstIterator<Tout> iterator(tmp0, region);
-		iterator.GoToBegin();
-		while(!iterator.IsAtEnd())
+		try
 		{
-			const double a = static_cast<double>(iterator.Get().GetAlpha());
-			const double b = static_cast<double>(iterator.Get().GetBlue());
-			const double g = static_cast<double>(iterator.Get().GetGreen());
-			const double r = static_cast<double>(iterator.Get().GetRed());
-			const double one_minus_alpha = 1.0 - ((a+(-vmin))/vrange);
-			const double tmp_whi = one_minus_alpha * 255.0;
-			const double tmp_red = tmp_whi + a*(255.0*((r+(-vmin))/vrange));
-			const double tmp_gre = tmp_whi + a*(255.0*((g+(-vmin))/vrange));
-			const double tmp_blu = tmp_whi + a*(255.0*((b+(-vmin))/vrange));
-			p[j_+2] = static_cast<unsigned char>(tmp_blu);
-			p[j_+1] = static_cast<unsigned char>(tmp_gre);
-			p[j_+0] = static_cast<unsigned char>(tmp_red);
-			j_ += 3;
- 			++iterator;
+			unsigned long j_ = 0;
+			itk::ImageRegionConstIterator<Tout> iterator(tmp0, region);
+			iterator.GoToBegin();
+			while(!iterator.IsAtEnd())
+			{
+				const double a = static_cast<double>(iterator.Get().GetAlpha());
+				const double b = static_cast<double>(iterator.Get().GetBlue());
+				const double g = static_cast<double>(iterator.Get().GetGreen());
+				const double r = static_cast<double>(iterator.Get().GetRed());
+				const double one_minus_alpha = 1.0 - ((a+(-vmin))/vrange);
+				const double tmp_whi = one_minus_alpha * 255.0;
+				const double tmp_red = tmp_whi + a*(255.0*((r+(-vmin))/vrange));
+				const double tmp_gre = tmp_whi + a*(255.0*((g+(-vmin))/vrange));
+				const double tmp_blu = tmp_whi + a*(255.0*((b+(-vmin))/vrange));
+				p[j_+2] = static_cast<unsigned char>(tmp_blu);
+				p[j_+1] = static_cast<unsigned char>(tmp_gre);
+				p[j_+0] = static_cast<unsigned char>(tmp_red);
+				j_ += 3;
+ 				++iterator;
+			}
+		}
+		catch(itk::ExceptionObject & ex)
+		{
+			std::cout << ex.GetDescription() << std::endl;
+			return;
 		}
 		QImage tmpi(p,size[0],size[1],3*size[0],QImage::Format_RGB888);
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true,true);

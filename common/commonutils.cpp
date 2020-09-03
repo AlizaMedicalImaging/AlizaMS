@@ -87,7 +87,7 @@ template<typename T> void calculate_min_max(
 	}
 	catch (itk::ExceptionObject & ex)
 	{
-		std::cout << ex << std::endl;
+		std::cout << ex.GetDescription() << std::endl;
 		return;
 	}
 	if (iv->di->maxwindow)
@@ -816,7 +816,7 @@ template<typename T> void read_geometry_from_image(
 		}
 		catch (itk::ExceptionObject & ex)
 		{
-			std::cout << ex << std::endl;
+			std::cout << ex.GetDescription() << std::endl;
 			continue;
 		}
 		float x0 = p0[0], y0 = p0[1], z0 = p0[2];
@@ -874,7 +874,7 @@ template<typename T> void calc_center_from_image(
 	}
 	catch (itk::ExceptionObject & ex)
 	{
-		std::cout << ex << std::endl;
+		std::cout << ex.GetDescription() << std::endl;
 		return;
 	}
 	sVector3 v0 = sVector3((float)origin[0], (float)origin[1], (float)origin[2]);
@@ -3135,7 +3135,10 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						p__ = new char[dimx*dimy*dimz*2];
 					}
-					catch (std::bad_alloc&) { return QString("std::bad_alloc"); }
+					catch (std::bad_alloc&)
+					{
+						return QString("std::bad_alloc");
+					}
 					if (!p__) return QString("p__ == NULL");
 					long inc = 0;
 					for (unsigned int z_ = 0; z_ < dimz; z_++)
@@ -3191,7 +3194,10 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						p__ = new char[dimx*dimy*dimz*4];
 					}
-					catch (std::bad_alloc&) { return QString("std::bad_alloc"); }
+					catch (std::bad_alloc&)
+					{
+						return QString("std::bad_alloc");
+					}
 					if (!p__) return QString("p__ == NULL");
 					long inc = 0;
 					for (unsigned int z_ = 0; z_ < dimz; z_++)
@@ -3247,7 +3253,10 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						p__ = new char[dimx*dimy*dimz*4];
 					}
-					catch (std::bad_alloc&) { return QString("std::bad_alloc"); }
+					catch (std::bad_alloc&)
+					{
+						return QString("std::bad_alloc");
+					}
 					if (!p__) return QString("p__ == NULL");
 					long inc = 0;
 					for (unsigned int z_ = 0; z_ < dimz; z_++)
@@ -3303,7 +3312,10 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						p__ = new char[dimx*dimy*dimz*8];
 					}
-					catch (std::bad_alloc&) { return QString("std::bad_alloc"); }
+					catch (std::bad_alloc&)
+					{
+						return QString("std::bad_alloc");
+					}
 					if (!p__) return QString("p__ == NULL");
 					long inc = 0;
 					for (unsigned int z_ = 0; z_ < dimz; z_++)
@@ -3359,7 +3371,10 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						p__ = new char[dimx*dimy*dimz*8];
 					}
-					catch (std::bad_alloc&) { return QString("std::bad_alloc"); }
+					catch (std::bad_alloc&)
+					{
+						return QString("std::bad_alloc");
+					}
 					if (!p__) return QString("p__ == NULL");
 					long inc = 0;
 					for (unsigned int z_ = 0; z_ < dimz; z_++)
@@ -3417,7 +3432,10 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						p__ = new char[dimx*dimy*dimz];
 					}
-					catch (std::bad_alloc&) { return QString("std::bad_alloc"); }
+					catch (std::bad_alloc&)
+					{
+						return QString("std::bad_alloc");
+					}
 					if (!p__) return QString("p__ == NULL");
 					long inc = 0;
 					for (unsigned int z_ = 0; z_ < dimz; z_++)
@@ -3476,7 +3494,10 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						p__ = new char[dimx*dimy*dimz*4];
 					}
-					catch (std::bad_alloc&) { return QString("std::bad_alloc"); }
+					catch (std::bad_alloc&)
+					{
+						return QString("std::bad_alloc");
+					}
 					if (!p__) return QString("p__ == NULL");
 					long inc = 0;
 					for (unsigned int z_ = 0; z_ < dimz; z_++)
@@ -3532,7 +3553,10 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						p__ = new char[dimx*dimy*dimz*8];
 					}
-					catch (std::bad_alloc&) { return QString("std::bad_alloc"); }
+					catch (std::bad_alloc&)
+					{
+						return QString("std::bad_alloc");
+					}
 					if (!p__) return QString("p__ == NULL");
 					long inc = 0;
 					for (unsigned int z_ = 0; z_ < dimz; z_++)
@@ -3597,7 +3621,10 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				{
 					p__ = new char[dimx*dimy*dimz*3];
 				}
-				catch (std::bad_alloc&) { return QString("std::bad_alloc"); }
+				catch (std::bad_alloc&)
+				{
+					return QString("std::bad_alloc");
+				}
 				if (!p__) return QString("p__ == NULL");
 				long inc = 0;
 				for (unsigned int z_ = 0; z_ < dimz; z_++)
@@ -3655,7 +3682,10 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				{
 					p__ = new char[dimx*dimy*dimz*6];
 				}
-				catch (std::bad_alloc&) { return QString("std::bad_alloc"); }
+				catch (std::bad_alloc&)
+				{
+					return QString("std::bad_alloc");
+				}
 				if (!p__) return QString("p__ == NULL");
 				long inc = 0;
 				for (unsigned int z_ = 0; z_ < dimz; z_++)
@@ -3713,7 +3743,10 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				{
 					p__ = new char[dimx*dimy*dimz*6];
 				}
-				catch (std::bad_alloc&) { return QString("std::bad_alloc"); }
+				catch (std::bad_alloc&)
+				{
+					return QString("std::bad_alloc");
+				}
 				if (!p__) return QString("p__ == NULL");
 				long inc = 0;
 				for (unsigned int z_ = 0; z_ < dimz; z_++)
@@ -3769,7 +3802,10 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				{
 					p__ = new char[dimx*dimy*dimz*12];
 				}
-				catch (std::bad_alloc&) { return QString("std::bad_alloc"); }
+				catch (std::bad_alloc&)
+				{
+					return QString("std::bad_alloc");
+				}
 				if (!p__) return QString("p__ == NULL");
 				long inc = 0;
 				for (unsigned int z_ = 0; z_ < dimz; z_++)
@@ -3845,7 +3881,10 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				{
 					p__ = new char[dimx*dimy*dimz*4];
 				}
-				catch (std::bad_alloc&) { return QString("std::bad_alloc"); }
+				catch (std::bad_alloc&)
+				{
+					return QString("std::bad_alloc");
+				}
 				if (!p__) return QString("p__ == NULL");
 				long inc = 0;
 				for (unsigned int z_ = 0; z_ < dimz; z_++)
