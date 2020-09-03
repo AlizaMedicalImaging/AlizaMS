@@ -48,9 +48,11 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
   }
   if(TagField == Tag(0xfffe,0xe0dd))
   {
+#if 0
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
+#endif
   }
   const Tag itemDelItem(0xfffe,0xe00d);
   if(TagField == itemDelItem)
@@ -84,7 +86,12 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
     ValueField->SetLength((int32_t)(e - s));
     ValueLengthField = ValueField->GetLength();
     const bool failed = !ValueIO<ExplicitDataElement,TSwap,uint16_t>::Read(is,*ValueField,true);
-    if (failed) { throw Exception("Exception"); }
+    if (failed)
+	{
+#if 0
+		throw Exception("Exception");
+#endif
+	}
     return is;
   }
 #endif
@@ -133,7 +140,9 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
 
     if(!ValueLengthField.Read<TSwap>(is))
     {
+#if 0
       throw Exception("Impossible");
+#endif
       return is;
     }
     if(ValueLengthField == 0)
@@ -265,7 +274,9 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
       else
 #endif
       {
+#if 0
         throw Exception("Should not happen (imp)");
+#endif
       }
       return is;
     }
@@ -275,7 +286,8 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
     VL dummy = ValueField->GetLength();
     if(ValueLengthField != dummy)
     {
-      mdcmWarningMacro("ValueLengthField was bogus"); assert(0);
+      mdcmWarningMacro("ValueLengthField was bogus");
+	  assert(0);
       ValueLengthField = dummy;
     }
 #else
@@ -288,9 +300,11 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
   // chances is that 99% of times there is now way we can reach here, so safely throw an exception
   if(TagField == Tag(0x0000,0x0000) && ValueLengthField == 0 && VRField == VR::INVALID)
   {
+#if 0
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
+#endif
   }
 #ifdef ELSCINT1_01F7_1070
   if(TagField == Tag(0x01f7,0x1070))
@@ -345,9 +359,11 @@ std::istream &ExplicitImplicitDataElement::ReadValue(std::istream &is, bool read
         // Must be one of those non-cp246 file,
         // but for some reason seekg back to previous offset + Read
         // as Explicit does not work
+#if 0
         ParseException pe;
         pe.SetLastElement(*this);
         throw pe;
+#endif
       }
       return is;
     }
@@ -450,9 +466,11 @@ std::istream &ExplicitImplicitDataElement::ReadValue(std::istream &is, bool read
 #endif
     {
       // Might be the famous UN 16bits
+#if 0
       ParseException pe;
       pe.SetLastElement(*this);
       throw pe;
+#endif
     }
     return is;
   }

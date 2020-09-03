@@ -1621,22 +1621,29 @@ QString apply_per_slice_rescale_(
 		size_[1] = size_y;
 		size_[2] = 1;
 		typename Tin::RegionType region;
-		region.SetIndex(index);
-		region.SetSize(size_);
-		itk::ImageRegionConstIterator<Tin> it0(image, region);
-		it0.GoToBegin();
-		itk::ImageRegionIterator<Tout> it1(out_image, region);
-		it1.GoToBegin();
-		while(!it0.IsAtEnd())
+		try
 		{
-			const typename Tin::PixelType v0 = it0.Get();
-			const typename Tout::PixelType v1 =
-				static_cast<typename Tout::PixelType>(
-					v0*rescale_values.at(x).second +
-					rescale_values.at(x).first);
-			it1.Set(v1);
-			++it0;
-			++it1;
+			region.SetIndex(index);
+			region.SetSize(size_);
+			itk::ImageRegionConstIterator<Tin> it0(image, region);
+			it0.GoToBegin();
+			itk::ImageRegionIterator<Tout> it1(out_image, region);
+			it1.GoToBegin();
+			while(!it0.IsAtEnd())
+			{
+				const typename Tin::PixelType v0 = it0.Get();
+				const typename Tout::PixelType v1 =
+					static_cast<typename Tout::PixelType>(
+						v0*rescale_values.at(x).second +
+						rescale_values.at(x).first);
+				it1.Set(v1);
+				++it0;
+				++it1;
+			}
+		}
+		catch(itk::ExceptionObject & ex)
+		{
+			return QString(ex.GetDescription());
 		}
 	}
 	image->DisconnectPipeline();
