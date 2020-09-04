@@ -85,7 +85,7 @@ public:
 		const mdcm::PixelFormat&,
 		const mdcm::PhotometricInterpretation&,
 		ImageVariant*,
-		itk::Matrix<double,3,3> &,
+		itk::Matrix<itk::SpacePrecisionType,3,3> &,
 		unsigned int, unsigned int, unsigned int,
 		double, double, double,
 		double, double, double,

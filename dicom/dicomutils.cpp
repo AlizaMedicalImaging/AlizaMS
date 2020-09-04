@@ -5031,7 +5031,7 @@ QString DicomUtils::read_enhanced(
 	FrameGroupValues values;
 	FrameGroupValues shared_values;
 	ImageOverlays image_overlays;
-	itk::Matrix<double,3,3> direction;
+	itk::Matrix<itk::SpacePrecisionType,3,3> direction;
 	mdcm::PhotometricInterpretation pi;
 	mdcm::PixelFormat pixelformat;
 	mdcm::Reader reader;
@@ -5342,7 +5342,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 	FrameGroupValues values;
 	FrameGroupValues shared_values;
 	ImageOverlays image_overlays; // unused
-	itk::Matrix<double,3,3> direction;
+	itk::Matrix<itk::SpacePrecisionType,3,3> direction;
 	mdcm::PhotometricInterpretation pi;
 	mdcm::PixelFormat pixelformat;
 	mdcm::Reader reader;
@@ -5657,7 +5657,7 @@ QString DicomUtils::read_ultrasound(
 	double spacing_x = 0.0, spacing_y = 0.0, spacing_z = 0.0;
 	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
 	std::vector<char*> data;
-	itk::Matrix<double,3,3> direction;
+	itk::Matrix<itk::SpacePrecisionType,3,3> direction;
 	mdcm::PixelFormat pixelformat;
 	mdcm::PhotometricInterpretation pi;
 	const mdcm::Tag tnumframes(0x0028,0x0008);
@@ -5864,7 +5864,7 @@ QString DicomUtils::read_series(
 	double spacing_x = 0.0, spacing_y = 0.0, spacing_z = 0.0;
 	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
 	std::vector<char*> data;
-	itk::Matrix<double,3,3> direction;
+	itk::Matrix<itk::SpacePrecisionType,3,3> direction;
 	mdcm::PixelFormat pixelformat;
 	mdcm::PixelFormat previous_pixelformat;
 	mdcm::PhotometricInterpretation pi;
@@ -7998,7 +7998,7 @@ QString DicomUtils::read_enhanced_common(
 			bool   equi_ = false;
 			bool   one_direction_ = false;
 			double origin_x_gen, origin_y_gen, origin_z_gen;
-			itk::Matrix<double,3,3> direction;
+			itk::Matrix<itk::SpacePrecisionType,3,3> direction;
 			double spacing_x, spacing_y, spacing_z;
 			double origin_x, origin_y, origin_z;
 			double spacing_z_tmp;
