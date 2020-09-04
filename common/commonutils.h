@@ -14,7 +14,6 @@
 #include <mdcmPixelFormat.h>
 #include <mdcmPhotometricInterpretation.h>
 #include <itkMatrix.h>
-#include <itkFloatTypes.h>
 #include <vector>
 #include <string>
 
@@ -86,7 +85,7 @@ public:
 		const mdcm::PixelFormat&,
 		const mdcm::PhotometricInterpretation&,
 		ImageVariant*,
-		itk::Matrix<itk::SpacePrecisionType,3,3> &,
+		itk::Matrix<double,3,3> &,
 		unsigned int, unsigned int, unsigned int,
 		double, double, double,
 		double, double, double,
