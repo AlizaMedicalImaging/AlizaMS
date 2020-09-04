@@ -13,6 +13,7 @@
 #include <mdcmDataSet.h>
 #include <mdcmPixelFormat.h>
 #include <mdcmPhotometricInterpretation.h>
+#include <itkFloatTypes.h>
 #include <itkMatrix.h>
 #include <vector>
 #include <string>
