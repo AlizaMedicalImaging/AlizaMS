@@ -31,8 +31,8 @@ protected:
   ~Command() {};
 
 private:
-  Command(const Command &);  // Not implemented.
-  void operator=(const Command &);  // Not implemented.
+  Command(const Command &); //purposely not implemented
+  void operator=(const Command &); //purposely not implemented
 };
 
 template <class T>
@@ -66,7 +66,7 @@ public:
 
   virtual void Execute(Subject * caller, const Event & event)
   {
-    if(m_MemberFunction)
+    if(m_This && m_MemberFunction)
     {
       ((*m_This).*(m_MemberFunction))(caller, event);
     }
@@ -74,7 +74,7 @@ public:
 
   virtual void Execute(const Subject * caller, const Event & event)
   {
-    if(m_ConstMemberFunction)
+    if(m_This && m_MemberFunction)
     {
       ((*m_This).*(m_ConstMemberFunction))(caller, event);
     }
@@ -84,13 +84,12 @@ protected:
   T * m_This;
   TMemberFunctionPointer m_MemberFunction;
   TConstMemberFunctionPointer m_ConstMemberFunction;
-  MemberCommand() : m_MemberFunction(0),m_ConstMemberFunction(0) {}
-  virtual ~MemberCommand(){}
+  MemberCommand() : m_This(NULL),m_MemberFunction(0),m_ConstMemberFunction(0) {}
+  virtual ~MemberCommand() {}
 
 private:
   MemberCommand(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
-
 };
 
 
@@ -116,7 +115,7 @@ public:
 
   virtual void Execute(Subject *,const Event &)
   {
-    if(m_MemberFunction)
+    if(m_This && m_MemberFunction)
     {
       ((*m_This).*(m_MemberFunction))();
     }
@@ -124,7 +123,7 @@ public:
 
   virtual void Execute(const Subject *,const Event &)
   {
-    if(m_MemberFunction)
+    if(m_This && m_MemberFunction)
     {
       ((*m_This).*(m_MemberFunction))();
     }
@@ -133,7 +132,7 @@ public:
 protected:
   T * m_This;
   TMemberFunctionPointer m_MemberFunction;
-  SimpleMemberCommand() : m_This(0),m_MemberFunction(0) {}
+  SimpleMemberCommand() : m_This(NULL),m_MemberFunction(0) {}
   virtual ~SimpleMemberCommand() {}
 
 private:

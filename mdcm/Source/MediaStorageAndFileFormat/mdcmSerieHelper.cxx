@@ -25,7 +25,6 @@ namespace mdcm
 
 SerieHelper::SerieHelper()
 {
-  Trace::WarningOff();
   UseSeriesDetails = false;
   Clear();
   UserLessThanFunction = nullptr;

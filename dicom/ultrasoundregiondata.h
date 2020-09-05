@@ -17,12 +17,26 @@ public:
 		m_PhysicalDeltaX(1.0),
 		m_PhysicalDeltaY(1.0),
 		m_PixelComponentOrganizationBool(false),
+		m_PixelComponentOrganization(0),
 		m_TMLineBool(false),
 		m_UnitXString(QString("")),
 		m_UnitYString(QString("")),
 		m_SpatialFormatString(QString("")),
 		m_DataTypeString(QString("")),
-		m_PixelComponentOrganizationString(QString(""))
+		m_PixelComponentOrganizationString(QString("")),
+		m_X0(0),
+		m_Y0(0),
+		m_X1(0),
+		m_Y1(0),
+		m_RegionFlags(0),
+		m_ReferencePixelX0(0),
+		m_ReferencePixelY0(0),
+		m_ReferencePixelPhysicalValueX(0.0),
+		m_ReferencePixelPhysicalValueY(0.0),
+		m_TMLinePositionX0(0),
+		m_TMLinePositionY0(0),
+		m_TMLinePositionX1(0),
+		m_TMLinePositionY1(0)
 	{
 	}
 	~UltrasoundRegionData()
