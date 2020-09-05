@@ -21,7 +21,6 @@
 #include <itkImageRegionIterator.h>
 #include <itkImageRegionConstIterator.h>
 #include <itkByteSwapper.h>
-#include <itkMatrix.h>
 #include <itkMath.h>
 #include "mdcmReader.h"
 #include "mdcmFile.h"

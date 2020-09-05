@@ -15,7 +15,6 @@
 #include "mdcmDataElement.h"
 #include "mdcmDataSet.h"
 #include "mdcmAttribute.h"
-
 #include <vector>
 
 namespace mdcm
@@ -31,18 +30,21 @@ public:
   TypeOfData(),
   CurveDescription(),
   DataValueRepresentation(0),
-  Data() {}
-
+  CoordinateStartValue(0),
+  CoordinateStepValue(0),
+  Data()
+  {
+  }
   unsigned short Group;
   unsigned short Dimensions;
   unsigned short NumberOfPoints;
   std::string TypeOfData;
   std::string CurveDescription;
   unsigned short DataValueRepresentation;
-  std::vector<char> Data;
-  std::vector<unsigned short> CurveDataDescriptor;
   unsigned short CoordinateStartValue;
   unsigned short CoordinateStepValue;
+  std::vector<char> Data;
+  std::vector<unsigned short> CurveDataDescriptor;
   void Print(std::ostream & os) const
   {
     os << "Group           0x" <<  std::hex << Group << std::dec << std::endl;
@@ -64,15 +66,15 @@ Curve::Curve()
   Internal = new CurveInternal;
 }
 
-Curve::~Curve()
-{
-  delete Internal;
-}
-
 Curve::Curve(Curve const & ov) : Object(ov)
 {
   Internal = new CurveInternal;
   *Internal = *ov.Internal;
+}
+
+Curve::~Curve()
+{
+  delete Internal;
 }
 
 void Curve::Print(std::ostream & os) const

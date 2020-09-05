@@ -16,7 +16,6 @@
 
 #include "mdcmTypes.h"
 #include "mdcmObject.h"
-
 #include <vector>
 
 namespace mdcm
@@ -27,8 +26,7 @@ class ByteValue;
 class DataSet;
 class DataElement;
 /**
- * \brief Curve class to handle element 50xx,3000 Curve Data
- * \details  
+ * Curve class to handle element 50xx,3000 Curve Data
  *  WARNING: This is deprecated and lastly defined in PS 3.3 - 2004
  *
  *  Examples:
@@ -41,43 +39,35 @@ class MDCM_EXPORT Curve : public Object
 {
 public:
   Curve();
+  Curve(Curve const &);
   ~Curve();
   void Print(std::ostream &) const;
-
-  void GetAsPoints(float *array) const;
-
-  static unsigned int GetNumberOfCurves(DataSet const & ds);
-
-  // Update curve data from dataelmenet de:
-  void Update(const DataElement & de);
-
-  void SetGroup(unsigned short group);
+  void GetAsPoints(float *) const;
+  static unsigned int GetNumberOfCurves(DataSet const &);
+  void Update(const DataElement &);
+  void SetGroup(unsigned short);
   unsigned short GetGroup() const;
-  void SetDimensions(unsigned short dimensions);
+  void SetDimensions(unsigned short);
   unsigned short GetDimensions() const;
-  void SetNumberOfPoints(unsigned short numberofpoints);
+  void SetNumberOfPoints(unsigned short);
   unsigned short GetNumberOfPoints() const;
-  void SetTypeOfData(const char *typeofdata);
+  void SetTypeOfData(const char *);
   const char *GetTypeOfData() const;
   // See PS 3.3 - 2004 - C.10.2.1.1 Type of data
   const char *GetTypeOfDataDescription() const;
-  void SetCurveDescription(const char *curvedescription);
-  void SetDataValueRepresentation(unsigned short datavaluerepresentation);
+  void SetCurveDescription(const char *);
+  void SetDataValueRepresentation(unsigned short);
   unsigned short GetDataValueRepresentation() const;
-  void SetCurveDataDescriptor(const uint16_t * values, size_t num);
+  void SetCurveDataDescriptor(const uint16_t *, size_t);
   std::vector<unsigned short> const &GetCurveDataDescriptor() const;
-  void SetCoordinateStartValue( unsigned short v );
-  void SetCoordinateStepValue( unsigned short v );
-
-  void SetCurve(const char *array, unsigned int length);
-
+  void SetCoordinateStartValue(unsigned short);
+  void SetCoordinateStepValue(unsigned short);
+  void SetCurve(const char *, unsigned int);
   bool IsEmpty() const;
+  void Decode(std::istream &, std::ostream &);
 
-  void Decode(std::istream &is, std::ostream &os);
-
-  Curve(Curve const &ov);
 private:
-  double ComputeValueFromStartAndStep(unsigned int idx) const;
+  double ComputeValueFromStartAndStep(unsigned int) const;
   CurveInternal *Internal;
 };
 
