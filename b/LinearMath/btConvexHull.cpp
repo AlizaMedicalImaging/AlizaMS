@@ -1090,7 +1090,7 @@ void HullLibrary::BringOutYourDead(const btVector3 *verts, unsigned int vcount, 
 	{
 		unsigned int v = indices[i];  // original array index
 
-		if (v >= 0 && v < vcount)
+		if (v < vcount)
 		{
 			if (usedIndices[static_cast<int>(v)])  // if already remapped
 			{
