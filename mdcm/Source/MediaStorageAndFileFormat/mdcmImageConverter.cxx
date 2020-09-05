@@ -19,6 +19,7 @@ namespace mdcm
 
 ImageConverter::ImageConverter()
 {
+  Input = NULL;
   Output = new Image;
 }
 
