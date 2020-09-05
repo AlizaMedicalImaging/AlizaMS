@@ -1417,8 +1417,8 @@ void btCollisionWorld::debugDrawObject(const btTransform& worldTransform, const 
 									getDebugDrawer()->drawLine(worldTransform * poly->m_vertices[lastV], worldTransform * poly->m_vertices[curVert], color);
 									lastV = curVert;
 								}
+								centroid *= btScalar(1.f) / btScalar(numVerts);
 							}
-							centroid *= btScalar(1.f) / btScalar(numVerts);
 							if (getDebugDrawer()->getDebugMode() & btIDebugDraw::DBG_DrawNormals)
 							{
 								btVector3 normalColor(1, 1, 0);

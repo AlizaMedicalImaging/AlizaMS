@@ -458,8 +458,8 @@ public:
 		memcpy(buffer, "BULLETf", 7);
 #endif  //BT_USE_DOUBLE_PRECISION
 
-		int littleEndian = 1;
-		littleEndian = ((char*)&littleEndian)[0];
+		int littleEndian0 = 1;
+		int littleEndian = ((char*)&littleEndian0)[0];
 
 		if (sizeof(void*) == 8)
 		{

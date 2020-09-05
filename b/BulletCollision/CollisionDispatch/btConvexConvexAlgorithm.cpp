@@ -554,7 +554,7 @@ void btConvexConvexAlgorithm ::processCollision(const btCollisionObjectWrapper* 
 					btScalar maxDist = threshold;
 
 					bool foundSepAxis = false;
-					bool useSatSepNormal = true;
+					const bool useSatSepNormal = true;
 
 					if (useSatSepNormal)
 					{

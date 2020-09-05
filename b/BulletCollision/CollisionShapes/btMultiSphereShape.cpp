@@ -78,7 +78,7 @@ btVector3 btMultiSphereShape::localGetSupportingVertexWithoutMargin(const btVect
 			rad++;
 		}
 		long i = vec.maxDot(temp, inner_count, newDot);
-		if (newDot > maxDot)
+		if (newDot > maxDot && i >= 0)
 		{
 			maxDot = newDot;
 			supVec = temp[i];
@@ -114,7 +114,7 @@ void btMultiSphereShape::batchedUnitVectorGetSupportingVertexWithoutMargin(const
 				rad++;
 			}
 			long i = vec.maxDot(temp, inner_count, newDot);
-			if (newDot > maxDot)
+			if (newDot > maxDot && i >= 0)
 			{
 				maxDot = newDot;
 				supportVerticesOut[j] = temp[i];

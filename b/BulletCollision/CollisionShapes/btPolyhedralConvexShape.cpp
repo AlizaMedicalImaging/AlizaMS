@@ -412,7 +412,7 @@ btVector3 btPolyhedralConvexShape::localGetSupportingVertexWithoutMargin(const b
 		for (i = 0; i < inner_count; i++)
 			getVertex(i, temp[i]);
 		i = (int)vec.maxDot(temp, inner_count, newDot);
-		if (newDot > maxDot)
+		if (newDot > maxDot && i >= 0)
 		{
 			maxDot = newDot;
 			supVec = temp[i];

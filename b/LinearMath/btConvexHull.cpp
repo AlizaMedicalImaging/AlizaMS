@@ -1090,31 +1090,32 @@ void HullLibrary::BringOutYourDead(const btVector3 *verts, unsigned int vcount, 
 	{
 		unsigned int v = indices[i];  // original array index
 
-		btAssert(v >= 0 && v < vcount);
-
-		if (usedIndices[static_cast<int>(v)])  // if already remapped
+		if (v >= 0 && v < vcount)
 		{
-			indices[i] = usedIndices[static_cast<int>(v)] - 1;  // index to new array
-		}
-		else
-		{
-			indices[i] = ocount;  // new index mapping
-
-			overts[ocount][0] = verts[v][0];  // copy old vert to new vert array
-			overts[ocount][1] = verts[v][1];
-			overts[ocount][2] = verts[v][2];
-
-			for (int k = 0; k < m_vertexIndexMapping.size(); k++)
+			if (usedIndices[static_cast<int>(v)])  // if already remapped
 			{
-				if (tmpIndices[k] == int(v))
-					m_vertexIndexMapping[k] = ocount;
+				indices[i] = usedIndices[static_cast<int>(v)] - 1;  // index to new array
 			}
+			else
+			{
+				indices[i] = ocount;  // new index mapping
 
-			ocount++;  // increment output vert count
+				overts[ocount][0] = verts[v][0];  // copy old vert to new vert array
+				overts[ocount][1] = verts[v][1];
+				overts[ocount][2] = verts[v][2];
 
-			btAssert(ocount >= 0 && ocount <= vcount);
+				for (int k = 0; k < m_vertexIndexMapping.size(); k++)
+				{
+					if (tmpIndices[k] == int(v))
+						m_vertexIndexMapping[k] = ocount;
+				}
 
-			usedIndices[static_cast<int>(v)] = ocount;  // assign new index remapping
+				ocount++;  // increment output vert count
+
+				btAssert(ocount >= 0 && ocount <= vcount);
+
+				usedIndices[static_cast<int>(v)] = ocount;  // assign new index remapping
+			}
 		}
 	}
 }
