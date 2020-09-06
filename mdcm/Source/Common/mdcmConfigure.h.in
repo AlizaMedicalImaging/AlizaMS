@@ -91,7 +91,7 @@
 
 #cmakedefine MDCM_BUILD_SHARED_LIBS
 
-/* MDCMuses __FUNCTION__ which is not ANSI C, but C99 */
+/* MDCM uses __FUNCTION__ which is not ANSI C, but C99 */
 #cmakedefine MDCM_CXX_HAS_FUNCTION
 
 #cmakedefine MDCM_HAVE_SYS_TIME_H
