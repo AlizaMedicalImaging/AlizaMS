@@ -236,7 +236,7 @@ int maxdirsterid(const T *p, int count, const T &dir, btAlignedObjectArray<int> 
 	while (m == -1)
 	{
 		m = maxdirfiltered(p, count, dir, allow);
-		if (m >= 0 && allow[m] == 3) return m;
+		if (allow[m] == 3) return m;
 		T u = orth(dir);
 		T v = btCross(u, dir);
 		int ma = -1;
@@ -245,7 +245,7 @@ int maxdirsterid(const T *p, int count, const T &dir, btAlignedObjectArray<int> 
 			btScalar s = btSin(SIMD_RADS_PER_DEG * (x));
 			btScalar c = btCos(SIMD_RADS_PER_DEG * (x));
 			int mb = maxdirfiltered(p, count, dir + (u * s + v * c) * btScalar(0.025), allow);
-			if (m >= 0 && ma == m && mb == m)
+			if (ma == m && mb == m)
 			{
 				allow[m] = 3;
 				return m;
@@ -258,7 +258,7 @@ int maxdirsterid(const T *p, int count, const T &dir, btAlignedObjectArray<int> 
 					btScalar s = btSin(SIMD_RADS_PER_DEG * (xx));
 					btScalar c = btCos(SIMD_RADS_PER_DEG * (xx));
 					int md = maxdirfiltered(p, count, dir + (u * s + v * c) * btScalar(0.025), allow);
-					if (m >= 0 && mc == m && md == m)
+					if (mc == m && md == m)
 					{
 						allow[m] = 3;
 						return m;
@@ -268,9 +268,11 @@ int maxdirsterid(const T *p, int count, const T &dir, btAlignedObjectArray<int> 
 			}
 			ma = mb;
 		}
-		if (m >= 0) allow[m] = 0;
+		allow[m] = 0;
 		m = -1;
 	}
+	btAssert(0);
+	return m;
 }
 
 int operator==(const int3 &a, const int3 &b);
@@ -1088,32 +1090,31 @@ void HullLibrary::BringOutYourDead(const btVector3 *verts, unsigned int vcount, 
 	{
 		unsigned int v = indices[i];  // original array index
 
-		if (v < vcount)
+		btAssert(v >= 0 && v < vcount);
+
+		if (usedIndices[static_cast<int>(v)])  // if already remapped
 		{
-			if (usedIndices[static_cast<int>(v)])  // if already remapped
+			indices[i] = usedIndices[static_cast<int>(v)] - 1;  // index to new array
+		}
+		else
+		{
+			indices[i] = ocount;  // new index mapping
+
+			overts[ocount][0] = verts[v][0];  // copy old vert to new vert array
+			overts[ocount][1] = verts[v][1];
+			overts[ocount][2] = verts[v][2];
+
+			for (int k = 0; k < m_vertexIndexMapping.size(); k++)
 			{
-				indices[i] = usedIndices[static_cast<int>(v)] - 1;  // index to new array
+				if (tmpIndices[k] == int(v))
+					m_vertexIndexMapping[k] = ocount;
 			}
-			else
-			{
-				indices[i] = ocount;  // new index mapping
 
-				overts[ocount][0] = verts[v][0];  // copy old vert to new vert array
-				overts[ocount][1] = verts[v][1];
-				overts[ocount][2] = verts[v][2];
+			ocount++;  // increment output vert count
 
-				for (int k = 0; k < m_vertexIndexMapping.size(); k++)
-				{
-					if (tmpIndices[k] == int(v))
-						m_vertexIndexMapping[k] = ocount;
-				}
+			btAssert(ocount >= 0 && ocount <= vcount);
 
-				ocount++;  // increment output vert count
-
-				btAssert(ocount >= 0 && ocount <= vcount);
-
-				usedIndices[static_cast<int>(v)] = ocount;  // assign new index remapping
-			}
+			usedIndices[static_cast<int>(v)] = ocount;  // assign new index remapping
 		}
 	}
 }
