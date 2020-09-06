@@ -1,6 +1,6 @@
 /*********************************************************
  *
- * MDCM 
+ * MDCM
  *
  * Modifications github.com/issakomi
  *
@@ -30,9 +30,9 @@ namespace mdcm_ns
 {
   class StreamImageReader;
 /**
- * \brief Reader ala DOM (Document Object Model)
+ * Reader ala DOM (Document Object Model)
  *
- * \details This class is a non-validating reader, it will only performs well-
+ * This class is a non-validating reader, it will only performs well-
  * formedness check only, and to some extent catch known error (non
  * well-formed document).
  *
@@ -46,17 +46,8 @@ namespace mdcm_ns
  * be able to read a DataSet if the IOD was not found Instead we separate the
  * reading from the validation.
  *
- * \note
- * From MDCM1.x. Users will realize that one feature is missing
- * from this DOM implementation. In MDCM 1.x user used to be able to
- * control the size of the Value to be read. By default it was 0xfff.
- * The main author of MDCM2 thought this was too dangerous and harmful and
- * therefore this feature did not make it into MDCM2
- *
- * \warning
  * MDCM will not produce warning for unorder (non-alphabetical order).
  *
- * \see Writer FileMetaInformation DataSet File
  */
 class MDCM_EXPORT Reader
 {
@@ -64,45 +55,44 @@ public:
   Reader();
   virtual ~Reader();
 
-  /// Main function to read a file
+  // Main function to read a file
   virtual bool Read(); // Execute()
 
-  /// Set the filename to open. This will create a std::ifstream internally
-  /// See SetStream if you are dealing with different std::istream object
+  // Set the filename to open. This will create a std::ifstream internally
+  // See SetStream if you are dealing with different std::istream object
   void SetFileName(const char*);
   void SetFileNameUTF8(const char*);
 
-  /// Set the open-ed stream directly
+  // Set the open-ed stream directly
   void SetStream(std::istream & input_stream)
   {
     Stream = &input_stream;
   }
 
-  /// Set/Get File
+  // Set/Get File
   const File & GetFile() const { return *F; }
 
-  /// Set/Get File
+  // Set/Get File
   File & GetFile() { return *F; }
 
-  /// Set/Get File
+  // Set/Get File
   void SetFile(File & file) { F = &file; }
 
-  /// Will read only up to Tag \param tag and skipping any tag specified in
-  /// \param skiptags
+  // Will read only up to Tag \param tag and skipping any tag specified in
   bool ReadUpToTag(const Tag & tag, std::set<Tag> const & skiptags = std::set<Tag>() );
 
-  /// Will only read the specified selected tags.
+  // Will only read the specified selected tags.
   bool ReadSelectedTags(std::set<Tag> const & tags, bool readvalues = true);
 
-  /// Will only read the specified selected private tags.
+  // Will only read the specified selected private tags.
   bool ReadSelectedPrivateTags(std::set<PrivateTag> const & ptags, bool readvalues = true);
 
-  /// Test whether this is a DICOM file
-  /// \warning need to call either SetFileName or SetStream first
+  // Test whether this is a DICOM file,
+  // need to call either SetFileName or SetStream first
   bool CanRead() const;
 
-  /// For wrapped language. return type is compatible with System::FileSize return type
-  /// Use native std::streampos / std::streamoff directly from the stream from C++
+  // For wrapped language. return type is compatible with System::FileSize return type
+  // Use native std::streampos / std::streamoff directly from the stream from C++
   size_t GetStreamCurrentPosition() const;
 
 protected:
