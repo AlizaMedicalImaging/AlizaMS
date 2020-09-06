@@ -2,6 +2,14 @@
 // GENERATED FILE DO NOT EDIT
 // $ xsltproc TagToVR.xsl Part6.xml > mdcmTagToVR.cxx
 
+/*********************************************************
+ *
+ * MDCM 
+ *
+ * Modifications github.com/issakomi
+ *
+ *********************************************************/
+
 /*=========================================================================
 
   Program: GDCM (Grassroots DICOM). A DICOM library

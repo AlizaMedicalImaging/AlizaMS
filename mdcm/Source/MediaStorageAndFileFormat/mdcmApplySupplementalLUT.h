@@ -1,3 +1,11 @@
+/*********************************************************
+ *
+ * MDCM 
+ *
+ * github.com/issakomi
+ *
+ *********************************************************/
+
 #ifndef MDCMAPPLYSUPPLEMENTALLUT_H
 #define MDCMAPPLYSUPPLEMENTALLUT_H
 

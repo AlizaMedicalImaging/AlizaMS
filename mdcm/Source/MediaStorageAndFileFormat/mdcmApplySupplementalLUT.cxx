@@ -1,3 +1,11 @@
+/*********************************************************
+ *
+ * MDCM 
+ *
+ * github.com/issakomi
+ *
+ *********************************************************/
+
 #include "mdcmApplySupplementalLUT.h"
 #include <climits>
 #include <limits>

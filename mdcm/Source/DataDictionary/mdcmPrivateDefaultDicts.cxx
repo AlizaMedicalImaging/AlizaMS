@@ -2,6 +2,14 @@
 // GENERATED FILE DO NOT EDIT
 // $ xsltproc DefaultDicts.xsl DICOMV3.xml > mdcmDefaultDicts.cxx
 
+/*********************************************************
+ *
+ * MDCM 
+ *
+ * Modifications github.com/issakomi
+ *
+ *********************************************************/
+
 /*=========================================================================
 
   Program: GDCM (Grassroots DICOM). A DICOM library

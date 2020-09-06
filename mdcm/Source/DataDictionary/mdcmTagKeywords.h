@@ -1,6 +1,14 @@
 // GENERATED FILE DO NOT EDIT
 // $ xsltproc TagKeywords.xsl Part6.xml > mdcmTagKeywords.h
 
+/*********************************************************
+ *
+ * MDCM 
+ *
+ * Modifications github.com/issakomi
+ *
+ *********************************************************/
+
 /*=========================================================================
 
   Program: GDCM (Grassroots DICOM). A DICOM library

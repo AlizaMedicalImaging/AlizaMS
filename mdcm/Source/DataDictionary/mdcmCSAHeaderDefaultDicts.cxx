@@ -2,6 +2,14 @@
 // GENERATED FILE DO NOT EDIT
 // $ xsltproc CSADefaultDicts.xsl CSAHeader.xml > mdcmCSAHeaderDefaultDicts.cxx
 
+/*********************************************************
+ *
+ * MDCM 
+ *
+ * Modifications github.com/issakomi
+ *
+ *********************************************************/
+
 /*=========================================================================
 
   Program: GDCM (Grassroots DICOM). A DICOM library
