@@ -236,7 +236,7 @@ int maxdirsterid(const T *p, int count, const T &dir, btAlignedObjectArray<int> 
 	while (m == -1)
 	{
 		m = maxdirfiltered(p, count, dir, allow);
-		if (allow[m] == 3) return m;
+		if (m >= 0 && allow[m] == 3) return m;
 		T u = orth(dir);
 		T v = btCross(u, dir);
 		int ma = -1;
@@ -245,7 +245,7 @@ int maxdirsterid(const T *p, int count, const T &dir, btAlignedObjectArray<int> 
 			btScalar s = btSin(SIMD_RADS_PER_DEG * (x));
 			btScalar c = btCos(SIMD_RADS_PER_DEG * (x));
 			int mb = maxdirfiltered(p, count, dir + (u * s + v * c) * btScalar(0.025), allow);
-			if (ma == m && mb == m)
+			if (m >= 0 && ma == m && mb == m)
 			{
 				allow[m] = 3;
 				return m;
@@ -258,7 +258,7 @@ int maxdirsterid(const T *p, int count, const T &dir, btAlignedObjectArray<int> 
 					btScalar s = btSin(SIMD_RADS_PER_DEG * (xx));
 					btScalar c = btCos(SIMD_RADS_PER_DEG * (xx));
 					int md = maxdirfiltered(p, count, dir + (u * s + v * c) * btScalar(0.025), allow);
-					if (mc == m && md == m)
+					if (m >= 0 && mc == m && md == m)
 					{
 						allow[m] = 3;
 						return m;
@@ -268,11 +268,9 @@ int maxdirsterid(const T *p, int count, const T &dir, btAlignedObjectArray<int> 
 			}
 			ma = mb;
 		}
-		allow[m] = 0;
+		if (m >= 0) allow[m] = 0;
 		m = -1;
 	}
-	btAssert(0);
-	return m;
 }
 
 int operator==(const int3 &a, const int3 &b);

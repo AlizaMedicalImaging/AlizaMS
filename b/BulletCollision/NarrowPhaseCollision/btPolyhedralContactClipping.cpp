@@ -533,6 +533,7 @@ void btPolyhedralContactClipping::clipHullAgainstHull(const btVector3& separatin
 		}
 	}
 	worldVertsB1.resize(0);
+	if (closestFaceB >= 0)
 	{
 		const btFace& polyB = hullB.m_faces[closestFaceB];
 		const int numVertices = polyB.m_indices.size();

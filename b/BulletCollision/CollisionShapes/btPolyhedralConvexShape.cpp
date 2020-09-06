@@ -447,7 +447,7 @@ void btPolyhedralConvexShape::batchedUnitVectorGetSupportingVertexWithoutMargin(
 			for (i = 0; i < inner_count; i++)
 				getVertex(i, temp[i]);
 			i = (int)vec.maxDot(temp, inner_count, newDot);
-			if (newDot > supportVerticesOut[j][3])
+			if (newDot > supportVerticesOut[j][3] && i >= 0)
 			{
 				supportVerticesOut[j] = temp[i];
 				supportVerticesOut[j][3] = newDot;

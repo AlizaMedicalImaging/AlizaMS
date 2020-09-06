@@ -65,7 +65,7 @@ btVector3 btConvexHullShape::localGetSupportingVertexWithoutMargin(const btVecto
 	{
 		btVector3 scaled = vec * m_localScaling;
 		int index = (int)scaled.maxDot(&m_unscaledPoints[0], m_unscaledPoints.size(), maxDot);  // FIXME: may violate encapsulation of m_unscaledPoints
-		return m_unscaledPoints[index] * m_localScaling;
+		if (index >= 0) return m_unscaledPoints[index] * m_localScaling;
 	}
 
 	return supVec;
@@ -88,11 +88,20 @@ void btConvexHullShape::batchedUnitVectorGetSupportingVertexWithoutMargin(const 
 		if (0 < m_unscaledPoints.size())
 		{
 			int i = (int)vec.maxDot(&m_unscaledPoints[0], m_unscaledPoints.size(), newDot);
-			supportVerticesOut[j] = getScaledPoint(i);
-			supportVerticesOut[j][3] = newDot;
+			if (i >= 0)
+			{
+				supportVerticesOut[j] = getScaledPoint(i);
+				supportVerticesOut[j][3] = newDot;
+			}
+			else
+			{
+				supportVerticesOut[j][3] = -BT_LARGE_FLOAT;
+			}
 		}
 		else
+		{
 			supportVerticesOut[j][3] = -BT_LARGE_FLOAT;
+		}
 	}
 }
 
