@@ -236,7 +236,6 @@ int maxdirsterid(const T *p, int count, const T &dir, btAlignedObjectArray<int> 
 	while (m == -1)
 	{
 		m = maxdirfiltered(p, count, dir, allow);
-		if (m < 0) break;
 		if (allow[m] == 3) return m;
 		T u = orth(dir);
 		T v = btCross(u, dir);
@@ -248,8 +247,7 @@ int maxdirsterid(const T *p, int count, const T &dir, btAlignedObjectArray<int> 
 			int mb = maxdirfiltered(p, count, dir + (u * s + v * c) * btScalar(0.025), allow);
 			if (ma == m && mb == m)
 			{
-				if (m < 0) break;
-				else allow[m] = 3;
+				allow[m] = 3;
 				return m;
 			}
 			if (ma != -1 && ma != mb)  // Yuck - this is really ugly
@@ -262,8 +260,7 @@ int maxdirsterid(const T *p, int count, const T &dir, btAlignedObjectArray<int> 
 					int md = maxdirfiltered(p, count, dir + (u * s + v * c) * btScalar(0.025), allow);
 					if (mc == m && md == m)
 					{
-						if (m < 0) break;
-						else allow[m] = 3;
+						allow[m] = 3;
 						return m;
 					}
 					mc = md;
@@ -271,12 +268,10 @@ int maxdirsterid(const T *p, int count, const T &dir, btAlignedObjectArray<int> 
 			}
 			ma = mb;
 		}
-		if (m < 0) break;
-		else allow[m] = 0;
+		allow[m] = 0;
 		m = -1;
 	}
 	btAssert(0);
-	if (m < 0) return 0;
 	return m;
 }
 
