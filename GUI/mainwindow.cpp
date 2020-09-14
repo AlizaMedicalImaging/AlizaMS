@@ -1734,9 +1734,9 @@ void MainWindow::writeSettings()
 	else
 		settings.setValue(QString("hide_3d_frame"),QVariant(QString("N")));
 	settings.endGroup();
-	if (browser2) browser2->writeSettings(settings);
-	if (anonymizer) anonymizer->writeSettings(settings);
-	if (settingswidget) settingswidget->writeSettings(settings);
+	browser2->writeSettings(settings);
+	anonymizer->writeSettings(settings);
+	settingswidget->writeSettings(settings);
 }
 
 void MainWindow::readSettings()
