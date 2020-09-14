@@ -462,6 +462,8 @@ MainWindow::MainWindow(
 	connect(browser_load_act,               SIGNAL(triggered()),         this,    SLOT(load_dicom_series2()));
 	connect(meta_open_act,                  SIGNAL(triggered()),         sqtree,  SLOT(open_file()));
 	connect(meta_open_scan_act,             SIGNAL(triggered()),         sqtree,  SLOT(open_file_and_series()));
+	connect(anon_open_in_dir,               SIGNAL(triggered()),         anonymizer,SLOT(set_input_dir()));
+	connect(anon_open_out_dir,              SIGNAL(triggered()),         anonymizer,SLOT(set_output_dir()));
 	connect(tabWidget,                      SIGNAL(currentChanged(int)), this,    SLOT(tab_ind_changed(int)));
 	connect(imagesbox->actionDICOMMeta,     SIGNAL(triggered()),         this,    SLOT(trigger_image_dicom_meta()));
 	connect(aliza,                          SIGNAL(image_opened()),      this,    SLOT(set_image_view()));
@@ -708,14 +710,16 @@ void MainWindow::createActions()
 	oneAct->setCheckable(true);
 	oneAct->setChecked(false);
 	oneAct->setEnabled(false);
-	browser_open_dir_act    = new QAction(QIcon(":/bitmaps/folder.svg"),QString("Open directory"),    this);
-	browser_open_dcmdir_act = new QAction(QIcon(":/bitmaps/dcmdir.svg"),QString("Open DICOMDIR"),     this);
-	browser_reload_act      = new QAction(QIcon(":/bitmaps/reload.svg"),QString("Reload"),            this);
-	browser_metadata_act    = new QAction(QIcon(":/bitmaps/meta.svg"),  QString("Show metadata"),     this);
-	browser_copy_act        = new QAction(QIcon(":/bitmaps/copy2.svg"), QString("Copy selected"),     this);
-	browser_load_act        = new QAction(QIcon(":/bitmaps/right0.svg"),QString("Load selected"),     this);
-	meta_open_act           = new QAction(QIcon(":/bitmaps/file.svg"),  QString("Open file"),         this);
-	meta_open_scan_act      = new QAction(QIcon(":/bitmaps/align.svg"), QString("Open file and scan"),this);
+	browser_open_dir_act    = new QAction(QIcon(":/bitmaps/folder.svg"),QString("Open directory"),      this);
+	browser_open_dcmdir_act = new QAction(QIcon(":/bitmaps/dcmdir.svg"),QString("Open DICOMDIR"),       this);
+	browser_reload_act      = new QAction(QIcon(":/bitmaps/reload.svg"),QString("Reload"),              this);
+	browser_metadata_act    = new QAction(QIcon(":/bitmaps/meta.svg"),  QString("Show metadata"),       this);
+	browser_copy_act        = new QAction(QIcon(":/bitmaps/copy2.svg"), QString("Copy selected"),       this);
+	browser_load_act        = new QAction(QIcon(":/bitmaps/right0.svg"),QString("Load selected"),       this);
+	meta_open_act           = new QAction(QIcon(":/bitmaps/file.svg"),  QString("Open file"),           this);
+	meta_open_scan_act      = new QAction(QIcon(":/bitmaps/align.svg"), QString("Open file and scan"),  this);
+	anon_open_in_dir        = new QAction(QIcon(":/bitmaps/folder.svg"),QString("Open input directory"),this);
+	anon_open_out_dir       = new QAction(QIcon(":/bitmaps/folder.svg"),QString("Open output directory"),this);
 }
 
 void MainWindow::createMenus()
@@ -817,6 +821,8 @@ void MainWindow::createMenus()
 	metadata_menu->menuAction()->setVisible(false);
 	//
 	deidentify_menu = menuBar()->addMenu(QString("De-identify"));
+	deidentify_menu->addAction(anon_open_in_dir);
+	deidentify_menu->addAction(anon_open_out_dir);
 	deidentify_menu->menuAction()->setVisible(false);
 	//
 	settings_menu = menuBar()->addMenu(QString("Settings"));
@@ -1729,6 +1735,7 @@ void MainWindow::writeSettings()
 		settings.setValue(QString("hide_3d_frame"),QVariant(QString("N")));
 	settings.endGroup();
 	if (browser2) browser2->writeSettings(settings);
+	if (anonymizer) anonymizer->writeSettings(settings);
 	if (settingswidget) settingswidget->writeSettings(settings);
 }
 
