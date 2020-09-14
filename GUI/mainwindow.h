@@ -9,7 +9,6 @@
 #include "CG/glwidget-qt4.h"
 #include <QGLFormat>
 #endif
-#include "aliza.h"
 #include <QMainWindow>
 #include <QStringList>
 #include <QMenuBar>
@@ -27,7 +26,10 @@
 #include <QPoint>
 #include "zoomwidget.h"
 #include "aboutwidget.h"
+#include "browser/browserwidget2.h"
 #include "browser/sqtree.h"
+#include "browser/anonymazerwidget2.h"
+#include "aliza.h"
 
 class MainWindow : public QMainWindow, private Ui::MainWindow
 {
@@ -131,30 +133,31 @@ private:
 	bool   hide_gl3_frame_later;
 	bool   saved_ok3d;
 	//
-	Aliza            * aliza;
-	GLWidget         * glwidget;
-	ToolBox          * toolbox;
-	ImagesBox        * imagesbox;
-	BrowserWidget2   * browser2;
-	SQtree           * sqtree;
-	SettingsWidget   * settingswidget;
-	GraphicsWidget   * graphicswidget_m;
-	GraphicsWidget   * graphicswidget_y;
-	GraphicsWidget   * graphicswidget_x;
-	SliderWidget     * slider_m;
-	SliderWidget     * slider_y;
-	SliderWidget     * slider_x;
-	ZRangeWidget     * zrangewidget;
-	ToolBox2D        * toolbox2D;
-	LabelWidget      * labelwidget;
-	LUTWidget        * lutwidget;
-	LUTWidget        * lutwidget2;
-	ZoomWidget	     * zoomwidget2D;
-	ZoomWidget       * zoomwidget3D;
-	HistogramView    * histogramview;
-	AnimWidget       * anim3Dwidget;
-	AnimWidget       * anim2Dwidget;
-	AboutWidget      * aboutwidget;
+	Aliza             * aliza;
+	GLWidget          * glwidget;
+	ToolBox           * toolbox;
+	ImagesBox         * imagesbox;
+	BrowserWidget2    * browser2;
+	AnonymazerWidget2 * anonymizer;
+	SQtree            * sqtree;
+	SettingsWidget    * settingswidget;
+	GraphicsWidget    * graphicswidget_m;
+	GraphicsWidget    * graphicswidget_y;
+	GraphicsWidget    * graphicswidget_x;
+	SliderWidget      * slider_m;
+	SliderWidget      * slider_y;
+	SliderWidget      * slider_x;
+	ZRangeWidget      * zrangewidget;
+	ToolBox2D         * toolbox2D;
+	LabelWidget       * labelwidget;
+	LUTWidget         * lutwidget;
+	LUTWidget         * lutwidget2;
+	ZoomWidget	      * zoomwidget2D;
+	ZoomWidget        * zoomwidget3D;
+	HistogramView     * histogramview;
+	AnimWidget        * anim3Dwidget;
+	AnimWidget        * anim2Dwidget;
+	AboutWidget       * aboutwidget;
 	bool first_image_loaded;
 	bool hide_zoom;
 	QMenu * file_menu;
@@ -162,6 +165,7 @@ private:
 	QMenu * tools_menu;
 	QMenu * browser_menu;
 	QMenu * metadata_menu;
+	QMenu * deidentify_menu;
 	QMenu * settings_menu;
 	QToolBar * toolbar2;
 	QToolBar * toolbar3;
@@ -203,6 +207,7 @@ private:
 	QAction  * browser_copy_act;
 	QAction  * browser_load_act;
 	QAction  * meta_open_act;
+	QAction  * meta_open_scan_act;
 	QVBoxLayout * frame2D_viewerZ_layout;
 	QVBoxLayout * frame2D_viewer_layout;
 	QVBoxLayout * histogram_frame_layout;

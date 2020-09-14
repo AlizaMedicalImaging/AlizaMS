@@ -378,7 +378,7 @@ static QString read_MRImageModule(const mdcm::DataSet & ds)
 							else if (tmp1 == QString("CG"))
 								s += QString("Cardiac Gating");
 							else if (tmp1 == QString("PPG"))
-								s += QString("Peripheral Pulse Gating");
+								s += QString("Peripheral 1.2.826.0.1Pulse Gating");
 							else if (tmp1 == QString("FC"))
 								s += QString("Flow Compensation");
 							else if (tmp1 == QString("PFF"))
@@ -1439,6 +1439,21 @@ bool DicomUtils::priv_get_string_value(
 		bv->GetPointer(),
 		bv->GetLength()).trimmed();
 	return true;
+}
+
+QString DicomUtils::generate_id()
+{
+	char c[] = "\0\0\0\0\0\0\0\0\0\0\0\0";
+    const char s[] =
+    	"0123456789ABCDEFGHIJKLMNOPQRSTU"
+		"VWXYZabcdefghijklmnopqrstuvwxyz";
+	const unsigned int ss = sizeof(s);
+	for (unsigned int i = 0; i < 11; i++)
+	{
+		c[i] = s[rand() % (ss - 1)];
+	}
+	const QString r = QString(c).trimmed();
+ 	return r;
 }
 
 bool DicomUtils::is_image(

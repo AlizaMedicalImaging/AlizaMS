@@ -85,6 +85,7 @@ public:
 	static bool priv_get_string_value(
 		const mdcm::DataSet&, const mdcm::PrivateTag&,
 		QString&);
+	static QString generate_id();
 	static bool is_image(
 		const mdcm::DataSet&,
 		unsigned short*,unsigned short*,
@@ -364,7 +365,6 @@ public:
 		const QString&);
 	static void global_force_suppllut(
 		short);
-	static QString generate_id();
 	//
 	// Type of object processing
 	//

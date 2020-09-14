@@ -253,6 +253,12 @@ MainWindow::MainWindow(
 	vl396->setSpacing(0);
 	vl396->addWidget(browser2);
 	//
+	anonymizer = new AnonymazerWidget2(scale_icons*adjust_scale_icons, this);
+	QVBoxLayout * vl196 = new QVBoxLayout(deidentify_frame);
+	vl196->setContentsMargins(0,0,0,0);
+	vl196->setSpacing(0);
+	vl196->addWidget(anonymizer);
+	//
 	settingswidget = new SettingsWidget(scale_icons, this);
 	QVBoxLayout * vl496 = new QVBoxLayout(settings_frame);
 	vl496->setContentsMargins(0,0,0,0);
@@ -455,6 +461,7 @@ MainWindow::MainWindow(
 	connect(browser_copy_act,               SIGNAL(triggered()),         browser2,SLOT(copy_files()));
 	connect(browser_load_act,               SIGNAL(triggered()),         this,    SLOT(load_dicom_series2()));
 	connect(meta_open_act,                  SIGNAL(triggered()),         sqtree,  SLOT(open_file()));
+	connect(meta_open_scan_act,             SIGNAL(triggered()),         sqtree,  SLOT(open_file_and_series()));
 	connect(tabWidget,                      SIGNAL(currentChanged(int)), this,    SLOT(tab_ind_changed(int)));
 	connect(imagesbox->actionDICOMMeta,     SIGNAL(triggered()),         this,    SLOT(trigger_image_dicom_meta()));
 	connect(aliza,                          SIGNAL(image_opened()),      this,    SLOT(set_image_view()));
@@ -701,13 +708,14 @@ void MainWindow::createActions()
 	oneAct->setCheckable(true);
 	oneAct->setChecked(false);
 	oneAct->setEnabled(false);
-	browser_open_dir_act    = new QAction(QIcon(":/bitmaps/folder.svg"),QString("Open directory"),   this);
-	browser_open_dcmdir_act = new QAction(QIcon(":/bitmaps/dcmdir.svg"),QString("Open DICOMDIR"),    this);
-	browser_reload_act      = new QAction(QIcon(":/bitmaps/reload.svg"),QString("Reload"),           this);
-	browser_metadata_act    = new QAction(QIcon(":/bitmaps/meta.svg"),  QString("Show metadata"),    this);
-	browser_copy_act        = new QAction(QIcon(":/bitmaps/copy2.svg"), QString("Copy selected"),    this);
-	browser_load_act        = new QAction(QIcon(":/bitmaps/right0.svg"),QString("Load selected"),    this);
-	meta_open_act           = new QAction(QIcon(":/bitmaps/file.svg"),  QString("Open file"),        this);
+	browser_open_dir_act    = new QAction(QIcon(":/bitmaps/folder.svg"),QString("Open directory"),    this);
+	browser_open_dcmdir_act = new QAction(QIcon(":/bitmaps/dcmdir.svg"),QString("Open DICOMDIR"),     this);
+	browser_reload_act      = new QAction(QIcon(":/bitmaps/reload.svg"),QString("Reload"),            this);
+	browser_metadata_act    = new QAction(QIcon(":/bitmaps/meta.svg"),  QString("Show metadata"),     this);
+	browser_copy_act        = new QAction(QIcon(":/bitmaps/copy2.svg"), QString("Copy selected"),     this);
+	browser_load_act        = new QAction(QIcon(":/bitmaps/right0.svg"),QString("Load selected"),     this);
+	meta_open_act           = new QAction(QIcon(":/bitmaps/file.svg"),  QString("Open file"),         this);
+	meta_open_scan_act      = new QAction(QIcon(":/bitmaps/align.svg"), QString("Open file and scan"),this);
 }
 
 void MainWindow::createMenus()
@@ -805,7 +813,11 @@ void MainWindow::createMenus()
 	//
 	metadata_menu = menuBar()->addMenu(QString("DICOM metadata"));
 	metadata_menu->addAction(meta_open_act);
+	metadata_menu->addAction(meta_open_scan_act);
 	metadata_menu->menuAction()->setVisible(false);
+	//
+	deidentify_menu = menuBar()->addMenu(QString("De-identify"));
+	deidentify_menu->menuAction()->setVisible(false);
 	//
 	settings_menu = menuBar()->addMenu(QString("Settings"));
 	settings_menu->menuAction()->setVisible(false);
@@ -1628,6 +1640,7 @@ void MainWindow::tab_ind_changed(int i)
 		file_menu->menuAction()->setVisible(true);
 		settings_menu->menuAction()->setVisible(false);
 		metadata_menu->menuAction()->setVisible(false);
+		deidentify_menu->menuAction()->setVisible(false);
 		browser_menu->menuAction()->setVisible(false);
 		views_menu->menuAction()->setVisible(true);
 		tools_menu->menuAction()->setVisible(true);
@@ -1635,6 +1648,7 @@ void MainWindow::tab_ind_changed(int i)
 	case 1:
 		settings_menu->menuAction()->setVisible(false);
 		metadata_menu->menuAction()->setVisible(false);
+		deidentify_menu->menuAction()->setVisible(false);
 		tools_menu->menuAction()->setVisible(false);
 		views_menu->menuAction()->setVisible(false);
 		file_menu->menuAction()->setVisible(true);
@@ -1644,6 +1658,7 @@ void MainWindow::tab_ind_changed(int i)
 	case 2:
 		file_menu->menuAction()->setVisible(true);
 		metadata_menu->menuAction()->setVisible(true);
+		deidentify_menu->menuAction()->setVisible(false);
 		settings_menu->menuAction()->setVisible(false);
 		browser_menu->menuAction()->setVisible(false);
 		views_menu->menuAction()->setVisible(false);
@@ -1651,8 +1666,18 @@ void MainWindow::tab_ind_changed(int i)
 		break;
 	case 3:
 		file_menu->menuAction()->setVisible(true);
+		settings_menu->menuAction()->setVisible(false);
+		metadata_menu->menuAction()->setVisible(false);
+		deidentify_menu->menuAction()->setVisible(true);
+		browser_menu->menuAction()->setVisible(false);
+		views_menu->menuAction()->setVisible(false);
+		tools_menu->menuAction()->setVisible(false);
+		break;
+	case 4:
+		file_menu->menuAction()->setVisible(true);
 		settings_menu->menuAction()->setVisible(true);
 		metadata_menu->menuAction()->setVisible(false);
+		deidentify_menu->menuAction()->setVisible(false);
 		browser_menu->menuAction()->setVisible(false);
 		views_menu->menuAction()->setVisible(false);
 		tools_menu->menuAction()->setVisible(false);
@@ -1661,6 +1686,7 @@ void MainWindow::tab_ind_changed(int i)
 		file_menu->menuAction()->setVisible(true);
 		settings_menu->menuAction()->setVisible(false);
 		metadata_menu->menuAction()->setVisible(false);
+		deidentify_menu->menuAction()->setVisible(false);
 		browser_menu->menuAction()->setVisible(false);
 		views_menu->menuAction()->setVisible(false);
 		tools_menu->menuAction()->setVisible(false);
