@@ -1,11 +1,241 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: mdcm
+Upstream-Name: alizams
 Upstream-Contact: mihail.isakov@gmail.com
 Source: https://github.com/AlizaMedicalImaging/AlizaMS
 
 Files: *
 Copyright:
- 2018-2020 Mikhail Isakov
+  2018-2020 Mikhail Isakov
 License: GLPv3
-  ...
+  On Debian systems, the text of the GNU GPL can be found in
+  /usr/share/common-licenses/GPL.
+
+Files: b/*
+Copyright:
+  2003-2006 Erwin Coumans
+License: Zlib
+  All source code files are licensed under the permissive zlib license.
+  http://opensource.org/licenses/Zlib
+  Bullet Continuous Collision Detection and Physics Library
+  http://bulletphysics.org
+  This software is provided 'as-is', without any express or implied warranty.
+  In no event will the authors be held liable for any damages arising from
+  the use of this software.
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it freely,
+  subject to the following restrictions:
+  1. The origin of this software must not be misrepresented; you must not claim
+     that you wrote the original software. If you use this software in a product,
+     an acknowledgment in the product documentation would be appreciated but
+	 is not required.
+  2. Altered source versions must be plainly marked as such,
+     and must not be misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
+
+Files: common/colorspace/*
+Copyright: 2005-2010 Pascal Getreuer
+License: BSD
+  All rights reserved.
+  Redistribution and use in source and binary forms, with or without 
+  modification, are permitted provided that the following conditions are met:
+  - Redistributions of source code must retain the above copyright 
+    notice, this list of conditions and the following disclaimer.
+  - Redistributions in binary form must reproduce the above copyright 
+    notice, this list of conditions and the following disclaimer in 
+    the documentation and/or other materials provided with the distribution.
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
+  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  POSSIBILITY OF SUCH DAMAGE.
+
+Files: mdcm/*
+Copyright:
+  2018-2020 Mikhail Isakov
+  2006-2016 Mathieu Malaterre
+  1993-2005 CREATIS
+License: BSD-3-clause-alike-CREATIS
+  All rights reserved.
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are met:
+  * Redistributions of source code must retain the above copyright notice,
+    this list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+  * Neither name of Mathieu Malaterre, or CREATIS, nor the names of any
+    contributors (CNRS, INSERM, UCB, Universite Lyon I), may be used to
+    endorse or promote products derived from this software without specific
+    prior written permission.
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS''
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE LIABLE FOR
+  ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Files: mdcm/Utilities/mdcmcharls/*
+Copyright:
+  2007-2010 Jan de Vaan
+  CharLS Team 2014
+License: BSD-3-clause-alike-Jan-de-Vaan
+
+Files: mdcm/Utilities/mdcmjpeg/*
+Copyright: 1991-1998, Thomas G. Lane.
+License: jpeg
+  Permission is hereby granted to use, copy, modify, and distribute this
+  software (or portions thereof) for any purpose, without fee, subject to these
+  conditions:
+  (1) If any part of the source code for this software is distributed, then this
+  README file must be included, with this copyright and no-warranty notice
+  unaltered and any additions, deletions, or changes to the original files
+  must be clearly indicated in accompanying documentation.
+  (2) If only executable code is distributed, then the accompanying
+  documentation must state that "this software is based in part on the work of
+  the Independent JPEG Group".
+  (3) Permission for use of this software is granted only if the user accepts
+  full responsibility for any undesirable consequences the authors accept
+  NO LIABILITY for damages of any kind.
+  These conditions apply to any software derived from or based on the IJG code,
+  not just to the unmodified library.  If you use our work, you ought to
+  acknowledge us.
+  Permission is NOT granted for the use of any IJG author's name or company name
+  in advertising or publicity relating to this software or products derived from
+  it.  This software may be referred to only as "the Independent JPEG Group's
+  software".
+  We specifically permit and encourage the use of this software as the basis of
+  commercial products, provided that all warranty or liability claims are
+  assumed by the product vendor.
+
+Files: mdcm/Utilities/C99/*
+Copyright:
+  2006 Alexander Chemeris
+License: BSD-3-clause-alike-Alexander-Chemeris
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are met:
+  1. Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+  3. The name of the author may be used to endorse or promote products
+     derived from this software without specific prior written permission.
+  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+  EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Files: mdcm/Utilities/mdcmuuid/*
+Copyright:
+  1996, 1997 Theodore Ts'o.
+License: BSD-3-clause-alike-Theodore-Ts
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+  1. Redistributions of source code must retain the above copyright
+     notice, and the entire permission notice in its entirety,
+     including the disclaimer of warranties.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+  3. The name of the author may not be used to endorse or promote
+     products derived from this software without specific prior
+     written permission.
+  THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
+  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ALL OF
+  WHICH ARE HEREBY DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE
+  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+  OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+  BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+  USE OF THIS SOFTWARE, EVEN IF NOT ADVISED OF THE POSSIBILITY OF SUCH
+  DAMAGE.
+
+Files: mdcm/Utilities/mdcmopenjpeg/*
+Copyright:
+  2002-2014, Universite catholique de Louvain (UCL), Belgium
+  2002-2014, Professor Benoit Macq
+  2003-2014, Antonin Descampe
+  2003-2009, Francois-Olivier Devaux
+  2005, Herve Drolon, FreeImage Team
+  2002-2003, Yannick Verschueren
+  2001-2003, David Janssens
+  2011-2012, Centre National d'Etudes Spatiales (CNES), France 
+  2012, CS Systemes d'Information, France
+License: BSD-2-clause
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+   1. Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS `AS IS'
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  POSSIBILITY OF SUCH DAMAGE.
+
+Files: mdcm/Utilities/mdcmzlib/*
+Copyright:
+  1995-2005 Jean-loup Gailly and Mark Adler
+License: Zlib
+  This software is provided 'as-is', without any express or implied
+  warranty.  In no event will the authors be held liable for any damages
+  arising from the use of this software.
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it
+  freely, subject to the following restrictions:
+  1. The origin of this software must not be misrepresented; you must not
+     claim that you wrote the original software. If you use this software
+     in a product, an acknowledgment in the product documentation would be
+     appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not be
+     misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
+
+Files: mdcm/Utilities/pvrg/*
+Copyright:
+  Copyright (C) 1990, 1991, 1993 Andy C. Hung, all rights reserved.
+License: public-domain
+  PUBLIC DOMAIN LICENSE: Stanford University Portable Video Research
+  Group. If you use this software, you agree to the following: This
+  program package is purely experimental, and is licensed "as is".
+  Permission is granted to use, modify, and distribute this program
+  q without charge for any purpose, provided this license/ disclaimer
+  notice appears in the copies.  No warranty or maintenance is given,
+  either expressed or implied.  In no event shall the author(s) be
+  liable to you or a third party for any special, incidental,
+  consequential, or other damages, arising out of the use or inability
+  to use the program for any purpose (or the loss of data), even if we
+  have been advised of such possibilities.  Any public reference or
+  advertisement of this source code should refer to it as the Portable
+  Video Research Group (PVRG) code, and not by any author(s) (or
+  Stanford University) name.
 

@@ -17,6 +17,8 @@ subject to the following restrictions:
 ///Separating axis rest based on work from Pierre Terdiman, see
 ///And contact clipping based on work from Simon Hobbs
 
+// modified github.com/issakomi
+
 #include "btPolyhedralContactClipping.h"
 #include "BulletCollision/CollisionShapes/btConvexPolyhedron.h"
 

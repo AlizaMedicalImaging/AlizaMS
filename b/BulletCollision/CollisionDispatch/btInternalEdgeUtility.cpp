@@ -1,3 +1,5 @@
+// modified github.com/issakomi
+
 #include "btInternalEdgeUtility.h"
 
 #include "BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h"

@@ -13,6 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
+// modified github.com/issakomi
+
 #ifndef BT_SERIALIZER_H
 #define BT_SERIALIZER_H
 
