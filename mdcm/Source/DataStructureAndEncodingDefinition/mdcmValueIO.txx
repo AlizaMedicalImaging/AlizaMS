@@ -29,7 +29,7 @@
 #include "mdcmSequenceOfItems.h"
 #include "mdcmByteValue.h"
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 template <typename TDE, typename TSwap, typename TType>
@@ -78,6 +78,6 @@ const std::ostream & ValueIO<DE,TSwap,TType>::Write(std::ostream & os, const Val
     return os;
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm
 
 #endif // MDCMVALUEIO_TXX

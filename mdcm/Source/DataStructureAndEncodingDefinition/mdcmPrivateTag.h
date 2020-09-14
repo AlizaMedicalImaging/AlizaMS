@@ -24,12 +24,12 @@
 #include <cstring>
 #include <ctype.h>
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 /**
- * \brief Class to represent a Private DICOM Data Element (Attribute) Tag (Group, Element, Owner)
- * \note private tag have element value in: [0x10,0xff], for instance 0x0009,0x0000 is NOT a private tag
+ * Class to represent a Private DICOM Data Element (Attribute) Tag (Group, Element, Owner)
+ * Private tag have element value in: [0x10,0xff], for instance 0x0009,0x0000 is NOT a private tag
  */
 
 class MDCM_EXPORT PrivateTag : public Tag
@@ -81,6 +81,6 @@ inline std::ostream& operator<<(std::ostream &os, const PrivateTag &val)
   return os;
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm
 
 #endif //MDCMPRIVATETAG_H

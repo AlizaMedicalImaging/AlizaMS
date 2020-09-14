@@ -23,10 +23,9 @@
 #define MDCMREADER_H
 
 #include "mdcmFile.h"
-
 #include <fstream>
 
-namespace mdcm_ns
+namespace mdcm
 {
   class StreamImageReader;
 /**
@@ -56,7 +55,7 @@ public:
   virtual ~Reader();
 
   // Main function to read a file
-  virtual bool Read(); // Execute()
+  virtual bool Read();
 
   // Set the filename to open. This will create a std::ifstream internally
   // See SetStream if you are dealing with different std::istream object
@@ -69,16 +68,13 @@ public:
     Stream = &input_stream;
   }
 
-  // Set/Get File
   const File & GetFile() const { return *F; }
 
-  // Set/Get File
   File & GetFile() { return *F; }
 
-  // Set/Get File
   void SetFile(File & file) { F = &file; }
 
-  // Will read only up to Tag \param tag and skipping any tag specified in
+  // Will read only up to Tag tag and skipping any tag specified in
   bool ReadUpToTag(const Tag & tag, std::set<Tag> const & skiptags = std::set<Tag>() );
 
   // Will only read the specified selected tags.
@@ -91,7 +87,7 @@ public:
   // need to call either SetFileName or SetStream first
   bool CanRead() const;
 
-  // For wrapped language. return type is compatible with System::FileSize return type
+  // For wrapped language, return type is compatible with System::FileSize return type
   // Use native std::streampos / std::streamoff directly from the stream from C++
   size_t GetStreamCurrentPosition() const;
 
@@ -120,7 +116,7 @@ private:
   std::ifstream * Ifstream;
 };
 
-} // end namespace mdcm_ns
+} // end namespace mdcm
 
 
 #endif //MDCMREADER_H

@@ -31,7 +31,7 @@
 
 #include "mdcmTag.h"
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 const char FileMetaInformation::MDCM_FILE_META_INFORMATION_VERSION[] = "\0\1";
@@ -882,4 +882,4 @@ std::ostream &FileMetaInformation::Write(std::ostream &os) const
   return os;
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm

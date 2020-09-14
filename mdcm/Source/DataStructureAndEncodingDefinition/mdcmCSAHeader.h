@@ -34,8 +34,8 @@ class DataElement;
 class PrivateTag;
 
 /**
- * \brief Class for CSAHeader
- * \details SIEMENS store private information in tag (0x0029,0x10,"SIEMENS CSA
+ * Class for CSAHeader
+ * SIEMENS store private information in tag (0x0029,0x10,"SIEMENS CSA
  * HEADER") this class is meant for user wishing to access values stored within
  * this private attribute.
  * There are basically two main 'format' for this attribute : SV10/NOMAGIC and
@@ -44,16 +44,14 @@ class PrivateTag;
  * DATASET_FORMAT is in fact simply just another DICOM dataset (implicit) with
  * -currently unknown- value. This can be only be printed for now.
  *
- * \warning
  * Everything you do with this code is at your own risk, since decoding process
  * was not written from specification documents.
  *
- * \warning the API of this class might change.
+ * The API of this class might change.
  *
- * \todo
+ * Todo
  * MrEvaProtocol in 29,1020 contains ^M that would be nice to get rid of on UNIX system...
  *
- * \see PDBHeader
  *
  * External references:
  * 5.1.3.2.4.1 MEDCOM History Information
@@ -82,40 +80,40 @@ public :
   /// Decode the CSAHeader from element 'de'
   bool LoadFromDataElement(DataElement const &de);
 
-  /// Print the CSAHeader (use only if Format == SV10 or NOMAGIC)
+  // Print the CSAHeader (use only if Format == SV10 or NOMAGIC)
   void Print(std::ostream & os) const;
 
-  /// Return the DataSet output (use only if Format == DATASET_FORMAT )
+  // Return the DataSet output (use only if Format == DATASET_FORMAT )
   const DataSet & GetDataSet() const { return InternalDataSet; }
 
-  /// Return the string output (use only if Format == Interfile)
+  // Return the string output (use only if Format == Interfile)
   const char * GetInterfile() const { return InterfileData; }
 
-  /// return the format of the CSAHeader
-  /// SV10 and NOMAGIC are equivalent.
+  // return the format of the CSAHeader
+  // SV10 and NOMAGIC are equivalent.
   CSAHeaderType GetFormat() const;
 
-  /// Return the private tag used by SIEMENS to store the CSA Image Header
-  /// This is: PrivateTag(0x0029,0x0010,"SIEMENS CSA HEADER");
+  // Return the private tag used by SIEMENS to store the CSA Image Header
+  // This is: PrivateTag(0x0029,0x0010,"SIEMENS CSA HEADER");
   static const PrivateTag & GetCSAImageHeaderInfoTag();
 
-  /// Return the private tag used by SIEMENS to store the CSA Series Header
-  /// This is: PrivateTag(0x0029,0x0020,"SIEMENS CSA HEADER");
+  // Return the private tag used by SIEMENS to store the CSA Series Header
+  // This is: PrivateTag(0x0029,0x0020,"SIEMENS CSA HEADER");
   static const PrivateTag & GetCSASeriesHeaderInfoTag();
 
-  /// Return the private tag used by SIEMENS to store the CSA Data Info
-  /// This is: PrivateTag(0x0029,0x0010,"SIEMENS CSA NON-IMAGE");
+  // Return the private tag used by SIEMENS to store the CSA Data Info
+  // This is: PrivateTag(0x0029,0x0010,"SIEMENS CSA NON-IMAGE");
   static const PrivateTag & GetCSADataInfo();
 
-  /// Return the CSAElement corresponding to name 'name'
-  /// \warning Case Sensitive
+  // Return the CSAElement corresponding to name 'name'
+  // Case Sensitive
   const CSAElement & GetCSAElementByName(const char * name);
 
-  /// Return true if the CSA element matching 'name' is found or not
-  /// \warning Case Sensitive
+  // Return true if the CSA element matching 'name' is found or not
+  // Case Sensitive
   bool FindCSAElementByName(const char * name);
 
-  /// Retrieve the ASCII portion stored within the MrProtocol/MrPhoenixProtocol:
+  // Retrieve the ASCII portion stored within the MrProtocol/MrPhoenixProtocol:
   bool GetMrProtocol( const DataSet & ds, MrProtocol & mrProtocol );
 
 protected:

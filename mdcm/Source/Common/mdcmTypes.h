@@ -29,7 +29,7 @@
 
 #ifdef MDCM_HAVE_STDINT_H
 #ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
+#define __STDC_LIMIT_MACROS 1
 #endif
 #include <stdint.h>
 #else

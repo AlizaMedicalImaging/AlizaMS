@@ -24,7 +24,7 @@
 #include "mdcmSequenceOfItems.h"
 #include "mdcmSequenceOfFragments.h"
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 VL ExplicitDataElement::GetLength() const
@@ -72,4 +72,4 @@ VL ExplicitDataElement::GetLength() const
   }
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm

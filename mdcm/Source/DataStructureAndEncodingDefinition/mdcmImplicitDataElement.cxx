@@ -23,7 +23,7 @@
 #include "mdcmByteValue.h"
 #include "mdcmSequenceOfItems.h"
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 VL ImplicitDataElement::GetLength() const
@@ -62,4 +62,4 @@ VL ImplicitDataElement::GetLength() const
   }
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm

@@ -29,7 +29,7 @@
 #include "mdcmTagToVR.h"
 #endif
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 template <typename TSwap>
@@ -576,7 +576,7 @@ const std::ostream &ImplicitDataElement::Write(std::ostream &os) const
   return os;
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm
 
 
 #endif // MDCMIMPLICITDATAELEMENT_TXX

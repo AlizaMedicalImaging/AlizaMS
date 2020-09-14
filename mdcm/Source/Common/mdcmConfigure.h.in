@@ -121,15 +121,7 @@
 
 #cmakedefine MDCM_FORCE_BIGENDIAN_EMULATION
 
-#ifndef MDCM_OVERRIDE_BROKEN_IMPLEMENTATION
-/* To Remove code that support broken DICOM implementation and therefore
- * add some over head. Turn Off at your own risk
- */
 #cmakedefine MDCM_SUPPORT_BROKEN_IMPLEMENTATION
-#endif
-#ifndef mdcm_ns
-#define mdcm_ns mdcm
-#endif
 
 #define MDCM_PVRG_JPEG_EXECUTABLE "@PVRGJPEG_EXECUTABLE@"
 #define MDCM_KAKADU_EXPAND_EXECUTABLE "@KDU_EXPAND_EXECUTABLE@"

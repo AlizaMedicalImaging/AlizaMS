@@ -36,7 +36,7 @@ class ByteValue;
 
 class DataElement;
 /**
- * \brief Class for MrProtocol
+ * Class for MrProtocol
  */
 class MDCM_EXPORT MrProtocol
 {

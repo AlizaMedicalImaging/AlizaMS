@@ -20,8 +20,7 @@
 namespace mdcm
 {
 /**
- * \brief
- * \details File-set: A File-set is a collection of DICOM Files (and possibly non-DICOM Files)
+ * File-set: A File-set is a collection of DICOM Files (and possibly non-DICOM Files)
  * that share a common naming space within which File IDs are unique.
  */
 class MDCM_EXPORT FileSet
@@ -32,15 +31,16 @@ public:
   typedef std::string FileType;
   typedef std::vector<FileType> FilesType;
 
-  /// \deprecated. Does nothing
+  // Does nothing
   void AddFile(File const & ) {}
 
-  /// Add a file 'filename' to the list of files. Return true on success, false in case filename could not
-  /// be found on system.
+  // Add a file 'filename' to the list of files. Return true on success, false in case filename could not
+  // be found on system.
   bool AddFile(const char *filename);
 
   void SetFiles(FilesType const &files);
-  FilesType const &GetFiles() const {
+  FilesType const &GetFiles() const
+  {
     return Files;
   }
 

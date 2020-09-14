@@ -14,7 +14,7 @@
 #ifndef MDCMSEQUENCEOFITEMS_TXX
 #define MDCMSEQUENCEOFITEMS_TXX
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 template <typename TDE>

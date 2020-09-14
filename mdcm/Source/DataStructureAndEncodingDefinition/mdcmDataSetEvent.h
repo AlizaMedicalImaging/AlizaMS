@@ -29,8 +29,8 @@ namespace mdcm
 {
 
 /**
- * \brief DataSetEvent
- * \details Special type of event triggered during the DataSet store/move process
+ * DataSetEvent
+ * Special type of event triggered during the DataSet store/move process
  *
  */
 class DataSetEvent : public AnyEvent

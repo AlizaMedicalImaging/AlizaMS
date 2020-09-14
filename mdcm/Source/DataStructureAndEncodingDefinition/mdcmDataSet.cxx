@@ -22,7 +22,7 @@
 #include "mdcmDataSet.h"
 #include "mdcmPrivateTag.h"
 
-namespace mdcm_ns
+namespace mdcm
 {
 DataElement DataSet::DEEnd = DataElement(Tag(0xffff,0xffff));
 
@@ -144,4 +144,4 @@ MediaStorage DataSet::GetMediaStorage() const
   return ms;
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm

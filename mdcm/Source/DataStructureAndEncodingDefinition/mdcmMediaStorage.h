@@ -24,15 +24,10 @@
 
 #include "mdcmTransferSyntax.h"
 
-namespace mdcm { class Tag; }
-
-namespace mdcm_ns
+namespace mdcm
 {
 
-#if !defined(SWIGPYTHON) && !defined(SWIGCSHARP) && !defined(SWIGJAVA) && !defined(SWIGPHP)
-using namespace mdcm;
-#endif
-
+class Tag;
 class DataSet;
 class FileMetaInformation;
 class File;
@@ -41,15 +36,13 @@ class File;
 // Please check the mdcm::UIDs class if adding new well known UID.
 
 /**
- * \brief MediaStorage
+ * MediaStorage
  *
- * \note
  * FIXME There should not be any notion of Image and/or PDF at that point
  * Only the codec can answer yes I support this Media Storage or not...
  * For instance an ImageCodec will answer yes to most of them
  * while a PDFCodec will answer only for the Encapsulated PDF
  *
- * \see UIDs
  */
 class MDCM_EXPORT MediaStorage
 {
@@ -200,11 +193,11 @@ void SetFromSourceImageSequence(DataSet const &);
 
 private:
 bool SetFromDataSetOrHeader(DataSet const &, const Tag &);
-/// NOT THREAD SAFE
+// NOT THREAD SAFE
 const char * GetFromDataSetOrHeader(DataSet const &, const Tag &);
-/// NOT THREAD SAFE
+// NOT THREAD SAFE
 const char * GetFromHeader(FileMetaInformation const &);
-/// NOT THREAD SAFE
+// NOT THREAD SAFE
 const char * GetFromDataSet(DataSet const &);
 
 MSType MSField;
@@ -217,6 +210,6 @@ inline std::ostream &operator<<(std::ostream & _os, const MediaStorage & ms)
   return _os;
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm
 
 #endif // MDCMMEDIASTORAGE_H

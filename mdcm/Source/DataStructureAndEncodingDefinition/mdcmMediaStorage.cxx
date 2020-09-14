@@ -28,7 +28,7 @@
 #include "mdcmSequenceOfItems.h"
 #include "mdcmCodeString.h"
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 static const char * MSStrings[] =
@@ -595,4 +595,4 @@ bool MediaStorage::SetFromFile(File const & file)
   return true;
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm

@@ -217,40 +217,25 @@ if(MDCM_HAVE_BYTESWAP_FILE_H)
   include(CheckCXXSourceCompiles)
   CHECK_CXX_SOURCE_COMPILES("\#include <byteswap.h>\nint main(){return bswap_32(42);}" MDCM_HAVE_BYTESWAP_H)
 endif()
-CHECK_INCLUDE_FILE("rpc.h"      MDCM_HAVE_RPC_H)
+CHECK_INCLUDE_FILE("rpc.h" MDCM_HAVE_RPC_H)
 CHECK_INCLUDE_FILE("langinfo.h" MDCM_HAVE_LANGINFO_H)
 
 include(CheckFunctionExists)
 include(CheckSymbolExists)
-#FIXME
-#set(CMAKE_REQUIRED_INCLUDES math.h)
-#set(CMAKE_REQUIRED_LIBRARIES m)
-CHECK_SYMBOL_EXISTS(nl_langinfo "langinfo.h" MDCM_HAVE_NL_LANGINFO)
-#CHECK_FUNCTION_EXISTS(strcasecmp MDCM_HAVE_STRCASECMP)
+
 CHECK_SYMBOL_EXISTS(strcasecmp "strings.h" MDCM_HAVE_STRCASECMP)
-#CHECK_FUNCTION_EXISTS(strncasecmp MDCM_HAVE_STRNCASECMP)
 CHECK_SYMBOL_EXISTS(strncasecmp "strings.h" MDCM_HAVE_STRNCASECMP)
-#CHECK_FUNCTION_EXISTS(snprintf MDCM_HAVE_SNPRINTF)
 CHECK_SYMBOL_EXISTS(snprintf "stdio.h" MDCM_HAVE_SNPRINTF)
-#CHECK_SYMBOL_EXISTS(strptime "time.h" MDCM_HAVE_STRPTIME)
 CHECK_FUNCTION_EXISTS(strptime MDCM_HAVE_STRPTIME)
-CHECK_FUNCTION_EXISTS(_stricmp  MDCM_HAVE__STRICMP)
+CHECK_FUNCTION_EXISTS(_stricmp MDCM_HAVE__STRICMP)
 CHECK_FUNCTION_EXISTS(_strnicmp MDCM_HAVE__STRNICMP)
 CHECK_FUNCTION_EXISTS(_snprintf MDCM_HAVE__SNPRINTF)
 CHECK_FUNCTION_EXISTS(lround MDCM_HAVE_LROUND)
 CHECK_FUNCTION_EXISTS(gettimeofday MDCM_HAVE_GETTIMEOFDAY)
-
-#TODO remove
 CHECK_INCLUDE_FILE("stdint.h" MDCM_HAVE_STDINT_H)
 if(UNIX)
   CHECK_INCLUDE_FILE("inttypes.h" MDCM_HAVE_INTTYPES_H)
 endif()
-if(NOT MDCM_HAVE_STDINT_H)
-  if(MSVC OR "x${CMAKE_CXX_COMPILER_ID}x" MATCHES "Intel")
-    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities/C99")
-  endif()
-endif()
-#
 
 include(CheckCXXSourceCompiles)
 CHECK_CXX_SOURCE_COMPILES("int main(){const char *f =__FUNCTION__;return 0;}" MDCM_CXX_HAS_FUNCTION)
@@ -371,48 +356,21 @@ set(MDCM_DICT_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmUIDs.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmCSAHeaderDefaultDicts.cxx)
 
-
-#FIXME
-# dual compilation (namespace mdcm_ns), all the following either directly
-# reference code using MDCM_SUPPORT_BROKEN_IMPLEMENTATION or indirectly
-set(MDCM_DSED2_SRCS
-  mdcmByteValue.cxx
-  mdcmDataElement.cxx
-  mdcmDataSet.cxx
-  mdcmExplicitDataElement.cxx
-  mdcmFile.cxx # FileMeta is class member
-  mdcmFileMetaInformation.cxx # subclass of DataSet
-  mdcmFragment.cxx
-  mdcmImplicitDataElement.cxx
-  mdcmMediaStorage.cxx # SetFromModality takes a DataSet
-  mdcmPrivateTag.cxx
-  mdcmReader.cxx
-  mdcmSequenceOfFragments.cxx
-  mdcmSequenceOfItems.cxx
-  mdcmValue.cxx) # friend decl
-
-# need to prepare duplicate files to help cmake handle setting compile
-# definitions (cmake cannot handle duplicate source file in same target).
-# this trick allows us to avoid a static compilation which may not be portable
-foreach(src ${MDCM_DSED2_SRCS})
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/${src}
-    ${CMAKE_CURRENT_BINARY_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/strict_${src}
-    COPYONLY)
-  list(APPEND MDCM_DSED3_SRCS ${CMAKE_CURRENT_BINARY_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/strict_${src})
-  set_property(
-    SOURCE ${CMAKE_CURRENT_BINARY_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/strict_${src}
-    PROPERTY COMPILE_DEFINITIONS "MDCM_OVERRIDE_BROKEN_IMPLEMENTATION" "mdcm_ns=mdcmstrict")
-endforeach()
-
-foreach(src ${MDCM_DSED2_SRCS})
-  list(APPEND MDCM_DSED4_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/${src})
-endforeach()
-
-# the following source code do not need a duplicate compilation to handle
-# MDCM_SUPPORT_BROKEN_IMPLEMENTATION
 set(MDCM_DSED_SRCS
-  ${MDCM_DSED4_SRCS}
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmReader.strict.cxx # hook to call mdcmstrict API
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmByteValue.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmDataElement.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmDataSet.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmExplicitDataElement.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmFile.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmFileMetaInformation.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmFragment.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmImplicitDataElement.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmMediaStorage.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmPrivateTag.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmReader.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmSequenceOfFragments.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmSequenceOfItems.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmValue.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmTag.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmTagToVR.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmCodeString.cxx
@@ -429,8 +387,7 @@ set(MDCM_DSED_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmUNExplicitDataElement.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmCP246ExplicitDataElement.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmExplicitImplicitDataElement.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmVR16ExplicitDataElement.cxx
-  ${MDCM_DSED3_SRCS})
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmVR16ExplicitDataElement.cxx)
 
 set(MDCM_MSFF_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmIconImageFilter.cxx
@@ -461,7 +418,6 @@ set(MDCM_MSFF_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmUIDGenerator.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmUUIDGenerator.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmScanner.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmStrictScanner.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPixmapReader.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageReader.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPixmapWriter.cxx

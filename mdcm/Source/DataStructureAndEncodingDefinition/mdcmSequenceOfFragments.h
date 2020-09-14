@@ -27,20 +27,17 @@
 #include "mdcmFragment.h"
 #include "mdcmBasicOffsetTable.h"
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 /**
- * \brief Class to represent a Sequence Of Fragments
- * \todo I do not enforce that Sequence of Fragments ends with a SQ end del
+ * Class to represent a Sequence Of Fragments
+ * Todo MM: I do not enforce that Sequence of Fragments ends with a SQ end del
  */
-
-// mdcmSequenceOfItems and mdcmSequenceOfFragments duplicate code
 
 class MDCM_EXPORT SequenceOfFragments : public Value
 {
 public:
-  // Typdefs:
   typedef std::vector<Fragment> FragmentVector;
   typedef FragmentVector::size_type SizeType;
   typedef FragmentVector::iterator Iterator;
@@ -302,6 +299,6 @@ private:
   bool FillFragmentWithJPEG(Fragment & frag, std::istream & is);
 };
 
-} // end namespace mdcm_ns
+} // end namespace mdcm
 
 #endif //MDCMSEQUENCEOFFRAGMENTS_H

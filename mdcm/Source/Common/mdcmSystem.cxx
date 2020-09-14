@@ -858,23 +858,4 @@ static const char * CharsetAliasToName(const char * alias)
 }
 #endif //_WIN32
 
-const char * System::GetLocaleCharset()
-{
-  const char * codeset = NULL;
-#if defined(MDCM_HAVE_NL_LANGINFO)
-  char * oldlocale = strdup(setlocale(LC_ALL, ""));
-  codeset = nl_langinfo (CODESET);
-  setlocale(LC_ALL, oldlocale);
-  free(oldlocale);
-#endif // MDCM_HAVE_NL_LANGINFO
-#if defined(_WIN32)
-  static char buf[2+10+1]; // 2 char, 10 bytes + 0
-  // GetACP: Retrieves the current Windows ANSI code page identifier for the
-  // operating system.
-  sprintf (buf, "CP%u", GetACP ());
-  codeset = CharsetAliasToName(buf);
-#endif
-  return codeset;
-}
-
 } // end namespace mdcm

@@ -23,7 +23,7 @@
 #include "mdcmImplicitDataElement.h"
 #include "mdcmByteValue.h"
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 void SequenceOfFragments::Clear()
@@ -145,4 +145,4 @@ bool SequenceOfFragments::FillFragmentWithJPEG(Fragment & frag, std::istream & i
   return true;
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm

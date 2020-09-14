@@ -20,7 +20,7 @@
 #include <vector>
 #include <cstring>
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 /**
@@ -239,7 +239,7 @@ public:
   Item empty;
 };
 
-} // end namespace mdcm_ns
+} // end namespace mdcm
 
 #include "mdcmSequenceOfItems.txx"
 

@@ -22,7 +22,7 @@
 #include "mdcmValue.h"
 #include "mdcmVL.h"
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 void Value::SetLengthOnly(VL l)

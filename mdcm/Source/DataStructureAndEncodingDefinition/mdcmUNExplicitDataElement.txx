@@ -87,7 +87,7 @@ std::istream & UNExplicitDataElement::ReadPreValue(std::istream & is)
       return is;
     }
   }
-  catch(Exception &)
+  catch(Exception & ex)
   {
 #ifndef MDCM_DONT_THROW
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION

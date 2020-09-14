@@ -30,15 +30,11 @@
 #include <iomanip>
 #include <algorithm>
 
-namespace mdcm_ns
+namespace mdcm
 {
-#if !defined(SWIGPYTHON) && !defined(SWIGCSHARP) && !defined(SWIGJAVA) && !defined(SWIGPHP)
-using namespace mdcm;
-#endif
 
 /**
- * \brief Class to represent binary value (array of bytes)
- * \note
+ * Class to represent binary value (array of bytes)
  */
 
 class MDCM_EXPORT ByteValue : public Value
@@ -249,6 +245,6 @@ private:
   VL Length;
 };
 
-} // end namespace mdcm_ns
+} // end namespace mdcm
 
 #endif //MDCMBYTEVALUE_H

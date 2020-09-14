@@ -25,6 +25,8 @@
 #include "mdcmException.h"
 #include "mdcmDataElement.h"
 
+// FIXME
+
 // Disable clang warning "dynamic exception specifications are deprecated".
 // We need to be C++03 and C++11 compatible, and if we remove the 'throw()'
 // specifier we'll get an error in C++03 by not matching the superclass.
@@ -35,10 +37,10 @@
 # endif
 #endif
 
-namespace mdcm_ns
+namespace mdcm
 {
 /**
- * \brief ParseException Standard exception handling object.
+ * ParseException Standard exception handling object.
  *
  */
 class ParseException : public Exception
@@ -63,7 +65,7 @@ private:
   DataElement LastElement;
 };
 
-} // end namespace mdcm_ns
+} // end namespace mdcm
 
 // Undo warning suppression
 #if defined(__clang__) && defined(__has_warning)

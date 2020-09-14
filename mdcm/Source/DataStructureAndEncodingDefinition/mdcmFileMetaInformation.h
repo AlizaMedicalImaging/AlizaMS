@@ -29,12 +29,12 @@
 #include "mdcmTransferSyntax.h"
 #include "mdcmExplicitDataElement.h"
 
-namespace mdcm_ns
+namespace mdcm
 {
 /**
- * \brief Class to represent a File Meta Information
+ * Class to represent a File Meta Information
  *
- * \details FileMetaInformation is a Explicit Structured Set.  Whenever the
+ * FileMetaInformation is a Explicit Structured Set.  Whenever the
  * file contains an ImplicitDataElement DataSet, a conversion will take place.
  *
  * Definition:
@@ -43,7 +43,6 @@ namespace mdcm_ns
  * followed by a 4 byte DICOM prefix, followed by the File Meta Elements shown
  * in Table 7.1-1. This header shall be present in every DICOM file.
  *
- * \see Writer Reader
  */
 class MDCM_EXPORT FileMetaInformation : public DataSet
 {
@@ -80,22 +79,22 @@ public:
     Insert(de);
   }
 
-  /// Read
+  // Read
   std::istream & Read(std::istream & is);
   std::istream & ReadCompat(std::istream & is);
 
-  /// Write
+  // Write
   std::ostream & Write(std::ostream & os) const;
 
-  /// Construct a FileMetaInformation from an already existing DataSet:
+  // Construct a FileMetaInformation from an already existing DataSet:
   void FillFromDataSet(DataSet const &ds);
 
-  /// Get Preamble
+  // Get Preamble
   const Preamble & GetPreamble() const { return P; }
   Preamble & GetPreamble() { return P; }
   void SetPreamble(const Preamble & p) { P = p; }
 
-  /// Override the MDCM default values:
+  // Override the MDCM default values:
   static void SetImplementationClassUID(const char * imp);
   static void AppendImplementationClassUID(const char * imp);
   static const char * GetImplementationClassUID();
@@ -153,6 +152,6 @@ inline std::ostream& operator<<(std::ostream &os, const FileMetaInformation &val
   return os;
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm
 
 #endif //MDCMFILEMETAINFORMATION_H

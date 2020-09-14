@@ -30,7 +30,7 @@
 #include "mdcmValueIO.h"
 #include "mdcmSwapper.h"
 
-namespace mdcm_ns
+namespace mdcm
 {
 template <typename TSwap>
 std::istream &ExplicitDataElement::Read(std::istream &is)
@@ -565,6 +565,6 @@ const std::ostream &ExplicitDataElement::Write(std::ostream &os) const
   return os;
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm
 
 #endif // MDCMEXPLICITDATAELEMENT_TXX

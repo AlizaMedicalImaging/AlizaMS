@@ -24,12 +24,11 @@
 
 #include "mdcmDataElement.h"
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 /**
- * \brief Class to represent an *Implicit VR* Data Element
- * \note bla
+ * Class to represent an *Implicit VR* Data Element
  */
 class MDCM_EXPORT ImplicitDataElement : public DataElement
 {
@@ -55,7 +54,7 @@ public:
   const std::ostream &Write(std::ostream& os) const;
 };
 
-} // end namespace mdcm_ns
+} // end namespace mdcm
 
 #include "mdcmImplicitDataElement.txx"
 

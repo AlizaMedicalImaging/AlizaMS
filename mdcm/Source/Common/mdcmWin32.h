@@ -26,7 +26,7 @@
 #if !defined(MDCMTYPES_H)
 #error you need to include mdcmTypes.h instead
 #endif
-//-----------------------------------------------------------------------------
+
 // http://gcc.gnu.org/wiki/Visibility
 #if defined(_WIN32) && defined(MDCM_BUILD_SHARED_LIBS)
   #if (defined(mdcmCommon_EXPORTS) || defined(mdcmDICT_EXPORTS) || defined(mdcmDSED_EXPORTS) || defined(mdcmMSFF_EXPORTS)
@@ -43,12 +43,6 @@
   #endif
 #endif
 
-#if defined(MDCM_OVERRIDE_BROKEN_IMPLEMENTATION) && !defined(MDCM_FORCE_EXPORT)
-#undef MDCM_EXPORT
-#define MDCM_EXPORT
-#endif
-
-//-----------------------------------------------------------------------------
 //This is needed when compiling in debug mode
 #ifdef _MSC_VER
 // to allow construct such as: std::numeric_limits<int>::max() we need the following:
@@ -69,5 +63,4 @@
 #pragma warning ( disable : 4503 )
 #endif //_MSC_VER
 
-//-----------------------------------------------------------------------------
 #endif //MDCMWIN32_H

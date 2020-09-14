@@ -24,7 +24,7 @@
 
 #include "mdcmItem.h"
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 template <typename TDE>
@@ -60,6 +60,6 @@ VL Item::GetLength() const
   }
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm
 
 #endif // MDCMITEM_TXX

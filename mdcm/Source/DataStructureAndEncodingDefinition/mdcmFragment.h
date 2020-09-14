@@ -27,11 +27,11 @@
 #include "mdcmSmartPointer.h"
 #include "mdcmParseException.h"
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 /**
- * \brief Class to represent a Fragment
+ * Class to represent a Fragment
  */
 class MDCM_EXPORT Fragment : public DataElement
 {
@@ -225,6 +225,6 @@ inline std::ostream &operator<<(std::ostream & os, const Fragment & val)
   return os;
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm
 
 #endif //MDCMFRAGMENT_H

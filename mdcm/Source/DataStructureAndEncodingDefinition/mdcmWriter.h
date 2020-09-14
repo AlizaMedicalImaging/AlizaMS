@@ -30,11 +30,11 @@ namespace mdcm
 
 class FileMetaInformation;
 /**
- * \brief Writer ala DOM (Document Object Model)
- * \details This class is a non-validating writer, it will only performs well-
+ * Writer ala DOM (Document Object Model)
+ * This class is a non-validating writer, it will only performs well-
  * formedness check only.
  *
- * \details Detailled description here
+ * Detailled description here
  * To avoid MDCM being yet another broken DICOM lib we try to
  * be user level and avoid writing illegal stuff (odd length,
  * non-zero value for Item start/end length ...)
@@ -47,11 +47,9 @@ class FileMetaInformation;
  * - Alphabetical order for elements (garanteed by design of internals)
  * - 32bits VR will be rewritten with 00
  *
- * \warning
  * mdcm::Writer cannot write a DataSet if no SOP Instance UID (0008,0018) is found,
  * unless a DICOMDIR is being written out
  *
- * \see Reader DataSet File
  */
 class MDCM_EXPORT Writer
 {

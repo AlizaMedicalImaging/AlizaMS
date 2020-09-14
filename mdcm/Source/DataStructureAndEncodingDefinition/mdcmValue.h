@@ -26,16 +26,11 @@
 
 namespace mdcm { class VL; }
 
-namespace mdcm_ns
+namespace mdcm
 {
 
-#if !defined(SWIGPYTHON) && !defined(SWIGCSHARP) && !defined(SWIGJAVA) && !defined(SWIGPHP)
-using namespace mdcm;
-#endif
-
 /**
- * \brief Class to represent the value of a Data Element.
- * \note
+ * Class to represent the value of a Data Element.
  * VALUE: A component of a Value Field. A Value Field may consist of one
  * or more of these components.
  */

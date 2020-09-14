@@ -26,13 +26,11 @@
 #include "mdcmDataSet.h"
 #include "mdcmFileMetaInformation.h"
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 /**
- * \brief a DICOM File PS 3.10
- *
- * \see Reader Writer
+ * DICOM File PS 3.10
  */
 class MDCM_EXPORT File : public Object
 {
@@ -60,6 +58,6 @@ inline std::ostream& operator<<(std::ostream & os, const File & val)
   return os;
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm
 
 #endif //MDCMFILE_H

@@ -26,7 +26,7 @@
 #include <cstdio>
 #include <limits>
 
-namespace mdcm_ns
+namespace mdcm
 {
   bool PrivateTag::ReadFromCommaSeparatedString(const char * str)
   {
@@ -98,4 +98,4 @@ DataElement PrivateTag::GetAsDataElement() const
   return de;
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm

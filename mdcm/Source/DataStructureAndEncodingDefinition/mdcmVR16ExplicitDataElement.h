@@ -27,8 +27,8 @@
 namespace mdcm
 {
 /**
- * \brief Class to read/write a DataElement as Explicit Data Element
- * \note This class support 16 bits when finding an unkown VR:
+ * Class to read/write a DataElement as Explicit Data Element
+ * This class support 16 bits when finding an unkown VR:
  * For instance:
  * Siemens_CT_Sensation64_has_VR_RT.dcm
  */

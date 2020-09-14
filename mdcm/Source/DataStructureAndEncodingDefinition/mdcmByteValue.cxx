@@ -24,7 +24,7 @@
 #include <algorithm>
 #include <cstring>
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 void ByteValue::SetLength(VL vl)
@@ -313,4 +313,4 @@ void ByteValue::Append(ByteValue const & bv)
   assert(Internal.size() % 2 == 0 && Internal.size() == Length);
 }
    
-} // end namespace mdcm_ns
+} // end namespace mdcm

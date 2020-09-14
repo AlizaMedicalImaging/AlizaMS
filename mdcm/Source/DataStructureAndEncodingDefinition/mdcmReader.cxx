@@ -39,7 +39,7 @@
 #include "mdcmVR16ExplicitDataElement.h"
 #endif
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 Reader::Reader():F(new File)
@@ -900,4 +900,4 @@ size_t Reader::GetStreamCurrentPosition() const
   return static_cast<size_t>(GetStreamPtr()->tellg());
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm

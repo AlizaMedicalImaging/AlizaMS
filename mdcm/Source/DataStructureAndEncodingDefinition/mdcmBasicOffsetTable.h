@@ -25,10 +25,10 @@
 
 #include "mdcmFragment.h"
 
-namespace mdcm_ns
+namespace mdcm
 {
 /**
- * \brief Class to represent a BasicOffsetTable
+ * Class to represent a BasicOffsetTable
  */
 
 class MDCM_EXPORT BasicOffsetTable : public Fragment
@@ -81,6 +81,6 @@ inline std::ostream &operator<<(std::ostream & os, const BasicOffsetTable & val)
   return os;
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm
 
 #endif //MDCMBASICOFFSETTABLE_H

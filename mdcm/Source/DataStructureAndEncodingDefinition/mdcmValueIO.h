@@ -24,10 +24,10 @@
 
 #include "mdcmTypes.h"
 
-namespace mdcm_ns
+namespace mdcm
 {
 /**
- * \brief Class to dispatch template calls
+ * Class to dispatch template calls
  */
 template <typename TDE, typename TSwap, typename TType = uint8_t>
 class ValueIO

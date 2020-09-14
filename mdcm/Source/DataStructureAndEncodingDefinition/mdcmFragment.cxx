@@ -21,7 +21,7 @@
 =========================================================================*/
 #include "mdcmFragment.h"
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 VL Fragment::GetLength() const
@@ -37,9 +37,8 @@ VL Fragment::ComputeLength() const
   const ByteValue *bv = GetByteValue();
   assert( bv );
   assert( !ValueLengthField.IsUndefined() );
-  //assert( !ValueField || ValueField->GetLength() == ValueLengthField );
   return TagField.GetLength() + ValueLengthField.GetLength()
     + bv->ComputeLength() /*ValueLengthField*/;
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm

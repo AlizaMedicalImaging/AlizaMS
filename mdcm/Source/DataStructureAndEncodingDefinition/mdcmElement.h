@@ -36,7 +36,7 @@
 #include <cmath>
 #include <cstring>
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 /**
@@ -65,7 +65,7 @@ template <int TVM>
 class ElementDisableCombinations<VR::OW, TVM>;
 
 /**
- * \brief Element class
+ * Element class
  */
 template<long long TVR, int TVM>
 class Element
@@ -927,6 +927,6 @@ class Element<VR::OB, VM::VM1> : public Element<VR::OB, VM::VM1_n> {};
 template<>
 class Element<VR::OW, VM::VM1> : public Element<VR::OW, VM::VM1_n> {};
 
-} // namespace mdcm_ns
+} // namespace mdcm
 
 #endif //MDCMELEMENT_H

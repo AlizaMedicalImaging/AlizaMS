@@ -28,7 +28,7 @@
 
 #include <cstring>
 
-namespace mdcm_ns
+namespace mdcm
 {
 template <typename TDE, typename TSwap>
 std::istream & DataSet::ReadNested(std::istream & is)
@@ -371,7 +371,7 @@ std::istream & DataSet::ReadSelectedPrivateTagsWithLength(
       {
         InsertDataElement(dataElem);
       }
-      if (! (tag < maxTag))
+      if (!(tag < maxTag))
       {
         // The maximum group was encountered, and as we assume
         // ascending tag ordering, we can exit the loop.
@@ -536,6 +536,6 @@ std::ostream const & DataSet::Write(std::ostream & os) const
   return os;
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm
 
 #endif // MDCMDATASET_TXX

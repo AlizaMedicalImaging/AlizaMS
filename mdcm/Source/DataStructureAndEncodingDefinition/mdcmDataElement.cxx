@@ -21,7 +21,7 @@
 #include "mdcmTrace.h"
 #include <typeinfo>
 
-namespace mdcm_ns
+namespace mdcm
 {
   void DataElement::SetVLToUndefined()
   {
@@ -149,4 +149,4 @@ void DataElement::SetValueFieldLength(VL vl, bool readvalues)
   else ValueField->SetLengthOnly(vl); // do not perform realloc
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm

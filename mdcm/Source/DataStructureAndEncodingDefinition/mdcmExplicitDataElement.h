@@ -24,10 +24,10 @@
 
 #include "mdcmDataElement.h"
 
-namespace mdcm_ns
+namespace mdcm
 {
 /**
- * \brief Class to read/write a DataElement as Explicit Data Element
+ * Class to read/write a DataElement as Explicit Data Element
  */
 class MDCM_EXPORT ExplicitDataElement : public DataElement
 {
@@ -50,7 +50,7 @@ public:
   const std::ostream & Write(std::ostream & os) const;
 };
 
-} // end namespace mdcm_ns
+} // end namespace mdcm
 
 #include "mdcmExplicitDataElement.txx"
 

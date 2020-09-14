@@ -22,15 +22,15 @@
 #include <set>
 #include <iterator>
 
-namespace mdcm_ns
+namespace mdcm
 {
 class MDCM_EXPORT DataElementException : public std::exception {};
 
 class PrivateTag;
 /**
- * \brief Class to represent a Data Set (which contains Data Elements)
- * \details A Data Set represents an instance of a real world Information Object
- * \note
+ * Class to represent a Data Set (which contains Data Elements)
+ * A Data Set represents an instance of a real world Information Object
+ *
  * DATA SET:
  * Exchanged information consisting of a structured set of Attribute values
  * directly or indirectly related to Information Objects. The value of each
@@ -38,7 +38,7 @@ class PrivateTag;
  * A collection of Data Elements ordered by increasing Data Element Tag
  * number that is an encoding of the values of Attributes of a real world
  * object.
- * \note
+ *
  * Implementation note. If one do:
  * DataSet ds;
  * ds.SetLength(0);
@@ -48,7 +48,6 @@ class PrivateTag;
  * or defined length (different from 0) means nested dataset with defined
  * length.
  *
- * \warning
  * a DataSet does not have a Transfer Syntax type, only a File does.
  */
 class MDCM_EXPORT DataSet
@@ -181,9 +180,8 @@ public:
     return count;
   }
 
-  /// Return the DataElement with Tag 't'
-  /// \warning:
-  /// This only search at the 'root level' of the DataSet
+  // Return the DataElement with Tag 't'
+  // This only search at the 'root level' of the DataSet
   const DataElement & GetDataElement(const Tag & t) const
   {
     const DataElement r(t);
@@ -317,7 +315,7 @@ private:
 };
 #endif
 
-} // end namespace mdcm_ns
+} // end namespace mdcm
 
 #include "mdcmDataSet.txx"
 

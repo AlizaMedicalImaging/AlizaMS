@@ -34,7 +34,7 @@
 #include <vector>
 #include <sstream>
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 template<int T> class VRVLSize;
@@ -623,6 +623,6 @@ public:
   static VM GetVM() { return VM::VM3_3n; }
 };
 
-} // namespace mdcm_ns
+} // namespace mdcm
 
 #endif //MDCMATTRIBUTE_H

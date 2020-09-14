@@ -29,7 +29,7 @@
 #include "mdcmSmartPointer.h"
 #include <set>
 
-namespace mdcm_ns
+namespace mdcm
 {
 // Data Element
 // Contains multiple fields:
@@ -41,10 +41,9 @@ namespace mdcm_ns
 class SequenceOfItems;
 class SequenceOfFragments;
 /**
- * \brief Class to represent a Data Element
+ * Class to represent a Data Element
  * either Implicit or Explicit
  *
- * \details
  * DATA ELEMENT:
  * A unit of information as defined by a single entry in the data dictionary.
  * An encoded Information Object Definition (IOD) Attribute that is composed
@@ -54,11 +53,10 @@ class SequenceOfFragments;
  * specified explicitly.
  *
  * Design:
- * \li A DataElement in MDCM always store VL (Value Length) on a 32 bits integer even when VL is 16 bits
- * \li A DataElement always store the VR even for Implicit TS, in which case VR is defaulted to VR::INVALID
- * \li For Item start/end (See 0xfffe tags), Value is NULL
+ * A DataElement in MDCM always store VL (Value Length) on a 32 bits integer even when VL is 16 bits
+ * A DataElement always store the VR even for Implicit TS, in which case VR is defaulted to VR::INVALID
+ * For Item start/end (See 0xfffe tags), Value is NULL
  *
- * \see ExplicitDataElement ImplicitDataElement
  */
 class MDCM_EXPORT DataElement
 {
@@ -278,6 +276,6 @@ inline bool operator!=(const DataElement & lhs, const DataElement & rhs)
   return !(lhs == rhs);
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm
 
 #endif //MDCMDATAELEMENT_H

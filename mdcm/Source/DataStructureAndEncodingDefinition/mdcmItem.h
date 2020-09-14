@@ -32,13 +32,13 @@
 #include "mdcmByteSwapFilter.h"
 #endif
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 class DataSet;
 /**
- * \brief Class to represent an Item
- * \details A component of the value of a Data Element that is of Value Representation
+ * Class to represent an Item
+ * A component of the value of a Data Element that is of Value Representation
  * Sequence of Items.
  * An Item contains a Data Set .
  * See PS 3.5 7.5.1 Item Encoding Rules
@@ -46,7 +46,6 @@ class DataSet;
  * Data Element with a specific Data Element Tag of Value (FFFE,E000). The Item
  * Tag is followed by a 4 byte Item Length field encoded in one of the
  * following two ways Explicit/ Implicit
- * \note
  * ITEM: A component of the Value of a Data Element that is of Value
  * Representation Sequence of Items. An Item contains a Data Set.
  */
@@ -328,7 +327,7 @@ inline std::ostream& operator<<(std::ostream & os, const Item & val)
   return os;
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm
 
 #include "mdcmItem.txx"
 

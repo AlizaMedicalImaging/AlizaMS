@@ -30,10 +30,9 @@ namespace mdcm
 {
 
 /**
- * \brief Class to represent a DICOM Data Element (Attribute) Tag (Group, Element).
- * \details Basically an uint32_t which can also be expressed as two uint16_t (group and
+ * Class to represent a DICOM Data Element (Attribute) Tag (Group, Element).
+ * Basically an uint32_t which can also be expressed as two uint16_t (group and
  * element)
- * \note
  * DATA ELEMENT TAG:
  * A unique identifier for a Data Element composed of an ordered pair of
  * numbers (a Group Number followed by an Element Number).  GROUP NUMBER: The
@@ -52,8 +51,8 @@ public:
     ElementTag.tags[0] = group; ElementTag.tags[1] = element;
   }
 
-  /// \brief Constructor with 1*uint32_t
-  /// Prefer the cstor that takes two uint16_t
+  // Constructor with 1*uint32_t
+  // Prefer the cstor that takes two uint16_t
   Tag(uint32_t tag = 0)
   {
     SetElementTag(tag);
@@ -62,21 +61,21 @@ public:
   friend std::ostream& operator<<(std::ostream &_os, const Tag &_val);
   friend std::istream& operator>>(std::istream &_is, Tag &_val);
 
-  /// \brief Returns the 'Group number' of the given Tag
+  // Returns the 'Group number' of the given Tag
   uint16_t GetGroup() const { return ElementTag.tags[0]; }
-  /// \brief Returns the 'Element number' of the given Tag
+  // Returns the 'Element number' of the given Tag
   uint16_t GetElement() const { return ElementTag.tags[1]; }
-  /// \brief Sets the 'Group number' of the given Tag
+  // Sets the 'Group number' of the given Tag
   void SetGroup(uint16_t group) { ElementTag.tags[0] = group; }
-  /// \brief Sets the 'Element number' of the given Tag
+  // Sets the 'Element number' of the given Tag
   void SetElement(uint16_t element) { ElementTag.tags[1] = element; }
-  /// \brief Sets the 'Group number' & 'Element number' of the given Tag
+  // Sets the 'Group number' & 'Element number' of the given Tag
   void SetElementTag(uint16_t group, uint16_t element)
   {
     ElementTag.tags[0] = group; ElementTag.tags[1] = element;
   }
 
-  /// \brief Returns the full tag value of the given Tag
+  // Returns the full tag value of the given Tag
   uint32_t GetElementTag() const
   {
 #ifndef MDCM_WORDS_BIGENDIAN
@@ -86,7 +85,7 @@ public:
 #endif
   }
 
-  /// \brief Sets the full tag value of the given Tag
+  // Sets the full tag value of the given Tag
   void SetElementTag(uint32_t tag)
   {
 #ifndef MDCM_WORDS_BIGENDIAN
@@ -95,13 +94,13 @@ public:
     ElementTag.tag = tag;
   }
 
-  /// Returns the Group or Element of the given Tag, depending on id (0/1)
+  // Returns the Group or Element of the given Tag, depending on id (0/1)
   const uint16_t &operator[](const unsigned int &_id) const
   {
     assert(_id<2);
     return ElementTag.tags[_id];
   }
-  /// Returns the Group or Element of the given Tag, depending on id (0/1)
+  // Returns the Group or Element of the given Tag, depending on id (0/1)
   uint16_t &operator[](const unsigned int &_id)
   {
     assert(_id<2);
@@ -123,13 +122,12 @@ public:
     return ElementTag.tag != _val.ElementTag.tag;
   }
 
-  /// DICOM Standard expects the Data Element to be sorted by Tags
-  /// All other comparison can be constructed from this one and operator ==
-  // FIXME FIXME FIXME TODO
+  // DICOM Standard expects the Data Element to be sorted by Tags
+  // All other comparison can be constructed from this one and operator ==
+  // FIXME
   // the following is pretty dumb. Since we have control over who is group
   // and who is element, we should reverse them in little endian and big endian case
   // since what we really want is fast comparison and not garantee that group is in #0
-  // ...
   bool operator<(const Tag &_val) const
   {
 #ifndef MDCM_WORDS_BIGENDIAN
@@ -154,21 +152,21 @@ public:
   {
     ElementTag.tag = _val.ElementTag.tag;
   }
-  /// return the length of tag (read: size on disk)
+  // return the length of tag (read: size on disk)
   uint32_t GetLength() const { return 4; }
 
-  /// STANDARD DATA ELEMENT: A Data Element defined in the DICOM Standard,
-  /// and therefore listed in the DICOM Data Element Dictionary in PS 3.6.
-  /// Is the Tag from the Public dict...well the implementation is buggy
-  /// it does not prove the element is indeed in the dict...
+  // STANDARD DATA ELEMENT: A Data Element defined in the DICOM Standard,
+  // and therefore listed in the DICOM Data Element Dictionary in PS 3.6.
+  // Is the Tag from the Public dict...well the implementation is buggy
+  // it does not prove the element is indeed in the dict...
   bool IsPublic() const { return !(ElementTag.tags[0] % 2); }
 
-  /// PRIVATE DATA ELEMENT: Additional Data Element, defined by an
-  /// implementor, to communicate information that is not contained in
-  /// Standard Data Elements. Private Data elements have odd Group Numbers.
+  // PRIVATE DATA ELEMENT: Additional Data Element, defined by an
+  // implementor, to communicate information that is not contained in
+  // Standard Data Elements. Private Data elements have odd Group Numbers.
   bool IsPrivate() const { return !IsPublic(); }
 
-  /// Read a tag from binary representation
+  // Read a tag from binary representation
   template <typename TSwap>
   std::istream &Read(std::istream &is)
   {
@@ -177,7 +175,7 @@ public:
     return is;
   }
 
-  /// Write a tag in binary rep
+  // Write a tag in binary rep
   template <typename TSwap>
   const std::ostream &Write(std::ostream &os) const
   {
@@ -188,7 +186,7 @@ public:
     return os.write((char*)(&copy), 4);
   }
 
-  /// Return the Private Creator Data Element tag of a private data element
+  // Return the Private Creator Data Element tag of a private data element
   Tag GetPrivateCreator() const
   {
     // See PS 3.5 - 7.8.1 PRIVATE DATA ELEMENT TAGS
@@ -202,7 +200,7 @@ public:
     if(IsPrivateCreator()) return *this;
     return Tag(0x0,0x0);
   }
-  /// Set private creator:
+  // Set private creator:
   void SetPrivateCreator(Tag const &t)
   {
     // See PS 3.5 - 7.8.1 PRIVATE DATA ELEMENT TAGS
@@ -214,14 +212,14 @@ public:
     SetGroup(t.GetGroup());
   }
 
-  /// Returns if tag is a Private Creator (xxxx,00yy), where xxxx is odd number
-  /// and yy in [0x10,0xFF]
+  // Returns if tag is a Private Creator (xxxx,00yy), where xxxx is odd number
+  // and yy in [0x10,0xFF]
   bool IsPrivateCreator() const
   {
     return IsPrivate() && (GetElement() <= 0xFF && GetElement() >= 0x10);
   }
 
-  /// return if the tag is considered to be an illegal tag
+  // return if the tag is considered to be an illegal tag
   bool IsIllegal() const
   {
     // DICOM reserved those groups:
@@ -233,13 +231,13 @@ public:
       (IsPrivate() && GetElement() > 0x0 && GetElement() < 0x10));
   }
 
-  /// return whether the tag correspond to a group length tag:
+  // return whether the tag correspond to a group length tag:
   bool IsGroupLength() const
   {
     return GetElement() == 0x0;
   }
 
-  /// e.g 6002,3000 belong to groupXX: 6000,3000
+  // e.g 6002,3000 belong to groupXX: 6000,3000
   bool IsGroupXX(const Tag &t) const
   {
     if(t.GetElement() == GetElement())
@@ -251,30 +249,30 @@ public:
     return false;
   }
 
-  /// Read from a comma separated string.
-  /// This is a highly user oriented function, the string should be formated as:
-  /// 1234,5678 to specify the tag (0x1234,0x5678)
-  /// The notation comes from the DICOM standard, and is handy to use from a
-  /// command line program
+  // Read from a comma separated string.
+  // This is a highly user oriented function, the string should be formated as:
+  // 1234,5678 to specify the tag (0x1234,0x5678)
+  // The notation comes from the DICOM standard, and is handy to use from a
+  // command line program
   bool ReadFromCommaSeparatedString(const char *str);
   
-  /// Read From XML formatted tag value eg. tag = "12345678"
-  /// It comes in useful when reading tag values from XML file(in NativeDICOMModel)
+  // Read From XML formatted tag value eg. tag = "12345678"
+  // It comes in useful when reading tag values from XML file(in NativeDICOMModel)
   bool ReadFromContinuousString(const char *str);
 
-  /// Print tag value with no separating comma: eg. tag = "12345678"
-  /// It comes in useful when reading tag values from XML file(in NativeDICOMModel)
+  // Print tag value with no separating comma: eg. tag = "12345678"
+  // It comes in useful when reading tag values from XML file(in NativeDICOMModel)
   std::string PrintAsContinuousString() const;
 
-  /// Same as PrintAsContinuousString, but hexadecimal [a-f] are printed using upper case
+  // Same as PrintAsContinuousString, but hexadecimal [a-f] are printed using upper case
   std::string PrintAsContinuousUpperCaseString() const;
 
-  /// Read from a pipe separated string (MDCM 1.x compat only). Do not use in newer code
-  /// \see ReadFromCommaSeparatedString
+  // Read from a pipe separated string (MDCM 1.x compat only). Do not use in newer code
+  // \see ReadFromCommaSeparatedString
   bool ReadFromPipeSeparatedString(const char *str);
 
-  /// Print as a pipe separated string (MDCM 1.x compat only). Do not use in newer code
-  /// \see ReadFromPipeSeparatedString
+  // Print as a pipe separated string (MDCM 1.x compat only). Do not use in newer code
+  // \see ReadFromPipeSeparatedString
   std::string PrintAsPipeSeparatedString() const;
 
 private:

@@ -29,7 +29,7 @@ namespace mdcm
 {
 
 /**
- * \brief DICOM Preamble (Part 10)
+ * DICOM Preamble (Part 10)
  */
 
 class MDCM_EXPORT Preamble

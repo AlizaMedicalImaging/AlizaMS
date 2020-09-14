@@ -36,12 +36,11 @@ namespace mdcm
 {
 
 /**
- * \brief VR class
- * \details This is adapted from DICOM standard
+ * VR class
+ * This is adapted from DICOM standard
  * The biggest difference is the INVALID VR
  * and the composite one that differ from standard (more like an addition)
  * This allow us to represent all the possible case express in the DICOMV3 dict
- * \note
  * VALUE REPRESENTATION (VR)
  * Specifies the data type and format of the Value(s) contained in the
  * Value Field of a Data Element.

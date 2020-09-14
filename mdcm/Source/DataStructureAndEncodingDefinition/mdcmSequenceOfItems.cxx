@@ -22,7 +22,7 @@
 
 #include "mdcmSequenceOfItems.h"
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 void SequenceOfItems::AddItem(Item const & item)
@@ -95,4 +95,4 @@ bool SequenceOfItems::FindDataElement(const Tag & t) const
   return found;
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm

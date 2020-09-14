@@ -21,7 +21,7 @@
 =========================================================================*/
 #include "mdcmFile.h"
 
-namespace mdcm_ns
+namespace mdcm
 {
 
 File::File() {}
@@ -37,4 +37,4 @@ std::ostream const & File::Write(std::ostream & os) const
   return os;
 }
 
-} // end namespace mdcm_ns
+} // end namespace mdcm
