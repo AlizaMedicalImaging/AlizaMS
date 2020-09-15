@@ -7554,8 +7554,7 @@ QString DicomUtils::read_buffer(
 		{
 			const unsigned char c = singlebit_buffer[x];
 			bool bit1, bit2, bit3, bit4, bit5, bit6, bit7, bit8;
-			// TODO
-			if (itk::ByteSwapper<unsigned char>::SystemIsLittleEndian())
+			if (true) // FIXME big endian
 			{
 				bit1 = c &  0x1;
 				bit2 = c &  0x2;
@@ -7577,22 +7576,14 @@ QString DicomUtils::read_buffer(
 				bit2 = c & 0x40;
 				bit1 = c & 0x80;
 			}
-			if (bit1) not_rescaled_buffer[j  ] = 255;
-			else      not_rescaled_buffer[j  ] = 0;
-			if (bit2) not_rescaled_buffer[j+1] = 255;
-			else      not_rescaled_buffer[j+1] = 0;
-			if (bit3) not_rescaled_buffer[j+2] = 255;
-			else      not_rescaled_buffer[j+2] = 0;
-			if (bit4) not_rescaled_buffer[j+3] = 255;
-			else      not_rescaled_buffer[j+3] = 0;
-			if (bit5) not_rescaled_buffer[j+4] = 255;
-			else      not_rescaled_buffer[j+4] = 0;
-			if (bit6) not_rescaled_buffer[j+5] = 255;
-			else      not_rescaled_buffer[j+5] = 0;
-			if (bit7) not_rescaled_buffer[j+6] = 255;
-			else      not_rescaled_buffer[j+6] = 0;
-			if (bit8) not_rescaled_buffer[j+7] = 255;
-			else      not_rescaled_buffer[j+7] = 0;
+			not_rescaled_buffer[j  ] = bit1 ? 255 : 0;
+			not_rescaled_buffer[j+1] = bit2 ? 255 : 0;
+			not_rescaled_buffer[j+2] = bit3 ? 255 : 0;
+			not_rescaled_buffer[j+3] = bit4 ? 255 : 0;
+			not_rescaled_buffer[j+4] = bit5 ? 255 : 0;
+			not_rescaled_buffer[j+5] = bit6 ? 255 : 0;
+			not_rescaled_buffer[j+6] = bit7 ? 255 : 0;
+			not_rescaled_buffer[j+7] = bit8 ? 255 : 0;
 			j += 8;
 		}
 		delete [] singlebit_buffer;
