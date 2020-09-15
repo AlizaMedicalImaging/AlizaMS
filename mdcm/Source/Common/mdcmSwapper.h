@@ -27,7 +27,6 @@
 namespace mdcm
 {
 
-
 #ifdef MDCM_WORDS_BIGENDIAN
 class SwapperDoOp
 {
@@ -71,7 +70,6 @@ public:
   }
 };
 #endif
-
 
 } // end namespace mdcm
 

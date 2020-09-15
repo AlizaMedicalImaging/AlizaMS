@@ -32,8 +32,8 @@ namespace mdcm
 
 class Event;
 /**
- * \brief SimpleSubjectWatcher
- * \details This is a typical Subject Watcher class. It will observe all events.
+ * SimpleSubjectWatcher
+ * This is a typical Subject Watcher class. It will observe all events.
  */
 class MDCM_EXPORT SimpleSubjectWatcher
 {
@@ -74,8 +74,8 @@ private:
   unsigned long m_DataTag;
   unsigned long m_DataSetTag;
   bool m_TestAbort;
-  SimpleSubjectWatcher(const SimpleSubjectWatcher &);  // Not implemented.
-  void operator=(const SimpleSubjectWatcher &);  // Not implemented.
+  SimpleSubjectWatcher(const SimpleSubjectWatcher &);  // Not implemented
+  void operator=(const SimpleSubjectWatcher &);  // Not implemented
 };
 } // end namespace mdcm
 

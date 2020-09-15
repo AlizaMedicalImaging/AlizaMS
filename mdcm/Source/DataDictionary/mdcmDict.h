@@ -37,13 +37,8 @@
 
 namespace mdcm
 {
-// Data Element Tag
 /**
- * \brief Class to represent a map of DictEntry
- * TODO For Element == 0x0 need to return
- * Name = Group Length
- * ValueRepresentation = UL
- * ValueMultiplicity = 1
+ * Class to represent a map of DictEntry
  */
 class MDCM_EXPORT Dict
 {
@@ -71,18 +66,6 @@ public:
     MapDictEntry::const_iterator it = DictInternal.find(tag);
     if (it == DictInternal.end())
     {
-#ifdef UNKNOWNPUBLICTAG
-      if(  tag != Tag(0x28,0x15)
-        && tag != Tag(0x28,0x16)
-        && tag != Tag(0x28,0x199)
-        && tag != Tag(0x20,0x1)
-        && tag != Tag(0x8348,0x339)
-        && tag != Tag(0xb5e8,0x338)
-        && tag != Tag(0x40,0xa125))
-      {
-        assert(0 && "Impossible");
-      }
-#endif
       it = DictInternal.find(Tag(0xffff,0xffff));
       return it->second;
     }
@@ -134,37 +117,6 @@ public:
     return it->second;
   }
 
-  // Inefficient way of looking up tag by name. Technically DICOM
-  // does not garantee uniqueness (and Curve / Overlay are there to prove it). But
-  // most of the time name is in fact uniq and can be uniquely link to a tag
-  const DictEntry & GetDictEntryByName(const char * name, Tag & tag) const
-  {
-    MapDictEntry::const_iterator it = DictInternal.begin();
-    if(name)
-    {
-      for(; it != DictInternal.end(); ++it)
-      {
-        if(strcmp(name, it->second.GetName()) == 0)
-        {
-          tag = it->first;
-          break;
-        }
-      }
-    }
-    else
-    {
-      it = DictInternal.end();
-    }
-    if (it == DictInternal.end())
-    {
-      tag = Tag(0xffff,0xffff);
-      it = DictInternal.find(tag);
-      return it->second;
-    }
-    assert(DictInternal.count(tag) == 1);
-    return it->second;
-  }
-
 protected:
   friend class Dicts;
   void LoadDefault();
@@ -188,15 +140,8 @@ inline std::ostream& operator<<(std::ostream & os, const Dict & val)
   return os;
 }
 
-// TODO
-// For private dict, element < 0x10 should automatically defined:
-// Name = "Private Creator"
-// ValueRepresentation = LO
-// ValueMultiplicity = 1
-// Owner = ""
-
 /**
- * \brief Private Dict
+ * Private Dict
  */
 class MDCM_EXPORT PrivateDict
 {
@@ -210,39 +155,13 @@ public:
 #ifndef NDEBUG
     MapDictEntry::size_type s = DictInternal.size();
 #endif
-    DictInternal.insert(
-      MapDictEntry::value_type(tag, de));
-   // The following code should only be used when
-   // manually constructing a Private.xml file by hand
-   // it will get rid of VR::UN duplicate
-   // (ie. if a VR != VR::Un can be found)
-#if defined(NDEBUG) && 0
-    if(s == DictInternal.size())
-    {
-      MapDictEntry::iterator it = DictInternal.find(tag);
-      assert(it != DictInternal.end());
-      DictEntry &duplicate = it->second;
-      assert(de.GetVR() == VR::UN || duplicate.GetVR() == VR::UN);
-      assert(de.GetVR() != duplicate.GetVR());
-      if(duplicate.GetVR() == VR::UN)
-      {
-        assert(de.GetVR() != VR::UN);
-        duplicate.SetVR(de.GetVR());
-        duplicate.SetVM(de.GetVM());
-        assert(GetDictEntry(tag).GetVR() != VR::UN);
-        assert(GetDictEntry(tag).GetVR() == de.GetVR());
-        assert(GetDictEntry(tag).GetVM() == de.GetVM());
-      }
-      return;
-    }
-#endif
+    DictInternal.insert(MapDictEntry::value_type(tag, de));
     assert(s < DictInternal.size());
   }
 
   bool RemoveDictEntry(const PrivateTag & tag)
   {
-    MapDictEntry::size_type s =
-      DictInternal.erase(tag);
+    MapDictEntry::size_type s = DictInternal.erase(tag);
     assert(s == 1 || s == 0);
     return s == 1;
   }

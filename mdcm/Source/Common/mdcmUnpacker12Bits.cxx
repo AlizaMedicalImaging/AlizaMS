@@ -27,7 +27,7 @@ namespace mdcm
 
 bool Unpacker12Bits::Unpack(char * out, const char * in, size_t n)
 {
-  // 3bytes are actually 2 words
+  // 3 bytes = 2 words
   // http://groups.google.com/group/comp.lang.c/msg/572bc9b085c717f3
   if(n % 3) return false;
   short * q = (short*)out;
@@ -47,7 +47,7 @@ bool Unpacker12Bits::Unpack(char * out, const char * in, size_t n)
 
 bool Unpacker12Bits::Pack(char * out, const char * in, size_t n)
 {
-  // we need an even number of 'words' so that 2 words are split in 3 bytes
+  // number of words should be even, so that 2 words are split in 3 bytes
   if(n % 4) return false;
   unsigned char * q = (unsigned char*)out;
   const unsigned short * p = (const unsigned short*)(const void*)in;

@@ -29,7 +29,7 @@ namespace mdcm
 {
 
 /**
- * \brief class to handle a path of tag
+ * Class to handle a path of tag
  */
 class MDCM_EXPORT TagPath
 {
@@ -38,16 +38,12 @@ public:
   ~TagPath();
   void Print(std::ostream &) const;
 
-  // "/0018,0018/"...
   // No space allowed, comma is use to separate tag group
   // from tag element and slash is used to separate tag
   // return false if invalid
   bool ConstructFromString(const char * path);
-
   static bool IsValid(const char * path);
-
   bool ConstructFromTagList(Tag const * l, unsigned int n);
-
   bool Push(Tag const & t);
   bool Push(unsigned int itemnum);
 

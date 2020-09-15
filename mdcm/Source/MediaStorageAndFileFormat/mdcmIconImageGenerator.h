@@ -29,8 +29,8 @@ namespace mdcm
 {
 class IconImageGeneratorInternals;
 /**
- * \brief IconImageGenerator
- * \details This filter will generate a valid Icon from the Pixel Data element (an
+ * IconImageGenerator
+ * This filter will generate a valid Icon from the Pixel Data element (an
  * instance of Pixmap).
  * To generate a valid Icon, one is only allowed the following Photometric
  * Interpretation:
@@ -44,7 +44,6 @@ class IconImageGeneratorInternals;
  * This may not be ideal for some situation, in which case the API
  * SetPixelMinMax can be used to overwrite the default min,max interval used.
  *
- * \see ImageReader
  */
 class MDCM_EXPORT IconImageGenerator
 {
@@ -57,12 +56,12 @@ public:
   void SetOutputDimensions(const unsigned int dims[2]);
   void SetPixelMinMax(double min, double max);
   void AutoPixelMinMax(bool b);
-  /// Converting from RGB to PALETTE_COLOR can be a slow operation. However DICOM
-  /// standard requires that color icon be described as palette. Set this boolean
-  /// to false only if you understand the consequences.
-  /// default value is true, false generates invalid Icon Image Sequence
+  // Converting from RGB to PALETTE_COLOR can be a slow operation. However DICOM
+  // standard requires that color icon be described as palette. Set this boolean
+  // to false only if you understand the consequences.
+  // default value is true, false generates invalid Icon Image Sequence
   void ConvertRGBToPaletteColor(bool b);
-  /// Requires AutoPixelMinMax(true)
+  // Requires AutoPixelMinMax(true)
   void SetOutsideValuePixel(double v);
   bool Generate();
   const IconImage& GetIconImage() const { return *I; }

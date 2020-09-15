@@ -32,8 +32,8 @@ namespace mdcm
 {
 
 /**
- * \brief ImageCodec
- * \note Main codec, this is a central place for all implementation
+ * ImageCodec
+ * Main codec, this is a central place for all implementation
  */
 class MDCM_EXPORT ImageCodec : public Codec
 {
@@ -118,12 +118,12 @@ public:
 
 protected:
   // Streaming (write) API:
-  /// This is a high level API to encode in a streaming fashion. Each plugin
-  /// will handle differently the caching mechanism so that a limited memory is
-  /// used when compressing dataset.
-  /// Codec will fall into two categories:
-  /// - Full row encoder: only a single scanline (row) of data is needed to be loaded at a time;
-  /// - Full frame encoder (default): a complete frame (row x col) is needed to be loaded at a time
+  // This is a high level API to encode in a streaming fashion. Each plugin
+  // will handle differently the caching mechanism so that a limited memory is
+  // used when compressing dataset.
+  // Codec will fall into two categories:
+  // - Full row encoder: only a single scanline (row) of data is needed to be loaded at a time;
+  // - Full frame encoder (default): a complete frame (row x col) is needed to be loaded at a time
   friend class FileChangeTransferSyntax;
   virtual bool StartEncode(std::ostream & os);
   virtual bool IsRowEncoder();

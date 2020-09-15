@@ -29,8 +29,8 @@ namespace mdcm
 
 class Image;
 /**
- * \brief ImageToImageFilter class
- * \details Super class for all filter taking an image and producing an output image
+ * ImageToImageFilter class
+ * Super class for all filter taking an image and producing an output image
  */
 class MDCM_EXPORT ImageToImageFilter : public PixmapToPixmapFilter
 {

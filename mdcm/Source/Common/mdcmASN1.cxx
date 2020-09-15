@@ -90,7 +90,6 @@ bool ASN1::ParseDump(const char *array, size_t length)
 #else
   (void)array;
   (void)length;
-  mdcmDebugMacro("MDCM_USE_SYSTEM_OPENSSL is OFF");
   return false;
 #endif
 }

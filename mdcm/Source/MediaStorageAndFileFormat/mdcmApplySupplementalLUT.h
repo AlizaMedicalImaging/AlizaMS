@@ -15,11 +15,7 @@ namespace mdcm
 {
 
 class DataElement;
-/**
- * \brief ImageSupplementalLUT class
- * \details It applies SupplementalLUT to the PixelData
- * Output will be a PhotometricInterpretation=RGB image
- */
+
 class MDCM_EXPORT ApplySupplementalLUT : public ImageToImageFilter
 {
 public:

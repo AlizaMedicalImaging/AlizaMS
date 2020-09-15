@@ -22,8 +22,7 @@
 #ifndef MDCMSURFACEHELPER_H
 #define MDCMSURFACEHELPER_H
 
-#include "mdcmTypes.h"  // for MDCM_EXPORT
-
+#include "mdcmTypes.h"
 #include <vector>
 #include <iostream>
 
@@ -144,7 +143,7 @@ SurfaceHelper::ColorArray SurfaceHelper::RGBToRecommendedDisplayCIELab(const std
 
   // Convert to range 0x0000-0xFFFF
   // 0xFFFF "=" 127, 0x8080 "=" 0, 0x0000 "=" -128
-  CIELab[0] = (unsigned short) (          0xFFFF           * (tmp[0]*0.01f));
+  CIELab[0] = (unsigned short)(0xFFFF * (tmp[0]*0.01f));
   if(tmp[1] >= -128 && tmp[1] <= 0)
   {
       CIELab[1] = (unsigned short)(((float)(0x8080)/128.0f)*tmp[1] + ((float)0x8080));

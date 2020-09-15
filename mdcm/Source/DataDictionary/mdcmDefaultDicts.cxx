@@ -14211,7 +14211,6 @@ void Dict::LoadDefault()
    {
       Tag t(n.group, n.element);
       DictEntry e(n.name, n.keyword, n.vr, n.vm, n.ret);
-      assert(DictEntry::CheckKeywordAgainstName(n.name, n.keyword));
       AddDictEntry(t, e);
       n = DICOMV3DataDict[++i];
    }

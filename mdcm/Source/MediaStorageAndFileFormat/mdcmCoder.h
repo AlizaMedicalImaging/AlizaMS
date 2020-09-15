@@ -30,9 +30,7 @@ namespace mdcm
 
 class TransferSyntax;
 class DataElement;
-/**
- * \brief Coder
- */
+
 class MDCM_EXPORT Coder
 {
 public:

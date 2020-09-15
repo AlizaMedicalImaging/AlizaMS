@@ -28,9 +28,6 @@
 namespace mdcm
 {
 
-/**
- * \brief Codec class
- */
 class MDCM_EXPORT Codec : public Coder, public Decoder
 {
 };

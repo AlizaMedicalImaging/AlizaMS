@@ -49,14 +49,14 @@ MediaStorage ImageWriter::ComputeTargetMediaStorage()
   MediaStorage ms;
   if(!ms.SetFromFile(GetFile()))
   {
-    // Let's fix some old ACR-NEMA stuff
+    // Fix some old ACR-NEMA stuff
     ms = ImageHelper::ComputeMediaStorageFromModality(ms.GetModality(),
         PixelData->GetNumberOfDimensions(),
         PixelData->GetPixelFormat(),
         PixelData->GetPhotometricInterpretation(),
         GetImage().GetIntercept(), GetImage().GetSlope());
   }
-  // double check for MR Image Storage
+  // Double-check for MR Image Storage
   if(ms == MediaStorage::MRImageStorage &&
       (GetImage().GetIntercept() != 0.0 || GetImage().GetSlope() != 1.0))
   {
@@ -66,7 +66,7 @@ MediaStorage ImageWriter::ComputeTargetMediaStorage()
         PixelData->GetPhotometricInterpretation(),
         GetImage().GetIntercept(), GetImage().GetSlope());
   }
-  // double check for Grayscale since they need specific pixel type
+  // Double-check for Grayscale since they need specific pixel type
   if( ms == MediaStorage::MultiframeGrayscaleByteSecondaryCaptureImageStorage
    || ms == MediaStorage::MultiframeGrayscaleWordSecondaryCaptureImageStorage
    || ms == MediaStorage::MultiframeSingleBitSecondaryCaptureImageStorage
@@ -88,7 +88,6 @@ bool ImageWriter::Write()
   if(!PrepareWrite(ms)) return false;
   File & file = GetFile();
   DataSet & ds = file.GetDataSet();
-  // Some Type 2 Element:
   // PatientName
   if(!ds.FindDataElement(Tag(0x0010,0x0010)))
   {

@@ -32,8 +32,8 @@ namespace mdcm
 
 class DataElement;
 /**
- * \brief FileDecompressLookupTable class
- * \details It decompress the segmented LUT into linearized one (only PALETTE_COLOR images)
+ * FileDecompressLookupTable class
+ * Decompress the segmented LUT into linearized one (only PALETTE_COLOR images)
  * Output will be a PhotometricInterpretation=RGB image
  */
 class MDCM_EXPORT FileDecompressLookupTable : public Subject

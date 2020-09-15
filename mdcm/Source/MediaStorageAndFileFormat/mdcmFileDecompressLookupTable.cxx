@@ -55,7 +55,7 @@ bool FileDecompressLookupTable::Change()
     redde.SetVR(VR::OW);
     redde.SetByteValue((char*)rawlut, l);
     ds.Replace(redde);
-    // Descriptor:
+    // Descriptor
     Attribute<0x0028, 0x1101, VR::US, VM::VM3> reddesc;
     lut.GetLUTDescriptor(LookupTable::RED, length, subscript, bitsize);
     reddesc.SetValue(length,0); reddesc.SetValue(subscript,1); reddesc.SetValue(bitsize,2);
@@ -67,7 +67,7 @@ bool FileDecompressLookupTable::Change()
     greende.SetVR(VR::OW);
     greende.SetByteValue((char*)rawlut, l);
     ds.Replace(greende);
-    // Descriptor:
+    // Descriptor
     Attribute<0x0028, 0x1102, VR::US, VM::VM3> greendesc;
     lut.GetLUTDescriptor(LookupTable::GREEN, length, subscript, bitsize);
     greendesc.SetValue(length,0); greendesc.SetValue(subscript,1); greendesc.SetValue(bitsize,2);
@@ -79,7 +79,7 @@ bool FileDecompressLookupTable::Change()
     bluede.SetVR(VR::OW);
     bluede.SetByteValue((char*)rawlut, l);
     ds.Replace(bluede);
-    // Descriptor:
+    // Descriptor
     Attribute<0x0028, 0x1103, VR::US, VM::VM3> bluedesc;
     lut.GetLUTDescriptor(LookupTable::BLUE, length, subscript, bitsize);
     bluedesc.SetValue(length,0); bluedesc.SetValue(subscript,1); bluedesc.SetValue(bitsize,2);

@@ -28,23 +28,17 @@ namespace mdcm
 {
 
 /**
- * \brief BitmapToBitmapFilter class
- * \details Super class for all filter taking an image and producing an output image
+ * BitmapToBitmapFilter class
+ * Super class for all filter taking an image and producing an output image
  */
 class MDCM_EXPORT BitmapToBitmapFilter
 {
 public:
   BitmapToBitmapFilter();
   ~BitmapToBitmapFilter() {}
-
-  /// Set input image
   void SetInput(const Bitmap& image);
-
-  /// Get Output image
   const Bitmap &GetOutput() const { return *Output; }
-
-  // SWIG/Java hack:
-  const Bitmap &GetOutputAsBitmap() const;
+  const Bitmap &GetOutputAsBitmap() const; // SWIG/Java hack
 
 protected:
   SmartPointer<Bitmap> Input;

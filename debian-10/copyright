@@ -12,7 +12,7 @@ License: GLPv3
 
 Files: b/*
 Copyright:
-  2003-2006 Erwin Coumans
+  2003-2020 Erwin Coumans and contributors
 License: Zlib
   All source code files are licensed under the permissive zlib license.
   http://opensource.org/licenses/Zlib
@@ -83,6 +83,11 @@ License: BSD-3-clause-alike-CREATIS
   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Files: mdcm/Source/Common/mdcmBase64.*
+Copyright:
+  2004-2008 René Nyffenegger
+License: BSD-3-clause
 
 Files: mdcm/Utilities/mdcmcharls/*
 Copyright:
@@ -198,7 +203,7 @@ License: Zlib
 
 Files: mdcm/Utilities/pvrg/*
 Copyright:
-  Copyright (C) 1990, 1991, 1993 Andy C. Hung, all rights reserved.
+  1990, 1991, 1993 Andy C. Hung
 License: public-domain
   PUBLIC DOMAIN LICENSE: Stanford University Portable Video Research
   Group. If you use this software, you agree to the following: This

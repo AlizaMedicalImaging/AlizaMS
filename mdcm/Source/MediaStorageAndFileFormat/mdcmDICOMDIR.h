@@ -27,11 +27,7 @@
 
 namespace mdcm
 {
-/**
- * \brief DICOMDIR class
- *
- * \details Structured for handling DICOMDIR
- */
+
 class MDCM_EXPORT DICOMDIR
 {
 public:

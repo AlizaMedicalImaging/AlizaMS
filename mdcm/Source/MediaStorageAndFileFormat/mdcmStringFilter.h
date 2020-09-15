@@ -30,8 +30,8 @@ namespace mdcm
 {
 
 /**
- * \brief StringFilter
- * \details StringFilter is the class that make mdcm2.x looks more like mdcm1 and transform the binary blob
+ * StringFilter
+ * StringFilter is the class that make mdcm2.x looks more like mdcm1 and transform the binary blob
  * contained in a DataElement into a string, typically this is a nice feature to have for wrapped language
  */
 class MDCM_EXPORT StringFilter
@@ -40,29 +40,29 @@ public:
   StringFilter();
   ~StringFilter();
   void UseDictAlways(bool) {}
-  /// Allow user to pass in there own dicts
+  // Allow user to pass in there own dicts
   void SetDicts(const Dicts &dicts);
-  /// Convert to string the ByteValue contained in a DataElement. The
-  /// DataElement must be coming from the actual DataSet associated with File
-  /// (see SetFile).
+  // Convert to string the ByteValue contained in a DataElement. The
+  // DataElement must be coming from the actual DataSet associated with File
+  // (see SetFile).
   std::string ToString(const DataElement& de) const;
-  /// Directly from a Tag:
+  // Directly from a Tag:
   std::string ToString(const Tag& t) const;
-  /// Convert to string the ByteValue contained in a DataElement
-  /// the returned elements are:
-  /// pair.first : the name as found in the dictionary of DataElement
-  /// pari.second : the value encoded into a string (US,UL...) are properly converted
+  // Convert to string the ByteValue contained in a DataElement
+  // the returned elements are:
+  // pair.first : the name as found in the dictionary of DataElement
+  // pari.second : the value encoded into a string (US,UL...) are properly converted
   std::pair<std::string, std::string> ToStringPair(const DataElement& de) const;
-  /// Directly from a Tag
+  // Directly from a Tag
   std::pair<std::string, std::string> ToStringPair(const Tag& t) const;
-  /// Convert to string the char array defined by the pair (value,len)
+  // Convert to string the char array defined by the pair (value,len)
   std::string FromString(const Tag&t, const char * value, size_t len);
   void SetFile(const File& f) { F = f; }
   File &GetFile() { return *F; }
   const File &GetFile() const { return *F; }
-  /// Execute the XPATH query to find a value (as string)
-  /// return false when attribute is not found (or an error in the XPATH query)
-  /// You need to make sure that your XPATH query is syntatically correct
+  // Execute the XPATH query to find a value (as string)
+  // return false when attribute is not found (or an error in the XPATH query)
+  // You need to make sure that your XPATH query is syntatically correct
   bool ExecuteQuery(std::string const &query, std::string & value) const;
 
 protected:

@@ -32,18 +32,17 @@ class DataElement;
 class ImageCodec;
 
 /**
- * \brief ImageChangeTransferSyntax class
- * \details Class to change the transfer syntax of an input DICOM
+ * ImageChangeTransferSyntax class
+ * Class to change the transfer syntax of an input DICOM
  *
  * If only Force param is set but no input TransferSyntax is set, it is assumed
  * that user only wants to inspect encapsulated stream (advanced dev. option).
  *
  * When using UserCodec it is very important that the TransferSyntax (as set in
  * SetTransferSyntax) is actually understood by UserCodec (ie.
- * UserCodec->CanCode( TransferSyntax ) ). Otherwise the behavior is to use a
+ * UserCodec->CanCode(TransferSyntax)). Otherwise the behavior is to use a
  * default codec.
  *
- * \sa JPEGCodec JPEGLSCodec JPEG2000Codec
  */
 
 class MDCM_EXPORT ImageChangeTransferSyntax : public ImageToImageFilter

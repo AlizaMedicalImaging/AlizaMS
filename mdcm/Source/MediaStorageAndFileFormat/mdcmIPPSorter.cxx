@@ -47,8 +47,7 @@ inline double spacing_round(double n, int d) /* pow is defined as pow(double, do
 
 bool IPPSorter::Sort(std::vector<std::string> const & filenames)
 {
-  // BUG: I cannot clear Filenames since input filenames could also be the output of ourself...
-  // Filenames.clear();
+  // BUG: I cannot clear Filenames since input filenames could also be the output of ourself
   ZSpacing = 0;
   if(filenames.empty())
   {
@@ -131,7 +130,7 @@ bool IPPSorter::Sort(std::vector<std::string> const & filenames)
   // Take the first file in the list of filenames, if not IOP is found, simply gives up:
   if(it == t2v.end())
   {
-    // DEAD CODE
+    // Dead code
     mdcmDebugMacro("No iop in: " << reference);
     return false;
   }

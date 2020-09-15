@@ -29,8 +29,8 @@ namespace mdcm
 
 class DataElement;
 /**
- * \brief ImageFragmentSplitter class
- * \details For single frame image, DICOM standard allow splitting the frame into multiple fragments
+ * ImageFragmentSplitter class
+ * For single frame image, DICOM standard allow splitting the frame into multiple fragments
  */
 class MDCM_EXPORT ImageFragmentSplitter : public ImageToImageFilter
 {

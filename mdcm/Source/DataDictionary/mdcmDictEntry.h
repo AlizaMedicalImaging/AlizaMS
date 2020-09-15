@@ -31,14 +31,7 @@
 namespace mdcm
 {
 /**
- * \brief Class to represent an Entry in the Dict
- * \details Does not really exist within the DICOM definition, just a way to minimize
- * storage and have a mapping from mdcm::Tag to the needed information
- *
- * TODO : Need a PublicDictEntry, indeed DictEntry has a notion of retired which
- * does not exist in PrivateDictEntry.
- *
- * \see mdcm::Dict
+ * Class to represent an Entry in the Dict
  */
 class MDCM_EXPORT DictEntry
 {
@@ -73,7 +66,6 @@ public:
   bool IsUnique() const { return ElementXX == false && GroupXX == false; }
 private:
   friend class Dict;
-  static bool CheckKeywordAgainstName(const char * name, const char * keyword);
 private:
   std::string Name;
   std::string Keyword;

@@ -29,8 +29,8 @@ namespace mdcm
 
 class DataElement;
 /**
- * \brief ImageChangePlanarConfiguration class
- * \details Class to change the Planar configuration of an input DICOM
+ * ImageChangePlanarConfiguration class
+ * Class to change the Planar configuration of an input DICOM
  * By default it will change into the more usual reprensentation: PlanarConfiguration = 0
  */
 class MDCM_EXPORT ImageChangePlanarConfiguration : public ImageToImageFilter

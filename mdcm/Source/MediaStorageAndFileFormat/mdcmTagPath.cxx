@@ -35,7 +35,6 @@ namespace mdcm
  * First tag is a valid tag,
  * Second tag is an item number (or 0)
  * Third tag is a valid tag
- * ...
  * and so on an so forth
  */
 
