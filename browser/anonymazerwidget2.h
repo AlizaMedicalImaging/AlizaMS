@@ -14,7 +14,7 @@
 #include <QSettings>
 #include <set>
 
-#define ALIZAMS_ROOT_UID "1.2.826.0.1.3680043.9.4245"
+#define ALIZAMS_ROOT_UID "1.2.826.0.1.3680043.10.585"
 
 class AnonymazerWidget2 : public QWidget, private Ui::AnonymazerWidget2
 {
