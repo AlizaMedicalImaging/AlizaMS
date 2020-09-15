@@ -22,35 +22,36 @@
 #ifndef MDCMCONFIGURE_H
 #define MDCMCONFIGURE_H
 
-/* This header is configured by MDCM's build process.  */
-
-/*--------------------------------------------------------------------------*/
-/* Platform Features                                                        */
-
-/* Byte order.  */
 /* All compilers that support Mac OS X define either __BIG_ENDIAN__ or
    __LITTLE_ENDIAN__ to match the endianness of the architecture being
    compiled for. This is not necessarily the same as the architecture of the
    machine doing the building. In order to support Universal Binaries on
    Mac OS X, we prefer those defines to decide the endianness.
-   Elsewhere use the platform check result.  */
+   Elsewhere use the platform check result.
+*/
 #if !defined(__APPLE__)
- #cmakedefine MDCM_WORDS_BIGENDIAN
+#cmakedefine MDCM_WORDS_BIGENDIAN
 #elif defined(__BIG_ENDIAN__)
-# define MDCM_WORDS_BIGENDIAN
+#define MDCM_WORDS_BIGENDIAN
 #endif
 
-/* Allow access to UINT32_MAX , cf mdcmCommon.h */
-#define __STDC_LIMIT_MACROS
+#ifndef MDCM_USE_SYSTEM_OPENJPEG
+#define OPENJPEG_VERSION_MAJOR 2
+#else
+#define OPENJPEG_VERSION_MAJOR @OPENJPEG_VERSION_MAJOR@
+#endif
 
-/* Hard code the path to the public dictionary */
-#define PUB_DICT_PATH "@MDCM_PUB_DICT_PATH@"
-
-/* Usefull in particular for loadshared where the full path
- * to the lib is needed */
-#define MDCM_SOURCE_DIR "@MDCM_SOURCE_DIR@"
-#define MDCM_EXECUTABLE_OUTPUT_PATH "@EXECUTABLE_OUTPUT_PATH@"
-#define MDCM_LIBRARY_OUTPUT_PATH    "@LIBRARY_OUTPUT_PATH@"
+#define MDCM_LIBRARY_OUTPUT_PATH "@LIBRARY_OUTPUT_PATH@"
+#define MDCM_CMAKE_INSTALL_PREFIX "@CMAKE_INSTALL_PREFIX@"
+#define MDCM_INSTALL_INCLUDE_DIR "@MDCM_INSTALL_INCLUDE_DIR@"
+#define MDCM_INSTALL_DATA_DIR "@MDCM_INSTALL_DATA_DIR@"
+#define MDCM_PVRG_JPEG_EXECUTABLE "@PVRGJPEG_EXECUTABLE@"
+#define MDCM_KAKADU_EXPAND_EXECUTABLE "@KDU_EXPAND_EXECUTABLE@"
+#define MDCM_MAJOR_VERSION @MDCM_MAJOR_VERSION@
+#define MDCM_MINOR_VERSION @MDCM_MINOR_VERSION@
+#define MDCM_BUILD_VERSION @MDCM_BUILD_VERSION@
+#define MDCM_VERSION "@MDCM_VERSION@"
+#define MDCM_API_VERSION "@MDCM_API_VERSION@"
 
 #cmakedefine MDCM_USE_SYSTEM_ZLIB
 #cmakedefine MDCM_USE_SYSTEM_UUID
@@ -60,48 +61,18 @@
 #cmakedefine MDCM_USE_SYSTEM_CHARLS
 #cmakedefine MDCM_USE_SYSTEM_KAKADU
 #cmakedefine MDCM_USE_SYSTEM_PVRG
-#cmakedefine MDCMV2_0_COMPATIBILITY
-#cmakedefine MDCM_USE_SYSTEM_PAPYRUS3
-
-#ifndef MDCM_USE_SYSTEM_OPENJPEG
-#define OPENJPEG_VERSION_MAJOR 2
-#else
-#define OPENJPEG_VERSION_MAJOR @OPENJPEG_VERSION_MAJOR@
-#endif
-
-#ifndef OPENJPEG_VERSION_MAJOR
-#error problem with openjpeg major version
-#endif
-
 #cmakedefine MDCM_USE_PVRG
 #cmakedefine MDCM_USE_KAKADU
-#cmakedefine MDCM_AUTOLOAD_MDCMJNI
 #cmakedefine MDCM_HAVE_STDINT_H
 #cmakedefine MDCM_HAVE_INTTYPES_H
-
-/* This variable allows you to have helpful debug statement */
-/* That are in between #ifdef / endif in the mdcm code */
-/* That means if MDCM_DEBUG is OFF there shouldn't be any 'cout' at all ! */
-/* only cerr, for instance 'invalid file' will be allowed */
-#cmakedefine MDCM_DEBUG
-
-#define MDCM_CMAKE_INSTALL_PREFIX "@CMAKE_INSTALL_PREFIX@"
-#define MDCM_INSTALL_INCLUDE_DIR "@MDCM_INSTALL_INCLUDE_DIR@"
-#define MDCM_INSTALL_DATA_DIR "@MDCM_INSTALL_DATA_DIR@"
-
 #cmakedefine MDCM_BUILD_SHARED_LIBS
-
-/* MDCM uses __FUNCTION__ which is not ANSI C, but C99 */
+// MDCM uses __FUNCTION__ which is not ANSI C, but C99
 #cmakedefine MDCM_CXX_HAS_FUNCTION
-
 #cmakedefine MDCM_HAVE_SYS_TIME_H
 #cmakedefine MDCM_HAVE_BYTESWAP_H
 #cmakedefine MDCM_HAVE_RPC_H
 // CMS with PBE (added in OpenSSL 1.0.0 ~ Fri Nov 27 15:33:25 CET 2009)
 #cmakedefine MDCM_HAVE_CMS_RECIPIENT_PASSWORD
-#cmakedefine MDCM_HAVE_LANGINFO_H
-#cmakedefine MDCM_HAVE_NL_LANGINFO
-
 #cmakedefine MDCM_HAVE_STRCASECMP
 #cmakedefine MDCM_HAVE_STRNCASECMP
 #cmakedefine MDCM_HAVE_SNPRINTF
@@ -112,28 +83,14 @@
 #cmakedefine MDCM_HAVE_LROUND
 #cmakedefine MDCM_HAVE_GETTIMEOFDAY
 #cmakedefine MDCM_HAVE_ATOLL
+#cmakedefine MDCM_SUPPORT_BROKEN_IMPLEMENTATION
+#cmakedefine MDCM_USE_COREFOUNDATION_LIBRARY
 
 // MM: I have a feeling that if MDCM_HAVE_WCHAR_IFSTREAM, then UNICODE filename
 // are expected to be specified as UTF-16, but if no API exist for UTF-16
 // at std::ifstream level, then const char* of std::ifstream might accept
 // UTF-8
 #cmakedefine MDCM_HAVE_WCHAR_IFSTREAM
-
-#cmakedefine MDCM_FORCE_BIGENDIAN_EMULATION
-
-#cmakedefine MDCM_SUPPORT_BROKEN_IMPLEMENTATION
-
-#define MDCM_PVRG_JPEG_EXECUTABLE "@PVRGJPEG_EXECUTABLE@"
-#define MDCM_KAKADU_EXPAND_EXECUTABLE "@KDU_EXPAND_EXECUTABLE@"
-
-#define MDCM_MAJOR_VERSION @MDCM_MAJOR_VERSION@
-#define MDCM_MINOR_VERSION @MDCM_MINOR_VERSION@
-#define MDCM_BUILD_VERSION @MDCM_BUILD_VERSION@
-#define MDCM_VERSION "@MDCM_VERSION@"
-#define MDCM_API_VERSION "@MDCM_API_VERSION@"
-
-#cmakedefine MDCM_ALWAYS_TRACE_MACRO
-#cmakedefine MDCM_USE_COREFOUNDATION_LIBRARY
 
 #endif
 

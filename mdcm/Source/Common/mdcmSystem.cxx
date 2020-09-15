@@ -59,12 +59,8 @@
 #include <dlfcn.h>
 #include <sys/types.h>
 #include <fcntl.h>
-#include <unistd.h> /* gethostname */
+#include <unistd.h> // gethostname
 #include <strings.h> // strncasecmp
-#endif
-
-#if defined(MDCM_HAVE_LANGINFO_H)
-#include <langinfo.h> // nl_langinfo
 #endif
 
 namespace mdcm

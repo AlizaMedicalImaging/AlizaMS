@@ -710,15 +710,15 @@ void MainWindow::createActions()
 	oneAct->setCheckable(true);
 	oneAct->setChecked(false);
 	oneAct->setEnabled(false);
-	browser_open_dir_act    = new QAction(QIcon(":/bitmaps/folder.svg"),QString("Open directory"),      this);
-	browser_open_dcmdir_act = new QAction(QIcon(":/bitmaps/dcmdir.svg"),QString("Open DICOMDIR"),       this);
-	browser_reload_act      = new QAction(QIcon(":/bitmaps/reload.svg"),QString("Reload"),              this);
-	browser_metadata_act    = new QAction(QIcon(":/bitmaps/meta.svg"),  QString("Show metadata"),       this);
-	browser_copy_act        = new QAction(QIcon(":/bitmaps/copy2.svg"), QString("Copy selected"),       this);
-	browser_load_act        = new QAction(QIcon(":/bitmaps/right0.svg"),QString("Load selected"),       this);
-	meta_open_act           = new QAction(QIcon(":/bitmaps/file.svg"),  QString("Open file"),           this);
-	meta_open_scan_act      = new QAction(QIcon(":/bitmaps/align.svg"), QString("Open file and scan"),  this);
-	anon_open_in_dir        = new QAction(QIcon(":/bitmaps/folder.svg"),QString("Open input directory"),this);
+	browser_open_dir_act    = new QAction(QIcon(":/bitmaps/folder.svg"),QString("Open directory"),       this);
+	browser_open_dcmdir_act = new QAction(QIcon(":/bitmaps/dcmdir.svg"),QString("Open DICOMDIR"),        this);
+	browser_reload_act      = new QAction(QIcon(":/bitmaps/reload.svg"),QString("Reload"),               this);
+	browser_metadata_act    = new QAction(QIcon(":/bitmaps/meta.svg"),  QString("Show metadata"),        this);
+	browser_copy_act        = new QAction(QIcon(":/bitmaps/copy2.svg"), QString("Copy selected"),        this);
+	browser_load_act        = new QAction(QIcon(":/bitmaps/right0.svg"),QString("Load selected"),        this);
+	meta_open_act           = new QAction(QIcon(":/bitmaps/file.svg"),  QString("Open file"),            this);
+	meta_open_scan_act      = new QAction(QIcon(":/bitmaps/align.svg"), QString("Open file and scan"),   this);
+	anon_open_in_dir        = new QAction(QIcon(":/bitmaps/folder.svg"),QString("Open input directory"), this);
 	anon_open_out_dir       = new QAction(QIcon(":/bitmaps/folder.svg"),QString("Open output directory"),this);
 }
 
