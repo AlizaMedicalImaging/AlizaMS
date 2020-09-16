@@ -7529,7 +7529,7 @@ QString DicomUtils::read_buffer(
 			return QString("Buffer is NULL");
 		}
 		not_rescaled_buffer_size=dimx*dimy*dimz;
-		if (not_rescaled_buffer_size != singlebit_buffer_size*8)
+		if (not_rescaled_buffer_size > singlebit_buffer_size*8)
 		{
 			delete [] singlebit_buffer;
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
