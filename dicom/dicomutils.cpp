@@ -7550,7 +7550,7 @@ QString DicomUtils::read_buffer(
 			return QString("Buffer allocation error");
 		}
 		size_t j = 0;
-		for (size_t x = 0; x < singlebit_buffer_size; x++)
+		for (size_t x = 0; x < not_rescaled_buffer_size/8; x++)
 		{
 			const unsigned char c = singlebit_buffer[x];
 			not_rescaled_buffer[j  ] = (c &  0x1) ? 255 : 0;
