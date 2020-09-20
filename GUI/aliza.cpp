@@ -617,7 +617,8 @@ void Aliza::load_dicom_series(QProgressDialog * pb)
 			ok3d,
 			static_cast<QWidget*>(settingswidget),
 			pb,
-			0);
+			0,
+			settingswidget->get_ignore_dim_org());
 	}
 quit__:
 	for (unsigned int x = 0; x < ivariants.size(); x++)
@@ -3745,7 +3746,8 @@ void Aliza::load_dicom_file(int * image_id,
 			ok3d,
 			static_cast<QWidget*>(settingswidget),
 			pb,
-			0);
+			0,
+			settingswidget->get_ignore_dim_org());
 		if (error__.isEmpty())
 		{
 			ok = true;

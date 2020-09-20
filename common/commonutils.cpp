@@ -180,8 +180,16 @@ template<typename T> void calculate_min_max(
 		{
 			const double tmp110 = (vmax_minus_vmin>0) ? vmax_minus_vmin : rmax_minus_rmin;
 			const double tmp111 = (vmax_minus_vmin>0) ? iv->di->vmin    : iv->di->rmin;
-			iv->di->default_us_window_center = iv->di->us_window_center = ((tmp110/2.0)-(-tmp111));
-			iv->di->default_us_window_width  = iv->di->us_window_width  = tmp110;
+			if (tmp110 > 0)
+			{
+				iv->di->default_us_window_center = iv->di->us_window_center = ((tmp110/2.0)-(-tmp111));
+				iv->di->default_us_window_width  = iv->di->us_window_width  = tmp110;
+			}
+			else // TODO
+			{
+				iv->di->default_us_window_center = iv->di->us_window_center = 0.5*iv->di->vmax;
+				iv->di->default_us_window_width  = iv->di->us_window_width  = fabs(iv->di->vmax);
+			}
 		}
 	}
 	iv->di->window_center =

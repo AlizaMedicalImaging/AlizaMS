@@ -270,3 +270,8 @@ bool SettingsWidget::get_sr_skip_images() const
 {
 	return srskipimage_checkBox->isChecked();
 }
+
+bool SettingsWidget::get_ignore_dim_org() const
+{
+	return enh_skip_dim_org_checkBox->isChecked();
+}

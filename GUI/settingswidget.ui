@@ -260,6 +260,28 @@
                </widget>
               </item>
               <item>
+               <widget class="QCheckBox" name="enh_skip_dim_org_checkBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="mouseTracking">
+                 <bool>false</bool>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Skip &lt;span style=&quot; font-style:italic;&quot;&gt;Dimension organization&lt;/span&gt; for enhanced IODs. Load frames one by one.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>Ignore 'Dimension Organization' for enhanced IODs</string>
+                </property>
+                <property name="checked">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QCheckBox" name="pet_no_level_checkBox">
                 <property name="enabled">
                  <bool>true</bool>
@@ -362,8 +384,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>355</width>
-            <height>124</height>
+            <width>991</width>
+            <height>514</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -590,8 +612,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>482</width>
-            <height>244</height>
+            <width>991</width>
+            <height>514</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -896,6 +918,7 @@
   <tabstop>srwidth_spinBox</tabstop>
   <tabstop>srskipimage_checkBox</tabstop>
   <tabstop>clean_unused_checkBox</tabstop>
+  <tabstop>enh_skip_dim_org_checkBox</tabstop>
   <tabstop>pet_no_level_checkBox</tabstop>
   <tabstop>time_s__checkBox</tabstop>
   <tabstop>rescale_checkBox</tabstop>
