@@ -339,6 +339,7 @@ public:
 		const QString&, const QString&,
 		std::vector<ImageVariant*> &,
 		int, GLWidget*, bool,
+		bool,
 		const QWidget*,
 		QProgressDialog*);
 	static QString find_file_from_uid(

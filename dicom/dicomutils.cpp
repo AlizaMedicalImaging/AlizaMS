@@ -4068,6 +4068,7 @@ bool DicomUtils::generate_geometry(
 				))
 			{
 				invalidate_volume = true;
+#if 0
 				std::cout
 					<< "Warning: orientation is not reliable -\n"
 					<< " cosines defined in DICOM: "
@@ -4079,6 +4080,37 @@ bool DicomUtils::generate_geometry(
 					<< direction0.getX() << "," << direction0.getY() << "," << direction0.getZ() << "\n"
 					<< " ... using image as non-uniform.\n"
 					<< std::endl;
+#endif
+#if 1
+				const QString z_inv_string =
+					QString("Direction cosines defined in DICOM:\n") +
+					QVariant((double)row_dircos_x).toString() + QString("\\") +
+					QVariant((double)row_dircos_y).toString() + QString("\\") +
+					QVariant((double)row_dircos_z).toString() + QString("\\") +
+					QVariant((double)col_dircos_x).toString() + QString("\\") +
+					QVariant((double)col_dircos_y).toString() + QString("\\") +
+					QVariant((double)col_dircos_z).toString() + QString("\n") +
+					QString(" Z direction calculated from defined cosines: ") +
+					QVariant((double)direction1.getX()).toString() + QString(",") +
+					QVariant((double)direction1.getY()).toString() + QString(",") +
+					QVariant((double)direction1.getZ()).toString() + QString("\n") +
+					QString(" Z direction calculated from geometry (real): ") +
+					QVariant((double)direction0.getX()).toString() + QString(",") +
+					QVariant((double)direction0.getY()).toString() + QString(",") +
+					QVariant((double)direction0.getZ()).toString() + QString("\n") +
+					QString(" ... using image as non-uniform.\n") +
+					QString(
+						"Try to toggle option\n"
+						"\"Ignore 'Dimension Organization' for enhanced IODs\"\n"
+						"for particular image");
+					QMessageBox mbox;
+					mbox.setWindowModality(Qt::ApplicationModal);
+					mbox.addButton(QMessageBox::Close);
+					mbox.setIcon(QMessageBox::Warning);
+					mbox.setText(z_inv_string);
+					mbox.exec();
+					QApplication::processEvents();
+#endif
 			}
 		}
 		else
@@ -5191,69 +5223,58 @@ QString DicomUtils::read_enhanced(
 	int dim4th = -1;
 	int dim3rd = -1;
 	int enh_id = -1;
-	if (!idx_values.empty() && !values.empty())
+	if (!enh_original_frames && !idx_values.empty() && !values.empty())
 	{
 		enhanced_get_indices(
 			sq,
 			&dim6th, &dim5th, &dim4th, &dim3rd,
 			&enh_id);
 	}
-	else if (idx_values.empty() && !values.empty())
+	else if (!enh_original_frames && idx_values.empty() && !values.empty())
 	{
 		// stack id/position number without dimension organisation?
 		// try to re-build
-		const bool is_legacy = (
-			sop == QString("1.2.840.10008.5.1.4.1.1.2.2") ||
-			sop == QString("1.2.840.10008.5.1.4.1.1.4.4") ||
-			sop == QString("1.2.840.10008.5.1.4.1.1.128.1"))
-			?
-			true : false;
-		if (!is_legacy)
+		bool idx_values_rebuild = false;
+		bool tmp12 = false;
+		DimIndexValues idx_values_tmp;
+		for (unsigned int x = 0; x < values.size(); x++)
 		{
-			// don't rebuld for Legacy IODs, many files are wrong,
-			// try frames one by one
-			bool idx_values_rebuild = false;
-			bool tmp12 = false;
-			DimIndexValues idx_values_tmp;
+			if (!(
+				values.at(x).stack_id_ok &&
+				values.at(x).in_stack_pos_num_ok))
+			{
+				tmp12 = true;
+				break;
+			}
+		}
+		if (!tmp12)
+		{
 			for (unsigned int x = 0; x < values.size(); x++)
 			{
-				if (!(
-					values.at(x).stack_id_ok &&
-					values.at(x).in_stack_pos_num_ok))
-				{
-					tmp12 = true;
-					break;
-				}
+				DimIndexValue tmp13;
+				tmp13.id = values.at(x).id;
+				tmp13.idx.push_back(values.at(x).stack_id);
+				tmp13.idx.push_back(values.at(x).in_stack_pos_num);
+				idx_values_tmp.push_back(tmp13);
 			}
-			if (!tmp12)
+			for (unsigned int x = 0; x < idx_values_tmp.size(); x++)
 			{
-				for (unsigned int x = 0; x < values.size(); x++)
-				{
-					DimIndexValue tmp13;
-					tmp13.id = values.at(x).id;
-					tmp13.idx.push_back(values.at(x).stack_id);
-					tmp13.idx.push_back(values.at(x).in_stack_pos_num);
-					idx_values_tmp.push_back(tmp13);
-				}
-				for (unsigned int x = 0; x < idx_values_tmp.size(); x++)
-				{
-					idx_values.push_back(idx_values_tmp[x]);
-				}
-				idx_values_tmp.clear();
-				idx_values_rebuild = true;
+				idx_values.push_back(idx_values_tmp[x]);
+			}
+			idx_values_tmp.clear();
+			idx_values_rebuild = true;
 #ifdef ENHANCED_PRINT_INFO
-				if (!min_load)
-					std::cout
-						<< "stack id and position without dim. org."
-						<< std::endl;
+			if (!min_load)
+				std::cout
+					<< "stack id and position without dim. org."
+					<< std::endl;
 #endif
-			}
-			if (idx_values_rebuild)
-			{
-				enh_id = 0;
-				dim4th = 0;
-				dim3rd = 1;
-			}
+		}
+		if (idx_values_rebuild)
+		{
+			enh_id = 0;
+			dim4th = 0;
+			dim3rd = 1;
 		}
 	}
 #ifdef ENHANCED_PRINT_INFO
@@ -5505,14 +5526,14 @@ QString DicomUtils::read_enhanced_supp_palette(
 	int dim4th = -1;
 	int dim3rd = -1;
 	int enh_id = -1;
-	if (!idx_values.empty() && !values.empty())
+	if (!enh_original_frames && !idx_values.empty() && !values.empty())
 	{
 		enhanced_get_indices(
 			sq,
 			&dim6th, &dim5th, &dim4th, &dim3rd,
 			&enh_id);
 	}
-	else if (idx_values.empty() && !values.empty())
+	else if (!enh_original_frames && idx_values.empty() && !values.empty())
 	{
 		// stack id/position number without dimension organisation?
 		// try to re-build
@@ -9029,6 +9050,7 @@ bool DicomUtils::process_contrours_ref(
 	const QString & path,
 	std::vector<ImageVariant*> & tmp_ivariants,
 	int max_3d_tex_size, GLWidget * gl, bool ok3d,
+	bool enh_original_frames,
 	const QWidget * settings,
 	QProgressDialog * pb)
 {
@@ -9151,7 +9173,8 @@ bool DicomUtils::process_contrours_ref(
 						max_3d_tex_size, gl, NULL, ok3d,
 						settings,
 						pb,
-						2);
+						2,
+						enh_original_frames);
 				if (!message_.isEmpty())
 				{
 					std::cout << message_.toStdString() << std::endl;
@@ -11666,6 +11689,7 @@ QString DicomUtils::read_dicom(
 					rtstruct_ref_search_path,
 					tmp_ivariants_rtstruct,
 					max_3d_tex_size, gl, ok3d,
+					enh_original_frames,
 					settings,
 					pb);
 			bool ref2_ok = false;
@@ -11741,6 +11765,7 @@ QString DicomUtils::read_dicom(
 							rtstruct_ref_search_path,
 							tmp_ivariants_rtstruct,
 							max_3d_tex_size, gl, ok3d,
+							enh_original_frames,
 							settings,
 							pb);
 						if (ref2_ok)
@@ -11969,7 +11994,8 @@ QString DicomUtils::read_dicom(
 						ok3d,
 						settings,
 						pb,
-						1);
+						1,
+						enh_original_frames);
 				for (unsigned int z = 0; z < ref_ivariants.size(); z++)
 				{
 					if (pb) pb->setValue(-1);
@@ -12138,7 +12164,8 @@ QString DicomUtils::read_dicom(
 							ok3d,
 							settings,
 							pb,
-							1);
+							1,
+							enh_original_frames);
 					for (unsigned int z = 0; z < ref_ivariants.size(); z++)
 					{
 						if (pb) pb->setValue(-1);
