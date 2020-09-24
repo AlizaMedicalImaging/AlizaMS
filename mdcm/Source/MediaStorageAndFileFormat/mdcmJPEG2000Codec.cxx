@@ -1629,8 +1629,6 @@ bool JPEG2000Codec::DecodeExtent(
     std::vector< size_t > offsets;
     while(frag.ReadPreValue<SwapperNoOp>(is) && frag.GetTag() != seqDelItem)
     {
-      //std::streamoff relstart = is.tellg();
-      //assert(relstart - thestart == 8);
       std::streamoff off = frag.GetVL();
       offsets.push_back((size_t)off);
       is.seekg(off, std::ios::cur);
@@ -1651,13 +1649,16 @@ bool JPEG2000Codec::DecodeExtent(
       const size_t buf_size = offsets[z];
       char *dummy_buffer = new char[ buf_size ];
       is.read(dummy_buffer, buf_size);
-      std::pair<char*,size_t> raw_len = this->DecodeByStreamsCommon(dummy_buffer, buf_size);
-      /* free the memory containing the code-stream */
+      std::pair<char*,size_t> raw_len =
+        this->DecodeByStreamsCommon(dummy_buffer, buf_size);
       delete[] dummy_buffer;
       if(!raw_len.first || !raw_len.second) return false;
-      // check pixel format *after* DecodeByStreamsCommon !
       const PixelFormat & pf2 = this->GetPixelFormat();
-      if(pf != pf2) return false;
+      if((pf.GetSamplesPerPixel() != pf2.GetSamplesPerPixel()) ||
+        (pf.GetBitsAllocated() != pf2.GetBitsAllocated()))
+      {
+        return false;
+      }
       char *raw = raw_len.first;
       const unsigned int rowsize = xmax - xmin + 1;
       const unsigned int colsize = ymax - ymin + 1;
