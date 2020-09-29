@@ -1416,17 +1416,16 @@ void BrowserWidget2::readSettings()
 		QApplication::applicationName());
 	settings.setFallbacksEnabled(true);
 #if (defined _WIN32)
-	const QString d =
-		QDir::toNativeSeparators(
-			QString(".") +
-			QDir::separator() +
-			QString("DICOM"));
+	const QString d = QDir::toNativeSeparators(
+		QString(".") +
+		QDir::separator() +
+		QString("DICOM"));
 #else
-	const QString d =
-		QDir::toNativeSeparators(
-			QApplication::applicationDirPath() +
-			QDir::separator() + QString("..") + QDir::separator() +
-			QString("DICOM"));
+	const QString d = QDir::toNativeSeparators(
+		QApplication::applicationDirPath() +
+		QDir::separator() + QString("..") +
+		QDir::separator() +
+		QString("DICOM"));
 #endif
 	settings.beginGroup(QString("BrowserWidget2"));
 	directory_lineEdit->setText(settings.value(QString("saved_user_dir"), d).toString());

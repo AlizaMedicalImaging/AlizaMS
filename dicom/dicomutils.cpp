@@ -1,4 +1,4 @@
-//#define ENHANCED_PRINT_INFO
+#define ENHANCED_PRINT_INFO
 
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -11706,6 +11706,7 @@ QString DicomUtils::read_dicom(
 					tmpp,
 					tmp_ivariants_rtstruct,
 					max_3d_tex_size, gl, ok3d,
+					enh_original_frames,
 					settings,
 					pb);
 				if (ref2_ok)

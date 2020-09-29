@@ -40,7 +40,7 @@ public:
 
 	MY_DECLARE_NEW()
 
-	Camera(); // call reset() to initialize
+	Camera();
 	~Camera();
 #ifdef DISABLE_SIMDMATH
 	Vectormath::Scalar::Point3 m_position;

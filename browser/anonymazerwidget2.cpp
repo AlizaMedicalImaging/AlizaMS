@@ -607,7 +607,22 @@ AnonymazerWidget2::AnonymazerWidget2(float si, QWidget * p, Qt::WindowFlags f) :
 	run_pushButton->setEnabled(false);
 	readSettings();
 	init_profile();
+#ifdef USE_WORKSTATION_MODE
 	input_dir = QString("");
+#else
+#if (defined _WIN32)
+	input_dir = QDir::toNativeSeparators(
+		QString(".") +
+		QDir::separator() +
+		QString("DICOM"));
+#else
+	input_dir = QDir::toNativeSeparators(
+		QApplication::applicationDirPath() +
+		QDir::separator() + QString("..") +
+		QDir::separator() +
+		QString("DICOM"));
+#endif
+#endif
 	connect(out_pushButton,SIGNAL(clicked()),this,SLOT(set_output_dir()));
 	connect(in_pushButton,SIGNAL(clicked()),this,SLOT(set_input_dir()));
 	connect(run_pushButton,SIGNAL(clicked()),this,SLOT(run_()));
