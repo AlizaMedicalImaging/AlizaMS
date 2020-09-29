@@ -622,6 +622,10 @@ AnonymazerWidget2::AnonymazerWidget2(float si, QWidget * p, Qt::WindowFlags f) :
 		QDir::separator() +
 		QString("DICOM"));
 #endif
+	QFileInfo fi(input_dir);
+	if (fi.exists()) input_dir = fi.absoluteFilePath();
+	else             input_dir = QString("");
+	in_lineEdit->setText(input_dir);
 #endif
 	connect(out_pushButton,SIGNAL(clicked()),this,SLOT(set_output_dir()));
 	connect(in_pushButton,SIGNAL(clicked()),this,SLOT(set_input_dir()));

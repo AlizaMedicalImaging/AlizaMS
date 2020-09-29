@@ -1,4 +1,4 @@
-#define ENHANCED_PRINT_INFO
+//#define ENHANCED_PRINT_INFO
 
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
