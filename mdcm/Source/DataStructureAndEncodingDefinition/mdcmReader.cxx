@@ -28,9 +28,6 @@
 #include "mdcmSystem.h"
 #include "mdcmExplicitDataElement.h"
 #include "mdcmImplicitDataElement.h"
-#ifdef _MSC_VER
-#include <windows.h> // MultiByteToWideChar 
-#endif
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
 #include "mdcmUNExplicitDataElement.h"
 #include "mdcmCP246ExplicitDataElement.h"
@@ -59,22 +56,16 @@ Reader::~Reader()
   }
 }
 
-/// \brief tells us if "DICM" is found as position 128
-///        (i.e. the file is a 'true dicom' one)
-/// If not found then seek back at beginning of file (could be Mallinckrodt
-/// or old ACRNEMA with no preamble)
-/// \precondition we are at the beginning of file
-/// \postcondition we are at the beginning of the DataSet or
-/// Meta Information Header
+// "DICM" is found as position 128 (the file is a 'true dicom' one)
+// If not found then seek back at beginning of file (could be Mallinckrodt
+// or old ACRNEMA with no preamble)
 bool Reader::ReadPreamble()
 {
  return true;
 }
 
-/// \brief read the DICOM Meta Information Header
-/// Find out the TransferSyntax used (default: Little Endian Explicit)
-/// \precondition we are at the start of group 0x0002 (well after preamble)
-/// \postcondition we are at the beginning of the DataSet
+// read the DICOM Meta Information Header
+// Find out the TransferSyntax used (default: Little Endian Explicit)
 bool Reader::ReadMetaInformation()
 {
   return true;
@@ -87,8 +78,7 @@ bool Reader::ReadDataSet()
 
 TransferSyntax Reader::GuessTransferSyntax()
 {
-  // Don't call this function if you have a meta file info
-  //assert(Header->GetTransferSyntaxType() == TransferSyntax::TS_END);
+  // Don't call this function if there is a meta file info
   std::streampos start = Stream->tellg();
   SwapCode sc = SwapCode::Unknown;
   TransferSyntax::NegociatedType nts = TransferSyntax::Unknown;
@@ -107,12 +97,13 @@ TransferSyntax Reader::GuessTransferSyntax()
       break;
     default:
       assert(0);
+      break;
     }
-    // Purposely not Re-use ReadVR since we can read VR_END
+    // Purposely not re-use ReadVR (can read VR_END)
     char vr_str[3];
     Stream->read(vr_str, 2);
     vr_str[2] = '\0';
-    // Cannot use GetVRTypeFromFile since is assert
+    // Cannot use GetVRTypeFromFile
     VR::VRType vr = VR::GetVRType(vr_str);
     if(vr != VR::VR_END)
     {
@@ -144,6 +135,7 @@ TransferSyntax Reader::GuessTransferSyntax()
           break;
         default:
           assert(0);
+          break;
         }
       }
       nts = TransferSyntax::Implicit;
@@ -160,12 +152,11 @@ TransferSyntax Reader::GuessTransferSyntax()
       break;
     default:
       assert(0);
+      break;
     }
-    // Purposely not Re-use ReadVR since we can read VR_END
     char vr_str[3];
     Stream->read(vr_str, 2);
     vr_str[2] = '\0';
-    // Cannot use GetVRTypeFromFile since is assert
     VR::VRType vr = VR::GetVRType(vr_str);
     if(vr != VR::VR_END)
     {
@@ -174,7 +165,7 @@ TransferSyntax Reader::GuessTransferSyntax()
     else
     {
       nts = TransferSyntax::Implicit;
-      // We are reading a private creator (0x0010) so it's LO, it's
+      // Reading a private creator (0x0010) so it's LO, it's
       // difficult to come up with someting to check, maybe that
       // VL < 256
       mdcmWarningMacro("Very dangerous assertion needs some work");
@@ -208,104 +199,106 @@ TransferSyntax Reader::GuessTransferSyntax()
 
 namespace details
 {
-  class DefaultCaller
-  {
-  private:
-    DataSet & m_dataSet;
-  public:
-    DefaultCaller(DataSet &ds): m_dataSet(ds) {}
-    template<class T1, class T2>
-    void ReadCommon(std::istream & is) const
-    { 
-      m_dataSet.template Read<T1,T2>(is);
-    }
-    template<class T1, class T2>
-    void ReadCommonWithLength(std::istream & is, VL & length) const
-    {
-      m_dataSet.template ReadWithLength<T1,T2>(is,length);
-      // manually set eofbit:
-      // https://groups.google.com/forum/?fromgroups#!topic/comp.lang.c++/yTW4ESh1IL8
-      is.setstate(std::ios::eofbit);
-    }
-    static void Check(bool b, std::istream &stream)
-    {
-      (void)stream;
-      if(b) assert(stream.eof());
-    }
-  };
 
-  class ReadUpToTagCaller
+class DefaultCaller
+{
+private:
+  DataSet & m_dataSet;
+public:
+  DefaultCaller(DataSet &ds): m_dataSet(ds) {}
+  template<class T1, class T2>
+  void ReadCommon(std::istream & is) const
+  { 
+    m_dataSet.template Read<T1,T2>(is);
+  }
+  template<class T1, class T2>
+  void ReadCommonWithLength(std::istream & is, VL & length) const
   {
-  private:
-    DataSet & m_dataSet;
-    const Tag & m_tag;
-    std::set<Tag> const & m_skipTags;
-  public:
-    ReadUpToTagCaller(DataSet &ds,const Tag & tag, std::set<Tag> const & skiptags)
+    m_dataSet.template ReadWithLength<T1,T2>(is,length);
+    // manually set eofbit:
+    // https://groups.google.com/forum/?fromgroups#!topic/comp.lang.c++/yTW4ESh1IL8
+    is.setstate(std::ios::eofbit);
+  }
+  static void Check(bool b, std::istream &stream)
+  {
+    (void)stream;
+    if(b) assert(stream.eof());
+  }
+};
+
+class ReadUpToTagCaller
+{
+private:
+  DataSet & m_dataSet;
+  const Tag & m_tag;
+  std::set<Tag> const & m_skipTags;
+public:
+  ReadUpToTagCaller(DataSet &ds,const Tag & tag, std::set<Tag> const & skiptags)
+  :
+  m_dataSet(ds),m_tag(tag),m_skipTags(skiptags) {}
+
+  template<class T1, class T2> void ReadCommon(std::istream & is) const
+  {
+    m_dataSet.template ReadUpToTag<T1,T2>(is,m_tag,m_skipTags);
+  }
+  template<class T1, class T2> void ReadCommonWithLength(std::istream & is, VL & length) const
+  {
+    m_dataSet.template ReadUpToTagWithLength<T1,T2>(is,m_tag,m_skipTags,length);
+  }
+  static void Check(bool , std::istream &)  {}
+};
+
+class ReadSelectedTagsCaller
+{
+private:
+  DataSet & m_dataSet;
+  std::set<Tag> const & m_tags;
+  bool m_readvalues;
+
+public:
+  ReadSelectedTagsCaller(DataSet &ds, std::set<Tag> const & tags, const bool readvalues)
     :
-    m_dataSet(ds),m_tag(tag),m_skipTags(skiptags) {}
+  m_dataSet(ds),m_tags(tags),m_readvalues(readvalues) {}
 
-    template<class T1, class T2> void ReadCommon(std::istream & is) const
-    {
-      m_dataSet.template ReadUpToTag<T1,T2>(is,m_tag,m_skipTags);
-    }
-    template<class T1, class T2> void ReadCommonWithLength(std::istream & is, VL & length) const
-    {
-      m_dataSet.template ReadUpToTagWithLength<T1,T2>(is,m_tag,m_skipTags,length);
-    }
-    static void Check(bool , std::istream &)  {}
-  };
-
-  class ReadSelectedTagsCaller
+  template<class T1, class T2> void ReadCommon(std::istream & is) const
   {
-  private:
-    DataSet & m_dataSet;
-    std::set<Tag> const & m_tags;
-    bool m_readvalues;
+    m_dataSet.template ReadSelectedTags<T1,T2>(is,m_tags,m_readvalues);
+  }
 
-  public:
-    ReadSelectedTagsCaller(DataSet &ds, std::set<Tag> const & tags, const bool readvalues)
-      :
-    m_dataSet(ds),m_tags(tags),m_readvalues(readvalues) {}
-
-    template<class T1, class T2> void ReadCommon(std::istream & is) const
-    {
-      m_dataSet.template ReadSelectedTags<T1,T2>(is,m_tags,m_readvalues);
-    }
-
-    template<class T1, class T2> void ReadCommonWithLength(std::istream & is, VL & length) const
-    {
-      m_dataSet.template ReadSelectedTagsWithLength<T1,T2>(is,m_tags,length,m_readvalues);
-    }
-
-    static void Check(bool , std::istream &)  {}
-  };
-
-  class ReadSelectedPrivateTagsCaller
+  template<class T1, class T2> void ReadCommonWithLength(std::istream & is, VL & length) const
   {
-  private:
-    DataSet & m_dataSet;
-    std::set<PrivateTag> const & m_groups;
-    bool m_readvalues;
+    m_dataSet.template ReadSelectedTagsWithLength<T1,T2>(is,m_tags,length,m_readvalues);
+  }
 
-  public:
-    ReadSelectedPrivateTagsCaller(DataSet &ds, std::set<PrivateTag> const & groups, const bool readvalues)
-      :
-    m_dataSet(ds),m_groups(groups),m_readvalues(readvalues) {}
+  static void Check(bool , std::istream &)  {}
+};
 
-    template<class T1, class T2> void ReadCommon(std::istream & is) const
-    {
-      m_dataSet.template ReadSelectedPrivateTags<T1,T2>(is,m_groups,m_readvalues);
-    }
+class ReadSelectedPrivateTagsCaller
+{
+private:
+  DataSet & m_dataSet;
+  std::set<PrivateTag> const & m_groups;
+  bool m_readvalues;
 
-    template<class T1, class T2> void ReadCommonWithLength(std::istream & is, VL & length) const
-    {
-      m_dataSet.template ReadSelectedPrivateTagsWithLength<T1,T2>(is,m_groups,length,m_readvalues);
-    }
+public:
+  ReadSelectedPrivateTagsCaller(DataSet &ds, std::set<PrivateTag> const & groups, const bool readvalues)
+    :
+  m_dataSet(ds),m_groups(groups),m_readvalues(readvalues) {}
 
-    static void Check(bool , std::istream &)  {}
-  };
-}
+  template<class T1, class T2> void ReadCommon(std::istream & is) const
+  {
+    m_dataSet.template ReadSelectedPrivateTags<T1,T2>(is,m_groups,m_readvalues);
+  }
+
+  template<class T1, class T2> void ReadCommonWithLength(std::istream & is, VL & length) const
+  {
+    m_dataSet.template ReadSelectedPrivateTagsWithLength<T1,T2>(is,m_groups,length,m_readvalues);
+  }
+
+  static void Check(bool , std::istream &)  {}
+};
+
+} // namespace details
 
 bool Reader::Read()
 {
@@ -375,9 +368,9 @@ bool Reader::InternalReadCommon(const T_Caller &caller)
         }
         catch(std::exception &ex)
         {
-          (void)ex;  //to avoid unreferenced variable warning on release
+          (void)ex;
           mdcmWarningMacro(ex.what());
-          // Weird implicit meta header:
+          // Weird implicit meta header
           is.seekg(128+4, std::ios::beg);
           assert(is.good());
           try
@@ -386,9 +379,8 @@ bool Reader::InternalReadCommon(const T_Caller &caller)
           }
           catch(std::exception &ex2)
           {
-            (void)ex2;  //to avoid unreferenced variable warning on release
-            // Ok I get it now... there is absolutely no meta header, giving up
-            //hasmetaheader = false;
+            // no meta header
+            (void)ex2;
             mdcmErrorMacro(ex2.what());
           }
         }
@@ -400,7 +392,6 @@ bool Reader::InternalReadCommon(const T_Caller &caller)
     }
     catch(std::exception &)
     {
-      // Same player play again
       is.seekg(0, std::ios::beg);
       hasmetaheader = false;
     }
@@ -427,16 +418,9 @@ bool Reader::InternalReadCommon(const T_Caller &caller)
     // algorithm
     if(ts == TransferSyntax::DeflatedExplicitVRLittleEndian)
     {
-
       zlib_stream::zip_istream gzis(is);
-      // FIXME: we also know in this case that we are dealing with Explicit
       assert(ts.GetNegociatedType() == TransferSyntax::Explicit);
-      //F->GetDataSet().ReadUpToTag<ExplicitDataElement,SwapperNoOp>(gzis,tag, skiptags);
       caller.template ReadCommon<ExplicitDataElement,SwapperNoOp>(gzis);
-      // I need the following hack to read: srwithgraphdeflated.dcm
-      //is.clear();
-      // well not anymore, see special handling of trailing \0 in:
-      // basic_unzip_streambuf<charT, traits>::fill_input_buffer(void)
       return is.good();
     }
 
@@ -447,10 +431,7 @@ bool Reader::InternalReadCommon(const T_Caller &caller)
         //US-RGB-8-epicard.dcm is big endian
         if(ts.GetNegociatedType() == TransferSyntax::Implicit)
         {
-          // There is no such thing as Implicit Big Endian... oh well
           // LIBIDO-16-ACR_NEMA-Volume.dcm
-          //F->GetDataSet().ReadUpToTag<ImplicitDataElement,SwapperDoOp>(is,tag, skiptags);
-          //caller.template ReadCommon<ImplicitDataElement,SwapperDoOp>(is);
           mdcmErrorMacro("VirtualBigEndianNotHandled");
 #ifndef MDCM_DONT_THROW
           throw "Virtual Big Endian Implicit is not defined by DICOM";
@@ -458,7 +439,6 @@ bool Reader::InternalReadCommon(const T_Caller &caller)
         }
         else
         {
-          //F->GetDataSet().ReadUpToTag<ExplicitDataElement,SwapperDoOp>(is,tag, skiptags);
           caller.template ReadCommon<ExplicitDataElement,SwapperDoOp>(is);
         }
       }
@@ -468,7 +448,6 @@ bool Reader::InternalReadCommon(const T_Caller &caller)
         {
           if(hasmetaheader && haspreamble)
           {
-            //F->GetDataSet().ReadUpToTag<ImplicitDataElement,SwapperNoOp>(is,tag, skiptags);
             caller.template ReadCommon<ImplicitDataElement,SwapperNoOp>(is);
           }
           else
@@ -498,9 +477,8 @@ bool Reader::InternalReadCommon(const T_Caller &caller)
     {
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
       if(ex.GetLastElement().GetVR() == VR::UN && ex.GetLastElement().IsUndefinedLength())
-        {
+      {
         // non CP 246
-        // P.Read(is);
         is.clear();
         if(haspreamble)
         {
@@ -512,21 +490,15 @@ bool Reader::InternalReadCommon(const T_Caller &caller)
         }
         if(hasmetaheader)
         {
-          // FIXME: we are reading twice the same meta-header, we succedeed the first time
-          // We should be able to seek to proper place instead of re-reading
           FileMetaInformation header;
           header.Read(is);
         }
-
-        // MDCM 1.X
         mdcmWarningMacro("Attempt to read non CP 246");
-        F->GetDataSet().Clear(); // remove garbage from 1st attempt
-        //F->GetDataSet().ReadUpToTag<CP246ExplicitDataElement,SwapperNoOp>(is,tag, skiptags);
+        F->GetDataSet().Clear();
         caller.template ReadCommon<CP246ExplicitDataElement,SwapperNoOp>(is);
       }
       else if(ex.GetLastElement().GetVR() == VR::UN)
       {
-        // P.Read(is);
         is.clear();
         if(haspreamble)
         {
@@ -538,24 +510,19 @@ bool Reader::InternalReadCommon(const T_Caller &caller)
         }
         if(hasmetaheader)
         {
-          // FIXME: we are reading twice the same meta-header, we succedeed the first time
-          // We should be able to seek to proper place instead of re-reading
           FileMetaInformation header;
           header.Read(is);
         }
 
-        // MDCM 1.X
+        // GDCM 1.X
         mdcmWarningMacro("Attempt to read MDCM 1.X wrongly encoded");
-        F->GetDataSet().Clear(); // remove garbage from 1st attempt...
-        //F->GetDataSet().ReadUpToTag<UNExplicitDataElement,SwapperNoOp>(is,tag, skiptags);
+        F->GetDataSet().Clear();
         caller.template ReadCommon<UNExplicitDataElement,SwapperNoOp>(is);
-        // This file can only be rewritten as implicit...
       }
       else if (ex.GetLastElement().GetTag() == Tag(0xfeff,0x00e0))
       {
         // Famous philips where some private sequence were byteswapped
         // eg. PHILIPS_Intera-16-MONO2-Uncompress.dcm
-        // P.Read(is);
         is.clear();
         if(haspreamble)
         {
@@ -568,16 +535,13 @@ bool Reader::InternalReadCommon(const T_Caller &caller)
 
         if(hasmetaheader)
         {
-          // FIXME: we are reading twice the same meta-header, we succedeed the first time...
-          // We should be able to seek to proper place instead of re-reading
           FileMetaInformation header;
           header.Read(is);
         }
 
-        //
         mdcmWarningMacro("Attempt to read Philips with ByteSwap private sequence wrongly encoded");
-        F->GetDataSet().Clear(); // remove garbage from 1st attempt
-        assert(0);  // TODO FIXME
+        F->GetDataSet().Clear();
+        assert(0); // TODO FIXME
       }
       else if(ex.GetLastElement().GetVR() == VR::INVALID)
       {
@@ -593,18 +557,15 @@ bool Reader::InternalReadCommon(const T_Caller &caller)
             ide.template Read<SwapperNoOp>(is);
             // If we are here it means we succeeded in reading the implicit data element
             F->GetDataSet().Insert(ide);
-            //F->GetDataSet().template Read<VR16ExplicitDataElement,SwapperNoOp>(is);
             caller.template ReadCommon<VR16ExplicitDataElement,SwapperNoOp>(is);
-            // This file can only be rewritten as implicit
           }
           catch (Exception &)
           {
             try
             {
-              // Ouch ! the file is neither:
+              // The file is neither:
               // 1. An Explicit encoded
-              // 2. I could not reread it using the VR16Explicit reader, last option is
-              // that the file is explicit/implicit
+              // 2. I could not reread it using the VR16Explicit reader, last option is that the file is explicit/implicit
               is.clear();
               if(haspreamble)
               {
@@ -616,24 +577,20 @@ bool Reader::InternalReadCommon(const T_Caller &caller)
               }
               if(hasmetaheader)
               {
-                // FIXME: we are reading twice the same meta-header, we succedeed the first time...
-                // We should be able to seek to proper place instead of re-reading
                 FileMetaInformation header;
                 header.Read(is);
               }
 
               // Explicit/Implicit
               // mdcmData/c_vf1001.dcm falls into that category, while in fact the fmi could simply
-              // be inverted and all would be perfect...
+              // be inverted and all would be perfect
               mdcmWarningMacro("Attempt to read file with explicit/implicit");
-              F->GetDataSet().Clear(); // remove garbage from 1st attempt...
-              //F->GetDataSet().template Read<ExplicitImplicitDataElement,SwapperNoOp>(is);
+              F->GetDataSet().Clear();
               caller.template ReadCommon<ExplicitImplicitDataElement,SwapperNoOp>(is);
             }
             catch (Exception &ex2)
             {
               (void)ex2;
-              // Mon Jan 24 10:59:25 CET 2011
               // MM: UNExplicitImplicitDataElement does not seems to be used anymore to read
               // mdcmData/TheralysMDCM120Bug.dcm, instead the code path goes into
               // ExplicitImplicitDataElement class instead.
@@ -652,7 +609,6 @@ bool Reader::InternalReadCommon(const T_Caller &caller)
         if(ts.GetSwapCode() == SwapCode::LittleEndian &&
           ts.GetNegociatedType() == TransferSyntax::Explicit)
         {
-          // P.Read(is);
           if(haspreamble)
           {
             is.seekg(128+4, std::ios::beg);
@@ -663,17 +619,12 @@ bool Reader::InternalReadCommon(const T_Caller &caller)
           }
           if(hasmetaheader)
           {
-            // FIXME: we are reading twice the same meta-header, we succedeed the first time...
-            // We should be able to seek to proper place instead of re-reading
             FileMetaInformation header;
             header.ReadCompat(is);
           }
 
-          // Philips
-          F->GetDataSet().Clear(); // remove garbage from 1st attempt
-          //F->GetDataSet().ReadUpToTag<ExplicitImplicitDataElement,SwapperNoOp>(is,tag, skiptags);
+          F->GetDataSet().Clear();
           caller.template ReadCommon<ExplicitImplicitDataElement,SwapperNoOp>(is);
-          // This file can only be rewritten as implicit
         }
         else
         {
@@ -752,11 +703,11 @@ bool Reader::CanRead() const
   char b[8];
   if (is.good() && is.read(b,8))
   {
-    // examine probable group number ... assume <= 0x00ff
+    // examine probable group number, assume <= 0x00ff
     if (b[0] < b[1]) bigendian=true;
     else if (b[0] == 0 && b[1] == 0)
     {
-      // blech ... group number is zero
+      // group number is zero
       // no point in looking at element number
       // as it will probably be zero too (group length)
       // try the 32 bit value length of implicit vr
@@ -823,65 +774,19 @@ bool Reader::CanRead() const
   return false;
 }
 
-#ifdef _MSC_VER
-namespace
-{
-/*
-static std::wstring Utf8ToUtf16(const char * utf8)
-{
-  const size_t x = strlen(utf8);
-  wchar_t * t = new wchar_t[x];
-  MultiByteToWideChar(CP_UTF8, 0, utf8, -1, t, x);
-  std::wstring r(t);
-  delete [] t;
-  return w;
-}
-*/
-
-static std::wstring ToUtf16(std::string s)
-{
-  std::wstring r;
-  const size_t l =
-    MultiByteToWideChar(CP_UTF8, 0, s.c_str(), s.length(), NULL, 0);
-  if (l > 0)
-  {
-    r.resize(l);
-    MultiByteToWideChar(CP_UTF8, 0, s.c_str(), s.length(), &r[0], l);
-  }
-  return r;
-}
-}
-#endif
-
-void Reader::SetFileName(const char * f)
+void Reader::SetFileName(const char * utf8path)
 {
   if(Ifstream) delete Ifstream;
   Ifstream = new std::ifstream();
-  Ifstream->open(f, std::ios::binary);
-  if(Ifstream->is_open())
+  if (utf8path && *utf8path)
   {
-    Stream = Ifstream;
-    assert(Stream && *Stream);
-  }
-  else
-  {
-    delete Ifstream;
-    Ifstream = NULL;
-    Stream = NULL;
-  }
-}
-
-void Reader::SetFileNameUTF8(const char * uft8)
-{
-  if(Ifstream) delete Ifstream;
-  Ifstream = new std::ifstream();
-  Ifstream->open(
 #ifdef _MSC_VER
-  ToUtf16(uft8).c_str(),
+    const std::wstring uncpath = System::ConvertToUNC(utf8path);
+    Ifstream->open(uncpath.c_str(), std::ios::binary);
 #else
-  uft8,
+    Ifstream->open(utf8path, std::ios::binary);
 #endif
-  std::ios::binary);
+  }
   if(Ifstream->is_open())
   {
     Stream = Ifstream;
