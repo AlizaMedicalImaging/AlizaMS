@@ -438,8 +438,13 @@ bool DoOverlays(const DataSet & ds, Pixmap & pixeldata)
       {
         pixeldata.RemoveOverlay(ov);
         updateoverlayinfo.erase(updateoverlayinfo.begin() + ov);
-        mdcmWarningMacro("Invalid BitPosition: " << obp << " for overlay #" <<
-          ov << " removing it.");
+        mdcmWarningMacro("Invalid: " << obp << " < GetBitsStored()");
+      }
+      else if (obp > pf.GetBitsAllocated())
+      {
+        pixeldata.RemoveOverlay(ov);
+        updateoverlayinfo.erase(updateoverlayinfo.begin() + ov);
+        mdcmWarningMacro("Invalid: " << obp << " > GetBitsAllocated()");
       }
     }
   }

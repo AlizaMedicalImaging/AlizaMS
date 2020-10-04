@@ -156,13 +156,15 @@ bool System::MakeDirectory(const char * path)
 
 bool System::FileExists(const char * filename)
 {
-#ifdef _MSC_VER
-# define access _access
-#endif
 #ifndef R_OK
-# define R_OK 04
+#define R_OK 04
 #endif
-  if (access(filename, R_OK) != 0)
+#ifdef _MSC_VER
+  const std::wstring unc = System::ConvertToUNC(filename);
+  if (_waccess(unc.c_str(), R_OK) != 0)
+#else
+  if ( access(filename, R_OK) != 0 )
+#endif
   {
     return false;
   }
@@ -174,8 +176,14 @@ bool System::FileExists(const char * filename)
 
 bool System::FileIsDirectory(const char * name)
 {
+#ifdef _MSC_VER
+  struct _stat64i32 fs;
+  const std::wstring wname = System::ConvertToUNC(name);
+  if (_wstat(wname.c_str(), &fs) == 0)
+#else
   struct stat fs;
   if(stat(name, &fs) == 0)
+#endif
   {
 #if _WIN32
     return ((fs.st_mode & _S_IFDIR) != 0);
@@ -326,6 +334,81 @@ bool System::DeleteDirectory(const char * source)
 #define PATH_MAX 4096
 #endif
 
+#ifdef _MSC_VER
+namespace
+{
+
+static inline std::wstring ToUtf16(std::string const &str)
+{
+  std::wstring ret;
+  const int len = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int)str.length(), NULL, 0);
+  if (len > 0)
+  {
+    ret.resize(len);
+    MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int)str.length(), &ret[0], len);
+  }
+  return ret;
+}
+
+// http://arsenmk.blogspot.com/2015/12/handling-long-paths-on-windows.html
+static inline bool ComputeFullPath(std::wstring const &in, std::wstring &out)
+{
+  // consider an input fileName of type PCWSTR (const wchar_t*)
+  const wchar_t *fileName = in.c_str();
+  DWORD requiredBufferLength = GetFullPathNameW(fileName, 0, nullptr, nullptr);
+  if (0 == requiredBufferLength) return false;
+  out.resize(requiredBufferLength);
+  wchar_t *buffer = &out[0];
+  DWORD result = GetFullPathNameW(fileName, requiredBufferLength, buffer, nullptr);
+  if (0 == result) return false;
+  return true;
+}
+
+static inline std::wstring HandleMaxPath(std::wstring const &in)
+{
+  if (in.size() >= MAX_PATH)
+  {
+    std::wstring out;
+    bool ret = ComputeFullPath(in, out);
+    if (!ret) return in;
+    if (out.size() < 4) return in;
+    if (out[0] == '\\' && out[1] == '\\' && out[2] == '?')
+    {
+      ;;
+    }
+    else if (out[0] == '\\' && out[1] == '\\' && out[2] != '?')
+    {
+      // server path
+      const std::wstring prefix = LR"(\\?\UNC\)";
+      out = prefix + (out.c_str() + 2);
+    }
+    else
+    {
+      // regular C:\ style path:
+      assert(out[1] == ':');
+      const std::wstring prefix = LR"(\\?\)";
+      out = prefix + out.c_str();
+    }
+    return out;
+  }
+  return in;
+}
+
+}
+#endif
+
+std::wstring System::ConvertToUNC(const char *utf8path)
+{
+#ifdef _MSC_VER
+  const std::wstring uft16path = ToUtf16(utf8path);
+  const std::wstring uncpath = HandleMaxPath(uft16path);
+  return uncpath;
+#else
+  (void)utf8path;
+  return std::wstring();
+#endif
+}
+
 size_t System::FileSize(const char * filename)
 {
 #if 0
@@ -401,7 +484,7 @@ const char * System::GetCurrentProcessFileName()
     return path;
   }
 #else
-  mdcmErrorMacro("missing implementation");
+  mdcmErrorMacro("Not implementated");
 #endif
   return 0;
 }
@@ -418,15 +501,14 @@ const char * System::GetCurrentModuleFileName()
   if (dladdr((void*)&where_am_i, &info) == 0)
   {
     size_t len = strlen(info.dli_fname);
-    if(len >= PATH_MAX) return 0;
+    if(len >= PATH_MAX) return NULL;
     strcpy(path,info.dli_fname);
     return path;
   }
 #elif defined(_WIN32)
-  // GetModuleFileName works the same on Win32 for library AFAIK
   return System::GetCurrentProcessFileName();
 #endif
-  return 0;
+  return NULL;
 }
 
 const char * System::GetCurrentResourcesDirectory()
@@ -447,11 +529,11 @@ const char * System::GetCurrentResourcesDirectory()
     return path;
   }
 #endif
-  return 0;
+  return NULL;
 }
 
 /**
- * \brief Encode the mac address on a fixed length string of 15 characters.
+ * Encode the mac address on a fixed length string of 15 characters.
  * we save space this way.
  */
 inline int getlastdigit(unsigned char * data, unsigned long size)

@@ -171,14 +171,19 @@ static inline PixelFormat::ScalarType ComputeBestFit(
 
 PixelFormat::ScalarType Rescaler::ComputeInterceptSlopePixelType()
 {
+  if(PF.GetSamplesPerPixel() != 1)
+  {
+    mdcmErrorMacro("Samples per pixel != 1");
+    return PF;
+  }
   PixelFormat::ScalarType output = PixelFormat::UNKNOWN;
   if(PF == PixelFormat::SINGLEBIT)
   {
     return PixelFormat::SINGLEBIT;
   }
-  if (PF == PixelFormat::FLOAT16 ||
-      PF == PixelFormat::FLOAT32 ||
-      PF == PixelFormat::FLOAT64)
+  if(PF == PixelFormat::FLOAT16 ||
+     PF == PixelFormat::FLOAT32 ||
+     PF == PixelFormat::FLOAT64)
   {
     return PixelFormat::FLOAT64;
   }

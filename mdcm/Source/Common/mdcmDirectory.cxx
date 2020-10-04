@@ -1,3 +1,11 @@
+/*********************************************************
+ *
+ * MDCM
+ *
+ * Modifications github.com/issakomi
+ *
+ *********************************************************/
+
 /*=========================================================================
 
   Program: GDCM (Grassroots DICOM). A DICOM library
@@ -19,11 +27,11 @@
 #include <sys/stat.h>
 #include <cstring>
 #ifdef _MSC_VER
-  #include <windows.h>
-  #include <direct.h>
+#include <windows.h>
+#include <direct.h>
 #else
-  #include <dirent.h>
-  #include <sys/types.h>
+#include <dirent.h>
+#include <sys/types.h>
 #endif
 
 namespace mdcm
@@ -41,66 +49,84 @@ unsigned int Directory::Load(FilenameType const & name, bool recursive)
   return false;
 }
 
+#ifdef _MSC_VER
+static inline std::string ToUtf8(std::wstring const &str)
+{
+  std::string ret;
+  int len =
+    WideCharToMultiByte(CP_UTF8, 0, str.c_str(), (int)str.length(), NULL, 0, NULL, NULL);
+  if (len > 0)
+  {
+    ret.resize(len);
+    WideCharToMultiByte(CP_UTF8, 0, str.c_str(), (int)str.length(), &ret[0], len, NULL, NULL);
+  }
+  return ret;
+}
+#endif
+
 unsigned int Directory::Explore(FilenameType const & name, bool recursive)
 {
   unsigned int nFiles = 0;
-  std::string fileName;
-  std::string dirName = name;
-  Directories.push_back(dirName);
 #ifdef _MSC_VER
-  WIN32_FIND_DATA fileData;
-  if ('/' != dirName[dirName.size()-1]) dirName.push_back('/');
-  assert('/' == dirName[dirName.size()-1]);
-  const FilenameType firstfile = dirName+"*";
-  HANDLE hFile = FindFirstFile(firstfile.c_str(), &fileData);
-  for(BOOL b = (hFile != INVALID_HANDLE_VALUE); b;
-      b = FindNextFile(hFile, &fileData))
+  std::wstring fileName;
+  std::wstring dirName = System::ConvertToUNC(name.c_str());
+  Directories.push_back(ToUtf8(dirName));
+  WIN32_FIND_DATAW fileData;
+  if('\\' != dirName[dirName.size()-1]) dirName.push_back('\\');
+  assert('\\' == dirName[dirName.size()-1]);
+  const std::wstring firstfile = dirName+L"*";
+  HANDLE hFile = FindFirstFileW(firstfile.c_str(), &fileData);
+  for(BOOL b = (hFile != INVALID_HANDLE_VALUE); b; b = FindNextFileW(hFile, &fileData))
   {
     fileName = fileData.cFileName;
-    if (fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+    if(fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
     {
-      // check for . and .. to avoid infinite loop and discard any hidden dir
-      if (fileName != "." && fileName != ".." && fileName[0] != '.' && recursive)
+      // Check for . and .. to avoid infinite loop and discard hidden dir
+      if(fileName != L"." && fileName != L".." && fileName[0] != '.' && recursive )
       {
-        nFiles += Explore(dirName+fileName,recursive);
+        nFiles += Explore(ToUtf8(dirName + fileName), recursive);
       }
     }
     else
     {
-      Filenames.push_back(dirName+fileName);
-      nFiles++;
+      if(fileName[0] != '.') // discard UNIX hidden files
+      {
+        Filenames.push_back(ToUtf8(dirName+fileName));
+        nFiles++;
+      }
     }
   }
   DWORD dwError = GetLastError();
-  if (hFile != INVALID_HANDLE_VALUE) FindClose(hFile);
-  if (dwError != ERROR_NO_MORE_FILES)
+  if(hFile != INVALID_HANDLE_VALUE) FindClose(hFile);
+  if(dwError != ERROR_NO_MORE_FILES)
   {
     return 0;
   }
 #else
-  DIR * dir = opendir(dirName.c_str());
+  std::string fileName;
+  std::string dirName = name;
+  Directories.push_back(dirName);
+  DIR* dir = opendir(dirName.c_str());
   if (!dir)
   {
-    const char * str = strerror(errno);
-    (void)str;
-    mdcmErrorMacro("Error was: " << str << " when opening directory: " << dirName);
+    const char *str = strerror(errno); (void)str;
+    mdcmErrorMacro("Error: " << str << " when opening directory " << dirName);
     return 0;
   }
   struct stat buf;
-  dirent * d;
-  if ('/' != dirName[dirName.size()-1]) dirName.push_back('/');
-  assert('/' == dirName[dirName.size()-1]);
-  for (d = readdir(dir); d; d = readdir(dir))
+  dirent *d;
+  if('/' != dirName[dirName.size()-1]) dirName.push_back('/');
+  assert( '/' == dirName[dirName.size()-1] );
+  for(d = readdir(dir); d; d = readdir(dir))
   {
     fileName = dirName + d->d_name;
     if(stat(fileName.c_str(), &buf) != 0)
     {
-      const char * str = strerror(errno);
-      (void)str;
-      mdcmErrorMacro("Last Error was: " << str << " for file: " << fileName);
+      const char *str = strerror(errno); (void)str;
+      mdcmErrorMacro( "Last error: " << str << " for file " << fileName );
       break;
     }
-    if (S_ISREG(buf.st_mode)) // is regular file
+    if(S_ISREG(buf.st_mode)) // is a regular file?
     {
       if(d->d_name[0] != '.')
       {
@@ -108,35 +134,31 @@ unsigned int Directory::Explore(FilenameType const & name, bool recursive)
         nFiles++;
       }
     }
-    else if (S_ISDIR(buf.st_mode)) // is directory
+    else if (S_ISDIR(buf.st_mode)) // directory?
     {
-      // discard . and .. and hidden dir
-      if(strcmp(d->d_name, ".")  == 0 ||
-         strcmp(d->d_name, "..") == 0 ||
-         d->d_name[0] == '.')
+      // discard '.', '..' and hidden
+      if(strcmp(d->d_name, ".") == 0 || strcmp(d->d_name, "..") == 0 || d->d_name[0] == '.')
       {
         continue;
       }
-      assert(d->d_name[0] != '.');
-      if (recursive)
+      if(recursive)
       {
-        nFiles += Explore(fileName, recursive);
+        nFiles += Explore( fileName, recursive);
       }
     }
     else
     {
-      mdcmErrorMacro("Unexpected type for file: " << fileName);
+      mdcmErrorMacro("Unexpected type: " << fileName);
       break;
     }
   }
   if(closedir(dir) != 0)
   {
-    const char * str = strerror(errno);
-    (void)str;
-    mdcmErrorMacro("Last error was: " << str << " when closing directory: " << fileName);
+    const char *str = strerror(errno);
+	(void)str;
+    mdcmErrorMacro("Last error: " << str << " when closing directory " << fileName);
   }
 #endif
-
   return nFiles;
 }
 

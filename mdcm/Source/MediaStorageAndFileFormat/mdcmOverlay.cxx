@@ -24,7 +24,6 @@
 #include "mdcmDataElement.h"
 #include "mdcmDataSet.h"
 #include "mdcmAttribute.h"
-
 #include <vector>
 
 namespace mdcm
@@ -114,15 +113,10 @@ void Overlay::Update(const DataElement & de)
     Element (60xx,3000), Overlay Bits Allocated (60xx,0100) is always 1 and Overlay
     Bit Position (60xx,0102) is always 0.
 */
-  assert(de.GetTag().IsPublic());
   const ByteValue* bv = de.GetByteValue();
   if(!bv) return;
   assert(bv->GetPointer() && bv->GetLength());
   std::string s(bv->GetPointer(), bv->GetLength());
-  // What if a \0 can be found before the end of string...
-  //assert(strlen( s.c_str()) == s.size() );
-
-  // First thing check consistency
   if(!GetGroup())
   {
     SetGroup(de.GetTag().GetGroup());
@@ -134,7 +128,7 @@ void Overlay::Update(const DataElement & de)
 
   if(de.GetTag().GetElement() == 0x0000) // OverlayGroupLength
   {
-    ;
+    ;;
   }
   else if(de.GetTag().GetElement() == 0x0010) // OverlayRows
   {
@@ -238,95 +232,102 @@ void Overlay::Update(const DataElement & de)
 
 bool Overlay::GrabOverlayFromPixelData(DataSet const &ds)
 {
-  if (Internal->NumberOfFrames > 1) return false;
-  const unsigned int ovlength = Internal->Rows*Internal->Columns/8;
+  if(!ds.FindDataElement(Tag(0x7fe0,0x0010))) return false;
+  if(Internal->NumberOfFrames > 1) return false;
+  const unsigned int s = Internal->Rows*Internal->Columns;
+  const unsigned int ovlength = s/8 + (s%8 != 0 ? 1 : 0);
   Internal->Data.resize(ovlength);
-  if(Internal->BitsAllocated == 16)
+  const DataElement &pixeldata = ds.GetDataElement(Tag(0x7fe0,0x0010));
+  const ByteValue *bv = pixeldata.GetByteValue();
+  if(!bv)
   {
-    if(!ds.FindDataElement(Tag(0x7fe0,0x0010)) )
-    {
-      mdcmWarningMacro("Could not find Pixel Data. Cannot extract Overlay.");
-      return false;
-    }
-    const DataElement &pixeldata = ds.GetDataElement(Tag(0x7fe0,0x0010));
-    const ByteValue *bv = pixeldata.GetByteValue();
-    if(!bv)
-    {
-      // XA_GE_JPEG_02_with_Overlays.dcm
-      mdcmWarningMacro("Could not extract overlay from encapsulated stream.");
-      return false;
-    }
-    assert(bv);
-    const char *array = bv->GetPointer();
-    // SIEMENS_GBS_III-16-ACR_NEMA_1.acr is pain to support,
-    // I cannot simply use the bv->GetLength I have to use the image dim:
-    const unsigned int length = ovlength * 8 * 2; //bv->GetLength();
-    const uint16_t *p = (const uint16_t*)(const void*)array;
-    const uint16_t *end = (const uint16_t*)(const void*)(array + length);
-    assert(8*ovlength == (unsigned int)(Internal->Rows*Internal->Columns));
-    if(Internal->Data.empty())
-    {
-      mdcmWarningMacro("Internal Data is empty.");
-      return false;
-    }
-    unsigned char * overlay = (unsigned char*)&Internal->Data[0];
+    // XA_GE_JPEG_02_with_Overlays.dcm  TODO
+    mdcmWarningMacro("Could not extract overlay from encapsulated stream");
+    return false;
+  }
+  const char *array = bv->GetPointer();
+  if(!array) return false;
+  if(Internal->BitsAllocated == 8)
+  {
+    const unsigned int length = ovlength * 8;
+    const uint8_t *p = (const uint8_t*)array;
+    const uint8_t *end = (const uint8_t*)(array + length);
+    unsigned char *overlay = (unsigned char*)&Internal->Data[0];
     int c = 0;
-    uint16_t pmask = (uint16_t)(1 << Internal->BitPosition);
-    assert(length / 2 == ovlength * 8);
+    uint8_t pmask = (uint8_t)(1 << Internal->BitPosition);
     while(p != end)
     {
-      const uint16_t val = *p & pmask;
-      assert(val == 0x0 || val == pmask);
-      // 128 -> 0x80
-      if(val)
+      const uint8_t val = *p & pmask;
+      if(val != 0)
       {
-        overlay[ c / 8 ] |= (unsigned char)(0x1 << c%8);
+        overlay[c/8] |= (unsigned char)(1 << c%8);
       }
-      else
-      {
-        // else overlay[ c / 8 ] is already 0
-      }
+      // else overlay[c/8] is already 0
       ++p;
       ++c;
     }
-    assert((unsigned)c / 8 == ovlength);
+    return true;
   }
-  else
+  else if(Internal->BitsAllocated == 16)
   {
-    mdcmErrorMacro("Could not grab Overlay from image. Please report.");
-    return false;
+    const unsigned int length = ovlength*16;
+    const uint16_t *p = (const uint16_t*)array;
+    const uint16_t *end = (const uint16_t*)(array + length);
+    unsigned char *overlay = (unsigned char*)&Internal->Data[0];
+    int c = 0;
+    uint16_t pmask = (uint16_t)(1 << Internal->BitPosition);
+    while(p != end)
+    {
+      const uint16_t val = *p & pmask;
+      if(val != 0)
+      {
+        overlay[c/8] |= (unsigned char)(1 << c%8);
+      }
+      // else overlay[c/8] is already 0
+      ++p;
+      ++c;
+    }
+    return true;
   }
-  return true;
+  return false;
 }
 
 void Overlay::SetGroup(unsigned short group) { Internal->Group = group; }
+
 unsigned short Overlay::GetGroup() const { return Internal->Group; }
 
 void Overlay::SetRows(unsigned short rows) { Internal->Rows = rows; }
+
 unsigned short Overlay::GetRows() const { return Internal->Rows; }
+
 void Overlay::SetColumns(unsigned short columns) { Internal->Columns = columns; }
+
 unsigned short Overlay::GetColumns() const { return Internal->Columns; }
+
 void Overlay::SetNumberOfFrames(unsigned int numberofframes) { Internal->NumberOfFrames = numberofframes; }
+
 unsigned int Overlay::GetNumberOfFrames() const { return Internal->NumberOfFrames; }
+
 void Overlay::SetDescription(const char* description) { if(description) Internal->Description = description; }
+
 const char *Overlay::GetDescription() const { return Internal->Description.c_str(); }
+
 void Overlay::SetType(const char* type) { if(type) Internal->Type = type; }
+
 const char *Overlay::GetType() const { return Internal->Type.c_str(); }
-static const char *OverlayTypeStrings[] = {
-  "INVALID",
-  "G ",
-  "R ",
-};
+
+static const char *OverlayTypeStrings[] = { "INVALID", "G ", "R " };
+
 const char *Overlay::GetOverlayTypeAsString(OverlayType ot)
 {
   return OverlayTypeStrings[ (int) ot ];
 }
+
 Overlay::OverlayType Overlay::GetOverlayTypeFromString(const char *s)
 {
-  static const int n = sizeof(OverlayTypeStrings) / sizeof ( *OverlayTypeStrings );
   if(s)
   {
-    for(int i = 0; i < n; ++i)
+    for(int i = 0; i < 3; ++i)
     {
       if(strcmp(s, OverlayTypeStrings[i]) == 0 )
       {
@@ -334,10 +335,10 @@ Overlay::OverlayType Overlay::GetOverlayTypeFromString(const char *s)
       }
     }
   }
-  // could not find the proper type, maybe padded with \0 ?
+  // maybe padded with '\0'?
   if(s && strlen(s) == 1)
   {
-    for(int i = 0; i < n; ++i)
+    for(int i = 0; i < 3; ++i)
     {
       if(strncmp(s, OverlayTypeStrings[i], 1) == 0 )
       {
@@ -348,6 +349,7 @@ Overlay::OverlayType Overlay::GetOverlayTypeFromString(const char *s)
   }
   return Overlay::Invalid;
 }
+
 Overlay::OverlayType Overlay::GetTypeAsEnum() const
 {
   return GetOverlayTypeFromString(GetType());
@@ -366,20 +368,25 @@ const signed short * Overlay::GetOrigin() const
   return &Internal->Origin[0];
 }
 void Overlay::SetFrameOrigin(unsigned short frameorigin) { Internal->FrameOrigin = frameorigin; }
+
 unsigned short Overlay::GetFrameOrigin() const { return Internal->FrameOrigin; }
+
 void Overlay::SetBitsAllocated(unsigned short bitsallocated) { Internal->BitsAllocated = bitsallocated; }
+
 unsigned short Overlay::GetBitsAllocated() const { return Internal->BitsAllocated; }
+
 void Overlay::SetBitPosition(unsigned short bitposition) { Internal->BitPosition = bitposition; }
+
 unsigned short Overlay::GetBitPosition() const { return Internal->BitPosition; }
 
 bool Overlay::IsEmpty() const
 {
   return Internal->Data.empty();
 }
+
 bool Overlay::IsZero() const
 {
   if(IsEmpty()) return false;
-
   std::vector<char>::const_iterator it = Internal->Data.begin();
   for(; it != Internal->Data.end(); ++it)
   {
@@ -387,14 +394,10 @@ bool Overlay::IsZero() const
   }
   return false;
 }
-bool Overlay::IsInPixelData() const { return Internal->InPixelData; }
-void Overlay::IsInPixelData(bool b) { Internal->InPixelData = b; }
 
-inline unsigned int compute_bit_and_dicom_padding(unsigned short rows, unsigned short columns)
-{
-  unsigned int word_padding = (rows * columns + 7) / 8; // need to send full word (8bits at a time)
-  return word_padding + word_padding%2; // Cannot have odd length
-}
+bool Overlay::IsInPixelData() const { return Internal->InPixelData; }
+
+void Overlay::IsInPixelData(bool b) { Internal->InPixelData = b; }
 
 void Overlay::SetOverlay(const char *array, size_t length)
 {
@@ -448,7 +451,7 @@ bool Overlay::GetUnpackBuffer(char *buffer, size_t len) const
   unsigned char *unpackedbytes = (unsigned char*)buffer;
   const unsigned char *begin = unpackedbytes;
   for(std::vector<char>::const_iterator it =
-        Internal->Data.begin(); it != Internal->Data.end(); ++it)
+    Internal->Data.begin(); it != Internal->Data.end(); ++it)
   {
     assert(unpackedbytes <= begin + len);
     unsigned char packedbytes = static_cast<unsigned char>(*it);

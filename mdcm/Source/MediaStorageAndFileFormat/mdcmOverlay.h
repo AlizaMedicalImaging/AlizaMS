@@ -33,108 +33,56 @@ class ByteValue;
 class DataSet;
 class DataElement;
 /**
- * \brief Overlay class
- * \note
- * see AreOverlaysInPixelData
- *
- * \todo
- *  Is there actually any way to recognize an overlay ? On images with multiple overlay I do not see
- *  any way to differenciate them (other than the group tag).
- *
- *  Example:
+ * Overlay class
  */
 class MDCM_EXPORT Overlay : public Object
 {
 public:
   Overlay();
   ~Overlay();
-  /// Print
   void Print(std::ostream &) const;
-
-  /// Update overlay from data element de:
-  void Update(const DataElement & de);
-
-  /// Set Group number
-  void SetGroup(unsigned short group);
-  /// Get Group number
+  void Update(const DataElement &);
+  void SetGroup(unsigned short);
   unsigned short GetGroup() const;
-  /// set rows
-  void SetRows(unsigned short rows);
-  /// get rows
+  void SetRows(unsigned short);
   unsigned short GetRows() const;
-  /// set columns
-  void SetColumns(unsigned short columns);
-  /// get columns
+  void SetColumns(unsigned short);
   unsigned short GetColumns() const;
-  /// set number of frames
-  void SetNumberOfFrames(unsigned int numberofframes);
+  void SetNumberOfFrames(unsigned int);
   unsigned int GetNumberOfFrames() const;
-  /// set description
-  void SetDescription(const char* description);
-  /// get description
+  void SetDescription(const char *);
   const char *GetDescription() const;
-  typedef enum {
+  typedef enum
+  {
     Invalid  = 0,
     Graphics = 1,
     ROI      = 2
   } OverlayType;
-  /// set type
-  void SetType(const char* type);
-  /// get type
+  void SetType(const char *);
   const char *GetType() const;
   OverlayType GetTypeAsEnum() const;
-  static const char *GetOverlayTypeAsString(OverlayType ot);
+  static const char *GetOverlayTypeAsString(OverlayType);
   static OverlayType GetOverlayTypeFromString(const char *);
-  /// set origin
   void SetOrigin(const signed short origin[2]);
-  /// get origin
   const signed short * GetOrigin() const;
-  /// set frame origin
-  void SetFrameOrigin(unsigned short frameorigin);
+  void SetFrameOrigin(unsigned short);
   unsigned short GetFrameOrigin() const;
-  /// set bits allocated
-  void SetBitsAllocated(unsigned short bitsallocated);
-  /// return bits allocated
+  void SetBitsAllocated(unsigned short);
   unsigned short GetBitsAllocated() const;
-  /// set bit position
-  void SetBitPosition(unsigned short bitposition);
-  /// return bit position
+  void SetBitPosition(unsigned short);
   unsigned short GetBitPosition() const;
-
-  /// set overlay from byte array + length
-  void SetOverlay(const char *array, size_t length);
-  ///
-  bool GrabOverlayFromPixelData(DataSet const &ds);
-
-  /// Return the Overlay Data as ByteValue:
-  /// Not thread safe
-  const ByteValue &GetOverlayData() const;
-
-  /// Return whether or not the Overlay is empty:
+  void SetOverlay(const char *, size_t);
+  bool GrabOverlayFromPixelData(DataSet const &);
+  const ByteValue &GetOverlayData() const; // Not thread safe
   bool IsEmpty() const;
-
-  /// return true if all bits are set to 0
   bool IsZero() const;
-
-  /// return if the Overlay is stored in the pixel data or not
   bool IsInPixelData() const;
-
-  /// Set whether or no the OverlayData is in the Pixel Data:
   void IsInPixelData(bool b);
-
-  /// Decode the internal OverlayData (packed bits) into unpacked representation
-  void Decompress(std::ostream &os) const;
-
-  /// Retrieve the size of the buffer needed to hold the Overlay
-  /// as specified by Col & Row parameters
+  void Decompress(std::ostream &) const;
   size_t GetUnpackBufferLength() const;
-
-  /// Retrieve the unpack buffer for Overlay. This is an error if
-  /// the size if below GetUnpackBufferLength()
-  bool GetUnpackBuffer(char *buffer, size_t len) const;
-
+  bool GetUnpackBuffer(char *, size_t) const;
   Overlay(Overlay const &ov);
-  Overlay &operator=(Overlay const &ov);
+  Overlay &operator=(Overlay const &);
 
 private:
   OverlayInternal *Internal;

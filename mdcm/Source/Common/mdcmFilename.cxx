@@ -23,7 +23,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <limits.h>
-#include <assert.h>
 
 namespace mdcm
 {
@@ -31,7 +30,6 @@ namespace mdcm
 const char * Filename::GetPath()
 {
   std::string fn = ToUnixSlashes();
-
   std::string::size_type slash_pos = fn.rfind("/");
   if(slash_pos != std::string::npos)
   {
@@ -41,14 +39,12 @@ const char * Filename::GetPath()
   {
     Path = "";
   }
-
   return Path.c_str();
 }
 
 const char * Filename::GetName()
 {
   std::string filename = FileName;
-  assert( !filename.empty() );
 #if defined(_WIN32)
   std::string::size_type slash_pos = filename.find_last_of("/\\");
 #else
@@ -58,7 +54,6 @@ const char * Filename::GetName()
   {
     return &FileName[0] + slash_pos + 1;
   }
-
   return &FileName[0];
 }
 
@@ -68,27 +63,24 @@ const char * Filename::ToWindowsSlashes()
   for (std::string::iterator it = Conversion.begin(); it != Conversion.end(); ++it)
   {
     if(*it == '/')
-   {
+    {
       *it = '\\';
     }
   }
-
   return Conversion.c_str();
 }
 
 const char * Filename::ToUnixSlashes()
 {
   Conversion = FileName;
-  assert( !Conversion.empty() );
   for (std::string::iterator it = Conversion.begin(); it != Conversion.end(); ++it)
   {
     if( *it == '\\' )
     {
-      assert(it+1 == Conversion.end() || *(it+1) != ' '); // is it an escaped space ?
+      //assert(it+1 == Conversion.end() || *(it+1) != ' '); // is it an escaped space ?
       *it = '/';
     }
   }
-
   return Conversion.c_str();
 }
 
@@ -111,11 +103,11 @@ inline void Realpath(const char * path, std::string & resolved_path)
 }
 #else
 #if defined(PATH_MAX)
-# define MDCM_FILENAME_MAXPATH PATH_MAX
+#define MDCM_FILENAME_MAXPATH PATH_MAX
 #elif defined(MAXPATHLEN)
-# define MDCM_FILENAME_MAXPATH MAXPATHLEN
+#define MDCM_FILENAME_MAXPATH MAXPATHLEN
 #else
-# define MDCM_FILENAME_MAXPATH 16384
+#define MDCM_FILENAME_MAXPATH 16384
 #endif
 
 inline void Realpath(const char * path, std::string & resolved_path)
@@ -123,7 +115,7 @@ inline void Realpath(const char * path, std::string & resolved_path)
   char resolved_name[MDCM_FILENAME_MAXPATH];
 
   char * ret = realpath(path, resolved_name);
-  if( ret )
+  if(ret)
   {
     resolved_path = resolved_name;
   }
@@ -159,7 +151,7 @@ bool Filename::IsIdentical(Filename const & fn) const
 
 const char * Filename::Join(const char * path, const char *filename)
 {
-  static std::string s; // warning C4640: 's' : construction of local static object is not thread-safe
+  static std::string s; // construction of local static object is not thread-safe
   s = path;
   s += '/';
   s += filename;
@@ -172,10 +164,8 @@ bool Filename::EndWith(const char ending[]) const
   const char * str = FileName.c_str();
   size_t str_len = FileName.size();
   size_t ending_len = strlen(ending);
-
   if(ending_len > str_len) return false;
-
-  return 0 == strncmp( str + str_len - ending_len, ending, ending_len );
+  return 0 == strncmp(str + str_len - ending_len, ending, ending_len);
 }
 
 } // end namespace mdcm
