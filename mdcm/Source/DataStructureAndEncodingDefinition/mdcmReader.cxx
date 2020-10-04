@@ -780,7 +780,8 @@ void Reader::SetFileName(const char * utf8path)
   Ifstream = new std::ifstream();
   if (utf8path && *utf8path)
   {
-#ifdef _MSC_VER
+//#ifdef _MSC_VER
+#if 0
     const std::wstring uncpath = System::ConvertToUNC(utf8path);
     Ifstream->open(uncpath.c_str(), std::ios::binary);
 #else
