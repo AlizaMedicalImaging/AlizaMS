@@ -6,8 +6,7 @@
 class FilePath
 {
 public:
-	static QString getPath(const QString &);
+	static const char * getPath(const QString &);
 };
-
 
 #endif

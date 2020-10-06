@@ -1,7 +1,10 @@
 #include "filepath.h"
 
-QString FilePath::getPath(const QString & p)
+const char * FilePath::getPath(const QString & p)
 {
-	const QString s(p);
-	return s.toLocal8Bit();
+#ifdef _WIN32
+	return p.toUtf8().constData();
+#else
+	return p.toLocal8Bit().constData();
+#endif
 }
