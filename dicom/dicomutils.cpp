@@ -23,6 +23,7 @@
 #include <itkImageRegionConstIterator.h>
 #include <itkByteSwapper.h>
 #include <itkMath.h>
+#include "mdcmSystem.h"
 #include "mdcmReader.h"
 #include "mdcmFile.h"
 #include "mdcmAttribute.h"
@@ -8911,7 +8912,13 @@ bool DicomUtils::is_dicom_file(const QString & f)
 	bool dicom = false;
 	char b[4];
 	std::ifstream fs;
-	fs.open(FilePath::getPath(f), std::ios::in|std::ios::binary);
+#ifdef _MSC_VER 
+    const std::wstring uncpath =
+		mdcm::System::ConvertToUNC(FilePath::getPath(f));
+    fs.open(uncpath.c_str(), std::ios::in|std::ios::binary);
+#else
+    fs.open(FilePath::getPath(f), std::ios::in|std::ios::binary);
+#endif
 	for (long off = 128; off >= 0; off -= 128)
 	{
 		fs.seekg(off, std::ios_base::beg);

@@ -2,7 +2,7 @@
 
 const char * FilePath::getPath(const QString & p)
 {
-#ifdef _WIN32
+#ifdef _MSC_VER
 	return p.toUtf8().constData();
 #else
 	return p.toLocal8Bit().constData();

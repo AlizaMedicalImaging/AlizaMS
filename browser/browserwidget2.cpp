@@ -176,15 +176,28 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 	QStringList dlist = dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
 	QStringList flist = dir.entryList(QDir::Files|QDir::Readable,QDir::Name);
 	std::vector<std::string> filenames;
+	QStringList filenames_no_series_uid;
 	for (int x=0; x < flist.size(); x++)
 	{
 		pd->setValue(-1);
 		qApp->processEvents();
 		if (pd->wasCanceled()) return;
-		const QString tmp0 =
-			QDir::toNativeSeparators(
-				dir.absolutePath() + QDir::separator() + flist.at(x));
-		filenames.push_back(std::string(FilePath::getPath(tmp0)));
+		const QString tmp0 = QDir::toNativeSeparators(
+			dir.absolutePath() + QDir::separator() + flist.at(x));
+		{
+			std::set<mdcm::Tag> tags;
+			tags.insert(tSeriesInstanceUID);
+			mdcm::Reader reader;
+			reader.SetFileName(FilePath::getPath(tmp0));
+			if (reader.ReadSelectedTags(tags))
+			{
+				filenames.push_back(std::string(FilePath::getPath(tmp0)));
+			}
+			else if (DicomUtils::is_dicom_file(tmp0))
+			{
+				filenames_no_series_uid.push_back(tmp0);
+			}
+		}
 	}
 	flist.clear();
 	//
@@ -199,9 +212,6 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 	if (pd->wasCanceled()) return;
 	mdcm::Scanner::ValuesType v = s0.GetValues();
 	mdcm::Scanner::ValuesType::iterator vi = v.begin();
-	unsigned long all_dicom_files = filenames.size();
-	unsigned long detected_by_scanner = 0;
-	QStringList all_detected;
 	for (;vi!=v.end();++vi)
 	{
 		QString modality    = QString("");
@@ -219,13 +229,15 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 		std::vector<std::string> files__;
 		files__ = s0.GetAllFilenamesFromTagToValue(
 			tSeriesInstanceUID, (*vi).c_str());
-		detected_by_scanner += files__.size();
 		for (unsigned int z = 0; z < files__.size(); z++)
 		{
 			const QString tmp_filename =
-				QString(files__.at(z).c_str());
+#ifdef _MSC_VER
+				QString::fromStdString(files__.at(z));
+#else
+				QString::fromLocal8Bit(files__.at(z).c_str());
+#endif
 			i->files.push_back(tmp_filename);
-			all_detected.push_back(tmp_filename);
 		}
 		const unsigned int series_size = i->files.size();
 		if (series_size > 0) read_tags_(
@@ -282,65 +294,54 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 		if (pd->wasCanceled()) return;
 	}
 	//
-	// bad files don't contain tag 0x0020,0x000e
-	long diff_size = all_dicom_files-detected_by_scanner;
-	if (diff_size>0)
+	for (unsigned int x = 0; x < filenames_no_series_uid.size(); x++)
 	{
-		for (unsigned int x = 0; x < filenames.size(); x++)
+		const QString tmp1 = filenames_no_series_uid.at(x);
+		QString modality    = QString("");
+		QString name        = QString("");
+		QString birthdate   = QString("");
+		QString study       = QString("");
+		QString study_date  = QString("");
+		QString series      = QString("");
+		QString series_date = QString("");
+		bool is_image       = false;
+		bool is_softcopy    = false;
+		const int idx = tableWidget->rowCount();
+		QString ids(""); ids.sprintf("%010d", idx);
+		TableWidgetItem * i = new TableWidgetItem(ids);
+		i->files.push_back(tmp1);
+		read_tags_(
+			tmp1,
+			name,birthdate,
+			modality,
+			study,study_date,
+			series,series_date,
+			&is_image,&is_softcopy);
+		tableWidget->setRowCount(idx+1);
+		tableWidget->setItem(idx,0,static_cast<QTableWidgetItem*>(i));
+		if (is_image)
 		{
-			const QString tmp1 =
-				QString(filenames.at(x).c_str());
-			if (!all_detected.contains(tmp1))
-			{
-				QString modality    = QString("");
-				QString name        = QString("");
-				QString birthdate   = QString("");
-				QString study       = QString("");
-				QString study_date  = QString("");
-				QString series      = QString("");
-				QString series_date = QString("");
-				bool is_image       = false;
-				bool is_softcopy    = false;
-				const int idx = tableWidget->rowCount();
-				QString ids(""); ids.sprintf("%010d", idx);
-				TableWidgetItem * i = new TableWidgetItem(ids);
-				i->files.push_back(tmp1);
-				read_tags_(
-					tmp1,
-					name,birthdate,
-					modality,
-					study,study_date,
-					series,series_date,
-					&is_image,&is_softcopy);
-				tableWidget->setRowCount(idx+1);
-				tableWidget->setItem(idx,0,static_cast<QTableWidgetItem*>(i));
-				if (is_image)
-				{
-					tableWidget->setItem(idx,1,new QTableWidgetItem(eye_icon,QString("")));
-				}
-				else if (is_softcopy)
-				{
-					tableWidget->setItem(idx,1,new QTableWidgetItem(eye2_icon,QString("")));
-				}
-				tableWidget->setItem(idx,2,new QTableWidgetItem(modality));
-				tableWidget->setItem(idx,3,new QTableWidgetItem(
-					DicomUtils::convert_pn_value(name.remove(QChar('\0')))));
-				tableWidget->setItem(idx,4,new QTableWidgetItem(birthdate));
-				tableWidget->setItem(idx,5,new QTableWidgetItem(study.remove(QChar('\0'))));
-				tableWidget->setItem(idx,6,new QTableWidgetItem(study_date));
-				tableWidget->setItem(idx,7,new QTableWidgetItem(series.remove(QChar('\0'))));
-				tableWidget->setItem(idx,8,new QTableWidgetItem(series_date));
-				tableWidget->setItem(idx,9,new QTableWidgetItem(QString("1")));
-				diff_size -= 1;
-				if (diff_size == 0) break;
-			}
-			pd->setValue(-1);
-			qApp->processEvents();
-			if (pd->wasCanceled()) return;
+			tableWidget->setItem(idx,1,new QTableWidgetItem(eye_icon,QString("")));
 		}
+		else if (is_softcopy)
+		{
+			tableWidget->setItem(idx,1,new QTableWidgetItem(eye2_icon,QString("")));
+		}
+		tableWidget->setItem(idx,2,new QTableWidgetItem(modality));
+		tableWidget->setItem(idx,3,new QTableWidgetItem(
+			DicomUtils::convert_pn_value(name.remove(QChar('\0')))));
+		tableWidget->setItem(idx,4,new QTableWidgetItem(birthdate));
+		tableWidget->setItem(idx,5,new QTableWidgetItem(study.remove(QChar('\0'))));
+		tableWidget->setItem(idx,6,new QTableWidgetItem(study_date));
+		tableWidget->setItem(idx,7,new QTableWidgetItem(series.remove(QChar('\0'))));
+		tableWidget->setItem(idx,8,new QTableWidgetItem(series_date));
+		tableWidget->setItem(idx,9,new QTableWidgetItem(QString("1")));
+		pd->setValue(-1);
+		qApp->processEvents();
+		if (pd->wasCanceled()) return;
 	}
 	filenames.clear();
-	all_detected.clear();
+	filenames_no_series_uid.clear();
 	//
 	if (!pd->wasCanceled())
 	{

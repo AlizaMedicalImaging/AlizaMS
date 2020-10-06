@@ -910,10 +910,10 @@ void AnonymazerWidget2::process_directory(
 		QFileInfo fi(filenames.at(i));
 		const QString out_filename = fi.fileName();
 #endif
-		const QString out_file = FilePath::getPath(QDir::toNativeSeparators(
+		const QString out_file = QDir::toNativeSeparators(
 			outp +
 			QDir::separator() +
-			out_filename));
+			out_filename);
 		bool ok_ = false;
 		bool overlay_in_data = false;
 		anonymize_file__(
