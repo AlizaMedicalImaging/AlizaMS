@@ -179,21 +179,29 @@ bool Writer::Write()
   return true;
 }
 
-void Writer::SetFileName(const char * filename)
+void Writer::SetFileName(const char * p)
 {
-    if (Ofstream)
+  if (Ofstream)
+  {
+    if (Ofstream->is_open())
     {
-      if (Ofstream->is_open())
-      {
-        Ofstream->close();
-      }
-      delete Ofstream;
+      Ofstream->close();
     }
-    Ofstream = new std::ofstream();
-    Ofstream->open(filename, std::ios::out | std::ios::binary);
+    delete Ofstream;
+  }
+  Ofstream = new std::ofstream();
+  if (p && *p)
+  {
+#ifdef _MSC_VER
+    const std::wstring uncpath = System::ConvertToUNC(p);
+    Ofstream->open(uncpath.c_str(), std::ios::out | std::ios::binary);
+#else
+    Ofstream->open(p, std::ios::out | std::ios::binary);
+#endif
     assert(Ofstream->is_open());
     assert(!Ofstream->fail());
-    Stream = Ofstream;
+  }
+  Stream = Ofstream;
 }
 
 } // end namespace mdcm

@@ -3734,27 +3734,24 @@ void Aliza::load_dicom_file(int * image_id,
 	if (pb) pb->setValue(-1);
 	if (ok3d) glwidget->set_skip_draw(true);
 	qApp->processEvents();
-	if (DicomUtils::is_dicom_file(f))
+	tmp_filenames__.push_back(f);
+	error__ = DicomUtils::read_dicom(
+		ivariants,
+		tmp_filenames__,
+		max_3d_tex_size,
+		(ok3d ? glwidget : NULL),
+		mesh_shader,
+		ok3d,
+		static_cast<QWidget*>(settingswidget),
+		pb,
+		0,
+		settingswidget->get_ignore_dim_org());
+	if (error__.isEmpty())
 	{
-		tmp_filenames__.push_back(f);
-		error__ = DicomUtils::read_dicom(
-			ivariants,
-			tmp_filenames__,
-			max_3d_tex_size,
-			(ok3d ? glwidget : NULL),
-			mesh_shader,
-			ok3d,
-			static_cast<QWidget*>(settingswidget),
-			pb,
-			0,
-			settingswidget->get_ignore_dim_org());
-		if (error__.isEmpty())
+		ok = true;
+		if (ivariants.size()==1 && ivariants.at(0))
 		{
-			ok = true;
-			if (ivariants.size()==1 && ivariants.at(0))
-			{
-				*image_id = ivariants.at(0)->id;
-			}
+			*image_id = ivariants.at(0)->id;
 		}
 	}
 quit__:

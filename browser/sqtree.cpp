@@ -43,6 +43,7 @@
 #include "codecutils.h"
 #include "dicomutils.h"
 #include "commonutils.h"
+#include "filepath.h"
 
 template <typename T, long long TVR>
 void get_bin_values(
@@ -81,12 +82,7 @@ static void get_series_files(
 		{
 			const QString tmp0 = QDir::toNativeSeparators(
 				dir.absolutePath() + QDir::separator() + l.at(x));
-			if (DicomUtils::is_dicom_file(tmp0))
-			{
-				files.push_back(
-					std::string(
-						tmp0.toLocal8Bit().constData()));
-			}
+			files.push_back(std::string(FilePath::getPath(tmp0)));
 		}
 	}
 	const mdcm::Tag t(0x0020,0x000e);
@@ -106,7 +102,7 @@ static void get_series_files(
 				s.GetAllFilenamesFromTagToValue(t, (*it).c_str());
 			for (unsigned int j = 0; j < f__.size(); j++)
 			{
-				result.push_back(QString::fromLocal8Bit(f__[j].c_str()));
+				result.push_back(QString(f__[j].c_str()));
 			}
 			break;
 		}
@@ -818,7 +814,7 @@ void SQtree::read_file(const QString & f)
 		mdcm::Reader reader;
 		const mdcm::File & file = reader.GetFile();
 		bool ok = false;
-		reader.SetFileName(f.toLocal8Bit().constData());
+		reader.SetFileName(FilePath::getPath(f));
 		ok = reader.Read();
 		if (!ok)
 		{
@@ -1188,7 +1184,7 @@ void SQtree::open_file_and_series()
 		std::set<mdcm::Tag> tags;
 		tags.insert(mdcm::Tag(0x0020,0x000e));
 		mdcm::Reader reader;
-		reader.SetFileName(f.toLocal8Bit().constData());
+		reader.SetFileName(FilePath::getPath(f));
 		if (reader.ReadSelectedTags(tags))
 		{
 			const mdcm::File & file = reader.GetFile();

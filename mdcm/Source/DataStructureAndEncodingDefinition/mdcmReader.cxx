@@ -743,9 +743,7 @@ void Reader::SetFileName(const char * p)
   Ifstream = new std::ifstream();
   if (p && *p)
   {
-// FIXME
-//#ifdef _MSC_VER 
-#if 0
+#ifdef _MSC_VER 
     const std::wstring uncpath = System::ConvertToUNC(p);
     Ifstream->open(uncpath.c_str(), std::ios::binary);
 #else

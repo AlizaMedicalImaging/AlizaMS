@@ -23,6 +23,7 @@
 #include "mdcmImage.h"
 #include "mdcmOverlay.h"
 #include "dicomutils.h"
+#include "filepath.h"
 #include "alizams_version.h"
 
 static void replace__(
@@ -442,7 +443,7 @@ static void anonymize_file__(
 	const QMap<QString, QString> & pn_map)
 {
 	mdcm::Reader reader;
-	reader.SetFileName(filename.toLocal8Bit().constData());
+	reader.SetFileName(FilePath::getPath(filename));
 	if(!reader.Read())
 	{
 		*ok = false;
@@ -474,7 +475,7 @@ static void anonymize_file__(
 		//
 		{
 			mdcm::ImageReader image_reader;
-			image_reader.SetFileName(filename.toLocal8Bit().constData());
+			image_reader.SetFileName(FilePath::getPath(filename));
 			if (image_reader.Read())
 			{
 				const mdcm::Image image = image_reader.GetImage();
@@ -591,7 +592,7 @@ static void anonymize_file__(
 	header.Replace(app_entity.GetAsDataElement());
 	//
 	mdcm::Writer writer;
-	writer.SetFileName(outfilename.toLocal8Bit().constData());
+	writer.SetFileName(FilePath::getPath(outfilename));
 	writer.SetFile(file);
 	if(!writer.Write()) *ok = false;
 }
@@ -824,7 +825,7 @@ static void build_maps(
 		pd->setValue(-1);
 		if (pd->wasCanceled()) return;
 		mdcm::Reader reader;
-		reader.SetFileName(l.at(x).toLocal8Bit().constData());
+		reader.SetFileName(FilePath::getPath(l.at(x)));
 		if (!reader.Read()) continue;
 		const mdcm::File    & f  = reader.GetFile();
 		const mdcm::DataSet & ds = f.GetDataSet();
@@ -891,7 +892,7 @@ void AnonymazerWidget2::process_directory(
 		const QString tmp0 =
 			QDir::toNativeSeparators(
 				dir.absolutePath() + QDir::separator() + flist.at(x));
-		if (DicomUtils::is_dicom_file(tmp0)) filenames.push_back(tmp0);
+		filenames.push_back(tmp0);
 	}
 	flist.clear();
 	for(int i = 0; i < filenames.size(); ++i)
@@ -909,10 +910,10 @@ void AnonymazerWidget2::process_directory(
 		QFileInfo fi(filenames.at(i));
 		const QString out_filename = fi.fileName();
 #endif
-		const QString out_file = QDir::toNativeSeparators(
+		const QString out_file = FilePath::getPath(QDir::toNativeSeparators(
 			outp +
 			QDir::separator() +
-			out_filename).toLocal8Bit().constData();
+			out_filename));
 		bool ok_ = false;
 		bool overlay_in_data = false;
 		anonymize_file__(

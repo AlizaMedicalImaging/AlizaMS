@@ -31,6 +31,7 @@
 #include "mdcmFileMetaInformation.h"
 #include "codecutils.h"
 #include "dicomutils.h"
+#include "filepath.h"
 #include <vector>
 #include <string>
 
@@ -183,9 +184,7 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 		const QString tmp0 =
 			QDir::toNativeSeparators(
 				dir.absolutePath() + QDir::separator() + flist.at(x));
-		if (DicomUtils::is_dicom_file(tmp0))
-			filenames.push_back(
-				std::string(tmp0.toLocal8Bit().constData()));
+		filenames.push_back(std::string(FilePath::getPath(tmp0)));
 	}
 	flist.clear();
 	//
@@ -224,7 +223,7 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 		for (unsigned int z = 0; z < files__.size(); z++)
 		{
 			const QString tmp_filename =
-				QString::fromLocal8Bit(files__.at(z).c_str());
+				QString(files__.at(z).c_str());
 			i->files.push_back(tmp_filename);
 			all_detected.push_back(tmp_filename);
 		}
@@ -290,7 +289,7 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 		for (unsigned int x = 0; x < filenames.size(); x++)
 		{
 			const QString tmp1 =
-				QString::fromLocal8Bit(filenames.at(x).c_str());
+				QString(filenames.at(x).c_str());
 			if (!all_detected.contains(tmp1))
 			{
 				QString modality    = QString("");
@@ -654,7 +653,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 	tableWidget->setRowCount(0);
 	//
 	mdcm::Reader reader;
-	reader.SetFileName(f.toLocal8Bit().constData());
+	reader.SetFileName(FilePath::getPath(f));
 	if(!reader.Read())
 	{
 		QApplication::restoreOverrideCursor();
@@ -1150,7 +1149,7 @@ void BrowserWidget2::read_tags_(
 	bool * is_softcopy)
 {
 	mdcm::Reader reader;
-	reader.SetFileName(f.toLocal8Bit().constData());
+	reader.SetFileName(FilePath::getPath(f));
 	bool f_ok = reader.ReadSelectedTags(selected_tags);
 	if (!f_ok) return;
 	const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
@@ -1329,7 +1328,7 @@ void BrowserWidget2::read_tags_short_(
 	bool * is_softcopy)
 {
 	mdcm::Reader reader;
-	reader.SetFileName(f.toLocal8Bit().constData());
+	reader.SetFileName(FilePath::getPath(f));
 	bool f_ok = reader.ReadSelectedTags(selected_tags_short);
 	if (!f_ok) return;
 	const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
