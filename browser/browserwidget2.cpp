@@ -194,10 +194,10 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 				{
 					filenames.push_back(std::string(FilePath::getPath(tmp0)));
 				}
-			}
-			else if (DicomUtils::is_dicom_file(tmp0))
-			{
-				filenames_no_series_uid.push_back(tmp0);
+				else
+				{
+					filenames_no_series_uid.push_back(tmp0);
+				}
 			}
 		}
 	}
@@ -237,7 +237,7 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 			{
 				const QString tmp_filename =
 #ifdef _MSC_VER
-					QString(files__.at(z).c_str());
+					QString::fromUtf8(files__.at(z).c_str());
 #else
 					QString::fromLocal8Bit(files__.at(z).c_str());
 #endif
