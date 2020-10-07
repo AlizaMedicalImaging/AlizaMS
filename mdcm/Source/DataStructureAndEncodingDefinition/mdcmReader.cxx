@@ -743,7 +743,7 @@ void Reader::SetFileName(const char * p)
   Ifstream = new std::ifstream();
   if (p && *p)
   {
-#ifdef _MSC_VER 
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC)) 
     const std::wstring uncpath = System::ConvertToUNC(p);
     Ifstream->open(uncpath.c_str(), std::ios::binary);
 #else

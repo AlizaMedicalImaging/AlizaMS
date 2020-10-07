@@ -192,7 +192,7 @@ void Writer::SetFileName(const char * p)
   Ofstream = new std::ofstream();
   if (p && *p)
   {
-#ifdef _MSC_VER
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
     const std::wstring uncpath = System::ConvertToUNC(p);
     Ofstream->open(uncpath.c_str(), std::ios::out | std::ios::binary);
 #else

@@ -40,9 +40,9 @@ public:
   static bool FileIsSymlink(const char* name);
   static bool RemoveFile(const char* source);
   static bool DeleteDirectory(const char *source);
-  // This allows transparent support for path longer that MAX_PATH.
-  // Only on Visual Studio compiler, return empty string otherwise.
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
   static std::wstring ConvertToUNC(const char *utf8path);
+#endif
   static const char *GetLastSystemError();
   // Return the filesize. 0 if file does not exist,
   // use FileExists to differentiate between empty file and missing file.

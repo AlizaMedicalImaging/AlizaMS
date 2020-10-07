@@ -72,29 +72,29 @@ inline int Mkdir(const char * dir)
   return _mkdir(dir);
 }
 
-inline int Rmdir(const char * dir)
+int Rmdir(const char * dir)
 {
   return _rmdir(dir);
 }
 
-inline const char* Getcwd(char * buf, unsigned int len)
+const char* Getcwd(char * buf, unsigned int len)
 {
   const char * ret = _getcwd(buf, len);
   return ret;
 }
 
 #else
-inline int Mkdir(const char * dir)
+int Mkdir(const char * dir)
 {
   return mkdir(dir, 00777);
 }
 
-inline int Rmdir(const char * dir)
+int Rmdir(const char * dir)
 {
   return rmdir(dir);
 }
 
-inline const char * Getcwd(char * buf, unsigned int len)
+const char * Getcwd(char * buf, unsigned int len)
 {
   const char * ret = getcwd(buf, len);
   return ret;
@@ -334,11 +334,11 @@ bool System::DeleteDirectory(const char * source)
 #define PATH_MAX 4096
 #endif
 
-#ifdef _MSC_VER
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
 namespace
 {
 
-static inline std::wstring ToUtf16(std::string const &str)
+static std::wstring ToUtf16(std::string const &str)
 {
   std::wstring ret;
   const int len = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int)str.length(), NULL, 0);
@@ -351,7 +351,7 @@ static inline std::wstring ToUtf16(std::string const &str)
 }
 
 // http://arsenmk.blogspot.com/2015/12/handling-long-paths-on-windows.html
-static inline bool ComputeFullPath(std::wstring const &in, std::wstring &out)
+static bool ComputeFullPath(std::wstring const &in, std::wstring &out)
 {
   // consider an input fileName of type PCWSTR (const wchar_t*)
   const wchar_t *fileName = in.c_str();
@@ -364,7 +364,7 @@ static inline bool ComputeFullPath(std::wstring const &in, std::wstring &out)
   return true;
 }
 
-static inline std::wstring HandleMaxPath(std::wstring const &in)
+static std::wstring HandleMaxPath(std::wstring const &in)
 {
   if (in.size() >= MAX_PATH)
   {
@@ -395,19 +395,14 @@ static inline std::wstring HandleMaxPath(std::wstring const &in)
 }
 
 }
-#endif
 
 std::wstring System::ConvertToUNC(const char *utf8path)
 {
-#ifdef _MSC_VER
   const std::wstring uft16path = ToUtf16(utf8path);
   const std::wstring uncpath = HandleMaxPath(uft16path);
   return uncpath;
-#else
-  (void)utf8path;
-  return std::wstring();
-#endif
 }
+#endif
 
 size_t System::FileSize(const char * filename)
 {
@@ -536,7 +531,7 @@ const char * System::GetCurrentResourcesDirectory()
  * Encode the mac address on a fixed length string of 15 characters.
  * we save space this way.
  */
-inline int getlastdigit(unsigned char * data, unsigned long size)
+static int getlastdigit(unsigned char * data, unsigned long size)
 {
   int extended, carry = 0;
   for(unsigned int i=0;i<size;i++)
@@ -592,9 +587,9 @@ static int gettimeofday2(struct timeval * tv, struct timezone * tz)
 }
 
 #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
-  #define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
+#define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
 #else
-  #define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
+#define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
 #endif
 
 int gettimeofday(struct timeval *tv, struct timezone *tz)

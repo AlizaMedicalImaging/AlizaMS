@@ -49,8 +49,8 @@ unsigned int Directory::Load(FilenameType const & name, bool recursive)
   return false;
 }
 
-#ifdef _MSC_VER
-static inline std::string ToUtf8(std::wstring const &str)
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+static std::string ToUtf8(std::wstring const & str)
 {
   std::string ret;
   int len =
@@ -68,6 +68,7 @@ unsigned int Directory::Explore(FilenameType const & name, bool recursive)
 {
   unsigned int nFiles = 0;
 #ifdef _MSC_VER
+#ifdef MDCM_WIN32_UNC
   std::wstring fileName;
   std::wstring dirName = System::ConvertToUNC(name.c_str());
   Directories.push_back(ToUtf8(dirName));
@@ -102,6 +103,37 @@ unsigned int Directory::Explore(FilenameType const & name, bool recursive)
   {
     return 0;
   }
+#else
+  WIN32_FIND_DATA fileData;
+  if ('/' != dirName[dirName.size()-1]) dirName.push_back('/');
+  assert('/' == dirName[dirName.size()-1]);
+  const FilenameType firstfile = dirName+"*";
+  HANDLE hFile = FindFirstFile(firstfile.c_str(), &fileData);
+  for(BOOL b = (hFile != INVALID_HANDLE_VALUE); b;
+      b = FindNextFile(hFile, &fileData))
+  {
+    fileName = fileData.cFileName;
+    if (fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+    {
+      // check for . and .. to avoid infinite loop and discard any hidden dir
+      if (fileName != "." && fileName != ".." && fileName[0] != '.' && recursive)
+      {
+        nFiles += Explore(dirName+fileName,recursive);
+      }
+    }
+    else
+    {
+      Filenames.push_back(dirName+fileName);
+      nFiles++;
+    }
+  }
+  DWORD dwError = GetLastError();
+  if (hFile != INVALID_HANDLE_VALUE) FindClose(hFile);
+  if (dwError != ERROR_NO_MORE_FILES)
+  {
+    return 0;
+  }
+#endif
 #else
   std::string fileName;
   std::string dirName = name;
