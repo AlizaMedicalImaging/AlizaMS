@@ -8837,7 +8837,7 @@ void DicomUtils::write_encapsulated(
 	const mdcm::ByteValue * bv = e.GetByteValue();
 	if (bv && bv->GetPointer() && (bv->GetLength() > 0))
 	{
-#ifdef _MSC_VER 
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC)) 
 		const std::wstring uncpath =
 			mdcm::System::ConvertToUNC(FilePath::getPath(out_f));
 		std::ofstream o(uncpath.c_str(), std::ios::binary);
@@ -8884,7 +8884,7 @@ void DicomUtils::write_mpeg(
 	if (e.IsEmpty()) return;
 	const mdcm::SequenceOfFragments * sf = e.GetSequenceOfFragments();
 	if(!sf) return;
-#ifdef _MSC_VER 
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC)) 
 	const std::wstring uncpath =
 		mdcm::System::ConvertToUNC(FilePath::getPath(out_f));
 	std::ofstream output(uncpath.c_str(), std::ios::binary);
@@ -8900,7 +8900,7 @@ bool DicomUtils::is_dicom_file(const QString & f)
 	bool dicom = false;
 	char b[4];
 	std::ifstream fs;
-#ifdef _MSC_VER 
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC)) 
 	const std::wstring uncpath =
 		mdcm::System::ConvertToUNC(FilePath::getPath(f));
 	fs.open(uncpath.c_str(), std::ios::in|std::ios::binary);
