@@ -148,9 +148,6 @@ bool Sorter2::StableSort(
 		Filenames.clear();
 		return true;
 	}
-	std::set<mdcm::Tag> tags;
-	tags.insert(mdcm::Tag(0x0020,0x0032));
-	tags.insert(mdcm::Tag(0x0020,0x0037));
 	std::vector< SmartPointer<FileWithQString> > filelist;
 	filelist.resize(filenames.size());
 	std::vector< SmartPointer<FileWithQString> >::iterator it2 =
@@ -164,7 +161,7 @@ bool Sorter2::StableSort(
 		Reader reader;
 		reader.SetFileName(FilePath::getPath(*it));
 		SmartPointer<FileWithQString> f = *it2;
-		if (reader.ReadSelectedTags(tags))
+		if (reader.ReadUpToTag(mdcm::Tag(0x0020,0x0037)))
 		{
 			f = new FileWithQString(reader.GetFile());
 			f->filename = *it;
@@ -1596,17 +1593,14 @@ void DicomUtils::read_sop_instance_uid(
 	const QString & f,
 	QString & sop_instance_uid)
 {
-	std::set<mdcm::Tag> tags;
-	mdcm::Tag tsopinstance(0x0008,0x0018);
-	tags.insert(tsopinstance);
 	mdcm::Reader reader;
 	reader.SetFileName(FilePath::getPath(f));
-	const bool f_ok = reader.ReadSelectedTags(tags);
+	const bool f_ok = reader.ReadUpToTag(mdcm::Tag(0x0008,0x0018));
 	if (!f_ok) return;
 	const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
 	if (ds.IsEmpty()) return;
 	QString sop_instance_uid_;
-	if (get_string_value(ds,tsopinstance,sop_instance_uid_))
+	if (get_string_value(ds,mdcm::Tag(0x0008,0x0018),sop_instance_uid_))
 		sop_instance_uid = sop_instance_uid_.remove(QChar('\0'));
 }
 
@@ -1619,26 +1613,21 @@ void DicomUtils::read_image_info(
 	QString        & spacing,
 	QString        & sop_instance_uid)
 {
-	std::set<mdcm::Tag> tags;
-	mdcm::Tag tsopinstance(0x0008,0x0018); tags.insert(tsopinstance);
-	// Imager Pixel Spacing
-	mdcm::Tag tspacing1(0x0018,0x1164);    tags.insert(tspacing1);
-	// Nominal Scanned Pixel Spacing
-	mdcm::Tag tspacing2(0x0018,0x2010);    tags.insert(tspacing2);
-	mdcm::Tag tpos_old(0x0020,0x0030);     tags.insert(tpos_old);
-	mdcm::Tag tpos(0x0020,0x0032);         tags.insert(tpos);
-	mdcm::Tag torie_old(0x0020,0x0035);    tags.insert(torie_old);
-	mdcm::Tag torie(0x0020,0x0037);        tags.insert(torie);
-	mdcm::Tag trows(0x0028,0x0010);        tags.insert(trows);
-	mdcm::Tag tcolumns(0x0028,0x0011);     tags.insert(tcolumns);
-	// Pixel Spacing
-	mdcm::Tag tspacing0(0x0028,0x0030);    tags.insert(tspacing0);
-	// Pixel Aspect Ratio
-	mdcm::Tag tspacing3(0x0028,0x0034);    tags.insert(tspacing3);
+	mdcm::Tag tsopinstance(0x0008,0x0018);
+	mdcm::Tag tspacing1(0x0018,0x1164); // Imager Pixel Spacing
+	mdcm::Tag tspacing2(0x0018,0x2010); // Nominal Scanned Pixel Spacing
+	mdcm::Tag tpos_old(0x0020,0x0030);
+	mdcm::Tag tpos(0x0020,0x0032);
+	mdcm::Tag torie_old(0x0020,0x0035);
+	mdcm::Tag torie(0x0020,0x0037);
+	mdcm::Tag trows(0x0028,0x0010);
+	mdcm::Tag tcolumns(0x0028,0x0011);
+	mdcm::Tag tspacing0(0x0028,0x0030); // Pixel Spacing
+	mdcm::Tag tspacing3(0x0028,0x0034); // Pixel Aspect Ratio
 	//
 	mdcm::Reader reader;
 	reader.SetFileName(FilePath::getPath(f));
-	const bool f_ok = reader.ReadSelectedTags(tags);
+	const bool f_ok = reader.ReadUpToTag(tspacing3);
 	if (!f_ok) return;
 	const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
 	if (ds.IsEmpty()) return;
@@ -1718,18 +1707,16 @@ void DicomUtils::read_image_info_rtdose(const QString & f,
 	QString        & spacing,
 	std::vector<double> & z_offsets)
 {
-	std::set<mdcm::Tag> tags;
-	mdcm::Tag tframes(0x0028,0x0008);      tags.insert(tframes);
-	mdcm::Tag trows(0x0028,0x0010);        tags.insert(trows);
-	mdcm::Tag tcolumns(0x0028,0x0011);     tags.insert(tcolumns);
-	mdcm::Tag tpos(0x0020,0x0032);         tags.insert(tpos);
-	mdcm::Tag torie(0x0020,0x0037);        tags.insert(torie);
-	mdcm::Tag tspacing(0x0028,0x0030);     tags.insert(tspacing);
-	mdcm::Tag tframeoffset(0x3004,0x000c); tags.insert(tframeoffset);
-	//
+	mdcm::Tag tframes(0x0028,0x0008);
+	mdcm::Tag trows(0x0028,0x0010);
+	mdcm::Tag tcolumns(0x0028,0x0011);
+	mdcm::Tag tpos(0x0020,0x0032);
+	mdcm::Tag torie(0x0020,0x0037);
+	mdcm::Tag tspacing(0x0028,0x0030);
+	mdcm::Tag tframeoffset(0x3004,0x000c);
 	mdcm::Reader reader;
 	reader.SetFileName(FilePath::getPath(f));
-	const bool f_ok = reader.ReadSelectedTags(tags);
+	const bool f_ok = reader.ReadUpToTag(tframeoffset);
 	if (!f_ok) return;
 	const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
 	if (ds.IsEmpty()) return;
@@ -7080,10 +7067,10 @@ QString DicomUtils::read_buffer(
 	if (elscint)
 	{
 		QFileInfo fi(f);
-		elscf = QDir::toNativeSeparators(
+		elscf = 
 			QDir::tempPath() +
 			QDir::separator() +
-			fi.fileName() + QString("ELSCINT.dcm"));
+			fi.fileName() + QString("ELSCINT.dcm");
 		const bool elsc_ok = convert_elscint(f, elscf);
 		if (elsc_ok)
 		{
@@ -8730,22 +8717,20 @@ QString DicomUtils::read_enhanced_3d_6d(
 
 bool DicomUtils::is_not_interleaved(const QStringList & images)
 {
-	const mdcm::Tag tSlicePosition(0x0020,0x1041);
-	std::set<mdcm::Tag> tags;
-	tags.insert(tSlicePosition);
 	long tmp0 = 0;
 	for (int x = 0; x < images.size(); x++)
 	{
 		mdcm::Reader reader;
 		reader.SetFileName(FilePath::getPath(images.at(x)));
-		const bool f_ok = reader.ReadSelectedTags(tags);
+		const bool f_ok = reader.ReadUpToTag(mdcm::Tag(0x0020,0x1041));
 		if (!f_ok) return false;
 		const mdcm::File & file = reader.GetFile();
 		const mdcm::DataSet & ds = file.GetDataSet();
 		if (ds.IsEmpty()) return false;
-		if (ds.FindDataElement(tSlicePosition))
+		if (ds.FindDataElement(mdcm::Tag(0x0020,0x1041)))
 		{
-			const mdcm::DataElement & sp_ = ds.GetDataElement(tSlicePosition);
+			const mdcm::DataElement & sp_ =
+				ds.GetDataElement(mdcm::Tag(0x0020,0x1041));
 			if (!sp_.IsEmpty() && !sp_.IsUndefinedLength() && sp_.GetByteValue())
 			{
 				bool sp_ok = false;
@@ -8840,17 +8825,14 @@ void DicomUtils::write_encapsulated(
 	const QString & in_f,
 	const QString & out_f)
 {
-	const mdcm::Tag t(0x0042,0x0011);
-	std::set<mdcm::Tag> tags;
-	tags.insert(t);
 	mdcm::Reader reader;
 	reader.SetFileName(FilePath::getPath(in_f));
-	const bool ok = reader.ReadSelectedTags(tags);
+	const bool ok = reader.ReadUpToTag(mdcm::Tag(0x0042,0x0011));
 	if (!ok) return;
 	const mdcm::File & file = reader.GetFile();
 	const mdcm::DataSet & ds = file.GetDataSet();
-	if(!ds.FindDataElement(t)) return;
-	const mdcm::DataElement & e = ds.GetDataElement(t);
+	if(!ds.FindDataElement(mdcm::Tag(0x0042,0x0011))) return;
+	const mdcm::DataElement & e = ds.GetDataElement(mdcm::Tag(0x0042,0x0011));
 	if (e.IsEmpty()||e.IsUndefinedLength()) return;
 	const mdcm::ByteValue * bv = e.GetByteValue();
 	if (bv && bv->GetPointer() && (bv->GetLength() > 0))
@@ -8891,20 +8873,16 @@ void DicomUtils::write_mpeg(
 	const QString & in_f,
 	const QString & out_f)
 {
-	const mdcm::Tag t(0x7fe0,0x0010);
-	std::set<mdcm::Tag> tags;
-	tags.insert(t);
 	mdcm::Reader reader;
 	reader.SetFileName(FilePath::getPath(in_f));
-	const bool ok = reader.ReadSelectedTags(tags);
+	const bool ok = reader.ReadUpToTag(mdcm::Tag(0x7fe0,0x0010));
 	if (!ok) return;
 	const mdcm::File & file = reader.GetFile();
 	const mdcm::DataSet & ds = file.GetDataSet();
-	if(!ds.FindDataElement(t)) return;
-	const mdcm::DataElement & e = ds.GetDataElement(t);
+	if(!ds.FindDataElement(mdcm::Tag(0x7fe0,0x0010))) return;
+	const mdcm::DataElement & e = ds.GetDataElement(mdcm::Tag(0x7fe0,0x0010));
 	if (e.IsEmpty()) return;
-	const mdcm::SequenceOfFragments * sf =
-		e.GetSequenceOfFragments();
+	const mdcm::SequenceOfFragments * sf = e.GetSequenceOfFragments();
 	if(!sf) return;
 #ifdef _MSC_VER 
 	const std::wstring uncpath =
@@ -8992,8 +8970,7 @@ void DicomUtils::scan_files_for_rtstruct_image(
 	{
 		QApplication::processEvents();
 		const QString tmp0 =
-			QDir::toNativeSeparators(
-				dir.absolutePath() + QDir::separator() + flist.at(x));
+			dir.absolutePath() + QDir::separator() + flist.at(x);
 		filenames.push_back(std::string(FilePath::getPath(tmp0)));
 	}
 	flist.clear();
@@ -9105,18 +9082,15 @@ bool DicomUtils::process_contrours_ref(
 			}
 			QApplication::processEvents();
 			QString sop_instance_uid("");
-			std::set<mdcm::Tag> tags;
-			mdcm::Tag tsopinstance(0x0008,0x0018);
-			tags.insert(tsopinstance);
 			mdcm::Reader reader;
 			reader.SetFileName(FilePath::getPath(detected_files.at(z).at(k)));
-			const bool f_ok = reader.ReadSelectedTags(tags);
+			const bool f_ok = reader.ReadUpToTag(mdcm::Tag(0x0008,0x0018));
 			if (!f_ok) continue;
 			const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
-			if (ds.FindDataElement(tsopinstance))
+			if (ds.FindDataElement(mdcm::Tag(0x0008,0x0018)))
 			{
 				const mdcm::DataElement & e =
-					ds.GetDataElement(tsopinstance);
+					ds.GetDataElement(mdcm::Tag(0x0008,0x0018));
 				if (!e.IsEmpty() &&
 					!e.IsUndefinedLength() &&
 					e.GetByteValue())
@@ -9246,9 +9220,6 @@ bool DicomUtils::scan_files_for_pr_image(
 {
 	if (p.isEmpty())   return false;
 	if (uid.isEmpty()) return false;
-	std::set<mdcm::Tag> tags;
-	const mdcm::Tag tSOPInstanceUID(0x0008,0x0018);
-	tags.insert(tSOPInstanceUID);
 	QDir dir(p);
 	QStringList flist =
 		dir.entryList(QDir::Files|QDir::Readable,QDir::Name);
@@ -9259,14 +9230,13 @@ bool DicomUtils::scan_files_for_pr_image(
 		if (pb) pb->setValue(-1);
 		QApplication::processEvents();
 		const QString tmp0 =
-			QDir::toNativeSeparators(
-				dir.absolutePath() + QDir::separator() + flist.at(x));
+			dir.absolutePath() + QDir::separator() + flist.at(x);
 		mdcm::Reader reader;
 		reader.SetFileName(FilePath::getPath(tmp0));
-		if (!reader.ReadSelectedTags(tags)) continue;
+		if (!reader.ReadUpToTag(mdcm::Tag(0x0008,0x0018))) continue;
 		const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
 		QString uid_("");
-		const bool ok = get_string_value(ds, tSOPInstanceUID, uid_);
+		const bool ok = get_string_value(ds, mdcm::Tag(0x0008,0x0018), uid_);
 		if (ok && uid == uid_)
 		{
 			file = tmp0;
@@ -10274,8 +10244,7 @@ QString DicomUtils::read_dicom(
 			if (load_type == 0)
 			{
 				QFileInfo reffi(filenames.at(x));
-				rtstruct_ref_search_path =
-					QDir::toNativeSeparators(reffi.absolutePath());
+				rtstruct_ref_search_path = reffi.absolutePath();
 				load_image_ref_contour = true;
 				if (!load_image_ref_contour)
 				{
@@ -10288,9 +10257,7 @@ QString DicomUtils::read_dicom(
 							!wsettings->get_3d(),
 							gl,
 							0);
-					ivariant->filenames =
-						QStringList(
-							QDir::toNativeSeparators(filenames.at(x)));
+					ivariant->filenames = QStringList(filenames.at(x));
 					load_contour(ds,ivariant);
 					ContourUtils::calculate_rois_center(ivariant);
 					rtstructs.push_back(ivariant);
@@ -11697,9 +11664,7 @@ QString DicomUtils::read_dicom(
 					y++)
 				{
 					tmp_ivariants_rtstruct[y]->filenames =
-						QStringList(
-							QDir::toNativeSeparators(
-								rtstruct_ref_search.at(x)));
+						QStringList(rtstruct_ref_search.at(x));
 					ivariants.push_back(tmp_ivariants_rtstruct[y]);
 				}
 			}
@@ -11728,9 +11693,7 @@ QString DicomUtils::read_dicom(
 						y++)
 					{
 						tmp_ivariants_rtstruct[y]->filenames =
-							QStringList(
-								QDir::toNativeSeparators(
-									rtstruct_ref_search.at(x)));
+							QStringList(rtstruct_ref_search.at(x));
 						ivariants.push_back(tmp_ivariants_rtstruct[y]);
 					}
 				}
@@ -11773,9 +11736,7 @@ QString DicomUtils::read_dicom(
 								y++)
 							{
 								tmp_ivariants_rtstruct[y]->filenames =
-									QStringList(
-										QDir::toNativeSeparators(
-											rtstruct_ref_search.at(x)));
+									QStringList(rtstruct_ref_search.at(x));
 								ivariants.push_back(tmp_ivariants_rtstruct[y]);
 							}
 						}
@@ -11792,9 +11753,7 @@ QString DicomUtils::read_dicom(
 					ImageVariant * ivariant = new ImageVariant(
 						CommonUtils::get_next_id(),
 						ok3d, !wsettings->get_3d(), gl, 0);
-					ivariant->filenames = QStringList(
-						QDir::toNativeSeparators(
-							rtstruct_ref_search.at(x)));
+					ivariant->filenames = QStringList(rtstruct_ref_search.at(x));
 					const mdcm::File & file = reader.GetFile();
 					const mdcm::DataSet & ds = file.GetDataSet();
 					load_contour(ds,ivariant);
@@ -11860,9 +11819,7 @@ QString DicomUtils::read_dicom(
 				QFileInfo fi(pdff);
 				CommonUtils::set_save_dir(
 					QDir::toNativeSeparators(fi.absolutePath()));
-				write_encapsulated(
-					QDir::toNativeSeparators(pdf_files.at(x)),
-					QDir::toNativeSeparators(pdff));
+				write_encapsulated(pdf_files.at(x), pdff);
 			}
 		}
 		if (pb) { pb->show(); pb->setValue(-1); }
@@ -11891,9 +11848,7 @@ QString DicomUtils::read_dicom(
 				QFileInfo fi(stlf);
 				CommonUtils::set_save_dir(
 					QDir::toNativeSeparators(fi.absolutePath()));
-				write_encapsulated(
-					QDir::toNativeSeparators(stl_files.at(x)),
-					QDir::toNativeSeparators(stlf));
+				write_encapsulated(stl_files.at(x), stlf);
 			}
 		}
 		if (pb) { pb->show(); pb->setValue(-1); }
@@ -11906,8 +11861,7 @@ QString DicomUtils::read_dicom(
 		for (int x = 0; x < video_files.size(); x++)
 		{
 			if (pb) pb->hide();
-			const QString tmp943 =
-				QDir::toNativeSeparators(video_files.at(x));
+			const QString tmp943 = video_files.at(x);
 			const QString suf = suffix_mpeg(tmp943);
 			const QString video_file_name =
 				QFileDialog::getSaveFileName(
@@ -11927,9 +11881,7 @@ QString DicomUtils::read_dicom(
 				QFileInfo fi(video_file_name);
 				CommonUtils::set_save_dir(
 					QDir::toNativeSeparators(fi.absolutePath()));
-				write_mpeg(
-					tmp943,
-					QDir::toNativeSeparators(video_file_name));
+				write_mpeg(tmp943, video_file_name);
 			}
 		}
 		if (pb) { pb->show(); pb->setValue(-1); }
@@ -11943,7 +11895,7 @@ QString DicomUtils::read_dicom(
 		const QString file0 = grey_softcopy_pr_files.at(0);
 		QFileInfo p0(file0);
 #ifdef USE_WORKSTATION_MODE
-		QString p = QDir::toNativeSeparators(p0.absolutePath());
+		QString p = p0.absolutePath();
 #else
 		QString p = QString(
 #ifdef _WIN32
@@ -12009,8 +11961,7 @@ QString DicomUtils::read_dicom(
 					if (pr_image)
 					{
 						pr_image->filenames = QStringList(
-							QDir::toNativeSeparators(
-								grey_softcopy_pr_files.at(x)));
+							grey_softcopy_pr_files.at(x));
 						if (ref_ivariants.at(z)->di->slices_generated)
 						{
 							CommonUtils::copy_slices(
@@ -12094,8 +12045,8 @@ QString DicomUtils::read_dicom(
 		if (count < 1 && message_.isEmpty())
 		{
 #ifdef USE_WORKSTATION_MODE
-			QFileInfo fi99(QDir::toNativeSeparators(p));
-			p = QDir::toNativeSeparators(fi99.absolutePath());
+			QFileInfo fi99(p);
+			p = fi99.absolutePath();
 #else
 			p = QString();
 #endif
