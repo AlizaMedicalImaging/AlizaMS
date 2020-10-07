@@ -236,7 +236,7 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 			for (unsigned int z = 0; z < files__.size(); z++)
 			{
 				const QString tmp_filename =
-#ifdef _MSC_VER
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
 					QString::fromUtf8(files__.at(z).c_str());
 #else
 					QString::fromLocal8Bit(files__.at(z).c_str());

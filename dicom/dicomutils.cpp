@@ -9013,7 +9013,7 @@ void DicomUtils::scan_files_for_rtstruct_image(
 			for (unsigned int j = 0; j < files__.size(); j++)
 			{
 				t1_tmp.push_back(
-#ifdef _MSC_VER
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
 				QString::fromUtf8(files__[j].c_str())
 #else
 				QString::fromLocal8Bit(files__[j].c_str())
@@ -12063,7 +12063,7 @@ QString DicomUtils::read_dicom(
 			FindRefDialog * d =
 				new FindRefDialog(wsettings->get_scale_icons());
 			d->set_text(s);
-			d->set_path(p);
+			d->set_path(QDir::toNativeSeparators(p));
 			bool _ok = false;
 			if (d->exec() == QDialog::Accepted)
 			{

@@ -144,7 +144,7 @@ bool PixmapReader::Read()
   return res;
 }
 
-void DoIconImage(const DataSet& rootds, Pixmap& image)
+static void DoIconImage(const DataSet& rootds, Pixmap& image)
 {
   const Tag ticonimage(0x0088,0x0200);
   IconImage & pixeldata = image.GetIconImage();
@@ -273,7 +273,7 @@ void DoIconImage(const DataSet& rootds, Pixmap& image)
   }
 }
 
-void DoCurves(const DataSet& ds, Pixmap& pixeldata)
+static void DoCurves(const DataSet& ds, Pixmap& pixeldata)
 {
   unsigned int numcurves;
   if((numcurves = Curve::GetNumberOfCurves(ds)))
@@ -314,7 +314,7 @@ void DoCurves(const DataSet& ds, Pixmap& pixeldata)
   }
 }
 
-unsigned int GetNumberOfOverlaysInternal(DataSet const & ds, std::vector<uint16_t> & overlaylist)
+static unsigned int GetNumberOfOverlaysInternal(DataSet const & ds, std::vector<uint16_t> & overlaylist)
 {
   Tag overlay(0x6000,0x0000);
   bool finished = false;
@@ -377,12 +377,12 @@ unsigned int GetNumberOfOverlaysInternal(DataSet const & ds, std::vector<uint16_
   return numoverlays;
 }
 
-bool DoOverlays(const DataSet & ds, Pixmap & pixeldata)
+static bool DoOverlays(const DataSet & ds, Pixmap & pixeldata)
 {
-  unsigned int numoverlays;
   std::vector<uint16_t> overlaylist;
   std::vector<bool> updateoverlayinfo;
-  if((numoverlays = GetNumberOfOverlaysInternal(ds, overlaylist)))
+  const unsigned int numoverlays = GetNumberOfOverlaysInternal(ds, overlaylist);
+  if(numoverlays > 0)
   {
     updateoverlayinfo.resize(numoverlays, false);
     pixeldata.SetNumberOfOverlays(numoverlays);
@@ -409,7 +409,7 @@ bool DoOverlays(const DataSet & ds, Pixmap & pixeldata)
       {
         assert(ov.IsInPixelData() == false);
       }
-      else
+      else if(pixeldata.GetPixelFormat().GetSamplesPerPixel() == 1)
       {
         ov.IsInPixelData(true);
         if(ov.GetBitsAllocated() != pixeldata.GetPixelFormat().GetBitsAllocated())
@@ -420,9 +420,13 @@ bool DoOverlays(const DataSet & ds, Pixmap & pixeldata)
 
         if(!ov.GrabOverlayFromPixelData(ds))
         {
-          mdcmWarningMacro("Could not extract Overlay from Pixel Data");
+          mdcmWarningMacro("Could not extract overlay from pixel data (1)");
         }
         updateoverlayinfo[idxoverlays] = true;
+      }
+	  else
+      {
+        mdcmWarningMacro("Could not extract overlay from pixel data (2)");
       }
     }
   }
