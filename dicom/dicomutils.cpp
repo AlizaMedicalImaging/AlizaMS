@@ -160,7 +160,7 @@ bool Sorter2::StableSort(
 	{
 		Reader reader;
 		reader.SetFileName(FilePath::getPath(*it));
-		SmartPointer<FileWithQString> f = *it2;
+		SmartPointer<FileWithQString> & f = *it2;
 		if (reader.ReadUpToTag(mdcm::Tag(0x0020,0x0037)))
 		{
 			f = new FileWithQString(reader.GetFile());
@@ -174,7 +174,7 @@ bool Sorter2::StableSort(
 	Filenames.clear();
 	for(it2 = filelist.begin(); it2 != filelist.end(); ++it2 )
 	{
-		SmartPointer<FileWithQString> f = *it2;
+		SmartPointer<FileWithQString> & f = *it2;
 		Filenames.push_back(f->filename);
 	}
 	return true;
