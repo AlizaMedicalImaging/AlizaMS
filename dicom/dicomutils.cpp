@@ -163,7 +163,7 @@ bool Sorter2::StableSort(
 	{
 		Reader reader;
 		reader.SetFileName(FilePath::getPath(*it));
-		SmartPointer<FileWithQString> & f = *it2;
+		SmartPointer<FileWithQString> f = *it2;
 		if (reader.ReadSelectedTags(tags))
 		{
 			f = new FileWithQString(reader.GetFile());
@@ -177,7 +177,7 @@ bool Sorter2::StableSort(
 	Filenames.clear();
 	for(it2 = filelist.begin(); it2 != filelist.end(); ++it2 )
 	{
-		SmartPointer<FileWithQString> const & f = *it2;
+		SmartPointer<FileWithQString> f = *it2;
 		Filenames.push_back(f->filename);
 	}
 	return true;
@@ -1446,8 +1446,8 @@ bool DicomUtils::priv_get_string_value(
 QString DicomUtils::generate_id()
 {
 	char c[] = "\0\0\0\0\0\0\0\0\0\0\0\0";
-    const char s[] =
-    	"0123456789ABCDEFGHIJKLMNOPQRSTU"
+	const char s[] =
+		"0123456789ABCDEFGHIJKLMNOPQRSTU"
 		"VWXYZabcdefghijklmnopqrstuvwxyz";
 	const unsigned int ss = sizeof(s);
 	for (unsigned int i = 0; i < 11; i++)
@@ -6001,18 +6001,18 @@ QString DicomUtils::read_series(
 				}
 				else if (
 						ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.7")       || // SC
-				        ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.77.1.5.1")|| // Ophthalmic Photography  8 Bit
-				        ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.77.1.5.2")|| // Ophthalmic Photography 16 Bit
-				        ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.1")       || // Computed Radiography 
-				        ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.1.1")     || // Digital X-Ray - For Presentation
-				        ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.1.1.1")   || // Digital X-Ray - For Processing
-				        ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.1.2")     || // Digital Mammography X-Ray - For Presentation
-				        ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.1.2.1")   || // Digital Mammography X-Ray - For Processing
-				        ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.1.3")     || // Digital Intra-Oral X-Ray - For Presentation
-				        ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.1.3.1")   || // Digital Intra-Oral X-Ray - For Processing
-				        ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.20")      || // Nuclear Medicine
-				        ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.12.1")    || // X-Ray Angiographic
-				        ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.12.2")       // X-Ray RF
+					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.77.1.5.1")|| // Ophthalmic Photography  8 Bit
+					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.77.1.5.2")|| // Ophthalmic Photography 16 Bit
+					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.1")       || // Computed Radiography 
+					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.1.1")     || // Digital X-Ray - For Presentation
+					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.1.1.1")   || // Digital X-Ray - For Processing
+					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.1.2")     || // Digital Mammography X-Ray - For Presentation
+					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.1.2.1")   || // Digital Mammography X-Ray - For Processing
+					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.1.3")     || // Digital Intra-Oral X-Ray - For Presentation
+					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.1.3.1")   || // Digital Intra-Oral X-Ray - For Processing
+					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.20")      || // Nuclear Medicine
+					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.12.1")    || // X-Ray Angiographic
+					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.12.2")       // X-Ray RF
 						)
 				{
 					if (!min_load) ivariant->di->skip_texture = true;
@@ -8853,11 +8853,15 @@ void DicomUtils::write_encapsulated(
 	const mdcm::DataElement & e = ds.GetDataElement(t);
 	if (e.IsEmpty()||e.IsUndefinedLength()) return;
 	const mdcm::ByteValue * bv = e.GetByteValue();
-	if (bv && bv->GetPointer() &&bv->GetLength()>0)
+	if (bv && bv->GetPointer() && (bv->GetLength() > 0))
 	{
-		std::ofstream o(
-			FilePath::getPath(out_f),
-			std::ios::binary);
+#ifdef _MSC_VER 
+		const std::wstring uncpath =
+			mdcm::System::ConvertToUNC(FilePath::getPath(out_f));
+		std::ofstream o(uncpath.c_str(), std::ios::binary);
+#else
+		std::ofstream o(FilePath::getPath(out_f), std::ios::binary);
+#endif
 		o.write(bv->GetPointer(), bv->GetLength());
 		o.close();
 	}
@@ -8902,7 +8906,13 @@ void DicomUtils::write_mpeg(
 	const mdcm::SequenceOfFragments * sf =
 		e.GetSequenceOfFragments();
 	if(!sf) return;
+#ifdef _MSC_VER 
+	const std::wstring uncpath =
+		mdcm::System::ConvertToUNC(FilePath::getPath(out_f));
+	std::ofstream output(uncpath.c_str(), std::ios::binary);
+#else
 	std::ofstream output(FilePath::getPath(out_f), std::ios::binary);
+#endif
 	sf->WriteBuffer(output);
 	output.close();
 }
@@ -8913,11 +8923,11 @@ bool DicomUtils::is_dicom_file(const QString & f)
 	char b[4];
 	std::ifstream fs;
 #ifdef _MSC_VER 
-    const std::wstring uncpath =
+	const std::wstring uncpath =
 		mdcm::System::ConvertToUNC(FilePath::getPath(f));
-    fs.open(uncpath.c_str(), std::ios::in|std::ios::binary);
+	fs.open(uncpath.c_str(), std::ios::in|std::ios::binary);
 #else
-    fs.open(FilePath::getPath(f), std::ios::in|std::ios::binary);
+	fs.open(FilePath::getPath(f), std::ios::in|std::ios::binary);
 #endif
 	for (long off = 128; off >= 0; off -= 128)
 	{
@@ -9024,7 +9034,15 @@ void DicomUtils::scan_files_for_rtstruct_image(
 				s1.GetAllFilenamesFromTagToValue(t1, (*vi1).c_str());
 			QStringList t1_tmp;
 			for (unsigned int j = 0; j < files__.size(); j++)
-				t1_tmp.push_back(QString(files__[j].c_str()));
+			{
+				t1_tmp.push_back(
+#ifdef _MSC_VER
+				QString::fromUtf8(files__[j].c_str())
+#else
+				QString::fromLocal8Bit(files__[j].c_str())
+#endif
+				);
+			}
 			ref_files.push_back(t1_tmp);
 		}
 	}
@@ -10520,16 +10538,16 @@ QString DicomUtils::read_dicom(
 					sop==QString("1.2.840.10008.5.1.4.1.1.30")      || // Parametric Map
 					sop==QString("1.2.840.10008.5.1.4.1.1.66.4")    || // Segmentation
 					sop==QString("1.2.840.10008.5.1.4.1.1.4.3")     || // Enhanced MR Color
-				    sop==QString("1.2.840.10008.5.1.4.1.1.77.1.5.4")|| // Ophthalmic Tomography
+					sop==QString("1.2.840.10008.5.1.4.1.1.77.1.5.4")|| // Ophthalmic Tomography
 					sop==QString("1.2.840.10008.5.1.4.1.1.14.1")    || // Intravascular Optical Coherence Tomography Image Storage - For Presentation
 					sop==QString("1.2.840.10008.5.1.4.1.1.14.2")    || // Intravascular Optical Coherence Tomography Image Storage - For Processing
 					// ipp-iop ??
 					sop==QString("1.2.840.10008.5.1.4.1.1.13.1.4")  || // Breast Projection X-Ray Image Storage - For Presentation
 					sop==QString("1.2.840.10008.5.1.4.1.1.13.1.5")  || // Breast Projection X-Ray Image Storage - For Processing
-				    sop==QString("1.2.840.10008.5.1.4.1.1.77.1.5.5")|| // Wide Field Ophthalmic Photography Stereographic Projection
-				    sop==QString("1.2.840.10008.5.1.4.1.1.77.1.5.6")|| // Wide Field Ophthalmic Photography 3D Coordinates
-				    sop==QString("1.2.840.10008.5.1.4.1.1.12.1.1")  || // Enhanced X-Ray Angiographic
-				    sop==QString("1.2.840.10008.5.1.4.1.1.12.2.1")     // Enhanced X-Ray RF
+					sop==QString("1.2.840.10008.5.1.4.1.1.77.1.5.5")|| // Wide Field Ophthalmic Photography Stereographic Projection
+					sop==QString("1.2.840.10008.5.1.4.1.1.77.1.5.6")|| // Wide Field Ophthalmic Photography 3D Coordinates
+					sop==QString("1.2.840.10008.5.1.4.1.1.12.1.1")  || // Enhanced X-Ray Angiographic
+					sop==QString("1.2.840.10008.5.1.4.1.1.12.2.1")     // Enhanced X-Ray RF
 					//sop==QString("1.2.840.10008.5.1.4.1.1.77.1.6")     // VL Whole Slide Microscopy
 					)
 				{

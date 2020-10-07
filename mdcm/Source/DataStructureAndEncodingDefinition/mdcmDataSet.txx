@@ -25,7 +25,6 @@
 #include "mdcmByteValue.h"
 #include "mdcmPrivateTag.h"
 #include "mdcmParseException.h"
-
 #include <cstring>
 
 namespace mdcm

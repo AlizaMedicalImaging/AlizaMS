@@ -449,17 +449,17 @@ void BrowserWidget2::dropEvent(QDropEvent * e)
 
 void BrowserWidget2::dragEnterEvent(QDragEnterEvent * e)
 {
-    e->acceptProposedAction();
+	e->acceptProposedAction();
 }
  
 void BrowserWidget2::dragMoveEvent(QDragMoveEvent * e)
 {
-    e->acceptProposedAction();
+	e->acceptProposedAction();
 }
  
 void BrowserWidget2::dragLeaveEvent(QDragLeaveEvent * e)
 {
-    e->accept();
+	e->accept();
 }
 
 bool BrowserWidget2::is_first_run() const
@@ -907,7 +907,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 			}
 		}
 		++it;
-    }
+	}
 	//
 	QString warning("");
 	//

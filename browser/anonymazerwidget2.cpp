@@ -718,17 +718,17 @@ void AnonymazerWidget2::dropEvent(QDropEvent * e)
 
 void AnonymazerWidget2::dragEnterEvent(QDragEnterEvent * e)
 {
-    e->acceptProposedAction();
+	e->acceptProposedAction();
 }
  
 void AnonymazerWidget2::dragMoveEvent(QDragMoveEvent * e)
 {
-    e->acceptProposedAction();
+	e->acceptProposedAction();
 }
  
 void AnonymazerWidget2::dragLeaveEvent(QDragLeaveEvent * e)
 {
-    e->accept();
+	e->accept();
 }
 
 static void find_pn_recurs__(
