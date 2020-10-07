@@ -159,11 +159,15 @@ bool System::FileExists(const char * filename)
 #ifndef R_OK
 #define R_OK 04
 #endif
-#ifdef _MSC_VER
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
   const std::wstring unc = System::ConvertToUNC(filename);
   if (_waccess(unc.c_str(), R_OK) != 0)
 #else
+#ifdef _WIN32
+  if (_access(filename, R_OK) != 0)
+#else
   if (access(filename, R_OK) != 0)
+#endif
 #endif
   {
     return false;
@@ -176,7 +180,7 @@ bool System::FileExists(const char * filename)
 
 bool System::FileIsDirectory(const char * name)
 {
-#ifdef _MSC_VER
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
   struct _stat64i32 fs;
   const std::wstring wname = System::ConvertToUNC(name);
   if (_wstat(wname.c_str(), &fs) == 0)
@@ -185,7 +189,7 @@ bool System::FileIsDirectory(const char * name)
   if(stat(name, &fs) == 0)
 #endif
   {
-#if _WIN32
+#ifdef _WIN32
     return ((fs.st_mode & _S_IFDIR) != 0);
 #else
     return S_ISDIR(fs.st_mode);
@@ -199,7 +203,7 @@ bool System::FileIsDirectory(const char * name)
 
 bool System::FileIsSymlink(const char * name)
 {
-#if defined(_WIN32)
+#ifdef _WIN32
   (void)name;
 #else
   struct stat fs;
@@ -406,26 +410,22 @@ std::wstring System::ConvertToUNC(const char *utf8path)
 
 size_t System::FileSize(const char * filename)
 {
-#if 0
-All of these system calls return a stat structure, which  contains  the
-following fields:
-  struct stat
-  {
-     dev_t     st_dev;    /* ID of device containing file */
-     ino_t     st_ino;    /* inode number */
-     mode_t    st_mode;   /* protection */
-     nlink_t   st_nlink;  /* number of hard links */
-     uid_t     st_uid;    /* user ID of owner */
-     gid_t     st_gid;    /* group ID of owner */
-     dev_t     st_rdev;   /* device ID (if special file) */
-     off_t     st_size;   /* total size, in bytes */
-     blksize_t st_blksize;/* blocksize for filesystem I/O */
-     blkcnt_t  st_blocks; /* number of blocks allocated */
-     time_t    st_atime;  /* time of last access */
-     time_t    st_mtime;  /* time of last modification */
-     time_t    st_ctime;  /* time of last status change */
-  };
-#endif
+/*
+stat structure contains following fields:
+ dev_t     st_dev;    // ID of device containing file
+ ino_t     st_ino;    // inode number
+ mode_t    st_mode;   // protection
+ nlink_t   st_nlink;  // number of hard links
+ uid_t     st_uid;    // user ID of owner
+ gid_t     st_gid;    // group ID of owner
+ dev_t     st_rdev;   // device ID (if special file)
+ off_t     st_size;   // total size, in bytes
+ blksize_t st_blksize;// blocksize for filesystem I/O
+ blkcnt_t  st_blocks; // number of blocks allocated
+ time_t    st_atime;  // time of last access
+ time_t    st_mtime;  // time of last modification
+ time_t    st_ctime;  // time of last status change
+*/
   struct stat fs;
   if (stat(filename, &fs) != 0)
   {
@@ -527,7 +527,7 @@ const char * System::GetCurrentResourcesDirectory()
   return NULL;
 }
 
-/**
+/*
  * Encode the mac address on a fixed length string of 15 characters.
  * we save space this way.
  */
@@ -581,7 +581,7 @@ static int gettimeofday2(struct timeval * tv, struct timezone * tz)
   filetime <<= 32;
   filetime |= ft.dwLowDateTime;
   filetime -= OFFSET;
-  tv->tv_sec = (long)(filetime / 10000000); /* seconds since epoch */
+  tv->tv_sec = (long)(filetime / 10000000); // seconds since epoch
   tv->tv_usec = (uint32_t)((filetime % 10000000) / 10);
   return 0;
 }
@@ -611,8 +611,8 @@ historic interest.
     tmpres |= ft.dwHighDateTime;
     tmpres <<= 32;
     tmpres |= ft.dwLowDateTime;
-    /*converting file time to unix epoch*/
-    tmpres /= 10;  /*convert into microseconds*/
+    //converting file time to unix epoch
+    tmpres /= 10;  //convert into microseconds
     tmpres -= DELTA_EPOCH_IN_MICROSECS;
     tv->tv_sec = (long)(tmpres / 1000000UL);
     tv->tv_usec = (long)(tmpres % 1000000UL);
@@ -621,7 +621,7 @@ historic interest.
 }
 #endif
 
-/**
+/*
  Implementation note. We internally use mktime which seems to be quite relaxed when it
  comes to invalid date. It handles :
  "17890714172557";
@@ -753,22 +753,24 @@ bool System::GetCurrentDateTime(char date[22])
 {
   long milliseconds;
   time_t timep;
-#if 0
+/*
 The functions gettimeofday() and settimeofday() can  get  and  set  the
 time  as  well  as a timezone.  The tv argument is a struct timeval (as
 specified  in <sys/time.h>):
 
-  struct timeval {
-      time_t      tv_sec;     /* seconds */
-      suseconds_t tv_usec;    /* microseconds */
+struct timeval
+{
+  time_t      tv_sec;     // seconds
+  suseconds_t tv_usec;    // microseconds
 };
 
 and gives the number of seconds and microseconds since the  Epoch  (see
 time(2)).  The tz argument is a struct timezone:
 
-  struct timezone {
-      int tz_minuteswest;     /* minutes west of Greenwich */
-      int tz_dsttime;         /* type of DST correction */
+struct timezone
+{
+  int tz_minuteswest;     // minutes west of Greenwich
+  int tz_dsttime;         // type of DST correction
 };
 
 If  either  tv or tz is NULL, the corresponding structure is not set or
@@ -780,7 +782,7 @@ used under Linux; it has not been and will not be supported by libc  or
 glibc.   Each  and  every occurrence of this field in the kernel source
 (other than the declaration) is a bug. Thus, the following is purely of
 historic interest.
-#endif
+*/
   struct timeval tv;
   gettimeofday (&tv, NULL);
   timep = tv.tv_sec;
@@ -835,7 +837,7 @@ bool System::GetHostName(char name[255])
 {
 // http://msdn.microsoft.com/en-us/library/ms738527.aspx
 // WSANOTINITIALISED A successful WSAStartup call must occur before using this function.
-#if _WIN32
+#ifdef _WIN32
   WORD wVersionRequested;
   WSADATA wsaData;
   wVersionRequested = MAKEWORD(2,0);
@@ -910,7 +912,7 @@ struct CharsetAliasType
   const char * name;
 };
 
-#if defined(_WIN32)
+#ifdef _WIN32
 static const char * CharsetAliasToName(const char * alias)
 {
   assert(alias);
@@ -921,14 +923,15 @@ static const char * CharsetAliasToName(const char * alias)
   };
   for(CharsetAliasType *a = aliases; a->alias; a++)
   {
-    if (strcmp (a->alias, alias) == 0)
+    if (strcmp(a->alias, alias) == 0)
     {
       return a->name;
     }
   }
-  mdcmWarningMacro(std::string("Could not find Charset from alias: ") + alias);
+  mdcmWarningMacro("Could not find Charset");
   return NULL;
 }
-#endif //_WIN32
+#endif
 
 } // end namespace mdcm
+

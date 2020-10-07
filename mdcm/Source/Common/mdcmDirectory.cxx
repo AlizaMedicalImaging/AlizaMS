@@ -104,6 +104,9 @@ unsigned int Directory::Explore(FilenameType const & name, bool recursive)
     return 0;
   }
 #else
+  std::string fileName;
+  std::string dirName = name;
+  Directories.push_back(dirName);
   WIN32_FIND_DATA fileData;
   if ('/' != dirName[dirName.size()-1]) dirName.push_back('/');
   assert('/' == dirName[dirName.size()-1]);
@@ -219,3 +222,4 @@ void Directory::Print(std::ostream & _os) const
 }
 
 } // end namespace mdcm
+
