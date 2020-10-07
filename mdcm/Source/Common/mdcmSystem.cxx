@@ -163,7 +163,7 @@ bool System::FileExists(const char * filename)
   const std::wstring unc = System::ConvertToUNC(filename);
   if (_waccess(unc.c_str(), R_OK) != 0)
 #else
-  if ( access(filename, R_OK) != 0 )
+  if (access(filename, R_OK) != 0)
 #endif
   {
     return false;
