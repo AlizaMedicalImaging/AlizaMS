@@ -177,7 +177,7 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 	QStringList flist = dir.entryList(QDir::Files|QDir::Readable,QDir::Name);
 	std::vector<std::string> filenames;
 	QStringList filenames_no_series_uid;
-	for (int x=0; x < flist.size(); x++)
+	for (int x = 0; x < flist.size(); x++)
 	{
 		pd->setValue(-1);
 		qApp->processEvents();
@@ -185,13 +185,15 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 		const QString tmp0 = QDir::toNativeSeparators(
 			dir.absolutePath() + QDir::separator() + flist.at(x));
 		{
-			std::set<mdcm::Tag> tags;
-			tags.insert(tSeriesInstanceUID);
 			mdcm::Reader reader;
 			reader.SetFileName(FilePath::getPath(tmp0));
-			if (reader.ReadSelectedTags(tags))
+			if (reader.ReadUpToTag(tSeriesInstanceUID))
 			{
-				filenames.push_back(std::string(FilePath::getPath(tmp0)));
+				const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
+				if (ds.FindDataElement(tSeriesInstanceUID))
+				{
+					filenames.push_back(std::string(FilePath::getPath(tmp0)));
+				}
 			}
 			else if (DicomUtils::is_dicom_file(tmp0))
 			{
@@ -201,100 +203,103 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 	}
 	flist.clear();
 	//
-	mdcm::SmartPointer<mdcm::Scanner> sp = new mdcm::Scanner;
-	mdcm::Scanner & s0 = *sp;
-	ScannerWatcher sw(&s0);
-	s0.AddTag(tSeriesInstanceUID);
-	const bool b = s0.Scan(filenames);
-	if(!b) return;
-	pd->setValue(-1);
-	qApp->processEvents();
-	if (pd->wasCanceled()) return;
-	mdcm::Scanner::ValuesType v = s0.GetValues();
-	mdcm::Scanner::ValuesType::iterator vi = v.begin();
-	for (;vi!=v.end();++vi)
 	{
-		QString modality    = QString("");
-		QString name        = QString("");
-		QString birthdate   = QString("");
-		QString study       = QString("");
-		QString study_date  = QString("");
-		QString series      = QString("");
-		QString series_date = QString("");
-		bool is_image       = false;
-		bool is_softcopy  = false;
-		const int idx = tableWidget->rowCount();
-		QString ids(""); ids.sprintf("%010d", idx);
-		TableWidgetItem * i = new TableWidgetItem(ids);
-		std::vector<std::string> files__;
-		files__ = s0.GetAllFilenamesFromTagToValue(
-			tSeriesInstanceUID, (*vi).c_str());
-		for (unsigned int z = 0; z < files__.size(); z++)
-		{
-			const QString tmp_filename =
-#ifdef _MSC_VER
-				QString::fromStdString(files__.at(z));
-#else
-				QString::fromLocal8Bit(files__.at(z).c_str());
-#endif
-			i->files.push_back(tmp_filename);
-		}
-		const unsigned int series_size = i->files.size();
-		if (series_size > 0) read_tags_(
-			i->files.at(0),
-			name,birthdate,
-			modality,
-			study,study_date,
-			series,series_date,
-			&is_image,&is_softcopy);
+		mdcm::SmartPointer<mdcm::Scanner> sp = new mdcm::Scanner;
+		mdcm::Scanner & s0 = *sp;
+		ScannerWatcher sw(&s0);
+		s0.AddTag(tSeriesInstanceUID);
+		const bool b = s0.Scan(filenames);
+		if(!b) return;
 		pd->setValue(-1);
 		qApp->processEvents();
 		if (pd->wasCanceled()) return;
-		//
-		if (!is_image && series_size > 1)
+		mdcm::Scanner::ValuesType v = s0.GetValues();
+		mdcm::Scanner::ValuesType::iterator vi = v.begin();
+		for (;vi!=v.end();++vi)
 		{
-			unsigned int series_idx = 0;
-			do
+			QString modality    = QString("");
+			QString name        = QString("");
+			QString birthdate   = QString("");
+			QString study       = QString("");
+			QString study_date  = QString("");
+			QString series      = QString("");
+			QString series_date = QString("");
+			bool is_image       = false;
+			bool is_softcopy  = false;
+			const int idx = tableWidget->rowCount();
+			QString ids("");
+			ids.sprintf("%010d", idx);
+			TableWidgetItem * i = new TableWidgetItem(ids);
+			std::vector<std::string> files__(
+				s0.GetAllFilenamesFromTagToValue(
+					tSeriesInstanceUID, (*vi).c_str()));
+			for (unsigned int z = 0; z < files__.size(); z++)
 			{
-				series_idx += 1;
-				qApp->processEvents();
-				if (pd->wasCanceled()) return;
-				bool is_image_tmp = false;
-				read_tags_short_(
-					i->files.at(series_idx),
-					&is_image_tmp,&is_softcopy);
-				if (is_image_tmp) { is_image = true; break; }
-				else if (is_softcopy) { break; }
+				const QString tmp_filename =
+#ifdef _MSC_VER
+					QString(files__.at(z).c_str());
+#else
+					QString::fromLocal8Bit(files__.at(z).c_str());
+#endif
+				i->files.push_back(tmp_filename);
 			}
-			while (series_idx < series_size-1);
+			const unsigned int series_size = i->files.size();
+			if (series_size > 0) read_tags_(
+				i->files.at(0),
+				name,birthdate,
+				modality,
+				study,study_date,
+				series,series_date,
+				&is_image,&is_softcopy);
+			pd->setValue(-1);
+			qApp->processEvents();
+			if (pd->wasCanceled()) return;
+			//
+			if (!is_image && series_size > 1)
+			{
+				size_t series_idx = 0;
+				do
+				{
+					series_idx += 1;
+					qApp->processEvents();
+					if (pd->wasCanceled()) return;
+					bool is_image_tmp = false;
+					read_tags_short_(
+						i->files.at(series_idx),
+						&is_image_tmp,&is_softcopy);
+					if (is_image_tmp) { is_image = true; break; }
+					else if (is_softcopy) { break; }
+				}
+				while (series_idx < (series_size - 1));
+			}
+			//
+			tableWidget->setRowCount(idx + 1);
+			tableWidget->setItem(idx,0,static_cast<QTableWidgetItem*>(i));
+			if (is_image)
+			{
+				tableWidget->setItem(idx,1,new QTableWidgetItem(eye_icon,QString("")));
+			}
+			else if (is_softcopy)
+			{
+				tableWidget->setItem(idx,1,new QTableWidgetItem(eye2_icon,QString("")));
+			}
+			tableWidget->setItem(idx,2,new QTableWidgetItem(modality));
+			tableWidget->setItem(idx,3,new QTableWidgetItem(
+				DicomUtils::convert_pn_value(name.remove(QChar('\0')))));
+			tableWidget->setItem(idx,4,new QTableWidgetItem(birthdate));
+			tableWidget->setItem(idx,5,new QTableWidgetItem(study.remove(QChar('\0'))));
+			tableWidget->setItem(idx,6,new QTableWidgetItem(study_date));
+			tableWidget->setItem(idx,7,new QTableWidgetItem(series.remove(QChar('\0'))));
+			tableWidget->setItem(idx,8,new QTableWidgetItem(series_date));
+			tableWidget->setItem(idx,9,new QTableWidgetItem(QVariant(i->files.size()).toString()));
+			//
+			pd->setValue(-1);
+			qApp->processEvents();
+			if (pd->wasCanceled()) return;
 		}
-		//
-		tableWidget->setRowCount(idx+1);
-		tableWidget->setItem(idx,0,static_cast<QTableWidgetItem*>(i));
-		if (is_image)
-		{
-			tableWidget->setItem(idx,1,new QTableWidgetItem(eye_icon,QString("")));
-		}
-		else if (is_softcopy)
-		{
-			tableWidget->setItem(idx,1,new QTableWidgetItem(eye2_icon,QString("")));
-		}
-		tableWidget->setItem(idx,2,new QTableWidgetItem(modality));
-		tableWidget->setItem(idx,3,new QTableWidgetItem(
-			DicomUtils::convert_pn_value(name.remove(QChar('\0')))));
-		tableWidget->setItem(idx,4,new QTableWidgetItem(birthdate));
-		tableWidget->setItem(idx,5,new QTableWidgetItem(study.remove(QChar('\0'))));
-		tableWidget->setItem(idx,6,new QTableWidgetItem(study_date));
-		tableWidget->setItem(idx,7,new QTableWidgetItem(series.remove(QChar('\0'))));
-		tableWidget->setItem(idx,8,new QTableWidgetItem(series_date));
-		tableWidget->setItem(idx,9,new QTableWidgetItem(QVariant(i->files.size()).toString()));
-		//
-		pd->setValue(-1);
-		qApp->processEvents();
-		if (pd->wasCanceled()) return;
 	}
 	//
-	for (unsigned int x = 0; x < filenames_no_series_uid.size(); x++)
+	for (int x = 0; x < filenames_no_series_uid.size(); x++)
 	{
 		const QString tmp1 = filenames_no_series_uid.at(x);
 		QString modality    = QString("");
@@ -307,7 +312,8 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 		bool is_image       = false;
 		bool is_softcopy    = false;
 		const int idx = tableWidget->rowCount();
-		QString ids(""); ids.sprintf("%010d", idx);
+		QString ids("");
+		ids.sprintf("%010d", idx);
 		TableWidgetItem * i = new TableWidgetItem(ids);
 		i->files.push_back(tmp1);
 		read_tags_(
