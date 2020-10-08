@@ -102,7 +102,11 @@ static void get_series_files(
 				s.GetAllFilenamesFromTagToValue(t, (*it).c_str());
 			for (unsigned int j = 0; j < f__.size(); j++)
 			{
-				result.push_back(QString(f__[j].c_str()));
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+				result.push_back(QString::fromUtf8(f__.at(j).c_str()));
+#else
+				result.push_back(QString::fromLocal8Bit(f__.at(j).c_str()));
+#endif
 			}
 			break;
 		}
