@@ -8991,7 +8991,7 @@ void DicomUtils::scan_files_for_rtstruct_image(
 				s0.GetAllFilenamesFromTagToValue(t0, (*vi0).c_str());
 			for (unsigned int j = 0; j < files__.size(); j++)
 			{
-				t0_files.push_back(files__[j]);
+				t0_files.push_back(files__.at(j));
 			}
 		}
 	}
@@ -9014,9 +9014,9 @@ void DicomUtils::scan_files_for_rtstruct_image(
 			{
 				t1_tmp.push_back(
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-				QString::fromUtf8(files__[j].c_str())
+					QString::fromUtf8(files__.at(j).c_str())
 #else
-				QString::fromLocal8Bit(files__[j].c_str())
+					QString::fromLocal8Bit(files__.at(j).c_str())
 #endif
 				);
 			}
@@ -9224,7 +9224,6 @@ bool DicomUtils::scan_files_for_pr_image(
 	QStringList flist =
 		dir.entryList(QDir::Files|QDir::Readable,QDir::Name);
 	QApplication::processEvents();
-	std::vector<std::string> filenames;
 	for (int x = 0; x < flist.size(); x++)
 	{
 		if (pb) pb->setValue(-1);
