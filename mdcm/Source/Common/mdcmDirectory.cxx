@@ -50,16 +50,12 @@ unsigned int Directory::Load(FilenameType const & name, bool recursive)
 }
 
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-static std::string ToUtf8(std::wstring const & str)
+static std::string utf8_encode(std::wstring const & wstr)
 {
-  std::string ret;
-  int len =
-    WideCharToMultiByte(CP_UTF8, 0, str.c_str(), (int)str.length(), NULL, 0, NULL, NULL);
-  if (len > 0)
-  {
-    ret.resize(len);
-    WideCharToMultiByte(CP_UTF8, 0, str.c_str(), (int)str.length(), &ret[0], len, NULL, NULL);
-  }
+  if(wstr.empty()) return std::string();
+  const int len = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], -1, NULL, 0, NULL, NULL);
+  std::string ret(len, 0);
+  WideCharToMultiByte(CP_UTF8, 0, &wstr[0], -1, &ret[0], len, NULL, NULL);
   return ret;
 }
 #endif
@@ -67,14 +63,16 @@ static std::string ToUtf8(std::wstring const & str)
 unsigned int Directory::Explore(FilenameType const & name, bool recursive)
 {
   unsigned int nFiles = 0;
-#ifdef _MSC_VER
-#ifdef MDCM_WIN32_UNC
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
   std::wstring fileName;
   std::wstring dirName = System::ConvertToUNC(name.c_str());
-  Directories.push_back(ToUtf8(dirName));
+  Directories.push_back(utf8_encode(dirName));
   WIN32_FIND_DATAW fileData;
-  if('\\' != dirName[dirName.size()-1]) dirName.push_back('\\');
-  assert('\\' == dirName[dirName.size()-1]);
+  if(('\\' != dirName[dirName.size()-1]) && ('/' != dirName[dirName.size()-1]))
+  {
+    dirName.push_back('/'); // FIXME
+  }
   const std::wstring firstfile = dirName+L"*";
   HANDLE hFile = FindFirstFileW(firstfile.c_str(), &fileData);
   for(BOOL b = (hFile != INVALID_HANDLE_VALUE); b; b = FindNextFileW(hFile, &fileData))
@@ -83,16 +81,16 @@ unsigned int Directory::Explore(FilenameType const & name, bool recursive)
     if(fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
     {
       // Check for . and .. to avoid infinite loop and discard hidden dir
-      if(fileName != L"." && fileName != L".." && fileName[0] != '.' && recursive )
+      if(fileName != L"." && fileName != L".." && fileName[0] != '.' && recursive)
       {
-        nFiles += Explore(ToUtf8(dirName + fileName), recursive);
+        nFiles += Explore(utf8_encode(dirName + fileName), recursive);
       }
     }
     else
     {
       if(fileName[0] != '.') // discard UNIX hidden files
       {
-        Filenames.push_back(ToUtf8(dirName+fileName));
+        Filenames.push_back(utf8_encode(dirName+fileName));
         nFiles++;
       }
     }
@@ -108,8 +106,10 @@ unsigned int Directory::Explore(FilenameType const & name, bool recursive)
   std::string dirName = name;
   Directories.push_back(dirName);
   WIN32_FIND_DATA fileData;
-  if ('/' != dirName[dirName.size()-1]) dirName.push_back('/');
-  assert('/' == dirName[dirName.size()-1]);
+  if ('/' != dirName[dirName.size()-1])
+  {
+    dirName.push_back('/'); // FIXME
+  }
   const FilenameType firstfile = dirName+"*";
   HANDLE hFile = FindFirstFile(firstfile.c_str(), &fileData);
   for(BOOL b = (hFile != INVALID_HANDLE_VALUE); b;
@@ -144,21 +144,22 @@ unsigned int Directory::Explore(FilenameType const & name, bool recursive)
   DIR* dir = opendir(dirName.c_str());
   if (!dir)
   {
-    const char *str = strerror(errno); (void)str;
-    mdcmErrorMacro("Error: " << str << " when opening directory " << dirName);
+    const char *str = strerror(errno);
+    mdcmErrorMacro("Error: " << str << ", directory " << dirName);
+    (void)str;
     return 0;
   }
   struct stat buf;
   dirent *d;
   if('/' != dirName[dirName.size()-1]) dirName.push_back('/');
-  assert( '/' == dirName[dirName.size()-1] );
   for(d = readdir(dir); d; d = readdir(dir))
   {
     fileName = dirName + d->d_name;
     if(stat(fileName.c_str(), &buf) != 0)
     {
-      const char *str = strerror(errno); (void)str;
-      mdcmErrorMacro( "Last error: " << str << " for file " << fileName );
+      const char *str = strerror(errno);
+      mdcmErrorMacro("Last error: " << str << " for file " << fileName);
+      (void)str;
       break;
     }
     if(S_ISREG(buf.st_mode)) // is a regular file?
@@ -178,7 +179,7 @@ unsigned int Directory::Explore(FilenameType const & name, bool recursive)
       }
       if(recursive)
       {
-        nFiles += Explore( fileName, recursive);
+        nFiles += Explore(fileName, recursive);
       }
     }
     else
@@ -190,8 +191,8 @@ unsigned int Directory::Explore(FilenameType const & name, bool recursive)
   if(closedir(dir) != 0)
   {
     const char *str = strerror(errno);
-	(void)str;
     mdcmErrorMacro("Last error: " << str << " when closing directory " << fileName);
+	(void)str;
   }
 #endif
   return nFiles;

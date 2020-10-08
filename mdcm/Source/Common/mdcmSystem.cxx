@@ -67,34 +67,34 @@ namespace mdcm
 {
 
 #if defined(_WIN32) && (defined(_MSC_VER) || defined(__WATCOMC__) || defined(__BORLANDC__) || defined(__MINGW32__))
-inline int Mkdir(const char * dir)
+static int Mkdir(const char * dir)
 {
   return _mkdir(dir);
 }
 
-int Rmdir(const char * dir)
+static int Rmdir(const char * dir)
 {
   return _rmdir(dir);
 }
 
-const char* Getcwd(char * buf, unsigned int len)
+static const char* Getcwd(char * buf, unsigned int len)
 {
   const char * ret = _getcwd(buf, len);
   return ret;
 }
 
 #else
-int Mkdir(const char * dir)
+static int Mkdir(const char * dir)
 {
   return mkdir(dir, 00777);
 }
 
-int Rmdir(const char * dir)
+static int Rmdir(const char * dir)
 {
   return rmdir(dir);
 }
 
-const char * Getcwd(char * buf, unsigned int len)
+static const char * Getcwd(char * buf, unsigned int len)
 {
   const char * ret = getcwd(buf, len);
   return ret;
@@ -106,6 +106,16 @@ const char * System::GetCWD()
   static char buf[2048];
   const char* cwd = Getcwd(buf, 2048);
   return cwd;
+}
+
+static int Mkdir2(const char * p)
+{
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+  const std::wstring unc = System::ConvertToUNC(p);
+  return _wmkdir(unc.c_str());
+#else
+  return Mkdir(p);
+#endif
 }
 
 bool System::MakeDirectory(const char * path)
@@ -124,7 +134,7 @@ bool System::MakeDirectory(const char * path)
   while(ok && (pos = dir.find('/', pos)) != std::string::npos)
   {
     topdir = dir.substr(0, pos+1);
-    ok = ok && Mkdir(topdir.c_str());
+    ok = ok && (System::FileIsDirectory(topdir.c_str()) || 0 == Mkdir2(topdir.c_str()));
     pos++;
   }
   if(!ok) return false;
@@ -136,7 +146,7 @@ bool System::MakeDirectory(const char * path)
   {
     topdir = dir;
   }
-  if(Mkdir(topdir.c_str()) != 0)
+  if(Mkdir2(topdir.c_str()) != 0)
   {
     // There is a bug in the Borland Run time library which makes MKDIR
     // return EACCES when it should return EEXISTS
@@ -342,15 +352,12 @@ bool System::DeleteDirectory(const char * source)
 namespace
 {
 
-static std::wstring ToUtf16(std::string const &str)
+static std::wstring utf8_decode(std::string const &str)
 {
-  std::wstring ret;
-  const int len = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int)str.length(), NULL, 0);
-  if (len > 0)
-  {
-    ret.resize(len);
-    MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int)str.length(), &ret[0], len);
-  }
+  if(str.empty()) return std::wstring();
+  const int len = MultiByteToWideChar(CP_UTF8, 0, &str[0], -1, NULL, 0);
+  std::wstring ret(len, 0);
+  MultiByteToWideChar(CP_UTF8, 0, &str[0], -1, &ret[0], len);
   return ret;
 }
 
@@ -402,7 +409,7 @@ static std::wstring HandleMaxPath(std::wstring const &in)
 
 std::wstring System::ConvertToUNC(const char *utf8path)
 {
-  const std::wstring uft16path = ToUtf16(utf8path);
+  const std::wstring uft16path = utf8_decode(utf8path);
   const std::wstring uncpath = HandleMaxPath(uft16path);
   return uncpath;
 }
