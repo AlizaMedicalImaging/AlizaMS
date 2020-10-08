@@ -627,7 +627,7 @@ void GLWidget::get_screen(bool white_bg)
 	{
 		f__ = QDir::toNativeSeparators(
 			fi.absolutePath() +
-			QDir::separator() +
+			QString("/") +
 			fi.baseName() +
 			QString(".png"));
 	}

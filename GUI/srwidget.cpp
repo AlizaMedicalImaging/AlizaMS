@@ -167,7 +167,7 @@ void SRWidget::saveSR()
 		QString("Save as Open Document ODT"),
 		QDir::toNativeSeparators(
 			CommonUtils::get_save_dir() +
-			QDir::separator() +
+			QString("/") +
 			CommonUtils::get_save_name() +
 			QString(".odt")),
 		QString(

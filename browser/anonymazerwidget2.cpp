@@ -614,13 +614,13 @@ AnonymazerWidget2::AnonymazerWidget2(float si, QWidget * p, Qt::WindowFlags f) :
 #if (defined _WIN32)
 	input_dir = 
 		QString(".") +
-		QDir::separator() +
+		QString("/") +
 		QString("DICOM");
 #else
 	input_dir = 
 		QApplication::applicationDirPath() +
-		QDir::separator() + QString("..") +
-		QDir::separator() +
+		QString("/") + QString("..") +
+		QString("/") +
 		QString("DICOM");
 #endif
 	QFileInfo fi(input_dir);
@@ -887,7 +887,7 @@ void AnonymazerWidget2::process_directory(
 		pd->setValue(-1);
 		QApplication::processEvents();
 		if (pd->wasCanceled()) return;
-		const QString tmp0 = dir.absolutePath() + QDir::separator() + flist.at(x);
+		const QString tmp0 = dir.absolutePath() + QString("/") + flist.at(x);
 		filenames.push_back(tmp0);
 	}
 	flist.clear();
@@ -908,7 +908,7 @@ void AnonymazerWidget2::process_directory(
 #endif
 		const QString out_file = 
 			outp +
-			QDir::separator() +
+			QString("/") +
 			out_filename;
 		bool ok_ = false;
 		bool overlay_in_data = false;
@@ -947,10 +947,10 @@ void AnonymazerWidget2::process_directory(
 	for (int j = 0; j < dlist.size(); j++)
 	{
 		QApplication::processEvents();
-		QDir d(outp + QDir::separator() + dlist.at(j));
+		QDir d(outp + QString("/") + dlist.at(j));
 		if (!d.exists()) d.mkpath(d.absolutePath());
 		process_directory(
-			dir.absolutePath() + QDir::separator() + dlist.at(j),
+			dir.absolutePath() + QString("/") + dlist.at(j),
 			d.absolutePath(),
 			uids_m,
 			pn_m,

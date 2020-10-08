@@ -4038,7 +4038,7 @@ void CommonUtils::set_screenshot_dir(const QString & s)
 		screenshot_dir =
 			QDir::toNativeSeparators(
 				QDir::homePath() +
-				QDir::separator() +
+				QString("/") +
 				QString("Desktop"));
 #else
 		screenshot_dir =
@@ -4059,7 +4059,7 @@ QString CommonUtils::get_screenshot_name(const QString & s)
 		:
 			QDir::toNativeSeparators(
 				s +
-				QDir::separator() +
+				QString("/") +
 				QDateTime::currentDateTime().toString(
 					QString("yyyyMMdd-hhmmss")) +
 				QString(".png"));
@@ -4085,7 +4085,7 @@ void CommonUtils::set_save_dir(const QString & s)
 		save_dir =
 			QDir::toNativeSeparators(
 				QDir::homePath() +
-				QDir::separator() +
+				QString("/") +
 				QString("Desktop"));
 #else
 		save_dir =

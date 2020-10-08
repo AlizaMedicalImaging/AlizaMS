@@ -7069,7 +7069,7 @@ QString DicomUtils::read_buffer(
 		QFileInfo fi(f);
 		elscf = 
 			QDir::tempPath() +
-			QDir::separator() +
+			QString("/") +
 			fi.fileName() + QString("ELSCINT.dcm");
 		const bool elsc_ok = convert_elscint(f, elscf);
 		if (elsc_ok)
@@ -8970,7 +8970,7 @@ void DicomUtils::scan_files_for_rtstruct_image(
 	{
 		QApplication::processEvents();
 		const QString tmp0 =
-			dir.absolutePath() + QDir::separator() + flist.at(x);
+			dir.absolutePath() + QString("/") + flist.at(x);
 		filenames.push_back(std::string(FilePath::getPath(tmp0)));
 	}
 	flist.clear();
@@ -9230,7 +9230,7 @@ bool DicomUtils::scan_files_for_pr_image(
 		if (pb) pb->setValue(-1);
 		QApplication::processEvents();
 		const QString tmp0 =
-			dir.absolutePath() + QDir::separator() + flist.at(x);
+			dir.absolutePath() + QString("/") + flist.at(x);
 		mdcm::Reader reader;
 		reader.SetFileName(FilePath::getPath(tmp0));
 		if (!reader.ReadUpToTag(mdcm::Tag(0x0008,0x0018))) continue;
@@ -11807,7 +11807,7 @@ QString DicomUtils::read_dicom(
 				QString("Select file"),
 				QDir::toNativeSeparators(
 					CommonUtils::get_save_dir() +
-					QDir::separator() +
+					QString("/") +
 					CommonUtils::get_save_name() +
 					QString(".pdf")),
 				QString("All Files (*)"),
@@ -11836,7 +11836,7 @@ QString DicomUtils::read_dicom(
 				QString("Select file"),
 				QDir::toNativeSeparators(
 					CommonUtils::get_save_dir() +
-					QDir::separator() +
+					QString("/") +
 					CommonUtils::get_save_name() +
 					QString(".stl")),
 				QString("All Files (*)"),
@@ -11869,7 +11869,7 @@ QString DicomUtils::read_dicom(
 					QString("Select file"),
 					QDir::toNativeSeparators(
 						CommonUtils::get_save_dir() +
-						QDir::separator() +
+						QString("/") +
 						CommonUtils::get_save_name() +
 						suf),
 					QString("All Files (*)"),

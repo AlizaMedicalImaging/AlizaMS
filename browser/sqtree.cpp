@@ -81,7 +81,7 @@ static void get_series_files(
 		for (int x = 0; x < l.size(); x++)
 		{
 			const QString tmp0 = QDir::toNativeSeparators(
-				dir.absolutePath() + QDir::separator() + l.at(x));
+				dir.absolutePath() + QString("/") + l.at(x));
 			files.push_back(std::string(FilePath::getPath(tmp0)));
 		}
 	}

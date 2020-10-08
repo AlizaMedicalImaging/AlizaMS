@@ -907,7 +907,7 @@ static void process_elscint_dir(
 		}
 		const QString tmp0 =
 			QDir::toNativeSeparators(
-				dir.absolutePath() + QDir::separator() + flist.at(x));
+				dir.absolutePath() + QString("/") + flist.at(x));
 		if (DicomUtils::is_dicom_file(tmp0)) filenames.push_back(tmp0);
 	}
 	flist.clear();
@@ -923,7 +923,7 @@ static void process_elscint_dir(
 		QFileInfo fi(filenames.at(x));
 		const QString tmp9 =
 			QDir::toNativeSeparators(
-				outp + QDir::separator() + fi.fileName());
+				outp + QString("/") + fi.fileName());
 		if (DicomUtils::convert_elscint(filenames.at(x), tmp9))
 		{
 			count_elscint++;
@@ -946,10 +946,10 @@ static void process_elscint_dir(
 			if (pb->wasCanceled()) return;
 			pb->setValue(-1);
 		}
-		QDir d(outp + QDir::separator() + dlist.at(j));
-		if (!d.exists()) d.mkpath(".");
+		QDir d(outp + QString("/") + dlist.at(j));
+		if (!d.exists()) d.mkpath(d.absolutePath());
 		process_elscint_dir(
-			dir.absolutePath() + QDir::separator() + dlist.at(j),
+			dir.absolutePath() + QString("/") + dlist.at(j),
 			d.absolutePath(),
 			pb);
 	}

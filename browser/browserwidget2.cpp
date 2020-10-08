@@ -183,7 +183,7 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 		qApp->processEvents();
 		if (pd->wasCanceled()) return;
 		const QString tmp0 = QDir::toNativeSeparators(
-			dir.absolutePath() + QDir::separator() + flist.at(x));
+			dir.absolutePath() + QString("/") + flist.at(x));
 		{
 			mdcm::Reader reader;
 			reader.SetFileName(FilePath::getPath(tmp0));
@@ -353,7 +353,7 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 	{
 		for (int j = 0; j < dlist.size(); j++)
 			process_directory(
-				dir.absolutePath() + QDir::separator() + dlist.at(j),
+				dir.absolutePath() + QString("/") + dlist.at(j),
 				pd);
 	}
 	dlist.clear();
@@ -579,7 +579,7 @@ void BrowserWidget2::copy_files()
 			QVariant(count2).toString());
 		const QString dir1 = QDir::toNativeSeparators(
 			dirname +
-			QDir::separator() +
+			QString("/") +
 			tmp1);
 		QFileInfo fi2(dir1);
 		if (!fi2.exists())
@@ -596,7 +596,7 @@ void BrowserWidget2::copy_files()
 			{
 				const QString f1 = QDir::toNativeSeparators(
 					dir1 +
-					QDir::separator() +
+					QString("/") +
 					fi.fileName());
 				QFile::copy(f, f1);
 				qApp->processEvents();
@@ -895,7 +895,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 									for (int x = 0; x < l2size; x++)
 									{
 										fpath.append(l2.at(x));
-										if (x!=l2size-1) fpath.append(QDir::separator());
+										if (x!=l2size-1) fpath.append(QString("/"));
 									}
 									ed.file = fpath;
 								}
@@ -967,7 +967,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 		bool break__ = false;
 		for (int z = 0; z < series.at(x).files.size(); z++)
 		{
-			QFileInfo fi(QDir::toNativeSeparators(dir_ + QDir::separator() + series.at(x).files.at(z)));
+			QFileInfo fi(QDir::toNativeSeparators(dir_ + QString("/") + series.at(x).files.at(z)));
 			if (!fi.isFile())
 			{
 				if (!warning.isEmpty()) warning.append("\n");
@@ -985,7 +985,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 		QString ids(""); ids.sprintf("%010d", idx);
 		TableWidgetItem * i = new TableWidgetItem(ids);
 		for (int z = 0; z < series.at(x).files.size(); z++)
-			i->files.push_back(QDir::toNativeSeparators(dir_ + QDir::separator() + series.at(x).files.at(z)));
+			i->files.push_back(QDir::toNativeSeparators(dir_ + QString("/") + series.at(x).files.at(z)));
 		tableWidget->setRowCount(idx+1);
 		tableWidget->setItem(idx,0,static_cast<QTableWidgetItem*>(i));
 		if (series.at(x).eye)
@@ -1424,13 +1424,13 @@ void BrowserWidget2::readSettings()
 #if (defined _WIN32)
 	const QString d = QDir::toNativeSeparators(
 		QString(".") +
-		QDir::separator() +
+		QString("/") +
 		QString("DICOM"));
 #else
 	const QString d = QDir::toNativeSeparators(
 		QApplication::applicationDirPath() +
-		QDir::separator() + QString("..") +
-		QDir::separator() +
+		QString("/") + QString("..") +
+		QString("/") +
 		QString("DICOM"));
 #endif
 	settings.beginGroup(QString("BrowserWidget2"));
@@ -1450,9 +1450,9 @@ void BrowserWidget2::readSettings()
 		const QString f1_ = QDir::toNativeSeparators(
 			QApplication::applicationDirPath() +
 #ifndef _WIN32
-			QDir::separator() + QString("..") +
+			QString("/") + QString("..") +
 #endif
-			QDir::separator() + QString("DICOMDIR"));
+			QString("/") + QString("DICOMDIR"));
 		QFileInfo fi1 = QFileInfo(f1_);
 		if (fi1.exists() && fi1.isFile())
 		{
@@ -1463,9 +1463,9 @@ void BrowserWidget2::readSettings()
 			const QString f2_ = QDir::toNativeSeparators(
 				QApplication::applicationDirPath() +
 #ifndef _WIN32
-				QDir::separator() + QString("..") +
+				QString("/") + QString("..") +
 #endif
-				QDir::separator() + QString("DICOM"));
+				QString("/") + QString("DICOM"));
 				QFileInfo fi2 = QFileInfo(f2_);
 			if (fi2.exists() && fi2.isDir())
 			{
@@ -1535,7 +1535,7 @@ void BrowserWidget2::open_CTK_db()
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	dbfile = QDir::toNativeSeparators(
 		ctk_dir +
-		QDir::separator() +
+		QString("/") +
 		QString("ctkDICOM.sql"));
 	if (QSqlDatabase::contains(QString("CTKdb")))
 		db = QSqlDatabase::database("CTKdb");
