@@ -11805,11 +11805,10 @@ QString DicomUtils::read_dicom(
 			const QString pdff = QFileDialog::getSaveFileName(
 				NULL,
 				QString("Select file"),
-				QDir::toNativeSeparators(
-					CommonUtils::get_save_dir() +
+				CommonUtils::get_save_dir() +
 					QString("/") +
 					CommonUtils::get_save_name() +
-					QString(".pdf")),
+					QString(".pdf"),
 				QString("All Files (*)"),
 				(QString*)NULL
 				 //,QFileDialog::DontUseNativeDialog
@@ -11817,8 +11816,7 @@ QString DicomUtils::read_dicom(
 			if (!pdff.isEmpty())
 			{
 				QFileInfo fi(pdff);
-				CommonUtils::set_save_dir(
-					QDir::toNativeSeparators(fi.absolutePath()));
+				CommonUtils::set_save_dir(fi.absolutePath());
 				write_encapsulated(pdf_files.at(x), pdff);
 			}
 		}
@@ -11834,11 +11832,10 @@ QString DicomUtils::read_dicom(
 			const QString stlf = QFileDialog::getSaveFileName(
 				NULL,
 				QString("Select file"),
-				QDir::toNativeSeparators(
-					CommonUtils::get_save_dir() +
+				CommonUtils::get_save_dir() +
 					QString("/") +
 					CommonUtils::get_save_name() +
-					QString(".stl")),
+					QString(".stl"),
 				QString("All Files (*)"),
 				(QString*)NULL
 				 //,QFileDialog::DontUseNativeDialog
@@ -11846,8 +11843,7 @@ QString DicomUtils::read_dicom(
 			if (!stlf.isEmpty())
 			{
 				QFileInfo fi(stlf);
-				CommonUtils::set_save_dir(
-					QDir::toNativeSeparators(fi.absolutePath()));
+				CommonUtils::set_save_dir(fi.absolutePath());
 				write_encapsulated(stl_files.at(x), stlf);
 			}
 		}
@@ -11867,11 +11863,10 @@ QString DicomUtils::read_dicom(
 				QFileDialog::getSaveFileName(
 					NULL,
 					QString("Select file"),
-					QDir::toNativeSeparators(
-						CommonUtils::get_save_dir() +
+					CommonUtils::get_save_dir() +
 						QString("/") +
 						CommonUtils::get_save_name() +
-						suf),
+						suf,
 					QString("All Files (*)"),
 					(QString*)NULL
 					 //,QFileDialog::DontUseNativeDialog
@@ -11879,8 +11874,7 @@ QString DicomUtils::read_dicom(
 			if (!video_file_name.isEmpty())
 			{
 				QFileInfo fi(video_file_name);
-				CommonUtils::set_save_dir(
-					QDir::toNativeSeparators(fi.absolutePath()));
+				CommonUtils::set_save_dir(fi.absolutePath());
 				write_mpeg(tmp943, video_file_name);
 			}
 		}

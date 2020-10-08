@@ -182,8 +182,7 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 		pd->setValue(-1);
 		qApp->processEvents();
 		if (pd->wasCanceled()) return;
-		const QString tmp0 = QDir::toNativeSeparators(
-			dir.absolutePath() + QString("/") + flist.at(x));
+		const QString tmp0 = dir.absolutePath() + QString("/") + flist.at(x);
 		{
 			mdcm::Reader reader;
 			reader.SetFileName(FilePath::getPath(tmp0));
@@ -370,23 +369,21 @@ void BrowserWidget2::open_dicom_dir()
 											));
 	if (dirname.isEmpty()) return;
 	directory_lineEdit->setText(QDir::toNativeSeparators(dirname));
-	read_directory(directory_lineEdit->text());
+	read_directory(dirname);
 }
 
 void BrowserWidget2::open_dicom_dir2(const QString & d)
 {
 	if (d.isEmpty()) return;
-	const QString t_ = QDir::toNativeSeparators(d);
-	directory_lineEdit->setText(t_);
-	read_directory(t_);
+	directory_lineEdit->setText(QDir::toNativeSeparators(d));
+	read_directory(d);
 }
 
 void BrowserWidget2::open_DICOMDIR2(const QString & f)
 {
 	if (f.isEmpty()) return;
-	const QString t_ = QDir::toNativeSeparators(f);
-	directory_lineEdit->setText(t_);
-	const QString warning = read_DICOMDIR(t_);
+	directory_lineEdit->setText(QDir::toNativeSeparators(f));
+	const QString warning = read_DICOMDIR(f);
 	if (!warning.isEmpty())
 	{
 		QMessageBox mbox;
@@ -409,8 +406,9 @@ void BrowserWidget2::open_DICOMDIR2(const QString & f)
 		}
 		if (scan)
 		{
-			QFileInfo fi(t_);
-			directory_lineEdit->setText(fi.absolutePath());
+			QFileInfo fi(f);
+			directory_lineEdit->setText(
+				QDir::toNativeSeparators(fi.absolutePath()));
 			reload_dir();
 		}
 	}
@@ -429,7 +427,7 @@ void BrowserWidget2::dropEvent(QDropEvent * e)
 	}
 	if (l.size()>=1)
 	{
-		const QString f = QDir::toNativeSeparators(l.at(0));
+		const QString f = l.at(0);
 		QFileInfo fi(f);
 		if (fi.isDir())
 		{
@@ -469,10 +467,12 @@ bool BrowserWidget2::is_first_run() const
 
 void BrowserWidget2::reload_dir()
 {
-	QFileInfo fi(directory_lineEdit->text());
+	QFileInfo fi(QDir::fromNativeSeparators(
+		directory_lineEdit->text()));
 	if (fi.isDir())
 	{
-		read_directory(directory_lineEdit->text());
+		read_directory(QDir::fromNativeSeparators(
+			directory_lineEdit->text()));
 	}
 	else if (fi.isFile())
 	{
@@ -485,7 +485,8 @@ void BrowserWidget2::reload_dir()
 #endif
 		{
 			const QString warning =
-				read_DICOMDIR(directory_lineEdit->text());
+				read_DICOMDIR(QDir::fromNativeSeparators(
+					directory_lineEdit->text()));
 			if (!warning.isEmpty())
 			{
 				QMessageBox mbox;
@@ -572,15 +573,15 @@ void BrowserWidget2::copy_files()
 	for (int x = 0; x < files.size(); x++)
 	{
 		count2++;
-		const QString tmp1 =QDir::toNativeSeparators(
+		const QString tmp1 =
 			QDateTime::currentDateTime()
 				.toString(QString("yyyyMMddhhmmsszzz")) +
 			QString("-") +
-			QVariant(count2).toString());
-		const QString dir1 = QDir::toNativeSeparators(
+			QVariant(count2).toString();
+		const QString dir1 =
 			dirname +
 			QString("/") +
-			tmp1);
+			tmp1;
 		QFileInfo fi2(dir1);
 		if (!fi2.exists())
 		{
@@ -589,15 +590,14 @@ void BrowserWidget2::copy_files()
 		}
 		for (int y = 0; y < files.at(x).size(); y++)
 		{
-			const QString f =
-				QDir::toNativeSeparators(files.at(x).at(y));
+			const QString f = files.at(x).at(y);
 			QFileInfo fi(f);
 			if (fi.exists())
 			{
-				const QString f1 = QDir::toNativeSeparators(
+				const QString f1 = 
 					dir1 +
 					QString("/") +
-					fi.fileName());
+					fi.fileName();
 				QFile::copy(f, f1);
 				qApp->processEvents();
 			}
@@ -622,7 +622,7 @@ void BrowserWidget2::open_DICOMDIR()
 		));
 	if (f.isEmpty()) return;
 	directory_lineEdit->setText(QDir::toNativeSeparators(f));
-	const QString warning = read_DICOMDIR(QDir::toNativeSeparators(f));
+	const QString warning = read_DICOMDIR(f);
 	if (!warning.isEmpty())
 	{
 		QMessageBox mbox;
@@ -967,7 +967,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 		bool break__ = false;
 		for (int z = 0; z < series.at(x).files.size(); z++)
 		{
-			QFileInfo fi(QDir::toNativeSeparators(dir_ + QString("/") + series.at(x).files.at(z)));
+			QFileInfo fi(dir_ + QString("/") + series.at(x).files.at(z));
 			if (!fi.isFile())
 			{
 				if (!warning.isEmpty()) warning.append("\n");
@@ -985,7 +985,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 		QString ids(""); ids.sprintf("%010d", idx);
 		TableWidgetItem * i = new TableWidgetItem(ids);
 		for (int z = 0; z < series.at(x).files.size(); z++)
-			i->files.push_back(QDir::toNativeSeparators(dir_ + QString("/") + series.at(x).files.at(z)));
+			i->files.push_back(dir_ + QString("/") + series.at(x).files.at(z));
 		tableWidget->setRowCount(idx+1);
 		tableWidget->setItem(idx,0,static_cast<QTableWidgetItem*>(i));
 		if (series.at(x).eye)
@@ -1399,7 +1399,7 @@ void BrowserWidget2::writeSettings(QSettings & settings)
 	settings.beginGroup(QString("BrowserWidget2"));
 	settings.setValue(
 		QString("saved_user_dir"),
-		QVariant(QDir::toNativeSeparators(directory_lineEdit->text())));
+		QVariant(directory_lineEdit->text()));
 	settings.setValue(QString("ctk_dir"),   ctk_dir);
 	settings.setValue(QString("ctk_pname"), ctk_pname);
 	settings.setValue(QString("ctk_pid"),   ctk_pid);
@@ -1422,19 +1422,20 @@ void BrowserWidget2::readSettings()
 		QApplication::applicationName());
 	settings.setFallbacksEnabled(true);
 #if (defined _WIN32)
-	const QString d = QDir::toNativeSeparators(
+	const QString d = 
 		QString(".") +
 		QString("/") +
-		QString("DICOM"));
+		QString("DICOM");
 #else
-	const QString d = QDir::toNativeSeparators(
+	const QString d = 
 		QApplication::applicationDirPath() +
 		QString("/") + QString("..") +
 		QString("/") +
-		QString("DICOM"));
+		QString("DICOM");
 #endif
 	settings.beginGroup(QString("BrowserWidget2"));
-	directory_lineEdit->setText(settings.value(QString("saved_user_dir"), d).toString());
+	directory_lineEdit->setText(
+		settings.value(QString("saved_user_dir"), QDir::toNativeSeparators(d)).toString());
 	ctk_dir   = settings.value(QString("ctk_dir"),   QString("")).toString();
 	ctk_pname = settings.value(QString("ctk_pname"), QString("")).toString();
 	ctk_pid   = settings.value(QString("ctk_pid"),   QString("")).toString();
@@ -1447,29 +1448,31 @@ void BrowserWidget2::readSettings()
 	else ctk_apply_range = false;
 #else
 	{
-		const QString f1_ = QDir::toNativeSeparators(
+		const QString f1_ =
 			QApplication::applicationDirPath() +
 #ifndef _WIN32
 			QString("/") + QString("..") +
 #endif
-			QString("/") + QString("DICOMDIR"));
+			QString("/") + QString("DICOMDIR");
 		QFileInfo fi1 = QFileInfo(f1_);
 		if (fi1.exists() && fi1.isFile())
 		{
-			directory_lineEdit->setText(QDir::toNativeSeparators(fi1.absoluteFilePath()));
+			directory_lineEdit->setText(
+				QDir::toNativeSeparators(fi1.absoluteFilePath()));
 		}
 		else
 		{
-			const QString f2_ = QDir::toNativeSeparators(
+			const QString f2_ =
 				QApplication::applicationDirPath() +
 #ifndef _WIN32
 				QString("/") + QString("..") +
 #endif
-				QString("/") + QString("DICOM"));
+				QString("/") + QString("DICOM");
 				QFileInfo fi2 = QFileInfo(f2_);
 			if (fi2.exists() && fi2.isDir())
 			{
-				directory_lineEdit->setText(QDir::toNativeSeparators(fi2.absoluteFilePath()));
+				directory_lineEdit->setText(
+					QDir::toNativeSeparators(fi2.absoluteFilePath()));
 			}
 			else
 			{
@@ -1533,10 +1536,10 @@ void BrowserWidget2::open_CTK_db()
 	delete d;
 	if (!ok) return;
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-	dbfile = QDir::toNativeSeparators(
+	dbfile =
 		ctk_dir +
 		QString("/") +
-		QString("ctkDICOM.sql"));
+		QString("ctkDICOM.sql");
 	if (QSqlDatabase::contains(QString("CTKdb")))
 		db = QSqlDatabase::database("CTKdb");
 	else
@@ -1691,8 +1694,7 @@ void BrowserWidget2::open_CTK_db()
 			while (m.next())
 			{
 				series0.files.push_back(
-					QDir::toNativeSeparators(
-						m.value(0).toString().trimmed()));
+						m.value(0).toString().trimmed());
 			}
 			m.clear();
 		}

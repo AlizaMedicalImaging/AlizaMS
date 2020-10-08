@@ -80,8 +80,8 @@ static void get_series_files(
 			dir.entryList(QDir::Files|QDir::Readable, QDir::Name);
 		for (int x = 0; x < l.size(); x++)
 		{
-			const QString tmp0 = QDir::toNativeSeparators(
-				dir.absolutePath() + QString("/") + l.at(x));
+			const QString tmp0 =
+				dir.absolutePath() + QString("/") + l.at(x);
 			files.push_back(std::string(FilePath::getPath(tmp0)));
 		}
 	}
@@ -802,8 +802,7 @@ void SQtree::read_file(const QString & f)
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	clear_tree();
 	QFileInfo fi(f);
-	saved_dir =
-		QDir::toNativeSeparators(fi.absoluteDir().absolutePath());
+	saved_dir = fi.absoluteDir().absolutePath();
 	lineEdit->setText(QDir::toNativeSeparators(f));
 	QStringList l;
 	l << QString("") << QString("") <<
@@ -1054,7 +1053,7 @@ void SQtree::dropEvent(QDropEvent * e)
 			horizontalSlider->setValue(0);
 			horizontalSlider->hide();
 			horizontalSlider->blockSignals(false);
-			read_file(QDir::toNativeSeparators(l.at(0)));
+			read_file(l.at(0));
 		}
 	}
 	else
@@ -1119,7 +1118,7 @@ void SQtree::open_file()
 		horizontalSlider->setValue(0);
 		horizontalSlider->hide();
 		horizontalSlider->blockSignals(false);
-		read_file(QDir::toNativeSeparators(f));
+		read_file(f);
 	}
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
 	mutex.unlock();
@@ -1176,7 +1175,7 @@ void SQtree::open_file_and_series()
 #endif
 		return;
 	}
-	f = QDir::toNativeSeparators(fi.absoluteFilePath());
+	f = fi.absoluteFilePath();
 	QString series_uid;
 	QStringList files;
 	bool series_uid_ok = false;
@@ -1207,7 +1206,7 @@ void SQtree::open_file_and_series()
 		for (int x = 0; x < files_size; x++)
 		{
 			QFileInfo fi0(files.at(x));
-			if (QDir::toNativeSeparators(fi0.absoluteFilePath()) == f)
+			if (fi0.absoluteFilePath() == f)
 			{
 				idx = x;
 				break;
@@ -1232,7 +1231,7 @@ void SQtree::open_file_and_series()
 		horizontalSlider->hide();
 	}
 	horizontalSlider->blockSignals(false);
-	read_file(QDir::toNativeSeparators(f));
+	read_file(f);
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
 	mutex.unlock();
 #endif

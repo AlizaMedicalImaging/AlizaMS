@@ -515,22 +515,17 @@ void MainWindow::open_args(const QStringList & l)
 	pb->setValue(-1);
 	if (l2.size()==1)
 	{
-		const QString f =
-			QDir::toNativeSeparators(l2.at(0));
+		const QString f = l2.at(0);
 		QFileInfo fi(f);
 		if (
 			fi.isFile() &&
 			fi.fileName().toUpper() == QString("DICOMDIR"))
 		{
-			browser2->open_DICOMDIR2(
-				QDir::toNativeSeparators(
-					fi.absoluteFilePath()));
+			browser2->open_DICOMDIR2(fi.absoluteFilePath());
 		}
 		else if (fi.isDir())
 		{
-			browser2->open_dicom_dir2(
-				QDir::toNativeSeparators(
-					fi.absoluteFilePath()));
+			browser2->open_dicom_dir2(fi.absoluteFilePath());
 		}
 		else if (fi.isFile())
 		{
@@ -542,7 +537,7 @@ void MainWindow::open_args(const QStringList & l)
 		for (int x = 0; x < l2.size(); x++)
 		{
 			pb->setValue(-1);
-			const QString f = QDir::toNativeSeparators(l2.at(x));
+			const QString f = l2.at(x);
 			QFileInfo fi(f);
 			if (fi.isFile()) load_any_file(l2.at(x), pb, true);
 		}
@@ -1205,7 +1200,7 @@ void MainWindow::dropEvent(QDropEvent * e)
 	}
 	if (l.size() > 0)
 	{
-		const QString f = QDir::toNativeSeparators(l.at(0));
+		const QString f = l.at(0);
 		QFileInfo fi(f);
 		if (fi.isDir())
 		{
@@ -1239,13 +1234,11 @@ void MainWindow::dropEvent(QDropEvent * e)
 			{
 				if (i == 0 && fi.isFile())
 				{
-					load_any_file(
-						QDir::toNativeSeparators(f), pb, true);
+					load_any_file(f, pb, true);
 				}
 				else
 				{
-					const QString f1 =
-						QDir::toNativeSeparators(l.at(i));
+					const QString f1 = l.at(i);
 					QFileInfo fi1(f1);
 					if (fi1.isFile()) load_any_file(f1, pb, true);
 				}
@@ -1307,7 +1300,7 @@ void MainWindow::load_any()
 		}
 		else
 		{
-			load_any_file(QDir::toNativeSeparators(l.at(x)),pb,true);
+			load_any_file(l.at(x),pb,true);
 		}
 	}
 	l.clear();

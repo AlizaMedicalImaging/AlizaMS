@@ -906,8 +906,7 @@ static void process_elscint_dir(
 			pb->setValue(-1);
 		}
 		const QString tmp0 =
-			QDir::toNativeSeparators(
-				dir.absolutePath() + QString("/") + flist.at(x));
+			dir.absolutePath() + QString("/") + flist.at(x);
 		if (DicomUtils::is_dicom_file(tmp0)) filenames.push_back(tmp0);
 	}
 	flist.clear();
@@ -921,9 +920,7 @@ static void process_elscint_dir(
 			pb->setValue(-1);
 		}
 		QFileInfo fi(filenames.at(x));
-		const QString tmp9 =
-			QDir::toNativeSeparators(
-				outp + QString("/") + fi.fileName());
+		const QString tmp9 = outp + QString("/") + fi.fileName();
 		if (DicomUtils::convert_elscint(filenames.at(x), tmp9))
 		{
 			count_elscint++;

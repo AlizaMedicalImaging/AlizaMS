@@ -4028,7 +4028,7 @@ void CommonUtils::read_geometry_from_image_(ImageVariant * v)
 
 QString CommonUtils::get_screenshot_dir()
 {
-	return QDir::toNativeSeparators(screenshot_dir);
+	return screenshot_dir;
 }
 
 void CommonUtils::set_screenshot_dir(const QString & s)
@@ -4036,16 +4036,14 @@ void CommonUtils::set_screenshot_dir(const QString & s)
 	if (s.isEmpty())
 #ifdef _WIN32
 		screenshot_dir =
-			QDir::toNativeSeparators(
-				QDir::homePath() +
-				QString("/") +
-				QString("Desktop"));
+			QDir::homePath() +
+			QString("/") +
+			QString("Desktop");
 #else
-		screenshot_dir =
-			QDir::toNativeSeparators(QDir::homePath());
+		screenshot_dir = QDir::homePath();
 #endif
 	else
-		screenshot_dir = QDir::toNativeSeparators(s);
+		screenshot_dir = s;
 
 }
 
@@ -4057,12 +4055,10 @@ QString CommonUtils::get_screenshot_name(const QString & s)
 				QString("yyyyMMdd-hhmmss")) +
 			QString(".png")
 		:
-			QDir::toNativeSeparators(
-				s +
-				QString("/") +
-				QDateTime::currentDateTime().toString(
-					QString("yyyyMMdd-hhmmss")) +
-				QString(".png"));
+			s + QString("/") +
+			QDateTime::currentDateTime().toString(
+				QString("yyyyMMdd-hhmmss")) +
+				QString(".png");
 	return d;
 }
 
@@ -4075,7 +4071,7 @@ QString CommonUtils::get_screenshot_name2()
 
 QString CommonUtils::get_save_dir()
 {
-	return QDir::toNativeSeparators(save_dir);
+	return save_dir;
 }
 
 void CommonUtils::set_save_dir(const QString & s)
@@ -4083,16 +4079,15 @@ void CommonUtils::set_save_dir(const QString & s)
 	if (s.isEmpty())
 #ifdef _WIN32
 		save_dir =
-			QDir::toNativeSeparators(
-				QDir::homePath() +
-				QString("/") +
-				QString("Desktop"));
+			QDir::homePath() +
+			QString("/") +
+			QString("Desktop");
 #else
 		save_dir =
-			QDir::toNativeSeparators(QDir::homePath());
+			QDir::homePath();
 #endif
 	else
-		save_dir = QDir::toNativeSeparators(s);
+		save_dir = s;
 
 }
 
@@ -4104,12 +4099,12 @@ QString CommonUtils::get_save_name()
 
 QString CommonUtils::get_open_dir()
 {
-	return QDir::toNativeSeparators(open_dir);
+	return open_dir;
 }
 
 void CommonUtils::set_open_dir(const QString & s)
 {
-	open_dir = QDir::toNativeSeparators(s);
+	open_dir = s;
 }
 
 QString CommonUtils::apply_per_slice_rescale(
