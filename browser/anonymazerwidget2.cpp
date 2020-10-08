@@ -612,21 +612,21 @@ AnonymazerWidget2::AnonymazerWidget2(float si, QWidget * p, Qt::WindowFlags f) :
 	input_dir = QString("");
 #else
 #if (defined _WIN32)
-	input_dir = QDir::toNativeSeparators(
+	input_dir = 
 		QString(".") +
 		QDir::separator() +
-		QString("DICOM"));
+		QString("DICOM");
 #else
-	input_dir = QDir::toNativeSeparators(
+	input_dir = 
 		QApplication::applicationDirPath() +
 		QDir::separator() + QString("..") +
 		QDir::separator() +
-		QString("DICOM"));
+		QString("DICOM");
 #endif
 	QFileInfo fi(input_dir);
 	if (fi.exists()) input_dir = fi.absoluteFilePath();
 	else             input_dir = QString("");
-	in_lineEdit->setText(input_dir);
+	in_lineEdit->setText(QDir::toNativeSeparators(input_dir));
 #endif
 	connect(out_pushButton,SIGNAL(clicked()),this,SLOT(set_output_dir()));
 	connect(in_pushButton,SIGNAL(clicked()),this,SLOT(set_input_dir()));
@@ -684,8 +684,7 @@ void AnonymazerWidget2::writeSettings(QSettings & settings)
 	const int tmp10 = (chars_radioButton->isChecked())       ? 1 : 0;
 	const int tmp11 = (institution_radioButton->isChecked()) ? 1 : 0;
 	settings.beginGroup(QString("AnonymazerWidget"));
-	settings.setValue(QString("output_dir"),  QVariant(
-		QDir::toNativeSeparators(output_dir)));
+	settings.setValue(QString("output_dir"),           QVariant(output_dir));
 	settings.setValue(QString("remove_private"),       QVariant(tmp1));
 	settings.setValue(QString("remove_overlays"),      QVariant(tmp5));
 	settings.setValue(QString("preserve_uids"),        QVariant(tmp7));
@@ -711,8 +710,8 @@ void AnonymazerWidget2::dropEvent(QDropEvent * e)
 	QFileInfo fi(l.at(0));
 	if (fi.isDir())
 	{
-		input_dir = QDir::toNativeSeparators(fi.absoluteFilePath());
-		in_lineEdit->setText(input_dir);
+		input_dir = fi.absoluteFilePath();
+		in_lineEdit->setText(QDir::toNativeSeparators(input_dir));
 	}
 }
 
@@ -881,17 +880,14 @@ void AnonymazerWidget2::process_directory(
 	const bool retain_institution_id = institution_radioButton->isChecked();
 	QDir dir(p);
 	QStringList dlist = dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
-	QStringList flist =
-		dir.entryList(QDir::Files|QDir::Readable,QDir::Name);
+	QStringList flist = dir.entryList(QDir::Files|QDir::Readable,QDir::Name);
 	QStringList filenames;
 	for (int x = 0; x < flist.size(); x++)
 	{
 		pd->setValue(-1);
 		QApplication::processEvents();
 		if (pd->wasCanceled()) return;
-		const QString tmp0 =
-			QDir::toNativeSeparators(
-				dir.absolutePath() + QDir::separator() + flist.at(x));
+		const QString tmp0 = dir.absolutePath() + QDir::separator() + flist.at(x);
 		filenames.push_back(tmp0);
 	}
 	flist.clear();
@@ -910,10 +906,10 @@ void AnonymazerWidget2::process_directory(
 		QFileInfo fi(filenames.at(i));
 		const QString out_filename = fi.fileName();
 #endif
-		const QString out_file = QDir::toNativeSeparators(
+		const QString out_file = 
 			outp +
 			QDir::separator() +
-			out_filename);
+			out_filename;
 		bool ok_ = false;
 		bool overlay_in_data = false;
 		anonymize_file__(
@@ -952,7 +948,7 @@ void AnonymazerWidget2::process_directory(
 	{
 		QApplication::processEvents();
 		QDir d(outp + QDir::separator() + dlist.at(j));
-		if (!d.exists()) d.mkpath(".");
+		if (!d.exists()) d.mkpath(d.absolutePath());
 		process_directory(
 			dir.absolutePath() + QDir::separator() + dlist.at(j),
 			d.absolutePath(),
@@ -986,8 +982,7 @@ void AnonymazerWidget2::run_()
 	{
 		return;
 	}
-	if (QDir::toNativeSeparators(out_path) ==
-		QDir::toNativeSeparators(in_path))
+	if (out_path == in_path)
 	{
 		QMessageBox mb;
 		mb.setWindowModality(Qt::ApplicationModal);
@@ -1075,8 +1070,8 @@ void AnonymazerWidget2::set_output_dir()
 		dir_lineEdit->setText(QString("Select output directory"));
 		return;
 	}
-	output_dir = QDir::toNativeSeparators(dirname);
-	dir_lineEdit->setText(output_dir);
+	output_dir = dirname;
+	dir_lineEdit->setText(QDir::toNativeSeparators(output_dir));
 	run_pushButton->setEnabled(true);
 }
 
@@ -1094,8 +1089,8 @@ void AnonymazerWidget2::set_input_dir()
 		in_lineEdit->setText(QString("Select input directory"));
 		return;
 	}
-	input_dir = QDir::toNativeSeparators(dirname);
-	in_lineEdit->setText(input_dir);
+	input_dir = dirname;
+	in_lineEdit->setText(QDir::toNativeSeparators(input_dir));
 }
 
 void AnonymazerWidget2::init_profile()
