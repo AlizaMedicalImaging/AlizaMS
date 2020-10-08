@@ -50,11 +50,11 @@ void AboutWidget::set_opengl_info(const QString & s)
 void AboutWidget::set_info()
 {
 	info_label->setText(
-#if 0
+#if 1
 		get_build_info() +
-		QString("\n\n") +
+		QString("\n") +
 #else
-		QString("OpenGL:\n") +
+		QString("OpenGL\n") +
 #endif
 		opengl_info);
 }
@@ -65,6 +65,7 @@ QString AboutWidget::get_build_info()
 #if 0
 	s.append(QVariant(__DATE__).toString());
 	s.append(QString(" "));
+#endif
 #if (defined _MSC_VER)
 	s.append(QString("Visual Studio C++ "));
 	s.append(QVariant(_MSC_VER).toString());
@@ -74,11 +75,12 @@ QString AboutWidget::get_build_info()
 #endif
 #ifdef _WIN32
 #ifdef _WIN64
-	s.append(QString(" 64 Bit"));
+	s.append(QString(" x86_64"));
 #else
-	s.append(QString(" 32 Bit"));
+	s.append(QString(" x86_32"));
 #endif
-#endif
+#else
+	s.append(QString(" x86_64"));
 #endif
 #if 0
 	s.append(QString("\nMDCM ") +
