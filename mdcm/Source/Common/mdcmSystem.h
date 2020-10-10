@@ -27,19 +27,12 @@
 namespace mdcm
 {
 
-/**
- * Class to do system operation
- * OS independent functionalities
- */
 class MDCM_EXPORT System
 {
 public:
-  static bool MakeDirectory(const char *path);
   static bool FileExists(const char* filename);
   static bool FileIsDirectory(const char* name);
   static bool FileIsSymlink(const char* name);
-  static bool RemoveFile(const char* source);
-  static bool DeleteDirectory(const char *source);
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
   static std::wstring ConvertToUNC(const char *utf8path);
 #endif
@@ -52,9 +45,6 @@ public:
   // 0 if the file does not exist
   static time_t FileTime(const char* filename);
   static const char *GetCurrentProcessFileName(); // not thread safe
-  static const char *GetCurrentModuleFileName();  // not thread safe
-  static const char *GetCurrentResourcesDirectory();   // not thread safe
-  static bool GetHostName(char hostname[255]); // first 255 byte
   // In the following the size '22' is explicitly listed. You need to pass in
   // at least 22bytes of array. If the string is an output it will be
   // automatically padded ( array[21] == 0 ) for you.
@@ -83,10 +73,6 @@ public:
   // consistent func for C99 spec of strcasecmp/strncasecmp
   static int StrCaseCmp(const char *s1, const char *s2);
   static int StrNCaseCmp(const char *s1, const char *s2, size_t n); // n != 0
-  // Return current working directory
-  // Warning: if current working path is too long (>2048 bytes) the call will fail
-  // and call will return NULL
-  static const char * GetCWD(); // not thread safe
   // strtok_r
   static char *StrTokR(char *ptr, const char *sep, char **end);
   // strsep
@@ -94,11 +80,6 @@ public:
   // make a copy, in case you want to free the memory pointed at
   static char *StrSep(char **stringp, const char *delim);
 
-protected:
-  static bool GetPermissions(const char* file, unsigned short& mode);
-  static bool SetPermissions(const char* file, unsigned short mode);
-
-private:
 };
 
 } // end namespace mdcm

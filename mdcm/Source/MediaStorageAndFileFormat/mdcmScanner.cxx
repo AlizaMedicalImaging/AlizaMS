@@ -93,7 +93,7 @@ void Scanner::AddTag(Tag const & t)
   }
 }
 
-bool Scanner::Scan(Directory::FilenamesType const & filenames)
+bool Scanner::Scan(std::vector<std::string> const & filenames)
 {
   this->InvokeEvent(StartEvent());
   if(!Tags.empty() || !PrivateTags.empty())
@@ -117,8 +117,8 @@ bool Scanner::Scan(Directory::FilenamesType const & filenames)
     }
 
     StringFilter sf;
-    Directory::FilenamesType::const_iterator it = Filenames.begin();
-    const double progresstick = 1. / (double)Filenames.size();
+    std::vector<std::string>::const_iterator it = Filenames.begin();
+    const double progresstick = 1.0 / (double)Filenames.size();
     Progress = 0;
     for(; it != Filenames.end(); ++it)
     {
@@ -161,7 +161,7 @@ void Scanner::Print(std::ostream & os) const
     os << *it << "\n";
   }
   os << "Mapping:\n";
-  Directory::FilenamesType::const_iterator file = Filenames.begin();
+  std::vector<std::string>::const_iterator file = Filenames.begin();
   for(; file != Filenames.end(); ++file)
   {
     const char *filename = file->c_str();
@@ -198,11 +198,11 @@ bool Scanner::IsKey(const char * filename) const
   return it2 != Mappings.end();
 }
 
-Directory::FilenamesType Scanner::GetKeys() const
+std::vector<std::string> Scanner::GetKeys() const
 {
-  Directory::FilenamesType keys;
+  std::vector<std::string> keys;
 
-  Directory::FilenamesType::const_iterator file = Filenames.begin();
+  std::vector<std::string>::const_iterator file = Filenames.begin();
   for(; file != Filenames.end(); ++file)
   {
     const char *filename = file->c_str();
@@ -231,7 +231,7 @@ const char *Scanner::GetFilenameFromTagToValue(Tag const & t, const char * value
   const char *filenameref = 0;
   if(valueref)
   {
-    Directory::FilenamesType::const_iterator file = Filenames.begin();
+    std::vector<std::string>::const_iterator file = Filenames.begin();
     size_t len = strlen(valueref);
     if(len && valueref[len - 1] == ' ')
     {
@@ -250,14 +250,14 @@ const char *Scanner::GetFilenameFromTagToValue(Tag const & t, const char * value
   return filenameref;
 }
 
-Directory::FilenamesType
+std::vector<std::string>
 Scanner::GetAllFilenamesFromTagToValue(Tag const &t, const char *valueref) const
 {
-  Directory::FilenamesType theReturn;
+  std::vector<std::string> theReturn;
   if(valueref)
   {
     const std::string valueref_str = String<>::Trim(valueref);
-    Directory::FilenamesType::const_iterator file = Filenames.begin();
+    std::vector<std::string>::const_iterator file = Filenames.begin();
     for(; file != Filenames.end(); ++file)
     {
       const char *filename = file->c_str();
@@ -280,7 +280,7 @@ Scanner::TagToValue const & Scanner::GetMappingFromTagToValue(Tag const & t, con
 Scanner::ValuesType Scanner::GetValues(Tag const &t) const
 {
   ValuesType vt;
-  Directory::FilenamesType::const_iterator file = Filenames.begin();
+  std::vector<std::string>::const_iterator file = Filenames.begin();
   for(; file != Filenames.end(); ++file)
   {
     const char *filename = file->c_str();
@@ -293,10 +293,10 @@ Scanner::ValuesType Scanner::GetValues(Tag const &t) const
   return vt;
 }
 
-Directory::FilenamesType Scanner::GetOrderedValues(Tag const & t) const
+std::vector<std::string> Scanner::GetOrderedValues(Tag const & t) const
 {
-  Directory::FilenamesType theReturn;
-  Directory::FilenamesType::const_iterator file = Filenames.begin();
+  std::vector<std::string> theReturn;
+  std::vector<std::string>::const_iterator file = Filenames.begin();
   for(; file != Filenames.end(); ++file)
   {
     const char * filename = file->c_str();

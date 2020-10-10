@@ -23,9 +23,7 @@
 #include "mdcmElement.h"
 #include "mdcmFile.h"
 #include "mdcmReader.h"
-#include <map>
 #include <algorithm>
-#include <set>
 
 namespace mdcm
 {
@@ -51,7 +49,9 @@ void Sorter::SetSortFunction(SortFunction f)
 }
 
 
-namespace {
+namespace
+{
+
 class SortFunctor
 {
 public:
@@ -73,11 +73,12 @@ public:
     SortFunc = sf;
   }
 };
+
 }
 
 bool Sorter::StableSort(std::vector<std::string> const & filenames)
 {
-  // BUG: I cannot clear Filenames since input filenames could also be the output of ourself
+  // Can not clear Filenames since input filenames could also be the output
   if(filenames.empty() || !SortFunc)
   {
     Filenames.clear();
@@ -88,7 +89,7 @@ bool Sorter::StableSort(std::vector<std::string> const & filenames)
   filelist.resize(filenames.size());
 
   std::vector< SmartPointer<FileWithName> >::iterator it2 = filelist.begin();
-  for(Directory::FilenamesType::const_iterator it = filenames.begin();
+  for(std::vector<std::string>::const_iterator it = filenames.begin();
     it != filenames.end() && it2 != filelist.end(); ++it, ++it2)
   {
     Reader reader;
@@ -103,7 +104,7 @@ bool Sorter::StableSort(std::vector<std::string> const & filenames)
     }
     else
     {
-      mdcmErrorMacro("File could not be read: " << it->c_str());
+      mdcmErrorMacro("Could not read: " << it->c_str());
       return false;
     }
   }
@@ -123,7 +124,6 @@ bool Sorter::StableSort(std::vector<std::string> const & filenames)
 
 bool Sorter::Sort(std::vector<std::string> const & filenames)
 {
-  (void)filenames;
   Filenames.clear();
 
   if(filenames.empty() || !SortFunc) return true;
@@ -132,7 +132,7 @@ bool Sorter::Sort(std::vector<std::string> const & filenames)
   filelist.resize(filenames.size());
 
   std::vector< SmartPointer<FileWithName> >::iterator it2 = filelist.begin();
-  for(Directory::FilenamesType::const_iterator it = filenames.begin();
+  for(std::vector<std::string>::const_iterator it = filenames.begin();
     it != filenames.end() && it2 != filelist.end(); ++it, ++it2)
   {
     Reader reader;

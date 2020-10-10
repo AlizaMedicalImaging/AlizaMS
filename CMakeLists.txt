@@ -313,11 +313,9 @@ set(MDCM_COMMON_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmMD5.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmBase64.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmSHA1.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmDummyValueGenerator.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmCryptoFactory.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmASN1.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmSubject.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmDirectory.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmFilename.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmFilenameGenerator.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmSwapCode.cxx
@@ -444,7 +442,6 @@ set(MDCM_MSFF_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPhotometricInterpretation.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPixelFormat.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSegmentedPaletteColorLookupTable.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmDirectoryHelper.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSegment.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSurface.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmMeshPrimitive.cxx
@@ -455,7 +452,6 @@ set(MDCM_MSFF_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSurfaceHelper.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSegmentHelper.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG2000Codec.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSerieHelper.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmrle/rle.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmrle/info.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmrle/io.cxx)

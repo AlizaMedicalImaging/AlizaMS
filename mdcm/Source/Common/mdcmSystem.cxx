@@ -23,7 +23,6 @@
 #include "mdcmSystem.h"
 #include "mdcmTrace.h"
 #include "mdcmFilename.h"
-#include "mdcmDirectory.h"
 #include "mdcmException.h"
 #include <iostream>
 #include <string>
@@ -59,110 +58,12 @@
 #include <dlfcn.h>
 #include <sys/types.h>
 #include <fcntl.h>
-#include <unistd.h> // gethostname
-#include <strings.h> // strncasecmp
+#include <unistd.h>
+#include <strings.h>
 #endif
 
 namespace mdcm
 {
-
-#if defined(_WIN32) && (defined(_MSC_VER) || defined(__WATCOMC__) || defined(__BORLANDC__) || defined(__MINGW32__))
-static int Mkdir(const char * dir)
-{
-  return _mkdir(dir);
-}
-
-static int Rmdir(const char * dir)
-{
-  return _rmdir(dir);
-}
-
-static const char* Getcwd(char * buf, unsigned int len)
-{
-  const char * ret = _getcwd(buf, len);
-  return ret;
-}
-
-#else
-static int Mkdir(const char * dir)
-{
-  return mkdir(dir, 00777);
-}
-
-static int Rmdir(const char * dir)
-{
-  return rmdir(dir);
-}
-
-static const char * Getcwd(char * buf, unsigned int len)
-{
-  const char * ret = getcwd(buf, len);
-  return ret;
-}
-#endif
-
-const char * System::GetCWD()
-{
-  static char buf[2048];
-  const char* cwd = Getcwd(buf, 2048);
-  return cwd;
-}
-
-static int Mkdir2(const char * p)
-{
-#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-  const std::wstring unc = System::ConvertToUNC(p);
-  return _wmkdir(unc.c_str());
-#else
-  return Mkdir(p);
-#endif
-}
-
-bool System::MakeDirectory(const char * path)
-{
-  if(!path || !*path)return false;
-  if(System::FileExists(path)) return true;
-  Filename fn(path);
-  std::string dir = fn.ToUnixSlashes();
-  std::string::size_type pos = dir.find(':');
-  if(pos == std::string::npos)
-  {
-    pos = 0;
-  }
-  std::string topdir;
-  bool ok = true;
-  while(ok && (pos = dir.find('/', pos)) != std::string::npos)
-  {
-    topdir = dir.substr(0, pos+1);
-    ok = ok && (System::FileIsDirectory(topdir.c_str()) || 0 == Mkdir2(topdir.c_str()));
-    pos++;
-  }
-  if(!ok) return false;
-  if(dir[dir.size()-1] == '/')
-  {
-    topdir = dir.substr(0, dir.size());
-  }
-  else
-  {
-    topdir = dir;
-  }
-  if(Mkdir2(topdir.c_str()) != 0)
-  {
-    // There is a bug in the Borland Run time library which makes MKDIR
-    // return EACCES when it should return EEXISTS
-    // if it is some other error besides directory exists
-    // then return false
-    if((errno != EEXIST)
-#ifdef __BORLANDC__
-       && (errno != EACCES)
-#endif
-    )
-    {
-      return false;
-    }
-  }
-  return true;
-}
 
 bool System::FileExists(const char * filename)
 {
@@ -253,97 +154,6 @@ const char * System::GetLastSystemError()
   return strerror(e);
 }
 
-bool System::GetPermissions(const char * file, unsigned short & mode)
-{
-  if(!file)
-  {
-    return false;
-  }
-  struct stat st;
-  if(stat(file, &st) < 0)
-  {
-    return false;
-  }
-  mode = (short)st.st_mode;
-  return true;
-}
-
-bool System::SetPermissions(const char * file, unsigned short mode)
-{
-  if(!file)
-  {
-    return false;
-  }
-  if(!System::FileExists(file))
-  {
-    return false;
-  }
-  if(chmod(file, mode) < 0)
-  {
-    return false;
-  }
-  return true;
-}
-
-bool System::RemoveFile(const char * source)
-{
-#ifdef _WIN32
-  unsigned short mode;
-  if(!System::GetPermissions(source, mode))
-  {
-    return false;
-  }
-  System::SetPermissions(source, S_IWRITE);
-#endif
-  bool res = unlink(source) != 0 ? false : true;
-#ifdef _WIN32
-  if (!res)
-  {
-    System::SetPermissions(source, mode);
-  }
-#endif
-  return res;
-}
-
-bool System::DeleteDirectory(const char * source)
-{
-  unsigned short mode;
-  if(System::GetPermissions(source, mode))
-  {
-#if defined(_WIN32) && !defined(__CYGWIN__)
-    mode |= S_IWRITE;
-#else
-    mode |= S_IWUSR;
-#endif
-    System::SetPermissions(source, mode);
-  }
-  Directory dir;
-  unsigned int numfiles = dir.Load(source, false);
-  (void)numfiles;
-  Directory::FilenamesType const & files = dir.GetFilenames();
-  for (Directory::FilenamesType::const_iterator it = files.begin();
-    it != files.end(); ++it)
-  {
-    const char *filename = it->c_str();
-    if(System::FileIsDirectory(filename) &&
-      !System::FileIsSymlink(filename))
-    {
-      if (!System::DeleteDirectory(filename))
-      {
-        return false;
-      }
-    }
-    else
-    {
-      if(!System::RemoveFile(filename))
-      {
-        return false;
-      }
-    }
-  }
-  return Rmdir(source) == 0;
-}
-
 #ifndef PATH_MAX
 #define PATH_MAX 4096
 #endif
@@ -352,7 +162,7 @@ bool System::DeleteDirectory(const char * source)
 namespace
 {
 
-static std::wstring utf8_decode(std::string const &str)
+static std::wstring utf8_decode(const std::string & str)
 {
   if(str.empty()) return std::wstring();
   const int len = MultiByteToWideChar(CP_UTF8, 0, &str[0], -1, NULL, 0);
@@ -361,11 +171,20 @@ static std::wstring utf8_decode(std::string const &str)
   return ret;
 }
 
+static std::string utf8_encode(const std::wstring & wstr)
+{
+  if(wstr.empty()) return std::string();
+  const int len = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], -1, NULL, 0, NULL, NULL);
+  std::string ret(len, 0);
+  WideCharToMultiByte(CP_UTF8, 0, &wstr[0], -1, &ret[0], len, NULL, NULL);
+  return ret;
+}
+
 // http://arsenmk.blogspot.com/2015/12/handling-long-paths-on-windows.html
-static bool ComputeFullPath(std::wstring const &in, std::wstring &out)
+static bool ComputeFullPath(const std::wstring & in, std::wstring & out)
 {
   // consider an input fileName of type PCWSTR (const wchar_t*)
-  const wchar_t *fileName = in.c_str();
+  const wchar_t * fileName = in.c_str();
   DWORD requiredBufferLength = GetFullPathNameW(fileName, 0, nullptr, nullptr);
   if (0 == requiredBufferLength) return false;
   out.resize(requiredBufferLength);
@@ -375,7 +194,7 @@ static bool ComputeFullPath(std::wstring const &in, std::wstring &out)
   return true;
 }
 
-static std::wstring HandleMaxPath(std::wstring const &in)
+static std::wstring HandleMaxPath(const std::wstring & in)
 {
   if (in.size() >= MAX_PATH)
   {
@@ -390,14 +209,14 @@ static std::wstring HandleMaxPath(std::wstring const &in)
     else if (out[0] == '\\' && out[1] == '\\' && out[2] != '?')
     {
       // server path
-      const std::wstring prefix = LR"(\\?\UNC\)";
+      std::wstring prefix = LR"(\\?\UNC\)";
       out = prefix + (out.c_str() + 2);
     }
     else
     {
       // regular C:\ style path:
       assert(out[1] == ':');
-      const std::wstring prefix = LR"(\\?\)";
+      std::wstring prefix = LR"(\\?\)";
       out = prefix + out.c_str();
     }
     return out;
@@ -407,10 +226,10 @@ static std::wstring HandleMaxPath(std::wstring const &in)
 
 }
 
-std::wstring System::ConvertToUNC(const char *utf8path)
+std::wstring System::ConvertToUNC(const char * utf8path)
 {
-  const std::wstring uft16path = utf8_decode(utf8path);
-  const std::wstring uncpath = HandleMaxPath(uft16path);
+  std::wstring uft16path = utf8_decode(utf8path);
+  std::wstring uncpath = HandleMaxPath(uft16path);
   return uncpath;
 }
 #endif
@@ -438,8 +257,8 @@ stat structure contains following fields:
   {
     return 0;
   }
-  off_t size = fs.st_size;
-  size_t size2 = size;
+  const off_t size = fs.st_size;
+  const size_t size2 = size;
   // off_t can be larger than size_t
   if(size != (off_t)size2) return 0;
   return size2;
@@ -460,7 +279,7 @@ const char * System::GetCurrentProcessFileName()
   if (pathURL)
   {
     success = CFURLGetFileSystemRepresentation(
-      pathURL, true /*resolveAgainstBase*/, (unsigned char*) buf, PATH_MAX);
+      pathURL, true /*resolveAgainstBase*/, (unsigned char*)buf, PATH_MAX);
     CFRelease(pathURL);
   }
   if (success)
@@ -489,49 +308,6 @@ const char * System::GetCurrentProcessFileName()
   mdcmErrorMacro("Not implementated");
 #endif
   return 0;
-}
-
-#ifdef __USE_GNU
-static void where_am_i() {}
-#endif
-
-const char * System::GetCurrentModuleFileName()
-{
-#ifdef __USE_GNU
-  static char path[PATH_MAX];
-  Dl_info info;
-  if (dladdr((void*)&where_am_i, &info) == 0)
-  {
-    size_t len = strlen(info.dli_fname);
-    if(len >= PATH_MAX) return NULL;
-    strcpy(path,info.dli_fname);
-    return path;
-  }
-#elif defined(_WIN32)
-  return System::GetCurrentProcessFileName();
-#endif
-  return NULL;
-}
-
-const char * System::GetCurrentResourcesDirectory()
-{
-#ifdef MDCM_USE_COREFOUNDATION_LIBRARY
-  static char path[PATH_MAX];
-  Boolean success = false;
-  CFURLRef pathURL = CFBundleCopyResourcesDirectoryURL(CFBundleGetMainBundle());
-  if (pathURL != NULL)
-  {
-    success = CFURLGetFileSystemRepresentation(
-      pathURL, true /*resolveAgainstBase*/, (unsigned char*) path, PATH_MAX);
-    CFRelease(pathURL);
-  }
-  if (success)
-  {
-    strlcat(path, "/" MDCM_INSTALL_DATA_DIR, PATH_MAX);
-    return path;
-  }
-#endif
-  return NULL;
 }
 
 /*
@@ -575,23 +351,6 @@ size_t System::EncodeBytes(char * out, const unsigned char * data, int size)
 }
 
 #if defined(_WIN32) && !defined(MDCM_HAVE_GETTIMEOFDAY)
-
-static int gettimeofday2(struct timeval * tv, struct timezone * tz)
-{
-  FILETIME ft;
-  const uint64_t c1 = 27111902;
-  const uint64_t c2 = 3577643008UL;
-  const uint64_t OFFSET = (c1 << 32) + c2;
-  uint64_t filetime = 0;
-  GetSystemTimeAsFileTime(&ft);
-  filetime |= ft.dwHighDateTime;
-  filetime <<= 32;
-  filetime |= ft.dwLowDateTime;
-  filetime -= OFFSET;
-  tv->tv_sec = (long)(filetime / 10000000); // seconds since epoch
-  tv->tv_usec = (uint32_t)((filetime % 10000000) / 10);
-  return 0;
-}
 
 #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
 #define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
@@ -840,38 +599,6 @@ int System::StrCaseCmp(const char * s1, const char * s2)
 #endif
 }
 
-bool System::GetHostName(char name[255])
-{
-// http://msdn.microsoft.com/en-us/library/ms738527.aspx
-// WSANOTINITIALISED A successful WSAStartup call must occur before using this function.
-#ifdef _WIN32
-  WORD wVersionRequested;
-  WSADATA wsaData;
-  wVersionRequested = MAKEWORD(2,0);
-  if (WSAStartup( wVersionRequested, &wsaData) == 0 )
-  {
-    bool ret = false;
-    if(gethostname(name,255) == 0)
-    {
-      ret = true;
-    }
-    else
-    {
-      *name = 0;
-    }
-    WSACleanup();
-    return ret;
-  }
-#else
-  if(gethostname(name, 255) == 0)
-  {
-    return true;
-  }
-#endif
-  *name = 0;
-  return false;
-}
-
 char * System::StrTokR(char * str, const char * delim, char ** nextp)
 {
 #if 1
@@ -912,33 +639,6 @@ char *System::StrSep(char ** sp, const char * sep)
   return strsep(sp, sep);
 #endif
 }
-
-struct CharsetAliasType
-{
-  const char * alias;
-  const char * name;
-};
-
-#ifdef _WIN32
-static const char * CharsetAliasToName(const char * alias)
-{
-  assert(alias);
-  static CharsetAliasType aliases[] =
-  {
-    { "CP1252", "ISO-8859-1" },
-    { NULL, NULL },
-  };
-  for(CharsetAliasType *a = aliases; a->alias; a++)
-  {
-    if (strcmp(a->alias, alias) == 0)
-    {
-      return a->name;
-    }
-  }
-  mdcmWarningMacro("Could not find Charset");
-  return NULL;
-}
-#endif
 
 } // end namespace mdcm
 

@@ -42,10 +42,8 @@ class DICOMDIRGeneratorInternal
 public:
   DICOMDIRGeneratorInternal() : F(new File) {}
   SmartPointer<File> F;
-  typedef Directory::FilenamesType  FilenamesType;
-  FilenamesType fns;
-  typedef Directory::FilenameType  FilenameType;
-  FilenameType rootdir;
+  std::vector<std::string> fns;
+  std::string rootdir;
   Scanner scanner;
   std::vector<uint32_t> OffsetTable;
   std::string FileSetID;
@@ -651,12 +649,12 @@ static bool IsCompatibleWithISOIEC9660MediaFormat(const char *filename)
   return true;
 }
 
-void DICOMDIRGenerator::SetFilenames(FilenamesType const & fns)
+void DICOMDIRGenerator::SetFilenames(std::vector<std::string> const & fns)
 {
   Internals->fns = fns;
 }
 
-void DICOMDIRGenerator::SetRootDirectory(FilenameType const & root)
+void DICOMDIRGenerator::SetRootDirectory(std::string const & root)
 {
   Internals->rootdir = root;
 }
@@ -710,12 +708,12 @@ bool DICOMDIRGenerator::Generate()
   scanner.AddTag(Tag(0x2,0x10));
   // <entry group="0008" element="0008" vr="CS" vm="2-n" name="Image Type"/>
   scanner.AddTag(Tag(0x8,0x8));
-  FilenamesType const &filenames = Internals->fns;
+  std::vector<std::string> const &filenames = Internals->fns;
   Filename rootdir = Internals->rootdir.c_str();
   const char * rd = rootdir.ToWindowsSlashes();
   size_t strlen_rd = strlen(rd);
   {
-    FilenamesType::const_iterator it = filenames.begin();
+    std::vector<std::string>::const_iterator it = filenames.begin();
     for(; it != filenames.end(); ++it)
     {
       Filename fn = it->c_str();

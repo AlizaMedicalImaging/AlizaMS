@@ -138,17 +138,6 @@ const char * Filename::GetExtension()
   return 0;
 }
 
-
-bool Filename::IsIdentical(Filename const & fn) const
-{
-  std::string realpath1;
-  std::string realpath2;
-  Realpath(FileName.c_str(), realpath1);
-  Realpath(fn.GetFileName(), realpath2);
-  mdcmDebugMacro("IsIdentical: " << realpath1 << " vs " << realpath2);
-  return realpath1 == realpath2;
-}
-
 const char * Filename::Join(const char * path, const char *filename)
 {
   static std::string s; // construction of local static object is not thread-safe

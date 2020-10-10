@@ -22,7 +22,6 @@
 #ifndef MDCMSORTER_H
 #define MDCMSORTER_H
 
-#include "mdcmDirectory.h"
 #include "mdcmTag.h"
 #include "mdcmSmartPointer.h"
 #include "mdcmFile.h"
@@ -39,7 +38,7 @@ class DataSet;
 class MDCM_EXPORT FileWithName : public File
 {
 public:
-  FileWithName(File & f) : File(f),filename() {}
+  FileWithName(File & f) : File(f), filename() {}
   std::string filename;
 };
 
@@ -47,29 +46,29 @@ typedef std::vector< SmartPointer<FileWithName> > FileList;
 typedef bool (*BOOL_FUNCTION_PFILE_PFILE_POINTER)(File *, File *);
 
 /**
- * \brief Sorter
- * \details General class to do sorting using a custom function
+ * Sorter
+ * General class to do sorting using a custom function
  * You simply need to provide a function of type: Sorter::SortFunction
  *
- * \warning implementation details. For now there is no cache mechanism. Which means
+ * There is no cache mechanism. Which means
  * that everytime you call Sort, all files specified as input paramater are *read*
  *
- * \see Scanner
  */
 class MDCM_EXPORT Sorter
 {
-  friend std::ostream& operator<<(std::ostream &_os, const Sorter &s);
+  friend std::ostream& operator<<(std::ostream &, const Sorter &);
 public:
   Sorter();
   virtual ~Sorter();
-  virtual bool Sort(std::vector<std::string> const & filenames);
+  virtual bool Sort(std::vector<std::string> const &);
   const std::vector<std::string> &GetFilenames() const { return Filenames; }
-  void Print(std::ostream &os) const;
-  bool AddSelect( Tag const &tag, const char *value );
-  void SetTagsToRead( std::set<Tag> const & tags );
+  void Print(std::ostream &) const;
+  bool AddSelect(Tag const &, const char *);
+  void SetTagsToRead(std::set<Tag> const &);
   typedef bool (*SortFunction)(DataSet const &, DataSet const &);
-  void SetSortFunction( SortFunction f );
-  virtual bool StableSort(std::vector<std::string> const & filenames);
+  void SetSortFunction(SortFunction);
+  virtual bool StableSort(std::vector<std::string> const &);
+
 protected:
   std::vector<std::string> Filenames;
   typedef std::map<Tag,std::string> SelectionMap;
@@ -78,9 +77,9 @@ protected:
   std::set<Tag> TagsToRead;
 };
 
-inline std::ostream& operator<<(std::ostream &os, const Sorter &s)
+inline std::ostream& operator<<(std::ostream &os, const Sorter & s)
 {
-  s.Print( os );
+  s.Print(os);
   return os;
 }
 

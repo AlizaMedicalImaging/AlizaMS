@@ -16,7 +16,6 @@
 #include <set>
 #include "mdcmTag.h"
 #include "mdcmVL.h"
-#include "mdcmDirectory.h"
 #include "mdcmSimpleSubjectWatcher.h"
 #include "mdcmEvent.h"
 #include "mdcmDataSet.h"
