@@ -49,8 +49,7 @@ void get_bin_values(
 	const mdcm::DataElement & v,
 	std::vector<T> & result)
 {
-	if (v.IsEmpty() ||
-		v.IsUndefinedLength())
+	if (v.IsEmpty() || v.IsUndefinedLength())
 		return;
 	const mdcm::ByteValue * bv = v.GetByteValue();
 	if (!bv) return;
@@ -75,20 +74,18 @@ static void get_series_files(
 	std::vector<std::string> files;
 	{
 		QDir dir(p);
-		const QStringList l =
-			dir.entryList(QDir::Files|QDir::Readable, QDir::Name);
+		const QStringList l = dir.entryList(QDir::Files|QDir::Readable, QDir::Name);
 		for (int x = 0; x < l.size(); x++)
 		{
-			const QString tmp0 =
-				dir.absolutePath() + QString("/") + l.at(x);
+			const QString tmp2 = dir.absolutePath() + QString("/") + l.at(x);
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-			files.push_back(std::string(QDir::toNativeSeparators(f).toUtf8().constData()));
+			files.push_back(std::string(QDir::toNativeSeparators(tmp2).toUtf8().constData()));
 #else
-			files.push_back(std::string(QDir::toNativeSeparators(f).toLocal8Bit().constData()));
+			files.push_back(std::string(QDir::toNativeSeparators(tmp2).toLocal8Bit().constData()));
 #endif
 #else
-			files.push_back(std::string(f.toLocal8Bit().constData()));
+			files.push_back(std::string(tmp2.toLocal8Bit().constData()));
 #endif
 		}
 	}
@@ -97,23 +94,39 @@ static void get_series_files(
 	s.AddTag(t);
 	if(!s.Scan(files)) return;
 	mdcm::Scanner::ValuesType v = s.GetValues();
-	mdcm::Scanner::ValuesType::iterator it = v.begin();
+	mdcm::Scanner::ValuesType::iterator it = v.begin(); int x = 0;
 	while (it != v.end())
 	{
 		const QString tmp0 = QString::fromLatin1((*it).c_str());
-		if (
-			tmp0.trimmed().remove(QChar('\0')) ==
-				uid.trimmed().remove(QChar('\0')))
+		if (tmp0.trimmed().remove(QChar('\0')) == uid.trimmed().remove(QChar('\0')))
 		{
-			std::vector<std::string> f__ =
-				s.GetAllFilenamesFromTagToValue(t, (*it).c_str());
+			std::vector<std::string> f__ = s.GetAllFilenamesFromTagToValue(t, (*it).c_str());
 			for (unsigned int j = 0; j < f__.size(); j++)
 			{
+				const QString tmp1 =
+#ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-				result.push_back(QString::fromUtf8(f__.at(j).c_str()));
+					QDir::toNativeSeparators(QString::fromUtf8(f__.at(j).c_str()));
 #else
-				result.push_back(QString::fromLocal8Bit(f__.at(j).c_str()));
+					QDir::toNativeSeparators(QString::fromLocal8Bit(f__.at(j).c_str()));
 #endif
+#else
+					QString::fromLocal8Bit(f__.at(j).c_str());
+#endif
+				mdcm::Reader reader;
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+				reader.SetFileName(QDir::toNativeSeparators(tmp1).toUtf8().constData());
+#else
+				reader.SetFileName(QDir::toNativeSeparators(tmp1).toLocal8Bit().constData());
+#endif
+#else
+				reader.SetFileName(tmp1.toLocal8Bit().constData());
+#endif
+				if (reader.ReadUpToTag(t))
+				{
+					result.push_back(tmp1);
+				}
 			}
 			break;
 		}

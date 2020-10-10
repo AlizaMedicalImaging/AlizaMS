@@ -147,6 +147,9 @@ bool Sorter2::StableSort(
 		Filenames.clear();
 		return true;
 	}
+	std::set<mdcm::Tag> tags;
+	tags.insert(mdcm::Tag(0x0020,0x0032));
+	tags.insert(mdcm::Tag(0x0020,0x0037));
 	std::vector< SmartPointer<FileWithQString> > filelist;
 	filelist.resize(filenames.size());
 	std::vector< SmartPointer<FileWithQString> >::iterator it2 =
@@ -168,12 +171,15 @@ bool Sorter2::StableSort(
 		reader.SetFileName((*it).toLocal8Bit().constData());
 #endif
 		SmartPointer<FileWithQString> & f = *it2;
-		if (reader.ReadUpToTag(mdcm::Tag(0x0020,0x0037)))
+		if (reader.ReadSelectedTags(tags))
 		{
 			f = new FileWithQString(reader.GetFile());
 			f->filename = *it;
 		}
-		else { return false; }
+		else
+		{
+			return false;
+		}
 	}
 	SortFunctor2 sf;
 	sf = Sorter2::SortFunc;
@@ -1600,6 +1606,9 @@ void DicomUtils::read_sop_instance_uid(
 	const QString & f,
 	QString & sop_instance_uid)
 {
+	std::set<mdcm::Tag> tags;
+	mdcm::Tag tsopinstance(0x0008,0x0018);
+	tags.insert(tsopinstance);
 	mdcm::Reader reader;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
@@ -1610,12 +1619,12 @@ void DicomUtils::read_sop_instance_uid(
 #else
 	reader.SetFileName(f.toLocal8Bit().constData());
 #endif
-	const bool f_ok = reader.ReadUpToTag(mdcm::Tag(0x0008,0x0018));
+	const bool f_ok = reader.ReadSelectedTags(tags);
 	if (!f_ok) return;
 	const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
 	if (ds.IsEmpty()) return;
 	QString sop_instance_uid_;
-	if (get_string_value(ds,mdcm::Tag(0x0008,0x0018),sop_instance_uid_))
+	if (get_string_value(ds, tsopinstance, sop_instance_uid_))
 		sop_instance_uid = sop_instance_uid_.remove(QChar('\0'));
 }
 
@@ -1628,17 +1637,22 @@ void DicomUtils::read_image_info(
 	QString        & spacing,
 	QString        & sop_instance_uid)
 {
-	mdcm::Tag tsopinstance(0x0008,0x0018);
-	mdcm::Tag tspacing1(0x0018,0x1164); // Imager Pixel Spacing
-	mdcm::Tag tspacing2(0x0018,0x2010); // Nominal Scanned Pixel Spacing
-	mdcm::Tag tpos_old(0x0020,0x0030);
-	mdcm::Tag tpos(0x0020,0x0032);
-	mdcm::Tag torie_old(0x0020,0x0035);
-	mdcm::Tag torie(0x0020,0x0037);
-	mdcm::Tag trows(0x0028,0x0010);
-	mdcm::Tag tcolumns(0x0028,0x0011);
-	mdcm::Tag tspacing0(0x0028,0x0030); // Pixel Spacing
-	mdcm::Tag tspacing3(0x0028,0x0034); // Pixel Aspect Ratio
+	std::set<mdcm::Tag> tags;
+	mdcm::Tag tsopinstance(0x0008,0x0018); tags.insert(tsopinstance);
+	// Imager Pixel Spacing
+	mdcm::Tag tspacing1(0x0018,0x1164);    tags.insert(tspacing1);
+	// Nominal Scanned Pixel Spacing
+	mdcm::Tag tspacing2(0x0018,0x2010);    tags.insert(tspacing2);
+	mdcm::Tag tpos_old(0x0020,0x0030);     tags.insert(tpos_old);
+	mdcm::Tag tpos(0x0020,0x0032);         tags.insert(tpos);
+	mdcm::Tag torie_old(0x0020,0x0035);    tags.insert(torie_old);
+	mdcm::Tag torie(0x0020,0x0037);        tags.insert(torie);
+	mdcm::Tag trows(0x0028,0x0010);        tags.insert(trows);
+	mdcm::Tag tcolumns(0x0028,0x0011);     tags.insert(tcolumns);
+	// Pixel Spacing
+	mdcm::Tag tspacing0(0x0028,0x0030);    tags.insert(tspacing0);
+	// Pixel Aspect Ratio
+	mdcm::Tag tspacing3(0x0028,0x0034);    tags.insert(tspacing3);
 	//
 	mdcm::Reader reader;
 #ifdef _WIN32
@@ -1650,7 +1664,7 @@ void DicomUtils::read_image_info(
 #else
 	reader.SetFileName(f.toLocal8Bit().constData());
 #endif
-	const bool f_ok = reader.ReadUpToTag(tspacing3);
+	const bool f_ok = reader.ReadSelectedTags(tags);
 	if (!f_ok) return;
 	const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
 	if (ds.IsEmpty()) return;
@@ -1730,13 +1744,14 @@ void DicomUtils::read_image_info_rtdose(const QString & f,
 	QString        & spacing,
 	std::vector<double> & z_offsets)
 {
-	mdcm::Tag tframes(0x0028,0x0008);
-	mdcm::Tag trows(0x0028,0x0010);
-	mdcm::Tag tcolumns(0x0028,0x0011);
-	mdcm::Tag tpos(0x0020,0x0032);
-	mdcm::Tag torie(0x0020,0x0037);
-	mdcm::Tag tspacing(0x0028,0x0030);
-	mdcm::Tag tframeoffset(0x3004,0x000c);
+	std::set<mdcm::Tag> tags;
+	mdcm::Tag tframes(0x0028,0x0008);      tags.insert(tframes);
+	mdcm::Tag trows(0x0028,0x0010);        tags.insert(trows);
+	mdcm::Tag tcolumns(0x0028,0x0011);     tags.insert(tcolumns);
+	mdcm::Tag tpos(0x0020,0x0032);         tags.insert(tpos);
+	mdcm::Tag torie(0x0020,0x0037);        tags.insert(torie);
+	mdcm::Tag tspacing(0x0028,0x0030);     tags.insert(tspacing);
+	mdcm::Tag tframeoffset(0x3004,0x000c); tags.insert(tframeoffset);
 	mdcm::Reader reader;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
@@ -1747,7 +1762,7 @@ void DicomUtils::read_image_info_rtdose(const QString & f,
 #else
 	reader.SetFileName(f.toLocal8Bit().constData());
 #endif
-	const bool f_ok = reader.ReadUpToTag(tframeoffset);
+	const bool f_ok = reader.ReadSelectedTags(tags);
 	if (!f_ok) return;
 	const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
 	if (ds.IsEmpty()) return;
@@ -8812,6 +8827,9 @@ QString DicomUtils::read_enhanced_3d_6d(
 
 bool DicomUtils::is_not_interleaved(const QStringList & images)
 {
+	mdcm::Tag tSlicePosition(0x0020,0x1041);
+	std::set<mdcm::Tag> tags;
+	tags.insert(tSlicePosition);
 	long tmp0 = 0;
 	for (int x = 0; x < images.size(); x++)
 	{
@@ -8825,15 +8843,15 @@ bool DicomUtils::is_not_interleaved(const QStringList & images)
 #else
 		reader.SetFileName(images.at(x).toLocal8Bit().constData());
 #endif
-		const bool f_ok = reader.ReadUpToTag(mdcm::Tag(0x0020,0x1041));
+		const bool f_ok = reader.ReadSelectedTags(tags);
 		if (!f_ok) return false;
 		const mdcm::File & file = reader.GetFile();
 		const mdcm::DataSet & ds = file.GetDataSet();
 		if (ds.IsEmpty()) return false;
-		if (ds.FindDataElement(mdcm::Tag(0x0020,0x1041)))
+		if (ds.FindDataElement(tSlicePosition))
 		{
 			const mdcm::DataElement & sp_ =
-				ds.GetDataElement(mdcm::Tag(0x0020,0x1041));
+				ds.GetDataElement(tSlicePosition);
 			if (!sp_.IsEmpty() && !sp_.IsUndefinedLength() && sp_.GetByteValue())
 			{
 				bool sp_ok = false;
@@ -8928,6 +8946,9 @@ void DicomUtils::write_encapsulated(
 	const QString & in_f,
 	const QString & out_f)
 {
+	mdcm::Tag t(0x0042,0x0011);
+	std::set<mdcm::Tag> tags;
+	tags.insert(t);
 	mdcm::Reader reader;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
@@ -8938,12 +8959,12 @@ void DicomUtils::write_encapsulated(
 #else
 	reader.SetFileName(in_f.toLocal8Bit().constData());
 #endif
-	const bool ok = reader.ReadUpToTag(mdcm::Tag(0x0042,0x0011));
+	const bool ok = reader.ReadSelectedTags(tags);
 	if (!ok) return;
 	const mdcm::File & file = reader.GetFile();
 	const mdcm::DataSet & ds = file.GetDataSet();
-	if(!ds.FindDataElement(mdcm::Tag(0x0042,0x0011))) return;
-	const mdcm::DataElement & e = ds.GetDataElement(mdcm::Tag(0x0042,0x0011));
+	if(!ds.FindDataElement(t)) return;
+	const mdcm::DataElement & e = ds.GetDataElement(t);
 	if (e.IsEmpty()||e.IsUndefinedLength()) return;
 	const mdcm::ByteValue * bv = e.GetByteValue();
 	if (bv && bv->GetPointer() && (bv->GetLength() > 0))
@@ -8996,6 +9017,9 @@ void DicomUtils::write_mpeg(
 	const QString & in_f,
 	const QString & out_f)
 {
+	mdcm::Tag t(0x7fe0,0x0010);
+	std::set<mdcm::Tag> tags;
+	tags.insert(t);
 	mdcm::Reader reader;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
@@ -9006,12 +9030,12 @@ void DicomUtils::write_mpeg(
 #else
 	reader.SetFileName(in_f.toLocal8Bit().constData());
 #endif
-	const bool ok = reader.ReadUpToTag(mdcm::Tag(0x7fe0,0x0010));
+	const bool ok = reader.ReadSelectedTags(tags);
 	if (!ok) return;
 	const mdcm::File & file = reader.GetFile();
 	const mdcm::DataSet & ds = file.GetDataSet();
-	if(!ds.FindDataElement(mdcm::Tag(0x7fe0,0x0010))) return;
-	const mdcm::DataElement & e = ds.GetDataElement(mdcm::Tag(0x7fe0,0x0010));
+	if(!ds.FindDataElement(t)) return;
+	const mdcm::DataElement & e = ds.GetDataElement(t);
 	if (e.IsEmpty()) return;
 	const mdcm::SequenceOfFragments * sf = e.GetSequenceOfFragments();
 	if(!sf) return;
@@ -9138,7 +9162,20 @@ void DicomUtils::scan_files_for_rtstruct_image(
 				s0.GetAllFilenamesFromTagToValue(t0, (*vi0).c_str());
 			for (unsigned int j = 0; j < files__.size(); j++)
 			{
-				t0_files.push_back(files__.at(j));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+				t0_files.push_back(std::string(
+					QDir::toNativeSeparators(
+						QString::fromUtf8(files__.at(j).c_str())).toUtf8().constData()));
+#else
+				t0_files.push_back(std::string(
+					QDir::toNativeSeparators(
+						QString::fromLocal8Bit(files__.at(j).c_str())).toLocal8Bit().constData()));
+#endif
+#else
+				t0_files.push_back(std::string(
+					QString::fromLocal8Bit(files__.at(j).c_str()).toLocal8Bit().constData()));
+#endif
 			}
 		}
 	}
@@ -9160,8 +9197,12 @@ void DicomUtils::scan_files_for_rtstruct_image(
 			for (unsigned int j = 0; j < files__.size(); j++)
 			{
 				t1_tmp.push_back(
+#ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-					QString::fromUtf8(files__.at(j).c_str())
+					QDir::toNativeSeparators(QString::fromUtf8(files__.at(j).c_str()))
+#else
+					QDir::toNativeSeparators(QString::fromLocal8Bit(files__.at(j).c_str()))
+#endif
 #else
 					QString::fromLocal8Bit(files__.at(j).c_str())
 #endif
@@ -9237,6 +9278,9 @@ bool DicomUtils::process_contrours_ref(
 			}
 			QApplication::processEvents();
 			QString sop_instance_uid("");
+			std::set<mdcm::Tag> tags;
+			mdcm::Tag tsopinstance(0x0008,0x0018);
+			tags.insert(tsopinstance);
 			mdcm::Reader reader;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
@@ -9247,13 +9291,12 @@ bool DicomUtils::process_contrours_ref(
 #else
 			reader.SetFileName(detected_files.at(z).at(k).toLocal8Bit().constData());
 #endif
-			const bool f_ok = reader.ReadUpToTag(mdcm::Tag(0x0008,0x0018));
+			const bool f_ok = reader.ReadSelectedTags(tags);
 			if (!f_ok) continue;
 			const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
-			if (ds.FindDataElement(mdcm::Tag(0x0008,0x0018)))
+			if (ds.FindDataElement(tsopinstance))
 			{
-				const mdcm::DataElement & e =
-					ds.GetDataElement(mdcm::Tag(0x0008,0x0018));
+				const mdcm::DataElement & e = ds.GetDataElement(tsopinstance);
 				if (!e.IsEmpty() &&
 					!e.IsUndefinedLength() &&
 					e.GetByteValue())
@@ -9383,6 +9426,9 @@ bool DicomUtils::scan_files_for_pr_image(
 {
 	if (p.isEmpty())   return false;
 	if (uid.isEmpty()) return false;
+	std::set<mdcm::Tag> tags;
+	mdcm::Tag tSOPInstanceUID(0x0008,0x0018);
+	tags.insert(tSOPInstanceUID);
 	QDir dir(p);
 	QStringList flist =
 		dir.entryList(QDir::Files|QDir::Readable,QDir::Name);
@@ -9403,10 +9449,10 @@ bool DicomUtils::scan_files_for_pr_image(
 #else
 		reader.SetFileName(tmp0.toLocal8Bit().constData());
 #endif
-		if (!reader.ReadUpToTag(mdcm::Tag(0x0008,0x0018))) continue;
+		if (!reader.ReadSelectedTags(tags)) continue;
 		const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
 		QString uid_("");
-		const bool ok = get_string_value(ds, mdcm::Tag(0x0008,0x0018), uid_);
+		const bool ok = get_string_value(ds, tSOPInstanceUID, uid_);
 		if (ok && uid == uid_)
 		{
 			file = tmp0;

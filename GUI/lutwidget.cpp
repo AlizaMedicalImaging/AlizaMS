@@ -18,6 +18,7 @@ LUTWidget::LUTWidget(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
     sp.setHorizontalStretch(0);
     sp.setVerticalStretch(0);
     setSizePolicy(sp);
+	setToolTip(QString("LUT"));
 }
 
 LUTWidget::~LUTWidget()

@@ -145,14 +145,16 @@ ImagesBox::ImagesBox(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
 	actionClearChecked = new QAction(QIcon(":/bitmaps/delete.svg"), QString("Close checked"),this);
 	actionClearUnChek  = new QAction(QIcon(":/bitmaps/delete.svg"), QString("Close un-checked"),this);
 	actionClearAll     = new QAction(QIcon(":/bitmaps/delete2.svg"), QString("Close all"),this);
-	actionInfo         = new QAction(QIcon(":/bitmaps/info2.svg"), QString("Toggle info window"),this);
-	actionInfo->setCheckable(true);
 	actionCheck        = new QAction(QIcon(":/bitmaps/checked.svg"),  QString("Set all to checked (list)"),this);
 	actionUncheck      = new QAction(QIcon(":/bitmaps/unchecked.svg"),QString("Set all to un-checked (list)"),this);
 	actionReloadHistogram = new QAction(QIcon(":/bitmaps/chart0.svg"),QString("Calculate histogram"),this);
 	actionColor        = new QAction(QIcon(":/bitmaps/rgb.svg"),QString("Image color in UI"),this);
 	actionDICOMMeta    = new QAction(QIcon(":/bitmaps/meta.svg"),QString("Image DICOM Metadata"),this);
 	actionTmp          = new QAction(QString("TMP"),this);
+	//
+	actionInfo         = new QAction(QIcon(":/bitmaps/info2.svg"), QString("Toggle info window"),this);
+	actionInfo->setCheckable(true);
+	actionInfo->setChecked(true);
 	//
 	listWidget->addAction(actionNone);
 	listWidget->addAction(actionCheck);

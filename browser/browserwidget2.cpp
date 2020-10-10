@@ -213,9 +213,6 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 					filenames_no_series_uid.push_back(tmp0);
 				}
 			}
-			else
-			{
-			}
 		}
 	}
 	flist.clear();
