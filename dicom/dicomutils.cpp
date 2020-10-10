@@ -5412,7 +5412,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 	reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
 #endif
 #else
-	reader.SetFileName(f).toLocal8Bit().constData());
+	reader.SetFileName((f).toLocal8Bit().constData());
 #endif
 	if (!reader.Read())
 	{

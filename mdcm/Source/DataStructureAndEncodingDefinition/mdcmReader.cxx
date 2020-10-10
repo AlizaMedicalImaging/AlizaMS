@@ -736,15 +736,6 @@ bool Reader::CanRead() const
     return true;
   return false;
 }
-#include <windows.h>
-static std::string utf8_encode(const std::wstring & wstr)
-{
-  if(wstr.empty()) return std::string();
-  const int len = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
-  std::string ret(len, 0);
-  WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &ret[0], len, NULL, NULL);
-  return ret;
-}
 
 void Reader::SetFileName(const char * p)
 {
