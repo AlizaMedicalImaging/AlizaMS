@@ -71,7 +71,7 @@ bool System::FileExists(const char * filename)
 #define R_OK 04
 #endif
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-  const std::wstring unc = System::ConvertToUNC(filename);
+  const std::wstring unc = System::ConvertToUtf16(filename);
   if (_waccess(unc.c_str(), R_OK) != 0)
 #else
 #ifdef _WIN32
@@ -93,7 +93,7 @@ bool System::FileIsDirectory(const char * name)
 {
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
   struct _stat64i32 fs;
-  const std::wstring wname = System::ConvertToUNC(name);
+  const std::wstring wname = System::ConvertToUtf16(name);
   if (_wstat(wname.c_str(), &fs) == 0)
 #else
   struct stat fs;
@@ -165,7 +165,7 @@ namespace
 static std::wstring utf8_decode(const std::string & str)
 {
   if(str.empty()) return std::wstring();
-  const int len = MultiByteToWideChar(CP_UTF8, 0, &str[0], -1, NULL, 0);
+  const int len = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
   std::wstring ret(len, 0);
   MultiByteToWideChar(CP_UTF8, 0, &str[0], -1, &ret[0], len);
   return ret;
@@ -174,9 +174,9 @@ static std::wstring utf8_decode(const std::string & str)
 static std::string utf8_encode(const std::wstring & wstr)
 {
   if(wstr.empty()) return std::string();
-  const int len = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], -1, NULL, 0, NULL, NULL);
+  const int len = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
   std::string ret(len, 0);
-  WideCharToMultiByte(CP_UTF8, 0, &wstr[0], -1, &ret[0], len, NULL, NULL);
+  WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &ret[0], len, NULL, NULL);
   return ret;
 }
 
@@ -226,9 +226,9 @@ static std::wstring HandleMaxPath(const std::wstring & in)
 
 }
 
-std::wstring System::ConvertToUNC(const char * utf8path)
+std::wstring System::ConvertToUtf16(const char * utf8path)
 {
-  std::wstring uft16path = utf8_decode(utf8path);
+  const std::wstring uft16path = utf8_decode(utf8path);
   std::wstring uncpath = HandleMaxPath(uft16path);
   return uncpath;
 }

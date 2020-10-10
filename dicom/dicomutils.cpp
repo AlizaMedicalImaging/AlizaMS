@@ -11,7 +11,6 @@
 #include "commonutils.h"
 #include "codecutils.h"
 #include "contourutils.h"
-#include "filepath.h"
 #include "prconfigutils.h"
 #include "srutils.h"
 #include "ultrasoundregiondata.h"
@@ -73,8 +72,8 @@
 #include <string>
 #include <set>
 #include <algorithm>
-
 #include "vectormath/scalar/vectormath.h"
+
 typedef Vectormath::Scalar::Vector3 sVector3;
 typedef Vectormath::Scalar::Vector4 sVector4;
 typedef Vectormath::Scalar::Matrix4 sMatrix4;
@@ -159,7 +158,15 @@ bool Sorter2::StableSort(
 		++it, ++it2)
 	{
 		Reader reader;
-		reader.SetFileName(FilePath::getPath(*it));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+		reader.SetFileName(QDir::toNativeSeparators(*it).toUtf8().constData());
+#else
+		reader.SetFileName(QDir::toNativeSeparators(*it).toLocal8Bit().constData());
+#endif
+#else
+		reader.SetFileName((*it).toLocal8Bit().constData());
+#endif
 		SmartPointer<FileWithQString> & f = *it2;
 		if (reader.ReadUpToTag(mdcm::Tag(0x0020,0x0037)))
 		{
@@ -1452,7 +1459,7 @@ QString DicomUtils::generate_id()
 		c[i] = s[rand() % (ss - 1)];
 	}
 	const QString r = QString(c).trimmed();
- 	return r;
+	return r;
 }
 
 bool DicomUtils::is_image(
@@ -1594,7 +1601,15 @@ void DicomUtils::read_sop_instance_uid(
 	QString & sop_instance_uid)
 {
 	mdcm::Reader reader;
-	reader.SetFileName(FilePath::getPath(f));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+	reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
+#else
+	reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
+#endif
+#else
+	reader.SetFileName(f.toLocal8Bit().constData());
+#endif
 	const bool f_ok = reader.ReadUpToTag(mdcm::Tag(0x0008,0x0018));
 	if (!f_ok) return;
 	const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
@@ -1626,7 +1641,15 @@ void DicomUtils::read_image_info(
 	mdcm::Tag tspacing3(0x0028,0x0034); // Pixel Aspect Ratio
 	//
 	mdcm::Reader reader;
-	reader.SetFileName(FilePath::getPath(f));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+	reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
+#else
+	reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
+#endif
+#else
+	reader.SetFileName(f.toLocal8Bit().constData());
+#endif
 	const bool f_ok = reader.ReadUpToTag(tspacing3);
 	if (!f_ok) return;
 	const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
@@ -1715,7 +1738,15 @@ void DicomUtils::read_image_info_rtdose(const QString & f,
 	mdcm::Tag tspacing(0x0028,0x0030);
 	mdcm::Tag tframeoffset(0x3004,0x000c);
 	mdcm::Reader reader;
-	reader.SetFileName(FilePath::getPath(f));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+	reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
+#else
+	reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
+#endif
+#else
+	reader.SetFileName(f.toLocal8Bit().constData());
+#endif
 	const bool f_ok = reader.ReadUpToTag(tframeoffset);
 	if (!f_ok) return;
 	const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
@@ -5066,7 +5097,15 @@ QString DicomUtils::read_enhanced(
 	mdcm::PhotometricInterpretation pi;
 	mdcm::PixelFormat pixelformat;
 	mdcm::Reader reader;
-	reader.SetFileName(FilePath::getPath(f));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+	reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
+#else
+	reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
+#endif
+#else
+	reader.SetFileName(f.toLocal8Bit().constData());
+#endif
 	if (!reader.Read())
 	{
 		return QString("Can not read file");
@@ -5366,7 +5405,15 @@ QString DicomUtils::read_enhanced_supp_palette(
 	mdcm::PhotometricInterpretation pi;
 	mdcm::PixelFormat pixelformat;
 	mdcm::Reader reader;
-	reader.SetFileName(FilePath::getPath(f));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+	reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
+#else
+	reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
+#endif
+#else
+	reader.SetFileName(f).toLocal8Bit().constData());
+#endif
 	if (!reader.Read())
 	{
 		return QString("Can not read file");
@@ -5676,7 +5723,15 @@ QString DicomUtils::read_ultrasound(
 	int number_of_frames = 0;
 	//
 	mdcm::Reader reader;
-	reader.SetFileName(FilePath::getPath(images_ipp.at(0)));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+	reader.SetFileName(QDir::toNativeSeparators(images_ipp.at(0)).toUtf8().constData());
+#else
+	reader.SetFileName(QDir::toNativeSeparators(images_ipp.at(0)).toLocal8Bit().constData());
+#endif
+#else
+	reader.SetFileName(images_ipp.at(0).toLocal8Bit().constData());
+#endif
 	*ok = reader.Read();
 	if (*ok==false)
 	{
@@ -5890,7 +5945,15 @@ QString DicomUtils::read_series(
 	{
 		int number_of_frames = 0;
 		mdcm::Reader reader;
-		reader.SetFileName(FilePath::getPath(images_ipp.at(j)));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+		reader.SetFileName(QDir::toNativeSeparators(images_ipp.at(j)).toUtf8().constData());
+#else
+		reader.SetFileName(QDir::toNativeSeparators(images_ipp.at(j)).toLocal8Bit().constData());
+#endif
+#else
+		reader.SetFileName(images_ipp.at(j).toLocal8Bit().constData());
+#endif
 		*ok = reader.Read();
 		if (*ok==false)
 			return (QString("can not read file ")+images_ipp.at(j));
@@ -6769,7 +6832,15 @@ static void delta_decode(
 bool DicomUtils::convert_elscint(const QString f, const QString outf)
 {
 	mdcm::Reader reader;
-	reader.SetFileName(FilePath::getPath(f));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+	reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
+#else
+	reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
+#endif
+#else
+	reader.SetFileName(f.toLocal8Bit().constData());
+#endif
 	if(!reader.Read())
 	{
 		return false;
@@ -7021,7 +7092,15 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 		mdcm::TransferSyntax::ExplicitVRLittleEndian);
 	mdcm::Writer writer;
 	writer.SetFile(reader.GetFile());
-	writer.SetFileName(FilePath::getPath(outf));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+	writer.SetFileName(QDir::toNativeSeparators(outf).toUtf8().constData());
+#else
+	writer.SetFileName(QDir::toNativeSeparators(outf).toLocal8Bit().constData());
+#endif
+#else
+	writer.SetFileName(outf.toLocal8Bit().constData());
+#endif
 	if(!writer.Write())
 	{
 		std::cout << "Error: can not write tmp Elscint file "
@@ -7074,7 +7153,15 @@ QString DicomUtils::read_buffer(
 		const bool elsc_ok = convert_elscint(f, elscf);
 		if (elsc_ok)
 		{
-			image_reader.SetFileName(FilePath::getPath(elscf));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+			image_reader.SetFileName(QDir::toNativeSeparators(elscf).toUtf8().constData());
+#else
+			image_reader.SetFileName(QDir::toNativeSeparators(elscf).toLocal8Bit().constData());
+#endif
+#else
+			image_reader.SetFileName(elscf.toLocal8Bit().constData());
+#endif
 		}
 		else
 		{
@@ -7084,7 +7171,15 @@ QString DicomUtils::read_buffer(
 	}
 	else
 	{
-		image_reader.SetFileName(FilePath::getPath(f));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+		image_reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
+#else
+		image_reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
+#endif
+#else
+		image_reader.SetFileName(f.toLocal8Bit().constData());
+#endif
 		image_reader.SetApplySupplementalLUT(supp_palette_color);
 	}
 	if (overlay_idx == -2) image_reader.SetProcessOverlays(false);
@@ -8721,7 +8816,15 @@ bool DicomUtils::is_not_interleaved(const QStringList & images)
 	for (int x = 0; x < images.size(); x++)
 	{
 		mdcm::Reader reader;
-		reader.SetFileName(FilePath::getPath(images.at(x)));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+		reader.SetFileName(QDir::toNativeSeparators(images.at(x)).toUtf8().constData());
+#else
+		reader.SetFileName(QDir::toNativeSeparators(images.at(x)).toLocal8Bit().constData());
+#endif
+#else
+		reader.SetFileName(images.at(x).toLocal8Bit().constData());
+#endif
 		const bool f_ok = reader.ReadUpToTag(mdcm::Tag(0x0020,0x1041));
 		if (!f_ok) return false;
 		const mdcm::File & file = reader.GetFile();
@@ -8826,7 +8929,15 @@ void DicomUtils::write_encapsulated(
 	const QString & out_f)
 {
 	mdcm::Reader reader;
-	reader.SetFileName(FilePath::getPath(in_f));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+	reader.SetFileName(QDir::toNativeSeparators(in_f).toUtf8().constData());
+#else
+	reader.SetFileName(QDir::toNativeSeparators(in_f).toLocal8Bit().constData());
+#endif
+#else
+	reader.SetFileName(in_f.toLocal8Bit().constData());
+#endif
 	const bool ok = reader.ReadUpToTag(mdcm::Tag(0x0042,0x0011));
 	if (!ok) return;
 	const mdcm::File & file = reader.GetFile();
@@ -8837,12 +8948,16 @@ void DicomUtils::write_encapsulated(
 	const mdcm::ByteValue * bv = e.GetByteValue();
 	if (bv && bv->GetPointer() && (bv->GetLength() > 0))
 	{
+#ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC)) 
 		const std::wstring uncpath =
-			mdcm::System::ConvertToUNC(FilePath::getPath(out_f));
+			mdcm::System::ConvertToUtf16((QDir::toNativeSeparators(out_f)).toUtf8().constData());
 		std::ofstream o(uncpath.c_str(), std::ios::binary);
 #else
-		std::ofstream o(FilePath::getPath(out_f), std::ios::binary);
+		std::ofstream o((QDir::toNativeSeparators(out_f)).toLocal8Bit().constData(), std::ios::binary);
+#endif
+#else
+		std::ofstream o(out_f.toLocal8Bit().constData(), std::ios::binary);
 #endif
 		o.write(bv->GetPointer(), bv->GetLength());
 		o.close();
@@ -8852,7 +8967,15 @@ void DicomUtils::write_encapsulated(
 QString DicomUtils::suffix_mpeg(const QString & f)
 {
 	mdcm::Reader reader;
-	reader.SetFileName(FilePath::getPath(f));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+	reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
+#else
+	reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
+#endif
+#else
+	reader.SetFileName(f.toLocal8Bit().constData());
+#endif
 	if (reader.ReadUpToTag(mdcm::Tag(0x0008,0x0016)))
 	{
 		mdcm::FileMetaInformation & h = reader.GetFile().GetHeader();
@@ -8874,7 +8997,15 @@ void DicomUtils::write_mpeg(
 	const QString & out_f)
 {
 	mdcm::Reader reader;
-	reader.SetFileName(FilePath::getPath(in_f));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+	reader.SetFileName(QDir::toNativeSeparators(in_f).toUtf8().constData());
+#else
+	reader.SetFileName(QDir::toNativeSeparators(in_f).toLocal8Bit().constData());
+#endif
+#else
+	reader.SetFileName(in_f.toLocal8Bit().constData());
+#endif
 	const bool ok = reader.ReadUpToTag(mdcm::Tag(0x7fe0,0x0010));
 	if (!ok) return;
 	const mdcm::File & file = reader.GetFile();
@@ -8884,15 +9015,19 @@ void DicomUtils::write_mpeg(
 	if (e.IsEmpty()) return;
 	const mdcm::SequenceOfFragments * sf = e.GetSequenceOfFragments();
 	if(!sf) return;
+#ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC)) 
 	const std::wstring uncpath =
-		mdcm::System::ConvertToUNC(FilePath::getPath(out_f));
-	std::ofstream output(uncpath.c_str(), std::ios::binary);
+		mdcm::System::ConvertToUtf16((QDir::toNativeSeparators(out_f)).toUtf8().constData());
+	std::ofstream o(uncpath.c_str(), std::ios::binary);
 #else
-	std::ofstream output(FilePath::getPath(out_f), std::ios::binary);
+	std::ofstream o((QDir::toNativeSeparators(out_f)).toLocal8Bit().constData(), std::ios::binary);
 #endif
-	sf->WriteBuffer(output);
-	output.close();
+#else
+	std::ofstream o(out_f.toLocal8Bit().constData(), std::ios::binary);
+#endif
+	sf->WriteBuffer(o);
+	o.close();
 }
 
 bool DicomUtils::is_dicom_file(const QString & f)
@@ -8900,12 +9035,16 @@ bool DicomUtils::is_dicom_file(const QString & f)
 	bool dicom = false;
 	char b[4];
 	std::ifstream fs;
+#ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC)) 
 	const std::wstring uncpath =
-		mdcm::System::ConvertToUNC(FilePath::getPath(f));
+		mdcm::System::ConvertToUtf16((QDir::toNativeSeparators(f)).toUtf8().constData());
 	fs.open(uncpath.c_str(), std::ios::in|std::ios::binary);
 #else
-	fs.open(FilePath::getPath(f), std::ios::in|std::ios::binary);
+	fs.open((QDir::toNativeSeparators(f)).toLocal8Bit().constData(), std::ios::in|std::ios::binary);
+#endif
+#else
+	fs.open(f.toLocal8Bit().constData(), std::ios::in|std::ios::binary);
 #endif
 	for (long off = 128; off >= 0; off -= 128)
 	{
@@ -8971,7 +9110,15 @@ void DicomUtils::scan_files_for_rtstruct_image(
 		QApplication::processEvents();
 		const QString tmp0 =
 			dir.absolutePath() + QString("/") + flist.at(x);
-		filenames.push_back(std::string(FilePath::getPath(tmp0)));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+		filenames.push_back(std::string((QDir::toNativeSeparators(tmp0)).toUtf8().constData()));
+#else
+		filenames.push_back(std::string((QDir::toNativeSeparators(tmp0)).toLocal8Bit().constData()));
+#endif
+#else
+		filenames.push_back(std::string(tmp0.toLocal8Bit().constData()));
+#endif
 	}
 	flist.clear();
 	//
@@ -9044,7 +9191,15 @@ bool DicomUtils::process_contrours_ref(
 	}
 	QApplication::processEvents();
 	mdcm::Reader reader;
-	reader.SetFileName(FilePath::getPath(f));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+	reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
+#else
+	reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
+#endif
+#else
+	reader.SetFileName(f.toLocal8Bit().constData());
+#endif
 	if (!reader.Read()) return false;
 	QApplication::processEvents();
 	const mdcm::File & file = reader.GetFile();
@@ -9083,7 +9238,15 @@ bool DicomUtils::process_contrours_ref(
 			QApplication::processEvents();
 			QString sop_instance_uid("");
 			mdcm::Reader reader;
-			reader.SetFileName(FilePath::getPath(detected_files.at(z).at(k)));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+			reader.SetFileName(QDir::toNativeSeparators(detected_files.at(z).at(k)).toUtf8().constData());
+#else
+			reader.SetFileName(QDir::toNativeSeparators(detected_files.at(z).at(k)).toLocal8Bit().constData());
+#endif
+#else
+			reader.SetFileName(detected_files.at(z).at(k).toLocal8Bit().constData());
+#endif
 			const bool f_ok = reader.ReadUpToTag(mdcm::Tag(0x0008,0x0018));
 			if (!f_ok) continue;
 			const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
@@ -9231,7 +9394,15 @@ bool DicomUtils::scan_files_for_pr_image(
 		const QString tmp0 =
 			dir.absolutePath() + QString("/") + flist.at(x);
 		mdcm::Reader reader;
-		reader.SetFileName(FilePath::getPath(tmp0));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+		reader.SetFileName(QDir::toNativeSeparators(tmp0).toUtf8().constData());
+#else
+		reader.SetFileName(QDir::toNativeSeparators(tmp0).toLocal8Bit().constData());
+#endif
+#else
+		reader.SetFileName(tmp0.toLocal8Bit().constData());
+#endif
 		if (!reader.ReadUpToTag(mdcm::Tag(0x0008,0x0018))) continue;
 		const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
 		QString uid_("");
@@ -9258,7 +9429,15 @@ void DicomUtils::read_pr_ref(
 	const mdcm::Tag tReferencedSOPInstanceUID(0x0008,0x1155);
 	const mdcm::Tag tReferencedFrameNumber(0x0008,0x1160);
 	mdcm::Reader reader;
-	reader.SetFileName(FilePath::getPath(f));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+	reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
+#else
+	reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
+#endif
+#else
+	reader.SetFileName(f.toLocal8Bit().constData());
+#endif
 	if (!reader.Read()) return;
 	const mdcm::File & file = reader.GetFile();
 	const mdcm::DataSet & ds = file.GetDataSet();
@@ -10187,7 +10366,15 @@ QString DicomUtils::read_dicom(
 		bool localizer_ = false;
 		QFileInfo fi(filenames.at(x));
 		mdcm::Reader reader;
-		reader.SetFileName(FilePath::getPath(filenames.at(x)));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+		reader.SetFileName(QDir::toNativeSeparators(filenames.at(x)).toUtf8().constData());
+#else
+		reader.SetFileName(QDir::toNativeSeparators(filenames.at(x)).toLocal8Bit().constData());
+#endif
+#else
+		reader.SetFileName(filenames.at(x).toLocal8Bit().constData());
+#endif
 		if (!reader.Read()) continue;
 		const mdcm::File & file = reader.GetFile();
 		const mdcm::FileMetaInformation & header = file.GetHeader();
@@ -11343,7 +11530,15 @@ QString DicomUtils::read_dicom(
 			si.localizer =  false;
 			si.file      = QString(images.at(x));
 			mdcm::Reader reader;
-			reader.SetFileName(FilePath::getPath(filenames.at(x)));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+			reader.SetFileName(QDir::toNativeSeparators(filenames.at(x)).toUtf8().constData());
+#else
+			reader.SetFileName(QDir::toNativeSeparators(filenames.at(x)).toLocal8Bit().constData());
+#endif
+#else
+			reader.SetFileName(filenames.at(x).toLocal8Bit().constData());
+#endif
 			if (!reader.ReadUpToTag(mdcm::Tag(0x0028,0x0101))) continue;
 			const mdcm::File    & file = reader.GetFile();
 			const mdcm::DataSet & ds   = file.GetDataSet();
@@ -11745,7 +11940,15 @@ QString DicomUtils::read_dicom(
 			if (!(ref_ok || ref2_ok))
 			{
 				mdcm::Reader reader;
-				reader.SetFileName(FilePath::getPath(rtstruct_ref_search.at(x)));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+				reader.SetFileName(QDir::toNativeSeparators(rtstruct_ref_search.at(x)).toUtf8().constData());
+#else
+				reader.SetFileName(QDir::toNativeSeparators(rtstruct_ref_search.at(x)).toLocal8Bit().constData());
+#endif
+#else
+				reader.SetFileName(rtstruct_ref_search.at(x).toLocal8Bit().constData());
+#endif
 				const bool str_f_ok = reader.Read();
 				if (str_f_ok)
 				{
@@ -12237,5 +12440,3 @@ QString DicomUtils::read_dicom(
 #ifdef ENHANCED_PRINT_INFO
 #undef ENHANCED_PRINT_INFO
 #endif
-
-

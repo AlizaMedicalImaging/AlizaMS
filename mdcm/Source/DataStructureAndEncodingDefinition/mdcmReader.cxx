@@ -736,6 +736,15 @@ bool Reader::CanRead() const
     return true;
   return false;
 }
+#include <windows.h>
+static std::string utf8_encode(const std::wstring & wstr)
+{
+  if(wstr.empty()) return std::string();
+  const int len = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+  std::string ret(len, 0);
+  WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &ret[0], len, NULL, NULL);
+  return ret;
+}
 
 void Reader::SetFileName(const char * p)
 {
@@ -744,11 +753,15 @@ void Reader::SetFileName(const char * p)
   if (p && *p)
   {
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC)) 
-    const std::wstring uncpath = System::ConvertToUNC(p);
-    Ifstream->open(uncpath.c_str(), std::ios::binary);
+    const std::wstring uncpath = mdcm::System::ConvertToUtf16(p);
+    Ifstream->open(uncpath.c_str(), std::ios_base::in|std::ios::binary);
 #else
     Ifstream->open(p, std::ios::binary);
 #endif
+  }
+  else
+  {
+    mdcmAlwaysWarnMacro("Reader failed (1)");
   }
   if(Ifstream->is_open())
   {
@@ -757,6 +770,7 @@ void Reader::SetFileName(const char * p)
   }
   else
   {
+    mdcmAlwaysWarnMacro("Reader failed (2)");
     delete Ifstream;
     Ifstream = NULL;
     Stream = NULL;
@@ -771,3 +785,4 @@ size_t Reader::GetStreamCurrentPosition() const
 #endif
 
 } // end namespace mdcm
+

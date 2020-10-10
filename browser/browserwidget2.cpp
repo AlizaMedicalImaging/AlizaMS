@@ -31,7 +31,6 @@
 #include "mdcmFileMetaInformation.h"
 #include "codecutils.h"
 #include "dicomutils.h"
-#include "filepath.h"
 #include <vector>
 #include <string>
 
@@ -175,6 +174,7 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 	QDir dir(p);
 	QStringList dlist = dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
 	QStringList flist = dir.entryList(QDir::Files|QDir::Readable,QDir::Name);
+std::cout << "browser: flist.size()=" << flist.size() << std::endl;
 	std::vector<std::string> filenames;
 	QStringList filenames_no_series_uid;
 	for (int x = 0; x < flist.size(); x++)
@@ -185,22 +185,46 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 		const QString tmp0 = dir.absolutePath() + QString("/") + flist.at(x);
 		{
 			mdcm::Reader reader;
-			reader.SetFileName(FilePath::getPath(tmp0));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+			reader.SetFileName(QDir::toNativeSeparators(tmp0).toUtf8().constData());
+#else
+			reader.SetFileName(QDir::toNativeSeparators(tmp0).toLocal8Bit().constData());
+#endif
+#else
+			reader.SetFileName(tmp0.toLocal8Bit().constData());
+#endif
 			if (reader.ReadUpToTag(tSeriesInstanceUID))
 			{
+std::cout << "x=ok 1" << std::endl;
 				const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
 				if (ds.FindDataElement(tSeriesInstanceUID))
 				{
-					filenames.push_back(std::string(FilePath::getPath(tmp0)));
+std::cout << "x=ok 2" << std::endl;
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+					filenames.push_back(std::string(QDir::toNativeSeparators(tmp0).toUtf8().constData()));
+#else
+					filenames.push_back(std::string(QDir::toNativeSeparators(tmp0).toLocal8Bit().constData()));
+#endif
+#else
+					filenames.push_back(std::string(tmp0.toLocal8Bit().constData()));
+#endif
 				}
 				else
 				{
+std::cout << "x=ok 3" << std::endl;
 					filenames_no_series_uid.push_back(tmp0);
 				}
+			}
+			else
+			{
+std::cout << "x=" << x << " FAILED " << std::endl;
 			}
 		}
 	}
 	flist.clear();
+std::cout << "browser: filenames.size()=" << filenames.size() << std::endl;
 	//
 	{
 		mdcm::SmartPointer<mdcm::Scanner> sp = new mdcm::Scanner;
@@ -232,14 +256,18 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 			std::vector<std::string> files__(
 				s0.GetAllFilenamesFromTagToValue(
 					tSeriesInstanceUID, (*vi).c_str()));
+std::cout << "files__.size()=" << files__.size() << std::endl;
 			for (unsigned int z = 0; z < files__.size(); z++)
 			{
+std::cout << "files__.at(z)=" << files__.at(z) << std::endl;
+
 				const QString tmp_filename =
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
 					QString::fromUtf8(files__.at(z).c_str());
 #else
 					QString::fromLocal8Bit(files__.at(z).c_str());
 #endif
+std::cout << "tmp_filename=" << tmp_filename.toStdString() << std::endl;
 				i->files.push_back(tmp_filename);
 			}
 			const unsigned int series_size = i->files.size();
@@ -449,12 +477,12 @@ void BrowserWidget2::dragEnterEvent(QDragEnterEvent * e)
 {
 	e->acceptProposedAction();
 }
- 
+
 void BrowserWidget2::dragMoveEvent(QDragMoveEvent * e)
 {
 	e->acceptProposedAction();
 }
- 
+
 void BrowserWidget2::dragLeaveEvent(QDragLeaveEvent * e)
 {
 	e->accept();
@@ -660,7 +688,15 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 	tableWidget->setRowCount(0);
 	//
 	mdcm::Reader reader;
-	reader.SetFileName(FilePath::getPath(f));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+	reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
+#else
+	reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
+#endif
+#else
+	reader.SetFileName(f.toLocal8Bit().constData());
+#endif
 	if(!reader.Read())
 	{
 		QApplication::restoreOverrideCursor();
@@ -760,7 +796,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 					if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
 					{
 						const QString directory_record_type =
- 							QString::fromLatin1(
+							QString::fromLatin1(
 								e.GetByteValue()->GetPointer(),
 								e.GetByteValue()->GetLength()).toUpper().trimmed().remove(QChar('\0'));
 						ed.directoryRecordType = directory_record_type;
@@ -1156,7 +1192,15 @@ void BrowserWidget2::read_tags_(
 	bool * is_softcopy)
 {
 	mdcm::Reader reader;
-	reader.SetFileName(FilePath::getPath(f));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+	reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
+#else
+	reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
+#endif
+#else
+	reader.SetFileName(f.toLocal8Bit().constData());
+#endif
 	bool f_ok = reader.ReadSelectedTags(selected_tags);
 	if (!f_ok) return;
 	const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
@@ -1335,7 +1379,15 @@ void BrowserWidget2::read_tags_short_(
 	bool * is_softcopy)
 {
 	mdcm::Reader reader;
-	reader.SetFileName(FilePath::getPath(f));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+	reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
+#else
+	reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
+#endif
+#else
+	reader.SetFileName(f.toLocal8Bit().constData());
+#endif
 	bool f_ok = reader.ReadSelectedTags(selected_tags_short);
 	if (!f_ok) return;
 	const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
@@ -1744,3 +1796,4 @@ quit__:
 	}
 }
 #endif
+

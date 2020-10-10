@@ -193,7 +193,7 @@ void Writer::SetFileName(const char * p)
   if (p && *p)
   {
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-    const std::wstring uncpath = System::ConvertToUNC(p);
+    const std::wstring uncpath = mdcm::System::ConvertToUtf16(p);
     Ofstream->open(uncpath.c_str(), std::ios::out | std::ios::binary);
 #else
     Ofstream->open(p, std::ios::out | std::ios::binary);
@@ -201,7 +201,12 @@ void Writer::SetFileName(const char * p)
     assert(Ofstream->is_open());
     assert(!Ofstream->fail());
   }
+  else
+  {
+    mdcmAlwaysWarnMacro("Reader failed (1)");
+  }
   Stream = Ofstream;
 }
 
 } // end namespace mdcm
+

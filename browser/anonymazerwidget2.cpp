@@ -23,7 +23,6 @@
 #include "mdcmImage.h"
 #include "mdcmOverlay.h"
 #include "dicomutils.h"
-#include "filepath.h"
 #include "alizams_version.h"
 
 static void replace__(
@@ -443,7 +442,15 @@ static void anonymize_file__(
 	const QMap<QString, QString> & pn_map)
 {
 	mdcm::Reader reader;
-	reader.SetFileName(FilePath::getPath(filename));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+	reader.SetFileName(QDir::toNativeSeparators(filename).toUtf8().constData());
+#else
+	reader.SetFileName(QDir::toNativeSeparators(filename).toLocal8Bit().constData());
+#endif
+#else
+	reader.SetFileName(filename.toLocal8Bit().constData());
+#endif
 	if(!reader.Read())
 	{
 		*ok = false;
@@ -475,7 +482,15 @@ static void anonymize_file__(
 		//
 		{
 			mdcm::ImageReader image_reader;
-			image_reader.SetFileName(FilePath::getPath(filename));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+			image_reader.SetFileName(QDir::toNativeSeparators(filename).toUtf8().constData());
+#else
+			image_reader.SetFileName(QDir::toNativeSeparators(filename).toLocal8Bit().constData());
+#endif
+#else
+			image_reader.SetFileName(filename.toLocal8Bit().constData());
+#endif
 			if (image_reader.Read())
 			{
 				const mdcm::Image image = image_reader.GetImage();
@@ -592,7 +607,15 @@ static void anonymize_file__(
 	header.Replace(app_entity.GetAsDataElement());
 	//
 	mdcm::Writer writer;
-	writer.SetFileName(FilePath::getPath(outfilename));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+	writer.SetFileName(QDir::toNativeSeparators(outfilename).toUtf8().constData());
+#else
+	writer.SetFileName(QDir::toNativeSeparators(outfilename).toLocal8Bit().constData());
+#endif
+#else
+	writer.SetFileName(outfilename.toLocal8Bit().constData());
+#endif
 	writer.SetFile(file);
 	if(!writer.Write()) *ok = false;
 }
@@ -719,12 +742,12 @@ void AnonymazerWidget2::dragEnterEvent(QDragEnterEvent * e)
 {
 	e->acceptProposedAction();
 }
- 
+
 void AnonymazerWidget2::dragMoveEvent(QDragMoveEvent * e)
 {
 	e->acceptProposedAction();
 }
- 
+
 void AnonymazerWidget2::dragLeaveEvent(QDragLeaveEvent * e)
 {
 	e->accept();
@@ -824,7 +847,15 @@ static void build_maps(
 		pd->setValue(-1);
 		if (pd->wasCanceled()) return;
 		mdcm::Reader reader;
-		reader.SetFileName(FilePath::getPath(l.at(x)));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+		reader.SetFileName(QDir::toNativeSeparators(l.at(x)).toUtf8().constData());
+#else
+		reader.SetFileName(QDir::toNativeSeparators(l.at(x)).toLocal8Bit().constData());
+#endif
+#else
+		reader.SetFileName(l.at(x).toLocal8Bit().constData());
+#endif
 		if (!reader.Read()) continue;
 		const mdcm::File    & f  = reader.GetFile();
 		const mdcm::DataSet & ds = f.GetDataSet();
@@ -880,7 +911,8 @@ void AnonymazerWidget2::process_directory(
 	const bool retain_institution_id = institution_radioButton->isChecked();
 	QDir dir(p);
 	QStringList dlist = dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
-	QStringList flist = dir.entryList(QDir::Files|QDir::Readable,QDir::Name);
+	QStringList flist = dir.entryList(QDir::Files);
+{
 	QStringList filenames;
 	for (int x = 0; x < flist.size(); x++)
 	{
@@ -890,8 +922,7 @@ void AnonymazerWidget2::process_directory(
 		const QString tmp0 = dir.absolutePath() + QString("/") + flist.at(x);
 		filenames.push_back(tmp0);
 	}
-	flist.clear();
-	for(int i = 0; i < filenames.size(); ++i)
+	for(int x = 0; x < filenames.size(); x++)
 	{
 		pd->setValue(-1);
 		QApplication::processEvents();
@@ -903,7 +934,7 @@ void AnonymazerWidget2::process_directory(
 		const QString date_str = date_.toString(QString("hhmmss")); // FIXME
 		const QString out_filename = date_str + QString("-") + tmp200 + QString(".dcm");
 #else
-		QFileInfo fi(filenames.at(i));
+		QFileInfo fi(filenames.at(x));
 		const QString out_filename = fi.fileName();
 #endif
 		const QString out_file = 
@@ -915,7 +946,7 @@ void AnonymazerWidget2::process_directory(
 		anonymize_file__(
 			&ok_,
 			&overlay_in_data,
-			filenames.at(i),
+			filenames.at(x),
 			out_file,
 			pn_tags,
 			uid_tags,
@@ -943,7 +974,7 @@ void AnonymazerWidget2::process_directory(
 		}
 		QApplication::processEvents();
 	}
-	filenames.clear();
+}
 	for (int j = 0; j < dlist.size(); j++)
 	{
 		QApplication::processEvents();
@@ -958,7 +989,6 @@ void AnonymazerWidget2::process_directory(
 			count_errors,
 			pd);
 	}
-	dlist.clear();
 }
 
 void AnonymazerWidget2::run_()
@@ -1364,4 +1394,5 @@ void AnonymazerWidget2::init_profile()
 	remove_tags.insert(mdcm::Tag(0x0020,0x3404));//
 	remove_tags.insert(mdcm::Tag(0x0012,0x0064));// old de-identification
 }
+
 

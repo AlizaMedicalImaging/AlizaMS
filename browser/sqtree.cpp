@@ -43,7 +43,6 @@
 #include "codecutils.h"
 #include "dicomutils.h"
 #include "commonutils.h"
-#include "filepath.h"
 
 template <typename T, long long TVR>
 void get_bin_values(
@@ -82,7 +81,15 @@ static void get_series_files(
 		{
 			const QString tmp0 =
 				dir.absolutePath() + QString("/") + l.at(x);
-			files.push_back(std::string(FilePath::getPath(tmp0)));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+			files.push_back(std::string(QDir::toNativeSeparators(f).toUtf8().constData()));
+#else
+			files.push_back(std::string(QDir::toNativeSeparators(f).toLocal8Bit().constData()));
+#endif
+#else
+			files.push_back(std::string(f.toLocal8Bit().constData()));
+#endif
 		}
 	}
 	const mdcm::Tag t(0x0020,0x000e);
@@ -817,7 +824,15 @@ void SQtree::read_file(const QString & f)
 		mdcm::Reader reader;
 		const mdcm::File & file = reader.GetFile();
 		bool ok = false;
-		reader.SetFileName(FilePath::getPath(f));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+		reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
+#else
+		reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
+#endif
+#else
+		reader.SetFileName(f.toLocal8Bit().constData());
+#endif
 		ok = reader.Read();
 		if (!ok)
 		{
@@ -1071,17 +1086,17 @@ void SQtree::dropEvent(QDropEvent * e)
 
 void SQtree::dragEnterEvent(QDragEnterEvent * e)
 {
-    e->acceptProposedAction();
+	e->acceptProposedAction();
 }
 
 void SQtree::dragMoveEvent(QDragMoveEvent * e)
 {
-    e->acceptProposedAction();
+	e->acceptProposedAction();
 }
 
 void SQtree::dragLeaveEvent(QDragLeaveEvent * e)
 {
-    e->accept();
+	e->accept();
 }
 
 void SQtree::clear_tree()
@@ -1187,7 +1202,15 @@ void SQtree::open_file_and_series()
 		std::set<mdcm::Tag> tags;
 		tags.insert(mdcm::Tag(0x0020,0x000e));
 		mdcm::Reader reader;
-		reader.SetFileName(FilePath::getPath(f));
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+		reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
+#else
+		reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
+#endif
+#else
+		reader.SetFileName(f.toLocal8Bit().constData());
+#endif
 		if (reader.ReadSelectedTags(tags))
 		{
 			const mdcm::File & file = reader.GetFile();
@@ -1240,3 +1263,4 @@ void SQtree::open_file_and_series()
 	mutex.unlock();
 #endif
 }
+

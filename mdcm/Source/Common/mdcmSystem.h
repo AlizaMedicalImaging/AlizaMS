@@ -34,7 +34,7 @@ public:
   static bool FileIsDirectory(const char* name);
   static bool FileIsSymlink(const char* name);
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-  static std::wstring ConvertToUNC(const char *utf8path);
+  static std::wstring ConvertToUtf16(const char *);
 #endif
   static const char *GetLastSystemError();
   // Return the filesize. 0 if file does not exist,
@@ -85,3 +85,4 @@ public:
 } // end namespace mdcm
 
 #endif //MDCMSYSTEM_H
+

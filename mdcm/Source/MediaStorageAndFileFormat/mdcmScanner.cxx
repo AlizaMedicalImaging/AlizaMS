@@ -133,7 +133,7 @@ bool Scanner::Scan(std::vector<std::string> const & filenames)
       }
       catch(...)
       {
-        mdcmWarningMacro("Failed to read:" << filename);
+        mdcmAlwaysWarnMacro("Failed to read:" << filename);
       }
       if(read)
       {
@@ -354,3 +354,4 @@ void Scanner::ProcessPublicTag(StringFilter & sf, const char * filename)
 }
 
 } // end namespace mdcm
+
