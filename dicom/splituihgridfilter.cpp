@@ -13,8 +13,6 @@
 #include <vector>
 #include "dicomutils.h"
 
-//#include "mdcmImageWriter.h"
-
 template<typename T> bool reorganize_uih_grid(
 	const T * input,
 	const unsigned int * indims,
@@ -262,28 +260,6 @@ bool SplitUihGridFilter::Split()
 	image.SetDimension(2, dims[2]);
 	image.SetOrigin(origin);
 	image.SetDataElement(pixeldata);
-/*
-	{
-		const char * s = "1.2.840.10008.5.1.4.1.1.4.1";
-
-		FileMetaInformation & header = GetFile().GetHeader();
-		DataSet & ds = GetFile().GetDataSet();
-
-		Attribute<0x0002,0x0002, VR::UI> st;
-		st.SetValue(s);
-		header.Replace(st.GetAsDataElement());
-
-		DataElement e(Tag(0x0008, 0x0016));
-		if (ts.IsExplicit()) e.SetVR(VR::UI);
-		e.SetByteValue(s, (VL::Type)strlen(s));
-		ds.Replace(e);
-
-		ImageWriter writer;
-		writer.SetImage(image);
-		writer.SetFileName("/home/r/Desktop/zzzzz005.dcm");
-		writer.Write();
-	}
-*/
 	return true;
 }
 

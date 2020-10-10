@@ -174,7 +174,6 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 	QDir dir(p);
 	QStringList dlist = dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
 	QStringList flist = dir.entryList(QDir::Files|QDir::Readable,QDir::Name);
-std::cout << "browser: flist.size()=" << flist.size() << std::endl;
 	std::vector<std::string> filenames;
 	QStringList filenames_no_series_uid;
 	for (int x = 0; x < flist.size(); x++)
@@ -196,11 +195,9 @@ std::cout << "browser: flist.size()=" << flist.size() << std::endl;
 #endif
 			if (reader.ReadUpToTag(tSeriesInstanceUID))
 			{
-std::cout << "x=ok 1" << std::endl;
 				const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
 				if (ds.FindDataElement(tSeriesInstanceUID))
 				{
-std::cout << "x=ok 2" << std::endl;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
 					filenames.push_back(std::string(QDir::toNativeSeparators(tmp0).toUtf8().constData()));
@@ -213,18 +210,15 @@ std::cout << "x=ok 2" << std::endl;
 				}
 				else
 				{
-std::cout << "x=ok 3" << std::endl;
 					filenames_no_series_uid.push_back(tmp0);
 				}
 			}
 			else
 			{
-std::cout << "x=" << x << " FAILED " << std::endl;
 			}
 		}
 	}
 	flist.clear();
-std::cout << "browser: filenames.size()=" << filenames.size() << std::endl;
 	//
 	{
 		mdcm::SmartPointer<mdcm::Scanner> sp = new mdcm::Scanner;
@@ -256,10 +250,8 @@ std::cout << "browser: filenames.size()=" << filenames.size() << std::endl;
 			std::vector<std::string> files__(
 				s0.GetAllFilenamesFromTagToValue(
 					tSeriesInstanceUID, (*vi).c_str()));
-std::cout << "files__.size()=" << files__.size() << std::endl;
 			for (unsigned int z = 0; z < files__.size(); z++)
 			{
-std::cout << "files__.at(z)=" << files__.at(z) << std::endl;
 
 				const QString tmp_filename =
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
@@ -267,7 +259,6 @@ std::cout << "files__.at(z)=" << files__.at(z) << std::endl;
 #else
 					QString::fromLocal8Bit(files__.at(z).c_str());
 #endif
-std::cout << "tmp_filename=" << tmp_filename.toStdString() << std::endl;
 				i->files.push_back(tmp_filename);
 			}
 			const unsigned int series_size = i->files.size();

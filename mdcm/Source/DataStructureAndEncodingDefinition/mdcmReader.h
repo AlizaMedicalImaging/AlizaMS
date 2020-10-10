@@ -49,7 +49,6 @@ public:
   virtual ~Reader();
   virtual bool Read();
   void SetFileName(const char*);
-  void SetFileNameUTF8(const char*);
   void SetStream(std::istream & input_stream) { Stream = &input_stream; }
   const File & GetFile() const { return *F; }
   File & GetFile() { return *F; }

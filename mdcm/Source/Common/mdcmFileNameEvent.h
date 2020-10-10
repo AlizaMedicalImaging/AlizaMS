@@ -1,3 +1,11 @@
+/*********************************************************
+ *
+ * MDCM
+ *
+ * Modifications github.com/issakomi
+ *
+ *********************************************************/
+
 /*=========================================================================
 
   Program: GDCM (Grassroots DICOM). A DICOM library
@@ -21,10 +29,9 @@ namespace mdcm
 {
 
 /**
- * \brief FileNameEvent
- * \details Special type of event triggered during processing of FileSet
+ * FileNameEvent
+ * Special type of event triggered during processing of FileSet
  *
- * \see AnyEvent
  */
 class FileNameEvent : public AnyEvent
 {
