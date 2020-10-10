@@ -105,6 +105,13 @@ if(USE_FORCE_CXX14)
 endif()
 #
 
+if(WIN32)
+  option(MDCM_USE_WIN32_UNC "Unicode, long file path (Windows)" ON)
+  if(MDCM_USE_WIN32_UNC)
+    add_definitions(-DMDCM_WIN32_UNC)
+  endif()
+endif()
+
 option(MDCM_USE_SYSTEM_ZLIB "Use system zlib" OFF)
 
 #option(MDCM_USE_SYSTEM_OPENSSL "Use system OpenSSL" OFF)
@@ -640,7 +647,6 @@ set(ALIZAMS_SRCS ${ALIZAMS_SRCS}
   ${CMAKE_CURRENT_SOURCE_DIR}/common/commonutils.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/common/contourutils.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/common/colorspace/colorspace.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/common/filepath.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/common/codecutils.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/dicom/ultrasoundregionutils.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/dicom/dicomutils.cpp
