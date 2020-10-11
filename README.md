@@ -14,21 +14,21 @@ Linux
 To start on Linux extract archive and run _alizams.sh_
 
 ```
-cd alizams-1.1.0_linux
+cd alizams-1.2.1_linux
 ./alizams.sh
 ```
 
 Optionally install local desktop menu entry
 
 ```
-cd alizams-1.1.0_linux/install_menu
+cd alizams-1.2.1_linux/install_menu
 ./install_menu.sh
 ```
 
 To remove local menu entry
 
 ```
-cd alizams-1.1.0_linux/install_menu
+cd alizams-1.2.1_linux/install_menu
 ./uninstall_menu.sh
 ```
 
@@ -52,6 +52,7 @@ Highlights
 ----------
 
  * Very fast directory scanner, DICOMDIR
+ * Consistently de-identify DICOM
  * 2D and 3D views with many tools
  * View uniform and non-uniform series in physical space
  * 2D+t, 3D+t animations
