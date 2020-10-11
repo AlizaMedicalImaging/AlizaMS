@@ -94,7 +94,7 @@ static void get_series_files(
 	s.AddTag(t);
 	if(!s.Scan(files)) return;
 	mdcm::Scanner::ValuesType v = s.GetValues();
-	mdcm::Scanner::ValuesType::iterator it = v.begin(); int x = 0;
+	mdcm::Scanner::ValuesType::iterator it = v.begin();
 	while (it != v.end())
 	{
 		const QString tmp0 = QString::fromLatin1((*it).c_str());
