@@ -453,7 +453,8 @@ static void anonymize_file__(
 #endif
 	if(!reader.Read())
 	{
-		*ok = false;
+		if (DicomUtils::is_dicom_file(filename)) *ok = false;
+		else *ok = true;
 		return;
 	}
 	mdcm::File    & file = reader.GetFile();
