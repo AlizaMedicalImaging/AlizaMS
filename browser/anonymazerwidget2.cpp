@@ -930,7 +930,7 @@ void AnonymazerWidget2::process_directory(
 		if (pd->wasCanceled()) return;
 #if 0
 		QString tmp200;
-		tmp200.sprintf("%08d", i);
+		tmp200.sprintf("%08d", x);
 		QDateTime date_ = QDateTime::currentDateTime();
 		const QString date_str = date_.toString(QString("hhmmss")); // FIXME
 		const QString out_filename = date_str + QString("-") + tmp200 + QString(".dcm");

@@ -11578,12 +11578,12 @@ QString DicomUtils::read_dicom(
 			mdcm::Reader reader;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-			reader.SetFileName(QDir::toNativeSeparators(filenames.at(x)).toUtf8().constData());
+			reader.SetFileName(QDir::toNativeSeparators(images.at(x)).toUtf8().constData());
 #else
-			reader.SetFileName(QDir::toNativeSeparators(filenames.at(x)).toLocal8Bit().constData());
+			reader.SetFileName(QDir::toNativeSeparators(images.at(x)).toLocal8Bit().constData());
 #endif
 #else
-			reader.SetFileName(filenames.at(x).toLocal8Bit().constData());
+			reader.SetFileName(images.at(x).toLocal8Bit().constData());
 #endif
 			if (!reader.ReadUpToTag(mdcm::Tag(0x0028,0x0101))) continue;
 			const mdcm::File    & file = reader.GetFile();
