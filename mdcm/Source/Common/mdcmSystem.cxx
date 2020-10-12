@@ -225,14 +225,18 @@ static std::wstring HandleMaxPath(const std::wstring & in)
 }
 
 }
+#endif
 
 std::wstring System::ConvertToUtf16(const char * utf8path)
 {
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
   const std::wstring uft16path = utf8_decode(utf8path);
   std::wstring uncpath = HandleMaxPath(uft16path);
   return uncpath;
-}
+#else
+  return std::wstring();
 #endif
+}
 
 size_t System::FileSize(const char * filename)
 {

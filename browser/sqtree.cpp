@@ -1133,7 +1133,7 @@ void SQtree::open_file()
 	clear_tree();
 	const QString f = QFileDialog::getOpenFileName(
 		this,
-		tr("Open File"),
+		QString("Open File"),
 		saved_dir,
 		QString(),
 		(QString*)NULL,
@@ -1192,7 +1192,7 @@ void SQtree::open_file_and_series()
 	clear_tree();
 	QString f = QFileDialog::getOpenFileName(
 		this,
-		tr("Open file and scan series"),
+		QString("Open file and scan series"),
 		saved_dir,
 		QString(),
 		(QString*)NULL,

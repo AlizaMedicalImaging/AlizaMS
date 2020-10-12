@@ -65,14 +65,14 @@ void SRWidget::initSR(const QString & s)
 #if 1
 	textBrowser->setHtml(s1);
 #else
-	tmpfile = QDir::toNativeSeparators(
+	tmpfile =
 		QDir::tempPath() +
 		QString("/sr")+
 		QVariant(
 			(qulonglong)
 				QDateTime::currentMSecsSinceEpoch())
 					.toString() +
-		QString(".html"));
+		QString(".html");
 	QFile f(tmpfile);
 	if (f.open(QIODevice::WriteOnly | QIODevice::Text))
 	{

@@ -3237,8 +3237,7 @@ void GraphicsWidget::get_screen()
 	const QString d = CommonUtils::get_screenshot_name(saved_dir);
 	const QString f = QFileDialog::getSaveFileName(
 		NULL,
-		QString(
-			"Select file: format by extension"),
+		QString("Select file: format by extension"),
 		d,
 		QString("All Files (*)"),
 		(QString*)NULL
@@ -3247,21 +3246,19 @@ void GraphicsWidget::get_screen()
 	if (f.isEmpty()) return;
 	QString file;
 	QFileInfo fi(f);
-	CommonUtils::set_screenshot_dir(
-		QDir::toNativeSeparators(
-			fi.absolutePath()));
+	CommonUtils::set_screenshot_dir(fi.absolutePath());
 	QString ext = fi.suffix();
 	if (ext.isEmpty())
 	{
-		file = QDir::toNativeSeparators(f + QString(".png"));
+		file = f + QString(".png");
 		ext = QString("PNG");
 	}
 	else
 	{
-		file = QDir::toNativeSeparators(f);
+		file = f;
 		ext = ext.trimmed().toUpper();
 	}
-	if (!p.save(file, ext.toLocal8Bit().constData()))
+	if (!p.save(file, ext.toLatin1().constData()))
 	{
 		QMessageBox mbox;
 		mbox.setWindowModality(Qt::ApplicationModal);

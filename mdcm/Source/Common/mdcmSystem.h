@@ -33,9 +33,7 @@ public:
   static bool FileExists(const char* filename);
   static bool FileIsDirectory(const char* name);
   static bool FileIsSymlink(const char* name);
-#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
   static std::wstring ConvertToUtf16(const char *);
-#endif
   static const char *GetLastSystemError();
   // Return the filesize. 0 if file does not exist,
   // use FileExists to differentiate between empty file and missing file.

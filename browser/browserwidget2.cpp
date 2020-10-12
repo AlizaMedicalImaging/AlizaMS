@@ -157,7 +157,7 @@ void BrowserWidget2::read_directory(const QString & p)
 	qApp->processEvents();
 	QProgressDialog * pd =
 		new QProgressDialog(
-			QString("Recursive scan"),tr("Stop"),0,0);
+			QString("Recursive scan"),QString("Stop"),0,0);
 	pd->setWindowModality(Qt::ApplicationModal);
 	pd->setWindowFlags(
 		pd->windowFlags()^Qt::WindowContextHelpButtonHint);

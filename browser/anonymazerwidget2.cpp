@@ -1027,7 +1027,7 @@ void AnonymazerWidget2::run_()
 	QMap<QString, QString> uids_m;
 	QMap<QString, QString> pn_m;
 	QProgressDialog * pd =
-		new QProgressDialog(QString("De-identifying"),tr("Cancel"),0,0);
+		new QProgressDialog(QString("De-identifying"),QString("Cancel"),0,0);
 	pd->setWindowModality(Qt::ApplicationModal);
 	pd->setWindowFlags(
 		pd->windowFlags()^Qt::WindowContextHelpButtonHint);
