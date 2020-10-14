@@ -50,10 +50,10 @@ Highlights
 ----------
 
  * Very fast directory scanner, DICOMDIR
- * Consistently de-identify DICOM
  * 2D and 3D views with many tools
  * View uniform and non-uniform series in physical space
  * 2D+t, 3D+t animations
+ * Consistently de-identify DICOM
  * Ultrasound incl. proper measurement in regions, cine
  * Scout (localizer) lines
  * Grayscale softcopy presentation
