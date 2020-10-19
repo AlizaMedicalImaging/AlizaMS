@@ -61,14 +61,12 @@ endif()
 project(ALIZAMS)
 
 if(NOT WIN32)
-  if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    message(STATUS "CXX flags: " ${CMAKE_CXX_FLAGS})
-  else()
+  if(NOT (CMAKE_SIZEOF_VOID_P EQUAL 8))
     set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} " -msse2")
     set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} " -msse2")
-    message(STATUS "CXX flags: " ${CMAKE_CXX_FLAGS})
   endif()
 endif()
+message(STATUS "CXX flags: " ${CMAKE_CXX_FLAGS})
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
