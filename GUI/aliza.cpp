@@ -657,7 +657,9 @@ quit__:
 #endif
 		add_histogram(ivariants.at(x), pb);
 		scene3dimages[ivariants.at(x)->id] = ivariants[x];
-		disconnect(imagesbox->listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(update_selection()));
+		imagesbox->listWidget->blockSignals(true);
+		disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
+		disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
 		imagesbox->listWidget->reset();
 		imagesbox->add_image(ivariants.at(x)->id, ivariants[x], &ivariants[x]->icon);
 		int r = -1;
@@ -676,7 +678,9 @@ quit__:
 			if (ok3d) glwidget->fit_to_screen(ivariants.at(x));
 			emit image_opened();
 		}
-		connect(imagesbox->listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(update_selection()));
+		connect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
+		connect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
+		imagesbox->listWidget->blockSignals(false);
 	}
 	ivariants.clear();
 	if (!message_.isEmpty())
@@ -726,7 +730,9 @@ void Aliza::clear_ram()
 	graphicswidget_y->clear_();
 	graphicswidget_x->clear_();
 	histogramview->clear__();
-	disconnect(imagesbox->listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(update_selection()));
+	imagesbox->listWidget->blockSignals(true);
+	disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
+	disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
 	imagesbox->listWidget->clear();
 	imagesbox->set_html(NULL);
 	selected_images.clear();
@@ -742,7 +748,9 @@ void Aliza::clear_ram()
 	}
 	scene3dimages.clear();
 	if (ok3d && glwidget->isVisible()) glwidget->updateGL();
-	connect(imagesbox->listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(update_selection()));
+	connect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
+	connect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
+	imagesbox->listWidget->blockSignals(false);
 	//
 	mutex0.unlock();
 	if (ok3d) glwidget->set_skip_draw(false);
@@ -766,7 +774,9 @@ void Aliza::delete_image()
 	graphicswidget_y->clear_();
 	graphicswidget_x->clear_();
 	histogramview->clear__();
-	disconnect(imagesbox->listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(update_selection()));
+	imagesbox->listWidget->blockSignals(true);
+	disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
+	disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
 	if (item__)
 	{
 		imagesbox->listWidget->removeItemWidget(item__);
@@ -779,7 +789,9 @@ void Aliza::delete_image()
 		delete ivariant;
 	}
 	update_selection();
-	connect(imagesbox->listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(update_selection()));
+	connect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
+	connect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
+	imagesbox->listWidget->blockSignals(false);
 quit__:
 	mutex0.unlock();
 	if (check_3d()) glwidget->set_skip_draw(false);
@@ -802,7 +814,9 @@ void Aliza::delete_image2(ImageVariant * v)
 {
 	QListWidgetItem * item__ = NULL;
 	if (!v) return;
-	disconnect(imagesbox->listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(update_selection()));
+	imagesbox->listWidget->blockSignals(true);
+	disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
+	disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
 	for (int x = 0; x < imagesbox->listWidget->count(); x++)
 	{
 		if (imagesbox->listWidget->item(x) &&
@@ -824,7 +838,9 @@ void Aliza::delete_image2(ImageVariant * v)
 		delete v;
 		v = NULL;
 	}
-	connect(imagesbox->listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(update_selection()));
+	connect(imagesbox->listWidget, SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
+	connect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
+	imagesbox->listWidget->blockSignals(false);
 #ifdef ALIZA_PRINT_COUNT_GL_OBJ
 	std::cout << "Num VBOs " << GLWidget::get_count_vbos() << std::endl;
 #endif
@@ -3669,8 +3685,9 @@ void Aliza::delete_cheched_unchecked(bool t)
 	graphicswidget_y->clear_();
 	graphicswidget_x->clear_();
 	histogramview->clear__();
-	disconnect(imagesbox->listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(update_selection()));
 	imagesbox->listWidget->blockSignals(true);
+	disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
+	disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
 	for (int x = 0; x < items.size(); x++)
 	{
 		const ListWidgetItem2 * i = static_cast<const ListWidgetItem2*>(items.at(x));
@@ -3694,7 +3711,9 @@ void Aliza::delete_cheched_unchecked(bool t)
 	}
 	imagesbox->listWidget->blockSignals(false);
 	update_selection();
-	connect(imagesbox->listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(update_selection()));
+	connect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
+	connect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
+	imagesbox->listWidget->blockSignals(false);
 quit__:
 	mutex0.unlock();
 	if (ok3d) glwidget->set_skip_draw(false);
@@ -3773,11 +3792,9 @@ quit__:
 			scene3dimages[ivariants.at(j)->id] = ivariants[j];
 			if (true)
 			{
-				disconnect(
-					imagesbox->listWidget,
-					SIGNAL(itemSelectionChanged()),
-					this,
-					SLOT(update_selection()));
+				imagesbox->listWidget->blockSignals(true);
+				disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
+				disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
 				imagesbox->listWidget->reset();
 				imagesbox->add_image(
 					ivariants.at(j)->id,
@@ -3807,11 +3824,9 @@ quit__:
 								ivariants.at(j));
 					}
 				}
-				connect(
-					imagesbox->listWidget,
-					SIGNAL(itemSelectionChanged()),
-					this,
-					SLOT(update_selection()));
+				connect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
+				connect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
+				imagesbox->listWidget->blockSignals(false);
 			}
 		}
 	}
