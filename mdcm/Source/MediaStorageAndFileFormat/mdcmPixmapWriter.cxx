@@ -51,7 +51,6 @@ void PixmapWriter::SetPixmap(Pixmap const &img)
 
 void PixmapWriter::DoIconImage(DataSet & rootds, Pixmap const & image)
 {
-  //const Tag ticonimage(0x0088,0x0200);
   const IconImage &icon = image.GetIconImage();
   if(!icon.IsEmpty())
   {
@@ -108,7 +107,7 @@ void PixmapWriter::DoIconImage(DataSet & rootds, Pixmap const & image)
     {
       const LookupTable &lut = icon.GetLUT();
       assert((pf.GetBitsAllocated() == 8  && pf.GetPixelRepresentation() == 0)
-           || (pf.GetBitsAllocated() == 16 && pf.GetPixelRepresentation() == 0));
+          || (pf.GetBitsAllocated() == 16 && pf.GetPixelRepresentation() == 0));
       unsigned short length, subscript, bitsize;
       std::vector<unsigned short> rawlut8;
       rawlut8.resize(256);
@@ -160,46 +159,44 @@ void PixmapWriter::DoIconImage(DataSet & rootds, Pixmap const & image)
       ds.Replace(bluedesc.GetAsDataElement());
     }
     {
-       DataElement de(Tag(0x7fe0,0x0010));
-       const Value &v = icon.GetDataElement().GetValue();
-       de.SetValue(v);
-       const ByteValue *bv = de.GetByteValue();
-       const TransferSyntax &ts = icon.GetTransferSyntax();
-       assert(ts.IsExplicit() || ts.IsImplicit());
-       VL vl;
-       if(bv)
-       {
-         // if ts is explicit -> set VR
-         vl = bv->GetLength();
-       }
-       else
-       {
-         // if ts is explicit -> set VR
-         vl.SetToUndefined();
-       }
-       if(ts.IsExplicit())
-       {
-         switch (pf.GetBitsAllocated())
-         {
-           case 8:
-             de.SetVR(VR::OB);
-             break;
-           case 16:
-           case 32:
-             de.SetVR(VR::OW);
-             break;
-           default:
-             assert(0 && "should not happen");
-             break;
-         }
-       }
-       else
-       {
-         de.SetVR(VR::OB);
-       }
-       de.SetVL(vl);
-       ds.Replace(de);
-     }
+      DataElement de(Tag(0x7fe0,0x0010));
+      const Value &v = icon.GetDataElement().GetValue();
+      de.SetValue(v);
+      const ByteValue *bv = de.GetByteValue();
+      const TransferSyntax &ts = icon.GetTransferSyntax();
+      assert(ts.IsExplicit() || ts.IsImplicit());
+      VL vl;
+      if(bv)
+      {
+        vl = bv->GetLength();
+      }
+      else
+      {
+        vl.SetToUndefined();
+      }
+      if(ts.IsExplicit())
+      {
+        switch (pf.GetBitsAllocated())
+        {
+          case 8:
+            de.SetVR(VR::OB);
+            break;
+          case 16:
+          case 32:
+            de.SetVR(VR::OW);
+            break;
+          default:
+            assert(0 && "should not happen");
+            break;
+        }
+      }
+      else
+      {
+        de.SetVR(VR::OB);
+      }
+      de.SetVL(vl);
+      ds.Replace(de);
+    }
     Item item;
     item.SetNestedDataSet(ds);
     sq->AddItem(item);
@@ -273,7 +270,6 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
         lutlen = 65536;
       }
       unsigned int l;
-      // should I really clear rawlut each time ?
       // RED
       memset(rawlut,0,lutlen*2);
       lut.GetLUT(LookupTable::RED, (unsigned char*)rawlut, l);
@@ -389,7 +385,6 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
   DataElement depixdata(Tag(0x7fe0,0x0010));
   DataElement & pde = PixelData->GetDataElement();
   const ByteValue *bvpixdata = NULL;
-  // Sometime advanced user may use a mdcm::ImageRegionReader to feed an empty mdcm::Image
   if(!pde.IsEmpty())
   {
     const Value &v = PixelData->GetDataElement().GetValue();
@@ -414,12 +409,12 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
       if(ts_orig == TransferSyntax::JPEG2000)
       {
         static const CSComp newvalues2[] = {"ISO_15444_1"};
-        at3.SetValues( newvalues2, 1);
+        at3.SetValues(newvalues2, 1);
       }
       else if(ts_orig == TransferSyntax::JPEGLSNearLossless)
       {
         static const CSComp newvalues2[] = {"ISO_14495_1"};
-        at3.SetValues( newvalues2, 1);
+        at3.SetValues(newvalues2, 1);
       }
       else if (
         ts_orig == TransferSyntax::JPEGBaselineProcess1 ||
@@ -429,7 +424,7 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
         ts_orig == TransferSyntax::JPEGFullProgressionProcess10_12)
       {
         static const CSComp newvalues2[] = {"ISO_10918_1"};
-        at3.SetValues( newvalues2, 1);
+        at3.SetValues(newvalues2, 1);
       }
       else
       {
@@ -458,12 +453,10 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
   VL vl;
   if(bvpixdata)
   {
-    // if ts is explicit -> set VR
     vl = bvpixdata->GetLength();
   }
   else
   {
-    // if ts is explicit -> set VR
     vl.SetToUndefined();
   }
   if(ts.IsExplicit())
@@ -477,7 +470,14 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
       case 12:
       case 16:
       case 32:
-        depixdata.SetVR(VR::OW);
+        if(depixdata.GetSequenceOfFragments())
+        {
+          depixdata.SetVR(VR::OB);
+        }
+        else
+        {
+          depixdata.SetVR(VR::OW);
+        }
         break;
       default:
         assert(0 && "should not happen");
@@ -489,19 +489,18 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
     depixdata.SetVR(VR::OB);
   }
   depixdata.SetVL(vl);
-  // Advanced user may have passed an empty image
   if(!pde.IsEmpty())
   {
     ds.Replace(depixdata);
   }
   DoIconImage(ds, GetPixmap());
   MediaStorage ms = ref_ms;
-  // Most SOP Class support 2D, but let's make sure that 3D is ok
+  // Make sure 3D is ok
   if(PixelData->GetNumberOfDimensions() > 2)
   {
     if(ms.GetModalityDimension() < PixelData->GetNumberOfDimensions())
     {
-      // input was specified with SC, but the Number of Frame is > 1. Fix that
+      // Input was specified with SC, but the Number of Frames is > 1
       ms = ImageHelper::ComputeMediaStorageFromModality(ms.GetModality(),
           PixelData->GetNumberOfDimensions(),
           PixelData->GetPixelFormat(),
@@ -514,7 +513,6 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
       }
     }
   }
-  // If we are here something went really wrong
   if (!(ms != MediaStorage::MS_END))
   {
     mdcmAlwaysWarnMacro("Internal error (101)");
@@ -551,10 +549,9 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
   }
   ImageHelper::SetDimensionsValue(file, *PixelData);
   UIDGenerator uid;
-  // Be careful with the SOP Instance UID
-  if(ds.FindDataElement(Tag(0x0008, 0x0018)) && false)
+  if(ds.FindDataElement(Tag(0x0008, 0x0018)) && false) // FIXME
   {
-    // We are coming from a real DICOM image, we need to reference it
+    // Reference
     const Tag tsourceImageSequence(0x0008,0x2112);
     SmartPointer<SequenceOfItems> sq;
     if(ds.FindDataElement(tsourceImageSequence))
@@ -600,7 +597,7 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
     de.SetVR(Attribute<0x0008, 0x0018>::GetVR());
     ds.ReplaceEmpty(de);
   }
-  // Are we on a particular Study? If not create a new UID
+  // Create a new UID
   if(!ds.FindDataElement(Tag(0x0020, 0x000d)))
   {
     const char *study = uid.Generate();
@@ -610,7 +607,7 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
     de.SetVR(Attribute<0x0020, 0x000d>::GetVR());
     ds.ReplaceEmpty(de);
   }
-  // Are we on a particular Series ? If not create a new UID
+  // Create a new UID
   if(!ds.FindDataElement(Tag(0x0020, 0x000e)))
   {
     const char *series = uid.Generate();
@@ -624,7 +621,6 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
   if(GetCheckFileMetaInformation())
   {
     fmi.Clear();
-    //assert(ts == TransferSyntax::ImplicitVRLittleEndian);
     {
       const char *tsuid = TransferSyntax::GetTSString(ts);
       DataElement de(Tag(0x0002,0x0010));
@@ -656,7 +652,7 @@ bool PixmapWriter::Write()
   MediaStorage ms;
   if(!ms.SetFromFile(GetFile()))
   {
-    // Let's fix some old ACR-NAME stuff
+    // Fix old ACR-NEMA stuff
     ms = ImageHelper::ComputeMediaStorageFromModality(ms.GetModality(),
         PixelData->GetNumberOfDimensions(),
         PixelData->GetPixelFormat(),
