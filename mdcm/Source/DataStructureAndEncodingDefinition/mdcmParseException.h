@@ -50,10 +50,14 @@ public:
   {
   }
   virtual ~ParseException() throw() {}
-  ParseException &operator= (const ParseException &)
+  ParseException &operator= (const ParseException & e)
   {
-    //TODO
+    LastElement = e.LastElement;
     return *this;
+  }
+  ParseException(const ParseException & e) : Exception(e)
+  {
+    LastElement = e.LastElement;
   }
   void SetLastElement(DataElement & de)
   {

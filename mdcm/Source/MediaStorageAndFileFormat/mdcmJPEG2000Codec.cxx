@@ -1215,7 +1215,7 @@ bool JPEG2000Codec::CodeFrameIntoBuffer(
   opj_setup_encoder(cinfo, &parameters, image);
   myfile mysrc;
   myfile *fsrc = &mysrc;
-  char *buffer_j2k = new char[inputlength]; // overallocated
+  char *buffer_j2k = new char[inputlength*2]; // overallocated
   fsrc->mem = fsrc->cur = buffer_j2k;
   fsrc->len = 0; //inputlength;
   /* open a byte stream for writing */

@@ -110,6 +110,14 @@ public:
     DataSetMS = fmi.DataSetMS;
   }
 
+  FileMetaInformation& operator=(const FileMetaInformation& fmi)
+  {
+    DataSetTS = fmi.DataSetTS;
+    MetaInformationTS = fmi.MetaInformationTS;
+    DataSetMS = fmi.DataSetMS;
+    return *this;
+  }
+
   VL GetFullLength() const
   {
       return P.GetLength() + DataSet::GetLength<ExplicitDataElement>();
