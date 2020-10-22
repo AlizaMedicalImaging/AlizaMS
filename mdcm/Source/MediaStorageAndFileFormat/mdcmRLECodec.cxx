@@ -700,10 +700,10 @@ bool RLECodec::DecodeByStreams(std::istream &is, std::ostream &os)
     {
       is.read((char*)&byte, 1);
       if(!is.good())
-    {
+      {
         mdcmErrorMacro("Could not decode");
         return false;
-    }
+      }
       numberOfReadBytes++;
       if(byte >= 0 /*&& byte <= 127*/) /* 2nd is always true */
       {

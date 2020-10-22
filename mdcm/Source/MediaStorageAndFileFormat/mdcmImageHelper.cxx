@@ -1768,9 +1768,9 @@ void ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
         atDimensionIndexValues.SetValue(1, 0);
         atDimensionIndexValues.SetValue((unsigned int)(i+1), 1);
         subds3.Replace(atDimensionIndexValues.GetAsDataElement());
-        if (ms == MediaStorage::LegacyConvertedEnhancedMRImageStorage ||
-            ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage ||
-            ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
+        if(ms == MediaStorage::LegacyConvertedEnhancedMRImageStorage ||
+           ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage ||
+           ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
         {
           const Tag tConversionSourceAttributesSequence(0x0020,0x9172);
           if(!subds.FindDataElement(tConversionSourceAttributesSequence))
@@ -1797,15 +1797,15 @@ void ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
           Item &item4 = sqConversionSourceAttributesSequence->GetItem(1);
           DataSet &subds4 = item4.GetNestedDataSet();
           Attribute<0x0008,0x1150> atReferencedSOPClassUID;
-          if (ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage)
+          if(ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage)
             atReferencedSOPClassUID.SetValue(
               "1.2.840.10008.5.1.4.1.1.2.2");
-          else if (ms == MediaStorage::LegacyConvertedEnhancedMRImageStorage)
+          else if(ms == MediaStorage::LegacyConvertedEnhancedMRImageStorage)
             atReferencedSOPClassUID.SetValue(
               "1.2.840.10008.5.1.4.1.1.4.4");
-          else if (ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
-			  atReferencedSOPClassUID.SetValue(
-			  "1.2.840.10008.5.1.4.1.1.128.1");
+          else if(ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
+            atReferencedSOPClassUID.SetValue(
+              "1.2.840.10008.5.1.4.1.1.128.1");
           subds4.Replace(atReferencedSOPClassUID.GetAsDataElement());
           Attribute<0x0008,0x1155> atReferencedSOPInstanceUID;
           UIDGenerator gReferencedSOPInstanceUID;
@@ -1816,13 +1816,13 @@ void ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
   }
   // Sleanup the sharedgroup
   {
-      const Tag tfgs0(0x5200,0x9229);
-      if(ds.FindDataElement(tfgs0))
+    const Tag tfgs0(0x5200,0x9229);
+    if(ds.FindDataElement(tfgs0))
     {
-        SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs0).GetValueAsSQ();
-        assert(sqi);
-        SequenceOfItems::SizeType nitems = sqi->GetNumberOfItems();
-        for(SequenceOfItems::SizeType i0 = 1; i0 <= nitems; ++i0)
+      SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs0).GetValueAsSQ();
+      assert(sqi);
+      SequenceOfItems::SizeType nitems = sqi->GetNumberOfItems();
+      for(SequenceOfItems::SizeType i0 = 1; i0 <= nitems; ++i0)
       {
           Item &item = sqi->GetItem(i0);
           DataSet & subds = item.GetNestedDataSet();

@@ -111,14 +111,17 @@ static inline PixelFormat::ScalarType ComputeBestFit(
 {
   PixelFormat::ScalarType st = PixelFormat::UNKNOWN;
 
-  if (pf == PixelFormat::FLOAT16 ||
-      pf == PixelFormat::FLOAT32 ||
-      pf == PixelFormat::FLOAT64)
+  if(pf == PixelFormat::FLOAT16 ||
+     pf == PixelFormat::FLOAT32 ||
+     pf == PixelFormat::FLOAT64)
   {
     st = PixelFormat::FLOAT64;
     return st;
   }
-  assert(pf.GetMin() <= pf.GetMax());
+  if (!(pf.GetMin() <= pf.GetMax()))
+  {
+    mdcmAlwaysWarnMacro("ComputeBestFit !(pf.GetMin() <= pf.GetMax())")
+  }
   const double pfmin = slope >= 0 ? pf.GetMin() : pf.GetMax();
   const double pfmax = slope >= 0 ? pf.GetMax() : pf.GetMin();
   const double min = slope * pfmin + intercept;
@@ -137,9 +140,14 @@ static inline PixelFormat::ScalarType ComputeBestFit(
     {
       st = PixelFormat::UINT32;
     }
+    else if(max <= (double)(std::numeric_limits<uint64_t>::max()))
+    {
+      // Very large value in Rescale Slope?
+      return PixelFormat::FLOAT64;
+    }
     else
     {
-      mdcmErrorMacro("Unhandled Pixel Format");
+      mdcmAlwaysWarnMacro("ComputeBestFit failed (1)");
       return st;
     }
   }
@@ -160,9 +168,15 @@ static inline PixelFormat::ScalarType ComputeBestFit(
     {
       st = PixelFormat::INT32;
     }
+    else if(max <= (double)(std::numeric_limits<int64_t>::max())
+      && min >= (double)(std::numeric_limits<int64_t>::min()))
+    {
+      // Very large value in Rescale Slope?
+      return PixelFormat::FLOAT64;
+    }
     else
     {
-      mdcmErrorMacro("Unhandled Pixel Format");
+      mdcmAlwaysWarnMacro("ComputeBestFit failed (2)");
       return st;
     }
   }
@@ -189,7 +203,7 @@ PixelFormat::ScalarType Rescaler::ComputeInterceptSlopePixelType()
   }
   if(Slope != (int)Slope || Intercept != (int)Intercept)
   {
-    if (PF.GetBitsAllocated() <= 16)
+    if(PF.GetBitsAllocated() <= 16)
       return PixelFormat::FLOAT32;
     else
       return PixelFormat::FLOAT64;
@@ -367,7 +381,7 @@ bool Rescaler::Rescale(char * out, const char * in, size_t n)
     RescaleFunctionIntoBestFit<double>(out,(const double*)in,n);
     break;
   default:
-    mdcmErrorMacro("Unhandled: " << PF);
+    mdcmAlwaysWarnMacro("Unhandled: " << PF);
     break;
   }
   return true;
@@ -405,6 +419,7 @@ static PixelFormat ComputeInverseBestFitFromMinMax(
     }
     else
     {
+      mdcmAlwaysWarnMacro("ComputeInverseBestFitFromMinMax failed (1)");
       return PixelFormat::UNKNOWN;
     }
     int64_t max2 = max;
@@ -431,6 +446,7 @@ static PixelFormat ComputeInverseBestFitFromMinMax(
     }
     else
     {
+      mdcmAlwaysWarnMacro("ComputeInverseBestFitFromMinMax failed (2)");
       return PixelFormat::UNKNOWN;
     }
     int64_t max2 = max - min;
