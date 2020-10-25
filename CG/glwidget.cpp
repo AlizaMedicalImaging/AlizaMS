@@ -589,7 +589,6 @@ void GLWidget::get_screen(bool white_bg)
 	QString saved_dir;
 	QString d;
 	QString f;
-	QString f__;
 	QString ext;
 	QFileInfo fi;
 	if (white_bg)
@@ -616,26 +615,18 @@ void GLWidget::get_screen(bool white_bg)
 		);
 	if (f.isEmpty()) goto quit__;
 	fi = QFileInfo(f);
-	CommonUtils::set_screenshot_dir(
-		QDir::toNativeSeparators(fi.absolutePath()));
+	CommonUtils::set_screenshot_dir(fi.absolutePath());
 	ext = fi.suffix();
 	if (ext.isEmpty())
 	{
-		f__ = QDir::toNativeSeparators(f + QString(".png"));
+		f = f + QString(".png");
 	}
 	else if ((ext.toUpper() != QString("PNG")))
 	{
-		f__ = QDir::toNativeSeparators(
-			fi.absolutePath() +
-			QString("/") +
-			fi.baseName() +
-			QString(".png"));
+		f = fi.absolutePath() + QString("/") +
+			fi.baseName() + QString(".png");
 	}
-	else
-	{
-		f__ = QDir::toNativeSeparators(f);
-	}
-	if (!p.save(f__, "PNG"))
+	if (!p.save(f, "PNG"))
 	{
 		QMessageBox mbox;
 		mbox.setWindowModality(Qt::ApplicationModal);
