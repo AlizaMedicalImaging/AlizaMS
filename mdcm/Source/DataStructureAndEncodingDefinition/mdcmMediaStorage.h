@@ -148,6 +148,7 @@ typedef enum
   BreastProjectionXRayImageStorageForPresentation,
   BreastProjectionXRayImageStorageForProcessing,
   HardcopyColorImageStorage,
+  DCMTKUnknownStorage,
   MS_END
 } MSType;
 

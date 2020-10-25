@@ -768,6 +768,7 @@ std::vector<double> ImageHelper::GetRescaleInterceptSlopeValue(File const & f)
   || ms == MediaStorage::SecondaryCaptureImageStorage
   || ms == MediaStorage::MultiframeGrayscaleWordSecondaryCaptureImageStorage
   || ms == MediaStorage::MultiframeGrayscaleByteSecondaryCaptureImageStorage
+  || ms == MediaStorage::DCMTKUnknownStorage
   || ForceRescaleInterceptSlope)
   {
     bool b = GetRescaleInterceptSlopeValueFromDataSet(ds, interceptslope);
@@ -899,6 +900,7 @@ Tag ImageHelper::GetSpacingTagFromMediaStorage(MediaStorage const &ms)
   case MediaStorage::MultiframeGrayscaleByteSecondaryCaptureImageStorage:
   case MediaStorage::MultiframeGrayscaleWordSecondaryCaptureImageStorage:
   case MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage:
+  case MediaStorage::DCMTKUnknownStorage:
     t = Tag(0x0018,0x2010);
     break;
   case MediaStorage::GEPrivate3DModelStorage:

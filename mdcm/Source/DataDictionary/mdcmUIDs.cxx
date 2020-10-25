@@ -496,6 +496,7 @@ const char * const UIDsStrings[][2] = {
 {"1.2.840.113619.5.2","GE Implicit VR Big Endian DLX"},
 // DICOM_Conformance_Statement_GEMINI_R3.5_R3.6.pdf
 {"1.3.46.670589.33.1.4.1","CT-private-ELE"},
+{"1.2.276.0.7230010.3.1.0.1","DCMTK Unknown"},
 //
 //
 //
