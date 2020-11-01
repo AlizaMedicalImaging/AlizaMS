@@ -5711,14 +5711,12 @@ QString DicomUtils::read_ultrasound(
 	const QStringList & images_ipp,
 	const QWidget * settings, QProgressDialog * pb)
 {
-	//
-	const bool overwrite_mdcm_spacing = true;
-	//
+	if (!ok) return QString("read_ultrasound : error (1)");
 	*ok = false;
+	const bool overwrite_mdcm_spacing = true;
 	if (!ivariant) return QString("ivariant==NULL");
 	if (!settings) return QString("settings==NULL");
-	if (images_ipp.size() != 1)
-		return QString("read_ultrasound reads 1 image");
+	if (images_ipp.size() != 1) return QString("read_ultrasound reads 1 image");
 	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
 	const SettingsWidget * wsettings =
@@ -5733,6 +5731,7 @@ QString DicomUtils::read_ultrasound(
 	mdcm::PhotometricInterpretation pi;
 	const mdcm::Tag tnumframes(0x0028,0x0008);
 	const mdcm::Tag tPixelAspectRatio(0x0028,0x0034);
+	const mdcm::PrivateTag tPhilipsVoxelSpacing(0x200d,0x03,"Philips US Imaging DD 036");
 	const bool overlays_enabled = wsettings->get_overlays();
 	const int overlays_idx = overlays_enabled ? 0 : -2;
 	int number_of_frames = 0;
@@ -5748,10 +5747,9 @@ QString DicomUtils::read_ultrasound(
 	reader.SetFileName(images_ipp.at(0).toLocal8Bit().constData());
 #endif
 	*ok = reader.Read();
-	if (*ok==false)
+	if (*ok == false)
 	{
-		return (QString(
-			"can not read file ") + images_ipp.at(0));
+		return (QString("can not read file ") + images_ipp.at(0));
 	}
 	const mdcm::File    & file = reader.GetFile();
 	const mdcm::DataSet & ds   = file.GetDataSet();
@@ -5819,28 +5817,67 @@ QString DicomUtils::read_ultrasound(
 	//
 	if (overwrite_mdcm_spacing)
 	{
-		if (ds.FindDataElement(tPixelAspectRatio))
+		bool bPhilipsVoxelSpacing = false;
+		bool bPixelAspectRatio = false;
+		if (ds.FindDataElement(tPhilipsVoxelSpacing))
 		{
-			std::vector<int> tmp0;
-			const bool tmp0_ok =
-				get_is_values(ds,tPixelAspectRatio,tmp0);
-			if (tmp0_ok && tmp0.size()==2)
+			// Partial support Philips private 3D storage, only spacing,
+			// TODO complete
+			QString s;
+			if (priv_get_string_value(ds,tPhilipsVoxelSpacing,s))
 			{
-				spacing_x = tmp0[1];
-				spacing_y = tmp0[0];
-			}
-			else
-			{
-				spacing_x = 1.0;
-				spacing_y = 1.0;
+				const mdcm::DataElement & e =
+					ds.GetDataElement(tPhilipsVoxelSpacing);
+				if (!e.IsEmpty())
+				{
+					const mdcm::ByteValue * bv = e.GetByteValue();
+					if (bv)
+					{
+						const QString tmp0 = QString::fromLatin1(
+							bv->GetPointer(),
+							bv->GetLength());
+						const QStringList tmp1 = tmp0.split(
+							QString("\\"),
+							QString::SkipEmptyParts);
+						if (tmp1.size() == 3)
+						{
+							bool okx = false, oky = false, okz = false;
+							const double tmp_spacing_x = QVariant(
+								tmp1.at(0).trimmed()).toDouble(&okx);
+							const double tmp_spacing_y = QVariant(
+								tmp1.at(1).trimmed()).toDouble(&oky);
+							const double tmp_spacing_z = QVariant(
+								tmp1.at(2).trimmed()).toDouble(&okz);
+							if (okx && oky && okz)
+							{
+								bPhilipsVoxelSpacing = true;
+								spacing_x = tmp_spacing_x;
+								spacing_y = tmp_spacing_y;
+								spacing_z = tmp_spacing_z;
+							}
+						}
+					}
+				}
 			}
 		}
-		else
+		if (!bPhilipsVoxelSpacing && ds.FindDataElement(tPixelAspectRatio))
+		{
+			std::vector<int> tmp0;
+			const bool tmp0_ok = get_is_values(ds,tPixelAspectRatio,tmp0);
+			if (tmp0_ok && tmp0.size()==2)
+			{
+				bPixelAspectRatio = true;
+				spacing_x = tmp0[1];
+				spacing_y = tmp0[0];
+				spacing_z = 1.0;
+			}
+		}
+		if (!(bPhilipsVoxelSpacing || bPixelAspectRatio))
 		{
 			spacing_x = 1.0;
 			spacing_y = 1.0;
+			spacing_z = 1.0;
 		}
-		spacing_z = 1.0;
 	}
 	else
 	{
@@ -5905,8 +5942,14 @@ QString DicomUtils::read_ultrasound(
 		}
 	}
 	data.clear();
-	if (*ok==true) IconUtils::icon(ivariant);
-	if (*ok==false) return error;
+	if (*ok)
+	{
+		IconUtils::icon(ivariant);
+	}
+	else
+	{
+		return error;
+	}
 	if (!ivariant->frame_times.empty() &&
 		((int)ivariant->frame_times.size()!=ivariant->di->idimz))
 	{
