@@ -615,7 +615,7 @@ std::pair<char *, size_t> JPEG2000Codec::DecodeByStreamsCommon(
   {
     file_length--;
   }
-  if(file_length <= 0)
+  if(file_length < 1)
   {
     return std::make_pair((char*)NULL, 0);
   }
