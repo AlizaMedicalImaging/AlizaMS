@@ -597,6 +597,10 @@ std::pair<char *, size_t> JPEG2000Codec::DecodeByStreamsCommon(
   char *dummy_buffer,
   size_t buf_size)
 {
+  if(!dummy_buffer||buf_size <= 0)
+  {
+    return std::make_pair((char*)NULL, 0);
+  }
   opj_dparameters_t parameters; // decompression parameters
   opj_codec_t* dinfo = NULL; // handle to a decompressor
   opj_stream_t *cio = NULL;
@@ -614,8 +618,14 @@ std::pair<char *, size_t> JPEG2000Codec::DecodeByStreamsCommon(
   {
     file_length--;
   }
-  // what if 0xd9 is never found?
-  assert(file_length > 0 && src[file_length-1] == 0xd9);
+  if(file_length <= 0)
+  {
+    return std::make_pair((char*)NULL, 0);
+  }
+  if(src[file_length-1] != 0xd9)
+  {
+    return std::make_pair((char*)NULL, 0);
+  }
   /* set decoding parameters to default values */
   opj_set_default_decoder_parameters(&parameters);
   const char jp2magic[] = "\x00\x00\x00\x0C\x6A\x50\x20\x20\x0D\x0A\x87\x0A";
@@ -1315,10 +1325,11 @@ bool JPEG2000Codec::GetHeaderInfo(std::istream &is, TransferSyntax &ts)
   return b;
 }
 
-bool JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size, TransferSyntax &ts)
+bool JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size, TransferSyntax & ts)
 {
-  opj_dparameters_t parameters;  /* decompression parameters */
-  opj_codec_t* dinfo = NULL;  /* handle to a decompressor */
+  if (!dummy_buffer) return false;
+  opj_dparameters_t parameters; /* decompression parameters */
+  opj_codec_t* dinfo = NULL; /* handle to a decompressor */
   opj_stream_t *cio = NULL;
   opj_image_t *image = NULL;
   const unsigned char *src = (const unsigned char*)dummy_buffer;
@@ -1326,22 +1337,20 @@ bool JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size, Tr
   /* set decoding parameters to default values */
   opj_set_default_decoder_parameters(&parameters);
   const char jp2magic[] = "\x00\x00\x00\x0C\x6A\x50\x20\x20\x0D\x0A\x87\x0A";
-  if(memcmp(src, jp2magic, sizeof(jp2magic)) == 0)
+  const size_t jp2magic_size = sizeof(jp2magic);
+  if((file_length >= jp2magic_size) && (memcmp(src, jp2magic, jp2magic_size) == 0))
   {
     /* JPEG-2000 compressed image data */
     // mdcmData/ELSCINT1_JP2vsJ2K.dcm
-    mdcmWarningMacro("J2K start like JPEG-2000 compressed image data instead of codestream");
+    mdcmWarningMacro("J2K starts like JPEG2000 image data instead of codestream");
     parameters.decod_format = JP2_CFMT;
-    assert(parameters.decod_format == JP2_CFMT);
   }
   else
   {
     /* JPEG-2000 codestream */
     parameters.decod_format = J2K_CFMT;
-    assert(parameters.decod_format == J2K_CFMT);
   }
   parameters.cod_format = PGX_DFMT;
-  assert(parameters.cod_format == PGX_DFMT);
   /* get a decoder handle */
   switch(parameters.decod_format)
   {
@@ -1352,7 +1361,6 @@ bool JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size, Tr
     dinfo = opj_create_decompress(CODEC_JP2);
     break;
   default:
-    mdcmErrorMacro("Impossible happen");
     return false;
   }
 #if (OPJ_VERSION_MAJOR == 2 && OPJ_VERSION_MINOR >= 3)
@@ -1585,6 +1593,7 @@ bool JPEG2000Codec::DecodeExtent(
     {
       size_t fraglen = frag.GetVL();
       size_t oldlen = vdummybuffer.size();
+      if (fraglen == 0 && oldlen == 0) break;
       buf_size = fraglen + oldlen;
       vdummybuffer.resize(buf_size);
       dummy_buffer = &vdummybuffer[0];
