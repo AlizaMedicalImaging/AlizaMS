@@ -597,10 +597,7 @@ std::pair<char *, size_t> JPEG2000Codec::DecodeByStreamsCommon(
   char *dummy_buffer,
   size_t buf_size)
 {
-  if(!dummy_buffer||buf_size <= 0)
-  {
-    return std::make_pair((char*)NULL, 0);
-  }
+  if(!dummy_buffer) return std::make_pair((char*)NULL, 0);
   opj_dparameters_t parameters; // decompression parameters
   opj_codec_t* dinfo = NULL; // handle to a decompressor
   opj_stream_t *cio = NULL;
