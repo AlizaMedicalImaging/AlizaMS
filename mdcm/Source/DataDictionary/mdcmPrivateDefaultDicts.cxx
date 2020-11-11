@@ -1,7 +1,3 @@
-
-// GENERATED FILE DO NOT EDIT
-// $ xsltproc DefaultDicts.xsl DICOMV3.xml > mdcmDefaultDicts.cxx
-
 /*********************************************************
  *
  * MDCM
@@ -46,6 +42,41 @@ typedef struct
 } DICT_ENTRY;
 
 const DICT_ENTRY DICOMV3DataDict [] = {
+  {0x2013,0x0010,"BioDICOMizer",VR::LO,VM::VM1,"Custom Storage Version",false},
+  {0x2013,0x0011,"BioDICOMizer",VR::ST,VM::VM1,"Custom Storage Former Filename",false},
+  {0x2013,0x0012,"BioDICOMizer",VR::LO,VM::VM1,"Custom Storage Mime-Type",false},
+  {0x2013,0x0013,"BioDICOMizer",VR::UL,VM::VM1,"Custom Storage File Length",false},
+  {0x2013,0x0016,"BioDICOMizer",VR::ST,VM::VM1,"Custom Storage Information Description",false},
+  {0x2013,0x0017,"BioDICOMizer",VR::UL,VM::VM1,"Custom Storage Number Of Segments",false},
+  {0x2013,0x0018,"BioDICOMizer",VR::IS,VM::VM1,"Custom Storage Last Byte Padded",false},
+  {0x2013,0x0010,"BioClinicaImaging",VR::LO,VM::VM1,"Custom Storage Version",false},
+  {0x2013,0x0011,"BioClinicaImaging",VR::ST,VM::VM1,"Custom Storage Former Filename",false},
+  {0x2013,0x0012,"BioClinicaImaging",VR::LO,VM::VM1,"Custom Storage Mime-Type",false},
+  {0x2013,0x0013,"BioClinicaImaging",VR::UL,VM::VM1,"Custom Storage File Length",false},
+  {0x2013,0x0016,"BioClinicaImaging",VR::ST,VM::VM1,"Custom Storage Information Description",false},
+  {0x2013,0x0017,"BioClinicaImaging",VR::UL,VM::VM1,"Custom Storage Number Of Segments",false},
+  {0x2013,0x0018,"BioClinicaImaging",VR::IS,VM::VM1,"Custom Storage Last Byte Padded",false},
+  {0x2013,0x0001,"BioClinicaImagingSegmentGroup",VR::OB,VM::VM1,"Custom Storage Segment Blob #1",false},
+  {0x2013,0x0002,"BioClinicaImagingSegmentGroup",VR::OB,VM::VM1,"Custom Storage Segment Blob #2",false},
+  {0x2013,0x0003,"BioClinicaImagingSegmentGroup",VR::OB,VM::VM1,"Custom Storage Segment Blob #3",false},
+  {0x2013,0x0004,"BioClinicaImagingSegmentGroup",VR::OB,VM::VM1,"Custom Storage Segment Blob #4",false},
+  {0x2013,0x0005,"BioClinicaImagingSegmentGroup",VR::OB,VM::VM1,"Custom Storage Segment Blob #5",false},
+  {0x2013,0x0006,"BioClinicaImagingSegmentGroup",VR::OB,VM::VM1,"Custom Storage Segment Blob #6",false},
+  {0x2013,0x0007,"BioClinicaImagingSegmentGroup",VR::OB,VM::VM1,"Custom Storage Segment Blob #7",false},
+  {0x2013,0x0008,"BioClinicaImagingSegmentGroup",VR::OB,VM::VM1,"Custom Storage Segment Blob #8",false},
+  {0x2013,0x0009,"BioClinicaImagingSegmentGroup",VR::OB,VM::VM1,"Custom Storage Segment Blob #9",false},
+  {0x7fe1,0x0001,"Bioclinica",VR::UT,VM::VM1,"?",false},
+  {0x7fe1,0x0002,"Bioclinica",VR::LO,VM::VM1,"?",false},
+  {0x7fe1,0x0003,"Bioclinica",VR::LO,VM::VM1,"?",false},
+  {0x5533,0x0033,"Visus Change",VR::SQ,VM::VM1,"Visus Data Save Sequence",false},
+  {0x5533,0x0035,"Visus Change",VR::DA,VM::VM1,"Visus Data Save Date",false},
+  {0x5533,0x0037,"Visus Change",VR::LO,VM::VM1,"Visus Data Save Originator",false},
+  {0x5533,0x0039,"Visus Change",VR::FD,VM::VM1,"Visus Data Save ID",false},
+  {0x5533,0x003b,"Visus Change",VR::TM,VM::VM1,"?Visus Data Save Time?",false},
+  {0x0071,0x0021,"SIEMENS MED PT",VR::UI,VM::VM1,"Registration Matrix UID",false},
+  {0x0071,0x0022,"SIEMENS MED PT",VR::DT,VM::VM1,"Decay Correction DateTime",false},
+  {0x0071,0x0023,"SIEMENS MED PT",VR::FD,VM::VM16,"Registration Matrix",false},
+  {0x0071,0x0024,"SIEMENS MED PT",VR::CS,VM::VM1,"Table Motion",false},
   {0x0021,0x0001,"SIEMENS MR SDR 01",VR::LO,VM::VM1,"?",false},
   {0x0021,0x0001,"SIEMENS MR SDS 01",VR::IS,VM::VM1,"?",false},
   {0x0021,0x0002,"SIEMENS MR SDR 01",VR::LO,VM::VM1,"?",false},
@@ -115,6 +146,7 @@ const DICT_ENTRY DICOMV3DataDict [] = {
   {0x0021,0x0049,"SIEMENS MR SDS 01",VR::CS,VM::VM1,"?",false},
   {0x0021,0x0048,"SIEMENS MR SDI 02",VR::IS,VM::VM1,"?",false},
   {0x0021,0x0049,"SIEMENS MR SDI 02",VR::IS,VM::VM1,"?",false},
+  {0x0021,0x004e,"SIEMENS MR SDI 02",VR::IS,VM::VM1,"?",false},
   {0x0021,0x004f,"SIEMENS MR SDI 02",VR::LO,VM::VM1,"ImaCoilString",false},
   {0x0021,0x0050,"SIEMENS MR SDS 01",VR::US,VM::VM1,"?",false},
   {0x0021,0x0051,"SIEMENS MR SDI 02",VR::UL,VM::VM1,"?SequenceMask?",false},
@@ -128,6 +160,7 @@ const DICT_ENTRY DICOMV3DataDict [] = {
   {0x0021,0x005a,"SIEMENS MR SDS 01",VR::CS,VM::VM1,"?Sequence Varient 1?",false},
   {0x0021,0x005b,"SIEMENS MR SDI 02",VR::FD,VM::VM3,"Image Position (Patient)",false},
   {0x0021,0x005b,"SIEMENS MR SDS 01",VR::CS,VM::VM1,"?Sequence Varient 2?",false},
+  {0x0021,0x005c,"SIEMENS MR SDS 01",VR::CS,VM::VM1,"MTR flag. MT => ON",false},
   {0x0021,0x005d,"SIEMENS MR SDS 01",VR::SL,VM::VM1,"?",false},
   {0x0021,0x005e,"SIEMENS MR SDI 02",VR::IS,VM::VM1,"?FrameIndex?",false},
   {0x0021,0x0063,"SIEMENS MR SDI 02",VR::IS,VM::VM1,"?Acquisition Number?",false},
@@ -512,7 +545,7 @@ const DICT_ENTRY DICOMV3DataDict [] = {
   {0x0019,0x00ca,"PMTF INFORMATION DATA^10",VR::LO,VM::VM1,"Sequence Name",false },
   {0x0019,0x00cb,"PMTF INFORMATION DATA^10",VR::UL,VM::VM1,"?",false },
   {0x0019,0x00cc,"PMTF INFORMATION DATA^10",VR::UL,VM::VM1_n,"?",false },
-  {0x0019,0x00cc,"PMTF INFORMATION DATA^12",VR::SS,VM::VM1,"?",false },
+  {0x0019,0x00cc,"PMTF INFORMATION DATA^12",VR::SS,VM::VM1_n,"?",false },
   {0x0019,0x00cd,"PMTF INFORMATION DATA^10",VR::SL,VM::VM1,"?",false },
   {0x0019,0x00cd,"PMTF INFORMATION DATA^11",VR::SL,VM::VM3,"?",false },
   {0x0019,0x00cd,"PMTF INFORMATION DATA^12",VR::LO,VM::VM1,"?",false },
@@ -1958,6 +1991,9 @@ const DICT_ENTRY DICOMV3DataDict [] = {
   {0x0009,0x0092,"FDMS 1.0",VR::SH,VM::VM1,"Kanji Department Name",false },
   {0x0009,0x00f0,"FDMS 1.0",VR::CS,VM::VM1,"Blackening Process Flag",false },
   {0x0009,0x00f1,"FDMS 1.0",VR::ST,VM::VM1,"Processing Information Flag",false },
+  {0x0009,0x00f2,"FDMS 1.0",VR::CS,VM::VM1,"Normalization Flag",false },
+  {0x0009,0x00f3,"FDMS 1.0",VR::CS,VM::VM1,"Tone characteristic",false },
+  {0x0009,0x00f4,"FDMS 1.0",VR::CS,VM::VM1,"Window Value Fixed Flag",false },
   {0x0019,0x0015,"FDMS 1.0",VR::LO,VM::VM1,"Kanji Body Part for Exposure",false },
   {0x0019,0x0030,"FDMS 1.0",VR::LO,VM::VM1,"Menu Character String",false },
   {0x0019,0x0032,"FDMS 1.0",VR::LO,VM::VM1,"Kanji Menu Name",false },
@@ -8220,6 +8256,7 @@ const DICT_ENTRY DICOMV3DataDict [] = {
   {0x0051,0x0011,"SIEMENS MR HEADER",VR::LO,VM::VM1,"PAT Mode (Ima PAT Mode)",false },
   {0x0051,0x0012,"SIEMENS MR HEADER",VR::SH,VM::VM1,"?Table Position?",false },
   {0x0051,0x0013,"SIEMENS MR HEADER",VR::SH,VM::VM1,"Positive PCS Directions",false },
+  {0x0051,0x0014,"SIEMENS MR HEADER",VR::SH,VM::VM1,"?v150_through?",false },
   {0x0051,0x0015,"SIEMENS MR HEADER",VR::SH,VM::VM1,"?Data Filter?",false },
   {0x0051,0x0016,"SIEMENS MR HEADER",VR::LO,VM::VM1,"?Image Type?",false },
   {0x0051,0x0017,"SIEMENS MR HEADER",VR::SH,VM::VM1,"?Slice Thickness?",false },
@@ -10257,7 +10294,6 @@ const DICT_ENTRY DICOMV3DataDict [] = {
   {0x3115,0x0002,"http://www.gemedicalsystems.com/it_solutions/rad_pacs/",VR::UT,VM::VM1,"Reference to pacs image",false },
   {0x3115,0x0003,"http://www.gemedicalsystems.com/it_solutions/rad_pacs/",VR::CS,VM::VM1,"Pacs examnotes flag",false },
   {0x0021,0x00ae,"syngoDynamics",VR::OB,VM::VM1,"?",false },
-
   // United Imaging Healthcare
   {0x0061,0x0002,"DB Dicom Private Creator",VR::US,VM::VM1,"Generate Private",false },
   {0x0061,0x0002,"Common Private Header",VR::SH,VM::VM1,"FOV",false },
@@ -10300,21 +10336,9 @@ const DICT_ENTRY DICOMV3DataDict [] = {
   {0x0065,0x0041,"Image Private Header",VR::LT,VM::VM1,"?",false },
   {0x0065,0x0050,"Image Private Header",VR::DS,VM::VM1,"MR Number Of Slices In Volume",false },
   {0x0065,0x0051,"Image Private Header",VR::SQ,VM::VM1,"MR VFrame Sequence",false },
-  {0x7fe1,0x0001,"Bioclinica",VR::UT,VM::VM1,"?",false},
-  {0x7fe1,0x0002,"Bioclinica",VR::LO,VM::VM1,"?",false},
-  {0x7fe1,0x0003,"Bioclinica",VR::LO,VM::VM1,"?",false},
-  {0x5533,0x0033,"Visus Change",VR::SQ,VM::VM1,"Visus Data Save Sequence",false},
-  {0x5533,0x0035,"Visus Change",VR::DA,VM::VM1,"Visus Data Save Date",false},
-  {0x5533,0x0037,"Visus Change",VR::LO,VM::VM1,"Visus Data Save Originator",false},
-  {0x5533,0x0039,"Visus Change",VR::FD,VM::VM1,"Visus Data Save ID",false},
-  {0x5533,0x003b,"Visus Change",VR::TM,VM::VM1,"?Visus Data Save Time?",false},
-  {0x0071,0x0021,"SIEMENS MED PT",VR::UI,VM::VM1,"Registration Matrix UID",false},
-  {0x0071,0x0022,"SIEMENS MED PT",VR::DT,VM::VM1,"Decay Correction DateTime",false},
-  {0x0071,0x0023,"SIEMENS MED PT",VR::FD,VM::VM16,"Registration Matrix",false},
-  {0x0071,0x0024,"SIEMENS MED PT",VR::CS,VM::VM1,"Table Motion",false},
+  //
   {0x0067,0x0001,"ALIZA 001",VR::UT,VM::VM1,"Comment",false },
-  {0xffff,0xffff,"MDCM Private Sentinel",VR::INVALID,VM::VM0,"",true },
-  {0xffff,0xffff,"",VR::INVALID,VM::VM0,0,true }
+  {0xffff,0xffff,"",VR::INVALID,VM::VM0,NULL,true }
 };
 
 void PrivateDict::LoadDefault()
@@ -10323,11 +10347,10 @@ void PrivateDict::LoadDefault()
   DICT_ENTRY n = DICOMV3DataDict[i];
   while(n.name != NULL)
   {
-    assert(n.owner != 0);
-    assert(n.name);
-    assert(n.group % 2 != 0 || n.group == 0xffff);
+    assert(n.owner != NULL);
+    assert((n.group % 2) != 0 || n.group == 0xffff);
     assert(n.element <= 0xff || n.element == 0xffff);
-    PrivateTag t(n.group, n.element,n.owner);
+    PrivateTag t(n.group, n.element, n.owner);
     DictEntry e(n.name, "", n.vr, n.vm, n.ret);
     AddDictEntry(t, e);
     n = DICOMV3DataDict[++i];
