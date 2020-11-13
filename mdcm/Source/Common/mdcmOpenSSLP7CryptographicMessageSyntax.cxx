@@ -18,7 +18,6 @@
 #include <cstdio> // stderr
 #include <cstring> // strcmp
 #include <ctime>
-#include <assert.h>
 
 #ifdef MDCM_USE_SYSTEM_OPENSSL
 #include <openssl/evp.h>

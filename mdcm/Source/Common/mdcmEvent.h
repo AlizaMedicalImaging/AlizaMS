@@ -23,6 +23,7 @@
 #define MDCMEVENT_H
 
 #include "mdcmTypes.h"
+#include <iostream>
 
 namespace mdcm
 {

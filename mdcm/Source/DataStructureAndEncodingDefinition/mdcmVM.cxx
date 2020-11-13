@@ -15,7 +15,6 @@
 #include "mdcmVM.h"
 #include <cstdlib>
 #include <cstring>
-#include <assert.h>
 
 namespace mdcm
 {

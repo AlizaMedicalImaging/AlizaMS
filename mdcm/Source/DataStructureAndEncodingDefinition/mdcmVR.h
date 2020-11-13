@@ -17,9 +17,9 @@
 #include "mdcmTag.h"
 #include "mdcmTrace.h"
 #include "mdcmString.h"
+#include "mdcmException.h"
 #include <iostream>
 #include <fstream>
-#include <assert.h>
 
 // to ensure compilation on sunos gcc
 #ifdef CS

@@ -21,6 +21,7 @@
 =========================================================================*/
 
 #include "mdcmLookupTable.h"
+#include "mdcmTrace.h"
 #include <vector>
 #include <set>
 #include <climits>

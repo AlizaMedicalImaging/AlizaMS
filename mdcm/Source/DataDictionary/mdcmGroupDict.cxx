@@ -13,9 +13,16 @@
 =========================================================================*/
 
 #include "mdcmGroupDict.h"
+#include "mdcmTrace.h"
 
 namespace mdcm
 {
+
+size_t GroupDict::Size() const
+{
+  assert(Names.size() == Abbreviations.size());
+  return Names.size();
+}
 
 std::string const & GroupDict::GetAbbreviation(uint16_t num) const
 {

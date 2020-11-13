@@ -21,6 +21,7 @@
 =========================================================================*/
 
 #include "mdcmRescaler.h"
+#include "mdcmTrace.h"
 #include <limits>
 #include <cstring>
 #include <cmath>

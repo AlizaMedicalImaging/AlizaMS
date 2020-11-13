@@ -24,8 +24,9 @@
 
 #include "mdcmConfigure.h"
 #include "mdcmWin32.h"
-#include "mdcmException.h"
-#include "mdcmTrace.h"
+#include <cstdlib>
+#include <sstream>
+#include <string>
 
 #ifdef MDCM_HAVE_STDINT_H
 #ifndef __STDC_LIMIT_MACROS

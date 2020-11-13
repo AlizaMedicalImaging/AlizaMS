@@ -20,7 +20,7 @@
 
 =========================================================================*/
 #include "mdcmBoxRegion.h"
-
+#include "mdcmTrace.h"
 #include <limits>
 #include <algorithm>
 

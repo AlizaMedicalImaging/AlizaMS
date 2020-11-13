@@ -21,6 +21,7 @@
 =========================================================================*/
 
 #include "mdcmPreamble.h"
+#include "mdcmException.h"
 #include <cstring>
 
 namespace mdcm

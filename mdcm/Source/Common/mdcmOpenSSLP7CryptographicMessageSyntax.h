@@ -27,12 +27,11 @@
 
 namespace mdcm
 {
+
 class CryptographicMessageSyntaxInternals;
-//-----------------------------------------------------------------------------
 
 /**
- * \brief
- * \details Class for CryptographicMessageSyntax encryption. This is just a simple
+ * Class for CryptographicMessageSyntax encryption. This is just a simple
  * wrapper around openssl PKCS7_encrypt functionalities
  *
  * See online documentation
@@ -45,34 +44,36 @@ public:
   OpenSSLP7CryptographicMessageSyntax();
   ~OpenSSLP7CryptographicMessageSyntax();
   
-    // X.509
-  bool ParseCertificateFile( const char *filename );
-  bool ParseKeyFile( const char *filename );
+  // X.509
+  bool ParseCertificateFile(const char *);
+  bool ParseKeyFile(const char *);
 
   // PBE
   bool SetPassword(const char * /*pass*/, size_t /*passLen*/)
   {
-    mdcmWarningMacro( "Openssl using PKCS7 does not support Password Based Encryption." );
+    mdcmWarningMacro("Openssl using PKCS7 does not support Password Based Encryption.");
     return false;
   }
 
-  /// Set Cipher Type.
-  /// Default is: AES256_CIPHER
+  // Set Cipher Type.
+  // Default is: AES256_CIPHER
   void SetCipherType(CipherTypes type);
   CipherTypes GetCipherType() const;
 
-  /// create a PKCS#7 envelopedData structure
+  // create a PKCS#7 envelopedData structure
   bool Encrypt(char *output, size_t &outlen, const char *array, size_t len) const;
 
-  /// decrypt content from a PKCS#7 envelopedData structure
+  // decrypt content from a PKCS#7 envelopedData structure
   bool Decrypt(char *output, size_t &outlen, const char *array, size_t len) const;
 
 private:
-  CryptographicMessageSyntaxInternals *Internals;
+  CryptographicMessageSyntaxInternals * Internals;
+
 private:
-  OpenSSLP7CryptographicMessageSyntax(const OpenSSLP7CryptographicMessageSyntax&);  // Not implemented.
-  void operator=(const OpenSSLP7CryptographicMessageSyntax&);  // Not implemented.
+  OpenSSLP7CryptographicMessageSyntax(const OpenSSLP7CryptographicMessageSyntax &);  // Not implemented
+  void operator=(const OpenSSLP7CryptographicMessageSyntax &);  // Not implemented
 };
+
 } // end namespace mdcm
-//-----------------------------------------------------------------------------
+
 #endif //MDCMOPENSSLP7CRYPTOGRAPHICMESSAGESYNTAX_H

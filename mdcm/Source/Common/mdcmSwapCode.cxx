@@ -21,7 +21,7 @@
 =========================================================================*/
 
 #include "mdcmSwapCode.h"
-#include <assert.h>
+#include "mdcmTrace.h"
 
 namespace mdcm
 {

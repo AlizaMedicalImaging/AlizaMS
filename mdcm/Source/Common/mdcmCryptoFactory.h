@@ -23,6 +23,7 @@
 #define MDCMCRYPTOFACTORY_H
 
 #include "mdcmCryptographicMessageSyntax.h"
+#include "mdcmTrace.h"
 #include <map>
 
 namespace mdcm

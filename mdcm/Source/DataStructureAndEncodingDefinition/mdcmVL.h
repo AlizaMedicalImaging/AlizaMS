@@ -23,6 +23,7 @@
 #define MDCMVL_H
 
 #include "mdcmTypes.h"
+#include "mdcmTrace.h"
 #include <iostream>
 
 namespace mdcm

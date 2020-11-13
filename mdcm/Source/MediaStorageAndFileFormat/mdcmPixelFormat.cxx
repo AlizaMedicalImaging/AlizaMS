@@ -25,9 +25,11 @@
 #include "mdcmTransferSyntax.h"
 #include <cstdlib>
 #include <limits>
+#include <iostream>
 
 namespace mdcm
 {
+
 static const char *ScalarTypeStrings[] =
 {
   "UINT8",
@@ -58,6 +60,91 @@ unsigned short PixelFormat::GetSamplesPerPixel() const
 {
   assert(SamplesPerPixel == 1 || SamplesPerPixel == 3 || SamplesPerPixel == 4);
   return SamplesPerPixel;
+}
+
+void PixelFormat::SetSamplesPerPixel(unsigned short spp)
+{
+  SamplesPerPixel = spp;
+  assert(SamplesPerPixel == 1 || SamplesPerPixel == 3 || SamplesPerPixel == 4);
+}
+
+unsigned short PixelFormat::GetBitsAllocated() const
+{
+  return BitsAllocated;
+}
+
+void PixelFormat::SetBitsAllocated(unsigned short ba)
+{
+  if(ba > 0)
+  {
+    switch(ba)
+    {
+      // Some devices (FUJIFILM CR + MONO1) incorrectly set BitsAllocated/BitsStored
+      // as bitmask instead of value. Do what they mean instead of what they say.
+      case 0xffff: ba = 16; break;
+      case 0x0fff: ba = 12; break;
+      case 0x00ff: ba =  8; break;
+      default: break;
+    }
+    BitsAllocated = ba;
+    BitsStored = ba;
+    HighBit = (unsigned short)(ba - 1);
+  }
+  else
+  {
+    BitsAllocated = 0;
+    PixelRepresentation = 0;
+  }
+}
+
+unsigned short PixelFormat::GetBitsStored() const
+{
+  assert(BitsStored <= BitsAllocated);
+  return BitsStored;
+}
+
+void PixelFormat::SetBitsStored(unsigned short bs)
+{
+  switch(bs)
+  {
+    case 0xffff: bs = 16; break;
+    case 0x0fff: bs = 12; break;
+    case 0x00ff: bs =  8; break;
+    default: break;
+  }
+  if(bs <= BitsAllocated && bs)
+  {
+    BitsStored = bs;
+    SetHighBit((unsigned short) (bs - 1));
+  }
+}
+
+unsigned short PixelFormat::GetHighBit() const
+{
+  assert(HighBit < BitsStored);
+  return HighBit;
+}
+
+void PixelFormat::SetHighBit(unsigned short hb)
+{
+  switch(hb)
+  {
+    case 0xfffe: hb = 15; break;
+    case 0x0ffe: hb = 11; break;
+    case 0x00fe: hb =  7; break;
+    default: break;
+  }
+  if(hb < BitsStored) HighBit = hb;
+}
+
+unsigned short PixelFormat::GetPixelRepresentation() const
+{
+  return (unsigned short)(PixelRepresentation ? 1 : 0);
+}
+
+void PixelFormat::SetPixelRepresentation(unsigned short pr)
+{
+  PixelRepresentation = (unsigned short)(pr ? 1 : 0);
 }
 
 void PixelFormat::SetScalarType(ScalarType st)
@@ -202,7 +289,7 @@ PixelFormat::ScalarType PixelFormat::GetScalarType() const
   return type;
 }
 
-const char *PixelFormat::GetScalarTypeAsString() const
+const char * PixelFormat::GetScalarTypeAsString() const
 {
   return ScalarTypeStrings[GetScalarType()];
 }

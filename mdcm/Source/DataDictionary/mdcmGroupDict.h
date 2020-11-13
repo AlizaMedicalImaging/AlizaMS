@@ -24,7 +24,6 @@
 #define MDCMGROUPDICT_H
 
 #include "mdcmTypes.h"
-#include <assert.h>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -33,7 +32,7 @@
 namespace mdcm
 {
 /**
- * \brief Class to represent the mapping from group number to its abbreviation and name
+ * Class to represent the mapping from group number to its abbreviation and name
  */
 class MDCM_EXPORT GroupDict
 {
@@ -42,11 +41,7 @@ public:
   GroupDict() { FillDefaultGroupName(); }
   ~GroupDict() {}
   friend std::ostream& operator<<(std::ostream & _os, const GroupDict & _val);
-  size_t Size() const
-  {
-    assert(Names.size() == Abbreviations.size());
-    return Names.size();
-  }
+  size_t Size() const;
   std::string const & GetAbbreviation(uint16_t num) const;
   std::string const & GetName(uint16_t num) const;
 

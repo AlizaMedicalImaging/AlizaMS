@@ -25,10 +25,10 @@
 // TODO
 #define MDCM_SUPRESS_OUTPUT
 
-#include "mdcmTypes.h"
 #include "mdcmSystem.h"
 #include <iosfwd>
 #include <cassert>
+#include <iostream>
 
 namespace mdcm
 {

@@ -14,7 +14,6 @@
 #include "mdcmVR.h"
 #include <algorithm>
 #include <cstring>
-#include <assert.h>
 
 namespace mdcm
 {

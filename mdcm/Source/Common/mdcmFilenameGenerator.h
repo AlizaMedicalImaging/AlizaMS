@@ -23,15 +23,15 @@
 #define MDCMFILENAMEGENERATOR_H
 
 #include "mdcmTypes.h"
+#include "mdcmTrace.h"
 #include <string>
 #include <vector>
-
 
 namespace mdcm
 {
 /**
- * \brief FilenameGenerator
- * \details class to generate filenames based on a pattern (C-style)
+ * FilenameGenerator
+ * class to generate filenames based on a pattern (C-style)
  *
  * Output will be:
  *
@@ -46,30 +46,18 @@ class MDCM_EXPORT FilenameGenerator
 public:
   FilenameGenerator():Pattern(),Prefix(),Filenames() {}
   ~FilenameGenerator() {}
-  // FIXME: already defines in mdcm::Directory
   typedef std::string FilenameType;
   typedef std::vector<FilenameType> FilenamesType;
   typedef FilenamesType::size_type  SizeType;
 
-  /// Set/Get pattern
   void SetPattern(const char *pattern) { Pattern = pattern; }
   const char *GetPattern() const { return Pattern.c_str(); }
-
-  /// Set/Get prefix
   void SetPrefix(const char *prefix) { Prefix = prefix; }
   const char *GetPrefix() const { return Prefix.c_str(); }
-
-  /// Generate (return success)
   bool Generate();
-
-  /// Set/Get the number of filenames to generate
   void SetNumberOfFilenames(SizeType nfiles);
   SizeType GetNumberOfFilenames() const;
-
-  /// Get a particular filename (call after Generate)
   const char * GetFilename(SizeType n) const;
-
-  /// Return all filenames
   FilenamesType const & GetFilenames() const { assert( !Pattern.empty() ); return Filenames; }
 
 private:

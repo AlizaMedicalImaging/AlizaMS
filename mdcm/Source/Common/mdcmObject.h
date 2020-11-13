@@ -24,7 +24,7 @@
 #define MDCMOBJECT_H
 
 #include "mdcmTypes.h"
-#include <assert.h>
+#include "mdcmTrace.h"
 #include <iostream>
 
 namespace mdcm

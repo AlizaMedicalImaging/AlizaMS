@@ -29,7 +29,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <assert.h>
 #include <errno.h>
 #include <sys/stat.h>
 #include <limits.h> // PATH_MAX

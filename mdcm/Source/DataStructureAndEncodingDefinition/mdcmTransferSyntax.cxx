@@ -13,8 +13,6 @@
 =========================================================================*/
 #include "mdcmTransferSyntax.h"
 #include "mdcmTrace.h"
-
-#include <assert.h>
 #include <cstring>
 #include <string>
 #include <iostream>

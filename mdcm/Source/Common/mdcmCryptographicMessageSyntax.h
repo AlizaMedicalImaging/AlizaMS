@@ -43,8 +43,8 @@ public:
   } CipherTypes;
 
     // X.509
-  virtual bool ParseCertificateFile(const char *filename) = 0;
-  virtual bool ParseKeyFile(const char *filename) = 0;
+  virtual bool ParseCertificateFile(const char *) = 0;
+  virtual bool ParseKeyFile(const char *) = 0;
 
   // PBE
   virtual bool SetPassword(const char * pass, size_t passLen) = 0;
@@ -59,8 +59,8 @@ public:
   virtual CipherTypes GetCipherType() const = 0;
 
 private:
-  CryptographicMessageSyntax(const CryptographicMessageSyntax&);  // Not implemented.
-  void operator=(const CryptographicMessageSyntax&);  // Not implemented.
+  CryptographicMessageSyntax(const CryptographicMessageSyntax&);  // Not implemented
+  void operator=(const CryptographicMessageSyntax&);  // Not implemented
 };
 
 } // end namespace mdcm

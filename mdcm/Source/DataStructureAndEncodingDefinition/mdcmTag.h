@@ -23,6 +23,7 @@
 #define MDCMTAG_H
 
 #include "mdcmTypes.h"
+#include "mdcmTrace.h"
 #include <iostream>
 #include <iomanip>
 
