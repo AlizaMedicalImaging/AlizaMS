@@ -47,10 +47,8 @@ template <class T>
 class MemberCommand : public Command
 {
 public:
-  typedef  void (T::*TMemberFunctionPointer)(Subject *, const Event &);
-  typedef  void (T::*TConstMemberFunctionPointer)(
-    const Subject *,
-    const Event &);
+  typedef void (T::*TMemberFunctionPointer)(Subject *, const Event &);
+  typedef void (T::*TConstMemberFunctionPointer)(const Subject *, const Event &);
   typedef MemberCommand Self;
 
   static SmartPointer<MemberCommand> New()
@@ -58,15 +56,13 @@ public:
     return new MemberCommand;
   }
 
-  void SetCallbackFunction(T * object,
-    TMemberFunctionPointer memberFunction)
+  void SetCallbackFunction(T * object, TMemberFunctionPointer memberFunction)
   {
     m_This = object;
     m_MemberFunction = memberFunction;
   }
 
-  void SetCallbackFunction(T * object,
-    TConstMemberFunctionPointer memberFunction)
+  void SetCallbackFunction(T * object, TConstMemberFunctionPointer memberFunction)
   {
     m_This = object;
     m_ConstMemberFunction = memberFunction;
@@ -105,7 +101,7 @@ template <typename T>
 class SimpleMemberCommand : public Command
 {
 public:
-  typedef  void (T::*TMemberFunctionPointer)();
+  typedef void (T::*TMemberFunctionPointer)();
 
   typedef SimpleMemberCommand Self;
 

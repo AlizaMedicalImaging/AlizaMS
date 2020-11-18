@@ -31,7 +31,7 @@ static void replace__(
 	const char * value,
 	const size_t size_)
 {
-	if(t.GetGroup() < 0x0008) return;
+	if (t.GetGroup() < 0x0008) return;
 	static const mdcm::Global & g    = mdcm::GlobalInstance;
 	static const mdcm::Dicts & dicts = g.GetDicts();
 	if (t.IsPrivate()) return;
@@ -41,10 +41,10 @@ static void replace__(
 		dictentry.GetVR() == mdcm::VR::UN ||
 		dictentry.GetVR() == mdcm::VR::SQ)
 	{
-		if( dictentry.GetVR() == mdcm::VR::SQ && vl == 0 && value && *value == 0 )
+		if (dictentry.GetVR() == mdcm::VR::SQ && vl == 0 && value && *value == 0 )
 		{
 			mdcm::DataElement de(t);
-			de.SetVR( mdcm::VR::SQ);
+			de.SetVR(mdcm::VR::SQ);
 			ds.Replace(de);
 		}
 		else
@@ -59,7 +59,7 @@ static void replace__(
 		if (vl==0)
 		{
 			mdcm::DataElement de(t);
-			if( ds.FindDataElement(t))
+			if (ds.FindDataElement(t))
 			{
 				de.SetVR(ds.GetDataElement(t).GetVR());
 			}
@@ -85,9 +85,9 @@ static void replace__(
 		{
 			std::string padded(value, vl);
 			// ASCII VR needs to be padded with a space
-			if(vl.IsOdd())
+			if (vl.IsOdd())
 			{
-				if(dictentry.GetVR() == mdcm::VR::UI)
+				if (dictentry.GetVR() == mdcm::VR::UI)
 				{
 					// \0 is automatically added when using a ByteValue
 				}
@@ -97,7 +97,7 @@ static void replace__(
 				}
 			}
 			mdcm::DataElement de(t);
-			if(ds.FindDataElement(t))
+			if (ds.FindDataElement(t))
 			{
 				de.SetVR(ds.GetDataElement(t).GetVR());
 			}
@@ -120,12 +120,12 @@ static void replace_map_recurs__(
 	const QMap<QString, QString> & m)
 {
 	mdcm::DataSet::Iterator it = ds.Begin();
-	for(; it != ds.End();)
+	for (; it != ds.End();)
 	{
 		const mdcm::DataElement & de1 = *it;
 		mdcm::DataSet::Iterator dup = it;
 		++it;
-		if(de1.GetTag() == t)
+		if (de1.GetTag() == t)
 		{
 			QString s;
 			if (DicomUtils::get_string_value(ds, t, s))
@@ -149,13 +149,13 @@ static void replace_map_recurs__(
 		{
 			const mdcm::DataElement & de = *dup;
 			mdcm::VR vr = mdcm::DataSetHelper::ComputeVR(f, ds, de.GetTag());
-			if(vr.Compatible(mdcm::VR::SQ))
+			if (vr.Compatible(mdcm::VR::SQ))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
-				if(sq && sq->GetNumberOfItems()>0)
+				if (sq && sq->GetNumberOfItems() > 0)
 				{
 					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
-					for(mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
+					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
 						mdcm::DataSet & nested = item.GetNestedDataSet();
@@ -177,12 +177,12 @@ static void remove_recurs__(
 	const mdcm::Tag & t)
 {
 	mdcm::DataSet::Iterator it = ds.Begin();
-	for(; it != ds.End();)
+	for (; it != ds.End();)
 	{
 		const mdcm::DataElement & de1 = *it;
 		mdcm::DataSet::Iterator dup = it;
 		++it;
-		if(de1.GetTag() == t)
+		if (de1.GetTag() == t)
 		{
 			ds.GetDES().erase(dup);
 		}
@@ -190,13 +190,13 @@ static void remove_recurs__(
 		{
 			const mdcm::DataElement & de = *dup;
 			mdcm::VR vr = mdcm::DataSetHelper::ComputeVR(f, ds, de.GetTag());
-			if(vr.Compatible(mdcm::VR::SQ))
+			if (vr.Compatible(mdcm::VR::SQ))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
-				if(sq && sq->GetNumberOfItems()>0)
+				if (sq && sq->GetNumberOfItems()>0)
 				{
 					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
-					for(mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
+					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
 						mdcm::DataSet & nested = item.GetNestedDataSet();
@@ -218,7 +218,7 @@ static void remove_date_time_recurs__(
 	mdcm::DataSet & ds)
 {
 	mdcm::DataSet::Iterator it = ds.Begin();
-	for(; it != ds.End();)
+	for (; it != ds.End();)
 	{
 		const mdcm::DataElement & de1 = *it;
 		mdcm::DataSet::Iterator dup = it;
@@ -251,13 +251,13 @@ static void remove_date_time_recurs__(
 		{
 			const mdcm::DataElement & de = *dup;
 			mdcm::VR vr = mdcm::DataSetHelper::ComputeVR(f, ds, de.GetTag());
-			if(vr.Compatible(mdcm::VR::SQ))
+			if (vr.Compatible(mdcm::VR::SQ))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
-				if(sq && sq->GetNumberOfItems()>0)
+				if (sq && sq->GetNumberOfItems()>0)
 				{
 					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
-					for(mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
+					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
 						mdcm::DataSet & nested = item.GetNestedDataSet();
@@ -279,12 +279,12 @@ static void empty_recurs__(
 	const mdcm::Tag & t)
 {
 	mdcm::DataSet::Iterator it = ds.Begin();
-	for(; it != ds.End();)
+	for (; it != ds.End();)
 	{
 		const mdcm::DataElement & de1 = *it;
 		mdcm::DataSet::Iterator dup = it;
 		++it;
-		if(de1.GetTag() == t)
+		if (de1.GetTag() == t)
 		{
 			replace__(ds, t, "", 0);
 		}
@@ -292,13 +292,13 @@ static void empty_recurs__(
 		{
 			const mdcm::DataElement & de = *dup;
 			mdcm::VR vr = mdcm::DataSetHelper::ComputeVR(f, ds, de.GetTag());
-			if(vr.Compatible(mdcm::VR::SQ))
+			if (vr.Compatible(mdcm::VR::SQ))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
-				if(sq && sq->GetNumberOfItems()>0)
+				if (sq && sq->GetNumberOfItems()>0)
 				{
 					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
-					for(mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
+					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
 						mdcm::DataSet & nested = item.GetNestedDataSet();
@@ -317,12 +317,12 @@ static void empty_recurs__(
 static void remove_private__(const mdcm::File & file, mdcm::DataSet & ds)
 {
 	mdcm::DataSet::Iterator it = ds.Begin();
-	for(;it != ds.End();)
+	for (;it != ds.End();)
 	{
 		const mdcm::DataElement & de1 = *it;
 		mdcm::DataSet::Iterator dup = it;
 		++it;
-		if(de1.GetTag().IsPrivate())
+		if (de1.GetTag().IsPrivate())
 		{
 			ds.GetDES().erase(dup);
 		}
@@ -330,10 +330,10 @@ static void remove_private__(const mdcm::File & file, mdcm::DataSet & ds)
 		{
 			const mdcm::DataElement & de = *dup;
 			mdcm::VR vr = mdcm::DataSetHelper::ComputeVR(file, ds, de.GetTag());
-			if(vr.Compatible(mdcm::VR::SQ))
+			if (vr.Compatible(mdcm::VR::SQ))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
-				if(sq && sq->GetNumberOfItems()>0)
+				if (sq && sq->GetNumberOfItems()>0)
 				{
 					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
 					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
@@ -370,7 +370,7 @@ static void remove_curves__(const mdcm::File & file, mdcm::DataSet & ds)
 {
 	mdcm::DataSet::Iterator it = ds.Begin();
 	std::vector<mdcm::Tag> tmp0;
-	for(; it != ds.End(); ++it)
+	for (; it != ds.End(); ++it)
 	{
 		const mdcm::DataElement & de = *it;
 		const mdcm::Tag t = de.GetTag();
@@ -384,12 +384,12 @@ static void remove_curves__(const mdcm::File & file, mdcm::DataSet & ds)
 static void remove_group_length__(const mdcm::File & file, mdcm::DataSet & ds)
 {
 	mdcm::DataSet::Iterator it = ds.Begin();
-	for(; it != ds.End();)
+	for (; it != ds.End();)
 	{
 		const mdcm::DataElement & de1 = *it;
 		mdcm::DataSet::Iterator dup = it;
 		++it;
-		if(de1.GetTag().IsGroupLength())
+		if (de1.GetTag().IsGroupLength())
 		{
 			ds.GetDES().erase(dup);
 		}
@@ -397,13 +397,13 @@ static void remove_group_length__(const mdcm::File & file, mdcm::DataSet & ds)
 		{
 			const mdcm::DataElement & de = *dup;
 			mdcm::VR vr = mdcm::DataSetHelper::ComputeVR(file, ds, de.GetTag());
-			if(vr.Compatible(mdcm::VR::SQ))
+			if (vr.Compatible(mdcm::VR::SQ))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
-				if(sq && sq->GetNumberOfItems()>0)
+				if (sq && sq->GetNumberOfItems()>0)
 				{
 					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
-					for(mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
+					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
 						mdcm::DataSet & nested = item.GetNestedDataSet();
@@ -451,7 +451,7 @@ static void anonymize_file__(
 #else
 	reader.SetFileName(filename.toLocal8Bit().constData());
 #endif
-	if(!reader.Read())
+	if (!reader.Read())
 	{
 		if (DicomUtils::is_dicom_file(filename)) *ok = false;
 		else *ok = true;
@@ -463,7 +463,7 @@ static void anonymize_file__(
 #if 1
 	mdcm::MediaStorage ms;
 	ms.SetFromFile(file);
-	if(ms == mdcm::MediaStorage::MediaStorageDirectoryStorage)
+	if (ms == mdcm::MediaStorage::MediaStorageDirectoryStorage)
 	{
 		*ok = true;
 		return;
@@ -515,7 +515,7 @@ static void anonymize_file__(
 	//
 	{
 		std::set<mdcm::Tag>::const_iterator it = empty_tags.begin();
-		for(; it != empty_tags.end(); ++it)
+		for (; it != empty_tags.end(); ++it)
 		{
 			empty_recurs__(file, ds, *it);
 		}
@@ -523,7 +523,7 @@ static void anonymize_file__(
 	//
 	{
 		std::set<mdcm::Tag>::const_iterator it = remove_tags.begin();
-		for(it = remove_tags.begin(); it != remove_tags.end(); ++it)
+		for (it = remove_tags.begin(); it != remove_tags.end(); ++it)
 		{
 			remove_recurs__(file, ds, *it);
 		}
@@ -532,7 +532,7 @@ static void anonymize_file__(
 	if (!retain_device_id)
 	{
 		std::set<mdcm::Tag>::const_iterator it = device_tags.begin();
-		for(it = device_tags.begin(); it != device_tags.end(); ++it)
+		for (it = device_tags.begin(); it != device_tags.end(); ++it)
 		{
 			remove_recurs__(file, ds, *it);
 		}
@@ -541,7 +541,7 @@ static void anonymize_file__(
 	if (!retain_patient_chars)
 	{
 		std::set<mdcm::Tag>::const_iterator it = patient_tags.begin();
-		for(it = patient_tags.begin(); it != patient_tags.end(); ++it)
+		for (it = patient_tags.begin(); it != patient_tags.end(); ++it)
 		{
 			remove_recurs__(file, ds, *it);
 		}
@@ -550,7 +550,7 @@ static void anonymize_file__(
 	if (!retain_institution_id)
 	{
 		std::set<mdcm::Tag>::const_iterator it = institution_tags.begin();
-		for(it = institution_tags.begin(); it != institution_tags.end(); ++it)
+		for (it = institution_tags.begin(); it != institution_tags.end(); ++it)
 		{
 			remove_recurs__(file, ds, *it);
 		}
@@ -565,7 +565,7 @@ static void anonymize_file__(
 	{
 		std::set<mdcm::Tag>::const_iterator it =
 			uid_tags.begin();
-		for(; it != uid_tags.end(); ++it)
+		for (; it != uid_tags.end(); ++it)
 		{
 			replace_map_recurs__(file, ds, *it, uids_map);
 		}
@@ -573,7 +573,7 @@ static void anonymize_file__(
 	//
 	{
 		std::set<mdcm::Tag>::const_iterator it = pn_tags.begin();
-		for(it = pn_tags.begin(); it != pn_tags.end(); ++it)
+		for (it = pn_tags.begin(); it != pn_tags.end(); ++it)
 		{
 			replace_map_recurs__(file, ds, *it, pn_map);
 		}
@@ -618,7 +618,7 @@ static void anonymize_file__(
 	writer.SetFileName(outfilename.toLocal8Bit().constData());
 #endif
 	writer.SetFile(file);
-	if(!writer.Write()) *ok = false;
+	if (!writer.Write()) *ok = false;
 }
 
 AnonymazerWidget2::AnonymazerWidget2(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p,f)
@@ -673,47 +673,40 @@ void AnonymazerWidget2::readSettings()
 		QApplication::organizationName(), QApplication::applicationName());
 	settings.setFallbacksEnabled(true);
 	settings.beginGroup(QString("AnonymazerWidget"));
-	output_dir      = settings.value(QString("output_dir"), QString("")).toString();
-	const int tmp1  = settings.value(QString("remove_private"),        0).toInt();
-	const int tmp5  = settings.value(QString("remove_overlays"),       0).toInt();
-	const int tmp7  = settings.value(QString("preserve_uids"),         0).toInt();
-	const int tmp8  = settings.value(QString("retain_dates_times"),    0).toInt();
-	const int tmp9  = settings.value(QString("retain_device_id"),      0).toInt();
+	output_dir = settings.value(QString("output_dir"), QString("")).toString();
+	const int tmp01 = settings.value(QString("remove_private"),        0).toInt();
+	const int tmp05 = settings.value(QString("remove_overlays"),       0).toInt();
+	const int tmp07 = settings.value(QString("preserve_uids"),         0).toInt();
+	const int tmp08 = settings.value(QString("retain_dates_times"),    0).toInt();
+	const int tmp09 = settings.value(QString("retain_device_id"),      0).toInt();
 	const int tmp10 = settings.value(QString("retain_patient_chars"),  0).toInt();
 	const int tmp11 = settings.value(QString("retain_institution_id"), 0).toInt();
 	settings.endGroup();
-	if (tmp1==1) private_radioButton->setChecked(true);
-	else private_radioButton->setChecked(false);
-	if (tmp5==1) graphics_radioButton->setChecked(true);
-	else graphics_radioButton->setChecked(false);
-	if (tmp7==1) uids_radioButton->setChecked(true);
-	else uids_radioButton->setChecked(false);
-	if (tmp8==1) dates_radioButton->setChecked(true);
-	else dates_radioButton->setChecked(false);
-	if (tmp9==1) device_radioButton->setChecked(true);
-	else device_radioButton->setChecked(false);
-	if (tmp10==1) chars_radioButton->setChecked(true);
-	else chars_radioButton->setChecked(false);
-	if (tmp11==1) institution_radioButton->setChecked(true);
-	else institution_radioButton->setChecked(false);
+	private_radioButton->setChecked(    (tmp01 == 1) ? true : false);
+	graphics_radioButton->setChecked(   (tmp05 == 1) ? true : false);
+	uids_radioButton->setChecked(       (tmp07 == 1) ? true : false);
+	dates_radioButton->setChecked(      (tmp08 == 1) ? true : false);
+	device_radioButton->setChecked(     (tmp09 == 1) ? true : false);
+	chars_radioButton->setChecked(      (tmp10 == 1) ? true : false);
+	institution_radioButton->setChecked((tmp11 == 1) ? true : false);
 }
 
 void AnonymazerWidget2::writeSettings(QSettings & settings)
 {
-	const int tmp1  = (private_radioButton->isChecked())     ? 1 : 0;
-	const int tmp5  = (graphics_radioButton->isChecked())    ? 1 : 0;
-	const int tmp7  = (uids_radioButton->isChecked())        ? 1 : 0;
-	const int tmp8  = (dates_radioButton->isChecked())       ? 1 : 0;
-	const int tmp9  = (device_radioButton->isChecked())      ? 1 : 0;
+	const int tmp01 = (private_radioButton->isChecked())     ? 1 : 0;
+	const int tmp05 = (graphics_radioButton->isChecked())    ? 1 : 0;
+	const int tmp07 = (uids_radioButton->isChecked())        ? 1 : 0;
+	const int tmp08 = (dates_radioButton->isChecked())       ? 1 : 0;
+	const int tmp09 = (device_radioButton->isChecked())      ? 1 : 0;
 	const int tmp10 = (chars_radioButton->isChecked())       ? 1 : 0;
 	const int tmp11 = (institution_radioButton->isChecked()) ? 1 : 0;
 	settings.beginGroup(QString("AnonymazerWidget"));
 	settings.setValue(QString("output_dir"),           QVariant(output_dir));
-	settings.setValue(QString("remove_private"),       QVariant(tmp1));
-	settings.setValue(QString("remove_overlays"),      QVariant(tmp5));
-	settings.setValue(QString("preserve_uids"),        QVariant(tmp7));
-	settings.setValue(QString("retain_dates_times"),   QVariant(tmp8));
-	settings.setValue(QString("retain_device_id"),     QVariant(tmp9));
+	settings.setValue(QString("remove_private"),       QVariant(tmp01));
+	settings.setValue(QString("remove_overlays"),      QVariant(tmp05));
+	settings.setValue(QString("preserve_uids"),        QVariant(tmp07));
+	settings.setValue(QString("retain_dates_times"),   QVariant(tmp08));
+	settings.setValue(QString("retain_device_id"),     QVariant(tmp09));
 	settings.setValue(QString("retain_patient_chars"), QVariant(tmp10));
 	settings.setValue(QString("retain_institution_id"),QVariant(tmp11));
 	settings.endGroup();
@@ -760,13 +753,13 @@ static void find_pn_recurs__(
 	QStringList & l)
 {
 	mdcm::DataSet::ConstIterator it = ds.Begin();
-	for(; it != ds.End();)
+	for (; it != ds.End();)
 	{
 		const mdcm::DataElement & de = *it;
 		++it;
 		const mdcm::Tag t = de.GetTag();
 		mdcm::VR vr = mdcm::DataSetHelper::ComputeVR(f, ds, t);
-		if(vr == mdcm::VR::PN || t == mdcm::Tag(0x0010,0x0020))
+		if (vr == mdcm::VR::PN || t == mdcm::Tag(0x0010,0x0020))
 		{
 			QString s;
 			if (DicomUtils::get_string_value(ds, t, s)) l.push_back(s);
@@ -774,10 +767,10 @@ static void find_pn_recurs__(
 		else if (vr.Compatible(mdcm::VR::SQ))
 		{
 			mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
-			if(sq && sq->GetNumberOfItems()>0)
+			if (sq && sq->GetNumberOfItems()>0)
 			{
 				const mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
-				for(mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
+				for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
 				{
 					const mdcm::Item    & item   = sq->GetItem(i);
 					const mdcm::DataSet & nested = item.GetNestedDataSet();
@@ -795,12 +788,12 @@ static void find_uids_recurs__(
 	QStringList & l)
 {
 	mdcm::DataSet::ConstIterator it = ds.Begin();
-	for(; it != ds.End();)
+	for (; it != ds.End();)
 	{
 		const mdcm::DataElement & de = *it;
 		++it;
 		const mdcm::Tag t = de.GetTag();
-		if(ts.find(t) != ts.end())
+		if (ts.find(t) != ts.end())
 		{
 			QString s;
 			if (DicomUtils::get_string_value(ds, t, s)) l.push_back(s);
@@ -808,13 +801,13 @@ static void find_uids_recurs__(
 		else
 		{
 			mdcm::VR vr = mdcm::DataSetHelper::ComputeVR(f, ds, t);
-			if(vr.Compatible(mdcm::VR::SQ))
+			if (vr.Compatible(mdcm::VR::SQ))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
-				if(sq && sq->GetNumberOfItems()>0)
+				if (sq && sq->GetNumberOfItems()>0)
 				{
 					const mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
-					for(mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
+					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
 					{
 						const mdcm::Item    & item   = sq->GetItem(i);
 						const mdcm::DataSet & nested = item.GetNestedDataSet();
@@ -913,69 +906,71 @@ void AnonymazerWidget2::process_directory(
 	QDir dir(p);
 	QStringList dlist = dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
 	QStringList flist = dir.entryList(QDir::Files);
-{
-	QStringList filenames;
-	for (int x = 0; x < flist.size(); x++)
+	//
 	{
-		pd->setValue(-1);
-		QApplication::processEvents();
-		if (pd->wasCanceled()) return;
-		const QString tmp0 = dir.absolutePath() + QString("/") + flist.at(x);
-		filenames.push_back(tmp0);
-	}
-	for(int x = 0; x < filenames.size(); x++)
-	{
-		pd->setValue(-1);
-		QApplication::processEvents();
-		if (pd->wasCanceled()) return;
+		QStringList filenames;
+		for (int x = 0; x < flist.size(); x++)
+		{
+			pd->setValue(-1);
+			QApplication::processEvents();
+			if (pd->wasCanceled()) return;
+			const QString tmp0 = dir.absolutePath() + QString("/") + flist.at(x);
+			filenames.push_back(tmp0);
+		}
+		for (int x = 0; x < filenames.size(); x++)
+		{
+			pd->setValue(-1);
+			QApplication::processEvents();
+			if (pd->wasCanceled()) return;
 #if 0
-		QString tmp200;
-		tmp200.sprintf("%08d", x);
-		QDateTime date_ = QDateTime::currentDateTime();
-		const QString date_str = date_.toString(QString("hhmmss")); // FIXME
-		const QString out_filename = date_str + QString("-") + tmp200 + QString(".dcm");
+			QString tmp200;
+			tmp200.sprintf("%08d", x);
+			QDateTime date_ = QDateTime::currentDateTime();
+			const QString date_str = date_.toString(QString("hhmmss")); // FIXME
+			const QString out_filename = date_str + QString("-") + tmp200 + QString(".dcm");
 #else
-		QFileInfo fi(filenames.at(x));
-		const QString out_filename = fi.fileName();
+			QFileInfo fi(filenames.at(x));
+			const QString out_filename = fi.fileName();
 #endif
-		const QString out_file = 
-			outp +
-			QString("/") +
-			out_filename;
-		bool ok_ = false;
-		bool overlay_in_data = false;
-		anonymize_file__(
-			&ok_,
-			&overlay_in_data,
-			filenames.at(x),
-			out_file,
-			pn_tags,
-			uid_tags,
-			empty_tags,
-			remove_tags,
-			device_tags,
-			patient_tags,
-			institution_tags,
-			preserve_uids,
-			remove_private,
-			remove_graphics,
-			retain_dates_times,
-			retain_device_id,
-			retain_patient_chars,
-			retain_institution_id,
-			uids_m,
-			pn_m);
-		if (overlay_in_data)
-		{
-			(*count_overlay_in_data)++;
+			const QString out_file = 
+				outp +
+				QString("/") +
+				out_filename;
+			bool ok_ = false;
+			bool overlay_in_data = false;
+			anonymize_file__(
+				&ok_,
+				&overlay_in_data,
+				filenames.at(x),
+				out_file,
+				pn_tags,
+				uid_tags,
+				empty_tags,
+				remove_tags,
+				device_tags,
+				patient_tags,
+				institution_tags,
+				preserve_uids,
+				remove_private,
+				remove_graphics,
+				retain_dates_times,
+				retain_device_id,
+				retain_patient_chars,
+				retain_institution_id,
+				uids_m,
+				pn_m);
+			if (overlay_in_data)
+			{
+				(*count_overlay_in_data)++;
+			}
+			if (!ok_)
+			{
+				(*count_errors)++;
+			}
+			QApplication::processEvents();
 		}
-		if (!ok_)
-		{
-			(*count_errors)++;
-		}
-		QApplication::processEvents();
 	}
-}
+	//
 	for (int j = 0; j < dlist.size(); j++)
 	{
 		QApplication::processEvents();

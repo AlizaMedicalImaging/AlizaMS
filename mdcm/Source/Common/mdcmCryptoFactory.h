@@ -53,9 +53,9 @@ private:
   static void AddLib(CryptoLib id, CryptoFactory* f)
   {
     if (getInstanceMap().insert(std::pair<CryptoLib, CryptoFactory*>(id, f)).second == false)
-      {
+    {
       mdcmErrorMacro( "Library already registered under id " << (int)id );
-      }
+    }
   }
 
 protected:
