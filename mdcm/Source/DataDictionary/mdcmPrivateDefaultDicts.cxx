@@ -690,7 +690,6 @@ const DICT_ENTRY DICOMV3DataDict [] = {
   {0xee01,0x0000,"PMTF INFORMATION DATA^10",VR::US,VM::VM1,"?",false },
   {0xee01,0x0001,"PMTF INFORMATION DATA^10",VR::OB,VM::VM1,"?",false },
   {0xee01,0x0002,"PMTF INFORMATION DATA^10",VR::US,VM::VM1,"?",false },
-
   {0x3001,0x0001,"Philips3D",VR::UL,VM::VM1,"Number of Time Phases",false },
   {0x3001,0x0002,"Philips3D",VR::US,VM::VM1,"Physical Units Z Direction",false },
   {0x3001,0x0003,"Philips3D",VR::FD,VM::VM1,"Physical Delta Z",false },
@@ -2096,8 +2095,10 @@ const DICT_ENTRY DICOMV3DataDict [] = {
   {0x50f1,0x0010,"FDMS 1.0",VR::CS,VM::VM1,"Film Output Format",false },
   {0x50f1,0x0020,"FDMS 1.0",VR::CS,VM::VM1,"Image Processing Modification Flag",false },
   {0x0009,0x0001,"FFP DATA",VR::UN,VM::VM1,"CR Header Information",false },
+  //
   {0x4d4d,0x0001,"GDCM CONFORMANCE TESTS",VR::SQ,VM::VM1,"Array Container Sequence",false },
   {0x4d4d,0x0002,"GDCM CONFORMANCE TESTS",VR::OB,VM::VM1,"0 Filled Array",false },
+  //
   {0x4d4f,0x0001,"MDCM CONFORMANCE",VR::SQ,VM::VM1,"MDCM Conformance Sequence",false },
   {0x4d4f,0x0010,"MDCM CONFORMANCE",VR::AE,VM::VM1  ,"VR::AE",false },
   {0x4d4f,0x0011,"MDCM CONFORMANCE",VR::AS,VM::VM1  ,"VR::AS",false },
@@ -2133,6 +2134,9 @@ const DICT_ENTRY DICOMV3DataDict [] = {
   {0x4d4f,0x002f,"MDCM CONFORMANCE",VR::OV,VM::VM1  ,"VR::OV",false },
   {0x4d4f,0x0030,"MDCM CONFORMANCE",VR::SV,VM::VM1_n,"VR::SV",false },
   {0x4d4f,0x0031,"MDCM CONFORMANCE",VR::UV,VM::VM1_n,"VR::UV",false },
+  //
+  {0x0067,0x0001,"ALIZA 001",VR::UT,VM::VM1,"Comment",true },
+  //
   {0x0019,0x0030,"GE ?? From Adantage Review CS",VR::LO,VM::VM1,"CR EDR Mode",false },
   {0x0019,0x0040,"GE ?? From Adantage Review CS",VR::LO,VM::VM1,"CR Latitude",false },
   {0x0019,0x0050,"GE ?? From Adantage Review CS",VR::LO,VM::VM1,"CR Group Number",false },
@@ -10337,7 +10341,9 @@ const DICT_ENTRY DICOMV3DataDict [] = {
   {0x0065,0x0050,"Image Private Header",VR::DS,VM::VM1,"MR Number Of Slices In Volume",false },
   {0x0065,0x0051,"Image Private Header",VR::SQ,VM::VM1,"MR VFrame Sequence",false },
   //
-  {0x0067,0x0001,"ALIZA 001",VR::UT,VM::VM1,"Comment",false },
+  //
+  //
+  {0xffff,0xffff,"MDCM Private Sentinel",VR::INVALID,VM::VM0,"",true },
   {0xffff,0xffff,"",VR::INVALID,VM::VM0,NULL,true }
 };
 

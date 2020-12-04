@@ -19,9 +19,6 @@
 #include "mdcmDataSetHelper.h"
 #include "mdcmAttribute.h"
 #include "mdcmVersion.h"
-#include "mdcmImageReader.h"
-#include "mdcmImage.h"
-#include "mdcmOverlay.h"
 #include "dicomutils.h"
 #include "alizams_version.h"
 
@@ -352,7 +349,42 @@ static void remove_private__(const mdcm::File & file, mdcm::DataSet & ds)
 	}
 }
 
-static void remove_overlays__(const mdcm::File & file, mdcm::DataSet & ds)
+static bool check_overlay_in_pixeldata(const mdcm::DataSet & ds)
+{
+	mdcm::Tag t(0x6000,0x0000);
+	while(true)
+	{
+		const mdcm::DataElement & de = ds.FindNextDataElement(t);
+		if(de.GetTag().GetGroup() > 0x60FF)
+		{
+			break;
+		}
+		else if(de.GetTag().IsPrivate())
+		{
+			t.SetGroup((uint16_t)(de.GetTag().GetGroup() + 1));
+			t.SetElement(0);
+		}
+		else
+		{
+			t = de.GetTag();
+			mdcm::Tag tOverlayData(t.GetGroup(),0x3000);
+			mdcm::Tag tOverlayBitpos(t.GetGroup(),0x0102);
+			if(ds.FindDataElement(tOverlayData))
+			{
+				;;
+			}
+			else if(ds.FindDataElement(tOverlayBitpos))
+			{
+				return true;
+			}
+			t.SetGroup((uint16_t)(t.GetGroup() + 2));
+			t.SetElement(0);
+		}
+	}
+	return false;
+}
+
+static void remove_overlays__(mdcm::DataSet & ds)
 {
 	std::vector<mdcm::Tag> tmp0;
 	mdcm::DataSet::Iterator it = ds.Begin();
@@ -360,13 +392,16 @@ static void remove_overlays__(const mdcm::File & file, mdcm::DataSet & ds)
 	{
 		const mdcm::DataElement & de = *it;
 		const mdcm::Tag t = de.GetTag();
-		if ((t.GetGroup() >= 0x6000) && (t.GetGroup()<=0x601E) && (t.GetGroup()%2==0))
+		if (t.GetGroup() >= 0x6000 && t.GetGroup() <= 0x60FF && (t.GetGroup() % 2 == 0))
+		{
 			tmp0.push_back(t);
+		}
+		if (t.GetGroup() > 0x60FF) break;
 	}
 	for (unsigned int x = 0; x < tmp0.size(); x++) ds.Remove(tmp0.at(x));
 }
 
-static void remove_curves__(const mdcm::File & file, mdcm::DataSet & ds)
+static void remove_curves__(mdcm::DataSet & ds)
 {
 	mdcm::DataSet::Iterator it = ds.Begin();
 	std::vector<mdcm::Tag> tmp0;
@@ -374,9 +409,11 @@ static void remove_curves__(const mdcm::File & file, mdcm::DataSet & ds)
 	{
 		const mdcm::DataElement & de = *it;
 		const mdcm::Tag t = de.GetTag();
-		if ((t.GetGroup() >= 0x5000) && (t.GetGroup()<=0x501e) && (t.GetGroup()%2==0))
+		if (t.GetGroup() >= 0x5000 && t.GetGroup() <= 0x501e && (t.GetGroup() % 2 == 0))
+		{
 			tmp0.push_back(t);
-
+		}
+		if (t.GetGroup() > 0x50FF) break;
 	}
 	for (unsigned int x = 0; x < tmp0.size(); x++) ds.Remove(tmp0.at(x));
 }
@@ -474,43 +511,26 @@ static void anonymize_file__(
 	{
 		remove_private__(file, ds);
 	}
-	///
+	//
 	if (remove_graphics)
 	{
-		remove_curves__(file, ds);
-		//
-		//
-		//
+		remove_curves__(ds);
+		remove_recurs__(file, ds, mdcm::Tag(0x0070,0x0001));
+		if (ds.FindDataElement(mdcm::Tag(0x0028,0x0100)) &&
+			ds.FindDataElement(mdcm::Tag(0x0028,0x0101)))
 		{
-			mdcm::ImageReader image_reader;
-#ifdef _WIN32
-#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-			image_reader.SetFileName(QDir::toNativeSeparators(filename).toUtf8().constData());
-#else
-			image_reader.SetFileName(QDir::toNativeSeparators(filename).toLocal8Bit().constData());
-#endif
-#else
-			image_reader.SetFileName(filename.toLocal8Bit().constData());
-#endif
-			if (image_reader.Read())
+			mdcm::Attribute<0x0028,0x0100> at1;
+			at1.Set(ds);
+			const unsigned short bitsallocated = at1.GetValue();
+			mdcm::Attribute<0x0028,0x0101> at2;
+			at2.Set(ds);
+			const unsigned short bitsstored = at2.GetValue();
+			if (bitsallocated > bitsstored)
 			{
-				const mdcm::Image image = image_reader.GetImage();
-				for (unsigned int ov = 0; ov < image.GetNumberOfOverlays(); ov++)
-				{
-					const mdcm::Overlay & overlay = image.GetOverlay(ov);
-					if (overlay.IsInPixelData())
-					{
-						*overlay_in_data = true;
-						break;
-					}
-				}
+				*overlay_in_data = check_overlay_in_pixeldata(ds);
 			}
 		}
-		//
-		//
-		//
-		remove_overlays__(file, ds);
-		remove_recurs__(file, ds, mdcm::Tag(0x0070,0x0001));
+		remove_overlays__(ds);
 	}
 	//
 	{
