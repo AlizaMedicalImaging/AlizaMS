@@ -408,9 +408,8 @@ void MediaStorage::GuessFromModality(const char * modality, unsigned int dim)
   }
 }
 
-const char * MediaStorage::GetFromDataSetOrHeader(DataSet const & ds, const Tag & tag)
+const char * MediaStorage::GetFromDataSetOrHeader(DataSet const & ds, const Tag & tag, std::string & buf)
 {
-  static std::string ret;
   if(ds.FindDataElement(tag))
   {
     const ByteValue * sopclassuid = ds.GetDataElement(tag).GetByteValue();
@@ -424,15 +423,16 @@ const char * MediaStorage::GetFromDataSetOrHeader(DataSet const & ds, const Tag 
       std::string::size_type pos = sopclassuid_str.find_last_of(' ');
       sopclassuid_str = sopclassuid_str.substr(0,pos);
       }
-    ret = sopclassuid_str.c_str();
-    return ret.c_str();
+    buf = sopclassuid_str.c_str();
+    return buf.c_str();
   }
   return 0;
 }
 
 bool MediaStorage::SetFromDataSetOrHeader(DataSet const & ds, const Tag & tag)
 {
-  const char * ms_str = GetFromDataSetOrHeader(ds,tag);
+  std::string buf;
+  const char * ms_str = GetFromDataSetOrHeader(ds,tag,buf);
   if(ms_str)
   {
     MediaStorage ms = MediaStorage::GetMSType(ms_str);
@@ -446,10 +446,10 @@ bool MediaStorage::SetFromDataSetOrHeader(DataSet const & ds, const Tag & tag)
   return false;
 }
 
-const char * MediaStorage::GetFromHeader(FileMetaInformation const & fmi)
+const char * MediaStorage::GetFromHeader(FileMetaInformation const & fmi, std::string & buf)
 {
   const Tag tmediastoragesopclassuid(0x0002, 0x0002);
-  return GetFromDataSetOrHeader(fmi, tmediastoragesopclassuid);
+  return GetFromDataSetOrHeader(fmi, tmediastoragesopclassuid, buf);
 }
 
 bool MediaStorage::SetFromHeader(FileMetaInformation const & fmi)
@@ -458,10 +458,10 @@ bool MediaStorage::SetFromHeader(FileMetaInformation const & fmi)
   return SetFromDataSetOrHeader(fmi, tmediastoragesopclassuid);
 }
 
-const char * MediaStorage::GetFromDataSet(DataSet const & ds)
+const char * MediaStorage::GetFromDataSet(DataSet const & ds, std::string & buf)
 {
   const Tag tsopclassuid(0x0008, 0x0016);
-  return GetFromDataSetOrHeader(ds, tsopclassuid);
+  return GetFromDataSetOrHeader(ds, tsopclassuid, buf);
 }
 
 
@@ -480,11 +480,11 @@ void MediaStorage::SetFromSourceImageSequence(DataSet const & ds)
     SmartPointer<SequenceOfItems> sq = sourceImageSequencesq.GetValueAsSQ();
     if(!sq) return;
     SequenceOfItems::ConstIterator it = sq->Begin();
-    const DataSet &subds = it->GetNestedDataSet();
+    const DataSet & subds = it->GetNestedDataSet();
     const Tag referencedSOPClassUIDTag(0x0008,0x1150);
     if(subds.FindDataElement(referencedSOPClassUIDTag))
     {
-      const DataElement& de = subds.GetDataElement(referencedSOPClassUIDTag);
+      const DataElement & de = subds.GetDataElement(referencedSOPClassUIDTag);
       const ByteValue *sopclassuid = de.GetByteValue();
       if(sopclassuid)
       {
@@ -543,11 +543,11 @@ bool MediaStorage::SetFromFile(File const & file)
    * this is why we check 0008,0016, and to preserve compat with ACR-NEMA
    * we also check Modality element to guess a fake Media Storage UID
    * file such as:
-   * mdcmData/SIEMENS-MR-RGB-16Bits.dcm
-   * are a pain to handle ...
+   * mdcmData/SIEMENS-MR-RGB-16Bits.dcm are a pain to handle
    */
   const FileMetaInformation &header = file.GetHeader();
-  const char * header_ms_ptr = GetFromHeader(header);
+  std::string b1;
+  const char * header_ms_ptr = GetFromHeader(header, b1);
   std::string copy1;
   const char * header_ms_str = 0;
   if(header_ms_ptr)
@@ -556,7 +556,8 @@ bool MediaStorage::SetFromFile(File const & file)
     header_ms_str = copy1.c_str();
   }
   const DataSet & ds = file.GetDataSet();
-  const char * ds_ms_ptr = GetFromDataSet(ds);
+  std::string b2;
+  const char * ds_ms_ptr = GetFromDataSet(ds, b2);
   std::string copy2;
   const char * ds_ms_str = 0;
   if(ds_ms_ptr)

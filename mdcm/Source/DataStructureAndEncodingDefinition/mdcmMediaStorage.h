@@ -39,9 +39,9 @@ class File;
  * MediaStorage
  *
  * FIXME There should not be any notion of Image and/or PDF at that point
- * Only the codec can answer yes I support this Media Storage or not...
+ * Only the codec can answer yes I support this Media Storage or not.
  * For instance an ImageCodec will answer yes to most of them
- * while a PDFCodec will answer only for the Encapsulated PDF
+ * while a PDFCodec will answer only for the Encapsulated PDF.
  *
  */
 class MDCM_EXPORT MediaStorage
@@ -194,13 +194,9 @@ void SetFromSourceImageSequence(DataSet const &);
 
 private:
 bool SetFromDataSetOrHeader(DataSet const &, const Tag &);
-// NOT THREAD SAFE
-const char * GetFromDataSetOrHeader(DataSet const &, const Tag &);
-// NOT THREAD SAFE
-const char * GetFromHeader(FileMetaInformation const &);
-// NOT THREAD SAFE
-const char * GetFromDataSet(DataSet const &);
-
+const char * GetFromDataSetOrHeader(DataSet const &, const Tag &, std::string &);
+const char * GetFromHeader(FileMetaInformation const &, std::string &);
+const char * GetFromDataSet(DataSet const &, std::string &);
 MSType MSField;
 };
 
