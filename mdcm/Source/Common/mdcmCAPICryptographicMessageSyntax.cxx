@@ -20,7 +20,7 @@
 
 =========================================================================*/
 #include "mdcmCAPICryptographicMessageSyntax.h"
-
+#include "mdcmTrace.h"
 #include <cstdio> // fseek
 
 namespace mdcm

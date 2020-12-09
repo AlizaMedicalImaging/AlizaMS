@@ -409,7 +409,7 @@ static void remove_curves__(mdcm::DataSet & ds)
 	{
 		const mdcm::DataElement & de = *it;
 		const mdcm::Tag t = de.GetTag();
-		if (t.GetGroup() >= 0x5000 && t.GetGroup() <= 0x501e && (t.GetGroup() % 2 == 0))
+		if (t.GetGroup() >= 0x5000 && t.GetGroup() <= 0x50FF && (t.GetGroup() % 2 == 0))
 		{
 			tmp0.push_back(t);
 		}
