@@ -602,7 +602,7 @@ static void anonymize_file__(
 	remove_group_length__(file, ds);
 	//
 	const QString s0("YES");
-	const QString s1("");
+	const QString s1("DICOM PS 3.15 E.1");
 	replace__(ds, mdcm::Tag(0x0012,0x0062), s0.toLatin1().constData(), s0.toLatin1().length());
 	replace__(ds, mdcm::Tag(0x0012,0x0063), s1.toLatin1().constData(), s1.toLatin1().length());
 	//
