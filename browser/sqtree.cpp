@@ -277,11 +277,39 @@ void SQtree::process_element(
 			wi->addChild(ci);
 			return;
 		}
+		//
+		QString sq_length("");
+		if (!sqi->IsUndefinedLength())
+		{
+			const qlonglong length =
+				static_cast<qlonglong>(sqi->GetLength());
+			QString tmp1;
+			if (length > 1024*1024)
+			{
+				tmp1.sprintf(
+					"%.2f",
+					length / (1024.0*1024.0));
+				sq_length = tmp1 + QString(" MB");
+			}
+			else if (length > 1024)
+			{
+				tmp1.sprintf(
+					"%.2f",
+					length/1024.0);
+				sq_length = tmp1 + QString(" KB");
+			}
+			else
+			{
+				sq_length = QVariant(length).toString() +
+					QString(" B");
+			}
+		}
+		//
 		QStringList l;
 		l << QString(tag.PrintAsPipeSeparatedString().c_str())
 			<< tname
 			<< QString("SQ")
-			<< QString("")
+			<< sq_length
 			<< QString(" [")+
 				QVariant(static_cast<unsigned int>(
 					sqi->GetNumberOfItems())).toString() +
@@ -391,7 +419,7 @@ void SQtree::process_element(
 				{
 					tmp1.sprintf(
 						"%.2f",
-						bv->GetLength()/1024.0);
+						length / 1024.0);
 					length_s = tmp1 + QString(" KB");
 				}
 				else
@@ -658,13 +686,20 @@ void SQtree::process_element(
 					{
 						const QString date_s = QString::fromLatin1(
 							bv->GetPointer(),
-							bv->GetLength()).trimmed();
-						const QDate date_ =
-							QDate::fromString(
-								date_s, QString("yyyyMMdd"));
-						tmp0 = date_.toString(
-							QString("d MMM yyyy"));
-						date_time = true;
+							bv->GetLength()).trimmed().remove(QChar('\0'));
+						if (date_s.length() == 8)
+						{
+							const QDate date_ =
+								QDate::fromString(
+									date_s, QString("yyyyMMdd"));
+							tmp0 = date_.toString(
+								QString("d MMM yyyy"));
+							date_time = true;
+						}
+						else
+						{
+							tmp0 = date_s;
+						}
 					}
 					else if (vr == mdcm::VR::TM)
 					{
@@ -674,25 +709,36 @@ void SQtree::process_element(
 								trimmed().remove(QChar('\0'));
 						if (!time0_s.isEmpty())
 						{
-							const int point_idx =
-								time0_s.indexOf(QString("."));
-							if (point_idx == 6||point_idx == -1)
+							const int range_idx =
+								time0_s.indexOf(QString("-"));
+							const int multi_idx =
+								time0_s.indexOf(QString("\\"));
+							if (range_idx == -1 && multi_idx == -1)
 							{
-								const QString time1_s =
-									time0_s.left(6);
-								const QDateTime time_ =
-									QDateTime::fromString(
-										time1_s,
-										QString("HHmmss"));
-								tmp0 = time_.toString(
-									QString("HH:mm:ss"));
-								if (point_idx == 6)
+								const int point_idx =
+									time0_s.indexOf(QString("."));
+								if (point_idx == 6||point_idx == -1)
 								{
-									tmp0.append(QString(".") +
-										time0_s.right(
-											time0_s.length()-7));
+									const QString time1_s =
+										time0_s.left(6);
+									const QDateTime time_ =
+										QDateTime::fromString(
+											time1_s,
+											QString("HHmmss"));
+									tmp0 = time_.toString(
+										QString("HH:mm:ss"));
+									if (point_idx == 6)
+									{
+										tmp0.append(QString(".") +
+											time0_s.right(
+												time0_s.length()-7));
+									}
+									date_time = true;
 								}
-								date_time = true;
+								else
+								{
+									tmp0 = time0_s;
+								}
 							}
 							else
 							{
@@ -708,25 +754,33 @@ void SQtree::process_element(
 								trimmed().remove(QChar('\0'));
 						if (!time0_s.isEmpty())
 						{
-							const int point_idx =
-								time0_s.indexOf(QString("."));
-							if (point_idx == 14||point_idx == -1)
+							if (time0_s.length() >= 14 &&
+									time0_s.length() <= 26)
 							{
-								const QString time1_s =
-									time0_s.left(14);
-								const QDateTime time_ =
-									QDateTime::fromString(
-										time1_s,
-										QString("yyyyMMddHHmmss"));
-								tmp0 = time_.toString(
-									QString("d MMM yyyy HH:mm:ss"));
-								if (point_idx == 14)
+								const int point_idx =
+									time0_s.indexOf(QString("."));
+								if (point_idx == 14 || point_idx == -1)
 								{
-									tmp0.append(QString(".") +
-										time0_s.right(
-											time0_s.length()-15));
+									const QString time1_s =
+										time0_s.left(14);
+									const QDateTime time_ =
+										QDateTime::fromString(
+											time1_s,
+											QString("yyyyMMddHHmmss"));
+									tmp0 = time_.toString(
+										QString("d MMM yyyy HH:mm:ss"));
+									if (point_idx == 14)
+									{
+										tmp0.append(QString(".") +
+											time0_s.right(
+												time0_s.length()-15));
+									}
+									date_time = true;
 								}
-								date_time = true;
+								else
+								{
+									tmp0 = time0_s;
+								}
 							}
 							else
 							{
