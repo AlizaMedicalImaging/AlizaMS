@@ -1022,9 +1022,15 @@ QString DicomUtils::convert_pn_value(const QString & n)
 {
 	//family name, given name, middle name, name prefix, name suffix
 	QString s("");
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+	const QStringList tmp1 = n.split(
+		QString("="),
+		Qt::KeepEmptyParts);
+#else
 	const QStringList tmp1 = n.split(
 		QString("="),
 		QString::KeepEmptyParts);
+#endif
 	for (int x = 0; x < tmp1.size(); x++)
 	{
 		if (!s.isEmpty()) s += QString(" ");
