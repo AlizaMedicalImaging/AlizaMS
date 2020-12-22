@@ -14,13 +14,6 @@ cmake_minimum_required(VERSION 3.11.0)
 # https://cmake.org/cmake/help/v3.0/policy/CMP0003.html
 # Libraries linked via full path no longer produce linker search paths
 CMAKE_POLICY(SET CMP0003 NEW)
-if(USE_QT_V_5)
-  if(WIN32)
-# https://cmake.org/cmake/help/v3.0/policy/CMP0020.html
-# Automatically link Qt executables to qtmain target on Windows
-    CMAKE_POLICY(SET CMP0020 NEW)
-  endif()
-endif()
 
 # https://cmake.org/cmake/help/v3.0/policy/CMP0022.html
 # Link
@@ -82,7 +75,8 @@ if(NOT LIBRARY_OUTPUT_PATH)
   mark_as_advanced(LIBRARY_OUTPUT_PATH)
 endif()
 
-option(USE_QT_V_5 "Use Qt5" ON)
+set(ALIZA_QT_VERSION " " CACHE STRING "Qt version")
+set_property(CACHE ALIZA_QT_VERSION PROPERTY STRINGS " " "4" "5" "6")
 option(USE_SYSTEM_GLEW_QT4 "Use system GLEW (only Qt4)" OFF)
 option(USE_MEDIASTORAGE_MODE "Build for media storage" OFF)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -495,6 +489,26 @@ endif()
 #
 #
 #
+if(ALIZA_QT_VERSION STREQUAL "4")
+  set(USE_QT_V_4 TRUE)
+  message(STATUS "Using Qt4")
+elseif(ALIZA_QT_VERSION STREQUAL "5")
+  set(USE_QT_V_5 TRUE)
+  message(STATUS "Using Qt5")
+elseif(ALIZA_QT_VERSION STREQUAL "6")
+  set(USE_QT_V_6 TRUE)
+  message(STATUS "Using Qt6")
+else()
+  message(FATAL_ERROR "Can not determine Qt version to use")
+endif()
+
+if(USE_QT_V_5 OR USE_QT_V_6)
+  if(WIN32)
+# https://cmake.org/cmake/help/v3.0/policy/CMP0020.html
+# Automatically link Qt executables to qtmain target on Windows
+    CMAKE_POLICY(SET CMP0020 NEW)
+  endif()
+endif()
 
 find_package(ITK COMPONENTS
   ITKCommon
@@ -507,7 +521,20 @@ find_package(ITK COMPONENTS
 include(${ITK_USE_FILE})
 message(STATUS "ITK: ${ITK_LIBRARIES}")
 
-if(USE_QT_V_5)
+if(USE_QT_V_6)
+  find_package(Qt6 COMPONENTS
+    Core
+    Gui
+    Widgets
+    OpenGLWidgets
+    PrintSupport
+    Svg
+    Core5Compat REQUIRED)
+  if(NOT USE_MEDIASTORAGE_MODE)
+    find_package(Qt6 COMPONENTS Sql REQUIRED)
+  endif()
+  include_directories(${Qt6Core5Compat_INCLUDE_DIRS})
+elseif(USE_QT_V_5)
   find_package(Qt5Core REQUIRED)
   find_package(Qt5Gui REQUIRED)
   find_package(Qt5Widgets REQUIRED)
@@ -516,7 +543,7 @@ if(USE_QT_V_5)
   if(NOT USE_MEDIASTORAGE_MODE)
     find_package(Qt5Sql REQUIRED)
   endif()
-else()
+elseif(USE_QT_V_4)
   find_package(Qt4 REQUIRED)
   set(QT_USE_QTMAIN TRUE)
   set(QT_USE_QTGUI TRUE)
@@ -532,6 +559,9 @@ else()
     set(LOCAL_GLEW_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CG/glew")
     add_definitions(-DGLEW_STATIC)
   endif()
+  set(USE_QT_V_4 TRUE)
+else()
+  message(FATAL_ERROR "Can not determine Qt version to use")
 endif()
 
 #required?
@@ -710,7 +740,7 @@ if(NOT USE_MEDIASTORAGE_MODE)
   set(ALIZAMS_SRCS ${ALIZAMS_SRCS} ${CMAKE_CURRENT_SOURCE_DIR}/browser/ctkdialog.cpp)
 endif()
 
-if(NOT USE_QT_V_5 AND NOT USE_SYSTEM_GLEW_QT4)
+if(USE_QT_V_4 AND NOT USE_SYSTEM_GLEW_QT4)
   set(ALIZAMS_SRCS ${ALIZAMS_SRCS} "${LOCAL_GLEW_PATH}/src/glew.c")
 endif()
 
@@ -746,10 +776,14 @@ set(ALIZAMS_MOC_HRDS
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/srwidget.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/aliza.h)
 
-if(USE_QT_V_5)
+if(USE_QT_V_6)
   set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5.h)
-else()
+elseif(USE_QT_V_5)
+  set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5.h)
+elseif(USE_QT_V_4)
   set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt4.h)
+else()
+  message(FATAL_ERROR "Can not determine Qt version to use")
 endif()
 
 if(NOT USE_MEDIASTORAGE_MODE)
@@ -795,7 +829,22 @@ set(ALIZAMS_SRCS ${ALIZAMS_SRCS} ${MDCM_COMMON_SRCS} ${MDCM_DICT_SRCS} ${MDCM_DS
 
 set(ALIZAMS_LINK_LIBRARIES ${MDCM_LIBRARIES} ${ITK_LIBRARIES})
 
-if(USE_QT_V_5)
+if(USE_QT_V_6)
+  QT6_WRAP_CPP(ALIZAMS_MOC_SRCS ${ALIZAMS_MOC_HRDS})
+  QT6_WRAP_UI(ALIZAMS_UI ${ALIZAMS_UIS})
+  QT6_ADD_RESOURCES(ALIZAMS_QRCS_RCC ${ALIZAMS_QRCS})
+  set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES}
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Widgets
+	Qt6::OpenGLWidgets
+    Qt6::PrintSupport
+    Qt6::Svg
+	Qt6::Core5Compat)
+  if(NOT USE_MEDIASTORAGE_MODE)
+    set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} Qt6::Sql)
+  endif()
+elseif(USE_QT_V_5)
   QT5_WRAP_CPP(ALIZAMS_MOC_SRCS ${ALIZAMS_MOC_HRDS})
   QT5_WRAP_UI(ALIZAMS_UI ${ALIZAMS_UIS})
   QT5_ADD_RESOURCES(ALIZAMS_QRCS_RCC ${ALIZAMS_QRCS})
@@ -808,18 +857,20 @@ if(USE_QT_V_5)
   if(NOT USE_MEDIASTORAGE_MODE)
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} Qt5::Sql)
   endif()
-else()
+elseif(USE_QT_V_4)
   QT4_WRAP_CPP(ALIZAMS_MOC_SRCS ${ALIZAMS_MOC_HRDS})
   QT4_WRAP_UI(ALIZAMS_UI ${ALIZAMS_UIS})
   QT4_ADD_RESOURCES(ALIZAMS_QRCS_RCC ${ALIZAMS_QRCS})
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} ${QT_LIBRARIES})
+else()
+  message(FATAL_ERROR "Can not determine Qt version to use")
 endif()
 
 link_directories("bin")
 
 if(WIN32)
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} opengl32)
-  if(NOT USE_QT_V_5 AND USE_SYSTEM_GLEW_QT4)
+  if(USE_QT_V_4 AND USE_SYSTEM_GLEW_QT4)
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} glew32)
   endif()
   add_executable(alizams WIN32
@@ -834,7 +885,7 @@ else()
   else()
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GL)
   endif()
-  if(NOT USE_QT_V_5 AND USE_SYSTEM_GLEW_QT4)
+  if(USE_QT_V_4 AND USE_SYSTEM_GLEW_QT4)
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GLEW)
   endif()
   add_executable(alizams

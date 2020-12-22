@@ -1,10 +1,6 @@
 #include "imageinfodialog.h"
 
-ImageInfoDialog::ImageInfoDialog(
-	QWidget * p,
-	Qt::WindowFlags f)
-	:
-	QDialog(p, f)
+ImageInfoDialog::ImageInfoDialog( QWidget * p) : QDialog(p)
 {
 	setupUi(this);
 }

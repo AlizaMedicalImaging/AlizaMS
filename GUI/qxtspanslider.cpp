@@ -119,14 +119,25 @@ void QxtSpanSliderPrivate::setupPainter(QPainter* painter, Qt::Orientation orien
 {
     QColor highlight = qxt_p().palette().color(QPalette::Highlight);
     QLinearGradient gradient(x1, y1, x2, y2);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+    gradient.setColorAt(0, highlight.darker(120));
+    gradient.setColorAt(1, highlight.lighter(108));
+#else
     gradient.setColorAt(0, highlight.dark(120));
     gradient.setColorAt(1, highlight.light(108));
+#endif
     painter->setBrush(gradient);
-
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+    if (orientation == Qt::Horizontal)
+        painter->setPen(QPen(highlight.darker(130), 0));
+    else
+        painter->setPen(QPen(highlight.darker(150), 0));
+#else
     if (orientation == Qt::Horizontal)
         painter->setPen(QPen(highlight.dark(130), 0));
     else
         painter->setPen(QPen(highlight.dark(150), 0));
+#endif
 }
 
 void QxtSpanSliderPrivate::drawSpan(QStylePainter* painter, const QRect& rect) const

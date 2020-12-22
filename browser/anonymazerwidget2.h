@@ -20,7 +20,7 @@ class AnonymazerWidget2 : public QWidget, private Ui::AnonymazerWidget2
 {
 Q_OBJECT
 public:
-	AnonymazerWidget2(float, QWidget(*)=NULL,Qt::WindowFlags=0);
+	AnonymazerWidget2(float, QWidget(*)=NULL);
 	~AnonymazerWidget2();
 	void writeSettings(QSettings&);
 public slots:

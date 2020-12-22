@@ -2,7 +2,7 @@
 #include <QHBoxLayout>
 
 ZoomWidget::ZoomWidget(
-	float si, QWidget * p, Qt::WindowFlags f) : QWidget(p,f)
+	float si, QWidget * p) : QWidget(p)
 {
 	const QSize s = QSize((int)(18*si),(int)(18*si));
 	QHBoxLayout * l  = new QHBoxLayout(this);

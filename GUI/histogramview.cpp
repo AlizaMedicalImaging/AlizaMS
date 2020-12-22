@@ -278,9 +278,21 @@ void HistogramView::get_screen()
 {
 	QPixmap p;
 	if (multi_frame_ptr && multi_frame_ptr->isVisible())
+	{
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+		p = multi_frame_ptr->grab();
+#else
 		p = QPixmap::grabWidget(multi_frame_ptr);
+#endif
+	}
 	else
+	{
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+		p = this->grab();
+#else
 		p = QPixmap::grabWidget(this);
+#endif
+	}
 	if (p.isNull())
 	{
 		std::cout << "could not grab screen" << std::endl;

@@ -1,6 +1,6 @@
 #include "toolbox.h"
 
-ToolBox::ToolBox(QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
+ToolBox::ToolBox(QWidget * p) : QWidget(p)
 {
 	setupUi(this);
 }

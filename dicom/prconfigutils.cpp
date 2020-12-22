@@ -1367,9 +1367,15 @@ template<typename T, typename T2d> QString levels_slice_by_slice(
 					.remove(QChar(' '))
 					.remove(QChar('\0'));
 			QList<int> idxs;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+			const QStringList frames_tmp1 = frames.split(
+				QString("\\"),
+				Qt::SkipEmptyParts);
+#else
 			const QStringList frames_tmp1 = frames.split(
 				QString("\\"),
 				QString::SkipEmptyParts);
+#endif
 			if (frames_tmp1.size() < 1)
 			{
 				SOPInstanceUids::const_iterator it1 =
@@ -1582,9 +1588,15 @@ static void areas_slice_by_slice(
 			const QString frames =
 				l.at(z+1).trimmed().remove(QChar(' ')).remove(QChar('\0'));
 			QList<int> idxs;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+			const QStringList frames_tmp1 = frames.split(
+				QString("\\"),
+				Qt::SkipEmptyParts);
+#else
 			const QStringList frames_tmp1 = frames.split(
 				QString("\\"),
 				QString::SkipEmptyParts);
+#endif
 			if (frames_tmp1.empty())
 			{
 				SOPInstanceUids::const_iterator it1 =
@@ -1710,9 +1722,15 @@ static void text_slice_by_slice(
 					.remove(QChar(' '))
 					.remove(QChar('\0'));
 			QList<int> idxs;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+			const QStringList frames_tmp1 = frames.split(
+				QString("\\"),
+				Qt::SkipEmptyParts);
+#else
 			const QStringList frames_tmp1 = frames.split(
 				QString("\\"),
 				QString::SkipEmptyParts);
+#endif
 			if (frames_tmp1.empty())
 			{
 				SOPInstanceUids::const_iterator it1 =
@@ -1846,9 +1864,15 @@ static void graphic_slice_by_slice(
 					.remove(QChar(' '))
 					.remove(QChar('\0'));
 			QList<int> idxs;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+			const QStringList frames_tmp1 = frames.split(
+				QString("\\"),
+				Qt::SkipEmptyParts);
+#else
 			const QStringList frames_tmp1 = frames.split(
 				QString("\\"),
 				QString::SkipEmptyParts);
+#endif
 			if (frames_tmp1.empty())
 			{
 				SOPInstanceUids::const_iterator it1 =

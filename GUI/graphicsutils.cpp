@@ -110,7 +110,11 @@ template<typename T> QString get_scalar_pixel_value__(
 			{
 				const double tmp0 = static_cast<double>(p);
 				*label = static_cast<long long>(p);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+				s += QString::asprintf("%.6f",tmp0);
+#else
 				s.sprintf("%.6f",tmp0);
+#endif
 				s.append(idx_);
 			}
 			break;
@@ -216,9 +220,18 @@ template<typename T> QString get_rgb_pixel_value__(
 				const double tmp0 = static_cast<double>(p.GetRed());
 				const double tmp1 = static_cast<double>(p.GetGreen());
 				const double tmp2 = static_cast<double>(p.GetBlue());
-				QString tmp0s; tmp0s.sprintf("%.3f",tmp0);
-				QString tmp1s; tmp1s.sprintf("%.3f",tmp1);
-				QString tmp2s; tmp2s.sprintf("%.3f",tmp2);
+				QString tmp0s;
+				QString tmp1s;
+				QString tmp2s;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+				tmp0s = QString::asprintf("%.3f",tmp0);
+				tmp1s = QString::asprintf("%.3f",tmp1);
+				tmp2s = QString::asprintf("%.3f",tmp2);
+#else
+				tmp0s.sprintf("%.3f",tmp0);
+				tmp1s.sprintf("%.3f",tmp1);
+				tmp2s.sprintf("%.3f",tmp2);
+#endif
 				s.append(tmp0s+QString(",")+tmp1s+QString(",")+tmp2s);
 				s.append(idx_);
 			}
@@ -329,10 +342,21 @@ template<typename T> QString get_rgba_pixel_value__(
 				const double tmp1 = static_cast<double>(p.GetGreen());
 				const double tmp2 = static_cast<double>(p.GetBlue());
 				const double tmp3 = static_cast<double>(p.GetAlpha());
-				QString tmp0s; tmp0s.sprintf("%.3f",tmp0);
-				QString tmp1s; tmp1s.sprintf("%.3f",tmp1);
-				QString tmp2s; tmp2s.sprintf("%.3f",tmp2);
-				QString tmp3s; tmp3s.sprintf("%.3f",tmp3);
+				QString tmp0s;
+				QString tmp1s;
+				QString tmp2s;
+				QString tmp3s;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+				tmp0s = QString::asprintf("%.3f",tmp0);
+				tmp1s = QString::asprintf("%.3f",tmp1);
+				tmp2s = QString::asprintf("%.3f",tmp2);
+				tmp3s = QString::asprintf("%.3f",tmp3);
+#else
+				tmp0s.sprintf("%.3f",tmp0);
+				tmp1s.sprintf("%.3f",tmp1);
+				tmp2s.sprintf("%.3f",tmp2);
+				tmp3s.sprintf("%.3f",tmp3);
+#endif
 				s.append(tmp0s+QString(",")+tmp1s+QString(",")+tmp2s+QString(",")+tmp3s);
 				s.append(idx_);
 			}

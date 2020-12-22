@@ -9,6 +9,9 @@
 #include <QGLContext>
 #include "glwidget-qt4.h"
 #endif
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QOpenGLVersionFunctionsFactory>
+#endif
 #include <QApplication>
 #include <QSettings>
 #include <QMessageBox>
@@ -205,7 +208,7 @@ struct  MyClosestRayResultCallback0 : public btCollisionWorld::ClosestRayResultC
 };
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-GLWidget::GLWidget(QWidget * p, Qt::WindowFlags f) : QOpenGLWidget(p, f)
+GLWidget::GLWidget(QWidget * p) : QOpenGLWidget(p)
 {
 #ifdef USE_SET_GL_FORMAT
 #ifndef USE_SET_DEFAULT_GL_FORMAT
@@ -288,9 +291,17 @@ void GLWidget::initializeGL()
 	}
 	initializeOpenGLFunctions();
 #ifdef USE_CORE_3_2_PROFILE
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+	QOpenGLFunctions_3_2_Core * funcs = QOpenGLVersionFunctionsFactory::get<QOpenGLFunctions_3_2_Core>();
+#else
 	QOpenGLFunctions_3_2_Core * funcs = c->versionFunctions<QOpenGLFunctions_3_2_Core>();
+#endif
+#else
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+	QOpenGLFunctions_3_0 * funcs = QOpenGLVersionFunctionsFactory::get<QOpenGLFunctions_3_0>();
 #else
 	QOpenGLFunctions_3_0 * funcs = c->versionFunctions<QOpenGLFunctions_3_0>();
+#endif
 #endif
 	if (!funcs)
 	{
@@ -340,7 +351,7 @@ void GLWidget::mousePressEvent(QMouseEvent * e)
 	{
 		lastPos = e->pos();
 	}
-	else if (e->buttons() & Qt::MidButton)
+	else if (e->buttons() & Qt::MiddleButton)
 	{
 		lastPanPos = e->pos();
 	}
@@ -372,7 +383,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent * e)
 		lastPos = e->pos();
 		update_ = true;
 	}
-	else if (e->buttons() & Qt::MidButton)
+	else if (e->buttons() & Qt::MiddleButton)
 	{
 		const float deltax = e->x() - lastPanPos.x();
 		const float deltay = e->y() - lastPanPos.y();
@@ -407,7 +418,12 @@ void GLWidget::wheelEvent(QWheelEvent * e)
 		incr = 25.0;
 	}
 	else { ;; }
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+	const QPoint p = e->angleDelta();
+	if (p.x() > 0 || p.y() > 0)
+#else
 	if (e->delta() > 0)
+#endif
 	{
 		ortho_size += (float)incr;
 		position_z += incr;

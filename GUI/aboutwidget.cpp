@@ -90,7 +90,7 @@ QString AboutWidget::get_build_info()
 	s.append(QString("\nITK ") +
 		QString::fromLatin1(itk::Version::GetITKVersion()));
 #endif
-#if 0
+#if 1
 	s.append(QString("\nQt ") + QVariant(QT_VERSION_STR).toString());
 #endif
 	return s;

@@ -8,7 +8,7 @@ class CTKDialog: public QDialog, private Ui::CTKDialog
 {
 Q_OBJECT
 public:
-	CTKDialog(QWidget(*)=NULL, Qt::WindowFlags=0);
+	CTKDialog(QWidget(*)=NULL);
 	~CTKDialog() {}
 	QString get_dir() const;
 	QString get_pname() const;

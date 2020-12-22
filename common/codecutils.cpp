@@ -18,7 +18,11 @@
 
 #include <QtGlobal>
 #include <QStringList>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QRegularExpression>
+#else
 #include <QRegExp>
+#endif
 #include <QTextCodec>
 #include "codecutils.h"
 
@@ -52,7 +56,11 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
   for (int x = 0; x < l.size(); x++)
   {
     const QString tmp1 = l.at(x).trimmed().toUpper();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if (tmp1.contains(QRegularExpression(QString("ISO\\s+2022"))))
+#else
     if (tmp1.contains(QRegExp(QString("ISO\\s+2022"))))
+#endif
     {
       iso2022 = true;
       break;
@@ -239,7 +247,11 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
       else
       {
         // ISO IR 13
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        const QRegularExpression re(QString("ISO\\s+2022\\s+IR\\s+13"));
+#else
         const QRegExp re(QString("ISO\\s+2022\\s+IR\\s+13"));
+#endif
         const int i = l.indexOf(re, Qt::CaseInsensitive);
         if (i > -1)
         {
@@ -262,72 +274,76 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
     QTextCodec * codec = NULL;
     const QString s(l.at(0).trimmed().simplified().toUpper());
     // ISO IR 100
-    if (s.contains(QRegExp(QString("IR 100"))))
+    if (s.contains(QString("IR 100")))
     {
       codec = QTextCodec::codecForName("ISO-8859-1");
     }
     // ISO IR 192
-    else if (s.contains(QRegExp(QString("IR 192"))))
+    else if (s.contains(QString("IR 192")))
     {
       codec = QTextCodec::codecForName("UTF-8");
     }
     // GB18030
-    else if (s.contains(QRegExp("GB18030")))
+    else if (s.contains(QString("GB18030")))
     {
       codec = QTextCodec::codecForName("GB18030");
     }
     // GBK
-    else if (s.contains(QRegExp("GBK")))
+    else if (s.contains(QString("GBK")))
     {
       codec = QTextCodec::codecForName("GBK");
     }
     // ISO IR 166
-    else if (s.contains(QRegExp(QString("IR 166"))))
+    else if (s.contains(QString("IR 166")))
     {
       codec = QTextCodec::codecForName("TIS-620");
     }
     // ISO IR 148
-    else if (s.contains(QRegExp(QString("IR 148"))))
+    else if (s.contains(QString("IR 148")))
     {
       codec = QTextCodec::codecForName("ISO-8859-9");
     }
     // ISO IR 144
-    else if (s.contains(QRegExp(QString("IR 144"))))
+    else if (s.contains(QString("IR 144")))
     {
       codec = QTextCodec::codecForName("ISO-8859-5");
     }
     // ISO IR 138
-    else if (s.contains(QRegExp(QString("IR 138"))))
+    else if (s.contains(QString("IR 138")))
     {
       codec = QTextCodec::codecForName("ISO-8859-8");
     }
     // ISO IR 127
-    else if (s.contains(QRegExp(QString("IR 127"))))
+    else if (s.contains(QString("IR 127")))
     {
       codec = QTextCodec::codecForName("ISO-8859-6");
     }
     // ISO IR 126
-    else if (s.contains(QRegExp(QString("IR 126"))))
+    else if (s.contains(QString("IR 126")))
     {
       codec = QTextCodec::codecForName("ISO-8859-7");
     }
     // ISO IR 110
-    else if (s.contains(QRegExp(QString("IR 110"))))
+    else if (s.contains(QString("IR 110")))
     {
       codec = QTextCodec::codecForName("ISO-8859-4");
     }
     // ISO IR 109
-    else if (s.contains(QRegExp(QString("IR 109"))))
+    else if (s.contains(QString("IR 109")))
     {
       codec = QTextCodec::codecForName("ISO-8859-3");
     }
     // ISO IR 101
-    else if (s.contains(QRegExp(QString("IR 101"))))
+    else if (s.contains(QString("IR 101")))
     {
       codec = QTextCodec::codecForName("ISO-8859-2");
     }
     // ISO IR 13
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    else if (s.contains(QRegularExpression(QString("IR 13\\D*"))))
+#else
     else if (s.contains(QRegExp(QString("IR 13\\D*"))))
+#endif
     {
       codec = QTextCodec::codecForName("Shift_JIS");
     }

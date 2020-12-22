@@ -2,7 +2,7 @@
 
 #include <QHBoxLayout>
 
-ZRangeWidget::ZRangeWidget(QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
+ZRangeWidget::ZRangeWidget(QWidget * p) : QWidget(p)
 {
 	spanslider  = new QxtSpanSlider(Qt::Horizontal, this);
 	QHBoxLayout * l = new QHBoxLayout(this);

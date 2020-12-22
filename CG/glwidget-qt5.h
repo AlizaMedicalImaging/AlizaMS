@@ -122,7 +122,7 @@ public:
 
 	MY_DECLARE_NEW()
 
-	GLWidget(QWidget(*)=nullptr, Qt::WindowFlags=0);
+	GLWidget(QWidget(*)=nullptr);
 	~GLWidget();
 	void updateGL() { update(); }
 	void init_();

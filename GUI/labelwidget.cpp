@@ -2,7 +2,7 @@
 
 #include  <QHBoxLayout>
 
-LabelWidget::LabelWidget(QWidget * p, Qt::WindowFlags f) : QWidget(p,f)
+LabelWidget::LabelWidget(QWidget * p) : QWidget(p)
 {
 	label = new QLabel(this);
 	label->setMaximumSize(QSize(32, 32));

@@ -299,9 +299,15 @@ static QString read_MRImageModule(const mdcm::DataSet & ds)
 		if (!tmp2.isEmpty())
 		{
 			s += QString("<span class='y9'>Scanning Sequence</span><br />");
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+			const QStringList tmp0 =
+				tmp2.split(
+					QString("\\"), Qt::SkipEmptyParts);
+#else
 			const QStringList tmp0 =
 				tmp2.split(
 					QString("\\"), QString::SkipEmptyParts);
+#endif
 			const int tmp0_size = tmp0.size();
 			s += QString("<span class='y8'>");
 			for (int x = 0; x < tmp0_size; x++)
@@ -332,9 +338,15 @@ static QString read_MRImageModule(const mdcm::DataSet & ds)
 				{
 					s += QString("<span class='y9'>Variant</span><br />");
 					{
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+						const QStringList tmp0 =
+							tmp2.split(
+								QString("\\"), Qt::SkipEmptyParts);
+#else
 						const QStringList tmp0 =
 							tmp2.split(
 								QString("\\"), QString::SkipEmptyParts);
+#endif
 						const int tmp0_size = tmp0.size();
 						s += QString("<span class='y8'>");
 						for (int x = 0; x < tmp0_size; x++)
@@ -375,9 +387,15 @@ static QString read_MRImageModule(const mdcm::DataSet & ds)
 				{
 					s += QString("<span class='y9'>Options</span><br />");
 					{
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+						const QStringList tmp0 =
+							tmp2.split(
+								QString("\\"), Qt::SkipEmptyParts);
+#else
 						const QStringList tmp0 =
 							tmp2.split(
 								QString("\\"), QString::SkipEmptyParts);
+#endif
 						const int tmp0_size = tmp0.size();
 						s += QString("<span class='y8'>");
 						for (int x = 0; x < tmp0_size; x++)
@@ -1034,9 +1052,15 @@ QString DicomUtils::convert_pn_value(const QString & n)
 	for (int x = 0; x < tmp1.size(); x++)
 	{
 		if (!s.isEmpty()) s += QString(" ");
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+		const QStringList tmp2 = tmp1.at(x).split(
+			QString("^"),
+			Qt::KeepEmptyParts);
+#else
 		const QStringList tmp2 = tmp1.at(x).split(
 			QString("^"),
 			QString::KeepEmptyParts);
+#endif
 		const int tmp2_size = tmp2.size();
 		if (tmp2_size == 1)
 		{
@@ -1280,9 +1304,15 @@ bool DicomUtils::get_ds_values(
 	const QString tmp0 = QString::fromLatin1(
 		bv->GetPointer(),
 		bv->GetLength());
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+	const QStringList tmp1 = tmp0.split(
+		QString("\\"),
+		Qt::SkipEmptyParts);
+#else
 	const QStringList tmp1 = tmp0.split(
 		QString("\\"),
 		QString::SkipEmptyParts);
+#endif
 	if (tmp1.empty()) return false;
 	for (int x = 0; x < tmp1.size(); x++)
 	{
@@ -1312,9 +1342,15 @@ bool DicomUtils::priv_get_ds_values(
 	const QString tmp0 = QString::fromLatin1(
 		bv->GetPointer(),
 		bv->GetLength());
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+	const QStringList tmp1 = tmp0.split(
+		QString("\\"),
+		Qt::SkipEmptyParts);
+#else
 	const QStringList tmp1 = tmp0.split(
 		QString("\\"),
 		QString::SkipEmptyParts);
+#endif
 	if (tmp1.empty()) return false;
 	for (int x = 0; x < tmp1.size(); x++)
 	{
@@ -1375,9 +1411,15 @@ bool DicomUtils::get_is_values(
 	const QString tmp0 = QString::fromLatin1(
 		bv->GetPointer(),
 		bv->GetLength());
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+	const QStringList tmp1 = tmp0.split(
+		QString("\\"),
+		Qt::SkipEmptyParts);
+#else
 	const QStringList tmp1 = tmp0.split(
 		QString("\\"),
 		QString::SkipEmptyParts);
+#endif
 	if (tmp1.empty()) return false;
 	for (int x = 0; x < tmp1.size(); x++)
 	{
@@ -3581,9 +3623,15 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 		if (!imagetype.isEmpty())
 		{
 			QString imagetype_("");
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+			const QStringList l = imagetype.toLower().split(
+				QString("\\"),
+				Qt::SkipEmptyParts);
+#else
 			const QStringList l = imagetype.toLower().split(
 				QString("\\"),
 				QString::SkipEmptyParts);
+#endif
 			imagetype_.append(QString(
 				"<br /><span class='y7'>DICOM image type</span>"
 				"<br /><span class='y6'>"));
@@ -3841,8 +3889,13 @@ bool DicomUtils::get_patient_position(
 	if (pp==NULL || p.isEmpty()) return false;
 	const QString tmp0 = p.trimmed().
 		remove(QChar('\0'));
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+	const QStringList list =
+		tmp0.split(QString("\\"), Qt::SkipEmptyParts);
+#else
 	const QStringList list =
 		tmp0.split(QString("\\"), QString::SkipEmptyParts);
+#endif
 	if (list.size() == 3)
 	{
 		bool ok = false;
@@ -3867,8 +3920,13 @@ bool DicomUtils::get_patient_orientation(
 	if (po==NULL || o.isEmpty()) return false;
 	const QString tmp0 = QString(o.trimmed()).
 		remove(QChar('\0'));
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+	const QStringList list =
+		tmp0.split(QString("\\"), Qt::SkipEmptyParts);
+#else
 	const QStringList list =
 		tmp0.split(QString("\\"), QString::SkipEmptyParts);
+#endif
 	if (list.size() == 6)
 	{
 		bool ok = false;
@@ -5842,9 +5900,15 @@ QString DicomUtils::read_ultrasound(
 						const QString tmp0 = QString::fromLatin1(
 							bv->GetPointer(),
 							bv->GetLength());
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+						const QStringList tmp1 = tmp0.split(
+							QString("\\"),
+							Qt::SkipEmptyParts);
+#else
 						const QStringList tmp1 = tmp0.split(
 							QString("\\"),
 							QString::SkipEmptyParts);
+#endif
 						if (tmp1.size() == 3)
 						{
 							bool okx = false, oky = false, okz = false;
@@ -8370,12 +8434,21 @@ QString DicomUtils::read_enhanced_common(
 				QList<short>  tmp1l;
 				for (size_t k = 0; k < tmp1s; k++)
 				{
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+					QStringList w__ =
+						window_widths_l.at(k).split(QString("\\"),
+						Qt::SkipEmptyParts);
+					QStringList c__ =
+						window_centers_l.at(k).split(QString("\\"),
+						Qt::SkipEmptyParts);
+#else
 					QStringList w__ =
 						window_widths_l.at(k).split(QString("\\"),
 						QString::SkipEmptyParts);
 					QStringList c__ =
 						window_centers_l.at(k).split(QString("\\"),
 						QString::SkipEmptyParts);
+#endif
 					if (!w__.empty() && !c__.empty())
 					{
 						bool ok_c = false, ok_w = false;
@@ -9302,7 +9375,11 @@ bool DicomUtils::process_contrours_ref(
 	{
 		ref_frame_of_refs_set << tmp_ivariant->di->rois.at(z).ref_frame_of_ref;
 	}
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+	QList<QString> ref_frame_of_refs_list = ref_frame_of_refs_set.values();
+#else
 	QList<QString> ref_frame_of_refs_list = ref_frame_of_refs_set.toList();
+#endif
 	QStringList ref_frame_of_refs;
 	for (int z = 0; z < ref_frame_of_refs_list.size(); z++)
 	{
@@ -11677,7 +11754,16 @@ QString DicomUtils::read_dicom(
 		}
 		QList<QStringList> fff;
 		const QList<QString> & l1 = l0.keys();
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+		const QSet<QString> s1 =
+			(l1.empty())
+			?
+			QSet<QString>()
+			:
+			QSet<QString>(l1.begin(),l1.end());
+#else
 		const QSet<QString> s1 = l1.toSet();
+#endif
 		QSet<QString>::const_iterator it1 = s1.begin();
 		while (it1 != s1.end())
 		{
@@ -11849,7 +11935,16 @@ QString DicomUtils::read_dicom(
 							const size_t l_size = l_uids.size();
 							if (l_size > 1)
 							{
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+								QSet<QString> s_uids =
+									(l_uids.empty())
+									?
+									QSet<QString>()
+									:
+									QSet<QString>(l_uids.begin(),l_uids.end());
+#else
 								QSet<QString> s_uids = l_uids.toSet();
+#endif
 								const size_t s_size = s_uids.size();
 								if (l_size > s_size) count_uid_errors++;
 							}
@@ -11897,7 +11992,16 @@ QString DicomUtils::read_dicom(
 							const size_t l_size = l_uids.size();
 							if (l_size > 1)
 							{
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+								QSet<QString> s_uids =
+									(l_uids.empty())
+									?
+									QSet<QString>()
+									:
+									QSet<QString>(l_uids.begin(),l_uids.end());
+#else
 								QSet<QString> s_uids = l_uids.toSet();
+#endif
 								const size_t s_size = s_uids.size();
 								if (l_size > s_size) count_uid_errors++;
 							}

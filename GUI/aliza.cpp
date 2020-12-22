@@ -1,7 +1,6 @@
 //#define ALIZA_PRINT_COUNT_GL_OBJ
 
 #include "aliza.h"
-#include <QDesktopWidget>
 #include <QMutex>
 #include <QFileDialog>
 #include <QMessageBox>

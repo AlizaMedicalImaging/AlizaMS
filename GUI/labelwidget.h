@@ -9,7 +9,7 @@ class LabelWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	LabelWidget(QWidget(*)=NULL, Qt::WindowFlags f=0);
+	LabelWidget(QWidget(*)=NULL);
 	~LabelWidget();
 	void set_indicator_red();
 	void set_indicator_green();

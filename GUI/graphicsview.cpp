@@ -126,7 +126,11 @@ GraphicsView::GraphicsView(QWidget * p) : QGraphicsView()
 	pr_area->setFlag(QGraphicsItem::ItemIsMovable, false);
 	pr_area->setFlag(QGraphicsItem::ItemIsFocusable, false);
 	pr_area->setAcceptHoverEvents(false);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+	pr_area->setAcceptedMouseButtons(Qt::NoButton);
+#else
 	pr_area->setAcceptedMouseButtons(0);
+#endif
 	pr_area->setZValue(1e+19-6);
 	pr_area->hide();
 	//QBrush pbrush(QColor(73, 45, 124));
@@ -142,7 +146,11 @@ GraphicsView::GraphicsView(QWidget * p) : QGraphicsView()
 	paint_brush->setFlag(QGraphicsItem::ItemIsMovable, false);
 	paint_brush->setFlag(QGraphicsItem::ItemIsFocusable, false);
 	paint_brush->setAcceptHoverEvents(false);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+	paint_brush->setAcceptedMouseButtons(Qt::NoButton);
+#else
 	paint_brush->setAcceptedMouseButtons(0);
+#endif
 	QPen bpen;
 	bpen.setBrush(QBrush(QColor(Qt::blue))); //0xbc,0x86,0x2b
 	bpen.setWidth(0);
@@ -458,7 +466,7 @@ void GraphicsView::mousePressEvent(QMouseEvent * e)
 			parent->slider_m->set_slice(tmp0);
 		}
 	}
-	else if (e->button()==Qt::MidButton)
+	else if (e->button()==Qt::MiddleButton)
 	{
 		const QPoint p0(e->x(),e->y());
 		const QPointF p1 = mapToScene(p0);
@@ -530,7 +538,7 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent * e)
 			break;
 		}
 	}
-	else if (e->button()==Qt::MidButton)
+	else if (e->button()==Qt::MiddleButton)
 	{
 		get_pixel_value(-1,-1);
 	}
@@ -545,7 +553,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent * e)
 	const short mm = parent->get_mouse_modus();
 	if (
 		parent->get_show_cursor() &&
-		!(e->buttons() & Qt::MidButton))
+		!(e->buttons() & Qt::MiddleButton))
 	{
 		const QPoint p0(e->x(),e->y());
 		const QPointF p1 = mapToScene(p0);
@@ -569,7 +577,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent * e)
 			parent->slider_m->set_slice(tmp1);
 		}
 	}
-	else if (e->buttons() & Qt::MidButton)
+	else if (e->buttons() & Qt::MiddleButton)
 	{
 		const QPoint p0(e->x(),e->y());
 		const QPointF p1 = mapToScene(p0);
@@ -1973,9 +1981,15 @@ void GraphicsView::draw_shutter(const ImageVariant * ivariant)
 	}
 	const PRDisplayShutter & a =
 		ivariant->pr_display_shutters.value(idx);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+	const QStringList & l =
+			a.ShutterShape.split(
+				QString("\\"), Qt::SkipEmptyParts);
+#else
 	const QStringList & l =
 			a.ShutterShape.split(
 				QString("\\"), QString::SkipEmptyParts);
+#endif
 	for (int x = 0; x < l.size(); x++)
 	{
 		if (l.at(x).trimmed() == QString("RECTANGULAR"))

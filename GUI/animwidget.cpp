@@ -1,6 +1,6 @@
 #include "animwidget.h"
 
-AnimWidget::AnimWidget(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p, f)
+AnimWidget::AnimWidget(float si, QWidget * p) : QWidget(p)
 {
 	setupUi(this);
 	const QSize s = QSize((int)(18*si),(int)(18*si));

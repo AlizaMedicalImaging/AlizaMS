@@ -286,16 +286,20 @@ void SQtree::process_element(
 			QString tmp1;
 			if (length > 1024*1024)
 			{
-				tmp1.sprintf(
-					"%.2f",
-					length / (1024.0*1024.0));
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+				tmp1 = QString::asprintf("%.2f", length / (1024.0*1024.0));
+#else
+				tmp1.sprintf("%.2f", length / (1024.0*1024.0));
+#endif
 				sq_length = tmp1 + QString(" MB");
 			}
 			else if (length > 1024)
 			{
-				tmp1.sprintf(
-					"%.2f",
-					length/1024.0);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+				tmp1 = QString::asprintf("%.2f", length/1024.0);
+#else
+				tmp1.sprintf("%.2f", length/1024.0);
+#endif
 				sq_length = tmp1 + QString(" KB");
 			}
 			else
@@ -410,16 +414,20 @@ void SQtree::process_element(
 				QString tmp1;
 				if (length > 1024*1024)
 				{
-					tmp1.sprintf(
-						"%.2f",
-						length / (1024.0*1024.0));
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+					tmp1 = QString::asprintf("%.2f", length / (1024.0*1024.0));
+#else
+					tmp1.sprintf("%.2f", length / (1024.0*1024.0));
+#endif	
 					length_s = tmp1 + QString(" MB");
 				}
 				else if (length > 1024)
 				{
-					tmp1.sprintf(
-						"%.2f",
-						length / 1024.0);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+					tmp1 = QString::asprintf("%.2f", length / 1024.0);
+#else
+					tmp1.sprintf("%.2f", length / 1024.0);
+#endif
 					length_s = tmp1 + QString(" KB");
 				}
 				else
@@ -546,9 +554,17 @@ void SQtree::process_element(
 								element_[1] = buffer[3];
 								memcpy(&element,element_,2);
 								QString tmp3;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+								tmp3 = QString::asprintf("%04x",group);
+#else
 								tmp3.sprintf("%04x",group);
+#endif
 								QString tmp4;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+								tmp4 = QString::asprintf("%04x",element);
+#else
 								tmp4.sprintf("%04x",element);
+#endif
 								str_ = tmp3 + QString("|") + tmp4;
 							}
 						}
@@ -1095,25 +1111,53 @@ void SQtree::expand_item()
 void SQtree::expand_children(const QModelIndex & index)
 {
 	if (!index.isValid()) return;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+	const QAbstractItemModel * m = index.model();
+	if (m)
+	{
+		for (int i = 0; i < index.model()->rowCount(index); i++)
+		{
+			expanded_items++;
+			if (expanded_items > 65000) break;
+			expand_children(m->index(i, 0, index));
+		}
+	}
+	if (!treeWidget->isExpanded(index))
+		treeWidget->expand(index);
+#else
 	for (int i = 0; i < index.model()->rowCount(index); i++)
 	{
 		expanded_items++;
-	if (expanded_items > 65000) break;
+		if (expanded_items > 65000) break;
 	    expand_children(index.child(i, 0));
 	}
 	if (!treeWidget->isExpanded(index))
 		treeWidget->expand(index);
+#endif
 }
 
 void SQtree::collapse_children(const QModelIndex & index)
 {
 	if (!index.isValid()) return;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+	if (treeWidget->isExpanded(index))
+		treeWidget->collapse(index);
+	const QAbstractItemModel * m = index.model();
+	if (m)
+	{
+		for (int i = 0; i < index.model()->rowCount(index); i++)
+		{
+			collapse_children(m->index(i, 0, index));
+		}
+	}
+#else
 	if (treeWidget->isExpanded(index))
 		treeWidget->collapse(index);
 	for (int i = 0; i < index.model()->rowCount(index); i++)
 	{
 	    collapse_children(index.child(i, 0));
 	}
+#endif
 }
 
 void SQtree::dropEvent(QDropEvent * e)

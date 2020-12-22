@@ -269,88 +269,6 @@ static void remove_date_time_recurs__(
 	}
 }
 
-#if 0
-// TODO
-//static void modify_date_time_recurs__(
-static void remove_date_time_recurs__(
-	const mdcm::File & f,
-	mdcm::DataSet & ds)
-{
-	mdcm::DataSet::Iterator it = ds.Begin();
-	for (; it != ds.End();)
-	{
-		const mdcm::DataElement & de1 = *it;
-		mdcm::DataSet::Iterator dup = it;
-		++it;
-		mdcm::VR vr1 = mdcm::DataSetHelper::ComputeVR(f, ds, de1.GetTag());
-		if (vr1 == mdcm::VR::DA)
-		{
-			const mdcm::DataElement & de = *dup;
-			const mdcm::ByteValue * bv = de.GetByteValue();
-			if (bv)
-			{
-				const QString s = QString::fromLatin1(
-					bv->GetPointer(),
-					bv->GetLength())
-						.trimmed().remove(QChar('\0'));
-				if (s.length() == 8)
-				{
-					QDate d = QDate::fromString(s, QString("yyyyMMdd"));
-					d = d.addYears(-2);
-					d = d.addMonths(-3);
-					d = d.addDays(-4);
-					const QString s1 =
-						d.toString(QString("yyyyMMdd"));
-					mdcm::DataElement de2(de1.GetTag());
-					de2.SetVR(mdcm::VR::DA);
-					de2.SetByteValue(s1.toLatin1(), s1.length());
-					ds.Replace(de2);
-				}
-				/*
-				else if (s.length() == 18)
-				{
-					//
-				}*/
-				else
-				{
-std::cout << "s.length()=" << s.length() << std::endl;
-				}
-			}
-		}
-		else if (vr1 == mdcm::VR::TM)
-		{
-		}
-		else if (vr1 == mdcm::VR::DT)
-		{
-		}
-		else
-		{
-			const mdcm::DataElement & de = *dup;
-			mdcm::VR vr = mdcm::DataSetHelper::ComputeVR(f, ds, de.GetTag());
-			if (vr.Compatible(mdcm::VR::SQ))
-			{
-				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
-				if (sq && sq->GetNumberOfItems()>0)
-				{
-					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
-					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
-					{
-						mdcm::Item    & item   = sq->GetItem(i);
-						mdcm::DataSet & nested = item.GetNestedDataSet();
-						//modify_date_time_recurs__(f, nested);
-						remove_date_time_recurs__(f, nested);
-					}
-					mdcm::DataElement de_dup = *dup;
-					de_dup.SetValue(*sq);
-					de_dup.SetVLToUndefined();
-					ds.Replace(de_dup);
-				}
-			}
-		}
-	}
-}
-#endif
-
 static void empty_recurs__(
 	const mdcm::File & f,
 	mdcm::DataSet & ds,
@@ -722,7 +640,7 @@ static void anonymize_file__(
 	if (!writer.Write()) *ok = false;
 }
 
-AnonymazerWidget2::AnonymazerWidget2(float si, QWidget * p, Qt::WindowFlags f) : QWidget(p,f)
+AnonymazerWidget2::AnonymazerWidget2(float si, QWidget * p) : QWidget(p)
 {
 	setupUi(this);
 	const QSize s = QSize((int)(24*si),(int)(24*si));
@@ -958,7 +876,16 @@ static void build_maps(
 		find_uids_recurs__(f, ds, uid_tags, uids);
 		find_pn_recurs__(f, ds, pids);
 	}
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+	QSet<QString> uset =
+		(uids.empty())
+		?
+		QSet<QString>()
+		:
+		QSet<QString>(uids.begin(),uids.end());
+#else
 	QSet<QString> uset = uids.toSet();
+#endif
 	uids.clear();
 	QSetIterator<QString> it0(uset);
 	while (it0.hasNext())
@@ -972,7 +899,16 @@ static void build_maps(
 		//std::cout << s.toStdString() << " --> " << v.toStdString() << std::endl;
 	}
 	uset.clear();
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+	QSet<QString> pset =
+		(pids.empty())
+		?
+		QSet<QString>()
+		:
+		QSet<QString>(pids.begin(),pids.end());
+#else
 	QSet<QString> pset = pids.toSet();
+#endif
 	pids.clear();
 	QSetIterator<QString> it1(pset);
 	while (it1.hasNext())

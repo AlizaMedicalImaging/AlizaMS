@@ -241,8 +241,12 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 			bool is_image       = false;
 			bool is_softcopy  = false;
 			const int idx = tableWidget->rowCount();
-			QString ids("");
+			QString ids;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+			ids = QString::asprintf("%010d", idx);
+#else
 			ids.sprintf("%010d", idx);
+#endif
 			TableWidgetItem * i = new TableWidgetItem(ids);
 			std::vector<std::string> files__(
 				s0.GetAllFilenamesFromTagToValue(
@@ -327,8 +331,12 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 		bool is_image       = false;
 		bool is_softcopy    = false;
 		const int idx = tableWidget->rowCount();
-		QString ids("");
+		QString ids;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+		ids = QString::asprintf("%010d", idx);
+#else
 		ids.sprintf("%010d", idx);
+#endif
 		TableWidgetItem * i = new TableWidgetItem(ids);
 		i->files.push_back(tmp1);
 		read_tags_(
@@ -1006,7 +1014,12 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 	for (int x = 0; x < series.size(); x++)
 	{
 		const int idx = tableWidget->rowCount();
-		QString ids(""); ids.sprintf("%010d", idx);
+		QString ids;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+	 	ids = QString::asprintf("%010d", idx);
+#else
+	 	ids.sprintf("%010d", idx);
+#endif
 		TableWidgetItem * i = new TableWidgetItem(ids);
 		for (int z = 0; z < series.at(x).files.size(); z++)
 			i->files.push_back(dir_ + QString("/") + series.at(x).files.at(z));
@@ -1749,8 +1762,12 @@ void BrowserWidget2::open_CTK_db()
 	for (int x = 0; x < series.size(); x++)
 	{
 		const int idx = tableWidget->rowCount();
-		QString ids("");
+		QString ids;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+		ids = QString::asprintf("%010d", idx);
+#else
 		ids.sprintf("%010d", idx);
+#endif
 		TableWidgetItem * i = new TableWidgetItem(ids);
 		for (int z = 0; z < series.at(x).files.size(); z++)
 			i->files.push_back(series.at(x).files.at(z));

@@ -8,7 +8,11 @@
 #include <QUrl>
 #include <QMimeData>
 #include <QFileDialog>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#include <QScreen>
+#else
 #include <QDesktopWidget>
+#endif
 #include <QLabel>
 #include <QSvgRenderer>
 #include <QDateTime>
@@ -66,7 +70,11 @@ MainWindow::MainWindow(
 #endif
 	//
 	const bool force_vertical = false;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+	const QRect srec = qApp->primaryScreen()->availableGeometry();
+#else
 	const QRect srec = qApp->desktop()->screenGeometry();
+#endif
 	if (force_vertical ||(srec.height() > srec.width()))
 	{
 		QVBoxLayout * vl991 = new QVBoxLayout(views_frame);
@@ -467,7 +475,11 @@ MainWindow::MainWindow(
 	connect(tabWidget,                      SIGNAL(currentChanged(int)), this,    SLOT(tab_ind_changed(int)));
 	connect(imagesbox->actionDICOMMeta,     SIGNAL(triggered()),         this,    SLOT(trigger_image_dicom_meta()));
 	connect(aliza,                          SIGNAL(image_opened()),      this,    SLOT(set_image_view()));
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+	connect(settingswidget->styleComboBox,  SIGNAL(currentTextChanged(const QString&)),this,SLOT(set_style(const QString&)));
+#else
 	connect(settingswidget->styleComboBox,  SIGNAL(currentIndexChanged(QString)),this,SLOT(set_style(QString)));
+#endif
 	//
 	setAcceptDrops(true);
 }
@@ -1317,9 +1329,13 @@ void MainWindow::load_any()
 
 void MainWindow::desktop_layout(int * width_, int * height_)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+	const QRect rectr = qApp->primaryScreen()->availableGeometry();
+#else
 	const QDesktopWidget * desktop = qApp->desktop();
 	if (!desktop) return;
 	const QRect rectr = desktop->availableGeometry();
+#endif
 	*width_  = rectr.width();
 	*height_ = rectr.height();
 }
@@ -1751,12 +1767,20 @@ void MainWindow::readSettings()
 	settings.endGroup();
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+void MainWindow::set_style(const QString & s)
+#else
 void MainWindow::set_style(QString s)
+#endif
 {
-	if (settingswidget) change_style(s.trimmed());
+	change_style(s.trimmed());
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 void MainWindow::change_style(const QString & s)
+#else
+void MainWindow::change_style(QString s)
+#endif
 {
 	if (s.isEmpty()) return;
 	if (s==QString("Dark Fusion"))
@@ -1779,7 +1803,9 @@ void MainWindow::change_style(const QString & s)
 		p.setColor(QPalette::Link, Qt::darkBlue);
 		p.setColor(QPalette::Highlight, Qt::lightGray);
 		p.setColor(QPalette::HighlightedText, Qt::black);
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+		QApplication::setStyle(QString("Basic"));
+#elif QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		QApplication::setStyle(QString("Fusion"));
 #else
 		QApplication::setStyle(QString("Plastique"));

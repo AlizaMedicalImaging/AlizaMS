@@ -2,8 +2,7 @@
 #include <QFileDialog>
 #include <QDir>
 
-FindRefDialog::FindRefDialog(float si, QWidget * p, Qt::WindowFlags f)
-	: QDialog(p, f)
+FindRefDialog::FindRefDialog(float si, QWidget * p) : QDialog(p)
 {
 	setupUi(this);
 	const QSize s = QSize((int)(24*si),(int)(24*si));
