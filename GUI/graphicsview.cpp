@@ -126,7 +126,7 @@ GraphicsView::GraphicsView(QWidget * p) : QGraphicsView()
 	pr_area->setFlag(QGraphicsItem::ItemIsMovable, false);
 	pr_area->setFlag(QGraphicsItem::ItemIsFocusable, false);
 	pr_area->setAcceptHoverEvents(false);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	pr_area->setAcceptedMouseButtons(Qt::NoButton);
 #else
 	pr_area->setAcceptedMouseButtons(0);
@@ -146,7 +146,7 @@ GraphicsView::GraphicsView(QWidget * p) : QGraphicsView()
 	paint_brush->setFlag(QGraphicsItem::ItemIsMovable, false);
 	paint_brush->setFlag(QGraphicsItem::ItemIsFocusable, false);
 	paint_brush->setAcceptHoverEvents(false);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	paint_brush->setAcceptedMouseButtons(Qt::NoButton);
 #else
 	paint_brush->setAcceptedMouseButtons(0);
@@ -1981,7 +1981,7 @@ void GraphicsView::draw_shutter(const ImageVariant * ivariant)
 	}
 	const PRDisplayShutter & a =
 		ivariant->pr_display_shutters.value(idx);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	const QStringList & l =
 			a.ShutterShape.split(
 				QString("\\"), Qt::SkipEmptyParts);

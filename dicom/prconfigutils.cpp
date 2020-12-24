@@ -1367,7 +1367,7 @@ template<typename T, typename T2d> QString levels_slice_by_slice(
 					.remove(QChar(' '))
 					.remove(QChar('\0'));
 			QList<int> idxs;
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 			const QStringList frames_tmp1 = frames.split(
 				QString("\\"),
 				Qt::SkipEmptyParts);
@@ -1588,7 +1588,7 @@ static void areas_slice_by_slice(
 			const QString frames =
 				l.at(z+1).trimmed().remove(QChar(' ')).remove(QChar('\0'));
 			QList<int> idxs;
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 			const QStringList frames_tmp1 = frames.split(
 				QString("\\"),
 				Qt::SkipEmptyParts);
@@ -1722,7 +1722,7 @@ static void text_slice_by_slice(
 					.remove(QChar(' '))
 					.remove(QChar('\0'));
 			QList<int> idxs;
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 			const QStringList frames_tmp1 = frames.split(
 				QString("\\"),
 				Qt::SkipEmptyParts);
@@ -1864,7 +1864,7 @@ static void graphic_slice_by_slice(
 					.remove(QChar(' '))
 					.remove(QChar('\0'));
 			QList<int> idxs;
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 			const QStringList frames_tmp1 = frames.split(
 				QString("\\"),
 				Qt::SkipEmptyParts);

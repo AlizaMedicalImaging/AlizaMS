@@ -877,7 +877,7 @@ static void build_maps(
 		find_uids_recurs__(f, ds, uid_tags, uids);
 		find_pn_recurs__(f, ds, pids);
 	}
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	QSet<QString> uset =
 		(uids.empty())
 		?
@@ -900,7 +900,7 @@ static void build_maps(
 		//std::cout << s.toStdString() << " --> " << v.toStdString() << std::endl;
 	}
 	uset.clear();
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	QSet<QString> pset =
 		(pids.empty())
 		?
@@ -962,7 +962,7 @@ void AnonymazerWidget2::process_directory(
 			if (pd->wasCanceled()) return;
 #if 0
 			QString tmp200;
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 			tmp200 = QString::asprintf("%08d", x);
 #else
 			tmp200.sprintf("%08d", x);

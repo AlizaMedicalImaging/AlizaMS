@@ -243,7 +243,7 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 			bool is_softcopy  = false;
 			const int idx = tableWidget->rowCount();
 			QString ids;
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 			ids = QString::asprintf("%010d", idx);
 #else
 			ids.sprintf("%010d", idx);
@@ -333,7 +333,7 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 		bool is_softcopy    = false;
 		const int idx = tableWidget->rowCount();
 		QString ids;
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 		ids = QString::asprintf("%010d", idx);
 #else
 		ids.sprintf("%010d", idx);
@@ -1016,7 +1016,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 	{
 		const int idx = tableWidget->rowCount();
 		QString ids;
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	 	ids = QString::asprintf("%010d", idx);
 #else
 	 	ids.sprintf("%010d", idx);
@@ -1764,7 +1764,7 @@ void BrowserWidget2::open_CTK_db()
 	{
 		const int idx = tableWidget->rowCount();
 		QString ids;
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 		ids = QString::asprintf("%010d", idx);
 #else
 		ids.sprintf("%010d", idx);

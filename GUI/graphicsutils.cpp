@@ -111,7 +111,7 @@ template<typename T> QString get_scalar_pixel_value__(
 			{
 				const double tmp0 = static_cast<double>(p);
 				*label = static_cast<long long>(p);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 				s += QString::asprintf("%.6f",tmp0);
 #else
 				s.sprintf("%.6f",tmp0);
@@ -224,7 +224,7 @@ template<typename T> QString get_rgb_pixel_value__(
 				QString tmp0s;
 				QString tmp1s;
 				QString tmp2s;
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 				tmp0s = QString::asprintf("%.3f",tmp0);
 				tmp1s = QString::asprintf("%.3f",tmp1);
 				tmp2s = QString::asprintf("%.3f",tmp2);
@@ -347,7 +347,7 @@ template<typename T> QString get_rgba_pixel_value__(
 				QString tmp1s;
 				QString tmp2s;
 				QString tmp3s;
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 				tmp0s = QString::asprintf("%.3f",tmp0);
 				tmp1s = QString::asprintf("%.3f",tmp1);
 				tmp2s = QString::asprintf("%.3f",tmp2);

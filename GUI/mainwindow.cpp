@@ -8,7 +8,7 @@
 #include <QUrl>
 #include <QMimeData>
 #include <QFileDialog>
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 #include <QScreen>
 #else
 #include <QDesktopWidget>
@@ -70,7 +70,7 @@ MainWindow::MainWindow(
 #endif
 	//
 	const bool force_vertical = false;
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	const QRect srec = qApp->primaryScreen()->availableGeometry();
 #else
 	const QRect srec = qApp->desktop()->screenGeometry();
@@ -1329,7 +1329,7 @@ void MainWindow::load_any()
 
 void MainWindow::desktop_layout(int * width_, int * height_)
 {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	const QScreen * screen = qApp->primaryScreen();
 	if (!screen) return;
 	const QRect rectr = screen->availableGeometry();

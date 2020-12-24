@@ -18,7 +18,7 @@
 
 #include <QtGlobal>
 #include <QStringList>
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
 #include <QRegularExpression>
 #else
 #include <QRegExp>
@@ -47,7 +47,7 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
     if (ok) *ok = true;
     return QString::fromLatin1(ba->constData());
   }
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
   const QStringList l = cs.split(QString("\\"), Qt::KeepEmptyParts);
 #else
   const QStringList l = cs.split(QString("\\"), QString::KeepEmptyParts);
@@ -56,7 +56,7 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
   for (int x = 0; x < l.size(); x++)
   {
     const QString tmp1 = l.at(x).trimmed().toUpper();
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
     if (tmp1.contains(QRegularExpression(QString("ISO\\s+2022"))))
 #else
     if (tmp1.contains(QRegExp(QString("ISO\\s+2022"))))
@@ -247,7 +247,7 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
       else
       {
         // ISO IR 13
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
         const QRegularExpression re(QString("ISO\\s+2022\\s+IR\\s+13"));
 #else
         const QRegExp re(QString("ISO\\s+2022\\s+IR\\s+13"));
@@ -339,7 +339,7 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
       codec = QTextCodec::codecForName("ISO-8859-2");
     }
     // ISO IR 13
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
     else if (s.contains(QRegularExpression(QString("IR 13\\D*"))))
 #else
     else if (s.contains(QRegExp(QString("IR 13\\D*"))))

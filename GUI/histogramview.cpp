@@ -280,7 +280,7 @@ void HistogramView::get_screen()
 	QPixmap p;
 	if (multi_frame_ptr && multi_frame_ptr->isVisible())
 	{
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		p = multi_frame_ptr->grab();
 #else
 		p = QPixmap::grabWidget(multi_frame_ptr);
@@ -288,7 +288,7 @@ void HistogramView::get_screen()
 	}
 	else
 	{
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		p = this->grab();
 #else
 		p = QPixmap::grabWidget(this);

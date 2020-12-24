@@ -299,7 +299,7 @@ static QString read_MRImageModule(const mdcm::DataSet & ds)
 		if (!tmp2.isEmpty())
 		{
 			s += QString("<span class='y9'>Scanning Sequence</span><br />");
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 			const QStringList tmp0 =
 				tmp2.split(
 					QString("\\"), Qt::SkipEmptyParts);
@@ -338,7 +338,7 @@ static QString read_MRImageModule(const mdcm::DataSet & ds)
 				{
 					s += QString("<span class='y9'>Variant</span><br />");
 					{
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 						const QStringList tmp0 =
 							tmp2.split(
 								QString("\\"), Qt::SkipEmptyParts);
@@ -387,7 +387,7 @@ static QString read_MRImageModule(const mdcm::DataSet & ds)
 				{
 					s += QString("<span class='y9'>Options</span><br />");
 					{
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 						const QStringList tmp0 =
 							tmp2.split(
 								QString("\\"), Qt::SkipEmptyParts);
@@ -1040,7 +1040,7 @@ QString DicomUtils::convert_pn_value(const QString & n)
 {
 	//family name, given name, middle name, name prefix, name suffix
 	QString s("");
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	const QStringList tmp1 = n.split(
 		QString("="),
 		Qt::KeepEmptyParts);
@@ -1052,7 +1052,7 @@ QString DicomUtils::convert_pn_value(const QString & n)
 	for (int x = 0; x < tmp1.size(); x++)
 	{
 		if (!s.isEmpty()) s += QString(" ");
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 		const QStringList tmp2 = tmp1.at(x).split(
 			QString("^"),
 			Qt::KeepEmptyParts);
@@ -1304,7 +1304,7 @@ bool DicomUtils::get_ds_values(
 	const QString tmp0 = QString::fromLatin1(
 		bv->GetPointer(),
 		bv->GetLength());
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	const QStringList tmp1 = tmp0.split(
 		QString("\\"),
 		Qt::SkipEmptyParts);
@@ -1342,7 +1342,7 @@ bool DicomUtils::priv_get_ds_values(
 	const QString tmp0 = QString::fromLatin1(
 		bv->GetPointer(),
 		bv->GetLength());
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	const QStringList tmp1 = tmp0.split(
 		QString("\\"),
 		Qt::SkipEmptyParts);
@@ -1411,7 +1411,7 @@ bool DicomUtils::get_is_values(
 	const QString tmp0 = QString::fromLatin1(
 		bv->GetPointer(),
 		bv->GetLength());
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	const QStringList tmp1 = tmp0.split(
 		QString("\\"),
 		Qt::SkipEmptyParts);
@@ -3623,7 +3623,7 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 		if (!imagetype.isEmpty())
 		{
 			QString imagetype_("");
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 			const QStringList l = imagetype.toLower().split(
 				QString("\\"),
 				Qt::SkipEmptyParts);
@@ -3889,7 +3889,7 @@ bool DicomUtils::get_patient_position(
 	if (pp==NULL || p.isEmpty()) return false;
 	const QString tmp0 = p.trimmed().
 		remove(QChar('\0'));
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	const QStringList list =
 		tmp0.split(QString("\\"), Qt::SkipEmptyParts);
 #else
@@ -3920,7 +3920,7 @@ bool DicomUtils::get_patient_orientation(
 	if (po==NULL || o.isEmpty()) return false;
 	const QString tmp0 = QString(o.trimmed()).
 		remove(QChar('\0'));
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	const QStringList list =
 		tmp0.split(QString("\\"), Qt::SkipEmptyParts);
 #else
@@ -5900,7 +5900,7 @@ QString DicomUtils::read_ultrasound(
 						const QString tmp0 = QString::fromLatin1(
 							bv->GetPointer(),
 							bv->GetLength());
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 						const QStringList tmp1 = tmp0.split(
 							QString("\\"),
 							Qt::SkipEmptyParts);
@@ -8434,7 +8434,7 @@ QString DicomUtils::read_enhanced_common(
 				QList<short>  tmp1l;
 				for (size_t k = 0; k < tmp1s; k++)
 				{
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 					QStringList w__ =
 						window_widths_l.at(k).split(QString("\\"),
 						Qt::SkipEmptyParts);
@@ -9375,7 +9375,7 @@ bool DicomUtils::process_contrours_ref(
 	{
 		ref_frame_of_refs_set << tmp_ivariant->di->rois.at(z).ref_frame_of_ref;
 	}
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	QList<QString> ref_frame_of_refs_list = ref_frame_of_refs_set.values();
 #else
 	QList<QString> ref_frame_of_refs_list = ref_frame_of_refs_set.toList();
@@ -11754,7 +11754,7 @@ QString DicomUtils::read_dicom(
 		}
 		QList<QStringList> fff;
 		const QList<QString> & l1 = l0.keys();
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 		const QSet<QString> s1 =
 			(l1.empty())
 			?
@@ -11935,7 +11935,7 @@ QString DicomUtils::read_dicom(
 							const size_t l_size = l_uids.size();
 							if (l_size > 1)
 							{
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 								QSet<QString> s_uids =
 									(l_uids.empty())
 									?
@@ -11992,7 +11992,7 @@ QString DicomUtils::read_dicom(
 							const size_t l_size = l_uids.size();
 							if (l_size > 1)
 							{
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 								QSet<QString> s_uids =
 									(l_uids.empty())
 									?

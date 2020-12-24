@@ -9,7 +9,7 @@
 #include <QGLContext>
 #include "glwidget-qt4.h"
 #endif
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
 #include <QOpenGLVersionFunctionsFactory>
 #endif
 #include <QApplication>
@@ -291,13 +291,13 @@ void GLWidget::initializeGL()
 	}
 	initializeOpenGLFunctions();
 #ifdef USE_CORE_3_2_PROFILE
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
 	QOpenGLFunctions_3_2_Core * funcs = QOpenGLVersionFunctionsFactory::get<QOpenGLFunctions_3_2_Core>();
 #else
 	QOpenGLFunctions_3_2_Core * funcs = c->versionFunctions<QOpenGLFunctions_3_2_Core>();
 #endif
 #else
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
 	QOpenGLFunctions_3_0 * funcs = QOpenGLVersionFunctionsFactory::get<QOpenGLFunctions_3_0>();
 #else
 	QOpenGLFunctions_3_0 * funcs = c->versionFunctions<QOpenGLFunctions_3_0>();
@@ -418,9 +418,9 @@ void GLWidget::wheelEvent(QWheelEvent * e)
 		incr = 25.0;
 	}
 	else { ;; }
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	const QPoint p = e->angleDelta();
-	if (p.x() > 0 || p.y() > 0)
+	if (p.x() != 0 || p.y() != 0)
 #else
 	if (e->delta() > 0)
 #endif
