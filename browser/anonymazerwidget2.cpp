@@ -1,4 +1,5 @@
 #include "anonymazerwidget2.h"
+#include <QtGlobal>
 #include <QDir>
 #include <QDirIterator>
 #include <QFileDialog>
@@ -961,7 +962,11 @@ void AnonymazerWidget2::process_directory(
 			if (pd->wasCanceled()) return;
 #if 0
 			QString tmp200;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+			tmp200 = QString::asprintf("%08d", x);
+#else
 			tmp200.sprintf("%08d", x);
+#endif
 			QDateTime date_ = QDateTime::currentDateTime();
 			const QString date_str = date_.toString(QString("hhmmss")); // FIXME
 			const QString out_filename = date_str + QString("-") + tmp200 + QString(".dcm");

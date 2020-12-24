@@ -1,5 +1,6 @@
-#include "graphicsutils.h"
 #include "structures.h"
+#include "graphicsutils.h"
+#include <QtQlobal>
 #include <QPainter>
 #include <QPixmap>
 #include <iostream>

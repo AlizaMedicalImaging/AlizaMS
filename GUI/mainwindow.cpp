@@ -1330,7 +1330,9 @@ void MainWindow::load_any()
 void MainWindow::desktop_layout(int * width_, int * height_)
 {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-	const QRect rectr = qApp->primaryScreen()->availableGeometry();
+	const QScreen * screen = qApp->primaryScreen();
+	if (!screen) return;
+	const QRect rectr = screen->availableGeometry();
 #else
 	const QDesktopWidget * desktop = qApp->desktop();
 	if (!desktop) return;

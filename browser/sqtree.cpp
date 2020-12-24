@@ -40,6 +40,7 @@
 #include <QDateTime>
 #include <QMessageBox>
 #include <QAction>
+#include <QAbstractItemModel>
 #include "codecutils.h"
 #include "dicomutils.h"
 #include "commonutils.h"
