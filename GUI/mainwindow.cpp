@@ -478,7 +478,7 @@ MainWindow::MainWindow(
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	connect(settingswidget->styleComboBox,  SIGNAL(currentTextChanged(const QString&)),this,SLOT(set_style(const QString&)));
 #else
-	connect(settingswidget->styleComboBox,  SIGNAL(currentIndexChanged(QString)),this,SLOT(set_style(QString)));
+	connect(settingswidget->styleComboBox,  SIGNAL(currentIndexChanged(const QString&)),this,SLOT(set_style(const QString&)));
 #endif
 	//
 	setAcceptDrops(true);
@@ -1769,20 +1769,12 @@ void MainWindow::readSettings()
 	settings.endGroup();
 }
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 void MainWindow::set_style(const QString & s)
-#else
-void MainWindow::set_style(QString s)
-#endif
 {
 	change_style(s.trimmed());
 }
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 void MainWindow::change_style(const QString & s)
-#else
-void MainWindow::change_style(QString s)
-#endif
 {
 	if (s.isEmpty()) return;
 	if (s==QString("Dark Fusion"))

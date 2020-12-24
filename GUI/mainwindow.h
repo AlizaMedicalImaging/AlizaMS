@@ -42,11 +42,7 @@ public:
 		);
 	~MainWindow();
 	void open_args(const QStringList&);
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	void change_style(const QString &);
-#else
-	void change_style(QString);
-#endif
 	void check_3d_frame();
 	QAction * graphicsAct_Z;
 	QAction * graphicsAct_Y;
@@ -71,11 +67,7 @@ protected:
 
 public slots:
 	void exit_null();
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	void set_style(const QString &);
-#else
-	void set_style(QString);
-#endif
 	void set_no_gl3();
 	void set_image_view();
 
