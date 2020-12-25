@@ -1031,8 +1031,8 @@
                    <rect>
                     <x>598</x>
                     <y>1</y>
-                    <width>16</width>
-                    <height>32</height>
+                    <width>18</width>
+                    <height>76</height>
                    </rect>
                   </property>
                   <property name="sizePolicy">
@@ -1045,12 +1045,6 @@
                    <bool>true</bool>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_2">
-                   <property name="spacing">
-                    <number>0</number>
-                   </property>
-                   <property name="margin">
-                    <number>0</number>
-                   </property>
                    <item>
                     <widget class="QFrame" name="view3d_frame">
                      <property name="sizePolicy">
@@ -1071,27 +1065,17 @@
                     </widget>
                    </item>
                    <item>
-                    <layout class="QHBoxLayout" name="horizontalLayout">
-                     <property name="spacing">
-                      <number>0</number>
+                    <widget class="QFrame" name="gl_frame">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                       <horstretch>1</horstretch>
+                       <verstretch>1</verstretch>
+                      </sizepolicy>
                      </property>
-                     <property name="margin">
-                      <number>0</number>
+                     <property name="mouseTracking">
+                      <bool>false</bool>
                      </property>
-                     <item>
-                      <widget class="QFrame" name="gl_frame">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                         <horstretch>1</horstretch>
-                         <verstretch>1</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="mouseTracking">
-                        <bool>false</bool>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
+                    </widget>
                    </item>
                    <item>
                     <widget class="QFrame" name="toolbox3D_frame">
