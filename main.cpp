@@ -168,6 +168,13 @@ int main(int argc, char *argv[])
 			<< "\nsize of enum:long      { 1 } " << sizeof(E8)
 			<< "\nsize of enum:long long { 1 } " << sizeof(E9)
 			<< std::endl;
+#if _WIN32
+#ifdef UNICODE
+			std::cout << "UNICODE is defined " << std::endl;
+#else
+			std::cout << "UNICODE is not defined " << std::endl;
+#endif
+#endif
 	}
 #endif
 	//
