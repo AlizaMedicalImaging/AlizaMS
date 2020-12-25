@@ -91,7 +91,11 @@ inline void Realpath(const char * path, std::string & resolved_path)
 {
   char * ptemp;
   char fullpath[MAX_PATH];
+#if 1
   if(GetFullPathName(path, sizeof(fullpath), fullpath, &ptemp))
+#else
+  if(GetFullPathNameA(path, sizeof(fullpath), fullpath, &ptemp))
+#endif
   {
     Filename fn(fullpath);
     resolved_path = fn.ToUnixSlashes();

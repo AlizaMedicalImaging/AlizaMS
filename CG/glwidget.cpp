@@ -420,7 +420,7 @@ void GLWidget::wheelEvent(QWheelEvent * e)
 	else { ;; }
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	const QPoint p = e->angleDelta();
-	if (p.x() != 0 || p.y() != 0)
+	if (p.y() > 0)
 #else
 	if (e->delta() > 0)
 #endif
@@ -428,7 +428,11 @@ void GLWidget::wheelEvent(QWheelEvent * e)
 		ortho_size += (float)incr;
 		position_z += incr;
 	}
-	else
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+	else if (p.y() < 0)
+#else
+	else if (e->delta() < 0)
+#endif
 	{
 		ortho_size -= (float)incr;
 		position_z -= incr;

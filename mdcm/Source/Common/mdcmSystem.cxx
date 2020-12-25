@@ -271,7 +271,11 @@ const char * System::GetCurrentProcessFileName()
 {
 #ifdef _WIN32
   static char buf[MAX_PATH];
+#if 1
   if (::GetModuleFileName(0, buf, sizeof(buf)))
+#else
+  if (::GetModuleFileNameA(0, buf, sizeof(buf)))
+#endif
   {
     return buf;
   }

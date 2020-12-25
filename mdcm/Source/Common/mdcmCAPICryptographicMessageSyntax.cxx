@@ -431,7 +431,12 @@ const char *CAPICryptographicMessageSyntax::GetCipherObjId() const
 bool CAPICryptographicMessageSyntax::Initialize()
 {
   DWORD dwResult;
-  if (!CryptAcquireContextA(&hProv, NULL, MS_ENH_RSA_AES_PROV, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) //CRYPT_VERIFYCONTEXT aes decr in cryptmsgcontrol not working
+#if 1
+  if (!CryptAcquireContextA(&hProv, NULL, MS_ENH_RSA_AES_PROV, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) 
+#else
+  if (!CryptAcquireContextA(&hProv, NULL, MS_ENH_RSA_AES_PROV_A, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+#endif
+  //CRYPT_VERIFYCONTEXT aes decr in cryptmsgcontrol not working
     {
     dwResult = GetLastError();
     if (dwResult == NTE_BAD_KEYSET)
