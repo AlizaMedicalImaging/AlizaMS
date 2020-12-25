@@ -63,15 +63,15 @@ const char* UUIDGenerator::Generate()
   UuidCreate(&uuid);
   BYTE * str = 0;
 #if 1
-  UuidToString(&uuid, &str);
-#else
   UuidToStringA(&uuid, &str);
+#else
+  UuidToString(&uuid, &str);
 #endif
   Unique = (char*)str;
 #if 1
-  RpcStringFree(&str);
-#else
   RpcStringFreeA(&str);
+#else
+  RpcStringFree(&str);
 #endif
 #else
 #error should not happen
@@ -95,9 +95,9 @@ bool UUIDGenerator::IsValid(const char * suid)
 #elif defined(HAVE_UUIDCREATE)
   UUID uuid;
 #if 1
-  if (FAILED(UuidFromString((unsigned char *)suid, &uuid)))
-#else
   if (FAILED(UuidFromStringA((unsigned char *)suid, &uuid)))
+#else
+  if (FAILED(UuidFromString((unsigned char *)suid, &uuid)))
 #endif
   {
     return false;

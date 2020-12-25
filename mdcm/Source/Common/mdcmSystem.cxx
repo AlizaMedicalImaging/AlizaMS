@@ -267,15 +267,12 @@ stat structure contains following fields:
   return size2;
 }
 
+// TODO remove, only required for PVRG command
 const char * System::GetCurrentProcessFileName()
 {
 #ifdef _WIN32
   static char buf[MAX_PATH];
-#if 1
-  if (::GetModuleFileName(0, buf, sizeof(buf)))
-#else
-  if (::GetModuleFileNameA(0, buf, sizeof(buf)))
-#endif
+  if (GetModuleFileNameA(0, buf, sizeof(buf))) // FIXME
   {
     return buf;
   }

@@ -77,58 +77,12 @@ const char * Filename::ToUnixSlashes()
   {
     if( *it == '\\' )
     {
-      //assert(it+1 == Conversion.end() || *(it+1) != ' '); // is it an escaped space ?
+      //assert(it+1 == Conversion.end() || *(it+1) != ' '); // is it an escaped space?
       *it = '/';
     }
   }
   return Conversion.c_str();
 }
-
-#if defined(_WIN32) && (defined(_MSC_VER) || defined(__WATCOMC__) || defined(__BORLANDC__) || defined(__MINGW32__))
-#include <windows.h>
-
-inline void Realpath(const char * path, std::string & resolved_path)
-{
-  char * ptemp;
-  char fullpath[MAX_PATH];
-#if 1
-  if(GetFullPathName(path, sizeof(fullpath), fullpath, &ptemp))
-#else
-  if(GetFullPathNameA(path, sizeof(fullpath), fullpath, &ptemp))
-#endif
-  {
-    Filename fn(fullpath);
-    resolved_path = fn.ToUnixSlashes();
-  }
-  else
-  {
-    resolved_path = "";
-  }
-}
-#else
-#if defined(PATH_MAX)
-#define MDCM_FILENAME_MAXPATH PATH_MAX
-#elif defined(MAXPATHLEN)
-#define MDCM_FILENAME_MAXPATH MAXPATHLEN
-#else
-#define MDCM_FILENAME_MAXPATH 16384
-#endif
-
-inline void Realpath(const char * path, std::string & resolved_path)
-{
-  char resolved_name[MDCM_FILENAME_MAXPATH];
-
-  char * ret = realpath(path, resolved_name);
-  if(ret)
-  {
-    resolved_path = resolved_name;
-  }
-  else
-  {
-    resolved_path = "";
-  }
-}
-#endif
 
 const char * Filename::GetExtension()
 {
@@ -138,7 +92,6 @@ const char * Filename::GetExtension()
   {
     return GetName() + dot_pos;
   }
-
   return 0;
 }
 

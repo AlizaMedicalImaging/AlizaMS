@@ -88,9 +88,15 @@ bool PVRGCodec::Decode(DataElement const &in, DataElement &out)
 #ifdef MDCM_USE_SYSTEM_PVRG
   std::string pvrg_command = MDCM_PVRG_JPEG_EXECUTABLE;
 #else
+  // FIXME
+#ifdef _WIN32
+  std::string pvrg_command = "mdcmpvrg";
+#else
   Filename fn(System::GetCurrentProcessFileName());
   std::string executable_path = fn.GetPath();
   std::string pvrg_command = executable_path + "/mdcmpvrg";
+#endif
+  //
 #endif
   if(!System::FileExists(pvrg_command.c_str()))
   {
@@ -112,7 +118,6 @@ bool PVRGCodec::Decode(DataElement const &in, DataElement &out)
   pvrg_command += "-s ";
   pvrg_command += input;
 
-  mdcmDebugMacro(pvrg_command);
   int ret = system(pvrg_command.c_str());
   if(ret != 0)
   {
