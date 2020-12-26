@@ -8,7 +8,7 @@
 #include <QUrl>
 #include <QMimeData>
 #include <QFileDialog>
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #include <QScreen>
 #else
 #include <QDesktopWidget>
@@ -70,12 +70,10 @@ MainWindow::MainWindow(
 #endif
 	//
 	const bool force_vertical = false;
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-	const QRect srec = qApp->primaryScreen()->availableGeometry();
-#else
-	const QRect srec = qApp->desktop()->screenGeometry();
-#endif
-	if (force_vertical ||(srec.height() > srec.width()))
+	int swidth = 0;
+	int sheight = 0;
+	desktop_layout(&swidth, &sheight);
+	if (force_vertical || (sheight > swidth))
 	{
 		QVBoxLayout * vl991 = new QVBoxLayout(views_frame);
 		vl991->setContentsMargins(0,0,0,0);
@@ -83,7 +81,7 @@ MainWindow::MainWindow(
 		vl991->addWidget(frame2D);
 		vl991->addWidget(frame3D);
 #if 1
-		if (srec.height() > 1920.0) scale_icons = srec.height()/1920.0f;
+		if (sheight > 1920) scale_icons = sheight/1920.0f;
 #endif
 	}
 	else
@@ -94,10 +92,10 @@ MainWindow::MainWindow(
 		vl991->addWidget(frame2D);
 		vl991->addWidget(frame3D);
 #if 1
-		if (srec.width() > 1920.0) scale_icons = srec.width()/1920.0f;
+		if (swidth > 1920) scale_icons = swidth/1920.0f;
 #endif
 	}
-	aboutwidget = new AboutWidget(srec.width(), srec.height());
+	aboutwidget = new AboutWidget(swidth, sheight);
 	aboutwidget->hide();
 	//
 	toolbox = new ToolBox(this);
@@ -1329,7 +1327,7 @@ void MainWindow::load_any()
 
 void MainWindow::desktop_layout(int * width_, int * height_)
 {
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	const QScreen * screen = qApp->primaryScreen();
 	if (!screen) return;
 	const QRect rectr = screen->availableGeometry();
