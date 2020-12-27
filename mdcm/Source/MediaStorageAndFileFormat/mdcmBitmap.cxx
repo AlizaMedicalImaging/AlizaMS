@@ -165,11 +165,10 @@ unsigned long long Bitmap::GetBufferLength() const
     assert(Dimensions[2] == 1);
   }
   unsigned long long len = 0;
-  unsigned int mul = 1;
+  unsigned long long mul = 1;
   std::vector<unsigned int>::const_iterator it = Dimensions.begin();
   for(; it != Dimensions.end(); ++it)
   {
-    assert(*it);
     mul *= *it;
   }
   if (PF == PixelFormat::UINT12 || PF == PixelFormat::INT12)
@@ -179,30 +178,36 @@ unsigned long long Bitmap::GetBufferLength() const
   else if (PF == PixelFormat::SINGLEBIT)
   {
     assert(PF.GetSamplesPerPixel() == 1);
-    const size_t bytesPerRow = (Dimensions[0]/8) + (Dimensions[0]%8 != 0 ? 1 : 0);
-    size_t save = bytesPerRow*Dimensions[1];
+    const unsigned long long bytesPerRow =
+      ((unsigned long long)Dimensions[0]/8) +
+      (((unsigned long long)Dimensions[0]%8 != 0) ? 1 : 0);
+    unsigned long long save = bytesPerRow*Dimensions[1];
     if (NumberOfDimensions > 2) save *= Dimensions[2];
-    if (Dimensions[0]%8 == 0) assert(save*8 == mul);
     mul = save;
   }
   else if (PF.GetBitsAllocated()%8 != 0)
   {
     assert(PF.GetSamplesPerPixel() == 1);
-    const ByteValue *bv = PixelData.GetByteValue();
-    assert(bv);
-    unsigned int ref = bv->GetLength()/mul;
-    if (!GetTransferSyntax().IsEncapsulated())
-    {
-      assert(bv->GetLength()%mul == 0);
-    }
-    mul *= ref;
+    const ByteValue * bv = PixelData.GetByteValue();
+	if (bv)
+	{
+    	unsigned long long ref = bv->GetLength()/mul;
+    	if (!GetTransferSyntax().IsEncapsulated())
+    	{
+          mdcmAlwaysWarnMacro("GetBufferLength(): bv->GetLength()%mul != 0");
+    	}
+    	mul *= ref;
+	}
   }
   else
   {
     mul *= PF.GetPixelSize();
   }
   len = mul;
-  assert(len != 0);
+  if (len == 0)
+  {
+    mdcmAlwaysWarnMacro("GetBufferLength() = 0");
+  }
   return len;
 }
 
