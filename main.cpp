@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
 			<< "\nsize of enum:long      { 1 } " << sizeof(E8)
 			<< "\nsize of enum:long long { 1 } " << sizeof(E9)
 			<< std::endl;
-#if _WIN32
+#ifdef _WIN32
 #ifdef UNICODE
 			std::cout << "UNICODE is defined " << std::endl;
 #else
@@ -180,11 +180,13 @@ int main(int argc, char *argv[])
 	//
 	bool ok3d = false;
 	bool hide_zoom = true;
+	//
+#if 0
 #if ((QT_VERSION >= QT_VERSION_CHECK(5,6,0)) && (QT_VERSION < QT_VERSION_CHECK(6,0,0)))
-#if 1
 	QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
 #endif
 #endif
+	//
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #ifdef __arm__
 	QApplication::setAttribute(Qt::AA_UseDesktopOpenGLES);

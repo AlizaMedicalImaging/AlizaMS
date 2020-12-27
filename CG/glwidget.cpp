@@ -235,6 +235,8 @@ GLWidget::GLWidget(QWidget * p) : QOpenGLWidget(p)
 	setFormat(format);
 #endif
 #endif
+	//setAttribute(Qt::WA_NoSystemBackground);
+	//setAttribute(Qt::WA_OpaquePaintEvent);
 	setMinimumSize(64,64);
 	setFocusPolicy(Qt::WheelFocus);
 	init_();

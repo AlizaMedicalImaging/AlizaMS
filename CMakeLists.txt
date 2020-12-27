@@ -41,10 +41,16 @@ endif()
 
 # https://cmake.org/cmake/help/v3.3/policy/CMP0063.html
 # Honor visibility properties for all target types.
-if(POLICY CMP0063 )
+if(POLICY CMP0063)
   cmake_policy(SET CMP0063 NEW)
 endif()
 
+#https://cmake.org/cmake/help/v3.19/policy/CMP0072.html
+#FindOpenGL prefers GLVND by default when available.
+#https://cmake.org/cmake/help/v3.19/module/FindOpenGL.html
+#if (POLICY CMP0072)
+#  cmake_policy(SET CMP0072 NEW)
+#endif()
 #
 #
 #
