@@ -189,15 +189,15 @@ unsigned long long Bitmap::GetBufferLength() const
   {
     assert(PF.GetSamplesPerPixel() == 1);
     const ByteValue * bv = PixelData.GetByteValue();
-	if (bv)
-	{
-    	unsigned long long ref = bv->GetLength()/mul;
-    	if (!GetTransferSyntax().IsEncapsulated())
-    	{
-          mdcmAlwaysWarnMacro("GetBufferLength(): bv->GetLength()%mul != 0");
-    	}
-    	mul *= ref;
-	}
+    if (bv)
+    {
+      unsigned long long ref = bv->GetLength()/mul;
+      if (!GetTransferSyntax().IsEncapsulated())
+      {
+        mdcmAlwaysWarnMacro("GetBufferLength(): bv->GetLength()%mul != 0");
+      }
+      mul *= ref;
+    }
   }
   else
   {
