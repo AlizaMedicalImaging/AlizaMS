@@ -511,32 +511,6 @@ bool VR::IsBinary2(VRType vr)
     vr == VR::SQ;
 }
 
-bool VR::CanDisplay(VRType vr)
-{
-  return
-    vr == VR::AE ||
-    vr == VR::AS ||
-    vr == VR::AT ||
-    vr == VR::CS ||
-    vr == VR::DA ||
-    vr == VR::DS ||
-    vr == VR::FL ||
-    vr == VR::FD ||
-    vr == VR::IS ||
-    vr == VR::LO ||
-    vr == VR::LT ||
-    vr == VR::PN ||
-    vr == VR::SH ||
-    vr == VR::SL ||
-    vr == VR::SS ||
-    vr == VR::ST ||
-    vr == VR::TM ||
-    vr == VR::UI ||
-    vr == VR::UL ||
-    vr == VR::US ||
-    vr == VR::UT;
-}
-
 bool VR::Compatible(VR const & vr) const
 {
   if (vr.VRField == VR::INVALID) return true;

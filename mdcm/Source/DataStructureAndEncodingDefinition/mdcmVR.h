@@ -125,7 +125,6 @@ public:
   }
   static bool IsBinary(VRType vr);
   static bool IsASCII(VRType vr);
-  static bool CanDisplay(VRType vr);
   static bool IsBinary2(VRType vr);
   static bool IsASCII2(VRType vr);
   VR(VRType vr = INVALID):VRField(vr) {}

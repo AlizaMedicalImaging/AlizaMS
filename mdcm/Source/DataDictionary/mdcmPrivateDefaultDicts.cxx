@@ -10298,6 +10298,8 @@ const DICT_ENTRY DICOMV3DataDict [] = {
   {0x3115,0x0002,"http://www.gemedicalsystems.com/it_solutions/rad_pacs/",VR::UT,VM::VM1,"Reference to pacs image",false },
   {0x3115,0x0003,"http://www.gemedicalsystems.com/it_solutions/rad_pacs/",VR::CS,VM::VM1,"Pacs examnotes flag",false },
   {0x0021,0x00ae,"syngoDynamics",VR::OB,VM::VM1,"?",false },
+  {0x7fdf,0x0050,"TomTec",VR::OB,VM::VM1,"Bookmark Information",false },
+  {0x7fdf,0x0051,"TomTec",VR::OB,VM::VM1,"Bookmark Content",false },
   // United Imaging Healthcare
   {0x0061,0x0002,"DB Dicom Private Creator",VR::US,VM::VM1,"Generate Private",false },
   {0x0061,0x0002,"Common Private Header",VR::SH,VM::VM1,"FOV",false },

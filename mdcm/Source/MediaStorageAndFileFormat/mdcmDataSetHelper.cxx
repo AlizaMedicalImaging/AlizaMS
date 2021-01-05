@@ -86,10 +86,10 @@ VR ComputeVRImplicitLittleEndian(DataSet const &ds, const Tag& tag)
 
 VR DataSetHelper::ComputeVR(File const &file, DataSet const &ds, const Tag& tag)
 {
-  const Global& g = GlobalInstance;
-  const Dicts &dicts = g.GetDicts();
+  const Global & g = GlobalInstance;
+  const Dicts  & dicts = g.GetDicts();
   std::string strowner;
-  const char *owner = 0;
+  const char * owner = NULL;
   const Tag& t = tag;
   if(t.IsPrivate() && !t.IsPrivateCreator())
   {
@@ -105,10 +105,10 @@ VR DataSetHelper::ComputeVR(File const &file, DataSet const &ds, const Tag& tag)
   VR vr = refvr;
   if(vr == VR::US_SS)
   {
-    // I believe all US_SS VR derived from the value from 0028,0103 ... except 0028,0071
+    // I believe all US_SS VR derived from the value from 0028,0103, except 0028,0071
     if(t != Tag(0x0028,0x0071))
     {
-      // In case of SAX parser, we would have had to process Pixel Representation already:
+      // In case of SAX parser, we would have had to process Pixel Representation already
       Attribute<0x0028,0x0103> at;
       const Tag & pixelrep = at.GetTag();
       assert(pixelrep < t);
@@ -116,11 +116,10 @@ VR DataSetHelper::ComputeVR(File const &file, DataSet const &ds, const Tag& tag)
       // FIXME
       // PhilipsWith15Overlays.dcm has a Private SQ with public elements such as
       // 0028,3002, so we cannot look up element in current dataset, but have to get the root dataset
-      // to loop up...
-
+      // to loop up.
       // FIXME:
       // mdcmDataExtra/mdcmSampleData/ImagesPapyrus/TestImages/wristb.pap
-      // It's the contrary: root dataset does not have a Pixel Representation, but each SQ do...
+      // It's the contrary: root dataset does not have a Pixel Representation, but each SQ do.
       if(ds.FindDataElement(pixelrep))
       {
         at.SetFromDataElement(ds.GetDataElement(pixelrep));
@@ -177,7 +176,6 @@ VR DataSetHelper::ComputeVR(File const &file, DataSet const &ds, const Tag& tag)
       at.SetFromDataElement(ds.GetDataElement(bitsallocated));
     }
     (void)v;
-
     if(pixeldata == t || t.IsGroupXX(overlaydata))
     {
       vr = VR::OW;
@@ -220,10 +218,8 @@ VR DataSetHelper::ComputeVR(File const &file, DataSet const &ds, const Tag& tag)
     vr = VR::OW;
   }
   // TODO need to treat US_SS_OW too
-
   assert(vr.IsVRFile());
   assert(vr != VR::INVALID);
-
   if(tag.IsGroupLength())
   {
     assert(vr == VR::UL);
