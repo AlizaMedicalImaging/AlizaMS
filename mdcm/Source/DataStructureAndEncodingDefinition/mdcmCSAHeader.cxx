@@ -209,11 +209,11 @@ bool CSAHeader::LoadFromDataElement(DataElement const &de)
   uint16_t v2 = (uint16_t)(v >> 8);
   if(v2 == t1.GetElement())
   {
-    DataElementTag = t1;;
+    DataElementTag = t1;
   }
   else if(v2 == t2.GetElement())
   {
-    DataElementTag = t2;;
+    DataElementTag = t2;
   }
   else
   {

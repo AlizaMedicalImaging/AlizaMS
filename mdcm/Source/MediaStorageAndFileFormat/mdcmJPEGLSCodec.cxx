@@ -146,7 +146,7 @@ bool JPEGLSCodec::CanCode(TransferSyntax const &ts) const
       || ts == TransferSyntax::JPEGLSNearLossless;
 }
 
-bool JPEGLSCodec::DecodeByStreamsCommon(char *buffer, size_t totalLen, std::vector<unsigned char> &rgbyteOut)
+bool JPEGLSCodec::DecodeByStreamsCommon(const char *buffer, size_t totalLen, std::vector<unsigned char> &rgbyteOut)
 {
   using namespace charls;
   const unsigned char* pbyteCompressed = (const unsigned char*)buffer;
