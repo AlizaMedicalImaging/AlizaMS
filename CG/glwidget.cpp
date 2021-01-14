@@ -380,29 +380,32 @@ void GLWidget::mouseMoveEvent(QMouseEvent * e)
 	bool update_ = false;
 	if (e->buttons() & Qt::LeftButton)
 	{
+		const QPoint p = e->pos();
 		set_win_old_position(lastPos.x(), lastPos.y());
-		set_win_new_position(e->x(), e->y());
-		lastPos = e->pos();
+		set_win_new_position(p.x(), p.y());
+		lastPos = p;
 		update_ = true;
 	}
 	else if (e->buttons() & Qt::MiddleButton)
 	{
-		const float deltax = e->x() - lastPanPos.x();
-		const float deltay = e->y() - lastPanPos.y();
+		const QPoint p = e->pos();
+		const float deltax = p.x() - lastPanPos.x();
+		const float deltay = p.y() - lastPanPos.y();
 		set_pan_delta(deltax, deltay);
-		lastPanPos = e->pos();
+		lastPanPos = p;
 		update_ = true;
 	}
 	else if (e->buttons() & Qt::RightButton)
 	{
-		const int dy = lastPosScale.y() - e->y();
+		const QPoint p = e->pos();
+		const int dy = lastPosScale.y() - p.y();
 		const float  tmp0 = ortho_size - (float)dy;
 		const double tmp1 = position_z - (double)dy;
 		if (tmp0 < 0.001f) ortho_size = 0.001f;
 		else ortho_size = tmp0;
 		if (tmp1 < 0.001) position_z = 0.001;
 		else position_z = tmp1;
-		lastPosScale = e->pos();
+		lastPosScale = p;
 		update_ = true;
 	}
 	if (update_) updateGL();

@@ -468,24 +468,28 @@ void GraphicsView::mousePressEvent(QMouseEvent * e)
 	}
 	else if (e->button()==Qt::MiddleButton)
 	{
-		const QPoint p0(e->x(),e->y());
+		const QPoint p0 = e->pos();
 		const QPointF p1 = mapToScene(p0);
 		if (parent->get_show_cursor())
-			get_pixel_value2(p1.x(),p1.y());
+			get_pixel_value2(p1.x(), p1.y());
 		else
-			get_pixel_value(p1.x(),p1.y());
+			get_pixel_value(p1.x(), p1.y());
 	}
 	else if (e->button()==Qt::LeftButton)
 	{
 		switch(parent->get_mouse_modus())
 		{
 		case 1:
-			lines_at(e->x(),e->y());
+			{
+				const QPoint p0 = e->pos();
+				lines_at(p0.x(), p0.y());
+			}
 			break;
 		case 2:
 			{
-				m0_set = true; m1_set = false;
-				const QPoint p0(e->x(),e->y());
+				m0_set = true;
+				m1_set = false;
+				const QPoint p0 = e->pos();
 				const QPointF p1 = mapToScene(p0);
 				m0_win_pos_x = p1.x();
 				m0_win_pos_y = p1.y();
@@ -518,17 +522,22 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent * e)
 		switch(parent->get_mouse_modus())
 		{
 		case 1:
-			lines_at(e->x(),e->y());
+			{
+				const QPoint p0 = e->pos();
+				lines_at(p0.x(), p0.y());
+			}
 			break;
 		case 2:
 			{
-				m0_set = true; m1_set = true;
-				const QPoint p0(e->x(),e->y());
+				m0_set = true;
+				m1_set = true;
+				const QPoint p0 = e->pos();
 				const QPointF p1 = mapToScene(p0);
 				m1_win_pos_x = p1.x();
 				m1_win_pos_y = p1.y();
 				measure();
-				m0_set = false; m1_set = false;
+				m0_set = false;
+				m1_set = false;
 			}
 			break;
 		case 4:
@@ -555,14 +564,15 @@ void GraphicsView::mouseMoveEvent(QMouseEvent * e)
 		parent->get_show_cursor() &&
 		!(e->buttons() & Qt::MiddleButton))
 	{
-		const QPoint p0(e->x(),e->y());
+		const QPoint p0 = e->pos();
 		const QPointF p1 = mapToScene(p0);
-		get_pixel_value(p1.x(),p1.y());
+		get_pixel_value(p1.x(), p1.y());
 	}
 	if (e->buttons() & Qt::RightButton)
 	{
+		const QPoint p0 = e->pos();
 		set_win_old_position(new_win_pos_x, new_win_pos_y);
-		set_win_new_position(e->x(), e->y());
+		set_win_new_position(p0.x(), p0.y());
 		if (parent->slider_m)
 		{
 			const int tmp0 = old_win_pos_x-new_win_pos_x;
@@ -579,12 +589,12 @@ void GraphicsView::mouseMoveEvent(QMouseEvent * e)
 	}
 	else if (e->buttons() & Qt::MiddleButton)
 	{
-		const QPoint p0(e->x(),e->y());
+		const QPoint p0 = e->pos();
 		const QPointF p1 = mapToScene(p0);
 		if (parent->get_show_cursor())
-			get_pixel_value2(p1.x(),p1.y());
+			get_pixel_value2(p1.x(), p1.y());
 		else
-			get_pixel_value(p1.x(),p1.y());
+			get_pixel_value(p1.x(), p1.y());
 	}
 	else if (e->buttons() & Qt::LeftButton)
 	{
@@ -592,7 +602,8 @@ void GraphicsView::mouseMoveEvent(QMouseEvent * e)
 		{
 		case 1:
 			{
-				lines_at(e->x(),e->y());
+				const QPoint p0 = e->pos();
+				lines_at(p0.x(), p0.y());
 			}
 			break;
 		case 2:
@@ -600,7 +611,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent * e)
 				if (m0_set == true)
 				{
 					m1_set = true;
-					const QPoint p0(e->x(),e->y());
+					const QPoint p0 = e->pos();
 					const QPointF p1 = mapToScene(p0);
 					m1_win_pos_x = p1.x();
 					m1_win_pos_y = p1.y();
