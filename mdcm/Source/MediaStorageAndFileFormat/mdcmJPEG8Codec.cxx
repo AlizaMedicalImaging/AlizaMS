@@ -20,9 +20,7 @@
 
 =========================================================================*/
 #include "mdcmJPEG8Codec.h"
-
 #include "mdcm_ljpeg8.h"
-
 #include <setjmp.h>
 
 #define JPEGBITSCodec JPEG8Codec

@@ -29,27 +29,25 @@ namespace mdcm
 
 class JPEGInternals_16BIT;
 class ByteValue;
+
 /**
- * \brief Class to do JPEG 16bits (lossless)
- * \note internal class
+ * Class for JPEG 16 bits (lossless)
  */
 class JPEG16Codec : public JPEGCodec
 {
 public:
   JPEG16Codec();
   ~JPEG16Codec();
-
-  bool DecodeByStreams(std::istream &is, std::ostream &os);
-  bool InternalCode(const char *input, unsigned long len, std::ostream &os);
-
-  bool GetHeaderInfo(std::istream &is, TransferSyntax &ts);
+  bool DecodeByStreams(std::istream &, std::ostream &);
+  bool InternalCode(const char *, unsigned long, std::ostream &);
+  bool GetHeaderInfo(std::istream &, TransferSyntax &);
 
 protected:
   bool IsStateSuspension() const;
-  virtual bool EncodeBuffer(std::ostream &os, const char *data, size_t datalen);
+  virtual bool EncodeBuffer(std::ostream &, const char *, size_t);
 
 private:
-  JPEGInternals_16BIT *Internals;
+  JPEGInternals_16BIT * Internals;
 };
 
 } // end namespace mdcm

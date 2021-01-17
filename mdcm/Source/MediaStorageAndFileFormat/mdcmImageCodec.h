@@ -33,7 +33,6 @@ namespace mdcm
 
 /**
  * ImageCodec
- * Main codec, this is a central place for all implementation
  */
 class MDCM_EXPORT ImageCodec : public Codec
 {
@@ -43,16 +42,17 @@ public:
   ~ImageCodec();
   bool CanCode(TransferSyntax const &) const { return false; }
   bool CanDecode(TransferSyntax const &) const { return false; }
-  bool Decode(DataElement const &is_, DataElement &os);
+  bool Decode(DataElement const &, DataElement &);
   bool IsLossy() const;
   void SetLossyFlag(bool l);
   bool GetLossyFlag() const;
-  virtual bool GetHeaderInfo(std::istream &is_, TransferSyntax &ts);
+  virtual bool GetHeaderInfo(std::istream &, TransferSyntax &);
   virtual ImageCodec * Clone() const = 0;
-protected:
 
-  bool DecodeByStreams(std::istream & is_, std::ostream & os);
-  virtual bool IsValid(PhotometricInterpretation const & pi);
+protected:
+  bool DecodeByStreams(std::istream & is_, std::ostream &);
+  virtual bool IsValid(PhotometricInterpretation const &);
+
 public:
 
   unsigned int GetPlanarConfiguration() const
@@ -66,23 +66,23 @@ public:
     PlanarConfiguration = pc;
   }
 
-  PixelFormat &GetPixelFormat()
+  PixelFormat & GetPixelFormat()
   {
     return PF;
   }
 
-  const PixelFormat &GetPixelFormat() const
+  const PixelFormat & GetPixelFormat() const
   {
     return PF;
   }
 
-  virtual void SetPixelFormat(PixelFormat const &pf)
+  virtual void SetPixelFormat(PixelFormat const & pf)
   {
     PF = pf;
   }
 
-  const PhotometricInterpretation &GetPhotometricInterpretation() const;
-  void SetPhotometricInterpretation(PhotometricInterpretation const &pi);
+  const PhotometricInterpretation & GetPhotometricInterpretation() const;
+  void SetPhotometricInterpretation(PhotometricInterpretation const &);
 
   bool GetNeedByteSwap() const
   {
@@ -99,22 +99,27 @@ public:
     NeedOverlayCleanup = b;
   }
 
-  void SetLUT(LookupTable const &lut)
+  void SetLUT(LookupTable const & lut)
   {
     LUT = SmartPointer<LookupTable>(const_cast<LookupTable*>(&lut));
   }
 
-  const LookupTable &GetLUT() const
+  const LookupTable & GetLUT() const
   {
     return *LUT;
   }
 
   void SetDimensions(const unsigned int d[3]);
-  void SetDimensions(const std::vector<unsigned int> & d);
-  const unsigned int *GetDimensions() const { return Dimensions; }
-  void SetNumberOfDimensions(unsigned int dim);
+  void SetDimensions(const std::vector<unsigned int> &);
+
+  const unsigned int * GetDimensions() const
+  {
+    return Dimensions;
+  }
+
+  void SetNumberOfDimensions(unsigned int);
   unsigned int GetNumberOfDimensions() const;
-  bool CleanupUnusedBits(char * data, size_t datalen);
+  bool CleanupUnusedBits(char *, size_t);
 
 protected:
   // Streaming (write) API:
@@ -125,12 +130,12 @@ protected:
   // - Full row encoder: only a single scanline (row) of data is needed to be loaded at a time;
   // - Full frame encoder (default): a complete frame (row x col) is needed to be loaded at a time
   friend class FileChangeTransferSyntax;
-  virtual bool StartEncode(std::ostream & os);
+  virtual bool StartEncode(std::ostream &);
   virtual bool IsRowEncoder();
   virtual bool IsFrameEncoder();
-  virtual bool AppendRowEncode(std::ostream & out, const char * data, size_t datalen);
-  virtual bool AppendFrameEncode(std::ostream & out, const char * data, size_t datalen);
-  virtual bool StopEncode(std::ostream & os);
+  virtual bool AppendRowEncode(std::ostream &, const char *, size_t);
+  virtual bool AppendFrameEncode(std::ostream &, const char *, size_t);
+  virtual bool StopEncode(std::ostream &);
 
 protected:
   bool RequestPlanarConfiguration;
@@ -149,7 +154,7 @@ protected:
   bool DoByteSwap(std::istream &, std::ostream &);
   bool DoYBRFull422(std::istream &, std::ostream &);
   bool DoPlanarConfiguration(std::istream &, std::ostream &);
-  bool DoSimpleCopy(std::istream &is_, std::ostream & os);
+  bool DoSimpleCopy(std::istream &, std::ostream &);
   bool DoPaddedCompositePixelCode(std::istream &, std::ostream &);
   bool DoInvertMonochrome(std::istream &, std::ostream &);
 };

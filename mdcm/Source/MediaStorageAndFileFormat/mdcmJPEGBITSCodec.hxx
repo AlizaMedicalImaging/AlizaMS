@@ -255,12 +255,12 @@ typedef struct my_error_mgr* my_error_ptr;
 class JPEGInternals
 {
 public:
-  JPEGInternals():cinfo(),jerr(),StateSuspension(0),SampBuffer(NULL) {}
+  JPEGInternals() : cinfo(), jerr(), StateSuspension(0), SampBuffer(NULL) {}
   jpeg_decompress_struct cinfo;
   jpeg_compress_struct cinfo_comp;
   my_error_mgr jerr;
   int StateSuspension;
-  void *SampBuffer;
+  void * SampBuffer;
 };
 
 JPEGBITSCodec::JPEGBITSCodec()
@@ -291,7 +291,7 @@ extern "C"
   }
 }
 
-bool JPEGBITSCodec::GetHeaderInfo(std::istream &is, TransferSyntax &ts)
+bool JPEGBITSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
 {
   /* This struct contains the JPEG decompression parameters and pointers to
    * working space (which is allocated as needed by the JPEG library).
@@ -313,7 +313,7 @@ bool JPEGBITSCodec::GetHeaderInfo(std::istream &is, TransferSyntax &ts)
     // Establish the setjmp return context for my_error_exit to use.
     if (setjmp(jerr.setjmp_buffer))
     {
-      // If we get here, the JPEG code has signaled an error.
+      // If we are here, the JPEG code has signaled an error.
       // We need to clean up the JPEG object, close the input file, and return.
       // But first handle the case IJG does not like:
       if (jerr.pub.msg_code == JERR_BAD_PRECISION /* 18 */)
@@ -362,13 +362,11 @@ bool JPEGBITSCodec::GetHeaderInfo(std::istream &is, TransferSyntax &ts)
     }
     this->Dimensions[1] = cinfo.image_height; /* Number of rows in image */
     this->Dimensions[0] = cinfo.image_width;  /* Number of columns in image */
-    int prep = this->PF.GetPixelRepresentation();
-    //this->BitSample = cinfo.data_precision;
-    int precision = cinfo.data_precision;
+    const int prep = this->PF.GetPixelRepresentation();
+    const int precision = cinfo.data_precision;
     // if lossy it should only be 8 or 12, but for lossless it can be [2-16]
     if(precision == 1)
     {
-      // lossless !
       this->PF = PixelFormat(PixelFormat::SINGLEBIT);
     }
     else if(precision <= 8)
@@ -381,7 +379,6 @@ bool JPEGBITSCodec::GetHeaderInfo(std::istream &is, TransferSyntax &ts)
     }
     else if(precision <= 16)
     {
-      // lossless
       this->PF = PixelFormat(PixelFormat::UINT16);
     }
     else
@@ -508,9 +505,7 @@ UINT16 Y_density
   indicating square pixels of unknown size.
 */
 
-  if(  cinfo.density_unit != 0
-    || cinfo.X_density != 1
-    || cinfo.Y_density != 1)
+  if(cinfo.density_unit != 0 || cinfo.X_density != 1 || cinfo.Y_density != 1)
   {
     mdcmWarningMacro("Pixel Density from JFIF Marker is not supported (for now)");
   }
@@ -534,7 +529,7 @@ UINT16 Y_density
  * Note: see dcmdjpeg +cn option to avoid the YBR => RGB loss
  */
 
-bool JPEGBITSCodec::DecodeByStreams(std::istream &is, std::ostream &os)
+bool JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
 {
 #if 0
   static unsigned long long c___ = 0;
@@ -544,12 +539,12 @@ bool JPEGBITSCodec::DecodeByStreams(std::istream &is, std::ostream &os)
   /* This struct contains the JPEG decompression parameters and pointers to
    * working space (which is allocated as needed by the JPEG library).
    */
-  jpeg_decompress_struct &cinfo = Internals->cinfo;
+  jpeg_decompress_struct & cinfo = Internals->cinfo;
   /* We use our private extension JPEG error handler.
    * Note that this struct must live as long as the main JPEG parameter
    * struct, to avoid dangling-pointer problems.
    */
-  my_error_mgr &jerr = Internals->jerr;
+  my_error_mgr & jerr = Internals->jerr;
   /* More stuff */
   JSAMPARRAY buffer; /* Output row buffer */
   size_t row_stride; /* physical row width in output buffer */
@@ -620,7 +615,6 @@ bool JPEGBITSCodec::DecodeByStreams(std::istream &is, std::ostream &os)
       mdcmAlwaysWarnMacro("JPEG warning (4): JPEG is " <<
         cinfo.image_width << "x" << cinfo.image_height <<
         ", DICOM " << dims[0] << "x" << dims[1]);
-
     }
 #if 0
     switch (cinfo.jpeg_color_space)
@@ -775,8 +769,7 @@ bool JPEGBITSCodec::DecodeByStreams(std::istream &is, std::ostream &os)
  */
 
 /**
- * \brief very low level C 'structure', used to decode jpeg file
- * Should not appear in the Doxygen supplied documentation
+ * Very low level C 'structure', used to decode jpeg file
  */
 typedef struct
 {
@@ -796,7 +789,7 @@ typedef my_destination_mgr * my_dest_ptr;
 METHODDEF(void) init_destination (j_compress_ptr cinfo)
 {
   my_dest_ptr dest = (my_dest_ptr) cinfo->dest;
-  /* Allocate the output buffer --- it will be released when done with image */
+  /* Allocate the output buffer - it will be released when done with image */
   dest->buffer = (JOCTET *)
       (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
           OUTPUT_BUF_SIZE * SIZEOF(JOCTET));
@@ -1040,7 +1033,7 @@ bool JPEGBITSCodec::InternalCode(const char* input, unsigned long len, std::ostr
        * more than one scanline at a time if that's more convenient.
        */
       row_pointer[0] = & image_buffer[cinfo.next_scanline * row_stride];
-      (void) jpeg_write_scanlines(&cinfo, row_pointer, 1);
+      (void)jpeg_write_scanlines(&cinfo, row_pointer, 1);
     }
   }
   else

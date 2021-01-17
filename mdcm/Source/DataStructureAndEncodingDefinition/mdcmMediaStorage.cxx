@@ -364,29 +364,27 @@ unsigned int MediaStorage::GetNumberOfMSType()
 
 unsigned int MediaStorage::GetNumberOfMSString()
 {
-  static const unsigned int n = sizeof(MSStrings) / sizeof(*MSStrings);
+  const unsigned int n = sizeof(MSStrings) / sizeof(*MSStrings);
   assert(n > 0);
   return n - 1;
 }
 
 unsigned int MediaStorage::GetNumberOfModality()
 {
-  static const unsigned int n = sizeof(MSModalityTypes) / sizeof(*MSModalityTypes);
+  const unsigned int n = sizeof(MSModalityTypes) / sizeof(*MSModalityTypes);
   assert(n > 0);
   return n - 1;
 }
 
-const char *MediaStorage::GetModality() const
+const char * MediaStorage::GetModality() const
 {
   if (!MSModalityTypes[MSField].Modality) return NULL;
-  assert(MSModalityTypes[MSField].Modality[0] != ' '); // FIXME
   return MSModalityTypes[MSField].Modality;
 }
 
 unsigned int MediaStorage::GetModalityDimension() const
 {
   if (!MSModalityTypes[MSField].Modality) return 0;
-  assert(MSModalityTypes[MSField].Dimension);
   return MSModalityTypes[MSField].Dimension;
 }
 
@@ -413,20 +411,18 @@ const char * MediaStorage::GetFromDataSetOrHeader(DataSet const & ds, const Tag 
   if(ds.FindDataElement(tag))
   {
     const ByteValue * sopclassuid = ds.GetDataElement(tag).GetByteValue();
-    if(!sopclassuid || !sopclassuid->GetPointer()) return 0;
-    std::string sopclassuid_str(
-      sopclassuid->GetPointer(),
-      sopclassuid->GetLength());
+    if(!sopclassuid || !sopclassuid->GetPointer()) return NULL;
+    std::string sopclassuid_str(sopclassuid->GetPointer(), sopclassuid->GetLength());
     if(sopclassuid_str.find(' ') != std::string::npos)
-      {
+    {
       mdcmWarningMacro("UI contains a space character discarding");
       std::string::size_type pos = sopclassuid_str.find_last_of(' ');
       sopclassuid_str = sopclassuid_str.substr(0,pos);
-      }
+    }
     buf = sopclassuid_str.c_str();
     return buf.c_str();
   }
-  return 0;
+  return NULL;
 }
 
 bool MediaStorage::SetFromDataSetOrHeader(DataSet const & ds, const Tag & tag)
@@ -439,7 +435,7 @@ bool MediaStorage::SetFromDataSetOrHeader(DataSet const & ds, const Tag & tag)
     MSField = ms;
     if(ms == MS_END)
     {
-      mdcmWarningMacro("Does not know what: " << ms_str << " is...");
+      mdcmWarningMacro("Does not know " << ms_str);
     }
     return true;
   }
@@ -475,22 +471,20 @@ void MediaStorage::SetFromSourceImageSequence(DataSet const & ds)
 {
   const Tag sourceImageSequenceTag(0x0008,0x2112);
   if(ds.FindDataElement(sourceImageSequenceTag))
-    {
+  {
     const DataElement &sourceImageSequencesq = ds.GetDataElement(sourceImageSequenceTag);
     SmartPointer<SequenceOfItems> sq = sourceImageSequencesq.GetValueAsSQ();
-    if(!sq) return;
+    if(!(sq && sq->GetNumberOfItems() > 0)) return;
     SequenceOfItems::ConstIterator it = sq->Begin();
     const DataSet & subds = it->GetNestedDataSet();
     const Tag referencedSOPClassUIDTag(0x0008,0x1150);
     if(subds.FindDataElement(referencedSOPClassUIDTag))
     {
       const DataElement & de = subds.GetDataElement(referencedSOPClassUIDTag);
-      const ByteValue *sopclassuid = de.GetByteValue();
+      const ByteValue * sopclassuid = de.GetByteValue();
       if(sopclassuid)
       {
-        std::string sopclassuid_str(
-          sopclassuid->GetPointer(),
-          sopclassuid->GetLength());
+        std::string sopclassuid_str(sopclassuid->GetPointer(), sopclassuid->GetLength());
         if(sopclassuid_str.find(' ') != std::string::npos)
         {
           mdcmWarningMacro("UI contains a space character discarding");
@@ -511,9 +505,6 @@ bool MediaStorage::SetFromModality(DataSet const & ds)
   if(ds.FindDataElement(Tag(0x0008,0x0060)))
   {
     // mdcm-CR-DCMTK-16-NonSamplePerPix.dcm
-    // Someone defined the Transfer Syntax but I have no clue what
-    // it is. Since there is Pixel Data element, let's try to read
-    // that as a buggy DICOM Image file
     const ByteValue * bv = ds.GetDataElement(Tag(0x0008,0x0060)).GetByteValue();
     if(bv)
     {
@@ -521,12 +512,10 @@ bool MediaStorage::SetFromModality(DataSet const & ds)
       GuessFromModality(modality.c_str());
     }
   }
-  // We know there is a Pixel Data element, so make sure not to return without a default
-  // to SC Object
   if(MSField == MediaStorage::MS_END)
   {
+    // Return a default SC Object
     mdcmWarningMacro("Unknown/Unhandle MediaStorage, but Pixel Data element found");
-    // BUG: Need to check Col*Row*Bit*NSample == PixelSize (uncompressed)
     MSField = MediaStorage::SecondaryCaptureImageStorage;
     return false;
   }
@@ -571,7 +560,7 @@ bool MediaStorage::SetFromFile(File const & file)
   }
   if(ds_ms_str)
   {
-    // means either no header ms or different, take from dataset just in case
+    // Means either no header ms or different, take from dataset
     return SetFromDataSet(ds);
   }
   // Looks suspicious or DICOMDIR
@@ -579,16 +568,15 @@ bool MediaStorage::SetFromFile(File const & file)
   {
     return SetFromHeader(header);
   }
-  // old fall back
   if(!SetFromHeader(header))
   {
-    // try again but from dataset this time
+    // Try again but from dataset this time
     mdcmDebugMacro("No MediaStorage found in Header, looking up in DataSet");
     if(!SetFromDataSet(ds))
     {
       // ACR-NEMA compat
       mdcmDebugMacro("No MediaStorage found neither in DataSet nor in FileMetaInformation, trying from Modality");
-      // Attempt to read what's in Modality
+      // Attempt to read modality
       if(!SetFromModality(ds))
       {
         return false;

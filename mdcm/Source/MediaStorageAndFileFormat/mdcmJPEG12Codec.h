@@ -29,27 +29,25 @@ namespace mdcm
 
 class JPEGInternals_12BIT;
 class ByteValue;
+
 /**
- * \brief Class to do JPEG 12bits (lossy & lossless)
- * \note internal class
+ * Class for JPEG 12 bits (lossy & lossless)
  */
 class JPEG12Codec : public JPEGCodec
 {
 public:
   JPEG12Codec();
   ~JPEG12Codec();
-
-  bool DecodeByStreams(std::istream &is, std::ostream &os);
-  bool InternalCode(const char *input, unsigned long len, std::ostream &os);
-
-  bool GetHeaderInfo(std::istream &is, TransferSyntax &ts);
+  bool DecodeByStreams(std::istream &, std::ostream &);
+  bool InternalCode(const char *, unsigned long, std::ostream &);
+  bool GetHeaderInfo(std::istream &, TransferSyntax &);
 
 protected:
   bool IsStateSuspension() const;
-  virtual bool EncodeBuffer(std::ostream &os, const char *data, size_t datalen);
+  virtual bool EncodeBuffer(std::ostream &, const char *, size_t);
 
 private:
-  JPEGInternals_12BIT *Internals;
+  JPEGInternals_12BIT * Internals;
 };
 
 } // end namespace mdcm

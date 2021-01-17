@@ -20,9 +20,7 @@
 
 =========================================================================*/
 #include "mdcmJPEG16Codec.h"
-
 #include "mdcm_ljpeg16.h"
-
 #include <setjmp.h>
 
 #define JPEGBITSCodec JPEG16Codec
