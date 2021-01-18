@@ -54,9 +54,9 @@ double JPEGCodec::GetQuality() const
   return Quality;
 }
 
-void JPEGCodec::SetLossless(bool l)
+void JPEGCodec::SetLossless(bool b)
 {
-  LossyFlag = !l;
+  LossyFlag = !b;
 }
 
 bool JPEGCodec::GetLossless() const
@@ -64,7 +64,7 @@ bool JPEGCodec::GetLossless() const
   return !LossyFlag;
 }
 
-bool JPEGCodec::CanDecode(TransferSyntax const &ts) const
+bool JPEGCodec::CanDecode(TransferSyntax const & ts) const
 {
   return ts == TransferSyntax::JPEGBaselineProcess1
       || ts == TransferSyntax::JPEGExtendedProcess2_4
@@ -89,11 +89,7 @@ bool JPEGCodec::CanCode(TransferSyntax const & ts) const
 void JPEGCodec::SetPixelFormat(PixelFormat const & pf)
 {
   ImageCodec::SetPixelFormat(pf);
-#if 0
-  SetBitSample(pf.GetBitsAllocated());
-#else
-  SetBitSample(pf.GetBitsStored());
-#endif
+  SetBitSample(pf.GetBitsStored()); // in GDCM SetBitsAllocated
 }
 
 void JPEGCodec::SetupJPEGBitCodec(int bit)
@@ -101,24 +97,24 @@ void JPEGCodec::SetupJPEGBitCodec(int bit)
   BitSample = bit;
   delete Internal;
   Internal = NULL;
-  if (BitSample <= 8)
+  if(BitSample <= 8)
   {
-    mdcmDebugMacro("Using JPEG8");
+    mdcmDebugMacro("JPEGCodec: using JPEG8");
     Internal = new JPEG8Codec;
   }
-  else if (BitSample <= 12)
+  else if(BitSample <= 12)
   {
-    mdcmDebugMacro("Using JPEG12");
+    mdcmDebugMacro("JPEGCodec: using JPEG12");
     Internal = new JPEG12Codec;
   }
-  else if (BitSample <= 16)
+  else if(BitSample <= 16)
   {
-    mdcmDebugMacro("Using JPEG16");
+    mdcmDebugMacro("JPEGCodec: using JPEG16");
     Internal = new JPEG16Codec;
   }
   else
   {
-    mdcmAlwaysWarnMacro("JPEG: cannot instantiate codec for bit sample " << bit);
+    mdcmAlwaysWarnMacro("JPEGCodec: cannot instantiate codec for bit sample " << bit);
     delete Internal;
     Internal = NULL;
   }
@@ -135,11 +131,14 @@ void JPEGCodec::SetBitSample(int bit)
     Internal->SetLossless(this->GetLossless());
     Internal->SetQuality(this->GetQuality());
     Internal->ImageCodec::SetPixelFormat(this->ImageCodec::GetPixelFormat());
-    //Internal->SetNeedOverlayCleanup(this->AreOverlaysInPixelData());
+#if 0
+    // TODO check this
+    Internal->SetNeedOverlayCleanup(this->AreOverlaysInPixelData());
+#endif
   }
 }
 
-bool JPEGCodec::Decode(DataElement const &in, DataElement &out)
+bool JPEGCodec::Decode(DataElement const & in, DataElement & out)
 {
   assert(Internal);
   out = in;
@@ -147,7 +146,7 @@ bool JPEGCodec::Decode(DataElement const &in, DataElement &out)
   const ByteValue * jpegbv = in.GetByteValue();
   if(!sf0 && !jpegbv)
   {
-    mdcmAlwaysWarnMacro("JPEG: !sf0 && !jpegbv");
+    mdcmAlwaysWarnMacro("JPEGCodec: !sf0 && !jpegbv");
     return false;
   }
   std::stringstream os;
@@ -159,14 +158,14 @@ bool JPEGCodec::Decode(DataElement const &in, DataElement &out)
       const Fragment & frag = sf0->GetFragment(i);
       if(frag.IsEmpty())
       {
-        mdcmAlwaysWarnMacro("JPEG: frag.IsEmpty()");
+        mdcmAlwaysWarnMacro("JPEGCodec: frag.IsEmpty()");
         return false;
       }
       const ByteValue & bv = dynamic_cast<const ByteValue&>(frag.GetValue());
       const size_t bv_len = bv.GetLength();
       char * mybuffer = new char[bv_len];
       const bool b = bv.GetBuffer(mybuffer, bv_len);
-      if (!b)
+      if(!b)
       {
         delete [] mybuffer;
         return false;
@@ -177,13 +176,13 @@ bool JPEGCodec::Decode(DataElement const &in, DataElement &out)
       // PHILIPS_Gyroscan-12-MONO2-Jpeg_Lossless.dcm
       if(!r)
       {
-        mdcmDebugMacro("JPEG: failed to decompress Frag #" << i);
+        mdcmDebugMacro("JPEGCodec: failed to decompress Frag #" << i);
         const bool suspended = Internal->IsStateSuspension();
         const size_t nfrags = sf0->GetNumberOfFragments();
         // In case of chunked-jpeg, this is always an error
         if(suspended)
         {
-          mdcmAlwaysWarnMacro("JPEG: suspended");
+          mdcmAlwaysWarnMacro("JPEGCodec: suspended");
           return false;
         }
         // Ok so we are decoding a multiple frame jpeg DICOM file:
@@ -194,7 +193,7 @@ bool JPEGCodec::Decode(DataElement const &in, DataElement &out)
           // JPEGInvalidSecondFrag.dcm
           assert(nfrags == this->GetNumberOfDimensions());
           (void)nfrags;
-          mdcmAlwaysWarnMacro("JPEG: invalid fragment found at #" << i + 1 << ", skipped");
+          mdcmAlwaysWarnMacro("JPEGCodec: invalid fragment found at #" << i + 1 << ", skipped");
         }
         else
         {
@@ -203,14 +202,14 @@ bool JPEGCodec::Decode(DataElement const &in, DataElement &out)
       }
     }
   }
-  else if (jpegbv)
+  else if(jpegbv)
   {
     // GEIIS Icon
     std::stringstream is0;
     const size_t jpegbv_len = jpegbv->GetLength();
     char * mybuffer0 = new char[jpegbv_len];
     const bool b0 = jpegbv->GetBuffer(mybuffer0, jpegbv_len);
-    if (!b0)
+    if(!b0)
     {
       delete [] mybuffer0;
       return false;
@@ -220,16 +219,16 @@ bool JPEGCodec::Decode(DataElement const &in, DataElement &out)
     const bool r = DecodeByStreams(is0, os);
     if(!r)
     {
-      // let's try another time: JPEGDefinedLengthSequenceOfFragments.dcm
+      // Let's try another time: JPEGDefinedLengthSequenceOfFragments.dcm
       is0.seekg(0);
       SequenceOfFragments sf_bug;
       try
       {
         sf_bug.Read<SwapperNoOp>(is0,true);
       }
-      catch (...)
+      catch(...)
       {
-        mdcmAlwaysWarnMacro("JPEG: unknown exception");
+        mdcmAlwaysWarnMacro("JPEGCodec: unknown exception");
         return false;
       }
       const SequenceOfFragments * sf = &sf_bug;
@@ -239,24 +238,24 @@ bool JPEGCodec::Decode(DataElement const &in, DataElement &out)
         const Fragment & frag = sf->GetFragment(i);
         if(frag.IsEmpty())
         {
-          mdcmAlwaysWarnMacro("JPEG: frag.IsEmpty() (2)");
+          mdcmAlwaysWarnMacro("JPEGCodec: frag.IsEmpty() (2)");
           return false;
         }
         const ByteValue & bv = dynamic_cast<const ByteValue&>(frag.GetValue());
         const size_t bv_len = bv.GetLength();
         char * mybuffer = new char[bv_len];
         const bool b = bv.GetBuffer(mybuffer, bv_len);
-        if (!b)
+        if(!b)
         {
           delete [] mybuffer;
           return false;
         }
         is.write(mybuffer, bv_len);
-        delete[] mybuffer;
+        delete [] mybuffer;
         const bool r2 = DecodeByStreams(is, os);
         if(!r2)
         {
-          mdcmAlwaysWarnMacro("JPEG: !r2");
+          mdcmAlwaysWarnMacro("JPEGCodec: !r2");
           return false;
         }
       }
@@ -293,33 +292,33 @@ bool JPEGCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
         this->SetLossyFlag(Internal->GetLossyFlag());
         this->SetDimensions(Internal->GetDimensions());
         this->SetPhotometricInterpretation(Internal->GetPhotometricInterpretation());
-        int prep = this->GetPixelFormat().GetPixelRepresentation();
+        const int prep = this->GetPixelFormat().GetPixelRepresentation();
         this->PF = Internal->GetPixelFormat(); // Do not call SetPixelFormat
         this->PF.SetPixelRepresentation((uint16_t)prep);
         return true;
       }
       else
       {
-        mdcmAlwaysWarnMacro("JPEG: do not support this type");
+        mdcmAlwaysWarnMacro("JPEGCodec: not supported");
         return false;
       }
     }
     return false;
   }
-  // Foward everything back to meta jpeg codec:
+  // Foward everything back to meta jpeg codec
   this->SetLossyFlag(Internal->GetLossyFlag());
   this->SetDimensions(Internal->GetDimensions());
   this->SetPhotometricInterpretation(Internal->GetPhotometricInterpretation());
-  this->PF = Internal->GetPixelFormat(); // DO NOT CALL SetPixelFormat
+  this->PF = Internal->GetPixelFormat(); // Do not call SetPixelFormat
   if(this->PI != Internal->PI)
   {
-    mdcmWarningMacro("JPEG: possible Photometric Interpretation issue");
+    mdcmWarningMacro("JPEGCodec: possible Photometric Interpretation issue");
     this->PI = Internal->PI;
   }
   return true;
 }
 
-bool JPEGCodec::Code(DataElement const &in, DataElement &out)
+bool JPEGCodec::Code(DataElement const & in, DataElement & out)
 {
   out = in;
   SmartPointer<SequenceOfFragments> sq = new SequenceOfFragments;
@@ -352,7 +351,7 @@ bool JPEGCodec::Code(DataElement const &in, DataElement &out)
 }
 
 
-bool JPEGCodec::DecodeByStreams(std::istream &is, std::ostream &os)
+bool JPEGCodec::DecodeByStreams(std::istream & is, std::ostream & os)
 {
   std::stringstream tmpos;
   if(!Internal->DecodeByStreams(is,tmpos))
@@ -365,7 +364,7 @@ bool JPEGCodec::DecodeByStreams(std::istream &is, std::ostream &os)
       // PHILIPS_Gyroscan-12-MONO2-Jpeg_Lossless.dcm
       if(this->BitSample < Internal->BitSample)
       {
-        //assert(0); // Outside buffer will be too small
+        mdcmAlwaysWarnMacro("JPEGCodec: buffer will be too small");
       }
       is.seekg(0, std::ios::beg);
       SetupJPEGBitCodec(Internal->BitSample);
@@ -380,35 +379,39 @@ bool JPEGCodec::DecodeByStreams(std::istream &is, std::ostream &os)
         }
         else
         {
-          mdcmErrorMacro("JPEG: SetupJPEGBitCodec failed");
+          mdcmErrorMacro("JPEGCodec: SetupJPEGBitCodec failed");
         }
       }
     }
 #endif
-    mdcmAlwaysWarnMacro("JPEG: !Internal->DecodeByStreams(is,tmpos)");
+    mdcmAlwaysWarnMacro("JPEGCodec: DecodeByStreams() error");
     return false;
   }
   if(this->PlanarConfiguration != Internal->PlanarConfiguration)
   {
-    mdcmAlwaysWarnMacro("JPEG: possible PlanarConfiguration issue");
+    mdcmAlwaysWarnMacro("JPEGCodec: possible PlanarConfiguration issue");
     this->PlanarConfiguration = Internal->PlanarConfiguration;
   }
   if(this->PI != Internal->PI)
   {
-    mdcmAlwaysWarnMacro("JPEG: possible PhotometricInterpretation issue");
+    mdcmAlwaysWarnMacro("JPEGCodec: possible PhotometricInterpretation issue");
     this->PI = Internal->PI;
   }
+#if 1
+  // FIXME probably a hack from GDCM, no longer required
   if(this->PF == PixelFormat::UINT12 || this->PF == PixelFormat::INT12)
   {
+    mdcmAlwaysWarnMacro("JPEGCodec: PixelFormat is UINT12 or INT12");
     this->PF.SetBitsAllocated(16);
   }
+  //
+#endif
   return ImageCodec::DecodeByStreams(tmpos,os);
 }
 
-bool JPEGCodec::IsValid(PhotometricInterpretation const &pi)
+bool JPEGCodec::IsValid(PhotometricInterpretation const & pi)
 {
-  // JPEGCodec can produce the following PhotometricInterpretation as output
-  bool ret = false;
+  bool b = false;
   switch(pi)
   {
     case PhotometricInterpretation::MONOCHROME1:
@@ -417,18 +420,17 @@ bool JPEGCodec::IsValid(PhotometricInterpretation const &pi)
     case PhotometricInterpretation::RGB:
     case PhotometricInterpretation::YBR_FULL:
     case PhotometricInterpretation::YBR_FULL_422:
-    case PhotometricInterpretation::YBR_PARTIAL_422: // FIXME
-    case PhotometricInterpretation::YBR_PARTIAL_420: // FIXME
-      ret = true;
+    case PhotometricInterpretation::YBR_PARTIAL_422: // TODO
+    case PhotometricInterpretation::YBR_PARTIAL_420: // TODO
+      b = true;
       break;
     default:
       break;
   }
-  return ret;
+  return b;
 }
 
-bool JPEGCodec::DecodeExtent(
-    char * buffer,
+bool JPEGCodec::DecodeExtent(char * buffer,
     unsigned int xmin, unsigned int xmax,
     unsigned int ymin, unsigned int ymax,
     unsigned int zmin, unsigned int zmax,
@@ -440,14 +442,14 @@ bool JPEGCodec::DecodeExtent(
   const PixelFormat & pf = this->GetPixelFormat();
   if(pf == PixelFormat::SINGLEBIT) 
   {
-    mdcmAlwaysWarnMacro("JPEG: pf == PixelFormat::SINGLEBIT");
+    mdcmAlwaysWarnMacro("JPEGCodec: PixelFormat is SINGLEBIT");
     return false;
   }
   if(NumberOfDimensions == 2)
   {
     std::vector<char> vdummybuffer;
     size_t buf_size = 0;
-    const Tag seqDelItem(0xfffe,0xe0dd);
+    const Tag seqDelItem(0xfffe, 0xe0dd);
     Fragment frag;
     unsigned int nfrags = 0;
     try
@@ -466,35 +468,35 @@ bool JPEGCodec::DecodeExtent(
     catch(Exception & ex)
     {
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
-      // that's ok ! In all cases the whole file was read, because
-      // Fragment::Read only fail on eof() reached 1.
-      // SIEMENS-JPEG-CorruptFrag.dcm is more difficult to deal with, we have a
-      // partial fragment, read we decide to add it anyway to the stack of
-      // fragments (eof was reached so we need to clear error bit)
-      if(frag.GetTag() == Tag(0xfffe,0xe000))
+      // In all cases the whole file was read, because
+      // Fragment::Read only fail on EOF reached 1.
+      // SIEMENS-JPEG-CorruptFrag.dcm is more difficult to deal with, has a
+      // partial fragment, add it anyway to the stack of
+      // fragments (EOF was reached so we need to clear error bit)
+      if(frag.GetTag() == Tag(0xfffe, 0xe000))
       {
-        mdcmAlwaysWarnMacro("JPEG: Pixel Data Fragment could be corrupted");
+        mdcmAlwaysWarnMacro("JPEGCodec: Pixel Data Fragment could be corrupted");
         is.clear(); // clear the error bit
       }
-      // 2. GENESIS_SIGNA-JPEG-CorruptFrag.dcm
-      else if (frag.GetTag() == Tag(0xddff,0x00e0))
+      // GENESIS_SIGNA-JPEG-CorruptFrag.dcm
+      else if(frag.GetTag() == Tag(0xddff, 0x00e0))
       {
         assert(nfrags == 1);
         const ByteValue * bv = frag.GetByteValue();
         assert((unsigned char)bv->GetPointer()[bv->GetLength() - 1] == 0xfe);
-        // Yes this is an extra copy, this is a bug anyway, go fix YOUR code
+        // Yes this is an extra copy, this is a bug anyway
         frag.SetByteValue(bv->GetPointer(), bv->GetLength() - 1);
-        mdcmAlwaysWarnMacro("JPEG: fragment length was declared with an extra byte");
+        mdcmAlwaysWarnMacro("JPEGCodec: fragment length was declared with an extra byte");
         is.clear(); // clear the error bit
       }
       else
       {
-        // 3. mdcm-JPEG-LossLess3a.dcm: easy case, an extra tag was found
-        // instead of terminator (eof is the next char)
-        mdcmAlwaysWarnMacro("JPEG: reading failed at tag:" << frag.GetTag() << " " << ex.what());
+        // mdcm-JPEG-LossLess3a.dcm: easy case, an extra tag was found
+        // instead of terminator (EOF is the next char)
+        mdcmAlwaysWarnMacro("JPEGCodec: reading failed at tag:" << frag.GetTag() << " " << ex.what());
       }
 #endif
-      mdcmAlwaysWarnMacro("JPEG: exception: " << ex.what());
+      mdcmAlwaysWarnMacro("JPEGCodec: exception: " << ex.what());
     }
     assert(zmin == zmax);
     assert(zmin == 0);
@@ -503,7 +505,7 @@ bool JPEGCodec::DecodeExtent(
     std::stringstream os;
     if(!DecodeByStreams(iis,os))
     {
-      mdcmAlwaysWarnMacro("JPEG: !DecodeByStreams(iis,os)");
+      mdcmAlwaysWarnMacro("JPEGCodec: DecodeExtent() failed (!DecodeByStreams)");
       return false;
     }
     const unsigned int rowsize = xmax - xmin + 1;
@@ -517,23 +519,22 @@ bool JPEGCodec::DecodeExtent(
     char * tmpBuffer1 = &buffer1[0];
     unsigned int y, z;
     std::streamoff theOffset;
-    for (z = zmin; z <= zmax; ++z)
+    for(z = zmin; z <= zmax; ++z)
     {
-      for (y = ymin; y <= ymax; ++y)
+      for(y = ymin; y <= ymax; ++y)
       {
         theStream->seekg(std::ios::beg);
         theOffset = 0 + (z*dimensions[1]*dimensions[0] + y*dimensions[0] + xmin)*bytesPerPixel;
         theStream->seekg(theOffset);
         theStream->read(tmpBuffer1, rowsize*bytesPerPixel);
-        memcpy(
-          &(buffer[((z-zmin)*rowsize*colsize + (y-ymin)*rowsize)*bytesPerPixel]),
+        memcpy(&(buffer[((z-zmin)*rowsize*colsize + (y-ymin)*rowsize)*bytesPerPixel]),
           tmpBuffer1, rowsize*bytesPerPixel);
       }
     }
   }
-  else if (NumberOfDimensions == 3)
+  else if(NumberOfDimensions == 3)
   {
-    const Tag seqDelItem(0xfffe,0xe0dd);
+    const Tag seqDelItem(0xfffe, 0xe0dd);
     Fragment frag;
     std::streamoff thestart = is.tellg();
     unsigned int numfrags = 0;
@@ -549,32 +550,35 @@ bool JPEGCodec::DecodeExtent(
     assert(numfrags == offsets.size());
     if(numfrags != Dimensions[2])
     {
-      mdcmAlwaysWarnMacro("JPEG: numfrags != Dimensions[2]");
+      mdcmAlwaysWarnMacro("JPEGCodec: numfrags != Dimensions[2]");
       return false;
     }
     for(unsigned int z = zmin; z <= zmax; ++z)
     {
-      size_t curoffset = std::accumulate(offsets.begin(), offsets.begin() + z, size_t(0));
-      is.seekg(thestart + curoffset + 8 * z, std::ios::beg);
+      size_t curoffset = std::accumulate(offsets.begin(), offsets.begin() + z, (size_t)0);
+      is.seekg(thestart + curoffset + (8 * z), std::ios::beg);
       is.seekg(8, std::ios::cur);
       std::stringstream os;
-      const bool b = DecodeByStreams(is, os); (void)b;
-      assert(b);
+      const bool b = DecodeByStreams(is, os);
+      if(!b)
+      {
+        mdcmAlwaysWarnMacro("JPEGCodec: DecodeExtent() !DecodeByStreams");
+      }
       os.seekg(0, std::ios::beg);
       assert(os.good());
       std::istream *theStream = &os;
-      unsigned int rowsize = xmax - xmin + 1;
-      unsigned int colsize = ymax - ymin + 1;
-      unsigned int bytesPerPixel = pf.GetPixelSize();
+      const unsigned int rowsize = xmax - xmin + 1;
+      const unsigned int colsize = ymax - ymin + 1;
+      const unsigned int bytesPerPixel = pf.GetPixelSize();
       std::vector<char> buffer1;
       buffer1.resize(rowsize*bytesPerPixel);
       char * tmpBuffer1 = &buffer1[0];
       unsigned int y;
       std::streamoff theOffset;
-      for (y = ymin; y <= ymax; ++y)
+      for(y = ymin; y <= ymax; ++y)
       {
         theStream->seekg(std::ios::beg);
-        theOffset = 0 + (0*dimensions[1]*dimensions[0] + y*dimensions[0] + xmin)*bytesPerPixel;
+        theOffset = 0 + (0*dimensions[1]*dimensions[0] + y*dimensions[0] + xmin)*bytesPerPixel; //
         theStream->seekg(theOffset);
         theStream->read(tmpBuffer1, rowsize*bytesPerPixel);
         memcpy(&(buffer[((z-zmin)*rowsize*colsize + (y-ymin)*rowsize)*bytesPerPixel]),
@@ -603,8 +607,7 @@ ImageCodec * JPEGCodec::Clone() const
   return copy;
 }
 
-bool JPEGCodec::EncodeBuffer(std::ostream & out,
-    const char * inbuffer, size_t inlen)
+bool JPEGCodec::EncodeBuffer(std::ostream & out, const char * inbuffer, size_t inlen)
 {
   assert(Internal);
   return Internal->EncodeBuffer(out, inbuffer, inlen);
@@ -631,10 +634,10 @@ bool JPEGCodec::AppendRowEncode(std::ostream & os, const char * data, size_t dat
   return EncodeBuffer(os, data, datalen);
 }
 
-// TODO: technically the frame encoder could use the row encoder when present
-// this could reduce code duplication
-bool JPEGCodec::AppendFrameEncode(std::ostream & , const char * , size_t)
+bool JPEGCodec::AppendFrameEncode(std::ostream &, const char * , size_t)
 {
+  // Technically the frame encoder could use the row encoder when present
+  // this could reduce code duplication
   assert(0);
   return false;
 }

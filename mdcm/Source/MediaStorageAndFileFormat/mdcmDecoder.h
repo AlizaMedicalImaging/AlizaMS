@@ -31,17 +31,22 @@ namespace mdcm
 
 class TransferSyntax;
 class DataElement;
-/**
- * \brief Decoder
- */
+
 class MDCM_EXPORT Decoder
 {
 public:
   virtual ~Decoder() {}
   virtual bool CanDecode(TransferSyntax const &) const = 0;
-  virtual bool Decode(DataElement const &, DataElement &) { return false; }
+  virtual bool Decode(DataElement const &, DataElement &)
+  {
+    return false;
+  }
+
 protected:
-  virtual bool DecodeByStreams(std::istream &, std::ostream &) { return false; }
+  virtual bool DecodeByStreams(std::istream &, std::ostream &)
+  {
+    return false;
+  }
 };
 
 } // end namespace mdcm

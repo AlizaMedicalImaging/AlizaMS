@@ -20,67 +20,40 @@
 namespace mdcm
 {
 
-static const char *TSStrings[] = {
-    // Implicit VR Little Endian
-  "1.2.840.10008.1.2",
-  // Implicit VR Big Endian DLX (G.E Private)
-  "1.2.840.113619.5.2",
-  // Explicit VR Little Endian
-  "1.2.840.10008.1.2.1",
-  // Deflated Explicit VR Little Endian
-  "1.2.840.10008.1.2.1.99",
-  // Explicit VR Big Endian
-  "1.2.840.10008.1.2.2",
-  // JPEG Baseline (Process 1)
-  "1.2.840.10008.1.2.4.50",
-  // JPEG Extended (Process 2 & 4)
-  "1.2.840.10008.1.2.4.51",
-  // JPEG Extended (Process 3 & 5)
-  "1.2.840.10008.1.2.4.52",
-  // JPEG Spectral Selection, Non-Hierarchical (Process 6 & 8)
-  "1.2.840.10008.1.2.4.53",
-  // JPEG Full Progression, Non-Hierarchical (Process 10 & 12)
-  "1.2.840.10008.1.2.4.55",
-  // JPEG Lossless, Non-Hierarchical (Process 14)
-  "1.2.840.10008.1.2.4.57",
-  // JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14, [Selection Value 1])
-  "1.2.840.10008.1.2.4.70",
-  // JPEG-LS Lossless Image Compression
-  "1.2.840.10008.1.2.4.80",
-  // JPEG-LS Lossy (Near-Lossless) Image Compression
-  "1.2.840.10008.1.2.4.81",
-  // JPEG 2000 Lossless
-  "1.2.840.10008.1.2.4.90",
-  // JPEG 2000
-  "1.2.840.10008.1.2.4.91",
-  // JPEG 2000 Part 2 Lossless
-  "1.2.840.10008.1.2.4.92",
-  // JPEG 2000 Part 2
-  "1.2.840.10008.1.2.4.93",
-  // RLE Lossless
-  "1.2.840.10008.1.2.5",
-  // MPEG2 Main Profile @ Main Level
-  "1.2.840.10008.1.2.4.100",
-  // Old ACR NEMA, fake a TS
-  "ImplicitVRBigEndianACRNEMA",
-  // Weird Papyrus
-  "1.2.840.10008.1.20",
-  // CT_private_ELE,
-  "1.3.46.670589.33.1.4.1",
-  // JPIP Referenced
-  "1.2.840.10008.1.2.4.94",
-  // MPEG2 Main Profile @ High Level
-  "1.2.840.10008.1.2.4.101",
-  // MPEG-4 AVC/H.264 High Profile / Level 4.1
-  "1.2.840.10008.1.2.4.102",
-  // MPEG-4 AVC/H.264 BD-compatible High Profile / Level 4.1
-  "1.2.840.10008.1.2.4.103",
-  // Unknown
-  "Unknown Transfer Syntax",
+static const char * TSStrings[] =
+{
+  "1.2.840.10008.1.2",         // Implicit VR Little Endian
+  "1.2.840.113619.5.2",        // Implicit VR Big Endian DLX (G.E Private)
+  "1.2.840.10008.1.2.1",       // Explicit VR Little Endian
+  "1.2.840.10008.1.2.1.99",    // Deflated Explicit VR Little Endian
+  "1.2.840.10008.1.2.2",       // Explicit VR Big Endian
+  "1.2.840.10008.1.2.4.50",    // JPEG Baseline (Process 1)
+  "1.2.840.10008.1.2.4.51",    // JPEG Extended (Process 2 & 4)
+  "1.2.840.10008.1.2.4.52",    // JPEG Extended (Process 3 & 5)
+  "1.2.840.10008.1.2.4.53",    // JPEG Spectral Selection, Non-Hierarchical (Process 6 & 8)
+  "1.2.840.10008.1.2.4.55",    // JPEG Full Progression, Non-Hierarchical (Process 10 & 12)
+  "1.2.840.10008.1.2.4.57",    // JPEG Lossless, Non-Hierarchical (Process 14)
+  "1.2.840.10008.1.2.4.70",    // JPEG Lossless, Non-Hierarchical, First-Order Prediction (Process 14, [Selection Value 1])
+  "1.2.840.10008.1.2.4.80",    // JPEG-LS Lossless Image Compression
+  "1.2.840.10008.1.2.4.81",    // JPEG-LS Lossy (Near-Lossless) Image Compression
+  "1.2.840.10008.1.2.4.90",    // JPEG 2000 Lossless
+  "1.2.840.10008.1.2.4.91",    // JPEG 2000
+  "1.2.840.10008.1.2.4.92",    // JPEG 2000 Part 2 Lossless
+  "1.2.840.10008.1.2.4.93",    // JPEG 2000 Part 2
+  "1.2.840.10008.1.2.5",       // RLE Lossless
+  "1.2.840.10008.1.2.4.100",   // MPEG2 Main Profile @ Main Level
+  "ImplicitVRBigEndianACRNEMA",// Fake old ACR NEMA
+  "1.2.840.10008.1.20",        // Weird Papyrus
+  "1.3.46.670589.33.1.4.1",    // CT_private_ELE
+  "1.2.840.10008.1.2.4.94",    // JPIP Referenced
+  "1.2.840.10008.1.2.4.101",   // MPEG2 Main Profile @ High Level
+  "1.2.840.10008.1.2.4.102",   // MPEG-4 AVC/H.264 High Profile / Level 4.1
+  "1.2.840.10008.1.2.4.103",   // MPEG-4 AVC/H.264 BD-compatible High Profile / Level 4.1
+  "Unknown Transfer Syntax",   // Unknown
   NULL
 };
 
-TransferSyntax::TSType TransferSyntax::GetTSType(const char *cstr)
+TransferSyntax::TSType TransferSyntax::GetTSType(const char * cstr)
 {
   // trim trailing whitespace
   std::string str = cstr;
@@ -100,7 +73,7 @@ TransferSyntax::TSType TransferSyntax::GetTSType(const char *cstr)
   return TS_END;
 }
 
-const char* TransferSyntax::GetTSString(TSType ts)
+const char * TransferSyntax::GetTSString(TSType ts)
 {
   assert(ts <= TS_END);
   return TSStrings[(int)ts];
@@ -110,7 +83,7 @@ bool TransferSyntax::IsImplicit(TSType ts) const
 {
   assert(ts != TS_END);
   return
-    (ts == ImplicitVRLittleEndian
+    (  ts == ImplicitVRLittleEndian
     || ts == ImplicitVRBigEndianACRNEMA
     || ts == ImplicitVRBigEndianPrivateGE
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
@@ -123,7 +96,7 @@ bool TransferSyntax::IsImplicit() const
 {
   if (TSField == TS_END) return false;
   return
-   (TSField == ImplicitVRLittleEndian
+   (   TSField == ImplicitVRLittleEndian
     || TSField == ImplicitVRBigEndianACRNEMA
     || TSField == ImplicitVRBigEndianPrivateGE
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
@@ -169,7 +142,7 @@ bool TransferSyntax::IsLossy() const
 // irreversible wavelet compressed pixel data in a file declared with transfer
 // syntax JPEG2000Lossless.
 // Same goes for JPEG-LS (ITU-T T.87, ISO/IEC IS 14495-1), and to some extent
-// RLE which does not even allow lossy compression...
+// RLE which does not even allow lossy compression.
 bool TransferSyntax::CanStoreLossy() const
 {
   if (

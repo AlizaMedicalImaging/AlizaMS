@@ -40,6 +40,7 @@ public:
   {
     return false;
   }
+
 protected:
   virtual bool InternalCode(const char *, unsigned long, std::ostream &)
   {
