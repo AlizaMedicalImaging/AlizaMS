@@ -411,8 +411,8 @@ bool JPEGBITSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
       PI = PhotometricInterpretation::YBR_FULL_422;
       if(cinfo.process == JPROC_LOSSLESS)
       {
-        mdcmAlwaysWarnMacro("FIXME: JPROC_LOSSLESS and JCS_YCbCr");
-        PI = PhotometricInterpretation::RGB; // FIXME
+        mdcmAlwaysWarnMacro("JPROC_LOSSLESS and JCS_YCbCr");
+        PI = PhotometricInterpretation::RGB;
       }
       this->PF.SetSamplesPerPixel(3);
       this->PlanarConfiguration = 1;

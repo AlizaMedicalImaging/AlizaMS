@@ -398,15 +398,12 @@ bool JPEGCodec::DecodeByStreams(std::istream & is, std::ostream & os)
     this->PI = Internal->PI;
   }
 #if 1
-  // FIXME probably a hack from GDCM, no longer required
   if(this->PF == PixelFormat::UINT12 || this->PF == PixelFormat::INT12)
   {
     mdcmAlwaysWarnMacro("JPEGCodec: PixelFormat is UINT12 or INT12");
-    this->PF.SetBitsAllocated(16);
   }
-  //
 #endif
-  return ImageCodec::DecodeByStreams(tmpos,os);
+  return ImageCodec::DecodeByStreams(tmpos, os);
 }
 
 bool JPEGCodec::IsValid(PhotometricInterpretation const & pi)
