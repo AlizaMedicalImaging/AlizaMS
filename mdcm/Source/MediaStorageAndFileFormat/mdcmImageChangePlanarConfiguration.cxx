@@ -38,7 +38,7 @@ namespace mdcm
 
 bool ImageChangePlanarConfiguration::Change()
 {
-  if(PlanarConfiguration != 0 && PlanarConfiguration != 1)
+  if(!(PlanarConfiguration == 0 || PlanarConfiguration == 1))
   {
     return false;
   }
@@ -79,13 +79,13 @@ bool ImageChangePlanarConfiguration::Change()
       }
       else if(pf.GetBitsAllocated() == 8)
       {
-        ImageChangePlanarConfiguration::RGBPlanesToRGBPixels((uint8_t*)framecopy, (const uint8_t*)r, (const uint8_t*)g, (const uint8_t*)b, size);
+        ImageChangePlanarConfiguration::RGBPlanesToRGBPixels(
+          (uint8_t*)framecopy, (const uint8_t*)r, (const uint8_t*)g, (const uint8_t*)b, size);
       }
     }
   }
-  else // PlanarConfiguration 1
+  else if (PlanarConfiguration == 1)
   {
-    assert(PlanarConfiguration == 1);
     for(unsigned int z = 0; z < dims[2]; ++z)
     {
       const char * frame = p + z * framesize;
@@ -100,12 +100,13 @@ bool ImageChangePlanarConfiguration::Change()
       }
       else if(pf.GetBitsAllocated() == 8)
       {
-        ImageChangePlanarConfiguration::RGBPixelsToRGBPlanes((uint8_t*)r, (uint8_t*)g, (uint8_t*)b, (const uint8_t*)frame, size);
+        ImageChangePlanarConfiguration::RGBPixelsToRGBPlanes(
+          (uint8_t*)r, (uint8_t*)g, (uint8_t*)b, (const uint8_t*)frame, size);
       }
     }
   }
   delete[] p;
-  DataElement &de = Output->GetDataElement();
+  DataElement & de = Output->GetDataElement();
   de.SetByteValue(copy, (uint32_t)len);
   delete[] copy;
   Output->SetPlanarConfiguration(PlanarConfiguration);

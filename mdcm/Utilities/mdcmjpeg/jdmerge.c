@@ -104,11 +104,19 @@ build_ycc_rgb_table (j_decompress_ptr cinfo)
     /* i is the actual input pixel value, in the range 0..MAXJSAMPLE */
     /* The Cb or Cr value we are thinking of is x = i - CENTERJSAMPLE */
     /* Cr=>R value is nearest int to 1.40200 * x */
+#if (BITS_IN_JSAMPLE == 16 && REMOVE_OVERFLOW_WARN_JPEG16 == 1)
+    upsample->Cr_r_tab[i] = (int)
+        RIGHT_SHIFT((INT32)((long long)FIX(1.40200) * x + ONE_HALF), SCALEBITS);
+    /* Cb=>B value is nearest int to 1.77200 * x */
+    upsample->Cb_b_tab[i] = (int)
+        RIGHT_SHIFT((INT32)((long long)FIX(1.77200) * x + ONE_HALF), SCALEBITS);
+#else
     upsample->Cr_r_tab[i] = (int)
         RIGHT_SHIFT(FIX(1.40200) * x + ONE_HALF, SCALEBITS);
     /* Cb=>B value is nearest int to 1.77200 * x */
     upsample->Cb_b_tab[i] = (int)
         RIGHT_SHIFT(FIX(1.77200) * x + ONE_HALF, SCALEBITS);
+#endif
     /* Cr=>G value is scaled-up -0.71414 * x */
     upsample->Cr_g_tab[i] = (- FIX(0.71414)) * x;
     /* Cb=>G value is scaled-up -0.34414 * x */

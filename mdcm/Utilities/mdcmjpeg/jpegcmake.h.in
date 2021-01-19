@@ -43,4 +43,18 @@
 #include "mangle_jpeg16bits.h"
 #endif
 
+/*
+ * Silence warnings related to integer overflow for jpeg16.
+ * The problem is not solved, but related code for RGB->YCC
+ * conversion should not be in use in jpeg16, there is no
+ * lossy compression for RGB16.
+ *
+ * Only used in jpeg16.
+ * Jpeg8 and jpeg12 are not changed.
+ *
+ * Set to 0 to use original code, to 1 to silence warnings.
+ *
+ */
+#define REMOVE_OVERFLOW_WARN_JPEG16 0
+
 #endif /* __jpegcmake_h */

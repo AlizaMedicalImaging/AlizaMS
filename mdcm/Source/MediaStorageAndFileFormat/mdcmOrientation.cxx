@@ -26,15 +26,7 @@
 namespace mdcm
 {
 
-Orientation::Orientation() {}
-Orientation::~Orientation() {}
-
-void Orientation::Print(std::ostream &os) const
-{
-  os << "ObliquityThresholdCosineValue: " << ObliquityThresholdCosineValue;
-}
-
-static const char *OrientationStrings[] =
+static const char * OrientationStrings[] =
 {
   "UNKNOWN",
   "AXIAL",
@@ -44,10 +36,19 @@ static const char *OrientationStrings[] =
   NULL
 };
 
+Orientation::Orientation() {}
+Orientation::~Orientation() {}
+
 // http://public.kitware.com/pipermail/insight-users/2005-March/012246.html
 // 0.5477 would be the square root of 1 (unit vector sum of squares) divided by 3 (oblique axes - a "double" oblique)
 // 0.7071 would be the square root of 1 (unit vector sum of squares) divided by 2 (oblique axes)
 double Orientation::ObliquityThresholdCosineValue = 0.8;
+
+void Orientation::Print(std::ostream & os) const
+{
+  os << "ObliquityThresholdCosineValue: " << ObliquityThresholdCosineValue;
+}
+
 char Orientation::GetMajorAxisFromPatientRelativeDirectionCosine(double x, double y, double z)
 {
   char axis = 0;
@@ -59,16 +60,16 @@ char Orientation::GetMajorAxisFromPatientRelativeDirectionCosine(double x, doubl
   const double absZ = std::fabs(z);
   // The tests here really don't need to check the other dimensions,
   // just the threshold, since the sum of the squares should be == 1.0
-  // but just in case ...
-  if (absX>ObliquityThresholdCosineValue && absX>absY && absX>absZ)
+  // but just in case.
+  if ((absX > ObliquityThresholdCosineValue) && (absX > absY) && (absX > absZ))
   {
     axis = orientationX;
   }
-  else if (absY>ObliquityThresholdCosineValue && absY>absX && absY>absZ)
+  else if ((absY > ObliquityThresholdCosineValue) && (absY > absX) && (absY > absZ))
   {
     axis = orientationY;
   }
-  else if (absZ>ObliquityThresholdCosineValue && absZ>absX && absZ>absY)
+  else if ((absZ > ObliquityThresholdCosineValue) && (absZ > absX) && (absZ > absY))
   {
     axis = orientationZ;
   }
@@ -94,8 +95,8 @@ Orientation::OrientationType Orientation::GetType(const double dircos[6])
   OrientationType type = Orientation::UNKNOWN;
   if(dircos)
   {
-    char rowAxis = GetMajorAxisFromPatientRelativeDirectionCosine(dircos[0],dircos[1],dircos[2]);
-    char colAxis = GetMajorAxisFromPatientRelativeDirectionCosine(dircos[3],dircos[4],dircos[5]);
+    const char rowAxis = GetMajorAxisFromPatientRelativeDirectionCosine(dircos[0],dircos[1],dircos[2]);
+    const char colAxis = GetMajorAxisFromPatientRelativeDirectionCosine(dircos[3],dircos[4],dircos[5]);
     if (rowAxis != 0 && colAxis != 0)
     {
       if      ((rowAxis == 'R' || rowAxis == 'L') && (colAxis == 'A' || colAxis == 'P')) type = Orientation::AXIAL;

@@ -28,15 +28,15 @@ namespace mdcm
 {
 
 /**
- * \brief class to handle Orientation
+ * Orientation
  */
 class MDCM_EXPORT Orientation
 {
-  friend std::ostream& operator<<(std::ostream & _os, const Orientation & o);
+  friend std::ostream& operator<<(std::ostream &, const Orientation &);
+
 public:
   Orientation();
   ~Orientation();
-  /// Print
   void Print(std::ostream &) const;
   typedef enum
   {
@@ -46,17 +46,13 @@ public:
     SAGITTAL,
     OBLIQUE
   } OrientationType;
-  /// Return the type of orientation from a direction cosines
-  /// Input is an array of 6 double
-  static OrientationType GetType(const double dircos[6]);
-  /// ObliquityThresholdCosineValue stuff
-  static void SetObliquityThresholdCosineValue(double val);
+  static OrientationType GetType(const double[6]);
+  static void SetObliquityThresholdCosineValue(double);
   static double GetObliquityThresholdCosineValue();
-  /// Return the label of an Orientation
-  static const char * GetLabel(OrientationType type);
+  static const char * GetLabel(OrientationType);
 
 protected:
-  static char GetMajorAxisFromPatientRelativeDirectionCosine(double x, double y, double z);
+  static char GetMajorAxisFromPatientRelativeDirectionCosine(double, double, double);
 
 private:
   static double ObliquityThresholdCosineValue;
@@ -64,7 +60,7 @@ private:
 
 inline std::ostream& operator<<(std::ostream & os, const Orientation & o)
 {
-  o.Print( os );
+  o.Print(os);
   return os;
 }
 

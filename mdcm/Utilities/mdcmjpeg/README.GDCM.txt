@@ -49,11 +49,11 @@ diff -u -3 -p -r1.4 jmorecfg.h
 3.
 To further allow us to have to different copy of the 8, 12 and 16 bits jpeg
 library we had to mangle the name. Fur this purpose two new file were added to
-the library: mdcm_mangle_8bits.h, mdcm_mangle_12bits.h and
-mdcm_mangle_16bits.h.
+the library: gdcm_mangle_8bits.h, gdcm_mangle_12bits.h and
+gdcm_mangle_16bits.h.
 Those file were generated using:
 
-        nm libmdcmijpeg8.a | grep " [R|T] " | colrm 1 11 | sort
+        nm libgdcmijpeg8.a | grep " [R|T] " | colrm 1 11 | sort
 
 
 4.
@@ -63,7 +63,7 @@ tar xvfz /tmp/jpegsrc.v6b.tar.gz                        (1)
 patch < /tmp/ljpeg-6b.patch                             (2)
 patch -p0 < arithmetic-without-arith-option-full.patch  (3)
 patch -p0 < warnings10-14.patch                         (4)
-patch -p0 < previous-mdcm.patch                         (5)
+patch -p0 < previous-gdcm.patch                         (5)
 -----------------------------------------------------------
 = The subdir src/jpeg/libijg
 

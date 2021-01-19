@@ -30,10 +30,8 @@ namespace mdcm
 {
 
 /**
-  * \brief  This class defines surface mesh primitives.
-  * \details It is designed from surface mesh primitives macro.
-  *
-  * \see  PS 3.3 C.27.4
+  * This class defines surface mesh primitives.
+  * PS 3.3 C.27.4
   */
 class MDCM_EXPORT MeshPrimitive : public Object
 {
@@ -42,9 +40,8 @@ public:
   typedef std::vector< DataElement > PrimitivesData;
 
   /**
-    * \brief  This enumeration defines primitive types.
-    *
-    * \see  PS 3.3 C.27.4.1
+    * This enumeration defines primitive types.
+    * PS 3.3 C.27.4.1
     */
     typedef enum {
         VERTEX = 0,

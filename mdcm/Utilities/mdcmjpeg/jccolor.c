@@ -96,7 +96,11 @@ rgb_ycc_start (j_compress_ptr cinfo)
 
   for (i = 0; i <= MAXJSAMPLE; i++) {
     rgb_ycc_tab[i+R_Y_OFF] = FIX(0.29900) * i;
+#if (BITS_IN_JSAMPLE == 16 && REMOVE_OVERFLOW_WARN_JPEG16 == 1)
+    rgb_ycc_tab[i+G_Y_OFF] = (INT32)((long long)FIX(0.58700) * i);
+#else
     rgb_ycc_tab[i+G_Y_OFF] = FIX(0.58700) * i;
+#endif
     rgb_ycc_tab[i+B_Y_OFF] = FIX(0.11400) * i     + ONE_HALF;
     rgb_ycc_tab[i+R_CB_OFF] = (-FIX(0.16874)) * i;
     rgb_ycc_tab[i+G_CB_OFF] = (-FIX(0.33126)) * i;
@@ -104,7 +108,11 @@ rgb_ycc_start (j_compress_ptr cinfo)
      * This ensures that the maximum output will round to MAXJSAMPLE
      * not MAXJSAMPLE+1, and thus that we don't have to range-limit.
      */
+#if (BITS_IN_JSAMPLE == 16 && REMOVE_OVERFLOW_WARN_JPEG16 == 1)
+    rgb_ycc_tab[i+B_CB_OFF] = (INT32)((long long)FIX(0.50000) * i    + CBCR_OFFSET + ONE_HALF-1);
+#else
     rgb_ycc_tab[i+B_CB_OFF] = FIX(0.50000) * i    + CBCR_OFFSET + ONE_HALF-1;
+#endif
 /*  B=>Cb and R=>Cr tables are the same
     rgb_ycc_tab[i+R_CR_OFF] = FIX(0.50000) * i    + CBCR_OFFSET + ONE_HALF-1;
 */
