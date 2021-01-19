@@ -36,8 +36,8 @@ namespace mdcm
  * find a solution.
  */
 /**
- * \brief SplitMosaicFilter class
- * \details Class to reshuffle bytes for a SIEMENS Mosaic image
+ * SplitMosaicFilter class
+ * Class to reshuffle bytes for a SIEMENS Mosaic image
  * Siemens CSA Image Header
  * CSA:= Common Siemens Architecture, sometimes also known as Common syngo Architecture
  *
@@ -47,29 +47,16 @@ class MDCM_EXPORT SplitMosaicFilter
 public:
   SplitMosaicFilter();
   ~SplitMosaicFilter();
-
-  /// Split the SIEMENS MOSAIC image
   bool Split();
-
-  /// Compute the new dimensions according to private information
-  /// stored in the MOSAIC header.
-  bool ComputeMOSAICDimensions(unsigned int dims[3]);
-
-  /// Extract the value for SliceNormalVector (CSA header)
-  bool ComputeMOSAICSliceNormal( double dims[3], bool & inverted );
-
-  /// Extract the value for ImagePositionPatient (requires inverted flag)
-  bool ComputeMOSAICSlicePosition( double pos[3], bool inverted );
-
-  void SetImage(const Image& image);
-  const Image &GetImage() const { return *I; }
-  Image &GetImage() { return *I; }
-
-  void SetFile(const File& f) { F = f; }
-  File &GetFile() { return *F; }
-  const File &GetFile() const { return *F; }
-
-protected:
+  bool ComputeMOSAICDimensions(unsigned int[3]);
+  bool ComputeMOSAICSliceNormal(double[3], bool &);
+  bool ComputeMOSAICSlicePosition(double[3], bool);
+  void SetImage(const Image &);
+  const Image & GetImage() const { return *I; }
+  Image & GetImage() { return *I; }
+  void SetFile(const File & f) { F = f; }
+  File & GetFile() { return *F; }
+  const File & GetFile() const { return *F; }
 
 private:
   SmartPointer<File> F;
