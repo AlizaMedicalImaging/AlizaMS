@@ -418,7 +418,6 @@ set(MDCM_MSFF_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmFileExplicitFilter.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmFileDerivation.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageFragmentSplitter.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmTagPath.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSimpleSubjectWatcher.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPixmap.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmBitmap.cxx
