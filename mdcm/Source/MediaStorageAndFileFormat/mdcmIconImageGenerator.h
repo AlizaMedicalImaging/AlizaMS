@@ -53,23 +53,23 @@ public:
   void SetPixmap(const Pixmap & p) { P = p; }
   Pixmap & GetPixmap() { return *P; }
   const Pixmap & GetPixmap() const { return *P; }
-  void SetOutputDimensions(const unsigned int dims[2]);
-  void SetPixelMinMax(double min, double max);
-  void AutoPixelMinMax(bool b);
+  void SetOutputDimensions(const unsigned int[2]);
+  void SetPixelMinMax(double, double);
+  void AutoPixelMinMax(bool);
   // Converting from RGB to PALETTE_COLOR can be a slow operation. However DICOM
   // standard requires that color icon be described as palette. Set this boolean
   // to false only if you understand the consequences.
   // default value is true, false generates invalid Icon Image Sequence
-  void ConvertRGBToPaletteColor(bool b);
+  void ConvertRGBToPaletteColor(bool);
   // Requires AutoPixelMinMax(true)
-  void SetOutsideValuePixel(double v);
+  void SetOutsideValuePixel(double);
   bool Generate();
-  const IconImage& GetIconImage() const { return *I; }
+  const IconImage & GetIconImage() const { return *I; }
 
 protected:
 
 private:
-  void BuildLUT(Bitmap & bitmap, unsigned int maxcolor);
+  void BuildLUT(Bitmap &, unsigned int);
   SmartPointer<Pixmap> P;
   SmartPointer<IconImage> I;
   IconImageGeneratorInternals * Internals;

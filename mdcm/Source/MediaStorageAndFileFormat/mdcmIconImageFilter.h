@@ -36,10 +36,10 @@ public:
   ~IconImageFilter();
   void SetFile(const File & f) { F = f; }
   File & GetFile() { return *F; }
-  const File &GetFile() const { return *F; }
+  const File & GetFile() const { return *F; }
   bool Extract();
   unsigned int GetNumberOfIconImages() const;
-  IconImage & GetIconImage(unsigned int i) const;
+  IconImage & GetIconImage(unsigned int) const;
 
 protected:
   void ExtractIconImages();
