@@ -39,7 +39,7 @@ public:
   JPEG8Codec();
   ~JPEG8Codec();
   bool DecodeByStreams(std::istream &, std::ostream &);
-  bool InternalCode(const char *, unsigned long, std::ostream &);
+  bool InternalCode(const char *, size_t, std::ostream &);
   bool GetHeaderInfo(std::istream &, TransferSyntax &);
 
 protected:

@@ -42,7 +42,7 @@ public:
   }
 
 protected:
-  virtual bool InternalCode(const char *, unsigned long, std::ostream &)
+  virtual bool InternalCode(const char *, size_t, std::ostream &)
   {
     return false;
   }

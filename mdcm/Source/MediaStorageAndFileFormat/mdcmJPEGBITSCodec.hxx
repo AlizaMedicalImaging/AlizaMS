@@ -870,7 +870,7 @@ GLOBAL(void) jpeg_stdio_dest(j_compress_ptr cinfo, std::ostream * outfile)
  * Sample routine for JPEG compression.  We assume that the target file name
  * and a compression quality factor are passed in.
  */
-bool JPEGBITSCodec::InternalCode(const char * input, unsigned long len, std::ostream & os)
+bool JPEGBITSCodec::InternalCode(const char * input, size_t len, std::ostream & os)
 {
   int quality = 100;
   (void)len;
