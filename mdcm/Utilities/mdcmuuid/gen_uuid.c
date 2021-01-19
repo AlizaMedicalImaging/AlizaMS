@@ -35,9 +35,10 @@
 
 /*
  * Force inclusion of SVID stuff since we need it if we're compiling in
- * gcc-wall wall mode
+ * gcc wall mode
  */
 #define _SVID_SOURCE
+#define _DEFAULT_SOURCE
 
 #include <stdio.h>
 #ifdef HAVE_UNISTD_H
@@ -89,7 +90,6 @@
 
 #if defined(_WIN32)
 /* offer a limited gettimeofday on Win32 system */
-#include <stdio.h>
 static int gettimeofday(struct timeval *tv, struct timezone *tz)
 {
   FILETIME ft;

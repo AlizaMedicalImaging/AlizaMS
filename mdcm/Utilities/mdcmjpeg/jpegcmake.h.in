@@ -55,6 +55,6 @@
  * Set to 0 to use original code, to 1 to silence warnings.
  *
  */
-#define REMOVE_OVERFLOW_WARN_JPEG16 0
+#define REMOVE_OVERFLOW_WARN_JPEG16 1
 
 #endif /* __jpegcmake_h */
