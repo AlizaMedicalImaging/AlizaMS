@@ -428,7 +428,7 @@ static bool find_time_less_1h_recurs__(
 	{
 		const mdcm::DataElement & de1 = *it;
 		mdcm::Tag de1tag = de1.GetTag();
-		const mdcm::VR vr1 = get_vr(ds, de1tag, implicit, dicts);
+		const mdcm::VR vr1 = get_vr(ds, de1tag, implicit, dicts, true);
 		mdcm::DataSet::ConstIterator dup = it;
 		++it;
 		if (ts.find(de1tag) != ts.end())
@@ -522,7 +522,7 @@ static void modify_date_time_recurs__(
 	{
 		const mdcm::DataElement & de1 = *it;
 		const mdcm::Tag de1tag = de1.GetTag();
-		mdcm::VR vr1 = get_vr(ds, de1tag, implicit, dicts);
+		mdcm::VR vr1 = get_vr(ds, de1tag, implicit, dicts, true);
 		mdcm::DataSet::Iterator dup = it;
 		++it;
 		if (ts.find(de1tag) != ts.end())
