@@ -5281,7 +5281,8 @@ QString DicomUtils::read_enhanced(
 			empty_, -1, // unused in enhanced
 			f,
 			rescale_tmp,
-			pixelformat, pi,
+			pixelformat, false,
+			pi,
 			&dimx_read, &dimy_read, &dimz_read,
 			&origin_x_read,  &origin_y_read,  &origin_z_read,
 			&spacing_x_read, &spacing_y_read, &spacing_z_read,
@@ -5589,7 +5590,8 @@ QString DicomUtils::read_enhanced_supp_palette(
 			empty_, -1, // unused in enhanced
 			f,
 			false,
-			pixelformat, pi,
+			pixelformat, false,
+			pi,
 			&dimx_read, &dimy_read, &dimz_read,
 			&origin_x_read,  &origin_y_read,  &origin_z_read,
 			&spacing_x_read, &spacing_y_read, &spacing_z_read,
@@ -5868,7 +5870,8 @@ QString DicomUtils::read_ultrasound(
 		ivariant->anatomy, 0, // FIXME
 		images_ipp.at(0),
 		wsettings->get_rescale(),
-		pixelformat, pi,
+		pixelformat, false,
+		pi,
 		&dimx_, &dimy_, &dimz_,
 		&origin_x_, &origin_y_, &origin_z_,
 		&spacing_x_, &spacing_y_, &spacing_z_,
@@ -6250,6 +6253,9 @@ QString DicomUtils::read_series(
 		QString buff_error;
 		const int overlays_idx = overlays_enabled ? j : -2;
 		const bool rescale = (!apply_rescale) ? false : wsettings->get_rescale();
+		const bool force_double_pf =
+			(ivariant->sop==QString("1.2.840.10008.5.1.4.1.1.128"))
+			? true : false;
 		if (images_ipp.size()>1)
 		{
 			std::vector<char*> data_;
@@ -6262,7 +6268,8 @@ QString DicomUtils::read_series(
 				j,
 				images_ipp.at(j),
 				rescale,
-				pixelformat, pi,
+				pixelformat, force_double_pf,
+				pi,
 				&dimx_, &dimy_, &dimz_,
 				&origin_x_, &origin_y_, &origin_z_,
 				&spacing_x_, &spacing_y_, &spacing_z_,
@@ -6302,7 +6309,8 @@ QString DicomUtils::read_series(
 				j,
 				images_ipp.at(j),
 				rescale,
-				pixelformat, pi,
+				pixelformat, force_double_pf,
+				pi,
 				&dimx_, &dimy_, &dimz_,
 				&origin_x_, &origin_y_, &origin_z_,
 				&spacing_x_, &spacing_y_, &spacing_z_,
@@ -7246,7 +7254,8 @@ QString DicomUtils::read_buffer(
 	AnatomyMap & anatomy, const int anatomy_idx, // unused for enhanced
 	const QString & f,
 	const bool rescale,
-	mdcm::PixelFormat & pixelformat, mdcm::PhotometricInterpretation & pi,
+	mdcm::PixelFormat & pixelformat, const bool force_double_pf,
+	mdcm::PhotometricInterpretation & pi,
 	unsigned int * dimx_, unsigned int * dimy_, unsigned int * dimz_,
 	double * origin_x, double * origin_y, double * origin_z,
 	double * spacing_x, double * spacing_y, double * spacing_z,
@@ -7564,7 +7573,7 @@ QString DicomUtils::read_buffer(
 		*scale_tmp = rescale_slope;
 		if (rescale)
 		{
-			if (!(
+			if (force_double_pf || !(
 				rescale_intercept >= 0        &&
 				rescale_intercept <  0.000001 &&
 				rescale_slope     >  0.999999 &&
@@ -7587,8 +7596,15 @@ QString DicomUtils::read_buffer(
 				r.SetIntercept(rescale_intercept);
 				r.SetSlope(rescale_slope);
 				r.SetPixelFormat(image.GetPixelFormat());
-				pixelformat = mdcm::PixelFormat(r.ComputeInterceptSlopePixelType());
 				r.SetUseTargetPixelType(true);
+				if (!force_double_pf)
+				{
+					pixelformat = mdcm::PixelFormat(r.ComputeInterceptSlopePixelType());
+				}
+				else
+				{
+					pixelformat = mdcm::PixelFormat::FLOAT64;
+				}
 				r.SetTargetPixelType(pixelformat);
 				{
 					unsigned int rescale_type_size = 0;

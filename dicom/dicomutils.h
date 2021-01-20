@@ -239,7 +239,7 @@ public:
 		ImageOverlays &, const int,
 		AnatomyMap &, const int,
 		const QString&, const bool,
-		mdcm::PixelFormat&,
+		mdcm::PixelFormat&, const bool,
 		mdcm::PhotometricInterpretation&,
 		unsigned int*, unsigned int*, unsigned int*,
 		double*,double*,double*,
