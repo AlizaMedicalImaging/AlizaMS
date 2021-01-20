@@ -37,7 +37,8 @@ namespace mdcm
 
 bool ImageChangeTransferSyntax::TryRAWCodec(const DataElement & pixelde, Bitmap const & input, Bitmap & output)
 {
-  unsigned long long len = input.GetBufferLength(); (void)len;
+  const unsigned long long len = input.GetBufferLength();
+  (void)len;
   const TransferSyntax & ts = GetTransferSyntax();
   RAWCodec codec;
   if(codec.CanCode(ts))
@@ -58,7 +59,8 @@ bool ImageChangeTransferSyntax::TryRAWCodec(const DataElement & pixelde, Bitmap 
 
 bool ImageChangeTransferSyntax::TryRLECodec(const DataElement & pixelde, Bitmap const & input, Bitmap & output)
 {
-  unsigned long long len = input.GetBufferLength(); (void)len;
+  const unsigned long long len = input.GetBufferLength();
+  (void)len;
   const TransferSyntax & ts = GetTransferSyntax();
   RLECodec codec;
   if(codec.CanCode(ts))
@@ -87,7 +89,8 @@ bool ImageChangeTransferSyntax::TryRLECodec(const DataElement & pixelde, Bitmap 
 
 bool ImageChangeTransferSyntax::TryJPEGCodec(const DataElement & pixelde, Bitmap const & input, Bitmap & output)
 {
-  unsigned long long len = input.GetBufferLength(); (void)len;
+  const unsigned long long len = input.GetBufferLength();
+  (void)len;
   const TransferSyntax & ts = GetTransferSyntax();
   JPEGCodec jpgcodec;
   if(ts.IsLossy())
@@ -143,7 +146,8 @@ bool ImageChangeTransferSyntax::TryJPEGCodec(const DataElement & pixelde, Bitmap
 
 bool ImageChangeTransferSyntax::TryJPEGLSCodec(const DataElement & pixelde, Bitmap const & input, Bitmap & output)
 {
-  unsigned long long len = input.GetBufferLength(); (void)len;
+  const unsigned long long len = input.GetBufferLength();
+  (void)len;
   const TransferSyntax & ts = GetTransferSyntax();
   JPEGLSCodec jlscodec;
   ImageCodec * codec = &jlscodec;
@@ -192,7 +196,8 @@ bool ImageChangeTransferSyntax::TryJPEGLSCodec(const DataElement & pixelde, Bitm
 
 bool ImageChangeTransferSyntax::TryJPEG2000Codec(const DataElement & pixelde, Bitmap const & input, Bitmap & output)
 {
-  unsigned long long len = input.GetBufferLength(); (void)len;
+  const unsigned long long len = input.GetBufferLength();
+  (void)len;
   const TransferSyntax & ts = GetTransferSyntax();
   JPEG2000Codec j2kcodec;
   ImageCodec * codec = &j2kcodec;
@@ -210,14 +215,14 @@ bool ImageChangeTransferSyntax::TryJPEG2000Codec(const DataElement & pixelde, Bi
     codec->SetPhotometricInterpretation(input.GetPhotometricInterpretation());
     codec->SetNeedOverlayCleanup(input.AreOverlaysInPixelData() || input.UnusedBitsPresentInPixelData());
     DataElement out;
-    bool r = codec->Code(pixelde, out);
+    const bool r = codec->Code(pixelde, out);
     output.SetPlanarConfiguration(0);
     if(input.GetPixelFormat().GetSamplesPerPixel() == 3)
     {
       if (ForceYBRFull ||
           input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL)
       {
-        output.SetPhotometricInterpretation(PhotometricInterpretation::YBR_FULL);
+        output.SetPhotometricInterpretation(PhotometricInterpretation::YBR_FULL); // TODO
       }
       else if(input.GetPhotometricInterpretation() == PhotometricInterpretation::RGB ||
               input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_ICT ||
@@ -231,7 +236,8 @@ bool ImageChangeTransferSyntax::TryJPEG2000Codec(const DataElement & pixelde, Bi
         else
         {
           assert(ts == TransferSyntax::JPEG2000);
-          output.SetPhotometricInterpretation(PhotometricInterpretation::YBR_ICT);
+          //output.SetPhotometricInterpretation(PhotometricInterpretation::YBR_ICT); // TODO
+          output.SetPhotometricInterpretation(PhotometricInterpretation::RGB);
         }
       }
       // invalid
