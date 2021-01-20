@@ -3,6 +3,7 @@
 
 #include "ui_anonymazerwidget2.h"
 #include "mdcmTag.h"
+#include "mdcmDicts.h"
 #include <QStringList>
 #include <QMap>
 #include <QProgressDialog>
@@ -23,10 +24,16 @@ public:
 	AnonymazerWidget2(float, QWidget(*)=NULL);
 	~AnonymazerWidget2();
 	void writeSettings(QSettings&);
+
 public slots:
 	void run_();
 	void set_output_dir();
 	void set_input_dir();
+
+private slots:
+	void update_retain_dates(bool);
+	void update_modify_dates(bool);
+
 protected:
 	void closeEvent(QCloseEvent*);
 	void readSettings();
@@ -34,6 +41,7 @@ protected:
 	void dragEnterEvent(QDragEnterEvent*);
 	void dragMoveEvent(QDragMoveEvent*);
 	void dragLeaveEvent(QDragLeaveEvent*);
+
 private:
 	void process_directory(
 		const QString&,
@@ -42,6 +50,7 @@ private:
 		const QMap<QString,QString> &,
 		unsigned int*,
 		unsigned int*,
+		const mdcm::Dicts&,
 		QProgressDialog*);
 	void init_profile();
 	std::set<mdcm::Tag> pn_tags;
@@ -51,6 +60,7 @@ private:
 	std::set<mdcm::Tag> device_tags;
 	std::set<mdcm::Tag> patient_tags;
 	std::set<mdcm::Tag> institution_tags;
+	std::set<mdcm::Tag> time_tags;
 	QString output_dir;
 	QString input_dir;
 };
