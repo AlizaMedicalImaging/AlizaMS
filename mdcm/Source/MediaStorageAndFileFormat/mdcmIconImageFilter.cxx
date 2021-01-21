@@ -226,7 +226,7 @@ void IconImageFilter::ExtractIconImages()
       photometricinterpretation_str.c_str()));
     pixeldata.SetPhotometricInterpretation(pi);
     const Tag tpixeldata = Tag(0x7fe0, 0x0010);
-    if(ds.FindDataElement(tpixeldata));
+    if(ds.FindDataElement(tpixeldata))
     {
       const DataElement & de = ds.GetDataElement(tpixeldata);
       std::istringstream is;
@@ -310,7 +310,7 @@ void IconImageFilter::ExtractIconImages()
       photometricinterpretation_str.c_str()));
     pixeldata.SetPhotometricInterpretation(pi);
     const PrivateTag tpixeldata(0x6003,0x0011,"GEMS_Ultrasound_ImageGroup_001");
-    if(ds.FindDataElement(tpixeldata));
+    if(ds.FindDataElement(tpixeldata))
     {
       const DataElement & de = ds.GetDataElement(tpixeldata);
       pixeldata.SetDataElement(de);
