@@ -669,8 +669,8 @@ std::pair<char *, size_t> JPEG2000Codec::DecodeByStreamsCommon(
     dinfo = opj_create_decompress(CODEC_JP2);
     break;
   default:
-    mdcmErrorMacro("Impossible happen");
-    return std::make_pair<char*,size_t>(0,0);
+    mdcmErrorMacro("Error: parameters.decod_format");
+    return std::make_pair<char*,size_t>((char*)NULL, 0);
   }
 #if (OPJ_VERSION_MAJOR == 2 && OPJ_VERSION_MINOR >= 3)
   if(opj_has_thread_support())
@@ -794,7 +794,7 @@ std::pair<char *, size_t> JPEG2000Codec::DecodeByStreamsCommon(
 #endif
     if(comp->prec != PF.GetBitsStored())
     {
-      if(comp->prec <= 8)       PF.SetBitsAllocated(8);
+      if     (comp->prec <= 8)  PF.SetBitsAllocated(8);
       else if(comp->prec <= 16) PF.SetBitsAllocated(16);
       else if(comp->prec <= 32) PF.SetBitsAllocated(32);
       PF.SetBitsStored((unsigned short)comp->prec);
@@ -852,7 +852,8 @@ bool JPEG2000Codec::DecodeByStreams(std::istream &is, std::ostream &os)
   char * dummy_buffer = new char[buf_size];
   is.seekg(0, std::ios::beg);
   is.read(dummy_buffer, buf_size);
-  std::pair<char*,size_t> raw_len = this->DecodeByStreamsCommon(dummy_buffer, buf_size);
+  std::pair<char*,size_t> raw_len =
+    this->DecodeByStreamsCommon(dummy_buffer, buf_size);
   /* free the memory containing the code-stream */
   delete[] dummy_buffer;
   if(!raw_len.first || !raw_len.second) return false;
@@ -1023,7 +1024,7 @@ opj_image_t * rawtoimage(
   {
     numcomps = 3;
     color_space = CLRSPC_SRGB;
-    //TODO Does OpenJPEg support CLRSPC_SYCC?
+    //TODO Does OpenJPEG support CLRSPC_SYCC?
   }
   else
   {
