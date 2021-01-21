@@ -51,7 +51,11 @@ private:
 		unsigned int*,
 		unsigned int*,
 		const mdcm::Dicts&,
-		QProgressDialog*);
+		QProgressDialog*,
+		const int,
+		const int,
+		const int,
+		const int);
 	void init_profile();
 	std::set<mdcm::Tag> pn_tags;
 	std::set<mdcm::Tag> uid_tags;

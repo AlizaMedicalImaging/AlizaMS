@@ -25,13 +25,14 @@
 #include "mdcmVersion.h"
 #include "dicomutils.h"
 #include "alizams_version.h"
+#include <cstdlib>
+#include <ctime> 
 
 static mdcm::VR get_vr(
 	const mdcm::DataSet & ds,
 	const mdcm::Tag & t,
 	const bool implicit,
-	const mdcm::Dicts & dicts,
-	const bool try_private = false)
+	const mdcm::Dicts & dicts)
 {
 	mdcm::VR vr = mdcm::VR::INVALID;
 	bool priv = false;
@@ -85,29 +86,26 @@ static mdcm::VR get_vr(
 		}
 		else
 		{
-			if (try_private)
+			const mdcm::PrivateDict & pdict = dicts.GetPrivateDict();
+			mdcm::Tag private_creator_t = t.GetPrivateCreator();
+			if (ds.FindDataElement(private_creator_t))
 			{
-				const mdcm::PrivateDict & pdict = dicts.GetPrivateDict();
-				const mdcm::Tag private_creator_t = t.GetPrivateCreator();
-				if (ds.FindDataElement(private_creator_t))
+				const mdcm::DataElement & private_creator_e =
+					ds.GetDataElement(private_creator_t);
+				if (!private_creator_e.IsEmpty() &&
+					!private_creator_e.IsUndefinedLength() &&
+					private_creator_e.GetByteValue())
 				{
-					const mdcm::DataElement & private_creator_e =
-						ds.GetDataElement(private_creator_t);
-					if (!private_creator_e.IsEmpty() &&
-						!private_creator_e.IsUndefinedLength() &&
-						private_creator_e.GetByteValue())
-					{
-						const QString private_creator =
-							QString::fromLatin1(
-								private_creator_e.GetByteValue()->GetPointer(),
-								private_creator_e.GetByteValue()->GetLength());
-						const mdcm::PrivateTag pt(
-							t.GetGroup(),
-							t.GetElement(),
-							private_creator.toLatin1().constData());
-						const mdcm::DictEntry & pentry = pdict.GetDictEntry(pt);
-						vr = pentry.GetVR();
-					}
+					const QString private_creator =
+						QString::fromLatin1(
+							private_creator_e.GetByteValue()->GetPointer(),
+							private_creator_e.GetByteValue()->GetLength());
+					mdcm::PrivateTag pt(
+						t.GetGroup(),
+						t.GetElement(),
+						private_creator.toLatin1().constData());
+					const mdcm::DictEntry & pentry = pdict.GetDictEntry(pt);
+					vr = pentry.GetVR();
 				}
 			}
 		}
@@ -122,7 +120,7 @@ static bool compatible_sq(
 	const mdcm::Dicts & dicts)
 {
 	if (t.IsIllegal()) return false;
-	const mdcm::VR vr = get_vr(ds, t, implicit, dicts, true);
+	mdcm::VR vr = get_vr(ds, t, implicit, dicts);
 	if (vr.Compatible(mdcm::VR::SQ)) return true;
 	return false;
 }
@@ -136,7 +134,7 @@ static void replace__(
 	const mdcm::Dicts & dicts)
 {
 	if (t.GetGroup() < 0x0008) return;
-	mdcm::VR vr = get_vr(ds, t, implicit, dicts, true);
+	mdcm::VR vr = get_vr(ds, t, implicit, dicts);
 	mdcm::VL vl = static_cast<mdcm::VL::Type>(size_);
 	if (vr.Compatible(mdcm::VR::SQ))
 	{
@@ -190,7 +188,7 @@ static void replace__(
 			}
 			mdcm::DataElement de(t);
 			if (!implicit) de.SetVR(vr);
-			const mdcm::VL paddedSize = static_cast<mdcm::VL::Type>(padded.size());
+			mdcm::VL paddedSize = static_cast<mdcm::VL::Type>(padded.size());
 			de.SetByteValue(padded.c_str(), paddedSize);
 			ds.Replace(de);
 		}
@@ -208,11 +206,11 @@ static void replace_uid_recurs__(
 	for (; it != ds.End();)
 	{
 		const mdcm::DataElement & de1 = *it;
-		const mdcm::Tag t = de1.GetTag();
 		mdcm::DataSet::Iterator dup = it;
+		mdcm::Tag t = de1.GetTag();
+		mdcm::VR vr = get_vr(ds, t, implicit, dicts);
 		++it;
 		const mdcm::DataElement & de = *dup;
-		const mdcm::VR vr = get_vr(ds, t, implicit, dicts, true);
 		if (ts.find(t) != ts.end() || vr == mdcm::VR::UI)
 		{		
 			const mdcm::ByteValue * bv = de.GetByteValue();
@@ -233,8 +231,7 @@ static void replace_uid_recurs__(
 		}
 		else
 		{
-			const mdcm::Tag t2 = de.GetTag();
-			if (compatible_sq(const_cast<const mdcm::DataSet&>(ds), t2, implicit, dicts))
+			if (vr.Compatible(mdcm::VR::SQ))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 				if (sq && sq->GetNumberOfItems() > 0)
@@ -267,11 +264,11 @@ static void replace_pn_recurs__(
 	for (; it != ds.End();)
 	{
 		const mdcm::DataElement & de1 = *it;
-		const mdcm::Tag t = de1.GetTag();
+		mdcm::Tag t = de1.GetTag();
+		mdcm::VR vr = get_vr(ds, t, implicit, dicts);
 		mdcm::DataSet::Iterator dup = it;
 		++it;
 		const mdcm::DataElement & de = *dup;
-		const mdcm::VR vr = get_vr(ds, t, implicit, dicts, true);
 		if (ts.find(t) != ts.end() || vr == mdcm::VR::PN)
 		{
 			const mdcm::ByteValue * bv = de.GetByteValue();
@@ -292,8 +289,7 @@ static void replace_pn_recurs__(
 		}
 		else
 		{
-			const mdcm::Tag t2 = de.GetTag();
-			if (compatible_sq(const_cast<const mdcm::DataSet&>(ds), t2, implicit, dicts))
+			if (vr.Compatible(mdcm::VR::SQ))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 				if (sq && sq->GetNumberOfItems() > 0)
@@ -325,8 +321,8 @@ static void remove_recurs__(
 	for (; it != ds.End();)
 	{
 		const mdcm::DataElement & de1 = *it;
-		mdcm::DataSet::Iterator dup = it;
 		mdcm::Tag t = de1.GetTag();
+		mdcm::DataSet::Iterator dup = it;
 		++it;
 		if (ts.find(t) != ts.end())
 		{
@@ -335,11 +331,10 @@ static void remove_recurs__(
 		else
 		{
 			const mdcm::DataElement & de = *dup;
-			const mdcm::Tag t2 = de.GetTag();
-			if (compatible_sq(const_cast<const mdcm::DataSet&>(ds), t2, implicit, dicts))
+			if (compatible_sq(const_cast<const mdcm::DataSet&>(ds), t, implicit, dicts))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
-				if (sq && sq->GetNumberOfItems()>0)
+				if (sq && sq->GetNumberOfItems() > 0)
 				{
 					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
 					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
@@ -368,37 +363,37 @@ static void remove_date_time_recurs__(
 	for (; it != ds.End();)
 	{
 		const mdcm::DataElement & de1 = *it;
-		mdcm::Tag de1tag = de1.GetTag();
+		mdcm::Tag t = de1.GetTag();
+		mdcm::VR vr = get_vr(ds, t, implicit, dicts);
 		mdcm::DataSet::Iterator dup = it;
 		++it;
-		mdcm::VR vr1 = get_vr(ds, de1tag, implicit, dicts);
-		if (de1tag == mdcm::Tag(0x0008,0x0021))
+		if (t == mdcm::Tag(0x0008,0x0021))
 		{
 			replace__(ds, mdcm::Tag(0x0008,0x0021), "", 0, implicit, dicts);
 		}
-		else if (de1tag == mdcm::Tag(0x0008,0x0031))
+		else if (t == mdcm::Tag(0x0008,0x0031))
 		{
 			replace__(ds, mdcm::Tag(0x0008,0x0031), "", 0, implicit, dicts);
 		}
-		else if (de1tag == mdcm::Tag(0x0008,0x0020))
+		else if (t == mdcm::Tag(0x0008,0x0020))
 		{
 			replace__(ds, mdcm::Tag(0x0008,0x0020), "", 0, implicit, dicts);
 		}
-		else if (de1tag == mdcm::Tag(0x0008,0x0030))
+		else if (t == mdcm::Tag(0x0008,0x0030))
 		{
 			replace__(ds, mdcm::Tag(0x0008,0x0030), "", 0, implicit, dicts);
 		}
-		else if (ts.find(de1tag) != ts.end())
+		else if (ts.find(t) != ts.end())
 		{
 			ds.GetDES().erase(dup);
 		}
 		else
 		{
 			const mdcm::DataElement & de = *dup;
-			if (vr1.Compatible(mdcm::VR::SQ))
+			if (vr.Compatible(mdcm::VR::SQ))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
-				if (sq && sq->GetNumberOfItems()>0)
+				if (sq && sq->GetNumberOfItems() > 0)
 				{
 					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
 					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
@@ -427,11 +422,11 @@ static bool find_time_less_1h_recurs__(
 	for (; it != ds.End();)
 	{
 		const mdcm::DataElement & de1 = *it;
-		mdcm::Tag de1tag = de1.GetTag();
-		const mdcm::VR vr1 = get_vr(ds, de1tag, implicit, dicts, true);
+		mdcm::Tag t = de1.GetTag();
+		mdcm::VR vr = get_vr(ds, t, implicit, dicts);
 		mdcm::DataSet::ConstIterator dup = it;
 		++it;
-		if (ts.find(de1tag) != ts.end())
+		if (ts.find(t) != ts.end())
 		{
 			const mdcm::DataElement & de = *dup;
 			const mdcm::ByteValue * bv = de.GetByteValue();
@@ -454,7 +449,7 @@ static bool find_time_less_1h_recurs__(
 						const QString s0 = l.at(x).trimmed();
 						if (!s0.isEmpty())
 						{
-							if (vr1 == mdcm::VR::TM)
+							if (vr == mdcm::VR::TM)
 							{
 								const QString t0 = s0.left(2);
 								bool b0 = false;
@@ -464,7 +459,7 @@ static bool find_time_less_1h_recurs__(
 									return true;
 								}
 							}
-							else if (vr1 == mdcm::VR::DT)
+							else if (vr == mdcm::VR::DT)
 							{
 								if (s0.length() >= 10)
 								{
@@ -490,10 +485,10 @@ static bool find_time_less_1h_recurs__(
 		else
 		{
 			const mdcm::DataElement & de = *dup;
-			if (vr1.Compatible(mdcm::VR::SQ))
+			if (vr.Compatible(mdcm::VR::SQ))
 			{
 				const mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
-				if (sq && sq->GetNumberOfItems()>0)
+				if (sq && sq->GetNumberOfItems() > 0)
 				{
 					const mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
 					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
@@ -515,17 +510,21 @@ static void modify_date_time_recurs__(
 	const std::set<mdcm::Tag> & ts,
 	const bool less1h,
 	const bool implicit,
-	const mdcm::Dicts & dicts)
+	const mdcm::Dicts & dicts,
+	const int y_off,
+	const int m_off,
+	const int d_off,
+	const int s_off)
 {
 	mdcm::DataSet::Iterator it = ds.Begin();
 	for (; it != ds.End();)
 	{
 		const mdcm::DataElement & de1 = *it;
-		const mdcm::Tag de1tag = de1.GetTag();
-		mdcm::VR vr1 = get_vr(ds, de1tag, implicit, dicts, true);
+		mdcm::Tag t = de1.GetTag();
+		mdcm::VR vr = get_vr(ds, t, implicit, dicts);
 		mdcm::DataSet::Iterator dup = it;
 		++it;
-		if (ts.find(de1tag) != ts.end())
+		if (ts.find(t) != ts.end())
 		{
 			const mdcm::DataElement & de = *dup;
 			const mdcm::ByteValue * bv = de.GetByteValue();
@@ -549,19 +548,18 @@ static void modify_date_time_recurs__(
 						if (!s0.isEmpty())
 						{
 							const int s0_length = s0.length();
-							if (vr1 == mdcm::VR::DA)
+							if (vr == mdcm::VR::DA)
 							{
-								// - 2y 3m 4d
 								if (s0_length == 8)
 								{
 									QDate d = QDate::fromString(s0, QString("yyyyMMdd"));
-									d = d.addYears(-2);
-									d = d.addMonths(-3);
-									d = d.addDays(-4);
+									d = d.addYears(-y_off);
+									d = d.addMonths(-m_off);
+									d = d.addDays(-d_off);
 									r += d.toString(QString("yyyyMMdd"));
 								}
 							}
-							else if (vr1 == mdcm::VR::TM)
+							else if (vr == mdcm::VR::TM)
 							{
 								const int tmp0 = s0.indexOf(QString("."));
 								if (tmp0 == 6)
@@ -573,9 +571,8 @@ static void modify_date_time_recurs__(
 									}
 									else
 									{
-										// - 37 m 21 s
 										QTime t = QTime::fromString(s1, QString("HHmmss"));
-										t = t.addSecs(-2241);
+										t = t.addSecs(-s_off);
 										r += t.toString(QString("HHmmss")) + QString(".000000");
 									}
 								}
@@ -594,7 +591,6 @@ static void modify_date_time_recurs__(
 									}
 									else
 									{
-										// - 37 m 21 s
 										if (s0_length == 2)
 										{
 											r += s0;
@@ -602,19 +598,19 @@ static void modify_date_time_recurs__(
 										else if (s0_length == 4)
 										{
 											QTime t = QTime::fromString(s0, QString("HHmm"));
-											t = t.addSecs(-2241);
+											t = t.addSecs(-s_off);
 											r += t.toString(QString("HHmm"));
 										}
 										else if (s0_length == 6)
 										{
 											QTime t = QTime::fromString(s0, QString("HHmmss"));
-											t = t.addSecs(-2241);
+											t = t.addSecs(-s_off);
 											r += t.toString(QString("HHmmss"));
 										}
 									}
 								}
 							}
-							else if (vr1 == mdcm::VR::DT)
+							else if (vr == mdcm::VR::DT)
 							{
 								const int tmp0 = s0.indexOf(QString("-"));
 								const int tmp1 = s0.indexOf(QString("+"));
@@ -642,69 +638,69 @@ static void modify_date_time_recurs__(
 								if (s1_length == 4)
 								{
 									QDate d = QDate::fromString(s1, QString("yyyy"));
-									d = d.addYears(-2);
+									d = d.addYears(-y_off);
 									r += d.toString(QString("yyyy"));
 								}
 								else if (s1_length == 6)
 								{
 									QDate d = QDate::fromString(s1, QString("yyyyMM"));
-									d = d.addYears(-2);
-									d = d.addMonths(-3);
+									d = d.addYears(-y_off);
+									d = d.addMonths(-m_off);
 									r += d.toString(QString("yyyyMM"));
 								}
 								else if (s1_length == 8)
 								{
 									QDate d = QDate::fromString(s1, QString("yyyyMMdd"));
-									d = d.addYears(-2);
-									d = d.addMonths(-3);
-									d = d.addDays(-4);
+									d = d.addYears(-y_off);
+									d = d.addMonths(-m_off);
+									d = d.addDays(-d_off);
 									r += d.toString(QString("yyyyMMdd"));
 								}
 								else if (s1_length == 10)
 								{
 									QDateTime d = QDateTime::fromString(s1, QString("yyyyMMddHH"));
-									d = d.addYears(-2);
-									d = d.addMonths(-3);
-									d = d.addDays(-4);
+									d = d.addYears(-y_off);
+									d = d.addMonths(-m_off);
+									d = d.addDays(-d_off);
 									if (less1h)
 									{
 										;;
 									}
 									else
 									{
-										d = d.addSecs(-2241);
+										d = d.addSecs(-s_off);
 									}
 									r += d.toString("yyyyMMddHH");
 								}
 								else if (s1_length == 12)
 								{
 									QDateTime d = QDateTime::fromString(s1, QString("yyyyMMddHHmm"));
-									d = d.addYears(-2);
-									d = d.addMonths(-3);
-									d = d.addDays(-4);
+									d = d.addYears(-y_off);
+									d = d.addMonths(-m_off);
+									d = d.addDays(-d_off);
 									if (less1h)
 									{
 										;;
 									}
 									else
 									{
-										d = d.addSecs(-2241);
+										d = d.addSecs(-s_off);
 									}
 									r += d.toString("yyyyMMddHHmm");
 								}
 								else if (s1_length == 14)
 								{
 									QDateTime d = QDateTime::fromString(s1, QString("yyyyMMddHHmmss"));
-									d = d.addYears(-2);
-									d = d.addMonths(-3);
-									d = d.addDays(-4);
+									d = d.addYears(-y_off);
+									d = d.addMonths(-m_off);
+									d = d.addDays(-d_off);
 									if (less1h)
 									{
 										;;
 									}
 									else
 									{
-										d = d.addSecs(-2241);
+										d = d.addSecs(-s_off);
 									}
 									r += d.toString("yyyyMMddHHmmss");
 								}
@@ -712,16 +708,16 @@ static void modify_date_time_recurs__(
 								{
 									const QString s2 = s1.left(14);
 									QDateTime d = QDateTime::fromString(s2, QString("yyyyMMddHHmmss"));
-									d = d.addYears(-2);
-									d = d.addMonths(-3);
-									d = d.addDays(-4);
+									d = d.addYears(-y_off);
+									d = d.addMonths(-m_off);
+									d = d.addDays(-d_off);
 									if (less1h)
 									{
 										;;
 									}
 									else
 									{
-										d = d.addSecs(-2241);
+										d = d.addSecs(-s_off);
 									}
 									r += d.toString("yyyyMMddHHmmss") + QString(".000000");
 								}
@@ -732,9 +728,9 @@ static void modify_date_time_recurs__(
 							r += QString("\\");
 						}
 					}
-					mdcm::DataElement de2(de1tag);
-					if (!implicit) de2.SetVR(vr1);
-					de2.SetVR(vr1);
+					mdcm::DataElement de2(t);
+					if (!implicit) de2.SetVR(vr);
+					de2.SetVR(vr);
 					de2.SetByteValue(r.toLatin1(), r.length());
 					ds.Replace(de2);
 				}
@@ -743,17 +739,18 @@ static void modify_date_time_recurs__(
 		else
 		{
 			const mdcm::DataElement & de = *dup;
-			if (vr1.Compatible(mdcm::VR::SQ))
+			if (vr.Compatible(mdcm::VR::SQ))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
-				if (sq && sq->GetNumberOfItems()>0)
+				if (sq && sq->GetNumberOfItems() > 0)
 				{
 					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
 					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
 						mdcm::DataSet & nested = item.GetNestedDataSet();
-						modify_date_time_recurs__(nested, ts, less1h, implicit, dicts);
+						modify_date_time_recurs__(
+							nested, ts, less1h, implicit, dicts, y_off, m_off, d_off, s_off);
 					}
 					mdcm::DataElement de_dup = *dup;
 					de_dup.SetValue(*sq);
@@ -785,11 +782,10 @@ static void empty_recurs__(
 		else
 		{
 			const mdcm::DataElement & de = *dup;
-			const mdcm::Tag t2 = de.GetTag();
-			if (compatible_sq(const_cast<const mdcm::DataSet&>(ds), t2, implicit, dicts))
+			if (compatible_sq(const_cast<const mdcm::DataSet&>(ds), t, implicit, dicts))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
-				if (sq && sq->GetNumberOfItems()>0)
+				if (sq && sq->GetNumberOfItems() > 0)
 				{
 					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
 					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
@@ -826,11 +822,11 @@ static void remove_private__(
 		else
 		{
 			const mdcm::DataElement & de = *dup;
-			const mdcm::Tag t2 = de.GetTag();
-			if (compatible_sq(const_cast<const mdcm::DataSet&>(ds), t2, implicit, dicts))
+			mdcm::Tag t = de.GetTag();
+			if (compatible_sq(const_cast<const mdcm::DataSet&>(ds), t, implicit, dicts))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
-				if (sq && sq->GetNumberOfItems()>0)
+				if (sq && sq->GetNumberOfItems() > 0)
 				{
 					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
 					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
@@ -891,7 +887,7 @@ static void remove_overlays__(mdcm::DataSet & ds)
 	for (; it != ds.End(); ++it)
 	{
 		const mdcm::DataElement & de = *it;
-		const mdcm::Tag t = de.GetTag();
+		mdcm::Tag t = de.GetTag();
 		if (t.GetGroup() >= 0x6000 && t.GetGroup() <= 0x60ff && (t.GetGroup() % 2 == 0))
 		{
 			tmp0.push_back(t);
@@ -908,7 +904,7 @@ static void remove_curves__(mdcm::DataSet & ds)
 	for (; it != ds.End(); ++it)
 	{
 		const mdcm::DataElement & de = *it;
-		const mdcm::Tag t = de.GetTag();
+		mdcm::Tag t = de.GetTag();
 		if (t.GetGroup() >= 0x5000 && t.GetGroup() <= 0x50ff && (t.GetGroup() % 2 == 0))
 		{
 			tmp0.push_back(t);
@@ -936,11 +932,11 @@ static void remove_group_length__(
 		else
 		{
 			const mdcm::DataElement & de = *dup;
-			const mdcm::Tag t2 = de.GetTag();
-			if (compatible_sq(const_cast<const mdcm::DataSet&>(ds), t2, implicit, dicts))
+			mdcm::Tag t = de.GetTag();
+			if (compatible_sq(const_cast<const mdcm::DataSet&>(ds), t, implicit, dicts))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
-				if (sq && sq->GetNumberOfItems()>0)
+				if (sq && sq->GetNumberOfItems() > 0)
 				{
 					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
 					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
@@ -982,7 +978,11 @@ static void anonymize_file__(
 	bool retain_patient_chars,
 	bool retain_institution_id,
 	const QMap<QString, QString> & uids_map,
-	const QMap<QString, QString> & pn_map)
+	const QMap<QString, QString> & pn_map,
+	const int y_off,
+	const int m_off,
+	const int d_off,
+	const int s_off)
 {
 	mdcm::Reader reader;
 #ifdef _WIN32
@@ -1069,7 +1069,8 @@ static void anonymize_file__(
 		{
 			const bool less1h = find_time_less_1h_recurs__(
 				const_cast<const mdcm::DataSet&>(ds), time_tags, implicit, dicts);
-			modify_date_time_recurs__(ds, time_tags, less1h, implicit, dicts);
+			modify_date_time_recurs__(
+				ds, time_tags, less1h, implicit, dicts, y_off, m_off, d_off, s_off);
 		}
 		else
 		{
@@ -1270,9 +1271,9 @@ static void find_pn_recurs__(
 	for (; it != ds.End();)
 	{
 		const mdcm::DataElement & de = *it;
+		mdcm::Tag t = de.GetTag();
+		mdcm::VR vr = get_vr(ds, t, implicit, dicts);
 		++it;
-		const mdcm::Tag t = de.GetTag();
-		mdcm::VR vr = get_vr(ds, t, implicit, dicts, true);
 		if (vr == mdcm::VR::PN || t == mdcm::Tag(0x0010,0x0020))
 		{
 			QString s;
@@ -1280,11 +1281,10 @@ static void find_pn_recurs__(
 		}
 		else
 		{
-			const mdcm::VR vr1 = get_vr(ds, t, implicit, dicts);
-			if (vr1.Compatible(mdcm::VR::SQ))
+			if (vr.Compatible(mdcm::VR::SQ))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
-				if (sq && sq->GetNumberOfItems()>0)
+				if (sq && sq->GetNumberOfItems() > 0)
 				{
 					const mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
 					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
@@ -1322,7 +1322,7 @@ static void find_uids_recurs__(
 			if (compatible_sq(const_cast<const mdcm::DataSet&>(ds), t, implicit, dicts))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
-				if (sq && sq->GetNumberOfItems()>0)
+				if (sq && sq->GetNumberOfItems() > 0)
 				{
 					const mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
 					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
@@ -1435,7 +1435,11 @@ void AnonymazerWidget2::process_directory(
 	unsigned int * count_overlay_in_data,
 	unsigned int * count_errors,
 	const mdcm::Dicts & dicts,
-	QProgressDialog * pd)
+	QProgressDialog * pd,
+	const int y_off,
+	const int m_off,
+	const int d_off,
+	const int s_off)
 {
 	const bool preserve_uids         = uids_radioButton->isChecked();
 	const bool remove_private        = private_radioButton->isChecked();
@@ -1507,7 +1511,11 @@ void AnonymazerWidget2::process_directory(
 				retain_patient_chars,
 				retain_institution_id,
 				uids_m,
-				pn_m);
+				pn_m,
+				y_off,
+				m_off,
+				d_off,
+				s_off);
 			if (overlay_in_data)
 			{
 				(*count_overlay_in_data)++;
@@ -1533,12 +1541,18 @@ void AnonymazerWidget2::process_directory(
 			count_overlay_in_data,
 			count_errors,
 			dicts,
-			pd);
+			pd,
+			y_off, m_off, d_off, s_off);
 	}
 }
 
 void AnonymazerWidget2::run_()
 {
+	srand(time(NULL));
+	const int y_off = rand() % 2 + 1;
+	const int m_off = rand() % 3 + 1;
+	const int d_off = rand() % 4 + 1;
+	const int s_off = rand() % 1999 + 1;
 	//
 	const mdcm::Global & g     = mdcm::GlobalInstance;
 	const mdcm::Dicts  & dicts = g.GetDicts();
@@ -1609,7 +1623,8 @@ void AnonymazerWidget2::run_()
 		&count_overlay_in_data,
 		&count_errors,
 		dicts,
-		pd);
+		pd,
+		y_off, m_off, d_off, s_off);
 	QString message("");
 	if (count_errors > 0)
 	{
