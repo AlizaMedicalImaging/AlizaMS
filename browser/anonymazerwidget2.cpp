@@ -125,6 +125,32 @@ static bool compatible_sq(
 	return false;
 }
 
+static bool is_date_time(const mdcm::VR & vr, const mdcm::Tag & t)
+{
+/* To maintain consistency of PET series with 'modified date' option
+ * some addition processing is done.
+ */
+#if 1
+	if (vr == mdcm::VR::DA ||
+		vr == mdcm::VR::DT ||
+		vr == mdcm::VR::TM)
+	{
+		// TODO
+		if (t != mdcm::Tag(0x0008,0x0106) && // Context Group Version
+			t != mdcm::Tag(0x0008,0x0107) && // Context Group Local Version
+			t != mdcm::Tag(0x0040,0xdb06) && // Template Version
+			t != mdcm::Tag(0x0040,0xdb07) && // Template Local Version
+			t != mdcm::Tag(0x0044,0x000b))   // Product Expiration DateTime
+		return true;
+	}
+	return false;
+#else
+	(void)vr;
+	(void)t;
+	return false;
+#endif
+}
+
 static void replace__(
 	mdcm::DataSet & ds,
 	const mdcm::Tag & t,
@@ -383,7 +409,7 @@ static void remove_date_time_recurs__(
 		{
 			replace__(ds, mdcm::Tag(0x0008,0x0030), "", 0, implicit, dicts);
 		}
-		else if (ts.find(t) != ts.end())
+		else if (is_date_time(vr, t) || (ts.find(t) != ts.end()))
 		{
 			ds.GetDES().erase(dup);
 		}
@@ -426,7 +452,7 @@ static bool find_time_less_1h_recurs__(
 		mdcm::VR vr = get_vr(ds, t, implicit, dicts);
 		mdcm::DataSet::ConstIterator dup = it;
 		++it;
-		if (ts.find(t) != ts.end())
+		if (is_date_time(vr, t) || (ts.find(t) != ts.end()))
 		{
 			const mdcm::DataElement & de = *dup;
 			const mdcm::ByteValue * bv = de.GetByteValue();
@@ -524,7 +550,7 @@ static void modify_date_time_recurs__(
 		mdcm::VR vr = get_vr(ds, t, implicit, dicts);
 		mdcm::DataSet::Iterator dup = it;
 		++it;
-		if (ts.find(t) != ts.end())
+		if (is_date_time(vr, t) || (ts.find(t) != ts.end()))
 		{
 			const mdcm::DataElement & de = *dup;
 			const mdcm::ByteValue * bv = de.GetByteValue();
