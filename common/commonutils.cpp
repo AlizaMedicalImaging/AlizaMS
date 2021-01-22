@@ -4029,23 +4029,22 @@ void CommonUtils::read_geometry_from_image_(ImageVariant * v)
 
 QString CommonUtils::get_screenshot_dir()
 {
+	if (screenshot_dir.isEmpty())
+	{
+#ifdef _WIN32
+		return (QDir::homePath() +
+			QString("/") +
+			QString("Desktop"));
+#else
+		return QDir::homePath();
+#endif
+	}
 	return screenshot_dir;
 }
 
 void CommonUtils::set_screenshot_dir(const QString & s)
 {
-	if (s.isEmpty())
-#ifdef _WIN32
-		screenshot_dir =
-			QDir::homePath() +
-			QString("/") +
-			QString("Desktop");
-#else
-		screenshot_dir = QDir::homePath();
-#endif
-	else
-		screenshot_dir = s;
-
+	screenshot_dir = s;
 }
 
 QString CommonUtils::get_screenshot_name(const QString & s)
@@ -4072,24 +4071,22 @@ QString CommonUtils::get_screenshot_name2()
 
 QString CommonUtils::get_save_dir()
 {
+	if (save_dir.isEmpty())
+	{
+#ifdef _WIN32
+		return (QDir::homePath() +
+			QString("/") +
+			QString("Desktop"));
+#else
+		return QDir::homePath();
+#endif
+	}
 	return save_dir;
 }
 
 void CommonUtils::set_save_dir(const QString & s)
 {
-	if (s.isEmpty())
-#ifdef _WIN32
-		save_dir =
-			QDir::homePath() +
-			QString("/") +
-			QString("Desktop");
-#else
-		save_dir =
-			QDir::homePath();
-#endif
-	else
-		save_dir = s;
-
+	save_dir = s;
 }
 
 QString CommonUtils::get_save_name()
