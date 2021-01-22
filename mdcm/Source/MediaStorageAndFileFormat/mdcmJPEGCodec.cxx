@@ -89,34 +89,32 @@ bool JPEGCodec::CanCode(TransferSyntax const & ts) const
 void JPEGCodec::SetPixelFormat(PixelFormat const & pf)
 {
   ImageCodec::SetPixelFormat(pf);
-  SetBitSample(pf.GetBitsStored()); // in GDCM SetBitsAllocated
+  SetBitSample(pf.GetBitsStored()); //
 }
 
-void JPEGCodec::SetupJPEGBitCodec(int bit)
+void JPEGCodec::SetupJPEGBitCodec(int b)
 {
-  BitSample = bit;
+  BitSample = b;
   delete Internal;
   Internal = NULL;
   if(BitSample <= 8)
   {
-    mdcmDebugMacro("JPEGCodec: using JPEG8");
     Internal = new JPEG8Codec;
+    mdcmDebugMacro("JPEGCodec: using JPEG8, bits=" << b);
   }
   else if(BitSample <= 12)
   {
-    mdcmDebugMacro("JPEGCodec: using JPEG12");
     Internal = new JPEG12Codec;
+    mdcmDebugMacro("JPEGCodec: using JPEG12, bits=" << b);
   }
   else if(BitSample <= 16)
   {
-    mdcmDebugMacro("JPEGCodec: using JPEG16");
     Internal = new JPEG16Codec;
+    mdcmDebugMacro("JPEGCodec: using JPEG16, bits=" << b);
   }
   else
   {
-    mdcmAlwaysWarnMacro("JPEGCodec: cannot instantiate codec for bit sample " << bit);
-    delete Internal;
-    Internal = NULL;
+    mdcmAlwaysWarnMacro("JPEGCodec: SetupJPEGBitCodec(" << b << ") failed");
   }
 }
 
@@ -356,16 +354,8 @@ bool JPEGCodec::DecodeByStreams(std::istream & is, std::ostream & os)
   std::stringstream tmpos;
   if(!Internal->DecodeByStreams(is,tmpos))
   {
-#ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
-    // check if this is one of the buggy lossless JPEG
     if(this->BitSample != Internal->BitSample)
     {
-      // MARCONI_MxTWin-12-MONO2-JpegLossless-ZeroLengthSQ.dcm
-      // PHILIPS_Gyroscan-12-MONO2-Jpeg_Lossless.dcm
-      if(this->BitSample < Internal->BitSample)
-      {
-        mdcmAlwaysWarnMacro("JPEGCodec: buffer will be too small");
-      }
       is.seekg(0, std::ios::beg);
       SetupJPEGBitCodec(Internal->BitSample);
       if(Internal)
@@ -377,13 +367,9 @@ bool JPEGCodec::DecodeByStreams(std::istream & is, std::ostream & os)
         {
           return ImageCodec::DecodeByStreams(tmpos,os);
         }
-        else
-        {
-          mdcmErrorMacro("JPEGCodec: SetupJPEGBitCodec failed");
-        }
       }
+      mdcmErrorMacro("JPEGCodec: SetupJPEGBitCodec failed");
     }
-#endif
     mdcmAlwaysWarnMacro("JPEGCodec: DecodeByStreams() error");
     return false;
   }
@@ -408,7 +394,6 @@ bool JPEGCodec::DecodeByStreams(std::istream & is, std::ostream & os)
 
 bool JPEGCodec::IsValid(PhotometricInterpretation const & pi)
 {
-  bool b = false;
   switch(pi)
   {
     case PhotometricInterpretation::MONOCHROME1:
@@ -417,14 +402,13 @@ bool JPEGCodec::IsValid(PhotometricInterpretation const & pi)
     case PhotometricInterpretation::RGB:
     case PhotometricInterpretation::YBR_FULL:
     case PhotometricInterpretation::YBR_FULL_422:
-    case PhotometricInterpretation::YBR_PARTIAL_422: // TODO
-    case PhotometricInterpretation::YBR_PARTIAL_420: // TODO
-      b = true;
-      break;
+    case PhotometricInterpretation::YBR_PARTIAL_422: // FIXME
+    case PhotometricInterpretation::YBR_PARTIAL_420: // FIXME
+      return true;
     default:
       break;
   }
-  return b;
+  return false;
 }
 
 bool JPEGCodec::DecodeExtent(char * buffer,

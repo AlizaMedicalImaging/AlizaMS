@@ -576,25 +576,26 @@ bool JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
     }
     if(jerr.pub.num_warnings > 0)
     {
-      mdcmAlwaysWarnMacro("jerr.pub.num_warnings = " << jerr.pub.num_warnings);
-      // PHILIPS_Gyroscan-12-MONO2-Jpeg_Lossless.dcm
       if(jerr.pub.msg_code == JWRN_MUST_DOWNSCALE)
       {
         // PHILIPS_Gyroscan-12-Jpeg_Extended_Process_2_4.dcm
         // PHILIPS_Gyroscan-12-MONO2-Jpeg_Lossless.dcm
         // MARCONI_MxTWin-12-MONO2-JpegLossless-ZeroLengthSQ.dcm
         // LJPEG_BuginMDCM12.dcm
-        mdcmAlwaysWarnMacro("jerr.pub.msg_code == JWRN_MUST_DOWNSCALE");
+        mdcmAlwaysWarnMacro("jerr.pub.msg_code: JWRN_MUST_DOWNSCALE\n"
+          "    cinfo.data_precision=" << cinfo.data_precision << "\n"
+          "    this->BitSample=" << this->BitSample);
         this->BitSample = jerr.pub.msg_parm.i[0];
         assert(cinfo.data_precision == this->BitSample);
         jpeg_destroy_decompress(&cinfo);
         return false;
       }
+      mdcmAlwaysWarnMacro("jerr.pub.num_warnings = " << jerr.pub.num_warnings);
     }
     const unsigned int * dims = this->GetDimensions();
     if(cinfo.image_width != dims[0] || cinfo.image_height != dims[1])
     {
-      mdcmAlwaysWarnMacro("JPEG warning (4): JPEG is " <<
+      mdcmAlwaysWarnMacro("JPEG is " <<
         cinfo.image_width << "x" << cinfo.image_height <<
         ", DICOM " << dims[0] << "x" << dims[1]);
     }
