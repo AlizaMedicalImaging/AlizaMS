@@ -1490,7 +1490,7 @@ QString SRUtils::read_sr_title2(
 			qd.toString(QString("d MMM yyyy")) +
 			QString("</span></p>\n");
 	}
-	s += QString("<span class='y'><p id=\"1b\"><ul>");
+	s += QString("<span class='y'><ul>");
 	QString id;
 	if (DicomUtils::get_string_value(
 			ds,
@@ -1552,7 +1552,7 @@ QString SRUtils::read_sr_title2(
 	}
 	//
 	//
-	s += QString("</ul></p>\n</span>");
+	s += QString("</ul></span>\n");
 	return s;
 }
 
