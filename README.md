@@ -64,3 +64,6 @@ Highlights
  * United Imaging Healthcare (UIH) Grid / VFrame format
  * Elscint ELSCINT1 PMSCT_RLE1 and PMSCT_RGB1
  * DICOM metadata
+
+
+S. wiki for example how to build on Linux.
