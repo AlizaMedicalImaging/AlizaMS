@@ -12,21 +12,21 @@ Linux
 To start on Linux extract archive and run _alizams.sh_
 
 ```
-cd alizams-1.2.2_linux
+cd alizams-1.3.0_linux
 ./alizams.sh
 ```
 
 Optionally install local desktop menu entry
 
 ```
-cd alizams-1.2.2_linux/install_menu
+cd alizams-1.3.0_linux/install_menu
 ./install_menu.sh
 ```
 
 To remove local menu entry
 
 ```
-cd alizams-1.2.2_linux/install_menu
+cd alizams-1.3.0_linux/install_menu
 ./uninstall_menu.sh
 ```
 
@@ -54,6 +54,7 @@ Highlights
  * View uniform and non-uniform series in physical space
  * 2D+t, 3D+t animations
  * Consistently de-identify DICOM
+ * View DICOM metadata
  * Ultrasound incl. proper measurement in regions, cine
  * Scout (localizer) lines
  * Grayscale softcopy presentation
@@ -63,7 +64,7 @@ Highlights
  * Siemens mosaic format
  * United Imaging Healthcare (UIH) Grid / VFrame format
  * Elscint ELSCINT1 PMSCT_RLE1 and PMSCT_RGB1
- * DICOM metadata
+
 
 Build
 -----
