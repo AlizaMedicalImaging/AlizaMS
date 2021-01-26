@@ -65,5 +65,9 @@ Highlights
  * Elscint ELSCINT1 PMSCT_RLE1 and PMSCT_RGB1
  * DICOM metadata
 
+Build
+-----
 
-S. wiki for example how to build on Linux.
+ * S. ![wiki](https://github.com/AlizaMedicalImaging/AlizaMS/wiki) for example how to build on Linux.
+ * Or use cmake-gui to go through settings, specially on Windows.
+ * Open an issue to get support.
