@@ -128,7 +128,7 @@ static bool compatible_sq(
 static bool is_date_time(const mdcm::VR & vr, const mdcm::Tag & t)
 {
 /* To maintain consistency of PET series with 'modified date' option
- * some addition processing is done.
+ * some additional processing is done.
  */
 #if 1
 	if (vr == mdcm::VR::DA ||
