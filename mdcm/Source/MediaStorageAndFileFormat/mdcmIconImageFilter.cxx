@@ -56,7 +56,7 @@ void IconImageFilter::ExtractIconImages()
     SmartPointer<SequenceOfItems> sq = iconimagesq.GetValueAsSQ();
     if(sq)
     {
-      mdcmAssertAlwaysMacro(sq->GetNumberOfItems() == 1);
+      if(sq->GetNumberOfItems() != 1) return;
       SmartPointer<IconImage> si1 = new IconImage;
       IconImage & pixeldata = *si1;
       SequenceOfItems::ConstIterator it = sq->Begin();
@@ -360,7 +360,7 @@ void IconImageFilter::ExtractVeproIconImages()
     const char * raw = buf + sizeof(data);
     size_t offset = 4;
     int magic = memcmp(raw, "RAW\0", 4);
-    mdcmAssertAlwaysMacro(magic == 0);
+    if(magic != 0) return;
     unsigned int dims[3] = {};
     dims[0] = data.Width;
     dims[1] = data.Height;

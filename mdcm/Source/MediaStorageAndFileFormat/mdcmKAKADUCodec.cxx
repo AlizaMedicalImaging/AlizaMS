@@ -25,7 +25,6 @@
 #include "mdcmFilename.h"
 #include "mdcmSystem.h"
 #include "mdcmSequenceOfFragments.h"
-#include "mdcmPNMCodec.h"
 #include "mdcmByteSwap.txx"
 
 namespace mdcm
@@ -40,7 +39,7 @@ KAKADUCodec::~KAKADUCodec()
 {
 }
 
-bool KAKADUCodec::CanDecode(TransferSyntax const &ts) const
+bool KAKADUCodec::CanDecode(TransferSyntax const & ts) const
 {
 #ifndef MDCM_USE_KAKADU
   (void)ts;
@@ -56,7 +55,7 @@ bool KAKADUCodec::CanCode(TransferSyntax const &) const
   return false;
 }
 
-bool KAKADUCodec::Decode(DataElement const &in, DataElement &out)
+bool KAKADUCodec::Decode(DataElement const & in, DataElement & out)
 {
 #ifndef MDCM_USE_KAKADU
   (void)in;
@@ -96,10 +95,8 @@ bool KAKADUCodec::Decode(DataElement const &in, DataElement &out)
     kakadu_command += " -o ";
     kakadu_command += output;
 
-    //std::cerr << kakadu_command << std::endl;
     mdcmDebugMacro(kakadu_command);
     int ret = system(kakadu_command.c_str());
-    //std::cerr << "system: " << ret << std::endl;
 
     size_t len = System::FileSize(output.c_str());
     if(!len) return false;
@@ -150,10 +147,8 @@ bool KAKADUCodec::Decode(DataElement const &in, DataElement &out)
       std::ofstream outfile(input.c_str(), std::ios::binary);
       const Fragment &frag = sf->GetFragment(i);
       assert(!frag.IsEmpty());
-      const ByteValue *bv = frag.GetByteValue();
-      assert(bv);
-      //sf->WriteBuffer(outfile);
-      bv->WriteBuffer(outfile);
+      const ByteValue * bv = frag.GetByteValue();
+      if(bv) bv->WriteBuffer(outfile);
       outfile.close();
 
 #ifdef MDCM_USE_SYSTEM_KAKADU
@@ -168,10 +163,8 @@ bool KAKADUCodec::Decode(DataElement const &in, DataElement &out)
       kakadu_command += " -o ";
       kakadu_command += output;
 
-      //std::cerr << kakadu_command << std::endl;
       mdcmDebugMacro(kakadu_command);
       int ret = system(kakadu_command.c_str());
-      //std::cerr << "system: " << ret << std::endl;
 
       size_t len = System::FileSize(output.c_str());
       if(!len) return false;
@@ -180,7 +173,6 @@ bool KAKADUCodec::Decode(DataElement const &in, DataElement &out)
       char * buf = new char[len];
       is.read(buf, len);
       os.write(buf, len);
-      //out.SetByteValue(buf, len);
       delete[] buf;
 
       if(!System::RemoveFile(input.c_str()))
@@ -211,7 +203,7 @@ bool KAKADUCodec::Decode(DataElement const &in, DataElement &out)
 #endif
 }
 
-bool KAKADUCodec::Code(DataElement const &in, DataElement &out)
+bool KAKADUCodec::Code(DataElement const & in, DataElement & out)
 {
 #ifndef MDCM_USE_KAKADU
   (void)in;

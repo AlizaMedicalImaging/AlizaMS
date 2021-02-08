@@ -28,19 +28,17 @@ namespace mdcm
 {
 
 /**
- * \brief KAKADUCodec
+ * KAKADUCodec
  */
 class KAKADUCodec : public ImageCodec
 {
 public:
   KAKADUCodec();
   ~KAKADUCodec();
-  bool CanDecode(TransferSyntax const &ts) const;
-  bool CanCode(TransferSyntax const &ts) const;
-
-  bool Decode(DataElement const &is, DataElement &os);
-  bool Code(DataElement const &in, DataElement &out);
-
+  bool CanDecode(TransferSyntax const &) const;
+  bool CanCode(TransferSyntax const &) const;
+  bool Decode(DataElement const &, DataElement &);
+  bool Code(DataElement const &, DataElement &);
   virtual ImageCodec * Clone() const;
 private:
 };

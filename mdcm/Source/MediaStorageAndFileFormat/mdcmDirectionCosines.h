@@ -29,26 +29,26 @@ namespace mdcm
 {
 
 /**
- * \brief class to handle DirectionCosines
+ * Class to handle DirectionCosines
  */
 
 class MDCM_EXPORT DirectionCosines
 {
 public:
   DirectionCosines();
-  DirectionCosines(const double dircos[6]);
+  DirectionCosines(const double[6]);
   ~DirectionCosines();
   void Print(std::ostream &) const;
-  void Cross(double z[3]) const;
+  void Cross(double[3]) const;
   double Dot() const;
-  static double Dot(const double x[3], const double y[3]);
+  static double Dot(const double[3], const double[3]);
   void Normalize();
-  static void Normalize(double v[3]);
+  static void Normalize(double[3]);
   operator const double* () const { return Values; }
   bool IsValid() const;
-  bool SetFromString(const char * str);
-  double CrossDot(DirectionCosines const & dc) const;
-  double ComputeDistAlongNormal(const double ipp[3]) const;
+  bool SetFromString(const char *);
+  double CrossDot(DirectionCosines const &) const;
+  double ComputeDistAlongNormal(const double[3]) const;
 
 private:
   double Values[6];
