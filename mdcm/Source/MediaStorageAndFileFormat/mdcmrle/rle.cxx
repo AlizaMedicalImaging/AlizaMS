@@ -135,8 +135,8 @@ bool rle_encoder::write_header(dest & d)
     comp_pos[s] = offsets[s];
   }
   memcpy(internals->comp_pos, comp_pos, sizeof(comp_pos));
-  bool b = src->seek(start); // go back to start position
-  assert(b); (void)b;
+  const bool b = src->seek(start); // go back to start position
+  (void)b;
   return true;
 }
 
@@ -542,7 +542,8 @@ bool rle_decoder::read_header(pixel_info & pi)
   for(int i = 1; i < internals->nsources; i++)
   {
     internals->sources[i] = s->clone();
-    internals->sources[i]->seek(internals->rh.offset[i]);
+    const bool ok = internals->sources[i]->seek(internals->rh.offset[i]);
+    (void)ok;
   }
   return true;
 }

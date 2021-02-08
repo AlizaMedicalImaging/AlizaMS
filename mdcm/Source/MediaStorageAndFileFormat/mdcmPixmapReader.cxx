@@ -424,7 +424,7 @@ static bool DoOverlays(const DataSet & ds, Pixmap & pixeldata)
         }
         updateoverlayinfo[idxoverlays] = true;
       }
-	  else
+      else
       {
         mdcmWarningMacro("Could not extract overlay from pixel data (2)");
       }
@@ -713,15 +713,15 @@ bool PixmapReader::ReadImageInternal(MediaStorage const &ms, bool handlepixeldat
         {
           lut->SetLUT(LookupTable::LookupTableType(i),
             (const unsigned char*)lut_raw->GetPointer(), lut_raw->GetLength());
+          unsigned int check =
+            (el_us3.GetValue(0) ? el_us3.GetValue(0) : 65536) * el_us3.GetValue(2) / 8;
+          assert(!lut->Initialized() || check == lut_raw->GetLength());
+          (void)check;
         }
         else
         {
           lut->Clear();
         }
-        unsigned int check =
-          (el_us3.GetValue(0) ? el_us3.GetValue(0) : 65536)
-          * el_us3.GetValue(2) / 8;
-        assert(!lut->Initialized() || check == lut_raw->GetLength()); (void)check;
       }
       else if(ds.FindDataElement(seglut))
       {
@@ -773,16 +773,16 @@ bool PixmapReader::ReadImageInternal(MediaStorage const &ms, bool handlepixeldat
           // LookupTableType::SUPPLRED == 4
           lut->SetLUT(LookupTable::LookupTableType(i+4),
             (const unsigned char*)lut_raw->GetPointer(), lut_raw->GetLength());
+          unsigned int check =
+            (el_us3.GetValue(0) ? el_us3.GetValue(0) : 65536) * el_us3.GetValue(2) / 8;
+          assert(!lut->Initialized() || check == lut_raw->GetLength());
+          (void)check;
         }
         else
         {
           lut_ok = false;
           break;
         }
-        unsigned int check =
-          (el_us3.GetValue(0) ? el_us3.GetValue(0) : 65536)
-          * el_us3.GetValue(2) / 8;
-        assert(!lut->Initialized() || check == lut_raw->GetLength()); (void)check;
       }
       else if(ds.FindDataElement(seglut))
       {

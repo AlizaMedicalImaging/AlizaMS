@@ -179,8 +179,11 @@ bool StringFilter::ExecuteQuery(std::string const & query_const,
       state = 2;
       assert(subtokens[1] == "number");
 #if !defined(NDEBUG)
-      const ByteValue * const bv = curde->GetByteValue(); (void)bv;
-      assert(bv);
+      const ByteValue * const bv = curde->GetByteValue();
+      if (!bv)
+      {
+        mdcmAlwaysWarnMacro("ByteValue is NULL");
+      }
 #endif
     }
     else

@@ -30,10 +30,8 @@
 
 namespace mdcm
 {
-/*
-http://groups.google.com/group/comp.compression/browse_thread/thread/e2e20d85a436cfa5
-*/
-
+//http://groups.google.com/group/comp.compression/browse_thread/thread/e2e20d85a436cfa5
+//PHILIPS_Gyroscan-12-Jpeg_Extended_Process_2_4.dcm
 PVRGCodec::PVRGCodec()
 {
   NeedByteSwap = true;

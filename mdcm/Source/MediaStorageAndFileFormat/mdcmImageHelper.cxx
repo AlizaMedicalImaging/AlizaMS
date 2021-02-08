@@ -1540,7 +1540,6 @@ void ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spac
         assert(vr == VR::DS);
         assert(de.GetTag() == Tag(0x3004,0x000c));
         Attribute<0x28,0x8> numberoframes;
-        // Make we are multiframes
         if(ds.FindDataElement(numberoframes.GetTag()))
         {
           const DataElement& de1 = ds.GetDataElement(numberoframes.GetTag());
@@ -1548,20 +1547,23 @@ void ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spac
           Element<VR::DS,VM::VM2_n> el;
           el.SetLength(numberoframes.GetValue() * vr.GetSizeof());
           assert(entry.GetVM() == VM::VM2_n);
-          double spacing_start = 0;
-          assert(0 < numberoframes.GetValue());
-          for(int i = 0; i < numberoframes.GetValue(); ++i)
+          double spacing_start = 0.0;
+          const unsigned int number_of_frames = numberoframes.GetValue();
+          if (number_of_frames > 0)
           {
-            el.SetValue(spacing_start, i);
-            spacing_start += spacing[2];
+            for(unsigned int i = 0; i < number_of_frames; ++i)
+            {
+              el.SetValue(spacing_start, i);
+              spacing_start += spacing[2];
+            }
+            std::stringstream os;
+            el.Write(os);
+            de.SetVR(VR::DS);
+            if(os.str().size() % 2) os << " ";
+            VL::Type osStrSize = (VL::Type)os.str().size();
+            de.SetByteValue(os.str().c_str(), osStrSize);
+            ds.Replace(de);
           }
-          std::stringstream os;
-          el.Write(os);
-          de.SetVR(VR::DS);
-          if(os.str().size() % 2) os << " ";
-          VL::Type osStrSize = (VL::Type)os.str().size();
-          de.SetByteValue(os.str().c_str(), osStrSize);
-          ds.Replace(de);
         }
       }
       else
@@ -1588,6 +1590,7 @@ void ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spac
           break;
         default:
           assert(0);
+          break;
         }
       }
     }
@@ -1658,7 +1661,7 @@ void ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
   }
 
   // FIXME hardcoded
-  if(ms != MediaStorage::CTImageStorage
+  if( ms != MediaStorage::CTImageStorage
    && ms != MediaStorage::MRImageStorage
    && ms != MediaStorage::RTDoseStorage
    && ms != MediaStorage::PETImageStorage
@@ -1686,7 +1689,7 @@ void ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
     // FIXME remove the ipp tag?
     return;
   }
-  if(ms == MediaStorage::EnhancedCTImageStorage
+  if( ms == MediaStorage::EnhancedCTImageStorage
    || ms == MediaStorage::EnhancedMRImageStorage
    || ms == MediaStorage::EnhancedMRColorImageStorage
    || ms == MediaStorage::EnhancedPETImageStorage
@@ -1800,14 +1803,11 @@ void ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
           DataSet &subds4 = item4.GetNestedDataSet();
           Attribute<0x0008,0x1150> atReferencedSOPClassUID;
           if(ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage)
-            atReferencedSOPClassUID.SetValue(
-              "1.2.840.10008.5.1.4.1.1.2.2");
+            atReferencedSOPClassUID.SetValue("1.2.840.10008.5.1.4.1.1.2.2");
           else if(ms == MediaStorage::LegacyConvertedEnhancedMRImageStorage)
-            atReferencedSOPClassUID.SetValue(
-              "1.2.840.10008.5.1.4.1.1.4.4");
+            atReferencedSOPClassUID.SetValue("1.2.840.10008.5.1.4.1.1.4.4");
           else if(ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
-            atReferencedSOPClassUID.SetValue(
-              "1.2.840.10008.5.1.4.1.1.128.1");
+            atReferencedSOPClassUID.SetValue("1.2.840.10008.5.1.4.1.1.128.1");
           subds4.Replace(atReferencedSOPClassUID.GetAsDataElement());
           Attribute<0x0008,0x1155> atReferencedSOPInstanceUID;
           UIDGenerator gReferencedSOPInstanceUID;
@@ -2017,7 +2017,7 @@ void ImageHelper::SetRescaleInterceptSlopeValue(File & f, const Image & img)
   assert(MediaStorage::IsImage(ms));
   DataSet &ds = f.GetDataSet();
   // FIXME Hardcoded
-  if(ms != MediaStorage::CTImageStorage
+  if( ms != MediaStorage::CTImageStorage
    && ms != MediaStorage::ComputedRadiographyImageStorage
    && ms != MediaStorage::MRImageStorage // FIXME
    && ms != MediaStorage::PETImageStorage

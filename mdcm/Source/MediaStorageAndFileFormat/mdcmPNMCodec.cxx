@@ -47,11 +47,11 @@ bool PNMCodec::CanCode(TransferSyntax const &) const
   return false;
 }
 
-
 static uint8_t reverseBitsByte(uint8_t x)
 {
   uint8_t b = 0;
-  for (int i = 0; i < 8; ++i) {
+  for (int i = 0; i < 8; ++i)
+  {
     b <<= 1;
     b |= (x & 1);
     x >>= 1;
@@ -65,93 +65,81 @@ bool PNMCodec::Write(const char *filename, const DataElement &out) const
   const unsigned int *dims = this->GetDimensions();
   const PhotometricInterpretation &pi = this->GetPhotometricInterpretation();
   const PixelFormat& pf = GetPixelFormat();
-  if( pi == PhotometricInterpretation::MONOCHROME2
-    || pi == PhotometricInterpretation::MONOCHROME1 ) // warning viz will be surprising
-    {
+  if(pi == PhotometricInterpretation::MONOCHROME2 ||
+     pi == PhotometricInterpretation::MONOCHROME1) // warning viz will be surprising
+  {
     // FIXME possible mismatch pi vs pf (eg. pbm with mono2)
-    if( pf == PixelFormat::SINGLEBIT)
+    if(pf == PixelFormat::SINGLEBIT)
       os << "P4\n";
     else
       os << "P5\n";
-    }
-  else if( pi == PhotometricInterpretation::RGB
-    || pi == PhotometricInterpretation::PALETTE_COLOR )
-    {
+  }
+  else if(pi == PhotometricInterpretation::RGB ||
+          pi == PhotometricInterpretation::PALETTE_COLOR)
+  {
     os << "P6\n";
-    }
+  }
   else
-    {
-    mdcmErrorMacro( "PhotometricInterpretation unhandled: " << pi );
+  {
+    mdcmErrorMacro("PhotometricInterpretation unhandled: " << pi);
     return false;
-    }
+  }
   os << dims[0] << " " << dims[1] << "\n";
-
   const unsigned int pc = this->GetPlanarConfiguration();
-  if( pc )
-    {
-    mdcmErrorMacro( "PlanarConfiguration unhandled: " << pc );
+  if(pc)
+  {
+    mdcmErrorMacro("PlanarConfiguration unhandled: " << pc);
     return false;
-    }
-
+  }
   switch(pf)
-    {
+  {
   case PixelFormat::SINGLEBIT:
     break;
   case PixelFormat::UINT8:
-  //case PixelFormat::INT8:
     os << "255\n";
     break;
   case PixelFormat::UINT16:
-  //case PixelFormat::INT16:
     os << "65535\n";
     break;
   default:
-    mdcmErrorMacro( "Unhandled PF: " << pf );
+    mdcmErrorMacro("Unhandled PF: " << pf);
     return false;
-    }
-
-  const ByteValue *bv = out.GetByteValue();
-  // FIXME: PNM Codec cannot handle encapsulated syntax... sigh
+  }
+  const ByteValue * bv = out.GetByteValue();
+  // FIXME: PNM Codec cannot handle encapsulated syntax
   if(!bv)
-    {
-    mdcmErrorMacro( "PNM Codec does not handle compress syntax. You need to decompress first." );
+  {
+    mdcmErrorMacro("PNM Codec does not handle compress syntax. You need to decompress first.");
     return false;
-    }
-  assert(bv);
-
-  if( pi == PhotometricInterpretation::PALETTE_COLOR )
-    {
+  }
+  if(pi == PhotometricInterpretation::PALETTE_COLOR)
+  {
     std::stringstream is;
-    is.write( bv->GetPointer(), bv->GetLength() );
-
+    is.write(bv->GetPointer(), bv->GetLength());
     const LookupTable &lut = this->GetLUT();
     lut.Decode(is, os);
-    }
+  }
   else
+  {
+    if(pf.GetBitsAllocated() == 16)
     {
-    if( pf.GetBitsAllocated() == 16 )
-      {
-      bv->Write<SwapperDoOp, uint16_t>( os );
-      }
-    else if( pf.GetBitsAllocated() == 1 )
-      {
+      bv->Write<SwapperDoOp, uint16_t>(os);
+    }
+    else if(pf.GetBitsAllocated() == 1)
+    {
       const uint8_t *x = (const uint8_t*) bv->GetPointer();
-      for( size_t i = 0; i < bv->GetLength(); i++ )
-        {
+      for(size_t i = 0; i < bv->GetLength(); i++)
+      {
         uint8_t b = reverseBitsByte(x[i]);
         os.write((char*)&b, 1);
-        }
-      }
-    else
-      {
-      //bv->Write<SwapperDoOp, uint8_t>( os );
-      bv->WriteBuffer( os );
       }
     }
-
+    else
+    {
+      bv->WriteBuffer(os);
+    }
+  }
   os.close();
-
-
   return true;
 }
 
@@ -162,56 +150,52 @@ bool PNMCodec::Read(const char *filename, DataElement &out) const
   std::string type, str;
   std::getline(is,type);
   PhotometricInterpretation pi;
-  if( type == "P5" )
+  if(type == "P5")
     pi = PhotometricInterpretation::MONOCHROME2;
-  else if( type == "P6" )
+  else if(type == "P6")
     pi = PhotometricInterpretation::RGB;
   else
-    {
+  {
     std::cerr << "Unhandled PGM type: " << type << std::endl;
     return false;
-    }
-
-  // skip comments:
-  while( is.peek() == '#' )
-    {
+  }
+  // skip comments
+  while(is.peek() == '#')
+  {
     std::getline(is, str);
-    //std::cout << str << std::endl;
-    }
-  unsigned int dims[3] = {};
+  }
+  unsigned int dims[3] = { 0, 0, 0 };
   is >> dims[0]; is >> dims[1];
   unsigned int maxval;
   is >> maxval;
-  // some kind of empty line...
-  if( is.peek() == '\n' )
-    {
+  // empty line
+  if(is.peek() == '\n')
+  {
     is.get();
-    }
+  }
   std::streampos pos = is.tellg();
-  //assert(pos < INT_MAX);
-  size_t m = (len - (size_t)pos ) / ( dims[0]*dims[1] );
-  if( m * dims[0] * dims[1] != len - pos )
-    {
-    std::cerr << "Problem computing length" << std::endl;
+  if(dims[0]*dims[1])
+  {
     return false;
-    }
+  }
+  size_t m = (len - (size_t)pos) / (dims[0]*dims[1]);
   PixelFormat pf;
   switch(maxval)
-    {
+  {
   case 255:
     pf = PixelFormat::UINT8;
     break;
   case 1023:
     pf = PixelFormat::UINT16;
-    pf.SetBitsStored( 10 );
+    pf.SetBitsStored(10);
     break;
   case 4095:
     pf = PixelFormat::UINT16;
-    pf.SetBitsStored( 12 );
+    pf.SetBitsStored(12);
     break;
   case 32767:
     pf = PixelFormat::UINT16;
-    pf.SetBitsStored( 15 );
+    pf.SetBitsStored(15);
     break;
   case 65535:
     pf = PixelFormat::UINT16;
@@ -219,122 +203,114 @@ bool PNMCodec::Read(const char *filename, DataElement &out) const
   default:
     std::cerr << "Unhandled max val: " << maxval << std::endl;
     return false;
-    }
-  if( pi == PhotometricInterpretation::RGB )
-    {
-    pf.SetSamplesPerPixel( 3 );
-    }
-  //if ( maxval * 8 != bpp ) return 1;
-
+  }
+  if(pi == PhotometricInterpretation::RGB)
+  {
+    pf.SetSamplesPerPixel(3);
+  }
   size_t pdlen = GetBufferLength();
-  assert( pdlen );
+  assert(pdlen);
   char * buf = new char[pdlen];
-  // is should be at right offset, just read!
+  // is should be at right offset
   is.read(buf, len);
-  if( !is.eof() )
+  if(!is.eof())
   {
     delete[] buf;
     return false;
   }
-
-  out.SetTag( Tag(0x7fe0,0x0010) );
+  out.SetTag(Tag(0x7fe0,0x0010));
   VL::Type pdLenSize = (VL::Type)pdlen;
-  out.SetByteValue( buf, pdLenSize );
+  out.SetByteValue(buf, pdLenSize);
   delete[] buf;
-
   is.close();
-
   return true;
 }
 
-static inline int log2( int n )
+static inline int log2(int n)
 {
   int bits = 0;
   while (n > 0)
-    {
+  {
     bits++;
     n >>= 1;
-    }
+  }
   return bits;
 }
 
 bool PNMCodec::GetHeaderInfo(std::istream &is, TransferSyntax &ts)
 {
-  is.seekg( 0, std::ios::end );
+  is.seekg(0, std::ios::end);
   std::streampos len = is.tellg();
-  //assert(len < INT_MAX);
-  is.seekg( 0, std::ios::beg );
-
+  is.seekg(0, std::ios::beg);
   std::string type, str;
   std::getline(is,type);
   PhotometricInterpretation pi;
-  if( type == "P4" ) // P4 => mono W/B !
+  if(type == "P4") // P4 => mono W/B
     pi = PhotometricInterpretation::MONOCHROME1;
-  else if( type == "P5" )
+  else if(type == "P5")
     pi = PhotometricInterpretation::MONOCHROME2;
-  else if( type == "P6" ) // P3 => ASCII
+  else if(type == "P6") // P3 => ASCII
     pi = PhotometricInterpretation::RGB;
   else
-    {
+  {
     std::cerr << "Unhandled PGM type: " << type << std::endl;
     return false;
-    }
-
-  // skip comments:
-  while( is.peek() == '#' )
-    {
+  }
+  // skip comments
+  while(is.peek() == '#')
+  {
     std::getline(is, str);
-    //std::cout << str << std::endl;
-    }
+  }
   unsigned int dims[3] = {};
   is >> dims[0]; is >> dims[1];
   unsigned int maxval;
-  if( type == "P4" )
+  if(type == "P4")
     maxval = 1;
   else
     is >> maxval;
   // http://netpbm.sourceforge.net/doc/pgm.html
-  // some kind of empty line...
-  if( is.peek() == '\n' )
-    {
+  // empty line
+  if(is.peek() == '\n')
+  {
     is.get();
-    }
+  }
   std::streamoff pos = is.tellg();
-  //assert(len < INT_MAX);
-  //assert(pos < INT_MAX);
-  size_t m = ((size_t)len - (size_t)pos ) / ( dims[0]*dims[1] );
+  size_t m = ((size_t)len - (size_t)pos) / (dims[0]*dims[1]);
   bool cond;
-  if( type == "P4" ) {
+  if(type == "P4")
+  {
     const size_t bytesPerRow = dims[0] / 8 + (dims[0] % 8 != 0 ? 1 : 0);
     cond = bytesPerRow * dims[1] != ((size_t)len - (size_t)pos);
   }
   else
+  {
     cond = m * dims[0] * dims[1] != (size_t)len - (size_t)pos;
-  if( cond )
-    {
+  }
+  if(cond)
+  {
     std::cerr << "Problem computing length" << std::endl;
     std::cerr << "Pos: " << len - pos << std::endl;
     std::cerr << "expected: " << m * dims[0] * dims[1] << std::endl;
     return false;
-    }
+  }
   PixelFormat pf = GetPixelFormat();
 #if 0
   switch(maxval)
-    {
+  {
   case 255:
     pf = PixelFormat::UINT8;
     break;
   case 1023:
     pf = PixelFormat::UINT16;
-    pf.SetBitsStored( 10 );
+    pf.SetBitsStored(10);
     break;
   case 4095:
     pf = PixelFormat::UINT16;
-    pf.SetBitsStored( 12 );
+    pf.SetBitsStored(12);
     break;
   case 32767:
     pf = PixelFormat::UINT16;
-    pf.SetBitsStored( 15 );
+    pf.SetBitsStored(15);
     break;
   case 65535:
     pf = PixelFormat::UINT16;
@@ -342,54 +318,46 @@ bool PNMCodec::GetHeaderInfo(std::istream &is, TransferSyntax &ts)
   default:
     std::cerr << "Unhandled max val: " << maxval << std::endl;
     return false;
-    }
+  }
 #else
-  const int nbits = log2( maxval );
-  // handle case where nbits = 0 also:
-  if( nbits > 0 && nbits <= 1 )
-    {
-    pf.SetBitsAllocated( 1 );
-    }
-  else if( nbits > 1 && nbits <= 8 )
-    {
-    pf.SetBitsAllocated( 8 );
-    pf.SetBitsStored( (unsigned short)nbits );
-    }
-  else if( nbits > 8 && nbits <= 16 )
-    {
-    pf.SetBitsAllocated( 16 );
-    pf.SetBitsStored( (unsigned short)nbits );
-    }
-  else if( nbits > 16 && nbits <= 32 )
-    {
-    pf.SetBitsAllocated( 32 );
-    pf.SetBitsStored( (unsigned short)nbits );
-    }
+  const int nbits = log2(maxval);
+  // handle case where nbits = 0
+  if(nbits > 0 && nbits <= 1)
+  {
+    pf.SetBitsAllocated(1);
+  }
+  else if(nbits > 1 && nbits <= 8)
+  {
+    pf.SetBitsAllocated(8);
+    pf.SetBitsStored((unsigned short)nbits);
+  }
+  else if(nbits > 8 && nbits <= 16)
+  {
+    pf.SetBitsAllocated(16);
+    pf.SetBitsStored((unsigned short)nbits);
+  }
+  else if(nbits > 16 && nbits <= 32)
+  {
+    pf.SetBitsAllocated(32);
+    pf.SetBitsStored((unsigned short)nbits);
+  }
   else
-    {
+  {
     std::cerr << "Unhandled max val: " << maxval << std::endl;
     return false;
-    }
+  }
 #endif
-  if( pi == PhotometricInterpretation::RGB )
-    {
-    pf.SetSamplesPerPixel( 3 );
-    }
-  //if ( maxval * 8 != bpp ) return 1;
-
-  //image.SetTransferSyntax( TransferSyntax::ExplicitVRBigEndian ); // PGM are big endian
-  //image.SetTransferSyntax( TransferSyntax::ExplicitVRLittleEndian ); // PGM are big endian
-  //image.SetTransferSyntax( TransferSyntax::ImplicitVRBigEndianPrivateGE ); // PGM are big endian
-  if( pf.GetBitsAllocated() > 8 )
+  if(pi == PhotometricInterpretation::RGB)
+  {
+    pf.SetSamplesPerPixel(3);
+  }
+  if(pf.GetBitsAllocated() > 8)
     ts = TransferSyntax::ImplicitVRBigEndianPrivateGE;
   else
-    //ts = TransferSyntax::ImplicitVRLittleEndian; // nicer to handle than private GE
     ts = TransferSyntax::ExplicitVRLittleEndian; // nicer to handle than private GE
-
-  SetPhotometricInterpretation( pi );
-  SetPixelFormat( pf );
-  SetDimensions( dims );
-
+  SetPhotometricInterpretation(pi);
+  SetPixelFormat(pf);
+  SetDimensions(dims);
   return true;
 }
 

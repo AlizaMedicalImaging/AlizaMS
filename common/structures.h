@@ -170,14 +170,25 @@ public:
 		vol_pos_ok(false),
 		temp_pos_off_ok(false),
 		us_temp_pos_unknown_ok(false),
-		rescale_ok(false) {}
-	~FrameGroup() {}
+		rescale_ok(false)
+	{
+		vol_pos[0] = 0.0;
+		vol_pos[1] = 0.0;
+		vol_pos[2] = 0.0;
+		vol_orient[0] = 0.0;
+		vol_orient[1] = 0.0;
+		vol_orient[2] = 0.0;
+		vol_orient[3] = 0.0;
+		vol_orient[4] = 0.0;
+		vol_orient[5] = 0.0;
+	}
+	~FrameGroup()
+	{
+	}
 	int    id;
 	int    stack_id;
 	int    in_stack_pos_num;
 	int    temp_pos_idx;
-	double vol_pos[3];
-	double vol_orient[6];
 	double temp_pos_off;
 	double us_temp_pos_unknown;
 	double rescale_intercept;
@@ -203,6 +214,8 @@ public:
 	bool temp_pos_off_ok;
 	bool us_temp_pos_unknown_ok;
 	bool rescale_ok;
+	double vol_pos[3];
+	double vol_orient[6];
 };
 
 typedef std::vector<FrameGroup> FrameGroupValues;

@@ -2959,13 +2959,6 @@ bool DicomUtils::read_group_sq(
 	{
 		FrameGroup fg;
 		fg.id = x;
-		fg.stack_id_ok = false;
-		fg.in_stack_pos_num_ok = false;
-		fg.temp_pos_idx_ok = false;
-		fg.vol_orient_ok = false;
-		fg.vol_pos_ok = false;
-		fg.temp_pos_off_ok = false;
-		fg.us_temp_pos_unknown_ok = false;
 		const mdcm::Item & item = sqGroup->GetItem(x+1);
 		const mdcm::DataSet & nestedds = item.GetNestedDataSet();
 		if (nestedds.FindDataElement(tFrameContentSequence))
@@ -4274,67 +4267,68 @@ void DicomUtils::enhanced_get_indices(
 	int datatype_idx      = -1;
 	int mr_frame_type_idx = -1;
 	int mr_eff_echo_idx   = -1;
-	const unsigned int sq_size = sq.size();
-	for (unsigned int x = 0; x < sq_size; x++)
+	const int sq_size = (int)sq.size();
+	for (int x = 0; x < sq_size; x++)
 	{
-		if (sq.at(x).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-			sq.at(x).index_pointer==mdcm::Tag(0x0020,0x9056))
+		const size_t i = (size_t)x;
+		if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9056))
 		{
-			stack_id_idx = (int)x;
+			stack_id_idx = x;
 		}
-		else if (sq.at(x).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-			sq.at(x).index_pointer==mdcm::Tag(0x0020,0x9057))
+		else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9057))
 		{
-			in_stack_pos_idx = (int)x;
+			in_stack_pos_idx = x;
 		}
-		else if (sq.at(x).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-			sq.at(x).index_pointer==mdcm::Tag(0x0020,0x9128))
+		else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9128))
 		{
-			temporal_pos_idx = (int)x;
+			temporal_pos_idx = x;
 		}
-		else if (sq.at(x).group_pointer==mdcm::Tag(0x0018,0x9117) &&
-			sq.at(x).index_pointer==mdcm::Tag(0x0018,0x9087))
+		else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9117) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9087))
 		{
-			b_value_idx = (int)x;
+			b_value_idx = x;
 		}
-		else if (sq.at(x).group_pointer==mdcm::Tag(0x0018,0x9117) &&
-			sq.at(x).index_pointer==mdcm::Tag(0x0018,0x9089))
+		else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9117) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9089))
 		{
-			gradients_idx = (int)x;
+			gradients_idx = x;
 		}
-		else if (sq.at(x).group_pointer==mdcm::Tag(0x0018,0x9341)) // TODO check
+		else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9341)) // TODO check
 		{
-			contrast_idx = (int)x;
+			contrast_idx = x;
 		}
-		else if (sq.at(x).group_pointer==mdcm::Tag(0x0040,0x9096) &&
-			sq.at(x).index_pointer==mdcm::Tag(0x0040,0x9210))
+		else if (sq.at(i).group_pointer==mdcm::Tag(0x0040,0x9096) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0040,0x9210))
 		{
-			lut_label_idx = (int)x;
+			lut_label_idx = x;
 		}
-		else if (sq.at(x).group_pointer==mdcm::Tag(0x0020,0x9310) &&
-			sq.at(x).index_pointer==mdcm::Tag(0x0020,0x930d))
+		else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9310) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0020,0x930d))
 		{
-			temporal_idx = (int)x;
+			temporal_idx = x;
 		}
-		else if (sq.at(x).group_pointer==mdcm::Tag(0x0020,0x930e) &&
-			sq.at(x).index_pointer==mdcm::Tag(0x0020,0x9301))
+		else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x930e) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9301))
 		{
-			plane_pos_idx = (int)x;
+			plane_pos_idx = x;
 		}
-		else if (sq.at(x).group_pointer==mdcm::Tag(0x0018,0x9807) &&
-			sq.at(x).index_pointer==mdcm::Tag(0x0018,0x9808))
+		else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9807) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9808))
 		{
-			datatype_idx = (int)x;
+			datatype_idx = x;
 		}
-		else if (sq.at(x).group_pointer==mdcm::Tag(0x0018,0x9226) &&
-			sq.at(x).index_pointer==mdcm::Tag(0x0008,0x9007))
+		else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9226) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0008,0x9007))
 		{
-			mr_frame_type_idx = (int)x;
+			mr_frame_type_idx = x;
 		}
-		else if (sq.at(x).group_pointer==mdcm::Tag(0x0018,0x9114) &&
-			sq.at(x).index_pointer==mdcm::Tag(0x0018,0x9082))
+		else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9114) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9082))
 		{
-			mr_eff_echo_idx = (int)x;
+			mr_eff_echo_idx = x;
 		}
 	}
 	//
@@ -4572,10 +4566,6 @@ void DicomUtils::enhanced_get_indices(
 		*dim4th = temporal_pos_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
-	else
-	{
-		;;
-	}
 	// not recognized, try generic approach
 	if (*enh_id<0)
 	{
@@ -4584,21 +4574,22 @@ void DicomUtils::enhanced_get_indices(
 			in_stack_pos_idx>=0)
 		{
 			int dim5th_tmp = -1;
-			for (unsigned int x = 0; x < 3; x++)
+			for (int x = 0; x < 3; x++)
 			{
-				if (sq.at(x).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-					sq.at(x).index_pointer==mdcm::Tag(0x0020,0x9056))
+				const size_t i = (size_t)x;
+				if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
+					sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9056))
 				{
 					;;
 				}
-				else if (sq.at(x).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-					sq.at(x).index_pointer==mdcm::Tag(0x0020,0x9057))
+				else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
+					sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9057))
 				{
 					;;
 				}
 				else
 				{
-					dim5th_tmp = (int)x;
+					dim5th_tmp = x;
 					break;
 				}
 			}
@@ -4613,26 +4604,27 @@ void DicomUtils::enhanced_get_indices(
 			temporal_pos_idx>=0)
 		{
 			int dim6th_tmp = -1;
-			for (unsigned int x = 0; x < 4; x++)
+			for (int x = 0; x < 4; x++)
 			{
-				if (sq.at(x).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-					sq.at(x).index_pointer==mdcm::Tag(0x0020,0x9056))
+				const size_t i = (size_t)x;
+				if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
+					sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9056))
 				{
 					;;
 				}
-				else if (sq.at(x).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-					sq.at(x).index_pointer==mdcm::Tag(0x0020,0x9057))
+				else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
+					sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9057))
 				{
 					;;
 				}
-				else if (sq.at(x).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-					sq.at(x).index_pointer==mdcm::Tag(0x0020,0x9128))
+				else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
+					sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9128))
 				{
 					;;
 				}
 				else
 				{
-					dim6th_tmp = (int)x;
+					dim6th_tmp = x;
 					break;
 				}
 			}

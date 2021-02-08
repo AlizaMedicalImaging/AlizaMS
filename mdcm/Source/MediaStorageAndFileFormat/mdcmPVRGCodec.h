@@ -27,23 +27,17 @@
 namespace mdcm
 {
 
-/*
- * PHILIPS_Gyroscan-12-Jpeg_Extended_Process_2_4.dcm
- */
 class PVRGCodec : public ImageCodec
 {
 public:
   PVRGCodec();
   ~PVRGCodec();
-  bool CanDecode(TransferSyntax const &ts) const;
-  bool CanCode(TransferSyntax const &ts) const;
-
-  bool Decode(DataElement const &is, DataElement &os);
-  bool Code(DataElement const &in, DataElement &out);
-  void SetLossyFlag( bool l );
-
+  bool CanDecode(TransferSyntax const &) const;
+  bool CanCode(TransferSyntax const &) const;
+  bool Decode(DataElement const &is, DataElement &);
+  bool Code(DataElement const &, DataElement &);
+  void SetLossyFlag(bool);
   virtual ImageCodec * Clone() const;
-private:
 };
 
 } // end namespace mdcm
