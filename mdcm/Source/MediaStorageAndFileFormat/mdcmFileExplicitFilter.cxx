@@ -27,7 +27,6 @@
 #include "mdcmGlobal.h"
 #include "mdcmDict.h"
 #include "mdcmDicts.h"
-#include "mdcmGroupDict.h"
 #include "mdcmVR.h"
 #include "mdcmVM.h"
 #include "mdcmDataSetHelper.h"

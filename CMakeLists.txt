@@ -373,8 +373,6 @@ set(MDCM_DICT_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmDefaultDicts.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmPrivateDefaultDicts.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmGlobal.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmGroupDict.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmDefaultGroupNames.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmUIDs.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmCSAHeaderDefaultDicts.cxx)
 

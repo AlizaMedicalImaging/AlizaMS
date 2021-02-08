@@ -27,28 +27,22 @@
 
 namespace mdcm
 {
+
 class GlobalInternal;
 class Dicts;
 class MDCM_EXPORT Global
 {
-  friend std::ostream& operator<<(std::ostream & _os, const Global & g);
 public:
   Global();
   ~Global();
-  Dicts const & GetDicts() const;
+  const Dicts & GetDicts() const;
   Dicts & GetDicts();
   static Global & GetInstance();
+
 private:
-  Global &operator=(const Global &_val);
-  Global(const Global &_val);
+  Global(const Global &);
   static GlobalInternal * Internals;
 };
-
-inline std::ostream& operator<<(std::ostream &os, const Global &g)
-{
-  (void)g;
-  return os;
-}
 
 static Global GlobalInstance;
 

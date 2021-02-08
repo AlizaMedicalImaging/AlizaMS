@@ -26,12 +26,12 @@
 namespace mdcm
 {
 
-unsigned int GlobalCount;
+static unsigned int GlobalCount = 0;
 
 class GlobalInternal
 {
 public:
-  GlobalInternal():GlobalDicts() {}
+  GlobalInternal() : GlobalDicts() {}
   Dicts GlobalDicts;
 };
 
@@ -53,17 +53,17 @@ Global::~Global()
   }
 }
 
-Dicts const &Global::GetDicts() const
+const Dicts & Global::GetDicts() const
 {
   return Internals->GlobalDicts;
 }
 
-Dicts &Global::GetDicts()
+Dicts & Global::GetDicts()
 {
   return Internals->GlobalDicts;
 }
 
-Global& Global::GetInstance()
+Global & Global::GetInstance()
 {
   return GlobalInstance;
 }
