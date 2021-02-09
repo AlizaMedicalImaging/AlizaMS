@@ -25,26 +25,25 @@
 
 #include "mdcmDict.h"
 #include "mdcmCSAHeaderDict.h"
-#include <string>
 
 namespace mdcm
 {
 /**
- * \brief Class to manipulate the dict
+ * Class to manipulate the dictionaries
  */
 class MDCM_EXPORT Dicts
 {
-  friend std::ostream& operator<<(std::ostream & _os, const Dicts & d);
 public:
   Dicts();
   ~Dicts();
-  const DictEntry & GetDictEntry(const Tag & tag, const char * owner = NULL) const;
-  const DictEntry & GetDictEntry(const PrivateTag& tag) const;
+  const DictEntry & GetDictEntry(const Tag &, const char (*)= NULL) const;
+  const DictEntry & GetDictEntry(const PrivateTag &) const;
   const Dict & GetPublicDict() const;
   const PrivateDict & GetPrivateDict() const;
   PrivateDict & GetPrivateDict();
   const CSAHeaderDict & GetCSAHeaderDict() const;
-  bool IsEmpty() const { return GetPublicDict().IsEmpty(); }
+  bool IsEmpty() const;
+
 protected:
   typedef enum
   {
@@ -52,23 +51,17 @@ protected:
     GEMS,
     SIEMENS
   } ConstructorType;
-  static const char * GetConstructorString(ConstructorType type);
+  static const char * GetConstructorString(ConstructorType);
   friend class Global;
   void LoadDefaults();
+
 private:
   Dict PublicDict;
   PrivateDict ShadowDict;
   CSAHeaderDict CSADict;
-  Dicts &operator=(const Dicts & _val); // purposely not implemented
-  Dicts(const Dicts & _val); // purposely not implemented
+  Dicts &operator=(const Dicts &); // purposely not implemented
+  Dicts(const Dicts &); // purposely not implemented
 };
-
-inline std::ostream& operator<<(std::ostream & os, const Dicts & d)
-{
-  (void)d;
-  return os;
-}
-
 
 } // end namespace mdcm
 

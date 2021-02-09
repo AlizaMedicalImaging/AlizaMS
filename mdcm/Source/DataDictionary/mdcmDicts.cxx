@@ -24,6 +24,12 @@
 namespace mdcm
 {
 
+static const DictEntry ggl("Generic Group Length","GenericGroupLength",VR::UL,VM::VM1,true);
+static const DictEntry ill("Illegal Element","IllegalElement",VR::INVALID,VM::VM0,false);
+static const DictEntry prc("Private Creator","PrivateCreator",VR::LO,VM::VM1,false);
+static const DictEntry pe0("Private Element Without Private Creator","PrivateElementWithoutPrivateCreator",VR::INVALID,VM::VM0);
+static const DictEntry pe1("Private Element With Empty Private Creator","PrivateElementWithEmptyPrivateCreator",VR::INVALID,VM::VM0);
+
 Dicts::Dicts():PublicDict(),ShadowDict()
 {
 }
@@ -34,7 +40,6 @@ Dicts::~Dicts()
 
 const DictEntry & Dicts::GetDictEntry(const Tag & tag, const char * owner) const
 {
-  static DictEntry Dummy;
   if(tag.IsGroupLength())
   {
     const DictEntry & de = PublicDict.GetDictEntry(tag);
@@ -45,13 +50,7 @@ const DictEntry & Dicts::GetDictEntry(const Tag & tag, const char * owner) const
     }
     else
     {
-      Dummy.SetName("Generic Group Length");
-      Dummy.SetKeyword("GenericGroupLength");
-      bool retired = true;
-      Dummy.SetVR(VR::UL);
-      Dummy.SetVM(VM::VM1);
-      Dummy.SetRetired(retired);
-      return Dummy;
+      return ggl;
     }
   }
   else if(tag.IsPublic())
@@ -64,9 +63,11 @@ const DictEntry & Dicts::GetDictEntry(const Tag & tag, const char * owner) const
     assert(tag.IsPrivate());
     if(owner && *owner)
     {
-      size_t len = strlen(owner); (void)len;
-      PrivateTag ptag(tag.GetGroup(), (uint16_t)(((uint16_t)(tag.GetElement() << 8)) >> 8), owner);
-      const DictEntry &de = GetPrivateDict().GetDictEntry(ptag);
+      const DictEntry & de =
+        GetPrivateDict().GetDictEntry(
+          PrivateTag(tag.GetGroup(),
+                     (uint16_t)(((uint16_t)(tag.GetElement() << 8)) >> 8),
+                     owner));
       return de;
     }
     else
@@ -74,14 +75,7 @@ const DictEntry & Dicts::GetDictEntry(const Tag & tag, const char * owner) const
       // 0x0000 and [0x1,0xFF] are special cases:
       if(tag.IsIllegal())
       {
-        std::string pc ("Illegal Element");
-        Dummy.SetName(pc.c_str());
-        std::string kw ("IllegalElement");
-        Dummy.SetKeyword(kw.c_str());
-        Dummy.SetVR(VR::INVALID);
-        Dummy.SetVM(VM::VM0);
-        Dummy.SetRetired(false);
-        return Dummy;
+        return ill;
       }
       else if(tag.IsPrivateCreator())
       {
@@ -89,42 +83,21 @@ const DictEntry & Dicts::GetDictEntry(const Tag & tag, const char * owner) const
         assert(tag.GetElement());
         assert(tag.IsPrivate());
         assert(owner == 0x0);
-        {
-          static const char pc[] = "Private Creator";
-          static const char kw[] = "PrivateCreator";
-          Dummy.SetName(pc);
-          Dummy.SetKeyword(kw);
-        }
-        Dummy.SetVR(VR::LO);
-        Dummy.SetVM(VM::VM1);
-        Dummy.SetRetired(false);
-        return Dummy;
+        return prc;
       }
       else
       {
         if(owner && *owner)
         {
-          static const char pc[] = "Private Element Without Private Creator";
-          static const char kw[] = "PrivateElementWithoutPrivateCreator";
-          Dummy.SetName(pc);
-          Dummy.SetKeyword(kw);
+          return pe0;
         }
-        else
-        {
-          static const char pc[] = "Private Element With Empty Private Creator";
-          static const char kw[] = "PrivateElementWithEmptyPrivateCreator";
-          Dummy.SetName(pc);
-          Dummy.SetKeyword(kw);
-        }
-        Dummy.SetVR(VR::INVALID);
-        Dummy.SetVM(VM::VM0);
-        return Dummy;
+		return pe1;
       }
     }
   }
 }
 
-const DictEntry & Dicts::GetDictEntry(const PrivateTag& tag) const
+const DictEntry & Dicts::GetDictEntry(const PrivateTag & tag) const
 {
   return GetDictEntry(tag, tag.GetOwner());
 }
@@ -152,6 +125,11 @@ PrivateDict & Dicts::GetPrivateDict()
 const CSAHeaderDict & Dicts::GetCSAHeaderDict() const
 {
   return CSADict;
+}
+
+bool Dicts::IsEmpty() const
+{
+  return GetPublicDict().IsEmpty();
 }
 
 void Dicts::LoadDefaults()
