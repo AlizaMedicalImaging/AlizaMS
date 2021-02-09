@@ -24,11 +24,16 @@
 namespace mdcm
 {
 
-static const DictEntry ggl("Generic Group Length","GenericGroupLength",VR::UL,VM::VM1,true);
-static const DictEntry ill("Illegal Element","IllegalElement",VR::INVALID,VM::VM0,false);
-static const DictEntry prc("Private Creator","PrivateCreator",VR::LO,VM::VM1,false);
-static const DictEntry pe0("Private Element Without Private Creator","PrivateElementWithoutPrivateCreator",VR::INVALID,VM::VM0);
-static const DictEntry pe1("Private Element With Empty Private Creator","PrivateElementWithEmptyPrivateCreator",VR::INVALID,VM::VM0);
+static const DictEntry ggl(
+  "Generic Group Length","GenericGroupLength",VR::UL,VM::VM1,true);
+static const DictEntry ill(
+  "Illegal Element","IllegalElement",VR::INVALID,VM::VM0,false);
+static const DictEntry prc(
+  "Private Creator","PrivateCreator",VR::LO,VM::VM1,false);
+static const DictEntry pe0(
+  "Private Element Without Private Creator","PrivateElementWithoutPrivateCreator",VR::INVALID,VM::VM0,false);
+static const DictEntry pe1(
+  "Private Element With Empty Private Creator","PrivateElementWithEmptyPrivateCreator",VR::INVALID,VM::VM0,false);
 
 Dicts::Dicts():PublicDict(),ShadowDict()
 {
@@ -48,19 +53,14 @@ const DictEntry & Dicts::GetDictEntry(const Tag & tag, const char * owner) const
     {
       return de;
     }
-    else
-    {
-      return ggl;
-    }
+    return ggl;
   }
   else if(tag.IsPublic())
   {
-    assert(owner == NULL);
     return PublicDict.GetDictEntry(tag);
   }
   else
   {
-    assert(tag.IsPrivate());
     if(owner && *owner)
     {
       const DictEntry & de =
@@ -72,7 +72,7 @@ const DictEntry & Dicts::GetDictEntry(const Tag & tag, const char * owner) const
     }
     else
     {
-      // 0x0000 and [0x1,0xFF] are special cases:
+      // 0x0000 and [0x1,0xFF] are special cases
       if(tag.IsIllegal())
       {
         return ill;
@@ -91,7 +91,7 @@ const DictEntry & Dicts::GetDictEntry(const Tag & tag, const char * owner) const
         {
           return pe0;
         }
-		return pe1;
+        return pe1;
       }
     }
   }
