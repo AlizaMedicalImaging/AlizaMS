@@ -36,21 +36,15 @@ public:
   ~RAWCodec();
   bool CanCode(TransferSyntax const &) const;
   bool CanDecode(TransferSyntax const &) const;
-  bool Decode(DataElement const & is, DataElement & os);
-  bool Code(DataElement const & in, DataElement & out);
+  bool Decode(DataElement const &, DataElement &);
+  bool Code(DataElement const &, DataElement &);
   bool GetHeaderInfo(std::istream &, TransferSyntax &);
   virtual ImageCodec * Clone() const;
-  // Used by the ImageStreamReader-- converts a read in 
-  // buffer into one with the proper encodings.
-  bool DecodeBytes(
-    const char * inBytes, size_t,
-    char *      outBytes, size_t);
+  bool DecodeBytes(const char *, size_t, char *, size_t);
 
 protected:
   bool DecodeByStreams(std::istream &, std::ostream &);
 
-private:
-  RAWInternals * Internals;
 };
 
 } // end namespace mdcm

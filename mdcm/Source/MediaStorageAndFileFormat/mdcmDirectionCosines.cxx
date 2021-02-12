@@ -24,6 +24,7 @@
 #include <limits>
 #include <cmath>
 #include <cstdio>
+#include <locale>
 
 namespace mdcm
 {
@@ -144,8 +145,10 @@ bool DirectionCosines::SetFromString(const char * str)
 {
   if(str)
   {
+    std::locale currentLocale = std::locale::global(std::locale::classic());
     const int n = sscanf(str, "%lf\\%lf\\%lf\\%lf\\%lf\\%lf",
       Values, Values+1, Values+2, Values+3, Values+4, Values+5);
+    std::locale::global(currentLocale);
     if(n == 6)
     {
       return true;

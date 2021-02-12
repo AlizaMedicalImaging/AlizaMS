@@ -29,8 +29,9 @@ namespace mdcm
 {
 
 class TransferSyntax;
+
 /**
- * \brief Class to represent an PhotometricInterpretation
+ * Class to represent an PhotometricInterpretation
  */
 class MDCM_EXPORT PhotometricInterpretation
 {
@@ -55,26 +56,23 @@ public:
   } PIType;
 
   PhotometricInterpretation(PIType pi = UNKNOWN) : PIField(pi) {}
-  static const char * GetPIString(PIType pi);
+  static const char * GetPIString(PIType);
   const char * GetString() const;
   //make sure end of string is \0
-  static PIType GetPIType(const char * pi);
-  static bool IsRetired(PIType pi);
+  static PIType GetPIType(const char *);
+  static bool IsRetired(PIType);
   bool IsLossy() const;
   bool IsLossless() const;
-  /// Return the value for Sample Per Pixel associated with a particular Photometric Interpretation
   unsigned short GetSamplesPerPixel() const;
-  // TODO
-  // not all PhotometricInterpretation are allowed for compressed transfer syntax
-  friend std::ostream& operator<<(std::ostream & os, const PhotometricInterpretation & pi);
+  friend std::ostream& operator<<(std::ostream &, const PhotometricInterpretation &);
   operator PIType () const { return PIField; }
-  PIType GetType () const { return PIField; }
+  PIType GetType() const { return PIField; }
 
 private:
   PIType PIField;
 };
 
-inline std::ostream& operator<<(std::ostream & os, const PhotometricInterpretation & val)
+inline std::ostream & operator<<(std::ostream & os, const PhotometricInterpretation & val)
 {
   const char * s = PhotometricInterpretation::GetPIString(val.PIField);
   os << (s ? s : "");
