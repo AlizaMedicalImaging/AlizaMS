@@ -27,19 +27,18 @@
 
 namespace mdcm
 {
+
 class DataSet;
 class File;
 class Tag;
-class SequenceOfItems;
 
 /**
- * \brief DataSetHelper (internal class, not intended for user level)
+ * DataSetHelper (not intended at user level)
  */
 class MDCM_EXPORT DataSetHelper
 {
 public:
-  static VR ComputeVR(File const & file, DataSet const & ds, const Tag & tag);
-protected:
+  static VR ComputeVR(const File &, const DataSet &, const Tag &);
 };
 
 } // end namespace mdcm

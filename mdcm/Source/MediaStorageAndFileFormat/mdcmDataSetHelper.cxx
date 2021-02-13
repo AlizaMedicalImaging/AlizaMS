@@ -19,7 +19,6 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "mdcmDataSetHelper.h"
 #include "mdcmFile.h"
 #include "mdcmDataSet.h"
 #include "mdcmSequenceOfItems.h"
@@ -28,12 +27,13 @@
 #include "mdcmDicts.h"
 #include "mdcmDict.h"
 #include "mdcmAttribute.h"
+#include "mdcmDataSetHelper.h"
 
 namespace mdcm
 {
 /*
-    See PS 3.5 - 2008
-    Annex A (Normative) Transfer Syntax Specifications
+  See PS 3.5 - 2008
+  Annex A (Normative) Transfer Syntax Specifications
 */
 
 VR ComputeVRImplicitLittleEndian(DataSet const &ds, const Tag& tag)
@@ -84,7 +84,7 @@ VR ComputeVRImplicitLittleEndian(DataSet const &ds, const Tag& tag)
   return vr;
 }
 
-VR DataSetHelper::ComputeVR(File const &file, DataSet const &ds, const Tag& tag)
+VR DataSetHelper::ComputeVR(const File & file, const DataSet & ds, const Tag & tag)
 {
   const Global & g = GlobalInstance;
   const Dicts  & dicts = g.GetDicts();
@@ -105,21 +105,21 @@ VR DataSetHelper::ComputeVR(File const &file, DataSet const &ds, const Tag& tag)
   VR vr = refvr;
   if(vr == VR::US_SS)
   {
-    // I believe all US_SS VR derived from the value from 0028,0103, except 0028,0071
+    // All US_SS VR derived from the value from 0028,0103, except 0028,0071?
     if(t != Tag(0x0028,0x0071))
     {
-      // In case of SAX parser, we would have had to process Pixel Representation already
+      // In case of SAX parser, we would have had to process Pixel Representation already.
       Attribute<0x0028,0x0103> at;
       const Tag & pixelrep = at.GetTag();
       assert(pixelrep < t);
-      const DataSet &rootds = file.GetDataSet();
+      const DataSet & rootds = file.GetDataSet();
       // FIXME
       // PhilipsWith15Overlays.dcm has a Private SQ with public elements such as
       // 0028,3002, so we cannot look up element in current dataset, but have to get the root dataset
       // to loop up.
-      // FIXME:
+      // FIXME
       // mdcmDataExtra/mdcmSampleData/ImagesPapyrus/TestImages/wristb.pap
-      // It's the contrary: root dataset does not have a Pixel Representation, but each SQ do.
+      // It's the contrary: root dataset does not have a Pixel Representation, but each SQ does.
       if(ds.FindDataElement(pixelrep))
       {
         at.SetFromDataElement(ds.GetDataElement(pixelrep));
@@ -170,8 +170,7 @@ VR DataSetHelper::ComputeVR(File const &file, DataSet const &ds, const Tag& tag)
     }
     else
     {
-      if(!ds.FindDataElement(bitsallocated))
-        return VR::UN;
+      if(!ds.FindDataElement(bitsallocated)) return VR::UN;
       Attribute<0x0028,0x0100> at;
       at.SetFromDataElement(ds.GetDataElement(bitsallocated));
     }
@@ -217,7 +216,7 @@ VR DataSetHelper::ComputeVR(File const &file, DataSet const &ds, const Tag& tag)
   {
     vr = VR::OW;
   }
-  // TODO need to treat US_SS_OW too
+  // TODO US_SS_OW
   assert(vr.IsVRFile());
   assert(vr != VR::INVALID);
   if(tag.IsGroupLength())

@@ -30,7 +30,6 @@ namespace mdcm
 {
 
 class TransferSyntax;
-class DataElement;
 
 class MDCM_EXPORT Decoder
 {

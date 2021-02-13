@@ -31,6 +31,45 @@
 
 namespace mdcm
 {
+
+  DataElement::DataElement(const DataElement & _val)
+  {
+    if(this != &_val)
+    {
+      *this = _val;
+    }
+  }
+
+  const Tag & DataElement::GetTag() const
+  {
+    return TagField;
+  }
+
+  Tag & DataElement::GetTag()
+  {
+    return TagField;
+  }
+
+  void DataElement::SetTag(const Tag & t)
+  {
+    TagField = t;
+  }
+
+  const VL & DataElement::GetVL() const
+  {
+    return ValueLengthField;
+  }
+
+  VL & DataElement::GetVL()
+  {
+    return ValueLengthField;
+  }
+
+  void DataElement::SetVL(const VL & vl)
+  {
+    ValueLengthField = vl;
+  }
+
   void DataElement::SetVLToUndefined()
   {
     try
@@ -39,39 +78,71 @@ namespace mdcm
         dynamic_cast<SequenceOfItems*>(ValueField.GetPointer());
       if(sqi) sqi->SetLengthToUndefined();
     }
-    catch (std::bad_cast&) { ;; }
+    catch(std::bad_cast&) { ;; }
     ValueLengthField.SetToUndefined();
   }
 
-  const SequenceOfFragments * DataElement::GetSequenceOfFragments() const
+  const VR & DataElement::GetVR() const
   {
-    try
-    {
-      const SequenceOfFragments * sqf =
-        dynamic_cast<SequenceOfFragments*>(ValueField.GetPointer());
-      return sqf;
-    }
-    catch (std::bad_cast&) { ;; }
-    return NULL;
+    return VRField;
   }
 
-  SequenceOfFragments * DataElement::GetSequenceOfFragments()
+  void DataElement::SetVR(const VR & vr)
   {
-    try
-    {
-      SequenceOfFragments * sqf =
-        dynamic_cast<SequenceOfFragments*>(ValueField.GetPointer());
-      return sqf;
-    }
-    catch (std::bad_cast&) { ;; }
-    return NULL;
+    if(vr.IsVRFile()) VRField = vr;
+  }
+
+  const Value & DataElement::GetValue() const
+  {
+    return *ValueField;
+  }
+
+  Value & DataElement::GetValue()
+  {
+    return *ValueField;
+  }
+
+  void DataElement::SetValue(Value const & vl)
+  {
+    ValueField = vl;
+    ValueLengthField = vl.GetLength();
+  }
+
+  bool DataElement::IsEmpty() const
+  {
+    return (ValueField == 0 || (GetByteValue() && GetByteValue()->IsEmpty()));
+  }
+
+  void DataElement::Empty()
+  {
+    ValueField = 0;
+    ValueLengthField = 0;
+  }
+
+  void DataElement::Clear()
+  {
+    TagField = 0;
+    VRField = VR::INVALID;
+    ValueField = 0;
+    ValueLengthField = 0;
+  }
+
+  void DataElement::SetByteValue(const char * array, VL length)
+  {
+    ByteValue * bv = new ByteValue(array,length);
+    SetValue(*bv);
+  }
+
+  const ByteValue * DataElement::GetByteValue() const
+  {
+    const ByteValue * bv = dynamic_cast<const ByteValue*>(ValueField.GetPointer());
+    return bv;
   }
 
   SmartPointer<SequenceOfItems> DataElement::GetValueAsSQ() const
   {
-    if (IsEmpty()) return NULL;
-    if (GetSequenceOfFragments()) return NULL;
-
+    if(IsEmpty()) return NULL;
+    if(GetSequenceOfFragments()) return NULL;
     try
     {
       SequenceOfItems * sq =
@@ -83,12 +154,11 @@ namespace mdcm
       }
     }
     catch (std::bad_cast&) { ;; }
-
     const ByteValue * bv = GetByteValue();
-    if (!bv) return NULL;
+    if(!bv) return NULL;
     SequenceOfItems * sq = new SequenceOfItems;
     sq->SetLength(bv->GetLength());
-    if (GetVR() == VR::INVALID)
+    if(GetVR() == VR::INVALID)
     {
       try
       {
@@ -98,7 +168,7 @@ namespace mdcm
         SmartPointer<SequenceOfItems> sqi = sq;
         return sqi;
       }
-      catch (Exception &)
+      catch(Exception &)
       {
         // fix a broken dicom implementation for Philips
         const Tag itemPMSStart(0xfeff, 0x00e0);
@@ -115,9 +185,9 @@ namespace mdcm
           return sqi;
         }
       }
-      catch (...) { ;; }
+      catch(...) { ;; }
     }
-    else if (GetVR() == VR::UN)
+    else if(GetVR() == VR::UN)
     {
       try
       {
@@ -127,7 +197,7 @@ namespace mdcm
         SmartPointer<SequenceOfItems> sqi = sq;
         return sqi;
       }
-      catch (...) { ;; }
+      catch(...) { ;; }
       try
       {
         std::stringstream ss;
@@ -136,7 +206,7 @@ namespace mdcm
         SmartPointer<SequenceOfItems> sqi = sq;
         return sqi;
       }
-      catch (...) { ;; }
+      catch(...) { ;; }
       try
       {
         std::stringstream ss;
@@ -145,16 +215,62 @@ namespace mdcm
         SmartPointer<SequenceOfItems> sqi = sq;
         return sqi;
       }
-      catch (...) { ;; }
+      catch(...) { ;; }
     }
     delete sq;
     return NULL;
   }
 
-void DataElement::SetValueFieldLength(VL vl, bool readvalues)
-{
-  if (readvalues) ValueField->SetLength(vl); // perform realloc
-  else ValueField->SetLengthOnly(vl); // do not perform realloc
-}
+  const SequenceOfFragments * DataElement::GetSequenceOfFragments() const
+  {
+    try
+    {
+      const SequenceOfFragments * sqf =
+        dynamic_cast<SequenceOfFragments*>(ValueField.GetPointer());
+      return sqf;
+    }
+    catch(std::bad_cast&) { ;; }
+    return NULL;
+  }
+
+  SequenceOfFragments * DataElement::GetSequenceOfFragments()
+  {
+    try
+    {
+      SequenceOfFragments * sqf =
+        dynamic_cast<SequenceOfFragments*>(ValueField.GetPointer());
+      return sqf;
+    }
+    catch(std::bad_cast&) { ;; }
+    return NULL;
+  }
+
+  bool DataElement::IsUndefinedLength() const
+  {
+    return ValueLengthField.IsUndefined();
+  }
+
+  void DataElement::SetValueFieldLength(VL vl, bool readvalues)
+  {
+    if(readvalues) ValueField->SetLength(vl); // perform realloc
+    else ValueField->SetLengthOnly(vl); // do not perform realloc
+  }
+
+  std::ostream & operator<<(std::ostream & os, const DataElement & val)
+  {
+    os << val.TagField;
+    os << "\t" << val.VRField;
+    os << "\t" << val.ValueLengthField;
+    if(val.ValueField)
+    {
+      val.ValueField->Print(os << "\t");
+    }
+    return os;
+  }
+  
+  bool operator!=(const DataElement & lhs, const DataElement & rhs)
+  {
+    return !(lhs == rhs);
+  }
 
 } // end namespace mdcm
