@@ -149,7 +149,6 @@ private:
 	SliderWidget      * slider_x;
 	ZRangeWidget      * zrangewidget;
 	ToolBox2D         * toolbox2D;
-	LabelWidget       * labelwidget;
 	LUTWidget         * lutwidget;
 	LUTWidget         * lutwidget2;
 	ZoomWidget	      * zoomwidget2D;

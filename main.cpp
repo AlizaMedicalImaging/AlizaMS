@@ -30,6 +30,9 @@
 #if (defined LOG_STDOUT_TO_FILE && LOG_STDOUT_TO_FILE==1)
 #include <QMessageLogContext>
 #include <QDebug>
+#ifdef _WIN32
+#include "Windows.h"
+#endif
 #endif
 
 #if (defined USE_SPLASH_SCREEN && USE_SPLASH_SCREEN==1)
@@ -170,9 +173,22 @@ int main(int argc, char *argv[])
 			<< std::endl;
 #ifdef _WIN32
 #ifdef UNICODE
-			std::cout << "UNICODE is defined " << std::endl;
+		std::cout << "UNICODE is defined" << std::endl;
 #else
-			std::cout << "UNICODE is not defined " << std::endl;
+		std::cout << "UNICODE is not defined" << std::endl;
+#endif
+#if 1
+		UINT acp = GetACP();
+		if (activeCodePage == 65001)
+		{
+			std::cout << "Active code page is UTF-8"
+				<< std::endl;
+		}
+		else
+		{
+			std::cout << "Active code page is " << acp
+				<< std::endl;
+		}
 #endif
 #endif
 	}

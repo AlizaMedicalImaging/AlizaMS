@@ -439,7 +439,6 @@ Aliza::Aliza(QObject * parent) : QObject(parent)
 	imagesbox = NULL;
 	toolbox = NULL;
 	toolbox2D = NULL;
-	labelwidget = NULL;
 	browser2  = NULL;
 	settingswidget = NULL;
 	graphicswidget_m = NULL;
@@ -1296,11 +1295,6 @@ void Aliza::set_toolbox(ToolBox * i)
 void Aliza::set_toolbox2D(ToolBox2D * i)
 {
 	toolbox2D = i;
-}
-
-void Aliza::set_labelwidget(LabelWidget * i)
-{
-	labelwidget = i;
 }
 
 void Aliza::set_glwidget(GLWidget * i)

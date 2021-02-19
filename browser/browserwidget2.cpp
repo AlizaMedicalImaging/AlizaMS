@@ -30,6 +30,8 @@
 #include "mdcmMediaStorage.h"
 #include "mdcmExplicitDataElement.h"
 #include "mdcmFileMetaInformation.h"
+#include "mdcmGlobal.h"
+#include "mdcmDicts.h"
 #include "codecutils.h"
 #include "dicomutils.h"
 #include <vector>
@@ -163,13 +165,16 @@ void BrowserWidget2::read_directory(const QString & p)
 	pd->setWindowFlags(
 		pd->windowFlags()^Qt::WindowContextHelpButtonHint);
 	pd->show();
-	process_directory(p, pd);
+	const mdcm::Global & g  = mdcm::GlobalInstance;
+	const mdcm::Dicts  & dicts = g.GetDicts();
+	const mdcm::Dict & dict = dicts.GetPublicDict();
+	process_directory(p, dict, pd);
 	pd->close();
 	qApp->processEvents();
 	delete pd;
 }
 
-void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
+void BrowserWidget2::process_directory(const QString & p, const mdcm::Dict & dict, QProgressDialog * pd)
 {
 	if (p.isEmpty()) return;
 	QDir dir(p);
@@ -223,8 +228,7 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 		mdcm::Scanner & s0 = *sp;
 		ScannerWatcher sw(&s0);
 		s0.AddTag(tSeriesInstanceUID);
-		const bool b = s0.Scan(filenames);
-		if(!b) return;
+		s0.Scan(filenames, dict);
 		pd->setValue(-1);
 		qApp->processEvents();
 		if (pd->wasCanceled()) return;
@@ -378,6 +382,7 @@ void BrowserWidget2::process_directory(const QString & p, QProgressDialog * pd)
 		for (int j = 0; j < dlist.size(); j++)
 			process_directory(
 				dir.absolutePath() + QString("/") + dlist.at(j),
+				dict,
 				pd);
 	}
 	dlist.clear();

@@ -22,85 +22,128 @@
 
 #include "mdcmScanner.h"
 #include "mdcmReader.h"
-#include "mdcmGlobal.h"
-#include "mdcmDicts.h"
-#include "mdcmDict.h"
 #include "mdcmDictEntry.h"
-#include "mdcmStringFilter.h"
+#include "mdcmElement.h"
+#include "mdcmByteValue.h"
+#include "mdcmAttribute.h"
+#include "mdcmDataSetHelper.h"
 #include "mdcmProgressEvent.h"
 #include "mdcmFileNameEvent.h"
 #include <algorithm>
 
+#define stringBinaryVR(type) \
+case VR::type: \
+  { \
+    Element<VR::type, VM::VM1_n> el; \
+    if(!de.IsEmpty()) \
+    { \
+      el.Set(de.GetValue()); \
+      if(el.GetLength()) \
+      { \
+        os << el.GetValue(); \
+        for(unsigned int i = 1; i < el.GetLength(); ++i) \
+        { \
+          os << "\\" << el.GetValue(i); \
+        } \
+        retvalue = os.str(); \
+      } \
+    } \
+  } break
+
+
 namespace mdcm
 {
 
-Scanner::~Scanner() {}
+Scanner::Scanner() : Values(), Filenames(), Mappings(), Progress(0.0)
+{
+}
+
+Scanner::~Scanner()
+{
+}
+
+std::string Scanner::GetString(
+  const DataElement & de, const DataSet & ds, const bool implicit, const Dict & dict) const
+{
+  std::string r("");
+  if(ds.IsEmpty()) return r;
+  const Tag t = de.GetTag();
+  if(!ds.FindDataElement(t)) return r;
+  if(t.IsIllegal() || t.IsPrivate() || t.IsPrivateCreator()) return r;
+  VR vr = mdcm::VR::INVALID;
+  const DictEntry & e = dict.GetDictEntry(t);
+  if(!implicit)
+  {
+    vr = ds.GetDataElement(t).GetVR();
+  }
+  else
+  {
+    vr = e.GetVR();
+  }
+  if(vr == VR::INVALID || vr == VR::UN) return r;
+  if(vr == VR::US_SS)
+  {
+    vr = VR::SS; // FIXME
+  }
+  const ByteValue * bv = de.GetByteValue();
+  if(!bv) return r;
+  if(VR::IsASCII2(vr))
+  {
+    if(de.GetVL() > 0)
+    {
+      std::string s = std::string(bv->GetPointer(), bv->GetLength());
+      // Remove trailing '\0', strlen is lower or equal to size()
+      s.resize(std::min(s.size(), strlen(s.c_str())));
+      r = s;
+    }
+  }
+  else
+  {
+    std::ostringstream os;
+    std::string retvalue("");
+    switch(vr)
+    {
+    stringBinaryVR(AT);
+    stringBinaryVR(FL);
+    stringBinaryVR(FD);
+    stringBinaryVR(SS);
+    stringBinaryVR(SL);
+    stringBinaryVR(SV);
+    stringBinaryVR(US);
+    stringBinaryVR(UL);
+    stringBinaryVR(UV);
+    default:
+      break;
+    }
+    r = retvalue;
+  }
+  return r;
+}
+
+void Scanner::AddTag(const Tag & t)
+{
+  Tags.insert(t);
+}
 
 void Scanner::ClearTags()
 {
   Tags.clear();
 }
 
-void Scanner::ClearSkipTags()
-{
-  SkipTags.clear();
-}
-
-void Scanner::AddSkipTag(Tag const & t)
-{
-  SkipTags.insert(t);
-  assert(0); // not implemented
-}
-
-// Warning: API is passing a public tag (no way to specify a private tag)
-void Scanner::AddPrivateTag(PrivateTag const & t)
-{
-  static const Global &g = GlobalInstance;
-  static const Dicts &dicts = g.GetDicts();
-  const DictEntry &entry = dicts.GetDictEntry(t);
-  if(entry.GetVR() & VR::VRASCII)
-  {
-    PrivateTags.insert(t);
-  }
-  else if(entry.GetVR() == VR::INVALID)
-  {
-    mdcmWarningMacro("Only tag with known VR are allowed. Tag " << t << " will be discarded");
-  }
-  else
-  {
-    assert(entry.GetVR() & VR::VRBINARY);
-    PrivateTags.insert(t);
-  }
-}
-
-void Scanner::AddTag(Tag const & t)
-{
-  static const Global &g = GlobalInstance;
-  static const Dicts &dicts = g.GetDicts();
-  const DictEntry &entry = dicts.GetDictEntry(t);
-  if(entry.GetVR() & VR::VRASCII)
-  {
-    Tags.insert(t);
-  }
-  else if(entry.GetVR() == VR::INVALID)
-  {
-    mdcmWarningMacro("Only tag with known VR are allowed. Tag " << t << " will be discarded");
-  }
-  else
-  {
-    assert(entry.GetVR() & VR::VRBINARY);
-    Tags.insert(t);
-  }
-}
-
-bool Scanner::Scan(std::vector<std::string> const & filenames)
+bool Scanner::Scan(const std::vector<std::string> & filenames, const Dict & dict)
 {
   this->InvokeEvent(StartEvent());
-  if(!Tags.empty() || !PrivateTags.empty())
+  if(!Tags.empty())
   {
     Mappings.clear();
-    Mappings[""]; // Create a fake table for dummy file
-    Filenames = filenames;
+    TagToValue d0;
+    Mappings[""] = d0;
+    const size_t filenames_size = filenames.size();
+    Filenames.clear();
+    for(size_t x = 0; x < filenames_size; x++)
+    {
+      Filenames.push_back(filenames.at(x));
+    }
     // Find the tag with the highest value (get the one from the end of the std::set)
     Tag last;
     if(!Tags.empty())
@@ -109,27 +152,19 @@ bool Scanner::Scan(std::vector<std::string> const & filenames)
       const Tag & publiclast = *it1;
       last = publiclast;
     }
-    if(!PrivateTags.empty())
-    {
-      PrivateTagsType::const_reverse_iterator pit1 = PrivateTags.rbegin();
-      Tag privatelast = *pit1;
-      if(last < privatelast) last = privatelast;
-    }
-
-    StringFilter sf;
+    Progress = 0.0;
+    const double progresstick = (filenames_size > 0) ? 1.0 / (double)filenames_size : 0.0;
     std::vector<std::string>::const_iterator it = Filenames.begin();
-    const double progresstick = 1.0 / (double)Filenames.size();
-    Progress = 0;
     for(; it != Filenames.end(); ++it)
     {
       Reader reader;
-      const char *filename = it->c_str();
+      const char * filename = it->c_str();
       assert(filename);
       reader.SetFileName(filename);
       bool read = false;
       try
       {
-        read = reader.ReadUpToTag(last, SkipTags);
+        read = reader.ReadUpToTag(last);
       }
       catch(...)
       {
@@ -137,8 +172,8 @@ bool Scanner::Scan(std::vector<std::string> const & filenames)
       }
       if(read)
       {
-        sf.SetFile(reader.GetFile());
-        Scanner::ProcessPublicTag(sf, filename);
+        const File & file = reader.GetFile();
+        ProcessPublicTag(filename, file, dict);
       }
       Progress += progresstick;
       ProgressEvent pe;
@@ -152,60 +187,28 @@ bool Scanner::Scan(std::vector<std::string> const & filenames)
   return true;
 }
 
-void Scanner::Print(std::ostream & os) const
+const std::vector<std::string> & Scanner::GetFilenames() const
 {
-  os << "Values:\n";
-  for(ValuesType::const_iterator it = Values.begin() ; it != Values.end();
-    ++it)
-  {
-    os << *it << "\n";
-  }
-  os << "Mapping:\n";
-  std::vector<std::string>::const_iterator file = Filenames.begin();
-  for(; file != Filenames.end(); ++file)
-  {
-    const char *filename = file->c_str();
-    assert(filename && *filename);
-    bool b = IsKey(filename);
-    const char *comment = !b ? "could not be read" : "could be read";
-    os << "Filename: " << filename << " (" << comment << ")\n";
-    if(Mappings.find(filename) != Mappings.end())
-    {
-      const TagToValue &mapping = GetMapping(filename);
-      TagToValue::const_iterator it = mapping.begin();
-      for(; it != mapping.end(); ++it)
-      {
-        const Tag & tag = it->first;
-        const char *value = it->second;
-        os << tag << " -> [" << value << "]\n";
-      }
-    }
-  }
-}
-
-Scanner::TagToValue const & Scanner::GetMapping(const char * filename) const
-{
-  assert(filename && *filename);
-  if(Mappings.find(filename) != Mappings.end())
-    return Mappings.find(filename)->second;
-  return Mappings.find("")->second; // dummy file could not be found
+  return Filenames;
 }
 
 bool Scanner::IsKey(const char * filename) const
 {
-  assert(filename && *filename);
-  MappingType::const_iterator it2 = Mappings.find(filename);
-  return it2 != Mappings.end();
+  if(filename && *filename)
+  {
+    MappingType::const_iterator it2 = Mappings.find(filename);
+    return (it2 != Mappings.end());
+  }
+  return false;
 }
 
 std::vector<std::string> Scanner::GetKeys() const
 {
   std::vector<std::string> keys;
-
   std::vector<std::string>::const_iterator file = Filenames.begin();
   for(; file != Filenames.end(); ++file)
   {
-    const char *filename = file->c_str();
+    const char * filename = file->c_str();
     if(IsKey(filename))
     {
       keys.push_back(filename);
@@ -215,10 +218,11 @@ std::vector<std::string> Scanner::GetKeys() const
   return keys;
 }
 
-const char* Scanner::GetValue(const char * filename, Tag const & t) const
+// Tag 't' should have been added via AddTag() prior to the Scan() call
+const char * Scanner::GetValue(const char * filename, const Tag & t) const
 {
   assert(Tags.find(t) != Tags.end());
-  TagToValue const &ftv = GetMapping(filename);
+  const TagToValue & ftv = GetMapping(filename);
   if(ftv.find(t) != ftv.end())
   {
     return ftv.find(t)->second;
@@ -226,65 +230,19 @@ const char* Scanner::GetValue(const char * filename, Tag const & t) const
   return NULL;
 }
 
-const char *Scanner::GetFilenameFromTagToValue(Tag const & t, const char * valueref) const
+const Scanner::ValuesType & Scanner::GetValues() const
 {
-  const char *filenameref = 0;
-  if(valueref)
-  {
-    std::vector<std::string>::const_iterator file = Filenames.begin();
-    size_t len = strlen(valueref);
-    if(len && valueref[len - 1] == ' ')
-    {
-      --len;
-    }
-    for(; file != Filenames.end() && !filenameref; ++file)
-    {
-      const char *filename = file->c_str();
-      const char * value = GetValue(filename, t);
-      if(value && strncmp(value, valueref, len) == 0)
-      {
-        filenameref = filename;
-      }
-    }
-  }
-  return filenameref;
+  return Values;
 }
 
-std::vector<std::string>
-Scanner::GetAllFilenamesFromTagToValue(Tag const &t, const char *valueref) const
-{
-  std::vector<std::string> theReturn;
-  if(valueref)
-  {
-    const std::string valueref_str = String<>::Trim(valueref);
-    std::vector<std::string>::const_iterator file = Filenames.begin();
-    for(; file != Filenames.end(); ++file)
-    {
-      const char *filename = file->c_str();
-      const char * value = GetValue(filename, t);
-      const std::string value_str = String<>::Trim(value);
-      if(value_str == valueref_str)
-      {
-        theReturn.push_back(filename);
-      }
-    }
-  }
-  return theReturn;
-}
-
-Scanner::TagToValue const & Scanner::GetMappingFromTagToValue(Tag const & t, const char * valueref) const
-{
-  return GetMapping(GetFilenameFromTagToValue(t, valueref));
-}
-
-Scanner::ValuesType Scanner::GetValues(Tag const &t) const
+Scanner::ValuesType Scanner::GetValues(const Tag & t) const
 {
   ValuesType vt;
   std::vector<std::string>::const_iterator file = Filenames.begin();
   for(; file != Filenames.end(); ++file)
   {
-    const char *filename = file->c_str();
-    TagToValue const &ttv = GetMapping(filename);
+    const char * filename = file->c_str();
+    const TagToValue & ttv = GetMapping(filename);
     if(ttv.find(t) != ttv.end())
     {
       vt.insert(ttv.find(t)->second);
@@ -293,14 +251,14 @@ Scanner::ValuesType Scanner::GetValues(Tag const &t) const
   return vt;
 }
 
-std::vector<std::string> Scanner::GetOrderedValues(Tag const & t) const
+std::vector<std::string> Scanner::GetOrderedValues(const Tag & t) const
 {
   std::vector<std::string> theReturn;
   std::vector<std::string>::const_iterator file = Filenames.begin();
   for(; file != Filenames.end(); ++file)
   {
     const char * filename = file->c_str();
-    TagToValue const &ttv = GetMapping(filename);
+    const TagToValue & ttv = GetMapping(filename);
     if(ttv.find(t) != ttv.end())
     {
       std::string theVal = std::string(ttv.find(t)->second);
@@ -313,14 +271,77 @@ std::vector<std::string> Scanner::GetOrderedValues(Tag const & t) const
   return theReturn;
 }
 
-void Scanner::ProcessPublicTag(StringFilter & sf, const char * filename)
+const Scanner::TagToValue & Scanner::GetMapping(const char * filename) const
 {
-  assert(filename);
-  TagToValue &mapping = Mappings[filename];
-  const File& file = sf.GetFile();
+  if(filename && *filename)
+  {
+    if(Mappings.find(filename) != Mappings.end())
+    {
+      return Mappings.find(filename)->second;
+    }
+  }
+  return Mappings.find("")->second;
+}
 
-  const FileMetaInformation & header = file.GetHeader();
+const char * Scanner::GetFilenameFromTagToValue(const Tag & t, const char * valueref) const
+{
+  const char * filenameref = NULL;
+  if(valueref)
+  {
+    std::vector<std::string>::const_iterator file = Filenames.begin();
+    size_t len = strlen(valueref);
+    if(len && valueref[len - 1] == ' ')
+    {
+      --len;
+    }
+    for(; file != Filenames.end() && !filenameref; ++file)
+    {
+      const char * filename = file->c_str();
+      const char * value = GetValue(filename, t);
+      if(value && strncmp(value, valueref, len) == 0)
+      {
+        filenameref = filename;
+      }
+    }
+  }
+  return filenameref;
+}
+
+std::vector<std::string> Scanner::GetAllFilenamesFromTagToValue(
+  const Tag & t, const char * valueref) const
+{
+  std::vector<std::string> theReturn;
+  if(valueref)
+  {
+    const std::string valueref_str = String<>::Trim(valueref);
+    std::vector<std::string>::const_iterator file = Filenames.begin();
+    for(; file != Filenames.end(); ++file)
+    {
+      const char * filename = file->c_str();
+      const char * value = GetValue(filename, t);
+      const std::string value_str = String<>::Trim(value);
+      if(value_str == valueref_str)
+      {
+        theReturn.push_back(filename);
+      }
+    }
+  }
+  return theReturn;
+}
+
+const Scanner::TagToValue & Scanner::GetMappingFromTagToValue(const Tag & t, const char * valueref) const
+{
+  return GetMapping(GetFilenameFromTagToValue(t, valueref));
+}
+
+void Scanner::ProcessPublicTag(const char * filename, const File & file, const Dict & dict)
+{
+  if(!(filename && *filename)) return;
+  TagToValue & mapping = Mappings[filename];
   const DataSet & ds = file.GetDataSet();
+  const FileMetaInformation & header = file.GetHeader();
+  const mdcm::TransferSyntax & ts = header.GetDataSetTransferSyntax();
+  const bool implicit = ts.IsImplicit();
   TagsType::const_iterator tag = Tags.begin();
   for(; tag != Tags.end(); ++tag)
   {
@@ -328,12 +349,11 @@ void Scanner::ProcessPublicTag(StringFilter & sf, const char * filename)
     {
       if(header.FindDataElement(*tag))
       {
-        DataElement const & de = header.GetDataElement(*tag);
-        std::string s = sf.ToString(de.GetTag());
+        const DataElement & de = header.GetDataElement(*tag);
+        std::string s(GetString(de, header, implicit, dict));
         Values.insert(s);
         assert(Values.find(s) != Values.end());
-        const char *value = Values.find(s)->c_str();
-        assert(value);
+        const char * value = Values.find(s)->c_str();
         mapping.insert(TagToValue::value_type(*tag, value));
       }
     }
@@ -341,17 +361,49 @@ void Scanner::ProcessPublicTag(StringFilter & sf, const char * filename)
     {
       if(ds.FindDataElement(*tag))
       {
-        DataElement const & de = ds.GetDataElement(*tag);
-        std::string s = sf.ToString(de.GetTag());
+        const DataElement & de = ds.GetDataElement(*tag);
+        std::string s(GetString(de, ds, implicit, dict));
         Values.insert(s);
         assert(Values.find(s) != Values.end());
-        const char *value = Values.find(s)->c_str();
-        assert(value);
+        const char * value = Values.find(s)->c_str();
         mapping.insert(TagToValue::value_type(*tag, value));
       }
     }
   }
 }
+
+#if 0
+void Scanner::Print(std::ostream & os) const
+{
+  os << "Values:\n";
+  for(ValuesType::const_iterator it = Values.begin(); it != Values.end();
+    ++it)
+  {
+    os << *it << "\n";
+  }
+  os << "Mapping:\n";
+  std::vector<std::string>::const_iterator file = Filenames.begin();
+  for(; file != Filenames.end(); ++file)
+  {
+    const char * filename = file->c_str();
+    assert(filename && *filename);
+    bool b = IsKey(filename);
+    const char * comment = (!b) ? "could not read" : "could read";
+    os << "Filename: " << filename << " (" << comment << ")\n";
+    if(Mappings.find(filename) != Mappings.end())
+    {
+      const TagToValue & mapping = GetMapping(filename);
+      TagToValue::const_iterator it = mapping.begin();
+      for(; it != mapping.end(); ++it)
+      {
+        const Tag & tag = it->first;
+        const char * value = it->second;
+        os << tag << " -> [" << value << "]\n";
+      }
+    }
+  }
+}
+#endif
 
 } // end namespace mdcm
 

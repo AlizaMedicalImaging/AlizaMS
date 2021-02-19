@@ -410,7 +410,6 @@ set(MDCM_DSED_SRCS
 
 set(MDCM_MSFF_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmIconImageFilter.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmDICOMDIRGenerator.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmFileExplicitFilter.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageFragmentSplitter.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSimpleSubjectWatcher.cxx
@@ -436,7 +435,6 @@ set(MDCM_MSFF_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageReader.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPixmapWriter.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageWriter.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmStringFilter.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageHelper.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImage.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmImageCodec.cxx
@@ -698,7 +696,6 @@ set(ALIZAMS_SRCS ${ALIZAMS_SRCS}
   ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/CG/testgl.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/mainwindow.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/labelwidget.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/updateqtcommand.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/iconutils.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/histogramgen.cpp
@@ -758,7 +755,6 @@ set(ALIZAMS_MOC_HRDS
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/animwidget.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/toolbox2D.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/sliderwidget.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/labelwidget.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/zrangewidget.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/lutwidget.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/graphicsview.h

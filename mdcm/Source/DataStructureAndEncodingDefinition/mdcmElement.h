@@ -88,7 +88,7 @@ public:
     return VMToLength<TVM>::Length;
   }
 
-  void Print(std::ostream &_os) const
+  void Print(std::ostream & _os) const
   {
     _os << Internal[0];
     for(int i=1; i<VMToLength<TVM>::Length; ++i)
@@ -253,7 +253,7 @@ public:
     assert(data);
     assert(length);
     assert(_is);
-    // FIXME BUG: what if >> operation fails ?
+    // TODO what if >> operation fails?
     // gdcmData/MR00010001.dcm / SpacingBetweenSlices
     _is >> std::ws >> data[0];
     char sep;
@@ -275,7 +275,7 @@ public:
 
   template<typename T>
   static inline void Write(
-    const T * data, unsigned long length, std::ostream &_os)
+    const T * data, unsigned long length, std::ostream & _os)
   {
     assert(data);
     assert(length);
@@ -441,7 +441,6 @@ static void x16printf(char * buf, int size, Float f)
   }
   else
   {
-    int j;
     i = roundat(mant, size + 1 + iexp, iexp);
     if (i == 1)
     {
@@ -449,7 +448,7 @@ static void x16printf(char * buf, int size, Float f)
       return;
     }
     buf[0] = '.';
-    for(j=0; j< -1 - iexp; j++)
+    for(int j = 0; j < -1 - iexp; j++)
     {
       buf[j+1] = '0';
     }

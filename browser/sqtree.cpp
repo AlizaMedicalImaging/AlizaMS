@@ -18,6 +18,7 @@
 #include <mdcmWriter.h>
 #include <mdcmScanner.h>
 #include <mdcmSequenceOfFragments.h>
+#include <mdcmDict.h>
 #include <QString>
 #include <QStringList>
 #include <QVariant>
@@ -90,10 +91,13 @@ static void get_series_files(
 #endif
 		}
 	}
+	const mdcm::Global & g  = mdcm::GlobalInstance;
+	const mdcm::Dicts  & dicts = g.GetDicts();
+	const mdcm::Dict & dict = dicts.GetPublicDict();
 	const mdcm::Tag t(0x0020,0x000e);
 	mdcm::Scanner s;
 	s.AddTag(t);
-	if(!s.Scan(files)) return;
+	s.Scan(files, dict);
 	mdcm::Scanner::ValuesType v = s.GetValues();
 	mdcm::Scanner::ValuesType::iterator it = v.begin();
 	while (it != v.end())

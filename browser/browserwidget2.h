@@ -19,6 +19,7 @@
 #include "mdcmSimpleSubjectWatcher.h"
 #include "mdcmEvent.h"
 #include "mdcmDataSet.h"
+#include "mdcmDict.h"
 
 class ScannerWatcher : public mdcm::SimpleSubjectWatcher
 {
@@ -131,7 +132,7 @@ private:
 		const mdcm::SequenceOfItems*,
 		mdcm::VL,
 		std::vector<unsigned int> &);
-	void process_directory(const QString&, QProgressDialog*);
+	void process_directory(const QString&, const mdcm::Dict&, QProgressDialog*);
 	unsigned int add_roots(
 		const QMap<unsigned int, EntryDICOMDIR> &,
 		unsigned int,

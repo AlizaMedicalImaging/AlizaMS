@@ -30,7 +30,6 @@
 #include "sliderwidget.h"
 #include "zrangewidget.h"
 #include "animwidget.h"
-#include "labelwidget.h"
 
 class Aliza : public QObject
 {
@@ -50,7 +49,6 @@ public:
 	void set_settingswidget(SettingsWidget*);
 	void set_toolbox(ToolBox*);
 	void set_toolbox2D(ToolBox2D*);
-	void set_labelwidget(LabelWidget*);
 	void set_glwidget(GLWidget*);
 	void set_graphicswidget_m(GraphicsWidget*);
 	void set_graphicswidget_y(GraphicsWidget*);
@@ -156,7 +154,6 @@ private:
 	ImagesBox      * imagesbox;
 	ToolBox        * toolbox;
 	ToolBox2D      * toolbox2D;
-	LabelWidget    * labelwidget;
 	BrowserWidget2 * browser2;
 	SettingsWidget * settingswidget;
 	GraphicsWidget * graphicswidget_m;

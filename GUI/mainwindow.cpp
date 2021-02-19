@@ -104,8 +104,6 @@ MainWindow::MainWindow(
 	vl0->setSpacing(0);
 	vl0->addWidget(toolbox);
 	//
-	labelwidget = new LabelWidget(this);
-	//
 	anim3Dwidget = new AnimWidget(scale_icons*adjust_scale_icons, this);
 	anim3Dwidget->label->setText(QString("3D+t"));
 	QVBoxLayout * vl98 = new QVBoxLayout(anim3D_frame);

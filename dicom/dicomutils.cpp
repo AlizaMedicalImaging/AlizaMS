@@ -9276,13 +9276,15 @@ void DicomUtils::scan_files_for_rtstruct_image(
 	}
 	flist.clear();
 	//
+	const mdcm::Global & g  = mdcm::GlobalInstance;
+	const mdcm::Dicts  & dicts = g.GetDicts();
+	const mdcm::Dict & dict = dicts.GetPublicDict();
 	std::vector<std::string> t0_files;
 	{
 		mdcm::Scanner s0;
 		const mdcm::Tag t0(0x0020,0x0052);
 		s0.AddTag(t0);
-		const bool b0 = s0.Scan(filenames);
-		if(!b0) return;
+		s0.Scan(filenames, dict);
 		mdcm::Scanner::ValuesType v0 = s0.GetValues();
 		mdcm::Scanner::ValuesType::iterator vi0 = v0.begin();
 		for (;vi0!=v0.end();++vi0)
@@ -9314,8 +9316,7 @@ void DicomUtils::scan_files_for_rtstruct_image(
 		mdcm::Scanner s1;
 		const mdcm::Tag t1(0x0020,0x000e);
 		s1.AddTag(t1);
-		const bool b1 = s1.Scan(t0_files);
-		if(!b1) return;
+		s1.Scan(t0_files, dict);
 		mdcm::Scanner::ValuesType v1 = s1.GetValues();
 		mdcm::Scanner::ValuesType::iterator vi1 = v1.begin();
 		for (;vi1!=v1.end();++vi1)

@@ -421,6 +421,7 @@ bool VR::IsSwap(const char * vr)
        == VR::rep;
 
 #define VRTemplate(rep) \
+VRTemplateCase(UI,rep) \
 VRTemplateCase(AE,rep) \
 VRTemplateCase(AS,rep) \
 VRTemplateCase(AT,rep) \
@@ -448,7 +449,6 @@ VRTemplateCase(ST,rep) \
 VRTemplateCase(SV,rep) \
 VRTemplateCase(TM,rep) \
 VRTemplateCase(UC,rep) \
-VRTemplateCase(UI,rep) \
 VRTemplateCase(UL,rep) \
 VRTemplateCase(UN,rep) \
 VRTemplateCase(UR,rep) \
@@ -469,6 +469,7 @@ bool VR::IsASCII(VRType vr)
 bool VR::IsASCII2(VRType vr)
 {
   return
+    vr == VR::UI ||
     vr == VR::AE ||
     vr == VR::AS ||
     vr == VR::CS ||
@@ -482,7 +483,7 @@ bool VR::IsASCII2(VRType vr)
     vr == VR::SH ||
     vr == VR::ST ||
     vr == VR::TM ||
-    vr == VR::UI;
+    vr == VR::UT;
 }
 
 bool VR::IsBinary(VRType vr)
