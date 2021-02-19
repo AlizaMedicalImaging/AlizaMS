@@ -16,10 +16,10 @@
 #include "contourutils.h"
 #include "colorspace/colorspace.h"
 
-GraphicsView::GraphicsView(QWidget * p) : QGraphicsView()
+GraphicsView::GraphicsView(GraphicsWidget * p)
 {
 	setAcceptDrops(false);
-	parent = static_cast<GraphicsWidget*>(p);
+	parent = p;
 	widget_m = NULL;
 	widget_y = NULL;
 	widget_x = NULL;

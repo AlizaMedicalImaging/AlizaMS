@@ -29,7 +29,7 @@ class GraphicsView : public QGraphicsView
 {
     Q_OBJECT
 public:
-    GraphicsView(QWidget(*)=NULL);
+    GraphicsView(GraphicsWidget *);
     ~GraphicsView();
 	QGraphicsPixmapItem * image_item;
 	RectItem            * handle_rect;

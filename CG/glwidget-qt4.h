@@ -113,8 +113,8 @@ public:
 
 	MY_DECLARE_NEW()
 
-	GLWidget(QWidget(*)=NULL);
-	GLWidget(const QGLFormat&, QWidget(*)=NULL);
+	GLWidget();
+	GLWidget(const QGLFormat&);
 	~GLWidget();
 	void init_();
 	void close_();

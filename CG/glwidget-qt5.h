@@ -122,7 +122,7 @@ public:
 
 	MY_DECLARE_NEW()
 
-	GLWidget(QWidget(*)=nullptr);
+	GLWidget();
 	~GLWidget();
 	void updateGL() { update(); }
 	void init_();

@@ -208,7 +208,7 @@ struct  MyClosestRayResultCallback0 : public btCollisionWorld::ClosestRayResultC
 };
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-GLWidget::GLWidget(QWidget * p) : QOpenGLWidget(p)
+GLWidget::GLWidget()
 {
 #ifdef USE_SET_GL_FORMAT
 #ifndef USE_SET_DEFAULT_GL_FORMAT
@@ -243,7 +243,7 @@ GLWidget::GLWidget(QWidget * p) : QOpenGLWidget(p)
 	srand(time(NULL));
 }
 #else
-GLWidget::GLWidget(QWidget * p) : QGLWidget(p)
+GLWidget::GLWidget()
 {
 	setMinimumSize(64,64);
 	setFocusPolicy(Qt::WheelFocus);
@@ -251,7 +251,7 @@ GLWidget::GLWidget(QWidget * p) : QGLWidget(p)
 	srand(time(NULL));
 }
 
-GLWidget::GLWidget(const QGLFormat & frm, QWidget * p) : QGLWidget(frm,p)
+GLWidget::GLWidget(const QGLFormat & frm) : QGLWidget(frm)
 {
 	setMinimumSize(64,64);
 	setFocusPolicy(Qt::WheelFocus);
