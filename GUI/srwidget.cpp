@@ -17,7 +17,7 @@
 #include <QDir>
 #include "commonutils.h"
 
-SRWidget::SRWidget(float si, QWidget * p) : QWidget(p)
+SRWidget::SRWidget(float si)
 {
 	setupUi(this);
 	tmpfile = QString("");

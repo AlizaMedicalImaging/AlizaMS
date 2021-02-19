@@ -8,7 +8,7 @@ class LUTWidget: public QWidget
 {
 	Q_OBJECT
 public:
-	LUTWidget(float, QWidget(*)=NULL);
+	LUTWidget(float);
 	~LUTWidget();
 	void add_items1();
 	void add_items2();

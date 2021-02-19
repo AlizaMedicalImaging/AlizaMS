@@ -1,6 +1,6 @@
 #include "toolbox2D.h"
 
-ToolBox2D::ToolBox2D(float si, QWidget * p) : QWidget(p)
+ToolBox2D::ToolBox2D(float si)
 {
 	setupUi(this);
 	const QSize s = QSize((int)(18*si),(int)(18*si));

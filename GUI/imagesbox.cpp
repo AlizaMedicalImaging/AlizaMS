@@ -132,7 +132,7 @@ const QString head = QString(
 	" type='text/css' href='format.css'></head><body>");
 const QString foot = QString("</body></html>");
 
-ImagesBox::ImagesBox(float si, QWidget * p) : QWidget(p)
+ImagesBox::ImagesBox(float si)
 {
 	setupUi(this);
 	//

@@ -1,6 +1,6 @@
 #include "sliderwidget.h"
 
-SliderWidget::SliderWidget(QWidget * p) : QWidget(p)
+SliderWidget::SliderWidget()
 {
 	setupUi(this);
 	set_style_sheet();

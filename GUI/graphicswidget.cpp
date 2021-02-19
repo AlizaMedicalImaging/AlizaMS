@@ -1467,10 +1467,7 @@ GraphicsWidget::GraphicsWidget(
 	QLabel * measure_label_,
 	QLineEdit * info_line_,
 	QWidget * single_frame,
-	QWidget * multi_frame,
-	QWidget * p)
-	:
-	QWidget(p)
+	QWidget * multi_frame)
 {
 	run__ = false;
 	axis = a;

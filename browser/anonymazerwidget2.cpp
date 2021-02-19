@@ -1153,7 +1153,7 @@ static void anonymize_file__(
 	if (!writer.Write()) *ok = false;
 }
 
-AnonymazerWidget2::AnonymazerWidget2(float si, QWidget * p) : QWidget(p)
+AnonymazerWidget2::AnonymazerWidget2(float si)
 {
 	setupUi(this);
 	const QSize s = QSize((int)(24*si),(int)(24*si));

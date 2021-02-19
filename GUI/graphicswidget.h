@@ -36,8 +36,7 @@ public:
 		QLabel* /*measurment*/,
 		QLineEdit* /*value*/,
 		QWidget* /*sinle frame*/,
-		QWidget* /*multi frame*/,
-		QWidget(*)=NULL);
+		QWidget* /*multi frame*/);
 	~GraphicsWidget();
 	void set_axis(int); // 0 x, 1 y, 2 z
 	void set_top_label(QLabel*);

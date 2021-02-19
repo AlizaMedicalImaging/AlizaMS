@@ -90,7 +90,7 @@ void BrowserWidget2::compute_offsets(const mdcm::SequenceOfItems * sq, mdcm::VL 
 	}
 }
 
-BrowserWidget2::BrowserWidget2(float si, QWidget * p) : QWidget(p)
+BrowserWidget2::BrowserWidget2(float si)
 {
 	once = false;
 	eye_icon  = QIcon(":/bitmaps/eye.svg");

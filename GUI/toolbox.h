@@ -7,7 +7,7 @@ class ToolBox: public QWidget, public Ui::ToolBox
 {
 	Q_OBJECT
 public:
-	ToolBox(QWidget(*)=NULL);
+	ToolBox();
 	~ToolBox();
 };
 

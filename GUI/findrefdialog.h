@@ -7,7 +7,7 @@ class FindRefDialog: public QDialog, private Ui::FindRefDialog
 {
 Q_OBJECT
 public:
-	FindRefDialog(float, QWidget(*)=NULL);
+	FindRefDialog(float);
 	~FindRefDialog();
 	void set_path(const QString&);
 	QString get_path() const;

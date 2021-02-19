@@ -4,7 +4,7 @@
 #include <QSizePolicy>
 #include <QFont>
 
-LUTWidget::LUTWidget(float si, QWidget * p) : QWidget(p)
+LUTWidget::LUTWidget(float si)
 {
 	QFont small(QString("Arial"), 8);
 	setFont(small);

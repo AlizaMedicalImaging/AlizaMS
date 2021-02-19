@@ -98,20 +98,20 @@ MainWindow::MainWindow(
 	aboutwidget = new AboutWidget(swidth, sheight);
 	aboutwidget->hide();
 	//
-	toolbox = new ToolBox(this);
+	toolbox = new ToolBox();
 	QVBoxLayout * vl0 = new QVBoxLayout(toolbox3D_frame);
 	vl0->setContentsMargins(0,0,0,0);
 	vl0->setSpacing(0);
 	vl0->addWidget(toolbox);
 	//
-	anim3Dwidget = new AnimWidget(scale_icons*adjust_scale_icons, this);
+	anim3Dwidget = new AnimWidget(scale_icons*adjust_scale_icons);
 	anim3Dwidget->label->setText(QString("3D+t"));
 	QVBoxLayout * vl98 = new QVBoxLayout(anim3D_frame);
 	vl98->setContentsMargins(0,0,0,0);
 	vl98->setSpacing(0);
 	vl98->addWidget(anim3Dwidget);
 	//
-	anim2Dwidget = new AnimWidget(scale_icons*adjust_scale_icons, this);
+	anim2Dwidget = new AnimWidget(scale_icons*adjust_scale_icons);
 	anim2Dwidget->label->setText(QString("2D+t"));
 	anim2Dwidget->group_pushButton->hide();
 	anim2Dwidget->remove_pushButton->hide();
@@ -121,19 +121,19 @@ MainWindow::MainWindow(
 	vl99->setSpacing(0);
 	vl99->addWidget(anim2Dwidget);
 	//
-	imagesbox = new ImagesBox(scale_icons*adjust_scale_icons, this);
+	imagesbox = new ImagesBox(scale_icons*adjust_scale_icons);
 	QVBoxLayout * l1 = new QVBoxLayout(imagesbox_frame);
 	l1->setSpacing(0);
 	l1->setContentsMargins(0,0,0,0);
 	l1->addWidget(imagesbox);
 	//
-	toolbox2D = new ToolBox2D(scale_icons*adjust_scale_icons, this);
+	toolbox2D = new ToolBox2D(scale_icons*adjust_scale_icons);
 	QVBoxLayout * l2 = new QVBoxLayout(level_frame);
 	l2->setSpacing(0);
 	l2->setContentsMargins(0,0,0,0);
 	l2->addWidget(toolbox2D);
 	//
-	lutwidget2 = new LUTWidget(scale_icons*adjust_scale_icons, this);
+	lutwidget2 = new LUTWidget(scale_icons*adjust_scale_icons);
 	lutwidget2->add_items1();
 	//
 	if (hide_zoom)
@@ -143,8 +143,8 @@ MainWindow::MainWindow(
 	}
 	else
 	{
-		zoomwidget2D = new ZoomWidget(scale_icons*adjust_scale_icons, this);
-		zoomwidget3D = new ZoomWidget(scale_icons*adjust_scale_icons, this);
+		zoomwidget2D = new ZoomWidget(scale_icons*adjust_scale_icons);
+		zoomwidget3D = new ZoomWidget(scale_icons*adjust_scale_icons);
 	}
 	//
 	frame2D_viewer_layout = new QVBoxLayout(frame2D_viewer);
@@ -155,7 +155,7 @@ MainWindow::MainWindow(
 	frame2D_viewerZ_layout->setSpacing(0);
 	frame2D_viewerZ_layout->setContentsMargins(0,0,0,0);
 	//
-	slider_m  = new SliderWidget(this);
+	slider_m  = new SliderWidget();
 	slider_frame_layout = new QVBoxLayout(slider_frame);
 	slider_frame_layout->setSpacing(0);
 	slider_frame_layout->setContentsMargins(0,0,0,0);
@@ -163,13 +163,13 @@ MainWindow::MainWindow(
 	slider_frame_layoutZ->setSpacing(0);
 	slider_frame_layoutZ->setContentsMargins(0,0,0,0);
 	//
-	slider_y  = new SliderWidget(this);
+	slider_y  = new SliderWidget();
 	QVBoxLayout * l10 = new QVBoxLayout(slider_frameY);
 	l10->setSpacing(0);
 	l10->setContentsMargins(0,0,0,0);
 	l10->addWidget(slider_y);
 	//
-	slider_x  = new SliderWidget(this);
+	slider_x  = new SliderWidget();
 	QVBoxLayout * l11 = new QVBoxLayout(slider_frameX);
 	l11->setSpacing(0);
 	l11->setContentsMargins(0,0,0,0);
@@ -181,8 +181,7 @@ MainWindow::MainWindow(
 		top_label, left_label,
 		measure_label,
 		info_line,
-		graphicswidget_frame, multi_frame,
-		this);
+		graphicswidget_frame, multi_frame);
 	frame2D_viewer_layout->addWidget(graphicswidget_m);
 	slider_frame_layout->addWidget(slider_m);
 	multi_frame->hide();
@@ -197,8 +196,7 @@ MainWindow::MainWindow(
 		top_labelY, left_labelY,
 		measure_labelY,
 		info_lineY,
-		graphicswidget_frame, multi_frame,
-		this);
+		graphicswidget_frame, multi_frame);
 	QVBoxLayout * l7 = new QVBoxLayout(frame2D_viewerY);
 	l7->setSpacing(0);
 	l7->setContentsMargins(0,0,0,0);
@@ -213,9 +211,7 @@ MainWindow::MainWindow(
 		left_labelX,
 		measure_labelX,
 		info_lineX,
-		graphicswidget_frame,
-		multi_frame,
-		this);
+		graphicswidget_frame, multi_frame);
 	QVBoxLayout * l8 = new QVBoxLayout(frame2D_viewerX);
 	l8->setSpacing(0);
 	l8->setContentsMargins(0,0,0,0);
@@ -239,31 +235,31 @@ MainWindow::MainWindow(
 		graphicswidget_x->graphicsview->set_widget_y(graphicswidget_y);
 	}
 	//
-	zrangewidget = new ZRangeWidget(this);
+	zrangewidget = new ZRangeWidget();
 	QVBoxLayout * l13 = new QVBoxLayout(zrange_frame);
 	l13->setSpacing(0);
 	l13->setContentsMargins(0,0,0,0);
 	l13->addWidget(zrangewidget);
 	//
-	sqtree = new SQtree(this, true);
+	sqtree = new SQtree(true);
 	QVBoxLayout * vl296 = new QVBoxLayout(metadata_frame);
 	vl296->setContentsMargins(0,0,0,0);
 	vl296->setSpacing(0);
 	vl296->addWidget(sqtree);
 	//
-	browser2 = new BrowserWidget2(scale_icons*adjust_scale_icons, this);
+	browser2 = new BrowserWidget2(scale_icons*adjust_scale_icons);
 	QVBoxLayout * vl396 = new QVBoxLayout(browser2_frame);
 	vl396->setContentsMargins(0,0,0,0);
 	vl396->setSpacing(0);
 	vl396->addWidget(browser2);
 	//
-	anonymizer = new AnonymazerWidget2(scale_icons*adjust_scale_icons, this);
+	anonymizer = new AnonymazerWidget2(scale_icons*adjust_scale_icons);
 	QVBoxLayout * vl196 = new QVBoxLayout(deidentify_frame);
 	vl196->setContentsMargins(0,0,0,0);
 	vl196->setSpacing(0);
 	vl196->addWidget(anonymizer);
 	//
-	settingswidget = new SettingsWidget(scale_icons, this);
+	settingswidget = new SettingsWidget(scale_icons);
 	QVBoxLayout * vl496 = new QVBoxLayout(settings_frame);
 	vl496->setContentsMargins(0,0,0,0);
 	vl496->setSpacing(0);

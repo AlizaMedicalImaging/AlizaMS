@@ -3,7 +3,7 @@
 #include <QFileDialog>
 #include <QDir>
 
-CTKDialog::CTKDialog(QWidget * p) : QDialog(p)
+CTKDialog::CTKDialog()
 {
 	setupUi(this);
 	file_toolButton->hide();

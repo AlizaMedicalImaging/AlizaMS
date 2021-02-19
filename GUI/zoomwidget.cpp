@@ -1,8 +1,7 @@
 #include "zoomwidget.h"
 #include <QHBoxLayout>
 
-ZoomWidget::ZoomWidget(
-	float si, QWidget * p) : QWidget(p)
+ZoomWidget::ZoomWidget(float si)
 {
 	const QSize s = QSize((int)(18*si),(int)(18*si));
 	QHBoxLayout * l  = new QHBoxLayout(this);

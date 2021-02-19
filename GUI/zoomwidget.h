@@ -8,7 +8,7 @@ class ZoomWidget : public QWidget
 {
 Q_OBJECT
 public:
-	ZoomWidget(float, QWidget(*)=NULL);
+	ZoomWidget(float);
 	~ZoomWidget();
 	QPushButton * plus_pushButton;
 	QPushButton * minus_pushButton;

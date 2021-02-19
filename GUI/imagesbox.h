@@ -47,7 +47,7 @@ class ImagesBox: public QWidget, public Ui::ImagesBox
 {
 	Q_OBJECT
 public:
-	ImagesBox(float, QWidget(*)=NULL);
+	ImagesBox(float);
 	~ImagesBox();
 	void add_image(int, ImageVariant*, QPixmap(*)=NULL);
 	void set_html(const ImageVariant*);

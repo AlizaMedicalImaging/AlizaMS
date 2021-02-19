@@ -7,7 +7,7 @@ class ToolBox2D: public QWidget, public Ui::ToolBox2D
 {
 	Q_OBJECT
 public:
-	ToolBox2D(float, QWidget(*)=NULL);
+	ToolBox2D(float);
 	~ToolBox2D();
 	void set_style_sheet();
 	void set_indicator_red();

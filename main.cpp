@@ -445,7 +445,7 @@ int main(int argc, char *argv[])
 							"Max 256 DICOM files in Metadata Viewer"));
 					break;
 				}
-				SQtree * sqtree = new SQtree(NULL, false);
+				SQtree * sqtree = new SQtree(false);
 				sqtree->setAttribute(Qt::WA_DeleteOnClose);
 				sqtree->show();
 				sqtree->read_file(l.at(x));
@@ -453,7 +453,7 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
-			SQtree * sqtree = new SQtree(NULL, false);
+			SQtree * sqtree = new SQtree(false);
 			sqtree->setAttribute(Qt::WA_DeleteOnClose);
 			sqtree->show();
 		}

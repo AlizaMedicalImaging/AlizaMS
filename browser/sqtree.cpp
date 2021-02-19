@@ -148,7 +148,7 @@ const QString head = QString(
 	"<html><head><link rel='stylesheet' type='text/css' href='format.css'></head><body>");
 const QString foot = QString("</body></html>");
 
-SQtree::SQtree(QWidget * p, bool t) : QWidget(p), skip_settings_pos(t)
+SQtree::SQtree(bool t) : skip_settings_pos(t)
 {
 	setupUi(this);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

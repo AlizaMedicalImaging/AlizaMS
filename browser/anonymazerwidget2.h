@@ -21,7 +21,7 @@ class AnonymazerWidget2 : public QWidget, private Ui::AnonymazerWidget2
 {
 Q_OBJECT
 public:
-	AnonymazerWidget2(float, QWidget(*)=NULL);
+	AnonymazerWidget2(float);
 	~AnonymazerWidget2();
 	void writeSettings(QSettings&);
 

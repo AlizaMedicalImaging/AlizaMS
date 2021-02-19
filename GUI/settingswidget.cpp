@@ -12,7 +12,7 @@
 #include "commonutils.h"
 #include "dicomutils.h"
 
-SettingsWidget::SettingsWidget(float si, QWidget * p) : QWidget(p)
+SettingsWidget::SettingsWidget(float si)
 {
 	setupUi(this);
 	saved_idx = 0;

@@ -12,7 +12,7 @@ class SRWidget: public QWidget, public Ui::SRWidget
 {
 	Q_OBJECT
 public:
-	SRWidget(float, QWidget(*)=NULL);
+	SRWidget(float);
 	~SRWidget();
 	void initSR(const QString&);
 	QStringList tmpfiles;

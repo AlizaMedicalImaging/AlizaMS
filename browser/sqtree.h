@@ -25,7 +25,7 @@ class SQtree: public QWidget, private Ui::SQtree
 Q_OBJECT
 
 public:
-	SQtree(QWidget(*)=NULL, bool=true);
+	SQtree(bool=true);
 	~SQtree();
 	void read_file(const QString&);
 	void clear_tree();

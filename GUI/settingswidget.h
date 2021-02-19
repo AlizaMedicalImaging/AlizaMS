@@ -10,7 +10,7 @@ class SettingsWidget: public QWidget, public Ui::SettingsWidget
 	Q_OBJECT
 
 public:
-	SettingsWidget(float, QWidget(*)=NULL);
+	SettingsWidget(float);
 	~SettingsWidget();
 	short   get_filtering() const;
 	bool    get_resize() const;

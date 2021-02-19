@@ -7,7 +7,7 @@ class ZRangeWidget: public QWidget
 {
 	Q_OBJECT
 public:
-	ZRangeWidget(QWidget(*)=NULL);
+	ZRangeWidget();
 	~ZRangeWidget();
 	QxtSpanSlider * spanslider;
 public slots:
