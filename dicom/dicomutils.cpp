@@ -7778,14 +7778,14 @@ QString DicomUtils::read_buffer(
 		for (size_t x = 0; x < not_rescaled_buffer_size/8; x++)
 		{
 			const unsigned char c = singlebit_buffer[x];
-			not_rescaled_buffer[j  ] = (c &  0x1) ? 255 : 0;
-			not_rescaled_buffer[j+1] = (c &  0x2) ? 255 : 0;
-			not_rescaled_buffer[j+2] = (c &  0x4) ? 255 : 0;
-			not_rescaled_buffer[j+3] = (c &  0x8) ? 255 : 0;
-			not_rescaled_buffer[j+4] = (c & 0x10) ? 255 : 0;
-			not_rescaled_buffer[j+5] = (c & 0x20) ? 255 : 0;
-			not_rescaled_buffer[j+6] = (c & 0x40) ? 255 : 0;
-			not_rescaled_buffer[j+7] = (c & 0x80) ? 255 : 0;
+			not_rescaled_buffer[j  ] = (c &  0x1) ? (char)255 : 0;
+			not_rescaled_buffer[j+1] = (c &  0x2) ? (char)255 : 0;
+			not_rescaled_buffer[j+2] = (c &  0x4) ? (char)255 : 0;
+			not_rescaled_buffer[j+3] = (c &  0x8) ? (char)255 : 0;
+			not_rescaled_buffer[j+4] = (c & 0x10) ? (char)255 : 0;
+			not_rescaled_buffer[j+5] = (c & 0x20) ? (char)255 : 0;
+			not_rescaled_buffer[j+6] = (c & 0x40) ? (char)255 : 0;
+			not_rescaled_buffer[j+7] = (c & 0x80) ? (char)255 : 0;
 			j += 8;
 		}
 		delete [] singlebit_buffer;
