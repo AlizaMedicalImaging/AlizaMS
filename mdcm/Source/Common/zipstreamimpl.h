@@ -98,7 +98,7 @@ namespace detail
 
 /// default gzip buffer size,
 /// change this to suite your needs
-const size_t zstream_default_buffer_size = 4096;
+const size_t zstream_default_buffer_size = 32768;
 
 /// Compression strategy, see zlib doc.
 enum EStrategy
@@ -255,7 +255,7 @@ public:
                                EStrategy strategy = DefaultStrategy,
                                int window_size = -15 /*windowBits is passed < 0 to suppress zlib header */,
                                int memory_level = 8,
-                               size_t buffer_size = zstream_default_buffer_size);
+                               size_t buffer_size = zstream_default_buffer_size*16);
 
     ~basic_zip_ostream(void);
 
