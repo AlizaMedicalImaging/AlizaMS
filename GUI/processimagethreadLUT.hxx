@@ -29,11 +29,12 @@ public:
 		lut_function(lut_function_)
 	{
 	}
+
 	~ProcessImageThreadLUT_()
 	{
 	}
-	//
-	void run()
+
+	void run() override
 	{
 		typename T::SizeType size;
 		size[0] = size_0;
@@ -254,7 +255,7 @@ public:
  			++iterator;
 		}
 	}
-	//
+
 private:
 	typename T::Pointer image;
 	unsigned char * p;

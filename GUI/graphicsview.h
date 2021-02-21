@@ -27,9 +27,9 @@ class GraphicsWidget;
 
 class GraphicsView : public QGraphicsView
 {
-    Q_OBJECT
+Q_OBJECT
 public:
-    GraphicsView(GraphicsWidget *);
+    GraphicsView(GraphicsWidget*);
     ~GraphicsView();
 	QGraphicsPixmapItem * image_item;
 	RectItem            * handle_rect;
@@ -40,8 +40,8 @@ public:
 	QGraphicsPathItem   * measurment_line;
 	QGraphicsRectItem   * pr_area;
 	QGraphicsPathItem   * paint_brush;
-	QList<GraphicsPathItem*> paths;
-	QList<QGraphicsPathItem*> collision_paths;
+	QList<GraphicsPathItem*>     paths;
+	QList<QGraphicsPathItem*>    collision_paths;
 	QList<QGraphicsPathItem*>    us_regions;
 	QList<QGraphicsTextItem*>    prtexts;
 	QList<QGraphicsPathItem*>    prtextanchors;
@@ -76,23 +76,27 @@ public:
 	void draw_prtexts(const ImageVariant*);
 	void draw_prgraphics(const ImageVariant*);
 	void draw_shutter(const ImageVariant*);
+
 public slots:
     void zoom_in();
     void zoom_out();
 	void flip();
 	void animate_flip();
+
 protected:
-    void keyPressEvent(QKeyEvent*);
-    void keyReleaseEvent(QKeyEvent*);
-    void wheelEvent(QWheelEvent*);
-	void mousePressEvent(QMouseEvent*);
-	void mouseDoubleClickEvent(QMouseEvent*);
-	void mouseReleaseEvent(QMouseEvent*);
-	void mouseMoveEvent(QMouseEvent*);
-	void drawBackground(QPainter*, const QRectF&);
-	void drawForeground(QPainter*, const QRectF&);
+    void keyPressEvent(QKeyEvent*) override;
+    void keyReleaseEvent(QKeyEvent*) override;
+    void wheelEvent(QWheelEvent*) override;
+	void mousePressEvent(QMouseEvent*) override;
+	void mouseDoubleClickEvent(QMouseEvent*) override;
+	void mouseReleaseEvent(QMouseEvent*) override;
+	void mouseMoveEvent(QMouseEvent*) override;
+	void drawBackground(QPainter*, const QRectF&) override;
+	void drawForeground(QPainter*, const QRectF&) override;
+
 signals:
 	void bb_changed();
+
 private:
 	int old_win_pos_x;
 	int old_win_pos_y;

@@ -17,13 +17,15 @@ public:
 		LeftHandle,
 		BottomHandle
 	};
-	HandleItem(GraphicsView*,QGraphicsRectItem*, HandleRole);
-	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
-	QRectF boundingRect() const;
+	HandleItem(GraphicsView*, QGraphicsRectItem*, HandleRole);
+	QRectF boundingRect() const override;
+
 protected:
-	void mousePressEvent(QGraphicsSceneMouseEvent*);
-	void mouseReleaseEvent(QGraphicsSceneMouseEvent*);
-	QVariant itemChange(GraphicsItemChange, const QVariant &);
+	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;
+	void mousePressEvent(QGraphicsSceneMouseEvent*) override;
+	void mouseReleaseEvent(QGraphicsSceneMouseEvent*) override;
+	QVariant itemChange(GraphicsItemChange, const QVariant &) override;
+
 private:
 	GraphicsView * view;
 	QGraphicsRectItem * m_item;

@@ -7,33 +7,32 @@
 
 class SettingsWidget: public QWidget, public Ui::SettingsWidget
 {
-	Q_OBJECT
-
+Q_OBJECT
 public:
 	SettingsWidget(float);
 	~SettingsWidget();
-	short   get_filtering() const;
-	bool    get_resize() const;
-	int     get_size_x() const;
-	int     get_size_y() const;
-	bool    get_rescale() const;
-	bool    get_force_rescale() const;
-	bool    get_3d() const;
-	void    set_gl_visible(bool);
-	int     get_time_unit() const;
-	bool    get_mosaic() const;
-	bool    get_overlays() const;
-	double  get_font_pt() const;
-	bool    get_shutter() const;
-	bool    get_level_for_PET() const;
-	bool    get_clean_unused_bits() const;
-	void    writeSettings(QSettings&);
-	float   get_scale_icons() const;
-	bool    get_sr_info() const;
-	int     get_sr_image_width() const;
-	bool    get_sr_chapters() const;
-	bool    get_sr_skip_images() const;
-	bool    get_ignore_dim_org() const;
+	short  get_filtering() const;
+	bool   get_resize() const;
+	int    get_size_x() const;
+	int    get_size_y() const;
+	bool   get_rescale() const;
+	bool   get_force_rescale() const;
+	bool   get_3d() const;
+	void   set_gl_visible(bool);
+	int    get_time_unit() const;
+	bool   get_mosaic() const;
+	bool   get_overlays() const;
+	double get_font_pt() const;
+	bool   get_shutter() const;
+	bool   get_level_for_PET() const;
+	bool   get_clean_unused_bits() const;
+	void   writeSettings(QSettings&);
+	float  get_scale_icons() const;
+	bool   get_sr_info() const;
+	int    get_sr_image_width() const;
+	bool   get_sr_chapters() const;
+	bool   get_sr_skip_images() const;
+	bool   get_ignore_dim_org() const;
 
 private:
 	int   saved_idx;

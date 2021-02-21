@@ -5,11 +5,10 @@
 
 class AnimWidget: public QWidget, public Ui::AnimWidget
 {
-	Q_OBJECT
+Q_OBJECT
 public:
 	AnimWidget(float);
 	~AnimWidget();
-private:
 };
 
 #endif // AnimWidget_H

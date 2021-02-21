@@ -25,19 +25,19 @@ class ScannerWatcher : public mdcm::SimpleSubjectWatcher
 {
 public:
 	ScannerWatcher(mdcm::Subject * s, const char * comment = "") : mdcm::SimpleSubjectWatcher(s, comment) {}
-	void StartFilter()
+	void StartFilter() override
 	{
 		QApplication::processEvents();
 	}
-	void EndFilter()
+	void EndFilter() override
 	{
 		QApplication::processEvents();
 	}
-	void ShowProgress(mdcm::Subject*, const mdcm::Event&)
+	void ShowProgress(mdcm::Subject*, const mdcm::Event&) override
 	{
 		QApplication::processEvents();
 	}
-	void ShowFileName(mdcm::Subject*, const mdcm::Event&) {}
+	void ShowFileName(mdcm::Subject*, const mdcm::Event&) override {}
 };
 
 class EntryDICOMDIR
@@ -64,8 +64,7 @@ class SeriesDICOMDIR
 {
 public:
 	SeriesDICOMDIR() :
-		eye(false), eye2(false)
-	{} 
+		eye(false), eye2(false) {} 
 	~SeriesDICOMDIR() {}
 	bool    eye;
 	bool    eye2;
@@ -91,7 +90,7 @@ public:
 
 class BrowserWidget2: public QWidget, public Ui::BrowserWidget2
 {
-	Q_OBJECT
+Q_OBJECT
 public:
 	BrowserWidget2(float);
 	~BrowserWidget2();
@@ -101,11 +100,11 @@ public:
 	void          writeSettings(QSettings&);
 
 protected:
-	void closeEvent(QCloseEvent*);
-	void dropEvent(QDropEvent*);
-	void dragEnterEvent(QDragEnterEvent*);
-	void dragMoveEvent(QDragMoveEvent*);
-	void dragLeaveEvent(QDragLeaveEvent*);
+	void closeEvent(QCloseEvent*) override;
+	void dropEvent(QDropEvent*) override;
+	void dragEnterEvent(QDragEnterEvent*) override;
+	void dragMoveEvent(QDragMoveEvent*) override;
+	void dragLeaveEvent(QDragLeaveEvent*) override;
 	void readSettings();
 
 public slots:

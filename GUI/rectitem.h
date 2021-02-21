@@ -9,6 +9,7 @@
 #include <QGraphicsSceneHoverEvent>
 #include <QPainter>
 #include "handleitem.h"
+
 class RectItem : public QGraphicsRectItem
 {
 public:
@@ -28,15 +29,17 @@ public:
 	qreal  get_width() const;
 	void   set_width(double);
 	short  get_current_pen() const;
-	QRectF boundingRect() const;
+	QRectF boundingRect() const override;
+
 protected:
-	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
-    void mouseMoveEvent(QGraphicsSceneMouseEvent*);
-    void hoverMoveEvent(QGraphicsSceneHoverEvent*);
-    void mousePressEvent(QGraphicsSceneMouseEvent*);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent*);
-    void keyPressEvent(QKeyEvent*);
-    int  type() const;
+	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent*) override;
+    void hoverMoveEvent(QGraphicsSceneHoverEvent*) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent*) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent*) override;
+    void keyPressEvent(QKeyEvent*) override;
+    int  type() const override;
+
 private:
 	qreal pwidth;
 	short current_pen;

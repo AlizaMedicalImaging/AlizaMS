@@ -5,6 +5,7 @@
 #include <QImage>
 
 class ImageVariant;
+
 class GraphicsUtils
 {
 public:

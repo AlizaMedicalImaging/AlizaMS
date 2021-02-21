@@ -23,7 +23,6 @@
 class SQtree: public QWidget, private Ui::SQtree
 {
 Q_OBJECT
-
 public:
 	SQtree(bool=true);
 	~SQtree();
@@ -40,11 +39,11 @@ public slots:
 	void open_file_and_series();
 
 protected:
-	void closeEvent(QCloseEvent*);
-	void dropEvent(QDropEvent*);
-	void dragEnterEvent(QDragEnterEvent*);
-	void dragMoveEvent(QDragMoveEvent*);
-	void dragLeaveEvent(QDragLeaveEvent*);
+	void closeEvent(QCloseEvent*) override;
+	void dropEvent(QDropEvent*) override;
+	void dragEnterEvent(QDragEnterEvent*) override;
+	void dragMoveEvent(QDragMoveEvent*) override;
+	void dragLeaveEvent(QDragLeaveEvent*) override;
 
 private:
 	void process_element(

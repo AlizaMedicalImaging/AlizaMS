@@ -20,10 +20,11 @@ public:
 	~TestGL() {}
 	bool opengl_init_done;
 	bool no_opengl3;
+
 protected:
-	void initializeGL();
-	void paintGL();
-	void resizeGL(int, int);
+	void initializeGL() override;
+	void paintGL() override;
+	void resizeGL(int, int) override;
 };
 
 #endif // TESTGL____H__

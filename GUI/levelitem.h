@@ -12,12 +12,14 @@ class LevelItem : public QGraphicsItem
 public:
 	enum HandleRole {LeftHandle,RightHandle};
 	LevelItem(QGraphicsRectItem*,int,HistogramView*);
-	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
-	QRectF boundingRect() const;
+	QRectF boundingRect() const override;
+
 protected:
-	void mousePressEvent(QGraphicsSceneMouseEvent*);
-	void mouseReleaseEvent(QGraphicsSceneMouseEvent*);
-	QVariant itemChange(GraphicsItemChange, const QVariant &);
+	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;
+	void mousePressEvent(QGraphicsSceneMouseEvent*) override;
+	void mouseReleaseEvent(QGraphicsSceneMouseEvent*) override;
+	QVariant itemChange(GraphicsItemChange, const QVariant &) override;
+
 private:
 	HistogramView * view;
 	QGraphicsRectItem * m_item;

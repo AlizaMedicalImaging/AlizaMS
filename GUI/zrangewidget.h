@@ -5,11 +5,12 @@
 
 class ZRangeWidget: public QWidget
 {
-	Q_OBJECT
+Q_OBJECT
 public:
 	ZRangeWidget();
 	~ZRangeWidget();
 	QxtSpanSlider * spanslider;
+
 public slots:
 	void set_spanslider_max(int);
 	void set_from(int);

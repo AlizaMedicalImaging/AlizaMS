@@ -26,6 +26,7 @@ public:
 	int get_id() const;
 	ImageVariant * get_image_from_item();
 	const ImageVariant * get_image_from_item_const() const;
+
 private:
 	int id;
 	ImageVariant * ivariant;
@@ -39,13 +40,14 @@ public:
 	~TableWidgetItem2() {}
 	void set_id(int);
 	int  get_id() const;
+
 private:
 	int id;
 };
 
 class ImagesBox: public QWidget, public Ui::ImagesBox
 {
-	Q_OBJECT
+Q_OBJECT
 public:
 	ImagesBox(float);
 	~ImagesBox();

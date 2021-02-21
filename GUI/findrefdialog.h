@@ -12,6 +12,7 @@ public:
 	void set_path(const QString&);
 	QString get_path() const;
 	void set_text(const QString&);
+
 private slots:
 	void select_dir();
 };

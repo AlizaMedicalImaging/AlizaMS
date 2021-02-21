@@ -33,8 +33,7 @@
 
 class MainWindow : public QMainWindow, private Ui::MainWindow
 {
-    Q_OBJECT
-
+Q_OBJECT
 public:
     MainWindow(
 		bool /*3D*/,
@@ -56,12 +55,12 @@ public:
 	QAction * animAct3d;
 
 protected:
-	void closeEvent(QCloseEvent*);
-	void dropEvent(QDropEvent*);
-	void dragEnterEvent(QDragEnterEvent*);
-	void dragMoveEvent(QDragMoveEvent*);
-	void dragLeaveEvent(QDragLeaveEvent*);
-	void resizeEvent(QResizeEvent*);
+	void closeEvent(QCloseEvent*) override;
+	void dropEvent(QDropEvent*) override;
+	void dragEnterEvent(QDragEnterEvent*) override;
+	void dragMoveEvent(QDragMoveEvent*) override;
+	void dragLeaveEvent(QDragLeaveEvent*) override;
+	void resizeEvent(QResizeEvent*) override;
 	void readSettings();
 	void writeSettings();
 

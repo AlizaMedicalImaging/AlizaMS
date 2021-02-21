@@ -16,11 +16,7 @@ public:
 	void set_info();
 
 protected:
-#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-	void mouseReleaseEvent(QMouseEvent*);
-#else
 	void mouseReleaseEvent(QMouseEvent*) override;
-#endif
 
 private:
 	QString get_build_info();

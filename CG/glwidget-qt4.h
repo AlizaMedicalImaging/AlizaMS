@@ -106,11 +106,8 @@ public:
 
 ALIGN16_PRE class GLWidget : public QGLWidget
 {
-
-	Q_OBJECT
-
+Q_OBJECT
 public:
-
 	MY_DECLARE_NEW()
 
 	GLWidget();
@@ -451,14 +448,14 @@ signals:
 	void opengl3_not_available();
 
 protected:
-	void initializeGL();
-	void paintGL();
-	void resizeGL(int, int);
-	void mousePressEvent(QMouseEvent*);
-	void mouseReleaseEvent(QMouseEvent*);
-	void mouseMoveEvent(QMouseEvent*);
-	void wheelEvent(QWheelEvent*);
-	void keyPressEvent(QKeyEvent*);
+	void initializeGL() override;
+	void paintGL() override;
+	void resizeGL(int, int) override;
+	void mousePressEvent(QMouseEvent*) override;
+	void mouseReleaseEvent(QMouseEvent*) override;
+	void mouseMoveEvent(QMouseEvent*) override;
+	void wheelEvent(QWheelEvent*) override;
+	void keyPressEvent(QKeyEvent*) override;
 	QPoint lastPos;
 	QPoint lastPanPos;
 	QPoint lastPosScale;

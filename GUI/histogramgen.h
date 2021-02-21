@@ -10,6 +10,7 @@ public:
 	~HistogramGen() {}
 	void run();
 	QString get_error() const;
+
 private:
 	ImageVariant * ivariant;
 	QString error;

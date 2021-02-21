@@ -5,7 +5,7 @@
 
 class ToolBox2D: public QWidget, public Ui::ToolBox2D
 {
-	Q_OBJECT
+Q_OBJECT
 public:
 	ToolBox2D(float);
 	~ToolBox2D();
@@ -19,6 +19,7 @@ public:
 	void set_lut_function(int);
 	void connect_sliders();
 	void disconnect_sliders();
+
 public slots:
 	void set_window_upper(double);
 	void set_window_lower(double);
@@ -31,6 +32,7 @@ public slots:
 	void update_spinbox_width(int);
 	void set_maxwindow(bool);
 	void enable_maxwindow(bool);
+
 private:
 	QPixmap red;
 	QPixmap green;

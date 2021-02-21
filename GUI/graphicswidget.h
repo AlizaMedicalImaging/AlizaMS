@@ -79,8 +79,7 @@ public:
 	void  set_left_label_text(const QString&);
 	void  set_info_line_text(const QString&);
 	void  set_measure_text(const QString&);
-	void  update_reconstructed_geometry(
-		ImageVariant*);
+	void  update_reconstructed_geometry(ImageVariant*);
 	void  update_background_color();
 	void  set_main();
 	bool  is_main() const;
@@ -88,8 +87,7 @@ public:
 	bool  is_multiview() const;
 	void  set_smooth(bool);
 	bool  get_smooth() const;
-	void  update_measurement(
-		double, double, double, double);
+	void  update_measurement(double, double, double, double);
 	void  set_mouse_modus(short,bool);
 	short get_mouse_modus() const;
 	void  set_show_cursor(bool);
@@ -99,8 +97,7 @@ public:
 	void  set_alt_mode(bool);
 	bool  get_alt_mode() const;
 	int   get_frametime_2D() const;
-	QString contours_from_selected_paths(
-		ImageVariant*, ROI*);
+	QString contours_from_selected_paths(ImageVariant*, ROI*);
 	double get_contours_width() const;
 	bool get_enable_shutter() const;
 	bool get_enable_overlays() const;
@@ -113,14 +110,18 @@ public slots:
 	void set_frametime_2D(int);
 	void show_image_info();
 	void set_contours_width(double);
+
 private slots:
 	void update_image__();
 	void animate_();
+
 signals:
 	void slice_changed(int);
+
 protected:
-	void closeEvent(QCloseEvent*);
-	void leaveEvent(QEvent*);
+	void closeEvent(QCloseEvent*) override;
+	void leaveEvent(QEvent*) override;
+
 private:
 	short  axis;
 	bool   main;

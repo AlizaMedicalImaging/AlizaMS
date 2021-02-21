@@ -10,7 +10,7 @@ class SRImage;
 
 class SRWidget: public QWidget, public Ui::SRWidget
 {
-	Q_OBJECT
+Q_OBJECT
 public:
 	SRWidget(float);
 	~SRWidget();
@@ -19,7 +19,7 @@ public:
 	std::vector<SRImage> srimages;
 
 protected:
-	void closeEvent(QCloseEvent*);
+	void closeEvent(QCloseEvent*) override;
 	void readSettings();
 	void writeSettings();
 

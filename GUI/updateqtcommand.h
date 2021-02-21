@@ -12,8 +12,8 @@ public:
 	typedef itk::Command Superclass;
 	typedef itk::SmartPointer<Self> Pointer;
 	itkNewMacro(Self);
-	void Execute(itk::Object*, const itk::EventObject&);
-	void Execute(const itk::Object*, const itk::EventObject&);
+	void Execute(itk::Object*, const itk::EventObject&) override;
+	void Execute(const itk::Object*, const itk::EventObject&) override;
 };
 
 #endif

@@ -24,7 +24,10 @@ public:
 	int  get_type() const;
 	void set_type(int);
 	QPainterPath shape() const;
-	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
+
+protected:
+	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;
+
 private:
 	int  contour_id;
 	int  roi_id;
