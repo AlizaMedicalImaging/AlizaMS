@@ -38,7 +38,7 @@ Altered by: Andreas Zieringer 2003 for OpenSG project
 Altered by: Geoffrey Hutchison 2005 for Open Babel project
             minor namespace modifications, VC++ compatibility
 
-Altered by: Mathieu Malaterre 2008, for MDCM project
+Altered by: Mathieu Malaterre 2008, for GDCM project
             when reading deflate bit stream in DICOM special handling of \0 is needed
             also when writing deflate back to disk, the add_footer must be called
 */
@@ -255,7 +255,7 @@ public:
                                EStrategy strategy = DefaultStrategy,
                                int window_size = -15 /*windowBits is passed < 0 to suppress zlib header */,
                                int memory_level = 8,
-                               size_t buffer_size = zstream_default_buffer_size*16);
+                               size_t buffer_size = zstream_default_buffer_size*8);
 
     ~basic_zip_ostream(void);
 

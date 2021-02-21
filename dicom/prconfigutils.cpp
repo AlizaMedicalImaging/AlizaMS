@@ -942,6 +942,8 @@ static void rotate_flip_points(
 	}
 }
 
+template class itk::NumericTraits<RGBPixelUC>;
+
 template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 	const typename T::Pointer & image,
 	typename T::Pointer & out_image,
@@ -959,7 +961,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 		out_image->SetRegions(image->GetLargestPossibleRegion());
 		out_image->Allocate();
 		out_image->FillBuffer(
-			itk::NumericTraits<typename T::PixelType>::Zero);
+			itk::NumericTraits<typename T::PixelType>::ZeroValue());
 	}
 	catch (itk::ExceptionObject & ex)
 	{
@@ -1053,7 +1055,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 						filter0->SetInterpolator(interpolator);
 						filter0->SetDefaultPixelValue(
 							itk::NumericTraits<
-								typename T2d::PixelType>::Zero);
+								typename T2d::PixelType>::ZeroValue());
 						filter0->SetTransform(transform);
 						filter0->SetOutputOrigin(tmp0->GetOrigin());
 						filter0->SetOutputSpacing(tmp0->GetSpacing());
@@ -1141,7 +1143,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 							filter0->SetDefaultPixelValue(
 								itk::NumericTraits<
 									typename
-										T2d::PixelType>::Zero);
+										T2d::PixelType>::ZeroValue());
 							filter0->SetTransform(transform);
 							filter0->SetOutputOrigin(tmp0->GetOrigin());
 							filter0->SetOutputSpacing(tmp0->GetSpacing());
@@ -1193,7 +1195,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 										{
 											it.Set(itk::NumericTraits<
 												typename
-													T2d::PixelType>::Zero);
+													T2d::PixelType>::ZeroValue());
 										}
 										else
 										{
@@ -1210,7 +1212,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 										{
 											it.Set(itk::NumericTraits<
 												typename
-													T2d::PixelType>::Zero);
+													T2d::PixelType>::ZeroValue());
 										}
 										else
 										{
@@ -1307,6 +1309,13 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 	else return QString("Output image is NULL");
 	return QString("");
 }
+
+template QString rotate_flip_slice_by_slice<RGBImageTypeUC, RGBImage2DTypeUC>(
+	const RGBImageTypeUC::Pointer &,
+	RGBImageTypeUC::Pointer &,
+	const ImageVariant *,
+	const double,
+	const bool);
 
 template<typename T, typename T2d> QString levels_slice_by_slice(
 	const typename T::Pointer & image,
@@ -3835,21 +3844,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				if (d != 0.0 || flip)
 				{
 					*spatial_transform = true;
-					if (v->image_type == 14)
-					{
-						RGBImageTypeUC::Pointer tmp0;
-						error = rotate_flip_slice_by_slice<
-							RGBImageTypeUC,RGBImage2DTypeUC>(
-								v->pUC_rgb, tmp0, v, d,
-									(f == QString("Y")));
-						if (error.isEmpty())
-						{
-							if (v->pUC_rgb.IsNotNull())
-								v->pUC_rgb->DisconnectPipeline();
-							v->pUC_rgb = tmp0;
-						}
-					}
-					else if (v->image_type == 4)
+					if (v->image_type == 4)
 					{
 						ImageTypeUC::Pointer tmp0;
 						error = rotate_flip_slice_by_slice<
@@ -3873,6 +3868,20 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 							if (v->pF.IsNotNull())
 								v->pF->DisconnectPipeline();
 							v->pF = tmp0;
+						}
+					}
+					else if (v->image_type == 14)
+					{
+						RGBImageTypeUC::Pointer tmp0;
+						error = rotate_flip_slice_by_slice<
+							RGBImageTypeUC,RGBImage2DTypeUC>(
+								v->pUC_rgb, tmp0, v, d,
+									(f == QString("Y")));
+						if (error.isEmpty())
+						{
+							if (v->pUC_rgb.IsNotNull())
+								v->pUC_rgb->DisconnectPipeline();
+							v->pUC_rgb = tmp0;
 						}
 					}
 					else

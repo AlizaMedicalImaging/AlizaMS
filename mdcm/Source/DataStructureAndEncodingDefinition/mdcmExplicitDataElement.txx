@@ -491,6 +491,7 @@ const std::ostream &ExplicitDataElement::Write(std::ostream &os) const
       {
         VL dummy = sqi->template ComputeLength<ExplicitDataElement>();
         mdcmAssertAlwaysMacro(dummy == ValueLengthField);
+        (void)dummy;
       }
     }
     else if(GetSequenceOfFragments())

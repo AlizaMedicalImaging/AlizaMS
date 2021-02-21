@@ -167,6 +167,7 @@ std::istream& ReadValue(std::istream &is, bool /*readvalues*/)
       const ByteValue * bv = Fragments[ lastf ].GetByteValue();
       const char * a = bv->GetPointer();
       mdcmAssertAlwaysMacro((unsigned char)a[ bv->GetLength() - 1 ] == 0xfe);
+      (void)a;
       Fragments[ lastf ].SetByteValue(bv->GetPointer(), bv->GetLength() - 1);
       is.seekg(-9, std::ios::cur);
       assert(is.good());
@@ -191,6 +192,7 @@ std::istream& ReadValue(std::istream &is, bool /*readvalues*/)
       const ByteValue * bv = Fragments[ lastf ].GetByteValue();
       const char * a = bv->GetPointer();
       mdcmAssertAlwaysMacro((unsigned char)a[ bv->GetLength() - 2 ] == 0xfe);
+      (void)a;
       Fragments[ lastf ].SetByteValue(bv->GetPointer(), bv->GetLength() - 2);
       is.seekg(-10, std::ios::cur);
       assert(is.good());
@@ -216,6 +218,7 @@ std::istream& ReadValue(std::istream &is, bool /*readvalues*/)
       const ByteValue * bv = Fragments[ lastf ].GetByteValue();
       const char * a = bv->GetPointer();
       mdcmAssertAlwaysMacro((unsigned char)a[ bv->GetLength() - 3 ] == 0xfe);
+      (void)a;
       Fragments[ lastf ].SetByteValue(bv->GetPointer(), bv->GetLength() - 3);
       is.seekg(-11, std::ios::cur);
       assert(is.good());

@@ -23,7 +23,7 @@ public:
 	void set_slice(int);
 	int  get_type() const;
 	void set_type(int);
-	QPainterPath shape() const;
+	QPainterPath shape() const override;
 
 protected:
 	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;
