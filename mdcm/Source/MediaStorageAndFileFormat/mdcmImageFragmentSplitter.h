@@ -28,9 +28,11 @@ namespace mdcm
 {
 
 class DataElement;
+
 /**
  * ImageFragmentSplitter class
- * For single frame image, DICOM standard allow splitting the frame into multiple fragments
+ * For single frame image, DICOM standard allow splitting
+ * the frame into multiple fragments
  */
 class MDCM_EXPORT ImageFragmentSplitter : public ImageToImageFilter
 {
@@ -39,9 +41,8 @@ public:
   ~ImageFragmentSplitter() {}
   bool Split();
   void SetFragmentSizeMax(unsigned int fragsize);
-  unsigned int GetFragmentSizeMax() const { return FragmentSizeMax; }
-  void SetForce(bool f) { Force = f; }
-
+  unsigned int GetFragmentSizeMax() const;
+  void SetForce(bool);
 private:
   unsigned int FragmentSizeMax;
   bool Force;

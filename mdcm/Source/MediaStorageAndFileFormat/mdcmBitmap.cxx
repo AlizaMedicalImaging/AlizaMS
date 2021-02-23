@@ -45,7 +45,8 @@ Bitmap::Bitmap():
   LUT(new LookupTable),
   NeedByteSwap(false),
   LossyFlag(false)
-{}
+{
+}
 
 Bitmap::~Bitmap() {}
 
@@ -145,6 +146,11 @@ void Bitmap::Clear()
   Dimensions.clear();
 }
 
+bool Bitmap::IsEmpty() const
+{
+  return (Dimensions.size() == 0);
+}
+
 const PhotometricInterpretation & Bitmap::GetPhotometricInterpretation() const
 {
   return PI;
@@ -155,6 +161,18 @@ void Bitmap::SetPhotometricInterpretation(PhotometricInterpretation const &pi)
   PI = pi;
 }
 
+bool Bitmap::IsLossy() const
+{
+  return LossyFlag;
+}
+
+void Bitmap::SetLossyFlag(bool f)
+{
+  LossyFlag = f;
+}
+
+// For palette color multiply this length by 3,
+// if computing the size of equivalent RGB image.
 unsigned long long Bitmap::GetBufferLength() const
 {
   if (PF == PixelFormat::UNKNOWN) return 0;
@@ -208,6 +226,170 @@ unsigned long long Bitmap::GetBufferLength() const
     mdcmAlwaysWarnMacro("GetBufferLength() = 0");
   }
   return len;
+}
+
+bool Bitmap::GetBuffer(char * buffer) const
+{
+  bool dummy;
+  return GetBufferInternal(buffer, dummy);
+}
+
+bool Bitmap::AreOverlaysInPixelData() const
+{
+  return false;
+}
+
+bool Bitmap::UnusedBitsPresentInPixelData() const
+{
+  return false;
+}
+
+// Call SetPixelFormat first, before SetPlanarConfiguration!
+bool Bitmap::GetNeedByteSwap() const
+{
+  return NeedByteSwap;
+}
+
+void Bitmap::SetNeedByteSwap(bool b)
+{
+  NeedByteSwap = b;
+}
+
+void Bitmap::SetTransferSyntax(TransferSyntax const & ts)
+{
+  TS = ts;
+}
+
+const TransferSyntax & Bitmap::GetTransferSyntax() const
+{
+  return TS;
+}
+
+bool Bitmap::IsTransferSyntaxCompatible(TransferSyntax const & ts) const
+{
+  if (GetTransferSyntax() == ts) return true;
+  if (GetTransferSyntax() == TransferSyntax::JPEGExtendedProcess2_4)
+  {
+    if (GetPixelFormat().GetBitsAllocated() == 8)
+    {
+      if (ts == TransferSyntax::JPEGBaselineProcess1) return true;
+    }
+  }
+  return false;
+}
+
+void Bitmap::SetDataElement(DataElement const & de)
+{
+  PixelData = de;
+}
+
+const DataElement & Bitmap::GetDataElement() const
+{
+  return PixelData;
+}
+
+DataElement & Bitmap::GetDataElement()
+{
+  return PixelData;
+}
+
+void Bitmap::SetLUT(LookupTable const & lut)
+{
+  LUT = SmartPointer<LookupTable>(const_cast<LookupTable*>(&lut));
+}
+
+const LookupTable & Bitmap::GetLUT() const
+{
+  return *LUT;
+}
+
+LookupTable & Bitmap::GetLUT()
+{
+  return *LUT;
+}
+
+void Bitmap::SetColumns(unsigned int col)
+{
+  SetDimension(0,col);
+}
+
+unsigned int Bitmap::GetColumns() const
+{
+  return GetDimension(0);
+}
+
+void Bitmap::SetRows(unsigned int rows)
+{
+  SetDimension(1,rows);
+}
+
+unsigned int Bitmap::GetRows() const
+{
+  return GetDimension(1);
+}
+
+const PixelFormat & Bitmap::GetPixelFormat() const
+{
+  return PF;
+}
+
+PixelFormat & Bitmap::GetPixelFormat()
+{
+  return PF;
+}
+
+void Bitmap::SetPixelFormat(PixelFormat const &pf)
+{
+  PF = pf;
+  PF.Validate();
+}
+
+void Bitmap::Print(std::ostream & os) const
+{
+  Object::Print(os);
+  if (!IsEmpty())
+  {
+    os << "NumberOfDimensions: " << NumberOfDimensions << "\n";
+    assert(Dimensions.size());
+    os << "Dimensions: (";
+    std::vector<unsigned int>::const_iterator it = Dimensions.begin();
+    os << *it;
+    for (++it; it != Dimensions.end(); ++it)
+    {
+      os << "," << *it;
+    }
+    os << ")\n";
+    PF.Print(os);
+    os << "PhotometricInterpretation: " << PI << "\n";
+    os << "PlanarConfiguration: " << PlanarConfiguration << "\n";
+    os << "TransferSyntax: " << TS << "\n";
+  }
+}
+
+bool Bitmap::GetBuffer2(std::ostream &os) const
+{
+  bool success = false;
+  if (!success) success = TryJPEGCodec2(os);
+  if (!success)
+  {
+#ifndef MDCM_DONT_THROW
+    throw Exception("No codec found for this image");
+#endif
+  }
+  return success;
+}
+
+// Image can be lossy but in implicit little endian format
+bool Bitmap::ComputeLossyFlag()
+{
+  bool lossyflag;
+  if (this->GetBufferInternal(0, lossyflag))
+  {
+    LossyFlag = lossyflag;
+    return true;
+  }
+  LossyFlag = false;
+  return false;
 }
 
 bool Bitmap::TryRAWCodec(char * buffer, bool & lossyflag) const
@@ -508,23 +690,6 @@ bool Bitmap::TryJPEGLSCodec(char * buffer, bool & lossyflag) const
   return false;
 }
 
-bool Bitmap::IsLossy() const
-{
-  return LossyFlag;
-}
-
-bool Bitmap::ComputeLossyFlag()
-{
-  bool lossyflag;
-  if (this->GetBufferInternal(0, lossyflag))
-  {
-    LossyFlag = lossyflag;
-    return true;
-  }
-  LossyFlag = false;
-  return false;
-}
-
 bool Bitmap::TryJPEG2000Codec(char * buffer, bool & lossyflag) const
 {
   JPEG2000Codec codec;
@@ -666,12 +831,6 @@ bool Bitmap::TryRLECodec(char * buffer, bool & lossyflag ) const
   return false;
 }
 
-bool Bitmap::GetBuffer(char * buffer) const
-{
-  bool dummy;
-  return GetBufferInternal(buffer, dummy);
-}
-
 bool Bitmap::GetBufferInternal(char * buffer, bool & lossyflag) const
 {
   bool success = false;
@@ -683,54 +842,6 @@ bool Bitmap::GetBufferInternal(char * buffer, bool & lossyflag) const
   if (!success) success = TryRLECodec(buffer, lossyflag);
   if (!success) buffer = 0;
   return success;
-}
-
-bool Bitmap::GetBuffer2(std::ostream &os) const
-{
-  bool success = false;
-  if (!success) success = TryJPEGCodec2(os);
-  if (!success)
-  {
-#ifndef MDCM_DONT_THROW
-    throw Exception("No codec found for this image");
-#endif
-  }
-  return success;
-}
-
-bool Bitmap::IsTransferSyntaxCompatible(TransferSyntax const & ts) const
-{
-  if (GetTransferSyntax() == ts) return true;
-  if (GetTransferSyntax() == TransferSyntax::JPEGExtendedProcess2_4)
-  {
-    if (GetPixelFormat().GetBitsAllocated() == 8)
-    {
-      if (ts == TransferSyntax::JPEGBaselineProcess1) return true;
-    }
-  }
-  return false;
-}
-
-void Bitmap::Print(std::ostream & os) const
-{
-  Object::Print(os);
-  if (!IsEmpty())
-  {
-    os << "NumberOfDimensions: " << NumberOfDimensions << "\n";
-    assert(Dimensions.size());
-    os << "Dimensions: (";
-    std::vector<unsigned int>::const_iterator it = Dimensions.begin();
-    os << *it;
-    for (++it; it != Dimensions.end(); ++it)
-    {
-      os << "," << *it;
-    }
-    os << ")\n";
-    PF.Print(os);
-    os << "PhotometricInterpretation: " << PI << "\n";
-    os << "PlanarConfiguration: " << PlanarConfiguration << "\n";
-    os << "TransferSyntax: " << TS << "\n";
-  }
 }
 
 }

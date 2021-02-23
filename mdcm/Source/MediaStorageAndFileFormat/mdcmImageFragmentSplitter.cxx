@@ -30,13 +30,13 @@ bool ImageFragmentSplitter::Split()
 {
   Output = Input;
   const Bitmap & image = *Input;
-  const unsigned int *dims = image.GetDimensions();
+  const unsigned int * dims = image.GetDimensions();
   if(dims[2] != 1)
   {
     mdcmDebugMacro("Cannot split a 3D image");
     return false;
   }
-  const DataElement& pixeldata = image.GetDataElement();
+  const DataElement & pixeldata = image.GetDataElement();
   const SequenceOfFragments * sqf = pixeldata.GetSequenceOfFragments();
   if(!sqf)
   {
@@ -48,11 +48,15 @@ bool ImageFragmentSplitter::Split()
     mdcmDebugMacro("Case not handled (for now)");
     return false;
   }
-  const Fragment& frag = sqf->GetFragment(0);
+  const Fragment & frag = sqf->GetFragment(0);
   const ByteValue * bv = frag.GetByteValue();
+  if (!bv)
+  {
+    return false;
+  }
   const char * p = bv->GetPointer();
   unsigned long len = bv->GetLength();
-  if(FragmentSizeMax > len && !Force)
+  if((FragmentSizeMax > len) && !Force)
   {
     return true;
   }
@@ -101,6 +105,16 @@ void ImageFragmentSplitter::SetFragmentSizeMax(unsigned int fragsize)
     FragmentSizeMax = 2;
   }
   assert(FragmentSizeMax >= 2 && (FragmentSizeMax % 2) == 0);
+}
+
+unsigned int ImageFragmentSplitter::GetFragmentSizeMax() const
+{
+  return FragmentSizeMax;
+}
+
+void ImageFragmentSplitter::SetForce(bool f)
+{
+  Force = f;
 }
 
 } // end namespace mdcm

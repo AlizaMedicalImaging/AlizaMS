@@ -31,13 +31,14 @@ namespace mdcm
 {
 
 class LookupTableInternal;
+
 /**
- * \brief LookupTable class
+ * LookupTable class
  */
 class MDCM_EXPORT LookupTable : public Object
 {
 public:
-  typedef enum // don't change
+  typedef enum
   {
     RED        = 0,
     GREEN      = 1,
@@ -51,50 +52,32 @@ public:
 
   LookupTable();
   ~LookupTable();
-
-  void Print(std::ostream &) const {}
-  void Allocate( unsigned short bitsample = 8 );
-  //TODO: check to see if length should be unsigned short, unsigned int, or whatever
-  void InitializeLUT(LookupTableType type, unsigned short length,
-    unsigned short subscript, unsigned short bitsize);
-  unsigned int GetLUTLength(LookupTableType type) const;
-  virtual void SetLUT(LookupTableType type, const unsigned char * array,
-    unsigned int length);
-  void GetLUT(LookupTableType type, unsigned char * array, unsigned int & length) const;
-  void GetLUTDescriptor(LookupTableType type, unsigned short & length,
-    unsigned short & subscript, unsigned short & bitsize) const;
-  void InitializeRedLUT(unsigned short length, unsigned short subscript,
-    unsigned short bitsize);
-  void SetRedLUT(const unsigned char * red, unsigned int length);
-  void InitializeGreenLUT(unsigned short length, unsigned short subscript,
-    unsigned short bitsize);
-  void SetGreenLUT(const unsigned char * green, unsigned int length);
-  void InitializeBlueLUT(unsigned short length, unsigned short subscript,
-    unsigned short bitsize);
-  void SetBlueLUT(const unsigned char * blue, unsigned int length);
-  void Clear();
-  void Decode(std::istream & is, std::ostream & os) const;
-  bool Decode(
-    char * outputbuffer, size_t outlen,
-    const char * inputbuffer, size_t inlen) const;
-  int DecodeSupplemental(
-    char * outputbuffer, size_t outlen,
-    const char * inputbuffer, size_t inlen) const; 
-  LookupTable(LookupTable const & lut) : Object(lut)
-  {
-    assert(0);
-  }
-  bool GetBufferAsRGBA(unsigned char * rgba) const;
-  const unsigned char * GetPointer() const;
-  bool WriteBufferAsRGBA(const unsigned char * rgba);
-  unsigned short GetBitSample() const { return BitSample; }
   bool Initialized() const;
-
-private:
+  void Clear();
+  void Allocate(unsigned short = 8 /*bitsample*/ );
+  void InitializeLUT(LookupTableType, unsigned short, unsigned short, unsigned short);
+  unsigned int GetLUTLength(LookupTableType) const;
+  virtual void SetLUT(LookupTableType, const unsigned char *, unsigned int);
+  void GetLUT(LookupTableType, unsigned char *, unsigned int &) const;
+  void GetLUTDescriptor(LookupTableType, unsigned short &, unsigned short &, unsigned short &) const;
+  void InitializeRedLUT(unsigned short, unsigned short, unsigned short);
+  void InitializeGreenLUT(unsigned short, unsigned short, unsigned short);
+  void InitializeBlueLUT(unsigned short, unsigned short, unsigned short);
+  void SetRedLUT(const unsigned char *, unsigned int);
+  void SetGreenLUT(const unsigned char *, unsigned int);
+  void SetBlueLUT(const unsigned char *, unsigned int);
+  void Decode(std::istream & is, std::ostream & os) const;
+  bool Decode(char *, size_t, const char *, size_t) const;
+  int DecodeSupplemental(char *, size_t, const char *, size_t) const; 
+  const unsigned char * GetPointer() const;
+  bool GetBufferAsRGBA(unsigned char *) const;
+  bool WriteBufferAsRGBA(const unsigned char *);
+  unsigned short GetBitSample() const;
+  void Print(std::ostream &) const override;
 protected:
-  LookupTableInternal *Internal;
+  LookupTableInternal * Internal;
   unsigned short BitSample;
-  bool IncompleteLUT:1;
+  bool IncompleteLUT;
 };
 
 } // end namespace mdcm

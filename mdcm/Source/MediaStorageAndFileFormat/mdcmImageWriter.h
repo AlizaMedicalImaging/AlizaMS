@@ -29,6 +29,7 @@ namespace mdcm
 {
 
 class Image;
+
 /**
  * ImageWriter
  */
@@ -37,15 +38,10 @@ class MDCM_EXPORT ImageWriter : public PixmapWriter
 public:
   ImageWriter();
   ~ImageWriter();
-
-  // It will overwrite anything Image infos found in DataSet
-  // (see parent class to see how to pass dataset)
-  const Image& GetImage() const { return dynamic_cast<const Image&>(*PixelData); }
-  Image& GetImage() { return dynamic_cast<Image&>(*PixelData); } // FIXME
-  bool Write();
-  // Internal function used to compute a target MediaStorage
-  // User may want to call this function ahead before Write
+  const Image & GetImage() const;
+  Image & GetImage();
   MediaStorage ComputeTargetMediaStorage();
+  bool Write();
 };
 
 } // end namespace mdcm

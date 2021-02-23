@@ -32,60 +32,29 @@ namespace mdcm
 
 /**
  * Pixmap class
- * A bitmap based image. Used as parent for both IconImage and the main Pixel Data Image
- * It does not contains any World Space information (IPP, IOP)
+ * It does not contains any world space information.
  *
  */
 class MDCM_EXPORT Pixmap : public Bitmap
 {
 public:
-
   Pixmap();
   ~Pixmap();
-  void Print(std::ostream &) const;
-
-  bool AreOverlaysInPixelData() const;
-  bool UnusedBitsPresentInPixelData() const;
-
-  Curve & GetCurve(size_t i = 0)
-  {
-    assert( i < Curves.size() );
-    return Curves[i];
-  }
-
-  const Curve & GetCurve(size_t i = 0) const {
-    assert( i < Curves.size() );
-    return Curves[i];
-  }
-
-  size_t GetNumberOfCurves() const { return Curves.size(); }
-  void SetNumberOfCurves(size_t n) { Curves.resize(n); }
-
-  Overlay & GetOverlay(size_t i = 0)
-  {
-    assert( i < Overlays.size() );
-    return Overlays[i];
-  }
-
-  const Overlay & GetOverlay(size_t i = 0) const
-  {
-    assert( i < Overlays.size() );
-    return Overlays[i];
-  }
-
-  size_t GetNumberOfOverlays() const { return Overlays.size(); }
-  void SetNumberOfOverlays(size_t n) { Overlays.resize(n); }
-
-  void RemoveOverlay(size_t i)
-  {
-    assert( i < Overlays.size() );
-    Overlays.erase( Overlays.begin() + i );
-  }
-
-  const IconImage & GetIconImage() const { return *Icon; }
-  IconImage & GetIconImage() { return *Icon; }
-  void SetIconImage(IconImage const & ii) { Icon = ii; }
-
+  bool AreOverlaysInPixelData() const override;
+  bool UnusedBitsPresentInPixelData() const override;
+  Curve & GetCurve(size_t = 0);
+  const Curve & GetCurve(size_t = 0) const;
+  size_t GetNumberOfCurves() const;
+  void SetNumberOfCurves(size_t);
+  Overlay & GetOverlay(size_t = 0);
+  const Overlay & GetOverlay(size_t = 0) const;
+  size_t GetNumberOfOverlays() const;
+  void SetNumberOfOverlays(size_t);
+  void RemoveOverlay(size_t);
+  const IconImage & GetIconImage() const;
+  IconImage & GetIconImage();
+  void SetIconImage(IconImage const &);
+  void Print(std::ostream &) const override;
 protected:
   std::vector<Overlay>  Overlays;
   std::vector<Curve>  Curves;

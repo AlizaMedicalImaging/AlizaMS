@@ -245,12 +245,14 @@ void LookupTable::InitializeRedLUT(unsigned short length,
 {
   InitializeLUT(RED, length, subscript, bitsize);
 }
+
 void LookupTable::InitializeGreenLUT(unsigned short length,
   unsigned short subscript,
   unsigned short bitsize)
 {
   InitializeLUT(GREEN, length, subscript, bitsize);
 }
+
 void LookupTable::InitializeBlueLUT(unsigned short length,
   unsigned short subscript,
   unsigned short bitsize)
@@ -460,7 +462,7 @@ void LookupTable::Encode(std::istream &is, std::ostream &os)
 }
 #endif
 
-void LookupTable::Decode(std::istream &is, std::ostream &os) const
+void LookupTable::Decode(std::istream & is, std::ostream & os) const
 {
   assert(Initialized());
   if (BitSample == 8)
@@ -506,7 +508,8 @@ void LookupTable::Decode(std::istream &is, std::ostream &os) const
   }
 }
 
-bool LookupTable::Decode(char * output, size_t outlen, const char * input, size_t inlen) const
+bool LookupTable::Decode(
+  char * output, size_t outlen, const char * input, size_t inlen) const
 {
   bool success = false;
   if(outlen < 3 * inlen)
@@ -563,8 +566,7 @@ bool LookupTable::Decode(char * output, size_t outlen, const char * input, size_
 }
 
 int LookupTable::DecodeSupplemental(
-  char * output, size_t outlen,
-  const char * input, size_t inlen) const
+  char * output, size_t outlen, const char * input, size_t inlen) const
 {
   if(outlen < 3 * inlen)
   {
@@ -718,6 +720,15 @@ bool LookupTable::WriteBufferAsRGBA(const unsigned char *rgba)
     ret = true;
   }
   return ret;
+}
+
+unsigned short LookupTable::GetBitSample() const
+{
+  return BitSample;
+}
+
+void LookupTable::Print(std::ostream &) const
+{
 }
 
 } // end namespace mdcm

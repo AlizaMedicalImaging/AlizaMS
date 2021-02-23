@@ -48,6 +48,71 @@ bool Pixmap::UnusedBitsPresentInPixelData() const
   return ba != bs;
 }
 
+Curve & Pixmap::GetCurve(size_t i)
+{
+  assert(i < Curves.size());
+  return Curves[i];
+}
+
+const Curve & Pixmap::GetCurve(size_t i) const
+{
+  assert(i < Curves.size());
+  return Curves[i];
+}
+
+size_t Pixmap::GetNumberOfCurves() const
+{
+  return Curves.size();
+}
+
+void Pixmap::SetNumberOfCurves(size_t n)
+{
+  Curves.resize(n);
+}
+
+Overlay & Pixmap::GetOverlay(size_t i)
+{
+  assert(i < Overlays.size());
+  return Overlays[i];
+}
+
+const Overlay & Pixmap::GetOverlay(size_t i) const
+{
+  assert(i < Overlays.size());
+  return Overlays[i];
+}
+
+size_t Pixmap::GetNumberOfOverlays() const
+{
+  return Overlays.size();
+}
+
+void Pixmap::SetNumberOfOverlays(size_t n)
+{
+  Overlays.resize(n);
+}
+
+void Pixmap::RemoveOverlay(size_t i)
+{
+  assert(i < Overlays.size());
+  Overlays.erase(Overlays.begin() + i);
+}
+
+const IconImage & Pixmap::GetIconImage() const
+{
+  return *Icon;
+}
+
+IconImage & Pixmap::GetIconImage()
+{
+  return *Icon;
+}
+
+void Pixmap::SetIconImage(IconImage const & ii)
+{
+  Icon = ii;
+}
+
 void Pixmap::Print(std::ostream &os) const
 {
   Bitmap::Print(os);

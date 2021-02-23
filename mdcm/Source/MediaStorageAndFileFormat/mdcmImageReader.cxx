@@ -76,7 +76,9 @@ bool ImageReader::ReadImage(const MediaStorage & ms)
     pixeldata.SetSpacing(&spacing[0]);
     if(spacing.size() > pixeldata.GetNumberOfDimensions()) // HACK
     {
-      pixeldata.SetSpacing(pixeldata.GetNumberOfDimensions(), spacing[pixeldata.GetNumberOfDimensions()]);
+      pixeldata.SetSpacing(
+        pixeldata.GetNumberOfDimensions(),
+        spacing[pixeldata.GetNumberOfDimensions()]);
     }
   }
   // Origin
@@ -86,7 +88,9 @@ bool ImageReader::ReadImage(const MediaStorage & ms)
     pixeldata.SetOrigin(&origin[0]);
     if(origin.size() > pixeldata.GetNumberOfDimensions()) // HACK
     {
-      pixeldata.SetOrigin(pixeldata.GetNumberOfDimensions(), origin[pixeldata.GetNumberOfDimensions()]);
+      pixeldata.SetOrigin(
+        pixeldata.GetNumberOfDimensions(),
+        origin[pixeldata.GetNumberOfDimensions()]);
     }
   }
   std::vector<double> dircos = ImageHelper::GetDirectionCosinesValue(*F);
@@ -128,7 +132,9 @@ bool ImageReader::ReadACRNEMAImage()
     pixeldata.SetOrigin(at.GetValues());
     if(at.GetNumberOfValues() > pixeldata.GetNumberOfDimensions()) // HACK
     {
-      pixeldata.SetOrigin(pixeldata.GetNumberOfDimensions(), at.GetValue(pixeldata.GetNumberOfDimensions()));
+      pixeldata.SetOrigin(
+        pixeldata.GetNumberOfDimensions(),
+        at.GetValue(pixeldata.GetNumberOfDimensions()));
     }
   }
   const Tag timageorientation(0x0020, 0x0035);

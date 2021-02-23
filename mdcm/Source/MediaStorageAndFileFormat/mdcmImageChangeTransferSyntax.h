@@ -56,30 +56,19 @@ public:
     ForceYBRFull(false),
 	UserCodec(NULL) {}
   ~ImageChangeTransferSyntax() {}
-  void SetTransferSyntax(const TransferSyntax & ts) { TS = ts; }
-  const TransferSyntax & GetTransferSyntax() const { return TS; }
+  void SetTransferSyntax(const TransferSyntax &);
+  const TransferSyntax & GetTransferSyntax() const;
+  void SetCompressIconImage(bool);
+  void SetForce(bool);
+  void SetUserCodec(ImageCodec *);
+  void SetForceYBRFull(bool);
   bool Change();
-  void SetCompressIconImage(bool b) { CompressIconImage = b; }
-  // When target Transfer Syntax is identical to input target syntax, no
-  // operation is actually done.
-  // This is an issue when someone wants to re-compress using MDCM internal
-  // implementation a JPEG (for example) image
-  void SetForce( bool f ) { Force = f; }
-  // Allow user to specify exactly which codec to use. this is needed to
-  // specify special qualities or compression option.
-  // warning: if the codec 'ic' is not compatible with the TransferSyntax
-  // requested, it will not be used. It is the user responsibility to check
-  // that UserCodec->CanCode( TransferSyntax )
-  void SetUserCodec(ImageCodec *ic) { UserCodec = ic; }
-  void SetForceYBRFull(bool t) { ForceYBRFull = t; }
-
 protected:
-  bool TryJPEGCodec(const DataElement & pixelde, Bitmap const & input, Bitmap & output);
-  bool TryJPEG2000Codec(const DataElement & pixelde, Bitmap const & input, Bitmap & output);
-  bool TryJPEGLSCodec(const DataElement & pixelde, Bitmap const & input, Bitmap & output);
-  bool TryRAWCodec(const DataElement & pixelde, Bitmap const & input, Bitmap & output);
-  bool TryRLECodec(const DataElement & pixelde, Bitmap const & input, Bitmap & output);
-
+  bool TryRAWCodec(const DataElement &, Bitmap const &, Bitmap &);
+  bool TryRLECodec(const DataElement &, Bitmap const &, Bitmap &);
+  bool TryJPEGCodec(const DataElement &, Bitmap const &, Bitmap &);
+  bool TryJPEGLSCodec(const DataElement &, Bitmap const &, Bitmap &);
+  bool TryJPEG2000Codec(const DataElement &, Bitmap const &, Bitmap &);
 private:
   TransferSyntax TS;
   bool Force;

@@ -30,6 +30,8 @@
 #include "mdcmSmartPointer.h"
 #include "mdcmLookupTable.h"
 
+// TODO completely replace and remove
+
 namespace mdcm
 {
 
@@ -48,17 +50,6 @@ struct RealWorldValueMappingContent
   std::string CodeMeaning;
 };
 
-/**
- * \brief ImageHelper (internal class, not intended for user level)
- *
- * \details
- * Helper for writing World images in DICOM. DICOM has a 'template' approach to image where
- * MR Image Storage are distinct object from Enhanced MR Image Storage. For example the
- * Pixel Spacing in one object is not at the same position (ie Tag) as in the other
- * this class is the central (read: fragile) place where all the dispatching is done from
- * a unified view of a world image (typically VTK or ITK point of view) down to the low
- * level DICOM point of view.
- */
 class MDCM_EXPORT ImageHelper
 {
 public:

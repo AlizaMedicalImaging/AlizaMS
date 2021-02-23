@@ -30,7 +30,7 @@
 namespace mdcm
 {
 
-static const char *ScalarTypeStrings[] =
+static const char * ScalarTypeStrings[] =
 {
   "UINT8",
   "INT8",
@@ -56,6 +56,7 @@ PixelFormat::PixelFormat(ScalarType st)
   SetScalarType(st);
 }
 
+// Samples Per Pixel (0028,0002) US Samples Per Pixel
 unsigned short PixelFormat::GetSamplesPerPixel() const
 {
   assert(SamplesPerPixel == 1 || SamplesPerPixel == 3 || SamplesPerPixel == 4);
@@ -79,8 +80,9 @@ void PixelFormat::SetBitsAllocated(unsigned short ba)
   {
     switch(ba)
     {
-      // Some devices (FUJIFILM CR + MONO1) incorrectly set BitsAllocated/BitsStored
-      // as bitmask instead of value. Do what they mean instead of what they say.
+      // Some devices (FUJIFILM CR + MONO1) incorrectly set
+      // BitsAllocated/BitsStored as bitmask instead of value.
+      // Do what they mean instead of what they say.
       case 0xffff: ba = 16; break;
       case 0x0fff: ba = 12; break;
       case 0x00ff: ba =  8; break;
@@ -97,6 +99,7 @@ void PixelFormat::SetBitsAllocated(unsigned short ba)
   }
 }
 
+// BitsStored (0028,0101) US Bits Stored
 unsigned short PixelFormat::GetBitsStored() const
 {
   assert(BitsStored <= BitsAllocated);
@@ -119,6 +122,7 @@ void PixelFormat::SetBitsStored(unsigned short bs)
   }
 }
 
+// HighBit (0028,0102) US High Bit
 unsigned short PixelFormat::GetHighBit() const
 {
   assert(HighBit < BitsStored);
@@ -137,6 +141,7 @@ void PixelFormat::SetHighBit(unsigned short hb)
   if(hb < BitsStored) HighBit = hb;
 }
 
+// PixelRepresentation: 0 or 1, (0028,0103) US Pixel Representation
 unsigned short PixelFormat::GetPixelRepresentation() const
 {
   return (unsigned short)(PixelRepresentation ? 1 : 0);
@@ -147,6 +152,8 @@ void PixelFormat::SetPixelRepresentation(unsigned short pr)
   PixelRepresentation = (unsigned short)(pr ? 1 : 0);
 }
 
+// Set PixelFormat based only on the ScalarType
+// Need to call SetScalarType *before* SetSamplesPerPixel
 void PixelFormat::SetScalarType(ScalarType st)
 {
   SamplesPerPixel = 1;
@@ -220,6 +227,7 @@ void PixelFormat::SetScalarType(ScalarType st)
   HighBit = (uint16_t)(BitsStored - 1);
 }
 
+// ScalarType does not take into account the sample per pixel
 PixelFormat::ScalarType PixelFormat::GetScalarType() const
 {
   ScalarType type = PixelFormat::UNKNOWN;
@@ -294,6 +302,11 @@ const char * PixelFormat::GetScalarTypeAsString() const
   return ScalarTypeStrings[GetScalarType()];
 }
 
+// This is the number of words it would take to store one pixel.
+// The return value takes into account the SamplesPerPixel.
+// In the rare case when BitsAllocated == 12, the function
+// assume word padding and value returned will be identical as
+// if BitsAllocated == 16
 uint8_t PixelFormat::GetPixelSize() const
 {
   uint8_t pixelsize = (uint8_t)(BitsAllocated / 8);
@@ -397,6 +410,13 @@ bool PixelFormat::IsValid() const
   return true;
 }
 
+bool PixelFormat::IsCompatible(const TransferSyntax & ts) const
+{
+  if(ts == TransferSyntax::JPEGBaselineProcess1 && BitsAllocated != 8) return false;
+  // TODO
+  return true;
+}
+
 bool PixelFormat::Validate()
 {
   if(!IsValid()) return false;
@@ -422,7 +442,7 @@ bool PixelFormat::Validate()
   return true;
 }
 
-void PixelFormat::Print(std::ostream &os) const
+void PixelFormat::Print(std::ostream & os) const
 {
   os << "SamplesPerPixel    :" << SamplesPerPixel     << "\n";
   os << "BitsAllocated      :" << BitsAllocated       << "\n";
@@ -430,13 +450,6 @@ void PixelFormat::Print(std::ostream &os) const
   os << "HighBit            :" << HighBit             << "\n";
   os << "PixelRepresentation:" << PixelRepresentation << "\n";
   os << "ScalarType found   :" << GetScalarTypeAsString() << "\n";
-}
-
-bool PixelFormat::IsCompatible(const TransferSyntax & ts) const
-{
-  if(ts == TransferSyntax::JPEGBaselineProcess1 && BitsAllocated != 8) return false;
-  // Are we missing any?
-  return true;
 }
 
 } // end namespace mdcm

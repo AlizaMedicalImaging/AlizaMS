@@ -32,9 +32,8 @@ class TransferSyntax;
 
 class MDCM_EXPORT PixelFormat
 {
-  friend class Bitmap;
-  friend std::ostream& operator<<(std::ostream &, const PixelFormat &);
-
+friend class Bitmap;
+friend std::ostream& operator<<(std::ostream &, const PixelFormat &);
 public:
   typedef enum
   {
@@ -56,70 +55,43 @@ public:
   } ScalarType;
 
   PixelFormat() : PixelFormat(1, 8, 8, 7, 0) {}
-
   explicit PixelFormat(
     unsigned short samplesperpixel,
     unsigned short bitsallocated = 8,
     unsigned short bitsstored = 8,
     unsigned short highbit = 7,
     unsigned short pixelrepresentation = 0)
-    :
-    SamplesPerPixel(samplesperpixel),
-    BitsAllocated(bitsallocated),
-    BitsStored(bitsstored),
-    HighBit(highbit),
-    PixelRepresentation(pixelrepresentation) {}
-
+      :
+      SamplesPerPixel(samplesperpixel),
+      BitsAllocated(bitsallocated),
+      BitsStored(bitsstored),
+      HighBit(highbit),
+      PixelRepresentation(pixelrepresentation) {}
   PixelFormat(ScalarType);
-
-  operator ScalarType() const { return GetScalarType(); }
-
-  // Samples Per Pixel (0028,0002) US Samples Per Pixel
   unsigned short GetSamplesPerPixel() const;
-
   void SetSamplesPerPixel(unsigned short);
-
   unsigned short GetBitsAllocated() const;
-
   void SetBitsAllocated(unsigned short);
-
-  // BitsStored (0028,0101) US Bits Stored
   unsigned short GetBitsStored() const;
-
   void SetBitsStored(unsigned short);
-
-  // HighBit (0028,0102) US High Bit
   unsigned short GetHighBit() const;
-
   void SetHighBit(unsigned short);
-
-  // PixelRepresentation: 0 or 1, (0028,0103) US Pixel Representation
   unsigned short GetPixelRepresentation() const;
-
   void SetPixelRepresentation(unsigned short);
-
-  // ScalarType does not take into account the sample per pixel
-  ScalarType GetScalarType() const;
-
-  // Set PixelFormat based only on the ScalarType
-  // Need to call SetScalarType *before* SetSamplesPerPixel
   void SetScalarType(ScalarType st);
-
+  ScalarType GetScalarType() const;
   const char * GetScalarTypeAsString() const;
-
-  // This is the number of words it would take to store one pixel.
-  // The return value takes into account the SamplesPerPixel.
-  // In the rare case when BitsAllocated == 12, the function
-  // assume word padding and value returned will be identical as if BitsAllocated == 16
   uint8_t GetPixelSize() const;
-
+  double GetMin() const;
+  double GetMax() const;
+  bool IsValid() const;
+  bool IsCompatible(const TransferSyntax &) const;
   void Print(std::ostream &) const;
 
-  double GetMin() const;
-
-  double GetMax() const;
-
-  bool IsValid() const;
+  operator ScalarType() const
+  {
+    return GetScalarType();
+  }
 
   bool operator==(ScalarType st) const
   {
@@ -131,7 +103,7 @@ public:
     return GetScalarType() != st;
   }
 
-  bool operator==(const PixelFormat &pf) const
+  bool operator==(const PixelFormat & pf) const
   {
     return
       SamplesPerPixel     == pf.SamplesPerPixel &&
@@ -141,7 +113,7 @@ public:
       PixelRepresentation == pf.PixelRepresentation;
   }
 
-  bool operator!=(const PixelFormat &pf) const
+  bool operator!=(const PixelFormat & pf) const
   {
     return
       SamplesPerPixel     != pf.SamplesPerPixel ||
@@ -151,11 +123,8 @@ public:
       PixelRepresentation != pf.PixelRepresentation;
   }
 
-  bool IsCompatible(const TransferSyntax & ts) const;
-
 protected:
   bool Validate();
-
 private:
   unsigned short SamplesPerPixel;
   unsigned short BitsAllocated;

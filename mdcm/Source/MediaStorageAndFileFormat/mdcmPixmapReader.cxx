@@ -49,11 +49,53 @@ PixmapReader::~PixmapReader()
 {
 }
 
+void PixmapReader::SetApplySupplementalLUT(bool t)
+{
+  m_AlppySupplementalLUT = t;
+}
+
+bool PixmapReader::GetApplySupplementalLUT() const
+{
+  return m_AlppySupplementalLUT;
+}
+
+void PixmapReader::SetProcessOverlays(bool t)
+{
+  m_ProcessOverlays = t;
+}
+
+bool PixmapReader::GetProcessOverlays() const
+{
+  return m_ProcessOverlays;
+}
+
+void PixmapReader::SetProcessIcons(bool t)
+{
+  m_ProcessIcons = t;
+}
+
+bool PixmapReader::GetProcessIcons() const
+{
+  return m_ProcessIcons;
+}
+
+void PixmapReader::SetProcessCurves(bool t)
+{
+  m_ProcessCurves = t;
+}
+
+bool PixmapReader::GetProcessCurves() const
+{
+  return m_ProcessCurves;
+}
+
+// Valid only after a call to Read
 const Pixmap & PixmapReader::GetPixmap() const
 {
   return *PixelData;
 }
 
+// Valid only after a call to Read
 Pixmap & PixmapReader::GetPixmap()
 {
   return *PixelData;
@@ -468,11 +510,6 @@ static bool DoOverlays(const DataSet & ds, Pixmap & pixeldata)
     }
   }
   return true;
-}
-
-bool PixmapReader::ReadImage(const MediaStorage & ms)
-{
-  return ReadImageInternal(ms);
 }
 
 bool PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
@@ -932,6 +969,11 @@ bool PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixelda
     }
   }
   return true;
+}
+
+bool PixmapReader::ReadImage(const MediaStorage & ms)
+{
+  return ReadImageInternal(ms);
 }
 
 bool PixmapReader::ReadACRNEMAImage()

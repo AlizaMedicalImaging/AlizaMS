@@ -42,18 +42,15 @@ void RescaleFunction(
 
 // no such thing as partial specialization of function in c++
 // so instead use this trick
-template<typename TOut, typename TIn>
-struct FImpl;
+template<typename TOut, typename TIn> struct FImpl;
 
-template<typename TOut, typename TIn>
-void InverseRescaleFunction(
+template<typename TOut, typename TIn> void InverseRescaleFunction(
   TOut * out, const TIn *in, double intercept, double slope, size_t size)
 {
   FImpl<TOut,TIn>::InverseRescaleFunction(out,in,intercept,slope,size);
-} // users, don't touch this
+} // don't touch this
 
-template<typename TOut, typename TIn>
-struct FImpl
+template<typename TOut, typename TIn> struct FImpl
 {
   static void InverseRescaleFunction(TOut * out, const TIn * in,
     double intercept, double slope, size_t size) // users, go ahead and specialize this
@@ -68,8 +65,7 @@ struct FImpl
 
 // http://stackoverflow.com/questions/485525/round-for-float-in-c
 // http://en.cppreference.com/w/c/numeric/math/round
-template < typename T >
-static inline T round_impl(const double d)
+template < typename T > static inline T round_impl(const double d)
 {
 #ifdef MDCM_HAVE_LROUND
   // round() is C99, std::round() is C++11
@@ -79,8 +75,7 @@ static inline T round_impl(const double d)
 #endif
 }
 
-template<typename TOut>
-struct FImpl<TOut, float>
+template<typename TOut> struct FImpl<TOut, float>
 {
   static void InverseRescaleFunction(TOut * out, const float * in,
     double intercept, double slope, size_t size)
@@ -93,8 +88,7 @@ struct FImpl<TOut, float>
   }
 };
 
-template<typename TOut>
-struct FImpl<TOut, double>
+template<typename TOut> struct FImpl<TOut, double>
 {
   static void InverseRescaleFunction(TOut * out, const double * in,
     double intercept, double slope, size_t size)
@@ -215,8 +209,8 @@ PixelFormat::ScalarType Rescaler::ComputeInterceptSlopePixelType()
   return output;
 }
 
-template <typename TIn>
-void Rescaler::RescaleFunctionIntoBestFit(char *out, const TIn *in, size_t n)
+template <typename TIn> void Rescaler::RescaleFunctionIntoBestFit(
+  char *out, const TIn *in, size_t n)
 {
   double intercept = Intercept;
   double slope = Slope;
@@ -257,8 +251,7 @@ void Rescaler::RescaleFunctionIntoBestFit(char *out, const TIn *in, size_t n)
   }
 }
 
-template <typename TIn>
-void Rescaler::InverseRescaleFunctionIntoBestFit(
+template <typename TIn> void Rescaler::InverseRescaleFunctionIntoBestFit(
   char * out, const TIn * in, size_t n)
 {
   const double intercept = Intercept;
@@ -467,11 +460,16 @@ PixelFormat Rescaler::ComputePixelTypeFromMinMax()
   return output;
 }
 
+// By default (when UseTargetPixelType is false), a best
+// matching Target Pixel Type is computed. However user can override
+// this auto selection by switching UseTargetPixelType:true and
+// also specifying the specifix Target Pixel Type
 void Rescaler::SetTargetPixelType(PixelFormat const & targetpf)
 {
   TargetScalarType = targetpf.GetScalarType();
 }
 
+// Override default behavior of Rescale
 void Rescaler::SetUseTargetPixelType(bool b)
 {
   UseTargetPixelType = b;
@@ -490,6 +488,31 @@ void Rescaler::SetMinMaxForPixelType(double min, double max)
     ScalarRangeMin = max;
     ScalarRangeMax = min;
   }
+}
+
+void Rescaler::SetIntercept(double i)
+{
+  Intercept = i;
+}
+
+double Rescaler::GetIntercept() const
+{
+  return Intercept;
+}
+
+void Rescaler::SetSlope(double s)
+{
+  Slope = s;
+}
+
+double Rescaler::GetSlope() const
+{
+  return Slope;
+}
+
+void Rescaler::SetPixelFormat(PixelFormat const & pf)
+{
+  PF = pf;
 }
 
 } // end namespace mdcm

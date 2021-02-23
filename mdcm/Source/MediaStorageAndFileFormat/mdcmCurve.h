@@ -49,8 +49,6 @@ public:
   Curve();
   Curve(Curve const &);
   ~Curve();
-  void Print(std::ostream &) const override;
-  void GetAsPoints(float *) const;
   static unsigned int GetNumberOfCurves(DataSet const &);
   void Update(const DataElement &);
   void SetGroup(unsigned short);
@@ -61,7 +59,6 @@ public:
   unsigned short GetNumberOfPoints() const;
   void SetTypeOfData(const char *);
   const char * GetTypeOfData() const;
-  // See PS 3.3 - 2004 - C.10.2.1.1 Type of data
   const char * GetTypeOfDataDescription() const;
   void SetCurveDescription(const char *);
   void SetDataValueRepresentation(unsigned short);
@@ -70,9 +67,11 @@ public:
   std::vector<unsigned short> const & GetCurveDataDescriptor() const;
   void SetCoordinateStartValue(unsigned short);
   void SetCoordinateStepValue(unsigned short);
-  void SetCurve(const char *, unsigned int);
   bool IsEmpty() const;
+  void SetCurve(const char *, unsigned int);
   void Decode(std::istream &, std::ostream &);
+  void GetAsPoints(float *) const;
+  void Print(std::ostream &) const override;
 
 private:
   double ComputeValueFromStartAndStep(unsigned int) const;

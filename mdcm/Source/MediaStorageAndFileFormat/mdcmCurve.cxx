@@ -31,16 +31,17 @@ namespace mdcm
 class CurveInternal
 {
 public:
-  CurveInternal():
-  Group(0),
-  Dimensions(0),
-  NumberOfPoints(0),
-  TypeOfData(),
-  CurveDescription(),
-  DataValueRepresentation(0),
-  CoordinateStartValue(0),
-  CoordinateStepValue(0),
-  Data()
+  CurveInternal()
+    :
+    Group(0),
+    Dimensions(0),
+    NumberOfPoints(0),
+    TypeOfData(),
+    CurveDescription(),
+    DataValueRepresentation(0),
+    CoordinateStartValue(0),
+    CoordinateStepValue(0),
+    Data()
   {
   }
   unsigned short Group;
@@ -83,11 +84,6 @@ Curve::Curve(Curve const & ov) : Object(ov)
 Curve::~Curve()
 {
   delete Internal;
-}
-
-void Curve::Print(std::ostream & os) const
-{
-  Internal->Print(os);
 }
 
 unsigned int Curve::GetNumberOfCurves(DataSet const & ds)
@@ -228,18 +224,47 @@ void Curve::Update(const DataElement & de)
   }
 }
 
-void Curve::SetGroup(unsigned short group) { Internal->Group = group; }
-unsigned short Curve::GetGroup() const { return Internal->Group; }
-void Curve::SetDimensions(unsigned short dimensions) { Internal->Dimensions = dimensions; }
-unsigned short Curve::GetDimensions() const { return Internal->Dimensions; }
-void Curve::SetNumberOfPoints(unsigned short numberofpoints) { Internal->NumberOfPoints = numberofpoints; }
-unsigned short Curve::GetNumberOfPoints() const { return Internal->NumberOfPoints; }
+void Curve::SetGroup(unsigned short group)
+{
+  Internal->Group = group;
+}
+
+unsigned short Curve::GetGroup() const
+{
+  return Internal->Group;
+}
+
+void Curve::SetDimensions(unsigned short dimensions)
+{
+  Internal->Dimensions = dimensions;
+}
+
+unsigned short Curve::GetDimensions() const
+{
+  return Internal->Dimensions;
+}
+
+void Curve::SetNumberOfPoints(unsigned short numberofpoints)
+{
+  Internal->NumberOfPoints = numberofpoints;
+}
+
+unsigned short Curve::GetNumberOfPoints() const
+{
+  return Internal->NumberOfPoints;
+}
+
 void Curve::SetTypeOfData(const char *typeofdata)
 {
   if(typeofdata) Internal->TypeOfData = typeofdata;
 }
-const char *Curve::GetTypeOfData() const { return Internal->TypeOfData.c_str(); }
 
+const char * Curve::GetTypeOfData() const
+{
+  return Internal->TypeOfData.c_str();
+}
+
+// See PS 3.3 - 2004 - C.10.2.1.1 Type of data
 static const char * const TypeOfDataDescription[][2] = {
 { "TAC" , "time activity curve" },
 { "PROF" , "image profile" },
@@ -291,7 +316,7 @@ void Curve::SetCurveDataDescriptor(const uint16_t * values, size_t num)
   Internal->CurveDataDescriptor = std::vector<uint16_t>(values, values+num);
 }
 
-std::vector<unsigned short> const &Curve::GetCurveDataDescriptor() const
+std::vector<unsigned short> const & Curve::GetCurveDataDescriptor() const
 {
   return Internal->CurveDataDescriptor;
 }
@@ -311,7 +336,7 @@ bool Curve::IsEmpty() const
   return Internal->Data.empty();
 }
 
-void Curve::SetCurve(const char *array, unsigned int length)
+void Curve::SetCurve(const char * array, unsigned int length)
 {
   if(!array || length == 0) return;
   Internal->Data.resize(length);
@@ -356,32 +381,7 @@ inline size_t getsizeofrep(unsigned short dr)
   return val;
 }
 
-/*
-C.10.2.1.5 Curve data descriptor, coordinate start value, coordinate step value
-The Curve Data for dimension(s) containing evenly distributed data can be eliminated by using a
-method that defines the Coordinate Start Value and Coordinate Step Value (interval). The one
-dimensional data list is then calculated rather than being enumerated.
-For the Curve Data Descriptor (50xx,0110) an Enumerated Value describing how each
-component of the N-tuple curve is described, either by points or interval spacing. One value for
-each dimension. Where:
-0000H = Dimension component described using interval spacing
-0001H = Dimension component described using values
-Using interval spacing:
-Dimension component(s) described by interval spacing use Attributes of Coordinate Start Value
-(50xx,0112), Coordinate Step Value (50xx,0114) and Number of Points (50xx,0010). The 1-
-dimensional data list is calculated by using a start point of Coordinate Start Value and adding the
-interval (Coordinate Step Value) to obtain each data point until the Number of Points is satisfied.
-The data points of this dimension will be absent from Curve Data (50xx,3000).
-*/
-double Curve::ComputeValueFromStartAndStep(unsigned int idx) const
-{
-  assert(!Internal->CurveDataDescriptor.empty());
-  const double res = Internal->CoordinateStartValue +
-    Internal->CoordinateStepValue * idx;
-  return res;
-}
-
-void Curve::GetAsPoints(float *array) const
+void Curve::GetAsPoints(float * array) const
 {
   assert(getsizeofrep(Internal->DataValueRepresentation));
   if(Internal->CurveDataDescriptor.empty())
@@ -395,7 +395,6 @@ void Curve::GetAsPoints(float *array) const
       1 * getsizeofrep(Internal->DataValueRepresentation));
   }
   assert(Internal->Dimensions == 1 || Internal->Dimensions == 2);
-
   const int mult = Internal->Dimensions;
   int genidx = -1;
   if(!Internal->CurveDataDescriptor.empty())
@@ -429,7 +428,6 @@ void Curve::GetAsPoints(float *array) const
     assert(end == beg + mult * Internal->NumberOfPoints);
     (void)beg;(void)end;
   }
-
   if(Internal->DataValueRepresentation == 0)
   {
     // PS 3.3 - 2004
@@ -522,6 +520,36 @@ void Curve::GetAsPoints(float *array) const
   {
     assert(0);
   }
+}
+
+void Curve::Print(std::ostream & os) const
+{
+  Internal->Print(os);
+}
+
+/*
+C.10.2.1.5 Curve data descriptor, coordinate start value, coordinate step value
+The Curve Data for dimension(s) containing evenly distributed data can be eliminated by using a
+method that defines the Coordinate Start Value and Coordinate Step Value (interval). The one
+dimensional data list is then calculated rather than being enumerated.
+For the Curve Data Descriptor (50xx,0110) an Enumerated Value describing how each
+component of the N-tuple curve is described, either by points or interval spacing. One value for
+each dimension. Where:
+0000H = Dimension component described using interval spacing
+0001H = Dimension component described using values
+Using interval spacing:
+Dimension component(s) described by interval spacing use Attributes of Coordinate Start Value
+(50xx,0112), Coordinate Step Value (50xx,0114) and Number of Points (50xx,0010). The 1-
+dimensional data list is calculated by using a start point of Coordinate Start Value and adding the
+interval (Coordinate Step Value) to obtain each data point until the Number of Points is satisfied.
+The data points of this dimension will be absent from Curve Data (50xx,3000).
+*/
+double Curve::ComputeValueFromStartAndStep(unsigned int idx) const
+{
+  assert(!Internal->CurveDataDescriptor.empty());
+  const double res = Internal->CoordinateStartValue +
+    Internal->CoordinateStepValue * idx;
+  return res;
 }
 
 }

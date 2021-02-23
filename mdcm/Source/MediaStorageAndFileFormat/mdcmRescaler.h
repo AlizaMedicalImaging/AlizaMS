@@ -29,8 +29,8 @@ namespace mdcm
 {
 
 /**
- * \brief Rescale class
- * \details This class is meant to apply the linear transform of Stored Pixel Value to
+ * Rescale class
+ * This class is meant to apply the linear transform of Stored Pixel Value to
  * Real World Value.
  * This is mostly found in CT or PET dataset, where the value are stored using
  * one type, but need to be converted to another scale using a linear
@@ -38,10 +38,7 @@ namespace mdcm
  * There are basically two cases:
  * In CT: the linear transform is generally integer based. E.g. the Stored
  * Pixel Type is unsigned short 12bits, but to get Hounsfield unit, one need to
- * apply the linear transform:
- *  \f[
- *   RWV = 1. * SV - 1024
- *  \f]
+ * apply the linear transform:  RWV = 1. * SV - 1024
  * So the best scalar to store the Real World Value will be 16 bits signed
  * type.
  *
@@ -51,79 +48,56 @@ namespace mdcm
  * all linear transform and deduce the best Pixel Type only at the end (when
  * all the images to be read have been parsed).
  *
- * \warning Internally any time a floating point value is found either in the
+ * Warning: internally any time a floating point value is found either in the
  * Rescale Slope or the Rescale Intercept it is assumed that the best matching
  * output pixel type is FLOAT64 (in previous implementation it was FLOAT32).
  * Because VR:DS is closer to a 64bits floating point type FLOAT64 is thus a
  * best matching pixel type for the floating point transformation.
  *
- * Example: Let say input is FLOAT64, and we want UINT16 as ouput, we would do:
+ * Example: input is FLOAT64, UINT16 as ouput:
  *
- *\code
  *  Rescaler ir;
- *  ir.SetIntercept( 0 );
- *  ir.SetSlope( 5.6789 );
- *  ir.SetPixelFormat( FLOAT64 );
- *  ir.SetMinMaxForPixelType( ((PixelFormat)UINT16).GetMin(), ((PixelFormat)UINT16).GetMax() );
- *  ir.InverseRescale(output,input,numberofbytes );
- *\endcode
+ *  ir.SetIntercept(0);
+ *  ir.SetSlope(5.6789);
+ *  ir.SetPixelFormat(FLOAT64);
+ *  ir.SetMinMaxForPixelType(((PixelFormat)UINT16).GetMin(), ((PixelFormat)UINT16).GetMax());
+ *  ir.InverseRescale(output,input,numberofbytes);
  *
- * \note handle floating point transformation back and forth to integer
- * properly (no loss)
  *
- * \see Unpacker12Bits
  */
 class MDCM_EXPORT Rescaler
 {
 public:
   Rescaler()
-  :
-  Intercept(0),
-  Slope(1),
-  PF(PixelFormat::UNKNOWN),
-  TargetScalarType(PixelFormat::UNKNOWN),
-  ScalarRangeMin(0),
-  ScalarRangeMax(0),
-  UseTargetPixelType(false) {}
-
+    :
+    Intercept(0),
+    Slope(1),
+    PF(PixelFormat::UNKNOWN),
+    TargetScalarType(PixelFormat::UNKNOWN),
+    ScalarRangeMin(0),
+    ScalarRangeMax(0),
+    UseTargetPixelType(false) {}
   ~Rescaler() {}
-
-  bool Rescale(char * out, const char * in, size_t n);
-  bool InverseRescale(char * out, const char * in, size_t n);
-
-  void SetIntercept(double i) { Intercept = i; }
-
-  double GetIntercept() const { return Intercept; }
-
-  void SetSlope(double s) { Slope = s; }
-
-  double GetSlope() const { return Slope; }
-
-  // By default (when UseTargetPixelType is false), a best
-  // matching Target Pixel Type is computed. However user can override
-  // this auto selection by switching UseTargetPixelType:true and
-  // also specifying the specifix Target Pixel Type
-  void SetTargetPixelType( PixelFormat const & targetst );
-  // Override default behavior of Rescale
-  void SetUseTargetPixelType(bool b);
-
-  void SetPixelFormat(PixelFormat const & pf) { PF = pf; }
-
   PixelFormat::ScalarType ComputeInterceptSlopePixelType();
-
-  void SetMinMaxForPixelType(double, double);
-
+  bool InverseRescale(char *, const char *, size_t);
+  bool Rescale(char *, const char *, size_t);
   PixelFormat ComputePixelTypeFromMinMax();
-
+  void SetTargetPixelType(PixelFormat const &);
+  void SetUseTargetPixelType(bool);
+  void SetMinMaxForPixelType(double, double);
+  void SetIntercept(double);
+  double GetIntercept() const;
+  void SetSlope(double);
+  double GetSlope() const;
+  void SetPixelFormat(PixelFormat const &);
 protected:
-  template <typename TIn>
-    void RescaleFunctionIntoBestFit(char * out, const TIn * in, size_t n);
-  template <typename TIn>
-    void InverseRescaleFunctionIntoBestFit(char * out, const TIn * in, size_t n);
-
+  template<typename TIn> void RescaleFunctionIntoBestFit(
+    char *, const TIn *, size_t);
+  template<typename TIn> void InverseRescaleFunctionIntoBestFit(
+    char *, const TIn *, size_t);
 private:
-  double Intercept; // 0028,1052
-  double Slope;     // 0028,1053
+  double Intercept;
+  double Slope;
   PixelFormat PF;
   PixelFormat::ScalarType TargetScalarType;
   double ScalarRangeMin;

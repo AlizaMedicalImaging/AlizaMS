@@ -22,7 +22,6 @@
 #include "mdcmBitmapToBitmapFilter.h"
 
 #include "mdcmImage.h"
-
 #include <limits>
 #include <cstring>
 
@@ -55,9 +54,14 @@ void BitmapToBitmapFilter::SetInput(const Bitmap & image)
   }
 }
 
-const Bitmap &BitmapToBitmapFilter::GetOutputAsBitmap() const
+const Bitmap & BitmapToBitmapFilter::GetOutput() const
 {
-  return * Output;
+  return *Output;
+}
+
+const Bitmap & BitmapToBitmapFilter::GetOutputAsBitmap() const
+{
+  return *Output;
 }
 
 

@@ -44,7 +44,6 @@ public:
   bool Read() override;
   const Image & GetImage() const;
   Image & GetImage();
-
 protected:
   bool ReadImage(const MediaStorage &) override;
   bool ReadACRNEMAImage() override;

@@ -44,9 +44,29 @@ PixmapWriter::~PixmapWriter()
 {
 }
 
+const Pixmap & PixmapWriter::GetPixmap() const
+{
+  return *PixelData;
+}
+
+Pixmap & PixmapWriter::GetPixmap() // FIXME
+{
+  return *PixelData;
+}
+
 void PixmapWriter::SetPixmap(Pixmap const &img)
 {
   PixelData = img;
+}
+
+const Pixmap & PixmapWriter::GetImage() const
+{
+  return *PixelData;
+}
+
+Pixmap & PixmapWriter::GetImage() // FIXME
+{
+  return *PixelData;
 }
 
 void PixmapWriter::DoIconImage(DataSet & rootds, Pixmap const & image)
@@ -647,6 +667,11 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
   return true;
 }
 
+void PixmapWriter::SetImage(Pixmap const & img)
+{
+  PixelData = img;
+}
+
 bool PixmapWriter::Write()
 {
   MediaStorage ms;
@@ -666,11 +691,6 @@ bool PixmapWriter::Write()
     return false;
   }
   return true;
-}
-
-void PixmapWriter::SetImage(Pixmap const &img)
-{
-  PixelData = img;
 }
 
 } // end namespace mdcm

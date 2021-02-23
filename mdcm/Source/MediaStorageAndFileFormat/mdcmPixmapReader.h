@@ -45,18 +45,17 @@ class MDCM_EXPORT PixmapReader : public Reader
 public:
   PixmapReader();
   virtual ~PixmapReader();
-  void SetApplySupplementalLUT(bool t) { m_AlppySupplementalLUT = t; }
-  bool GetApplySupplementalLUT() const { return m_AlppySupplementalLUT; }
-  void SetProcessOverlays(bool t) { m_ProcessOverlays = t; }
-  bool GetProcessOverlays() const { return m_ProcessOverlays; }
-  void SetProcessIcons(bool t) { m_ProcessIcons = t; }
-  bool GetProcessIcons() const { return m_ProcessIcons; }
-  void SetProcessCurves(bool t) { m_ProcessCurves = t; }
-  bool GetProcessCurves() const { return m_ProcessCurves; }
-  virtual bool Read() override;
-  // Following methods are valid only after a call to 'Read'
+  void SetApplySupplementalLUT(bool);
+  bool GetApplySupplementalLUT() const;
+  void SetProcessOverlays(bool);
+  bool GetProcessOverlays() const;
+  void SetProcessIcons(bool);
+  bool GetProcessIcons() const;
+  void SetProcessCurves(bool);
+  bool GetProcessCurves() const;
   const Pixmap & GetPixmap() const;
   Pixmap & GetPixmap();
+  virtual bool Read() override;
 protected:
   bool ReadImageInternal(const MediaStorage &, bool handlepixeldata = true);
   virtual bool ReadImage(const MediaStorage &);

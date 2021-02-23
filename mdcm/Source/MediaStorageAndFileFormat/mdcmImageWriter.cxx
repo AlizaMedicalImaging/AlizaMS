@@ -44,6 +44,20 @@ ImageWriter::~ImageWriter()
 {
 }
 
+// It will overwrite anything Image infos found in DataSet
+// (see parent class to see how to pass dataset)
+const Image & ImageWriter::GetImage() const
+{
+  return dynamic_cast<const Image&>(*PixelData);
+}
+
+Image & ImageWriter::GetImage() // FIXME
+{
+  return dynamic_cast<Image&>(*PixelData);
+}
+
+// Internal function used to compute a target MediaStorage
+// User may want to call this function ahead before Write
 MediaStorage ImageWriter::ComputeTargetMediaStorage()
 {
   MediaStorage ms;
@@ -67,10 +81,10 @@ MediaStorage ImageWriter::ComputeTargetMediaStorage()
         GetImage().GetIntercept(), GetImage().GetSlope());
   }
   // Double-check for Grayscale since they need specific pixel type
-  if( ms == MediaStorage::MultiframeGrayscaleByteSecondaryCaptureImageStorage
-   || ms == MediaStorage::MultiframeGrayscaleWordSecondaryCaptureImageStorage
-   || ms == MediaStorage::MultiframeSingleBitSecondaryCaptureImageStorage
-   || ms == MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage)
+  if(ms == MediaStorage::MultiframeGrayscaleByteSecondaryCaptureImageStorage
+   ||ms == MediaStorage::MultiframeGrayscaleWordSecondaryCaptureImageStorage
+   ||ms == MediaStorage::MultiframeSingleBitSecondaryCaptureImageStorage
+   ||ms == MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage)
   {
     // Always pretend to use number of dimension = 3 here
     ms = ImageHelper::ComputeMediaStorageFromModality(ms.GetModality(),
@@ -241,8 +255,8 @@ bool ImageWriter::Write()
     {
       return false;
     }
-    else if(ms == MediaStorage::MRImageStorage && (pixeldata.GetIntercept() != 0 ||
-      pixeldata.GetSlope() != 1.0))
+    else if(ms == MediaStorage::MRImageStorage &&
+      (pixeldata.GetIntercept() != 0 || pixeldata.GetSlope() != 1.0))
     {
       if(!mdcm::ImageHelper::GetForceRescaleInterceptSlope()) return false;
     }
@@ -272,7 +286,8 @@ bool ImageWriter::Write()
     // descriptor
     Attribute<0x0028, 0x1101, VR::US, VM::VM3> reddesc;
     lut.GetLUTDescriptor(LookupTable::RED, length, subscript, bitsize);
-    reddesc.SetValue(length,0); reddesc.SetValue(subscript,1); reddesc.SetValue(bitsize,2);
+    reddesc.SetValue(length,0);
+    reddesc.SetValue(subscript,1); reddesc.SetValue(bitsize,2);
     ds.Replace(reddesc.GetAsDataElement());
     // GREEN
     memset(rawlut,0,lutlen*2);
@@ -284,7 +299,8 @@ bool ImageWriter::Write()
     // descriptor
     Attribute<0x0028, 0x1102, VR::US, VM::VM3> greendesc;
     lut.GetLUTDescriptor(LookupTable::GREEN, length, subscript, bitsize);
-    greendesc.SetValue(length,0); greendesc.SetValue(subscript,1); greendesc.SetValue(bitsize,2);
+    greendesc.SetValue(length,0);
+    greendesc.SetValue(subscript,1); greendesc.SetValue(bitsize,2);
     ds.Replace(greendesc.GetAsDataElement());
     // BLUE
     memset(rawlut,0,lutlen*2);
@@ -296,7 +312,8 @@ bool ImageWriter::Write()
     // descriptor
     Attribute<0x0028, 0x1103, VR::US, VM::VM3> bluedesc;
     lut.GetLUTDescriptor(LookupTable::BLUE, length, subscript, bitsize);
-    bluedesc.SetValue(length,0); bluedesc.SetValue(subscript,1); bluedesc.SetValue(bitsize,2);
+    bluedesc.SetValue(length,0); bluedesc.SetValue(subscript,1);
+    bluedesc.SetValue(bitsize,2);
     ds.Replace(bluedesc.GetAsDataElement());
     ds.Remove(Tag(0x0028, 0x1221));
     ds.Remove(Tag(0x0028, 0x1222));

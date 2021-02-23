@@ -31,8 +31,8 @@ namespace mdcm
 class StreamImageWriter;
 class Pixmap;
 /**
- * \brief PixmapWriter
- * \details This class will takes two inputs:
+ * PixmapWriter
+ * This class will takes two inputs:
  * 1. The DICOM DataSet
  * 2. The Image input
  * It will override any info from the Image over the DataSet.
@@ -46,19 +46,16 @@ class MDCM_EXPORT PixmapWriter : public Writer
 public:
   PixmapWriter();
   ~PixmapWriter();
-  const Pixmap & GetPixmap() const { return *PixelData; }
-  Pixmap & GetPixmap() { return *PixelData; } // FIXME
-  void SetPixmap(Pixmap const &img);
-  // It will overwrite anything Pixmap infos found in DataSet
-  // (see parent class to see how to pass dataset)
-  virtual const Pixmap & GetImage() const { return *PixelData; }
-  virtual Pixmap & GetImage() { return *PixelData; } // FIXME
-  virtual void SetImage(Pixmap const & img);
+  const Pixmap & GetPixmap() const;
+  Pixmap & GetPixmap();
+  void SetPixmap(Pixmap const &);
+  const Pixmap & GetImage() const;
+  Pixmap & GetImage();
+  void SetImage(Pixmap const &);
   bool Write();
-
 protected:
-  void DoIconImage(DataSet & ds, Pixmap const & image);
-  bool PrepareWrite( MediaStorage const & refms );
+  bool PrepareWrite(MediaStorage const &);
+  void DoIconImage(DataSet &, Pixmap const &);
   SmartPointer<Pixmap> PixelData;
 };
 
