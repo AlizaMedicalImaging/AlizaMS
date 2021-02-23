@@ -39,8 +39,8 @@ VL ExplicitDataElement::GetLength() const
     {
       const VL sqlen = sq->ComputeLength<ExplicitDataElement>();
       assert(sqlen % 2 == 0);
-      return TagField.GetLength() + VRField.GetLength() +
-        ValueLengthField.GetLength() + sqlen;
+      return (TagField.GetLength() + VRField.GetLength() +
+        ValueLengthField.GetLength() + sqlen);
     }
     SequenceOfFragments * sf = dynamic_cast<SequenceOfFragments*>(p);
     if(sf)
@@ -48,8 +48,8 @@ VL ExplicitDataElement::GetLength() const
       assert(VRField & VR::OB_OW);
       const VL sflen = sf->ComputeLength();
       assert(sflen % 2 == 0);
-      return TagField.GetLength() + VRField.GetLength()
-        + ValueLengthField.GetLength() + sflen;
+      return (TagField.GetLength() + VRField.GetLength() +
+        ValueLengthField.GetLength() + sflen);
     }
     assert(0);
     return 0;
@@ -60,12 +60,12 @@ VL ExplicitDataElement::GetLength() const
     //                              4 then Value Length is coded in 4
     assert(!ValueField || ValueField->GetLength() == ValueLengthField);
     const bool vr16bitsimpossible =
-      (VRField & VR::VL16) && (ValueLengthField >
-        (uint32_t)VL::GetVL16Max());
+      (VRField & VR::VL16) &&
+      (ValueLengthField > (uint32_t)VL::GetVL16Max());
     if(vr16bitsimpossible || VRField == VR::INVALID)
     {
-      return TagField.GetLength() + 2*VR::GetLength(VR::UN) +
-        ValueLengthField;
+      return (TagField.GetLength() + 2*VR::GetLength(VR::UN) +
+        ValueLengthField);
     }
     return (TagField.GetLength() + 2*VRField.GetLength() +
       ValueLengthField);

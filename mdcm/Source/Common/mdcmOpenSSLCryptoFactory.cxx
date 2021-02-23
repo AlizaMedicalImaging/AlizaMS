@@ -26,6 +26,17 @@
 namespace mdcm
 {
 
+OpenSSLCryptoFactory::OpenSSLCryptoFactory(CryptoLib id) : CryptoFactory(id)
+{
+  mdcmDebugMacro("OpenSSL Factory registered.");
+}
+  
+CryptographicMessageSyntax * OpenSSLCryptoFactory::CreateCMSProvider()
+{
+  InitOpenSSL();
+  return new OpenSSLCryptographicMessageSyntax();
+}
+
 void OpenSSLCryptoFactory::InitOpenSSL()
 {
   static bool Initialized = false;

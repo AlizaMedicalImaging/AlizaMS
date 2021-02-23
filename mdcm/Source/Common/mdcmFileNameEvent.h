@@ -38,19 +38,37 @@ class FileNameEvent : public AnyEvent
 public:
   typedef FileNameEvent Self;
   typedef AnyEvent Superclass;
-  FileNameEvent(const char *s = ""):m_FileName(s) {}
-  virtual ~FileNameEvent() {}
-  virtual const char * GetEventName() const { return "FileNameEvent"; }
-  virtual bool CheckEvent(const ::mdcm::Event* e) const
-    { return dynamic_cast<const Self*>(e) ? true : false; }
-  virtual ::mdcm::Event* MakeObject() const
-    { return new Self; }
-  FileNameEvent(const Self&s) : AnyEvent(s){};
+  FileNameEvent(const char * s = "") : m_FileName(s) {}
+  FileNameEvent(const Self & s) : AnyEvent(s) {};
+  ~FileNameEvent() {}
 
-  void SetFileName(const char *f) { m_FileName = f; }
-  const char *GetFileName() const { return m_FileName.c_str(); }
+  const char * GetEventName() const override
+  {
+    return "FileNameEvent";
+  }
+
+  bool CheckEvent(const ::mdcm::Event* e) const override
+  {
+    return dynamic_cast<const Self*>(e) ? true : false;
+  }
+
+  ::mdcm::Event* MakeObject() const override
+  {
+    return new Self;
+  }
+
+  void SetFileName(const char * f)
+  {
+    m_FileName = f;
+  }
+
+  const char * GetFileName() const
+  {
+    return m_FileName.c_str();
+  }
+
 private:
-  void operator=(const Self&);
+  void operator=(const Self &);
   std::string m_FileName;
 };
 

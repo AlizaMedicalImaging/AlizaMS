@@ -34,17 +34,15 @@ class MDCM_EXPORT IconImageFilter
 public:
   IconImageFilter();
   ~IconImageFilter();
-  void SetFile(const File & f) { F = f; }
-  File & GetFile() { return *F; }
-  const File & GetFile() const { return *F; }
+  void SetFile(const File &);
+  File & GetFile();
+  const File & GetFile() const;
   bool Extract();
   unsigned int GetNumberOfIconImages() const;
   IconImage & GetIconImage(unsigned int) const;
-
 protected:
   void ExtractIconImages();
   void ExtractVeproIconImages();
-
 private:
   SmartPointer<File> F;
   IconImageFilterInternals * Internals;

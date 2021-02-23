@@ -26,14 +26,14 @@
 // from BOOST static assert
 namespace mdcm
 {
-  template <bool x>
-  struct STATIC_ASSERTION_FAILURE;
+  template <bool x> struct STATIC_ASSERTION_FAILURE;
 
-  template <>
-  struct STATIC_ASSERTION_FAILURE<true> { enum { value = 1 }; };
+  template <> struct STATIC_ASSERTION_FAILURE<true>
+  {
+    enum { value = 1 };
+  };
 
-  template <int x>
-  struct static_assert_test {};
+  template <int x> struct static_assert_test {};
 }
 
 #define MDCM_JOIN( X, Y ) MDCM_DO_JOIN( X, Y )
@@ -46,11 +46,10 @@ namespace mdcm
 
 /* Example:
  *
- * template <class T>
- * struct must_not_be_instantiated
+ * template <class T> struct must_not_be_instantiated
  * {
- * // this will be triggered if this type is instantiated
- * MDCM_STATIC_ASSERT(sizeof(T) == 0);
+ *   // this will be triggered if this type is instantiated
+ *   MDCM_STATIC_ASSERT(sizeof(T) == 0);
  * };
  *
  */

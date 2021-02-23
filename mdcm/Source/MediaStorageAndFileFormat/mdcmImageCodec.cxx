@@ -33,11 +33,6 @@
 namespace mdcm
 {
 
-class ImageInternals
-{
-public:
-};
-
 ImageCodec::ImageCodec()
 {
   PlanarConfiguration = 0;
@@ -56,10 +51,29 @@ ImageCodec::~ImageCodec()
 {
 }
 
-bool ImageCodec::GetHeaderInfo(std::istream &, TransferSyntax &)
+bool ImageCodec::CanDecode(TransferSyntax const &) const
 {
-  assert(0);
   return false;
+}
+
+bool ImageCodec::Decode(DataElement const &, DataElement &)
+{
+  return false;
+}
+
+bool ImageCodec::CanCode(TransferSyntax const &) const
+{
+  return false;
+}
+
+bool ImageCodec::Code(DataElement const &, DataElement &)
+{
+  return false;
+}
+
+bool ImageCodec::IsLossy() const
+{
+  return LossyFlag;
 }
 
 void ImageCodec::SetLossyFlag(bool l)
@@ -72,9 +86,94 @@ bool ImageCodec::GetLossyFlag() const
   return LossyFlag;
 }
 
-bool ImageCodec::IsLossy() const
+bool ImageCodec::GetHeaderInfo(std::istream &, TransferSyntax &)
 {
-  return LossyFlag;
+  assert(0);
+  return false;
+}
+
+unsigned int ImageCodec::GetPlanarConfiguration() const
+{
+  return PlanarConfiguration;
+}
+
+void ImageCodec::SetPlanarConfiguration(unsigned int pc)
+{
+  assert(pc == 0 || pc == 1);
+  PlanarConfiguration = pc;
+}
+
+PixelFormat & ImageCodec::GetPixelFormat()
+{
+  return PF;
+}
+
+const PixelFormat & ImageCodec::GetPixelFormat() const
+{
+  return PF;
+}
+
+void ImageCodec::SetPixelFormat(PixelFormat const & pf)
+{
+  PF = pf;
+}
+
+const PhotometricInterpretation & ImageCodec::GetPhotometricInterpretation() const
+{
+  return PI;
+}
+
+void ImageCodec::SetPhotometricInterpretation(PhotometricInterpretation const & pi)
+{
+  PI = pi;
+}
+
+bool ImageCodec::GetNeedByteSwap() const
+{
+  return NeedByteSwap;
+}
+
+void ImageCodec::SetNeedByteSwap(bool b)
+{
+  NeedByteSwap = b;
+}
+
+void ImageCodec::SetNeedOverlayCleanup(bool b)
+{
+  NeedOverlayCleanup = b;
+}
+
+void ImageCodec::SetLUT(LookupTable const & lut)
+{
+  LUT = SmartPointer<LookupTable>(const_cast<LookupTable*>(&lut));
+}
+
+const LookupTable & ImageCodec::GetLUT() const
+{
+  return *LUT;
+}
+
+void ImageCodec::SetDimensions(const unsigned int d[3])
+{
+  Dimensions[0] = d[0];
+  Dimensions[1] = d[1];
+  Dimensions[2] = d[2];
+}
+
+void ImageCodec::SetDimensions(const std::vector<unsigned int> & d)
+{
+  size_t s = d.size();
+  assert(s <= 3);
+  for (size_t i = 0; i < 3; i++)
+  {
+    if (i < s) Dimensions[i] = d[i];
+    else Dimensions[i] = 1;
+  }
+}
+
+const unsigned int * ImageCodec::GetDimensions() const
+{
+  return Dimensions;
 }
 
 void ImageCodec::SetNumberOfDimensions(unsigned int dim)
@@ -87,15 +186,182 @@ unsigned int ImageCodec::GetNumberOfDimensions() const
   return NumberOfDimensions;
 }
 
-
-const PhotometricInterpretation &ImageCodec::GetPhotometricInterpretation() const
+bool ImageCodec::CleanupUnusedBits(char * data, size_t datalen)
 {
-  return PI;
+  if(!NeedOverlayCleanup) return true;
+  if(PF.GetBitsAllocated() == 16)
+  {
+    const uint16_t d = PF.GetBitsAllocated() - PF.GetBitsStored();
+    const uint16_t t = PF.GetBitsStored() - PF.GetHighBit() - 1;
+    // mask unused bits
+    const uint16_t pmask = (uint16_t)(0xffff >> d);
+    if(PF.GetPixelRepresentation() == 1)
+    {
+      // check sign
+      const uint16_t smask = (uint16_t)(0x0001 << (16 - (d + 1)));
+      // propagate sign bit on negative values
+      const int16_t nmask = (int16_t)(0x8000 >> (d - 1));
+      uint16_t * start = (uint16_t*)data;
+      for(uint16_t * p = start; p != start + datalen / 2; ++p)
+      {
+        uint16_t c = *p;
+        c = c >> t;
+        if (c & smask)
+        {
+          c = (uint16_t)(c | nmask);
+        }
+        else
+        {
+          c = c & pmask;
+        }
+        *p = c;
+      }
+    }
+    else // unsigned
+    {
+      uint16_t * start = (uint16_t*)data;
+      for(uint16_t * p = start; p != start + datalen / 2; ++p)
+      {
+        uint16_t c = *p;
+        c = (uint16_t)((c >> t) & pmask);
+        *p = c;
+      }
+    }
+  }
+  else
+  {
+    assert(0); // TODO
+    return false;
+  }
+  return true;
 }
 
-void ImageCodec::SetPhotometricInterpretation(PhotometricInterpretation const & pi)
+bool ImageCodec::IsValid(PhotometricInterpretation const &)
 {
-  PI = pi;
+  return false;
+}
+
+// Streaming (write) API
+// This is a high level API to encode in a streaming fashion.
+// Each plugin will handle differently the caching mechanism.
+// Codec will fall into two categories:
+// - Full row encoder: only a single scanline (row) of data is
+//   needed to be loaded at a time;
+// - Full frame encoder (default): a complete frame (row x col)
+//   is needed to be loaded at a time
+
+bool ImageCodec::IsRowEncoder()
+{
+  return false;
+}
+
+bool ImageCodec::IsFrameEncoder()
+{
+  return false;
+}
+
+bool ImageCodec::StartEncode(std::ostream &)
+{
+  assert(0);
+  return false;
+}
+
+bool ImageCodec::AppendRowEncode(std::ostream &, const char *, size_t)
+{
+  assert(0);
+  return false;
+}
+
+bool ImageCodec::AppendFrameEncode(std::ostream &, const char *, size_t)
+{
+  assert(0);
+  return false;
+}
+
+bool ImageCodec::StopEncode(std::ostream &)
+{
+  assert(0);
+  return false;
+}
+
+bool ImageCodec::DecodeByStreams(std::istream & is, std::ostream & os)
+{
+  assert(PlanarConfiguration == 0 || PlanarConfiguration == 1);
+  assert(PI != PhotometricInterpretation::UNKNOWN);
+  std::stringstream bs_os;   // ByteSwap
+  std::stringstream pcpc_os; // Padded Composite Pixel Code
+  std::stringstream pi_os;   // PhotometricInterpretation
+  std::stringstream pl_os;   // PlanarConf
+  std::istream * cur_is = &is;
+  // Byte swap
+  if(NeedByteSwap)
+  {
+    // MR_GE_with_Private_Compressed_Icon_0009_1110.dcm
+    DoByteSwap(*cur_is,bs_os);
+    cur_is = &bs_os;
+  }
+  if (RequestPaddedCompositePixelCode)
+  {
+    // D_CLUNIE_CT2_RLE.dcm
+    DoPaddedCompositePixelCode(*cur_is,pcpc_os);
+    cur_is = &pcpc_os;
+  }
+  switch(PI)
+  {
+  case PhotometricInterpretation::MONOCHROME2:
+  case PhotometricInterpretation::RGB:
+  case PhotometricInterpretation::ARGB:
+  case PhotometricInterpretation::YBR_ICT:
+  case PhotometricInterpretation::YBR_RCT:
+  case PhotometricInterpretation::MONOCHROME1:
+  case PhotometricInterpretation::PALETTE_COLOR:
+  case PhotometricInterpretation::YBR_FULL:
+    break;
+  case PhotometricInterpretation::YBR_FULL_422:
+    {
+      const JPEGCodec * c = dynamic_cast<const JPEGCodec*>(this);
+      if(!c)
+      {
+        // try raw/YBR_FULL_422
+        if (DoYBRFull422(*cur_is,pl_os)) cur_is = &pl_os;
+        else return false;
+      }
+    }
+    break;
+  case PhotometricInterpretation::YBR_PARTIAL_422: // retired
+  case PhotometricInterpretation::YBR_PARTIAL_420: // not supported
+    { // try JPEG
+      const JPEGCodec * c = dynamic_cast<const JPEGCodec*>(this);
+      if(!c) return false;
+    }
+    break;
+  default:
+    mdcmErrorMacro("Unhandled PhotometricInterpretation: " << PI);
+    return false;
+  }
+  if(RequestPlanarConfiguration)
+  {
+    DoPlanarConfiguration(*cur_is,pl_os);
+    cur_is = &pl_os;
+  }
+  // Overlay cleanup or cleanup the unused bits
+  if (PF.GetBitsAllocated() != PF.GetBitsStored() && PF.GetBitsAllocated() != 8)
+  {
+    if(NeedOverlayCleanup)
+    {
+      DoOverlayCleanup(*cur_is,os);
+    }
+    else
+    {
+      DoSimpleCopy(*cur_is,os);
+    }
+  }
+  else
+  {
+    assert(PF.GetBitsAllocated() == PF.GetBitsStored());
+    DoSimpleCopy(*cur_is,os);
+  }
+  return true;
 }
 
 bool ImageCodec::DoByteSwap(std::istream & is, std::ostream & os)
@@ -112,15 +378,15 @@ bool ImageCodec::DoByteSwap(std::istream & is, std::ostream & os)
 #ifdef MDCM_WORDS_BIGENDIAN
   if(PF.GetBitsAllocated() == 16)
   {
-    ByteSwap<uint16_t>::SwapRangeFromSwapCodeIntoSystem((uint16_t*)
-      dummy_buffer, SwapCode::LittleEndian, buf_size/2);
+    ByteSwap<uint16_t>::SwapRangeFromSwapCodeIntoSystem(
+      (uint16_t*)dummy_buffer, SwapCode::LittleEndian, buf_size/2);
   }
 #else
   // GE_DLX-8-MONO2-PrivateSyntax.dcm is 8bits
   if (PF.GetBitsAllocated() == 16)
   {
-    ByteSwap<uint16_t>::SwapRangeFromSwapCodeIntoSystem((uint16_t*)
-      dummy_buffer, SwapCode::BigEndian, buf_size/2);
+    ByteSwap<uint16_t>::SwapRangeFromSwapCodeIntoSystem(
+      (uint16_t*)dummy_buffer, SwapCode::BigEndian, buf_size/2);
   }
 #endif
   os.write(dummy_buffer, buf_size);
@@ -340,57 +606,7 @@ bool ImageCodec::DoInvertMonochrome(std::istream & is, std::ostream & os)
   return true;
 }
 
-bool ImageCodec::CleanupUnusedBits(char * data, size_t datalen)
-{
-  if(!NeedOverlayCleanup) return true;
-  if(PF.GetBitsAllocated() == 16)
-  {
-    const uint16_t d = PF.GetBitsAllocated() - PF.GetBitsStored();
-    const uint16_t t = PF.GetBitsStored() - PF.GetHighBit() - 1;
-    // mask unused bits
-    const uint16_t pmask = (uint16_t)(0xffff >> d);
-    if(PF.GetPixelRepresentation() == 1)
-    {
-      // check sign
-      const uint16_t smask = (uint16_t)(0x0001 << (16 - (d + 1)));
-      // propagate sign bit on negative values
-      const int16_t nmask = (int16_t)(0x8000 >> (d - 1));
-      uint16_t * start = (uint16_t*)data;
-      for(uint16_t * p = start; p != start + datalen / 2; ++p)
-      {
-        uint16_t c = *p;
-        c = c >> t;
-        if (c & smask)
-        {
-          c = (uint16_t)(c | nmask);
-        }
-        else
-        {
-          c = c & pmask;
-        }
-        *p = c;
-      }
-    }
-    else // unsigned
-    {
-      uint16_t * start = (uint16_t*)data;
-      for(uint16_t * p = start; p != start + datalen / 2; ++p)
-      {
-        uint16_t c = *p;
-        c = (uint16_t)((c >> t) & pmask);
-        *p = c;
-      }
-    }
-  }
-  else
-  {
-    assert(0); // TODO
-    return false;
-  }
-  return true;
-}
-
-bool ImageCodec::DoOverlayCleanup(std::istream &is, std::ostream &os)
+bool ImageCodec::DoOverlayCleanup(std::istream & is, std::ostream & os)
 {
   if(PF.GetBitsAllocated() == 16)
   {
@@ -451,148 +667,6 @@ bool ImageCodec::DoOverlayCleanup(std::istream &is, std::ostream &os)
     return false;
   }
   return true;
-}
-
-bool ImageCodec::Decode(DataElement const &, DataElement &)
-{
-  return true;
-}
-
-bool ImageCodec::DecodeByStreams(std::istream &is, std::ostream &os)
-{
-  assert(PlanarConfiguration == 0 || PlanarConfiguration == 1);
-  assert(PI != PhotometricInterpretation::UNKNOWN);
-  std::stringstream bs_os;   // ByteSwap
-  std::stringstream pcpc_os; // Padded Composite Pixel Code
-  std::stringstream pi_os;   // PhotometricInterpretation
-  std::stringstream pl_os;   // PlanarConf
-  std::istream * cur_is = &is;
-  // Byte swap
-  if(NeedByteSwap)
-  {
-    // MR_GE_with_Private_Compressed_Icon_0009_1110.dcm
-    DoByteSwap(*cur_is,bs_os);
-    cur_is = &bs_os;
-  }
-  if (RequestPaddedCompositePixelCode)
-  {
-    // D_CLUNIE_CT2_RLE.dcm
-    DoPaddedCompositePixelCode(*cur_is,pcpc_os);
-    cur_is = &pcpc_os;
-  }
-  switch(PI)
-  {
-  case PhotometricInterpretation::MONOCHROME2:
-  case PhotometricInterpretation::RGB:
-  case PhotometricInterpretation::ARGB:
-  case PhotometricInterpretation::YBR_ICT:
-  case PhotometricInterpretation::YBR_RCT:
-  case PhotometricInterpretation::MONOCHROME1:
-  case PhotometricInterpretation::PALETTE_COLOR:
-  case PhotometricInterpretation::YBR_FULL:
-    break;
-  case PhotometricInterpretation::YBR_FULL_422:
-    {
-      const JPEGCodec * c = dynamic_cast<const JPEGCodec*>(this);
-      if(!c)
-      {
-        // try raw/YBR_FULL_422
-        if (DoYBRFull422(*cur_is,pl_os)) cur_is = &pl_os;
-        else return false;
-      }
-    }
-    break;
-  case PhotometricInterpretation::YBR_PARTIAL_422: // retired
-  case PhotometricInterpretation::YBR_PARTIAL_420: // not supported
-    { // try JPEG
-      const JPEGCodec * c = dynamic_cast<const JPEGCodec*>(this);
-      if(!c) return false;
-    }
-    break;
-  default:
-    mdcmErrorMacro("Unhandled PhotometricInterpretation: " << PI);
-    return false;
-  }
-  if(RequestPlanarConfiguration)
-  {
-    DoPlanarConfiguration(*cur_is,pl_os);
-    cur_is = &pl_os;
-  }
-  // Overlay cleanup or cleanup the unused bits
-  if (PF.GetBitsAllocated() != PF.GetBitsStored() && PF.GetBitsAllocated() != 8)
-  {
-    if(NeedOverlayCleanup)
-    {
-      DoOverlayCleanup(*cur_is,os);
-    }
-    else
-    {
-      DoSimpleCopy(*cur_is,os);
-    }
-  }
-  else
-  {
-    assert(PF.GetBitsAllocated() == PF.GetBitsStored());
-    DoSimpleCopy(*cur_is,os);
-  }
-  return true;
-}
-
-bool ImageCodec::IsValid(PhotometricInterpretation const &)
-{
-  return false;
-}
-
-void ImageCodec::SetDimensions(const unsigned int d[3])
-{
-  Dimensions[0] = d[0];
-  Dimensions[1] = d[1];
-  Dimensions[2] = d[2];
-}
-
-void ImageCodec::SetDimensions(const std::vector<unsigned int> & d)
-{
-  size_t s = d.size();
-  assert(s <= 3);
-  for (size_t i = 0; i < 3; i++)
-  {
-    if (i < s) Dimensions[i] = d[i];
-    else Dimensions[i] = 1;
-  }
-}
-
-bool ImageCodec::StartEncode(std::ostream &)
-{
-  assert(0);
-  return false;
-}
-
-bool ImageCodec::IsRowEncoder()
-{
-  return false;
-}
-
-bool ImageCodec::IsFrameEncoder()
-{
-  return false;
-}
-
-bool ImageCodec::AppendRowEncode(std::ostream &, const char *, size_t)
-{
-  assert(0);
-  return false;
-}
-
-bool ImageCodec::AppendFrameEncode(std::ostream &, const char *, size_t)
-{
-  assert(0);
-  return false;
-}
-
-bool ImageCodec::StopEncode(std::ostream &)
-{
-  assert(0);
-  return false;
 }
 
 } // end namespace mdcm

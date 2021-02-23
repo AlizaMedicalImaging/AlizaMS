@@ -1,2 +1,0 @@
-find_program(KDU_EXPAND_EXECUTABLE kdu_expand)
-mark_as_advanced(KDU_EXPAND_EXECUTABLE)

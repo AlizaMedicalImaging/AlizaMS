@@ -33,7 +33,7 @@
 namespace mdcm
 {
 
-CryptoFactory * CryptoFactory::GetFactoryInstance(CryptoLib id)
+CryptoFactory * CryptoFactory::GetFactoryInstance(CryptoFactory::CryptoLib id)
 {
 #ifdef _WIN32
   static CAPICryptoFactory capi(CryptoFactory::CAPI);
@@ -57,7 +57,7 @@ CryptoFactory * CryptoFactory::GetFactoryInstance(CryptoLib id)
     id = CryptoFactory::CAPI;
 #endif
   }
-  std::map<CryptoLib, CryptoFactory*>::iterator it =
+  std::map<CryptoFactory::CryptoLib, CryptoFactory *>::iterator it =
     getInstanceMap().find(id);
   if (it == getInstanceMap().end())
   {
@@ -66,6 +66,34 @@ CryptoFactory * CryptoFactory::GetFactoryInstance(CryptoLib id)
   }
   assert(it->second);
   return it->second;
+}
+
+CryptoFactory::CryptoFactory(CryptoFactory::CryptoLib id)
+{
+  AddLib(id, this);
+}
+
+CryptoFactory::CryptoFactory()
+{
+}
+
+CryptoFactory::~CryptoFactory()
+{
+}
+
+std::map<CryptoFactory::CryptoLib, CryptoFactory*> & CryptoFactory::getInstanceMap()
+{
+  static std::map<CryptoFactory::CryptoLib, CryptoFactory*> libs;
+  return libs;
+}
+
+void CryptoFactory::AddLib(CryptoFactory::CryptoLib id, CryptoFactory * f)
+{
+  if (getInstanceMap().insert(
+    std::pair<CryptoFactory::CryptoLib, CryptoFactory*>(id, f)).second == false)
+  {
+    mdcmErrorMacro("Library already registered under id " << (int)id);
+  }
 }
 
 } // end native mdcm

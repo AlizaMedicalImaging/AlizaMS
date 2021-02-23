@@ -40,13 +40,16 @@ public:
   typedef AnyEvent Superclass;
   DataSetEvent(DataSet const * ds = NULL) : m_DataSet(ds) {}
   virtual ~DataSetEvent() {}
-  virtual const char * GetEventName() const { return "DataSetEvent"; }
-  virtual bool CheckEvent(const ::mdcm::Event* e) const
+  virtual const char * GetEventName() const override
+  {
+    return "DataSetEvent";
+  }
+  virtual bool CheckEvent(const ::mdcm::Event* e) const override
   {
     return (dynamic_cast<const Self*>(e) == NULL ? false : true) ;
   }
-  virtual ::mdcm::Event * MakeObject() const { return new Self; }
-  DataSetEvent(const Self&s) : AnyEvent(s){};
+  virtual ::mdcm::Event * MakeObject() const override { return new Self; }
+  DataSetEvent(const Self & s) : AnyEvent(s) {};
   DataSet const & GetDataSet() const { return *m_DataSet; }
 private:
   void operator=(const Self&);

@@ -31,19 +31,14 @@ namespace mdcm
 class ByteValue;
 class MediaStorage;
 /**
- * \brief PixmapReader
- * \details 
- * \note its role is to convert the DICOM DataSet into a Pixmap
- * representation
+ * PixmapReader
+ * 
  * By default it is also loading the lookup table and overlay when found as
  * they impact the rendering or the image
  *
  * See PS 3.3-2008, Table C.7-11b IMAGE PIXEL MACRO ATTRIBUTES for the list of
  * attribute that belong to what mdcm calls a 'Pixmap'
  *
- * \warning the API ReadUpToTag and ReadSelectedTag
- *
- * \see Pixmap
  */
 class MDCM_EXPORT PixmapReader : public Reader
 {
@@ -58,13 +53,13 @@ public:
   bool GetProcessIcons() const { return m_ProcessIcons; }
   void SetProcessCurves(bool t) { m_ProcessCurves = t; }
   bool GetProcessCurves() const { return m_ProcessCurves; }
-  virtual bool Read();
+  virtual bool Read() override;
   // Following methods are valid only after a call to 'Read'
-  const Pixmap& GetPixmap() const;
-  Pixmap& GetPixmap();
+  const Pixmap & GetPixmap() const;
+  Pixmap & GetPixmap();
 protected:
-  bool ReadImageInternal(MediaStorage const & ms, bool handlepixeldata = true);
-  virtual bool ReadImage(MediaStorage const & ms);
+  bool ReadImageInternal(const MediaStorage &, bool handlepixeldata = true);
+  virtual bool ReadImage(const MediaStorage &);
   virtual bool ReadACRNEMAImage();
   SmartPointer<Pixmap> PixelData;
   bool m_AlppySupplementalLUT;

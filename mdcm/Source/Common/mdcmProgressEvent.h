@@ -29,10 +29,8 @@ namespace mdcm
 {
 
 /**
- * \brief ProgressEvent
- * \details Special type of event triggered during
+ * ProgressEvent
  *
- * \see AnyEvent
  */
 
 class ProgressEvent : public AnyEvent
@@ -40,27 +38,24 @@ class ProgressEvent : public AnyEvent
 public:
   typedef ProgressEvent Self;
   typedef AnyEvent Superclass;
-
   ProgressEvent(double p = 0) : m_Progress(p) {}
+  ProgressEvent(const Self & s) : AnyEvent(s) {}
+  ~ProgressEvent() {}
 
-  virtual ~ProgressEvent() {}
-
-  virtual const char * GetEventName() const
+  const char * GetEventName() const override
   {
     return "ProgressEvent";
   }
 
-  virtual bool CheckEvent(const ::mdcm::Event * e) const
+  bool CheckEvent(const ::mdcm::Event * e) const override
   {
     return ((dynamic_cast<const Self*>(e)) ? true : false);
   }
 
-  virtual ::mdcm::Event * MakeObject() const
+  ::mdcm::Event * MakeObject() const override
   {
     return new Self;
   }
-
-  ProgressEvent(const Self & s) : AnyEvent(s) {};
 
   void SetProgress(double p)
   {

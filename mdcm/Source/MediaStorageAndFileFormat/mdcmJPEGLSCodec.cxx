@@ -40,16 +40,132 @@ JPEGLSCodec::JPEGLSCodec() : BufferLength(0), LossyError(0)
 }
 
 JPEGLSCodec::~JPEGLSCodec()
-= default;
-
-void JPEGLSCodec::SetLossless(bool l)
 {
-  LossyFlag = !l;
 }
 
-bool JPEGLSCodec::GetLossless() const
+bool JPEGLSCodec::CanDecode(TransferSyntax const & ts) const
 {
-  return !LossyFlag;
+  return (ts == TransferSyntax::JPEGLSLossless ||
+    ts == TransferSyntax::JPEGLSNearLossless);
+}
+
+bool JPEGLSCodec::CanCode(TransferSyntax const & ts) const
+{
+  return ts == TransferSyntax::JPEGLSLossless || ts == TransferSyntax::JPEGLSNearLossless;
+}
+
+bool JPEGLSCodec::Decode(DataElement const &in, DataElement &out)
+{
+  using namespace charls;
+  if(NumberOfDimensions == 2)
+  {
+    const SequenceOfFragments * sf = in.GetSequenceOfFragments();
+    if (!sf) return false;
+    const size_t totalLen = sf->ComputeByteLength();
+    char * buffer = new char[totalLen];
+    sf->GetBuffer(buffer, totalLen);
+    std::vector<unsigned char> rgbyteOut;
+    const bool b = DecodeByStreamsCommon(buffer, totalLen, rgbyteOut);
+    if(!b) return false;
+    delete[] buffer;
+    out = in;
+    out.SetByteValue((char*)&rgbyteOut[0], (uint32_t)rgbyteOut.size());
+    return true;
+  }
+  else if(NumberOfDimensions == 3)
+  {
+    const SequenceOfFragments * sf = in.GetSequenceOfFragments();
+    if (!sf) return false;
+    if (sf->GetNumberOfFragments() != Dimensions[2]) return false;
+    std::stringstream os;
+    for(unsigned int i = 0; i < sf->GetNumberOfFragments(); ++i)
+    {
+      const Fragment &frag = sf->GetFragment(i);
+      if(frag.IsEmpty()) return false;
+      const ByteValue * bv = frag.GetByteValue();
+      if (!bv) return false;
+      size_t totalLen = bv->GetLength();
+      char * mybuffer = new char[totalLen];
+      bv->GetBuffer(mybuffer, bv->GetLength());
+      const unsigned char * pbyteCompressed = (const unsigned char*)mybuffer;
+      while(totalLen > 0 && pbyteCompressed[totalLen-1] != 0xd9)
+      {
+        totalLen--;
+      }
+      // what if 0xd9 is never found ?
+      assert(totalLen > 0 && pbyteCompressed[totalLen-1] == 0xd9);
+      size_t cbyteCompressed = totalLen;
+      JlsParameters params = {};
+      if(JpegLsReadHeader(pbyteCompressed, cbyteCompressed, &params, NULL) != ApiResult::OK)
+      {
+        mdcmDebugMacro("Could not parse JPEG-LS header");
+        return false;
+      }
+      // allowedlossyerror == 0 => Lossless
+      LossyFlag = params.allowedLossyError!= 0;
+      std::vector<unsigned char> rgbyteOut;
+      rgbyteOut.resize(params.height *params.width * ((params.bitsPerSample + 7) / 8) * params.components);
+      ApiResult result = JpegLsDecode(&rgbyteOut[0], rgbyteOut.size(), pbyteCompressed, cbyteCompressed, &params, NULL);
+      delete[] mybuffer;
+      if (result != ApiResult::OK)
+      {
+        return false;
+      }
+      os.write((const char*)&rgbyteOut[0], rgbyteOut.size());
+    }
+    std::string str = os.str();
+    assert(str.size());
+    out.SetByteValue(&str[0], (uint32_t)str.size());
+    return true;
+  }
+  return false;
+}
+
+bool JPEGLSCodec::Decode(DataElement const &, char * , size_t,
+  uint32_t , uint32_t , uint32_t ,
+  uint32_t , uint32_t , uint32_t)
+{
+  return false;
+}
+
+bool JPEGLSCodec::Code(DataElement const & in, DataElement & out)
+{
+  out = in;
+  SmartPointer<SequenceOfFragments> sq = new SequenceOfFragments;
+  const unsigned int *dims = this->GetDimensions();
+  const int image_width = dims[0];
+  const int image_height = dims[1];
+  const ByteValue * bv = in.GetByteValue();
+  const char * input = bv->GetPointer();
+  const size_t len = bv->GetLength();
+  const size_t image_len = len / dims[2];
+  const size_t inputlength = image_len;
+  for(unsigned int dim = 0; dim < dims[2]; ++dim)
+  {
+    const char * inputdata = input + dim * image_len;
+    std::vector<unsigned char> rgbyteCompressed;
+    rgbyteCompressed.resize(image_width * image_height * 4 * 2); // overallocate
+    size_t cbyteCompressed;
+    const bool b = this->CodeFrameIntoBuffer(
+      (char*)&rgbyteCompressed[0], rgbyteCompressed.size(), cbyteCompressed, inputdata, inputlength);
+    if(!b) return false;
+    Fragment frag;
+    frag.SetByteValue((char*)&rgbyteCompressed[0], (uint32_t)cbyteCompressed);
+    sq->AddFragment(frag);
+  }
+  assert(sq->GetNumberOfFragments() == dims[2]);
+  out.SetValue(*sq);
+  return true;
+}
+
+unsigned long long JPEGLSCodec::GetBufferLength() const
+{
+  return BufferLength;
+}
+
+void JPEGLSCodec::SetBufferLength(unsigned long long l)
+{
+  BufferLength = l;
 }
 
 bool JPEGLSCodec::GetHeaderInfo(std::istream &is, TransferSyntax &ts)
@@ -130,220 +246,19 @@ bool JPEGLSCodec::GetHeaderInfo(std::istream &is, TransferSyntax &ts)
   return true;
 }
 
-bool JPEGLSCodec::CanDecode(TransferSyntax const & ts) const
+void JPEGLSCodec::SetLossless(bool l)
 {
-  return ts == TransferSyntax::JPEGLSLossless || ts == TransferSyntax::JPEGLSNearLossless;
+  LossyFlag = !l;
 }
 
-bool JPEGLSCodec::CanCode(TransferSyntax const & ts) const
+bool JPEGLSCodec::GetLossless() const
 {
-  return ts == TransferSyntax::JPEGLSLossless || ts == TransferSyntax::JPEGLSNearLossless;
-}
-
-bool JPEGLSCodec::DecodeByStreamsCommon(const char * buffer, size_t totalLen, std::vector<unsigned char> & rgbyteOut)
-{
-  using namespace charls;
-  const unsigned char * pbyteCompressed = (const unsigned char*)buffer;
-  const size_t cbyteCompressed = totalLen;
-  JlsParameters params = {};
-  if(JpegLsReadHeader(pbyteCompressed, cbyteCompressed, &params, NULL) != ApiResult::OK)
-  {
-    mdcmDebugMacro("Could not parse JPEG-LS header");
-    return false;
-  }
-  // allowedlossyerror == 0 => Lossless
-  LossyFlag = params.allowedLossyError!= 0;
-  rgbyteOut.resize(params.height *params.width * ((params.bitsPerSample + 7) / 8) * params.components);
-  ApiResult result = JpegLsDecode(&rgbyteOut[0], rgbyteOut.size(), pbyteCompressed, cbyteCompressed, &params, NULL);
-  if (result != ApiResult::OK)
-  {
-    mdcmErrorMacro("Could not decode JPEG-LS stream");
-    return false;
-  }
-  return true;
-}
-
-bool JPEGLSCodec::Decode(DataElement const &in, DataElement &out)
-{
-  using namespace charls;
-  if(NumberOfDimensions == 2)
-  {
-    const SequenceOfFragments * sf = in.GetSequenceOfFragments();
-    if (!sf) return false;
-    const size_t totalLen = sf->ComputeByteLength();
-    char * buffer = new char[totalLen];
-    sf->GetBuffer(buffer, totalLen);
-    std::vector<unsigned char> rgbyteOut;
-    const bool b = DecodeByStreamsCommon(buffer, totalLen, rgbyteOut);
-    if(!b) return false;
-    delete[] buffer;
-    out = in;
-    out.SetByteValue((char*)&rgbyteOut[0], (uint32_t)rgbyteOut.size());
-    return true;
-  }
-  else if(NumberOfDimensions == 3)
-  {
-    const SequenceOfFragments * sf = in.GetSequenceOfFragments();
-    if (!sf) return false;
-    if (sf->GetNumberOfFragments() != Dimensions[2]) return false;
-    std::stringstream os;
-    for(unsigned int i = 0; i < sf->GetNumberOfFragments(); ++i)
-    {
-      const Fragment &frag = sf->GetFragment(i);
-      if(frag.IsEmpty()) return false;
-      const ByteValue * bv = frag.GetByteValue();
-      if (!bv) return false;
-      size_t totalLen = bv->GetLength();
-      char * mybuffer = new char[totalLen];
-      bv->GetBuffer(mybuffer, bv->GetLength());
-      const unsigned char * pbyteCompressed = (const unsigned char*)mybuffer;
-      while(totalLen > 0 && pbyteCompressed[totalLen-1] != 0xd9)
-      {
-        totalLen--;
-      }
-      // what if 0xd9 is never found ?
-      assert(totalLen > 0 && pbyteCompressed[totalLen-1] == 0xd9);
-      size_t cbyteCompressed = totalLen;
-      JlsParameters params = {};
-      if(JpegLsReadHeader(pbyteCompressed, cbyteCompressed, &params, NULL) != ApiResult::OK)
-      {
-        mdcmDebugMacro("Could not parse JPEG-LS header");
-        return false;
-      }
-      // allowedlossyerror == 0 => Lossless
-      LossyFlag = params.allowedLossyError!= 0;
-      std::vector<unsigned char> rgbyteOut;
-      rgbyteOut.resize(params.height *params.width * ((params.bitsPerSample + 7) / 8) * params.components);
-      ApiResult result = JpegLsDecode(&rgbyteOut[0], rgbyteOut.size(), pbyteCompressed, cbyteCompressed, &params, NULL);
-      delete[] mybuffer;
-      if (result != ApiResult::OK)
-      {
-        return false;
-      }
-      os.write((const char*)&rgbyteOut[0], rgbyteOut.size());
-    }
-    std::string str = os.str();
-    assert(str.size());
-    out.SetByteValue(&str[0], (uint32_t)str.size());
-    return true;
-  }
-  return false;
-}
-
-bool JPEGLSCodec::CodeFrameIntoBuffer(char * outdata, size_t outlen, size_t & complen, const char * indata, size_t inlen)
-{
-  using namespace charls;
-  const unsigned int *dims = this->GetDimensions();
-  const int image_width = dims[0];
-  const int image_height = dims[1];
-  const PixelFormat &pf = this->GetPixelFormat();
-  const int sample_pixel = pf.GetSamplesPerPixel();
-  const int bitsallocated = pf.GetBitsAllocated();
-  const int bitsstored = pf.GetBitsStored();
-  JlsParameters params = {};
-  /*
-  The fields in JlsCustomParameters do not control lossy/lossless. They
-  provide the possiblity to tune the JPEG-LS internals for better compression
-  ratios. Expect a lot of work and testing to achieve small improvements.
-
-  Lossy/lossless is controlled by the field allowedlossyError. If you put in
-  0, encoding is lossless. If it is non-zero, then encoding is lossy. The
-  value of 3 is often suggested as a default.
-
-  The nice part about JPEG-LS encoding is that in lossy encoding, there is a
-  guarenteed maximum error for each pixel. So a pixel that has value 12,
-  encoded with a maximum lossy error of 3, may be decoded as a value between 9
-  and 15, but never anything else. In medical imaging this could be a useful
-  guarantee.
-
-  The not so nice part is that you may see striping artifacts when decoding
-  "non-natural" images. I haven't seen the effects myself on medical images,
-  but I suspect screenshots may suffer the most. Also, the bandwidth saving is
-  not as big as with other lossy schemes.
-
-  As for 12 bit, I am about to commit a unit test (with the sample you gave
-  me) that does a successful round trip encoding of 12 bit color. I did notice
-  that for 12 bit, the encoder fails if the unused bits are non-zero, but the
-  sample dit not suffer from that.
-   */
-  params.allowedLossyError = !LossyFlag ? 0 : LossyError;
-  params.components = sample_pixel;
-  // D_CLUNIE_RG3_JPLY.dcm. The famous 16bits allocated / 10 bits stored with the pixel value = 1024
-  // CharLS properly encode 1024 considering it as 10bits data, so the output
-  // Using bitsstored for the encoder gives a slightly better compression ratio, and is indeed the
-  // right way of doing it.
-
-  // mdcmData/PHILIPS_Gyroscan-8-MONO2-Odd_Sequence.dcm
-  if(true || pf.GetPixelRepresentation())
-  {
-    // mdcmData/CT_16b_signed-UsedBits13.dcm
-    params.bitsPerSample = bitsallocated;
-  }
-  else
-  {
-    params.bitsPerSample = bitsstored;
-  }
-  params.height = image_height;
-  params.width = image_width;
-  if (sample_pixel == 4)
-  {
-    params.interleaveMode = InterleaveMode::Line;
-  }
-  else if (sample_pixel == 3)
-  {
-    params.interleaveMode = InterleaveMode::Line;
-    params.colorTransformation = ColorTransformation::HP1;
-  }
-  ApiResult error = JpegLsEncode(outdata, outlen, &complen, indata, inlen, &params, NULL);
-  if(error != ApiResult::OK)
-  {
-    mdcmErrorMacro("Error compressing: " << (int)error);
-    return false;
-  }
-  assert(complen < outlen);
-  return true;
-}
-
-bool JPEGLSCodec::Code(DataElement const & in, DataElement & out)
-{
-  out = in;
-  SmartPointer<SequenceOfFragments> sq = new SequenceOfFragments;
-  const unsigned int *dims = this->GetDimensions();
-  const int image_width = dims[0];
-  const int image_height = dims[1];
-  const ByteValue * bv = in.GetByteValue();
-  const char * input = bv->GetPointer();
-  const size_t len = bv->GetLength();
-  const size_t image_len = len / dims[2];
-  const size_t inputlength = image_len;
-  for(unsigned int dim = 0; dim < dims[2]; ++dim)
-  {
-    const char * inputdata = input + dim * image_len;
-    std::vector<unsigned char> rgbyteCompressed;
-    rgbyteCompressed.resize(image_width * image_height * 4 * 2); // overallocate
-    size_t cbyteCompressed;
-    const bool b = this->CodeFrameIntoBuffer(
-      (char*)&rgbyteCompressed[0], rgbyteCompressed.size(), cbyteCompressed, inputdata, inputlength);
-    if(!b) return false;
-    Fragment frag;
-    frag.SetByteValue((char*)&rgbyteCompressed[0], (uint32_t)cbyteCompressed);
-    sq->AddFragment(frag);
-  }
-  assert(sq->GetNumberOfFragments() == dims[2]);
-  out.SetValue(*sq);
-  return true;
+  return !LossyFlag;
 }
 
 void JPEGLSCodec::SetLossyError(int error)
 {
   LossyError = error;
-}
-
-bool JPEGLSCodec::Decode(DataElement const &, char * , size_t,
-  uint32_t , uint32_t , uint32_t ,
-  uint32_t , uint32_t , uint32_t)
-{
-  return false;
 }
 
 bool JPEGLSCodec::DecodeExtent(char * buffer,
@@ -459,16 +374,11 @@ bool JPEGLSCodec::DecodeExtent(char * buffer,
   return true;
 }
 
-ImageCodec * JPEGLSCodec::Clone() const
-{
-  JPEGLSCodec * copy = new JPEGLSCodec;
-  return copy;
-}
-
 bool JPEGLSCodec::StartEncode(std::ostream &)
 {
   return true;
 }
+
 bool JPEGLSCodec::IsRowEncoder()
 {
   return false;
@@ -500,6 +410,103 @@ bool JPEGLSCodec::AppendFrameEncode(std::ostream & out, const char * data, size_
 
 bool JPEGLSCodec::StopEncode(std::ostream &)
 {
+  return true;
+}
+
+bool JPEGLSCodec::DecodeByStreamsCommon(const char * buffer, size_t totalLen, std::vector<unsigned char> & rgbyteOut)
+{
+  using namespace charls;
+  const unsigned char * pbyteCompressed = (const unsigned char*)buffer;
+  const size_t cbyteCompressed = totalLen;
+  JlsParameters params = {};
+  if(JpegLsReadHeader(pbyteCompressed, cbyteCompressed, &params, NULL) != ApiResult::OK)
+  {
+    mdcmDebugMacro("Could not parse JPEG-LS header");
+    return false;
+  }
+  // allowedlossyerror == 0 => Lossless
+  LossyFlag = params.allowedLossyError!= 0;
+  rgbyteOut.resize(params.height *params.width * ((params.bitsPerSample + 7) / 8) * params.components);
+  ApiResult result = JpegLsDecode(&rgbyteOut[0], rgbyteOut.size(), pbyteCompressed, cbyteCompressed, &params, NULL);
+  if (result != ApiResult::OK)
+  {
+    mdcmErrorMacro("Could not decode JPEG-LS stream");
+    return false;
+  }
+  return true;
+}
+
+bool JPEGLSCodec::CodeFrameIntoBuffer(char * outdata, size_t outlen, size_t & complen, const char * indata, size_t inlen)
+{
+  using namespace charls;
+  const unsigned int *dims = this->GetDimensions();
+  const int image_width = dims[0];
+  const int image_height = dims[1];
+  const PixelFormat &pf = this->GetPixelFormat();
+  const int sample_pixel = pf.GetSamplesPerPixel();
+  const int bitsallocated = pf.GetBitsAllocated();
+  const int bitsstored = pf.GetBitsStored();
+  JlsParameters params = {};
+  /*
+  The fields in JlsCustomParameters do not control lossy/lossless. They
+  provide the possiblity to tune the JPEG-LS internals for better compression
+  ratios. Expect a lot of work and testing to achieve small improvements.
+
+  Lossy/lossless is controlled by the field allowedlossyError. If you put in
+  0, encoding is lossless. If it is non-zero, then encoding is lossy. The
+  value of 3 is often suggested as a default.
+
+  The nice part about JPEG-LS encoding is that in lossy encoding, there is a
+  guarenteed maximum error for each pixel. So a pixel that has value 12,
+  encoded with a maximum lossy error of 3, may be decoded as a value between 9
+  and 15, but never anything else. In medical imaging this could be a useful
+  guarantee.
+
+  The not so nice part is that you may see striping artifacts when decoding
+  "non-natural" images. I haven't seen the effects myself on medical images,
+  but I suspect screenshots may suffer the most. Also, the bandwidth saving is
+  not as big as with other lossy schemes.
+
+  As for 12 bit, I am about to commit a unit test (with the sample you gave
+  me) that does a successful round trip encoding of 12 bit color. I did notice
+  that for 12 bit, the encoder fails if the unused bits are non-zero, but the
+  sample dit not suffer from that.
+   */
+  params.allowedLossyError = !LossyFlag ? 0 : LossyError;
+  params.components = sample_pixel;
+  // D_CLUNIE_RG3_JPLY.dcm. The famous 16bits allocated / 10 bits stored with the pixel value = 1024
+  // CharLS properly encode 1024 considering it as 10bits data, so the output
+  // Using bitsstored for the encoder gives a slightly better compression ratio, and is indeed the
+  // right way of doing it.
+
+  // mdcmData/PHILIPS_Gyroscan-8-MONO2-Odd_Sequence.dcm
+  if(true || pf.GetPixelRepresentation())
+  {
+    // mdcmData/CT_16b_signed-UsedBits13.dcm
+    params.bitsPerSample = bitsallocated;
+  }
+  else
+  {
+    params.bitsPerSample = bitsstored;
+  }
+  params.height = image_height;
+  params.width = image_width;
+  if (sample_pixel == 4)
+  {
+    params.interleaveMode = InterleaveMode::Line;
+  }
+  else if (sample_pixel == 3)
+  {
+    params.interleaveMode = InterleaveMode::Line;
+    params.colorTransformation = ColorTransformation::HP1;
+  }
+  ApiResult error = JpegLsEncode(outdata, outlen, &complen, indata, inlen, &params, NULL);
+  if(error != ApiResult::OK)
+  {
+    mdcmErrorMacro("Error compressing: " << (int)error);
+    return false;
+  }
+  assert(complen < outlen);
   return true;
 }
 

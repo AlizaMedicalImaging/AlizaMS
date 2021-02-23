@@ -44,12 +44,11 @@ public :
   unsigned int GetYMax() const;
   unsigned int GetZMin() const;
   unsigned int GetZMax() const;
-  Region *Clone() const;
-  bool Empty() const;
-  bool IsValid() const;
-  size_t Area() const;
-  BoxRegion ComputeBoundingBox();
-  void Print(std::ostream & os = std::cout) const;
+  bool Empty() const override;
+  bool IsValid() const override;
+  size_t Area() const override;
+  BoxRegion ComputeBoundingBox() override;
+  void Print(std::ostream & os = std::cout) const override;
   static BoxRegion BoundingBox(BoxRegion const &, BoxRegion const &);
   BoxRegion(const BoxRegion &);
   void operator=(const BoxRegion &);

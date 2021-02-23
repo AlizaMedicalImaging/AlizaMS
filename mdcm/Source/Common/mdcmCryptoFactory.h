@@ -32,35 +32,22 @@ namespace mdcm
 class MDCM_EXPORT CryptoFactory
 {
 public:
-  enum CryptoLib {DEFAULT = 0, OPENSSL = 1, CAPI = 2, OPENSSLP7 = 3};
-
-  virtual CryptographicMessageSyntax* CreateCMSProvider() = 0;
-  static CryptoFactory* GetFactoryInstance(CryptoLib id = DEFAULT);
-
-protected:
-  CryptoFactory(CryptoLib id)
+  enum CryptoLib
   {
-    AddLib(id, this);
-  }
-
+    DEFAULT = 0,
+    OPENSSL = 1,
+    CAPI = 2,
+    OPENSSLP7 = 3
+  };
+  virtual CryptographicMessageSyntax * CreateCMSProvider() = 0;
+  static CryptoFactory * GetFactoryInstance(CryptoLib = DEFAULT);
+protected:
+  CryptoFactory(CryptoLib);
+  CryptoFactory();
+  ~CryptoFactory();
 private:
-  static std::map<CryptoLib, CryptoFactory*>& getInstanceMap()
-  {
-    static std::map<CryptoLib, CryptoFactory*> libs;
-    return libs;
-  }
-
-  static void AddLib(CryptoLib id, CryptoFactory* f)
-  {
-    if (getInstanceMap().insert(std::pair<CryptoLib, CryptoFactory*>(id, f)).second == false)
-    {
-      mdcmErrorMacro( "Library already registered under id " << (int)id );
-    }
-  }
-
-protected:
-  CryptoFactory(){}
-  ~CryptoFactory(){}
+  static std::map<CryptoLib, CryptoFactory *> & getInstanceMap();
+  static void AddLib(CryptoLib, CryptoFactory *);
 };
 
 } // end namespace mdcm

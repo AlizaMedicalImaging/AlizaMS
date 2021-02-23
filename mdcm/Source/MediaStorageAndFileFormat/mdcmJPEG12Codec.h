@@ -37,14 +37,14 @@ class JPEG12Codec : public JPEGCodec
 {
 public:
   JPEG12Codec();
-  ~JPEG12Codec();
-  bool DecodeByStreams(std::istream &, std::ostream &);
-  bool InternalCode(const char *, size_t, std::ostream &);
-  bool GetHeaderInfo(std::istream &, TransferSyntax &);
+  ~JPEG12Codec() override;
+  bool DecodeByStreams(std::istream &, std::ostream &) override;
+  bool InternalCode(const char *, size_t, std::ostream &) override;
+  bool GetHeaderInfo(std::istream &, TransferSyntax &) override;
 
 protected:
-  bool IsStateSuspension() const;
-  virtual bool EncodeBuffer(std::ostream &, const char *, size_t);
+  bool IsStateSuspension() const override;
+  bool EncodeBuffer(std::ostream &, const char *, size_t) override;
 
 private:
   JPEGInternals_12BIT * Internals;

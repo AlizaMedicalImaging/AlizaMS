@@ -29,7 +29,8 @@ namespace mdcm
 // Data Element (CP246Explicit)
 /**
  * Class to read/write a DataElement as CP246Explicit Data Element
- * Some system are producing SQ, declare them as UN, but encode the SQ as 'Explicit' instead of Implicit
+ * Some system are producing SQ, declare them as UN, but encode
+ * the SQ as 'Explicit' instead of Implicit
  */
 class MDCM_EXPORT CP246ExplicitDataElement : public DataElement
 {
@@ -48,7 +49,7 @@ public:
   template <typename TSwap>
   std::istream & ReadWithLength(std::istream & is, VL & length);
 
-  // PURPOSELY do not provide an implementation for writing
+  // Purposely do not provide an implementation for writing
 };
 
 } // end namespace mdcm

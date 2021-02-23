@@ -30,9 +30,8 @@ namespace mdcm
 class MDCM_EXPORT CAPICryptoFactory : public CryptoFactory
 {
 public:
-  CAPICryptoFactory(CryptoLib id);
-  CryptographicMessageSyntax * CreateCMSProvider();
-
+  CAPICryptoFactory(CryptoLib);
+  CryptographicMessageSyntax * CreateCMSProvider() override;
 private:
   CAPICryptoFactory() {}
 };

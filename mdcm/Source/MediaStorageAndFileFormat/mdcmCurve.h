@@ -49,7 +49,7 @@ public:
   Curve();
   Curve(Curve const &);
   ~Curve();
-  void Print(std::ostream &) const;
+  void Print(std::ostream &) const override;
   void GetAsPoints(float *) const;
   static unsigned int GetNumberOfCurves(DataSet const &);
   void Update(const DataElement &);
@@ -60,14 +60,14 @@ public:
   void SetNumberOfPoints(unsigned short);
   unsigned short GetNumberOfPoints() const;
   void SetTypeOfData(const char *);
-  const char *GetTypeOfData() const;
+  const char * GetTypeOfData() const;
   // See PS 3.3 - 2004 - C.10.2.1.1 Type of data
-  const char *GetTypeOfDataDescription() const;
+  const char * GetTypeOfDataDescription() const;
   void SetCurveDescription(const char *);
   void SetDataValueRepresentation(unsigned short);
   unsigned short GetDataValueRepresentation() const;
   void SetCurveDataDescriptor(const uint16_t *, size_t);
-  std::vector<unsigned short> const &GetCurveDataDescriptor() const;
+  std::vector<unsigned short> const & GetCurveDataDescriptor() const;
   void SetCoordinateStartValue(unsigned short);
   void SetCoordinateStepValue(unsigned short);
   void SetCurve(const char *, unsigned int);
@@ -76,7 +76,7 @@ public:
 
 private:
   double ComputeValueFromStartAndStep(unsigned int) const;
-  CurveInternal *Internal;
+  CurveInternal * Internal;
 };
 
 } // end namespace mdcm

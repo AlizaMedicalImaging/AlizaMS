@@ -41,27 +41,11 @@ JPEGCodec::JPEGCodec() : BitSample(0), Quality(100)
 
 JPEGCodec::~JPEGCodec()
 {
-  if(Internal) delete Internal;
-}
-
-void JPEGCodec::SetQuality(double q)
-{
-  Quality = (int)q;
-}
-
-double JPEGCodec::GetQuality() const
-{
-  return Quality;
-}
-
-void JPEGCodec::SetLossless(bool b)
-{
-  LossyFlag = !b;
-}
-
-bool JPEGCodec::GetLossless() const
-{
-  return !LossyFlag;
+  if(Internal)
+  {
+    delete Internal;
+    Internal = NULL;
+  }
 }
 
 bool JPEGCodec::CanDecode(TransferSyntax const & ts) const
@@ -84,56 +68,6 @@ bool JPEGCodec::CanCode(TransferSyntax const & ts) const
       || ts == TransferSyntax::JPEGFullProgressionProcess10_12
       || ts == TransferSyntax::JPEGLosslessProcess14
       || ts == TransferSyntax::JPEGLosslessProcess14_1;
-}
-
-void JPEGCodec::SetPixelFormat(PixelFormat const & pf)
-{
-  ImageCodec::SetPixelFormat(pf);
-  SetBitSample(pf.GetBitsStored()); //
-}
-
-void JPEGCodec::SetupJPEGBitCodec(int b)
-{
-  BitSample = b;
-  delete Internal;
-  Internal = NULL;
-  if(BitSample <= 8)
-  {
-    Internal = new JPEG8Codec;
-    mdcmDebugMacro("JPEGCodec: using JPEG8, bits=" << b);
-  }
-  else if(BitSample <= 12)
-  {
-    Internal = new JPEG12Codec;
-    mdcmDebugMacro("JPEGCodec: using JPEG12, bits=" << b);
-  }
-  else if(BitSample <= 16)
-  {
-    Internal = new JPEG16Codec;
-    mdcmDebugMacro("JPEGCodec: using JPEG16, bits=" << b);
-  }
-  else
-  {
-    mdcmAlwaysWarnMacro("JPEGCodec: SetupJPEGBitCodec(" << b << ") failed");
-  }
-}
-
-void JPEGCodec::SetBitSample(int bit)
-{
-  SetupJPEGBitCodec(bit);
-  if(Internal)
-  {
-    Internal->SetDimensions(this->GetDimensions());
-    Internal->SetPlanarConfiguration(this->GetPlanarConfiguration());
-    Internal->SetPhotometricInterpretation(this->GetPhotometricInterpretation());
-    Internal->SetLossless(this->GetLossless());
-    Internal->SetQuality(this->GetQuality());
-    Internal->ImageCodec::SetPixelFormat(this->ImageCodec::GetPixelFormat());
-#if 0
-    // TODO check this
-    Internal->SetNeedOverlayCleanup(this->AreOverlaysInPixelData());
-#endif
-  }
 }
 
 bool JPEGCodec::Decode(DataElement const & in, DataElement & out)
@@ -268,6 +202,44 @@ bool JPEGCodec::Decode(DataElement const & in, DataElement & out)
   return true;
 }
 
+bool JPEGCodec::Code(DataElement const & in, DataElement & out)
+{
+  out = in;
+  SmartPointer<SequenceOfFragments> sq = new SequenceOfFragments;
+  const Tag itemStart(0xfffe, 0xe000);
+  const ByteValue * bv = in.GetByteValue();
+  if(!bv) return false;
+  const unsigned int * dims = this->GetDimensions();
+  const char * input = bv->GetPointer();
+  const size_t len = bv->GetLength();
+  const size_t image_len = len / dims[2];
+  if(!Internal) return false;
+  Internal->SetLossless(this->GetLossless());
+  Internal->SetQuality(this->GetQuality());
+  for(unsigned int dim = 0; dim < dims[2]; ++dim)
+  {
+    std::stringstream os;
+    const char * p = input + dim * image_len;
+    const bool r = Internal->InternalCode(p, image_len, os);
+    if(!r) return false;
+    std::string str = os.str();
+    assert(str.size());
+    Fragment frag;
+    VL::Type strSize = (VL::Type)str.size();
+    frag.SetByteValue(&str[0], strSize);
+    sq->AddFragment(frag);
+  }
+  assert(sq->GetNumberOfFragments() == dims[2]);
+  out.SetValue(*sq);
+  return true;
+}
+
+void JPEGCodec::SetPixelFormat(PixelFormat const & pf)
+{
+  ImageCodec::SetPixelFormat(pf);
+  SetBitSample(pf.GetBitsStored()); //
+}
+
 void JPEGCodec::ComputeOffsetTable(bool)
 {
   // Not implemented
@@ -316,99 +288,40 @@ bool JPEGCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
   return true;
 }
 
-bool JPEGCodec::Code(DataElement const & in, DataElement & out)
+void JPEGCodec::SetQuality(double q)
 {
-  out = in;
-  SmartPointer<SequenceOfFragments> sq = new SequenceOfFragments;
-  const Tag itemStart(0xfffe, 0xe000);
-  const ByteValue * bv = in.GetByteValue();
-  if(!bv) return false;
-  const unsigned int * dims = this->GetDimensions();
-  const char * input = bv->GetPointer();
-  const size_t len = bv->GetLength();
-  const size_t image_len = len / dims[2];
-  if(!Internal) return false;
-  Internal->SetLossless(this->GetLossless());
-  Internal->SetQuality(this->GetQuality());
-  for(unsigned int dim = 0; dim < dims[2]; ++dim)
-  {
-    std::stringstream os;
-    const char * p = input + dim * image_len;
-    const bool r = Internal->InternalCode(p, image_len, os);
-    if(!r) return false;
-    std::string str = os.str();
-    assert(str.size());
-    Fragment frag;
-    VL::Type strSize = (VL::Type)str.size();
-    frag.SetByteValue(&str[0], strSize);
-    sq->AddFragment(frag);
-  }
-  assert(sq->GetNumberOfFragments() == dims[2]);
-  out.SetValue(*sq);
+  Quality = (int)q;
+}
+
+double JPEGCodec::GetQuality() const
+{
+  return Quality;
+}
+
+void JPEGCodec::SetLossless(bool b)
+{
+  LossyFlag = !b;
+}
+
+bool JPEGCodec::GetLossless() const
+{
+  return !LossyFlag;
+}
+
+bool JPEGCodec::EncodeBuffer(std::ostream & out, const char * inbuffer, size_t inlen)
+{
+  assert(Internal);
+  return Internal->EncodeBuffer(out, inbuffer, inlen);
+}
+
+bool JPEGCodec::StartEncode(std::ostream &)
+{
   return true;
 }
 
-
-bool JPEGCodec::DecodeByStreams(std::istream & is, std::ostream & os)
+bool JPEGCodec::StopEncode(std::ostream &)
 {
-  std::stringstream tmpos;
-  if(!Internal->DecodeByStreams(is,tmpos))
-  {
-    if(this->BitSample != Internal->BitSample)
-    {
-      is.seekg(0, std::ios::beg);
-      SetupJPEGBitCodec(Internal->BitSample);
-      if(Internal)
-      {
-        Internal->SetDimensions(this->GetDimensions());
-        Internal->SetPlanarConfiguration(this->GetPlanarConfiguration());
-        Internal->SetPhotometricInterpretation(this->GetPhotometricInterpretation());
-        if(Internal->DecodeByStreams(is,tmpos))
-        {
-          return ImageCodec::DecodeByStreams(tmpos,os);
-        }
-      }
-      mdcmErrorMacro("JPEGCodec: SetupJPEGBitCodec failed");
-    }
-    mdcmAlwaysWarnMacro("JPEGCodec: DecodeByStreams() error");
-    return false;
-  }
-  if(this->PlanarConfiguration != Internal->PlanarConfiguration)
-  {
-    mdcmAlwaysWarnMacro("JPEGCodec: possible PlanarConfiguration issue");
-    this->PlanarConfiguration = Internal->PlanarConfiguration;
-  }
-  if(this->PI != Internal->PI)
-  {
-    mdcmAlwaysWarnMacro("JPEGCodec: possible PhotometricInterpretation issue");
-    this->PI = Internal->PI;
-  }
-#if 1
-  if(this->PF == PixelFormat::UINT12 || this->PF == PixelFormat::INT12)
-  {
-    mdcmAlwaysWarnMacro("JPEGCodec: PixelFormat is UINT12 or INT12");
-  }
-#endif
-  return ImageCodec::DecodeByStreams(tmpos, os);
-}
-
-bool JPEGCodec::IsValid(PhotometricInterpretation const & pi)
-{
-  switch(pi)
-  {
-    case PhotometricInterpretation::MONOCHROME1:
-    case PhotometricInterpretation::MONOCHROME2:
-    case PhotometricInterpretation::PALETTE_COLOR:
-    case PhotometricInterpretation::RGB:
-    case PhotometricInterpretation::YBR_FULL:
-    case PhotometricInterpretation::YBR_FULL_422:
-    case PhotometricInterpretation::YBR_PARTIAL_422: // FIXME
-    case PhotometricInterpretation::YBR_PARTIAL_420: // FIXME
-      return true;
-    default:
-      break;
-  }
-  return false;
+  return true;
 }
 
 bool JPEGCodec::DecodeExtent(char * buffer,
@@ -570,33 +483,71 @@ bool JPEGCodec::DecodeExtent(char * buffer,
   return true;
 }
 
-bool JPEGCodec::IsStateSuspension() const
+bool JPEGCodec::DecodeByStreams(std::istream & is, std::ostream & os)
 {
-  assert(0);
+  std::stringstream tmpos;
+  if(!Internal->DecodeByStreams(is,tmpos))
+  {
+    if(this->BitSample != Internal->BitSample)
+    {
+      is.seekg(0, std::ios::beg);
+      SetupJPEGBitCodec(Internal->BitSample);
+      if(Internal)
+      {
+        Internal->SetDimensions(this->GetDimensions());
+        Internal->SetPlanarConfiguration(this->GetPlanarConfiguration());
+        Internal->SetPhotometricInterpretation(this->GetPhotometricInterpretation());
+        if(Internal->DecodeByStreams(is,tmpos))
+        {
+          return ImageCodec::DecodeByStreams(tmpos,os);
+        }
+      }
+      mdcmErrorMacro("JPEGCodec: SetupJPEGBitCodec failed");
+    }
+    mdcmAlwaysWarnMacro("JPEGCodec: DecodeByStreams() error");
+    return false;
+  }
+  if(this->PlanarConfiguration != Internal->PlanarConfiguration)
+  {
+    mdcmAlwaysWarnMacro("JPEGCodec: possible PlanarConfiguration issue");
+    this->PlanarConfiguration = Internal->PlanarConfiguration;
+  }
+  if(this->PI != Internal->PI)
+  {
+    mdcmAlwaysWarnMacro("JPEGCodec: possible PhotometricInterpretation issue");
+    this->PI = Internal->PI;
+  }
+#if 1
+  if(this->PF == PixelFormat::UINT12 || this->PF == PixelFormat::INT12)
+  {
+    mdcmAlwaysWarnMacro("JPEGCodec: PixelFormat is UINT12 or INT12");
+  }
+#endif
+  return ImageCodec::DecodeByStreams(tmpos, os);
+}
+
+bool JPEGCodec::InternalCode(const char *, size_t, std::ostream &)
+{
   return false;
 }
 
-ImageCodec * JPEGCodec::Clone() const
+bool JPEGCodec::IsValid(PhotometricInterpretation const & pi)
 {
-  JPEGCodec * copy = new JPEGCodec;
-  ImageCodec & ic = *copy;
-  ic = *this;
-  assert(copy->PF == PF);
-  copy->SetPixelFormat(GetPixelFormat());
-  assert(copy->BitSample == BitSample || BitSample == 0);
-  copy->Quality = Quality;
-  return copy;
-}
-
-bool JPEGCodec::EncodeBuffer(std::ostream & out, const char * inbuffer, size_t inlen)
-{
-  assert(Internal);
-  return Internal->EncodeBuffer(out, inbuffer, inlen);
-}
-
-bool JPEGCodec::StartEncode(std::ostream &)
-{
-  return true;
+  switch(pi)
+  {
+    case PhotometricInterpretation::MONOCHROME1:
+    case PhotometricInterpretation::MONOCHROME2:
+    case PhotometricInterpretation::PALETTE_COLOR:
+    case PhotometricInterpretation::RGB:
+    case PhotometricInterpretation::YBR_FULL:
+    case PhotometricInterpretation::YBR_FULL_422:
+    case PhotometricInterpretation::YBR_PARTIAL_422: // FIXME
+    case PhotometricInterpretation::YBR_PARTIAL_420: // FIXME
+      return true;
+    default:
+      break;
+  }
+  return false;
 }
 
 bool JPEGCodec::IsRowEncoder()
@@ -623,9 +574,54 @@ bool JPEGCodec::AppendFrameEncode(std::ostream &, const char * , size_t)
   return false;
 }
 
-bool JPEGCodec::StopEncode(std::ostream &)
+void JPEGCodec::SetBitSample(int bit)
 {
-  return true;
+  SetupJPEGBitCodec(bit);
+  if(Internal)
+  {
+    Internal->SetDimensions(this->GetDimensions());
+    Internal->SetPlanarConfiguration(this->GetPlanarConfiguration());
+    Internal->SetPhotometricInterpretation(this->GetPhotometricInterpretation());
+    Internal->SetLossless(this->GetLossless());
+    Internal->SetQuality(this->GetQuality());
+    Internal->ImageCodec::SetPixelFormat(this->ImageCodec::GetPixelFormat());
+#if 0
+    // TODO check this
+    Internal->SetNeedOverlayCleanup(this->AreOverlaysInPixelData());
+#endif
+  }
+}
+
+bool JPEGCodec::IsStateSuspension() const
+{
+  assert(0);
+  return false;
+}
+
+void JPEGCodec::SetupJPEGBitCodec(int b)
+{
+  BitSample = b;
+  delete Internal;
+  Internal = NULL;
+  if(BitSample <= 8)
+  {
+    Internal = new JPEG8Codec;
+    mdcmDebugMacro("JPEGCodec: using JPEG8, bits=" << b);
+  }
+  else if(BitSample <= 12)
+  {
+    Internal = new JPEG12Codec;
+    mdcmDebugMacro("JPEGCodec: using JPEG12, bits=" << b);
+  }
+  else if(BitSample <= 16)
+  {
+    Internal = new JPEG16Codec;
+    mdcmDebugMacro("JPEGCodec: using JPEG16, bits=" << b);
+  }
+  else
+  {
+    mdcmAlwaysWarnMacro("JPEGCodec: SetupJPEGBitCodec(" << b << ") failed");
+  }
 }
 
 } // end namespace mdcm

@@ -31,11 +31,10 @@ namespace mdcm
 {
 
 /**
- * \brief Pixmap class
- * \details A bitmap based image. Used as parent for both IconImage and the main Pixel Data Image
+ * Pixmap class
+ * A bitmap based image. Used as parent for both IconImage and the main Pixel Data Image
  * It does not contains any World Space information (IPP, IOP)
  *
- * \see PixmapReader
  */
 class MDCM_EXPORT Pixmap : public Bitmap
 {

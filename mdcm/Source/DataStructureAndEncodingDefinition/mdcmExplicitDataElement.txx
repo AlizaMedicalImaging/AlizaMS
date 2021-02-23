@@ -166,7 +166,7 @@ std::istream &ExplicitDataElement::ReadPreValue(std::istream &is)
     }
 #endif
   }
-  // I don't like the following 3 lines, what if 0000,0000 was indeed -wrongly- sent, we should be able to continue
+  // What if 0000,0000 was indeed -wrongly- sent, we should be able to continue
   // chances is that 99% of times there is now way we can reach here, so safely throw an exception
   if(TagField == Tag(0x0000,0x0000) && ValueLengthField == 0 && VRField == VR::INVALID)
   {
@@ -176,7 +176,6 @@ std::istream &ExplicitDataElement::ReadPreValue(std::istream &is)
     throw pe;
 #endif
   }
-
 #ifdef ELSCINT1_01F7_1070
   if(TagField == Tag(0x01f7,0x1070))
   {
@@ -195,7 +194,6 @@ std::istream &ExplicitDataElement::ReadValue(std::istream &is, bool readvalues)
     ValueField = 0;
     return is;
   }
-
   if(VRField == VR::SQ)
   {
     // Check whether or not this is an undefined length sequence
@@ -260,7 +258,7 @@ std::istream &ExplicitDataElement::ReadValue(std::istream &is, bool readvalues)
     //TagField.IsPrivate() && VRField == VR::SQ
     //-> Does not work for 0029
     //we really need to read item marker
-  )
+    )
   {
     mdcmWarningMacro("ByteSwaping Private SQ: " << TagField);
     assert(VRField == VR::SQ);
@@ -290,7 +288,6 @@ std::istream &ExplicitDataElement::ReadValue(std::istream &is, bool readvalues)
     return is;
   }
 #endif
-
   bool failed;
   if(VRField & VR::VRASCII)
   {
@@ -344,7 +341,6 @@ std::istream &ExplicitDataElement::ReadValue(std::istream &is, bool readvalues)
     }
     return is;
   }
-
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
   if(SequenceOfItems *sqi = dynamic_cast<SequenceOfItems*>(&GetValue()))
   {
@@ -368,7 +364,6 @@ std::istream &ExplicitDataElement::ReadValue(std::istream &is, bool readvalues)
     assert(ValueLengthField.IsUndefined());
   }
 #endif
-
   return is;
 }
 
@@ -477,7 +472,6 @@ const std::ostream &ExplicitDataElement::Write(std::ostream &os) const
     {
       mdcmAssertAlwaysMacro(dynamic_cast<const SequenceOfItems*>(&GetValue()));
     }
-
     // check consistency in Length:
     if(GetByteValue())
     {
@@ -498,7 +492,6 @@ const std::ostream &ExplicitDataElement::Write(std::ostream &os) const
     {
       assert(ValueField->GetLength() == ValueLengthField);
     }
-
     // We have the length we should be able to write the value
     if(VRField == VR::UN && ValueLengthField.IsUndefined())
     {
@@ -562,7 +555,6 @@ const std::ostream &ExplicitDataElement::Write(std::ostream &os) const
       }
     }
   }
-
   return os;
 }
 

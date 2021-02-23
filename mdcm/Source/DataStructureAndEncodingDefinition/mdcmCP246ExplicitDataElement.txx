@@ -121,7 +121,7 @@ std::istream &CP246ExplicitDataElement::ReadPreValue(std::istream &is)
   }
   return is;
 }
-//-----------------------------------------------------------------------------
+
 template <typename TSwap>
 std::istream &CP246ExplicitDataElement::ReadValue(std::istream &is, bool readvalues)
 {
@@ -160,9 +160,9 @@ std::istream &CP246ExplicitDataElement::ReadValue(std::istream &is, bool readval
       }
       catch(std::exception &)
       {
-        // Must be one of those non-cp246 file...
+        // Must be one of those non-cp246 file,
         // but for some reason seekg back to previous offset + Read
-        // as CP246Explicit does not work...
+        // as CP246Explicit does not work.
 #ifndef MDCM_DONT_THROW
         ParseException pe;
         pe.SetLastElement(*this);
@@ -183,7 +183,7 @@ std::istream &CP246ExplicitDataElement::ReadValue(std::istream &is, bool readval
   {
     ValueField = new ByteValue;
   }
-  // We have the length we should be able to read the value
+  // We have the length, we should be able to read the value
   ValueField->SetLength(ValueLengthField); // perform realloc
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
   if(TagField == Tag(0x2001,0xe05f)
@@ -220,7 +220,6 @@ std::istream &CP246ExplicitDataElement::ReadValue(std::istream &is, bool readval
     throw pe;
 #endif
   }
-
   return is;
 }
 

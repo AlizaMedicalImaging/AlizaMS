@@ -61,7 +61,7 @@ public:
     return false;
   }
 
-  bool operator==(const Value & val) const
+  bool operator==(const Value & val) const override
   {
     const ByteValue &bv = dynamic_cast<const ByteValue&>(val);
     return Length == bv.Length && Internal == bv.Internal;
@@ -120,11 +120,11 @@ public:
   void PrintHex(std::ostream &, VL) const;
   void PrintGroupLength(std::ostream &);
   bool IsEmpty() const;
-  VL GetLength() const;
+  VL GetLength() const override;
   VL ComputeLength() const;
-  void SetLength(VL);
+  void SetLength(VL) override;
   void Append(ByteValue const &);
-  void Clear();
+  void Clear() override;
   const char * GetPointer() const;
   const void * GetVoidPointer() const;
   void * GetVoidPointer();
@@ -133,7 +133,7 @@ public:
   bool WriteBuffer(std::ostream &) const;
 
 protected:
-  void SetLengthOnly(VL);
+  void SetLengthOnly(VL) override;
 
 private:
   std::vector<char> Internal;

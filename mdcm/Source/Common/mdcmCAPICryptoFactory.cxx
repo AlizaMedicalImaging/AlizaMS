@@ -27,14 +27,14 @@ namespace mdcm
 
 CAPICryptoFactory::CAPICryptoFactory(CryptoLib id) : CryptoFactory(id)
 {
-  mdcmDebugMacro( "CAPI Factory registered." << std::endl );
+  mdcmDebugMacro("CAPI Factory registered." << std::endl);
 }
 
-CryptographicMessageSyntax* CAPICryptoFactory::CreateCMSProvider()
+CryptographicMessageSyntax * CAPICryptoFactory::CreateCMSProvider()
 {
   CAPICryptographicMessageSyntax * capicms =
     new CAPICryptographicMessageSyntax();
-  if (!capicms->GetInitialized())
+  if (capicms && !capicms->GetInitialized())
   {
     delete capicms;
     return NULL;

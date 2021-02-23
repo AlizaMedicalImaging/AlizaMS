@@ -33,16 +33,21 @@ public:
   typedef DataEvent Self;
   typedef AnyEvent Superclass;
   DataEvent(const char * bytes = 0, size_t len = 0)
-  :
-  Bytes(bytes),Length(len) {}
-  virtual ~DataEvent() {}
-  virtual const char * GetEventName() const { return "DataEvent"; }
-  virtual bool CheckEvent(const ::mdcm::Event * e) const
+    : Bytes(bytes), Length(len) {}
+  DataEvent(const Self & s) : AnyEvent(s){};
+  ~DataEvent() {}
+  const char * GetEventName() const override
+  {
+    return "DataEvent";
+  }
+  bool CheckEvent(const ::mdcm::Event * e) const override
   {
     return (dynamic_cast<const Self*>(e) == NULL ? false : true);
   }
-  virtual ::mdcm::Event* MakeObject() const { return new Self; }
-  DataEvent(const Self&s) : AnyEvent(s){};
+  ::mdcm::Event * MakeObject() const override
+  {
+    return new Self;
+  }
   void SetData(const char * bytes, size_t len)
   {
     Bytes = bytes;

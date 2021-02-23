@@ -262,7 +262,11 @@ JPEGBITSCodec::JPEGBITSCodec()
 
 JPEGBITSCodec::~JPEGBITSCodec()
 {
-  delete Internals;
+  if(Internals)
+  {
+    delete Internals;
+    Internals = NULL; // not required
+  }
 }
 
 /*

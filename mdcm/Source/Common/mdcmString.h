@@ -28,11 +28,11 @@
 namespace mdcm
 {
 
-// do not export
+// Do not export
 template <char TDelimiter = '\\', unsigned int TMaxLength = 64, char TPadChar = ' '>
 class String : public std::string 
 {
-  // VR UI used \0 for pad character, while ASCII ones wants space char
+  // VR UI used \0 for pad character, while ASCII space char
   MDCM_STATIC_ASSERT(TPadChar == ' ' || TPadChar == 0);
 
 public:
@@ -47,59 +47,66 @@ public:
   typedef std::string::reverse_iterator       reverse_iterator;
   typedef std::string::const_reverse_iterator const_reverse_iterator;
 
-  String(): std::string() {}
-  String(const value_type* s): std::string(s)
+  String() : std::string() {}
+
+  String(const value_type * s): std::string(s)
   {
-  if(size() % 2)
+    if(size() % 2)
     {
-    push_back(TPadChar);
+      push_back(TPadChar);
     }
   }
-  String(const value_type* s, size_type n): std::string(s, n)
+
+  String(const value_type * s, size_type n): std::string(s, n)
   {
-  // We are being passed a const char* pointer, so s[n] == 0 (garanteed!)
-  if( n % 2 )
+    // passed a const char* pointer, so s[n] == 0 (garanteed)
+    if(n % 2)
     {
-    push_back(TPadChar);
+      push_back(TPadChar);
     }
   }
-  String(const std::string& s, size_type pos=0, size_type n=npos):
+
+  String(const std::string & s, size_type pos=0, size_type n=npos):
     std::string(s, pos, n)
   {
-  // FIXME: some users might already have padded the string 's' with a trailing \0...
-  if( size() % 2 )
+    // FIXME some users might already have padded the string 's' with a trailing \0
+    if(size() % 2)
     {
-    push_back(TPadChar);
+      push_back(TPadChar);
     }
   }
 
   // Trailing \0 might be lost in this operation:
   operator const char *() const { return this->c_str(); }
 
-  bool IsValid() const {
+  bool IsValid() const
+  {
     size_type l = size();
-    if( l > TMaxLength ) return false;
+    if(l > TMaxLength) return false;
     return true;
   }
 
-  mdcm::String<TDelimiter, TMaxLength, TPadChar> Truncate() const {
+  mdcm::String<TDelimiter, TMaxLength, TPadChar> Truncate() const
+  {
     if(IsValid()) return *this;
     std::string str = *this;
     str.resize(TMaxLength);
     return str;
   }
 
-  std::string Trim() const {
+  std::string Trim() const
+  {
     std::string str = *this;
     std::string::size_type pos1 = str.find_first_not_of(' ');
     std::string::size_type pos2 = str.find_last_not_of(' ');
-    str = str.substr( (pos1 == std::string::npos) ? 0 : pos1,
+    str = str.substr((pos1 == std::string::npos) ? 0 : pos1,
       (pos2 == std::string::npos) ? (str.size() - 1) : (pos2 - pos1 + 1));
     return str;
   }
 
-  static std::string Trim(const char *input) {
-    if( !input ) return "";
+  static std::string Trim(const char * input)
+  {
+    if(!input) return "";
     std::string str = input;
     std::string::size_type pos1 = str.find_first_not_of(' ');
     std::string::size_type pos2 = str.find_last_not_of(' ');
@@ -108,16 +115,17 @@ public:
     return str;
   }
 };
+
 template <char TDelimiter, unsigned int TMaxLength, char TPadChar>
-inline std::istream& operator>>(std::istream &is, String<TDelimiter,TMaxLength,TPadChar> &ms)
+inline std::istream& operator>>(std::istream & is, String<TDelimiter,TMaxLength,TPadChar> & ms)
 {
   if(is)
-    {
+  {
     std::getline(is, ms, TDelimiter);
-    // no such thing as std::get where the delim char would be left, so I need to manually add it back...
-    // hopefully this is the right thing to do (no overhead)
-    if( !is.eof() ) is.putback( TDelimiter );
-    }
+    // No such thing as std::get where the delim char would be left, so manually add it back,
+    // hopefully this is the right thing to do (no overhead).
+    if(!is.eof()) is.putback(TDelimiter);
+  }
   return is;
 }
 

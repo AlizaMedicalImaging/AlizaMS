@@ -31,9 +31,7 @@ class MDCM_EXPORT CryptographicMessageSyntax
 {
 public:
   CryptographicMessageSyntax() {}
-
   virtual ~CryptographicMessageSyntax() {}
-
   typedef enum
   {
     DES3_CIPHER,   // Triple DES
@@ -41,25 +39,19 @@ public:
     AES192_CIPHER, // '   '
     AES256_CIPHER  // '   '
   } CipherTypes;
-
-    // X.509
+  // X.509
   virtual bool ParseCertificateFile(const char *) = 0;
   virtual bool ParseKeyFile(const char *) = 0;
-
   // PBE
-  virtual bool SetPassword(const char * pass, size_t passLen) = 0;
-
-  /// create a CMS envelopedData structure
-  virtual bool Encrypt(char *output, size_t &outlen, const char *array, size_t len) const = 0;
-  /// decrypt content from a CMS envelopedData structure
-  virtual bool Decrypt(char *output, size_t &outlen, const char *array, size_t len) const = 0;
-
-  virtual void SetCipherType(CipherTypes type) = 0;
-
+  virtual bool SetPassword(const char *, size_t) = 0;
+  // Create a CMS envelopedData structure
+  virtual bool Encrypt(char *, size_t &, const char *, size_t) const = 0;
+  // Decrypt content from a CMS envelopedData structure
+  virtual bool Decrypt(char *, size_t &, const char *, size_t) const = 0;
+  virtual void SetCipherType(CipherTypes) = 0;
   virtual CipherTypes GetCipherType() const = 0;
-
 private:
-  CryptographicMessageSyntax(const CryptographicMessageSyntax&);  // Not implemented
+  CryptographicMessageSyntax(const CryptographicMessageSyntax &);  // Not implemented
   void operator=(const CryptographicMessageSyntax&);  // Not implemented
 };
 

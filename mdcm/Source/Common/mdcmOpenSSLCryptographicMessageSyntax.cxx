@@ -33,7 +33,8 @@
 namespace mdcm
 {
 
-OpenSSLCryptographicMessageSyntax::OpenSSLCryptographicMessageSyntax() :
+OpenSSLCryptographicMessageSyntax::OpenSSLCryptographicMessageSyntax()
+  :
   recips(sk_X509_new_null()),
   pkey(NULL),
   password(NULL)
@@ -49,7 +50,7 @@ OpenSSLCryptographicMessageSyntax::~OpenSSLCryptographicMessageSyntax()
   if (password) delete[] password;
 }
 
-void OpenSSLCryptographicMessageSyntax::SetCipherType( CryptographicMessageSyntax::CipherTypes type )
+void OpenSSLCryptographicMessageSyntax::SetCipherType(CryptographicMessageSyntax::CipherTypes type)
 {
   internalCipherType = CreateCipher(type);
   cipherType = type;
@@ -63,245 +64,208 @@ CryptographicMessageSyntax::CipherTypes OpenSSLCryptographicMessageSyntax::GetCi
 bool OpenSSLCryptographicMessageSyntax::SetPassword(const char * pass, size_t passLen)
 {
   assert(pass);
-
   if (password)
-    {
+  {
     delete[] password;
-    }
-
+  }
   passwordLength = passLen;
   password = new char[passLen];
   memcpy(password, pass, passLen);
-
   return true;
 }
 
-bool OpenSSLCryptographicMessageSyntax::Encrypt(char *output, size_t &outlen, const char *array, size_t len) const
+bool OpenSSLCryptographicMessageSyntax::Encrypt(
+  char * output, size_t & outlen, const char * array, size_t len) const
 {
-  BIO *in = NULL, *out = NULL;
-  CMS_ContentInfo *cms = NULL;
+  BIO * in = NULL, * out = NULL;
+  CMS_ContentInfo * cms = NULL;
   int flags = CMS_BINARY | CMS_PARTIAL;
   bool ret = false;
-
   if (!password && ::sk_X509_num(recips) == 0)
   {
-    mdcmErrorMacro( "No password or recipients added." );
+    mdcmErrorMacro("No password or recipients added.");
     goto err;
   }
-
   // RAND_status() and RAND_event() return 1 if the PRNG has been seeded with
   // enough data, 0 otherwise.
-  if( !RAND_status() )
-    {
-    mdcmErrorMacro( "PRNG was not seeded properly" );
+  if(!RAND_status())
+  {
+    mdcmErrorMacro("PRNG was not seeded properly");
     goto err;
-    }
-
-  if( len > (size_t)std::numeric_limits<int>::max() )
-    {
-    mdcmErrorMacro( "len is too big: " << len );
+  }
+  if(len > (size_t)std::numeric_limits<int>::max())
+  {
+    mdcmErrorMacro("len is too big: " << len);
     goto err;
-    }
-
+  }
   in = BIO_new_mem_buf((const void*)array, (int)len);
   if(!in)
-    {
-    mdcmErrorMacro( "Error at creating the input memory buffer." );
+  {
+    mdcmErrorMacro("Error at creating the input memory buffer.");
     goto err;
-    }
-
+  }
   out = BIO_new(BIO_s_mem());
   if (!out)
-    {
-    mdcmErrorMacro( "Error at creating the output memory buffer." );
+  {
+    mdcmErrorMacro("Error at creating the output memory buffer.");
     goto err;
-    }
-
-
+  }
   cms = CMS_encrypt(recips, in, internalCipherType, flags);
   if (!cms)
-    {
-    mdcmErrorMacro( "Error at creating the CMS strucutre." );
+  {
+    mdcmErrorMacro("Error at creating the CMS strucutre.");
     goto err;
-    }
-
+  }
   if (password)
-    {
-    unsigned char* pwri_tmp = (unsigned char *)BUF_memdup(password, passwordLength);
-    
-    if (!pwri_tmp)
-      goto err;
-
+  {
+    unsigned char * pwri_tmp = (unsigned char *)BUF_memdup(password, passwordLength);
+    if (!pwri_tmp) goto err;
     if (!CMS_add0_recipient_password(cms, -1, NID_undef, NID_undef, pwri_tmp, passwordLength, NULL))
+    {
       goto err;
+    }
     pwri_tmp = NULL;
-    }
-
-  if (!CMS_final(cms, in, NULL, flags))
+  }
+  if (!CMS_final(cms, in, NULL, flags)) goto err;
+  if (!i2d_CMS_bio(out, cms))
+  {
+    mdcmErrorMacro("Error at writing CMS structure to output.");
     goto err;
-
-  if (! i2d_CMS_bio(out, cms))
-    {
-    mdcmErrorMacro( "Error at writing CMS structure to output." );
-    goto err;
-    }
-
-  BUF_MEM *bptr;
+  }
+  BUF_MEM * bptr;
   BIO_get_mem_ptr(out, &bptr);
-
   if (bptr->length > outlen)
-    {
-    mdcmErrorMacro( "Supplied output buffer too small: " << bptr->length << " bytes needed." );
+  {
+    mdcmErrorMacro("Supplied output buffer too small: " << bptr->length << " bytes needed.");
     goto err;
-    }
+  }
   memcpy(output, bptr->data, bptr->length);
   outlen = bptr->length;
-  
   ret = true;
-
 err:
   if (!ret)
-    {
+  {
     outlen = 0;
-    mdcmErrorMacro( ERR_error_string(ERR_peek_error(), NULL) );
-    }
-
-  if (cms)
-    CMS_ContentInfo_free(cms);
-  if (in)
-    BIO_free(in);
-  if (out)
-    BIO_free(out);
-
+    mdcmErrorMacro(ERR_error_string(ERR_peek_error(), NULL));
+  }
+  if (cms) CMS_ContentInfo_free(cms);
+  if (in)  BIO_free(in);
+  if (out) BIO_free(out);
   return ret;
 }
 
-bool OpenSSLCryptographicMessageSyntax::Decrypt(char *output, size_t &outlen, const char *array, size_t len) const
+bool OpenSSLCryptographicMessageSyntax::Decrypt(
+  char * output, size_t & outlen, const char * array, size_t len) const
 {
-  BIO *in = NULL, *out = NULL;
-  CMS_ContentInfo *cms = NULL;
+  BIO * in = NULL, * out = NULL;
+  CMS_ContentInfo * cms = NULL;
   bool ret = false;
-  int flags = /*CMS_DETACHED | */CMS_BINARY;
-
+  int flags = /*CMS_DETACHED | */ CMS_BINARY;
   if (!password && pkey == NULL)
-    {
-    mdcmErrorMacro( "No password or private key specified." );
+  {
+    mdcmErrorMacro("No password or private key specified.");
     goto err;
-    }
-
+  }
   in = BIO_new_mem_buf((const void*)array, (int)len);
   if (!in)
-    {
-    mdcmErrorMacro( "Error at creating the input memory buffer." );
+  {
+    mdcmErrorMacro("Error at creating the input memory buffer.");
     goto err;
-    }
-
+  }
   cms = d2i_CMS_bio(in, NULL);
   if (!cms)
-    {
-    mdcmErrorMacro( "Error when parsing the CMS structure." );
+  {
+    mdcmErrorMacro("Error when parsing the CMS structure.");
     goto err;
-    }
-
+  }
   out = BIO_new(BIO_s_mem());
   if (!out)
-    {
-    mdcmErrorMacro( "Error at creating the output memory buffer." );
+  {
+    mdcmErrorMacro("Error at creating the output memory buffer.");
     goto err;
-    }
-
+  }
   if (password)
+  {
     if (!CMS_decrypt_set1_password(cms, (unsigned char*)password, passwordLength))
-      {
-      mdcmErrorMacro( "Error at setting the decryption password." );
+    {
+      mdcmErrorMacro("Error at setting the decryption password.");
       goto err;
-      }
-
+    }
+  }
   if (!CMS_decrypt(cms, pkey, NULL, NULL, out, flags))
-    {
-    mdcmErrorMacro( "Error at decrypting CMS structure" );
+  {
+    mdcmErrorMacro("Error at decrypting CMS structure");
     goto err;
-    }
-
-  BUF_MEM *bptr;
+  }
+  BUF_MEM * bptr;
   BIO_get_mem_ptr(out, &bptr);
-
   if (bptr->length > outlen)
-    {
-    mdcmErrorMacro( "Supplied output buffer too small: " << bptr->length << " bytes needed." );
+  {
+    mdcmErrorMacro("Supplied output buffer too small: " << bptr->length << " bytes needed.");
     goto err;
-    }
+  }
   memcpy(output, bptr->data, bptr->length);
   outlen = bptr->length;
-  
   ret = true;
-
 err:
   if (!ret)
-    {
+  {
     outlen = 0;
-    mdcmErrorMacro( ERR_error_string(ERR_peek_error(), NULL) );
-    }
-
-  if (cms)
-    CMS_ContentInfo_free(cms);
-  if (in)
-    BIO_free(in);
-  if (out)
-    BIO_free(out);
-
+    mdcmErrorMacro(ERR_error_string(ERR_peek_error(), NULL));
+  }
+  if (cms) CMS_ContentInfo_free(cms);
+  if (in)  BIO_free(in);
+  if (out) BIO_free(out);
   return ret;
 }
 
-bool OpenSSLCryptographicMessageSyntax::ParseKeyFile( const char *keyfile)
+bool OpenSSLCryptographicMessageSyntax::ParseKeyFile(const char * keyfile)
 {
-  ::BIO *in;
-  ::EVP_PKEY *new_pkey;
-  if ((in=::BIO_new_file(keyfile,"r")) == NULL)
-    {
+  ::BIO * in;
+  ::EVP_PKEY * new_pkey;
+  if ((in = ::BIO_new_file(keyfile,"r")) == NULL)
+  {
     return false;
-    }
+  }
   (void)BIO_reset(in);
-  if ((new_pkey=PEM_read_bio_PrivateKey(in,NULL,NULL,NULL)) == NULL)
-    {
+  if ((new_pkey = PEM_read_bio_PrivateKey(in,NULL,NULL,NULL)) == NULL)
+  {
     return false;
-    }
+  }
   BIO_free(in);
-
   if (pkey != NULL)
-    {
+  {
     EVP_PKEY_free(pkey);
-    }
-  
+  }
   this->pkey = new_pkey;
   return true;
 }
 
-bool OpenSSLCryptographicMessageSyntax::ParseCertificateFile( const char *keyfile)
+bool OpenSSLCryptographicMessageSyntax::ParseCertificateFile(const char * keyfile)
 {
-  assert( recips );
-  ::X509 *x509 = NULL;
-
-  ::BIO *in;
-  if (!(in=::BIO_new_file(keyfile,"r")))
-    {
+  assert(recips);
+  ::X509 * x509 = NULL;
+  ::BIO * in;
+  if (!(in = ::BIO_new_file(keyfile,"r")))
+  {
     return false;
-    }
+  }
   // -> LEAK reported by valgrind...
   if (!(x509=::PEM_read_bio_X509(in,NULL,NULL,NULL)))
-    {
+  {
     return false;
-    }
-  ::BIO_free(in); in = NULL;
+  }
+  ::BIO_free(in);
+  in = NULL;
   ::sk_X509_push(recips, x509);
   return true;
 }
 
-const EVP_CIPHER* OpenSSLCryptographicMessageSyntax::CreateCipher( CryptographicMessageSyntax::CipherTypes ciphertype)
+const EVP_CIPHER * OpenSSLCryptographicMessageSyntax::CreateCipher(CryptographicMessageSyntax::CipherTypes ciphertype)
 {
-  const EVP_CIPHER *cipher = 0;
-  switch( ciphertype )
-    {
+  const EVP_CIPHER * cipher = 0;
+  switch(ciphertype)
+  {
   case CryptographicMessageSyntax::DES3_CIPHER:   // Triple DES
     cipher = EVP_des_ede3_cbc();
     break;
@@ -314,7 +278,9 @@ const EVP_CIPHER* OpenSSLCryptographicMessageSyntax::CreateCipher( Cryptographic
   case CryptographicMessageSyntax::AES256_CIPHER: // '   '
     cipher = EVP_aes_256_cbc();
     break;
-    }
+  default:
+    break;
+  }
   return cipher;
 }
 

@@ -47,15 +47,15 @@ public:
   ConstIterator Begin() const { return Fragments.begin(); }
   ConstIterator End() const { return Fragments.end(); }
   SequenceOfFragments() : Table(), SequenceLengthField(0xFFFFFFFF) {}
-  VL GetLength() const
+  VL GetLength() const override
   {
     return SequenceLengthField;
   }
-  void SetLength(VL length)
+  void SetLength(VL length) override
   {
     SequenceLengthField = length;
   }
-  void Clear();
+  void Clear() override;
   void AddFragment(Fragment const &item);
   unsigned long long ComputeByteLength() const;
   VL ComputeLength() const;
@@ -269,7 +269,7 @@ static SmartPointer<SequenceOfFragments> New()
 }
 
 public:
-  void Print(std::ostream & os) const
+  void Print(std::ostream & os) const override
   {
     os << "SQ L= " << SequenceLengthField << "\n";
     os << "Table:" << Table << "\n";
@@ -285,9 +285,10 @@ public:
       os << "\t" << zero;
     }
   }
-  bool operator==(const Value & val) const
+  bool operator==(const Value & val) const override
   {
-    const SequenceOfFragments &sqf = dynamic_cast<const SequenceOfFragments&>(val);
+    const SequenceOfFragments & sqf =
+      dynamic_cast<const SequenceOfFragments&>(val);
     return (Table == sqf.Table &&
       SequenceLengthField == sqf.SequenceLengthField &&
       Fragments == sqf.Fragments);

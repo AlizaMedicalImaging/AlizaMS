@@ -35,19 +35,15 @@ class JPEG2000Internals;
  */
 class MDCM_EXPORT JPEG2000Codec : public ImageCodec
 {
-  friend class ImageRegionReader;
-
-  friend class Bitmap;
-
+friend class Bitmap;
 public:
   JPEG2000Codec();
-  ~JPEG2000Codec();
-  bool CanDecode(TransferSyntax const &) const;
-  bool CanCode(TransferSyntax const &) const;
-  bool Decode(DataElement const &, DataElement &);
-  bool Code(DataElement const &, DataElement &);
-  virtual bool GetHeaderInfo(std::istream &, TransferSyntax &);
-  virtual ImageCodec * Clone() const;
+  ~JPEG2000Codec() override;
+  bool CanDecode(TransferSyntax const &) const override;
+  bool CanCode(TransferSyntax const &) const override;
+  bool Decode(DataElement const &, DataElement &) override;
+  bool Code(DataElement const &, DataElement &) override;
+  bool GetHeaderInfo(std::istream &, TransferSyntax &) override;
   void SetRate(unsigned int, double);
   double GetRate(unsigned int = 0) const;
   void SetQuality(unsigned int, double);
@@ -63,13 +59,13 @@ protected:
     unsigned int, unsigned int,
     unsigned int, unsigned int,
     std::istream &);
-  bool DecodeByStreams(std::istream &, std::ostream &);
-  bool StartEncode(std::ostream &);
-  bool IsRowEncoder();
-  bool IsFrameEncoder();
-  bool AppendRowEncode(std::ostream &, const char *, size_t);
-  bool AppendFrameEncode(std::ostream &, const char *, size_t);
-  bool StopEncode(std::ostream &);
+  bool DecodeByStreams(std::istream &, std::ostream &) override;
+  bool StartEncode(std::ostream &) override;
+  bool IsRowEncoder() override;
+  bool IsFrameEncoder() override;
+  bool AppendRowEncode(std::ostream &, const char *, size_t) override;
+  bool AppendFrameEncode(std::ostream &, const char *, size_t) override;
+  bool StopEncode(std::ostream &) override;
 
 private:
   std::pair<char *, size_t> DecodeByStreamsCommon(char *, size_t);

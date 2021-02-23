@@ -44,6 +44,39 @@ IconImageFilter::~IconImageFilter()
   delete Internals;
 }
 
+void IconImageFilter::SetFile(const File & f)
+{
+  F = f;
+}
+
+File & IconImageFilter::GetFile()
+{
+  return *F;
+}
+
+const File & IconImageFilter::GetFile() const
+{
+  return *F;
+}
+
+bool IconImageFilter::Extract()
+{
+  Internals->icons.clear();
+  ExtractIconImages();
+  ExtractVeproIconImages();
+  return (GetNumberOfIconImages() != 0);
+}
+
+unsigned int IconImageFilter::GetNumberOfIconImages() const
+{
+  return (unsigned int)Internals->icons.size();
+}
+
+IconImage & IconImageFilter::GetIconImage(unsigned int i) const
+{
+  return *Internals->icons[i];
+}
+
 void IconImageFilter::ExtractIconImages()
 {
   const DataSet & rootds = F->GetDataSet();
@@ -325,7 +358,9 @@ void IconImageFilter::ExtractIconImages()
   }
 }
 
-namespace {
+namespace
+{
+
 struct VeproData
 {
   char ID[3];
@@ -333,6 +368,7 @@ struct VeproData
   uint16_t Width;
   uint16_t Height;
 };
+
 }
 
 void IconImageFilter::ExtractVeproIconImages()
@@ -377,24 +413,6 @@ void IconImageFilter::ExtractVeproIconImages()
     pixeldata.SetPhotometricInterpretation(PhotometricInterpretation::MONOCHROME2);
     Internals->icons.push_back(pixeldata);
   }
-}
-
-bool IconImageFilter::Extract()
-{
-  Internals->icons.clear();
-  ExtractIconImages();
-  ExtractVeproIconImages();
-  return (GetNumberOfIconImages() != 0);
-}
-
-unsigned int IconImageFilter::GetNumberOfIconImages() const
-{
-  return (unsigned int)Internals->icons.size();
-}
-
-IconImage & IconImageFilter::GetIconImage(unsigned int i) const
-{
-  return *Internals->icons[i];
 }
 
 } // end namespace mdcm

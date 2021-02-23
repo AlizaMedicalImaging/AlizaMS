@@ -35,23 +35,20 @@ namespace mdcm
 {
 
 class PixelFormat;
-
 class TransferSyntax;
 
 class MDCM_EXPORT JPEGCodec : public ImageCodec
 {
-friend class ImageRegionReader;
 public:
   JPEGCodec();
-  ~JPEGCodec();
-  bool CanDecode(TransferSyntax const &) const;
-  bool CanCode(TransferSyntax const &) const;
-  bool Decode(DataElement const &, DataElement &);
-  void SetPixelFormat(PixelFormat const &);
+  virtual ~JPEGCodec() override;
+  bool CanDecode(TransferSyntax const &) const override;
+  bool CanCode(TransferSyntax const &) const override;
+  bool Decode(DataElement const &, DataElement &) override;
+  bool Code(DataElement const &, DataElement &) override;
+  void SetPixelFormat(PixelFormat const &) override;
   void ComputeOffsetTable(bool);
-  bool Code(DataElement const &, DataElement &);
-  virtual bool GetHeaderInfo(std::istream &, TransferSyntax &);
-  virtual ImageCodec * Clone() const;
+  virtual bool GetHeaderInfo(std::istream &, TransferSyntax &) override;
   void SetQuality(double);
   double GetQuality() const;
   void SetLossless(bool);
@@ -59,28 +56,25 @@ public:
   virtual bool EncodeBuffer(std::ostream &, const char *, size_t);
 
 protected:
+  bool StartEncode(std::ostream &) override;
+  bool StopEncode(std::ostream &) override;
   bool DecodeExtent(
     char *,
     unsigned int, unsigned int,
     unsigned int, unsigned int,
     unsigned int, unsigned int,
     std::istream &);
-  bool DecodeByStreams(std::istream &, std::ostream &);
-  bool IsValid(PhotometricInterpretation const &);
-  bool StartEncode(std::ostream &);
-  bool IsRowEncoder();
-  bool IsFrameEncoder();
-  bool AppendRowEncode(std::ostream &, const char *, size_t);
-  bool AppendFrameEncode(std::ostream &, const char *, size_t);
-  bool StopEncode(std::ostream &);
-
-protected:
+  virtual bool DecodeByStreams(std::istream &, std::ostream &) override;
+  virtual bool InternalCode(const char *, size_t, std::ostream &);
+  bool IsValid(PhotometricInterpretation const &) override;
+  bool IsRowEncoder() override;
+  bool IsFrameEncoder() override;
+  bool AppendRowEncode(std::ostream &, const char *, size_t) override;
+  bool AppendFrameEncode(std::ostream &, const char *, size_t) override;
   // Internal method called by SetPixelFormat
   // Instantiate the right jpeg codec (8, 12 or 16)
   void SetBitSample(int);
   virtual bool IsStateSuspension() const;
-
-protected:
   int BitSample;
   int Quality;
 

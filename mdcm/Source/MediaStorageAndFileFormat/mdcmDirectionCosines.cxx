@@ -141,14 +141,14 @@ void DirectionCosines::Normalize()
   }
 }
 
-bool DirectionCosines::SetFromString(const char * str)
+bool DirectionCosines::SetFromString(const char * s)
 {
-  if(str)
+  if(s)
   {
-    std::locale currentLocale = std::locale::global(std::locale::classic());
-    const int n = sscanf(str, "%lf\\%lf\\%lf\\%lf\\%lf\\%lf",
+    std::locale l = std::locale::global(std::locale::classic());
+    const int n = sscanf(s, "%lf\\%lf\\%lf\\%lf\\%lf\\%lf",
       Values, Values+1, Values+2, Values+3, Values+4, Values+5);
-    std::locale::global(currentLocale);
+    std::locale::global(l);
     if(n == 6)
     {
       return true;

@@ -26,6 +26,7 @@
 
 namespace mdcm
 {
+
 class Event;
 
 class MDCM_EXPORT Command : public Subject
@@ -43,8 +44,7 @@ private:
   void operator=(const Command &); //purposely not implemented
 };
 
-template <class T>
-class MemberCommand : public Command
+template <class T> class MemberCommand : public Command
 {
 public:
   typedef void (T::*TMemberFunctionPointer)(Subject *, const Event &);
@@ -68,7 +68,7 @@ public:
     m_ConstMemberFunction = memberFunction;
   }
 
-  virtual void Execute(Subject * caller, const Event & event)
+  void Execute(Subject * caller, const Event & event) override
   {
     if(m_This && m_MemberFunction)
     {
@@ -76,7 +76,7 @@ public:
     }
   }
 
-  virtual void Execute(const Subject * caller, const Event & event)
+  void Execute(const Subject * caller, const Event & event) override
   {
     if(m_This && m_MemberFunction)
     {
@@ -97,14 +97,11 @@ private:
 };
 
 
-template <typename T>
-class SimpleMemberCommand : public Command
+template <typename T> class SimpleMemberCommand : public Command
 {
 public:
   typedef void (T::*TMemberFunctionPointer)();
-
   typedef SimpleMemberCommand Self;
-
   static SmartPointer<SimpleMemberCommand> New()
   {
     return new SimpleMemberCommand;
@@ -117,7 +114,7 @@ public:
     m_MemberFunction = memberFunction;
   }
 
-  virtual void Execute(Subject *,const Event &)
+  void Execute(Subject *,const Event &) override
   {
     if(m_This && m_MemberFunction)
     {
@@ -125,7 +122,7 @@ public:
     }
   }
 
-  virtual void Execute(const Subject *,const Event &)
+  void Execute(const Subject *,const Event &) override
   {
     if(m_This && m_MemberFunction)
     {

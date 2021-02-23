@@ -30,8 +30,8 @@ namespace mdcm
 class Fragment;
 class RLEInternals;
 /**
- * \brief Class to do RLE
- * \note
+ * Class to do RLE
+ *
  * ANSI X3.9
  * A.4.2 RLE Compression
  * Annex G defines a RLE Compression Transfer Syntax. This transfer Syntax is
@@ -43,45 +43,37 @@ class RLEInternals;
  */
 class MDCM_EXPORT RLECodec : public ImageCodec
 {
-friend class ImageRegionReader;
 public:
   RLECodec();
-  ~RLECodec();
-  bool CanCode(TransferSyntax const & ts) const;
-  bool CanDecode(TransferSyntax const & ts) const;
-  bool Decode(DataElement const & is, DataElement & os);
-  unsigned long long GetBufferLength() const { return BufferLength; }
-  void SetBufferLength(unsigned long long l) { BufferLength = l; }
-  bool Code(DataElement const & in, DataElement & out);
-  bool GetHeaderInfo(std::istream & is, TransferSyntax & ts);
-  virtual ImageCodec * Clone() const;
-
+  ~RLECodec() override;
+  bool CanCode(TransferSyntax const &) const override;
+  bool CanDecode(TransferSyntax const &) const override;
+  bool Decode(DataElement const &, DataElement &) override;
+  bool Code(DataElement const &, DataElement & out) override;
+  unsigned long long GetBufferLength() const;
+  void SetBufferLength(unsigned long long);
+  bool GetHeaderInfo(std::istream &, TransferSyntax &) override;
+  void SetLength(unsigned long long);
 protected:
   bool DecodeExtent(
-    char * buffer,
-    unsigned int XMin, unsigned int XMax,
-    unsigned int YMin, unsigned int YMax,
-    unsigned int ZMin, unsigned int ZMax,
-    std::istream & is);
-  bool DecodeByStreams(std::istream & is, std::ostream & os);
-
-public:
-  void SetLength(unsigned long long l) { Length = l; }
-
-protected:
-  bool StartEncode( std::ostream & );
-  bool IsRowEncoder();
-  bool IsFrameEncoder();
-  bool AppendRowEncode(std::ostream & out, const char * data, size_t datalen);
-  bool AppendFrameEncode(std::ostream & out, const char * data, size_t datalen);
-  bool StopEncode(std::ostream &);
-
+    char *,
+    unsigned int, unsigned int,
+    unsigned int, unsigned int,
+    unsigned int, unsigned int,
+    std::istream &);
+  bool DecodeByStreams(std::istream &, std::ostream &) override;
+  bool StartEncode(std::ostream &) override;
+  bool IsRowEncoder() override;
+  bool IsFrameEncoder() override;
+  bool AppendRowEncode(std::ostream &, const char *, size_t) override;
+  bool AppendFrameEncode(std::ostream &, const char *, size_t) override;
+  bool StopEncode(std::ostream &) override;
 private:
-  bool DecodeByStreamsCommon(std::istream & is, std::ostream & os);
+  bool DecodeByStreamsCommon(std::istream &, std::ostream &);
+  size_t DecodeFragment(Fragment const &, char *, size_t);
   RLEInternals * Internals;
   unsigned long long Length;
   unsigned long long BufferLength;
-  size_t DecodeFragment(Fragment const & frag, char * buffer, size_t llen);
 };
 
 } // end namespace mdcm

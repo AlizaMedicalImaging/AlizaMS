@@ -35,13 +35,13 @@ template<class ObjectType> class SmartPointer;
 class MDCM_EXPORT Object
 {
   template <class ObjectType> friend class SmartPointer;
-  friend std::ostream& operator<<(std::ostream & os, const Object & obj);
+  friend std::ostream& operator<<(std::ostream &, const Object &);
 
 public:
-  Object():ReferenceCount(0) {}
+  Object() : ReferenceCount(0) {}
   virtual ~Object() { assert(ReferenceCount == 0); }
-  Object(const Object&):ReferenceCount(0){}
-  void operator=(const Object&){}
+  Object(const Object&) : ReferenceCount(0) {}
+  void operator=(const Object &) {}
 
 protected:
   void Register()
@@ -64,13 +64,13 @@ public:
   virtual void Print(std::ostream &) const {}
 
 private:
-  long ReferenceCount;
+  long long ReferenceCount;
 };
 
-// Function do not carry vtable. Define in the base class the operator
-// and use the member function ->Print() to call the appropriate function
-// NOTE: All subclass of Object needs to implement the Print function
-inline std::ostream& operator<<(std::ostream & os, const Object & obj)
+// Define in the base class the operator and use the member function
+// ->Print() to call the appropriate function.
+// All subclass of Object needs to implement the Print function
+inline std::ostream & operator<<(std::ostream & os, const Object & obj)
 {
   obj.Print(os);
   return os;

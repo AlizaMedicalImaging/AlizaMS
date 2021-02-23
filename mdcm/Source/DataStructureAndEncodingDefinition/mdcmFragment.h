@@ -55,7 +55,6 @@ public:
   {
     const Tag itemStart(0xfffe, 0xe000);
     const Tag seqDelItem(0xfffe,0xe0dd);
-
     TagField.Read<TSwap>(is);
     if(!is)
     {
@@ -143,7 +142,6 @@ public:
     {
       return is;
     }
-
     SmartPointer<ByteValue> bv = new ByteValue;
     bv->SetLength(ValueLengthField);
     if(!bv->Read<TSwap>(is))
@@ -198,7 +196,6 @@ public:
         return os;
       }
     }
-
     if(ValueLengthField && bv)
     {
       assert(bv);
@@ -221,7 +218,6 @@ inline std::ostream &operator<<(std::ostream & os, const Fragment & val)
   {
     os << "\t" << *(val.ValueField);
   }
-
   return os;
 }
 

@@ -38,7 +38,7 @@ public:
   ImageToImageFilter();
   ~ImageToImageFilter() {}
   Image & GetInput();
-  const Image &GetOutput() const;
+  const Image & GetOutput() const;
 };
 
 } // end namespace mdcm

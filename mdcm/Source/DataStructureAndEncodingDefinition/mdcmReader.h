@@ -27,7 +27,6 @@
 
 namespace mdcm
 {
-  class StreamImageReader;
 /**
  * Reader
  *
@@ -68,18 +67,6 @@ protected:
   bool ReadMetaInformation();
   bool ReadDataSet();
   SmartPointer<File> F;
-#if 0
-  friend class StreamImageReader; //to grab the GetStreamPtr
-  //MM: this function is added for the StreamImageReader, which needs to read
-  //up to the pixel data and then stops right before reading the pixel data.
-  //it's used to get that position, so that reading can continue
-  //apace once the read function is called.
-  //so, this function gets the stream directly, and then allows for position information
-  //from the tellg function, and allows for stream/pointer manip in order
-  //to read the pixel data.  Note, of course, that reading pixel elements
-  //will still have to be subject to endianness swaps, if necessary.
-  std::istream * GetStreamPtr() const { return Stream; }
-#endif
 
 private:
   template <typename T_Caller>

@@ -27,16 +27,16 @@
 
 namespace mdcm
 {
+
 class MDCM_EXPORT OpenSSLP7CryptoFactory : public CryptoFactory
 {
 public:
   OpenSSLP7CryptoFactory(CryptoLib id) : CryptoFactory(id)
   {
-    mdcmDebugMacro( "OpenSSL (PKCS7) Factory registered." );
+    mdcmDebugMacro("OpenSSL (PKCS7) Factory registered");
   }
     
-public:
-  CryptographicMessageSyntax* CreateCMSProvider()
+  CryptographicMessageSyntax * CreateCMSProvider() override
   {
     return new OpenSSLP7CryptographicMessageSyntax();
   }
@@ -44,6 +44,7 @@ public:
 private:
   OpenSSLP7CryptoFactory(){}
 };
+
 }
 
 #endif //MDCMOPENSSLP7CRYPTOFACTORY_H

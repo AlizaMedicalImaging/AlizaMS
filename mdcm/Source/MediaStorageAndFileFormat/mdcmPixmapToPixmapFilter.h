@@ -29,17 +29,17 @@ namespace mdcm
 
 class Pixmap;
 /**
- * \brief PixmapToPixmapFilter class
- * \details Super class for all filter taking an image and producing an output image
+ * PixmapToPixmapFilter class
+ * Super class for all filter taking an image and producing an output image
  */
 class MDCM_EXPORT PixmapToPixmapFilter : public BitmapToBitmapFilter
 {
 public:
   PixmapToPixmapFilter();
   ~PixmapToPixmapFilter() {}
-  Pixmap &GetInput();
-  const Pixmap &GetOutput() const;
-  const Pixmap &GetOutputAsPixmap() const;
+  Pixmap & GetInput();
+  const Pixmap & GetOutput() const;
+  const Pixmap & GetOutputAsPixmap() const;
 };
 
 } // end namespace mdcm

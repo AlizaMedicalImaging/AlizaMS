@@ -56,11 +56,6 @@ bool PVRGCodec::CanDecode(TransferSyntax const &ts) const
 #endif
 }
 
-bool PVRGCodec::CanCode(TransferSyntax const &) const
-{
-  return false;
-}
-
 /*
  * ./bin/pvrg-jpeg -d -s jpeg.jpg -ci 0 out.raw
  *
@@ -100,28 +95,23 @@ bool PVRGCodec::Decode(DataElement const &in, DataElement &out)
     mdcmErrorMacro("Could not find: " << pvrg_command);
     return false;
   }
-
   // http://msdn.microsoft.com/en-us/library/hs3e7355.aspx
   char name2[L_tmpnam];
   char * input = std::tmpnam(name2);
   if(!input) return false;
-
   std::ofstream outfile(input, std::ios::binary);
   sf->WriteBuffer(outfile);
   outfile.close();
-
   // -u : set Notify to 0 (less verbose)
   pvrg_command += " -d -u ";
   pvrg_command += "-s ";
   pvrg_command += input;
-
   int ret = system(pvrg_command.c_str());
   if(ret != 0)
   {
     mdcmErrorMacro("PVRG error: " << ret);
     return false;
   }
-
   int numoutfile = GetPixelFormat().GetSamplesPerPixel();
   std::string wholebuf;
   for(int file = 0; file < numoutfile; ++file)
@@ -138,14 +128,12 @@ bool PVRGCodec::Decode(DataElement const &in, DataElement &out)
       return false;
     }
     const char * rawfile = altfile.c_str();
-
     mdcmDebugMacro("Processing: " << rawfile);
     std::ifstream is(rawfile, std::ios::binary);
     std::string buf;
     buf.resize(len);
     is.read(&buf[0], len);
     out.SetTag(Tag(0x7fe0,0x0010));
-
     if(PF.GetBitsAllocated() == 16)
     {
       ByteSwap<uint16_t>::SwapRangeFromSwapCodeIntoSystem((uint16_t*)
@@ -168,30 +156,18 @@ bool PVRGCodec::Decode(DataElement const &in, DataElement &out)
   {
     this->PlanarConfiguration = 1;
   }
-
   if(!System::RemoveFile(input))
   {
     mdcmErrorMacro("Could not delete input: " << input);
   }
-
   LossyFlag = true; // FIXME
   return true;
 #endif
 }
 
-void PVRGCodec::SetLossyFlag(bool l)
-{
-  LossyFlag = l;
-}
-
 bool PVRGCodec::Code(DataElement const &, DataElement &)
 {
   return false;
-}
-
-ImageCodec * PVRGCodec::Clone() const
-{
-  return NULL;
 }
 
 } // end namespace mdcm

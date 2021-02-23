@@ -21,9 +21,7 @@
 =========================================================================*/
 #include "mdcmASN1.h"
 #include "mdcmSystem.h"
-
 #include <cstring>
-
 #ifdef MDCM_USE_SYSTEM_OPENSSL
 #include <openssl/bio.h>
 #include <openssl/err.h>
@@ -33,28 +31,20 @@
 #include <openssl/rand.h>
 #include <openssl/x509.h>
 #endif
-
 #include <fstream>
 
 namespace mdcm
 {
 
-class ASN1Internals
-{
-public:
-};
-
 ASN1::ASN1()
 {
-  Internals = new ASN1Internals;
 }
 
 ASN1::~ASN1()
 {
-  delete Internals;
 }
 
-bool ASN1::ParseDumpFile(const char *filename)
+bool ASN1::ParseDumpFile(const char * filename)
 {
   if(!filename) return false;
   std::ifstream is(filename, std::ios::binary);
@@ -67,17 +57,14 @@ bool ASN1::ParseDumpFile(const char *filename)
   return b;
 }
 
-bool ASN1::ParseDump(const char *array, size_t length)
+bool ASN1::ParseDump(const char * array, size_t length)
 {
 #ifdef MDCM_USE_SYSTEM_OPENSSL
-  // check array pointer:
-  // if length == 0, then return ok. This is an empty element.
+  // If length == 0 return ok. This is an empty element.
   if(!array) return !length;
-
   int indent = 1; // 0 is not visually nice
   int dump = 0; // -1 => will print hex stuff
-  BIO *out=NULL;
-
+  BIO * out=NULL;
   out=BIO_new(BIO_s_file());
   assert(out);
   BIO_set_fp(out,stdout,BIO_NOCLOSE|BIO_FP_TEXT);
@@ -85,7 +72,6 @@ bool ASN1::ParseDump(const char *array, size_t length)
   {
     return false;
   }
-
   return true;
 #else
   (void)array;
@@ -95,12 +81,11 @@ bool ASN1::ParseDump(const char *array, size_t length)
 }
 
 #ifdef MDCM_USE_SYSTEM_OPENSSL
-static int print_hex(unsigned char *buf, int len)
+static int print_hex(unsigned char * buf, int len)
 {
-  int i;
-  int n;
-
-  for(i=0,n=0;i<len;i++)
+  int i = 0;
+  int n = 0;
+  for(; i < len; i++)
   {
     if(n > 7)
     {
@@ -111,7 +96,6 @@ static int print_hex(unsigned char *buf, int len)
     n++;
   }
   printf("\n");
-
   return(0);
 }
 #endif
@@ -124,19 +108,15 @@ int ASN1::TestPBKDF2()
   const char salt[] = "12340000";
   int ic = 1;
   unsigned char buf[1024];
-
-  ic = 1;
   PKCS5_PBKDF2_HMAC_SHA1(pass, (int)strlen(pass), (const unsigned char*)salt,
     (int)strlen(salt), ic, 32+16, buf);
   printf("PKCS5_PBKDF2_HMAC_SHA1(\"%s\", \"%s\", %d)=\n", pass, salt, ic);
   print_hex(buf, 32+16);
-
   ic = 1;
   EVP_BytesToKey(EVP_aes_256_cbc(), EVP_sha1(), (const unsigned char*)salt,
     (unsigned char*)pass, (int)strlen(pass), ic, buf, buf+32);
   printf("EVP_BytesToKey(\"%s\", \"%s\", %d)=\n", pass, salt, ic);
   print_hex(buf, 32+16);
-
 #endif
   return 0;
 }

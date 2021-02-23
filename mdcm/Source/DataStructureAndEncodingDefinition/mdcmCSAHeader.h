@@ -62,11 +62,8 @@ class PrivateTag;
 
 class MDCM_EXPORT CSAHeader
 {
-  friend std::ostream& operator<<(std::ostream & _os, const CSAHeader & d);
-public :
-  CSAHeader():InternalDataSet(),InternalType(UNKNOWN),InterfileData(0) {};
-  ~CSAHeader() {};
-
+friend std::ostream& operator<<(std::ostream &, const CSAHeader &);
+public:
   typedef enum
   {
     UNKNOWN = 0,
@@ -76,12 +73,16 @@ public :
     INTERFILE,
     ZEROED_OUT
   } CSAHeaderType;
+ 
+  CSAHeader()
+    : InternalDataSet(), InternalType(UNKNOWN), InterfileData(0) {}
+  ~CSAHeader() {}
 
-  /// Decode the CSAHeader from element 'de'
-  bool LoadFromDataElement(DataElement const &de);
+  // Decode the CSAHeader from element 'de'
+  bool LoadFromDataElement(DataElement const &);
 
   // Print the CSAHeader (use only if Format == SV10 or NOMAGIC)
-  void Print(std::ostream & os) const;
+  void Print(std::ostream &) const;
 
   // Return the DataSet output (use only if Format == DATASET_FORMAT )
   const DataSet & GetDataSet() const { return InternalDataSet; }
@@ -107,17 +108,17 @@ public :
 
   // Return the CSAElement corresponding to name 'name'
   // Case Sensitive
-  const CSAElement & GetCSAElementByName(const char * name);
+  const CSAElement & GetCSAElementByName(const char *);
 
   // Return true if the CSA element matching 'name' is found or not
   // Case Sensitive
-  bool FindCSAElementByName(const char * name);
+  bool FindCSAElementByName(const char *);
 
   // Retrieve the ASCII portion stored within the MrProtocol/MrPhoenixProtocol:
-  bool GetMrProtocol( const DataSet & ds, MrProtocol & mrProtocol );
+  bool GetMrProtocol(const DataSet &, MrProtocol &);
 
 protected:
-  const CSAElement& GetCSAEEnd() const;
+  const CSAElement & GetCSAEEnd() const;
 
 private:
   std::set<CSAElement> InternalCSADataSet;
@@ -125,12 +126,12 @@ private:
   CSAHeaderType InternalType;
   Tag DataElementTag;
   static CSAElement CSAEEnd;
-  const char *InterfileData;
+  const char * InterfileData;
 };
 
 inline std::ostream& operator<<(std::ostream & os, const CSAHeader & d)
 {
-  d.Print( os );
+  d.Print(os);
   return os;
 }
 

@@ -35,32 +35,39 @@ namespace mdcm
  */
 class MDCM_EXPORT CSAElement
 {
+friend std::ostream& operator<<(std::ostream &os, const CSAElement &val);
 public:
-  CSAElement(unsigned int kf = 0):KeyField(kf) {}
-
-  friend std::ostream& operator<<(std::ostream &os, const CSAElement &val);
-
+  CSAElement(unsigned int kf = 0) : KeyField(kf) {}
+  
   unsigned int GetKey() const { return KeyField; }
+
   void SetKey(unsigned int key) { KeyField = key; }
 
-  const char *GetName() const { return NameField.c_str(); }
-  void SetName(const char *name) { NameField = name; }
+  const char * GetName() const { return NameField.c_str(); }
 
-  const VM& GetVM() const { return ValueMultiplicityField; }
-  void SetVM(const VM &vm) { ValueMultiplicityField = vm; }
+  void SetName(const char * name) { NameField = name; }
 
-  VR const &GetVR() const { return VRField; }
-  void SetVR(VR const &vr) { VRField = vr; }
+  const VM & GetVM() const { return ValueMultiplicityField; }
+
+  void SetVM(const VM & vm) { ValueMultiplicityField = vm; }
+
+  VR const & GetVR() const { return VRField; }
+
+  void SetVR(VR const & vr) { VRField = vr; }
 
   unsigned int GetSyngoDT() const { return SyngoDTField; }
+
   void SetSyngoDT(unsigned int syngodt) { SyngoDTField = syngodt; }
 
   unsigned int GetNoOfItems() const { return NoOfItemsField; }
+
   void SetNoOfItems(unsigned int items) { NoOfItemsField = items; }
 
-  /// Set/Get Value (bytes array, SQ of items, SQ of fragments):
-  Value const &GetValue() const { return *DataField; }
-  Value &GetValue() { return *DataField; }
+  // Set/Get Value (bytes array, SQ of items, SQ of fragments):
+  Value const & GetValue() const { return *DataField; }
+
+  Value & GetValue() { return *DataField; }
+
   void SetValue(Value const & vl)
   {
     DataField = vl;
@@ -68,34 +75,34 @@ public:
 
   bool IsEmpty() const { return DataField == 0; }
 
-
-  void SetByteValue(const char *array, VL length)
+  void SetByteValue(const char * array, VL length)
   {
-    ByteValue *bv = new ByteValue(array,length);
+    ByteValue * bv = new ByteValue(array,length);
     SetValue(*bv);
   }
+
   // Return the Value of CSAElement as a ByteValue (if possible),
   // check for NULL return value
-  const ByteValue* GetByteValue() const
+  const ByteValue * GetByteValue() const
   {
-    const ByteValue *bv = dynamic_cast<const ByteValue*>(DataField.GetPointer());
+    const ByteValue * bv = dynamic_cast<const ByteValue*>(DataField.GetPointer());
     return bv; // Will return NULL if not ByteValue
   }
 
-  CSAElement(const CSAElement &_val)
+  CSAElement(const CSAElement & _val)
   {
-    if( this != &_val)
+    if(this != &_val)
     {
       *this = _val;
     }
   }
 
-  bool operator<(const CSAElement &de) const
+  bool operator<(const CSAElement & de) const
   {
     return GetKey() < de.GetKey();
   }
 
-  CSAElement &operator=(const CSAElement &de)
+  CSAElement &operator=(const CSAElement & de)
   {
     KeyField = de.KeyField;
     NameField = de.NameField;
@@ -107,13 +114,13 @@ public:
     return *this;
   }
 
-  bool operator==(const CSAElement &de) const
+  bool operator==(const CSAElement & de) const
   {
-    return KeyField == de.KeyField
+    return (KeyField == de.KeyField
       && NameField == de.NameField
       && ValueMultiplicityField == de.ValueMultiplicityField
       && VRField == de.VRField
-      && SyngoDTField == de.SyngoDTField;
+      && SyngoDTField == de.SyngoDTField);
   }
 
 protected:
@@ -127,7 +134,7 @@ protected:
   DataPtr DataField;
 };
 
-inline std::ostream& operator<<(std::ostream &os, const CSAElement &val)
+inline std::ostream& operator<<(std::ostream & os, const CSAElement & val)
 {
   os << val.KeyField;
   os << ") " << val.NameField << "  ";

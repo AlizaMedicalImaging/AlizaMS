@@ -31,13 +31,10 @@ class PVRGCodec : public ImageCodec
 {
 public:
   PVRGCodec();
-  ~PVRGCodec();
-  bool CanDecode(TransferSyntax const &) const;
-  bool CanCode(TransferSyntax const &) const;
-  bool Decode(DataElement const &is, DataElement &);
-  bool Code(DataElement const &, DataElement &);
-  void SetLossyFlag(bool);
-  virtual ImageCodec * Clone() const;
+  ~PVRGCodec() override;
+  bool CanDecode(TransferSyntax const &) const override;
+  bool Decode(DataElement const &, DataElement &) override;
+  bool Code(DataElement const &, DataElement &) override;
 };
 
 } // end namespace mdcm

@@ -21,10 +21,10 @@ namespace mdcm
 {
 
 /**
-  * \brief  This class defines a segment writer.
-  * \details It writes attributes of group 0x0062.
+  * This class defines a segment writer.
+  * It writes attributes of group 0x0062.
   *
-  * \see  PS 3.3 C.8.20.2 and C.8.23
+  * PS 3.3 C.8.20.2 and C.8.23
   */
 class MDCM_EXPORT SegmentWriter : public Writer
 {
@@ -32,7 +32,7 @@ public:
   typedef std::vector< SmartPointer< Segment > > SegmentVector;
   SegmentWriter();
   virtual ~SegmentWriter();
-  bool Write();
+  bool Write() override;
   unsigned int GetNumberOfSegments() const;
   void SetNumberOfSegments(const unsigned int size);
   const SegmentVector & GetSegments() const;

@@ -31,21 +31,10 @@ namespace mdcm
 class MDCM_EXPORT OpenSSLCryptoFactory : public CryptoFactory
 {
 public:
-  OpenSSLCryptoFactory(CryptoLib id) : CryptoFactory(id)
-  {
-    mdcmDebugMacro( "OpenSSL Factory registered." );
-  }
-    
-public:
-  CryptographicMessageSyntax* CreateCMSProvider()
-  {
-    InitOpenSSL();
-    return new OpenSSLCryptographicMessageSyntax();
-  }
-
+  OpenSSLCryptoFactory(CryptoLib id) : CryptoFactory(id);
+  CryptographicMessageSyntax * CreateCMSProvider() override;
 protected:
   void InitOpenSSL();
-
 private:
   OpenSSLCryptoFactory(){}
 };

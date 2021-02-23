@@ -32,8 +32,8 @@ namespace mdcm
 {
 
 // Unpack an array of 'packed' 12bits data into a more conventional 16bits
-// array. n is the length in bytes of array in, out will be a 16bits array of
-// size (n / 3) * 2
+// array. n is the length in bytes of array in, out will be a 16bits
+// array of size (n / 3) * 2
 static bool Unpack12Bits(char * out, const char * in, size_t n)
 {
   // 3 bytes = 2 words
@@ -55,9 +55,9 @@ static bool Unpack12Bits(char * out, const char * in, size_t n)
 }
 
 #if 0
-// Pack an array of 16bits where all values are 12bits into a pack form. n
-// is the length in bytes of array in, out will be a fake 8bits array of size
-// (n / 2) * 3
+// Pack an array of 16bits where all values are 12bits into a pack form.
+// n is the length in bytes of array in, out will be a fake 8bits array
+// of size (n / 2) * 3
 static bool Pack12Bits(char * out, const char * in, size_t n)
 {
   // number of words should be even, so that 2 words are split in 3 bytes
@@ -110,6 +110,61 @@ bool RAWCodec::Code(DataElement const & in, DataElement & out)
   return true;
 }
 
+bool RAWCodec::Decode(DataElement const & in, DataElement & out)
+{
+  if(!NeedByteSwap &&
+     !RequestPaddedCompositePixelCode &&
+     PI == PhotometricInterpretation::MONOCHROME2 &&
+     !PlanarConfiguration && !RequestPlanarConfiguration &&
+     GetPixelFormat().GetBitsAllocated() != 12 &&
+     !NeedOverlayCleanup)
+  {
+    out = in;
+    return true;
+  }
+  const ByteValue * bv = in.GetByteValue();
+  if (!bv) return false;
+  std::stringstream is;
+  is.write(bv->GetPointer(), bv->GetLength());
+  std::stringstream os;
+  const bool r = DecodeByStreams(is, os);
+  if(!r) return false;
+  std::string str = os.str();
+  out = in;
+  if(this->GetPixelFormat() == PixelFormat::UINT12 ||
+     this->GetPixelFormat() == PixelFormat::INT12)
+  {
+    const size_t len = str.size() * 16 / 12;
+    char * copy = new char[len];
+    const bool b = Unpack12Bits(copy, &str[0], str.size());
+    if (!b)
+    {
+      delete [] copy;
+      return false;
+    }
+    VL::Type lenSize = (VL::Type)len;
+    out.SetByteValue(copy, lenSize);
+    delete [] copy;
+    this->GetPixelFormat().SetBitsAllocated(16);
+  }
+  else
+  {
+    VL::Type strSize = (VL::Type) str.size();
+    out.SetByteValue(&str[0], strSize);
+  }
+  return r;
+}
+
+bool RAWCodec::GetHeaderInfo(std::istream &, TransferSyntax & ts)
+{
+  ts = TransferSyntax::ExplicitVRLittleEndian;
+  if(NeedByteSwap)
+  {
+    ts = TransferSyntax::ImplicitVRBigEndianPrivateGE;
+  }
+  return true;
+}
+
 bool RAWCodec::DecodeBytes(
   const char * inBytes, size_t inBufferLength,
   char *      outBytes, size_t inOutBufferLength)
@@ -159,69 +214,9 @@ bool RAWCodec::DecodeBytes(
   return r;
 }
 
-bool RAWCodec::Decode(DataElement const & in, DataElement & out)
-{
-  if(!NeedByteSwap &&
-     !RequestPaddedCompositePixelCode &&
-     PI == PhotometricInterpretation::MONOCHROME2 &&
-     !PlanarConfiguration && !RequestPlanarConfiguration &&
-     GetPixelFormat().GetBitsAllocated() != 12 &&
-     !NeedOverlayCleanup)
-  {
-    out = in;
-    return true;
-  }
-  const ByteValue * bv = in.GetByteValue();
-  if (!bv) return false;
-  std::stringstream is;
-  is.write(bv->GetPointer(), bv->GetLength());
-  std::stringstream os;
-  const bool r = DecodeByStreams(is, os);
-  if(!r) return false;
-  std::string str = os.str();
-  out = in;
-  if(this->GetPixelFormat() == PixelFormat::UINT12 ||
-     this->GetPixelFormat() == PixelFormat::INT12)
-  {
-    const size_t len = str.size() * 16 / 12;
-    char * copy = new char[len];
-    const bool b = Unpack12Bits(copy, &str[0], str.size());
-    if (!b)
-    {
-      delete [] copy;
-      return false;
-    }
-    VL::Type lenSize = (VL::Type)len;
-    out.SetByteValue(copy, lenSize);
-    delete [] copy;
-    this->GetPixelFormat().SetBitsAllocated(16);
-  }
-  else
-  {
-    VL::Type strSize = (VL::Type) str.size();
-    out.SetByteValue(&str[0], strSize);
-  }
-  return r;
-}
-
 bool RAWCodec::DecodeByStreams(std::istream & is, std::ostream & os)
 {
   return ImageCodec::DecodeByStreams(is, os);
-}
-
-bool RAWCodec::GetHeaderInfo(std::istream &, TransferSyntax & ts)
-{
-  ts = TransferSyntax::ExplicitVRLittleEndian;
-  if(NeedByteSwap)
-  {
-    ts = TransferSyntax::ImplicitVRBigEndianPrivateGE;
-  }
-  return true;
-}
-
-ImageCodec * RAWCodec::Clone() const
-{
-  return NULL;
 }
 
 } // end namespace mdcm

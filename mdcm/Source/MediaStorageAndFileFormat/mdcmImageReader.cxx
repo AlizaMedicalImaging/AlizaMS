@@ -59,13 +59,13 @@ bool ImageReader::Read()
   return PixmapReader::Read();
 }
 
-bool ImageReader::ReadImage(MediaStorage const & ms)
+bool ImageReader::ReadImage(const MediaStorage & ms)
 {
   if(!PixmapReader::ReadImage(ms))
   {
     return false;
   }
-  Image& pixeldata = GetImage();
+  Image & pixeldata = GetImage();
   // Pixel Spacing
   std::vector<double> spacing = ImageHelper::GetSpacingValue(*F);
   // Only SC is allowed not to have spacing
@@ -106,13 +106,13 @@ bool ImageReader::ReadACRNEMAImage()
   {
     return false;
   }
-  const DataSet &ds = F->GetDataSet();
+  const DataSet & ds = F->GetDataSet();
   Image& pixeldata = GetImage();
   // Pixel Spacing
   const Tag tpixelspacing(0x0028, 0x0030);
   if(ds.FindDataElement(tpixelspacing))
   {
-    const DataElement& de = ds.GetDataElement(tpixelspacing);
+    const DataElement & de = ds.GetDataElement(tpixelspacing);
     Attribute<0x0028,0x0030> at;
     at.SetFromDataElement(de);
     pixeldata.SetSpacing(0, at.GetValue(0));
@@ -122,7 +122,7 @@ bool ImageReader::ReadACRNEMAImage()
   const Tag timageposition(0x0020, 0x0030);
   if(ds.FindDataElement(timageposition))
   {
-    const DataElement& de = ds.GetDataElement(timageposition);
+    const DataElement & de = ds.GetDataElement(timageposition);
     Attribute<0x0020,0x0030> at = {{}};
     at.SetFromDataElement(de);
     pixeldata.SetOrigin(at.GetValues());
@@ -134,7 +134,7 @@ bool ImageReader::ReadACRNEMAImage()
   const Tag timageorientation(0x0020, 0x0035);
   if(ds.FindDataElement(timageorientation))
   {
-    const DataElement& de = ds.GetDataElement(timageorientation);
+    const DataElement & de = ds.GetDataElement(timageorientation);
     Attribute<0x0020,0x0035> at = {{1,0,0,0,1,0}};
     at.SetFromDataElement(de);
     pixeldata.SetDirectionCosines(at.GetValues());
@@ -144,6 +144,5 @@ bool ImageReader::ReadACRNEMAImage()
   pixeldata.SetSlope(is[1]);
   return true;
 }
-
 
 } // end namespace mdcm

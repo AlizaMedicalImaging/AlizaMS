@@ -30,26 +30,24 @@ namespace mdcm
 
 class MediaStorage;
 /**
- * \brief ImageReader
- * \note its role is to convert the DICOM DataSet into a Image
- * representation
+ * ImageReader
+ *
  * Image is different from Pixmap has it has a position and a direction in
  * Space.
  *
- * \see Image
  */
 class MDCM_EXPORT ImageReader : public PixmapReader
 {
 public:
   ImageReader();
-  virtual ~ImageReader();
-  virtual bool Read();
-  const Image& GetImage() const;
-  Image& GetImage();
+  ~ImageReader();
+  bool Read() override;
+  const Image & GetImage() const;
+  Image & GetImage();
 
 protected:
-  bool ReadImage(MediaStorage const & ms);
-  bool ReadACRNEMAImage();
+  bool ReadImage(const MediaStorage &) override;
+  bool ReadACRNEMAImage() override;
 };
 
 } // end namespace mdcm

@@ -35,20 +35,15 @@ class MDCM_EXPORT ASN1
 public :
   ASN1();
   ~ASN1();
-
-  static bool ParseDumpFile(const char *filename);
-
-  static bool ParseDump(const char *array, size_t length);
-
+  static bool ParseDumpFile(const char *);
+  static bool ParseDump(const char *, size_t);
 protected:
   int TestPBKDF2();
-
 private:
-  ASN1Internals *Internals;
-private:
-  ASN1(const ASN1&);  // Not implemented.
-  void operator=(const ASN1&);  // Not implemented.
+  ASN1(const ASN1&); // Not implemented.
+  void operator=(const ASN1 &); // Not implemented.
 };
+
 } // end namespace mdcm
 
 #endif //MDCMASN1_H

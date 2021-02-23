@@ -67,12 +67,6 @@ void BoxRegion::SetDomain(
   Internals->ZMax = zmax;
 }
 
-Region * BoxRegion::Clone() const
-{
-  BoxRegion * br = new BoxRegion(*this);
-  return br;
-}
-
 bool BoxRegion::Empty() const
 {
   assert(0);

@@ -35,38 +35,34 @@ class JPEGLSInternals;
  */
 class MDCM_EXPORT JPEGLSCodec : public ImageCodec
 {
-friend class ImageRegionReader;
 public:
   JPEGLSCodec();
-  ~JPEGLSCodec();
-  bool CanDecode(TransferSyntax const &) const;
-  bool CanCode(TransferSyntax const &) const;
-  unsigned long long GetBufferLength() const { return BufferLength; }
-  void SetBufferLength(unsigned long long l) { BufferLength = l; }
-  bool Decode(DataElement const &, DataElement &);
+  ~JPEGLSCodec() override;
+  bool CanDecode(TransferSyntax const &) const override;
+  bool CanCode(TransferSyntax const &) const override;
+  bool Decode(DataElement const &, DataElement &) override;
   bool Decode(DataElement const &, char *, size_t,
     uint32_t, uint32_t, uint32_t,
     uint32_t, uint32_t, uint32_t);
-  bool Code(DataElement const &, DataElement &);
-  bool GetHeaderInfo(std::istream &, TransferSyntax &);
-  ImageCodec * Clone() const;
+  bool Code(DataElement const &, DataElement &) override;
+  unsigned long long GetBufferLength() const;
+  void SetBufferLength(unsigned long long);
+  bool GetHeaderInfo(std::istream &, TransferSyntax &) override;
   void SetLossless(bool);
   bool GetLossless() const;
   void SetLossyError(int); // [0-3] generally
-
 protected:
   bool DecodeExtent(char *,
     unsigned int, unsigned int,
     unsigned int, unsigned int,
     unsigned int, unsigned int,
     std::istream &);
-  bool StartEncode(std::ostream &);
-  bool IsRowEncoder();
-  bool IsFrameEncoder();
-  bool AppendRowEncode(std::ostream &, const char *, size_t);
-  bool AppendFrameEncode(std::ostream &, const char *, size_t);
-  bool StopEncode(std::ostream &);
-
+  bool StartEncode(std::ostream &) override;
+  bool IsRowEncoder() override;
+  bool IsFrameEncoder() override;
+  bool AppendRowEncode(std::ostream &, const char *, size_t) override;
+  bool AppendFrameEncode(std::ostream &, const char *, size_t) override;
+  bool StopEncode(std::ostream &) override;
 private:
   bool DecodeByStreamsCommon(const char *, size_t, std::vector<unsigned char> &);
   bool CodeFrameIntoBuffer(char *, size_t, size_t &, const char *, size_t);

@@ -30,11 +30,10 @@ namespace mdcm
 class MDCM_EXPORT MD5
 {
 public :
-  // Compute md5 from memory pointed by `pointer` of size `buf_len`
-  static bool Compute(const char * buffer, size_t buf_len, char digest_str[33]);
-
-  // Compute md5 from a file `filename`
-  static bool ComputeFile(const char * filename, char digest_str[33]);
+  // Compute md5 from memory pointed by pointer
+  static bool Compute(const char *, size_t, char[33]);
+  // Compute md5 from a file
+  static bool ComputeFile(const char *, char[33]);
 };
 
 } // end namespace mdcm

@@ -47,9 +47,9 @@ public:
   ConstIterator Begin() const { return Items.begin(); }
   ConstIterator End() const { return Items.end(); }
   SequenceOfItems():SequenceLengthField(0xFFFFFFFF) {}
-  VL GetLength() const { return SequenceLengthField; }
+  VL GetLength() const override { return SequenceLengthField; }
 
-  void SetLength(VL length)
+  void SetLength(VL length) override
   {
     SequenceLengthField = length;
   }
@@ -63,7 +63,7 @@ public:
 
   template <typename TDE>
   VL ComputeLength() const;
-  void Clear();
+  void Clear() override;
   void AddItem(Item const &);
   Item & AddNewUndefinedLengthItem();
   bool RemoveItemByIndex(const SizeType);
@@ -202,7 +202,7 @@ public:
     return os;
   }
 
-  void Print(std::ostream &os) const
+  void Print(std::ostream &os) const override
   {
     os << "\t(" << SequenceLengthField << ")\n";
     ItemVector::const_iterator it =
@@ -227,12 +227,12 @@ public:
 
   bool FindDataElement(const Tag &) const;
 
-  bool operator==(const Value &val) const
+  bool operator==(const Value & val) const override
   {
     const SequenceOfItems & sqi = dynamic_cast<const SequenceOfItems&>(val);
     return (SequenceLengthField == sqi.SequenceLengthField &&
       Items == sqi.Items);
-   }
+  }
 
   VL SequenceLengthField;
   ItemVector Items;

@@ -28,28 +28,25 @@ namespace mdcm
 {
 
 /**
- * \brief Class for Smart Pointer
- * \details
+ * Class for Smart Pointer
+ *
  * Will only work for subclass of mdcm::Object
  * See tr1/shared_ptr for a more general approach (not invasive)
  * #include <tr1/memory>
  * {
  *   shared_ptr<Bla> b(new Bla);
  * }
- * \note
+ *
  * Class partly based on post by Bill Hubauer:
  * http://groups.google.com/group/comp.lang.c++/msg/173ddc38a827a930
- * \see
  * http://www.davethehat.com/articles/smartp.htm
- *
  * and itk::SmartPointer
  */
 
-template<class ObjectType>
-class SmartPointer
+template<class ObjectType> class SmartPointer
 {
 public:
-  SmartPointer():Pointer(0) {}
+  SmartPointer() : Pointer(0) {}
 
   SmartPointer(const SmartPointer<ObjectType> & p) : Pointer(p.Pointer)
   {
@@ -73,7 +70,7 @@ public:
     Pointer = 0;
   }
 
-  /// Overload operator ->
+  // Overload operator ->
   ObjectType *operator -> () const
   {
     return Pointer;
@@ -85,19 +82,19 @@ public:
     return *Pointer; 
   }
 
-  /// Return pointer to object.
+  // Return pointer to object.
   operator ObjectType * () const
   {
     return Pointer;
   }
 
-  /// Overload operator assignment.
+  // Overload operator assignment.
   SmartPointer &operator = (SmartPointer const & r)
   {
     return operator = (r.Pointer);
   }
 
-  /// Overload operator assignment.
+  // Overload operator assignment.
   SmartPointer &operator = (ObjectType * r)
   {
     // http://www.parashift.com/c++-faq-lite/freestore-mgmt.html#faq-16.22
@@ -120,7 +117,7 @@ public:
     return operator = (tmp);
   }
 
-  /// Explicit function to retrieve the pointer
+  // Explicit function to retrieve the pointer
   ObjectType * GetPointer() const { return Pointer; }
 
 private:

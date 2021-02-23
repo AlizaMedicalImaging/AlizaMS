@@ -25,7 +25,6 @@
 #include "mdcmRAWCodec.h"
 #include "mdcmJPEGCodec.h"
 #include "mdcmPVRGCodec.h"
-#include "mdcmKAKADUCodec.h"
 #include "mdcmJPEGLSCodec.h"
 #include "mdcmJPEG2000Codec.h"
 #include "mdcmRLECodec.h"
@@ -454,37 +453,6 @@ bool Bitmap::TryPVRGCodec(char * buffer, bool & lossyflag) const
     assert(len <= outbv->GetLength());
     if (buffer) memcpy(buffer, outbv->GetPointer(), len);
     lossyflag = codec.IsLossy();
-    return r;
-  }
-  return false;
-}
-
-bool Bitmap::TryKAKADUCodec(char * buffer, bool & lossyflag) const
-{
-  unsigned long long len = GetBufferLength();
-  const TransferSyntax & ts = GetTransferSyntax();
-  KAKADUCodec codec;
-  if (codec.CanDecode(ts))
-  {
-    codec.SetPixelFormat(GetPixelFormat());
-    codec.SetNumberOfDimensions(GetNumberOfDimensions());
-    codec.SetPlanarConfiguration(GetPlanarConfiguration());
-    codec.SetPhotometricInterpretation(GetPhotometricInterpretation());
-    codec.SetNeedOverlayCleanup(AreOverlaysInPixelData() ||
-      (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
-    codec.SetDimensions(GetDimensions());
-    DataElement out;
-    bool r = codec.Decode(PixelData, out);
-    if (!r) return false;
-    const ByteValue * outbv = out.GetByteValue();
-    if (!outbv) return false;
-    assert(len <= outbv->GetLength());
-    if (buffer) memcpy(buffer, outbv->GetPointer(), len);
-    lossyflag = codec.IsLossy();
-    if (codec.IsLossy() != ts.IsLossy())
-    {
-      mdcmErrorMacro("declared as lossless but is in fact lossy.");
-    }
     return r;
   }
   return false;

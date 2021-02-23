@@ -30,6 +30,7 @@ namespace mdcm
 {
 
 class BoxRegion;
+
 class MDCM_EXPORT Region
 {
 public :
@@ -39,9 +40,7 @@ public :
   virtual bool Empty() const = 0;
   virtual bool IsValid() const = 0;
   virtual size_t Area() const = 0;
-  virtual Region * Clone() const = 0;
   virtual BoxRegion ComputeBoundingBox() = 0;
-private:
 };
 
 inline std::ostream& operator<<(std::ostream & os, const Region & r)

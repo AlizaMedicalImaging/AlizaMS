@@ -470,12 +470,12 @@ static bool DoOverlays(const DataSet & ds, Pixmap & pixeldata)
   return true;
 }
 
-bool PixmapReader::ReadImage(MediaStorage const &ms)
+bool PixmapReader::ReadImage(const MediaStorage & ms)
 {
   return ReadImageInternal(ms);
 }
 
-bool PixmapReader::ReadImageInternal(MediaStorage const &ms, bool handlepixeldata)
+bool PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
 {
   const DataSet & ds = F->GetDataSet();
   std::string conversion;

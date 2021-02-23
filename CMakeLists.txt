@@ -171,18 +171,6 @@ if(MDCM_USE_PVRG)
   endif()
 endif()
 
-#option(MDCM_USE_KAKADU "Use Kakadu, advanced" OFF)
-#mark_as_advanced(MDCM_USE_KAKADU)
-#if(MDCM_USE_KAKADU)
-#  option(MDCM_USE_SYSTEM_KAKADU "Use system KAKADU " ON)
-#  mark_as_advanced(MDCM_USE_SYSTEM_KAKADU)
-#  if(MDCM_USE_SYSTEM_KAKADU)
-#    find_package(KAKADU REQUIRED)
-#  else()
-#    message(FATAL_ERROR "Not Implemented")
-#  endif()
-#endif()
-
 if(MDCM_USE_SYSTEM_ZLIB)
   find_package(ZLIB REQUIRED)
   include_directories(${ZLIB_INCLUDE_DIR})
@@ -393,7 +381,6 @@ set(MDCM_DSED_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmTag.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmTagToVR.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmCodeString.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmFileSet.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmByteSwapFilter.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmUNExplicitImplicitDataElement.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmWriter.cxx
@@ -445,7 +432,6 @@ set(MDCM_MSFF_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG8Codec.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGCodec.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPVRGCodec.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmKAKADUCodec.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmRAWCodec.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmLookupTable.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmOverlay.cxx
