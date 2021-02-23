@@ -36,10 +36,12 @@ namespace mdcm
 class MDCM_EXPORT CSAHeaderDictException : public std::exception {};
 
 /**
- * \brief Class to represent a map of CSAHeaderDictEntry
+ * Class to represent a map of CSAHeaderDictEntry
  */
 class MDCM_EXPORT CSAHeaderDict
 {
+friend std::ostream& operator<<(std::ostream &, const CSAHeaderDict &);
+friend class Dicts;
 public:
   typedef std::set<CSAHeaderDictEntry> MapCSAHeaderDictEntry;
   typedef MapCSAHeaderDictEntry::iterator Iterator;
@@ -48,10 +50,10 @@ public:
   {
     assert(CSAHeaderDictInternal.empty());
   }
-  friend std::ostream& operator<<(std::ostream & _os, const CSAHeaderDict & _val);
   ConstIterator Begin() const { return CSAHeaderDictInternal.begin(); }
   ConstIterator End() const { return CSAHeaderDictInternal.end(); }
   bool IsEmpty() const { return CSAHeaderDictInternal.empty(); }
+
   void AddCSAHeaderDictEntry(const CSAHeaderDictEntry & de)
   {
 #ifndef NDEBUG
@@ -60,6 +62,7 @@ public:
     CSAHeaderDictInternal.insert(de);
     assert(s < CSAHeaderDictInternal.size());
   }
+
   const CSAHeaderDictEntry &GetCSAHeaderDictEntry(const char * name) const
   {
     MapCSAHeaderDictEntry::const_iterator it = CSAHeaderDictInternal.find(name);
@@ -73,12 +76,10 @@ public:
   }
 
 protected:
-  friend class Dicts;
   void LoadDefault();
-
 private:
-  CSAHeaderDict &operator=(const CSAHeaderDict & _val); // purposely not implemented
-  CSAHeaderDict(const CSAHeaderDict &_val); // purposely not implemented
+  CSAHeaderDict &operator=(const CSAHeaderDict &); // purposely not implemented
+  CSAHeaderDict(const CSAHeaderDict &); // purposely not implemented
   MapCSAHeaderDictEntry CSAHeaderDictInternal;
 };
 

@@ -32,9 +32,9 @@ namespace SegmentHelper
 {
 
 /**
-  * \brief  This structure defines a basic coded entry with all of its attributes.
+  * This structure defines a basic coded entry with all of its attributes.
   *
-  * \see  PS 3.3 section 8.8.
+  * PS 3.3 section 8.8.
   */
 struct MDCM_EXPORT BasicCodedEntry
 {
@@ -42,16 +42,14 @@ struct MDCM_EXPORT BasicCodedEntry
     CV(""),
     CSD(""),
     CSV(""),
-    CM("")
-  {}
+    CM("") {}
   BasicCodedEntry(const char * a_CV,
                   const char * a_CSD,
                   const char * a_CM):
     CV(a_CV),
     CSD(a_CSD),
     CSV(""),
-    CM(a_CM)
-  {}
+    CM(a_CM) {}
   BasicCodedEntry(const char * a_CV,
                   const char * a_CSD,
                   const char * a_CSV,
@@ -59,8 +57,7 @@ struct MDCM_EXPORT BasicCodedEntry
     CV(a_CV),
     CSD(a_CSD),
     CSV(a_CSV),
-    CM(a_CM)
-  {}
+    CM(a_CM) {}
   bool IsEmpty(const bool checkOptionalAttributes = false) const;
   // 0008 0100 1   Code Value
   std::string CV;   /// Code Value attribute

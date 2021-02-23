@@ -30,8 +30,7 @@ namespace mdcm
 {
 
 /**
- * \brief SurfaceHelper
- * \details Helper class for Surface object
+ * SurfaceHelper
  */
 class MDCM_EXPORT SurfaceHelper
 {
@@ -40,56 +39,56 @@ public:
   typedef std::vector< unsigned short > ColorArray;
 
   /**
-    * \brief  Convert a RGB color into DICOM grayscale (ready to write).
+    * Convert a RGB color into DICOM grayscale (ready to write).
     *
-    * \see    PS 3.3 C.27.1 tag(0062,000C)
+    * PS 3.3 C.27.1 tag(0062,000C)
     *
-    * \param  RGB RGB array.
-    * \param  rangeMax  Max value of the RGB range.
+    * RGB RGB array.
+    * rangeMax  Max value of the RGB range.
     *
-    * \tparam T Type of RGB components.
-    * \tparam U Type of rangeMax value.
+    * T Type of RGB components.
+    * U Type of rangeMax value.
     */
   template <typename T, typename U>
   static unsigned short RGBToRecommendedDisplayGrayscale(const std::vector<T> & RGB,
                                                          const U rangeMax = 255);
   /**
-    * \brief  Convert a RGB color into DICOM CIE-Lab (ready to write).
+    * Convert a RGB color into DICOM CIE-Lab (ready to write).
     *
-    * \see    PS 3.3 C.10.7.1.1
+    * PS 3.3 C.10.7.1.1
     *
-    * \param  RGB RGB array.
-    * \param  rangeMax  Max value of the RGB range.
+    * RGB RGB array.
+    * rangeMax  Max value of the RGB range.
     *
-    * \tparam T Type of RGB components.
-    * \tparam U Type of rangeMax value.
+    * T Type of RGB components.
+    * U Type of rangeMax value.
     */
   template <typename T, typename U>
   static ColorArray RGBToRecommendedDisplayCIELab(const std::vector<T> & RGB,
                                                   const U rangeMax = 255);
   /**
-    * \brief  Convert a DICOM CIE-Lab (after reading) color into RGB.
+    * Convert a DICOM CIE-Lab (after reading) color into RGB.
     *
-    * \see    PS 3.3 C.10.7.1.1
+    * PS 3.3 C.10.7.1.1
     *
-    * \param  CIELab DICOM CIE-Lab array.
-    * \param  rangeMax  Max value of the RGB range.
+    * CIELab DICOM CIE-Lab array.
+    * rangeMax  Max value of the RGB range.
     *
-    * \tparam T Type of CIELab components.
-    * \tparam U Type of rangeMax value.
+    * T Type of CIELab components.
+    * U Type of rangeMax value.
     */
   template <typename T, typename U>
   static std::vector<T> RecommendedDisplayCIELabToRGB(const ColorArray & CIELab,
                                                       const U rangeMax = 255);
   /**
-    * \brief  Convert a DICOM CIE-Lab (after reading) color into RGB.
+    * Convert a DICOM CIE-Lab (after reading) color into RGB.
     *
-    * \see    PS 3.3 C.10.7.1.1
+    * PS 3.3 C.10.7.1.1
     *
-    * \param  CIELab DICOM CIE-Lab array.
-    * \param  rangeMax  Max value of the RGB range.
+    * CIELab DICOM CIE-Lab array.
+    * rangeMax  Max value of the RGB range.
     *
-    * \tparam U Type of rangeMax value.
+    * U Type of rangeMax value.
     */
   template <typename U>
   static std::vector<float> RecommendedDisplayCIELabToRGB(const ColorArray & CIELab,

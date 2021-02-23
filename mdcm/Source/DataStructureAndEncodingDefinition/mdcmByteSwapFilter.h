@@ -28,17 +28,16 @@ namespace mdcm
 {
 
 /**
- * \brief ByteSwapFilter
- * \details In place byte-swapping of a dataset
+ * ByteSwapFilter
+ * In place byte-swapping of a dataset
  */
 class MDCM_EXPORT ByteSwapFilter
 {
 public:
-  ByteSwapFilter(DataSet& ds) : DS(ds), ByteSwapTag(false) {}
+  ByteSwapFilter(DataSet &);
   ~ByteSwapFilter();
   bool ByteSwap();
-  void SetByteSwapTag(bool b) { ByteSwapTag = b; }
-
+  void SetByteSwapTag(bool);
 private:
   DataSet &DS;
   bool ByteSwapTag;

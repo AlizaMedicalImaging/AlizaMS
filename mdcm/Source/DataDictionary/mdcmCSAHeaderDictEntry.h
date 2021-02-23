@@ -32,17 +32,19 @@
 namespace mdcm
 {
 /**
- * \brief Class to represent an Entry in the Dict
- * \details Does not really exist within the DICOM definition, just a way to minimize
- * storage and have a mapping from mdcm::Tag to the needed information
+ * Class to represent an Entry in the Dict
+ * Does not really exist within the DICOM definition, just a way to
+ * minimize storage and have a mapping from mdcm::Tag to the needed
+ * information.
  * 
- * TODO : Need a PublicCSAHeaderDictEntry, indeed CSAHeaderDictEntry has a notion of retired which
- * does not exist in PrivateCSAHeaderDictEntry.
+ * TODO : Need a PublicCSAHeaderDictEntry, indeed CSAHeaderDictEntry
+ * has a notion of retired which does not exist in
+ * PrivateCSAHeaderDictEntry.
  *
- * \see mdcm::Dict
  */
 class MDCM_EXPORT CSAHeaderDictEntry
 {
+friend std::ostream& operator<<(std::ostream &, const CSAHeaderDictEntry &);
 public:
   CSAHeaderDictEntry(
     const char * name = "",
@@ -54,7 +56,6 @@ public:
     ValueRepresentation(vr),
     ValueMultiplicity(vm),
     Description(desc) {}
-  friend std::ostream& operator<<(std::ostream & _os, const CSAHeaderDictEntry & _val);
   const VR & GetVR() const { return ValueRepresentation; }
   void SetVR(const VR & vr) { ValueRepresentation = vr; }
   const VM & GetVM() const { return ValueMultiplicity; }
@@ -63,11 +64,10 @@ public:
   void SetName(const char * name) { Name = name; }
   const char * GetDescription() const { return Description.c_str(); }
   void SetDescription(const char * desc) { Description = desc; }
-  bool operator<(const CSAHeaderDictEntry &entry) const
+  bool operator<(const CSAHeaderDictEntry & entry) const
   {
     return strcmp(GetName(),entry.GetName()) < 0;
   }
-
 private:
   std::string Name;
   VR ValueRepresentation;

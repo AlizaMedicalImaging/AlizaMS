@@ -27,14 +27,18 @@
 namespace mdcm
 {
 /**
- * \brief Class to read/write a DataElement as ExplicitImplicit Data Element
- * \details This class gather two known bugs:
- * 1. MDCM 1.2.0 would rewrite VR=UN Value Length on 2 bytes instead of 4 bytes
- * 2. MDCM 1.2.0 would also rewrite DataElement as Implicit when the VR would not be known
- *    this would only happen in some very rare cases.
- * mdcm 2.X design could handle bug #1 or #2 exclusively, this class can now handle
- * file which have both issues.
- * See: mdcmData/TheralysMDCM120Bug.dcm
+ * Class to read/write a DataElement as ExplicitImplicit Data Element
+ *
+ * This class gather two known bugs:
+ * 1. GDCM 1.2.0 would rewrite VR=UN Value Length on 2 bytes instead
+ *    of 4 bytes
+ * 2. GDCM 1.2.0 would also rewrite DataElement as Implicit when the
+ *    VR would not be known, this would only happen in some very
+ *    rare cases.
+ *
+ * MDCM could handle bug #1 or #2 exclusively, this class can now
+ * handle file which have both issues.
+ * See TheralysMDCM120Bug.dcm
  */
 class MDCM_EXPORT UNExplicitImplicitDataElement : public DataElement
 {

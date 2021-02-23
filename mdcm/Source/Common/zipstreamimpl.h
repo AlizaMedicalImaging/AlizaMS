@@ -112,7 +112,7 @@ enum EStrategy
 //  template class basic_zip_streambuf
 //*****************************************************************************
 
-/** \brief A stream decorator that takes raw input and zips it to a ostream.
+/** A stream decorator that takes raw input and zips it to a ostream.
 
 The class wraps up the inflate method of the zlib library 1.1.4 http://www.gzip.org/zlib/
 */
@@ -170,7 +170,7 @@ private:
 //  template class basic_unzip_streambuf
 //*****************************************************************************
 
-/** \brief A stream decorator that takes compressed input and unzips it to a istream.
+/** A stream decorator that takes compressed input and unzips it to a istream.
 
 The class wraps up the deflate method of the zlib library 1.1.4 http://www.gzip.org/zlib/
 */

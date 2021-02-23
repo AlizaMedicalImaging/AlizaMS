@@ -29,7 +29,7 @@ namespace mdcm
 {
 
 /**
- * \brief all known UIDs
+ * All known UIDs
  */
 class MDCM_EXPORT UIDs
 {

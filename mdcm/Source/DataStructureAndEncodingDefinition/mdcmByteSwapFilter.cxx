@@ -30,6 +30,10 @@
 namespace mdcm
 {
 
+ByteSwapFilter::ByteSwapFilter(DataSet & ds) : DS(ds), ByteSwapTag(false)
+{
+}
+
 ByteSwapFilter::~ByteSwapFilter()
 {
 }
@@ -137,6 +141,11 @@ bool ByteSwapFilter::ByteSwap()
     DS = copy;
   }
   return true;
+}
+
+void ByteSwapFilter::SetByteSwapTag(bool b)
+{
+  ByteSwapTag = b;
 }
 
 }

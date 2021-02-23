@@ -27,7 +27,7 @@
 namespace mdcm
 {
 /**
- * \brief Class to read/write a DataElement as UNExplicit Data Element
+ * Class to read/write a DataElement as UNExplicit Data Element
  */
 class MDCM_EXPORT UNExplicitDataElement : public DataElement
 {

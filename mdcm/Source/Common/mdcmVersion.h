@@ -30,21 +30,21 @@ namespace mdcm
 {
 
 /**
- * \class Version
- * \brief major/minor and build version
+ * Version
+ * major/minor and build version
  */
 
 class MDCM_EXPORT Version
 {
-  friend std::ostream& operator<<(std::ostream & _os, const Version & v);
+friend std::ostream& operator<<(std::ostream &, const Version &);
 public:
   static const char * GetVersion();
   static int GetMajorVersion();
   static int GetMinorVersion();
   static int GetBuildVersion();
-  void Print(std::ostream &os = std::cout) const;
   Version() {};
   ~Version() {};
+  void Print(std::ostream &os = std::cout) const;
 };
 
 inline std::ostream& operator<<(std::ostream & os, const Version & v)
