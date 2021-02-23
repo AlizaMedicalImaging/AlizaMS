@@ -21,6 +21,7 @@
 =========================================================================*/
 
 #include "mdcmFileDecompressLookupTable.h"
+#include "mdcmDataElement.h"
 #include "mdcmAttribute.h"
 #include <cstring>
 #include <limits>
@@ -49,7 +50,7 @@ bool FileDecompressLookupTable::Change()
     }
     unsigned int l;
     // RED
-    memset(rawlut,0,lutlen*2);
+    memset(rawlut, 0, lutlen*2);
     lut.GetLUT(LookupTable::RED, (unsigned char*)rawlut, l);
     DataElement redde(Tag(0x0028, 0x1201));
     redde.SetVR(VR::OW);
@@ -58,10 +59,12 @@ bool FileDecompressLookupTable::Change()
     // Descriptor
     Attribute<0x0028, 0x1101, VR::US, VM::VM3> reddesc;
     lut.GetLUTDescriptor(LookupTable::RED, length, subscript, bitsize);
-    reddesc.SetValue(length,0); reddesc.SetValue(subscript,1); reddesc.SetValue(bitsize,2);
+    reddesc.SetValue(length, 0);
+    reddesc.SetValue(subscript, 1);
+    reddesc.SetValue(bitsize, 2);
     ds.Replace(reddesc.GetAsDataElement());
     // GREEN
-    memset(rawlut,0,lutlen*2);
+    memset(rawlut, 0, lutlen*2);
     lut.GetLUT(LookupTable::GREEN, (unsigned char*)rawlut, l);
     DataElement greende(Tag(0x0028, 0x1202));
     greende.SetVR(VR::OW);
@@ -70,10 +73,12 @@ bool FileDecompressLookupTable::Change()
     // Descriptor
     Attribute<0x0028, 0x1102, VR::US, VM::VM3> greendesc;
     lut.GetLUTDescriptor(LookupTable::GREEN, length, subscript, bitsize);
-    greendesc.SetValue(length,0); greendesc.SetValue(subscript,1); greendesc.SetValue(bitsize,2);
+    greendesc.SetValue(length, 0);
+    greendesc.SetValue(subscript, 1);
+    greendesc.SetValue(bitsize,2);
     ds.Replace(greendesc.GetAsDataElement());
     // BLUE
-    memset(rawlut,0,lutlen*2);
+    memset(rawlut, 0, lutlen*2);
     lut.GetLUT(LookupTable::BLUE, (unsigned char*)rawlut, l);
     DataElement bluede(Tag(0x0028, 0x1203));
     bluede.SetVR(VR::OW);
@@ -82,7 +87,9 @@ bool FileDecompressLookupTable::Change()
     // Descriptor
     Attribute<0x0028, 0x1103, VR::US, VM::VM3> bluedesc;
     lut.GetLUTDescriptor(LookupTable::BLUE, length, subscript, bitsize);
-    bluedesc.SetValue(length,0); bluedesc.SetValue(subscript,1); bluedesc.SetValue(bitsize,2);
+    bluedesc.SetValue(length, 0);
+    bluedesc.SetValue(subscript, 1);
+    bluedesc.SetValue(bitsize, 2);
     ds.Replace(bluedesc.GetAsDataElement());
     ds.Remove(Tag(0x0028, 0x1221));
     ds.Remove(Tag(0x0028, 0x1222));
@@ -90,6 +97,31 @@ bool FileDecompressLookupTable::Change()
     return true;
   }
   return false;
+}
+
+void FileDecompressLookupTable::SetFile(const File & f)
+{
+  F = f;
+}
+
+File & FileDecompressLookupTable::GetFile()
+{
+  return *F;
+}
+
+const Pixmap & FileDecompressLookupTable::GetPixmap() const
+{
+  return *PixelData;
+}
+
+Pixmap & FileDecompressLookupTable::GetPixmap()
+{
+  return *PixelData;
+}
+
+void FileDecompressLookupTable::SetPixmap(Pixmap const & img)
+{
+  PixelData = img;
 }
 
 } // end namespace mdcm

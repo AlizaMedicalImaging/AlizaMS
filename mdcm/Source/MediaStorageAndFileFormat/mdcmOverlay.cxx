@@ -32,18 +32,22 @@ namespace mdcm
 class OverlayInternal
 {
 public:
-  OverlayInternal():
-  InPixelData(false),
-  Group(0), // invalid default
-  Rows(0),
-  Columns(0),
-  NumberOfFrames(0),
-  Description(),
-  Type(),
-  FrameOrigin(0),
-  BitsAllocated(0),
-  BitPosition(0),
-  Data() { Origin[0] = Origin[1] = 0; }
+  OverlayInternal()
+    :
+    InPixelData(false),
+    Group(0), // invalid default
+    Rows(0),
+    Columns(0),
+    NumberOfFrames(0),
+    Description(),
+    Type(),
+    FrameOrigin(0),
+    BitsAllocated(0),
+    BitPosition(0),
+    Data()
+  {
+    Origin[0] = Origin[1] = 0;
+  }
   bool InPixelData;
   unsigned short Group;
   unsigned short Rows;           // (6000,0010) US
@@ -55,10 +59,10 @@ public:
   unsigned short FrameOrigin;    // (6000,0051) US
   unsigned short BitsAllocated;  // (6000,0100) US
   unsigned short BitPosition;    // (6000,0102) US
-  std::vector<char> Data; // hold the Overlay data, but not the trailing DICOM padding (\0)
-  void Print(std::ostream &os) const
-{
-    os << "Group           0x" <<  std::hex << Group << std::dec << std::endl;
+  std::vector<char> Data;        // data, no trailing padding '\0'
+  void Print(std::ostream & os) const
+  {
+    os << "Group           0x" << std::hex << Group << std::dec << std::endl;
     os << "Rows            " <<  Rows << std::endl;
     os << "Columns         " <<  Columns << std::endl;
     os << "NumberOfFrames  " <<  NumberOfFrames << std::endl;
@@ -68,7 +72,7 @@ public:
     os << "FrameOrigin     " <<  FrameOrigin << std::endl;
     os << "BitsAllocated   " <<  BitsAllocated << std::endl;
     os << "BitPosition     " <<  BitPosition << std::endl;
-}
+  }
 };
 
 Overlay::Overlay()
@@ -81,14 +85,14 @@ Overlay::~Overlay()
   delete Internal;
 }
 
-Overlay::Overlay(Overlay const &ov):Object(ov)
+Overlay::Overlay(Overlay const & ov) : Object(ov)
 {
   Internal = new OverlayInternal;
   // TODO copy
   *Internal = *ov.Internal;
 }
 
-Overlay & Overlay::operator=(Overlay const &ov)
+Overlay & Overlay::operator=(Overlay const & ov)
 {
   assert(Internal);
   *Internal = *ov.Internal;
@@ -113,7 +117,7 @@ void Overlay::Update(const DataElement & de)
     Element (60xx,3000), Overlay Bits Allocated (60xx,0100) is always 1 and Overlay
     Bit Position (60xx,0102) is always 0.
 */
-  const ByteValue* bv = de.GetByteValue();
+  const ByteValue * bv = de.GetByteValue();
   if(!bv) return;
   assert(bv->GetPointer() && bv->GetLength());
   std::string s(bv->GetPointer(), bv->GetLength());
@@ -241,11 +245,11 @@ bool Overlay::GrabOverlayFromPixelData(DataSet const &ds)
   const ByteValue *bv = pixeldata.GetByteValue();
   if(!bv)
   {
-    // XA_GE_JPEG_02_with_Overlays.dcm  TODO
+    // XA_GE_JPEG_02_with_Overlays.dcm TODO
     mdcmWarningMacro("Could not extract overlay from encapsulated stream");
     return false;
   }
-  const char *array = bv->GetPointer();
+  const char * array = bv->GetPointer();
   if(!array) return false;
   if(Internal->BitsAllocated == 8)
   {
@@ -292,33 +296,69 @@ bool Overlay::GrabOverlayFromPixelData(DataSet const &ds)
   return false;
 }
 
-void Overlay::SetGroup(unsigned short group) { Internal->Group = group; }
+void Overlay::SetGroup(unsigned short group)
+{
+  Internal->Group = group;
+}
 
-unsigned short Overlay::GetGroup() const { return Internal->Group; }
+unsigned short Overlay::GetGroup() const
+{
+  return Internal->Group;
+}
 
-void Overlay::SetRows(unsigned short rows) { Internal->Rows = rows; }
+void Overlay::SetRows(unsigned short rows)
+{
+  Internal->Rows = rows;
+}
 
-unsigned short Overlay::GetRows() const { return Internal->Rows; }
+unsigned short Overlay::GetRows() const
+{
+  return Internal->Rows;
+}
 
-void Overlay::SetColumns(unsigned short columns) { Internal->Columns = columns; }
+void Overlay::SetColumns(unsigned short columns)
+{
+  Internal->Columns = columns;
+}
 
-unsigned short Overlay::GetColumns() const { return Internal->Columns; }
+unsigned short Overlay::GetColumns() const
+{
+  return Internal->Columns;
+}
 
-void Overlay::SetNumberOfFrames(unsigned int numberofframes) { Internal->NumberOfFrames = numberofframes; }
+void Overlay::SetNumberOfFrames(unsigned int numberofframes)
+{
+  Internal->NumberOfFrames = numberofframes;
+}
 
-unsigned int Overlay::GetNumberOfFrames() const { return Internal->NumberOfFrames; }
+unsigned int Overlay::GetNumberOfFrames() const
+{
+ return Internal->NumberOfFrames;
+}
 
-void Overlay::SetDescription(const char* description) { if(description) Internal->Description = description; }
+void Overlay::SetDescription(const char* description)
+{
+  if(description) Internal->Description = description;
+}
 
-const char *Overlay::GetDescription() const { return Internal->Description.c_str(); }
+const char * Overlay::GetDescription() const
+{
+  return Internal->Description.c_str();
+}
 
-void Overlay::SetType(const char* type) { if(type) Internal->Type = type; }
+void Overlay::SetType(const char* type)
+{
+  if(type) Internal->Type = type;
+}
 
-const char *Overlay::GetType() const { return Internal->Type.c_str(); }
+const char * Overlay::GetType() const
+{
+  return Internal->Type.c_str();
+}
 
-static const char *OverlayTypeStrings[] = { "INVALID", "G ", "R " };
+static const char * OverlayTypeStrings[] = { "INVALID", "G ", "R " };
 
-const char *Overlay::GetOverlayTypeAsString(OverlayType ot)
+const char * Overlay::GetOverlayTypeAsString(OverlayType ot)
 {
   return OverlayTypeStrings[ (int) ot ];
 }
@@ -335,7 +375,7 @@ Overlay::OverlayType Overlay::GetOverlayTypeFromString(const char *s)
       }
     }
   }
-  // maybe padded with '\0'?
+  // Maybe padded with '\0'?
   if(s && strlen(s) == 1)
   {
     for(int i = 0; i < 3; ++i)
@@ -367,17 +407,36 @@ const signed short * Overlay::GetOrigin() const
 {
   return &Internal->Origin[0];
 }
-void Overlay::SetFrameOrigin(unsigned short frameorigin) { Internal->FrameOrigin = frameorigin; }
 
-unsigned short Overlay::GetFrameOrigin() const { return Internal->FrameOrigin; }
+void Overlay::SetFrameOrigin(unsigned short frameorigin)
+{
+  Internal->FrameOrigin = frameorigin;
+}
 
-void Overlay::SetBitsAllocated(unsigned short bitsallocated) { Internal->BitsAllocated = bitsallocated; }
+unsigned short Overlay::GetFrameOrigin() const
+{
+  return Internal->FrameOrigin;
+}
 
-unsigned short Overlay::GetBitsAllocated() const { return Internal->BitsAllocated; }
+void Overlay::SetBitsAllocated(unsigned short bitsallocated)
+{
+  Internal->BitsAllocated = bitsallocated;
+}
 
-void Overlay::SetBitPosition(unsigned short bitposition) { Internal->BitPosition = bitposition; }
+unsigned short Overlay::GetBitsAllocated() const
+{
+  return Internal->BitsAllocated;
+}
 
-unsigned short Overlay::GetBitPosition() const { return Internal->BitPosition; }
+void Overlay::SetBitPosition(unsigned short bitposition)
+{
+  Internal->BitPosition = bitposition;
+}
+
+unsigned short Overlay::GetBitPosition() const
+{
+  return Internal->BitPosition;
+}
 
 bool Overlay::IsEmpty() const
 {
@@ -395,35 +454,40 @@ bool Overlay::IsZero() const
   return false;
 }
 
-bool Overlay::IsInPixelData() const { return Internal->InPixelData; }
+bool Overlay::IsInPixelData() const
+{
+  return Internal->InPixelData;
+}
 
-void Overlay::IsInPixelData(bool b) { Internal->InPixelData = b; }
+void Overlay::IsInPixelData(bool b)
+{
+  Internal->InPixelData = b;
+}
 
-void Overlay::SetOverlay(const char *array, size_t length)
+void Overlay::SetOverlay(const char * array, size_t length)
 {
   if(!array || !length) return;
   size_t computed_length = 0;
   const size_t tmp1 = Internal->Rows;
   const size_t tmp2 = Internal->Columns;
   const size_t tmp3 = Internal->NumberOfFrames;
-  if (tmp3 > 0)
-    computed_length = (tmp1*tmp2*tmp3 + 7) / 8;
-  else
-    computed_length = (tmp1*tmp2 + 7) / 8;
-  Internal->Data.resize(computed_length); // filled with 0 if length < computed_length
+  if(tmp3 > 0) computed_length = (tmp1*tmp2*tmp3 + 7) / 8;
+  else computed_length = (tmp1*tmp2 + 7) / 8;
+  // Filled with 0 if length < computed_length
+  Internal->Data.resize(computed_length);
   if(length < computed_length)
   {
-    mdcmWarningMacro("Not enough data found in Overlay. Proceed with caution");
+    mdcmWarningMacro("Not enough data found in overlay.");
     std::copy(array, array+length, Internal->Data.begin());
   }
   else
   {
-    // do not try to copy more than allocated:
+    // Do not try to copy more than allocated,
     // technically we may be missing the trailing DICOM padding (\0),
-    // but we have all the data needed anyway:
+    // but we have all the data needed anyway.
     std::copy(array, array+computed_length, Internal->Data.begin());
   }
-  /* warning need to take into account padding to the next word (8bits) */
+  // Warning: need to take into account padding to the next word (8bits)
   assert(Internal->Data.size() == computed_length);
 }
 
@@ -444,7 +508,7 @@ size_t Overlay::GetUnpackBufferLength() const
   return (size_t)(Internal->Rows*Internal->Columns);
 }
 
-bool Overlay::GetUnpackBuffer(char *buffer, size_t len) const
+bool Overlay::GetUnpackBuffer(char * buffer, size_t len) const
 {
   const size_t unpacklen = GetUnpackBufferLength();
   if(len < unpacklen) return false;
@@ -456,9 +520,9 @@ bool Overlay::GetUnpackBuffer(char *buffer, size_t len) const
     assert(unpackedbytes <= begin + len);
     unsigned char packedbytes = static_cast<unsigned char>(*it);
     unsigned char mask = 1;
-    for (unsigned int i = 0; i < 8 && unpackedbytes < begin + len; ++i)
+    for(unsigned int i = 0; i < 8 && unpackedbytes < begin + len; ++i)
     {
-      if ((packedbytes & mask) == 0)
+      if((packedbytes & mask) == 0)
       {
         *unpackedbytes = 0;
       }
@@ -474,7 +538,7 @@ bool Overlay::GetUnpackBuffer(char *buffer, size_t len) const
   return true;
 }
 
-void Overlay::Decompress(std::ostream &os) const
+void Overlay::Decompress(std::ostream & os) const
 {
   const size_t unpacklen = GetUnpackBufferLength();
   unsigned char unpackedbytes[8];
@@ -485,7 +549,7 @@ void Overlay::Decompress(std::ostream &os) const
     unsigned char packedbytes = *it;
     unsigned char mask = 1;
     unsigned int i = 0;
-    for (; i < 8 && curlen < unpacklen; ++i)
+    for(; i < 8 && curlen < unpacklen; ++i)
     {
       if ((packedbytes & mask) == 0)
       {
@@ -502,7 +566,7 @@ void Overlay::Decompress(std::ostream &os) const
   }
 }
 
-void Overlay::Print(std::ostream &os) const
+void Overlay::Print(std::ostream & os) const
 {
   Internal->Print(os);
 }

@@ -54,7 +54,7 @@ SegmentWriter::SegmentVector & SegmentWriter::GetSegments()
   return Segments;
 }
 
-SmartPointer< Segment > SegmentWriter::GetSegment(const unsigned int idx) const
+SmartPointer<Segment> SegmentWriter::GetSegment(const unsigned int idx) const
 {
   assert(idx < Segments.size());
   return Segments[idx];
@@ -70,8 +70,7 @@ void SegmentWriter::SetSegments(SegmentVector & segments)
   Segments = segments;
 }
 
-
-void writeCodeSequenceMacroAttributes(
+static void writeCodeSequenceMacroAttributes(
   const SegmentHelper::BasicCodedEntry & entry,
   const Tag & tag,
   DataSet & dataset,
@@ -127,7 +126,7 @@ void writeCodeSequenceMacroAttributes(
   sequence->AddItem(item);
 }
 
-void writeCodeSequenceMacroAttributes(
+static void writeCodeSequenceMacroAttributes(
   const Segment::BasicCodedEntryVector & entries,
   const Tag & tag,
   DataSet & dataset)

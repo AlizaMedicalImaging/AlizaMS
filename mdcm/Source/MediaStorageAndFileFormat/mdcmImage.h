@@ -52,39 +52,27 @@ namespace mdcm
 class MDCM_EXPORT Image : public Pixmap
 {
 public:
-  Image () : Spacing(),SC(),Intercept(0),Slope(1)
-  {
-    Origin.resize(3);
-    DirectionCosines.resize(6);
-    DirectionCosines[0] = 1;
-    DirectionCosines[4] = 1;
-    Spacing.resize(3, 1);
-  }
-  ~Image() {}
-  // NOTE: 3rd value can be an '1' when the spacing was not specified
-  // WARNING: when the spacing is not specifier, a default '1' will be returned
+  Image();
+  ~Image();
   const double * GetSpacing() const;
-  double GetSpacing(unsigned int idx) const;
-  void SetSpacing(const double  *spacing);
-  void SetSpacing(unsigned int idx, double spacing);
-  // Return (0,0,0) if the origin was not specified.
+  double GetSpacing(unsigned int) const;
+  void SetSpacing(const double *);
+  void SetSpacing(unsigned int, double);
   const double * GetOrigin() const;
-  double GetOrigin(unsigned int idx) const;
-  void SetOrigin(const float *ori);
-  void SetOrigin(const double *ori);
-  void SetOrigin(unsigned int idx, double ori);
-  // A default value of (1,0,0,0,1,0) will be return when the direction cosines was not specified.
+  double GetOrigin(unsigned int) const;
+  void SetOrigin(const float *);
+  void SetOrigin(const double *);
+  void SetOrigin(unsigned int, double);
   const double * GetDirectionCosines() const;
-  double GetDirectionCosines(unsigned int idx) const;
-  void SetDirectionCosines(const float *dircos);
-  void SetDirectionCosines(const double *dircos);
-  void SetDirectionCosines(unsigned int idx, double dircos);
-  void Print(std::ostream &os) const;
-  void SetIntercept(double intercept) { Intercept = intercept; }
-  double GetIntercept() const { return Intercept; }
-  void SetSlope(double slope) { Slope = slope; }
-  double GetSlope() const { return Slope; }
-
+  double GetDirectionCosines(unsigned int) const;
+  void SetDirectionCosines(const float *);
+  void SetDirectionCosines(const double *);
+  void SetDirectionCosines(unsigned int, double);
+  void SetIntercept(double);
+  double GetIntercept() const;
+  void SetSlope(double);
+  double GetSlope() const;
+  void Print(std::ostream &) const override;
 private:
   std::vector<double> Spacing;
   std::vector<double> Origin;

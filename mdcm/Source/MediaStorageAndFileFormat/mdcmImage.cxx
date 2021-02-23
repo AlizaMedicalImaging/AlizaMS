@@ -31,6 +31,19 @@
 namespace mdcm
 {
 
+Image::Image() : Spacing(), SC(), Intercept(0), Slope(1)
+{
+  Origin.resize(3);
+  DirectionCosines.resize(6);
+  DirectionCosines[0] = 1;
+  DirectionCosines[4] = 1;
+  Spacing.resize(3, 1);
+}
+
+Image::~Image() {}
+
+// Note: 3rd value can be an '1' when the spacing was not specified.
+// Warning: when the spacing is not specifier, a default '1' will be returned.
 const double * Image::GetSpacing() const
 {
   assert(NumberOfDimensions);
@@ -55,6 +68,7 @@ void Image::SetSpacing(unsigned int idx, double spacing)
   Spacing[idx] = spacing;
 }
 
+// Return (0,0,0) if the origin was not specified.
 const double * Image::GetOrigin() const
 {
   assert(NumberOfDimensions);
@@ -95,6 +109,8 @@ void Image::SetOrigin(unsigned int idx, double ori)
   Origin[idx] = ori;
 }
 
+// A default value of (1,0,0,0,1,0) will be return when the direction
+// cosines was not specified.
 const double * Image::GetDirectionCosines() const
 {
   assert(NumberOfDimensions);
@@ -132,6 +148,26 @@ void Image::SetDirectionCosines(unsigned int idx, double dircos)
 {
   DirectionCosines.resize(idx + 1);
   DirectionCosines[idx] = dircos;
+}
+
+void Image::SetIntercept(double intercept)
+{
+  Intercept = intercept;
+}
+
+double Image::GetIntercept() const
+{
+  return Intercept;
+}
+
+void Image::SetSlope(double slope)
+{
+  Slope = slope;
+}
+
+double Image::GetSlope() const
+{
+  return Slope;
 }
 
 void Image::Print(std::ostream &os) const

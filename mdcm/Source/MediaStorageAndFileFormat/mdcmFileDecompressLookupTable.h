@@ -31,10 +31,13 @@ namespace mdcm
 {
 
 class DataElement;
+
 /**
  * FileDecompressLookupTable class
- * Decompress the segmented LUT into linearized one (only PALETTE_COLOR images)
- * Output will be a PhotometricInterpretation=RGB image
+ *
+ * Decompress the segmented LUT into linearized one
+ * (only PALETTE_COLOR images).
+ * Output will be a PhotometricInterpretation::RGB image.
  */
 class MDCM_EXPORT FileDecompressLookupTable : public Subject
 {
@@ -42,12 +45,11 @@ public:
   FileDecompressLookupTable() {}
   ~FileDecompressLookupTable() {}
   bool Change();
-  void SetFile(const File& f) { F = f; }
-  File &GetFile() { return *F; }
-  const Pixmap& GetPixmap() const { return *PixelData; }
-  Pixmap& GetPixmap() { return *PixelData; }
-  void SetPixmap(Pixmap const &img) { PixelData = img; }
-
+  void SetFile(const File &);
+  File & GetFile();
+  const Pixmap & GetPixmap() const;
+  Pixmap & GetPixmap();
+  void SetPixmap(Pixmap const &);
 private:
   SmartPointer<File> F;
   SmartPointer<Pixmap> PixelData;

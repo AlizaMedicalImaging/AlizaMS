@@ -59,8 +59,9 @@ bool ImageApplyLookupTable::Apply()
   Output->GetLUT().Clear();
   Output->SetPhotometricInterpretation(PhotometricInterpretation::RGB);
   Output->GetPixelFormat().SetSamplesPerPixel(3);
-  Output->SetPlanarConfiguration(0); // OT-PAL-8-face.dcm has a PlanarConfiguration while being PALETTE COLOR
-  const TransferSyntax &ts = image.GetTransferSyntax();
+  // OT-PAL-8-face.dcm has a PlanarConfiguration while being PALETTE COLOR
+  Output->SetPlanarConfiguration(0);
+  const TransferSyntax & ts = image.GetTransferSyntax();
   if(ts.IsExplicit())
   {
     Output->SetTransferSyntax(TransferSyntax::ExplicitVRLittleEndian);

@@ -31,15 +31,13 @@ class MDCM_EXPORT UIDGenerator
 {
 public:
   UIDGenerator():Unique() {}
-  static void SetRoot(const char * root);
+  static void SetRoot(const char *);
   static const char * GetRoot();
   const char* Generate();
-  static bool IsValid(const char *uid);
+  static bool IsValid(const char *);
   static const char * GetMDCMUID();
-
 protected:
-  static bool GenerateUUID(unsigned char * uuid_data);
-
+  static bool GenerateUUID(unsigned char *);
 private:
   static const char MDCM_UID[];
   static std::string Root;

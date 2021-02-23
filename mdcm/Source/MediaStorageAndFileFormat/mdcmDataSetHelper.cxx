@@ -90,14 +90,14 @@ VR DataSetHelper::ComputeVR(const File & file, const DataSet & ds, const Tag & t
   const Dicts  & dicts = g.GetDicts();
   std::string strowner;
   const char * owner = NULL;
-  const Tag& t = tag;
+  const Tag & t = tag;
   if(t.IsPrivate() && !t.IsPrivateCreator())
   {
     strowner = ds.GetPrivateCreator(t);
     owner = strowner.c_str();
   }
   const DictEntry &entry = dicts.GetDictEntry(t,owner);
-  const VR &refvr = entry.GetVR();
+  const VR & refvr = entry.GetVR();
   if(refvr == VR::INVALID || refvr == VR::UN)
   {
     return VR::UN;

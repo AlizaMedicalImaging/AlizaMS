@@ -22,7 +22,7 @@ public:
   ApplySupplementalLUT() : m_RedSubscipt(0) {}
   ~ApplySupplementalLUT() {}
   bool Apply();
-  int  GetRedSubscript() const { return m_RedSubscipt; };
+  int  GetRedSubscript() const;
 private:
   int m_RedSubscipt;
 };

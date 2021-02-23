@@ -51,16 +51,6 @@ DirectionCosines::DirectionCosines(const double dircos[6])
 
 DirectionCosines::~DirectionCosines() {}
 
-void DirectionCosines::Print(std::ostream & os) const
-{
-  os << Values[0] << ",";
-  os << Values[1] << ",";
-  os << Values[2] << ",";
-  os << Values[3] << ",";
-  os << Values[4] << ",";
-  os << Values[5];
-}
-
 bool DirectionCosines::IsValid() const
 {
   const double epsilon = 1e-3;
@@ -181,6 +171,16 @@ double DirectionCosines::ComputeDistAlongNormal(const double ipp[3]) const
   double dist = 0.;
   for (int i = 0; i < 3; ++i) dist += normal[i]*ipp[i];
   return dist;
+}
+
+void DirectionCosines::Print(std::ostream & os) const
+{
+  os << Values[0] << ",";
+  os << Values[1] << ",";
+  os << Values[2] << ",";
+  os << Values[3] << ",";
+  os << Values[4] << ",";
+  os << Values[5];
 }
 
 } // end namespace mdcm

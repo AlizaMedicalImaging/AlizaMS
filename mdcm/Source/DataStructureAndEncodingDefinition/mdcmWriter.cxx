@@ -68,15 +68,12 @@ bool Writer::Write()
   std::ostream &os = *Stream;
   FileMetaInformation &Header = F->GetHeader();
   DataSet &DS = F->GetDataSet();
-
   if(DS.IsEmpty())
   {
     mdcmErrorMacro("DS empty");
     return false;
   }
-
   // Check that 0002,0002 / 0008,0016 and 0002,0003 / 0008,0018 match?
-
   if(!WriteDataSetOnly)
   {
     if(CheckFileMetaInformation)
@@ -102,14 +99,12 @@ bool Writer::Write()
       Header.Write(os);
     }
   }
-
   const TransferSyntax & ts = Header.GetDataSetTransferSyntax();
   if(!ts.IsValid())
   {
     mdcmErrorMacro("Invalid Transfer Syntax");
     return false;
   }
-
   if(ts == TransferSyntax::DeflatedExplicitVRLittleEndian)
   {
     try
@@ -124,7 +119,6 @@ bool Writer::Write()
     }
     return true;
   }
-
   try
   {
     if(ts.GetSwapCode() == SwapCode::BigEndian)
@@ -169,13 +163,11 @@ bool Writer::Write()
     mdcmErrorMacro("unknown exception");
     return false;
   }
-
   os.flush();
   if (Ofstream)
   {
     Ofstream->close();
   }
-
   return true;
 }
 
@@ -206,6 +198,55 @@ void Writer::SetFileName(const char * p)
     mdcmAlwaysWarnMacro("Reader failed (1)");
   }
   Stream = Ofstream;
+}
+
+void Writer::SetStream(std::ostream &output_stream)
+{
+  Stream = &output_stream;
+}
+
+void Writer::SetFile(const File & f)
+{
+  F = f;
+}
+
+File & Writer::GetFile()
+{
+  return *F;
+}
+
+void Writer::SetCheckFileMetaInformation(bool b)
+{
+  CheckFileMetaInformation = b;
+}
+
+void Writer::CheckFileMetaInformationOff()
+{
+  CheckFileMetaInformation = false;
+}
+
+void Writer::CheckFileMetaInformationOn()
+{
+  CheckFileMetaInformation = true;
+}
+
+void Writer::SetWriteDataSetOnly(bool b)
+{
+  WriteDataSetOnly = b;
+}
+
+//this function is added for the StreamImageWriter, which needs to write
+//up to the pixel data and then stops right before writing the pixel data.
+//after that, for the raw codec at least, zeros are written for the length
+// of the data
+std::ostream * Writer::GetStreamPtr() const
+{
+  return Stream;
+}
+
+bool Writer::GetCheckFileMetaInformation() const
+{
+  return CheckFileMetaInformation;
 }
 
 } // end namespace mdcm

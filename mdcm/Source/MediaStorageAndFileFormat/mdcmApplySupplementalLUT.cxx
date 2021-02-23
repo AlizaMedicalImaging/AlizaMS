@@ -63,5 +63,9 @@ bool ApplySupplementalLUT::Apply()
   return true;
 }
 
+int ApplySupplementalLUT::GetRedSubscript() const
+{
+  return m_RedSubscipt;
+}
 
 } // end namespace mdcm

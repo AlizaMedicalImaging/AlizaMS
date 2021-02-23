@@ -31,17 +31,17 @@ class MDCM_EXPORT SegmentWriter : public Writer
 public:
   typedef std::vector< SmartPointer< Segment > > SegmentVector;
   SegmentWriter();
-  virtual ~SegmentWriter();
+  virtual ~SegmentWriter() override;
   bool Write() override;
   unsigned int GetNumberOfSegments() const;
-  void SetNumberOfSegments(const unsigned int size);
+  void SetNumberOfSegments(const unsigned int);
   const SegmentVector & GetSegments() const;
   SegmentVector & GetSegments();
-  SmartPointer< Segment > GetSegment(const unsigned int idx = 0) const;
-  void AddSegment(SmartPointer< Segment > segment);
+  SmartPointer<Segment> GetSegment(const unsigned int = 0) const;
+  void AddSegment(SmartPointer<Segment> segment);
   void SetSegments(SegmentVector & segments);
 protected:
-  bool PrepareWrite();
+  virtual bool PrepareWrite();
   SegmentVector Segments;
 };
 

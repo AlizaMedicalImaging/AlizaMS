@@ -29,9 +29,9 @@ namespace mdcm
 
 class DataElement;
 /**
- * \brief ImageApplyLookupTable class
- * \details It applies the LUT the PixelData (only PALETTE_COLOR images)
- * Output will be a PhotometricInterpretation=RGB image
+ * ImageApplyLookupTable class
+ * It applies the LUT the PixelData (only PALETTE_COLOR images)
+ * Output will be a PhotometricInterpretation:RGB image
  */
 class MDCM_EXPORT ImageApplyLookupTable : public ImageToImageFilter
 {
@@ -39,8 +39,6 @@ public:
   ImageApplyLookupTable() {}
   ~ImageApplyLookupTable() {}
   bool Apply();
-
-private:
 };
 
 } // end namespace mdcm

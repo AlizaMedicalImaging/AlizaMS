@@ -31,9 +31,38 @@
 #include "mdcmVM.h"
 #include "mdcmDataSetHelper.h"
 
+/**
+ * FileExplicitFilter class
+ * After changing a file from Implicit to Explicit representation (see
+ * ImageChangeTransferSyntax) one operation is to make sure the VR of each
+ * DICOM attribute are accurate and do match the one from PS 3.6. Indeed when a
+ * file is written in Implicit reprensentation, the VR is not stored directly
+ * in the file.
+ *
+ * Changing an implicit dataset to an explicit dataset is NOT a
+ * trivial task of simply changing the VR to the dict one:
+ *  One has to make sure SQ is properly set
+ *  One has to recompute the explicit length SQ
+ *  One has to make sure that VR is valid for the encoding
+ *  One has to make sure that VR 16bits can store the original value length
+ */
+
 namespace mdcm
 {
 
+// Decide whether or not to VR'ify private tags
+void FileExplicitFilter::SetChangePrivateTags(bool b)
+{
+  ChangePrivateTags = b;
+}
+
+// When VR=16bits in explicit but Implicit has a 32bits length, use VR=UN
+void FileExplicitFilter::SetUseVRUN(bool b)
+{
+  UseVRUN = b;
+}
+
+// By default set Sequence & Item length to Undefined to avoid recomputing length
 void FileExplicitFilter::SetRecomputeItemLength(bool b)
 {
   RecomputeItemLength = b;
@@ -42,6 +71,25 @@ void FileExplicitFilter::SetRecomputeItemLength(bool b)
 void FileExplicitFilter::SetRecomputeSequenceLength(bool b)
 {
   RecomputeSequenceLength = b;
+}
+
+void FileExplicitFilter::SetFile(const File & f)
+{
+  F = f;
+}
+
+File & FileExplicitFilter::GetFile()
+{
+  return *F;
+}
+
+bool FileExplicitFilter::Change()
+{
+  const Global& g = GlobalInstance;
+  const Dicts &dicts = g.GetDicts();
+  DataSet &ds = F->GetDataSet();
+  bool b = ProcessDataSet(ds, dicts);
+  return b;
 }
 
 bool FileExplicitFilter::ChangeFMI()
@@ -64,7 +112,7 @@ bool FileExplicitFilter::ChangeFMI()
   return true;
 }
 
-bool FileExplicitFilter::ProcessDataSet(DataSet &ds, Dicts const & dicts)
+bool FileExplicitFilter::ProcessDataSet(DataSet & ds, Dicts const & dicts)
 {
   if(RecomputeSequenceLength || RecomputeItemLength)
   {
@@ -182,15 +230,5 @@ bool FileExplicitFilter::ProcessDataSet(DataSet &ds, Dicts const & dicts)
   }
   return true;
 }
-
-bool FileExplicitFilter::Change()
-{
-  const Global& g = GlobalInstance;
-  const Dicts &dicts = g.GetDicts();
-  DataSet &ds = F->GetDataSet();
-  bool b = ProcessDataSet(ds, dicts);
-  return b;
-}
-
 
 } // end namespace mdcm

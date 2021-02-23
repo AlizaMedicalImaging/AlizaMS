@@ -58,7 +58,7 @@ const char UIDGenerator::MDCM_UID[] = "1.2.826.0.1.3680043.10.135";
 std::string UIDGenerator::Root = GetMDCMUID();
 std::string UIDGenerator::EncodedHardwareAddress;
 
-const char *UIDGenerator::GetRoot()
+const char * UIDGenerator::GetRoot()
 {
   return Root.c_str();
 }
@@ -69,7 +69,7 @@ void UIDGenerator::SetRoot(const char * root)
   Root = root;
 }
 
-const char *UIDGenerator::GetMDCMUID()
+const char * UIDGenerator::GetMDCMUID()
 {
   return MDCM_UID;
 }
@@ -99,16 +99,18 @@ struct fnv_hash
 
 /*
 Implementation note: You cannot set a root of more than 26 bytes
-(which should already enough for most people).
-Since implementation is only playing with the first 8bits of the
-upper
+(which should already enough for most people). Since implementation
+is only playing with the first 8bits of the upper.
 */
-const char* UIDGenerator::Generate()
+const char * UIDGenerator::Generate()
 {
   Unique = GetRoot();
-  // We choose here a value of 26 so that we can still have 37 bytes free to
-  // set the suffix part which is sufficient to store a 2^(128-8+1)-1 number
-  if(Unique.empty() || Unique.size() > 62) // 62 is simply the highest possible limit
+  // We choose here a value of 26 so that we can still have 37 bytes free
+  // to set the suffix part which is sufficient to store a
+  // 2^(128-8+1)-1 number
+  //
+  // 62 is simply the highest possible limit
+  if(Unique.empty() || Unique.size() > 62) 
   {
     return NULL;
   }
@@ -144,7 +146,7 @@ const char* UIDGenerator::Generate()
       }
       else
       {
-        // cool we found enough to stop
+        // enough to stop
         found = true;
       }
     }
@@ -159,7 +161,7 @@ const char* UIDGenerator::Generate()
   return Unique.c_str();
 }
 
-bool UIDGenerator::GenerateUUID(unsigned char *uuid_data)
+bool UIDGenerator::GenerateUUID(unsigned char * uuid_data)
 {
 #if defined(HAVE_UUID_GENERATE)
   uuid_t g;
@@ -169,8 +171,7 @@ bool UIDGenerator::GenerateUUID(unsigned char *uuid_data)
   uint32_t rv;
   uuid_t g;
   uuid_create(&g, &rv);
-  if (rv != uuid_s_ok)
-    return false;
+  if (rv != uuid_s_ok) return false;
   memcpy(uuid_data, &g, sizeof(uuid_t));
 #elif defined(HAVE_UUIDCREATE)
   if (FAILED(UuidCreate((UUID *)uuid_data)))
@@ -185,23 +186,28 @@ bool UIDGenerator::GenerateUUID(unsigned char *uuid_data)
 
 bool UIDGenerator::IsValid(const char *uid_)
 {
-  /*
+/*
   9.1 UID ENCODING RULES
   The DICOM UID encoding rules are defined as follows:
-  - Each component of a UID is a number and shall consist of one or more digits. The first digit of
-  each component shall not be zero unless the component is a single digit.
-  Note: Registration authorities may distribute components with non-significant leading zeroes. The leading
-  zeroes should be ignored when being encoded (ie. 00029 would be encoded 29).
-  - Each component numeric value shall be encoded using the characters 0-9 of the Basic G0 Set
-  of the International Reference Version of ISO 646:1990 (the DICOM default character
-  repertoire).
+  - Each component of a UID is a number and shall consist of one
+  or more digits. The first digit of each component shall not be
+  zero unless the component is a single digit.
+  Note: Registration authorities may distribute components with
+  non-significant leading zeroes. The leading zeroes should be
+  ignored when being encoded (ie. 00029 would be encoded 29).
+   - Each component numeric value shall be encoded using
+     the characters 0-9 of the Basic G0 Set
+     of the International Reference Version of ISO 646:1990
+     (the DICOM default character repertoire).
   - Components shall be separated by the character "." (2EH).
-  - If ending on an odd byte boundary, except when used for network negotiation (See PS 3.8),
-  one trailing NULL (00H), as a padding character, shall follow the last component in order to
-  align the UID on an even byte boundary.
-  - UID's, shall not exceed 64 total characters, including the digits of each component, separators
-  between components, and the NULL (00H) padding character if needed.
-  */
+  - If ending on an odd byte boundary, except when used for
+    network negotiation (See PS 3.8), one trailing NULL (00H),
+    as a padding character, shall follow the last component in
+    order to align the UID on an even byte boundary.
+  - UID's, shall not exceed 64 total characters, including the
+    digits of each component, separators between components,
+    and the NULL (00H) padding character if needed.
+*/
   if(!uid_) return false;
   std::string uid = uid_;
   if(uid.size() > 64 || uid.empty())
@@ -217,14 +223,18 @@ bool UIDGenerator::IsValid(const char *uid_)
   std::string::size_type i = 0;
   for(; i < uid.size(); ++i)
   {
-    if(uid[i] == '.') // if test is true we are garantee that next char is valid (see previous check)
+    // if test is true we are garantee that next char is valid
+    // (see previous check)
+    if(uid[i] == '.') 
     {
-      // check that next character is neither '0' (except single number) not '.'
+      // check that next character is neither '0'
+      // (except single number) not '.'
       if(uid[i+1] == '.')
       {
         return false;
       }
-      else if(uid[i+1] == '0') // character is garantee to exist since '.' is not last char
+      // character is garantee to exist since '.' is not last char
+      else if(uid[i+1] == '0')
       {
         // need to check first if we are not at the end of string
         if(i+2 != uid.size() && uid[i+2] != '.')
@@ -233,7 +243,7 @@ bool UIDGenerator::IsValid(const char *uid_)
         }
       }
     }
-    else if (!isdigit((unsigned char)uid[i]))
+    else if(!isdigit((unsigned char)uid[i]))
     {
       return false;
     }

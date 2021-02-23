@@ -42,7 +42,7 @@
 namespace mdcm
 {
 
-const char* UUIDGenerator::Generate()
+const char * UUIDGenerator::Generate()
 {
   Unique.resize(36);
   char * uuid_data = &Unique[0];

@@ -51,6 +51,7 @@ namespace mdcm
 
 class MDCM_EXPORT VR
 {
+friend std::ostream &operator<<(std::ostream &, const VR &);
 public:
   typedef enum:long long
   {
@@ -105,30 +106,36 @@ public:
     VRALL    = VRASCII|VRBINARY
   } VRType;
 
-  static const char * GetVRString(VRType vr);
+  static const char * GetVRString(VRType);
   // This function will only look at the very first two chars nothing else
-  static VRType GetVRTypeFromFile(const char *vr);
-  static VRType GetVRType(const char * vr);
-  static const char * GetVRStringFromFile(VRType vr);
-  static bool IsValid(const char * vr);
-  static bool IsValid(const char * vr1, VRType vr2);
-  static bool IsSwap (const char * vr);
+  static VRType GetVRTypeFromFile(const char *);
+  static VRType GetVRType(const char *);
+  static const char * GetVRStringFromFile(VRType);
+  static bool IsValid(const char *);
+  static bool IsValid(const char *, VRType);
+  static bool IsSwap (const char *);
+
   unsigned int GetLength() const
   {
     return GetLength(VRField);
   }
+
   unsigned int GetSizeof() const;
+
   static unsigned int GetLength(VRType vr)
   {
     if (vr & VL32) return 4;
     return 2;
   }
-  static bool IsBinary(VRType vr);
-  static bool IsASCII(VRType vr);
-  static bool IsBinary2(VRType vr);
-  static bool IsASCII2(VRType vr);
+
+  static bool IsBinary(VRType);
+  static bool IsASCII(VRType);
+  static bool IsBinary2(VRType);
+  static bool IsASCII2(VRType);
+
   VR(VRType vr = INVALID):VRField(vr) {}
-  std::istream &Read(std::istream &is)
+
+  std::istream & Read(std::istream & is)
   {
     char vr[2];
     is.read(vr, 2);
@@ -152,7 +159,7 @@ public:
     return is;
   }
 
-  const std::ostream &Write(std::ostream &os) const
+  const std::ostream & Write(std::ostream & os) const
   {
     VRType vrfield = VRField;
     mdcmAssertAlwaysMacro( !IsDual() );
@@ -167,15 +174,14 @@ public:
     }
     return os;
   }
-  friend std::ostream &operator<<(std::ostream &os, const VR &vr);
+
   operator VRType () const { return VRField; }
   unsigned int GetSize() const;
-  bool Compatible(VR const &vr) const;
+  bool Compatible(VR const &) const;
   bool IsVRFile() const;
   bool IsDual() const;
-
 private:
-  static unsigned int GetIndex(VRType vr);
+  static unsigned int GetIndex(VRType);
   VRType VRField;
 };
 
@@ -200,6 +206,7 @@ struct UI
   char Internal[64+1];
   friend std::ostream& operator<<(std::ostream &_os, const UI &_val);
 };
+
 inline std::ostream& operator<<(std::ostream &_os, const UI &_val)
 {
   _os << _val.Internal;

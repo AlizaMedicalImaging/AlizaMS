@@ -66,9 +66,9 @@ public:
   std::string GetString(const DataElement &, const DataSet &, const bool, const Dict &) const;
   // struct to map a filename to a value
   // Implementation note:
-  // all std::map in this class will be using const char * and not std::string
-  // since we are pointing to existing std::string (hold in a std::vector)
-  // this avoid an extra copy of the byte array.
+  // all std::map in this class will be using const char * and
+  // not std::string since we are pointing to existing std::string
+  // (hold in a std::vector), this avoid an extra copy of the byte array.
   // Tag are used as Tag class since sizeof(tag) <= sizeof(pointer)
   typedef std::map<Tag, const char *> TagToValue;
   typedef std::map<const char *, TagToValue, ltstr> MappingType;
@@ -90,16 +90,14 @@ public:
   const MappingType & GetMappings() const { return Mappings; }
   const TagToValue & GetMapping(const char *) const;
   const char * GetFilenameFromTagToValue(const Tag &, const char *) const;
-  std::vector<std::string> GetAllFilenamesFromTagToValue(const Tag &, const char *) const;
-  const TagToValue & GetMappingFromTagToValue(const Tag &, const char *) const;
+  std::vector<std::string> GetAllFilenamesFromTagToValue(
+    const Tag &, const char *) const;
+  const TagToValue & GetMappingFromTagToValue(
+    const Tag &, const char *) const;
   static SmartPointer<Scanner> New() { return new Scanner; }
-#if 0
-  void Print(std::ostream &) const;
-#endif
-
+  void Print(std::ostream &) const override;
 protected:
   void ProcessPublicTag(const char *, const File &, const Dict &);
-
 private:
   std::set<Tag> Tags;
   ValuesType Values;

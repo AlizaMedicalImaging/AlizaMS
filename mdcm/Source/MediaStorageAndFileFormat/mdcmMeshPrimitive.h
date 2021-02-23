@@ -36,58 +36,46 @@ namespace mdcm
 class MDCM_EXPORT MeshPrimitive : public Object
 {
 public:
-
   typedef std::vector< DataElement > PrimitivesData;
+/**
+  * This enumeration defines primitive types.
+  * PS 3.3 C.27.4.1
+  */
+  typedef enum
+  {
+    VERTEX = 0,
+    EDGE,
+    TRIANGLE,
+    TRIANGLE_STRIP,
+    TRIANGLE_FAN,
+    LINE,
+    FACET,
+    MPType_END
+  } MPType;
 
-  /**
-    * This enumeration defines primitive types.
-    * PS 3.3 C.27.4.1
-    */
-    typedef enum {
-        VERTEX = 0,
-        EDGE,
-        TRIANGLE,
-        TRIANGLE_STRIP,
-        TRIANGLE_FAN,
-        LINE,
-        FACET,
-        MPType_END
-        } MPType;
-
-    static const char * GetMPTypeString(const MPType type);
-
-    static MPType GetMPType(const char * type);
-
-    MeshPrimitive();
-
-    virtual ~MeshPrimitive();
-
-    MPType GetPrimitiveType() const;
-    void SetPrimitiveType(const MPType type);
-
-    const DataElement & GetPrimitiveData() const;
-    DataElement & GetPrimitiveData();
-    void SetPrimitiveData(DataElement const & de);
-
-    const PrimitivesData & GetPrimitivesData() const;
-    PrimitivesData & GetPrimitivesData();
-    void SetPrimitivesData(PrimitivesData const & DEs);
-
-    const DataElement & GetPrimitiveData(const unsigned int idx) const;
-    DataElement & GetPrimitiveData(const unsigned int idx);
-    void SetPrimitiveData(const unsigned int idx, DataElement const & de);
-    void AddPrimitiveData(DataElement const & de);
-
-    unsigned int GetNumberOfPrimitivesData() const;
-
+  static const char * GetMPTypeString(const MPType);
+  static MPType GetMPType(const char *);
+  MeshPrimitive();
+  virtual ~MeshPrimitive();
+  MPType GetPrimitiveType() const;
+  void SetPrimitiveType(const MPType);
+  const DataElement & GetPrimitiveData() const;
+  DataElement & GetPrimitiveData();
+  void SetPrimitiveData(DataElement const &);
+  const PrimitivesData & GetPrimitivesData() const;
+  PrimitivesData & GetPrimitivesData();
+  void SetPrimitivesData(PrimitivesData const &);
+  const DataElement & GetPrimitiveData(const unsigned int) const;
+  DataElement & GetPrimitiveData(const unsigned int);
+  void SetPrimitiveData(const unsigned int, DataElement const &);
+  void AddPrimitiveData(DataElement const &);
+  unsigned int GetNumberOfPrimitivesData() const;
 protected:
-
-    // Use to define tag where PrimitiveData will be put.
-    MPType          PrimitiveType;
-
-    // PrimitiveData contains point index list.
-    // It shall have 1 or 1-n DataElement following PrimitiveType.
-    PrimitivesData  PrimitiveData;
+  // Use to define tag where PrimitiveData will be put.
+  MPType PrimitiveType;
+  // PrimitiveData contains point index list.
+  // It shall have 1 or 1-n DataElement following PrimitiveType.
+  PrimitivesData PrimitiveData;
 };
 
 }

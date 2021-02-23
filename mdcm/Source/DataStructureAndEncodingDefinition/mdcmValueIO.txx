@@ -33,7 +33,8 @@ namespace mdcm
 {
 
 template <typename TDE, typename TSwap, typename TType>
-std::istream & ValueIO<TDE,TSwap,TType>::Read(std::istream & is, Value & _v, bool readvalues)
+std::istream & ValueIO<TDE,TSwap,TType>::Read(
+  std::istream & is, Value & _v, bool readvalues)
 {
     Value * v = &_v;
     if(ByteValue * bv = dynamic_cast<ByteValue*>(v))
@@ -56,7 +57,8 @@ std::istream & ValueIO<TDE,TSwap,TType>::Read(std::istream & is, Value & _v, boo
 }
 
 template <typename DE, typename TSwap, typename TType>
-const std::ostream & ValueIO<DE,TSwap,TType>::Write(std::ostream & os, const Value & _v)
+const std::ostream & ValueIO<DE,TSwap,TType>::Write(
+  std::ostream & os, const Value & _v)
 {
     const Value * v = &_v;
     if(const ByteValue * bv = dynamic_cast<const ByteValue*>(v))

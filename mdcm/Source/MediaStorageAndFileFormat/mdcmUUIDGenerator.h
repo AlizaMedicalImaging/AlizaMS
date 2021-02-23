@@ -31,7 +31,7 @@ class MDCM_EXPORT UUIDGenerator
 {
 public:
   const char * Generate(); // Not thread safe
-  static bool IsValid(const char * uid);
+  static bool IsValid(const char *);
 
 private:
   std::string Unique;

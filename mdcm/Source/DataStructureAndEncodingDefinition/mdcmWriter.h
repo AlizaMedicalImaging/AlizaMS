@@ -53,36 +53,24 @@ class FileMetaInformation;
  */
 class MDCM_EXPORT Writer
 {
+friend class StreamImageWriter;
 public:
   Writer();
   virtual ~Writer();
   virtual bool Write();
-  void SetFileName(const char * filename_native);
-  void SetStream(std::ostream &output_stream)
-  {
-    Stream = &output_stream;
-  }
-  void SetFile(const File & f) { F = f; }
-  File &GetFile() { return *F; }
-  void SetCheckFileMetaInformation(bool b) { CheckFileMetaInformation = b; }
-  void CheckFileMetaInformationOff() { CheckFileMetaInformation = false; }
-  void CheckFileMetaInformationOn() { CheckFileMetaInformation = true; }
-
+  void SetFileName(const char *);
+  void SetStream(std::ostream &);
+  void SetFile(const File &);
+  File & GetFile();
+  void SetCheckFileMetaInformation(bool);
+  void CheckFileMetaInformationOff();
+  void CheckFileMetaInformationOn();
 protected:
-  void SetWriteDataSetOnly(bool b) { WriteDataSetOnly = b; }
-
-protected:
-  friend class StreamImageWriter;
-  //this function is added for the StreamImageWriter, which needs to write
-  //up to the pixel data and then stops right before writing the pixel data.
-  //after that, for the raw codec at least, zeros are written for the length of the data
-  std::ostream * GetStreamPtr() const { return Stream; }
-
-protected:
+  void SetWriteDataSetOnly(bool);
+  std::ostream * GetStreamPtr() const;
+  bool GetCheckFileMetaInformation() const;
   std::ostream * Stream;
   std::ofstream * Ofstream;
-  bool GetCheckFileMetaInformation() const { return CheckFileMetaInformation; }
-
 private:
   SmartPointer<File> F;
   bool CheckFileMetaInformation;

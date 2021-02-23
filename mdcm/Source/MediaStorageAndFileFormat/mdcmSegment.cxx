@@ -56,9 +56,9 @@ Segment::ALGOType Segment::GetALGOType(const char * type)
       return (ALGOType)i;
     }
   }
-  //  We did not find anything, that's pretty bad, let's hope that
-  // the toolkit which wrote the image is buggy and tolerate space padded binary
-  // string
+  // Did not find anything, that's pretty bad, let's hope that
+  // the toolkit which wrote the image is buggy and tolerate space
+  // padded binary string.
   CodeString codestring = strClear;
   std::string cs = codestring.GetAsString();
   for(unsigned int i = 0; ALGOTypeStrings[i] != 0; ++i)

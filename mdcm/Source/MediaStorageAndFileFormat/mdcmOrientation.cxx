@@ -36,17 +36,59 @@ static const char * OrientationStrings[] =
   NULL
 };
 
+// http://public.kitware.com/pipermail/insight-users/2005-March/012246.html
+// 0.5477 would be the square root of 1 (unit vector sum of squares)
+// divided by 3 (oblique axes - a "double" oblique)
+// 0.7071 would be the square root of 1 (unit vector sum of squares)
+// divided by 2 (oblique axes)
+double Orientation::ObliquityThresholdCosineValue = 0.8;
+
 Orientation::Orientation() {}
+
 Orientation::~Orientation() {}
 
-// http://public.kitware.com/pipermail/insight-users/2005-March/012246.html
-// 0.5477 would be the square root of 1 (unit vector sum of squares) divided by 3 (oblique axes - a "double" oblique)
-// 0.7071 would be the square root of 1 (unit vector sum of squares) divided by 2 (oblique axes)
-double Orientation::ObliquityThresholdCosineValue = 0.8;
+Orientation::OrientationType Orientation::GetType(const double dircos[6])
+{
+  OrientationType type = Orientation::UNKNOWN;
+  if(dircos)
+  {
+    const char rowAxis = GetMajorAxisFromPatientRelativeDirectionCosine(dircos[0],dircos[1],dircos[2]);
+    const char colAxis = GetMajorAxisFromPatientRelativeDirectionCosine(dircos[3],dircos[4],dircos[5]);
+    if(rowAxis != 0 && colAxis != 0)
+    {
+      if((rowAxis == 'R' || rowAxis == 'L') && (colAxis == 'A' || colAxis == 'P')) type = Orientation::AXIAL;
+      else if((colAxis == 'R' || colAxis == 'L') && (rowAxis == 'A' || rowAxis == 'P')) type = Orientation::AXIAL;
+      else if((rowAxis == 'R' || rowAxis == 'L') && (colAxis == 'H' || colAxis == 'F')) type = Orientation::CORONAL;
+      else if((colAxis == 'R' || colAxis == 'L') && (rowAxis == 'H' || rowAxis == 'F')) type = Orientation::CORONAL;
+      else if((rowAxis == 'A' || rowAxis == 'P') && (colAxis == 'H' || colAxis == 'F')) type = Orientation::SAGITTAL;
+      else if((colAxis == 'A' || colAxis == 'P') && (rowAxis == 'H' || rowAxis == 'F')) type = Orientation::SAGITTAL;
+    }
+    else
+    {
+      type = Orientation::OBLIQUE;
+    }
+  }
+  return type;
+}
+
+void Orientation::SetObliquityThresholdCosineValue(double val)
+{
+  Orientation::ObliquityThresholdCosineValue = val;
+}
+
+double Orientation::GetObliquityThresholdCosineValue()
+{
+  return Orientation::ObliquityThresholdCosineValue;
+}
+
+const char * Orientation::GetLabel(OrientationType type)
+{
+  return OrientationStrings[type];
+}
 
 void Orientation::Print(std::ostream & os) const
 {
-  os << "ObliquityThresholdCosineValue: " << ObliquityThresholdCosineValue;
+  os << "Obliquity threshold cosine value: " << ObliquityThresholdCosineValue;
 }
 
 char Orientation::GetMajorAxisFromPatientRelativeDirectionCosine(double x, double y, double z)
@@ -78,45 +120,6 @@ char Orientation::GetMajorAxisFromPatientRelativeDirectionCosine(double x, doubl
     ;;
   }
   return axis;
-}
-
-void Orientation::SetObliquityThresholdCosineValue(double val)
-{
-  Orientation::ObliquityThresholdCosineValue = val;
-}
-
-double Orientation::GetObliquityThresholdCosineValue()
-{
-  return Orientation::ObliquityThresholdCosineValue;
-}
-
-Orientation::OrientationType Orientation::GetType(const double dircos[6])
-{
-  OrientationType type = Orientation::UNKNOWN;
-  if(dircos)
-  {
-    const char rowAxis = GetMajorAxisFromPatientRelativeDirectionCosine(dircos[0],dircos[1],dircos[2]);
-    const char colAxis = GetMajorAxisFromPatientRelativeDirectionCosine(dircos[3],dircos[4],dircos[5]);
-    if (rowAxis != 0 && colAxis != 0)
-    {
-      if      ((rowAxis == 'R' || rowAxis == 'L') && (colAxis == 'A' || colAxis == 'P')) type = Orientation::AXIAL;
-      else if ((colAxis == 'R' || colAxis == 'L') && (rowAxis == 'A' || rowAxis == 'P')) type = Orientation::AXIAL;
-      else if ((rowAxis == 'R' || rowAxis == 'L') && (colAxis == 'H' || colAxis == 'F')) type = Orientation::CORONAL;
-      else if ((colAxis == 'R' || colAxis == 'L') && (rowAxis == 'H' || rowAxis == 'F')) type = Orientation::CORONAL;
-      else if ((rowAxis == 'A' || rowAxis == 'P') && (colAxis == 'H' || colAxis == 'F')) type = Orientation::SAGITTAL;
-      else if ((colAxis == 'A' || colAxis == 'P') && (rowAxis == 'H' || rowAxis == 'F')) type = Orientation::SAGITTAL;
-    }
-    else
-    {
-      type = Orientation::OBLIQUE;
-    }
-  }
-  return type;
-}
-
-const char * Orientation::GetLabel(OrientationType type)
-{
-  return OrientationStrings[type];
 }
 
 }

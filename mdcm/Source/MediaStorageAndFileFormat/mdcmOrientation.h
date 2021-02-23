@@ -32,12 +32,10 @@ namespace mdcm
  */
 class MDCM_EXPORT Orientation
 {
-  friend std::ostream& operator<<(std::ostream &, const Orientation &);
-
+friend std::ostream& operator<<(std::ostream &, const Orientation &);
 public:
   Orientation();
   ~Orientation();
-  void Print(std::ostream &) const;
   typedef enum
   {
     UNKNOWN,
@@ -50,10 +48,10 @@ public:
   static void SetObliquityThresholdCosineValue(double);
   static double GetObliquityThresholdCosineValue();
   static const char * GetLabel(OrientationType);
-
+  void Print(std::ostream &) const;
 protected:
-  static char GetMajorAxisFromPatientRelativeDirectionCosine(double, double, double);
-
+  static char GetMajorAxisFromPatientRelativeDirectionCosine(
+    double, double, double);
 private:
   static double ObliquityThresholdCosineValue;
 };

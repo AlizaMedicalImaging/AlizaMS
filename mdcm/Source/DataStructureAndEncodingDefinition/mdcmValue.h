@@ -43,7 +43,6 @@ public:
   virtual void SetLength(VL) = 0;
   virtual void Clear() = 0;
   virtual bool operator==(const Value &) const = 0;
-
 protected:
   friend class DataElement;
   virtual void SetLengthOnly(VL);

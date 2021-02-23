@@ -71,7 +71,8 @@ const char * PhotometricInterpretation::GetPIString(PIType pi)
   return PIStrings[pi];
 }
 
-PhotometricInterpretation::PIType PhotometricInterpretation::GetPIType(const char *inputpi)
+PhotometricInterpretation::PIType PhotometricInterpretation::GetPIType(
+  const char * inputpi)
 {
   if(!inputpi) return PI_END;
   // Handle whitespace and invalid padding
@@ -102,9 +103,9 @@ PhotometricInterpretation::PIType PhotometricInterpretation::GetPIType(const cha
   return PI_END;
 }
 
-bool PhotometricInterpretation::IsRetired(PIType pi)
+const char * PhotometricInterpretation::GetString() const
 {
-  return pi == HSV || pi == ARGB || pi == CMYK;
+  return PhotometricInterpretation::GetPIString(PIField);
 }
 
 unsigned short PhotometricInterpretation::GetSamplesPerPixel() const
@@ -113,7 +114,9 @@ unsigned short PhotometricInterpretation::GetSamplesPerPixel() const
   {
     return 0;
   }
-  else if(PIField == MONOCHROME1 || PIField == MONOCHROME2 || PIField == PALETTE_COLOR)
+  else if(PIField == MONOCHROME1 ||
+          PIField == MONOCHROME2 ||
+          PIField == PALETTE_COLOR)
   {
     return 1;
   }
@@ -157,9 +160,9 @@ bool PhotometricInterpretation::IsLossless() const
   return false;
 }
 
-const char *PhotometricInterpretation::GetString() const
+bool PhotometricInterpretation::IsRetired(PIType pi)
 {
-  return PhotometricInterpretation::GetPIString(PIField);
+  return pi == HSV || pi == ARGB || pi == CMYK;
 }
 
 }

@@ -38,10 +38,19 @@ class DataElement;
 class MDCM_EXPORT Overlay : public Object
 {
 public:
+  typedef enum
+  {
+    Invalid  = 0,
+    Graphics = 1,
+    ROI      = 2
+  } OverlayType;
+
   Overlay();
-  ~Overlay();
-  void Print(std::ostream &) const;
+  ~Overlay() override;
+  Overlay(Overlay const &);
+  Overlay & operator=(Overlay const &);
   void Update(const DataElement &);
+  bool GrabOverlayFromPixelData(DataSet const &);
   void SetGroup(unsigned short);
   unsigned short GetGroup() const;
   void SetRows(unsigned short);
@@ -51,18 +60,12 @@ public:
   void SetNumberOfFrames(unsigned int);
   unsigned int GetNumberOfFrames() const;
   void SetDescription(const char *);
-  const char *GetDescription() const;
-  typedef enum
-  {
-    Invalid  = 0,
-    Graphics = 1,
-    ROI      = 2
-  } OverlayType;
+  const char * GetDescription() const;
   void SetType(const char *);
-  const char *GetType() const;
-  OverlayType GetTypeAsEnum() const;
-  static const char *GetOverlayTypeAsString(OverlayType);
+  const char * GetType() const;
+  static const char * GetOverlayTypeAsString(OverlayType);
   static OverlayType GetOverlayTypeFromString(const char *);
+  OverlayType GetTypeAsEnum() const;
   void SetOrigin(const signed short origin[2]);
   const signed short * GetOrigin() const;
   void SetFrameOrigin(unsigned short);
@@ -71,21 +74,19 @@ public:
   unsigned short GetBitsAllocated() const;
   void SetBitPosition(unsigned short);
   unsigned short GetBitPosition() const;
-  void SetOverlay(const char *, size_t);
-  bool GrabOverlayFromPixelData(DataSet const &);
   const ByteValue &GetOverlayData() const; // Not thread safe
   bool IsEmpty() const;
   bool IsZero() const;
   bool IsInPixelData() const;
   void IsInPixelData(bool b);
-  void Decompress(std::ostream &) const;
+  void SetOverlay(const char *, size_t);
   size_t GetUnpackBufferLength() const;
   bool GetUnpackBuffer(char *, size_t) const;
-  Overlay(Overlay const &ov);
-  Overlay &operator=(Overlay const &);
+  void Decompress(std::ostream &) const;
+  void Print(std::ostream &) const override;
 
 private:
-  OverlayInternal *Internal;
+  OverlayInternal * Internal;
 };
 
 } // end namespace mdcm

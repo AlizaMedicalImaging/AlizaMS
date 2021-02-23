@@ -35,6 +35,7 @@ class TransferSyntax;
  */
 class MDCM_EXPORT PhotometricInterpretation
 {
+friend std::ostream& operator<<(std::ostream &, const PhotometricInterpretation &);
 public:
   typedef enum
   {
@@ -57,17 +58,14 @@ public:
 
   PhotometricInterpretation(PIType pi = UNKNOWN) : PIField(pi) {}
   static const char * GetPIString(PIType);
-  const char * GetString() const;
-  //make sure end of string is \0
   static PIType GetPIType(const char *);
-  static bool IsRetired(PIType);
+  const char * GetString() const;
+  unsigned short GetSamplesPerPixel() const;
   bool IsLossy() const;
   bool IsLossless() const;
-  unsigned short GetSamplesPerPixel() const;
-  friend std::ostream& operator<<(std::ostream &, const PhotometricInterpretation &);
+  static bool IsRetired(PIType);
   operator PIType () const { return PIField; }
   PIType GetType() const { return PIField; }
-
 private:
   PIType PIField;
 };

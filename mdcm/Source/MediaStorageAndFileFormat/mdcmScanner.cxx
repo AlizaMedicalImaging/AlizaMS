@@ -403,6 +403,10 @@ void Scanner::Print(std::ostream & os) const
     }
   }
 }
+#else
+void Scanner::Print(std::ostream &) const
+{
+}
 #endif
 
 } // end namespace mdcm

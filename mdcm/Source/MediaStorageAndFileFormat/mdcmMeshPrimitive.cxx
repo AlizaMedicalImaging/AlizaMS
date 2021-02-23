@@ -27,7 +27,8 @@
 namespace mdcm
 {
 
-static const char * MPStrings[] = {
+static const char * MPStrings[] =
+{
   "VERTEX",
   "EDGE",
   "TRIANGLE",
@@ -41,14 +42,14 @@ static const char * MPStrings[] = {
 const char * MeshPrimitive::GetMPTypeString(const MPType type)
 {
   assert(type <= MPType_END);
-  return MPStrings[(int)type];
+  return MPStrings[(unsigned int)type];
 }
 
 MeshPrimitive::MPType MeshPrimitive::GetMPType(const char * type)
 {
   if(!type) return MPType_END;
   // Delete possible space as last character
-  String<>  str( type );
+  String<>  str(type);
   str.Trim();
   std::string typeClearStr = str.Trim();
   const char * typeClear = typeClearStr.c_str();

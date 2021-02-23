@@ -29,41 +29,27 @@ namespace mdcm
 
 class Dicts;
 
-/**
- * FileExplicitFilter class
- * After changing a file from Implicit to Explicit representation (see
- * ImageChangeTransferSyntax) one operation is to make sure the VR of each
- * DICOM attribute are accurate and do match the one from PS 3.6. Indeed when a
- * file is written in Implicit reprensentation, the VR is not stored directly
- * in the file.
- *
- * Changing an implicit dataset to an explicit dataset is NOT a
- * trivial task of simply changing the VR to the dict one:
- *  One has to make sure SQ is properly set
- *  One has to recompute the explicit length SQ
- *  One has to make sure that VR is valid for the encoding
- *  One has to make sure that VR 16bits can store the original value length
- */
 class MDCM_EXPORT FileExplicitFilter
 {
 public:
-  FileExplicitFilter():F(new File),ChangePrivateTags(false),UseVRUN(true),RecomputeItemLength(false),RecomputeSequenceLength(false) {}
+  FileExplicitFilter()
+    :
+    F(new File),
+    ChangePrivateTags(false),
+    UseVRUN(true),
+    RecomputeItemLength(false),
+    RecomputeSequenceLength(false) {}
   ~FileExplicitFilter() {}
-  // Decide whether or not to VR'ify private tags
-  void SetChangePrivateTags(bool b) { ChangePrivateTags = b;}
-  // When VR=16bits in explicit but Implicit has a 32bits length, use VR=UN
-  void SetUseVRUN(bool b) { UseVRUN = b; }
-  // By default set Sequence & Item length to Undefined to avoid recomputing length:
-  void SetRecomputeItemLength(bool b);
-  void SetRecomputeSequenceLength(bool b);
+  void SetChangePrivateTags(bool);
+  void SetUseVRUN(bool);
+  void SetRecomputeItemLength(bool);
+  void SetRecomputeSequenceLength(bool);
+  void SetFile(const File &);
+  File & GetFile();
   bool Change();
-  void SetFile(const File& f) { F = f; }
-  File &GetFile() { return *F; }
-
 protected:
-  bool ProcessDataSet(DataSet &ds, Dicts const & dicts);
   bool ChangeFMI();
-
+  bool ProcessDataSet(DataSet &, Dicts const &);
 private:
   SmartPointer<File> F;
   bool ChangePrivateTags;
