@@ -170,7 +170,6 @@ Segment::BasicCodedEntryVector readCodeSequenceMacroAttributes(const Tag & tag, 
 bool SegmentReader::ReadSegment(const Item & segmentItem, const unsigned int idx)
 {
   SmartPointer< Segment > segment = new Segment;
-
   const DataSet & rootDs    = GetFile().GetDataSet();
   const DataSet & segmentDS = segmentItem.GetNestedDataSet();
   // Segment Number
@@ -243,7 +242,6 @@ bool SegmentReader::ReadSegment(const Item & segmentItem, const unsigned int idx
     {
       mdcmWarningMacro("No Item have been found in Segmented Property Category Code Sequence.");
     }
-
     // Segmented Property Type Code Sequence (Type 1)
     basicCodedEntries = readCodeSequenceMacroAttributes(Tag(0x0062, 0x000F), segmentDS);
     if(!basicCodedEntries.empty())

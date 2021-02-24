@@ -55,7 +55,8 @@ public:
     *
     * Tag(0x0066, 0x000D) and PS 3.3 C.27.1.1.3
     */
-  typedef enum {
+  typedef enum
+  {
     SURFACE = 0,
     WIREFRAME,
     POINTS,
@@ -86,7 +87,7 @@ public:
   unsigned short GetRecommendedDisplayCIELabValue(const unsigned int) const;
   void SetRecommendedDisplayCIELabValue(const unsigned short[3]);
   void SetRecommendedDisplayCIELabValue(const unsigned short, const unsigned int = 0);
-  void SetRecommendedDisplayCIELabValue(const std::vector<unsigned short> &);
+  void SetRecommendedDisplayCIELabValue(const std::vector<unsigned short>&);
   float GetRecommendedPresentationOpacity() const;
   void SetRecommendedPresentationOpacity(const float);
   VIEWType GetRecommendedPresentationType() const;
@@ -125,7 +126,7 @@ public:
    * Pointer is null if undefined
    */
   const float * GetAxisOfRotation() const;
-  void SetAxisOfRotation(const float * axis);
+  void SetAxisOfRotation(const float *);
   /**
    * Pointer is null if undefined
    */
@@ -199,7 +200,7 @@ private:
   float *       VectorAccuracy;
   //0066 0021 OF 1 Vector Coordinate Data
   DataElement   VectorCoordinateData;
-  SmartPointer< MeshPrimitive > Primitive;
+  SmartPointer<MeshPrimitive> Primitive;
 };
 
 }

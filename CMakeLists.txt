@@ -395,6 +395,7 @@ set(MDCM_DSED_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmExplicitImplicitDataElement.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmVR16ExplicitDataElement.cxx)
 
+# Code for segments and surfaces is currently unused
 set(MDCM_MSFF_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmIconImageFilter.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmFileExplicitFilter.cxx
@@ -439,15 +440,15 @@ set(MDCM_MSFF_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPhotometricInterpretation.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPixelFormat.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSegmentedPaletteColorLookupTable.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSegment.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSurface.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmMeshPrimitive.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSegmentWriter.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSurfaceWriter.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSegmentReader.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSurfaceReader.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSurfaceHelper.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSegmentHelper.cxx
+#  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSegment.cxx
+#  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSurface.cxx
+#  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmMeshPrimitive.cxx
+#  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSegmentWriter.cxx
+#  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSurfaceWriter.cxx
+#  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSegmentReader.cxx
+#  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSurfaceReader.cxx
+#  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSurfaceHelper.cxx
+#  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmSegmentHelper.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG2000Codec.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmrle/rle.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmrle/info.cxx
