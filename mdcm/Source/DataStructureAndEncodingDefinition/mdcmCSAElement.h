@@ -35,10 +35,14 @@ namespace mdcm
  */
 class MDCM_EXPORT CSAElement
 {
-friend std::ostream& operator<<(std::ostream &os, const CSAElement &val);
+friend std::ostream& operator<<(std::ostream &, const CSAElement &);
 public:
-  CSAElement(unsigned int kf = 0) : KeyField(kf) {}
-  
+  CSAElement(unsigned int kf = 0)
+    :
+    KeyField(kf),
+    SyngoDTField(0),
+    NoOfItemsField(0) {}
+
   unsigned int GetKey() const { return KeyField; }
 
   void SetKey(unsigned int key) { KeyField = key; }
@@ -87,14 +91,6 @@ public:
   {
     const ByteValue * bv = dynamic_cast<const ByteValue*>(DataField.GetPointer());
     return bv; // Will return NULL if not ByteValue
-  }
-
-  CSAElement(const CSAElement & _val)
-  {
-    if(this != &_val)
-    {
-      *this = _val;
-    }
   }
 
   bool operator<(const CSAElement & de) const

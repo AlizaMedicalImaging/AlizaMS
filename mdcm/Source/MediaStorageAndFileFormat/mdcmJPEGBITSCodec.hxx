@@ -246,7 +246,13 @@ struct my_error_mgr
 class JPEGInternals
 {
 public:
-  JPEGInternals() : cinfo(), jerr(), StateSuspension(0), SampBuffer(NULL) {}
+  JPEGInternals()
+	:
+	cinfo(),
+	cinfo_comp(),
+	jerr(),
+	StateSuspension(0),
+	SampBuffer(NULL) {}
   jpeg_decompress_struct cinfo;
   jpeg_compress_struct cinfo_comp;
   my_error_mgr jerr;

@@ -425,14 +425,35 @@ bool System::ParseDateTime(time_t & timep, long & milliseconds, const char date[
   if ((n = sscanf(date, "%4d%2d%2d%2d%2d%2d",
         &year, &mon, &day, &hour, &min, &sec)) >= 1)
   {
-    switch (n)
+    if(n == 1)
     {
-    case 1: mon = 1;
-    case 2: day = 1;
-    case 3: hour = 0;
-    case 4: min = 0;
-    case 5: sec = 0;
-      break;
+      mon = 1;
+      day = 1;
+      hour = 0;
+      min = 0;
+      sec = 0;
+    }
+    else if(n == 2)
+    {
+      day = 1;
+      hour = 0;
+      min = 0;
+      sec = 0;
+    }
+    else if(n == 3)
+    {
+      hour = 0;
+      min = 0;
+      sec = 0;
+    }
+    else if(n == 4)
+    {
+      min = 0;
+      sec = 0;
+    }
+    else if(n == 5)
+    {
+      sec = 0;
     }
     ptm.tm_year = year - 1900;
     if(mon < 1 || mon > 12) return false;

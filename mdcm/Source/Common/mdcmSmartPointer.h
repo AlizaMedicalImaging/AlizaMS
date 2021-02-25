@@ -46,12 +46,19 @@ namespace mdcm
 template<class ObjectType> class SmartPointer
 {
 public:
-  SmartPointer() : Pointer(0) {}
+  SmartPointer() : Pointer(NULL) {}
 
   SmartPointer(const SmartPointer<ObjectType> & p) : Pointer(p.Pointer)
   {
     Register();
   }
+
+#if 1
+  SmartPointer(SmartPointer<ObjectType> && p) : Pointer(p.Pointer)
+  {
+    p.Pointer = NULL;
+  }
+#endif
 
   SmartPointer(ObjectType * p) : Pointer(p)
   {
@@ -67,7 +74,7 @@ public:
   ~SmartPointer()
   {
     UnRegister();
-    Pointer = 0;
+    Pointer = NULL;
   }
 
   // Overload operator ->
@@ -99,14 +106,18 @@ public:
   {
     // http://www.parashift.com/c++-faq-lite/freestore-mgmt.html#faq-16.22
     // DO NOT CHANGE THE ORDER OF THESE STATEMENTS!
-    // (This order properly handles self-assignment)
-    // (This order also properly handles recursion, e.g., if a ObjectType contains SmartPointer<ObjectType>s)
+    // This order properly handles self-assignment.
+    // This order also properly handles recursion,
+    // e.g. if a ObjectType contains SmartPointer<ObjectType>s)
     if(Pointer != r)
     {
-      ObjectType* old = Pointer;
+      ObjectType * old = Pointer;
       Pointer = r;
       Register();
-      if (old) { old->UnRegister(); }
+      if (old)
+      {
+        old->UnRegister();
+      }
     }
     return *this;
   }
@@ -118,7 +129,10 @@ public:
   }
 
   // Explicit function to retrieve the pointer
-  ObjectType * GetPointer() const { return Pointer; }
+  ObjectType * GetPointer() const
+  {
+    return Pointer;
+  }
 
 private:
   void Register()
