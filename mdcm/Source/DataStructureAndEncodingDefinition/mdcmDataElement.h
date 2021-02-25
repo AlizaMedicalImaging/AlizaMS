@@ -60,6 +60,7 @@ class SequenceOfFragments;
  */
 class MDCM_EXPORT DataElement
 {
+friend std::ostream & operator<<(std::ostream &, const DataElement &);
 public:
   DataElement(const Tag & t = Tag(0), const VL & vl = 0, const VR & vr = VR::INVALID)
     :
@@ -68,7 +69,6 @@ public:
     VRField(vr),
     ValueField(0) {}
   DataElement(const DataElement &);
-  friend std::ostream & operator<<(std::ostream &, const DataElement &);
   const Tag & GetTag() const;
   Tag & GetTag();
   // Need to match Part 6

@@ -1789,9 +1789,7 @@ void MainWindow::change_style(const QString & s)
 		p.setColor(QPalette::Link, Qt::darkBlue);
 		p.setColor(QPalette::Highlight, Qt::lightGray);
 		p.setColor(QPalette::HighlightedText, Qt::black);
-#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
-		QApplication::setStyle(QString("Basic"));
-#elif QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		QApplication::setStyle(QString("Fusion"));
 #else
 		QApplication::setStyle(QString("Plastique"));
@@ -1801,7 +1799,13 @@ void MainWindow::change_style(const QString & s)
 	else
 	{
 		QApplication::setStyle(s);
-		QApplication::setPalette(QApplication::style()->standardPalette());
+		if (!(
+			(s.toUpper() == QString("WINDOWSVISTA")) ||
+			(s.toUpper() == QString("MACOS"))))
+		{
+			QApplication::setPalette(
+				QApplication::style()->standardPalette());
+		}
 	}
 	if (glwidget)         glwidget->update_clear_color();
 	if (graphicswidget_m) graphicswidget_m->update_background_color();

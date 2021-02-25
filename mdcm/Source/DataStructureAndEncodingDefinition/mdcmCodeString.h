@@ -40,18 +40,17 @@ namespace mdcm
  * case CS from there input file without the need to first rewrite them
  * to get rid of invalid character (validation is a different operation from
  * searching, querying).
- * \warning when writing out DICOM file it is highly recommended to perform
+ * Warning: when writing out DICOM file it is highly recommended to perform
  * the IsValid() call, at least to check that the length of the string match
  * the definition in the standard.
  */
 class MDCM_EXPORT CodeString
 {
-  friend std::ostream& operator<< (std::ostream & os, const CodeString & str);
-  friend bool operator==(const CodeString & ref, const CodeString & cs);
-  friend bool operator!=(const CodeString & ref, const CodeString & cs);
-  typedef String<'\\',16> InternalClass;
-
+friend std::ostream& operator<< (std::ostream & os, const CodeString & str);
+friend bool operator==(const CodeString & ref, const CodeString & cs);
+friend bool operator!=(const CodeString & ref, const CodeString & cs);
 public:
+  typedef String<'\\',16> InternalClass;
   typedef InternalClass::value_type             value_type;
   typedef InternalClass::pointer                pointer;
   typedef InternalClass::reference              reference;
@@ -64,16 +63,19 @@ public:
   typedef InternalClass::const_reverse_iterator const_reverse_iterator;
 
   CodeString(): Internal() {}
+
   CodeString(const value_type * s): Internal(s)
   {
     Internal = Internal.Trim();
   }
+
   CodeString(const value_type * s, size_type n): Internal(s, n)
   {
     Internal = Internal.Trim();
   }
+
   CodeString(
-    const InternalClass & s, size_type pos=0, size_type n=InternalClass::npos)
+    const InternalClass & s, size_type pos=0, size_type n = InternalClass::npos)
     :
     Internal(s, pos, n)
   {
@@ -87,7 +89,10 @@ public:
     return Internal;
   }
 
-  size_type Size() const { return Internal.size(); }
+  size_type Size() const
+  {
+    return Internal.size();
+  }
 
 protected:
   std::string TrimInternal() const

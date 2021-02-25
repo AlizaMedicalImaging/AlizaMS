@@ -362,9 +362,7 @@ int main(int argc, char *argv[])
 			p.setColor(QPalette::Link,            Qt::darkBlue);
 			p.setColor(QPalette::Highlight,       Qt::lightGray);
 			p.setColor(QPalette::HighlightedText, Qt::black);
-#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
-			app.setStyle(QString("Basic"));
-#elif QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			app.setStyle(QString("Fusion"));
 #else
 			app.setStyle(QString("Plastique"));
@@ -374,7 +372,12 @@ int main(int argc, char *argv[])
 		else
 		{
 			app.setStyle(saved_style);
-			app.setPalette(app.style()->standardPalette());
+			if (!(
+				(saved_style.toUpper() == QString("WINDOWSVISTA")) ||
+				(saved_style.toUpper() == QString("MACOS"))))
+			{
+				app.setPalette(app.style()->standardPalette());
+			}
 		}
 	}
 	//

@@ -54,7 +54,6 @@ ByteValue::~ByteValue()
   Internal.clear();
 }
 
-
 void ByteValue::PrintASCII(std::ostream &os, VL maxlength) const
 {
   VL length = std::min(maxlength, Length);
