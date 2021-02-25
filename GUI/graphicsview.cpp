@@ -97,6 +97,7 @@ GraphicsView::GraphicsView(GraphicsWidget * p)
 	QPen xpen;
 	xpen.setBrush(QBrush(QColor(255, 0, 0, 255)));
 	xpen.setWidth(0);
+	xpen.setStyle(Qt::DashLine);
 	line_x = new QGraphicsPathItem();
 	line_x->setPen(xpen);
 	line_x->setZValue(1e+19-4);
@@ -105,6 +106,7 @@ GraphicsView::GraphicsView(GraphicsWidget * p)
 	QPen ypen;
 	ypen.setBrush(QBrush(QColor(0, 255, 0, 255)));
 	ypen.setWidth(0);
+	ypen.setStyle(Qt::DashLine);
 	line_y = new QGraphicsPathItem();
 	line_y->setPen(ypen);
 	line_y->setZValue(1e+19-3);
@@ -113,6 +115,7 @@ GraphicsView::GraphicsView(GraphicsWidget * p)
 	QPen zpen;
 	zpen.setBrush(QBrush(QColor(0, 0, 255, 255)));
 	zpen.setWidth(0);
+	zpen.setStyle(Qt::DashLine);
 	line_z = new QGraphicsPathItem();
 	line_z->setPen(zpen);
 	line_z->setZValue(1e+19-2);
