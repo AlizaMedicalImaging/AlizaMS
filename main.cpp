@@ -213,10 +213,14 @@ int main(int argc, char *argv[])
 	if (!metadata_only && !force_disable_opengl)
 	{
 		QSurfaceFormat format;
+#ifdef __APPLE__
+		format.setRenderableType(QSurfaceFormat::OpenGL);
+#else
 #ifdef __arm__
 		format.setRenderableType(QSurfaceFormat::OpenGLES);
 #else
 		format.setRenderableType(QSurfaceFormat::OpenGL);
+#endif
 #endif
 #ifdef USE_CORE_3_2_PROFILE
 #ifdef USE_GL_MAJOR_3_MINOR_2

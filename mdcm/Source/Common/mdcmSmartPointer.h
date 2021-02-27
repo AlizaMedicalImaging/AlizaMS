@@ -53,7 +53,7 @@ public:
     Register();
   }
 
-#if 1
+#if 0
   SmartPointer(SmartPointer<ObjectType> && p) : Pointer(p.Pointer)
   {
     p.Pointer = NULL;
