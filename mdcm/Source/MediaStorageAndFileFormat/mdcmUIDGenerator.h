@@ -34,7 +34,7 @@ public:
   static void SetRoot(const char *);
   static const char * GetRoot();
   const char* Generate();
-  static bool IsValid(const char *);
+  static bool IsValid(const std::string &);
   static const char * GetMDCMUID();
 protected:
   static bool GenerateUUID(unsigned char *);

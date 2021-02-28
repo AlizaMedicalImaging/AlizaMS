@@ -1124,12 +1124,12 @@ static void anonymize_file__(
 	const QString impl_uid_s =
 		QVariant(ALIZAMS_ROOT_UID).toString() +
 		QString(".0.0.0.0.") +
-		QVariant(ALIZAMS_ROOT_UID).toString();
+		QVariant(ALIZAMS_VERSION).toString();
 	impl_uid.SetValue(impl_uid_s.toLatin1().constData());
 	header.Replace(impl_uid.GetAsDataElement());
 
 	QString name_s = QString("AlizaMS ") +
-		QVariant(ALIZAMS_ROOT_UID).toString();
+		QVariant(ALIZAMS_VERSION).toString();
 	if (name_s.length()%2!=0) name_s.append(QString(" "));
 	mdcm::Attribute<0x0002,0x0013, mdcm::VR::SH> impl_name;
 	impl_name.SetValue(name_s.toLatin1().constData());

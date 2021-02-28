@@ -46,26 +46,31 @@ namespace mdcm
 template<class ObjectType> class SmartPointer
 {
 public:
-  SmartPointer() : Pointer(NULL) {}
-
-  SmartPointer(const SmartPointer<ObjectType> & p) : Pointer(p.Pointer)
+  SmartPointer() : Pointer(NULL)
   {
+  }
+
+  SmartPointer(const SmartPointer<ObjectType> & p)
+  {
+    Pointer = p.Pointer;
     Register();
   }
 
 #if 0
-  SmartPointer(SmartPointer<ObjectType> && p) : Pointer(p.Pointer)
+  SmartPointer(SmartPointer<ObjectType> && p)
   {
+    Pointer = p.Pointer;
     p.Pointer = NULL;
   }
 #endif
 
-  SmartPointer(ObjectType * p) : Pointer(p)
+  SmartPointer(ObjectType * p)
   {
+    Pointer = p;
     Register();
   }
 
-  SmartPointer(ObjectType const & p)
+  SmartPointer(const ObjectType & p)
   {
     Pointer = const_cast<ObjectType*>(&p);
     Register();
@@ -96,7 +101,7 @@ public:
   }
 
   // Overload operator assignment.
-  SmartPointer &operator = (SmartPointer const & r)
+  SmartPointer &operator = (const SmartPointer & r)
   {
     return operator = (r.Pointer);
   }
@@ -122,7 +127,7 @@ public:
     return *this;
   }
 
-  SmartPointer &operator = (ObjectType const & r)
+  SmartPointer &operator = (const ObjectType & r)
   {
     ObjectType * tmp = const_cast<ObjectType*>(&r);
     return operator = (tmp);

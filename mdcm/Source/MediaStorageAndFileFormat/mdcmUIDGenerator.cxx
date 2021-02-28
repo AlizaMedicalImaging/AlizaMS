@@ -65,7 +65,6 @@ const char * UIDGenerator::GetRoot()
 
 void UIDGenerator::SetRoot(const char * root)
 {
-  assert(IsValid(root));
   Root = root;
 }
 
@@ -157,7 +156,6 @@ const char * UIDGenerator::Generate()
     }
   }
   Unique += randbytesbuf;
-  assert(IsValid(Unique.c_str()));
   return Unique.c_str();
 }
 
@@ -184,7 +182,7 @@ bool UIDGenerator::GenerateUUID(unsigned char * uuid_data)
   return true;
 }
 
-bool UIDGenerator::IsValid(const char *uid_)
+bool UIDGenerator::IsValid(const std::string & uid)
 {
 /*
   9.1 UID ENCODING RULES
@@ -208,20 +206,21 @@ bool UIDGenerator::IsValid(const char *uid_)
     digits of each component, separators between components,
     and the NULL (00H) padding character if needed.
 */
-  if(!uid_) return false;
-  std::string uid = uid_;
-  if(uid.size() > 64 || uid.empty())
+  if(uid.empty()) return false;
+  const size_t uid_size = uid.size();
+  if(uid_size > 64 || uid_size < 3)
   {
     return false;
   }
-  if(uid[0] == '.' || uid[uid.size()-1] == '.')
+  if(uid[0] == '.' || uid[uid_size-1] == '.')
   {
     return false;
   }
-  if(uid.size() < 3) return false;
-  if(uid[0] == '0' && uid[1] != '.') return false;
-  std::string::size_type i = 0;
-  for(; i < uid.size(); ++i)
+  if(uid[0] == '0' && uid[1] != '.')
+  {
+    return false;
+  }
+  for(size_t i = 0; i < uid_size; ++i)
   {
     // if test is true we are garantee that next char is valid
     // (see previous check)
@@ -229,17 +228,20 @@ bool UIDGenerator::IsValid(const char *uid_)
     {
       // check that next character is neither '0'
       // (except single number) not '.'
-      if(uid[i+1] == '.')
+      if((i + i) < uid_size)
       {
-        return false;
-      }
-      // character is garantee to exist since '.' is not last char
-      else if(uid[i+1] == '0')
-      {
-        // need to check first if we are not at the end of string
-        if(i+2 != uid.size() && uid[i+2] != '.')
+        if(uid[i + 1] == '.')
         {
           return false;
+        }
+        // character is garantee to exist since '.' is not last char
+        else if(((i + 2) < uid_size) && (uid[i + 1] == '0'))
+        {
+          // need to check first if we are not at the end of string
+          if(uid[i + 2] != '.')
+          {
+            return false;
+          }
         }
       }
     }

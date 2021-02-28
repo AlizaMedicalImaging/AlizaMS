@@ -361,9 +361,6 @@ public:
 		bool);
 	static QString read_enhct_info(
 		const mdcm::DataSet&);
-	static void set_rootUID();
-	static bool check_rootUID(
-		const QString&);
 	static void global_force_suppllut(
 		short);
 	//

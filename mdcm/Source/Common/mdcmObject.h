@@ -34,14 +34,25 @@ template<class ObjectType> class SmartPointer;
 
 class MDCM_EXPORT Object
 {
-  template <class ObjectType> friend class SmartPointer;
-  friend std::ostream& operator<<(std::ostream &, const Object &);
-
+friend std::ostream& operator<<(std::ostream &, const Object &);
+template <class ObjectType> friend class SmartPointer;
 public:
-  Object() : ReferenceCount(0) {}
-  virtual ~Object() { assert(ReferenceCount == 0); }
-  Object(const Object&) : ReferenceCount(0) {}
-  void operator=(const Object &) {}
+  Object() : ReferenceCount(0)
+  {
+  }
+
+  virtual ~Object()
+  {
+    assert(ReferenceCount == 0);
+  }
+
+  Object(const Object &) : ReferenceCount(0)
+  {
+  }
+
+  void operator=(const Object &)
+  {
+  }
 
 protected:
   void Register()
@@ -54,8 +65,9 @@ protected:
   {
     assert(ReferenceCount > 0);
     ReferenceCount--;
-    if(!ReferenceCount)
+    if(ReferenceCount <= 0)
     {
+      assert(ReferenceCount == 0);
       delete this;
     }
   }
