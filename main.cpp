@@ -47,7 +47,7 @@
 #endif
 
 #if (defined PRINT_HOST_INFO && PRINT_HOST_INFO==1)
-#include <limits.h>
+#include <climits>
 #endif
 
 #if (defined LOG_STDOUT_TO_FILE && LOG_STDOUT_TO_FILE==1)
