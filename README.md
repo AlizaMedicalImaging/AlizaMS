@@ -3,6 +3,8 @@
 Aliza MS - DICOM Viewer
 =======================
 
+![Youtube Channel](https://www.youtube.com/channel/UCPGvoSYX7PC5XCp-81Q4MAg)
+
 Quick start
 -----------
 
