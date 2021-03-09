@@ -1,12 +1,12 @@
 #include "structures.h"
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-#ifdef ALIZAMS_GL_3_2_CORE
+#ifdef ALIZA_GL_3_2_CORE
 #include "CG/glwidget-qt5-core.h"
 #else
 #include "CG/glwidget-qt5.h"
 #endif
 #else
-#ifdef ALIZAMS_GL_3_2_CORE
+#ifdef ALIZA_GL_3_2_CORE
 #include "CG/glwidget-qt4-core.h"
 #else
 #include "CG/glwidget-qt4.h"

@@ -6,7 +6,7 @@
 #include "alizams_version.h"
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-#ifdef ALIZAMS_GL_3_2_CORE
+#ifdef ALIZA_GL_3_2_CORE
 #include "CG/glwidget-qt5-core.h"
 #else
 #include "CG/glwidget-qt5.h"
@@ -14,7 +14,7 @@
 #include <QSurfaceFormat>
 #else
 #include "CG/glew/include/GL/glew.h"
-#ifdef ALIZAMS_GL_3_2_CORE
+#ifdef ALIZA_GL_3_2_CORE
 #include "CG/glwidget-qt4-core.h"
 #else
 #include "CG/glwidget-qt4.h"
@@ -213,10 +213,14 @@ int main(int argc, char *argv[])
 #endif
 	//
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#ifdef __APPLE__
+	QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
+#else
 #ifdef __arm__
 	QApplication::setAttribute(Qt::AA_UseDesktopOpenGLES);
 #else
 	QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
+#endif
 #endif
 #ifdef USE_SET_DEFAULT_GL_FORMAT
 	if (!metadata_only && !force_disable_opengl)
@@ -233,7 +237,7 @@ int main(int argc, char *argv[])
 #endif
 #ifdef USE_CORE_3_2_PROFILE
 #ifdef USE_GL_MAJOR_3_MINOR_2
-		format.setVersion(3, 2); // may be required sometimes, e.g. Intel on Linux
+		format.setVersion(3, 2); // may be required sometimes
 #endif
 		format.setProfile(QSurfaceFormat::CoreProfile);
 #endif

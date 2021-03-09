@@ -274,7 +274,7 @@ MainWindow::MainWindow(
 		QGLFormat fmt;
 #ifdef USE_CORE_3_2_PROFILE
 #ifdef USE_GL_MAJOR_3_MINOR_2
-		fmt.setVersion(3, 2); // may be required sometimes, e.g. Intel on Linux
+		fmt.setVersion(3, 2); // may be required sometimes
 #endif
 		fmt.setProfile(QGLFormat::CoreProfile);
 #endif

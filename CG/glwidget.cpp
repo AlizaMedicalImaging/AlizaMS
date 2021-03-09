@@ -4,14 +4,14 @@
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #include <QOpenGLContext>
 #include <QSurfaceFormat>
-#ifdef ALIZAMS_GL_3_2_CORE
+#ifdef ALIZA_GL_3_2_CORE
 #include "glwidget-qt5-core.h"
 #else
 #include "glwidget-qt5.h"
 #endif
 #else
 #include <QGLContext>
-#ifdef ALIZAMS_GL_3_2_CORE
+#ifdef ALIZA_GL_3_2_CORE
 #include "glwidget-qt4-core.h"
 #else
 #include "glwidget-qt4.h"

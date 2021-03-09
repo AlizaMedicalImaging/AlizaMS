@@ -1,12 +1,12 @@
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-#ifdef ALIZAMS_GL_3_2_CORE
+#ifdef ALIZA_GL_3_2_CORE
 #include "CG/glwidget-qt5-core.h"
 #else
 #include "CG/glwidget-qt5.h"
 #endif
 #else
-#ifdef ALIZAMS_GL_3_2_CORE
+#ifdef ALIZA_GL_3_2_CORE
 #include "CG/glwidget-qt4-core.h"
 #else
 #include "CG/glwidget-qt4.h"
@@ -614,7 +614,11 @@ template<typename T> int generate_tex3d(
 		std::cout << "gl->isValid()=" << std::endl;
 	}
 #endif
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+	glerror__ = gl->glGetError();
+#else
 	glerror__ = glGetError();
+#endif
 #if 0
 	if (glerror__ != 0)
 	{
@@ -625,7 +629,7 @@ template<typename T> int generate_tex3d(
 #endif
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	gl->glGenTextures(1, &(ivariant->di->cube_3dtex));
-	glBindTexture(GL_TEXTURE_3D, ivariant->di->cube_3dtex);
+	gl->glBindTexture(GL_TEXTURE_3D, ivariant->di->cube_3dtex);
 	switch(ivariant->di->filtering)
 	{
 	case 1: // bilinear
