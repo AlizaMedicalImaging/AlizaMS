@@ -6,22 +6,10 @@
 //
 //
 //
-#ifdef __APPLE__
-
-#define USE_SET_GL_FORMAT
-#ifdef USE_SET_GL_FORMAT
-#define USE_CORE_3_2_PROFILE
-#define USE_GL_MAJOR_3_MINOR_2
-#endif
-
-#else
-
 #define USE_SET_GL_FORMAT
 #ifdef USE_SET_GL_FORMAT
 //#define USE_CORE_3_2_PROFILE
 //#define USE_GL_MAJOR_3_MINOR_2
-#endif
-
 #endif
 //
 //
