@@ -5,9 +5,6 @@
 #include "alizams_version.h"
 #include "mdcmVersion.h"
 #include "itkVersion.h"
-#ifdef __GNUC__
-#include <cpuid.h>
-#endif
 
 AboutWidget::AboutWidget(int w, int h)
 {
@@ -69,18 +66,11 @@ QString AboutWidget::get_build_info()
 #if (defined _MSC_VER)
 	s.append(QString("Visual Studio C++ "));
 	s.append(QVariant(_MSC_VER).toString());
-#elif (defined __GNUC__)
+#elif (defined __VERSION__)
+#ifndef __APPLE__
 	s.append(QString("GCC "));
+#endif
 	s.append(QVariant(__VERSION__).toString());
-#endif
-#ifdef _WIN32
-#ifdef _WIN64
-	s.append(QString(" x86_64"));
-#else
-	s.append(QString(" x86_32"));
-#endif
-#else
-	s.append(QString(" x86_64"));
 #endif
 #if 0
 	s.append(QString("\nMDCM ") +

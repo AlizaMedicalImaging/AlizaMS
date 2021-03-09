@@ -33,11 +33,6 @@
 #include <cstdlib>
 #include "dicomutils.h"
 #include "colorspace/colorspace.h"
-#if (defined  __FreeBSD__)
-#include <sys/sysctl.h>
-#elif (defined  __GNUC__)
-#include <sys/sysinfo.h>
-#endif
 #include "float.h"
 
 typedef Vectormath::Scalar::Vector3 sVector3;

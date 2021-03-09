@@ -21,7 +21,6 @@
 #include "commonutils.h"
 #include <cmath>
 #include <iostream>
-#include "shaders.h"
 #include "luts.h"
 #include "itkSpatialOrientation.h"
 #include "data/cube_data.h"
@@ -31,6 +30,12 @@
 #include "data/lettera_data.h"
 #include "data/letterr_data.h"
 #include "data/letterl_data.h"
+
+#ifdef USE_CORE_3_2_PROFILE
+#include "shaders_core.h"
+#else
+#include "shaders.h"
+#endif
 
 #define FBO_SIZE__0  512
 #define FBO_SIZE__1 1024

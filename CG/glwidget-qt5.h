@@ -1,13 +1,35 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
-//#define USE_SET_GL_FORMAT
+////////////////////////////////////////////
+//
+//
+//
+//
+#ifdef __APPLE__
 
+#define USE_SET_GL_FORMAT
+#ifdef USE_SET_GL_FORMAT
+#define USE_CORE_3_2_PROFILE
+#define USE_GL_MAJOR_3_MINOR_2
+#define USE_SET_DEFAULT_GL_FORMAT
+#endif
+
+#else
+
+//#define USE_SET_GL_FORMAT
 #ifdef USE_SET_GL_FORMAT
 #define USE_CORE_3_2_PROFILE
 #define USE_GL_MAJOR_3_MINOR_2
 //#define USE_SET_DEFAULT_GL_FORMAT
 #endif
+
+#endif
+//
+//
+//
+//
+////////////////////////////////////////////
 
 #include <QtGlobal>
 #include <QOpenGLWidget>

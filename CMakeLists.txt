@@ -490,6 +490,11 @@ if(USE_QT_V_5 OR USE_QT_V_6)
   endif()
 endif()
 
+if(APPLE)
+  find_package(OpenGL REQUIRED)
+  message(STATUS "OpenGL libraries: " ${OPENGL_LIBRARIES})
+endif()
+
 find_package(ITK COMPONENTS
   ITKCommon
   ITKImageFilterBase
@@ -842,7 +847,7 @@ else()
   message(FATAL_ERROR "Can not determine Qt version to use")
 endif()
 
-link_directories("bin")
+link_directories("${CMAKE_CURRENT_BINARY_DIR}/bin")
 
 if(WIN32)
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} opengl32)
@@ -856,7 +861,9 @@ if(WIN32)
     ${ALIZAMS_QRCS_RCC})
   target_link_libraries(alizams ${ALIZAMS_LINK_LIBRARIES} crypt32 rpcrt4)
 else()
-  if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
+  if(APPLE)
+    set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} ${OPENGL_LIBRARIES})
+  elseif(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GLES)
   else()
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GL)
