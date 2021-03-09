@@ -4,15 +4,15 @@
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #include <QOpenGLContext>
 #include <QSurfaceFormat>
-#ifdef __APPLE__
-#include "glwidget-qt5-mac.h"
+#ifdef ALIZAMS_GL_3_2_CORE
+#include "glwidget-qt5-core.h"
 #else
 #include "glwidget-qt5.h"
 #endif
 #else
 #include <QGLContext>
-#ifdef __APPLE__
-#include "glwidget-qt4-mac.h"
+#ifdef ALIZAMS_GL_3_2_CORE
+#include "glwidget-qt4-core.h"
 #else
 #include "glwidget-qt4.h"
 #endif
@@ -226,14 +226,19 @@ GLWidget::GLWidget()
 #ifdef USE_SET_GL_FORMAT
 #ifndef USE_SET_DEFAULT_GL_FORMAT
 	QSurfaceFormat format;
+#ifdef __APPLE__
+	format.setRenderableType(QSurfaceFormat::OpenGL);
+#else
 #ifdef __arm__
 	format.setRenderableType(QSurfaceFormat::OpenGLES);
 #else
 	format.setRenderableType(QSurfaceFormat::OpenGL);
 #endif
+#endif
+
 #ifdef USE_CORE_3_2_PROFILE
 #ifdef USE_GL_MAJOR_3_MINOR_2
-	format.setVersion(3, 2); // may be required sometimes, e.g. Intel on Linux
+	format.setVersion(3, 2); // may be required sometimes
 #endif
 	format.setProfile(QSurfaceFormat::CoreProfile);
 #endif

@@ -7,11 +7,7 @@
 //
 //
 //#define USE_SET_GL_FORMAT
-#ifdef USE_SET_GL_FORMAT
-#define USE_CORE_3_2_PROFILE
-#define USE_GL_MAJOR_3_MINOR_2
 //#define USE_SET_DEFAULT_GL_FORMAT
-#endif
 //
 //
 //
@@ -20,11 +16,7 @@
 
 #include <QtGlobal>
 #include <QOpenGLWidget>
-#ifdef USE_CORE_3_2_PROFILE
-#include <QOpenGLFunctions_3_2_Core>
-#else
 #include <QOpenGLFunctions_3_0>
-#endif
 #include "camera.h"
 #include <QPoint>
 #include <QModelIndex>
@@ -117,11 +109,7 @@ public:
 	qMeshData * mesh_data;
 } ALIGN16_POST;
 
-#ifdef USE_CORE_3_2_PROFILE
-ALIGN16_PRE class GLWidget : public QOpenGLWidget, public QOpenGLFunctions_3_2_Core
-#else
 ALIGN16_PRE class GLWidget : public QOpenGLWidget, public QOpenGLFunctions_3_0
-#endif
 {
 Q_OBJECT
 public:
