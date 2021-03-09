@@ -242,6 +242,7 @@ GLWidget::GLWidget()
 #endif
 	format.setProfile(QSurfaceFormat::CoreProfile);
 #endif
+#if 0
 	format.setRedBufferSize(8);
 	format.setGreenBufferSize(8);
 	format.setBlueBufferSize(8);
@@ -250,6 +251,7 @@ GLWidget::GLWidget()
 	//format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
 	//format.setSwapInterval(0);
 	//format.setSamples(4);
+#endif
 	setFormat(format);
 #endif
 #endif

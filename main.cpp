@@ -237,6 +237,7 @@ int main(int argc, char *argv[])
 #endif
 		format.setProfile(QSurfaceFormat::CoreProfile);
 #endif
+#if 0
 		format.setRedBufferSize(8);
 		format.setGreenBufferSize(8);
 		format.setBlueBufferSize(8);
@@ -245,6 +246,7 @@ int main(int argc, char *argv[])
 		//format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
 		//format.setSwapInterval(0);
 		//format.setSamples(4);
+#endif
 		QSurfaceFormat::setDefaultFormat(format);
 	}
 #endif
