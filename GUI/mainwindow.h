@@ -4,9 +4,17 @@
 #include "ui_mainwindow.h"
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#ifdef __APPLE__
+#include "CG/glwidget-qt5-mac.h"
+#else
 #include "CG/glwidget-qt5.h"
+#endif
+#else
+#ifdef __APPLE__
+#include "CG/glwidget-qt4-mac.h"
 #else
 #include "CG/glwidget-qt4.h"
+#endif
 #include <QGLFormat>
 #endif
 #include <QMainWindow>

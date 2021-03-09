@@ -6,11 +6,19 @@
 #include "alizams_version.h"
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#ifdef __APPLE__
+#include "CG/glwidget-qt5-mac.h"
+#else
 #include "CG/glwidget-qt5.h"
+#endif
 #include <QSurfaceFormat>
 #else
 #include "CG/glew/include/GL/glew.h"
+#ifdef __APPLE__
+#include "CG/glwidget-qt4-mac.h"
+#else
 #include "CG/glwidget-qt4.h"
+#endif
 #endif
 #ifdef TMP_USE_GL_TEST
 #include "CG/testgl.h"

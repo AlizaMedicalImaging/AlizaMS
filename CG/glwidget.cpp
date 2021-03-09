@@ -4,10 +4,18 @@
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #include <QOpenGLContext>
 #include <QSurfaceFormat>
+#ifdef __APPLE__
+#include "glwidget-qt5-mac.h"
+#else
 #include "glwidget-qt5.h"
+#endif
 #else
 #include <QGLContext>
+#ifdef __APPLE__
+#include "glwidget-qt4-mac.h"
+#else
 #include "glwidget-qt4.h"
+#endif
 #endif
 #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
 #include <QOpenGLVersionFunctionsFactory>
