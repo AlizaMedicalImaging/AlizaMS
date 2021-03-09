@@ -48,7 +48,7 @@
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title /></cc:Work></rdf:RDF></metadata><defs
      id="defs3461" /><g
      transform="scale(1.0488406,0.95343372)"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:184.59593201px;line-height:125%;font-family:Helios;-inkscape-font-specification:Helios;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:184.59593201px;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
      id="text3770"><path
        d="m 45.215628,223.9632 h 53.53282 c 43.933792,0 57.040142,-38.76518 57.040142,-68.85429 0,-38.58051 -21.41316,-65.162361 -56.301758,-65.162361 H 45.215628 V 223.9632 M 63.306029,105.45261 h 33.781056 c 24.551235,0 40.057315,16.98286 40.057315,50.76388 0,33.78102 -15.32148,52.24065 -38.765144,52.24065 H 63.306029 V 105.45261"
        id="path3777"

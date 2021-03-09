@@ -45,7 +45,7 @@
          rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title /></cc:Work></rdf:RDF></metadata><defs
    id="defs3461" /><text
    xml:space="preserve"
-   style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+   style="font-style:normal;font-weight:normal;line-height:0%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
    x="153.40622"
    y="297.99832"
    id="text3876"><tspan
@@ -53,10 +53,10 @@
      id="tspan3878"
      x="153.40622"
      y="297.99832"
-     style="font-size:40px;line-height:1.25;font-family:sans-serif"> </tspan></text>
+     style="font-size:40px;line-height:1.25"> </tspan></text>
 
 <g
-   style="font-size:288px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#131300;fill-opacity:1;stroke:none;font-family:Helios;-inkscape-font-specification:Helios"
+   style="font-size:288px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#131300;fill-opacity:1;stroke:none"
    id="text3081"
    transform="translate(34.124,32.456)"><path
      d="m 84.691998,179.944 c 0.864,-14.11198 2.592039,-50.4 41.184002,-50.4 29.95197,0 40.32,20.73602 40.32,37.152 0,26.49598 -16.99203,37.44002 -43.488,50.976 -54.719947,28.22397 -66.240004,50.68805 -68.832002,93.6 l 139.680002,0 0,-24.192 -110.880002,0 c 1.151999,-8.06399 11.232028,-26.49601 38.880002,-41.472 50.11195,-27.07197 72,-41.18403 72,-77.76 0,-38.30396 -28.51204,-61.344 -63.936,-61.344 -22.17598,0 -70.560002,6.91207 -70.560002,73.44 l 25.632,0"
