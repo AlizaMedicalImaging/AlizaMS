@@ -1799,9 +1799,11 @@ void MainWindow::change_style(const QString & s)
 	else
 	{
 		QApplication::setStyle(s);
+#if 0
 		if (!(
 			(s.toUpper() == QString("WINDOWSVISTA")) ||
 			(s.toUpper() == QString("MACOS"))))
+#endif
 		{
 			QApplication::setPalette(
 				QApplication::style()->standardPalette());
