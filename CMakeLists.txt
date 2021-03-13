@@ -889,17 +889,16 @@ if(WIN32)
     ${ALIZAMS_QRCS_RCC})
   target_link_libraries(alizams ${ALIZAMS_LINK_LIBRARIES} crypt32 rpcrt4)
 elseif(APPLE)
-  # TODO
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} ${OPENGL_LIBRARIES})
   if(USE_QT_V_4 AND USE_SYSTEM_GLEW_QT4)
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GLEW)
   endif()
-  add_executable(alizams MACOSX_BUNDLE
+  add_executable(AlizaMS MACOSX_BUNDLE
     ${ALIZAMS_SRCS}
     ${ALIZAMS_MOC_SRCS}
     ${ALIZAMS_UIS}
     ${ALIZAMS_QRCS_RCC})
-  target_link_libraries(alizams ${ALIZAMS_LINK_LIBRARIES})
+  target_link_libraries(AlizaMS ${ALIZAMS_LINK_LIBRARIES})
 else()
   if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GLES)

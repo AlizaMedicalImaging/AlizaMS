@@ -1481,16 +1481,14 @@ void BrowserWidget2::readSettings()
 		QApplication::applicationName());
 	settings.setFallbacksEnabled(true);
 #if (defined _WIN32)
-	const QString d = 
-		QString(".") +
-		QString("/") +
-		QString("DICOM");
+	const QString d = QString("./DICOM");
+#elif (defined __APPLE__)
+	const QString d = QString
+		//("/Applications/AlizaMS.app/Content/Resources/DICOM");
+		("/Applications/alizams.app/Contents/Resources/DICOM");
 #else
 	const QString d = 
-		QApplication::applicationDirPath() +
-		QString("/") + QString("..") +
-		QString("/") +
-		QString("DICOM");
+		QApplication::applicationDirPath() + QString("/../DICOM");
 #endif
 	settings.beginGroup(QString("BrowserWidget2"));
 	directory_lineEdit->setText(
@@ -1508,11 +1506,7 @@ void BrowserWidget2::readSettings()
 #else
 	{
 		const QString f1_ =
-			QApplication::applicationDirPath() +
-#ifndef _WIN32
-			QString("/") + QString("..") +
-#endif
-			QString("/") + QString("DICOMDIR");
+			QApplication::applicationDirPath() + QString("/../DICOMDIR");
 		QFileInfo fi1 = QFileInfo(f1_);
 		if (fi1.exists() && fi1.isFile())
 		{
@@ -1522,12 +1516,8 @@ void BrowserWidget2::readSettings()
 		else
 		{
 			const QString f2_ =
-				QApplication::applicationDirPath() +
-#ifndef _WIN32
-				QString("/") + QString("..") +
-#endif
-				QString("/") + QString("DICOM");
-				QFileInfo fi2 = QFileInfo(f2_);
+				QApplication::applicationDirPath() + QString("/../DICOM");
+			QFileInfo fi2 = QFileInfo(f2_);
 			if (fi2.exists() && fi2.isDir())
 			{
 				directory_lineEdit->setText(

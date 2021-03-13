@@ -10,17 +10,17 @@ if [ -d "$dir" ]; then
 fi
 
 # set up your app name, version number, and background image file name
-APP_NAME="alizams"
-VERSION="1.3.1arm64"
-DMG_BACKGROUND_IMG="alizams.png"
+APP_NAME="AlizaMS"
+VERSION="1.3.1_mac_arm64"
+DMG_BACKGROUND_IMG="Background.png"
 
 # you should not need to change these
 APP_EXE="${APP_NAME}.app/Contents/MacOS/${APP_NAME}"
 
-VOL_NAME="${APP_NAME} ${VERSION}"   # volume name will be "SuperCoolApp 1.0.0"
+VOL_NAME="${APP_NAME} ${VERSION}"
 DMG_TMP="${VOL_NAME}-temp.dmg"
-DMG_FINAL="${VOL_NAME}.dmg"         # final DMG name will be "SuperCoolApp 1.0.0.dmg"
-STAGING_DIR="./Install"             # we copy all our stuff into this dir
+DMG_FINAL="${VOL_NAME}.dmg"
+STAGING_DIR="./Install"
 
 # Check the background image DPI and convert it if it isn't 72x72
 _BACKGROUND_IMAGE_DPI_H=`sips -g dpiHeight ${DMG_BACKGROUND_IMG} | grep -Eo '[0-9]+\.[0-9]+'`

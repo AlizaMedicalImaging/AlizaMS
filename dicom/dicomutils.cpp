@@ -10812,6 +10812,7 @@ QString DicomUtils::read_dicom(
 					true);
 				sr->initSR(s1);
 				sr->show();
+				sr->activateWindow();
 				sr->raise();
 			}
 			continue;

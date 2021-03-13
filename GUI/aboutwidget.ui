@@ -44,7 +44,7 @@
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap resource="../alizams.qrc">:/bitmaps/alizams2.svg</pixmap>
+      <pixmap resource="../alizams.qrc">:/bitmaps/alizams2.png</pixmap>
      </property>
      <property name="scaledContents">
       <bool>false</bool>
@@ -151,7 +151,6 @@
   </layout>
  </widget>
  <resources>
-  <include location="../alizams.qrc"/>
   <include location="../alizams.qrc"/>
  </resources>
  <connections/>
