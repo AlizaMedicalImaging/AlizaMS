@@ -9,15 +9,21 @@ if [ -d "$dir" ]; then
   cd "$dir"
 fi
 
-# set up your app name, version number, and background image file name
+#
+#
+#
+#
 APP_NAME="AlizaMS"
 VERSION="1.3.1_mac_arm64"
 DMG_BACKGROUND_IMG="Background.png"
+#
+#
+#
+#
 
 # you should not need to change these
 APP_EXE="${APP_NAME}.app/Contents/MacOS/${APP_NAME}"
-
-VOL_NAME="${APP_NAME} ${VERSION}"
+VOL_NAME="${APP_NAME}-${VERSION}"
 DMG_TMP="${VOL_NAME}-temp.dmg"
 DMG_FINAL="${VOL_NAME}.dmg"
 STAGING_DIR="./Install"

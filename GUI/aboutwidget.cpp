@@ -72,6 +72,13 @@ QString AboutWidget::get_build_info()
 #endif
 	s.append(QVariant(__VERSION__).toString());
 #endif
+#ifdef __APPLE__
+#if defined __arm64__
+	s.append("\narm64");
+#elif defined __x86_64__
+	s.append("\nx86_64");
+#endif
+#endif
 #if 0
 	s.append(QString("\nMDCM ") +
 		QString::fromLatin1(mdcm::Version::GetVersion()));
