@@ -44,16 +44,16 @@ std::istream &ImplicitDataElement::ReadPreValue(std::istream& is)
 {
   TagField.Read<TSwap>(is);
   // See PS 3.5, 7.1.3 Data Element Structure With Implicit VR
-  // Read Tag
   if(!is)
   {
     if(!is.eof()) // FIXME This should not be needed
+    {
       assert(0 && "Should not happen");
+    }
     return is;
   }
   const Tag itemStartItem(0xfffe,0xe000);
   if(TagField == itemStartItem) return is;
-
   // Read Value Length
   if(!ValueLengthField.Read<TSwap>(is))
   {
@@ -70,10 +70,9 @@ std::istream &ImplicitDataElement::ReadValue(std::istream &is, bool readvalues)
   if(is.eof()) return is;
   const Tag itemStartItem(0xfffe,0xe000);
   assert(TagField != itemStartItem);
-
   /*
-   * technically this should not be needed, but what if an implementor, forgot
-   * to set VL = 0, then we should make sure to exit early
+   * Technically this should not be needed, but what if an implementor, forgot
+   * to set VL = 0, then we should make sure to exit early.
    */
   const Tag itemDelItem(0xfffe,0xe00d);
   if(TagField == itemDelItem)
@@ -122,11 +121,9 @@ std::istream &ImplicitDataElement::ReadValue(std::istream &is, bool readvalues)
       const Tag itemPMSStart2(0x3f3f, 0x3f00);
 #endif
       Tag item;
-      // TODO FIXME
-      // This is pretty dumb to actually read to later on seekg back, why not `peek` directly ?
+      // TODO FIXME why not `peek` directly?
       item.Read<TSwap>(is);
-      // Maybe this code can later be rewritten as I believe that seek back
-      // is very slow
+      // Maybe seek back is slow
       is.seekg(-4, std::ios::cur);
       if(item == itemStart)
       {
@@ -138,8 +135,8 @@ std::istream &ImplicitDataElement::ReadValue(std::istream &is, bool readvalues)
       {
         // MR_Philips_Intera_No_PrivateSequenceImplicitVR.dcm
         mdcmWarningMacro("Illegal Tag for Item starter: " << TagField << " should be: " << itemStart);
-        // TODO: We READ Explicit ok...but we store Implicit!
-        // Indeed when copying the VR will be saved... pretty cool eh?
+        // TODO: We READ Explicit ok... but we store Implicit!
+        // Indeed when copying the VR will be saved.
         ValueField = new SequenceOfItems;
         ValueField->SetLength(ValueLengthField);
         std::streampos start = is.tellg();
@@ -194,8 +191,7 @@ std::istream &ImplicitDataElement::ReadValue(std::istream &is, bool readvalues)
     // thus Theralys started writing illegal DICOM images:
     const Tag theralys1(0x0008,0x0070);
     const Tag theralys2(0x0008,0x0080);
-    if(TagField != theralys1
-     && TagField != theralys2)
+    if(TagField != theralys1 && TagField != theralys2)
     {
       mdcmWarningMacro("GE,13: Replacing VL=0x000d with VL=0x000a, for Tag="
         << TagField << " in order to read a buggy DICOM file.");
@@ -267,7 +263,6 @@ std::istream &ImplicitDataElement::ReadValue(std::istream &is, bool readvalues)
     }
     return is;
   }
-
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
   // dcmtk 3.5.4 is resilient to broken explicit SQ length and will properly
   // recompute it as long as each of the Item lengths are correct
@@ -281,7 +276,6 @@ std::istream &ImplicitDataElement::ReadValue(std::istream &is, bool readvalues)
   assert(ValueLengthField == ValueField->GetLength());
   assert(VRField == VR::INVALID);
 #endif
-
   return is;
 }
 
@@ -298,10 +292,9 @@ std::istream &ImplicitDataElement::ReadValueWithLength(std::istream& is, VL & le
   if(is.eof()) return is;
   const Tag itemStartItem(0xfffe,0xe000);
   if(TagField == itemStartItem) return is;
-
   /*
-   * technically this should not be needed, but what if an implementor, forgot
-   * to set VL = 0, then we should make sure to exit early
+   * Technically this should not be needed, but what if an implementor, forgot
+   * to set VL = 0, then we should make sure to exit early.
    */
   const Tag itemDelItem(0xfffe,0xe00d);
   if(TagField == itemDelItem)
@@ -327,8 +320,6 @@ std::istream &ImplicitDataElement::ReadValueWithLength(std::istream& is, VL & le
   }
   else if(ValueLengthField.IsUndefined())
   {
-    // FIXME what if I am reading the pixel data...
-    //assert(TagField != Tag(0x7fe0,0x0010));
     if(TagField != Tag(0x7fe0,0x0010))
     {
       ValueField = new SequenceOfItems;
@@ -357,11 +348,9 @@ std::istream &ImplicitDataElement::ReadValueWithLength(std::istream& is, VL & le
       const Tag itemPMSStart2(0x3f3f, 0x3f00);
 #endif
       Tag item;
-      // TODO FIXME
-      // This is pretty dumb to actually read to later on seekg back, why not `peek` directly ?
+      // TODO FIXME why not `peek` directly ?
       item.Read<TSwap>(is);
-      // Maybe this code can later be rewritten as I believe that seek back
-      // is very slow
+      // Maybe seek back is slow
       is.seekg(-4, std::ios::cur);
       if(item == itemStart)
       {
@@ -374,7 +363,7 @@ std::istream &ImplicitDataElement::ReadValueWithLength(std::istream& is, VL & le
         // MR_Philips_Intera_No_PrivateSequenceImplicitVR.dcm
         mdcmWarningMacro("Illegal Tag for Item starter: " << TagField << " should be: " << itemStart);
         // TODO: We READ Explicit ok...but we store Implicit !
-        // Indeed when copying the VR will be saved... pretty cool eh ?
+        // Indeed when copying the VR will be saved.
         ValueField = new SequenceOfItems;
         ValueField->SetLength(ValueLengthField); // perform realloc
         std::streampos start = is.tellg();
@@ -391,7 +380,8 @@ std::istream &ImplicitDataElement::ReadValueWithLength(std::istream& is, VL & le
         {
           // MR_ELSCINT1_00e1_1042_SQ_feff_00e0_Item.dcm
           std::streampos current = is.tellg();
-          std::streamoff diff = start - current;//could be bad, if the specific implementation does not support negative streamoff values.
+          //could be bad, if the specific implementation does not support negative streamoff values.
+          std::streamoff diff = start - current;
           is.seekg(diff, std::ios::cur);
           assert(diff == -14);
           ValueIO<ImplicitDataElement,SwapperDoOp>::Read(is,*ValueField,readvalues);
@@ -423,15 +413,14 @@ std::istream &ImplicitDataElement::ReadValueWithLength(std::istream& is, VL & le
     }
   }
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
-  // THE WORST BUG EVER. From GE Workstation
+  // THE WORST BUG EVER. From GE Workstation.
   if(ValueLengthField == 13)
   {
     // Historically mdcm did not enforce proper length
-    // thus Theralys started writing illegal DICOM images:
+    // thus Theralys started writing illegal DICOM images.
     const Tag theralys1(0x0008,0x0070);
     const Tag theralys2(0x0008,0x0080);
-    if(TagField != theralys1
-     && TagField != theralys2)
+    if(TagField != theralys1 && TagField != theralys2)
     {
       mdcmWarningMacro("GE,13: Replacing VL=0x000d with VL=0x000a, for Tag="
         << TagField << " in order to read a buggy DICOM file.");
@@ -503,7 +492,6 @@ std::istream &ImplicitDataElement::ReadValueWithLength(std::istream& is, VL & le
     }
     return is;
   }
-
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
   // dcmtk 3.5.4 is resilient to broken explicit SQ length and will properly recompute it
   // as long as each of the Item lengths are correct
@@ -517,7 +505,6 @@ std::istream &ImplicitDataElement::ReadValueWithLength(std::istream& is, VL & le
   assert(ValueLengthField == ValueField->GetLength());
   assert(VRField == VR::INVALID);
 #endif
-
   return is;
 }
 
@@ -545,7 +532,7 @@ const std::ostream &ImplicitDataElement::Write(std::ostream &os) const
       return os;
     }
   }
-  else // It should be safe to simply use the ValueLengthField as stored:
+  else // It should be safe to simply use the ValueLengthField as stored
   {
     // Do not allow writing file such as: dcm4che_UndefinedValueLengthInImplicitTS.dcm
     if(TagField == Tag(0x7fe0,0x0010) && ValueLengthField.IsUndefined())

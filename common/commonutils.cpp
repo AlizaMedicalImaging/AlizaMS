@@ -1294,7 +1294,8 @@ template<typename T> QString process_dicom_rgb_image(
 	double origin_x, double origin_y, double origin_z,
 	double spacing_x, double spacing_y, double spacing_z,
 	short image_type,
-	bool ybr, bool gen_vertices,
+	bool ybr, int bitsstored,
+	bool gen_vertices,
 	QProgressDialog * pb)
 {
 	if (!buffer)
@@ -1376,15 +1377,13 @@ template<typename T> QString process_dicom_rgb_image(
 						const double Y  = static_cast<double>(p__[j  ]);
 						const double Cb = static_cast<double>(p__[j+1]);
 						const double Cr = static_cast<double>(p__[j+2]);
-						int R = static_cast<int>((Y + 1.402*(Cr-128)) + 0.5);
-						int G = static_cast<int>((Y - (0.114*1.772*(Cb-128) + 0.299*1.402*(Cr-128))/0.587) + 0.5);
-						int B = static_cast<int>((Y + 1.772*(Cb-128)) + 0.5);
-						if (R < 0) { R = 0; }; if (R > 255) { R = 255; }
-						if (G < 0) { G = 0; }; if (G > 255) { G = 255; }
-						if (B < 0) { B = 0; }; if (B > 255) { B = 255; }
-						p[0]=static_cast<typename T::PixelType::ValueType>(R);
-						p[1]=static_cast<typename T::PixelType::ValueType>(G);
-						p[2]=static_cast<typename T::PixelType::ValueType>(B);
+						const int hscale = 1 << (bitsstored - 1);
+						const int R = static_cast<int>(Y + 1.402*(Cr-hscale));
+						const int G = static_cast<int>(Y - (0.114*1.772*(Cb-hscale) + 0.299*1.402*(Cr-hscale))/0.587);
+						const int B = static_cast<int>(Y + 1.772*(Cb-hscale));
+						p[0]=static_cast<typename T::PixelType::ValueType>(R < 0 ? 0 : R);
+						p[1]=static_cast<typename T::PixelType::ValueType>(G < 0 ? 0 : G);
+						p[2]=static_cast<typename T::PixelType::ValueType>(B < 0 ? 0 : B);
 					}
 					else
 					{
@@ -1437,7 +1436,7 @@ template<typename T> QString process_dicom_rgba_image(
 	{
 		*ok = false;
 		return QString(
-			"process_dicom_rgb_image : buffer==NULL");
+			"process_dicom_rgba_image : buffer==NULL");
 	}
 	typename T::RegionType region;
 	typename T::SizeType size;
@@ -3638,6 +3637,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 			pixelformat == mdcm::PixelFormat::INT8)
 		{
 			char * p__;
+			const int bitsstored = pixelformat.GetBitsStored();
 			if (data_size>1)
 			{
 				try
@@ -3691,7 +3691,8 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				origin_x, origin_y, origin_z,
 				spacing_x, spacing_y, spacing_z,
 				14,
-				ybr, geometry_from_image, pb);
+				ybr, bitsstored,
+				geometry_from_image, pb);
 			if (data_size>1) delete [] p__;
 		}
 		else if (
@@ -3699,6 +3700,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 			pixelformat == mdcm::PixelFormat::UINT12)
 		{
 			char * p__;
+			const int bitsstored = pixelformat.GetBitsStored();
 			if (data_size>1)
 			{
 				try
@@ -3752,7 +3754,8 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				origin_x, origin_y, origin_z,
 				spacing_x, spacing_y, spacing_z,
 				11,
-				false, geometry_from_image, pb);
+				ybr, bitsstored,
+				geometry_from_image, pb);
 			if (data_size>1) delete [] p__;
 		}
 		else if (
@@ -3813,7 +3816,8 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				origin_x, origin_y, origin_z,
 				spacing_x, spacing_y, spacing_z,
 				10,
-				false, geometry_from_image, pb);
+				false, 0,
+				geometry_from_image, pb);
 			if (data_size>1) delete [] p__;
 		}
 		else if (pixelformat == mdcm::PixelFormat::FLOAT32)
@@ -3872,7 +3876,8 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				origin_x, origin_y, origin_z,
 				spacing_x, spacing_y, spacing_z,
 				15,
-				false, geometry_from_image, pb);
+				false, 0,
+				geometry_from_image, pb);
 
 			if (data_size>1) delete [] p__;
 		}

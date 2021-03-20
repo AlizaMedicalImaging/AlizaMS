@@ -386,6 +386,14 @@ bool RLECodec::Decode(DataElement const & in, DataElement & out)
 
 bool RLECodec::Code(DataElement const & in, DataElement & out)
 {
+  if(GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422 ||
+     GetPhotometricInterpretation() == PhotometricInterpretation::YBR_ICT ||
+     GetPhotometricInterpretation() == PhotometricInterpretation::YBR_RCT ||
+     GetPhotometricInterpretation() == PhotometricInterpretation::YBR_PARTIAL_420 ||
+     GetPhotometricInterpretation() == PhotometricInterpretation::YBR_PARTIAL_422)
+  {
+    return false;
+  }
   const unsigned int * dims = this->GetDimensions();
   const unsigned int n = 256*256;
   char * outbuf;
@@ -401,9 +409,9 @@ bool RLECodec::Code(DataElement const & in, DataElement & out)
   const char * input = bv->GetPointer();
   const size_t bvl = bv->GetLength();
   const size_t image_len = bvl / dims[2];
-  // If 16bits, need to do the padded composite
+  // If > 8 bits, need to do the padded composite
   char * buffer = NULL;
-  // if rgb (3 comp) need to the planar configuration
+  // if 3 comp. need to the planar configuration
   char * bufferrgb = NULL;
   if(GetPixelFormat().GetBitsAllocated() > 8)
   {
@@ -413,15 +421,6 @@ bool RLECodec::Code(DataElement const & in, DataElement & out)
      GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL)
   {
     bufferrgb = new char[image_len];
-  }
-  else if(GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422 ||
-          GetPhotometricInterpretation() == PhotometricInterpretation::YBR_ICT ||
-          GetPhotometricInterpretation() == PhotometricInterpretation::YBR_RCT ||
-          GetPhotometricInterpretation() == PhotometricInterpretation::YBR_PARTIAL_420 ||
-          GetPhotometricInterpretation() == PhotometricInterpretation::YBR_PARTIAL_422)
-  {
-    bufferrgb = new char[image_len];
-    mdcmWarningMacro("Wrong photometric interpretation");
   }
   unsigned int MaxNumSegments = 1;
   if(GetPixelFormat().GetBitsAllocated() == 8)
@@ -438,17 +437,12 @@ bool RLECodec::Code(DataElement const & in, DataElement & out)
   }
   else
   {
-    delete [] buffer;
-    delete [] bufferrgb;
+    if(buffer) delete [] buffer;
+    if(bufferrgb) delete [] bufferrgb;
     return false;
   }
   if(GetPhotometricInterpretation() == PhotometricInterpretation::RGB ||
-     GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL ||
-     GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422 ||
-     GetPhotometricInterpretation() == PhotometricInterpretation::YBR_ICT ||
-     GetPhotometricInterpretation() == PhotometricInterpretation::YBR_RCT ||
-     GetPhotometricInterpretation() == PhotometricInterpretation::YBR_PARTIAL_420 ||
-     GetPhotometricInterpretation() == PhotometricInterpretation::YBR_PARTIAL_422)
+     GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL)
   {
     MaxNumSegments *= 3;
   }
@@ -577,8 +571,8 @@ bool RLECodec::Code(DataElement const & in, DataElement & out)
         if(llength < 0)
         {
           mdcmErrorMacro("RLE compressor error");
-          delete[] buffer;
-          delete[] bufferrgb;
+          if(buffer) delete[] buffer;
+          if(bufferrgb) delete[] bufferrgb;
           return false;
         }
         assert(llength);
@@ -601,8 +595,8 @@ bool RLECodec::Code(DataElement const & in, DataElement & out)
     sq->AddFragment(frag);
   }
   out.SetValue(*sq);
-  delete [] buffer;
-  delete [] bufferrgb;
+  if(buffer) delete[] buffer;
+  if(bufferrgb) delete[] bufferrgb;
   return true;
 }
 

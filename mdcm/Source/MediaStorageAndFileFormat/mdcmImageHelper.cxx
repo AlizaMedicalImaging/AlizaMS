@@ -2621,6 +2621,23 @@ MediaStorage ImageHelper::ComputeMediaStorageFromModality(const char *modality,
         return MediaStorage::MS_END;
       }
     }
+    // Not valid MultiframeTrueColorSecondaryCaptureImageStorage
+    else if(dimension == 3 &&
+      pixeltype.GetSamplesPerPixel() == 3 &&
+      (  pi == PhotometricInterpretation::RGB
+      || pi == PhotometricInterpretation::YBR_RCT
+      || pi == PhotometricInterpretation::YBR_ICT
+      || pi == PhotometricInterpretation::YBR_FULL) &&
+      pixeltype.GetBitsAllocated() == 16 &&
+      pixeltype.GetPixelRepresentation() == 0)
+    {
+      ms = MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage;
+      if(intercept != 0 || slope != 1)
+      {
+        mdcmDebugMacro("Cannot have shift/scale");
+        return MediaStorage::MS_END;
+      }
+    }
     else
     {
       mdcmDebugMacro("Cannot handle Multi Frame image in SecondaryCaptureImageStorage");

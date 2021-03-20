@@ -80,7 +80,6 @@ std::istream &ExplicitDataElement::ReadPreValue(std::istream &is)
     VRField = VR::INVALID;
     return is;
   }
-
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
   if(TagField == Tag(0x00ff, 0x4aa5))
   {
@@ -242,7 +241,6 @@ std::istream &ExplicitDataElement::ReadValue(std::istream &is, bool readvalues)
   }
   else
   {
-    //assert(TagField != Tag(0x7fe0,0x0010));
     ValueField = new ByteValue;
   }
   // We have the length we should be able to read the value
@@ -325,7 +323,7 @@ std::istream &ExplicitDataElement::ReadValue(std::istream &is, bool readvalues)
     {
       // BUG this should be moved to the ImageReader class, only this class
       // knows what 7fe0 actually is, and should tolerate partial Pixel Data
-      // element...  PMS-IncompletePixelData.dcm
+      // element.  PMS-IncompletePixelData.dcm
       mdcmAlwaysWarnMacro("Pixel Data may be corrupted");
       is.clear();
     }
@@ -345,7 +343,7 @@ std::istream &ExplicitDataElement::ReadValue(std::istream &is, bool readvalues)
   if(SequenceOfItems *sqi = dynamic_cast<SequenceOfItems*>(&GetValue()))
   {
     assert(ValueField->GetLength() == ValueLengthField);
-    // Recompute the total length:
+    // Recompute the total length
     if(!ValueLengthField.IsUndefined())
     {
       // PhilipsInteraSeqTermInvLen.dcm
