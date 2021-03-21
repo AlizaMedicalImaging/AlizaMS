@@ -1803,11 +1803,11 @@ void ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
           DataSet &subds4 = item4.GetNestedDataSet();
           Attribute<0x0008,0x1150> atReferencedSOPClassUID;
           if(ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage)
-            atReferencedSOPClassUID.SetValue("1.2.840.10008.5.1.4.1.1.2.2");
+            atReferencedSOPClassUID.SetValue("1.2.840.10008.5.1.4.1.1.2"); 	
           else if(ms == MediaStorage::LegacyConvertedEnhancedMRImageStorage)
-            atReferencedSOPClassUID.SetValue("1.2.840.10008.5.1.4.1.1.4.4");
+            atReferencedSOPClassUID.SetValue("1.2.840.10008.5.1.4.1.1.4");
           else if(ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
-            atReferencedSOPClassUID.SetValue("1.2.840.10008.5.1.4.1.1.128.1");
+            atReferencedSOPClassUID.SetValue("1.2.840.10008.5.1.4.1.1.128");
           subds4.Replace(atReferencedSOPClassUID.GetAsDataElement());
           Attribute<0x0008,0x1155> atReferencedSOPInstanceUID;
           UIDGenerator gReferencedSOPInstanceUID;
@@ -2080,7 +2080,7 @@ void ImageHelper::SetRescaleInterceptSlopeValue(File & f, const Image & img)
       }
       sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
       sqi->SetLengthToUndefined();
-      if(!sqi->GetNumberOfItems())
+      if(sqi->GetNumberOfItems() < 1)
       {
           Item item; //(Tag(0xfffe,0xe000));
           item.SetVLToUndefined();
@@ -2100,7 +2100,7 @@ void ImageHelper::SetRescaleInterceptSlopeValue(File & f, const Image & img)
       }
       sqi = subds.GetDataElement(tpms).GetValueAsSQ();
       sqi->SetLengthToUndefined();
-      if(!sqi->GetNumberOfItems())
+      if(sqi->GetNumberOfItems() < 1)
       {
           Item item; //(Tag(0xfffe,0xe000));
           item.SetVLToUndefined();
@@ -2248,6 +2248,108 @@ void ImageHelper::SetRescaleInterceptSlopeValue(File & f, const Image & img)
       // In case user decide to override the default
       ds.ReplaceEmpty(at3.GetAsDataElement());
     }
+  }
+}
+
+void ImageHelper::SetVOILUT(File & f, const Image & img)
+{
+  std::string swidth = img.GetWindowWidth();
+  std::string scenter = img.GetWindowCenter();
+  if (swidth.empty() || scenter.empty()) return;
+  std::string sfunc = img.GetWindowFunction();
+  MediaStorage ms;
+  ms.SetFromFile(f);
+  if(!MediaStorage::IsImage(ms)) return;
+  DataSet & ds = f.GetDataSet();
+  // TODO
+  if(ms == MediaStorage::CTImageStorage ||
+     ms == MediaStorage::MRImageStorage ||
+     ms == MediaStorage::PETImageStorage ||
+     ms == MediaStorage::SecondaryCaptureImageStorage)
+  {
+    DataElement center(Tag(0x0028,0x1050));
+    center.SetByteValue(scenter.c_str(), scenter.size());
+	center.SetVR(VR::DS);
+    ds.Replace(center);
+    DataElement width(Tag(0x0028,0x1051));
+    width.SetByteValue(swidth.c_str(), swidth.size());
+	width.SetVR(VR::DS);
+    ds.Replace(width);
+	if (!sfunc.empty())
+    {
+      DataElement func(Tag(0x0028,0x1056));
+      func.SetByteValue(sfunc.c_str(), sfunc.size());
+	  func.SetVR(VR::CS);
+      ds.Replace(func);
+    }
+  }
+  else if(
+    ms == MediaStorage::MultiframeGrayscaleWordSecondaryCaptureImageStorage ||
+    ms == MediaStorage::MultiframeGrayscaleByteSecondaryCaptureImageStorage ||
+    ms == MediaStorage::EnhancedMRImageStorage ||
+    ms == MediaStorage::EnhancedCTImageStorage ||
+    ms == MediaStorage::EnhancedPETImageStorage ||
+    ms == MediaStorage::LegacyConvertedEnhancedMRImageStorage ||
+    ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage ||
+    ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
+  {
+      const Tag t(0x5200,0x9229);
+      SmartPointer<SequenceOfItems> sq;
+      if(!ds.FindDataElement(t))
+      {
+          sq = new SequenceOfItems;
+          DataElement de(t);
+          de.SetVR(VR::SQ);
+          de.SetValue(*sq);
+          de.SetVLToUndefined();
+          ds.Insert(de);
+      }
+      sq = ds.GetDataElement(t).GetValueAsSQ();
+      sq->SetLengthToUndefined();
+      if(sq->GetNumberOfItems() < 1)
+      {
+          Item i;
+          i.SetVLToUndefined();
+          sq->AddItem(i);
+      }
+      Item & i1 = sq->GetItem(1);
+      DataSet & nds = i1.GetNestedDataSet();
+      const Tag t1(0x0028,0x9132);
+      SmartPointer<SequenceOfItems> sq1;
+      if(!nds.FindDataElement(t1))
+      {
+          sq1 = new SequenceOfItems;
+          DataElement de1(t1);
+          de1.SetVR(VR::SQ);
+          de1.SetValue(*sq1);
+          de1.SetVLToUndefined();
+          nds.Insert(de1);
+      }
+      sq1 = nds.GetDataElement(t1).GetValueAsSQ();
+      sq1->SetLengthToUndefined();
+      if(sq1->GetNumberOfItems() < 1)
+      {
+          Item i;
+          i.SetVLToUndefined();
+          sq1->AddItem(i);
+      }
+      Item & i2 = sq1->GetItem(1);
+      DataSet & nds1 = i2.GetNestedDataSet();
+      DataElement center(Tag(0x0028,0x1050));
+      center.SetByteValue(scenter.c_str(), scenter.size());
+	  center.SetVR(VR::DS);
+      nds1.Replace(center);
+      DataElement width(Tag(0x0028,0x1051));
+      width.SetByteValue(swidth.c_str(), swidth.size());
+	  width.SetVR(VR::DS);
+      nds1.Replace(width);
+	  if (!sfunc.empty())
+      {
+        DataElement func(Tag(0x0028,0x1056));
+        func.SetByteValue(sfunc.c_str(), sfunc.size());
+	    func.SetVR(VR::CS);
+        nds1.Replace(func);
+      }
   }
 }
 

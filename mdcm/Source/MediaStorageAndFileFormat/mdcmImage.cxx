@@ -31,13 +31,17 @@
 namespace mdcm
 {
 
-Image::Image() : Spacing(), SC(), Intercept(0), Slope(1)
+Image::Image() : SC(), Intercept(0), Slope(1)
 {
-  Origin.resize(3);
+  Spacing.resize(3, 1);
+  Origin.resize(3, 0);
   DirectionCosines.resize(6);
   DirectionCosines[0] = 1;
+  DirectionCosines[1] = 0;
+  DirectionCosines[2] = 0;
+  DirectionCosines[3] = 0;
   DirectionCosines[4] = 1;
-  Spacing.resize(3, 1);
+  DirectionCosines[5] = 0;
 }
 
 Image::~Image() {}
@@ -170,7 +174,37 @@ double Image::GetSlope() const
   return Slope;
 }
 
-void Image::Print(std::ostream &os) const
+void Image::SetWindowWidth(const std::string & s)
+{
+  WindowWidth = s;
+}
+
+void Image::SetWindowCenter(const std::string & s)
+{
+  WindowCenter = s;
+}
+
+void Image::SetWindowFunction(const std::string & s)
+{
+  WindowFunction = s;
+}
+
+std::string Image::GetWindowWidth() const
+{
+  return WindowWidth;
+}
+
+std::string Image::GetWindowCenter() const
+{
+  return WindowCenter;
+}
+
+std::string Image::GetWindowFunction() const
+{
+  return WindowFunction;
+}
+
+void Image::Print(std::ostream & os) const
 {
   Pixmap::Print(os);
   if(NumberOfDimensions)

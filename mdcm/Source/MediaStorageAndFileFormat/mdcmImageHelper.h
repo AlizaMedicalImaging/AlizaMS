@@ -66,6 +66,7 @@ public:
   static PixelFormat GetPixelFormatValue(const File &);
   static std::vector<double> GetRescaleInterceptSlopeValue(File const &);
   static void SetRescaleInterceptSlopeValue(File &, const Image &);
+  static void SetVOILUT(File &, const Image &);
   static bool GetRealWorldValueMappingContent(
     File const &,
     RealWorldValueMappingContent &);
