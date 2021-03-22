@@ -72,14 +72,23 @@ public:
   double GetIntercept() const;
   void SetSlope(double);
   double GetSlope() const;
+  void SetWindowWidth(const std::string&);
+  void SetWindowCenter(const std::string&);
+  void SetWindowFunction(const std::string&);
+  std::string GetWindowWidth() const;
+  std::string GetWindowCenter() const;
+  std::string GetWindowFunction() const;
   void Print(std::ostream &) const override;
 private:
-  std::vector<double> Spacing;
-  std::vector<double> Origin;
-  std::vector<double> DirectionCosines;
   SwapCode SC;
   double Intercept;
   double Slope;
+  std::vector<double> Spacing;
+  std::vector<double> Origin;
+  std::vector<double> DirectionCosines;
+  std::string WindowWidth;
+  std::string WindowCenter;
+  std::string WindowFunction;
 };
 
 } // end namespace mdcm

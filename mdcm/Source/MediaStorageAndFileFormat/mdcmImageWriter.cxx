@@ -371,6 +371,13 @@ bool ImageWriter::Write()
   {
     ImageHelper::SetOriginValue(ds, pixeldata);
   }
+  // Window
+  if(pi == PhotometricInterpretation::MONOCHROME1 ||
+     pi == PhotometricInterpretation::MONOCHROME2)
+  {
+    ImageHelper::SetVOILUT(GetFile(), pixeldata);
+  }
+  //
   assert(Stream);
   if(!Writer::Write()) return false;
   return true;
