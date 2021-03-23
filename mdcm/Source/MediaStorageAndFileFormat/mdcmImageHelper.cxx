@@ -1,3 +1,5 @@
+// This class must be completely re-written!
+
 /*********************************************************
  *
  * MDCM
@@ -251,7 +253,7 @@ static bool GetSpacingValueFromSequence(const DataSet& ds, const Tag& tfgs, std:
   const Tag tpms(0x0028,0x9110);
   if(!subds.FindDataElement(tpms)) return false;
   SmartPointer<SequenceOfItems> sqi2 = subds.GetDataElement(tpms).GetValueAsSQ();
-  assert(sqi2);
+  if(!(sqi2 && sqi2->GetNumberOfItems() > 0)) return false;
   const Item &item2 = sqi2->GetItem(1);
   const DataSet & subds2 = item2.GetNestedDataSet();
   const Tag tps(0x0028,0x0030);
@@ -356,13 +358,12 @@ std::vector<double> ImageHelper::GetOriginValue(File const & f)
     ori[1] = 0;
     ori[2] = 0;
   }
-  assert(ori.size() == 3);
   return ori;
 }
 
 bool ImageHelper::GetDirectionCosinesFromDataSet(DataSet const & ds, std::vector<double> & dircos)
 {
-  // \precondition: this dataset is not a secondary capture
+  // precondition: this dataset is not a secondary capture
   const Tag timageorientationpatient(0x0020, 0x0037);
   if(ds.FindDataElement(timageorientationpatient))
   {
@@ -456,17 +457,13 @@ std::vector<double> ImageHelper::GetDirectionCosinesValue(File const & f)
     if(ds.FindDataElement(t1))
     {
       SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(t1).GetValueAsSQ();
-      if(sqi && sqi->GetNumberOfItems() >= 1)
+      if(sqi && sqi->GetNumberOfItems() > 0)
       {
-        const Item &item = sqi->GetItem(1);
+        const Item & item = sqi->GetItem(1);
         const DataSet & subds = item.GetNestedDataSet();
-
         dircos.resize(6);
-        bool b2 = ImageHelper::GetDirectionCosinesFromDataSet(subds, dircos);
-        if(b2)
-        {
-        }
-        else
+        const bool b2 = ImageHelper::GetDirectionCosinesFromDataSet(subds, dircos);
+        if(!b2)
         {
           mdcmErrorMacro("Image Orientation (Patient) was not found");
           dircos[0] = 1;
@@ -490,7 +487,6 @@ std::vector<double> ImageHelper::GetDirectionCosinesValue(File const & f)
     dircos[4] = 1;
     dircos[5] = 0;
   }
-  assert(dircos.size() == 6);
   return dircos;
 }
 
@@ -561,41 +557,37 @@ bool GetRescaleInterceptSlopeValueFromDataSet(const DataSet& ds, std::vector<dou
       }
     }
   }
-  return intercept || slope;
+  return (intercept || slope);
 }
 
-
-/// This function returns pixel information about an image from its dataset
-/// That includes samples per pixel and bit depth (in that order)
-/// Returns a PixelFormat
-PixelFormat ImageHelper::GetPixelFormatValue(const File& f)
+PixelFormat ImageHelper::GetPixelFormatValue(const File & f)
 {
   PixelFormat pf;
   const DataSet& ds = f.GetDataSet();
   {
-      Attribute<0x0028,0x0100> at = { 0 };
-      at.SetFromDataSet(ds);
-      pf.SetBitsAllocated(at.GetValue());
+    Attribute<0x0028,0x0100> at = { 0 };
+    at.SetFromDataSet(ds);
+    pf.SetBitsAllocated(at.GetValue());
   }
   {
-      Attribute<0x0028,0x0101> at = { 0 };
-      at.SetFromDataSet(ds);
-      pf.SetBitsStored(at.GetValue());
+    Attribute<0x0028,0x0101> at = { 0 };
+    at.SetFromDataSet(ds);
+    pf.SetBitsStored(at.GetValue());
   }
   {
-      Attribute<0x0028,0x0102> at = { 0 };
-      at.SetFromDataSet(ds);
-      pf.SetHighBit(at.GetValue());
+    Attribute<0x0028,0x0102> at = { 0 };
+    at.SetFromDataSet(ds);
+    pf.SetHighBit(at.GetValue());
   }
   {
-      Attribute<0x0028,0x0103> at = { 0 };
-      at.SetFromDataSet(ds);
-      pf.SetPixelRepresentation(at.GetValue());
+    Attribute<0x0028,0x0103> at = { 0 };
+    at.SetFromDataSet(ds);
+    pf.SetPixelRepresentation(at.GetValue());
   }
   {
-      Attribute<0x0028,0x0002> at = { 1 };
-      at.SetFromDataSet(ds);
-      pf.SetSamplesPerPixel(at.GetValue());
+    Attribute<0x0028,0x0002> at = { 1 };
+    at.SetFromDataSet(ds);
+    pf.SetSamplesPerPixel(at.GetValue());
   }
   return pf;
 
@@ -608,7 +600,6 @@ PixelFormat ImageHelper::GetPixelFormatValue(const File& f)
 std::vector<unsigned int> ImageHelper::GetDimensionsValue(const File& f)
 {
   DataSet const & ds = f.GetDataSet();
-
   MediaStorage ms;
   ms.SetFromFile(f);
   std::vector<unsigned int> theReturn(3);
@@ -638,7 +629,7 @@ std::vector<unsigned int> ImageHelper::GetDimensionsValue(const File& f)
     if(ds.FindDataElement(at.GetTag()))
     {
       const DataElement &de = ds.GetDataElement(at.GetTag());
-      // SIEMENS_MAGNETOM-12-MONO2-Uncompressed.dcm picks VR::SS instead...
+      // SIEMENS_MAGNETOM-12-MONO2-Uncompressed.dcm picks VR::SS instead
       if(at.GetVR().Compatible(de.GetVR()))
       {
         at.SetFromDataSet(ds);
@@ -659,7 +650,7 @@ std::vector<unsigned int> ImageHelper::GetDimensionsValue(const File& f)
   return theReturn;
 }
 
-void ImageHelper::SetDimensionsValue(File& f, const Pixmap & img)
+void ImageHelper::SetDimensionsValue(File & f, const Pixmap & img)
 {
   const unsigned int *dims = img.GetDimensions();
   MediaStorage ms;
@@ -678,7 +669,9 @@ void ImageHelper::SetDimensionsValue(File& f, const Pixmap & img)
     if(img.GetNumberOfDimensions() == 3 && dims[2] > 1)
     {
       if(ms.MediaStorage::GetModalityDimension() > 2)
+      {
         ds.Replace(numframes.GetAsDataElement());
+      }
       else
       {
         mdcmErrorMacro("MediaStorage does not allow 3rd dimension. But value is: " << dims[2]);
@@ -720,9 +713,12 @@ void ImageHelper::SetDimensionsValue(File& f, const Pixmap & img)
     const Tag tfgs(0x5200,0x9230);
     if(ds.FindDataElement(tfgs))
     {
-        SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
-        assert(sqi);
+      SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
+      if(sqi && (sqi->GetNumberOfItems() != dims[2]))
+      {
+        // WTF
         sqi->SetNumberOfItems(dims[2]);
+      }
     }
   }
 }
@@ -733,7 +729,6 @@ std::vector<double> ImageHelper::GetRescaleInterceptSlopeValue(File const & f)
   MediaStorage ms;
   ms.SetFromFile(f);
   const DataSet& ds = f.GetDataSet();
-
   if( ms == MediaStorage::EnhancedCTImageStorage
    || ms == MediaStorage::EnhancedMRImageStorage
    || ms == MediaStorage::EnhancedMRColorImageStorage
@@ -758,7 +753,6 @@ std::vector<double> ImageHelper::GetRescaleInterceptSlopeValue(File const & f)
       return interceptslope;
     }
   }
-
   interceptslope.resize(2);
   interceptslope[0] = 0;
   interceptslope[1] = 1;
@@ -1039,7 +1033,8 @@ std::vector<double> ImageHelper::GetSpacingValue(File const & f)
     return sp;
   }
   Tag spacingtag = GetSpacingTagFromMediaStorage(ms);
-  if(spacingtag != Tag(0xffff,0xffff) && ds.FindDataElement(spacingtag) && !ds.GetDataElement(spacingtag).IsEmpty())
+  if(spacingtag != Tag(0xffff,0xffff) && ds.FindDataElement(spacingtag) &&
+     !ds.GetDataElement(spacingtag).IsEmpty())
   {
     const DataElement& de = ds.GetDataElement(spacingtag);
     const Global &g = GlobalInstance;
@@ -1233,12 +1228,6 @@ void ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spac
 {
   MediaStorage ms;
   ms.SetFromDataSet(ds);
-  if(ms == MediaStorage::SecondaryCaptureImageStorage)
-  {
-    Tag pixelspacing(0x0028,0x0030);
-    Tag imagerpixelspacing(0x0018,0x1164);
-    Tag spacingbetweenslice(0x0018,0x0088);
-  }
   if( ms == MediaStorage::EnhancedCTImageStorage
    || ms == MediaStorage::EnhancedMRImageStorage
    || ms == MediaStorage::EnhancedMRColorImageStorage
@@ -1260,69 +1249,64 @@ void ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spac
    || ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
   {
     {
-        const Tag tfgs(0x5200,0x9229);
-        SmartPointer<SequenceOfItems> sqi;
-        if(!ds.FindDataElement(tfgs))
+      const Tag tfgs(0x5200,0x9229);
+      SmartPointer<SequenceOfItems> sqi;
+      if(!ds.FindDataElement(tfgs))
       {
-          sqi = new SequenceOfItems;
-          DataElement de(tfgs);
-          de.SetVR(VR::SQ);
-          de.SetValue(*sqi);
-          de.SetVLToUndefined();
-          ds.Insert(de);
+        sqi = new SequenceOfItems;
+        DataElement de(tfgs);
+        de.SetVR(VR::SQ);
+        de.SetValue(*sqi);
+        de.SetVLToUndefined();
+        ds.Insert(de);
       }
-        sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
-        sqi->SetLengthToUndefined();
-
-        if(!sqi->GetNumberOfItems())
+      sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
+      sqi->SetLengthToUndefined();
+      if(!sqi->GetNumberOfItems())
       {
-          Item item; //(Tag(0xfffe,0xe000));
-          item.SetVLToUndefined();
-          sqi->AddItem(item);
+        Item item;
+        item.SetVLToUndefined();
+        sqi->AddItem(item);
       }
-        Item &item1 = sqi->GetItem(1);
-        DataSet &subds = item1.GetNestedDataSet();
-        const Tag tpms(0x0028,0x9110);
-        if(!subds.FindDataElement(tpms))
+      Item & item1 = sqi->GetItem(1);
+      DataSet & subds = item1.GetNestedDataSet();
+      const Tag tpms(0x0028,0x9110);
+      SmartPointer<SequenceOfItems> sqi2;
+      if(!subds.FindDataElement(tpms))
       {
-          SmartPointer<SequenceOfItems> sqi2 = new SequenceOfItems;
-          DataElement de(tpms);
-          de.SetVR(VR::SQ);
-          de.SetValue(*sqi2);
-          de.SetVLToUndefined();
-          subds.Insert(de);
+        sqi2 = new SequenceOfItems;
+        DataElement de(tpms);
+        de.SetVR(VR::SQ);
+        de.SetValue(*sqi2);
+        de.SetVLToUndefined();
+        subds.Insert(de);
       }
-
-        sqi = subds.GetDataElement(tpms).GetValueAsSQ();
-        sqi->SetLengthToUndefined();
-
-        if(!sqi->GetNumberOfItems())
+      sqi2 = subds.GetDataElement(tpms).GetValueAsSQ();
+      sqi2->SetLengthToUndefined();
+      if(!sqi2->GetNumberOfItems())
       {
-          Item item; //(Tag(0xfffe,0xe000));
-          item.SetVLToUndefined();
-          sqi->AddItem(item);
+        Item item;
+        item.SetVLToUndefined();
+        sqi2->AddItem(item);
       }
-        Item &item2 = sqi->GetItem(1);
-        DataSet &subds2 = item2.GetNestedDataSet();
-
-        Attribute<0x0018,0x0088> at2;
-        at2.SetValue(SetNDigits(fabs(spacing[2]), 6));
-        Attribute<0x0028,0x0030> at1;
-        at1.SetValue(SetNDigits(spacing[1], 6), 0);
-        at1.SetValue(SetNDigits(spacing[0], 6), 1);
-        Attribute<0x0018,0x0050> at3;
-        at3.SetValue(SetNDigits(fabs(spacing[2]), 6));
-        subds2.Replace(at1.GetAsDataElement());
-        subds2.Replace(at2.GetAsDataElement());
-        subds2.Replace(at3.GetAsDataElement());
-
-/////////////////////////////////////////////////////////////////////
-// TODO
-      if (ms == MediaStorage::LegacyConvertedEnhancedMRImageStorage)
+      Item & item2 = sqi2->GetItem(1);
+      DataSet & subds2 = item2.GetNestedDataSet();
+      Attribute<0x0018,0x0088> at2;
+      at2.SetValue(SetNDigits(fabs(spacing[2]), 6));
+      Attribute<0x0028,0x0030> at1;
+      at1.SetValue(SetNDigits(spacing[1], 6), 0);
+      at1.SetValue(SetNDigits(spacing[0], 6), 1);
+      Attribute<0x0018,0x0050> at3;
+      at3.SetValue(SetNDigits(fabs(spacing[2]), 6));
+      subds2.Replace(at1.GetAsDataElement());
+      subds2.Replace(at2.GetAsDataElement());
+      subds2.Replace(at3.GetAsDataElement());
+      //
+      if(ms == MediaStorage::LegacyConvertedEnhancedMRImageStorage)
       {
-          const Tag tMRImageFrameTypeSequence(0x0018,0x9226);
-          SmartPointer<SequenceOfItems> sqMRImageFrameTypeSequence;
-          if(!subds.FindDataElement(tMRImageFrameTypeSequence))
+        const Tag tMRImageFrameTypeSequence(0x0018,0x9226);
+        SmartPointer<SequenceOfItems> sqMRImageFrameTypeSequence;
+        if(!subds.FindDataElement(tMRImageFrameTypeSequence))
         {
           sqMRImageFrameTypeSequence = new SequenceOfItems;
           DataElement eMRImageFrameTypeSequence(tMRImageFrameTypeSequence);
@@ -1340,7 +1324,7 @@ void ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spac
           item.SetVLToUndefined();
           sqMRImageFrameTypeSequence->AddItem(item);
         }
-        Item    & item3  = sqMRImageFrameTypeSequence->GetItem(1);
+        Item & item3  = sqMRImageFrameTypeSequence->GetItem(1);
         DataSet & subds3 = item3.GetNestedDataSet();
         Attribute<0x0008,0x9007> atFrameType;
         atFrameType.SetValue("DERIVED ",   0);
@@ -1358,7 +1342,7 @@ void ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spac
         atVolumeBasedCalculationTechnique.SetValue("NONE");
         subds3.Replace(atVolumeBasedCalculationTechnique.GetAsDataElement());
       }
-      else if (ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage)
+      else if(ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage)
       {
         const Tag tCTImageFrameTypeSequence(0x0018,0x9329);
         SmartPointer<SequenceOfItems> sqCTImageFrameTypeSequence;
@@ -1380,8 +1364,8 @@ void ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spac
           item.SetVLToUndefined();
           sqCTImageFrameTypeSequence->AddItem(item);
         }
-        Item &item3 = sqCTImageFrameTypeSequence->GetItem(1);
-        DataSet &subds3 = item3.GetNestedDataSet();
+        Item & item3 = sqCTImageFrameTypeSequence->GetItem(1);
+        DataSet & subds3 = item3.GetNestedDataSet();
         Attribute<0x0008,0x9007> atFrameType;
         atFrameType.SetValue("DERIVED ",   0);
         atFrameType.SetValue("PRIMARY ",   1);
@@ -1398,7 +1382,7 @@ void ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spac
         atVolumeBasedCalculationTechnique.SetValue("NONE");
         subds3.Replace(atVolumeBasedCalculationTechnique.GetAsDataElement());
       }
-      else if (ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
+      else if(ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
       {
         const Tag tPTImageFrameTypeSequence(0x0018,0x9751);
         SmartPointer<SequenceOfItems> sqPTImageFrameTypeSequence;
@@ -1438,22 +1422,60 @@ void ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spac
         atVolumeBasedCalculationTechnique.SetValue("NONE");
         subds3.Replace(atVolumeBasedCalculationTechnique.GetAsDataElement());
       }
+      if(ms == MediaStorage::LegacyConvertedEnhancedMRImageStorage ||
+         ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage ||
+         ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
+      {
+        const Tag tUnassignedSharedConvertedAttributesSequence(0x0020,0x9170);
+        if(!subds.FindDataElement(tUnassignedSharedConvertedAttributesSequence))
+        {
+          SmartPointer<SequenceOfItems> sqUnassignedSharedConvertedAttributesSequence =
+           new SequenceOfItems;
+          DataElement eUnassignedSharedConvertedAttributesSequence(
+            tUnassignedSharedConvertedAttributesSequence);
+          eUnassignedSharedConvertedAttributesSequence.SetVR(VR::SQ);
+          eUnassignedSharedConvertedAttributesSequence.SetValue(
+            *sqUnassignedSharedConvertedAttributesSequence);
+          eUnassignedSharedConvertedAttributesSequence.SetVLToUndefined();
+          subds.Insert(eUnassignedSharedConvertedAttributesSequence);
+        }
+        SmartPointer<SequenceOfItems> sqUnassignedSharedConvertedAttributesSequence =
+          subds.GetDataElement(tUnassignedSharedConvertedAttributesSequence).GetValueAsSQ();
+        sqUnassignedSharedConvertedAttributesSequence->SetLengthToUndefined();
+        if(!sqUnassignedSharedConvertedAttributesSequence->GetNumberOfItems())
+        {
+          Item item;
+          item.SetVLToUndefined();
+          sqUnassignedSharedConvertedAttributesSequence->AddItem(item);
+        }
+        Item & item5 = sqUnassignedSharedConvertedAttributesSequence->GetItem(1);
+        DataSet & subds5 = item5.GetNestedDataSet();
+        //
+        DataElement ePrivateCreator(mdcm::Tag(0x4d4f, 0x10));
+        ePrivateCreator.SetByteValue("MDCM CONFORMANCE", 16);
+        ePrivateCreator.SetVR(mdcm::VR::LO);
+        subds5.Insert(ePrivateCreator);
+        mdcm::DataElement dePriv(mdcm::Tag(0x4d4f,0x1013));
+        dePriv.SetByteValue("", 0);
+        dePriv.SetVR(VR::CS);
+        subds5.Insert(dePriv);
+      }
     }
     // Cleanup per frame
     {
-        const Tag tfgs(0x5200,0x9230);
-        if(ds.FindDataElement(tfgs))
+      const Tag tfgs(0x5200,0x9230);
+      if(ds.FindDataElement(tfgs))
       {
-          SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
-          assert(sqi);
-          SequenceOfItems::SizeType nitems = sqi->GetNumberOfItems();
-          for(SequenceOfItems::SizeType i0 = 1; i0 <= nitems; ++i0)
+        SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
+        assert(sqi);
+        SequenceOfItems::SizeType nitems = sqi->GetNumberOfItems();
+        for(SequenceOfItems::SizeType i0 = 1; i0 <= nitems; ++i0)
         {
-            // Get first item:
-            Item &item = sqi->GetItem(i0);
-            DataSet & subds = item.GetNestedDataSet();
-            const Tag tpms(0x0028,0x9110);
-            subds.Remove(tpms);
+          // Get first item:
+          Item &item = sqi->GetItem(i0);
+          DataSet & subds = item.GetNestedDataSet();
+          const Tag tpms(0x0028,0x9110);
+          subds.Remove(tpms);
         }
       }
     }
@@ -1597,7 +1619,8 @@ void ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spac
   }
 }
 
-static void SetDataElementInSQAsItemNumber(DataSet & ds, DataElement const & de, Tag const & sqtag, unsigned int itemidx)
+static void SetDataElementInSQAsItemNumber(
+  DataSet & ds, DataElement const & de, Tag const & sqtag, unsigned int itemidx)
 {
     const Tag tfgs = sqtag;
     SmartPointer<SequenceOfItems> sqi;
@@ -1612,55 +1635,50 @@ static void SetDataElementInSQAsItemNumber(DataSet & ds, DataElement const & de,
     }
     sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
     sqi->SetLengthToUndefined();
-
     if(sqi->GetNumberOfItems() < itemidx)
     {
       Item item;
       item.SetVLToUndefined();
       sqi->AddItem(item);
     }
-    Item &item1 = sqi->GetItem(itemidx);
-    DataSet &subds = item1.GetNestedDataSet();
+    Item & item1 = sqi->GetItem(itemidx);
+    DataSet & subds = item1.GetNestedDataSet();
     const Tag tpms(0x0020,0x9113);
+    SmartPointer<SequenceOfItems> sqi2;
     if(!subds.FindDataElement(tpms))
     {
-      SmartPointer<SequenceOfItems> sqi2 = new SequenceOfItems;
+      sqi2 = new SequenceOfItems;
       DataElement detmp(tpms);
       detmp.SetVR(VR::SQ);
       detmp.SetValue(*sqi2);
       detmp.SetVLToUndefined();
       subds.Insert(detmp);
     }
-    sqi = subds.GetDataElement(tpms).GetValueAsSQ();
-    sqi->SetLengthToUndefined();
-
-    if(!sqi->GetNumberOfItems())
+    sqi2 = subds.GetDataElement(tpms).GetValueAsSQ();
+    sqi2->SetLengthToUndefined();
+    if(sqi2->GetNumberOfItems() < 1)
     {
       Item item;
       item.SetVLToUndefined();
-      sqi->AddItem(item);
+      sqi2->AddItem(item);
     }
-    Item &item2 = sqi->GetItem(1);
-    DataSet &subds2 = item2.GetNestedDataSet();
-
+    Item & item2 = sqi2->GetItem(1);
+    DataSet & subds2 = item2.GetNestedDataSet();
     subds2.Replace(de);
 }
 
 void ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
 {
-  const double *origin = image.GetOrigin();
+  const double * origin = image.GetOrigin();
   MediaStorage ms;
   ms.SetFromDataSet(ds);
   assert(MediaStorage::IsImage(ms));
-
   if(ms == MediaStorage::SecondaryCaptureImageStorage)
   {
     // https://sourceforge.net/p/mdcm/bugs/322/
     // default behavior is simply to pass
     return;
   }
-
-  // FIXME hardcoded
   if( ms != MediaStorage::CTImageStorage
    && ms != MediaStorage::MRImageStorage
    && ms != MediaStorage::RTDoseStorage
@@ -1713,10 +1731,12 @@ void ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
     Attribute<0x0020,0x0032> ipp = {{0,0,0}};
     double zspacing = image.GetSpacing(2);
     unsigned int dimz = image.GetDimension(2);
-    const double *cosines = image.GetDirectionCosines();
+    const double * cosines = image.GetDirectionCosines();
     DirectionCosines dc(cosines);
     double normal[3];
     dc.Cross(normal);
+    const Tag tConversionSourceAttributesSequence(0x0020,0x9172);
+    const Tag tUnassignedPerFrameConvertedAttributesSequence(0x0020,0x9171);
     for(unsigned int i = 0; i < dimz; ++i)
     {
       double new_origin[3];
@@ -1731,15 +1751,15 @@ void ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
       ipp.SetValue(SetNDigits(new_origin[2], 6), 2);
       SetDataElementInSQAsItemNumber(ds, ipp.GetAsDataElement(), tfgs, i+1);
       // Frame Content Sequence
-      if (ms == MediaStorage::LegacyConvertedEnhancedMRImageStorage  ||
-          ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage  ||
-          ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage ||
-          ms == MediaStorage::SegmentationStorage)
+      if(ms == MediaStorage::LegacyConvertedEnhancedMRImageStorage  ||
+         ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage  ||
+         ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage ||
+         ms == MediaStorage::SegmentationStorage)
       {
         SmartPointer<SequenceOfItems> sqi =
           ds.GetDataElement(tfgs).GetValueAsSQ();
         if (!(sqi && sqi->GetNumberOfItems()>0)) continue;
-        Item    & item  = sqi->GetItem(i+1);
+        Item  & item  = sqi->GetItem(i+1);
         DataSet & subds = item.GetNestedDataSet();
         const Tag tFrameContentSequence(0x0020,0x9111);
         if(!subds.FindDataElement(tFrameContentSequence))
@@ -1777,42 +1797,78 @@ void ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
            ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage ||
            ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
         {
-          const Tag tConversionSourceAttributesSequence(0x0020,0x9172);
-          if(!subds.FindDataElement(tConversionSourceAttributesSequence))
           {
+            if(!subds.FindDataElement(tConversionSourceAttributesSequence))
+            {
+              SmartPointer<SequenceOfItems> sqConversionSourceAttributesSequence =
+               new SequenceOfItems;
+              DataElement eConversionSourceAttributesSequence(
+                tConversionSourceAttributesSequence);
+              eConversionSourceAttributesSequence.SetVR(VR::SQ);
+              eConversionSourceAttributesSequence.SetValue(
+                *sqConversionSourceAttributesSequence);
+              eConversionSourceAttributesSequence.SetVLToUndefined();
+              subds.Insert(eConversionSourceAttributesSequence);
+            }
             SmartPointer<SequenceOfItems> sqConversionSourceAttributesSequence =
-             new SequenceOfItems;
-            DataElement eConversionSourceAttributesSequence(
-              tConversionSourceAttributesSequence);
-            eConversionSourceAttributesSequence.SetVR(VR::SQ);
-            eConversionSourceAttributesSequence.SetValue(
-              *sqConversionSourceAttributesSequence);
-            eConversionSourceAttributesSequence.SetVLToUndefined();
-            subds.Insert(eConversionSourceAttributesSequence);
+              subds.GetDataElement(tConversionSourceAttributesSequence).GetValueAsSQ();
+            sqConversionSourceAttributesSequence->SetLengthToUndefined();
+            if(!sqConversionSourceAttributesSequence->GetNumberOfItems())
+            {
+              Item item;
+              item.SetVLToUndefined();
+              sqConversionSourceAttributesSequence->AddItem(item);
+            }
+            Item &item4 = sqConversionSourceAttributesSequence->GetItem(1);
+            DataSet &subds4 = item4.GetNestedDataSet();
+            Attribute<0x0008,0x1150> atReferencedSOPClassUID;
+            if(ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage)
+              atReferencedSOPClassUID.SetValue("1.2.840.10008.5.1.4.1.1.2");
+            else if(ms == MediaStorage::LegacyConvertedEnhancedMRImageStorage)
+              atReferencedSOPClassUID.SetValue("1.2.840.10008.5.1.4.1.1.4");
+            else if(ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
+              atReferencedSOPClassUID.SetValue("1.2.840.10008.5.1.4.1.1.128");
+            subds4.Replace(atReferencedSOPClassUID.GetAsDataElement());
+            Attribute<0x0008,0x1155> atReferencedSOPInstanceUID;
+            UIDGenerator gReferencedSOPInstanceUID;
+            atReferencedSOPInstanceUID.SetValue(gReferencedSOPInstanceUID.Generate());
+            subds4.Replace(atReferencedSOPInstanceUID.GetAsDataElement());
           }
-          SmartPointer<SequenceOfItems> sqConversionSourceAttributesSequence =
-            subds.GetDataElement(tConversionSourceAttributesSequence).GetValueAsSQ();
-          sqConversionSourceAttributesSequence->SetLengthToUndefined();
-          if(!sqConversionSourceAttributesSequence->GetNumberOfItems())
+          //
           {
-            Item item;
-            item.SetVLToUndefined();
-            sqConversionSourceAttributesSequence->AddItem(item);
+            if(!subds.FindDataElement(tUnassignedPerFrameConvertedAttributesSequence))
+            {
+              SmartPointer<SequenceOfItems> sqUnassignedPerFrameConvertedAttributesSequence =
+               new SequenceOfItems;
+              DataElement eUnassignedPerFrameConvertedAttributesSequence(
+                tUnassignedPerFrameConvertedAttributesSequence);
+              eUnassignedPerFrameConvertedAttributesSequence.SetVR(VR::SQ);
+              eUnassignedPerFrameConvertedAttributesSequence.SetValue(
+                *sqUnassignedPerFrameConvertedAttributesSequence);
+              eUnassignedPerFrameConvertedAttributesSequence.SetVLToUndefined();
+              subds.Insert(eUnassignedPerFrameConvertedAttributesSequence);
+            }
+            SmartPointer<SequenceOfItems> sqUnassignedPerFrameConvertedAttributesSequence =
+              subds.GetDataElement(tUnassignedPerFrameConvertedAttributesSequence).GetValueAsSQ();
+            sqUnassignedPerFrameConvertedAttributesSequence->SetLengthToUndefined();
+            if(!sqUnassignedPerFrameConvertedAttributesSequence->GetNumberOfItems())
+            {
+              Item item;
+              item.SetVLToUndefined();
+              sqUnassignedPerFrameConvertedAttributesSequence->AddItem(item);
+            }
+            Item & item5 = sqUnassignedPerFrameConvertedAttributesSequence->GetItem(1);
+            DataSet & subds5 = item5.GetNestedDataSet();
+            //
+            DataElement ePrivateCreator(mdcm::Tag(0x4d4f, 0x10));
+            ePrivateCreator.SetByteValue("MDCM CONFORMANCE", 16);
+            ePrivateCreator.SetVR(mdcm::VR::LO);
+            subds5.Insert(ePrivateCreator);
+            mdcm::DataElement dePriv(mdcm::Tag(0x4d4f,0x1013));
+            dePriv.SetByteValue("", 0);
+            dePriv.SetVR(VR::CS);
+            subds5.Insert(dePriv);
           }
-          Item &item4 = sqConversionSourceAttributesSequence->GetItem(1);
-          DataSet &subds4 = item4.GetNestedDataSet();
-          Attribute<0x0008,0x1150> atReferencedSOPClassUID;
-          if(ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage)
-            atReferencedSOPClassUID.SetValue("1.2.840.10008.5.1.4.1.1.2");
-          else if(ms == MediaStorage::LegacyConvertedEnhancedMRImageStorage)
-            atReferencedSOPClassUID.SetValue("1.2.840.10008.5.1.4.1.1.4");
-          else if(ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
-            atReferencedSOPClassUID.SetValue("1.2.840.10008.5.1.4.1.1.128");
-          subds4.Replace(atReferencedSOPClassUID.GetAsDataElement());
-          Attribute<0x0008,0x1155> atReferencedSOPInstanceUID;
-          UIDGenerator gReferencedSOPInstanceUID;
-          atReferencedSOPInstanceUID.SetValue(gReferencedSOPInstanceUID.Generate());
-          subds4.Replace(atReferencedSOPInstanceUID.GetAsDataElement());
       }
     }
   }
@@ -1826,10 +1882,10 @@ void ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
       SequenceOfItems::SizeType nitems = sqi->GetNumberOfItems();
       for(SequenceOfItems::SizeType i0 = 1; i0 <= nitems; ++i0)
       {
-          Item &item = sqi->GetItem(i0);
-          DataSet & subds = item.GetNestedDataSet();
-          const Tag tpms(0x0020,0x9113);
-          subds.Remove(tpms);
+        Item & item = sqi->GetItem(i0);
+        DataSet & subds = item.GetNestedDataSet();
+        const Tag tpms(0x0020,0x9113);
+        subds.Remove(tpms);
       }
     }
   }
@@ -1841,8 +1897,7 @@ void ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
   // Frame Increment Pointer
   if(  ms == MediaStorage::MultiframeGrayscaleWordSecondaryCaptureImageStorage
     || ms == MediaStorage::MultiframeGrayscaleByteSecondaryCaptureImageStorage
-    || ms == MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage //
-    )
+    || ms == MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage)
   {
     if(dimz > 1)
     {
@@ -1873,7 +1928,6 @@ void ImageHelper::SetDirectionCosinesValue(DataSet & ds, const std::vector<doubl
     // default behavior is simply to pass
     return;
   }
-  // FIXME Hardcoded
   if( ms != MediaStorage::CTImageStorage
    && ms != MediaStorage::MRImageStorage
    && ms != MediaStorage::RTDoseStorage
@@ -1899,7 +1953,6 @@ void ImageHelper::SetDirectionCosinesValue(DataSet & ds, const std::vector<doubl
    && ms != MediaStorage::LegacyConvertedEnhancedCTImageStorage
    && ms != MediaStorage::LegacyConvertedEnhancedPETImageStorage)
   {
-    // FIXME: ? remove the iop tag
     return;
   }
   // Image Orientation Patient
@@ -1944,43 +1997,44 @@ void ImageHelper::SetDirectionCosinesValue(DataSet & ds, const std::vector<doubl
       SmartPointer<SequenceOfItems> sqi;
       if(!ds.FindDataElement(tfgs))
       {
-          sqi = new SequenceOfItems;
-          DataElement de(tfgs);
-          de.SetVR(VR::SQ);
-          de.SetValue(*sqi);
-          de.SetVLToUndefined();
-          ds.Insert(de);
+        sqi = new SequenceOfItems;
+        DataElement de(tfgs);
+        de.SetVR(VR::SQ);
+        de.SetValue(*sqi);
+        de.SetVLToUndefined();
+        ds.Insert(de);
       }
       sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
       sqi->SetLengthToUndefined();
-      if(!sqi->GetNumberOfItems())
+      if(sqi->GetNumberOfItems() < 1)
       {
-          Item item;
-          item.SetVLToUndefined();
-          sqi->AddItem(item);
+        Item item;
+        item.SetVLToUndefined();
+        sqi->AddItem(item);
       }
-      Item &item1 = sqi->GetItem(1);
-      DataSet &subds = item1.GetNestedDataSet();
+      Item & item1 = sqi->GetItem(1);
+      DataSet & subds = item1.GetNestedDataSet();
       const Tag tpms(0x0020,0x9116);
+      SequenceOfItems * sqi2;
       if(!subds.FindDataElement(tpms))
       {
-          SequenceOfItems *sqi2 = new SequenceOfItems;
-          DataElement de(tpms);
-          de.SetVR(VR::SQ);
-          de.SetValue(*sqi2);
-          de.SetVLToUndefined();
-          subds.Insert(de);
+        sqi2 = new SequenceOfItems;
+        DataElement de(tpms);
+        de.SetVR(VR::SQ);
+        de.SetValue(*sqi2);
+        de.SetVLToUndefined();
+        subds.Insert(de);
       }
-      sqi = subds.GetDataElement(tpms).GetValueAsSQ();
-      sqi->SetLengthToUndefined();
-      if(!sqi->GetNumberOfItems())
+      sqi2 = subds.GetDataElement(tpms).GetValueAsSQ();
+      sqi2->SetLengthToUndefined();
+      if(sqi2->GetNumberOfItems() < 1)
       {
-          Item item;
-          item.SetVLToUndefined();
-          sqi->AddItem(item);
+        Item item;
+        item.SetVLToUndefined();
+        sqi2->AddItem(item);
       }
-      Item &item2 = sqi->GetItem(1);
-      DataSet &subds2 = item2.GetNestedDataSet();
+      Item & item2 = sqi2->GetItem(1);
+      DataSet & subds2 = item2.GetNestedDataSet();
       subds2.Replace(iop.GetAsDataElement());
     }
     // Cleanup per-frame
@@ -2016,10 +2070,9 @@ void ImageHelper::SetRescaleInterceptSlopeValue(File & f, const Image & img)
   ms.SetFromFile(f);
   assert(MediaStorage::IsImage(ms));
   DataSet &ds = f.GetDataSet();
-  // FIXME Hardcoded
   if( ms != MediaStorage::CTImageStorage
    && ms != MediaStorage::ComputedRadiographyImageStorage
-   && ms != MediaStorage::MRImageStorage // FIXME
+   && ms != MediaStorage::MRImageStorage //
    && ms != MediaStorage::PETImageStorage
    && ms != MediaStorage::RTDoseStorage
    && ms != MediaStorage::SecondaryCaptureImageStorage
@@ -2050,7 +2103,6 @@ void ImageHelper::SetRescaleInterceptSlopeValue(File & f, const Image & img)
     }
     return;
   }
-
   if(ms == MediaStorage::SegmentationStorage) return;
   if( ms == MediaStorage::EnhancedCTImageStorage
    || ms == MediaStorage::EnhancedMRImageStorage
@@ -2071,43 +2123,44 @@ void ImageHelper::SetRescaleInterceptSlopeValue(File & f, const Image & img)
       SmartPointer<SequenceOfItems> sqi;
       if(!ds.FindDataElement(tfgs))
       {
-          sqi = new SequenceOfItems;
-          DataElement de(tfgs);
-          de.SetVR(VR::SQ);
-          de.SetValue(*sqi);
-          de.SetVLToUndefined();
-          ds.Insert(de);
+        sqi = new SequenceOfItems;
+        DataElement de(tfgs);
+        de.SetVR(VR::SQ);
+        de.SetValue(*sqi);
+        de.SetVLToUndefined();
+        ds.Insert(de);
       }
       sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
       sqi->SetLengthToUndefined();
       if(sqi->GetNumberOfItems() < 1)
       {
-          Item item; //(Tag(0xfffe,0xe000));
-          item.SetVLToUndefined();
-          sqi->AddItem(item);
+        Item item;
+        item.SetVLToUndefined();
+        sqi->AddItem(item);
       }
-      Item &item1 = sqi->GetItem(1);
-      DataSet &subds = item1.GetNestedDataSet();
+      Item & item1 = sqi->GetItem(1);
+      DataSet & subds = item1.GetNestedDataSet();
       const Tag tpms(0x0028,0x9145);
+      SequenceOfItems * sqi2;
       if(!subds.FindDataElement(tpms))
       {
-          SequenceOfItems *sqi2 = new SequenceOfItems;
-          DataElement de(tpms);
-          de.SetVR(VR::SQ);
-          de.SetValue(*sqi2);
-          de.SetVLToUndefined();
-          subds.Insert(de);
+        sqi2 = new SequenceOfItems;
+        DataElement de(tpms);
+        de.SetVR(VR::SQ);
+        de.SetValue(*sqi2);
+        de.SetVLToUndefined();
+        subds.Insert(de);
       }
-      sqi = subds.GetDataElement(tpms).GetValueAsSQ();
-      sqi->SetLengthToUndefined();
-      if(sqi->GetNumberOfItems() < 1)
+      sqi2 = subds.GetDataElement(tpms).GetValueAsSQ();
+      sqi2->SetLengthToUndefined();
+      if(sqi2->GetNumberOfItems() < 1)
       {
-          Item item; //(Tag(0xfffe,0xe000));
-          item.SetVLToUndefined();
-          sqi->AddItem(item);
+        Item item;
+        item.SetVLToUndefined();
+        sqi2->AddItem(item);
       }
-      Item &item2 = sqi->GetItem(1);
-      DataSet &subds2 = item2.GetNestedDataSet();
+      Item & item2 = sqi2->GetItem(1);
+      DataSet & subds2 = item2.GetNestedDataSet();
       Attribute<0x0028,0x1052> at1;
       at1.SetValue(img.GetIntercept());
       subds2.Replace(at1.GetAsDataElement());
@@ -2128,8 +2181,7 @@ void ImageHelper::SetRescaleInterceptSlopeValue(File & f, const Image & img)
         SequenceOfItems::SizeType nitems = sqi->GetNumberOfItems();
         for(SequenceOfItems::SizeType i0 = 1; i0 <= nitems; ++i0)
         {
-          // Get first item:
-          Item &item = sqi->GetItem(i0);
+          Item & item = sqi->GetItem(i0);
           DataSet & subds = item.GetNestedDataSet();
           const Tag tpms(0x0028,0x9145);
           subds.Remove(tpms);
@@ -2231,8 +2283,8 @@ void ImageHelper::SetRescaleInterceptSlopeValue(File & f, const Image & img)
     Attribute<0x0028,0x1053> at2;
     at2.SetValue(img.GetSlope());
     ds.Replace(at2.GetAsDataElement());
-    Attribute<0x0028,0x1054> at3; // Rescale Type
-    at3.SetValue("US"); // FIXME
+    Attribute<0x0028,0x1054> at3;
+    at3.SetValue("US");
     if(ms == MediaStorage::SecondaryCaptureImageStorage)
     {
       // As per 3-2009, US is the only valid enumerated value
@@ -2240,12 +2292,10 @@ void ImageHelper::SetRescaleInterceptSlopeValue(File & f, const Image & img)
     }
     else if(ms == MediaStorage::PETImageStorage)
     {
-      // not there anyway:
       ds.Remove(at3.GetTag());
     }
     else
     {
-      // In case user decide to override the default
       ds.ReplaceEmpty(at3.GetAsDataElement());
     }
   }
@@ -2253,7 +2303,6 @@ void ImageHelper::SetRescaleInterceptSlopeValue(File & f, const Image & img)
 
 void ImageHelper::SetVOILUT(File & f, const Image & img)
 {
-  // TODO more IODs
   std::string swidth = img.GetWindowWidth();
   std::string scenter = img.GetWindowCenter();
   if (swidth.empty() || scenter.empty()) return;
@@ -2302,72 +2351,72 @@ void ImageHelper::SetVOILUT(File & f, const Image & img)
     ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage ||
     ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
   {
-      const Tag t(0x5200,0x9229);
-      SmartPointer<SequenceOfItems> sq;
-      if(!ds.FindDataElement(t))
-      {
-          sq = new SequenceOfItems;
-          DataElement de(t);
-          de.SetVR(VR::SQ);
-          de.SetValue(*sq);
-          de.SetVLToUndefined();
-          ds.Insert(de);
-      }
-      sq = ds.GetDataElement(t).GetValueAsSQ();
-      sq->SetLengthToUndefined();
-      if(sq->GetNumberOfItems() < 1)
-      {
-          Item i;
-          i.SetVLToUndefined();
-          sq->AddItem(i);
-      }
-      Item & i1 = sq->GetItem(1);
-      DataSet & nds = i1.GetNestedDataSet();
-      const Tag t1(0x0028,0x9132);
-      SmartPointer<SequenceOfItems> sq1;
-      if(!nds.FindDataElement(t1))
-      {
-          sq1 = new SequenceOfItems;
-          DataElement de1(t1);
-          de1.SetVR(VR::SQ);
-          de1.SetValue(*sq1);
-          de1.SetVLToUndefined();
-          nds.Insert(de1);
-      }
-      sq1 = nds.GetDataElement(t1).GetValueAsSQ();
-      sq1->SetLengthToUndefined();
-      if(sq1->GetNumberOfItems() < 1)
-      {
-          Item i;
-          i.SetVLToUndefined();
-          sq1->AddItem(i);
-      }
-      Item & i2 = sq1->GetItem(1);
-      DataSet & nds1 = i2.GetNestedDataSet();
-      DataElement center(Tag(0x0028,0x1050));
-      std::stringstream oscenter;
-      oscenter << scenter;
-      if((oscenter.str().size() % 2) != 0) oscenter << " ";
-      center.SetByteValue(oscenter.str().c_str(), (VL::Type)oscenter.str().size());
-      center.SetVR(VR::DS);
-      nds1.Replace(center);
-      DataElement width(Tag(0x0028,0x1051));
-      std::stringstream oswidth;
-      oswidth << swidth;
-      if((oswidth.str().size() % 2) != 0) oswidth << " ";
-      width.SetByteValue(oswidth.str().c_str(), (VL::Type)oswidth.str().size());
-      width.SetVR(VR::DS);
-      nds1.Replace(width);
-      if(!sfunc.empty())
-      {
-        DataElement func(Tag(0x0028,0x1056));
-        std::stringstream osfunc;
-        osfunc << sfunc;
-        if((osfunc.str().size() % 2) != 0) osfunc << " ";
-        func.SetByteValue(osfunc.str().c_str(), (VL::Type)osfunc.str().size());
-        func.SetVR(VR::CS);
-        nds1.Replace(func);
-      }
+    const Tag t(0x5200,0x9229);
+    SmartPointer<SequenceOfItems> sq;
+    if(!ds.FindDataElement(t))
+    {
+      sq = new SequenceOfItems;
+      DataElement de(t);
+      de.SetVR(VR::SQ);
+      de.SetValue(*sq);
+      de.SetVLToUndefined();
+      ds.Insert(de);
+    }
+    sq = ds.GetDataElement(t).GetValueAsSQ();
+    sq->SetLengthToUndefined();
+    if(sq->GetNumberOfItems() < 1)
+    {
+      Item i;
+      i.SetVLToUndefined();
+      sq->AddItem(i);
+    }
+    Item & i1 = sq->GetItem(1);
+    DataSet & nds = i1.GetNestedDataSet();
+    const Tag t1(0x0028,0x9132);
+    SmartPointer<SequenceOfItems> sq1;
+    if(!nds.FindDataElement(t1))
+    {
+      sq1 = new SequenceOfItems;
+      DataElement de1(t1);
+      de1.SetVR(VR::SQ);
+      de1.SetValue(*sq1);
+      de1.SetVLToUndefined();
+      nds.Insert(de1);
+    }
+    sq1 = nds.GetDataElement(t1).GetValueAsSQ();
+    sq1->SetLengthToUndefined();
+    if(sq1->GetNumberOfItems() < 1)
+    {
+      Item i;
+      i.SetVLToUndefined();
+      sq1->AddItem(i);
+    }
+    Item & i2 = sq1->GetItem(1);
+    DataSet & nds1 = i2.GetNestedDataSet();
+    DataElement center(Tag(0x0028,0x1050));
+    std::stringstream oscenter;
+    oscenter << scenter;
+    if((oscenter.str().size() % 2) != 0) oscenter << " ";
+    center.SetByteValue(oscenter.str().c_str(), (VL::Type)oscenter.str().size());
+    center.SetVR(VR::DS);
+    nds1.Replace(center);
+    DataElement width(Tag(0x0028,0x1051));
+    std::stringstream oswidth;
+    oswidth << swidth;
+    if((oswidth.str().size() % 2) != 0) oswidth << " ";
+    width.SetByteValue(oswidth.str().c_str(), (VL::Type)oswidth.str().size());
+    width.SetVR(VR::DS);
+    nds1.Replace(width);
+    if(!sfunc.empty())
+    {
+      DataElement func(Tag(0x0028,0x1056));
+      std::stringstream osfunc;
+      osfunc << sfunc;
+      if((osfunc.str().size() % 2) != 0) osfunc << " ";
+      func.SetByteValue(osfunc.str().c_str(), (VL::Type)osfunc.str().size());
+      func.SetVR(VR::CS);
+      nds1.Replace(func);
+    }
   }
 }
 
@@ -2375,7 +2424,7 @@ bool ImageHelper::GetRealWorldValueMappingContent(File const & f, RealWorldValue
 {
   MediaStorage ms;
   ms.SetFromFile(f);
-  const DataSet& ds = f.GetDataSet();
+  const DataSet & ds = f.GetDataSet();
   if(ms == MediaStorage::MRImageStorage)
   {
     const Tag trwvms(0x0040,0x9096); // Real World Value Mapping Sequence
@@ -2459,7 +2508,6 @@ PhotometricInterpretation ImageHelper::GetPhotometricInterpretationValue(File co
       pi = PhotometricInterpretation::ARGB;
     }
   }
-
   bool isacrnema = false;
   DataSet ds = f.GetDataSet();
   const Tag trecognitioncode(0x0008,0x0010);
@@ -2508,11 +2556,10 @@ unsigned int ImageHelper::GetPlanarConfigurationValue(const File& f)
     const DataElement& de = ds.GetDataElement(planarconfiguration);
     Attribute<0x0028,0x0006> at = { 0 };
     at.SetFromDataElement(de);
-
     pc = at.GetValue();
     if(pc && pf.GetSamplesPerPixel() != 3)
     {
-      mdcmDebugMacro("Cannot have PlanarConfiguration=1, when Sample Per Pixel != 3");
+      mdcmDebugMacro("Cannot have PlanarConfiguration 1, when Sample Per Pixel != 3");
       pc = 0;
     }
   }
@@ -2698,7 +2745,7 @@ MediaStorage ImageHelper::ComputeMediaStorageFromModality(const char *modality,
       pixeltype.GetPixelRepresentation() == 0)
     {
       ms = MediaStorage::MultiframeSingleBitSecondaryCaptureImageStorage;
-      // FIXME does not handle bit packing...
+      // FIXME does not handle bit packing
       if(intercept != 0 || slope != 1)
       {
         mdcmDebugMacro("Cannot have shift/scale");
@@ -2742,8 +2789,7 @@ MediaStorage ImageHelper::ComputeMediaStorageFromModality(const char *modality,
       }
     }
     // Not valid MultiframeTrueColorSecondaryCaptureImageStorage
-    else if(dimension == 3 &&
-      pixeltype.GetSamplesPerPixel() == 3 &&
+    else if(dimension == 3 && pixeltype.GetSamplesPerPixel() == 3 &&
       (  pi == PhotometricInterpretation::RGB
       || pi == PhotometricInterpretation::YBR_RCT
       || pi == PhotometricInterpretation::YBR_ICT

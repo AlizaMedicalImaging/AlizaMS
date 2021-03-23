@@ -1,3 +1,5 @@
+// This class must be completely re-written!
+
 /*********************************************************
  *
  * MDCM
