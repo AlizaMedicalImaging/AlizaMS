@@ -1480,14 +1480,23 @@ void ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spac
         Item & item5 = sqUnassignedSharedConvertedAttributesSequence->GetItem(1);
         DataSet & subds5 = item5.GetNestedDataSet();
         //
-        DataElement ePrivateCreator(mdcm::Tag(0x4d4f, 0x10));
-        ePrivateCreator.SetByteValue("MDCM CONFORMANCE", 16);
-        ePrivateCreator.SetVR(mdcm::VR::LO);
-        subds5.Insert(ePrivateCreator);
-        mdcm::DataElement dePriv(mdcm::Tag(0x4d4f,0x1013));
-        dePriv.SetByteValue("", 0);
-        dePriv.SetVR(VR::CS);
-        subds5.Insert(dePriv);
+        if(ms == MediaStorage::LegacyConvertedEnhancedMRImageStorage)
+        {
+          DataElement eScanOptions(Tag(0x0018,0x0022));
+          eScanOptions.SetByteValue("", 0);
+          eScanOptions.SetVR(VR::CS);
+          subds5.Replace(eScanOptions);
+        }
+        else if(ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage)
+        {
+          DataElement eAcquisitionNumber(Tag(0x0020,0x0012));
+          eAcquisitionNumber.SetByteValue("", 0);
+          eAcquisitionNumber.SetVR(VR::IS);
+          subds5.Replace(eAcquisitionNumber);
+        }
+        else if(ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
+        {
+        }
       }
     }
     // Cleanup per frame
@@ -1592,7 +1601,7 @@ void ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spac
           const DataElement & de1 = ds.GetDataElement(Tag(0x0028,0x0008));
           if (!de1.IsEmpty() && !de1.IsUndefinedLength() && de1.GetByteValue())
           {
-            const mdcm::ByteValue * tmp0 = de1.GetByteValue();
+            const ByteValue * tmp0 = de1.GetByteValue();
             const std::string tmp1 =
               std::string(tmp0->GetPointer(), tmp0->GetLength());
             const int number_of_frames = std::stoi(tmp1);
@@ -1914,14 +1923,27 @@ void ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
             Item & item5 = sqUnassignedPerFrameConvertedAttributesSequence->GetItem(1);
             DataSet & subds5 = item5.GetNestedDataSet();
             //
-            DataElement ePrivateCreator(mdcm::Tag(0x4d4f, 0x10));
-            ePrivateCreator.SetByteValue("MDCM CONFORMANCE", 16);
-            ePrivateCreator.SetVR(mdcm::VR::LO);
-            subds5.Insert(ePrivateCreator);
-            mdcm::DataElement dePriv(mdcm::Tag(0x4d4f,0x1013));
-            dePriv.SetByteValue("", 0);
-            dePriv.SetVR(VR::CS);
-            subds5.Insert(dePriv);
+            if(ms == MediaStorage::LegacyConvertedEnhancedMRImageStorage)
+            {
+              DataElement eRepetitionTime(Tag(0x0018,0x0080));
+              eRepetitionTime.SetByteValue("", 0);
+              eRepetitionTime.SetVR(VR::DS);
+              subds5.Replace(eRepetitionTime);
+              DataElement eEchoTime(Tag(0x0018,0x0081));
+              eEchoTime.SetByteValue("", 0);
+              eEchoTime.SetVR(VR::DS);
+              subds5.Replace(eEchoTime);
+            }
+            else if(ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage)
+            {
+              DataElement eKVP(Tag(0x0018,0x0060));
+              eKVP.SetByteValue("", 0);
+              eKVP.SetVR(VR::DS);
+              subds5.Replace(eKVP);
+            }
+            else if(ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
+            {
+            }
           }
         }
         else if(ms == MediaStorage::SegmentationStorage)
