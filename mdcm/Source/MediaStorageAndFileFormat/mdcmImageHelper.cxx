@@ -92,7 +92,7 @@ static bool GetDirectionCosinesValueFromSequence(const DataSet& ds, const Tag& t
   const Tag tpms(0x0020,0x9116);
   if(!subds.FindDataElement(tpms)) return false;
   SmartPointer<SequenceOfItems> sqi2 = subds.GetDataElement(tpms).GetValueAsSQ();
-  assert(sqi2 && sqi2->GetNumberOfItems());
+  if(!(sqi2 && sqi2->GetNumberOfItems() > 0)) return false;
   const Item &item2 = sqi2->GetItem(1);
   const DataSet & subds2 = item2.GetNestedDataSet();
   const Tag tps(0x0020,0x0037);
@@ -119,8 +119,8 @@ static bool GetInterceptSlopeValueFromSequence(const DataSet& ds, const Tag& tfg
   const Tag tpms(0x0028,0x9145);
   if(!subds.FindDataElement(tpms)) return false;
   SmartPointer<SequenceOfItems> sqi2 = subds.GetDataElement(tpms).GetValueAsSQ();
-  assert(sqi2);
-  const Item &item2 = sqi2->GetItem(1);
+  if(!(sqi2 && sqi2->GetNumberOfItems() > 0)) return false;
+  const Item & item2 = sqi2->GetItem(1);
   const DataSet & subds2 = item2.GetNestedDataSet();
   {
     const Tag tps(0x0028,0x1052);
@@ -152,7 +152,7 @@ static bool ComputeZSpacingFromIPP(const DataSet &ds, double &zspacing)
   if(!b1)
   {
     cosines.resize(6);
-    bool b2 = ImageHelper::GetDirectionCosinesFromDataSet(ds, cosines);
+    const bool b2 = ImageHelper::GetDirectionCosinesFromDataSet(ds, cosines);
     if(b2)
     {
       mdcmWarningMacro("Image Orientation (Patient) cannot be stored here!. Continuing");
@@ -173,13 +173,14 @@ static bool ComputeZSpacingFromIPP(const DataSet &ds, double &zspacing)
   const Tag tfgs(0x5200,0x9230);
   if(!ds.FindDataElement(tfgs)) return false;
   SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
-  assert(sqi);
+  if(!(sqi && sqi->GetNumberOfItems() > 0)) return false;
   double normal[3];
   DirectionCosines dc(&cosines[0]);
   dc.Cross(normal);
   std::vector<double> distances;
-  SequenceOfItems::SizeType nitems = sqi->GetNumberOfItems();
-  std::vector<double> dircos_subds2; dircos_subds2.resize(6);
+  std::vector<double> dircos_subds2;
+  dircos_subds2.resize(6);
+  const SequenceOfItems::SizeType nitems = sqi->GetNumberOfItems();
   for(SequenceOfItems::SizeType i0 = 1; i0 <= nitems; ++i0)
   {
     const Item &item = sqi->GetItem(i0);
@@ -187,8 +188,8 @@ static bool ComputeZSpacingFromIPP(const DataSet &ds, double &zspacing)
     const Tag tpms(0x0020,0x9113);
     if(!subds.FindDataElement(tpms)) return false;
     SmartPointer<SequenceOfItems> sqi2 = subds.GetDataElement(tpms).GetValueAsSQ();
-    assert(sqi2);
-    const Item &item2 = sqi2->GetItem(1);
+    if(!(sqi2 && sqi2->GetNumberOfItems() > 0)) return false;
+    const Item & item2 = sqi2->GetItem(1);
     const DataSet & subds2 = item2.GetNestedDataSet();
     if(ImageHelper::GetDirectionCosinesFromDataSet(subds2, dircos_subds2))
     {
@@ -320,7 +321,7 @@ std::vector<double> ImageHelper::GetOriginValue(File const & f)
     if(ds.FindDataElement(t1))
     {
       SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(t1).GetValueAsSQ();
-      if(sqi && sqi->GetNumberOfItems() >= 1)
+      if(sqi && sqi->GetNumberOfItems() > 0)
       {
         const Item &item = sqi->GetItem(1);
         const DataSet & subds = item.GetNestedDataSet();
@@ -1250,17 +1251,21 @@ void ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spac
   {
     {
       const Tag tfgs(0x5200,0x9229);
-      SmartPointer<SequenceOfItems> sqi;
       if(!ds.FindDataElement(tfgs))
       {
-        sqi = new SequenceOfItems;
+        SmartPointer<SequenceOfItems> sqi = new SequenceOfItems;
         DataElement de(tfgs);
         de.SetVR(VR::SQ);
         de.SetValue(*sqi);
         de.SetVLToUndefined();
         ds.Insert(de);
       }
-      sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
+      SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
+      if(!sqi)
+      {
+        mdcmAlwaysWarnMacro("!sqi");
+        return;
+      }
       sqi->SetLengthToUndefined();
       if(!sqi->GetNumberOfItems())
       {
@@ -1271,17 +1276,21 @@ void ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spac
       Item & item1 = sqi->GetItem(1);
       DataSet & subds = item1.GetNestedDataSet();
       const Tag tpms(0x0028,0x9110);
-      SmartPointer<SequenceOfItems> sqi2;
       if(!subds.FindDataElement(tpms))
       {
-        sqi2 = new SequenceOfItems;
+        SmartPointer<SequenceOfItems> sqi2 = new SequenceOfItems;
         DataElement de(tpms);
         de.SetVR(VR::SQ);
         de.SetValue(*sqi2);
         de.SetVLToUndefined();
         subds.Insert(de);
       }
-      sqi2 = subds.GetDataElement(tpms).GetValueAsSQ();
+      SmartPointer<SequenceOfItems> sqi2 = subds.GetDataElement(tpms).GetValueAsSQ();
+      if(!sqi2)
+      {
+        mdcmAlwaysWarnMacro("!sqi2");
+        return;
+      }
       sqi2->SetLengthToUndefined();
       if(!sqi2->GetNumberOfItems())
       {
@@ -1305,18 +1314,23 @@ void ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spac
       if(ms == MediaStorage::LegacyConvertedEnhancedMRImageStorage)
       {
         const Tag tMRImageFrameTypeSequence(0x0018,0x9226);
-        SmartPointer<SequenceOfItems> sqMRImageFrameTypeSequence;
         if(!subds.FindDataElement(tMRImageFrameTypeSequence))
         {
-          sqMRImageFrameTypeSequence = new SequenceOfItems;
+          SmartPointer<SequenceOfItems> sqMRImageFrameTypeSequence =
+            new SequenceOfItems;
           DataElement eMRImageFrameTypeSequence(tMRImageFrameTypeSequence);
           eMRImageFrameTypeSequence.SetVR(VR::SQ);
           eMRImageFrameTypeSequence.SetValue(*sqMRImageFrameTypeSequence);
           eMRImageFrameTypeSequence.SetVLToUndefined();
           subds.Insert(eMRImageFrameTypeSequence);
         }
-        sqMRImageFrameTypeSequence =
+        SmartPointer<SequenceOfItems> sqMRImageFrameTypeSequence =
           subds.GetDataElement(tMRImageFrameTypeSequence).GetValueAsSQ();
+        if(!sqMRImageFrameTypeSequence)
+        {
+          mdcmAlwaysWarnMacro("!sqMRImageFrameTypeSequence");
+          return;
+        }
         sqMRImageFrameTypeSequence->SetLengthToUndefined();
         if(!sqMRImageFrameTypeSequence->GetNumberOfItems())
         {
@@ -1345,18 +1359,23 @@ void ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spac
       else if(ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage)
       {
         const Tag tCTImageFrameTypeSequence(0x0018,0x9329);
-        SmartPointer<SequenceOfItems> sqCTImageFrameTypeSequence;
         if(!subds.FindDataElement(tCTImageFrameTypeSequence))
         {
-          sqCTImageFrameTypeSequence = new SequenceOfItems;
+          SmartPointer<SequenceOfItems> sqCTImageFrameTypeSequence
+            = new SequenceOfItems;
           DataElement eCTImageFrameTypeSequence(tCTImageFrameTypeSequence);
           eCTImageFrameTypeSequence.SetVR(VR::SQ);
           eCTImageFrameTypeSequence.SetValue(*sqCTImageFrameTypeSequence);
           eCTImageFrameTypeSequence.SetVLToUndefined();
           subds.Insert(eCTImageFrameTypeSequence);
         }
-        sqCTImageFrameTypeSequence =
+        SmartPointer<SequenceOfItems> sqCTImageFrameTypeSequence =
           subds.GetDataElement(tCTImageFrameTypeSequence).GetValueAsSQ();
+        if(!sqCTImageFrameTypeSequence)
+        {
+          mdcmAlwaysWarnMacro("!sqCTImageFrameTypeSequence");
+          return;
+        }
         sqCTImageFrameTypeSequence->SetLengthToUndefined();
         if(!sqCTImageFrameTypeSequence->GetNumberOfItems())
         {
@@ -1385,27 +1404,32 @@ void ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spac
       else if(ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
       {
         const Tag tPTImageFrameTypeSequence(0x0018,0x9751);
-        SmartPointer<SequenceOfItems> sqPTImageFrameTypeSequence;
         if(!subds.FindDataElement(tPTImageFrameTypeSequence))
         {
-          sqPTImageFrameTypeSequence = new SequenceOfItems;
+          SmartPointer<SequenceOfItems> sqPTImageFrameTypeSequence
+            = new SequenceOfItems;
           DataElement ePTImageFrameTypeSequence(tPTImageFrameTypeSequence);
           ePTImageFrameTypeSequence.SetVR(VR::SQ);
           ePTImageFrameTypeSequence.SetValue(*sqPTImageFrameTypeSequence);
           ePTImageFrameTypeSequence.SetVLToUndefined();
           subds.Insert(ePTImageFrameTypeSequence);
         }
-        sqPTImageFrameTypeSequence =
+        SmartPointer<SequenceOfItems> sqPTImageFrameTypeSequence =
           subds.GetDataElement(tPTImageFrameTypeSequence).GetValueAsSQ();
+        if(!sqPTImageFrameTypeSequence)
+        {
+          mdcmAlwaysWarnMacro("!sqPTImageFrameTypeSequence");
+          return;
+        }
         sqPTImageFrameTypeSequence->SetLengthToUndefined();
-        if(!sqPTImageFrameTypeSequence->GetNumberOfItems())
+        if(sqPTImageFrameTypeSequence->GetNumberOfItems() < 1)
         {
           Item item;
           item.SetVLToUndefined();
           sqPTImageFrameTypeSequence->AddItem(item);
         }
-        Item &item3 = sqPTImageFrameTypeSequence->GetItem(1);
-        DataSet &subds3 = item3.GetNestedDataSet();
+        Item & item3 = sqPTImageFrameTypeSequence->GetItem(1);
+        DataSet & subds3 = item3.GetNestedDataSet();
         Attribute<0x0008,0x9007> atFrameType;
         atFrameType.SetValue("DERIVED ",   0);
         atFrameType.SetValue("PRIMARY ",   1);
@@ -1441,8 +1465,13 @@ void ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spac
         }
         SmartPointer<SequenceOfItems> sqUnassignedSharedConvertedAttributesSequence =
           subds.GetDataElement(tUnassignedSharedConvertedAttributesSequence).GetValueAsSQ();
+        if(!sqUnassignedSharedConvertedAttributesSequence)
+        {
+          mdcmAlwaysWarnMacro("!sqUnassignedSharedConvertedAttributesSequence");
+          return;
+        }
         sqUnassignedSharedConvertedAttributesSequence->SetLengthToUndefined();
-        if(!sqUnassignedSharedConvertedAttributesSequence->GetNumberOfItems())
+        if(sqUnassignedSharedConvertedAttributesSequence->GetNumberOfItems() < 1)
         {
           Item item;
           item.SetVLToUndefined();
@@ -1467,11 +1496,10 @@ void ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spac
       if(ds.FindDataElement(tfgs))
       {
         SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
-        assert(sqi);
-        SequenceOfItems::SizeType nitems = sqi->GetNumberOfItems();
+        if(!sqi) return;
+        const SequenceOfItems::SizeType nitems = sqi->GetNumberOfItems();
         for(SequenceOfItems::SizeType i0 = 1; i0 <= nitems; ++i0)
         {
-          // Get first item:
           Item &item = sqi->GetItem(i0);
           DataSet & subds = item.GetNestedDataSet();
           const Tag tpms(0x0028,0x9110);
@@ -1623,7 +1651,6 @@ static void SetDataElementInSQAsItemNumber(
   DataSet & ds, DataElement const & de, Tag const & sqtag, unsigned int itemidx)
 {
     const Tag tfgs = sqtag;
-    SmartPointer<SequenceOfItems> sqi;
     if(!ds.FindDataElement(tfgs))
     {
       SmartPointer<SequenceOfItems> sqi = new SequenceOfItems;
@@ -1633,7 +1660,12 @@ static void SetDataElementInSQAsItemNumber(
       detmp.SetVLToUndefined();
       ds.Insert(detmp);
     }
-    sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
+    SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
+    if(!sqi)
+    {
+      mdcmAlwaysWarnMacro("!sqi");
+      return;
+    }
     sqi->SetLengthToUndefined();
     if(sqi->GetNumberOfItems() < itemidx)
     {
@@ -1644,17 +1676,21 @@ static void SetDataElementInSQAsItemNumber(
     Item & item1 = sqi->GetItem(itemidx);
     DataSet & subds = item1.GetNestedDataSet();
     const Tag tpms(0x0020,0x9113);
-    SmartPointer<SequenceOfItems> sqi2;
     if(!subds.FindDataElement(tpms))
     {
-      sqi2 = new SequenceOfItems;
+      SmartPointer<SequenceOfItems> sqi2 = new SequenceOfItems;
       DataElement detmp(tpms);
       detmp.SetVR(VR::SQ);
       detmp.SetValue(*sqi2);
       detmp.SetVLToUndefined();
       subds.Insert(detmp);
     }
-    sqi2 = subds.GetDataElement(tpms).GetValueAsSQ();
+    SmartPointer<SequenceOfItems> sqi2 = subds.GetDataElement(tpms).GetValueAsSQ();
+    if(!sqi2)
+    {
+      mdcmAlwaysWarnMacro("!sqi2");
+      return;
+    }
     sqi2->SetLengthToUndefined();
     if(sqi2->GetNumberOfItems() < 1)
     {
@@ -1737,6 +1773,8 @@ void ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
     dc.Cross(normal);
     const Tag tConversionSourceAttributesSequence(0x0020,0x9172);
     const Tag tUnassignedPerFrameConvertedAttributesSequence(0x0020,0x9171);
+    const Tag tSegmentIdentificationSequence(0x0062,0x000a);
+    const Tag tReferencedSegmentNumber(0x0062,0x000b);
     for(unsigned int i = 0; i < dimz; ++i)
     {
       double new_origin[3];
@@ -1758,7 +1796,7 @@ void ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
       {
         SmartPointer<SequenceOfItems> sqi =
           ds.GetDataElement(tfgs).GetValueAsSQ();
-        if (!(sqi && sqi->GetNumberOfItems()>0)) continue;
+        if (!(sqi && sqi->GetNumberOfItems() > 0)) continue;
         Item  & item  = sqi->GetItem(i+1);
         DataSet & subds = item.GetNestedDataSet();
         const Tag tFrameContentSequence(0x0020,0x9111);
@@ -1774,15 +1812,20 @@ void ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
         }
         SmartPointer<SequenceOfItems> sqFrameContentSequence =
           subds.GetDataElement(tFrameContentSequence).GetValueAsSQ();
+        if(!sqFrameContentSequence)
+        {
+          mdcmAlwaysWarnMacro("!sqFrameContentSequence");
+          continue;
+        }
         sqFrameContentSequence->SetLengthToUndefined();
-        if(!sqFrameContentSequence->GetNumberOfItems())
+        if(sqFrameContentSequence->GetNumberOfItems() < 1)
         {
           Item item;
           item.SetVLToUndefined();
           sqFrameContentSequence->AddItem(item);
         }
-        Item &item3 = sqFrameContentSequence->GetItem(1);
-        DataSet &subds3 = item3.GetNestedDataSet();
+        Item & item3 = sqFrameContentSequence->GetItem(1);
+        DataSet & subds3 = item3.GetNestedDataSet();
         Attribute<0x0020,0x9056> atStackID;
         atStackID.SetValue("1 ");
         subds3.Replace(atStackID.GetAsDataElement());
@@ -1812,15 +1855,20 @@ void ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
             }
             SmartPointer<SequenceOfItems> sqConversionSourceAttributesSequence =
               subds.GetDataElement(tConversionSourceAttributesSequence).GetValueAsSQ();
+            if(!sqConversionSourceAttributesSequence)
+            {
+              mdcmAlwaysWarnMacro("!sqConversionSourceAttributesSequence");
+              continue;
+            }
             sqConversionSourceAttributesSequence->SetLengthToUndefined();
-            if(!sqConversionSourceAttributesSequence->GetNumberOfItems())
+            if(sqConversionSourceAttributesSequence->GetNumberOfItems() < 1)
             {
               Item item;
               item.SetVLToUndefined();
               sqConversionSourceAttributesSequence->AddItem(item);
             }
-            Item &item4 = sqConversionSourceAttributesSequence->GetItem(1);
-            DataSet &subds4 = item4.GetNestedDataSet();
+            Item & item4 = sqConversionSourceAttributesSequence->GetItem(1);
+            DataSet & subds4 = item4.GetNestedDataSet();
             Attribute<0x0008,0x1150> atReferencedSOPClassUID;
             if(ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage)
               atReferencedSOPClassUID.SetValue("1.2.840.10008.5.1.4.1.1.2");
@@ -1850,8 +1898,13 @@ void ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
             }
             SmartPointer<SequenceOfItems> sqUnassignedPerFrameConvertedAttributesSequence =
               subds.GetDataElement(tUnassignedPerFrameConvertedAttributesSequence).GetValueAsSQ();
+            if(!sqUnassignedPerFrameConvertedAttributesSequence)
+            {
+              mdcmAlwaysWarnMacro("!sqUnassignedPerFrameConvertedAttributesSequence");
+              continue;
+            }
             sqUnassignedPerFrameConvertedAttributesSequence->SetLengthToUndefined();
-            if(!sqUnassignedPerFrameConvertedAttributesSequence->GetNumberOfItems())
+            if(sqUnassignedPerFrameConvertedAttributesSequence->GetNumberOfItems() < 1)
             {
               Item item;
               item.SetVLToUndefined();
@@ -1869,45 +1922,87 @@ void ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
             dePriv.SetVR(VR::CS);
             subds5.Insert(dePriv);
           }
+        }
+        else if(ms == MediaStorage::SegmentationStorage)
+        {
+          // TODO currently only one referenced segm. "1", single binary segment
+          if(!subds.FindDataElement(tSegmentIdentificationSequence))
+          {
+            SmartPointer<SequenceOfItems> sqSegmentIdentificationSequence
+              = new SequenceOfItems;
+            DataElement eSegmentIdentificationSequence(
+              tSegmentIdentificationSequence);
+            eSegmentIdentificationSequence.SetVR(VR::SQ);
+            eSegmentIdentificationSequence.SetValue(
+              *sqSegmentIdentificationSequence);
+            eSegmentIdentificationSequence.SetVLToUndefined();
+            subds.Insert(eSegmentIdentificationSequence);
+          }
+          SmartPointer<SequenceOfItems> sqSegmentIdentificationSequence =
+            subds.GetDataElement(tSegmentIdentificationSequence).GetValueAsSQ();
+          if(!sqSegmentIdentificationSequence)
+          {
+            mdcmAlwaysWarnMacro("!sqSegmentIdentificationSequence");
+            continue;
+          }
+          sqSegmentIdentificationSequence->SetLengthToUndefined();
+          if(sqSegmentIdentificationSequence->GetNumberOfItems() < 1)
+          {
+            Item item;
+            item.SetVLToUndefined();
+            sqSegmentIdentificationSequence->AddItem(item);
+          }
+          Item & item4 = sqSegmentIdentificationSequence->GetItem(1);
+          DataSet & subds4 = item4.GetNestedDataSet();
+          if(!subds4.FindDataElement(tReferencedSegmentNumber))
+          {
+            Attribute<0x0062,0x000b, VR::US, VM::VM1> atReferencedSegmentNumber;
+            atReferencedSegmentNumber.SetValue(1);
+            subds4.Replace(atReferencedSegmentNumber.GetAsDataElement());
+          }
+        }
       }
     }
-  }
-  // Sleanup the sharedgroup
-  {
-    const Tag tfgs0(0x5200,0x9229);
-    if(ds.FindDataElement(tfgs0))
+    // Sleanup the sharedgroup
     {
-      SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs0).GetValueAsSQ();
-      assert(sqi);
-      SequenceOfItems::SizeType nitems = sqi->GetNumberOfItems();
-      for(SequenceOfItems::SizeType i0 = 1; i0 <= nitems; ++i0)
+      const Tag tfgs0(0x5200,0x9229);
+      if(ds.FindDataElement(tfgs0))
       {
-        Item & item = sqi->GetItem(i0);
-        DataSet & subds = item.GetNestedDataSet();
-        const Tag tpms(0x0020,0x9113);
-        subds.Remove(tpms);
+        SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs0).GetValueAsSQ();
+        if(!sqi)
+        {
+          mdcmAlwaysWarnMacro("!sqi");
+          return;
+        }
+        const SequenceOfItems::SizeType nitems = sqi->GetNumberOfItems();
+        for(SequenceOfItems::SizeType i0 = 1; i0 <= nitems; ++i0)
+        {
+          Item & item = sqi->GetItem(i0);
+          DataSet & subds = item.GetNestedDataSet();
+          const Tag tpms(0x0020,0x9113);
+          subds.Remove(tpms);
+        }
       }
     }
-  }
-  // Cleanup root level
-  {
-    const Tag tiop(0x0020,0x0032);
-    ds.Remove(tiop);
-  }
-  // Frame Increment Pointer
-  if(  ms == MediaStorage::MultiframeGrayscaleWordSecondaryCaptureImageStorage
-    || ms == MediaStorage::MultiframeGrayscaleByteSecondaryCaptureImageStorage
-    || ms == MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage)
-  {
-    if(dimz > 1)
+    // Cleanup root level
     {
-      Attribute<0x0028,0x0009> fip;
-      fip.SetNumberOfValues(1);
-      fip.SetValue(tfgs);
-      ds.Replace(fip.GetAsDataElement());
+      const Tag tiop(0x0020,0x0032);
+      ds.Remove(tiop);
     }
-  }
-  return;
+    // Frame Increment Pointer
+    if(  ms == MediaStorage::MultiframeGrayscaleWordSecondaryCaptureImageStorage
+      || ms == MediaStorage::MultiframeGrayscaleByteSecondaryCaptureImageStorage
+      || ms == MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage)
+    {
+      if(dimz > 1)
+      {
+        Attribute<0x0028,0x0009> fip;
+        fip.SetNumberOfValues(1);
+        fip.SetValue(tfgs);
+        ds.Replace(fip.GetAsDataElement());
+      }
+    }
+    return;
   }
   // Image Position Patient
   Attribute<0x0020,0x0032> ipp = {{0,0,0}};
@@ -1994,17 +2089,22 @@ void ImageHelper::SetDirectionCosinesValue(DataSet & ds, const std::vector<doubl
   {
     {
       const Tag tfgs(0x5200,0x9229);
-      SmartPointer<SequenceOfItems> sqi;
       if(!ds.FindDataElement(tfgs))
       {
-        sqi = new SequenceOfItems;
+        SmartPointer<SequenceOfItems> sqi = new SequenceOfItems;
         DataElement de(tfgs);
         de.SetVR(VR::SQ);
         de.SetValue(*sqi);
         de.SetVLToUndefined();
         ds.Insert(de);
       }
-      sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
+      SmartPointer<SequenceOfItems> sqi =
+        ds.GetDataElement(tfgs).GetValueAsSQ();
+      if(!sqi)
+      {
+        mdcmAlwaysWarnMacro("!sqi");
+        return;
+      }
       sqi->SetLengthToUndefined();
       if(sqi->GetNumberOfItems() < 1)
       {
@@ -2015,17 +2115,22 @@ void ImageHelper::SetDirectionCosinesValue(DataSet & ds, const std::vector<doubl
       Item & item1 = sqi->GetItem(1);
       DataSet & subds = item1.GetNestedDataSet();
       const Tag tpms(0x0020,0x9116);
-      SequenceOfItems * sqi2;
       if(!subds.FindDataElement(tpms))
       {
-        sqi2 = new SequenceOfItems;
+        SmartPointer<SequenceOfItems> sqi2 = new SequenceOfItems;
         DataElement de(tpms);
         de.SetVR(VR::SQ);
         de.SetValue(*sqi2);
         de.SetVLToUndefined();
         subds.Insert(de);
       }
-      sqi2 = subds.GetDataElement(tpms).GetValueAsSQ();
+      SmartPointer<SequenceOfItems> sqi2 =
+        subds.GetDataElement(tpms).GetValueAsSQ();
+      if(!sqi)
+      {
+        mdcmAlwaysWarnMacro("!sqi2");
+        return;
+      }
       sqi2->SetLengthToUndefined();
       if(sqi2->GetNumberOfItems() < 1)
       {
@@ -2043,11 +2148,15 @@ void ImageHelper::SetDirectionCosinesValue(DataSet & ds, const std::vector<doubl
       if(ds.FindDataElement(tfgs))
       {
         SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
-        assert(sqi);
-        SequenceOfItems::SizeType nitems = sqi->GetNumberOfItems();
+        if(!sqi)
+        {
+          mdcmAlwaysWarnMacro("!sqi2");
+          return;
+        }
+        const SequenceOfItems::SizeType nitems = sqi->GetNumberOfItems();
         for(SequenceOfItems::SizeType i0 = 1; i0 <= nitems; ++i0)
         {
-          Item &item = sqi->GetItem(i0);
+          Item & item = sqi->GetItem(i0);
           DataSet & subds = item.GetNestedDataSet();
           const Tag tpms(0x0020,0x9116);
           subds.Remove(tpms);
@@ -2120,17 +2229,22 @@ void ImageHelper::SetRescaleInterceptSlopeValue(File & f, const Image & img)
   {
     {
       const Tag tfgs(0x5200,0x9229);
-      SmartPointer<SequenceOfItems> sqi;
       if(!ds.FindDataElement(tfgs))
       {
-        sqi = new SequenceOfItems;
+        SmartPointer<SequenceOfItems> sqi = new SequenceOfItems;
         DataElement de(tfgs);
         de.SetVR(VR::SQ);
         de.SetValue(*sqi);
         de.SetVLToUndefined();
         ds.Insert(de);
       }
-      sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
+      SmartPointer<SequenceOfItems> sqi =
+	    ds.GetDataElement(tfgs).GetValueAsSQ();
+      if(!sqi)
+      {
+        mdcmAlwaysWarnMacro("!sqi");
+        return;
+      }
       sqi->SetLengthToUndefined();
       if(sqi->GetNumberOfItems() < 1)
       {
@@ -2141,17 +2255,22 @@ void ImageHelper::SetRescaleInterceptSlopeValue(File & f, const Image & img)
       Item & item1 = sqi->GetItem(1);
       DataSet & subds = item1.GetNestedDataSet();
       const Tag tpms(0x0028,0x9145);
-      SequenceOfItems * sqi2;
       if(!subds.FindDataElement(tpms))
       {
-        sqi2 = new SequenceOfItems;
+        SmartPointer<SequenceOfItems> sqi2 = new SequenceOfItems;
         DataElement de(tpms);
         de.SetVR(VR::SQ);
         de.SetValue(*sqi2);
         de.SetVLToUndefined();
         subds.Insert(de);
       }
-      sqi2 = subds.GetDataElement(tpms).GetValueAsSQ();
+      SmartPointer<SequenceOfItems> sqi2 =
+        subds.GetDataElement(tpms).GetValueAsSQ();
+      if(!sqi2)
+      {
+        mdcmAlwaysWarnMacro("!sqi2");
+        return;
+      }
       sqi2->SetLengthToUndefined();
       if(sqi2->GetNumberOfItems() < 1)
       {
@@ -2176,15 +2295,19 @@ void ImageHelper::SetRescaleInterceptSlopeValue(File & f, const Image & img)
       const Tag tfgs(0x5200,0x9230);
       if(ds.FindDataElement(tfgs))
       {
-        SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
-        assert(sqi);
-        SequenceOfItems::SizeType nitems = sqi->GetNumberOfItems();
+        SmartPointer<SequenceOfItems> sqi =
+          ds.GetDataElement(tfgs).GetValueAsSQ();
+        if(!sqi)
+        {
+          mdcmAlwaysWarnMacro("!sqi");
+          return;
+        }
+        const SequenceOfItems::SizeType nitems = sqi->GetNumberOfItems();
         for(SequenceOfItems::SizeType i0 = 1; i0 <= nitems; ++i0)
         {
           Item & item = sqi->GetItem(i0);
           DataSet & subds = item.GetNestedDataSet();
-          const Tag tpms(0x0028,0x9145);
-          subds.Remove(tpms);
+          subds.Remove(Tag(0x0028,0x9145));
         }
       }
     }
@@ -2352,17 +2475,22 @@ void ImageHelper::SetVOILUT(File & f, const Image & img)
     ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
   {
     const Tag t(0x5200,0x9229);
-    SmartPointer<SequenceOfItems> sq;
     if(!ds.FindDataElement(t))
     {
-      sq = new SequenceOfItems;
+      SmartPointer<SequenceOfItems> sq = new SequenceOfItems;
       DataElement de(t);
       de.SetVR(VR::SQ);
       de.SetValue(*sq);
       de.SetVLToUndefined();
       ds.Insert(de);
     }
-    sq = ds.GetDataElement(t).GetValueAsSQ();
+    SmartPointer<SequenceOfItems> sq =
+      ds.GetDataElement(t).GetValueAsSQ();
+    if(!sq)
+    {
+      mdcmAlwaysWarnMacro("!sq");
+      return;
+    }
     sq->SetLengthToUndefined();
     if(sq->GetNumberOfItems() < 1)
     {
@@ -2373,17 +2501,22 @@ void ImageHelper::SetVOILUT(File & f, const Image & img)
     Item & i1 = sq->GetItem(1);
     DataSet & nds = i1.GetNestedDataSet();
     const Tag t1(0x0028,0x9132);
-    SmartPointer<SequenceOfItems> sq1;
     if(!nds.FindDataElement(t1))
     {
-      sq1 = new SequenceOfItems;
+      SmartPointer<SequenceOfItems> sq1 = new SequenceOfItems;
       DataElement de1(t1);
       de1.SetVR(VR::SQ);
       de1.SetValue(*sq1);
       de1.SetVLToUndefined();
       nds.Insert(de1);
     }
-    sq1 = nds.GetDataElement(t1).GetValueAsSQ();
+    SmartPointer<SequenceOfItems> sq1 =
+      nds.GetDataElement(t1).GetValueAsSQ();
+    if(!sq1)
+    {
+      mdcmAlwaysWarnMacro("!sq1");
+      return;
+    }
     sq1->SetLengthToUndefined();
     if(sq1->GetNumberOfItems() < 1)
     {
@@ -2431,16 +2564,20 @@ bool ImageHelper::GetRealWorldValueMappingContent(File const & f, RealWorldValue
     if(ds.FindDataElement(trwvms))
     {
       SmartPointer<SequenceOfItems> sqi0 = ds.GetDataElement(trwvms).GetValueAsSQ();
-      if(sqi0)
+      if(sqi0 && sqi0->GetNumberOfItems() > 0)
       {
         const Tag trwvlutd(0x0040,0x9212); // Real World Value LUT Data
         if(ds.FindDataElement(trwvlutd))
         {
-          mdcmAssertAlwaysMacro(0); // Not supported !
+          mdcmAlwaysWarnMacro("Not supported");
+          return false;
         }
-        // dont know how to handle multiples
-        mdcmAssertAlwaysMacro(sqi0->GetNumberOfItems() == 1);
-        const Item &item0 = sqi0->GetItem(1);
+        if(!(sqi0->GetNumberOfItems() == 1))
+        {
+          mdcmAlwaysWarnMacro("Not supported (multiple items)");
+          return false;
+        }
+        const Item & item0 = sqi0->GetItem(1);
         const DataSet & subds0 = item0.GetNestedDataSet();
         //const Tag trwvi(0x0040,0x9224); // Real World Value Intercept
         //const Tag trwvs(0x0040,0x9225); // Real World Value Slope
@@ -2455,11 +2592,11 @@ bool ImageHelper::GetRealWorldValueMappingContent(File const & f, RealWorldValue
         const Tag tmucs(0x0040,0x08ea); // Measurement Units Code Sequence
         if(subds0.FindDataElement(tmucs))
         {
-          SmartPointer<SequenceOfItems> sqi = subds0.GetDataElement(tmucs).GetValueAsSQ();
-          if(sqi)
+          SmartPointer<SequenceOfItems> sqi =
+            subds0.GetDataElement(tmucs).GetValueAsSQ();
+          if(sqi && sqi->GetNumberOfItems() == 1)
           {
-            mdcmAssertAlwaysMacro(sqi->GetNumberOfItems() == 1);
-            const Item &item = sqi->GetItem(1);
+            const Item & item = sqi->GetItem(1);
             const DataSet & subds = item.GetNestedDataSet();
             Attribute<0x0008,0x0100> at1;
             at1.SetFromDataSet(subds);
