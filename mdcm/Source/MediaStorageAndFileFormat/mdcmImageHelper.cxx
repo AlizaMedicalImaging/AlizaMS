@@ -1575,44 +1575,45 @@ void ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spac
     }
   }
   {
-    const Tag &currentspacing = zspacingtag;
+    // FIXME
+    const Tag & currentspacing = zspacingtag;
     if(currentspacing != Tag(0xffff,0xffff))
     {
       DataElement de(currentspacing);
-      const Global &g = GlobalInstance;
-      const Dicts &dicts = g.GetDicts();
-      const DictEntry &entry = dicts.GetDictEntry(de.GetTag());
+      const Global & g = GlobalInstance;
+      const Dicts & dicts = g.GetDicts();
+      const DictEntry & entry = dicts.GetDictEntry(de.GetTag());
       const VR & vr = entry.GetVR();
-      const VM & vm = entry.GetVM(); (void)vm;
-      assert(de.GetVR() == vr || de.GetVR() == VR::INVALID);
-      if(entry.GetVM() == VM::VM2_n)
+      if(de.GetTag() == Tag(0x3004,0x000c))
       {
         assert(vr == VR::DS);
-        assert(de.GetTag() == Tag(0x3004,0x000c));
-        Attribute<0x28,0x8> numberoframes;
-        if(ds.FindDataElement(numberoframes.GetTag()))
+        if(ds.FindDataElement(Tag(0x0028,0x0008)))
         {
-          const DataElement& de1 = ds.GetDataElement(numberoframes.GetTag());
-          numberoframes.SetFromDataElement(de1);
-          Element<VR::DS,VM::VM2_n> el;
-          el.SetLength(numberoframes.GetValue() * vr.GetSizeof());
-          assert(entry.GetVM() == VM::VM2_n);
-          double spacing_start = 0.0;
-          const unsigned int number_of_frames = numberoframes.GetValue();
-          if (number_of_frames > 0)
+          const DataElement & de1 = ds.GetDataElement(Tag(0x0028,0x0008));
+          if (!de1.IsEmpty() && !de1.IsUndefinedLength() && de1.GetByteValue())
           {
-            for(unsigned int i = 0; i < number_of_frames; ++i)
+            const mdcm::ByteValue * tmp0 = de1.GetByteValue();
+            const std::string tmp1 =
+              std::string(tmp0->GetPointer(), tmp0->GetLength());
+            const int number_of_frames = std::stoi(tmp1);
+            if (number_of_frames > 0 && number_of_frames < 65536)
             {
-              el.SetValue(spacing_start, i);
-              spacing_start += spacing[2];
+              Element<VR::DS,VM::VM2_n> el;
+              el.SetLength(number_of_frames * vr.GetSizeof());
+              double spacing_start = 0.0;
+              for(unsigned int i = 0; i < (unsigned int)number_of_frames; ++i)
+              {
+                el.SetValue(spacing_start, i);
+                spacing_start += spacing[2];
+              }
+              std::stringstream os;
+              el.Write(os);
+              de.SetVR(VR::DS);
+              if(os.str().size() % 2) os << " ";
+              VL::Type osStrSize = (VL::Type)os.str().size();
+              de.SetByteValue(os.str().c_str(), osStrSize);
+              ds.Replace(de);
             }
-            std::stringstream os;
-            el.Write(os);
-            de.SetVR(VR::DS);
-            if(os.str().size() % 2) os << " ";
-            VL::Type osStrSize = (VL::Type)os.str().size();
-            de.SetByteValue(os.str().c_str(), osStrSize);
-            ds.Replace(de);
           }
         }
       }
@@ -2239,7 +2240,7 @@ void ImageHelper::SetRescaleInterceptSlopeValue(File & f, const Image & img)
         ds.Insert(de);
       }
       SmartPointer<SequenceOfItems> sqi =
-	    ds.GetDataElement(tfgs).GetValueAsSQ();
+        ds.GetDataElement(tfgs).GetValueAsSQ();
       if(!sqi)
       {
         mdcmAlwaysWarnMacro("!sqi");
