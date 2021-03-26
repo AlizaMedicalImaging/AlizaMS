@@ -30,14 +30,7 @@ namespace mdcm
 /**
  * Class for Smart Pointer
  *
- * Will only work for subclass of mdcm::Object
- * See tr1/shared_ptr for a more general approach (not invasive)
- * #include <tr1/memory>
- * {
- *   shared_ptr<Bla> b(new Bla);
- * }
- *
- * Class partly based on post by Bill Hubauer:
+ * Class partly based on post by Bill Hubauer
  * http://groups.google.com/group/comp.lang.c++/msg/173ddc38a827a930
  * http://www.davethehat.com/articles/smartp.htm
  * and itk::SmartPointer

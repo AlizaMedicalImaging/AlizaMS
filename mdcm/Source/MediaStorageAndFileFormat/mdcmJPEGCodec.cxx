@@ -95,7 +95,15 @@ bool JPEGCodec::Decode(DataElement const & in, DataElement & out)
       }
       const ByteValue & bv = dynamic_cast<const ByteValue&>(frag.GetValue());
       const size_t bv_len = bv.GetLength();
-      char * mybuffer = new char[bv_len];
+      char * mybuffer;
+      try
+      {
+        mybuffer = new char[bv_len];
+      }
+      catch(std::bad_alloc&)
+      {
+        return false;
+      }
       const bool b = bv.GetBuffer(mybuffer, bv_len);
       if(!b)
       {
@@ -139,7 +147,15 @@ bool JPEGCodec::Decode(DataElement const & in, DataElement & out)
     // GEIIS Icon
     std::stringstream is0;
     const size_t jpegbv_len = jpegbv->GetLength();
-    char * mybuffer0 = new char[jpegbv_len];
+    char * mybuffer0;
+    try
+    {
+      mybuffer0 = new char[jpegbv_len];
+    }
+    catch(std::bad_alloc&)
+    {
+      return false;
+    }
     const bool b0 = jpegbv->GetBuffer(mybuffer0, jpegbv_len);
     if(!b0)
     {
@@ -175,7 +191,15 @@ bool JPEGCodec::Decode(DataElement const & in, DataElement & out)
         }
         const ByteValue & bv = dynamic_cast<const ByteValue&>(frag.GetValue());
         const size_t bv_len = bv.GetLength();
-        char * mybuffer = new char[bv_len];
+        char * mybuffer;
+        try
+        {
+          mybuffer = new char[bv_len];
+        }
+        catch(std::bad_alloc&)
+        {
+          return false;
+        }
         const bool b = bv.GetBuffer(mybuffer, bv_len);
         if(!b)
         {

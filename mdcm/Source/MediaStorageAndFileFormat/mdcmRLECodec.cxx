@@ -362,7 +362,15 @@ bool RLECodec::Decode(DataElement const & in, DataElement & out)
       mdcmErrorMacro("Invalid number of fragments: " << nframes << " should be: " << zdim);
       return false;
     }
-    char * buffer = new char[len];
+    char * buffer;
+    try
+    {
+      buffer = new char[len];
+    }
+    catch(std::bad_alloc&)
+    {
+      return false;
+    }
     const size_t llen = len / nframes;
     bool corruption = false;
     for(unsigned int i = 0; i < nframes; ++i)
@@ -415,12 +423,26 @@ bool RLECodec::Code(DataElement const & in, DataElement & out)
   char * bufferrgb = NULL;
   if(GetPixelFormat().GetBitsAllocated() > 8)
   {
-    buffer = new char[image_len];
+    try
+    {
+      buffer = new char[image_len];
+    }
+    catch(std::bad_alloc&)
+    {
+      return false;
+    }
   }
   if(GetPhotometricInterpretation() == PhotometricInterpretation::RGB ||
      GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL)
   {
-    bufferrgb = new char[image_len];
+    try
+    {
+      bufferrgb = new char[image_len];
+    }
+    catch(std::bad_alloc&)
+    {
+      return false;
+    }
   }
   unsigned int MaxNumSegments = 1;
   if(GetPixelFormat().GetBitsAllocated() == 8)
@@ -860,7 +882,15 @@ size_t RLECodec::DecodeFragment(Fragment const & frag, char * buffer, size_t lle
   std::stringstream is;
   const ByteValue & bv = dynamic_cast<const ByteValue&>(frag.GetValue());
   const size_t bv_len = bv.GetLength();
-  char * mybuffer = new char[bv_len];
+  char * mybuffer;
+  try
+  {
+    mybuffer = new char[bv_len];
+  }
+  catch(std::bad_alloc&)
+  {
+    return false;
+  }
   bv.GetBuffer(mybuffer, bv.GetLength());
   is.write(mybuffer, bv.GetLength());
   delete [] mybuffer;

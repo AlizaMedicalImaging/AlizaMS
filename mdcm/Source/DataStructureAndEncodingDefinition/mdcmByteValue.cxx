@@ -35,12 +35,12 @@ ByteValue::ByteValue(const char * array, const VL & vl)
   Internal(array, array+vl),
   Length(vl)
 {
-    if(vl.IsOdd())
-    {
-      mdcmDebugMacro("Odd length");
-      Internal.resize(vl+1);
-      Length++;
-    }
+  if(vl.IsOdd())
+  {
+    mdcmDebugMacro("Odd length");
+    Internal.resize(vl+1);
+    Length++;
+  }
 }
 
 ByteValue::ByteValue(std::vector<char> & v)
@@ -141,7 +141,7 @@ void ByteValue::SetLength(VL vl)
 #ifdef SHORT_READ_HACK
     if(l <= 0xff)
 #endif
-    Internal.resize(l);
+      Internal.resize(l);
   }
   catch(...)
   {

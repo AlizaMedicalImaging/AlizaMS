@@ -135,9 +135,17 @@ bool RAWCodec::Decode(DataElement const & in, DataElement & out)
      this->GetPixelFormat() == PixelFormat::INT12)
   {
     const size_t len = str.size() * 16 / 12;
-    char * copy = new char[len];
+    char * copy;
+    try
+    {
+      copy = new char[len];
+    }
+    catch(std::bad_alloc&)
+    {
+      return false;
+    }
     const bool b = Unpack12Bits(copy, &str[0], str.size());
-    if (!b)
+    if(!b)
     {
       delete [] copy;
       return false;
@@ -196,9 +204,17 @@ bool RAWCodec::DecodeBytes(
      this->GetPixelFormat() == PixelFormat::INT12)
   {
     const size_t len = str.size() * 16 / 12;
-    char * copy = new char[len];
+    char * copy;
+    try
+    {
+      copy = new char[len];
+    }
+    catch(std::bad_alloc&)
+    {
+      return false;
+    }
     const bool b = Unpack12Bits(copy, &str[0], str.size());
-    if (!b)
+    if(!b)
     {
       delete [] copy;
       return false;

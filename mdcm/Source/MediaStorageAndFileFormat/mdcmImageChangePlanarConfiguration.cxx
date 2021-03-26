@@ -54,14 +54,30 @@ bool ImageChangePlanarConfiguration::Change()
   const Bitmap & image = *Input;
   const unsigned int * dims = image.GetDimensions();
   unsigned long long len = image.GetBufferLength();
-  char * p = new char[len];
+  char * p;
+  try
+  {
+    p = new char[len];
+  }
+  catch(std::bad_alloc&)
+  {
+    return false;
+  }
   image.GetBuffer(p);
   assert(len % 3 == 0);
   PixelFormat pf = Input->GetPixelFormat();
   const size_t ps = pf.GetPixelSize();
   const size_t framesize = dims[0] * dims[1] * ps;
   assert(framesize * dims[2] == len);
-  char * copy = new char[len];
+  char * copy;
+  try
+  {
+    copy = new char[len];
+  }
+  catch(std::bad_alloc&)
+  {
+    return false;
+  }
   size_t size = framesize / 3;
   if(PlanarConfiguration == 0)
   {

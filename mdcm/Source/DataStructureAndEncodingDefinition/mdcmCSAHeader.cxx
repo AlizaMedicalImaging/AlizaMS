@@ -362,7 +362,15 @@ bool CSAHeader::LoadFromDataElement(DataElement const &de)
       assert(item_xx[0] == item_xx[1] && item_xx[1] == item_xx[3]);
       if(len)
       {
-        char *val = new char[len+1];
+        char * val;
+        try
+        {
+          val = new char[len+1];
+        }
+        catch(std::bad_alloc&)
+        {
+          return false;
+        }
         val[len] = 0; // security
         ss.read(val,len);
         // simply print the value as if it was IS/DS or LO (ASCII)

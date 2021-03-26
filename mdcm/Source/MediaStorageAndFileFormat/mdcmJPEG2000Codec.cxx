@@ -786,7 +786,15 @@ bool JPEG2000Codec::Decode(DataElement const & in, DataElement & out)
       assert(!sf);
       std::stringstream is;
       const size_t j2kbv_len = j2kbv->GetLength();
-      char * mybuffer = new char[j2kbv_len];
+      char * mybuffer;
+      try
+      {
+        mybuffer = new char[j2kbv_len];
+      }
+      catch(std::bad_alloc&)
+      {
+        return false;
+      }
       const bool b = j2kbv->GetBuffer(mybuffer, (unsigned long long)j2kbv_len);
       if(b) is.write(mybuffer, j2kbv_len);
       delete[] mybuffer;
@@ -804,7 +812,15 @@ bool JPEG2000Codec::Decode(DataElement const & in, DataElement & out)
     if(!sf) return false;
     std::stringstream is;
     const unsigned long long totalLen = sf->ComputeByteLength();
-    char * buffer = new char[totalLen];
+    char * buffer;
+    try
+    {
+      buffer = new char[totalLen];
+    }
+    catch(std::bad_alloc&)
+    {
+      return false;
+    }
     sf->GetBuffer(buffer, totalLen);
     is.write(buffer, totalLen);
     delete[] buffer;
@@ -840,7 +856,15 @@ bool JPEG2000Codec::Decode(DataElement const & in, DataElement & out)
       const ByteValue * bv = frag.GetByteValue();
       if(!bv) return false;
       const size_t bv_len = bv->GetLength();
-      char * mybuffer = new char[bv_len];
+      char * mybuffer;
+      try
+      {
+        mybuffer = new char[bv_len];
+      }
+      catch(std::bad_alloc&)
+      {
+        return false;
+      }
       bv->GetBuffer(mybuffer, bv->GetLength());
       is.write(mybuffer, bv->GetLength());
       delete[] mybuffer;
@@ -897,7 +921,15 @@ bool JPEG2000Codec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
 {
   is.seekg(0, std::ios::end);
   const size_t buf_size = (size_t)is.tellg();
-  char * dummy_buffer = new char[buf_size];
+  char * dummy_buffer;
+  try
+  {
+    dummy_buffer = new char[buf_size];
+  }
+  catch(std::bad_alloc&)
+  {
+    return false;
+  }
   is.seekg(0, std::ios::beg);
   is.read(dummy_buffer, buf_size);
   const bool b = GetHeaderInfo(dummy_buffer, buf_size, ts);
@@ -1042,7 +1074,15 @@ bool JPEG2000Codec::DecodeExtent(
       is.seekg(thestart + curoffset + 8 * z, std::ios::beg);
       is.seekg(8, std::ios::cur);
       const size_t buf_size = offsets[z];
-      char * dummy_buffer = new char[buf_size];
+      char * dummy_buffer;
+      try
+      {
+        dummy_buffer = new char[buf_size];
+      }
+      catch(std::bad_alloc&)
+      {
+        return false;
+      }
       is.read(dummy_buffer, buf_size);
       std::pair<char*,size_t> raw_len = this->DecodeByStreamsCommon(dummy_buffer, buf_size);
       delete[] dummy_buffer;
@@ -1077,7 +1117,15 @@ bool JPEG2000Codec::DecodeByStreams(std::istream &is, std::ostream &os)
   // TODO may be could be done better?
   is.seekg(0, std::ios::end);
   const size_t buf_size = (size_t)is.tellg();
-  char * dummy_buffer = new char[buf_size];
+  char * dummy_buffer;
+  try
+  {
+    dummy_buffer = new char[buf_size];
+  }
+  catch(std::bad_alloc&)
+  {
+    return false;
+  }
   is.seekg(0, std::ios::beg);
   is.read(dummy_buffer, buf_size);
   std::pair<char*,size_t> raw_len =
@@ -1304,7 +1352,15 @@ std::pair<char *, size_t> JPEG2000Codec::DecodeByStreamsCommon(
   opj_stream_destroy(cio);
   const unsigned long long len =
     Dimensions[0]*Dimensions[1] * (PF.GetBitsAllocated() / 8) * image->numcomps;
-  char * raw = new char[len];
+  char * raw;
+  try
+  {
+    raw = new char[len];
+  }
+  catch(std::bad_alloc&)
+  {
+    return std::make_pair((char*)NULL, 0);
+  }
   for(unsigned int compno = 0; compno < (unsigned int)image->numcomps; compno++)
   {
     opj_image_comp_t * comp = &image->comps[compno];
@@ -1462,7 +1518,15 @@ bool JPEG2000Codec::CodeFrameIntoBuffer(
   opj_setup_encoder(cinfo, &parameters, image);
   myfile mysrc;
   myfile * fsrc = &mysrc;
-  char * buffer_j2k = new char[inputlength*2]; // overallocated
+  char * buffer_j2k; // overallocated
+  try
+  {
+    buffer_j2k = new char[inputlength*2];
+  }
+  catch(std::bad_alloc&)
+  {
+    return false;
+  }
   fsrc->mem = fsrc->cur = buffer_j2k;
   fsrc->len = 0; //inputlength
   /* open a byte stream for writing */

@@ -162,7 +162,7 @@ void ImageCodec::SetDimensions(const unsigned int d[3])
 
 void ImageCodec::SetDimensions(const std::vector<unsigned int> & d)
 {
-  size_t s = d.size();
+  const size_t s = d.size();
   assert(s <= 3);
   for (size_t i = 0; i < 3; i++)
   {
@@ -369,8 +369,16 @@ bool ImageCodec::DoByteSwap(std::istream & is, std::ostream & os)
   std::streampos start = is.tellg();
   assert(0 - start == 0);
   is.seekg(0, std::ios::end);
-  size_t buf_size = (size_t)is.tellg();
-  char * dummy_buffer = new char[(unsigned int)buf_size];
+  const size_t buf_size = is.tellg();
+  char * dummy_buffer;
+  try
+  {
+    dummy_buffer = new char[buf_size];
+  }
+  catch(std::bad_alloc&)
+  {
+    return false;
+  }
   is.seekg(start, std::ios::beg);
   is.read(dummy_buffer, buf_size);
   is.seekg(start, std::ios::beg);
@@ -404,33 +412,45 @@ bool ImageCodec::DoYBRFull422(std::istream & is, std::ostream & os)
   const size_t rgb_buf_size = buf_size * 3 / 2;
   if (rgb_buf_size % 3 != 0) return false;
   unsigned char * buffer;
-  try { buffer = new unsigned char[buf_size]; }
-  catch (std::bad_alloc&) { return false; }
+  try
+  {
+    buffer = new unsigned char[buf_size];
+  }
+  catch (std::bad_alloc&)
+  {
+    return false;
+  }
   is.seekg(start, std::ios::beg);
   is.read((char*)buffer, buf_size);
   is.seekg(start, std::ios::beg);
   unsigned char * copy;
-  try { copy = new unsigned char[rgb_buf_size]; }
-  catch (std::bad_alloc&) { delete [] buffer; return false; }
+  try
+  {
+    copy = new unsigned char[rgb_buf_size];
+  }
+  catch (std::bad_alloc&)
+  {
+    delete [] buffer; return false;
+  }
   const size_t size = buf_size/4;
   for (size_t j = 0; j < size; ++j)
   {
     const unsigned char ybr422[] =
-    {
-      buffer[4*j+0],
-      buffer[4*j+1],
-      buffer[4*j+2],
-      buffer[4*j+3]
-    };
+      {
+        buffer[4*j+0],
+        buffer[4*j+1],
+        buffer[4*j+2],
+        buffer[4*j+3]
+      };
     const unsigned char ybr[] =
-    {
-      ybr422[0],
-      ybr422[2],
-      ybr422[3],
-      ybr422[1],
-      ybr422[2],
-      ybr422[3]
-    };
+      {
+        ybr422[0],
+        ybr422[2],
+        ybr422[3],
+        ybr422[1],
+        ybr422[2],
+        ybr422[3]
+      };
     memcpy(copy + 6 * j, ybr, 6);
   }
   os.write((char*)copy, rgb_buf_size);
@@ -444,20 +464,36 @@ bool ImageCodec::DoPlanarConfiguration(std::istream & is, std::ostream & os)
   std::streampos start = is.tellg();
   assert(0 - start == 0);
   is.seekg(0, std::ios::end);
-  size_t buf_size = (size_t)is.tellg();
-  char * dummy_buffer = new char[(unsigned int)buf_size];
+  const size_t buf_size = is.tellg();
+  char * dummy_buffer;
+  try
+  {
+    dummy_buffer = new char[buf_size];
+  }
+  catch(std::bad_alloc&)
+  {
+    return false;
+  }
   is.seekg(start, std::ios::beg);
   is.read(dummy_buffer, buf_size);
   is.seekg(start, std::ios::beg);
   // US-RGB-8-epicard.dcm
   assert(buf_size % 3 == 0);
-  unsigned long size = (unsigned long)buf_size/3;
-  char * copy = new char[(unsigned int)buf_size];
+  const size_t size = buf_size/3;
+  char * copy;
+  try
+  {
+    copy = new char[buf_size];
+  }
+  catch(std::bad_alloc&)
+  {
+    return false;
+  }
   const char * r = dummy_buffer;
   const char * g = dummy_buffer + size;
   const char * b = dummy_buffer + size + size;
   char * p = copy;
-  for (unsigned long j = 0; j < size; ++j)
+  for (size_t j = 0; j < size; ++j)
   {
     *(p++) = *(r++);
     *(p++) = *(g++);

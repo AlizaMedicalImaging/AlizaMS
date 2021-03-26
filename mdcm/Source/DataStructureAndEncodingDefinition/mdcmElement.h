@@ -611,7 +611,15 @@ public:
       if(len > Length)
       {
         assert((len / size) * size == len);
-        Type * internal = new Type[len / size];
+        Type * internal;
+        try
+        {
+          internal = new Type[len / size];
+        }
+        catch(std::bad_alloc&)
+        {
+          return;
+        }
         assert(Save == false);
         Save = true; // ?
         if(Internal)

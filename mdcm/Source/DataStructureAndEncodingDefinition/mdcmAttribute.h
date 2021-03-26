@@ -485,12 +485,20 @@ public:
     }
     Own = own;
     Length = numel;
-    assert(Internal == 0);
     if(own)
     {
-      Internal = new ArrayType[numel];
+      try
+      {
+        Internal = new ArrayType[numel];
+      }
+      catch(std::bad_alloc&)
+      {
+        return;
+      }
       if(array && numel)
+      {
         std::copy(array, array+numel, Internal);
+      }
     }
     else
     {
@@ -565,7 +573,15 @@ protected:
     }
     else
     {
-      internal = new ArrayType[(VL::Type)bv->GetLength()]; // over allocation
+      try
+      {
+         // overallocation
+        internal = new ArrayType[(VL::Type)bv->GetLength()];
+      }
+      catch(std::bad_alloc&)
+      {
+        return;
+      }
     }
     EncodingImplementation<VRToEncoding<TVR>::Mode>::ReadComputeLength(internal, Length, ss);
     SetValues(internal, Length, true);

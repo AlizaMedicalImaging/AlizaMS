@@ -62,7 +62,15 @@ bool JPEGLSCodec::Decode(DataElement const &in, DataElement &out)
     const SequenceOfFragments * sf = in.GetSequenceOfFragments();
     if (!sf) return false;
     const size_t totalLen = sf->ComputeByteLength();
-    char * buffer = new char[totalLen];
+    char * buffer;
+    try
+    {
+      buffer = new char[totalLen];
+    }
+    catch(std::bad_alloc&)
+    {
+      return false;
+    }
     sf->GetBuffer(buffer, totalLen);
     std::vector<unsigned char> rgbyteOut;
     const bool b = DecodeByStreamsCommon(buffer, totalLen, rgbyteOut);
@@ -85,7 +93,15 @@ bool JPEGLSCodec::Decode(DataElement const &in, DataElement &out)
       const ByteValue * bv = frag.GetByteValue();
       if (!bv) return false;
       size_t totalLen = bv->GetLength();
-      char * mybuffer = new char[totalLen];
+      char * mybuffer;
+      try
+      {
+        mybuffer = new char[totalLen];
+      }
+      catch(std::bad_alloc&)
+      {
+        return false;
+      }
       bv->GetBuffer(mybuffer, bv->GetLength());
       const unsigned char * pbyteCompressed = (const unsigned char*)mybuffer;
       while(totalLen > 0 && pbyteCompressed[totalLen-1] != 0xd9)
@@ -173,7 +189,15 @@ bool JPEGLSCodec::GetHeaderInfo(std::istream &is, TransferSyntax &ts)
   using namespace charls;
   is.seekg(0, std::ios::end);
   const size_t buf_size = (size_t)is.tellg();
-  char * dummy_buffer = new char[buf_size];
+  char * dummy_buffer;
+  try
+  {
+    dummy_buffer = new char[buf_size];
+  }
+  catch(std::bad_alloc&)
+  {
+    return false;
+  }
   is.seekg(0, std::ios::beg);
   is.read(dummy_buffer, buf_size);
   JlsParameters metadata = {};
@@ -346,7 +370,15 @@ bool JPEGLSCodec::DecodeExtent(char * buffer,
       is.seekg(thestart + curoffset + 8 * z, std::ios::beg);
       is.seekg(8, std::ios::cur);
       const size_t buf_size = offsets[z];
-      char * dummy_buffer = new char[ buf_size ];
+      char * dummy_buffer;
+      try
+      {
+        dummy_buffer = new char[buf_size];
+      }
+      catch(std::bad_alloc&)
+      {
+        return false;
+      }
       is.read(dummy_buffer, buf_size);
       std::vector <unsigned char> outv;
       const bool b = DecodeByStreamsCommon(dummy_buffer, buf_size, outv);
