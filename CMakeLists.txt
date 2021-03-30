@@ -59,6 +59,10 @@ endif()
 
 project(ALIZAMS)
 
+if(APPLE)
+  set(ALIZAMS_OSX_BUNDLE_VERSION "1.3.2")
+endif()
+
 if(NOT WIN32)
   if(NOT (CMAKE_SIZEOF_VOID_P EQUAL 8))
     if(NOT (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm"))
@@ -846,10 +850,10 @@ if(USE_QT_V_6)
     Qt6::Core
     Qt6::Gui
     Qt6::Widgets
-	Qt6::OpenGLWidgets
+    Qt6::OpenGLWidgets
     Qt6::PrintSupport
     Qt6::Svg
-	Qt6::Core5Compat)
+    Qt6::Core5Compat)
   if(NOT USE_MEDIASTORAGE_MODE)
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} Qt6::Sql)
   endif()
@@ -901,9 +905,11 @@ elseif(APPLE)
     ${ALIZAMS_MOC_SRCS}
     ${ALIZAMS_UIS}
     ${ALIZAMS_QRCS_RCC}
-    ${ALIZAMS_OSX_ICON}
-  )
+    ${ALIZAMS_OSX_ICON})
   set_target_properties(AlizaMS PROPERTIES
+    MACOSX_BUNDLE_BUNDLE_NAME "AlizaMS"
+    MACOSX_BUNDLE_BUNDLE_VERSION ${ALIZAMS_OSX_BUNDLE_VERSION}
+    MACOSX_BUNDLE_GUI_IDENTIFIER "com.aliza.alizams"
     MACOSX_BUNDLE_ICON_FILE ${ALIZAMS_OSX_ICON_NAME}
     MACOSX_BUNDLE_COPYRIGHT "© 2015-2021 Aliza Medical Imaging")
   target_link_libraries(AlizaMS ${ALIZAMS_LINK_LIBRARIES})
