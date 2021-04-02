@@ -39,9 +39,12 @@
 #include <iostream>
 #include <list>
 #include <cstdlib>
+#include <random>
+#include "float.h"
+#include <chrono>
+#include <functional>
 #include "dicomutils.h"
 #include "colorspace/colorspace.h"
-#include "float.h"
 
 typedef Vectormath::Scalar::Vector3 sVector3;
 typedef Vectormath::Scalar::Point3  sPoint3;
@@ -1682,7 +1685,15 @@ int CommonUtils::get_next_group_id()
 
 float CommonUtils::random_range(float lo, float hi)
 {
-	return lo+(hi-lo)*(rand()/(float)RAND_MAX);
+#if 0
+	return lo + ((hi - lo) * (rand() / (float)RAND_MAX));
+#else
+	auto f = std::bind(
+		std::uniform_real_distribution<float>(lo, hi),
+		std::mt19937(
+			std::chrono::high_resolution_clock::now().time_since_epoch().count()));
+	return f();
+#endif
 }
 
 QString CommonUtils::convert_orientation_flag(unsigned int in)

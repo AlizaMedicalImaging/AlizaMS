@@ -26,7 +26,8 @@
 #include "dicomutils.h"
 #include "alizams_version.h"
 #include <cstdlib>
-#include <ctime> 
+#include <ctime>
+#include <random>
 
 static mdcm::VR get_vr(
 	const mdcm::DataSet & ds,
@@ -1574,11 +1575,11 @@ void AnonymazerWidget2::process_directory(
 
 void AnonymazerWidget2::run_()
 {
-	srand(time(NULL));
-	const int y_off = rand() % 2 + 1;
-	const int m_off = rand() % 3 + 1;
-	const int d_off = rand() % 4 + 1;
-	const int s_off = rand() % 1999 + 1;
+	std::mt19937 mtrand(time(0));
+	const int y_off = mtrand() % 2 + 1;
+	const int m_off = mtrand() % 3 + 1;
+	const int d_off = mtrand() % 4 + 1;
+	const int s_off = mtrand() % 1999 + 1;
 	//
 	const mdcm::Global & g     = mdcm::GlobalInstance;
 	const mdcm::Dicts  & dicts = g.GetDicts();

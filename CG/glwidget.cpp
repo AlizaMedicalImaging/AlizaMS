@@ -260,7 +260,6 @@ GLWidget::GLWidget()
 	setMinimumSize(64,64);
 	setFocusPolicy(Qt::WheelFocus);
 	init_();
-	srand(time(NULL));
 }
 #else
 GLWidget::GLWidget()
@@ -268,7 +267,6 @@ GLWidget::GLWidget()
 	setMinimumSize(64,64);
 	setFocusPolicy(Qt::WheelFocus);
 	init_();
-	srand(time(NULL));
 }
 
 GLWidget::GLWidget(const QGLFormat & frm) : QGLWidget(frm)
@@ -276,7 +274,6 @@ GLWidget::GLWidget(const QGLFormat & frm) : QGLWidget(frm)
 	setMinimumSize(64,64);
 	setFocusPolicy(Qt::WheelFocus);
 	init_();
-	srand(time(NULL));
 }
 #endif
 

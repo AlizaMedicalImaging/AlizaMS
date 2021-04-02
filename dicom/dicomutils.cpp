@@ -80,6 +80,8 @@
 #include <string>
 #include <set>
 #include <algorithm>
+#include <random>
+#include <ctime>
 #include "vectormath/scalar/vectormath.h"
 
 typedef Vectormath::Scalar::Vector3 sVector3;
@@ -1516,9 +1518,10 @@ QString DicomUtils::generate_id()
 		"0123456789ABCDEFGHIJKLMNOPQRSTU"
 		"VWXYZabcdefghijklmnopqrstuvwxyz";
 	const unsigned int ss = sizeof(s);
+	std::mt19937 mtrand(time(0));
 	for (unsigned int i = 0; i < 11; i++)
 	{
-		c[i] = s[rand() % (ss - 1)];
+		c[i] = s[mtrand() % (ss - 1)];
 	}
 	const QString r = QString(c).trimmed();
 	return r;
