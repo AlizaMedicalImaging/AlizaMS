@@ -2061,9 +2061,13 @@ void PrConfigUtils::read_voi_lut(
 				QString s;
 				if (DicomUtils::get_string_value(
 						nestedds,tVOILUTFunction,s))
+				{
 					c.values.push_back(QVariant(s));
+				}
 				else
+				{
 					c.values.push_back(QVariant(QString(""))); // 2
+				}
 				if (nestedds.FindDataElement(tReferencedImageSequence))
 				{
 					const mdcm::DataElement & de1 =
@@ -2085,11 +2089,13 @@ void PrConfigUtils::read_voi_lut(
 							c.values.push_back(QVariant(s1)); // 3+
 							if (DicomUtils::get_string_value(
 									nestedds1,tReferencedFrameNumber,s2))
-								c.values.push_back(QVariant(
-									s2)); //
+							{
+								c.values.push_back(QVariant(s2)); //
+							}
 							else
-								c.values.push_back(QVariant(
-									QString(""))); //
+							{
+								c.values.push_back(QVariant(QString(""))); //
+							}
 						}
 
 					}
@@ -2277,9 +2283,13 @@ void PrConfigUtils::read_display_areas(
 						c.values.push_back(QVariant(s1)); // 11+
 						if (DicomUtils::get_string_value(
 								nestedds1,tReferencedFrameNumber,s2))
+						{
 							c.values.push_back(QVariant(s2)); //
+						}
 						else
+						{
 							c.values.push_back(QVariant(QString(""))); //
+						}
 					}
 				}
 			}
@@ -2384,8 +2394,8 @@ static void read_overlays(
 	std::vector<uint16_t> l;
 	get_overlays(ds, l);
 	const unsigned int s = l.size();
-	if(s < 1) return;
-	for(unsigned int i = 0; i < s; i++)
+	if (s < 1) return;
+	for (unsigned int i = 0; i < s; i++)
 	{
 		mdcm::Overlay o;
 		mdcm::Tag t(0x6000,0x0000);
@@ -2570,7 +2580,9 @@ void PrConfigUtils::read_graphic_objects(
 	const mdcm::Tag tFillPattern(0x0070,0x0256);
 	//
 	QString t00080005("");
-	DicomUtils::get_string_value(ds, mdcm::Tag(0x0008,0x0005), t00080005);
+	const bool t00080005_ok =
+		DicomUtils::get_string_value(ds, mdcm::Tag(0x0008,0x0005), t00080005);
+	(void)t00080005_ok;
 	if (ds.FindDataElement(tGraphicAnnotationSequence))
 	{
 		const mdcm::DataElement & de =
@@ -2601,12 +2613,14 @@ void PrConfigUtils::read_graphic_objects(
 					const mdcm::DataSet & nestedds1 =
 						item1.GetNestedDataSet();
 					QString s1, s2;
-					DicomUtils::get_string_value(
+					const bool s1_ok = DicomUtils::get_string_value(
 						nestedds1,tReferencedSOPInstanceUID,s1);
-					DicomUtils::get_string_value(
+					const bool s2_ok = DicomUtils::get_string_value(
 						nestedds1,tReferencedFrameNumber,s2);
 					ref_sop.push_back(s1);
 					ref_sop.push_back(s2);
+					(void)s1_ok;
+					(void)s2_ok;
 				}
 			}
 			if (nestedds.FindDataElement(tGraphicObjectSequence))
@@ -2745,7 +2759,9 @@ void PrConfigUtils::read_text_annotations(
 	const mdcm::Tag tBold(0x0070,0x0249);          // Y, N
 	const mdcm::Tag tItalic(0x0070,0x0250);        // Y, N
 	QString t00080005("");
-	DicomUtils::get_string_value(ds, mdcm::Tag(0x0008,0x0005), t00080005);
+	const bool t00080005_ok =
+		DicomUtils::get_string_value(ds, mdcm::Tag(0x0008,0x0005), t00080005);
+	(void)t00080005_ok;
 	if (ds.FindDataElement(tGraphicAnnotationSequence))
 	{
 		const mdcm::DataElement & de =
@@ -2776,12 +2792,14 @@ void PrConfigUtils::read_text_annotations(
 					const mdcm::DataSet & nestedds1 =
 						item1.GetNestedDataSet();
 					QString s1, s2;
-					DicomUtils::get_string_value(
+					const bool s1_ok = DicomUtils::get_string_value(
 						nestedds1,tReferencedSOPInstanceUID,s1);
-					DicomUtils::get_string_value(
+					const bool s2_ok = DicomUtils::get_string_value(
 						nestedds1,tReferencedFrameNumber,s2);
 					ref_sop.push_back(s1);
 					ref_sop.push_back(s2);
+					(void)s1_ok;
+					(void)s2_ok;
 				}
 			}
 			if (nestedds.FindDataElement(tTextObjectSequence))
