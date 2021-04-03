@@ -41,7 +41,6 @@
 #include <cstdlib>
 #include <random>
 #include "float.h"
-#include <chrono>
 #include <functional>
 #include "dicomutils.h"
 #include "colorspace/colorspace.h"
@@ -1685,14 +1684,14 @@ int CommonUtils::get_next_group_id()
 
 float CommonUtils::random_range(float lo, float hi)
 {
-#if 0
-	return lo + ((hi - lo) * (rand() / (float)RAND_MAX));
-#else
+#if 1
+	std::random_device rd;
 	auto f = std::bind(
 		std::uniform_real_distribution<float>(lo, hi),
-		std::mt19937(
-			std::chrono::high_resolution_clock::now().time_since_epoch().count()));
+		std::mt19937(rd()));
 	return f();
+#else
+	return lo + ((hi - lo) * (rand() / (float)RAND_MAX));
 #endif
 }
 
@@ -4356,9 +4355,9 @@ double CommonUtils::calculate_max_delta(const ImageVariant * v)
 
 void CommonUtils::random_RGB(float * R, float * G, float * B)
 {
-	const double H = CommonUtils::random_range(0.0f,359.999f);
-	const double S = CommonUtils::random_range(0.5f,0.999f);
-	const double V = CommonUtils::random_range(0.4f,0.999f);
+	const double H = random_range(0.0f, 360.0f);
+	const double S = random_range(0.5f, 1.0f);
+	const double V = random_range(0.4f, 1.0f);
 	double R_, G_, B_;
 	ColorSpace_::Hsv2Rgb(&R_, &G_, &B_, H, S, V);
 	*R = (float)R_;
