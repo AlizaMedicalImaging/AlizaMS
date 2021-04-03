@@ -1687,7 +1687,7 @@ double CommonUtils::random_range(
 {
 	auto f = std::bind(
 		std::uniform_real_distribution<double>(lo, hi),
-		std::mt19937(seed));
+		std::mt19937_64(seed));
 	return f();
 }
 

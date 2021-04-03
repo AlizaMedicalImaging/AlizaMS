@@ -36,12 +36,12 @@ DisplayInterface::DisplayInterface(
 	lock_2Dview = false;
 	lock_single = false;
 	cube_3dtex = 0;
-	for (int x=0;x<3;x++) origin[x]=0.0f;
+	for (int x = 0;x < 3; x++) { origin[x] = 0.0f; }
 	origin_ok = false;
 	tex_info = -1;
 	idimx = idimy = idimz = 0;
 	ix_origin = iy_origin = iz_origin = 0.0f;
-	for (int x=0;x<6;x++) dircos[x]=0.0f;
+	for (int x = 0; x < 6; x++) { dircos[x] = 0.0f; }
 	ix_spacing = iy_spacing = iz_spacing = 0.0;
 	dimx = dimy = 0;
 	x_spacing = y_spacing = 0.0;
@@ -117,6 +117,7 @@ void DisplayInterface::close(bool clear_geometry)
 		if (image_slices.at(x))
 		{
 			delete image_slices[x];
+			image_slices[x] = NULL;
 		}
 	}
 	image_slices.clear();
@@ -174,12 +175,13 @@ void DisplayInterface::close(bool clear_geometry)
 				}
 			}
 			delete spectroscopy_slices[x];
+			spectroscopy_slices[x] = NULL;
 		}
 	}
 	spectroscopy_slices.clear();
 	spectroscopy_generated = false;
-	for (int x=0;x<6;x++) dircos[x]=0.0f;
-	for (int x=0;x<3;x++) origin[x]=0.0f;
+	for (int x = 0; x < 6; x++) { dircos[x] = 0.0f; }
+	for (int x = 0; x < 3; x++) { origin[x] = 0.0f; }
 	origin_ok = false;
 	for (int k = 0; k < rois.size(); k++)
 	{
@@ -213,6 +215,7 @@ void DisplayInterface::close(bool clear_geometry)
 					GLWidget::increment_count_vbos(-1);
 				}
 				delete c;
+				c = NULL;
 			}
 		}
 		keys.clear();
@@ -239,8 +242,13 @@ void DisplayInterface::close(bool clear_geometry)
 #endif
 			GLWidget::increment_count_vbos(-2);
 			delete trimesh->qmesh;
+			trimesh->qmesh = NULL;
 		}
-		if (trimesh) delete trimesh;
+		if (trimesh)
+		{
+			delete trimesh;
+			trimesh = NULL;
+		}
 	}
 	trimeshes.clear();
 	center_x = center_y = center_z = 0.0f;
@@ -314,6 +322,7 @@ ImageVariant::~ImageVariant()
 	//
 	di->close();
 	delete di;
+	di = NULL;
 	icon      = QPixmap();
 	histogram = QPixmap();
 }

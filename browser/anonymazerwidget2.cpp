@@ -26,8 +26,8 @@
 #include "dicomutils.h"
 #include "alizams_version.h"
 #include <cstdlib>
-#include <ctime>
 #include <random>
+#include <chrono>
 
 static mdcm::VR get_vr(
 	const mdcm::DataSet & ds,
@@ -1575,7 +1575,11 @@ void AnonymazerWidget2::process_directory(
 
 void AnonymazerWidget2::run_()
 {
-	std::mt19937 mtrand(time(0));
+	const unsigned long long seed =
+		std::chrono::high_resolution_clock::now()
+			.time_since_epoch()
+			.count();
+	std::mt19937_64 mtrand(seed);
 	const int y_off = mtrand() % 2 + 1;
 	const int m_off = mtrand() % 3 + 1;
 	const int d_off = mtrand() % 4 + 1;

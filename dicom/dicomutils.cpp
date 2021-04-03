@@ -81,7 +81,7 @@
 #include <set>
 #include <algorithm>
 #include <random>
-#include <ctime>
+#include <chrono>
 #include "vectormath/scalar/vectormath.h"
 
 typedef Vectormath::Scalar::Vector3 sVector3;
@@ -1518,7 +1518,11 @@ QString DicomUtils::generate_id()
 		"0123456789ABCDEFGHIJKLMNOPQRSTU"
 		"VWXYZabcdefghijklmnopqrstuvwxyz";
 	const unsigned int ss = sizeof(s);
-	std::mt19937 mtrand(time(0));
+	const unsigned long long seed =
+		std::chrono::high_resolution_clock::now()
+			.time_since_epoch()
+			.count();
+	std::mt19937_64 mtrand(seed);
 	for (unsigned int i = 0; i < 11; i++)
 	{
 		c[i] = s[mtrand() % (ss - 1)];
@@ -3412,7 +3416,8 @@ void DicomUtils::read_frame_times(const mdcm::DataSet & ds, ImageVariant * ivari
 	if (ds.FindDataElement(tframeincrementpointer))
 	{
 		unsigned short group, element;
-		char group_[2]; char element_[2];
+		char group_[2];
+		char element_[2];
 		const mdcm::DataElement & e = ds.GetDataElement(tframeincrementpointer);
 		const mdcm::ByteValue * bv = e.GetByteValue();
 		if (bv)
@@ -3424,9 +3429,11 @@ void DicomUtils::read_frame_times(const mdcm::DataSet & ds, ImageVariant * ivari
 				const bool ok0 = bv->GetBuffer(buffer,4);
 				if (ok0)
 				{
-					group_[0]   = buffer[0]; group_[1]   = buffer[1];
+					group_[0] = buffer[0];
+					group_[1] = buffer[1];
 					memcpy(&group,group_,2);
-					element_[0] = buffer[2]; element_[1] = buffer[3];
+					element_[0] = buffer[2];
+					element_[1] = buffer[3];
 					memcpy(&element,element_,2);
 					if (group==0x0018 && element==0x1063)
 					{
@@ -3435,7 +3442,9 @@ void DicomUtils::read_frame_times(const mdcm::DataSet & ds, ImageVariant * ivari
 							const mdcm::DataElement & e = ds.GetDataElement(tframetime);
 							if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
 							{
-								const QString s = QString::fromLatin1(e.GetByteValue()->GetPointer(),e.GetByteValue()->GetLength());
+								const QString s =
+									QString::fromLatin1(
+										e.GetByteValue()->GetPointer(),e.GetByteValue()->GetLength());
 								bool ok;
 								double tmp0 = QVariant(s.trimmed().remove(QChar('\0'))).toDouble(&ok);
 								if (ok) frametime = tmp0;
@@ -3450,7 +3459,9 @@ void DicomUtils::read_frame_times(const mdcm::DataSet & ds, ImageVariant * ivari
 							const mdcm::DataElement & e = ds.GetDataElement(tframetimes);
 							if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
 							{
-								const QString s = QString::fromLatin1(e.GetByteValue()->GetPointer(),e.GetByteValue()->GetLength());
+								const QString s =
+									QString::fromLatin1(
+										e.GetByteValue()->GetPointer(),e.GetByteValue()->GetLength());
 								bool ok;
 								QStringList l = s.trimmed().remove(QChar('\0')).split(QString("\\"));
 								for (int x = 0; x < l.size(); x++)
@@ -3473,7 +3484,9 @@ void DicomUtils::read_frame_times(const mdcm::DataSet & ds, ImageVariant * ivari
 			const mdcm::DataElement & e = ds.GetDataElement(tframetime);
 			if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
 			{
-				const QString s = QString::fromLatin1(e.GetByteValue()->GetPointer(),e.GetByteValue()->GetLength());
+				const QString s =
+					QString::fromLatin1(
+						e.GetByteValue()->GetPointer(),e.GetByteValue()->GetLength());
 				bool ok;
 				double tmp0 = QVariant(s.trimmed().remove(QChar('\0'))).toDouble(&ok);
 				if (ok) frametime = tmp0;
