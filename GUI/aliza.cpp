@@ -29,9 +29,6 @@
 #include <itkMath.h>
 #ifndef WIN32
 #include <unistd.h>
-#if QT_VERSION < QT_VERSION_CHECK(4,7,0)
-#include <sys/time.h>
-#endif
 #endif
 
 // non-recursive
@@ -3092,14 +3089,7 @@ void Aliza::animate_()
 {
 	if (!run__) return;
 	if (animation_images.size()<2) return;
-#if QT_VERSION >= QT_VERSION_CHECK(4,7,0)
 	const qint64 t0 = QDateTime::currentMSecsSinceEpoch();
-#else
-	struct timeval tp0;
-	gettimeofday(&tp0, NULL);
-	const long long t0 =
-		(long long) tp0.tv_sec*1000L+(long long)tp0.tv_usec/1000L;
-#endif
 	const int tmp0 = anim_idx+1;
 	anim_idx = (tmp0>=animation_images.size()||tmp0<0) ? 0 : tmp0;
 	selected_images.clear();
@@ -3114,14 +3104,7 @@ void Aliza::animate_()
 			graphicswidget_x->set_slice_2D(animation_images[anim_idx],0,false);
 		}
 	}
-#if QT_VERSION >= QT_VERSION_CHECK(4,7,0)
 	const qint64 t1 = QDateTime::currentMSecsSinceEpoch();
-#else
-	struct timeval tp1;
-	gettimeofday(&tp1, NULL);
-	const long long t1 =
-		(long long)tp1.tv_sec*1000L+(long long)tp1.tv_usec/1000L;
-#endif
 	const int dt =(int)(t1-t0);
 	const bool acq_time =
 		anim3Dwidget->t_checkBox->isChecked() &&

@@ -32,15 +32,10 @@
 #include "contourutils.h"
 #include "aliza.h"
 #include "updateqtcommand.h"
-
+#include <limits>
 #ifndef WIN32
 #include <unistd.h>
-#if QT_VERSION < QT_VERSION_CHECK(4,7,0)
-#include <sys/time.h>
 #endif
-#endif
-
-#include <limits>
 
 void gImageCleanupHandler(void * info)
 {
@@ -2430,14 +2425,7 @@ void GraphicsWidget::animate_()
 	double requested_time = frametime_2D;
 	bool time_defined = false;
 	if (!image_container.image3D) return;
-#if QT_VERSION >= QT_VERSION_CHECK(4,7,0)
 	const qint64 t0 = QDateTime::currentMSecsSinceEpoch();
-#else
-	struct timeval tp0;
-	gettimeofday(&tp0, NULL);
-	const long long t0 =
-		(long long) tp0.tv_sec * 1000L + tp0.tv_usec / 1000;
-#endif
 	switch(axis)
 	{
 	case 0:
@@ -2500,14 +2488,7 @@ void GraphicsWidget::animate_()
 		aliza->update_slice_from_animation(
 			const_cast<const ImageVariant*>(image_container.image3D));
 	}
-#if QT_VERSION >= QT_VERSION_CHECK(4,7,0)
 	const qint64 t1 = QDateTime::currentMSecsSinceEpoch();
-#else
-	struct timeval tp1;
-	gettimeofday(&tp1, NULL);
-	const long long t1 =
-		(long long)tp1.tv_sec * 1000L + (long long)tp1.tv_usec / 1000;
-#endif
 	const long int t = static_cast<int>(requested_time-(t1-t0));
 	if (t <= 0)
 	{

@@ -30,7 +30,7 @@ public:
 	~CommonUtils();
 	static int get_next_id();
 	static int get_next_group_id();
-	static float random_range(float, float);
+	static double random_range(double, double, unsigned long long);
 	static QString convert_orientation_flag(unsigned int);
 	static double set_digits(double, int);
 	static QString get_orientation2(const double*);

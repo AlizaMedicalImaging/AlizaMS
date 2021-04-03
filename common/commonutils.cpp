@@ -1682,17 +1682,13 @@ int CommonUtils::get_next_group_id()
 	return group_id___;
 }
 
-float CommonUtils::random_range(float lo, float hi)
+double CommonUtils::random_range(
+	double lo, double hi, unsigned long long seed)
 {
-#if 1
-	std::random_device rd;
 	auto f = std::bind(
-		std::uniform_real_distribution<float>(lo, hi),
-		std::mt19937(rd()));
+		std::uniform_real_distribution<double>(lo, hi),
+		std::mt19937(seed));
 	return f();
-#else
-	return lo + ((hi - lo) * (rand() / (float)RAND_MAX));
-#endif
 }
 
 QString CommonUtils::convert_orientation_flag(unsigned int in)
@@ -4355,11 +4351,15 @@ double CommonUtils::calculate_max_delta(const ImageVariant * v)
 
 void CommonUtils::random_RGB(float * R, float * G, float * B)
 {
-	const double H = random_range(0.0f, 360.0f);
-	const double S = random_range(0.5f, 1.0f);
-	const double V = random_range(0.4f, 1.0f);
+	const unsigned long long seed =
+		std::chrono::high_resolution_clock::now()
+			.time_since_epoch()
+			.count();
+	const double H = random_range(0.0, 3600.0, seed  );
+	const double S = random_range(0.5,    1.0, seed/7);
+	const double V = random_range(0.4,    1.0, seed/3);
 	double R_, G_, B_;
-	ColorSpace_::Hsv2Rgb(&R_, &G_, &B_, H, S, V);
+	ColorSpace_::Hsv2Rgb(&R_, &G_, &B_, 0.1*H, S, V);
 	*R = (float)R_;
 	*G = (float)G_;
 	*B = (float)B_;
