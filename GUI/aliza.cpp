@@ -430,7 +430,7 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 #endif
 }
 
-Aliza::Aliza(QObject * parent) : QObject(parent)
+Aliza::Aliza()
 {
 	glwidget  = NULL;
 	imagesbox = NULL;
@@ -476,7 +476,7 @@ Aliza::Aliza(QObject * parent) : QObject(parent)
 	frametime_3D = 120;
 	trans_icon = QIcon(":/bitmaps/trans1.svg");
 	notrans_icon = QIcon(":/bitmaps/notrans1.svg");
-	anim3D_timer = new QTimer(this);
+	anim3D_timer = new QTimer();
 	g_init_physics();
 }
 
@@ -486,6 +486,12 @@ Aliza::~Aliza()
 	{
 		IconUtils::kill_threads();
 		mutex0.unlock();
+	}
+	if (anim3D_timer)
+	{
+		if (anim3D_timer->isActive()) anim3D_timer->stop();
+		delete anim3D_timer;
+		anim3D_timer = NULL;
 	}
 }
 
@@ -501,14 +507,17 @@ void Aliza::close_()
 	graphicswidget_y->clear_();
 	graphicswidget_x->clear_();
 	histogramview->clear__();
-	selected_images.clear();
-	QMap<int, ImageVariant*>::iterator iv = scene3dimages.begin();
-	while (iv != scene3dimages.end())
+	if (!selected_images.empty()) selected_images.clear();
+	if (!scene3dimages.empty())
 	{
-		if (iv.value()) { delete iv.value(); }
-		++iv;
+		QMap<int, ImageVariant*>::iterator iv = scene3dimages.begin();
+		while (iv != scene3dimages.end())
+		{
+			if (iv.value()) { delete iv.value(); }
+			++iv;
+		}
+		scene3dimages.clear();
 	}
-	scene3dimages.clear();
 	if (check_3d())
 	{
 		glwidget->close_();

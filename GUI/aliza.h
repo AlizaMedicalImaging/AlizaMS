@@ -43,7 +43,7 @@ class Aliza : public QObject
 {
 Q_OBJECT
 public:
-	Aliza(QObject(*)=NULL);
+	Aliza();
 	~Aliza();
 	void close_();
 	ImageVariant * get_image(int);

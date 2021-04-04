@@ -288,60 +288,54 @@ void GraphicsView::zoom_out()
 
 void GraphicsView::clear_paths()
 {
-	if (!paths.empty())
+	if (paths.empty()) return;
+	for (int i = 0; i < paths.size(); i++)
 	{
-		for (int i=0; i < paths.size();i++)
+		if (paths.at(i))
 		{
-			if (paths.at(i))
-			{
-				scene()->removeItem(
-					static_cast<QGraphicsItem*>(paths[i]));
-				delete paths[i];
-			}
+			scene()->removeItem(
+				static_cast<QGraphicsItem*>(paths[i]));
+			delete paths[i];
 		}
-		paths.clear();
 	}
+	paths.clear();
 }
 
 void GraphicsView::clear_collision_paths()
 {
-	if (!collision_paths.empty())
+	if (collision_paths.empty()) return;
+	for (int i = 0; i < collision_paths.size(); i++)
 	{
-		for (int i=0; i < collision_paths.size();i++)
+		if (collision_paths.at(i))
 		{
-			if (collision_paths.at(i))
-			{
-				scene()->removeItem(
-					static_cast<QGraphicsItem*>(collision_paths[i]));
-				delete collision_paths[i];
-			}
+			scene()->removeItem(
+				static_cast<QGraphicsItem*>(collision_paths[i]));
+			delete collision_paths[i];
 		}
-		collision_paths.clear();
 	}
+	collision_paths.clear();
 }
 
 void GraphicsView::clear_us_regions()
 {
-	if (!us_regions.empty())
+	if (us_regions.empty()) return;
+	for (int i = 0; i < us_regions.size(); i++)
 	{
-		for (int i=0; i < us_regions.size();i++)
+		if (us_regions.at(i))
 		{
-			if (us_regions.at(i))
-			{
-				scene()->removeItem(
-					static_cast<QGraphicsItem*>(us_regions[i]));
-				delete us_regions[i];
-			}
+			scene()->removeItem(
+				static_cast<QGraphicsItem*>(us_regions[i]));
+			delete us_regions[i];
 		}
-		us_regions.clear();
 	}
+	us_regions.clear();
 }
 
 void GraphicsView::clear_prtexts_items()
 {
 	if (!prtexts.empty())
 	{
-		for (int i=0; i < prtexts.size();i++)
+		for (int i = 0; i < prtexts.size(); i++)
 		{
 			if (prtexts.at(i))
 			{
@@ -354,7 +348,7 @@ void GraphicsView::clear_prtexts_items()
 	}
 	if (!prtextanchors.empty())
 	{
-		for (int i=0; i < prtextanchors.size();i++)
+		for (int i = 0; i < prtextanchors.size(); i++)
 		{
 			if (prtextanchors.at(i))
 			{
@@ -371,7 +365,7 @@ void GraphicsView::clear_prgraphicobjects_items()
 {
 	if (!prpoints.empty())
 	{
-		for (int i=0; i < prpoints.size();i++)
+		for (int i = 0; i < prpoints.size(); i++)
 		{
 			if (prpoints.at(i))
 			{
@@ -384,7 +378,7 @@ void GraphicsView::clear_prgraphicobjects_items()
 	}
 	if (!prpolylines.empty())
 	{
-		for (int i=0; i < prpolylines.size();i++)
+		for (int i = 0; i < prpolylines.size(); i++)
 		{
 			if (prpolylines.at(i))
 			{
@@ -397,7 +391,7 @@ void GraphicsView::clear_prgraphicobjects_items()
 	}
 	if (!printerpolated.empty())
 	{
-		for (int i=0; i < printerpolated.size();i++)
+		for (int i = 0; i < printerpolated.size(); i++)
 		{
 			if (printerpolated.at(i))
 			{
@@ -410,7 +404,7 @@ void GraphicsView::clear_prgraphicobjects_items()
 	}
 	if (!prcircles.empty())
 	{
-		for (int i=0; i < prcircles.size();i++)
+		for (int i = 0; i < prcircles.size(); i++)
 		{
 			if (prcircles.at(i))
 			{
@@ -423,7 +417,7 @@ void GraphicsView::clear_prgraphicobjects_items()
 	}
 	if (!prellipses.empty())
 	{
-		for (int i=0; i < prellipses.size();i++)
+		for (int i = 0; i < prellipses.size(); i++)
 		{
 			if (prellipses.at(i))
 			{
@@ -438,19 +432,17 @@ void GraphicsView::clear_prgraphicobjects_items()
 
 void GraphicsView::clear_shutters()
 {
-	if (!display_shutters.empty())
+	if (display_shutters.empty()) return;
+	for (int i = 0; i < display_shutters.size(); i++)
 	{
-		for (int i=0; i < display_shutters.size();i++)
+		if (display_shutters.at(i))
 		{
-			if (display_shutters.at(i))
-			{
-				scene()->removeItem(
-					static_cast<QGraphicsItem*>(display_shutters[i]));
-				delete display_shutters[i];
-			}
+			scene()->removeItem(
+				static_cast<QGraphicsItem*>(display_shutters[i]));
+			delete display_shutters[i];
 		}
-		display_shutters.clear();
 	}
+	display_shutters.clear();
 }
 
 void GraphicsView::mousePressEvent(QMouseEvent * e)
