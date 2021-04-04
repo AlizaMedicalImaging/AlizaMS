@@ -549,6 +549,7 @@ void MainWindow::open_args(const QStringList & l)
 	disconnect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
 	pb->close();
 	delete pb;
+	pb = NULL;
 	mutex.unlock();
 }
 
@@ -557,7 +558,9 @@ void MainWindow::closeEvent(QCloseEvent * e)
 	writeSettings();
 	aliza->close_();
 	delete aliza;
+	aliza = NULL;
 	delete aboutwidget;
+	aboutwidget = NULL;
 #if QT_VERSION < QT_VERSION_CHECK(4,8,1)
 	qApp->quit();
 #else
@@ -587,10 +590,10 @@ void MainWindow::about()
 
 void MainWindow::createActions()
 {
-	openAct       = new QAction(QIcon(":/bitmaps/dcm.svg"),   QString("DICOM scanner"),        this);
-	openanyAct    = new QAction(QIcon(":/bitmaps/file.svg"),  QString("Open file"),            this);
-	exitAct       = new QAction(QIcon(":/bitmaps/delete.svg"),QString("Exit"),                 this);
-	aboutAct      = new QAction(QIcon(":/bitmaps/info.svg"),  QString("About"),      this);
+	openAct       = new QAction(QIcon(":/bitmaps/dcm.svg"),   QString("DICOM scanner"),this);
+	openanyAct    = new QAction(QIcon(":/bitmaps/file.svg"),  QString("Open file"),    this);
+	exitAct       = new QAction(QIcon(":/bitmaps/delete.svg"),QString("Exit"),         this);
+	aboutAct      = new QAction(QIcon(":/bitmaps/info.svg"),  QString("About"),        this);
 	exitAct->setShortcuts(QKeySequence::Quit);
 	axis_group = new QActionGroup(this);
 	graphicsAct_Z = new QAction(QIcon(":/bitmaps/align.svg"),
@@ -1250,6 +1253,7 @@ void MainWindow::dropEvent(QDropEvent * e)
 			disconnect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
 			pb->close();
 			delete pb;
+			pb = NULL;
 		}
 	}
 	mutex.unlock();
@@ -1311,6 +1315,7 @@ void MainWindow::load_any()
 	disconnect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
 	pb->close();
 	delete pb;
+	pb = NULL;
 	if (is_dicomdir)
 	{
 		if (tabWidget->currentIndex()!=1) tabWidget->setCurrentIndex(1);
@@ -1451,6 +1456,7 @@ void MainWindow::load_dicom_series2()
 	disconnect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
 	pb->close();
 	delete pb;
+	pb = NULL;
 	qApp->processEvents();
 	mutex.unlock();
 }

@@ -288,6 +288,7 @@ template<typename T> QString contour_from_path(
 		default:
 			{
 				delete c;
+				c = NULL;
 				return QString("item->get_axis() - unknown value");
 			}
 		}
@@ -572,7 +573,11 @@ template<typename T> void load_rgb_image(
 	//
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 	tmpi = QImage();
-	if (p__) delete [] p__;
+	if (p__)
+	{
+		delete [] p__;
+		p__ = NULL;
+	}
 #endif
 }
 
@@ -845,7 +850,11 @@ template<typename T> void load_rgba_image(
 	//
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 	tmpi = QImage();
-	if (p__) delete [] p__;
+	if (p__)
+	{
+		delete [] p__;
+		p__ = NULL;
+	}
 #endif
 }
 
@@ -1126,7 +1135,11 @@ template<typename T> void load_rgba_char_image(
 	//
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 	tmpi = QImage();
-	if (p) delete [] p;
+	if (p)
+	{
+		delete [] p;
+		p = NULL;
+	}
 #endif
 }
 
@@ -1250,6 +1263,7 @@ template<typename T> void load_image(const typename T::Pointer & image,
 	for (int i=0; i < threadsLUT_size; i++)
 	{
 		delete widget->threadsLUT_[i];
+		widget->threadsLUT_[i] = NULL;
 	}
 	widget->threadsLUT_.clear();
 	//
@@ -1347,7 +1361,11 @@ template<typename T> void load_image(const typename T::Pointer & image,
 	//
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 	tmpi = QImage();
-	if (p) delete [] p;
+	if (p)
+	{
+		delete [] p;
+		p = NULL;
+	}
 #endif
 }
 

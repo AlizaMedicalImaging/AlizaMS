@@ -10128,10 +10128,12 @@ QString DicomUtils::read_enhmr_spectro_info(
 							const mdcm::Tag tGradientOutputType(
 								0x0018,0x9180);
 							QString GradientOutputType("");
-							get_string_value(
-								nds1,
-								tGradientOutputType,
-								GradientOutputType);
+							const bool tGradientOutputType_ok =
+								get_string_value(
+									nds1,
+									tGradientOutputType,
+									GradientOutputType);
+							(void)tGradientOutputType_ok;
 							GradientOutputType = GradientOutputType
 								.simplified().remove(QChar('\0'));
 							QString sGradientOutputType =
@@ -10604,8 +10606,10 @@ QString DicomUtils::read_dicom(
 						trimmed().remove(QChar('\0'));
 			}
 		}
-		DicomUtils::get_string_value(
-			ds, tPhotometricInterpretation, photometric);
+		const bool tPhotometricInterpretation_ok =
+			DicomUtils::get_string_value(
+				ds, tPhotometricInterpretation, photometric);
+		(void)tPhotometricInterpretation_ok;
 #if 1
 		if (sop==QString("1.2.840.10008.5.1.4.1.1.77.1.6")) // TODO
 #else
@@ -10802,8 +10806,9 @@ QString DicomUtils::read_dicom(
 			{
 				const bool srinfo = wsettings->get_sr_info();
 				QString t00080005;
-				get_string_value(
+				const bool t00080005_ok = get_string_value(
 					ds, mdcm::Tag(0x0008,0x0005), t00080005);
+				(void)t00080005_ok;
 				const QString s0 =
 					SRUtils::read_sr_title1(ds, t00080005);
 				if (pb) pb->hide();
