@@ -26,19 +26,14 @@
 namespace mdcm
 {
 
-Preamble::Preamble() : Internal(NULL)
-{
-  Create();
-}
-
-Preamble::Preamble(Preamble const &)
+Preamble::Preamble()
 {
   Create();
 }
 
 Preamble::~Preamble()
 {
-  if(Internal) delete[] Internal;
+  delete[] Internal;
 }
 
 bool Preamble::Read(std::istream & is)
@@ -66,15 +61,18 @@ bool Preamble::Read(std::istream & is)
 
 void Preamble::Create()
 {
-  if(!Internal) Internal = new char[128+4];
+  Internal = new char[128+4];
   memset(Internal, 0, 128);
   memcpy(Internal+128, "DICM", 4);
 }
 
 void Preamble::Remove()
 {
-  delete[] Internal;
-  Internal = NULL;
+  if(Internal)
+  {
+    delete[] Internal;
+    Internal = NULL;
+  }
 }
 
 void Preamble::Write(std::ostream & os) const

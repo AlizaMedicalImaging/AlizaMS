@@ -559,16 +559,26 @@ bool FileMetaInformation::Read2(std::istream & is)
     return false;
   }
   VR vr;
-  vr.Read(is);
-  if(vr == VR::INVALID)
+  if(vr.Read(is))
   {
-    mdcmAlwaysWarnMacro("In FileMetaInformation::Read: VR is invalid");
-    return false;
+    if(vr == VR::INVALID)
+    {
+      mdcmAlwaysWarnMacro("In FileMetaInformation::Read: VR is invalid");
+      return false;
+    }
+    if(vr != VR::UL)
+    {
+      mdcmAlwaysWarnMacro("In FileMetaInformation::Read: VR is !UL");
+#if 0
+      return false;
+#endif
+    }
   }
-  if(vr != VR::UL)
+  else
   {
-    mdcmAlwaysWarnMacro("In FileMetaInformation::Read: VR is invalid (!UL)");
+#if 0
     return false;
+#endif
   }
   is.seekg(-6,std::ios::cur);
   xde.Read<SwapperNoOp>(is);

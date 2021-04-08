@@ -1390,8 +1390,8 @@ static void build_maps(
 		try
 		{
 			mdcm::Reader reader;
-#ifdef _	WIN32
-#if (def	ined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
 			reader.SetFileName(QDir::toNativeSeparators(l.at(x)).toUtf8().constData());
 #else
 			reader.SetFileName(QDir::toNativeSeparators(l.at(x)).toLocal8Bit().constData());

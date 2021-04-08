@@ -179,12 +179,12 @@ void BrowserWidget2::read_directory(const QString & p)
 	}
 	catch(mdcm::ParseException & pe)
 	{
-		std::cout << "mdcm::ParseException in read_directory:\n"
+		std::cout << "mdcm::ParseException in process_directory:\n"
 			<< pe.what() << std::endl;
 	}
 	catch(std::exception & ex)
 	{
-		std::cout << "Exception in read_directory:\n"
+		std::cout << "Exception in process_directory:\n"
 			<< ex.what() << std::endl;
 	}
 	pd->close();
@@ -438,12 +438,12 @@ void BrowserWidget2::open_DICOMDIR2(const QString & f)
 	}
 	catch(mdcm::ParseException & pe)
 	{
-		std::cout << "mdcm::ParseException in open_DICOMDIR2:\n"
+		std::cout << "mdcm::ParseException in read_DICOMDIR:\n"
 			<< pe.what() << std::endl;
 	}
 	catch(std::exception & ex)
 	{
-		std::cout << "Exception in open_DICOMDIR2:\n"
+		std::cout << "Exception in read_DICOMDIR:\n"
 			<< ex.what() << std::endl;
 	}
 	if (!warning.isEmpty())
@@ -546,9 +546,22 @@ void BrowserWidget2::reload_dir()
 		else
 #endif
 		{
-			const QString warning =
-				read_DICOMDIR(QDir::fromNativeSeparators(
-					directory_lineEdit->text()));
+			QString warning;
+			try
+			{
+				warning = read_DICOMDIR(QDir::fromNativeSeparators(
+							directory_lineEdit->text()));
+			}
+			catch(mdcm::ParseException & pe)
+			{
+				std::cout << "mdcm::ParseException in read_DICOMDIR:\n"
+					<< pe.what() << std::endl;
+			}
+			catch(std::exception & ex)
+			{
+				std::cout << "Exception in read_DICOMDIR:\n"
+					<< ex.what() << std::endl;
+			}
 			if (!warning.isEmpty())
 			{
 				QMessageBox mbox;

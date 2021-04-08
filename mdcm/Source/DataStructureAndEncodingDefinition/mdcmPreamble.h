@@ -36,16 +36,7 @@ class MDCM_EXPORT Preamble
 {
 public:
   Preamble();
-  Preamble(const Preamble &);
   ~Preamble();
-
-  Preamble& operator=(Preamble const &)
-  {
-    Create();
-    return *this;
-  }
-
-  void Create();
   void Remove();
   bool Read(std::istream &);
   void Write(std::ostream &) const;
@@ -55,6 +46,7 @@ public:
   VL GetLength() const;
 
 private:
+  void Create();
   char * Internal;
 };
 
