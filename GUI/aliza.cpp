@@ -579,7 +579,8 @@ void Aliza::close_filters_progress(QProgressDialog * pb)
 
 void Aliza::load_dicom_series(QProgressDialog * pb)
 {
-	QString message_ = QString("");
+	QString message_("");
+	unsigned int count_messages = 0;
 	std::vector<ImageVariant*> ivariants;
 	std::vector<int> rows;
 	QStringList filenames;
@@ -615,7 +616,7 @@ void Aliza::load_dicom_series(QProgressDialog * pb)
 		filenames = item->files;
 		try
 		{
-			message_ += DicomUtils::read_dicom(
+			const QString tmp_message = DicomUtils::read_dicom(
 				ivariants,
 				filenames,
 				max_3d_tex_size,
@@ -626,6 +627,11 @@ void Aliza::load_dicom_series(QProgressDialog * pb)
 				pb,
 				0,
 				settingswidget->get_ignore_dim_org());
+			if (!tmp_message.isEmpty())
+			{
+				++count_messages;
+				message_.append(tmp_message + QString("\n"));
+			}
 		}
 		catch(mdcm::ParseException & pe)
 		{
@@ -703,11 +709,27 @@ quit__:
 	ivariants.clear();
 	if (!message_.isEmpty())
 	{
+		QString message;
+		if (count_messages > 1)
+		{
+			message = QVariant(count_messages).toString() +
+				QString(" errors or warnings\n");
+		}
+		if (message_.size() > 500)
+		{
+			message_.truncate(500);
+			message += message_;
+			message += QString("\n<truncated>");
+		}
+		else
+		{
+			message += message_;
+		}
 		QMessageBox mbox;
 		mbox.setWindowModality(Qt::ApplicationModal);
 		mbox.addButton(QMessageBox::Close);
 		mbox.setIcon(QMessageBox::Warning);
-		mbox.setText(message_);
+		mbox.setText(message);
 		qApp->processEvents();
 		mbox.exec();
 	}
