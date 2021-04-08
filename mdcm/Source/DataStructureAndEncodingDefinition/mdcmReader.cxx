@@ -204,6 +204,11 @@ public:
     is.setstate(std::ios::eofbit);
   }
 
+  static void Check(bool b, std::istream & is)
+  {
+    if(b) { assert(is.eof()); }
+    (void)is;
+  }
 };
 
 class ReadUpToTagCaller
@@ -227,6 +232,7 @@ public:
     m_dataSet.template ReadUpToTagWithLength<T1,T2>(is,m_tag,m_skipTags,length);
   }
 
+  static void Check(bool , std::istream &) {}
 };
 
 class ReadSelectedTagsCaller
@@ -250,6 +256,7 @@ public:
     m_dataSet.template ReadSelectedTagsWithLength<T1,T2>(is,m_tags,length,m_readvalues);
   }
 
+  static void Check(bool , std::istream &) {}
 };
 
 class ReadSelectedPrivateTagsCaller
@@ -273,6 +280,7 @@ public:
     m_dataSet.template ReadSelectedPrivateTagsWithLength<T1,T2>(is,m_groups,length,m_readvalues);
   }
 
+  static void Check(bool , std::istream &) {}
 };
 
 } // namespace details
@@ -302,57 +310,84 @@ bool Reader::ReadSelectedPrivateTags(std::set<PrivateTag> const & selectedPTags,
 }
 
 template <typename T_Caller>
-bool Reader::InternalReadCommon(const T_Caller & caller)
+bool Reader::InternalReadCommon(const T_Caller &caller)
 {
   if(!Stream || !*Stream)
   {
+    mdcmErrorMacro("No File");
     return false;
   }
+  bool success = true;
   try
   {
-    std::istream & is = *Stream;
+    std::istream &is = *Stream;
     bool haspreamble = true;
-    if(!F->GetHeader().GetPreamble().Read(is))
+    try
+    {
+      F->GetHeader().GetPreamble().Read(is);
+    }
+    catch(std::exception &)
     {
       // return to beginning of file, hopefully this file is simply missing preamble
       is.clear();
       is.seekg(0, std::ios::beg);
       haspreamble = false;
     }
-	bool hasmetaheader = false;
-    if(haspreamble)
+    catch(...)
     {
-	  if(F->GetHeader().Read2(is))
-	  {
-        hasmetaheader = true;
-	  }
+      assert(0);
+    }
+    bool hasmetaheader = false;
+    try
+    {
+      if(haspreamble)
+      {
+        try
+        {
+          F->GetHeader().Read(is);
+          hasmetaheader = true;
+          assert(!F->GetHeader().IsEmpty());
+        }
+        catch(std::exception & ex)
+        {
+          mdcmWarningMacro(ex.what());
+          // weird implicit meta header
+          is.seekg(128+4, std::ios::beg);
+          assert(is.good());
+          try
+          {
+            F->GetHeader().ReadCompat(is);
+          }
+          catch(std::exception & ex2)
+          {
+            // no meta header
+            mdcmAlwaysWarnMacro(ex2.what());
+          }
+        }
+      }
       else
-	  {
-        is.seekg(128+4, std::ios::beg);
-        assert(is.good());
-        hasmetaheader = F->GetHeader().ReadCompat2(is);
+      {
+        F->GetHeader().ReadCompat(is);
       }
     }
-    else
-    {
-      hasmetaheader = F->GetHeader().ReadCompat2(is);
-    }
-    if(!hasmetaheader)
+    catch(std::exception &)
     {
       is.seekg(0, std::ios::beg);
-    }
-    if(hasmetaheader && F->GetHeader().IsEmpty())
-    {
       hasmetaheader = false;
     }
-	if(!hasmetaheader)
-	{
-      mdcmWarningMacro("Can not read header");
-	}
-    const TransferSyntax & ts = F->GetHeader().GetDataSetTransferSyntax();
-    if(hasmetaheader && !ts.IsValid())
+    catch(...)
     {
-      mdcmAlwaysWarnMacro("TransferSyntax in header is invalid");
+      assert(0);
+    }
+    if(F->GetHeader().IsEmpty())
+    {
+      hasmetaheader = false;
+      mdcmDebugMacro("no file meta info found");
+    }
+    const TransferSyntax &ts = F->GetHeader().GetDataSetTransferSyntax();
+    if(!ts.IsValid())
+    {
+      throw std::logic_error("Meta Header issue");
     }
     // Special case where the dataset was compressed using the deflate
     // algorithm
@@ -371,7 +406,8 @@ bool Reader::InternalReadCommon(const T_Caller & caller)
         if(ts.GetNegociatedType() == TransferSyntax::Implicit)
         {
           // LIBIDO-16-ACR_NEMA-Volume.dcm
-          mdcmAlwaysWarnMacro("Can not handle Virtual Big Endian Implicit");
+          mdcmErrorMacro("VirtualBigEndianNotHandled");
+          throw std::logic_error("Virtual Big Endian Implicit is not defined by DICOM");
         }
         else
         {
@@ -408,6 +444,7 @@ bool Reader::InternalReadCommon(const T_Caller & caller)
         }
       }
     }
+    // Only catch parse exception at this point
     catch(ParseException & ex)
     {
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
@@ -426,13 +463,9 @@ bool Reader::InternalReadCommon(const T_Caller & caller)
         if(hasmetaheader)
         {
           FileMetaInformation header;
-          const bool header_ok = header.Read2(is);
-		  if(!header_ok)
-		  {
-		    mdcmAlwaysWarnMacro("header.Read failed (1)");
-		  }
+          header.Read(is);
         }
-        mdcmAlwaysWarnMacro("Attempt to read non CP 246");
+        mdcmWarningMacro("Attempt to read non CP 246");
         F->GetDataSet().Clear();
         caller.template ReadCommon<CP246ExplicitDataElement,SwapperNoOp>(is);
       }
@@ -450,18 +483,14 @@ bool Reader::InternalReadCommon(const T_Caller & caller)
         if(hasmetaheader)
         {
           FileMetaInformation header;
-          const bool header_ok = header.Read2(is);
-		  if(!header_ok)
-		  {
-		    mdcmAlwaysWarnMacro("header.Read failed (2)");
-		  }
+          header.Read(is);
         }
         // GDCM 1.X
-        mdcmAlwaysWarnMacro("Attempt to read GDCM 1.X wrongly encoded");
+        mdcmWarningMacro("Attempt to read GDCM 1.X wrongly encoded");
         F->GetDataSet().Clear();
         caller.template ReadCommon<UNExplicitDataElement,SwapperNoOp>(is);
       }
-      else if(ex.GetLastElement().GetTag() == Tag(0xfeff,0x00e0))
+      else if (ex.GetLastElement().GetTag() == Tag(0xfeff,0x00e0))
       {
         // Famous philips where some private sequence were byteswapped
         // eg. PHILIPS_Intera-16-MONO2-Uncompress.dcm
@@ -477,13 +506,9 @@ bool Reader::InternalReadCommon(const T_Caller & caller)
         if(hasmetaheader)
         {
           FileMetaInformation header;
-          const bool header_ok = header.Read2(is);
-		  if(!header_ok)
-		  {
-		    mdcmAlwaysWarnMacro("header.Read failed (3)");
-		  }
+          header.Read(is);
         }
-        mdcmAlwaysWarnMacro("Attempt to read wrongly encoded sequence");
+        mdcmWarningMacro("Attempt to read Philips with ByteSwap private sequence wrongly encoded");
         F->GetDataSet().Clear();
         assert(0); // TODO FIXME
       }
@@ -493,10 +518,13 @@ bool Reader::InternalReadCommon(const T_Caller & caller)
         {
           try
           {
-            mdcmAlwaysWarnMacro("Attempt to read file with VR16bits");
+            mdcmWarningMacro("Attempt to read file with VR16bits");
+            // We could not read the VR in an explicit dataset
+            // seek back tag + vr
             is.seekg(-6, std::ios::cur);
             VR16ExplicitDataElement ide;
             ide.template Read<SwapperNoOp>(is);
+            // If we are here it means we succeeded in reading the implicit data element
             F->GetDataSet().Insert(ide);
             caller.template ReadCommon<VR16ExplicitDataElement,SwapperNoOp>(is);
           }
@@ -504,6 +532,9 @@ bool Reader::InternalReadCommon(const T_Caller & caller)
           {
             try
             {
+              // The file is neither:
+              // 1. An Explicit encoded
+              // 2. I could not reread it using the VR16Explicit reader, last option is that the file is explicit/implicit
               is.clear();
               if(haspreamble)
               {
@@ -516,30 +547,32 @@ bool Reader::InternalReadCommon(const T_Caller & caller)
               if(hasmetaheader)
               {
                 FileMetaInformation header;
-                const bool header_ok = header.Read2(is);
-		        if(!header_ok)
-		        {
-		          mdcmAlwaysWarnMacro("header.Read failed (4)");
-		        }
+                header.Read(is);
               }
-              mdcmWarningMacro("Attempt to read with explicit/implicit");
+              // Explicit/Implicit
+              // mdcmData/c_vf1001.dcm falls into that category, while in fact the fmi could simply
+              // be inverted and all would be perfect
+              mdcmAlwaysWarnMacro("Attempt to read file with explicit/implicit");
               F->GetDataSet().Clear();
               caller.template ReadCommon<ExplicitImplicitDataElement,SwapperNoOp>(is);
             }
-            catch(std::exception & ex)
+            catch(std::exception &)
             {
-              // Siemens_CT_Sensation64_has_VR_RT.dcm
-              mdcmAlwaysWarnMacro("Exception in Reader.cxx (1):\n" << ex.what());
-              return false;
+              // MM: UNExplicitImplicitDataElement does not seems to be used anymore to read
+              // mdcmData/TheralysMDCM120Bug.dcm, instead the code path goes into
+              // ExplicitImplicitDataElement class instead.
+              // Simply rethrow the exception for now.
+              throw std::logic_error("Exception in Reader.cxx (1)"); // TODO
             }
           }
         }
       }
       else
       {
-        mdcmWarningMacro("Attempt to read the file as mixture of explicit/implicit");
+        mdcmAlwaysWarnMacro("Attempt to read the file as mixture of explicit/implicit");
+        // Try again with an ExplicitImplicitDataElement
         if(ts.GetSwapCode() == SwapCode::LittleEndian &&
-           ts.GetNegociatedType() == TransferSyntax::Explicit)
+          ts.GetNegociatedType() == TransferSyntax::Explicit)
         {
           if(haspreamble)
           {
@@ -552,7 +585,7 @@ bool Reader::InternalReadCommon(const T_Caller & caller)
           if(hasmetaheader)
           {
             FileMetaInformation header;
-            header.ReadCompat2(is);
+            header.ReadCompat(is);
           }
           F->GetDataSet().Clear();
           caller.template ReadCommon<ExplicitImplicitDataElement,SwapperNoOp>(is);
@@ -560,26 +593,28 @@ bool Reader::InternalReadCommon(const T_Caller & caller)
         else
         {
           mdcmAlwaysWarnMacro("Exception in Reader.cxx (2)");
-          return false;
+          success = false;
         }
       }
 #else
-      mdcmAlwaysWarnMacro(ex.what());
-      return false;
-#endif
+      mdcmDebugMacro(ex.what());
+      (void)ex;
+      success = false;
+#endif /* MDCM_SUPPORT_BROKEN_IMPLEMENTATION */
     }
     catch(...)
     {
       mdcmAlwaysWarnMacro("Exception in Reader.cxx (3)");
-      return false;
+      success = false;
     }
+    caller.Check(success, *Stream);
   }
   catch(...)
   {
     mdcmWarningMacro("Exception in Reader.cxx (4)");
-    return false;
+    success = false;
   }
-  return true;
+  return success;
 }
 
 static inline bool isasciiupper(char c)

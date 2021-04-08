@@ -720,11 +720,7 @@ bool SurfaceWriter::PrepareWrite()
     fmi.Replace(de);
     fmi.SetDataSetTransferSyntax(ts);
   }
-  const bool fmi_ok = fmi.FillFromDataSet(ds);
-  if(!fmi_ok)
-  {
-    mdcmAlwaysWarnMacro("In SurfaceWriter::PrepareWrite: FillFromDataSet failed");
-  }
+  fmi.FillFromDataSet(ds);
   return true;
 }
 

@@ -77,15 +77,31 @@ std::istream & UNExplicitDataElement::ReadPreValue(std::istream & is)
     VRField = VR::INVALID;
     return is;
   }
-  if(!VRField.Read(is))
+  try
+  {
+    if(!VRField.Read(is))
+    {
+      assert(0 && "Should not happen");
+      return is;
+    }
+  }
+  catch(std::logic_error & ex)
   {
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
+    // mdcm-MR-PHILIPS-16-Multi-Seq.dcm
+    // assert(TagField == Tag(0xfffe, 0xe000));
+    // -> For some reason VR is written as {44,0} well I guess this is a VR...
+    // Technically there is a second bug, dcmtk assume other things when reading this tag,
+    // so I need to change this tag too, if I ever want dcmtk to read this file. oh well
+    // 0019004_Baseline_IMG1.dcm
+    // -> VR is garbage also...
+    // assert(TagField == Tag(8348,0339) || TagField == Tag(b5e8,0338))
+    //mdcmWarningMacro("Assuming 16 bits VR for Tag=" <<
+    //  TagField << " in order to read a buggy DICOM file.");
+    //VRField = VR::INVALID;
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
-#else
-    assert(0 && "Should not happen");
-    return is;
 #endif
   }
   if(VRField == VR::UN)
@@ -149,7 +165,7 @@ std::istream & UNExplicitDataElement::ReadValue(std::istream & is, bool readvalu
       }
       catch(std::exception &)
       {
-        // Must be one of those non-cp246 file,
+        // Must be one of those non-cp246 file...
         // but for some reason seekg back to previous offset + Read
         // as UNExplicit does not work
         throw std::logic_error("CP 246");

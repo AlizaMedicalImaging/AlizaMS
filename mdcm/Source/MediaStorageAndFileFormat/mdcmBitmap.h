@@ -88,6 +88,7 @@ public:
   void SetPixelFormat(PixelFormat const &);
   void Print(std::ostream &) const;
 protected:
+  bool GetBuffer2(std::ostream &) const;
   bool ComputeLossyFlag();
   bool TryRAWCodec     (char * buffer, bool & lossyflag) const;
   bool TryJPEGCodec    (char * buffer, bool & lossyflag) const;

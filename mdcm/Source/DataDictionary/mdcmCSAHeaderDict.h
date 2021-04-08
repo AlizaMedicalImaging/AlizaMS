@@ -28,7 +28,6 @@
 #include <iostream>
 #include <iomanip>
 #include <set>
-#include <exception>
 
 namespace mdcm
 {
@@ -68,7 +67,7 @@ public:
     {
       return *it;
     }
-    mdcmAlwaysWarnMacro("Error in GetCSAHeaderDictEntry");
+    throw std::logic_error("Exception in GetCSAHeaderDictEntry");
   }
 
 protected:

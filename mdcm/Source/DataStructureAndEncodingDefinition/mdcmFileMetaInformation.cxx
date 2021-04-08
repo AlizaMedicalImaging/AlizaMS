@@ -42,106 +42,36 @@ std::string FileMetaInformation::ImplementationClassUID = GetMDCMImplementationC
 std::string FileMetaInformation::ImplementationVersionName = GetMDCMImplementationVersionName();
 std::string FileMetaInformation::SourceApplicationEntityTitle = GetMDCMSourceApplicationEntityTitle();
 
+const char * FileMetaInformation::GetFileMetaInformationVersion()
+{
+  return MDCM_FILE_META_INFORMATION_VERSION;
+}
+
+const char * FileMetaInformation::GetMDCMImplementationClassUID()
+{
+  return MDCM_IMPLEMENTATION_CLASS_UID;
+}
+
+const char * FileMetaInformation::GetMDCMImplementationVersionName()
+{
+  return MDCM_IMPLEMENTATION_VERSION_NAME;
+}
+
+const char * FileMetaInformation::GetMDCMSourceApplicationEntityTitle()
+{
+  return MDCM_SOURCE_APPLICATION_ENTITY_TITLE;
+}
+
+// Keep cstor and dstor here to keep API minimal (see dllexport issue with mdcmstrict::)
 FileMetaInformation::FileMetaInformation() :
   DataSetTS(TransferSyntax::TS_END),
   MetaInformationTS(TransferSyntax::Unknown),
-  DataSetMS(MediaStorage::MS_END)
-{
-}
-
-FileMetaInformation::FileMetaInformation(FileMetaInformation const & fmi) : DataSet(fmi)
-{
-  DataSetTS = fmi.DataSetTS;
-  MetaInformationTS = fmi.MetaInformationTS;
-  DataSetMS = fmi.DataSetMS;
-}
-
-FileMetaInformation::~FileMetaInformation()
-{
-}
-
-bool FileMetaInformation::IsValid() const
-{
-  return true;
-}
-
-TransferSyntax::NegociatedType FileMetaInformation::GetMetaInformationTS() const
-{
-  return MetaInformationTS;
-}
-
-const TransferSyntax & FileMetaInformation::GetDataSetTransferSyntax() const
-{
-  return DataSetTS;
-}
-
-void FileMetaInformation::SetDataSetTransferSyntax(const TransferSyntax & ts)
-{
-  DataSetTS = ts;
-}
-
-std::string FileMetaInformation::GetMediaStorageAsString() const
-{
-  // D 0002|0002 [UI] [Media Storage SOP Class UID]
-  // [1.2.840.10008.5.1.4.1.1.12.1]
-  // ==>       [X-Ray Angiographic Image Storage]
-  const Tag t(0x0002,0x0002);
-  if(!FindDataElement(t))
-  {
-    return std::string("");
-  }
-  const DataElement & de = GetDataElement(t);
-  std::string ts;
-  {
-    const ByteValue * bv = de.GetByteValue();
-    if(bv && bv->GetPointer() && bv->GetLength())
-    {
-      // Pad string with a \0
-      ts = std::string(bv->GetPointer(), bv->GetLength());
-    }
-  }
-  const size_t ts_size = ts.size();
-  if(ts_size > 0)
-  {
-    char & last = ts[ts_size - 1];
-    if(last == ' ') last = '\0';
-  }
-  return ts;
-}
-
-MediaStorage FileMetaInformation::GetMediaStorage() const
-{
-  const std::string & ts = GetMediaStorageAsString();
-  if(ts.empty()) return MediaStorage::MS_END;
-  MediaStorage ms = MediaStorage::GetMSType(ts.c_str());
-  if(ms == MediaStorage::MS_END)
-  {
-    mdcmAlwaysWarnMacro("Media Storage Class UID: " << ts << " is unknown");
-  }
-  return ms;
-}
-
-void FileMetaInformation::Insert(const DataElement & de)
-{
-  if(de.GetTag().GetGroup() == 0x0002)
-  {
-    InsertDataElement(de);
-  }
-  else
-  {
-    mdcmErrorMacro("Cannot add element with group != 0x0002 in the file meta header: " << de);
-  }
-}
-
-void FileMetaInformation::Replace(const DataElement & de)
-{
-  Remove(de.GetTag());
-  Insert(de);
-}
+  DataSetMS(MediaStorage::MS_END) {}
+FileMetaInformation::~FileMetaInformation() {}
 
 void FileMetaInformation::SetImplementationClassUID(const char * imp)
 {
-  // TODO make sure imp is actually a valid UID
+  // TODO: it would be nice to make sure imp is actually a valid UID
   if(imp)
   {
     ImplementationClassUID = imp;
@@ -191,14 +121,14 @@ const char * FileMetaInformation::GetSourceApplicationEntityTitle()
   return SourceApplicationEntityTitle.c_str();
 }
 
-bool FileMetaInformation::FillFromDataSet(const DataSet & ds)
+void FileMetaInformation::FillFromDataSet(DataSet const & ds)
 {
   DataElement xde;
   if(!FindDataElement(Tag(0x0002, 0x0001)))
   {
     xde.SetTag(Tag(0x0002, 0x0001));
     xde.SetVR(VR::OB);
-    const char * version = FileMetaInformation::GetFileMetaInformationVersion();
+    const char *version = FileMetaInformation::GetFileMetaInformationVersion();
     xde.SetByteValue(version, 2);
     Insert(xde);
   }
@@ -211,7 +141,7 @@ bool FileMetaInformation::FillFromDataSet(const DataSet & ds)
     {
       xde.SetTag(Tag(0x0002, 0x0001));
       xde.SetVR(VR::OB);
-      const char * version = FileMetaInformation::GetFileMetaInformationVersion();
+      const char *version = FileMetaInformation::GetFileMetaInformationVersion();
       xde.SetByteValue(version, 2);
       Replace(xde);
     }
@@ -259,7 +189,7 @@ bool FileMetaInformation::FillFromDataSet(const DataSet & ds)
       }
       else
       {
-        const DataElement & sopclass = ds.GetDataElement(Tag(0x0008, 0x0016));
+        const DataElement& sopclass = ds.GetDataElement(Tag(0x0008, 0x0016));
         DataElement mssopclass = GetDataElement(Tag(0x0002, 0x0002));
         assert(!mssopclass.IsEmpty());
         const ByteValue * bv = sopclass.GetByteValue();
@@ -270,14 +200,13 @@ bool FileMetaInformation::FillFromDataSet(const DataSet & ds)
         }
         else
         {
-          mdcmWarningMacro("SOP Class is empty");
-          return false;
+          throw std::logic_error("SOP Class is empty");
         }
       }
     }
   }
   // Media Storage SOP Instance UID (0002,0003) -> see (0008,0018)
-  const DataElement & dummy = GetDataElement(Tag(0x0002,0x0003)); (void)dummy;
+  const DataElement &dummy = GetDataElement(Tag(0x0002,0x0003)); (void)dummy;
   if(!FindDataElement(Tag(0x0002, 0x0003)) || GetDataElement(Tag(0x0002,0x0003)).IsEmpty())
   {
     if(ds.FindDataElement(Tag(0x0008, 0x0018)))
@@ -293,8 +222,7 @@ bool FileMetaInformation::FillFromDataSet(const DataSet & ds)
     }
     else
     {
-      mdcmWarningMacro("No (0x0002,0x0003) and (0x0008,0x0018) elements");
-      return false;
+      throw std::logic_error("No (0x0002,0x0003) and (0x0008,0x0018) elements");
     }
   }
   else // Ok there is a value in (0002,0003) let see if it match (0008,0018)
@@ -308,8 +236,7 @@ bool FileMetaInformation::FillFromDataSet(const DataSet & ds)
       if(!ds.FindDataElement(Tag(0x0008, 0x0018)) ||
          ds.GetDataElement(Tag(0x0008, 0x0018)).IsEmpty())
       {
-        mdcmWarningMacro("No (0x0008,0x0018) element");
-        return false;
+        throw std::logic_error("No (0x0008,0x0018) element");
       }
       const DataElement & sopinst = ds.GetDataElement(Tag(0x0008, 0x0018));
       assert(!GetDataElement(Tag(0x0002, 0x0003)).IsEmpty());
@@ -347,62 +274,73 @@ bool FileMetaInformation::FillFromDataSet(const DataSet & ds)
   }
   else
   {
+    // Very bad !!
     // Constuct it from DataSetTS
     if(DataSetTS == TransferSyntax::TS_END)
     {
-      mdcmAlwaysWarnMacro("No TransferSyntax specified");
-      return false;
+      throw std::logic_error("No TransferSyntax specified");
     }
-    const char * str = TransferSyntax::GetTSString(DataSetTS);
-    VL::Type strlenStr = (VL::Type)strlen(str);
+    const char* str = TransferSyntax::GetTSString(DataSetTS);
+    VL::Type strlenStr = (VL::Type) strlen(str);
     xde.SetByteValue(str, strlenStr);
     xde.SetVR(VR::UI);
     xde.SetTag(Tag(0x0002,0x0010));
     Insert(xde);
   }
-  // Implementation Class UID (0002,0012)
+  // Implementation Class UID (0002,0012) -> ??
   if(!FindDataElement(Tag(0x0002, 0x0012)))
   {
     xde.SetTag(Tag(0x0002, 0x0012));
     xde.SetVR(VR::UI);
-    const char * implementation = FileMetaInformation::GetImplementationClassUID();
-    VL::Type strlenImplementation = (VL::Type)strlen(implementation);
+    //const char implementation[] = MDCM_IMPLEMENTATION_CLASS_UID;
+    const char *implementation = FileMetaInformation::GetImplementationClassUID();
+    VL::Type strlenImplementation = (VL::Type) strlen(implementation);
     xde.SetByteValue(implementation, strlenImplementation);
     Insert(xde);
   }
-  // Implementation Version Name (0002,0013)
+  else
+  {
+    // TODO: Need to check Implementation UID is actually a valid UID...
+  }
+  // Implementation Version Name (0002,0013) -> ??
   if(!FindDataElement(Tag(0x0002, 0x0013)))
   {
     xde.SetTag(Tag(0x0002, 0x0013));
     xde.SetVR(VR::SH);
+    //const char version[] = MDCM_IMPLEMENTATION_VERSION_NAME;
     SHComp version = FileMetaInformation::GetImplementationVersionName();
     VL::Type strlenVersion = (VL::Type)strlen(version);
     xde.SetByteValue(version, strlenVersion);
     Insert(xde);
   }
-  // Source Application Entity Title (0002,0016)
+  // Source Application Entity Title (0002,0016) -> ??
   if(!FindDataElement(Tag(0x0002, 0x0016)))
   {
     xde.SetTag(Tag(0x0002, 0x0016));
     xde.SetVR(VR::AE);
-    const char * title = FileMetaInformation::GetSourceApplicationEntityTitle();
+    const char *title = FileMetaInformation::GetSourceApplicationEntityTitle();
     VL::Type strlenTitle = (VL::Type)strlen(title);
     xde.SetByteValue(title, strlenTitle);
     Insert(xde);
   }
-  // (Meta) Group Length (0002,0000)
+  // Do this one last!
+  // (Meta) Group Length (0002,0000) -> computed
   Attribute<0x0002, 0x0000> filemetagrouplength;
   Remove(filemetagrouplength.GetTag());
-  const unsigned int glen = GetLength<ExplicitDataElement>();
+  unsigned int glen = GetLength<ExplicitDataElement>();
   assert((glen % 2) == 0);
   filemetagrouplength.SetValue(glen);
   Insert(filemetagrouplength.GetAsDataElement());
+
   assert(!IsEmpty());
-  return true;
 }
 
+// FIXME
+// This code should clearly be rewritten with some template meta programing to
+// enable reuse of code
+//
 template <typename TSwap>
-bool ReadExplicitDataElement(std::istream & is, ExplicitDataElement & de)
+bool ReadExplicitDataElement(std::istream &is, ExplicitDataElement &de)
 {
   // Read Tag
   std::streampos start = is.tellg();
@@ -472,7 +410,7 @@ bool ReadExplicitDataElement(std::istream & is, ExplicitDataElement & de)
   de.SetTag(t);
   de.SetVR(vr);
   de.SetVL(vl);
-  // FIXME set the Value to the NULL pointer?
+  // FIXME: There should be a way to set the Value to the NULL pointer...
   de.SetValue(*bv);
   return true;
 }
@@ -502,7 +440,7 @@ bool ReadImplicitDataElement(std::istream &is, ImplicitDataElement &de)
     assert(0 && "Should not happen");
     return false;
   }
-  ByteValue * bv = NULL;
+  ByteValue *bv = 0;
   if(vl.IsUndefined())
   {
     assert(0 && "Should not happen");
@@ -522,6 +460,7 @@ bool ReadImplicitDataElement(std::istream &is, ImplicitDataElement &de)
   de.SetTag(t);
   de.SetVL(vl);
   de.SetValue(*bv);
+
   return true;
 }
 
@@ -538,55 +477,44 @@ bool ReadImplicitDataElement(std::istream &is, ImplicitDataElement &de)
  * Note: PS 3.5 specifies that Elements with Tags (0001,xxxx), (0003,xxxx),
  * (0005,xxxx), and (0007,xxxx) shall not be used.
  */
-// TODO
-// For now seek back of 6 bytes. It would be better to finish reading
-// the first element of the FMI to read the group length and
-// therefore compare it against the actual value.
-bool FileMetaInformation::Read2(std::istream & is)
+/// \TODO FIXME
+/// For now I do a Seek back of 6 bytes. It would be better to finish reading
+/// the first element of the FMI so that I can read the group length and
+/// therefore compare it against the actual value we found...
+std::istream &FileMetaInformation::Read(std::istream &is)
 {
   std::streampos start = is.tellg();
+  // TODO: Can now load data from std::ios::cur to std::ios::cur + metagl.GetValue()
+
   ExplicitDataElement xde;
   Tag gl;
   gl.Read<SwapperNoOp>(is);
   if(gl.GetGroup() != 0x2)
   {
-    mdcmAlwaysWarnMacro("In FileMetaInformation::Read: group is invalid");
-    return false;
+    throw std::logic_error("Group is invalid");
   }
   if(gl.GetElement() != 0x0)
   {
-    mdcmAlwaysWarnMacro("In FileMetaInformation::Read: element is invalid");
-    return false;
+    throw std::logic_error("Element is invalid");
   }
   VR vr;
-  if(vr.Read(is))
+  vr.Read(is);
+  if(vr == VR::INVALID)
   {
-    if(vr == VR::INVALID)
-    {
-      mdcmAlwaysWarnMacro("In FileMetaInformation::Read: VR is invalid");
-      return false;
-    }
-    if(vr != VR::UL)
-    {
-      mdcmAlwaysWarnMacro("In FileMetaInformation::Read: VR is !UL");
-#if 0
-      return false;
-#endif
-    }
+    throw std::logic_error("VR is invalid");
   }
-  else
+  if(vr != VR::UL)
   {
-#if 0
-    return false;
-#endif
+    throw std::logic_error("VR is invalid (!UL)");
   }
+  // TODO FIXME: I should not do seekg for valid file this is costly
   is.seekg(-6,std::ios::cur);
   xde.Read<SwapperNoOp>(is);
   Insert(xde);
   // See PS 3.5, Data Element Structure With Explicit VR
   try
   {
-    // Read all possible group 2 element, until the last one
+    // MDCM is a hack, so let's read all possible group 2 element, until the last one
     // and leave the group length value aside.
     while(ReadExplicitDataElement<SwapperNoOp>(is, xde))
     {
@@ -601,6 +529,7 @@ bool FileMetaInformation::Read2(std::istream & is)
     // (first dataelement). Let's start over again, but this time use group
     // length as the sentinel for the last group 2 element:
     is.seekg(start,std::ios::beg);
+    // Group Length:
     ReadExplicitDataElement<SwapperNoOp>(is, xde);
     Attribute<0x0002, 0x0000> filemetagrouplength;
     filemetagrouplength.SetFromDataElement(xde);
@@ -612,32 +541,30 @@ bool FileMetaInformation::Read2(std::istream & is)
       cur_len += xde.GetLength();
     }
   }
-  const bool ts_ok = ComputeDataSetTransferSyntax();
-  (void)ts_ok;
-  if(!is) return false;
-  return true;
+  // Now is a good time to compute the transfer syntax:
+  ComputeDataSetTransferSyntax();
+  // we are at the end of the meta file information and before the dataset
+  return is;
 }
 
-bool FileMetaInformation::ReadCompat2(std::istream & is)
+std::istream &FileMetaInformation::ReadCompat(std::istream & is)
 {
   assert(is.good());
   // First off save position in case we fail (no File Meta Information)
   // See PS 3.5, Data Element Structure With Explicit VR
   if(!IsEmpty())
   {
-    mdcmAlwaysWarnMacro("!IsEmpty()");
-    return false;
+    throw std::logic_error("!IsEmpty()");
   }
   Tag t;
   if(!t.Read<SwapperNoOp>(is))
   {
-    mdcmAlwaysWarnMacro("Cannot read very first tag");
-    return false;
+    throw std::logic_error("Cannot read very first tag");
   }
   if(t.GetGroup() == 0x0002)
   {
     // GE_DLX-8-MONO2-PrivateSyntax.dcm is in Implicit...
-    return ReadCompatInternal2<SwapperNoOp>(is);
+    return ReadCompatInternal<SwapperNoOp>(is);
   }
   else if(t.GetGroup() == 0x0008)
   {
@@ -702,8 +629,7 @@ bool FileMetaInformation::ReadCompat2(std::istream & is)
     }
     else
     {
-      mdcmAlwaysWarnMacro("Impossible: cannot read 2bytes for VR");
-      return false;
+      throw std::logic_error("Impossible: cannot read 2bytes for VR");
     }
     is.seekg(-6, std::ios::cur); // Seek back
     if(vr != VR::VR_END)
@@ -724,51 +650,18 @@ bool FileMetaInformation::ReadCompat2(std::istream & is)
         // This is insane, we are actually reading an attribute with tag (0,0) !
         // something like IM-0001-0066.CommandTag00.dcm was crafted
         ide.ReadValue<SwapperNoOp>(is);
-        const bool ok = ReadCompat2(is); // this will read the next element
-        (void)ok;
+        ReadCompat(is); // this will read the next element
         assert(DataSetTS == TransferSyntax::ImplicitVRLittleEndian);
         is.seekg(-12, std::ios::cur); // Seek back
-        return true;
+        return is;
       }
-      else
-      {
-        mdcmAlwaysWarnMacro("Cannot find DICOM type");
-        return false;
+	  else
+	  {
+        throw std::logic_error("Cannot find DICOM type");
       }
     }
   }
-  if(!is) return false;
-  return true;
-}
-
-bool FileMetaInformation::Write2(std::ostream & os) const
-{
-  P.Write(os);
-  {
-    this->DataSet::Write<ExplicitDataElement,SwapperNoOp>(os);
-  }
-  if(!os) return false;
-  return true;
-}
-
-const Preamble & FileMetaInformation::GetPreamble() const
-{
-  return P;
-}
-
-Preamble & FileMetaInformation::GetPreamble()
-{
-  return P;
-}
-
-void FileMetaInformation::SetPreamble(const Preamble & p)
-{
-  P = p;
-}
-
-VL FileMetaInformation::GetFullLength() const
-{
-    return P.GetLength() + DataSet::GetLength<ExplicitDataElement>();
+  return is;
 }
 
 #define ADDVRIMPLICIT(element) \
@@ -776,7 +669,7 @@ VL FileMetaInformation::GetFullLength() const
       de.SetVR((VR::VRType)TagToType<0x0002,element>::VRType); \
       break
 
-static bool AddVRToDataElement(DataElement & de)
+bool AddVRToDataElement(DataElement &de)
 {
   switch(de.GetTag().GetElement())
   {
@@ -797,82 +690,85 @@ static bool AddVRToDataElement(DataElement & de)
 }
 
 template <typename TSwap>
-bool FileMetaInformation::ReadCompatInternal2(std::istream & is)
+std::istream &FileMetaInformation::ReadCompatInternal(std::istream &is)
 {
-  // Purposely not Re-use ReadVR since we can read VR_END
-  char vr_str0[2];
-  is.read(vr_str0, 2);
-  if(VR::IsValid(vr_str0))
   {
-    MetaInformationTS = TransferSyntax::Explicit;
-    // Looks like an Explicit File Meta Information Header
-    is.seekg(-6, std::ios::cur); // Seek back
-    ExplicitDataElement xde;
-    while(ReadExplicitDataElement<SwapperNoOp>(is, xde))
+    // Purposely not Re-use ReadVR since we can read VR_END
+    char vr_str0[2];
+    is.read(vr_str0, 2);
+    if(VR::IsValid(vr_str0))
     {
-      if(xde.GetVR() == VR::UN)
-      {
-        mdcmWarningMacro("VR::UN found in file Meta header. "
-          "VR::UN will be replaced with proper VR for tag: " << xde.GetTag());
-        AddVRToDataElement(xde);
-      }
-      Insert(xde);
-    }
-    // find out the dataset transfer syntax
-    const bool ts_ok = ComputeDataSetTransferSyntax();
-    (void)ts_ok;
-  }
-  else
-  {
-    MetaInformationTS = TransferSyntax::Implicit;
-    mdcmWarningMacro("File Meta Information is implicit. VR will be explicitly added");
-    // might be an implicit encoded Meta File Information header
-    // GE_DLX-8-MONO2-PrivateSyntax.dcm
-    is.seekg(-6, std::ios::cur); // Seek back
-    ImplicitDataElement ide;
-    while(ReadImplicitDataElement<SwapperNoOp>(is, ide))
-    {
-      if(AddVRToDataElement(ide))
-      {
-        Insert(ide);
-      }
-      else
-      {
-        mdcmWarningMacro("Unknown element found in Meta Header: " << ide.GetTag());
-      }
-    }
-    // find out the dataset transfer syntax
-    if(!ComputeDataSetTransferSyntax())
-    {
-      // We were able to read some of the Meta Header, but failed to compute the DataSetTS
-      // technically MDCM is able to cope with any value here. But be kind and try to have a good guess
-      mdcmWarningMacro("Meta Header is bogus. Guessing DataSet TS.");
-      Tag t;
-      if(!t.Read<SwapperNoOp>(is))
-      {
-        mdcmAlwaysWarnMacro("Cannot read very first tag");
-        return false;
-      }
-      char vr_str[3];
-      is.read(vr_str, 2);
-      vr_str[2] = '\0';
-      VR::VRType vr = VR::GetVRType(vr_str);
-      if(vr != VR::VR_END)
-      {
-        DataSetTS = TransferSyntax::ExplicitVRLittleEndian;
-      }
-      else
-      {
-        DataSetTS = TransferSyntax::ImplicitVRLittleEndian;
-      }
+      MetaInformationTS = TransferSyntax::Explicit;
+      // Looks like an Explicit File Meta Information Header
       is.seekg(-6, std::ios::cur); // Seek back
+      ExplicitDataElement xde;
+      while(ReadExplicitDataElement<SwapperNoOp>(is, xde))
+      {
+        if(xde.GetVR() == VR::UN)
+        {
+          mdcmWarningMacro("VR::UN found in file Meta header. "
+            "VR::UN will be replaced with proper VR for tag: " << xde.GetTag());
+          AddVRToDataElement(xde);
+        }
+        Insert(xde);
+      }
+      // find out the dataset transfer syntax
+      ComputeDataSetTransferSyntax();
+    }
+    else
+    {
+      MetaInformationTS = TransferSyntax::Implicit;
+      mdcmWarningMacro("File Meta Information is implicit. VR will be explicitly added");
+      // might be an implicit encoded Meta File Information header
+      // GE_DLX-8-MONO2-PrivateSyntax.dcm
+      is.seekg(-6, std::ios::cur); // Seek back
+      ImplicitDataElement ide;
+      while(ReadImplicitDataElement<SwapperNoOp>(is, ide))
+      {
+        if(AddVRToDataElement(ide))
+        {
+          Insert(ide);
+        }
+        else
+        {
+          mdcmWarningMacro("Unknown element found in Meta Header: " << ide.GetTag());
+        }
+      }
+      // find out the dataset transfer syntax
+      try
+      {
+        ComputeDataSetTransferSyntax();
+      }
+      catch(std::logic_error &)
+      {
+        // We were able to read some of the Meta Header, but failed to compute the DataSetTS
+        // technically MDCM is able to cope with any value here. But be kind and try to have a good guess
+        mdcmWarningMacro("Meta Header is bogus. Guessing DataSet TS.");
+        Tag t;
+        if(!t.Read<SwapperNoOp>(is))
+        {
+          throw std::logic_error("Cannot read very first tag");
+        }
+        char vr_str[3];
+        is.read(vr_str, 2);
+        vr_str[2] = '\0';
+        VR::VRType vr = VR::GetVRType(vr_str);
+        if(vr != VR::VR_END)
+        {
+          DataSetTS = TransferSyntax::ExplicitVRLittleEndian;
+        }
+        else
+        {
+          DataSetTS = TransferSyntax::ImplicitVRLittleEndian;
+        }
+        is.seekg(-6, std::ios::cur); // Seek back
+      }
     }
   }
-  if(!is) return false;
-  return true;
+  return is;
 }
 
-bool FileMetaInformation::ComputeDataSetTransferSyntax()
+void FileMetaInformation::ComputeDataSetTransferSyntax()
 {
   const Tag t(0x0002,0x0010);
   const DataElement & de = GetDataElement(t);
@@ -880,43 +776,79 @@ bool FileMetaInformation::ComputeDataSetTransferSyntax()
   const ByteValue * bv = de.GetByteValue();
   if(!bv)
   {
-    mdcmAlwaysWarnMacro("Unknown Transfer syntax: (0x0002,0x0010) is NULL");
-    return false;
+    throw std::logic_error("Unknown Transfer syntax (!bv)");
   }
   // Pad string with a \0
   ts = std::string(bv->GetPointer(), bv->GetLength());
   TransferSyntax tst(TransferSyntax::GetTSType(ts.c_str()));
   if(tst == TransferSyntax::TS_END)
   {
-    mdcmAlwaysWarnMacro("Unknown Transfer syntax: TS_END");
-    return false;
+    throw std::logic_error("Unknown Transfer syntax (TS_END)");
   }
   DataSetTS = tst;
 #if 0
   const bool b = DataSetTS.IsValid();
   (void)b;
 #endif
-  return true;
 }
 
-const char * FileMetaInformation::GetFileMetaInformationVersion()
+void FileMetaInformation::SetDataSetTransferSyntax(const TransferSyntax &ts)
 {
-  return MDCM_FILE_META_INFORMATION_VERSION;
+  DataSetTS = ts;
 }
 
-const char * FileMetaInformation::GetMDCMImplementationClassUID()
+std::string FileMetaInformation::GetMediaStorageAsString() const
 {
-  return MDCM_IMPLEMENTATION_CLASS_UID;
+  // D 0002|0002 [UI] [Media Storage SOP Class UID]
+  // [1.2.840.10008.5.1.4.1.1.12.1]
+  // ==>       [X-Ray Angiographic Image Storage]
+  const Tag t(0x0002,0x0002);
+  if(!FindDataElement(t))
+  {
+    return std::string("");
+  }
+  const DataElement &de = GetDataElement(t);
+  std::string ts;
+  {
+    const ByteValue * bv = de.GetByteValue();
+    if(bv && bv->GetPointer() && bv->GetLength())
+    {
+      // Pad string with a \0
+      ts = std::string(bv->GetPointer(), bv->GetLength());
+    }
+  }
+  const size_t ts_size = ts.size();
+  if(ts_size > 0)
+  {
+    char & last = ts[ts_size - 1];
+    if(last == ' ') last = '\0';
+  }
+  return ts;
 }
 
-const char * FileMetaInformation::GetMDCMImplementationVersionName()
+MediaStorage FileMetaInformation::GetMediaStorage() const
 {
-  return MDCM_IMPLEMENTATION_VERSION_NAME;
+  const std::string &ts = GetMediaStorageAsString();
+  if(ts.empty()) return MediaStorage::MS_END;
+  MediaStorage ms = MediaStorage::GetMSType(ts.c_str());
+  if(ms == MediaStorage::MS_END)
+  {
+    mdcmAlwaysWarnMacro("Media Storage Class UID: " << ts << " is unknown");
+  }
+  return ms;
 }
 
-const char * FileMetaInformation::GetMDCMSourceApplicationEntityTitle()
+void FileMetaInformation::Default()
 {
-  return MDCM_SOURCE_APPLICATION_ENTITY_TITLE;
+}
+
+std::ostream & FileMetaInformation::Write(std::ostream &os) const
+{
+  P.Write(os);
+  {
+    this->DataSet::Write<ExplicitDataElement,SwapperNoOp>(os);
+  }
+  return os;
 }
 
 } // end namespace mdcm

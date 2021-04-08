@@ -99,8 +99,13 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
     return is;
   }
 #endif
-  if(VRField.Read(is))
+  try
   {
+    if(!VRField.Read(is))
+    {
+      assert(0 && "Should not happen");
+      return is;
+    }
     if(VR::GetLength(VRField) == 4)
     {
       if(!ValueLengthField.Read<TSwap>(is))
@@ -129,7 +134,7 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
 #endif
     }
   }
-  else
+  catch(std::logic_error &)
   {
     VRField = VR::INVALID;
     is.seekg(-2, std::ios::cur);
@@ -267,7 +272,7 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
       else
 #endif
       {
-        throw std::logic_error("ExplicitImplicitDataElement::ReadPreValue !ValueIO<ImplicitDataElement,TSwap>::Read");
+        throw std::logic_error("Should not happen (imp)");
       }
       return is;
     }
@@ -305,7 +310,7 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
 }
 
 template <typename TSwap>
-std::istream & ExplicitImplicitDataElement::ReadValue(std::istream &is, bool readvalues)
+std::istream &ExplicitImplicitDataElement::ReadValue(std::istream &is, bool readvalues)
 {
   if(is.eof()) return is;
   /* thechnically the following is bad

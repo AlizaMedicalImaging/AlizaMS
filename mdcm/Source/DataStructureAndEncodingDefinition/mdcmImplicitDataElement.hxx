@@ -33,14 +33,14 @@ namespace mdcm
 {
 
 template <typename TSwap>
-std::istream & ImplicitDataElement::Read(std::istream &is)
+std::istream &ImplicitDataElement::Read(std::istream &is)
 {
   ReadPreValue<TSwap>(is);
   return ReadValue<TSwap>(is);
 }
 
 template <typename TSwap>
-std::istream & ImplicitDataElement::ReadPreValue(std::istream& is)
+std::istream &ImplicitDataElement::ReadPreValue(std::istream& is)
 {
   TagField.Read<TSwap>(is);
   // See PS 3.5, 7.1.3 Data Element Structure With Implicit VR
@@ -63,7 +63,7 @@ std::istream & ImplicitDataElement::ReadPreValue(std::istream& is)
 }
 
 template <typename TSwap>
-std::istream & ImplicitDataElement::ReadValue(std::istream & is, bool readvalues)
+std::istream &ImplicitDataElement::ReadValue(std::istream &is, bool readvalues)
 {
   if(is.eof()) return is;
   const Tag itemStartItem(0xfffe,0xe000);
@@ -255,7 +255,7 @@ std::istream & ImplicitDataElement::ReadValue(std::istream & is, bool readvalues
     else
 #endif /* MDCM_SUPPORT_BROKEN_IMPLEMENTATION */
     {
-      throw std::logic_error("ImplicitDataElement::ReadValue !ValueIO<ImplicitDataElement,TSwap>::Read");
+      throw std::logic_error("Should not happen (imp)");
     }
     return is;
   }
@@ -479,7 +479,7 @@ std::istream & ImplicitDataElement::ReadValueWithLength(std::istream & is, VL & 
     else
 #endif
     {
-      throw std::logic_error("ImplicitDataElement::ReadValueWithLength !ValueIO<ImplicitDataElement,TSwap>::Read");
+      throw std::logic_error("Should not happen (imp)");
     }
     return is;
   }
@@ -500,7 +500,7 @@ std::istream & ImplicitDataElement::ReadValueWithLength(std::istream & is, VL & 
 }
 
 template <typename TSwap>
-const std::ostream & ImplicitDataElement::Write(std::ostream &os) const
+const std::ostream &ImplicitDataElement::Write(std::ostream &os) const
 {
   // See PS 3.5, 7.1.3 Data Element Structure With Implicit VR
   // Write Tag

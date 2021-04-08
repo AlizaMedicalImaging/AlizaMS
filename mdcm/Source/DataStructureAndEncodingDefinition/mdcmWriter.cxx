@@ -78,24 +78,26 @@ bool Writer::Write()
     if(CheckFileMetaInformation)
     {
       FileMetaInformation duplicate(Header);
-      if(!duplicate.FillFromDataSet(DS))
+      try
       {
-        mdcmAlwaysWarnMacro("In Writer::Write: FillFromDataSet failed");
+        duplicate.FillFromDataSet(DS);
+      }
+      catch(std::logic_error & ex)
+      {
+        mdcmAlwaysWarnMacro("Could not recreate the File Meta Header, please report:" << ex.what());
         return false;
       }
-      const bool ok = duplicate.Write2(os);
-      (void)ok;
+      duplicate.Write(os);
     }
     else
     {
-      const bool ok = Header.Write2(os);
-      (void)ok;
+      Header.Write(os);
     }
   }
   const TransferSyntax & ts = Header.GetDataSetTransferSyntax();
   if(!ts.IsValid())
   {
-    mdcmAlwaysWarnMacro("In Writer::Write: Invalid Transfer Syntax");
+    mdcmErrorMacro("Invalid Transfer Syntax");
     return false;
   }
   if(ts == TransferSyntax::DeflatedExplicitVRLittleEndian)
@@ -106,9 +108,8 @@ bool Writer::Write()
       assert(ts.GetNegociatedType() == TransferSyntax::Explicit);
       DS.Write<ExplicitDataElement,SwapperNoOp>(gzos);
     }
-    catch(std::exception & ex)
+    catch (...)
     {
-      mdcmAlwaysWarnMacro(ex.what());
       return false;
     }
     return true;
@@ -146,6 +147,11 @@ bool Writer::Write()
   catch(std::exception & ex)
   {
     mdcmAlwaysWarnMacro(ex.what());
+    return false;
+  }
+  catch(...)
+  {
+    mdcmAlwaysWarnMacro("Unknown exception");
     return false;
   }
   os.flush();

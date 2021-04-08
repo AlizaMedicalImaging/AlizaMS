@@ -41,7 +41,6 @@ std::istream &UNExplicitImplicitDataElement::Read(std::istream & is)
   return ReadValue<TSwap>(is);
 }
 
-// TODO
 template <typename TSwap>
 std::istream &UNExplicitImplicitDataElement::ReadPreValue(std::istream & is)
 {
@@ -51,12 +50,10 @@ std::istream &UNExplicitImplicitDataElement::ReadPreValue(std::istream & is)
   return is;
 }
 
-// TODO
 template <typename TSwap>
 std::istream &UNExplicitImplicitDataElement::ReadValue(std::istream & is)
 {
   if(is.eof()) return is;
-#if 0
   DataElement & de = *this;
   try
   {
@@ -76,7 +73,6 @@ std::istream &UNExplicitImplicitDataElement::ReadValue(std::istream & is)
     }
     //de.template ReadValue<ImplicitDataElement,TSwap>(is);
   }
-#endif
   return is;
 }
 

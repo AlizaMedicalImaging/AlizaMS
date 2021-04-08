@@ -34,21 +34,27 @@ namespace mdcm
 
 class MDCM_EXPORT Preamble
 {
+friend std::ostream &operator<<(std::ostream &, const Preamble &);
 public:
   Preamble();
   ~Preamble();
   void Remove();
-  bool Read(std::istream &);
-  void Write(std::ostream &) const;
-  void Print(std::ostream &) const;
-  const char * GetInternal() const;
-  bool IsEmpty() const;
-  VL GetLength() const;
+  std::istream & Read(std::istream &);
+  std::ostream const & Write(std::ostream &) const;
+  const char * GetInternal() const { return Internal; }
+  bool IsEmpty() const { return !Internal; }
+  VL GetLength() const { return 128 + 4; }
 
 private:
   void Create();
   char * Internal;
 };
+
+inline std::ostream& operator<<(std::ostream & os, const Preamble & val)
+{
+  os << val.Internal;
+  return os;
+}
 
 } // end namespace mdcm
 

@@ -37,35 +37,32 @@ public:
   BasicOffsetTable() : Fragment() {}
   friend std::ostream &operator<<(std::ostream & os, const BasicOffsetTable & val);
   template <typename TSwap>
-  bool Read(std::istream & is)
-  {
+  std::istream & Read(std::istream &is) {
     const Tag itemStart(0xfffe, 0xe000);
     const Tag seqDelItem(0xfffe,0xe0dd);
     if(!TagField.Read<TSwap>(is))
     {
       assert(0 && "Should not happen");
-      return false;
+      return is;
     }
     if(TagField != itemStart)
     {
-      mdcmAlwaysWarnMacro("TagField != itemStart (Siemens icon bug?)");
-      return false;
+      throw std::logic_error("Siemens Icon issue?");
     }
     if(!ValueLengthField.Read<TSwap>(is))
     {
       assert(0 && "Should not happen");
-      return false;
+      return is;
     }
     SmartPointer<ByteValue> bv = new ByteValue;
     bv->SetLength(ValueLengthField);
     if(!bv->Read<TSwap>(is))
     {
       assert(0 && "Should not happen");
-      return false;
+      return is;
     }
     ValueField = bv;
-    if(!is) return false;
-    return true;
+    return is;
   }
 };
 
@@ -75,8 +72,10 @@ inline std::ostream &operator<<(std::ostream & os, const BasicOffsetTable & val)
   if(val.ValueField)
   {
     const ByteValue * bv = val.GetByteValue();
-    if(bv) os << *bv;
+    assert(bv);
+    os << *bv;
   }
+
   return os;
 }
 
