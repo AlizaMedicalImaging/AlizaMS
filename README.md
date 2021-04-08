@@ -14,21 +14,21 @@ Linux
 To start on Linux extract archive and run _alizams.sh_
 
 ```
-cd alizams-1.3.0_linux
+cd alizams-1.3.1_linux
 ./alizams.sh
 ```
 
 Optionally install local desktop menu entry
 
 ```
-cd alizams-1.3.0_linux/install_menu
+cd alizams-1.3.1_linux/install_menu
 ./install_menu.sh
 ```
 
 To remove local menu entry
 
 ```
-cd alizams-1.3.0_linux/install_menu
+cd alizams-1.3.1_linux/install_menu
 ./uninstall_menu.sh
 ```
 
@@ -72,5 +72,4 @@ Build
 -----
 
  * S. ![wiki](https://github.com/AlizaMedicalImaging/AlizaMS/wiki) for example how to build on Linux.
- * Or use cmake-gui to go through settings, specially on Windows.
- * Open an issue to get support.
+
