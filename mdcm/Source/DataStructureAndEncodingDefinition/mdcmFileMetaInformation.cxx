@@ -629,7 +629,7 @@ std::istream &FileMetaInformation::ReadCompat(std::istream & is)
     }
     else
     {
-      throw std::logic_error("Impossible: cannot read 2bytes for VR");
+      throw std::logic_error("Can not read 2 bytes for VR");
     }
     is.seekg(-6, std::ios::cur); // Seek back
     if(vr != VR::VR_END)
@@ -655,9 +655,9 @@ std::istream &FileMetaInformation::ReadCompat(std::istream & is)
         is.seekg(-12, std::ios::cur); // Seek back
         return is;
       }
-	  else
-	  {
-        throw std::logic_error("Cannot find DICOM type");
+      else
+      {
+        throw std::logic_error("Can not distinguish type of DICOM file");
       }
     }
   }

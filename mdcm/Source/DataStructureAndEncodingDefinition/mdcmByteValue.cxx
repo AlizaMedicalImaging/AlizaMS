@@ -118,9 +118,7 @@ void ByteValue::SetLength(VL vl)
   // CompressedLossy.dcm
   if(l.IsUndefined())
   {
-    mdcmAlwaysWarnMacro("Can not SetLength, undefined");
-    Internal.resize(0);
-    Length = 0;
+    throw std::logic_error("Can not SetLength, undefined");
   }
   if(l.IsOdd())
   {
@@ -139,9 +137,7 @@ void ByteValue::SetLength(VL vl)
   }
   catch(...)
   {
-    mdcmAlwaysWarnMacro("Can not resize Internal, exception");
-    Internal.resize(0);
-    Length = 0;
+    throw std::logic_error("Can not resize Internal, exception");
   }
   Length = vl;
 }
@@ -189,7 +185,7 @@ bool ByteValue::GetBuffer(char * buffer, unsigned long long length) const
     if (!Internal.empty()) memcpy(buffer, &Internal[0], length);
     return true;
   }
-  mdcmDebugMacro("Could not handle length= " << length);
+  mdcmAlwaysWarnMacro("Could not handle length = " << length);
   return false;
 }
 

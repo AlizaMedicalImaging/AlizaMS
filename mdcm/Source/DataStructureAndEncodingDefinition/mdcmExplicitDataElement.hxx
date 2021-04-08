@@ -54,7 +54,7 @@ std::istream &ExplicitDataElement::ReadPreValue(std::istream &is)
   }
   if(TagField == Tag(0xfffe,0xe0dd))
   {
-    ParseException pe("");
+    ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
   }

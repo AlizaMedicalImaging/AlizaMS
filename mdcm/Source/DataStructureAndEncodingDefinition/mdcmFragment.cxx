@@ -26,19 +26,19 @@ namespace mdcm
 
 VL Fragment::GetLength() const
 {
-  assert( !ValueLengthField.IsUndefined() );
-  assert( !ValueField || ValueField->GetLength() == ValueLengthField );
-  return TagField.GetLength() + ValueLengthField.GetLength()
-    + ValueLengthField;
+  assert(!ValueLengthField.IsUndefined());
+  assert(!ValueField || ValueField->GetLength() == ValueLengthField);
+  return (TagField.GetLength() + ValueLengthField.GetLength()
+    + ValueLengthField);
 }
 
 VL Fragment::ComputeLength() const
 {
-  const ByteValue *bv = GetByteValue();
-  assert( bv );
-  assert( !ValueLengthField.IsUndefined() );
-  return TagField.GetLength() + ValueLengthField.GetLength()
-    + bv->ComputeLength() /*ValueLengthField*/;
+  assert(!ValueLengthField.IsUndefined());
+  const ByteValue * bv = GetByteValue();
+  assert(bv);
+  return (TagField.GetLength() + ValueLengthField.GetLength()
+    + ((bv) ? bv->ComputeLength() : (VL)0));
 }
 
 } // end namespace mdcm

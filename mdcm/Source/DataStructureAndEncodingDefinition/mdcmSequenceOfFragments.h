@@ -33,7 +33,7 @@ namespace mdcm
 
 /**
  * Class to represent a Sequence Of Fragments
- * Todo MM: I do not enforce that Sequence of Fragments ends with a SQ end del
+ * MM: I do not enforce that Sequence of Fragments ends with a SQ end del TODO
  */
 
 class MDCM_EXPORT SequenceOfFragments : public Value
@@ -57,221 +57,219 @@ public:
     SequenceLengthField = length;
   }
   void Clear() override;
-  void AddFragment(Fragment const &item);
+  void AddFragment(Fragment const &);
   unsigned long long ComputeByteLength() const;
   VL ComputeLength() const;
-  bool GetBuffer(char * buffer, unsigned long long length) const;
-  bool GetFragBuffer(unsigned int fragNb, char * buffer, unsigned long long & length) const;
+  bool GetBuffer(char *, unsigned long long) const;
+  bool GetFragBuffer(unsigned int, char *, unsigned long long &) const;
   SizeType GetNumberOfFragments() const;
-  const Fragment & GetFragment(SizeType num) const;
-  bool WriteBuffer(std::ostream &os) const;
+  const Fragment & GetFragment(SizeType) const;
+  bool WriteBuffer(std::ostream &) const;
   const BasicOffsetTable & GetTable() const { return Table; }
   BasicOffsetTable &GetTable() { return Table; }
 
-template <typename TSwap>
-std::istream& Read(std::istream &is, bool readvalues = true)
-{
-  assert(SequenceLengthField.IsUndefined());
-  ReadPreValue<TSwap>(is);
-  return ReadValue<TSwap>(is, readvalues);
-}
-
-template <typename TSwap>
-std::istream & ReadPreValue(std::istream &is)
-{
-  // First item is the basic offset table
-  try
+  template <typename TSwap>
+  std::istream & Read(std::istream & is, bool readvalues = true)
   {
-    Table.Read<TSwap>(is);
-    mdcmDebugMacro("Table: " << Table);
+    assert(SequenceLengthField.IsUndefined());
+    ReadPreValue<TSwap>(is);
+    return ReadValue<TSwap>(is, readvalues);
   }
-  catch(...)
+
+  template <typename TSwap>
+  std::istream & ReadPreValue(std::istream & is)
   {
-    // Bug_Siemens_PrivateIconNoItem.dcm
-    // First thing first let's rewind
-    is.seekg(-4, std::ios::cur);
-    // FF D8 <=> Start of Image (SOI) marker
-    // FF E0 <=> APP0 Reserved for Application Use
-    if (Table.GetTag() == Tag(0xd8ff,0xe0ff))
+    // First item is the basic offset table
+    try
     {
-      Table = BasicOffsetTable();
-      Fragment frag;
-      if(FillFragmentWithJPEG(frag, is))
+      Table.Read<TSwap>(is);
+      mdcmDebugMacro("Table: " << Table);
+    }
+    catch(...)
+    {
+      // Bug_Siemens_PrivateIconNoItem.dcm
+      // First thing first let's rewind
+      is.seekg(-4, std::ios::cur);
+      // FF D8 <=> Start of Image (SOI) marker
+      // FF E0 <=> APP0 Reserved for Application Use
+      if (Table.GetTag() == Tag(0xd8ff,0xe0ff))
+      {
+        Table = BasicOffsetTable();
+        Fragment frag;
+        if(FillFragmentWithJPEG(frag, is))
+        {
+          Fragments.push_back(frag);
+        }
+        return is;
+      }
+      else
+      {
+        throw std::logic_error("Seq. of frag. : ReadPreValue exception");
+      }
+    }
+    return is;
+  }
+
+  template <typename TSwap>
+  std::istream & ReadValue(std::istream & is, bool /*readvalues*/)
+  {
+    const Tag seqDelItem(0xfffe,0xe0dd);
+    // not used
+    Fragment frag;
+    try
+    {
+      while(frag.Read<TSwap>(is) && frag.GetTag() != seqDelItem)
       {
         Fragments.push_back(frag);
       }
-      return is;
+      assert(frag.GetTag() == seqDelItem && frag.GetVL() == 0);
     }
-    else
+    catch(std::exception & ex)
     {
-      throw std::logic_error("Seq. of frag. : ReadPreValue exception");
-    }
-  }
-  return is;
-}
-
-template <typename TSwap>
-std::istream & ReadValue(std::istream &is, bool /*readvalues*/)
-{
-  const Tag seqDelItem(0xfffe,0xe0dd);
-  // not used
-  Fragment frag;
-  try
-  {
-    while(frag.Read<TSwap>(is) && frag.GetTag() != seqDelItem)
-    {
-      Fragments.push_back(frag);
-    }
-    assert(frag.GetTag() == seqDelItem && frag.GetVL() == 0);
-  }
-  catch(std::exception & ex)
-  {
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
-    // that's ok ! In all cases the whole file was read, because
-    // Fragment::Read only fail on eof() reached 1.
-    // SIEMENS-JPEG-CorruptFrag.dcm is more difficult to deal with, we have a
-    // partial fragment, read we decide to add it anyway to the stack of
-    // fragments (eof was reached so we need to clear error bit)
-    if(frag.GetTag() == Tag(0xfffe,0xe000) )
-    {
-      mdcmWarningMacro("Pixel Data Fragment could be corrupted. Use file at own risk");
-      Fragments.push_back(frag);
-      is.clear();
-    }
-    // 2. GENESIS_SIGNA-JPEG-CorruptFrag.dcm
-    else if(frag.GetTag() == Tag(0xddff,0x00e0))
-    {
-      assert(Fragments.size() == 1);
-      const ByteValue * bv = Fragments[0].GetByteValue();
-      assert((unsigned char)bv->GetPointer()[ bv->GetLength() - 1 ] == 0xfe);
-      // Yes this is an extra copy, this is a bug anyway, go fix YOUR code
-      Fragments[0].SetByteValue(bv->GetPointer(), bv->GetLength() - 1);
-      mdcmWarningMacro("JPEG Fragment length was declared with an extra byte"
-        " at the end: stripped !");
-      is.clear(); // clear the error bit
-    }
-    // 3. LEICA/WSI
-    else if((frag.GetTag().GetGroup() == 0x00ff) &&
-      ((frag.GetTag().GetElement() & 0x00ff) == 0xe0))
-    {
-      // Looks like there is a mess with offset and odd byte array
-      // We are going first to backtrack one byte back, and then use a
-      // ReadBacktrack function which in turn may backtrack up to 10 bytes
-      // backward. This appears to be working on a set of DICOM/WSI files from
-      // LEICA
-      mdcmWarningMacro("Trying to fix the even-but-odd value length bug #1");
-      assert(Fragments.size());
-      const size_t lastf = Fragments.size() - 1;
-      const ByteValue * bv = Fragments[ lastf ].GetByteValue();
-      const char * a = bv->GetPointer();
-      mdcmAssertAlwaysMacro((unsigned char)a[ bv->GetLength() - 1 ] == 0xfe);
-      (void)a;
-      Fragments[ lastf ].SetByteValue(bv->GetPointer(), bv->GetLength() - 1);
-      is.seekg(-9, std::ios::cur);
-      assert(is.good());
-      while(frag.ReadBacktrack<TSwap>(is) && frag.GetTag() != seqDelItem)
+      // In all cases the whole file was read, because
+      // Fragment::Read only fail on eof() reached 1.
+      // SIEMENS-JPEG-CorruptFrag.dcm is more difficult to deal with, we have a
+      // partial fragment, we decide to add it anyway to the stack of
+      // fragments (eof was reached so we need to clear error bit)
+      if(frag.GetTag() == Tag(0xfffe,0xe000) )
       {
-        mdcmDebugMacro("Frag: " << frag);
+        mdcmWarningMacro("Pixel Data Fragment could be corrupted. Use file at own risk");
         Fragments.push_back(frag);
+        is.clear();
       }
-      assert(frag.GetTag() == seqDelItem && frag.GetVL() == 0);
-    }
-    // 4. LEICA/WSI (bis)
-    else if (frag.GetTag().GetGroup() == 0xe000)
-    {
-      // Looks like there is a mess with offset and odd byte array
-      // We are going first to backtrack one byte back, and then use a
-      // ReadBacktrack function which in turn may backtrack up to 10 bytes
-      // backward. This appears to be working on a set of DICOM/WSI files from
-      // LEICA
-      mdcmWarningMacro("Trying to fix the even-but-odd value length bug #2");
-      assert(Fragments.size());
-      const size_t lastf = Fragments.size() - 1;
-      const ByteValue * bv = Fragments[ lastf ].GetByteValue();
-      const char * a = bv->GetPointer();
-      mdcmAssertAlwaysMacro((unsigned char)a[ bv->GetLength() - 2 ] == 0xfe);
-      (void)a;
-      Fragments[ lastf ].SetByteValue(bv->GetPointer(), bv->GetLength() - 2);
-      is.seekg(-10, std::ios::cur);
-      assert(is.good());
-      while(frag.ReadBacktrack<TSwap>(is) && frag.GetTag() != seqDelItem)
+      // 2. GENESIS_SIGNA-JPEG-CorruptFrag.dcm
+      else if(frag.GetTag() == Tag(0xddff,0x00e0))
       {
-        mdcmDebugMacro("Frag: " << frag);
-        Fragments.push_back(frag);
+        assert(Fragments.size() == 1);
+        const ByteValue * bv = Fragments[0].GetByteValue();
+        assert((unsigned char)bv->GetPointer()[bv->GetLength() - 1] == 0xfe);
+        // Yes this is an extra copy, this is a bug anyway
+        Fragments[0].SetByteValue(bv->GetPointer(), bv->GetLength() - 1);
+        mdcmWarningMacro("JPEG Fragment length was declared with an extra byte"
+          " at the end: stripped !");
+        is.clear(); // clear the error bit
       }
-      assert(frag.GetTag() == seqDelItem && frag.GetVL() == 0);
-    }
-    // 5. LEICA/WSI (ter)
-    else if ((frag.GetTag().GetGroup() & 0x00ff) == 0x00e0 &&
-              (frag.GetTag().GetElement() & 0xff00) == 0x0000)
-    {
-      // Looks like there is a mess with offset and odd byte array
-      // We are going first to backtrack one byte back, and then use a
-      // ReadBacktrack function which in turn may backtrack up to 10 bytes
-      // backward. This appears to be working on a set of DICOM/WSI files from
-      // LEICA
-      mdcmWarningMacro("Trying to fix the even-but-odd value length bug #3");
-      assert(Fragments.size());
-      const size_t lastf = Fragments.size() - 1;
-      const ByteValue * bv = Fragments[ lastf ].GetByteValue();
-      const char * a = bv->GetPointer();
-      mdcmAssertAlwaysMacro((unsigned char)a[ bv->GetLength() - 3 ] == 0xfe);
-      (void)a;
-      Fragments[ lastf ].SetByteValue(bv->GetPointer(), bv->GetLength() - 3);
-      is.seekg(-11, std::ios::cur);
-      assert(is.good());
-      while(frag.ReadBacktrack<TSwap>(is) && frag.GetTag() != seqDelItem)
+      // 3. LEICA/WSI
+      else if((frag.GetTag().GetGroup() == 0x00ff) &&
+        ((frag.GetTag().GetElement() & 0x00ff) == 0xe0))
       {
-        mdcmDebugMacro("Frag: " << frag);
-        Fragments.push_back(frag);
+        // Looks like there is a mess with offset and odd byte array
+        // We are going first to backtrack one byte back, and then use a
+        // ReadBacktrack function which in turn may backtrack up to 10 bytes
+        // backward. This appears to be working on a set of DICOM/WSI files from
+        // LEICA
+        mdcmWarningMacro("Trying to fix the even-but-odd value length bug #1");
+        assert(Fragments.size());
+        const size_t lastf = Fragments.size() - 1;
+        const ByteValue * bv = Fragments[lastf].GetByteValue();
+        const char * a = bv->GetPointer();
+        assert((unsigned char)a[bv->GetLength() - 1] == 0xfe);
+        (void)a;
+        Fragments[ lastf ].SetByteValue(bv->GetPointer(), bv->GetLength() - 1);
+        is.seekg(-9, std::ios::cur);
+        assert(is.good());
+        while(frag.ReadBacktrack<TSwap>(is) && frag.GetTag() != seqDelItem)
+        {
+          mdcmDebugMacro("Frag: " << frag);
+          Fragments.push_back(frag);
+        }
+        assert(frag.GetTag() == seqDelItem && frag.GetVL() == 0);
       }
-      assert(frag.GetTag() == seqDelItem && frag.GetVL() == 0);
-    }
-    else
-    {
-      // 3. mdcm-JPEG-LossLess3a.dcm: easy case, an extra tag was found
-      // instead of terminator (eof is the next char)
-      mdcmAlwaysWarnMacro("Reading failed at Tag:" << frag.GetTag() << " Index #"
-        << Fragments.size() << " Offset " << is.tellg() << ". Use file at own risk.\n"
-        << ex.what());
-    }
+      // 4. LEICA/WSI (bis)
+      else if(frag.GetTag().GetGroup() == 0xe000)
+      {
+        // Looks like there is a mess with offset and odd byte array
+        // We are going first to backtrack one byte back, and then use a
+        // ReadBacktrack function which in turn may backtrack up to 10 bytes
+        // backward. This appears to be working on a set of DICOM/WSI files from
+        // LEICA
+        mdcmWarningMacro("Trying to fix the even-but-odd value length bug #2");
+        assert(Fragments.size());
+        const size_t lastf = Fragments.size() - 1;
+        const ByteValue * bv = Fragments[lastf].GetByteValue();
+        const char * a = bv->GetPointer();
+        assert((unsigned char)a[bv->GetLength() - 2] == 0xfe);
+        (void)a;
+        Fragments[lastf].SetByteValue(bv->GetPointer(), bv->GetLength() - 2);
+        is.seekg(-10, std::ios::cur);
+        assert(is.good());
+        while(frag.ReadBacktrack<TSwap>(is) && frag.GetTag() != seqDelItem)
+        {
+          mdcmDebugMacro("Frag: " << frag);
+          Fragments.push_back(frag);
+        }
+        assert(frag.GetTag() == seqDelItem && frag.GetVL() == 0);
+      }
+      // 5. LEICA/WSI (ter)
+      else if((frag.GetTag().GetGroup() & 0x00ff) == 0x00e0 &&
+        (frag.GetTag().GetElement() & 0xff00) == 0x0000)
+      {
+        // Looks like there is a mess with offset and odd byte array
+        // We are going first to backtrack one byte back, and then use a
+        // ReadBacktrack function which in turn may backtrack up to 10 bytes
+        // backward. This appears to be working on a set of DICOM/WSI files from
+        // LEICA
+        mdcmWarningMacro("Trying to fix the even-but-odd value length bug #3");
+        assert(Fragments.size());
+        const size_t lastf = Fragments.size() - 1;
+        const ByteValue * bv = Fragments[lastf].GetByteValue();
+        const char * a = bv->GetPointer();
+        assert((unsigned char)a[bv->GetLength() - 3] == 0xfe);
+        (void)a;
+        Fragments[lastf].SetByteValue(bv->GetPointer(), bv->GetLength() - 3);
+        is.seekg(-11, std::ios::cur);
+        assert(is.good());
+        while(frag.ReadBacktrack<TSwap>(is) && frag.GetTag() != seqDelItem)
+        {
+          mdcmDebugMacro("Frag: " << frag);
+          Fragments.push_back(frag);
+        }
+        assert(frag.GetTag() == seqDelItem && frag.GetVL() == 0);
+      }
+      else
+      {
+        // 3. mdcm-JPEG-LossLess3a.dcm: easy case, an extra tag was found
+        // instead of terminator (eof is the next char)
+        mdcmAlwaysWarnMacro("Reading failed at Tag:" << frag.GetTag() << " Index #"
+          << Fragments.size() << " Offset " << is.tellg() << ". Use file at own risk.\n"
+          << ex.what());
+      }
 #endif /* MDCM_SUPPORT_BROKEN_IMPLEMENTATION */
+    }
+    return is;
   }
-  return is;
-}
 
-template <typename TSwap>
-std::ostream const & Write(std::ostream &os) const
-{
-  if(!Table.Write<TSwap>(os))
+  template <typename TSwap>
+  std::ostream const & Write(std::ostream & os) const
   {
-    assert(0 && "Should not happen");
+    if(!Table.Write<TSwap>(os))
+    {
+      assert(0 && "Should not happen");
+      return os;
+    }
+    for(ConstIterator it = Begin(); it != End(); ++it)
+    {
+      it->Write<TSwap>(os);
+    }
+    // seq del item is not stored, write it
+    const Tag seqDelItem(0xfffe,0xe0dd);
+    seqDelItem.Write<TSwap>(os);
+    VL zero = 0;
+    zero.Write<TSwap>(os);
     return os;
   }
-  for(ConstIterator it = Begin();it != End(); ++it)
+
+  static SmartPointer<SequenceOfFragments> New()
   {
-    it->Write<TSwap>(os);
+     return new SequenceOfFragments();
   }
-  // seq del item is not stored, write it
-  const Tag seqDelItem(0xfffe,0xe0dd);
-  seqDelItem.Write<TSwap>(os);
-  VL zero = 0;
-  zero.Write<TSwap>(os);
 
-  return os;
-}
-
-static SmartPointer<SequenceOfFragments> New()
-{
-   return new SequenceOfFragments();
-}
-
-public:
   void Print(std::ostream & os) const override
   {
     os << "SQ L= " << SequenceLengthField << "\n";
     os << "Table:" << Table << "\n";
-    for(ConstIterator it = Begin();it != End(); ++it)
+    for(ConstIterator it = Begin(); it != End(); ++it)
     {
       os << "  " << *it << "\n";
     }
@@ -283,6 +281,7 @@ public:
       os << "\t" << zero;
     }
   }
+
   bool operator==(const Value & val) const override
   {
     const SequenceOfFragments & sqf =
@@ -296,9 +295,7 @@ private:
   BasicOffsetTable Table;
   VL SequenceLengthField;
   FragmentVector Fragments;
-
-private:
-  bool FillFragmentWithJPEG(Fragment & frag, std::istream & is);
+  bool FillFragmentWithJPEG(Fragment &, std::istream &);
 };
 
 } // end namespace mdcm

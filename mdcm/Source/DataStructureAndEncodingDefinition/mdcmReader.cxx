@@ -354,6 +354,7 @@ bool Reader::InternalReadCommon(const T_Caller &caller)
           // weird implicit meta header
           is.seekg(128+4, std::ios::beg);
           assert(is.good());
+          (void)ex;
           try
           {
             F->GetHeader().ReadCompat(is);

@@ -35,16 +35,16 @@ namespace mdcm
  */
 class MDCM_EXPORT Fragment : public DataElement
 {
+friend std::ostream &operator<<(std::ostream &, const Fragment &);
 public:
   Fragment() : DataElement(Tag(0xfffe, 0xe000), 0) {}
-  friend std::ostream &operator<<(std::ostream & os, const Fragment & val);
 
   VL GetLength() const;
 
   VL ComputeLength() const;
 
   template <typename TSwap>
-  std::istream & Read(std::istream &is)
+  std::istream & Read(std::istream & is)
   {
     ReadPreValue<TSwap>(is);
     return ReadValue<TSwap>(is);
@@ -59,25 +59,22 @@ public:
     if(!is)
     {
       throw std::logic_error("Problem #1");
-      return is;
     }
     if(!ValueLengthField.Read<TSwap>(is))
     {
       throw std::logic_error("Problem #2");
-      return is;
     }
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
     if(TagField != itemStart && TagField != seqDelItem)
     {
       throw std::logic_error("Problem #3");
-      return is;
     }
 #endif
     return is;
   }
 
   template <typename TSwap>
-  std::istream &ReadValue(std::istream &is)
+  std::istream & ReadValue(std::istream & is)
   {
     const Tag itemStart(0xfffe, 0xe000);
     const Tag seqDelItem(0xfffe,0xe0dd);
@@ -98,7 +95,7 @@ public:
   }
 
   template <typename TSwap>
-  std::istream &ReadBacktrack(std::istream &is)
+  std::istream & ReadBacktrack(std::istream & is)
   {
     const Tag itemStart(0xfffe, 0xe000);
     const Tag seqDelItem(0xfffe,0xe0dd);
@@ -114,12 +111,10 @@ public:
       {
         ++offset;
         is.seekg((std::streampos)((size_t)start - offset));
-        mdcmWarningMacro("Fuzzy Search, backtrack: " << (start - is.tellg()) << " Offset: " << is.tellg());
+        mdcmWarningMacro("Fuzzy search, backtrack: " << (start - is.tellg()) << " Offset: " << is.tellg());
         if(offset > max)
         {
-          mdcmErrorMacro("Giving up");
           throw std::logic_error("Impossible to backtrack");
-          return is;
         }
       }
       else
@@ -142,14 +137,13 @@ public:
       ParseException pe;
       pe.SetLastElement(*this);
       throw pe;
-      return is;
     }
     ValueField = bv;
     return is;
   }
 
   template <typename TSwap>
-  std::ostream & Write(std::ostream &os) const
+  std::ostream & Write(std::ostream & os) const
   {
     const Tag itemStart(0xfffe, 0xe000);
     const Tag seqDelItem(0xfffe,0xe0dd);
@@ -160,9 +154,7 @@ public:
     }
     assert(TagField == itemStart || TagField == seqDelItem);
     const ByteValue * bv = GetByteValue();
-    // VL
-    // The following piece of code is hard to read in order to support such broken file as
-    // CompressedLossy.dcm
+    // broken file e.g. CompressedLossy.dcm
     if(IsEmpty())
     {
       VL zero = 0;

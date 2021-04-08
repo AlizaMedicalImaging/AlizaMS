@@ -304,7 +304,7 @@ std::string to_string (Float data) {
   }
   else
   {
-    throw std::logic_error("Impossible Conversion");
+    throw std::logic_error("Impossible conversion");
   }
 }
 #else
