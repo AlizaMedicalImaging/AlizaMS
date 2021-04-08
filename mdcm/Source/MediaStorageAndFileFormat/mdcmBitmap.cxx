@@ -366,19 +366,6 @@ void Bitmap::Print(std::ostream & os) const
   }
 }
 
-bool Bitmap::GetBuffer2(std::ostream &os) const
-{
-  bool success = false;
-  if (!success) success = TryJPEGCodec2(os);
-  if (!success)
-  {
-#ifndef MDCM_DONT_THROW
-    throw Exception("No codec found for this image");
-#endif
-  }
-  return success;
-}
-
 // Image can be lossy but in implicit little endian format
 bool Bitmap::ComputeLossyFlag()
 {

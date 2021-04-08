@@ -46,6 +46,6 @@ public:
 
 }
 
-#include "mdcmUNExplicitDataElement.txx"
+#include "mdcmUNExplicitDataElement.hxx"
 
 #endif //MDCMUNEXPLICITDATAELEMENT_H

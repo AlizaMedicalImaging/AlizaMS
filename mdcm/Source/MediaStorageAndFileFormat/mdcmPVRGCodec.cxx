@@ -25,7 +25,7 @@
 #include "mdcmFilename.h"
 #include "mdcmSystem.h"
 #include "mdcmSequenceOfFragments.h"
-#include "mdcmByteSwap.txx"
+#include "mdcmByteSwap.h"
 
 namespace mdcm
 {

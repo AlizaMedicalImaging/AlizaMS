@@ -23,6 +23,7 @@
 #include "mdcmVM.h"
 #include "mdcmSequenceOfItems.h"
 #include "mdcmVersion.h"
+#include "mdcmParseException.h"
 #include "dicomutils.h"
 #include "alizams_version.h"
 #include <cstdlib>
@@ -1386,25 +1387,38 @@ static void build_maps(
 		QApplication::processEvents();
 		pd->setValue(-1);
 		if (pd->wasCanceled()) return;
-		mdcm::Reader reader;
-#ifdef _WIN32
-#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-		reader.SetFileName(QDir::toNativeSeparators(l.at(x)).toUtf8().constData());
+		try
+		{
+			mdcm::Reader reader;
+#ifdef _	WIN32
+#if (def	ined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+			reader.SetFileName(QDir::toNativeSeparators(l.at(x)).toUtf8().constData());
 #else
-		reader.SetFileName(QDir::toNativeSeparators(l.at(x)).toLocal8Bit().constData());
+			reader.SetFileName(QDir::toNativeSeparators(l.at(x)).toLocal8Bit().constData());
 #endif
 #else
-		reader.SetFileName(l.at(x).toLocal8Bit().constData());
+			reader.SetFileName(l.at(x).toLocal8Bit().constData());
 #endif
-		if (!reader.Read()) continue;
-		const mdcm::File    & f  = reader.GetFile();
-		const mdcm::DataSet & ds = f.GetDataSet();
-		if (ds.IsEmpty()) continue;
-		const mdcm::FileMetaInformation & h = f.GetHeader();
-		const mdcm::TransferSyntax ts = h.GetDataSetTransferSyntax();
-		const bool implicit = ts.IsImplicit();
-		find_uids_recurs__(ds, uid_tags, uids, implicit, dicts);
-		find_pn_recurs__(ds, pids, implicit, dicts);
+			if (!reader.Read()) continue;
+			const mdcm::File    & f  = reader.GetFile();
+			const mdcm::DataSet & ds = f.GetDataSet();
+			if (ds.IsEmpty()) continue;
+			const mdcm::FileMetaInformation & h = f.GetHeader();
+			const mdcm::TransferSyntax ts = h.GetDataSetTransferSyntax();
+			const bool implicit = ts.IsImplicit();
+			find_uids_recurs__(ds, uid_tags, uids, implicit, dicts);
+			find_pn_recurs__(ds, pids, implicit, dicts);
+		}
+		catch(mdcm::ParseException & pe)
+		{
+			std::cout << "mdcm::ParseException in build_maps:\n"
+				<< pe.what() << std::endl;
+		}
+		catch(std::exception & ex)
+		{
+			std::cout << "Exception in build_maps:\n"
+				<< ex.what() << std::endl;
+		}
 	}
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	QSet<QString> uset =
@@ -1646,16 +1660,27 @@ void AnonymazerWidget2::run_()
 	}
 	unsigned int count_overlay_in_data = 0;
 	unsigned int count_errors = 0;
-	process_directory(
-		in_path,
-		out_path,
-		uids_m,
-		pn_m,
-		&count_overlay_in_data,
-		&count_errors,
-		dicts,
-		pd,
-		y_off, m_off, d_off, s_off);
+	try
+	{
+		process_directory(
+			in_path,
+			out_path,
+			uids_m,
+			pn_m,
+			&count_overlay_in_data,
+			&count_errors,
+			dicts,
+			pd,
+			y_off, m_off, d_off, s_off);
+	}
+	catch(mdcm::ParseException & pe)
+	{
+		std::cout << "Exception in anonymizer\n" << pe.what() << std::endl;
+	}
+	catch(std::exception & ex)
+	{
+		std::cout << "Exception in anonymizer\n" << ex.what() << std::endl;
+	}
 	QString message("");
 	if (count_errors > 0)
 	{

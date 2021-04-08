@@ -227,10 +227,10 @@ void PixmapWriter::DoIconImage(DataSet & rootds, Pixmap const & image)
 
 bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
 {
-  File& file = GetFile();
-  DataSet& ds = file.GetDataSet();
-  FileMetaInformation &fmi_orig = file.GetHeader();
-  const TransferSyntax &ts_orig = fmi_orig.GetDataSetTransferSyntax();
+  File & file = GetFile();
+  DataSet & ds = file.GetDataSet();
+  FileMetaInformation & fmi_orig = file.GetHeader();
+  const TransferSyntax & ts_orig = fmi_orig.GetDataSetTransferSyntax();
   PixelFormat pf = PixelData->GetPixelFormat();
   if (!pf.IsValid())
   {
@@ -246,7 +246,7 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
   }
   {
     assert(pi != PhotometricInterpretation::UNKNOWN);
-    const char *pistr = PhotometricInterpretation::GetPIString(pi);
+    const char * pistr = PhotometricInterpretation::GetPIString(pi);
     DataElement de(Tag(0x0028, 0x0004));
     VL::Type strlenPistr = (VL::Type)strlen(pistr);
     de.SetByteValue(pistr, strlenPistr);
@@ -282,7 +282,7 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
       unsigned short length, subscript, bitsize;
       unsigned short rawlut8[256];
       unsigned short rawlut16[65536];
-      unsigned short *rawlut = rawlut8;
+      unsigned short * rawlut = rawlut8;
       unsigned int lutlen = 256;
       if(pf.GetBitsAllocated() == 16)
       {
@@ -351,7 +351,7 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
   for(SequenceOfItems::SizeType ovidx = 0; ovidx < nOv; ++ovidx)
   {
     DataElement de;
-    const Overlay &ov = PixelData->GetOverlay(ovidx);
+    const Overlay & ov = PixelData->GetOverlay(ovidx);
     Attribute<0x6000,0x0010> overlayrows;
     overlayrows.SetValue(ov.GetRows());
     de = overlayrows.GetAsDataElement();
@@ -404,14 +404,14 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
   // Pixel Data
   DataElement depixdata(Tag(0x7fe0,0x0010));
   DataElement & pde = PixelData->GetDataElement();
-  const ByteValue *bvpixdata = NULL;
+  const ByteValue * bvpixdata = NULL;
   if(!pde.IsEmpty())
   {
-    const Value &v = PixelData->GetDataElement().GetValue();
+    const Value & v = PixelData->GetDataElement().GetValue();
     depixdata.SetValue(v);
     bvpixdata = depixdata.GetByteValue();
   }
-  const TransferSyntax &ts = PixelData->GetTransferSyntax();
+  const TransferSyntax & ts = PixelData->GetTransferSyntax();
   assert(ts.IsExplicit() || ts.IsImplicit());
   if(PixelData->IsLossy())
   {
@@ -436,7 +436,7 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
         static const CSComp newvalues2[] = {"ISO_14495_1"};
         at3.SetValues(newvalues2, 1);
       }
-      else if (
+      else if(
         ts_orig == TransferSyntax::JPEGBaselineProcess1 ||
         ts_orig == TransferSyntax::JPEGExtendedProcess2_4 ||
         ts_orig == TransferSyntax::JPEGExtendedProcess3_5 ||
@@ -533,9 +533,9 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
       }
     }
   }
-  if (!(ms != MediaStorage::MS_END))
+  if (ms == MediaStorage::MS_END)
   {
-    mdcmAlwaysWarnMacro("Internal error (101)");
+    mdcmAlwaysWarnMacro("MediaStorage::MS_END");
     return false;
   }
   const char * msstr = MediaStorage::GetMSString(ms);
@@ -549,10 +549,10 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
   }
   else
   {
-    const ByteValue *bv = ds.GetDataElement(Tag(0x0008,0x0016)).GetByteValue();
+    const ByteValue * bv = ds.GetDataElement(Tag(0x0008,0x0016)).GetByteValue();
     if(!bv)
     {
-      mdcmErrorMacro("Cant be empty");
+      mdcmErrorMacro("(0x0008,0x0016) ByteValue is NULL");
       return false;
     }
     if(strncmp(bv->GetPointer(), msstr, bv->GetLength()) != 0)
@@ -610,7 +610,7 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
     }
   }
   {
-    const char *sop = uid.Generate();
+    const char * sop = uid.Generate();
     DataElement de(Tag(0x0008,0x0018));
     VL::Type strlenSOP = (VL::Type) strlen(sop);
     de.SetByteValue(sop, strlenSOP);
@@ -620,7 +620,7 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
   // Create a new UID
   if(!ds.FindDataElement(Tag(0x0020, 0x000d)))
   {
-    const char *study = uid.Generate();
+    const char * study = uid.Generate();
     DataElement de(Tag(0x0020,0x000d));
     VL::Type strlenStudy= (VL::Type)strlen(study);
     de.SetByteValue(study, strlenStudy);
@@ -630,7 +630,7 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
   // Create a new UID
   if(!ds.FindDataElement(Tag(0x0020, 0x000e)))
   {
-    const char *series = uid.Generate();
+    const char * series = uid.Generate();
     DataElement de(Tag(0x0020,0x000e));
     VL::Type strlenSeries= (VL::Type)strlen(series);
     de.SetByteValue(series, strlenSeries);
@@ -642,7 +642,7 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
   {
     fmi.Clear();
     {
-      const char *tsuid = TransferSyntax::GetTSString(ts);
+      const char * tsuid = TransferSyntax::GetTSString(ts);
       DataElement de(Tag(0x0002,0x0010));
       VL::Type strlenTSUID = (VL::Type)strlen(tsuid);
       de.SetByteValue(tsuid, strlenTSUID);
@@ -650,13 +650,17 @@ bool PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
       fmi.Replace(de);
       fmi.SetDataSetTransferSyntax(ts);
     }
-    fmi.FillFromDataSet(ds);
+    const bool fmi_ok = fmi.FillFromDataSet(ds);
+    if(!fmi_ok)
+    {
+      mdcmAlwaysWarnMacro("In PixmapWriter::PrepareWrite: FillFromDataSet failed");
+    }
   }
   else
   {
     Attribute<0x0002,0x0010> at;
     at.SetFromDataSet(fmi);
-    const char *tsuid = TransferSyntax::GetTSString(ts);
+    const char * tsuid = TransferSyntax::GetTSString(ts);
     UIComp tsui  = at.GetValue();
     if(tsui != tsuid)
     {

@@ -55,11 +55,9 @@ std::istream & UNExplicitDataElement::ReadPreValue(std::istream & is)
   }
   if(TagField == Tag(0xfffe,0xe0dd))
   {
-#ifndef MDCM_DONT_THROW
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
-#endif
   }
   assert(TagField != Tag(0xfffe,0xe0dd));
   const Tag itemDelItem(0xfffe,0xe00d);
@@ -79,35 +77,15 @@ std::istream & UNExplicitDataElement::ReadPreValue(std::istream & is)
     VRField = VR::INVALID;
     return is;
   }
-  try
+  if(!VRField.Read(is))
   {
-    if(!VRField.Read(is))
-    {
-      assert(0 && "Should not happen");
-      return is;
-    }
-  }
-  catch(Exception & ex)
-  {
-#ifndef MDCM_DONT_THROW
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
-    // mdcm-MR-PHILIPS-16-Multi-Seq.dcm
-    // assert(TagField == Tag(0xfffe, 0xe000));
-    // -> For some reason VR is written as {44,0} well I guess this is a VR...
-    // Technically there is a second bug, dcmtk assume other things when reading this tag,
-    // so I need to change this tag too, if I ever want dcmtk to read this file. oh well
-    // 0019004_Baseline_IMG1.dcm
-    // -> VR is garbage also...
-    // assert(TagField == Tag(8348,0339) || TagField == Tag(b5e8,0338))
-    //mdcmWarningMacro("Assuming 16 bits VR for Tag=" <<
-    //  TagField << " in order to read a buggy DICOM file.");
-    //VRField = VR::INVALID;
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
 #else
-    throw ex;
-#endif
+    assert(0 && "Should not happen");
+    return is;
 #endif
   }
   if(VRField == VR::UN)
@@ -144,7 +122,6 @@ std::istream & UNExplicitDataElement::ReadValue(std::istream & is, bool readvalu
     ValueField = 0;
     return is;
   }
-
   if(VRField == VR::SQ)
   {
     // Check whether or not this is an undefined length sequence
@@ -172,12 +149,10 @@ std::istream & UNExplicitDataElement::ReadValue(std::istream & is, bool readvalu
       }
       catch(std::exception &)
       {
-        // Must be one of those non-cp246 file...
+        // Must be one of those non-cp246 file,
         // but for some reason seekg back to previous offset + Read
         // as UNExplicit does not work
-#ifndef MDCM_DONT_THROW
-        throw Exception("CP 246");
-#endif
+        throw std::logic_error("CP 246");
       }
       return is;
     }
@@ -195,7 +170,7 @@ std::istream & UNExplicitDataElement::ReadValue(std::istream & is, bool readvalu
   }
   // We have the length we should be able to read the value
   ValueField->SetLength(ValueLengthField);
-  if(TagField == Tag(0x2001,0xe05f)
+  if(  TagField == Tag(0x2001,0xe05f)
     || TagField == Tag(0x2001,0xe100)
     || TagField == Tag(0x2005,0xe080)
     || TagField == Tag(0x2005,0xe083)
@@ -209,12 +184,9 @@ std::istream & UNExplicitDataElement::ReadValue(std::istream & is, bool readvalu
   }
   if(!ValueIO<UNExplicitDataElement,TSwap>::Read(is,*ValueField,readvalues))
   {
-#ifndef MDCM_DONT_THROW
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
-#endif
-    return is;
   }
   return is;
 }

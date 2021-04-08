@@ -27,15 +27,11 @@ pixel_info::pixel_info(unsigned char nc, unsigned char bpp)
 {
   if (nc != 1 && nc != 3)
   {
-#ifndef MDCM_DONT_THROW
     throw std::runtime_error("RLE: invalid samples per pixel");
-#endif
   }
   if(bpp != 8 && bpp != 16 && bpp != 32)
   {
-#ifndef MDCM_DONT_THROW
     throw std::runtime_error("RLE: invalid bits per pixel");
-#endif
   }
 }
 
@@ -134,15 +130,11 @@ image_info::image_info(int w, int h, pixel_info const & pi, bool pc, bool le):
 {
   if(width < 0 || height < 0)
   {
-#ifndef MDCM_DONT_THROW
     throw std::runtime_error("RLE: invalid dimensions");
-#endif
   }
   if(pc && pix.get_number_of_components() != 3)
   {
-#ifndef MDCM_DONT_THROW
     throw std::runtime_error("RLE: invalid planar configuration");
-#endif
   }
 }
 

@@ -39,6 +39,6 @@ public:
 
 }
 
-#include "mdcmValueIO.txx"
+#include "mdcmValueIO.hxx"
 
 #endif //MDCMVALUEIO_H

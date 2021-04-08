@@ -26,6 +26,7 @@
 #include "mdcmVL.h"
 #include "mdcmFragment.h"
 #include "mdcmBasicOffsetTable.h"
+#include <exception>
 
 namespace mdcm
 {
@@ -76,7 +77,7 @@ std::istream& Read(std::istream &is, bool readvalues = true)
 }
 
 template <typename TSwap>
-std::istream& ReadPreValue(std::istream &is)
+std::istream & ReadPreValue(std::istream &is)
 {
   // First item is the basic offset table
   try
@@ -103,16 +104,14 @@ std::istream& ReadPreValue(std::istream &is)
     }
     else
     {
-#ifndef MDCM_DONT_THROW
-      throw "Seq. of frag. : ReadPreValue exception";
-#endif
+      throw std::logic_error("Seq. of frag. : ReadPreValue exception");
     }
   }
   return is;
 }
 
 template <typename TSwap>
-std::istream& ReadValue(std::istream &is, bool /*readvalues*/)
+std::istream & ReadValue(std::istream &is, bool /*readvalues*/)
 {
   const Tag seqDelItem(0xfffe,0xe0dd);
   // not used
@@ -125,9 +124,8 @@ std::istream& ReadValue(std::istream &is, bool /*readvalues*/)
     }
     assert(frag.GetTag() == seqDelItem && frag.GetVL() == 0);
   }
-  catch(Exception &ex)
+  catch(std::exception & ex)
   {
-    (void)ex;
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
     // that's ok ! In all cases the whole file was read, because
     // Fragment::Read only fail on eof() reached 1.
@@ -141,7 +139,7 @@ std::istream& ReadValue(std::istream &is, bool /*readvalues*/)
       is.clear();
     }
     // 2. GENESIS_SIGNA-JPEG-CorruptFrag.dcm
-    else if (frag.GetTag() == Tag(0xddff,0x00e0))
+    else if(frag.GetTag() == Tag(0xddff,0x00e0))
     {
       assert(Fragments.size() == 1);
       const ByteValue * bv = Fragments[0].GetByteValue();
@@ -153,8 +151,8 @@ std::istream& ReadValue(std::istream &is, bool /*readvalues*/)
       is.clear(); // clear the error bit
     }
     // 3. LEICA/WSI
-    else if ((frag.GetTag().GetGroup() == 0x00ff) &&
-              ((frag.GetTag().GetElement() & 0x00ff) == 0xe0))
+    else if((frag.GetTag().GetGroup() == 0x00ff) &&
+      ((frag.GetTag().GetElement() & 0x00ff) == 0xe0))
     {
       // Looks like there is a mess with offset and odd byte array
       // We are going first to backtrack one byte back, and then use a
@@ -233,8 +231,8 @@ std::istream& ReadValue(std::istream &is, bool /*readvalues*/)
     {
       // 3. mdcm-JPEG-LossLess3a.dcm: easy case, an extra tag was found
       // instead of terminator (eof is the next char)
-      mdcmWarningMacro("Reading failed at Tag:" << frag.GetTag() << " Index #"
-        << Fragments.size() << " Offset " << is.tellg() << ". Use file at own risk."
+      mdcmAlwaysWarnMacro("Reading failed at Tag:" << frag.GetTag() << " Index #"
+        << Fragments.size() << " Offset " << is.tellg() << ". Use file at own risk.\n"
         << ex.what());
     }
 #endif /* MDCM_SUPPORT_BROKEN_IMPLEMENTATION */

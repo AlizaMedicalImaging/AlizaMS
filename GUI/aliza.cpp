@@ -25,6 +25,7 @@
 #include "mdcmFile.h"
 #include "mdcmDataSet.h"
 #include "mdcmUIDGenerator.h"
+#include "mdcmParseException.h"
 #include "vectormath/scalar/vectormath.h"
 #include <itkMath.h>
 #ifndef WIN32
@@ -612,17 +613,30 @@ void Aliza::load_dicom_series(QProgressDialog * pb)
 		if (!item) continue;
 		if ((item->files.empty())) continue;
 		filenames = item->files;
-		message_ += DicomUtils::read_dicom(
-			ivariants,
-			filenames,
-			max_3d_tex_size,
-			(ok3d ? glwidget : NULL),
-			mesh_shader,
-			ok3d,
-			static_cast<QWidget*>(settingswidget),
-			pb,
-			0,
-			settingswidget->get_ignore_dim_org());
+		try
+		{
+			message_ += DicomUtils::read_dicom(
+				ivariants,
+				filenames,
+				max_3d_tex_size,
+				(ok3d ? glwidget : NULL),
+				mesh_shader,
+				ok3d,
+				static_cast<QWidget*>(settingswidget),
+				pb,
+				0,
+				settingswidget->get_ignore_dim_org());
+		}
+		catch(mdcm::ParseException & pe)
+		{
+			std::cout << "mdcm::ParseException in Aliza::load_dicom_series:\n"
+				<< pe.what() << std::endl;
+		}
+		catch(std::exception & ex)
+		{
+			std::cout << "Exception in Aliza::load_dicom_series\n"
+				<< ex.what() << std::endl;
+		}
 	}
 quit__:
 	for (unsigned int x = 0; x < ivariants.size(); x++)
@@ -1868,9 +1882,9 @@ void Aliza::set_axis_zyx(bool rect_mode)
 		if (rect_mode)
 		{
 			graphicswidget_m->graphicsview->handle_rect->show();
-			graphicswidget_m->graphicsview->selection_item->hide();
 			graphicswidget_x->graphicsview->selection_item->show();
 			graphicswidget_y->graphicsview->selection_item->show();
+			graphicswidget_m->graphicsview->selection_item->hide();
 		}
 		else
 		{
@@ -3736,17 +3750,30 @@ void Aliza::load_dicom_file(int * image_id,
 	if (ok3d) glwidget->set_skip_draw(true);
 	qApp->processEvents();
 	tmp_filenames__.push_back(f);
-	error__ = DicomUtils::read_dicom(
-		ivariants,
-		tmp_filenames__,
-		max_3d_tex_size,
-		(ok3d ? glwidget : NULL),
-		mesh_shader,
-		ok3d,
-		static_cast<QWidget*>(settingswidget),
-		pb,
-		0,
-		settingswidget->get_ignore_dim_org());
+	try
+	{
+		error__ = DicomUtils::read_dicom(
+			ivariants,
+			tmp_filenames__,
+			max_3d_tex_size,
+			(ok3d ? glwidget : NULL),
+			mesh_shader,
+			ok3d,
+			static_cast<QWidget*>(settingswidget),
+			pb,
+			0,
+			settingswidget->get_ignore_dim_org());
+	}
+	catch(mdcm::ParseException & pe)
+	{
+		std::cout << "mdcm::ParseException in Aliza::load_dicom_file:\n"
+			<< pe.what() << std::endl;
+	}
+	catch(std::exception & ex)
+	{
+		std::cout << "Exception in Aliza::load_dicom_file\n"
+			<< ex.what() << std::endl;
+	}
 	if (error__.isEmpty())
 	{
 		ok = true;

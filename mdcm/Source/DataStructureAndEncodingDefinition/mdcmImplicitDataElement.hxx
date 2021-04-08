@@ -33,14 +33,14 @@ namespace mdcm
 {
 
 template <typename TSwap>
-std::istream &ImplicitDataElement::Read(std::istream &is)
+std::istream & ImplicitDataElement::Read(std::istream &is)
 {
   ReadPreValue<TSwap>(is);
   return ReadValue<TSwap>(is);
 }
 
 template <typename TSwap>
-std::istream &ImplicitDataElement::ReadPreValue(std::istream& is)
+std::istream & ImplicitDataElement::ReadPreValue(std::istream& is)
 {
   TagField.Read<TSwap>(is);
   // See PS 3.5, 7.1.3 Data Element Structure With Implicit VR
@@ -57,15 +57,13 @@ std::istream &ImplicitDataElement::ReadPreValue(std::istream& is)
   // Read Value Length
   if(!ValueLengthField.Read<TSwap>(is))
   {
-#ifndef MDCM_DONT_THROW
-    throw Exception("Impossible ValueLengthField");
-#endif
+    throw std::logic_error("Impossible ValueLengthField");
   }
   return is;
 }
 
 template <typename TSwap>
-std::istream &ImplicitDataElement::ReadValue(std::istream &is, bool readvalues)
+std::istream & ImplicitDataElement::ReadValue(std::istream & is, bool readvalues)
 {
   if(is.eof()) return is;
   const Tag itemStartItem(0xfffe,0xe000);
@@ -131,7 +129,7 @@ std::istream &ImplicitDataElement::ReadValue(std::istream &is, bool readvalues)
         ValueField = new SequenceOfItems;
       }
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
-      else if (item == itemPMSStart)
+      else if(item == itemPMSStart)
       {
         // MR_Philips_Intera_No_PrivateSequenceImplicitVR.dcm
         mdcmWarningMacro("Illegal Tag for Item starter: " << TagField << " should be: " << itemStart);
@@ -149,7 +147,7 @@ std::istream &ImplicitDataElement::ReadValue(std::istream &is, bool readvalues)
           mdcmWarningMacro("Illegal: Explicit SQ found in a file with "
             "TransferSyntax=Implicit for tag: " << TagField);
         }
-        catch(Exception &)
+        catch(std::logic_error &)
         {
           // MR_ELSCINT1_00e1_1042_SQ_feff_00e0_Item.dcm
           std::streampos current = is.tellg();
@@ -164,7 +162,7 @@ std::istream &ImplicitDataElement::ReadValue(std::istream &is, bool readvalues)
         }
         return is;
       }
-      else if (item == itemPMSStart2 && false)
+      else if(item == itemPMSStart2 && false)
       {
         mdcmWarningMacro("Illegal: SQ start with " << itemPMSStart2
           << " instead of " << itemStart << " for tag: " << TagField);
@@ -257,9 +255,7 @@ std::istream &ImplicitDataElement::ReadValue(std::istream &is, bool readvalues)
     else
 #endif /* MDCM_SUPPORT_BROKEN_IMPLEMENTATION */
     {
-#ifndef MDCM_DONT_THROW
-      throw Exception("Should not happen (imp)");
-#endif
+      throw std::logic_error("ImplicitDataElement::ReadValue !ValueIO<ImplicitDataElement,TSwap>::Read");
     }
     return is;
   }
@@ -280,14 +276,14 @@ std::istream &ImplicitDataElement::ReadValue(std::istream &is, bool readvalues)
 }
 
 template <typename TSwap>
-std::istream &ImplicitDataElement::ReadWithLength(std::istream &is, VL & length, bool readvalues)
+std::istream & ImplicitDataElement::ReadWithLength(std::istream & is, VL & length, bool readvalues)
 {
   ReadPreValue<TSwap>(is);
   return ReadValueWithLength<TSwap>(is, length, readvalues);
 }
 
 template <typename TSwap>
-std::istream &ImplicitDataElement::ReadValueWithLength(std::istream& is, VL & length, bool readvalues)
+std::istream & ImplicitDataElement::ReadValueWithLength(std::istream & is, VL & length, bool readvalues)
 {
   if(is.eof()) return is;
   const Tag itemStartItem(0xfffe,0xe000);
@@ -301,17 +297,15 @@ std::istream &ImplicitDataElement::ReadValueWithLength(std::istream& is, VL & le
   {
     if(ValueLengthField != 0)
     {
-      mdcmWarningMacro("VL should be set to 0");
+      mdcmAlwaysWarnMacro("VL should be set to 0, correcting");
     }
     ValueField = 0;
     return is;
   }
   if(ValueLengthField > length && !ValueLengthField.IsUndefined())
   {
-    mdcmWarningMacro("Cannot read more length than what is remaining in the file");
-#ifndef MDCM_DONT_THROW
-    throw Exception("Impossible (more)");
-#endif
+    mdcmAlwaysWarnMacro("ValueLengthField > length && !ValueLengthField.IsUndefined()");
+    throw std::logic_error("Impossible (more)");
   }
   if(ValueLengthField == 0)
   {
@@ -326,7 +320,7 @@ std::istream &ImplicitDataElement::ReadValueWithLength(std::istream& is, VL & le
     }
     else
     {
-      mdcmErrorMacro("Undefined value length is impossible in non-encapsulated Transfer Syntax. Proceeding with caution");
+      mdcmAlwaysWarnMacro("Undefined value length is impossible in non-encapsulated Transfer Syntax");
       ValueField = new SequenceOfFragments;
     }
   }
@@ -358,7 +352,7 @@ std::istream &ImplicitDataElement::ReadValueWithLength(std::istream& is, VL & le
         ValueField = new SequenceOfItems;
       }
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
-      else if (item == itemPMSStart)
+      else if(item == itemPMSStart)
       {
         // MR_Philips_Intera_No_PrivateSequenceImplicitVR.dcm
         mdcmWarningMacro("Illegal Tag for Item starter: " << TagField << " should be: " << itemStart);
@@ -373,10 +367,10 @@ std::istream &ImplicitDataElement::ReadValueWithLength(std::istream& is, VL & le
           {
             assert(0 && "Should not happen");
           }
-          mdcmWarningMacro("Illegal: Explicit SQ found in a file with "
+          mdcmAlwaysWarnMacro("Illegal: Explicit SQ found in a file with "
             "TransferSyntax=Implicit for tag: " << TagField);
         }
-        catch(Exception &)
+        catch(std::logic_error &)
         {
           // MR_ELSCINT1_00e1_1042_SQ_feff_00e0_Item.dcm
           std::streampos current = is.tellg();
@@ -392,10 +386,10 @@ std::istream &ImplicitDataElement::ReadValueWithLength(std::istream& is, VL & le
         }
         return is;
       }
-      else if (item == itemPMSStart2)
+      else if(item == itemPMSStart2)
       {
         assert(0); // FIXME: Sync Read/ReadWithLength
-        mdcmWarningMacro("Illegal: SQ start with " << itemPMSStart2
+        mdcmAlwaysWarnMacro("Illegal: SQ start with " << itemPMSStart2
           << " instead of " << itemStart << " for tag: " << TagField);
         ValueField = new SequenceOfItems;
         ValueField->SetLength(ValueLengthField);
@@ -422,7 +416,7 @@ std::istream &ImplicitDataElement::ReadValueWithLength(std::istream& is, VL & le
     const Tag theralys2(0x0008,0x0080);
     if(TagField != theralys1 && TagField != theralys2)
     {
-      mdcmWarningMacro("GE,13: Replacing VL=0x000d with VL=0x000a, for Tag="
+      mdcmAlwaysWarnMacro("GE,13: Replacing VL=0x000d with VL=0x000a, for Tag="
         << TagField << " in order to read a buggy DICOM file.");
       ValueLengthField = 10;
     }
@@ -432,8 +426,7 @@ std::istream &ImplicitDataElement::ReadValueWithLength(std::istream& is, VL & le
   if(ValueLengthField == 0x31f031c && TagField == Tag(0x031e,0x0324))
   {
     // TestImages/elbow.pap
-    mdcmWarningMacro("Replacing a VL. To be able to read a supposively"
-      "broken Payrus file.");
+    mdcmAlwaysWarnMacro("Replacing a VL. To be able to read a supposively broken Payrus file.");
     ValueLengthField = 202; // 0xca
   }
 #endif
@@ -480,15 +473,13 @@ std::istream &ImplicitDataElement::ReadValueWithLength(std::istream& is, VL & le
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
     if(TagField == Tag(0x7fe0,0x0010))
     {
-      mdcmWarningMacro("Incomplete Pixel Data found, use file at own risk");
+      mdcmAlwaysWarnMacro("Incomplete Pixel Data found, use file at own risk");
       is.clear();
     }
     else
 #endif
     {
-#ifndef MDCM_DONT_THROW
-      throw Exception("Should not happen (imp)");
-#endif
+      throw std::logic_error("ImplicitDataElement::ReadValueWithLength !ValueIO<ImplicitDataElement,TSwap>::Read");
     }
     return is;
   }
@@ -498,7 +489,7 @@ std::istream &ImplicitDataElement::ReadValueWithLength(std::istream& is, VL & le
   VL dummy = ValueField->GetLength();
   if(ValueLengthField != dummy)
   {
-    mdcmWarningMacro("ValueLengthField was bogus");
+    mdcmAlwaysWarnMacro("ValueLengthField was bogus");
     ValueLengthField = dummy;
   }
 #else
@@ -509,7 +500,7 @@ std::istream &ImplicitDataElement::ReadValueWithLength(std::istream& is, VL & le
 }
 
 template <typename TSwap>
-const std::ostream &ImplicitDataElement::Write(std::ostream &os) const
+const std::ostream & ImplicitDataElement::Write(std::ostream &os) const
 {
   // See PS 3.5, 7.1.3 Data Element Structure With Implicit VR
   // Write Tag
@@ -537,9 +528,7 @@ const std::ostream &ImplicitDataElement::Write(std::ostream &os) const
     // Do not allow writing file such as: dcm4che_UndefinedValueLengthInImplicitTS.dcm
     if(TagField == Tag(0x7fe0,0x0010) && ValueLengthField.IsUndefined())
     {
-#ifndef MDCM_DONT_THROW
-      throw Exception( "VL u/f Impossible" );
-#endif
+      throw std::logic_error("VL u/f Impossible");
     }
     if(!ValueLengthField.Write<TSwap>(os))
     {

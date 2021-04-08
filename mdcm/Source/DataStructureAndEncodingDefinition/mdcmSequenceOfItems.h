@@ -111,28 +111,26 @@ public:
         {
           item.Read<TDE,TSwap>(is);
         }
-        catch(Exception & ex)
+        catch(std::logic_error & ex)
         {
-          if(strcmp(ex.GetDescription(), "Changed Length") == 0)
+          if(strcmp(ex.what(), "Changed Length") == 0)
           {
             VL newlength = l + item.template GetLength<TDE>();
             if(newlength > SequenceLengthField)
             {
-              mdcmWarningMacro("SQ length is wrong");
+              mdcmAlwaysWarnMacro("SQ length is wrong");
               SequenceLengthField = newlength;
             }
           }
           else
           {
-#ifndef MDCM_DONT_THROW
             throw ex;
-#endif
           }
         }
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
         if(item.GetTag() == seqDelItem)
         {
-          mdcmWarningMacro("SegDelItem found in defined length Sequence. Skipping");
+          mdcmAlwaysWarnMacro("SegDelItem found in defined length Sequence. Skipping");
           assert(item.GetVL() == 0);
           assert(item.GetNestedDataSet().Size() == 0);
           // we need to pay attention that the length of the Sequence of Items will be wrong
@@ -150,22 +148,16 @@ public:
         l += item.template GetLength<TDE>();
         if(l > SequenceLengthField)
         {
-          mdcmDebugMacro("Found: Length of Item larger than expected")
-#ifndef MDCM_DONT_THROW
-          throw "Length of Item larger than expected";
-#endif
+          throw std::logic_error("Length of Item larger than expected");
         }
         assert(l <= SequenceLengthField);
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
         // MR_Philips_Intera_No_PrivateSequenceImplicitVR.dcm
-        // (0x2005, 0x1080): for some reason computation of length fails...
+        // (0x2005, 0x1080): for some reason computation of length fails.
         if(SequenceLengthField == 778 && l == 774)
         {
-          mdcmWarningMacro("PMS: Super bad hack");
+          mdcmAlwaysWarnMacro("PMS: Super bad hack");
           SequenceLengthField = l;
-#ifndef MDCM_DONT_THROW
-          throw Exception("Wrong Length");
-#endif
         }
         // Bug_Philips_ItemTag_3F3F
         // (0x2005, 0x1080): Because we do not handle fully the bug at the item
@@ -173,7 +165,7 @@ public:
         else if (SequenceLengthField == 444 && l == 3*71)
         {
           // This one is a double bug. Item length is wrong and impact SQ length
-          mdcmWarningMacro("PMS: Super bad hack");
+          mdcmAlwaysWarnMacro("PMS: Super bad hack");
           l = SequenceLengthField;
         }
 #endif
@@ -241,6 +233,6 @@ public:
 
 } // end namespace mdcm
 
-#include "mdcmSequenceOfItems.txx"
+#include "mdcmSequenceOfItems.hxx"
 
 #endif //MDCMSEQUENCEOFITEMS_H

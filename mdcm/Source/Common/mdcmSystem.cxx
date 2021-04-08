@@ -23,7 +23,6 @@
 #include "mdcmSystem.h"
 #include "mdcmTrace.h"
 #include "mdcmFilename.h"
-#include "mdcmException.h"
 #include <iostream>
 #include <string>
 #include <cstdio>

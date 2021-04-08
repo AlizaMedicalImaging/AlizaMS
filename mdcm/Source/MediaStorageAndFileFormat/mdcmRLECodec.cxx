@@ -22,7 +22,7 @@
 #include "mdcmRLECodec.h"
 #include "mdcmTransferSyntax.h"
 #include "mdcmTrace.h"
-#include "mdcmByteSwap.txx"
+#include "mdcmByteSwap.h"
 #include "mdcmDataElement.h"
 #include "mdcmSequenceOfFragments.h"
 #include "mdcmSmartPointer.h"

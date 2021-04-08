@@ -56,11 +56,9 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
   }
   if(TagField == Tag(0xfffe,0xe0dd))
   {
-#ifndef MDCM_DONT_THROW
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
-#endif
   }
   const Tag itemDelItem(0xfffe,0xe00d);
   if(TagField == itemDelItem)
@@ -96,20 +94,13 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
     const bool failed = !ValueIO<ExplicitDataElement,TSwap,uint16_t>::Read(is,*ValueField,true);
     if (failed)
     {
-#ifndef MDCM_DONT_THROW
-      throw Exception("Exception");
-#endif
+      throw std::logic_error("Exception");
     }
     return is;
   }
 #endif
-  try
+  if(VRField.Read(is))
   {
-    if(!VRField.Read(is))
-    {
-      assert(0 && "Should not happen");
-      return is;
-    }
     if(VR::GetLength(VRField) == 4)
     {
       if(!ValueLengthField.Read<TSwap>(is))
@@ -131,27 +122,22 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
       if(ValueLengthField == 0x0006 && VRField == VR::UL &&
            TagField.GetGroup() == 0x0009)
       {
-        mdcmWarningMacro("Replacing VL=0x0006 with VL=0x0004, for Tag=" <<
+        mdcmAlwaysWarnMacro("Replacing VL=0x0006 with VL=0x0004, for Tag=" <<
           TagField << " in order to read a buggy DICOM file.");
         ValueLengthField = 0x0004;
       }
 #endif
     }
   }
-  catch(Exception &)
+  else
   {
     VRField = VR::INVALID;
     is.seekg(-2, std::ios::cur);
-
     const Tag itemStartItem(0xfffe,0xe000);
     if(TagField == itemStartItem) return is;
-
     if(!ValueLengthField.Read<TSwap>(is))
     {
-#ifndef MDCM_DONT_THROW
-      throw Exception("Impossible");
-#endif
-      return is;
+      throw std::logic_error("Impossible");
     }
     if(ValueLengthField == 0)
     {
@@ -167,7 +153,7 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
       }
       else
       {
-        mdcmErrorMacro("Undefined value length is impossible in non-encapsulated Transfer Syntax");
+        mdcmAlwaysWarnMacro("Undefined value length is impossible in non-encapsulated Transfer Syntax");
         ValueField = new SequenceOfFragments;
       }
     }
@@ -201,10 +187,10 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
           ValueField = new SequenceOfItems;
         }
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
-        else if (item == itemPMSStart)
+        else if(item == itemPMSStart)
         {
           // MR_Philips_Intera_No_PrivateSequenceImplicitVR.dcm
-          mdcmWarningMacro("Illegal: Explicit SQ found in a file with "
+          mdcmAlwaysWarnMacro("Illegal: Explicit SQ found in a file with "
             "TransferSyntax=Implicit for tag: " << TagField);
           // TODO: We READ Explicit ok, but we store Implicit !
           // Indeed when copying the VR will be saved, pretty cool eh?
@@ -224,9 +210,9 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
           }
           return is;
         }
-        else if (item == itemPMSStart2 && false)
+        else if(item == itemPMSStart2 && false)
         {
-          mdcmWarningMacro("Illegal: SQ start with " << itemPMSStart2
+          mdcmAlwaysWarnMacro("Illegal: SQ start with " << itemPMSStart2
             << " instead of " << itemStart << " for tag: " << TagField);
           ValueField = new SequenceOfItems;
           ValueField->SetLength(ValueLengthField);
@@ -253,7 +239,7 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
       const Tag theralys2(0x0008,0x0080);
       if(TagField != theralys1 && TagField != theralys2)
       {
-        mdcmWarningMacro("GE,13: Replacing VL=0x000d with VL=0x000a, for Tag="
+        mdcmAlwaysWarnMacro("GE,13: Replacing VL=0x000d with VL=0x000a, for Tag="
           << TagField << " in order to read a buggy DICOM file.");
         ValueLengthField = 10;
       }
@@ -263,8 +249,7 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
     if(ValueLengthField == 0x31f031c && TagField == Tag(0x031e,0x0324))
     {
       // TestImages/elbow.pap
-      mdcmWarningMacro("Replacing a VL. To be able to read a supposively"
-        "broken Payrus file.");
+      mdcmAlwaysWarnMacro("Replacing a VL. To be able to read a supposively broken Payrus file.");
       ValueLengthField = 202; // 0xca
     }
 #endif
@@ -282,9 +267,7 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
       else
 #endif
       {
-#ifndef MDCM_DONT_THROW
-        throw Exception("Should not happen (imp)");
-#endif
+        throw std::logic_error("ExplicitImplicitDataElement::ReadPreValue !ValueIO<ImplicitDataElement,TSwap>::Read");
       }
       return is;
     }
@@ -294,7 +277,7 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
     VL dummy = ValueField->GetLength();
     if(ValueLengthField != dummy)
     {
-      mdcmWarningMacro("ValueLengthField was bogus");
+      mdcmAlwaysWarnMacro("ValueLengthField was bogus");
       assert(0);
       ValueLengthField = dummy;
     }
@@ -308,11 +291,9 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
   // chances is that 99% of times there is now way we can reach here, so safely throw an exception
   if(TagField == Tag(0x0000,0x0000) && ValueLengthField == 0 && VRField == VR::INVALID)
   {
-#ifndef MDCM_DONT_THROW
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
-#endif
   }
 #ifdef ELSCINT1_01F7_1070
   if(TagField == Tag(0x01f7,0x1070))
@@ -324,7 +305,7 @@ std::istream & ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
 }
 
 template <typename TSwap>
-std::istream &ExplicitImplicitDataElement::ReadValue(std::istream &is, bool readvalues)
+std::istream & ExplicitImplicitDataElement::ReadValue(std::istream &is, bool readvalues)
 {
   if(is.eof()) return is;
   /* thechnically the following is bad
@@ -367,11 +348,9 @@ std::istream &ExplicitImplicitDataElement::ReadValue(std::istream &is, bool read
         // Must be one of those non-cp246 file,
         // but for some reason seekg back to previous offset + Read
         // as Explicit does not work
-#ifndef MDCM_DONT_THROW
         ParseException pe;
         pe.SetLastElement(*this);
         throw pe;
-#endif
       }
       return is;
     }
@@ -391,12 +370,12 @@ std::istream &ExplicitImplicitDataElement::ReadValue(std::istream &is, bool read
   this->SetValueFieldLength(ValueLengthField, readvalues);
 #if defined(MDCM_SUPPORT_BROKEN_IMPLEMENTATION) && 0
   // PHILIPS_Intera-16-MONO2-Uncompress.dcm
-  if (TagField == Tag(0x2001,0xe05f) ||
-      TagField == Tag(0x2001,0xe100) ||
-      TagField == Tag(0x2005,0xe080) ||
-      TagField == Tag(0x2005,0xe083) ||
-      TagField == Tag(0x2005,0xe084) ||
-      TagField == Tag(0x2005,0xe402))
+  if(TagField == Tag(0x2001,0xe05f) ||
+     TagField == Tag(0x2001,0xe100) ||
+     TagField == Tag(0x2005,0xe080) ||
+     TagField == Tag(0x2005,0xe083) ||
+     TagField == Tag(0x2005,0xe084) ||
+     TagField == Tag(0x2005,0xe402))
   //TagField.IsPrivate() && VRField == VR::SQ
   //-> Does not work for 0029
   //we really need to read item marker
@@ -467,18 +446,16 @@ std::istream &ExplicitImplicitDataElement::ReadValue(std::istream &is, bool read
       // BUG this should be moved to the ImageReader class, only this class knows
       // what 7fe0 actually is, and should tolerate partial Pixel Data element...
       // PMS-IncompletePixelData.dcm
-      mdcmWarningMacro("Incomplete Pixel Data found, use file at own risk");
+      mdcmAlwaysWarnMacro("Incomplete Pixel Data found, use file at own risk");
       is.clear();
     }
     else
 #endif
     {
       // Might be the famous UN 16bits
-#ifndef MDCM_DONT_THROW
       ParseException pe;
       pe.SetLastElement(*this);
       throw pe;
-#endif
     }
     return is;
   }

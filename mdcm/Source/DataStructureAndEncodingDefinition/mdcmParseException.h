@@ -22,42 +22,21 @@
 #ifndef MDCMPARSEEXCEPTION_H
 #define MDCMPARSEEXCEPTION_H
 
-#include "mdcmException.h"
+#include <stdexcept>
 #include "mdcmDataElement.h"
-
-// FIXME
-
-// Disable clang warning "dynamic exception specifications are deprecated".
-// We need to be C++03 and C++11 compatible, and if we remove the 'throw()'
-// specifier we'll get an error in C++03 by not matching the superclass.
-#if defined(__clang__) && defined(__has_warning)
-# if __has_warning("-Wdeprecated")
-#  pragma clang diagnostic push
-#  pragma clang diagnostic ignored "-Wdeprecated"
-# endif
-#endif
 
 namespace mdcm
 {
-/**
- * ParseException Standard exception handling object.
- *
- */
-class ParseException : public Exception
+
+class ParseException : public std::logic_error
 {
 public:
-  ParseException()
+  explicit ParseException() : std::logic_error(std::string("")) {}
+  explicit ParseException(const std::string & arg) : std::logic_error(arg) {}
+  explicit ParseException(const char * arg) : std::logic_error(arg) {};
+  void SetLastElement(const DataElement & de)
   {
-  }
-  virtual ~ParseException() throw() {}
-  ParseException &operator= (const ParseException & e)
-  {
-    LastElement = e.LastElement;
-    return *this;
-  }
-  ParseException(const ParseException & e) : Exception(e)
-  {
-    LastElement = e.LastElement;
+    LastElement = de;
   }
   void SetLastElement(DataElement & de)
   {
@@ -70,12 +49,5 @@ private:
 };
 
 } // end namespace mdcm
-
-// Undo warning suppression
-#if defined(__clang__) && defined(__has_warning)
-# if __has_warning("-Wdeprecated")
-#  pragma clang diagnostic pop
-# endif
-#endif
 
 #endif

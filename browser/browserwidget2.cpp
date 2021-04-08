@@ -32,10 +32,12 @@
 #include "mdcmFileMetaInformation.h"
 #include "mdcmGlobal.h"
 #include "mdcmDicts.h"
+#include "mdcmParseException.h"
 #include "codecutils.h"
 #include "dicomutils.h"
 #include <vector>
 #include <string>
+#include <exception>
 
 const mdcm::Tag tOffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity(0x0004,0x1200);
 const mdcm::Tag tDirectoryRecordSequence                    (0x0004,0x1220);
@@ -168,10 +170,23 @@ void BrowserWidget2::read_directory(const QString & p)
 	pd->setWindowFlags(
 		pd->windowFlags()^Qt::WindowContextHelpButtonHint);
 	pd->show();
-	const mdcm::Global & g  = mdcm::GlobalInstance;
-	const mdcm::Dicts  & dicts = g.GetDicts();
-	const mdcm::Dict & dict = dicts.GetPublicDict();
-	process_directory(p, dict, pd);
+	try
+	{
+		const mdcm::Global & g = mdcm::GlobalInstance;
+		const mdcm::Dicts & dicts = g.GetDicts();
+		const mdcm::Dict & dict = dicts.GetPublicDict();
+		process_directory(p, dict, pd);
+	}
+	catch(mdcm::ParseException & pe)
+	{
+		std::cout << "mdcm::ParseException in read_directory:\n"
+			<< pe.what() << std::endl;
+	}
+	catch(std::exception & ex)
+	{
+		std::cout << "Exception in read_directory:\n"
+			<< ex.what() << std::endl;
+	}
 	pd->close();
 	qApp->processEvents();
 	delete pd;
@@ -416,7 +431,21 @@ void BrowserWidget2::open_DICOMDIR2(const QString & f)
 {
 	if (f.isEmpty()) return;
 	directory_lineEdit->setText(QDir::toNativeSeparators(f));
-	const QString warning = read_DICOMDIR(f);
+	QString warning;
+	try
+	{
+		warning = read_DICOMDIR(f);
+	}
+	catch(mdcm::ParseException & pe)
+	{
+		std::cout << "mdcm::ParseException in open_DICOMDIR2:\n"
+			<< pe.what() << std::endl;
+	}
+	catch(std::exception & ex)
+	{
+		std::cout << "Exception in open_DICOMDIR2:\n"
+			<< ex.what() << std::endl;
+	}
 	if (!warning.isEmpty())
 	{
 		QMessageBox mbox;

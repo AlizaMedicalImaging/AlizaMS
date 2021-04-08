@@ -17,11 +17,11 @@
 #include "mdcmTag.h"
 #include "mdcmTrace.h"
 #include "mdcmString.h"
-#include "mdcmException.h"
 #include <iostream>
 #include <fstream>
+#include <stdexcept>
 
-// to ensure compilation on sunos gcc
+// to compile on SunOS gcc
 #ifdef CS
 #undef CS
 #endif
@@ -107,74 +107,23 @@ public:
   } VRType;
 
   static const char * GetVRString(VRType);
-  // This function will only look at the very first two chars nothing else
+  // This function will only look at the very first two chars
   static VRType GetVRTypeFromFile(const char *);
   static VRType GetVRType(const char *);
   static const char * GetVRStringFromFile(VRType);
   static bool IsValid(const char *);
   static bool IsValid(const char *, VRType);
   static bool IsSwap (const char *);
-
-  unsigned int GetLength() const
-  {
-    return GetLength(VRField);
-  }
-
   unsigned int GetSizeof() const;
-
-  static unsigned int GetLength(VRType vr)
-  {
-    if (vr & VL32) return 4;
-    return 2;
-  }
-
-  static bool IsBinary(VRType);
+  unsigned int GetLength() const;
+  static unsigned int GetLength(VRType);
   static bool IsASCII(VRType);
-  static bool IsBinary2(VRType);
   static bool IsASCII2(VRType);
-
-  VR(VRType vr = INVALID):VRField(vr) {}
-
-  std::istream & Read(std::istream & is)
-  {
-    char vr[2];
-    is.read(vr, 2);
-    VRField = GetVRTypeFromFile(vr);
-    assert(VRField != VR_END);
-    if (VRField == INVALID)
-    {
-#ifndef MDCM_DONT_THROW
-      throw Exception("INVALID VR");
-#endif
-    }
-    if (VRField & VL32)
-    {
-      char dum[2];
-      is.read(dum, 2);
-      if(!(dum[0] == 0 && dum[1] == 0))
-      {
-        mdcmDebugMacro("32 bits VR contains non zero bytes. Skipped");
-      }
-    }
-    return is;
-  }
-
-  const std::ostream & Write(std::ostream & os) const
-  {
-    VRType vrfield = VRField;
-    mdcmAssertAlwaysMacro( !IsDual() );
-    const char *vr = GetVRString(vrfield);
-    assert( vr[0] && vr[1] && vr[2] == 0 );
-    os.write(vr, 2);
-    // See PS 3.5, Data Element Structure With Explicit VR
-    if (vrfield & VL32)
-    {
-      const char dum[2] = {0, 0};
-      os.write(dum,2);
-    }
-    return os;
-  }
-
+  static bool IsBinary(VRType);
+  static bool IsBinary2(VRType);
+  VR(VRType vr = INVALID) : VRField(vr) {}
+  bool Read(std::istream &);
+  void Write(std::ostream &) const;
   operator VRType () const { return VRField; }
   unsigned int GetSize() const;
   bool Compatible(VR const &) const;
@@ -185,7 +134,7 @@ private:
   VRType VRField;
 };
 
-inline std::ostream &operator<<(std::ostream &_os, const VR &val)
+inline std::ostream &operator<<(std::ostream & _os, const VR & val)
 {
   _os << VR::GetVRString(val.VRField);
   return _os;
@@ -199,19 +148,6 @@ template<long long T> struct VRToType;
   template<> struct VRToType<VR::type>     \
   { typedef rtype Type; };
 
-
-// Do not use
-struct UI
-{
-  char Internal[64+1];
-  friend std::ostream& operator<<(std::ostream &_os, const UI &_val);
-};
-
-inline std::ostream& operator<<(std::ostream &_os, const UI &_val)
-{
-  _os << _val.Internal;
-  return _os;
-}
 
 typedef String<'\\',16>         AEComp;
 typedef String<'\\',64>         ASComp;

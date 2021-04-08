@@ -21,7 +21,7 @@
 =========================================================================*/
 #include "mdcmRAWCodec.h"
 #include "mdcmTransferSyntax.h"
-#include "mdcmByteSwap.txx"
+#include "mdcmByteSwap.h"
 #include "mdcmDataElement.h"
 #include "mdcmSequenceOfFragments.h"
 #include <limits>

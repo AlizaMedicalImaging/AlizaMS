@@ -42,6 +42,6 @@ public:
 
 } // end namespace mdcm
 
-#include "mdcmByteSwap.txx"
+#include "mdcmByteSwap.hxx"
 
 #endif //MDCMBYTESWAP_H

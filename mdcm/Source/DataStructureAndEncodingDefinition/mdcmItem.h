@@ -27,7 +27,6 @@
 #include "mdcmDataSet.h"
 #include "mdcmParseException.h"
 #include "mdcmSwapper.h"
-
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
 #include "mdcmByteSwapFilter.h"
 #endif
@@ -109,9 +108,7 @@ public:
     }
     if(!TagField.Read<TSwap>(is))
     {
-#ifndef MDCM_DONT_THROW
-      throw Exception("Should not happen (item)");
-#endif
+      throw std::logic_error("Should not happen (item)");
       return is;
     }
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
@@ -131,13 +128,12 @@ public:
         assert(0 && "Should not happen");
         return is;
       }
-      // Self
-      // Some file written by MDCM 1.0 we writting 0xFFFFFFFF instead of 0x0
+      // Some file written by GDCM 1.0 we writting 0xFFFFFFFF instead of 0x0
       if(TagField == Tag(0xfffe,0xe0dd))
       {
         if(ValueLengthField)
         {
-          mdcmErrorMacro("ValueLengthField is not 0");
+          mdcmAlwaysWarnMacro("ValueLengthField is not 0 (GDCM 1.0 bug?)");
         }
       }
       else if(ValueLengthField.IsUndefined())
@@ -156,7 +152,7 @@ public:
         {
           // MR_Philips_Intera_PrivateSequenceExplicitVR_in_SQ_2001_e05f_item_wrong_lgt_use_NOSHADOWSEQ.dcm
           // You have to byteswap the length but not the tag...sigh
-          mdcmWarningMacro("Attempt to read nested Item without byteswapping the Value Length.");
+          mdcmWarningMacro("Attempt to read nested Item without byte-swapping the Value Length");
           start -= is.tellg();
           assert(start < 0);
           is.seekg(start, std::ios::cur);
@@ -167,17 +163,10 @@ public:
           bsf.SetByteSwapTag(true);
           bsf.ByteSwap();
         }
-        catch(Exception & e)
-        {
-          // MR_Philips_Intera_No_PrivateSequenceImplicitVR.dcm
-#ifndef MDCM_DONT_THROW
-          throw e;
-#else
-          (void)e;
-#endif
-        }
         catch(...)
         {
+          // MR_Philips_Intera_No_PrivateSequenceImplicitVR.dcm
+          mdcmWarningMacro("Unhandled exception");
           assert(0);
         }
       }
@@ -203,10 +192,8 @@ public:
     if(TagField != Tag(0xfffe, 0xe000) &&
        TagField != Tag(0xfffe, 0xe0dd))
     {
-      mdcmDebugMacro("Invalid Item, found tag: " << TagField);
-#ifndef MDCM_DONT_THROW
-      throw Exception("Not a valid Item");
-#endif
+      mdcmAlwaysWarnMacro("Invalid Item, found tag: " << TagField);
+      throw std::logic_error("Not a valid Item");
     }
     assert(TagField == Tag(0xfffe, 0xe000) ||
            TagField == Tag(0xfffe, 0xe0dd));
@@ -329,6 +316,6 @@ inline std::ostream& operator<<(std::ostream & os, const Item & val)
 
 } // end namespace mdcm
 
-#include "mdcmItem.txx"
+#include "mdcmItem.hxx"
 
 #endif //MDCMITEM_H

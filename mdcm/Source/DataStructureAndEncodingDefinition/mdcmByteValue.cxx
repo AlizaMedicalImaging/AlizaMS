@@ -21,7 +21,6 @@
 =========================================================================*/
 
 #include "mdcmByteValue.h"
-#include "mdcmException.h"
 #include <cstring>
 #include <iterator>
 #include <iomanip>
@@ -119,13 +118,13 @@ void ByteValue::SetLength(VL vl)
   // CompressedLossy.dcm
   if(l.IsUndefined())
   {
-#ifndef MDCM_DONT_THROW
-    throw Exception("Impossible");
-#endif
+    mdcmAlwaysWarnMacro("Can not SetLength, undefined");
+    Internal.resize(0);
+    Length = 0;
   }
   if(l.IsOdd())
   {
-    mdcmDebugMacro("BUGGY HEADER: Your dicom contain odd length value field.");
+    mdcmAlwaysWarnMacro("Odd length value field, trying to workaround");
     ++l;
   }
 #else
@@ -134,20 +133,15 @@ void ByteValue::SetLength(VL vl)
   // Can not use reserve for now, need to implement:
   // STL - vector<> and istream
   // http://groups.google.com/group/comp.lang.c++/msg/37ec052ed8283e74
-
-  //#define SHORT_READ_HACK
   try
   {
-#ifdef SHORT_READ_HACK
-    if(l <= 0xff)
-#endif
-      Internal.resize(l);
+    Internal.resize(l);
   }
   catch(...)
   {
-#ifndef MDCM_DONT_THROW
-    throw Exception("Impossible to allocate");
-#endif
+    mdcmAlwaysWarnMacro("Can not resize Internal, exception");
+    Internal.resize(0);
+    Length = 0;
   }
   Length = vl;
 }

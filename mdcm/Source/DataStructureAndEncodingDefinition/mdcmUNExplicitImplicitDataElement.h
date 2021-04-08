@@ -55,6 +55,6 @@ public:
 
 }
 
-#include "mdcmUNExplicitImplicitDataElement.txx"
+#include "mdcmUNExplicitImplicitDataElement.hxx"
 
 #endif //MDCMUNEXPLICITIMPLICITDATAELEMENT_H

@@ -2768,19 +2768,31 @@ void GraphicsWidget::update_measurement(
 			{
 				if (tmp1x)
 				{
-					path.moveTo(x0, y0);
-					path.lineTo(x1, y0);
+					const double x0___ = x0;
+					const double y0___ = y0;
+					const double x1___ = x1;
+					const double y1___ = y0;
+					path.moveTo(x0___, y0___);
+					path.lineTo(x1___, y1___);
 				}
 				if (tmp1y)
 				{
-					path.moveTo(x0, y0);
-					path.lineTo(x0, y1);
+					const double x0___ = x0;
+					const double y0___ = y0;
+					const double x1___ = x0;
+					const double y1___ = y1;
+					path.moveTo(x0___, y0___);
+					path.lineTo(x1___, y1___);
 				}
 			}
 			else
 			{
-				path.moveTo(x0, y0);
-				path.lineTo(x1, y1);
+				const double x0___ = x0;
+				const double y0___ = y0;
+				const double x1___ = x1;
+				const double y1___ = y1;
+				path.moveTo(x0___, y0___);
+				path.lineTo(x1___, y1___);
 			}
 			graphicsview->measurment_line->setPath(path);
 			if (!data_type.isEmpty() && !tmp0.isEmpty())

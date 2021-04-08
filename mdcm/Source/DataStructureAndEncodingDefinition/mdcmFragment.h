@@ -35,56 +35,47 @@ namespace mdcm
  */
 class MDCM_EXPORT Fragment : public DataElement
 {
+friend std::ostream &operator<<(std::ostream & os, const Fragment & val);
 public:
   Fragment() : DataElement(Tag(0xfffe, 0xe000), 0) {}
-  friend std::ostream &operator<<(std::ostream & os, const Fragment & val);
-
   VL GetLength() const;
-
   VL ComputeLength() const;
 
-  template <typename TSwap>
-  std::istream & Read(std::istream &is)
+  template <typename TSwap> bool Read(std::istream & is)
   {
-    ReadPreValue<TSwap>(is);
+    const bool ok = ReadPreValue<TSwap>(is);
+    (void)ok;
     return ReadValue<TSwap>(is);
   }
 
-  template <typename TSwap>
-  std::istream & ReadPreValue(std::istream & is)
+  template <typename TSwap> bool ReadPreValue(std::istream & is)
   {
     const Tag itemStart(0xfffe, 0xe000);
     const Tag seqDelItem(0xfffe,0xe0dd);
     TagField.Read<TSwap>(is);
     if(!is)
     {
-#ifndef MDCM_DONT_THROW
-      throw Exception("Problem #1");
-#endif
-      return is;
+      mdcmAlwaysWarnMacro("Problem #1");
+      return false;
     }
     if(!ValueLengthField.Read<TSwap>(is))
     {
-#ifndef MDCM_DONT_THROW
-      throw Exception("Problem #2");
-#endif
-      return is;
+      mdcmAlwaysWarnMacro("Problem #2");
+      return false;
     }
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
     if(TagField != itemStart && TagField != seqDelItem)
     {
-#ifndef MDCM_DONT_THROW
-      throw Exception("Problem #3");
-#endif
+      mdcmAlwaysWarnMacro("Problem #3");
+      return false;
     }
 #endif
-    return is;
+    return true;
   }
 
-  template <typename TSwap>
-  std::istream &ReadValue(std::istream &is)
+  template <typename TSwap> bool ReadValue(std::istream & is)
   {
-    const Tag itemStart(0xfffe, 0xe000);
+    const Tag itemStart(0xfffe,0xe000);
     const Tag seqDelItem(0xfffe,0xe0dd);
     SmartPointer<ByteValue> bv = new ByteValue;
     bv->SetLength(ValueLengthField);
@@ -93,23 +84,20 @@ public:
       // Fragment is incomplete, but is a itemStart, let's try to push it anyway
       mdcmWarningMacro("Fragment could not be read");
       ValueField = bv;
-#ifndef MDCM_DONT_THROW
       ParseException pe;
       pe.SetLastElement(*this);
       throw pe;
-#endif
-      return is;
     }
     ValueField = bv;
-    return is;
+    if(!is) return false;
+    return true;
   }
 
-  template <typename TSwap>
-  std::istream &ReadBacktrack(std::istream &is)
+  template <typename TSwap> bool ReadBacktrack(std::istream & is)
   {
+    if(!is) return false;
     const Tag itemStart(0xfffe, 0xe000);
     const Tag seqDelItem(0xfffe,0xe0dd);
-
     bool cont = true;
     const std::streampos start = is.tellg();
     const int max = 10;
@@ -117,7 +105,6 @@ public:
     while(cont)
     {
       TagField.Read<TSwap>(is);
-      assert(is);
       if(TagField != itemStart && TagField != seqDelItem)
       {
         ++offset;
@@ -125,11 +112,8 @@ public:
         mdcmWarningMacro("Fuzzy Search, backtrack: " << (start - is.tellg()) << " Offset: " << is.tellg());
         if(offset > max)
         {
-          mdcmErrorMacro("Giving up");
-#ifndef MDCM_DONT_THROW
-          throw "Impossible to backtrack";
-#endif
-          return is;
+          mdcmAlwaysWarnMacro("Impossible to backtrack");
+          return false;
         }
       }
       else
@@ -140,7 +124,7 @@ public:
     assert(TagField == itemStart || TagField == seqDelItem);
     if(!ValueLengthField.Read<TSwap>(is))
     {
-      return is;
+      return false;
     }
     SmartPointer<ByteValue> bv = new ByteValue;
     bv->SetLength(ValueLengthField);
@@ -149,19 +133,15 @@ public:
       // Fragment is incomplete, but is a itemStart, let's try to push it anyway
       mdcmWarningMacro("Fragment could not be read");
       ValueField = bv;
-#ifndef MDCM_DONT_THROW
       ParseException pe;
       pe.SetLastElement(*this);
       throw pe;
-#endif
-      return is;
     }
     ValueField = bv;
-    return is;
+    return true;
   }
 
-  template <typename TSwap>
-  std::ostream & Write(std::ostream &os) const
+  template <typename TSwap> std::ostream & Write(std::ostream & os) const
   {
     const Tag itemStart(0xfffe, 0xe000);
     const Tag seqDelItem(0xfffe,0xe0dd);

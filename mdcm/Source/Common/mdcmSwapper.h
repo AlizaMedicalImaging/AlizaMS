@@ -73,6 +73,6 @@ public:
 
 } // end namespace mdcm
 
-#include "mdcmSwapper.txx"
+#include "mdcmSwapper.hxx"
 
 #endif //MDCMSWAPPER_H

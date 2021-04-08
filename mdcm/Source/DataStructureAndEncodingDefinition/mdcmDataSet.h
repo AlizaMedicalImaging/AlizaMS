@@ -207,6 +207,6 @@ private:
 
 } // end namespace mdcm
 
-#include "mdcmDataSet.txx"
+#include "mdcmDataSet.hxx"
 
 #endif //MDCMDATASET_H

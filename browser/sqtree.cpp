@@ -18,6 +18,7 @@
 #include <mdcmWriter.h>
 #include <mdcmScanner.h>
 #include <mdcmSequenceOfFragments.h>
+#include <mdcmParseException.h>
 #include <mdcmDict.h>
 #include <QString>
 #include <QStringList>
@@ -45,6 +46,7 @@
 #include "codecutils.h"
 #include "dicomutils.h"
 #include "commonutils.h"
+#include <exception>
 
 template <typename T, long long TVR>
 void get_bin_values(
@@ -908,6 +910,7 @@ void SQtree::read_file(const QString & f)
 		QString("") << QString("") << QString("");
 	QTreeWidgetItem * i = new QTreeWidgetItem(l);
 	treeWidget->addTopLevelItem(i);
+	try
 	{
 		mdcm::Reader reader;
 		const mdcm::File & file = reader.GetFile();
@@ -1018,6 +1021,16 @@ void SQtree::read_file(const QString & f)
 			tmp_tag = elem.GetTag();
 			ce++;
 		}
+	}
+	catch(mdcm::ParseException & pe)
+	{
+		std::cout << "Exception in SQtree::read_file("
+			<< f.toStdString() << "):\n" << pe.what() << std::endl;
+	}
+	catch(std::exception & ex)
+	{
+		std::cout << "Exception in SQtree::read_file("
+			<< f.toStdString() << "):\n" << ex.what() << std::endl;
 	}
 	treeWidget->expandToDepth(0);
 	QApplication::restoreOverrideCursor();
@@ -1314,33 +1327,46 @@ void SQtree::open_file_and_series()
 	QString series_uid;
 	QStringList files;
 	bool series_uid_ok = false;
+	try
 	{
-		std::set<mdcm::Tag> tags;
-		tags.insert(mdcm::Tag(0x0020,0x000e));
-		mdcm::Reader reader;
+		{
+			std::set<mdcm::Tag> tags;
+			tags.insert(mdcm::Tag(0x0020,0x000e));
+			mdcm::Reader reader;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-		reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
+			reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
 #else
-		reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
+			reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
 #endif
 #else
-		reader.SetFileName(f.toLocal8Bit().constData());
+			reader.SetFileName(f.toLocal8Bit().constData());
 #endif
-		if (reader.ReadSelectedTags(tags))
+			if (reader.ReadSelectedTags(tags))
+			{
+				const mdcm::File & file = reader.GetFile();
+				const mdcm::DataSet & ds = file.GetDataSet();
+				series_uid_ok =
+					DicomUtils::get_string_value(
+						ds,
+						mdcm::Tag(0x0020,0x000e),
+						series_uid);
+			}
+		}
+		if (series_uid_ok)
 		{
-			const mdcm::File & file = reader.GetFile();
-			const mdcm::DataSet & ds = file.GetDataSet();
-			series_uid_ok =
-				DicomUtils::get_string_value(
-					ds,
-					mdcm::Tag(0x0020,0x000e),
-					series_uid);
+			get_series_files(f, series_uid, files);
 		}
 	}
-	if (series_uid_ok)
+	catch(mdcm::ParseException & pe)
 	{
-		get_series_files(f, series_uid, files);
+		std::cout << "Exception in SQtree::open_file_and_series:\n"
+			<< pe.what() << std::endl;
+	}
+	catch(std::exception & ex)
+	{
+		std::cout << "Exception in SQtree::open_file_and_series:\n"
+			<< ex.what() << std::endl;
 	}
 	int idx = -1;
 	const int files_size = files.size();

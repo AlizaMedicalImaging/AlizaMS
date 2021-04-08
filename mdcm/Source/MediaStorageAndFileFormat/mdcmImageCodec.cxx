@@ -22,7 +22,7 @@
 
 #include "mdcmImageCodec.h"
 #include "mdcmJPEGCodec.h"
-#include "mdcmByteSwap.txx"
+#include "mdcmByteSwap.h"
 #include "mdcmTrace.h"
 #include <iostream>
 #include <iomanip>

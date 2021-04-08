@@ -29,6 +29,7 @@
 
 namespace mdcm
 {
+
 template <typename TDE, typename TSwap>
 std::istream & DataSet::ReadNested(std::istream & is)
 {
@@ -42,7 +43,7 @@ std::istream & DataSet::ReadNested(std::istream & is)
       InsertDataElement(de);
     }
   }
-  catch(ParseException &pe)
+  catch(ParseException & pe)
   {
     if(pe.GetLastElement().GetTag() == Tag(0xfffe,0xe0dd))
     {
@@ -54,9 +55,7 @@ std::istream & DataSet::ReadNested(std::istream & is)
     else
     {
       // MR_Philips_Intera_PrivateSequenceExplicitVR_in_SQ_2001_e05f_item_wrong_lgt_use_NOSHADOWSEQ.dcm
-#ifndef MDCM_DONT_THROW
       throw pe;
-#endif
     }
   }
   assert(de.GetTag() == itemDelItem);
@@ -96,7 +95,7 @@ std::istream & DataSet::ReadUpToTag(
         is.seekg(de.GetVL(), std::ios::cur);
     }
     // tag was found, we can exit the loop
-    if (t <= de.GetTag())
+    if(t <= de.GetTag())
     {
       assert(is.good());
       break;
@@ -124,11 +123,10 @@ std::istream & DataSet::ReadUpToTagWithLength(
     else
     {
       assert(is.good());
-      if(de.GetTag() != t)
-        is.seekg(de.GetVL(), std::ios::cur);
+      if(de.GetTag() != t) is.seekg(de.GetVL(), std::ios::cur);
     }
     // tag was found, we can exit the loop.
-    if (t <= de.GetTag())
+    if(t <= de.GetTag())
     {
       assert(is.good());
       break;
@@ -143,17 +141,16 @@ std::istream & DataSet::ReadSelectedTags(
   const std::set<Tag> & selectedTags,
   bool readvalues)
 {
-  if (!(selectedTags.empty() || inputStream.fail()))
+  if(!(selectedTags.empty() || inputStream.fail()))
   {
     const Tag maxTag = *(selectedTags.rbegin());
     std::set<Tag> tags = selectedTags;
     DataElement dataElem;
-
     while(!inputStream.eof())
     {
       static_cast<TDE&>(dataElem).template ReadPreValue<TSwap>(inputStream);
       const Tag& tag = dataElem.GetTag();
-      if (inputStream.fail() || maxTag < tag)
+      if(inputStream.fail() || maxTag < tag)
       {
         if(inputStream.good())
         {
@@ -170,15 +167,13 @@ std::istream & DataSet::ReadSelectedTags(
         break;
       }
       static_cast<TDE&>(dataElem).template ReadValue<TSwap>(inputStream, readvalues);
-
       const std::set<Tag>::iterator found = tags.find(tag);
-
       if (found != tags.end())
       {
         InsertDataElement(dataElem);
         tags.erase(found);
 
-        if (tags.empty())
+        if(tags.empty())
         {
           // All selected tags were found, we can exit the loop.
           break;
@@ -202,7 +197,7 @@ std::istream & DataSet::ReadSelectedPrivateTags(
   const std::set<PrivateTag> & selectedPTags,
   bool readvalues)
 {
-  if (!(selectedPTags.empty() || inputStream.fail()))
+  if(!(selectedPTags.empty() || inputStream.fail()))
   {
     assert(selectedPTags.size() == 1);
     const PrivateTag refPTag = *(selectedPTags.rbegin());
@@ -212,7 +207,6 @@ std::istream & DataSet::ReadSelectedPrivateTags(
     Tag maxTag;
     maxTag.SetPrivateCreator(nextPTag);
     DataElement dataElem;
-
     while(!inputStream.eof())
     {
       static_cast<TDE&>(dataElem).template ReadPreValue<TSwap>(inputStream);
@@ -234,12 +228,10 @@ std::istream & DataSet::ReadSelectedPrivateTags(
         break;
       }
       static_cast<TDE&>(dataElem).template ReadValue<TSwap>(inputStream, readvalues);
-
       if (inputStream.fail())
       {
         break;
       }
-
       if(tag.GetPrivateCreator() == refPTag)
       {
         DES.insert(dataElem);
@@ -268,7 +260,6 @@ std::istream & DataSet::ReadSelectedTagsWithLength(
     const Tag maxTag = *(selectedTags.rbegin());
     std::set<Tag> tags = selectedTags;
     DataElement dataElem;
-
     while(!inputStream.eof())
     {
       static_cast<TDE&>(dataElem).template ReadPreValue<TSwap>(inputStream);
@@ -290,19 +281,15 @@ std::istream & DataSet::ReadSelectedTagsWithLength(
         break;
       }
       static_cast<TDE&>(dataElem).template ReadValue<TSwap>(inputStream, readvalues);
-
       if (inputStream.fail())
       {
         break;
       }
-
       const std::set<Tag>::iterator found = tags.find(tag);
-
       if (found != tags.end())
       {
         InsertDataElement(dataElem);
         tags.erase(found);
-
         if (tags.empty())
         {
           // All selected tags were found, we can exit the loop.
@@ -328,7 +315,7 @@ std::istream & DataSet::ReadSelectedPrivateTagsWithLength(
   bool readvalues)
 {
   (void)length;
-  if (!(selectedPTags.empty() || inputStream.fail()))
+  if(!(selectedPTags.empty() || inputStream.fail()))
   {
     assert(selectedPTags.size() == 1);
     const PrivateTag refPTag = *(selectedPTags.rbegin());
@@ -338,7 +325,6 @@ std::istream & DataSet::ReadSelectedPrivateTagsWithLength(
     Tag maxTag;
     maxTag.SetPrivateCreator(nextPTag);
     DataElement dataElem;
-
     while(!inputStream.eof())
     {
       static_cast<TDE&>(dataElem).template ReadPreValue<TSwap>(inputStream);
@@ -360,12 +346,10 @@ std::istream & DataSet::ReadSelectedPrivateTagsWithLength(
         break;
       }
       static_cast<TDE&>(dataElem).template ReadValue<TSwap>(inputStream, readvalues);
-
       if (inputStream.fail())
       {
         break;
       }
-
       if(tag.GetPrivateCreator() == refPTag)
       {
         InsertDataElement(dataElem);
@@ -407,10 +391,7 @@ std::istream & DataSet::ReadWithLength(std::istream & is, VL & length)
       }
       if((curpos - startpos) + 1 == l)
       {
-        mdcmDebugMacro("Papyrus odd padding detected");
-#ifndef MDCM_DONT_THROW
-        throw Exception("Papyrus odd padding");
-#endif
+        throw std::logic_error("Papyrus odd padding");
       }
       if(l > locallength)
       {
@@ -420,21 +401,17 @@ std::istream & DataSet::ReadWithLength(std::istream & is, VL & length)
           // we found a discrepandy with own vendor made its layout.
           // update the length directly
           locallength = length = l;
-#ifndef MDCM_DONT_THROW
-          throw Exception("Changed Length");
-#endif
+          throw std::logic_error("Changed Length");
         }
         else
         {
-          mdcmDebugMacro("Out of Range SQ detected: " << l << " while max: " << locallength);
-#ifndef MDCM_DONT_THROW
-          throw Exception("Out of Range");
-#endif
+          mdcmAlwaysWarnMacro("Out of range SQ detected: " << l << " while max: " << locallength);
+          throw std::logic_error("Out of Range");
         }
       }
     }
   }
-  catch(ParseException &pe)
+  catch(ParseException & pe)
   {
     if(pe.GetLastElement().GetTag() == Tag(0xfffe,0xe000))
     {
@@ -455,10 +432,7 @@ std::istream & DataSet::ReadWithLength(std::istream & is, VL & length)
           (pd.GetVR() != VR::OB) ||
           !pd.IsUndefinedLength())
       {
-        mdcmAlwaysWarnMacro("");
-#ifndef MDCM_DONT_THROW
-        throw Exception("Exception");
-#endif
+        throw std::logic_error("Exception");
       }
       const VL pdlen = locallength - l - 12;
       pd.SetVL(pdlen);
@@ -469,15 +443,13 @@ std::istream & DataSet::ReadWithLength(std::istream & is, VL & length)
     else
     {
       // mdcmDataExtra/mdcmBreakers/BuggedDicomWorksImage_Hopeless.dcm
-      mdcmErrorMacro("Last Tag is : " << pe.GetLastElement().GetTag());
-#ifndef MDCM_DONT_THROW
-      throw Exception("Unhandled");
-#endif
+      mdcmAlwaysWarnMacro("Last Tag is : " << pe.GetLastElement().GetTag());
+      throw std::logic_error("Unhandled");
     }
   }
-  catch(Exception &pe)
+  catch(std::logic_error & pe)
   {
-    if(strcmp(pe.GetDescription(), "Out of Range") == 0)
+    if(strcmp(pe.what(), "Out of Range") == 0)
     {
       // BogugsItemAndSequenceLength.dcm
       // This is most likely the "Out of Range" one
@@ -500,23 +472,17 @@ std::istream & DataSet::ReadWithLength(std::istream & is, VL & length)
       }
       // fix the length now
       length = locallength = l;
-      mdcmWarningMacro("Item length is wrong");
-#ifndef MDCM_DONT_THROW
-      throw Exception("Changed Length");
-#endif
+      mdcmAlwaysWarnMacro("Item length is wrong");
+      throw std::logic_error("Changed Length");
     }
-    else if(strcmp(pe.GetDescription(), "Papyrus odd padding") == 0)
+    else if(strcmp(pe.what(), "Papyrus odd padding") == 0)
     {
       is.get();
-#ifndef MDCM_DONT_THROW
-      throw Exception("Changed Length");
-#endif
+      throw std::logic_error("Changed Length");
     }
     else
     {
-#ifndef MDCM_DONT_THROW
       throw pe;
-#endif
     }
   }
   assert(l <= locallength);

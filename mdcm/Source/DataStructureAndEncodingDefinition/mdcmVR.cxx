@@ -262,6 +262,17 @@ unsigned int VR::GetSizeof() const
   return size;
 }
 
+unsigned int VR::GetLength() const
+{
+  return GetLength(VRField);
+}
+
+unsigned int VR::GetLength(VRType vr)
+{
+  if (vr & VL32) return 4;
+  return 2;
+}
+
 unsigned int VR::GetIndex(VRType vr)
 {
   if (vr == VR::VL32) return 0;
@@ -512,16 +523,73 @@ bool VR::IsBinary2(VRType vr)
     vr == VR::SQ;
 }
 
+bool VR::Read(std::istream & is)
+{
+  if(!is) return false;
+  char vr[2];
+  is.read(vr, 2);
+  VRField = GetVRTypeFromFile(vr);
+  if(VRField == VR_END)
+  {
+    mdcmAlwaysWarnMacro("In VR::Read VRField == VR_END");
+    return false;
+  }
+  if(VRField == INVALID)
+  {
+    // TheralysGDCM120Bug.dcm
+    // MR_Philips_Intera_PrivateSequenceExplicitVR_in_SQ_2001_e05f_item_wrong_lgt_use_NOSHADOWSEQ.dcm
+    // BugGDCM2_UndefItemWrongVL.dcm
+    // gdcm-MR-PHILIPS-16-Multi-Seq.dcm
+    // ExplicitVRforPublicElementsImplicitVRforShadowElements.dcm
+    // DMCPACS_ExplicitImplicit_BogusIOP.dcm
+    // THERALYS-12-MONO2-Uncompressed-Even_Length_Tag.dcm
+    // PrivateGEImplicitVRBigEndianTransferSyntax16Bits.dcm
+    // GE_DLX-8-MONO2-PrivateSyntax.dcm
+    mdcmAlwaysWarnMacro("In VR::Read: VRField is INVALID");
+    return false;
+  }
+  if(VRField & VL32)
+  {
+    char dum[2];
+    is.read(dum, 2);
+    if(!(dum[0] == 0 && dum[1] == 0))
+    {
+      // JDDICOM_Sample2.dcm
+      mdcmAlwaysWarnMacro("In VR::Read: 32 bits VR contains non-zero bytes");
+    }
+  }
+  return true;
+}
+
+void VR::Write(std::ostream & os) const
+{
+  if(!os) return;
+  VRType vrfield = VRField;
+  if(IsDual())
+  {
+    mdcmAlwaysWarnMacro("In VR::Write: IsDual() is true");
+    return;
+  }
+  const char * vr = GetVRString(vrfield);
+  os.write(vr, 2);
+  // See PS 3.5, Data Element Structure With Explicit VR
+  if(vrfield & VL32)
+  {
+    const char dum[2] = {0, 0};
+    os.write(dum,2);
+  }
+}
+
 bool VR::Compatible(VR const & vr) const
 {
-  if (vr.VRField == VR::INVALID) return true;
-  else if (vr.VRField == VR::UN) return true;
+  if(vr.VRField == VR::INVALID) return true;
+  else if(vr.VRField == VR::UN) return true;
   return ((VRField & vr.VRField) > 0 ? true : false);
 }
 
 bool VR::IsDual() const
 {
-  switch (VRField)
+  switch(VRField)
   {
   case VR::OB_OW:
   case VR::US_SS:

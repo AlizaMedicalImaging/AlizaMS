@@ -56,6 +56,6 @@ public:
 
 } // end namespace mdcm
 
-#include "mdcmImplicitDataElement.txx"
+#include "mdcmImplicitDataElement.hxx"
 
 #endif //MDCMIMPLICITDATAELEMENT_H

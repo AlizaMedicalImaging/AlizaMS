@@ -66,7 +66,7 @@ std::istream & VR16ExplicitDataElement::ReadPreValue(std::istream & is)
     }
     if(ValueLengthField)
     {
-      mdcmWarningMacro(
+      mdcmAlwaysWarnMacro(
         "Item Delimitation Item has a length different from 0 and is: " << ValueLengthField);
     }
     ValueField = 0;
@@ -81,34 +81,20 @@ std::istream & VR16ExplicitDataElement::ReadPreValue(std::istream & is)
 #endif
   // FIXME
   // Special hack for KONICA_VROX.dcm where in fact the VR=OX, in Pixel Data element
-  // in which case we need to assume a 32bits VR...for now this is a big phat hack !
+  // in which case we need to assume a 32bits VR.
   bool OX_hack = false;
-  try
-  {
-    if(!VRField.Read(is))
-    {
-      assert(0 && "Should not happen");
-      return is;
-    }
-  }
-  catch(Exception &)
+  if(!VRField.Read(is))
   {
     VRField = VR::INVALID;
     // mdcm-MR-PHILIPS-16-Multi-Seq.dcm
     if(TagField == Tag(0xfffe, 0xe000))
     {
-      mdcmWarningMacro("Found item delimitor in item");
-#ifndef MDCM_DONT_THROW
+      mdcmAlwaysWarnMacro("Found item delimitor in item");
       ParseException pe;
       pe.SetLastElement(*this);
       throw pe;
-#endif
     }
-    // -> For some reason VR is written as {44,0} well I guess this is a VR...
-    // Technically there is a second bug, dcmtk assume other things when reading this tag,
-    // so I need to change this tag too, if I ever want dcmtk to read this file. oh well
     // 0019004_Baseline_IMG1.dcm
-    // -> VR is garbage also...
     if(TagField == Tag(0x7fe0,0x0010))
     {
       OX_hack = true;
@@ -116,13 +102,13 @@ std::istream & VR16ExplicitDataElement::ReadPreValue(std::istream & is)
       char dummy[2];
       is.read(dummy,2);
       assert(dummy[0] == 0 && dummy[1] == 0);
-      mdcmWarningMacro("Assuming 32 bits VR for Tag=" <<
-        TagField << " in order to read a buggy DICOM file.");
+      mdcmAlwaysWarnMacro("Assuming 32 bits VR for Tag=" <<
+        TagField << " (buggy file)");
     }
     else
     {
-      mdcmWarningMacro("Assuming 16 bits VR for Tag=" <<
-        TagField << " in order to read a buggy DICOM file.");
+      mdcmAlwaysWarnMacro("Assuming 16 bits VR for Tag=" <<
+        TagField << " (buggy file)");
     }
   }
   if(VR::GetLength(VRField) == 4)
@@ -148,11 +134,10 @@ std::istream & VR16ExplicitDataElement::ReadPreValue(std::istream & is)
     }
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
     // HACK for SIEMENS Leonardo
-    if(ValueLengthField == 0x0006
-     && VRField == VR::UL
-     && TagField.GetGroup() == 0x0009)
+    if(ValueLengthField == 0x0006 && VRField == VR::UL
+      && TagField.GetGroup() == 0x0009)
     {
-      mdcmWarningMacro("Replacing VL=0x0006 with VL=0x0004, for Tag=" <<
+      mdcmAlwaysWarnMacro("Replacing VL=0x0006 with VL=0x0004, for Tag=" <<
         TagField << " in order to read a buggy DICOM file.");
       ValueLengthField = 0x0004;
     }
@@ -163,11 +148,9 @@ std::istream & VR16ExplicitDataElement::ReadPreValue(std::istream & is)
   if(TagField == Tag(0x0000,0x0000) && ValueLengthField == 0 && VRField == VR::INVALID)
   {
     // This handles DMCPACS_ExplicitImplicit_BogusIOP.dcm
-#ifndef MDCM_DONT_THROW
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
-#endif
   }
   return is;
 }
@@ -211,11 +194,9 @@ std::istream & VR16ExplicitDataElement::ReadValue(std::istream & is, bool readva
         // Must be one of those non-cp246 file...
         // but for some reason seekg back to previous offset + Read
         // as Explicit does not work
-#ifndef MDCM_DONT_THROW
         ParseException pe;
         pe.SetLastElement(*this);
         throw pe;
-#endif
       }
       return is;
     }
@@ -224,11 +205,9 @@ std::istream & VR16ExplicitDataElement::ReadValue(std::istream & is, bool readva
       if(TagField != Tag(0x7fe0,0x0010))
       {
         // mdcmSampleData/ForSeriesTesting/Perfusion/DICOMDIR
-#ifndef MDCM_DONT_THROW
         ParseException pe;
         pe.SetLastElement(*this);
         throw pe;
-#endif
       }
       // Ok this is Pixel Data fragmented
       assert(TagField == Tag(0x7fe0,0x0010));
@@ -275,7 +254,7 @@ std::istream & VR16ExplicitDataElement::ReadValue(std::istream & is, bool readva
         bsf.ByteSwap();
       }
     }
-    catch(std::exception &ex)
+    catch(std::exception & ex)
     {
       ValueLengthField = ValueField->GetLength();
     }
@@ -285,11 +264,9 @@ std::istream & VR16ExplicitDataElement::ReadValue(std::istream & is, bool readva
   if(!ValueIO<VR16ExplicitDataElement,TSwap>::Read(is,*ValueField,readvalues))
   {
     // Might be the famous UN 16bits
-#ifndef MDCM_DONT_THROW
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;
-#endif
   }
   return is;
 }

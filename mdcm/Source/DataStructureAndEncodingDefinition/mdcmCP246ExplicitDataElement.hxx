@@ -74,26 +74,13 @@ std::istream &CP246ExplicitDataElement::ReadPreValue(std::istream &is)
     return is;
   }
   // Read VR
-  try
-  {
-    if(!VRField.Read(is))
-    {
-      assert(0 && "Should not happen");
-      return is;
-    }
-  }
-  catch(std::exception &)
+  if(!VRField.Read(is))
   {
     // mdcm-MR-PHILIPS-16-Multi-Seq.dcm
     // assert(TagField == Tag(0xfffe, 0xe000));
-    // -> For some reason VR is written as {44,0} well I guess this is a VR...
-    // Technically there is a second bug, dcmtk assume other things when reading this tag,
-    // so I need to change this tag too, if I ever want dcmtk to read this file. oh well
     // 0019004_Baseline_IMG1.dcm
-    // -> VR is garbage also...
     // assert(TagField == Tag(8348,0339) || TagField == Tag(b5e8,0338))
-    mdcmWarningMacro("Assuming 16 bits VR for Tag=" <<
-      TagField << " in order to read a buggy DICOM file.");
+    mdcmAlwaysWarnMacro("Assuming 16 bits VR for Tag=" << TagField << " (buggy file)");
     VRField = VR::INVALID;
   }
   // Read Value Length
@@ -113,10 +100,7 @@ std::istream &CP246ExplicitDataElement::ReadPreValue(std::istream &is)
       // The following is occurs with mdcm 2.0.17 when two
       // seq del item marker are found
       // See UnexpectedSequenceDelimiterInFixedLengthSequence.dcm
-#ifndef MDCM_DONT_THROW
-      throw Exception("Should not happen CP246");
-#endif
-      return is;
+      throw std::logic_error("Should not happen, CP246");
     }
   }
   return is;
@@ -132,7 +116,6 @@ std::istream &CP246ExplicitDataElement::ReadValue(std::istream &is, bool readval
     ValueField = 0;
     return is;
   }
-
   // Read the Value
   if(VRField == VR::SQ)
   {
@@ -163,11 +146,9 @@ std::istream &CP246ExplicitDataElement::ReadValue(std::istream &is, bool readval
         // Must be one of those non-cp246 file,
         // but for some reason seekg back to previous offset + Read
         // as CP246Explicit does not work.
-#ifndef MDCM_DONT_THROW
         ParseException pe;
         pe.SetLastElement(*this);
         throw pe;
-#endif
       }
       return is;
     }
@@ -186,7 +167,7 @@ std::istream &CP246ExplicitDataElement::ReadValue(std::istream &is, bool readval
   // We have the length, we should be able to read the value
   ValueField->SetLength(ValueLengthField); // perform realloc
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
-  if(TagField == Tag(0x2001,0xe05f)
+  if(  TagField == Tag(0x2001,0xe05f)
     || TagField == Tag(0x2001,0xe100)
     || TagField == Tag(0x2005,0xe080)
     || TagField == Tag(0x2005,0xe083)
@@ -216,9 +197,7 @@ std::istream &CP246ExplicitDataElement::ReadValue(std::istream &is, bool readval
     // Might be the famous UN 16bits
     ParseException pe;
     pe.SetLastElement(*this);
-#ifndef MDCM_DONT_THROW
     throw pe;
-#endif
   }
   return is;
 }

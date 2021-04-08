@@ -49,6 +49,6 @@ public:
 
 }
 
-#include "mdcmVR16ExplicitDataElement.txx"
+#include "mdcmVR16ExplicitDataElement.hxx"
 
 #endif //MDCMVR16EXPLICITDATAELEMENT_H
