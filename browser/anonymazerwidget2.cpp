@@ -27,8 +27,8 @@
 #include "dicomutils.h"
 #include "alizams_version.h"
 #include <cstdlib>
-#include <random>
 #include <chrono>
+#include <random>
 
 static mdcm::VR get_vr(
 	const mdcm::DataSet & ds,
@@ -1412,7 +1412,7 @@ static void build_maps(
 		catch(mdcm::ParseException & pe)
 		{
 			std::cout << "mdcm::ParseException in build_maps:\n"
-				<< pe.what() << std::endl;
+				<< pe.GetLastElement().GetTag() << std::endl;
 		}
 		catch(std::exception & ex)
 		{
@@ -1675,11 +1675,14 @@ void AnonymazerWidget2::run_()
 	}
 	catch(mdcm::ParseException & pe)
 	{
-		std::cout << "Exception in anonymizer\n" << pe.what() << std::endl;
+		std::cout
+			<< "mdcm::ParseException in AnonymazerWidget2::run_\n"
+			<< pe.GetLastElement().GetTag() << std::endl;
 	}
 	catch(std::exception & ex)
 	{
-		std::cout << "Exception in anonymizer\n" << ex.what() << std::endl;
+		std::cout << "Exception in AnonymazerWidget2::run_\n"
+			<< ex.what() << std::endl;
 	}
 	QString message("");
 	if (count_errors > 0)

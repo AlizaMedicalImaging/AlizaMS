@@ -179,12 +179,13 @@ void BrowserWidget2::read_directory(const QString & p)
 	}
 	catch(mdcm::ParseException & pe)
 	{
-		std::cout << "mdcm::ParseException in process_directory:\n"
-			<< pe.what() << std::endl;
+		std::cout
+			<< "mdcm::ParseException in BrowserWidget2::read_directory:\n"
+			<< pe.GetLastElement().GetTag() << std::endl;
 	}
 	catch(std::exception & ex)
 	{
-		std::cout << "Exception in process_directory:\n"
+		std::cout << "Exception in BrowserWidget2::read_directory:\n"
 			<< ex.what() << std::endl;
 	}
 	pd->close();
@@ -438,12 +439,13 @@ void BrowserWidget2::open_DICOMDIR2(const QString & f)
 	}
 	catch(mdcm::ParseException & pe)
 	{
-		std::cout << "mdcm::ParseException in read_DICOMDIR:\n"
-			<< pe.what() << std::endl;
+		std::cout
+			<< "mdcm::ParseException in BrowserWidget2::open_DICOMDIR2:\n"
+			<< pe.GetLastElement().GetTag() << std::endl;
 	}
 	catch(std::exception & ex)
 	{
-		std::cout << "Exception in read_DICOMDIR:\n"
+		std::cout << "Exception in BrowserWidget2::open_DICOMDIR2:\n"
 			<< ex.what() << std::endl;
 	}
 	if (!warning.isEmpty())
@@ -554,12 +556,13 @@ void BrowserWidget2::reload_dir()
 			}
 			catch(mdcm::ParseException & pe)
 			{
-				std::cout << "mdcm::ParseException in read_DICOMDIR:\n"
-					<< pe.what() << std::endl;
+				std::cout
+					<< "mdcm::ParseException in BrowserWidget2::reload_dir:\n"
+					<< pe.GetLastElement().GetTag() << std::endl;
 			}
 			catch(std::exception & ex)
 			{
-				std::cout << "Exception in read_DICOMDIR:\n"
+				std::cout << "Exception in BrowserWidget2::reload_dir:\n"
 					<< ex.what() << std::endl;
 			}
 			if (!warning.isEmpty())

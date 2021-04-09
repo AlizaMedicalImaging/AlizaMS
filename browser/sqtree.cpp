@@ -1024,8 +1024,9 @@ void SQtree::read_file(const QString & f)
 	}
 	catch(mdcm::ParseException & pe)
 	{
-		std::cout << "Exception in SQtree::read_file("
-			<< f.toStdString() << "):\n" << pe.what() << std::endl;
+		std::cout << "mdcm::ParseException in SQtree::read_file("
+			<< f.toStdString() << "):\n"
+			<< pe.GetLastElement().GetTag() << std::endl;
 	}
 	catch(std::exception & ex)
 	{
@@ -1360,8 +1361,9 @@ void SQtree::open_file_and_series()
 	}
 	catch(mdcm::ParseException & pe)
 	{
-		std::cout << "Exception in SQtree::open_file_and_series:\n"
-			<< pe.what() << std::endl;
+		std::cout
+			<< "mdcm::ParseException in SQtree::open_file_and_series:\n"
+			<< pe.GetLastElement().GetTag() << std::endl;
 	}
 	catch(std::exception & ex)
 	{

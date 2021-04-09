@@ -636,11 +636,11 @@ void Aliza::load_dicom_series(QProgressDialog * pb)
 		catch(mdcm::ParseException & pe)
 		{
 			std::cout << "mdcm::ParseException in Aliza::load_dicom_series:\n"
-				<< pe.what() << std::endl;
+				<< pe.GetLastElement().GetTag() << std::endl;
 		}
 		catch(std::exception & ex)
 		{
-			std::cout << "Exception in Aliza::load_dicom_series\n"
+			std::cout << "Exception in Aliza::load_dicom_series:\n"
 				<< ex.what() << std::endl;
 		}
 	}
@@ -977,16 +977,29 @@ static void process_elscint_dir(
 		}
 		QFileInfo fi(filenames.at(x));
 		const QString tmp9 = outp + QString("/") + fi.fileName();
-		if (DicomUtils::convert_elscint(filenames.at(x), tmp9))
+		try
 		{
-			count_elscint++;
-		}
-		else
-		{
-			if (QFile::copy(filenames.at(x), tmp9))
+			if (DicomUtils::convert_elscint(filenames.at(x), tmp9))
 			{
-				count_elscint_copy++;
+				count_elscint++;
 			}
+			else
+			{
+				if (QFile::copy(filenames.at(x), tmp9))
+				{
+					count_elscint_copy++;
+				}
+			}
+		}
+		catch(mdcm::ParseException & pe)
+		{
+			std::cout << "mdcm::ParseException in process_elscint_dir:\n"
+				<< pe.GetLastElement().GetTag() << std::endl;
+		}
+		catch(std::exception & ex)
+		{
+			std::cout << "Exception in process_elscint_dir:\n"
+				<< ex.what() << std::endl;
 		}
 	}
 	filenames.clear();
@@ -3789,11 +3802,11 @@ void Aliza::load_dicom_file(int * image_id,
 	catch(mdcm::ParseException & pe)
 	{
 		std::cout << "mdcm::ParseException in Aliza::load_dicom_file:\n"
-			<< pe.what() << std::endl;
+			<< pe.GetLastElement().GetTag() << std::endl;
 	}
 	catch(std::exception & ex)
 	{
-		std::cout << "Exception in Aliza::load_dicom_file\n"
+		std::cout << "Exception in Aliza::load_dicom_file:\n"
 			<< ex.what() << std::endl;
 	}
 	if (error__.isEmpty())
