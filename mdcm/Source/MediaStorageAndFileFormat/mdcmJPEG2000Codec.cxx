@@ -742,24 +742,23 @@ JPEG2000Codec::~JPEG2000Codec()
   if(Internals)
   {
     delete Internals;
-    Internals = NULL; // not required
+    Internals = NULL;
   }
 }
 
 bool JPEG2000Codec::CanDecode(TransferSyntax const & ts) const
 {
-  return ts == TransferSyntax::JPEG2000Lossless
-      || ts == TransferSyntax::JPEG2000
-      || ts == TransferSyntax::JPEG2000Part2Lossless
-      || ts == TransferSyntax::JPEG2000Part2;
+  return (ts == TransferSyntax::JPEG2000Lossless
+       || ts == TransferSyntax::JPEG2000
+       || ts == TransferSyntax::JPEG2000Part2Lossless
+       || ts == TransferSyntax::JPEG2000Part2);
+  // Part 2 is not tested, TODO
 }
 
 bool JPEG2000Codec::CanCode(TransferSyntax const & ts) const
 {
-  return ts == TransferSyntax::JPEG2000Lossless
-      || ts == TransferSyntax::JPEG2000
-      || ts == TransferSyntax::JPEG2000Part2Lossless
-      || ts == TransferSyntax::JPEG2000Part2;
+  return (ts == TransferSyntax::JPEG2000Lossless
+       || ts == TransferSyntax::JPEG2000);
 }
 
 /*
