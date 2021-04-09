@@ -40,6 +40,7 @@
 #include <list>
 #include <cstdlib>
 #include <random>
+#include <chrono>
 #include "float.h"
 #include <functional>
 #include "dicomutils.h"

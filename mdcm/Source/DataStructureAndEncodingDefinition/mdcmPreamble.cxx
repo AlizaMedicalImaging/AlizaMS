@@ -22,6 +22,7 @@
 
 #include "mdcmPreamble.h"
 #include <cstring>
+#include <stdexcept>
 
 namespace mdcm
 {
