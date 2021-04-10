@@ -5188,7 +5188,6 @@ QString DicomUtils::read_enhanced(
 	FrameGroupValues values;
 	FrameGroupValues shared_values;
 	ImageOverlays image_overlays;
-	itk::Matrix<itk::SpacePrecisionType,3,3> direction;
 	mdcm::PhotometricInterpretation pi;
 	mdcm::PixelFormat pixelformat;
 	mdcm::Reader reader;
@@ -5497,7 +5496,6 @@ QString DicomUtils::read_enhanced_supp_palette(
 	FrameGroupValues values;
 	FrameGroupValues shared_values;
 	ImageOverlays image_overlays; // unused
-	itk::Matrix<itk::SpacePrecisionType,3,3> direction;
 	mdcm::PhotometricInterpretation pi;
 	mdcm::PixelFormat pixelformat;
 	mdcm::Reader reader;
