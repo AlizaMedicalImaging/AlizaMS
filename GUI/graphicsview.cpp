@@ -296,6 +296,7 @@ void GraphicsView::clear_paths()
 			scene()->removeItem(
 				static_cast<QGraphicsItem*>(paths[i]));
 			delete paths[i];
+			paths[i] = NULL;
 		}
 	}
 	paths.clear();
@@ -311,6 +312,7 @@ void GraphicsView::clear_collision_paths()
 			scene()->removeItem(
 				static_cast<QGraphicsItem*>(collision_paths[i]));
 			delete collision_paths[i];
+			collision_paths[i] = NULL;
 		}
 	}
 	collision_paths.clear();
@@ -326,6 +328,7 @@ void GraphicsView::clear_us_regions()
 			scene()->removeItem(
 				static_cast<QGraphicsItem*>(us_regions[i]));
 			delete us_regions[i];
+			us_regions[i] = NULL;
 		}
 	}
 	us_regions.clear();
@@ -342,6 +345,7 @@ void GraphicsView::clear_prtexts_items()
 				scene()->removeItem(
 					static_cast<QGraphicsItem*>(prtexts[i]));
 				delete prtexts[i];
+				prtexts[i] = NULL;
 			}
 		}
 		prtexts.clear();
@@ -355,6 +359,7 @@ void GraphicsView::clear_prtexts_items()
 				scene()->removeItem(
 					static_cast<QGraphicsItem*>(prtextanchors[i]));
 				delete prtextanchors[i];
+				prtextanchors[i] = NULL;
 			}
 		}
 		prtextanchors.clear();
@@ -372,6 +377,7 @@ void GraphicsView::clear_prgraphicobjects_items()
 				scene()->removeItem(
 					static_cast<QGraphicsItem*>(prpoints[i]));
 				delete prpoints[i];
+				prpoints[i] = NULL;
 			}
 		}
 		prpoints.clear();
@@ -385,6 +391,7 @@ void GraphicsView::clear_prgraphicobjects_items()
 				scene()->removeItem(
 					static_cast<QGraphicsItem*>(prpolylines[i]));
 				delete prpolylines[i];
+				prpolylines[i] = NULL;
 			}
 		}
 		prpolylines.clear();
@@ -398,6 +405,7 @@ void GraphicsView::clear_prgraphicobjects_items()
 				scene()->removeItem(
 					static_cast<QGraphicsItem*>(printerpolated[i]));
 				delete printerpolated[i];
+				printerpolated[i] = NULL;
 			}
 		}
 		printerpolated.clear();
@@ -411,6 +419,7 @@ void GraphicsView::clear_prgraphicobjects_items()
 				scene()->removeItem(
 					static_cast<QGraphicsItem*>(prcircles[i]));
 				delete prcircles[i];
+				prcircles[i] = NULL;
 			}
 		}
 		prcircles.clear();
@@ -424,6 +433,7 @@ void GraphicsView::clear_prgraphicobjects_items()
 				scene()->removeItem(
 					static_cast<QGraphicsItem*>(prellipses[i]));
 				delete prellipses[i];
+				prellipses[i] = NULL;
 			}
 		}
 		prellipses.clear();
@@ -440,6 +450,7 @@ void GraphicsView::clear_shutters()
 			scene()->removeItem(
 				static_cast<QGraphicsItem*>(display_shutters[i]));
 			delete display_shutters[i];
+			display_shutters[i] = NULL;
 		}
 	}
 	display_shutters.clear();

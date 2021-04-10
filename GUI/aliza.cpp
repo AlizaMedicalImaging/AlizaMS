@@ -514,15 +514,13 @@ void Aliza::close_()
 		QMap<int, ImageVariant*>::iterator iv = scene3dimages.begin();
 		while (iv != scene3dimages.end())
 		{
-			if (iv.value()) { delete iv.value(); }
+			ImageVariant * v = iv.value();
 			++iv;
+			if (v) delete v;
 		}
 		scene3dimages.clear();
 	}
-	if (check_3d())
-	{
-		glwidget->close_();
-	}
+	if (check_3d()) glwidget->close_();
 	g_close_physics();
 	mutex0.unlock();
 }

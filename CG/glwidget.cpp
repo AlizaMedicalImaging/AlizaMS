@@ -185,7 +185,7 @@ static std::vector<qMeshData*> qmeshes;
 
 //static btAlignedObjectArray<CollisionObject*>  collision_objects;
 
-struct  MyRayResultCallback : public btCollisionWorld::AllHitsRayResultCallback
+struct MyRayResultCallback : public btCollisionWorld::AllHitsRayResultCallback
 {
 	MyRayResultCallback(const btVector3 & rayFrom,const btVector3 & rayTo)
 		: btCollisionWorld::AllHitsRayResultCallback(rayFrom, rayTo) {}
@@ -203,7 +203,7 @@ struct  MyRayResultCallback : public btCollisionWorld::AllHitsRayResultCallback
 	}
 };
 
-struct  MyClosestRayResultCallback0 : public btCollisionWorld::ClosestRayResultCallback
+struct MyClosestRayResultCallback0 : public btCollisionWorld::ClosestRayResultCallback
 {
 	MyClosestRayResultCallback0 (const btVector3 & rayFrom,const btVector3 & rayTo)
 		: btCollisionWorld::ClosestRayResultCallback(rayFrom, rayTo) {}
@@ -843,7 +843,6 @@ void GLWidget::init_()
 
 GLWidget::~GLWidget()
 {
-	selected_images__ = NULL;
 	delete camera;
 }
 
@@ -874,14 +873,22 @@ void GLWidget::close_()
 	shaders.clear();
 	for (unsigned int x = 0; x < qmeshes.size(); x++)
 	{
-		if (qmeshes[x]) delete qmeshes[x];
+		if (qmeshes.at(x))
+		{
+			delete qmeshes[x];
+			qmeshes[x] = NULL;
+		}
 	}
 	qmeshes.clear();
 	for (unsigned int x = 0; x < vboids.size(); x++)
 	{
 		glDeleteBuffers(2, vboids[x]); // size 2
 		increment_count_vbos(-2);
-		delete[] vboids[x];
+		if (vboids.at(x))
+		{
+			delete[] vboids[x];
+			vboids[x] = NULL;
+		}
 	}
 	vboids.clear();
 	for (unsigned int x = 0; x < vaoids.size(); x++)
@@ -2082,7 +2089,7 @@ void GLWidget::paint_raycaster()
 void GLWidget::paint_volume()
 {
 	const int selected_images_size = selected_images__->size();
-	if (selected_images_size <1) return;
+	if (selected_images_size < 1) return;
 	//
 	const float fold_win_pos_x =  2.0f * (((float)old_win_pos_x/(float)win_w) - 0.5f);
 	const float fold_win_pos_y = -2.0f * (((float)old_win_pos_y/(float)win_h) - 0.5f);
