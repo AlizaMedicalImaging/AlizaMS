@@ -80,8 +80,8 @@ ShaderObj::ShaderObj()
 	location_pparams = 0;
 	texture_handle   = new GLuint[TEXTURES_SIZE];
 	location_sampler = new GLuint[TEXTURES_SIZE];
-	for (int x = 0; x < TEXTURES_SIZE; x++) texture_handle[x] = 0;
-	for (int x = 0; x < TEXTURES_SIZE; x++) location_sampler[x] = 0;
+	for (int x = 0; x < TEXTURES_SIZE; ++x) texture_handle[x] = 0;
+	for (int x = 0; x < TEXTURES_SIZE; ++x) location_sampler[x] = 0;
 }
 
 ShaderObj::~ShaderObj()
@@ -101,12 +101,12 @@ qMeshData::qMeshData() : shader(NULL)
 	cast_shadows = new int[MAX_SHADOWS_];
 	textures     = new GLuint[TEXTURES_SIZE];
 	tex_units    = new GLuint[TEXTURES_SIZE];
-	for (int x = 0; x < 12; x++) K[x] = 0;
-	for (int x = 0; x < VBOIDS_SIZE;   x++) vboid[x] = 0;
-	for (int x = 0; x < MAX_SHADOWS_;  x++) get_shadows[x] = 0;
-	for (int x = 0; x < MAX_SHADOWS_;  x++) cast_shadows[x] = 0;
-	for (int x = 0; x < TEXTURES_SIZE; x++) textures[x] = 0;
-	for (int x = 0; x < TEXTURES_SIZE; x++) tex_units[x] = 0;
+	for (int x = 0; x < 12; ++x) K[x] = 0;
+	for (int x = 0; x < VBOIDS_SIZE;   ++x) vboid[x] = 0;
+	for (int x = 0; x < MAX_SHADOWS_;  ++x) get_shadows[x] = 0;
+	for (int x = 0; x < MAX_SHADOWS_;  ++x) cast_shadows[x] = 0;
+	for (int x = 0; x < TEXTURES_SIZE; ++x) textures[x] = 0;
+	for (int x = 0; x < TEXTURES_SIZE; ++x) tex_units[x] = 0;
 }
 
 qMeshData::~qMeshData()
@@ -858,7 +858,7 @@ void GLWidget::close_()
 	if (gradient5>0) {glDeleteTextures(1,&gradient5);gradient5=0;}
 	if (gradient6>0) {glDeleteTextures(1,&gradient6);gradient6=0;}
 	if (gradient7>0) {glDeleteTextures(1,&gradient7);gradient7=0;}
-	for (unsigned int x = 0; x < shaders.size(); x++)
+	for (unsigned int x = 0; x < shaders.size(); ++x)
 	{
 		if (shaders.at(x)->program != 0)
 		{
@@ -871,7 +871,7 @@ void GLWidget::close_()
 		}
 	}
 	shaders.clear();
-	for (unsigned int x = 0; x < qmeshes.size(); x++)
+	for (unsigned int x = 0; x < qmeshes.size(); ++x)
 	{
 		if (qmeshes.at(x))
 		{
@@ -880,7 +880,7 @@ void GLWidget::close_()
 		}
 	}
 	qmeshes.clear();
-	for (unsigned int x = 0; x < vboids.size(); x++)
+	for (unsigned int x = 0; x < vboids.size(); ++x)
 	{
 		glDeleteBuffers(2, vboids[x]); // size 2
 		increment_count_vbos(-2);
@@ -891,7 +891,7 @@ void GLWidget::close_()
 		}
 	}
 	vboids.clear();
-	for (unsigned int x = 0; x < vaoids.size(); x++)
+	for (unsigned int x = 0; x < vaoids.size(); ++x)
 	{
 		glDeleteVertexArrays(1, &(vaoids[x]));
 	}
@@ -904,7 +904,7 @@ void GLWidget::close_()
 	glDeleteVertexArrays(1, &raycast_color_shader_sigm_vao);
 	glDeleteVertexArrays(1, &raycast_shader_bb_sigm_vao);
 	glDeleteVertexArrays(1, &raycast_color_shader_bb_sigm_vao);
-	for (unsigned int x = 0; x < textures.size(); x++)
+	for (unsigned int x = 0; x < textures.size(); ++x)
 	{
 		glDeleteTextures(1, textures[x]);
 	}
@@ -935,8 +935,8 @@ void GLWidget::init_opengl(int w, int h)
 {
 	if (opengl_init_done) return;
 	opengl_init_done = true;
-	for (int i = 0; i < 16; i++) mparams[i] = 0.0f;
-	for (int i = 0; i <  6; i++) sparams[i] = 0.0f;
+	for (int i = 0; i < 16; ++i) mparams[i] = 0.0f;
+	for (int i = 0; i <  6; ++i) sparams[i] = 0.0f;
 	win_w = w;
 	win_h = h;
 	opengl_info.clear();
@@ -1335,7 +1335,7 @@ void GLWidget::init_opengl(int w, int h)
 	//
 	{
 		float * tmp99 = new float[12];
-		for (int x = 0; x < 12; x++) tmp99[x] = 0.0f;
+		for (int x = 0; x < 12; ++x) tmp99[x] = 0.0f;
 		glGenVertexArrays(1, &frames_vao);
 		glBindVertexArray(frames_vao);
 		glGenBuffers(1, &frames_vbo);
@@ -1717,7 +1717,7 @@ void GLWidget::paint__()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	if (skip_draw) return;
 	if (!selected_images__) return;
-	count_frames += 1;
+	++count_frames;
 	switch(view)
 	{
 	case 0:
@@ -2143,7 +2143,7 @@ void GLWidget::paint_volume()
 	ALIGN16(float mvp_aos_ptr[16]);
 	camera->matrix4_to_float(mvp_aos,mvp_aos_ptr);
 	//
-	for (int iii = 0; iii < selected_images_size; iii++)
+	for (int iii = 0; iii < selected_images_size; ++iii)
 	{
 		if (!selected_images__->at(iii)) continue;
 		if (!selected_images__->at(iii)->di->spectroscopy_slices.empty())
@@ -2152,7 +2152,7 @@ void GLWidget::paint_volume()
 			glUseProgram(frame_shader.program);
 			glUniformMatrix4fv(frame_shader.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
 			glPointSize(2.0f);
-			for (unsigned long x = 0; x < di->spectroscopy_slices.size(); x++)
+			for (unsigned long x = 0; x < di->spectroscopy_slices.size(); ++x)
 			{
 				glUniform4f(
 					frame_shader.location_K,
@@ -2183,7 +2183,7 @@ void GLWidget::paint_volume()
 					glDrawArrays(GL_LINE_LOOP, 0, 4);
 				}
 			}
-			count += 1;
+			++count;
 		}
 		//
 		if (!selected_images__->at(iii)->di->trimeshes.empty())
@@ -2227,7 +2227,7 @@ void GLWidget::paint_volume()
 			glPointSize(1.5f);
 			glUseProgram(frame_shader.program);
 			glUniformMatrix4fv(frame_shader.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-			for (int i = 0; i < selected_images__->at(iii)->di->rois.size(); i++)
+			for (int i = 0; i < selected_images__->at(iii)->di->rois.size(); ++i)
 			{
 				if (selected_images__->at(iii)->di->rois.at(i).show)
 				{
@@ -2268,11 +2268,11 @@ void GLWidget::paint_volume()
 					}
 				}
 			}
-			count += 1;
+			++count;
 		}
 	}
 	//
-	for (int iii = 0; iii < selected_images_size; iii++)
+	for (int iii = 0; iii < selected_images_size; ++iii)
 	{
 		if (!selected_images__->at(iii)) continue;
 		if (selected_images__->at(iii)->image_type >= 200) continue;
@@ -2324,12 +2324,12 @@ void GLWidget::paint_volume()
 				1.0f);
 			if (dotv<0)
 			{
-				for (int x = di->from_slice; x <= di->to_slice; x++)
+				for (int x = di->from_slice; x <= di->to_slice; ++x)
 					draw_frame2(di->image_slices.at(x)->fv);
 			}
 			else
 			{
-				for (int x = di->to_slice; x >= di->from_slice; x--)
+				for (int x = di->to_slice; x >= di->from_slice; --x)
 					draw_frame2(di->image_slices.at(x)->fv);
 			}
 			if (di->origin_ok)
@@ -2364,7 +2364,7 @@ void GLWidget::paint_volume()
 						glUniform1i(c3d_shader_bb_clamp_sigm.location_sampler[0], 0);
 						if (dotv<0)
 						{
-							for (int x = di->from_slice; x <= di->to_slice; x++)
+							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
 									&c3d_shader_bb_clamp_sigm_vao,
 									c3d_shader_bb_clamp_sigm_vbo,
@@ -2373,7 +2373,7 @@ void GLWidget::paint_volume()
 						}
 						else
 						{
-							for (int x = di->to_slice; x >= di->from_slice; x--)
+							for (int x = di->to_slice; x >= di->from_slice; --x)
 								draw_3d_tex1(
 									&c3d_shader_bb_clamp_sigm_vao,
 									c3d_shader_bb_clamp_sigm_vbo,
@@ -2389,7 +2389,7 @@ void GLWidget::paint_volume()
 						glUniform1i(c3d_shader_bb_sigm.location_sampler[0], 0);
 						if (dotv<0)
 						{
-							for (int x = di->from_slice; x <= di->to_slice; x++)
+							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
 									&c3d_shader_bb_sigm_vao,
 									c3d_shader_bb_sigm_vbo,
@@ -2398,7 +2398,7 @@ void GLWidget::paint_volume()
 						}
 						else
 						{
-							for (int x = di->to_slice; x >= di->from_slice; x--)
+							for (int x = di->to_slice; x >= di->from_slice; --x)
 								draw_3d_tex1(
 									&c3d_shader_bb_sigm_vao,
 									c3d_shader_bb_sigm_vbo,
@@ -2417,7 +2417,7 @@ void GLWidget::paint_volume()
 						glUniform1i(c3d_shader_bb_clamp.location_sampler[0], 0);
 						if (dotv<0)
 						{
-							for (int x = di->from_slice; x <= di->to_slice; x++)
+							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
 									&c3d_shader_bb_clamp_vao,
 									c3d_shader_bb_clamp_vbo,
@@ -2426,7 +2426,7 @@ void GLWidget::paint_volume()
 						}
 						else
 						{
-							for (int x = di->to_slice; x >= di->from_slice; x--)
+							for (int x = di->to_slice; x >= di->from_slice; --x)
 								draw_3d_tex1(
 									&c3d_shader_bb_clamp_vao,
 									c3d_shader_bb_clamp_vbo,
@@ -2442,7 +2442,7 @@ void GLWidget::paint_volume()
 						glUniform1i(c3d_shader_bb.location_sampler[0], 0);
 						if (dotv<0)
 						{
-							for (int x = di->from_slice; x <= di->to_slice; x++)
+							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
 									&c3d_shader_bb_vao,
 									c3d_shader_bb_vbo,
@@ -2451,7 +2451,7 @@ void GLWidget::paint_volume()
 						}
 						else
 						{
-							for (int x = di->to_slice; x >= di->from_slice; x--)
+							for (int x = di->to_slice; x >= di->from_slice; --x)
 								draw_3d_tex1(
 									&c3d_shader_bb_vao,
 									c3d_shader_bb_vbo,
@@ -2473,7 +2473,7 @@ void GLWidget::paint_volume()
 						glUniform1i(c3d_shader_clamp_sigm.location_sampler[0], 0);
 						if (dotv<0)
 						{
-							for (int x = di->from_slice; x <= di->to_slice; x++)
+							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
 									&c3d_shader_clamp_sigm_vao,
 									c3d_shader_clamp_sigm_vbo,
@@ -2482,7 +2482,7 @@ void GLWidget::paint_volume()
 						}
 						else
 						{
-							for (int x = di->to_slice; x >= di->from_slice; x--)
+							for (int x = di->to_slice; x >= di->from_slice; --x)
 								draw_3d_tex1(
 									&c3d_shader_clamp_sigm_vao,
 									c3d_shader_clamp_sigm_vbo,
@@ -2498,7 +2498,7 @@ void GLWidget::paint_volume()
 						glUniform1i(c3d_shader_sigm.location_sampler[0], 0);
 						if (dotv<0)
 						{
-							for (int x = di->from_slice; x <= di->to_slice; x++)
+							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
 									&c3d_shader_sigm_vao,
 									c3d_shader_sigm_vbo,
@@ -2507,7 +2507,7 @@ void GLWidget::paint_volume()
 						}
 						else
 						{
-							for (int x = di->to_slice; x >= di->from_slice; x--)
+							for (int x = di->to_slice; x >= di->from_slice; --x)
 								draw_3d_tex1(
 									&c3d_shader_sigm_vao,
 									c3d_shader_sigm_vbo,
@@ -2526,7 +2526,7 @@ void GLWidget::paint_volume()
 						glUniform1i(c3d_shader_clamp.location_sampler[0], 0);
 						if (dotv<0)
 						{
-							for (int x = di->from_slice; x <= di->to_slice; x++)
+							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
 									&c3d_shader_clamp_vao,
 									c3d_shader_clamp_vbo,
@@ -2535,7 +2535,7 @@ void GLWidget::paint_volume()
 						}
 						else
 						{
-							for (int x = di->to_slice; x >= di->from_slice; x--)
+							for (int x = di->to_slice; x >= di->from_slice; --x)
 								draw_3d_tex1(
 									&c3d_shader_clamp_vao,
 									c3d_shader_clamp_vbo,
@@ -2551,7 +2551,7 @@ void GLWidget::paint_volume()
 						glUniform1i(c3d_shader.location_sampler[0], 0);
 						if (dotv<0)
 						{
-							for (int x = di->from_slice; x <= di->to_slice; x++)
+							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
 									&c3d_shader_vao,
 									c3d_shader_vbo,
@@ -2560,7 +2560,7 @@ void GLWidget::paint_volume()
 						}
 						else
 						{
-							for (int x = di->to_slice; x >= di->from_slice; x--)
+							for (int x = di->to_slice; x >= di->from_slice; --x)
 								draw_3d_tex1(
 									&c3d_shader_vao,
 									c3d_shader_vbo,
@@ -2598,7 +2598,7 @@ void GLWidget::paint_volume()
 						glUniform1i(c3d_shader_gradient_bb_clamp_sigm.location_sampler[1], 3);
 						if (dotv<0)
 						{
-							for (int x = di->from_slice; x <= di->to_slice; x++)
+							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
 									&c3d_shader_gradient_bb_clamp_sigm_vao,
 									c3d_shader_gradient_bb_clamp_sigm_vbo,
@@ -2607,7 +2607,7 @@ void GLWidget::paint_volume()
 						}
 						else
 						{
-							for (int x = di->to_slice; x >= di->from_slice; x--)
+							for (int x = di->to_slice; x >= di->from_slice; --x)
 								draw_3d_tex1(
 									&c3d_shader_gradient_bb_clamp_sigm_vao,
 									c3d_shader_gradient_bb_clamp_sigm_vbo,
@@ -2624,7 +2624,7 @@ void GLWidget::paint_volume()
 						glUniform1i(c3d_shader_gradient_bb_sigm.location_sampler[1], 3);
 						if (dotv<0)
 						{
-							for (int x = di->from_slice; x <= di->to_slice; x++)
+							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
 									&c3d_shader_gradient_bb_sigm_vao,
 									c3d_shader_gradient_bb_sigm_vbo,
@@ -2633,7 +2633,7 @@ void GLWidget::paint_volume()
 						}
 						else
 						{
-							for (int x = di->to_slice; x >= di->from_slice; x--)
+							for (int x = di->to_slice; x >= di->from_slice; --x)
 								draw_3d_tex1(
 									&c3d_shader_gradient_bb_sigm_vao,
 									c3d_shader_gradient_bb_sigm_vbo,
@@ -2653,7 +2653,7 @@ void GLWidget::paint_volume()
 						glUniform1i(c3d_shader_gradient_bb_clamp.location_sampler[1], 3);
 						if (dotv<0)
 						{
-							for (int x = di->from_slice; x <= di->to_slice; x++)
+							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
 									&c3d_shader_gradient_bb_clamp_vao,
 									c3d_shader_gradient_bb_clamp_vbo,
@@ -2662,7 +2662,7 @@ void GLWidget::paint_volume()
 						}
 						else
 						{
-							for (int x = di->to_slice; x >= di->from_slice; x--)
+							for (int x = di->to_slice; x >= di->from_slice; --x)
 								draw_3d_tex1(
 									&c3d_shader_gradient_bb_clamp_vao,
 									c3d_shader_gradient_bb_clamp_vbo,
@@ -2679,7 +2679,7 @@ void GLWidget::paint_volume()
 						glUniform1i(c3d_shader_gradient_bb.location_sampler[1], 3);
 						if (dotv<0)
 						{
-							for (int x = di->from_slice; x <= di->to_slice; x++)
+							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
 									&c3d_shader_gradient_bb_vao,
 									c3d_shader_gradient_bb_vbo,
@@ -2688,7 +2688,7 @@ void GLWidget::paint_volume()
 						}
 						else
 						{
-							for (int x = di->to_slice; x >= di->from_slice; x--)
+							for (int x = di->to_slice; x >= di->from_slice; --x)
 								draw_3d_tex1(
 									&c3d_shader_gradient_bb_vao,
 									c3d_shader_gradient_bb_vbo,
@@ -2711,7 +2711,7 @@ void GLWidget::paint_volume()
 						glUniform1i(c3d_shader_gradient_clamp_sigm.location_sampler[1], 3);
 						if (dotv<0)
 						{
-							for (int x = di->from_slice; x <= di->to_slice; x++)
+							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
 									&c3d_shader_gradient_clamp_sigm_vao,
 									c3d_shader_gradient_clamp_sigm_vbo,
@@ -2720,7 +2720,7 @@ void GLWidget::paint_volume()
 						}
 						else
 						{
-							for (int x = di->to_slice; x >= di->from_slice; x--)
+							for (int x = di->to_slice; x >= di->from_slice; --x)
 								draw_3d_tex1(
 									&c3d_shader_gradient_clamp_sigm_vao,
 									c3d_shader_gradient_clamp_sigm_vbo,
@@ -2737,7 +2737,7 @@ void GLWidget::paint_volume()
 						glUniform1i(c3d_shader_gradient_sigm.location_sampler[1], 3);
 						if (dotv<0)
 						{
-							for (int x = di->from_slice; x <= di->to_slice; x++)
+							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
 									&c3d_shader_gradient_sigm_vao,
 									c3d_shader_gradient_sigm_vbo,
@@ -2746,7 +2746,7 @@ void GLWidget::paint_volume()
 						}
 						else
 						{
-							for (int x = di->to_slice; x >= di->from_slice; x--)
+							for (int x = di->to_slice; x >= di->from_slice; --x)
 								draw_3d_tex1(
 									&c3d_shader_gradient_sigm_vao,
 									c3d_shader_gradient_sigm_vbo,
@@ -2766,7 +2766,7 @@ void GLWidget::paint_volume()
 						glUniform1i(c3d_shader_gradient_clamp.location_sampler[1], 3);
 						if (dotv<0)
 						{
-							for (int x = di->from_slice; x <= di->to_slice; x++)
+							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
 									&c3d_shader_gradient_clamp_vao,
 									c3d_shader_gradient_clamp_vbo,
@@ -2775,7 +2775,7 @@ void GLWidget::paint_volume()
 						}
 						else
 						{
-							for (int x = di->to_slice; x >= di->from_slice; x--)
+							for (int x = di->to_slice; x >= di->from_slice; --x)
 								draw_3d_tex1(
 									&c3d_shader_gradient_clamp_vao,
 									c3d_shader_gradient_clamp_vbo,
@@ -2792,7 +2792,7 @@ void GLWidget::paint_volume()
 						glUniform1i(c3d_shader_gradient.location_sampler[1], 3);
 						if (dotv<0)
 						{
-							for (int x = di->from_slice; x <= di->to_slice; x++)
+							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
 									&c3d_shader_gradient_vao,
 									c3d_shader_gradient_vbo,
@@ -2801,7 +2801,7 @@ void GLWidget::paint_volume()
 						}
 						else
 						{
-							for (int x = di->to_slice; x >= di->from_slice; x--)
+							for (int x = di->to_slice; x >= di->from_slice; --x)
 								draw_3d_tex1(
 									&c3d_shader_gradient_vao,
 									c3d_shader_gradient_vbo,
@@ -2815,8 +2815,8 @@ void GLWidget::paint_volume()
 		//
 		if (!di->hide_orientation)
 		{
-			count += 1;
-			count_images += 1;
+			++count;
+			++count_images;
 		}
 	}
 	if ((count > 0) && show_cube)
@@ -3217,7 +3217,7 @@ void GLWidget::fit_to_screen(const ImageVariant * ivariant)
 	else if (ivariant->image_type==100)
 	{
 		double max_delta = 0;
-		for (int x = 0; x < ivariant->di->rois.size(); x++)
+		for (int x = 0; x < ivariant->di->rois.size(); ++x)
 		{
 			if (ivariant->di->rois.at(x).max_delta > max_delta)
 				max_delta = ivariant->di->rois.at(x).max_delta;
@@ -3271,7 +3271,7 @@ void GLWidget::generate_vao1(GLuint * vao, GLuint * vbo, GLuint * attr_v, GLuint
 	vbo[1] = 0;
 	GLfloat * v = new GLfloat[12];
 	GLfloat * t = new GLfloat[12];
-	for (int x = 0; x < 12; x++)
+	for (int x = 0; x < 12; ++x)
 	{
 		v[x] = 0.0f;
 		t[x] = 0.0f;
@@ -3304,7 +3304,7 @@ void GLWidget::generate_raycastcube_vao(
 	vbo[1] = 0;
 	GLfloat * v = new GLfloat[54];
 	GLfloat * c = new GLfloat[54];
-	for (int x  = 0; x < 54; x++)
+	for (int x  = 0; x < 54; ++x)
 	{
 		v[x] = 0.0f;
 		c[x] = 0.0f;
@@ -3812,9 +3812,9 @@ void GLWidget::makeModelVBO_ArraysT(
 
 	unsigned int count_buffers = 1;
 
-	if (normals)  count_buffers++;
-	if (textures) count_buffers++;
-	if (tangents) count_buffers++;
+	if (normals)  ++count_buffers;
+	if (textures) ++count_buffers;
+	if (tangents) ++count_buffers;
 
 	glGenVertexArrays(1, vaoid);
 	glBindVertexArray(*vaoid);
@@ -6613,17 +6613,17 @@ void GLWidget::generateAnisoTexture(
 	const bool  use_Ks = true;
 	const float p = 2.0f; // compensation for unusually uniform brightness
 	GLubyte t[h][w][3];
-	for (unsigned int y = 0; y < h; y++)
+	for (unsigned int y = 0; y < h; ++y)
 	{
 		const float LdotT = 2.0f * y / (h - 1.0f) - 1.0f;
 		const float LdotN = sqrt(1.0f - LdotT * LdotT);
-		for (unsigned int x = 0; x < w; x++)
+		for (unsigned int x = 0; x < w; ++x)
 		{
 			const float VdotT = 2.0f * x / (w - 1.0f) - 1.0f;
 			const float VdotN = sqrt(1.0f - VdotT * VdotT);
 			float       VdotR = LdotN * VdotN - LdotT * VdotT;
 			if (VdotR < 0) VdotR = 0;
-			for (unsigned int i = 0; i < 3; i++)
+			for (unsigned int i = 0; i < 3; ++i)
 			{
 				const float c =
 					(use_Ka ? Ka : 0.0f) +

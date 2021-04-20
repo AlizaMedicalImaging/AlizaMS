@@ -62,7 +62,7 @@ void get_bin_values(
 		return;
 	mdcm::Element<TVR, mdcm::VM::VM1_n> e;
 	e.SetFromDataElement(v);
-	for (unsigned long x = 0; x < e.GetLength(); x++)
+	for (unsigned long x = 0; x < e.GetLength(); ++x)
 	{
 		result.push_back(static_cast<T>(e.GetValue(x)));
 	}
@@ -79,7 +79,7 @@ static void get_series_files(
 	{
 		QDir dir(p);
 		const QStringList l = dir.entryList(QDir::Files|QDir::Readable, QDir::Name);
-		for (int x = 0; x < l.size(); x++)
+		for (int x = 0; x < l.size(); ++x)
 		{
 			const QString tmp2 = dir.absolutePath() + QString("/") + l.at(x);
 #ifdef _WIN32
@@ -108,7 +108,7 @@ static void get_series_files(
 		if (tmp0.trimmed().remove(QChar('\0')) == uid.trimmed().remove(QChar('\0')))
 		{
 			std::vector<std::string> f__ = s.GetAllFilenamesFromTagToValue(t, (*it).c_str());
-			for (unsigned int j = 0; j < f__.size(); j++)
+			for (unsigned int j = 0; j < f__.size(); ++j)
 			{
 				const QString tmp1 =
 #ifdef _WIN32
@@ -361,7 +361,7 @@ void SQtree::process_element(
 				if (ce > 0 && tmp_tag == elem.GetTag()) duplicated_ = true;
 				process_element(nds, elem, d, cin, charset, duplicated_);
 				tmp_tag = elem.GetTag();
-				ce++;
+				++ce;
 			}
 		}
 	}
@@ -450,7 +450,7 @@ void SQtree::process_element(
 						std::vector<unsigned short> values;
 						get_bin_values<unsigned short, mdcm::VR::US>(
 							e, values);
-						for (unsigned long j = 0; j < values.size(); j++)
+						for (unsigned long j = 0; j < values.size(); ++j)
 						{
 							str_.append(
 								QVariant(
@@ -463,7 +463,7 @@ void SQtree::process_element(
 						std::vector<signed short> values;
 						get_bin_values<signed short, mdcm::VR::SS>(
 							e, values);
-						for (unsigned long j = 0; j < values.size(); j++)
+						for (unsigned long j = 0; j < values.size(); ++j)
 						{
 							str_.append(
 								QVariant(
@@ -476,7 +476,7 @@ void SQtree::process_element(
 						std::vector<float> values;
 						get_bin_values<float, mdcm::VR::FL>(
 							e, values);
-						for (unsigned long j = 0; j < values.size(); j++)
+						for (unsigned long j = 0; j < values.size(); ++j)
 						{
 							str_.append(
 								QVariant(values[j]).toString() +
@@ -488,7 +488,7 @@ void SQtree::process_element(
 						std::vector<double> values;
 						get_bin_values<double, mdcm::VR::FD>(
 							e, values);
-						for (unsigned long j = 0; j < values.size(); j++)
+						for (unsigned long j = 0; j < values.size(); ++j)
 						{
 							str_.append(
 								QVariant(values[j]).toString() +
@@ -500,7 +500,7 @@ void SQtree::process_element(
 						std::vector<unsigned int> values;
 						get_bin_values<unsigned int, mdcm::VR::UL>(
 							e, values);
-						for (unsigned long j = 0; j < values.size(); j++)
+						for (unsigned long j = 0; j < values.size(); ++j)
 						{
 							str_.append(
 								QVariant(values[j]).toString() +
@@ -512,7 +512,7 @@ void SQtree::process_element(
 						std::vector<signed int> values;
 						get_bin_values<signed int, mdcm::VR::SL>(
 							e, values);
-						for (unsigned long j = 0; j < values.size(); j++)
+						for (unsigned long j = 0; j < values.size(); ++j)
 						{
 							str_.append(
 								QVariant(values[j]).toString() +
@@ -524,7 +524,7 @@ void SQtree::process_element(
 						std::vector<signed long long> values;
 						get_bin_values<signed long long, mdcm::VR::SV>(
 							e, values);
-						for (unsigned long j = 0; j < values.size(); j++)
+						for (unsigned long j = 0; j < values.size(); ++j)
 						{
 							str_.append(
 								QVariant(values[j]).toString() +
@@ -536,7 +536,7 @@ void SQtree::process_element(
 						std::vector<unsigned long long> values;
 						get_bin_values<unsigned long long, mdcm::VR::UV>(
 							e, values);
-						for (unsigned long j = 0; j < values.size(); j++)
+						for (unsigned long j = 0; j < values.size(); ++j)
 						{
 							str_.append(
 								QVariant(values[j]).toString() +
@@ -1019,7 +1019,7 @@ void SQtree::read_file(const QString & f)
 			process_element(
 				ds, elem, dicts, i, charset.toLatin1().constData(), duplicated);
 			tmp_tag = elem.GetTag();
-			ce++;
+			++ce;
 		}
 	}
 	catch(mdcm::ParseException & pe)
@@ -1134,9 +1134,9 @@ void SQtree::expand_children(const QModelIndex & index)
 	const QAbstractItemModel * m = index.model();
 	if (m)
 	{
-		for (int i = 0; i < index.model()->rowCount(index); i++)
+		for (int i = 0; i < index.model()->rowCount(index); ++i)
 		{
-			expanded_items++;
+			++expanded_items;
 			if (expanded_items > 65000) break;
 			expand_children(m->index(i, 0, index));
 		}
@@ -1144,9 +1144,9 @@ void SQtree::expand_children(const QModelIndex & index)
 	if (!treeWidget->isExpanded(index))
 		treeWidget->expand(index);
 #else
-	for (int i = 0; i < index.model()->rowCount(index); i++)
+	for (int i = 0; i < index.model()->rowCount(index); ++i)
 	{
-		expanded_items++;
+		++expanded_items;
 		if (expanded_items > 65000) break;
 	    expand_children(index.child(i, 0));
 	}
@@ -1164,7 +1164,7 @@ void SQtree::collapse_children(const QModelIndex & index)
 	const QAbstractItemModel * m = index.model();
 	if (m)
 	{
-		for (int i = 0; i < index.model()->rowCount(index); i++)
+		for (int i = 0; i < index.model()->rowCount(index); ++i)
 		{
 			collapse_children(m->index(i, 0, index));
 		}
@@ -1172,7 +1172,7 @@ void SQtree::collapse_children(const QModelIndex & index)
 #else
 	if (treeWidget->isExpanded(index))
 		treeWidget->collapse(index);
-	for (int i = 0; i < index.model()->rowCount(index); i++)
+	for (int i = 0; i < index.model()->rowCount(index); ++i)
 	{
 	    collapse_children(index.child(i, 0));
 	}
@@ -1191,7 +1191,7 @@ void SQtree::dropEvent(QDropEvent * e)
 	if (mimeData && mimeData->hasUrls())
 	{
 		urls = mimeData->urls();
-		for (int i = 0; i < urls.size(); i++)
+		for (int i = 0; i < urls.size(); ++i)
 			l.push_back(urls.at(i).toLocalFile());
 		if (!l.empty())
 		{
@@ -1374,7 +1374,7 @@ void SQtree::open_file_and_series()
 	const int files_size = files.size();
 	if (files_size > 1)
 	{
-		for (int x = 0; x < files_size; x++)
+		for (int x = 0; x < files_size; ++x)
 		{
 			QFileInfo fi0(files.at(x));
 			if (fi0.absoluteFilePath() == f)

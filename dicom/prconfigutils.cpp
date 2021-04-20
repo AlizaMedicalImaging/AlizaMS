@@ -78,7 +78,7 @@ template<typename T> void set_darea(
 	const typename T::SizeType s =
 		image->GetLargestPossibleRegion().GetSize();
 	const int dimz = s[2];
-	for (int x = 0; x < dimz; x++)
+	for (int x = 0; x < dimz; ++x)
 	{
 		PRDisplayArea a;
 		a.top_left_x     = areaTLx;
@@ -278,7 +278,7 @@ static void rotate_flip_points(
 	bool tmp0 = false;
 	bool tmp1 = false;
 	bool tmp2 = false;
-	for (int z = 0; z < dz; z++)
+	for (int z = 0; z < dz; ++z)
 	{
 		int ax = 0;
 		int ay = 0;
@@ -360,7 +360,7 @@ static void rotate_flip_points(
 				const int j =
 					ivariant->pr_text_annotations
 						.value(idx0).size();
-				for (int k = 0; k < j; k++)
+				for (int k = 0; k < j; ++k)
 				{
 					if (ivariant->pr_text_annotations
 						.value(idx0)
@@ -496,7 +496,7 @@ static void rotate_flip_points(
 				const int j =
 					ivariant->pr_graphicobjects
 						.value(idx1).size();
-				for (int k = 0; k < j; k++)
+				for (int k = 0; k < j; ++k)
 				{
 					if ((ivariant->pr_graphicobjects
 							.value(idx1)
@@ -744,7 +744,7 @@ static void rotate_flip_points(
 			if (idx0 >= -1)
 			{
 				const int j = ivariant->pr_text_annotations.value(idx0).size();
-				for (int k = 0; k < j; k++)
+				for (int k = 0; k < j; ++k)
 				{
 					if (ivariant->pr_text_annotations
 						.value(idx0)
@@ -811,7 +811,7 @@ static void rotate_flip_points(
 			if (idx1 >= -1)
 			{
 				const int j = ivariant->pr_graphicobjects.value(idx1).size();
-				for (int k = 0; k < j; k++)
+				for (int k = 0; k < j; ++k)
 				{
 					if ((ivariant->pr_graphicobjects
 							.value(idx1)
@@ -985,7 +985,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 	typedef itk::ImageLinearIteratorWithIndex<T2d> LinearIterator;
 	typedef itk::ImageDuplicator<T2d> DuplicatorType;
 	const int dz = (int)image->GetLargestPossibleRegion().GetSize()[2];
-	for (int z = 0; z < dz; z++)
+	for (int z = 0; z < dz; ++z)
 	{
 		typename T2d::Pointer tmp0;
 		typename T2d::Pointer tmp1;
@@ -1237,11 +1237,11 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 										i[1] = y__;
 										it.Set(tmp2->GetPixel(i));
 									}
-									x__++;
+									++x__;
 									++it;
 								}
 								x__ = 0;
-								y__++;
+								++y__;
 								it.NextLine();
 							}
 						}
@@ -1299,7 +1299,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 						}
 					}
 					it2.NextSlice();
-					j++;
+					++j;
 				}
 			}
 			catch(itk::ExceptionObject & ex)
@@ -1410,7 +1410,7 @@ template<typename T, typename T2d> QString levels_slice_by_slice(
 			}
 			else
 			{
-				for (int x = 0; x < frames_tmp1.size(); x++)
+				for (int x = 0; x < frames_tmp1.size(); ++x)
 				{
 					bool tmp99 = false;
 					const int tmp98 = QVariant(
@@ -1431,7 +1431,7 @@ template<typename T, typename T2d> QString levels_slice_by_slice(
 					<< std::endl;
 				continue;
 			}
-			for (int x = 0; x < idxs.size(); x++)
+			for (int x = 0; x < idxs.size(); ++x)
 			{
 				const QString uid_ =
 					(slices_uids.contains(idxs.at(x)))
@@ -1559,7 +1559,7 @@ template<typename T, typename T2d> QString levels_slice_by_slice(
 									}
 								}
 								it2.NextSlice();
-								j++;
+								++j;
 							}
 						}
 						catch(itk::ExceptionObject & ex)
@@ -1629,7 +1629,7 @@ static void areas_slice_by_slice(
 			}
 			else
 			{
-				for (int x = 0; x < frames_tmp1.size(); x++)
+				for (int x = 0; x < frames_tmp1.size(); ++x)
 				{
 					bool tmp99 = false;
 					const int tmp98 = QVariant(
@@ -1650,7 +1650,7 @@ static void areas_slice_by_slice(
 					<< std::endl;
 				continue;
 			}
-			for (int x = 0; x < idxs.size(); x++)
+			for (int x = 0; x < idxs.size(); ++x)
 			{
 				const QString uid_ =
 					(slices_uids.contains(idxs.at(x)))
@@ -1763,7 +1763,7 @@ static void text_slice_by_slice(
 			}
 			else
 			{
-				for (int x = 0; x < frames_tmp1.size(); x++)
+				for (int x = 0; x < frames_tmp1.size(); ++x)
 				{
 					bool tmp99 = false;
 					const int tmp98 = QVariant(
@@ -1784,7 +1784,7 @@ static void text_slice_by_slice(
 					<< std::endl;
 				continue;
 			}
-			for (int x = 0; x < idxs.size(); x++)
+			for (int x = 0; x < idxs.size(); ++x)
 			{
 				const QString uid_ =
 					(slices_uids.contains(idxs.at(x)))
@@ -1905,7 +1905,7 @@ static void graphic_slice_by_slice(
 			}
 			else
 			{
-				for (int x = 0; x < frames_tmp1.size(); x++)
+				for (int x = 0; x < frames_tmp1.size(); ++x)
 				{
 					bool tmp99 = false;
 					const int tmp98 = QVariant(
@@ -1926,7 +1926,7 @@ static void graphic_slice_by_slice(
 					<< std::endl;
 				continue;
 			}
-			for (int x = 0; x < idxs.size(); x++)
+			for (int x = 0; x < idxs.size(); ++x)
 			{
 				const QString uid_ =
 					(slices_uids.contains(idxs.at(x)))
@@ -1944,7 +1944,7 @@ static void graphic_slice_by_slice(
 					a.GraphicData.clear();
 					const QList<QVariant> & l465 =
 						gdata.value(k).toList();
-					for (int z = 0; z < l465.size(); z++)
+					for (int z = 0; z < l465.size(); ++z)
 					{
 						a.GraphicData.push_back(
 							static_cast<float>(l465.at(z).toDouble()));
@@ -2040,7 +2040,7 @@ void PrConfigUtils::read_voi_lut(
 		if (!sq) return;
 		const unsigned int number_of_items =
 			sq->GetNumberOfItems();
-		for (unsigned int x = 0; x < number_of_items; x++)
+		for (unsigned int x = 0; x < number_of_items; ++x)
 		{
 			const mdcm::Item & item = sq->GetItem(x+1);
 			const mdcm::DataSet & nestedds =
@@ -2077,7 +2077,7 @@ void PrConfigUtils::read_voi_lut(
 					if (!sq1) continue;
 					const unsigned int number_of_items1 =
 						sq1->GetNumberOfItems();
-					for (unsigned int x1 = 0; x1 < number_of_items1; x1++)
+					for (unsigned int x1 = 0; x1 < number_of_items1; ++x1)
 					{
 						const mdcm::Item & item1 = sq1->GetItem(x1+1);
 						const mdcm::DataSet & nestedds1 =
@@ -2147,7 +2147,7 @@ void PrConfigUtils::read_display_areas(
 		if (!sq) return;
 		const unsigned int number_of_items =
 			sq->GetNumberOfItems();
-		for (unsigned int x = 0; x < number_of_items; x++)
+		for (unsigned int x = 0; x < number_of_items; ++x)
 		{
 			PrConfig c;
 			c.id = 4;
@@ -2271,7 +2271,7 @@ void PrConfigUtils::read_display_areas(
 				if (!sq1) continue;
 				const unsigned int number_of_items1 =
 					sq1->GetNumberOfItems();
-				for (unsigned int x1 = 0; x1 < number_of_items1; x1++)
+				for (unsigned int x1 = 0; x1 < number_of_items1; ++x1)
 				{
 					const mdcm::Item & item1 = sq1->GetItem(x1+1);
 					const mdcm::DataSet & nestedds1 =
@@ -2395,7 +2395,7 @@ static void read_overlays(
 	get_overlays(ds, l);
 	const unsigned int s = l.size();
 	if (s < 1) return;
-	for (unsigned int i = 0; i < s; i++)
+	for (unsigned int i = 0; i < s; ++i)
 	{
 		mdcm::Overlay o;
 		mdcm::Tag t(0x6000,0x0000);
@@ -2416,7 +2416,7 @@ static void read_overlays(
 	}
 	if (overlays.empty()) return;
 	QMultiMap<int, SliceOverlay> slice_overlays;
-	for (unsigned int i = 0; i < overlays.size(); i++)
+	for (unsigned int i = 0; i < overlays.size(); ++i)
 	{
 		mdcm::Overlay & o = overlays[i];
 		const unsigned int NumberOfFrames =
@@ -2444,7 +2444,7 @@ static void read_overlays(
 				continue;
 			}
 			int idx = FrameOrigin - 1;
-			for (unsigned int y = 0; y < NumberOfFrames; y++)
+			for (unsigned int y = 0; y < NumberOfFrames; ++y)
 			{
 				SliceOverlay overlay;
 				overlay.dimx = o_dimx;
@@ -2453,7 +2453,7 @@ static void read_overlays(
 				overlay.y    = o_y;
 				const size_t p = idx*o_dimx*o_dimy;
 				idx++;
-				for (size_t j = 0; j < fbuffer_size; j++)
+				for (size_t j = 0; j < fbuffer_size; ++j)
 				{
 					const size_t jj = p + j;
 					if (jj < obuffer_size)
@@ -2499,7 +2499,7 @@ static void read_overlays(
 				delete [] tmp0;
 				continue;
 			}
-			for (size_t j = 0; j < obuffer_size; j++)
+			for (size_t j = 0; j < obuffer_size; ++j)
 			{
 				overlay.data.push_back(tmp0[j]);
 			}
@@ -2508,7 +2508,7 @@ static void read_overlays(
 		}
 	}
 	const QList<int> keys = slice_overlays.keys();
-	for (int x = 0; x < keys.size(); x++)
+	for (int x = 0; x < keys.size(); ++x)
 	{
 		const int idx = keys.at(x);
 		SliceOverlays l2 = slice_overlays.values(idx);
@@ -2518,7 +2518,7 @@ static void read_overlays(
 		}
 		else
 		{
-			for (int j = 0; j < l2.size(); j++)
+			for (int j = 0; j < l2.size(); ++j)
 			{
 				ref.image_overlays.all_overlays[idx]
 					.push_back(l2[j]);
@@ -2592,7 +2592,7 @@ void PrConfigUtils::read_graphic_objects(
 		if (!sq) return;
 		const unsigned int number_of_items =
 			sq->GetNumberOfItems();
-		for (unsigned int x = 0; x < number_of_items; x++)
+		for (unsigned int x = 0; x < number_of_items; ++x)
 		{
 			const mdcm::Item & item = sq->GetItem(x+1);
 			const mdcm::DataSet & nestedds =
@@ -2607,7 +2607,7 @@ void PrConfigUtils::read_graphic_objects(
 				if (!sq1) continue;
 				const unsigned int number_of_items1 =
 					sq1->GetNumberOfItems();
-				for (unsigned int x1 = 0; x1 < number_of_items1; x1++)
+				for (unsigned int x1 = 0; x1 < number_of_items1; ++x1)
 				{
 					const mdcm::Item & item1 = sq1->GetItem(x1+1);
 					const mdcm::DataSet & nestedds1 =
@@ -2632,7 +2632,7 @@ void PrConfigUtils::read_graphic_objects(
 				if (!sq2) continue;
 				const unsigned int number_of_items2 =
 					sq2->GetNumberOfItems();
-				for (unsigned int x2 = 0; x2 < number_of_items2; x2++)
+				for (unsigned int x2 = 0; x2 < number_of_items2; ++x2)
 				{
 					PrConfig c;
 					c.id = 6;
@@ -2682,7 +2682,7 @@ void PrConfigUtils::read_graphic_objects(
 						QList<QVariant> q;
 						for (unsigned int x3 = 0;
 							x3 < GraphicData.size();
-							 x3++)
+							++x3)
 						{
 							q.push_back(QVariant(
 								(double)GraphicData.at(x3)));
@@ -2707,7 +2707,7 @@ void PrConfigUtils::read_graphic_objects(
 						c.values.push_back(QVariant(QString(""))); // 3
 					}
 					//
-					for (int y = 0; y < ref_sop.size(); y++)
+					for (int y = 0; y < ref_sop.size(); ++y)
 					{
 						c.values.push_back(ref_sop.at(y)); // 4+
 					}
@@ -2771,7 +2771,7 @@ void PrConfigUtils::read_text_annotations(
 		if (!sq) return;
 		const unsigned int number_of_items =
 			sq->GetNumberOfItems();
-		for (unsigned int x = 0; x < number_of_items; x++)
+		for (unsigned int x = 0; x < number_of_items; ++x)
 		{
 			const mdcm::Item & item = sq->GetItem(x+1);
 			const mdcm::DataSet & nestedds =
@@ -2786,7 +2786,7 @@ void PrConfigUtils::read_text_annotations(
 				if (!sq1) continue;
 				const unsigned int number_of_items1 =
 					sq1->GetNumberOfItems();
-				for (unsigned int x1 = 0; x1 < number_of_items1; x1++)
+				for (unsigned int x1 = 0; x1 < number_of_items1; ++x1)
 				{
 					const mdcm::Item & item1 = sq1->GetItem(x1+1);
 					const mdcm::DataSet & nestedds1 =
@@ -2811,7 +2811,7 @@ void PrConfigUtils::read_text_annotations(
 				if (!sq2) continue;
 				const unsigned int number_of_items2 =
 					sq2->GetNumberOfItems();
-				for (unsigned int x2 = 0; x2 < number_of_items2; x2++)
+				for (unsigned int x2 = 0; x2 < number_of_items2; ++x2)
 				{
 					PrConfig c;
 					c.id = 5;
@@ -3210,7 +3210,7 @@ void PrConfigUtils::read_text_annotations(
 						c.values.push_back(QVariant()); // 25
 						c.values.push_back(QVariant()); // 26
 					}
-					for (int y = 0; y < ref_sop.size(); y++)
+					for (int y = 0; y < ref_sop.size(); ++y)
 					{
 						c.values.push_back(ref_sop.at(y)); // 27+
 					}
@@ -3325,7 +3325,7 @@ void PrConfigUtils::read_display_shutter(
 		QList<QVariant> l;
 		for (unsigned int x = 0;
 			x < VerticesofthePolygonalShutter.size();
-			x++)
+			++x)
 		{
 			l.push_back(QVariant(
 				(int)VerticesofthePolygonalShutter.at(x)));
@@ -3357,7 +3357,7 @@ void PrConfigUtils::read_display_shutter(
 		(ShutterPresentationColorCIELabValue.size()==3))
 	{
 		QList<QVariant> l;
-		for (unsigned int x = 0; x < 3; x++)
+		for (unsigned int x = 0; x < 3; ++x)
 		{
 			l.push_back(QVariant(
 				(int)ShutterPresentationColorCIELabValue.at(x)));
@@ -3396,12 +3396,12 @@ void PrConfigUtils::read_pr(
 //
 #if 0
 	std::cout << "-------" << std::endl;
-	for (int x = 0; x < ref.prconfig.size(); x++)
+	for (int x = 0; x < ref.prconfig.size(); ++x)
 	{
 		std::cout << ref.prconfig.at(x).desc.toStdString();
 #if 0
 		std::cout << ": ";
-		for (int z = 0; z < ref.prconfig.at(x).values.size(); z++)
+		for (int z = 0; z < ref.prconfig.at(x).values.size(); ++z)
 		{
 			std::cout
 				<< ref.prconfig.at(x).values.at(z)
@@ -3444,7 +3444,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 	// Modality LUT
 	//
 	{
-		for (int x = 0; x < l.size(); x++)
+		for (int x = 0; x < l.size(); ++x)
 		{
 			QApplication::processEvents();
 			if (l.at(x).id == 1 && l.at(x).values.size() >= 2)
@@ -3510,7 +3510,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		QMap<int, double>      window_widths;
 		QMap<int, QString>     lut_functions;
 		int voi_luts = 0;
-		for (int x = 0; x < l.size(); x++)
+		for (int x = 0; x < l.size(); ++x)
 		{
 			const int values_size = l.at(x).values.size();
 			if (l.at(x).id == 2 &&  values_size >= 3)
@@ -3521,11 +3521,11 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				if (values_size >= 4)
 				{
 					QStringList sl;
-					for (int z = 3; z < values_size; z++)
+					for (int z = 3; z < values_size; ++z)
 						sl.push_back(l.at(x).values.at(z).toString());
 					if (sl.size() > 0) voi_lut_images[voi_luts] = sl;
 				}
-				voi_luts++;
+				++voi_luts;
 			}
 		}
 		QApplication::processEvents();
@@ -3616,7 +3616,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		QMap<int, double>      pixel_spacings1;
 		QMap<int, QString>     size_modes;
 		int areas = 0;
-		for (int x = 0; x < l.size(); x++)
+		for (int x = 0; x < l.size(); ++x)
 		{
 			const int values_size = l.at(x).values.size();
 			if (l.at(x).id == 4 && values_size >= 11)
@@ -3633,11 +3633,11 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				if (values_size >= 12)
 				{
 					QStringList sl;
-					for (int z = 11; z < values_size; z++)
+					for (int z = 11; z < values_size; ++z)
 						sl.push_back(l.at(x).values.at(z).toString());
 					if (sl.size() > 0) area_images[areas] = sl;
 				}
-				areas++;
+				++areas;
 			}
 		}
 		if (areas > 0)
@@ -3855,7 +3855,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 	//
 	{
 		QApplication::processEvents();
-		for (int x = 0; x < l.size(); x++)
+		for (int x = 0; x < l.size(); ++x)
 		{
 			if (l.at(x).id == 3 && l.at(x).values.size() == 2)
 			{
@@ -3964,7 +3964,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		QMap<int, int>     ShadowColorCIELabValue_a;
 		QMap<int, int>     ShadowColorCIELabValue_b;
 		int texts = 0;
-		for (int x = 0; x < l.size(); x++)
+		for (int x = 0; x < l.size(); ++x)
 		{
 			const int values_size = l.at(x).values.size();
 			if (l.at(x).id == 5 && values_size >= 26)
@@ -4035,13 +4035,13 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				if (values_size >= 28)
 				{
 					QStringList sl;
-					for (int z = 27; z < values_size; z++)
+					for (int z = 27; z < values_size; ++z)
 					{
 						sl.push_back(l.at(x).values.at(z).toString());
 					}
 					if (!sl.empty()) text_images[texts] = sl;
 				}
-				texts++;
+				++texts;
 			}
 		}
 		if (texts > 0)
@@ -4049,7 +4049,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 			if (text_images.empty())
 			{
 				QList<PRTextAnnotation> tas;
-				for (int y = 0; y < texts; y++)
+				for (int y = 0; y < texts; ++y)
 				{
 					PRTextAnnotation a;
 					a.has_bb = (has_bb.value(y) == 1) ? true : false;
@@ -4141,7 +4141,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				while (it8 != v->pr_text_annotations.end())
 				{
 					const QList< PRTextAnnotation > & lll = it8.value();
-					for (int y = 0; y < lll.size(); y++)
+					for (int y = 0; y < lll.size(); ++y)
 					{
 						std::cout << it8.key() << " "
 							<< lll.at(y).UnformattedTextValue.toStdString()
@@ -4198,7 +4198,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		////std::vector<unsigned char> FillPattern;
 
 		int graphics = 0;
-		for (int x = 0; x < l.size(); x++)
+		for (int x = 0; x < l.size(); ++x)
 		{
 			const int values_size = l.at(x).values.size();
 			if (l.at(x).id == 6 && values_size >= 4)
@@ -4210,13 +4210,13 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				if (values_size >= 5)
 				{
 					QStringList sl;
-					for (int z = 4; z < values_size; z++)
+					for (int z = 4; z < values_size; ++z)
 					{
 						sl.push_back(l.at(x).values.at(z).toString());
 					}
 					if (!sl.empty()) graphic_images[graphics] = sl;
 				}
-				graphics++;
+				++graphics;
 			}
 		}
 		if (graphics > 0)
@@ -4224,7 +4224,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 			if (graphic_images.empty())
 			{
 				QList<PRGraphicObject> gs;
-				for (int y = 0; y < graphics; y++)
+				for (int y = 0; y < graphics; ++y)
 				{
 					PRGraphicObject a;
 					a.GraphicType = GraphicType.value(y);
@@ -4233,7 +4233,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 					a.GraphicData.clear();
 					const QList<QVariant> & l465 =
 						gdata.value(y).toList();
-					for (int z = 0; z < l465.size(); z++)
+					for (int z = 0; z < l465.size(); ++z)
 					{
 						a.GraphicData.push_back(
 							static_cast<float>(l465.at(z).toDouble()));
@@ -4262,7 +4262,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				while (it8 != v->pr_graphicobjects.end())
 				{
 					const QList< PRGraphicObject > & lll = it8.value();
-					for (int y = 0; y < lll.size(); y++)
+					for (int y = 0; y < lll.size(); ++y)
 					{
 						std::cout << it8.key() << " "
 							<< lll.at(y).GraphicType.toStdString()
@@ -4279,7 +4279,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 	//
 	{
 		QApplication::processEvents();
-		for (int x = 0; x < l.size(); x++)
+		for (int x = 0; x < l.size(); ++x)
 		{
 			const int values_size = l.at(x).values.size();
 			if (l.at(x).id == 7 && values_size == 11)
@@ -4297,7 +4297,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 					const QList<QVariant> & q = l.at(x).values.at(8).toList();
 					if (!q.empty() && (q.size()%2 == 0))
 					{
-						for (int j = 0; j < q.size(); j++)
+						for (int j = 0; j < q.size(); ++j)
 						{
 							a.VerticesofthePolygonalShutter.push_back(
 								q.at(j).toInt());
@@ -4358,7 +4358,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 			const int key = it3.key();
 			const SliceOverlays & overlays = it3.value();
 			++it3;
-			for (int x = 0; x < overlays.size(); x++)
+			for (int x = 0; x < overlays.size(); ++x)
 			{
 				SliceOverlay o = overlays.at(x);
 				if (!v->image_overlays.all_overlays.contains(key))

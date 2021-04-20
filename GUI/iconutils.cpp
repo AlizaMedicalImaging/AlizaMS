@@ -108,7 +108,7 @@ template<typename Tin, typename Tout> void extract_icon(
 	if (tmp99==0)
 	{
 		int j=0;
-		for (int i=0; i<num_threads; i++)
+		for (int i=0; i<num_threads; ++i)
 		{
 			const int size_0 = size_x;
 			const int size_1 = size_y/num_threads;
@@ -132,7 +132,7 @@ template<typename Tin, typename Tout> void extract_icon(
 		const int incr = (int)floor(size_y/(double)block);
 		if (size_y > block)
 		{
-			for (int i=0; i<incr; i++)
+			for (int i=0; i<incr; ++i)
 			{
 				const int size_0  = size_x;
 				const int index_0 = 0;
@@ -172,13 +172,13 @@ template<typename Tin, typename Tout> void extract_icon(
 #else
 		usleep(2000);
 #endif
-		for (int i=0; i < threads_size; i++)
+		for (int i=0; i < threads_size; ++i)
 		{
-			if (icon_threads.at(i)->isFinished()) { b__++; }
+			if (icon_threads.at(i)->isFinished()) { ++b__; }
 		}
 		if (b__==threads_size) break;
 	}
-	for (int i=0; i < threads_size; i++) delete icon_threads[i];
+	for (int i=0; i < threads_size; ++i) delete icon_threads[i];
 	icon_threads.clear();
 	//
 	QImage tmpi(p,size_x,size_y,3*size_x,QImage::Format_RGB888);
@@ -991,7 +991,7 @@ void IconUtils::icon(ImageVariant * ivariant)
 
 void IconUtils::kill_threads()
 {
-	for (unsigned int i=0; i<icon_threads.size(); i++)
+	for (unsigned int i=0; i<icon_threads.size(); ++i)
 	{
 		if (icon_threads.at(i))
 		{

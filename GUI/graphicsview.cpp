@@ -289,7 +289,7 @@ void GraphicsView::zoom_out()
 void GraphicsView::clear_paths()
 {
 	if (paths.empty()) return;
-	for (int i = 0; i < paths.size(); i++)
+	for (int i = 0; i < paths.size(); ++i)
 	{
 		if (paths.at(i))
 		{
@@ -305,7 +305,7 @@ void GraphicsView::clear_paths()
 void GraphicsView::clear_collision_paths()
 {
 	if (collision_paths.empty()) return;
-	for (int i = 0; i < collision_paths.size(); i++)
+	for (int i = 0; i < collision_paths.size(); ++i)
 	{
 		if (collision_paths.at(i))
 		{
@@ -321,7 +321,7 @@ void GraphicsView::clear_collision_paths()
 void GraphicsView::clear_us_regions()
 {
 	if (us_regions.empty()) return;
-	for (int i = 0; i < us_regions.size(); i++)
+	for (int i = 0; i < us_regions.size(); ++i)
 	{
 		if (us_regions.at(i))
 		{
@@ -338,7 +338,7 @@ void GraphicsView::clear_prtexts_items()
 {
 	if (!prtexts.empty())
 	{
-		for (int i = 0; i < prtexts.size(); i++)
+		for (int i = 0; i < prtexts.size(); ++i)
 		{
 			if (prtexts.at(i))
 			{
@@ -352,7 +352,7 @@ void GraphicsView::clear_prtexts_items()
 	}
 	if (!prtextanchors.empty())
 	{
-		for (int i = 0; i < prtextanchors.size(); i++)
+		for (int i = 0; i < prtextanchors.size(); ++i)
 		{
 			if (prtextanchors.at(i))
 			{
@@ -370,7 +370,7 @@ void GraphicsView::clear_prgraphicobjects_items()
 {
 	if (!prpoints.empty())
 	{
-		for (int i = 0; i < prpoints.size(); i++)
+		for (int i = 0; i < prpoints.size(); ++i)
 		{
 			if (prpoints.at(i))
 			{
@@ -384,7 +384,7 @@ void GraphicsView::clear_prgraphicobjects_items()
 	}
 	if (!prpolylines.empty())
 	{
-		for (int i = 0; i < prpolylines.size(); i++)
+		for (int i = 0; i < prpolylines.size(); ++i)
 		{
 			if (prpolylines.at(i))
 			{
@@ -398,7 +398,7 @@ void GraphicsView::clear_prgraphicobjects_items()
 	}
 	if (!printerpolated.empty())
 	{
-		for (int i = 0; i < printerpolated.size(); i++)
+		for (int i = 0; i < printerpolated.size(); ++i)
 		{
 			if (printerpolated.at(i))
 			{
@@ -412,7 +412,7 @@ void GraphicsView::clear_prgraphicobjects_items()
 	}
 	if (!prcircles.empty())
 	{
-		for (int i = 0; i < prcircles.size(); i++)
+		for (int i = 0; i < prcircles.size(); ++i)
 		{
 			if (prcircles.at(i))
 			{
@@ -426,7 +426,7 @@ void GraphicsView::clear_prgraphicobjects_items()
 	}
 	if (!prellipses.empty())
 	{
-		for (int i = 0; i < prellipses.size(); i++)
+		for (int i = 0; i < prellipses.size(); ++i)
 		{
 			if (prellipses.at(i))
 			{
@@ -443,7 +443,7 @@ void GraphicsView::clear_prgraphicobjects_items()
 void GraphicsView::clear_shutters()
 {
 	if (display_shutters.empty()) return;
-	for (int i = 0; i < display_shutters.size(); i++)
+	for (int i = 0; i < display_shutters.size(); ++i)
 	{
 		if (display_shutters.at(i))
 		{
@@ -788,7 +788,7 @@ void GraphicsView::draw_us_regions()
 	if (!parent->image_container.image3D) return;
 	for (int x = 0;
 		x < parent->image_container.image3D->usregions.size();
-		x++)
+		++x)
 	{
 		const UltrasoundRegionData & r =
 			parent->image_container.image3D->usregions.at(x);
@@ -1091,7 +1091,7 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 	}
 	const QList<PRTextAnnotation> & l =
 		ivariant->pr_text_annotations.value(idx);
-	for (int x = 0; x < l.size(); x++)
+	for (int x = 0; x < l.size(); ++x)
 	{
 		QGraphicsTextItem * i = new QGraphicsTextItem();
 #if 1
@@ -1459,7 +1459,7 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 	}
 	const QList<PRGraphicObject> & l =
 		ivariant->pr_graphicobjects.value(idx);
-	for (int x = 0; x < l.size(); x++)
+	for (int x = 0; x < l.size(); ++x)
 	{
 		if (!(l.at(x).GraphicData.size() > 1 &&
 				(l.at(x).GraphicData.size()%2 == 0)))
@@ -2007,7 +2007,7 @@ void GraphicsView::draw_shutter(const ImageVariant * ivariant)
 			a.ShutterShape.split(
 				QString("\\"), QString::SkipEmptyParts);
 #endif
-	for (int x = 0; x < l.size(); x++)
+	for (int x = 0; x < l.size(); ++x)
 	{
 		if (l.at(x).trimmed() == QString("RECTANGULAR"))
 		{

@@ -12,7 +12,7 @@ public:
 	~ContourUtils();
 	static float distance_to_plane(
 		float, float, float, float, float, float, float, float, float);
-	static long get_next_contour_tmpid();
+	static long long get_next_contour_tmpid();
 	static void calculate_rois_center(ImageVariant*);
 	static int  get_new_roi_id(const ImageVariant*);
 	static void generate_roi_vbos(GLWidget*, ROI&, bool);

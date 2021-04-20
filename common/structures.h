@@ -438,7 +438,7 @@ typedef struct
 {
 	unsigned int id;
 	int  instance_number;
-	long slice_position;
+	long long slice_position;
 } SliceInstance;
 
 class PrConfig

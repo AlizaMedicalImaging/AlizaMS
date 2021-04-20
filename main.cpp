@@ -341,7 +341,10 @@ int main(int argc, char *argv[])
 					const size_t aa_size = aa_.size();
 					if (aa_size > 1)
 					{
-						for (size_t y = 1; y < aa_size; y++) aa.push_back(aa_.at(y));
+						for (size_t y = 1; y < aa_size; ++y)
+						{
+							aa.push_back(aa_.at(y));
+						}
 					}
 #if QT_VERSION < QT_VERSION_CHECK(4,8,1)
 					app.quit();
@@ -432,7 +435,7 @@ int main(int argc, char *argv[])
 		if (argc > 1)
 		{
 			QStringList l;
-			for (int x = 1; x < argc; x++)
+			for (int x = 1; x < argc; ++x)
 				l.push_back(QString::fromLocal8Bit(argv[x]));
 			mainWin.open_args(l);
 		}
@@ -445,7 +448,7 @@ int main(int argc, char *argv[])
 		QTimer::singleShot(500, splash, SLOT(close()));
 #endif
 		QStringList l;
-		for (int x = 1; x < argc; x++)
+		for (int x = 1; x < argc; ++x)
 		{
 			const QString f = QString::fromLocal8Bit(argv[x]);
 			if (
@@ -456,7 +459,7 @@ int main(int argc, char *argv[])
 		}
 		if (!l.empty())
 		{
-			for (int x = 0; x < l.size(); x++)
+			for (int x = 0; x < l.size(); ++x)
 			{
 				if (x == 256)
 				{

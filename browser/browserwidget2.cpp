@@ -85,7 +85,7 @@ void BrowserWidget2::compute_offsets(const mdcm::SequenceOfItems * sq, mdcm::VL 
 	const unsigned int n = sq->GetNumberOfItems();
 	offsets.resize(n);
 	offsets[0] = static_cast<unsigned int>(start);
-	for(unsigned int i = 1; i < n; i++)
+	for(unsigned int i = 1; i < n; ++i)
 	{
 		const mdcm::Item & item = sq->GetItem(i);
 		offsets[i] = offsets[i-1] + static_cast<unsigned int>(item.GetLength<mdcm::ExplicitDataElement>());
@@ -201,7 +201,7 @@ void BrowserWidget2::process_directory(const QString & p, const mdcm::Dict & dic
 	QStringList flist = dir.entryList(QDir::Files|QDir::Readable,QDir::Name);
 	std::vector<std::string> filenames;
 	QStringList filenames_no_series_uid;
-	for (int x = 0; x < flist.size(); x++)
+	for (int x = 0; x < flist.size(); ++x)
 	{
 		pd->setValue(-1);
 		qApp->processEvents();
@@ -253,7 +253,7 @@ void BrowserWidget2::process_directory(const QString & p, const mdcm::Dict & dic
 		if (pd->wasCanceled()) return;
 		mdcm::Scanner::ValuesType v = s0.GetValues();
 		mdcm::Scanner::ValuesType::iterator vi = v.begin();
-		for (;vi!=v.end();++vi)
+		for (; vi!=v.end(); ++vi)
 		{
 			QString modality    = QString("");
 			QString name        = QString("");
@@ -275,7 +275,7 @@ void BrowserWidget2::process_directory(const QString & p, const mdcm::Dict & dic
 			std::vector<std::string> files__(
 				s0.GetAllFilenamesFromTagToValue(
 					tSeriesInstanceUID, (*vi).c_str()));
-			for (unsigned int z = 0; z < files__.size(); z++)
+			for (unsigned int z = 0; z < files__.size(); ++z)
 			{
 
 				const QString tmp_filename =
@@ -303,7 +303,7 @@ void BrowserWidget2::process_directory(const QString & p, const mdcm::Dict & dic
 				size_t series_idx = 0;
 				do
 				{
-					series_idx += 1;
+					++series_idx;
 					qApp->processEvents();
 					if (pd->wasCanceled()) return;
 					bool is_image_tmp = false;
@@ -342,7 +342,7 @@ void BrowserWidget2::process_directory(const QString & p, const mdcm::Dict & dic
 		}
 	}
 	//
-	for (int x = 0; x < filenames_no_series_uid.size(); x++)
+	for (int x = 0; x < filenames_no_series_uid.size(); ++x)
 	{
 		const QString tmp1 = filenames_no_series_uid.at(x);
 		QString modality    = QString("");
@@ -398,7 +398,7 @@ void BrowserWidget2::process_directory(const QString & p, const mdcm::Dict & dic
 	//
 	if (!pd->wasCanceled())
 	{
-		for (int j = 0; j < dlist.size(); j++)
+		for (int j = 0; j < dlist.size(); ++j)
 			process_directory(
 				dir.absolutePath() + QString("/") + dlist.at(j),
 				dict,
@@ -623,7 +623,7 @@ void BrowserWidget2::copy_files()
 	std::vector<int> rows;
 	QModelIndexList selection =
 		tableWidget->selectionModel()->selectedRows();
-	for(int x = 0; x < selection.count(); x++)
+	for(int x = 0; x < selection.count(); ++x)
 	{
 		const QModelIndex index = selection.at(x);
 		rows.push_back(index.row());
@@ -638,7 +638,7 @@ void BrowserWidget2::copy_files()
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	saved_copy_dir = dirname;
 	QList<QStringList> files;
-	for (unsigned int x = 0; x < rows.size(); x++)
+	for (unsigned int x = 0; x < rows.size(); ++x)
 	{
 		const int row = rows.at(x);
 		if (row < 0) continue;
@@ -648,9 +648,9 @@ void BrowserWidget2::copy_files()
 		if ((item->files.empty())) continue;
 		files << item->files;
 	}
-	for (int x = 0; x < files.size(); x++)
+	for (int x = 0; x < files.size(); ++x)
 	{
-		count2++;
+		++count2;
 		const QString tmp1 =
 			QDateTime::currentDateTime()
 				.toString(QString("yyyyMMddhhmmsszzz")) +
@@ -666,7 +666,7 @@ void BrowserWidget2::copy_files()
 			QDir d(dirname);
 			d.mkdir(tmp1);
 		}
-		for (int y = 0; y < files.at(x).size(); y++)
+		for (int y = 0; y < files.at(x).size(); ++y)
 		{
 			const QString f = files.at(x).at(y);
 			QFileInfo fi(f);
@@ -806,7 +806,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 		{
 			const mdcm::DataElement & de = *it;
 			mdcm::SmartPointer<mdcm::SequenceOfItems> sqi = de.GetValueAsSQ();
-			for (unsigned int i = 0; i < sqi->GetNumberOfItems(); i++)
+			for (unsigned int i = 0; i < sqi->GetNumberOfItems(); ++i)
 			{
 				const mdcm::Item    & item = sqi->GetItem(i+1);
 				const mdcm::DataSet & nds  = item.GetNestedDataSet();
@@ -978,7 +978,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 									const QStringList l2 = tmp0.trimmed().split(QString("\\"));
 									const int l2size = l2.size();
 									QString fpath("");
-									for (int x = 0; x < l2size; x++)
+									for (int x = 0; x < l2size; ++x)
 									{
 										fpath.append(l2.at(x));
 										if (x!=l2size-1) fpath.append(QString("/"));
@@ -1048,10 +1048,10 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 		warning = QString("Can not completely process DICOMDIR.");
 	}
 	//
-	for (int x = 0; x < series.size(); x++)
+	for (int x = 0; x < series.size(); ++x)
 	{
 		bool break__ = false;
-		for (int z = 0; z < series.at(x).files.size(); z++)
+		for (int z = 0; z < series.at(x).files.size(); ++z)
 		{
 			QFileInfo fi(dir_ + QString("/") + series.at(x).files.at(z));
 			if (!fi.isFile())
@@ -1065,7 +1065,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 		if (break__) break;
 	}
 	//
-	for (int x = 0; x < series.size(); x++)
+	for (int x = 0; x < series.size(); ++x)
 	{
 		const int idx = tableWidget->rowCount();
 		QString ids;
@@ -1075,7 +1075,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 	 	ids.sprintf("%010d", idx);
 #endif
 		TableWidgetItem * i = new TableWidgetItem(ids);
-		for (int z = 0; z < series.at(x).files.size(); z++)
+		for (int z = 0; z < series.at(x).files.size(); ++z)
 			i->files.push_back(dir_ + QString("/") + series.at(x).files.at(z));
 		tableWidget->setRowCount(idx+1);
 		tableWidget->setItem(idx,0,static_cast<QTableWidgetItem*>(i));
@@ -1687,7 +1687,7 @@ void BrowserWidget2::open_CTK_db()
 		while (it0 != ids.constEnd())
 		{
 			p1.append(QVariant(*it0).toString());
-			ids_count++;
+			++ids_count;
 			if (ids_count < (size_t)ids.size()) p1.append(QString(","));
 			++it0;
 		}
@@ -1705,7 +1705,7 @@ void BrowserWidget2::open_CTK_db()
 	}
 	p1Query.clear();
 	p2 = QString("select SeriesInstanceUID from Series where StudyInstanceUID in (");
-	for (int x = 0; x < ctk_studies.size(); x++)
+	for (int x = 0; x < ctk_studies.size(); ++x)
 	{
 		p2.append(QString("\"") + ctk_studies.at(x) + QString("\""));
 		if (x < ctk_studies.size() - 1) p2.append(QString(","));
@@ -1717,7 +1717,7 @@ void BrowserWidget2::open_CTK_db()
 		ctk_series.push_back(p2Query.value(0).toString());
 	}
 	p2Query.clear();
-	for (int x = 0; x < ctk_series.size(); x++)
+	for (int x = 0; x < ctk_series.size(); ++x)
 	{
 		SeriesDICOMDIR series0;
 		series0.UID = ctk_series.at(x);
@@ -1803,7 +1803,7 @@ void BrowserWidget2::open_CTK_db()
 		db.close();
 		goto quit__;
 	}
-	for (int x = 0; x < series.size(); x++)
+	for (int x = 0; x < series.size(); ++x)
 	{
 		const int idx = tableWidget->rowCount();
 		QString ids;
@@ -1813,7 +1813,7 @@ void BrowserWidget2::open_CTK_db()
 		ids.sprintf("%010d", idx);
 #endif
 		TableWidgetItem * i = new TableWidgetItem(ids);
-		for (int z = 0; z < series.at(x).files.size(); z++)
+		for (int z = 0; z < series.at(x).files.size(); ++z)
 			i->files.push_back(series.at(x).files.at(z));
 		tableWidget->setRowCount(idx+1);
 		tableWidget->setItem(idx,0,static_cast<QTableWidgetItem*>(i));

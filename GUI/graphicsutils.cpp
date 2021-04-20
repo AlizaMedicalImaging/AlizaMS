@@ -563,7 +563,7 @@ void GraphicsUtils::draw_overlays(
 		{
 			const SliceOverlays ov =
 				ivariant->image_overlays.all_overlays.value(ov_idx);
-			for (int ox = 0; ox < ov.size(); ox++)
+			for (int ox = 0; ox < ov.size(); ++ox)
 			{
 				const unsigned char * tmp_p_ =
 					reinterpret_cast< const unsigned char* >(
@@ -753,7 +753,7 @@ void GraphicsUtils::print_image_info(
 	if (!v->filenames.empty())
 	{
 		s.append(QString("\n\nSource files:\n"));
-		for (int x = 0; x < v->filenames.size(); x++)
+		for (int x = 0; x < v->filenames.size(); ++x)
 		{
 			s.append(v->filenames.at(x) + QString("\n"));
 		}

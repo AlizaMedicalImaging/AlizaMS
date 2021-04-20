@@ -675,7 +675,7 @@ void ImagesBox::toggle_info(bool t)
 
 void ImagesBox::check_all()
 {
-	for (int x = 0; x < listWidget->count(); x++)
+	for (int x = 0; x < listWidget->count(); ++x)
 	{
 		if (listWidget->item(x) &&
 			listWidget->item(x)->checkState()==Qt::Unchecked)
@@ -685,7 +685,7 @@ void ImagesBox::check_all()
 
 void ImagesBox::uncheck_all()
 {
-	for (int x = 0; x < listWidget->count(); x++)
+	for (int x = 0; x < listWidget->count(); ++x)
 	{
 		if (listWidget->item(x) &&
 			listWidget->item(x)->checkState()==Qt::Checked)

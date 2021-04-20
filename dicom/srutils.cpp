@@ -101,7 +101,7 @@ template<typename T> SRImage li3(
 	if (tmp99==0)
 	{
 		int j=0;
-		for (int i=0; i<num_threads; i++)
+		for (int i = 0; i < num_threads; ++i)
 		{
 			const int size_0 = size[0];
 			const int size_1 = size[1]/num_threads;
@@ -127,7 +127,7 @@ template<typename T> SRImage li3(
 		const int incr = (int)floor(size[1]/(double)block);
 		if (size[1] > block)
 		{
-			for (int i=0; i<incr; i++)
+			for (int i = 0; i < incr; ++i)
 			{
 				const int size_0 = size[0];
 				const int index_0 = 0;
@@ -168,13 +168,13 @@ template<typename T> SRImage li3(
 	while (true)
 	{
 		unsigned short b__ = 0;
-		for (int i=0; i < threadsLUT_size; i++)
+		for (int i = 0; i < threadsLUT_size; ++i)
 		{
-			if (threadsLUT_.at(i)->isFinished()) { b__++; }
+			if (threadsLUT_.at(i)->isFinished()) { ++b__; }
 		}
 		if (b__==threadsLUT_size) break;
 	}
-	for (int i=0; i < threadsLUT_size; i++)
+	for (int i=0; i < threadsLUT_size; ++i)
 	{
 		delete threadsLUT_[i];
 	}
@@ -613,7 +613,7 @@ endpoints of the minor axis of an ellipse
 						pen.setBrush(QBrush(QColor(255,0,0)));
 						QBrush brush(QColor(255,0,0));
 						brush.setStyle(Qt::SolidPattern);
-						for (size_t yy = 0; yy < grobjects.size(); yy++)
+						for (size_t yy = 0; yy < grobjects.size(); ++yy)
 						{
 							const SRGraphic & sg = grobjects.at(yy);
 							const size_t gsize = sg.GraphicData.size();
@@ -857,12 +857,12 @@ endpoints of the minor axis of an ellipse
 					e_.trimmed() +
 					QString("</span><br />\n");
 			}
-			for (size_t yy = 0; yy < ivariants.size(); yy++)
+			for (size_t yy = 0; yy < ivariants.size(); ++yy)
 			{
 				if (ivariants.at(yy)) delete ivariants[yy];
 			}
 			ivariants.clear();
-			for (size_t yy = 0; yy < ivariants2.size(); yy++)
+			for (size_t yy = 0; yy < ivariants2.size(); ++yy)
 			{
 				if (ivariants2.at(yy)) delete ivariants2[yy];
 			}
@@ -998,11 +998,11 @@ bool SRUtils::read_SCOORD(
 				}
 				else
 				{
-					other_++;
+					++other_;
 				}
 				if (nds1.FindDataElement(mdcm::Tag(0x0040,0xa730)))
 				{
-					other_++;
+					++other_;
 				}
 			}
 		}
@@ -1082,7 +1082,7 @@ void SRUtils::read_NUM(
 	if (!sq3) return;
 	for(unsigned int i3 = 0;
 		i3 < sq3->GetNumberOfItems();
-		i3++)
+		++i3)
 	{
 		const mdcm::Item & item3 = sq3->GetItem(i3+1);
 		const mdcm::DataSet & nds3 =
@@ -1623,7 +1623,7 @@ QStringList SRUtils::read_referenced(
 				refframes))
 		{
 			QString ff("");
-			for (size_t k = 0; k < refframes.size(); k++)
+			for (size_t k = 0; k < refframes.size(); ++k)
 			{
 				ff.append(
 					QVariant(refframes.at(k)).toString() +
@@ -1793,7 +1793,7 @@ QString SRUtils::read_sr_content_sq(
 			for (
 				unsigned int z = 0;
 				z < s___;
-				z++)
+				++z)
 			{
 				identifiers +=
 					QVariant(

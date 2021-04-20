@@ -135,10 +135,10 @@ QString SpectroscopyUtils::ProcessData(
 	if (!ok_f && !ok_g) return QString("!ok_f && !ok_g");
 	if (ok_f && idx_values.size()==values.size())
 	{
-		for (unsigned long x = 0; x < sq_size; x++)
+		for (unsigned long x = 0; x < sq_size; ++x)
 		{
 			std::list<unsigned int> tmpl;
-			for (unsigned long j = 0; j < idx_values.size(); j++)
+			for (unsigned long j = 0; j < idx_values.size(); ++j)
 				tmpl.push_back(idx_values.at(j).idx.at(x));
 			tmpl.sort();
 			tmpl.unique();
@@ -153,7 +153,7 @@ QString SpectroscopyUtils::ProcessData(
 	{
 		bool tmp12 = false;
 		DimIndexValues idx_values_tmp;
-		for (unsigned int x = 0; x < values.size(); x++)
+		for (unsigned int x = 0; x < values.size(); ++x)
 		{
 			if (!(
 				values.at(x).stack_id_ok &&
@@ -165,7 +165,7 @@ QString SpectroscopyUtils::ProcessData(
 		}
 		if (!tmp12)
 		{
-			for (unsigned int x = 0; x < values.size(); x++)
+			for (unsigned int x = 0; x < values.size(); ++x)
 			{
 				DimIndexValue tmp13;
 				tmp13.id = values.at(x).id;
@@ -173,7 +173,7 @@ QString SpectroscopyUtils::ProcessData(
 				tmp13.idx.push_back(values.at(x).in_stack_pos_num);
 				idx_values_tmp.push_back(tmp13);
 			}
-			for (unsigned int x = 0; x < idx_values_tmp.size(); x++)
+			for (unsigned int x = 0; x < idx_values_tmp.size(); ++x)
 			{
 				idx_values.push_back(idx_values_tmp[x]);
 			}
@@ -246,7 +246,7 @@ QString SpectroscopyUtils::ProcessData(
 	if (tmp0.empty())
 		return QString("tmp0.size()<1");
 
-	for (unsigned int x = 0; x < tmp0.size(); x++)
+	for (unsigned int x = 0; x < tmp0.size(); ++x)
 	{
 		if (tmp0.at(x).size()<1)
 			return
@@ -258,7 +258,7 @@ QString SpectroscopyUtils::ProcessData(
 #ifdef LOAD_SPECT_DATA___
 	const unsigned long xy =
 		s.m_SpectroscopyData.size()/values.size();
-	for (unsigned int j = 0; j < values.size(); j++)
+	for (unsigned int j = 0; j < values.size(); ++j)
 	{
 		float * p__ = new float[xy];
 		memcpy(p__,&(s.m_SpectroscopyData[j*xy]),xy);
@@ -266,7 +266,7 @@ QString SpectroscopyUtils::ProcessData(
 	}
 #endif
 
-	for (unsigned int x = 0; x < tmp0.size(); x++)
+	for (unsigned int x = 0; x < tmp0.size(); ++x)
 	{
 		bool error = false;
 		std::vector<float*>  tmp3;
@@ -369,7 +369,7 @@ QString SpectroscopyUtils::ProcessData(
 					tmp5.push_back(QString(""));
 				}
 				//
-				j++;
+				++j;
 			}
 			else 
 			{
@@ -403,7 +403,7 @@ QString SpectroscopyUtils::ProcessData(
 			double spacing_tmp0[2] = {0.0, 0.0 };
 			double spacing_tmp1[2] = {0.0, 0.0 };
 			bool spacing_ok = false;
-			for (int i = 0; i < tmp5.size(); i++)
+			for (int i = 0; i < tmp5.size(); ++i)
 			{
 				spacing_ok = DicomUtils::get_pixel_spacing(
 					tmp5.at(i), spacing_tmp0);
@@ -477,7 +477,7 @@ QString SpectroscopyUtils::ProcessData(
 				if (equi_ && rows_ > 1 && columns_ > 1)
 				{
 					bool no_orientation = false;
-					for (unsigned long k = 0; k < slices.size()-1; k++)
+					for (unsigned long k = 0; k < slices.size()-1; ++k)
 					{
 						if (slices.at(k)->slice_orientation_string !=
 							slices.at(k+1)->slice_orientation_string)
@@ -490,7 +490,7 @@ QString SpectroscopyUtils::ProcessData(
 						ivariant->spect_orientation_string =
 							slices.at(0)->slice_orientation_string;
 				}
-				for (unsigned int k = 0; k < slices.size(); k++)
+				for (unsigned int k = 0; k < slices.size(); ++k)
 					ivariant->di->spectroscopy_slices.push_back(slices[k]);
 				ivariant->di->spectroscopy_generated = true;
 				DicomUtils::read_ivariant_info_tags(ds, ivariant);
@@ -533,7 +533,7 @@ QString SpectroscopyUtils::ProcessData(
 			}
 		}
 		//
-		for (unsigned int k = 0; k < tmp4.size(); k++)
+		for (unsigned int k = 0; k < tmp4.size(); ++k)
 		{
 			if (tmp4.at(k)) delete [] tmp4[k];
 		}
@@ -541,7 +541,7 @@ QString SpectroscopyUtils::ProcessData(
 	}
 
 #ifdef LOAD_SPECT_DATA___
-	for (unsigned int x=0; x < data.size(); x++)
+	for (unsigned int x=0; x < data.size(); ++x)
 	{
 		if (data.at(x)) delete [] data[x];
 	}

@@ -72,7 +72,7 @@ template<typename T> QString calculate_histogramm(
 	}
 	//
 	const HistogramType * h = histogram_generator->GetOutput();
-	for (int x = 0; x < bins_size; x++)
+	for (int x = 0; x < bins_size; ++x)
 	{
 		bins[x] = h->GetFrequency(x, 0);
 		if (bins[x] > tmp0) tmp0 = bins[x];
@@ -105,7 +105,7 @@ template<typename T> QString calculate_histogramm(
 		painter.setBrush(brush);
 		double first_x = 0.0f;
 		double last_x  = 0.0f;
-		for (int x = 0; x < bins_size; x++)
+		for (int x = 0; x < bins_size; ++x)
 		{
 			const double x_ =
 				pixmap_w*x/(double)bins_size;
@@ -196,7 +196,7 @@ template<typename T> QString calculate_histogramm_rgb(
 	if (!bins0||!bins1||!bins2)
 	{ *ok = false; return QString("!bins0||!bins1||!bins2"); }
 	//
-	for (int x = 0; x < bins_size; x++)
+	for (int x = 0; x < bins_size; ++x)
 	{
 		bins0[x] = histogram->GetFrequency(x, 0);
 		if (bins0[x] > tmp0) tmp0 = bins0[x];
@@ -239,7 +239,7 @@ template<typename T> QString calculate_histogramm_rgb(
 		const double tmp101 = 2.0*tmp100;
 		const double tmp102 = 3.0*tmp100;
 		const double tmp103 = 0.8*tmp100;
-		for (int x = 0; x < bins_size; x++)
+		for (int x = 0; x < bins_size; ++x)
 		{
 			const double x_  = tmp102*x;
 			const double y0_ = (bins0[x]>0) ? pixmap_h*log((double)bins0[x])/tmp2 : 0.0;

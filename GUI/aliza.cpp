@@ -77,7 +77,7 @@ static void search_frame_of_ref2(
 	const QString & study_uid,
 	QList<const ImageVariant*> & l)
 {
-	for (int x = 0; x < selected_images.size(); x++)
+	for (int x = 0; x < selected_images.size(); ++x)
 	{
 		const ImageVariant * v = selected_images.at(x);
 		if (v &&
@@ -119,14 +119,14 @@ static void g_close_physics()
 			o = NULL;
 		}
 	}
-	for (int x = 0; x < g_collision_shapes.size(); x++)
+	for (int x = 0; x < g_collision_shapes.size(); ++x)
 	{
 		btCollisionShape * s = static_cast<btCollisionShape *>(g_collision_shapes[x]);
 		if (!s) continue;
 		if (s->getShapeType() == COMPOUND_SHAPE_PROXYTYPE)
 		{
 			btCompoundShape * c = (btCompoundShape*)s;
-			for (int z = 0; z < c->getNumChildShapes(); z++)
+			for (int z = 0; z < c->getNumChildShapes(); ++z)
 			{
 				btCollisionShape * ch = static_cast<btCollisionShape *>(c->getChildShape(z));
 				if (!ch) continue;
@@ -304,7 +304,7 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 		2,
 		tmp_shapes,
 		tmp_objects);
-	for (int u = 0; u < refs.size(); u++)
+	for (int u = 0; u < refs.size(); ++u)
 	{
 		const int z1 = refs.at(u)->di->selected_z_slice;
 		if ((int)refs.at(u)->di->image_slices.size() <= z1)
@@ -317,7 +317,7 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 		}
 		g_collisionWorld->performDiscreteCollisionDetection();
 		btAlignedObjectArray<btVector3> hits;
-		for (int q = 0; q < 4; q++)
+		for (int q = 0; q < 4; ++q)
 		{
 			int k0 = 0, k1 = 1, k2 = 2, k3 = 3, k4 = 4, k5 = 5;
 			switch(q)
@@ -404,7 +404,7 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 			w->graphicsview->collision_paths.push_back(g);
 		}
 	}
-	for (int j = 0; j < tmp_objects.size(); j++)
+	for (int j = 0; j < tmp_objects.size(); ++j)
 	{
 		btCollisionObject * k = tmp_objects[j];
 		if (k)
@@ -418,7 +418,7 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 			delete k;
 		}
 	}
-	for (int j = 0; j < tmp_shapes.size(); j++)
+	for (int j = 0; j < tmp_shapes.size(); ++j)
 	{
 		btCollisionShape * k =
 			static_cast<btCollisionShape *>(tmp_shapes[j]);
@@ -596,13 +596,13 @@ void Aliza::load_dicom_series(QProgressDialog * pb)
 	if (!lock) goto quit__;
 	selection =
 		browser2->tableWidget->selectionModel()->selectedRows();
-	for(int x = 0; x < selection.count(); x++)
+	for(int x = 0; x < selection.count(); ++x)
 	{
 		const QModelIndex index = selection.at(x);
 		rows.push_back(index.row());
 	}
 	if (rows.empty()) goto quit__;
-	for (unsigned int x = 0; x < rows.size(); x++)
+	for (unsigned int x = 0; x < rows.size(); ++x)
 	{
 		const int row = rows.at(x);
 		if (row < 0) continue;
@@ -643,7 +643,7 @@ void Aliza::load_dicom_series(QProgressDialog * pb)
 		}
 	}
 quit__:
-	for (unsigned int x = 0; x < ivariants.size(); x++)
+	for (unsigned int x = 0; x < ivariants.size(); ++x)
 	{
 		if (!ivariants.at(x)) continue;
 		if (
@@ -685,7 +685,7 @@ quit__:
 		imagesbox->listWidget->reset();
 		imagesbox->add_image(ivariants.at(x)->id, ivariants[x], &ivariants[x]->icon);
 		int r = -1;
-		for (int j = 0; j < imagesbox->listWidget->count(); j++)
+		for (int j = 0; j < imagesbox->listWidget->count(); ++j)
 		{
 			short id0 = -1;
 			ListWidgetItem2 * item =
@@ -855,7 +855,7 @@ void Aliza::delete_image2(ImageVariant * v)
 	imagesbox->listWidget->blockSignals(true);
 	disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
 	disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
-	for (int x = 0; x < imagesbox->listWidget->count(); x++)
+	for (int x = 0; x < imagesbox->listWidget->count(); ++x)
 	{
 		if (imagesbox->listWidget->item(x) &&
 			static_cast<ListWidgetItem2*>(imagesbox->listWidget->item(x))->get_id()==v->id)
@@ -951,7 +951,7 @@ static void process_elscint_dir(
 	QStringList flist =
 		dir.entryList(QDir::Files|QDir::Readable,QDir::Name);
 	QStringList filenames;
-	for (int x = 0; x < flist.size(); x++)
+	for (int x = 0; x < flist.size(); ++x)
 	{
 		QApplication::processEvents();
 		if (pb)
@@ -965,7 +965,7 @@ static void process_elscint_dir(
 	}
 	flist.clear();
 	//
-	for (int x = 0; x < filenames.size(); x++)
+	for (int x = 0; x < filenames.size(); ++x)
 	{
 		QApplication::processEvents();
 		if (pb)
@@ -979,13 +979,13 @@ static void process_elscint_dir(
 		{
 			if (DicomUtils::convert_elscint(filenames.at(x), tmp9))
 			{
-				count_elscint++;
+				++count_elscint;
 			}
 			else
 			{
 				if (QFile::copy(filenames.at(x), tmp9))
 				{
-					count_elscint_copy++;
+					++count_elscint_copy;
 				}
 			}
 		}
@@ -1002,7 +1002,7 @@ static void process_elscint_dir(
 	}
 	filenames.clear();
 	//
-	for (int j = 0; j < dlist.size(); j++)
+	for (int j = 0; j < dlist.size(); ++j)
 	{
 		QApplication::processEvents();
 		if (pb)
@@ -1134,7 +1134,7 @@ void Aliza::reload_3d(
 	if (!ok) return;
 	imagesbox->listWidget->reset();
 	int r = -1;
-	for (int x = 0; x < imagesbox->listWidget->count(); x++)
+	for (int x = 0; x < imagesbox->listWidget->count(); ++x)
 	{
 		ListWidgetItem2 * item =
 			static_cast<ListWidgetItem2*>(
@@ -2075,13 +2075,13 @@ void Aliza::calculate_bb()
 	{
 		int j = 0;
 		double tmpx = 0.0, tmpy = 0.0, tmpz = 0.0;
-		for (int x = 0; x < selected_images.size(); x++)
+		for (int x = 0; x < selected_images.size(); ++x)
 		{
 			ImageVariant * tmpv = selected_images.at(x);
 			if (tmpv)
 			{
 				if (tmpv->equi) update_center(tmpv);
-				j++;
+				++j;
 				tmpx += static_cast<double>(tmpv->di->center_x);
 				tmpy += static_cast<double>(tmpv->di->center_y);
 				tmpz += static_cast<double>(tmpv->di->center_z);
@@ -2431,7 +2431,7 @@ void Aliza::update_selection_common2(QListWidgetItem * s)
 		else tmp_images.push_back(k->get_image_from_item_const());
 		if (ok3d) deltas.push_back(CommonUtils::calculate_max_delta(v));
 	}
-	for (int x = 0; x < imagesbox->listWidget->count(); x++)
+	for (int x = 0; x < imagesbox->listWidget->count(); ++x)
 	{
 		QListWidgetItem * j = imagesbox->listWidget->item(x);
 		if (!j) continue;
@@ -2451,10 +2451,10 @@ void Aliza::update_selection_common2(QListWidgetItem * s)
 			}
 		}
 	}
-	for (int x = 0; x < spect_images.size(); x++)
+	for (int x = 0; x < spect_images.size(); ++x)
 	{
 		bool ref_ok = false;
-		for (int k1 = 0; k1 < tmp_images.size(); k1++)
+		for (int k1 = 0; k1 < tmp_images.size(); ++k1)
 		{
 			if (tmp_images.at(k1)->frame_of_ref_uid ==
 				spect_images.at(x)->frame_of_ref_uid)
@@ -2482,7 +2482,7 @@ void Aliza::update_selection_common2(QListWidgetItem * s)
 		if (ok3d)
 		{
 			double max_delta = 0;
-			for (int x = 0; x < deltas.size(); x++)
+			for (int x = 0; x < deltas.size(); ++x)
 			{
 				if (deltas.at(x) > max_delta) max_delta = deltas.at(x);
 			}
@@ -2530,7 +2530,7 @@ void Aliza::update_visible_rois(QTableWidgetItem * i)
 			const int  id   = item->get_id();
 			const bool show =
 				(Qt::Checked == item->checkState()) ? true : false;
-			for (int x = 0; x < v->di->rois.size(); x++)
+			for (int x = 0; x < v->di->rois.size(); ++x)
 			{
 				if (v->di->rois.at(x).id == id)
 				{
@@ -2914,7 +2914,7 @@ QString Aliza::create_group_(bool * ok, bool lock_mutex)
 		goto quit__;
 	}
 	{
-		for (int x = 0; x < tmp_images.size(); x++)
+		for (int x = 0; x < tmp_images.size(); ++x)
 			map[tmp_images.at(x)->id]=tmp_images.at(x);
 		QMap<int, ImageVariant*>::const_iterator it = map.constBegin();
 		while (it != map.constEnd())
@@ -2924,7 +2924,7 @@ QString Aliza::create_group_(bool * ok, bool lock_mutex)
 		}
 	}
 	group_id = CommonUtils::get_next_group_id();
-	for (int z = 0; z < group_images.size(); z++)
+	for (int z = 0; z < group_images.size(); ++z)
 	{
 		if (group_images.at(z))
 		{
@@ -3697,7 +3697,7 @@ void Aliza::delete_cheched_unchecked(bool t)
 	const bool ok3d = check_3d();
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	if (ok3d) glwidget->set_skip_draw(true);
-	for (int x = 0; x < imagesbox->listWidget->count(); x++)
+	for (int x = 0; x < imagesbox->listWidget->count(); ++x)
 	{
 		QListWidgetItem * j = imagesbox->listWidget->item(x);
 		if (j)
@@ -3720,19 +3720,19 @@ void Aliza::delete_cheched_unchecked(bool t)
 	imagesbox->listWidget->blockSignals(true);
 	disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
 	disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
-	for (int x = 0; x < items.size(); x++)
+	for (int x = 0; x < items.size(); ++x)
 	{
 		const ListWidgetItem2 * i = static_cast<const ListWidgetItem2*>(items.at(x));
 		image_ids.push_back(i->get_id());
 	}
-	for (int x = 0; x < items.size(); x++)
+	for (int x = 0; x < items.size(); ++x)
 	{
 		ListWidgetItem2 * i = static_cast<ListWidgetItem2*>(items[x]);
 		imagesbox->listWidget->removeItemWidget(items[x]);
 		delete i;
 	}
 	imagesbox->listWidget->reset();
-	for (int x = 0; x < image_ids.size(); x++)
+	for (int x = 0; x < image_ids.size(); ++x)
 	{
 		ImageVariant * ivariant = get_image(image_ids.at(x));
 		if (ivariant)
@@ -3818,7 +3818,7 @@ void Aliza::load_dicom_file(int * image_id,
 quit__:
 	if (ok)
 	{
-		for (unsigned int j = 0; j < ivariants.size(); j++)
+		for (unsigned int j = 0; j < ivariants.size(); ++j)
 		{
 			if (!ivariants.at(j)) continue;
 			if (ivariants.at(j) &&
@@ -3848,10 +3848,9 @@ quit__:
 				if (j == ivariants.size() - 1)
 				{
 					int r = -1;
-					for (
-						int x = 0;
+					for (int x = 0;
 						x < imagesbox->listWidget->count();
-						x++)
+						++x)
 					{
 						short id0 = -1;
 						ListWidgetItem2 * item =
@@ -3877,7 +3876,7 @@ quit__:
 	}
 	else
 	{
-		for (unsigned int x = 0; x < ivariants.size(); x++)
+		for (unsigned int x = 0; x < ivariants.size(); ++x)
 		{
 			if (ivariants.at(x)) delete ivariants[x];
 		}

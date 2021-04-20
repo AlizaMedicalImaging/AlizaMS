@@ -265,7 +265,7 @@ static void replace_uid_recurs__(
 				if (sq && sq->GetNumberOfItems() > 0)
 				{
 					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
-					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
+					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; ++i)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
 						mdcm::DataSet & nested = item.GetNestedDataSet();
@@ -323,7 +323,7 @@ static void replace_pn_recurs__(
 				if (sq && sq->GetNumberOfItems() > 0)
 				{
 					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
-					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
+					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; ++i)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
 						mdcm::DataSet & nested = item.GetNestedDataSet();
@@ -365,7 +365,7 @@ static void remove_recurs__(
 				if (sq && sq->GetNumberOfItems() > 0)
 				{
 					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
-					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
+					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; ++i)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
 						mdcm::DataSet & nested = item.GetNestedDataSet();
@@ -424,7 +424,7 @@ static void remove_date_time_recurs__(
 				if (sq && sq->GetNumberOfItems() > 0)
 				{
 					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
-					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
+					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; ++i)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
 						mdcm::DataSet & nested = item.GetNestedDataSet();
@@ -472,7 +472,7 @@ static bool find_time_less_1h_recurs__(
   					const QStringList l = s.split(QString("\\"), QString::KeepEmptyParts);
 #endif
 					const int l_size = l.size();
-					for (int x = 0; x < l_size; x++)
+					for (int x = 0; x < l_size; ++x)
 					{
 						const QString s0 = l.at(x).trimmed();
 						if (!s0.isEmpty())
@@ -519,7 +519,7 @@ static bool find_time_less_1h_recurs__(
 				if (sq && sq->GetNumberOfItems() > 0)
 				{
 					const mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
-					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
+					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; ++i)
 					{
 						const mdcm::Item    & item   = sq->GetItem(i);
 						const mdcm::DataSet & nested = item.GetNestedDataSet();
@@ -570,7 +570,7 @@ static void modify_date_time_recurs__(
   					const QStringList l = s.split(QString("\\"), QString::KeepEmptyParts);
 #endif
 					const int l_size = l.size();
-					for (int x = 0; x < l_size; x++)
+					for (int x = 0; x < l_size; ++x)
 					{
 						const QString s0 = l.at(x).trimmed();
 						if (!s0.isEmpty())
@@ -773,7 +773,7 @@ static void modify_date_time_recurs__(
 				if (sq && sq->GetNumberOfItems() > 0)
 				{
 					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
-					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
+					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; ++i)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
 						mdcm::DataSet & nested = item.GetNestedDataSet();
@@ -816,7 +816,7 @@ static void empty_recurs__(
 				if (sq && sq->GetNumberOfItems() > 0)
 				{
 					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
-					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
+					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; ++i)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
 						mdcm::DataSet & nested = item.GetNestedDataSet();
@@ -857,7 +857,7 @@ static void remove_private__(
 				if (sq && sq->GetNumberOfItems() > 0)
 				{
 					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
-					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
+					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; ++i)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
 						mdcm::DataSet & nested = item.GetNestedDataSet();
@@ -922,7 +922,7 @@ static void remove_overlays__(mdcm::DataSet & ds)
 		}
 		if (t.GetGroup() > 0x60ff) break;
 	}
-	for (unsigned int x = 0; x < tmp0.size(); x++) ds.Remove(tmp0.at(x));
+	for (unsigned int x = 0; x < tmp0.size(); ++x) ds.Remove(tmp0.at(x));
 }
 
 static void remove_curves__(mdcm::DataSet & ds)
@@ -939,7 +939,7 @@ static void remove_curves__(mdcm::DataSet & ds)
 		}
 		if (t.GetGroup() > 0x50ff) break;
 	}
-	for (unsigned int x = 0; x < tmp0.size(); x++) ds.Remove(tmp0.at(x));
+	for (unsigned int x = 0; x < tmp0.size(); ++x) ds.Remove(tmp0.at(x));
 }
 
 static void remove_group_length__(
@@ -967,7 +967,7 @@ static void remove_group_length__(
 				if (sq && sq->GetNumberOfItems() > 0)
 				{
 					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
-					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
+					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; ++i)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
 						mdcm::DataSet & nested = item.GetNestedDataSet();
@@ -1315,7 +1315,7 @@ static void find_pn_recurs__(
 				if (sq && sq->GetNumberOfItems() > 0)
 				{
 					const mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
-					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
+					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; ++i)
 					{
 						const mdcm::Item    & item   = sq->GetItem(i);
 						const mdcm::DataSet & nested = item.GetNestedDataSet();
@@ -1353,7 +1353,7 @@ static void find_uids_recurs__(
 				if (sq && sq->GetNumberOfItems() > 0)
 				{
 					const mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
-					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; i++)
+					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; ++i)
 					{
 						const mdcm::Item    & item   = sq->GetItem(i);
 						const mdcm::DataSet & nested = item.GetNestedDataSet();
@@ -1382,7 +1382,7 @@ static void build_maps(
 {
 	QStringList uids;
 	QStringList pids;
-	for (int x = 0; x < l.size(); x++)
+	for (int x = 0; x < l.size(); ++x)
 	{
 		QApplication::processEvents();
 		pd->setValue(-1);
@@ -1496,7 +1496,7 @@ void AnonymazerWidget2::process_directory(
 	//
 	{
 		QStringList filenames;
-		for (int x = 0; x < flist.size(); x++)
+		for (int x = 0; x < flist.size(); ++x)
 		{
 			pd->setValue(-1);
 			QApplication::processEvents();
@@ -1504,7 +1504,7 @@ void AnonymazerWidget2::process_directory(
 			const QString tmp0 = dir.absolutePath() + QString("/") + flist.at(x);
 			filenames.push_back(tmp0);
 		}
-		for (int x = 0; x < filenames.size(); x++)
+		for (int x = 0; x < filenames.size(); ++x)
 		{
 			pd->setValue(-1);
 			QApplication::processEvents();
@@ -1569,7 +1569,7 @@ void AnonymazerWidget2::process_directory(
 		}
 	}
 	//
-	for (int j = 0; j < dlist.size(); j++)
+	for (int j = 0; j < dlist.size(); ++j)
 	{
 		QApplication::processEvents();
 		QDir d(outp + QString("/") + dlist.at(j));

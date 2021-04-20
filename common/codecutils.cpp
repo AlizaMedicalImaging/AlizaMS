@@ -53,7 +53,7 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
   const QStringList l = cs.split(QString("\\"), QString::KeepEmptyParts);
 #endif
   bool iso2022 = false;
-  for (int x = 0; x < l.size(); x++)
+  for (int x = 0; x < l.size(); ++x)
   {
     const QString tmp1 = l.at(x).trimmed().toUpper();
 #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
@@ -71,7 +71,7 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
   {
     const QList<QByteArray> iso = ba->split(0x1b); // ESC
     if (ok) *ok = false;
-    for (int z = 0; z < iso.size(); z++)
+    for (int z = 0; z < iso.size(); ++z)
     {
       QTextCodec * codec = NULL;
       QByteArray a = iso[z];

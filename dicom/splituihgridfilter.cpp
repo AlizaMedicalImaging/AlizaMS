@@ -24,11 +24,11 @@ template<typename T> bool reorganize_uih_grid(
 	if (!(div > 0)) return false;
 	const size_t insize  = indims[0]*indims[1]*indims[2];
 	const size_t outsize = outdims[0]*outdims[1]*outdims[2];
-	for (unsigned int x = 0; x < outdims[0]; x++)
+	for (unsigned int x = 0; x < outdims[0]; ++x)
 	{
-		for (unsigned int y = 0; y < outdims[1]; y++)
+		for (unsigned int y = 0; y < outdims[1]; ++y)
 		{
-			for (unsigned int z = 0; z < outdims[2]; z++)
+			for (unsigned int z = 0; z < outdims[2]; ++z)
 			{
 				const size_t outidx =
 					x + y*outdims[0] + z*outdims[0]*outdims[1];

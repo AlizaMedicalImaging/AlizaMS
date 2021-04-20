@@ -68,7 +68,7 @@ void UltrasoundRegionUtils::Read(const mdcm::DataSet & ds, QList<UltrasoundRegio
 	const mdcm::Tag tTMLinePositionX1(0x0018,0x6041);
 	const mdcm::Tag tTMLinePositionY1(0x0018,0x6043);
 
-	for (unsigned int x = 0; x < sqSequenceOfUltrasoundRegions->GetNumberOfItems(); x++)
+	for (unsigned int x = 0; x < sqSequenceOfUltrasoundRegions->GetNumberOfItems(); ++x)
 	{
 		const mdcm::Item & item = sqSequenceOfUltrasoundRegions->GetItem(x+1);
 		const mdcm::DataSet & nestedds = item.GetNestedDataSet();

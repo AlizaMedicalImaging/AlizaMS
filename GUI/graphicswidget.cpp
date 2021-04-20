@@ -56,7 +56,7 @@ static void draw_contours(
 		(widget->get_mouse_modus() == 3) ? true : false;
 	if (axis != 2) return;
 	const int idx = ivariant->di->selected_z_slice;
-	for (int x = 0; x < ivariant->di->rois.size(); x++)
+	for (int x = 0; x < ivariant->di->rois.size(); ++x)
 	{
 		const int c_r = (int)(ivariant->di->rois.at(x).color.r*255.0f);
 		const int c_g = (int)(ivariant->di->rois.at(x).color.g*255.0f);
@@ -72,7 +72,7 @@ static void draw_contours(
 			{
 				continue;
 			}
-			for (int z = 0; z < indices.size(); z++)
+			for (int z = 0; z < indices.size(); ++z)
 			{
 				const Contour * c =
 					ivariant->di->rois.at(x)
@@ -130,7 +130,7 @@ static void draw_contours(
 							pi_->setCursor(Qt::PointingHandCursor);
 						pi_->setPen(pen);
 						QPainterPath p;
-						for (int y = 0; y < c->dpoints.size(); y++)
+						for (int y = 0; y < c->dpoints.size(); ++y)
 						{
 							if (c->dpoints.at(y).t == idx)
 								p.addRect(
@@ -244,12 +244,12 @@ template<typename T> QString contour_from_path(
 		if (z) tmp0.push_back(z->id);
 	}
 	int a = 0;
-	for (int j = 0; j < tmp0.size(); j++)
+	for (int j = 0; j < tmp0.size(); ++j)
 	{
 		if (tmp0.at(j) >= a) a = tmp0.at(j);
 	}
 	tmp0.clear();
-	a += 1;
+	++a;
 	Contour * c = NULL;
 	try { c = new Contour(); }
 	catch (std::bad_alloc&) { c = NULL; }
@@ -259,7 +259,7 @@ template<typename T> QString contour_from_path(
 	c->color.r = 0.0f;
 	c->color.g = 0.0f;
 	c->color.b = 1.0f;
-	for (int x = 0; x < p.elementCount(); x++)
+	for (int x = 0; x < p.elementCount(); ++x)
 	{
 		itk::ContinuousIndex<float, 3> idx;
 		switch(item->get_axis())
@@ -346,12 +346,12 @@ static QString contour_from_path_nonuniform(
 		if (z) tmp0.push_back(z->id);
 	}
 	int a = 0;
-	for (int j = 0; j < tmp0.size(); j++)
+	for (int j = 0; j < tmp0.size(); ++j)
 	{
 		if (tmp0.at(j) >= a) a = tmp0.at(j);
 	}
 	tmp0.clear();
-	a += 1;
+	++a;
 	Contour * c = NULL;
 	try { c = new Contour(); }
 	catch (std::bad_alloc&) { c = NULL; }
@@ -361,7 +361,7 @@ static QString contour_from_path_nonuniform(
 	c->color.r = 0.0f;
 	c->color.g = 0.0f;
 	c->color.b = 1.0f;
-	for (int x = 0; x < p.elementCount(); x++)
+	for (int x = 0; x < p.elementCount(); ++x)
 	{
 		itk::ContinuousIndex<float, 3> idx;
 		idx[0]=p.elementAt(x).x;
@@ -690,7 +690,7 @@ template<typename T> void load_rgba_image(
 		const double vmin = ivariant->di->vmin;
 		const double vmax = ivariant->di->vmax;
 		const double vrange = vmax - vmin;
-		if (!(vrange!=0)) return;
+		if (!(vrange != 0)) return;
 		try { p__ = new unsigned char[size[0]*size[1]*4]; }
 		catch(std::bad_alloc&) { p__ = NULL; }
 		if (!p__) return;
@@ -1178,8 +1178,8 @@ template<typename T> void load_image(const typename T::Pointer & image,
 	}
 	if (tmp99==0)
 	{
-		int j=0;
-		for (int i=0; i<num_threads; i++)
+		int j = 0;
+		for (int i = 0; i < num_threads; ++i)
 		{
 			const int size_0 = size[0];
 			const int size_1 = size[1]/num_threads;
@@ -1191,21 +1191,21 @@ template<typename T> void load_image(const typename T::Pointer & image,
 						index_0, index_1, j,
 						ivariant->di->us_window_center, ivariant->di->us_window_width,
 						lut, alt_mode,lut_function);
-			j += 3*(size_0*size_1);
+			j += 3*size_0*size_1;
 			widget->threadsLUT_.push_back(static_cast<QThread*>(t__));
 			t__->start();
 		}
 	}
 	else
 	{
-		int j=0;
+		int j = 0;
 		unsigned int block = 64;
 		if (static_cast<float>(size[1])/static_cast<float>(block)>16.0f) block=128;
 		const int tmp100 = size[1]%block;
 		const int incr = (int)floor(size[1]/(double)block);
 		if (size[1] > block)
 		{
-			for (int i=0; i<incr; i++)
+			for (int i=0; i<incr; ++i)
 			{
 				const int size_0 = size[0];
 				const int index_0 = 0;
@@ -1216,7 +1216,7 @@ template<typename T> void load_image(const typename T::Pointer & image,
 							index_0, index_1, j,
 							ivariant->di->us_window_center, ivariant->di->us_window_width,
 							lut, alt_mode,lut_function);
-				j += 3*(size_0*block);
+				j += 3*size_0*block;
 				widget->threadsLUT_.push_back(static_cast<QThread*>(t__));
 				t__->start();
 			}
@@ -1254,13 +1254,13 @@ template<typename T> void load_image(const typename T::Pointer & image,
 	while (true)
 	{
 		unsigned short b__ = 0;
-		for (int i=0; i < threadsLUT_size; i++)
+		for (int i=0; i < threadsLUT_size; ++i)
 		{
-			if (widget->threadsLUT_.at(i)->isFinished()) { b__++; }
+			if (widget->threadsLUT_.at(i)->isFinished()) { ++b__; }
 		}
-		if (b__==threadsLUT_size) break;
+		if (b__ == threadsLUT_size) break;
 	}
-	for (int i=0; i < threadsLUT_size; i++)
+	for (int i = 0; i < threadsLUT_size; ++i)
 	{
 		delete widget->threadsLUT_[i];
 		widget->threadsLUT_[i] = NULL;
@@ -1270,10 +1270,10 @@ template<typename T> void load_image(const typename T::Pointer & image,
 	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
 	const QRectF rectf(0,0,size[0],size[1]);
 	double scale__;
-	if (spacing[0]!=spacing[1])
+	if (spacing[0] != spacing[1])
 	{
-		if (spacing[1]>spacing[0]) coeff_size_1 = spacing[1]/spacing[0];
-		else                       coeff_size_0 = spacing[0]/spacing[1];
+		if (spacing[1] > spacing[0]) coeff_size_1 = spacing[1]/spacing[0];
+		else                         coeff_size_0 = spacing[0]/spacing[1];
 	}
 	QString top_string = QString(""), left_string = QString("");
 	bool flip_y = false, flip_x = false;
@@ -1524,7 +1524,7 @@ GraphicsWidget::~GraphicsWidget()
 	run__ = false;
 	if (mutex.tryLock(30000))
 	{
-		for (unsigned int i=0; i<threads_.size(); i++)
+		for (unsigned int i=0; i<threads_.size(); ++i)
 		{
 			if (threads_.at(i))
 			{
@@ -1533,7 +1533,7 @@ GraphicsWidget::~GraphicsWidget()
 				threads_[i] = NULL;
 			}
 		}
-		for (unsigned int i=0; i<threadsLUT_.size(); i++)
+		for (unsigned int i=0; i<threadsLUT_.size(); ++i)
 		{
 			if (threadsLUT_.at(i))
 			{
@@ -2450,9 +2450,13 @@ void GraphicsWidget::animate_()
 		{
 			k = image_container.image3D->di->selected_x_slice;
 			if (k >= image_container.image3D->di->idimx-1 || k < 0)
+			{
 				k = 0;
+			}
 			else
-				k+=1;
+			{
+				++k;
+			}
 			image_container.image3D->di->selected_x_slice = k;
 		}
 		break;
@@ -2460,9 +2464,13 @@ void GraphicsWidget::animate_()
 		{
 			k = image_container.image3D->di->selected_y_slice;
 			if (k >= image_container.image3D->di->idimy-1 || k < 0)
+			{
 				k = 0;
+			}
 			else
-				k+=1;
+			{
+				++k;
+			}
 			image_container.image3D->di->selected_y_slice = k;
 		}
 		break;
@@ -2470,9 +2478,13 @@ void GraphicsWidget::animate_()
 		{
 			k = image_container.image3D->di->selected_z_slice;
 			if (k >= image_container.image3D->di->idimz-1 || k < 0)
+			{
 				k = 0;
+			}
 			else
-				k+=1;
+			{
+				++k;
+			}
 			if (image_container.image3D->di->lock_2Dview)
 			{
 				image_container.image3D->di->from_slice = k;
@@ -2625,7 +2637,7 @@ void GraphicsWidget::update_measurement(
 		QVector<int> ids;
 		QVector<int> ids2;
 		QVector<int> high_priority_regions;
-		for (int x = 0; x < ivariant->usregions.size(); x++)
+		for (int x = 0; x < ivariant->usregions.size(); ++x)
 		{
 			if (x0 >= ivariant->usregions.at(x).m_X0 &&
 				y0 >= ivariant->usregions.at(x).m_Y0 &&
@@ -2642,7 +2654,7 @@ void GraphicsWidget::update_measurement(
 				ids2.push_back(x);
 			}
 		}
-		for (int x = 0; x < ids.size(); x++)
+		for (int x = 0; x < ids.size(); ++x)
 		{
 			if (ivariant->usregions.at(ids.at(x)).m_FlagsBool)
 			{
@@ -2654,7 +2666,7 @@ void GraphicsWidget::update_measurement(
 		}
 		//
 		QString data_type("");
-		for (int x = 0; x < ids2.size(); x++)
+		for (int x = 0; x < ids2.size(); ++x)
 		{
 			if (
 				!ivariant->usregions.at(
@@ -3176,7 +3188,7 @@ QString GraphicsWidget::contours_from_selected_paths(
 		message = QString("Nothing selected,\nclick at contour");
 		goto quit__;
 	}
-	for (int x = 0; x < selected_items_size; x++)
+	for (int x = 0; x < selected_items_size; ++x)
 	{
 		QString s0 = QVariant(x+1).toString() + QString(": ");
 		QString s1("");

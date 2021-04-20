@@ -498,7 +498,7 @@ void MainWindow::open_args(const QStringList & l)
 		{
 			l2.push_back(l.at(i));
 		}
-		i++;
+		++i;
 	}
 	if (l2.size()==0)
 	{
@@ -538,7 +538,7 @@ void MainWindow::open_args(const QStringList & l)
 	}
 	else if (l2.size()>1)
 	{
-		for (int x = 0; x < l2.size(); x++)
+		for (int x = 0; x < l2.size(); ++x)
 		{
 			pb->setValue(-1);
 			const QString f = l2.at(x);
@@ -1202,7 +1202,7 @@ void MainWindow::dropEvent(QDropEvent * e)
 	QStringList l;
 	if (mimeData && mimeData->hasUrls())
 	{
-		for (int i = 0; i < mimeData->urls().size(); i++)
+		for (int i = 0; i < mimeData->urls().size(); ++i)
 			l.push_back(mimeData->urls().at(i).toLocalFile());
 	}
 	if (l.size() > 0)
@@ -1237,7 +1237,7 @@ void MainWindow::dropEvent(QDropEvent * e)
 			pb->setValue(-1);
 			pb->show();
 			qApp->processEvents();
-			for (int i = 0; i < l.size(); i++)
+			for (int i = 0; i < l.size(); ++i)
 			{
 				if (i == 0 && fi.isFile())
 				{
@@ -1296,7 +1296,7 @@ void MainWindow::load_any()
 	pb->show();
 	qApp->processEvents();
 	bool is_dicomdir = false;
-	for (int x = 0; x < l.size(); x++)
+	for (int x = 0; x < l.size(); ++x)
 	{
 		QFileInfo fi(l.at(x));
 		CommonUtils::set_open_dir(fi.absolutePath());

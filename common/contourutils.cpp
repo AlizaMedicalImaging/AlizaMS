@@ -26,20 +26,20 @@ template <typename T> void calculate_uvt(
 	ImageVariant * ivariant)
 {
 	if (image.IsNull()) return;
-	unsigned long count = 0;
-	for (int x = 0; x < ivariant->di->rois.size(); x++)
+	unsigned long long count = 0;
+	for (int x = 0; x < ivariant->di->rois.size(); ++x)
 	{
 		QMap< int, Contour* >::iterator it =
 			ivariant->di->rois[x].contours.begin();
 		while (it != ivariant->di->rois[x].contours.end())
 		{
-			count += 1;
+			++count;
 			Contour * c = it.value();
 			if (c)
 			{
 				bool planar = true;
 				int  tmp0 = -1;
-				for (long k = 0; k < c->dpoints.size(); k++)
+				for (int k = 0; k < c->dpoints.size(); ++k)
 				{
 					itk::ContinuousIndex<float, 3> index;
 					typename T::PointType point;
@@ -54,9 +54,7 @@ template <typename T> void calculate_uvt(
 						c->dpoints[k].u = index[0];
 						c->dpoints[k].v = index[1];
 						c->dpoints[k].t = static_cast<int>(round(index[2]));
-						if (
-							k>0 &&
-							(tmp0 != c->dpoints[k].t))
+						if ((k > 0) && (tmp0 != c->dpoints[k].t))
 						{
 							if (planar) planar = false;
 						}
@@ -85,19 +83,19 @@ float ContourUtils::distance_to_plane(
 	return d;
 }
 
-long ContourUtils::get_next_contour_tmpid()
+long long ContourUtils::get_next_contour_tmpid()
 {
-	static long contour_tmpid___ = 0;
-	contour_tmpid___+=1;
+	static long long contour_tmpid___ = 0;
+	++contour_tmpid___;
 	return contour_tmpid___;
 }
 
 void ContourUtils::calculate_rois_center(ImageVariant * iv)
 {
 	if (!iv) return;
-	long int z = 0;
+	unsigned long long z = 0;
 	double tmpx = 0.0, tmpy = 0.0, tmpz = 0.0;
-	for (int x = 0; x < iv->di->rois.size(); x++)
+	for (int x = 0; x < iv->di->rois.size(); ++x)
 	{
 		QMap< int, Contour* >::const_iterator it =
 			iv->di->rois.at(x).contours.constBegin();
@@ -106,9 +104,9 @@ void ContourUtils::calculate_rois_center(ImageVariant * iv)
 			const Contour * c = it.value();
 			if (c)
 			{
-				for (int k = 0; k < c->dpoints.size(); k++)
+				for (int k = 0; k < c->dpoints.size(); ++k)
 				{
-					z++;
+					++z;
 					tmpx += (double)c->dpoints.at(k).x;
 					tmpy += (double)c->dpoints.at(k).y;
 					tmpz += (double)c->dpoints.at(k).z;
@@ -132,7 +130,7 @@ int ContourUtils::get_new_roi_id(const ImageVariant * ivariant)
 {
 	if (!ivariant) return -1;
 	int tmp0 = 0;
-	for (int x = 0; x < ivariant->di->rois.size(); x++)
+	for (int x = 0; x < ivariant->di->rois.size(); ++x)
 	{
 		if (ivariant->di->rois.at(x).id >= tmp0)
 			tmp0 = ivariant->di->rois.at(x).id;
@@ -159,24 +157,24 @@ void ContourUtils::generate_roi_vbos(
 			{
 				ok = false;
 			}
-			unsigned long ind = 0;
+			size_t ind = 0;
 			if (ok && !c->vao_initialized)
 			{
-				const unsigned long s = 3*c->dpoints.size();
+				const size_t s = 3*c->dpoints.size();
 				GLfloat * v;
 				try { v = new GLfloat[s]; }
 				catch(std::bad_alloc&) { return; }
 				if (!v) return;
-				for (long k=0; k < c->dpoints.size(); k++)
+				for (int k = 0; k < c->dpoints.size(); ++k)
 				{
 					v[ind] = (GLfloat)(c->dpoints.at(k).x);
-					ind+=1;
+					++ind;
 					v[ind] = (GLfloat)(c->dpoints.at(k).y);
-					ind+=1;
+					++ind;
 					v[ind] = (GLfloat)(c->dpoints.at(k).z);
-					ind+=1;
+					++ind;
 				}
-				if (ind!=s)
+				if (ind != s)
 				{
 					std::cout
 						<< "failed generating VBOs (contours)"
@@ -241,14 +239,17 @@ void ContourUtils::copy_roi(
 			contour->roiid = id; 
 			contour->type = c->type;
 			contour->vao_initialized = false;
-			for (int i = 0; i < c->dpoints.size(); i++)
+			for (int i = 0; i < c->dpoints.size(); ++i)
+			{
 				contour->dpoints.push_back(c->dpoints[i]);
-			for (
-				int i = 0;
+			}
+			for (int i = 0;
 				i < c->ref_sop_instance_uids.size();
-				i++)
+				++i)
+			{
 				contour->ref_sop_instance_uids
 					.push_back(c->ref_sop_instance_uids.at(i));
+			}
 			dest.contours[contour->id] = contour;
 		}
 		++it;
@@ -259,7 +260,7 @@ void ContourUtils::calculate_uvt_nonuniform(
 	ImageVariant * ivariant)
 {
 	if (!ivariant) return;
-	for (int x = 0; x < ivariant->di->rois.size(); x++)
+	for (int x = 0; x < ivariant->di->rois.size(); ++x)
 	{
 		QMap< int, Contour* >::iterator it =
 			ivariant->di->rois[x].contours.begin();
@@ -270,7 +271,7 @@ void ContourUtils::calculate_uvt_nonuniform(
 			QList<int> slices;
 			for (unsigned int z = 0;
 				z < (unsigned int)ivariant->di->idimz;
-				z++)
+				++z)
 			{
 				bool in_slice = false;
 				if (ivariant->di->image_slices.size() > z)
@@ -291,7 +292,7 @@ void ContourUtils::calculate_uvt_nonuniform(
 						(float)(ivariant->di->image_slices.at(z)->v[8])-pz);
 					const sVector3 n = Vectormath::Scalar::normalize(
 						Vectormath::Scalar::cross(v1,v2));
-					for (int k = 0; k < c->dpoints.size(); k++)
+					for (int k = 0; k < c->dpoints.size(); ++k)
 					{
 						const float distance =
 							distance_to_plane(
@@ -318,7 +319,7 @@ void ContourUtils::calculate_uvt_nonuniform(
 			if (slices.size()==1)
 			{
 				const int idx = slices.at(0);
-				for (long k = 0; k < c->dpoints.size(); k++)
+				for (int k = 0; k < c->dpoints.size(); ++k)
 				{
 					ImageTypeUC::Pointer image = ImageTypeUC::New();
 					const bool image_ok =
@@ -430,7 +431,7 @@ void ContourUtils::map_contours_uniform(
 		return;
 	}
 	const float tolerance = (float)ivariant->di->iz_spacing*0.5f;
-	for (int x = 0; x < ivariant->di->rois.size(); x++)
+	for (int x = 0; x < ivariant->di->rois.size(); ++x)
 	{
 		if (ivariant->di->rois.at(x).id == roi_id)
 		{
@@ -441,7 +442,7 @@ void ContourUtils::map_contours_uniform(
 			{
 				const Contour * c = it.value();
 				if (!c) continue;
-				for (int z = 0; z < ivariant->di->idimz; z++)
+				for (int z = 0; z < ivariant->di->idimz; ++z)
 				{
 					const float px =
 						(float)ivariant->di->image_slices.at(z)->v[0];
@@ -459,7 +460,7 @@ void ContourUtils::map_contours_uniform(
 						(float)(ivariant->di->image_slices.at(z)->v[8]) - pz);
 					const sVector3 n = Vectormath::Scalar::normalize(
 						Vectormath::Scalar::cross(v1,v2));
-					for (int k = 0; k < c->dpoints.size(); k++)
+					for (int k = 0; k < c->dpoints.size(); ++k)
 					{
 						const float distance = distance_to_plane(
 							c->dpoints.at(k).x,
@@ -501,7 +502,7 @@ void ContourUtils::map_contours_nonuniform(
 		return;
 	}
 	const float tolerance = 0.1f;
-	for (int x = 0; x < ivariant->di->rois.size(); x++)
+	for (int x = 0; x < ivariant->di->rois.size(); ++x)
 	{
 		if (ivariant->di->rois.at(x).id == roi_id)
 		{
@@ -514,7 +515,7 @@ void ContourUtils::map_contours_nonuniform(
 				if (!c) continue;
 				bool in_slice = false;
 				QList<int> slices;
-				for (int z = 0; z < ivariant->di->idimz; z++)
+				for (int z = 0; z < ivariant->di->idimz; ++z)
 				{
 					const float px =
 						(float)ivariant->di->image_slices.at(z)->v[0];
@@ -538,7 +539,7 @@ void ContourUtils::map_contours_nonuniform(
 							- pz);
 					const sVector3 n = Vectormath::Scalar::normalize(
 						Vectormath::Scalar::cross(v1,v2));
-					for (int k = 0; k < c->dpoints.size(); k++)
+					for (int k = 0; k < c->dpoints.size(); ++k)
 					{
 						const float distance = distance_to_plane(
 							c->dpoints.at(k).x,
@@ -605,7 +606,7 @@ void ContourUtils::map_contours_all(
 	ImageVariant * ivariant)
 {
 	if (!ivariant) return;
-	for (int x = 0; x < ivariant->di->rois.size(); x++)
+	for (int x = 0; x < ivariant->di->rois.size(); ++x)
 	{
 		map_contours(ivariant, ivariant->di->rois.at(x).id);
 	}
@@ -615,10 +616,10 @@ void ContourUtils::map_contours_test_refs(
 	ImageVariant * ivariant)
 {
 	if (!ivariant) return;
-	for (int x = 0; x < ivariant->di->rois.size(); x++)
+	for (int x = 0; x < ivariant->di->rois.size(); ++x)
 	{
 		ivariant->di->rois[x].map.clear();
-		for (int z = 0; z < ivariant->di->idimz; z++)
+		for (int z = 0; z < ivariant->di->idimz; ++z)
 		{
 			QMap< int, Contour* >::const_iterator it =
 				ivariant->di->rois.at(x).contours.constBegin();
@@ -629,7 +630,7 @@ void ContourUtils::map_contours_test_refs(
 				{
 					for (int y = 0;
 						y < c->ref_sop_instance_uids.size();
-						y++)
+						++y)
 					{
 						if (c->ref_sop_instance_uids.at(y) ==
 							ivariant->image_instance_uids.value(z))
@@ -648,7 +649,7 @@ void ContourUtils::contours_build_path(
 {
 	if (!ivariant) return;
 	if (ivariant->di->idimz == 0) return;
-	for (int x = 0; x < ivariant->di->rois.size(); x++)
+	for (int x = 0; x < ivariant->di->rois.size(); ++x)
 	{
 		if (ivariant->di->rois.at(x).id == roi_id)
 		{
@@ -663,7 +664,7 @@ void ContourUtils::contours_build_path(
 				// CLOSED_PLANAR, OPEN_PLANAR
 				if (contour_type == 1||contour_type == 2)
 				{
-					for (int k = 0; k < c->dpoints.size(); k++)
+					for (int k = 0; k < c->dpoints.size(); ++k)
 					{
 						if (k == 0)
 						{
@@ -681,7 +682,7 @@ void ContourUtils::contours_build_path(
 				// POINT
 				else if (contour_type == 4)
 				{
-					for (int k = 0; k < c->dpoints.size(); k++)
+					for (int k = 0; k < c->dpoints.size(); ++k)
 					{
 						const DPoint & pf_ = c->dpoints.at(k);
 						path.addRect(
@@ -694,9 +695,9 @@ void ContourUtils::contours_build_path(
 				// NON-PLANAR, not set
 				else
 				{
-					for (int z = 0; z < ivariant->di->idimz; z++)
+					for (int z = 0; z < ivariant->di->idimz; ++z)
 					{
-						for (int k = 0; k < c->dpoints.size(); k++)
+						for (int k = 0; k < c->dpoints.size(); ++k)
 						{
 							const DPoint & pf_ = c->dpoints.at(k);
 							if (pf_.t == z)
@@ -723,7 +724,7 @@ void ContourUtils::contours_build_path_all(
 {
 	if (!ivariant) return;
 	if (ivariant->di->idimz == 0) return;
-	for (int x = 0; x < ivariant->di->rois.size(); x++)
+	for (int x = 0; x < ivariant->di->rois.size(); ++x)
 	{
 		contours_build_path(ivariant, ivariant->di->rois.at(x).id);
 		QApplication::processEvents();
@@ -737,11 +738,11 @@ void ContourUtils::copy_imagevariant_rois_no_init(
 	if (!dest) return;
 	if (!source) return;
 	int tmp0 = get_new_roi_id(dest);
-	for (int x = 0; x < source->di->rois.size(); x++)
+	for (int x = 0; x < source->di->rois.size(); ++x)
 	{
 		ROI roi;
 		roi.id = tmp0;
-		tmp0 += 1;
+		++tmp0;
 		copy_roi(roi, source->di->rois.at(x));
 		dest->di->rois.push_back(roi);
 	}

@@ -93,12 +93,12 @@ void SRWidget::closeEvent(QCloseEvent * e)
 		textBrowser->document()->clear();
 	}
 	textBrowser->clear();
-	for (int k = 0; k < tmpfiles.size(); k++)
+	for (int k = 0; k < tmpfiles.size(); ++k)
 	{
 		QFile::remove(tmpfiles.at(k));
 	}
 	tmpfiles.clear();
-	for (size_t k = 0; k < srimages.size(); k++)
+	for (size_t k = 0; k < srimages.size(); ++k)
 	{
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 		srimages[k].i = QImage();
