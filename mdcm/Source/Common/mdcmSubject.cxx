@@ -76,7 +76,7 @@ unsigned long SubjectInternals::AddObserver(const Event & event, Command * cmd)
 {
   Observer * ptr = new Observer(cmd, event.MakeObject(), m_Count);
   m_Observers.push_back(ptr);
-  m_Count++;
+  ++m_Count;
   return ptr->m_Tag;
 }
 
@@ -85,7 +85,7 @@ unsigned long SubjectInternals::AddObserver(const Event & event, Command * cmd) 
   Observer * ptr = new Observer(cmd, event.MakeObject(), m_Count);
   SubjectInternals * me = const_cast<SubjectInternals *>(this);
   me->m_Observers.push_back(ptr);
-  me->m_Count++;
+  ++(me->m_Count);
   return ptr->m_Tag;
 }
 

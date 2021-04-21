@@ -325,13 +325,13 @@ public:
 		fv      = new float[12];
 		tc      = new float[12];
 		ipp_iop = new double[9];
-		for (int x = 0; x < 12; x++)
+		for (int x = 0; x < 12; ++x)
 		{
 			v[x]  = 0.0f;
 			fv[x] = 0.0f;
 			tc[x] = 0.0f;
 		}
-		for (int x = 0; x <  9; x++)
+		for (int x = 0; x <  9; ++x)
 		{
 			ipp_iop[x] = 0.0;
 		}
@@ -363,7 +363,7 @@ public:
 		pvaoid  = 0;
 		pvboid  = 0;
 		fv      = new float[12];
-		for (int x = 0; x < 12; x++) { fv[x] = 0.0f; }
+		for (int x = 0; x < 12; ++x) { fv[x] = 0.0f; }
 		lsize = 0;
 		psize = 0;
 	}
@@ -396,7 +396,7 @@ public:
 		dimx(j.dimx), dimy(j.dimy),
 		x(j.x), y(j.y)
 	{
-		for (size_t k = 0; k < j.data.size(); k++)
+		for (size_t k = 0; k < j.data.size(); ++k)
 		{
 			data.push_back(j.data.at(k));
 		}
@@ -413,7 +413,7 @@ public:
 		dimy = j.dimy;
 		x = j.x;
 		y = j.y;
-		for (size_t k = 0; k < j.data.size(); k++)
+		for (size_t k = 0; k < j.data.size(); ++k)
 		{
 			data.push_back(j.data.at(k));
 		}
@@ -680,7 +680,7 @@ public:
 		}
 		for (unsigned int x = 0;
 			x < VerticesofthePolygonalShutter.size();
-			x++)
+			++x)
 		{
 			if (o.VerticesofthePolygonalShutter.at(x) !=
 				VerticesofthePolygonalShutter.at(x))

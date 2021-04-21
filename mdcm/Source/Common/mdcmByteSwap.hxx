@@ -75,7 +75,7 @@ void ByteSwap<T>::SwapFromSwapCodeIntoSystem(T &a, SwapCode const &swapcode)
 template <class T>
 void ByteSwap<T>::SwapRange(T *p, unsigned int num)
 {
-  for(unsigned int i=0; i<num; i++)
+  for(unsigned int i = 0; i < num; ++i)
   {
     ByteSwap<T>::Swap(p[i]);
   }
@@ -85,7 +85,7 @@ template <class T>
 void ByteSwap<T>::SwapRangeFromSwapCodeIntoSystem(T *p, SwapCode const &sc,
   std::streamoff num)
 {
-  for(std::streamoff i=0; i<num; i++)
+  for(std::streamoff i = 0; i < num; ++i)
   {
     ByteSwap<T>::SwapFromSwapCodeIntoSystem(p[i], sc);
   }

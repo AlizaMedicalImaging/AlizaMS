@@ -320,7 +320,7 @@ const char * System::GetCurrentProcessFileName()
 static int getlastdigit(unsigned char * data, unsigned long size)
 {
   int extended, carry = 0;
-  for(unsigned int i=0;i<size;i++)
+  for(unsigned int i = 0;i < size; ++i)
   {
     extended = (carry << 8) + data[i];
     data[i] = (unsigned char)(extended / 10);
@@ -599,8 +599,8 @@ int System::StrNCaseCmp(const char * s1, const char * s2, size_t n)
   assert(n); // TODO
   while (--n && *s1 && (tolower(*s1) == tolower(*s2)))
   {
-    s1++;
-    s2++;
+    ++s1;
+    ++s2;
   }
   return tolower(*s1) - tolower(*s2);
 #endif
@@ -616,8 +616,8 @@ int System::StrCaseCmp(const char * s1, const char * s2)
 #error
   while (*s1 && (tolower(*s1) == tolower(*s2)))
   {
-    s1++;
-    s2++;
+    ++s1;
+    ++s2;
   }
   return tolower(*s1) - tolower(*s2);
 #endif

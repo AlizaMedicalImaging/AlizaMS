@@ -243,7 +243,7 @@ bool CAPICryptographicMessageSyntax::Decrypt(char *output, size_t &outlen, const
   DWORD cekLen;
   {
     BOOL foundRecipient = FALSE;
-    for (DWORD i=0; i < nrOfRecipeints; i++)
+    for (DWORD i=0; i < nrOfRecipeints; ++i)
     {
       if (recipientInfo) delete[] recipientInfo;
       DWORD cbRecipientInfoLen;
@@ -456,7 +456,7 @@ bool CAPICryptographicMessageSyntax::Initialize()
 void CAPICryptographicMessageSyntax::ReverseBytes(BYTE * data, DWORD len)
 {
   BYTE temp;
-  for (DWORD i = 0; i < len/2; i++)
+  for (DWORD i = 0; i < len/2; ++i)
   {
     temp = data[len-i-1];
     data[len-i-1] = data[i];

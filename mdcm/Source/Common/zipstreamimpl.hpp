@@ -775,7 +775,7 @@ basic_zip_istream<charT, traits>::check_header(void)
     z_stream &zip_stream = this->get_zip_stream();
 
     /* Check the gzip magic header */
-    for(len = 0; len < 2; len++)
+    for(len = 0; len < 2; ++len)
     {
         c = (int)this->get_istream().get();
         if (c != detail::gz_magic[len])
@@ -803,7 +803,7 @@ basic_zip_istream<charT, traits>::check_header(void)
     }
 
     /* Discard time, xflags and OS code: */
-    for (len = 0; len < 6; len++)
+    for (len = 0; len < 6; ++len)
         this->get_istream().get();
 
     if ((flagsbyte & detail::gz_extra_field) != 0)
@@ -826,7 +826,7 @@ basic_zip_istream<charT, traits>::check_header(void)
     }
     if ((flagsbyte & detail::gz_head_crc) != 0)
     {  /* skip the header crc */
-        for (len = 0; len < 2; len++)
+        for (len = 0; len < 2; ++len)
             this->get_istream().get();
     }
     err = this->get_istream().eof() ? Z_DATA_ERROR : Z_OK;

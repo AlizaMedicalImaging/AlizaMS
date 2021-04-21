@@ -85,7 +85,7 @@ static int print_hex(unsigned char * buf, int len)
 {
   int i = 0;
   int n = 0;
-  for(; i < len; i++)
+  for(; i < len; ++i)
   {
     if(n > 7)
     {
@@ -93,10 +93,10 @@ static int print_hex(unsigned char * buf, int len)
       n = 0;
     }
     printf("0x%02x, ",buf[i]);
-    n++;
+    ++n;
   }
   printf("\n");
-  return(0);
+  return 0;
 }
 #endif
 

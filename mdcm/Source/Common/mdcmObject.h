@@ -57,7 +57,7 @@ public:
 protected:
   void Register()
   {
-    ReferenceCount++;
+    ++ReferenceCount;
     assert(ReferenceCount > 0);
   }
 

@@ -138,7 +138,7 @@ public:
     // and openssl/crypto/pkcs7/enc.c
     if(!PKCS7_set_cipher(p7,cipher)) return false;
 
-    for(unsigned int i = 0; i < GetNumberOfRecipients(); i++)
+    for(unsigned int i = 0; i < GetNumberOfRecipients(); ++i)
     {
       ::X509 * recip = GetRecipient(i);
       if (!PKCS7_add_recipient(p7,recip)) return false;
@@ -379,7 +379,7 @@ bool OpenSSLP7CryptographicMessageSyntax::Decrypt(
     /* Ok, first we need to, for each subject entry,
      * see if we can verify */
     ERR_clear_error();
-    for (i = 0; i < sk_PKCS7_SIGNER_INFO_num(sk); i++)
+    for (i = 0; i < sk_PKCS7_SIGNER_INFO_num(sk); ++i)
     {
       //si=my_sk_PKCS7_SIGNER_INFO_value(sk,i);
           si=sk_PKCS7_SIGNER_INFO_value(sk,i);
