@@ -103,7 +103,7 @@ void DirectionCosines::Normalize(double v[3])
   double den;
   if ((den = Norm(v)) != 0.0)
   {
-    for (int i=0; i < 3; i++)
+    for (int i=0; i < 3; ++i)
     {
       v[i] /= den;
     }
@@ -116,7 +116,7 @@ void DirectionCosines::Normalize()
   double den;
   if ((den = Norm(x)) != 0.0)
   {
-    for (int i=0; i < 3; i++)
+    for (int i=0; i < 3; ++i)
     {
       x[i] /= den;
     }
@@ -124,7 +124,7 @@ void DirectionCosines::Normalize()
   x = Values+3;
   if ((den = Norm(x)) != 0.0)
   {
-    for (int i=0; i < 3; i++)
+    for (int i=0; i < 3; ++i)
     {
       x[i] /= den;
     }

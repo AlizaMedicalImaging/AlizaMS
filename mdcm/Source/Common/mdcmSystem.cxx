@@ -320,7 +320,7 @@ const char * System::GetCurrentProcessFileName()
 static int getlastdigit(unsigned char * data, unsigned long size)
 {
   int extended, carry = 0;
-  for(unsigned int i = 0;i < size; ++i)
+  for(unsigned int i = 0; i < size; ++i)
   {
     extended = (carry << 8) + data[i];
     data[i] = (unsigned char)(extended / 10);

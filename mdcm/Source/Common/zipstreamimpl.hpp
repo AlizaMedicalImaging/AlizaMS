@@ -775,7 +775,7 @@ basic_zip_istream<charT, traits>::check_header(void)
     z_stream &zip_stream = this->get_zip_stream();
 
     /* Check the gzip magic header */
-    for(len = 0; len < 2; ++len)
+    for (len = 0; len < 2; ++len)
     {
         c = (int)this->get_istream().get();
         if (c != detail::gz_magic[len])

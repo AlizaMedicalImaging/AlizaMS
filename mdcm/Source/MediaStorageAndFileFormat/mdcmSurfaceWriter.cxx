@@ -113,14 +113,14 @@ bool SurfaceWriter::PrepareWrite()
   std::vector<SmartPointer<Segment> >::const_iterator it0End = segments.end();
   unsigned int numSegment= 1;
   unsigned int numSurface= 1;
-  for (; it0 != it0End; it0++)
+  for (; it0 != it0End; ++it0)
   {
     SmartPointer< Segment > segment = *it0;
     assert(segment);
     std::vector<SmartPointer< Surface> >  surfaces  = segment->GetSurfaces();
     std::vector<SmartPointer< Surface> >::const_iterator it1    = surfaces.begin();
     std::vector<SmartPointer< Surface> >::const_iterator it1End = surfaces.end();
-    for (; it1 != it1End; it1++)
+    for (; it1 != it1End; ++it1)
     {
       SmartPointer< Surface > surface = *it1;
       assert(surface);
@@ -482,7 +482,7 @@ bool SurfaceWriter::PrepareWrite()
           MeshPrimitive::PrimitivesData::const_iterator it    = primitivesData.begin();
           MeshPrimitive::PrimitivesData::const_iterator itEnd = primitivesData.end();
           unsigned int i = 1;
-          for (; it != itEnd; it++)
+          for (; it != itEnd; ++it)
           {
             Item &    typedSequenceItem = typedSequenceSQ->GetItem(i++);
             DataSet & pointIndexListDS  = typedSequenceItem.GetNestedDataSet();
@@ -594,7 +594,7 @@ bool SurfaceWriter::PrepareWrite()
     SequenceOfItems::Iterator itRefSurface = refSurfaceSQ->Begin();
     SequenceOfItems::Iterator itEndRefSurface = refSurfaceSQ->End();
     unsigned int idxSurface = 0;
-    for (; itRefSurface != itEndRefSurface; itRefSurface++)
+    for (; itRefSurface != itEndRefSurface; ++itRefSurface)
     {
       DataSet & refSurfaceDS = itRefSurface->GetNestedDataSet();
       SmartPointer<Surface> surface = segment->GetSurface(idxSurface++);

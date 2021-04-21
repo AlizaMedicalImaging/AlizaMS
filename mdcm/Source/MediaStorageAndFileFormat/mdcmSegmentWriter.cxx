@@ -174,7 +174,7 @@ bool SegmentWriter::PrepareWrite()
   std::vector< SmartPointer< Segment > >::const_iterator it0End = Segments.end();
   unsigned int itemNumber = 1;
   unsigned long surfaceNumber = 1;
-  for (; it0 != it0End; it0++)
+  for (; it0 != it0End; ++it0)
   {
     SmartPointer< Segment > segment = *it0;
     assert(segment);
@@ -298,7 +298,7 @@ bool SegmentWriter::PrepareWrite()
       std::vector< SmartPointer< Surface > >::const_iterator it = surfaces.begin();
       std::vector< SmartPointer< Surface > >::const_iterator itEnd = surfaces.end();
       unsigned int itemSurfaceNumber = 1;
-      for (; it != itEnd; it++)
+      for (; it != itEnd; ++it)
       {
         SmartPointer< Surface > surface = *it;
         Item &    segmentsRefItem = segmentsRefSQ->GetItem(itemSurfaceNumber++);

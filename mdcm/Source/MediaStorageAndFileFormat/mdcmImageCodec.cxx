@@ -164,7 +164,7 @@ void ImageCodec::SetDimensions(const std::vector<unsigned int> & d)
 {
   const size_t s = d.size();
   assert(s <= 3);
-  for (size_t i = 0; i < 3; i++)
+  for (size_t i = 0; i < 3; ++i)
   {
     if (i < s) Dimensions[i] = d[i];
     else Dimensions[i] = 1;

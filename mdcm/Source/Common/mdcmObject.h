@@ -64,7 +64,7 @@ protected:
   void UnRegister()
   {
     assert(ReferenceCount > 0);
-    ReferenceCount--;
+    --ReferenceCount;
     if(ReferenceCount <= 0)
     {
       assert(ReferenceCount == 0);

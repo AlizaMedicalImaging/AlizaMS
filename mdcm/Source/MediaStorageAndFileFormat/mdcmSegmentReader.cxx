@@ -54,7 +54,7 @@ SegmentReader::SegmentVector SegmentReader::GetSegments()
     // Search and add only different segments
     SegmentVector::const_iterator itVec;
     SegmentVector::const_iterator itVecEnd;
-    for (; itMap != itMapEnd; itMap++)
+    for (; itMap != itMapEnd; ++itMap)
     {
       itVec = res.begin();
       itVecEnd = res.end(); // if res is a list, remove this line
@@ -275,7 +275,7 @@ bool SegmentReader::ReadSegment(const Item & segmentItem, const unsigned int idx
       SequenceOfItems::ConstIterator itRefSurface     = refSurfaceSQ->Begin();
       SequenceOfItems::ConstIterator itEndRefSurface  = refSurfaceSQ->End();
       unsigned long                  numberOfSurfaces = 0;
-      for (; itRefSurface != itEndRefSurface; itRefSurface++)
+      for (; itRefSurface != itEndRefSurface; ++itRefSurface)
       {
         const DataSet & refSurfaceDS = itRefSurface->GetNestedDataSet();
         // Referenced Surface Number

@@ -1788,7 +1788,7 @@ void ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
     for(unsigned int i = 0; i < dimz; ++i)
     {
       double new_origin[3];
-      for (int j = 0; j < 3; j++)
+      for (int j = 0; j < 3; ++j)
       { 
         // the n'th slice is n * z-spacing aloung the IOP-derived
         // z-axis

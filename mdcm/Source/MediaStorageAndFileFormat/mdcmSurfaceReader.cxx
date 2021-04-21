@@ -83,7 +83,7 @@ bool SurfaceReader::ReadSurfaces()
     SequenceOfItems::ConstIterator itSurface    = surfaceSQ->Begin();
     SequenceOfItems::ConstIterator itEndSurface = surfaceSQ->End();
     unsigned long idxItem = 1;
-    for (; itSurface != itEndSurface; itSurface++)
+    for (; itSurface != itEndSurface; ++itSurface)
     {
       if(!ReadSurface(*itSurface, idxItem))
       {

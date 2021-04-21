@@ -289,7 +289,7 @@ unsigned int VR::GetIndex(VRType vr)
   default:
     {
       long long a = (long long)vr;
-      for (; a > 1; l++) a >>= 1LL;
+      for (; a > 1; ++l) a >>= 1LL;
       l++;
     }
     break;
@@ -319,7 +319,7 @@ const char * VR::GetVRStringFromFile(VRType vr)
 VR::VRType VR::GetVRTypeFromFile(const char * vr)
 {
   VRType r = VR::VR_END;
-  for (int i = 1; VRStrings[i] != NULL; i++)
+  for (int i = 1; VRStrings[i] != NULL; ++i)
   {
     const char *ref = VRStrings[i];
     if (ref[0] == vr[0] && ref[1] == vr[1])
@@ -350,7 +350,7 @@ VR::VRType VR::GetVRType(const char * vr)
 {
   VRType r = VR::VR_END;
   if (!vr) return r;
-  for (int i = 0; VRStrings[i] != NULL; i++)
+  for (int i = 0; VRStrings[i] != NULL; ++i)
   {
     if (strcmp(VRStrings[i],vr) == 0)
     {
@@ -386,7 +386,7 @@ VR::VRType VR::GetVRType(const char * vr)
 
 bool VR::IsValid(const char * vr)
 {
-  for (int i = 1; VRStrings[i] != NULL; i++)
+  for (int i = 1; VRStrings[i] != NULL; ++i)
   {
     const char * ref = VRStrings[i];
     if (ref[0] == vr[0] && ref[1] == vr[1])

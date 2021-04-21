@@ -236,7 +236,7 @@ VM::VMType VM::GetVMType(const char * vm)
 {
   if (!vm)  return VM::VM_END;
   if (!*vm) return VM::VM0; // FIXME
-  for (int i = 0; VMStrings[i] != NULL; i++)
+  for (int i = 0; VMStrings[i] != NULL; ++i)
   {
     if (strcmp(VMStrings[i],vm) == 0)
     {
