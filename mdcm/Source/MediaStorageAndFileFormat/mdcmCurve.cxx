@@ -436,46 +436,46 @@ void Curve::GetAsPoints(float * array) const
     // X
     if(genidx == 0)
     {
-      for(int i = 0; i < Internal->NumberOfPoints; i++)
+      for(int i = 0; i < Internal->NumberOfPoints; ++i)
         array[3*i+0] = (float)ComputeValueFromStartAndStep(i);
     }
     else
     {
-      for(int i = 0; i < Internal->NumberOfPoints; i++)
+      for(int i = 0; i < Internal->NumberOfPoints; ++i)
         array[3*i+0] = p[i + 0];
     }
     // Y
     if(genidx == 1)
     {
-      for(int i = 0; i < Internal->NumberOfPoints; i++)
+      for(int i = 0; i < Internal->NumberOfPoints; ++i)
         array[3*i+1] = (float)ComputeValueFromStartAndStep(i);
     }
     else
     {
       if(mult == 2 && genidx == -1)
       {
-        for(int i = 0; i < Internal->NumberOfPoints; i++)
+        for(int i = 0; i < Internal->NumberOfPoints; ++i)
           array[3*i+1] = p[i + 1];
       }
       else if(mult == 2 && genidx == 0)
       {
-        for(int i = 0; i < Internal->NumberOfPoints; i++)
+        for(int i = 0; i < Internal->NumberOfPoints; ++i)
           array[3*i+1] = p[i + 0];
       }
       else
       {
-        for(int i = 0; i < Internal->NumberOfPoints; i++)
+        for(int i = 0; i < Internal->NumberOfPoints; ++i)
           array[3*i+1] = 0;
       }
     }
     // Z
-    for(int i = 0; i < Internal->NumberOfPoints; i++)
+    for(int i = 0; i < Internal->NumberOfPoints; ++i)
       array[3*i+2] = 0;
   }
   else if(Internal->DataValueRepresentation == 1)
   {
     int16_t * p = (int16_t*)&Internal->Data[0];
-    for(int i = 0; i < Internal->NumberOfPoints; i++)
+    for(int i = 0; i < Internal->NumberOfPoints; ++i)
     {
       array[3*i+0] = p[mult*i + 0];
       if(mult > 1) array[3*i+1] = p[mult*i + 1];
@@ -486,7 +486,7 @@ void Curve::GetAsPoints(float * array) const
   else if(Internal->DataValueRepresentation == 2)
   {
     float * p = (float*)&Internal->Data[0];
-    for(int i = 0; i < Internal->NumberOfPoints; i++)
+    for(int i = 0; i < Internal->NumberOfPoints; ++i)
     {
       array[3*i+0] = p[mult*i + 0];
       if(mult > 1) array[3*i+1] = p[mult*i + 1];
@@ -497,7 +497,7 @@ void Curve::GetAsPoints(float * array) const
   else if(Internal->DataValueRepresentation == 3)
   {
     double * p = (double*)&Internal->Data[0];
-    for(int i = 0; i < Internal->NumberOfPoints; i++)
+    for(int i = 0; i < Internal->NumberOfPoints; ++i)
     {
       array[3*i+0] = (float)p[mult*i + 0];
       if(mult > 1) array[3*i+1] = (float)p[mult*i + 1];
@@ -508,7 +508,7 @@ void Curve::GetAsPoints(float * array) const
   else if(Internal->DataValueRepresentation == 4)
   {
     int32_t * p = (int32_t*)&Internal->Data[0];
-    for(int i = 0; i < Internal->NumberOfPoints; i++)
+    for(int i = 0; i < Internal->NumberOfPoints; ++i)
     {
       array[3*i+0] = (float)p[mult*i + 0];
       if(mult > 1) array[3*i+1] = (float)p[mult*i + 1];

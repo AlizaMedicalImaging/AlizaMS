@@ -498,7 +498,7 @@ int rle_decoder::decode_row(dest & d)
 
 rle_decoder::streamsize_t rle_decoder::decode_frame(dest & d)
 {
-  for(int i = 0; i < internals->nsources; i++)
+  for(int i = 0; i < internals->nsources; ++i)
   {
     source *s = internals->sources[i];
     assert(s->tell() == internals->rh.offset[i]);
@@ -537,7 +537,7 @@ bool rle_decoder::read_header(pixel_info & pi)
   if(!check_header(rh, pi)) return false;
   // now is a good time to initialize all sources
   assert(internals->nsources == (int)internals->rh.num_segments);
-  for(int i = 1; i < internals->nsources; i++)
+  for(int i = 1; i < internals->nsources; ++i)
   {
     internals->sources[i] = s->clone();
     const bool ok = internals->sources[i]->seek(internals->rh.offset[i]);

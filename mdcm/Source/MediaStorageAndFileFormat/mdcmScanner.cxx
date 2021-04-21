@@ -140,7 +140,7 @@ bool Scanner::Scan(const std::vector<std::string> & filenames, const Dict & dict
     Mappings[""] = d0;
     const size_t filenames_size = filenames.size();
     Filenames.clear();
-    for(size_t x = 0; x < filenames_size; x++)
+    for(size_t x = 0; x < filenames_size; ++x)
     {
       Filenames.push_back(filenames.at(x));
     }

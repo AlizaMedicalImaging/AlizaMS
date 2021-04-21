@@ -431,9 +431,9 @@ void rawtoimage_fill2(
     nmask = (int16_t)(nmask >> (bitsallocated - bitsstored - 1));
     if(pc)
     {
-      for(int compno = 0; compno < numcomps; compno++)
+      for(int compno = 0; compno < numcomps; ++compno)
       {
-        for(int i = 0; i < w * h; i++)
+        for(int i = 0; i < w * h; ++i)
         {
           /* compno : 0 = GREY, (0, 1, 2) = (R, G, B) */
           uint16_t c = *p;
@@ -455,9 +455,9 @@ void rawtoimage_fill2(
     }
     else
     {
-      for(int i = 0; i < w * h; i++)
+      for(int i = 0; i < w * h; ++i)
       {
-        for(int compno = 0; compno < numcomps; compno++)
+        for(int compno = 0; compno < numcomps; ++compno)
         {
           /* compno : 0 = GREY, (0, 1, 2) = (R, G, B) */
           uint16_t c = *p;
@@ -482,9 +482,9 @@ void rawtoimage_fill2(
   {
     if(pc)
     {
-      for(int compno = 0; compno < numcomps; compno++)
+      for(int compno = 0; compno < numcomps; ++compno)
       {
-        for(int i = 0; i < w * h; i++)
+        for(int i = 0; i < w * h; ++i)
         {
           /* compno : 0 = GREY, (0, 1, 2) = (R, G, B) */
           uint16_t c = *p;
@@ -496,9 +496,9 @@ void rawtoimage_fill2(
     }
     else
     {
-      for(int i = 0; i < w * h; i++)
+      for(int i = 0; i < w * h; ++i)
       {
-        for(int compno = 0; compno < numcomps; compno++)
+        for(int compno = 0; compno < numcomps; ++compno)
         {
           /* compno : 0 = GREY, (0, 1, 2) = (R, G, B) */
           uint16_t c = *p;
@@ -521,9 +521,9 @@ void rawtoimage_fill(const T * inputbuffer,
   const T *p = inputbuffer;
   if(pc)
   {
-    for(int compno = 0; compno < numcomps; compno++)
+    for(int compno = 0; compno < numcomps; ++compno)
     {
-      for(int i = 0; i < w * h; i++)
+      for(int i = 0; i < w * h; ++i)
       {
         /* compno : 0 = GREY, (0, 1, 2) = (R, G, B) */
         image->comps[compno].data[i] = *p;
@@ -533,9 +533,9 @@ void rawtoimage_fill(const T * inputbuffer,
   }
   else
   {
-    for(int i = 0; i < w * h; i++)
+    for(int i = 0; i < w * h; ++i)
     {
-      for(int compno = 0; compno < numcomps; compno++)
+      for(int compno = 0; compno < numcomps; ++compno)
       {
         /* compno : 0 = GREY, (0, 1, 2) = (R, G, B) */
         image->comps[compno].data[i] = *p;
@@ -591,7 +591,7 @@ opj_image_t * rawtoimage(
   h = image_height;
   /* initialize image components */
   memset(&cmptparm[0], 0, 3 * sizeof(opj_image_cmptparm_t));
-  for(int i = 0; i < numcomps; i++)
+  for(int i = 0; i < numcomps; ++i)
   {
     //cmptparm[i].prec = bitsstored;
     cmptparm[i].prec = bitsallocated; // FIXME
@@ -1360,7 +1360,7 @@ std::pair<char *, size_t> JPEG2000Codec::DecodeByStreamsCommon(
   {
     return std::make_pair((char*)NULL, 0);
   }
-  for(unsigned int compno = 0; compno < (unsigned int)image->numcomps; compno++)
+  for(unsigned int compno = 0; compno < (unsigned int)image->numcomps; ++compno)
   {
     opj_image_comp_t * comp = &image->comps[compno];
     int w  = image->comps[compno].w;
@@ -1389,7 +1389,7 @@ std::pair<char *, size_t> JPEG2000Codec::DecodeByStreamsCommon(
     if(comp->prec <= 8)
     {
       uint8_t * data8 = (uint8_t*)raw + compno;
-      for(int i = 0; i < wr * hr; i++)
+      for(int i = 0; i < wr * hr; ++i)
       {
         int v = image->comps[compno].data[i / wr * w + i % wr];
         *data8 = (uint8_t)v;
@@ -1400,7 +1400,7 @@ std::pair<char *, size_t> JPEG2000Codec::DecodeByStreamsCommon(
     {
       // ELSCINT1_JP2vsJ2K.dcm is a 12bits image
       uint16_t * data16 = (uint16_t*)raw + compno;
-      for(int i = 0; i < wr * hr; i++)
+      for(int i = 0; i < wr * hr; ++i)
       {
         int v = image->comps[compno].data[i / wr * w + i % wr];
         *data16 = (uint16_t)v;
@@ -1410,7 +1410,7 @@ std::pair<char *, size_t> JPEG2000Codec::DecodeByStreamsCommon(
     else
     {
       uint32_t * data32 = (uint32_t*)raw + compno;
-      for(int i = 0; i < wr * hr; i++)
+      for(int i = 0; i < wr * hr; ++i)
       {
         int v = image->comps[compno].data[i / wr * w + i % wr];
         *data32 = (uint32_t)v;

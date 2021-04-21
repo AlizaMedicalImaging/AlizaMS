@@ -38,7 +38,7 @@ void SurfaceWriter::ComputeNumberOfSurfaces()
 {
   std::vector<SmartPointer<Segment> >::const_iterator it = Segments.begin();
   std::vector<SmartPointer<Segment> >::const_iterator itEnd = Segments.end();
-  for(; it != itEnd; it++)
+  for(; it != itEnd; ++it)
   {
     NumberOfSurfaces += (*it)->GetSurfaceCount();
   }

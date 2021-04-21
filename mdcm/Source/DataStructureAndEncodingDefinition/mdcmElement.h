@@ -446,7 +446,7 @@ static void x16printf(char * buf, int size, Float f)
       return;
     }
     buf[0] = '.';
-    for(int j = 0; j < -1 - iexp; j++)
+    for(int j = 0; j < -1 - iexp; ++j)
     {
       buf[j+1] = '0';
     }
