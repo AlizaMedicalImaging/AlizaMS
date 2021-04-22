@@ -41,7 +41,7 @@ DisplayInterface::DisplayInterface(
 	tex_info = -1;
 	idimx = idimy = idimz = 0;
 	ix_origin = iy_origin = iz_origin = 0.0f;
-	for (int x = 0; x < 6; x++) { dircos[x] = 0.0f; }
+	for (int x = 0; x < 6; ++x) { dircos[x] = 0.0f; }
 	ix_spacing = iy_spacing = iz_spacing = 0.0;
 	dimx = dimy = 0;
 	x_spacing = y_spacing = 0.0;
@@ -112,7 +112,7 @@ void DisplayInterface::close(bool clear_geometry)
 	//
 	//
 	//
-	for (unsigned int x = 0; x < image_slices.size(); x++)
+	for (unsigned int x = 0; x < image_slices.size(); ++x)
 	{
 		if (image_slices.at(x))
 		{
@@ -122,7 +122,7 @@ void DisplayInterface::close(bool clear_geometry)
 	}
 	image_slices.clear();
 	slices_generated = false;
-	for (unsigned int x = 0; x < spectroscopy_slices.size(); x++)
+	for (unsigned int x = 0; x < spectroscopy_slices.size(); ++x)
 	{
 		if (spectroscopy_slices.at(x))
 		{
@@ -180,10 +180,10 @@ void DisplayInterface::close(bool clear_geometry)
 	}
 	spectroscopy_slices.clear();
 	spectroscopy_generated = false;
-	for (int x = 0; x < 6; x++) { dircos[x] = 0.0f; }
-	for (int x = 0; x < 3; x++) { origin[x] = 0.0f; }
+	for (int x = 0; x < 6; ++x) { dircos[x] = 0.0f; }
+	for (int x = 0; x < 3; ++x) { origin[x] = 0.0f; }
 	origin_ok = false;
-	for (int k = 0; k < rois.size(); k++)
+	for (int k = 0; k < rois.size(); ++k)
 	{
 		QList<int> keys;
 		{
@@ -195,7 +195,7 @@ void DisplayInterface::close(bool clear_geometry)
 				++it2;
 			}
 		}
-		for (int x = 0; x < keys.size(); x++)
+		for (int x = 0; x < keys.size(); ++x)
 		{
 			Contour * c = rois[k].contours.value(keys.at(x));
 			if (c)
