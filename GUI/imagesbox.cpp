@@ -7,7 +7,6 @@
 #include <QStringList>
 #include <QTextDocument>
 #include <QToolButton>
-#include <QSettings>
 #include <QDate>
 #include "structures.h"
 #include "commonutils.h"
