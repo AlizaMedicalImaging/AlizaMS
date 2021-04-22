@@ -354,7 +354,7 @@ void Bitmap::Print(std::ostream & os) const
     os << "Dimensions: (";
     std::vector<unsigned int>::const_iterator it = Dimensions.begin();
     os << *it;
-    for (++it; it != Dimensions.end(); ++it)
+    for (; it != Dimensions.end(); ++it)
     {
       os << "," << *it;
     }

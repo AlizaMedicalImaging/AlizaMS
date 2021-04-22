@@ -215,7 +215,7 @@ void Image::Print(std::ostream & os) const
       {
         std::vector<double>::const_iterator it = Origin.begin();
         os << *it;
-        for(++it; it != Origin.end(); ++it)
+        for(; it != Origin.end(); ++it)
         {
           os << "," << *it;
         }
@@ -226,7 +226,7 @@ void Image::Print(std::ostream & os) const
       os << "Spacing: (";
       std::vector<double>::const_iterator it = Spacing.begin();
       os << *it;
-      for(++it; it != Spacing.end(); ++it)
+      for(; it != Spacing.end(); ++it)
       {
         os << "," << *it;
       }
@@ -238,7 +238,7 @@ void Image::Print(std::ostream & os) const
       {
         std::vector<double>::const_iterator it = DirectionCosines.begin();
         os << *it;
-        for(++it; it != DirectionCosines.end(); ++it)
+        for(; it != DirectionCosines.end(); ++it)
         {
           os << "," << *it;
         }
