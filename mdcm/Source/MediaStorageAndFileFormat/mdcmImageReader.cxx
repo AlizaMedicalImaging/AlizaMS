@@ -22,15 +22,11 @@
 
 =========================================================================*/
 #include "mdcmImageReader.h"
-#include "mdcmExplicitDataElement.h"
-#include "mdcmImplicitDataElement.h"
 #include "mdcmValue.h"
-#include "mdcmFileMetaInformation.h"
 #include "mdcmElement.h"
 #include "mdcmTransferSyntax.h"
 #include "mdcmAttribute.h"
 #include "mdcmImageHelper.h"
-#include "mdcmPrivateTag.h"
 
 namespace mdcm
 {
@@ -111,7 +107,7 @@ bool ImageReader::ReadACRNEMAImage()
     return false;
   }
   const DataSet & ds = F->GetDataSet();
-  Image& pixeldata = GetImage();
+  Image & pixeldata = GetImage();
   // Pixel Spacing
   const Tag tpixelspacing(0x0028, 0x0030);
   if(ds.FindDataElement(tpixelspacing))

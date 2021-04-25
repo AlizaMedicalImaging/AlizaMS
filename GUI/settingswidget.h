@@ -35,6 +35,7 @@ public:
 	bool   get_ignore_dim_org() const;
 	bool   get_predictor_workaround() const;
 	bool   get_cornell_workaround() const;
+
 private:
 	int   saved_idx;
 	float scale_icons;

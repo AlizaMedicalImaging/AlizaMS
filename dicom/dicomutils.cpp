@@ -7309,29 +7309,17 @@ QString DicomUtils::read_buffer(
 {
 	*ok = false;
 	if (rescale)
-	{
 		mdcm::ImageHelper::SetForceRescaleInterceptSlope(true);
-	}
 	else
-	{
 		mdcm::ImageHelper::SetForceRescaleInterceptSlope(false);
-	}
 	if (pred6_bug)
-	{
 		mdcm::ImageHelper::SetWorkaroundPredictorBug(true);
-	}
 	else
-	{
 		mdcm::ImageHelper::SetWorkaroundPredictorBug(false);
-	}
 	if (cornell_bug)
-	{
 		mdcm::ImageHelper::SetWorkaroundCornellBug(true);
-	}
 	else
-	{
 		mdcm::ImageHelper::SetWorkaroundCornellBug(false);
-	}
 	mdcm::ImageHelper::SetCleanUnusedBits(clean_unused_bits);
 	mdcm::ImageReader image_reader;
 	QString elscf("");
