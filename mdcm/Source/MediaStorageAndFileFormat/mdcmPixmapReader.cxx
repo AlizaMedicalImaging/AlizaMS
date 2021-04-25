@@ -43,7 +43,9 @@ PixmapReader::PixmapReader() :
   m_AlppySupplementalLUT(false),
   m_ProcessOverlays(true),
   m_ProcessIcons(false),
-  m_ProcessCurves(false) {}
+  m_ProcessCurves(false)
+{
+}
 
 PixmapReader::~PixmapReader()
 {
@@ -778,7 +780,7 @@ bool PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixelda
         return false;
       }
     }
-    if(! lut->Initialized()) return false;
+    if(!lut->Initialized()) return false;
     PixelData->SetLUT(*lut);
   }
   // Supplemental LUT

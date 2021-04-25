@@ -5218,6 +5218,8 @@ QString DicomUtils::read_enhanced(
 	const mdcm::Tag tColumns(0x0028,0x0011);
 	const bool cols_ok = get_us_value(ds,tColumns,&columns_);
 	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
+	const bool pred6_bug = wsettings->get_predictor_workaround();
+	const bool cornell_bug = wsettings->get_cornell_workaround();
 	QString sop("");
 	QString sop_tmp("");
 	QString iod("");
@@ -5306,7 +5308,10 @@ QString DicomUtils::read_enhanced(
 			&unsused1, // GDCM's rescale, unused
 			clean_unused_bits,
 			false, false, false,
-			false, NULL);
+			false,
+			pred6_bug,
+			cornell_bug,
+			NULL);
 	if (*ok==false) return message_;
 	if (
 		rows_ok && cols_ok &&
@@ -5525,6 +5530,8 @@ QString DicomUtils::read_enhanced_supp_palette(
 	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
 	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
+	const bool pred6_bug = wsettings->get_predictor_workaround();
+	const bool cornell_bug = wsettings->get_cornell_workaround();
 	unsigned short rows_ = 0, columns_ = 0;
 	const mdcm::Tag tRows(0x0028,0x0010);
 	const bool rows_ok = get_us_value(ds,tRows,&rows_);
@@ -5614,7 +5621,10 @@ QString DicomUtils::read_enhanced_supp_palette(
 			&unsused1, // GDCM's rescale, unused
 			clean_unused_bits,
 			false, false, false,
-			true, &red_subscript);
+			true,
+			pred6_bug,
+			cornell_bug,
+			&red_subscript);
 #if 0
 	std::cout << "subscript = " << red_subscript << std::endl;
 #endif
@@ -5805,6 +5815,8 @@ QString DicomUtils::read_ultrasound(
 	double origin_x  = 0.0, origin_y  = 0.0, origin_z  = 0.0;
 	double spacing_x = 0.0, spacing_y = 0.0, spacing_z = 0.0;
 	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
+	const bool pred6_bug = wsettings->get_predictor_workaround();
+	const bool cornell_bug = wsettings->get_cornell_workaround();
 	std::vector<char*> data;
 	itk::Matrix<itk::SpacePrecisionType,3,3> direction;
 	mdcm::PixelFormat pixelformat;
@@ -5893,7 +5905,10 @@ QString DicomUtils::read_ultrasound(
 		&shift_tmp, &scale_tmp,
 		clean_unused_bits,
 		false, false, false,
-		false, NULL);
+		false,
+		pred6_bug,
+		cornell_bug,
+		NULL);
 	if (*ok==false) return buff_error;
 	//
 	if (overwrite_mdcm_spacing)
@@ -6072,6 +6087,8 @@ QString DicomUtils::read_series(
 	double origin_x  = 0.0, origin_y  = 0.0, origin_z  = 0.0;
 	double spacing_x = 0.0, spacing_y = 0.0, spacing_z = 0.0;
 	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
+	const bool pred6_bug = wsettings->get_predictor_workaround();
+	const bool cornell_bug = wsettings->get_cornell_workaround();
 	std::vector<char*> data;
 	itk::Matrix<itk::SpacePrecisionType,3,3> direction;
 	mdcm::PixelFormat pixelformat;
@@ -6291,7 +6308,10 @@ QString DicomUtils::read_series(
 				&shift_tmp, &scale_tmp,
 				clean_unused_bits,
 				false, false, elscint,
-				false, NULL);
+				false,
+				pred6_bug,
+				cornell_bug,
+				NULL);
 			if (dimz_>1)
 			{
 				*ok = false;
@@ -6332,7 +6352,10 @@ QString DicomUtils::read_series(
 				&shift_tmp, &scale_tmp,
 				clean_unused_bits,
 				mosaic, uihgrid, elscint,
-				false, NULL);
+				false,
+				pred6_bug,
+				cornell_bug,
+				NULL);
 		}
 		if (*ok == false)
 		{
@@ -7280,6 +7303,8 @@ QString DicomUtils::read_buffer(
 	const bool uihgrid,
 	const bool elscint,
 	const bool supp_palette_color,
+	const bool pred6_bug,
+	const bool cornell_bug,
 	int * red_subscript)
 {
 	*ok = false;
@@ -7290,6 +7315,22 @@ QString DicomUtils::read_buffer(
 	else
 	{
 		mdcm::ImageHelper::SetForceRescaleInterceptSlope(false);
+	}
+	if (pred6_bug)
+	{
+		mdcm::ImageHelper::SetWorkaroundPredictorBug(true);
+	}
+	else
+	{
+		mdcm::ImageHelper::SetWorkaroundPredictorBug(false);
+	}
+	if (cornell_bug)
+	{
+		mdcm::ImageHelper::SetWorkaroundCornellBug(true);
+	}
+	else
+	{
+		mdcm::ImageHelper::SetWorkaroundCornellBug(false);
 	}
 	mdcm::ImageHelper::SetCleanUnusedBits(clean_unused_bits);
 	mdcm::ImageReader image_reader;

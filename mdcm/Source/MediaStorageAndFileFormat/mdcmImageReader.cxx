@@ -27,12 +27,10 @@
 #include "mdcmValue.h"
 #include "mdcmFileMetaInformation.h"
 #include "mdcmElement.h"
-#include "mdcmPhotometricInterpretation.h"
 #include "mdcmTransferSyntax.h"
 #include "mdcmAttribute.h"
 #include "mdcmImageHelper.h"
 #include "mdcmPrivateTag.h"
-#include "mdcmJPEGCodec.h"
 
 namespace mdcm
 {

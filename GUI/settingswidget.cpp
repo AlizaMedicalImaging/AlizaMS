@@ -117,6 +117,9 @@ void SettingsWidget::set_default()
 	time_s__checkBox->setChecked(false);
 	overlays_checkBox->setChecked(true);
 	clean_unused_checkBox->setChecked(false);
+	pred6_checkBox->setChecked(false);
+	cornell_checkBox->setChecked(false);
+	enh_skip_dim_org_checkBox->setChecked(false);
 	pet_no_level_checkBox->setChecked(false);
 	srinfo_checkBox->setChecked(false);
 	srscale_checkBox->blockSignals(true);
@@ -283,3 +286,14 @@ bool SettingsWidget::get_ignore_dim_org() const
 {
 	return enh_skip_dim_org_checkBox->isChecked();
 }
+
+bool SettingsWidget::get_predictor_workaround() const
+{
+	return pred6_checkBox->isChecked();
+}
+
+bool SettingsWidget::get_cornell_workaround() const
+{
+	return cornell_checkBox->isChecked();
+}
+

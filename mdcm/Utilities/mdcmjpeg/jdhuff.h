@@ -174,7 +174,7 @@ EXTERN(boolean) jpeg_fill_bit_buffer
  * 3. jpeg_huff_decode returns -1 if forced to suspend.
  */
 
-#define HUFF_DECODE(result,state,htbl,failaction,slowlabel) \
+#define HUFF_DECODE(result,state,htbl,failaction,slowlabel,cornell_workaround) \
 { register int nb, look; \
   if (bits_left < HUFF_LOOKAHEAD) { \
     if (! jpeg_fill_bit_buffer(&state,get_buffer,bits_left, 0)) {failaction;} \
@@ -190,16 +190,16 @@ EXTERN(boolean) jpeg_fill_bit_buffer
   } else { \
     nb = HUFF_LOOKAHEAD+1; \
 slowlabel: \
-    if ((result=jpeg_huff_decode(&state,get_buffer,bits_left,htbl,nb)) < 0) \
-  { failaction; } \
+    if ((result=jpeg_huff_decode(&state,get_buffer,bits_left,htbl,nb,cornell_workaround)) < 0) \
+    { failaction; } \
     get_buffer = state.get_buffer; bits_left = state.bits_left; \
   } \
 }
 
 /* Out-of-line case for Huffman code fetching */
 EXTERN(int) jpeg_huff_decode
-  JPP((bitread_working_state * state, register bit_buf_type get_buffer,
-       register int bits_left, d_derived_tbl * htbl, int min_bits));
+    JPP((bitread_working_state * state, register bit_buf_type get_buffer,
+         register int bits_left, d_derived_tbl * htbl, int min_bits, boolean enable_cornell_workaround));
 
 
 /* Common fields between sequential, progressive and lossless Huffman entropy

@@ -251,6 +251,8 @@ public:
 		const bool,
 		const bool,
 		const bool,
+		const bool,
+		const bool,
 		int*);
 	static QString read_enhanced_common(
 		bool*,

@@ -63,6 +63,10 @@ public:
   static bool GetForcePixelSpacing();
   static bool GetCleanUnusedBits();
   static void SetCleanUnusedBits(bool);
+  static void SetWorkaroundCornellBug(bool);
+  static bool GetWorkaroundCornellBug();
+  static void SetWorkaroundPredictorBug(bool);
+  static bool GetWorkaroundPredictorBug();
   static std::vector<unsigned int> GetDimensionsValue(const File &);
   static void SetDimensionsValue(File &, const Pixmap &);
   static PixelFormat GetPixelFormatValue(const File &);
@@ -105,6 +109,8 @@ private:
   static bool PMSRescaleInterceptSlope;
   static bool ForcePixelSpacing;
   static bool CleanUnusedBits;
+  static bool WorkaroundCornellBug;
+  static bool WorkaroundPredictorBug;
 };
 
 } // end namespace mdcm

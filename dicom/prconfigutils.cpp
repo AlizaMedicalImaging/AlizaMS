@@ -2463,7 +2463,7 @@ static void read_overlays(
 					else
 					{
 						std::cout
-							<< "warning: read_buffer() jj="
+							<< "warning: read_overlays() jj="
 							<< jj << " obuffer_size"
 							<< obuffer_size << std::endl;
 					}

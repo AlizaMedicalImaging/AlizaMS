@@ -21,7 +21,7 @@
 =========================================================================*/
 #include "mdcmTrace.h"
 #include "mdcmTransferSyntax.h"
-
+#include "mdcmImageHelper.h"
 /*
  * jdatasrc.c
  *
@@ -331,9 +331,16 @@ bool JPEGBITSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
   }
   if(Internals->StateSuspension == 0)
   {
-    // Now we can initialize the JPEG decompression object
+    // Initialize the JPEG decompression object.
     jpeg_create_decompress(&cinfo);
-    // Step 2: specify data source (eg, a file)
+	int workaround = 0;
+    if(ImageHelper::GetWorkaroundPredictorBug())
+      workaround |= WORKAROUND_PREDICTOR6OVERFLOW;
+    if(ImageHelper::GetWorkaroundCornellBug())
+      workaround |= WORKAROUND_BUGGY_CORNELL_16BIT_JPEG_ENCODER;
+    if(workaround != 0)
+      cinfo.workaround_options = workaround;
+    // Step 2: specify data source (e.g., a file)
     jpeg_stdio_src(&cinfo, is, true);
   }
   else
@@ -553,8 +560,8 @@ bool JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
     {
       // If we get here, the JPEG code has signaled an error.
       // We need to clean up the JPEG object, close the input file, and return.
-      // But first handle the case IJG does not like:
-      if (jerr.pub.msg_code == JERR_BAD_PRECISION /* 18 */)
+      // But first handle the case IJG does not like.
+      if (jerr.pub.msg_code == JERR_BAD_PRECISION)
       {
         this->BitSample = jerr.pub.msg_parm.i[0];
       }
@@ -569,6 +576,13 @@ bool JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
   {
     // Initialize the JPEG decompression object.
     jpeg_create_decompress(&cinfo);
+	int workaround = 0;
+    if(ImageHelper::GetWorkaroundPredictorBug())
+      workaround |= WORKAROUND_PREDICTOR6OVERFLOW;
+    if(ImageHelper::GetWorkaroundCornellBug())
+      workaround |= WORKAROUND_BUGGY_CORNELL_16BIT_JPEG_ENCODER;
+    if(workaround != 0)
+      cinfo.workaround_options = workaround;
     // Step 2: specify data source (e.g. a file)
     jpeg_stdio_src(&cinfo, is, true);
   }

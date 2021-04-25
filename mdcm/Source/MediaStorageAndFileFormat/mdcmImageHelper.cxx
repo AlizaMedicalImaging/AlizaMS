@@ -46,6 +46,8 @@ bool ImageHelper::ForceRescaleInterceptSlope = false;
 bool ImageHelper::PMSRescaleInterceptSlope = true;
 bool ImageHelper::ForcePixelSpacing = false;
 bool ImageHelper::CleanUnusedBits = false;
+bool ImageHelper::WorkaroundCornellBug = false;
+bool ImageHelper::WorkaroundPredictorBug = false;
 
 static double SetNDigits(double x, int n)
 {
@@ -529,6 +531,26 @@ bool ImageHelper::GetCleanUnusedBits()
 void ImageHelper::SetCleanUnusedBits(bool b)
 {
   CleanUnusedBits = b;
+}
+
+void ImageHelper::SetWorkaroundCornellBug(bool b)
+{
+  WorkaroundCornellBug = b;
+}
+
+bool ImageHelper::GetWorkaroundCornellBug()
+{
+  return WorkaroundCornellBug;
+}
+
+void ImageHelper::SetWorkaroundPredictorBug(bool b)
+{
+  WorkaroundPredictorBug = b;
+}
+
+bool ImageHelper::GetWorkaroundPredictorBug()
+{
+  return WorkaroundPredictorBug;
 }
 
 bool GetRescaleInterceptSlopeValueFromDataSet(const DataSet& ds, std::vector<double> & interceptslope)

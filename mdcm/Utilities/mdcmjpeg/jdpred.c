@@ -109,113 +109,99 @@
 
 METHODDEF(void)
 jpeg_undifference1(j_decompress_ptr cinfo, int comp_index,
-       JDIFFROW diff_buf, JDIFFROW prev_row,
+       const JDIFFROW diff_buf, const JDIFFROW prev_row,
        JDIFFROW undiff_buf, JDIMENSION width)
 {
   UNDIFFERENCE_1D(INITIAL_PREDICTOR2);
-  (void)cinfo;(void)comp_index;(void)diff_buf;(void)prev_row;(void)undiff_buf;(void)width;
 }
 
 METHODDEF(void)
 jpeg_undifference2(j_decompress_ptr cinfo, int comp_index,
-       JDIFFROW diff_buf, JDIFFROW prev_row,
+       const JDIFFROW diff_buf, const JDIFFROW prev_row,
        JDIFFROW undiff_buf, JDIMENSION width)
 {
   UNDIFFERENCE_2D(PREDICTOR2);
-  (void)cinfo;(void)comp_index;(void)diff_buf;(void)prev_row;(void)undiff_buf;(void)width;
 }
 
 METHODDEF(void)
 jpeg_undifference3(j_decompress_ptr cinfo, int comp_index,
-       JDIFFROW diff_buf, JDIFFROW prev_row,
+       const JDIFFROW diff_buf, const JDIFFROW prev_row,
        JDIFFROW undiff_buf, JDIMENSION width)
 {
   UNDIFFERENCE_2D(PREDICTOR3);
-  (void)cinfo;(void)comp_index;(void)diff_buf;(void)prev_row;(void)undiff_buf;(void)width;
 }
 
 METHODDEF(void)
 jpeg_undifference4(j_decompress_ptr cinfo, int comp_index,
-       JDIFFROW diff_buf, JDIFFROW prev_row,
+       const JDIFFROW diff_buf, const JDIFFROW prev_row,
        JDIFFROW undiff_buf, JDIMENSION width)
 {
   UNDIFFERENCE_2D(PREDICTOR4);
-  (void)cinfo;(void)comp_index;(void)diff_buf;(void)prev_row;(void)undiff_buf;(void)width;
 }
 
 METHODDEF(void)
 jpeg_undifference5(j_decompress_ptr cinfo, int comp_index,
-       JDIFFROW diff_buf, JDIFFROW prev_row,
+       const JDIFFROW diff_buf, const JDIFFROW prev_row,
        JDIFFROW undiff_buf, JDIMENSION width)
 {
   SHIFT_TEMPS
   UNDIFFERENCE_2D(PREDICTOR5);
-  (void)cinfo;(void)comp_index;(void)diff_buf;(void)prev_row;(void)undiff_buf;(void)width;
 }
-
-#ifdef SUPPORT_JPEG_PRED6_BUG
-/* uninitialized */
-static int pred6_bug = -1; /* 0 == nobug, 1 == bug */
-#endif
 
 METHODDEF(void)
 jpeg_undifference6(j_decompress_ptr cinfo, int comp_index,
-       JDIFFROW diff_buf, JDIFFROW prev_row,
-       JDIFFROW undiff_buf, JDIMENSION width)
+           const JDIFFROW diff_buf, const JDIFFROW prev_row,
+           JDIFFROW undiff_buf, JDIMENSION width)
 {
-#ifdef SUPPORT_JPEG_PRED6_BUG
-  unsigned int xindex;
-  int Ra, Rb, Rc;
-  int min, max, temp;
-  SHIFT_TEMPS
-  if( pred6_bug == -1 )
-    {
-    pred6_bug = 0; /* no bug by default */
-
-    Rb = GETJSAMPLE(prev_row[0]);
-    Ra = (diff_buf[0] + PREDICTOR2) & 0xFFFF;
-    undiff_buf[0] = Ra;
-    temp = min = max = undiff_buf[0];
-
-    for (xindex = 1; xindex < width; xindex++) {
-      Rc = Rb;
-      Rb = GETJSAMPLE(prev_row[xindex]);
-      Ra = (diff_buf[xindex] + PREDICTOR6) & 0xFFFF;
-      temp = Ra;
-      min = temp < min ? temp : min;
-      max = temp > max ? temp : max;
-    }
-    if( (max - min) > 50000) /* magic number */
-      {
-      pred6_bug = 1;
-      WARNMS(cinfo, JWRN_SIGNED_ARITH);
-      }
-    }
-  if(pred6_bug)
-    {
-    UNDIFFERENCE_2D_BUG(PREDICTOR6_BUG);
-    }
-  else
-    {
-    UNDIFFERENCE_2D_BUG(PREDICTOR6);
-    }
-#else
   SHIFT_TEMPS
   UNDIFFERENCE_2D(PREDICTOR6);
-#endif
-  (void)comp_index;(void)cinfo;
 }
 
 METHODDEF(void)
 jpeg_undifference7(j_decompress_ptr cinfo, int comp_index,
-       JDIFFROW diff_buf, JDIFFROW prev_row,
+       const JDIFFROW diff_buf, const JDIFFROW prev_row,
        JDIFFROW undiff_buf, JDIMENSION width)
 {
   SHIFT_TEMPS
   UNDIFFERENCE_2D(PREDICTOR7);
-  (void)cinfo;(void)comp_index;(void)diff_buf;(void)prev_row;(void)undiff_buf;(void)width;
 }
 
+#if BITS_IN_JSAMPLE == 16
+METHODDEF(void)
+jpeg_undifference4a(j_decompress_ptr cinfo, int comp_index,
+           const JDIFFROW diff_buf, const JDIFFROW prev_row,
+           JDIFFROW undiff_buf, JDIMENSION width)
+{
+  UNDIFFERENCE_2D(PREDICTOR4A);
+}
+
+METHODDEF(void)
+jpeg_undifference5a(j_decompress_ptr cinfo, int comp_index,
+           const JDIFFROW diff_buf, const JDIFFROW prev_row,
+           JDIFFROW undiff_buf, JDIMENSION width)
+{
+  SHIFT_TEMPS
+  UNDIFFERENCE_2D(PREDICTOR5A);
+}
+
+METHODDEF(void)
+jpeg_undifference6a(j_decompress_ptr cinfo, int comp_index,
+           const JDIFFROW diff_buf, const JDIFFROW prev_row,
+           JDIFFROW undiff_buf, JDIMENSION width)
+{
+  SHIFT_TEMPS
+  UNDIFFERENCE_2D(PREDICTOR6A);
+}
+
+METHODDEF(void)
+jpeg_undifference7a(j_decompress_ptr cinfo, int comp_index,
+           const JDIFFROW diff_buf, const JDIFFROW prev_row,
+           JDIFFROW undiff_buf, JDIMENSION width)
+{
+  SHIFT_TEMPS
+  UNDIFFERENCE_2D(PREDICTOR7A);
+}
+#endif
 
 /*
  * Undifferencer for the first row in a scan or restart interval.  The first
@@ -250,16 +236,40 @@ jpeg_undifference_first_row(j_decompress_ptr cinfo, int comp_index,
     losslsd->predict_undifference[comp_index] = jpeg_undifference3;
     break;
   case 4:
+#if BITS_IN_JSAMPLE == 16
+    if (cinfo->workaround_options & WORKAROUND_PREDICTOR6OVERFLOW)
+      losslsd->predict_undifference[comp_index] = jpeg_undifference4a;
+    else losslsd->predict_undifference[comp_index] = jpeg_undifference4;
+#else
     losslsd->predict_undifference[comp_index] = jpeg_undifference4;
+#endif
     break;
   case 5:
+#if BITS_IN_JSAMPLE == 16
+    if (cinfo->workaround_options & WORKAROUND_PREDICTOR6OVERFLOW)
+      losslsd->predict_undifference[comp_index] = jpeg_undifference5a;
+    else losslsd->predict_undifference[comp_index] = jpeg_undifference5;
+#else
     losslsd->predict_undifference[comp_index] = jpeg_undifference5;
+#endif
     break;
   case 6:
+#if BITS_IN_JSAMPLE == 16
+    if (cinfo->workaround_options & WORKAROUND_PREDICTOR6OVERFLOW)
+      losslsd->predict_undifference[comp_index] = jpeg_undifference6a;
+    else losslsd->predict_undifference[comp_index] = jpeg_undifference6;
+#else
     losslsd->predict_undifference[comp_index] = jpeg_undifference6;
+#endif
     break;
   case 7:
+#if BITS_IN_JSAMPLE == 16
+    if (cinfo->workaround_options & WORKAROUND_PREDICTOR6OVERFLOW)
+      losslsd->predict_undifference[comp_index] = jpeg_undifference7a;
+    else losslsd->predict_undifference[comp_index] = jpeg_undifference7;
+#else
     losslsd->predict_undifference[comp_index] = jpeg_undifference7;
+#endif
     break;
   }
 }
