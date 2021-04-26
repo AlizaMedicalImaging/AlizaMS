@@ -95,8 +95,8 @@ void BrowserWidget2::compute_offsets(const mdcm::SequenceOfItems * sq, mdcm::VL 
 BrowserWidget2::BrowserWidget2(float si)
 {
 	once = false;
-	eye_icon  = QIcon(":/bitmaps/eye.svg");
-	eye2_icon = QIcon(":/bitmaps/eye2.svg");
+	eye_icon  = QIcon(QString(":/bitmaps/eye.svg"));
+	eye2_icon = QIcon(QString(":/bitmaps/eye2.svg"));
 	setupUi(this);
 #if 0
 	ctk_pushButton->hide();

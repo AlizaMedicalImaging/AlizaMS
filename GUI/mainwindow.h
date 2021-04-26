@@ -32,6 +32,7 @@
 #include <QResizeEvent>
 #include <QSize>
 #include <QPoint>
+#include <QIcon>
 #include "zoomwidget.h"
 #include "aboutwidget.h"
 #include "browser/browserwidget2.h"
@@ -223,6 +224,12 @@ private:
 	QVBoxLayout * slider_frame_layout;
 	QVBoxLayout * slider_frame_layoutZ;
 	QLabel  * anim_label;
+	QIcon trans_icon;
+	QIcon notrans_icon;
+	QIcon cut_icon;
+	QIcon nocut_icon;
+	QIcon anchor_icon;
+	QIcon anchor2_icon;
 };
 
 #endif

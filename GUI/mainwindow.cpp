@@ -419,6 +419,13 @@ MainWindow::MainWindow(
 	//
 	readSettings();
 	//
+	trans_icon = QIcon(QString(":/bitmaps/trans1.svg"));
+	notrans_icon = QIcon(QString(":/bitmaps/notrans1.svg"));
+	cut_icon = QIcon(QString(":bitmaps/cut.svg"));
+	nocut_icon = QIcon(QString(":bitmaps/nocut.svg"));
+	anchor_icon = QIcon(QString(":/bitmaps/anchor.svg"));
+	anchor2_icon = QIcon(QString(":/bitmaps/anchor2.svg"));
+	//
 	connect(openAct,                        SIGNAL(triggered()),         this,SLOT(toggle_browser()));
 	connect(openanyAct,                     SIGNAL(triggered()),         this,SLOT(load_any()));
 	connect(exitAct,                        SIGNAL(triggered()),         this,SLOT(close()));
@@ -590,59 +597,59 @@ void MainWindow::about()
 
 void MainWindow::createActions()
 {
-	openAct       = new QAction(QIcon(":/bitmaps/dcm.svg"),   QString("DICOM scanner"),this);
-	openanyAct    = new QAction(QIcon(":/bitmaps/file.svg"),  QString("Open file"),    this);
-	exitAct       = new QAction(QIcon(":/bitmaps/delete.svg"),QString("Exit"),         this);
-	aboutAct      = new QAction(QIcon(":/bitmaps/info.svg"),  QString("About"),        this);
+	openAct       = new QAction(QIcon(QString(":/bitmaps/dcm.svg")),   QString("DICOM scanner"),this);
+	openanyAct    = new QAction(QIcon(QString(":/bitmaps/file.svg")),  QString("Open file"),    this);
+	exitAct       = new QAction(QIcon(QString(":/bitmaps/delete.svg")),QString("Exit"),         this);
+	aboutAct      = new QAction(QIcon(QString(":/bitmaps/info.svg")),  QString("About"),        this);
 	exitAct->setShortcuts(QKeySequence::Quit);
 	axis_group = new QActionGroup(this);
-	graphicsAct_Z = new QAction(QIcon(":/bitmaps/align.svg"),
+	graphicsAct_Z = new QAction(QIcon(QString(":/bitmaps/align.svg")),
 		QString("Slice view (Z)"), this);
 	graphicsAct_Z->setCheckable(true);
 	graphicsAct_Z->setChecked(true);
 	axis_group->addAction(graphicsAct_Z);
-	graphicsAct_Y = new QAction(QIcon(":/bitmaps/2dy2.svg"),
+	graphicsAct_Y = new QAction(QIcon(QString(":/bitmaps/2dy2.svg")),
 		QString("Reconstruction view (Y)"), this);
 	graphicsAct_Y->setCheckable(true);
 	axis_group->addAction(graphicsAct_Y);
-	graphicsAct_X = new QAction(QIcon(":/bitmaps/2dx2.svg"),
+	graphicsAct_X = new QAction(QIcon(QString(":/bitmaps/2dx2.svg")),
 		QString("Reconstruction view (X)"), this);
 	graphicsAct_X->setCheckable(true);
 	axis_group->addAction(graphicsAct_X);
-	histogramAct = new QAction(QIcon(":/bitmaps/chart0.svg"),
+	histogramAct = new QAction(QIcon(QString(":/bitmaps/chart0.svg")),
 		QString("Histogram,\nclick histogram symbol\nin list widget to calculate"), this);
 	histogramAct->setCheckable(true);
 	axis_group->addAction(histogramAct);
-	zyxAct = new QAction(QIcon(":/bitmaps/grid.svg"),
+	zyxAct = new QAction(QIcon(QString(":/bitmaps/grid.svg")),
 		QString("Z, MPR Y, MPR X, Histogram"), this);
 	zyxAct->setCheckable(true);
 	axis_group->addAction(zyxAct);
-	show3DAct = new QAction(QString("3D Window"), this); // QIcon(":/bitmaps/3d.svg")
+	show3DAct = new QAction(QString("3D Window"), this);
 	show3DAct->setCheckable(true);
 	show3DAct->setChecked(true);
 	show3DAct->setEnabled(false);
-	show2DAct = new QAction(QString("2D Window"), this); // QIcon(":/bitmaps/2d.svg")
+	show2DAct = new QAction(QString("2D Window"), this);
 	show2DAct->setCheckable(true);
 	show2DAct->setChecked(true);
 	show2DAct->setEnabled(false);
-	cursorAct = new QAction(QIcon(":/bitmaps/cursor.svg"),
+	cursorAct = new QAction(QIcon(QString(":/bitmaps/cursor.svg")),
 		QString("Show value under cursor"), this);
 	cursorAct->setCheckable(true);
 	cursorAct->setEnabled(true);
-	collisionAct = new QAction(QIcon(":/bitmaps/collisions.svg"),
+	collisionAct = new QAction(QIcon(QString(":/bitmaps/collisions.svg")),
 		QString("Show slices intersections"), this);
 	collisionAct->setCheckable(true);
 	collisionAct->setChecked(true);
 	collisionAct->setEnabled(true);
-	rectAct = new QAction(QIcon(":/bitmaps/cut.svg"),
+	rectAct = new QAction(QIcon(QString(":/bitmaps/cut.svg")),
 		QString("X, Y - selection rectangle"), this);
 	rectAct->setCheckable(true);
 	rectAct->setEnabled(true);
-	distanceAct = new QAction(QIcon(":/bitmaps/distance.svg"),
+	distanceAct = new QAction(QIcon(QString(":/bitmaps/distance.svg")),
 		QString("Measure distance"), this);
 	distanceAct->setCheckable(true);
 	distanceAct->setEnabled(true);
-	transp2dAct = new QAction(QIcon(":/bitmaps/notrans1.svg"),
+	transp2dAct = new QAction(QIcon(QString(":/bitmaps/notrans1.svg")),
 		QString(
 			"On: discard outside lower and upper.\n"
 			"Off: discard outside lower, "
@@ -650,23 +657,23 @@ void MainWindow::createActions()
 	transp2dAct->setCheckable(true);
 	transp2dAct->setEnabled(true);
 	view_group = new QActionGroup(this);
-	slicesAct = new QAction(QIcon(":/bitmaps/align.svg"),
+	slicesAct = new QAction(QIcon(QString(":/bitmaps/align.svg")),
 		QString("Physical space, intensity projection, OpenGL"), this);
 	slicesAct->setCheckable(true);
 	slicesAct->setChecked(true);
 	view_group->addAction(slicesAct);
-	raycastAct = new QAction(QIcon(":/bitmaps/ray.svg"),
+	raycastAct = new QAction(QIcon(QString(":/bitmaps/ray.svg")),
 		QString("Intensity projection, OpenGL"), this);
 	raycastAct->setCheckable(true);
 	view_group->addAction(raycastAct);
-	frames2DAct = new QAction(QIcon(":/bitmaps/cross.svg"),
+	frames2DAct = new QAction(QIcon(QString(":/bitmaps/cross.svg")),
 		QString("MPR set position"), this);
 	frames2DAct->setCheckable(true);
-	frames3DAct = new QAction(QIcon(":/bitmaps/square.svg"),
+	frames3DAct = new QAction(QIcon(QString(":/bitmaps/square.svg")),
 		QString("Show frames"), this);
 	frames3DAct->setCheckable(true);
 	frames3DAct->setChecked(false);
-	resetRectAct2 = new QAction(QIcon(":/bitmaps/reload.svg"),
+	resetRectAct2 = new QAction(QIcon(QString(":/bitmaps/reload.svg")),
 		QString("Reset 2D view"), this);
 	resetRectAct2->setEnabled(true);
 	const QString tooltip0 = QString(
@@ -674,27 +681,27 @@ void MainWindow::createActions()
 		"Off: discard outside lower, "
 		"clamp outside upper to max (alpha 1)");
 	trans3DAct = new QAction(
-		QIcon(":/bitmaps/trans1.svg"), tooltip0, this);
+		QIcon(QString(":/bitmaps/trans1.svg")), tooltip0, this);
 	trans3DAct->setCheckable(true);
 	trans3DAct->setChecked(true);
-	gloptionsAct = new QAction(QIcon(":/bitmaps/tool.svg"),
+	gloptionsAct = new QAction(QIcon(QString(":/bitmaps/tool.svg")),
 		QString("OpenGL options"), this);
-	reset3DAct = new QAction(QIcon(":/bitmaps/reload.svg"),
+	reset3DAct = new QAction(QIcon(QString(":/bitmaps/reload.svg")),
 		QString("Reset 3D view"), this);
 	reset3DAct->setEnabled(true);
-	animAct2d = new QAction(QIcon(":/bitmaps/2dt.svg"),
+	animAct2d = new QAction(QIcon(QString(":/bitmaps/2dt.svg")),
 		QString("2D+time"), this);
 	animAct2d->setCheckable(true);
-	animAct3d = new QAction(QIcon(":/bitmaps/3dt.svg"),
+	animAct3d = new QAction(QIcon(QString(":/bitmaps/3dt.svg")),
 		QString("3D+time"), this);
 	animAct3d->setCheckable(true);
-	flipXAct = new QAction(QIcon(":/bitmaps/flipx.svg"),
+	flipXAct = new QAction(QIcon(QString(":/bitmaps/flipx.svg")),
 		QString(
 			"Flip horizontally,\n"
 			"press \"x\" key\n"
 			"(having widget in focus)"), this);
 	flipXAct->setCheckable(false);
-	flipYAct = new QAction(QIcon(":/bitmaps/flipy.svg"),
+	flipYAct = new QAction(QIcon(QString(":/bitmaps/flipy.svg")),
 		QString(
 			"Flip vertically,\n"
 			"press \"y\" key\n"
@@ -703,25 +710,25 @@ void MainWindow::createActions()
 	zrangeAct = new QAction(
 		QString("Z - double-slicer below 2D view"), this);
 	setLevelAct = new QAction(QString("Set level/window"), this);
-	zlockAct = new QAction(QIcon(":/bitmaps/anchor2.svg"),
+	zlockAct = new QAction(QIcon(QString(":/bitmaps/anchor2.svg")),
 		QString("Anchor selected slice"), this);
 	zlockAct->setCheckable(true);
 	zlockAct->setChecked(false);
-	oneAct = new QAction(QIcon(":/bitmaps/one.svg"),
+	oneAct = new QAction(QIcon(QString(":/bitmaps/one.svg")),
 		QString("Single slice"), this);
 	oneAct->setCheckable(true);
 	oneAct->setChecked(false);
 	oneAct->setEnabled(false);
-	browser_open_dir_act    = new QAction(QIcon(":/bitmaps/folder.svg"),QString("Open directory"),       this);
-	browser_open_dcmdir_act = new QAction(QIcon(":/bitmaps/dcmdir.svg"),QString("Open DICOMDIR"),        this);
-	browser_reload_act      = new QAction(QIcon(":/bitmaps/reload.svg"),QString("Reload"),               this);
-	browser_metadata_act    = new QAction(QIcon(":/bitmaps/meta.svg"),  QString("Show metadata"),        this);
-	browser_copy_act        = new QAction(QIcon(":/bitmaps/copy2.svg"), QString("Copy selected"),        this);
-	browser_load_act        = new QAction(QIcon(":/bitmaps/right0.svg"),QString("Load selected"),        this);
-	meta_open_act           = new QAction(QIcon(":/bitmaps/file.svg"),  QString("Open file"),            this);
-	meta_open_scan_act      = new QAction(QIcon(":/bitmaps/align.svg"), QString("Open file and scan"),   this);
-	anon_open_in_dir        = new QAction(QIcon(":/bitmaps/folder.svg"),QString("Open input directory"), this);
-	anon_open_out_dir       = new QAction(QIcon(":/bitmaps/folder.svg"),QString("Open output directory"),this);
+	browser_open_dir_act    = new QAction(QIcon(QString(":/bitmaps/folder.svg")),QString("Open directory"), this);
+	browser_open_dcmdir_act = new QAction(QIcon(QString(":/bitmaps/dcmdir.svg")),QString("Open DICOMDIR"), this);
+	browser_reload_act      = new QAction(QIcon(QString(":/bitmaps/reload.svg")),QString("Reload"), this);
+	browser_metadata_act    = new QAction(QIcon(QString(":/bitmaps/meta.svg")),QString("Show metadata"), this);
+	browser_copy_act        = new QAction(QIcon(QString(":/bitmaps/copy2.svg")),QString("Copy selected"), this);
+	browser_load_act        = new QAction(QIcon(QString(":/bitmaps/right0.svg")),QString("Load selected"), this);
+	meta_open_act           = new QAction(QIcon(QString(":/bitmaps/file.svg")),QString("Open file"), this);
+	meta_open_scan_act      = new QAction(QIcon(QString(":/bitmaps/align.svg")),QString("Open file and scan"), this);
+	anon_open_in_dir        = new QAction(QIcon(QString(":/bitmaps/folder.svg")),QString("Open input directory"), this);
+	anon_open_out_dir       = new QAction(QIcon(QString(":/bitmaps/folder.svg")),QString("Open output directory"), this);
 }
 
 void MainWindow::createMenus()
@@ -1361,8 +1368,8 @@ void MainWindow::toggle_collisions(bool t)
 
 void MainWindow::toggle_segmentation(bool t)
 {
-	if (t) transp2dAct->setIcon(QIcon(":/bitmaps/trans1.svg"));
-	else   transp2dAct->setIcon(QIcon(":/bitmaps/notrans1.svg"));
+	if (t) transp2dAct->setIcon(trans_icon);
+	else   transp2dAct->setIcon(notrans_icon);
 	graphicswidget_m->set_alt_mode(t);
 	graphicswidget_x->set_alt_mode(t);
 	graphicswidget_y->set_alt_mode(t);
@@ -1596,11 +1603,11 @@ void MainWindow::set_show_frames_2d(bool t)
 	if (t)
 	{
 		if (distanceAct->isChecked()) distanceAct->setChecked(false);
-		rectAct->setIcon(QIcon(":bitmaps/nocut.svg"));
+		rectAct->setIcon(nocut_icon);
 	}
 	else
 	{
-		rectAct->setIcon(QIcon(":bitmaps/cut.svg"));
+		rectAct->setIcon(cut_icon);
 	}
 	const short m = t ? 1 : 0;
 	aliza->set_view2d_mouse_modus(m);
@@ -1613,11 +1620,11 @@ void MainWindow::toggle_distance(bool t)
 	if (t)
 	{
 		if (frames2DAct->isChecked()) frames2DAct->setChecked(false);
-		rectAct->setIcon(QIcon(":bitmaps/nocut.svg"));
+		rectAct->setIcon(nocut_icon);
 	}
 	else
 	{
-		rectAct->setIcon(QIcon(":bitmaps/cut.svg"));
+		rectAct->setIcon(cut_icon);
 	}
 	const short m = t ? 2 : 0;
 	aliza->set_view2d_mouse_modus(m);
@@ -1712,8 +1719,8 @@ void MainWindow::tab_ind_changed(int i)
 
 void MainWindow::set_zlock(bool t)
 {
-	if (t) zlockAct->setIcon(QIcon(":/bitmaps/anchor.svg"));
-	else   zlockAct->setIcon(QIcon(":/bitmaps/anchor2.svg"));
+	if (t) zlockAct->setIcon(anchor_icon);
+	else   zlockAct->setIcon(anchor2_icon);
 	oneAct->setEnabled(t);
 	aliza->toggle_zlock(t);
 }

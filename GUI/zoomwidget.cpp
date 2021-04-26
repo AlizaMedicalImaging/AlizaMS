@@ -8,11 +8,15 @@ ZoomWidget::ZoomWidget(float si)
 	l->setContentsMargins(0,0,0,0);
 	l->setSpacing(0);
 	plus_pushButton =
-		new QPushButton(QIcon(":/bitmaps/add.svg"),QString(""), this);
+		new QPushButton(QIcon(QString(":/bitmaps/add.svg")),
+		QString(""),
+		this);
 	plus_pushButton->setIconSize(s);
 	plus_pushButton->setAutoRepeat(true);
 	minus_pushButton =
-		new QPushButton(QIcon(":/bitmaps/remove.svg"),QString(""), this);
+		new QPushButton(QIcon(QString(":/bitmaps/remove.svg")),
+		QString(""),
+		this);
 	minus_pushButton->setIconSize(s);
 	minus_pushButton->setAutoRepeat(true);
 	l->addWidget(plus_pushButton);
