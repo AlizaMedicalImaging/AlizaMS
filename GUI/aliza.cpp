@@ -475,8 +475,12 @@ Aliza::Aliza()
 	saved_mouse_modus = 0;
 	saved_show_cursor = false;
 	frametime_3D = 120;
-	trans_icon = QIcon(":/bitmaps/trans1.svg");
-	notrans_icon = QIcon(":/bitmaps/notrans1.svg");
+	trans_icon = QIcon(QString(":/bitmaps/trans1.svg"));
+	notrans_icon = QIcon(QString(":/bitmaps/notrans1.svg"));
+	cut_icon = QIcon(QString(":bitmaps/cut.svg"));
+	nocut_icon = QIcon(QString(":bitmaps/nocut.svg"));
+	anchor_icon = QIcon(QString(":/bitmaps/anchor.svg"));
+	anchor2_icon = QIcon(QString(":/bitmaps/anchor2.svg"));
 	anim3D_timer = new QTimer();
 	g_init_physics();
 }
@@ -1543,7 +1547,7 @@ void Aliza::update_toolbox(const ImageVariant * v)
 	if (v->di->lock_2Dview)
 	{
 		zlockAct->setChecked(true);
-		zlockAct->setIcon(QIcon(":/bitmaps/anchor.svg"));
+		zlockAct->setIcon(anchor_icon);
 		oneAct->setEnabled(true);
 		v->di->from_slice = v->di->selected_z_slice;
 		if (v->di->lock_single)
@@ -1554,7 +1558,7 @@ void Aliza::update_toolbox(const ImageVariant * v)
 	else
 	{
 		zlockAct->setChecked(false);
-		zlockAct->setIcon(QIcon(":/bitmaps/anchor2.svg"));
+		zlockAct->setIcon(anchor2_icon);
 		oneAct->setEnabled(false);
 	}
 	oneAct->setChecked(v->di->lock_single);
@@ -2606,7 +2610,7 @@ void Aliza::start_anim()
 	graphicswidget_m->set_show_cursor(false);
 	graphicswidget_y->set_show_cursor(false);
 	graphicswidget_x->set_show_cursor(false);
-	rectAct->setIcon(QIcon(":bitmaps/cut.svg"));
+	rectAct->setIcon(cut_icon);
 	graphicsAct_Z->setEnabled(false);
 	histogramAct->setEnabled(false);
 	graphicswidget_m->set_frame_time_unit(settingswidget->get_time_unit());
@@ -2641,7 +2645,7 @@ void Aliza::stop_anim()
 	}
 	if (saved_mouse_modus==1||saved_mouse_modus==2)
 	{
-		rectAct->setIcon(QIcon(":bitmaps/nocut.svg"));
+		rectAct->setIcon(nocut_icon);
 	}
 	frames2DAct->setEnabled(true);
 	cursorAct->setEnabled(true);
@@ -3087,8 +3091,8 @@ void Aliza::start_3D_anim()
 		saved_mouse_modus = graphicswidget_m->get_mouse_modus();
 		saved_show_cursor = graphicswidget_m->get_show_cursor();
 		const short mm = (saved_mouse_modus == 5) ? 5 : 0;
-		if (mm == 0) rectAct->setIcon(QIcon(":bitmaps/cut.svg"));
-		else rectAct->setIcon(QIcon(":bitmaps/nocut.svg"));
+		if (mm == 0) rectAct->setIcon(cut_icon);
+		else rectAct->setIcon(nocut_icon);
 		graphicswidget_m->set_mouse_modus(mm, false);
 		graphicswidget_y->set_mouse_modus(mm, false);
 		graphicswidget_x->set_mouse_modus(mm, false);
@@ -3124,9 +3128,9 @@ void Aliza::stop_3D_anim()
 	graphicswidget_y->set_show_cursor(saved_show_cursor);
 	graphicswidget_x->set_show_cursor(saved_show_cursor);
 	if (mm==1 || mm==2 || mm==4 || mm==5)
-		rectAct->setIcon(QIcon(":bitmaps/nocut.svg"));
+		rectAct->setIcon(nocut_icon);
 	else
-		rectAct->setIcon(QIcon(":bitmaps/cut.svg"));
+		rectAct->setIcon(cut_icon);
 	anim3Dwidget->acq_spinBox->clear();
 	frames2DAct->setEnabled(true);
 	cursorAct->setEnabled(true);

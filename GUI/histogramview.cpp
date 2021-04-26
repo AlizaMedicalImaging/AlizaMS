@@ -95,11 +95,6 @@ void LevelRectItem::mouseMoveEvent(QGraphicsSceneMouseEvent * e)
 	QGraphicsItem::mouseMoveEvent(e);
 }
 
-void LevelRectItem::hoverMoveEvent(QGraphicsSceneHoverEvent * e)
-{
-	QGraphicsItem::hoverMoveEvent(e);
-}
-
 void LevelRectItem::mousePressEvent(QGraphicsSceneMouseEvent * e)
 {
 	setCursor(Qt::ClosedHandCursor);

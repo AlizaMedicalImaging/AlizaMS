@@ -192,6 +192,10 @@ private:
 	QAction * segmentAct;
 	QIcon trans_icon;
 	QIcon notrans_icon;
+	QIcon cut_icon;
+	QIcon nocut_icon;
+	QIcon anchor_icon;
+	QIcon anchor2_icon;
   	bool rect_selection;
 	bool hide_zoom;
 	bool multiview;

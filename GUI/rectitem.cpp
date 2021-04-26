@@ -81,12 +81,6 @@ void RectItem::mouseMoveEvent(
 	QGraphicsItem::mouseMoveEvent(e);
 }
 
-void RectItem::hoverMoveEvent(
-	QGraphicsSceneHoverEvent * e)
-{
-	QGraphicsItem::hoverMoveEvent(e);
-}
-
 void RectItem::mousePressEvent(
 	QGraphicsSceneMouseEvent * e)
 {

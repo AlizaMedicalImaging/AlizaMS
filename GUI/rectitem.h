@@ -6,7 +6,6 @@
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
 #include <QStyleOptionGraphicsItem>
-#include <QGraphicsSceneHoverEvent>
 #include <QPainter>
 #include "handleitem.h"
 
@@ -34,7 +33,6 @@ public:
 protected:
 	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent*) override;
-    void hoverMoveEvent(QGraphicsSceneHoverEvent*) override;
     void mousePressEvent(QGraphicsSceneMouseEvent*) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent*) override;
     void keyPressEvent(QKeyEvent*) override;

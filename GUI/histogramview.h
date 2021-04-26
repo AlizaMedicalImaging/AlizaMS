@@ -55,7 +55,6 @@ protected:
 	QVariant itemChange(GraphicsItemChange, const QVariant &) override;
 	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent*) override;
-    void hoverMoveEvent(QGraphicsSceneHoverEvent*) override;
     void mousePressEvent(QGraphicsSceneMouseEvent*) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent*) override;
     void keyPressEvent(QKeyEvent*) override;

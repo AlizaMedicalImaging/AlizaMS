@@ -6,7 +6,6 @@
 #include <QStyleOptionButton>
 #include <QTimer>
 #include <QGraphicsSceneMouseEvent>
-#include <QGraphicsSceneHoverEvent>
 #include <QApplication>
 #include <QList>
 #include <QGraphicsDropShadowEffect>

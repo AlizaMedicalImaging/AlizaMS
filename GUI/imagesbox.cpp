@@ -140,18 +140,18 @@ ImagesBox::ImagesBox(float si)
 	listWidget->setFlow(QListView::TopToBottom);
 	//
 	actionNone         = new QAction(QString(""),this);
-	actionClear        = new QAction(QIcon(":/bitmaps/delete.svg"), QString("Close selected"),this);
-	actionClearChecked = new QAction(QIcon(":/bitmaps/delete.svg"), QString("Close checked"),this);
-	actionClearUnChek  = new QAction(QIcon(":/bitmaps/delete.svg"), QString("Close un-checked"),this);
-	actionClearAll     = new QAction(QIcon(":/bitmaps/delete2.svg"), QString("Close all"),this);
-	actionCheck        = new QAction(QIcon(":/bitmaps/checked.svg"),  QString("Set all to checked (list)"),this);
-	actionUncheck      = new QAction(QIcon(":/bitmaps/unchecked.svg"),QString("Set all to un-checked (list)"),this);
-	actionReloadHistogram = new QAction(QIcon(":/bitmaps/chart0.svg"),QString("Calculate histogram"),this);
-	actionColor        = new QAction(QIcon(":/bitmaps/rgb.svg"),QString("Image color in UI"),this);
-	actionDICOMMeta    = new QAction(QIcon(":/bitmaps/meta.svg"),QString("Image DICOM Metadata"),this);
+	actionClear        = new QAction(QIcon(QString(":/bitmaps/delete.svg")),QString("Close selected"),this);
+	actionClearChecked = new QAction(QIcon(QString(":/bitmaps/delete.svg")),QString("Close checked"),this);
+	actionClearUnChek  = new QAction(QIcon(QString(":/bitmaps/delete.svg")),QString("Close un-checked"),this);
+	actionClearAll     = new QAction(QIcon(QString(":/bitmaps/delete2.svg")),QString("Close all"),this);
+	actionCheck        = new QAction(QIcon(QString(":/bitmaps/checked.svg")),QString("Set all to checked (list)"),this);
+	actionUncheck      = new QAction(QIcon(QString(":/bitmaps/unchecked.svg")),QString("Set all to un-checked (list)"),this);
+	actionReloadHistogram = new QAction(QIcon(QString(":/bitmaps/chart0.svg")),QString("Calculate histogram"),this);
+	actionColor        = new QAction(QIcon(QString(":/bitmaps/rgb.svg")),QString("Image color in UI"),this);
+	actionDICOMMeta    = new QAction(QIcon(QString(":/bitmaps/meta.svg")),QString("Image DICOM Metadata"),this);
 	actionTmp          = new QAction(QString("TMP"),this);
 	//
-	actionInfo         = new QAction(QIcon(":/bitmaps/info2.svg"), QString("Toggle info window"),this);
+	actionInfo         = new QAction(QIcon(QString(":/bitmaps/info2.svg")),QString("Toggle info window"),this);
 	actionInfo->setCheckable(true);
 	actionInfo->setChecked(true);
 	//

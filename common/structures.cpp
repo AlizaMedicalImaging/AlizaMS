@@ -323,8 +323,6 @@ ImageVariant::~ImageVariant()
 	di->close();
 	delete di;
 	di = NULL;
-	icon      = QPixmap();
-	histogram = QPixmap();
 }
 
 ImageVariant2D::ImageVariant2D()

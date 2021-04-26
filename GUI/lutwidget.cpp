@@ -27,31 +27,14 @@ LUTWidget::~LUTWidget()
 
 void LUTWidget::add_items1()
 {
-    QIcon icon;
-    icon.addFile(QString(":/bitmaps/grey0.png"), QSize(), QIcon::Normal, QIcon::Off);
-    comboBox->addItem(icon, QString(""));
-    QIcon icon1;
-    icon1.addFile(QString(":/bitmaps/lut1.png"), QSize(), QIcon::Normal, QIcon::Off);
-    comboBox->addItem(icon1, QString("Hot metal 768"));
-    QIcon icon2;
-    icon2.addFile(QString(":/bitmaps/lut2.png"), QSize(), QIcon::Normal, QIcon::Off);
-    comboBox->addItem(icon2, QString("RainbowB 1536"));
-    QIcon icon3;
-    icon3.addFile(QString(":/bitmaps/lut3.png"), QSize(), QIcon::Normal, QIcon::Off);
-    comboBox->addItem(icon3, QString("Syngo 1792"));
-    QIcon icon4;
-    icon4.addFile(QString(":/bitmaps/lut4.png"), QSize(), QIcon::Normal, QIcon::Off);
-    comboBox->addItem(icon4, QString("Hot iron"));
-    QIcon icon5;
-    icon5.addFile(QString(":/bitmaps/lut5.png"), QSize(), QIcon::Normal, QIcon::Off);
-    comboBox->addItem(icon5, QString("Hot metal blue"));
-    QIcon icon6;
-    icon6.addFile(QString(":/bitmaps/lut6.png"), QSize(), QIcon::Normal, QIcon::Off);
-    comboBox->addItem(icon6, QString("PET"));
-    QIcon icon7;
-    icon7.addFile(QString(":/bitmaps/lut7.png"), QSize(), QIcon::Normal, QIcon::Off);
-    comboBox->addItem(icon7, QString("PET 20 steps"));
-	//
+    comboBox->addItem(QIcon(QString(":/bitmaps/grey0.png")), QString(""));
+    comboBox->addItem(QIcon(QString(":/bitmaps/lut1.png")),  QString("Hot metal 768"));
+    comboBox->addItem(QIcon(QString(":/bitmaps/lut2.png")),  QString("RainbowB 1536"));
+    comboBox->addItem(QIcon(QString(":/bitmaps/lut3.png")),  QString("Syngo 1792"));
+    comboBox->addItem(QIcon(QString(":/bitmaps/lut4.png")),  QString("Hot iron"));
+    comboBox->addItem(QIcon(QString(":/bitmaps/lut5.png")),  QString("Hot metal blue"));
+    comboBox->addItem(QIcon(QString(":/bitmaps/lut6.png")),  QString("PET"));
+    comboBox->addItem(QIcon(QString(":/bitmaps/lut7.png")),  QString("PET 20 steps"));
     comboBox->setObjectName(QString("comboBox"));
     QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     sizePolicy.setHorizontalStretch(0);
@@ -65,30 +48,14 @@ void LUTWidget::add_items1()
 
 void LUTWidget::add_items2()
 {
-    QIcon icon;
-    icon.addFile(QString(":/bitmaps/grey0.png"), QSize(), QIcon::Normal, QIcon::Off);
-    comboBox->addItem(icon, QString(""));
-    QIcon icon1;
-    icon1.addFile(QString(":/bitmaps/lut1.png"), QSize(), QIcon::Normal, QIcon::Off);
-    comboBox->addItem(icon1, QString("Hot metal 768"));
-    QIcon icon2;
-    icon2.addFile(QString(":/bitmaps/lut2.png"), QSize(), QIcon::Normal, QIcon::Off);
-    comboBox->addItem(icon2, QString("RainbowB 1536"));
-    QIcon icon3;
-    icon3.addFile(QString(":/bitmaps/lut3.png"), QSize(), QIcon::Normal, QIcon::Off);
-    comboBox->addItem(icon3, QString("Syngo 1792"));
-    QIcon icon4;
-    icon4.addFile(QString(":/bitmaps/lut4.png"), QSize(), QIcon::Normal, QIcon::Off);
-    comboBox->addItem(icon4, QString("Hot iron"));
-    QIcon icon5;
-    icon5.addFile(QString(":/bitmaps/lut5.png"), QSize(), QIcon::Normal, QIcon::Off);
-    comboBox->addItem(icon5, QString("Hot metal blue"));
-    QIcon icon6;
-    icon6.addFile(QString(":/bitmaps/lut6.png"), QSize(), QIcon::Normal, QIcon::Off);
-    comboBox->addItem(icon6, QString("PET"));
-    QIcon icon7;
-    icon7.addFile(QString(":/bitmaps/lut7.png"), QSize(), QIcon::Normal, QIcon::Off);
-    comboBox->addItem(icon7, QString("PET 20 steps"));
+    comboBox->addItem(QIcon(QString(":/bitmaps/grey0.png")), QString(""));
+    comboBox->addItem(QIcon(QString(":/bitmaps/lut1.png")),  QString("Hot metal 768"));
+    comboBox->addItem(QIcon(QString(":/bitmaps/lut2.png")),  QString("RainbowB 1536"));
+    comboBox->addItem(QIcon(QString(":/bitmaps/lut3.png")),  QString("Syngo 1792"));
+    comboBox->addItem(QIcon(QString(":/bitmaps/lut4.png")),  QString("Hot iron"));
+    comboBox->addItem(QIcon(QString(":/bitmaps/lut5.png")),  QString("Hot metal blue"));
+    comboBox->addItem(QIcon(QString(":/bitmaps/lut6.png")),  QString("PET"));
+    comboBox->addItem(QIcon(QString(":/bitmaps/lut7.png")),  QString("PET 20 steps"));
     comboBox->setObjectName(QString("comboBox"));
     QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     sizePolicy.setHorizontalStretch(0);
