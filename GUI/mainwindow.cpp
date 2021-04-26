@@ -305,6 +305,13 @@ MainWindow::MainWindow(
 	//
 	aliza = new Aliza();
 	//
+	trans_icon = QIcon(QString(":/bitmaps/trans1.svg"));
+	notrans_icon = QIcon(QString(":/bitmaps/notrans1.svg"));
+	cut_icon = QIcon(QString(":bitmaps/cut.svg"));
+	nocut_icon = QIcon(QString(":bitmaps/nocut.svg"));
+	anchor_icon = QIcon(QString(":/bitmaps/anchor.svg"));
+	anchor2_icon = QIcon(QString(":/bitmaps/anchor2.svg"));
+	//
 	createActions();
 	createMenus();
 	createToolBars();
@@ -418,13 +425,6 @@ MainWindow::MainWindow(
 	}
 	//
 	readSettings();
-	//
-	trans_icon = QIcon(QString(":/bitmaps/trans1.svg"));
-	notrans_icon = QIcon(QString(":/bitmaps/notrans1.svg"));
-	cut_icon = QIcon(QString(":bitmaps/cut.svg"));
-	nocut_icon = QIcon(QString(":bitmaps/nocut.svg"));
-	anchor_icon = QIcon(QString(":/bitmaps/anchor.svg"));
-	anchor2_icon = QIcon(QString(":/bitmaps/anchor2.svg"));
 	//
 	connect(openAct,                        SIGNAL(triggered()),         this,SLOT(toggle_browser()));
 	connect(openanyAct,                     SIGNAL(triggered()),         this,SLOT(load_any()));
@@ -641,7 +641,7 @@ void MainWindow::createActions()
 	collisionAct->setCheckable(true);
 	collisionAct->setChecked(true);
 	collisionAct->setEnabled(true);
-	rectAct = new QAction(QIcon(QString(":/bitmaps/cut.svg")),
+	rectAct = new QAction(cut_icon,
 		QString("X, Y - selection rectangle"), this);
 	rectAct->setCheckable(true);
 	rectAct->setEnabled(true);
@@ -649,7 +649,7 @@ void MainWindow::createActions()
 		QString("Measure distance"), this);
 	distanceAct->setCheckable(true);
 	distanceAct->setEnabled(true);
-	transp2dAct = new QAction(QIcon(QString(":/bitmaps/notrans1.svg")),
+	transp2dAct = new QAction(notrans_icon,
 		QString(
 			"On: discard outside lower and upper.\n"
 			"Off: discard outside lower, "
@@ -680,8 +680,7 @@ void MainWindow::createActions()
 		"On: discard outside lower and upper (intensity to alpha).\n"
 		"Off: discard outside lower, "
 		"clamp outside upper to max (alpha 1)");
-	trans3DAct = new QAction(
-		QIcon(QString(":/bitmaps/trans1.svg")), tooltip0, this);
+	trans3DAct = new QAction(trans_icon, tooltip0, this);
 	trans3DAct->setCheckable(true);
 	trans3DAct->setChecked(true);
 	gloptionsAct = new QAction(QIcon(QString(":/bitmaps/tool.svg")),
@@ -710,7 +709,7 @@ void MainWindow::createActions()
 	zrangeAct = new QAction(
 		QString("Z - double-slicer below 2D view"), this);
 	setLevelAct = new QAction(QString("Set level/window"), this);
-	zlockAct = new QAction(QIcon(QString(":/bitmaps/anchor2.svg")),
+	zlockAct = new QAction(anchor2_icon,
 		QString("Anchor selected slice"), this);
 	zlockAct->setCheckable(true);
 	zlockAct->setChecked(false);
