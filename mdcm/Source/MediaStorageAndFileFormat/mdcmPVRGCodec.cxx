@@ -27,6 +27,61 @@
 #include "mdcmSequenceOfFragments.h"
 #include "mdcmByteSwap.h"
 
+#ifdef MDCM_USE_PVRG
+
+#include <sys/stat.h>
+#ifdef _WIN32
+#include <windows.h>
+#endif
+#if defined(_WIN32) && (defined(_MSC_VER) || defined(__WATCOMC__) ||defined(__BORLANDC__) || defined(__MINGW32__))
+#include <io.h>
+#include <direct.h>
+#define _unlink unlink
+#else
+#include <dlfcn.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <strings.h>
+#endif
+
+namespace mdcm
+{
+
+static bool GetPermissions(const char * file, unsigned short & mode)
+{
+  if(!file) return false;
+  struct stat st;
+  if(stat(file, &st) < 0) return false;
+  mode = (short)st.st_mode;
+  return true;
+}
+
+static bool SetPermissions(const char * file, unsigned short mode)
+{
+  if(!file) { return false; }
+  if(!System::FileExists(file)) return false;
+  if(chmod(file, mode) < 0) return false;
+  return true;
+}
+
+static bool RemoveFile(const char* source)
+{
+#ifdef _WIN32
+  unsigned short mode;
+  if(!GetPermissions(source, mode)) return false;
+  System::SetPermissions(source, S_IWRITE);
+#endif
+  const bool res = unlink(source) != 0 ? false : true;
+#ifdef _WIN32
+  if(!res) SetPermissions(source, mode);
+#endif
+  return res;
+}
+
+}
+#endif
+
 namespace mdcm
 {
 //http://groups.google.com/group/comp.compression/browse_thread/thread/e2e20d85a436cfa5
@@ -80,7 +135,6 @@ bool PVRGCodec::Decode(DataElement const &in, DataElement &out)
 #ifdef MDCM_USE_SYSTEM_PVRG
   std::string pvrg_command = MDCM_PVRG_JPEG_EXECUTABLE;
 #else
-  // FIXME
 #ifdef _WIN32
   std::string pvrg_command = "mdcmpvrg";
 #else
@@ -146,7 +200,7 @@ bool PVRGCodec::Decode(DataElement const &in, DataElement &out)
         len/2);
     }
     wholebuf.insert(wholebuf.end(), buf.begin(), buf.end());
-    if(!System::RemoveFile(rawfile))
+    if(!RemoveFile(rawfile))
     {
       mdcmErrorMacro("Could not delete output: " << rawfile);
     }
@@ -156,7 +210,7 @@ bool PVRGCodec::Decode(DataElement const &in, DataElement &out)
   {
     this->PlanarConfiguration = 1;
   }
-  if(!System::RemoveFile(input))
+  if(!RemoveFile(input))
   {
     mdcmErrorMacro("Could not delete input: " << input);
   }

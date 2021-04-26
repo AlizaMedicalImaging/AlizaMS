@@ -50,9 +50,7 @@
 #if defined(_WIN32) && (defined(_MSC_VER) || defined(__WATCOMC__) ||defined(__BORLANDC__) || defined(__MINGW32__))
 #include <io.h>
 #include <direct.h>
-#define _unlink unlink
 #else
-
 #include <dlfcn.h>
 #include <sys/types.h>
 #include <fcntl.h>
@@ -236,6 +234,10 @@ std::wstring System::ConvertToUtf16(const char * utf8path)
 #endif
 }
 
+// Return the filesize. 0 if file does not exist,
+// use FileExists to differentiate between empty file and missing file.
+// For very large size file and on system where size_t is not appropriate to store
+// off_t value the function will return 0.
 size_t System::FileSize(const char * filename)
 {
 /*
