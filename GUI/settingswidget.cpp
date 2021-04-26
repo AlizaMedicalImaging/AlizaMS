@@ -17,6 +17,8 @@
 #include <QStyleFactory>
 #include <QDir>
 #include <QFont>
+#include <QFile>
+#include <QFileInfo>
 #include "commonutils.h"
 #include "dicomutils.h"
 
@@ -36,11 +38,7 @@ SettingsWidget::SettingsWidget(float si)
 		styleComboBox->addItem(QString("Dark Fusion"));
 		styleComboBox->addItems(keys);
 	}
-#if 1
 	readSettings();
-#else
-
-#endif
 	styleComboBox->setCurrentIndex(saved_idx);
 	connect(reload_pushButton,SIGNAL(clicked()),this,SLOT(set_default()));
 	connect(pt_doubleSpinBox,SIGNAL(valueChanged(double)),this,SLOT(update_font_pt(double)));
@@ -96,6 +94,26 @@ void SettingsWidget::set_gl_visible(bool t)
 
 void SettingsWidget::set_default()
 {
+#if 1
+	{
+		QSettings settings(
+			QSettings::IniFormat,
+			QSettings::UserScope,
+			QApplication::organizationName(),
+			QApplication::applicationName());
+		QFileInfo fi(settings.fileName());
+		if (fi.exists())
+		{
+			const QString p = fi.absoluteFilePath();
+			const bool ok = QFile::remove(p);
+			if (!ok)
+			{
+				std::cout << "Could not remove config file"
+					<< std::endl;
+			}
+		}
+	}
+#endif
 	styleComboBox->setCurrentIndex(0);
 	gl3D_checkBox->setChecked(true);
 	si_doubleSpinBox->setValue(1.0);
