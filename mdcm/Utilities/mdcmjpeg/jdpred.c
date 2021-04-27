@@ -72,18 +72,6 @@
  * logically AND the result with 0xFFFF.
  */
 
-#define UNDIFFERENCE_2D_BUG(PREDICTOR) \
-  Rb = GETJSAMPLE(prev_row[0]); \
-  Ra = (diff_buf[0] + PREDICTOR2) & 0xFFFF; \
-  undiff_buf[0] = Ra; \
- \
-  for (xindex = 1; xindex < width; xindex++) { \
-    Rc = Rb; \
-    Rb = GETJSAMPLE(prev_row[xindex]); \
-    Ra = (diff_buf[xindex] + PREDICTOR) & 0xFFFF; \
-    undiff_buf[xindex] = Ra; \
-  }
-
 #define UNDIFFERENCE_2D(PREDICTOR) \
   unsigned int xindex; \
   int Ra, Rb, Rc; \
