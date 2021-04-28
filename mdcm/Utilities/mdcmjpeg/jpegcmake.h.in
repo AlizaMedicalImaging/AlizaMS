@@ -42,8 +42,7 @@
  * conversion should not be in use in jpeg16, there is no
  * lossy compression for RGB16.
  *
- * Only used in jpeg16.
- * Jpeg8 and jpeg12 are not changed.
+ * Only used in jpeg16, jpeg8 and jpeg12 are not changed.
  *
  * Set to 0 to use original code, to 1 to silence warnings.
  *

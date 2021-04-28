@@ -30,7 +30,7 @@
  * whether actually used in an image or not.)
  */
 
-#define MAX_COMPONENTS 4 /* maximum number of image components */
+#define MAX_COMPONENTS 4
 
 
 /*
@@ -356,17 +356,16 @@ typedef int boolean;
 /* Definitions for speed-related optimizations. */
 
 
-/* If your compiler supports inline functions, define INLINE
+/* If your compiler supports inline functions, define IJG_INLINE
  * as the inline keyword; otherwise define it as empty.
  */
 
-#  ifndef INLINE
-#    ifdef __GNUC__ /* for instance, GNU C knows about inline */
-#      define INLINE __inline__
-#    endif
-#    ifndef INLINE
-#      define INLINE /* default is to define it as empty */
-#    endif
+#  if defined _MSC_VER
+#    define IJG_INLINE __inline
+#  elif defined __GNUC__
+#    define IJG_INLINE __inline__
+#  else
+#    define IJG_INLINE
 #  endif
 
 
@@ -396,4 +395,4 @@ typedef int boolean;
 #    endif
 #  endif
 
-#endif /* JPEG_INTERNAL_OPTIONS */
+#endif
