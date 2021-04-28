@@ -11,28 +11,26 @@
  */
 
 /*
- * Define BITS_IN_JSAMPLE as either
- *   8   for 8-bit sample values (the usual setting)
- *   12  for 12-bit sample values
- * Only 8 and 12 are legal data precisions for lossy JPEG according to the
- * JPEG standard, and the IJG code does not support anything else!
- * We do not support run-time selection of data precision, sorry.
+ * Modified for DICOM.
+ *
  */
 
+/*
+ * 8, 12 and 16 bits
+ *
+ */
 #ifndef BITS_IN_JSAMPLE
-#  error You need to define BITS_IN_JSAMPLE
+#  error
 #endif
 
 /*
  * Maximum number of components (color channels) allowed in JPEG image.
- * To meet the letter of the JPEG spec, set this to 255.  However, darn
- * few applications need more than 4 channels (maybe 5 for CMYK + alpha
- * mask).  We recommend 10 as a reasonable compromise; use 4 if you are
- * really short on memory.  (Each allowed component costs a hundred or so
- * bytes of storage, whether actually used in an image or not.)
+ * In the JPEG spec it is 255.
+ * (Each allowed component costs a hundred or so bytes of storage,
+ * whether actually used in an image or not.)
  */
 
-#define MAX_COMPONENTS 10 /* maximum number of image components */
+#define MAX_COMPONENTS 4 /* maximum number of image components */
 
 
 /*
@@ -59,21 +57,21 @@
 typedef unsigned char JSAMPLE;
 #    define GETJSAMPLE(value) ((int)(value))
 
-#  else /* not HAVE_UNSIGNED_CHAR */
+#  else
 
 typedef char JSAMPLE;
 #    ifdef CHAR_IS_UNSIGNED
 #      define GETJSAMPLE(value) ((int)(value))
 #    else
 #      define GETJSAMPLE(value) ((int)(value)&0xFF)
-#    endif /* CHAR_IS_UNSIGNED */
+#    endif
 
-#  endif /* HAVE_UNSIGNED_CHAR */
+#  endif
 
 #  define MAXJSAMPLE 255
 #  define CENTERJSAMPLE 128
 
-#endif /* BITS_IN_JSAMPLE == 8 */
+#endif
 
 
 #if BITS_IN_JSAMPLE == 12
@@ -87,7 +85,7 @@ typedef short JSAMPLE;
 #  define MAXJSAMPLE 4095
 #  define CENTERJSAMPLE 2048
 
-#endif /* BITS_IN_JSAMPLE == 12 */
+#endif
 
 
 #if BITS_IN_JSAMPLE == 16
@@ -100,21 +98,21 @@ typedef short JSAMPLE;
 typedef unsigned short JSAMPLE;
 #    define GETJSAMPLE(value) ((int)(value))
 
-#  else /* not HAVE_UNSIGNED_SHORT */
+#  else
 
 typedef short JSAMPLE;
 #    ifdef SHORT_IS_UNSIGNED
 #      define GETJSAMPLE(value) ((int)(value))
 #    else
 #      define GETJSAMPLE(value) ((int)(value)&0xFFFF)
-#    endif /* SHORT_IS_UNSIGNED */
+#    endif
 
-#  endif /* HAVE_UNSIGNED_SHORT */
+#  endif
 
 #  define MAXJSAMPLE 65535
 #  define CENTERJSAMPLE 32768
 
-#endif /* BITS_IN_JSAMPLE == 16 */
+#endif
 
 
 /* Representation of a DCT frequency coefficient.
@@ -144,16 +142,16 @@ typedef int JDIFF;
 typedef unsigned char JOCTET;
 #  define GETJOCTET(value) (value)
 
-#else /* not HAVE_UNSIGNED_CHAR */
+#else
 
-typedef char         JOCTET;
+typedef char JOCTET;
 #  ifdef CHAR_IS_UNSIGNED
 #    define GETJOCTET(value) (value)
 #  else
 #    define GETJOCTET(value) ((value)&0xFF)
-#  endif /* CHAR_IS_UNSIGNED */
+#  endif
 
-#endif /* HAVE_UNSIGNED_CHAR */
+#endif
 
 
 /* These typedefs are used for various table entries and so forth.
@@ -167,28 +165,29 @@ typedef char         JOCTET;
 
 #ifdef HAVE_UNSIGNED_CHAR
 typedef unsigned char IJG_UCHAR;
-#else /* not HAVE_UNSIGNED_CHAR */
+#else
 #  ifdef CHAR_IS_UNSIGNED
-typedef char         IJG_UCHAR;
-#  else  /* not CHAR_IS_UNSIGNED */
+typedef char IJG_UCHAR;
+#  else
 typedef short IJG_UCHAR;
-#  endif /* CHAR_IS_UNSIGNED */
-#endif   /* HAVE_UNSIGNED_CHAR */
+#  endif
+#endif
 
 /* IJG_USHRT must hold at least the values 0..65535. */
 
 #ifdef HAVE_UNSIGNED_SHORT
 typedef unsigned short IJG_USHRT;
-#else  /* not HAVE_UNSIGNED_SHORT */
+#else
 typedef unsigned int IJG_USHRT;
-#endif /* HAVE_UNSIGNED_SHORT */
+#endif
 
-/* IJG_SHRT must hold at least the values -32768..32767. */
+/* Must hold at least the values -32768..32767. */
 typedef short IJG_SHRT;
 
-/* IJG_INT must hold at least signed 32-bit values. */
+/* Must hold at least signed 32-bit values. */
 typedef int IJG_INT;
 
+/* Must hold at least signed 32-bit values. */
 typedef long long IJG_LONG;
 
 /* Datatype used for image dimensions.  The JPEG standard only supports
@@ -201,7 +200,6 @@ typedef long long IJG_LONG;
 typedef unsigned int JDIMENSION;
 
 #define JPEG_MAX_DIMENSION 65500L /* a tad under 64K to prevent overflows */
-
 
 /* These macros are used in all function definitions and extern declarations.
  * You could modify them if you need to change function linkage conventions;
@@ -348,23 +346,6 @@ typedef int boolean;
 #  define QUANT_1PASS_SUPPORTED       /* 1-pass color quantization? */
 #  define QUANT_2PASS_SUPPORTED       /* 2-pass color quantization? */
 
-/* more capability options later, no doubt */
-
-
-/*
- * Ordering of RGB data in scanlines passed to or from the application.
- * If your application wants to deal with data in the order B,G,R, just
- * change these macros.  You can also deal with formats such as R,G,B,X
- * (one extra byte per pixel) by changing RGB_PIXELSIZE.  Note that changing
- * the offsets will also change the order in which colormap data is organized.
- * RESTRICTIONS:
- * 1. The sample applications cjpeg,djpeg do NOT support modified RGB formats.
- * 2. These macros only affect RGB<=>YCbCr color conversion, so they are not
- *    useful if you are using JPEG color spaces other than YCbCr or grayscale.
- * 3. The color quantizer modules will not behave desirably if RGB_PIXELSIZE
- *    is not 3 (they don't understand about dummy color components!).  So you
- *    can't use color quantization if you change that value.
- */
 
 #  define RGB_RED 0       /* Offset of Red in an RGB scanline element */
 #  define RGB_GREEN 1     /* Offset of Green */
