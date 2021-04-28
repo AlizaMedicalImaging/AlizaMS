@@ -79,10 +79,10 @@ calc_output_dimensions(j_decompress_ptr cinfo)
     /* Size in samples, after IDCT scaling */
     compptr->downsampled_width =
       (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_width * (IJG_LONG)(compptr->h_samp_factor * compptr->codec_data_unit),
-                                (IJG_LONG)(cinfo->max_h_samp_factor * DCTSIZE));
+                                (IJG_LONG)cinfo->max_h_samp_factor * DCTSIZE);
     compptr->downsampled_height =
       (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_height * (IJG_LONG)(compptr->v_samp_factor * compptr->codec_data_unit),
-                                (IJG_LONG)(cinfo->max_v_samp_factor * DCTSIZE));
+                                (IJG_LONG)cinfo->max_v_samp_factor * DCTSIZE);
   }
 
 #else /* !IDCT_SCALING_SUPPORTED */

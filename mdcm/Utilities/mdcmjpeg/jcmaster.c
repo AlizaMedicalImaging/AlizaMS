@@ -98,9 +98,9 @@ initial_setup(j_compress_ptr cinfo)
     compptr->codec_data_unit = data_unit;
     /* Size in data units */
     compptr->width_in_data_units = (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_width * (IJG_LONG)compptr->h_samp_factor,
-                                                             (IJG_LONG)(cinfo->max_h_samp_factor * data_unit));
+                                                             (IJG_LONG)cinfo->max_h_samp_factor * data_unit);
     compptr->height_in_data_units = (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_height * (IJG_LONG)compptr->v_samp_factor,
-                                                              (IJG_LONG)(cinfo->max_v_samp_factor * data_unit));
+                                                              (IJG_LONG)cinfo->max_v_samp_factor * data_unit);
     /* Size in samples */
     compptr->downsampled_width = (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_width * (IJG_LONG)compptr->h_samp_factor,
                                                            (IJG_LONG)cinfo->max_h_samp_factor);
@@ -114,7 +114,7 @@ initial_setup(j_compress_ptr cinfo)
    * main controller will call coefficient controller).
    */
   cinfo->total_iMCU_rows =
-    (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_height, (IJG_LONG)(cinfo->max_v_samp_factor * data_unit));
+    (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_height, (IJG_LONG)cinfo->max_v_samp_factor * data_unit);
 }
 
 #ifdef C_MULTISCAN_FILES_SUPPORTED
@@ -422,9 +422,9 @@ per_scan_setup(j_compress_ptr cinfo)
 
     /* Overall image size in MCUs */
     cinfo->MCUs_per_row =
-      (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_width, (IJG_LONG)(cinfo->max_h_samp_factor * data_unit));
+      (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_width, (IJG_LONG)cinfo->max_h_samp_factor * data_unit);
     cinfo->MCU_rows_in_scan =
-      (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_height, (IJG_LONG)(cinfo->max_v_samp_factor * data_unit));
+      (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_height, (IJG_LONG)cinfo->max_v_samp_factor * data_unit);
 
     cinfo->data_units_in_MCU = 0;
 

@@ -89,9 +89,9 @@ initial_setup(j_decompress_ptr cinfo)
     compptr->codec_data_unit = cinfo->data_unit;
     /* Size in data units */
     compptr->width_in_data_units = (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_width * (IJG_LONG)compptr->h_samp_factor,
-                                                             (IJG_LONG)(cinfo->max_h_samp_factor * cinfo->data_unit));
+                                                             (IJG_LONG)cinfo->max_h_samp_factor * cinfo->data_unit);
     compptr->height_in_data_units = (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_height * (IJG_LONG)compptr->v_samp_factor,
-                                                              (IJG_LONG)(cinfo->max_v_samp_factor * cinfo->data_unit));
+                                                              (IJG_LONG)cinfo->max_v_samp_factor * cinfo->data_unit);
     /* downsampled_width and downsampled_height will also be overridden by
      * jdmaster.c if we are doing full decompression.  The transcoder library
      * doesn't use these values, but the calling application might.
@@ -109,7 +109,7 @@ initial_setup(j_decompress_ptr cinfo)
 
   /* Compute number of fully interleaved MCU rows. */
   cinfo->total_iMCU_rows =
-    (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_height, (IJG_LONG)(cinfo->max_v_samp_factor * cinfo->data_unit));
+    (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_height, (IJG_LONG)cinfo->max_v_samp_factor * cinfo->data_unit);
 
   /* Decide whether file contains multiple scans */
   if (cinfo->comps_in_scan < cinfo->num_components || cinfo->process == JPROC_PROGRESSIVE)
@@ -164,9 +164,9 @@ per_scan_setup(j_decompress_ptr cinfo)
 
     /* Overall image size in MCUs */
     cinfo->MCUs_per_row =
-      (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_width, (IJG_LONG)(cinfo->max_h_samp_factor * cinfo->data_unit));
+      (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_width, (IJG_LONG)cinfo->max_h_samp_factor * cinfo->data_unit);
     cinfo->MCU_rows_in_scan =
-      (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_height, (IJG_LONG)(cinfo->max_v_samp_factor * cinfo->data_unit));
+      (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_height, (IJG_LONG)cinfo->max_v_samp_factor * cinfo->data_unit);
 
     cinfo->data_units_in_MCU = 0;
 
