@@ -19,9 +19,8 @@
  * We do not support run-time selection of data precision, sorry.
  */
 
-/*#define BITS_IN_JSAMPLE  8*//* use 8 or 12 (or 16 only for lossless) */
 #ifndef BITS_IN_JSAMPLE
-#error You need to define BITS_IN_JSAMPLE
+#  error You need to define BITS_IN_JSAMPLE
 #endif
 
 /*
@@ -33,7 +32,7 @@
  * bytes of storage, whether actually used in an image or not.)
  */
 
-#define MAX_COMPONENTS  10	/* maximum number of image components */
+#define MAX_COMPONENTS 10 /* maximum number of image components */
 
 
 /*
@@ -55,24 +54,24 @@
  * You can use a signed char by having GETJSAMPLE mask it with 0xFF.
  */
 
-#ifdef HAVE_UNSIGNED_CHAR
+#  ifdef HAVE_UNSIGNED_CHAR
 
 typedef unsigned char JSAMPLE;
-#define GETJSAMPLE(value)  ((int) (value))
+#    define GETJSAMPLE(value) ((int)(value))
 
-#else /* not HAVE_UNSIGNED_CHAR */
+#  else /* not HAVE_UNSIGNED_CHAR */
 
 typedef char JSAMPLE;
-#ifdef CHAR_IS_UNSIGNED
-#define GETJSAMPLE(value)  ((int) (value))
-#else
-#define GETJSAMPLE(value)  ((int) (value) & 0xFF)
-#endif /* CHAR_IS_UNSIGNED */
+#    ifdef CHAR_IS_UNSIGNED
+#      define GETJSAMPLE(value) ((int)(value))
+#    else
+#      define GETJSAMPLE(value) ((int)(value)&0xFF)
+#    endif /* CHAR_IS_UNSIGNED */
 
-#endif /* HAVE_UNSIGNED_CHAR */
+#  endif /* HAVE_UNSIGNED_CHAR */
 
-#define MAXJSAMPLE	255
-#define CENTERJSAMPLE	128
+#  define MAXJSAMPLE 255
+#  define CENTERJSAMPLE 128
 
 #endif /* BITS_IN_JSAMPLE == 8 */
 
@@ -83,10 +82,10 @@ typedef char JSAMPLE;
  */
 
 typedef short JSAMPLE;
-#define GETJSAMPLE(value)  ((int) (value))
+#  define GETJSAMPLE(value) ((int)(value))
 
-#define MAXJSAMPLE	4095
-#define CENTERJSAMPLE	2048
+#  define MAXJSAMPLE 4095
+#  define CENTERJSAMPLE 2048
 
 #endif /* BITS_IN_JSAMPLE == 12 */
 
@@ -96,24 +95,24 @@ typedef short JSAMPLE;
  * You can use a signed short by having GETJSAMPLE mask it with 0xFFFF.
  */
 
-#ifdef HAVE_UNSIGNED_SHORT
+#  ifdef HAVE_UNSIGNED_SHORT
 
 typedef unsigned short JSAMPLE;
-#define GETJSAMPLE(value)  ((int) (value))
+#    define GETJSAMPLE(value) ((int)(value))
 
-#else /* not HAVE_UNSIGNED_SHORT */
+#  else /* not HAVE_UNSIGNED_SHORT */
 
 typedef short JSAMPLE;
-#ifdef SHORT_IS_UNSIGNED
-#define GETJSAMPLE(value)  ((int) (value))
-#else
-#define GETJSAMPLE(value)  ((int) (value) & 0xFFFF)
-#endif /* SHORT_IS_UNSIGNED */
+#    ifdef SHORT_IS_UNSIGNED
+#      define GETJSAMPLE(value) ((int)(value))
+#    else
+#      define GETJSAMPLE(value) ((int)(value)&0xFFFF)
+#    endif /* SHORT_IS_UNSIGNED */
 
-#endif /* HAVE_UNSIGNED_SHORT */
+#  endif /* HAVE_UNSIGNED_SHORT */
 
-#define MAXJSAMPLE	65535
-#define CENTERJSAMPLE	32768
+#  define MAXJSAMPLE 65535
+#  define CENTERJSAMPLE 32768
 
 #endif /* BITS_IN_JSAMPLE == 16 */
 
@@ -143,16 +142,16 @@ typedef int JDIFF;
 #ifdef HAVE_UNSIGNED_CHAR
 
 typedef unsigned char JOCTET;
-#define GETJOCTET(value)  (value)
+#  define GETJOCTET(value) (value)
 
 #else /* not HAVE_UNSIGNED_CHAR */
 
-typedef char JOCTET;
-#ifdef CHAR_IS_UNSIGNED
-#define GETJOCTET(value)  (value)
-#else
-#define GETJOCTET(value)  ((value) & 0xFF)
-#endif /* CHAR_IS_UNSIGNED */
+typedef char         JOCTET;
+#  ifdef CHAR_IS_UNSIGNED
+#    define GETJOCTET(value) (value)
+#  else
+#    define GETJOCTET(value) ((value)&0xFF)
+#  endif /* CHAR_IS_UNSIGNED */
 
 #endif /* HAVE_UNSIGNED_CHAR */
 
@@ -164,38 +163,33 @@ typedef char JOCTET;
  * typedefs live at a different point on the speed/space tradeoff curve.)
  */
 
-/* UINT8 must hold at least the values 0..255. */
+/* IJG_UCHAR must hold at least the values 0..255. */
 
 #ifdef HAVE_UNSIGNED_CHAR
-typedef unsigned char UINT8;
+typedef unsigned char IJG_UCHAR;
 #else /* not HAVE_UNSIGNED_CHAR */
-#ifdef CHAR_IS_UNSIGNED
-typedef char UINT8;
-#else /* not CHAR_IS_UNSIGNED */
-typedef short UINT8;
-#endif /* CHAR_IS_UNSIGNED */
-#endif /* HAVE_UNSIGNED_CHAR */
+#  ifdef CHAR_IS_UNSIGNED
+typedef char         IJG_UCHAR;
+#  else  /* not CHAR_IS_UNSIGNED */
+typedef short IJG_UCHAR;
+#  endif /* CHAR_IS_UNSIGNED */
+#endif   /* HAVE_UNSIGNED_CHAR */
 
-/* UINT16 must hold at least the values 0..65535. */
+/* IJG_USHRT must hold at least the values 0..65535. */
 
 #ifdef HAVE_UNSIGNED_SHORT
-typedef unsigned short UINT16;
-#else /* not HAVE_UNSIGNED_SHORT */
-typedef unsigned int UINT16;
+typedef unsigned short IJG_USHRT;
+#else  /* not HAVE_UNSIGNED_SHORT */
+typedef unsigned int IJG_USHRT;
 #endif /* HAVE_UNSIGNED_SHORT */
 
-/* INT16 must hold at least the values -32768..32767. */
+/* IJG_SHRT must hold at least the values -32768..32767. */
+typedef short IJG_SHRT;
 
-#ifndef XMD_H			/* X11/xmd.h correctly defines INT16 */
-typedef short INT16;
-#endif
+/* IJG_INT must hold at least signed 32-bit values. */
+typedef int IJG_INT;
 
-/* INT32 must hold at least signed 32-bit values. */
-/* X11/xmd.h and basetsd.h correctly defines INT32 */
-
-#if !defined(XMD_H) && !defined(_BASETSD_H_)
-typedef int INT32;
-#endif
+typedef long long IJG_LONG;
 
 /* Datatype used for image dimensions.  The JPEG standard only supports
  * images up to 64K*64K due to 16-bit fields in SOF markers.  Therefore
@@ -206,7 +200,7 @@ typedef int INT32;
 
 typedef unsigned int JDIMENSION;
 
-#define JPEG_MAX_DIMENSION  65500L  /* a tad under 64K to prevent overflows */
+#define JPEG_MAX_DIMENSION 65500L /* a tad under 64K to prevent overflows */
 
 
 /* These macros are used in all function definitions and extern declarations.
@@ -217,32 +211,32 @@ typedef unsigned int JDIMENSION;
  */
 
 /* a function called through method pointers: */
-#define METHODDEF(type)		static type
+#define METHODDEF(type) static type
 /* a function used only in its module: */
-#define LOCAL(type)		static type
+#define LOCAL(type) static type
 /* a function referenced thru EXTERNs: */
-#if defined( _WIN32 ) && defined (JPEGDLL)
-#define GLOBAL(type)            __declspec(dllexport) type
+#if defined(_WIN32) && defined(JPEGDLL)
+#  define GLOBAL(type) __declspec(dllexport) type
 #else
-#if __GNUC__ >= 4 && defined (JPEGDLL)
-#define GLOBAL(type)            __attribute__ ((visibility ("default"))) type
-#else
-#define GLOBAL(type)            type
-#endif
+#  if __GNUC__ >= 4 && defined(JPEGDLL)
+#    define GLOBAL(type) __attribute__((visibility("default"))) type
+#  else
+#    define GLOBAL(type) type
+#  endif
 #endif
 
 /* a reference to a GLOBAL function: */
 #if defined(_WIN32) && !defined(JPEGSTATIC)
-#ifdef JPEGDLL
+#  ifdef JPEGDLL
 /* Win32, building a dll */
-#define EXTERN(type)            __declspec(dllexport) type
-#else
+#    define EXTERN(type) __declspec(dllexport) type
+#  else
 /* Win32, not building a dll but using the dll */
-#define EXTERN(type)            __declspec(dllimport) type
-#endif
+#    define EXTERN(type) __declspec(dllimport) type
+#  endif
 #else
 /* not a Win32 system or building a static Win32 lib */
-#define EXTERN(type)            extern type
+#  define EXTERN(type) extern type
 #endif
 
 
@@ -253,9 +247,9 @@ typedef unsigned int JDIMENSION;
  */
 
 #ifdef HAVE_PROTOTYPES
-#define JMETHOD(type,methodname,arglist)  type (*methodname) arglist
+#  define JMETHOD(type, methodname, arglist) type(*methodname) arglist
 #else
-#define JMETHOD(type,methodname,arglist)  type (*methodname) ()
+#  define JMETHOD(type, methodname, arglist) type (*methodname)()
 #endif
 
 
@@ -266,11 +260,11 @@ typedef unsigned int JDIMENSION;
  */
 
 #ifndef FAR
-#ifdef NEED_FAR_POINTERS
-#define FAR  far
-#else
-#define FAR
-#endif
+#  ifdef NEED_FAR_POINTERS
+#    define FAR far
+#  else
+#    define FAR
+#  endif
 #endif
 
 
@@ -284,11 +278,11 @@ typedef unsigned int JDIMENSION;
 #ifndef HAVE_BOOLEAN
 typedef int boolean;
 #endif
-#ifndef FALSE			/* in case these macros already exist */
-#define FALSE	0		/* values of boolean */
+#ifndef FALSE     /* in case these macros already exist */
+#  define FALSE 0 /* values of boolean */
 #endif
 #ifndef TRUE
-#define TRUE	1
+#  define TRUE 1
 #endif
 
 
@@ -300,7 +294,7 @@ typedef int boolean;
  */
 
 #ifdef JPEG_INTERNALS
-#define JPEG_INTERNAL_OPTIONS
+#  define JPEG_INTERNAL_OPTIONS
 #endif
 
 #ifdef JPEG_INTERNAL_OPTIONS
@@ -318,17 +312,17 @@ typedef int boolean;
 
 /* Capability options common to encoder and decoder: */
 
-#define DCT_ISLOW_SUPPORTED	/* slow but accurate integer algorithm */
-#define DCT_IFAST_SUPPORTED	/* faster, less accurate integer method */
-#define DCT_FLOAT_SUPPORTED	/* floating-point: accurate, fast on fast HW */
+#  define DCT_ISLOW_SUPPORTED /* slow but accurate integer algorithm */
+#  define DCT_IFAST_SUPPORTED /* faster, less accurate integer method */
+#  define DCT_FLOAT_SUPPORTED /* floating-point: accurate, fast on fast HW */
 
 /* Encoder capability options: */
 
-#undef  C_ARITH_CODING_SUPPORTED    /* Arithmetic coding back end? */
-#define C_MULTISCAN_FILES_SUPPORTED /* Multiple-scan JPEG files? */
-#define C_PROGRESSIVE_SUPPORTED	    /* Progressive JPEG? (Requires MULTISCAN)*/
-#define C_LOSSLESS_SUPPORTED	    /* Lossless JPEG? */
-#define ENTROPY_OPT_SUPPORTED	    /* Optimization of entropy coding parms? */
+#  undef C_ARITH_CODING_SUPPORTED     /* Arithmetic coding back end? */
+#  define C_MULTISCAN_FILES_SUPPORTED /* Multiple-scan JPEG files? */
+#  define C_PROGRESSIVE_SUPPORTED     /* Progressive JPEG? (Requires MULTISCAN)*/
+#  define C_LOSSLESS_SUPPORTED        /* Lossless JPEG? */
+#  define ENTROPY_OPT_SUPPORTED       /* Optimization of entropy coding parms? */
 /* Note: if you selected 12-bit data precision, it is dangerous to turn off
  * ENTROPY_OPT_SUPPORTED.  The standard Huffman tables are only good for 8-bit
  * precision, so jcshuff.c normally uses entropy optimization to compute
@@ -338,21 +332,21 @@ typedef int boolean;
  * the default tables don't work for progressive mode or lossless mode.
  * (This may get fixed, however.)
  */
-#define INPUT_SMOOTHING_SUPPORTED   /* Input image smoothing option? */
+#  define INPUT_SMOOTHING_SUPPORTED /* Input image smoothing option? */
 
 /* Decoder capability options: */
 
-#undef  D_ARITH_CODING_SUPPORTED    /* Arithmetic coding back end? */
-#define D_MULTISCAN_FILES_SUPPORTED /* Multiple-scan JPEG files? */
-#define D_PROGRESSIVE_SUPPORTED	    /* Progressive JPEG? (Requires MULTISCAN)*/
-#define D_LOSSLESS_SUPPORTED	    /* Lossless JPEG? */
-#define SAVE_MARKERS_SUPPORTED	    /* jpeg_save_markers() needed? */
-#define BLOCK_SMOOTHING_SUPPORTED   /* Block smoothing? (Progressive only) */
-#define IDCT_SCALING_SUPPORTED	    /* Output rescaling via IDCT? */
-#undef  UPSAMPLE_SCALING_SUPPORTED  /* Output rescaling at upsample stage? */
-#define UPSAMPLE_MERGING_SUPPORTED  /* Fast path for sloppy upsampling? */
-#define QUANT_1PASS_SUPPORTED	    /* 1-pass color quantization? */
-#define QUANT_2PASS_SUPPORTED	    /* 2-pass color quantization? */
+#  undef D_ARITH_CODING_SUPPORTED     /* Arithmetic coding back end? */
+#  define D_MULTISCAN_FILES_SUPPORTED /* Multiple-scan JPEG files? */
+#  define D_PROGRESSIVE_SUPPORTED     /* Progressive JPEG? (Requires MULTISCAN)*/
+#  define D_LOSSLESS_SUPPORTED        /* Lossless JPEG? */
+#  define SAVE_MARKERS_SUPPORTED      /* jpeg_save_markers() needed? */
+#  define BLOCK_SMOOTHING_SUPPORTED   /* Block smoothing? (Progressive only) */
+#  define IDCT_SCALING_SUPPORTED      /* Output rescaling via IDCT? */
+#  undef UPSAMPLE_SCALING_SUPPORTED   /* Output rescaling at upsample stage? */
+#  define UPSAMPLE_MERGING_SUPPORTED  /* Fast path for sloppy upsampling? */
+#  define QUANT_1PASS_SUPPORTED       /* 1-pass color quantization? */
+#  define QUANT_2PASS_SUPPORTED       /* 2-pass color quantization? */
 
 /* more capability options later, no doubt */
 
@@ -372,10 +366,10 @@ typedef int boolean;
  *    can't use color quantization if you change that value.
  */
 
-#define RGB_RED		0	/* Offset of Red in an RGB scanline element */
-#define RGB_GREEN	1	/* Offset of Green */
-#define RGB_BLUE	2	/* Offset of Blue */
-#define RGB_PIXELSIZE	3	/* JSAMPLEs per RGB scanline element */
+#  define RGB_RED 0       /* Offset of Red in an RGB scanline element */
+#  define RGB_GREEN 1     /* Offset of Green */
+#  define RGB_BLUE 2      /* Offset of Blue */
+#  define RGB_PIXELSIZE 3 /* JSAMPLEs per RGB scanline element */
 
 
 /* Definitions for speed-related optimizations. */
@@ -385,14 +379,14 @@ typedef int boolean;
  * as the inline keyword; otherwise define it as empty.
  */
 
-#ifndef INLINE
-#ifdef __GNUC__			/* for instance, GNU C knows about inline */
-#define INLINE __inline__
-#endif
-#ifndef INLINE
-#define INLINE			/* default is to define it as empty */
-#endif
-#endif
+#  ifndef INLINE
+#    ifdef __GNUC__ /* for instance, GNU C knows about inline */
+#      define INLINE __inline__
+#    endif
+#    ifndef INLINE
+#      define INLINE /* default is to define it as empty */
+#    endif
+#  endif
 
 
 /* On some machines (notably 68000 series) "int" is 32 bits, but multiplying
@@ -400,9 +394,9 @@ typedef int boolean;
  * as short on such a machine.  MULTIPLIER must be at least 16 bits wide.
  */
 
-#ifndef MULTIPLIER
-#define MULTIPLIER  int		/* type for fastest integer multiply */
-#endif
+#  ifndef MULTIPLIER
+#    define MULTIPLIER int /* type for fastest integer multiply */
+#  endif
 
 
 /* FAST_FLOAT should be either float or double, whichever is done faster
@@ -413,12 +407,12 @@ typedef int boolean;
  * The code below therefore chooses float if we have ANSI-style prototypes.
  */
 
-#ifndef FAST_FLOAT
-#ifdef HAVE_PROTOTYPES
-#define FAST_FLOAT  float
-#else
-#define FAST_FLOAT  double
-#endif
-#endif
+#  ifndef FAST_FLOAT
+#    ifdef HAVE_PROTOTYPES
+#      define FAST_FLOAT float
+#    else
+#      define FAST_FLOAT double
+#    endif
+#  endif
 
 #endif /* JPEG_INTERNAL_OPTIONS */

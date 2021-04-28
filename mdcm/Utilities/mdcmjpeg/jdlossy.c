@@ -19,35 +19,36 @@
  */
 
 METHODDEF(void)
-calc_output_dimensions (j_decompress_ptr cinfo)
+calc_output_dimensions(j_decompress_ptr cinfo)
 {
 #ifdef IDCT_SCALING_SUPPORTED
-  int ci;
-  jpeg_component_info *compptr;
+  int                   ci;
+  jpeg_component_info * compptr;
 
   /* Compute actual output image dimensions and DCT scaling choices. */
-  if (cinfo->scale_num * 8 <= cinfo->scale_denom) {
+  if (cinfo->scale_num * 8 <= cinfo->scale_denom)
+  {
     /* Provide 1/8 scaling */
-    cinfo->output_width = (JDIMENSION)
-      jdiv_round_up((long) cinfo->image_width, 8L);
-    cinfo->output_height = (JDIMENSION)
-      jdiv_round_up((long) cinfo->image_height, 8L);
+    cinfo->output_width = (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_width, 8L);
+    cinfo->output_height = (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_height, 8L);
     cinfo->min_codec_data_unit = 1;
-  } else if (cinfo->scale_num * 4 <= cinfo->scale_denom) {
+  }
+  else if (cinfo->scale_num * 4 <= cinfo->scale_denom)
+  {
     /* Provide 1/4 scaling */
-    cinfo->output_width = (JDIMENSION)
-      jdiv_round_up((long) cinfo->image_width, 4L);
-    cinfo->output_height = (JDIMENSION)
-      jdiv_round_up((long) cinfo->image_height, 4L);
+    cinfo->output_width = (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_width, 4L);
+    cinfo->output_height = (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_height, 4L);
     cinfo->min_codec_data_unit = 2;
-  } else if (cinfo->scale_num * 2 <= cinfo->scale_denom) {
+  }
+  else if (cinfo->scale_num * 2 <= cinfo->scale_denom)
+  {
     /* Provide 1/2 scaling */
-    cinfo->output_width = (JDIMENSION)
-      jdiv_round_up((long) cinfo->image_width, 2L);
-    cinfo->output_height = (JDIMENSION)
-      jdiv_round_up((long) cinfo->image_height, 2L);
+    cinfo->output_width = (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_width, 2L);
+    cinfo->output_height = (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_height, 2L);
     cinfo->min_codec_data_unit = 4;
-  } else {
+  }
+  else
+  {
     /* Provide 1/1 scaling */
     cinfo->output_width = cinfo->image_width;
     cinfo->output_height = cinfo->image_height;
@@ -58,14 +59,13 @@ calc_output_dimensions (j_decompress_ptr cinfo)
    * This saves time if the upsampler gets to use 1:1 scaling.
    * Note this code assumes that the supported DCT scalings are powers of 2.
    */
-  for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;
-       ci++, compptr++) {
+  for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components; ci++, compptr++)
+  {
     int ssize = cinfo->min_codec_data_unit;
     while (ssize < DCTSIZE &&
-     (compptr->h_samp_factor * ssize * 2 <=
-      cinfo->max_h_samp_factor * cinfo->min_codec_data_unit) &&
-     (compptr->v_samp_factor * ssize * 2 <=
-      cinfo->max_v_samp_factor * cinfo->min_codec_data_unit)) {
+           (compptr->h_samp_factor * ssize * 2 <= cinfo->max_h_samp_factor * cinfo->min_codec_data_unit) &&
+           (compptr->v_samp_factor * ssize * 2 <= cinfo->max_v_samp_factor * cinfo->min_codec_data_unit))
+    {
       ssize = ssize * 2;
     }
     compptr->codec_data_unit = ssize;
@@ -74,17 +74,15 @@ calc_output_dimensions (j_decompress_ptr cinfo)
   /* Recompute downsampled dimensions of components;
    * application needs to know these if using raw downsampled data.
    */
-  for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;
-       ci++, compptr++) {
+  for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components; ci++, compptr++)
+  {
     /* Size in samples, after IDCT scaling */
-    compptr->downsampled_width = (JDIMENSION)
-      jdiv_round_up((long) cinfo->image_width *
-        (long) (compptr->h_samp_factor * compptr->codec_data_unit),
-        (long) (cinfo->max_h_samp_factor * DCTSIZE));
-    compptr->downsampled_height = (JDIMENSION)
-      jdiv_round_up((long) cinfo->image_height *
-        (long) (compptr->v_samp_factor * compptr->codec_data_unit),
-        (long) (cinfo->max_v_samp_factor * DCTSIZE));
+    compptr->downsampled_width =
+      (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_width * (IJG_LONG)(compptr->h_samp_factor * compptr->codec_data_unit),
+                                (IJG_LONG)(cinfo->max_h_samp_factor * DCTSIZE));
+    compptr->downsampled_height =
+      (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_height * (IJG_LONG)(compptr->v_samp_factor * compptr->codec_data_unit),
+                                (IJG_LONG)(cinfo->max_v_samp_factor * DCTSIZE));
   }
 
 #else /* !IDCT_SCALING_SUPPORTED */
@@ -122,26 +120,24 @@ calc_output_dimensions (j_decompress_ptr cinfo)
  */
 
 LOCAL(void)
-latch_quant_tables (j_decompress_ptr cinfo)
+latch_quant_tables(j_decompress_ptr cinfo)
 {
-  int ci, qtblno;
-  jpeg_component_info *compptr;
-  JQUANT_TBL * qtbl;
+  int                   ci, qtblno;
+  jpeg_component_info * compptr;
+  JQUANT_TBL *          qtbl;
 
-  for (ci = 0; ci < cinfo->comps_in_scan; ci++) {
+  for (ci = 0; ci < cinfo->comps_in_scan; ci++)
+  {
     compptr = cinfo->cur_comp_info[ci];
     /* No work if we already saved Q-table for this component */
     if (compptr->quant_table != NULL)
       continue;
     /* Make sure specified quantization table is present */
     qtblno = compptr->quant_tbl_no;
-    if (qtblno < 0 || qtblno >= NUM_QUANT_TBLS ||
-  cinfo->quant_tbl_ptrs[qtblno] == NULL)
+    if (qtblno < 0 || qtblno >= NUM_QUANT_TBLS || cinfo->quant_tbl_ptrs[qtblno] == NULL)
       ERREXIT1(cinfo, JERR_NO_QUANT_TABLE, qtblno);
     /* OK, save away the quantization table */
-    qtbl = (JQUANT_TBL *)
-      (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-          SIZEOF(JQUANT_TBL));
+    qtbl = (JQUANT_TBL *)(*cinfo->mem->alloc_small)((j_common_ptr)cinfo, JPOOL_IMAGE, SIZEOF(JQUANT_TBL));
     MEMCOPY(qtbl, cinfo->quant_tbl_ptrs[qtblno], SIZEOF(JQUANT_TBL));
     compptr->quant_table = qtbl;
   }
@@ -153,13 +149,13 @@ latch_quant_tables (j_decompress_ptr cinfo)
  */
 
 METHODDEF(void)
-start_input_pass (j_decompress_ptr cinfo)
+start_input_pass(j_decompress_ptr cinfo)
 {
-  j_lossy_d_ptr lossyd = (j_lossy_d_ptr) cinfo->codec;
+  j_lossy_d_ptr lossyd = (j_lossy_d_ptr)cinfo->codec;
 
   latch_quant_tables(cinfo);
-  (*lossyd->entropy_start_pass) (cinfo);
-  (*lossyd->coef_start_input_pass) (cinfo);
+  (*lossyd->entropy_start_pass)(cinfo);
+  (*lossyd->coef_start_input_pass)(cinfo);
 }
 
 
@@ -168,12 +164,12 @@ start_input_pass (j_decompress_ptr cinfo)
  */
 
 METHODDEF(void)
-start_output_pass (j_decompress_ptr cinfo)
+start_output_pass(j_decompress_ptr cinfo)
 {
-  j_lossy_d_ptr lossyd = (j_lossy_d_ptr) cinfo->codec;
+  j_lossy_d_ptr lossyd = (j_lossy_d_ptr)cinfo->codec;
 
-  (*lossyd->idct_start_pass) (cinfo);
-  (*lossyd->coef_start_output_pass) (cinfo);
+  (*lossyd->idct_start_pass)(cinfo);
+  (*lossyd->coef_start_output_pass)(cinfo);
 }
 
 /*
@@ -182,36 +178,39 @@ start_output_pass (j_decompress_ptr cinfo)
  */
 
 GLOBAL(void)
-jinit_lossy_d_codec (j_decompress_ptr cinfo)
+jinit_lossy_d_codec(j_decompress_ptr cinfo)
 {
   j_lossy_d_ptr lossyd;
-  boolean use_c_buffer;
+  boolean       use_c_buffer;
 
   /* Create subobject in permanent pool */
-  lossyd = (j_lossy_d_ptr)
-    (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
-        SIZEOF(jpeg_lossy_d_codec));
-  cinfo->codec = (struct jpeg_d_codec *) lossyd;
+  lossyd = (j_lossy_d_ptr)(*cinfo->mem->alloc_small)((j_common_ptr)cinfo, JPOOL_PERMANENT, SIZEOF(jpeg_lossy_d_codec));
+  cinfo->codec = (struct jpeg_d_codec *)lossyd;
 
   /* Initialize sub-modules */
 
   /* Inverse DCT */
   jinit_inverse_dct(cinfo);
   /* Entropy decoding: either Huffman or arithmetic coding. */
-  if (cinfo->arith_code) {
+  if (cinfo->arith_code)
+  {
 #ifdef WITH_ARITHMETIC_PATCH
     jinit_arith_decoder(cinfo);
 #else
     ERREXIT(cinfo, JERR_ARITH_NOTIMPL);
 #endif
-  } else {
-    if (cinfo->process == JPROC_PROGRESSIVE) {
+  }
+  else
+  {
+    if (cinfo->process == JPROC_PROGRESSIVE)
+    {
 #ifdef D_PROGRESSIVE_SUPPORTED
       jinit_phuff_decoder(cinfo);
 #else
       ERREXIT(cinfo, JERR_NOT_COMPILED);
 #endif
-    } else
+    }
+    else
       jinit_shuff_decoder(cinfo);
   }
 

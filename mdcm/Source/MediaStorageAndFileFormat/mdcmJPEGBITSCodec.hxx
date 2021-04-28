@@ -59,7 +59,7 @@ typedef my_source_mgr * my_src_ptr;
  * Initialize source - called by jpeg_read_header
  * before any data is actually read.
  */
-METHODDEF(void) init_source (j_decompress_ptr cinfo)
+METHODDEF(void) init_source(j_decompress_ptr cinfo)
 {
   my_src_ptr src = (my_src_ptr) cinfo->src;
   /* We reset the empty-input-file flag for each image,
@@ -106,7 +106,7 @@ METHODDEF(boolean) fill_input_buffer(j_decompress_ptr cinfo)
 {
   my_src_ptr src = (my_src_ptr)cinfo->src;
   size_t nbytes;
-  //FIXME FIXME FIXME FIXME FIXME
+  //FIXME
   //nbytes = JFREAD(src->infile, src->buffer, INPUT_BUF_SIZE);
   std::streampos pos = src->infile->tellg();
   std::streampos end = src->infile->seekg(0, std::ios::end).tellg();
@@ -157,20 +157,20 @@ METHODDEF(boolean) fill_input_buffer(j_decompress_ptr cinfo)
  * Arranging for additional bytes to be discarded before reloading the input
  * buffer is the application writer's problem.
  */
-METHODDEF(void) skip_input_data(j_decompress_ptr cinfo, long int num_bytes)
+METHODDEF(void) skip_input_data(j_decompress_ptr cinfo, IJG_LONG num_bytes)
 {
-  my_src_ptr src = (my_src_ptr) cinfo->src;
+  my_src_ptr src = (my_src_ptr)cinfo->src;
   /* Just a dumb implementation for now.  Could use fseek() except
    * it doesn't work on pipes.  Not clear that being smart is worth
    * any trouble anyway --- large skips are infrequent.
    */
   if(num_bytes > 0)
   {
-    while(num_bytes > (long int)src->pub.bytes_in_buffer)
+    while(num_bytes > (IJG_LONG)src->pub.bytes_in_buffer)
     {
-      num_bytes -= (long int) src->pub.bytes_in_buffer;
+      num_bytes -= (IJG_LONG)src->pub.bytes_in_buffer;
       (void)fill_input_buffer(cinfo);
-      /* FIXME assumed that fill_input_buffer will never return FALSE,
+      /* assumed that fill_input_buffer will never return FALSE,
        * so suspension need not be handled.
        */
     }

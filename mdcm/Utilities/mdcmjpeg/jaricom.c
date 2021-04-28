@@ -1,14 +1,16 @@
 /*
- * jversion.h
+ * jaricom.c
  *
  * Copyright (C) 1991-1998, Thomas G. Lane.
  * This file is part of the Independent JPEG Group's software.
  * For conditions of distribution and use, see the accompanying README file.
  *
- * This file contains software version identification.
+ * This file holds place for arithmetic entropy codec tables.
  */
 
+#define JPEG_INTERNALS
+#include "jinclude.h"
+#include "jpeglib.h"
 
-#define JVERSION "6b  27-Mar-1998"
+IJG_INT jaritab[1];	/* dummy table */
 
-#define JCOPYRIGHT "Copyright (C) 1998, Thomas G. Lane"

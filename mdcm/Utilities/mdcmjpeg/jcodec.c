@@ -21,15 +21,17 @@
  */
 
 GLOBAL(void)
-jinit_c_codec (j_compress_ptr cinfo)
+jinit_c_codec(j_compress_ptr cinfo)
 {
-  if (cinfo->process == JPROC_LOSSLESS) {
+  if (cinfo->process == JPROC_LOSSLESS)
+  {
 #ifdef C_LOSSLESS_SUPPORTED
     jinit_lossless_c_codec(cinfo);
 #else
     ERREXIT(cinfo, JERR_NOT_COMPILED);
 #endif
-  } else
+  }
+  else
     jinit_lossy_c_codec(cinfo);
 }
 
@@ -40,14 +42,16 @@ jinit_c_codec (j_compress_ptr cinfo)
  */
 
 GLOBAL(void)
-jinit_d_codec (j_decompress_ptr cinfo)
+jinit_d_codec(j_decompress_ptr cinfo)
 {
-  if (cinfo->process == JPROC_LOSSLESS) {
+  if (cinfo->process == JPROC_LOSSLESS)
+  {
 #ifdef D_LOSSLESS_SUPPORTED
     jinit_lossless_d_codec(cinfo);
 #else
     ERREXIT(cinfo, JERR_NOT_COMPILED);
 #endif
-  } else
+  }
+  else
     jinit_lossy_d_codec(cinfo);
 }

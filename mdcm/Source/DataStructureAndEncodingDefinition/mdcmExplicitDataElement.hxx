@@ -108,7 +108,7 @@ std::istream &ExplicitDataElement::ReadPreValue(std::istream &is)
       return is;
     }
   }
-  catch(std::logic_error & ex)
+  catch(std::logic_error &)
   {
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
     // mdcm-MR-PHILIPS-16-Multi-Seq.dcm

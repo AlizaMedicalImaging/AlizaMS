@@ -19,10 +19,11 @@
 
 /* Private state */
 
-typedef struct {
+typedef struct
+{
   struct jpeg_input_controller pub; /* public fields */
 
-  boolean inheaders;    /* TRUE until first SOS is reached */
+  boolean inheaders; /* TRUE until first SOS is reached */
 } my_input_controller;
 
 typedef my_input_controller * my_inputctl_ptr;
@@ -37,24 +38,24 @@ METHODDEF(int) consume_markers JPP((j_decompress_ptr cinfo));
  */
 
 LOCAL(void)
-initial_setup (j_decompress_ptr cinfo)
+initial_setup(j_decompress_ptr cinfo)
 /* Called once, when first SOS marker is reached */
 {
-  int ci;
-  jpeg_component_info *compptr;
+  int                   ci;
+  jpeg_component_info * compptr;
 
   /* Make sure image isn't bigger than I can handle */
-  if ((long) cinfo->image_height > (long) JPEG_MAX_DIMENSION ||
-      (long) cinfo->image_width > (long) JPEG_MAX_DIMENSION)
-    ERREXIT1(cinfo, JERR_IMAGE_TOO_BIG, (unsigned int) JPEG_MAX_DIMENSION);
+  if ((IJG_LONG)cinfo->image_height > (IJG_LONG)JPEG_MAX_DIMENSION || (IJG_LONG)cinfo->image_width > (IJG_LONG)JPEG_MAX_DIMENSION)
+    ERREXIT1(cinfo, JERR_IMAGE_TOO_BIG, (unsigned int)JPEG_MAX_DIMENSION);
 
-  if (cinfo->process == JPROC_LOSSLESS) {
+  if (cinfo->process == JPROC_LOSSLESS)
+  {
     /* If precision > compiled-in value, we must downscale */
     if (cinfo->data_precision > BITS_IN_JSAMPLE)
-      WARNMS2(cinfo, JWRN_MUST_DOWNSCALE,
-        cinfo->data_precision, BITS_IN_JSAMPLE);
+      WARNMS2(cinfo, JWRN_MUST_DOWNSCALE, cinfo->data_precision, BITS_IN_JSAMPLE);
   }
-  else {  /* Lossy processes */
+  else
+  { /* Lossy processes */
     /* For now, precision must match compiled-in value... */
     if (cinfo->data_precision != BITS_IN_JSAMPLE)
       ERREXIT1(cinfo, JERR_BAD_PRECISION, cinfo->data_precision);
@@ -62,21 +63,18 @@ initial_setup (j_decompress_ptr cinfo)
 
   /* Check that number of components won't exceed internal array sizes */
   if (cinfo->num_components > MAX_COMPONENTS)
-    ERREXIT2(cinfo, JERR_COMPONENT_COUNT, cinfo->num_components,
-       MAX_COMPONENTS);
+    ERREXIT2(cinfo, JERR_COMPONENT_COUNT, cinfo->num_components, MAX_COMPONENTS);
 
   /* Compute maximum sampling factors; check factor validity */
   cinfo->max_h_samp_factor = 1;
   cinfo->max_v_samp_factor = 1;
-  for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;
-       ci++, compptr++) {
-    if (compptr->h_samp_factor<=0 || compptr->h_samp_factor>MAX_SAMP_FACTOR ||
-  compptr->v_samp_factor<=0 || compptr->v_samp_factor>MAX_SAMP_FACTOR)
+  for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components; ci++, compptr++)
+  {
+    if (compptr->h_samp_factor <= 0 || compptr->h_samp_factor > MAX_SAMP_FACTOR || compptr->v_samp_factor <= 0 ||
+        compptr->v_samp_factor > MAX_SAMP_FACTOR)
       ERREXIT(cinfo, JERR_BAD_SAMPLING);
-    cinfo->max_h_samp_factor = MAX(cinfo->max_h_samp_factor,
-           compptr->h_samp_factor);
-    cinfo->max_v_samp_factor = MAX(cinfo->max_v_samp_factor,
-           compptr->v_samp_factor);
+    cinfo->max_h_samp_factor = MAX(cinfo->max_h_samp_factor, compptr->h_samp_factor);
+    cinfo->max_v_samp_factor = MAX(cinfo->max_v_samp_factor, compptr->v_samp_factor);
   }
 
   /* We initialize codec_data_unit and min_codec_data_unit to data_unit.
@@ -86,27 +84,23 @@ initial_setup (j_decompress_ptr cinfo)
   cinfo->min_codec_data_unit = cinfo->data_unit;
 
   /* Compute dimensions of components */
-  for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;
-       ci++, compptr++) {
+  for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components; ci++, compptr++)
+  {
     compptr->codec_data_unit = cinfo->data_unit;
     /* Size in data units */
-    compptr->width_in_data_units = (JDIMENSION)
-      jdiv_round_up((long) cinfo->image_width * (long) compptr->h_samp_factor,
-        (long) (cinfo->max_h_samp_factor * cinfo->data_unit));
-    compptr->height_in_data_units = (JDIMENSION)
-      jdiv_round_up((long) cinfo->image_height * (long) compptr->v_samp_factor,
-        (long) (cinfo->max_v_samp_factor * cinfo->data_unit));
+    compptr->width_in_data_units = (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_width * (IJG_LONG)compptr->h_samp_factor,
+                                                             (IJG_LONG)(cinfo->max_h_samp_factor * cinfo->data_unit));
+    compptr->height_in_data_units = (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_height * (IJG_LONG)compptr->v_samp_factor,
+                                                              (IJG_LONG)(cinfo->max_v_samp_factor * cinfo->data_unit));
     /* downsampled_width and downsampled_height will also be overridden by
      * jdmaster.c if we are doing full decompression.  The transcoder library
      * doesn't use these values, but the calling application might.
      */
     /* Size in samples */
-    compptr->downsampled_width = (JDIMENSION)
-      jdiv_round_up((long) cinfo->image_width * (long) compptr->h_samp_factor,
-        (long) cinfo->max_h_samp_factor);
-    compptr->downsampled_height = (JDIMENSION)
-      jdiv_round_up((long) cinfo->image_height * (long) compptr->v_samp_factor,
-        (long) cinfo->max_v_samp_factor);
+    compptr->downsampled_width = (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_width * (IJG_LONG)compptr->h_samp_factor,
+                                                           (IJG_LONG)cinfo->max_h_samp_factor);
+    compptr->downsampled_height = (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_height * (IJG_LONG)compptr->v_samp_factor,
+                                                            (IJG_LONG)cinfo->max_v_samp_factor);
     /* Mark component needed, until color conversion says otherwise */
     compptr->component_needed = TRUE;
     /* Mark no quantization table yet saved for component */
@@ -114,13 +108,11 @@ initial_setup (j_decompress_ptr cinfo)
   }
 
   /* Compute number of fully interleaved MCU rows. */
-  cinfo->total_iMCU_rows = (JDIMENSION)
-    jdiv_round_up((long) cinfo->image_height,
-      (long) (cinfo->max_v_samp_factor*cinfo->data_unit));
+  cinfo->total_iMCU_rows =
+    (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_height, (IJG_LONG)(cinfo->max_v_samp_factor * cinfo->data_unit));
 
   /* Decide whether file contains multiple scans */
-  if (cinfo->comps_in_scan < cinfo->num_components ||
-      cinfo->process == JPROC_PROGRESSIVE)
+  if (cinfo->comps_in_scan < cinfo->num_components || cinfo->process == JPROC_PROGRESSIVE)
     cinfo->inputctl->has_multiple_scans = TRUE;
   else
     cinfo->inputctl->has_multiple_scans = FALSE;
@@ -128,14 +120,15 @@ initial_setup (j_decompress_ptr cinfo)
 
 
 LOCAL(void)
-per_scan_setup (j_decompress_ptr cinfo)
+per_scan_setup(j_decompress_ptr cinfo)
 /* Do computations that are needed before processing a JPEG scan */
 /* cinfo->comps_in_scan and cinfo->cur_comp_info[] were set from SOS marker */
 {
-  int ci, mcublks, tmp;
-  jpeg_component_info *compptr;
+  int                   ci, mcublks, tmp;
+  jpeg_component_info * compptr;
 
-  if (cinfo->comps_in_scan == 1) {
+  if (cinfo->comps_in_scan == 1)
+  {
 
     /* Noninterleaved (single-component) scan */
     compptr = cinfo->cur_comp_info[0];
@@ -153,32 +146,32 @@ per_scan_setup (j_decompress_ptr cinfo)
     /* For noninterleaved scans, it is convenient to define last_row_height
      * as the number of data unit rows present in the last iMCU row.
      */
-    tmp = (int) (compptr->height_in_data_units % compptr->v_samp_factor);
-    if (tmp == 0) tmp = compptr->v_samp_factor;
+    tmp = (int)compptr->height_in_data_units % compptr->v_samp_factor;
+    if (tmp == 0)
+      tmp = compptr->v_samp_factor;
     compptr->last_row_height = tmp;
 
     /* Prepare array describing MCU composition */
     cinfo->data_units_in_MCU = 1;
     cinfo->MCU_membership[0] = 0;
-
-  } else {
+  }
+  else
+  {
 
     /* Interleaved (multi-component) scan */
     if (cinfo->comps_in_scan <= 0 || cinfo->comps_in_scan > MAX_COMPS_IN_SCAN)
-      ERREXIT2(cinfo, JERR_COMPONENT_COUNT, cinfo->comps_in_scan,
-         MAX_COMPS_IN_SCAN);
+      ERREXIT2(cinfo, JERR_COMPONENT_COUNT, cinfo->comps_in_scan, MAX_COMPS_IN_SCAN);
 
     /* Overall image size in MCUs */
-    cinfo->MCUs_per_row = (JDIMENSION)
-      jdiv_round_up((long) cinfo->image_width,
-        (long) (cinfo->max_h_samp_factor*cinfo->data_unit));
-    cinfo->MCU_rows_in_scan = (JDIMENSION)
-      jdiv_round_up((long) cinfo->image_height,
-        (long) (cinfo->max_v_samp_factor*cinfo->data_unit));
+    cinfo->MCUs_per_row =
+      (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_width, (IJG_LONG)(cinfo->max_h_samp_factor * cinfo->data_unit));
+    cinfo->MCU_rows_in_scan =
+      (JDIMENSION)jdiv_round_up((IJG_LONG)cinfo->image_height, (IJG_LONG)(cinfo->max_v_samp_factor * cinfo->data_unit));
 
     cinfo->data_units_in_MCU = 0;
 
-    for (ci = 0; ci < cinfo->comps_in_scan; ci++) {
+    for (ci = 0; ci < cinfo->comps_in_scan; ci++)
+    {
       compptr = cinfo->cur_comp_info[ci];
       /* Sampling factors give # of data units of component in each MCU */
       compptr->MCU_width = compptr->h_samp_factor;
@@ -186,21 +179,23 @@ per_scan_setup (j_decompress_ptr cinfo)
       compptr->MCU_data_units = compptr->MCU_width * compptr->MCU_height;
       compptr->MCU_sample_width = compptr->MCU_width * compptr->codec_data_unit;
       /* Figure number of non-dummy data units in last MCU column & row */
-      tmp = (int) (compptr->width_in_data_units % compptr->MCU_width);
-      if (tmp == 0) tmp = compptr->MCU_width;
+      tmp = (int)compptr->width_in_data_units % compptr->MCU_width;
+      if (tmp == 0)
+        tmp = compptr->MCU_width;
       compptr->last_col_width = tmp;
-      tmp = (int) (compptr->height_in_data_units % compptr->MCU_height);
-      if (tmp == 0) tmp = compptr->MCU_height;
+      tmp = (int)compptr->height_in_data_units % compptr->MCU_height;
+      if (tmp == 0)
+        tmp = compptr->MCU_height;
       compptr->last_row_height = tmp;
       /* Prepare array describing MCU composition */
       mcublks = compptr->MCU_data_units;
       if (cinfo->data_units_in_MCU + mcublks > D_MAX_DATA_UNITS_IN_MCU)
-  ERREXIT(cinfo, JERR_BAD_MCU_SIZE);
-      while (mcublks-- > 0) {
-  cinfo->MCU_membership[cinfo->data_units_in_MCU++] = ci;
+        ERREXIT(cinfo, JERR_BAD_MCU_SIZE);
+      while (mcublks-- > 0)
+      {
+        cinfo->MCU_membership[cinfo->data_units_in_MCU++] = ci;
       }
     }
-
   }
 }
 
@@ -213,10 +208,10 @@ per_scan_setup (j_decompress_ptr cinfo)
  */
 
 METHODDEF(void)
-start_input_pass (j_decompress_ptr cinfo)
+start_input_pass(j_decompress_ptr cinfo)
 {
   per_scan_setup(cinfo);
-  (*cinfo->codec->start_input_pass) (cinfo);
+  (*cinfo->codec->start_input_pass)(cinfo);
   cinfo->inputctl->consume_input = cinfo->codec->consume_data;
 }
 
@@ -228,7 +223,7 @@ start_input_pass (j_decompress_ptr cinfo)
  */
 
 METHODDEF(void)
-finish_input_pass (j_decompress_ptr cinfo)
+finish_input_pass(j_decompress_ptr cinfo)
 {
   cinfo->inputctl->consume_input = consume_markers;
 }
@@ -245,52 +240,59 @@ finish_input_pass (j_decompress_ptr cinfo)
  */
 
 METHODDEF(int)
-consume_markers (j_decompress_ptr cinfo)
+consume_markers(j_decompress_ptr cinfo)
 {
-  my_inputctl_ptr inputctl = (my_inputctl_ptr) cinfo->inputctl;
-  int val;
+  my_inputctl_ptr inputctl = (my_inputctl_ptr)cinfo->inputctl;
+  int             val;
 
   if (inputctl->pub.eoi_reached) /* After hitting EOI, read no further */
     return JPEG_REACHED_EOI;
 
-  val = (*cinfo->marker->read_markers) (cinfo);
+  val = (*cinfo->marker->read_markers)(cinfo);
 
-  switch (val) {
-  case JPEG_REACHED_SOS:  /* Found SOS */
-    if (inputctl->inheaders) {  /* 1st SOS */
-      initial_setup(cinfo);
-      /*
-       * Initialize the decompression codec.  We need to do this here so that
-       * any codec-specific fields and function pointers are available to
-       * the rest of the library.
-       */
-      jinit_d_codec(cinfo);
-      inputctl->inheaders = FALSE;
-      /* Note: start_input_pass must be called by jdmaster.c
-       * before any more input can be consumed.  jdapimin.c is
-       * responsible for enforcing this sequencing.
-       */
-    } else {      /* 2nd or later SOS marker */
-      if (! inputctl->pub.has_multiple_scans)
-  ERREXIT(cinfo, JERR_EOI_EXPECTED); /* Oops, I wasn't expecting this! */
-      start_input_pass(cinfo);
-    }
-    break;
-  case JPEG_REACHED_EOI:  /* Found EOI */
-    inputctl->pub.eoi_reached = TRUE;
-    if (inputctl->inheaders) {  /* Tables-only datastream, apparently */
-      if (cinfo->marker->saw_SOF)
-  ERREXIT(cinfo, JERR_SOF_NO_SOS);
-    } else {
-      /* Prevent infinite loop in coef ctlr's decompress_data routine
-       * if user set output_scan_number larger than number of scans.
-       */
-      if (cinfo->output_scan_number > cinfo->input_scan_number)
-  cinfo->output_scan_number = cinfo->input_scan_number;
-    }
-    break;
-  case JPEG_SUSPENDED:
-    break;
+  switch (val)
+  {
+    case JPEG_REACHED_SOS: /* Found SOS */
+      if (inputctl->inheaders)
+      { /* 1st SOS */
+        initial_setup(cinfo);
+        /*
+         * Initialize the decompression codec.  We need to do this here so that
+         * any codec-specific fields and function pointers are available to
+         * the rest of the library.
+         */
+        jinit_d_codec(cinfo);
+        inputctl->inheaders = FALSE;
+        /* Note: start_input_pass must be called by jdmaster.c
+         * before any more input can be consumed.  jdapimin.c is
+         * responsible for enforcing this sequencing.
+         */
+      }
+      else
+      { /* 2nd or later SOS marker */
+        if (!inputctl->pub.has_multiple_scans)
+          ERREXIT(cinfo, JERR_EOI_EXPECTED); /* Oops, I wasn't expecting this! */
+        start_input_pass(cinfo);
+      }
+      break;
+    case JPEG_REACHED_EOI: /* Found EOI */
+      inputctl->pub.eoi_reached = TRUE;
+      if (inputctl->inheaders)
+      { /* Tables-only datastream, apparently */
+        if (cinfo->marker->saw_SOF)
+          ERREXIT(cinfo, JERR_SOF_NO_SOS);
+      }
+      else
+      {
+        /* Prevent infinite loop in coef ctlr's decompress_data routine
+         * if user set output_scan_number larger than number of scans.
+         */
+        if (cinfo->output_scan_number > cinfo->input_scan_number)
+          cinfo->output_scan_number = cinfo->input_scan_number;
+      }
+      break;
+    case JPEG_SUSPENDED:
+      break;
   }
 
   return val;
@@ -302,17 +304,17 @@ consume_markers (j_decompress_ptr cinfo)
  */
 
 METHODDEF(void)
-reset_input_controller (j_decompress_ptr cinfo)
+reset_input_controller(j_decompress_ptr cinfo)
 {
-  my_inputctl_ptr inputctl = (my_inputctl_ptr) cinfo->inputctl;
+  my_inputctl_ptr inputctl = (my_inputctl_ptr)cinfo->inputctl;
 
   inputctl->pub.consume_input = consume_markers;
   inputctl->pub.has_multiple_scans = FALSE; /* "unknown" would be better */
   inputctl->pub.eoi_reached = FALSE;
   inputctl->inheaders = TRUE;
   /* Reset other modules */
-  (*cinfo->err->reset_error_mgr) ((j_common_ptr) cinfo);
-  (*cinfo->marker->reset_marker_reader) (cinfo);
+  (*cinfo->err->reset_error_mgr)((j_common_ptr)cinfo);
+  (*cinfo->marker->reset_marker_reader)(cinfo);
   /* Reset progression state -- would be cleaner if entropy decoder did this */
   cinfo->coef_bits = NULL;
 }
@@ -324,15 +326,14 @@ reset_input_controller (j_decompress_ptr cinfo)
  */
 
 GLOBAL(void)
-jinit_input_controller (j_decompress_ptr cinfo)
+jinit_input_controller(j_decompress_ptr cinfo)
 {
   my_inputctl_ptr inputctl;
 
   /* Create subobject in permanent pool */
-  inputctl = (my_inputctl_ptr)
-    (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
-        SIZEOF(my_input_controller));
-  cinfo->inputctl = (struct jpeg_input_controller *) inputctl;
+  inputctl =
+    (my_inputctl_ptr)(*cinfo->mem->alloc_small)((j_common_ptr)cinfo, JPOOL_PERMANENT, SIZEOF(my_input_controller));
+  cinfo->inputctl = (struct jpeg_input_controller *)inputctl;
   /* Initialize method pointers */
   inputctl->pub.consume_input = consume_markers;
   inputctl->pub.reset_input_controller = reset_input_controller;

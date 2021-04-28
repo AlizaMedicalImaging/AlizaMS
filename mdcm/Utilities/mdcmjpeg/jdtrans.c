@@ -43,41 +43,46 @@ LOCAL(void) transdecode_master_selection JPP((j_decompress_ptr cinfo));
  */
 
 GLOBAL(jvirt_barray_ptr *)
-jpeg_read_coefficients (j_decompress_ptr cinfo)
+jpeg_read_coefficients(j_decompress_ptr cinfo)
 {
   /* j_lossy_d_ptr decomp; */
 
   /* Can't read coefficients from lossless streams */
-  if (cinfo->process == JPROC_LOSSLESS) {
+  if (cinfo->process == JPROC_LOSSLESS)
+  {
     ERREXIT(cinfo, JERR_CANT_TRANSCODE);
     return NULL;
   }
 
-  if (cinfo->global_state == DSTATE_READY) {
+  if (cinfo->global_state == DSTATE_READY)
+  {
     /* First call: initialize active modules */
     transdecode_master_selection(cinfo);
     cinfo->global_state = DSTATE_RDCOEFS;
   }
-  if (cinfo->global_state == DSTATE_RDCOEFS) {
+  if (cinfo->global_state == DSTATE_RDCOEFS)
+  {
     /* Absorb whole file into the coef buffer */
-    for (;;) {
+    for (;;)
+    {
       int retcode;
       /* Call progress monitor hook if present */
       if (cinfo->progress != NULL)
-  (*cinfo->progress->progress_monitor) ((j_common_ptr) cinfo);
+        (*cinfo->progress->progress_monitor)((j_common_ptr)cinfo);
       /* Absorb some more input */
-      retcode = (*cinfo->inputctl->consume_input) (cinfo);
+      retcode = (*cinfo->inputctl->consume_input)(cinfo);
       if (retcode == JPEG_SUSPENDED)
-  return NULL;
+        return NULL;
       if (retcode == JPEG_REACHED_EOI)
-  break;
+        break;
       /* Advance progress counter if appropriate */
-      if (cinfo->progress != NULL &&
-    (retcode == JPEG_ROW_COMPLETED || retcode == JPEG_REACHED_SOS)) {
-  if (++cinfo->progress->pass_counter >= cinfo->progress->pass_limit) {
-    /* startup underestimated number of scans; ratchet up one scan */
-    cinfo->progress->pass_limit += (long) cinfo->total_iMCU_rows;
-  }
+      if (cinfo->progress != NULL && (retcode == JPEG_ROW_COMPLETED || retcode == JPEG_REACHED_SOS))
+      {
+        if (++cinfo->progress->pass_counter >= cinfo->progress->pass_limit)
+        {
+          /* startup underestimated number of scans; ratchet up one scan */
+          cinfo->progress->pass_limit += (IJG_LONG)cinfo->total_iMCU_rows;
+        }
       }
     }
     /* Set state so that jpeg_finish_decompress does the right thing */
@@ -87,13 +92,13 @@ jpeg_read_coefficients (j_decompress_ptr cinfo)
    * standalone, or in state DSTATE_BUFIMAGE if being invoked to get access
    * to the coefficients during a full buffered-image-mode decompression.
    */
-  if ((cinfo->global_state == DSTATE_STOPPING ||
-       cinfo->global_state == DSTATE_BUFIMAGE) && cinfo->buffered_image) {
-    return ((j_lossy_d_ptr) cinfo->codec)->coef_arrays;
+  if ((cinfo->global_state == DSTATE_STOPPING || cinfo->global_state == DSTATE_BUFIMAGE) && cinfo->buffered_image)
+  {
+    return ((j_lossy_d_ptr)cinfo->codec)->coef_arrays;
   }
   /* Oops, improper usage */
   ERREXIT1(cinfo, JERR_BAD_STATE, cinfo->global_state);
-  return NULL;      /* keep compiler happy */
+  return NULL; /* keep compiler happy */
 }
 
 
@@ -103,7 +108,7 @@ jpeg_read_coefficients (j_decompress_ptr cinfo)
  */
 
 LOCAL(void)
-transdecode_master_selection (j_decompress_ptr cinfo)
+transdecode_master_selection(j_decompress_ptr cinfo)
 {
   /* This is effectively a buffered-image operation. */
   cinfo->buffered_image = TRUE;
@@ -112,26 +117,32 @@ transdecode_master_selection (j_decompress_ptr cinfo)
   jinit_d_codec(cinfo);
 
   /* We can now tell the memory manager to allocate virtual arrays. */
-  (*cinfo->mem->realize_virt_arrays) ((j_common_ptr) cinfo);
+  (*cinfo->mem->realize_virt_arrays)((j_common_ptr)cinfo);
 
   /* Initialize input side of decompressor to consume first scan. */
-  (*cinfo->inputctl->start_input_pass) (cinfo);
+  (*cinfo->inputctl->start_input_pass)(cinfo);
 
   /* Initialize progress monitoring. */
-  if (cinfo->progress != NULL) {
+  if (cinfo->progress != NULL)
+  {
     int nscans;
     /* Estimate number of scans to set pass_limit. */
-    if (cinfo->process == JPROC_PROGRESSIVE) {
+    if (cinfo->process == JPROC_PROGRESSIVE)
+    {
       /* Arbitrarily estimate 2 interleaved DC scans + 3 AC scans/component. */
       nscans = 2 + 3 * cinfo->num_components;
-    } else if (cinfo->inputctl->has_multiple_scans) {
+    }
+    else if (cinfo->inputctl->has_multiple_scans)
+    {
       /* For a nonprogressive multiscan file, estimate 1 scan per component. */
       nscans = cinfo->num_components;
-    } else {
+    }
+    else
+    {
       nscans = 1;
     }
     cinfo->progress->pass_counter = 0L;
-    cinfo->progress->pass_limit = (long) cinfo->total_iMCU_rows * nscans;
+    cinfo->progress->pass_limit = (IJG_LONG)cinfo->total_iMCU_rows * nscans;
     cinfo->progress->completed_passes = 0;
     cinfo->progress->total_passes = 1;
   }

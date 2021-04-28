@@ -21,7 +21,7 @@
  */
 
 METHODDEF(void)
-calc_output_dimensions (j_decompress_ptr cinfo)
+calc_output_dimensions(j_decompress_ptr cinfo)
 {
   /* Hardwire it to "no scaling" */
   cinfo->output_width = cinfo->image_width;
@@ -37,14 +37,14 @@ calc_output_dimensions (j_decompress_ptr cinfo)
  */
 
 METHODDEF(void)
-start_input_pass (j_decompress_ptr cinfo)
+start_input_pass(j_decompress_ptr cinfo)
 {
-  j_lossless_d_ptr losslsd = (j_lossless_d_ptr) cinfo->codec;
+  j_lossless_d_ptr losslsd = (j_lossless_d_ptr)cinfo->codec;
 
-  (*losslsd->entropy_start_pass) (cinfo);
-  (*losslsd->predict_start_pass) (cinfo);
-  (*losslsd->scaler_start_pass) (cinfo);
-  (*losslsd->diff_start_input_pass) (cinfo);
+  (*losslsd->entropy_start_pass)(cinfo);
+  (*losslsd->predict_start_pass)(cinfo);
+  (*losslsd->scaler_start_pass)(cinfo);
+  (*losslsd->diff_start_input_pass)(cinfo);
 }
 
 
@@ -57,23 +57,25 @@ GLOBAL(void)
 jinit_lossless_d_codec(j_decompress_ptr cinfo)
 {
   j_lossless_d_ptr losslsd;
-  boolean use_c_buffer;
+  boolean          use_c_buffer;
 
   /* Create subobject in permanent pool */
-  losslsd = (j_lossless_d_ptr)
-    (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
-        SIZEOF(jpeg_lossless_d_codec));
-  cinfo->codec = (struct jpeg_d_codec *) losslsd;
+  losslsd =
+    (j_lossless_d_ptr)(*cinfo->mem->alloc_small)((j_common_ptr)cinfo, JPOOL_PERMANENT, SIZEOF(jpeg_lossless_d_codec));
+  cinfo->codec = (struct jpeg_d_codec *)losslsd;
 
   /* Initialize sub-modules */
   /* Entropy decoding: either Huffman or arithmetic coding. */
-  if (cinfo->arith_code) {
-#ifdef WITH_ARITHMETIC_PATCH
+  if (cinfo->arith_code)
+  {
+#  ifdef WITH_ARITHMETIC_PATCH
     jinit_arith_decoder(cinfo);
-#else
+#  else
     ERREXIT(cinfo, JERR_ARITH_NOTIMPL);
-#endif
-  } else {
+#  endif
+  }
+  else
+  {
     jinit_lhuff_decoder(cinfo);
   }
 

@@ -19,12 +19,12 @@
  */
 
 METHODDEF(void)
-start_pass (j_compress_ptr cinfo, J_BUF_MODE pass_mode)
+start_pass(j_compress_ptr cinfo, J_BUF_MODE pass_mode)
 {
-  j_lossy_c_ptr lossyc = (j_lossy_c_ptr) cinfo->codec;
+  j_lossy_c_ptr lossyc = (j_lossy_c_ptr)cinfo->codec;
 
-  (*lossyc->fdct_start_pass) (cinfo);
-  (*lossyc->coef_start_pass) (cinfo, pass_mode);
+  (*lossyc->fdct_start_pass)(cinfo);
+  (*lossyc->coef_start_pass)(cinfo, pass_mode);
 }
 
 
@@ -34,42 +34,43 @@ start_pass (j_compress_ptr cinfo, J_BUF_MODE pass_mode)
  */
 
 GLOBAL(void)
-jinit_lossy_c_codec (j_compress_ptr cinfo)
+jinit_lossy_c_codec(j_compress_ptr cinfo)
 {
   j_lossy_c_ptr lossyc;
 
   /* Create subobject in permanent pool */
-  lossyc = (j_lossy_c_ptr)
-    (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
-        SIZEOF(jpeg_lossy_c_codec));
-  cinfo->codec = (struct jpeg_c_codec *) lossyc;
+  lossyc = (j_lossy_c_ptr)(*cinfo->mem->alloc_small)((j_common_ptr)cinfo, JPOOL_PERMANENT, SIZEOF(jpeg_lossy_c_codec));
+  cinfo->codec = (struct jpeg_c_codec *)lossyc;
 
   /* Initialize sub-modules */
 
   /* Forward DCT */
   jinit_forward_dct(cinfo);
   /* Entropy encoding: either Huffman or arithmetic coding. */
-  if (cinfo->arith_code) {
+  if (cinfo->arith_code)
+  {
 #ifdef WITH_ARITHMETIC_PATCH
     jinit_arith_encoder(cinfo);
 #else
     ERREXIT(cinfo, JERR_ARITH_NOTIMPL);
 #endif
-  } else {
-    if (cinfo->process == JPROC_PROGRESSIVE) {
+  }
+  else
+  {
+    if (cinfo->process == JPROC_PROGRESSIVE)
+    {
 #ifdef C_PROGRESSIVE_SUPPORTED
       jinit_phuff_encoder(cinfo);
 #else
       ERREXIT(cinfo, JERR_NOT_COMPILED);
 #endif
-    } else
+    }
+    else
       jinit_shuff_encoder(cinfo);
   }
 
   /* Need a full-image coefficient buffer in any multi-pass mode. */
-  jinit_c_coef_controller(cinfo,
-        (boolean) (cinfo->num_scans > 1 ||
-             cinfo->optimize_coding));
+  jinit_c_coef_controller(cinfo, (boolean)(cinfo->num_scans > 1 || cinfo->optimize_coding));
 
   /* Initialize method pointers.
    *

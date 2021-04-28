@@ -17,13 +17,14 @@
 #define JPEG_INTERNALS
 #include "jinclude.h"
 #include "jpeglib.h"
-#include "jlossls.h"    /* Private declarations for lossless codec */
-#include "jdhuff.h"    /* Declarations shared with jd*huff.c */
+#include "jlossls.h" /* Private declarations for lossless codec */
+#include "jdhuff.h"  /* Declarations shared with jd*huff.c */
 
 
 #ifdef D_LOSSLESS_SUPPORTED
 
-typedef struct {
+typedef struct
+{
   int ci, yoffset, MCU_width;
 } lhd_output_ptr_info;
 
@@ -31,8 +32,9 @@ typedef struct {
  * Private entropy decoder object for lossless Huffman decoding.
  */
 
-typedef struct {
-  huffd_common_fields;    /* Fields shared with other entropy decoders */
+typedef struct
+{
+  huffd_common_fields; /* Fields shared with other entropy decoders */
 
   /* Pointers to derived tables (these workspaces have image lifespan) */
   d_derived_tbl * derived_tbls[NUM_HUFF_TBLS];
@@ -70,40 +72,42 @@ typedef lhuff_entropy_decoder * lhuff_entropy_ptr;
  */
 
 METHODDEF(void)
-start_pass_lhuff_decoder (j_decompress_ptr cinfo)
+start_pass_lhuff_decoder(j_decompress_ptr cinfo)
 {
-  j_lossless_d_ptr losslsd = (j_lossless_d_ptr) cinfo->codec;
-  lhuff_entropy_ptr entropy = (lhuff_entropy_ptr) losslsd->entropy_private;
-  int ci, dctbl, sampn, ptrn, yoffset, xoffset;
+  j_lossless_d_ptr      losslsd = (j_lossless_d_ptr)cinfo->codec;
+  lhuff_entropy_ptr     entropy = (lhuff_entropy_ptr)losslsd->entropy_private;
+  int                   ci, dctbl, sampn, ptrn, yoffset, xoffset;
   jpeg_component_info * compptr;
 
-  for (ci = 0; ci < cinfo->comps_in_scan; ci++) {
+  for (ci = 0; ci < cinfo->comps_in_scan; ci++)
+  {
     compptr = cinfo->cur_comp_info[ci];
     dctbl = compptr->dc_tbl_no;
     /* Make sure requested tables are present */
-    if (dctbl < 0 || dctbl >= NUM_HUFF_TBLS ||
-  cinfo->dc_huff_tbl_ptrs[dctbl] == NULL)
+    if (dctbl < 0 || dctbl >= NUM_HUFF_TBLS || cinfo->dc_huff_tbl_ptrs[dctbl] == NULL)
       ERREXIT1(cinfo, JERR_NO_HUFF_TABLE, dctbl);
     /* Compute derived values for Huffman tables */
     /* We may do this more than once for a table, but it's not expensive */
-    jpeg_make_d_derived_tbl(cinfo, TRUE, dctbl,
-          & entropy->derived_tbls[dctbl]);
+    jpeg_make_d_derived_tbl(cinfo, TRUE, dctbl, &entropy->derived_tbls[dctbl]);
   }
 
   /* Precalculate decoding info for each sample in an MCU of this scan */
-  for (sampn = 0, ptrn = 0; sampn < cinfo->data_units_in_MCU;) {
+  for (sampn = 0, ptrn = 0; sampn < cinfo->data_units_in_MCU;)
+  {
     compptr = cinfo->cur_comp_info[cinfo->MCU_membership[sampn]];
     ci = compptr->component_index;
-    for (yoffset = 0; yoffset < compptr->MCU_height; yoffset++, ptrn++) {
+    for (yoffset = 0; yoffset < compptr->MCU_height; yoffset++, ptrn++)
+    {
       /* Precalculate the setup info for each output pointer */
       entropy->output_ptr_info[ptrn].ci = ci;
       entropy->output_ptr_info[ptrn].yoffset = yoffset;
       entropy->output_ptr_info[ptrn].MCU_width = compptr->MCU_width;
-      for (xoffset = 0; xoffset < compptr->MCU_width; xoffset++, sampn++) {
-  /* Precalculate the output pointer index for each sample */
-  entropy->output_ptr_index[sampn] = ptrn;
-  /* Precalculate which table to use for each sample */
-  entropy->cur_tbls[sampn] = entropy->derived_tbls[compptr->dc_tbl_no];
+      for (xoffset = 0; xoffset < compptr->MCU_width; xoffset++, sampn++)
+      {
+        /* Precalculate the output pointer index for each sample */
+        entropy->output_ptr_index[sampn] = ptrn;
+        /* Precalculate which table to use for each sample */
+        entropy->cur_tbls[sampn] = entropy->derived_tbls[compptr->dc_tbl_no];
       }
     }
   }
@@ -121,25 +125,38 @@ start_pass_lhuff_decoder (j_decompress_ptr cinfo)
  * On some machines, a shift and add will be faster than a table lookup.
  */
 
-#ifdef AVOID_TABLES
+#  ifdef AVOID_TABLES
 
-#define HUFF_EXTEND(x,s)  ((x) < (1<<((s)-1)) ? (x) + (((-1u)<<(s)) + 1) : (x))
+#    define HUFF_EXTEND(x, s) ((x) < (1 << ((s)-1)) ? (x) + (((~0U) << (s)) + 1) : (x))
 
-#else
+#  else
 
-#define HUFF_EXTEND(x,s)  ((x) < extend_test[s] ? (x) + extend_offset[s] : (x))
+#    define HUFF_EXTEND(x, s) ((x) < extend_test[s] ? (x) + extend_offset[s] : (x))
 
-static const int extend_test[16] =   /* entry n is 2**(n-1) */
-  { 0, 0x0001, 0x0002, 0x0004, 0x0008, 0x0010, 0x0020, 0x0040, 0x0080,
-    0x0100, 0x0200, 0x0400, 0x0800, 0x1000, 0x2000, 0x4000 };
+static const int extend_test[18] = /* entry n is 2**(n-1) */
+  { 0,      0x0001, 0x0002, 0x0004, 0x0008, 0x0010, 0x0020, 0x0040, 0x0080,
+    0x0100, 0x0200, 0x0400, 0x0800, 0x1000, 0x2000, 0x4000, 0x8000, 0 };
 
-static const int extend_offset[16] = /* entry n is (-1u << n) + 1 */
-  { 0, ((-1u)<<1) + 1, ((-1u)<<2) + 1, ((-1u)<<3) + 1, ((-1u)<<4) + 1,
-    ((-1u)<<5) + 1, ((-1u)<<6) + 1, ((-1u)<<7) + 1, ((-1u)<<8) + 1,
-    ((-1u)<<9) + 1, ((-1u)<<10) + 1, ((-1u)<<11) + 1, ((-1u)<<12) + 1,
-    ((-1u)<<13) + 1, ((-1u)<<14) + 1, ((-1u)<<15) + 1 };
-
-#endif /* AVOID_TABLES */
+static const int extend_offset[18] = /* entry n is (-1 << n) + 1 */
+  { 0,
+    (int)((~0U) << 1) + 1,
+    (int)((~0U) << 2) + 1,
+    (int)((~0U) << 3) + 1,
+    (int)((~0U) << 4) + 1,
+    (int)((~0U) << 5) + 1,
+    (int)((~0U) << 6) + 1,
+    (int)((~0U) << 7) + 1,
+    (int)((~0U) << 8) + 1,
+    (int)((~0U) << 9) + 1,
+    (int)((~0U) << 10) + 1,
+    (int)((~0U) << 11) + 1,
+    (int)((~0U) << 12) + 1,
+    (int)((~0U) << 13) + 1,
+    (int)((~0U) << 14) + 1,
+    (int)((~0U) << 15) + 1,
+    (int)((~0U) << 16) + 1,
+    0 };
+#  endif /* AVOID_TABLES */
 
 
 /*
@@ -148,10 +165,10 @@ static const int extend_offset[16] = /* entry n is (-1u << n) + 1 */
  */
 
 METHODDEF(boolean)
-process_restart (j_decompress_ptr cinfo)
+process_restart(j_decompress_ptr cinfo)
 {
-  j_lossless_d_ptr losslsd = (j_lossless_d_ptr) cinfo->codec;
-  lhuff_entropy_ptr entropy = (lhuff_entropy_ptr) losslsd->entropy_private;
+  j_lossless_d_ptr  losslsd = (j_lossless_d_ptr)cinfo->codec;
+  lhuff_entropy_ptr entropy = (lhuff_entropy_ptr)losslsd->entropy_private;
   /* int ci; */
 
   /* Throw away any unused bits remaining in bit buffer; */
@@ -160,7 +177,7 @@ process_restart (j_decompress_ptr cinfo)
   entropy->bitstate.bits_left = 0;
 
   /* Advance past the RSTn marker */
-  if (! (*cinfo->marker->read_restart_marker) (cinfo))
+  if (!(*cinfo->marker->read_restart_marker)(cinfo))
     return FALSE;
 
   /* Reset out-of-data flag, unless read_restart_marker left us smack up
@@ -191,23 +208,26 @@ process_restart (j_decompress_ptr cinfo)
  */
 
 METHODDEF(JDIMENSION)
-decode_mcus (j_decompress_ptr cinfo, JDIFFIMAGE diff_buf,
-       JDIMENSION MCU_row_num, JDIMENSION MCU_col_num, JDIMENSION nMCU)
+decode_mcus(j_decompress_ptr cinfo,
+            JDIFFIMAGE       diff_buf,
+            JDIMENSION       MCU_row_num,
+            JDIMENSION       MCU_col_num,
+            JDIMENSION       nMCU)
 {
-  j_lossless_d_ptr losslsd = (j_lossless_d_ptr) cinfo->codec;
-  lhuff_entropy_ptr entropy = (lhuff_entropy_ptr) losslsd->entropy_private;
-  unsigned int mcu_num;
-  int sampn, ci, yoffset, MCU_width, ptrn;
+  j_lossless_d_ptr  losslsd = (j_lossless_d_ptr)cinfo->codec;
+  lhuff_entropy_ptr entropy = (lhuff_entropy_ptr)losslsd->entropy_private;
+  unsigned int      mcu_num;
+  int               sampn, ci, yoffset, MCU_width, ptrn;
   BITREAD_STATE_VARS;
   boolean cornell_workaround = (cinfo->workaround_options & WORKAROUND_BUGGY_CORNELL_16BIT_JPEG_ENCODER) != 0;
 
   /* Set output pointer locations based on MCU_col_num */
-  for (ptrn = 0; ptrn < entropy->num_output_ptrs; ptrn++) {
+  for (ptrn = 0; ptrn < entropy->num_output_ptrs; ptrn++)
+  {
     ci = entropy->output_ptr_info[ptrn].ci;
     yoffset = entropy->output_ptr_info[ptrn].yoffset;
     MCU_width = entropy->output_ptr_info[ptrn].MCU_width;
-    entropy->output_ptr[ptrn] =
-      diff_buf[ci][MCU_row_num + yoffset] + (MCU_col_num * MCU_width);
+    entropy->output_ptr[ptrn] = diff_buf[ci][MCU_row_num + yoffset] + (MCU_col_num * MCU_width);
   }
 
   /*
@@ -217,86 +237,100 @@ decode_mcus (j_decompress_ptr cinfo, JDIFFIMAGE diff_buf,
    * NB: We should find a way to do this without interacting with the
    * undifferencer module directly.
    */
-  if (entropy->insufficient_data) {
+  if (entropy->insufficient_data)
+  {
     for (ptrn = 0; ptrn < entropy->num_output_ptrs; ptrn++)
-      jzero_far((void FAR *) entropy->output_ptr[ptrn],
-    nMCU * entropy->output_ptr_info[ptrn].MCU_width * SIZEOF(JDIFF));
+      jzero_far((void FAR *)entropy->output_ptr[ptrn], nMCU * entropy->output_ptr_info[ptrn].MCU_width * SIZEOF(JDIFF));
 
-    (*losslsd->predict_process_restart) (cinfo);
+    (*losslsd->predict_process_restart)(cinfo);
   }
 
-  else {
+  else
+  {
 
     /* Load up working state */
-    BITREAD_LOAD_STATE(cinfo,entropy->bitstate);
+    BITREAD_LOAD_STATE(cinfo, entropy->bitstate);
 
     /* Outer loop handles the number of MCU requested */
 
-    for (mcu_num = 0; mcu_num < nMCU; mcu_num++) {
+    for (mcu_num = 0; mcu_num < nMCU; mcu_num++)
+    {
 
       /* Inner loop handles the samples in the MCU */
-      for (sampn = 0; sampn < cinfo->data_units_in_MCU; sampn++) {
-  d_derived_tbl * dctbl = entropy->cur_tbls[sampn];
-  register int s, r;
+      for (sampn = 0; sampn < cinfo->data_units_in_MCU; sampn++)
+      {
+        d_derived_tbl * dctbl = entropy->cur_tbls[sampn];
+        register int    s, r;
 
-  /* Section H.2.2: decode the sample difference */
-  HUFF_DECODE(s, br_state, dctbl, return mcu_num, label1, cornell_workaround);
-#if BITS_IN_JSAMPLE == 16
-  if (s) {
-    if (cornell_workaround)
-    {
-        if ((s == 16) && (bits_left < 16)) { /* standard case: always output 32768 */
-          s = 32768;
-        }
-        else if (s >= 16) { /* there are enough bits available, so check ... */
-          r = PEEK_BITS(16);
-          s = HUFF_EXTEND(r, 16);
-          if ((s & 0xffff) == 0x8000) { /* special case: handle buggy Cornell encoder */
-            DROP_BITS(16);
-          } else {  /* standard case: always output 32768 */
-            if (s == 0x7fff)
-              DROP_BITS(16);
-            s = 32768;
+        /* Section H.2.2: decode the sample difference */
+        HUFF_DECODE(s, br_state, dctbl, return mcu_num, label1, cornell_workaround);
+#  if BITS_IN_JSAMPLE == 16
+        if (s)
+        {
+          if (cornell_workaround)
+          {
+            if ((s == 16) && (bits_left < 16))
+            { /* standard case: always output 32768 */
+              s = 32768;
+            }
+            else if (s >= 16)
+            { /* there are enough bits available, so check ... */
+              r = PEEK_BITS(16);
+              s = HUFF_EXTEND(r, 16);
+              if ((s & 0xffff) == 0x8000)
+              { /* special case: handle buggy Cornell encoder */
+                DROP_BITS(16);
+              }
+              else
+              { /* standard case: always output 32768 */
+                if (s == 0x7fff)
+                  DROP_BITS(16);
+                s = 32768;
+              }
+            }
+            else
+            { /* normal case: fetch subsequent bits */
+              CHECK_BIT_BUFFER(br_state, s, return mcu_num);
+              r = GET_BITS(s);
+              s = HUFF_EXTEND(r, s);
+            }
           }
-        } else {    /* normal case: fetch subsequent bits */
-          CHECK_BIT_BUFFER(br_state, s, return mcu_num);
-          r = GET_BITS(s);
-          s = HUFF_EXTEND(r, s);
+          else
+          {
+            if (s == 16) /* special case: always output 32768 */
+              s = 32768;
+            else
+            { /* normal case: fetch subsequent bits */
+              CHECK_BIT_BUFFER(br_state, s, return mcu_num);
+              r = GET_BITS(s);
+              s = HUFF_EXTEND(r, s);
+            }
+          }
         }
-    }
-    else
-    {
-        if (s == 16)  /* special case: always output 32768 */
-          s = 32768;
-        else {    /* normal case: fetch subsequent bits */
-          CHECK_BIT_BUFFER(br_state, s, return mcu_num);
-          r = GET_BITS(s);
-          s = HUFF_EXTEND(r, s);
+#  else
+        if (s)
+        {
+          if (s == 16) /* special case: always output 32768 */
+            s = 32768;
+          else
+          { /* normal case: fetch subsequent bits */
+            CHECK_BIT_BUFFER(br_state, s, return mcu_num);
+            r = GET_BITS(s);
+            s = HUFF_EXTEND(r, s);
+          }
         }
-    }
-  }
-#else
-  if (s) {
-    if (s == 16)  /* special case: always output 32768 */
-      s = 32768;
-    else {  /* normal case: fetch subsequent bits */
-      CHECK_BIT_BUFFER(br_state, s, return mcu_num);
-      r = GET_BITS(s);
-      s = HUFF_EXTEND(r, s);
-    }
-  }
-#endif
+#  endif
 
-  /* Output the sample difference */
-  *entropy->output_ptr[entropy->output_ptr_index[sampn]]++ = (JDIFF) s;
+        /* Output the sample difference */
+        *entropy->output_ptr[entropy->output_ptr_index[sampn]]++ = (JDIFF)s;
       }
 
       /* Completed MCU, so update state */
-      BITREAD_SAVE_STATE(cinfo,entropy->bitstate);
+      BITREAD_SAVE_STATE(cinfo, entropy->bitstate);
     }
   }
 
- return nMCU;
+  return nMCU;
 }
 
 
@@ -305,22 +339,22 @@ decode_mcus (j_decompress_ptr cinfo, JDIFFIMAGE diff_buf,
  */
 
 GLOBAL(void)
-jinit_lhuff_decoder (j_decompress_ptr cinfo)
+jinit_lhuff_decoder(j_decompress_ptr cinfo)
 {
-  j_lossless_d_ptr losslsd = (j_lossless_d_ptr) cinfo->codec;
+  j_lossless_d_ptr  losslsd = (j_lossless_d_ptr)cinfo->codec;
   lhuff_entropy_ptr entropy;
-  int i;
+  int               i;
 
-  entropy = (lhuff_entropy_ptr)
-    (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-        SIZEOF(lhuff_entropy_decoder));
-  losslsd->entropy_private = (void *) entropy;
+  entropy =
+    (lhuff_entropy_ptr)(*cinfo->mem->alloc_small)((j_common_ptr)cinfo, JPOOL_IMAGE, SIZEOF(lhuff_entropy_decoder));
+  losslsd->entropy_private = (void *)entropy;
   losslsd->entropy_start_pass = start_pass_lhuff_decoder;
   losslsd->entropy_process_restart = process_restart;
   losslsd->entropy_decode_mcus = decode_mcus;
 
   /* Mark tables unallocated */
-  for (i = 0; i < NUM_HUFF_TBLS; i++) {
+  for (i = 0; i < NUM_HUFF_TBLS; i++)
+  {
     entropy->derived_tbls[i] = NULL;
   }
 }

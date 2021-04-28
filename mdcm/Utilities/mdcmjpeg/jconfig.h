@@ -22,36 +22,36 @@
 /* don't conflict if rpcndr.h already read; Note that the w32api headers
    used by Cygwin and Mingw do not define "boolean", so jmorecfg.h
    handles it later. */
-#ifndef __RPCNDR_H__
+#  ifndef __RPCNDR_H__
 typedef unsigned char boolean;
-#endif
-#define HAVE_BOOLEAN            /* prevent jmorecfg.h from redefining it */
+#  endif
+#  define HAVE_BOOLEAN /* prevent jmorecfg.h from redefining it */
 #endif
 
 #ifdef JPEG_INTERNALS
 
-#undef RIGHT_SHIFT_IS_UNSIGNED
-#undef INLINE
+#  undef RIGHT_SHIFT_IS_UNSIGNED
+#  undef INLINE
 /* These are for configuring the JPEG memory manager. */
-#undef DEFAULT_MAX_MEM
-#undef NO_MKTEMP
+#  undef DEFAULT_MAX_MEM
+#  undef NO_MKTEMP
 
 #endif /* JPEG_INTERNALS */
 
 #ifdef JPEG_CJPEG_DJPEG
 
-#define BMP_SUPPORTED		/* BMP image file format */
-#define GIF_SUPPORTED		/* GIF image file format */
-#define PPM_SUPPORTED		/* PBMPLUS PPM/PGM image file format */
-#undef RLE_SUPPORTED		/* Utah RLE image file format */
-#define TARGA_SUPPORTED		/* Targa image file format */
+#  define BMP_SUPPORTED   /* BMP image file format */
+#  define GIF_SUPPORTED   /* GIF image file format */
+#  define PPM_SUPPORTED   /* PBMPLUS PPM/PGM image file format */
+#  undef RLE_SUPPORTED    /* Utah RLE image file format */
+#  define TARGA_SUPPORTED /* Targa image file format */
 
-#undef TWO_FILE_COMMANDLINE
-#undef NEED_SIGNAL_CATCHER
-#undef DONT_USE_B_MODE
+#  undef TWO_FILE_COMMANDLINE
+#  undef NEED_SIGNAL_CATCHER
+#  undef DONT_USE_B_MODE
 
 /* Define this if you want percent-done progress reports from cjpeg/djpeg. */
-#undef PROGRESS_REPORT
+#  undef PROGRESS_REPORT
 
 #endif /* JPEG_CJPEG_DJPEG */
 

@@ -21,13 +21,13 @@
  */
 
 METHODDEF(void)
-start_pass (j_compress_ptr cinfo, J_BUF_MODE pass_mode)
+start_pass(j_compress_ptr cinfo, J_BUF_MODE pass_mode)
 {
-  j_lossless_c_ptr losslsc = (j_lossless_c_ptr) cinfo->codec;
+  j_lossless_c_ptr losslsc = (j_lossless_c_ptr)cinfo->codec;
 
-  (*losslsc->scaler_start_pass) (cinfo);
-  (*losslsc->predict_start_pass) (cinfo);
-  (*losslsc->diff_start_pass) (cinfo, pass_mode);
+  (*losslsc->scaler_start_pass)(cinfo);
+  (*losslsc->predict_start_pass)(cinfo);
+  (*losslsc->diff_start_pass)(cinfo, pass_mode);
 }
 
 
@@ -42,10 +42,9 @@ jinit_lossless_c_codec(j_compress_ptr cinfo)
   j_lossless_c_ptr losslsc;
 
   /* Create subobject in permanent pool */
-  losslsc = (j_lossless_c_ptr)
-    (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
-        SIZEOF(jpeg_lossless_c_codec));
-  cinfo->codec = (struct jpeg_c_codec *) losslsc;
+  losslsc =
+    (j_lossless_c_ptr)(*cinfo->mem->alloc_small)((j_common_ptr)cinfo, JPOOL_PERMANENT, SIZEOF(jpeg_lossless_c_codec));
+  cinfo->codec = (struct jpeg_c_codec *)losslsc;
 
   /* Initialize sub-modules */
 
@@ -56,20 +55,21 @@ jinit_lossless_c_codec(j_compress_ptr cinfo)
   jinit_differencer(cinfo);
 
   /* Entropy encoding: either Huffman or arithmetic coding. */
-  if (cinfo->arith_code) {
-#ifdef WITH_ARITHMETIC_PATCH
+  if (cinfo->arith_code)
+  {
+#  ifdef WITH_ARITHMETIC_PATCH
     jinit_arith_encoder(cinfo);
-#else
+#  else
     ERREXIT(cinfo, JERR_ARITH_NOTIMPL);
-#endif
-  } else {
+#  endif
+  }
+  else
+  {
     jinit_lhuff_encoder(cinfo);
   }
 
   /* Need a full-image difference buffer in any multi-pass mode. */
-  jinit_c_diff_controller(cinfo,
-        (boolean) (cinfo->num_scans > 1 ||
-             cinfo->optimize_coding));
+  jinit_c_diff_controller(cinfo, (boolean)(cinfo->num_scans > 1 || cinfo->optimize_coding));
 
   /* Initialize method pointers.
    *
