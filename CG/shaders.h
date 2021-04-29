@@ -1,5 +1,5 @@
-#ifndef SHADERS____H____
-#define SHADERS____H____
+#ifndef SHADERS_H___
+#define SHADERS_H___
 
 const char c3d_vs[] =
 "#version 130\n"
