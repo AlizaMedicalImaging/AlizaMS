@@ -136,9 +136,15 @@ start_pass_huff(j_compress_ptr cinfo, boolean gather_statistics)
       /* Check for invalid table indexes */
       /* (make_c_derived_tbl does this in the other path) */
       if (dctbl < 0 || dctbl >= NUM_HUFF_TBLS)
+      {
         ERREXIT1(cinfo, JERR_NO_HUFF_TABLE, dctbl);
+        return;
+      }
       if (actbl < 0 || actbl >= NUM_HUFF_TBLS)
+      {
         ERREXIT1(cinfo, JERR_NO_HUFF_TABLE, actbl);
+        return;
+      }
       /* Allocate and zero the statistics tables */
       /* Note that jpeg_gen_optimal_table expects 257 entries in each table! */
       if (entropy->dc_count_ptrs[dctbl] == NULL)

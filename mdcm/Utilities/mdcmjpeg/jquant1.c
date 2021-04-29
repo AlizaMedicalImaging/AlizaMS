@@ -856,10 +856,16 @@ jinit_1pass_quantizer(j_decompress_ptr cinfo)
 
   /* Make sure my internal arrays won't overflow */
   if (cinfo->out_color_components > MAX_Q_COMPS)
+  {
     ERREXIT1(cinfo, JERR_QUANT_COMPONENTS, MAX_Q_COMPS);
+    return;
+  }
   /* Make sure colormap indexes can be represented by JSAMPLEs */
   if (cinfo->desired_number_of_colors > (MAXJSAMPLE + 1))
+  {
     ERREXIT1(cinfo, JERR_QUANT_MANY_COLORS, MAXJSAMPLE + 1);
+    return;
+  }
 
   /* Create the colormap and color index table. */
   create_colormap(cinfo);

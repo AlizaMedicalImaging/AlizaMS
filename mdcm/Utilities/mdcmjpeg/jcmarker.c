@@ -153,7 +153,10 @@ emit_dqt(j_compress_ptr cinfo, int index)
   int          i;
 
   if (qtbl == NULL)
+  {
     ERREXIT1(cinfo, JERR_NO_QUANT_TABLE, index);
+    return 0;
+  }
 
   prec = 0;
   for (i = 0; i < DCTSIZE2; i++)
@@ -204,7 +207,10 @@ emit_dht(j_compress_ptr cinfo, int index, boolean is_ac)
   }
 
   if (htbl == NULL)
+  {
     ERREXIT1(cinfo, JERR_NO_HUFF_TABLE, index);
+    return;
+  }
 
   if (!htbl->sent_table)
   {

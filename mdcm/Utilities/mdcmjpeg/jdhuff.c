@@ -39,10 +39,16 @@ jpeg_make_d_derived_tbl(j_decompress_ptr cinfo, boolean isDC, int tblno, d_deriv
 
   /* Find the input Huffman table */
   if (tblno < 0 || tblno >= NUM_HUFF_TBLS)
+  {
     ERREXIT1(cinfo, JERR_NO_HUFF_TABLE, tblno);
+    return;
+  }
   htbl = isDC ? cinfo->dc_huff_tbl_ptrs[tblno] : cinfo->ac_huff_tbl_ptrs[tblno];
   if (htbl == NULL)
+  {
     ERREXIT1(cinfo, JERR_NO_HUFF_TABLE, tblno);
+    return;
+  }
 
   /* Allocate a workspace if we haven't already done so. */
   if (*pdtbl == NULL)

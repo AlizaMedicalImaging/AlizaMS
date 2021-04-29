@@ -389,7 +389,10 @@ get_dac(j_decompress_ptr cinfo)
     TRACEMS2(cinfo, 1, JTRC_DAC, index, val);
 
     if (index < 0 || index >= (2 * NUM_ARITH_TBLS))
+    {
       ERREXIT1(cinfo, JERR_DAC_INDEX, index);
+      return FALSE;
+    }
 
     if (index >= NUM_ARITH_TBLS)
     { /* define AC table */
@@ -455,7 +458,10 @@ get_dht(j_decompress_ptr cinfo)
      * off the end of our table space.  jdhuff.c will check more carefully.
      */
     if (count > 256 || ((IJG_INT)count) > length)
+    {
       ERREXIT(cinfo, JERR_BAD_HUFF_TABLE);
+      return FALSE;
+    }
 
     for (i = 0; i < count; i++)
       INPUT_BYTE(cinfo, huffval[i], return FALSE);
@@ -468,6 +474,7 @@ get_dht(j_decompress_ptr cinfo)
       if (index < 0 || index >= NUM_HUFF_TBLS)
       {
         ERREXIT1(cinfo, JERR_DHT_INDEX, index);
+        return FALSE;
       }
       htblptr = &cinfo->ac_huff_tbl_ptrs[index];
     }
@@ -476,12 +483,16 @@ get_dht(j_decompress_ptr cinfo)
       if (index < 0 || index >= NUM_HUFF_TBLS)
       {
         ERREXIT1(cinfo, JERR_DHT_INDEX, index);
+        return FALSE;
       }
       htblptr = &cinfo->dc_huff_tbl_ptrs[index];
     }
 
     if (htblptr == NULL)
+    {
       ERREXIT(cinfo, JERR_BAD_HUFF_TABLE);
+      return FALSE;
+    }
 
     if (*htblptr == NULL)
       *htblptr = jpeg_alloc_huff_table((j_common_ptr)cinfo);
@@ -520,7 +531,10 @@ get_dqt(j_decompress_ptr cinfo)
     TRACEMS2(cinfo, 1, JTRC_DQT, n, prec);
 
     if (n >= NUM_QUANT_TBLS)
+    {
       ERREXIT1(cinfo, JERR_DQT_INDEX, n);
+      return FALSE;
+    }
 
     if (cinfo->quant_tbl_ptrs[n] == NULL)
       cinfo->quant_tbl_ptrs[n] = jpeg_alloc_quant_table((j_common_ptr)cinfo);

@@ -276,7 +276,10 @@ alloc_small(j_common_ptr cinfo, int pool_id, size_t sizeofobject)
 
   /* See if space is available in any existing pool */
   if (pool_id < 0 || pool_id >= JPOOL_NUMPOOLS)
+  {
     ERREXIT1(cinfo, JERR_BAD_POOL_ID, pool_id); /* safety check */
+    return (void *)NULL;
+  }
   prev_hdr_ptr = NULL;
   hdr_ptr = mem->small_list[pool_id];
   while (hdr_ptr != NULL)
@@ -363,11 +366,17 @@ alloc_large(j_common_ptr cinfo, int pool_id, size_t sizeofobject)
 
   /* Always make a new pool */
   if (pool_id < 0 || pool_id >= JPOOL_NUMPOOLS)
+  {
     ERREXIT1(cinfo, JERR_BAD_POOL_ID, pool_id); /* safety check */
+    return (void FAR *)NULL;
+  }
 
   hdr_ptr = (large_pool_ptr)jpeg_get_large(cinfo, sizeofobject + SIZEOF(large_pool_hdr));
   if (hdr_ptr == NULL)
+  {
     out_of_memory(cinfo, 4); /* jpeg_get_large failed */
+    return (void FAR *)NULL;
+  }
   mem->total_space_allocated += sizeofobject + SIZEOF(large_pool_hdr);
 
   /* Success, initialize the new pool header and add to list */
@@ -824,7 +833,10 @@ access_virt_sarray(j_common_ptr     cinfo,
 
   /* debugging check */
   if (end_row > ptr->rows_in_array || num_rows > ptr->maxaccess || ptr->mem_buffer == NULL)
+  {
     ERREXIT(cinfo, JERR_BAD_VIRTUAL_ACCESS);
+    return (JSAMPARRAY)NULL;
+  }
 
   /* Make the desired part of the virtual array accessible */
   if (start_row < ptr->cur_start_row || end_row > ptr->cur_start_row + ptr->rows_in_mem)
@@ -922,7 +934,10 @@ access_virt_barray(j_common_ptr     cinfo,
 
   /* debugging check */
   if (end_row > ptr->rows_in_array || num_rows > ptr->maxaccess || ptr->mem_buffer == NULL)
+  {
     ERREXIT(cinfo, JERR_BAD_VIRTUAL_ACCESS);
+    return (JBLOCKARRAY)NULL;
+  }
 
   /* Make the desired part of the virtual array accessible */
   if (start_row < ptr->cur_start_row || end_row > ptr->cur_start_row + ptr->rows_in_mem)
@@ -1018,7 +1033,10 @@ free_pool(j_common_ptr cinfo, int pool_id)
   size_t         space_freed;
 
   if (pool_id < 0 || pool_id >= JPOOL_NUMPOOLS)
+  {
     ERREXIT1(cinfo, JERR_BAD_POOL_ID, pool_id); /* safety check */
+    return;
+  }
 
 #ifdef MEM_STATS
   if (cinfo->err->trace_level > 1)
@@ -1148,6 +1166,7 @@ jinit_memory_mgr(j_common_ptr cinfo)
   {
     jpeg_mem_term(cinfo); /* system-dependent cleanup */
     ERREXIT1(cinfo, JERR_OUT_OF_MEMORY, 0);
+    return;
   }
 
   /* OK, fill in the method pointers */

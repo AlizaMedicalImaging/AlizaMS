@@ -36,10 +36,16 @@ jpeg_make_c_derived_tbl(j_compress_ptr cinfo, boolean isDC, int tblno, c_derived
 
   /* Find the input Huffman table */
   if (tblno < 0 || tblno >= NUM_HUFF_TBLS)
+  {
     ERREXIT1(cinfo, JERR_NO_HUFF_TABLE, tblno);
+    return;
+  }
   htbl = isDC ? cinfo->dc_huff_tbl_ptrs[tblno] : cinfo->ac_huff_tbl_ptrs[tblno];
   if (htbl == NULL)
+  {
     ERREXIT1(cinfo, JERR_NO_HUFF_TABLE, tblno);
+    return;
+  }
 
   /* Allocate a workspace if we haven't already done so. */
   if (*pdtbl == NULL)
@@ -53,7 +59,10 @@ jpeg_make_c_derived_tbl(j_compress_ptr cinfo, boolean isDC, int tblno, c_derived
   {
     i = (int)htbl->bits[l];
     if (i < 0 || p + i > 256) /* protect against table overrun */
+    {
       ERREXIT(cinfo, JERR_BAD_HUFF_TABLE);
+      return;
+    }
     while (i--)
       huffsize[p++] = (char)l;
   }
@@ -105,7 +114,10 @@ jpeg_make_c_derived_tbl(j_compress_ptr cinfo, boolean isDC, int tblno, c_derived
   {
     i = htbl->huffval[p];
     if (i < 0 || i > maxsymbol || dtbl->ehufsi[i])
+    {
       ERREXIT(cinfo, JERR_BAD_HUFF_TABLE);
+      return;
+    }
     dtbl->ehufco[i] = huffcode[p];
     dtbl->ehufsi[i] = huffsize[p];
   }

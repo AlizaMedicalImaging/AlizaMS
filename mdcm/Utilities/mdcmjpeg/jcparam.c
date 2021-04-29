@@ -40,7 +40,10 @@ jpeg_add_quant_table(j_compress_ptr       cinfo,
     ERREXIT1(cinfo, JERR_BAD_STATE, cinfo->global_state);
 
   if (which_tbl < 0 || which_tbl >= NUM_QUANT_TBLS)
+  {
     ERREXIT1(cinfo, JERR_DQT_INDEX, which_tbl);
+    return;
+  }
 
   qtblptr = &cinfo->quant_tbl_ptrs[which_tbl];
 
@@ -162,7 +165,10 @@ add_huff_table(j_compress_ptr cinfo, JHUFF_TBL ** htblptr, const IJG_UCHAR * bit
   for (len = 1; len <= 16; len++)
     nsymbols += bits[len];
   if (nsymbols < 1 || nsymbols > 256)
+  {
     ERREXIT(cinfo, JERR_BAD_HUFF_TABLE);
+    return;
+  }
 
   MEMCOPY((*htblptr)->huffval, val, nsymbols * SIZEOF(IJG_UCHAR));
 

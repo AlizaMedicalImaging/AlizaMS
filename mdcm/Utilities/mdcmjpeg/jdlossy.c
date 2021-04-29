@@ -135,7 +135,10 @@ latch_quant_tables(j_decompress_ptr cinfo)
     /* Make sure specified quantization table is present */
     qtblno = compptr->quant_tbl_no;
     if (qtblno < 0 || qtblno >= NUM_QUANT_TBLS || cinfo->quant_tbl_ptrs[qtblno] == NULL)
+    {
       ERREXIT1(cinfo, JERR_NO_QUANT_TABLE, qtblno);
+      return;
+    }
     /* OK, save away the quantization table */
     qtbl = (JQUANT_TBL *)(*cinfo->mem->alloc_small)((j_common_ptr)cinfo, JPOOL_IMAGE, SIZEOF(JQUANT_TBL));
     MEMCOPY(qtbl, cinfo->quant_tbl_ptrs[qtblno], SIZEOF(JQUANT_TBL));
