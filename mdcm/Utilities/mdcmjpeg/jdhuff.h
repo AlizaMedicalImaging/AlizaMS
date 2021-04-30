@@ -70,12 +70,13 @@ EXTERN(void) jpeg_make_d_derived_tbl JPP((j_decompress_ptr cinfo, boolean isDC, 
  */
 
 typedef IJG_INT bit_buf_type; /* type of bit-extraction buffer */
-#define BIT_BUF_SIZE (sizeof(bit_buf_type)*8) /* size of buffer in bits */
 
 /*
  * Warning: define BIT_BUF_SIZE manually if plantform doesn't measure
  * sizeof in 8-bit bytes!
  */
+
+#define BIT_BUF_SIZE ((size_t)sizeof(bit_buf_type)*8) /* size of buffer in bits */
 
 typedef struct
 {                          /* Bitreading state saved across MCUs */
