@@ -378,7 +378,7 @@ encode_mcus_huff(j_compress_ptr cinfo,
     for (sampn = 0; sampn < cinfo->data_units_in_MCU; sampn++)
     {
       register int    temp, temp2;
-      register int    nbits;
+      register int    nbits = 0;
       c_derived_tbl * dctbl = entropy->cur_tbls[sampn];
 
       /* Encode the difference per section H.1.2.2 */
@@ -390,8 +390,9 @@ encode_mcus_huff(j_compress_ptr cinfo,
       {                          /* instead of temp < 0 */
         temp = (-temp) & 0x7FFF; /* absolute value, mod 2^16 */
         if (temp == 0)           /* special case: magnitude = 32768 */
-          temp = 0x8000; /* was 'temp2 = temp = 0x8000' TODO check why */
-        temp2 = ~temp; /* one's complement of magnitude */
+          nbits = 16;            /* temp, temp2 are unused */
+        else
+          temp2 = ~temp;  /* one's complement of magnitude */
       }
       else
       {
@@ -400,12 +401,15 @@ encode_mcus_huff(j_compress_ptr cinfo,
       }
 
       /* Find the number of bits needed for the magnitude of the difference */
-      nbits = 0;
-      while (temp)
+      if (nbits != 16)
       {
-        nbits++;
-        temp >>= 1;
+        while (temp)
+        {
+          nbits++;
+          temp >>= 1;
+        }
       }
+
       /* Check for out-of-range difference values.
        */
       if (nbits > MAX_DIFF_BITS)
