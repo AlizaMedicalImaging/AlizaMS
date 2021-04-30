@@ -178,6 +178,7 @@ public:
   bool Compatible(VR const &) const;
   bool IsVRFile() const;
   bool IsDual() const;
+
 private:
   static unsigned int GetIndex(VRType);
   VRType VRField;
@@ -197,19 +198,6 @@ template<long long T> struct VRToType;
   template<> struct VRToType<VR::type>     \
   { typedef rtype Type; };
 
-
-// Do not use
-struct UI
-{
-  char Internal[64+1];
-  friend std::ostream& operator<<(std::ostream &_os, const UI &_val);
-};
-
-inline std::ostream& operator<<(std::ostream &_os, const UI &_val)
-{
-  _os << _val.Internal;
-  return _os;
-}
 
 typedef String<'\\',16>         AEComp;
 typedef String<'\\',64>         ASComp;
