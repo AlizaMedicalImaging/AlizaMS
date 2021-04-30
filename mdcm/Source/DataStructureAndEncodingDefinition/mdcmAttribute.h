@@ -278,9 +278,7 @@ public:
   // defaulted to allow everything (see mdcmTagToType.h default template for TagToType)
   static VR GetDictVR() { return (VR::VRType)(TagToType<Group, Element>::VRType); }
   static VM GetDictVM() { return (VM::VMType)(TagToType<Group, Element>::VMType); }
-  unsigned int GetNumberOfValues() const {
-    return VMToLength<VM::VM1>::Length;
-}
+  unsigned int GetNumberOfValues() const { return VMToLength<VM::VM1>::Length; }
 
   void Print(std::ostream & os) const
   {
