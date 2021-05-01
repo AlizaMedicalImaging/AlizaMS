@@ -316,8 +316,6 @@ flush_bits(working_state * state)
 LOCAL(boolean)
 emit_restart(working_state * state, int restart_num)
 {
-  /* int ci; */
-
   if (!flush_bits(state))
     return FALSE;
 
@@ -346,7 +344,6 @@ encode_mcus_huff(j_compress_ptr cinfo,
   working_state     state;
   unsigned int      mcu_num;
   int               sampn, ci, yoffset, MCU_width, ptrn;
-  /* jpeg_component_info * compptr; */
 
   /* Load up working state */
   state.next_output_byte = cinfo->dest->next_output_byte;
@@ -506,7 +503,6 @@ encode_mcus_gather(j_compress_ptr cinfo,
   lhuff_entropy_ptr entropy = (lhuff_entropy_ptr)losslsc->entropy_private;
   unsigned int      mcu_num;
   int               sampn, ci, yoffset, MCU_width, ptrn;
-  /* jpeg_component_info * compptr; */
 
   /* Take care of restart intervals if needed */
   if (cinfo->restart_interval)
@@ -536,7 +532,6 @@ encode_mcus_gather(j_compress_ptr cinfo,
     {
       register int temp;
       register int nbits;
-      /* c_derived_tbl *dctbl = entropy->cur_tbls[sampn]; */
       IJG_LONG * counts = entropy->cur_counts[sampn];
 
       /* Encode the difference per section H.1.2.2 */
