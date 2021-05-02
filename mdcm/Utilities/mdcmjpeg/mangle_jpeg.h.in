@@ -1,10 +1,6 @@
 #ifndef @MANGLE_PREFIX@_mangle_h
 #define @MANGLE_PREFIX@_mangle_h
 
-/*
- * nm libmdcmjpeg.a | grep " [R|T] " | colrm 1 11 | sort
- */
-
 #define jcopy_block_row @MANGLE_PREFIX@_jcopy_block_row
 #define jcopy_sample_rows @MANGLE_PREFIX@_jcopy_sample_rows
 #define jdiv_round_up @MANGLE_PREFIX@_jdiv_round_up
@@ -125,7 +121,6 @@
 #define jpeg_write_tables @MANGLE_PREFIX@_jpeg_write_tables
 #define jround_up @MANGLE_PREFIX@_jround_up
 #define jzero_far @MANGLE_PREFIX@_jzero_far
-
 #define jpeg_memory_src @MANGLE_PREFIX@_memory_src
 #define jpeg_memory_mgr @MANGLE_PREFIX@_memory_mgr
 #define jpeg_common_struct @MANGLE_PREFIX@_common_struct
