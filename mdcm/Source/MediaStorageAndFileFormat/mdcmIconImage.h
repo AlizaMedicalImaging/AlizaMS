@@ -26,7 +26,7 @@
 
 namespace mdcm
 {
-  typedef Bitmap IconImage;
+typedef Bitmap IconImage;
 }
 
-#endif //MDCMICONIMAGE_H
+#endif // MDCMICONIMAGE_H

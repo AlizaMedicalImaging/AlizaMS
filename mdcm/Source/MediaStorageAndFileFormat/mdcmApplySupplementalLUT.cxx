@@ -13,30 +13,33 @@
 namespace mdcm
 {
 
-bool ApplySupplementalLUT::Apply()
+bool
+ApplySupplementalLUT::Apply()
 {
   Output = Input;
-  const Bitmap & image = *Input;
+  const Bitmap &      image = *Input;
   const LookupTable & lut = image.GetLUT();
-  int bitsample = lut.GetBitSample();
-  if( !bitsample ) return false;
+  int                 bitsample = lut.GetBitSample();
+  if (!bitsample)
+    return false;
   const unsigned long long len = image.GetBufferLength();
-  std::vector<char> v;
+  std::vector<char>        v;
   v.resize(len);
   char * p = &v[0];
   image.GetBuffer(p);
   std::stringstream is;
-  if(!is.write(p, len))
+  if (!is.write(p, len))
   {
     mdcmErrorMacro("Could not write to stringstream");
     return false;
   }
-  DataElement &de = Output->GetDataElement();
+  DataElement &     de = Output->GetDataElement();
   std::vector<char> v2;
   v2.resize(len * 3);
   const int RedSubscipt = lut.DecodeSupplemental(&v2[0], v2.size(), &v[0], v.size());
-  if (RedSubscipt > INT_MIN) m_RedSubscipt = RedSubscipt;
-  assert( v2.size() < (size_t)std::numeric_limits<uint32_t>::max());
+  if (RedSubscipt > INT_MIN)
+    m_RedSubscipt = RedSubscipt;
+  assert(v2.size() < (size_t)std::numeric_limits<uint32_t>::max());
   de.SetByteValue(&v2[0], (uint32_t)v2.size());
   Output->GetLUT().Clear();
   Output->SetPhotometricInterpretation(PhotometricInterpretation::RGB);
@@ -51,7 +54,7 @@ bool ApplySupplementalLUT::Apply()
   {
     return false;
   }
-  if(ts.IsExplicit())
+  if (ts.IsExplicit())
   {
     Output->SetTransferSyntax(TransferSyntax::ExplicitVRLittleEndian);
   }
@@ -63,7 +66,8 @@ bool ApplySupplementalLUT::Apply()
   return true;
 }
 
-int ApplySupplementalLUT::GetRedSubscript() const
+int
+ApplySupplementalLUT::GetRedSubscript() const
 {
   return m_RedSubscipt;
 }

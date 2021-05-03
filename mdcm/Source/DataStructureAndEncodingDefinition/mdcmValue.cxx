@@ -25,9 +25,10 @@
 namespace mdcm
 {
 
-void Value::SetLengthOnly(VL l)
+void
+Value::SetLengthOnly(VL l)
 {
   SetLength(l);
 }
 
-}
+} // namespace mdcm

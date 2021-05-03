@@ -25,109 +25,124 @@
 namespace mdcm
 {
 
-Pixmap::Pixmap() : Overlays(),Curves(),Icon(new IconImage) {}
+Pixmap::Pixmap()
+  : Overlays()
+  , Curves()
+  , Icon(new IconImage)
+{}
 
 Pixmap::~Pixmap() {}
 
-bool Pixmap::AreOverlaysInPixelData() const
+bool
+Pixmap::AreOverlaysInPixelData() const
 {
-  int total = 0;
+  int                                  total = 0;
   std::vector<Overlay>::const_iterator it = Overlays.begin();
-  for(; it != Overlays.end(); ++it)
+  for (; it != Overlays.end(); ++it)
   {
     total += (int)it->IsInPixelData();
   }
   return total != 0;
 }
 
-bool Pixmap::UnusedBitsPresentInPixelData() const
+bool
+Pixmap::UnusedBitsPresentInPixelData() const
 {
-  const PixelFormat &pf = GetPixelFormat();
-  unsigned short ba = pf.GetBitsAllocated();
-  unsigned short bs = pf.GetBitsStored();
+  const PixelFormat & pf = GetPixelFormat();
+  unsigned short      ba = pf.GetBitsAllocated();
+  unsigned short      bs = pf.GetBitsStored();
   return ba != bs;
 }
 
-Curve & Pixmap::GetCurve(size_t i)
+Curve &
+Pixmap::GetCurve(size_t i)
 {
   assert(i < Curves.size());
   return Curves[i];
 }
 
-const Curve & Pixmap::GetCurve(size_t i) const
+const Curve &
+Pixmap::GetCurve(size_t i) const
 {
   assert(i < Curves.size());
   return Curves[i];
 }
 
-size_t Pixmap::GetNumberOfCurves() const
+size_t
+Pixmap::GetNumberOfCurves() const
 {
   return Curves.size();
 }
 
-void Pixmap::SetNumberOfCurves(size_t n)
+void
+Pixmap::SetNumberOfCurves(size_t n)
 {
   Curves.resize(n);
 }
 
-Overlay & Pixmap::GetOverlay(size_t i)
+Overlay &
+Pixmap::GetOverlay(size_t i)
 {
   assert(i < Overlays.size());
   return Overlays[i];
 }
 
-const Overlay & Pixmap::GetOverlay(size_t i) const
+const Overlay &
+Pixmap::GetOverlay(size_t i) const
 {
   assert(i < Overlays.size());
   return Overlays[i];
 }
 
-size_t Pixmap::GetNumberOfOverlays() const
+size_t
+Pixmap::GetNumberOfOverlays() const
 {
   return Overlays.size();
 }
 
-void Pixmap::SetNumberOfOverlays(size_t n)
+void
+Pixmap::SetNumberOfOverlays(size_t n)
 {
   Overlays.resize(n);
 }
 
-void Pixmap::RemoveOverlay(size_t i)
+void
+Pixmap::RemoveOverlay(size_t i)
 {
   assert(i < Overlays.size());
   Overlays.erase(Overlays.begin() + i);
 }
 
-const IconImage & Pixmap::GetIconImage() const
+const IconImage &
+Pixmap::GetIconImage() const
 {
   return *Icon;
 }
 
-IconImage & Pixmap::GetIconImage()
+IconImage &
+Pixmap::GetIconImage()
 {
   return *Icon;
 }
 
-void Pixmap::SetIconImage(IconImage const & ii)
+void
+Pixmap::SetIconImage(IconImage const & ii)
 {
   Icon = ii;
 }
 
-void Pixmap::Print(std::ostream &os) const
+void
+Pixmap::Print(std::ostream & os) const
 {
   Bitmap::Print(os);
-  for(std::vector<Overlay>::const_iterator it = Overlays.begin();
-    it != Overlays.end();
-    ++it)
+  for (std::vector<Overlay>::const_iterator it = Overlays.begin(); it != Overlays.end(); ++it)
   {
     it->Print(os);
   }
-  for(std::vector<Curve>::const_iterator it = Curves.begin();
-    it != Curves.end();
-    ++it)
+  for (std::vector<Curve>::const_iterator it = Curves.begin(); it != Curves.end(); ++it)
   {
     it->Print(os);
   }
 }
 
-}
+} // namespace mdcm

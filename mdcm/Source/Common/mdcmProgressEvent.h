@@ -37,41 +37,51 @@ class ProgressEvent : public AnyEvent
 {
 public:
   typedef ProgressEvent Self;
-  typedef AnyEvent Superclass;
-  ProgressEvent(double p = 0) : m_Progress(p) {}
-  ProgressEvent(const Self & s) : AnyEvent(s) {}
+  typedef AnyEvent      Superclass;
+  ProgressEvent(double p = 0)
+    : m_Progress(p)
+  {}
+  ProgressEvent(const Self & s)
+    : AnyEvent(s)
+  {}
   ~ProgressEvent() {}
 
-  const char * GetEventName() const override
+  const char *
+  GetEventName() const override
   {
     return "ProgressEvent";
   }
 
-  bool CheckEvent(const ::mdcm::Event * e) const override
+  bool
+  CheckEvent(const ::mdcm::Event * e) const override
   {
-    return ((dynamic_cast<const Self*>(e)) ? true : false);
+    return ((dynamic_cast<const Self *>(e)) ? true : false);
   }
 
-  ::mdcm::Event * MakeObject() const override
+  ::mdcm::Event *
+  MakeObject() const override
   {
     return new Self;
   }
 
-  void SetProgress(double p)
+  void
+  SetProgress(double p)
   {
     m_Progress = p;
   }
 
-  double GetProgress() const
+  double
+  GetProgress() const
   {
     return m_Progress;
   }
 
 private:
-  void operator=(const Self &);
+  void
+         operator=(const Self &);
   double m_Progress;
 };
 
 } // end namespace mdcm
 
-#endif //MDCMPROGRESSEVENT_H
+#endif // MDCMPROGRESSEVENT_H

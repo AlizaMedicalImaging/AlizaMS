@@ -26,59 +26,62 @@
 namespace mdcm
 {
 
-SegmentWriter::SegmentWriter()
-{
-}
+SegmentWriter::SegmentWriter() {}
 
-SegmentWriter::~SegmentWriter()
-{
-}
+SegmentWriter::~SegmentWriter() {}
 
-unsigned int SegmentWriter::GetNumberOfSegments() const
+unsigned int
+SegmentWriter::GetNumberOfSegments() const
 {
   return (unsigned int)Segments.size();
 }
 
-void SegmentWriter::SetNumberOfSegments(const unsigned int size)
+void
+SegmentWriter::SetNumberOfSegments(const unsigned int size)
 {
   Segments.resize(size);
 }
 
-const SegmentWriter::SegmentVector & SegmentWriter::GetSegments() const
+const SegmentWriter::SegmentVector &
+SegmentWriter::GetSegments() const
 {
   return Segments;
 }
 
-SegmentWriter::SegmentVector & SegmentWriter::GetSegments()
+SegmentWriter::SegmentVector &
+SegmentWriter::GetSegments()
 {
   return Segments;
 }
 
-SmartPointer<Segment> SegmentWriter::GetSegment(const unsigned int idx) const
+SmartPointer<Segment>
+SegmentWriter::GetSegment(const unsigned int idx) const
 {
   assert(idx < Segments.size());
   return Segments[idx];
 }
 
-void SegmentWriter::AddSegment(SmartPointer< Segment > segment)
+void
+SegmentWriter::AddSegment(SmartPointer<Segment> segment)
 {
   Segments.push_back(segment);
 }
 
-void SegmentWriter::SetSegments(SegmentVector & segments)
+void
+SegmentWriter::SetSegments(SegmentVector & segments)
 {
   Segments = segments;
 }
 
-static void writeCodeSequenceMacroAttributes(
-  const SegmentHelper::BasicCodedEntry & entry,
-  const Tag & tag,
-  DataSet & dataset,
-  bool severalItemsAllowed)
+static void
+writeCodeSequenceMacroAttributes(const SegmentHelper::BasicCodedEntry & entry,
+                                 const Tag &                            tag,
+                                 DataSet &                              dataset,
+                                 bool                                   severalItemsAllowed)
 {
   SmartPointer<SequenceOfItems> sequence;
   // If the sequence does not exist, we create it
-  if(!dataset.FindDataElement(tag))
+  if (!dataset.FindDataElement(tag))
   {
     sequence = new SequenceOfItems();
     DataElement dataElement(tag);
@@ -112,7 +115,7 @@ static void writeCodeSequenceMacroAttributes(
     codingSchemeDesignatorAttribute.SetValue(entry.CSD);
     itemDataSet.Replace(codingSchemeDesignatorAttribute.GetAsDataElement());
     // Coding Scheme Version (Type 1C)
-    if(!entry.CSV.empty())
+    if (!entry.CSV.empty())
     {
       Attribute<0x0008, 0x0103> codingSchemeVersionAttribute;
       codingSchemeVersionAttribute.SetValue(entry.CSV);
@@ -126,24 +129,23 @@ static void writeCodeSequenceMacroAttributes(
   sequence->AddItem(item);
 }
 
-static void writeCodeSequenceMacroAttributes(
-  const Segment::BasicCodedEntryVector & entries,
-  const Tag & tag,
-  DataSet & dataset)
+static void
+writeCodeSequenceMacroAttributes(const Segment::BasicCodedEntryVector & entries, const Tag & tag, DataSet & dataset)
 {
   Segment::BasicCodedEntryVector::const_iterator it = entries.begin();
-  for(; it != entries.end(); ++it)
+  for (; it != entries.end(); ++it)
   {
     writeCodeSequenceMacroAttributes(*it, tag, dataset, true);
   }
 }
 
-bool SegmentWriter::PrepareWrite()
+bool
+SegmentWriter::PrepareWrite()
 {
-  File & file = GetFile();
-  DataSet & ds = file.GetDataSet();
+  File &                        file = GetFile();
+  DataSet &                     ds = file.GetDataSet();
   SmartPointer<SequenceOfItems> segmentsSQ;
-  if(!ds.FindDataElement(Tag(0x0062, 0x0002)))
+  if (!ds.FindDataElement(Tag(0x0062, 0x0002)))
   {
     segmentsSQ = new SequenceOfItems;
     DataElement detmp(Tag(0x0062, 0x0002));
@@ -161,8 +163,8 @@ bool SegmentWriter::PrepareWrite()
     if (nbItems < numberOfSegments)
     {
       const size_t diff = numberOfSegments - nbItems;
-      const size_t nbOfItemToMake = (diff > 0?diff:0);
-      for(unsigned int i = 1; i <= nbOfItemToMake; ++i)
+      const size_t nbOfItemToMake = (diff > 0 ? diff : 0);
+      for (unsigned int i = 1; i <= nbOfItemToMake; ++i)
       {
         Item item;
         item.SetVLToUndefined();
@@ -170,19 +172,19 @@ bool SegmentWriter::PrepareWrite()
       }
     }
   }
-  std::vector< SmartPointer< Segment > >::const_iterator it0 = Segments.begin();
-  std::vector< SmartPointer< Segment > >::const_iterator it0End = Segments.end();
-  unsigned int itemNumber = 1;
-  unsigned long surfaceNumber = 1;
+  std::vector<SmartPointer<Segment>>::const_iterator it0 = Segments.begin();
+  std::vector<SmartPointer<Segment>>::const_iterator it0End = Segments.end();
+  unsigned int                                       itemNumber = 1;
+  unsigned long                                      surfaceNumber = 1;
   for (; it0 != it0End; ++it0)
   {
-    SmartPointer< Segment > segment = *it0;
+    SmartPointer<Segment> segment = *it0;
     assert(segment);
     Item &    segmentItem = segmentsSQ->GetItem(itemNumber);
-    DataSet & segmentDS   = segmentItem.GetNestedDataSet();
+    DataSet & segmentDS = segmentItem.GetNestedDataSet();
     // Segment Number (Type 1)
     Attribute<0x0062, 0x0004> segmentNumberAt;
-    unsigned short segmentNumber = segment->GetSegmentNumber();
+    unsigned short            segmentNumber = segment->GetSegmentNumber();
     if (segmentNumber == 0)
       segmentNumber = (unsigned short)itemNumber;
     segmentNumberAt.SetValue(segmentNumber);
@@ -223,41 +225,41 @@ bool SegmentWriter::PrepareWrite()
     {
       // Anatomic Region Sequence (Type 3) - Only a single Item allowed
       const SegmentHelper::BasicCodedEntry & anatomicRegion = segment->GetAnatomicRegion();
-      if(!anatomicRegion.IsEmpty())
+      if (!anatomicRegion.IsEmpty())
       {
         writeCodeSequenceMacroAttributes(anatomicRegion, Tag(0x0008, 0x2218), segmentDS, false);
         // Anatomic Region Modifier Sequence (Type 3)
         const Segment::BasicCodedEntryVector & anatomicRegionModifiers = segment->GetAnatomicRegionModifiers();
-        if(!anatomicRegionModifiers.empty())
+        if (!anatomicRegionModifiers.empty())
         {
           SmartPointer<SequenceOfItems> sequence = segmentDS.GetDataElement(Tag(0x0008, 0x2218)).GetValueAsSQ();
-          Item& item = sequence->GetItem(1);
-          DataSet& itemDataSet = item.GetNestedDataSet();
+          Item &                        item = sequence->GetItem(1);
+          DataSet &                     itemDataSet = item.GetNestedDataSet();
           writeCodeSequenceMacroAttributes(anatomicRegionModifiers, Tag(0x0008, 0x2220), itemDataSet);
         }
       }
     }
     // Segmented Property Category Code Sequence (Type 1) - Only a single Item allowed
     const SegmentHelper::BasicCodedEntry & propertyCategory = segment->GetPropertyCategory();
-    if(propertyCategory.IsEmpty())
+    if (propertyCategory.IsEmpty())
     {
       mdcmWarningMacro("The property category is not specified or incomplete");
     }
     writeCodeSequenceMacroAttributes(propertyCategory, Tag(0x0062, 0x0003), segmentDS, false);
     // Segmented Property Type Code Sequence (Type 1) - Only a single Item allowed
     const SegmentHelper::BasicCodedEntry & propertyType = segment->GetPropertyType();
-    if(propertyType.IsEmpty())
+    if (propertyType.IsEmpty())
     {
       mdcmWarningMacro("The property type is not specified or incomplete");
     }
     writeCodeSequenceMacroAttributes(propertyType, Tag(0x0062, 0x000F), segmentDS, false);
     // Segmented Property Type Modifier Code Sequence (Type 3)
     const Segment::BasicCodedEntryVector & propertyTypeModifiers = segment->GetPropertyTypeModifiers();
-    if(!propertyTypeModifiers.empty())
+    if (!propertyTypeModifiers.empty())
     {
       SmartPointer<SequenceOfItems> sequence = segmentDS.GetDataElement(Tag(0x0062, 0x000F)).GetValueAsSQ();
-      Item& item = sequence->GetItem(1);
-      DataSet& itemDataSet = item.GetNestedDataSet();
+      Item &                        item = sequence->GetItem(1);
+      DataSet &                     itemDataSet = item.GetNestedDataSet();
       writeCodeSequenceMacroAttributes(propertyTypeModifiers, Tag(0x0062, 0x0011), itemDataSet);
     }
     // Surface segmentation
@@ -270,7 +272,7 @@ bool SegmentWriter::PrepareWrite()
       segmentDS.Replace(surfaceCountAt.GetAsDataElement());
       // Referenced Surface Sequence
       SmartPointer<SequenceOfItems> segmentsRefSQ;
-      if(!segmentDS.FindDataElement(Tag(0x0066, 0x002B)))
+      if (!segmentDS.FindDataElement(Tag(0x0066, 0x002B)))
       {
         segmentsRefSQ = new SequenceOfItems;
         DataElement detmp(Tag(0x0066, 0x002B));
@@ -285,27 +287,27 @@ bool SegmentWriter::PrepareWrite()
       const size_t nbItems = segmentsRefSQ->GetNumberOfItems();
       if (nbItems < surfaceCount)
       {
-        const size_t diff           = surfaceCount - nbItems;
-        const size_t nbOfItemToMake = (diff > 0?diff:0);
-        for(unsigned int i = 1; i <= nbOfItemToMake; ++i)
+        const size_t diff = surfaceCount - nbItems;
+        const size_t nbOfItemToMake = (diff > 0 ? diff : 0);
+        for (unsigned int i = 1; i <= nbOfItemToMake; ++i)
         {
           Item item;
           item.SetVLToUndefined();
           segmentsRefSQ->AddItem(item);
         }
       }
-      std::vector< SmartPointer< Surface > > surfaces = segment->GetSurfaces();
-      std::vector< SmartPointer< Surface > >::const_iterator it = surfaces.begin();
-      std::vector< SmartPointer< Surface > >::const_iterator itEnd = surfaces.end();
-      unsigned int itemSurfaceNumber = 1;
+      std::vector<SmartPointer<Surface>>                 surfaces = segment->GetSurfaces();
+      std::vector<SmartPointer<Surface>>::const_iterator it = surfaces.begin();
+      std::vector<SmartPointer<Surface>>::const_iterator itEnd = surfaces.end();
+      unsigned int                                       itemSurfaceNumber = 1;
       for (; it != itEnd; ++it)
       {
-        SmartPointer< Surface > surface = *it;
-        Item &    segmentsRefItem = segmentsRefSQ->GetItem(itemSurfaceNumber++);
-        DataSet & segmentsRefDS = segmentsRefItem.GetNestedDataSet();
+        SmartPointer<Surface> surface = *it;
+        Item &                segmentsRefItem = segmentsRefSQ->GetItem(itemSurfaceNumber++);
+        DataSet &             segmentsRefDS = segmentsRefItem.GetNestedDataSet();
         // Referenced Surface Number
         Attribute<0x0066, 0x002C> refSurfaceNumberAt;
-        unsigned long refSurfaceNumber = surface->GetSurfaceNumber();
+        unsigned long             refSurfaceNumber = surface->GetSurfaceNumber();
         if (refSurfaceNumber == 0)
         {
           refSurfaceNumber = surfaceNumber++;
@@ -315,20 +317,20 @@ bool SegmentWriter::PrepareWrite()
         segmentsRefDS.Replace(refSurfaceNumberAt.GetAsDataElement());
         // Segment Surface Source Instance Sequence
         {
-//          SmartPointer<SequenceOfItems> surfaceSourceSQ;
-//          if(!segmentsRefDS.FindDataElement(Tag(0x0066, 0x002E)))
-//          {
-//            surfaceSourceSQ = new SequenceOfItems;
-//            DataElement detmp(Tag(0x0066, 0x002E));
-//            detmp.SetVR(VR::SQ);
-//            detmp.SetValue(*surfaceSourceSQ);
-//            detmp.SetVLToUndefined();
-//            segmentsRefDS.Insert(detmp);
-//          }
-//          surfaceSourceSQ = segmentsRefDS.GetDataElement(Tag(0x0066, 0x002E)).GetValueAsSQ();
-//          surfaceSourceSQ->SetLengthToUndefined();
+          //          SmartPointer<SequenceOfItems> surfaceSourceSQ;
+          //          if(!segmentsRefDS.FindDataElement(Tag(0x0066, 0x002E)))
+          //          {
+          //            surfaceSourceSQ = new SequenceOfItems;
+          //            DataElement detmp(Tag(0x0066, 0x002E));
+          //            detmp.SetVR(VR::SQ);
+          //            detmp.SetValue(*surfaceSourceSQ);
+          //            detmp.SetVLToUndefined();
+          //            segmentsRefDS.Insert(detmp);
+          //          }
+          //          surfaceSourceSQ = segmentsRefDS.GetDataElement(Tag(0x0066, 0x002E)).GetValueAsSQ();
+          //          surfaceSourceSQ->SetLengthToUndefined();
 
-          //NOTE: If surfaces are derived from image, include 'Image SOP Instance Reference Macro' PS 3.3 Table C.10-3.
+          // NOTE: If surfaces are derived from image, include 'Image SOP Instance Reference Macro' PS 3.3 Table C.10-3.
           //      How to know it?
         }
       }
@@ -350,14 +352,15 @@ bool SegmentWriter::PrepareWrite()
   return true;
 }
 
-bool SegmentWriter::Write()
+bool
+SegmentWriter::Write()
 {
-  if(!PrepareWrite())
+  if (!PrepareWrite())
   {
     return false;
   }
   assert(Stream);
-  if(!Writer::Write())
+  if (!Writer::Write())
   {
     return false;
   }

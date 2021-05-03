@@ -38,21 +38,32 @@ public:
   DirectionCosines();
   DirectionCosines(const double[6]);
   ~DirectionCosines();
-  bool IsValid() const;
-  void Cross(double[3]) const;
-  double Dot() const;
-  static double Dot(const double[3], const double[3]);
-  static void Normalize(double[3]);
-  void Normalize();
-  bool SetFromString(const char *);
-  double CrossDot(DirectionCosines const &) const;
-  double ComputeDistAlongNormal(const double[3]) const;
-  void Print(std::ostream &) const;
-  operator const double* () const { return Values; }
+  bool
+  IsValid() const;
+  void
+  Cross(double[3]) const;
+  double
+  Dot() const;
+  static double
+  Dot(const double[3], const double[3]);
+  static void
+  Normalize(double[3]);
+  void
+  Normalize();
+  bool
+  SetFromString(const char *);
+  double
+  CrossDot(DirectionCosines const &) const;
+  double
+  ComputeDistAlongNormal(const double[3]) const;
+  void
+  Print(std::ostream &) const;
+  operator const double *() const { return Values; }
+
 private:
   double Values[6];
 };
 
 } // end namespace mdcm
 
-#endif //MDCMDIRECTIONCOSINES_H
+#endif // MDCMDIRECTIONCOSINES_H

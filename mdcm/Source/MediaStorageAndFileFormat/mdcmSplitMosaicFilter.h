@@ -47,22 +47,47 @@ class MDCM_EXPORT SplitMosaicFilter
 public:
   SplitMosaicFilter();
   ~SplitMosaicFilter();
-  bool Split();
-  bool ComputeMOSAICDimensions(unsigned int[3]);
-  bool ComputeMOSAICSliceNormal(double[3], bool &);
-  bool ComputeMOSAICSlicePosition(double[3], bool);
-  void SetImage(const Image &);
-  const Image & GetImage() const { return *I; }
-  Image & GetImage() { return *I; }
-  void SetFile(const File & f) { F = f; }
-  File & GetFile() { return *F; }
-  const File & GetFile() const { return *F; }
+  bool
+  Split();
+  bool
+  ComputeMOSAICDimensions(unsigned int[3]);
+  bool
+  ComputeMOSAICSliceNormal(double[3], bool &);
+  bool
+  ComputeMOSAICSlicePosition(double[3], bool);
+  void
+  SetImage(const Image &);
+  const Image &
+  GetImage() const
+  {
+    return *I;
+  }
+  Image &
+  GetImage()
+  {
+    return *I;
+  }
+  void
+  SetFile(const File & f)
+  {
+    F = f;
+  }
+  File &
+  GetFile()
+  {
+    return *F;
+  }
+  const File &
+  GetFile() const
+  {
+    return *F;
+  }
 
 private:
-  SmartPointer<File> F;
+  SmartPointer<File>  F;
   SmartPointer<Image> I;
 };
 
 } // end namespace mdcm
 
-#endif //MDCMSPLITMOSAICFILTER_H
+#endif // MDCMSPLITMOSAICFILTER_H

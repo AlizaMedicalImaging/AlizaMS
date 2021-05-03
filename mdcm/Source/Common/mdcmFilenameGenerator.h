@@ -44,28 +44,57 @@ namespace mdcm
 class MDCM_EXPORT FilenameGenerator
 {
 public:
-  FilenameGenerator():Pattern(),Prefix(),Filenames() {}
+  FilenameGenerator()
+    : Pattern()
+    , Prefix()
+    , Filenames()
+  {}
   ~FilenameGenerator() {}
-  typedef std::string FilenameType;
+  typedef std::string               FilenameType;
   typedef std::vector<FilenameType> FilenamesType;
   typedef FilenamesType::size_type  SizeType;
 
-  void SetPattern(const char *pattern) { Pattern = pattern; }
-  const char *GetPattern() const { return Pattern.c_str(); }
-  void SetPrefix(const char *prefix) { Prefix = prefix; }
-  const char *GetPrefix() const { return Prefix.c_str(); }
-  bool Generate();
-  void SetNumberOfFilenames(SizeType nfiles);
-  SizeType GetNumberOfFilenames() const;
-  const char * GetFilename(SizeType n) const;
-  FilenamesType const & GetFilenames() const { assert( !Pattern.empty() ); return Filenames; }
+  void
+  SetPattern(const char * pattern)
+  {
+    Pattern = pattern;
+  }
+  const char *
+  GetPattern() const
+  {
+    return Pattern.c_str();
+  }
+  void
+  SetPrefix(const char * prefix)
+  {
+    Prefix = prefix;
+  }
+  const char *
+  GetPrefix() const
+  {
+    return Prefix.c_str();
+  }
+  bool
+  Generate();
+  void
+  SetNumberOfFilenames(SizeType nfiles);
+  SizeType
+  GetNumberOfFilenames() const;
+  const char *
+  GetFilename(SizeType n) const;
+  FilenamesType const &
+  GetFilenames() const
+  {
+    assert(!Pattern.empty());
+    return Filenames;
+  }
 
 private:
-  FilenameType Pattern;
-  FilenameType Prefix;
+  FilenameType  Pattern;
+  FilenameType  Prefix;
   FilenamesType Filenames;
 };
 
 } // end namespace mdcm
 
-#endif //MDCMFILENAMEGENERATOR_H
+#endif // MDCMFILENAMEGENERATOR_H

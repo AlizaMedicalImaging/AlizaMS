@@ -36,30 +36,44 @@ class DataElement;
 class MDCM_EXPORT ImageChangePlanarConfiguration : public ImageToImageFilter
 {
 public:
-  ImageChangePlanarConfiguration():PlanarConfiguration(0) {}
+  ImageChangePlanarConfiguration()
+    : PlanarConfiguration(0)
+  {}
   ~ImageChangePlanarConfiguration() {}
-  void SetPlanarConfiguration(unsigned int pc) { PlanarConfiguration = pc; }
-  unsigned int GetPlanarConfiguration() const { return PlanarConfiguration; }
+  void
+  SetPlanarConfiguration(unsigned int pc)
+  {
+    PlanarConfiguration = pc;
+  }
+  unsigned int
+  GetPlanarConfiguration() const
+  {
+    return PlanarConfiguration;
+  }
   // s is the size of one plane (r,g or b). Thus the output buffer needs to be at least 3*s bytes long
   // s can be seen as the number of RGB pixels in the output
   template <typename T>
-  static size_t RGBPlanesToRGBPixels(T *out, const T * r, const T * g, const T * b, size_t s);
+  static size_t
+  RGBPlanesToRGBPixels(T * out, const T * r, const T * g, const T * b, size_t s);
   // Convert a regular RGB pixel image (R,G,B,R,G,B...) into a planar R,G,B image (R,R..,G,G...B,B)
   // warning this works on a frame basis, you need to loop over all frames in multiple frames
   // image to apply this function
   template <typename T>
-  static size_t RGBPixelsToRGBPlanes(T * r, T * g, T * b, const T * rgb, size_t s);
-  bool Change();
+  static size_t
+  RGBPixelsToRGBPlanes(T * r, T * g, T * b, const T * rgb, size_t s);
+  bool
+  Change();
 
 private:
   unsigned int PlanarConfiguration;
 };
 
 template <typename T>
-size_t ImageChangePlanarConfiguration::RGBPlanesToRGBPixels(T * out, const T * r, const T * g, const T * b, size_t s)
+size_t
+ImageChangePlanarConfiguration::RGBPlanesToRGBPixels(T * out, const T * r, const T * g, const T * b, size_t s)
 {
   T * pout = out;
-  for(size_t i = 0; i < s; ++i)
+  for (size_t i = 0; i < s; ++i)
   {
     *pout++ = *r++;
     *pout++ = *g++;
@@ -70,10 +84,11 @@ size_t ImageChangePlanarConfiguration::RGBPlanesToRGBPixels(T * out, const T * r
 }
 
 template <typename T>
-size_t ImageChangePlanarConfiguration::RGBPixelsToRGBPlanes(T * r, T * g, T * b, const T * rgb, size_t s)
+size_t
+ImageChangePlanarConfiguration::RGBPixelsToRGBPlanes(T * r, T * g, T * b, const T * rgb, size_t s)
 {
-  const T *prgb = rgb;
-  for(size_t i = 0; i < s; ++i)
+  const T * prgb = rgb;
+  for (size_t i = 0; i < s; ++i)
   {
     *r++ = *prgb++;
     *g++ = *prgb++;
@@ -85,4 +100,4 @@ size_t ImageChangePlanarConfiguration::RGBPixelsToRGBPlanes(T * r, T * g, T * b,
 
 } // end namespace mdcm
 
-#endif //MDCMIMAGECHANGEPLANARCONFIGURATION_H
+#endif // MDCMIMAGECHANGEPLANARCONFIGURATION_H

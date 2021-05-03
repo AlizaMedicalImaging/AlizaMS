@@ -37,21 +37,37 @@ namespace mdcm
  */
 class MDCM_EXPORT CSAHeaderDict
 {
-friend std::ostream& operator<<(std::ostream &, const CSAHeaderDict &);
-friend class Dicts;
+  friend std::ostream &
+  operator<<(std::ostream &, const CSAHeaderDict &);
+  friend class Dicts;
+
 public:
-  typedef std::set<CSAHeaderDictEntry> MapCSAHeaderDictEntry;
-  typedef MapCSAHeaderDictEntry::iterator Iterator;
+  typedef std::set<CSAHeaderDictEntry>          MapCSAHeaderDictEntry;
+  typedef MapCSAHeaderDictEntry::iterator       Iterator;
   typedef MapCSAHeaderDictEntry::const_iterator ConstIterator;
-  CSAHeaderDict():CSAHeaderDictInternal()
+  CSAHeaderDict()
+    : CSAHeaderDictInternal()
   {
     assert(CSAHeaderDictInternal.empty());
   }
-  ConstIterator Begin() const { return CSAHeaderDictInternal.begin(); }
-  ConstIterator End() const { return CSAHeaderDictInternal.end(); }
-  bool IsEmpty() const { return CSAHeaderDictInternal.empty(); }
+  ConstIterator
+  Begin() const
+  {
+    return CSAHeaderDictInternal.begin();
+  }
+  ConstIterator
+  End() const
+  {
+    return CSAHeaderDictInternal.end();
+  }
+  bool
+  IsEmpty() const
+  {
+    return CSAHeaderDictInternal.empty();
+  }
 
-  void AddCSAHeaderDictEntry(const CSAHeaderDictEntry & de)
+  void
+  AddCSAHeaderDictEntry(const CSAHeaderDictEntry & de)
   {
 #ifndef NDEBUG
     MapCSAHeaderDictEntry::size_type s = CSAHeaderDictInternal.size();
@@ -60,10 +76,11 @@ public:
     assert(s < CSAHeaderDictInternal.size());
   }
 
-  const CSAHeaderDictEntry &GetCSAHeaderDictEntry(const char * name) const
+  const CSAHeaderDictEntry &
+  GetCSAHeaderDictEntry(const char * name) const
   {
     MapCSAHeaderDictEntry::const_iterator it = CSAHeaderDictInternal.find(name);
-    if(it != CSAHeaderDictInternal.end())
+    if (it != CSAHeaderDictInternal.end())
     {
       return *it;
     }
@@ -71,18 +88,21 @@ public:
   }
 
 protected:
-  void LoadDefault();
+  void
+  LoadDefault();
+
 private:
-  CSAHeaderDict &operator=(const CSAHeaderDict &); // purposely not implemented
+  CSAHeaderDict &
+  operator=(const CSAHeaderDict &);     // purposely not implemented
   CSAHeaderDict(const CSAHeaderDict &); // purposely not implemented
   MapCSAHeaderDictEntry CSAHeaderDictInternal;
 };
 
-inline std::ostream& operator<<(std::ostream & os, const CSAHeaderDict & val)
+inline std::ostream &
+operator<<(std::ostream & os, const CSAHeaderDict & val)
 {
-  CSAHeaderDict::MapCSAHeaderDictEntry::const_iterator it =
-    val.CSAHeaderDictInternal.begin();
-  for(;it != val.CSAHeaderDictInternal.end(); ++it)
+  CSAHeaderDict::MapCSAHeaderDictEntry::const_iterator it = val.CSAHeaderDictInternal.begin();
+  for (; it != val.CSAHeaderDictInternal.end(); ++it)
   {
     const CSAHeaderDictEntry & de = *it;
     os << de << '\n';
@@ -92,4 +112,4 @@ inline std::ostream& operator<<(std::ostream & os, const CSAHeaderDict & val)
 
 } // end namespace mdcm
 
-#endif //MDCMCSAHEADERDICT_H
+#endif // MDCMCSAHEADERDICT_H

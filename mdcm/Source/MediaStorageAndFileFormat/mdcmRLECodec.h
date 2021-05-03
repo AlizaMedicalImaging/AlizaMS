@@ -46,36 +46,58 @@ class MDCM_EXPORT RLECodec : public ImageCodec
 public:
   RLECodec();
   ~RLECodec() override;
-  bool CanCode(TransferSyntax const &) const override;
-  bool CanDecode(TransferSyntax const &) const override;
-  bool Decode(DataElement const &, DataElement &) override;
-  bool Code(DataElement const &, DataElement & out) override;
-  unsigned long long GetBufferLength() const;
-  void SetBufferLength(unsigned long long);
-  bool GetHeaderInfo(std::istream &, TransferSyntax &) override;
-  void SetLength(unsigned long long);
+  bool
+  CanCode(TransferSyntax const &) const override;
+  bool
+  CanDecode(TransferSyntax const &) const override;
+  bool
+  Decode(DataElement const &, DataElement &) override;
+  bool
+  Code(DataElement const &, DataElement & out) override;
+  unsigned long long
+  GetBufferLength() const;
+  void
+  SetBufferLength(unsigned long long);
+  bool
+  GetHeaderInfo(std::istream &, TransferSyntax &) override;
+  void
+  SetLength(unsigned long long);
+
 protected:
-  bool DecodeExtent(
-    char *,
-    unsigned int, unsigned int,
-    unsigned int, unsigned int,
-    unsigned int, unsigned int,
-    std::istream &);
-  bool DecodeByStreams(std::istream &, std::ostream &) override;
-  bool StartEncode(std::ostream &) override;
-  bool IsRowEncoder() override;
-  bool IsFrameEncoder() override;
-  bool AppendRowEncode(std::ostream &, const char *, size_t) override;
-  bool AppendFrameEncode(std::ostream &, const char *, size_t) override;
-  bool StopEncode(std::ostream &) override;
+  bool
+  DecodeExtent(char *,
+               unsigned int,
+               unsigned int,
+               unsigned int,
+               unsigned int,
+               unsigned int,
+               unsigned int,
+               std::istream &);
+  bool
+  DecodeByStreams(std::istream &, std::ostream &) override;
+  bool
+  StartEncode(std::ostream &) override;
+  bool
+  IsRowEncoder() override;
+  bool
+  IsFrameEncoder() override;
+  bool
+  AppendRowEncode(std::ostream &, const char *, size_t) override;
+  bool
+  AppendFrameEncode(std::ostream &, const char *, size_t) override;
+  bool
+  StopEncode(std::ostream &) override;
+
 private:
-  bool DecodeByStreamsCommon(std::istream &, std::ostream &);
-  size_t DecodeFragment(Fragment const &, char *, size_t);
-  RLEInternals * Internals;
+  bool
+  DecodeByStreamsCommon(std::istream &, std::ostream &);
+  size_t
+                     DecodeFragment(Fragment const &, char *, size_t);
+  RLEInternals *     Internals;
   unsigned long long Length;
   unsigned long long BufferLength;
 };
 
 } // end namespace mdcm
 
-#endif //MDCMRLECODEC_H
+#endif // MDCMRLECODEC_H

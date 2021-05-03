@@ -38,9 +38,10 @@ class MDCM_EXPORT ImageApplyLookupTable : public ImageToImageFilter
 public:
   ImageApplyLookupTable() {}
   ~ImageApplyLookupTable() {}
-  bool Apply();
+  bool
+  Apply();
 };
 
 } // end namespace mdcm
 
-#endif //MDCMIMAGEAPPLYLOOKUPTABLE_H
+#endif // MDCMIMAGEAPPLYLOOKUPTABLE_H

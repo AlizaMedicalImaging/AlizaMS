@@ -29,13 +29,15 @@ namespace mdcm
 
 class MDCM_EXPORT MD5
 {
-public :
+public:
   // Compute md5 from memory pointed by pointer
-  static bool Compute(const char *, size_t, char[33]);
+  static bool
+  Compute(const char *, size_t, char[33]);
   // Compute md5 from a file
-  static bool ComputeFile(const char *, char[33]);
+  static bool
+  ComputeFile(const char *, char[33]);
 };
 
 } // end namespace mdcm
 
-#endif //MDCMMD5_H
+#endif // MDCMMD5_H

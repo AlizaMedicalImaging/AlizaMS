@@ -34,14 +34,22 @@ class MDCM_EXPORT RAWCodec : public ImageCodec
 public:
   RAWCodec();
   ~RAWCodec() override;
-  bool CanCode(TransferSyntax const &) const override;
-  bool CanDecode(TransferSyntax const &) const override;
-  bool Code(DataElement const &, DataElement &) override;
-  bool Decode(DataElement const &, DataElement &) override;
-  bool GetHeaderInfo(std::istream &, TransferSyntax &) override;
-  bool DecodeBytes(const char *, size_t, char *, size_t);
+  bool
+  CanCode(TransferSyntax const &) const override;
+  bool
+  CanDecode(TransferSyntax const &) const override;
+  bool
+  Code(DataElement const &, DataElement &) override;
+  bool
+  Decode(DataElement const &, DataElement &) override;
+  bool
+  GetHeaderInfo(std::istream &, TransferSyntax &) override;
+  bool
+  DecodeBytes(const char *, size_t, char *, size_t);
+
 protected:
-  bool DecodeByStreams(std::istream &, std::ostream &) override;
+  bool
+  DecodeByStreams(std::istream &, std::ostream &) override;
 };
 
 } // end namespace mdcm

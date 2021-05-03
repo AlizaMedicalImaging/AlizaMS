@@ -33,32 +33,43 @@ class MDCM_EXPORT FileExplicitFilter
 {
 public:
   FileExplicitFilter()
-    :
-    F(new File),
-    ChangePrivateTags(false),
-    UseVRUN(true),
-    RecomputeItemLength(false),
-    RecomputeSequenceLength(false) {}
+    : F(new File)
+    , ChangePrivateTags(false)
+    , UseVRUN(true)
+    , RecomputeItemLength(false)
+    , RecomputeSequenceLength(false)
+  {}
   ~FileExplicitFilter() {}
-  void SetChangePrivateTags(bool);
-  void SetUseVRUN(bool);
-  void SetRecomputeItemLength(bool);
-  void SetRecomputeSequenceLength(bool);
-  void SetFile(const File &);
-  File & GetFile();
-  bool Change();
+  void
+  SetChangePrivateTags(bool);
+  void
+  SetUseVRUN(bool);
+  void
+  SetRecomputeItemLength(bool);
+  void
+  SetRecomputeSequenceLength(bool);
+  void
+  SetFile(const File &);
+  File &
+  GetFile();
+  bool
+  Change();
+
 protected:
-  bool ChangeFMI();
-  bool ProcessDataSet(DataSet &, Dicts const &);
+  bool
+  ChangeFMI();
+  bool
+  ProcessDataSet(DataSet &, Dicts const &);
+
 private:
   SmartPointer<File> F;
-  bool ChangePrivateTags;
-  bool UseVRUN;
-  bool RecomputeItemLength;
-  bool RecomputeSequenceLength;
+  bool               ChangePrivateTags;
+  bool               UseVRUN;
+  bool               RecomputeItemLength;
+  bool               RecomputeSequenceLength;
 };
 
 
 } // end namespace mdcm
 
-#endif //MDCMFILEEXPLICITFILTER_H
+#endif // MDCMFILEEXPLICITFILTER_H

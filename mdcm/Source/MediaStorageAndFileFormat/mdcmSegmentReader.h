@@ -30,27 +30,33 @@ namespace mdcm
 {
 
 /**
-  * This class defines a segment reader.
-  * It reads attributes of group 0x0062
-  *
-  * PS 3.3 C.8.20.2 and C.8.23
-  */
+ * This class defines a segment reader.
+ * It reads attributes of group 0x0062
+ *
+ * PS 3.3 C.8.20.2 and C.8.23
+ */
 class MDCM_EXPORT SegmentReader : public Reader
 {
 public:
-  typedef std::vector< SmartPointer<Segment> > SegmentVector;
+  typedef std::vector<SmartPointer<Segment>> SegmentVector;
   SegmentReader();
   virtual ~SegmentReader();
-  virtual bool Read();
-  const SegmentVector GetSegments() const;
-  SegmentVector GetSegments();
+  virtual bool
+  Read();
+  const SegmentVector
+  GetSegments() const;
+  SegmentVector
+  GetSegments();
+
 protected:
-  typedef std::map< unsigned long, SmartPointer<Segment> > SegmentMap;
-  bool ReadSegments();
-  bool ReadSegment(const Item &, const unsigned int);
+  typedef std::map<unsigned long, SmartPointer<Segment>> SegmentMap;
+  bool
+  ReadSegments();
+  bool
+             ReadSegment(const Item &, const unsigned int);
   SegmentMap Segments;
 };
 
-}
+} // namespace mdcm
 
 #endif // MDCMSEGMENTREADER_H

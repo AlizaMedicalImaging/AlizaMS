@@ -35,45 +35,71 @@ class JPEG2000Internals;
  */
 class MDCM_EXPORT JPEG2000Codec : public ImageCodec
 {
-friend class Bitmap;
+  friend class Bitmap;
+
 public:
   JPEG2000Codec();
   ~JPEG2000Codec() override;
-  bool CanDecode(TransferSyntax const &) const override;
-  bool CanCode(TransferSyntax const &) const override;
-  bool Decode(DataElement const &, DataElement &) override;
-  bool Code(DataElement const &, DataElement &) override;
-  bool GetHeaderInfo(std::istream &, TransferSyntax &) override;
-  void SetRate(unsigned int, double);
-  double GetRate(unsigned int = 0) const;
-  void SetQuality(unsigned int, double);
-  double GetQuality(unsigned int = 0) const;
-  void SetTileSize(unsigned int, unsigned int);
-  void SetNumberOfResolutions(unsigned int);
-  void SetReversible(bool);
+  bool
+  CanDecode(TransferSyntax const &) const override;
+  bool
+  CanCode(TransferSyntax const &) const override;
+  bool
+  Decode(DataElement const &, DataElement &) override;
+  bool
+  Code(DataElement const &, DataElement &) override;
+  bool
+  GetHeaderInfo(std::istream &, TransferSyntax &) override;
+  void
+  SetRate(unsigned int, double);
+  double
+  GetRate(unsigned int = 0) const;
+  void
+  SetQuality(unsigned int, double);
+  double
+  GetQuality(unsigned int = 0) const;
+  void
+  SetTileSize(unsigned int, unsigned int);
+  void
+  SetNumberOfResolutions(unsigned int);
+  void
+  SetReversible(bool);
 
 protected:
-  bool DecodeExtent(
-    char *,
-    unsigned int, unsigned int,
-    unsigned int, unsigned int,
-    unsigned int, unsigned int,
-    std::istream &);
-  bool DecodeByStreams(std::istream &, std::ostream &) override;
-  bool StartEncode(std::ostream &) override;
-  bool IsRowEncoder() override;
-  bool IsFrameEncoder() override;
-  bool AppendRowEncode(std::ostream &, const char *, size_t) override;
-  bool AppendFrameEncode(std::ostream &, const char *, size_t) override;
-  bool StopEncode(std::ostream &) override;
+  bool
+  DecodeExtent(char *,
+               unsigned int,
+               unsigned int,
+               unsigned int,
+               unsigned int,
+               unsigned int,
+               unsigned int,
+               std::istream &);
+  bool
+  DecodeByStreams(std::istream &, std::ostream &) override;
+  bool
+  StartEncode(std::ostream &) override;
+  bool
+  IsRowEncoder() override;
+  bool
+  IsFrameEncoder() override;
+  bool
+  AppendRowEncode(std::ostream &, const char *, size_t) override;
+  bool
+  AppendFrameEncode(std::ostream &, const char *, size_t) override;
+  bool
+  StopEncode(std::ostream &) override;
 
 private:
-  std::pair<char *, size_t> DecodeByStreamsCommon(char *, size_t);
-  bool CodeFrameIntoBuffer(char *, size_t, size_t &, const char *, size_t);
-  bool GetHeaderInfo(const char *, size_t, TransferSyntax &);
+  std::pair<char *, size_t>
+  DecodeByStreamsCommon(char *, size_t);
+  bool
+  CodeFrameIntoBuffer(char *, size_t, size_t &, const char *, size_t);
+  bool
+                      GetHeaderInfo(const char *, size_t, TransferSyntax &);
   JPEG2000Internals * Internals;
 };
 
 } // end namespace mdcm
 
-#endif //MDCMJPEG2000CODEC_H
+#endif // MDCMJPEG2000CODEC_H

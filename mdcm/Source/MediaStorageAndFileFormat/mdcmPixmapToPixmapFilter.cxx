@@ -26,23 +26,24 @@
 namespace mdcm
 {
 
-PixmapToPixmapFilter::PixmapToPixmapFilter()
+PixmapToPixmapFilter::PixmapToPixmapFilter() {}
+
+Pixmap &
+PixmapToPixmapFilter::GetInput()
 {
+  return dynamic_cast<Pixmap &>(*Input);
 }
 
-Pixmap & PixmapToPixmapFilter::GetInput()
+const Pixmap &
+PixmapToPixmapFilter::GetOutput() const
 {
-  return dynamic_cast<Pixmap&>(*Input);
+  return dynamic_cast<const Pixmap &>(*Output);
 }
 
-const Pixmap & PixmapToPixmapFilter::GetOutput() const
+const Pixmap &
+PixmapToPixmapFilter::GetOutputAsPixmap() const
 {
-  return dynamic_cast<const Pixmap&>(*Output);
-}
-
-const Pixmap & PixmapToPixmapFilter::GetOutputAsPixmap() const
-{
-  return dynamic_cast<const Pixmap&>(*Output);
+  return dynamic_cast<const Pixmap &>(*Output);
 }
 
 } // end namespace mdcm

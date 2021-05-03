@@ -29,27 +29,33 @@ namespace mdcm
 {
 
 /**
-  * This class defines a SURFACE IE writer.
-  * It writes surface mesh module attributes.
-  *
-  * PS 3.3 A.1.2.18 , A.57 and C.27
-  */
+ * This class defines a SURFACE IE writer.
+ * It writes surface mesh module attributes.
+ *
+ * PS 3.3 A.1.2.18 , A.57 and C.27
+ */
 class MDCM_EXPORT SurfaceWriter : public SegmentWriter
 {
 public:
-    SurfaceWriter();
-    virtual ~SurfaceWriter() override;
-    bool Write() override;
-    unsigned long GetNumberOfSurfaces();
-    void SetNumberOfSurfaces(const unsigned long);
+  SurfaceWriter();
+  virtual ~SurfaceWriter() override;
+  bool
+  Write() override;
+  unsigned long
+  GetNumberOfSurfaces();
+  void
+  SetNumberOfSurfaces(const unsigned long);
+
 protected:
-    bool PrepareWrite() override;
-    void ComputeNumberOfSurfaces();
-    bool PrepareWritePointMacro(
-      SmartPointer< Surface >, DataSet &, const TransferSyntax &);
-    unsigned long NumberOfSurfaces;
+  bool
+  PrepareWrite() override;
+  void
+  ComputeNumberOfSurfaces();
+  bool
+                PrepareWritePointMacro(SmartPointer<Surface>, DataSet &, const TransferSyntax &);
+  unsigned long NumberOfSurfaces;
 };
 
-}
+} // namespace mdcm
 
 #endif // MDCMSURFACEWRITER_H

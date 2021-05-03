@@ -37,19 +37,24 @@ namespace mdcm
 class MDCM_EXPORT ExplicitImplicitDataElement : public DataElement
 {
 public:
-  VL GetLength() const;
+  VL
+  GetLength() const;
 
   template <typename TSwap>
-  std::istream & Read(std::istream & is);
+  std::istream &
+  Read(std::istream & is);
 
   template <typename TSwap>
-  std::istream & ReadPreValue(std::istream & is);
+  std::istream &
+  ReadPreValue(std::istream & is);
 
   template <typename TSwap>
-  std::istream & ReadValue(std::istream & is, bool readvalues = true);
+  std::istream &
+  ReadValue(std::istream & is, bool readvalues = true);
 
   template <typename TSwap>
-  std::istream & ReadWithLength(std::istream & is, VL & length)
+  std::istream &
+  ReadWithLength(std::istream & is, VL & length)
   {
     (void)length;
     return Read<TSwap>(is);
@@ -61,4 +66,4 @@ public:
 
 #include "mdcmExplicitImplicitDataElement.hxx"
 
-#endif //MDCMEXPLICITIMPLICITDATAELEMENT_H
+#endif // MDCMEXPLICITIMPLICITDATAELEMENT_H

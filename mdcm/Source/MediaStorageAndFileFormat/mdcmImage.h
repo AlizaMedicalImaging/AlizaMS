@@ -54,43 +54,69 @@ class MDCM_EXPORT Image : public Pixmap
 public:
   Image();
   ~Image();
-  const double * GetSpacing() const;
-  double GetSpacing(unsigned int) const;
-  void SetSpacing(const double *);
-  void SetSpacing(unsigned int, double);
-  const double * GetOrigin() const;
-  double GetOrigin(unsigned int) const;
-  void SetOrigin(const float *);
-  void SetOrigin(const double *);
-  void SetOrigin(unsigned int, double);
-  const double * GetDirectionCosines() const;
-  double GetDirectionCosines(unsigned int) const;
-  void SetDirectionCosines(const float *);
-  void SetDirectionCosines(const double *);
-  void SetDirectionCosines(unsigned int, double);
-  void SetIntercept(double);
-  double GetIntercept() const;
-  void SetSlope(double);
-  double GetSlope() const;
-  void SetWindowWidth(const std::string&);
-  void SetWindowCenter(const std::string&);
-  void SetWindowFunction(const std::string&);
-  std::string GetWindowWidth() const;
-  std::string GetWindowCenter() const;
-  std::string GetWindowFunction() const;
-  void Print(std::ostream &) const override;
+  const double *
+  GetSpacing() const;
+  double
+  GetSpacing(unsigned int) const;
+  void
+  SetSpacing(const double *);
+  void
+  SetSpacing(unsigned int, double);
+  const double *
+  GetOrigin() const;
+  double
+  GetOrigin(unsigned int) const;
+  void
+  SetOrigin(const float *);
+  void
+  SetOrigin(const double *);
+  void
+  SetOrigin(unsigned int, double);
+  const double *
+  GetDirectionCosines() const;
+  double
+  GetDirectionCosines(unsigned int) const;
+  void
+  SetDirectionCosines(const float *);
+  void
+  SetDirectionCosines(const double *);
+  void
+  SetDirectionCosines(unsigned int, double);
+  void
+  SetIntercept(double);
+  double
+  GetIntercept() const;
+  void
+  SetSlope(double);
+  double
+  GetSlope() const;
+  void
+  SetWindowWidth(const std::string &);
+  void
+  SetWindowCenter(const std::string &);
+  void
+  SetWindowFunction(const std::string &);
+  std::string
+  GetWindowWidth() const;
+  std::string
+  GetWindowCenter() const;
+  std::string
+  GetWindowFunction() const;
+  void
+  Print(std::ostream &) const override;
+
 private:
-  SwapCode SC;
-  double Intercept;
-  double Slope;
+  SwapCode            SC;
+  double              Intercept;
+  double              Slope;
   std::vector<double> Spacing;
   std::vector<double> Origin;
   std::vector<double> DirectionCosines;
-  std::string WindowWidth;
-  std::string WindowCenter;
-  std::string WindowFunction;
+  std::string         WindowWidth;
+  std::string         WindowCenter;
+  std::string         WindowFunction;
 };
 
 } // end namespace mdcm
 
-#endif //MDCMIMAGE_H
+#endif // MDCMIMAGE_H

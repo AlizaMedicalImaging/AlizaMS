@@ -51,20 +51,37 @@ public:
   FileMetaInformation();
   ~FileMetaInformation();
 
-  friend std::ostream &operator<<(std::ostream &_os, const FileMetaInformation &_val);
+  friend std::ostream &
+  operator<<(std::ostream & _os, const FileMetaInformation & _val);
 
-  bool IsValid() const { return true; }
+  bool
+  IsValid() const
+  {
+    return true;
+  }
 
-  TransferSyntax::NegociatedType GetMetaInformationTS() const { return MetaInformationTS; }
-  void SetDataSetTransferSyntax(const TransferSyntax & ts);
-  const TransferSyntax & GetDataSetTransferSyntax() const { return DataSetTS; }
-  MediaStorage GetMediaStorage() const;
-  std::string GetMediaStorageAsString() const;
+  TransferSyntax::NegociatedType
+  GetMetaInformationTS() const
+  {
+    return MetaInformationTS;
+  }
+  void
+  SetDataSetTransferSyntax(const TransferSyntax & ts);
+  const TransferSyntax &
+  GetDataSetTransferSyntax() const
+  {
+    return DataSetTS;
+  }
+  MediaStorage
+  GetMediaStorage() const;
+  std::string
+  GetMediaStorageAsString() const;
 
   // FIXME: no virtual function means: duplicate code...
-  void Insert(const DataElement & de)
+  void
+  Insert(const DataElement & de)
   {
-    if(de.GetTag().GetGroup() == 0x0002)
+    if (de.GetTag().GetGroup() == 0x0002)
     {
       InsertDataElement(de);
     }
@@ -73,44 +90,70 @@ public:
       mdcmErrorMacro("Cannot add element with group != 0x0002 in the file meta header: " << de);
     }
   }
-  void Replace(const DataElement & de)
+  void
+  Replace(const DataElement & de)
   {
     Remove(de.GetTag());
     Insert(de);
   }
 
   // Read
-  std::istream & Read(std::istream & is);
-  std::istream & ReadCompat(std::istream & is);
+  std::istream &
+  Read(std::istream & is);
+  std::istream &
+  ReadCompat(std::istream & is);
 
   // Write
-  std::ostream & Write(std::ostream & os) const;
+  std::ostream &
+  Write(std::ostream & os) const;
 
   // Construct a FileMetaInformation from an already existing DataSet:
-  void FillFromDataSet(DataSet const &ds);
+  void
+  FillFromDataSet(DataSet const & ds);
 
   // Get Preamble
-  const Preamble & GetPreamble() const { return P; }
-  Preamble & GetPreamble() { return P; }
-  void SetPreamble(const Preamble & p) { P = p; }
+  const Preamble &
+  GetPreamble() const
+  {
+    return P;
+  }
+  Preamble &
+  GetPreamble()
+  {
+    return P;
+  }
+  void
+  SetPreamble(const Preamble & p)
+  {
+    P = p;
+  }
 
   // Override the MDCM default values:
-  static void SetImplementationClassUID(const char * imp);
-  static void AppendImplementationClassUID(const char * imp);
-  static const char * GetImplementationClassUID();
-  static void SetImplementationVersionName(const char * version);
-  static const char * GetImplementationVersionName();
-  static void SetSourceApplicationEntityTitle(const char * title);
-  static const char * GetSourceApplicationEntityTitle();
+  static void
+  SetImplementationClassUID(const char * imp);
+  static void
+  AppendImplementationClassUID(const char * imp);
+  static const char *
+  GetImplementationClassUID();
+  static void
+  SetImplementationVersionName(const char * version);
+  static const char *
+  GetImplementationVersionName();
+  static void
+  SetSourceApplicationEntityTitle(const char * title);
+  static const char *
+  GetSourceApplicationEntityTitle();
 
-  FileMetaInformation(FileMetaInformation const & fmi):DataSet(fmi)
+  FileMetaInformation(FileMetaInformation const & fmi)
+    : DataSet(fmi)
   {
     DataSetTS = fmi.DataSetTS;
     MetaInformationTS = fmi.MetaInformationTS;
     DataSetMS = fmi.DataSetMS;
   }
 
-  FileMetaInformation& operator=(const FileMetaInformation& fmi)
+  FileMetaInformation &
+  operator=(const FileMetaInformation & fmi)
   {
     DataSetTS = fmi.DataSetTS;
     MetaInformationTS = fmi.MetaInformationTS;
@@ -118,42 +161,52 @@ public:
     return *this;
   }
 
-  VL GetFullLength() const
+  VL
+  GetFullLength() const
   {
-      return P.GetLength() + DataSet::GetLength<ExplicitDataElement>();
+    return P.GetLength() + DataSet::GetLength<ExplicitDataElement>();
   }
 
 protected:
-  void ComputeDataSetTransferSyntax(); // FIXME
+  void
+  ComputeDataSetTransferSyntax(); // FIXME
 
   template <typename TSwap>
-  std::istream &ReadCompatInternal(std::istream & is);
+  std::istream &
+  ReadCompatInternal(std::istream & is);
 
-  void Default();
-  void ComputeDataSetMediaStorageSOPClass();
+  void
+  Default();
+  void
+  ComputeDataSetMediaStorageSOPClass();
 
-  TransferSyntax DataSetTS;
+  TransferSyntax                 DataSetTS;
   TransferSyntax::NegociatedType MetaInformationTS;
-  MediaStorage::MSType DataSetMS;
+  MediaStorage::MSType           DataSetMS;
 
 protected:
-  static const char * GetFileMetaInformationVersion();
-  static const char * GetMDCMImplementationClassUID();
-  static const char * GetMDCMImplementationVersionName();
-  static const char * GetMDCMSourceApplicationEntityTitle();
+  static const char *
+  GetFileMetaInformationVersion();
+  static const char *
+  GetMDCMImplementationClassUID();
+  static const char *
+  GetMDCMImplementationVersionName();
+  static const char *
+  GetMDCMSourceApplicationEntityTitle();
 
 private:
-  Preamble P;
-  static const char MDCM_FILE_META_INFORMATION_VERSION[];
-  static const char MDCM_IMPLEMENTATION_CLASS_UID[];
-  static const char MDCM_IMPLEMENTATION_VERSION_NAME[];
-  static const char MDCM_SOURCE_APPLICATION_ENTITY_TITLE[];
+  Preamble           P;
+  static const char  MDCM_FILE_META_INFORMATION_VERSION[];
+  static const char  MDCM_IMPLEMENTATION_CLASS_UID[];
+  static const char  MDCM_IMPLEMENTATION_VERSION_NAME[];
+  static const char  MDCM_SOURCE_APPLICATION_ENTITY_TITLE[];
   static std::string ImplementationClassUID;
   static std::string ImplementationVersionName;
   static std::string SourceApplicationEntityTitle;
 };
 
-inline std::ostream& operator<<(std::ostream &os, const FileMetaInformation &val)
+inline std::ostream &
+operator<<(std::ostream & os, const FileMetaInformation & val)
 {
   os << val.GetPreamble() << std::endl;
   val.Print(os);
@@ -162,4 +215,4 @@ inline std::ostream& operator<<(std::ostream &os, const FileMetaInformation &val
 
 } // end namespace mdcm
 
-#endif //MDCMFILEMETAINFORMATION_H
+#endif // MDCMFILEMETAINFORMATION_H

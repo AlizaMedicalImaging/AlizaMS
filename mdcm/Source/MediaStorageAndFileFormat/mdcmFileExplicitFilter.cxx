@@ -51,133 +51,144 @@ namespace mdcm
 {
 
 // Decide whether or not to VR'ify private tags
-void FileExplicitFilter::SetChangePrivateTags(bool b)
+void
+FileExplicitFilter::SetChangePrivateTags(bool b)
 {
   ChangePrivateTags = b;
 }
 
 // When VR=16bits in explicit but Implicit has a 32bits length, use VR=UN
-void FileExplicitFilter::SetUseVRUN(bool b)
+void
+FileExplicitFilter::SetUseVRUN(bool b)
 {
   UseVRUN = b;
 }
 
 // By default set Sequence & Item length to Undefined to avoid recomputing length
-void FileExplicitFilter::SetRecomputeItemLength(bool b)
+void
+FileExplicitFilter::SetRecomputeItemLength(bool b)
 {
   RecomputeItemLength = b;
 }
 
-void FileExplicitFilter::SetRecomputeSequenceLength(bool b)
+void
+FileExplicitFilter::SetRecomputeSequenceLength(bool b)
 {
   RecomputeSequenceLength = b;
 }
 
-void FileExplicitFilter::SetFile(const File & f)
+void
+FileExplicitFilter::SetFile(const File & f)
 {
   F = f;
 }
 
-File & FileExplicitFilter::GetFile()
+File &
+FileExplicitFilter::GetFile()
 {
   return *F;
 }
 
-bool FileExplicitFilter::Change()
+bool
+FileExplicitFilter::Change()
 {
-  const Global& g = GlobalInstance;
-  const Dicts &dicts = g.GetDicts();
-  DataSet &ds = F->GetDataSet();
-  bool b = ProcessDataSet(ds, dicts);
+  const Global & g = GlobalInstance;
+  const Dicts &  dicts = g.GetDicts();
+  DataSet &      ds = F->GetDataSet();
+  bool           b = ProcessDataSet(ds, dicts);
   return b;
 }
 
-bool FileExplicitFilter::ChangeFMI()
+bool
+FileExplicitFilter::ChangeFMI()
 {
-/*
-    FileMetaInformation &fmi = F->GetHeader();
-    TransferSyntax ts = TransferSyntax::ImplicitVRLittleEndian;
-    {
-      ts = TransferSyntax::ExplicitVRLittleEndian;
-    }
-    const char *tsuid = TransferSyntax::GetTSString(ts);
-    DataElement de(Tag(0x0002,0x0010));
-    de.SetByteValue(tsuid, strlen(tsuid));
-    de.SetVR(Attribute<0x0002, 0x0010>::GetVR());
-    fmi.Replace(de);
-    //fmi.Remove(Tag(0x0002,0x0012)); // will be regenerated
-    //fmi.Remove(Tag(0x0002,0x0013)); //  '   '    '
-    fmi.SetDataSetTransferSyntax(ts);
-*/
+  /*
+      FileMetaInformation &fmi = F->GetHeader();
+      TransferSyntax ts = TransferSyntax::ImplicitVRLittleEndian;
+      {
+        ts = TransferSyntax::ExplicitVRLittleEndian;
+      }
+      const char *tsuid = TransferSyntax::GetTSString(ts);
+      DataElement de(Tag(0x0002,0x0010));
+      de.SetByteValue(tsuid, strlen(tsuid));
+      de.SetVR(Attribute<0x0002, 0x0010>::GetVR());
+      fmi.Replace(de);
+      //fmi.Remove(Tag(0x0002,0x0012)); // will be regenerated
+      //fmi.Remove(Tag(0x0002,0x0013)); //  '   '    '
+      fmi.SetDataSetTransferSyntax(ts);
+  */
   return true;
 }
 
-bool FileExplicitFilter::ProcessDataSet(DataSet & ds, Dicts const & dicts)
+bool
+FileExplicitFilter::ProcessDataSet(DataSet & ds, Dicts const & dicts)
 {
-  if(RecomputeSequenceLength || RecomputeItemLength)
+  if (RecomputeSequenceLength || RecomputeItemLength)
   {
     mdcmWarningMacro("Not implemented sorry");
     return false;
   }
   DataSet::Iterator it = ds.Begin();
-  for(; it != ds.End();)
+  for (; it != ds.End();)
   {
-    DataElement de = *it;
-    std::string strowner;
-    const char *owner = 0;
-    const Tag& t = de.GetTag();
-    if(t.IsPrivate() && !ChangePrivateTags
-    // As a special exception we convert to proper VR:
-    // - Private Group Length
-    // - Private Creator
-    // This makes the output more readable (and this should be relative safe)
-      && !t.IsGroupLength() && !t.IsPrivateCreator()
-   )
+    DataElement  de = *it;
+    std::string  strowner;
+    const char * owner = 0;
+    const Tag &  t = de.GetTag();
+    if (t.IsPrivate() &&
+        !ChangePrivateTags
+        // As a special exception we convert to proper VR:
+        // - Private Group Length
+        // - Private Creator
+        // This makes the output more readable (and this should be relative safe)
+        && !t.IsGroupLength() && !t.IsPrivateCreator())
     {
       // skip
       ++it;
       continue;
     }
-    if(t.IsPrivate() && !t.IsPrivateCreator())
+    if (t.IsPrivate() && !t.IsPrivateCreator())
     {
       strowner = ds.GetPrivateCreator(t);
       owner = strowner.c_str();
     }
-    const DictEntry &entry = dicts.GetDictEntry(t,owner);
-    const VR &vr = entry.GetVR();
+    const DictEntry & entry = dicts.GetDictEntry(t, owner);
+    const VR &        vr = entry.GetVR();
 
-    VR cvr = DataSetHelper::ComputeVR(*F,ds, t);
-    VR oldvr = de.GetVR();
+    VR                            cvr = DataSetHelper::ComputeVR(*F, ds, t);
+    VR                            oldvr = de.GetVR();
     SmartPointer<SequenceOfItems> sqi = 0;
-    if(vr == VR::SQ)
+    if (vr == VR::SQ)
     {
       sqi = de.GetValueAsSQ();
-      if(!sqi)
+      if (!sqi)
       {
         assert(de.IsEmpty());
       }
     }
-    if(de.GetByteValue() && !sqi)
+    if (de.GetByteValue() && !sqi)
     {
       assert(cvr != VR::INVALID);
-      if(cvr != VR::UN)
+      if (cvr != VR::UN)
       {
-        if(cvr & VR::VRASCII)
+        if (cvr & VR::VRASCII)
         {
           // mdcm-JPEG-Extended.dcm has a couple of VR::OB private field
           // is this a good idea to change them to an ASCII when we know this might not work?
-          if(!(oldvr & VR::VRASCII || oldvr == VR::INVALID || oldvr == VR::UN))
+          if (!(oldvr & VR::VRASCII || oldvr == VR::INVALID || oldvr == VR::UN))
           {
-            mdcmErrorMacro("Cannot convert VR for tag: " << t << " " << oldvr << " is incompatible with " << cvr << " as given by ref. dict.");
+            mdcmErrorMacro("Cannot convert VR for tag: " << t << " " << oldvr << " is incompatible with " << cvr
+                                                         << " as given by ref. dict.");
             return false;
           }
         }
-        else if(cvr & VR::VRBINARY)
+        else if (cvr & VR::VRBINARY)
         {
           // PHILIPS_Gyroscan-12-MONO2-Jpeg_Lossless.dcm
-          if(!( oldvr & VR::VRBINARY || oldvr == VR::INVALID || oldvr == VR::UN) )
+          if (!(oldvr & VR::VRBINARY || oldvr == VR::INVALID || oldvr == VR::UN))
           {
-            mdcmErrorMacro("Cannot convert VR for tag: " << t << " " << oldvr << " is incompatible with " << cvr << " as given by ref. dict.");
+            mdcmErrorMacro("Cannot convert VR for tag: " << t << " " << oldvr << " is incompatible with " << cvr
+                                                         << " as given by ref. dict.");
             return false;
           }
         }
@@ -187,18 +198,18 @@ bool FileExplicitFilter::ProcessDataSet(DataSet & ds, Dicts const & dicts)
         }
         // one more check we are going to make this attribute explicit VR, there is
         // still a special case, when VL is > uint16_max then we must give up:
-        if(!(cvr & VR::VL32) && de.GetVL() > UINT16_MAX)
+        if (!(cvr & VR::VL32) && de.GetVL() > UINT16_MAX)
         {
           cvr = VR::UN;
         }
         de.SetVR(cvr);
       }
     }
-    else if(sqi)
+    else if (sqi)
     {
       assert(cvr == VR::SQ || cvr == VR::UN);
       de.SetVR(VR::SQ);
-      if(de.GetByteValue())
+      if (de.GetByteValue())
       {
         de.SetValue(*sqi);
       }
@@ -206,16 +217,16 @@ bool FileExplicitFilter::ProcessDataSet(DataSet & ds, Dicts const & dicts)
       assert(sqi->GetLength().IsUndefined());
       // recursive
       SequenceOfItems::ItemVector::iterator sit = sqi->Items.begin();
-      for(; sit != sqi->Items.end(); ++sit)
+      for (; sit != sqi->Items.end(); ++sit)
       {
-        Item &item = *sit;
+        Item & item = *sit;
         item.SetVLToUndefined();
-        DataSet &nds = item.GetNestedDataSet();
+        DataSet & nds = item.GetNestedDataSet();
         ProcessDataSet(nds, dicts);
         item.SetVL(item.GetLength<ExplicitDataElement>());
       }
     }
-    else if(de.GetSequenceOfFragments())
+    else if (de.GetSequenceOfFragments())
     {
       assert(cvr & VR::OB_OW);
     }

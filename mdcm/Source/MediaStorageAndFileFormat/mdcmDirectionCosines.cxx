@@ -51,16 +51,17 @@ DirectionCosines::DirectionCosines(const double dircos[6])
 
 DirectionCosines::~DirectionCosines() {}
 
-bool DirectionCosines::IsValid() const
+bool
+DirectionCosines::IsValid() const
 {
   const double epsilon = 1e-3;
-  double norm_v1 = Values[0] * Values[0] + Values[1]*Values[1] + Values[2]*Values[2];
-  double norm_v2 = Values[3] * Values[3] + Values[4]*Values[4] + Values[5]*Values[5];
-  double dot = Dot();
-  bool ret = false;
-  if(fabs(norm_v1 - 1) < epsilon && fabs(norm_v2 - 1) < epsilon)
+  double       norm_v1 = Values[0] * Values[0] + Values[1] * Values[1] + Values[2] * Values[2];
+  double       norm_v2 = Values[3] * Values[3] + Values[4] * Values[4] + Values[5] * Values[5];
+  double       dot = Dot();
+  bool         ret = false;
+  if (fabs(norm_v1 - 1) < epsilon && fabs(norm_v2 - 1) < epsilon)
   {
-    if(fabs(dot) < epsilon)
+    if (fabs(dot) < epsilon)
     {
       ret = true;
     }
@@ -68,78 +69,88 @@ bool DirectionCosines::IsValid() const
   return ret;
 }
 
-void DirectionCosines::Cross(double z[3]) const
+void
+DirectionCosines::Cross(double z[3]) const
 {
   const double * x = Values;
-  const double * y = x+3;
-  double Zx = x[1]*y[2] - x[2]*y[1];
-  double Zy = x[2]*y[0] - x[0]*y[2];
-  double Zz = x[0]*y[1] - x[1]*y[0];
-  z[0] = Zx; z[1] = Zy; z[2] = Zz;
+  const double * y = x + 3;
+  double         Zx = x[1] * y[2] - x[2] * y[1];
+  double         Zy = x[2] * y[0] - x[0] * y[2];
+  double         Zz = x[0] * y[1] - x[1] * y[0];
+  z[0] = Zx;
+  z[1] = Zy;
+  z[2] = Zz;
 }
 
-static inline double DotImpl(const double x[3], const double y[3])
+static inline double
+DotImpl(const double x[3], const double y[3])
 {
-  return x[0]*y[0] + x[1]*y[1] + x[2]*y[2];
+  return x[0] * y[0] + x[1] * y[1] + x[2] * y[2];
 }
 
-double DirectionCosines::Dot(const double x[3], const double y[3])
+double
+DirectionCosines::Dot(const double x[3], const double y[3])
 {
   return DotImpl(x, y);
 }
 
-double DirectionCosines::Dot() const
+double
+DirectionCosines::Dot() const
 {
-  return DotImpl(Values, Values+3);
+  return DotImpl(Values, Values + 3);
 }
 
-static inline double Norm(const double x[3])
+static inline double
+Norm(const double x[3])
 {
-  return sqrt(x[0]*x[0] + x[1]*x[1] + x[2]*x[2]);
+  return sqrt(x[0] * x[0] + x[1] * x[1] + x[2] * x[2]);
 }
 
-void DirectionCosines::Normalize(double v[3])
+void
+DirectionCosines::Normalize(double v[3])
 {
   double den;
   if ((den = Norm(v)) != 0.0)
   {
-    for (int i=0; i < 3; ++i)
+    for (int i = 0; i < 3; ++i)
     {
       v[i] /= den;
     }
   }
 }
 
-void DirectionCosines::Normalize()
+void
+DirectionCosines::Normalize()
 {
   double * x = Values;
-  double den;
+  double   den;
   if ((den = Norm(x)) != 0.0)
   {
-    for (int i=0; i < 3; ++i)
+    for (int i = 0; i < 3; ++i)
     {
       x[i] /= den;
     }
   }
-  x = Values+3;
+  x = Values + 3;
   if ((den = Norm(x)) != 0.0)
   {
-    for (int i=0; i < 3; ++i)
+    for (int i = 0; i < 3; ++i)
     {
       x[i] /= den;
     }
   }
 }
 
-bool DirectionCosines::SetFromString(const char * s)
+bool
+DirectionCosines::SetFromString(const char * s)
 {
-  if(s)
+  if (s)
   {
     std::locale l = std::locale::global(std::locale::classic());
-    const int n = sscanf(s, "%lf\\%lf\\%lf\\%lf\\%lf\\%lf",
-      Values, Values+1, Values+2, Values+3, Values+4, Values+5);
+    const int   n =
+      sscanf(s, "%lf\\%lf\\%lf\\%lf\\%lf\\%lf", Values, Values + 1, Values + 2, Values + 3, Values + 4, Values + 5);
     std::locale::global(l);
-    if(n == 6)
+    if (n == 6)
     {
       return true;
     }
@@ -153,7 +164,8 @@ bool DirectionCosines::SetFromString(const char * s)
   return false;
 }
 
-double DirectionCosines::CrossDot(DirectionCosines const & dc) const
+double
+DirectionCosines::CrossDot(DirectionCosines const & dc) const
 {
   double z1[3];
   Cross(z1);
@@ -161,19 +173,22 @@ double DirectionCosines::CrossDot(DirectionCosines const & dc) const
   dc.Cross(z2);
   const double * x = z1;
   const double * y = z2;
-  return x[0]*y[0] + x[1]*y[1] + x[2]*y[2];
+  return x[0] * y[0] + x[1] * y[1] + x[2] * y[2];
 }
 
-double DirectionCosines::ComputeDistAlongNormal(const double ipp[3]) const
+double
+DirectionCosines::ComputeDistAlongNormal(const double ipp[3]) const
 {
   double normal[3];
   Cross(normal);
   double dist = 0.;
-  for (int i = 0; i < 3; ++i) dist += normal[i]*ipp[i];
+  for (int i = 0; i < 3; ++i)
+    dist += normal[i] * ipp[i];
   return dist;
 }
 
-void DirectionCosines::Print(std::ostream & os) const
+void
+DirectionCosines::Print(std::ostream & os) const
 {
   os << Values[0] << ",";
   os << Values[1] << ",";

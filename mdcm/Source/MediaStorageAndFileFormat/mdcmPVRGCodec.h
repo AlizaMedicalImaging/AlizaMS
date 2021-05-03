@@ -34,11 +34,14 @@ class PVRGCodec : public ImageCodec
 public:
   PVRGCodec();
   ~PVRGCodec() override;
-  bool CanDecode(TransferSyntax const &) const override;
-  bool Decode(DataElement const &, DataElement &) override;
-  bool Code(DataElement const &, DataElement &) override;
+  bool
+  CanDecode(TransferSyntax const &) const override;
+  bool
+  Decode(DataElement const &, DataElement &) override;
+  bool
+  Code(DataElement const &, DataElement &) override;
 };
 
 } // end namespace mdcm
 
-#endif //MDCMPVRGCODEC_H
+#endif // MDCMPVRGCODEC_H

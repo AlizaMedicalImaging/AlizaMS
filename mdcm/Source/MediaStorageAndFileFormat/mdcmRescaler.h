@@ -69,42 +69,58 @@ class MDCM_EXPORT Rescaler
 {
 public:
   Rescaler()
-    :
-    Intercept(0),
-    Slope(1),
-    PF(PixelFormat::UNKNOWN),
-    TargetScalarType(PixelFormat::UNKNOWN),
-    ScalarRangeMin(0),
-    ScalarRangeMax(0),
-    UseTargetPixelType(false) {}
+    : Intercept(0)
+    , Slope(1)
+    , PF(PixelFormat::UNKNOWN)
+    , TargetScalarType(PixelFormat::UNKNOWN)
+    , ScalarRangeMin(0)
+    , ScalarRangeMax(0)
+    , UseTargetPixelType(false)
+  {}
   ~Rescaler() {}
-  PixelFormat::ScalarType ComputeInterceptSlopePixelType();
-  bool InverseRescale(char *, const char *, size_t);
-  bool Rescale(char *, const char *, size_t);
-  PixelFormat ComputePixelTypeFromMinMax();
-  void SetTargetPixelType(PixelFormat const &);
-  void SetUseTargetPixelType(bool);
-  void SetMinMaxForPixelType(double, double);
-  void SetIntercept(double);
-  double GetIntercept() const;
-  void SetSlope(double);
-  double GetSlope() const;
-  void SetPixelFormat(PixelFormat const &);
+  PixelFormat::ScalarType
+  ComputeInterceptSlopePixelType();
+  bool
+  InverseRescale(char *, const char *, size_t);
+  bool
+  Rescale(char *, const char *, size_t);
+  PixelFormat
+  ComputePixelTypeFromMinMax();
+  void
+  SetTargetPixelType(PixelFormat const &);
+  void
+  SetUseTargetPixelType(bool);
+  void
+  SetMinMaxForPixelType(double, double);
+  void
+  SetIntercept(double);
+  double
+  GetIntercept() const;
+  void
+  SetSlope(double);
+  double
+  GetSlope() const;
+  void
+  SetPixelFormat(PixelFormat const &);
+
 protected:
-  template<typename TIn> void RescaleFunctionIntoBestFit(
-    char *, const TIn *, size_t);
-  template<typename TIn> void InverseRescaleFunctionIntoBestFit(
-    char *, const TIn *, size_t);
+  template <typename TIn>
+  void
+  RescaleFunctionIntoBestFit(char *, const TIn *, size_t);
+  template <typename TIn>
+  void
+  InverseRescaleFunctionIntoBestFit(char *, const TIn *, size_t);
+
 private:
-  double Intercept;
-  double Slope;
-  PixelFormat PF;
+  double                  Intercept;
+  double                  Slope;
+  PixelFormat             PF;
   PixelFormat::ScalarType TargetScalarType;
-  double ScalarRangeMin;
-  double ScalarRangeMax;
-  bool UseTargetPixelType;
+  double                  ScalarRangeMin;
+  double                  ScalarRangeMax;
+  bool                    UseTargetPixelType;
 };
 
 } // end namespace mdcm
 
-#endif //MDCMRESCALER_H
+#endif // MDCMRESCALER_H

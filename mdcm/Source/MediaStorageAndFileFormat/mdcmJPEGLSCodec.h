@@ -38,38 +38,60 @@ class MDCM_EXPORT JPEGLSCodec : public ImageCodec
 public:
   JPEGLSCodec();
   ~JPEGLSCodec() override;
-  bool CanDecode(TransferSyntax const &) const override;
-  bool CanCode(TransferSyntax const &) const override;
-  bool Decode(DataElement const &, DataElement &) override;
-  bool Decode(DataElement const &, char *, size_t,
-    uint32_t, uint32_t, uint32_t,
-    uint32_t, uint32_t, uint32_t);
-  bool Code(DataElement const &, DataElement &) override;
-  unsigned long long GetBufferLength() const;
-  void SetBufferLength(unsigned long long);
-  bool GetHeaderInfo(std::istream &, TransferSyntax &) override;
-  void SetLossless(bool);
-  bool GetLossless() const;
-  void SetLossyError(int); // [0-3] generally
+  bool
+  CanDecode(TransferSyntax const &) const override;
+  bool
+  CanCode(TransferSyntax const &) const override;
+  bool
+  Decode(DataElement const &, DataElement &) override;
+  bool
+  Decode(DataElement const &, char *, size_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t);
+  bool
+  Code(DataElement const &, DataElement &) override;
+  unsigned long long
+  GetBufferLength() const;
+  void
+  SetBufferLength(unsigned long long);
+  bool
+  GetHeaderInfo(std::istream &, TransferSyntax &) override;
+  void
+  SetLossless(bool);
+  bool
+  GetLossless() const;
+  void
+  SetLossyError(int); // [0-3] generally
 protected:
-  bool DecodeExtent(char *,
-    unsigned int, unsigned int,
-    unsigned int, unsigned int,
-    unsigned int, unsigned int,
-    std::istream &);
-  bool StartEncode(std::ostream &) override;
-  bool IsRowEncoder() override;
-  bool IsFrameEncoder() override;
-  bool AppendRowEncode(std::ostream &, const char *, size_t) override;
-  bool AppendFrameEncode(std::ostream &, const char *, size_t) override;
-  bool StopEncode(std::ostream &) override;
+  bool
+  DecodeExtent(char *,
+               unsigned int,
+               unsigned int,
+               unsigned int,
+               unsigned int,
+               unsigned int,
+               unsigned int,
+               std::istream &);
+  bool
+  StartEncode(std::ostream &) override;
+  bool
+  IsRowEncoder() override;
+  bool
+  IsFrameEncoder() override;
+  bool
+  AppendRowEncode(std::ostream &, const char *, size_t) override;
+  bool
+  AppendFrameEncode(std::ostream &, const char *, size_t) override;
+  bool
+  StopEncode(std::ostream &) override;
+
 private:
-  bool DecodeByStreamsCommon(const char *, size_t, std::vector<unsigned char> &);
-  bool CodeFrameIntoBuffer(char *, size_t, size_t &, const char *, size_t);
+  bool
+  DecodeByStreamsCommon(const char *, size_t, std::vector<unsigned char> &);
+  bool
+                     CodeFrameIntoBuffer(char *, size_t, size_t &, const char *, size_t);
   unsigned long long BufferLength;
-  int LossyError;
+  int                LossyError;
 };
 
 } // end namespace mdcm
 
-#endif //MDCMJPEGLSCODEC_H
+#endif // MDCMJPEGLSCODEC_H

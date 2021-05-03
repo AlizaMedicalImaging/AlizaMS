@@ -31,14 +31,19 @@ namespace mdcm
 class MDCM_EXPORT OpenSSLCryptoFactory : public CryptoFactory
 {
 public:
-  OpenSSLCryptoFactory(CryptoLib id) : CryptoFactory(id);
-  CryptographicMessageSyntax * CreateCMSProvider() override;
+  OpenSSLCryptoFactory(CryptoLib id)
+    : CryptoFactory(id);
+  CryptographicMessageSyntax *
+  CreateCMSProvider() override;
+
 protected:
-  void InitOpenSSL();
+  void
+  InitOpenSSL();
+
 private:
-  OpenSSLCryptoFactory(){}
+  OpenSSLCryptoFactory() {}
 };
 
 } // end namespace mdcm
 
-#endif //MDCMOPENSSLCRYPTOFACTORY_H
+#endif // MDCMOPENSSLCRYPTOFACTORY_H

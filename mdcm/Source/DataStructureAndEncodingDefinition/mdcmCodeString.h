@@ -46,11 +46,15 @@ namespace mdcm
  */
 class MDCM_EXPORT CodeString
 {
-friend std::ostream& operator<< (std::ostream & os, const CodeString & str);
-friend bool operator==(const CodeString & ref, const CodeString & cs);
-friend bool operator!=(const CodeString & ref, const CodeString & cs);
+  friend std::ostream &
+  operator<<(std::ostream & os, const CodeString & str);
+  friend bool
+  operator==(const CodeString & ref, const CodeString & cs);
+  friend bool
+  operator!=(const CodeString & ref, const CodeString & cs);
+
 public:
-  typedef String<'\\',16> InternalClass;
+  typedef String<'\\', 16>                      InternalClass;
   typedef InternalClass::value_type             value_type;
   typedef InternalClass::pointer                pointer;
   typedef InternalClass::reference              reference;
@@ -62,59 +66,68 @@ public:
   typedef InternalClass::reverse_iterator       reverse_iterator;
   typedef InternalClass::const_reverse_iterator const_reverse_iterator;
 
-  CodeString(): Internal() {}
+  CodeString()
+    : Internal()
+  {}
 
-  CodeString(const value_type * s): Internal(s)
+  CodeString(const value_type * s)
+    : Internal(s)
   {
     Internal = Internal.Trim();
   }
 
-  CodeString(const value_type * s, size_type n): Internal(s, n)
+  CodeString(const value_type * s, size_type n)
+    : Internal(s, n)
   {
     Internal = Internal.Trim();
   }
 
-  CodeString(
-    const InternalClass & s, size_type pos=0, size_type n = InternalClass::npos)
-    :
-    Internal(s, pos, n)
+  CodeString(const InternalClass & s, size_type pos = 0, size_type n = InternalClass::npos)
+    : Internal(s, pos, n)
   {
     Internal = Internal.Trim();
   }
 
-  bool IsValid() const;
+  bool
+  IsValid() const;
 
-  std::string GetAsString() const
+  std::string
+  GetAsString() const
   {
     return Internal;
   }
 
-  size_type Size() const
+  size_type
+  Size() const
   {
     return Internal.size();
   }
 
 protected:
-  std::string TrimInternal() const
+  std::string
+  TrimInternal() const
   {
     return Internal.Trim();
   }
 
 private:
-  String<'\\',16> Internal;
+  String<'\\', 16> Internal;
 };
 
-inline std::ostream& operator<< (std::ostream & os, const CodeString & str)
+inline std::ostream &
+operator<<(std::ostream & os, const CodeString & str)
 {
   os << str.Internal;
   return os;
 }
 
-inline bool operator==(const CodeString & ref, const CodeString & cs)
+inline bool
+operator==(const CodeString & ref, const CodeString & cs)
 {
   return ref.Internal == cs.Internal;
 }
-inline bool operator!=(const CodeString & ref, const CodeString & cs)
+inline bool
+operator!=(const CodeString & ref, const CodeString & cs)
 {
   return ref.Internal != cs.Internal;
 }
@@ -122,4 +135,4 @@ inline bool operator!=(const CodeString & ref, const CodeString & cs)
 
 } // end namespace mdcm
 
-#endif //MDCMCODESTRING_H
+#endif // MDCMCODESTRING_H

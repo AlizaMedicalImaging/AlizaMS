@@ -24,60 +24,60 @@
 namespace mdcm
 {
 
-static const DictEntry ggl(
-  "Generic Group Length","GenericGroupLength",VR::UL,VM::VM1,true);
-static const DictEntry ill(
-  "Illegal Element","IllegalElement",VR::INVALID,VM::VM0,false);
-static const DictEntry prc(
-  "Private Creator","PrivateCreator",VR::LO,VM::VM1,false);
-static const DictEntry pe0(
-  "Private Element Without Private Creator","PrivateElementWithoutPrivateCreator",VR::INVALID,VM::VM0,false);
-static const DictEntry pe1(
-  "Private Element With Empty Private Creator","PrivateElementWithEmptyPrivateCreator",VR::INVALID,VM::VM0,false);
+static const DictEntry ggl("Generic Group Length", "GenericGroupLength", VR::UL, VM::VM1, true);
+static const DictEntry ill("Illegal Element", "IllegalElement", VR::INVALID, VM::VM0, false);
+static const DictEntry prc("Private Creator", "PrivateCreator", VR::LO, VM::VM1, false);
+static const DictEntry pe0("Private Element Without Private Creator",
+                           "PrivateElementWithoutPrivateCreator",
+                           VR::INVALID,
+                           VM::VM0,
+                           false);
+static const DictEntry pe1("Private Element With Empty Private Creator",
+                           "PrivateElementWithEmptyPrivateCreator",
+                           VR::INVALID,
+                           VM::VM0,
+                           false);
 
-Dicts::Dicts():PublicDict(),ShadowDict()
-{
-}
+Dicts::Dicts()
+  : PublicDict()
+  , ShadowDict()
+{}
 
-Dicts::~Dicts()
-{
-}
+Dicts::~Dicts() {}
 
-const DictEntry & Dicts::GetDictEntry(const Tag & tag, const char * owner) const
+const DictEntry &
+Dicts::GetDictEntry(const Tag & tag, const char * owner) const
 {
-  if(tag.IsGroupLength())
+  if (tag.IsGroupLength())
   {
     const DictEntry & de = PublicDict.GetDictEntry(tag);
-    const char * name = de.GetName();
-    if(name && *name)
+    const char *      name = de.GetName();
+    if (name && *name)
     {
       return de;
     }
     return ggl;
   }
-  else if(tag.IsPublic())
+  else if (tag.IsPublic())
   {
     return PublicDict.GetDictEntry(tag);
   }
   else
   {
-    if(owner && *owner)
+    if (owner && *owner)
     {
-      const DictEntry & de =
-        GetPrivateDict().GetDictEntry(
-          PrivateTag(tag.GetGroup(),
-                     (uint16_t)(((uint16_t)(tag.GetElement() << 8)) >> 8),
-                     owner));
+      const DictEntry & de = GetPrivateDict().GetDictEntry(
+        PrivateTag(tag.GetGroup(), (uint16_t)(((uint16_t)(tag.GetElement() << 8)) >> 8), owner));
       return de;
     }
     else
     {
       // 0x0000 and [0x1,0xFF] are special cases
-      if(tag.IsIllegal())
+      if (tag.IsIllegal())
       {
         return ill;
       }
-      else if(tag.IsPrivateCreator())
+      else if (tag.IsPrivateCreator())
       {
         assert(!tag.IsIllegal());
         assert(tag.GetElement());
@@ -87,7 +87,7 @@ const DictEntry & Dicts::GetDictEntry(const Tag & tag, const char * owner) const
       }
       else
       {
-        if(owner && *owner)
+        if (owner && *owner)
         {
           return pe0;
         }
@@ -97,7 +97,8 @@ const DictEntry & Dicts::GetDictEntry(const Tag & tag, const char * owner) const
   }
 }
 
-const DictEntry & Dicts::GetDictEntry(const PrivateTag & tag) const
+const DictEntry &
+Dicts::GetDictEntry(const PrivateTag & tag) const
 {
   return GetDictEntry(tag, tag.GetOwner());
 }
@@ -107,32 +108,38 @@ const char * Dicts::GetConstructorString(ConstructorType)
   return "";
 }
 
-const Dict &Dicts::GetPublicDict() const
+const Dict &
+Dicts::GetPublicDict() const
 {
   return PublicDict;
 }
 
-const PrivateDict & Dicts::GetPrivateDict() const
+const PrivateDict &
+Dicts::GetPrivateDict() const
 {
   return ShadowDict;
 }
 
-PrivateDict & Dicts::GetPrivateDict()
+PrivateDict &
+Dicts::GetPrivateDict()
 {
   return ShadowDict;
 }
 
-const CSAHeaderDict & Dicts::GetCSAHeaderDict() const
+const CSAHeaderDict &
+Dicts::GetCSAHeaderDict() const
 {
   return CSADict;
 }
 
-bool Dicts::IsEmpty() const
+bool
+Dicts::IsEmpty() const
 {
   return GetPublicDict().IsEmpty();
 }
 
-void Dicts::LoadDefaults()
+void
+Dicts::LoadDefaults()
 {
   PublicDict.LoadDefault();
   ShadowDict.LoadDefault();

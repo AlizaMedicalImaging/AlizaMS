@@ -37,7 +37,8 @@ public:
   unsigned int XMin, XMax;
   unsigned int YMin, YMax;
   unsigned int ZMin, ZMax;
-  void Print(std::ostream & os) const
+  void
+  Print(std::ostream & os) const
   {
     os << "Min:" << XMin << "," << YMin << "," << ZMin << "\n";
     os << "Max:" << XMax << "," << YMax << "," << ZMax;
@@ -54,10 +55,13 @@ BoxRegion::~BoxRegion()
   delete Internals;
 }
 
-void BoxRegion::SetDomain(
-  unsigned int xmin, unsigned int xmax,
-  unsigned int ymin, unsigned int ymax,
-  unsigned int zmin, unsigned int zmax)
+void
+BoxRegion::SetDomain(unsigned int xmin,
+                     unsigned int xmax,
+                     unsigned int ymin,
+                     unsigned int ymax,
+                     unsigned int zmin,
+                     unsigned int zmax)
 {
   Internals->XMin = xmin;
   Internals->YMin = ymin;
@@ -67,17 +71,17 @@ void BoxRegion::SetDomain(
   Internals->ZMax = zmax;
 }
 
-bool BoxRegion::Empty() const
+bool
+BoxRegion::Empty() const
 {
   assert(0);
   return false;
 }
 
-bool BoxRegion::IsValid() const
+bool
+BoxRegion::IsValid() const
 {
-  if (Internals->XMax < Internals->XMin ||
-      Internals->YMax < Internals->YMin ||
-      Internals->ZMax < Internals->ZMin)
+  if (Internals->XMax < Internals->XMin || Internals->YMax < Internals->YMin || Internals->ZMax < Internals->ZMin)
   {
     return false;
   }
@@ -92,7 +96,8 @@ bool BoxRegion::IsValid() const
   return true;
 }
 
-size_t BoxRegion::Area() const
+size_t
+BoxRegion::Area() const
 {
   // on some system size_t is too small:
   const uint64_t A = Internals->XMax - Internals->XMin + 1;
@@ -107,39 +112,46 @@ size_t BoxRegion::Area() const
   return (size_t)(tmp * C);
 }
 
-unsigned int BoxRegion::GetXMin() const
+unsigned int
+BoxRegion::GetXMin() const
 {
   return Internals->XMin;
 }
 
-unsigned int BoxRegion::GetXMax() const
+unsigned int
+BoxRegion::GetXMax() const
 {
   return Internals->XMax;
 }
 
-unsigned int BoxRegion::GetYMin() const
+unsigned int
+BoxRegion::GetYMin() const
 {
   return Internals->YMin;
 }
 
-unsigned int BoxRegion::GetYMax() const
+unsigned int
+BoxRegion::GetYMax() const
 {
   return Internals->YMax;
 }
 
-unsigned int BoxRegion::GetZMin() const
+unsigned int
+BoxRegion::GetZMin() const
 {
   return Internals->ZMin;
 }
 
-unsigned int BoxRegion::GetZMax() const
+unsigned int
+BoxRegion::GetZMax() const
 {
   return Internals->ZMax;
 }
 
-BoxRegion BoxRegion::BoundingBox(BoxRegion const & b1, BoxRegion const & b2)
+BoxRegion
+BoxRegion::BoundingBox(BoxRegion const & b1, BoxRegion const & b2)
 {
-  BoxRegion r;
+  BoxRegion    r;
   unsigned int xmin = std::min(b1.GetXMin(), b2.GetXMin());
   unsigned int xmax = std::min(b1.GetXMax(), b2.GetXMax());
   unsigned int ymin = std::min(b1.GetYMin(), b2.GetYMin());
@@ -157,18 +169,21 @@ BoxRegion::BoxRegion(const BoxRegion & b)
   *Internals = *b.Internals;
 }
 
-void BoxRegion::operator=(const BoxRegion & b)
+void
+BoxRegion::operator=(const BoxRegion & b)
 {
   assert(b.Internals);
   *Internals = *b.Internals;
 }
 
-BoxRegion BoxRegion::ComputeBoundingBox()
+BoxRegion
+BoxRegion::ComputeBoundingBox()
 {
   return *this;
 }
 
-void BoxRegion::Print(std::ostream & os) const
+void
+BoxRegion::Print(std::ostream & os) const
 {
   Region::Print(os);
   os << "Domain:\n";

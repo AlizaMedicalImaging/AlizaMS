@@ -24,7 +24,10 @@
 
 #include "mdcmObject.h"
 
-namespace mdcm { class VL; }
+namespace mdcm
+{
+class VL;
+}
 
 namespace mdcm
 {
@@ -37,17 +40,21 @@ namespace mdcm
 class MDCM_EXPORT Value : public Object
 {
 public:
-  Value()  {}
+  Value() {}
   ~Value() {}
-  virtual VL GetLength() const = 0;
+  virtual VL
+               GetLength() const = 0;
   virtual void SetLength(VL) = 0;
-  virtual void Clear() = 0;
-  virtual bool operator==(const Value &) const = 0;
+  virtual void
+  Clear() = 0;
+  virtual bool
+  operator==(const Value &) const = 0;
+
 protected:
   friend class DataElement;
   virtual void SetLengthOnly(VL);
 };
 
-}
+} // namespace mdcm
 
 #endif // MDCMVALUE_H

@@ -40,43 +40,57 @@ class MDCM_EXPORT SimpleSubjectWatcher
 public:
   SimpleSubjectWatcher(Subject * s, const char * comment = "");
   virtual ~SimpleSubjectWatcher();
+
 protected:
-  virtual void StartFilter();
-  virtual void EndFilter();
-  virtual void ShowProgress(Subject * caller, const Event & evt);
-  virtual void ShowFileName(Subject * caller, const Event & evt);
-  virtual void ShowIteration();
-  virtual void ShowDataSet(Subject * caller, const Event & evt);
-  virtual void ShowData(Subject * caller, const Event & evt);
-  virtual void ShowAbort();
+  virtual void
+  StartFilter();
+  virtual void
+  EndFilter();
+  virtual void
+  ShowProgress(Subject * caller, const Event & evt);
+  virtual void
+  ShowFileName(Subject * caller, const Event & evt);
+  virtual void
+  ShowIteration();
+  virtual void
+  ShowDataSet(Subject * caller, const Event & evt);
+  virtual void
+  ShowData(Subject * caller, const Event & evt);
+  virtual void
+  ShowAbort();
+
 protected:
-  void TestAbortOn();
-  void TestAbortOff();
+  void
+  TestAbortOn();
+  void
+  TestAbortOff();
+
 private:
-  SmartPointer<Subject> m_Subject;
-  std::string m_Comment;
+  SmartPointer<Subject>                             m_Subject;
+  std::string                                       m_Comment;
   typedef SimpleMemberCommand<SimpleSubjectWatcher> SimpleCommandType;
-  typedef MemberCommand<SimpleSubjectWatcher> CommandType;
-  SmartPointer<SimpleCommandType> m_StartFilterCommand;
-  SmartPointer<SimpleCommandType> m_EndFilterCommand;
-  SmartPointer<CommandType> m_ProgressFilterCommand;
-  SmartPointer<CommandType> m_FileNameFilterCommand;
-  SmartPointer<SimpleCommandType> m_IterationFilterCommand;
-  SmartPointer<SimpleCommandType> m_AbortFilterCommand;
-  SmartPointer<CommandType> m_DataFilterCommand;
-  SmartPointer<CommandType> m_DataSetFilterCommand;
-  unsigned long m_StartTag;
-  unsigned long m_EndTag;
-  unsigned long m_ProgressTag;
-  unsigned long m_FileNameTag;
-  unsigned long m_IterationTag;
-  unsigned long m_AbortTag;
-  unsigned long m_DataTag;
-  unsigned long m_DataSetTag;
-  bool m_TestAbort;
-  SimpleSubjectWatcher(const SimpleSubjectWatcher &);  // Not implemented
-  void operator=(const SimpleSubjectWatcher &);  // Not implemented
+  typedef MemberCommand<SimpleSubjectWatcher>       CommandType;
+  SmartPointer<SimpleCommandType>                   m_StartFilterCommand;
+  SmartPointer<SimpleCommandType>                   m_EndFilterCommand;
+  SmartPointer<CommandType>                         m_ProgressFilterCommand;
+  SmartPointer<CommandType>                         m_FileNameFilterCommand;
+  SmartPointer<SimpleCommandType>                   m_IterationFilterCommand;
+  SmartPointer<SimpleCommandType>                   m_AbortFilterCommand;
+  SmartPointer<CommandType>                         m_DataFilterCommand;
+  SmartPointer<CommandType>                         m_DataSetFilterCommand;
+  unsigned long                                     m_StartTag;
+  unsigned long                                     m_EndTag;
+  unsigned long                                     m_ProgressTag;
+  unsigned long                                     m_FileNameTag;
+  unsigned long                                     m_IterationTag;
+  unsigned long                                     m_AbortTag;
+  unsigned long                                     m_DataTag;
+  unsigned long                                     m_DataSetTag;
+  bool                                              m_TestAbort;
+  SimpleSubjectWatcher(const SimpleSubjectWatcher &); // Not implemented
+  void
+  operator=(const SimpleSubjectWatcher &); // Not implemented
 };
 } // end namespace mdcm
 
-#endif //MDCMSIMPLESUBJECTWATCHER_H
+#endif // MDCMSIMPLESUBJECTWATCHER_H

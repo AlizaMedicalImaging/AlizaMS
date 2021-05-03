@@ -21,30 +21,40 @@ namespace mdcm
 {
 
 /**
-  * This class defines a segment writer.
-  * It writes attributes of group 0x0062.
-  *
-  * PS 3.3 C.8.20.2 and C.8.23
-  */
+ * This class defines a segment writer.
+ * It writes attributes of group 0x0062.
+ *
+ * PS 3.3 C.8.20.2 and C.8.23
+ */
 class MDCM_EXPORT SegmentWriter : public Writer
 {
 public:
-  typedef std::vector< SmartPointer< Segment > > SegmentVector;
+  typedef std::vector<SmartPointer<Segment>> SegmentVector;
   SegmentWriter();
   virtual ~SegmentWriter() override;
-  bool Write() override;
-  unsigned int GetNumberOfSegments() const;
-  void SetNumberOfSegments(const unsigned int);
-  const SegmentVector & GetSegments() const;
-  SegmentVector & GetSegments();
-  SmartPointer<Segment> GetSegment(const unsigned int = 0) const;
-  void AddSegment(SmartPointer<Segment> segment);
-  void SetSegments(SegmentVector & segments);
+  bool
+  Write() override;
+  unsigned int
+  GetNumberOfSegments() const;
+  void
+  SetNumberOfSegments(const unsigned int);
+  const SegmentVector &
+  GetSegments() const;
+  SegmentVector &
+  GetSegments();
+  SmartPointer<Segment>
+  GetSegment(const unsigned int = 0) const;
+  void
+  AddSegment(SmartPointer<Segment> segment);
+  void
+  SetSegments(SegmentVector & segments);
+
 protected:
-  virtual bool PrepareWrite();
+  virtual bool
+                PrepareWrite();
   SegmentVector Segments;
 };
 
-}
+} // namespace mdcm
 
 #endif // MDCMSEGMENTWRITER_H

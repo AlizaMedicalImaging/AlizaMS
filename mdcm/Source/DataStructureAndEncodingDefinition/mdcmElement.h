@@ -44,7 +44,8 @@ namespace mdcm
  *
  */
 
-template<long long T> class EncodingImplementation;
+template <long long T>
+class EncodingImplementation;
 
 /**
  * Class which is used to produce compile errors for an
@@ -54,85 +55,123 @@ template<long long T> class EncodingImplementation;
  * definition.
  */
 template <long long TVR, int TVM>
-class ElementDisableCombinations {};
+class ElementDisableCombinations
+{};
+
 template <>
-class ElementDisableCombinations<VR::OB, VM::VM1_n> {};
+class ElementDisableCombinations<VR::OB, VM::VM1_n>
+{};
+
 template <>
-class ElementDisableCombinations<VR::OW, VM::VM1_n> {};
+class ElementDisableCombinations<VR::OW, VM::VM1_n>
+{};
+
+template <>
+class ElementDisableCombinations<VR::OL, VM::VM1_n>
+{};
+
+template <>
+class ElementDisableCombinations<VR::OD, VM::VM1_n>
+{};
+
+template <>
+class ElementDisableCombinations<VR::OF, VM::VM1_n>
+{};
+
+template <>
+class ElementDisableCombinations<VR::OV, VM::VM1_n>
+{};
+
 template <int TVM>
 class ElementDisableCombinations<VR::OB, TVM>;
+
 template <int TVM>
 class ElementDisableCombinations<VR::OW, TVM>;
+
+template <int TVM>
+class ElementDisableCombinations<VR::OL, TVM>;
+
+template <int TVM>
+class ElementDisableCombinations<VR::OD, TVM>;
+
+template <int TVM>
+class ElementDisableCombinations<VR::OF, TVM>;
+
+template <int TVM>
+class ElementDisableCombinations<VR::OV, TVM>;
 
 /**
  * Element class
  */
-template<long long TVR, int TVM>
+template <long long TVR, int TVM>
 class Element
 {
   enum
   {
-    ElementDisableCombinationsCheck =
-      sizeof(ElementDisableCombinations<TVR, TVM>)
+    ElementDisableCombinationsCheck = sizeof(ElementDisableCombinations<TVR, TVM>)
   };
 
 public:
-  typename VRToType<TVR>::Type Internal[VMToLength<TVM>::Length];
+  typename VRToType<TVR>::Type         Internal[VMToLength<TVM>::Length];
   typedef typename VRToType<TVR>::Type Type;
 
-  static VR GetVR() { return (VR::VRType)TVR; }
-  static VM GetVM() { return (VM::VMType)TVM; }
+  static VR
+  GetVR()
+  {
+    return (VR::VRType)TVR;
+  }
 
-  unsigned long GetLength() const
+  static VM
+  GetVM()
+  {
+    return (VM::VMType)TVM;
+  }
+
+  unsigned long
+  GetLength() const
   {
     return VMToLength<TVM>::Length;
   }
 
-  void Print(std::ostream & _os) const
-  {
-    _os << Internal[0];
-    for(int i=1; i<VMToLength<TVM>::Length; ++i)
-    {
-      _os << "," << Internal[i];
-    }
-  }
-
-  const typename VRToType<TVR>::Type * GetValues() const
+  const typename VRToType<TVR>::Type *
+  GetValues() const
   {
     return Internal;
   }
 
-  const typename VRToType<TVR>::Type & GetValue(unsigned int idx = 0) const
+  const typename VRToType<TVR>::Type &
+  GetValue(unsigned int idx = 0) const
   {
     assert(idx < VMToLength<TVM>::Length);
     return Internal[idx];
   }
 
-  typename VRToType<TVR>::Type & GetValue(unsigned int idx = 0)
+  typename VRToType<TVR>::Type &
+  GetValue(unsigned int idx = 0)
   {
     assert(idx < VMToLength<TVM>::Length);
     return Internal[idx];
   }
 
-  typename VRToType<TVR>::Type operator[] (unsigned int idx) const
-  {
-    return GetValue(idx);
-  }
+  typename VRToType<TVR>::Type operator[](unsigned int idx) const { return GetValue(idx); }
 
-  void SetValue(typename VRToType<TVR>::Type v, unsigned int idx = 0)
+  void
+  SetValue(typename VRToType<TVR>::Type v, unsigned int idx = 0)
   {
     assert(idx < VMToLength<TVM>::Length);
     Internal[idx] = v;
   }
 
-  void SetFromDataElement(DataElement const & de)
+  void
+  SetFromDataElement(DataElement const & de)
   {
     const ByteValue * bv = de.GetByteValue();
-    if(!bv) return;
+    if (!bv)
+      return;
 #ifdef MDCM_WORDS_BIGENDIAN
-    if(de.GetVR() == VR::UN)
+    if (de.GetVR() == VR::UN)
 #else
-    if(de.GetVR() == VR::UN || de.GetVR() == VR::INVALID)
+    if (de.GetVR() == VR::UN || de.GetVR() == VR::INVALID)
 #endif
     {
       Set(de.GetValue());
@@ -143,21 +182,19 @@ public:
     }
   }
 
-  DataElement GetAsDataElement() const
+  DataElement
+  GetAsDataElement() const
   {
-    DataElement ret;
+    DataElement        ret;
     std::ostringstream os;
-    EncodingImplementation<VRToEncoding<TVR>::Mode>::Write(
-      Internal,
-      GetLength(),
-      os);
+    EncodingImplementation<VRToEncoding<TVR>::Mode>::Write(Internal, GetLength(), os);
     ret.SetVR((VR::VRType)TVR);
     assert(ret.GetVR() != VR::SQ);
-    if((VR::VRType)VRToEncoding<TVR>::Mode == VR::VRASCII)
+    if ((VR::VRType)VRToEncoding<TVR>::Mode == VR::VRASCII)
     {
-      if(GetVR() != VR::UI)
+      if (GetVR() != VR::UI)
       {
-        if(os.str().size() % 2)
+        if (os.str().size() % 2)
         {
           os << " ";
         }
@@ -168,136 +205,153 @@ public:
     return ret;
   }
 
-  void Read(std::istream & _is)
+  void
+  Read(std::istream & _is)
   {
-    return
-      EncodingImplementation<VRToEncoding<TVR>::Mode>::Read(
-        Internal, GetLength(), _is);
+    return EncodingImplementation<VRToEncoding<TVR>::Mode>::Read(Internal, GetLength(), _is);
   }
-  void Write(std::ostream & _os) const
+  void
+
+  Write(std::ostream & _os) const
   {
-    return
-      EncodingImplementation<VRToEncoding<TVR>::Mode>::Write(
-        Internal, GetLength(), _os);
+    return EncodingImplementation<VRToEncoding<TVR>::Mode>::Write(Internal, GetLength(), _os);
   }
 
-  void Set(Value const & v)
+  void
+  Set(Value const & v)
   {
-    const ByteValue * bv = dynamic_cast<const ByteValue*>(&v);
-    if (!bv) return;
+    const ByteValue * bv = dynamic_cast<const ByteValue *>(&v);
+    if (!bv)
+      return;
     std::stringstream ss;
-    std::string s = std::string(bv->GetPointer(), bv->GetLength());
+    std::string       s = std::string(bv->GetPointer(), bv->GetLength());
     ss.str(s);
-    EncodingImplementation<VRToEncoding<TVR>::Mode>::Read(
-      Internal, GetLength(), ss);
+    EncodingImplementation<VRToEncoding<TVR>::Mode>::Read(Internal, GetLength(), ss);
   }
 
 protected:
-  void SetNoSwap(Value const & v)
+  void
+  SetNoSwap(Value const & v)
   {
-    const ByteValue * bv = dynamic_cast<const ByteValue*>(&v);
-    if (!bv) return;
+    const ByteValue * bv = dynamic_cast<const ByteValue *>(&v);
+    if (!bv)
+      return;
     std::stringstream ss;
-    std::string s = std::string(bv->GetPointer(), bv->GetLength());
+    std::string       s = std::string(bv->GetPointer(), bv->GetLength());
     ss.str(s);
-    EncodingImplementation<VRToEncoding<TVR>::Mode>::ReadNoSwap(
-      Internal, GetLength(), ss);
+    EncodingImplementation<VRToEncoding<TVR>::Mode>::ReadNoSwap(Internal, GetLength(), ss);
   }
 };
 
 struct ignore_char
 {
-  ignore_char(char c): m_char(c) {}
+  ignore_char(char c)
+    : m_char(c)
+  {}
   char m_char;
 };
 ignore_char const backslash('\\');
 
-inline std::istream& operator>> (std::istream & in, ignore_char const & ic)
+inline std::istream &
+operator>>(std::istream & in, ignore_char const & ic)
 {
-  if (!in.eof()) in.clear(in.rdstate() & ~std::ios_base::failbit);
-  if (in.get() != ic.m_char) in.setstate(std::ios_base::failbit);
+  if (!in.eof())
+    in.clear(in.rdstate() & ~std::ios_base::failbit);
+  if (in.get() != ic.m_char)
+    in.setstate(std::ios_base::failbit);
   return in;
 }
 
 // Implementation to perform formatted read and write
-template<> class EncodingImplementation<VR::VRASCII>
+template <>
+class EncodingImplementation<VR::VRASCII>
 {
 public:
-  template<typename T> // FIXME this should be VRToType<TVR>::Type
-  static inline void ReadComputeLength(
-    T * data, unsigned int & length, std::istream & _is)
+  template <typename T> // may be VRToType<TVR>::Type
+  static inline void
+  ReadComputeLength(T * data, unsigned int & length, std::istream & _is)
   {
-    assert(data);
     length = 0;
-    assert(_is);
-#if 0
-    char sep;
-    while(_is >> data[length++])
+    if (!data)
+      return;
+    while (_is >> std::ws >> data[length++] >> std::ws >> backslash)
     {
-      // Get the separator in between the values
-      assert(_is);
-      _is.get(sep);
-      if(sep == ' ') length--; // FIXME
+      ;;
     }
-#else
-    while(_is >> std::ws >> data[length++] >> std::ws >> backslash)
-    {
-    }
-#endif
   }
 
-  template<typename T> // FIXME this should be VRToType<TVR>::Type
-  static inline void Read(
-    T * data, unsigned long length, std::istream & _is)
+  template <typename T> // may be VRToType<TVR>::Type
+  static inline void
+  Read(T * data, unsigned long length, std::istream & _is)
   {
-    assert(data);
-    assert(length);
-    assert(_is);
-    // TODO what if >> operation fails?
-    // gdcmData/MR00010001.dcm / SpacingBetweenSlices
+    if (!data || length < 1)
+      return;
     _is >> std::ws >> data[0];
-    char sep;
-    for(unsigned long i=1; i<length; ++i)
+    if (length > 1)
     {
-      assert(_is);
-      // Get the separator in between the values
-      _is >> std::ws >> sep;
-      _is >> std::ws >> data[i];
+      char sep;
+      for (unsigned long i = 1; i < length; ++i)
+      {
+        _is >> std::ws >> sep;
+        _is >> std::ws >> data[i];
+      }
     }
   }
 
-  template<typename T>
-  static inline void ReadNoSwap(
-    T * data, unsigned long length, std::istream & _is)
+  template <typename T>
+  static inline void
+  ReadNoSwap(T * data, unsigned long length, std::istream & _is)
   {
     Read(data, length, _is);
   }
 
-  template<typename T>
-  static inline void Write(
-    const T * data, unsigned long length, std::ostream & _os)
+  template <typename T>
+  static inline void
+  Write(const T * data, unsigned long length, std::ostream & _os)
   {
-    assert(data);
-    assert(length);
-    assert(_os);
+    if (!data || length < 1)
+      return;
     _os << data[0];
-    for(unsigned long i=1; i<length; ++i)
+    if (length > 1)
     {
-      assert(_os);
-      _os << "\\" << data[i];
+      for (unsigned long i = 1; i < length; ++i)
+      {
+        _os << "\\" << data[i];
+      }
     }
+  }
+
+  template <typename T> // may be VRToType<TVR>::Type
+  static inline void
+  ReadOne(T & data, unsigned long, std::istream & _is)
+  {
+    _is >> std::ws >> data;
+  }
+
+  template <typename T>
+  static inline void
+  ReadNoSwapOne(T & data, unsigned long l, std::istream & _is)
+  {
+    ReadOne(data, l, _is);
+  }
+
+  template <typename T>
+  static inline void
+  WriteOne(const T & data, unsigned long, std::ostream & _os)
+  {
+    _os << data;
   }
 };
 
 //#define VRDS16ILLEGAL
 #ifdef VRDS16ILLEGAL
 template <typename Float>
-std::string to_string (Float data) {
+std::string
+to_string(Float data)
+{
   std::stringstream in;
-  int const digits =
-    static_cast< int >(
-      - std::log(std::numeric_limits<Float>::epsilon())
-        / static_cast< Float >(std::log(10.0)));
+  int const         digits =
+    static_cast<int>(-std::log(std::numeric_limits<Float>::epsilon()) / static_cast<Float>(std::log(10.0)));
   if (in << std::dec << std::setprecision(digits) << data)
   {
     return (in.str());
@@ -309,10 +363,11 @@ std::string to_string (Float data) {
 }
 #else
 // http://stackoverflow.com/questions/32631178/writing-ieee-754-1985-double-as-ascii-on-a-limited-16-bytes-string
-static inline void clean(char * mant)
+static inline void
+clean(char * mant)
 {
   char * ix = mant + strlen(mant) - 1;
-  while(('0' == *ix) && (ix > mant))
+  while (('0' == *ix) && (ix > mant))
   {
     *ix-- = '\0';
   }
@@ -322,13 +377,15 @@ static inline void clean(char * mant)
   }
 }
 
-static int add1(char * buf, int n)
+static int
+add1(char * buf, int n)
 {
-  if (n < 0) return 1;
+  if (n < 0)
+    return 1;
   if (buf[n] == '9')
   {
     buf[n] = '0';
-    return add1(buf, n-1);
+    return add1(buf, n - 1);
   }
   else
   {
@@ -337,40 +394,44 @@ static int add1(char * buf, int n)
   return 0;
 }
 
-static int doround(char * buf, unsigned int n)
+static int
+doround(char * buf, unsigned int n)
 {
   char c;
-  if (n >= strlen(buf)) return 0;
+  if (n >= strlen(buf))
+    return 0;
   c = buf[n];
   buf[n] = 0;
-  if ((c >= '5') && (c <= '9')) return add1(buf, n-1);
+  if ((c >= '5') && (c <= '9'))
+    return add1(buf, n - 1);
   return 0;
 }
 
-static int roundat(char * buf, unsigned int i, int iexp)
+static int
+roundat(char * buf, unsigned int i, int iexp)
 {
   if (doround(buf, i) != 0)
   {
     iexp += 1;
-    switch(iexp)
+    switch (iexp)
     {
-    case -2:
-      strcpy(buf, ".01");
-      break;
-    case -1:
-      strcpy(buf, ".1");
-      break;
-    case 0:
-      strcpy(buf, "1.");
-      break;
-    case 1:
-      strcpy(buf, "10");
-      break;
-    case 2:
-      strcpy(buf, "100");
-      break;
-    default:
-      sprintf(buf, "1e%d", iexp);
+      case -2:
+        strcpy(buf, ".01");
+        break;
+      case -1:
+        strcpy(buf, ".1");
+        break;
+      case 0:
+        strcpy(buf, "1.");
+        break;
+      case 1:
+        strcpy(buf, "10");
+        break;
+      case 2:
+        strcpy(buf, "100");
+        break;
+      default:
+        sprintf(buf, "1e%d", iexp);
     }
     return 1;
   }
@@ -378,7 +439,8 @@ static int roundat(char * buf, unsigned int i, int iexp)
 }
 
 template <typename Float>
-static void x16printf(char * buf, int size, Float f)
+static void
+x16printf(char * buf, int size, Float f)
 {
   char line[40];
   char * mant = line + 1;
@@ -405,8 +467,8 @@ static void x16printf(char * buf, int size, Float f)
   lexp = sprintf(exp, "e%d", iexp);
   if ((iexp >= size) || (iexp < -3))
   {
-    i = roundat(mant, size - 1 -lexp, iexp);
-    if(i == 1)
+    i = roundat(mant, size - 1 - lexp, iexp);
+    if (i == 1)
     {
       strcpy(buf, mant);
       return;
@@ -414,7 +476,7 @@ static void x16printf(char * buf, int size, Float f)
     buf[0] = mant[0];
     buf[1] = '.';
     strncpy(buf + i + 2, mant + 1, size - 2 - lexp);
-    buf[size-lexp] = 0;
+    buf[size - lexp] = 0;
     clean(buf);
     strcat(buf, exp);
   }
@@ -446,17 +508,17 @@ static void x16printf(char * buf, int size, Float f)
       return;
     }
     buf[0] = '.';
-    for(int j = 0; j < -1 - iexp; ++j)
+    for (int j = 0; j < -1 - iexp; ++j)
     {
-      buf[j+1] = '0';
+      buf[j + 1] = '0';
     }
-/* FIXME dead code
-    if ((i == 1) && (iexp != -1))
-    {
-      buf[-iexp] = '1';
-      buf++;
-    }
-*/
+    /* FIXME dead code
+        if ((i == 1) && (iexp != -1))
+        {
+          buf[-iexp] = '1';
+          buf++;
+        }
+    */
     strncpy(buf - iexp, mant, size + 1 + iexp);
     buf[size] = 0;
     clean(buf);
@@ -464,117 +526,154 @@ static void x16printf(char * buf, int size, Float f)
 }
 #endif
 
-template<> inline void EncodingImplementation<VR::VRASCII>::Write(
-  const double * data,
-  unsigned long length,
-  std::ostream & _os)
+template <>
+inline void
+EncodingImplementation<VR::VRASCII>::Write(const double * data, unsigned long length, std::ostream & _os)
 {
-  assert(data);
-  assert(length);
-  assert(_os);
+  if (!data || length < 1)
+    return;
 #ifdef VRDS16ILLEGAL
   _os << to_string(data[0]);
 #else
-  char buf[16+1];
+  char buf[16 + 1];
   x16printf(buf, 16, data[0]);
   _os << buf;
 #endif
-  for(unsigned long i=1; i<length; ++i)
+  if (length > 1)
   {
-    assert(_os);
+    for (unsigned long i = 1; i < length; ++i)
+    {
 #ifdef VRDS16ILLEGAL
-    _os << "\\" << to_string(data[i]);
+      _os << "\\" << to_string(data[i]);
 #else
-    x16printf(buf, 16, data[i]);
-    _os << "\\" << buf;
+      x16printf(buf, 16, data[i]);
+      _os << "\\" << buf;
 #endif
+    }
   }
 }
 
-// Implementation to perform binary read and write
-// TODO rewrite operation so that either:
-// #1. dummy implementation use a pointer to Internal and do ++p (faster)
-// #2. Actually do some meta programming to unroll the loop
-// (no notion of order in VM)
-template<> class EncodingImplementation<VR::VRBINARY>
+template <>
+class EncodingImplementation<VR::VRBINARY>
 {
 public:
-  template<typename T> // FIXME this should be VRToType<TVR>::Type
-    static inline void ReadComputeLength(
-      T * data, unsigned int & length, std::istream & _is)
+  template <typename T> // may be VRToType<TVR>::Type
+  static inline void
+  ReadComputeLength(T * data, unsigned int & length, std::istream & _is)
   {
+    if (!data)
+    {
+      length = 0;
+      return;
+    }
     const unsigned int type_size = sizeof(T);
-    assert(data);
     length /= type_size;
-    assert(_is);
-    _is.read(reinterpret_cast<char*>(data+0), type_size);
-    for(unsigned long i=1; i<length; ++i)
+    for (unsigned long i = 0; i < length; ++i)
     {
-      assert(_is);
-      _is.read(reinterpret_cast<char*>(data+i), type_size);
+      _is.read(reinterpret_cast<char *>(data + i), type_size);
     }
   }
 
-  template<typename T>
-  static inline void ReadNoSwap(
-    T * data, unsigned long length, std::istream & _is)
+  template <typename T>
+  static inline void
+  ReadNoSwap(T * data, unsigned long length, std::istream & _is)
   {
+    if (!data || length < 1)
+      return;
     const unsigned int type_size = sizeof(T);
-    assert(data);
-    assert(length);
-    assert(_is);
-    _is.read(reinterpret_cast<char*>(data+0), type_size);
-    for(unsigned long i=1; i<length; ++i)
+    for (unsigned long i = 0; i < length; ++i)
     {
-      assert(_is);
-      _is.read(reinterpret_cast<char*>(data+i), type_size);
+      _is.read(reinterpret_cast<char *>(data + i), type_size);
     }
   }
 
-  template<typename T>
-  static inline void Read(
-    T * data, unsigned long length, std::istream & _is)
+  template <typename T>
+  static inline void
+  Read(T * data, unsigned long length, std::istream & _is)
   {
+    if (!data || length < 1)
+      return;
     const unsigned int type_size = sizeof(T);
-    assert(data);
-    assert(length);
-    assert(_is);
-    _is.read(reinterpret_cast<char*>(data+0), type_size);
-    for(unsigned long i=1; i<length; ++i)
+    for (unsigned long i = 0; i < length; ++i)
     {
-      assert(_is);
-      _is.read(reinterpret_cast<char*>(data+i), type_size);
+      _is.read(reinterpret_cast<char *>(data + i), type_size);
     }
-    SwapperNoOp::SwapArray(data,length);
+    SwapperNoOp::SwapArray(data, length);
   }
 
-  template<typename T>
-  static inline void Write(
-    const T * data, unsigned long length, std::ostream & _os)
+  template <typename T>
+  static inline void
+  Write(const T * data, unsigned long length, std::ostream & _os)
+  {
+    if (!data || length < 1)
+      return;
+    const unsigned int type_size = sizeof(T);
+    for (unsigned long i = 0; i < length; ++i)
+    {
+      const T swappedData = SwapperNoOp::Swap(data[i]);
+      _os.write(reinterpret_cast<const char *>(&swappedData), type_size);
+    }
+  }
+
+  template <typename T> // may be VRToType<TVR>::Type
+  static inline void
+  ReadComputeLengthOne(T & data, unsigned int & length, std::istream & _is)
   {
     const unsigned int type_size = sizeof(T);
-    assert(data);
-    assert(length);
-    assert(_os);
-    T swappedData = SwapperNoOp::Swap(data[0]);
-    _os.write(reinterpret_cast<const char*>(&swappedData), type_size);
-    for(unsigned long i=1; i<length;++i)
+    length /= type_size;
+	char * cdata = reinterpret_cast<char *>(&data);
+    for (unsigned long i = 0; i < length; ++i)
     {
-      assert(_os);
-      swappedData = SwapperNoOp::Swap(data[i]);
-      _os.write(reinterpret_cast<const char*>(&swappedData), type_size);
+      _is.read(cdata + i, type_size);
+    }
+  }
+
+  template <typename T>
+  static inline void
+  ReadNoSwapOne(T & data, unsigned long length, std::istream & _is)
+  {
+    const unsigned int type_size = sizeof(T);
+	char * cdata = reinterpret_cast<char *>(&data);
+    for (unsigned long i = 0; i < length; ++i)
+    {
+      _is.read(cdata + i, type_size);
+    }
+  }
+
+  template <typename T>
+  static inline void
+  ReadOne(T & data, unsigned long length, std::istream & _is)
+  {
+    const unsigned int type_size = sizeof(T);
+	char * cdata = reinterpret_cast<char *>(&data);
+    for (unsigned long i = 0; i < length; ++i)
+    {
+      _is.read(cdata + i, type_size);
+    }
+    SwapperNoOp::SwapArray(cdata, length);
+  }
+
+  template <typename T>
+  static inline void
+  WriteOne(const T & data, unsigned long length, std::ostream & _os)
+  {
+    const unsigned int type_size = sizeof(T);
+	const char * cdata = reinterpret_cast<const char *>(&data);
+    for (unsigned long i = 0; i < length; ++i)
+    {
+      const char * swappedData = SwapperNoOp::Swap(cdata + i);
+      _os.write(swappedData, type_size);
     }
   }
 };
 
 // Implementation for the undefined length (dynamically allocated array)
-template<long long TVR>
+template <long long TVR>
 class Element<TVR, VM::VM1_n>
 {
   enum
   {
-    ElementDisableCombinationsCheck =
-      sizeof (ElementDisableCombinations<TVR, VM::VM1_n>)
+    ElementDisableCombinationsCheck = sizeof(ElementDisableCombinations<TVR, VM::VM1_n>)
   };
 
 public:
@@ -584,29 +683,45 @@ public:
     Length = 0;
     Save = false;
   }
+
   ~Element()
   {
-    if(Save)
+    if (Save)
     {
-      delete[] Internal;
+      if (Internal)
+        delete[] Internal;
     }
     Internal = NULL;
   }
 
-  static VR  GetVR() { return (VR::VRType)TVR; }
-  static VM  GetVM() { return VM::VM1_n; }
+  static VR
+  GetVR()
+  {
+    return (VR::VRType)TVR;
+  }
 
-  // SetLength should really be protected anyway, all operation
+  static VM
+  GetVM()
+  {
+    return VM::VM1_n;
+  }
+
+  // SetLength should be protected anyway, all operation
   // should go through SetArray
-  unsigned long GetLength() const { return Length; }
+  unsigned long
+  GetLength() const
+  {
+    return Length;
+  }
   typedef typename VRToType<TVR>::Type Type;
 
-  void SetLength(unsigned long len)
+  void
+  SetLength(unsigned long len)
   {
     const unsigned int size = sizeof(Type);
-    if(len)
+    if (len)
     {
-      if(len > Length)
+      if (len > Length)
       {
         assert((len / size) * size == len);
         Type * internal;
@@ -614,13 +729,13 @@ public:
         {
           internal = new Type[len / size];
         }
-        catch(std::bad_alloc&)
+        catch (std::bad_alloc &)
         {
           return;
         }
         assert(Save == false);
-        Save = true; // ?
-        if(Internal)
+        Save = true; //
+        if (Internal)
         {
           memcpy(internal, Internal, len);
           delete[] Internal;
@@ -631,10 +746,10 @@ public:
     Length = len / size;
   }
 
-  // If save is set to zero user should not delete the pointer
-  void SetArray(const Type * array, unsigned long len, bool save = false)
+  void
+  SetArray(const Type * array, unsigned long len, bool save = false)
   {
-    if(save)
+    if (save)
     {
       SetLength(len);
       memcpy(Internal, array, len);
@@ -642,77 +757,82 @@ public:
     }
     else
     {
-      // TODO rewrite this stupid code
       assert(Length == 0);
-      assert(Internal == 0);
+      assert(Internal == NULL);
       assert(Save == false);
       Length = len / sizeof(Type);
-      if((len / sizeof(Type)) * sizeof(Type) != len)
+      if ((len / sizeof(Type)) * sizeof(Type) != len)
       {
         Internal = NULL;
         Length = 0;
       }
       else
       {
-        Internal = const_cast<Type*>(array);
+        Internal = const_cast<Type *>(array);
       }
     }
     Save = save;
   }
 
-  void SetValue(typename VRToType<TVR>::Type v, unsigned int idx = 0)
+  void
+  SetValue(typename VRToType<TVR>::Type v, unsigned int idx = 0)
   {
     assert(idx < Length);
     Internal[idx] = v;
   }
 
-  const typename VRToType<TVR>::Type & GetValue(unsigned int idx = 0) const
+  const typename VRToType<TVR>::Type &
+  GetValue(unsigned int idx = 0) const
   {
     assert(idx < Length);
     return Internal[idx];
   }
 
-  typename VRToType<TVR>::Type & GetValue(unsigned int idx = 0)
+  typename VRToType<TVR>::Type &
+  GetValue(unsigned int idx = 0)
   {
     return Internal[idx];
   }
 
-  typename VRToType<TVR>::Type operator[] (unsigned int idx) const
+  typename VRToType<TVR>::Type operator[](unsigned int idx) const
   {
     return GetValue(idx);
   }
 
-  void Set(Value const & v)
+  void
+  Set(Value const & v)
   {
-    const ByteValue * bv = dynamic_cast<const ByteValue*>(&v);
-    if(!bv) return;
-    if((VR::VRType)(VRToEncoding<TVR>::Mode) == VR::VRBINARY)
+    const ByteValue * bv = dynamic_cast<const ByteValue *>(&v);
+    if (!bv)
+      return;
+    if ((VR::VRType)(VRToEncoding<TVR>::Mode) == VR::VRBINARY)
     {
-      const Type * array = (const Type*)bv->GetVoidPointer();
-      if(array)
+      const Type * array = (const Type *)bv->GetVoidPointer();
+      if (array)
       {
-        assert(Internal == 0);
+        assert(Internal == NULL);
         SetArray(array, bv->GetLength());
       }
     }
     else
     {
       std::stringstream ss;
-      std::string s = std::string(bv->GetPointer(), bv->GetLength());
+      std::string       s = std::string(bv->GetPointer(), bv->GetLength());
       ss.str(s);
-      EncodingImplementation<VRToEncoding<TVR>::Mode>::Read(Internal,
-        GetLength(),ss);
+      EncodingImplementation<VRToEncoding<TVR>::Mode>::Read(Internal, GetLength(), ss);
     }
   }
 
-  void SetFromDataElement(DataElement const & de)
+  void
+  SetFromDataElement(DataElement const & de)
   {
     const ByteValue * bv = de.GetByteValue();
-    if(!bv) return;
+    if (!bv)
+      return;
 #ifdef MDCM_WORDS_BIGENDIAN
-    if(de.GetVR() == VR::UN)
+    if (de.GetVR() == VR::UN)
 #else
-    if(de.GetVR() == VR::UN || de.GetVR() == VR::INVALID)
+    if (de.GetVR() == VR::UN || de.GetVR() == VR::INVALID)
 #endif
     {
       Set(de.GetValue());
@@ -724,49 +844,56 @@ public:
   }
 
   // Need to be placed after definition of EncodingImplementation<VR::VRASCII>
-  void WriteASCII(std::ostream & os) const
+  void
+  WriteASCII(std::ostream & os) const
   {
     return EncodingImplementation<VR::VRASCII>::Write(Internal, GetLength(), os);
   }
 
   // Implementation of Print is common to all Mode (ASCII/Binary)
-  void Print(std::ostream & _os) const
+  void
+  Print(std::ostream & _os) const
   {
-    assert(Length);
-    assert(Internal);
+    if (!Internal || Length < 1)
+      return;
     _os << Internal[0];
-    const unsigned long length = GetLength() < 25 ? GetLength() : 25;
-    for(unsigned long i=1; i<length; ++i) _os << "," << Internal[i];
+    if (Length > 1)
+    {
+      const unsigned long length = Length < 25 ? Length : 25; //
+      for (unsigned long i = 1; i < length; ++i)
+        _os << "," << Internal[i];
+    }
   }
 
-  void Read(std::istream & _is)
+  void
+  Read(std::istream & _is)
   {
-    if(!Internal) return;
-    EncodingImplementation<VRToEncoding<TVR>::Mode>::Read(
-      Internal, GetLength(), _is);
+    if (!Internal)
+      return;
+    EncodingImplementation<VRToEncoding<TVR>::Mode>::Read(Internal, GetLength(), _is);
   }
 
-  void Write(std::ostream & _os) const
+  void
+  Write(std::ostream & _os) const
   {
-    EncodingImplementation<VRToEncoding<TVR>::Mode>::Write(
-      Internal, GetLength(), _os);
+    EncodingImplementation<VRToEncoding<TVR>::Mode>::Write(Internal, GetLength(), _os);
   }
 
-  DataElement GetAsDataElement() const
+  DataElement
+  GetAsDataElement() const
   {
     DataElement ret;
     ret.SetVR((VR::VRType)TVR);
     assert(ret.GetVR() != VR::SQ);
-    if(Internal)
+    if (Internal)
     {
       std::ostringstream os;
-      EncodingImplementation<VRToEncoding<TVR>::Mode>::Write(
-        Internal, GetLength(), os);
-      if((VR::VRType)VRToEncoding<TVR>::Mode == VR::VRASCII)
+      EncodingImplementation<VRToEncoding<TVR>::Mode>::Write(Internal, GetLength(), os);
+      if ((VR::VRType)VRToEncoding<TVR>::Mode == VR::VRASCII)
       {
-        if(GetVR() != VR::UI)
+        if (GetVR() != VR::UI)
         {
-          if(os.str().size() % 2)
+          if (os.str().size() % 2)
           {
             os << " ";
           }
@@ -780,182 +907,206 @@ public:
 
   Element(const Element & _val)
   {
-    if(this != &_val)
+    if (this != &_val)
     {
       *this = _val;
     }
   }
 
-  Element &operator=(const Element & _val)
+  Element &
+  operator=(const Element & _val)
   {
-    Length = 0;
-    Internal = 0;
+    if (Length > 0 && Internal != NULL)
+    {
+      // TODO check delete
+      Internal = NULL;
+      Length = 0;
+    }
     SetArray(_val.Internal, _val.Length, true);
     return *this;
   }
 
 protected:
-  void SetNoSwap(Value const & v)
+  void
+  SetNoSwap(Value const & v)
   {
-    const ByteValue * bv = dynamic_cast<const ByteValue*>(&v);
-    if(!bv) return;
-    if((VR::VRType)(VRToEncoding<TVR>::Mode) == VR::VRBINARY)
+    const ByteValue * bv = dynamic_cast<const ByteValue *>(&v);
+    if (!bv)
+      return;
+    if ((VR::VRType)(VRToEncoding<TVR>::Mode) == VR::VRBINARY)
     {
-      const Type * array = (const Type*)bv->GetVoidPointer();
-      if(array)
+      const Type * array = (const Type *)bv->GetVoidPointer();
+      if (array)
       {
-        assert(Internal == 0);
+        assert(Internal == NULL);
         SetArray(array, bv->GetLength());
       }
     }
     else
     {
       std::stringstream ss;
-      std::string s = std::string(bv->GetPointer(), bv->GetLength());
+      std::string       s = std::string(bv->GetPointer(), bv->GetLength());
       ss.str(s);
-      EncodingImplementation<VRToEncoding<TVR>::Mode>::ReadNoSwap(
-        Internal, GetLength(), ss);
+      EncodingImplementation<VRToEncoding<TVR>::Mode>::ReadNoSwap(Internal, GetLength(), ss);
     }
   }
 
 private:
   typename VRToType<TVR>::Type * Internal;
-  unsigned long Length;
-  bool Save;
+  unsigned long                  Length;
+  bool                           Save;
 };
 
 // Partial specialization for derivatives of 1-n : 2-n, 3-n
-template<long long TVR>
+template <long long TVR>
 class Element<TVR, VM::VM1_2> : public Element<TVR, VM::VM1_n>
 {
 public:
   typedef Element<TVR, VM::VM1_n> Parent;
-  void SetLength(int len)
+  void
+  SetLength(int len)
   {
-    if(!(len >= 1 && len <= 2)) return;
+    if (!(len >= 1 && len <= 2))
+      return;
     Parent::SetLength(len);
   }
 };
 
-template<long long TVR>
+template <long long TVR>
 class Element<TVR, VM::VM3_4> : public Element<TVR, VM::VM1_n>
 {
 public:
   typedef Element<TVR, VM::VM1_n> Parent;
-  void SetLength(int len)
+  void
+  SetLength(int len)
   {
-    if(!(len >= 3 && len <= 4)) return;
+    if (!(len >= 3 && len <= 4))
+      return;
     Parent::SetLength(len);
   }
 };
 
-template<long long TVR>
+template <long long TVR>
 class Element<TVR, VM::VM2_4> : public Element<TVR, VM::VM1_n>
 {
 public:
   typedef Element<TVR, VM::VM1_n> Parent;
-  void SetLength(int len)
+  void
+  SetLength(int len)
   {
-    if(!(len >= 2 && len <= 4)) return;
+    if (!(len >= 2 && len <= 4))
+      return;
     Parent::SetLength(len);
   }
 };
 
-template<long long TVR>
+template <long long TVR>
 class Element<TVR, VM::VM2_n> : public Element<TVR, VM::VM1_n>
 {
   enum
   {
-    ElementDisableCombinationsCheck =
-      sizeof (ElementDisableCombinations<TVR, VM::VM2_n>)
+    ElementDisableCombinationsCheck = sizeof(ElementDisableCombinations<TVR, VM::VM2_n>)
   };
+
 public:
   typedef Element<TVR, VM::VM1_n> Parent;
-  void SetLength(int len)
+  void
+  SetLength(int len)
   {
-    if(len <= 1) return;
+    if (len <= 1)
+      return;
     Parent::SetLength(len);
   }
 };
 
-template<long long TVR>
+template <long long TVR>
 class Element<TVR, VM::VM2_2n> : public Element<TVR, VM::VM2_n>
 {
   enum
   {
-    ElementDisableCombinationsCheck =
-      sizeof (ElementDisableCombinations<TVR, VM::VM2_2n>)
+    ElementDisableCombinationsCheck = sizeof(ElementDisableCombinations<TVR, VM::VM2_2n>)
   };
+
 public:
   typedef Element<TVR, VM::VM2_n> Parent;
-  void SetLength(int len)
+  void
+  SetLength(int len)
   {
-    if(len % 2) return;
+    if (len % 2)
+      return;
     Parent::SetLength(len);
   }
 };
 
-template<long long TVR>
+template <long long TVR>
 class Element<TVR, VM::VM3_n> : public Element<TVR, VM::VM1_n>
 {
   enum
   {
-    ElementDisableCombinationsCheck =
-      sizeof (ElementDisableCombinations<TVR, VM::VM3_n>)
+    ElementDisableCombinationsCheck = sizeof(ElementDisableCombinations<TVR, VM::VM3_n>)
   };
+
 public:
   typedef Element<TVR, VM::VM1_n> Parent;
-  void SetLength(int len)
+  void
+  SetLength(int len)
   {
-    if(len <= 2) return;
+    if (len <= 2)
+      return;
     Parent::SetLength(len);
   }
 };
 
-template<long long TVR>
+template <long long TVR>
 class Element<TVR, VM::VM3_3n> : public Element<TVR, VM::VM3_n>
 {
   enum
   {
-    ElementDisableCombinationsCheck =
-      sizeof (ElementDisableCombinations<TVR, VM::VM3_3n>)
+    ElementDisableCombinationsCheck = sizeof(ElementDisableCombinations<TVR, VM::VM3_3n>)
   };
+
 public:
   typedef Element<TVR, VM::VM3_n> Parent;
-  void SetLength(int len)
+  void
+  SetLength(int len)
   {
-    if(len % 3) return;
+    if (len % 3)
+      return;
     Parent::SetLength(len);
   }
 };
 
-// only 0010 1010 AS 1 Patient's Age
-template<>
+template <>
 class Element<VR::AS, VM::VM5>
 {
   enum
   {
-    ElementDisableCombinationsCheck =
-      sizeof (ElementDisableCombinations<VR::AS, VM::VM5>)
+    ElementDisableCombinationsCheck = sizeof(ElementDisableCombinations<VR::AS, VM::VM5>)
   };
+
 public:
-  char Internal[VMToLength<VM::VM5>::Length*sizeof(VRToType<VR::AS>::Type)];
-  void Print(std::ostream & _os) const
+  char Internal[VMToLength<VM::VM5>::Length * sizeof(VRToType<VR::AS>::Type)];
+  void
+  Print(std::ostream & _os) const
   {
     _os << Internal;
   }
-  unsigned long GetLength() const
+
+  unsigned long
+  GetLength() const
   {
     return VMToLength<VM::VM5>::Length;
   }
 };
 
-template<>
-class Element<VR::OB, VM::VM1> : public Element<VR::OB, VM::VM1_n> {};
+template <>
+class Element<VR::OB, VM::VM1> : public Element<VR::OB, VM::VM1_n>
+{};
 
-template<>
-class Element<VR::OW, VM::VM1> : public Element<VR::OW, VM::VM1_n> {};
+template <>
+class Element<VR::OW, VM::VM1> : public Element<VR::OW, VM::VM1_n>
+{};
 
 } // namespace mdcm
 
-#endif //MDCMELEMENT_H
+#endif // MDCMELEMENT_H

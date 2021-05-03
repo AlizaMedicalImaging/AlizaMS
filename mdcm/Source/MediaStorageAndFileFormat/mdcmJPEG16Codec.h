@@ -38,13 +38,18 @@ class JPEG16Codec : public JPEGCodec
 public:
   JPEG16Codec();
   ~JPEG16Codec() override;
-  bool DecodeByStreams(std::istream &, std::ostream &) override;
-  bool InternalCode(const char *, size_t, std::ostream &) override;
-  bool GetHeaderInfo(std::istream &, TransferSyntax &) override;
+  bool
+  DecodeByStreams(std::istream &, std::ostream &) override;
+  bool
+  InternalCode(const char *, size_t, std::ostream &) override;
+  bool
+  GetHeaderInfo(std::istream &, TransferSyntax &) override;
 
 protected:
-  bool IsStateSuspension() const override;
-  bool EncodeBuffer(std::ostream &, const char *, size_t) override;
+  bool
+  IsStateSuspension() const override;
+  bool
+  EncodeBuffer(std::ostream &, const char *, size_t) override;
 
 private:
   JPEGInternals_16BIT * Internals;
@@ -52,4 +57,4 @@ private:
 
 } // end namespace mdcm
 
-#endif //MDCMJPEG16CODEC_H
+#endif // MDCMJPEG16CODEC_H

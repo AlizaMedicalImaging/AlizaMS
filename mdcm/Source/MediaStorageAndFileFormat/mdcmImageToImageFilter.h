@@ -37,10 +37,12 @@ class MDCM_EXPORT ImageToImageFilter : public PixmapToPixmapFilter
 public:
   ImageToImageFilter();
   ~ImageToImageFilter() {}
-  Image & GetInput();
-  const Image & GetOutput() const;
+  Image &
+  GetInput();
+  const Image &
+  GetOutput() const;
 };
 
 } // end namespace mdcm
 
-#endif //MDCMIMAGETOIMAGEFILTER_H
+#endif // MDCMIMAGETOIMAGEFILTER_H

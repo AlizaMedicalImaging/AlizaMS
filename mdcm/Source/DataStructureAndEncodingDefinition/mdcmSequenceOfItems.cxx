@@ -25,69 +25,77 @@
 namespace mdcm
 {
 
-void SequenceOfItems::AddItem(Item const & item)
+void
+SequenceOfItems::AddItem(Item const & item)
 {
   Items.push_back(item);
-  if(!SequenceLengthField.IsUndefined())
+  if (!SequenceLengthField.IsUndefined())
   {
     assert(0); // TODO
   }
 }
 
-Item & SequenceOfItems::AddNewUndefinedLengthItem()
+Item &
+SequenceOfItems::AddNewUndefinedLengthItem()
 {
-	Item itemToAdd ;
-	itemToAdd.SetVLToUndefined();
-	this->AddItem(itemToAdd);
-	return GetItem(this->GetNumberOfItems());
+  Item itemToAdd;
+  itemToAdd.SetVLToUndefined();
+  this->AddItem(itemToAdd);
+  return GetItem(this->GetNumberOfItems());
 }
 
-void SequenceOfItems::Clear()
+void
+SequenceOfItems::Clear()
 {
   Items.clear();
   assert(SequenceLengthField.IsUndefined());
 }
 
-bool SequenceOfItems::RemoveItemByIndex(const SizeType position)
+bool
+SequenceOfItems::RemoveItemByIndex(const SizeType position)
 {
-  if(position < 1 || position > Items.size())
+  if (position < 1 || position > Items.size())
   {
     return false;
   }
-  Items.erase (Items.begin() + position - 1);
+  Items.erase(Items.begin() + position - 1);
   return true;
 }
 
-Item & SequenceOfItems::GetItem(SizeType position)
+Item &
+SequenceOfItems::GetItem(SizeType position)
 {
-  if(position < 1 || position > Items.size())
+  if (position < 1 || position > Items.size())
   {
     mdcmAlwaysWarnMacro("SQ: invalid index");
     return empty;
   }
-  return Items[position-1];
+  return Items[position - 1];
 }
 
-const Item & SequenceOfItems::GetItem(SizeType position) const
+const Item &
+SequenceOfItems::GetItem(SizeType position) const
 {
-  if(position < 1 || position > Items.size())
+  if (position < 1 || position > Items.size())
   {
     mdcmAlwaysWarnMacro("SQ: invalid index");
     return empty;
   }
-  return Items[position-1];
+  return Items[position - 1];
 }
 
-void SequenceOfItems::SetLengthToUndefined()
+void
+SequenceOfItems::SetLengthToUndefined()
 {
   SequenceLengthField = 0xFFFFFFFF;
 }
 
-bool SequenceOfItems::FindDataElement(const Tag & t) const
+bool
+SequenceOfItems::FindDataElement(const Tag & t) const
 {
   ConstIterator it = Begin();
-  bool found = false;
-  for(; it != End() && !found; ++it)
+  bool          found = false;
+  for (; it != End() && !found; ++it)
   {
     const Item & item = *it;
     found = item.FindDataElement(t);

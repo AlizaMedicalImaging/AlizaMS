@@ -27,34 +27,34 @@
 namespace mdcm
 {
 
-VL CP246ExplicitDataElement::GetLength() const
+VL
+CP246ExplicitDataElement::GetLength() const
 {
-  if(ValueLengthField.IsUndefined())
+  if (ValueLengthField.IsUndefined())
   {
     assert(ValueField->GetLength().IsUndefined());
-    Value * p = ValueField;
-    SequenceOfItems * sq = dynamic_cast<SequenceOfItems*>(p);
-    if(sq)
+    Value *           p = ValueField;
+    SequenceOfItems * sq = dynamic_cast<SequenceOfItems *>(p);
+    if (sq)
     {
-      return (TagField.GetLength() + VRField.GetLength() +
-        ValueLengthField.GetLength() + sq->ComputeLength<CP246ExplicitDataElement>());
+      return (TagField.GetLength() + VRField.GetLength() + ValueLengthField.GetLength() +
+              sq->ComputeLength<CP246ExplicitDataElement>());
     }
-    SequenceOfFragments * sf = dynamic_cast<SequenceOfFragments*>(p);
-    if(sf)
+    SequenceOfFragments * sf = dynamic_cast<SequenceOfFragments *>(p);
+    if (sf)
     {
       assert(VRField & VR::OB_OW);
-      return (TagField.GetLength() + VRField.GetLength()
-        + ValueLengthField.GetLength() + sf->ComputeLength());
+      return (TagField.GetLength() + VRField.GetLength() + ValueLengthField.GetLength() + sf->ComputeLength());
     }
     assert(0);
-  return 0;
+    return 0;
   }
   else
   {
     // Each time VR::GetLength() is 2 then Value Length is coded in 2
     //                              4 then Value Length is coded in 4
     assert(!ValueField || ValueField->GetLength() == ValueLengthField);
-    return (TagField.GetLength() + 2*VRField.GetLength() + ValueLengthField);
+    return (TagField.GetLength() + 2 * VRField.GetLength() + ValueLengthField);
   }
 }
 

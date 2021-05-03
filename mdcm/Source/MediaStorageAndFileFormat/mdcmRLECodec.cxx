@@ -71,59 +71,67 @@ separately and not cross a row boundary.
  * output nothing
  * Endif
  * Endloop
-*/
+ */
 
 class RLEHeader
 {
 public:
   uint32_t NumSegments;
   uint32_t Offset[15];
-  void Print(std::ostream &os)
+  void
+  Print(std::ostream & os)
   {
     os << "NumSegments:" << NumSegments << "\n";
-    for(int i=0; i<15; ++i) { os << i << ":" << Offset[i] << "\n"; }
+    for (int i = 0; i < 15; ++i)
+    {
+      os << i << ":" << Offset[i] << "\n";
+    }
   }
 };
 
 class RLEFrame
 {
 public:
-  bool Read(std::istream &is)
+  bool
+  Read(std::istream & is)
   {
     // header 64 bytes
-    is.read((char*)(&Header), sizeof(uint32_t)*16);
-    assert(sizeof(uint32_t)*16 == 64);
+    is.read((char *)(&Header), sizeof(uint32_t) * 16);
+    assert(sizeof(uint32_t) * 16 == 64);
     assert(sizeof(RLEHeader) == 64);
-    SwapperNoOp::SwapArray((uint32_t*)&Header,16);
+    SwapperNoOp::SwapArray((uint32_t *)&Header, 16);
     uint32_t numSegments = Header.NumSegments;
-    if(numSegments >= 1)
+    if (numSegments >= 1)
     {
-      if(Header.Offset[0] != 64) return false;
+      if (Header.Offset[0] != 64)
+        return false;
     }
     // we just check that we are indeed at the proper position start+64
     return true;
   }
-  void Print(std::ostream &os)
+  void
+  Print(std::ostream & os)
   {
     Header.Print(os);
   }
-  RLEHeader Header;
+  RLEHeader         Header;
   std::vector<char> Bytes;
 };
 
 class RLEInternals
 {
 public:
-  RLEFrame Frame;
+  RLEFrame              Frame;
   std::vector<uint32_t> SegmentLength;
 };
 
-inline int count_identical_bytes(const char * start, size_t len)
+inline int
+count_identical_bytes(const char * start, size_t len)
 {
-  const char ref = start[0];
+  const char   ref = start[0];
   unsigned int count = 1;
   const size_t cmin = std::min((size_t)128, len);
-  while(count < cmin && start[count] == ref)
+  while (count < cmin && start[count] == ref)
   {
     ++count;
   }
@@ -132,16 +140,17 @@ inline int count_identical_bytes(const char * start, size_t len)
   return count;
 }
 
-inline int count_nonrepetitive_bytes(const char * start, size_t len)
+inline int
+count_nonrepetitive_bytes(const char * start, size_t len)
 {
   unsigned int count = 1;
-  const size_t cmin = std::min((size_t)128,len);
+  const size_t cmin = std::min((size_t)128, len);
   // this version properly encode: 0 1 1 0 as: 3 0 1 1 0
-  for(count = 1; count < cmin; ++count)
+  for (count = 1; count < cmin; ++count)
   {
-    if(start[count] == start[count-1])
+    if (start[count] == start[count - 1])
     {
-      if(count + 1 < cmin && start[count] != start[count+1])
+      if (count + 1 < cmin && start[count] != start[count + 1])
       {
         continue;
       }
@@ -154,21 +163,23 @@ inline int count_nonrepetitive_bytes(const char * start, size_t len)
   return count;
 }
 
-ptrdiff_t rle_encode(char * output, size_t outputlength, const char * input, size_t inputlength)
+ptrdiff_t
+rle_encode(char * output, size_t outputlength, const char * input, size_t inputlength)
 {
-  char * pout = output;
+  char *       pout = output;
   const char * pin = input;
-  size_t length = inputlength;
-  while(pin != input + inputlength)
+  size_t       length = inputlength;
+  while (pin != input + inputlength)
   {
     assert(length <= inputlength);
     assert(pin <= input + inputlength);
     int count = count_identical_bytes(pin, length);
-    if(count > 1) /* or 2 ? */
+    if (count > 1) /* or 2 ? */
     {
       // repeat case
       // test first we are allowed to write two bytes
-      if(pout + 1 + 1 > output + outputlength) return -1;
+      if (pout + 1 + 1 > output + outputlength)
+        return -1;
       *pout = (char)(-count + 1);
       assert(1 - *pout == count);
       assert(*pout <= -1 && *pout >= -127);
@@ -181,9 +192,10 @@ ptrdiff_t rle_encode(char * output, size_t outputlength, const char * input, siz
       // non repeat case
       count = count_nonrepetitive_bytes(pin, length);
       // first test we are allowed to write 1 + count bytes in the output buffer
-      if(pout + count + 1 > output + outputlength) return -1;
+      if (pout + count + 1 > output + outputlength)
+        return -1;
       *pout = (char)(count - 1);
-      assert(*pout != -128 && *pout+1 == count);
+      assert(*pout != -128 && *pout + 1 == count);
       assert(*pout >= 0);
       ++pout;
       memcpy(pout, pin, count);
@@ -199,18 +211,19 @@ ptrdiff_t rle_encode(char * output, size_t outputlength, const char * input, siz
 }
 
 template <typename T>
-bool DoInvertPlanarConfiguration(T * output, const T * input, uint32_t inputlength)
+bool
+DoInvertPlanarConfiguration(T * output, const T * input, uint32_t inputlength)
 {
   const T * r = input + 0;
   const T * g = input + 1;
   const T * b = input + 2;
-  uint32_t length = (inputlength / 3) * 3; // remove the 0 padding
+  uint32_t  length = (inputlength / 3) * 3; // remove the 0 padding
   assert(length == inputlength || length == inputlength - 1);
   assert(length % 3 == 0);
   uint32_t plane_length = length / 3;
-  T *pout = output;
+  T *      pout = output;
   // copy red plane
-  while(pout != output + plane_length * 1)
+  while (pout != output + plane_length * 1)
   {
     *pout++ = *r;
     r += 3;
@@ -218,79 +231,93 @@ bool DoInvertPlanarConfiguration(T * output, const T * input, uint32_t inputleng
   assert(r == input + length);
   // copy green plane
   assert(pout == output + plane_length);
-  while(pout != output + plane_length * 2)
+  while (pout != output + plane_length * 2)
   {
     *pout++ = *g;
     g += 3;
   }
   assert(g == input + length + 1);
   // copy blue plane
-  assert(pout == output + 2*plane_length);
-  while(pout != output + plane_length * 3)
+  assert(pout == output + 2 * plane_length);
+  while (pout != output + plane_length * 3)
   {
     *pout++ = *b;
     b += 3;
   }
   assert(b == input + length + 2);
-  assert (pout == output + length);
+  assert(pout == output + length);
   return true;
 }
 
 class memsrc : public ::rle::source
 {
 public:
-  memsrc(const char * data, size_t datalen):ptr(data),cur(data),len(datalen) {}
-  int read(char * out, int l)
+  memsrc(const char * data, size_t datalen)
+    : ptr(data)
+    , cur(data)
+    , len(datalen)
+  {}
+  int
+  read(char * out, int l)
   {
     memcpy(out, cur, l);
     cur += l;
     assert(cur <= ptr + len);
     return l;
   }
-  streampos_t tell()
+  streampos_t
+  tell()
   {
     assert(cur <= ptr + len);
     return (streampos_t)(cur - ptr);
   }
-  bool seek(streampos_t pos)
+  bool
+  seek(streampos_t pos)
   {
     cur = ptr + pos;
     assert(cur <= ptr + len && cur >= ptr);
     return true;
   }
-  bool eof()
+  bool
+  eof()
   {
     assert(cur <= ptr + len);
     return cur == ptr + len;
   }
-  memsrc * clone()
+  memsrc *
+  clone()
   {
     memsrc * ret = new memsrc(ptr, len);
     return ret;
   }
+
 private:
   const char * ptr;
   const char * cur;
-  size_t len;
+  size_t       len;
 };
 
 class streamdest : public rle::dest
 {
 public:
-  streamdest(std::ostream & os):stream(os)
+  streamdest(std::ostream & os)
+    : stream(os)
   {
     start = os.tellp();
   }
-  int write(const char * in, int len)
+  int
+  write(const char * in, int len)
   {
     stream.write(in, len);
     return len;
   }
-  bool seek(streampos_t abs_pos)
+  bool
+  seek(streampos_t abs_pos)
   {
     stream.seekp(abs_pos + start);
     return true;
   }
+
 private:
   std::ostream & stream;
   std::streampos start;
@@ -305,42 +332,46 @@ RLECodec::RLECodec()
 
 RLECodec::~RLECodec()
 {
-  if(Internals)
+  if (Internals)
   {
     delete Internals;
     Internals = NULL; // not required
   }
 }
 
-bool RLECodec::CanCode(TransferSyntax const & ts) const
+bool
+RLECodec::CanCode(TransferSyntax const & ts) const
 {
   return ts == TransferSyntax::RLELossless;
 }
 
-bool RLECodec::CanDecode(TransferSyntax const & ts) const
+bool
+RLECodec::CanDecode(TransferSyntax const & ts) const
 {
   return ts == TransferSyntax::RLELossless;
 }
 
-bool RLECodec::Decode(DataElement const & in, DataElement & out)
+bool
+RLECodec::Decode(DataElement const & in, DataElement & out)
 {
-  if(NumberOfDimensions == 2)
+  if (NumberOfDimensions == 2)
   {
     out = in;
     const SequenceOfFragments * sf = in.GetSequenceOfFragments();
-    if(!sf) return false;
+    if (!sf)
+      return false;
     const unsigned long long len = GetBufferLength();
-    std::stringstream is;
+    std::stringstream        is;
     sf->WriteBuffer(is);
     SetLength(len);
     std::stringstream os;
-    const bool r = DecodeByStreams(is, os);
-    if(!r)
+    const bool        r = DecodeByStreams(is, os);
+    if (!r)
     {
       mdcmErrorMacro("DecodeByStreams failure.");
       return false;
     }
-    std::string str = os.str();
+    std::string            str = os.str();
     std::string::size_type check = str.size();
     assert(check == len);
     VL::Type checkCast = (VL::Type)check;
@@ -350,14 +381,15 @@ bool RLECodec::Decode(DataElement const & in, DataElement & out)
   else if (NumberOfDimensions == 3)
   {
     out = in;
-    const SequenceOfFragments *sf = in.GetSequenceOfFragments();
-    if(!sf) return false;
+    const SequenceOfFragments * sf = in.GetSequenceOfFragments();
+    if (!sf)
+      return false;
     const size_t len = GetBufferLength();
-    size_t pos = 0;
+    size_t       pos = 0;
     // Each RLE Frame store a 2D frame, len is the 3d length
     const size_t nframes = sf->GetNumberOfFragments();
     const size_t zdim = Dimensions[2];
-    if(nframes != zdim)
+    if (nframes != zdim)
     {
       mdcmErrorMacro("Invalid number of fragments: " << nframes << " should be: " << zdim);
       return false;
@@ -367,53 +399,58 @@ bool RLECodec::Decode(DataElement const & in, DataElement & out)
     {
       buffer = new char[len];
     }
-    catch(std::bad_alloc&)
+    catch (std::bad_alloc &)
     {
       return false;
     }
     const size_t llen = len / nframes;
-    bool corruption = false;
-    for(unsigned int i = 0; i < nframes; ++i)
+    bool         corruption = false;
+    for (unsigned int i = 0; i < nframes; ++i)
     {
-      const Fragment &frag = sf->GetFragment(i);
-      const size_t check = DecodeFragment(frag, buffer + pos, llen);
-      if(check != llen)
+      const Fragment & frag = sf->GetFragment(i);
+      const size_t     check = DecodeFragment(frag, buffer + pos, llen);
+      if (check != llen)
       {
         mdcmDebugMacro("RLE pb with frag: " << i);
         corruption = true;
       }
       pos += llen;
     }
-    if(!corruption) { assert(pos == len); }
+    if (!corruption)
+    {
+      assert(pos == len);
+    }
     out.SetByteValue(buffer, (uint32_t)len);
-    delete [] buffer;
+    delete[] buffer;
     return !corruption;
   }
   return false;
 }
 
-bool RLECodec::Code(DataElement const & in, DataElement & out)
+bool
+RLECodec::Code(DataElement const & in, DataElement & out)
 {
-  if(GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422 ||
-     GetPhotometricInterpretation() == PhotometricInterpretation::YBR_ICT ||
-     GetPhotometricInterpretation() == PhotometricInterpretation::YBR_RCT ||
-     GetPhotometricInterpretation() == PhotometricInterpretation::YBR_PARTIAL_420 ||
-     GetPhotometricInterpretation() == PhotometricInterpretation::YBR_PARTIAL_422)
+  if (GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422 ||
+      GetPhotometricInterpretation() == PhotometricInterpretation::YBR_ICT ||
+      GetPhotometricInterpretation() == PhotometricInterpretation::YBR_RCT ||
+      GetPhotometricInterpretation() == PhotometricInterpretation::YBR_PARTIAL_420 ||
+      GetPhotometricInterpretation() == PhotometricInterpretation::YBR_PARTIAL_422)
   {
     return false;
   }
   const unsigned int * dims = this->GetDimensions();
-  const unsigned int n = 256*256;
-  char * outbuf;
+  const unsigned int   n = 256 * 256;
+  char *               outbuf;
   // At most we are encoding a single row at a time, so we would be very unlucky
   // if the row *after* compression would not fit in 256*256 bytes
   char small_buffer[n];
   outbuf = small_buffer;
   // Create a Sequence Of Fragments
   SmartPointer<SequenceOfFragments> sq = new SequenceOfFragments;
-  const Tag itemStart(0xfffe, 0xe000);
-  const ByteValue * bv = in.GetByteValue();
-  if (!bv) return false;
+  const Tag                         itemStart(0xfffe, 0xe000);
+  const ByteValue *                 bv = in.GetByteValue();
+  if (!bv)
+    return false;
   const char * input = bv->GetPointer();
   const size_t bvl = bv->GetLength();
   const size_t image_len = bvl / dims[2];
@@ -421,68 +458,70 @@ bool RLECodec::Code(DataElement const & in, DataElement & out)
   char * buffer = NULL;
   // if 3 comp. need to the planar configuration
   char * bufferrgb = NULL;
-  if(GetPixelFormat().GetBitsAllocated() > 8)
+  if (GetPixelFormat().GetBitsAllocated() > 8)
   {
     try
     {
       buffer = new char[image_len];
     }
-    catch(std::bad_alloc&)
+    catch (std::bad_alloc &)
     {
       return false;
     }
   }
-  if(GetPhotometricInterpretation() == PhotometricInterpretation::RGB ||
-     GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL)
+  if (GetPhotometricInterpretation() == PhotometricInterpretation::RGB ||
+      GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL)
   {
     try
     {
       bufferrgb = new char[image_len];
     }
-    catch(std::bad_alloc&)
+    catch (std::bad_alloc &)
     {
       return false;
     }
   }
   unsigned int MaxNumSegments = 1;
-  if(GetPixelFormat().GetBitsAllocated() == 8)
+  if (GetPixelFormat().GetBitsAllocated() == 8)
   {
     MaxNumSegments *= 1;
   }
-  else if(GetPixelFormat().GetBitsAllocated() == 16)
+  else if (GetPixelFormat().GetBitsAllocated() == 16)
   {
     MaxNumSegments *= 2;
   }
-  else if(GetPixelFormat().GetBitsAllocated() == 32)
+  else if (GetPixelFormat().GetBitsAllocated() == 32)
   {
     MaxNumSegments *= 4;
   }
   else
   {
-    if(buffer) delete [] buffer;
-    if(bufferrgb) delete [] bufferrgb;
+    if (buffer)
+      delete[] buffer;
+    if (bufferrgb)
+      delete[] bufferrgb;
     return false;
   }
-  if(GetPhotometricInterpretation() == PhotometricInterpretation::RGB ||
-     GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL)
+  if (GetPhotometricInterpretation() == PhotometricInterpretation::RGB ||
+      GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL)
   {
     MaxNumSegments *= 3;
   }
-  if(GetPixelFormat().GetSamplesPerPixel() == 3)
+  if (GetPixelFormat().GetSamplesPerPixel() == 3)
   {
     assert(MaxNumSegments % 3 == 0);
   }
   RLEHeader header = { static_cast<uint32_t>(MaxNumSegments), { 64 } };
   // Create a RLE Frame for each frame
-  for(unsigned int dim = 0; dim < dims[2]; ++dim)
+  for (unsigned int dim = 0; dim < dims[2]; ++dim)
   {
     // Within each frame, create the RLE Segments:
     // lets' try a simple scheme where each Segments is given an equal portion
     // of the input image.
     const char * ptr_img = input + dim * image_len;
-    if(GetPlanarConfiguration() == 0 && GetPixelFormat().GetSamplesPerPixel() == 3)
+    if (GetPlanarConfiguration() == 0 && GetPixelFormat().GetSamplesPerPixel() == 3)
     {
-      if(GetPixelFormat().GetBitsAllocated() == 8)
+      if (GetPixelFormat().GetBitsAllocated() == 8)
       {
         DoInvertPlanarConfiguration<char>(bufferrgb, ptr_img, (uint32_t)(image_len / sizeof(char)));
       }
@@ -491,79 +530,79 @@ bool RLECodec::Code(DataElement const & in, DataElement & out)
         assert(GetPixelFormat().GetBitsAllocated() == 16);
         // should not happen right?
         DoInvertPlanarConfiguration<short>(
-          (short*)bufferrgb, (const short*)(const void*)ptr_img, (uint32_t)(image_len / sizeof(short)));
+          (short *)bufferrgb, (const short *)(const void *)ptr_img, (uint32_t)(image_len / sizeof(short)));
       }
       ptr_img = bufferrgb;
     }
-    if(GetPixelFormat().GetBitsAllocated() == 32)
+    if (GetPixelFormat().GetBitsAllocated() == 32)
     {
       assert(!(image_len % 4));
       unsigned int div = GetPixelFormat().GetSamplesPerPixel();
-      for(unsigned int j = 0; j < div; ++j)
+      for (unsigned int j = 0; j < div; ++j)
       {
-        size_t iimage_len = image_len / div;
-        char * ibuffer = buffer + j * iimage_len;
+        size_t       iimage_len = image_len / div;
+        char *       ibuffer = buffer + j * iimage_len;
         const char * iptr_img = ptr_img + j * iimage_len;
         assert(iimage_len % 4 == 0);
-        for(size_t i = 0; i < iimage_len/4; ++i)
+        for (size_t i = 0; i < iimage_len / 4; ++i)
         {
 #ifdef MDCM_WORDS_BIGENDIAN
-          ibuffer[i] = iptr_img[4*i+0];
+          ibuffer[i] = iptr_img[4 * i + 0];
 #else
-          ibuffer[i] = iptr_img[4*i+3];
+          ibuffer[i] = iptr_img[4 * i + 3];
 #endif
         }
-        for(size_t i = 0; i < iimage_len/4; ++i)
+        for (size_t i = 0; i < iimage_len / 4; ++i)
         {
 #ifdef MDCM_WORDS_BIGENDIAN
-          ibuffer[i+iimage_len/4] = iptr_img[4*i+1];
+          ibuffer[i + iimage_len / 4] = iptr_img[4 * i + 1];
 #else
-          ibuffer[i+iimage_len/4] = iptr_img[4*i+2];
+          ibuffer[i + iimage_len / 4] = iptr_img[4 * i + 2];
 #endif
         }
-        for(size_t i = 0; i < iimage_len/4; ++i)
+        for (size_t i = 0; i < iimage_len / 4; ++i)
         {
 #ifdef MDCM_WORDS_BIGENDIAN
-          ibuffer[i+2*iimage_len/4] = iptr_img[4*i+2];
+          ibuffer[i + 2 * iimage_len / 4] = iptr_img[4 * i + 2];
 #else
-          ibuffer[i+2*iimage_len/4] = iptr_img[4*i+1];
+          ibuffer[i + 2 * iimage_len / 4] = iptr_img[4 * i + 1];
 #endif
         }
-        for(size_t i = 0; i < iimage_len/4; ++i)
+        for (size_t i = 0; i < iimage_len / 4; ++i)
         {
 #ifdef MDCM_WORDS_BIGENDIAN
-          ibuffer[i+3*iimage_len/4] = iptr_img[4*i+3];
+          ibuffer[i + 3 * iimage_len / 4] = iptr_img[4 * i + 3];
 #else
-          ibuffer[i+3*iimage_len/4] = iptr_img[4*i+0];
+          ibuffer[i + 3 * iimage_len / 4] = iptr_img[4 * i + 0];
 #endif
         }
       }
       ptr_img = buffer;
     }
-    else if(GetPixelFormat().GetBitsAllocated() == 16)
+    else if (GetPixelFormat().GetBitsAllocated() == 16)
     {
       assert(!(image_len % 2));
       unsigned int div = GetPixelFormat().GetSamplesPerPixel();
-      for(unsigned int j = 0; j < div; ++j)
+      for (unsigned int j = 0; j < div; ++j)
       {
-        size_t iimage_len = image_len / div;
-        char * ibuffer = buffer + j * iimage_len;
+        size_t       iimage_len = image_len / div;
+        char *       ibuffer = buffer + j * iimage_len;
         const char * iptr_img = ptr_img + j * iimage_len;
         assert(iimage_len % 2 == 0);
-        for(size_t i = 0; i < iimage_len/2; ++i)
+        for (size_t i = 0; i < iimage_len / 2; ++i)
         {
 #ifdef MDCM_WORDS_BIGENDIAN
-          ibuffer[i] = iptr_img[2*i];
+          ibuffer[i] = iptr_img[2 * i];
 #else
-          ibuffer[i] = iptr_img[2*i+1];
+          ibuffer[i] = iptr_img[2 * i + 1];
 #endif
         }
-        for(size_t i = 0; i < iimage_len/2; ++i)
+        for (size_t i = 0; i < iimage_len / 2; ++i)
         {
 #ifdef MDCM_WORDS_BIGENDIAN
-          ibuffer[i+iimage_len/2] = iptr_img[2*i+1];
+          ibuffer[i + iimage_len / 2] = iptr_img[2 * i + 1];
 #else
-          ibuffer[i+iimage_len/2] = iptr_img[2*i];
+          ibuffer[i + iimage_len / 2] = iptr_img[2 * i];
 #endif
         }
       }
@@ -571,44 +610,46 @@ bool RLECodec::Code(DataElement const & in, DataElement & out)
     }
     assert(image_len % MaxNumSegments == 0);
     const size_t input_seg_length = image_len / MaxNumSegments;
-    std::string datastr;
-    for(unsigned int seg = 0; seg < MaxNumSegments; ++seg)
+    std::string  datastr;
+    for (unsigned int seg = 0; seg < MaxNumSegments; ++seg)
     {
-      size_t partition = input_seg_length;
-      const char *ptr = ptr_img + seg * input_seg_length;
+      size_t       partition = input_seg_length;
+      const char * ptr = ptr_img + seg * input_seg_length;
       assert(ptr < ptr_img + image_len);
-      if(seg == MaxNumSegments - 1)
+      if (seg == MaxNumSegments - 1)
       {
         partition += image_len % MaxNumSegments;
-        assert((MaxNumSegments-1) * input_seg_length + partition == (size_t)image_len);
+        assert((MaxNumSegments - 1) * input_seg_length + partition == (size_t)image_len);
       }
       assert(partition == input_seg_length);
       std::stringstream data;
       assert(partition % dims[1] == 0);
       size_t length = 0;
       // do not cross row boundary
-      for(unsigned int y = 0; y < dims[1]; ++y)
+      for (unsigned int y = 0; y < dims[1]; ++y)
       {
-        ptrdiff_t llength = rle_encode(outbuf, n, ptr + y*dims[0], partition / dims[1]);
-        if(llength < 0)
+        ptrdiff_t llength = rle_encode(outbuf, n, ptr + y * dims[0], partition / dims[1]);
+        if (llength < 0)
         {
           mdcmErrorMacro("RLE compressor error");
-          if(buffer) delete[] buffer;
-          if(bufferrgb) delete[] bufferrgb;
+          if (buffer)
+            delete[] buffer;
+          if (bufferrgb)
+            delete[] bufferrgb;
           return false;
         }
         assert(llength);
-        data.write((char*)outbuf, llength);
+        data.write((char *)outbuf, llength);
         length += llength;
       }
       // update header
-      header.Offset[1+seg] = (uint32_t)(header.Offset[seg] + length);
+      header.Offset[1 + seg] = (uint32_t)(header.Offset[seg] + length);
       assert(data.str().size() == length);
       datastr += data.str();
     }
     header.Offset[MaxNumSegments] = 0;
     std::stringstream os;
-    os.write((char*)&header,sizeof(header));
+    os.write((char *)&header, sizeof(header));
     std::string str = os.str() + datastr;
     assert(str.size());
     Fragment frag;
@@ -617,66 +658,76 @@ bool RLECodec::Code(DataElement const & in, DataElement & out)
     sq->AddFragment(frag);
   }
   out.SetValue(*sq);
-  if(buffer) delete[] buffer;
-  if(bufferrgb) delete[] bufferrgb;
+  if (buffer)
+    delete[] buffer;
+  if (bufferrgb)
+    delete[] bufferrgb;
   return true;
 }
 
-unsigned long long RLECodec::GetBufferLength() const
+unsigned long long
+RLECodec::GetBufferLength() const
 {
   return BufferLength;
 }
 
-void RLECodec::SetBufferLength(unsigned long long l)
+void
+RLECodec::SetBufferLength(unsigned long long l)
 {
   BufferLength = l;
 }
 
-bool RLECodec::GetHeaderInfo(std::istream &, TransferSyntax &ts)
+bool
+RLECodec::GetHeaderInfo(std::istream &, TransferSyntax & ts)
 {
   ts = TransferSyntax::RLELossless;
   return true;
 }
 
-void RLECodec::SetLength(unsigned long long l)
+void
+RLECodec::SetLength(unsigned long long l)
 {
   Length = l;
 }
 
-bool RLECodec::DecodeExtent(
-  char * buffer,
-  unsigned int xmin, unsigned int xmax,
-  unsigned int ymin, unsigned int ymax,
-  unsigned int zmin, unsigned int zmax,
-  std::istream & is)
+bool
+RLECodec::DecodeExtent(char *         buffer,
+                       unsigned int   xmin,
+                       unsigned int   xmax,
+                       unsigned int   ymin,
+                       unsigned int   ymax,
+                       unsigned int   zmin,
+                       unsigned int   zmax,
+                       std::istream & is)
 {
   std::stringstream tmpos;
-  BasicOffsetTable bot;
+  BasicOffsetTable  bot;
   bot.Read<SwapperNoOp>(is);
   const unsigned int * dimensions = this->GetDimensions();
-  const PixelFormat & pf = this->GetPixelFormat();
+  const PixelFormat &  pf = this->GetPixelFormat();
   assert(pf.GetBitsAllocated() % 8 == 0);
   assert(pf != PixelFormat::SINGLEBIT);
   assert(pf != PixelFormat::UINT12 && pf != PixelFormat::INT12);
   std::stringstream os;
-  Fragment frag;
-  for(unsigned int z = 0; z < zmin; ++z)
+  Fragment          frag;
+  for (unsigned int z = 0; z < zmin; ++z)
   {
     frag.ReadPreValue<SwapperNoOp>(is);
     std::streamoff off = frag.GetVL();
     is.seekg(off, std::ios::cur);
   }
-  for(unsigned int z = zmin; z <= zmax; ++z)
+  for (unsigned int z = zmin; z <= zmax; ++z)
   {
     frag.ReadPreValue<SwapperNoOp>(is);
     std::streampos start = is.tellg();
     SetLength((unsigned long long)dimensions[0] * (unsigned long long)dimensions[1] * pf.GetPixelSize());
     const bool r = DecodeByStreams(is, os);
-    if(!r) return false;
+    if (!r)
+      return false;
     // handle DICOM padding
     std::streampos end = is.tellg();
-    size_t numberOfReadBytes = (size_t)(end - start);
-    if(numberOfReadBytes > frag.GetVL())
+    size_t         numberOfReadBytes = (size_t)(end - start);
+    if (numberOfReadBytes > frag.GetVL())
     {
       // Special handling for ALOKA_SSD-8-MONO2-RLE-SQ.dcm
       size_t diff = numberOfReadBytes - frag.GetVL();
@@ -687,54 +738,55 @@ bool RLECodec::DecodeExtent(
     }
     assert(end - start == frag.GetVL() || (size_t)(end - start) + 1 == frag.GetVL());
     // sync is (rle16loo.dcm)
-    if((end - start) % 2 == 1)
+    if ((end - start) % 2 == 1)
     {
       is.get();
     }
   } // for each z
   os.seekg(0, std::ios::beg);
   assert(os.good());
-  std::istream * theStream = &os;
-  unsigned int rowsize = xmax - xmin + 1;
-  unsigned int colsize = ymax - ymin + 1;
-  unsigned int bytesPerPixel = pf.GetPixelSize();
+  std::istream *    theStream = &os;
+  unsigned int      rowsize = xmax - xmin + 1;
+  unsigned int      colsize = ymax - ymin + 1;
+  unsigned int      bytesPerPixel = pf.GetPixelSize();
   std::vector<char> buffer1;
-  buffer1.resize(rowsize*bytesPerPixel);
-  char * tmpBuffer1 = &buffer1[0];
-  unsigned int y, z;
+  buffer1.resize(rowsize * bytesPerPixel);
+  char *         tmpBuffer1 = &buffer1[0];
+  unsigned int   y, z;
   std::streamoff theOffset;
   for (z = zmin; z <= zmax; ++z)
   {
     for (y = ymin; y <= ymax; ++y)
     {
       theStream->seekg(std::ios::beg);
-      theOffset = 0 + ((z-zmin)*dimensions[1]*dimensions[0] + y*dimensions[0] + xmin)*bytesPerPixel;
+      theOffset = 0 + ((z - zmin) * dimensions[1] * dimensions[0] + y * dimensions[0] + xmin) * bytesPerPixel;
       theStream->seekg(theOffset);
-      theStream->read(tmpBuffer1, rowsize*bytesPerPixel);
-      memcpy(&(buffer[((z-zmin)*rowsize*colsize +
-            (y-ymin)*rowsize)*bytesPerPixel]),
-        tmpBuffer1, rowsize*bytesPerPixel);
+      theStream->read(tmpBuffer1, rowsize * bytesPerPixel);
+      memcpy(&(buffer[((z - zmin) * rowsize * colsize + (y - ymin) * rowsize) * bytesPerPixel]),
+             tmpBuffer1,
+             rowsize * bytesPerPixel);
     }
   }
   return true;
 }
 
-bool RLECodec::DecodeByStreams(std::istream & is, std::ostream & os)
+bool
+RLECodec::DecodeByStreams(std::istream & is, std::ostream & os)
 {
-  std::streampos start = is.tellg();
-  char dummy_buffer[256];
+  std::streampos    start = is.tellg();
+  char              dummy_buffer[256];
   std::stringstream tmpos;
-  RLEFrame &frame = Internals->Frame;
-  if(!frame.Read(is)) return false;
+  RLEFrame &        frame = Internals->Frame;
+  if (!frame.Read(is))
+    return false;
   unsigned long long numSegments = frame.Header.NumSegments;
   unsigned long long numberOfReadBytes = 0;
   unsigned long long length = Length;
   assert(length);
   // Special case
-  assert(GetPixelFormat().GetBitsAllocated() == 32 ||
-         GetPixelFormat().GetBitsAllocated() == 16 ||
+  assert(GetPixelFormat().GetBitsAllocated() == 32 || GetPixelFormat().GetBitsAllocated() == 16 ||
          GetPixelFormat().GetBitsAllocated() == 8);
-  if(GetPixelFormat().GetBitsAllocated() > 8)
+  if (GetPixelFormat().GetBitsAllocated() > 8)
   {
     RequestPaddedCompositePixelCode = true;
   }
@@ -748,12 +800,12 @@ bool RLECodec::DecodeByStreams(std::istream & is, std::ostream & os)
   // Because MDCM internally set PlanarConfiguration == 0 by default, even if
   // the Attribute is not sent, it will still default to 0 and we will be
   // consistent with ourselves...
-  if(GetPixelFormat().GetSamplesPerPixel() == 3 && GetPlanarConfiguration() == 0)
+  if (GetPixelFormat().GetSamplesPerPixel() == 3 && GetPlanarConfiguration() == 0)
   {
     RequestPlanarConfiguration = true;
   }
   length /= numSegments;
-  for(unsigned long long i = 0; i < numSegments; ++i)
+  for (unsigned long long i = 0; i < numSegments; ++i)
   {
     numberOfReadBytes = 0;
     std::streampos pos = is.tellg() - start;
@@ -762,104 +814,110 @@ bool RLECodec::DecodeByStreams(std::istream & is, std::ostream & os)
       // ACUSON-24-YBR_FULL-RLE.dcm
       // D_CLUNIE_CT1_RLE.dcm
       // This should be at most the \0 padding
-      //mdcmWarningMacro("RLE Header says: " << frame.Header.Offset[i] <<
+      // mdcmWarningMacro("RLE Header says: " << frame.Header.Offset[i] <<
       //   " when it should says: " << pos << std::endl);
-      std::streamoff check = frame.Header.Offset[i] - pos;//should it be a streampos or a uint32? mmr
+      std::streamoff check = frame.Header.Offset[i] - pos; // should it be a streampos or a uint32? mmr
       // check == 2 for mdcmDataExtra/mdcmSampleData/US_DataSet/GE_US/2929J686-breaker
-      //assert(check == 1 || check == 2);
-      (void)check; //warning removal
+      // assert(check == 1 || check == 2);
+      (void)check; // warning removal
       is.seekg(frame.Header.Offset[i] + start, std::ios::beg);
     }
     unsigned long long numOutBytes = 0;
-    signed char byte;
+    signed char        byte;
     // FIXME: ALOKA_SSD-8-MONO2-RLE-SQ.dcm I think the RLE decoder is off by
     // one, we are reading in 128001 byte, while only 128000 are present
-    while(numOutBytes < length)
+    while (numOutBytes < length)
     {
-      is.read((char*)&byte, 1);
-      if(!is.good())
+      is.read((char *)&byte, 1);
+      if (!is.good())
       {
         mdcmErrorMacro("Could not decode");
         return false;
       }
       numberOfReadBytes++;
-      if(byte >= 0 /*&& byte <= 127*/) /* 2nd is always true */
+      if (byte >= 0 /*&& byte <= 127*/) /* 2nd is always true */
       {
-        is.read(dummy_buffer, byte+1);
-        numberOfReadBytes += byte+1;
-        numOutBytes += byte+ 1;
-        tmpos.write(dummy_buffer, byte+1);
+        is.read(dummy_buffer, byte + 1);
+        numberOfReadBytes += byte + 1;
+        numOutBytes += byte + 1;
+        tmpos.write(dummy_buffer, byte + 1);
       }
-      else if(byte <= -1 && byte >= -127)
+      else if (byte <= -1 && byte >= -127)
       {
         char nextByte;
         is.read(&nextByte, 1);
         numberOfReadBytes += 1;
         memset(dummy_buffer, nextByte, -byte + 1);
         numOutBytes += -byte + 1;
-        tmpos.write(dummy_buffer, -byte+1);
+        tmpos.write(dummy_buffer, -byte + 1);
       }
       else /* byte == -128 */
       {
         assert(byte == -128);
       }
     }
-    if(numOutBytes != length) return false;
+    if (numOutBytes != length)
+      return false;
   }
-  return ImageCodec::DecodeByStreams(tmpos,os);
+  return ImageCodec::DecodeByStreams(tmpos, os);
 }
 
-bool RLECodec::StartEncode(std::ostream &)
+bool
+RLECodec::StartEncode(std::ostream &)
 {
   return true;
 }
 
-bool RLECodec::IsRowEncoder()
+bool
+RLECodec::IsRowEncoder()
 {
   return false;
 }
 
-bool RLECodec::IsFrameEncoder()
+bool
+RLECodec::IsFrameEncoder()
 {
   return true;
 }
 
-bool RLECodec::AppendRowEncode(std::ostream &, const char *, size_t)
+bool
+RLECodec::AppendRowEncode(std::ostream &, const char *, size_t)
 {
   assert(0);
   return false;
 }
 
-bool RLECodec::AppendFrameEncode(std::ostream & out, const char * data, size_t datalen)
+bool
+RLECodec::AppendFrameEncode(std::ostream & out, const char * data, size_t datalen)
 {
   try
   {
-    const PixelFormat & pf = this->GetPixelFormat();
-    unsigned int pc = this->GetPlanarConfiguration();
-    bool isLittleEndian = !this->GetNeedByteSwap();
-    rle::pixel_info pi((unsigned char)pf.GetSamplesPerPixel(), (unsigned char)(pf.GetBitsAllocated()));
+    const PixelFormat &  pf = this->GetPixelFormat();
+    unsigned int         pc = this->GetPlanarConfiguration();
+    bool                 isLittleEndian = !this->GetNeedByteSwap();
+    rle::pixel_info      pi((unsigned char)pf.GetSamplesPerPixel(), (unsigned char)(pf.GetBitsAllocated()));
     const unsigned int * dimensions = this->GetDimensions();
-    rle::image_info ii(dimensions[0], dimensions[1], pi, pc ? true : false, isLittleEndian);
-    const int h = dimensions[1];
-    memsrc src(data, datalen);
-    rle::rle_encoder re(src, ii);
-    streamdest fd(out);
-    if(!re.write_header(fd))
+    rle::image_info      ii(dimensions[0], dimensions[1], pi, pc ? true : false, isLittleEndian);
+    const int            h = dimensions[1];
+    memsrc               src(data, datalen);
+    rle::rle_encoder     re(src, ii);
+    streamdest           fd(out);
+    if (!re.write_header(fd))
     {
       mdcmErrorMacro("Could not write header");
       return false;
     }
-    for(int y = 0; y < h; ++y)
+    for (int y = 0; y < h; ++y)
     {
       const int ret = re.encode_row(fd);
-      if(ret < 0)
+      if (ret < 0)
       {
         mdcmErrorMacro("Problem at row: " << y);
         return false;
       }
     }
   }
-  catch(std::exception &)
+  catch (std::exception &)
   {
     mdcmErrorMacro("Invalid compression params (not supported)");
     return false;
@@ -867,38 +925,42 @@ bool RLECodec::AppendFrameEncode(std::ostream & out, const char * data, size_t d
   return true;
 }
 
-bool RLECodec::StopEncode(std::ostream &)
+bool
+RLECodec::StopEncode(std::ostream &)
 {
   return true;
 }
 
-bool RLECodec::DecodeByStreamsCommon(std::istream &, std::ostream &)
+bool
+RLECodec::DecodeByStreamsCommon(std::istream &, std::ostream &)
 {
   return false;
 }
 
-size_t RLECodec::DecodeFragment(Fragment const & frag, char * buffer, size_t llen)
+size_t
+RLECodec::DecodeFragment(Fragment const & frag, char * buffer, size_t llen)
 {
   std::stringstream is;
-  const ByteValue & bv = dynamic_cast<const ByteValue&>(frag.GetValue());
-  const size_t bv_len = bv.GetLength();
-  char * mybuffer;
+  const ByteValue & bv = dynamic_cast<const ByteValue &>(frag.GetValue());
+  const size_t      bv_len = bv.GetLength();
+  char *            mybuffer;
   try
   {
     mybuffer = new char[bv_len];
   }
-  catch(std::bad_alloc&)
+  catch (std::bad_alloc &)
   {
     return false;
   }
   bv.GetBuffer(mybuffer, bv.GetLength());
   is.write(mybuffer, bv.GetLength());
-  delete [] mybuffer;
+  delete[] mybuffer;
   std::stringstream os;
   SetLength((unsigned long long)llen);
   const bool r = DecodeByStreams(is, os);
-  if(!r) return 0;
-  std::streampos p = is.tellg();
+  if (!r)
+    return 0;
+  std::streampos         p = is.tellg();
   std::string::size_type check = os.str().size();
   memcpy(buffer, os.str().c_str(), check);
   return check;

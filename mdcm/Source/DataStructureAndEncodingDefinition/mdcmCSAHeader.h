@@ -62,7 +62,9 @@ class PrivateTag;
 
 class MDCM_EXPORT CSAHeader
 {
-friend std::ostream& operator<<(std::ostream &, const CSAHeader &);
+  friend std::ostream &
+  operator<<(std::ostream &, const CSAHeader &);
+
 public:
   typedef enum
   {
@@ -73,63 +75,85 @@ public:
     INTERFILE,
     ZEROED_OUT
   } CSAHeaderType;
- 
+
   CSAHeader()
-    : InternalDataSet(), InternalType(UNKNOWN), InterfileData(0) {}
+    : InternalDataSet()
+    , InternalType(UNKNOWN)
+    , InterfileData(0)
+  {}
   ~CSAHeader() {}
 
   // Decode the CSAHeader from element 'de'
-  bool LoadFromDataElement(DataElement const &);
+  bool
+  LoadFromDataElement(DataElement const &);
 
   // Print the CSAHeader (use only if Format == SV10 or NOMAGIC)
-  void Print(std::ostream &) const;
+  void
+  Print(std::ostream &) const;
 
   // Return the DataSet output (use only if Format == DATASET_FORMAT )
-  const DataSet & GetDataSet() const { return InternalDataSet; }
+  const DataSet &
+  GetDataSet() const
+  {
+    return InternalDataSet;
+  }
 
   // Return the string output (use only if Format == Interfile)
-  const char * GetInterfile() const { return InterfileData; }
+  const char *
+  GetInterfile() const
+  {
+    return InterfileData;
+  }
 
   // return the format of the CSAHeader
   // SV10 and NOMAGIC are equivalent.
-  CSAHeaderType GetFormat() const;
+  CSAHeaderType
+  GetFormat() const;
 
   // Return the private tag used by SIEMENS to store the CSA Image Header
   // This is: PrivateTag(0x0029,0x0010,"SIEMENS CSA HEADER");
-  static const PrivateTag & GetCSAImageHeaderInfoTag();
+  static const PrivateTag &
+  GetCSAImageHeaderInfoTag();
 
   // Return the private tag used by SIEMENS to store the CSA Series Header
   // This is: PrivateTag(0x0029,0x0020,"SIEMENS CSA HEADER");
-  static const PrivateTag & GetCSASeriesHeaderInfoTag();
+  static const PrivateTag &
+  GetCSASeriesHeaderInfoTag();
 
   // Return the private tag used by SIEMENS to store the CSA Data Info
   // This is: PrivateTag(0x0029,0x0010,"SIEMENS CSA NON-IMAGE");
-  static const PrivateTag & GetCSADataInfo();
+  static const PrivateTag &
+  GetCSADataInfo();
 
   // Return the CSAElement corresponding to name 'name'
   // Case Sensitive
-  const CSAElement & GetCSAElementByName(const char *);
+  const CSAElement &
+  GetCSAElementByName(const char *);
 
   // Return true if the CSA element matching 'name' is found or not
   // Case Sensitive
-  bool FindCSAElementByName(const char *);
+  bool
+  FindCSAElementByName(const char *);
 
   // Retrieve the ASCII portion stored within the MrProtocol/MrPhoenixProtocol:
-  bool GetMrProtocol(const DataSet &, MrProtocol &);
+  bool
+  GetMrProtocol(const DataSet &, MrProtocol &);
 
 protected:
-  const CSAElement & GetCSAEEnd() const;
+  const CSAElement &
+  GetCSAEEnd() const;
 
 private:
   std::set<CSAElement> InternalCSADataSet;
-  DataSet InternalDataSet;
-  CSAHeaderType InternalType;
-  Tag DataElementTag;
-  static CSAElement CSAEEnd;
-  const char * InterfileData;
+  DataSet              InternalDataSet;
+  CSAHeaderType        InternalType;
+  Tag                  DataElementTag;
+  static CSAElement    CSAEEnd;
+  const char *         InterfileData;
 };
 
-inline std::ostream& operator<<(std::ostream & os, const CSAHeader & d)
+inline std::ostream &
+operator<<(std::ostream & os, const CSAHeader & d)
 {
   d.Print(os);
   return os;
@@ -137,4 +161,4 @@ inline std::ostream& operator<<(std::ostream & os, const CSAHeader & d)
 
 } // end namespace mdcm
 
-#endif //MDCMCSAHEADER_H
+#endif // MDCMCSAHEADER_H

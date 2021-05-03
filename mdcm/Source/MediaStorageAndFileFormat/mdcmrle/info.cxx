@@ -23,19 +23,21 @@ namespace rle
 // system.
 
 pixel_info::pixel_info(unsigned char nc, unsigned char bpp)
-  : number_components(nc), bits_per_pixel(bpp)
+  : number_components(nc)
+  , bits_per_pixel(bpp)
 {
   if (nc != 1 && nc != 3)
   {
     throw std::runtime_error("RLE: invalid samples per pixel");
   }
-  if(bpp != 8 && bpp != 16 && bpp != 32)
+  if (bpp != 8 && bpp != 16 && bpp != 32)
   {
     throw std::runtime_error("RLE: invalid bits per pixel");
   }
 }
 
-static inline int compute_num_segments_impl(int nc, int bpp)
+static inline int
+compute_num_segments_impl(int nc, int bpp)
 {
   assert(bpp % 8 == 0 && (nc == 1 || nc == 3));
   const int mult = bpp / 8;
@@ -44,11 +46,12 @@ static inline int compute_num_segments_impl(int nc, int bpp)
   return res;
 }
 
-bool pixel_info::check_num_segments(const int num_segments)
+bool
+pixel_info::check_num_segments(const int num_segments)
 {
   bool ok = false;
   // DICOM restrict number of possible values
-  switch(num_segments)
+  switch (num_segments)
   {
     case 1:  // 1 -> Grayscale / 8bits
     case 2:  // 2 -> 16bits
@@ -62,10 +65,11 @@ bool pixel_info::check_num_segments(const int num_segments)
   return ok;
 }
 
-static inline void compute_nc_bpp_from_num_segments(const int num_segments, int & nc, int & bpp)
+static inline void
+compute_nc_bpp_from_num_segments(const int num_segments, int & nc, int & bpp)
 {
-  assert(pixel_info::check_num_segments( num_segments) );
-  if(num_segments % 3 == 0)
+  assert(pixel_info::check_num_segments(num_segments));
+  if (num_segments % 3 == 0)
   {
     nc = 3;
     bpp = (num_segments / 3) * 8;
@@ -75,7 +79,7 @@ static inline void compute_nc_bpp_from_num_segments(const int num_segments, int 
     nc = 1;
     bpp = num_segments;
   }
-  assert(compute_num_segments_impl( nc, bpp) == num_segments );
+  assert(compute_num_segments_impl(nc, bpp) == num_segments);
 }
 
 pixel_info::pixel_info(int num_segments)
@@ -86,12 +90,14 @@ pixel_info::pixel_info(int num_segments)
   bits_per_pixel = bpp;
 }
 
-int pixel_info::get_number_of_bits_per_pixel() const
+int
+pixel_info::get_number_of_bits_per_pixel() const
 {
   return bits_per_pixel;
 }
 
-int pixel_info::get_number_of_components() const
+int
+pixel_info::get_number_of_components() const
 {
   return number_components;
 }
@@ -116,28 +122,28 @@ Offset: 0
 Offset: 0
 */
 
-int pixel_info::compute_num_segments() const
+int
+pixel_info::compute_num_segments() const
 {
   return compute_num_segments_impl(number_components, bits_per_pixel);
 }
 
-image_info::image_info(int w, int h, pixel_info const & pi, bool pc, bool le):
-  width(w),
-  height(h),
-  pix(pi),
-  planarconfiguration(pc),
-  littleendian(le)
+image_info::image_info(int w, int h, pixel_info const & pi, bool pc, bool le)
+  : width(w)
+  , height(h)
+  , pix(pi)
+  , planarconfiguration(pc)
+  , littleendian(le)
 {
-  if(width < 0 || height < 0)
+  if (width < 0 || height < 0)
   {
     throw std::runtime_error("RLE: invalid dimensions");
   }
-  if(pc && pix.get_number_of_components() != 3)
+  if (pc && pix.get_number_of_components() != 3)
   {
     throw std::runtime_error("RLE: invalid planar configuration");
   }
 }
-
 
 
 } // end namespace rle

@@ -30,97 +30,105 @@ namespace mdcm
 {
 
 ByteValue::ByteValue(const char * array, const VL & vl)
-  :
-  Internal(array, array+vl),
-  Length(vl)
+  : Internal(array, array + vl)
+  , Length(vl)
 {
-  if(vl.IsOdd())
+  if (vl.IsOdd())
   {
     mdcmDebugMacro("Odd length");
-    Internal.resize(vl+1);
+    Internal.resize(vl + 1);
     Length++;
   }
 }
 
 ByteValue::ByteValue(std::vector<char> & v)
-  :
-  Internal(v),Length((uint32_t)v.size())
-{
-}
+  : Internal(v)
+  , Length((uint32_t)v.size())
+{}
 
 ByteValue::~ByteValue()
 {
   Internal.clear();
 }
 
-void ByteValue::PrintASCII(std::ostream &os, VL maxlength) const
+void
+ByteValue::PrintASCII(std::ostream & os, VL maxlength) const
 {
   VL length = std::min(maxlength, Length);
   // Special case for VR::UI, do not print the trailing \0
-  if(length && length == Length)
+  if (length && length == Length)
   {
-    if(Internal[length-1] == 0)
+    if (Internal[length - 1] == 0)
     {
       length = length - 1;
     }
   }
   std::vector<char>::const_iterator it = Internal.begin();
-  for(; it != Internal.begin()+length; ++it)
+  for (; it != Internal.begin() + length; ++it)
   {
-    const char &c = *it;
-    if (!(isprint((unsigned char)c) || isspace((unsigned char)c))) os << ".";
-    else os << c;
+    const char & c = *it;
+    if (!(isprint((unsigned char)c) || isspace((unsigned char)c)))
+      os << ".";
+    else
+      os << c;
   }
 }
 
-void ByteValue::PrintHex(std::ostream &os, VL maxlength) const
+void
+ByteValue::PrintHex(std::ostream & os, VL maxlength) const
 {
   std::ios oldState(NULL);
   oldState.copyfmt(os);
-  VL length = std::min(maxlength, Length);
+  VL                                length = std::min(maxlength, Length);
   std::vector<char>::const_iterator it = Internal.begin();
   os << std::hex;
-  for(; it != Internal.begin()+length; ++it)
+  for (; it != Internal.begin() + length; ++it)
   {
     uint8_t v = *it;
-    if(it != Internal.begin()) os << "\\";
+    if (it != Internal.begin())
+      os << "\\";
     os << std::setw(2) << std::setfill('0') << (uint16_t)v;
   }
   os << std::dec;
   os.copyfmt(oldState);
 }
 
-void ByteValue::PrintGroupLength(std::ostream & os)
+void
+ByteValue::PrintGroupLength(std::ostream & os)
 {
   assert(Length == 2);
   (void)os;
 }
 
-bool ByteValue::IsEmpty() const
+bool
+ByteValue::IsEmpty() const
 {
   return Length == 0;
 }
 
-VL ByteValue::GetLength() const
+VL
+ByteValue::GetLength() const
 {
   return Length;
 }
 
-VL ByteValue::ComputeLength() const
+VL
+ByteValue::ComputeLength() const
 {
   return Length + Length % 2;
 }
 
-void ByteValue::SetLength(VL vl)
+void
+ByteValue::SetLength(VL vl)
 {
   VL l(vl);
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
   // CompressedLossy.dcm
-  if(l.IsUndefined())
+  if (l.IsUndefined())
   {
     throw std::logic_error("Can not SetLength, undefined");
   }
-  if(l.IsOdd())
+  if (l.IsOdd())
   {
     mdcmAlwaysWarnMacro("Odd length value field, trying to workaround");
     ++l;
@@ -135,63 +143,76 @@ void ByteValue::SetLength(VL vl)
   {
     Internal.resize(l);
   }
-  catch(...)
+  catch (...)
   {
     throw std::logic_error("Can not resize Internal, exception");
   }
   Length = vl;
 }
 
-void ByteValue::Append(ByteValue const & bv)
+void
+ByteValue::Append(ByteValue const & bv)
 {
   Internal.insert(Internal.end(), bv.Internal.begin(), bv.Internal.end());
   Length += bv.Length;
   assert(Internal.size() % 2 == 0 && Internal.size() == Length);
 }
 
-void ByteValue::Clear()
+void
+ByteValue::Clear()
 {
   Internal.clear();
 }
 
-const char * ByteValue::GetPointer() const
+const char *
+ByteValue::GetPointer() const
 {
-  if(!Internal.empty()) return &Internal[0];
+  if (!Internal.empty())
+    return &Internal[0];
   return NULL;
 }
 
-const void * ByteValue::GetVoidPointer() const
+const void *
+ByteValue::GetVoidPointer() const
 {
-  if(!Internal.empty()) return &Internal[0];
+  if (!Internal.empty())
+    return &Internal[0];
   return NULL;
 }
 
-void * ByteValue::GetVoidPointer()
+void *
+ByteValue::GetVoidPointer()
 {
-  if(!Internal.empty()) return &Internal[0];
+  if (!Internal.empty())
+    return &Internal[0];
   return NULL;
 }
 
-void ByteValue::Fill(char c)
+void
+ByteValue::Fill(char c)
 {
   std::vector<char>::iterator it = Internal.begin();
-  for(; it != Internal.end(); ++it) *it = c;
+  for (; it != Internal.end(); ++it)
+    *it = c;
 }
 
-bool ByteValue::GetBuffer(char * buffer, unsigned long long length) const
+bool
+ByteValue::GetBuffer(char * buffer, unsigned long long length) const
 {
-  if(length <= Internal.size())
+  if (length <= Internal.size())
   {
-    if (!Internal.empty()) memcpy(buffer, &Internal[0], length);
+    if (!Internal.empty())
+      memcpy(buffer, &Internal[0], length);
     return true;
   }
   mdcmAlwaysWarnMacro("Could not handle length = " << length);
   return false;
 }
 
-bool ByteValue::WriteBuffer(std::ostream & os) const
+bool
+ByteValue::WriteBuffer(std::ostream & os) const
 {
-  if(Length)
+  if (Length)
   {
     assert(!(Internal.size() % 2));
     os.write(&Internal[0], Internal.size());
@@ -199,7 +220,8 @@ bool ByteValue::WriteBuffer(std::ostream & os) const
   return true;
 }
 
-void ByteValue::SetLengthOnly(VL vl)
+void
+ByteValue::SetLengthOnly(VL vl)
 {
   Length = vl;
 }

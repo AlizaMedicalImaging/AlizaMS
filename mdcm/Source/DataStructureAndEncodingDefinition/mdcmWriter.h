@@ -53,30 +53,44 @@ class FileMetaInformation;
  */
 class MDCM_EXPORT Writer
 {
-friend class StreamImageWriter;
+  friend class StreamImageWriter;
+
 public:
   Writer();
   virtual ~Writer();
-  virtual bool Write();
-  void SetFileName(const char *);
-  void SetStream(std::ostream &);
-  void SetFile(const File &);
-  File & GetFile();
-  void SetCheckFileMetaInformation(bool);
-  void CheckFileMetaInformationOff();
-  void CheckFileMetaInformationOn();
+  virtual bool
+  Write();
+  void
+  SetFileName(const char *);
+  void
+  SetStream(std::ostream &);
+  void
+  SetFile(const File &);
+  File &
+  GetFile();
+  void
+  SetCheckFileMetaInformation(bool);
+  void
+  CheckFileMetaInformationOff();
+  void
+  CheckFileMetaInformationOn();
+
 protected:
-  void SetWriteDataSetOnly(bool);
-  std::ostream * GetStreamPtr() const;
-  bool GetCheckFileMetaInformation() const;
-  std::ostream * Stream;
+  void
+  SetWriteDataSetOnly(bool);
+  std::ostream *
+  GetStreamPtr() const;
+  bool
+                  GetCheckFileMetaInformation() const;
+  std::ostream *  Stream;
   std::ofstream * Ofstream;
+
 private:
   SmartPointer<File> F;
-  bool CheckFileMetaInformation;
-  bool WriteDataSetOnly;
+  bool               CheckFileMetaInformation;
+  bool               WriteDataSetOnly;
 };
 
 } // end namespace mdcm
 
-#endif //MDCMWRITER_H
+#endif // MDCMWRITER_H

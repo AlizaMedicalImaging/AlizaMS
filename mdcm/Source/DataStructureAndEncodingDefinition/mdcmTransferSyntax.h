@@ -84,34 +84,56 @@ public:
     TS_END
   } TSType;
   static const char * GetTSString(TSType);
-  static TSType GetTSType(const char *);
-  NegociatedType GetNegociatedType() const;
+  static TSType
+  GetTSType(const char *);
+  NegociatedType
+  GetNegociatedType() const;
   // Return the SwapCode associated with the Transfer Syntax. Be careful with
   // the special GE private syntax the DataSet is written in little endian but
   // the Pixel Data is in Big Endian.
-  SwapCode GetSwapCode() const;
-  bool IsValid() const { return TSField != TS_END; }
-  operator TSType () const { return TSField; }
-  TransferSyntax(TSType type = ImplicitVRLittleEndian) : TSField(type) {}
-  bool IsEncoded() const;
-  bool IsImplicit() const;
-  bool IsExplicit() const;
-  bool IsEncapsulated() const;
-  bool IsLossy() const;
-  bool IsLossless() const;
-  bool CanStoreLossy() const;
-  const char * GetString() const { return TransferSyntax::GetTSString(TSField); }
-  friend std::ostream &operator<<(std::ostream &, const TransferSyntax &);
+  SwapCode
+  GetSwapCode() const;
+  bool
+  IsValid() const
+  {
+    return TSField != TS_END;
+  }
+  operator TSType() const { return TSField; }
+  TransferSyntax(TSType type = ImplicitVRLittleEndian)
+    : TSField(type)
+  {}
+  bool
+  IsEncoded() const;
+  bool
+  IsImplicit() const;
+  bool
+  IsExplicit() const;
+  bool
+  IsEncapsulated() const;
+  bool
+  IsLossy() const;
+  bool
+  IsLossless() const;
+  bool
+  CanStoreLossy() const;
+  const char *
+  GetString() const
+  {
+    return TransferSyntax::GetTSString(TSField);
+  }
+  friend std::ostream &
+  operator<<(std::ostream &, const TransferSyntax &);
 
 private:
-  bool IsImplicit(TSType) const;
-  bool IsExplicit(TSType) const;
-  bool IsLittleEndian(TSType) const;
-  bool IsBigEndian(TSType) const;
+  bool   IsImplicit(TSType) const;
+  bool   IsExplicit(TSType) const;
+  bool   IsLittleEndian(TSType) const;
+  bool   IsBigEndian(TSType) const;
   TSType TSField;
 };
 
-inline std::ostream &operator<<(std::ostream & _os, const TransferSyntax & ts)
+inline std::ostream &
+operator<<(std::ostream & _os, const TransferSyntax & ts)
 {
   _os << TransferSyntax::GetTSString(ts);
   return _os;
@@ -119,4 +141,4 @@ inline std::ostream &operator<<(std::ostream & _os, const TransferSyntax & ts)
 
 } // end namespace mdcm
 
-#endif //MDCMTRANSFERSYNTAX_H
+#endif // MDCMTRANSFERSYNTAX_H

@@ -35,10 +35,13 @@ class MDCM_EXPORT SegmentedPaletteColorLookupTable : public LookupTable
 public:
   SegmentedPaletteColorLookupTable();
   ~SegmentedPaletteColorLookupTable();
-  void Print(std::ostream &) const {}
-  void SetLUT(LookupTableType, const unsigned char *, unsigned int);
+  void
+  Print(std::ostream &) const
+  {}
+  void
+  SetLUT(LookupTableType, const unsigned char *, unsigned int);
 };
 
 } // end namespace mdcm
 
-#endif //MDCMSEGMENTEDPALETTECOLORLOOKUPTABLE_H
+#endif // MDCMSEGMENTEDPALETTECOLORLOOKUPTABLE_H

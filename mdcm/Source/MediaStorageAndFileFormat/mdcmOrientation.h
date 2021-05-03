@@ -32,7 +32,9 @@ namespace mdcm
  */
 class MDCM_EXPORT Orientation
 {
-friend std::ostream& operator<<(std::ostream &, const Orientation &);
+  friend std::ostream &
+  operator<<(std::ostream &, const Orientation &);
+
 public:
   Orientation();
   ~Orientation();
@@ -44,19 +46,26 @@ public:
     SAGITTAL,
     OBLIQUE
   } OrientationType;
-  static OrientationType GetType(const double[6]);
-  static void SetObliquityThresholdCosineValue(double);
-  static double GetObliquityThresholdCosineValue();
+  static OrientationType
+  GetType(const double[6]);
+  static void
+  SetObliquityThresholdCosineValue(double);
+  static double
+                      GetObliquityThresholdCosineValue();
   static const char * GetLabel(OrientationType);
-  void Print(std::ostream &) const;
+  void
+  Print(std::ostream &) const;
+
 protected:
-  static char GetMajorAxisFromPatientRelativeDirectionCosine(
-    double, double, double);
+  static char
+  GetMajorAxisFromPatientRelativeDirectionCosine(double, double, double);
+
 private:
   static double ObliquityThresholdCosineValue;
 };
 
-inline std::ostream& operator<<(std::ostream & os, const Orientation & o)
+inline std::ostream &
+operator<<(std::ostream & os, const Orientation & o)
 {
   o.Print(os);
   return os;
@@ -64,4 +73,4 @@ inline std::ostream& operator<<(std::ostream & os, const Orientation & o)
 
 } // end namespace mdcm
 
-#endif //MDCMORIENTATION_H
+#endif // MDCMORIENTATION_H

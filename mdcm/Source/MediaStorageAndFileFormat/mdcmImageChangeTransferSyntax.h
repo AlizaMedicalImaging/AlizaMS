@@ -49,34 +49,48 @@ class MDCM_EXPORT ImageChangeTransferSyntax : public ImageToImageFilter
 {
 public:
   ImageChangeTransferSyntax()
-    :
-    TS(TransferSyntax::TS_END),
-    Force(false),
-    CompressIconImage(false),
-    ForceYBRFull(false),
-	UserCodec(NULL) {}
+    : TS(TransferSyntax::TS_END)
+    , Force(false)
+    , CompressIconImage(false)
+    , ForceYBRFull(false)
+    , UserCodec(NULL)
+  {}
   ~ImageChangeTransferSyntax() {}
-  void SetTransferSyntax(const TransferSyntax &);
-  const TransferSyntax & GetTransferSyntax() const;
-  void SetCompressIconImage(bool);
-  void SetForce(bool);
-  void SetUserCodec(ImageCodec *);
-  void SetForceYBRFull(bool);
-  bool Change();
+  void
+  SetTransferSyntax(const TransferSyntax &);
+  const TransferSyntax &
+  GetTransferSyntax() const;
+  void
+  SetCompressIconImage(bool);
+  void
+  SetForce(bool);
+  void
+  SetUserCodec(ImageCodec *);
+  void
+  SetForceYBRFull(bool);
+  bool
+  Change();
+
 protected:
-  bool TryRAWCodec(const DataElement &, Bitmap const &, Bitmap &);
-  bool TryRLECodec(const DataElement &, Bitmap const &, Bitmap &);
-  bool TryJPEGCodec(const DataElement &, Bitmap const &, Bitmap &);
-  bool TryJPEGLSCodec(const DataElement &, Bitmap const &, Bitmap &);
-  bool TryJPEG2000Codec(const DataElement &, Bitmap const &, Bitmap &);
+  bool
+  TryRAWCodec(const DataElement &, Bitmap const &, Bitmap &);
+  bool
+  TryRLECodec(const DataElement &, Bitmap const &, Bitmap &);
+  bool
+  TryJPEGCodec(const DataElement &, Bitmap const &, Bitmap &);
+  bool
+  TryJPEGLSCodec(const DataElement &, Bitmap const &, Bitmap &);
+  bool
+  TryJPEG2000Codec(const DataElement &, Bitmap const &, Bitmap &);
+
 private:
   TransferSyntax TS;
-  bool Force;
-  bool CompressIconImage;
-  bool ForceYBRFull;
-  ImageCodec *UserCodec;
+  bool           Force;
+  bool           CompressIconImage;
+  bool           ForceYBRFull;
+  ImageCodec *   UserCodec;
 };
 
 } // end namespace mdcm
 
-#endif //MDCMIMAGECHANGETRANSFERSYNTAX_H
+#endif // MDCMIMAGECHANGETRANSFERSYNTAX_H

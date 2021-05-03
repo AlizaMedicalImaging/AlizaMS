@@ -33,17 +33,23 @@ class BoxRegion;
 
 class MDCM_EXPORT Region
 {
-public :
+public:
   Region();
   virtual ~Region();
-  virtual void Print(std::ostream & os = std::cout) const;
-  virtual bool Empty() const = 0;
-  virtual bool IsValid() const = 0;
-  virtual size_t Area() const = 0;
-  virtual BoxRegion ComputeBoundingBox() = 0;
+  virtual void
+  Print(std::ostream & os = std::cout) const;
+  virtual bool
+  Empty() const = 0;
+  virtual bool
+  IsValid() const = 0;
+  virtual size_t
+  Area() const = 0;
+  virtual BoxRegion
+  ComputeBoundingBox() = 0;
 };
 
-inline std::ostream& operator<<(std::ostream & os, const Region & r)
+inline std::ostream &
+operator<<(std::ostream & os, const Region & r)
 {
   r.Print(os);
   return os;
@@ -51,4 +57,4 @@ inline std::ostream& operator<<(std::ostream & os, const Region & r)
 
 } // end namespace mdcm
 
-#endif //MDCMREGION_H
+#endif // MDCMREGION_H

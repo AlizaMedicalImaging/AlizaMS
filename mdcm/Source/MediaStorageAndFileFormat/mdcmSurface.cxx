@@ -27,32 +27,29 @@
 namespace mdcm
 {
 
-static const char * STATESStrings[] =
-{
-  "NO",
-  "YES",
-  "UNKNOWN",
-  NULL
-};
+static const char * STATESStrings[] = { "NO", "YES", "UNKNOWN", NULL };
 
-const char * Surface::GetSTATESString(STATES state)
+const char *
+Surface::GetSTATESString(STATES state)
 {
   assert(state <= STATES_END);
   return STATESStrings[(int)state];
 }
 
-Surface::STATES Surface::GetSTATES(const char * state)
+Surface::STATES
+Surface::GetSTATES(const char * state)
 {
-  if(!state) return STATES_END;
+  if (!state)
+    return STATES_END;
   // Delete possible space as last character
-  String<>  str( state );
+  String<> str(state);
   str.Trim();
-  std::string stateClearStr = str.Trim();
+  std::string  stateClearStr = str.Trim();
   const char * stateClear = stateClearStr.c_str();
 
-  for(unsigned int i = 0; STATESStrings[i] != NULL; ++i)
+  for (unsigned int i = 0; STATESStrings[i] != NULL; ++i)
   {
-    if(strcmp(stateClear, STATESStrings[i]) == 0)
+    if (strcmp(stateClear, STATESStrings[i]) == 0)
     {
       return (STATES)i;
     }
@@ -60,11 +57,11 @@ Surface::STATES Surface::GetSTATES(const char * state)
   // We did not find anything, that's pretty bad, let's hope that
   // the toolkit which wrote the image is buggy and tolerate space padded binary
   // string
-  CodeString  codestring  = stateClear;
-  std::string cs          = codestring.GetAsString();
-  for(unsigned int i = 0; STATESStrings[i] != NULL; ++i)
+  CodeString  codestring = stateClear;
+  std::string cs = codestring.GetAsString();
+  for (unsigned int i = 0; STATESStrings[i] != NULL; ++i)
   {
-    if(strcmp(cs.c_str(), STATESStrings[i]) == 0)
+    if (strcmp(cs.c_str(), STATESStrings[i]) == 0)
     {
       return (STATES)i;
     }
@@ -72,31 +69,28 @@ Surface::STATES Surface::GetSTATES(const char * state)
   return STATES_END;
 }
 
-static const char * VIEWStrings[] =
-{
-  "SURFACE",
-  "WIREFRAME",
-  "POINTS",
-  NULL
-};
+static const char * VIEWStrings[] = { "SURFACE", "WIREFRAME", "POINTS", NULL };
 
-const char * Surface::GetVIEWTypeString(VIEWType type)
+const char *
+Surface::GetVIEWTypeString(VIEWType type)
 {
   assert(type <= VIEWType_END);
   return VIEWStrings[(int)type];
 }
 
-Surface::VIEWType Surface::GetVIEWType(const char * type)
+Surface::VIEWType
+Surface::GetVIEWType(const char * type)
 {
-  if(!type) return VIEWType_END;
+  if (!type)
+    return VIEWType_END;
   // Delete possible space as last character
-  String<>  str( type );
+  String<> str(type);
   str.Trim();
-  std::string typeClearStr = str.Trim();
+  std::string  typeClearStr = str.Trim();
   const char * typeClear = typeClearStr.c_str();
-  for(unsigned int i = 0; VIEWStrings[i] != NULL; ++i)
+  for (unsigned int i = 0; VIEWStrings[i] != NULL; ++i)
   {
-    if(strcmp(typeClear, VIEWStrings[i]) == 0)
+    if (strcmp(typeClear, VIEWStrings[i]) == 0)
     {
       return (VIEWType)i;
     }
@@ -104,11 +98,11 @@ Surface::VIEWType Surface::GetVIEWType(const char * type)
   // Ouch ! We did not find anything, that's pretty bad, let's hope that
   // the toolkit which wrote the image is buggy and tolerate space padded binary
   // string
-  CodeString  codestring  = typeClear;
-  std::string cs          = codestring.GetAsString();
-  for(unsigned int i = 0; VIEWStrings[i] != NULL; ++i)
+  CodeString  codestring = typeClear;
+  std::string cs = codestring.GetAsString();
+  for (unsigned int i = 0; VIEWStrings[i] != NULL; ++i)
   {
-    if(strcmp(cs.c_str(), VIEWStrings[i]) == 0)
+    if (strcmp(cs.c_str(), VIEWStrings[i]) == 0)
     {
       return (VIEWType)i;
     }
@@ -116,34 +110,34 @@ Surface::VIEWType Surface::GetVIEWType(const char * type)
   return VIEWType_END;
 }
 
-Surface::Surface():
-  SurfaceNumber(0),
-  SurfaceComments(""),
-  SurfaceProcessing(false),
-  SurfaceProcessingRatio(1.),
-  SurfaceProcessingDescription(""),
-  ProcessingAlgorithm(),
-  RecommendedDisplayGrayscaleValue(0),
-  RecommendedPresentationOpacity(1),
-  RecommendedPresentationType(SURFACE),
-  FiniteVolume(UNKNOWN),
-  Manifold(UNKNOWN),
-  AlgorithmFamily(),
-  AlgorithmVersion(""),
-  AlgorithmName(""),
-  NumberOfSurfacePoints(0),
-  PointCoordinatesData(),
-  PointPositionAccuracy(NULL),
-  MeanPointDistance(0),
-  MaximumPointDistance(0),
-  PointsBoundingBoxCoordinates(NULL),
-  AxisOfRotation(NULL),
-  CenterOfRotation(NULL),
-  NumberOfVectors(0),
-  VectorDimensionality(0),
-  VectorAccuracy(NULL),
-  VectorCoordinateData(),
-  Primitive(new MeshPrimitive)
+Surface::Surface()
+  : SurfaceNumber(0)
+  , SurfaceComments("")
+  , SurfaceProcessing(false)
+  , SurfaceProcessingRatio(1.)
+  , SurfaceProcessingDescription("")
+  , ProcessingAlgorithm()
+  , RecommendedDisplayGrayscaleValue(0)
+  , RecommendedPresentationOpacity(1)
+  , RecommendedPresentationType(SURFACE)
+  , FiniteVolume(UNKNOWN)
+  , Manifold(UNKNOWN)
+  , AlgorithmFamily()
+  , AlgorithmVersion("")
+  , AlgorithmName("")
+  , NumberOfSurfacePoints(0)
+  , PointCoordinatesData()
+  , PointPositionAccuracy(NULL)
+  , MeanPointDistance(0)
+  , MaximumPointDistance(0)
+  , PointsBoundingBoxCoordinates(NULL)
+  , AxisOfRotation(NULL)
+  , CenterOfRotation(NULL)
+  , NumberOfVectors(0)
+  , VectorDimensionality(0)
+  , VectorAccuracy(NULL)
+  , VectorCoordinateData()
+  , Primitive(new MeshPrimitive)
 {
   RecommendedDisplayCIELabValue[0] = 0;
   RecommendedDisplayCIELabValue[1] = 0;
@@ -152,48 +146,60 @@ Surface::Surface():
 
 Surface::~Surface()
 {
-  if(PointPositionAccuracy)        delete[] PointPositionAccuracy;
-  if(PointsBoundingBoxCoordinates) delete[] PointsBoundingBoxCoordinates;
-  if(AxisOfRotation)               delete[] AxisOfRotation;
-  if(CenterOfRotation)             delete[] CenterOfRotation;
-  if(VectorAccuracy)               delete[] VectorAccuracy;
+  if (PointPositionAccuracy)
+    delete[] PointPositionAccuracy;
+  if (PointsBoundingBoxCoordinates)
+    delete[] PointsBoundingBoxCoordinates;
+  if (AxisOfRotation)
+    delete[] AxisOfRotation;
+  if (CenterOfRotation)
+    delete[] CenterOfRotation;
+  if (VectorAccuracy)
+    delete[] VectorAccuracy;
 }
 
-unsigned short Surface::GetRecommendedDisplayGrayscaleValue() const
+unsigned short
+Surface::GetRecommendedDisplayGrayscaleValue() const
 {
   return RecommendedDisplayGrayscaleValue;
 }
 
-void Surface::SetRecommendedDisplayGrayscaleValue(const unsigned short vl)
+void
+Surface::SetRecommendedDisplayGrayscaleValue(const unsigned short vl)
 {
   RecommendedDisplayGrayscaleValue = vl;
 }
 
-const unsigned short * Surface::GetRecommendedDisplayCIELabValue() const
+const unsigned short *
+Surface::GetRecommendedDisplayCIELabValue() const
 {
   return &RecommendedDisplayCIELabValue[0];
 }
 
-unsigned short Surface::GetRecommendedDisplayCIELabValue(const unsigned int idx) const
+unsigned short
+Surface::GetRecommendedDisplayCIELabValue(const unsigned int idx) const
 {
   assert(idx < 3);
   return RecommendedDisplayCIELabValue[idx];
 }
 
-void Surface::SetRecommendedDisplayCIELabValue(const unsigned short vl[3])
+void
+Surface::SetRecommendedDisplayCIELabValue(const unsigned short vl[3])
 {
   RecommendedDisplayCIELabValue[0] = vl[0];
   RecommendedDisplayCIELabValue[1] = vl[1];
   RecommendedDisplayCIELabValue[2] = vl[2];
 }
 
-void Surface::SetRecommendedDisplayCIELabValue(const unsigned short vl, const unsigned int idx)
+void
+Surface::SetRecommendedDisplayCIELabValue(const unsigned short vl, const unsigned int idx)
 {
   assert(idx < 3);
   RecommendedDisplayCIELabValue[idx] = vl;
 }
 
-void Surface::SetRecommendedDisplayCIELabValue(const std::vector< unsigned short > & vl)
+void
+Surface::SetRecommendedDisplayCIELabValue(const std::vector<unsigned short> & vl)
 {
   assert(vl.size() > 2);
   RecommendedDisplayCIELabValue[0] = vl[0];
@@ -201,226 +207,269 @@ void Surface::SetRecommendedDisplayCIELabValue(const std::vector< unsigned short
   RecommendedDisplayCIELabValue[2] = vl[2];
 }
 
-float Surface::GetRecommendedPresentationOpacity() const
+float
+Surface::GetRecommendedPresentationOpacity() const
 {
   return RecommendedPresentationOpacity;
 }
 
-void Surface::SetRecommendedPresentationOpacity(float opacity)
+void
+Surface::SetRecommendedPresentationOpacity(float opacity)
 {
-  if((0 <= opacity) && (opacity <= 1))
+  if ((0 <= opacity) && (opacity <= 1))
   {
     RecommendedPresentationOpacity = opacity;
   }
 }
 
-Surface::VIEWType Surface::GetRecommendedPresentationType() const
+Surface::VIEWType
+Surface::GetRecommendedPresentationType() const
 {
   return RecommendedPresentationType;
 }
 
-void Surface::SetRecommendedPresentationType(VIEWType type)
+void
+Surface::SetRecommendedPresentationType(VIEWType type)
 {
-  if(type < VIEWType_END)
+  if (type < VIEWType_END)
   {
     RecommendedPresentationType = type;
   }
 }
 
-unsigned long Surface::GetSurfaceNumber() const
+unsigned long
+Surface::GetSurfaceNumber() const
 {
   return SurfaceNumber;
 }
 
-void Surface::SetSurfaceNumber(const unsigned long nb)
+void
+Surface::SetSurfaceNumber(const unsigned long nb)
 {
   SurfaceNumber = nb;
 }
 
-const char * Surface::GetSurfaceComments() const
+const char *
+Surface::GetSurfaceComments() const
 {
   return SurfaceComments.c_str();
 }
 
-void Surface::SetSurfaceComments(const char * comment)
+void
+Surface::SetSurfaceComments(const char * comment)
 {
   SurfaceComments = comment;
 }
 
-bool Surface::GetSurfaceProcessing() const
+bool
+Surface::GetSurfaceProcessing() const
 {
   return SurfaceProcessing;
 }
 
-void Surface::SetSurfaceProcessing(bool b)
+void
+Surface::SetSurfaceProcessing(bool b)
 {
   SurfaceProcessing = b;
 }
 
-float Surface::GetSurfaceProcessingRatio() const
+float
+Surface::GetSurfaceProcessingRatio() const
 {
   return SurfaceProcessingRatio;
 }
 
-void Surface::SetSurfaceProcessingRatio(const float ratio)
+void
+Surface::SetSurfaceProcessingRatio(const float ratio)
 {
   SurfaceProcessingRatio = ratio;
 }
 
-const char * Surface::GetSurfaceProcessingDescription() const
+const char *
+Surface::GetSurfaceProcessingDescription() const
 {
   return SurfaceProcessingDescription.c_str();
 }
 
-void Surface::SetSurfaceProcessingDescription(const char * description)
+void
+Surface::SetSurfaceProcessingDescription(const char * description)
 {
   SurfaceProcessingDescription = description;
 }
 
-SegmentHelper::BasicCodedEntry const & Surface::GetProcessingAlgorithm() const
+SegmentHelper::BasicCodedEntry const &
+Surface::GetProcessingAlgorithm() const
 {
   return ProcessingAlgorithm;
 }
 
-SegmentHelper::BasicCodedEntry & Surface::GetProcessingAlgorithm()
+SegmentHelper::BasicCodedEntry &
+Surface::GetProcessingAlgorithm()
 {
   return ProcessingAlgorithm;
 }
 
-void Surface::SetProcessingAlgorithm(SegmentHelper::BasicCodedEntry const & BSE)
+void
+Surface::SetProcessingAlgorithm(SegmentHelper::BasicCodedEntry const & BSE)
 {
-  ProcessingAlgorithm.CV  = BSE.CV;
+  ProcessingAlgorithm.CV = BSE.CV;
   ProcessingAlgorithm.CSD = BSE.CSD;
-  ProcessingAlgorithm.CM  = BSE.CM;
+  ProcessingAlgorithm.CM = BSE.CM;
 }
 
-Surface::STATES Surface::GetFiniteVolume() const
+Surface::STATES
+Surface::GetFiniteVolume() const
 {
   return FiniteVolume;
 }
 
-void Surface::SetFiniteVolume(STATES state)
+void
+Surface::SetFiniteVolume(STATES state)
 {
   assert(state < STATES_END);
   FiniteVolume = state;
 }
 
-Surface::STATES Surface::GetManifold() const
+Surface::STATES
+Surface::GetManifold() const
 {
   return Manifold;
 }
 
-void Surface::SetManifold(STATES state)
+void
+Surface::SetManifold(STATES state)
 {
   assert(state < STATES_END);
   Manifold = state;
 }
 
-SegmentHelper::BasicCodedEntry const & Surface::GetAlgorithmFamily() const
+SegmentHelper::BasicCodedEntry const &
+Surface::GetAlgorithmFamily() const
 {
   return AlgorithmFamily;
 }
 
-SegmentHelper::BasicCodedEntry & Surface::GetAlgorithmFamily()
+SegmentHelper::BasicCodedEntry &
+Surface::GetAlgorithmFamily()
 {
   return AlgorithmFamily;
 }
 
-void Surface::SetAlgorithmFamily(SegmentHelper::BasicCodedEntry const & BSE)
+void
+Surface::SetAlgorithmFamily(SegmentHelper::BasicCodedEntry const & BSE)
 {
-  AlgorithmFamily.CV  = BSE.CV;
+  AlgorithmFamily.CV = BSE.CV;
   AlgorithmFamily.CSD = BSE.CSD;
-  AlgorithmFamily.CM  = BSE.CM;
+  AlgorithmFamily.CM = BSE.CM;
 }
 
-const char * Surface::GetAlgorithmVersion() const
+const char *
+Surface::GetAlgorithmVersion() const
 {
   return AlgorithmVersion.c_str();
 }
 
-void Surface::SetAlgorithmVersion(const char * str)
+void
+Surface::SetAlgorithmVersion(const char * str)
 {
   AlgorithmVersion = str;
 }
 
-const char * Surface::GetAlgorithmName() const
+const char *
+Surface::GetAlgorithmName() const
 {
   return AlgorithmName.c_str();
 }
 
-void Surface::SetAlgorithmName(const char * str)
+void
+Surface::SetAlgorithmName(const char * str)
 {
   AlgorithmName = str;
 }
 
-unsigned long Surface::GetNumberOfSurfacePoints() const
+unsigned long
+Surface::GetNumberOfSurfacePoints() const
 {
   return NumberOfSurfacePoints;
 }
 
-void Surface::SetNumberOfSurfacePoints(const unsigned long nb)
+void
+Surface::SetNumberOfSurfacePoints(const unsigned long nb)
 {
   NumberOfSurfacePoints = nb;
 }
 
-const DataElement & Surface::GetPointCoordinatesData() const
+const DataElement &
+Surface::GetPointCoordinatesData() const
 {
   return PointCoordinatesData;
 }
 
-DataElement & Surface::GetPointCoordinatesData()
+DataElement &
+Surface::GetPointCoordinatesData()
 {
   return PointCoordinatesData;
 }
 
-void Surface::SetPointCoordinatesData(DataElement const & de)
+void
+Surface::SetPointCoordinatesData(DataElement const & de)
 {
   PointCoordinatesData = de;
 }
 
-const float * Surface::GetPointPositionAccuracy() const
+const float *
+Surface::GetPointPositionAccuracy() const
 {
   return PointPositionAccuracy;
 }
 
-void Surface::SetPointPositionAccuracy(const float * accuracies)
+void
+Surface::SetPointPositionAccuracy(const float * accuracies)
 {
   assert(accuracies);
-  if(!PointPositionAccuracy) PointPositionAccuracy = new float[3];
+  if (!PointPositionAccuracy)
+    PointPositionAccuracy = new float[3];
   PointPositionAccuracy[0] = accuracies[0];
   PointPositionAccuracy[1] = accuracies[1];
   PointPositionAccuracy[2] = accuracies[2];
 }
 
-float Surface::GetMeanPointDistance() const
+float
+Surface::GetMeanPointDistance() const
 {
   return MeanPointDistance;
 }
 
-void Surface::SetMeanPointDistance(float average)
+void
+Surface::SetMeanPointDistance(float average)
 {
   MeanPointDistance = average;
 }
 
-float Surface::GetMaximumPointDistance() const
+float
+Surface::GetMaximumPointDistance() const
 {
   return MaximumPointDistance;
 }
 
-void Surface::SetMaximumPointDistance(float maximum)
+void
+Surface::SetMaximumPointDistance(float maximum)
 {
   MaximumPointDistance = maximum;
 }
 
-const float * Surface::GetPointsBoundingBoxCoordinates() const
+const float *
+Surface::GetPointsBoundingBoxCoordinates() const
 {
   return PointsBoundingBoxCoordinates;
 }
 
-void Surface::SetPointsBoundingBoxCoordinates(const float * coordinates)
+void
+Surface::SetPointsBoundingBoxCoordinates(const float * coordinates)
 {
   assert(coordinates);
-  if(!PointsBoundingBoxCoordinates) PointsBoundingBoxCoordinates = new float[6];
+  if (!PointsBoundingBoxCoordinates)
+    PointsBoundingBoxCoordinates = new float[6];
   PointsBoundingBoxCoordinates[0] = coordinates[0];
   PointsBoundingBoxCoordinates[1] = coordinates[1];
   PointsBoundingBoxCoordinates[2] = coordinates[2];
@@ -429,97 +478,116 @@ void Surface::SetPointsBoundingBoxCoordinates(const float * coordinates)
   PointsBoundingBoxCoordinates[5] = coordinates[5];
 }
 
-const float * Surface::GetAxisOfRotation() const
+const float *
+Surface::GetAxisOfRotation() const
 {
   return AxisOfRotation;
 }
 
-void Surface::SetAxisOfRotation(const float * axis)
+void
+Surface::SetAxisOfRotation(const float * axis)
 {
   assert(axis);
-  if(!AxisOfRotation) AxisOfRotation = new float[3];
+  if (!AxisOfRotation)
+    AxisOfRotation = new float[3];
   AxisOfRotation[0] = axis[0];
   AxisOfRotation[1] = axis[1];
   AxisOfRotation[2] = axis[2];
 }
 
-const float * Surface::GetCenterOfRotation() const
+const float *
+Surface::GetCenterOfRotation() const
 {
   return CenterOfRotation;
 }
 
-void Surface::SetCenterOfRotation(const float * center)
+void
+Surface::SetCenterOfRotation(const float * center)
 {
   assert(center);
-  if(!CenterOfRotation ) CenterOfRotation = new float[3];
+  if (!CenterOfRotation)
+    CenterOfRotation = new float[3];
   CenterOfRotation[0] = center[0];
   CenterOfRotation[1] = center[1];
   CenterOfRotation[2] = center[2];
 }
 
-unsigned long Surface::GetNumberOfVectors() const
+unsigned long
+Surface::GetNumberOfVectors() const
 {
   return NumberOfVectors;
 }
 
-void Surface::SetNumberOfVectors(const unsigned long nb)
+void
+Surface::SetNumberOfVectors(const unsigned long nb)
 {
   NumberOfVectors = nb;
 }
 
-unsigned short Surface::GetVectorDimensionality() const
+unsigned short
+Surface::GetVectorDimensionality() const
 {
   return VectorDimensionality;
 }
 
-void Surface::SetVectorDimensionality(const unsigned short dim)
+void
+Surface::SetVectorDimensionality(const unsigned short dim)
 {
   VectorDimensionality = dim;
 }
 
-const float * Surface::GetVectorAccuracy() const
+const float *
+Surface::GetVectorAccuracy() const
 {
   return VectorAccuracy;
 }
 
-void Surface::SetVectorAccuracy(const float * accuracy)
+void
+Surface::SetVectorAccuracy(const float * accuracy)
 {
   assert(accuracy);
-  if(!VectorAccuracy) VectorAccuracy = new float[VectorDimensionality];
-  for(unsigned int i = 0; i < VectorDimensionality; ++i)
+  if (!VectorAccuracy)
+    VectorAccuracy = new float[VectorDimensionality];
+  for (unsigned int i = 0; i < VectorDimensionality; ++i)
   {
     VectorAccuracy[i] = accuracy[i];
   }
 }
 
-const DataElement & Surface::GetVectorCoordinateData() const
+const DataElement &
+Surface::GetVectorCoordinateData() const
 {
   return VectorCoordinateData;
 }
 
-DataElement & Surface::GetVectorCoordinateData()
+DataElement &
+Surface::GetVectorCoordinateData()
 {
   return VectorCoordinateData;
 }
 
-void Surface::SetVectorCoordinateData(DataElement const & de)
+void
+Surface::SetVectorCoordinateData(DataElement const & de)
 {
   VectorCoordinateData = de;
 }
 
-MeshPrimitive const & Surface::GetMeshPrimitive() const
+MeshPrimitive const &
+Surface::GetMeshPrimitive() const
 {
   return *Primitive;
 }
 
-MeshPrimitive & Surface::GetMeshPrimitive()
+MeshPrimitive &
+Surface::GetMeshPrimitive()
 {
   return *Primitive;
 }
 
-void Surface::SetMeshPrimitive(MeshPrimitive & mp)
+void
+Surface::SetMeshPrimitive(MeshPrimitive & mp)
 {
   Primitive = mp;
 }
 
-}
+} // namespace mdcm

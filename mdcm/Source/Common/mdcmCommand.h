@@ -31,116 +31,138 @@ class Event;
 
 class MDCM_EXPORT Command : public Subject
 {
-public :
-  virtual void Execute(Subject *, const Event &) = 0;
-  virtual void Execute(const Subject *, const Event &) = 0;
+public:
+  virtual void
+  Execute(Subject *, const Event &) = 0;
+  virtual void
+  Execute(const Subject *, const Event &) = 0;
 
 protected:
-  Command()  {};
-  ~Command() {};
+  Command(){};
+  ~Command(){};
 
 private:
-  Command(const Command &); //purposely not implemented
-  void operator=(const Command &); //purposely not implemented
+  Command(const Command &); // purposely not implemented
+  void
+  operator=(const Command &); // purposely not implemented
 };
 
-template <class T> class MemberCommand : public Command
+template <class T>
+class MemberCommand : public Command
 {
 public:
   typedef void (T::*TMemberFunctionPointer)(Subject *, const Event &);
   typedef void (T::*TConstMemberFunctionPointer)(const Subject *, const Event &);
   typedef MemberCommand Self;
 
-  static SmartPointer<MemberCommand> New()
+  static SmartPointer<MemberCommand>
+  New()
   {
     return new MemberCommand;
   }
 
-  void SetCallbackFunction(T * object, TMemberFunctionPointer memberFunction)
+  void
+  SetCallbackFunction(T * object, TMemberFunctionPointer memberFunction)
   {
     m_This = object;
     m_MemberFunction = memberFunction;
   }
 
-  void SetCallbackFunction(T * object, TConstMemberFunctionPointer memberFunction)
+  void
+  SetCallbackFunction(T * object, TConstMemberFunctionPointer memberFunction)
   {
     m_This = object;
     m_ConstMemberFunction = memberFunction;
   }
 
-  void Execute(Subject * caller, const Event & event) override
+  void
+  Execute(Subject * caller, const Event & event) override
   {
-    if(m_This && m_MemberFunction)
+    if (m_This && m_MemberFunction)
     {
       ((*m_This).*(m_MemberFunction))(caller, event);
     }
   }
 
-  void Execute(const Subject * caller, const Event & event) override
+  void
+  Execute(const Subject * caller, const Event & event) override
   {
-    if(m_This && m_MemberFunction)
+    if (m_This && m_MemberFunction)
     {
       ((*m_This).*(m_ConstMemberFunction))(caller, event);
     }
   }
 
 protected:
-  T * m_This;
-  TMemberFunctionPointer m_MemberFunction;
+  T *                         m_This;
+  TMemberFunctionPointer      m_MemberFunction;
   TConstMemberFunctionPointer m_ConstMemberFunction;
-  MemberCommand() : m_This(NULL),m_MemberFunction(0),m_ConstMemberFunction(0) {}
+  MemberCommand()
+    : m_This(NULL)
+    , m_MemberFunction(0)
+    , m_ConstMemberFunction(0)
+  {}
   virtual ~MemberCommand() {}
 
 private:
-  MemberCommand(const Self&); //purposely not implemented
-  void operator=(const Self&); //purposely not implemented
+  MemberCommand(const Self &); // purposely not implemented
+  void
+  operator=(const Self &); // purposely not implemented
 };
 
 
-template <typename T> class SimpleMemberCommand : public Command
+template <typename T>
+class SimpleMemberCommand : public Command
 {
 public:
   typedef void (T::*TMemberFunctionPointer)();
   typedef SimpleMemberCommand Self;
-  static SmartPointer<SimpleMemberCommand> New()
+  static SmartPointer<SimpleMemberCommand>
+  New()
   {
     return new SimpleMemberCommand;
   }
 
-  void SetCallbackFunction(T * object,
-    TMemberFunctionPointer memberFunction)
+  void
+  SetCallbackFunction(T * object, TMemberFunctionPointer memberFunction)
   {
     m_This = object;
     m_MemberFunction = memberFunction;
   }
 
-  void Execute(Subject *,const Event &) override
+  void
+  Execute(Subject *, const Event &) override
   {
-    if(m_This && m_MemberFunction)
+    if (m_This && m_MemberFunction)
     {
       ((*m_This).*(m_MemberFunction))();
     }
   }
 
-  void Execute(const Subject *,const Event &) override
+  void
+  Execute(const Subject *, const Event &) override
   {
-    if(m_This && m_MemberFunction)
+    if (m_This && m_MemberFunction)
     {
       ((*m_This).*(m_MemberFunction))();
     }
   }
 
 protected:
-  T * m_This;
+  T *                    m_This;
   TMemberFunctionPointer m_MemberFunction;
-  SimpleMemberCommand() : m_This(NULL),m_MemberFunction(0) {}
+  SimpleMemberCommand()
+    : m_This(NULL)
+    , m_MemberFunction(0)
+  {}
   virtual ~SimpleMemberCommand() {}
 
 private:
-  SimpleMemberCommand(const Self &); //purposely not implemented
-  void operator=(const Self &); //purposely not implemented
+  SimpleMemberCommand(const Self &); // purposely not implemented
+  void
+  operator=(const Self &); // purposely not implemented
 };
 
 } // end namespace mdcm
 
-#endif //MDCMCOMMAND_H
+#endif // MDCMCOMMAND_H

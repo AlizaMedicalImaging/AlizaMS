@@ -11,6 +11,9 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+
+// clang-format off
+
 #include "mdcmVR.h"
 #include <algorithm>
 #include <cstring>
@@ -18,134 +21,101 @@
 namespace mdcm
 {
 
-static const char *VRStrings[] = {
-  "??",            //  0
-  "AE",            //  1
-  "AS",            //  2
-  "AT",            //  3
-  "CS",            //  4
-  "DA",            //  5
-  "DS",            //  6
-  "DT",            //  7
-  "FD",            //  8
-  "FL",            //  9
-  "IS",            // 10
-  "LO",            // 11
-  "LT",            // 12
-  "OB",            // 13
-  "OF",            // 14
-  "OW",            // 15
-  "PN",            // 16
-  "SH",            // 17
-  "SL",            // 18
-  "SQ",            // 19
-  "SS",            // 20
-  "ST",            // 21
-  "TM",            // 22
-  "UI",            // 23
-  "UL",            // 24
-  "UN",            // 25
-  "US",            // 26
-  "UT",            // 27
-  "OD",            // 28
-  "OL",            // 29
-  "UC",            // 30
-  "UR",            // 31
-  "OV",            // 32
-  "SV",            // 33
-  "UV",            // 34
-  "OB or OW",      // 35
-  "US or SS",      // 36
-  "US or SS or OW",// 37
-  "US or OW",      // 38
-  NULL
-};
+static const char * VRStrings[] = { "??",             //  0
+                                    "AE",             //  1
+                                    "AS",             //  2
+                                    "AT",             //  3
+                                    "CS",             //  4
+                                    "DA",             //  5
+                                    "DS",             //  6
+                                    "DT",             //  7
+                                    "FD",             //  8
+                                    "FL",             //  9
+                                    "IS",             // 10
+                                    "LO",             // 11
+                                    "LT",             // 12
+                                    "OB",             // 13
+                                    "OF",             // 14
+                                    "OW",             // 15
+                                    "PN",             // 16
+                                    "SH",             // 17
+                                    "SL",             // 18
+                                    "SQ",             // 19
+                                    "SS",             // 20
+                                    "ST",             // 21
+                                    "TM",             // 22
+                                    "UI",             // 23
+                                    "UL",             // 24
+                                    "UN",             // 25
+                                    "US",             // 26
+                                    "UT",             // 27
+                                    "OD",             // 28
+                                    "OL",             // 29
+                                    "UC",             // 30
+                                    "UR",             // 31
+                                    "OV",             // 32
+                                    "SV",             // 33
+                                    "UV",             // 34
+                                    "OB or OW",       // 35
+                                    "US or SS",       // 36
+                                    "US or SS or OW", // 37
+                                    "US or OW",       // 38
+                                    NULL };
 
-static VR::VRType VRValue[] = {
-    VR::INVALID,
-    VR::AE,
-    VR::AS,
-    VR::AT,
-    VR::CS,
-    VR::DA,
-    VR::DS,
-    VR::DT,
-    VR::FD,
-    VR::FL,
-    VR::IS,
-    VR::LO,
-    VR::LT,
-    VR::OB,
-    VR::OF,
-    VR::OW,
-    VR::PN,
-    VR::SH,
-    VR::SL,
-    VR::SQ,
-    VR::SS,
-    VR::ST,
-    VR::TM,
-    VR::UI,
-    VR::UL,
-    VR::UN,
-    VR::US,
-    VR::UT,
-    VR::OD,
-    VR::OL,
-    VR::UC,
-    VR::UR,
-    VR::OV,
-    VR::SV,
-    VR::UV
-};
+static VR::VRType VRValue[] = { VR::INVALID, VR::AE, VR::AS, VR::AT, VR::CS, VR::DA, VR::DS, VR::DT, VR::FD,
+                                VR::FL,      VR::IS, VR::LO, VR::LT, VR::OB, VR::OF, VR::OW, VR::PN, VR::SH,
+                                VR::SL,      VR::SQ, VR::SS, VR::ST, VR::TM, VR::UI, VR::UL, VR::UN, VR::US,
+                                VR::UT,      VR::OD, VR::OL, VR::UC, VR::UR, VR::OV, VR::SV, VR::UV };
 
-bool VR::IsVRFile() const
+bool
+VR::IsVRFile() const
 {
-  switch(VRField)
+  switch (VRField)
   {
-  case VR::INVALID:
-  case VR::AE:
-  case VR::AS:
-  case VR::AT:
-  case VR::CS:
-  case VR::DA:
-  case VR::DS:
-  case VR::DT:
-  case VR::FD:
-  case VR::FL:
-  case VR::IS:
-  case VR::LO:
-  case VR::LT:
-  case VR::OB:
-  case VR::OD:
-  case VR::OF:
-  case VR::OL:
-  case VR::OV:
-  case VR::OW:
-  case VR::PN:
-  case VR::SH:
-  case VR::SL:
-  case VR::SQ:
-  case VR::SS:
-  case VR::ST:
-  case VR::SV:
-  case VR::TM:
-  case VR::UC:
-  case VR::UI:
-  case VR::UL:
-  case VR::UN:
-  case VR::UR:
-  case VR::US:
-  case VR::UT:
-  case VR::UV:
-    return true;
-  default:
-    break;
+    case VR::INVALID:
+    case VR::AE:
+    case VR::AS:
+    case VR::AT:
+    case VR::CS:
+    case VR::DA:
+    case VR::DS:
+    case VR::DT:
+    case VR::FD:
+    case VR::FL:
+    case VR::IS:
+    case VR::LO:
+    case VR::LT:
+    case VR::OB:
+    case VR::OD:
+    case VR::OF:
+    case VR::OL:
+    case VR::OV:
+    case VR::OW:
+    case VR::PN:
+    case VR::SH:
+    case VR::SL:
+    case VR::SQ:
+    case VR::SS:
+    case VR::ST:
+    case VR::SV:
+    case VR::TM:
+    case VR::UC:
+    case VR::UI:
+    case VR::UL:
+    case VR::UN:
+    case VR::UR:
+    case VR::US:
+    case VR::UT:
+    case VR::UV:
+      return true;
+    default:
+      break;
   }
   return false;
 }
 
-unsigned int VR::GetSizeof() const
+unsigned int
+VR::GetSizeof() const
 {
   unsigned int size;
   switch(VRField)
@@ -253,7 +223,9 @@ unsigned int VR::GetSizeof() const
     size = sizeof(VRToType<VR::UV>::Type);
     break;
   case VR::US_SS:
-    size = sizeof(VRToType<VR::US>::Type); //
+  case VR::US_SS_OW:
+  case VR::US_OW:
+    size = sizeof(short); //
     break;
   default:
     size = 0;
@@ -262,34 +234,37 @@ unsigned int VR::GetSizeof() const
   return size;
 }
 
-unsigned int VR::GetIndex(VRType vr)
+unsigned int
+VR::GetIndex(VRType vr)
 {
-  if (vr == VR::VL32) return 0;
+  if (vr == VR::VL32)
+    return 0;
   unsigned int l = 0;
   assert(vr <= VR::VR_END);
-  switch(vr)
+  switch (vr)
   {
-  case INVALID:
-    break;
-  case OB_OW:
-    l =  35;
-    break;
-  case US_SS:
-    l =  36;
-    break;
-  case US_SS_OW:
-    l =  37;
-    break;
-  case US_OW:
-    l =  38;
-    break;
-  case VR_END:
-    l = 39;
-    break;
-  default:
+    case INVALID:
+      break;
+    case OB_OW:
+      l = 35;
+      break;
+    case US_SS:
+      l = 36;
+      break;
+    case US_SS_OW:
+      l = 37;
+      break;
+    case US_OW:
+      l = 38;
+      break;
+    case VR_END:
+      l = 39;
+      break;
+    default:
     {
       long long a = (long long)vr;
-      for (; a > 1; ++l) a >>= 1LL;
+      for (; a > 1; ++l)
+        a >>= 1LL;
       l++;
     }
     break;
@@ -297,34 +272,37 @@ unsigned int VR::GetIndex(VRType vr)
   return l;
 }
 
-const char * VR::GetVRString(VRType vr)
+const char *
+VR::GetVRString(VRType vr)
 {
   const unsigned int idx = GetIndex(vr);
   return VRStrings[idx];
 }
 
-const char * VR::GetVRStringFromFile(VRType vr)
+const char *
+VR::GetVRStringFromFile(VRType vr)
 {
   static const int N = sizeof(VRValue) / sizeof(VRType);
-  static VRType * start = VRValue;
-  static VRType * end   = VRValue+N;
-  const  VRType * p     = std::lower_bound(start, end, vr);
+  static VRType *  start = VRValue;
+  static VRType *  end = VRValue + N;
+  const VRType *   p = std::lower_bound(start, end, vr);
   assert(*p == vr);
   assert((p - start) == (long long)GetIndex(vr));
-  return VRStrings[p-start];
+  return VRStrings[p - start];
 }
 
 // Optimized version for transforming a read VR from DICOM file
 // into a VRType (does not support OB_OW for instance)
-VR::VRType VR::GetVRTypeFromFile(const char * vr)
+VR::VRType
+VR::GetVRTypeFromFile(const char * vr)
 {
   VRType r = VR::VR_END;
   for (int i = 1; VRStrings[i] != NULL; ++i)
   {
-    const char *ref = VRStrings[i];
+    const char * ref = VRStrings[i];
     if (ref[0] == vr[0] && ref[1] == vr[1])
     {
-      r = (VRType)(1LL << (i-1));
+      r = (VRType)(1LL << (i - 1));
       break;
     }
   }
@@ -337,46 +315,44 @@ VR::VRType VR::GetVRTypeFromFile(const char * vr)
     }
     return VR::INVALID;
   }
-  assert( r != VR::INVALID
-       && r != VR::OB_OW
-       && r != VR::US_SS
-       && r != VR::US_SS_OW
-       && r != VR::US_OW
-       && r != VR::VR_END );
+  assert(r != VR::INVALID && r != VR::OB_OW && r != VR::US_SS && r != VR::US_SS_OW && r != VR::US_OW &&
+         r != VR::VR_END);
   return r;
 }
 
-VR::VRType VR::GetVRType(const char * vr)
+VR::VRType
+VR::GetVRType(const char * vr)
 {
   VRType r = VR::VR_END;
-  if (!vr) return r;
+  if (!vr)
+    return r;
   for (int i = 0; VRStrings[i] != NULL; ++i)
   {
-    if (strcmp(VRStrings[i],vr) == 0)
+    if (strcmp(VRStrings[i], vr) == 0)
     {
-      switch(i)
+      switch (i)
       {
-      case 0:
-        r = VR::INVALID;
-        break;
-      case 35:
-        r = VR::OB_OW;
-        break;
-      case 36:
-        r = VR::US_SS;
-        break;
-      case 37:
-        r = VR::US_SS_OW;
-        break;
-      case 38:
-        r = VR::US_OW;
-        break;
-      case 39:
-        r = VR::VR_END;
-        break;
-      default:
-        assert(vr[2] == 0);
-        r = (VRType)(1LL << (i-1));
+        case 0:
+          r = VR::INVALID;
+          break;
+        case 35:
+          r = VR::OB_OW;
+          break;
+        case 36:
+          r = VR::US_SS;
+          break;
+        case 37:
+          r = VR::US_SS_OW;
+          break;
+        case 38:
+          r = VR::US_OW;
+          break;
+        case 39:
+          r = VR::VR_END;
+          break;
+        default:
+          assert(vr[2] == 0);
+          r = (VRType)(1LL << (i - 1));
       }
       break;
     }
@@ -384,7 +360,8 @@ VR::VRType VR::GetVRType(const char * vr)
   return r;
 }
 
-bool VR::IsValid(const char * vr)
+bool
+VR::IsValid(const char * vr)
 {
   for (int i = 1; VRStrings[i] != NULL; ++i)
   {
@@ -397,14 +374,16 @@ bool VR::IsValid(const char * vr)
   return false;
 }
 
-bool VR::IsValid(const char * vr1, VRType vr2)
+bool
+VR::IsValid(const char * vr1, VRType vr2)
 {
   assert(strlen(vr1) == 2);
   VRType vr = GetVRType(vr1);
   return ((vr & vr2) != 0 ? true : false);
 }
 
-bool VR::IsSwap(const char * vr)
+bool
+VR::IsSwap(const char * vr)
 {
   assert(vr[2] == '\0');
   char vr_swap[3];
@@ -456,81 +435,73 @@ VRTemplateCase(US,rep) \
 VRTemplateCase(UT,rep) \
 VRTemplateCase(UV,rep)
 
-bool VR::IsASCII(VRType vr)
+bool
+VR::IsASCII(VRType vr)
 {
-  switch(vr)
+  switch (vr)
   {
-  VRTemplate(VRASCII)
-  default:
+    VRTemplate(VRASCII)
+    default:
       return false;
   }
 }
 
-bool VR::IsASCII2(VRType vr)
+bool
+VR::IsASCII2(VRType vr)
 {
-  return
-    vr == VR::UI ||
-    vr == VR::AE ||
-    vr == VR::AS ||
-    vr == VR::CS ||
-    vr == VR::DA ||
-    vr == VR::DS ||
-    vr == VR::DT ||
-    vr == VR::IS ||
-    vr == VR::LO ||
-    vr == VR::LT ||
-    vr == VR::PN ||
-    vr == VR::SH ||
-    vr == VR::ST ||
-    vr == VR::TM ||
-    vr == VR::UT;
+  return vr == VR::UI || vr == VR::AE || vr == VR::AS || vr == VR::CS || vr == VR::DA || vr == VR::DS || vr == VR::DT ||
+         vr == VR::IS || vr == VR::LO || vr == VR::LT || vr == VR::PN || vr == VR::SH || vr == VR::ST || vr == VR::TM ||
+         vr == VR::UT;
 }
 
-bool VR::IsBinary(VRType vr)
+bool
+VR::IsBinary(VRType vr)
 {
-  switch(vr)
+  switch (vr)
   {
-  VRTemplate(VRBINARY)
-  case VR::US_SS_OW:
-    return true;
-  case VR::US_SS:
-    return true;
-  case VR::OB_OW:
-    return true;
-  default:
-    return false;
+    VRTemplate(VRBINARY)
+    case VR::US_SS_OW:
+      return true;
+    case VR::US_SS:
+      return true;
+    case VR::OB_OW:
+      return true;
+    default:
+      return false;
   }
 }
 
-bool VR::IsBinary2(VRType vr)
+bool
+VR::IsBinary2(VRType vr)
 {
-  return
-    vr == VR::OB    ||
-    vr == VR::OW    ||
-    vr == VR::OB_OW ||
-    vr == VR::UN    ||
-    vr == VR::SQ;
+  return vr == VR::OB || vr == VR::OW || vr == VR::OB_OW || vr == VR::UN || vr == VR::SQ;
 }
 
-bool VR::Compatible(VR const & vr) const
+bool
+VR::Compatible(VR const & vr) const
 {
-  if (vr.VRField == VR::INVALID) return true;
-  else if (vr.VRField == VR::UN) return true;
+  if (vr.VRField == VR::INVALID)
+    return true;
+  else if (vr.VRField == VR::UN)
+    return true;
   return ((VRField & vr.VRField) > 0 ? true : false);
 }
 
-bool VR::IsDual() const
+bool
+VR::IsDual() const
 {
   switch (VRField)
   {
-  case VR::OB_OW:
-  case VR::US_SS:
-  case VR::US_SS_OW:
-  case VR::US_OW:
-    return true;
-  default:
-    return false;
+    case VR::OB_OW:
+    case VR::US_SS:
+    case VR::US_SS_OW:
+    case VR::US_OW:
+      return true;
+    default:
+      return false;
   }
 }
 
 } // end of namespace mdcm
+
+// clang-format on

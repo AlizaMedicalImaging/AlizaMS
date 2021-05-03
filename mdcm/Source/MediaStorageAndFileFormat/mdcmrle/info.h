@@ -22,10 +22,14 @@ class pixel_info
 public:
   pixel_info(unsigned char nc = 1, unsigned char bpp = 8);
   explicit pixel_info(int num_segments);
-  int compute_num_segments() const;
-  int get_number_of_components() const;
-  int get_number_of_bits_per_pixel() const;
-  static bool check_num_segments(const int num_segments);
+  int
+  compute_num_segments() const;
+  int
+  get_number_of_components() const;
+  int
+  get_number_of_bits_per_pixel() const;
+  static bool
+  check_num_segments(const int num_segments);
 
 private:
   unsigned char number_components;
@@ -35,20 +39,43 @@ private:
 class image_info
 {
 public:
-  image_info(int width = 0, int height = 0, pixel_info const & pi = pixel_info(),
-    bool planarconfiguration = false, bool littleendian = true);
-  int get_width() const { return width; }
-  int get_height() const { return height; }
-  pixel_info get_pixel_info() const { return pix; }
-  bool get_planar_configuration() const { return planarconfiguration; }
-  bool is_little_endian() const { return littleendian; }
+  image_info(int                width = 0,
+             int                height = 0,
+             pixel_info const & pi = pixel_info(),
+             bool               planarconfiguration = false,
+             bool               littleendian = true);
+  int
+  get_width() const
+  {
+    return width;
+  }
+  int
+  get_height() const
+  {
+    return height;
+  }
+  pixel_info
+  get_pixel_info() const
+  {
+    return pix;
+  }
+  bool
+  get_planar_configuration() const
+  {
+    return planarconfiguration;
+  }
+  bool
+  is_little_endian() const
+  {
+    return littleendian;
+  }
 
 private:
-  int width;
-  int height;
+  int        width;
+  int        height;
   pixel_info pix;
-  bool planarconfiguration;
-  bool littleendian;
+  bool       planarconfiguration;
+  bool       littleendian;
 };
 
 } // end namespace rle

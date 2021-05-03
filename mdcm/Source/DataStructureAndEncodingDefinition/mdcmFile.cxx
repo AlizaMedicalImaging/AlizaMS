@@ -27,12 +27,14 @@ namespace mdcm
 File::File() {}
 File::~File() {}
 
-std::istream & File::Read(std::istream & is)
+std::istream &
+File::Read(std::istream & is)
 {
   return is;
 }
 
-std::ostream const & File::Write(std::ostream & os) const
+std::ostream const &
+File::Write(std::ostream & os) const
 {
   return os;
 }

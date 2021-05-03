@@ -44,24 +44,33 @@ public:
   OpenSSLP7CryptographicMessageSyntax();
   ~OpenSSLP7CryptographicMessageSyntax();
   // X.509
-  bool ParseCertificateFile(const char *) override;
-  bool ParseKeyFile(const char *) override;
+  bool
+  ParseCertificateFile(const char *) override;
+  bool
+  ParseKeyFile(const char *) override;
   // PBE
-  bool SetPassword(const char *, size_t) override;
+  bool
+  SetPassword(const char *, size_t) override;
   // Set Cipher Type.
   // Default is: AES256_CIPHER
-  void SetCipherType(CipherTypes type) override;
-  CipherTypes GetCipherType() const override;
+  void
+  SetCipherType(CipherTypes type) override;
+  CipherTypes
+  GetCipherType() const override;
   // create a PKCS#7 envelopedData structure
-  bool Encrypt(char *, size_t &, const char *, size_t) const override;
+  bool
+  Encrypt(char *, size_t &, const char *, size_t) const override;
   // decrypt content from a PKCS#7 envelopedData structure
-  bool Decrypt(char *, size_t &, const char *, size_t) const override;
+  bool
+  Decrypt(char *, size_t &, const char *, size_t) const override;
+
 private:
   CryptographicMessageSyntaxInternals * Internals;
-  OpenSSLP7CryptographicMessageSyntax(const OpenSSLP7CryptographicMessageSyntax &);  // Not implemented
-  void operator=(const OpenSSLP7CryptographicMessageSyntax &);  // Not implemented
+  OpenSSLP7CryptographicMessageSyntax(const OpenSSLP7CryptographicMessageSyntax &); // Not implemented
+  void
+  operator=(const OpenSSLP7CryptographicMessageSyntax &); // Not implemented
 };
 
 } // end namespace mdcm
 
-#endif //MDCMOPENSSLP7CRYPTOGRAPHICMESSAGESYNTAX_H
+#endif // MDCMOPENSSLP7CRYPTOGRAPHICMESSAGESYNTAX_H

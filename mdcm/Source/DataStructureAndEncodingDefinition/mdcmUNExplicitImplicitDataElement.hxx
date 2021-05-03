@@ -35,34 +35,38 @@ namespace mdcm
 {
 
 template <typename TSwap>
-std::istream &UNExplicitImplicitDataElement::Read(std::istream & is)
+std::istream &
+UNExplicitImplicitDataElement::Read(std::istream & is)
 {
   ReadPreValue<TSwap>(is);
   return ReadValue<TSwap>(is);
 }
 
 template <typename TSwap>
-std::istream &UNExplicitImplicitDataElement::ReadPreValue(std::istream & is)
+std::istream &
+UNExplicitImplicitDataElement::ReadPreValue(std::istream & is)
 {
   assert(0);
-  //DataElement & de = *this;//unused de, fires a warning on macos
-  //de.template ReadPreValue<UNExplicitDataElement,TSwap>(is);
+  // DataElement & de = *this;//unused de, fires a warning on macos
+  // de.template ReadPreValue<UNExplicitDataElement,TSwap>(is);
   return is;
 }
 
 template <typename TSwap>
-std::istream &UNExplicitImplicitDataElement::ReadValue(std::istream & is)
+std::istream &
+UNExplicitImplicitDataElement::ReadValue(std::istream & is)
 {
-  if(is.eof()) return is;
+  if (is.eof())
+    return is;
   DataElement & de = *this;
   try
   {
-    //de.template ReadValue<UNExplicitDataElement,TSwap>(is);
+    // de.template ReadValue<UNExplicitDataElement,TSwap>(is);
   }
-  catch(ParseException &ex)
+  catch (ParseException & ex)
   {
     de.SetVR(VR::INVALID); // EXTREMELY IMPORTANT
-    if(ex.GetLastElement().GetTag() == Tag(0xfffe,0xe0dd))
+    if (ex.GetLastElement().GetTag() == Tag(0xfffe, 0xe0dd))
     {
       // We have never read the 2 bytes for the VR, since exception raised earlier
       is.seekg(-4, std::ios::cur);
@@ -71,7 +75,7 @@ std::istream &UNExplicitImplicitDataElement::ReadValue(std::istream & is)
     {
       is.seekg(-6, std::ios::cur);
     }
-    //de.template ReadValue<ImplicitDataElement,TSwap>(is);
+    // de.template ReadValue<ImplicitDataElement,TSwap>(is);
   }
   return is;
 }

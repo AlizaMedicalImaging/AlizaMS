@@ -38,13 +38,18 @@ class JPEG12Codec : public JPEGCodec
 public:
   JPEG12Codec();
   ~JPEG12Codec() override;
-  bool DecodeByStreams(std::istream &, std::ostream &) override;
-  bool InternalCode(const char *, size_t, std::ostream &) override;
-  bool GetHeaderInfo(std::istream &, TransferSyntax &) override;
+  bool
+  DecodeByStreams(std::istream &, std::ostream &) override;
+  bool
+  InternalCode(const char *, size_t, std::ostream &) override;
+  bool
+  GetHeaderInfo(std::istream &, TransferSyntax &) override;
 
 protected:
-  bool IsStateSuspension() const override;
-  bool EncodeBuffer(std::ostream &, const char *, size_t) override;
+  bool
+  IsStateSuspension() const override;
+  bool
+  EncodeBuffer(std::ostream &, const char *, size_t) override;
 
 private:
   JPEGInternals_12BIT * Internals;
@@ -52,4 +57,4 @@ private:
 
 } // end namespace mdcm
 
-#endif //MDCMJPEG12CODEC_H
+#endif // MDCMJPEG12CODEC_H

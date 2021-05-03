@@ -34,25 +34,24 @@ Preamble::Preamble()
 
 Preamble::~Preamble()
 {
-  if(Internal) delete[] Internal;
+  if (Internal)
+    delete[] Internal;
 }
 
-std::istream & Preamble::Read(std::istream & is)
+std::istream &
+Preamble::Read(std::istream & is)
 {
-  if(!IsEmpty())
+  if (!IsEmpty())
   {
-    if(is.read(Internal, 128+4))
+    if (is.read(Internal, 128 + 4))
     {
-      if(Internal[128+0] == 'D' &&
-         Internal[128+1] == 'I' &&
-         Internal[128+2] == 'C' &&
-         Internal[128+3] == 'M')
+      if (Internal[128 + 0] == 'D' && Internal[128 + 1] == 'I' && Internal[128 + 2] == 'C' && Internal[128 + 3] == 'M')
       {
         return is;
       }
     }
   }
-  if(Internal)
+  if (Internal)
   {
     delete[] Internal;
     Internal = NULL;
@@ -60,27 +59,30 @@ std::istream & Preamble::Read(std::istream & is)
   throw std::logic_error("Not a DICOM V3 file (No Preamble)");
 }
 
-void Preamble::Create()
+void
+Preamble::Create()
 {
-  Internal = new char[128+4];
+  Internal = new char[128 + 4];
   memset(Internal, 0, 128);
-  memcpy(Internal+128, "DICM", 4);
+  memcpy(Internal + 128, "DICM", 4);
 }
 
-void Preamble::Remove()
+void
+Preamble::Remove()
 {
-  if(Internal)
+  if (Internal)
   {
     delete[] Internal;
     Internal = NULL;
   }
 }
 
-std::ostream const & Preamble::Write(std::ostream & os) const
+std::ostream const &
+Preamble::Write(std::ostream & os) const
 {
-  if(Internal)
+  if (Internal)
   {
-    os.write(Internal, 128+4);
+    os.write(Internal, 128 + 4);
   }
   return os;
 }

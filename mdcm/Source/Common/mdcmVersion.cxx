@@ -25,29 +25,34 @@
 namespace mdcm
 {
 
-void Version::Print(std::ostream & os) const
+void
+Version::Print(std::ostream & os) const
 {
   os << Version::GetVersion();
 }
 
-const char * Version::GetVersion()
+const char *
+Version::GetVersion()
 {
   return MDCM_VERSION;
 }
 
-int Version::GetMajorVersion()
+int
+Version::GetMajorVersion()
 {
   return MDCM_MAJOR_VERSION;
 }
 
-int Version::GetMinorVersion()
+int
+Version::GetMinorVersion()
 {
   return MDCM_MINOR_VERSION;
 }
 
-int Version::GetBuildVersion()
+int
+Version::GetBuildVersion()
 {
   return MDCM_BUILD_VERSION;
 }
 
-}
+} // namespace mdcm

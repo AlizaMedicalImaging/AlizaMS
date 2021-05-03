@@ -49,35 +49,59 @@ public:
   Curve();
   Curve(Curve const &);
   ~Curve();
-  static unsigned int GetNumberOfCurves(DataSet const &);
-  void Update(const DataElement &);
-  void SetGroup(unsigned short);
-  unsigned short GetGroup() const;
-  void SetDimensions(unsigned short);
-  unsigned short GetDimensions() const;
-  void SetNumberOfPoints(unsigned short);
-  unsigned short GetNumberOfPoints() const;
-  void SetTypeOfData(const char *);
-  const char * GetTypeOfData() const;
-  const char * GetTypeOfDataDescription() const;
-  void SetCurveDescription(const char *);
-  void SetDataValueRepresentation(unsigned short);
-  unsigned short GetDataValueRepresentation() const;
-  void SetCurveDataDescriptor(const uint16_t *, size_t);
-  std::vector<unsigned short> const & GetCurveDataDescriptor() const;
-  void SetCoordinateStartValue(unsigned short);
-  void SetCoordinateStepValue(unsigned short);
-  bool IsEmpty() const;
-  void SetCurve(const char *, unsigned int);
-  void Decode(std::istream &, std::ostream &);
-  void GetAsPoints(float *) const;
-  void Print(std::ostream &) const override;
+  static unsigned int
+  GetNumberOfCurves(DataSet const &);
+  void
+  Update(const DataElement &);
+  void
+  SetGroup(unsigned short);
+  unsigned short
+  GetGroup() const;
+  void
+  SetDimensions(unsigned short);
+  unsigned short
+  GetDimensions() const;
+  void
+  SetNumberOfPoints(unsigned short);
+  unsigned short
+  GetNumberOfPoints() const;
+  void
+  SetTypeOfData(const char *);
+  const char *
+  GetTypeOfData() const;
+  const char *
+  GetTypeOfDataDescription() const;
+  void
+  SetCurveDescription(const char *);
+  void
+  SetDataValueRepresentation(unsigned short);
+  unsigned short
+  GetDataValueRepresentation() const;
+  void
+  SetCurveDataDescriptor(const uint16_t *, size_t);
+  std::vector<unsigned short> const &
+  GetCurveDataDescriptor() const;
+  void
+  SetCoordinateStartValue(unsigned short);
+  void
+  SetCoordinateStepValue(unsigned short);
+  bool
+  IsEmpty() const;
+  void
+  SetCurve(const char *, unsigned int);
+  void
+  Decode(std::istream &, std::ostream &);
+  void
+  GetAsPoints(float *) const;
+  void
+  Print(std::ostream &) const override;
 
 private:
-  double ComputeValueFromStartAndStep(unsigned int) const;
+  double
+                  ComputeValueFromStartAndStep(unsigned int) const;
   CurveInternal * Internal;
 };
 
 } // end namespace mdcm
 
-#endif //MDCMCURVE_H
+#endif // MDCMCURVE_H

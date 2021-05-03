@@ -40,12 +40,16 @@ class MDCM_EXPORT ImageWriter : public PixmapWriter
 public:
   ImageWriter();
   ~ImageWriter();
-  const Image & GetImage() const;
-  Image & GetImage();
-  MediaStorage ComputeTargetMediaStorage();
-  bool Write();
+  const Image &
+  GetImage() const;
+  Image &
+  GetImage();
+  MediaStorage
+  ComputeTargetMediaStorage();
+  bool
+  Write();
 };
 
 } // end namespace mdcm
 
-#endif //MDCMIMAGEWRITER_H
+#endif // MDCMIMAGEWRITER_H

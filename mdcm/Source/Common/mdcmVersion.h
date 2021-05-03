@@ -36,18 +36,26 @@ namespace mdcm
 
 class MDCM_EXPORT Version
 {
-friend std::ostream& operator<<(std::ostream &, const Version &);
+  friend std::ostream &
+  operator<<(std::ostream &, const Version &);
+
 public:
-  static const char * GetVersion();
-  static int GetMajorVersion();
-  static int GetMinorVersion();
-  static int GetBuildVersion();
-  Version() {};
-  ~Version() {};
-  void Print(std::ostream &os = std::cout) const;
+  static const char *
+  GetVersion();
+  static int
+  GetMajorVersion();
+  static int
+  GetMinorVersion();
+  static int
+  GetBuildVersion();
+  Version(){};
+  ~Version(){};
+  void
+  Print(std::ostream & os = std::cout) const;
 };
 
-inline std::ostream& operator<<(std::ostream & os, const Version & v)
+inline std::ostream &
+operator<<(std::ostream & os, const Version & v)
 {
   v.Print(os);
   return os;
@@ -55,4 +63,4 @@ inline std::ostream& operator<<(std::ostream & os, const Version & v)
 
 } // end namespace mdcm
 
-#endif //MDCMVERSION_H
+#endif // MDCMVERSION_H

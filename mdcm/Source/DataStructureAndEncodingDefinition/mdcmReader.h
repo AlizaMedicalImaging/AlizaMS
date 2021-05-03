@@ -46,16 +46,38 @@ class MDCM_EXPORT Reader
 public:
   Reader();
   virtual ~Reader();
-  virtual bool Read();
-  void SetFileName(const char*);
-  void SetStream(std::istream & input_stream) { Stream = &input_stream; }
-  const File & GetFile() const { return *F; }
-  File & GetFile() { return *F; }
-  void SetFile(File & file) { F = &file; }
-  bool ReadUpToTag(const Tag & tag, std::set<Tag> const & skiptags = std::set<Tag>());
-  bool ReadSelectedTags(std::set<Tag> const & tags, bool readvalues = true);
-  bool ReadSelectedPrivateTags(std::set<PrivateTag> const & ptags, bool readvalues = true);
-  bool CanRead() const;
+  virtual bool
+  Read();
+  void
+  SetFileName(const char *);
+  void
+  SetStream(std::istream & input_stream)
+  {
+    Stream = &input_stream;
+  }
+  const File &
+  GetFile() const
+  {
+    return *F;
+  }
+  File &
+  GetFile()
+  {
+    return *F;
+  }
+  void
+  SetFile(File & file)
+  {
+    F = &file;
+  }
+  bool
+  ReadUpToTag(const Tag & tag, std::set<Tag> const & skiptags = std::set<Tag>());
+  bool
+  ReadSelectedTags(std::set<Tag> const & tags, bool readvalues = true);
+  bool
+  ReadSelectedPrivateTags(std::set<PrivateTag> const & ptags, bool readvalues = true);
+  bool
+  CanRead() const;
 #if 0
   // For wrapped language, return type is compatible with System::FileSize return type
   // Use native std::streampos / std::streamoff directly from the stream from C++
@@ -63,19 +85,24 @@ public:
 #endif
 
 protected:
-  bool ReadPreamble();
-  bool ReadMetaInformation();
-  bool ReadDataSet();
+  bool
+  ReadPreamble();
+  bool
+  ReadMetaInformation();
+  bool
+                     ReadDataSet();
   SmartPointer<File> F;
 
 private:
   template <typename T_Caller>
-  bool InternalReadCommon(const T_Caller &);
-  TransferSyntax GuessTransferSyntax();
-  std::istream  * Stream;
+  bool
+  InternalReadCommon(const T_Caller &);
+  TransferSyntax
+                  GuessTransferSyntax();
+  std::istream *  Stream;
   std::ifstream * Ifstream;
 };
 
 } // end namespace mdcm
 
-#endif //MDCMREADER_H
+#endif // MDCMREADER_H

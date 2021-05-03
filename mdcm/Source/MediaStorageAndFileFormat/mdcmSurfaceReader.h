@@ -29,24 +29,30 @@ namespace mdcm
 {
 
 /**
-  * This class defines a SURFACE IE reader.
-  * It reads surface mesh module attributes.
-  *
-  * PS 3.3 A.1.2.18 , A.57 and C.27
-  */
+ * This class defines a SURFACE IE reader.
+ * It reads surface mesh module attributes.
+ *
+ * PS 3.3 A.1.2.18 , A.57 and C.27
+ */
 class MDCM_EXPORT SurfaceReader : public SegmentReader
 {
 public:
-    SurfaceReader();
-    virtual ~SurfaceReader();
-    virtual bool Read();
-    unsigned long GetNumberOfSurfaces() const;
+  SurfaceReader();
+  virtual ~SurfaceReader();
+  virtual bool
+  Read();
+  unsigned long
+  GetNumberOfSurfaces() const;
+
 protected:
-    bool ReadSurfaces();
-    bool ReadSurface(const Item &, const unsigned long);
-    bool ReadPointMacro(SmartPointer<Surface>, const DataSet &);
+  bool
+  ReadSurfaces();
+  bool
+  ReadSurface(const Item &, const unsigned long);
+  bool
+  ReadPointMacro(SmartPointer<Surface>, const DataSet &);
 };
 
-}
+} // namespace mdcm
 
 #endif // MDCMSURFACEREADER_H

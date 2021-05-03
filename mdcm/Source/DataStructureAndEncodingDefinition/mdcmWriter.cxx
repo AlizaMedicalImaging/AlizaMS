@@ -38,14 +38,13 @@
 namespace mdcm
 {
 
-Writer::Writer() :
-  Stream(NULL),
-  Ofstream(NULL),
-  F(new File),
-  CheckFileMetaInformation(true),
-  WriteDataSetOnly(false)
-{
-}
+Writer::Writer()
+  : Stream(NULL)
+  , Ofstream(NULL)
+  , F(new File)
+  , CheckFileMetaInformation(true)
+  , WriteDataSetOnly(false)
+{}
 
 Writer::~Writer()
 {
@@ -57,32 +56,33 @@ Writer::~Writer()
   }
 }
 
-bool Writer::Write()
+bool
+Writer::Write()
 {
-  if(!Stream || !*Stream)
+  if (!Stream || !*Stream)
   {
     mdcmErrorMacro("No Filename");
     return false;
   }
-  std::ostream & os = *Stream;
-  FileMetaInformation &Header = F->GetHeader();
-  DataSet & DS = F->GetDataSet();
-  if(DS.IsEmpty())
+  std::ostream &        os = *Stream;
+  FileMetaInformation & Header = F->GetHeader();
+  DataSet &             DS = F->GetDataSet();
+  if (DS.IsEmpty())
   {
     mdcmErrorMacro("DS empty");
     return false;
   }
   // Check that 0002,0002 / 0008,0016 and 0002,0003 / 0008,0018 match?
-  if(!WriteDataSetOnly)
+  if (!WriteDataSetOnly)
   {
-    if(CheckFileMetaInformation)
+    if (CheckFileMetaInformation)
     {
       FileMetaInformation duplicate(Header);
       try
       {
         duplicate.FillFromDataSet(DS);
       }
-      catch(std::logic_error & ex)
+      catch (std::logic_error & ex)
       {
         mdcmAlwaysWarnMacro("Could not recreate the File Meta Header, please report:" << ex.what());
         return false;
@@ -95,18 +95,18 @@ bool Writer::Write()
     }
   }
   const TransferSyntax & ts = Header.GetDataSetTransferSyntax();
-  if(!ts.IsValid())
+  if (!ts.IsValid())
   {
     mdcmErrorMacro("Invalid Transfer Syntax");
     return false;
   }
-  if(ts == TransferSyntax::DeflatedExplicitVRLittleEndian)
+  if (ts == TransferSyntax::DeflatedExplicitVRLittleEndian)
   {
     try
     {
       zlib_stream::zip_ostream gzos(os);
       assert(ts.GetNegociatedType() == TransferSyntax::Explicit);
-      DS.Write<ExplicitDataElement,SwapperNoOp>(gzos);
+      DS.Write<ExplicitDataElement, SwapperNoOp>(gzos);
     }
     catch (...)
     {
@@ -116,40 +116,40 @@ bool Writer::Write()
   }
   try
   {
-    if(ts.GetSwapCode() == SwapCode::BigEndian)
+    if (ts.GetSwapCode() == SwapCode::BigEndian)
     {
-      //US-RGB-8-epicard.dcm is big endian
-      if(ts.GetNegociatedType() == TransferSyntax::Implicit)
+      // US-RGB-8-epicard.dcm is big endian
+      if (ts.GetNegociatedType() == TransferSyntax::Implicit)
       {
         // There is no such thing as Implicit Big Endian... oh well
         // LIBIDO-16-ACR_NEMA-Volume.dcm
-        DS.Write<ImplicitDataElement,SwapperDoOp>(os);
+        DS.Write<ImplicitDataElement, SwapperDoOp>(os);
       }
       else
       {
         assert(ts.GetNegociatedType() == TransferSyntax::Explicit);
-        DS.Write<ExplicitDataElement,SwapperDoOp>(os);
+        DS.Write<ExplicitDataElement, SwapperDoOp>(os);
       }
     }
     else // LittleEndian
     {
-      if(ts.GetNegociatedType() == TransferSyntax::Implicit)
+      if (ts.GetNegociatedType() == TransferSyntax::Implicit)
       {
-        DS.Write<ImplicitDataElement,SwapperNoOp>(os);
+        DS.Write<ImplicitDataElement, SwapperNoOp>(os);
       }
       else
       {
         assert(ts.GetNegociatedType() == TransferSyntax::Explicit);
-        DS.Write<ExplicitDataElement,SwapperNoOp>(os);
+        DS.Write<ExplicitDataElement, SwapperNoOp>(os);
       }
     }
   }
-  catch(std::exception & ex)
+  catch (std::exception & ex)
   {
     mdcmAlwaysWarnMacro(ex.what());
     return false;
   }
-  catch(...)
+  catch (...)
   {
     mdcmAlwaysWarnMacro("Unknown exception");
     return false;
@@ -162,7 +162,8 @@ bool Writer::Write()
   return true;
 }
 
-void Writer::SetFileName(const char * p)
+void
+Writer::SetFileName(const char * p)
 {
   if (Ofstream)
   {
@@ -191,54 +192,62 @@ void Writer::SetFileName(const char * p)
   Stream = Ofstream;
 }
 
-void Writer::SetStream(std::ostream &output_stream)
+void
+Writer::SetStream(std::ostream & output_stream)
 {
   Stream = &output_stream;
 }
 
-void Writer::SetFile(const File & f)
+void
+Writer::SetFile(const File & f)
 {
   F = f;
 }
 
-File & Writer::GetFile()
+File &
+Writer::GetFile()
 {
   return *F;
 }
 
-void Writer::SetCheckFileMetaInformation(bool b)
+void
+Writer::SetCheckFileMetaInformation(bool b)
 {
   CheckFileMetaInformation = b;
 }
 
-void Writer::CheckFileMetaInformationOff()
+void
+Writer::CheckFileMetaInformationOff()
 {
   CheckFileMetaInformation = false;
 }
 
-void Writer::CheckFileMetaInformationOn()
+void
+Writer::CheckFileMetaInformationOn()
 {
   CheckFileMetaInformation = true;
 }
 
-void Writer::SetWriteDataSetOnly(bool b)
+void
+Writer::SetWriteDataSetOnly(bool b)
 {
   WriteDataSetOnly = b;
 }
 
-//this function is added for the StreamImageWriter, which needs to write
-//up to the pixel data and then stops right before writing the pixel data.
-//after that, for the raw codec at least, zeros are written for the length
+// this function is added for the StreamImageWriter, which needs to write
+// up to the pixel data and then stops right before writing the pixel data.
+// after that, for the raw codec at least, zeros are written for the length
 // of the data
-std::ostream * Writer::GetStreamPtr() const
+std::ostream *
+Writer::GetStreamPtr() const
 {
   return Stream;
 }
 
-bool Writer::GetCheckFileMetaInformation() const
+bool
+Writer::GetCheckFileMetaInformation() const
 {
   return CheckFileMetaInformation;
 }
 
 } // end namespace mdcm
-

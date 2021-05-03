@@ -36,9 +36,12 @@ class MDCM_EXPORT BitmapToBitmapFilter
 public:
   BitmapToBitmapFilter();
   ~BitmapToBitmapFilter() {}
-  void SetInput(const Bitmap &);
-  const Bitmap & GetOutput() const;
-  const Bitmap & GetOutputAsBitmap() const; // SWIG/Java hack
+  void
+  SetInput(const Bitmap &);
+  const Bitmap &
+  GetOutput() const;
+  const Bitmap &
+  GetOutputAsBitmap() const; // SWIG/Java hack
 protected:
   SmartPointer<Bitmap> Input;
   SmartPointer<Bitmap> Output;
@@ -46,4 +49,4 @@ protected:
 
 } // end namespace mdcm
 
-#endif //MDCMBITMAPTOBITMAPFILTER_H
+#endif // MDCMBITMAPTOBITMAPFILTER_H

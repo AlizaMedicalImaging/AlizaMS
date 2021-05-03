@@ -33,12 +33,14 @@ template <typename TDE, typename TSwap, typename TType = uint8_t>
 class ValueIO
 {
 public:
-  static std::istream & Read(std::istream &, Value &, bool);
-  static const std::ostream & Write(std::ostream &, const Value &);
+  static std::istream &
+  Read(std::istream &, Value &, bool);
+  static const std::ostream &
+  Write(std::ostream &, const Value &);
 };
 
-}
+} // namespace mdcm
 
 #include "mdcmValueIO.hxx"
 
-#endif //MDCMVALUEIO_H
+#endif // MDCMVALUEIO_H

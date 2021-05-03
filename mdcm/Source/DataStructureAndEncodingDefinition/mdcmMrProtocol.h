@@ -40,16 +40,22 @@ class DataElement;
  */
 class MDCM_EXPORT MrProtocol
 {
-  friend std::ostream& operator<<(std::ostream &, const MrProtocol &);
+  friend std::ostream &
+  operator<<(std::ostream &, const MrProtocol &);
 
-public :
+public:
   MrProtocol();
   ~MrProtocol();
-  bool Load(const ByteValue *, const char *, int);
-  void Print(std::ostream &) const;
-  int GetVersion() const;
-  const char * GetMrProtocolByName(const char *) const;
-  bool FindMrProtocolByName(const char *) const;
+  bool
+  Load(const ByteValue *, const char *, int);
+  void
+  Print(std::ostream &) const;
+  int
+  GetVersion() const;
+  const char *
+  GetMrProtocolByName(const char *) const;
+  bool
+  FindMrProtocolByName(const char *) const;
 
   struct Vector3
   {
@@ -66,18 +72,20 @@ public :
 
   struct SliceArray
   {
-    std::vector< Slice > Slices;
+    std::vector<Slice> Slices;
   };
 
-  bool GetSliceArray(MrProtocol::SliceArray &) const;
+  bool
+  GetSliceArray(MrProtocol::SliceArray &) const;
 
 private:
   struct Element;
   struct Internals;
-  Internals *Pimpl;
+  Internals * Pimpl;
 };
 
-inline std::ostream& operator<<(std::ostream & os, const MrProtocol & d)
+inline std::ostream &
+operator<<(std::ostream & os, const MrProtocol & d)
 {
   d.Print(os);
   return os;
@@ -85,4 +93,4 @@ inline std::ostream& operator<<(std::ostream & os, const MrProtocol & d)
 
 } // end namespace mdcm
 
-#endif //MDCMMRPROTOCOL_H
+#endif // MDCMMRPROTOCOL_H

@@ -27,31 +27,28 @@
 namespace mdcm
 {
 
-static const char * ALGOTypeStrings[] =
-{
-  "AUTOMATIC",
-  "SEMIAUTOMATIC",
-  "MANUAL",
-  NULL
-};
+static const char * ALGOTypeStrings[] = { "AUTOMATIC", "SEMIAUTOMATIC", "MANUAL", NULL };
 
-const char * Segment::GetALGOTypeString(ALGOType type)
+const char *
+Segment::GetALGOTypeString(ALGOType type)
 {
   assert(type <= ALGOType_END);
   return ALGOTypeStrings[(int)type];
 }
 
-Segment::ALGOType Segment::GetALGOType(const char * type)
+Segment::ALGOType
+Segment::GetALGOType(const char * type)
 {
-  if(!type) return ALGOType_END;
+  if (!type)
+    return ALGOType_END;
   // Delete possible space as last character
-  String<>  str(type);
+  String<> str(type);
   str.Trim();
-  std::string strClearStr = str.Trim();
+  std::string  strClearStr = str.Trim();
   const char * strClear = strClearStr.c_str();
-  for(unsigned int i = 0; ALGOTypeStrings[i] != 0; ++i)
+  for (unsigned int i = 0; ALGOTypeStrings[i] != 0; ++i)
   {
-    if(strcmp(strClear, ALGOTypeStrings[i]) == 0)
+    if (strcmp(strClear, ALGOTypeStrings[i]) == 0)
     {
       return (ALGOType)i;
     }
@@ -59,11 +56,11 @@ Segment::ALGOType Segment::GetALGOType(const char * type)
   // Did not find anything, that's pretty bad, let's hope that
   // the toolkit which wrote the image is buggy and tolerate space
   // padded binary string.
-  CodeString codestring = strClear;
+  CodeString  codestring = strClear;
   std::string cs = codestring.GetAsString();
-  for(unsigned int i = 0; ALGOTypeStrings[i] != 0; ++i)
+  for (unsigned int i = 0; ALGOTypeStrings[i] != 0; ++i)
   {
-    if(strcmp(cs.c_str(), ALGOTypeStrings[i]) == 0)
+    if (strcmp(cs.c_str(), ALGOTypeStrings[i]) == 0)
     {
       return (ALGOType)i;
     }
@@ -71,196 +68,227 @@ Segment::ALGOType Segment::GetALGOType(const char * type)
   return ALGOType_END;
 }
 
-Segment::Segment():
-  SegmentNumber(0),
-  SegmentLabel(""),
-  SegmentDescription(""),
-  AnatomicRegion(),
-  AnatomicRegionModifiers(),
-  PropertyCategory(),
-  PropertyType(),
-  PropertyTypeModifiers(),
-  SegmentAlgorithmType(ALGOType_END),
-  SegmentAlgorithmName(""),
-  SurfaceCount(0),
-  Surfaces()
-{
-}
+Segment::Segment()
+  : SegmentNumber(0)
+  , SegmentLabel("")
+  , SegmentDescription("")
+  , AnatomicRegion()
+  , AnatomicRegionModifiers()
+  , PropertyCategory()
+  , PropertyType()
+  , PropertyTypeModifiers()
+  , SegmentAlgorithmType(ALGOType_END)
+  , SegmentAlgorithmName("")
+  , SurfaceCount(0)
+  , Surfaces()
+{}
 
-Segment::~Segment()
-{
-}
+Segment::~Segment() {}
 
-unsigned short Segment::GetSegmentNumber() const
+unsigned short
+Segment::GetSegmentNumber() const
 {
   return SegmentNumber;
 }
 
-void Segment::SetSegmentNumber(const unsigned short num)
+void
+Segment::SetSegmentNumber(const unsigned short num)
 {
   SegmentNumber = num;
 }
 
-const char * Segment::GetSegmentLabel() const
+const char *
+Segment::GetSegmentLabel() const
 {
   return SegmentLabel.c_str();
 }
 
-void Segment::SetSegmentLabel(const char * label)
+void
+Segment::SetSegmentLabel(const char * label)
 {
   SegmentLabel = label;
 }
 
-const char * Segment::GetSegmentDescription() const
+const char *
+Segment::GetSegmentDescription() const
 {
   return SegmentDescription.c_str();
 }
 
-void Segment::SetSegmentDescription(const char * description)
+void
+Segment::SetSegmentDescription(const char * description)
 {
   SegmentDescription = description;
 }
 
-SegmentHelper::BasicCodedEntry const & Segment::GetAnatomicRegion() const
+SegmentHelper::BasicCodedEntry const &
+Segment::GetAnatomicRegion() const
 {
   return AnatomicRegion;
 }
 
-SegmentHelper::BasicCodedEntry & Segment::GetAnatomicRegion()
+SegmentHelper::BasicCodedEntry &
+Segment::GetAnatomicRegion()
 {
   return AnatomicRegion;
 }
 
-void Segment::SetAnatomicRegion(SegmentHelper::BasicCodedEntry const & BSE)
+void
+Segment::SetAnatomicRegion(SegmentHelper::BasicCodedEntry const & BSE)
 {
-  AnatomicRegion.CV  = BSE.CV;
+  AnatomicRegion.CV = BSE.CV;
   AnatomicRegion.CSD = BSE.CSD;
-  AnatomicRegion.CM  = BSE.CM;
+  AnatomicRegion.CM = BSE.CM;
 }
 
-Segment::BasicCodedEntryVector const & Segment::GetAnatomicRegionModifiers() const
+Segment::BasicCodedEntryVector const &
+Segment::GetAnatomicRegionModifiers() const
 {
   return AnatomicRegionModifiers;
 }
 
-Segment::BasicCodedEntryVector & Segment::GetAnatomicRegionModifiers()
+Segment::BasicCodedEntryVector &
+Segment::GetAnatomicRegionModifiers()
 {
   return AnatomicRegionModifiers;
 }
 
-void Segment::SetAnatomicRegionModifiers(BasicCodedEntryVector const & BSEV)
+void
+Segment::SetAnatomicRegionModifiers(BasicCodedEntryVector const & BSEV)
 {
-    AnatomicRegionModifiers = BSEV;
+  AnatomicRegionModifiers = BSEV;
 }
 
-SegmentHelper::BasicCodedEntry const & Segment::GetPropertyCategory() const
+SegmentHelper::BasicCodedEntry const &
+Segment::GetPropertyCategory() const
 {
   return PropertyCategory;
 }
 
-SegmentHelper::BasicCodedEntry & Segment::GetPropertyCategory()
+SegmentHelper::BasicCodedEntry &
+Segment::GetPropertyCategory()
 {
   return PropertyCategory;
 }
 
-void Segment::SetPropertyCategory(SegmentHelper::BasicCodedEntry const & BSE)
+void
+Segment::SetPropertyCategory(SegmentHelper::BasicCodedEntry const & BSE)
 {
-  PropertyCategory.CV  = BSE.CV;
+  PropertyCategory.CV = BSE.CV;
   PropertyCategory.CSD = BSE.CSD;
-  PropertyCategory.CM  = BSE.CM;
+  PropertyCategory.CM = BSE.CM;
 }
 
-SegmentHelper::BasicCodedEntry const & Segment::GetPropertyType() const
+SegmentHelper::BasicCodedEntry const &
+Segment::GetPropertyType() const
 {
   return PropertyType;
 }
 
-SegmentHelper::BasicCodedEntry & Segment::GetPropertyType()
+SegmentHelper::BasicCodedEntry &
+Segment::GetPropertyType()
 {
   return PropertyType;
 }
 
-void Segment::SetPropertyType(SegmentHelper::BasicCodedEntry const & BSE)
+void
+Segment::SetPropertyType(SegmentHelper::BasicCodedEntry const & BSE)
 {
-  PropertyType.CV  = BSE.CV;
+  PropertyType.CV = BSE.CV;
   PropertyType.CSD = BSE.CSD;
-  PropertyType.CM  = BSE.CM;
+  PropertyType.CM = BSE.CM;
 }
 
-Segment::BasicCodedEntryVector const & Segment::GetPropertyTypeModifiers() const
+Segment::BasicCodedEntryVector const &
+Segment::GetPropertyTypeModifiers() const
 {
   return PropertyTypeModifiers;
 }
 
-Segment::BasicCodedEntryVector & Segment::GetPropertyTypeModifiers()
+Segment::BasicCodedEntryVector &
+Segment::GetPropertyTypeModifiers()
 {
   return PropertyTypeModifiers;
 }
 
-void Segment::SetPropertyTypeModifiers(BasicCodedEntryVector const & BSEV)
+void
+Segment::SetPropertyTypeModifiers(BasicCodedEntryVector const & BSEV)
 {
   PropertyTypeModifiers = BSEV;
 }
 
-Segment::ALGOType Segment::GetSegmentAlgorithmType() const
+Segment::ALGOType
+Segment::GetSegmentAlgorithmType() const
 {
   return SegmentAlgorithmType;
 }
 
-void Segment::SetSegmentAlgorithmType(Segment::ALGOType type)
+void
+Segment::SetSegmentAlgorithmType(Segment::ALGOType type)
 {
   assert(type <= ALGOType_END);
   SegmentAlgorithmType = type;
 }
 
-void Segment::SetSegmentAlgorithmType(const char * typeStr)
+void
+Segment::SetSegmentAlgorithmType(const char * typeStr)
 {
   SetSegmentAlgorithmType(GetALGOType(typeStr));
 }
 
-const char * Segment::GetSegmentAlgorithmName() const
+const char *
+Segment::GetSegmentAlgorithmName() const
 {
   return SegmentAlgorithmName.c_str();
 }
 
-void Segment::SetSegmentAlgorithmName(const char * name)
+void
+Segment::SetSegmentAlgorithmName(const char * name)
 {
   SegmentAlgorithmName = name;
 }
 
-void Segment::ComputeSurfaceCount()
+void
+Segment::ComputeSurfaceCount()
 {
   SurfaceCount = (unsigned long)Surfaces.size();
 }
 
-unsigned long Segment::GetSurfaceCount()
+unsigned long
+Segment::GetSurfaceCount()
 {
-  if (SurfaceCount == 0) ComputeSurfaceCount();
+  if (SurfaceCount == 0)
+    ComputeSurfaceCount();
   return SurfaceCount;
 }
 
-void Segment::SetSurfaceCount(const unsigned long nb)
+void
+Segment::SetSurfaceCount(const unsigned long nb)
 {
   SurfaceCount = nb;
 }
 
-Segment::SurfaceVector const & Segment::GetSurfaces() const
+Segment::SurfaceVector const &
+Segment::GetSurfaces() const
 {
   return Surfaces;
 }
 
-Segment::SurfaceVector & Segment::GetSurfaces()
+Segment::SurfaceVector &
+Segment::GetSurfaces()
 {
   return Surfaces;
 }
 
-SmartPointer< Surface > Segment::GetSurface(const unsigned int idx) const
+SmartPointer<Surface>
+Segment::GetSurface(const unsigned int idx) const
 {
   assert(idx < SurfaceCount);
   return Surfaces[idx];
 }
 
-void Segment::AddSurface(SmartPointer< Surface > surface)
+void
+Segment::AddSurface(SmartPointer<Surface> surface)
 {
   Surfaces.push_back(surface);
 }

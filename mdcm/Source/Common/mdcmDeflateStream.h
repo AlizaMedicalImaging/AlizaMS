@@ -24,4 +24,4 @@
 
 #include "zipstreamimpl.h"
 
-#endif //MDCMDEFLATESTREAM_H
+#endif // MDCMDEFLATESTREAM_H

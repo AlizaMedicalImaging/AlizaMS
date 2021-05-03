@@ -40,27 +40,36 @@ class MDCM_EXPORT Pixmap : public Bitmap
 public:
   Pixmap();
   ~Pixmap();
-  bool AreOverlaysInPixelData() const override;
-  bool UnusedBitsPresentInPixelData() const override;
-  Curve & GetCurve(size_t = 0);
+  bool
+  AreOverlaysInPixelData() const override;
+  bool
+                UnusedBitsPresentInPixelData() const override;
+  Curve &       GetCurve(size_t = 0);
   const Curve & GetCurve(size_t = 0) const;
-  size_t GetNumberOfCurves() const;
-  void SetNumberOfCurves(size_t);
-  Overlay & GetOverlay(size_t = 0);
+  size_t
+                  GetNumberOfCurves() const;
+  void            SetNumberOfCurves(size_t);
+  Overlay &       GetOverlay(size_t = 0);
   const Overlay & GetOverlay(size_t = 0) const;
-  size_t GetNumberOfOverlays() const;
+  size_t
+       GetNumberOfOverlays() const;
   void SetNumberOfOverlays(size_t);
   void RemoveOverlay(size_t);
-  const IconImage & GetIconImage() const;
-  IconImage & GetIconImage();
-  void SetIconImage(IconImage const &);
-  void Print(std::ostream &) const override;
+  const IconImage &
+  GetIconImage() const;
+  IconImage &
+  GetIconImage();
+  void
+  SetIconImage(IconImage const &);
+  void
+  Print(std::ostream &) const override;
+
 protected:
-  std::vector<Overlay>  Overlays;
-  std::vector<Curve>  Curves;
+  std::vector<Overlay>    Overlays;
+  std::vector<Curve>      Curves;
   SmartPointer<IconImage> Icon;
 };
 
 } // end namespace mdcm
 
-#endif //MDCMPIXMAP_H
+#endif // MDCMPIXMAP_H

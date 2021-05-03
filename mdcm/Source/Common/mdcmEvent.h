@@ -30,53 +30,73 @@ namespace mdcm
 
 class MDCM_EXPORT Event
 {
-public :
+public:
   Event();
   Event(const Event &);
   virtual ~Event();
-  virtual Event * MakeObject() const = 0;
-  virtual void Print(std::ostream &) const;
-  virtual const char * GetEventName() const = 0;
-  virtual bool CheckEvent(const Event *) const = 0;
+  virtual Event *
+  MakeObject() const = 0;
+  virtual void
+  Print(std::ostream &) const;
+  virtual const char *
+  GetEventName() const = 0;
+  virtual bool
+  CheckEvent(const Event *) const = 0;
 
 private:
-  void operator=(const Event &);  // Not implemented.
+  void
+  operator=(const Event &); // Not implemented.
 };
 
-inline std::ostream& operator<<(std::ostream & os, Event & e)
+inline std::ostream &
+operator<<(std::ostream & os, Event & e)
 {
   e.Print(os);
   return os;
 }
 
-#define mdcmEventMacro( classname , super ) \
- class  classname : public super { \
-   public: \
-     typedef classname Self; \
-     typedef super Superclass; \
-     classname() {} \
-     virtual ~classname() {} \
-     virtual const char * GetEventName() const { return #classname; } \
-     virtual bool CheckEvent(const ::mdcm::Event* e) const \
-       { return dynamic_cast<const Self*>(e) ? true : false; } \
-     virtual ::mdcm::Event* MakeObject() const \
-       { return new Self; } \
-     classname(const Self&s) : super(s){}; \
-   private: \
-     void operator=(const Self&); \
- }
+#define mdcmEventMacro(classname, super)                                                                               \
+  class classname : public super                                                                                       \
+  {                                                                                                                    \
+  public:                                                                                                              \
+    typedef classname Self;                                                                                            \
+    typedef super     Superclass;                                                                                      \
+    classname() {}                                                                                                     \
+    virtual ~classname() {}                                                                                            \
+    virtual const char *                                                                                               \
+    GetEventName() const                                                                                               \
+    {                                                                                                                  \
+      return #classname;                                                                                               \
+    }                                                                                                                  \
+    virtual bool                                                                                                       \
+    CheckEvent(const ::mdcm::Event * e) const                                                                          \
+    {                                                                                                                  \
+      return dynamic_cast<const Self *>(e) ? true : false;                                                             \
+    }                                                                                                                  \
+    virtual ::mdcm::Event *                                                                                            \
+    MakeObject() const                                                                                                 \
+    {                                                                                                                  \
+      return new Self;                                                                                                 \
+    }                                                                                                                  \
+    classname(const Self & s)                                                                                          \
+      : super(s){};                                                                                                    \
+                                                                                                                       \
+  private:                                                                                                             \
+    void                                                                                                               \
+    operator=(const Self &);                                                                                           \
+  }
 
-mdcmEventMacro( NoEvent          , Event );
-mdcmEventMacro( AnyEvent         , Event );
-mdcmEventMacro( StartEvent       , AnyEvent );
-mdcmEventMacro( EndEvent         , AnyEvent );
-mdcmEventMacro( ExitEvent        , AnyEvent );
-mdcmEventMacro( AbortEvent       , AnyEvent );
-mdcmEventMacro( ModifiedEvent    , AnyEvent );
-mdcmEventMacro( InitializeEvent  , AnyEvent );
-mdcmEventMacro( IterationEvent   , AnyEvent );
-mdcmEventMacro( UserEvent        , AnyEvent );
+mdcmEventMacro(NoEvent, Event);
+mdcmEventMacro(AnyEvent, Event);
+mdcmEventMacro(StartEvent, AnyEvent);
+mdcmEventMacro(EndEvent, AnyEvent);
+mdcmEventMacro(ExitEvent, AnyEvent);
+mdcmEventMacro(AbortEvent, AnyEvent);
+mdcmEventMacro(ModifiedEvent, AnyEvent);
+mdcmEventMacro(InitializeEvent, AnyEvent);
+mdcmEventMacro(IterationEvent, AnyEvent);
+mdcmEventMacro(UserEvent, AnyEvent);
 
 } // end namespace mdcm
 
-#endif //MDCMEVENT_H
+#endif // MDCMEVENT_H

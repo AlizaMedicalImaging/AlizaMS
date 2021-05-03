@@ -35,34 +35,43 @@ public:
   OpenSSLCryptographicMessageSyntax();
   ~OpenSSLCryptographicMessageSyntax();
   // X.509
-  bool ParseCertificateFile(const char *) override;
-  bool ParseKeyFile(const char *) override;
+  bool
+  ParseCertificateFile(const char *) override;
+  bool
+  ParseKeyFile(const char *) override;
   // PBE
-  bool SetPassword(const char *, size_t) override;
+  bool
+  SetPassword(const char *, size_t) override;
   // Set Cipher Type.
   // Default is: AES256_CIPHER
   void SetCipherType(CipherTypes) override;
-  CipherTypes GetCipherType() const override;
+  CipherTypes
+  GetCipherType() const override;
   // create a CMS envelopedData structure
-  bool Encrypt(char *, size_t &, const char *, size_t) const override;
+  bool
+  Encrypt(char *, size_t &, const char *, size_t) const override;
   // decrypt content from a PKCS#7 envelopedData structure
-  bool Decrypt(char *t, size_t &, const char *, size_t) const override;
+  bool
+  Decrypt(char * t, size_t &, const char *, size_t) const override;
+
 private:
-//#ifdef MDCM_HAVE_CMS_RECIPIENT_PASSWORD
-//  ::stack_st_X509 *recips;
-//#else
+  //#ifdef MDCM_HAVE_CMS_RECIPIENT_PASSWORD
+  //  ::stack_st_X509 *recips;
+  //#else
   STACK_OF(X509) * recips;
-//#endif
-  ::EVP_PKEY * pkey;
+  //#endif
+  ::EVP_PKEY *       pkey;
   const EVP_CIPHER * internalCipherType;
-  char * password;
-  size_t passwordLength;
-  CipherTypes cipherType;
-  OpenSSLCryptographicMessageSyntax(const OpenSSLCryptographicMessageSyntax&);  // Not implemented.
-  void operator=(const OpenSSLCryptographicMessageSyntax&);  // Not implemented.
-  const EVP_CIPHER *CreateCipher( CryptographicMessageSyntax::CipherTypes ciphertype);
+  char *             password;
+  size_t             passwordLength;
+  CipherTypes        cipherType;
+  OpenSSLCryptographicMessageSyntax(const OpenSSLCryptographicMessageSyntax &); // Not implemented.
+  void
+  operator=(const OpenSSLCryptographicMessageSyntax &); // Not implemented.
+  const EVP_CIPHER *
+  CreateCipher(CryptographicMessageSyntax::CipherTypes ciphertype);
 };
 
 } // end namespace mdcm
 
-#endif //MDCMOPENSSLCRYPTOGRAPHICMESSAGESYNTAX_H
+#endif // MDCMOPENSSLCRYPTOGRAPHICMESSAGESYNTAX_H

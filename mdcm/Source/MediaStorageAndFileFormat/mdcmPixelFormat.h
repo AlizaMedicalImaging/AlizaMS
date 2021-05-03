@@ -32,8 +32,10 @@ class TransferSyntax;
 
 class MDCM_EXPORT PixelFormat
 {
-friend class Bitmap;
-friend std::ostream& operator<<(std::ostream &, const PixelFormat &);
+  friend class Bitmap;
+  friend std::ostream &
+  operator<<(std::ostream &, const PixelFormat &);
+
 public:
   typedef enum
   {
@@ -54,77 +56,92 @@ public:
     UNKNOWN
   } ScalarType;
 
-  PixelFormat() : PixelFormat(1, 8, 8, 7, 0) {}
-  explicit PixelFormat(
-    unsigned short samplesperpixel,
-    unsigned short bitsallocated = 8,
-    unsigned short bitsstored = 8,
-    unsigned short highbit = 7,
-    unsigned short pixelrepresentation = 0)
-      :
-      SamplesPerPixel(samplesperpixel),
-      BitsAllocated(bitsallocated),
-      BitsStored(bitsstored),
-      HighBit(highbit),
-      PixelRepresentation(pixelrepresentation) {}
+  PixelFormat()
+    : PixelFormat(1, 8, 8, 7, 0)
+  {}
+  explicit PixelFormat(unsigned short samplesperpixel,
+                       unsigned short bitsallocated = 8,
+                       unsigned short bitsstored = 8,
+                       unsigned short highbit = 7,
+                       unsigned short pixelrepresentation = 0)
+    : SamplesPerPixel(samplesperpixel)
+    , BitsAllocated(bitsallocated)
+    , BitsStored(bitsstored)
+    , HighBit(highbit)
+    , PixelRepresentation(pixelrepresentation)
+  {}
   PixelFormat(ScalarType);
-  unsigned short GetSamplesPerPixel() const;
-  void SetSamplesPerPixel(unsigned short);
-  unsigned short GetBitsAllocated() const;
-  void SetBitsAllocated(unsigned short);
-  unsigned short GetBitsStored() const;
-  void SetBitsStored(unsigned short);
-  unsigned short GetHighBit() const;
-  void SetHighBit(unsigned short);
-  unsigned short GetPixelRepresentation() const;
-  void SetPixelRepresentation(unsigned short);
-  void SetScalarType(ScalarType st);
-  ScalarType GetScalarType() const;
-  const char * GetScalarTypeAsString() const;
-  uint8_t GetPixelSize() const;
-  double GetMin() const;
-  double GetMax() const;
-  bool IsValid() const;
-  bool IsCompatible(const TransferSyntax &) const;
-  void Print(std::ostream &) const;
+  unsigned short
+  GetSamplesPerPixel() const;
+  void
+  SetSamplesPerPixel(unsigned short);
+  unsigned short
+  GetBitsAllocated() const;
+  void
+  SetBitsAllocated(unsigned short);
+  unsigned short
+  GetBitsStored() const;
+  void
+  SetBitsStored(unsigned short);
+  unsigned short
+  GetHighBit() const;
+  void
+  SetHighBit(unsigned short);
+  unsigned short
+  GetPixelRepresentation() const;
+  void
+  SetPixelRepresentation(unsigned short);
+  void
+  SetScalarType(ScalarType st);
+  ScalarType
+  GetScalarType() const;
+  const char *
+  GetScalarTypeAsString() const;
+  uint8_t
+  GetPixelSize() const;
+  double
+  GetMin() const;
+  double
+  GetMax() const;
+  bool
+  IsValid() const;
+  bool
+  IsCompatible(const TransferSyntax &) const;
+  void
+  Print(std::ostream &) const;
 
-  operator ScalarType() const
-  {
-    return GetScalarType();
-  }
+  operator ScalarType() const { return GetScalarType(); }
 
-  bool operator==(ScalarType st) const
+  bool
+  operator==(ScalarType st) const
   {
     return GetScalarType() == st;
   }
 
-  bool operator!=(ScalarType st) const
+  bool
+  operator!=(ScalarType st) const
   {
     return GetScalarType() != st;
   }
 
-  bool operator==(const PixelFormat & pf) const
+  bool
+  operator==(const PixelFormat & pf) const
   {
-    return
-      SamplesPerPixel     == pf.SamplesPerPixel &&
-      BitsAllocated       == pf.BitsAllocated &&
-      BitsStored          == pf.BitsStored &&
-      HighBit             == pf.HighBit &&
-      PixelRepresentation == pf.PixelRepresentation;
+    return SamplesPerPixel == pf.SamplesPerPixel && BitsAllocated == pf.BitsAllocated && BitsStored == pf.BitsStored &&
+           HighBit == pf.HighBit && PixelRepresentation == pf.PixelRepresentation;
   }
 
-  bool operator!=(const PixelFormat & pf) const
+  bool
+  operator!=(const PixelFormat & pf) const
   {
-    return
-      SamplesPerPixel     != pf.SamplesPerPixel ||
-      BitsAllocated       != pf.BitsAllocated ||
-      BitsStored          != pf.BitsStored ||
-      HighBit             != pf.HighBit ||
-      PixelRepresentation != pf.PixelRepresentation;
+    return SamplesPerPixel != pf.SamplesPerPixel || BitsAllocated != pf.BitsAllocated || BitsStored != pf.BitsStored ||
+           HighBit != pf.HighBit || PixelRepresentation != pf.PixelRepresentation;
   }
 
 protected:
-  bool Validate();
+  bool
+  Validate();
+
 private:
   unsigned short SamplesPerPixel;
   unsigned short BitsAllocated;
@@ -133,7 +150,8 @@ private:
   unsigned short PixelRepresentation;
 };
 
-inline std::ostream& operator<<(std::ostream & os, const PixelFormat & pf)
+inline std::ostream &
+operator<<(std::ostream & os, const PixelFormat & pf)
 {
   pf.Print(os);
   return os;
@@ -141,4 +159,4 @@ inline std::ostream& operator<<(std::ostream & os, const PixelFormat & pf)
 
 } // end namespace mdcm
 
-#endif //MDCMPIXELFORMAT_H
+#endif // MDCMPIXELFORMAT_H

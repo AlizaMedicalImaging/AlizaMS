@@ -34,29 +34,34 @@ namespace mdcm
 class MDCM_EXPORT BasicOffsetTable : public Fragment
 {
 public:
-  BasicOffsetTable() : Fragment() {}
-  friend std::ostream &operator<<(std::ostream & os, const BasicOffsetTable & val);
+  BasicOffsetTable()
+    : Fragment()
+  {}
+  friend std::ostream &
+  operator<<(std::ostream & os, const BasicOffsetTable & val);
   template <typename TSwap>
-  std::istream & Read(std::istream &is) {
+  std::istream &
+  Read(std::istream & is)
+  {
     const Tag itemStart(0xfffe, 0xe000);
-    const Tag seqDelItem(0xfffe,0xe0dd);
-    if(!TagField.Read<TSwap>(is))
+    const Tag seqDelItem(0xfffe, 0xe0dd);
+    if (!TagField.Read<TSwap>(is))
     {
       assert(0 && "Should not happen");
       return is;
     }
-    if(TagField != itemStart)
+    if (TagField != itemStart)
     {
       throw std::logic_error("Siemens Icon issue?");
     }
-    if(!ValueLengthField.Read<TSwap>(is))
+    if (!ValueLengthField.Read<TSwap>(is))
     {
       assert(0 && "Should not happen");
       return is;
     }
     SmartPointer<ByteValue> bv = new ByteValue;
     bv->SetLength(ValueLengthField);
-    if(!bv->Read<TSwap>(is))
+    if (!bv->Read<TSwap>(is))
     {
       assert(0 && "Should not happen");
       return is;
@@ -66,10 +71,11 @@ public:
   }
 };
 
-inline std::ostream &operator<<(std::ostream & os, const BasicOffsetTable & val)
+inline std::ostream &
+operator<<(std::ostream & os, const BasicOffsetTable & val)
 {
   os << " BasicOffsetTable Length=" << val.ValueLengthField << std::endl;
-  if(val.ValueField)
+  if (val.ValueField)
   {
     const ByteValue * bv = val.GetByteValue();
     assert(bv);
@@ -81,4 +87,4 @@ inline std::ostream &operator<<(std::ostream & os, const BasicOffsetTable & val)
 
 } // end namespace mdcm
 
-#endif //MDCMBASICOFFSETTABLE_H
+#endif // MDCMBASICOFFSETTABLE_H

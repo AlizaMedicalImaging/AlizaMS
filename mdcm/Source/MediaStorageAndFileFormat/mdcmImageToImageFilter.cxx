@@ -31,12 +31,14 @@ ImageToImageFilter::ImageToImageFilter()
   Output = new Image;
 }
 
-Image & ImageToImageFilter::GetInput()
+Image &
+ImageToImageFilter::GetInput()
 {
-  return dynamic_cast<Image&>(*Input);
+  return dynamic_cast<Image &>(*Input);
 }
 
-const Image & ImageToImageFilter::GetOutput() const
+const Image &
+ImageToImageFilter::GetOutput() const
 {
   return dynamic_cast<const Image &>(*Output);
 }

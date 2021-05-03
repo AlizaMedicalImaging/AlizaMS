@@ -31,11 +31,13 @@ class MDCM_EXPORT CAPICryptoFactory : public CryptoFactory
 {
 public:
   CAPICryptoFactory(CryptoLib);
-  CryptographicMessageSyntax * CreateCMSProvider() override;
+  CryptographicMessageSyntax *
+  CreateCMSProvider() override;
+
 private:
   CAPICryptoFactory() {}
 };
 
 } // end namespace mdcm
 
-#endif //MDCMCAPICRYPTOFACTORY_H
+#endif // MDCMCAPICRYPTOFACTORY_H

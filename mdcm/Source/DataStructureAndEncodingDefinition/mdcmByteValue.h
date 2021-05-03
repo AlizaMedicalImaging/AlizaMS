@@ -42,45 +42,48 @@ public:
   ByteValue(std::vector<char> &);
   ~ByteValue();
 
-  operator const std::vector<char>& () const
-  {
-    return Internal;
-  }
+  operator const std::vector<char> &() const { return Internal; }
 
-  ByteValue &operator=(const ByteValue & val)
+  ByteValue &
+  operator=(const ByteValue & val)
   {
     Internal = val.Internal;
     Length = val.Length;
     return *this;
   }
 
-  bool operator==(const ByteValue & val) const
+  bool
+  operator==(const ByteValue & val) const
   {
-    if(Length != val.Length)     return false;
-    if(Internal == val.Internal) return true;
+    if (Length != val.Length)
+      return false;
+    if (Internal == val.Internal)
+      return true;
     return false;
   }
 
-  bool operator==(const Value & val) const override
+  bool
+  operator==(const Value & val) const override
   {
-    const ByteValue &bv = dynamic_cast<const ByteValue&>(val);
+    const ByteValue & bv = dynamic_cast<const ByteValue &>(val);
     return Length == bv.Length && Internal == bv.Internal;
   }
 
   template <typename TSwap, typename TType>
-  std::istream & Read(std::istream & is, bool readvalues = true)
+  std::istream &
+  Read(std::istream & is, bool readvalues = true)
   {
     // If Length is odd we have detected that in SetLength
     // and calling std::vector::resize make sure to allocate *AND*
     // initialize values to 0 so we are sure to have a \0 at the end
     // even in this case
-    if(Length)
+    if (Length)
     {
-      if(readvalues)
+      if (readvalues)
       {
         is.read(&Internal[0], Length);
         assert(Internal.size() == Length || Internal.size() == Length + 1);
-        TSwap::SwapArray((TType*)GetVoidPointer(), Internal.size()/sizeof(TType));
+        TSwap::SwapArray((TType *)GetVoidPointer(), Internal.size() / sizeof(TType));
       }
       else
       {
@@ -91,46 +94,62 @@ public:
   }
 
   template <typename TSwap>
-  std::istream & Read(std::istream & is)
+  std::istream &
+  Read(std::istream & is)
   {
-    return Read<TSwap,uint8_t>(is);
+    return Read<TSwap, uint8_t>(is);
   }
 
   template <typename TSwap, typename TType>
-  std::ostream const & Write(std::ostream & os) const
+  std::ostream const &
+  Write(std::ostream & os) const
   {
     assert(!(Internal.size() % 2));
-    if(!Internal.empty())
+    if (!Internal.empty())
     {
       std::vector<char> copy = Internal;
-      TSwap::SwapArray(
-        (TType*)(void*)&copy[0], Internal.size()/sizeof(TType));
+      TSwap::SwapArray((TType *)(void *)&copy[0], Internal.size() / sizeof(TType));
       os.write(&copy[0], copy.size());
     }
     return os;
   }
 
   template <typename TSwap>
-  std::ostream const & Write(std::ostream & os) const
+  std::ostream const &
+  Write(std::ostream & os) const
   {
-    return Write<TSwap,uint8_t>(os);
+    return Write<TSwap, uint8_t>(os);
   }
 
-  void PrintASCII(std::ostream &, VL) const;
-  void PrintHex(std::ostream &, VL) const;
-  void PrintGroupLength(std::ostream &);
-  bool IsEmpty() const;
-  VL GetLength() const override;
-  VL ComputeLength() const;
+  void
+  PrintASCII(std::ostream &, VL) const;
+  void
+  PrintHex(std::ostream &, VL) const;
+  void
+  PrintGroupLength(std::ostream &);
+  bool
+  IsEmpty() const;
+  VL
+  GetLength() const override;
+  VL
+       ComputeLength() const;
   void SetLength(VL) override;
-  void Append(ByteValue const &);
-  void Clear() override;
-  const char * GetPointer() const;
-  const void * GetVoidPointer() const;
-  void * GetVoidPointer();
-  void Fill(char);
-  bool GetBuffer(char*, unsigned long long) const;
-  bool WriteBuffer(std::ostream &) const;
+  void
+  Append(ByteValue const &);
+  void
+  Clear() override;
+  const char *
+  GetPointer() const;
+  const void *
+  GetVoidPointer() const;
+  void *
+  GetVoidPointer();
+  void
+  Fill(char);
+  bool
+  GetBuffer(char *, unsigned long long) const;
+  bool
+  WriteBuffer(std::ostream &) const;
 
 protected:
   void SetLengthOnly(VL) override;
@@ -143,4 +162,4 @@ private:
 
 } // end namespace mdcm
 
-#endif //MDCMBYTEVALUE_H
+#endif // MDCMBYTEVALUE_H

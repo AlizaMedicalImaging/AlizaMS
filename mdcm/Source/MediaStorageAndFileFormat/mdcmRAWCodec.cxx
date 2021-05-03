@@ -34,22 +34,24 @@ namespace mdcm
 // Unpack an array of 'packed' 12bits data into a more conventional 16bits
 // array. n is the length in bytes of array in, out will be a 16bits
 // array of size (n / 3) * 2
-static bool Unpack12Bits(char * out, const char * in, size_t n)
+static bool
+Unpack12Bits(char * out, const char * in, size_t n)
 {
   // 3 bytes = 2 words
   // http://groups.google.com/group/comp.lang.c/msg/572bc9b085c717f3
-  if(n % 3) return false;
-  short * q = (short*)out;
-  const unsigned char * p = (const unsigned char*)in;
-  const unsigned char * end = p+n;
-  unsigned char b0, b1, b2;
+  if (n % 3)
+    return false;
+  short *               q = (short *)out;
+  const unsigned char * p = (const unsigned char *)in;
+  const unsigned char * end = p + n;
+  unsigned char         b0, b1, b2;
   while (p != end)
   {
     b0 = *p++;
     b1 = *p++;
     b2 = *p++;
     *q++ = (short)(((b1 & 0xf) << 8) + b0);
-    *q++ = (short)((b1>>4) + (b2<<4));
+    *q++ = (short)((b1 >> 4) + (b2 << 4));
   }
   return true;
 }
@@ -78,112 +80,103 @@ static bool Pack12Bits(char * out, const char * in, size_t n)
 }
 #endif
 
-RAWCodec::RAWCodec()
+RAWCodec::RAWCodec() {}
+
+RAWCodec::~RAWCodec() {}
+
+bool
+RAWCodec::CanCode(TransferSyntax const & ts) const
 {
+  return (ts == TransferSyntax::ImplicitVRLittleEndian || ts == TransferSyntax::ExplicitVRLittleEndian ||
+          ts == TransferSyntax::ExplicitVRBigEndian || ts == TransferSyntax::ImplicitVRBigEndianPrivateGE ||
+          ts == TransferSyntax::DeflatedExplicitVRLittleEndian);
 }
 
-RAWCodec::~RAWCodec()
+bool
+RAWCodec::CanDecode(TransferSyntax const & ts) const
 {
+  return (ts == TransferSyntax::ImplicitVRLittleEndian || ts == TransferSyntax::ExplicitVRLittleEndian ||
+          ts == TransferSyntax::ExplicitVRBigEndian || ts == TransferSyntax::ImplicitVRBigEndianPrivateGE ||
+          ts == TransferSyntax::DeflatedExplicitVRLittleEndian);
 }
 
-bool RAWCodec::CanCode(TransferSyntax const & ts) const
-{
-  return (ts == TransferSyntax::ImplicitVRLittleEndian
-       || ts == TransferSyntax::ExplicitVRLittleEndian
-       || ts == TransferSyntax::ExplicitVRBigEndian
-       || ts == TransferSyntax::ImplicitVRBigEndianPrivateGE
-       || ts == TransferSyntax::DeflatedExplicitVRLittleEndian);
-}
-
-bool RAWCodec::CanDecode(TransferSyntax const & ts) const
-{
-  return (ts == TransferSyntax::ImplicitVRLittleEndian
-       || ts == TransferSyntax::ExplicitVRLittleEndian
-       || ts == TransferSyntax::ExplicitVRBigEndian
-       || ts == TransferSyntax::ImplicitVRBigEndianPrivateGE
-       || ts == TransferSyntax::DeflatedExplicitVRLittleEndian);
-}
-
-bool RAWCodec::Code(DataElement const & in, DataElement & out)
+bool
+RAWCodec::Code(DataElement const & in, DataElement & out)
 {
   out = in;
   return true;
 }
 
-bool RAWCodec::Decode(DataElement const & in, DataElement & out)
+bool
+RAWCodec::Decode(DataElement const & in, DataElement & out)
 {
-  if(!NeedByteSwap &&
-     !RequestPaddedCompositePixelCode &&
-     PI == PhotometricInterpretation::MONOCHROME2 &&
-     !PlanarConfiguration && !RequestPlanarConfiguration &&
-     GetPixelFormat().GetBitsAllocated() != 12 &&
-     !NeedOverlayCleanup)
+  if (!NeedByteSwap && !RequestPaddedCompositePixelCode && PI == PhotometricInterpretation::MONOCHROME2 &&
+      !PlanarConfiguration && !RequestPlanarConfiguration && GetPixelFormat().GetBitsAllocated() != 12 &&
+      !NeedOverlayCleanup)
   {
     out = in;
     return true;
   }
   const ByteValue * bv = in.GetByteValue();
-  if (!bv) return false;
+  if (!bv)
+    return false;
   std::stringstream is;
   is.write(bv->GetPointer(), bv->GetLength());
   std::stringstream os;
-  const bool r = DecodeByStreams(is, os);
-  if(!r) return false;
+  const bool        r = DecodeByStreams(is, os);
+  if (!r)
+    return false;
   std::string str = os.str();
   out = in;
-  if(this->GetPixelFormat() == PixelFormat::UINT12 ||
-     this->GetPixelFormat() == PixelFormat::INT12)
+  if (this->GetPixelFormat() == PixelFormat::UINT12 || this->GetPixelFormat() == PixelFormat::INT12)
   {
     const size_t len = str.size() * 16 / 12;
-    char * copy;
+    char *       copy;
     try
     {
       copy = new char[len];
     }
-    catch(std::bad_alloc&)
+    catch (std::bad_alloc &)
     {
       return false;
     }
     const bool b = Unpack12Bits(copy, &str[0], str.size());
-    if(!b)
+    if (!b)
     {
-      delete [] copy;
+      delete[] copy;
       return false;
     }
     VL::Type lenSize = (VL::Type)len;
     out.SetByteValue(copy, lenSize);
-    delete [] copy;
+    delete[] copy;
     this->GetPixelFormat().SetBitsAllocated(16);
   }
   else
   {
-    VL::Type strSize = (VL::Type) str.size();
+    VL::Type strSize = (VL::Type)str.size();
     out.SetByteValue(&str[0], strSize);
   }
   return r;
 }
 
-bool RAWCodec::GetHeaderInfo(std::istream &, TransferSyntax & ts)
+bool
+RAWCodec::GetHeaderInfo(std::istream &, TransferSyntax & ts)
 {
   ts = TransferSyntax::ExplicitVRLittleEndian;
-  if(NeedByteSwap)
+  if (NeedByteSwap)
   {
     ts = TransferSyntax::ImplicitVRBigEndianPrivateGE;
   }
   return true;
 }
 
-bool RAWCodec::DecodeBytes(
-  const char * inBytes, size_t inBufferLength,
-  char *      outBytes, size_t inOutBufferLength)
+bool
+RAWCodec::DecodeBytes(const char * inBytes, size_t inBufferLength, char * outBytes, size_t inOutBufferLength)
 {
-  if(!NeedByteSwap && !RequestPaddedCompositePixelCode &&
-     !RequestPlanarConfiguration &&
-	 PI != PhotometricInterpretation::YBR_FULL_422 &&
-     GetPixelFormat().GetBitsAllocated() != 12 &&
-     !NeedOverlayCleanup)
+  if (!NeedByteSwap && !RequestPaddedCompositePixelCode && !RequestPlanarConfiguration &&
+      PI != PhotometricInterpretation::YBR_FULL_422 && GetPixelFormat().GetBitsAllocated() != 12 && !NeedOverlayCleanup)
   {
-    if(inOutBufferLength <= inBufferLength)
+    if (inOutBufferLength <= inBufferLength)
     {
       memcpy(outBytes, inBytes, inOutBufferLength);
     }
@@ -197,30 +190,30 @@ bool RAWCodec::DecodeBytes(
   std::stringstream is;
   is.write(inBytes, inBufferLength);
   std::stringstream os;
-  const bool r = DecodeByStreams(is, os);
-  if(!r) return false;
+  const bool        r = DecodeByStreams(is, os);
+  if (!r)
+    return false;
   std::string str = os.str();
-  if(this->GetPixelFormat() == PixelFormat::UINT12 ||
-     this->GetPixelFormat() == PixelFormat::INT12)
+  if (this->GetPixelFormat() == PixelFormat::UINT12 || this->GetPixelFormat() == PixelFormat::INT12)
   {
     const size_t len = str.size() * 16 / 12;
-    char * copy;
+    char *       copy;
     try
     {
       copy = new char[len];
     }
-    catch(std::bad_alloc&)
+    catch (std::bad_alloc &)
     {
       return false;
     }
     const bool b = Unpack12Bits(copy, &str[0], str.size());
-    if(!b)
+    if (!b)
     {
-      delete [] copy;
+      delete[] copy;
       return false;
     }
     memcpy(outBytes, copy, len);
-    delete [] copy;
+    delete[] copy;
     this->GetPixelFormat().SetBitsAllocated(16);
   }
   else
@@ -230,7 +223,8 @@ bool RAWCodec::DecodeBytes(
   return r;
 }
 
-bool RAWCodec::DecodeByStreams(std::istream & is, std::ostream & os)
+bool
+RAWCodec::DecodeByStreams(std::istream & is, std::ostream & os)
 {
   return ImageCodec::DecodeByStreams(is, os);
 }

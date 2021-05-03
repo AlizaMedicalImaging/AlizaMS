@@ -35,20 +35,25 @@ namespace mdcm
 class MDCM_EXPORT VR16ExplicitDataElement : public DataElement
 {
 public:
-  VL GetLength() const;
+  VL
+  GetLength() const;
   template <typename TSwap>
-  std::istream & Read(std::istream &);
+  std::istream &
+  Read(std::istream &);
   template <typename TSwap>
-  std::istream & ReadPreValue(std::istream &);
+  std::istream &
+  ReadPreValue(std::istream &);
   template <typename TSwap>
-  std::istream & ReadValue(std::istream &, bool = true);
+  std::istream &
+  ReadValue(std::istream &, bool = true);
   template <typename TSwap>
-  std::istream & ReadWithLength(std::istream &, VL &);
+  std::istream &
+  ReadWithLength(std::istream &, VL &);
   // Purposely do not provide an implementation for writing!
 };
 
-}
+} // namespace mdcm
 
 #include "mdcmVR16ExplicitDataElement.hxx"
 
-#endif //MDCMVR16EXPLICITDATAELEMENT_H
+#endif // MDCMVR16EXPLICITDATAELEMENT_H

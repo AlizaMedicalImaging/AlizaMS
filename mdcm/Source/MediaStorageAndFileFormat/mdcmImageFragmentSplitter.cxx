@@ -26,19 +26,20 @@
 namespace mdcm
 {
 
-bool ImageFragmentSplitter::Split()
+bool
+ImageFragmentSplitter::Split()
 {
   Output = Input;
-  const Bitmap & image = *Input;
+  const Bitmap &       image = *Input;
   const unsigned int * dims = image.GetDimensions();
-  if(dims[2] != 1)
+  if (dims[2] != 1)
   {
     mdcmDebugMacro("Cannot split a 3D image");
     return false;
   }
-  const DataElement & pixeldata = image.GetDataElement();
+  const DataElement &         pixeldata = image.GetDataElement();
   const SequenceOfFragments * sqf = pixeldata.GetSequenceOfFragments();
-  if(!sqf)
+  if (!sqf)
   {
     mdcmDebugMacro("Cannot split a non-encapsulated syntax");
     return false;
@@ -48,33 +49,33 @@ bool ImageFragmentSplitter::Split()
     mdcmDebugMacro("Case not handled (for now)");
     return false;
   }
-  const Fragment & frag = sqf->GetFragment(0);
+  const Fragment &  frag = sqf->GetFragment(0);
   const ByteValue * bv = frag.GetByteValue();
   if (!bv)
   {
     return false;
   }
-  const char * p = bv->GetPointer();
+  const char *  p = bv->GetPointer();
   unsigned long len = bv->GetLength();
-  if((FragmentSizeMax > len) && !Force)
+  if ((FragmentSizeMax > len) && !Force)
   {
     return true;
   }
-  if(FragmentSizeMax == 0)
+  if (FragmentSizeMax == 0)
   {
     mdcmDebugMacro("Need to set a real value for fragment size");
     return false;
   }
-  unsigned long nfrags = len / FragmentSizeMax;
-  unsigned long lastfrag = len % FragmentSizeMax;
+  unsigned long                     nfrags = len / FragmentSizeMax;
+  unsigned long                     lastfrag = len % FragmentSizeMax;
   SmartPointer<SequenceOfFragments> sq = new SequenceOfFragments;
-  for(unsigned long i = 0; i < nfrags; ++i)
+  for (unsigned long i = 0; i < nfrags; ++i)
   {
     Fragment splitfrag;
     splitfrag.SetByteValue(p + i * FragmentSizeMax, FragmentSizeMax);
     sq->AddFragment(splitfrag);
   }
-  if(lastfrag)
+  if (lastfrag)
   {
     Fragment splitfrag;
     splitfrag.SetByteValue(p + nfrags * FragmentSizeMax, (uint32_t)lastfrag);
@@ -86,33 +87,36 @@ bool ImageFragmentSplitter::Split()
   return success;
 }
 
-void ImageFragmentSplitter::SetFragmentSizeMax(unsigned int fragsize)
+void
+ImageFragmentSplitter::SetFragmentSizeMax(unsigned int fragsize)
 {
-/*
- * A.4 TRANSFER SYNTAXES FOR ENCAPSULATION OF ENCODED PIXEL DATA
- *
- * All items containing an encoded fragment shall be made of an even number of bytes
- * greater or equal to two. The last fragment of a frame may be padded, if necessary,
- * to meet the sequence item format requirements of the DICOM Standard.
- */
+  /*
+   * A.4 TRANSFER SYNTAXES FOR ENCAPSULATION OF ENCODED PIXEL DATA
+   *
+   * All items containing an encoded fragment shall be made of an even number of bytes
+   * greater or equal to two. The last fragment of a frame may be padded, if necessary,
+   * to meet the sequence item format requirements of the DICOM Standard.
+   */
   FragmentSizeMax = fragsize;
-  if(fragsize % 2)
+  if (fragsize % 2)
   {
     FragmentSizeMax--;
   }
-  if(fragsize < 2)
+  if (fragsize < 2)
   {
     FragmentSizeMax = 2;
   }
   assert(FragmentSizeMax >= 2 && (FragmentSizeMax % 2) == 0);
 }
 
-unsigned int ImageFragmentSplitter::GetFragmentSizeMax() const
+unsigned int
+ImageFragmentSplitter::GetFragmentSizeMax() const
 {
   return FragmentSizeMax;
 }
 
-void ImageFragmentSplitter::SetForce(bool f)
+void
+ImageFragmentSplitter::SetForce(bool f)
 {
   Force = f;
 }

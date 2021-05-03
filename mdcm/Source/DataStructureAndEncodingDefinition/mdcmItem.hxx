@@ -28,9 +28,10 @@ namespace mdcm
 {
 
 template <typename TDE>
-VL Item::GetLength() const
+VL
+Item::GetLength() const
 {
-  if(ValueLengthField.IsUndefined())
+  if (ValueLengthField.IsUndefined())
   {
     assert(!NestedDataSet.GetLength<TDE>().IsUndefined());
     // Item Start             4
@@ -38,9 +39,9 @@ VL Item::GetLength() const
     // DataSet                ?
     // Item End Delimitation  4
     // Item End Length        4
-    assert(NestedDataSet.GetLength<TDE>() % 2 == 0 );
+    assert(NestedDataSet.GetLength<TDE>() % 2 == 0);
     return TagField.GetLength() /* 4 */ + ValueLengthField.GetLength() /* 4 */
-      + NestedDataSet.GetLength<TDE>() + 4 + 4;
+           + NestedDataSet.GetLength<TDE>() + 4 + 4;
   }
   else
   {
@@ -52,11 +53,12 @@ VL Item::GetLength() const
     // we are computing the actual length of an implicit dataset, from an
     // initially read explicit dataset in which case the two length cannot
     // related to each other
-    //mdcmAssertAlwaysMacro( ValueLengthField == nestedlen );
-    assert(nestedlen % 2 == 0 );
-    return TagField.GetLength() /* 4 */ + ValueLengthField.GetLength() /* 4 */
-      //+ ValueLengthField;
-      + nestedlen;
+    // mdcmAssertAlwaysMacro( ValueLengthField == nestedlen );
+    assert(nestedlen % 2 == 0);
+    return TagField.GetLength() /* 4 */ +
+           ValueLengthField.GetLength() /* 4 */
+           //+ ValueLengthField;
+           + nestedlen;
   }
 }
 

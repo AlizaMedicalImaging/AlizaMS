@@ -26,23 +26,29 @@
 // from BOOST static assert
 namespace mdcm
 {
-  template <bool x> struct STATIC_ASSERTION_FAILURE;
+template <bool x>
+struct STATIC_ASSERTION_FAILURE;
 
-  template <> struct STATIC_ASSERTION_FAILURE<true>
+template <>
+struct STATIC_ASSERTION_FAILURE<true>
+{
+  enum
   {
-    enum { value = 1 };
+    value = 1
   };
+};
 
-  template <int x> struct static_assert_test {};
-}
+template <int x>
+struct static_assert_test
+{};
+} // namespace mdcm
 
-#define MDCM_JOIN( X, Y ) MDCM_DO_JOIN( X, Y )
-#define MDCM_DO_JOIN( X, Y ) MDCM_DO_JOIN2(X,Y)
-#define MDCM_DO_JOIN2( X, Y ) X##Y
-#define MDCM_STATIC_ASSERT( B ) \
-  typedef ::mdcm::static_assert_test<\
-    sizeof(::mdcm::STATIC_ASSERTION_FAILURE< (bool)( B ) >)>\
-      MDCM_JOIN(mdcm_static_assert_typedef_, __LINE__)
+#define MDCM_JOIN(X, Y) MDCM_DO_JOIN(X, Y)
+#define MDCM_DO_JOIN(X, Y) MDCM_DO_JOIN2(X, Y)
+#define MDCM_DO_JOIN2(X, Y) X##Y
+#define MDCM_STATIC_ASSERT(B)                                                                                          \
+  typedef ::mdcm::static_assert_test<sizeof(::mdcm::STATIC_ASSERTION_FAILURE<(bool)(B)>)> MDCM_JOIN(                   \
+    mdcm_static_assert_typedef_, __LINE__)
 
 /* Example:
  *

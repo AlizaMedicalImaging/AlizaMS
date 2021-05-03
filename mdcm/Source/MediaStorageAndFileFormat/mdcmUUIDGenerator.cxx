@@ -26,23 +26,24 @@
 
 // FIXME
 #if defined(_WIN32) || defined(__CYGWIN__)
-#define HAVE_UUIDCREATE
+#  define HAVE_UUIDCREATE
 #else
-#define HAVE_UUID_GENERATE
+#  define HAVE_UUID_GENERATE
 #endif
 
 #ifdef HAVE_UUID_GENERATE
-#include "mdcm_uuid.h"
+#  include "mdcm_uuid.h"
 #endif
 
 #ifdef MDCM_HAVE_RPC_H
-#include <rpc.h>
+#  include <rpc.h>
 #endif
 
 namespace mdcm
 {
 
-const char * UUIDGenerator::Generate()
+const char *
+UUIDGenerator::Generate()
 {
   Unique.resize(36);
   char * uuid_data = &Unique[0];
@@ -53,57 +54,63 @@ const char * UUIDGenerator::Generate()
   uuid_unparse(g, uuid_data);
 #elif defined(HAVE_UUID_CREATE)
   uint32_t rv;
-  uuid_t g;
+  uuid_t   g;
   uuid_create(&g, &rv);
-  if (rv != uuid_s_ok) return NULL;
+  if (rv != uuid_s_ok)
+    return NULL;
   uuid_to_string(&g, &uuid_data, &rv);
-  if (rv != uuid_s_ok) return NULL;
+  if (rv != uuid_s_ok)
+    return NULL;
 #elif defined(HAVE_UUIDCREATE)
   UUID uuid;
   UuidCreate(&uuid);
   BYTE * str = 0;
-#if 1
+#  if 1
   UuidToStringA(&uuid, &str);
-#else
+#  else
   UuidToString(&uuid, &str);
-#endif
-  Unique = (char*)str;
-#if 1
+#  endif
+  Unique = (char *)str;
+#  if 1
   RpcStringFreeA(&str);
-#else
+#  else
   RpcStringFree(&str);
-#endif
+#  endif
 #else
-#error should not happen
+#  error should not happen
 #endif
   assert(IsValid(Unique.c_str()));
   return Unique.c_str();
 }
 
-bool UUIDGenerator::IsValid(const char * suid)
+bool
+UUIDGenerator::IsValid(const char * suid)
 {
-  if(!suid) return false;
+  if (!suid)
+    return false;
 #if defined(HAVE_UUID_GENERATE)
   uuid_t uu;
-  int res = uuid_parse((const char *)suid, uu);
-  if(res) return false;
+  int    res = uuid_parse((const char *)suid, uu);
+  if (res)
+    return false;
 #elif defined(HAVE_UUID_CREATE)
   uint32_t status;
-  uuid_t uuid;
+  uuid_t   uuid;
   uuid_from_string(suid, &uuid, &status);
-  if(status != uuid_s_ok) return false;
+  if (status != uuid_s_ok)
+    return false;
 #elif defined(HAVE_UUIDCREATE)
   UUID uuid;
-#if 1
+#  if 1
   if (FAILED(UuidFromStringA((unsigned char *)suid, &uuid)))
-#else
+#  else
   if (FAILED(UuidFromString((unsigned char *)suid, &uuid)))
-#endif
+#  endif
   {
     return false;
   }
 #else
-#error should not happen
+#  error should not happen
 #endif
   return true;
 }

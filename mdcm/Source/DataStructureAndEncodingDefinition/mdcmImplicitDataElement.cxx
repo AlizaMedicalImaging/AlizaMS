@@ -26,39 +26,36 @@
 namespace mdcm
 {
 
-VL ImplicitDataElement::GetLength() const
+VL
+ImplicitDataElement::GetLength() const
 {
-  if(ValueLengthField.IsUndefined())
+  if (ValueLengthField.IsUndefined())
   {
     assert(ValueField->GetLength().IsUndefined());
-    Value *p = ValueField;
-    SequenceOfItems *sq = dynamic_cast<SequenceOfItems*>(p);
-    if(sq)
+    Value *           p = ValueField;
+    SequenceOfItems * sq = dynamic_cast<SequenceOfItems *>(p);
+    if (sq)
     {
-      return TagField.GetLength() + ValueLengthField.GetLength()
-        + sq->ComputeLength<ImplicitDataElement>();
+      return TagField.GetLength() + ValueLengthField.GetLength() + sq->ComputeLength<ImplicitDataElement>();
     }
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
-    SequenceOfFragments *sf = dynamic_cast<SequenceOfFragments*>(p);
-    if(sf)
+    SequenceOfFragments * sf = dynamic_cast<SequenceOfFragments *>(p);
+    if (sf)
     {
-      return TagField.GetLength()
-        + ValueLengthField.GetLength() + sf->ComputeLength();
+      return TagField.GetLength() + ValueLengthField.GetLength() + sf->ComputeLength();
     }
 #endif
     assert(!ValueLengthField.IsUndefined());
     return ValueLengthField;
   }
-  else if(const SequenceOfItems *sqi = dynamic_cast<const SequenceOfItems*>( ValueField.GetPointer()) )
+  else if (const SequenceOfItems * sqi = dynamic_cast<const SequenceOfItems *>(ValueField.GetPointer()))
   {
-    return TagField.GetLength() + ValueLengthField.GetLength()
-      + sqi->ComputeLength<ImplicitDataElement>();
+    return TagField.GetLength() + ValueLengthField.GetLength() + sqi->ComputeLength<ImplicitDataElement>();
   }
   else
   {
     assert(!ValueField || ValueField->GetLength() == ValueLengthField);
-    return TagField.GetLength() + ValueLengthField.GetLength()
-      + ValueLengthField;
+    return TagField.GetLength() + ValueLengthField.GetLength() + ValueLengthField;
   }
 }
 

@@ -35,9 +35,12 @@ class MDCM_EXPORT Global
 public:
   Global();
   ~Global();
-  const Dicts & GetDicts() const;
-  Dicts & GetDicts();
-  static Global & GetInstance();
+  const Dicts &
+  GetDicts() const;
+  Dicts &
+  GetDicts();
+  static Global &
+  GetInstance();
 
 private:
   Global(const Global &);
@@ -46,6 +49,6 @@ private:
 
 static Global GlobalInstance;
 
-}
+} // namespace mdcm
 
-#endif //MDCMGLOBAL_H
+#endif // MDCMGLOBAL_H

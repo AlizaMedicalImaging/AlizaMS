@@ -34,17 +34,30 @@ class MDCM_EXPORT Filename
 {
 public:
   Filename(const char * filename = "")
-    : FileName(filename ? filename : ""), Path(), Conversion() {}
-  const char * GetFileName() const;
-  const char * GetPath();
-  const char * GetName();
-  const char * GetExtension();
-  const char * ToUnixSlashes();
-  const char * ToWindowsSlashes();
-  std::string Join(const char *, const char *);
-  bool IsEmpty() const;
-  operator const char * () const { return GetFileName(); }
-  bool EndWith(const char ending[]) const;
+    : FileName(filename ? filename : "")
+    , Path()
+    , Conversion()
+  {}
+  const char *
+  GetFileName() const;
+  const char *
+  GetPath();
+  const char *
+  GetName();
+  const char *
+  GetExtension();
+  const char *
+  ToUnixSlashes();
+  const char *
+  ToWindowsSlashes();
+  std::string
+  Join(const char *, const char *);
+  bool
+  IsEmpty() const;
+  operator const char *() const { return GetFileName(); }
+  bool
+  EndWith(const char ending[]) const;
+
 private:
   std::string FileName;
   std::string Path;
@@ -53,4 +66,4 @@ private:
 
 } // end namespace mdcm
 
-#endif //MDCMFILENAME_H
+#endif // MDCMFILENAME_H

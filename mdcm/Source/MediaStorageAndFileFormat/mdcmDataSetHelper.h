@@ -38,7 +38,8 @@ class Tag;
 class MDCM_EXPORT DataSetHelper
 {
 public:
-  static VR ComputeVR(const File &, const DataSet &, const Tag &);
+  static VR
+  ComputeVR(const File &, const DataSet &, const Tag &);
 };
 
 } // end namespace mdcm

@@ -18,21 +18,22 @@ namespace mdcm
 {
 
 template <typename TDE>
-VL SequenceOfItems::ComputeLength() const
+VL
+SequenceOfItems::ComputeLength() const
 {
   typename ItemVector::const_iterator it = Items.begin();
-  VL length = 0;
-  for(;it != Items.end(); ++it)
+  VL                                  length = 0;
+  for (; it != Items.end(); ++it)
   {
     length += it->template GetLength<TDE>();
   }
-  if(SequenceLengthField.IsUndefined())
+  if (SequenceLengthField.IsUndefined())
   {
     length += 8; // item end delimitor (tag + vl)
   }
   return length;
 }
 
-}
+} // namespace mdcm
 
 #endif // MDCMSEQUENCEOFITEMS_TXX

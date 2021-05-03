@@ -36,14 +36,18 @@ class MDCM_EXPORT ByteSwapFilter
 public:
   ByteSwapFilter(DataSet &);
   ~ByteSwapFilter();
-  bool ByteSwap();
-  void SetByteSwapTag(bool);
+  bool
+  ByteSwap();
+  void
+  SetByteSwapTag(bool);
+
 private:
-  DataSet &DS;
-  bool ByteSwapTag;
-  ByteSwapFilter& operator=(const ByteSwapFilter &);
+  DataSet & DS;
+  bool      ByteSwapTag;
+  ByteSwapFilter &
+  operator=(const ByteSwapFilter &);
 };
 
 } // end namespace mdcm
 
-#endif //MDCMBYTESWAPFILTER_H
+#endif // MDCMBYTESWAPFILTER_H

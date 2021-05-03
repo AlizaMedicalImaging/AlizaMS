@@ -31,13 +31,15 @@ static unsigned int GlobalCount = 0;
 class GlobalInternal
 {
 public:
-  GlobalInternal() : GlobalDicts() {}
+  GlobalInternal()
+    : GlobalDicts()
+  {}
   Dicts GlobalDicts;
 };
 
 Global::Global()
 {
-  if(++GlobalCount == 1)
+  if (++GlobalCount == 1)
   {
     Internals = new GlobalInternal;
     Internals->GlobalDicts.LoadDefaults();
@@ -46,24 +48,27 @@ Global::Global()
 
 Global::~Global()
 {
-  if(--GlobalCount == 0)
+  if (--GlobalCount == 0)
   {
     delete Internals;
     Internals = NULL;
   }
 }
 
-const Dicts & Global::GetDicts() const
+const Dicts &
+Global::GetDicts() const
 {
   return Internals->GlobalDicts;
 }
 
-Dicts & Global::GetDicts()
+Dicts &
+Global::GetDicts()
 {
   return Internals->GlobalDicts;
 }
 
-Global & Global::GetInstance()
+Global &
+Global::GetInstance()
 {
   return GlobalInstance;
 }

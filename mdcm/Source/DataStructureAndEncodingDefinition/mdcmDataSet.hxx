@@ -31,21 +31,22 @@ namespace mdcm
 {
 
 template <typename TDE, typename TSwap>
-std::istream & DataSet::ReadNested(std::istream & is)
+std::istream &
+DataSet::ReadNested(std::istream & is)
 {
   DataElement de;
-  const Tag itemDelItem(0xfffe,0xe00d);
+  const Tag   itemDelItem(0xfffe, 0xe00d);
   assert(de.GetTag() != itemDelItem);
   try
   {
-    while(de.Read<TDE,TSwap>(is) && de.GetTag() != itemDelItem ) // Keep that order!
+    while (de.Read<TDE, TSwap>(is) && de.GetTag() != itemDelItem) // Keep that order!
     {
       InsertDataElement(de);
     }
   }
-  catch(ParseException & pe)
+  catch (ParseException & pe)
   {
-    if(pe.GetLastElement().GetTag() == Tag(0xfffe,0xe0dd))
+    if (pe.GetLastElement().GetTag() == Tag(0xfffe, 0xe0dd))
     {
       // BogusItemStartItemEnd.dcm
       mdcmWarningMacro("SQ End found but no Item end found");
@@ -63,10 +64,11 @@ std::istream & DataSet::ReadNested(std::istream & is)
 }
 
 template <typename TDE, typename TSwap>
-std::istream & DataSet::Read(std::istream & is)
+std::istream &
+DataSet::Read(std::istream & is)
 {
   DataElement de;
-  while(!is.eof() && de.Read<TDE,TSwap>(is))
+  while (!is.eof() && de.Read<TDE, TSwap>(is))
   {
     InsertDataElement(de);
   }
@@ -74,28 +76,26 @@ std::istream & DataSet::Read(std::istream & is)
 }
 
 template <typename TDE, typename TSwap>
-std::istream & DataSet::ReadUpToTag(
-  std::istream & is,
-  const Tag & t,
-  const std::set<Tag> & skiptags)
+std::istream &
+DataSet::ReadUpToTag(std::istream & is, const Tag & t, const std::set<Tag> & skiptags)
 {
   DataElement de;
-  while(!is.eof() && de.template ReadPreValue<TDE,TSwap>(is, skiptags))
+  while (!is.eof() && de.template ReadPreValue<TDE, TSwap>(is, skiptags))
   {
     // If tag read was in skiptags then we should NOT add it
-    if(skiptags.count(de.GetTag()) == 0)
+    if (skiptags.count(de.GetTag()) == 0)
     {
-      de.template ReadValue<TDE,TSwap>(is, skiptags);
+      de.template ReadValue<TDE, TSwap>(is, skiptags);
       InsertDataElement(de);
     }
     else
     {
       assert(is.good());
-      if(de.GetTag() != t)
+      if (de.GetTag() != t)
         is.seekg(de.GetVL(), std::ios::cur);
     }
     // tag was found, we can exit the loop
-    if(t <= de.GetTag())
+    if (t <= de.GetTag())
     {
       assert(is.good());
       break;
@@ -105,28 +105,26 @@ std::istream & DataSet::ReadUpToTag(
 }
 
 template <typename TDE, typename TSwap>
-std::istream & DataSet::ReadUpToTagWithLength(
-  std::istream & is,
-  const Tag & t,
-  std::set<Tag> const & skiptags,
-  VL & length)
+std::istream &
+DataSet::ReadUpToTagWithLength(std::istream & is, const Tag & t, std::set<Tag> const & skiptags, VL & length)
 {
   DataElement de;
-  while(!is.eof() && de.template ReadPreValue<TDE,TSwap>(is, skiptags))
+  while (!is.eof() && de.template ReadPreValue<TDE, TSwap>(is, skiptags))
   {
     // If tag read was in skiptags then we should NOT add it.
-    if(skiptags.count(de.GetTag()) == 0)
+    if (skiptags.count(de.GetTag()) == 0)
     {
-      de.template ReadValueWithLength<TDE,TSwap>(is, length, skiptags);
+      de.template ReadValueWithLength<TDE, TSwap>(is, length, skiptags);
       InsertDataElement(de);
     }
     else
     {
       assert(is.good());
-      if(de.GetTag() != t) is.seekg(de.GetVL(), std::ios::cur);
+      if (de.GetTag() != t)
+        is.seekg(de.GetVL(), std::ios::cur);
     }
     // tag was found, we can exit the loop.
-    if(t <= de.GetTag())
+    if (t <= de.GetTag())
     {
       assert(is.good());
       break;
@@ -136,26 +134,24 @@ std::istream & DataSet::ReadUpToTagWithLength(
 }
 
 template <typename TDE, typename TSwap>
-std::istream & DataSet::ReadSelectedTags(
-  std::istream & inputStream,
-  const std::set<Tag> & selectedTags,
-  bool readvalues)
+std::istream &
+DataSet::ReadSelectedTags(std::istream & inputStream, const std::set<Tag> & selectedTags, bool readvalues)
 {
-  if(!(selectedTags.empty() || inputStream.fail()))
+  if (!(selectedTags.empty() || inputStream.fail()))
   {
-    const Tag maxTag = *(selectedTags.rbegin());
+    const Tag     maxTag = *(selectedTags.rbegin());
     std::set<Tag> tags = selectedTags;
-    DataElement dataElem;
-    while(!inputStream.eof())
+    DataElement   dataElem;
+    while (!inputStream.eof())
     {
-      static_cast<TDE&>(dataElem).template ReadPreValue<TSwap>(inputStream);
-      const Tag& tag = dataElem.GetTag();
-      if(inputStream.fail() || maxTag < tag)
+      static_cast<TDE &>(dataElem).template ReadPreValue<TSwap>(inputStream);
+      const Tag & tag = dataElem.GetTag();
+      if (inputStream.fail() || maxTag < tag)
       {
-        if(inputStream.good())
+        if (inputStream.good())
         {
           const int l = dataElem.GetVR().GetLength();
-          inputStream.seekg(- 4 - 2 * l, std::ios::cur);
+          inputStream.seekg(-4 - 2 * l, std::ios::cur);
         }
         else
         {
@@ -166,14 +162,14 @@ std::istream & DataSet::ReadSelectedTags(
         // As we assume ascending tag ordering, we can exit the loop.
         break;
       }
-      static_cast<TDE&>(dataElem).template ReadValue<TSwap>(inputStream, readvalues);
+      static_cast<TDE &>(dataElem).template ReadValue<TSwap>(inputStream, readvalues);
       const std::set<Tag>::iterator found = tags.find(tag);
       if (found != tags.end())
       {
         InsertDataElement(dataElem);
         tags.erase(found);
 
-        if(tags.empty())
+        if (tags.empty())
         {
           // All selected tags were found, we can exit the loop.
           break;
@@ -192,31 +188,31 @@ std::istream & DataSet::ReadSelectedTags(
 }
 
 template <typename TDE, typename TSwap>
-std::istream & DataSet::ReadSelectedPrivateTags(
-  std::istream & inputStream,
-  const std::set<PrivateTag> & selectedPTags,
-  bool readvalues)
+std::istream &
+DataSet::ReadSelectedPrivateTags(std::istream &               inputStream,
+                                 const std::set<PrivateTag> & selectedPTags,
+                                 bool                         readvalues)
 {
-  if(!(selectedPTags.empty() || inputStream.fail()))
+  if (!(selectedPTags.empty() || inputStream.fail()))
   {
     assert(selectedPTags.size() == 1);
     const PrivateTag refPTag = *(selectedPTags.rbegin());
-    PrivateTag nextPTag = refPTag;
+    PrivateTag       nextPTag = refPTag;
     nextPTag.SetElement((uint16_t)(nextPTag.GetElement() + 0x1));
     assert(nextPTag.GetElement() & 0x00ff); // no wrap
     Tag maxTag;
     maxTag.SetPrivateCreator(nextPTag);
     DataElement dataElem;
-    while(!inputStream.eof())
+    while (!inputStream.eof())
     {
-      static_cast<TDE&>(dataElem).template ReadPreValue<TSwap>(inputStream);
-      const Tag& tag = dataElem.GetTag();
+      static_cast<TDE &>(dataElem).template ReadPreValue<TSwap>(inputStream);
+      const Tag & tag = dataElem.GetTag();
       if (inputStream.fail() || maxTag < tag)
       {
-        if(inputStream.good())
+        if (inputStream.good())
         {
           const int l = dataElem.GetVR().GetLength();
-          inputStream.seekg(- 4 - 2 * l, std::ios::cur);
+          inputStream.seekg(-4 - 2 * l, std::ios::cur);
         }
         else
         {
@@ -227,16 +223,16 @@ std::istream & DataSet::ReadSelectedPrivateTags(
         // As we assume ascending tag ordering, we can exit the loop.
         break;
       }
-      static_cast<TDE&>(dataElem).template ReadValue<TSwap>(inputStream, readvalues);
+      static_cast<TDE &>(dataElem).template ReadValue<TSwap>(inputStream, readvalues);
       if (inputStream.fail())
       {
         break;
       }
-      if(tag.GetPrivateCreator() == refPTag)
+      if (tag.GetPrivateCreator() == refPTag)
       {
         DES.insert(dataElem);
       }
-      if (! (tag < maxTag))
+      if (!(tag < maxTag))
       {
         // The maximum group was encountered, and as we assume
         // ascending tag ordering, we can exit the loop.
@@ -248,28 +244,28 @@ std::istream & DataSet::ReadSelectedPrivateTags(
 }
 
 template <typename TDE, typename TSwap>
-std::istream & DataSet::ReadSelectedTagsWithLength(
-  std::istream &inputStream,
-  const std::set<Tag> & selectedTags,
-  VL & length,
-  bool readvalues)
+std::istream &
+DataSet::ReadSelectedTagsWithLength(std::istream &        inputStream,
+                                    const std::set<Tag> & selectedTags,
+                                    VL &                  length,
+                                    bool                  readvalues)
 {
   (void)length;
-  if (! selectedTags.empty())
+  if (!selectedTags.empty())
   {
-    const Tag maxTag = *(selectedTags.rbegin());
+    const Tag     maxTag = *(selectedTags.rbegin());
     std::set<Tag> tags = selectedTags;
-    DataElement dataElem;
-    while(!inputStream.eof())
+    DataElement   dataElem;
+    while (!inputStream.eof())
     {
-      static_cast<TDE&>(dataElem).template ReadPreValue<TSwap>(inputStream);
+      static_cast<TDE &>(dataElem).template ReadPreValue<TSwap>(inputStream);
       const Tag tag = dataElem.GetTag();
       if (inputStream.fail() || maxTag < tag)
       {
-        if(inputStream.good())
+        if (inputStream.good())
         {
           const int l = dataElem.GetVR().GetLength();
-          inputStream.seekg(- 4 - 2 * l, std::ios::cur);
+          inputStream.seekg(-4 - 2 * l, std::ios::cur);
         }
         else
         {
@@ -280,7 +276,7 @@ std::istream & DataSet::ReadSelectedTagsWithLength(
         // As we assume ascending tag ordering, we can exit the loop.
         break;
       }
-      static_cast<TDE&>(dataElem).template ReadValue<TSwap>(inputStream, readvalues);
+      static_cast<TDE &>(dataElem).template ReadValue<TSwap>(inputStream, readvalues);
       if (inputStream.fail())
       {
         break;
@@ -308,33 +304,33 @@ std::istream & DataSet::ReadSelectedTagsWithLength(
 }
 
 template <typename TDE, typename TSwap>
-std::istream & DataSet::ReadSelectedPrivateTagsWithLength(
-  std::istream & inputStream,
-  const std::set<PrivateTag> & selectedPTags,
-  VL & length,
-  bool readvalues)
+std::istream &
+DataSet::ReadSelectedPrivateTagsWithLength(std::istream &               inputStream,
+                                           const std::set<PrivateTag> & selectedPTags,
+                                           VL &                         length,
+                                           bool                         readvalues)
 {
   (void)length;
-  if(!(selectedPTags.empty() || inputStream.fail()))
+  if (!(selectedPTags.empty() || inputStream.fail()))
   {
     assert(selectedPTags.size() == 1);
     const PrivateTag refPTag = *(selectedPTags.rbegin());
-    PrivateTag nextPTag = refPTag;
+    PrivateTag       nextPTag = refPTag;
     nextPTag.SetElement((uint16_t)(nextPTag.GetElement() + 0x1));
     assert(nextPTag.GetElement()); // no wrap
     Tag maxTag;
     maxTag.SetPrivateCreator(nextPTag);
     DataElement dataElem;
-    while(!inputStream.eof())
+    while (!inputStream.eof())
     {
-      static_cast<TDE&>(dataElem).template ReadPreValue<TSwap>(inputStream);
-      const Tag& tag = dataElem.GetTag();
+      static_cast<TDE &>(dataElem).template ReadPreValue<TSwap>(inputStream);
+      const Tag & tag = dataElem.GetTag();
       if (inputStream.fail() || maxTag < tag)
       {
-        if(inputStream.good())
+        if (inputStream.good())
         {
           const int l = dataElem.GetVR().GetLength();
-          inputStream.seekg(- 4 - 2 * l, std::ios::cur);
+          inputStream.seekg(-4 - 2 * l, std::ios::cur);
         }
         else
         {
@@ -345,12 +341,12 @@ std::istream & DataSet::ReadSelectedPrivateTagsWithLength(
         // As we assume ascending tag ordering, we can exit the loop.
         break;
       }
-      static_cast<TDE&>(dataElem).template ReadValue<TSwap>(inputStream, readvalues);
+      static_cast<TDE &>(dataElem).template ReadValue<TSwap>(inputStream, readvalues);
       if (inputStream.fail())
       {
         break;
       }
-      if(tag.GetPrivateCreator() == refPTag)
+      if (tag.GetPrivateCreator() == refPTag)
       {
         InsertDataElement(dataElem);
       }
@@ -366,36 +362,37 @@ std::istream & DataSet::ReadSelectedPrivateTagsWithLength(
 }
 
 template <typename TDE, typename TSwap>
-std::istream & DataSet::ReadWithLength(std::istream & is, VL & length)
+std::istream &
+DataSet::ReadWithLength(std::istream & is, VL & length)
 {
-  DataElement de;
-  VL l = 0;
-  VL locallength = length;
+  DataElement          de;
+  VL                   l = 0;
+  VL                   locallength = length;
   const std::streampos startpos = is.tellg();
   try
   {
-    while(l != locallength && de.ReadWithLength<TDE,TSwap>(is, locallength))
+    while (l != locallength && de.ReadWithLength<TDE, TSwap>(is, locallength))
     {
 #ifndef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
-      assert(de.GetTag() != Tag(0xfffe,0xe000)); // We should not read the next item
+      assert(de.GetTag() != Tag(0xfffe, 0xe000)); // We should not read the next item
 #endif
       InsertDataElement(de);
       const VL oflen = de.GetLength<TDE>();
       l += oflen;
       const std::streampos curpos = is.tellg();
       // Bug_Philips_ItemTag_3F3F (0x2005, 0x1080): for some reason computation of fails
-      if(l == 70 && locallength == 63)
+      if (l == 70 && locallength == 63)
       {
         mdcmWarningMacro("PMS: Super bad hack. Changing length");
         length = locallength = 140;
       }
-      if((curpos - startpos) + 1 == l)
+      if ((curpos - startpos) + 1 == l)
       {
         throw std::logic_error("Papyrus odd padding");
       }
-      if(l > locallength)
+      if (l > locallength)
       {
-        if((curpos - startpos) == locallength)
+        if ((curpos - startpos) == locallength)
         {
           // this means that something went wrong somewhere, and upon recomputing the length
           // we found a discrepandy with own vendor made its layout.
@@ -411,26 +408,24 @@ std::istream & DataSet::ReadWithLength(std::istream & is, VL & length)
       }
     }
   }
-  catch(ParseException & pe)
+  catch (ParseException & pe)
   {
-    if(pe.GetLastElement().GetTag() == Tag(0xfffe,0xe000))
+    if (pe.GetLastElement().GetTag() == Tag(0xfffe, 0xe000))
     {
       // mdcm-MR-PHILIPS-16-Multi-Seq.dcm
       // Philips engineer inserted 0xfffe,0x0000 instead of an item start element
       is.seekg(-6, std::ios::cur);
       length = locallength = l;
     }
-    else if(de.GetTag() == Tag(0x7fe0,0x0010) && de.IsUndefinedLength())
+    else if (de.GetTag() == Tag(0x7fe0, 0x0010) && de.IsUndefinedLength())
     {
       // Some bozo crafted an undefined length Pixel Data, but is actually
       // defined length. Since inside SQ/Item it should be possible to
       // compute the proper length
-      is.seekg(-16, std::ios::cur );
+      is.seekg(-16, std::ios::cur);
       TDE pd;
       pd.template ReadPreValue<TSwap>(is);
-      if ((pd.GetTag() != Tag(0x7fe0,0x0010)) ||
-          (pd.GetVR() != VR::OB) ||
-          !pd.IsUndefinedLength())
+      if ((pd.GetTag() != Tag(0x7fe0, 0x0010)) || (pd.GetVR() != VR::OB) || !pd.IsUndefinedLength())
       {
         throw std::logic_error("Exception");
       }
@@ -447,23 +442,24 @@ std::istream & DataSet::ReadWithLength(std::istream & is, VL & length)
       throw std::logic_error("Unhandled");
     }
   }
-  catch(std::logic_error & pe)
+  catch (std::logic_error & pe)
   {
-    if(strcmp(pe.what(), "Out of Range") == 0)
+    if (strcmp(pe.what(), "Out of Range") == 0)
     {
       // BogugsItemAndSequenceLength.dcm
       // This is most likely the "Out of Range" one
       // Cautiously read until we find the next item starter and then stop.
-      while(de.Read<TDE,TSwap>(is) && de.GetTag() != Tag(0xfffe,0xe000) && de.GetTag().GetElement() != 0x0)
+      while (de.Read<TDE, TSwap>(is) && de.GetTag() != Tag(0xfffe, 0xe000) && de.GetTag().GetElement() != 0x0)
       {
         InsertDataElement(de);
         l += de.GetLength<TDE>();
       }
       // seek back since we read the next item starter
       int iteml = de.GetLength<TDE>();
-      if(!de.GetTag().GetElement())
+      if (!de.GetTag().GetElement())
       {
-        assert(iteml == 12); (void)iteml;
+        assert(iteml == 12);
+        (void)iteml;
         is.seekg(-12, std::ios::cur);
       }
       else
@@ -475,7 +471,7 @@ std::istream & DataSet::ReadWithLength(std::istream & is, VL & length)
       mdcmAlwaysWarnMacro("Item length is wrong");
       throw std::logic_error("Changed Length");
     }
-    else if(strcmp(pe.what(), "Papyrus odd padding") == 0)
+    else if (strcmp(pe.what(), "Papyrus odd padding") == 0)
     {
       is.get();
       throw std::logic_error("Changed Length");
@@ -490,13 +486,14 @@ std::istream & DataSet::ReadWithLength(std::istream & is, VL & length)
 }
 
 template <typename TDE, typename TSwap>
-std::ostream const & DataSet::Write(std::ostream & os) const
+std::ostream const &
+DataSet::Write(std::ostream & os) const
 {
   typename DataSet::ConstIterator it = DES.begin();
-  for(; it != DES.end(); ++it)
+  for (; it != DES.end(); ++it)
   {
     const DataElement & de = *it;
-    de.Write<TDE,TSwap>(os);
+    de.Write<TDE, TSwap>(os);
   }
   return os;
 }

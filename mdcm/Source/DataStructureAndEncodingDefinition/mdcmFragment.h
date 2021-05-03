@@ -35,37 +35,45 @@ namespace mdcm
  */
 class MDCM_EXPORT Fragment : public DataElement
 {
-friend std::ostream &operator<<(std::ostream &, const Fragment &);
+  friend std::ostream &
+  operator<<(std::ostream &, const Fragment &);
+
 public:
-  Fragment() : DataElement(Tag(0xfffe, 0xe000), 0) {}
+  Fragment()
+    : DataElement(Tag(0xfffe, 0xe000), 0)
+  {}
 
-  VL GetLength() const;
+  VL
+  GetLength() const;
 
-  VL ComputeLength() const;
+  VL
+  ComputeLength() const;
 
   template <typename TSwap>
-  std::istream & Read(std::istream & is)
+  std::istream &
+  Read(std::istream & is)
   {
     ReadPreValue<TSwap>(is);
     return ReadValue<TSwap>(is);
   }
 
   template <typename TSwap>
-  std::istream & ReadPreValue(std::istream & is)
+  std::istream &
+  ReadPreValue(std::istream & is)
   {
     const Tag itemStart(0xfffe, 0xe000);
-    const Tag seqDelItem(0xfffe,0xe0dd);
+    const Tag seqDelItem(0xfffe, 0xe0dd);
     TagField.Read<TSwap>(is);
-    if(!is)
+    if (!is)
     {
       throw std::logic_error("Problem #1");
     }
-    if(!ValueLengthField.Read<TSwap>(is))
+    if (!ValueLengthField.Read<TSwap>(is))
     {
       throw std::logic_error("Problem #2");
     }
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
-    if(TagField != itemStart && TagField != seqDelItem)
+    if (TagField != itemStart && TagField != seqDelItem)
     {
       throw std::logic_error("Problem #3");
     }
@@ -74,13 +82,14 @@ public:
   }
 
   template <typename TSwap>
-  std::istream & ReadValue(std::istream & is)
+  std::istream &
+  ReadValue(std::istream & is)
   {
-    const Tag itemStart(0xfffe, 0xe000);
-    const Tag seqDelItem(0xfffe,0xe0dd);
+    const Tag               itemStart(0xfffe, 0xe000);
+    const Tag               seqDelItem(0xfffe, 0xe0dd);
     SmartPointer<ByteValue> bv = new ByteValue;
     bv->SetLength(ValueLengthField);
-    if(!bv->Read<TSwap>(is))
+    if (!bv->Read<TSwap>(is))
     {
       // Fragment is incomplete, but is a itemStart, let's try to push it anyway
       mdcmWarningMacro("Fragment could not be read");
@@ -95,24 +104,25 @@ public:
   }
 
   template <typename TSwap>
-  std::istream & ReadBacktrack(std::istream & is)
+  std::istream &
+  ReadBacktrack(std::istream & is)
   {
-    const Tag itemStart(0xfffe, 0xe000);
-    const Tag seqDelItem(0xfffe,0xe0dd);
-    bool cont = true;
+    const Tag            itemStart(0xfffe, 0xe000);
+    const Tag            seqDelItem(0xfffe, 0xe0dd);
+    bool                 cont = true;
     const std::streampos start = is.tellg();
-    const int max = 10;
-    int offset = 0;
-    while(cont)
+    const int            max = 10;
+    int                  offset = 0;
+    while (cont)
     {
       TagField.Read<TSwap>(is);
       assert(is);
-      if(TagField != itemStart && TagField != seqDelItem)
+      if (TagField != itemStart && TagField != seqDelItem)
       {
         ++offset;
         is.seekg((std::streampos)((size_t)start - offset));
         mdcmWarningMacro("Fuzzy search, backtrack: " << (start - is.tellg()) << " Offset: " << is.tellg());
-        if(offset > max)
+        if (offset > max)
         {
           throw std::logic_error("Impossible to backtrack");
         }
@@ -123,13 +133,13 @@ public:
       }
     }
     assert(TagField == itemStart || TagField == seqDelItem);
-    if(!ValueLengthField.Read<TSwap>(is))
+    if (!ValueLengthField.Read<TSwap>(is))
     {
       return is;
     }
     SmartPointer<ByteValue> bv = new ByteValue;
     bv->SetLength(ValueLengthField);
-    if(!bv->Read<TSwap>(is))
+    if (!bv->Read<TSwap>(is))
     {
       // Fragment is incomplete, but is a itemStart, let's try to push it anyway
       mdcmWarningMacro("Fragment could not be read");
@@ -143,11 +153,12 @@ public:
   }
 
   template <typename TSwap>
-  std::ostream & Write(std::ostream & os) const
+  std::ostream &
+  Write(std::ostream & os) const
   {
     const Tag itemStart(0xfffe, 0xe000);
-    const Tag seqDelItem(0xfffe,0xe0dd);
-    if(!TagField.Write<TSwap>(os))
+    const Tag seqDelItem(0xfffe, 0xe0dd);
+    if (!TagField.Write<TSwap>(os))
     {
       assert(0 && "Should not happen");
       return os;
@@ -155,10 +166,10 @@ public:
     assert(TagField == itemStart || TagField == seqDelItem);
     const ByteValue * bv = GetByteValue();
     // broken file e.g. CompressedLossy.dcm
-    if(IsEmpty())
+    if (IsEmpty())
     {
       VL zero = 0;
-      if(!zero.Write<TSwap>(os))
+      if (!zero.Write<TSwap>(os))
       {
         assert(0 && "Should not happen");
         return os;
@@ -170,17 +181,17 @@ public:
       assert(!ValueLengthField.IsUndefined());
       const VL actuallen = bv->ComputeLength();
       assert(actuallen == ValueLengthField || actuallen == ValueLengthField + 1);
-      if(!actuallen.Write<TSwap>(os))
+      if (!actuallen.Write<TSwap>(os))
       {
         assert(0 && "Should not happen");
         return os;
       }
     }
-    if(ValueLengthField && bv)
+    if (ValueLengthField && bv)
     {
       assert(bv);
       assert(bv->GetLength() == ValueLengthField);
-      if(!bv->Write<TSwap>(os))
+      if (!bv->Write<TSwap>(os))
       {
         assert(0 && "Should not happen");
         return os;
@@ -190,11 +201,12 @@ public:
   }
 };
 
-inline std::ostream &operator<<(std::ostream & os, const Fragment & val)
+inline std::ostream &
+operator<<(std::ostream & os, const Fragment & val)
 {
   os << "Tag: " << val.TagField;
   os << "\tVL: " << val.ValueLengthField;
-  if(val.ValueField)
+  if (val.ValueField)
   {
     os << "\t" << *(val.ValueField);
   }
@@ -203,4 +215,4 @@ inline std::ostream &operator<<(std::ostream & os, const Fragment & val)
 
 } // end namespace mdcm
 
-#endif //MDCMFRAGMENT_H
+#endif // MDCMFRAGMENT_H

@@ -27,6 +27,8 @@ namespace mdcm
 
 Region::Region() {}
 Region::~Region() {}
-void Region::Print(std::ostream &) const {}
+void
+Region::Print(std::ostream &) const
+{}
 
-}
+} // namespace mdcm

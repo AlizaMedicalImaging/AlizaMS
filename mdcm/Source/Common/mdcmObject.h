@@ -30,42 +30,45 @@
 namespace mdcm
 {
 
-template<class ObjectType> class SmartPointer;
+template <class ObjectType>
+class SmartPointer;
 
 class MDCM_EXPORT Object
 {
-friend std::ostream& operator<<(std::ostream &, const Object &);
-template <class ObjectType> friend class SmartPointer;
+  friend std::ostream &
+  operator<<(std::ostream &, const Object &);
+  template <class ObjectType>
+  friend class SmartPointer;
+
 public:
-  Object() : ReferenceCount(0)
-  {
-  }
+  Object()
+    : ReferenceCount(0)
+  {}
 
-  virtual ~Object()
-  {
-    assert(ReferenceCount == 0);
-  }
+  virtual ~Object() { assert(ReferenceCount == 0); }
 
-  Object(const Object &) : ReferenceCount(0)
-  {
-  }
+  Object(const Object &)
+    : ReferenceCount(0)
+  {}
 
-  void operator=(const Object &)
-  {
-  }
+  void
+  operator=(const Object &)
+  {}
 
 protected:
-  void Register()
+  void
+  Register()
   {
     ++ReferenceCount;
     assert(ReferenceCount > 0);
   }
 
-  void UnRegister()
+  void
+  UnRegister()
   {
     assert(ReferenceCount > 0);
     --ReferenceCount;
-    if(ReferenceCount <= 0)
+    if (ReferenceCount <= 0)
     {
       assert(ReferenceCount == 0);
       delete this;
@@ -73,7 +76,9 @@ protected:
   }
 
 public:
-  virtual void Print(std::ostream &) const {}
+  virtual void
+  Print(std::ostream &) const
+  {}
 
 private:
   long long ReferenceCount;
@@ -82,7 +87,8 @@ private:
 // Define in the base class the operator and use the member function
 // ->Print() to call the appropriate function.
 // All subclass of Object needs to implement the Print function
-inline std::ostream & operator<<(std::ostream & os, const Object & obj)
+inline std::ostream &
+operator<<(std::ostream & os, const Object & obj)
 {
   obj.Print(os);
   return os;
@@ -90,4 +96,4 @@ inline std::ostream & operator<<(std::ostream & os, const Object & obj)
 
 } // end namespace mdcm
 
-#endif //MDCMOBJECT_H
+#endif // MDCMOBJECT_H

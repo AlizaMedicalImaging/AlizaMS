@@ -36,12 +36,13 @@ namespace mdcm
  * and itk::SmartPointer
  */
 
-template<class ObjectType> class SmartPointer
+template <class ObjectType>
+class SmartPointer
 {
 public:
-  SmartPointer() : Pointer(NULL)
-  {
-  }
+  SmartPointer()
+    : Pointer(NULL)
+  {}
 
   SmartPointer(const SmartPointer<ObjectType> & p)
   {
@@ -65,7 +66,7 @@ public:
 
   SmartPointer(const ObjectType & p)
   {
-    Pointer = const_cast<ObjectType*>(&p);
+    Pointer = const_cast<ObjectType *>(&p);
     Register();
   }
 
@@ -76,38 +77,34 @@ public:
   }
 
   // Overload operator ->
-  ObjectType *operator -> () const
-  {
-    return Pointer;
-  }
+  ObjectType * operator->() const { return Pointer; }
 
-  ObjectType& operator * () const
+  ObjectType & operator*() const
   {
     assert(Pointer);
-    return *Pointer; 
+    return *Pointer;
   }
 
   // Return pointer to object.
-  operator ObjectType * () const
+  operator ObjectType *() const { return Pointer; }
+
+  // Overload operator assignment.
+  SmartPointer &
+  operator=(const SmartPointer & r)
   {
-    return Pointer;
+    return operator=(r.Pointer);
   }
 
   // Overload operator assignment.
-  SmartPointer &operator = (const SmartPointer & r)
-  {
-    return operator = (r.Pointer);
-  }
-
-  // Overload operator assignment.
-  SmartPointer &operator = (ObjectType * r)
+  SmartPointer &
+  operator=(ObjectType * r)
   {
     // http://www.parashift.com/c++-faq-lite/freestore-mgmt.html#faq-16.22
     // DO NOT CHANGE THE ORDER OF THESE STATEMENTS!
     // This order properly handles self-assignment.
     // This order also properly handles recursion,
     // e.g. if a ObjectType contains SmartPointer<ObjectType>s)
-    if(Pointer != r)
+    if (Pointer != r)
     {
       ObjectType * old = Pointer;
       Pointer = r;
@@ -120,27 +117,33 @@ public:
     return *this;
   }
 
-  SmartPointer &operator = (const ObjectType & r)
+  SmartPointer &
+  operator=(const ObjectType & r)
   {
-    ObjectType * tmp = const_cast<ObjectType*>(&r);
-    return operator = (tmp);
+    ObjectType * tmp = const_cast<ObjectType *>(&r);
+    return       operator=(tmp);
   }
 
   // Explicit function to retrieve the pointer
-  ObjectType * GetPointer() const
+  ObjectType *
+  GetPointer() const
   {
     return Pointer;
   }
 
 private:
-  void Register()
+  void
+  Register()
   {
-    if(Pointer) Pointer->Register();
+    if (Pointer)
+      Pointer->Register();
   }
 
-  void UnRegister()
+  void
+  UnRegister()
   {
-    if(Pointer) Pointer->UnRegister();
+    if (Pointer)
+      Pointer->UnRegister();
   }
 
   ObjectType * Pointer;
@@ -148,4 +151,4 @@ private:
 
 } // end namespace mdcm
 
-#endif //MDCMSMARTPOINTER_H
+#endif // MDCMSMARTPOINTER_H

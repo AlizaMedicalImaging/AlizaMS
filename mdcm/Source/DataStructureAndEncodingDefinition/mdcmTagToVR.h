@@ -24,10 +24,11 @@
 
 #include "mdcmVR.h"
 
-namespace mdcm 
+namespace mdcm
 {
-  class Tag;
-  VR::VRType GetVRFromTag(Tag const &);
-}
+class Tag;
+VR::VRType
+GetVRFromTag(Tag const &);
+} // namespace mdcm
 
 #endif // MDCMTAGTOVR_H

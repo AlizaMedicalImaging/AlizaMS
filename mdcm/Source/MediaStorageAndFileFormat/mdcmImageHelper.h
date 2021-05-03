@@ -46,8 +46,8 @@ class ByteValue;
 
 struct RealWorldValueMappingContent
 {
-  double RealWorldValueIntercept;
-  double RealWorldValueSlope;
+  double      RealWorldValueIntercept;
+  double      RealWorldValueSlope;
   std::string CodeValue;
   std::string CodeMeaning;
 };
@@ -55,54 +55,79 @@ struct RealWorldValueMappingContent
 class MDCM_EXPORT ImageHelper
 {
 public:
-  static void SetForceRescaleInterceptSlope(bool);
-  static bool GetForceRescaleInterceptSlope();
-  static void SetPMSRescaleInterceptSlope(bool);
-  static bool GetPMSRescaleInterceptSlope();
-  static void SetForcePixelSpacing(bool);
-  static bool GetForcePixelSpacing();
-  static bool GetCleanUnusedBits();
-  static void SetCleanUnusedBits(bool);
-  static void SetWorkaroundCornellBug(bool);
-  static bool GetWorkaroundCornellBug();
-  static void SetWorkaroundPredictorBug(bool);
-  static bool GetWorkaroundPredictorBug();
-  static std::vector<unsigned int> GetDimensionsValue(const File &);
-  static void SetDimensionsValue(File &, const Pixmap &);
-  static PixelFormat GetPixelFormatValue(const File &);
-  static std::vector<double> GetRescaleInterceptSlopeValue(File const &);
-  static void SetRescaleInterceptSlopeValue(File &, const Image &);
-  static void SetVOILUT(File &, const Image &);
-  static bool GetRealWorldValueMappingContent(
-    File const &,
-    RealWorldValueMappingContent &);
-  static std::vector<double> GetOriginValue(File const &);
-  static void SetOriginValue(DataSet &, const Image &);
-  static std::vector<double> GetDirectionCosinesValue(File const &);
-  static void SetDirectionCosinesValue(
-    DataSet &,
-    const std::vector<double> &);
-  static std::vector<double> GetSpacingValue(File const &);
-  static void SetSpacingValue(DataSet &, const std::vector<double> &);
-  static bool GetDirectionCosinesFromDataSet(
-    DataSet const &,
-    std::vector<double> &);
-  static PhotometricInterpretation GetPhotometricInterpretationValue(
-    File const &);
-  static unsigned int GetPlanarConfigurationValue(const File &);
-  static SmartPointer<LookupTable> GetLUT(File const &);
-  static const ByteValue* GetPointerFromElement(Tag const &, File const &);
-  static MediaStorage ComputeMediaStorageFromModality(
-    const char * modality,
-    unsigned int dimension = 2,
-    PixelFormat const & pf = PixelFormat(),
-    PhotometricInterpretation const & pi = PhotometricInterpretation(),
-    double rescaleintercept = 0,
-    double rescaleslope = 1 );
+  static void
+  SetForceRescaleInterceptSlope(bool);
+  static bool
+  GetForceRescaleInterceptSlope();
+  static void
+  SetPMSRescaleInterceptSlope(bool);
+  static bool
+  GetPMSRescaleInterceptSlope();
+  static void
+  SetForcePixelSpacing(bool);
+  static bool
+  GetForcePixelSpacing();
+  static bool
+  GetCleanUnusedBits();
+  static void
+  SetCleanUnusedBits(bool);
+  static void
+  SetWorkaroundCornellBug(bool);
+  static bool
+  GetWorkaroundCornellBug();
+  static void
+  SetWorkaroundPredictorBug(bool);
+  static bool
+  GetWorkaroundPredictorBug();
+  static std::vector<unsigned int>
+  GetDimensionsValue(const File &);
+  static void
+  SetDimensionsValue(File &, const Pixmap &);
+  static PixelFormat
+  GetPixelFormatValue(const File &);
+  static std::vector<double>
+  GetRescaleInterceptSlopeValue(File const &);
+  static void
+  SetRescaleInterceptSlopeValue(File &, const Image &);
+  static void
+  SetVOILUT(File &, const Image &);
+  static bool
+  GetRealWorldValueMappingContent(File const &, RealWorldValueMappingContent &);
+  static std::vector<double>
+  GetOriginValue(File const &);
+  static void
+  SetOriginValue(DataSet &, const Image &);
+  static std::vector<double>
+  GetDirectionCosinesValue(File const &);
+  static void
+  SetDirectionCosinesValue(DataSet &, const std::vector<double> &);
+  static std::vector<double>
+  GetSpacingValue(File const &);
+  static void
+  SetSpacingValue(DataSet &, const std::vector<double> &);
+  static bool
+  GetDirectionCosinesFromDataSet(DataSet const &, std::vector<double> &);
+  static PhotometricInterpretation
+  GetPhotometricInterpretationValue(File const &);
+  static unsigned int
+  GetPlanarConfigurationValue(const File &);
+  static SmartPointer<LookupTable>
+  GetLUT(File const &);
+  static const ByteValue *
+  GetPointerFromElement(Tag const &, File const &);
+  static MediaStorage
+  ComputeMediaStorageFromModality(const char *                      modality,
+                                  unsigned int                      dimension = 2,
+                                  PixelFormat const &               pf = PixelFormat(),
+                                  PhotometricInterpretation const & pi = PhotometricInterpretation(),
+                                  double                            rescaleintercept = 0,
+                                  double                            rescaleslope = 1);
 
 protected:
-  static Tag GetSpacingTagFromMediaStorage(MediaStorage const &);
-  static Tag GetZSpacingTagFromMediaStorage(MediaStorage const &);
+  static Tag
+  GetSpacingTagFromMediaStorage(MediaStorage const &);
+  static Tag
+  GetZSpacingTagFromMediaStorage(MediaStorage const &);
 
 private:
   static bool ForceRescaleInterceptSlope;

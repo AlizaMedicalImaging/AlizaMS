@@ -25,18 +25,20 @@
 namespace mdcm
 {
 
-bool CodeString::IsValid() const
+bool
+CodeString::IsValid() const
 {
-  if(!Internal.IsValid()) return false;
+  if (!Internal.IsValid())
+    return false;
   /*
    * Uppercase characters, 0-9, the SPACE character, and underscore _, of the
    * Default Character Repertoire
    */
   const_iterator it = Internal.begin();
-  for(; it != Internal.end(); ++it)
+  for (; it != Internal.end(); ++it)
   {
     int c = *it;
-    if(!isupper(c) && !isdigit(c) && c != ' ' && c != '_')
+    if (!isupper(c) && !isdigit(c) && c != ' ' && c != '_')
     {
       return false;
     }

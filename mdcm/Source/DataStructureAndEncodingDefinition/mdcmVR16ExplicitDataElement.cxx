@@ -27,24 +27,24 @@
 namespace mdcm
 {
 
-VL VR16ExplicitDataElement::GetLength() const
+VL
+VR16ExplicitDataElement::GetLength() const
 {
-  if(ValueLengthField.IsUndefined())
+  if (ValueLengthField.IsUndefined())
   {
     assert(ValueField->GetLength().IsUndefined());
-    Value *p = ValueField;
-    SequenceOfItems * sq = dynamic_cast<SequenceOfItems*>(p);
-    if(sq)
+    Value *           p = ValueField;
+    SequenceOfItems * sq = dynamic_cast<SequenceOfItems *>(p);
+    if (sq)
     {
-      return (TagField.GetLength() + VRField.GetLength() +
-        ValueLengthField.GetLength() + sq->ComputeLength<VR16ExplicitDataElement>());
+      return (TagField.GetLength() + VRField.GetLength() + ValueLengthField.GetLength() +
+              sq->ComputeLength<VR16ExplicitDataElement>());
     }
-    SequenceOfFragments *sf = dynamic_cast<SequenceOfFragments*>(p);
-    if(sf)
+    SequenceOfFragments * sf = dynamic_cast<SequenceOfFragments *>(p);
+    if (sf)
     {
       assert(VRField & (VR::OB | VR::OW));
-      return (TagField.GetLength() + VRField.GetLength()
-        + ValueLengthField.GetLength() + sf->ComputeLength());
+      return (TagField.GetLength() + VRField.GetLength() + ValueLengthField.GetLength() + sf->ComputeLength());
     }
     assert(0);
     return 0;
@@ -54,7 +54,7 @@ VL VR16ExplicitDataElement::GetLength() const
     // Each time VR::GetLength() is 2 then Value Length is coded in 2
     //                              4 then Value Length is coded in 4
     assert(!ValueField || ValueField->GetLength() == ValueLengthField);
-    return TagField.GetLength() + 2*VRField.GetLength() + ValueLengthField;
+    return TagField.GetLength() + 2 * VRField.GetLength() + ValueLengthField;
   }
 }
 

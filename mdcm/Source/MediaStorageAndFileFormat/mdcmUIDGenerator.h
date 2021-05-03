@@ -30,21 +30,31 @@ namespace mdcm
 class MDCM_EXPORT UIDGenerator
 {
 public:
-  UIDGenerator():Unique() {}
-  static void SetRoot(const char *);
-  static const char * GetRoot();
-  const char* Generate();
-  static bool IsValid(const std::string &);
-  static const char * GetMDCMUID();
+  UIDGenerator()
+    : Unique()
+  {}
+  static void
+  SetRoot(const char *);
+  static const char *
+  GetRoot();
+  const char *
+  Generate();
+  static bool
+  IsValid(const std::string &);
+  static const char *
+  GetMDCMUID();
+
 protected:
-  static bool GenerateUUID(unsigned char *);
+  static bool
+  GenerateUUID(unsigned char *);
+
 private:
-  static const char MDCM_UID[];
+  static const char  MDCM_UID[];
   static std::string Root;
   static std::string EncodedHardwareAddress;
-  std::string Unique;
+  std::string        Unique;
 };
 
 } // end namespace mdcm
 
-#endif //MDCMUIDGENERATOR_H
+#endif // MDCMUIDGENERATOR_H

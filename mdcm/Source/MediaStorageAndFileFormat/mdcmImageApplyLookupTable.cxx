@@ -26,31 +26,33 @@
 namespace mdcm
 {
 
-bool ImageApplyLookupTable::Apply()
+bool
+ImageApplyLookupTable::Apply()
 {
   Output = Input;
-  const Bitmap & image = *Input;
+  const Bitmap &            image = *Input;
   PhotometricInterpretation pi = image.GetPhotometricInterpretation();
-  if(pi != PhotometricInterpretation::PALETTE_COLOR)
+  if (pi != PhotometricInterpretation::PALETTE_COLOR)
   {
     mdcmDebugMacro("Image is not palettized");
     return false;
   }
-  const LookupTable &lut = image.GetLUT();
-  int bitsample = lut.GetBitSample();
-  if(!bitsample) return false;
+  const LookupTable & lut = image.GetLUT();
+  int                 bitsample = lut.GetBitSample();
+  if (!bitsample)
+    return false;
   const unsigned long long len = image.GetBufferLength();
-  std::vector<char> v;
+  std::vector<char>        v;
   v.resize(len);
   char * p = &v[0];
   image.GetBuffer(p);
   std::stringstream is;
-  if(!is.write(p, len))
+  if (!is.write(p, len))
   {
     mdcmErrorMacro("Could not write to stringstream");
     return false;
   }
-  DataElement &de = Output->GetDataElement();
+  DataElement &     de = Output->GetDataElement();
   std::vector<char> v2;
   v2.resize(len * 3);
   lut.Decode(&v2[0], v2.size(), &v[0], v.size());
@@ -62,7 +64,7 @@ bool ImageApplyLookupTable::Apply()
   // OT-PAL-8-face.dcm has a PlanarConfiguration while being PALETTE COLOR
   Output->SetPlanarConfiguration(0);
   const TransferSyntax & ts = image.GetTransferSyntax();
-  if(ts.IsExplicit())
+  if (ts.IsExplicit())
   {
     Output->SetTransferSyntax(TransferSyntax::ExplicitVRLittleEndian);
   }

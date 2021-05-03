@@ -32,7 +32,8 @@
 
 namespace mdcm
 {
-class MDCM_EXPORT DataElementException : public std::exception {};
+class MDCM_EXPORT DataElementException : public std::exception
+{};
 
 class PrivateTag;
 /**
@@ -61,6 +62,7 @@ class PrivateTag;
 class MDCM_EXPORT DataSet
 {
   friend class CSAHeader;
+
 public:
 #if 0
   typedef std::set<DataElement> DataElementSet;
@@ -68,25 +70,57 @@ public:
   typedef std::multiset<DataElement> DataElementSet;
 #endif
   typedef DataElementSet::const_iterator ConstIterator;
-  typedef DataElementSet::iterator Iterator;
-  typedef DataElementSet::size_type SizeType;
-  ConstIterator Begin() const { return DES.begin(); }
-  Iterator Begin() { return DES.begin(); }
-  ConstIterator End() const { return DES.end(); }
-  Iterator End() { return DES.end(); }
-  const DataElementSet & GetDES() const { return DES; }
-  DataElementSet & GetDES() { return DES; }
-  void Clear();
-  SizeType Size() const { return DES.size(); }
-  void Print(std::ostream &, std::string const & indent = "") const;
-
-  template <typename TDE> unsigned int ComputeGroupLength(Tag const &tag) const
+  typedef DataElementSet::iterator       Iterator;
+  typedef DataElementSet::size_type      SizeType;
+  ConstIterator
+  Begin() const
   {
-    assert( tag.GetElement() == 0x0 );
+    return DES.begin();
+  }
+  Iterator
+  Begin()
+  {
+    return DES.begin();
+  }
+  ConstIterator
+  End() const
+  {
+    return DES.end();
+  }
+  Iterator
+  End()
+  {
+    return DES.end();
+  }
+  const DataElementSet &
+  GetDES() const
+  {
+    return DES;
+  }
+  DataElementSet &
+  GetDES()
+  {
+    return DES;
+  }
+  void
+  Clear();
+  SizeType
+  Size() const
+  {
+    return DES.size();
+  }
+  void
+  Print(std::ostream &, std::string const & indent = "") const;
+
+  template <typename TDE>
+  unsigned int
+  ComputeGroupLength(Tag const & tag) const
+  {
+    assert(tag.GetElement() == 0x0);
     const DataElement r(tag);
-    ConstIterator it = DES.find(r);
-    unsigned int res = 0;
-    for(++it; it != DES.end() && it->GetTag().GetGroup() == tag.GetGroup(); ++it)
+    ConstIterator     it = DES.find(r);
+    unsigned int      res = 0;
+    for (++it; it != DES.end() && it->GetTag().GetGroup() == tag.GetGroup(); ++it)
     {
       assert(it->GetTag().GetElement() != 0x0);
       assert(it->GetTag().GetGroup() == tag.GetGroup());
@@ -95,17 +129,20 @@ public:
     return res;
   }
 
-  template <typename TDE> VL GetLength() const
+  template <typename TDE>
+  VL
+  GetLength() const
   {
-    if(DES.empty()) return 0;
-    assert( !DES.empty() );
+    if (DES.empty())
+      return 0;
+    assert(!DES.empty());
     VL ll = 0;
-    assert( ll == 0 );
+    assert(ll == 0);
     ConstIterator it = DES.begin();
-    for( ; it != DES.end(); ++it)
+    for (; it != DES.end(); ++it)
     {
-      assert( !(it->GetLength<TDE>().IsUndefined()) );
-      if ( it->GetTag() != Tag(0xfffe,0xe00d) )
+      assert(!(it->GetLength<TDE>().IsUndefined()));
+      if (it->GetTag() != Tag(0xfffe, 0xe00d))
       {
         ll += it->GetLength<TDE>();
       }
@@ -114,11 +151,15 @@ public:
   }
 
   // Tag need to be >= 0x8 to be considered valid data element.
-  void Insert(const DataElement &);
-  void Replace(const DataElement &);
-  void ReplaceEmpty(const DataElement &);
+  void
+  Insert(const DataElement &);
+  void
+  Replace(const DataElement &);
+  void
+  ReplaceEmpty(const DataElement &);
 
-  SizeType Remove(const Tag & tag)
+  SizeType
+  Remove(const Tag & tag)
   {
     SizeType count = DES.erase(tag);
     assert(count == 0 || count == 1);
@@ -126,62 +167,94 @@ public:
   }
 
   // This only search at the 'root level' of the DataSet.
-  const DataElement & GetDataElement(const Tag &) const;
-  const DataElement & GetDataElement(const PrivateTag &) const;
-  std::string GetPrivateCreator(const Tag &) const;
+  const DataElement &
+  GetDataElement(const Tag &) const;
+  const DataElement &
+  GetDataElement(const PrivateTag &) const;
+  std::string
+  GetPrivateCreator(const Tag &) const;
   // This only search within the level of the current DataSet.
-  bool FindDataElement(const Tag & t) const;
-  bool FindDataElement(const PrivateTag &) const;
+  bool
+  FindDataElement(const Tag & t) const;
+  bool
+  FindDataElement(const PrivateTag &) const;
   // This only search at the same level as the DataSet is.
-  const DataElement & FindNextDataElement(const Tag &) const;
-  bool IsEmpty() const;
-  MediaStorage GetMediaStorage() const;
+  const DataElement &
+  FindNextDataElement(const Tag &) const;
+  bool
+  IsEmpty() const;
+  MediaStorage
+  GetMediaStorage() const;
 
-  DataSet & operator=(DataSet const & val)
+  DataSet &
+  operator=(DataSet const & val)
   {
     DES = val.DES;
     return *this;
   }
 
-  const DataElement & operator[] (const Tag & t) const
+  const DataElement & operator[](const Tag & t) const { return GetDataElement(t); }
+
+  const DataElement &
+  operator()(uint16_t group, uint16_t element) const
   {
-    return GetDataElement(t);
+    return GetDataElement(Tag(group, element));
   }
 
-  const DataElement & operator() (uint16_t group, uint16_t element) const
-  {
-    return GetDataElement(Tag(group,element));
-  }
-
-  template <typename TDE, typename TSwap> std::istream & ReadNested(std::istream &);
-  template <typename TDE, typename TSwap> std::istream & Read(std::istream &);
-  template <typename TDE, typename TSwap> std::istream & ReadUpToTag(std::istream &, const Tag &, std::set<Tag> const &);
-  template <typename TDE, typename TSwap> std::istream & ReadUpToTagWithLength(std::istream &, const Tag &, std::set<Tag> const &, VL &);
-  template <typename TDE, typename TSwap> std::istream & ReadSelectedTags(std::istream &, const std::set<Tag> &, bool=true);
-  template <typename TDE, typename TSwap> std::istream & ReadSelectedTagsWithLength(std::istream &, const std::set<Tag> &, VL &, bool=true);
-  template <typename TDE, typename TSwap> std::istream & ReadSelectedPrivateTags(std::istream &, const std::set<PrivateTag> & tags, bool=true);
-  template <typename TDE, typename TSwap> std::istream & ReadSelectedPrivateTagsWithLength(std::istream &, const std::set<PrivateTag> & tags, VL &, bool=true);
-  template <typename TDE, typename TSwap> std::ostream const & Write(std::ostream &) const;
-  template <typename TDE, typename TSwap> std::istream & ReadWithLength(std::istream &, VL &);
+  template <typename TDE, typename TSwap>
+  std::istream &
+  ReadNested(std::istream &);
+  template <typename TDE, typename TSwap>
+  std::istream &
+  Read(std::istream &);
+  template <typename TDE, typename TSwap>
+  std::istream &
+  ReadUpToTag(std::istream &, const Tag &, std::set<Tag> const &);
+  template <typename TDE, typename TSwap>
+  std::istream &
+  ReadUpToTagWithLength(std::istream &, const Tag &, std::set<Tag> const &, VL &);
+  template <typename TDE, typename TSwap>
+  std::istream &
+  ReadSelectedTags(std::istream &, const std::set<Tag> &, bool = true);
+  template <typename TDE, typename TSwap>
+  std::istream &
+  ReadSelectedTagsWithLength(std::istream &, const std::set<Tag> &, VL &, bool = true);
+  template <typename TDE, typename TSwap>
+  std::istream &
+  ReadSelectedPrivateTags(std::istream &, const std::set<PrivateTag> & tags, bool = true);
+  template <typename TDE, typename TSwap>
+  std::istream &
+  ReadSelectedPrivateTagsWithLength(std::istream &, const std::set<PrivateTag> & tags, VL &, bool = true);
+  template <typename TDE, typename TSwap>
+  std::ostream const &
+  Write(std::ostream &) const;
+  template <typename TDE, typename TSwap>
+  std::istream &
+  ReadWithLength(std::istream &, VL &);
 
 protected:
-  const DataElement& GetDEEnd() const;
+  const DataElement &
+  GetDEEnd() const;
   // This function is not safe, it does not check for the value of the tag
   // so depending whether we are getting called from a dataset or file meta header
   // the condition is different
-  void InsertDataElement(const DataElement &);
+  void
+  InsertDataElement(const DataElement &);
 
 protected:
   // Internal function, that will compute the actual Tag (if found) of
   // a requested Private Tag (XXXX,YY,"PRIVATE")
-  Tag ComputeDataElement(const PrivateTag &) const;
+  Tag
+  ComputeDataElement(const PrivateTag &) const;
 
 private:
   DataElementSet DES;
-  friend std::ostream& operator<<(std::ostream &, const DataSet &);
+  friend std::ostream &
+  operator<<(std::ostream &, const DataSet &);
 };
 
-inline std::ostream& operator<<(std::ostream & os, const DataSet & val)
+inline std::ostream &
+operator<<(std::ostream & os, const DataSet & val)
 {
   val.Print(os);
   return os;
@@ -194,13 +267,33 @@ inline std::ostream& operator<<(std::ostream & os, const DataSet & val)
 class SWIGDataSet
 {
 public:
-  SWIGDataSet(DataSet & des) : Internal(des), it(des.Begin()) {}
-  const DataElement& GetCurrent() const { return *it; }
-  void Start() { it = Internal.Begin(); }
-  bool IsAtEnd() const { return it == Internal.End(); }
-  void Next() { ++it; }
+  SWIGDataSet(DataSet & des)
+    : Internal(des)
+    , it(des.Begin())
+  {}
+  const DataElement &
+  GetCurrent() const
+  {
+    return *it;
+  }
+  void
+  Start()
+  {
+    it = Internal.Begin();
+  }
+  bool
+  IsAtEnd() const
+  {
+    return it == Internal.End();
+  }
+  void
+  Next()
+  {
+    ++it;
+  }
+
 private:
-  DataSet & Internal;
+  DataSet &              Internal;
   DataSet::ConstIterator it;
 };
 #endif
@@ -209,4 +302,4 @@ private:
 
 #include "mdcmDataSet.hxx"
 
-#endif //MDCMDATASET_H
+#endif // MDCMDATASET_H

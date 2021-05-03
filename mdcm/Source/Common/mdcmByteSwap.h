@@ -28,20 +28,26 @@
 namespace mdcm
 {
 
-template<class T> class ByteSwap
+template <class T>
+class ByteSwap
 {
 public:
-  static bool SystemIsBigEndian ();
-  static bool SystemIsLittleEndian ();
-  static void Swap(T &);
-  static void SwapFromSwapCodeIntoSystem(T &, SwapCode const &);
-  static void SwapRange(T *, unsigned int);
-  static void SwapRangeFromSwapCodeIntoSystem(
-    T *, SwapCode const &, std::streamoff);
+  static bool
+  SystemIsBigEndian();
+  static bool
+  SystemIsLittleEndian();
+  static void
+  Swap(T &);
+  static void
+  SwapFromSwapCodeIntoSystem(T &, SwapCode const &);
+  static void
+  SwapRange(T *, unsigned int);
+  static void
+  SwapRangeFromSwapCodeIntoSystem(T *, SwapCode const &, std::streamoff);
 };
 
 } // end namespace mdcm
 
 #include "mdcmByteSwap.hxx"
 
-#endif //MDCMBYTESWAP_H
+#endif // MDCMBYTESWAP_H

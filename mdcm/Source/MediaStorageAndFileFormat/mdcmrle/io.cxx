@@ -22,37 +22,40 @@ namespace rle
 // this function will read in len bytes so that out contains N pixel of
 // pixel_type pt spread into chunks.
 // Eg, for an RGB 8bits input, out will contains RRRRR ... GGGG .... BBBBB
-int source::read_into_segments(char * out, int len, image_info const & ii)
+int
+source::read_into_segments(char * out, int len, image_info const & ii)
 {
   pixel_info pt = ii.get_pixel_info();
-  const int nc = pt.get_number_of_components();
-  const int bpp = pt.get_number_of_bits_per_pixel();
-  const int numsegs = pt.compute_num_segments();
-  const int npadded = bpp / 8; // aka composite pixel
-  if(numsegs == 1)
+  const int  nc = pt.get_number_of_components();
+  const int  bpp = pt.get_number_of_bits_per_pixel();
+  const int  numsegs = pt.compute_num_segments();
+  const int  npadded = bpp / 8; // aka composite pixel
+  if (numsegs == 1)
   {
     const int nvalues = read(out, len);
-    assert(nvalues == len); (void)nvalues;
+    assert(nvalues == len);
+    (void)nvalues;
   }
   else
   {
     assert(len % numsegs == 0);
-    if(ii.get_planar_configuration() == 0)
+    if (ii.get_planar_configuration() == 0)
     {
       const int llen = len / numsegs;
-      char *sbuf[12]; // max possible is 12
-      for(int s = 0; s < numsegs; ++s)
+      char *    sbuf[12]; // max possible is 12
+      for (int s = 0; s < numsegs; ++s)
       {
         sbuf[s] = out + s * llen;
       }
       char values[12];
-      for(int l = 0; l < llen; ++l)
+      for (int l = 0; l < llen; ++l)
       {
         const int nvalues = read(values, numsegs);
-        assert(nvalues == numsegs); (void)nvalues;
-        for(int c = 0; c < nc; ++c)
+        assert(nvalues == numsegs);
+        (void)nvalues;
+        for (int c = 0; c < nc; ++c)
         {
-          for(int p = 0; p < npadded; ++p)
+          for (int p = 0; p < npadded; ++p)
           {
             const int i = p + c * npadded;
             const int j = (npadded - 1 - p) + c * npadded; // little endian
@@ -63,22 +66,25 @@ int source::read_into_segments(char * out, int len, image_info const & ii)
     }
     else
     {
-      if(numsegs == 3)
+      if (numsegs == 3)
       {
         const int llen = len / numsegs;
-        assert(ii.get_width()  == llen);
-        size_t plane = (size_t)ii.get_width() * (size_t)ii.get_height() * 1;
+        assert(ii.get_width() == llen);
+        size_t      plane = (size_t)ii.get_width() * (size_t)ii.get_height() * 1;
         streampos_t pos = tell();
-        int nvalues = read(out + 0 * llen, llen);
-        assert(nvalues == llen); (void)nvalues;
+        int         nvalues = read(out + 0 * llen, llen);
+        assert(nvalues == llen);
+        (void)nvalues;
         bool b = seek(pos + 1 * plane);
         assert(b);
         nvalues = read(out + 1 * llen, llen);
-        assert(nvalues == llen); (void)nvalues;
+        assert(nvalues == llen);
+        (void)nvalues;
         b = seek(pos + 2 * plane);
         assert(b);
         nvalues = read(out + 2 * llen, llen);
-        assert(nvalues == llen); (void)nvalues;
+        assert(nvalues == llen);
+        (void)nvalues;
         b = seek(pos + llen);
         assert(b);
       }

@@ -27,35 +27,30 @@
 namespace mdcm
 {
 
-static const char * MPStrings[] =
-{
-  "VERTEX",
-  "EDGE",
-  "TRIANGLE",
-  "TRIANGLESTRIP",
-  "TRIANGLEFAN",
-  "LINE",
-  "FACET",
-  NULL
+static const char * MPStrings[] = {
+  "VERTEX", "EDGE", "TRIANGLE", "TRIANGLESTRIP", "TRIANGLEFAN", "LINE", "FACET", NULL
 };
 
-const char * MeshPrimitive::GetMPTypeString(const MPType type)
+const char *
+MeshPrimitive::GetMPTypeString(const MPType type)
 {
   assert(type <= MPType_END);
   return MPStrings[(unsigned int)type];
 }
 
-MeshPrimitive::MPType MeshPrimitive::GetMPType(const char * type)
+MeshPrimitive::MPType
+MeshPrimitive::GetMPType(const char * type)
 {
-  if(!type) return MPType_END;
+  if (!type)
+    return MPType_END;
   // Delete possible space as last character
-  String<>  str(type);
+  String<> str(type);
   str.Trim();
-  std::string typeClearStr = str.Trim();
+  std::string  typeClearStr = str.Trim();
   const char * typeClear = typeClearStr.c_str();
-  for(unsigned int i = 0; MPStrings[i] != 0; ++i)
+  for (unsigned int i = 0; MPStrings[i] != 0; ++i)
   {
-    if( strcmp(typeClear, MPStrings[i]) == 0 )
+    if (strcmp(typeClear, MPStrings[i]) == 0)
     {
       return (MPType)i;
     }
@@ -63,11 +58,11 @@ MeshPrimitive::MPType MeshPrimitive::GetMPType(const char * type)
   // We did not find anything, that's pretty bad, let's hope that
   // the toolkit which wrote the image is buggy and tolerate space padded binary
   // string
-  CodeString codestring = typeClear;
+  CodeString  codestring = typeClear;
   std::string cs = codestring.GetAsString();
-  for(unsigned int i = 0; MPStrings[i] != 0; ++i)
+  for (unsigned int i = 0; MPStrings[i] != 0; ++i)
   {
-    if(strcmp(cs.c_str(), MPStrings[i]) == 0)
+    if (strcmp(cs.c_str(), MPStrings[i]) == 0)
     {
       return (MPType)i;
     }
@@ -75,82 +70,92 @@ MeshPrimitive::MPType MeshPrimitive::GetMPType(const char * type)
   return MPType_END;
 }
 
-MeshPrimitive::MeshPrimitive():
-  PrimitiveType(MPType_END),
-  PrimitiveData(1, DataElement())
-{
-}
+MeshPrimitive::MeshPrimitive()
+  : PrimitiveType(MPType_END)
+  , PrimitiveData(1, DataElement())
+{}
 
-MeshPrimitive::~MeshPrimitive()
-{
-}
+MeshPrimitive::~MeshPrimitive() {}
 
-MeshPrimitive::MPType MeshPrimitive::GetPrimitiveType() const
+MeshPrimitive::MPType
+MeshPrimitive::GetPrimitiveType() const
 {
   return PrimitiveType;
 }
 
-void MeshPrimitive::SetPrimitiveType(const MPType type)
+void
+MeshPrimitive::SetPrimitiveType(const MPType type)
 {
   assert(type <= MPType_END);
   PrimitiveType = type;
 }
 
-const DataElement & MeshPrimitive::GetPrimitiveData() const
+const DataElement &
+MeshPrimitive::GetPrimitiveData() const
 {
   return PrimitiveData.front();
 }
 
-DataElement & MeshPrimitive::GetPrimitiveData()
+DataElement &
+MeshPrimitive::GetPrimitiveData()
 {
   return PrimitiveData.front();
 }
 
-void MeshPrimitive::SetPrimitiveData(DataElement const & de)
+void
+MeshPrimitive::SetPrimitiveData(DataElement const & de)
 {
   PrimitiveData.insert(PrimitiveData.begin(), de);
 }
 
-const MeshPrimitive::PrimitivesData & MeshPrimitive::GetPrimitivesData() const
+const MeshPrimitive::PrimitivesData &
+MeshPrimitive::GetPrimitivesData() const
 {
   return PrimitiveData;
 }
 
-MeshPrimitive::PrimitivesData & MeshPrimitive::GetPrimitivesData()
+MeshPrimitive::PrimitivesData &
+MeshPrimitive::GetPrimitivesData()
 {
   return PrimitiveData;
 }
 
-void MeshPrimitive::SetPrimitivesData(PrimitivesData const & DEs)
+void
+MeshPrimitive::SetPrimitivesData(PrimitivesData const & DEs)
 {
   PrimitiveData = DEs;
 }
 
-void MeshPrimitive::SetPrimitiveData(const unsigned int idx, DataElement const & de)
+void
+MeshPrimitive::SetPrimitiveData(const unsigned int idx, DataElement const & de)
 {
   PrimitiveData.insert(PrimitiveData.begin() + idx, de);
 }
 
-void MeshPrimitive::AddPrimitiveData(DataElement const & de)
+void
+MeshPrimitive::AddPrimitiveData(DataElement const & de)
 {
   PrimitiveData.push_back(de);
 }
 
-const DataElement & MeshPrimitive::GetPrimitiveData(const unsigned int idx) const
+const DataElement &
+MeshPrimitive::GetPrimitiveData(const unsigned int idx) const
 {
   assert(idx < this->GetNumberOfPrimitivesData());
   return PrimitiveData[idx];
 }
 
-DataElement & MeshPrimitive::GetPrimitiveData(const unsigned int idx)
+DataElement &
+MeshPrimitive::GetPrimitiveData(const unsigned int idx)
 {
   assert(idx < this->GetNumberOfPrimitivesData());
   return PrimitiveData[idx];
 }
 
-unsigned int MeshPrimitive::GetNumberOfPrimitivesData() const
+unsigned int
+MeshPrimitive::GetNumberOfPrimitivesData() const
 {
   return (unsigned int)PrimitiveData.size();
 }
 
-}
+} // namespace mdcm

@@ -33,29 +33,36 @@ namespace mdcm
 class MDCM_EXPORT ImplicitDataElement : public DataElement
 {
 public:
-  VL GetLength() const;
+  VL
+  GetLength() const;
 
   template <typename TSwap>
-  std::istream &Read(std::istream& is);
+  std::istream &
+  Read(std::istream & is);
 
   template <typename TSwap>
-  std::istream &ReadPreValue(std::istream& is);
+  std::istream &
+  ReadPreValue(std::istream & is);
 
   template <typename TSwap>
-  std::istream &ReadValue(std::istream& is, bool readvalues = true);
+  std::istream &
+  ReadValue(std::istream & is, bool readvalues = true);
 
   template <typename TSwap>
-  std::istream &ReadWithLength(std::istream& is, VL & length, bool readvalues = true);
+  std::istream &
+  ReadWithLength(std::istream & is, VL & length, bool readvalues = true);
 
   template <typename TSwap>
-  std::istream &ReadValueWithLength(std::istream& is, VL & length, bool readvalues = true);
+  std::istream &
+  ReadValueWithLength(std::istream & is, VL & length, bool readvalues = true);
 
   template <typename TSwap>
-  const std::ostream &Write(std::ostream& os) const;
+  const std::ostream &
+  Write(std::ostream & os) const;
 };
 
 } // end namespace mdcm
 
 #include "mdcmImplicitDataElement.hxx"
 
-#endif //MDCMIMPLICITDATAELEMENT_H
+#endif // MDCMIMPLICITDATAELEMENT_H

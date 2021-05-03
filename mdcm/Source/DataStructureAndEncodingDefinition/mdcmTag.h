@@ -45,39 +45,45 @@ namespace mdcm
 
 class MDCM_EXPORT Tag
 {
-friend std::ostream& operator<<(std::ostream &_os, const Tag &_val);
-friend std::istream& operator>>(std::istream &_is, Tag &_val);
+  friend std::ostream &
+  operator<<(std::ostream & _os, const Tag & _val);
+  friend std::istream &
+  operator>>(std::istream & _is, Tag & _val);
+
 public:
   Tag(uint16_t, uint16_t);
   Tag(uint32_t = 0);
   Tag(const Tag &);
 
   // Returns the Group or Element of the given Tag: 0 / 1
-  const uint16_t & operator [](const unsigned int & _id) const
+  const uint16_t & operator[](const unsigned int & _id) const
   {
-    assert(_id<2);
+    assert(_id < 2);
     return ElementTag.tags[_id];
   }
 
   // Returns the Group or Element of the given Tag: 0 / 1
-  uint16_t & operator [](const unsigned int & _id)
+  uint16_t & operator[](const unsigned int & _id)
   {
-    assert(_id<2);
+    assert(_id < 2);
     return ElementTag.tags[_id];
   }
 
-  Tag & operator =(const Tag & _val)
+  Tag &
+  operator=(const Tag & _val)
   {
     ElementTag.tag = _val.ElementTag.tag;
     return *this;
   }
 
-  bool operator ==(const Tag & _val) const
+  bool
+  operator==(const Tag & _val) const
   {
     return ElementTag.tag == _val.ElementTag.tag;
   }
 
-  bool operator !=(const Tag & _val) const
+  bool
+  operator!=(const Tag & _val) const
   {
     return ElementTag.tag != _val.ElementTag.tag;
   }
@@ -90,13 +96,13 @@ public:
   // we should reverse them in little endian and big endian case
   // since what we really want is fast comparison and not garantee
   // that group is in #0
-  bool operator <(const Tag & _val) const
+  bool
+  operator<(const Tag & _val) const
   {
 #ifndef MDCM_WORDS_BIGENDIAN
-    if(ElementTag.tags[0] < _val.ElementTag.tags[0])
+    if (ElementTag.tags[0] < _val.ElementTag.tags[0])
       return true;
-    if(ElementTag.tags[0] == _val.ElementTag.tags[0]
-      && ElementTag.tags[1] <  _val.ElementTag.tags[1])
+    if (ElementTag.tags[0] == _val.ElementTag.tags[0] && ElementTag.tags[1] < _val.ElementTag.tags[1])
       return true;
     return false;
 #else
@@ -105,7 +111,8 @@ public:
 #endif
   }
 
-  bool operator <=(const Tag & t2) const
+  bool
+  operator<=(const Tag & t2) const
   {
     const Tag & t1 = *this;
     return t1 == t2 || t1 < t2;
@@ -113,56 +120,78 @@ public:
 
   // Read a tag from binary representation
   template <typename TSwap>
-  std::istream & Read(std::istream & is)
+  std::istream &
+  Read(std::istream & is)
   {
-    if(is.read(ElementTag.bytes, 4))
+    if (is.read(ElementTag.bytes, 4))
       TSwap::SwapArray(ElementTag.tags, 2);
     return is;
   }
 
   // Write a tag in binary rep
   template <typename TSwap>
-  const std::ostream & Write(std::ostream & os) const
+  const std::ostream &
+  Write(std::ostream & os) const
   {
     uint16_t copy[2];
-    copy[0]= ElementTag.tags[0];
-    copy[1]= ElementTag.tags[1];
+    copy[0] = ElementTag.tags[0];
+    copy[1] = ElementTag.tags[1];
     TSwap::SwapArray(copy, 2);
-    return os.write((char*)(&copy), 4);
+    return os.write((char *)(&copy), 4);
   }
 
-  uint16_t GetGroup() const;
-  uint16_t GetElement() const;
+  uint16_t
+  GetGroup() const;
+  uint16_t
+       GetElement() const;
   void SetGroup(uint16_t);
   void SetElement(uint16_t);
   void SetElementTag(uint16_t, uint16_t);
-  uint32_t GetElementTag() const;
+  uint32_t
+       GetElementTag() const;
   void SetElementTag(uint32_t);
-  uint32_t GetLength() const;
-  bool IsPublic() const;
-  bool IsPrivate() const;
-  Tag GetPrivateCreator() const;
-  void SetPrivateCreator(Tag const &);
-  bool IsPrivateCreator() const;
-  bool IsIllegal() const;
-  bool IsGroupLength() const;
-  bool IsGroupXX(const Tag &) const;
-  bool ReadFromCommaSeparatedString(const char *);
-  bool ReadFromContinuousString(const char *);
-  bool ReadFromPipeSeparatedString(const char *);
-  std::string PrintAsContinuousString() const;
-  std::string PrintAsContinuousUpperCaseString() const;
-  std::string PrintAsPipeSeparatedString() const;
+  uint32_t
+  GetLength() const;
+  bool
+  IsPublic() const;
+  bool
+  IsPrivate() const;
+  Tag
+  GetPrivateCreator() const;
+  void
+  SetPrivateCreator(Tag const &);
+  bool
+  IsPrivateCreator() const;
+  bool
+  IsIllegal() const;
+  bool
+  IsGroupLength() const;
+  bool
+  IsGroupXX(const Tag &) const;
+  bool
+  ReadFromCommaSeparatedString(const char *);
+  bool
+  ReadFromContinuousString(const char *);
+  bool
+  ReadFromPipeSeparatedString(const char *);
+  std::string
+  PrintAsContinuousString() const;
+  std::string
+  PrintAsContinuousUpperCaseString() const;
+  std::string
+  PrintAsPipeSeparatedString() const;
+
 private:
   union
   {
     uint32_t tag;
     uint16_t tags[2];
-    char bytes[4];
+    char     bytes[4];
   } ElementTag;
 };
 
-inline std::istream & operator >>(std::istream & _is, Tag & _val)
+inline std::istream &
+operator>>(std::istream & _is, Tag & _val)
 {
   char c;
   _is >> c;
@@ -176,15 +205,15 @@ inline std::istream & operator >>(std::istream & _is, Tag & _val)
   return _is;
 }
 
-inline std::ostream & operator <<(std::ostream & _os, const Tag & _val)
+inline std::ostream &
+operator<<(std::ostream & _os, const Tag & _val)
 {
   _os.setf(std::ios::right);
-  _os << std::hex << '(' << std::setw(4) << std::setfill('0')
-    << _val[0] << ',' << std::setw(4) << std::setfill('0')
-    << _val[1] << ')' << std::setfill(' ') << std::dec;
+  _os << std::hex << '(' << std::setw(4) << std::setfill('0') << _val[0] << ',' << std::setw(4) << std::setfill('0')
+      << _val[1] << ')' << std::setfill(' ') << std::dec;
   return _os;
 }
 
 } // end namespace mdcm
 
-#endif //MDCMTAG_H
+#endif // MDCMTAG_H

@@ -28,7 +28,8 @@ namespace mdcm
 namespace SegmentHelper
 {
 
-bool BasicCodedEntry::IsEmpty(const bool checkOptionalAttributes) const
+bool
+BasicCodedEntry::IsEmpty(const bool checkOptionalAttributes) const
 {
   bool res = true;
   if (!CV.empty() && !CSD.empty() && !CM.empty())
@@ -48,6 +49,6 @@ bool BasicCodedEntry::IsEmpty(const bool checkOptionalAttributes) const
   return res;
 }
 
-}
+} // namespace SegmentHelper
 
-} // end of mdcm namespace
+} // namespace mdcm

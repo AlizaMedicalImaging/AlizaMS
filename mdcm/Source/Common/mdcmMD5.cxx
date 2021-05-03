@@ -15,7 +15,7 @@
 #include "mdcmMD5.h"
 #include "mdcmSystem.h"
 #ifdef MDCM_USE_SYSTEM_OPENSSL
-#include <openssl/md5.h>
+#  include <openssl/md5.h>
 #endif
 #include <fstream>
 #include <vector>
@@ -24,20 +24,22 @@
 namespace mdcm
 {
 
-bool MD5::Compute(const char * buffer, size_t buf_len, char digest_str[33])
+bool
+MD5::Compute(const char * buffer, size_t buf_len, char digest_str[33])
 {
-  if(!buffer || !buf_len) return false;
+  if (!buffer || !buf_len)
+    return false;
 #ifdef MDCM_USE_SYSTEM_OPENSSL
   unsigned char digest[16];
-  MD5_CTX ctx;
+  MD5_CTX       ctx;
   MD5_Init(&ctx);
   MD5_Update(&ctx, buffer, buf_len);
   MD5_Final(digest, &ctx);
   for (int di = 0; di < 16; ++di)
   {
-    sprintf(digest_str+2*di, "%02x", digest[di]);
+    sprintf(digest_str + 2 * di, "%02x", digest[di]);
   }
-  digest_str[2*16] = '\0';
+  digest_str[2 * 16] = '\0';
   return true;
 #else
   (void)digest_str;
@@ -46,14 +48,17 @@ bool MD5::Compute(const char * buffer, size_t buf_len, char digest_str[33])
 }
 
 #ifdef MDCM_USE_SYSTEM_OPENSSL
-static bool process_file(const char * filename, unsigned char * digest)
+static bool
+process_file(const char * filename, unsigned char * digest)
 {
-  if(!filename || !digest) return false;
+  if (!filename || !digest)
+    return false;
   std::ifstream file(filename, std::ios::binary);
-  if(!file) return false;
-  const size_t file_size = System::FileSize(filename);
+  if (!file)
+    return false;
+  const size_t      file_size = System::FileSize(filename);
   std::vector<char> v(file_size);
-  char * buffer = &v[0];
+  char *            buffer = &v[0];
   file.read(buffer, file_size);
   MD5_CTX ctx;
   MD5_Init(&ctx);
@@ -62,22 +67,25 @@ static bool process_file(const char * filename, unsigned char * digest)
   return true;
 }
 #else
-static inline bool process_file(const char *, unsigned char *)
+static inline bool
+process_file(const char *, unsigned char *)
 {
   return false;
 }
 #endif
 
-bool MD5::ComputeFile(const char * filename, char digest_str[33])
+bool
+MD5::ComputeFile(const char * filename, char digest_str[33])
 {
 #ifdef MDCM_USE_SYSTEM_OPENSSL
   unsigned char digest[16];
-  if(!process_file(filename, digest)) return false;
+  if (!process_file(filename, digest))
+    return false;
   for (int di = 0; di < 16; ++di)
   {
-    sprintf(digest_str+2*di, "%02x", digest[di]);
+    sprintf(digest_str + 2 * di, "%02x", digest[di]);
   }
-  digest_str[2*16] = '\0';
+  digest_str[2 * 16] = '\0';
   return true;
 #else
   (void)filename;

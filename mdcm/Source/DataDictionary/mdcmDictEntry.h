@@ -36,49 +36,104 @@ namespace mdcm
 class MDCM_EXPORT DictEntry
 {
 public:
-  DictEntry(
-    const char * name = "",
-    const char * keyword = "",
-    VR const &vr = VR::INVALID,
-    VM const &vm = VM::VM0,
-    bool ret = false)
-    :
-    Name(name),
-    Keyword(keyword),
-    ValueRepresentation(vr),
-    ValueMultiplicity(vm),
-    Retired(ret),
-    GroupXX(false),
-    ElementXX(false) {}
-  friend std::ostream& operator<<(std::ostream & _os, const DictEntry & _val);
-  const VR &GetVR() const { return ValueRepresentation; }
-  void SetVR(const VR & vr) { ValueRepresentation = vr; }
-  const VM &GetVM() const { return ValueMultiplicity; }
-  void SetVM(VM const & vm) { ValueMultiplicity = vm; }
-  const char *GetName() const { return Name.c_str(); }
-  void SetName(const char* name) { Name = name; }
-  const char *GetKeyword() const { return Keyword.c_str(); }
-  void SetKeyword(const char* keyword) { Keyword = keyword; }
-  bool GetRetired() const { return Retired; }
-  void SetRetired(bool retired) { Retired = retired; }
-  void SetGroupXX(bool v) { GroupXX = v; }
-  void SetElementXX(bool v) { ElementXX = v; }
-  bool IsUnique() const { return ElementXX == false && GroupXX == false; }
+  DictEntry(const char * name = "",
+            const char * keyword = "",
+            VR const &   vr = VR::INVALID,
+            VM const &   vm = VM::VM0,
+            bool         ret = false)
+    : Name(name)
+    , Keyword(keyword)
+    , ValueRepresentation(vr)
+    , ValueMultiplicity(vm)
+    , Retired(ret)
+    , GroupXX(false)
+    , ElementXX(false)
+  {}
+  friend std::ostream &
+  operator<<(std::ostream & _os, const DictEntry & _val);
+  const VR &
+  GetVR() const
+  {
+    return ValueRepresentation;
+  }
+  void
+  SetVR(const VR & vr)
+  {
+    ValueRepresentation = vr;
+  }
+  const VM &
+  GetVM() const
+  {
+    return ValueMultiplicity;
+  }
+  void
+  SetVM(VM const & vm)
+  {
+    ValueMultiplicity = vm;
+  }
+  const char *
+  GetName() const
+  {
+    return Name.c_str();
+  }
+  void
+  SetName(const char * name)
+  {
+    Name = name;
+  }
+  const char *
+  GetKeyword() const
+  {
+    return Keyword.c_str();
+  }
+  void
+  SetKeyword(const char * keyword)
+  {
+    Keyword = keyword;
+  }
+  bool
+  GetRetired() const
+  {
+    return Retired;
+  }
+  void
+  SetRetired(bool retired)
+  {
+    Retired = retired;
+  }
+  void
+  SetGroupXX(bool v)
+  {
+    GroupXX = v;
+  }
+  void
+  SetElementXX(bool v)
+  {
+    ElementXX = v;
+  }
+  bool
+  IsUnique() const
+  {
+    return ElementXX == false && GroupXX == false;
+  }
+
 private:
   friend class Dict;
+
 private:
   std::string Name;
   std::string Keyword;
-  VR ValueRepresentation;
-  VM ValueMultiplicity;
-  bool Retired : 1;
-  bool GroupXX : 1;
-  bool ElementXX : 1;
+  VR          ValueRepresentation;
+  VM          ValueMultiplicity;
+  bool        Retired : 1;
+  bool        GroupXX : 1;
+  bool        ElementXX : 1;
 };
 
-inline std::ostream& operator<<(std::ostream & os, const DictEntry & val)
+inline std::ostream &
+operator<<(std::ostream & os, const DictEntry & val)
 {
-  if(val.Name.empty())
+  if (val.Name.empty())
   {
     os << "[No name]";
   }
@@ -86,7 +141,7 @@ inline std::ostream& operator<<(std::ostream & os, const DictEntry & val)
   {
     os << val.Name;
   }
-  if(val.Keyword.empty())
+  if (val.Keyword.empty())
   {
     os << "[No keyword]";
   }
@@ -95,7 +150,7 @@ inline std::ostream& operator<<(std::ostream & os, const DictEntry & val)
     os << val.Keyword;
   }
   os << "\t" << val.ValueRepresentation << "\t" << val.ValueMultiplicity;
-  if(val.Retired)
+  if (val.Retired)
   {
     os << "\t(RET)";
   }
@@ -104,4 +159,4 @@ inline std::ostream& operator<<(std::ostream & os, const DictEntry & val)
 
 } // end namespace mdcm
 
-#endif //MDCMDICTENTRY_H
+#endif // MDCMDICTENTRY_H

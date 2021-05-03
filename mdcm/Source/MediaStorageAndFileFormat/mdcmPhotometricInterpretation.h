@@ -35,7 +35,9 @@ class TransferSyntax;
  */
 class MDCM_EXPORT PhotometricInterpretation
 {
-friend std::ostream& operator<<(std::ostream &, const PhotometricInterpretation &);
+  friend std::ostream &
+  operator<<(std::ostream &, const PhotometricInterpretation &);
+
 public:
   typedef enum
   {
@@ -56,21 +58,34 @@ public:
     PI_END
   } PIType;
 
-  PhotometricInterpretation(PIType pi = UNKNOWN) : PIField(pi) {}
+  PhotometricInterpretation(PIType pi = UNKNOWN)
+    : PIField(pi)
+  {}
   static const char * GetPIString(PIType);
-  static PIType GetPIType(const char *);
-  const char * GetString() const;
-  unsigned short GetSamplesPerPixel() const;
-  bool IsLossy() const;
-  bool IsLossless() const;
+  static PIType
+  GetPIType(const char *);
+  const char *
+  GetString() const;
+  unsigned short
+  GetSamplesPerPixel() const;
+  bool
+  IsLossy() const;
+  bool
+              IsLossless() const;
   static bool IsRetired(PIType);
-  operator PIType () const { return PIField; }
-  PIType GetType() const { return PIField; }
+              operator PIType() const { return PIField; }
+  PIType
+  GetType() const
+  {
+    return PIField;
+  }
+
 private:
   PIType PIField;
 };
 
-inline std::ostream & operator<<(std::ostream & os, const PhotometricInterpretation & val)
+inline std::ostream &
+operator<<(std::ostream & os, const PhotometricInterpretation & val)
 {
   const char * s = PhotometricInterpretation::GetPIString(val.PIField);
   os << (s ? s : "");
@@ -79,4 +94,4 @@ inline std::ostream & operator<<(std::ostream & os, const PhotometricInterpretat
 
 } // end namespace mdcm
 
-#endif //MDCMPHOTOMETRICINTERPRETATION_H
+#endif // MDCMPHOTOMETRICINTERPRETATION_H

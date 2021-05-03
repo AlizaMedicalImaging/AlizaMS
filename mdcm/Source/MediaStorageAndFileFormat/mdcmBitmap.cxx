@@ -34,28 +34,29 @@
 namespace mdcm
 {
 
-Bitmap::Bitmap():
-  PlanarConfiguration(0),
-  NumberOfDimensions(2),
-  TS(),
-  PF(),
-  PI(),
-  Dimensions(),
-  PixelData(),
-  LUT(new LookupTable),
-  NeedByteSwap(false),
-  LossyFlag(false)
-{
-}
+Bitmap::Bitmap()
+  : PlanarConfiguration(0)
+  , NumberOfDimensions(2)
+  , TS()
+  , PF()
+  , PI()
+  , Dimensions()
+  , PixelData()
+  , LUT(new LookupTable)
+  , NeedByteSwap(false)
+  , LossyFlag(false)
+{}
 
 Bitmap::~Bitmap() {}
 
-unsigned int Bitmap::GetNumberOfDimensions() const
+unsigned int
+Bitmap::GetNumberOfDimensions() const
 {
   return NumberOfDimensions;
 }
 
-void Bitmap::SetNumberOfDimensions(unsigned int dim)
+void
+Bitmap::SetNumberOfDimensions(unsigned int dim)
 {
   NumberOfDimensions = dim;
   assert(NumberOfDimensions);
@@ -67,38 +68,46 @@ void Bitmap::SetNumberOfDimensions(unsigned int dim)
   }
 }
 
-const unsigned int * Bitmap::GetDimensions() const
+const unsigned int *
+Bitmap::GetDimensions() const
 {
   assert(NumberOfDimensions);
   return &Dimensions[0];
 }
 
-unsigned int Bitmap::GetDimension(unsigned int idx) const
+unsigned int
+Bitmap::GetDimension(unsigned int idx) const
 {
   assert(NumberOfDimensions);
   return Dimensions[idx];
 }
 
-void Bitmap::SetDimensions(const unsigned int *dims)
+void
+Bitmap::SetDimensions(const unsigned int * dims)
 {
   assert(NumberOfDimensions);
   assert(Dimensions.size() == 3);
   Dimensions[0] = dims[0];
   Dimensions[1] = dims[1];
-  if (NumberOfDimensions == 2) Dimensions[2] = 1;
-  else Dimensions[2] = dims[2];
+  if (NumberOfDimensions == 2)
+    Dimensions[2] = 1;
+  else
+    Dimensions[2] = dims[2];
 }
 
-void Bitmap::SetDimension(unsigned int idx, unsigned int dim)
+void
+Bitmap::SetDimension(unsigned int idx, unsigned int dim)
 {
   assert(NumberOfDimensions);
   assert(idx < NumberOfDimensions);
   Dimensions.resize(3);
   Dimensions[idx] = dim;
-  if (NumberOfDimensions == 2) Dimensions[2] = 1;
+  if (NumberOfDimensions == 2)
+    Dimensions[2] = 1;
 }
 
-unsigned int Bitmap::GetPlanarConfiguration() const
+unsigned int
+Bitmap::GetPlanarConfiguration() const
 {
   if (PlanarConfiguration && PF.GetSamplesPerPixel() != 3)
   {
@@ -109,7 +118,8 @@ unsigned int Bitmap::GetPlanarConfiguration() const
   return PlanarConfiguration;
 }
 
-void Bitmap::SetPlanarConfiguration(unsigned int pc)
+void
+Bitmap::SetPlanarConfiguration(unsigned int pc)
 {
   assert(pc == 0 || pc == 1);
   PlanarConfiguration = pc;
@@ -120,19 +130,13 @@ void Bitmap::SetPlanarConfiguration(unsigned int pc)
       mdcmWarningMacro("Cant have Planar Configuration in non RGB input. Discarding");
       PlanarConfiguration = 0;
     }
-    const TransferSyntax &ts = GetTransferSyntax();
-    if(  ts == TransferSyntax::JPEGBaselineProcess1
-      || ts == TransferSyntax::JPEGExtendedProcess2_4
-      || ts == TransferSyntax::JPEGExtendedProcess3_5
-      || ts == TransferSyntax::JPEGSpectralSelectionProcess6_8
-      || ts == TransferSyntax::JPEGFullProgressionProcess10_12
-      || ts == TransferSyntax::JPEGLosslessProcess14
-      || ts == TransferSyntax::JPEGLosslessProcess14_1
-      || ts == TransferSyntax::JPEGLSLossless
-      || ts == TransferSyntax::JPEGLSNearLossless
-      || ts == TransferSyntax::JPEG2000Lossless
-      || ts == TransferSyntax::JPEG2000
-      || ts == TransferSyntax::JPIPReferenced)
+    const TransferSyntax & ts = GetTransferSyntax();
+    if (ts == TransferSyntax::JPEGBaselineProcess1 || ts == TransferSyntax::JPEGExtendedProcess2_4 ||
+        ts == TransferSyntax::JPEGExtendedProcess3_5 || ts == TransferSyntax::JPEGSpectralSelectionProcess6_8 ||
+        ts == TransferSyntax::JPEGFullProgressionProcess10_12 || ts == TransferSyntax::JPEGLosslessProcess14 ||
+        ts == TransferSyntax::JPEGLosslessProcess14_1 || ts == TransferSyntax::JPEGLSLossless ||
+        ts == TransferSyntax::JPEGLSNearLossless || ts == TransferSyntax::JPEG2000Lossless ||
+        ts == TransferSyntax::JPEG2000 || ts == TransferSyntax::JPIPReferenced)
     {
       mdcmWarningMacro("Cant have Planar Configuration in JPEG/JPEG-LS/JPEG 2000. Discarding");
       PlanarConfiguration = 0;
@@ -141,50 +145,58 @@ void Bitmap::SetPlanarConfiguration(unsigned int pc)
   assert(PlanarConfiguration == 0 || PlanarConfiguration == 1);
 }
 
-void Bitmap::Clear()
+void
+Bitmap::Clear()
 {
   Dimensions.clear();
 }
 
-bool Bitmap::IsEmpty() const
+bool
+Bitmap::IsEmpty() const
 {
   return (Dimensions.size() == 0);
 }
 
-const PhotometricInterpretation & Bitmap::GetPhotometricInterpretation() const
+const PhotometricInterpretation &
+Bitmap::GetPhotometricInterpretation() const
 {
   return PI;
 }
 
-void Bitmap::SetPhotometricInterpretation(PhotometricInterpretation const &pi)
+void
+Bitmap::SetPhotometricInterpretation(PhotometricInterpretation const & pi)
 {
   PI = pi;
 }
 
-bool Bitmap::IsLossy() const
+bool
+Bitmap::IsLossy() const
 {
   return LossyFlag;
 }
 
-void Bitmap::SetLossyFlag(bool f)
+void
+Bitmap::SetLossyFlag(bool f)
 {
   LossyFlag = f;
 }
 
 // For palette color multiply this length by 3,
 // if computing the size of equivalent RGB image.
-unsigned long long Bitmap::GetBufferLength() const
+unsigned long long
+Bitmap::GetBufferLength() const
 {
-  if (PF == PixelFormat::UNKNOWN) return 0;
+  if (PF == PixelFormat::UNKNOWN)
+    return 0;
   assert(NumberOfDimensions);
   if (NumberOfDimensions != Dimensions.size())
   {
     assert(Dimensions[2] == 1);
   }
-  unsigned long long len = 0;
-  unsigned long long mul = 1;
+  unsigned long long                        len = 0;
+  unsigned long long                        mul = 1;
   std::vector<unsigned int>::const_iterator it = Dimensions.begin();
-  for(; it != Dimensions.end(); ++it)
+  for (; it != Dimensions.end(); ++it)
   {
     mul *= *it;
   }
@@ -196,19 +208,19 @@ unsigned long long Bitmap::GetBufferLength() const
   {
     assert(PF.GetSamplesPerPixel() == 1);
     const unsigned long long bytesPerRow =
-      ((unsigned long long)Dimensions[0]/8) +
-      (((unsigned long long)Dimensions[0]%8 != 0) ? 1 : 0);
-    unsigned long long save = bytesPerRow*Dimensions[1];
-    if (NumberOfDimensions > 2) save *= Dimensions[2];
+      ((unsigned long long)Dimensions[0] / 8) + (((unsigned long long)Dimensions[0] % 8 != 0) ? 1 : 0);
+    unsigned long long save = bytesPerRow * Dimensions[1];
+    if (NumberOfDimensions > 2)
+      save *= Dimensions[2];
     mul = save;
   }
-  else if (PF.GetBitsAllocated()%8 != 0)
+  else if (PF.GetBitsAllocated() % 8 != 0)
   {
     assert(PF.GetSamplesPerPixel() == 1);
     const ByteValue * bv = PixelData.GetByteValue();
     if (bv)
     {
-      unsigned long long ref = bv->GetLength()/mul;
+      unsigned long long ref = bv->GetLength() / mul;
       if (!GetTransferSyntax().IsEncapsulated())
       {
         mdcmAlwaysWarnMacro("GetBufferLength(): bv->GetLength()%mul != 0");
@@ -228,123 +240,147 @@ unsigned long long Bitmap::GetBufferLength() const
   return len;
 }
 
-bool Bitmap::GetBuffer(char * buffer) const
+bool
+Bitmap::GetBuffer(char * buffer) const
 {
   bool dummy;
   return GetBufferInternal(buffer, dummy);
 }
 
-bool Bitmap::AreOverlaysInPixelData() const
+bool
+Bitmap::AreOverlaysInPixelData() const
 {
   return false;
 }
 
-bool Bitmap::UnusedBitsPresentInPixelData() const
+bool
+Bitmap::UnusedBitsPresentInPixelData() const
 {
   return false;
 }
 
 // Call SetPixelFormat first, before SetPlanarConfiguration!
-bool Bitmap::GetNeedByteSwap() const
+bool
+Bitmap::GetNeedByteSwap() const
 {
   return NeedByteSwap;
 }
 
-void Bitmap::SetNeedByteSwap(bool b)
+void
+Bitmap::SetNeedByteSwap(bool b)
 {
   NeedByteSwap = b;
 }
 
-void Bitmap::SetTransferSyntax(TransferSyntax const & ts)
+void
+Bitmap::SetTransferSyntax(TransferSyntax const & ts)
 {
   TS = ts;
 }
 
-const TransferSyntax & Bitmap::GetTransferSyntax() const
+const TransferSyntax &
+Bitmap::GetTransferSyntax() const
 {
   return TS;
 }
 
-bool Bitmap::IsTransferSyntaxCompatible(TransferSyntax const & ts) const
+bool
+Bitmap::IsTransferSyntaxCompatible(TransferSyntax const & ts) const
 {
-  if (GetTransferSyntax() == ts) return true;
+  if (GetTransferSyntax() == ts)
+    return true;
   if (GetTransferSyntax() == TransferSyntax::JPEGExtendedProcess2_4)
   {
     if (GetPixelFormat().GetBitsAllocated() == 8)
     {
-      if (ts == TransferSyntax::JPEGBaselineProcess1) return true;
+      if (ts == TransferSyntax::JPEGBaselineProcess1)
+        return true;
     }
   }
   return false;
 }
 
-void Bitmap::SetDataElement(DataElement const & de)
+void
+Bitmap::SetDataElement(DataElement const & de)
 {
   PixelData = de;
 }
 
-const DataElement & Bitmap::GetDataElement() const
+const DataElement &
+Bitmap::GetDataElement() const
 {
   return PixelData;
 }
 
-DataElement & Bitmap::GetDataElement()
+DataElement &
+Bitmap::GetDataElement()
 {
   return PixelData;
 }
 
-void Bitmap::SetLUT(LookupTable const & lut)
+void
+Bitmap::SetLUT(LookupTable const & lut)
 {
-  LUT = SmartPointer<LookupTable>(const_cast<LookupTable*>(&lut));
+  LUT = SmartPointer<LookupTable>(const_cast<LookupTable *>(&lut));
 }
 
-const LookupTable & Bitmap::GetLUT() const
-{
-  return *LUT;
-}
-
-LookupTable & Bitmap::GetLUT()
+const LookupTable &
+Bitmap::GetLUT() const
 {
   return *LUT;
 }
 
-void Bitmap::SetColumns(unsigned int col)
+LookupTable &
+Bitmap::GetLUT()
 {
-  SetDimension(0,col);
+  return *LUT;
 }
 
-unsigned int Bitmap::GetColumns() const
+void
+Bitmap::SetColumns(unsigned int col)
+{
+  SetDimension(0, col);
+}
+
+unsigned int
+Bitmap::GetColumns() const
 {
   return GetDimension(0);
 }
 
-void Bitmap::SetRows(unsigned int rows)
+void
+Bitmap::SetRows(unsigned int rows)
 {
-  SetDimension(1,rows);
+  SetDimension(1, rows);
 }
 
-unsigned int Bitmap::GetRows() const
+unsigned int
+Bitmap::GetRows() const
 {
   return GetDimension(1);
 }
 
-const PixelFormat & Bitmap::GetPixelFormat() const
+const PixelFormat &
+Bitmap::GetPixelFormat() const
 {
   return PF;
 }
 
-PixelFormat & Bitmap::GetPixelFormat()
+PixelFormat &
+Bitmap::GetPixelFormat()
 {
   return PF;
 }
 
-void Bitmap::SetPixelFormat(PixelFormat const &pf)
+void
+Bitmap::SetPixelFormat(PixelFormat const & pf)
 {
   PF = pf;
   PF.Validate();
 }
 
-void Bitmap::Print(std::ostream & os) const
+void
+Bitmap::Print(std::ostream & os) const
 {
   Object::Print(os);
   if (!IsEmpty())
@@ -367,7 +403,8 @@ void Bitmap::Print(std::ostream & os) const
 }
 
 // Image can be lossy but in implicit little endian format
-bool Bitmap::ComputeLossyFlag()
+bool
+Bitmap::ComputeLossyFlag()
 {
   bool lossyflag;
   if (this->GetBufferInternal(0, lossyflag))
@@ -379,9 +416,10 @@ bool Bitmap::ComputeLossyFlag()
   return false;
 }
 
-bool Bitmap::TryRAWCodec(char * buffer, bool & lossyflag) const
+bool
+Bitmap::TryRAWCodec(char * buffer, bool & lossyflag) const
 {
-  RAWCodec codec;
+  RAWCodec               codec;
   const TransferSyntax & ts = GetTransferSyntax();
   if (!buffer)
   {
@@ -399,22 +437,24 @@ bool Bitmap::TryRAWCodec(char * buffer, bool & lossyflag) const
   if (bv)
   {
     unsigned long long len = GetBufferLength();
-    if (!codec.CanDecode(ts)) return false;
+    if (!codec.CanDecode(ts))
+      return false;
     codec.SetPlanarConfiguration(GetPlanarConfiguration());
     codec.SetPhotometricInterpretation(GetPhotometricInterpretation());
     codec.SetLUT(GetLUT());
     codec.SetPixelFormat(GetPixelFormat());
     codec.SetNeedByteSwap(GetNeedByteSwap());
     codec.SetNeedOverlayCleanup(AreOverlaysInPixelData() ||
-      (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
+                                (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
     DataElement out;
-    const bool r = codec.DecodeBytes(bv->GetPointer(), bv->GetLength(), buffer, len);
-    if (!r) return false;
-    if(GetNeedByteSwap())
+    const bool  r = codec.DecodeBytes(bv->GetPointer(), bv->GetLength(), buffer, len);
+    if (!r)
+      return false;
+    if (GetNeedByteSwap())
     {
       // Internally DecodeBytes always does the byte-swapping step,
       // so remove internal flag
-      Bitmap *i = const_cast<Bitmap*>(this);
+      Bitmap * i = const_cast<Bitmap *>(this);
       i->SetNeedByteSwap(false);
     }
     if (len != bv->GetLength())
@@ -426,24 +466,25 @@ bool Bitmap::TryRAWCodec(char * buffer, bool & lossyflag) const
   return false;
 }
 
-bool Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
+bool
+Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
 {
-  JPEGCodec codec;
+  JPEGCodec              codec;
   const TransferSyntax & ts = GetTransferSyntax();
   if (!buffer)
   {
     if (codec.CanDecode(ts))
     {
-      TransferSyntax ts2;
+      TransferSyntax              ts2;
       const SequenceOfFragments * sf = PixelData.GetSequenceOfFragments();
       if (!sf)
       {
         mdcmAlwaysWarnMacro("JPEG: SequenceOfFragments is NULL");
         return false;
       }
-      const Fragment &frag = sf->GetFragment(0);
-      const ByteValue &bv2 = dynamic_cast<const ByteValue&>(frag.GetValue());
-      PixelFormat pf = GetPixelFormat();
+      const Fragment &  frag = sf->GetFragment(0);
+      const ByteValue & bv2 = dynamic_cast<const ByteValue &>(frag.GetValue());
+      PixelFormat       pf = GetPixelFormat();
       codec.SetPixelFormat(pf);
       std::stringstream ss;
       ss.write(bv2.GetPointer(), bv2.GetLength());
@@ -462,29 +503,28 @@ bool Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
 #else
       const PixelFormat & cpf = codec.GetPixelFormat();
       // SC16BitsAllocated_8BitsStoredJPEG.dcm
-      if(cpf.GetBitsAllocated() <= pf.GetBitsAllocated())
+      if (cpf.GetBitsAllocated() <= pf.GetBitsAllocated())
       {
-        if(cpf.GetPixelRepresentation() == pf.GetPixelRepresentation())
+        if (cpf.GetPixelRepresentation() == pf.GetPixelRepresentation())
         {
-          if(cpf.GetSamplesPerPixel() == pf.GetSamplesPerPixel())
+          if (cpf.GetSamplesPerPixel() == pf.GetSamplesPerPixel())
           {
-            if(cpf.GetBitsStored() < pf.GetBitsStored())
+            if (cpf.GetBitsStored() < pf.GetBitsStored())
             {
               mdcmAlwaysWarnMacro("Encapsulated stream has fewer bits stored, fixed");
-              Bitmap *i = const_cast<Bitmap*>(this);
-              i->GetPixelFormat().SetBitsAllocated( cpf.GetBitsAllocated());
-              i->GetPixelFormat().SetBitsStored( cpf.GetBitsStored() );
+              Bitmap * i = const_cast<Bitmap *>(this);
+              i->GetPixelFormat().SetBitsAllocated(cpf.GetBitsAllocated());
+              i->GetPixelFormat().SetBitsStored(cpf.GetBitsStored());
             }
           }
         }
       }
 #endif
-      if (GetDimensions()[0] != codec.GetDimensions()[0] ||
-          GetDimensions()[1] != codec.GetDimensions()[1])
+      if (GetDimensions()[0] != codec.GetDimensions()[0] || GetDimensions()[1] != codec.GetDimensions()[1])
       {
         // JPEGNote_bogus.dcm
         mdcmAlwaysWarnMacro("JPEG: dimension mismatch for JPEG");
-        (const_cast<Bitmap*>(this))->SetDimensions(codec.GetDimensions());
+        (const_cast<Bitmap *>(this))->SetDimensions(codec.GetDimensions());
       }
       return true;
     }
@@ -499,7 +539,7 @@ bool Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
     codec.SetPhotometricInterpretation(GetPhotometricInterpretation());
     codec.SetPixelFormat(GetPixelFormat());
     codec.SetNeedOverlayCleanup(AreOverlaysInPixelData() ||
-      (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
+                                (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
     DataElement out;
     if (!codec.Decode(PixelData, out))
     {
@@ -509,7 +549,7 @@ bool Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
     }
     if (GetPlanarConfiguration() != codec.GetPlanarConfiguration())
     {
-      Bitmap * i = const_cast<Bitmap*>(this);
+      Bitmap * i = const_cast<Bitmap *>(this);
       (void)i;
     }
 #if 1
@@ -518,11 +558,11 @@ bool Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
     if (pf != cpf)
     {
       // DCMTK_JPEGExt_12Bits.dcm
-      if(pf.GetPixelRepresentation() == cpf.GetPixelRepresentation())
+      if (pf.GetPixelRepresentation() == cpf.GetPixelRepresentation())
       {
-        if(pf.GetBitsAllocated() == 12)
+        if (pf.GetBitsAllocated() == 12)
         {
-          Bitmap *i = const_cast<Bitmap*>(this);
+          Bitmap * i = const_cast<Bitmap *>(this);
           i->GetPixelFormat().SetBitsAllocated(16);
           i->GetPixelFormat().SetBitsStored(12);
         }
@@ -532,18 +572,18 @@ bool Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
     const PixelFormat & cpf = codec.GetPixelFormat();
     const PixelFormat & pf = GetPixelFormat();
     // SC16BitsAllocated_8BitsStoredJPEG.dcm
-    if(cpf.GetBitsAllocated() <= pf.GetBitsAllocated())
+    if (cpf.GetBitsAllocated() <= pf.GetBitsAllocated())
     {
-      if(cpf.GetPixelRepresentation() == pf.GetPixelRepresentation())
+      if (cpf.GetPixelRepresentation() == pf.GetPixelRepresentation())
       {
-        if(cpf.GetSamplesPerPixel() == pf.GetSamplesPerPixel())
+        if (cpf.GetSamplesPerPixel() == pf.GetSamplesPerPixel())
         {
-          if(cpf.GetBitsStored() < pf.GetBitsStored())
+          if (cpf.GetBitsStored() < pf.GetBitsStored())
           {
             mdcmAlwaysWarnMacro("Encapsulated stream has fewer bits stored, fixed");
-            Bitmap *i = const_cast<Bitmap*>(this);
-            i->GetPixelFormat().SetBitsAllocated( cpf.GetBitsAllocated());
-            i->GetPixelFormat().SetBitsStored( cpf.GetBitsStored() );
+            Bitmap * i = const_cast<Bitmap *>(this);
+            i->GetPixelFormat().SetBitsAllocated(cpf.GetBitsAllocated());
+            i->GetPixelFormat().SetBitsStored(cpf.GetBitsStored());
           }
         }
       }
@@ -571,10 +611,11 @@ bool Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
   return false;
 }
 
-bool Bitmap::TryJPEGCodec2(std::ostream &os) const
+bool
+Bitmap::TryJPEGCodec2(std::ostream & os) const
 {
   const TransferSyntax & ts = GetTransferSyntax();
-  JPEGCodec codec;
+  JPEGCodec              codec;
   if (codec.CanCode(ts))
   {
     codec.SetDimensions(GetDimensions());
@@ -582,68 +623,77 @@ bool Bitmap::TryJPEGCodec2(std::ostream &os) const
     codec.SetPhotometricInterpretation(GetPhotometricInterpretation());
     codec.SetPixelFormat(GetPixelFormat());
     codec.SetNeedOverlayCleanup(AreOverlaysInPixelData() ||
-      (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
+                                (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
     DataElement out;
-    bool r = codec.Code(PixelData, out);
-    if (!r) return false;
+    bool        r = codec.Code(PixelData, out);
+    if (!r)
+      return false;
     const ByteValue * outbv = out.GetByteValue();
-    if (!outbv) return false;
+    if (!outbv)
+      return false;
     os.write(outbv->GetPointer(), outbv->GetLength());
     return true;
   }
   return false;
 }
 
-bool Bitmap::TryPVRGCodec(char * buffer, bool & lossyflag) const
+bool
+Bitmap::TryPVRGCodec(char * buffer, bool & lossyflag) const
 {
-  unsigned long long len = GetBufferLength();
+  unsigned long long     len = GetBufferLength();
   const TransferSyntax & ts = GetTransferSyntax();
-  PVRGCodec codec;
+  PVRGCodec              codec;
   if (codec.CanDecode(ts))
   {
     codec.SetPixelFormat(GetPixelFormat());
     codec.SetPlanarConfiguration(GetPlanarConfiguration());
     codec.SetPhotometricInterpretation(GetPhotometricInterpretation());
     codec.SetNeedOverlayCleanup(AreOverlaysInPixelData() ||
-      (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
+                                (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
     codec.SetDimensions(GetDimensions());
     DataElement out;
-    bool r = codec.Decode(PixelData, out);
-    if (!r) return false;
+    bool        r = codec.Decode(PixelData, out);
+    if (!r)
+      return false;
     codec.SetLossyFlag(ts.IsLossy());
     assert(r);
     if (GetPlanarConfiguration() != codec.GetPlanarConfiguration())
     {
-      Bitmap * i = const_cast<Bitmap*>(this);
+      Bitmap * i = const_cast<Bitmap *>(this);
       i->PlanarConfiguration = codec.GetPlanarConfiguration();
     }
     const ByteValue * outbv = out.GetByteValue();
-    if (!outbv) return false;
+    if (!outbv)
+      return false;
     assert(len <= outbv->GetLength());
-    if (buffer) memcpy(buffer, outbv->GetPointer(), len);
+    if (buffer)
+      memcpy(buffer, outbv->GetPointer(), len);
     lossyflag = codec.IsLossy();
     return r;
   }
   return false;
 }
 
-bool Bitmap::TryJPEGLSCodec(char * buffer, bool & lossyflag) const
+bool
+Bitmap::TryJPEGLSCodec(char * buffer, bool & lossyflag) const
 {
-  JPEGLSCodec codec;
+  JPEGLSCodec            codec;
   const TransferSyntax & ts = GetTransferSyntax();
   if (!buffer)
   {
     if (codec.CanDecode(ts))
     {
-      TransferSyntax ts2;
+      TransferSyntax              ts2;
       const SequenceOfFragments * sf = PixelData.GetSequenceOfFragments();
-      if (!sf) return false;
-      const Fragment &frag = sf->GetFragment(0);
-      const ByteValue &bv2 = dynamic_cast<const ByteValue&>(frag.GetValue());
+      if (!sf)
+        return false;
+      const Fragment &  frag = sf->GetFragment(0);
+      const ByteValue & bv2 = dynamic_cast<const ByteValue &>(frag.GetValue());
       std::stringstream ss;
       ss.write(bv2.GetPointer(), bv2.GetLength());
       bool b = codec.GetHeaderInfo(ss, ts2);
-      if (!b) return false;
+      if (!b)
+        return false;
       lossyflag = codec.IsLossy();
       return true;
     }
@@ -658,15 +708,18 @@ bool Bitmap::TryJPEGLSCodec(char * buffer, bool & lossyflag) const
     codec.SetPlanarConfiguration(GetPlanarConfiguration());
     codec.SetPhotometricInterpretation(GetPhotometricInterpretation());
     codec.SetNeedOverlayCleanup(AreOverlaysInPixelData() ||
-      (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
+                                (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
     codec.SetDimensions(GetDimensions());
     DataElement out;
-    bool r = codec.Decode(PixelData, out);
-    if (!r) return false;
+    bool        r = codec.Decode(PixelData, out);
+    if (!r)
+      return false;
     const ByteValue * outbv = out.GetByteValue();
-    if (!outbv) return false;
+    if (!outbv)
+      return false;
     assert(len <= outbv->GetLength());
-    if (buffer) memcpy(buffer, outbv->GetPointer(), len);
+    if (buffer)
+      memcpy(buffer, outbv->GetPointer(), len);
     lossyflag = codec.IsLossy();
     if (codec.IsLossy() != ts.IsLossy())
     {
@@ -677,21 +730,24 @@ bool Bitmap::TryJPEGLSCodec(char * buffer, bool & lossyflag) const
   return false;
 }
 
-bool Bitmap::TryJPEG2000Codec(char * buffer, bool & lossyflag) const
+bool
+Bitmap::TryJPEG2000Codec(char * buffer, bool & lossyflag) const
 {
-  JPEG2000Codec codec;
+  JPEG2000Codec          codec;
   const TransferSyntax & ts = GetTransferSyntax();
   if (!buffer)
   {
     if (codec.CanDecode(ts))
     {
-      TransferSyntax ts2;
+      TransferSyntax              ts2;
       const SequenceOfFragments * sf = PixelData.GetSequenceOfFragments();
-      if (!sf) return false;
-      const Fragment & frag = sf->GetFragment(0);
-      const ByteValue & bv2 = dynamic_cast<const ByteValue&>(frag.GetValue());
-      bool b = codec.GetHeaderInfo(bv2.GetPointer(), bv2.GetLength(), ts2);
-      if (!b) return false;
+      if (!sf)
+        return false;
+      const Fragment &  frag = sf->GetFragment(0);
+      const ByteValue & bv2 = dynamic_cast<const ByteValue &>(frag.GetValue());
+      bool              b = codec.GetHeaderInfo(bv2.GetPointer(), bv2.GetLength(), ts2);
+      if (!b)
+        return false;
       lossyflag = codec.IsLossy();
       const PixelFormat & cpf = codec.GetPixelFormat();
       const PixelFormat & pf = GetPixelFormat();
@@ -703,7 +759,7 @@ bool Bitmap::TryJPEG2000Codec(char * buffer, bool & lossyflag) const
           {
             if (cpf.GetBitsStored() < pf.GetBitsStored())
             {
-              Bitmap * i = const_cast<Bitmap*>(this);
+              Bitmap * i = const_cast<Bitmap *>(this);
               mdcmWarningMacro("Encapsulated stream has fewer bits actually stored on disk. correcting.");
               i->GetPixelFormat().SetBitsStored(cpf.GetBitsStored());
             }
@@ -713,7 +769,7 @@ bool Bitmap::TryJPEG2000Codec(char * buffer, bool & lossyflag) const
       else
       {
         mdcmWarningMacro("Bits Allocated are different. This is pretty bad using info from codestream");
-        Bitmap * i = const_cast<Bitmap*>(this);
+        Bitmap * i = const_cast<Bitmap *>(this);
         i->SetPixelFormat(codec.GetPixelFormat());
       }
       return true;
@@ -728,15 +784,18 @@ bool Bitmap::TryJPEG2000Codec(char * buffer, bool & lossyflag) const
     codec.SetPlanarConfiguration(GetPlanarConfiguration());
     codec.SetPhotometricInterpretation(GetPhotometricInterpretation());
     codec.SetNeedOverlayCleanup(AreOverlaysInPixelData() ||
-      (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
+                                (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
     codec.SetDimensions(GetDimensions());
     DataElement out;
-    bool r = codec.Decode(PixelData, out);
-    if (!r) return false;
+    bool        r = codec.Decode(PixelData, out);
+    if (!r)
+      return false;
     const ByteValue * outbv = out.GetByteValue();
-    if (!outbv) return false;
+    if (!outbv)
+      return false;
     assert(len <= outbv->GetLength());
-    if (buffer) memcpy(buffer, outbv->GetPointer(), len);
+    if (buffer)
+      memcpy(buffer, outbv->GetPointer(), len);
     lossyflag = codec.IsLossy();
     if (codec.IsLossy() && !ts.IsLossy())
     {
@@ -754,7 +813,7 @@ bool Bitmap::TryJPEG2000Codec(char * buffer, bool & lossyflag) const
         {
           if (cpf.GetBitsStored() < pf.GetBitsStored())
           {
-            Bitmap * i = const_cast<Bitmap*>(this);
+            Bitmap * i = const_cast<Bitmap *>(this);
             mdcmWarningMacro("Encapsulated stream has fewer bits actually stored on disk. correcting.");
             i->GetPixelFormat().SetBitsStored(cpf.GetBitsStored());
           }
@@ -766,10 +825,11 @@ bool Bitmap::TryJPEG2000Codec(char * buffer, bool & lossyflag) const
   return false;
 }
 
-bool Bitmap::TryJPEG2000Codec2(std::ostream &os) const
+bool
+Bitmap::TryJPEG2000Codec2(std::ostream & os) const
 {
-  const TransferSyntax &ts = GetTransferSyntax();
-  JPEG2000Codec codec;
+  const TransferSyntax & ts = GetTransferSyntax();
+  JPEG2000Codec          codec;
   if (codec.CanCode(ts))
   {
     codec.SetDimensions(GetDimensions());
@@ -778,23 +838,26 @@ bool Bitmap::TryJPEG2000Codec2(std::ostream &os) const
     codec.SetPlanarConfiguration(GetPlanarConfiguration());
     codec.SetPhotometricInterpretation(GetPhotometricInterpretation());
     codec.SetNeedOverlayCleanup(AreOverlaysInPixelData() ||
-      (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
+                                (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
     DataElement out;
-    bool r = codec.Code(PixelData, out);
-    if (!r) return false;
+    bool        r = codec.Code(PixelData, out);
+    if (!r)
+      return false;
     const ByteValue * outbv = out.GetByteValue();
-    if (!outbv) return false;
+    if (!outbv)
+      return false;
     os.write(outbv->GetPointer(), outbv->GetLength());
     return r;
   }
   return false;
 }
 
-bool Bitmap::TryRLECodec(char * buffer, bool & lossyflag ) const
+bool
+Bitmap::TryRLECodec(char * buffer, bool & lossyflag) const
 {
-  unsigned long long len = GetBufferLength();
-  const TransferSyntax &ts = GetTransferSyntax();
-  RLECodec codec;
+  unsigned long long     len = GetBufferLength();
+  const TransferSyntax & ts = GetTransferSyntax();
+  RLECodec               codec;
   if (codec.CanDecode(ts))
   {
     codec.SetDimensions(GetDimensions());
@@ -804,31 +867,41 @@ bool Bitmap::TryRLECodec(char * buffer, bool & lossyflag ) const
     codec.SetPixelFormat(GetPixelFormat());
     codec.SetLUT(GetLUT());
     codec.SetNeedOverlayCleanup(AreOverlaysInPixelData() ||
-      (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
+                                (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
     codec.SetBufferLength(len);
     DataElement out;
-    bool r = codec.Decode(PixelData, out);
-    if (!r) return false;
+    bool        r = codec.Decode(PixelData, out);
+    if (!r)
+      return false;
     const ByteValue * outbv = out.GetByteValue();
     assert(len <= outbv->GetLength());
-    if (buffer) memcpy(buffer, outbv->GetPointer(), len);
+    if (buffer)
+      memcpy(buffer, outbv->GetPointer(), len);
     lossyflag = false;
     return true;
   }
   return false;
 }
 
-bool Bitmap::GetBufferInternal(char * buffer, bool & lossyflag) const
+bool
+Bitmap::GetBufferInternal(char * buffer, bool & lossyflag) const
 {
   bool success = false;
-  if (!success) success = TryRAWCodec(buffer, lossyflag);
-  if (!success) success = TryJPEGCodec(buffer, lossyflag);
-  if (!success) success = TryPVRGCodec(buffer, lossyflag);
-  if (!success) success = TryJPEG2000Codec(buffer, lossyflag);
-  if (!success) success = TryJPEGLSCodec(buffer, lossyflag);
-  if (!success) success = TryRLECodec(buffer, lossyflag);
-  if (!success) buffer = 0;
+  if (!success)
+    success = TryRAWCodec(buffer, lossyflag);
+  if (!success)
+    success = TryJPEGCodec(buffer, lossyflag);
+  if (!success)
+    success = TryPVRGCodec(buffer, lossyflag);
+  if (!success)
+    success = TryJPEG2000Codec(buffer, lossyflag);
+  if (!success)
+    success = TryJPEGLSCodec(buffer, lossyflag);
+  if (!success)
+    success = TryRLECodec(buffer, lossyflag);
+  if (!success)
+    buffer = 0;
   return success;
 }
 
-}
+} // namespace mdcm

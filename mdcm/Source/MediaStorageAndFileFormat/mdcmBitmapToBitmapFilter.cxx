@@ -28,23 +28,22 @@
 namespace mdcm
 {
 
-BitmapToBitmapFilter::BitmapToBitmapFilter()
-{
-}
+BitmapToBitmapFilter::BitmapToBitmapFilter() {}
 
-void BitmapToBitmapFilter::SetInput(const Bitmap & image)
+void
+BitmapToBitmapFilter::SetInput(const Bitmap & image)
 {
   Input = image;
   const Bitmap * p = &image;
-  if (dynamic_cast<const Image*>(p))
+  if (dynamic_cast<const Image *>(p))
   {
     Output = new Image;
   }
-  else if (dynamic_cast<const Pixmap*>(p))
+  else if (dynamic_cast<const Pixmap *>(p))
   {
     Output = new Pixmap;
   }
-  else if (dynamic_cast<const Bitmap*>(p))
+  else if (dynamic_cast<const Bitmap *>(p))
   {
     Output = new Bitmap;
   }
@@ -54,12 +53,14 @@ void BitmapToBitmapFilter::SetInput(const Bitmap & image)
   }
 }
 
-const Bitmap & BitmapToBitmapFilter::GetOutput() const
+const Bitmap &
+BitmapToBitmapFilter::GetOutput() const
 {
   return *Output;
 }
 
-const Bitmap & BitmapToBitmapFilter::GetOutputAsBitmap() const
+const Bitmap &
+BitmapToBitmapFilter::GetOutputAsBitmap() const
 {
   return *Output;
 }

@@ -22,7 +22,7 @@
 #include "mdcmSHA1.h"
 #include "mdcmSystem.h"
 #ifdef MDCM_USE_SYSTEM_OPENSSL
-#include <openssl/sha.h>
+#  include <openssl/sha.h>
 #endif
 #include <cstring>
 #include <cstdlib>
@@ -49,20 +49,22 @@ SHA1::~SHA1()
   delete Internals;
 }
 
-bool SHA1::Compute(const char * buffer, unsigned long buf_len, char digest[])
+bool
+SHA1::Compute(const char * buffer, unsigned long buf_len, char digest[])
 {
 #ifdef MDCM_USE_SYSTEM_OPENSSL
-  if(!buffer || !buf_len) return false;
+  if (!buffer || !buf_len)
+    return false;
   unsigned char output[20];
-  SHA_CTX ctx;
+  SHA_CTX       ctx;
   SHA1_Init(&ctx);
   SHA1_Update(&ctx, buffer, buf_len);
   SHA1_Final(output, &ctx);
   for (int di = 0; di < 20; ++di)
   {
-    sprintf(digest+2*di, "%02x", output[di]);
+    sprintf(digest + 2 * di, "%02x", output[di]);
   }
-  digest[2*20] = '\0';
+  digest[2 * 20] = '\0';
   return true;
 #else
   (void)buffer;
@@ -73,43 +75,52 @@ bool SHA1::Compute(const char * buffer, unsigned long buf_len, char digest[])
 }
 
 #ifdef MDCM_USE_SYSTEM_OPENSSL
-static bool process_file(const char * filename, unsigned char * digest)
+static bool
+process_file(const char * filename, unsigned char * digest)
 {
-  if(!filename || !digest) return false;
+  if (!filename || !digest)
+    return false;
   FILE * file = fopen(filename, "rb");
-  if(!file) return false;
+  if (!file)
+    return false;
   size_t file_size = System::FileSize(filename);
   void * buffer = malloc(file_size);
-  if(!buffer)
+  if (!buffer)
   {
     fclose(file);
     return false;
   }
   size_t read = fread(buffer, 1, file_size, file);
-  if(read != file_size) return false;
+  if (read != file_size)
+    return false;
   SHA_CTX ctx;
-  int ret = SHA1_Init(&ctx);
-  if(!ret) return false;
+  int     ret = SHA1_Init(&ctx);
+  if (!ret)
+    return false;
   ret = SHA1_Update(&ctx, buffer, file_size);
-  if(!ret) return false;
+  if (!ret)
+    return false;
   ret = SHA1_Final(digest, &ctx);
-  if(!ret) return false;
+  if (!ret)
+    return false;
   free(buffer);
   fclose(file);
   return true;
 }
 #endif
 
-bool SHA1::ComputeFile(const char * filename, char digest_str[20*2+1])
+bool
+SHA1::ComputeFile(const char * filename, char digest_str[20 * 2 + 1])
 {
 #ifdef MDCM_USE_SYSTEM_OPENSSL
   unsigned char digest[20];
-  if(!process_file(filename, digest)) return false;
+  if (!process_file(filename, digest))
+    return false;
   for (int di = 0; di < 20; ++di)
   {
-    sprintf(digest_str+2*di, "%02x", digest[di]);
+    sprintf(digest_str + 2 * di, "%02x", digest[di]);
   }
-  digest_str[2*20] = '\0';
+  digest_str[2 * 20] = '\0';
   return true;
 #else
   (void)filename;

@@ -43,14 +43,20 @@ class MDCM_EXPORT ImageReader : public PixmapReader
 public:
   ImageReader();
   ~ImageReader();
-  bool Read() override;
-  const Image & GetImage() const;
-  Image & GetImage();
+  bool
+  Read() override;
+  const Image &
+  GetImage() const;
+  Image &
+  GetImage();
+
 protected:
-  bool ReadImage(const MediaStorage &) override;
-  bool ReadACRNEMAImage() override;
+  bool
+  ReadImage(const MediaStorage &) override;
+  bool
+  ReadACRNEMAImage() override;
 };
 
 } // end namespace mdcm
 
-#endif //MDCMIMAGEREADER_H
+#endif // MDCMIMAGEREADER_H

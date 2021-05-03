@@ -39,15 +39,20 @@ public:
     CAPI = 2,
     OPENSSLP7 = 3
   };
-  virtual CryptographicMessageSyntax * CreateCMSProvider() = 0;
+  virtual CryptographicMessageSyntax *
+                         CreateCMSProvider() = 0;
   static CryptoFactory * GetFactoryInstance(CryptoLib = DEFAULT);
+
 protected:
   CryptoFactory(CryptoLib);
   CryptoFactory();
   ~CryptoFactory();
+
 private:
-  static std::map<CryptoLib, CryptoFactory *> & getInstanceMap();
-  static void AddLib(CryptoLib, CryptoFactory *);
+  static std::map<CryptoLib, CryptoFactory *> &
+  getInstanceMap();
+  static void
+  AddLib(CryptoLib, CryptoFactory *);
 };
 
 } // end namespace mdcm

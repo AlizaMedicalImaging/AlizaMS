@@ -36,13 +36,20 @@ class MDCM_EXPORT Dicts
 public:
   Dicts();
   ~Dicts();
-  const DictEntry & GetDictEntry(const Tag &, const char (*)= NULL) const;
-  const DictEntry & GetDictEntry(const PrivateTag &) const;
-  const Dict & GetPublicDict() const;
-  const PrivateDict & GetPrivateDict() const;
-  PrivateDict & GetPrivateDict();
-  const CSAHeaderDict & GetCSAHeaderDict() const;
-  bool IsEmpty() const;
+  const DictEntry &
+  GetDictEntry(const Tag &, const char(*) = NULL) const;
+  const DictEntry &
+  GetDictEntry(const PrivateTag &) const;
+  const Dict &
+  GetPublicDict() const;
+  const PrivateDict &
+  GetPrivateDict() const;
+  PrivateDict &
+  GetPrivateDict();
+  const CSAHeaderDict &
+  GetCSAHeaderDict() const;
+  bool
+  IsEmpty() const;
 
 protected:
   typedef enum
@@ -53,16 +60,18 @@ protected:
   } ConstructorType;
   static const char * GetConstructorString(ConstructorType);
   friend class Global;
-  void LoadDefaults();
+  void
+  LoadDefaults();
 
 private:
-  Dict PublicDict;
-  PrivateDict ShadowDict;
+  Dict          PublicDict;
+  PrivateDict   ShadowDict;
   CSAHeaderDict CSADict;
-  Dicts &operator=(const Dicts &); // purposely not implemented
-  Dicts(const Dicts &); // purposely not implemented
+  Dicts &
+  operator=(const Dicts &); // purposely not implemented
+  Dicts(const Dicts &);     // purposely not implemented
 };
 
 } // end namespace mdcm
 
-#endif //MDCMDICTS_H
+#endif // MDCMDICTS_H

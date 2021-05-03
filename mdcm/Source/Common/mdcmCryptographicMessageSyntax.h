@@ -40,21 +40,29 @@ public:
     AES256_CIPHER  // '   '
   } CipherTypes;
   // X.509
-  virtual bool ParseCertificateFile(const char *) = 0;
-  virtual bool ParseKeyFile(const char *) = 0;
+  virtual bool
+  ParseCertificateFile(const char *) = 0;
+  virtual bool
+  ParseKeyFile(const char *) = 0;
   // PBE
-  virtual bool SetPassword(const char *, size_t) = 0;
+  virtual bool
+  SetPassword(const char *, size_t) = 0;
   // Create a CMS envelopedData structure
-  virtual bool Encrypt(char *, size_t &, const char *, size_t) const = 0;
+  virtual bool
+  Encrypt(char *, size_t &, const char *, size_t) const = 0;
   // Decrypt content from a CMS envelopedData structure
-  virtual bool Decrypt(char *, size_t &, const char *, size_t) const = 0;
+  virtual bool
+               Decrypt(char *, size_t &, const char *, size_t) const = 0;
   virtual void SetCipherType(CipherTypes) = 0;
-  virtual CipherTypes GetCipherType() const = 0;
+  virtual CipherTypes
+  GetCipherType() const = 0;
+
 private:
-  CryptographicMessageSyntax(const CryptographicMessageSyntax &);  // Not implemented
-  void operator=(const CryptographicMessageSyntax&);  // Not implemented
+  CryptographicMessageSyntax(const CryptographicMessageSyntax &); // Not implemented
+  void
+  operator=(const CryptographicMessageSyntax &); // Not implemented
 };
 
 } // end namespace mdcm
 
-#endif //MDCMCRYPTOGRAPHICMESSAGESYNTAX_H
+#endif // MDCMCRYPTOGRAPHICMESSAGESYNTAX_H

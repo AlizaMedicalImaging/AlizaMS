@@ -30,11 +30,11 @@ namespace mdcm
 class MDCM_EXPORT Base64
 {
 public:
-
   /**
    * Call this function to obtain the required buffer size
    */
-  static size_t GetEncodeLength(const char *, size_t);
+  static size_t
+  GetEncodeLength(const char *, size_t);
 
   /**
    *
@@ -46,12 +46,14 @@ public:
    * return 0 if not successful, size of encoded otherwise
    *
    */
-  static size_t Encode(char * dst, size_t dlen, const char * src, size_t slen );
+  static size_t
+  Encode(char * dst, size_t dlen, const char * src, size_t slen);
 
   /**
    * Call this function to obtain the required buffer size
    */
-  static size_t GetDecodeLength(const char *, size_t);
+  static size_t
+  GetDecodeLength(const char *, size_t);
 
   /**
    *
@@ -63,11 +65,13 @@ public:
    * return 0 if not successful, size of decoded otherwise
    *
    */
-  static size_t Decode(char * dst, size_t dlen, const char * src, size_t slen);
+  static size_t
+  Decode(char * dst, size_t dlen, const char * src, size_t slen);
 
 private:
-  Base64(const Base64 &);  // Not implemented.
-  void operator=(const Base64 &);  // Not implemented.
+  Base64(const Base64 &); // Not implemented.
+  void
+  operator=(const Base64 &); // Not implemented.
 };
 
 } // end namespace mdcm

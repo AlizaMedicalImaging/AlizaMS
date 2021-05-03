@@ -34,10 +34,9 @@ namespace mdcm
 {
 
 OpenSSLCryptographicMessageSyntax::OpenSSLCryptographicMessageSyntax()
-  :
-  recips(sk_X509_new_null()),
-  pkey(NULL),
-  password(NULL)
+  : recips(sk_X509_new_null())
+  , pkey(NULL)
+  , password(NULL)
 {
   cipherType = AES128_CIPHER;
   internalCipherType = CreateCipher(cipherType);
@@ -47,21 +46,25 @@ OpenSSLCryptographicMessageSyntax::~OpenSSLCryptographicMessageSyntax()
 {
   EVP_PKEY_free(pkey);
   sk_X509_free(recips);
-  if (password) delete[] password;
+  if (password)
+    delete[] password;
 }
 
-void OpenSSLCryptographicMessageSyntax::SetCipherType(CryptographicMessageSyntax::CipherTypes type)
+void
+OpenSSLCryptographicMessageSyntax::SetCipherType(CryptographicMessageSyntax::CipherTypes type)
 {
   internalCipherType = CreateCipher(type);
   cipherType = type;
 }
 
-CryptographicMessageSyntax::CipherTypes OpenSSLCryptographicMessageSyntax::GetCipherType() const
+CryptographicMessageSyntax::CipherTypes
+OpenSSLCryptographicMessageSyntax::GetCipherType() const
 {
   return cipherType;
 }
 
-bool OpenSSLCryptographicMessageSyntax::SetPassword(const char * pass, size_t passLen)
+bool
+OpenSSLCryptographicMessageSyntax::SetPassword(const char * pass, size_t passLen)
 {
   assert(pass);
   if (password)
@@ -74,13 +77,13 @@ bool OpenSSLCryptographicMessageSyntax::SetPassword(const char * pass, size_t pa
   return true;
 }
 
-bool OpenSSLCryptographicMessageSyntax::Encrypt(
-  char * output, size_t & outlen, const char * array, size_t len) const
+bool
+OpenSSLCryptographicMessageSyntax::Encrypt(char * output, size_t & outlen, const char * array, size_t len) const
 {
-  BIO * in = NULL, * out = NULL;
+  BIO *             in = NULL, *out = NULL;
   CMS_ContentInfo * cms = NULL;
-  int flags = CMS_BINARY | CMS_PARTIAL;
-  bool ret = false;
+  int               flags = CMS_BINARY | CMS_PARTIAL;
+  bool              ret = false;
   if (!password && ::sk_X509_num(recips) == 0)
   {
     mdcmErrorMacro("No password or recipients added.");
@@ -88,18 +91,18 @@ bool OpenSSLCryptographicMessageSyntax::Encrypt(
   }
   // RAND_status() and RAND_event() return 1 if the PRNG has been seeded with
   // enough data, 0 otherwise.
-  if(!RAND_status())
+  if (!RAND_status())
   {
     mdcmErrorMacro("PRNG was not seeded properly");
     goto err;
   }
-  if(len > (size_t)std::numeric_limits<int>::max())
+  if (len > (size_t)std::numeric_limits<int>::max())
   {
     mdcmErrorMacro("len is too big: " << len);
     goto err;
   }
-  in = BIO_new_mem_buf((const void*)array, (int)len);
-  if(!in)
+  in = BIO_new_mem_buf((const void *)array, (int)len);
+  if (!in)
   {
     mdcmErrorMacro("Error at creating the input memory buffer.");
     goto err;
@@ -119,14 +122,16 @@ bool OpenSSLCryptographicMessageSyntax::Encrypt(
   if (password)
   {
     unsigned char * pwri_tmp = (unsigned char *)BUF_memdup(password, passwordLength);
-    if (!pwri_tmp) goto err;
+    if (!pwri_tmp)
+      goto err;
     if (!CMS_add0_recipient_password(cms, -1, NID_undef, NID_undef, pwri_tmp, passwordLength, NULL))
     {
       goto err;
     }
     pwri_tmp = NULL;
   }
-  if (!CMS_final(cms, in, NULL, flags)) goto err;
+  if (!CMS_final(cms, in, NULL, flags))
+    goto err;
   if (!i2d_CMS_bio(out, cms))
   {
     mdcmErrorMacro("Error at writing CMS structure to output.");
@@ -148,25 +153,28 @@ err:
     outlen = 0;
     mdcmErrorMacro(ERR_error_string(ERR_peek_error(), NULL));
   }
-  if (cms) CMS_ContentInfo_free(cms);
-  if (in)  BIO_free(in);
-  if (out) BIO_free(out);
+  if (cms)
+    CMS_ContentInfo_free(cms);
+  if (in)
+    BIO_free(in);
+  if (out)
+    BIO_free(out);
   return ret;
 }
 
-bool OpenSSLCryptographicMessageSyntax::Decrypt(
-  char * output, size_t & outlen, const char * array, size_t len) const
+bool
+OpenSSLCryptographicMessageSyntax::Decrypt(char * output, size_t & outlen, const char * array, size_t len) const
 {
-  BIO * in = NULL, * out = NULL;
+  BIO *             in = NULL, *out = NULL;
   CMS_ContentInfo * cms = NULL;
-  bool ret = false;
-  int flags = /*CMS_DETACHED | */ CMS_BINARY;
+  bool              ret = false;
+  int               flags = /*CMS_DETACHED | */ CMS_BINARY;
   if (!password && pkey == NULL)
   {
     mdcmErrorMacro("No password or private key specified.");
     goto err;
   }
-  in = BIO_new_mem_buf((const void*)array, (int)len);
+  in = BIO_new_mem_buf((const void *)array, (int)len);
   if (!in)
   {
     mdcmErrorMacro("Error at creating the input memory buffer.");
@@ -186,7 +194,7 @@ bool OpenSSLCryptographicMessageSyntax::Decrypt(
   }
   if (password)
   {
-    if (!CMS_decrypt_set1_password(cms, (unsigned char*)password, passwordLength))
+    if (!CMS_decrypt_set1_password(cms, (unsigned char *)password, passwordLength))
     {
       mdcmErrorMacro("Error at setting the decryption password.");
       goto err;
@@ -213,22 +221,26 @@ err:
     outlen = 0;
     mdcmErrorMacro(ERR_error_string(ERR_peek_error(), NULL));
   }
-  if (cms) CMS_ContentInfo_free(cms);
-  if (in)  BIO_free(in);
-  if (out) BIO_free(out);
+  if (cms)
+    CMS_ContentInfo_free(cms);
+  if (in)
+    BIO_free(in);
+  if (out)
+    BIO_free(out);
   return ret;
 }
 
-bool OpenSSLCryptographicMessageSyntax::ParseKeyFile(const char * keyfile)
+bool
+OpenSSLCryptographicMessageSyntax::ParseKeyFile(const char * keyfile)
 {
-  ::BIO * in;
+  ::BIO *      in;
   ::EVP_PKEY * new_pkey;
-  if ((in = ::BIO_new_file(keyfile,"r")) == NULL)
+  if ((in = ::BIO_new_file(keyfile, "r")) == NULL)
   {
     return false;
   }
   (void)BIO_reset(in);
-  if ((new_pkey = PEM_read_bio_PrivateKey(in,NULL,NULL,NULL)) == NULL)
+  if ((new_pkey = PEM_read_bio_PrivateKey(in, NULL, NULL, NULL)) == NULL)
   {
     return false;
   }
@@ -241,17 +253,18 @@ bool OpenSSLCryptographicMessageSyntax::ParseKeyFile(const char * keyfile)
   return true;
 }
 
-bool OpenSSLCryptographicMessageSyntax::ParseCertificateFile(const char * keyfile)
+bool
+OpenSSLCryptographicMessageSyntax::ParseCertificateFile(const char * keyfile)
 {
   assert(recips);
   ::X509 * x509 = NULL;
-  ::BIO * in;
-  if (!(in = ::BIO_new_file(keyfile,"r")))
+  ::BIO *  in;
+  if (!(in = ::BIO_new_file(keyfile, "r")))
   {
     return false;
   }
   // -> LEAK reported by valgrind...
-  if (!(x509=::PEM_read_bio_X509(in,NULL,NULL,NULL)))
+  if (!(x509 = ::PEM_read_bio_X509(in, NULL, NULL, NULL)))
   {
     return false;
   }
@@ -261,28 +274,28 @@ bool OpenSSLCryptographicMessageSyntax::ParseCertificateFile(const char * keyfil
   return true;
 }
 
-const EVP_CIPHER * OpenSSLCryptographicMessageSyntax::CreateCipher(CryptographicMessageSyntax::CipherTypes ciphertype)
+const EVP_CIPHER *
+OpenSSLCryptographicMessageSyntax::CreateCipher(CryptographicMessageSyntax::CipherTypes ciphertype)
 {
   const EVP_CIPHER * cipher = 0;
-  switch(ciphertype)
+  switch (ciphertype)
   {
-  case CryptographicMessageSyntax::DES3_CIPHER:   // Triple DES
-    cipher = EVP_des_ede3_cbc();
-    break;
-  case CryptographicMessageSyntax::AES128_CIPHER: // CBC AES
-    cipher = EVP_aes_128_cbc();
-    break;
-  case CryptographicMessageSyntax::AES192_CIPHER: // '   '
-    cipher = EVP_aes_192_cbc();
-    break;
-  case CryptographicMessageSyntax::AES256_CIPHER: // '   '
-    cipher = EVP_aes_256_cbc();
-    break;
-  default:
-    break;
+    case CryptographicMessageSyntax::DES3_CIPHER: // Triple DES
+      cipher = EVP_des_ede3_cbc();
+      break;
+    case CryptographicMessageSyntax::AES128_CIPHER: // CBC AES
+      cipher = EVP_aes_128_cbc();
+      break;
+    case CryptographicMessageSyntax::AES192_CIPHER: // '   '
+      cipher = EVP_aes_192_cbc();
+      break;
+    case CryptographicMessageSyntax::AES256_CIPHER: // '   '
+      cipher = EVP_aes_256_cbc();
+      break;
+    default:
+      break;
   }
   return cipher;
 }
 
 } // end namespace mdcm
-

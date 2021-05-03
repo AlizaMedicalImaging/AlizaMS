@@ -43,16 +43,34 @@ namespace mdcm
 class MDCM_EXPORT Dict
 {
 public:
-  typedef std::map<Tag, DictEntry> MapDictEntry;
-  typedef MapDictEntry::iterator Iterator;
+  typedef std::map<Tag, DictEntry>     MapDictEntry;
+  typedef MapDictEntry::iterator       Iterator;
   typedef MapDictEntry::const_iterator ConstIterator;
-  Dict() : DictInternal() { assert(DictInternal.empty()); }
-  friend std::ostream& operator<<(std::ostream &, const Dict &);
-  ConstIterator Begin() const { return DictInternal.begin(); }
-  ConstIterator End() const { return DictInternal.end(); }
-  bool IsEmpty() const { return DictInternal.empty(); }
+  Dict()
+    : DictInternal()
+  {
+    assert(DictInternal.empty());
+  }
+  friend std::ostream &
+  operator<<(std::ostream &, const Dict &);
+  ConstIterator
+  Begin() const
+  {
+    return DictInternal.begin();
+  }
+  ConstIterator
+  End() const
+  {
+    return DictInternal.end();
+  }
+  bool
+  IsEmpty() const
+  {
+    return DictInternal.empty();
+  }
 
-  void AddDictEntry(const Tag & tag, const DictEntry & de)
+  void
+  AddDictEntry(const Tag & tag, const DictEntry & de)
   {
 #ifndef NDEBUG
     MapDictEntry::size_type s = DictInternal.size();
@@ -61,19 +79,21 @@ public:
     assert(s < DictInternal.size());
   }
 
-  const DictEntry & GetDictEntry(const Tag & tag) const
+  const DictEntry &
+  GetDictEntry(const Tag & tag) const
   {
     MapDictEntry::const_iterator it = DictInternal.find(tag);
     if (it == DictInternal.end())
     {
-      it = DictInternal.find(Tag(0xffff,0xffff));
+      it = DictInternal.find(Tag(0xffff, 0xffff));
       return it->second;
     }
     assert(DictInternal.count(tag) == 1);
     return it->second;
   }
 
-  const char * GetKeywordFromTag(Tag const & tag) const
+  const char *
+  GetKeywordFromTag(Tag const & tag) const
   {
     MapDictEntry::const_iterator it = DictInternal.find(tag);
     if (it == DictInternal.end())
@@ -88,15 +108,15 @@ public:
   // as being unique. The lookup table is built on Tag. Therefore
   // looking up a DictEntry by Keyword is more inefficient than looking up
   // by Tag.
-  const DictEntry & GetDictEntryByKeyword(const char * keyword, Tag & tag) const
+  const DictEntry &
+  GetDictEntryByKeyword(const char * keyword, Tag & tag) const
   {
-    MapDictEntry::const_iterator it =
-      DictInternal.begin();
-    if(keyword)
+    MapDictEntry::const_iterator it = DictInternal.begin();
+    if (keyword)
     {
-      for(; it != DictInternal.end(); ++it)
+      for (; it != DictInternal.end(); ++it)
       {
-        if(strcmp(keyword, it->second.GetKeyword()) == 0)
+        if (strcmp(keyword, it->second.GetKeyword()) == 0)
         {
           tag = it->first;
           break;
@@ -109,7 +129,7 @@ public:
     }
     if (it == DictInternal.end())
     {
-      tag = Tag(0xffff,0xffff);
+      tag = Tag(0xffff, 0xffff);
       it = DictInternal.find(tag);
       return it->second;
     }
@@ -119,20 +139,23 @@ public:
 
 protected:
   friend class Dicts;
-  void LoadDefault();
+  void
+  LoadDefault();
 
 private:
-  Dict &operator=(const Dict &); // purposely not implemented
-  Dict(const Dict &); // purposely not implemented
+  Dict &
+  operator=(const Dict &); // purposely not implemented
+  Dict(const Dict &);      // purposely not implemented
   MapDictEntry DictInternal;
 };
 
-inline std::ostream& operator<<(std::ostream & os, const Dict & val)
+inline std::ostream &
+operator<<(std::ostream & os, const Dict & val)
 {
   Dict::MapDictEntry::const_iterator it = val.DictInternal.begin();
-  for(;it != val.DictInternal.end(); ++it)
+  for (; it != val.DictInternal.end(); ++it)
   {
-    const Tag & t = it->first;
+    const Tag &       t = it->first;
     const DictEntry & de = it->second;
     os << t << " " << de << '\n';
   }
@@ -146,11 +169,14 @@ inline std::ostream& operator<<(std::ostream & os, const Dict & val)
 class MDCM_EXPORT PrivateDict
 {
   typedef std::map<PrivateTag, DictEntry> MapDictEntry;
-  friend std::ostream& operator<<(std::ostream &, const PrivateDict &);
+  friend std::ostream &
+  operator<<(std::ostream &, const PrivateDict &);
+
 public:
-  PrivateDict()  {}
+  PrivateDict() {}
   ~PrivateDict() {}
-  void AddDictEntry(const PrivateTag & tag, const DictEntry & de)
+  void
+  AddDictEntry(const PrivateTag & tag, const DictEntry & de)
   {
 #ifndef NDEBUG
     MapDictEntry::size_type s = DictInternal.size();
@@ -159,17 +185,18 @@ public:
     assert(s < DictInternal.size());
   }
 
-  bool RemoveDictEntry(const PrivateTag & tag)
+  bool
+  RemoveDictEntry(const PrivateTag & tag)
   {
     MapDictEntry::size_type s = DictInternal.erase(tag);
     assert(s == 1 || s == 0);
     return s == 1;
   }
 
-  bool FindDictEntry(const PrivateTag & tag) const
+  bool
+  FindDictEntry(const PrivateTag & tag) const
   {
-    MapDictEntry::const_iterator it =
-      DictInternal.find(tag);
+    MapDictEntry::const_iterator it = DictInternal.find(tag);
     if (it == DictInternal.end())
     {
       return false;
@@ -177,36 +204,34 @@ public:
     return true;
   }
 
-  const DictEntry & GetDictEntry(const PrivateTag & tag) const
+  const DictEntry &
+  GetDictEntry(const PrivateTag & tag) const
   {
     MapDictEntry::const_iterator it = DictInternal.find(tag);
     if (it == DictInternal.end())
     {
-      it = DictInternal.find(PrivateTag(
-        0xffff,0xffff,"MDCM Private Sentinel"));
-      assert (it != DictInternal.end());
+      it = DictInternal.find(PrivateTag(0xffff, 0xffff, "MDCM Private Sentinel"));
+      assert(it != DictInternal.end());
       return it->second;
     }
     assert(DictInternal.count(tag) == 1);
     return it->second;
   }
 
-  void PrintXML() const
+  void
+  PrintXML() const
   {
     MapDictEntry::const_iterator it = DictInternal.begin();
     std::cout << "<dict edition=\"2008\">\n";
-    for(;it != DictInternal.end(); ++it)
+    for (; it != DictInternal.end(); ++it)
     {
       const PrivateTag & t = it->first;
-      const DictEntry & de = it->second;
-      std::cout << "  <entry group=\"" << std::hex << std::setw(4)
-        << std::setfill('0') << t.GetGroup() << "\"" <<
-        " element=\"xx" << std::setw(2) << std::setfill('0')
-        << t.GetElement() << "\"" << " vr=\""
-        << de.GetVR() << "\" vm=\"" << de.GetVM() << "\" owner=\""
-        << t.GetOwner();
+      const DictEntry &  de = it->second;
+      std::cout << "  <entry group=\"" << std::hex << std::setw(4) << std::setfill('0') << t.GetGroup() << "\""
+                << " element=\"xx" << std::setw(2) << std::setfill('0') << t.GetElement() << "\""
+                << " vr=\"" << de.GetVR() << "\" vm=\"" << de.GetVM() << "\" owner=\"" << t.GetOwner();
       const char * name = de.GetName();
-      if(*name == 0)
+      if (*name == 0)
       {
         std::cout << "\"/>\n";
       }
@@ -218,25 +243,32 @@ public:
     std::cout << "</dict>\n";
   }
 
-  bool IsEmpty() const { return DictInternal.empty(); }
+  bool
+  IsEmpty() const
+  {
+    return DictInternal.empty();
+  }
 
 protected:
   friend class Dicts;
-  void LoadDefault();
+  void
+  LoadDefault();
 
 private:
-  PrivateDict &operator=(const PrivateDict &); // purposely not implemented
+  PrivateDict &
+  operator=(const PrivateDict &);   // purposely not implemented
   PrivateDict(const PrivateDict &); // purposely not implemented
   MapDictEntry DictInternal;
 };
 
-inline std::ostream& operator<<(std::ostream & os, const PrivateDict & val)
+inline std::ostream &
+operator<<(std::ostream & os, const PrivateDict & val)
 {
   PrivateDict::MapDictEntry::const_iterator it = val.DictInternal.begin();
-  for(;it != val.DictInternal.end(); ++it)
+  for (; it != val.DictInternal.end(); ++it)
   {
     const PrivateTag & t = it->first;
-    const DictEntry & de = it->second;
+    const DictEntry &  de = it->second;
     os << t << " " << de << '\n';
   }
   return os;
@@ -244,4 +276,4 @@ inline std::ostream& operator<<(std::ostream & os, const PrivateDict & val)
 
 } // end namespace mdcm
 
-#endif //MDCMDICT_H
+#endif // MDCMDICT_H

@@ -36,30 +36,46 @@ public:
   CAPICryptographicMessageSyntax();
   ~CAPICryptographicMessageSyntax();
   // X.509
-  bool ParseCertificateFile(const char *) override;
-  bool ParseKeyFile(const char *) override;
+  bool
+  ParseCertificateFile(const char *) override;
+  bool
+  ParseKeyFile(const char *) override;
   // PBE
-  bool SetPassword(const char *, size_t) override;
+  bool
+       SetPassword(const char *, size_t) override;
   void SetCipherType(CipherTypes) override;
-  CipherTypes GetCipherType() const override;
+  CipherTypes
+  GetCipherType() const override;
   // Create a CMS envelopedData structure
-  bool Encrypt(char *, size_t &, const char *, size_t) const override;
+  bool
+  Encrypt(char *, size_t &, const char *, size_t) const override;
   // Decrypt content from a CMS envelopedData structure
-  bool Decrypt(char *, size_t &, const char *, size_t) const override;
-  bool GetInitialized() const { return initialized; }
+  bool
+  Decrypt(char *, size_t &, const char *, size_t) const override;
+  bool
+  GetInitialized() const
+  {
+    return initialized;
+  }
+
 private:
-  bool Initialize();
-  static ALG_ID GetAlgIdByObjId(const char *);
-  const char * GetCipherObjId() const;
-  static void ReverseBytes(BYTE * data, DWORD len);
-  static bool LoadFile(const char *, BYTE* &, DWORD &);
-  bool initialized;
-  HCRYPTPROV hProv;
+  bool
+  Initialize();
+  static ALG_ID
+  GetAlgIdByObjId(const char *);
+  const char *
+  GetCipherObjId() const;
+  static void
+  ReverseBytes(BYTE * data, DWORD len);
+  static bool
+                              LoadFile(const char *, BYTE *&, DWORD &);
+  bool                        initialized;
+  HCRYPTPROV                  hProv;
   std::vector<PCCERT_CONTEXT> certifList;
-  HCRYPTKEY hRsaPrivK;
-  CipherTypes cipherType;
+  HCRYPTKEY                   hRsaPrivK;
+  CipherTypes                 cipherType;
 };
 
 } // end namespace mdcm
 
-#endif //MDCMCAPICRYPTOGRAPHICMESSAGESYNTAX_H
+#endif // MDCMCAPICRYPTOGRAPHICMESSAGESYNTAX_H

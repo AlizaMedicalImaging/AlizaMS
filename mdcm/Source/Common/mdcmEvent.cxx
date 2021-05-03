@@ -21,9 +21,10 @@ Event::Event() {}
 Event::Event(const Event &) {}
 Event::~Event() {}
 
-void Event::Print(std::ostream & os) const
+void
+Event::Print(std::ostream & os) const
 {
   os << GetEventName();
 }
 
-}
+} // namespace mdcm

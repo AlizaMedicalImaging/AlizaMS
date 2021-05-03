@@ -27,17 +27,26 @@
 namespace mdcm
 {
 
-static bool IsToBeRemoved(int c)
+static bool
+IsToBeRemoved(int c)
 {
-  if (isspace(c)) return true;
-  if(c == '-')    return true;
-  if(c == '/')    return true;
-  if(c == '\'')   return true;
-  if(c == '(')    return true;
-  if(c == ')')    return true;
-  if(c == '&')    return true;
-  if(c == ',')    return true;
+  if (isspace(c))
+    return true;
+  if (c == '-')
+    return true;
+  if (c == '/')
+    return true;
+  if (c == '\'')
+    return true;
+  if (c == '(')
+    return true;
+  if (c == ')')
+    return true;
+  if (c == '&')
+    return true;
+  if (c == ',')
+    return true;
   return false;
 }
 
-}
+} // namespace mdcm

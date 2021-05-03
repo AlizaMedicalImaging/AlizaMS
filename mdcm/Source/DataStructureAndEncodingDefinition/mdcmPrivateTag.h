@@ -34,53 +34,59 @@ namespace mdcm
 
 class MDCM_EXPORT PrivateTag : public Tag
 {
-  friend std::ostream& operator<<(std::ostream & _os, const PrivateTag & _val);
+  friend std::ostream &
+  operator<<(std::ostream & _os, const PrivateTag & _val);
 
 public:
-  PrivateTag(
-    uint16_t group = 0,
-    uint16_t element = 0,
-    const char * owner = "")
-    :
-    Tag(group,element),
-    Owner(owner ? LOComp::Trim(owner) : "")
+  PrivateTag(uint16_t group = 0, uint16_t element = 0, const char * owner = "")
+    : Tag(group, element)
+    , Owner(owner ? LOComp::Trim(owner) : "")
   {
     // truncate the high bits
-    SetElement( (uint8_t)element );
+    SetElement((uint8_t)element);
   }
-  PrivateTag(
-    Tag const & t,
-    const char * owner = "")
-    :
-    Tag(t),
-    Owner(owner ? LOComp::Trim(owner) : "")
+  PrivateTag(Tag const & t, const char * owner = "")
+    : Tag(t)
+    , Owner(owner ? LOComp::Trim(owner) : "")
   {
     // truncate the high bits
-    SetElement( (uint8_t)t.GetElement());
+    SetElement((uint8_t)t.GetElement());
   }
-  const char * GetOwner() const { return Owner.c_str(); }
-  void SetOwner(const char * owner) { if(owner) Owner = LOComp::Trim(owner); }
-  bool operator<(const PrivateTag &_val) const;
+  const char *
+  GetOwner() const
+  {
+    return Owner.c_str();
+  }
+  void
+  SetOwner(const char * owner)
+  {
+    if (owner)
+      Owner = LOComp::Trim(owner);
+  }
+  bool
+  operator<(const PrivateTag & _val) const;
   // Element number will be truncated to 8bits.
   // Eg: "1234,5678,MDCM" is private tag: (1234,78,"MDCM")
-  bool ReadFromCommaSeparatedString(const char *str);
-  DataElement GetAsDataElement() const;
+  bool
+  ReadFromCommaSeparatedString(const char * str);
+  DataElement
+  GetAsDataElement() const;
 
 private:
   std::string Owner;
 };
 
-inline std::ostream& operator<<(std::ostream &os, const PrivateTag &val)
+inline std::ostream &
+operator<<(std::ostream & os, const PrivateTag & val)
 {
-  os.setf( std::ios::right );
-  os << std::hex << '(' << std::setw( 4 ) << std::setfill( '0' )
-    << val[0] << ',' << std::setw( 2 ) << std::setfill( '0' )
-    << val[1] << ',';
+  os.setf(std::ios::right);
+  os << std::hex << '(' << std::setw(4) << std::setfill('0') << val[0] << ',' << std::setw(2) << std::setfill('0')
+     << val[1] << ',';
   os << val.Owner;
-  os << ')' << std::setfill( ' ' ) << std::dec;
+  os << ')' << std::setfill(' ') << std::dec;
   return os;
 }
 
 } // end namespace mdcm
 
-#endif //MDCMPRIVATETAG_H
+#endif // MDCMPRIVATETAG_H

@@ -44,17 +44,24 @@ class MDCM_EXPORT FileDecompressLookupTable : public Subject
 public:
   FileDecompressLookupTable() {}
   ~FileDecompressLookupTable() {}
-  bool Change();
-  void SetFile(const File &);
-  File & GetFile();
-  const Pixmap & GetPixmap() const;
-  Pixmap & GetPixmap();
-  void SetPixmap(Pixmap const &);
+  bool
+  Change();
+  void
+  SetFile(const File &);
+  File &
+  GetFile();
+  const Pixmap &
+  GetPixmap() const;
+  Pixmap &
+  GetPixmap();
+  void
+  SetPixmap(Pixmap const &);
+
 private:
-  SmartPointer<File> F;
+  SmartPointer<File>   F;
   SmartPointer<Pixmap> PixelData;
 };
 
 } // end namespace mdcm
 
-#endif //MDCMFILEDECOMPRESSLOOKUPTABLE_H
+#endif // MDCMFILEDECOMPRESSLOOKUPTABLE_H

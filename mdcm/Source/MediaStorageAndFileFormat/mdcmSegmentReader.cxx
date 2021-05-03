@@ -27,24 +27,22 @@
 namespace mdcm
 {
 
-SegmentReader::SegmentReader()
+SegmentReader::SegmentReader() {}
+
+SegmentReader::~SegmentReader() {}
+
+const SegmentReader::SegmentVector
+SegmentReader::GetSegments() const
 {
+  return const_cast<SegmentReader *>(this)->GetSegments();
 }
 
-SegmentReader::~SegmentReader()
-{
-}
-
-const SegmentReader::SegmentVector SegmentReader::GetSegments() const
-{
-  return const_cast<SegmentReader*>(this)->GetSegments();
-}
-
-SegmentReader::SegmentVector SegmentReader::GetSegments()
+SegmentReader::SegmentVector
+SegmentReader::GetSegments()
 {
   SegmentVector res;
   // Make a segment vector from map with no duplicate.
-  SegmentMap::const_iterator itMap    = Segments.begin();
+  SegmentMap::const_iterator itMap = Segments.begin();
   SegmentMap::const_iterator itMapEnd = Segments.end();
   if (itMap != itMapEnd)
   {
@@ -62,29 +60,30 @@ SegmentReader::SegmentVector SegmentReader::GetSegments()
       {
         itVec++;
       }
-      if (itVec == itVecEnd) res.push_back(itMap->second);
+      if (itVec == itVecEnd)
+        res.push_back(itMap->second);
     }
   }
   return res;
 }
 
-bool SegmentReader::Read()
+bool
+SegmentReader::Read()
 {
   bool res = false;
-  if(!Reader::Read())
+  if (!Reader::Read())
   {
     return res;
   }
   const FileMetaInformation & header = F->GetHeader();
-  MediaStorage ms = header.GetMediaStorage();
-  if(ms == MediaStorage::SegmentationStorage ||
-     ms == MediaStorage::SurfaceSegmentationStorage)
+  MediaStorage                ms = header.GetMediaStorage();
+  if (ms == MediaStorage::SegmentationStorage || ms == MediaStorage::SurfaceSegmentationStorage)
   {
     res = ReadSegments();
   }
   else
   {
-    const char * modality = ms.GetModality();
+    const char *    modality = ms.GetModality();
     const DataSet & dsRoot = F->GetDataSet();
     if (modality != 0)
     {
@@ -106,15 +105,16 @@ bool SegmentReader::Read()
   return res;
 }
 
-bool SegmentReader::ReadSegments()
+bool
+SegmentReader::ReadSegments()
 {
-  bool res = false;
+  bool            res = false;
   const DataSet & ds = F->GetDataSet();
-  const Tag segmentSQTag(0x0062, 0x0002);
+  const Tag       segmentSQTag(0x0062, 0x0002);
   if (ds.FindDataElement(segmentSQTag))
   {
-    SmartPointer< SequenceOfItems > segmentSQ = ds.GetDataElement(segmentSQTag).GetValueAsSQ();
-    const size_t numberOfSegments = segmentSQ->GetNumberOfItems();
+    SmartPointer<SequenceOfItems> segmentSQ = ds.GetDataElement(segmentSQTag).GetValueAsSQ();
+    const size_t                  numberOfSegments = segmentSQ->GetNumberOfItems();
     if (numberOfSegments == 0)
     {
       mdcmErrorMacro("No segment found");
@@ -124,7 +124,7 @@ bool SegmentReader::ReadSegments()
     {
       if (!ReadSegment(segmentSQ->GetItem(i), i))
       {
-        mdcmWarningMacro("Segment "<<i<<" reading error");
+        mdcmWarningMacro("Segment " << i << " reading error");
       }
     }
     res = true;
@@ -133,17 +133,18 @@ bool SegmentReader::ReadSegments()
 }
 
 
-Segment::BasicCodedEntryVector readCodeSequenceMacroAttributes(const Tag & tag, const DataSet & dataset)
+Segment::BasicCodedEntryVector
+readCodeSequenceMacroAttributes(const Tag & tag, const DataSet & dataset)
 {
   Segment::BasicCodedEntryVector result;
-  if(dataset.FindDataElement(tag))
+  if (dataset.FindDataElement(tag))
   {
     SmartPointer<SequenceOfItems> sequence = dataset.GetDataElement(tag).GetValueAsSQ();
-    SequenceOfItems::Iterator it = sequence->Begin();
-    for(; it != sequence->End(); ++it)
+    SequenceOfItems::Iterator     it = sequence->Begin();
+    for (; it != sequence->End(); ++it)
     {
-      const Item & item = *it;
-      const DataSet & itemDataSet = item.GetNestedDataSet();
+      const Item &                   item = *it;
+      const DataSet &                itemDataSet = item.GetNestedDataSet();
       SegmentHelper::BasicCodedEntry entry;
       // Code Value (Type 1C)
       Attribute<0x0008, 0x0100> codeValueAttribute;
@@ -167,15 +168,15 @@ Segment::BasicCodedEntryVector readCodeSequenceMacroAttributes(const Tag & tag, 
   return result;
 }
 
-bool SegmentReader::ReadSegment(const Item & segmentItem, const unsigned int idx)
+bool
+SegmentReader::ReadSegment(const Item & segmentItem, const unsigned int idx)
 {
-  SmartPointer< Segment > segment = new Segment;
-  const DataSet & rootDs    = GetFile().GetDataSet();
-  const DataSet & segmentDS = segmentItem.GetNestedDataSet();
+  SmartPointer<Segment> segment = new Segment;
+  const DataSet &       rootDs = GetFile().GetDataSet();
+  const DataSet &       segmentDS = segmentItem.GetNestedDataSet();
   // Segment Number
   const Tag segmentNumberTag(0x0062, 0x0004);
-  if (segmentDS.FindDataElement(segmentNumberTag)
-  && !segmentDS.GetDataElement(segmentNumberTag).IsEmpty())
+  if (segmentDS.FindDataElement(segmentNumberTag) && !segmentDS.GetDataElement(segmentNumberTag).IsEmpty())
   {
     Attribute<0x0062, 0x0004> segmentNumberAt;
     segmentNumberAt.SetFromDataSet(segmentDS);
@@ -205,37 +206,38 @@ bool SegmentReader::ReadSegment(const Item & segmentItem, const unsigned int idx
   // Check if there is a Surface Segmentation Module
   if (surfaceCount > 0 || rootDs.FindDataElement(Tag(0x0066, 0x0002)))
   {
-    //Basic Coded Entries in each sequences
+    // Basic Coded Entries in each sequences
     Segment::BasicCodedEntryVector basicCodedEntries;
     // Anatomic Region Sequence (Type 3)
     basicCodedEntries = readCodeSequenceMacroAttributes(Tag(0x0008, 0x2218), segmentDS);
-    if(!basicCodedEntries.empty())
+    if (!basicCodedEntries.empty())
     {
       segment->SetAnatomicRegion(basicCodedEntries[0]);
       // Only a single Item is permitted in this Sequence
-      if(basicCodedEntries.size() > 1)
+      if (basicCodedEntries.size() > 1)
       {
         mdcmWarningMacro("Only a single Item is permitted in Anatomic Region Sequence, other items will be ignored");
       }
       SmartPointer<SequenceOfItems> sequence = segmentDS.GetDataElement(Tag(0x0008, 0x2218)).GetValueAsSQ();
-      Item& item = sequence->GetItem(1);
-      DataSet& itemDataSet = item.GetNestedDataSet();
+      Item &                        item = sequence->GetItem(1);
+      DataSet &                     itemDataSet = item.GetNestedDataSet();
       // Anatomic Region Modifier Sequence (Type 3)
       basicCodedEntries = readCodeSequenceMacroAttributes(Tag(0x0008, 0x2220), itemDataSet);
-      if(!basicCodedEntries.empty())
+      if (!basicCodedEntries.empty())
       {
         segment->SetAnatomicRegionModifiers(basicCodedEntries);
       }
     }
     // Segmented Property Category Code Sequence (Type 1)
     basicCodedEntries = readCodeSequenceMacroAttributes(Tag(0x0062, 0x0003), segmentDS);
-    if(!basicCodedEntries.empty())
+    if (!basicCodedEntries.empty())
     {
       segment->SetPropertyCategory(basicCodedEntries[0]);
       // Only a single Item shall be included in this Sequence
-      if(basicCodedEntries.size() > 1)
+      if (basicCodedEntries.size() > 1)
       {
-        mdcmWarningMacro("Only a single Item shall be included in Segmented Property Category Code Sequence, other items will be ignored");
+        mdcmWarningMacro("Only a single Item shall be included in Segmented Property Category Code Sequence, other "
+                         "items will be ignored");
       }
     }
     else
@@ -244,20 +246,21 @@ bool SegmentReader::ReadSegment(const Item & segmentItem, const unsigned int idx
     }
     // Segmented Property Type Code Sequence (Type 1)
     basicCodedEntries = readCodeSequenceMacroAttributes(Tag(0x0062, 0x000F), segmentDS);
-    if(!basicCodedEntries.empty())
+    if (!basicCodedEntries.empty())
     {
       segment->SetPropertyType(basicCodedEntries[0]);
       // Only a single Item shall be included in this Sequence
-      if(basicCodedEntries.size() > 1)
+      if (basicCodedEntries.size() > 1)
       {
-        mdcmWarningMacro("Only a single Item shall be included in Segmented Property Type Code Sequence, other items will be ignored");
+        mdcmWarningMacro(
+          "Only a single Item shall be included in Segmented Property Type Code Sequence, other items will be ignored");
       }
       SmartPointer<SequenceOfItems> sequence = segmentDS.GetDataElement(Tag(0x0062, 0x000F)).GetValueAsSQ();
-      Item& item = sequence->GetItem(1);
-      DataSet& itemDataSet = item.GetNestedDataSet();
+      Item &                        item = sequence->GetItem(1);
+      DataSet &                     itemDataSet = item.GetNestedDataSet();
       // Segmented Property Type Modifier Sequence (Type 3)
       basicCodedEntries = readCodeSequenceMacroAttributes(Tag(0x0062, 0x0011), itemDataSet);
-      if(!basicCodedEntries.empty())
+      if (!basicCodedEntries.empty())
       {
         segment->SetPropertyTypeModifiers(basicCodedEntries);
       }
@@ -270,10 +273,10 @@ bool SegmentReader::ReadSegment(const Item & segmentItem, const unsigned int idx
     const Tag refSurfaceSQTag(0x0066, 0x002B);
     if (segmentDS.FindDataElement(refSurfaceSQTag))
     {
-      SmartPointer< SequenceOfItems > refSurfaceSQ = segmentDS.GetDataElement(refSurfaceSQTag).GetValueAsSQ();
+      SmartPointer<SequenceOfItems> refSurfaceSQ = segmentDS.GetDataElement(refSurfaceSQTag).GetValueAsSQ();
       // Index each surface of a segment
-      SequenceOfItems::ConstIterator itRefSurface     = refSurfaceSQ->Begin();
-      SequenceOfItems::ConstIterator itEndRefSurface  = refSurfaceSQ->End();
+      SequenceOfItems::ConstIterator itRefSurface = refSurfaceSQ->Begin();
+      SequenceOfItems::ConstIterator itEndRefSurface = refSurfaceSQ->End();
       unsigned long                  numberOfSurfaces = 0;
       for (; itRefSurface != itEndRefSurface; ++itRefSurface)
       {
@@ -281,7 +284,7 @@ bool SegmentReader::ReadSegment(const Item & segmentItem, const unsigned int idx
         // Referenced Surface Number
         Attribute<0x0066, 0x002C> refSurfaceNumberAt;
         refSurfaceNumberAt.SetFromDataSet(refSurfaceDS);
-        unsigned long             refSurfaceNumber;
+        unsigned long refSurfaceNumber;
         if (!refSurfaceNumberAt.GetAsDataElement().IsEmpty())
         {
           refSurfaceNumber = refSurfaceNumberAt.GetValue();
@@ -320,4 +323,4 @@ bool SegmentReader::ReadSegment(const Item & segmentItem, const unsigned int idx
   return true;
 }
 
-}
+} // namespace mdcm

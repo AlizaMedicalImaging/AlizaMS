@@ -30,8 +30,10 @@ namespace mdcm
 class MDCM_EXPORT UUIDGenerator
 {
 public:
-  const char * Generate(); // Not thread safe
-  static bool IsValid(const char *);
+  const char *
+  Generate(); // Not thread safe
+  static bool
+  IsValid(const char *);
 
 private:
   std::string Unique;
@@ -39,4 +41,4 @@ private:
 
 } // end namespace mdcm
 
-#endif //MDCMUUIDGENERATOR_H
+#endif // MDCMUUIDGENERATOR_H

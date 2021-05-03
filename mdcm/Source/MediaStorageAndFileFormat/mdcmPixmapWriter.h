@@ -49,19 +49,29 @@ class MDCM_EXPORT PixmapWriter : public Writer
 public:
   PixmapWriter();
   ~PixmapWriter();
-  const Pixmap & GetPixmap() const;
-  Pixmap & GetPixmap();
-  void SetPixmap(Pixmap const &);
-  const Pixmap & GetImage() const;
-  Pixmap & GetImage();
-  void SetImage(Pixmap const &);
-  bool Write();
+  const Pixmap &
+  GetPixmap() const;
+  Pixmap &
+  GetPixmap();
+  void
+  SetPixmap(Pixmap const &);
+  const Pixmap &
+  GetImage() const;
+  Pixmap &
+  GetImage();
+  void
+  SetImage(Pixmap const &);
+  bool
+  Write();
+
 protected:
-  bool PrepareWrite(MediaStorage const &);
-  void DoIconImage(DataSet &, Pixmap const &);
+  bool
+  PrepareWrite(MediaStorage const &);
+  void
+                       DoIconImage(DataSet &, Pixmap const &);
   SmartPointer<Pixmap> PixelData;
 };
 
 } // end namespace mdcm
 
-#endif //MDCMPIXMAPWRITER_H
+#endif // MDCMPIXMAPWRITER_H
