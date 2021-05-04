@@ -327,6 +327,12 @@ public:
   MDCM_STATIC_ASSERT(((VM::VMType)VM::VM1 & (VM::VMType)(TagToType<Group, Element>::VMType)));
   MDCM_STATIC_ASSERT(((((VR::VRType)TVR & VR::VR_VM1) && ((VM::VMType)VM::VM1 == VM::VM1)) ||
                       !((VR::VRType)TVR & VR::VR_VM1)));
+  MDCM_STATIC_ASSERT((VR::VRType)TVR != VR::OB);
+  MDCM_STATIC_ASSERT((VR::VRType)TVR != VR::OW);
+  MDCM_STATIC_ASSERT((VR::VRType)TVR != VR::OD);
+  MDCM_STATIC_ASSERT((VR::VRType)TVR != VR::OF);
+  MDCM_STATIC_ASSERT((VR::VRType)TVR != VR::OL);
+  MDCM_STATIC_ASSERT((VR::VRType)TVR != VR::OV);
 
   static Tag
   GetTag()
@@ -424,7 +430,7 @@ public:
   {
     DataElement        ret(GetTag());
     std::ostringstream os;
-    EncodingImplementation<VRToEncoding<TVR>::Mode>::WriteOne(Internal, GetNumberOfValues(), os);
+    EncodingImplementation<VRToEncoding<TVR>::Mode>::WriteOne(Internal, 1, os);
     ret.SetVR(GetVR());
     assert(ret.GetVR() != VR::SQ);
     if ((VR::VRType)VRToEncoding<TVR>::Mode == VR::VRASCII)
@@ -490,7 +496,7 @@ protected:
     std::stringstream ss;
     std::string       s = std::string(bv->GetPointer(), bv->GetLength());
     ss.str(s);
-    EncodingImplementation<VRToEncoding<TVR>::Mode>::ReadNoSwapOne(Internal, GetNumberOfValues(), ss);
+    EncodingImplementation<VRToEncoding<TVR>::Mode>::ReadNoSwapOne(Internal, 1, ss);
   }
 
   void
@@ -502,7 +508,7 @@ protected:
     std::stringstream ss;
     std::string       s = std::string(bv->GetPointer(), bv->GetLength());
     ss.str(s);
-    EncodingImplementation<VRToEncoding<TVR>::Mode>::ReadOne(Internal, GetNumberOfValues(), ss);
+    EncodingImplementation<VRToEncoding<TVR>::Mode>::ReadOne(Internal, 1, ss);
   }
 };
 

@@ -615,55 +615,32 @@ public:
     }
   }
 
-  template <typename T> // may be VRToType<TVR>::Type
+  template <typename T>
   static inline void
-  ReadComputeLengthOne(T & data, unsigned int & length, std::istream & _is)
+  ReadNoSwapOne(T & data, unsigned long, std::istream & _is)
   {
     const unsigned int type_size = sizeof(T);
-    length /= type_size;
 	char * cdata = reinterpret_cast<char *>(&data);
-    for (unsigned long i = 0; i < length; ++i)
-    {
-      _is.read(cdata + i, type_size);
-    }
+    _is.read(cdata, type_size);
   }
 
   template <typename T>
   static inline void
-  ReadNoSwapOne(T & data, unsigned long length, std::istream & _is)
+  ReadOne(T & data, unsigned long, std::istream & _is)
   {
     const unsigned int type_size = sizeof(T);
 	char * cdata = reinterpret_cast<char *>(&data);
-    for (unsigned long i = 0; i < length; ++i)
-    {
-      _is.read(cdata + i, type_size);
-    }
+    _is.read(cdata, type_size);
+    SwapperNoOp::SwapArray((T*)cdata, 1);
   }
 
   template <typename T>
   static inline void
-  ReadOne(T & data, unsigned long length, std::istream & _is)
+  WriteOne(const T & data, unsigned long, std::ostream & _os)
   {
     const unsigned int type_size = sizeof(T);
-	char * cdata = reinterpret_cast<char *>(&data);
-    for (unsigned long i = 0; i < length; ++i)
-    {
-      _is.read(cdata + i, type_size);
-    }
-    SwapperNoOp::SwapArray(cdata, length);
-  }
-
-  template <typename T>
-  static inline void
-  WriteOne(const T & data, unsigned long length, std::ostream & _os)
-  {
-    const unsigned int type_size = sizeof(T);
-	const char * cdata = reinterpret_cast<const char *>(&data);
-    for (unsigned long i = 0; i < length; ++i)
-    {
-      const char * swappedData = SwapperNoOp::Swap(cdata + i);
-      _os.write(swappedData, type_size);
-    }
+    const T swappedData = SwapperNoOp::Swap(data);
+    _os.write(reinterpret_cast<const char *>(&swappedData), type_size);
   }
 };
 
