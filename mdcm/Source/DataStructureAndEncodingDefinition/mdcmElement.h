@@ -620,7 +620,7 @@ public:
   ReadNoSwapOne(T & data, unsigned long, std::istream & _is)
   {
     const unsigned int type_size = sizeof(T);
-	char * cdata = reinterpret_cast<char *>(&data);
+    char * cdata = reinterpret_cast<char *>(&data);
     _is.read(cdata, type_size);
   }
 
@@ -629,7 +629,7 @@ public:
   ReadOne(T & data, unsigned long, std::istream & _is)
   {
     const unsigned int type_size = sizeof(T);
-	char * cdata = reinterpret_cast<char *>(&data);
+    char * cdata = reinterpret_cast<char *>(&data);
     _is.read(cdata, type_size);
     SwapperNoOp::SwapArray((T*)cdata, 1);
   }
