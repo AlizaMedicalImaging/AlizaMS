@@ -13,6 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
+// modified github.com/issakomi
+
 #include "btCollisionWorld.h"
 #include "btCollisionDispatcher.h"
 #include "BulletCollision/CollisionDispatch/btCollisionObject.h"
@@ -1416,7 +1418,7 @@ void btCollisionWorld::debugDrawObject(const btTransform& worldTransform, const 
 									lastV = curVert;
 								}
 							}
-							centroid *= btScalar(1.f) / btScalar(numVerts);
+							if (numVerts > 0) centroid *= btScalar(1.f) / btScalar(numVerts);
 							if (getDebugDrawer()->getDebugMode() & btIDebugDraw::DBG_DrawNormals)
 							{
 								btVector3 normalColor(1, 1, 0);
