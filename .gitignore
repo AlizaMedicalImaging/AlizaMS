@@ -4,3 +4,4 @@ update_tags.sh
 *.bak
 *~
 *.DS_Store
+mITK
