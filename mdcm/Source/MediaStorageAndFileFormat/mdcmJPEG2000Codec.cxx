@@ -985,6 +985,42 @@ JPEG2000Codec::SetReversible(bool res)
   Internals->coder_param.irreversible = !res;
 }
 
+/*
+"The JPEG 2000 bit stream specifies whether or not a reversible or
+irreversible multi-component (color) transformation [ISO 15444-1 Annex G],
+if any, has been applied. If no multi-component transformation has been
+applied, then the components shall correspond to those specified by the
+DICOM Attribute Photometric Interpretation (0028,0004). If the JPEG 2000
+Part 1 reversible multi-component transformation has been applied then
+the DICOM Attribute Photometric Interpretation (0028,0004) shall be YBR_RCT.
+If the JPEG 2000 Part 1 irreversible multi-component transformation has been
+applied then the DICOM Attribute Photometric Interpretation (0028,0004)
+shall be YBR_ICT."
+
+"... a Photometric Interpretation of RGB could be specified as long as no
+multi-component transformation [ISO 15444-1 Annex G] was specified by the
+JPEG 2000 bit stream"
+
+Looks like -
+for 3 samples/px:
+Input RGB      + MCT 0 -> Photometric Interpretation RGB
+Input YBR_FULL + MCT 0 -> Photometric Interpretation YBR_FULL
+Input RGB      + MCT 1 -> Photometric Interpretation YBR_RCT or YBR_ICT
+Input YBR_FULL + MCT 1 -> Not allowed
+
+for 1 sample/px:
+Input PI + MCT 0 -> PI
+Input PI + MCT 1 -> Not allowed
+*/
+void
+JPEG2000Codec::SetMCT(bool mct)
+{
+  // Set the Multiple Component Transformation value (COD -> SGcod)
+  // 0 for none, 1 to apply to components 0, 1, 2
+  if (mct) Internals->coder_param.tcp_mct = 1;
+  else     Internals->coder_param.tcp_mct = 0;
+}
+
 bool
 JPEG2000Codec::DecodeExtent(char *         buffer,
                             unsigned int   xmin,

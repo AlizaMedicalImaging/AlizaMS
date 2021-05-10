@@ -64,6 +64,8 @@ public:
   SetNumberOfResolutions(unsigned int);
   void
   SetReversible(bool);
+  void
+  SetMCT(bool);
 
 protected:
   bool
