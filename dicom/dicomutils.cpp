@@ -4605,7 +4605,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim4th = segment_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
-	else if (sq_size==2 &&
+	else if (sq_size>=2 &&
 		segment_idx>=0)
 	{
 		*enh_id = 20;
