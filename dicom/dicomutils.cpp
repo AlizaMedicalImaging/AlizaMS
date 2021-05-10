@@ -4291,6 +4291,7 @@ void DicomUtils::enhanced_get_indices(
 	int datatype_idx      = -1;
 	int mr_frame_type_idx = -1;
 	int mr_eff_echo_idx   = -1;
+	int segment_idx       = -1;
 	const int sq_size = (int)sq.size();
 	for (int x = 0; x < sq_size; ++x)
 	{
@@ -4353,6 +4354,11 @@ void DicomUtils::enhanced_get_indices(
 			sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9082))
 		{
 			mr_eff_echo_idx = x;
+		}
+		else if (sq.at(i).group_pointer==mdcm::Tag(0x0062,0x000a) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0062,0x000b))
+		{
+			segment_idx = x;
 		}
 	}
 	//
@@ -4589,6 +4595,21 @@ void DicomUtils::enhanced_get_indices(
 		*dim5th = lut_label_idx;
 		*dim4th = temporal_pos_idx;
 		*dim3rd = in_stack_pos_idx;
+	}
+	// Segmentation, TODO
+	else if (sq_size==3 &&
+		in_stack_pos_idx>=0 &&
+		segment_idx>=0)
+	{
+		*enh_id = 19;
+		*dim4th = segment_idx;
+		*dim3rd = in_stack_pos_idx;
+	}
+	else if (sq_size==2 &&
+		segment_idx>=0)
+	{
+		*enh_id = 20;
+		*dim4th = segment_idx;
 	}
 	// not recognized, try generic approach
 	if (*enh_id<0)
