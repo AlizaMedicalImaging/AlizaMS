@@ -4363,7 +4363,7 @@ void DicomUtils::enhanced_get_indices(
 	}
 	//
 	//
-	// workaround to guess temporar tag, e.g. ultrasound
+	// Workaround to guess temporar tag, e.g. ultrasound
 	if (sq_size==3 &&
 		temporal_idx<0 &&
 		plane_pos_idx==1 &&
@@ -4374,7 +4374,7 @@ void DicomUtils::enhanced_get_indices(
 	//
 	//
 	//
-	// well-known combinations
+	// Well-known combinations
 	if (sq_size==3 &&
 		temporal_idx>=0 &&
 		plane_pos_idx>=0 &&
@@ -4413,7 +4413,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim3rd = plane_pos_idx;
 		*enh_id = 106;
 	}
-	// generic
+	// Generic
 	else if (sq_size==1 &&
 		in_stack_pos_idx==0)
 	{
@@ -4428,7 +4428,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
-	// temporal
+	// Temporal
 	else if (sq_size==3 &&
 		stack_id_idx>=0 &&
 		in_stack_pos_idx>=0 &&
@@ -4453,7 +4453,7 @@ void DicomUtils::enhanced_get_indices(
 		*enh_id = 5;
 		*dim3rd = temporal_pos_idx;
 	}
-	// contrast
+	// Contrast
 	else if (sq_size==4 &&
 		temporal_pos_idx>=0 &&
 		in_stack_pos_idx>=0 &&
@@ -4484,7 +4484,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim4th = contrast_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
-	// mr frame type
+	// MR frame type
 	else if (sq_size==4 &&
 		stack_id_idx>=0 &&
 		in_stack_pos_idx>=0 &&
@@ -4507,7 +4507,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
-	// mr eff. echo
+	// MR eff. echo
 	else if (sq_size==4 &&
 		stack_id_idx>=0 &&
 		in_stack_pos_idx>=0 &&
@@ -4530,7 +4530,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
-	// diffusion
+	// Diffusion
 	else if (sq_size==4 &&
 		stack_id_idx>=0 && 
 		in_stack_pos_idx>=0 &&
@@ -4596,7 +4596,8 @@ void DicomUtils::enhanced_get_indices(
 		*dim4th = temporal_pos_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
-	// Segmentation, TODO
+	// Segmentation
+	// TODO check more examples
 	else if (sq_size==3 &&
 		in_stack_pos_idx>=0 &&
 		segment_idx>=0)
@@ -4611,7 +4612,7 @@ void DicomUtils::enhanced_get_indices(
 		*enh_id = 20;
 		*dim4th = segment_idx;
 	}
-	// not recognized, try generic approach
+	// Not recognized, try generic approach
 	if (*enh_id<0)
 	{
 		if (sq_size==3 &&
