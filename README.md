@@ -14,35 +14,42 @@ Linux
 To start on Linux extract archive and run _alizams.sh_
 
 ```
-cd alizams-1.3.1_linux
+cd alizams-1.3.2_linux
 ./alizams.sh
 ```
 
 Optionally install local desktop menu entry
 
 ```
-cd alizams-1.3.1_linux/install_menu
+cd alizams-1.3.2_linux/install_menu
 ./install_menu.sh
 ```
 
 To remove local menu entry
 
 ```
-cd alizams-1.3.1_linux/install_menu
+cd alizams-1.3.2_linux/install_menu
 ./uninstall_menu.sh
 ```
+
+macOS
+-----
+
+Open DMG file (signed and notarized), in the window move icon onto Applications, eject,
+
+s. _Applications_ menu.
 
 Windows
 -------
 
-Extract archive, click or run from terminal _alizams.exe_
+Extract archive, click or run from terminal _alizams.exe_.
 
 View
 ----
 
-Select _DICOM scanner_ tab, open directory with DICOM files or DICOMDIR file (or drag-and-drop)
+Select _DICOM scanner_ tab, open directory with DICOM files or DICOMDIR file (or drag-and-drop).
 
-Select one or more series and click _arrow_ action (or double-click selected row) to load
+Select one or more series and click _arrow_ action (or double-click selected row) to load.
 
 
 ![Open](package/art/start0.png)
