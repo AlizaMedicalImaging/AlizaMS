@@ -2727,6 +2727,7 @@ void Aliza::trigger_reload_histogram()
 	const bool lock = mutex0.tryLock();
 	if (!lock) return;
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+	qApp->processEvents();
 	ImageVariant * v = get_selected_image();
 	if (v)
 	{
@@ -2735,6 +2736,7 @@ void Aliza::trigger_reload_histogram()
 	}
 	QApplication::restoreOverrideCursor();
 	mutex0.unlock();
+	qApp->processEvents();
 }
 
 void Aliza::width_from_histogram_min(double x)
