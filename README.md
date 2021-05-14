@@ -37,7 +37,11 @@ macOS
 
 Open DMG file (signed and notarized), in the window move icon onto Applications, eject,
 
-s. _Launchpad_.
+s. _Launchpad_ or use from terminal
+
+```
+/Applications/AlizaMS.app/Contents/MacOS/AlizaMS
+```
 
 Windows
 -------
