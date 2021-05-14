@@ -1,0 +1,41 @@
+/Applications/CMake.app/Contents/bin/cmake -DBUILD_TESTING:BOOL=OFF -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_CONFIGURATION_TYPES:STRING=Release -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=11.1 -DModule_MGHIO:BOOL=ON -DModule_ITKIOPhilipsREC:BOOL=ON ../ITK
+
+export PATH=/Users/mi/Qt/6.0.2/m1/bin:$PATH
+
+/Applications/CMake.app/Contents/bin/cmake -DALIZA_QT_VERSION:STRING=6 -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_CONFIGURATION_TYPES:STRING=Release -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=11.1 -DITK_DIR:STRING="/Users/mi/mitk/barm64" ../AlizaMS
+
+
+
+-----------------------------
+
+
+/Applications/CMake.app/Contents/bin/cmake -DBUILD_TESTING:BOOL=OFF -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_CONFIGURATION_TYPES:STRING=Release -DCMAKE_APPLE_SILICON_PROCESSOR:STRING=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.15 -DModule_MGHIO:BOOL=ON -DModule_ITKIOPhilipsREC:BOOL=ON ../ITK
+
+export PATH=/Users/mi/Qt/6.0.2/clang_64/bin:$PATH
+
+/Applications/CMake.app/Contents/bin/cmake -DALIZA_QT_VERSION:STRING=6 -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_CONFIGURATION_TYPES:STRING=Release -DCMAKE_APPLE_SILICON_PROCESSOR:STRING=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.15 -DITK_DIR:STRING="/Users/mi/mitk/bx86_64" ../AlizaMS
+
+
+-----------------------------
+
+1st copy sqldriver plugin (bug)
+macdeployqt AlizaMS.app
+
+-----------------------------
+
+lipo
+
+-----------------------------
+
+codesign --deep -f --options runtime --sign "xxx" AlizaMS.app
+
+ditto -ck --rsrc --sequesterRsrc AlizaMS.app AlizaMS.zip
+
+xcrun altool --notarize-app -t osx -f AlizaMS.zip --verbose --primary-bundle-id="com.aliza.alizams" -u "xxx" -p xxx
+
+xcrun stapler staple AlizaMS.app
+
+ * Build the dmg using the stapled app
+ * Upload the dmg to Apple for notarization
+ * Wait for notarization success and staple the dmg
+
