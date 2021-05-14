@@ -37,7 +37,7 @@ macOS
 
 Open DMG file (signed and notarized), in the window move icon onto Applications, eject,
 
-s. _Applications_ menu.
+s. _Launchpad_.
 
 Windows
 -------
