@@ -9032,7 +9032,7 @@ bool DicomUtils::is_not_interleaved(const QStringList & images)
 	mdcm::Tag tSlicePosition(0x0020,0x1041);
 	std::set<mdcm::Tag> tags;
 	tags.insert(tSlicePosition);
-	long tmp0 = 0;
+	long long tmp0 = 0;
 	for (int x = 0; x < images.size(); ++x)
 	{
 		mdcm::Reader reader;
@@ -9057,7 +9057,7 @@ bool DicomUtils::is_not_interleaved(const QStringList & images)
 			if (!sp_.IsEmpty() && !sp_.IsUndefinedLength() && sp_.GetByteValue())
 			{
 				bool sp_ok = false;
-				long long tmp1 = -9999999999L;
+				long long tmp1 = -9999999999LL;
 				const QString sp = QString::fromLatin1(
 					sp_.GetByteValue()->GetPointer(),sp_.GetByteValue()->GetLength());
 				const double spvd = QVariant(sp.trimmed().remove(QChar('\0'))).toDouble(&sp_ok);
