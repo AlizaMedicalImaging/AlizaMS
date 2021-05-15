@@ -2523,6 +2523,7 @@ void Aliza::update_visible_rois(QTableWidgetItem * i)
 	const bool lock = mutex0.tryLock();
 	if (!lock) return;
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+	qApp->processEvents();
 	ImageVariant * v = get_selected_image();
 	if (v)
 	{
@@ -2548,6 +2549,7 @@ void Aliza::update_visible_rois(QTableWidgetItem * i)
 	}
 	QApplication::restoreOverrideCursor();
 	mutex0.unlock();
+	qApp->processEvents();
 }
 
 void Aliza::reset_rect2()
@@ -3309,7 +3311,6 @@ void Aliza::flipY()
 
 void Aliza::toggle_maxwindow(bool i)
 {
-	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	ImageVariant * v = NULL;
 	const bool ok3d = check_3d();
 	if (ok3d) glwidget->set_skip_draw(true);
@@ -3322,6 +3323,8 @@ void Aliza::toggle_maxwindow(bool i)
 		// maxwin_pushButton must be disabled for other types
 		goto quit__;
 	}
+	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+	qApp->processEvents();
 	v->di->maxwindow = i;
 	CommonUtils::calculate_minmax_scalar(v);
 	if (!v->histogram.isNull()) add_histogram(v,NULL,false);
@@ -3358,10 +3361,10 @@ void Aliza::toggle_maxwindow(bool i)
 	check_slice_collisions(const_cast<const ImageVariant *>(v), graphicswidget_m);
 	if (multiview) graphicswidget_y->set_slice_2D(v,0,false);
 	if (multiview) graphicswidget_x->set_slice_2D(v,0,false);
+	QApplication::restoreOverrideCursor();
 quit__:
 	if (ok3d) glwidget->set_skip_draw(false);
 	if (lock) mutex0.unlock();
-	QApplication::restoreOverrideCursor();
 	qApp->processEvents();
 }
 
@@ -3703,6 +3706,7 @@ void Aliza::delete_cheched_unchecked(bool t)
 	const bool ok3d = check_3d();
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	if (ok3d) glwidget->set_skip_draw(true);
+	qApp->processEvents();
 	for (int x = 0; x < imagesbox->listWidget->count(); ++x)
 	{
 		QListWidgetItem * j = imagesbox->listWidget->item(x);
@@ -3759,6 +3763,7 @@ quit__:
 #ifdef ALIZA_PRINT_COUNT_GL_OBJ
 	std::cout << "Num VBOs " << GLWidget::get_count_vbos() << std::endl;
 #endif
+	qApp->processEvents();
 }
 
 void Aliza::load_dicom_file(int * image_id,
