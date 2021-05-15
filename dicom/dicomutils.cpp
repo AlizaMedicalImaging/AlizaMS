@@ -9057,7 +9057,7 @@ bool DicomUtils::is_not_interleaved(const QStringList & images)
 			if (!sp_.IsEmpty() && !sp_.IsUndefinedLength() && sp_.GetByteValue())
 			{
 				bool sp_ok = false;
-				long tmp1 = -9999999999L;
+				long long tmp1 = -9999999999L;
 				const QString sp = QString::fromLatin1(
 					sp_.GetByteValue()->GetPointer(),sp_.GetByteValue()->GetLength());
 				const double spvd = QVariant(sp.trimmed().remove(QChar('\0'))).toDouble(&sp_ok);
