@@ -35,6 +35,3 @@ lipo -create arm/AlizaMS.app/Contents/Frameworks/QtSvg.framework/Versions/A/QtSv
 
 lipo -create arm/AlizaMS.app/Contents/Frameworks/QtSql.framework/Versions/A/QtSql x86/AlizaMS.app/Contents/Frameworks/QtSql.framework/Versions/A/QtSql -output universal/AlizaMS.app/Contents/Frameworks/QtSql.framework/Versions/A/QtSql
 
-lipo -create arm/AlizaMS.app/Contents/Frameworks/QtSql.framework/Versions/A/QtSql x86/AlizaMS.app/Contents/Frameworks/QtSql.framework/Versions/A/QtSql -output universal/AlizaMS.app/Contents/Frameworks/QtSql.framework/Versions/A/QtSql
-
-
