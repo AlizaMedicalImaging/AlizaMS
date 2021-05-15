@@ -1532,7 +1532,7 @@ void BrowserWidget2::readSettings()
 	const QString d = QString("./DICOM");
 #elif (defined __APPLE__)
 	const QString d = QString
-		("/Applications/AlizaMS.app/Content/Resources/DICOM");
+		("/Applications/AlizaMS.app/Contents/Resources/DICOM");
 #else
 	const QString d = 
 		QApplication::applicationDirPath() + QString("/../DICOM");
