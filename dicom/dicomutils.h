@@ -97,9 +97,6 @@ public:
 	static bool has_modality_lut_sq(const mdcm::DataSet&);
 	static bool check_encapsulated(const mdcm::DataSet&);
 	static bool is_multiframe(const mdcm::DataSet&);
-	static void read_sop_instance_uid(
-		const QString&,
-		QString&);
 	static void read_image_info(
 		const QString&,
 		unsigned short*,

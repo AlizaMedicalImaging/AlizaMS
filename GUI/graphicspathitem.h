@@ -11,17 +11,17 @@ class GraphicsPathItem : public QGraphicsPathItem
 public:
 	GraphicsPathItem();
 	~GraphicsPathItem();
-	int  get_contour_id() const;
+	int get_contour_id() const;
 	void set_contour_id(int);
-	int  get_roi_id() const;
+	int get_roi_id() const;
 	void set_roi_id(int);
-	long get_tmp_id() const;
-	void set_tmp_id(long);
-	int  get_axis() const;
+	long long get_tmp_id() const;
+	void set_tmp_id(long long);
+	int get_axis() const;
 	void set_axis(int);
-	int  get_slice() const;
+	int get_slice() const;
 	void set_slice(int);
-	int  get_type() const;
+	int get_type() const;
 	void set_type(int);
 	QPainterPath shape() const override;
 
@@ -29,14 +29,14 @@ protected:
 	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;
 
 private:
-	int  contour_id;
-	int  roi_id;
-	long tmp_id;
-	int  axis;
-	int  slice;
+	int contour_id;
+	int roi_id;
+	long long tmp_id;
+	int axis;
+	int slice;
 	// 1 - closed planar
 	// 2 - open planar
-	int  contour_type;
+	int contour_type;
 };
 
 #endif // GraphicsPathItem___H

@@ -619,7 +619,7 @@ template<typename T> void load_rgba_image(
 	const typename T::SizeType   size   = region.GetSize();
 	const typename T::SpacingType spacing = image->GetSpacing();
 	unsigned char * p__   = NULL;
-	unsigned long j_ = 0;
+	unsigned long long j_ = 0;
 	const short axis = widget->get_axis();
 	const bool global_flip_x = widget->graphicsview->global_flip_x;
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
@@ -1052,9 +1052,9 @@ template<typename T> void load_rgba_char_image(
 		try { p = new unsigned char[size[0] * size[1] * 3]; }
 		catch (std::bad_alloc&) { p = NULL; }
 		if (!p) return;
-		unsigned long j_ = 0;
 		try
 		{
+			unsigned long long j_ = 0;
 			itk::ImageRegionConstIterator<T> iterator(image, region);
 			iterator.GoToBegin();
 			while (!iterator.IsAtEnd())
@@ -1104,6 +1104,7 @@ template<typename T> void load_rgba_char_image(
 		if (!ivariant->equi||ivariant->orientation_string.isEmpty())
 			GraphicsUtils::draw_cross_out(tmpi);
 	}
+	//
 	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(tmpi));
 	//
 	const bool hide_orientation = ivariant->di->hide_orientation;
@@ -1181,7 +1182,7 @@ template<typename T> void load_image(const typename T::Pointer & image,
 	const int tmp99 = size[1]%num_threads;
 	if (!widget->threadsLUT_.empty())
 	{
-		std::cout << "load_image4<>() : widget->threadsLUT_.size()>0" << std::endl;
+		std::cout << "load_image<>() : widget->threadsLUT_.size()>0" << std::endl;
 	}
 	if (tmp99==0)
 	{
@@ -2484,13 +2485,9 @@ void GraphicsWidget::animate_()
 		{
 			k = image_container.image3D->di->selected_x_slice;
 			if (k >= image_container.image3D->di->idimx-1 || k < 0)
-			{
 				k = 0;
-			}
 			else
-			{
 				++k;
-			}
 			image_container.image3D->di->selected_x_slice = k;
 		}
 		break;
@@ -2498,13 +2495,9 @@ void GraphicsWidget::animate_()
 		{
 			k = image_container.image3D->di->selected_y_slice;
 			if (k >= image_container.image3D->di->idimy-1 || k < 0)
-			{
 				k = 0;
-			}
 			else
-			{
 				++k;
-			}
 			image_container.image3D->di->selected_y_slice = k;
 		}
 		break;
@@ -2512,13 +2505,9 @@ void GraphicsWidget::animate_()
 		{
 			k = image_container.image3D->di->selected_z_slice;
 			if (k >= image_container.image3D->di->idimz-1 || k < 0)
-			{
 				k = 0;
-			}
 			else
-			{
 				++k;
-			}
 			if (image_container.image3D->di->lock_2Dview)
 			{
 				image_container.image3D->di->from_slice = k;
@@ -2553,7 +2542,7 @@ void GraphicsWidget::animate_()
 			const_cast<const ImageVariant*>(image_container.image3D));
 	}
 	const qint64 t1 = QDateTime::currentMSecsSinceEpoch();
-	const long int t = static_cast<int>(requested_time-(t1-t0));
+	const long long t = static_cast<long long>(requested_time-(t1-t0));
 	if (t <= 0)
 	{
 		// can not run at required speed
@@ -3210,7 +3199,7 @@ QString GraphicsWidget::contours_from_selected_paths(
 	if (!roi)      return QString("ROI is NULL");
 	QString message("");
 	int selected_items_size = 0;
-	QList<long> tmp_ids;
+	QList<long long> tmp_ids;
 	QList<QGraphicsItem*> selected_items;
 	const bool lock = mutex.tryLock();
 	if (!lock) goto quit__;
@@ -3229,7 +3218,7 @@ QString GraphicsWidget::contours_from_selected_paths(
 		QGraphicsItem * gi = selected_items.at(x);
 		GraphicsPathItem * p = static_cast<GraphicsPathItem*>(gi);
 		if (!p) continue;
-		const long tmp_id = p->get_tmp_id();
+		const long long tmp_id = p->get_tmp_id();
 		if (tmp_id >= 0) tmp_ids.push_back(tmp_id);
 		if (ivariant->equi)
 		{

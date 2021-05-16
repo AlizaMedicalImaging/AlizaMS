@@ -1665,32 +1665,6 @@ bool DicomUtils::is_multiframe(const mdcm::DataSet & ds)
 	return false;
 }
 
-void DicomUtils::read_sop_instance_uid(
-	const QString & f,
-	QString & sop_instance_uid)
-{
-	std::set<mdcm::Tag> tags;
-	mdcm::Tag tsopinstance(0x0008,0x0018);
-	tags.insert(tsopinstance);
-	mdcm::Reader reader;
-#ifdef _WIN32
-#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-	reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
-#else
-	reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
-#endif
-#else
-	reader.SetFileName(f.toLocal8Bit().constData());
-#endif
-	const bool f_ok = reader.ReadSelectedTags(tags);
-	if (!f_ok) return;
-	const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
-	if (ds.IsEmpty()) return;
-	QString sop_instance_uid_;
-	if (get_string_value(ds, tsopinstance, sop_instance_uid_))
-		sop_instance_uid = sop_instance_uid_.remove(QChar('\0'));
-}
-
 void DicomUtils::read_image_info(
 	const QString & f,
 	unsigned short * rows_,
@@ -6302,26 +6276,6 @@ QString DicomUtils::read_series(
 						if (slices_ok) load_contour(ds,ivariant);
 					}
 				}
-#if 0
-				else if (
-						ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.7")       || // SC
-					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.77.1.5.1")|| // Ophthalmic Photography  8 Bit
-					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.77.1.5.2")|| // Ophthalmic Photography 16 Bit
-					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.1")       || // Computed Radiography 
-					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.1.1")     || // Digital X-Ray - For Presentation
-					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.1.1.1")   || // Digital X-Ray - For Processing
-					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.1.2")     || // Digital Mammography X-Ray - For Presentation
-					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.1.2.1")   || // Digital Mammography X-Ray - For Processing
-					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.1.3")     || // Digital Intra-Oral X-Ray - For Presentation
-					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.1.3.1")   || // Digital Intra-Oral X-Ray - For Processing
-					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.20")      || // Nuclear Medicine
-					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.12.1")    || // X-Ray Angiographic
-					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.12.2")       // X-Ray RF
-						)
-				{
-					if (!min_load) ivariant->di->skip_texture = true;
-				}
-#endif
 				else
 				{
 					if (!min_load)
@@ -8359,7 +8313,10 @@ QString DicomUtils::read_enhanced_common(
 			float  center_x, center_y, center_z;
 			std::vector<ImageSlice*> slices;
 			const bool enable_gl = min_load ? false : ok3d;
-			bool skip_texture = min_load ?  true : !wsettings->get_3d();
+			// Disable texturet for Breast Tomosynthesis
+			bool skip_texture =
+				(min_load || (sop==QString("1.2.840.10008.5.1.4.1.1.13.1.3")))
+				? true : !wsettings->get_3d();
 			const int new_id = min_load ? -1 : CommonUtils::get_next_id();
 			const int lut1   = 0;
 			ImageVariant * ivariant = new ImageVariant(
@@ -10655,6 +10612,7 @@ QString DicomUtils::read_dicom(
 	bool elscint      = false;
 	bool uihgrid      = false;
 	bool mixed        = false;
+	bool skip_volume  = false;
 	bool multiseries  = false;
 	bool ultrasound   = false;
 	unsigned short rows_tmp0 = 0, rows_tmp1 = 0;
@@ -11122,6 +11080,25 @@ QString DicomUtils::read_dicom(
 				{
 					mixed = true;
 				}
+				if (
+				   sop==QString("1.2.840.10008.5.1.4.1.1.7")       || // SC
+				   sop==QString("1.2.840.10008.5.1.4.1.1.77.1.5.1")|| // Ophthalmic Photography  8 Bit
+				   sop==QString("1.2.840.10008.5.1.4.1.1.77.1.5.2")|| // Ophthalmic Photography 16 Bit
+				   sop==QString("1.2.840.10008.5.1.4.1.1.1")       || // Computed Radiography 
+				   sop==QString("1.2.840.10008.5.1.4.1.1.1.1")     || // Digital X-Ray - For Presentation
+				   sop==QString("1.2.840.10008.5.1.4.1.1.1.1.1")   || // Digital X-Ray - For Processing
+				   sop==QString("1.2.840.10008.5.1.4.1.1.1.2")     || // Digital Mammography X-Ray - For Presentation
+				   sop==QString("1.2.840.10008.5.1.4.1.1.1.2.1")   || // Digital Mammography X-Ray - For Processing
+				   sop==QString("1.2.840.10008.5.1.4.1.1.1.3")     || // Digital Intra-Oral X-Ray - For Presentation
+				   sop==QString("1.2.840.10008.5.1.4.1.1.1.3.1")   || // Digital Intra-Oral X-Ray - For Processing
+				   sop==QString("1.2.840.10008.5.1.4.1.1.20")      || // Nuclear Medicine
+				   sop==QString("1.2.840.10008.5.1.4.1.1.12.1")    || // X-Ray Angiographic
+				   sop==QString("1.2.840.10008.5.1.4.1.1.12.2")       // X-Ray RF
+				)
+				{
+					// Force split individual file, don't want volume
+					skip_volume = true;
+				}
 			}
 			images.push_back(filenames.at(x));
 			++count_images;
@@ -11173,6 +11150,7 @@ QString DicomUtils::read_dicom(
 		!multiframe &&
 		!enhanced &&
 		!mixed &&
+		!skip_volume &&
 		!mosaic &&
 		!uihgrid)
 	{
@@ -11401,6 +11379,49 @@ QString DicomUtils::read_dicom(
 			else
 			{
 				delete ivariant;
+			}
+		}
+	}
+	else if (skip_volume)
+	{
+		for (int x = 0; x < images.size(); ++x)
+		{
+			if (pb) pb->setValue(-1);
+			QApplication::processEvents();
+			QStringList images_tmp;
+			images_tmp << images.at(x);
+			{
+				// don't load OpenGL
+				ImageVariant * ivariant = new ImageVariant(
+					CommonUtils::get_next_id(),
+					false,
+					true,
+					NULL,
+					0);
+				message_ = read_series(
+					&ok,
+					false,
+					false,
+					false,
+					false,
+					ivariant,
+					images_tmp,
+					0,
+					NULL,
+					false,
+					settings,
+					pb,
+					tolerance,
+					false);
+				if (ok)
+				{
+					ivariant->filenames = QStringList(images_tmp);
+					ivariants.push_back(ivariant);
+				}
+				else
+				{
+					delete ivariant;
+				}
 			}
 		}
 	}
@@ -11790,14 +11811,6 @@ QString DicomUtils::read_dicom(
 					true);
 				if (ok)
 				{
-					QString sop_instance_uid("");
-					read_sop_instance_uid(
-						images.at(x),
-						sop_instance_uid);
-					for (int z = 0; z < ivariant->di->idimz; ++z)
-					{
-						ivariant->image_instance_uids[z] = sop_instance_uid;
-					}
 					ivariant->filenames = QStringList(images_tmp);
 					ivariants.push_back(ivariant);
 				}
@@ -11832,14 +11845,6 @@ QString DicomUtils::read_dicom(
 					false);
 				if (ok)
 				{
-					QString sop_instance_uid("");
-					read_sop_instance_uid(
-						images.at(x),
-						sop_instance_uid);
-					for (int z = 0; z < ivariant->di->idimz; ++z)
-					{
-						ivariant->image_instance_uids[z] = sop_instance_uid;
-					}
 					ivariant->filenames = QStringList(images_tmp);
 					ivariants.push_back(ivariant);
 				}

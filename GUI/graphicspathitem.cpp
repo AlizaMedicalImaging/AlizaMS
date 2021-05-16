@@ -36,12 +36,12 @@ void GraphicsPathItem::set_roi_id(int a)
 	roi_id = a;
 }
 
-long GraphicsPathItem::get_tmp_id() const
+long long GraphicsPathItem::get_tmp_id() const
 {
 	return tmp_id;
 }
 
-void GraphicsPathItem::set_tmp_id(long a)
+void GraphicsPathItem::set_tmp_id(long long a)
 {
 	tmp_id = a;
 }
