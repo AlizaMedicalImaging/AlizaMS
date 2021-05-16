@@ -499,15 +499,40 @@ void GraphicsUtils::gen_labels(
 		if (!orientation_20_20.isEmpty())
 		{
 			top_string =
-				QString("<small><i>0x20,0x20 ") +
+				QString("<small>Pat. orient. ") +
 				orientation_20_20 +
-				QString("</i></small>");
+				QString("</small>");
 		}
 		else
 		{
 			top_string = QString("");
 		}
 		left_string = QString("");
+		if (global_flip_x || global_flip_y)
+		{
+			QString flip_info;
+			if (global_flip_x) flip_info += QString("X");
+			if (global_flip_y)
+			{
+				if (!flip_info.isEmpty())
+					flip_info += QString(", ");
+				flip_info += QString("Y");
+			}
+			if (top_string.isEmpty())
+			{
+				top_string +=
+					QString("<small><b>View flipped ") +
+					flip_info +
+					QString("</b></small>");
+			}
+			else
+			{
+				top_string +=
+					QString("<small><b>, view flipped ") +
+					flip_info +
+					QString("</b></small>");
+			}
+		}
 	}
 	if (body_part.isEmpty())
 	{

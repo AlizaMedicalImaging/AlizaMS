@@ -4071,7 +4071,7 @@ bool DicomUtils::generate_geometry(
 	sVector3 tmp_p1 = sVector3(0.0f,0.0f,0.0f);
 	sVector3 tmp_p2 = sVector3(0.0f,0.0f,0.0f);
 	sVector3 tmp_p3 = sVector3(0.0f,0.0f,0.0f);
-	float tmp_length0=0.0f, tmp_length1=0.0f, tmp_length2=0.0f, tmp_length3=0.0f;
+	float tmp_length0 = 0.0f, tmp_length1 = 0.0f, tmp_length2 = 0.0f, tmp_length3 = 0.0f;
 	double spacing_z_ = 0;
 	bool invalidate_volume = false;
 	for (unsigned int i = 0; i < size_; ++i)
@@ -4093,15 +4093,22 @@ bool DicomUtils::generate_geometry(
 					(float)ipp_iop[1],
 					(float)ipp_iop[2],
 					1.0f);
+#if 0
+		std::cout << "ipp[0]=" << ipp_iop[0] << std::endl;
+		std::cout << "ipp[1]=" << ipp_iop[1] << std::endl;
+		std::cout << "ipp[2]=" << ipp_iop[2] << std::endl;
+#endif
 		sMatrix4 m0 = sMatrix4::identity();
 		m0.setCol0(c0);
 		m0.setCol1(c1);
 		m0.setCol2(c2);
 		m0.setCol3(c3);
-		const sVector4 ind0 = sVector4(0.0f,(float)(rows_-1),0.0f,1.0f);
-		const sVector4 ind1 = sVector4(0.0f,0.0f,0.0f,1.0f);
-		const sVector4 ind2 = sVector4((float)(columns_-1),(float)(rows_-1),0.0f,1.0f);
-		const sVector4 ind3 = sVector4((float)(columns_-1),0.0f,0.0f,1.0f);
+		const float r_ = rows_ - 1;
+		const float c_ = columns_ - 1;
+		const sVector4 ind0 = sVector4(0.0f ,  r_, 0.0f, 1.0f);
+		const sVector4 ind1 = sVector4(0.0f, 0.0f, 0.0f, 1.0f);
+		const sVector4 ind2 = sVector4(  c_,   r_, 0.0f, 1.0f);
+		const sVector4 ind3 = sVector4(  c_, 0.0f, 0.0f, 1.0f);
 		const sVector4 p0 = sVector4(m0*ind0);
 		const sVector4 p1 = sVector4(m0*ind1);
 		const sVector4 p2 = sVector4(m0*ind2);
@@ -4110,8 +4117,14 @@ bool DicomUtils::generate_geometry(
 		const float x1 = p1.getX(), y1 = p1.getY(), z1 = p1.getZ();
 		const float x2 = p2.getX(), y2 = p2.getY(), z2 = p2.getZ();
 		const float x3 = p3.getX(), y3 = p3.getY(), z3 = p3.getZ();
+#if 0
+		std::cout << "x0=" << x0 << " y0=" << y0 << " z0=" << z0 << std::endl;
+		std::cout << "x1=" << x1 << " y1=" << y1 << " z1=" << z1 << std::endl;
+		std::cout << "x2=" << x2 << " y2=" << y2 << " z2=" << z2 << std::endl;
+		std::cout << "x3=" << x3 << " y3=" << y3 << " z3=" << z3 << std::endl;
+#endif
 		const QString orientation_string = CommonUtils::get_orientation2(&ipp_iop[3]);
-		if (i==0)
+		if (i == 0)
 		{
 			first = sVector3(x0,y0,z0);
 			v0 = (p0.getXYZ()+p3.getXYZ())*0.5f;
@@ -4123,7 +4136,7 @@ bool DicomUtils::generate_geometry(
 			*origin_z = ipp_iop[2];
 			for (int j = 0; j < 6; ++j) dircos[j] = ipp_iop[3+j];
 		}
-		if (i==size_-1)
+		if (i == size_-1)
 		{
 			last = sVector3(x0,y0,z0);
 			v1 = (p0.getXYZ()+p3.getXYZ())*0.5f;
@@ -4146,12 +4159,12 @@ bool DicomUtils::generate_geometry(
 				x0, y0, z0, x1, y1, z1, x2, y2, z2, x3, y3, z3,
 				ipp_iop);
 		}
-		const float length0 = length(p0.getXYZ()-tmp_p0);
-		const float length1 = length(p1.getXYZ()-tmp_p1);
-		const float length2 = length(p2.getXYZ()-tmp_p2);
-		const float length3 = length(p3.getXYZ()-tmp_p3);
+		const float length0 = Vectormath::Scalar::length(p0.getXYZ()-tmp_p0);
+		const float length1 = Vectormath::Scalar::length(p1.getXYZ()-tmp_p1);
+		const float length2 = Vectormath::Scalar::length(p2.getXYZ()-tmp_p2);
+		const float length3 = Vectormath::Scalar::length(p3.getXYZ()-tmp_p3);
 		// check orientation
-		if (i!=0)
+		if (i != 0)
 		{
 			if (tmp1)
 			{
@@ -4167,7 +4180,7 @@ bool DicomUtils::generate_geometry(
 			}
 		}
 		// check equidistance, requires 3 slices
-		if (i>=2)
+		if (i >= 2)
 		{
 			if (tmp2)
 			{
@@ -4181,7 +4194,22 @@ bool DicomUtils::generate_geometry(
 					tmp2 = false;
 			}
 		}
-		if (i==size_-1) spacing_z_ = static_cast<double>(length0);
+#if 0
+		std::cout << "length0=" << length0 << std::endl;
+		std::cout << "length1=" << length1 << std::endl;
+		std::cout << "length2=" << length2 << std::endl;
+		std::cout << "length3=" << length3 << std::endl;
+		std::cout << "tmp1=" << tmp1 << std::endl;
+		std::cout << "tmp2=" << tmp2 << std::endl;
+		std::cout << "------------------------" << std::endl;
+#endif
+		if (i == size_ - 1)
+		{
+			spacing_z_ = length1;
+#if 0
+			std::cout << "spacing_z_=" << spacing_z_ << std::endl;
+#endif
+		}
 		tmp0 = orientation_string;
 		tmp_p0 = p0.getXYZ();
 		tmp_p1 = p1.getXYZ();
@@ -4219,9 +4247,9 @@ bool DicomUtils::generate_geometry(
 				tmp1 &&
 				((tmp2 && (size_ > 2))||size_ == 2) &&
 				!(
-				(direction0.getX()<direction1.getX()+0.001f && direction0.getX()>direction1.getX()-0.001f) &&
-				(direction0.getY()<direction1.getY()+0.001f && direction0.getY()>direction1.getY()-0.001f) &&
-				(direction0.getZ()<direction1.getZ()+0.001f && direction0.getZ()>direction1.getZ()-0.001f)
+				(direction0.getX() < direction1.getX() + 0.001f && direction0.getX() > direction1.getX() - 0.001f) &&
+				(direction0.getY() < direction1.getY() + 0.001f && direction0.getY() > direction1.getY() - 0.001f) &&
+				(direction0.getZ() < direction1.getZ() + 0.001f && direction0.getZ() > direction1.getZ() - 0.001f)
 				))
 			{
 				invalidate_volume = true;
@@ -4288,14 +4316,14 @@ bool DicomUtils::generate_geometry(
 	}
 	else
 	{
-		if      (size_ >  2) { *equi_ = (tmp1 && tmp2); }
-		else if (size_ == 2) { *equi_ = tmp1; }
+		if      (size_ >  2) *equi_ = (tmp1 && tmp2);
+		else if (size_ == 2) *equi_ = tmp1;
 	}
 	//
 	*up_dir_x = up.getX();
 	*up_dir_y = up.getY();
 	*up_dir_z = up.getZ();
-	if (*equi_==true)
+	if (*equi_ == true)
 	{
 		const sVector3 cube_center = sVector3((v0+v1)*0.5f);
 		*center_x = cube_center.getX();
@@ -4308,7 +4336,7 @@ bool DicomUtils::generate_geometry(
 		if (tmp1 && size_ > 1) *one_direction_ = true;
 		else *one_direction_ = false;
 	}
-	*spacing_z = (size_>1) ? spacing_z_ : 1;
+	*spacing_z = (size_ > 1) ? spacing_z_ : 1.0;
 	return true;
 }
 
@@ -8452,6 +8480,14 @@ QString DicomUtils::read_enhanced_common(
 					tolerance,
 					false);
 			}
+#if 0
+			std::cout
+				<< "geom_ok=" << geom_ok
+				<< " spacing ok=" << spacing_ok
+				<< " sx=" << spacing_x
+				<< " sy=" << spacing_y
+				<< " sz_tmp=" << spacing_z_tmp <<std::endl;
+#endif
 			//
 			ivariant->equi = equi_;
 			//
@@ -11003,7 +11039,6 @@ QString DicomUtils::read_dicom(
 					sop==QString("1.2.840.10008.5.1.4.1.1.77.1.5.6")|| // Wide Field Ophthalmic Photography 3D Coordinates
 					sop==QString("1.2.840.10008.5.1.4.1.1.12.1.1")  || // Enhanced X-Ray Angiographic
 					sop==QString("1.2.840.10008.5.1.4.1.1.12.2.1")     // Enhanced X-Ray RF
-					//sop==QString("1.2.840.10008.5.1.4.1.1.77.1.6")     // VL Whole Slide Microscopy
 					)
 				{
 					enhanced = true;
