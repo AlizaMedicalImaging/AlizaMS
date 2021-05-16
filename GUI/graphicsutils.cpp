@@ -387,6 +387,7 @@ void GraphicsUtils::gen_labels(
 	const QString & rai,
 	const QString & laterality,
 	const QString & body_part,
+	const QString & orientation_20_20,
 	QString & left_string,
 	QString & top_string,
 	const bool global_flip_x,
@@ -495,7 +496,17 @@ void GraphicsUtils::gen_labels(
 	}
 	else
 	{
-		top_string = QString("");
+		if (!orientation_20_20.isEmpty())
+		{
+			top_string =
+				QString("<small><i>0x20,0x20 ") +
+				orientation_20_20 +
+				QString("</i></small>");
+		}
+		else
+		{
+			top_string = QString("");
+		}
 		left_string = QString("");
 	}
 	if (body_part.isEmpty())

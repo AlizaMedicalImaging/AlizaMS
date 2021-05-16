@@ -351,6 +351,8 @@ public:
 };
 typedef std::vector<ImageSlice*> SlicesVector;
 
+typedef QMap<unsigned int, QString> Orientations_20_20;
+
 class SpectroscopySlice
 {
 public:
@@ -868,6 +870,7 @@ public:
 	PRGraphicObjects  pr_graphicobjects;
 	PRDisplayShutters pr_display_shutters;
 	QStringList filenames;
+	Orientations_20_20 orientations_20_20;
 	QPixmap icon;
 	QPixmap histogram;
 	bool rescale_disabled;
@@ -978,6 +981,7 @@ public:
 	double us_window_center_ext;
 	double us_window_width_ext;
 	short selected_lut;
+	QString orientation_20_20;
 };
 
 class ProcessImageThread_ : public QThread

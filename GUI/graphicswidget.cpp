@@ -394,6 +394,7 @@ template<typename T> void load_rgb_image(
 	const QString & rai,
 	const QString & laterality,
 	const QString & body_part,
+	const QString & orientation_20_20,
 	const short image_type,
 	const bool redraw_contours,
 	short fit=0)
@@ -543,6 +544,7 @@ template<typename T> void load_rgb_image(
 	GraphicsUtils::gen_labels(
 		axis, hide_orientation,
 		rai, laterality, body_part,
+		orientation_20_20,
 		left_string, top_string,
 		global_flip_x, global_flip_y,
 		&flip_x, &flip_y);
@@ -820,6 +822,7 @@ template<typename T> void load_rgba_image(
 	GraphicsUtils::gen_labels(
 		axis, hide_orientation,
 		rai, QString(""), QString(""),
+		QString(""),
 		left_string, top_string,
 		global_flip_x, global_flip_y,
 		&flip_x, &flip_y);
@@ -865,6 +868,7 @@ template<typename T> void load_rgb_char_image(
 	const QString & rai,
 	const QString & laterality,
 	const QString & body_part,
+	const QString & orientation_20_20,
 	const short image_type,
 	const bool redraw_contours,
 	short fit=0)
@@ -946,6 +950,7 @@ template<typename T> void load_rgb_char_image(
 	GraphicsUtils::gen_labels(
 		axis, hide_orientation,
 		rai, laterality, body_part,
+		orientation_20_20,
 		left_string, top_string,
 		global_flip_x, global_flip_y,
 		&flip_x, &flip_y);
@@ -1105,6 +1110,7 @@ template<typename T> void load_rgba_char_image(
 	GraphicsUtils::gen_labels(
 		axis, hide_orientation,
 		rai, QString(""), QString(""),
+		QString(""),
 		left_string, top_string,
 		global_flip_x, global_flip_y,
 		&flip_x, &flip_y);
@@ -1149,6 +1155,7 @@ template<typename T> void load_image(const typename T::Pointer & image,
 	const QString & rai,
 	const QString & laterality,
 	const QString & body_part,
+	const QString & orientation_20_20,
 	const bool redraw_contours,
 	short fit=0)
 {
@@ -1334,6 +1341,7 @@ template<typename T> void load_image(const typename T::Pointer & image,
 	GraphicsUtils::gen_labels(
 		axis, hide_orientation,
 		rai, laterality, body_part,
+		orientation_20_20,
 		left_string, top_string,
 		global_flip_x, global_flip_y,
 		&flip_x, &flip_y);
@@ -1675,6 +1683,7 @@ void GraphicsWidget::update_image(
 				image_container.image2D->orientation_string,
 				image_container.image2D->laterality,
 				image_container.image2D->body_part,
+				image_container.orientation_20_20,
 				redraw_contours,
 				fit);
 		break;
@@ -1685,6 +1694,7 @@ void GraphicsWidget::update_image(
 				image_container.image2D->orientation_string,
 				image_container.image2D->laterality,
 				image_container.image2D->body_part,
+				image_container.orientation_20_20,
 				redraw_contours,
 				fit);
 		break;
@@ -1695,6 +1705,7 @@ void GraphicsWidget::update_image(
 				image_container.image2D->orientation_string,
 				image_container.image2D->laterality,
 				image_container.image2D->body_part,
+				image_container.orientation_20_20,
 				redraw_contours,
 				fit);
 		break;
@@ -1705,6 +1716,7 @@ void GraphicsWidget::update_image(
 				image_container.image2D->orientation_string,
 				image_container.image2D->laterality,
 				image_container.image2D->body_part,
+				image_container.orientation_20_20,
 				redraw_contours,
 				fit);
 		break;
@@ -1715,6 +1727,7 @@ void GraphicsWidget::update_image(
 				image_container.image2D->orientation_string,
 				image_container.image2D->laterality,
 				image_container.image2D->body_part,
+				image_container.orientation_20_20,
 				redraw_contours,
 				fit);
 		break;
@@ -1725,6 +1738,7 @@ void GraphicsWidget::update_image(
 				image_container.image2D->orientation_string,
 				image_container.image2D->laterality,
 				image_container.image2D->body_part,
+				image_container.orientation_20_20,
 				redraw_contours,
 				fit);
 		break;
@@ -1735,6 +1749,7 @@ void GraphicsWidget::update_image(
 				image_container.image2D->orientation_string,
 				image_container.image2D->laterality,
 				image_container.image2D->body_part,
+				image_container.orientation_20_20,
 				redraw_contours,
 				fit);
 		break;
@@ -1745,6 +1760,7 @@ void GraphicsWidget::update_image(
 				image_container.image2D->orientation_string,
 				image_container.image2D->laterality,
 				image_container.image2D->body_part,
+				image_container.orientation_20_20,
 				redraw_contours,
 				fit);
 		break;
@@ -1755,6 +1771,7 @@ void GraphicsWidget::update_image(
 				image_container.image2D->orientation_string,
 				image_container.image2D->laterality,
 				image_container.image2D->body_part,
+				image_container.orientation_20_20,
 				redraw_contours,
 				fit);
 		break;
@@ -1765,6 +1782,7 @@ void GraphicsWidget::update_image(
 				image_container.image2D->orientation_string,
 				image_container.image2D->laterality,
 				image_container.image2D->body_part,
+				image_container.orientation_20_20,
 				image_container.image2D->image_type,
 				redraw_contours,
 				fit);
@@ -1776,6 +1794,7 @@ void GraphicsWidget::update_image(
 				image_container.image2D->orientation_string,
 				image_container.image2D->laterality,
 				image_container.image2D->body_part,
+				image_container.orientation_20_20,
 				image_container.image2D->image_type,
 				redraw_contours,
 				fit);
@@ -1787,6 +1806,7 @@ void GraphicsWidget::update_image(
 				image_container.image2D->orientation_string,
 				image_container.image2D->laterality,
 				image_container.image2D->body_part,
+				image_container.orientation_20_20,
 				image_container.image2D->image_type,
 				redraw_contours,
 				fit);
@@ -1798,6 +1818,7 @@ void GraphicsWidget::update_image(
 				image_container.image2D->orientation_string,
 				image_container.image2D->laterality,
 				image_container.image2D->body_part,
+				image_container.orientation_20_20,
 				image_container.image2D->image_type,
 				redraw_contours,
 				fit);
@@ -1809,6 +1830,7 @@ void GraphicsWidget::update_image(
 				image_container.image2D->orientation_string,
 				image_container.image2D->laterality,
 				image_container.image2D->body_part,
+				image_container.orientation_20_20,
 				image_container.image2D->image_type,
 				redraw_contours,
 				fit);
@@ -1820,6 +1842,7 @@ void GraphicsWidget::update_image(
 				image_container.image2D->orientation_string,
 				image_container.image2D->laterality,
 				image_container.image2D->body_part,
+				image_container.orientation_20_20,
 				image_container.image2D->image_type,
 				redraw_contours,
 				fit);
@@ -1831,6 +1854,7 @@ void GraphicsWidget::update_image(
 				image_container.image2D->orientation_string,
 				image_container.image2D->laterality,
 				image_container.image2D->body_part,
+				image_container.orientation_20_20,
 				image_container.image2D->image_type,
 				redraw_contours,
 				fit);
@@ -2150,11 +2174,12 @@ void GraphicsWidget::set_slice_2D(
 	graphicsview->clear_prtexts_items();
 	graphicsview->clear_prgraphicobjects_items();
 	graphicsview->clear_shutters();
-	set_top_label_text("");
-	set_left_label_text("");
-	set_measure_text("");
+	set_top_label_text(QString(""));
+	set_left_label_text(QString(""));
+	set_measure_text(QString(""));
 	graphicsview->set_empty_distance();
 	graphicsview->pr_area->hide();
+	image_container.orientation_20_20 = QString("");
 	//
 	if (!v) return;
 	int x = 0;
@@ -2341,6 +2366,14 @@ void GraphicsWidget::set_slice_2D(
 					image_container.image2D->orientation_string =
 						v->di->image_slices.at(x)->slice_orientation_string;
 			}
+			if (v->orientations_20_20.contains(x))
+			{
+				const QString s2020 = v->orientations_20_20.value(x);
+				if (!s2020.isEmpty())
+				{
+					image_container.orientation_20_20 = s2020;
+				}
+			}
 			if (v->anatomy.contains(x))
 			{
 				image_container.image2D->laterality =
@@ -2350,7 +2383,8 @@ void GraphicsWidget::set_slice_2D(
 			}
 		}
 		break;
-	default : break; // never
+	default :
+		break;
 	}
 	update_image(fit, true, false);
 	//

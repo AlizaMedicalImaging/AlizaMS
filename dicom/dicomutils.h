@@ -107,6 +107,7 @@ public:
 		QString&,
 		QString&,
 		QString&,
+		QString&,
 		QString&);
 	static void read_image_info_rtdose(
 		const QString&,

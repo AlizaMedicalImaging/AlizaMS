@@ -16,6 +16,7 @@ public:
 		const short,
 		const bool,
 		const QString&, const QString&, const QString&,
+		const QString&,
 		QString&, QString&,
 		const bool, const bool,
 		bool*, bool*);

@@ -1698,7 +1698,8 @@ void DicomUtils::read_image_info(
 	QString        & position,
 	QString        & orientation,
 	QString        & spacing,
-	QString        & sop_instance_uid)
+	QString        & sop_instance_uid,
+	QString        & orientation_20_20)
 {
 	std::set<mdcm::Tag> tags;
 	mdcm::Tag tsopinstance(0x0008,0x0018); tags.insert(tsopinstance);
@@ -1716,6 +1717,8 @@ void DicomUtils::read_image_info(
 	mdcm::Tag tspacing0(0x0028,0x0030);    tags.insert(tspacing0);
 	// Pixel Aspect Ratio
 	mdcm::Tag tspacing3(0x0028,0x0034);    tags.insert(tspacing3);
+	// Patient Orientation
+	mdcm::Tag t2020(0x0020,0x0020);        tags.insert(t2020);
 	//
 	mdcm::Reader reader;
 #ifdef _WIN32
@@ -1794,6 +1797,15 @@ void DicomUtils::read_image_info(
 		{
 			if (get_string_value(ds,tspacing3,spacing_))
 				spacing = spacing_.remove(QChar('\0'));
+		}
+	}
+	//
+	{
+		QString o20_20;
+		if (ds.FindDataElement(t2020))
+		{
+			if (get_string_value(ds,t2020,o20_20))
+				orientation_20_20 = o20_20.remove(QChar('\0'));
 		}
 	}
 }
@@ -2256,10 +2268,11 @@ bool DicomUtils::read_slices(
 	for (unsigned int i = 0; i < size_z; ++i)
 	{
 		QString
-			sop_instance_uid(""),
-			pat_pos_s(""),
-			pat_orient_s(""),
-			pix_spacing_s("");
+			sop_instance_uid,
+			pat_pos_s,
+			pat_orient_s,
+			pix_spacing_s,
+			orientation_20_20;
 		unsigned short rows_ = 0, columns_ = 0;
 		read_image_info(
 			filenames_.at(i),
@@ -2267,7 +2280,11 @@ bool DicomUtils::read_slices(
 			pat_pos_s,
 			pat_orient_s,
 			pix_spacing_s,
-			sop_instance_uid);
+			sop_instance_uid,
+			orientation_20_20);
+		ivariant->image_instance_uids[i] = sop_instance_uid;
+		if (!orientation_20_20.isEmpty())
+			ivariant->orientations_20_20[i] = orientation_20_20;
 		double pat_pos[3];
 		double pat_orient[6];
 		double pix_spacing[2];
@@ -2277,33 +2294,38 @@ bool DicomUtils::read_slices(
 			get_patient_orientation(pat_orient_s,pat_orient);
 		const bool pix_spacing_ok =
 			get_pixel_spacing(pix_spacing_s,pix_spacing);
-		if (!ok_pos||!ok_orient||!pix_spacing_ok) goto quit_;
-		if (i==0)
+		if (ok_pos && ok_orient && pix_spacing_ok)
 		{
-			rows = rows_; columns = columns_;
-			spacing_x = pix_spacing[1];
-			spacing_y = pix_spacing[0];
+			if (i==0)
+			{
+				rows = rows_;
+				columns = columns_;
+				spacing_x = pix_spacing[1];
+				spacing_y = pix_spacing[0];
+			}
+			else
+			{
+				if (rows!=rows_||columns!=columns_) ok = false;
+				if (spacing_x > pix_spacing[1]+0.01 ||
+					spacing_x < pix_spacing[1]-0.01 ||
+					spacing_y > pix_spacing[0]+0.01 ||
+					spacing_y < pix_spacing[0]-0.01)
+				{
+					ok = false;
+				}
+			}
+			double * p = new double[9];
+			p[0] = pat_pos[0];
+			p[1] = pat_pos[1];
+			p[2] = pat_pos[2];
+			p[3] = pat_orient[0];
+			p[4] = pat_orient[1];
+			p[5] = pat_orient[2];
+			p[6] = pat_orient[3];
+			p[7] = pat_orient[4];
+			p[8] = pat_orient[5];
+			values.push_back(p);
 		}
-		else
-		{
-			if (rows!=rows_||columns!=columns_) goto quit_;
-			if (spacing_x > pix_spacing[1]+0.01 ||
-				spacing_x < pix_spacing[1]-0.01 ||
-				spacing_y > pix_spacing[0]+0.01 ||
-				spacing_y < pix_spacing[0]-0.01) goto quit_;
-		}
-		double * p = new double[9];
-		p[0] = pat_pos[0];
-		p[1] = pat_pos[1];
-		p[2] = pat_pos[2];
-		p[3] = pat_orient[0];
-		p[4] = pat_orient[1];
-		p[5] = pat_orient[2];
-		p[6] = pat_orient[3];
-		p[7] = pat_orient[4];
-		p[8] = pat_orient[5];
-		values.push_back(p);
-		ivariant->image_instance_uids[i] = sop_instance_uid;
 #if 0
 		if (i == 0) std::cout << std::endl;
 		std::cout << "read_slices() "
@@ -2317,6 +2339,7 @@ bool DicomUtils::read_slices(
 	}
 	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
+	if (!ok) goto quit_;
 	ok = generate_geometry(
 			ivariant->di->image_slices,
 			ivariant->di->spectroscopy_slices,
@@ -6233,6 +6256,7 @@ QString DicomUtils::read_series(
 						if (slices_ok) load_contour(ds,ivariant);
 					}
 				}
+#if 0
 				else if (
 						ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.7")       || // SC
 					    ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.77.1.5.1")|| // Ophthalmic Photography  8 Bit
@@ -6251,6 +6275,7 @@ QString DicomUtils::read_series(
 				{
 					if (!min_load) ivariant->di->skip_texture = true;
 				}
+#endif
 				else
 				{
 					if (!min_load)
