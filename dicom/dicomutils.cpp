@@ -2240,6 +2240,7 @@ bool DicomUtils::read_slices(
 {
 	if (!ivariant) return false;
 	bool ok = false;
+	bool failed = false;
 	const int unsigned size_z = filenames_.size();
 	std::vector<double*> values;
 	unsigned short rows    = 0;
@@ -2296,7 +2297,8 @@ bool DicomUtils::read_slices(
 			get_pixel_spacing(pix_spacing_s,pix_spacing);
 		if (ok_pos && ok_orient && pix_spacing_ok)
 		{
-			if (i==0)
+			bool ok1 = true;
+			if (i == 0)
 			{
 				rows = rows_;
 				columns = columns_;
@@ -2305,26 +2307,40 @@ bool DicomUtils::read_slices(
 			}
 			else
 			{
-				if (rows!=rows_||columns!=columns_) ok = false;
+				if (rows!=rows_ || columns!=columns_)
+				{
+					ok1 = false;
+				}
 				if (spacing_x > pix_spacing[1]+0.01 ||
 					spacing_x < pix_spacing[1]-0.01 ||
 					spacing_y > pix_spacing[0]+0.01 ||
 					spacing_y < pix_spacing[0]-0.01)
 				{
-					ok = false;
+					ok1 = false;
 				}
 			}
-			double * p = new double[9];
-			p[0] = pat_pos[0];
-			p[1] = pat_pos[1];
-			p[2] = pat_pos[2];
-			p[3] = pat_orient[0];
-			p[4] = pat_orient[1];
-			p[5] = pat_orient[2];
-			p[6] = pat_orient[3];
-			p[7] = pat_orient[4];
-			p[8] = pat_orient[5];
-			values.push_back(p);
+			if (ok1)
+			{
+				double * p = new double[9];
+				p[0] = pat_pos[0];
+				p[1] = pat_pos[1];
+				p[2] = pat_pos[2];
+				p[3] = pat_orient[0];
+				p[4] = pat_orient[1];
+				p[5] = pat_orient[2];
+				p[6] = pat_orient[3];
+				p[7] = pat_orient[4];
+				p[8] = pat_orient[5];
+				values.push_back(p);
+			}
+			else
+			{
+				failed = true;
+			}
+		}
+		else
+		{
+			failed = true;
 		}
 #if 0
 		if (i == 0) std::cout << std::endl;
@@ -2339,7 +2355,7 @@ bool DicomUtils::read_slices(
 	}
 	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
-	if (!ok) goto quit_;
+	if (failed) goto quit_;
 	ok = generate_geometry(
 			ivariant->di->image_slices,
 			ivariant->di->spectroscopy_slices,
@@ -2371,7 +2387,9 @@ bool DicomUtils::read_slices(
 		ivariant->di->iy_spacing = spacing_y;
 		ivariant->di->iz_spacing = size_z==1 ? 1 : spacing_z;
 		for (int x = 0; x < 6; ++x)
+		{
 			ivariant->di->dircos[x] = (float)dircos[x]; ///////
+		}
 		//
 		if (ivariant->equi == false)
 		{
