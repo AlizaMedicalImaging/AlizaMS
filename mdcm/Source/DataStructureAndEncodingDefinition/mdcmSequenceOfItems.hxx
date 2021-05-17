@@ -21,9 +21,9 @@ template <typename TDE>
 VL
 SequenceOfItems::ComputeLength() const
 {
-  typename ItemVector::const_iterator it = Items.begin();
+  typename ItemVector::const_iterator it = Items.cbegin();
   VL                                  length = 0;
-  for (; it != Items.end(); ++it)
+  for (; it != Items.cend(); ++it)
   {
     length += it->template GetLength<TDE>();
   }

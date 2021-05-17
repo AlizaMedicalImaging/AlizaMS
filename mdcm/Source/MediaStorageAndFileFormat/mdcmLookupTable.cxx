@@ -382,7 +382,7 @@ void LookupTable::Encode(std::istream &is, std::ostream &os)
     //int i = Internal->RGB.size();
     //assert(Internal->RGB.size() == 5);
     int idx = 0;
-    for(RGBColorIndexer::const_iterator it = s.begin(); it != s.end() && idx < 256; ++it, ++idx)
+    for(RGBColorIndexer::const_iterator it = s.cbegin(); it != s.cend() && idx < 256; ++it, ++idx)
     {
       assert(idx == std::distance(s.begin(), it));
       //std::cout << "Index: " << idx << " -> "; printrgb(it->rgb); std::cout << "\n";
@@ -451,7 +451,7 @@ void LookupTable::Encode(std::istream &is, std::ostream &os)
     //assert(Internal->RGB.size() == 5);
     int idx = 0;
     uint16_t *rgb16 = (uint16_t*)&Internal->RGB[0];
-    for(RGBColorIndexer::const_iterator it = s.begin(); it != s.end(); ++it, ++idx)
+    for(RGBColorIndexer::const_iterator it = s.cbegin(); it != s.cend(); ++it, ++idx)
     {
       assert(idx == std::distance(s.begin(), it));
       //std::cout << "Index: " << idx << " -> "; printrgb(it->rgb); std::cout << "\n";
@@ -659,8 +659,8 @@ LookupTable::GetBufferAsRGBA(unsigned char * rgba) const
   bool ret = false;
   if (BitSample == 8)
   {
-    std::vector<unsigned char>::const_iterator it = Internal->RGB.begin();
-    for (; it != Internal->RGB.end();)
+    std::vector<unsigned char>::const_iterator it = Internal->RGB.cbegin();
+    for (; it != Internal->RGB.cend();)
     {
       // RED
       *rgba++ = *it++;

@@ -164,8 +164,8 @@ Scanner::Scan(const std::vector<std::string> & filenames, const Dict & dict)
     }
     Progress = 0.0;
     const double                             progresstick = (filenames_size > 0) ? 1.0 / (double)filenames_size : 0.0;
-    std::vector<std::string>::const_iterator it = Filenames.begin();
-    for (; it != Filenames.end(); ++it)
+    std::vector<std::string>::const_iterator it = Filenames.cbegin();
+    for (; it != Filenames.cend(); ++it)
     {
       Reader       reader;
       const char * filename = it->c_str();
@@ -209,7 +209,7 @@ Scanner::IsKey(const char * filename) const
   if (filename && *filename)
   {
     MappingType::const_iterator it2 = Mappings.find(filename);
-    return (it2 != Mappings.end());
+    return (it2 != Mappings.cend());
   }
   return false;
 }
@@ -218,8 +218,8 @@ std::vector<std::string>
 Scanner::GetKeys() const
 {
   std::vector<std::string>                 keys;
-  std::vector<std::string>::const_iterator file = Filenames.begin();
-  for (; file != Filenames.end(); ++file)
+  std::vector<std::string>::const_iterator file = Filenames.cbegin();
+  for (; file != Filenames.cend(); ++file)
   {
     const char * filename = file->c_str();
     if (IsKey(filename))
@@ -254,8 +254,8 @@ Scanner::ValuesType
 Scanner::GetValues(const Tag & t) const
 {
   ValuesType                               vt;
-  std::vector<std::string>::const_iterator file = Filenames.begin();
-  for (; file != Filenames.end(); ++file)
+  std::vector<std::string>::const_iterator file = Filenames.cbegin();
+  for (; file != Filenames.cend(); ++file)
   {
     const char *       filename = file->c_str();
     const TagToValue & ttv = GetMapping(filename);
@@ -271,8 +271,8 @@ std::vector<std::string>
 Scanner::GetOrderedValues(const Tag & t) const
 {
   std::vector<std::string>                 theReturn;
-  std::vector<std::string>::const_iterator file = Filenames.begin();
-  for (; file != Filenames.end(); ++file)
+  std::vector<std::string>::const_iterator file = Filenames.cbegin();
+  for (; file != Filenames.cend(); ++file)
   {
     const char *       filename = file->c_str();
     const TagToValue & ttv = GetMapping(filename);
@@ -307,13 +307,13 @@ Scanner::GetFilenameFromTagToValue(const Tag & t, const char * valueref) const
   const char * filenameref = NULL;
   if (valueref)
   {
-    std::vector<std::string>::const_iterator file = Filenames.begin();
+    std::vector<std::string>::const_iterator file = Filenames.cbegin();
     size_t                                   len = strlen(valueref);
     if (len && valueref[len - 1] == ' ')
     {
       --len;
     }
-    for (; file != Filenames.end() && !filenameref; ++file)
+    for (; file != Filenames.cend() && !filenameref; ++file)
     {
       const char * filename = file->c_str();
       const char * value = GetValue(filename, t);
@@ -333,8 +333,8 @@ Scanner::GetAllFilenamesFromTagToValue(const Tag & t, const char * valueref) con
   if (valueref)
   {
     const std::string                        valueref_str = String<>::Trim(valueref);
-    std::vector<std::string>::const_iterator file = Filenames.begin();
-    for (; file != Filenames.end(); ++file)
+    std::vector<std::string>::const_iterator file = Filenames.cbegin();
+    for (; file != Filenames.cend(); ++file)
     {
       const char *      filename = file->c_str();
       const char *      value = GetValue(filename, t);
@@ -364,8 +364,8 @@ Scanner::ProcessPublicTag(const char * filename, const File & file, const Dict &
   const FileMetaInformation &  header = file.GetHeader();
   const mdcm::TransferSyntax & ts = header.GetDataSetTransferSyntax();
   const bool                   implicit = ts.IsImplicit();
-  TagsType::const_iterator     tag = Tags.begin();
-  for (; tag != Tags.end(); ++tag)
+  TagsType::const_iterator     tag = Tags.cbegin();
+  for (; tag != Tags.cend(); ++tag)
   {
     if (tag->GetGroup() == 0x2)
     {
@@ -398,14 +398,14 @@ Scanner::ProcessPublicTag(const char * filename, const File & file, const Dict &
 void Scanner::Print(std::ostream & os) const
 {
   os << "Values:\n";
-  for(ValuesType::const_iterator it = Values.begin(); it != Values.end();
+  for(ValuesType::const_iterator it = Values.cbegin(); it != Values.cend();
     ++it)
   {
     os << *it << "\n";
   }
   os << "Mapping:\n";
-  std::vector<std::string>::const_iterator file = Filenames.begin();
-  for(; file != Filenames.end(); ++file)
+  std::vector<std::string>::const_iterator file = Filenames.cbegin();
+  for(; file != Filenames.cend(); ++file)
   {
     const char * filename = file->c_str();
     assert(filename && *filename);
@@ -415,8 +415,8 @@ void Scanner::Print(std::ostream & os) const
     if(Mappings.find(filename) != Mappings.end())
     {
       const TagToValue & mapping = GetMapping(filename);
-      TagToValue::const_iterator it = mapping.begin();
-      for(; it != mapping.end(); ++it)
+      TagToValue::const_iterator it = mapping.cbegin();
+      for(; it != mapping.cend(); ++it)
       {
         const Tag & tag = it->first;
         const char * value = it->second;

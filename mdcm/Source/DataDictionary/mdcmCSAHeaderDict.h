@@ -53,12 +53,12 @@ public:
   ConstIterator
   Begin() const
   {
-    return CSAHeaderDictInternal.begin();
+    return CSAHeaderDictInternal.cbegin();
   }
   ConstIterator
   End() const
   {
-    return CSAHeaderDictInternal.end();
+    return CSAHeaderDictInternal.cend();
   }
   bool
   IsEmpty() const
@@ -80,7 +80,7 @@ public:
   GetCSAHeaderDictEntry(const char * name) const
   {
     MapCSAHeaderDictEntry::const_iterator it = CSAHeaderDictInternal.find(name);
-    if (it != CSAHeaderDictInternal.end())
+    if (it != CSAHeaderDictInternal.cend())
     {
       return *it;
     }
@@ -101,8 +101,8 @@ private:
 inline std::ostream &
 operator<<(std::ostream & os, const CSAHeaderDict & val)
 {
-  CSAHeaderDict::MapCSAHeaderDictEntry::const_iterator it = val.CSAHeaderDictInternal.begin();
-  for (; it != val.CSAHeaderDictInternal.end(); ++it)
+  CSAHeaderDict::MapCSAHeaderDictEntry::const_iterator it = val.CSAHeaderDictInternal.cbegin();
+  for (; it != val.CSAHeaderDictInternal.cend(); ++it)
   {
     const CSAHeaderDictEntry & de = *it;
     os << de << '\n';

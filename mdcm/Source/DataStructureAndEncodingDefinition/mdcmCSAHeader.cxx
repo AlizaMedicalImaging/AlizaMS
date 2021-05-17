@@ -362,7 +362,7 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
 void
 CSAHeader::Print(std::ostream & os) const
 {
-  std::set<CSAElement>::const_iterator it = InternalCSADataSet.begin();
+  std::set<CSAElement>::const_iterator it = InternalCSADataSet.cbegin();
   mdcm::Tag                            t1(0x0029, 0x0010);
   mdcm::Tag                            t2(0x0029, 0x0020);
   if (DataElementTag == t1)
@@ -373,7 +373,7 @@ CSAHeader::Print(std::ostream & os) const
   {
     os << "Series shadow data (0029|xx20)\n\n";
   }
-  for (; it != InternalCSADataSet.end(); ++it)
+  for (; it != InternalCSADataSet.cend(); ++it)
   {
     if (!((*it).IsEmpty()))
       os << *it << std::endl;
@@ -385,8 +385,8 @@ CSAHeader::GetCSAElementByName(const char * name)
 {
   if (name)
   {
-    std::set<CSAElement>::const_iterator it = InternalCSADataSet.begin();
-    for (; it != InternalCSADataSet.end(); ++it)
+    std::set<CSAElement>::const_iterator it = InternalCSADataSet.cbegin();
+    for (; it != InternalCSADataSet.cend(); ++it)
     {
       const char * itname = it->GetName();
       assert(itname);
@@ -404,8 +404,8 @@ CSAHeader::FindCSAElementByName(const char * name)
 {
   if (name)
   {
-    std::set<CSAElement>::const_iterator it = InternalCSADataSet.begin();
-    for (; it != InternalCSADataSet.end(); ++it)
+    std::set<CSAElement>::const_iterator it = InternalCSADataSet.cbegin();
+    for (; it != InternalCSADataSet.cend(); ++it)
     {
       const char * itname = it->GetName();
       assert(itname);

@@ -98,8 +98,8 @@ void ContourUtils::calculate_rois_center(ImageVariant * iv)
 	for (int x = 0; x < iv->di->rois.size(); ++x)
 	{
 		QMap< int, Contour* >::const_iterator it =
-			iv->di->rois.at(x).contours.constBegin();
-		while (it != iv->di->rois.at(x).contours.constEnd())
+			iv->di->rois.at(x).contours.cbegin();
+		while (it != iv->di->rois.at(x).contours.cend())
 		{
 			const Contour * c = it.value();
 			if (c)
@@ -228,8 +228,8 @@ void ContourUtils::copy_roi(
 	dest.color.b          = src.color.b;
 	dest.ref_frame_of_ref = src.ref_frame_of_ref;
 	QMap< int, Contour* >::const_iterator it =
-		src.contours.constBegin();
-	while (it != src.contours.constEnd())
+		src.contours.cbegin();
+	while (it != src.contours.cend())
 	{
 		Contour * c = it.value();
 		if (c)
@@ -437,8 +437,8 @@ void ContourUtils::map_contours_uniform(
 		{
 			ivariant->di->rois[x].map.clear();
 			QMap< int, Contour* >::const_iterator it =
-				ivariant->di->rois.at(x).contours.constBegin();
-			while (it != ivariant->di->rois.at(x).contours.constEnd())
+				ivariant->di->rois.at(x).contours.cbegin();
+			while (it != ivariant->di->rois.at(x).contours.cend())
 			{
 				const Contour * c = it.value();
 				if (!c) continue;
@@ -508,8 +508,8 @@ void ContourUtils::map_contours_nonuniform(
 		{
 			ivariant->di->rois[x].map.clear();
 			QMap< int, Contour* >::const_iterator it =
-				ivariant->di->rois.at(x).contours.constBegin();
-			while (it != ivariant->di->rois.at(x).contours.constEnd())
+				ivariant->di->rois.at(x).contours.cbegin();
+			while (it != ivariant->di->rois.at(x).contours.cend())
 			{
 				const Contour * c = it.value();
 				if (!c) continue;
@@ -622,8 +622,8 @@ void ContourUtils::map_contours_test_refs(
 		for (int z = 0; z < ivariant->di->idimz; ++z)
 		{
 			QMap< int, Contour* >::const_iterator it =
-				ivariant->di->rois.at(x).contours.constBegin();
-			while (it != ivariant->di->rois.at(x).contours.constEnd())
+				ivariant->di->rois.at(x).contours.cbegin();
+			while (it != ivariant->di->rois.at(x).contours.cend())
 			{
 				const Contour * c = it.value();
 				if (c)

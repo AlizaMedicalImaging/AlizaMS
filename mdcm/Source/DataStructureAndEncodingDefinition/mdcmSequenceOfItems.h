@@ -55,12 +55,12 @@ public:
   ConstIterator
   Begin() const
   {
-    return Items.begin();
+    return Items.cbegin();
   }
   ConstIterator
   End() const
   {
-    return Items.end();
+    return Items.cend();
   }
   SequenceOfItems()
     : SequenceLengthField(0xFFFFFFFF)
@@ -225,8 +225,8 @@ public:
   std::ostream const &
   Write(std::ostream & os) const
   {
-    typename ItemVector::const_iterator it = Items.begin();
-    for (; it != Items.end(); ++it)
+    typename ItemVector::const_iterator it = Items.cbegin();
+    for (; it != Items.cend(); ++it)
     {
       it->Write<TDE, TSwap>(os);
     }
@@ -245,8 +245,8 @@ public:
   Print(std::ostream & os) const override
   {
     os << "\t(" << SequenceLengthField << ")\n";
-    ItemVector::const_iterator it = Items.begin();
-    for (; it != Items.end(); ++it)
+    ItemVector::const_iterator it = Items.cbegin();
+    for (; it != Items.cend(); ++it)
     {
       os << "  " << *it;
     }

@@ -56,12 +56,12 @@ public:
   ConstIterator
   Begin() const
   {
-    return DictInternal.begin();
+    return DictInternal.cbegin();
   }
   ConstIterator
   End() const
   {
-    return DictInternal.end();
+    return DictInternal.cend();
   }
   bool
   IsEmpty() const
@@ -83,7 +83,7 @@ public:
   GetDictEntry(const Tag & tag) const
   {
     MapDictEntry::const_iterator it = DictInternal.find(tag);
-    if (it == DictInternal.end())
+    if (it == DictInternal.cend())
     {
       it = DictInternal.find(Tag(0xffff, 0xffff));
       return it->second;
@@ -96,7 +96,7 @@ public:
   GetKeywordFromTag(Tag const & tag) const
   {
     MapDictEntry::const_iterator it = DictInternal.find(tag);
-    if (it == DictInternal.end())
+    if (it == DictInternal.cend())
     {
       return NULL;
     }
@@ -111,10 +111,10 @@ public:
   const DictEntry &
   GetDictEntryByKeyword(const char * keyword, Tag & tag) const
   {
-    MapDictEntry::const_iterator it = DictInternal.begin();
+    MapDictEntry::const_iterator it = DictInternal.cbegin();
     if (keyword)
     {
-      for (; it != DictInternal.end(); ++it)
+      for (; it != DictInternal.cend(); ++it)
       {
         if (strcmp(keyword, it->second.GetKeyword()) == 0)
         {
@@ -152,8 +152,8 @@ private:
 inline std::ostream &
 operator<<(std::ostream & os, const Dict & val)
 {
-  Dict::MapDictEntry::const_iterator it = val.DictInternal.begin();
-  for (; it != val.DictInternal.end(); ++it)
+  Dict::MapDictEntry::const_iterator it = val.DictInternal.cbegin();
+  for (; it != val.DictInternal.cend(); ++it)
   {
     const Tag &       t = it->first;
     const DictEntry & de = it->second;
@@ -197,7 +197,7 @@ public:
   FindDictEntry(const PrivateTag & tag) const
   {
     MapDictEntry::const_iterator it = DictInternal.find(tag);
-    if (it == DictInternal.end())
+    if (it == DictInternal.cend())
     {
       return false;
     }
@@ -208,7 +208,7 @@ public:
   GetDictEntry(const PrivateTag & tag) const
   {
     MapDictEntry::const_iterator it = DictInternal.find(tag);
-    if (it == DictInternal.end())
+    if (it == DictInternal.cend())
     {
       it = DictInternal.find(PrivateTag(0xffff, 0xffff, "MDCM Private Sentinel"));
       assert(it != DictInternal.end());
@@ -221,9 +221,9 @@ public:
   void
   PrintXML() const
   {
-    MapDictEntry::const_iterator it = DictInternal.begin();
+    MapDictEntry::const_iterator it = DictInternal.cbegin();
     std::cout << "<dict edition=\"2008\">\n";
-    for (; it != DictInternal.end(); ++it)
+    for (; it != DictInternal.cend(); ++it)
     {
       const PrivateTag & t = it->first;
       const DictEntry &  de = it->second;
@@ -264,8 +264,8 @@ private:
 inline std::ostream &
 operator<<(std::ostream & os, const PrivateDict & val)
 {
-  PrivateDict::MapDictEntry::const_iterator it = val.DictInternal.begin();
-  for (; it != val.DictInternal.end(); ++it)
+  PrivateDict::MapDictEntry::const_iterator it = val.DictInternal.cbegin();
+  for (; it != val.DictInternal.cend(); ++it)
   {
     const PrivateTag & t = it->first;
     const DictEntry &  de = it->second;

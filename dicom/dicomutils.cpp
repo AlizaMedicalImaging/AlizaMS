@@ -166,8 +166,8 @@ bool Sorter2::StableSort(
 		filelist.begin();
 	for(
 		std::vector<QString>::const_iterator it =
-			filenames.begin();
-		it != filenames.end() && it2 != filelist.end();
+			filenames.cbegin();
+		it != filenames.cend() && it2 != filelist.cend();
 		++it, ++it2)
 	{
 		Reader reader;
@@ -2594,8 +2594,8 @@ bool DicomUtils::read_slices_uihgrid(
 		}
 	}
 	QMap<qlonglong,QString>::const_iterator acqit =
-		acqtimes.constBegin();
-	if (acqit != acqtimes.constEnd())
+		acqtimes.cbegin();
+	if (acqit != acqtimes.cend())
 	{
 		const QString tmp57 = acqit.value();
 		if (tmp57.size() >= 14)
@@ -8090,7 +8090,7 @@ QString DicomUtils::read_enhanced_common(
 				unsigned int,
 				unsigned int,
 				std::less<unsigned int> >::const_iterator
-			it = tmp0.at(x).begin(); it != tmp0.at(x).end(); ++it)
+			it = tmp0.at(x).cbegin(); it != tmp0.at(x).cend(); ++it)
 		{
 			const unsigned int idx__ = it->first;
 			if (!(
@@ -8135,7 +8135,7 @@ QString DicomUtils::read_enhanced_common(
 				unsigned int,
 				unsigned int,
 				std::less<unsigned int> >::const_iterator
-			it = tmp0.at(x).begin(); it != tmp0.at(x).end(); ++it)
+			it = tmp0.at(x).cbegin(); it != tmp0.at(x).cend(); ++it)
 		{
 			tmp1[it->second] = it->first;
 		}
@@ -8158,7 +8158,7 @@ QString DicomUtils::read_enhanced_common(
 				unsigned int,
 				unsigned int,
 				std::less<unsigned int> >::const_iterator
-			it = tmp1.begin(); it != tmp1.end(); ++it)
+			it = tmp1.cbegin(); it != tmp1.cend(); ++it)
 		{
 			const unsigned int idx__ = it->second;
 #ifdef ENHANCED_PRINT_INFO
@@ -8361,8 +8361,8 @@ QString DicomUtils::read_enhanced_common(
 					}
 				}
 				QMap<qlonglong,QString>::const_iterator acqit =
-					acq_times_tmp.constBegin();
-				if (acqit != acq_times_tmp.constEnd())
+					acq_times_tmp.cbegin();
+				if (acqit != acq_times_tmp.cend())
 				{
 					const QString tmp57 = acqit.value();
 					if (tmp57.size() >= 14)
@@ -8927,18 +8927,18 @@ bool DicomUtils::enhanced_process_indices(
 	if (!idx_values.empty())
 	{
 		for (
-			std::list<unsigned int>::const_iterator it1 = tmp1_1.begin();
-			it1 != tmp1_1.end();
+			std::list<unsigned int>::const_iterator it1 = tmp1_1.cbegin();
+			it1 != tmp1_1.cend();
 			++it1)
 		{
 			for (
-				std::list<unsigned int>::const_iterator it2 = tmp1_2.begin();
+				std::list<unsigned int>::const_iterator it2 = tmp1_2.cbegin();
 				it2 != tmp1_2.end();
 				++it2)
 			{
 				for (
-					std::list<unsigned int>::const_iterator it3 = tmp1_3.begin();
-					it3 != tmp1_3.end();
+					std::list<unsigned int>::const_iterator it3 = tmp1_3.cbegin();
+					it3 != tmp1_3.cend();
 					++it3)
 				{
 					std::map< unsigned int,unsigned int,std::less<unsigned int> > tmp2;
@@ -9556,8 +9556,8 @@ bool DicomUtils::process_contrours_ref(
 				for (int y = 0; y < tmp_ivariant->di->rois.size(); ++y)
 				{
 					QMap< int, Contour* >::const_iterator it =
-						tmp_ivariant->di->rois.at(y).contours.constBegin();
-					while (it != tmp_ivariant->di->rois.at(y).contours.constEnd())
+						tmp_ivariant->di->rois.at(y).contours.cbegin();
+					while (it != tmp_ivariant->di->rois.at(y).contours.cend())
 					{
 						if (pb)
 						{
@@ -11172,8 +11172,8 @@ QString DicomUtils::read_dicom(
 			std::list<int> slices_instance_nums;
 			{
 				for (std::map<unsigned int,SliceInstance>::const_iterator it =
-						slice_pos_map.begin();
-					it != slice_pos_map.end();
+						slice_pos_map.cbegin();
+					it != slice_pos_map.cend();
 					++it)
 				{
 					const SliceInstance & si = it->second;
@@ -11197,16 +11197,16 @@ QString DicomUtils::read_dicom(
 			if (unique_instance_nums)
 			{
 				for (std::map<unsigned int, SliceInstance>::const_iterator it =
-						slice_pos_map.begin();
-					it != slice_pos_map.end();
+						slice_pos_map.cbegin();
+					it != slice_pos_map.cend();
 					++it)
 				{
 					slices_instance_map[it->second.instance_number]=it->second.id;
 				}
 				std::vector<unsigned int> image_ids;
 				for (std::map<unsigned int, unsigned int>::const_iterator it =
-						slices_instance_map.begin();
-					it != slices_instance_map.end();
+						slices_instance_map.cbegin();
+					it != slices_instance_map.cend();
 					++it)
 				{
 					image_ids.push_back(it->second);
@@ -11244,8 +11244,8 @@ QString DicomUtils::read_dicom(
 					// list of all slice positions
 					std::list<long long> slices_pos_list2;
 					for (std::map<unsigned int, SliceInstance>::const_iterator it =
-							slice_pos_map.begin();
-						it != slice_pos_map.end();
+							slice_pos_map.cbegin();
+						it != slice_pos_map.cend();
 						++it)
 					{
 						slices_pos_map2[it->second.instance_number] =
@@ -11261,8 +11261,8 @@ QString DicomUtils::read_dicom(
 					// assign id for every unique slice postion
 					std::map<unsigned int, long long> slices_pos_ids;
 					for (std::list<long long>::const_iterator it =
-							slices_pos_list2.begin();
-						it != slices_pos_list2.end(); ++it)
+							slices_pos_list2.cbegin();
+						it != slices_pos_list2.cend(); ++it)
 					{
 						slices_pos_ids[g]=*it;
 						++g;
@@ -11270,14 +11270,14 @@ QString DicomUtils::read_dicom(
 					// find instance numbers for every unique slice postion
 					std::vector< std::vector<unsigned int> > slices_;
 					for (std::map<unsigned int, long long>::const_iterator it =
-						slices_pos_ids.begin();
-						it != slices_pos_ids.end();
+						slices_pos_ids.cbegin();
+						it != slices_pos_ids.cend();
 						++it)
 					{
 						std::vector<unsigned int> tmp_list;
 						for (std::map<unsigned int, long long>::const_iterator it2 =
-								slices_pos_map2.begin();
-							it2 != slices_pos_map2.end();
+								slices_pos_map2.cbegin();
+							it2 != slices_pos_map2.cend();
 							++it2)
 						{
 							if (it->second == it2->second)
@@ -11934,8 +11934,8 @@ QString DicomUtils::read_dicom(
 #else
 		const QSet<QString> s1 = l1.toSet();
 #endif
-		QSet<QString>::const_iterator it1 = s1.begin();
-		while (it1 != s1.end())
+		QSet<QString>::const_iterator it1 = s1.cbegin();
+		while (it1 != s1.cend())
 		{
 			QStringList ff;
 			const QList<QString> & q = l0.values(*it1);
@@ -12350,8 +12350,8 @@ QString DicomUtils::read_dicom(
 				for (int j = 0; j < v->di->rois.size(); ++j)
 				{
 					Contours::const_iterator ic =
-						v->di->rois.at(j).contours.constBegin();
-					while (ic != v->di->rois.at(j).contours.constEnd())
+						v->di->rois.at(j).contours.cbegin();
+					while (ic != v->di->rois.at(j).contours.cend())
 					{
 						const Contour * c = ic.value();
 						if (c) { ++contours_count; }

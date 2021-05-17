@@ -42,8 +42,8 @@ SegmentReader::GetSegments()
 {
   SegmentVector res;
   // Make a segment vector from map with no duplicate.
-  SegmentMap::const_iterator itMap = Segments.begin();
-  SegmentMap::const_iterator itMapEnd = Segments.end();
+  SegmentMap::const_iterator itMap = Segments.cbegin();
+  SegmentMap::const_iterator itMapEnd = Segments.cend();
   if (itMap != itMapEnd)
   {
     // Add first segment
@@ -54,8 +54,8 @@ SegmentReader::GetSegments()
     SegmentVector::const_iterator itVecEnd;
     for (; itMap != itMapEnd; ++itMap)
     {
-      itVec = res.begin();
-      itVecEnd = res.end(); // if res is a list, remove this line
+      itVec = res.cbegin();
+      itVecEnd = res.cend(); // if res is a list, remove this line
       while (itVec != itVecEnd && itMap->second != *itVec)
       {
         itVec++;

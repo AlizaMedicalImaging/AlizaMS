@@ -63,8 +63,8 @@ ByteValue::PrintASCII(std::ostream & os, VL maxlength) const
       length = length - 1;
     }
   }
-  std::vector<char>::const_iterator it = Internal.begin();
-  for (; it != Internal.begin() + length; ++it)
+  std::vector<char>::const_iterator it = Internal.cbegin();
+  for (; it != Internal.cbegin() + length; ++it)
   {
     const char & c = *it;
     if (!(isprint((unsigned char)c) || isspace((unsigned char)c)))

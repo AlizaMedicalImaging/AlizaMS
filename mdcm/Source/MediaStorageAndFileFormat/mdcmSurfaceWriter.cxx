@@ -35,8 +35,8 @@ SurfaceWriter::~SurfaceWriter() {}
 void
 SurfaceWriter::ComputeNumberOfSurfaces()
 {
-  std::vector<SmartPointer<Segment>>::const_iterator it = Segments.begin();
-  std::vector<SmartPointer<Segment>>::const_iterator itEnd = Segments.end();
+  std::vector<SmartPointer<Segment>>::const_iterator it = Segments.cbegin();
+  std::vector<SmartPointer<Segment>>::const_iterator itEnd = Segments.cend();
   for (; it != itEnd; ++it)
   {
     NumberOfSurfaces += (*it)->GetSurfaceCount();
@@ -111,8 +111,8 @@ SurfaceWriter::PrepareWrite()
   }
   // else should remove items?
   std::vector<SmartPointer<Segment>>                 segments = this->GetSegments();
-  std::vector<SmartPointer<Segment>>::const_iterator it0 = segments.begin();
-  std::vector<SmartPointer<Segment>>::const_iterator it0End = segments.end();
+  std::vector<SmartPointer<Segment>>::const_iterator it0 = segments.cbegin();
+  std::vector<SmartPointer<Segment>>::const_iterator it0End = segments.cend();
   unsigned int                                       numSegment = 1;
   unsigned int                                       numSurface = 1;
   for (; it0 != it0End; ++it0)
@@ -120,8 +120,8 @@ SurfaceWriter::PrepareWrite()
     SmartPointer<Segment> segment = *it0;
     assert(segment);
     std::vector<SmartPointer<Surface>>                 surfaces = segment->GetSurfaces();
-    std::vector<SmartPointer<Surface>>::const_iterator it1 = surfaces.begin();
-    std::vector<SmartPointer<Surface>>::const_iterator it1End = surfaces.end();
+    std::vector<SmartPointer<Surface>>::const_iterator it1 = surfaces.cbegin();
+    std::vector<SmartPointer<Surface>>::const_iterator it1End = surfaces.cend();
     for (; it1 != it1End; ++it1)
     {
       SmartPointer<Surface> surface = *it1;
@@ -483,8 +483,8 @@ SurfaceWriter::PrepareWrite()
           }
           // else should remove items?
           const MeshPrimitive::PrimitivesData &         primitivesData = meshPrimitive->GetPrimitivesData();
-          MeshPrimitive::PrimitivesData::const_iterator it = primitivesData.begin();
-          MeshPrimitive::PrimitivesData::const_iterator itEnd = primitivesData.end();
+          MeshPrimitive::PrimitivesData::const_iterator it = primitivesData.cbegin();
+          MeshPrimitive::PrimitivesData::const_iterator itEnd = primitivesData.cend();
           unsigned int                                  i = 1;
           for (; it != itEnd; ++it)
           {

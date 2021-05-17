@@ -100,12 +100,12 @@ public:
   ConstIterator
   Begin() const
   {
-    return Mappings.begin();
+    return Mappings.cbegin();
   }
   ConstIterator
   End() const
   {
-    return Mappings.end();
+    return Mappings.cend();
   }
   const MappingType &
   GetMappings() const

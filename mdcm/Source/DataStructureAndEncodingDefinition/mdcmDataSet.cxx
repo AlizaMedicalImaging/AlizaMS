@@ -35,8 +35,8 @@ DataSet::Clear()
 void
 DataSet::Print(std::ostream & os, std::string const & indent) const
 {
-  ConstIterator it = DES.begin();
-  for (; it != DES.end(); ++it)
+  ConstIterator it = DES.cbegin();
+  for (; it != DES.cend(); ++it)
   {
     os << indent << *it << "\n";
   }
@@ -70,7 +70,7 @@ void
 DataSet::Replace(const DataElement & de)
 {
   ConstIterator it = DES.find(de);
-  if (it != DES.end())
+  if (it != DES.cend())
   {
     // detect loop
     mdcmAssertAlwaysMacro(&*it != &de);
@@ -83,7 +83,7 @@ void
 DataSet::ReplaceEmpty(const DataElement & de)
 {
   ConstIterator it = DES.find(de);
-  if (it != DES.end() && it->IsEmpty())
+  if (it != DES.cend() && it->IsEmpty())
   {
     // detect loop
     mdcmAssertAlwaysMacro(&*it != &de);
@@ -97,7 +97,7 @@ DataSet::GetDataElement(const Tag & t) const
 {
   const DataElement r(t);
   ConstIterator     it = DES.find(r);
-  if (it != DES.end())
+  if (it != DES.cend())
     return *it;
   return GetDEEnd();
 }
@@ -118,7 +118,7 @@ DataSet::GetPrivateCreator(const Tag & t) const
     {
       const DataElement r(pc);
       ConstIterator     it = DES.find(r);
-      if (it == DES.end())
+      if (it == DES.cend())
         return "";
       const DataElement & de = *it;
       if (de.IsEmpty())
@@ -142,7 +142,7 @@ bool
 DataSet::FindDataElement(const Tag & t) const
 {
   const DataElement r(t);
-  if (DES.find(r) != DES.end())
+  if (DES.find(r) != DES.cend())
     return true;
   return false;
 }
@@ -158,7 +158,7 @@ DataSet::FindNextDataElement(const Tag & t) const
 {
   const DataElement r(t);
   ConstIterator     it = DES.lower_bound(r);
-  if (it != DES.end())
+  if (it != DES.cend())
     return *it;
   return GetDEEnd();
 }
@@ -247,7 +247,7 @@ DataSet::ComputeDataElement(const PrivateTag & t) const
   const char *      refowner = t.GetOwner();
   assert(refowner);
   bool found = false;
-  while (it != DES.end() && it->GetTag().GetGroup() == t.GetGroup() && it->GetTag().GetElement() < 0x100)
+  while (it != DES.cend() && it->GetTag().GetGroup() == t.GetGroup() && it->GetTag().GetElement() < 0x100)
   {
     const ByteValue * bv = it->GetByteValue();
     if (bv)

@@ -1368,8 +1368,8 @@ template<typename T, typename T2d> QString levels_slice_by_slice(
 	typedef itk::ImageLinearConstIteratorWithIndex<Image2DTypeUC>
 		ConstIterator;
 	for (
-		QMap<int, QStringList>::const_iterator it = refs.constBegin();
-		it != refs.constEnd();
+		QMap<int, QStringList>::const_iterator it = refs.cbegin();
+		it != refs.cend();
 		++it)
 	{
 		const int k = it.key();
@@ -1396,8 +1396,8 @@ template<typename T, typename T2d> QString levels_slice_by_slice(
 			if (frames_tmp1.size() < 1)
 			{
 				SOPInstanceUids::const_iterator it1 =
-					slices_uids.constBegin();
-				while (it1 != slices_uids.constEnd())
+					slices_uids.cbegin();
+				while (it1 != slices_uids.cend())
 				{
 					if (uid == it1.value()
 						.trimmed()
@@ -1592,8 +1592,8 @@ static void areas_slice_by_slice(
 {
 	if (!v) return;
 	for (
-		QMap<int, QStringList>::const_iterator it = refs.constBegin();
-		it != refs.constEnd();
+		QMap<int, QStringList>::const_iterator it = refs.cbegin();
+		it != refs.cend();
 		++it)
 	{
 		const int k = it.key();
@@ -1617,8 +1617,8 @@ static void areas_slice_by_slice(
 			if (frames_tmp1.empty())
 			{
 				SOPInstanceUids::const_iterator it1 =
-					slices_uids.constBegin();
-				while (it1 != slices_uids.constEnd())
+					slices_uids.cbegin();
+				while (it1 != slices_uids.cend())
 				{
 					if (uid == it1.value().trimmed().remove(QChar('\0')))
 					{
@@ -1723,8 +1723,8 @@ static void text_slice_by_slice(
 {
 	if (!v) return;
 	for (
-		QMap<int, QStringList>::const_iterator it = refs.constBegin();
-		it != refs.constEnd();
+		QMap<int, QStringList>::const_iterator it = refs.cbegin();
+		it != refs.cend();
 		++it)
 	{
 		const int k = it.key();
@@ -1751,8 +1751,8 @@ static void text_slice_by_slice(
 			if (frames_tmp1.empty())
 			{
 				SOPInstanceUids::const_iterator it1 =
-					slices_uids.constBegin();
-				while (it1 != slices_uids.constEnd())
+					slices_uids.cbegin();
+				while (it1 != slices_uids.cend())
 				{
 					if (uid == it1.value().trimmed().remove(QChar('\0')))
 					{
@@ -1865,8 +1865,8 @@ static void graphic_slice_by_slice(
 {
 	if (!v) return;
 	for (
-		QMap<int, QStringList>::const_iterator it = refs.constBegin();
-		it != refs.constEnd();
+		QMap<int, QStringList>::const_iterator it = refs.cbegin();
+		it != refs.cend();
 		++it)
 	{
 		const int k = it.key();
@@ -1893,8 +1893,8 @@ static void graphic_slice_by_slice(
 			if (frames_tmp1.empty())
 			{
 				SOPInstanceUids::const_iterator it1 =
-					slices_uids.constBegin();
-				while (it1 != slices_uids.constEnd())
+					slices_uids.cbegin();
+				while (it1 != slices_uids.cend())
 				{
 					if (uid == it1.value().trimmed().remove(QChar('\0')))
 					{
@@ -3467,10 +3467,10 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 #if 0
 		{
 			QMap<int, QString>::const_iterator it =
-				ivariant->image_instance_uids.constBegin();
+				ivariant->image_instance_uids.cbegin();
 			std::cout << "Instance UIDs (dimZ="
 				<< ivariant->di->idimz <<") :" << std::endl;
-			while (it != ivariant->image_instance_uids.constEnd())
+			while (it != ivariant->image_instance_uids.cend())
 			{
 				std::cout << " " << it.key() << " "
 					<< it.value().toStdString() << std::endl;
@@ -3738,8 +3738,8 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 					py > 0.99999 && py < 1.00001))
 				{
 					bool one_spacing = true;
-					QMap<int, double>::const_iterator it0 = pixel_spacings1.begin();
-					while (it0 != pixel_spacings1.end())
+					QMap<int, double>::const_iterator it0 = pixel_spacings1.cbegin();
+					while (it0 != pixel_spacings1.cend())
 					{
 						const double tmp0 = it0.value();
 						if (!(px > tmp0-0.00001 && px < tmp0+0.00001))
@@ -3751,8 +3751,8 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 					}
 					if (one_spacing)
 					{
-						QMap<int, double>::const_iterator it1 = pixel_spacings0.begin();
-						while (it1 != pixel_spacings0.end())
+						QMap<int, double>::const_iterator it1 = pixel_spacings0.cbegin();
+						while (it1 != pixel_spacings0.cend())
 						{
 							const double tmp1 = it1.value();
 							if (!(py > tmp1-0.00001 && py < tmp1+0.00001))
@@ -3792,8 +3792,8 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 					ay > 0.99999f && ay < 1.00001))
 				{
 					bool one_aspect = true;
-					QMap<int, double>::const_iterator it0 = aspect_ratios1.begin();
-					while (it0 != aspect_ratios1.end())
+					QMap<int, double>::const_iterator it0 = aspect_ratios1.cbegin();
+					while (it0 != aspect_ratios1.cend())
 					{
 						const double tmp0 = it0.value();
 						if (!(ax > tmp0-0.00001 && ax < tmp0+0.00001))
@@ -3805,8 +3805,8 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 					}
 					if (one_aspect)
 					{
-						QMap<int, double>::const_iterator it1 = aspect_ratios0.begin();
-						while (it1 != aspect_ratios0.end())
+						QMap<int, double>::const_iterator it1 = aspect_ratios0.cbegin();
+						while (it1 != aspect_ratios0.cend())
 						{
 							const double tmp1 = it1.value();
 							if (!(ay > tmp1-0.00001 && ay < tmp1+0.00001))
@@ -4137,8 +4137,8 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 			std::cout << "Text annotations" << std::endl;
 			{
 				PRTextAnnotations::const_iterator it8 =
-					v->pr_text_annotations.begin();
-				while (it8 != v->pr_text_annotations.end())
+					v->pr_text_annotations.cbegin();
+				while (it8 != v->pr_text_annotations.cend())
 				{
 					const QList< PRTextAnnotation > & lll = it8.value();
 					for (int y = 0; y < lll.size(); ++y)
@@ -4258,8 +4258,8 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 			std::cout << "Graphic" << std::endl;
 			{
 				PRGraphicObjects::const_iterator it8 =
-					v->pr_graphicobjects.begin();
-				while (it8 != v->pr_graphicobjects.end())
+					v->pr_graphicobjects.cbegin();
+				while (it8 != v->pr_graphicobjects.cend())
 				{
 					const QList< PRGraphicObject > & lll = it8.value();
 					for (int y = 0; y < lll.size(); ++y)
@@ -4325,8 +4325,8 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		std::cout << "Display shutter" << std::endl;
 		{
 			PRDisplayShutters::const_iterator it8 =
-				v->pr_display_shutters.begin();
-			while (it8 != v->pr_display_shutters.end())
+				v->pr_display_shutters.cbegin();
+			while (it8 != v->pr_display_shutters.cend())
 			{
 				const PRDisplayShutter & dsh = it8.value();
 				std::cout << it8.key() << " "
@@ -4352,8 +4352,8 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		//
 		QApplication::processEvents();
 		QMap<int,SliceOverlays>::const_iterator it3 =
-			ref.image_overlays.all_overlays.begin();
-		while (it3 != ref.image_overlays.all_overlays.end())
+			ref.image_overlays.all_overlays.cbegin();
+		while (it3 != ref.image_overlays.all_overlays.cend())
 		{
 			const int key = it3.key();
 			const SliceOverlays & overlays = it3.value();

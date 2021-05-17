@@ -188,8 +188,8 @@ void DisplayInterface::close(bool clear_geometry)
 		QList<int> keys;
 		{
 			QMap< int,Contour* >::const_iterator it2 =
-				rois.at(k).contours.constBegin();
-			while (it2 != rois.at(k).contours.constEnd())
+				rois.at(k).contours.cbegin();
+			while (it2 != rois.at(k).contours.cend())
 			{
 				keys.push_back(it2.key());
 				++it2;

@@ -484,8 +484,8 @@ Overlay::IsZero() const
 {
   if (IsEmpty())
     return false;
-  std::vector<char>::const_iterator it = Internal->Data.begin();
-  for (; it != Internal->Data.end(); ++it)
+  std::vector<char>::const_iterator it = Internal->Data.cbegin();
+  for (; it != Internal->Data.cend(); ++it)
   {
     if (*it)
       return true;
@@ -562,7 +562,7 @@ Overlay::GetUnpackBuffer(char * buffer, size_t len) const
     return false;
   unsigned char *       unpackedbytes = (unsigned char *)buffer;
   const unsigned char * begin = unpackedbytes;
-  for (std::vector<char>::const_iterator it = Internal->Data.begin(); it != Internal->Data.end(); ++it)
+  for (std::vector<char>::const_iterator it = Internal->Data.cbegin(); it != Internal->Data.cend(); ++it)
   {
     assert(unpackedbytes <= begin + len);
     unsigned char packedbytes = static_cast<unsigned char>(*it);
@@ -591,7 +591,7 @@ Overlay::Decompress(std::ostream & os) const
   const size_t  unpacklen = GetUnpackBufferLength();
   unsigned char unpackedbytes[8];
   size_t        curlen = 0;
-  for (std::vector<char>::const_iterator it = Internal->Data.begin(); it != Internal->Data.end(); ++it)
+  for (std::vector<char>::const_iterator it = Internal->Data.cbegin(); it != Internal->Data.cend(); ++it)
   {
     unsigned char packedbytes = *it;
     unsigned char mask = 1;

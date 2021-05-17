@@ -56,8 +56,8 @@ static void search_frame_of_ref(
 	const QString & study_uid,
 	QList<const ImageVariant*> & l)
 {
-	QMap<int, ImageVariant*>::const_iterator it = scene3dimages.begin();
-	while (it != scene3dimages.end())
+	QMap<int, ImageVariant*>::const_iterator it = scene3dimages.cbegin();
+	while (it != scene3dimages.cend())
 	{
 		const ImageVariant * v = it.value();
 		if (v &&
@@ -666,12 +666,12 @@ quit__:
 #if 0
 		{
 			QMap<int, QString>::const_iterator it =
-				ivariants.at(x)->image_instance_uids.constBegin();
+				ivariants.at(x)->image_instance_uids.cbegin();
 			std::cout
 				<< "Instance UIDs (dimZ="
 				<< ivariants.at(x)->di->idimz <<") :"
 				<< std::endl;
-			while (it != ivariants.at(x)->image_instance_uids.constEnd())
+			while (it != ivariants.at(x)->image_instance_uids.cend())
 			{
 				std::cout
 					<< " " << it.key() << " "
@@ -1300,8 +1300,8 @@ void Aliza::set_lut(int i)
 	if (v->group_id >= 0)
 	{
 		QMap<int, ImageVariant*>::const_iterator iv =
-			scene3dimages.constBegin();
-		while (iv != scene3dimages.constEnd())
+			scene3dimages.cbegin();
+		while (iv != scene3dimages.cend())
 		{
 			ImageVariant * v2 = iv.value();
 			if (v2 && (v->group_id == v2->group_id))
@@ -1711,8 +1711,8 @@ void Aliza::set_selected_slice2D_m(int j)
 		if (v->group_id>=0)
 		{
 			QMap<int, ImageVariant*>::const_iterator iv =
-				scene3dimages.constBegin();
-			while (iv != scene3dimages.constEnd())
+				scene3dimages.cbegin();
+			while (iv != scene3dimages.cend())
 			{
 				ImageVariant * v2 = iv.value();
 				if (v2 && (v->group_id == v2->group_id))
@@ -1795,8 +1795,8 @@ void Aliza::set_selected_slice2D_y(int j)
 		if (v->group_id>=0)
 		{
 			QMap<int, ImageVariant*>::const_iterator iv =
-				scene3dimages.constBegin();
-			while (iv != scene3dimages.constEnd())
+				scene3dimages.cbegin();
+			while (iv != scene3dimages.cend())
 			{
 				ImageVariant * v2 = iv.value();
 				if (v2 && (v->group_id == v2->group_id))
@@ -1824,8 +1824,8 @@ void Aliza::set_selected_slice2D_x(int j)
 		if (v->group_id>=0)
 		{
 			QMap<int, ImageVariant*>::const_iterator iv =
-				scene3dimages.constBegin();
-			while (iv != scene3dimages.constEnd())
+				scene3dimages.cbegin();
+			while (iv != scene3dimages.cend())
 			{
 				ImageVariant * v2 = iv.value();
 				if (v2 && (v->group_id == v2->group_id))
@@ -2037,8 +2037,8 @@ void Aliza::calculate_bb()
 		if (v->group_id >= 0)
 		{
 			QMap<int, ImageVariant*>::const_iterator iv =
-				scene3dimages.constBegin();
-			while (iv != scene3dimages.constEnd())
+				scene3dimages.cbegin();
+			while (iv != scene3dimages.cend())
 			{
 				ImageVariant * v2 = iv.value();
 				if (v2 && (v->group_id == v2->group_id))
@@ -2061,8 +2061,8 @@ void Aliza::calculate_bb()
 		if (v->group_id>=0)
 		{
 			QMap<int, ImageVariant*>::const_iterator iv =
-				scene3dimages.constBegin();
-			while (iv != scene3dimages.constEnd())
+				scene3dimages.cbegin();
+			while (iv != scene3dimages.cend())
 			{
 				ImageVariant * v2 = iv.value();
 				if (v2 && (v->group_id == v2->group_id))
@@ -2106,8 +2106,8 @@ void Aliza::calculate_bb()
 			if (v->group_id>=0)
 			{
 				QMap<int, ImageVariant*>::const_iterator iv =
-					scene3dimages.constBegin();
-				while (iv != scene3dimages.constEnd())
+					scene3dimages.cbegin();
+				while (iv != scene3dimages.cend())
 				{
 					ImageVariant * v2 = iv.value();
 					if (v2 && (v->group_id == v2->group_id))
@@ -2317,8 +2317,8 @@ void Aliza::set_transparency(bool t)
 		if (v->group_id>=0)
 		{
 			QMap<int, ImageVariant*>::const_iterator iv =
-				scene3dimages.constBegin();
-			while (iv != scene3dimages.constEnd())
+				scene3dimages.cbegin();
+			while (iv != scene3dimages.cend())
 			{
 				ImageVariant * v2 = iv.value();
 				if (v2 && (v->group_id == v2->group_id))
@@ -2885,7 +2885,7 @@ QString Aliza::create_group_(bool * ok, bool lock_mutex)
 			return QString("");
 		}
 	}
-	QMap<int, ImageVariant*>::const_iterator iv = scene3dimages.constBegin();
+	QMap<int, ImageVariant*>::const_iterator iv = scene3dimages.cbegin();
 	if (scene3dimages.size()<2)
 	{
 		message_ = QString(
@@ -2902,7 +2902,7 @@ QString Aliza::create_group_(bool * ok, bool lock_mutex)
 	dimy = v->di->idimy;
 	dimz = v->di->idimz;
 	image_type = v->image_type;
-	while (iv != scene3dimages.constEnd())
+	while (iv != scene3dimages.cend())
 	{
 		ImageVariant * v2 = iv.value();
 		if (v2 &&
@@ -2924,8 +2924,8 @@ QString Aliza::create_group_(bool * ok, bool lock_mutex)
 	{
 		for (int x = 0; x < tmp_images.size(); ++x)
 			map[tmp_images.at(x)->id]=tmp_images.at(x);
-		QMap<int, ImageVariant*>::const_iterator it = map.constBegin();
-		while (it != map.constEnd())
+		QMap<int, ImageVariant*>::const_iterator it = map.cbegin();
+		while (it != map.cend())
 		{
 			group_images.push_back(it.value());
 			++it;
@@ -3229,8 +3229,8 @@ void Aliza::update_group_width(const ImageVariant * v)
 	if (v)
 	{
 		QMap<int, ImageVariant*>::const_iterator iv =
-			scene3dimages.constBegin();
-		while (iv != scene3dimages.constEnd())
+			scene3dimages.cbegin();
+		while (iv != scene3dimages.cend())
 		{
 			ImageVariant * v2 = iv.value();
 			if (v2 && (v->group_id == v2->group_id))
@@ -3263,8 +3263,8 @@ void Aliza::update_group_center(const ImageVariant * v)
 	if (v)
 	{
 		QMap<int, ImageVariant*>::const_iterator iv =
-			scene3dimages.constBegin();
-		while (iv != scene3dimages.constEnd())
+			scene3dimages.cbegin();
+		while (iv != scene3dimages.cend())
 		{
 			ImageVariant * v2 = iv.value();
 			if (v2 && (v->group_id == v2->group_id))
@@ -3443,8 +3443,8 @@ void Aliza::sort_4d(
 	const int selected_z_slice)
 {
 	QMap<int, ImageVariant*>::const_iterator iv =
-		scene3dimages.constBegin();
-	while (iv != scene3dimages.constEnd())
+		scene3dimages.cbegin();
+	while (iv != scene3dimages.cend())
 	{
 		ImageVariant * v2 = iv.value();
 		if (v2 && (group_id == v2->group_id))
@@ -3479,8 +3479,8 @@ void Aliza::sort_4d(
 	{
 		acqtimes_valid = true;
 		QMap<qlonglong, ImageVariant*>::const_iterator it =
-			acq_times_tmp.constBegin();
-		while (it != acq_times_tmp.constEnd())
+			acq_times_tmp.cbegin();
+		while (it != acq_times_tmp.cend())
 		{
 			if (it.key() <= 0)
 			{
@@ -3496,8 +3496,8 @@ void Aliza::sort_4d(
 		bool t0ok = false;
 		double t0 = 0;
 		QMap<qlonglong, ImageVariant*>::const_iterator it =
-			acq_times_tmp.constBegin();
-		while (it != acq_times_tmp.constEnd())
+			acq_times_tmp.cbegin();
+		while (it != acq_times_tmp.cend())
 		{
 			images.push_back(it.value());
 			bool t1ok = false;
@@ -3540,8 +3540,8 @@ void Aliza::sort_4d(
 		{
 			instance_numbers_valid = true;
 			QMap<int, ImageVariant*>::const_iterator it =
-				instance_numbers_tmp.constBegin();
-			while (it != instance_numbers_tmp.constEnd())
+				instance_numbers_tmp.cbegin();
+			while (it != instance_numbers_tmp.cend())
 			{
 				if (it.key() <= 0)
 				{
@@ -3559,8 +3559,8 @@ void Aliza::sort_4d(
 				<< std::endl;
 #endif
 			QMap<int, ImageVariant*>::const_iterator it =
-				instance_numbers_tmp.constBegin();
-			while (it != instance_numbers_tmp.constEnd())
+				instance_numbers_tmp.cbegin();
+			while (it != instance_numbers_tmp.cend())
 			{
 				images.push_back(it.value());
 				++it;
@@ -3574,8 +3574,8 @@ void Aliza::sort_4d(
 				<< std::endl;
 #endif
 			QMap<int, ImageVariant*>::const_iterator it =
-				map.constBegin();
-			while (it != map.constEnd())
+				map.cbegin();
+			while (it != map.cend())
 			{
 				images.push_back(it.value());
 				++it;
@@ -3591,8 +3591,8 @@ void Aliza::toggle_zlock(bool t)
 	if (v->group_id >= 0)
 	{
 		QMap<int, ImageVariant*>::const_iterator iv =
-			scene3dimages.constBegin();
-		while (iv != scene3dimages.constEnd())
+			scene3dimages.cbegin();
+		while (iv != scene3dimages.cend())
 		{
 			ImageVariant * v2 = iv.value();
 			if (v2 && (v->group_id == v2->group_id))
@@ -3636,8 +3636,8 @@ void Aliza::toggle_zlock_one(bool t)
 	if (v->group_id >= 0)
 	{
 		QMap<int, ImageVariant*>::const_iterator iv =
-			scene3dimages.constBegin();
-		while (iv != scene3dimages.constEnd())
+			scene3dimages.cbegin();
+		while (iv != scene3dimages.cend())
 		{
 			ImageVariant * v2 = iv.value();
 			if (v2 && (v->group_id == v2->group_id))

@@ -149,7 +149,7 @@ MrProtocol::Print(std::ostream & os) const
     os << Pimpl->csastr << " / Version: " << Pimpl->version << std::endl;
     os << std::endl;
     MyMapType & mymap = Pimpl->mymap;
-    for (MyMapType::const_iterator it = mymap.begin(); it != mymap.end(); ++it)
+    for (MyMapType::const_iterator it = mymap.cbegin(); it != mymap.cend(); ++it)
     {
       os << it->first << " : " << trim(std::string(it->second)) << std::endl;
     }
@@ -163,7 +163,7 @@ MrProtocol::GetMrProtocolByName(const char * name) const
   {
     MyMapType &               mymap = Pimpl->mymap;
     MyMapType::const_iterator it = mymap.find(name);
-    if (it == mymap.end())
+    if (it == mymap.cend())
       return NULL;
     return it->second.c_str();
   }
@@ -177,7 +177,7 @@ MrProtocol::FindMrProtocolByName(const char * name) const
   {
     MyMapType &               mymap = Pimpl->mymap;
     MyMapType::const_iterator it = mymap.find(name);
-    if (it != mymap.end())
+    if (it != mymap.cend())
       return true;
   }
   return false;

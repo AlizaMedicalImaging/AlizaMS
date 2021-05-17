@@ -53,7 +53,7 @@ protected:
   bool
   ReadSegments();
   bool
-             ReadSegment(const Item &, const unsigned int);
+  ReadSegment(const Item &, const unsigned int);
   SegmentMap Segments;
 };
 

@@ -195,8 +195,8 @@ Bitmap::GetBufferLength() const
   }
   unsigned long long                        len = 0;
   unsigned long long                        mul = 1;
-  std::vector<unsigned int>::const_iterator it = Dimensions.begin();
-  for (; it != Dimensions.end(); ++it)
+  std::vector<unsigned int>::const_iterator it = Dimensions.cbegin();
+  for (; it != Dimensions.cend(); ++it)
   {
     mul *= *it;
   }
@@ -388,9 +388,9 @@ Bitmap::Print(std::ostream & os) const
     os << "NumberOfDimensions: " << NumberOfDimensions << "\n";
     assert(Dimensions.size());
     os << "Dimensions: (";
-    std::vector<unsigned int>::const_iterator it = Dimensions.begin();
+    std::vector<unsigned int>::const_iterator it = Dimensions.cbegin();
     os << *it;
-    for (; it != Dimensions.end(); ++it)
+    for (; it != Dimensions.cend(); ++it)
     {
       os << "," << *it;
     }

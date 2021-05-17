@@ -34,8 +34,8 @@ CodeString::IsValid() const
    * Uppercase characters, 0-9, the SPACE character, and underscore _, of the
    * Default Character Repertoire
    */
-  const_iterator it = Internal.begin();
-  for (; it != Internal.end(); ++it)
+  const_iterator it = Internal.cbegin();
+  for (; it != Internal.cend(); ++it)
   {
     int c = *it;
     if (!isupper(c) && !isdigit(c) && c != ' ' && c != '_')

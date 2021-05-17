@@ -169,7 +169,7 @@ SubjectInternals::GetCommand(unsigned long tag)
 bool
 SubjectInternals::HasObserver(const Event & event) const
 {
-  for (std::list<Observer *>::const_iterator i = m_Observers.begin(); i != m_Observers.end(); ++i)
+  for (std::list<Observer *>::const_iterator i = m_Observers.cbegin(); i != m_Observers.cend(); ++i)
   {
     const Event * e = (*i)->m_Event;
     if (e && e->CheckEvent(&event))
@@ -188,7 +188,7 @@ SubjectInternals::PrintObservers(std::ostream & os, std::string indent) const
     return false;
   }
 
-  for (std::list<Observer *>::const_iterator i = m_Observers.begin(); i != m_Observers.end(); ++i)
+  for (std::list<Observer *>::const_iterator i = m_Observers.cbegin(); i != m_Observers.cend(); ++i)
   {
     const Event *   e = (*i)->m_Event;
     const Command * c = (*i)->m_Command;

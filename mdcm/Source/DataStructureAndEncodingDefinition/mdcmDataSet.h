@@ -75,7 +75,7 @@ public:
   ConstIterator
   Begin() const
   {
-    return DES.begin();
+    return DES.cbegin();
   }
   Iterator
   Begin()
@@ -85,7 +85,7 @@ public:
   ConstIterator
   End() const
   {
-    return DES.end();
+    return DES.cend();
   }
   Iterator
   End()
@@ -120,7 +120,7 @@ public:
     const DataElement r(tag);
     ConstIterator     it = DES.find(r);
     unsigned int      res = 0;
-    for (++it; it != DES.end() && it->GetTag().GetGroup() == tag.GetGroup(); ++it)
+    for (++it; it != DES.cend() && it->GetTag().GetGroup() == tag.GetGroup(); ++it)
     {
       assert(it->GetTag().GetElement() != 0x0);
       assert(it->GetTag().GetGroup() == tag.GetGroup());
@@ -138,7 +138,7 @@ public:
     assert(!DES.empty());
     VL ll = 0;
     assert(ll == 0);
-    ConstIterator it = DES.begin();
+    ConstIterator it = DES.cbegin();
     for (; it != DES.end(); ++it)
     {
       assert(!(it->GetLength<TDE>().IsUndefined()));

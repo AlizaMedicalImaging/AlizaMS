@@ -132,8 +132,8 @@ writeCodeSequenceMacroAttributes(const SegmentHelper::BasicCodedEntry & entry,
 static void
 writeCodeSequenceMacroAttributes(const Segment::BasicCodedEntryVector & entries, const Tag & tag, DataSet & dataset)
 {
-  Segment::BasicCodedEntryVector::const_iterator it = entries.begin();
-  for (; it != entries.end(); ++it)
+  Segment::BasicCodedEntryVector::const_iterator it = entries.cbegin();
+  for (; it != entries.cend(); ++it)
   {
     writeCodeSequenceMacroAttributes(*it, tag, dataset, true);
   }
@@ -172,8 +172,8 @@ SegmentWriter::PrepareWrite()
       }
     }
   }
-  std::vector<SmartPointer<Segment>>::const_iterator it0 = Segments.begin();
-  std::vector<SmartPointer<Segment>>::const_iterator it0End = Segments.end();
+  std::vector<SmartPointer<Segment>>::const_iterator it0 = Segments.cbegin();
+  std::vector<SmartPointer<Segment>>::const_iterator it0End = Segments.cend();
   unsigned int                                       itemNumber = 1;
   unsigned long                                      surfaceNumber = 1;
   for (; it0 != it0End; ++it0)
@@ -297,8 +297,8 @@ SegmentWriter::PrepareWrite()
         }
       }
       std::vector<SmartPointer<Surface>>                 surfaces = segment->GetSurfaces();
-      std::vector<SmartPointer<Surface>>::const_iterator it = surfaces.begin();
-      std::vector<SmartPointer<Surface>>::const_iterator itEnd = surfaces.end();
+      std::vector<SmartPointer<Surface>>::const_iterator it = surfaces.cbegin();
+      std::vector<SmartPointer<Surface>>::const_iterator itEnd = surfaces.cend();
       unsigned int                                       itemSurfaceNumber = 1;
       for (; it != itEnd; ++it)
       {

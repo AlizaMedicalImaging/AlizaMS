@@ -140,7 +140,7 @@ public:
     unsigned long                       offsetBytes = (*pOffset) | (static_cast<unsigned long>(*(pOffset + 1)) << 16);
     const EntryType *                   copied_part_head = first_segment + offsetBytes / sizeof(EntryType);
     typename SegmentMap::const_iterator ppHeadSeg = instances.find(copied_part_head);
-    if (ppHeadSeg == instances.end())
+    if (ppHeadSeg == instances.cend())
     {
       // referred segment not found
       return false;
@@ -149,7 +149,7 @@ public:
     typename SegmentMap::const_iterator ppSeg = ppHeadSeg;
     while (std::distance(ppHeadSeg, ppSeg) < nNumCopies)
     {
-      assert(ppSeg != instances.end());
+      assert(ppSeg != instances.cend());
       ppSeg->second->Expand(instances, expanded);
       ++ppSeg;
     }

@@ -281,8 +281,8 @@ QString SpectroscopyUtils::ProcessData(
 				unsigned int,
 				unsigned int,
 				std::less<unsigned int> >::const_iterator it =
-				tmp0.at(x).begin();
-			it != tmp0.at(x).end();
+				tmp0.at(x).cbegin();
+			it != tmp0.at(x).cend();
 			++it)
 		{
 			tmp1[it->second] = it->first;
@@ -299,8 +299,8 @@ QString SpectroscopyUtils::ProcessData(
 				unsigned int,
 				unsigned int,
 				std::less<unsigned int> >::const_iterator it =
-				tmp1.begin();
-			it != tmp1.end();
+				tmp1.cbegin();
+			it != tmp1.cend();
 			++it)
 		{
 			const unsigned int idx__ = it->second;
