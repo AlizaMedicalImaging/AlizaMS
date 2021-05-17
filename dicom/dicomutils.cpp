@@ -8916,7 +8916,7 @@ bool DicomUtils::enhanced_process_indices(
 		{
 			for (
 				std::list<unsigned int>::const_iterator it2 = tmp1_2.cbegin();
-				it2 != tmp1_2.end();
+				it2 != tmp1_2.cend();
 				++it2)
 			{
 				for (
