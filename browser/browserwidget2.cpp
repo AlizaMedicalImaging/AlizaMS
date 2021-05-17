@@ -799,8 +799,8 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 				&first_root_off);
 	}
 	//
-	std::set<mdcm::DataElement>::const_iterator it = ds.GetDES().begin();
-	while(it != ds.GetDES().end())
+	std::set<mdcm::DataElement>::const_iterator it = ds.GetDES().cbegin();
+	while(it != ds.GetDES().cend())
 	{
 		if (it->GetTag() == tDirectoryRecordSequence)
 		{
@@ -1682,8 +1682,8 @@ void BrowserWidget2::open_CTK_db()
 	else
 	{
 		p1 = QString("select StudyInstanceUID from Studies where PatientsUID in (");
-		it0 = ids.constBegin();
-		while (it0 != ids.constEnd())
+		it0 = ids.cbegin();
+		while (it0 != ids.cend())
 		{
 			p1.append(QVariant(*it0).toString());
 			++ids_count;

@@ -2281,7 +2281,7 @@ bool DicomUtils::read_slices(
 			}
 			else
 			{
-				if (rows!=rows_ || columns!=columns_)
+				if (rows != rows_ || columns != columns_)
 				{
 					ok1 = false;
 				}
@@ -8197,24 +8197,7 @@ QString DicomUtils::read_enhanced_common(
 				}
 /*
 				else if (sop==QString("1.2.840.10008.5.1.4.1.1.77.1.6")) // VL Whole Slide Microscopy
-				{
-					if (
-						values.at(idx__).vol_pos_ok &&
-						values.at(idx__).vol_orient_ok)
-					{
-						ss[0] = values.at(idx__).vol_pos[0];
-						ss[1] = values.at(idx__).vol_pos[1];
-						ss[2] = values.at(idx__).vol_pos[2];
-						ss[3] = values.at(idx__).vol_orient[0];
-						ss[4] = values.at(idx__).vol_orient[1];
-						ss[5] = values.at(idx__).vol_orient[2];
-						ss[6] = values.at(idx__).vol_orient[3];
-						ss[7] = values.at(idx__).vol_orient[4];
-						ss[8] = values.at(idx__).vol_orient[5];
-						tmp4.push_back(ss);
-					}
-					else { tmp4_ok = false; delete [] ss; }
-
+				{ // TODO
 				}
 */
 				// with iop/ipp
@@ -8313,7 +8296,7 @@ QString DicomUtils::read_enhanced_common(
 			float  center_x, center_y, center_z;
 			std::vector<ImageSlice*> slices;
 			const bool enable_gl = min_load ? false : ok3d;
-			// Disable texturet for Breast Tomosynthesis
+			// Disable texture for Breast Tomosynthesis
 			bool skip_texture =
 				(min_load || (sop==QString("1.2.840.10008.5.1.4.1.1.13.1.3")))
 				? true : !wsettings->get_3d();
