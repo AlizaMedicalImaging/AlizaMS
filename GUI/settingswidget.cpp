@@ -132,6 +132,7 @@ void SettingsWidget::set_default()
 	textureoptions_groupBox->setChecked(true);
 	rescale_checkBox->setChecked(true);
 	mosaic_checkBox->setChecked(true);
+	sortframes_checkBox->setChecked(true);
 	time_s__checkBox->setChecked(false);
 	overlays_checkBox->setChecked(true);
 	clean_unused_checkBox->setChecked(false);
@@ -221,6 +222,9 @@ void SettingsWidget::readSettings()
 	const int tmp5  = settings.value(QString("sr_info2"),        0).toInt();
 	const int tmp6  = settings.value(QString("sr_chapters"),     1).toInt();
 	const int tmp7  = settings.value(QString("sr_skip_images"),  0).toInt();
+	const int tmp8  = settings.value(QString("dcm_overlays"),    1).toInt();
+	const int tmp9  = settings.value(QString("dcm_mosaic"),      1).toInt();
+	const int tmp10 = settings.value(QString("dcm_sort_mf"),     1).toInt();
 	settings.endGroup();
 	settings.beginGroup(QString("StyleDialog"));
 	saved_idx = settings.value(QString("saved_idx"), 0).toInt();
@@ -249,20 +253,26 @@ void SettingsWidget::readSettings()
 	srinfo_checkBox->setChecked((tmp5 == 1));
 	srchapters_checkBox->setChecked((tmp6 == 1));
 	srskipimage_checkBox->setChecked((tmp7 == 1));
+	overlays_checkBox->setChecked((tmp8 == 1));
+	mosaic_checkBox->setChecked((tmp9 == 1));
+	sortframes_checkBox->setChecked((tmp10 == 1));
 }
 
 void SettingsWidget::writeSettings(QSettings & s)
 {
 	s.beginGroup(QString("GlobalSettings"));
-	s.setValue(QString("enable_gl_3D"),  QVariant((int)(gl3D_checkBox->isChecked()?1:0)));
+	s.setValue(QString("enable_gl_3D"),  QVariant((int)(gl3D_checkBox->isChecked() ? 1 : 0)));
 	s.setValue(QString("scale_ui_icons"),QVariant(si_doubleSpinBox->value()));
 	s.setValue(QString("app_font_pt"),   QVariant(pt_doubleSpinBox->value()));
 	s.setValue(QString("stylename"),     QVariant(styleComboBox->currentText().trimmed()));
-	s.setValue(QString("sr_info2"),      QVariant((int)(srinfo_checkBox->isChecked() ?1:0)));
-	s.setValue(QString("sr_i_scale"),    QVariant((int)(srscale_checkBox->isChecked()?1:0)));
+	s.setValue(QString("sr_info2"),      QVariant((int)(srinfo_checkBox->isChecked() ? 1 : 0)));
+	s.setValue(QString("sr_i_scale"),    QVariant((int)(srscale_checkBox->isChecked() ? 1: 0)));
 	s.setValue(QString("sr_i_width"),    QVariant(srwidth_spinBox->value()));
-	s.setValue(QString("sr_chapters"),   QVariant((int)(srchapters_checkBox->isChecked()?1:0)));
-	s.setValue(QString("sr_skip_images"),QVariant((int)(srskipimage_checkBox->isChecked()?1:0)));
+	s.setValue(QString("sr_chapters"),   QVariant((int)(srchapters_checkBox->isChecked() ? 1 : 0)));
+	s.setValue(QString("sr_skip_images"),QVariant((int)(srskipimage_checkBox->isChecked() ? 1 : 0)));
+	s.setValue(QString("dcm_overlays"),  QVariant((int)(overlays_checkBox->isChecked() ? 1 : 0)));
+	s.setValue(QString("dcm_mosaic"),    QVariant((int)(mosaic_checkBox->isChecked() ? 1 : 0)));
+	s.setValue(QString("dcm_sort_mf"),   QVariant((int)(sortframes_checkBox->isChecked() ? 1 : 0)));
 	s.endGroup();
 	s.beginGroup(QString("StyleDialog"));
 	s.setValue(QString("saved_idx"), QVariant(styleComboBox->currentIndex()));
@@ -315,3 +325,7 @@ bool SettingsWidget::get_cornell_workaround() const
 	return cornell_checkBox->isChecked();
 }
 
+bool SettingsWidget::get_sort_frames() const
+{
+	return sortframes_checkBox->isChecked();
+}

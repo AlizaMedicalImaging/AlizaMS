@@ -8941,11 +8941,14 @@ static bool sort_frames_ippiop(
 		++it;
 	}
 	std::stable_sort(tmp0.begin(), tmp0.end(), less_than_ipp());
+#ifdef ENHANCED_PRINT_INFO
+	std::cout << "Sorting frames" << std::endl;
+#endif
 	for (unsigned int j = 0; j < tmp0.size(); ++j)
 	{
 		const IPPIOP & k = tmp0.at(j);
 		out[k.idx] = j;
-#if 1
+#ifdef ENHANCED_PRINT_INFO
 		std::cout << "out[" << k.idx << "] = " << j << std::endl;
 #endif
 	}
@@ -9134,9 +9137,11 @@ QString DicomUtils::read_enhanced_3d_6d(
 {
 	QString message_ ;
 	std::vector< std::map< unsigned int,unsigned int,std::less<unsigned int> > > tmp0;
+	const SettingsWidget * wsettings = static_cast<const SettingsWidget*>(settings);
+	const bool sort_ippiop = wsettings->get_sort_frames();
 	*ok = enhanced_process_indices(
 		tmp0, idx_values, values,
-		dim6th, dim5th, dim4th, dim3rd, true);
+		dim6th, dim5th, dim4th, dim3rd, sort_ippiop);
 	if (*ok)
 		message_ = read_enhanced_common(
 			ok, ivariants,

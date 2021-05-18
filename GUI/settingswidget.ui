@@ -96,6 +96,28 @@
             </widget>
            </item>
            <item>
+            <widget class="QCheckBox" name="sortframes_checkBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="mouseTracking">
+              <bool>false</bool>
+             </property>
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Try to sort frames in enhanced multi-frame IODs by Image Postion (Patient). Multiple stacks are sorted separately, s. option to process Dimension Organisation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Sort frames in enhanced multi-frame IODs by IPP/IOP</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QGroupBox" name="groupBox_4">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -234,7 +256,7 @@
            <item>
             <widget class="QGroupBox" name="groupBox_2">
              <property name="title">
-              <string>Advanced</string>
+              <string>Advanced  (not saved)</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_13">
               <property name="spacing">
@@ -303,10 +325,10 @@
                  <bool>false</bool>
                 </property>
                 <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Skip &lt;span style=&quot; font-style:italic;&quot;&gt;Dimension organization&lt;/span&gt; for enhanced IODs. Load frames one by one.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Skip &lt;span style=&quot; font-style:italic;&quot;&gt;Dimension organization&lt;/span&gt; for enhanced IODs.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="text">
-                 <string>Ignore 'Dimension Organization' for enhanced IODs</string>
+                 <string>Skip 'Dimension Organization' in enhanced multi-frame IODs</string>
                 </property>
                 <property name="checked">
                  <bool>false</bool>
@@ -416,8 +438,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>991</width>
-            <height>540</height>
+            <width>355</width>
+            <height>124</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -644,8 +666,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>991</width>
-            <height>540</height>
+            <width>482</width>
+            <height>244</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -944,6 +966,7 @@
   <tabstop>scrollArea_3</tabstop>
   <tabstop>overlays_checkBox</tabstop>
   <tabstop>mosaic_checkBox</tabstop>
+  <tabstop>sortframes_checkBox</tabstop>
   <tabstop>srchapters_checkBox</tabstop>
   <tabstop>srinfo_checkBox</tabstop>
   <tabstop>srscale_checkBox</tabstop>
