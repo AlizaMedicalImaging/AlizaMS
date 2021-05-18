@@ -8865,10 +8865,98 @@ QString DicomUtils::read_enhanced_common(
 	return message;
 }
 
+struct IPPIOP
+{
+	IPPIOP(
+		unsigned int idx_,
+    	double ipp0_, double ipp1_, double ipp2_,
+    	double iop0_, double iop1_, double iop2_, double iop3_, double iop4_, double iop5_)
+	:
+		idx (idx_),
+		ipp0(ipp0_), ipp1(ipp1_), ipp2(ipp2_),
+		iop0(iop0_), iop1(iop1_), iop2(iop2_), iop3(iop3_), iop4(iop4_), iop5(iop5_) {}
+	~IPPIOP() {}
+	unsigned int idx;
+	double ipp0;
+	double ipp1;
+	double ipp2;
+	double iop0;
+	double iop1;
+	double iop2;
+	double iop3;
+	double iop4;
+	double iop5;
+};
+
+struct less_than_ipp
+{
+    inline bool operator() (const IPPIOP & s1, const IPPIOP & s2)
+	{
+		const double t = 0.001;
+		if (!(
+			((s1.iop0 + t) > s2.iop0) && ((s1.iop0 - t) < s2.iop0) &&
+			((s1.iop1 + t) > s2.iop1) && ((s1.iop1 - t) < s2.iop1) &&
+			((s1.iop2 + t) > s2.iop2) && ((s1.iop2 - t) < s2.iop2) &&
+			((s1.iop3 + t) > s2.iop3) && ((s1.iop3 - t) < s2.iop3) &&
+			((s1.iop4 + t) > s2.iop4) && ((s1.iop4 - t) < s2.iop4) &&
+			((s1.iop5 + t) > s2.iop5) && ((s1.iop5 - t) < s2.iop5)))
+			return false;
+		double normal[3];
+		normal[0] = s1.iop1*s1.iop5 - s1.iop2*s1.iop4;
+		normal[1] = s1.iop2*s1.iop3 - s1.iop0*s1.iop5;
+		normal[2] = s1.iop0*s1.iop4 - s1.iop1*s1.iop3;
+		double dist1 = 0, dist2 = 0;
+		dist1 += normal[0]*s1.ipp0;
+		dist2 += normal[0]*s2.ipp0;
+		dist1 += normal[1]*s1.ipp1;
+		dist2 += normal[1]*s2.ipp1;
+		dist1 += normal[2]*s1.ipp2;
+		dist2 += normal[2]*s2.ipp2;
+		const bool r = (dist1 < dist2);
+		return r;
+    }
+};
+
+static bool sort_frames_ippiop(
+	const std::map< unsigned int,unsigned int,std::less<unsigned int> > & in,
+	std::map< unsigned int,unsigned int,std::less<unsigned int> > & out,
+	const FrameGroupValues & values)
+{
+	std::vector<IPPIOP> tmp0;
+	std::map< unsigned int,unsigned int,std::less<unsigned int> >::const_iterator it =
+		in.cbegin();
+	while (it != in.cend())
+	{
+		const unsigned int x = it->first;
+		double ipp[3];
+		double iop[6];
+		const bool ok_p = DicomUtils::get_patient_position(values.at(x).pat_pos, ipp);
+		const bool ok_o = DicomUtils::get_patient_orientation(values.at(x).pat_orient, iop);
+		if (!(ok_o && ok_p)) return false;
+		IPPIOP tmp1(
+			x,
+			ipp[0], ipp[1], ipp[2],
+			iop[0], iop[1], iop[2], iop[3], iop[4], iop[5]);
+		tmp0.push_back(tmp1);
+		++it;
+	}
+	std::stable_sort(tmp0.begin(), tmp0.end(), less_than_ipp());
+	for (unsigned int j = 0; j < tmp0.size(); ++j)
+	{
+		const IPPIOP & k = tmp0.at(j);
+		out[k.idx] = j;
+#if 1
+		std::cout << "out[" << k.idx << "] = " << j << std::endl;
+#endif
+	}
+	return true;
+}
+
 bool DicomUtils::enhanced_process_indices(
 	std::vector< std::map< unsigned int,unsigned int,std::less<unsigned int> > > & tmp0,
 	const DimIndexValues & idx_values, const FrameGroupValues & values,
-	const int dim6th, const int dim5th, const int dim4th, const int dim3rd)
+	const int dim6th, const int dim5th, const int dim4th, const int dim3rd,
+	bool sort_ippiop)
 {
 	bool error = false;
 	std::list<unsigned int> tmp1_1;
@@ -8969,12 +9057,25 @@ bool DicomUtils::enhanced_process_indices(
 						tmp2_test.sort();
 						tmp2_test.unique();
 						const size_t tmp2_test_size1 = tmp2_test.size();
-						if (tmp2_test_size0!=tmp2_test_size1)
+						if (tmp2_test_size0!=tmp2_test_size1) error = true;
+						if (error) break;
+					}
+					if (sort_ippiop)
+					{
+						std::map< unsigned int,unsigned int,std::less<unsigned int> > tmp3;
+						const bool ok_sort = sort_frames_ippiop(tmp2, tmp3, values);
+						if (ok_sort)
 						{
-							error = true;
+							tmp0.push_back(tmp3);
 						}
-						if (!error) tmp0.push_back(tmp2);
-						else break;
+						else
+						{
+							tmp0.push_back(tmp2);
+						}
+					}
+					else
+					{
+						tmp0.push_back(tmp2);
 					}
 				}
 				if (error) break;
@@ -8986,7 +9087,23 @@ bool DicomUtils::enhanced_process_indices(
 	{
 		std::map< unsigned int,unsigned int,std::less<unsigned int> > tmp2;
 		for (unsigned int x = 0; x < values.size(); ++x) tmp2[x] = x;
-		tmp0.push_back(tmp2);
+		if (sort_ippiop)
+		{
+			std::map< unsigned int,unsigned int,std::less<unsigned int> > tmp3;
+			const bool ok_sort = sort_frames_ippiop(tmp2, tmp3, values);
+			if (ok_sort)
+			{
+				tmp0.push_back(tmp3);
+			}
+			else
+			{
+				tmp0.push_back(tmp2);
+			}
+		}
+		else
+		{
+			tmp0.push_back(tmp2);
+		}
 	}
 	return !error;
 }
@@ -9003,7 +9120,8 @@ QString DicomUtils::read_enhanced_3d_6d(
 	const int dim6th, const int dim5th, const int dim4th, const int dim3rd,
 	const DimIndexValues & idx_values, const FrameGroupValues & values,
 	const bool ok3d, const int max_3d_tex_size, GLWidget * gl,
-	const bool min_load, const QWidget * settings,
+	const bool min_load,
+	const QWidget * settings,
 	double * dircos_read,
 	const int red_subscript,
 	const double spacing_x_read, const double spacing_y_read, const double spacing_z_read,
@@ -9018,7 +9136,7 @@ QString DicomUtils::read_enhanced_3d_6d(
 	std::vector< std::map< unsigned int,unsigned int,std::less<unsigned int> > > tmp0;
 	*ok = enhanced_process_indices(
 		tmp0, idx_values, values,
-		dim6th, dim5th, dim4th, dim3rd);
+		dim6th, dim5th, dim4th, dim3rd, true);
 	if (*ok)
 		message_ = read_enhanced_common(
 			ok, ivariants,

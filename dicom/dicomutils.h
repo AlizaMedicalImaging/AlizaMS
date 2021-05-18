@@ -296,7 +296,8 @@ public:
 			> &,
 		const DimIndexValues&,
 		const FrameGroupValues&,
-		const int, const int, const int, const int);
+		const int, const int, const int, const int,
+		const bool);
 	static QString read_enhanced_3d_6d(
 		bool*,
 		std::vector<ImageVariant*> &,

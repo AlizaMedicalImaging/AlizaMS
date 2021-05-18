@@ -230,7 +230,7 @@ QString SpectroscopyUtils::ProcessData(
 			std::less<unsigned int> > > tmp0;
 	bool ok__ = DicomUtils::enhanced_process_indices(
 		tmp0, idx_values, values,
-		dim6th, dim5th, dim4th, dim3rd);
+		dim6th, dim5th, dim4th, dim3rd, false);
 #if 0
 	std::cout << "enhanced_process_indices = "
 		<< ok__ << std::endl;
@@ -240,7 +240,7 @@ QString SpectroscopyUtils::ProcessData(
 		tmp0.clear();
 		ok__ = DicomUtils::enhanced_process_indices(
 			tmp0, idx_values, values,
-			-1, -1, -1, -1);
+			-1, -1, -1, -1, false);
 	}
 	if (!ok__)tmp0.clear();
 	if (tmp0.empty())
