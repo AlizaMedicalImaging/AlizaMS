@@ -8869,8 +8869,8 @@ struct IPPIOP
 {
 	IPPIOP(
 		unsigned int idx_,
-    	double ipp0_, double ipp1_, double ipp2_,
-    	double iop0_, double iop1_, double iop2_, double iop3_, double iop4_, double iop5_)
+		double ipp0_, double ipp1_, double ipp2_,
+		double iop0_, double iop1_, double iop2_, double iop3_, double iop4_, double iop5_)
 	:
 		idx (idx_),
 		ipp0(ipp0_), ipp1(ipp1_), ipp2(ipp2_),
@@ -8890,7 +8890,7 @@ struct IPPIOP
 
 struct less_than_ipp
 {
-    inline bool operator() (const IPPIOP & s1, const IPPIOP & s2)
+	inline bool operator() (const IPPIOP & s1, const IPPIOP & s2)
 	{
 		const double t = 0.001;
 		if (!(
@@ -8914,7 +8914,7 @@ struct less_than_ipp
 		dist2 += normal[2]*s2.ipp2;
 		const bool r = (dist1 < dist2);
 		return r;
-    }
+	}
 };
 
 static bool sort_frames_ippiop(
