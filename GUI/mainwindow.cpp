@@ -5,22 +5,15 @@
 #include <QTextStream>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-#include <QUrl>
 #include <QMimeData>
+#include <QUrl>
 #include <QFileDialog>
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #include <QScreen>
 #else
 #include <QDesktopWidget>
 #endif
-#include <QLabel>
-#include <QSvgRenderer>
 #include <QDateTime>
-#include <QPixmap>
-#include <QImage>
-#include <QScrollBar>
-#include <QFont>
-#include <QTextDocument>
 #ifndef WIN32
 #include <unistd.h>
 #endif
@@ -35,10 +28,52 @@ MainWindow::MainWindow(
 	bool hide_zoom_)
 {
 	setupUi(this);
-	setAnimated(true);
 	setDocumentMode(false);
+	scale_icons = 1.0f;
+	adjust_scale_icons = 1.0f;
+	hide_gl3_frame_later = false;
+	saved_ok3d = false;
+	int dock_area = 2;
+	{
+		QSettings settings(
+			QSettings::IniFormat, QSettings::UserScope,
+			QApplication::organizationName(), QApplication::applicationName());
+		settings.beginGroup(QString("GlobalSettings"));
+		adjust_scale_icons =
+			(float)settings.value(QString("scale_ui_icons"), 1.0).toDouble();
+		settings.endGroup();
+		int width_ = 0, height_ = 0;
+		desktop_layout(&width_,&height_);
+		const int w = static_cast<int>(static_cast<double>(width_)*0.7);
+		const int h = static_cast<int>(static_cast<double>(height_)*0.7);
+		settings.beginGroup(QString("MainWindow"));
+		dock_area = settings.value(QString("dock_area"), 2).toInt();
+		resize(settings.value(QString("size"), QSize(w,h)).toSize());
+		move(settings.value(QString("pos"), QPoint(50,50)).toPoint());
+#ifdef USE_WORKSTATION_MODE
+		CommonUtils::set_open_dir(settings.value(QString("open_dir"), QString("")).toString());
+#endif
+		settings.endGroup();
+	}
+	dockWidget1 = new QDockWidget(this);
+	dockWidget1->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
+	dockWidget1->setFloating(false);
+	dockWidget1->setFeatures(QDockWidget::DockWidgetMovable);
+	addDockWidget(
+		(dock_area == 2) ? Qt::RightDockWidgetArea : Qt::LeftDockWidgetArea,
+		dockWidget1);
+	imagesbox_frame1 = new QFrame(this);
+	imagesbox_frame1->setFrameShape(QFrame::NoFrame);
+	imagesbox_frame1->setFrameShadow(QFrame::Plain);
+	imagesbox = new ImagesBox(scale_icons*adjust_scale_icons);
+	QVBoxLayout * l1 = new QVBoxLayout(imagesbox_frame1);
+	l1->setSpacing(0);
+	l1->setContentsMargins(0,0,0,0);
+	l1->addWidget(imagesbox);
+	dockWidget1->setWidget(imagesbox_frame1);
+	imagesbox_frame1->hide();
+	//
 	toolbox3D_frame->hide();
-	imagesbox_frame->hide();
 	anim2D_frame->hide();
 	anim3D_frame->hide();
 	view2d_frame->hide();
@@ -51,23 +86,6 @@ MainWindow::MainWindow(
 	histogram_frame->hide();
 	//
 	hide_zoom = hide_zoom_;
-	//
-	scale_icons = 1.0f;
-	adjust_scale_icons = 1.0f;
-	hide_gl3_frame_later = false;
-	saved_ok3d = false;
-#if 1
-	{
-		QSettings settings(
-			QSettings::IniFormat, QSettings::UserScope,
-			QApplication::organizationName(), QApplication::applicationName());
-		settings.setFallbacksEnabled(true);
-		settings.beginGroup(QString("GlobalSettings"));
-		adjust_scale_icons =
-			(float)settings.value(QString("scale_ui_icons"), 1.0).toDouble();
-		settings.endGroup();
-	}
-#endif
 	//
 	const bool force_vertical = false;
 	int swidth = 0;
@@ -120,12 +138,6 @@ MainWindow::MainWindow(
 	vl99->setContentsMargins(0,0,0,0);
 	vl99->setSpacing(0);
 	vl99->addWidget(anim2Dwidget);
-	//
-	imagesbox = new ImagesBox(scale_icons*adjust_scale_icons);
-	QVBoxLayout * l1 = new QVBoxLayout(imagesbox_frame);
-	l1->setSpacing(0);
-	l1->setContentsMargins(0,0,0,0);
-	l1->addWidget(imagesbox);
 	//
 	toolbox2D = new ToolBox2D(scale_icons*adjust_scale_icons);
 	QVBoxLayout * l2 = new QVBoxLayout(level_frame);
@@ -568,12 +580,12 @@ void MainWindow::closeEvent(QCloseEvent * e)
 	aliza = NULL;
 	delete aboutwidget;
 	aboutwidget = NULL;
+	e->accept();
 #if QT_VERSION < QT_VERSION_CHECK(4,8,1)
 	qApp->quit();
 #else
 	qApp->closeAllWindows();
 #endif
-	e->accept();
 }
 
 void MainWindow::resizeEvent(QResizeEvent * e)
@@ -1427,7 +1439,7 @@ void MainWindow::set_ui()
 		show2DAct->setEnabled(true);
 		toolbar2D_frame->show();
 		level_frame->show();
-		imagesbox_frame->show();
+		imagesbox_frame1->show();
 		zrange_frame->show();
 		slider_frame->show();
 		view2d_frame->show();
@@ -1447,7 +1459,7 @@ void MainWindow::set_ui()
 
 void MainWindow::load_dicom_series2()
 {
-	bool lock = mutex.tryLock();
+	const bool lock = mutex.tryLock();
 	if (!lock) return;
 	QProgressDialog * pb =
 		new QProgressDialog(QString("Loading..."), QString("Exit"), 0, 0);
@@ -1458,6 +1470,7 @@ void MainWindow::load_dicom_series2()
 	pb->setValue(-1);
 	pb->show();
 	set_ui();
+	qApp->processEvents();
 	aliza->load_dicom_series(pb);
 	disconnect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
 	pb->close();
@@ -1731,6 +1744,8 @@ void MainWindow::set_zlock_one(bool t)
 
 void MainWindow::writeSettings()
 {
+	const Qt::DockWidgetArea da = dockWidgetArea(dockWidget1);
+	const int area = (da == Qt::LeftDockWidgetArea) ? 1 : 2;
 	QSettings settings(
 		QSettings::IniFormat, QSettings::UserScope,
 		QApplication::organizationName(), QApplication::applicationName());
@@ -1739,15 +1754,15 @@ void MainWindow::writeSettings()
 	if (!isMaximized())
 	{
 		settings.setValue(QString("size"), QVariant(size()));
-		settings.setValue(QString("pos"),  QVariant(pos()));
+		settings.setValue(QString("pos"), QVariant(pos()));
+		settings.setValue(QString("dock_area"), QVariant(area));
 	}
 #ifdef USE_WORKSTATION_MODE
 	settings.setValue(QString("open_dir"),QVariant(CommonUtils::get_open_dir()));
 #endif
-	if (!show3DAct->isChecked())
-		settings.setValue(QString("hide_3d_frame"),QVariant(QString("Y")));
-	else
-		settings.setValue(QString("hide_3d_frame"),QVariant(QString("N")));
+	settings.setValue(
+		QString("hide_3d_frame"),
+		((show3DAct->isChecked()) ? QVariant(QString("N")) : QVariant(QString("Y"))));
 	settings.endGroup();
 	browser2->writeSettings(settings);
 	anonymizer->writeSettings(settings);

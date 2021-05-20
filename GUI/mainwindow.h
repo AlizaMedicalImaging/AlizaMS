@@ -18,6 +18,7 @@
 #include <QGLFormat>
 #endif
 #include <QMainWindow>
+#include <QDockWidget>
 #include <QStringList>
 #include <QMenuBar>
 #include <QMenu>
@@ -30,9 +31,10 @@
 #include <QDragMoveEvent>
 #include <QDragLeaveEvent>
 #include <QResizeEvent>
+#include <QLabel>
+#include <QIcon>
 #include <QSize>
 #include <QPoint>
-#include <QIcon>
 #include "zoomwidget.h"
 #include "aboutwidget.h"
 #include "browser/browserwidget2.h"
@@ -167,6 +169,8 @@ private:
 	AboutWidget       * aboutwidget;
 	bool first_image_loaded;
 	bool hide_zoom;
+	QDockWidget * dockWidget1;
+	QFrame * imagesbox_frame1;
 	QMenu * file_menu;
 	QMenu * views_menu;
 	QMenu * tools_menu;
