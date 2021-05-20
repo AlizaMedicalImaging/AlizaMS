@@ -1461,6 +1461,13 @@ void MainWindow::load_dicom_series2()
 {
 	const bool lock = mutex.tryLock();
 	if (!lock) return;
+	const bool selection =
+		browser2->tableWidget->selectionModel()->hasSelection();
+	if (!selection)
+	{
+		mutex.unlock();
+		return;
+	}
 	QProgressDialog * pb =
 		new QProgressDialog(QString("Loading..."), QString("Exit"), 0, 0);
 	connect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
