@@ -69,207 +69,340 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
   // ISO 2022
   if (iso2022)
   {
-    const QList<QByteArray> iso = ba->split(0x1b); // ESC
     if (ok) *ok = false;
-    for (int z = 0; z < iso.size(); ++z)
+    if ((*ba).contains(0x1b)) // ESC
+    {
+      const QList<QByteArray> iso = ba->split(0x1b);
+      // detect by ESC sequence
+      for (int z = 0; z < iso.size(); ++z)
+      {
+        QTextCodec * codec = NULL;
+        QByteArray a = iso[z];
+        // ISO 2022 IR 6
+        if (a.size() >= 2 && a.at(0) == 40 && a.at(1) == 66)
+        {
+          result += QString::fromLatin1(a.mid(2).constData());
+        }
+        // ISO 2022 IR 13 (ISO IR 13)
+        else if (a.size() >= 2 && a.at(0) == 41 && a.at(1) == 73)
+        {
+          codec = QTextCodec::codecForName("ISO-2022-JP");
+          if (codec)
+          {
+            result += codec->toUnicode(a.prepend(0x1b));
+          }
+        }
+        // ISO 2022 IR 13 (ISO IR 14)
+        else if (a.size() >= 2 && a.at(0) == 40 && a.at(1) == 74)
+        {
+          codec = QTextCodec::codecForName("ISO-2022-JP");
+          if (codec)
+          {
+            result += codec->toUnicode(a.prepend(0x1b));
+          }
+        }
+        // ISO 2022 IR 58
+        else if (a.size() >= 3 && a.at(0) == 36 && a.at(1) == 41 && a.at(2) == 65)
+        {
+          codec = QTextCodec::codecForName("GB2312");
+          if (codec)
+          {
+            result += codec->toUnicode(a.mid(3));
+          }
+        }
+        // ISO 2022 IR 87
+        else if (a.size() >= 2 && a.at(0) == 36 && a.at(1) == 66)
+        {
+          codec = QTextCodec::codecForName("ISO-2022-JP");
+          if (codec)
+          {
+            result += codec->toUnicode(a.prepend(0x1b));
+          }
+        }
+        // ISO 2022 IR 100
+        else if (a.size() >= 2 && a.at(0) == 45 && a.at(1) == 65)
+        {
+          codec = QTextCodec::codecForName("ISO-8859-1");
+          if (codec)
+          {
+            result += codec->toUnicode(a.mid(2));
+          }
+        }
+        // ISO 2022 IR 101
+        else if (a.size() >= 2 && a.at(0) == 45 && a.at(1) == 66)
+        {
+          codec = QTextCodec::codecForName("ISO-8859-2");
+          if (codec)
+          {
+            result += codec->toUnicode(a.mid(2));
+          }
+        }
+        // ISO 2022 IR 109
+        else if (a.size() >= 2 && a.at(0) == 45 && a.at(1) == 67)
+        {
+          codec = QTextCodec::codecForName("ISO-8859-3");
+          if (codec)
+          {
+            result += codec->toUnicode(a.mid(2));
+          }
+        }
+        // ISO 2022 IR 110
+        else if (a.size() >= 2 && a.at(0) == 45 && a.at(1) == 68)
+        {
+          codec = QTextCodec::codecForName("ISO-8859-4");
+          if (codec)
+          {
+            result += codec->toUnicode(a.mid(2));
+          }
+        }
+        // ISO 2022 IR 144
+        else if (a.size() >= 2 && a.at(0) == 45 && a.at(1) == 76)
+        {
+          codec = QTextCodec::codecForName("ISO-8859-5");
+          if (codec)
+          {
+            result += codec->toUnicode(a.mid(2));
+          }
+        }
+        // ISO 2022 IR 127
+        else if (a.size() >= 2 && a.at(0) == 45 && a.at(1) == 71)
+        {
+          codec = QTextCodec::codecForName("ISO-8859-6");
+          if (codec)
+          {
+            result += codec->toUnicode(a.mid(2));
+          }
+        }
+        // ISO 2022 IR 126
+        else if (a.size() >= 2 && a.at(0) == 45 && a.at(1) == 70)
+        {
+          codec = QTextCodec::codecForName("ISO-8859-7");
+          if (codec)
+          {
+            result += codec->toUnicode(a.mid(2));
+          }
+        }
+        // ISO 2022 IR 138
+        else if (a.size() >= 2 && a.at(0) == 45 && a.at(1) == 72)
+        {
+          codec = QTextCodec::codecForName("ISO-8859-8");
+          if (codec)
+          {
+            result += codec->toUnicode(a.mid(2));
+          }
+        }
+        // ISO 2022 IR 148
+        else if (a.size() >= 2 && a.at(0) == 45 && a.at(1) == 77)
+        {
+          codec = QTextCodec::codecForName("ISO-8859-9");
+          if (codec)
+          {
+            result += codec->toUnicode(a.mid(2));
+          }
+        }
+        // ISO 2022 IR 149
+        else if (a.size() >= 3 && a.at(0) == 36 && a.at(1) == 41 && a.at(2) == 67)
+        {
+          codec = QTextCodec::codecForName("iso-ir-149");
+          if (codec)
+          {
+            result += codec->toUnicode(a.mid(3));
+          }
+          if (!codec)
+          {
+            codec = QTextCodec::codecForName("EUC-KR");
+            if (codec)
+            {
+              result += codec->toUnicode(a.mid(3));
+            }
+          }
+          if (!codec)
+          {
+            codec = QTextCodec::codecForName("ISO-2022-KR");
+            if (codec)
+            {
+              result += codec->toUnicode(a.prepend(0x1b));
+            }
+          }
+          if (!codec)
+          {
+            result += QString::fromLatin1(a.mid(3).constData());
+          }
+        }
+        // ISO 2022 IR 159
+        else if (a.size() >= 3 && a.at(0) == 36 && a.at(1) == 40 && a.at(2) == 68)
+        {
+          codec = QTextCodec::codecForName("ISO-2022-JP");
+          if (codec)
+          {
+            result += codec->toUnicode(a.prepend(0x1b));
+          }
+        }
+        // ISO 2022 IR 166
+        else if (a.size() >= 2 && a.at(0) == 45 && a.at(1) == 85)
+        {
+          codec = QTextCodec::codecForName("TIS-620");
+          if (codec)
+          {
+              result += codec->toUnicode(a.mid(2));
+          }
+        }
+        else
+        {
+          // ISO IR 13
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+          const QRegularExpression re(QString("ISO\\s+2022\\s+IR\\s+13"));
+#else
+          const QRegExp re(QString("ISO\\s+2022\\s+IR\\s+13"));
+#endif
+          const int i = l.indexOf(re, Qt::CaseInsensitive);
+          if (i > -1)
+          {
+            codec = QTextCodec::codecForName("Shift_JIS");
+            if (codec)
+            {
+              result += codec->toUnicode(a);
+            }
+          }
+          if (!codec)
+          {
+            result += QString::fromLatin1(a.constData());
+          }
+        }
+        if (ok && codec) *ok = true;
+      }
+    }
+    else // ISO 2022, but no ESC character
     {
       QTextCodec * codec = NULL;
-      QByteArray a = iso[z];
-      // ISO 2022 IR 6
-      if (a.size() >= 2 && a.at(0) == 40 && a.at(1) == 66)
-      {
-        result += QString::fromLatin1(a.mid(2).constData());
-      }
-      // ISO 2022 IR 13 (ISO IR 13)
-      else if (a.size() >= 2 && a.at(0) == 41 && a.at(1) == 73)
-      {
-        codec = QTextCodec::codecForName("ISO-2022-JP");
-        if (codec)
-        {
-          result += codec->toUnicode(a.prepend(0x1b));
-        }
-      }
-      // ISO 2022 IR 13 (ISO IR 14)
-      else if (a.size() >= 2 && a.at(0) == 40 && a.at(1) == 74)
-      {
-        codec = QTextCodec::codecForName("ISO-2022-JP");
-        if (codec)
-        {
-          result += codec->toUnicode(a.prepend(0x1b));
-        }
-      }
-      // ISO 2022 IR 58
-      else if (a.size() >= 3 && a.at(0) == 36 && a.at(1) == 41 && a.at(2) == 65)
-      {
-        codec = QTextCodec::codecForName("GB2312");
-        if (codec)
-        {
-          result += codec->toUnicode(a.mid(3));
-        }
-      }
-      // ISO 2022 IR 87
-      else if (a.size() >= 2 && a.at(0) == 36 && a.at(1) == 66)
-      {
-        codec = QTextCodec::codecForName("ISO-2022-JP");
-        if (codec)
-        {
-          result += codec->toUnicode(a.prepend(0x1b));
-        }
-      }
-      // ISO 2022 IR 100
-      else if (a.size() >= 2 && a.at(0) == 45 && a.at(1) == 65)
-      {
-        codec = QTextCodec::codecForName("ISO-8859-1");
-        if (codec)
-        {
-          result += codec->toUnicode(a.mid(2));
-        }
-      }
-      // ISO 2022 IR 101
-      else if (a.size() >= 2 && a.at(0) == 45 && a.at(1) == 66)
-      {
-        codec = QTextCodec::codecForName("ISO-8859-2");
-        if (codec)
-        {
-          result += codec->toUnicode(a.mid(2));
-        }
-      }
-      // ISO 2022 IR 109
-      else if (a.size() >= 2 && a.at(0) == 45 && a.at(1) == 67)
-      {
-        codec = QTextCodec::codecForName("ISO-8859-3");
-        if (codec)
-        {
-          result += codec->toUnicode(a.mid(2));
-        }
-      }
-      // ISO 2022 IR 110
-      else if (a.size() >= 2 && a.at(0) == 45 && a.at(1) == 68)
-      {
-        codec = QTextCodec::codecForName("ISO-8859-4");
-        if (codec)
-        {
-          result += codec->toUnicode(a.mid(2));
-        }
-      }
-      // ISO 2022 IR 144
-      else if (a.size() >= 2 && a.at(0) == 45 && a.at(1) == 76)
-      {
-        codec = QTextCodec::codecForName("ISO-8859-5");
-        if (codec)
-        {
-          result += codec->toUnicode(a.mid(2));
-        }
-      }
-      // ISO 2022 IR 127
-      else if (a.size() >= 2 && a.at(0) == 45 && a.at(1) == 71)
-      {
-        codec = QTextCodec::codecForName("ISO-8859-6");
-        if (codec)
-        {
-          result += codec->toUnicode(a.mid(2));
-        }
-      }
-      // ISO 2022 IR 126
-      else if (a.size() >= 2 && a.at(0) == 45 && a.at(1) == 70)
-      {
-        codec = QTextCodec::codecForName("ISO-8859-7");
-        if (codec)
-        {
-          result += codec->toUnicode(a.mid(2));
-        }
-      }
-      // ISO 2022 IR 138
-      else if (a.size() >= 2 && a.at(0) == 45 && a.at(1) == 72)
-      {
-        codec = QTextCodec::codecForName("ISO-8859-8");
-        if (codec)
-        {
-          result += codec->toUnicode(a.mid(2));
-        }
-      }
-      // ISO 2022 IR 148
-      else if (a.size() >= 2 && a.at(0) == 45 && a.at(1) == 77)
-      {
-        codec = QTextCodec::codecForName("ISO-8859-9");
-        if (codec)
-        {
-          result += codec->toUnicode(a.mid(2));
-        }
-      }
-      // ISO 2022 IR 149
-      else if (a.size() >= 3 && a.at(0) == 36 && a.at(1) == 41 && a.at(2) == 67)
-      {
+      if (cs.trimmed() == QString("ISO 2022 IR 149")) // data sets exist
+	  {
         codec = QTextCodec::codecForName("iso-ir-149");
         if (codec)
         {
-          result += codec->toUnicode(a.mid(3));
+          result += codec->toUnicode(*ba);
         }
         if (!codec)
         {
           codec = QTextCodec::codecForName("EUC-KR");
           if (codec)
           {
-            result += codec->toUnicode(a.mid(3));
+            result += codec->toUnicode(*ba);
           }
         }
-        if (!codec)
-        {
-          codec = QTextCodec::codecForName("ISO-2022-KR");
-          if (codec)
-          {
-            result += codec->toUnicode(a.prepend(0x1b));
-          }
-        }
-        if (!codec)
-        {
-          result += QString::fromLatin1(a.mid(3).constData());
-        }
-      }
-      // ISO 2022 IR 159
-      else if (a.size() >= 3 && a.at(0) == 36 && a.at(1) == 40 && a.at(2) == 68)
-      {
-        codec = QTextCodec::codecForName("ISO-2022-JP");
+	  }
+	  // below variants are not tested
+      else if (cs.trimmed() == QString("ISO 2022 IR 6"))
+	  {
+        result += QString::fromLatin1((*ba).constData());
+	  }
+      else if (cs.trimmed() == QString("ISO 2022 IR 58"))
+	  {
+        codec = QTextCodec::codecForName("GB2312");
         if (codec)
         {
-          result += codec->toUnicode(a.prepend(0x1b));
+          result += codec->toUnicode(*ba);
+        }
+	  }
+      else if (cs.trimmed() == QString("ISO 2022 IR 13"))
+      {
+        codec = QTextCodec::codecForName("Shift_JIS");
+        if (codec)
+        {
+          result += codec->toUnicode(*ba);
         }
       }
-      // ISO 2022 IR 166
-      else if (a.size() >= 2 && a.at(0) == 45 && a.at(1) == 85)
+      else if (cs.trimmed() == QString("ISO 2022 IR 166"))
       {
         codec = QTextCodec::codecForName("TIS-620");
         if (codec)
         {
-            result += codec->toUnicode(a.mid(2));
+          result += codec->toUnicode(*ba);
         }
+      }
+      else if (cs.trimmed() == QString("ISO 2022 IR 100"))
+	  {
+        codec = QTextCodec::codecForName("ISO-8859-1");
+        if (codec)
+        {
+          result += codec->toUnicode(*ba);
+        }
+	  }
+      else if (cs.trimmed() == QString("ISO 2022 IR 101"))
+      {
+        codec = QTextCodec::codecForName("ISO-8859-2");
+        if (codec)
+        {
+          result += codec->toUnicode(*ba);
+        }
+      }
+      else if (cs.trimmed() == QString("ISO 2022 IR 109"))
+      {
+        codec = QTextCodec::codecForName("ISO-8859-3");
+        if (codec)
+        {
+          result += codec->toUnicode(*ba);
+        }
+      }
+      else if (cs.trimmed() == QString("ISO 2022 IR 110"))
+      {
+        codec = QTextCodec::codecForName("ISO-8859-4");
+        if (codec)
+        {
+          result += codec->toUnicode(*ba);
+        }
+      }
+      else if (cs.trimmed() == QString("ISO 2022 IR 144"))
+      {
+        codec = QTextCodec::codecForName("ISO-8859-5");
+        if (codec)
+        {
+          result += codec->toUnicode(*ba);
+        }
+      }
+      else if (cs.trimmed() == QString("ISO 2022 IR 127"))
+      {
+        codec = QTextCodec::codecForName("ISO-8859-6");
+        if (codec)
+        {
+          result += codec->toUnicode(*ba);
+        }
+      }
+      else if (cs.trimmed() == QString("ISO 2022 IR 126"))
+      {
+        codec = QTextCodec::codecForName("ISO-8859-7");
+        if (codec)
+        {
+          result += codec->toUnicode(*ba);
+        }
+      }
+      else if (cs.trimmed() == QString("ISO 2022 IR 138"))
+      {
+        codec = QTextCodec::codecForName("ISO-8859-8");
+        if (codec)
+        {
+          result += codec->toUnicode(*ba);
+        }
+      }
+      else if (cs.trimmed() == QString("ISO 2022 IR 148"))
+      {
+        codec = QTextCodec::codecForName("ISO-8859-9");
+        if (codec)
+        {
+          result += codec->toUnicode(*ba);
+        }
+      }
+      if (codec)
+      {
+        if (ok) *ok = true;
       }
       else
       {
-        // ISO IR 13
-#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
-        const QRegularExpression re(QString("ISO\\s+2022\\s+IR\\s+13"));
-#else
-        const QRegExp re(QString("ISO\\s+2022\\s+IR\\s+13"));
-#endif
-        const int i = l.indexOf(re, Qt::CaseInsensitive);
-        if (i > -1)
-        {
-          codec = QTextCodec::codecForName("Shift_JIS");
-          if (codec)
-          {
-            result += codec->toUnicode(a);
-          }
-        }
-        if (!codec)
-        {
-          result += QString::fromLatin1(a.constData());
-        }
+        result += QString::fromLatin1(*ba); // error
       }
-      if (ok && codec) *ok = true;
     }
   }
-  else if (l.size() == 1)
+  else if (l.size() == 1) // single value, not ISO 2022
   {
     QTextCodec * codec = NULL;
     const QString s(l.at(0).trimmed().simplified().toUpper());
@@ -356,16 +489,16 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
       if (ok) *ok = true;
       result = codec->toUnicode(*ba);
     }
-    else
+    else // error
     {
       if (ok) *ok = false;
       result = QString::fromLatin1(ba->constData());
     }
   }
-  else
+  else // multiple values, not ISO 2022, error
   {
     if (ok) *ok = false;
-    result = QString::fromLatin1(ba->constData()); // error
+    result = QString::fromLatin1(ba->constData());
   }
   return result;
 }
