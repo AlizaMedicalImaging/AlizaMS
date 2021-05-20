@@ -276,7 +276,7 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
     {
       QTextCodec * codec = NULL;
       if (cs.trimmed() == QString("ISO 2022 IR 149")) // data sets exist
-	  {
+      {
         codec = QTextCodec::codecForName("iso-ir-149");
         if (codec)
         {
@@ -290,20 +290,20 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
             result += codec->toUnicode(*ba);
           }
         }
-	  }
-	  // below variants are not tested
+      }
+      // below variants are not tested
       else if (cs.trimmed() == QString("ISO 2022 IR 6"))
-	  {
+      {
         result += QString::fromLatin1((*ba).constData());
-	  }
+      }
       else if (cs.trimmed() == QString("ISO 2022 IR 58"))
-	  {
+      {
         codec = QTextCodec::codecForName("GB2312");
         if (codec)
         {
           result += codec->toUnicode(*ba);
         }
-	  }
+      }
       else if (cs.trimmed() == QString("ISO 2022 IR 13"))
       {
         codec = QTextCodec::codecForName("Shift_JIS");
@@ -321,13 +321,13 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
         }
       }
       else if (cs.trimmed() == QString("ISO 2022 IR 100"))
-	  {
+      {
         codec = QTextCodec::codecForName("ISO-8859-1");
         if (codec)
         {
           result += codec->toUnicode(*ba);
         }
-	  }
+      }
       else if (cs.trimmed() == QString("ISO 2022 IR 101"))
       {
         codec = QTextCodec::codecForName("ISO-8859-2");
