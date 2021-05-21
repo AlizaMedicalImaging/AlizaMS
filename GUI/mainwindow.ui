@@ -160,10 +160,10 @@
                  <widget class="QFrame" name="frame2D">
                   <property name="geometry">
                    <rect>
-                    <x>1</x>
-                    <y>1</y>
-                    <width>597</width>
-                    <height>704</height>
+                    <x>9</x>
+                    <y>9</y>
+                    <width>591</width>
+                    <height>531</height>
                    </rect>
                   </property>
                   <property name="sizePolicy">
@@ -175,7 +175,7 @@
                   <property name="autoFillBackground">
                    <bool>true</bool>
                   </property>
-                  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0">
+                  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0,0">
                    <property name="spacing">
                     <number>0</number>
                    </property>
@@ -1027,15 +1027,31 @@
                      </property>
                     </widget>
                    </item>
+                   <item>
+                    <widget class="QFrame" name="level2d_frame">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                    </widget>
+                   </item>
                   </layout>
                  </widget>
                  <widget class="QFrame" name="frame3D">
                   <property name="geometry">
                    <rect>
-                    <x>598</x>
-                    <y>1</y>
-                    <width>18</width>
-                    <height>76</height>
+                    <x>635</x>
+                    <y>9</y>
+                    <width>521</width>
+                    <height>521</height>
                    </rect>
                   </property>
                   <property name="sizePolicy">
@@ -1048,6 +1064,12 @@
                    <bool>true</bool>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_2">
+                   <property name="spacing">
+                    <number>0</number>
+                   </property>
+                   <property name="margin">
+                    <number>0</number>
+                   </property>
                    <item>
                     <widget class="QFrame" name="view3d_frame">
                      <property name="sizePolicy">
@@ -1108,7 +1130,23 @@
                       <bool>true</bool>
                      </property>
                      <property name="frameShape">
-                      <enum>QFrame::StyledPanel</enum>
+                      <enum>QFrame::NoFrame</enum>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="level3d_frame">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="frameShape">
+                      <enum>QFrame::NoFrame</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Plain</enum>
                      </property>
                     </widget>
                    </item>
