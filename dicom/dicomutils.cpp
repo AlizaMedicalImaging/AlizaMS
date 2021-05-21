@@ -6751,31 +6751,30 @@ QString DicomUtils::read_series(
 	QApplication::processEvents();
 	//
 	{
-		bool one_level = true;
-		bool one_lut   = true;
 		const size_t levels_size = levels_.size();
-		if (levels_size == 1)
+		if (levels_size > 0)
 		{
-			ivariant->di->default_us_window_center =
-				ivariant->di->us_window_center = levels_.at(0);
-			ivariant->di->default_us_window_width  =
-				ivariant->di->us_window_width = windows_.at(0);
-			ivariant->di->lut_function = luts_.at(0);
-		}
-		else if (levels_size > 1)
-		{
-			for (size_t x = 1; x < levels_size; ++x)
+			bool one_level = true;
+			bool one_lut   = true;
+			for (size_t x = 0; x < levels_size; ++x)
 			{
-				const bool b3 = luts_.at(x) == luts_.at(x-1);
-				if (!b3) one_lut = false;
-					const bool b1 =
-				itk::Math::FloatAlmostEqual(levels_.at(x), levels_.at(x-1));
-				const bool b2 =
-					itk::Math::FloatAlmostEqual(windows_.at(x), windows_.at(x-1));
-				if (!b1||!b2)
+				FrameLevel fl;
+				fl.lut_function = luts_.at(x);
+				fl.default_us_window_center = levels_.at(x);
+				fl.us_window_center = levels_.at(x);
+				fl.default_us_window_width = windows_.at(x);
+				fl.us_window_width = windows_.at(x);
+				ivariant->frame_levels[x] = fl;
+				//
+				if (x > 0)
 				{
-					one_level = false;
-					break;
+					const bool b3 = luts_.at(x) == luts_.at(x-1);
+					if (!b3) one_lut = false;
+						const bool b1 =
+					itk::Math::FloatAlmostEqual(levels_.at(x), levels_.at(x-1));
+					const bool b2 =
+						itk::Math::FloatAlmostEqual(windows_.at(x), windows_.at(x-1));
+					if (!b1 || !b2) one_level = false;
 				}
 			}
 			if (one_level)
@@ -8585,23 +8584,27 @@ QString DicomUtils::read_enhanced_common(
 				}
 				/////////////////////
 				const int tmp1c_size = tmp1c.size();
-				if (tmp1c_size == 1)
-				{
-					window_center = tmp1c.at(0);
-					window_width  = tmp1w.at(0);
-					lut_function  = tmp1l.at(0);
-				}
-				else if (tmp1c_size > 1)
+				if (tmp1c_size > 0)
 				{
 					bool tmp5468ok = true;
-					for (int k = 1; k < tmp1c_size; ++k)
+					for (int k = 0; k < tmp1c_size; ++k)
 					{
-						if (!(
-							itk::Math::FloatAlmostEqual<double>(tmp1c.at(k), tmp1c.at(k - 1)) &&
-							itk::Math::FloatAlmostEqual<double>(tmp1w.at(k), tmp1w.at(k - 1))))
+						FrameLevel fl;
+						fl.lut_function = tmp1l.at(k);
+						fl.default_us_window_center = tmp1c.at(x);
+						fl.us_window_center = tmp1c.at(k);
+						fl.default_us_window_width = tmp1w.at(k);
+						fl.us_window_width = tmp1w.at(k);
+						ivariant->frame_levels[k] = fl;
+						//
+						if (k > 0)
 						{
-							tmp5468ok = false;
-							break;
+							if (!(
+								itk::Math::FloatAlmostEqual<double>(tmp1c.at(k), tmp1c.at(k - 1)) &&
+								itk::Math::FloatAlmostEqual<double>(tmp1w.at(k), tmp1w.at(k - 1))))
+							{
+								tmp5468ok = false;
+							}
 						}
 					}
 					if (tmp5468ok)
