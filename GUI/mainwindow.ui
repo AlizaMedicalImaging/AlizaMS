@@ -160,10 +160,10 @@
                  <widget class="QFrame" name="frame2D">
                   <property name="geometry">
                    <rect>
-                    <x>1</x>
-                    <y>1</y>
-                    <width>597</width>
-                    <height>704</height>
+                    <x>31</x>
+                    <y>21</y>
+                    <width>501</width>
+                    <height>591</height>
                    </rect>
                   </property>
                   <property name="sizePolicy">
@@ -1032,10 +1032,10 @@
                  <widget class="QFrame" name="frame3D">
                   <property name="geometry">
                    <rect>
-                    <x>598</x>
-                    <y>1</y>
-                    <width>18</width>
-                    <height>76</height>
+                    <x>578</x>
+                    <y>31</y>
+                    <width>451</width>
+                    <height>581</height>
                    </rect>
                   </property>
                   <property name="sizePolicy">
