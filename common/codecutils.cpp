@@ -41,12 +41,13 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
     if (ok) *ok = true;
     return result;
   }
-  const QString cs = QString::fromLatin1(charset);
+  QString cs = QString::fromLatin1(charset);
   if (cs.isEmpty())
   {
     if (ok) *ok = true;
     return QString::fromLatin1(ba->constData());
   }
+  if (ok) *ok = false;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
   const QStringList l = cs.split(QString("\\"), Qt::KeepEmptyParts);
 #else
@@ -69,7 +70,6 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
   // ISO 2022
   if (iso2022)
   {
-    if (ok) *ok = false;
     if ((*ba).contains(0x1b)) // ESC
     {
       const QList<QByteArray> iso = ba->split(0x1b);
@@ -274,135 +274,86 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
     }
     else // ISO 2022, but no ESC character
     {
+      cs = cs.trimmed();
       QTextCodec * codec = NULL;
-      if (cs.trimmed() == QString("ISO 2022 IR 149")) // data sets exist
+      if (cs == QString("ISO 2022 IR 149")) // data sets exist, tested
       {
         codec = QTextCodec::codecForName("iso-ir-149");
-        if (codec)
-        {
-          result += codec->toUnicode(*ba);
-        }
         if (!codec)
         {
           codec = QTextCodec::codecForName("EUC-KR");
-          if (codec)
-          {
-            result += codec->toUnicode(*ba);
-          }
         }
       }
       // below variants are not tested
-      else if (cs.trimmed() == QString("ISO 2022 IR 6"))
-      {
-        result += QString::fromLatin1((*ba).constData());
-      }
-      else if (cs.trimmed() == QString("ISO 2022 IR 58"))
+      else if (cs == QString("ISO 2022 IR 58"))
       {
         codec = QTextCodec::codecForName("GB2312");
-        if (codec)
-        {
-          result += codec->toUnicode(*ba);
-        }
       }
-      else if (cs.trimmed() == QString("ISO 2022 IR 13"))
+      else if (cs == QString("ISO 2022 IR 13") ||
+               cs == QString("ISO 2022 IR 14"))
       {
         codec = QTextCodec::codecForName("Shift_JIS");
-        if (codec)
-        {
-          result += codec->toUnicode(*ba);
-        }
       }
-      else if (cs.trimmed() == QString("ISO 2022 IR 166"))
+      else if (cs == QString("ISO 2022 IR 166"))
       {
         codec = QTextCodec::codecForName("TIS-620");
-        if (codec)
-        {
-          result += codec->toUnicode(*ba);
-        }
       }
-      else if (cs.trimmed() == QString("ISO 2022 IR 100"))
+      else if (cs == QString("ISO 2022 IR 100"))
       {
         codec = QTextCodec::codecForName("ISO-8859-1");
-        if (codec)
-        {
-          result += codec->toUnicode(*ba);
-        }
       }
-      else if (cs.trimmed() == QString("ISO 2022 IR 101"))
+      else if (cs == QString("ISO 2022 IR 101"))
       {
         codec = QTextCodec::codecForName("ISO-8859-2");
-        if (codec)
-        {
-          result += codec->toUnicode(*ba);
-        }
       }
-      else if (cs.trimmed() == QString("ISO 2022 IR 109"))
+      else if (cs == QString("ISO 2022 IR 109"))
       {
         codec = QTextCodec::codecForName("ISO-8859-3");
-        if (codec)
-        {
-          result += codec->toUnicode(*ba);
-        }
       }
-      else if (cs.trimmed() == QString("ISO 2022 IR 110"))
+      else if (cs == QString("ISO 2022 IR 110"))
       {
         codec = QTextCodec::codecForName("ISO-8859-4");
-        if (codec)
-        {
-          result += codec->toUnicode(*ba);
-        }
       }
-      else if (cs.trimmed() == QString("ISO 2022 IR 144"))
+      else if (cs == QString("ISO 2022 IR 144"))
       {
         codec = QTextCodec::codecForName("ISO-8859-5");
-        if (codec)
-        {
-          result += codec->toUnicode(*ba);
-        }
       }
-      else if (cs.trimmed() == QString("ISO 2022 IR 127"))
+      else if (cs == QString("ISO 2022 IR 127"))
       {
         codec = QTextCodec::codecForName("ISO-8859-6");
-        if (codec)
-        {
-          result += codec->toUnicode(*ba);
-        }
       }
-      else if (cs.trimmed() == QString("ISO 2022 IR 126"))
+      else if (cs == QString("ISO 2022 IR 126"))
       {
         codec = QTextCodec::codecForName("ISO-8859-7");
-        if (codec)
-        {
-          result += codec->toUnicode(*ba);
-        }
       }
-      else if (cs.trimmed() == QString("ISO 2022 IR 138"))
+      else if (cs == QString("ISO 2022 IR 138"))
       {
         codec = QTextCodec::codecForName("ISO-8859-8");
-        if (codec)
-        {
-          result += codec->toUnicode(*ba);
-        }
       }
-      else if (cs.trimmed() == QString("ISO 2022 IR 148"))
+      else if (cs == QString("ISO 2022 IR 148"))
       {
         codec = QTextCodec::codecForName("ISO-8859-9");
-        if (codec)
-        {
-          result += codec->toUnicode(*ba);
-        }
       }
       if (codec)
       {
         if (ok) *ok = true;
+        result += codec->toUnicode(*ba);
       }
       else
       {
-        result += QString::fromLatin1(*ba); // error
+	    if (cs == QString("ISO 2022 IR 6"))
+        {
+          if (ok) *ok = true;
+          result += QString::fromLatin1(ba->constData());
+        }
+        else
+        {
+          result += QString::fromLatin1(ba->constData()); // error
+        }
       }
     }
   }
-  else if (l.size() == 1) // single value, not ISO 2022
+  else if (l.size() == 1) // single value, not ISO 2022, tested
   {
     QTextCodec * codec = NULL;
     const QString s(l.at(0).trimmed().simplified().toUpper());
@@ -491,13 +442,11 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
     }
     else // error
     {
-      if (ok) *ok = false;
       result = QString::fromLatin1(ba->constData());
     }
   }
-  else // multiple values, not ISO 2022, error
+  else // multiple values, but not ISO 2022, error
   {
-    if (ok) *ok = false;
     result = QString::fromLatin1(ba->constData());
   }
   return result;
