@@ -8875,17 +8875,9 @@ struct IPPIOP
 		idx (idx_),
 		ipp0(ipp0_), ipp1(ipp1_), ipp2(ipp2_),
 		iop0(iop0_), iop1(iop1_), iop2(iop2_), iop3(iop3_), iop4(iop4_), iop5(iop5_) {}
-	~IPPIOP() {}
 	unsigned int idx;
-	double ipp0;
-	double ipp1;
-	double ipp2;
-	double iop0;
-	double iop1;
-	double iop2;
-	double iop3;
-	double iop4;
-	double iop5;
+	double ipp0, ipp1, ipp2;
+	double iop0, iop1, iop2, iop3, iop4, iop5;
 };
 
 struct less_than_ipp
