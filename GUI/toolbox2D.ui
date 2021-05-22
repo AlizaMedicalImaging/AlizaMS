@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1008</width>
-    <height>92</height>
+    <width>1100</width>
+    <height>65</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -38,6 +38,51 @@
       <string/>
      </property>
      <property name="scaledContents">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="lock_pushButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>38</width>
+       <height>38</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>38</width>
+       <height>38</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lock original frame to window defined in &lt;span style=&quot; font-style:italic;&quot;&gt;DICOM&lt;/span&gt; file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../alizams.qrc">
+       <normaloff>:/bitmaps/unlock.svg</normaloff>
+       <normalon>:/bitmaps/lock.svg</normalon>:/bitmaps/unlock.svg</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>24</width>
+       <height>24</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
       <bool>true</bool>
      </property>
     </widget>
@@ -272,46 +317,6 @@
        </layout>
       </widget>
      </item>
-     <item row="0" column="0">
-      <widget class="QDoubleSpinBox" name="center2d_doubleSpinBox">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
-       </property>
-       <property name="contextMenuPolicy">
-        <enum>Qt::NoContextMenu</enum>
-       </property>
-       <property name="frame">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-       <property name="buttonSymbols">
-        <enum>QAbstractSpinBox::NoButtons</enum>
-       </property>
-       <property name="keyboardTracking">
-        <bool>false</bool>
-       </property>
-       <property name="decimals">
-        <number>2</number>
-       </property>
-       <property name="minimum">
-        <double>-999999999.000000000000000</double>
-       </property>
-       <property name="maximum">
-        <double>999999999.000000000000000</double>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="0">
       <widget class="QDoubleSpinBox" name="width2_doubleSpinBox">
        <property name="sizePolicy">
@@ -349,6 +354,49 @@
        </property>
        <property name="value">
         <double>0.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QDoubleSpinBox" name="center2d_doubleSpinBox">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="contextMenuPolicy">
+        <enum>Qt::NoContextMenu</enum>
+       </property>
+       <property name="frame">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+       <property name="buttonSymbols">
+        <enum>QAbstractSpinBox::NoButtons</enum>
+       </property>
+       <property name="keyboardTracking">
+        <bool>false</bool>
+       </property>
+       <property name="decimals">
+        <number>2</number>
+       </property>
+       <property name="minimum">
+        <double>-999999.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>999999.000000000000000</double>
        </property>
       </widget>
      </item>

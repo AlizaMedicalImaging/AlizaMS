@@ -67,6 +67,8 @@
 		<file>bitmaps/ctk.svg</file>
 		<file>bitmaps/printer.svg</file>
 		<file>bitmaps/save2.svg</file>
+		<file>bitmaps/lock.svg</file>
+		<file>bitmaps/unlock.svg</file>
 	</qresource>
 </RCC>
 
