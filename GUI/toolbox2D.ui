@@ -43,26 +43,11 @@
     </widget>
    </item>
    <item>
-    <widget class="QToolButton" name="locklevel_toolButton">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset resource="../alizams.qrc">
-       <normaloff>:/bitmaps/anchor2.svg</normaloff>
-       <normalon>:/bitmaps/anchor.svg</normalon>:/bitmaps/anchor2.svg</iconset>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
     <layout class="QGridLayout" name="gridLayout_2">
      <property name="spacing">
       <number>0</number>
      </property>
-     <item row="1" column="1">
+     <item row="1" column="2">
       <widget class="QLabel" name="width_label">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -81,7 +66,7 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="0">
+     <item row="0" column="1">
       <widget class="QSlider" name="center_horizontalSlider">
        <property name="minimum">
         <number>-99</number>
@@ -100,7 +85,7 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="2">
+     <item row="0" column="3">
       <widget class="QDoubleSpinBox" name="center_doubleSpinBox">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -128,7 +113,7 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
+     <item row="1" column="1">
       <widget class="QSlider" name="width_horizontalSlider">
        <property name="minimum">
         <number>0</number>
@@ -147,7 +132,7 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="2">
+     <item row="1" column="3">
       <widget class="QDoubleSpinBox" name="width_doubleSpinBox">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -178,7 +163,7 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
+     <item row="0" column="2">
       <widget class="QLabel" name="center_label">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -197,7 +182,7 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="3">
+     <item row="0" column="4">
       <widget class="QComboBox" name="comboBox">
        <property name="toolTip">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;LUT function&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -214,7 +199,7 @@
        </item>
       </widget>
      </item>
-     <item row="1" column="3">
+     <item row="1" column="4">
       <widget class="QFrame" name="frame">
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
@@ -285,6 +270,86 @@
          </widget>
         </item>
        </layout>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QDoubleSpinBox" name="center2d_doubleSpinBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="contextMenuPolicy">
+        <enum>Qt::NoContextMenu</enum>
+       </property>
+       <property name="frame">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+       <property name="buttonSymbols">
+        <enum>QAbstractSpinBox::NoButtons</enum>
+       </property>
+       <property name="keyboardTracking">
+        <bool>false</bool>
+       </property>
+       <property name="decimals">
+        <number>2</number>
+       </property>
+       <property name="minimum">
+        <double>-999999999.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>999999999.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QDoubleSpinBox" name="width2_doubleSpinBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="contextMenuPolicy">
+        <enum>Qt::NoContextMenu</enum>
+       </property>
+       <property name="frame">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+       <property name="buttonSymbols">
+        <enum>QAbstractSpinBox::NoButtons</enum>
+       </property>
+       <property name="decimals">
+        <number>2</number>
+       </property>
+       <property name="minimum">
+        <double>0.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>999999999.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>0.000000000000000</double>
+       </property>
       </widget>
      </item>
     </layout>

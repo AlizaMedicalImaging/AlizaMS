@@ -1184,6 +1184,8 @@ template<typename T> void load_image(const typename T::Pointer & image,
 	{
 		std::cout << "load_image<>() : widget->threadsLUT_.size()>0" << std::endl;
 	}
+std::cout << "c=" << ivariant->frame_levels.value(ivariant->di->selected_z_slice).default_us_window_center
+  << " w=" << ivariant->frame_levels.value(ivariant->di->selected_z_slice).default_us_window_width << std::endl;
 	if (tmp99==0)
 	{
 		int j = 0;
@@ -1197,7 +1199,8 @@ template<typename T> void load_image(const typename T::Pointer & image,
 						p,
 						size_0,  size_1,
 						index_0, index_1, j,
-						ivariant->di->us_window_center, ivariant->di->us_window_width,
+//						ivariant->di->us_window_center, ivariant->di->us_window_width,
+ivariant->frame_levels.value(ivariant->di->selected_z_slice).default_us_window_center,ivariant->frame_levels.value(ivariant->di->selected_z_slice).default_us_window_width,
 						lut, alt_mode,lut_function);
 			j += 3*size_0*size_1;
 			widget->threadsLUT_.push_back(static_cast<QThread*>(t__));
@@ -1222,7 +1225,8 @@ template<typename T> void load_image(const typename T::Pointer & image,
 							p,
 							size_0,  block,
 							index_0, index_1, j,
-							ivariant->di->us_window_center, ivariant->di->us_window_width,
+//							ivariant->di->us_window_center, ivariant->di->us_window_width,
+ivariant->frame_levels.value(ivariant->di->selected_x_slice).default_us_window_center,ivariant->frame_levels.value(ivariant->di->selected_x_slice).default_us_window_width,
 							lut, alt_mode,lut_function);
 				j += 3*size_0*block;
 				widget->threadsLUT_.push_back(static_cast<QThread*>(t__));
@@ -1243,7 +1247,8 @@ template<typename T> void load_image(const typename T::Pointer & image,
 						p,
 						size[0],  size[1],
 						0, 0, 0,
-						ivariant->di->us_window_center, ivariant->di->us_window_width,
+//						ivariant->di->us_window_center, ivariant->di->us_window_width,
+ivariant->frame_levels.value(ivariant->di->selected_x_slice).default_us_window_center,ivariant->frame_levels.value(ivariant->di->selected_x_slice).default_us_window_width,
 						lut, alt_mode,lut_function);
 			widget->threadsLUT_.push_back(static_cast<QThread*>(lt__));
 			lt__->start();
