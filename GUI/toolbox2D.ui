@@ -162,7 +162,7 @@
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lock original frame in 2D view to window defined in &lt;span style=&quot; font-style:italic;&quot;&gt;DICOM&lt;/span&gt; file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lock original frame in 2D view to window defined in &lt;span style=&quot; font-style:italic;&quot;&gt;DICOM&lt;/span&gt; file. If there is no window defined - set default. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string/>

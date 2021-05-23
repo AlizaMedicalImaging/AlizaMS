@@ -1180,19 +1180,36 @@ template<typename T> void load_image(
 	const short axis = widget->get_axis();
 	//
 	double window_center, window_width;
-	int lut_function;
-	if (axis == 2 && ivariant->di->lock_level2D &&
-		ivariant->frame_levels.contains(ivariant->di->selected_z_slice))
+	short lut_function;
+	if (axis == 2)
 	{
-		const FrameLevel & fl = ivariant->frame_levels.value(ivariant->di->selected_z_slice);
-		window_center = fl.us_window_center;
-		window_width = fl.us_window_width;
-		lut_function = fl.lut_function;
+		if (ivariant->di->lock_level2D)
+		{
+			if (ivariant->frame_levels.contains(ivariant->di->selected_z_slice))
+			{
+				const FrameLevel & fl = ivariant->frame_levels.value(ivariant->di->selected_z_slice);
+				window_center = fl.us_window_center;
+				window_width = fl.us_window_width;
+				lut_function = fl.lut_function;
+			}
+			else
+			{
+				window_center = ivariant->di->default_us_window_center;
+				window_width = ivariant->di->default_us_window_center;
+				lut_function = 0;
+			}
+		}
+		else
+		{
+			window_center = ivariant->di->us_window_center;
+			window_width = ivariant->di->us_window_center;
+			lut_function = ivariant->di->lut_function;
+		}
 	}
 	else
 	{
 		window_center = ivariant->di->us_window_center;
-		window_width = ivariant->di->us_window_width;
+		window_width = ivariant->di->us_window_center;
 		lut_function = ivariant->di->lut_function;
 	}
 	//
