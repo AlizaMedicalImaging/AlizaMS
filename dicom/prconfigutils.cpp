@@ -3505,8 +3505,6 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 	// VOI LUT
 	//
 	{
-		unsigned int zsize = 0;
-		if (v->pF.IsNotNull()) zsize = v->pF->GetLargestPossibleRegion().GetSize()[2];
 		QMap<int, QStringList> voi_lut_images;
 		QMap<int, double>      window_centers;
 		QMap<int, double>      window_widths;
@@ -3600,14 +3598,6 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				ivariant->di->us_window_width;
 			v->di->lut_function =
 				ivariant->di->lut_function;
-		}
-		for (int x = 0; x < zsize; ++x)
-		{
-			FrameLevel fl;
-			fl.lut_function = ivariant->di->lut_function;
-			fl.us_window_center = v->di->default_us_window_center;
-			fl.us_window_width = v->di->default_us_window_width;
-			v->frame_levels[x] = fl;
 		}
 	}
 	//

@@ -1195,21 +1195,21 @@ template<typename T> void load_image(
 			else
 			{
 				window_center = ivariant->di->default_us_window_center;
-				window_width = ivariant->di->default_us_window_center;
-				lut_function = 0;
+				window_width = ivariant->di->default_us_window_width;
+				lut_function = 0; // TODO
 			}
 		}
 		else
 		{
 			window_center = ivariant->di->us_window_center;
-			window_width = ivariant->di->us_window_center;
+			window_width = ivariant->di->us_window_width;
 			lut_function = ivariant->di->lut_function;
 		}
 	}
 	else
 	{
 		window_center = ivariant->di->us_window_center;
-		window_width = ivariant->di->us_window_center;
+		window_width = ivariant->di->us_window_width;
 		lut_function = ivariant->di->lut_function;
 	}
 	//
