@@ -725,6 +725,13 @@ public:
 };
 typedef QMap<int, PRDisplayShutter> PRDisplayShutters;
 
+struct FrameLevel
+{
+	short lut_function;
+	double us_window_center, us_window_width;
+};
+typedef QMap<int, FrameLevel> FrameLevels;
+
 class DisplayInterface
 {
 public:
@@ -742,6 +749,7 @@ public:
 	bool transparency;
 	bool lock_2Dview;
 	bool lock_single;
+	bool lock_level2D;
 	quint32 cube_3dtex;
 	float origin[3];
 	bool  origin_ok;
@@ -870,6 +878,7 @@ public:
 	PRGraphicObjects  pr_graphicobjects;
 	PRDisplayShutters pr_display_shutters;
 	QStringList filenames;
+	FrameLevels frame_levels;
 	Orientations_20_20 orientations_20_20;
 	QPixmap icon;
 	QPixmap histogram;

@@ -3,9 +3,11 @@
 ToolBox2D::ToolBox2D(float si)
 {
 	setupUi(this);
-	const QSize s = QSize((int)(18*si),(int)(18*si));
-	resetlevel_pushButton->setIconSize(s);
-	maxwin_pushButton->setIconSize(s);
+	const QSize s1 = QSize((int)(18*si),(int)(18*si));
+	const QSize s2 = QSize((int)(36*si),(int)(18*si));
+	resetlevel_pushButton->setIconSize(s1);
+	maxwin_pushButton->setIconSize(s1);
+	lock_pushButton->setIconSize(s2);
 	set_style_sheet();
 	red   = QPixmap(":/bitmaps/red.svg");
 	green = QPixmap(":/bitmaps/green.svg");
@@ -140,4 +142,26 @@ void ToolBox2D::set_maxwindow(bool i)
 void ToolBox2D::enable_maxwindow(bool i)
 {
 	maxwin_pushButton->setEnabled(i);
+}
+
+bool ToolBox2D::get_locked() const
+{
+	return lock_pushButton->isChecked();
+}
+
+void ToolBox2D::toggle_locked_values(bool t)
+{
+	lock_pushButton->setChecked(t);
+	center2d_doubleSpinBox->setEnabled(t);
+	width2_doubleSpinBox->setEnabled(t);
+}
+
+void ToolBox2D::set_locked_center(double x)
+{
+	center2d_doubleSpinBox->setValue(x);
+}
+
+void ToolBox2D::set_locked_width(double x)
+{
+	width2_doubleSpinBox->setValue(x);
 }

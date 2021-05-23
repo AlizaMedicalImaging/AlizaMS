@@ -152,6 +152,7 @@ public slots:
 	void toggle_zlock(bool);
 	void toggle_zlock_one(bool);
 	void trigger_image_color();
+	void toggle_lock_window(bool);
 
 signals:
 	void report_load_to_mainwin();

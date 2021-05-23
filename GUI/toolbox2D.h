@@ -19,6 +19,10 @@ public:
 	void set_lut_function(int);
 	void connect_sliders();
 	void disconnect_sliders();
+	bool get_locked() const;
+	void toggle_locked_values(bool);
+	void set_locked_center(double);
+	void set_locked_width(double);
 
 public slots:
 	void set_window_upper(double);
