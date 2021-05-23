@@ -64,7 +64,6 @@ public:
 	QAction * gloptionsAct;
 	QAction * animAct2d;
 	QAction * animAct3d;
-	QAction * lockLevelAct;
 
 protected:
 	void closeEvent(QCloseEvent*) override;

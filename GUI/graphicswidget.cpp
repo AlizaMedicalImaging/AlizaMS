@@ -1150,25 +1150,27 @@ template<typename T> void load_rgba_char_image(
 #endif
 }
 
-template<typename T> void load_image(const typename T::Pointer & image,
-	ImageVariant * ivariant,
+template<typename T> void load_image(
+	const typename T::Pointer & image,
+	const ImageContainer & image_container,
 	GraphicsWidget * widget,
-	const QString & rai,
-	const QString & laterality,
-	const QString & body_part,
-	const QString & orientation_20_20,
 	const bool redraw_contours,
-	short fit=0)
+	short fit = 0)
 {
 	if (image.IsNull()) return;
-	if (!ivariant) return;
+	if (!image_container.image2D) return;
+	if (!image_container.image3D) return;
+	const ImageVariant * ivariant = image_container.image3D;
+	const QString & rai = image_container.image2D->orientation_string;
+	const QString & laterality = image_container.image2D->laterality;
+	const QString & body_part = image_container.image2D->body_part;
+	const QString & orientation_20_20 = image_container.orientation_20_20;
 	//
 	const typename T::SpacingType spacing = image->GetSpacing();
 	const typename T::RegionType region   = image->GetLargestPossibleRegion();
 	const typename T::SizeType size       = region.GetSize();
-	const short lut      = ivariant->di->selected_lut;
-	const bool  alt_mode = widget->get_alt_mode();
-	const int lut_function = ivariant->di->lut_function;
+	const short lut = ivariant->di->selected_lut;
+	const bool alt_mode = widget->get_alt_mode();
 	//
 	const unsigned int p_size = 3*size[0]*size[1];
 	unsigned char * p = NULL;
@@ -1176,6 +1178,24 @@ template<typename T> void load_image(const typename T::Pointer & image,
 	catch (std::bad_alloc&) { p = NULL; }
 	if (!p) return;
 	const short axis = widget->get_axis();
+	//
+	double window_center, window_width;
+	int lut_function;
+	if (axis == 2 && ivariant->di->lock_level2D &&
+		ivariant->frame_levels.contains(ivariant->di->selected_z_slice))
+	{
+		const FrameLevel & fl = ivariant->frame_levels.value(ivariant->di->selected_z_slice);
+		window_center = fl.us_window_center;
+		window_width = fl.us_window_width;
+		lut_function = fl.lut_function;
+	}
+	else
+	{
+		window_center = ivariant->di->us_window_center;
+		window_width = ivariant->di->us_window_width;
+		lut_function = ivariant->di->lut_function;
+	}
+	//
 	const bool global_flip_x = widget->graphicsview->global_flip_x;
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
 	const int num_threads = QThread::idealThreadCount();
@@ -1184,8 +1204,6 @@ template<typename T> void load_image(const typename T::Pointer & image,
 	{
 		std::cout << "load_image<>() : widget->threadsLUT_.size()>0" << std::endl;
 	}
-std::cout << "c=" << ivariant->frame_levels.value(ivariant->di->selected_z_slice).default_us_window_center
-  << " w=" << ivariant->frame_levels.value(ivariant->di->selected_z_slice).default_us_window_width << std::endl;
 	if (tmp99==0)
 	{
 		int j = 0;
@@ -1199,8 +1217,7 @@ std::cout << "c=" << ivariant->frame_levels.value(ivariant->di->selected_z_slice
 						p,
 						size_0,  size_1,
 						index_0, index_1, j,
-//						ivariant->di->us_window_center, ivariant->di->us_window_width,
-ivariant->frame_levels.value(ivariant->di->selected_z_slice).default_us_window_center,ivariant->frame_levels.value(ivariant->di->selected_z_slice).default_us_window_width,
+						window_center, window_width,
 						lut, alt_mode,lut_function);
 			j += 3*size_0*size_1;
 			widget->threadsLUT_.push_back(static_cast<QThread*>(t__));
@@ -1225,8 +1242,7 @@ ivariant->frame_levels.value(ivariant->di->selected_z_slice).default_us_window_c
 							p,
 							size_0,  block,
 							index_0, index_1, j,
-//							ivariant->di->us_window_center, ivariant->di->us_window_width,
-ivariant->frame_levels.value(ivariant->di->selected_x_slice).default_us_window_center,ivariant->frame_levels.value(ivariant->di->selected_x_slice).default_us_window_width,
+							window_center, window_width,
 							lut, alt_mode,lut_function);
 				j += 3*size_0*block;
 				widget->threadsLUT_.push_back(static_cast<QThread*>(t__));
@@ -1247,8 +1263,7 @@ ivariant->frame_levels.value(ivariant->di->selected_x_slice).default_us_window_c
 						p,
 						size[0],  size[1],
 						0, 0, 0,
-//						ivariant->di->us_window_center, ivariant->di->us_window_width,
-ivariant->frame_levels.value(ivariant->di->selected_x_slice).default_us_window_center,ivariant->frame_levels.value(ivariant->di->selected_x_slice).default_us_window_width,
+						window_center, window_width,
 						lut, alt_mode,lut_function);
 			widget->threadsLUT_.push_back(static_cast<QThread*>(lt__));
 			lt__->start();
@@ -1684,100 +1699,64 @@ void GraphicsWidget::update_image(
 	{
 	case 0: load_image<Image2DTypeSS>(
 				image_container.image2D->pSS,
-				image_container.image3D,
+				image_container,
 				this,
-				image_container.image2D->orientation_string,
-				image_container.image2D->laterality,
-				image_container.image2D->body_part,
-				image_container.orientation_20_20,
 				redraw_contours,
 				fit);
 		break;
 	case 1: load_image<Image2DTypeUS>(
 				image_container.image2D->pUS,
-				image_container.image3D,
+				image_container,
 				this,
-				image_container.image2D->orientation_string,
-				image_container.image2D->laterality,
-				image_container.image2D->body_part,
-				image_container.orientation_20_20,
 				redraw_contours,
 				fit);
 		break;
 	case 2: load_image<Image2DTypeSI>(
 				image_container.image2D->pSI,
-				image_container.image3D,
+				image_container,
 				this,
-				image_container.image2D->orientation_string,
-				image_container.image2D->laterality,
-				image_container.image2D->body_part,
-				image_container.orientation_20_20,
 				redraw_contours,
 				fit);
 		break;
 	case 3: load_image<Image2DTypeUI>(
 				image_container.image2D->pUI,
-				image_container.image3D,
+				image_container,
 				this,
-				image_container.image2D->orientation_string,
-				image_container.image2D->laterality,
-				image_container.image2D->body_part,
-				image_container.orientation_20_20,
 				redraw_contours,
 				fit);
 		break;
 	case 4: load_image<Image2DTypeUC>(
 				image_container.image2D->pUC,
-				image_container.image3D,
+				image_container,
 				this,
-				image_container.image2D->orientation_string,
-				image_container.image2D->laterality,
-				image_container.image2D->body_part,
-				image_container.orientation_20_20,
 				redraw_contours,
 				fit);
 		break;
 	case 5: load_image<Image2DTypeF>(
 				image_container.image2D->pF,
-				image_container.image3D,
+				image_container,
 				this,
-				image_container.image2D->orientation_string,
-				image_container.image2D->laterality,
-				image_container.image2D->body_part,
-				image_container.orientation_20_20,
 				redraw_contours,
 				fit);
 		break;
 	case 6: load_image<Image2DTypeD>(
 				image_container.image2D->pD,
-				image_container.image3D,
+				image_container,
 				this,
-				image_container.image2D->orientation_string,
-				image_container.image2D->laterality,
-				image_container.image2D->body_part,
-				image_container.orientation_20_20,
 				redraw_contours,
 				fit);
 		break;
 	case 7: load_image<Image2DTypeSLL>(
 				image_container.image2D->pSLL,
-				image_container.image3D,
+				image_container,
 				this,
-				image_container.image2D->orientation_string,
-				image_container.image2D->laterality,
-				image_container.image2D->body_part,
-				image_container.orientation_20_20,
 				redraw_contours,
 				fit);
 		break;
 	case 8: load_image<Image2DTypeULL>(
 				image_container.image2D->pULL,
-				image_container.image3D,
+				image_container,
 				this,
-				image_container.image2D->orientation_string,
-				image_container.image2D->laterality,
-				image_container.image2D->body_part,
-				image_container.orientation_20_20,
 				redraw_contours,
 				fit);
 		break;

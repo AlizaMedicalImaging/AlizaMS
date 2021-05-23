@@ -35,7 +35,7 @@ DisplayInterface::DisplayInterface(
 	transparency = true; // 3D phys. space view
 	lock_2Dview = false;
 	lock_single = false;
-	lock_level2D = false;
+	lock_level2D = true;
 	cube_3dtex = 0;
 	for (int x = 0;x < 3; x++) { origin[x] = 0.0f; }
 	origin_ok = false;

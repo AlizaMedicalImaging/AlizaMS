@@ -6760,9 +6760,7 @@ QString DicomUtils::read_series(
 			{
 				FrameLevel fl;
 				fl.lut_function = luts_.at(x);
-				fl.default_us_window_center = levels_.at(x);
 				fl.us_window_center = levels_.at(x);
-				fl.default_us_window_width = windows_.at(x);
 				fl.us_window_width = windows_.at(x);
 				ivariant->frame_levels[x] = fl;
 				//
@@ -8591,9 +8589,7 @@ QString DicomUtils::read_enhanced_common(
 					{
 						FrameLevel fl;
 						fl.lut_function = tmp1l.at(k);
-						fl.default_us_window_center = tmp1c.at(x);
 						fl.us_window_center = tmp1c.at(k);
-						fl.default_us_window_width = tmp1w.at(k);
 						fl.us_window_width = tmp1w.at(k);
 						ivariant->frame_levels[k] = fl;
 						//

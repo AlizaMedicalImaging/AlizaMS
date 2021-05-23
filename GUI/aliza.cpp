@@ -1485,6 +1485,7 @@ void Aliza::update_toolbox(const ImageVariant * v)
 	zlockAct->blockSignals(true);
 	oneAct->blockSignals(true);
 	toolbox2D->disconnect_sliders();
+	const int selected_z_frame = v->di->selected_z_slice;
 	if (check_3d())
 	{
 		slicesAct->setEnabled(true);
@@ -1496,6 +1497,18 @@ void Aliza::update_toolbox(const ImageVariant * v)
 	toolbox2D->set_max_width(v->di->rmax-v->di->rmin);
 	toolbox2D->set_window_upper(v->di->rmax);
 	toolbox2D->set_window_lower(v->di->rmin);
+	toolbox2D->toggle_locked_values(v->di->lock_level2D);
+	if (v->frame_levels.contains(selected_z_frame))
+	{
+		const FrameLevel & fl = v->frame_levels.value(selected_z_frame);
+		toolbox2D->set_locked_center(fl.us_window_center);
+		toolbox2D->set_locked_width(fl.us_window_width);
+	}
+	else
+	{
+		toolbox2D->set_locked_center(v->di->us_window_center);
+		toolbox2D->set_locked_width(v->di->us_window_width);
+	}
 	toolbox2D->set_width(v->di->us_window_width);
 	toolbox2D->set_center(v->di->us_window_center);
 	if (v->image_type == 0 || v->image_type == 1)
@@ -1549,9 +1562,9 @@ void Aliza::update_toolbox(const ImageVariant * v)
 		zlockAct->setChecked(true);
 		zlockAct->setIcon(anchor_icon);
 		oneAct->setEnabled(true);
-		v->di->from_slice = v->di->selected_z_slice;
+		v->di->from_slice = selected_z_frame;
 		if (v->di->lock_single)
-			v->di->to_slice = v->di->selected_z_slice;
+			v->di->to_slice = selected_z_frame;
 		else
 			v->di->to_slice = v->di->idimz > 1 ? v->di->idimz - 1 : 0;
 	}
@@ -1582,7 +1595,7 @@ void Aliza::update_toolbox(const ImageVariant * v)
 	case 2:
 		{
 			slider_m->set_slider_max(tmpz);
-			slider_m->set_slice(v->di->selected_z_slice);
+			slider_m->set_slice(selected_z_frame);
 		}
 		break;
 	default:
@@ -1665,6 +1678,7 @@ void Aliza::connect_tools()
 	connect(toolbox2D->center_doubleSpinBox,   SIGNAL(valueChanged(double)),    this, SLOT(center_from_spinbox(double)));
 	connect(toolbox2D->maxwin_pushButton,      SIGNAL(toggled(bool)),           this, SLOT(toggle_maxwindow(bool)));
 	connect(toolbox2D->comboBox,               SIGNAL(currentIndexChanged(int)),this, SLOT(set_lut_function1(int)));
+	connect(toolbox2D->lock_pushButton,        SIGNAL(toggled(bool)),           this, SLOT(toggle_lock_window(bool)));
 	if (!graphicswidget_m->run__)
 	{
 		connect(slider_m->slices_slider, SIGNAL(valueChanged(int)), this, SLOT(set_selected_slice2D_m(int)));
@@ -1683,6 +1697,7 @@ void Aliza::disconnect_tools()
 	disconnect(toolbox2D->center_doubleSpinBox,    SIGNAL(valueChanged(double)),    this, SLOT(center_from_spinbox(double)));
 	disconnect(toolbox2D->maxwin_pushButton,       SIGNAL(toggled(bool)),           this, SLOT(toggle_maxwindow(bool)));
 	disconnect(toolbox2D->comboBox,                SIGNAL(currentIndexChanged(int)),this, SLOT(set_lut_function1(int)));
+	disconnect(toolbox2D->lock_pushButton,         SIGNAL(toggled(bool)),           this, SLOT(toggle_lock_window(bool)));
 	if (!graphicswidget_m->run__)
 	{
 		disconnect(slider_m->slices_slider, SIGNAL(valueChanged(int)), this, SLOT(set_selected_slice2D_m(int)));
@@ -1748,6 +1763,12 @@ void Aliza::set_selected_slice2D_m(int j)
 		}
 		//
 		{
+			if (v->frame_levels.contains(v->di->selected_z_slice))
+			{
+				const FrameLevel & fl = v->frame_levels.value(v->di->selected_z_slice);
+				toolbox2D->set_locked_center(fl.us_window_center);
+				toolbox2D->set_locked_width(fl.us_window_width);
+			}
 			graphicswidget_m->set_slice_2D(
 				v,0,true);
 			if (!run__)
@@ -3910,6 +3931,39 @@ quit__:
 #ifdef ALIZA_PRINT_COUNT_GL_OBJ
 	std::cout << "Num VBOs " << GLWidget::get_count_vbos() << std::endl;
 #endif
+}
+
+void Aliza::toggle_lock_window(bool t) // TODO
+{
+	toolbox2D->toggle_locked_values(t);
+	ImageVariant * v = get_selected_image();
+	if (!v) return;
+	if (v->group_id >= 0)
+	{
+		QMap<int, ImageVariant*>::const_iterator iv =
+			scene3dimages.cbegin();
+		while (iv != scene3dimages.cend())
+		{
+			ImageVariant * v2 = iv.value();
+			if (v2 && (v->group_id == v2->group_id))
+			{
+				v2->di->lock_level2D = t;
+			}
+			++iv;
+		}
+	}
+	else
+	{
+		v->di->lock_level2D = t;
+	}
+	if (graphicswidget_m->get_axis() == 2)
+	{
+		set_selected_slice2D_m(v->di->selected_z_slice);
+	}
+	else
+	{
+		qApp->processEvents();
+	}
 }
 
 #ifdef ALIZA_PRINT_COUNT_GL_OBJ

@@ -729,9 +729,8 @@ struct FrameLevel
 {
 	short lut_function;
 	double us_window_center, us_window_width;
-	double default_us_window_center, default_us_window_width;
 };
-typedef QMap<unsigned int, FrameLevel> FrameLevels;
+typedef QMap<int, FrameLevel> FrameLevels;
 
 class DisplayInterface
 {
