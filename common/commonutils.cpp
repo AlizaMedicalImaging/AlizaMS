@@ -173,7 +173,8 @@ template<typename T> void calculate_min_max(
 	}
 	const double vmax_minus_vmin = iv->di->vmax-iv->di->vmin;
 	const double rmax_minus_rmin = iv->di->rmax-iv->di->rmin;
-	if ((iv->di->us_window_center <= -999999.0 && iv->di->us_window_width <= -999999.0) ||
+	if ((iv->di->us_window_width <= -999999.0) ||
+		// TODO check again
 		((iv->di->default_us_window_width > (iv->di->vmax - iv->di->vmin)) ||
 			(iv->di->default_us_window_center > iv->di->vmax ||
 				iv->di->default_us_window_center < iv->di->vmin)))
@@ -192,13 +193,44 @@ template<typename T> void calculate_min_max(
 				iv->di->default_us_window_center = iv->di->us_window_center = ((tmp110/2.0)-(-tmp111));
 				iv->di->default_us_window_width  = iv->di->us_window_width  = tmp110;
 			}
-			else // TODO
+			else // TODO check again
 			{
 				iv->di->default_us_window_center = iv->di->us_window_center = 0.5*iv->di->vmax;
 				iv->di->default_us_window_width  = iv->di->us_window_width  = fabs(iv->di->vmax);
 			}
 		}
 	}
+	//
+	{
+		QVector<int> undef_windows;
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+		FrameLevels::const_iterator it = iv->frame_levels.cbegin();
+		while (it != iv->frame_levels.cend())
+#else
+		FrameLevels::const_iterator it = iv->frame_levels.constBegin();
+		while (it != iv->frame_levels.constEnd())
+#endif
+		{
+			const FrameLevel & fl = it.value();
+			if (fl.us_window_width <= -999999.0)
+			{
+				undef_windows.push_back(it.key());
+			}
+			++it;
+		}
+		if (!undef_windows.empty())
+		{
+			for (int x = 0; x < undef_windows.size(); ++x)
+			{
+				FrameLevel fl;
+				fl.us_window_center = iv->di->default_us_window_center;
+				fl.us_window_width = iv->di->default_us_window_width;
+				fl.lut_function = 0;
+				iv->frame_levels[x] = fl;
+			}
+		}
+	}
+	//
 	iv->di->window_center =
 		(iv->di->us_window_center+(-iv->di->rmin))/rmax_minus_rmin;
 	iv->di->window_width  = iv->di->us_window_width/rmax_minus_rmin;

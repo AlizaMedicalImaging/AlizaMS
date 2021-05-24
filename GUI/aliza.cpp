@@ -1509,16 +1509,24 @@ void Aliza::update_toolbox(const ImageVariant * v)
 	toolbox2D->set_window_upper(v->di->rmax);
 	toolbox2D->set_window_lower(v->di->rmin);
 	toolbox2D->toggle_locked_values(v->di->lock_level2D);
-	if (v->frame_levels.contains(selected_z_frame))
+	if (v->image_type >= 0 && v->image_type < 10)
 	{
-		const FrameLevel & fl = v->frame_levels.value(selected_z_frame);
-		toolbox2D->set_locked_center(fl.us_window_center);
-		toolbox2D->set_locked_width(fl.us_window_width);
+		if (v->frame_levels.contains(selected_z_frame))
+		{
+			const FrameLevel & fl = v->frame_levels.value(selected_z_frame);
+			toolbox2D->set_locked_center(fl.us_window_center);
+			toolbox2D->set_locked_width(fl.us_window_width);
+		}
+		else
+		{
+			toolbox2D->set_locked_center(v->di->default_us_window_center);
+			toolbox2D->set_locked_width(v->di->default_us_window_width);
+		}
 	}
 	else
 	{
-		toolbox2D->set_locked_center(v->di->default_us_window_center);
-		toolbox2D->set_locked_width(v->di->default_us_window_width);
+		toolbox2D->set_locked_center(0.0);
+		toolbox2D->set_locked_width(0.0);
 	}
 	toolbox2D->set_width(v->di->us_window_width);
 	toolbox2D->set_center(v->di->us_window_center);
@@ -1783,17 +1791,25 @@ void Aliza::set_selected_slice2D_m(int j)
 			bool frame_level_available = false;
 			if (a == 2)
 			{
-				if (v->frame_levels.contains(v->di->selected_z_slice))
+				if (v->image_type >= 0 && v->image_type < 10)
 				{
-					const FrameLevel & fl = v->frame_levels.value(v->di->selected_z_slice);
-					toolbox2D->set_locked_center(fl.us_window_center);
-					toolbox2D->set_locked_width(fl.us_window_width);
-					frame_level_available = true;
+					if (v->frame_levels.contains(v->di->selected_z_slice))
+					{
+						const FrameLevel & fl = v->frame_levels.value(v->di->selected_z_slice);
+						toolbox2D->set_locked_center(fl.us_window_center);
+						toolbox2D->set_locked_width(fl.us_window_width);
+						frame_level_available = true;
+					}
+					else
+					{
+						toolbox2D->set_locked_center(v->di->default_us_window_center);
+						toolbox2D->set_locked_width(v->di->default_us_window_width);
+					}
 				}
 				else
 				{
-					toolbox2D->set_locked_center(v->di->default_us_window_center);
-					toolbox2D->set_locked_width(v->di->default_us_window_width);
+					toolbox2D->set_locked_center(0.0);
+					toolbox2D->set_locked_width(0.0);
 				}
 			}
 			graphicswidget_m->set_slice_2D(v, 0, true, frame_level_available);
@@ -1839,7 +1855,7 @@ void Aliza::set_selected_slice2D_y(int j)
 	if (v)
 	{
 		v->di->selected_y_slice = j;
-		if (v->group_id>=0)
+		if (v->group_id >= 0)
 		{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			QMap<int, ImageVariant*>::const_iterator iv =
@@ -1861,7 +1877,7 @@ void Aliza::set_selected_slice2D_y(int j)
 		}
 		//
 		{
-			graphicswidget_y->set_slice_2D(v,0,false);
+			graphicswidget_y->set_slice_2D(v, 0, false);
 			graphicswidget_m->update_frames();
 			graphicswidget_x->update_frames();
 		}
@@ -1874,7 +1890,7 @@ void Aliza::set_selected_slice2D_x(int j)
 	if (v)
 	{
 		v->di->selected_x_slice = j;
-		if (v->group_id>=0)
+		if (v->group_id >= 0)
 		{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			QMap<int, ImageVariant*>::const_iterator iv =
@@ -1896,7 +1912,7 @@ void Aliza::set_selected_slice2D_x(int j)
 		}
 		//
 		{
-			graphicswidget_x->set_slice_2D(v,0,false);
+			graphicswidget_x->set_slice_2D(v, 0, false);
 			graphicswidget_m->update_frames();
 			graphicswidget_y->update_frames();
 		}
@@ -1922,7 +1938,7 @@ void Aliza::set_axis_2D(int a, bool rect_mode)
 		graphicswidget_m->set_axis(a);
 		if (rect_mode)
 		{
-			if (graphicswidget_m->get_axis()==2)
+			if (graphicswidget_m->get_axis() == 2)
 			{
 				graphicswidget_m->graphicsview->handle_rect->show();
 				graphicswidget_m->graphicsview->selection_item->hide();
@@ -1945,13 +1961,12 @@ void Aliza::set_axis_2D(int a, bool rect_mode)
 		update_toolbox(v);
 		if (a==2)
 		{
-			graphicswidget_m->set_slice_2D(
-				v,1,true);
+			graphicswidget_m->set_slice_2D(v, 1, true);
 			check_slice_collisions(const_cast<const ImageVariant *>(v), graphicswidget_m);
 		}
 		else
 		{
-			graphicswidget_m->set_slice_2D(v,1,false);
+			graphicswidget_m->set_slice_2D(v, 1, false);
 		}
 		histogramview->clear__();
 	}
@@ -1992,8 +2007,8 @@ void Aliza::set_axis_zyx(bool rect_mode)
 		update_toolbox(v);
 		graphicswidget_m->set_slice_2D(v, 1, true);
 		check_slice_collisions(const_cast<const ImageVariant *>(v), graphicswidget_m);
-		graphicswidget_y->set_slice_2D(v,1,false);
-		graphicswidget_x->set_slice_2D(v,1,false);
+		graphicswidget_y->set_slice_2D(v, 1, false);
+		graphicswidget_x->set_slice_2D(v, 1, false);
 		histogramview->update__(v);
 	}
 }
@@ -2008,7 +2023,7 @@ void Aliza::toggle_rect(bool t)
 	graphicswidget_x->set_bb(t);
 	if (t)
 	{
-		if (graphicswidget_m->get_axis()==2)
+		if (graphicswidget_m->get_axis() == 2)
 		{
 			graphicswidget_m->graphicsview->handle_rect->show();
 			graphicswidget_m->graphicsview->selection_item->hide();
@@ -2046,26 +2061,18 @@ void Aliza::calculate_bb()
 			graphicswidget_m->graphicsview->handle_rect->pos() +
 			rect.topLeft() +
 			QPointF(0.5*line_width,0.5*line_width);
-		double x_min=0.0, x_max=1.0, y_min=0.0, y_max=1.0;
+		double x_min = 0.0, x_max = 1.0, y_min = 0.0, y_max = 1.0;
 		double size[2];
-		size[0] =
-			(rect.width() -line_width) > 1.0
-			? rect.width() -line_width : 1.0;
-		size[1] =
-			(rect.height()-line_width) > 1.0 ?
-			rect.height()-line_width : 1.0;
+		size[0] = (rect.width() -line_width) > 1.0 ? rect.width() -line_width : 1.0;
+		size[1] = (rect.height()-line_width) > 1.0 ?  rect.height()-line_width : 1.0;
 		const int tmpp_x = static_cast<int>(round(tmpp.x()));
 		const int tmpp_y = static_cast<int>(round(tmpp.y()));
 		const int size_0 = static_cast<int>(round(size[0]));
 		const int size_1 = static_cast<int>(round(size[1]));
-		x_min =  static_cast<double>(tmpp_x) /
-			static_cast<double>(v->di->idimx);
-		x_max = (static_cast<double>(tmpp_x+size_0)) /
-			static_cast<double>(v->di->idimx);
-		y_min =  static_cast<double>(tmpp_y) /
-			static_cast<double>(v->di->idimy);
-		y_max = (static_cast<double>(tmpp_y+size_1)) /
-			static_cast<double>(v->di->idimy);
+		x_min =  static_cast<double>(tmpp_x) / static_cast<double>(v->di->idimx);
+		x_max = (static_cast<double>(tmpp_x+size_0)) / static_cast<double>(v->di->idimx);
+		y_min =  static_cast<double>(tmpp_y) / static_cast<double>(v->di->idimy);
+		y_max = (static_cast<double>(tmpp_y+size_1)) / static_cast<double>(v->di->idimy);
 		if (x_min<0.0) x_min=0.0;
 		if (x_min>1.0) x_min=1.0;
 		if (y_min<0.0) y_min=0.0;
@@ -2173,7 +2180,7 @@ void Aliza::calculate_bb()
 		if (v->equi)
 		{
 			update_center(v);
-			if (v->group_id>=0)
+			if (v->group_id >= 0)
 			{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 				QMap<int, ImageVariant*>::const_iterator iv =

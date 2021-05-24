@@ -8632,9 +8632,12 @@ QString DicomUtils::read_enhanced_common(
 			{
 				read_window(ds, &window_center, &window_width, &lut_function);
 			}
-			ivariant->di->default_us_window_center = ivariant->di->us_window_center = window_center;
-			ivariant->di->default_us_window_width  = ivariant->di->us_window_width  = window_width;
-			ivariant->di->default_lut_function = ivariant->di->lut_function = lut_function;
+			ivariant->di->default_us_window_center =
+				ivariant->di->us_window_center = window_center;
+			ivariant->di->default_us_window_width =
+				ivariant->di->us_window_width  = window_width;
+			ivariant->di->default_lut_function =
+				ivariant->di->lut_function = lut_function;
 			ivariant->di->supp_palette_subsciptor = red_subscript;
 			const bool no_warn_rescale =
 				(apply_rescale)

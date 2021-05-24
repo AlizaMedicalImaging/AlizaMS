@@ -1205,7 +1205,8 @@ template<typename T> void load_image(
 			if (per_frame_level_found ||
 				ivariant->frame_levels.contains(ivariant->di->selected_z_slice))
 			{
-				const FrameLevel & fl = ivariant->frame_levels.value(ivariant->di->selected_z_slice);
+				const FrameLevel & fl =
+					ivariant->frame_levels.value(ivariant->di->selected_z_slice);
 				window_center = fl.us_window_center;
 				window_width = fl.us_window_width;
 				lut_function = fl.lut_function;
