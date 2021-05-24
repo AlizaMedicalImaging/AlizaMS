@@ -97,9 +97,15 @@ void ContourUtils::calculate_rois_center(ImageVariant * iv)
 	double tmpx = 0.0, tmpy = 0.0, tmpz = 0.0;
 	for (int x = 0; x < iv->di->rois.size(); ++x)
 	{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		QMap< int, Contour* >::const_iterator it =
 			iv->di->rois.at(x).contours.cbegin();
 		while (it != iv->di->rois.at(x).contours.cend())
+#else
+		QMap< int, Contour* >::const_iterator it =
+			iv->di->rois.at(x).contours.constBegin();
+		while (it != iv->di->rois.at(x).contours.constEnd())
+#endif
 		{
 			const Contour * c = it.value();
 			if (c)
@@ -227,9 +233,15 @@ void ContourUtils::copy_roi(
 	dest.color.g          = src.color.g;
 	dest.color.b          = src.color.b;
 	dest.ref_frame_of_ref = src.ref_frame_of_ref;
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	QMap< int, Contour* >::const_iterator it =
 		src.contours.cbegin();
 	while (it != src.contours.cend())
+#else
+	QMap< int, Contour* >::const_iterator it =
+		src.contours.constBegin();
+	while (it != src.contours.constEnd())
+#endif
 	{
 		Contour * c = it.value();
 		if (c)
@@ -436,9 +448,15 @@ void ContourUtils::map_contours_uniform(
 		if (ivariant->di->rois.at(x).id == roi_id)
 		{
 			ivariant->di->rois[x].map.clear();
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			QMap< int, Contour* >::const_iterator it =
 				ivariant->di->rois.at(x).contours.cbegin();
 			while (it != ivariant->di->rois.at(x).contours.cend())
+#else
+			QMap< int, Contour* >::const_iterator it =
+				ivariant->di->rois.at(x).contours.constBegin();
+			while (it != ivariant->di->rois.at(x).contours.constEnd())
+#endif
 			{
 				const Contour * c = it.value();
 				if (!c) continue;
@@ -507,9 +525,15 @@ void ContourUtils::map_contours_nonuniform(
 		if (ivariant->di->rois.at(x).id == roi_id)
 		{
 			ivariant->di->rois[x].map.clear();
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			QMap< int, Contour* >::const_iterator it =
 				ivariant->di->rois.at(x).contours.cbegin();
 			while (it != ivariant->di->rois.at(x).contours.cend())
+#else
+			QMap< int, Contour* >::const_iterator it =
+				ivariant->di->rois.at(x).contours.constBegin();
+			while (it != ivariant->di->rois.at(x).contours.constEnd())
+#endif
 			{
 				const Contour * c = it.value();
 				if (!c) continue;
@@ -621,9 +645,15 @@ void ContourUtils::map_contours_test_refs(
 		ivariant->di->rois[x].map.clear();
 		for (int z = 0; z < ivariant->di->idimz; ++z)
 		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			QMap< int, Contour* >::const_iterator it =
 				ivariant->di->rois.at(x).contours.cbegin();
 			while (it != ivariant->di->rois.at(x).contours.cend())
+#else
+			QMap< int, Contour* >::const_iterator it =
+				ivariant->di->rois.at(x).contours.constBegin();
+			while (it != ivariant->di->rois.at(x).contours.constEnd())
+#endif
 			{
 				const Contour * c = it.value();
 				if (c)

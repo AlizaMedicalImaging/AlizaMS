@@ -56,8 +56,13 @@ static void search_frame_of_ref(
 	const QString & study_uid,
 	QList<const ImageVariant*> & l)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	QMap<int, ImageVariant*>::const_iterator it = scene3dimages.cbegin();
 	while (it != scene3dimages.cend())
+#else
+	QMap<int, ImageVariant*>::const_iterator it = scene3dimages.constBegin();
+	while (it != scene3dimages.constEnd())
+#endif
 	{
 		const ImageVariant * v = it.value();
 		if (v &&
@@ -1299,9 +1304,15 @@ void Aliza::set_lut(int i)
 	v->di->selected_lut = (short)i;
 	if (v->group_id >= 0)
 	{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		QMap<int, ImageVariant*>::const_iterator iv =
 			scene3dimages.cbegin();
 		while (iv != scene3dimages.cend())
+#else
+		QMap<int, ImageVariant*>::const_iterator iv =
+			scene3dimages.constBegin();
+		while (iv != scene3dimages.constEnd())
+#endif
 		{
 			ImageVariant * v2 = iv.value();
 			if (v2 && (v->group_id == v2->group_id))
@@ -1725,9 +1736,15 @@ void Aliza::set_selected_slice2D_m(int j)
 		}
 		if (v->group_id>=0)
 		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			QMap<int, ImageVariant*>::const_iterator iv =
 				scene3dimages.cbegin();
 			while (iv != scene3dimages.cend())
+#else
+			QMap<int, ImageVariant*>::const_iterator iv =
+				scene3dimages.constBegin();
+			while (iv != scene3dimages.constEnd())
+#endif
 			{
 				ImageVariant * v2 = iv.value();
 				if (v2 && (v->group_id == v2->group_id))
@@ -1824,9 +1841,15 @@ void Aliza::set_selected_slice2D_y(int j)
 		v->di->selected_y_slice = j;
 		if (v->group_id>=0)
 		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			QMap<int, ImageVariant*>::const_iterator iv =
 				scene3dimages.cbegin();
 			while (iv != scene3dimages.cend())
+#else
+			QMap<int, ImageVariant*>::const_iterator iv =
+				scene3dimages.constBegin();
+			while (iv != scene3dimages.constEnd())
+#endif
 			{
 				ImageVariant * v2 = iv.value();
 				if (v2 && (v->group_id == v2->group_id))
@@ -1853,9 +1876,15 @@ void Aliza::set_selected_slice2D_x(int j)
 		v->di->selected_x_slice = j;
 		if (v->group_id>=0)
 		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			QMap<int, ImageVariant*>::const_iterator iv =
 				scene3dimages.cbegin();
 			while (iv != scene3dimages.cend())
+#else
+			QMap<int, ImageVariant*>::const_iterator iv =
+				scene3dimages.constBegin();
+			while (iv != scene3dimages.constEnd())
+#endif
 			{
 				ImageVariant * v2 = iv.value();
 				if (v2 && (v->group_id == v2->group_id))
@@ -2065,9 +2094,15 @@ void Aliza::calculate_bb()
 		graphicswidget_m->set_info_line_text(info_text);
 		if (v->group_id >= 0)
 		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			QMap<int, ImageVariant*>::const_iterator iv =
 				scene3dimages.cbegin();
 			while (iv != scene3dimages.cend())
+#else
+			QMap<int, ImageVariant*>::const_iterator iv =
+				scene3dimages.constBegin();
+			while (iv != scene3dimages.constEnd())
+#endif
 			{
 				ImageVariant * v2 = iv.value();
 				if (v2 && (v->group_id == v2->group_id))
@@ -2089,9 +2124,15 @@ void Aliza::calculate_bb()
 	{
 		if (v->group_id>=0)
 		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			QMap<int, ImageVariant*>::const_iterator iv =
 				scene3dimages.cbegin();
 			while (iv != scene3dimages.cend())
+#else
+			QMap<int, ImageVariant*>::const_iterator iv =
+				scene3dimages.constBegin();
+			while (iv != scene3dimages.constEnd())
+#endif
 			{
 				ImageVariant * v2 = iv.value();
 				if (v2 && (v->group_id == v2->group_id))
@@ -2134,9 +2175,15 @@ void Aliza::calculate_bb()
 			update_center(v);
 			if (v->group_id>=0)
 			{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 				QMap<int, ImageVariant*>::const_iterator iv =
 					scene3dimages.cbegin();
 				while (iv != scene3dimages.cend())
+#else
+				QMap<int, ImageVariant*>::const_iterator iv =
+					scene3dimages.constBegin();
+				while (iv != scene3dimages.constEnd())
+#endif
 				{
 					ImageVariant * v2 = iv.value();
 					if (v2 && (v->group_id == v2->group_id))
@@ -2345,9 +2392,15 @@ void Aliza::set_transparency(bool t)
 		v->di->transparency = t;
 		if (v->group_id>=0)
 		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			QMap<int, ImageVariant*>::const_iterator iv =
 				scene3dimages.cbegin();
 			while (iv != scene3dimages.cend())
+#else
+			QMap<int, ImageVariant*>::const_iterator iv =
+				scene3dimages.constBegin();
+			while (iv != scene3dimages.constEnd())
+#endif
 			{
 				ImageVariant * v2 = iv.value();
 				if (v2 && (v->group_id == v2->group_id))
@@ -2913,7 +2966,11 @@ QString Aliza::create_group_(bool * ok, bool lock_mutex)
 			return QString("");
 		}
 	}
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	QMap<int, ImageVariant*>::const_iterator iv = scene3dimages.cbegin();
+#else
+	QMap<int, ImageVariant*>::const_iterator iv = scene3dimages.constBegin();
+#endif
 	if (scene3dimages.size()<2)
 	{
 		message_ = QString(
@@ -2930,7 +2987,11 @@ QString Aliza::create_group_(bool * ok, bool lock_mutex)
 	dimy = v->di->idimy;
 	dimz = v->di->idimz;
 	image_type = v->image_type;
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	while (iv != scene3dimages.cend())
+#else
+	while (iv != scene3dimages.constEnd())
+#endif
 	{
 		ImageVariant * v2 = iv.value();
 		if (v2 &&
@@ -2952,8 +3013,13 @@ QString Aliza::create_group_(bool * ok, bool lock_mutex)
 	{
 		for (int x = 0; x < tmp_images.size(); ++x)
 			map[tmp_images.at(x)->id]=tmp_images.at(x);
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		QMap<int, ImageVariant*>::const_iterator it = map.cbegin();
 		while (it != map.cend())
+#else
+		QMap<int, ImageVariant*>::const_iterator it = map.constBegin();
+		while (it != map.constEnd())
+#endif
 		{
 			group_images.push_back(it.value());
 			++it;
@@ -3256,9 +3322,15 @@ void Aliza::update_group_width(const ImageVariant * v)
 {
 	if (v)
 	{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		QMap<int, ImageVariant*>::const_iterator iv =
 			scene3dimages.cbegin();
 		while (iv != scene3dimages.cend())
+#else
+		QMap<int, ImageVariant*>::const_iterator iv =
+			scene3dimages.constBegin();
+		while (iv != scene3dimages.constEnd())
+#endif
 		{
 			ImageVariant * v2 = iv.value();
 			if (v2 && (v->group_id == v2->group_id))
@@ -3290,9 +3362,15 @@ void Aliza::update_group_center(const ImageVariant * v)
 {
 	if (v)
 	{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		QMap<int, ImageVariant*>::const_iterator iv =
 			scene3dimages.cbegin();
 		while (iv != scene3dimages.cend())
+#else
+		QMap<int, ImageVariant*>::const_iterator iv =
+			scene3dimages.constBegin();
+		while (iv != scene3dimages.constEnd())
+#endif
 		{
 			ImageVariant * v2 = iv.value();
 			if (v2 && (v->group_id == v2->group_id))
@@ -3470,9 +3548,15 @@ void Aliza::sort_4d(
 	const int selected_y_slice,
 	const int selected_z_slice)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	QMap<int, ImageVariant*>::const_iterator iv =
 		scene3dimages.cbegin();
 	while (iv != scene3dimages.cend())
+#else
+	QMap<int, ImageVariant*>::const_iterator iv =
+		scene3dimages.constBegin();
+	while (iv != scene3dimages.constEnd())
+#endif
 	{
 		ImageVariant * v2 = iv.value();
 		if (v2 && (group_id == v2->group_id))
@@ -3506,9 +3590,15 @@ void Aliza::sort_4d(
 	if (acq_times_tmp.count() == map.count())
 	{
 		acqtimes_valid = true;
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		QMap<qlonglong, ImageVariant*>::const_iterator it =
 			acq_times_tmp.cbegin();
 		while (it != acq_times_tmp.cend())
+#else
+		QMap<qlonglong, ImageVariant*>::const_iterator it =
+			acq_times_tmp.constBegin();
+		while (it != acq_times_tmp.constEnd())
+#endif
 		{
 			if (it.key() <= 0)
 			{
@@ -3523,9 +3613,15 @@ void Aliza::sort_4d(
 		unsigned int tmp5 = 0;
 		bool t0ok = false;
 		double t0 = 0;
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		QMap<qlonglong, ImageVariant*>::const_iterator it =
 			acq_times_tmp.cbegin();
 		while (it != acq_times_tmp.cend())
+#else
+		QMap<qlonglong, ImageVariant*>::const_iterator it =
+			acq_times_tmp.constBegin();
+		while (it != acq_times_tmp.constEnd())
+#endif
 		{
 			images.push_back(it.value());
 			bool t1ok = false;
@@ -3567,9 +3663,15 @@ void Aliza::sort_4d(
 		if (instance_numbers_tmp.count() == map.count())
 		{
 			instance_numbers_valid = true;
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			QMap<int, ImageVariant*>::const_iterator it =
 				instance_numbers_tmp.cbegin();
 			while (it != instance_numbers_tmp.cend())
+#else
+			QMap<int, ImageVariant*>::const_iterator it =
+				instance_numbers_tmp.constBegin();
+			while (it != instance_numbers_tmp.constEnd())
+#endif
 			{
 				if (it.key() <= 0)
 				{
@@ -3586,9 +3688,15 @@ void Aliza::sort_4d(
 				<< "Instance numbers taken to sort 3D images in 4D image"
 				<< std::endl;
 #endif
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			QMap<int, ImageVariant*>::const_iterator it =
 				instance_numbers_tmp.cbegin();
 			while (it != instance_numbers_tmp.cend())
+#else
+			QMap<int, ImageVariant*>::const_iterator it =
+				instance_numbers_tmp.constBegin();
+			while (it != instance_numbers_tmp.constEnd())
+#endif
 			{
 				images.push_back(it.value());
 				++it;
@@ -3601,9 +3709,15 @@ void Aliza::sort_4d(
 				<< "IDs taken to sort 3D images in 4D image"
 				<< std::endl;
 #endif
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			QMap<int, ImageVariant*>::const_iterator it =
 				map.cbegin();
 			while (it != map.cend())
+#else
+			QMap<int, ImageVariant*>::const_iterator it =
+				map.constBegin();
+			while (it != map.constEnd())
+#endif
 			{
 				images.push_back(it.value());
 				++it;
@@ -3618,9 +3732,15 @@ void Aliza::toggle_zlock(bool t)
 	if (!v) return;
 	if (v->group_id >= 0)
 	{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		QMap<int, ImageVariant*>::const_iterator iv =
 			scene3dimages.cbegin();
 		while (iv != scene3dimages.cend())
+#else
+		QMap<int, ImageVariant*>::const_iterator iv =
+			scene3dimages.constBegin();
+		while (iv != scene3dimages.constEnd())
+#endif
 		{
 			ImageVariant * v2 = iv.value();
 			if (v2 && (v->group_id == v2->group_id))
@@ -3663,9 +3783,15 @@ void Aliza::toggle_zlock_one(bool t)
 	if (!v) return;
 	if (v->group_id >= 0)
 	{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		QMap<int, ImageVariant*>::const_iterator iv =
 			scene3dimages.cbegin();
 		while (iv != scene3dimages.cend())
+#else
+		QMap<int, ImageVariant*>::const_iterator iv =
+			scene3dimages.constBegin();
+		while (iv != scene3dimages.constEnd())
+#endif
 		{
 			ImageVariant * v2 = iv.value();
 			if (v2 && (v->group_id == v2->group_id))
@@ -3947,9 +4073,15 @@ void Aliza::toggle_lock_window(bool t)
 	if (!v) return;
 	if (v->group_id >= 0)
 	{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		QMap<int, ImageVariant*>::const_iterator iv =
 			scene3dimages.cbegin();
 		while (iv != scene3dimages.cend())
+#else
+		QMap<int, ImageVariant*>::const_iterator iv =
+			scene3dimages.constBegin();
+		while (iv != scene3dimages.constEnd())
+#endif
 		{
 			ImageVariant * v2 = iv.value();
 			if (v2 && (v->group_id == v2->group_id))

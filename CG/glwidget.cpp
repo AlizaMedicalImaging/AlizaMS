@@ -2197,8 +2197,15 @@ void GLWidget::paint_volume()
 			sparams[4] = sparams[1];
 			sparams[5] = sparams[2];
 			glUseProgram(mesh_shader.program); // all meshes currently using 'mesh_shader'
-			TriMeshes::const_iterator mi = selected_images__->at(iii)->di->trimeshes.cbegin();
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+			TriMeshes::const_iterator mi =
+				selected_images__->at(iii)->di->trimeshes.cbegin();
 			while (mi != selected_images__->at(iii)->di->trimeshes.cend())
+#else
+			TriMeshes::const_iterator mi =
+				selected_images__->at(iii)->di->trimeshes.constBegin();
+			while (mi != selected_images__->at(iii)->di->trimeshes.constEnd())
+#endif
 			{
 				TriMesh * tm = mi.value();
 				if (tm && tm->initialized && tm->visible && tm->qmesh)
@@ -2243,9 +2250,15 @@ void GLWidget::paint_volume()
 						};
 						glUniform4fv(frame_shader.location_K, 1, color);
 					}
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 					Contours::const_iterator it =
 						selected_images__->at(iii)->di->rois.at(i).contours.cbegin();
 					while (it != selected_images__->at(iii)->di->rois.at(i).contours.cend())
+#else
+					Contours::const_iterator it =
+						selected_images__->at(iii)->di->rois.at(i).contours.constBegin();
+					while (it != selected_images__->at(iii)->di->rois.at(i).contours.constEnd())
+#endif
 					{
 						const Contour * c = it.value();
 						if (c && c->vao_initialized)
@@ -3205,8 +3218,13 @@ void GLWidget::fit_to_screen(const ImageVariant * ivariant)
 	if (ivariant->image_type==200)
 	{
 		double max_delta = 0;
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		TriMeshes::const_iterator mi = ivariant->di->trimeshes.cbegin();
 		while (mi != ivariant->di->trimeshes.cend())
+#else
+		TriMeshes::const_iterator mi = ivariant->di->trimeshes.constBegin();
+		while (mi != ivariant->di->trimeshes.constEnd())
+#endif
 		{
 			if (mi.value() && mi.value()->max_delta > max_delta)
 				max_delta = mi.value()->max_delta;

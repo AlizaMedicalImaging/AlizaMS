@@ -189,6 +189,7 @@ void DisplayInterface::close(bool clear_geometry)
 	{
 		QList<int> keys;
 		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			QMap< int,Contour* >::const_iterator it2 =
 				rois.at(k).contours.cbegin();
 			while (it2 != rois.at(k).contours.cend())
@@ -196,6 +197,15 @@ void DisplayInterface::close(bool clear_geometry)
 				keys.push_back(it2.key());
 				++it2;
 			}
+#else
+			QMap< int,Contour* >::const_iterator it2 =
+				rois.at(k).contours.constBegin();
+			while (it2 != rois.at(k).contours.constEnd())
+			{
+				keys.push_back(it2.key());
+				++it2;
+			}
+#endif
 		}
 		for (int x = 0; x < keys.size(); ++x)
 		{

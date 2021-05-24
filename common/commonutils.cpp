@@ -2631,9 +2631,15 @@ void CommonUtils::copy_imagevariant_overlays(
 {
 	if (!dest) return;
 	if (!source) return;
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	QMap<int, SliceOverlays>::const_iterator it =
 		source->image_overlays.all_overlays.cbegin();
 	while (it != source->image_overlays.all_overlays.cend())
+#else
+	QMap<int, SliceOverlays>::const_iterator it =
+		source->image_overlays.all_overlays.constBegin();
+	while (it != source->image_overlays.all_overlays.constEnd())
+#endif
 	{
 		const int source_key = it.key();
 		const SliceOverlays & source_overlays = it.value();

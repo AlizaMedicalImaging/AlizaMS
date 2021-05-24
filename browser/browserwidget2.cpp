@@ -1682,8 +1682,13 @@ void BrowserWidget2::open_CTK_db()
 	else
 	{
 		p1 = QString("select StudyInstanceUID from Studies where PatientsUID in (");
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		it0 = ids.cbegin();
 		while (it0 != ids.cend())
+#else
+		it0 = ids.constBegin();
+		while (it0 != ids.constEnd())
+#endif
 		{
 			p1.append(QVariant(*it0).toString());
 			++ids_count;

@@ -2593,9 +2593,15 @@ bool DicomUtils::read_slices_uihgrid(
 					AcquisitionDateTime;
 		}
 	}
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	QMap<qlonglong,QString>::const_iterator acqit =
 		acqtimes.cbegin();
 	if (acqit != acqtimes.cend())
+#else
+	QMap<qlonglong,QString>::const_iterator acqit =
+		acqtimes.constBegin();
+	if (acqit != acqtimes.constEnd())
+#endif
 	{
 		const QString tmp57 = acqit.value();
 		if (tmp57.size() >= 14)
@@ -8345,9 +8351,15 @@ QString DicomUtils::read_enhanced_common(
 						}
 					}
 				}
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 				QMap<qlonglong,QString>::const_iterator acqit =
 					acq_times_tmp.cbegin();
 				if (acqit != acq_times_tmp.cend())
+#else
+				QMap<qlonglong,QString>::const_iterator acqit =
+					acq_times_tmp.constBegin();
+				if (acqit != acq_times_tmp.constEnd())
+#endif
 				{
 					const QString tmp57 = acqit.value();
 					if (tmp57.size() >= 14)
@@ -9657,9 +9669,15 @@ bool DicomUtils::process_contrours_ref(
 			{
 				for (int y = 0; y < tmp_ivariant->di->rois.size(); ++y)
 				{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 					QMap< int, Contour* >::const_iterator it =
 						tmp_ivariant->di->rois.at(y).contours.cbegin();
 					while (it != tmp_ivariant->di->rois.at(y).contours.cend())
+#else
+					QMap< int, Contour* >::const_iterator it =
+						tmp_ivariant->di->rois.at(y).contours.constBegin();
+					while (it != tmp_ivariant->di->rois.at(y).contours.constEnd())
+#endif
 					{
 						if (pb)
 						{
@@ -12036,8 +12054,13 @@ QString DicomUtils::read_dicom(
 #else
 		const QSet<QString> s1 = l1.toSet();
 #endif
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		QSet<QString>::const_iterator it1 = s1.cbegin();
 		while (it1 != s1.cend())
+#else
+		QSet<QString>::const_iterator it1 = s1.constBegin();
+		while (it1 != s1.constEnd())
+#endif
 		{
 			QStringList ff;
 			const QList<QString> & q = l0.values(*it1);
@@ -12451,9 +12474,15 @@ QString DicomUtils::read_dicom(
 				long long contours_count = 0;
 				for (int j = 0; j < v->di->rois.size(); ++j)
 				{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 					Contours::const_iterator ic =
 						v->di->rois.at(j).contours.cbegin();
 					while (ic != v->di->rois.at(j).contours.cend())
+#else
+					Contours::const_iterator ic =
+						v->di->rois.at(j).contours.constBegin();
+					while (ic != v->di->rois.at(j).contours.constEnd())
+#endif
 					{
 						const Contour * c = ic.value();
 						if (c) { ++contours_count; }
