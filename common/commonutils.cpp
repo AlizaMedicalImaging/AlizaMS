@@ -202,7 +202,7 @@ template<typename T> void calculate_min_max(
 	}
 	//
 	{
-		QVector<int> undef_windows;
+		std::vector<int> undef_windows;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		FrameLevels::const_iterator it = iv->frame_levels.cbegin();
 		while (it != iv->frame_levels.cend())
@@ -220,13 +220,13 @@ template<typename T> void calculate_min_max(
 		}
 		if (!undef_windows.empty())
 		{
-			for (int x = 0; x < undef_windows.size(); ++x)
+			for (size_t x = 0; x < undef_windows.size(); ++x)
 			{
 				FrameLevel fl;
 				fl.us_window_center = iv->di->default_us_window_center;
 				fl.us_window_width = iv->di->default_us_window_width;
 				fl.lut_function = 0;
-				iv->frame_levels[x] = fl;
+				iv->frame_levels[undef_windows.at(x)] = fl;
 			}
 		}
 	}
