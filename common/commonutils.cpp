@@ -220,12 +220,12 @@ template<typename T> void calculate_min_max(
 		}
 		if (!undef_windows.empty())
 		{
+			FrameLevel fl;
+			fl.us_window_center = iv->di->default_us_window_center;
+			fl.us_window_width = iv->di->default_us_window_width;
+			fl.lut_function = 0;
 			for (size_t x = 0; x < undef_windows.size(); ++x)
 			{
-				FrameLevel fl;
-				fl.us_window_center = iv->di->default_us_window_center;
-				fl.us_window_width = iv->di->default_us_window_width;
-				fl.lut_function = 0;
 				iv->frame_levels[undef_windows.at(x)] = fl;
 			}
 		}
