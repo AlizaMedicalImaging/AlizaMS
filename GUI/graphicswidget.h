@@ -52,14 +52,20 @@ public:
 	SliderWidget * slider_m;
 	std::vector<ProcessImageThread_*> threads_;
 	std::vector<QThread*> threadsLUT_;
-	void  set_slice_2D(
-		ImageVariant*,short/*fit*/,bool/*alw usregions*/);
-	void  set_toolbox2D_widget(ToolBox2D*);
-	void  set_sliderwidget(SliderWidget*);
-	void  update_image(
-		short /*fit*/, bool /*redraw_contours*/, bool /*lock*/);
-	void  clear_(bool=true);
-	void  update_frames();
+	void set_slice_2D(
+		ImageVariant*,
+		const short/*fit*/,
+		const bool/*alw usregions*/,
+		const bool=false/*frame level, to avoid check map twice*/);
+	void set_toolbox2D_widget(ToolBox2D*);
+	void set_sliderwidget(SliderWidget*);
+	void update_image(
+		const short /*fit*/,
+		const bool /*redraw_contours*/,
+		const bool /*lock*/,
+		const bool=false/*frame level, to avoid check map twice*/);
+	void clear_(bool=true);
+	void update_frames();
 	QMutex mutex;
 	ImageContainer image_container;
 	float get_offset_x();
@@ -112,7 +118,6 @@ public slots:
 	void set_contours_width(double);
 
 private slots:
-	void update_image__();
 	void animate_();
 
 signals:

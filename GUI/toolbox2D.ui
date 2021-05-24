@@ -45,10 +45,10 @@
    <item>
     <widget class="QFrame" name="frame_2">
      <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
+      <enum>QFrame::NoFrame</enum>
      </property>
      <property name="frameShadow">
-      <enum>QFrame::Sunken</enum>
+      <enum>QFrame::Plain</enum>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <property name="spacing">
@@ -77,10 +77,13 @@
            <enum>Qt::NoFocus</enum>
           </property>
           <property name="contextMenuPolicy">
-           <enum>Qt::NoContextMenu</enum>
+           <enum>Qt::DefaultContextMenu</enum>
           </property>
           <property name="toolTip">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Level (window center ) defined in &lt;span style=&quot; font-style:italic;&quot;&gt;DICOM&lt;/span&gt; file for current frame.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="inputMethodHints">
+           <set>Qt::ImhNone</set>
           </property>
           <property name="frame">
            <bool>false</bool>
@@ -120,10 +123,13 @@
            <enum>Qt::NoFocus</enum>
           </property>
           <property name="contextMenuPolicy">
-           <enum>Qt::NoContextMenu</enum>
+           <enum>Qt::DefaultContextMenu</enum>
           </property>
           <property name="toolTip">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Window (window width ) defined in &lt;span style=&quot; font-style:italic;&quot;&gt;DICOM&lt;/span&gt; file for current frame.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="inputMethodHints">
+           <set>Qt::ImhNone</set>
           </property>
           <property name="frame">
            <bool>false</bool>
@@ -187,6 +193,13 @@
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
     </widget>
    </item>
    <item>

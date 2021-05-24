@@ -5946,7 +5946,8 @@ QString DicomUtils::read_ultrasound(
 		ivariant->di->us_window_center = tmp_c;
 	ivariant->di->default_us_window_width =
 		ivariant->di->us_window_width  = tmp_w;
-	ivariant->di->lut_function = tmp_lut_function;
+	ivariant->di->default_lut_function =
+		ivariant->di->lut_function = tmp_lut_function;
 	//
 	double dircos_[] = {0.0,0.0,0.0,0.0,0.0,0.0};
 	unsigned int dimx_, dimy_, dimz_;
@@ -5958,7 +5959,7 @@ QString DicomUtils::read_ultrasound(
 		ok,
 		data,
 		ivariant->image_overlays, overlays_idx,
-		ivariant->anatomy, 0, // FIXME
+		ivariant->anatomy, 0, // TODO check
 		images_ipp.at(0),
 		wsettings->get_rescale(),
 		pixelformat, false,
@@ -6782,7 +6783,11 @@ QString DicomUtils::read_series(
 				ivariant->di->default_us_window_width  =
 					ivariant->di->us_window_width = windows_.at(0);
 			}
-			if (one_lut) ivariant->di->lut_function = luts_.at(0);
+			if (one_lut)
+			{
+				ivariant->di->default_lut_function =
+					ivariant->di->lut_function = luts_.at(0);
+			}
 		}
 	}
 	//
@@ -8617,7 +8622,7 @@ QString DicomUtils::read_enhanced_common(
 			}
 			ivariant->di->default_us_window_center = ivariant->di->us_window_center = window_center;
 			ivariant->di->default_us_window_width  = ivariant->di->us_window_width  = window_width;
-			ivariant->di->lut_function = lut_function;
+			ivariant->di->default_lut_function = ivariant->di->lut_function = lut_function;
 			ivariant->di->supp_palette_subsciptor = red_subscript;
 			const bool no_warn_rescale =
 				(apply_rescale)
@@ -8661,6 +8666,7 @@ QString DicomUtils::read_enhanced_common(
 					? false : wsettings->get_rescale();
 				const double saved_window_center = ivariant->di->default_us_window_center;
 				const double saved_window_width = ivariant->di->default_us_window_width;
+				const short saved_lut_function = ivariant->di->default_lut_function;
 				if (rescale_tmp)
 				{
 					message_ = CommonUtils::gen_itk_image(ok,
@@ -8710,13 +8716,12 @@ QString DicomUtils::read_enhanced_common(
 							message = CommonUtils::apply_per_slice_rescale(
 								ivariant, tmp6);
 						}
-						if (true)
-						{
-							ivariant->di->default_us_window_center = saved_window_center;
+						ivariant->di->default_us_window_center =
 							ivariant->di->us_window_center = saved_window_center;
-							ivariant->di->default_us_window_width = saved_window_width;
+						ivariant->di->default_us_window_width =
 							ivariant->di->us_window_width = saved_window_width;
-						}
+						ivariant->di->default_lut_function =
+							ivariant->di->lut_function = saved_lut_function;
 						const bool ok_ =
 							CommonUtils::reload_monochrome(
 								ivariant,

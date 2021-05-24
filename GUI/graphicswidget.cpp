@@ -389,18 +389,20 @@ static QString contour_from_path_nonuniform(
 
 template<typename T> void load_rgb_image(
 	const typename T::Pointer & image,
-	ImageVariant * ivariant,
+	const ImageContainer & image_container,
 	GraphicsWidget * widget,
-	const QString & rai,
-	const QString & laterality,
-	const QString & body_part,
-	const QString & orientation_20_20,
-	const short image_type,
 	const bool redraw_contours,
-	short fit=0)
+	const short fit)
 {
-	if (!ivariant) return;
 	if (image.IsNull()) return;
+	if (!image_container.image2D) return;
+	if (!image_container.image3D) return;
+	const ImageVariant * ivariant = image_container.image3D;
+	const QString & rai = image_container.image2D->orientation_string;
+	const QString & laterality = image_container.image2D->laterality;
+	const QString & body_part = image_container.image2D->body_part;
+	const QString & orientation_20_20 = image_container.orientation_20_20;
+	const short image_type = image_container.image2D->image_type;
 #ifdef DELETE_GRAPHICSIMAGEITEM
 	// clear
 	if (widget->graphicsview->image_item)
@@ -585,15 +587,17 @@ template<typename T> void load_rgb_image(
 
 template<typename T> void load_rgba_image(
 	const typename T::Pointer & image,
-	ImageVariant * ivariant,
+	const ImageContainer & image_container,
 	GraphicsWidget * widget,
-	const QString & rai,
-	const short image_type,
 	const bool redraw_contours,
-	short fit=0)
+	const short fit)
 {
-	if (!ivariant) return;
 	if (image.IsNull()) return;
+	if (!image_container.image2D) return;
+	if (!image_container.image3D) return;
+	const ImageVariant * ivariant = image_container.image3D;
+	const QString & rai = image_container.image2D->orientation_string;
+	const short image_type = image_container.image2D->image_type;
 #ifdef DELETE_GRAPHICSIMAGEITEM
 	// clear
 	if (widget->graphicsview->image_item)
@@ -863,17 +867,20 @@ template<typename T> void load_rgba_image(
 
 template<typename T> void load_rgb_char_image(
 	const typename T::Pointer & image,
-	ImageVariant * ivariant,
+	const ImageContainer & image_container,
 	GraphicsWidget * widget,
-	const QString & rai,
-	const QString & laterality,
-	const QString & body_part,
-	const QString & orientation_20_20,
-	const short image_type,
 	const bool redraw_contours,
-	short fit=0)
+	const short fit)
 {
 	if (image.IsNull()) return;
+	if (!image_container.image2D) return;
+	if (!image_container.image3D) return;
+	const ImageVariant * ivariant = image_container.image3D;
+	const QString & rai = image_container.image2D->orientation_string;
+	const QString & laterality = image_container.image2D->laterality;
+	const QString & body_part = image_container.image2D->body_part;
+	const QString & orientation_20_20 = image_container.orientation_20_20;
+	const short image_type = image_container.image2D->image_type;
 #ifdef DELETE_GRAPHICSIMAGEITEM
 	// clear
 	if (widget->graphicsview->image_item)
@@ -912,28 +919,34 @@ template<typename T> void load_rgb_char_image(
 		try { p = reinterpret_cast<unsigned char *>(image->GetBufferPointer()); }
 		catch (itk::ExceptionObject & ex) { std::cout << ex << std::endl; return; }
 	}
-	else return;
+	else
+	{
+		return;
+	}
 	if (!p) return;
 	//
-	if (spacing[0]!=spacing[1])
+	if (spacing[0] != spacing[1])
 	{
-		if (spacing[1]>spacing[0]) coeff_size_1 = spacing[1]/spacing[0];
-		else                       coeff_size_0 = spacing[0]/spacing[1];
+		if (spacing[1] > spacing[0]) coeff_size_1 = spacing[1]/spacing[0];
+		else                         coeff_size_0 = spacing[0]/spacing[1];
 	}
 	const double xratio =
 		(double)widget->graphicsview->width()  / (double)(size[0]*coeff_size_0);
 	const double yratio =
 		(double)widget->graphicsview->height() / (double)(size[1]*coeff_size_1);
-	if (fit==1)
+	if (fit == 1)
 	{
 		scale__ = qMin(xratio, yratio);
 		widget->graphicsview->m_scale = scale__;
 	}
-	else scale__ = widget->graphicsview->m_scale;
+	else
+	{
+		scale__ = widget->graphicsview->m_scale;
+	}
 	//
 	QImage tmpi = QImage(p,size[0],size[1],3*size[0],QImage::Format_RGB888);
 	//
-	if (axis==2)
+	if (axis == 2)
 	{
 		if (widget->get_enable_overlays())
 			GraphicsUtils::draw_overlays(ivariant, tmpi);
@@ -956,7 +969,7 @@ template<typename T> void load_rgb_char_image(
 		&flip_x, &flip_y);
 	//
 	QTransform t = QTransform();
-	if (spacing[1]!=spacing[0]) t = t.scale(coeff_size_0, coeff_size_1);
+	if (spacing[1] != spacing[0]) t = t.scale(coeff_size_0, coeff_size_1);
 	t = t.scale(scale__, scale__);
 	if (flip_y && flip_x) t = t.scale(-1.0,-1.0);
 	else if (flip_y)      t = t.scale( 1.0,-1.0);
@@ -965,10 +978,10 @@ template<typename T> void load_rgb_char_image(
 	if (global_flip_x) { t = t.scale(-1.0, 1.0); }
 	if (global_flip_y) { t = t.scale( 1.0,-1.0); }
 	//
-	const QRectF rectf(0,0,size[0],size[1]);
+	const QRectF rectf(0, 0, size[0], size[1]);
 	widget->graphicsview->scene()->setSceneRect(rectf);
 	//
-	if (redraw_contours && axis==2)
+	if (redraw_contours && axis == 2)
 		draw_contours(ivariant, widget);
 	//
 	widget->graphicsview->draw_shutter(ivariant);
@@ -982,14 +995,17 @@ template<typename T> void load_rgb_char_image(
 
 template<typename T> void load_rgba_char_image(
 	const typename T::Pointer & image,
-	ImageVariant * ivariant,
+	const ImageContainer & image_container,
 	GraphicsWidget * widget,
-	const QString & rai,
-	const short image_type,
 	const bool redraw_contours,
-	short fit=0)
+	const short fit)
 {
 	if (image.IsNull()) return;
+	if (!image_container.image2D) return;
+	if (!image_container.image3D) return;
+	const ImageVariant * ivariant = image_container.image3D;
+	const QString & rai = image_container.image2D->orientation_string;
+	const short image_type = image_container.image2D->image_type;
 #ifdef DELETE_GRAPHICSIMAGEITEM
 	// clear
 	if (widget->graphicsview->image_item)
@@ -1155,7 +1171,8 @@ template<typename T> void load_image(
 	const ImageContainer & image_container,
 	GraphicsWidget * widget,
 	const bool redraw_contours,
-	short fit = 0)
+	const short fit,
+	const bool per_frame_level_found)
 {
 	if (image.IsNull()) return;
 	if (!image_container.image2D) return;
@@ -1185,7 +1202,8 @@ template<typename T> void load_image(
 	{
 		if (ivariant->di->lock_level2D)
 		{
-			if (ivariant->frame_levels.contains(ivariant->di->selected_z_slice))
+			if (per_frame_level_found ||
+				ivariant->frame_levels.contains(ivariant->di->selected_z_slice))
 			{
 				const FrameLevel & fl = ivariant->frame_levels.value(ivariant->di->selected_z_slice);
 				window_center = fl.us_window_center;
@@ -1196,7 +1214,7 @@ template<typename T> void load_image(
 			{
 				window_center = ivariant->di->default_us_window_center;
 				window_width = ivariant->di->default_us_window_width;
-				lut_function = 0; // TODO
+				lut_function = ivariant->di->default_lut_function;
 			}
 		}
 		else
@@ -1603,11 +1621,6 @@ void GraphicsWidget::leaveEvent(QEvent*)
 	update_pixel_value(-1,-1);
 }
 
-void GraphicsWidget::update_image__()
-{
-	update_image(0, true, true);
-}
-
 void GraphicsWidget::update_selection_rectangle()
 {
 	if (axis != 2) return;
@@ -1703,9 +1716,10 @@ void GraphicsWidget::update_selection_item()
 }
 
 void GraphicsWidget::update_image(
-	short fit,
-	bool redraw_contours,
-	bool lock)
+	const short fit,
+	const bool redraw_contours,
+	const bool lock,
+	const bool per_frame_level_found)
 {
 	if (!image_container.image3D) return;
 	if (!image_container.image2D) return;
@@ -1719,211 +1733,173 @@ void GraphicsWidget::update_image(
 				image_container,
 				this,
 				redraw_contours,
-				fit);
+				fit,
+				per_frame_level_found);
 		break;
 	case 1: load_image<Image2DTypeUS>(
 				image_container.image2D->pUS,
 				image_container,
 				this,
 				redraw_contours,
-				fit);
+				fit,
+				per_frame_level_found);
 		break;
 	case 2: load_image<Image2DTypeSI>(
 				image_container.image2D->pSI,
 				image_container,
 				this,
 				redraw_contours,
-				fit);
+				fit,
+				per_frame_level_found);
 		break;
 	case 3: load_image<Image2DTypeUI>(
 				image_container.image2D->pUI,
 				image_container,
 				this,
 				redraw_contours,
-				fit);
+				fit,
+				per_frame_level_found);
 		break;
 	case 4: load_image<Image2DTypeUC>(
 				image_container.image2D->pUC,
 				image_container,
 				this,
 				redraw_contours,
-				fit);
+				fit,
+				per_frame_level_found);
 		break;
 	case 5: load_image<Image2DTypeF>(
 				image_container.image2D->pF,
 				image_container,
 				this,
 				redraw_contours,
-				fit);
+				fit,
+				per_frame_level_found);
 		break;
 	case 6: load_image<Image2DTypeD>(
 				image_container.image2D->pD,
 				image_container,
 				this,
 				redraw_contours,
-				fit);
+				fit,
+				per_frame_level_found);
 		break;
 	case 7: load_image<Image2DTypeSLL>(
 				image_container.image2D->pSLL,
 				image_container,
 				this,
 				redraw_contours,
-				fit);
+				fit,
+				per_frame_level_found);
 		break;
 	case 8: load_image<Image2DTypeULL>(
 				image_container.image2D->pULL,
 				image_container,
 				this,
 				redraw_contours,
-				fit);
+				fit,
+				per_frame_level_found);
 		break;
 	case 10: load_rgb_image<RGBImage2DTypeSS>(
 				image_container.image2D->pSS_rgb,
-				image_container.image3D,
+				image_container,
 				this,
-				image_container.image2D->orientation_string,
-				image_container.image2D->laterality,
-				image_container.image2D->body_part,
-				image_container.orientation_20_20,
-				image_container.image2D->image_type,
 				redraw_contours,
 				fit);
 		break;
 	case 11: load_rgb_image<RGBImage2DTypeUS>(
 				image_container.image2D->pUS_rgb,
-				image_container.image3D,
+				image_container,
 				this,
-				image_container.image2D->orientation_string,
-				image_container.image2D->laterality,
-				image_container.image2D->body_part,
-				image_container.orientation_20_20,
-				image_container.image2D->image_type,
 				redraw_contours,
 				fit);
 		break;
 	case 12: load_rgb_image<RGBImage2DTypeSI>(
 				image_container.image2D->pSI_rgb,
-				image_container.image3D,
+				image_container,
 				this,
-				image_container.image2D->orientation_string,
-				image_container.image2D->laterality,
-				image_container.image2D->body_part,
-				image_container.orientation_20_20,
-				image_container.image2D->image_type,
 				redraw_contours,
 				fit);
 		break;
 	case 13: load_rgb_image<RGBImage2DTypeUI>(
 				image_container.image2D->pUI_rgb,
-				image_container.image3D,
+				image_container,
 				this,
-				image_container.image2D->orientation_string,
-				image_container.image2D->laterality,
-				image_container.image2D->body_part,
-				image_container.orientation_20_20,
-				image_container.image2D->image_type,
 				redraw_contours,
 				fit);
 		break;
 	case 14: load_rgb_char_image<RGBImage2DTypeUC>(
 				image_container.image2D->pUC_rgb,
-				image_container.image3D,
+				image_container,
 				this,
-				image_container.image2D->orientation_string,
-				image_container.image2D->laterality,
-				image_container.image2D->body_part,
-				image_container.orientation_20_20,
-				image_container.image2D->image_type,
 				redraw_contours,
 				fit);
 		break;
 	case 15: load_rgb_image<RGBImage2DTypeF>(
 				image_container.image2D->pF_rgb,
-				image_container.image3D,
+				image_container,
 				this,
-				image_container.image2D->orientation_string,
-				image_container.image2D->laterality,
-				image_container.image2D->body_part,
-				image_container.orientation_20_20,
-				image_container.image2D->image_type,
 				redraw_contours,
 				fit);
 		break;
 	case 16: load_rgb_image<RGBImage2DTypeD>(
 				image_container.image2D->pD_rgb,
-				image_container.image3D,
+				image_container,
 				this,
-				image_container.image2D->orientation_string,
-				image_container.image2D->laterality,
-				image_container.image2D->body_part,
-				image_container.orientation_20_20,
-				image_container.image2D->image_type,
 				redraw_contours,
 				fit);
 		break;
 	case 20: load_rgba_image<RGBAImage2DTypeSS>(
 				image_container.image2D->pSS_rgba,
-				image_container.image3D,
+				image_container,
 				this,
-				image_container.image2D->orientation_string,
-				image_container.image2D->image_type,
+				redraw_contours,
 				fit);
 		break;
 	case 21: load_rgba_image<RGBAImage2DTypeUS>(
 				image_container.image2D->pUS_rgba,
-				image_container.image3D,
+				image_container,
 				this,
-				image_container.image2D->orientation_string,
-				image_container.image2D->image_type,
 				redraw_contours,
 				fit);
 		break;
 	case 22: load_rgba_image<RGBAImage2DTypeSI>(
 				image_container.image2D->pSI_rgba,
-				image_container.image3D,
+				image_container,
 				this,
-				image_container.image2D->orientation_string,
-				image_container.image2D->image_type,
 				redraw_contours,
 				fit);
 		break;
 	case 23: load_rgba_image<RGBAImage2DTypeUI>(
 				image_container.image2D->pUI_rgba,
-				image_container.image3D,
+				image_container,
 				this,
-				image_container.image2D->orientation_string,
-				image_container.image2D->image_type,
 				redraw_contours,
 				fit);
 		break;
 	case 24: load_rgba_char_image<RGBAImage2DTypeUC>(
 				image_container.image2D->pUC_rgba,
-				image_container.image3D,
+				image_container,
 				this,
-				image_container.image2D->orientation_string,
-				image_container.image2D->image_type,
 				redraw_contours,
 				fit);
 		break;
 	case 25: load_rgba_image<RGBAImage2DTypeF>(
 				image_container.image2D->pF_rgba,
-				image_container.image3D,
+				image_container,
 				this,
-				image_container.image2D->orientation_string,
-				image_container.image2D->image_type,
 				redraw_contours,
 				fit);
 		break;
 	case 26: load_rgba_image<RGBAImage2DTypeD>(
 				image_container.image2D->pD_rgba,
-				image_container.image3D,
+				image_container,
 				this,
-				image_container.image2D->orientation_string,
-				image_container.image2D->image_type,
 				redraw_contours,
 				fit);
 		break;
-	default: break;
+	default:
+		break;
 	}
 	//
 	if (lock) mutex.unlock();
@@ -2156,8 +2132,9 @@ float GraphicsWidget::get_offset_y()
 
 void GraphicsWidget::set_slice_2D(
 	ImageVariant * v,
-	short fit,
-	bool alw_usregs)
+	const short fit,
+	const bool alw_usregs,
+	const bool per_frame_level_found)
 {
 	if (graphicsview->image_item)
 	{
@@ -2274,58 +2251,89 @@ void GraphicsWidget::set_slice_2D(
 	case   0: x = image_container.image3D->di->selected_x_slice; break;
 	case   1: x = image_container.image3D->di->selected_y_slice; break;
 	case   2: x = image_container.image3D->di->selected_z_slice; break;
-	default : { clear_(false); goto quit__; }
+	default :
+		{
+			clear_(false);
+			goto quit__;
+		}
 	}
 	//
 	switch(v->image_type)
 	{
-	case 0: error_ = get_slice_<ImageTypeSS, Image2DTypeSS>(axis, v->pSS, image_container.image2D, image_container.image2D->pSS, x);
+	case 0: error_ = get_slice_<ImageTypeSS, Image2DTypeSS>(
+				axis, v->pSS, image_container.image2D, image_container.image2D->pSS, x);
 		break;
-	case 1: error_ = get_slice_<ImageTypeUS, Image2DTypeUS>(axis, v->pUS, image_container.image2D, image_container.image2D->pUS, x);
+	case 1: error_ = get_slice_<ImageTypeUS, Image2DTypeUS>(
+				axis, v->pUS, image_container.image2D, image_container.image2D->pUS, x);
 		break;
-	case 2: error_ = get_slice_<ImageTypeSI, Image2DTypeSI>(axis, v->pSI, image_container.image2D, image_container.image2D->pSI, x);
+	case 2: error_ = get_slice_<ImageTypeSI, Image2DTypeSI>(
+				axis, v->pSI, image_container.image2D, image_container.image2D->pSI, x);
 		break;
-	case 3: error_ = get_slice_<ImageTypeUI, Image2DTypeUI>(axis, v->pUI, image_container.image2D, image_container.image2D->pUI, x);
+	case 3: error_ = get_slice_<ImageTypeUI, Image2DTypeUI>(
+				axis, v->pUI, image_container.image2D, image_container.image2D->pUI, x);
 		break;
-	case 4: error_ = get_slice_<ImageTypeUC, Image2DTypeUC>(axis, v->pUC, image_container.image2D, image_container.image2D->pUC, x);
+	case 4: error_ = get_slice_<ImageTypeUC, Image2DTypeUC>(
+				axis, v->pUC, image_container.image2D, image_container.image2D->pUC, x);
 		break;
-	case 5: error_ = get_slice_<ImageTypeF, Image2DTypeF>(axis, v->pF, image_container.image2D, image_container.image2D->pF, x);
+	case 5: error_ = get_slice_<ImageTypeF, Image2DTypeF>(
+				axis, v->pF, image_container.image2D, image_container.image2D->pF, x);
 		break;
-	case 6: error_ = get_slice_<ImageTypeD, Image2DTypeD>(axis, v->pD, image_container.image2D, image_container.image2D->pD, x);
+	case 6: error_ = get_slice_<ImageTypeD, Image2DTypeD>(
+			axis, v->pD, image_container.image2D, image_container.image2D->pD, x);
 		break;
-	case 7: error_ = get_slice_<ImageTypeSLL, Image2DTypeSLL>(axis, v->pSLL, image_container.image2D, image_container.image2D->pSLL, x);
+	case 7: error_ = get_slice_<ImageTypeSLL, Image2DTypeSLL>(
+				axis, v->pSLL, image_container.image2D, image_container.image2D->pSLL, x);
 		break;
-	case 8: error_ = get_slice_<ImageTypeULL, Image2DTypeULL>(axis, v->pULL, image_container.image2D, image_container.image2D->pULL, x);
+	case 8: error_ = get_slice_<ImageTypeULL, Image2DTypeULL>(
+				axis, v->pULL, image_container.image2D, image_container.image2D->pULL, x);
 		break;
-	case 10: error_ = get_slice_<RGBImageTypeSS, RGBImage2DTypeSS>(axis, v->pSS_rgb, image_container.image2D, image_container.image2D->pSS_rgb, x);
+	case 10: error_ = get_slice_<RGBImageTypeSS, RGBImage2DTypeSS>(
+				axis, v->pSS_rgb, image_container.image2D, image_container.image2D->pSS_rgb, x);
 		break;
-	case 11: error_ = get_slice_<RGBImageTypeUS, RGBImage2DTypeUS>(axis, v->pUS_rgb, image_container.image2D, image_container.image2D->pUS_rgb, x);
+	case 11: error_ = get_slice_<RGBImageTypeUS, RGBImage2DTypeUS>(
+				axis, v->pUS_rgb, image_container.image2D, image_container.image2D->pUS_rgb, x);
 		break;
-	case 12: error_ = get_slice_<RGBImageTypeSI, RGBImage2DTypeSI>(axis, v->pSI_rgb, image_container.image2D, image_container.image2D->pSI_rgb, x);
+	case 12: error_ = get_slice_<RGBImageTypeSI, RGBImage2DTypeSI>(
+				axis, v->pSI_rgb, image_container.image2D, image_container.image2D->pSI_rgb, x);
 		break;
-	case 13: error_ = get_slice_<RGBImageTypeUI, RGBImage2DTypeUI>(axis, v->pUI_rgb, image_container.image2D, image_container.image2D->pUI_rgb, x);
+	case 13: error_ = get_slice_<RGBImageTypeUI, RGBImage2DTypeUI>(
+				axis, v->pUI_rgb, image_container.image2D, image_container.image2D->pUI_rgb, x);
 		break;
-	case 14: error_ = get_slice_<RGBImageTypeUC, RGBImage2DTypeUC>(axis, v->pUC_rgb, image_container.image2D, image_container.image2D->pUC_rgb, x);
+	case 14: error_ = get_slice_<RGBImageTypeUC, RGBImage2DTypeUC>(
+				axis, v->pUC_rgb, image_container.image2D, image_container.image2D->pUC_rgb, x);
 		break;
-	case 15: error_ = get_slice_<RGBImageTypeF, RGBImage2DTypeF>(axis, v->pF_rgb, image_container.image2D, image_container.image2D->pF_rgb, x);
+	case 15: error_ = get_slice_<RGBImageTypeF, RGBImage2DTypeF>(
+				axis, v->pF_rgb, image_container.image2D, image_container.image2D->pF_rgb, x);
 		break;
-	case 16: error_ = get_slice_<RGBImageTypeD, RGBImage2DTypeD>(axis, v->pD_rgb, image_container.image2D, image_container.image2D->pD_rgb, x);
+	case 16: error_ = get_slice_<RGBImageTypeD, RGBImage2DTypeD>(
+				axis, v->pD_rgb, image_container.image2D, image_container.image2D->pD_rgb, x);
 		break;
-	case 20: error_ = get_slice_<RGBAImageTypeSS, RGBAImage2DTypeSS>(axis, v->pSS_rgba, image_container.image2D, image_container.image2D->pSS_rgba, x);
+	case 20: error_ = get_slice_<RGBAImageTypeSS, RGBAImage2DTypeSS>(
+				axis, v->pSS_rgba, image_container.image2D, image_container.image2D->pSS_rgba, x);
 		break;
-	case 21: error_ = get_slice_<RGBAImageTypeUS, RGBAImage2DTypeUS>(axis, v->pUS_rgba, image_container.image2D, image_container.image2D->pUS_rgba, x);
+	case 21: error_ = get_slice_<RGBAImageTypeUS, RGBAImage2DTypeUS>(
+				axis, v->pUS_rgba, image_container.image2D, image_container.image2D->pUS_rgba, x);
 		break;
-	case 22: error_ = get_slice_<RGBAImageTypeSI, RGBAImage2DTypeSI>(axis, v->pSI_rgba, image_container.image2D, image_container.image2D->pSI_rgba, x);
+	case 22: error_ = get_slice_<RGBAImageTypeSI, RGBAImage2DTypeSI>(
+				axis, v->pSI_rgba, image_container.image2D, image_container.image2D->pSI_rgba, x);
 		break;
-	case 23: error_ = get_slice_<RGBAImageTypeUI, RGBAImage2DTypeUI>(axis, v->pUI_rgba, image_container.image2D, image_container.image2D->pUI_rgba, x);
+	case 23: error_ = get_slice_<RGBAImageTypeUI, RGBAImage2DTypeUI>(
+				axis, v->pUI_rgba, image_container.image2D, image_container.image2D->pUI_rgba, x);
 		break;
-	case 24: error_ = get_slice_<RGBAImageTypeUC, RGBAImage2DTypeUC>(axis, v->pUC_rgba, image_container.image2D, image_container.image2D->pUC_rgba, x);
+	case 24: error_ = get_slice_<RGBAImageTypeUC, RGBAImage2DTypeUC>(
+				axis, v->pUC_rgba, image_container.image2D, image_container.image2D->pUC_rgba, x);
 		break;
-	case 25: error_ = get_slice_<RGBAImageTypeF, RGBAImage2DTypeF>(axis, v->pF_rgba, image_container.image2D, image_container.image2D->pF_rgba, x);
+	case 25: error_ = get_slice_<RGBAImageTypeF, RGBAImage2DTypeF>(
+				axis, v->pF_rgba, image_container.image2D, image_container.image2D->pF_rgba, x);
 		break;
-	case 26: error_ = get_slice_<RGBAImageTypeD, RGBAImage2DTypeD>(axis, v->pD_rgba, image_container.image2D, image_container.image2D->pD_rgba, x);
+	case 26: error_ = get_slice_<RGBAImageTypeD, RGBAImage2DTypeD>(
+				axis, v->pD_rgba, image_container.image2D, image_container.image2D->pD_rgba, x);
 		break;
-	default: { clear_(false); goto quit__; }
+	default:
+		{
+			clear_(false);
+			goto quit__;
+		}
 	}
 	//
 	if (error_.isEmpty())
@@ -2353,20 +2361,21 @@ void GraphicsWidget::set_slice_2D(
 	case 2  : 
 		{
 			const bool check_consistence =
-				((int)v->di->image_slices.size() == v->di->idimz) &&
-					(int)v->di->image_slices.size()>x;
+				(((int)v->di->image_slices.size() == v->di->idimz) &&
+					(int)v->di->image_slices.size() > x);
 			if (v->equi)
 			{
-				image_container.image2D->orientation_string =
-					v->orientation_string;
+				image_container.image2D->orientation_string = v->orientation_string;
 			}
 			else
 			{
 				if (
 					check_consistence &&
 					!v->di->image_slices.at(x)->slice_orientation_string.isEmpty())
+				{
 					image_container.image2D->orientation_string =
 						v->di->image_slices.at(x)->slice_orientation_string;
+				}
 			}
 			if (v->orientations_20_20.contains(x))
 			{
@@ -2378,17 +2387,15 @@ void GraphicsWidget::set_slice_2D(
 			}
 			if (v->anatomy.contains(x))
 			{
-				image_container.image2D->laterality =
-					v->anatomy.value(x).laterality;
-				image_container.image2D->body_part  =
-					v->anatomy.value(x).body_part;
+				image_container.image2D->laterality = v->anatomy.value(x).laterality;
+				image_container.image2D->body_part  = v->anatomy.value(x).body_part;
 			}
 		}
 		break;
 	default :
 		break;
 	}
-	update_image(fit, true, false);
+	update_image(fit, true, false, per_frame_level_found);
 	//
 	if (alw_usregs) graphicsview->draw_us_regions();
 	graphicsview->update_selection_rect_width();
@@ -2403,8 +2410,7 @@ void GraphicsWidget::set_slice_2D(
 		}
 		else
 		{
-			if (graphicsview->pr_area->isVisible())
-				graphicsview->pr_area->hide();
+			if (graphicsview->pr_area->isVisible()) graphicsview->pr_area->hide();
 		}
 	}
 quit__:

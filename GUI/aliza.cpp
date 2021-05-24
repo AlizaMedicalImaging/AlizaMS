@@ -844,12 +844,12 @@ quit__:
 
 void Aliza::delete_checked_images()
 {
-	delete_cheched_unchecked(true);
+	delete_checked_unchecked(true);
 }
 
 void Aliza::delete_unchecked_images()
 {
-	delete_cheched_unchecked(false);
+	delete_checked_unchecked(false);
 }
 
 void Aliza::delete_image2(ImageVariant * v)
@@ -1506,8 +1506,8 @@ void Aliza::update_toolbox(const ImageVariant * v)
 	}
 	else
 	{
-		toolbox2D->set_locked_center(v->di->us_window_center);
-		toolbox2D->set_locked_width(v->di->us_window_width);
+		toolbox2D->set_locked_center(v->di->default_us_window_center);
+		toolbox2D->set_locked_width(v->di->default_us_window_width);
 	}
 	toolbox2D->set_width(v->di->us_window_width);
 	toolbox2D->set_center(v->di->us_window_center);
@@ -1763,14 +1763,23 @@ void Aliza::set_selected_slice2D_m(int j)
 		}
 		//
 		{
-			if (v->frame_levels.contains(v->di->selected_z_slice))
+			bool frame_level_available = false;
+			if (a == 2)
 			{
-				const FrameLevel & fl = v->frame_levels.value(v->di->selected_z_slice);
-				toolbox2D->set_locked_center(fl.us_window_center);
-				toolbox2D->set_locked_width(fl.us_window_width);
+				if (v->frame_levels.contains(v->di->selected_z_slice))
+				{
+					const FrameLevel & fl = v->frame_levels.value(v->di->selected_z_slice);
+					toolbox2D->set_locked_center(fl.us_window_center);
+					toolbox2D->set_locked_width(fl.us_window_width);
+					frame_level_available = true;
+				}
+				else
+				{
+					toolbox2D->set_locked_center(v->di->default_us_window_center);
+					toolbox2D->set_locked_width(v->di->default_us_window_width);
+				}
 			}
-			graphicswidget_m->set_slice_2D(
-				v,0,true);
+			graphicswidget_m->set_slice_2D(v, 0, true, frame_level_available);
 			if (!run__)
 			{
 				check_slice_collisions(
@@ -1952,8 +1961,7 @@ void Aliza::set_axis_zyx(bool rect_mode)
 			graphicswidget_y->graphicsview->selection_item->hide();
 		}
 		update_toolbox(v);
-		graphicswidget_m->set_slice_2D(
-			v, 1, true);
+		graphicswidget_m->set_slice_2D(v, 1, true);
 		check_slice_collisions(const_cast<const ImageVariant *>(v), graphicswidget_m);
 		graphicswidget_y->set_slice_2D(v,1,false);
 		graphicswidget_x->set_slice_2D(v,1,false);
@@ -2374,15 +2382,14 @@ void Aliza::update_selection()
 	selected_images.clear();
 	QList<QListWidgetItem*> l = imagesbox->listWidget->selectedItems();
 	QListWidgetItem * s = (l.size()>0) ? l.at(0) : NULL;
-	if (l.size()==1) // single selection mode
+	if (l.size() == 1) // single selection mode
 	{
 		QListWidgetItem * s = l.at(0);
 		ListWidgetItem2 * i = static_cast<ListWidgetItem2*>(s);
 		ImageVariant * v = (i) ? i->get_image_from_item() : NULL;
 		if (v)
 		{
-			graphicswidget_m->set_slice_2D(
-				v,0,true);
+			graphicswidget_m->set_slice_2D(v, 0, true);
 			if (multiview) graphicswidget_y->set_slice_2D(v,0,false);
 			if (multiview) graphicswidget_x->set_slice_2D(v,0,false);
 			update_selection_common1(v);
@@ -2396,7 +2403,7 @@ void Aliza::update_selection2()
 	selected_images.clear();
 	QList<QListWidgetItem*> l = imagesbox->listWidget->selectedItems();
 	QListWidgetItem * s = (!l.empty()) ? l.at(0) : NULL;
-	if (l.size()==1) // single selection mode
+	if (l.size() == 1) // single selection mode
 	{
 		ListWidgetItem2 * i = static_cast<ListWidgetItem2*>(s);
 		ImageVariant * v = (i) ? i->get_image_from_item() : NULL;
@@ -2408,7 +2415,7 @@ void Aliza::update_selection2()
 			graphicswidget_x->graphicsview->global_flip_y = false;
 			graphicswidget_y->graphicsview->global_flip_x = false;
 			graphicswidget_y->graphicsview->global_flip_y = false;
-			graphicswidget_m->set_slice_2D(v,1,true);
+			graphicswidget_m->set_slice_2D(v, 1, true);
 			if (multiview) graphicswidget_y->set_slice_2D(v, 1, false);
 			if (multiview) graphicswidget_x->set_slice_2D(v, 1, false);
 			update_selection_common1(v);
@@ -3718,7 +3725,7 @@ quit__:
 	mutex0.unlock();
 }
 
-void Aliza::delete_cheched_unchecked(bool t)
+void Aliza::delete_checked_unchecked(bool t)
 {
 	QList<QListWidgetItem *> items;
 	QList<int> image_ids;
@@ -3933,7 +3940,7 @@ quit__:
 #endif
 }
 
-void Aliza::toggle_lock_window(bool t) // TODO
+void Aliza::toggle_lock_window(bool t)
 {
 	toolbox2D->toggle_locked_values(t);
 	ImageVariant * v = get_selected_image();

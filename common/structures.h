@@ -768,6 +768,7 @@ public:
 	float slices_direction_x, slices_direction_y, slices_direction_z;
 	float up_direction_x, up_direction_y, up_direction_z;
 	short lut_function;
+	short default_lut_function;
 	double us_window_center, us_window_width;
 	double default_us_window_center, default_us_window_width;
 	double window_center, window_width;

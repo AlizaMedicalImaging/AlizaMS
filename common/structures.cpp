@@ -60,6 +60,7 @@ DisplayInterface::DisplayInterface(
 	// 1 - linear_exact,
 	// 2 - sigmoid
 	lut_function = -1;
+	default_lut_function = -1;
 	us_window_center = us_window_width = -999999.0;
 	default_us_window_center = default_us_window_width = -999999.0;
 	window_center = 0.5;

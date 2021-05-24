@@ -245,7 +245,7 @@ private:
 		const int=0,
 		const int=0,
 		const int=0);
-	void delete_cheched_unchecked(bool);
+	void delete_checked_unchecked(bool);
 };
 
 #endif // ALIZA_H
