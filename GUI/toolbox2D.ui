@@ -181,8 +181,7 @@
         </property>
         <property name="icon">
          <iconset resource="../alizams.qrc">
-          <normaloff>:/bitmaps/unlock2.svg</normaloff>
-          <normalon>:/bitmaps/lock2.svg</normalon>:/bitmaps/unlock2.svg</iconset>
+          <normaloff>:/bitmaps/lock2.svg</normaloff>:/bitmaps/lock2.svg</iconset>
         </property>
         <property name="iconSize">
          <size>

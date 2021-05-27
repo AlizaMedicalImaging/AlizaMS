@@ -12,6 +12,8 @@ ToolBox2D::ToolBox2D(float si)
 	red   = QPixmap(":/bitmaps/red.svg");
 	green = QPixmap(":/bitmaps/green.svg");
 	blue  = QPixmap(":/bitmaps/blue.svg");
+	lockon = QPixmap(":/bitmaps/lock2.svg");
+	lockoff = QPixmap(":/bitmaps/unlock2.svg");
 	anim_label->hide();
 	anim_label->setPixmap(green);
 	label_is_red   = false;
@@ -154,6 +156,14 @@ void ToolBox2D::toggle_locked_values(bool t)
 	lock_pushButton->setChecked(t);
 	center2d_doubleSpinBox->setEnabled(t);
 	width2_doubleSpinBox->setEnabled(t);
+	if (t)
+	{
+		lock_pushButton->setIcon(lockon);
+	}
+	else
+	{
+		lock_pushButton->setIcon(lockoff);
+	}
 }
 
 void ToolBox2D::set_locked_center(double x)

@@ -41,6 +41,8 @@ private:
 	QPixmap red;
 	QPixmap green;
 	QPixmap blue;
+	QPixmap lockon;
+	QPixmap lockoff;
 	bool label_is_red;
 	bool label_is_green;
 	bool label_is_blue;
