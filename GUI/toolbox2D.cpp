@@ -9,11 +9,11 @@ ToolBox2D::ToolBox2D(float si)
 	maxwin_pushButton->setIconSize(s1);
 	lock_pushButton->setIconSize(s2);
 	set_style_sheet();
-	red   = QPixmap(":/bitmaps/red.svg");
-	green = QPixmap(":/bitmaps/green.svg");
-	blue  = QPixmap(":/bitmaps/blue.svg");
-	lockon = QIcon(QPixmap(":/bitmaps/lock2.svg"));
-	lockoff = QIcon(QPixmap(":/bitmaps/unlock2.svg"));
+	red   = QPixmap(QString(":/bitmaps/red.svg"));
+	green = QPixmap(QString(":/bitmaps/green.svg"));
+	blue  = QPixmap(QString(":/bitmaps/blue.svg"));
+	lockon = QIcon(QString(":/bitmaps/lock2.svg"));
+	lockoff = QIcon(QString(":/bitmaps/unlock2.svg"));
 	anim_label->hide();
 	anim_label->setPixmap(green);
 	label_is_red   = false;
