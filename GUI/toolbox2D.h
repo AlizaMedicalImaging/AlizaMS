@@ -2,6 +2,8 @@
 #define TOOLBOX2D_H
 
 #include "ui_toolbox2D.h"
+#include <QPixmap>
+#include <QIcon>
 
 class ToolBox2D: public QWidget, public Ui::ToolBox2D
 {
@@ -41,8 +43,8 @@ private:
 	QPixmap red;
 	QPixmap green;
 	QPixmap blue;
-	QPixmap lockon;
-	QPixmap lockoff;
+	QIcon lockon;
+	QIcon lockoff;
 	bool label_is_red;
 	bool label_is_green;
 	bool label_is_blue;
