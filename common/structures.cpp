@@ -37,7 +37,7 @@ DisplayInterface::DisplayInterface(
 	lock_single = false;
 	lock_level2D = true;
 	cube_3dtex = 0;
-	for (int x = 0;x < 3; x++) { origin[x] = 0.0f; }
+	for (int x = 0;x < 3; ++x) { origin[x] = 0.0f; }
 	origin_ok = false;
 	tex_info = -1;
 	idimx = idimy = idimz = 0;
@@ -193,19 +193,15 @@ void DisplayInterface::close(bool clear_geometry)
 			QMap< int,Contour* >::const_iterator it2 =
 				rois.at(k).contours.cbegin();
 			while (it2 != rois.at(k).contours.cend())
-			{
-				keys.push_back(it2.key());
-				++it2;
-			}
 #else
 			QMap< int,Contour* >::const_iterator it2 =
 				rois.at(k).contours.constBegin();
 			while (it2 != rois.at(k).contours.constEnd())
+#endif
 			{
 				keys.push_back(it2.key());
 				++it2;
 			}
-#endif
 		}
 		for (int x = 0; x < keys.size(); ++x)
 		{

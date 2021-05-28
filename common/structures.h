@@ -439,7 +439,7 @@ typedef QList<UltrasoundRegionData> USRegions;
 typedef struct
 {
 	unsigned int id;
-	int  instance_number;
+	int instance_number;
 	long long slice_position;
 } SliceInstance;
 
@@ -971,7 +971,7 @@ public:
 		us_window_center_ext(0.0),
 		us_window_width_ext(1e-6),
 		selected_lut(0)
-		{}
+	{}
 	~ImageContainer()
 	{
 		if (image2D)

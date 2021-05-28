@@ -1,6 +1,7 @@
 #ifndef DICOMUTILS__H_
 #define DICOMUTILS__H_
 
+#include "structures.h"
 #include <QString>
 #include <QStringList>
 #include <QProgressDialog>
@@ -10,7 +11,6 @@
 #include <mdcmDataSet.h>
 #include <mdcmPixelFormat.h>
 #include <mdcmPhotometricInterpretation.h>
-#include "structures.h"
 
 class GLWidget;
 class ShaderObj;
@@ -347,7 +347,7 @@ public:
 		const QString&,
 		const QString&,
 		QProgressDialog*);
-	static bool scan_files_for_pr_image(
+	static bool scan_files_for_instance_uid(
 		const QString&,
 		const QString&,
 		QString&,
