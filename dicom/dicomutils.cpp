@@ -89,6 +89,7 @@ typedef Vectormath::Scalar::Matrix4 sMatrix4;
 
 namespace mdcm
 {
+
 class Sorter2
 {
 public:
@@ -103,18 +104,19 @@ protected:
 	SortFunction SortFunc;
 };
 
-namespace {
+namespace
+{
 class SortFunctor2
 {
 public:
-	bool operator() (File const *file1, File const *file2)
+	bool operator() (File const * file1, File const * file2)
 	{
 		return (SortFunc)(file1->GetDataSet(), file2->GetDataSet());
 	}
 	Sorter2::SortFunction SortFunc;
 	SortFunctor2()
 	{
-		SortFunc = 0;
+		SortFunc = NULL;
 	}
 	SortFunctor2(SortFunctor2 const & sf)
 	{
@@ -134,7 +136,7 @@ public:
 	QString filename;
 };
 
-Sorter2::Sorter2() { SortFunc = 0; }
+Sorter2::Sorter2() { SortFunc = NULL; }
 
 Sorter2::~Sorter2() {}
 
@@ -160,9 +162,6 @@ bool Sorter2::StableSort(
 	tags.insert(mdcm::Tag(0x0020,0x0032));
 	tags.insert(mdcm::Tag(0x0020,0x0037));
 	std::vector< SmartPointer<FileWithQString> > filelist;
-	filelist.resize(filenames.size());
-	std::vector< SmartPointer<FileWithQString> >::iterator it2 =
-		filelist.begin();
 	for(std::vector<QString>::const_iterator it =
 			filenames.cbegin();
 		it != filenames.cend();
@@ -178,26 +177,29 @@ bool Sorter2::StableSort(
 #else
 		reader.SetFileName((*it).toLocal8Bit().constData());
 #endif
-		SmartPointer<FileWithQString> & f = *it2;
 		if (reader.ReadSelectedTags(tags))
 		{
-			f = new FileWithQString(reader.GetFile());
+			SmartPointer<FileWithQString> f =
+				new FileWithQString(reader.GetFile());
 			f->filename = *it;
+			filelist.push_back(f);
 		}
 		else
 		{
 			return false;
 		}
-		++it2;
 	}
+	Filenames.clear();
 	SortFunctor2 sf;
 	sf = Sorter2::SortFunc;
 	std::stable_sort(filelist.begin(), filelist.end(), sf);
-	Filenames.clear();
-	for(it2 = filelist.begin(); it2 != filelist.end(); ++it2 )
+	std::vector< SmartPointer<FileWithQString> >::const_iterator it2 =
+		filelist.cbegin();
+	while (it2 != filelist.cend())
 	{
-		SmartPointer<FileWithQString> & f = *it2;
+		const SmartPointer<FileWithQString> & f = *it2;
 		Filenames.push_back(f->filename);
+		++it2;
 	}
 	return true;
 }
