@@ -1835,8 +1835,8 @@ void Aliza::set_selected_slice2D_m(int j)
 					v->di->to_slice   = tmp0;
 					zrangewidget->set_span(j, tmp0);
 				}
-				zrangewidget->spanslider->blockSignals(false);
 				if (check_3d() && glwidget->isVisible()) glwidget->updateGL();
+				zrangewidget->spanslider->blockSignals(false);
 			}
 			if (multiview)
 			{

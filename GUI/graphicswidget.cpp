@@ -1539,7 +1539,7 @@ template<typename T> double get_distance(
 
 GraphicsWidget::GraphicsWidget(
 	short a,
-	bool gl_,
+	bool,
 	QLabel * top_label_,
 	QLabel * left_label_,
 	QLabel * measure_label_,
