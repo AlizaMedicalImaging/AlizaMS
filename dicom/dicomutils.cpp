@@ -87,161 +87,172 @@ typedef Vectormath::Scalar::Vector3 sVector3;
 typedef Vectormath::Scalar::Vector4 sVector4;
 typedef Vectormath::Scalar::Matrix4 sMatrix4;
 
-namespace mdcm
+struct IPPIOP
 {
-
-class Sorter2
-{
-public:
-	Sorter2();
-	virtual ~Sorter2();
-	const std::vector<QString> & GetFilenames() const;
-	typedef bool (*SortFunction)(DataSet const &, DataSet const &);
-	void SetSortFunction(SortFunction);
-	virtual bool StableSort(std::vector<QString> const &);
-protected:
-	std::vector<QString> Filenames;
-	SortFunction SortFunc;
+	IPPIOP(
+		unsigned int idx_,
+		double ipp0_, double ipp1_, double ipp2_,
+		double iop0_, double iop1_, double iop2_, double iop3_, double iop4_, double iop5_)
+	:
+		idx (idx_),
+		ipp0(ipp0_), ipp1(ipp1_), ipp2(ipp2_),
+		iop0(iop0_), iop1(iop1_), iop2(iop2_), iop3(iop3_), iop4(iop4_), iop5(iop5_) {}
+	unsigned int idx;
+	double ipp0, ipp1, ipp2;
+	double iop0, iop1, iop2, iop3, iop4, iop5;
 };
 
-namespace
+struct less_than_ipp
 {
-class SortFunctor2
-{
-public:
-	bool operator() (File const * file1, File const * file2)
+	inline bool operator() (const IPPIOP & s1, const IPPIOP & s2)
 	{
-		return (SortFunc)(file1->GetDataSet(), file2->GetDataSet());
-	}
-	Sorter2::SortFunction SortFunc;
-	SortFunctor2()
-	{
-		SortFunc = NULL;
-	}
-	SortFunctor2(SortFunctor2 const & sf)
-	{
-		SortFunc = sf.SortFunc;
-	}
-	void operator=(Sorter2::SortFunction sf)
-	{
-		SortFunc = sf;
-	}
-};
-}
-
-class FileWithQString : public File
-{
-public:
-	FileWithQString(File & f) : File(f), filename(QString("")) {}
-	QString filename;
-};
-
-Sorter2::Sorter2() { SortFunc = NULL; }
-
-Sorter2::~Sorter2() {}
-
-const std::vector<QString> & Sorter2::GetFilenames() const
-{
-	return Filenames;
-}
-
-void Sorter2::SetSortFunction(SortFunction f)
-{
-	SortFunc = f;
-}
-
-bool Sorter2::StableSort(
-	std::vector<QString> const & filenames)
-{
-	if(filenames.empty() || !SortFunc)
-	{
-		Filenames.clear();
-		return true;
-	}
-	std::set<mdcm::Tag> tags;
-	tags.insert(mdcm::Tag(0x0020,0x0032));
-	tags.insert(mdcm::Tag(0x0020,0x0037));
-	std::vector< SmartPointer<FileWithQString> > filelist;
-	for(std::vector<QString>::const_iterator it =
-			filenames.cbegin();
-		it != filenames.cend();
-		++it)
-	{
-		Reader reader;
-#ifdef _WIN32
-#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-		reader.SetFileName(QDir::toNativeSeparators(*it).toUtf8().constData());
-#else
-		reader.SetFileName(QDir::toNativeSeparators(*it).toLocal8Bit().constData());
-#endif
-#else
-		reader.SetFileName((*it).toLocal8Bit().constData());
-#endif
-		if (reader.ReadSelectedTags(tags))
-		{
-			SmartPointer<FileWithQString> f =
-				new FileWithQString(reader.GetFile());
-			f->filename = *it;
-			filelist.push_back(f);
-		}
-		else
-		{
+		const double t = 0.001;
+		if (!(
+			((s1.iop0 + t) > s2.iop0) && ((s1.iop0 - t) < s2.iop0) &&
+			((s1.iop1 + t) > s2.iop1) && ((s1.iop1 - t) < s2.iop1) &&
+			((s1.iop2 + t) > s2.iop2) && ((s1.iop2 - t) < s2.iop2) &&
+			((s1.iop3 + t) > s2.iop3) && ((s1.iop3 - t) < s2.iop3) &&
+			((s1.iop4 + t) > s2.iop4) && ((s1.iop4 - t) < s2.iop4) &&
+			((s1.iop5 + t) > s2.iop5) && ((s1.iop5 - t) < s2.iop5)))
 			return false;
-		}
+		double normal[3];
+		normal[0] = s1.iop1*s1.iop5 - s1.iop2*s1.iop4;
+		normal[1] = s1.iop2*s1.iop3 - s1.iop0*s1.iop5;
+		normal[2] = s1.iop0*s1.iop4 - s1.iop1*s1.iop3;
+		double dist1 = 0, dist2 = 0;
+		dist1 += normal[0]*s1.ipp0;
+		dist2 += normal[0]*s2.ipp0;
+		dist1 += normal[1]*s1.ipp1;
+		dist2 += normal[1]*s2.ipp1;
+		dist1 += normal[2]*s1.ipp2;
+		dist2 += normal[2]*s2.ipp2;
+		const bool r = (dist1 < dist2);
+		return r;
 	}
-	Filenames.clear();
-	SortFunctor2 sf;
-	sf = Sorter2::SortFunc;
-	std::stable_sort(filelist.begin(), filelist.end(), sf);
-	std::vector< SmartPointer<FileWithQString> >::const_iterator it2 =
-		filelist.cbegin();
-	while (it2 != filelist.cend())
+};
+
+static bool sort_frames_ippiop(
+	const std::map< unsigned int,unsigned int,std::less<unsigned int> > & in,
+	std::map< unsigned int,unsigned int,std::less<unsigned int> > & out,
+	const FrameGroupValues & values)
+{
+	std::vector<IPPIOP> tmp0;
+	std::map< unsigned int,unsigned int,std::less<unsigned int> >::const_iterator it =
+		in.cbegin();
+	while (it != in.cend())
 	{
-		const SmartPointer<FileWithQString> & f = *it2;
-		Filenames.push_back(f->filename);
-		++it2;
+		const unsigned int x = it->first;
+		double ipp[3];
+		double iop[6];
+		const bool ok_p = DicomUtils::get_patient_position(values.at(x).pat_pos, ipp);
+		const bool ok_o = DicomUtils::get_patient_orientation(values.at(x).pat_orient, iop);
+		if (!(ok_o && ok_p)) return false;
+		IPPIOP tmp1(
+			x,
+			ipp[0], ipp[1], ipp[2],
+			iop[0], iop[1], iop[2], iop[3], iop[4], iop[5]);
+		tmp0.push_back(tmp1);
+		++it;
+	}
+	std::stable_sort(tmp0.begin(), tmp0.end(), less_than_ipp());
+#ifdef ENHANCED_PRINT_INFO
+	std::cout << "Sorting frames" << std::endl;
+#endif
+	for (unsigned int j = 0; j < tmp0.size(); ++j)
+	{
+		const IPPIOP & k = tmp0.at(j);
+		out[k.idx] = j;
+#ifdef ENHANCED_PRINT_INFO
+		std::cout << "out[" << k.idx << "] = " << j << std::endl;
+#endif
 	}
 	return true;
 }
 
-} // mdcm
-
-static bool sort0_(
-	mdcm::DataSet const & ds1,
-	mdcm::DataSet const & ds2)
+struct files_less_than_ipp
 {
-	// IPP sorting
-	const mdcm::Tag t1(0x0020,0x0032);
-	if(!ds1.FindDataElement(t1)||!ds2.FindDataElement(t1))
+	inline bool operator() (const QString & f1, const QString & f2)
+	{
+		const double t = 0.001;
+		mdcm::Tag ipp(0x0020,0x0032);
+		mdcm::Tag iop(0x0020,0x0037);
+		std::set<mdcm::Tag> tags;
+		tags.insert(ipp);
+		tags.insert(iop);
+		mdcm::Reader reader1;
+		mdcm::Reader reader2;
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+		reader1.SetFileName(QDir::toNativeSeparators(f1).toUtf8().constData());
+		reader2.SetFileName(QDir::toNativeSeparators(f2).toUtf8().constData());
+#else
+		reader1.SetFileName(QDir::toNativeSeparators(f1).toLocal8Bit().constData());
+		reader2.SetFileName(QDir::toNativeSeparators(f2).toLocal8Bit().constData());
+#endif
+#else
+		reader1.SetFileName(f1.toLocal8Bit().constData());
+		reader2.SetFileName(f2.toLocal8Bit().constData());
+#endif
+		if (reader1.ReadSelectedTags(tags) && reader2.ReadSelectedTags(tags))
+		{
+			const mdcm::DataSet & ds1 = reader1.GetFile().GetDataSet();
+			const mdcm::DataSet & ds2 = reader2.GetFile().GetDataSet();
+			if(!ds1.FindDataElement(ipp) || !ds2.FindDataElement(ipp))
+			{
+				return false;
+			}
+			if(!ds1.FindDataElement(iop) || !ds2.FindDataElement(iop))
+			{
+				return false;
+			}
+			mdcm::Attribute<0x0020,0x0032> ipp1;
+			ipp1.Set(ds1);
+			mdcm::Attribute<0x0020,0x0037> iop1;
+			iop1.Set(ds1);
+			mdcm::Attribute<0x0020,0x0032> ipp2;
+			ipp2.Set(ds2);
+			mdcm::Attribute<0x0020,0x0037> iop2;
+			iop2.Set(ds2);
+			if (ipp1.GetNumberOfValues() < 3 || ipp2.GetNumberOfValues() < 3)
+			{
+				return false;
+			}
+			if (iop1.GetNumberOfValues() < 6 || iop2.GetNumberOfValues() < 6)
+			{
+				return false;
+			}
+			if (!(
+				((iop1[0] + t) > iop2[0]) && ((iop1[0] - t) < iop2[0]) &&
+				((iop1[1] + t) > iop2[1]) && ((iop1[1] - t) < iop2[1]) &&
+				((iop1[2] + t) > iop2[2]) && ((iop1[2] - t) < iop2[2]) &&
+				((iop1[3] + t) > iop2[3]) && ((iop1[3] - t) < iop2[3]) &&
+				((iop1[4] + t) > iop2[4]) && ((iop1[4] - t) < iop2[4]) &&
+				((iop1[5] + t) > iop2[5]) && ((iop1[5] - t) < iop2[5])))
+			{
+				return false;
+			}
+			double normal[3];
+			normal[0] = iop1[1]*iop1[5] - iop1[2]*iop1[4];
+			normal[1] = iop1[2]*iop1[3] - iop1[0]*iop1[5];
+			normal[2] = iop1[0]*iop1[4] - iop1[1]*iop1[3];
+			double dist1 = 0, dist2 = 0;
+			for (int i = 0; i < 3; ++i) dist1 += normal[i]*ipp1[i];
+			for (int i = 0; i < 3; ++i) dist2 += normal[i]*ipp2[i];
+			return (dist1 < dist2);
+		}
 		return false;
-	const mdcm::Tag t2(0x0020,0x0037);
-	if(!ds1.FindDataElement(t2)||!ds2.FindDataElement(t2))
-		return false;
-	mdcm::Attribute<0x0020,0x0032> ipp1; ipp1.Set(ds1);
-	mdcm::Attribute<0x0020,0x0037> iop1; iop1.Set(ds1);
-	mdcm::Attribute<0x0020,0x0032> ipp2; ipp2.Set(ds2);
-	mdcm::Attribute<0x0020,0x0037> iop2; iop2.Set(ds2);
-	if (ipp1.GetNumberOfValues()<3||ipp2.GetNumberOfValues()<3)
-		return false;
-	if (iop1.GetNumberOfValues()<6||iop2.GetNumberOfValues()<6)
-		return false;
-	const double t = 0.001;
-	if (!(
-		((iop1[0] + t) > iop2[0]) && ((iop1[0] - t) < iop2[0]) &&
-		((iop1[1] + t) > iop2[1]) && ((iop1[1] - t) < iop2[1]) &&
-		((iop1[2] + t) > iop2[2]) && ((iop1[2] - t) < iop2[2]) &&
-		((iop1[3] + t) > iop2[3]) && ((iop1[3] - t) < iop2[3]) &&
-		((iop1[4] + t) > iop2[4]) && ((iop1[4] - t) < iop2[4]) &&
-		((iop1[5] + t) > iop2[5]) && ((iop1[5] - t) < iop2[5])))
-		return false;
-	double normal[3];
-	normal[0] = iop1[1]*iop1[5] - iop1[2]*iop1[4];
-	normal[1] = iop1[2]*iop1[3] - iop1[0]*iop1[5];
-	normal[2] = iop1[0]*iop1[4] - iop1[1]*iop1[3];
-	double dist1 = 0, dist2 = 0;
-	for (int i = 0; i < 3; ++i) dist1 += normal[i]*ipp1[i];
-	for (int i = 0; i < 3; ++i) dist2 += normal[i]*ipp2[i];
-	return (dist1 < dist2);
+	}
+};
+
+static void sort_dicom_files_ippiop(
+	const std::vector<QString> & images,
+	std::vector<QString> & images_ipp)
+{
+	for (size_t x = 0; x < images.size(); ++x)
+	{
+		images_ipp.push_back(images.at(x));
+	}
+	std::stable_sort(images_ipp.begin(), images_ipp.end(), files_less_than_ipp());
 }
 
 static QString generate_string_0(
@@ -8925,88 +8936,6 @@ QString DicomUtils::read_enhanced_common(
 	return message;
 }
 
-struct IPPIOP
-{
-	IPPIOP(
-		unsigned int idx_,
-		double ipp0_, double ipp1_, double ipp2_,
-		double iop0_, double iop1_, double iop2_, double iop3_, double iop4_, double iop5_)
-	:
-		idx (idx_),
-		ipp0(ipp0_), ipp1(ipp1_), ipp2(ipp2_),
-		iop0(iop0_), iop1(iop1_), iop2(iop2_), iop3(iop3_), iop4(iop4_), iop5(iop5_) {}
-	unsigned int idx;
-	double ipp0, ipp1, ipp2;
-	double iop0, iop1, iop2, iop3, iop4, iop5;
-};
-
-struct less_than_ipp
-{
-	inline bool operator() (const IPPIOP & s1, const IPPIOP & s2)
-	{
-		const double t = 0.001;
-		if (!(
-			((s1.iop0 + t) > s2.iop0) && ((s1.iop0 - t) < s2.iop0) &&
-			((s1.iop1 + t) > s2.iop1) && ((s1.iop1 - t) < s2.iop1) &&
-			((s1.iop2 + t) > s2.iop2) && ((s1.iop2 - t) < s2.iop2) &&
-			((s1.iop3 + t) > s2.iop3) && ((s1.iop3 - t) < s2.iop3) &&
-			((s1.iop4 + t) > s2.iop4) && ((s1.iop4 - t) < s2.iop4) &&
-			((s1.iop5 + t) > s2.iop5) && ((s1.iop5 - t) < s2.iop5)))
-			return false;
-		double normal[3];
-		normal[0] = s1.iop1*s1.iop5 - s1.iop2*s1.iop4;
-		normal[1] = s1.iop2*s1.iop3 - s1.iop0*s1.iop5;
-		normal[2] = s1.iop0*s1.iop4 - s1.iop1*s1.iop3;
-		double dist1 = 0, dist2 = 0;
-		dist1 += normal[0]*s1.ipp0;
-		dist2 += normal[0]*s2.ipp0;
-		dist1 += normal[1]*s1.ipp1;
-		dist2 += normal[1]*s2.ipp1;
-		dist1 += normal[2]*s1.ipp2;
-		dist2 += normal[2]*s2.ipp2;
-		const bool r = (dist1 < dist2);
-		return r;
-	}
-};
-
-static bool sort_frames_ippiop(
-	const std::map< unsigned int,unsigned int,std::less<unsigned int> > & in,
-	std::map< unsigned int,unsigned int,std::less<unsigned int> > & out,
-	const FrameGroupValues & values)
-{
-	std::vector<IPPIOP> tmp0;
-	std::map< unsigned int,unsigned int,std::less<unsigned int> >::const_iterator it =
-		in.cbegin();
-	while (it != in.cend())
-	{
-		const unsigned int x = it->first;
-		double ipp[3];
-		double iop[6];
-		const bool ok_p = DicomUtils::get_patient_position(values.at(x).pat_pos, ipp);
-		const bool ok_o = DicomUtils::get_patient_orientation(values.at(x).pat_orient, iop);
-		if (!(ok_o && ok_p)) return false;
-		IPPIOP tmp1(
-			x,
-			ipp[0], ipp[1], ipp[2],
-			iop[0], iop[1], iop[2], iop[3], iop[4], iop[5]);
-		tmp0.push_back(tmp1);
-		++it;
-	}
-	std::stable_sort(tmp0.begin(), tmp0.end(), less_than_ipp());
-#ifdef ENHANCED_PRINT_INFO
-	std::cout << "Sorting frames" << std::endl;
-#endif
-	for (unsigned int j = 0; j < tmp0.size(); ++j)
-	{
-		const IPPIOP & k = tmp0.at(j);
-		out[k.idx] = j;
-#ifdef ENHANCED_PRINT_INFO
-		std::cout << "out[" << k.idx << "] = " << j << std::endl;
-#endif
-	}
-	return true;
-}
-
 bool DicomUtils::enhanced_process_indices(
 	std::vector< std::map< unsigned int,unsigned int,std::less<unsigned int> > > & tmp0,
 	const DimIndexValues & idx_values, const FrameGroupValues & values,
@@ -11616,14 +11545,11 @@ QString DicomUtils::read_dicom(
 			{
 				images__.push_back(extracted_images.at(k).at(j));
 			}
-			if (images__.size()>1)
+			if (images__.size() > 1)
 			{
-				mdcm::Sorter2 sorter;
-				sorter.SetSortFunction(sort0_);
-				sorter.StableSort(images__);
-				images_ipp = sorter.GetFilenames();
+				sort_dicom_files_ippiop(images__, images_ipp);
 			}
-			else if (images__.size()==1)
+			else if (images__.size() == 1)
 			{
 				images_ipp.push_back(images__.at(0));
 			}
@@ -12139,14 +12065,11 @@ QString DicomUtils::read_dicom(
 			{
 				images__.push_back(fff.at(x).at(k));
 			}
-			if (images__.size()>1)
+			if (images__.size() > 1)
 			{
-				mdcm::Sorter2 sorter;
-				sorter.SetSortFunction(sort0_);
-				sorter.StableSort(images__);
-				images_ipp = sorter.GetFilenames();
+				sort_dicom_files_ippiop(images__, images_ipp);
 			}
-			else if (images__.size()==1)
+			else if (images__.size() == 1)
 			{
 				images_ipp.push_back(images__.at(0));
 			}
@@ -12237,14 +12160,11 @@ QString DicomUtils::read_dicom(
 			{
 				images__.push_back(images.at(k));
 			}
-			if (images__.size()>1)
+			if (images__.size() > 1)
 			{
-				mdcm::Sorter2 sorter;
-				sorter.SetSortFunction(sort0_);
-				sorter.StableSort(images__);
-				images_ipp = sorter.GetFilenames();
+				sort_dicom_files_ippiop(images__, images_ipp);
 			}
-			else if (images__.size()==1)
+			else if (images__.size() == 1)
 			{
 				images_ipp.push_back(images__.at(0));
 			}

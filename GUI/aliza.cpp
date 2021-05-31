@@ -108,7 +108,7 @@ static void g_init_physics()
 
 static void g_close_physics()
 {
-	if(g_collisionWorld)
+	if (g_collisionWorld)
 	{
 		for (int x = g_collisionWorld->getNumCollisionObjects() - 1; x >= 0; x--)
 		{
@@ -1042,8 +1042,7 @@ bool Aliza::load_3d(
 	int max_3d_tex_size = 0;
 	if (ok3d)
 	{
-		max_3d_tex_size =
-			glwidget->max_3d_texture_size;
+		max_3d_tex_size = glwidget->max_3d_texture_size;
 	}
 	bool change_size = false;
 	unsigned int size_x_ = 0, size_y_ = 0;

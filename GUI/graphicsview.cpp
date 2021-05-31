@@ -682,7 +682,7 @@ void GraphicsView::set_win_last_position(int x, int y)
 
 void GraphicsView::update_background_color()
 {
-	QColor bc = QApplication::palette().color(QPalette::Window);
+	QColor bc = qApp->palette().color(QPalette::Window);
 	setBackgroundBrush(QBrush(bc));
 	shutter_color = bc;
 }
@@ -1999,12 +1999,10 @@ void GraphicsView::draw_shutter(const ImageVariant * ivariant)
 		ivariant->pr_display_shutters.value(idx);
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	const QStringList & l =
-			a.ShutterShape.split(
-				QString("\\"), Qt::SkipEmptyParts);
+			a.ShutterShape.split(QString("\\"), Qt::SkipEmptyParts);
 #else
 	const QStringList & l =
-			a.ShutterShape.split(
-				QString("\\"), QString::SkipEmptyParts);
+			a.ShutterShape.split(QString("\\"), QString::SkipEmptyParts);
 #endif
 	for (int x = 0; x < l.size(); ++x)
 	{
