@@ -116,16 +116,16 @@ struct less_than_ipp
 			((s1.iop5 + t) > s2.iop5) && ((s1.iop5 - t) < s2.iop5)))
 			return false;
 		double normal[3];
-		normal[0] = s1.iop1*s1.iop5 - s1.iop2*s1.iop4;
-		normal[1] = s1.iop2*s1.iop3 - s1.iop0*s1.iop5;
-		normal[2] = s1.iop0*s1.iop4 - s1.iop1*s1.iop3;
+		normal[0] = (s1.iop1 * s1.iop5) - (s1.iop2 * s1.iop4);
+		normal[1] = (s1.iop2 * s1.iop3) - (s1.iop0 * s1.iop5);
+		normal[2] = (s1.iop0 * s1.iop4) - (s1.iop1 * s1.iop3);
 		double dist1 = 0, dist2 = 0;
-		dist1 += normal[0]*s1.ipp0;
-		dist2 += normal[0]*s2.ipp0;
-		dist1 += normal[1]*s1.ipp1;
-		dist2 += normal[1]*s2.ipp1;
-		dist1 += normal[2]*s1.ipp2;
-		dist2 += normal[2]*s2.ipp2;
+		dist1 += normal[0] * s1.ipp0;
+		dist2 += normal[0] * s2.ipp0;
+		dist1 += normal[1] * s1.ipp1;
+		dist2 += normal[1] * s2.ipp1;
+		dist1 += normal[2] * s1.ipp2;
+		dist2 += normal[2] * s2.ipp2;
 		const bool r = (dist1 < dist2);
 		return r;
 	}
@@ -232,13 +232,14 @@ struct files_less_than_ipp
 				return false;
 			}
 			double normal[3];
-			normal[0] = iop1[1]*iop1[5] - iop1[2]*iop1[4];
-			normal[1] = iop1[2]*iop1[3] - iop1[0]*iop1[5];
-			normal[2] = iop1[0]*iop1[4] - iop1[1]*iop1[3];
+			normal[0] = (iop1[1] * iop1[5]) - (iop1[2] * iop1[4]);
+			normal[1] = (iop1[2] * iop1[3]) - (iop1[0] * iop1[5]);
+			normal[2] = (iop1[0] * iop1[4]) - (iop1[1] * iop1[3]);
 			double dist1 = 0, dist2 = 0;
-			for (int i = 0; i < 3; ++i) dist1 += normal[i]*ipp1[i];
-			for (int i = 0; i < 3; ++i) dist2 += normal[i]*ipp2[i];
-			return (dist1 < dist2);
+			for (int i = 0; i < 3; ++i) dist1 += normal[i] * ipp1[i];
+			for (int i = 0; i < 3; ++i) dist2 += normal[i] * ipp2[i];
+			const bool r = (dist1 < dist2);
+			return r;
 		}
 		return false;
 	}
