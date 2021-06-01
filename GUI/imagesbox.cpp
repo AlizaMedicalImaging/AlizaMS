@@ -720,6 +720,7 @@ void ImagesBox::set_contours(const ImageVariant * v)
 	contours_tableWidget->setRowCount(0);
 	contours_tableWidget->setCurrentIndex(QModelIndex());
 	if (!v) return;
+	if (v->di->rois.empty()) return;
 	for (int x = 0; x < v->di->rois.size(); ++x)
 	{
 		const QColor c(
@@ -753,12 +754,22 @@ void ImagesBox::set_contours(const ImageVariant * v)
 
 int ImagesBox::get_selected_roi_id() const
 {
+	if (contours_tableWidget->rowCount() < 1)
+	{
+		return -1;
+	}
 	const int row = contours_tableWidget->row(
 		contours_tableWidget->currentItem());
-	if (row < 0) return -1;
+	if (row < 0)
+	{
+		return -1;
+	}
 	const TableWidgetItem2 * i =
 		static_cast<const TableWidgetItem2*>(
 			contours_tableWidget->item(row, 0));
-	if (i) return i->get_id();
+	if (i)
+	{
+		return i->get_id();
+	}
 	return -1;
 }
