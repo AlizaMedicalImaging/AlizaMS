@@ -135,6 +135,11 @@ ImagesBox::ImagesBox(float si)
 {
 	setupUi(this);
 	//
+	contours_tableWidget->setColumnWidth(0, 24);
+	contours_tableWidget->setColumnWidth(1, 24);
+	contours_tableWidget->setColumnWidth(2, 140);
+	contours_frame->hide();
+	//
 	listWidget->setIconSize(QSize(96,96));
 	listWidget->setMovement(QListView::Static);
 	listWidget->setFlow(QListView::TopToBottom);
@@ -149,6 +154,10 @@ ImagesBox::ImagesBox(float si)
 	actionReloadHistogram = new QAction(QIcon(QString(":/bitmaps/chart0.svg")),QString("Calculate histogram"),this);
 	actionColor        = new QAction(QIcon(QString(":/bitmaps/rgb.svg")),QString("Image color in UI"),this);
 	actionDICOMMeta    = new QAction(QIcon(QString(":/bitmaps/meta.svg")),QString("Image DICOM Metadata"),this);
+	actionContours     = new QAction(QIcon(QString(":/bitmaps/circle1.svg")),QString("Toggle contours window"), this);
+	actionContours->setCheckable(true);
+	actionContours->setChecked(false);
+	actionROIInfo      = new QAction(QString("ROI Info"), this);
 	actionTmp          = new QAction(QString("TMP"),this);
 	//
 	actionInfo         = new QAction(QIcon(QString(":/bitmaps/info2.svg")),QString("Toggle info window"),this);
@@ -189,6 +198,9 @@ ImagesBox::ImagesBox(float si)
 #endif
 	toolbar->addWidget(spacer);
 	//
+	contours_tableWidget->addAction(actionNone);
+	contours_tableWidget->addAction(actionROIInfo);
+	//
 	QToolBar * toolbar2 = new QToolBar(this);
 	toolbar2->setOrientation(Qt::Horizontal);
 	toolbar2->setIconSize(QSize((int)(18*si),(int)(18*si)));
@@ -206,6 +218,7 @@ ImagesBox::ImagesBox(float si)
 	QWidget * spacer2 = new QWidget(this);
 	spacer2->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
 	toolbar2->addWidget(spacer2);
+	toolbar2->addAction(actionContours);
 	toolbar2->addAction(actionInfo);
 	//
 	map['R'] = QString("right to left");
@@ -216,7 +229,8 @@ ImagesBox::ImagesBox(float si)
 	map['S'] = QString("superior to inferior");
 	textBrowser->document()->addResource(QTextDocument::StyleSheetResource, QUrl("format.css"), css1);
 	//
-	connect(actionInfo, SIGNAL(toggled(bool)),this,SLOT(toggle_info(bool)));
+	connect(actionInfo, SIGNAL(toggled(bool)), this, SLOT(toggle_info(bool)));
+	connect(actionContours, SIGNAL(toggled(bool)), this, SLOT(toggle_contours(bool)));
 }
 
 ImagesBox::~ImagesBox()
@@ -672,6 +686,14 @@ void ImagesBox::toggle_info(bool t)
 	textBrowser->setHidden(!t);
 }
 
+void ImagesBox::toggle_contours(bool t)
+{
+	contours_tableWidget->clearSelection();
+	contours_tableWidget->setCurrentIndex(QModelIndex());
+	if (t) contours_frame->show();
+	else   contours_frame->hide();
+}
+
 void ImagesBox::check_all()
 {
 	for (int x = 0; x < listWidget->count(); ++x)
@@ -692,3 +714,51 @@ void ImagesBox::uncheck_all()
 	}
 }
 
+void ImagesBox::set_contours(const ImageVariant * v)
+{
+	contours_tableWidget->clearContents();
+	contours_tableWidget->setRowCount(0);
+	contours_tableWidget->setCurrentIndex(QModelIndex());
+	if (!v) return;
+	for (int x = 0; x < v->di->rois.size(); ++x)
+	{
+		const QColor c(
+			(int)(v->di->rois.at(x).color.r*255.0f),
+			(int)(v->di->rois.at(x).color.g*255.0f),
+			(int)(v->di->rois.at(x).color.b*255.0f));
+		const int idx = contours_tableWidget->rowCount();
+		TableWidgetItem2 * i0 = new TableWidgetItem2();
+		i0->setFlags(i0->flags()|Qt::ItemIsUserCheckable);
+		if (v->di->rois.at(x).show)
+		{
+			i0->setCheckState(Qt::Checked);
+		}
+		else
+		{
+			i0->setCheckState(Qt::Unchecked);
+		}
+		i0->set_id(v->di->rois.at(x).id);
+		contours_tableWidget->setRowCount(idx+1);
+		contours_tableWidget->setItem(
+			idx,0,static_cast<QTableWidgetItem*>(i0));
+		QTableWidgetItem * i1 = new QTableWidgetItem();
+		i1->setFlags(i1->flags()^Qt::ItemIsSelectable);
+		i1->setBackground(QBrush(c));
+		contours_tableWidget->setItem(
+			idx,1,i1);
+		contours_tableWidget->setItem(
+			idx,2,new QTableWidgetItem(v->di->rois.at(x).name));
+	}
+}
+
+int ImagesBox::get_selected_roi_id() const
+{
+	const int row = contours_tableWidget->row(
+		contours_tableWidget->currentItem());
+	if (row < 0) return -1;
+	const TableWidgetItem2 * i =
+		static_cast<const TableWidgetItem2*>(
+			contours_tableWidget->item(row, 0));
+	if (i) return i->get_id();
+	return -1;
+}

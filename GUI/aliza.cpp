@@ -782,6 +782,7 @@ void Aliza::clear_ram()
 	disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
 	imagesbox->listWidget->clear();
 	imagesbox->set_html(NULL);
+	clear_contourstable();
 	selected_images.clear();
 	QMap<int, ImageVariant*>::iterator iv = scene3dimages.begin();
 	while (iv != scene3dimages.end())
@@ -1661,6 +1662,8 @@ void Aliza::connect_slots()
 	connect(imagesbox->actionUncheck,        SIGNAL(triggered()), this, SLOT(trigger_uncheck_all()));
 	connect(imagesbox->actionColor,          SIGNAL(triggered()), this, SLOT(trigger_image_color()));
 	connect(imagesbox->actionReloadHistogram,SIGNAL(triggered()), this, SLOT(trigger_reload_histogram()));
+	connect(imagesbox->actionROIInfo,        SIGNAL(triggered()), this, SLOT(trigger_show_roi_info()));
+	connect(imagesbox->contours_tableWidget, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(update_visible_rois(QTableWidgetItem*)));
 	//
 	//
 	connect(imagesbox->actionTmp,            SIGNAL(triggered()), this, SLOT(trigger_tmp()));
@@ -2500,6 +2503,7 @@ void Aliza::update_selection_common1(ImageVariant * v)
 	}
 	update_toolbox(v);
 	imagesbox->set_html(v);
+	set_contourstable(v);
 }
 
 void Aliza::update_selection_common2(QListWidgetItem * s)
@@ -2591,6 +2595,7 @@ void Aliza::clear_views()
 {
 	update_toolbox(NULL);
 	imagesbox->set_html(NULL);
+	clear_contourstable();
 	graphicswidget_m->clear_();
 	graphicswidget_y->clear_();
 	graphicswidget_x->clear_();
@@ -4109,6 +4114,136 @@ void Aliza::toggle_lock_window(bool t)
 	{
 		qApp->processEvents();
 	}
+}
+
+void Aliza::clear_contourstable()
+{
+	imagesbox->contours_tableWidget->blockSignals(true);
+	imagesbox->set_contours(NULL);
+	imagesbox->contours_tableWidget->blockSignals(false);
+}
+
+void Aliza::set_contourstable(const ImageVariant * v)
+{
+	imagesbox->contours_tableWidget->blockSignals(true);
+	imagesbox->set_contours(v);
+	imagesbox->contours_tableWidget->blockSignals(false);
+}
+
+void Aliza::trigger_show_roi_info()
+{
+	const bool lock = mutex0.tryLock();
+	if (!lock) return;
+	int tmp0 = -1;
+	const ImageVariant * v = get_selected_image_const();
+	if (!v)
+	{
+		mutex0.unlock();
+		return;
+	}
+	const int roi_id = imagesbox->get_selected_roi_id();
+	if (roi_id < 0)
+	{
+		mutex0.unlock();
+		return;
+	}
+	for (int x = 0; x < v->di->rois.size(); ++x)
+	{
+		if (v->di->rois.at(x).id == roi_id)
+		{
+			tmp0 = x;
+			break;
+		}
+	}
+	if (tmp0 >= 0)
+	{
+		unsigned int count_contours = 0;
+		bool has_closed_planar = false;
+		bool has_open_planar = false;
+		bool has_open_non_planar = false;
+		bool has_point = false;
+		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+			QMap<int, Contour*>::const_iterator it =
+				v->di->rois.at(tmp0).contours.cbegin();
+			while (it != v->di->rois.at(tmp0).contours.cend())
+#else
+			QMap<int, Contour*>::const_iterator it =
+				v->di->rois.at(tmp0).contours.constBegin();
+			while (it != v->di->rois.at(tmp0).contours.constEnd())
+#endif
+			{
+				const Contour * c = it.value();
+				if (c)
+				{
+					++count_contours;
+					const short ct = c->type;
+					switch(ct)
+					{
+					case 1:
+						if (!has_closed_planar) has_closed_planar = true;
+						break;
+					case 2:
+						if (!has_open_planar) has_open_planar = true;
+						break;
+					case 3:
+						if (!has_open_non_planar) has_open_non_planar = true;
+						break;
+					case 4:
+						if (!has_point) has_point = true;
+						break;
+					case 0:
+					default:
+						break;
+					}
+				}
+				++it;
+			}
+		}
+		{
+			QString s0("");
+			if (has_closed_planar)
+			{
+				s0.append(QString("CLOSED_PLANAR"));
+			}
+			if (has_open_planar)
+			{
+				if (!s0.isEmpty()) s0.append(QString(", "));
+				s0.append(QString("OPEN_PLANAR"));
+			}
+			if (has_open_non_planar)
+			{
+				if (!s0.isEmpty()) s0.append(QString(", "));
+				s0.append(QString("OPEN_NONPLANAR"));
+			}
+			if (has_point)
+			{
+				if (!s0.isEmpty()) s0.append(QString(", "));
+				s0.append(QString("POINT"));
+			}
+			if (!s0.isEmpty())
+			{
+				s0.prepend(QString("\nContours type: "));
+			}
+			const QString s =
+				QString("Name: ") +
+				v->di->rois.at(tmp0).name +
+				QString("\nType: ") +
+				v->di->rois.at(tmp0).interpreted_type +
+				QString("\nNumber of countours: ") +
+				QVariant(count_contours).toString() +
+				s0;
+			QMessageBox mbox;
+			mbox.setWindowTitle("ROI Info");
+			mbox.setWindowModality(Qt::ApplicationModal);
+			mbox.addButton(QMessageBox::Close);
+			mbox.setIcon(QMessageBox::Information);
+			mbox.setText(s);
+			mbox.exec();
+		}
+	}
+	mutex0.unlock();
+	qApp->processEvents();
 }
 
 #ifdef ALIZA_PRINT_COUNT_GL_OBJ

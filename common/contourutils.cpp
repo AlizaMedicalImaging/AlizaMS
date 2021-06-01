@@ -65,9 +65,16 @@ template <typename T> void calculate_uvt(
 						if (planar) planar = false;
 					}
 				}
-				if (!planar) c->type = 3;
+				if (!planar && (c->type == 1 || c->type == 2))
+				{
+					c->type = 0;
+				}
 			}
-			if (count%5==0) QApplication::processEvents();
+			if (count == 5)
+			{
+				count = 0;
+				QApplication::processEvents();
+			}
 			++it;
 		}
 	}

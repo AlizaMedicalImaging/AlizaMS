@@ -17,15 +17,6 @@
 #endif
 #include "structures.h"
 #include <QThread>
-#include <QString>
-#include <QStringList>
-#include <QVector>
-#include <QMap>
-#include <QVariant>
-#include <QList>
-#include <QGraphicsView>
-#include <QProgressDialog>
-#include <QTimer>
 #include <vector>
 #include "toolbox.h"
 #include "imagesbox.h"
@@ -38,6 +29,16 @@
 #include "sliderwidget.h"
 #include "zrangewidget.h"
 #include "animwidget.h"
+#include <QString>
+#include <QStringList>
+#include <QVector>
+#include <QMap>
+#include <QVariant>
+#include <QList>
+#include <QGraphicsView>
+#include <QProgressDialog>
+#include <QTimer>
+#include <QTableWidgetItem>
 
 class Aliza : public QObject
 {
@@ -153,6 +154,7 @@ public slots:
 	void toggle_zlock_one(bool);
 	void trigger_image_color();
 	void toggle_lock_window(bool);
+	void trigger_show_roi_info();
 
 signals:
 	void report_load_to_mainwin();
@@ -246,6 +248,8 @@ private:
 		const int=0,
 		const int=0);
 	void delete_checked_unchecked(bool);
+	void clear_contourstable();
+	void set_contourstable(const ImageVariant*);
 };
 
 #endif // ALIZA_H

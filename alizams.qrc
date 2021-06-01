@@ -69,6 +69,7 @@
 		<file>bitmaps/save2.svg</file>
 		<file>bitmaps/lock2.svg</file>
 		<file>bitmaps/unlock2.svg</file>
+		<file>bitmaps/circle1.svg</file>
 	</qresource>
 </RCC>
 

@@ -55,6 +55,8 @@ public:
 	void set_html(const ImageVariant*);
 	void check_all();
 	void uncheck_all();
+	void set_contours(const ImageVariant*);
+	int  get_selected_roi_id() const;
 	QAction * actionNone;
 	QAction * actionClear;
 	QAction * actionClearChecked;
@@ -67,9 +69,12 @@ public:
 	QAction * actionTmp;
 	QAction * actionColor;
 	QAction * actionDICOMMeta;
+	QAction * actionContours;
+	QAction * actionROIInfo;
 
 private slots:
 	void toggle_info(bool);
+	void toggle_contours(bool);
 
 private:
 	QMap<char,QString> map;
