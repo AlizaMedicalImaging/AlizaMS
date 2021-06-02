@@ -229,7 +229,6 @@
  </tabstops>
  <resources>
   <include location="../alizams.qrc"/>
-  <include location="../../../assembla/proj1/aliza.qrc"/>
  </resources>
  <connections/>
 </ui>
