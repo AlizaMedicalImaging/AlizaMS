@@ -231,6 +231,9 @@
                               <verstretch>0</verstretch>
                              </sizepolicy>
                             </property>
+                            <property name="mouseTracking">
+                             <bool>false</bool>
+                            </property>
                             <property name="focusPolicy">
                              <enum>Qt::NoFocus</enum>
                             </property>
@@ -454,6 +457,9 @@
                                  <verstretch>0</verstretch>
                                 </sizepolicy>
                                </property>
+                               <property name="mouseTracking">
+                                <bool>false</bool>
+                               </property>
                                <property name="focusPolicy">
                                 <enum>Qt::NoFocus</enum>
                                </property>
@@ -631,6 +637,9 @@
                                  <verstretch>0</verstretch>
                                 </sizepolicy>
                                </property>
+                               <property name="mouseTracking">
+                                <bool>false</bool>
+                               </property>
                                <property name="focusPolicy">
                                 <enum>Qt::NoFocus</enum>
                                </property>
@@ -807,6 +816,9 @@
                                  <horstretch>0</horstretch>
                                  <verstretch>0</verstretch>
                                 </sizepolicy>
+                               </property>
+                               <property name="mouseTracking">
+                                <bool>false</bool>
                                </property>
                                <property name="focusPolicy">
                                 <enum>Qt::NoFocus</enum>
