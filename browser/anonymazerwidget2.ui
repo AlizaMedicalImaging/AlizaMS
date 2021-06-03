@@ -57,7 +57,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../aliza.qrc">
+         <iconset resource="../alizams.qrc">
           <normaloff>:/bitmaps/folder.svg</normaloff>:/bitmaps/folder.svg</iconset>
         </property>
         <property name="iconSize">
@@ -109,7 +109,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../aliza.qrc">
+         <iconset resource="../alizams.qrc">
           <normaloff>:/bitmaps/folder.svg</normaloff>:/bitmaps/folder.svg</iconset>
         </property>
         <property name="iconSize">
@@ -365,7 +365,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../aliza.qrc">
+         <iconset resource="../alizams.qrc">
           <normaloff>:/bitmaps/right0.svg</normaloff>:/bitmaps/right0.svg</iconset>
         </property>
         <property name="iconSize">
@@ -437,7 +437,7 @@
   <tabstop>run_pushButton</tabstop>
  </tabstops>
  <resources>
-  <include location="../aliza.qrc"/>
+  <include location="../alizams.qrc"/>
  </resources>
  <connections/>
 </ui>
