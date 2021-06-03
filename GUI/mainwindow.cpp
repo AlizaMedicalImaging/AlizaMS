@@ -28,7 +28,6 @@ MainWindow::MainWindow(
 	bool hide_zoom_)
 {
 	setupUi(this);
-	update_info_lines_bg();
 	setDocumentMode(false);
 	scale_icons = 1.0f;
 	adjust_scale_icons = 1.0f;
@@ -74,6 +73,7 @@ MainWindow::MainWindow(
 	imagesbox = new ImagesBox(scale_icons*adjust_scale_icons);
 	if (saved_style != QString("Dark Fusion"))
 	{
+		update_info_lines_bg();
 		imagesbox->update_background_color(false);
 	}
 	QVBoxLayout * l1 = new QVBoxLayout(imagesbox_frame1);
