@@ -57,6 +57,7 @@ public:
 	void uncheck_all();
 	void set_contours(const ImageVariant*);
 	int  get_selected_roi_id() const;
+	void update_background_color(bool);
 	QAction * actionNone;
 	QAction * actionClear;
 	QAction * actionClearChecked;

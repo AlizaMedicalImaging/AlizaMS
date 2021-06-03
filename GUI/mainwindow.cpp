@@ -28,12 +28,14 @@ MainWindow::MainWindow(
 	bool hide_zoom_)
 {
 	setupUi(this);
+	update_info_lines_bg();
 	setDocumentMode(false);
 	scale_icons = 1.0f;
 	adjust_scale_icons = 1.0f;
 	hide_gl3_frame_later = false;
 	saved_ok3d = false;
 	int dock_area = 2;
+	QString saved_style;
 	{
 		QSettings settings(
 			QSettings::IniFormat, QSettings::UserScope,
@@ -41,6 +43,10 @@ MainWindow::MainWindow(
 		settings.beginGroup(QString("GlobalSettings"));
 		adjust_scale_icons =
 			(float)settings.value(QString("scale_ui_icons"), 1.0).toDouble();
+		saved_style =
+			settings.value(
+				QString("stylename"),
+				QVariant(QString("Dark Fusion"))).toString();
 		settings.endGroup();
 		int width_ = 0, height_ = 0;
 		desktop_layout(&width_,&height_);
@@ -66,6 +72,10 @@ MainWindow::MainWindow(
 	imagesbox_frame1->setFrameShape(QFrame::NoFrame);
 	imagesbox_frame1->setFrameShadow(QFrame::Plain);
 	imagesbox = new ImagesBox(scale_icons*adjust_scale_icons);
+	if (saved_style != QString("Dark Fusion"))
+	{
+		imagesbox->update_background_color(false);
+	}
 	QVBoxLayout * l1 = new QVBoxLayout(imagesbox_frame1);
 	l1->setSpacing(0);
 	l1->setContentsMargins(0,0,0,0);
@@ -394,7 +404,7 @@ MainWindow::MainWindow(
 		gl_frame->show();
 		glwidget->show();
 		view3d_label->setText(QString(
-			"Physical space, intensity projection, OpenGL"));
+			"Physical space, intensity projection"));
 		slicesAct->setChecked(true);
 		raycastAct->setChecked(false);
 	}
@@ -670,12 +680,12 @@ void MainWindow::createActions()
 	transp2dAct->setEnabled(true);
 	view_group = new QActionGroup(this);
 	slicesAct = new QAction(QIcon(QString(":/bitmaps/align.svg")),
-		QString("Physical space, intensity projection, OpenGL"), this);
+		QString("Physical space, intensity projection"), this);
 	slicesAct->setCheckable(true);
 	slicesAct->setChecked(true);
 	view_group->addAction(slicesAct);
 	raycastAct = new QAction(QIcon(QString(":/bitmaps/ray.svg")),
-		QString("Intensity projection, OpenGL"), this);
+		QString("Intensity projection"), this);
 	raycastAct->setCheckable(true);
 	view_group->addAction(raycastAct);
 	frames2DAct = new QAction(QIcon(QString(":/bitmaps/cross.svg")),
@@ -696,7 +706,7 @@ void MainWindow::createActions()
 	trans3DAct->setCheckable(true);
 	trans3DAct->setChecked(true);
 	gloptionsAct = new QAction(QIcon(QString(":/bitmaps/tool.svg")),
-		QString("OpenGL options"), this);
+		QString("3D view options"), this);
 	reset3DAct = new QAction(QIcon(QString(":/bitmaps/reload.svg")),
 		QString("Reset 3D view"), this);
 	reset3DAct->setEnabled(true);
@@ -1391,7 +1401,7 @@ void MainWindow::set_view_3d(bool t)
 	if (!t) return;
 	if (!aliza) return;
 	if (!aliza->check_3d()) return;
-	view3d_label->setText(QString("Physical space, intensity projection, OpenGL"));
+	view3d_label->setText(QString("Physical space, intensity projection"));
 	frames3DAct->setVisible(true);
 	trans3DAct->setVisible(true);
 	toolbox->contours_checkBox->setEnabled(true);
@@ -1415,7 +1425,7 @@ void MainWindow::set_view_rc(bool t)
 {
 	if (!t) return;
 	if (!aliza->check_3d()) return;
-	view3d_label->setText(QString("Intensity projection, OpenGL"));
+	view3d_label->setText(QString("Intensity projection"));
 	frames3DAct->setVisible(false);
 	trans3DAct->setVisible(false);
 	toolbox->alpha_doubleSpinBox->show();
@@ -1852,6 +1862,11 @@ void MainWindow::change_style(const QString & s)
 	if (slider_y)         slider_y->set_style_sheet();
 	if (slider_x)         slider_x->set_style_sheet();
 	if (histogramview)    histogramview->update_bgcolor();
+	if (s == QString("Dark Fusion"))
+		imagesbox->update_background_color(true);
+	else
+		imagesbox->update_background_color(false);
+	update_info_lines_bg();
 }
 
 void MainWindow::set_no_gl3()
@@ -1927,3 +1942,16 @@ void MainWindow::set_image_view()
 	}
 }
 
+void MainWindow::update_info_lines_bg()
+{
+	const QColor c = qApp->palette().color(QPalette::Window);
+	const QString s =
+		QString("QLineEdit { background-color: rgb(") +
+		QVariant(c.red()).toString() + QString(", ") +
+		QVariant(c.green()).toString() + QString(", ") +
+		QVariant(c.blue()).toString() + QString("); }");
+	info_line->setStyleSheet(s);
+	info_lineZ->setStyleSheet(s);
+	info_lineY->setStyleSheet(s);
+	info_lineX->setStyleSheet(s);
+}

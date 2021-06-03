@@ -135,6 +135,7 @@ private:
 		const QString&,
 		QProgressDialog*,
 		bool/*lock*/);
+	void update_info_lines_bg();
 	//
 	QSize  mainwindow_size;
 	QPoint mainwindow_pos;

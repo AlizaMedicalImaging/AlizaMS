@@ -628,7 +628,7 @@ void ImagesBox::set_html(const ImageVariant * v)
 			else if (v->di->tex_info==2)  texinfo = QString(" GL_R8 ");
 			else                          texinfo = QString(" ? ");
 			html.append(
-				QString("<span class='y4'>3D OpenGL views:<br />") +
+				QString("<span class='y4'>3D texture:<br />") +
 				texinfo +
 				QVariant(v->di->dimx).toString()  + QString("x") +
 				QVariant(v->di->dimy).toString()  + QString("x") +
@@ -640,8 +640,8 @@ void ImagesBox::set_html(const ImageVariant * v)
 			if (v->image_type>=0 && v->image_type<10)
 			{
 				html.append(QString(
-					"<span class='y4'>3D OpenGL"
-					" views:</span><br />"
+					"<span class='y4'>3D texture"
+					":</span><br />"
 					"<span class='y7'>Texture "
 					"is disabled</span><br />"));
 			}
@@ -772,4 +772,16 @@ int ImagesBox::get_selected_roi_id() const
 		return i->get_id();
 	}
 	return -1;
+}
+
+void ImagesBox::update_background_color(bool b)
+{
+	if (b)
+	{
+		textBrowser->setStyleSheet("QTextEdit { background-color: rgb(83, 89, 96); }");
+	}
+	else
+	{
+		textBrowser->setStyleSheet("QTextEdit { background-color: rgb(210, 210, 210); }");
+	}
 }

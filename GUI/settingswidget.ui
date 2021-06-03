@@ -650,7 +650,7 @@
      </widget>
      <widget class="QWidget" name="tab3">
       <attribute name="title">
-       <string>OpenGL</string>
+       <string>3D</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_9">
        <property name="margin">
@@ -686,7 +686,7 @@
               <bool>false</bool>
              </property>
              <property name="text">
-              <string>Enable OpenGL modules (restart is required)</string>
+              <string>Enable 3D modules (restart is required)</string>
              </property>
              <property name="checked">
               <bool>true</bool>
@@ -702,7 +702,7 @@
               </sizepolicy>
              </property>
              <property name="title">
-              <string>OpenGL texture</string>
+              <string>3D texture</string>
              </property>
              <property name="checkable">
               <bool>true</bool>
