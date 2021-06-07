@@ -1240,7 +1240,7 @@ template<typename T> void load_image(
 	{
 		std::cout << "load_image<>() : widget->threadsLUT_.size()>0" << std::endl;
 	}
-	if (tmp99==0)
+	if (tmp99 == 0)
 	{
 		int j = 0;
 		for (int i = 0; i < num_threads; ++i)
@@ -1249,7 +1249,8 @@ template<typename T> void load_image(
 			const int size_1 = size[1]/num_threads;
 			const int index_0 = 0;
 			const int index_1 = i*size_1;
-			ProcessImageThreadLUT_<T> * t__ = new ProcessImageThreadLUT_<T>(image,
+			ProcessImageThreadLUT_<T> * t__ = new ProcessImageThreadLUT_<T>(
+						image,
 						p,
 						size_0,  size_1,
 						index_0, index_1, j,
@@ -1269,12 +1270,13 @@ template<typename T> void load_image(
 		const int incr = (int)floor(size[1]/(double)block);
 		if (size[1] > block)
 		{
-			for (int i=0; i<incr; ++i)
+			for (int i = 0; i < incr; ++i)
 			{
 				const int size_0 = size[0];
 				const int index_0 = 0;
 				const int index_1 = i*block;
-				ProcessImageThreadLUT_<T> * t__ = new ProcessImageThreadLUT_<T>(image,
+				ProcessImageThreadLUT_<T> * t__ = new ProcessImageThreadLUT_<T>(
+							image,
 							p,
 							size_0,  block,
 							index_0, index_1, j,
@@ -1284,18 +1286,20 @@ template<typename T> void load_image(
 				widget->threadsLUT_.push_back(static_cast<QThread*>(t__));
 				t__->start();
 			}
-			ProcessImageThreadLUT_<T> * lt__ = new ProcessImageThreadLUT_<T>(image,
+			ProcessImageThreadLUT_<T> * lt__ = new ProcessImageThreadLUT_<T>(
+						image,
 						p,
 						size[0],  tmp100,
 						0, incr*block, j,
-						ivariant->di->us_window_center, ivariant->di->us_window_width,
+						window_center, window_width,
 						lut, alt_mode,lut_function);
 			widget->threadsLUT_.push_back(static_cast<QThread*>(lt__));
 			lt__->start();
 		}
 		else
 		{
-			ProcessImageThreadLUT_<T> * lt__ = new ProcessImageThreadLUT_<T>(image,
+			ProcessImageThreadLUT_<T> * lt__ = new ProcessImageThreadLUT_<T>(
+						image,
 						p,
 						size[0],  size[1],
 						0, 0, 0,
@@ -1318,7 +1322,7 @@ template<typename T> void load_image(
 	while (true)
 	{
 		unsigned short b__ = 0;
-		for (int i=0; i < threadsLUT_size; ++i)
+		for (int i = 0; i < threadsLUT_size; ++i)
 		{
 			if (widget->threadsLUT_.at(i)->isFinished()) { ++b__; }
 		}
