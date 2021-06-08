@@ -35,6 +35,7 @@
 #  include "mdcmUNExplicitImplicitDataElement.h"
 #  include "mdcmVR16ExplicitDataElement.h"
 #endif
+#include <limits>
 
 namespace mdcm
 {
