@@ -233,7 +233,7 @@
       </sizepolicy>
      </property>
      <property name="toolTip">
-      <string>Not implemented</string>
+      <string/>
      </property>
      <property name="text">
       <string>Modify dates and time</string>
