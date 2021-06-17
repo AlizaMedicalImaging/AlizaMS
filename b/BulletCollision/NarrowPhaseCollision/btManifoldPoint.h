@@ -13,6 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
+// modified github.com/issakomi
+
 #ifndef BT_MANIFOLD_CONTACT_POINT_H
 #define BT_MANIFOLD_CONTACT_POINT_H
 
@@ -71,9 +73,9 @@ public:
 					const btVector3& normal,
 					btScalar distance) : m_localPointA(pointA),
 										 m_localPointB(pointB),
+										 m_positionWorldOnB(0,0,0),
+										 m_positionWorldOnA(0,0,0),
 										 m_normalWorldOnB(normal),
-                     m_positionWorldOnB(0,0,0),
-                     m_positionWorldOnA(0,0,0),
 										 m_distance1(distance),
 										 m_combinedFriction(btScalar(0.)),
 										 m_combinedRollingFriction(btScalar(0.)),
@@ -95,8 +97,8 @@ public:
 										 m_contactERP(0.f),
 										 m_frictionCFM(0.f),
 										 m_lifeTime(0),
-            m_lateralFrictionDir1(0,0,0),
-            m_lateralFrictionDir2(0,0,0)
+										 m_lateralFrictionDir1(0,0,0),
+										 m_lateralFrictionDir2(0,0,0)
 	{
 	}
 
