@@ -84,6 +84,7 @@ public slots:
 private slots:
 	void about();
 	void toggle_browser();
+	void toggle_settingswidget();
 	void toggle_showgl(bool);
 	void toggle_show2D(bool);
 	void toggle_graphicswidget_m_x(bool);
@@ -189,6 +190,7 @@ private:
 	QAction * openanyAct;
 	QAction * exitAct;
 	QAction * aboutAct;
+	QAction * settingsAct;
 	QActionGroup * axis_group;
 	QAction * show2DAct;
 	QAction * show3DAct;

@@ -452,6 +452,7 @@ MainWindow::MainWindow(
 	connect(openanyAct,                     SIGNAL(triggered()),         this,SLOT(load_any()));
 	connect(exitAct,                        SIGNAL(triggered()),         this,SLOT(close()));
 	connect(aboutAct,                       SIGNAL(triggered()),         this,SLOT(about()));
+	connect(settingsAct,                    SIGNAL(triggered()),         this,SLOT(toggle_settingswidget()));
 	connect(graphicsAct_Z,                  SIGNAL(toggled(bool)),       this,SLOT(toggle_graphicswidget_m_z(bool)));
 	connect(graphicsAct_Y,                  SIGNAL(toggled(bool)),       this,SLOT(toggle_graphicswidget_m_y(bool)));
 	connect(graphicsAct_X,                  SIGNAL(toggled(bool)),       this,SLOT(toggle_graphicswidget_m_x(bool)));
@@ -622,8 +623,10 @@ void MainWindow::createActions()
 	openAct       = new QAction(QIcon(QString(":/bitmaps/dcm.svg")),   QString("DICOM scanner"),this);
 	openanyAct    = new QAction(QIcon(QString(":/bitmaps/file.svg")),  QString("Open file"),    this);
 	exitAct       = new QAction(QIcon(QString(":/bitmaps/delete.svg")),QString("Exit"),         this);
-	aboutAct      = new QAction(QIcon(QString(":/bitmaps/info.svg")),  QString("About"),        this);
 	exitAct->setShortcuts(QKeySequence::Quit);
+	aboutAct      = new QAction(QIcon(QString(":/bitmaps/info.svg")),  QString("About"),        this);
+	settingsAct   = new QAction(QIcon(QString(":/bitmaps/tool.svg")),  QString("Settings"),     this);
+	settingsAct->setShortcuts(QKeySequence::Preferences);
 	axis_group = new QActionGroup(this);
 	graphicsAct_Z = new QAction(QIcon(QString(":/bitmaps/align.svg")),
 		QString("Slice view (Z)"), this);
@@ -758,6 +761,7 @@ void MainWindow::createMenus()
 	file_menu->addAction(openAct);
 	file_menu->addAction(openanyAct);
 	file_menu->addAction(aboutAct);
+	file_menu->addAction(settingsAct);
 	file_menu->addAction(exitAct);
 	//
 	views_menu = menuBar()->addMenu(QString("Views"));
@@ -981,6 +985,11 @@ void MainWindow::createToolBars()
 void MainWindow::toggle_browser()
 {
 	tabWidget->setCurrentIndex(1);
+}
+
+void MainWindow::toggle_settingswidget()
+{
+	tabWidget->setCurrentIndex(4);
 }
 
 void MainWindow::toggle_showgl(bool t)
