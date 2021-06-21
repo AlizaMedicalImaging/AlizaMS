@@ -31,6 +31,22 @@ SRWidget::SRWidget(float si)
 	readSettings();
 	connect(print_toolButton, SIGNAL(pressed()), this, SLOT(printSR()));
 	connect(save_toolButton,  SIGNAL(pressed()), this, SLOT(saveSR()));
+	print_sc = new QShortcut(QKeySequence::Print, this, SLOT(printSR()));
+	print_sc->setAutoRepeat(false);
+	save_sc = new QShortcut(QKeySequence::Save, this, SLOT(saveSR()));
+	save_sc->setAutoRepeat(false);
+	close_sc = new QShortcut(QKeySequence::Close, this, SLOT(close()));
+	close_sc->setAutoRepeat(false);
+	quit_sc = new QShortcut(QKeySequence::Quit, this, SLOT(close()));
+	quit_sc->setAutoRepeat(false);
+#ifdef __APPLE__
+	minimaze_sc = new QShortcut(QKeySequence("Ctrl+M"), this, SLOT(showMinimized()));
+	minimaze_sc->setAutoRepeat(false);
+	fullsceen_sc = new QShortcut(QKeySequence("Ctrl+Meta+F"),this,SLOT(showFullScreen()));
+	fullsceen_sc->setAutoRepeat(false);
+	normal_sc = new QShortcut(QKeySequence("Esc"),this,SLOT(showNormal()));
+	normal_sc->setAutoRepeat(false);
+#endif
 }
 
 SRWidget::~SRWidget()

@@ -5,6 +5,7 @@
 #include <QCloseEvent>
 #include <QStringList>
 #include <QPrinter>
+#include <QShortcut>
 
 class SRImage;
 
@@ -30,6 +31,15 @@ public slots:
 
 private:
 	QString tmpfile;
+	QShortcut * print_sc;
+	QShortcut * save_sc;
+	QShortcut * close_sc;
+	QShortcut * quit_sc;
+#ifdef __APPLE__
+	QShortcut * minimaze_sc;
+	QShortcut * fullsceen_sc;
+	QShortcut * normal_sc;
+#endif
 };
 
 #endif // SRWIDGET_H

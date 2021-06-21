@@ -141,9 +141,11 @@ private:
 	void update_info_lines_bg();
 	//
 	QShortcut * close_sc;
+#ifdef __APPLE__
 	QShortcut * minimaze_sc;
 	QShortcut * fullsceen_sc;
 	QShortcut * normal_sc;
+#endif
 	QSize  mainwindow_size;
 	QPoint mainwindow_pos;
 	float  scale_icons;

@@ -503,11 +503,11 @@ MainWindow::MainWindow(
 	connect(settingswidget->styleComboBox,  SIGNAL(currentIndexChanged(const QString&)),this,SLOT(set_style(const QString&)));
 #endif
 	//
+	close_sc = new QShortcut(QKeySequence::Close, this, SLOT(ask_close()));
+	close_sc->setAutoRepeat(false);
 #ifdef __APPLE__
 	minimaze_sc = new QShortcut(QKeySequence("Ctrl+M"), this, SLOT(showMinimized()));
 	minimaze_sc->setAutoRepeat(false);
-	close_sc = new QShortcut(QKeySequence("Ctrl+W"), this, SLOT(ask_close()));
-	close_sc->setAutoRepeat(false);
 	fullsceen_sc = new QShortcut(QKeySequence("Ctrl+Meta+F"), this, SLOT(showFullScreen()));
 	fullsceen_sc->setAutoRepeat(false);
 	normal_sc = new QShortcut(QKeySequence("Esc"), this, SLOT(showNormal()));
@@ -636,7 +636,9 @@ void MainWindow::createActions()
 	exitAct->setShortcuts(QKeySequence::Quit);
 	aboutAct      = new QAction(QIcon(QString(":/bitmaps/info.svg")),  QString("About"),        this);
 	settingsAct   = new QAction(QIcon(QString(":/bitmaps/tool.svg")),  QString("Settings"),     this);
+#ifdef __APPLE__
 	settingsAct->setShortcuts(QKeySequence::Preferences);
+#endif
 	axis_group = new QActionGroup(this);
 	graphicsAct_Z = new QAction(QIcon(QString(":/bitmaps/align.svg")),
 		QString("Slice view (Z)"), this);
@@ -1979,7 +1981,7 @@ void MainWindow::ask_close()
 {
 	QMessageBox::StandardButton r;
 	r = QMessageBox::question(NULL, QString("Close Application"), QString("Close application?"));
-	if (r == QMessageBox::Yes)
+	if (r == QMessageBox::Yes || r == QMessageBox::Ok)
 	{
 		this->close();
 	}
