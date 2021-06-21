@@ -29,8 +29,6 @@ MainWindow::MainWindow(
 {
 	setupUi(this);
 	setDocumentMode(false);
-	minimaze_sc = new QShortcut(QKeySequence("Ctrl+M"), this, SLOT(showMinimized()));
-	minimaze_sc->setAutoRepeat(false);
 	scale_icons = 1.0f;
 	adjust_scale_icons = 1.0f;
 	hide_gl3_frame_later = false;
@@ -505,6 +503,16 @@ MainWindow::MainWindow(
 	connect(settingswidget->styleComboBox,  SIGNAL(currentIndexChanged(const QString&)),this,SLOT(set_style(const QString&)));
 #endif
 	//
+#ifdef __APPLE__
+	minimaze_sc = new QShortcut(QKeySequence("Ctrl+M"), this, SLOT(showMinimized()));
+	minimaze_sc->setAutoRepeat(false);
+	close_sc = new QShortcut(QKeySequence("Ctrl+W"), this, SLOT(ask_close()));
+	close_sc->setAutoRepeat(false);
+	fullsceen_sc = new QShortcut(QKeySequence("Ctrl+Meta+F"), this, SLOT(showFullScreen()));
+	fullsceen_sc->setAutoRepeat(false);
+	normal_sc = new QShortcut(QKeySequence("Esc"), this, SLOT(showNormal()));
+	normal_sc->setAutoRepeat(false);
+#endif
 	setAcceptDrops(true);
 }
 
@@ -1965,4 +1973,14 @@ void MainWindow::update_info_lines_bg()
 	info_lineZ->setStyleSheet(s);
 	info_lineY->setStyleSheet(s);
 	info_lineX->setStyleSheet(s);
+}
+
+void MainWindow::ask_close()
+{
+	QMessageBox::StandardButton r;
+	r = QMessageBox::question(NULL, QString("Close Application"), QString("Close application?"));
+	if (r == QMessageBox::Yes)
+	{
+		this->close();
+	}
 }

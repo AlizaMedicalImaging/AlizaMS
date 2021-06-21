@@ -126,6 +126,7 @@ private slots:
 	void set_zlock(bool);
 	void set_zlock_one(bool);
 	void trigger_image_dicom_meta();
+	void ask_close();
 
 private:
 	void createActions();
@@ -139,7 +140,10 @@ private:
 		bool/*lock*/);
 	void update_info_lines_bg();
 	//
+	QShortcut * close_sc;
 	QShortcut * minimaze_sc;
+	QShortcut * fullsceen_sc;
+	QShortcut * normal_sc;
 	QSize  mainwindow_size;
 	QPoint mainwindow_pos;
 	float  scale_icons;
