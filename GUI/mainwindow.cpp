@@ -29,6 +29,8 @@ MainWindow::MainWindow(
 {
 	setupUi(this);
 	setDocumentMode(false);
+	minimaze_sc = new QShortcut(QKeySequence("Ctrl+M"), this, SLOT(showMinimized()));
+	minimaze_sc->setAutoRepeat(false);
 	scale_icons = 1.0f;
 	adjust_scale_icons = 1.0f;
 	hide_gl3_frame_later = false;

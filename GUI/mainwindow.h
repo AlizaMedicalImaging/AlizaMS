@@ -18,6 +18,7 @@
 #include <QGLFormat>
 #endif
 #include <QMainWindow>
+#include <QShortcut>
 #include <QDockWidget>
 #include <QStringList>
 #include <QMenuBar>
@@ -138,6 +139,7 @@ private:
 		bool/*lock*/);
 	void update_info_lines_bg();
 	//
+	QShortcut * minimaze_sc;
 	QSize  mainwindow_size;
 	QPoint mainwindow_pos;
 	float  scale_icons;
