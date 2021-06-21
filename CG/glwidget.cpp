@@ -469,6 +469,7 @@ void GLWidget::keyPressEvent(QKeyEvent * e)
 	bool update_ = false;
 	switch (e->key())
 	{
+	case Qt::Key_Equal:
 	case Qt::Key_Plus:
 		{
 			zoom_in();
