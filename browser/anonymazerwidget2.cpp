@@ -1602,25 +1602,18 @@ void AnonymazerWidget2::run_()
 	const mdcm::Global & g     = mdcm::GlobalInstance;
 	const mdcm::Dicts  & dicts = g.GetDicts();
 	//
+	const QString in_path = in_lineEdit->text();
 	const QString out_path = dir_lineEdit->text();
-	if (out_path.isEmpty())
+	if (in_path.isEmpty() || out_path.isEmpty())
 	{
 		run_pushButton->setEnabled(false);
-		dir_lineEdit->setText(QString(
-			"Select output directory"));
+		QMessageBox::information(
+			NULL,
+			QString("De-identify"),
+			QString("Select input and output directories"));
 		return;
 	}
-	const QString in_path = in_lineEdit->text();
-	if (in_path.isEmpty())
-	{
-		in_lineEdit->setText(QString(
-			"Select input directory"));
-		return;
-	}
-	else if (in_path == QString("Select input directory"))
-	{
-		return;
-	}
+	//
 	if (out_path == in_path)
 	{
 		QMessageBox mb;
@@ -1706,8 +1699,8 @@ void AnonymazerWidget2::run_()
 		mbox.setText(message);
 		mbox.exec();
 	}
-	dir_lineEdit->setText(QString("Select output directory"));
-	in_lineEdit->setText(QString("Select input directory"));
+	dir_lineEdit->setText(QString(""));
+	in_lineEdit->setText(QString(""));
 	run_pushButton->setEnabled(false);
 }
 
@@ -1722,7 +1715,7 @@ void AnonymazerWidget2::set_output_dir()
 		));
 	if (dirname.isEmpty())
 	{
-		dir_lineEdit->setText(QString("Select output directory"));
+		dir_lineEdit->setText(QString(""));
 		return;
 	}
 	output_dir = dirname;
@@ -1741,7 +1734,7 @@ void AnonymazerWidget2::set_input_dir()
 		));
 	if (dirname.isEmpty())
 	{
-		in_lineEdit->setText(QString("Select input directory"));
+		in_lineEdit->setText(QString(""));
 		return;
 	}
 	input_dir = dirname;

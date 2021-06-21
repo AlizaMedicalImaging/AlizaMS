@@ -13,6 +13,7 @@
 #include <QCloseEvent>
 #include <QIcon>
 #include <QSettings>
+#include <QShortcut>
 #include <set>
 #include "mdcmTag.h"
 #include "mdcmVL.h"
@@ -171,6 +172,7 @@ private:
 	QString ctk_to;
 	bool    ctk_apply_range;
 #endif
+	QShortcut * refresh_sc;
 };
 
 #endif // BROWSERWIDGET2___H

@@ -146,6 +146,8 @@ BrowserWidget2::BrowserWidget2(float si)
 #else
 	ctk_pushButton->hide();
 #endif
+	refresh_sc = new QShortcut(QKeySequence::Refresh, this, SLOT(reload_dir()));
+	refresh_sc->setAutoRepeat(false);
 }
 
 BrowserWidget2::~BrowserWidget2()

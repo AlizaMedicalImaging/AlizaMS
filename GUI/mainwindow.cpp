@@ -494,6 +494,7 @@ MainWindow::MainWindow(
 	connect(meta_open_scan_act,             SIGNAL(triggered()),         sqtree,  SLOT(open_file_and_series()));
 	connect(anon_open_in_dir,               SIGNAL(triggered()),         anonymizer,SLOT(set_input_dir()));
 	connect(anon_open_out_dir,              SIGNAL(triggered()),         anonymizer,SLOT(set_output_dir()));
+	connect(anon_run,                       SIGNAL(triggered()),         anonymizer,SLOT(run_()));
 	connect(tabWidget,                      SIGNAL(currentChanged(int)), this,    SLOT(tab_ind_changed(int)));
 	connect(imagesbox->actionDICOMMeta,     SIGNAL(triggered()),         this,    SLOT(trigger_image_dicom_meta()));
 	connect(aliza,                          SIGNAL(image_opened()),      this,    SLOT(set_image_view()));
@@ -505,6 +506,8 @@ MainWindow::MainWindow(
 	//
 	close_sc = new QShortcut(QKeySequence::Close, this, SLOT(ask_close()));
 	close_sc->setAutoRepeat(false);
+	open_sc = new QShortcut(QKeySequence::Open, this, SLOT(toggle_browser()));
+	open_sc->setAutoRepeat(false);
 #ifdef __APPLE__
 	minimaze_sc = new QShortcut(QKeySequence("Ctrl+M"), this, SLOT(showMinimized()));
 	minimaze_sc->setAutoRepeat(false);
@@ -765,6 +768,7 @@ void MainWindow::createActions()
 	meta_open_scan_act      = new QAction(QIcon(QString(":/bitmaps/align.svg")),QString("Open file and scan"), this);
 	anon_open_in_dir        = new QAction(QIcon(QString(":/bitmaps/folder.svg")),QString("Open input directory"), this);
 	anon_open_out_dir       = new QAction(QIcon(QString(":/bitmaps/folder.svg")),QString("Open output directory"), this);
+	anon_run                = new QAction(QIcon(QString(":/bitmaps/right0.svg")),QString("De-identify"), this);
 }
 
 void MainWindow::createMenus()
@@ -869,6 +873,7 @@ void MainWindow::createMenus()
 	deidentify_menu = menuBar()->addMenu(QString("De-identify"));
 	deidentify_menu->addAction(anon_open_in_dir);
 	deidentify_menu->addAction(anon_open_out_dir);
+	deidentify_menu->addAction(anon_run);
 	deidentify_menu->menuAction()->setVisible(false);
 	//
 	settings_menu = menuBar()->addMenu(QString("Settings"));
@@ -996,7 +1001,10 @@ void MainWindow::createToolBars()
 
 void MainWindow::toggle_browser()
 {
-	tabWidget->setCurrentIndex(1);
+	if (tabWidget->currentIndex() == 1)
+		browser2->open_dicom_dir();
+	else
+		tabWidget->setCurrentIndex(1);
 }
 
 void MainWindow::toggle_settingswidget()

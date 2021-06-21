@@ -141,6 +141,7 @@ private:
 	void update_info_lines_bg();
 	//
 	QShortcut * close_sc;
+	QShortcut * open_sc;
 #ifdef __APPLE__
 	QShortcut * minimaze_sc;
 	QShortcut * fullsceen_sc;
@@ -232,6 +233,7 @@ private:
 	QAction  * meta_open_scan_act;
 	QAction  * anon_open_in_dir;
 	QAction  * anon_open_out_dir;
+	QAction  * anon_run;
 	QVBoxLayout * frame2D_viewerZ_layout;
 	QVBoxLayout * frame2D_viewer_layout;
 	QVBoxLayout * histogram_frame_layout;
