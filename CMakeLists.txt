@@ -711,6 +711,8 @@ set(ALIZAMS_SRCS ${ALIZAMS_SRCS}
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/graphicsutils.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/graphicspathitem.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/graphicsview.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/studygraphicswidget.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/studygraphicsview.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/graphicswidget.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/histogramview.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/aboutwidget.cpp
@@ -718,6 +720,10 @@ set(ALIZAMS_SRCS ${ALIZAMS_SRCS}
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/findrefdialog.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/imageinfodialog.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/srwidget.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/tabledialog.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/matrixbutton.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/studyframewidget.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/studyviewwidget.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/browser/sqtree.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/browser/browserwidget2.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/browser/anonymazerwidget2.cpp
@@ -754,8 +760,14 @@ set(ALIZAMS_MOC_HRDS
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/sliderwidget.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/zrangewidget.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/lutwidget.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/tabledialog.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/matrixbutton.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/studyframewidget.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/studyviewwidget.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/graphicsview.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/graphicswidget.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/studygraphicsview.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/studygraphicswidget.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/histogramview.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/zoomwidget.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/aboutwidget.h
@@ -817,6 +829,9 @@ set(ALIZAMS_UIS
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/toolbox2D.ui
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/sliderwidget.ui
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/srwidget.ui
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/tabledialog.ui
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/studyframewidget.ui
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/studyviewwidget.ui
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/imageinfodialog.ui)
 
 if(NOT USE_MEDIASTORAGE_MODE)

@@ -24,6 +24,7 @@
 #include "browser/browserwidget2.h"
 #include "settingswidget.h"
 #include "graphicswidget.h"
+#include "studyviewwidget.h"
 #include "lutwidget.h"
 #include "histogramview.h"
 #include "sliderwidget.h"
@@ -69,6 +70,7 @@ public:
 	void set_histogramview(HistogramView*);
 	void set_lutwidget2(LUTWidget*);
 	void set_trans3D_action(QAction*);
+	void set_studyview(StudyViewWidget*);
 	void set_axis_actions(
 		QAction*,
 		QAction*,
@@ -117,6 +119,7 @@ public:
 	void toggle_collisions(bool);
 	void update_slice_from_animation(const ImageVariant*);
 	void load_dicom_file(int*,const QString&,QProgressDialog*,bool);
+	void remove_from_studyview(int);
 
 public slots:
 	void delete_image();
@@ -155,6 +158,10 @@ public slots:
 	void trigger_image_color();
 	void toggle_lock_window(bool);
 	void trigger_show_roi_info();
+	void trigger_studyview();
+	void trigger_studyview_checked();
+	void trigger_studyview_all();
+	void update_studyview_intersections();
 
 signals:
 	void report_load_to_mainwin();
@@ -178,6 +185,7 @@ private:
 	HistogramView  * histogramview;
 	AnimWidget     * anim3Dwidget;
 	AnimWidget     * anim2Dwidget;
+	StudyViewWidget * studyview;
 	QAction * graphicsAct_Z;
 	QAction * graphicsAct_Y;
 	QAction * graphicsAct_X;
@@ -227,7 +235,6 @@ private:
 		ImageVariant*,bool=false,bool=false,bool=false,bool=false);
 	void update_center(ImageVariant*);
 	void add_histogram(ImageVariant*,QProgressDialog*,bool=true);
-	void delete_image2(ImageVariant*);
 	void update_group_center(const ImageVariant*);
 	void update_group_width(const ImageVariant*);
 	void set_us_center(ImageVariant*,double);

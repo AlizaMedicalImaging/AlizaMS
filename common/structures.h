@@ -962,7 +962,6 @@ class ImageContainer
 public:
 	ImageContainer() :
 		axis(-1),
-		slice(-1),
 		image3D(NULL),
 		image2D(NULL),
 		selected_x_slice_ext(-1),
@@ -970,7 +969,9 @@ public:
 		selected_z_slice_ext(-1),
 		us_window_center_ext(0.0),
 		us_window_width_ext(1e-6),
-		selected_lut(0)
+		selected_lut_ext(0),
+		lut_function_ext(0),
+		level_locked_ext(true)
 	{}
 	~ImageContainer()
 	{
@@ -982,7 +983,6 @@ public:
 		image3D = NULL;
 	}
 	short            axis;
-	int              slice;
 	ImageVariant   * image3D;
 	ImageVariant2D * image2D;
 	int selected_x_slice_ext;
@@ -990,7 +990,9 @@ public:
 	int selected_z_slice_ext;
 	double us_window_center_ext;
 	double us_window_width_ext;
-	short selected_lut;
+	short selected_lut_ext;
+	short lut_function_ext;
+	bool  level_locked_ext;
 	QString orientation_20_20;
 };
 

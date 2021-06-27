@@ -178,6 +178,7 @@ private:
 	AnimWidget        * anim3Dwidget;
 	AnimWidget        * anim2Dwidget;
 	AboutWidget       * aboutwidget;
+	StudyViewWidget   * studyview;
 	bool first_image_loaded;
 	bool hide_zoom;
 	QDockWidget * dockWidget1;

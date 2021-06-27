@@ -334,6 +334,8 @@ MainWindow::MainWindow(
 	anchor_icon = QIcon(QString(":/bitmaps/anchor.svg"));
 	anchor2_icon = QIcon(QString(":/bitmaps/anchor2.svg"));
 	//
+	studyview = new StudyViewWidget(scale_icons*adjust_scale_icons);
+	//
 	createActions();
 	createMenus();
 	createToolBars();
@@ -359,6 +361,7 @@ MainWindow::MainWindow(
 	aliza->set_zrangewidget(zrangewidget);
 	aliza->set_lutwidget2(lutwidget2);
 	aliza->set_trans3D_action(trans3DAct);
+	aliza->set_studyview(studyview);
 	aliza->set_axis_actions(
 		graphicsAct_Z,
 		graphicsAct_Y,
@@ -604,6 +607,8 @@ void MainWindow::closeEvent(QCloseEvent * e)
 	aliza = NULL;
 	delete aboutwidget;
 	aboutwidget = NULL;
+	delete studyview;
+	studyview = NULL;
 	e->accept();
 #if QT_VERSION < QT_VERSION_CHECK(4,8,1)
 	qApp->quit();

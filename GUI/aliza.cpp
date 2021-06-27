@@ -17,6 +17,8 @@
 #include "dicomutils.h"
 #include "updateqtcommand.h"
 #include "histogramgen.h"
+#include "studyframewidget.h"
+#include "studygraphicswidget.h"
 #include "itkVersion.h"
 #include "itkImage.h"
 #include "itkIndex.h"
@@ -436,6 +438,183 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 #endif
 }
 
+static void check_slice_collisions(StudyViewWidget * w)
+{
+#if 0
+	const qint64 t0 = QDateTime::currentMSecsSinceEpoch();
+#endif
+	if (!w) return;
+	if (!g_collisionWorld) return;
+	for (int x = 0; x < w->widgets.size(); ++x)
+	{
+		if (w->widgets.at(x) && w->widgets.at(x)->graphicswidget)
+		{
+			w->widgets[x]->graphicswidget->graphicsview->clear_collision_paths();
+		}
+	}
+	for (int x = 0; x < w->widgets.size(); ++x)
+	{
+		if (w->widgets.at(x) && w->widgets.at(x)->graphicswidget)
+		{	
+			if (w->widgets.at(x)->graphicswidget->image_container.image3D)
+			{
+				const ImageVariant * v =
+					w->widgets.at(x)->graphicswidget->image_container.image3D;
+				if (v->frame_of_ref_uid.isEmpty()) continue;
+				const int z =
+					w->widgets.at(x)->graphicswidget->image_container.selected_z_slice_ext;
+				if ((int)v->di->image_slices.size() <= z) continue;
+////////////////////////////////////////////////////////////////////////////////////////////////
+				btAlignedObjectArray<btCollisionShape*> tmp_shapes;
+				btAlignedObjectArray<btCollisionObject*> tmp_objects;
+				tmp_shapes.resize(0);
+				tmp_objects.resize(0);
+				add_slice_collision_plane(
+					v,
+					2,
+					tmp_shapes,
+					tmp_objects);
+				for (int u = 0; u < w->widgets.size(); ++u)
+				{
+					if (!(w->widgets.at(u) && w->widgets.at(u)->graphicswidget))
+					{
+						continue;
+					}
+					const ImageVariant * v1 = w->widgets.at(u)->graphicswidget->image_container.image3D;
+					if (!v1) continue;
+					if (!(v->study_uid == v1->study_uid) && (v->frame_of_ref_uid == v1->frame_of_ref_uid))
+					{
+						continue;
+					}
+					const int z1 = w->widgets.at(u)->graphicswidget->image_container.selected_z_slice_ext;
+					if ((int)v1->di->image_slices.size() <= z1)
+					{
+						continue;
+					}
+					if (check_slices_parallel(v, z, v1, z1))
+					{
+						continue;
+					}
+					g_collisionWorld->performDiscreteCollisionDetection();
+					btAlignedObjectArray<btVector3> hits;
+					for (int q = 0; q < 4; ++q)
+					{
+						int k0 = 0, k1 = 1, k2 = 2, k3 = 3, k4 = 4, k5 = 5;
+						switch(q)
+						{
+						case 1:
+							k0 = 3;
+							k1 = 4;
+							k2 = 5;
+							k3 = 6;
+							k4 = 7;
+							k5 = 8;
+							break;
+						case 2:
+							k0 = 6;
+							k1 = 7;
+							k2 = 8;
+							k3 = 9;
+							k4 = 10;
+							k5 = 11;
+							break;
+						case 3:
+							k0 = 9;
+							k1 = 10;
+							k2 = 11;
+							k3 = 0;
+							k4 = 1;
+							k5 = 2;
+							break;
+						default:
+							break;
+						}
+						btVector3 from = btVector3(
+							v1->di->image_slices.at(z1)->fv[k0],
+							v1->di->image_slices.at(z1)->fv[k1],
+							v1->di->image_slices.at(z1)->fv[k2]);
+						btVector3 to = btVector3(
+							v1->di->image_slices.at(z1)->fv[k3],
+							v1->di->image_slices.at(z1)->fv[k4],
+							v1->di->image_slices.at(z1)->fv[k5]);
+						ClosestRayResultCallback1 rayResult(from,to);
+						g_collisionWorld->rayTest(from, to, rayResult);
+						if (rayResult.hasHit())
+						{
+							const btCollisionObject * o = rayResult.m_collisionObject;
+							if (o)
+							{
+								const int * usrP = static_cast<int*>(o->getUserPointer());
+								if (usrP && usrP[0] == v->id)
+								{
+									const btVector3 hit = rayResult.m_hitPointWorld;
+									ImageTypeUC::Pointer image = ImageTypeUC::New();
+									const bool image_ok =
+										ContourUtils::phys_space_from_slice(v,z,image);
+									if (image_ok)
+									{
+										itk::ContinuousIndex<float, 3> index;
+										ImageTypeUC::PointType point;
+										point[0] = hit.getX();
+										point[1] = hit.getY();
+										point[2] = hit.getZ();
+										image->TransformPhysicalPointToContinuousIndex(point,index);
+										hits.push_back(btVector3(index[0], index[1], z));
+									}
+								}
+							}
+						}
+					}
+					if (hits.size() == 2)
+					{
+						const int R = round(v1->di->R*255.0f);
+						const int G = round(v1->di->G*255.0f);
+						const int B = round(v1->di->B*255.0f);
+						QPen pen;
+						pen.setBrush(QBrush(QColor(R, G, B, 255)));
+						pen.setStyle(Qt::SolidLine);
+						pen.setWidth(0);
+						QPainterPath pp;
+						pp.moveTo(hits.at(0).getX(),hits.at(0).getY());
+						pp.lineTo(hits.at(1).getX(),hits.at(1).getY());
+						QGraphicsPathItem * g = new QGraphicsPathItem();
+						g->setPen(pen);
+						g->setPath(pp);
+						w->widgets[x]->graphicswidget->graphicsview->scene()->addItem(g);
+						w->widgets[x]->graphicswidget->graphicsview->collision_paths.push_back(g);
+					}
+				}
+				for (int j = 0; j < tmp_objects.size(); ++j)
+				{
+					btCollisionObject * k = tmp_objects[j];
+					if (k)
+					{
+						if(k->getUserPointer())
+						{
+							int * p = static_cast<int*>(k->getUserPointer());
+							delete [] p;
+						}
+						g_collisionWorld->removeCollisionObject(k);
+						delete k;
+					}
+				}
+				for (int j = 0; j < tmp_shapes.size(); ++j)
+				{
+					btCollisionShape * k =
+						static_cast<btCollisionShape *>(tmp_shapes[j]);
+					if (k) delete k;
+				}
+////////////////////////////////////////////////////////////////////////////////////////////////
+			}
+		}
+	}
+#if 0
+	const long long t1 = QDateTime::currentMSecsSinceEpoch();
+	const long long ts = t1 - t0;
+	std::cout << "ts=" << ts << " t0=" << t0 << " t1=" << t1 << std::endl;
+#endif
+}
+
 Aliza::Aliza()
 {
 	glwidget  = NULL;
@@ -777,6 +956,16 @@ void Aliza::clear_ram()
 	graphicswidget_y->clear_();
 	graphicswidget_x->clear_();
 	histogramview->clear__();
+	{
+		for (int x = 0; x < studyview->widgets.size(); ++x)
+		{
+			studyview->widgets[x]->graphicswidget->clear_();
+			if (studyview->widgets.at(x)->frame0->frameShape() != QFrame::StyledPanel)
+				studyview->widgets[x]->frame0->setFrameShape(QFrame::StyledPanel);
+		}
+		studyview->set_active_id(-1);
+		studyview->update_null();
+	}
 	imagesbox->listWidget->blockSignals(true);
 	disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
 	disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
@@ -818,13 +1007,14 @@ void Aliza::delete_image()
 	ivariant = get_selected_image();
 	if (!ivariant) goto quit__;
 	item__ = imagesbox->listWidget->selectedItems()[0];
+	imagesbox->listWidget->blockSignals(true);
+	disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
+	disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
 	graphicswidget_m->clear_();
 	graphicswidget_y->clear_();
 	graphicswidget_x->clear_();
 	histogramview->clear__();
-	imagesbox->listWidget->blockSignals(true);
-	disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
-	disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
+	remove_from_studyview(ivariant->id);
 	if (item__)
 	{
 		imagesbox->listWidget->removeItemWidget(item__);
@@ -856,42 +1046,6 @@ void Aliza::delete_checked_images()
 void Aliza::delete_unchecked_images()
 {
 	delete_checked_unchecked(false);
-}
-
-void Aliza::delete_image2(ImageVariant * v)
-{
-	QListWidgetItem * item__ = NULL;
-	if (!v) return;
-	imagesbox->listWidget->blockSignals(true);
-	disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
-	disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
-	for (int x = 0; x < imagesbox->listWidget->count(); ++x)
-	{
-		if (imagesbox->listWidget->item(x) &&
-			static_cast<ListWidgetItem2*>(imagesbox->listWidget->item(x))->get_id()==v->id)
-		{
-			item__ = imagesbox->listWidget->item(x);
-			break;
-		}
-	}
-	if (item__)
-	{
-		imagesbox->listWidget->removeItemWidget(item__);
-		delete item__;
-	}
-	imagesbox->listWidget->reset();
-	if (v)
-	{
-		scene3dimages.remove(v->id);
-		delete v;
-		v = NULL;
-	}
-	connect(imagesbox->listWidget, SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
-	connect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
-	imagesbox->listWidget->blockSignals(false);
-#ifdef ALIZA_PRINT_COUNT_GL_OBJ
-	std::cout << "Num VBOs " << GLWidget::get_count_vbos() << std::endl;
-#endif
 }
 
 ImageVariant * Aliza::get_image(int id)
@@ -1422,6 +1576,11 @@ void Aliza::set_trans3D_action(QAction * a)
 	trans3DAct = a;
 }
 
+void Aliza::set_studyview(StudyViewWidget * s)
+{
+	studyview = s;
+}
+
 void Aliza::set_axis_actions(
 	QAction * act_z,
 	QAction * act_y,
@@ -1652,8 +1811,8 @@ void Aliza::update_toolbox(const ImageVariant * v)
 
 void Aliza::connect_slots()
 {
-	connect(imagesbox->listWidget,           SIGNAL(itemSelectionChanged()),         this, SLOT(update_selection()));
-	connect(imagesbox->listWidget,           SIGNAL(itemChanged(QListWidgetItem*)),  this, SLOT(update_selection()));
+	connect(imagesbox->listWidget,           SIGNAL(itemSelectionChanged()),        this, SLOT(update_selection()));
+	connect(imagesbox->listWidget,           SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(update_selection()));
 	connect(imagesbox->actionClear,          SIGNAL(triggered()), this, SLOT(delete_image()));
 	connect(imagesbox->actionClearChecked,   SIGNAL(triggered()), this, SLOT(delete_checked_images()));
 	connect(imagesbox->actionClearUnChek,    SIGNAL(triggered()), this, SLOT(delete_unchecked_images()));
@@ -1663,10 +1822,15 @@ void Aliza::connect_slots()
 	connect(imagesbox->actionColor,          SIGNAL(triggered()), this, SLOT(trigger_image_color()));
 	connect(imagesbox->actionReloadHistogram,SIGNAL(triggered()), this, SLOT(trigger_reload_histogram()));
 	connect(imagesbox->actionROIInfo,        SIGNAL(triggered()), this, SLOT(trigger_show_roi_info()));
+	connect(imagesbox->actionStudy,          SIGNAL(triggered()), this, SLOT(trigger_studyview()));
+	connect(imagesbox->actionStudyChecked,   SIGNAL(triggered()), this, SLOT(trigger_studyview_checked()));
+	connect(imagesbox->actionStudyAll,       SIGNAL(triggered()), this, SLOT(trigger_studyview_all()));
+	//
 	connect(imagesbox->contours_tableWidget, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(update_visible_rois(QTableWidgetItem*)));
 	//
-	//
+#if 0
 	connect(imagesbox->actionTmp,            SIGNAL(triggered()), this, SLOT(trigger_tmp()));
+#endif
 	//
 	//
 	if (glwidget)
@@ -1684,8 +1848,9 @@ void Aliza::connect_slots()
 	connect(anim3Dwidget->remove_pushButton,  SIGNAL(clicked()),         this,             SLOT(remove_group()));
 	connect(anim2Dwidget->frametime_spinBox,  SIGNAL(valueChanged(int)), graphicswidget_m, SLOT(set_frametime_2D(int)));
 	connect(settingswidget->time_s__checkBox, SIGNAL(toggled(bool)),     graphicswidget_m, SLOT(set_frame_time_unit(bool)));
-	connect(graphicswidget_m->graphicsview, SIGNAL(bb_changed()), this, SLOT(calculate_bb()));
+	connect(graphicswidget_m->graphicsview,   SIGNAL(bb_changed()), this, SLOT(calculate_bb()));
 	connect(toolbox2D->resetlevel_pushButton, SIGNAL(clicked()), this, SLOT(reset_level()));
+	connect(studyview, SIGNAL(update_scouts_required()), this, SLOT(update_studyview_intersections()));
 	//
 	anim3D_timer->setSingleShot(true);
 	connect(anim3D_timer, SIGNAL(timeout()), this, SLOT(animate_()));
@@ -4244,6 +4409,93 @@ void Aliza::trigger_show_roi_info()
 	}
 	mutex0.unlock();
 	qApp->processEvents();
+}
+
+void Aliza::trigger_studyview()
+{
+	const bool lock = mutex0.tryLock();
+	if (!lock) return;
+	ImageVariant * v = get_selected_image();
+	if (!v)
+	{
+		mutex0.unlock();
+		return;
+	}
+	//
+	studyview->clear_();
+	studyview->show();
+	studyview->activateWindow();
+	studyview->raise();
+	qApp->processEvents();
+	//
+	QList<ImageVariant*> l;
+	l.push_back(v);
+	QMap<int, ImageVariant*>::iterator it = scene3dimages.begin();
+	while (it != scene3dimages.end())
+	{
+		ImageVariant * v1 = it.value();
+		if (v1 && (v1->id != v->id) && (v1->study_uid == v->study_uid))
+		{
+			l.push_back(v1);
+		}
+		++it;
+	}
+	const int n = l.size();
+	//
+	studyview->calculate_grid(n);
+	//
+	unsigned int x = 0;
+	for (int j = 0; j < n; ++j)
+	{
+		ImageVariant * v2 = l[j];
+		if (v2 && (x < studyview->widgets.size()))
+		{
+			studyview->widgets[x]->graphicswidget->clear_();
+			studyview->widgets[x]->graphicswidget->set_image(v2, 1, true);
+		}
+		++x;
+	}
+	//
+	update_studyview_intersections();
+	//
+	mutex0.unlock();
+	qApp->processEvents();
+}
+
+void Aliza::trigger_studyview_checked()
+{
+}
+
+void Aliza::trigger_studyview_all()
+{
+}
+
+void Aliza::update_studyview_intersections()
+{
+	if (studyview) check_slice_collisions(studyview);
+}
+
+void Aliza::remove_from_studyview(int id)
+{
+	for (int x = 0; x < studyview->widgets.size(); ++x)
+	{
+		if (studyview->widgets.at(x)->graphicswidget->image_container.image3D)
+		{
+			if (studyview->widgets.at(x)->graphicswidget->image_container.image3D->id ==
+				id)
+			{
+				studyview->widgets[x]->graphicswidget->clear_();
+				if (studyview->widgets.at(x)->frame0->frameShape() != QFrame::StyledPanel)
+					studyview->widgets[x]->frame0->setFrameShape(QFrame::StyledPanel);
+			}
+		}
+	}
+	if (studyview->get_active_id() == id)
+	{
+		studyview->set_active_id(-1);
+		studyview->update_null();
+	}
+	update_studyview_intersections();
 }
 
 #ifdef ALIZA_PRINT_COUNT_GL_OBJ

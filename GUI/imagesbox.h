@@ -72,6 +72,11 @@ public:
 	QAction * actionDICOMMeta;
 	QAction * actionContours;
 	QAction * actionROIInfo;
+	QMenu   * studyMenu;
+	QAction * actionStudyMenu;
+	QAction * actionStudy;
+	QAction * actionStudyChecked;
+	QAction * actionStudyAll;
 
 private slots:
 	void toggle_info(bool);

@@ -158,6 +158,11 @@ ImagesBox::ImagesBox(float si)
 	actionContours->setCheckable(true);
 	actionContours->setChecked(false);
 	actionROIInfo      = new QAction(QString("ROI Info"), this);
+	actionStudyMenu    = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Study View"),this);
+	actionStudy        = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open study"), this);
+	actionStudyChecked = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open checked"), this);
+	actionStudyAll     = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open all"), this);
+	//
 	actionTmp          = new QAction(QString("TMP"),this);
 	//
 	actionInfo         = new QAction(QIcon(QString(":/bitmaps/info2.svg")),QString("Toggle info window"),this);
@@ -188,6 +193,14 @@ ImagesBox::ImagesBox(float si)
 	l->setContentsMargins(0,0,0,0);
 	l->setSpacing(0);
 	l->addWidget(toolbar);
+	//
+	studyMenu = new QMenu(this);
+	studyMenu->addAction(actionStudy);
+	studyMenu->addAction(actionStudyChecked);
+	studyMenu->addAction(actionStudyAll);
+	actionStudyMenu->setMenu(studyMenu);
+	toolbar->addAction(actionStudyMenu);
+	//
 	toolbar->addAction(actionReloadHistogram);
 	toolbar->addAction(actionClear);
 	toolbar->addAction(actionClearAll);
