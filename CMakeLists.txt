@@ -720,7 +720,7 @@ set(ALIZAMS_SRCS ${ALIZAMS_SRCS}
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/findrefdialog.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/imageinfodialog.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/srwidget.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/tabledialog.cpp
+  #${CMAKE_CURRENT_SOURCE_DIR}/GUI/tabledialog.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/matrixbutton.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/studyframewidget.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/studyviewwidget.cpp
@@ -760,7 +760,7 @@ set(ALIZAMS_MOC_HRDS
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/sliderwidget.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/zrangewidget.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/lutwidget.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/tabledialog.h
+  #${CMAKE_CURRENT_SOURCE_DIR}/GUI/tabledialog.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/matrixbutton.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/studyframewidget.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/studyviewwidget.h
@@ -829,7 +829,7 @@ set(ALIZAMS_UIS
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/toolbox2D.ui
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/sliderwidget.ui
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/srwidget.ui
-  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/tabledialog.ui
+  #${CMAKE_CURRENT_SOURCE_DIR}/GUI/tabledialog.ui
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/studyframewidget.ui
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/studyviewwidget.ui
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/imageinfodialog.ui)

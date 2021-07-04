@@ -439,7 +439,7 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 #endif
 }
 
-static void check_slice_collisions(StudyViewWidget * w)
+static void check_slice_collisions2(StudyViewWidget * w)
 {
 #if 0
 	const qint64 t0 = QDateTime::currentMSecsSinceEpoch();
@@ -465,7 +465,6 @@ static void check_slice_collisions(StudyViewWidget * w)
 				const int z =
 					w->widgets.at(x)->graphicswidget->image_container.selected_z_slice_ext;
 				if ((int)v->di->image_slices.size() <= z) continue;
-////////////////////////////////////////////////////////////////////////////////////////////////
 				btAlignedObjectArray<btCollisionShape*> tmp_shapes;
 				btAlignedObjectArray<btCollisionObject*> tmp_objects;
 				tmp_shapes.resize(0);
@@ -607,7 +606,6 @@ static void check_slice_collisions(StudyViewWidget * w)
 						static_cast<btCollisionShape *>(tmp_shapes[j]);
 					if (k) delete k;
 				}
-////////////////////////////////////////////////////////////////////////////////////////////////
 			}
 		}
 	}
@@ -4416,6 +4414,7 @@ void Aliza::trigger_show_roi_info()
 
 void Aliza::trigger_studyview()
 {
+	if (!studyview) return;
 	const bool lock = mutex0.tryLock();
 	if (!lock) return;
 	ImageVariant * v = get_selected_image();
@@ -4459,7 +4458,7 @@ void Aliza::trigger_studyview()
 		++x;
 	}
 	//
-	update_studyview_intersections();
+	check_slice_collisions2(studyview);
 	//
 	mutex0.unlock();
 	qApp->processEvents();
@@ -4475,11 +4474,12 @@ void Aliza::trigger_studyview_all()
 
 void Aliza::update_studyview_intersections()
 {
-	if (studyview) check_slice_collisions(studyview);
+	check_slice_collisions2(studyview);
 }
 
 void Aliza::remove_from_studyview(int id)
 {
+	if (!studyview) return;
 	for (int x = 0; x < studyview->widgets.size(); ++x)
 	{
 		if (studyview->widgets.at(x)->graphicswidget->image_container.image3D)
@@ -4498,7 +4498,7 @@ void Aliza::remove_from_studyview(int id)
 		studyview->set_active_id(-1);
 		studyview->update_null();
 	}
-	update_studyview_intersections();
+	check_slice_collisions2(studyview);
 }
 
 #ifdef ALIZA_PRINT_COUNT_GL_OBJ

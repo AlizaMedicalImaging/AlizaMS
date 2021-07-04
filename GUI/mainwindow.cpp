@@ -1818,6 +1818,7 @@ void MainWindow::writeSettings()
 	browser2->writeSettings(settings);
 	anonymizer->writeSettings(settings);
 	settingswidget->writeSettings(settings);
+	studyview->writeSettings(settings);
 }
 
 void MainWindow::readSettings()

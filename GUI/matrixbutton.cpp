@@ -185,13 +185,17 @@ MatrixButton::MatrixButton(float si)
 	setToolButtonStyle(Qt::ToolButtonIconOnly);
 	setIcon(QIcon(":/bitmaps/grid.svg"));
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+#if MATRIX_BUTTON_CUSTOM_ACT == 1
 	p_action = new QAction(
 		QIcon(":/bitmaps/grid.svg"),
 		QString("Custom"),
 		this);
+#endif
 	p_menu = new QMenu(this);
+#if MATRIX_BUTTON_CUSTOM_ACT == 1
 	p_menu->addAction(p_action);
 	p_menu->addSeparator();
+#endif
 	p_menu->addAction(new DimsChooserAction(this));
 	setMenu(p_menu);
 	setPopupMode(InstantPopup);

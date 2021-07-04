@@ -5,6 +5,7 @@
 #include <QList>
 #include <QIcon>
 #include <QCloseEvent>
+#include <QSettings>
 
 class StudyFrameWidget;
 class StudyGraphicsWidget;
@@ -33,6 +34,7 @@ public:
 	void block_signals(bool);
 	void update_null();
 	void update_scouts();
+	void writeSettings(QSettings&);
 
 	QList<StudyFrameWidget *> widgets;
 
@@ -66,6 +68,7 @@ private:
 	void update_max_width(double);
 	void update_locked_center(double);
 	void update_locked_width(double);
+	void readSettings();
 
 	MatrixButton * mbutton;
 	LUTWidget * lutwidget;

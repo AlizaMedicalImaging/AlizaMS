@@ -1,20 +1,24 @@
-#include "tabledialog.h"
 #include "structures.h"
 #include "matrixbutton.h"
 #include "lutwidget.h"
 #include "studyframewidget.h"
 #include "studygraphicswidget.h"
 #include "studyviewwidget.h"
-#include "aliza.h"
 #include <QGridLayout>
 #include <QVariant>
-#if 1
+#if MATRIX_BUTTON_CUSTOM_ACT == 1
+#include "tabledialog.h"
+#endif
+#if 0
 #include <iostream>
 #endif
 
 StudyViewWidget::StudyViewWidget(float si)
 {
 	setupUi(this);
+	//
+	const int widgets_size = 25;
+	//
 	const QSize s1 = QSize((int)(18*si),(int)(18*si));
 	lockon = QIcon(QString(":/bitmaps/lock.svg"));
 	lockoff = QIcon(QString(":/bitmaps/unlock.svg"));
@@ -34,7 +38,7 @@ StudyViewWidget::StudyViewWidget(float si)
 	l2->setSpacing(0);
 	l2->addWidget(lutwidget);
 	QGridLayout * gridLayout = new QGridLayout(frame);
-	for (int x = 0; x < 64; ++x)
+	for (int x = 0; x < widgets_size; ++x)
 	{
 		StudyGraphicsWidget * w = new StudyGraphicsWidget();
 		StudyFrameWidget * f = new StudyFrameWidget(w);
@@ -50,9 +54,11 @@ StudyViewWidget::StudyViewWidget(float si)
 	connect(
 		mbutton, SIGNAL(matrix_selected(int, int)),
 		this, SLOT(update_grid(int, int)));
+#if MATRIX_BUTTON_CUSTOM_ACT == 1
 	connect(
 		mbutton->p_action, SIGNAL(triggered()),
 		this, SLOT(update_grid2()));
+#endif
 	connect_tools();
 }
 
@@ -122,6 +128,12 @@ void StudyViewWidget::calculate_grid(int x)
 	int c = 1;
 	switch(x)
 	{
+	case 1:
+		{
+			r = 1;
+			c = 1;
+		}
+		break;
 	case 2:
 		{
 			if (horizontal)
@@ -152,16 +164,8 @@ void StudyViewWidget::calculate_grid(int x)
 		break;
 	case 4:
 		{
-			if (horizontal)
-			{
-				r = 1;
-				c = 4;
-			}
-			else
-			{
-				r = 4;
-				c = 1;
-			}
+			r = 2;
+			c = 2;
 		}
 		break;
 	case 5:
@@ -195,6 +199,11 @@ void StudyViewWidget::calculate_grid(int x)
 		}
 		break;
 	case 9:
+		{
+			r = 3;
+			c = 3;
+		}
+		break;
 	case 10:
 		{
 			if (horizontal)
@@ -227,40 +236,39 @@ void StudyViewWidget::calculate_grid(int x)
 	case 13:
 	case 14:
 	case 15:
+	case 16:
+		{
+			r = 4;
+			c = 4;
+		}
+		break;
+	case 17:
+	case 18:
+	case 19:
+	case 20:
 		{
 			if (horizontal)
 			{
-				r = 3;
+				r = 4;
 				c = 5;
 			}
 			else
 			{
 				r = 5;
-				c = 3;
+				c = 4;
 			}
 		}
 		break;
-	case 16:
-	case 17:
-	case 18:
-		{
-			if (horizontal)
-			{
-				r = 3;
-				c = 6;
-			}
-			else
-			{
-				r = 6;
-				c = 3;
-			}
-		}
-		break;
-
-
-
-
+	case 21:
+	case 22:
+	case 23:
+	case 24:
+	case 25:
 	default:
+		{
+			r = 5;
+			c = 5;
+		}
 		break;
 	}
 	update_grid(r, c);
@@ -361,6 +369,7 @@ void StudyViewWidget::update_grid(int r, int c)
 
 void StudyViewWidget::update_grid2()
 {
+#if MATRIX_BUTTON_CUSTOM_ACT == 1
 	bool ok = false;
 	int r = 0, c = 0;
 	TableDialog * d = new TableDialog();
@@ -373,6 +382,7 @@ void StudyViewWidget::update_grid2()
 	delete d;
 	if (ok) update_grid(r, c);
 	qApp->processEvents();
+#endif
 }
 
 int StudyViewWidget::get_active_id() const
@@ -440,7 +450,7 @@ void StudyViewWidget::set_active_image(ImageContainer * c)
 void StudyViewWidget::update_full(ImageContainer * c)
 {
 	block_signals(true);
-	const ImageVariant * v = c->image3D; // can not be NULL
+	const ImageVariant * v = c->image3D; // checked NULL before
 	update_max_width(v->di->rmax-v->di->rmin);
 	update_window_upper(v->di->rmax);
 	update_window_lower(v->di->rmin);
@@ -821,3 +831,12 @@ void StudyViewWidget::update_scouts()
 {
 	emit update_scouts_required();
 }
+
+void StudyViewWidget::readSettings()
+{
+}
+
+void StudyViewWidget::writeSettings(QSettings & s)
+{
+}
+

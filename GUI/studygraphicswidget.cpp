@@ -2120,15 +2120,6 @@ void StudyGraphicsWidget::set_selected_slice(int x)
 		image_container.image2D->body_part  = image_container.image3D->anatomy.value(x).body_part;
 	}
 	//
-	if (studyview)
-	{
-		if (studyview->get_active_id() == image_container.image3D->id)
-		{
-			studyview->update_level(&image_container);
-		}
-		studyview->update_scouts();
-	}
-	//
 	update_image(0, false);
 	//
 //	if (alw_usregs) FIXME
@@ -2140,6 +2131,15 @@ void StudyGraphicsWidget::set_selected_slice(int x)
 	else
 	{
 		if (graphicsview->pr_area->isVisible()) graphicsview->pr_area->hide();
+	}
+	//
+	if (studyview)
+	{
+		if (studyview->get_active_id() == image_container.image3D->id)
+		{
+			studyview->update_level(&image_container);
+		}
+		studyview->update_scouts();
 	}
 quit__:
 	mutex.unlock();
