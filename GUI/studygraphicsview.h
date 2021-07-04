@@ -31,7 +31,6 @@ public:
 	QGraphicsPixmapItem * image_item;
 	QGraphicsPathItem   * measurment_line;
 	QGraphicsRectItem   * pr_area;
-	QGraphicsPathItem   * paint_brush;
 	QList<QGraphicsPathItem*>    collision_paths;
 	QList<QGraphicsPathItem*>    us_regions;
 	QList<QGraphicsTextItem*>    prtexts;
