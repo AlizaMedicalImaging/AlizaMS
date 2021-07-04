@@ -16,6 +16,9 @@
 #include <QMargins>
 #endif
 
+const int rsize = 5;
+const int csize = 5;
+
 class DimsChooser : public QFrame
 {
 public:
@@ -79,7 +82,7 @@ DimsChooser::DimsChooser(MatrixButton * b, QAction * a)
 
 QSize DimsChooser::sizeHint() const
 {
-	return QSize( m_plus_w + 8 * m_column_w, m_plus_h + 8 * m_row_h);
+	return QSize( m_plus_w + csize * m_column_w, m_plus_h + rsize * m_row_h);
 }
 
 void DimsChooser::mouseMoveEvent(QMouseEvent * e)
@@ -134,17 +137,17 @@ void DimsChooser::paintEvent(QPaintEvent * e)
 			(m_column + 1) * m_column_w,
 			(m_row    + 1) * m_row_h),
 		palette().brush(QPalette::Highlight));
-	for(int c = 0; c <= 8; ++c)
+	for(int c = 0; c <= csize; ++c)
 	{
 		painter.drawLine(
 			QPointF(c * m_column_w, 0.0),
-			QPointF(c * m_column_w, 8 * m_row_h));
+			QPointF(c * m_column_w, rsize * m_row_h));
 	}
-	for(int r = 0; r <= 8; ++r)
+	for(int r = 0; r <= rsize; ++r)
 	{
 		painter.drawLine(
-			QPointF(0.0,             r * m_row_h),
-			QPointF(8  * m_column_w, r * m_row_h));
+			QPointF(0.0, r * m_row_h),
+			QPointF(csize  * m_column_w, r * m_row_h));
 	}
 	QTextOption o(Qt::AlignCenter);
 	o.setUseDesignMetrics(true);

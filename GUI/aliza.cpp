@@ -482,7 +482,8 @@ static void check_slice_collisions(StudyViewWidget * w)
 					}
 					const ImageVariant * v1 = w->widgets.at(u)->graphicswidget->image_container.image3D;
 					if (!v1) continue;
-					if (!(v->study_uid == v1->study_uid) && (v->frame_of_ref_uid == v1->frame_of_ref_uid))
+					if (v->id == v1->id) continue;
+					if (!((v->study_uid == v1->study_uid) && (v->frame_of_ref_uid == v1->frame_of_ref_uid)))
 					{
 						continue;
 					}
