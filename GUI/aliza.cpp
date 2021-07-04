@@ -222,11 +222,11 @@ static bool check_slices_parallel(
 
 static void add_slice_collision_plane(
 	const ImageVariant * v,
+	const int z,
 	const int id,
 	btAlignedObjectArray<btCollisionShape*> & tmp_shapes,
 	btAlignedObjectArray<btCollisionObject*> & tmp_objects) 
 {
-	const int z = v->di->selected_z_slice;
 	if ((int)v->di->image_slices.size() <= z) return;
 	btTransform t;
 	t.setIdentity();
@@ -308,6 +308,7 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 	tmp_objects.resize(0);
 	add_slice_collision_plane(
 		v,
+		z,
 		2,
 		tmp_shapes,
 		tmp_objects);
@@ -471,6 +472,7 @@ static void check_slice_collisions(StudyViewWidget * w)
 				tmp_objects.resize(0);
 				add_slice_collision_plane(
 					v,
+					z,
 					2,
 					tmp_shapes,
 					tmp_objects);
