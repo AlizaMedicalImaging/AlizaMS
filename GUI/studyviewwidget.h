@@ -37,6 +37,8 @@ public:
 	void block_signals(bool);
 	void update_null();
 	void update_scouts();
+	void set_single(int);
+	void restore_multi(int);
 	void writeSettings(QSettings&);
 
 	QList<StudyFrameWidget *> widgets;
@@ -82,6 +84,8 @@ private:
 	QIcon lockoff;
 	bool horizontal;
 	int active_id;
+	int saved_r;
+	int saved_c;
 #ifdef __APPLE__
 	QShortcut * minimaze_sc;
 	QShortcut * fullsceen_sc;

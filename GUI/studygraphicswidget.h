@@ -72,6 +72,7 @@ public:
 
 private slots:
 	void set_selected_slice(int);
+	void toggle_single(bool);
 
 signals:
 	void slice_changed(int);

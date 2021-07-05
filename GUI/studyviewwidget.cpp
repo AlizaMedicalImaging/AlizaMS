@@ -11,7 +11,7 @@
 #if MATRIX_BUTTON_CUSTOM_ACT == 1
 #include "tabledialog.h"
 #endif
-#if 0
+#if 1
 #include <iostream>
 #endif
 
@@ -19,6 +19,9 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 {
 	setupUi(this);
 	horizontal = !vertical;
+	active_id = -1;
+	saved_r = -1;
+	saved_c = -1;
 	//
 	const int widgets_size = 25;
 	//
@@ -27,7 +30,6 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 	lockoff = QIcon(QString(":/bitmaps/unlock.svg"));
 	resetlevel_pushButton->setIconSize(s1);
 	lock_pushButton->setIconSize(s1);
-	active_id = -1;
 	mbutton = new MatrixButton(si);
 	fitall_toolButton = new QToolButton(this);
 	fitall_toolButton->setIconSize(s1);
@@ -902,6 +904,16 @@ void StudyViewWidget::update_scouts()
 	{
 		emit update_scouts_required();
 	}
+}
+
+void StudyViewWidget::set_single(int id)
+{
+std::cout << "set_single " << id << std::endl;
+}
+
+void StudyViewWidget::restore_multi(int id)
+{
+std::cout << "restore_multi " << id << std::endl;
 }
 
 void StudyViewWidget::readSettings()

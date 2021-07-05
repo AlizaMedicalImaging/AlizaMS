@@ -1403,6 +1403,7 @@ void StudyGraphicsWidget::clear_(bool lock)
 	}
 	if (icon_button)
 	{
+		disconnect(icon_button, SIGNAL(toggled(bool)), this, SLOT(toggle_single(bool)));
 		icon_button->setIcon(QPixmap());
 	}
 	graphicsview->clear_collision_paths();
@@ -1796,6 +1797,7 @@ void StudyGraphicsWidget::set_image(
 		QColor c((int)(v->di->R*255.0f),(int)(v->di->G*255.0f),(int)(v->di->B*255.0f));
 		pp.fill(c);
 		icon_button->setIcon(pp);
+		connect(icon_button, SIGNAL(toggled(bool)), this, SLOT(toggle_single(bool)));
 	}
 	//
 	update_image(fit, false);
@@ -2146,6 +2148,19 @@ void StudyGraphicsWidget::set_selected_slice(int x)
 	}
 quit__:
 	mutex.unlock();
+}
+
+void StudyGraphicsWidget::toggle_single(bool t)//TODO
+{
+	if (!studyview) return;
+	if (t)
+	{
+		studyview->set_single(-1);
+	}
+	else
+	{
+		studyview->restore_multi(-1);
+	}
 }
 
 void StudyGraphicsWidget::set_active()
