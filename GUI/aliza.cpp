@@ -4057,7 +4057,7 @@ void Aliza::delete_checked_unchecked(bool t)
 {
 	QList<QListWidgetItem *> items;
 	QList<int> image_ids;
-	bool lock = mutex0.tryLock();
+	const bool lock = mutex0.tryLock();
 	if (!lock) return;
 	const bool ok3d = check_3d();
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -4470,7 +4470,6 @@ void Aliza::trigger_studyview()
 	const int n = l.size();
 	//
 	studyview->calculate_grid(n);
-	//
 	unsigned int x = 0;
 	for (int j = 0; j < n; ++j)
 	{
@@ -4491,6 +4490,62 @@ void Aliza::trigger_studyview()
 
 void Aliza::trigger_studyview_checked()
 {
+	const bool lock = mutex0.tryLock();
+	if (!lock) return;
+	//
+	studyview->clear_();
+	studyview->show();
+	studyview->activateWindow();
+	studyview->raise();
+	qApp->processEvents();
+	//
+	QList<ImageVariant*> l;
+	ImageVariant * v = get_selected_image();
+	if (v) l.push_back(v);
+	//
+	QList<const QListWidgetItem*> items;
+	for (int x = 0; x < imagesbox->listWidget->count(); ++x)
+	{
+		const QListWidgetItem * j = imagesbox->listWidget->item(x);
+		if (j)
+		{
+			if (Qt::Checked == j->checkState()) items.push_back(j);
+		}
+	}
+	for (int x = 0; x < items.size(); ++x)
+	{
+		const ListWidgetItem2 * i = static_cast<const ListWidgetItem2*>(items.at(x));
+		ImageVariant * v1 = get_image(i->get_id());
+		if (v1)
+		{
+			if (v && (v1->id == v->id))
+			{
+			}
+			else
+			{
+				l.push_back(v1);
+			}
+		}
+	}
+	const int n = l.size();
+	//
+	studyview->calculate_grid(n);
+	unsigned int x = 0;
+	for (int j = 0; j < n; ++j)
+	{
+		ImageVariant * v1 = l[j];
+		if (v1 && (x < studyview->widgets.size()))
+		{
+			studyview->widgets[x]->graphicswidget->clear_();
+			studyview->widgets[x]->graphicswidget->set_image(v1, 1, true);
+		}
+		++x;
+	}
+	//
+	check_slice_collisions2(studyview);
+	//
+	mutex0.unlock();
+	qApp->processEvents();
 }
 
 void Aliza::trigger_studyview_all()

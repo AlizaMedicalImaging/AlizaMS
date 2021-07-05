@@ -15,9 +15,10 @@
 #include <iostream>
 #endif
 
-StudyViewWidget::StudyViewWidget(float si)
+StudyViewWidget::StudyViewWidget(float si, bool vertical)
 {
 	setupUi(this);
+	horizontal = !vertical;
 	//
 	const int widgets_size = 25;
 	//
@@ -40,7 +41,6 @@ StudyViewWidget::StudyViewWidget(float si)
 	scouts_toolButton->setToolTip(QString("Show intersections"));
 	QWidget * spacer1 = new QWidget(this);
 	spacer1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	horizontal = true;
 	QHBoxLayout * l1 = new QHBoxLayout(toolbar_frame);
 	l1->setContentsMargins(0,0,0,0);
 	l1->setSpacing(4);
@@ -91,6 +91,7 @@ StudyViewWidget::StudyViewWidget(float si)
 	normal_sc = new QShortcut(QKeySequence("Esc"),this,SLOT(showNormal()));
 	normal_sc->setAutoRepeat(false);
 #endif
+	readSettings();
 }
 
 StudyViewWidget::~StudyViewWidget()
@@ -155,6 +156,7 @@ void StudyViewWidget::set_horizontal(bool h)
 
 void StudyViewWidget::calculate_grid(int x)
 {
+	const bool h = this->width() > this->height();
 	int r = 1;
 	int c = 1;
 	switch(x)
@@ -167,7 +169,7 @@ void StudyViewWidget::calculate_grid(int x)
 		break;
 	case 2:
 		{
-			if (horizontal)
+			if (h)
 			{
 				r = 1;
 				c = 2;
@@ -181,7 +183,7 @@ void StudyViewWidget::calculate_grid(int x)
 		break;
 	case 3:
 		{
-			if (horizontal)
+			if (h)
 			{
 				r = 1;
 				c = 3;
@@ -202,7 +204,7 @@ void StudyViewWidget::calculate_grid(int x)
 	case 5:
 	case 6:
 		{
-			if (horizontal)
+			if (h)
 			{
 				r = 2;
 				c = 3;
@@ -217,7 +219,7 @@ void StudyViewWidget::calculate_grid(int x)
 	case 7:
 	case 8:
 		{
-			if (horizontal)
+			if (h)
 			{
 				r = 2;
 				c = 4;
@@ -237,7 +239,7 @@ void StudyViewWidget::calculate_grid(int x)
 		break;
 	case 10:
 		{
-			if (horizontal)
+			if (h)
 			{
 				r = 2;
 				c = 5;
@@ -252,7 +254,7 @@ void StudyViewWidget::calculate_grid(int x)
 	case 11:
 	case 12:
 		{
-			if (horizontal)
+			if (h)
 			{
 				r = 3;
 				c = 4;
@@ -278,7 +280,7 @@ void StudyViewWidget::calculate_grid(int x)
 	case 19:
 	case 20:
 		{
-			if (horizontal)
+			if (h)
 			{
 				r = 4;
 				c = 5;
@@ -904,8 +906,25 @@ void StudyViewWidget::update_scouts()
 
 void StudyViewWidget::readSettings()
 {
+	const int w = horizontal ? 1000 : 700;
+	const int h = horizontal ? 700  : 1000;
+	QSettings settings(
+		QSettings::IniFormat, QSettings::UserScope,
+		QApplication::organizationName(), QApplication::applicationName());
+	settings.setFallbacksEnabled(false);
+	settings.beginGroup(QString("StudyViewWidget"));
+	resize(settings.value(QString("size"), QSize(w, h)).toSize());
+	move(settings.value(QString("pos"), QPoint(50, 50)).toPoint());
+	settings.endGroup();
 }
 
-void StudyViewWidget::writeSettings(QSettings & s)
+void StudyViewWidget::writeSettings(QSettings & settings)
 {
+	settings.beginGroup(QString("StudyViewWidget"));
+	if (!isMaximized())
+	{
+		settings.setValue(QString("size"), QVariant(this->size()));
+		settings.setValue(QString("pos"), QVariant(this->pos()));
+	}
+	settings.endGroup();
 }

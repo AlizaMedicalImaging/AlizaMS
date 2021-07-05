@@ -21,7 +21,7 @@ class StudyViewWidget : public QWidget, public Ui::StudyViewWidget
 Q_OBJECT
 
 public:
-	StudyViewWidget(float);
+	StudyViewWidget(float, bool);
 	~StudyViewWidget();
 	void clear_();
 	void set_horizontal(bool);

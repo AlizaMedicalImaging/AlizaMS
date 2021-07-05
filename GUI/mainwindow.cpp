@@ -334,7 +334,7 @@ MainWindow::MainWindow(
 	anchor_icon = QIcon(QString(":/bitmaps/anchor.svg"));
 	anchor2_icon = QIcon(QString(":/bitmaps/anchor2.svg"));
 	//
-	studyview = new StudyViewWidget(scale_icons*adjust_scale_icons);
+	studyview = new StudyViewWidget(scale_icons*adjust_scale_icons, (sheight > swidth));
 	//
 	createActions();
 	createMenus();

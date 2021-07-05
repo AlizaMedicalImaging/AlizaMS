@@ -160,7 +160,7 @@ ImagesBox::ImagesBox(float si)
 	actionROIInfo      = new QAction(QString("ROI Info"), this);
 	actionStudyMenu    = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Study View"),this);
 	actionStudy        = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open study"), this);
-	actionStudyChecked = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open checked"), this);
+	actionStudyChecked = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open sel. and checked"), this);
 	actionStudyAll     = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open all"), this);
 	//
 	actionTmp          = new QAction(QString("TMP"),this);
@@ -197,7 +197,9 @@ ImagesBox::ImagesBox(float si)
 	studyMenu = new QMenu(this);
 	studyMenu->addAction(actionStudy);
 	studyMenu->addAction(actionStudyChecked);
+#if 0
 	studyMenu->addAction(actionStudyAll);
+#endif
 	actionStudyMenu->setMenu(studyMenu);
 	toolbar->addAction(actionStudyMenu);
 	//
