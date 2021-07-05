@@ -1038,7 +1038,7 @@ StudyGraphicsWidget::StudyGraphicsWidget()
 	slider = NULL;
 	top_label = NULL;
 	left_label = NULL;
-	icon_label = NULL;
+	icon_button = NULL;
 	smooth_ = true;
 	mouse_modus = 0;
 	enable_shutter = true;
@@ -1101,9 +1101,9 @@ void StudyGraphicsWidget::set_left_label(QLabel * l)
 	left_label = l;
 }
 
-void StudyGraphicsWidget::set_icon_label(QLabel * l)
+void StudyGraphicsWidget::set_icon_button(QToolButton * b)
 {
-	icon_label = l;
+	icon_button = b;
 }
 
 void StudyGraphicsWidget::set_top_string(const QString & s)
@@ -1174,12 +1174,12 @@ void StudyGraphicsWidget::reset_level()
 
 void StudyGraphicsWidget::update_image_color(int r, int g, int b)
 {
-	if (icon_label)
+	if (icon_button)
 	{
-		QPixmap pp(16, 16);
+		QPixmap pp(14, 14);
 		QColor c(r, g, b);
 		pp.fill(c);
-		icon_label->setPixmap(pp);
+		icon_button->setIcon(pp);
 	}
 }
 
@@ -1401,9 +1401,9 @@ void StudyGraphicsWidget::clear_(bool lock)
 	{
 		left_label->setText(QString(""));
 	}
-	if (icon_label)
+	if (icon_button)
 	{
-		icon_label->setPixmap(QPixmap());
+		icon_button->setIcon(QPixmap());
 	}
 	graphicsview->clear_collision_paths();
 	graphicsview->pr_area->hide();
@@ -1543,7 +1543,7 @@ void StudyGraphicsWidget::clear_(bool lock)
 void StudyGraphicsWidget::set_image(
 	ImageVariant * v,
 	const short fit,
-	const bool alw_usregs)
+	const bool /* always draw US regions */)
 {
 	if (graphicsview->image_item)
 	{
@@ -1790,17 +1790,17 @@ void StudyGraphicsWidget::set_image(
 		slider->setValue(x);
 		connect(slider, SIGNAL(valueChanged(int)), this, SLOT(set_selected_slice(int)));
 	}
-	if (icon_label)
+	if (icon_button)
 	{
-		QPixmap pp(16, 16);
+		QPixmap pp(14, 14);
 		QColor c((int)(v->di->R*255.0f),(int)(v->di->G*255.0f),(int)(v->di->B*255.0f));
 		pp.fill(c);
-		icon_label->setPixmap(pp);
+		icon_button->setIcon(pp);
 	}
 	//
 	update_image(fit, false);
 	//
-	if (alw_usregs) graphicsview->draw_us_regions();
+	graphicsview->draw_us_regions();
 	if (!v->pr_display_areas.empty())
 	{
 		update_pr_area();
@@ -2126,8 +2126,7 @@ void StudyGraphicsWidget::set_selected_slice(int x)
 	//
 	update_image(0, false);
 	//
-//	if (alw_usregs) FIXME
-		graphicsview->draw_us_regions();
+	graphicsview->draw_us_regions();
 	if (!image_container.image3D->pr_display_areas.empty())
 	{
 		update_pr_area();

@@ -5,6 +5,7 @@
 #include "studygraphicsview.h"
 #include <QWidget>
 #include <QLabel>
+#include <QToolButton>
 #include <QSlider>
 #include <QList>
 #include <QVector>
@@ -34,7 +35,7 @@ public:
 	void set_slider(QSlider*);
 	void set_top_label(QLabel*);
 	void set_left_label(QLabel*);
-	void set_icon_label(QLabel*);
+	void set_icon_button(QToolButton*);
 	void set_top_string(const QString&);
 	void set_left_string(const QString&);
 	void set_center(double);
@@ -84,7 +85,7 @@ private:
 	QSlider * slider;
 	QLabel  * top_label;
 	QLabel  * left_label;
-	QLabel  * icon_label;
+	QToolButton * icon_button;
 	bool   smooth_;
 	short  mouse_modus;
 	bool   enable_shutter;

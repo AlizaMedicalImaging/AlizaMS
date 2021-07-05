@@ -131,24 +131,18 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="icon_label">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
+          <widget class="QToolButton" name="icon_button">
            <property name="text">
             <string/>
            </property>
-           <property name="textFormat">
-            <enum>Qt::PlainText</enum>
+           <property name="iconSize">
+            <size>
+             <width>14</width>
+             <height>14</height>
+            </size>
            </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-           <property name="textInteractionFlags">
-            <set>Qt::NoTextInteraction</set>
+           <property name="checkable">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -170,6 +164,10 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>icon_button</tabstop>
+  <tabstop>slider</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
