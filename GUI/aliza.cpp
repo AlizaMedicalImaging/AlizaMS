@@ -4022,6 +4022,31 @@ void Aliza::trigger_image_color()
 		{
 			if (l.at(0)) l[0]->setIcon(v->icon);
 		}
+		if (studyview)
+		{
+			const bool scouts = studyview->get_scouts();
+			for (int x = 0; x < studyview->widgets.size(); ++x)
+			{
+				if (studyview->widgets.at(x) && studyview->widgets.at(x)->graphicswidget)
+				{
+					if (studyview->widgets.at(x)->graphicswidget->image_container.image3D)
+					{
+						if (studyview->widgets.at(x)->graphicswidget->image_container.image3D->id == v->id)
+						{
+							studyview->widgets[x]->graphicswidget->update_image_color(
+								new_color.red(),
+								new_color.green(),
+								new_color.blue());
+						}
+					}
+					if (scouts)
+					{
+						studyview->widgets[x]->graphicswidget->graphicsview->clear_collision_paths();
+					}
+				}
+			}
+			if (scouts) check_slice_collisions2(studyview);
+		}
 	}
 quit__:
 	if (ok3d) glwidget->set_skip_draw(false);

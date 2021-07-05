@@ -341,24 +341,7 @@ void StudyGraphicsView::clear_shutters()
 
 void StudyGraphicsView::mousePressEvent(QMouseEvent * e)
 {
-	if (e->button()==Qt::RightButton)
-	{
-		parent->set_active();
-/* TODO
-		if (parent->slider_m)
-		{
-			int tmp0;
-			if (Qt::ControlModifier==QApplication::keyboardModifiers())
-				tmp0 = parent->slider_m->slices_slider->value() - 1;
-			else
-				tmp0 = parent->slider_m->slices_slider->value() + 1;
-			if (tmp0 < 0) tmp0=parent->slider_m->slices_slider->maximum();
-			if (tmp0 > parent->slider_m->slices_slider->maximum()) tmp0=0;
-			parent->slider_m->set_slice(tmp0);
-		}
-*/
-	}
-	else if (e->button()==Qt::LeftButton)
+	if (e->button()==Qt::LeftButton)
 	{
 		parent->set_active();
 		switch(parent->get_mouse_modus())
@@ -378,6 +361,9 @@ void StudyGraphicsView::mousePressEvent(QMouseEvent * e)
 			QGraphicsView::mousePressEvent(e);
 			break;
 		}
+	}
+	else if (e->button()==Qt::RightButton)
+	{
 	}
 	else
 	{
@@ -423,28 +409,7 @@ void StudyGraphicsView::mouseReleaseEvent(QMouseEvent * e)
 void StudyGraphicsView::mouseMoveEvent(QMouseEvent * e)
 {
 	const short mm = parent->get_mouse_modus();
-	if (e->buttons() & Qt::RightButton)
-	{
-		const QPoint p0 = e->pos();
-		set_win_old_position(new_win_pos_x, new_win_pos_y);
-		set_win_new_position(p0.x(), p0.y());
-/* TODO
-		if (parent->slider_m)
-		{
-			const int tmp0 = old_win_pos_x-new_win_pos_x;
-			int tmp1;
-			if (tmp0 > 0)
-				tmp1 = parent->slider_m->slices_slider->value() - 1;
-			else
-				tmp1 = parent->slider_m->slices_slider->value() + 1;
-			if (tmp1 < 0) tmp1=0;
-			if (tmp1 > parent->slider_m->slices_slider->maximum())
-				tmp1=parent->slider_m->slices_slider->maximum();
-			parent->slider_m->set_slice(tmp1);
-		}
-*/
-	}
-	else if (e->buttons() & Qt::LeftButton)
+	if (e->buttons() & Qt::LeftButton)
 	{
 		switch(mm)
 		{
@@ -465,6 +430,12 @@ void StudyGraphicsView::mouseMoveEvent(QMouseEvent * e)
 			QGraphicsView::mouseMoveEvent(e);
 			break;
 		}
+	}
+	else if (e->buttons() & Qt::RightButton)
+	{
+		const QPoint p0 = e->pos();
+		set_win_old_position(new_win_pos_x, new_win_pos_y);
+		set_win_new_position(p0.x(), p0.y());
 	}
 	else
 	{

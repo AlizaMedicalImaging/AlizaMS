@@ -28,6 +28,7 @@ public:
 	void calculate_grid(int);
 	int  get_active_id() const;
 	void set_active_id(int);
+	bool get_scouts() const;
 	void set_active_image(ImageContainer*);
 	void update_full(ImageContainer*);
 	void update_level(ImageContainer*);

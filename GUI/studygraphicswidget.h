@@ -43,7 +43,7 @@ public:
 	void set_lut_function(short);
 	void set_locked_window(bool);
 	void reset_level();
-	void update_image_color(int, int, int, int);
+	void update_image_color(int, int, int);
 	void set_image(
 		ImageVariant*,
 		const short/*fit*/,

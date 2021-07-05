@@ -426,12 +426,16 @@ void StudyViewWidget::set_active_id(int x)
 	active_id = x;
 }
 
+bool StudyViewWidget::get_scouts() const
+{
+	return scouts_toolButton->isChecked();
+}
+
 void StudyViewWidget::set_active_image(ImageContainer * c)
 {
 	if (!(c && c->image3D))
 	{
 		active_id = -1;
-		level_frame->setEnabled(false);
 		for (int i = 0; i < widgets.size(); ++i)
 		{
 			if (widgets.at(i))
@@ -799,6 +803,20 @@ void StudyViewWidget::all_to_original()
 
 void StudyViewWidget::toggle_scouts(bool t)
 {
+	if (t)
+	{
+		emit update_scouts_required();
+	}
+	else
+	{
+		for (int i = 0; i < widgets.size(); ++i)
+		{
+			if (widgets.at(i) &&widgets.at(i)->graphicswidget)
+			{
+				widgets[i]->graphicswidget->graphicsview->clear_collision_paths();;
+			}
+		}
+	}
 }
 
 ////////////////////
@@ -861,6 +879,7 @@ void StudyViewWidget::update_locked_width(double x)
 void StudyViewWidget::update_null()
 {
 	block_signals(true);
+	level_frame->setEnabled(false);
 	center_horizontalSlider->setValue(0);
 	width_horizontalSlider->setValue(1);
 	update_max_width(1);
@@ -877,7 +896,10 @@ void StudyViewWidget::update_null()
 
 void StudyViewWidget::update_scouts()
 {
-	emit update_scouts_required();
+	if (scouts_toolButton->isChecked())
+	{
+		emit update_scouts_required();
+	}
 }
 
 void StudyViewWidget::readSettings()

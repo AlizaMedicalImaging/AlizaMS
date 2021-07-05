@@ -121,10 +121,10 @@ template<typename T> void load_rgb_image2(
 		else                       coeff_size_0 = spacing[0]/spacing[1];
 	}
 	const double xratio =
-		(double)widget->graphicsview->width()  / (double)(size[0]*coeff_size_0);
+		(double)widget->graphicsview->width() / (double)(size[0]*coeff_size_0);
 	const double yratio =
 		(double)widget->graphicsview->height() / (double)(size[1]*coeff_size_1);
-	if (fit==1)
+	if (fit == 1)
 	{
 		scale__ = qMin(xratio, yratio);
 		widget->graphicsview->m_scale = scale__;
@@ -178,7 +178,7 @@ template<typename T> void load_rgb_image2(
 		const double vmin = ivariant->di->vmin;
 		const double vmax = ivariant->di->vmax;
 		const double vrange = vmax - vmin;
-		if (vrange!=0)
+		if (vrange != 0)
 		{
 			try
 			{
@@ -208,8 +208,7 @@ template<typename T> void load_rgb_image2(
 	QImage tmpi(p__,size[0],size[1],3*size[0],QImage::Format_RGB888);
 #endif
 	//
-	if (widget->get_enable_overlays())
-		GraphicsUtils::draw_overlays(ivariant, tmpi);
+	if (widget->get_enable_overlays()) GraphicsUtils::draw_overlays(ivariant, tmpi);
 	//
 	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(tmpi));
 	//
@@ -222,7 +221,7 @@ template<typename T> void load_rgb_image2(
 		&flip_x, &flip_y);
 	//
 	QTransform t = QTransform();
-	if (spacing[1]!=spacing[0]) t = t.scale(coeff_size_0, coeff_size_1);
+	if (spacing[1] != spacing[0]) t = t.scale(coeff_size_0, coeff_size_1);
 	t = t.scale(scale__, scale__);
 	if (flip_y && flip_x) t = t.scale(-1.0,-1.0);
 	else if (flip_y)      t = t.scale( 1.0,-1.0);
@@ -231,7 +230,7 @@ template<typename T> void load_rgb_image2(
 	if (global_flip_x) { t = t.scale(-1.0, 1.0); }
 	if (global_flip_y) { t = t.scale( 1.0,-1.0); }
 	//
-	const QRectF rectf(0,0,size[0],size[1]);
+	const QRectF rectf(0, 0, size[0], size[1]);
 	widget->graphicsview->scene()->setSceneRect(rectf);
 	//
 	widget->graphicsview->draw_shutter(ivariant);
@@ -295,16 +294,16 @@ template<typename T> void load_rgba_image2(
 	bool flip_x = false, flip_y = false;
 	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
 	double scale__;
-	if (spacing[0]!=spacing[1])
+	if (spacing[0] != spacing[1])
 	{
-		if (spacing[1]>spacing[0]) coeff_size_1 = spacing[1]/spacing[0];
-		else                       coeff_size_0 = spacing[0]/spacing[1];
+		if (spacing[1] > spacing[0]) coeff_size_1 = spacing[1]/spacing[0];
+		else                         coeff_size_0 = spacing[0]/spacing[1];
 	}
 	const double xratio =
 		(double)widget->graphicsview->width()  / (double)(size[0]*coeff_size_0);
 	const double yratio =
 		(double)widget->graphicsview->height() / (double)(size[1]*coeff_size_1);
-	if (fit==1)
+	if (fit == 1)
 	{
 		scale__ = qMin(xratio, yratio);
 		widget->graphicsview->m_scale = scale__;
@@ -439,7 +438,7 @@ template<typename T> void load_rgba_image2(
 		const double vmin = ivariant->di->vmin;
 		const double vmax = ivariant->di->vmax;
 		const double vrange = vmax - vmin;
-		if (!(vrange!=0)) return;
+		if (!(vrange != 0)) return;
 		try { p__ = new unsigned char[size[0]*size[1]*3]; }
 		catch(std::bad_alloc&) { p__ = NULL; }
 		if (!p__) return;
@@ -487,7 +486,7 @@ template<typename T> void load_rgba_image2(
 		&flip_x, &flip_y);
 	//
 	QTransform t = QTransform();
-	if (spacing[1]!=spacing[0]) t = t.scale(coeff_size_0, coeff_size_1);
+	if (spacing[1] != spacing[0]) t = t.scale(coeff_size_0, coeff_size_1);
 	t = t.scale(scale__, scale__);
 	if (flip_y && flip_x) t = t.scale(-1.0,-1.0);
 	else if (flip_y)      t = t.scale( 1.0,-1.0);
@@ -496,7 +495,7 @@ template<typename T> void load_rgba_image2(
 	if (global_flip_x) { t = t.scale(-1.0, 1.0); }
 	if (global_flip_y) { t = t.scale( 1.0,-1.0); }
 	//
-	const QRectF rectf(0,0,size[0],size[1]);
+	const QRectF rectf(0, 0, size[0], size[1]);
 	widget->graphicsview->scene()->setSceneRect(rectf);
 	//
 	widget->graphicsview->draw_shutter(ivariant);
@@ -579,7 +578,7 @@ template<typename T> void load_rgb_char_image2(
 		else                         coeff_size_0 = spacing[0]/spacing[1];
 	}
 	const double xratio =
-		(double)widget->graphicsview->width()  / (double)(size[0]*coeff_size_0);
+		(double)widget->graphicsview->width() / (double)(size[0]*coeff_size_0);
 	const double yratio =
 		(double)widget->graphicsview->height() / (double)(size[1]*coeff_size_1);
 	if (fit == 1)
@@ -672,16 +671,16 @@ template<typename T> void load_rgba_char_image2(
 	const bool global_flip_x = widget->graphicsview->global_flip_x;
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
 	//
-	if (spacing[0]!=spacing[1])
+	if (spacing[0] != spacing[1])
 	{
-		if (spacing[1]>spacing[0]) coeff_size_1 = spacing[1]/spacing[0];
-		else                       coeff_size_0 = spacing[0]/spacing[1];
+		if (spacing[1] > spacing[0]) coeff_size_1 = spacing[1]/spacing[0];
+		else                         coeff_size_0 = spacing[0]/spacing[1];
 	}
 	const double xratio =
-		(double)widget->graphicsview->width()  / (double)(size[0]*coeff_size_0);
+		(double)widget->graphicsview->width() / (double)(size[0]*coeff_size_0);
 	const double yratio =
 		(double)widget->graphicsview->height() / (double)(size[1]*coeff_size_1);
-	if (fit==1)
+	if (fit == 1)
 	{
 		scale__ = qMin(xratio, yratio);
 		widget->graphicsview->m_scale = scale__;
@@ -758,7 +757,7 @@ template<typename T> void load_rgba_char_image2(
 		&flip_x, &flip_y);
 	//
 	QTransform t = QTransform();
-	if (spacing[1]!=spacing[0]) t = t.scale(coeff_size_0, coeff_size_1);
+	if (spacing[1] != spacing[0]) t = t.scale(coeff_size_0, coeff_size_1);
 	t = t.scale(scale__, scale__);
 	if (flip_y && flip_x) t = t.scale(-1.0,-1.0);
 	else if (flip_y)      t = t.scale( 1.0,-1.0);
@@ -767,7 +766,7 @@ template<typename T> void load_rgba_char_image2(
 	if (global_flip_x) { t = t.scale(-1.0, 1.0); }
 	if (global_flip_y) { t = t.scale( 1.0,-1.0); }
 	//
-	const QRectF rectf(0,0,size[0],size[1]);
+	const QRectF rectf(0, 0, size[0], size[1]);
 	widget->graphicsview->scene()->setSceneRect(rectf);
 	//
 	widget->graphicsview->draw_shutter(ivariant);
@@ -942,7 +941,7 @@ template<typename T> void load_image2(
 	widget->threadsLUT_.clear();
 	//
 	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
-	const QRectF rectf(0,0,size[0],size[1]);
+	const QRectF rectf(0, 0, size[0], size[1]);
 	double scale__;
 	if (spacing[0] != spacing[1])
 	{
@@ -984,7 +983,7 @@ template<typename T> void load_image2(
 	//
 	const double xratio = (double)widget->graphicsview->width()  / (double)(size[0]*coeff_size_0);
 	const double yratio = (double)widget->graphicsview->height() / (double)(size[1]*coeff_size_1);
-	if (fit==1)
+	if (fit == 1)
 	{
 		scale__ = qMin(xratio, yratio);
 		widget->graphicsview->m_scale = scale__;
@@ -993,7 +992,7 @@ template<typename T> void load_image2(
 	//
 	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(tmpi));
 	QTransform t = QTransform();
-	if (spacing[1]!=spacing[0]) t = t.scale(coeff_size_0, coeff_size_1);
+	if (spacing[1] != spacing[0]) t = t.scale(coeff_size_0, coeff_size_1);
 	t = t.scale(scale__, scale__);
 	//
 	const bool hide_orientation = ivariant->di->hide_orientation;
@@ -1052,7 +1051,7 @@ StudyGraphicsWidget::StudyGraphicsWidget()
 	l->addWidget(graphicsview);
 	l->setSpacing(0);
 	l->setContentsMargins(0,0,0,0);
-	setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);
+	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 
 StudyGraphicsWidget::~StudyGraphicsWidget()
@@ -1173,9 +1172,15 @@ void StudyGraphicsWidget::reset_level()
 	mutex.unlock();
 }
 
-void StudyGraphicsWidget::update_image_color(int id, int r, int g, int b)
+void StudyGraphicsWidget::update_image_color(int r, int g, int b)
 {
-	// TODO
+	if (icon_label)
+	{
+		QPixmap pp(16, 16);
+		QColor c(r, g, b);
+		pp.fill(c);
+		icon_label->setPixmap(pp);
+	}
 }
 
 void StudyGraphicsWidget::closeEvent(QCloseEvent * e)
@@ -1374,8 +1379,7 @@ void StudyGraphicsWidget::clear_(bool lock)
 	if (graphicsview->image_item)
 	{
 #ifdef DELETE_STUDYGRAPHICSIMAGEITEM
-		if (graphicsview->scene())
-			graphicsview->scene()->removeItem(graphicsview->image_item);
+		if (graphicsview->scene()) graphicsview->scene()->removeItem(graphicsview->image_item);
 		delete graphicsview->image_item;
 		graphicsview->image_item = NULL;
 #else
