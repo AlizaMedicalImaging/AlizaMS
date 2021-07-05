@@ -4,8 +4,10 @@
 #include "ui_studyviewwidget.h"
 #include <QList>
 #include <QIcon>
+#include <QToolButton>
 #include <QCloseEvent>
 #include <QSettings>
+#include <QShortcut>
 
 class StudyFrameWidget;
 class StudyGraphicsWidget;
@@ -54,6 +56,7 @@ private slots:
 	void reset_level();
 	void all_to_fit();
 	void all_to_original();
+	void toggle_scouts(bool);
 
 signals:
 	void update_scouts_required();
@@ -71,11 +74,18 @@ private:
 	void readSettings();
 
 	MatrixButton * mbutton;
+	QToolButton * fitall_toolButton;
+	QToolButton * scouts_toolButton;
 	LUTWidget * lutwidget;
 	QIcon lockon;
 	QIcon lockoff;
 	bool horizontal;
 	int active_id;
+#ifdef __APPLE__
+	QShortcut * minimaze_sc;
+	QShortcut * fullsceen_sc;
+	QShortcut * normal_sc;
+#endif
 };
 
 #endif // STUDYVIEWWIDGET__H

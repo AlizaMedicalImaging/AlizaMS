@@ -4,6 +4,8 @@
 #include "studyframewidget.h"
 #include "studygraphicswidget.h"
 #include "studyviewwidget.h"
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QGridLayout>
 #include <QVariant>
 #if MATRIX_BUTTON_CUSTOM_ACT == 1
@@ -26,11 +28,26 @@ StudyViewWidget::StudyViewWidget(float si)
 	lock_pushButton->setIconSize(s1);
 	active_id = -1;
 	mbutton = new MatrixButton(si);
+	fitall_toolButton = new QToolButton(this);
+	fitall_toolButton->setIconSize(s1);
+	fitall_toolButton->setIcon(QIcon(QString(":/bitmaps/f2.svg")));
+	fitall_toolButton->setToolTip(QString("Fit to view"));
+	scouts_toolButton = new QToolButton(this);
+	scouts_toolButton->setCheckable(true);
+	scouts_toolButton->setChecked(true);
+	scouts_toolButton->setIconSize(s1);
+	scouts_toolButton->setIcon(QIcon(QString(":/bitmaps/collisions.svg")));
+	scouts_toolButton->setToolTip(QString("Show intersections"));
+	QWidget * spacer1 = new QWidget(this);
+	spacer1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	horizontal = true;
-	QVBoxLayout * l1 = new QVBoxLayout(toolbar_frame);
+	QHBoxLayout * l1 = new QHBoxLayout(toolbar_frame);
 	l1->setContentsMargins(0,0,0,0);
-	l1->setSpacing(0);
+	l1->setSpacing(4);
 	l1->addWidget(mbutton);
+	l1->addWidget(fitall_toolButton);
+	l1->addWidget(scouts_toolButton);
+	l1->addWidget(spacer1);
 	lutwidget  = new LUTWidget(si);
 	lutwidget->add_items1();
 	QVBoxLayout * l2 = new QVBoxLayout(lut_frame);
@@ -54,12 +71,26 @@ StudyViewWidget::StudyViewWidget(float si)
 	connect(
 		mbutton, SIGNAL(matrix_selected(int, int)),
 		this, SLOT(update_grid(int, int)));
+	connect(
+		fitall_toolButton, SIGNAL(clicked()),
+		this, SLOT(all_to_fit()));
+	connect(
+		scouts_toolButton, SIGNAL(toggled(bool)),
+		this, SLOT(toggle_scouts(bool)));
 #if MATRIX_BUTTON_CUSTOM_ACT == 1
 	connect(
 		mbutton->p_action, SIGNAL(triggered()),
 		this, SLOT(update_grid2()));
 #endif
 	connect_tools();
+#ifdef __APPLE__
+	minimaze_sc = new QShortcut(QKeySequence("Ctrl+M"), this, SLOT(showMinimized()));
+	minimaze_sc->setAutoRepeat(false);
+	fullsceen_sc = new QShortcut(QKeySequence("Ctrl+Meta+F"),this,SLOT(showFullScreen()));
+	fullsceen_sc->setAutoRepeat(false);
+	normal_sc = new QShortcut(QKeySequence("Esc"),this,SLOT(showNormal()));
+	normal_sc->setAutoRepeat(false);
+#endif
 }
 
 StudyViewWidget::~StudyViewWidget()
@@ -747,9 +778,26 @@ void StudyViewWidget::reset_level()
 
 void StudyViewWidget::all_to_fit()
 {
+	for (int i = 0; i < widgets.size(); ++i)
+	{
+		if (widgets.at(i))
+		{
+			if (widgets.at(i)->graphicswidget)
+			{
+				if (widgets.at(i)->graphicswidget->image_container.image3D)
+				{
+					widgets[i]->graphicswidget->update_image(1, true);
+				}
+			}
+		}
+	}
 }
 
 void StudyViewWidget::all_to_original()
+{
+}
+
+void StudyViewWidget::toggle_scouts(bool t)
 {
 }
 
@@ -839,4 +887,3 @@ void StudyViewWidget::readSettings()
 void StudyViewWidget::writeSettings(QSettings & s)
 {
 }
-

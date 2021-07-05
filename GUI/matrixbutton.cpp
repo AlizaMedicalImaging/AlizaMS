@@ -183,7 +183,8 @@ MatrixButton::MatrixButton(float si)
 	setFocusPolicy(Qt::NoFocus);
 	setIconSize(QSize((int)(si*18),(int)(si*18)));
 	setToolButtonStyle(Qt::ToolButtonIconOnly);
-	setIcon(QIcon(":/bitmaps/grid.svg"));
+	setIcon(QIcon(QString(":/bitmaps/grid.svg")));
+	setToolTip(QString("Layout"));
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 #if MATRIX_BUTTON_CUSTOM_ACT == 1
 	p_action = new QAction(
