@@ -4445,6 +4445,7 @@ void Aliza::trigger_studyview()
 	ImageVariant * v = get_selected_image();
 	if (!v)
 	{
+		QMessageBox::information(NULL, QString("Information"), QString("Select image"));
 		mutex0.unlock();
 		return;
 	}
@@ -4493,12 +4494,6 @@ void Aliza::trigger_studyview_checked()
 	const bool lock = mutex0.tryLock();
 	if (!lock) return;
 	//
-	studyview->clear_();
-	studyview->show();
-	studyview->activateWindow();
-	studyview->raise();
-	qApp->processEvents();
-	//
 	QList<ImageVariant*> l;
 	ImageVariant * v = get_selected_image();
 	if (v) l.push_back(v);
@@ -4528,15 +4523,26 @@ void Aliza::trigger_studyview_checked()
 		}
 	}
 	const int n = l.size();
+	if (n == 0)
+	{
+		QMessageBox::information(NULL, QString("Information"), QString("Nothing selected"));
+		mutex0.unlock();
+		return;
+	}
 	//
+	studyview->clear_();
+	studyview->show();
+	studyview->activateWindow();
+	studyview->raise();
+	qApp->processEvents();
 	studyview->calculate_grid(n);
+	qApp->processEvents();
 	unsigned int x = 0;
 	for (int j = 0; j < n; ++j)
 	{
 		ImageVariant * v1 = l[j];
 		if (v1 && (x < studyview->widgets.size()))
 		{
-			studyview->widgets[x]->graphicswidget->clear_();
 			studyview->widgets[x]->graphicswidget->set_image(v1, 1, true);
 		}
 		++x;

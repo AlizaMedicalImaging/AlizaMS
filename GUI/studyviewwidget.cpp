@@ -116,15 +116,21 @@ StudyViewWidget::~StudyViewWidget()
 void StudyViewWidget::clear_()
 {
 	active_id = -1;
+	update_null();
 	for (int i = 0; i < widgets.size(); ++i)
 	{
 		if (widgets.at(i))
 		{
+			if (widgets.at(i)->graphicswidget)
+			{
+				widgets[i]->graphicswidget->clear_();
+			}
 			if (widgets.at(i)->frame0->frameShape() != QFrame::StyledPanel)
+			{
 				widgets[i]->frame0->setFrameShape(QFrame::StyledPanel);
+			}
 		}
 	}
-	update_null();
     QGridLayout * layout = static_cast<QGridLayout*>(frame->layout());
 	if (!layout) return;
 	const int r = layout->rowCount();
@@ -140,8 +146,6 @@ void StudyViewWidget::clear_()
 				if (w)
 				{
 					layout->removeWidget(w);
-					StudyFrameWidget * f = static_cast<StudyFrameWidget*>(w);
-					f->graphicswidget->clear_();
 					w->hide();
 				}
 			}
