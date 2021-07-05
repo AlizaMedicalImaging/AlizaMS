@@ -906,14 +906,96 @@ void StudyViewWidget::update_scouts()
 	}
 }
 
-void StudyViewWidget::set_single(int id)
+void StudyViewWidget::set_single(const unsigned long long widget_id)
 {
-std::cout << "set_single " << id << std::endl;
+    QGridLayout * layout = static_cast<QGridLayout*>(frame->layout());
+	if (!layout)
+	{
+		// should never happen
+		saved_r = -1;
+		saved_c = -1;
+		active_id = -1;
+		update_null();
+		return;
+	}
+	saved_r = layout->rowCount();
+	saved_c = layout->columnCount();
+	StudyFrameWidget * selected = NULL;
+	for (int x = 0; x < saved_r; ++x)
+	{
+		for (int y = 0; y < saved_c; ++y)
+		{
+			QLayoutItem * li = layout->itemAtPosition(x, y);
+			if (li)
+			{
+				QWidget * w = li->widget();
+				if (w)
+				{
+					layout->removeWidget(w);
+					StudyFrameWidget * f = static_cast<StudyFrameWidget*>(w);
+					if (f->graphicswidget && f->graphicswidget->widget_id == widget_id)
+					{
+						selected = f;
+					}
+					else
+					{
+						// should not happen
+						if (f->icon_button->isChecked())
+						{
+							f->icon_button->blockSignals(true);
+							f->icon_button->setChecked(false);
+							f->icon_button->blockSignals(false);
+						}
+					}
+					if (f->frame0->frameShape() != QFrame::StyledPanel)
+					{
+						f->frame0->setFrameShape(QFrame::StyledPanel);
+					}
+					w->hide();
+				}
+			}
+		}
+	}
+	delete layout;
+	layout = NULL;
+	active_id = -1;
+	qApp->processEvents();
+	if (selected)
+	{
+		QGridLayout * gridLayout = new QGridLayout(frame);
+		gridLayout->addWidget(selected, 1, 1);
+		selected->show();
+		if (selected->graphicswidget)
+		{
+			selected->graphicswidget->show();
+			set_active_image(&(selected->graphicswidget->image_container));
+			selected->graphicswidget->update_image(1, true);
+		}
+		else
+		{
+			// should not happen
+			update_null();
+		}
+	}
+	else
+	{
+		// should not happen
+		update_null();
+	}
+	qApp->processEvents();
+#if 0
+	std::cout << "set_single: widget_id=" << widget_id << std::endl;
+#endif
 }
 
-void StudyViewWidget::restore_multi(int id)
+void StudyViewWidget::restore_multi(const unsigned long long widget_id)
 {
-std::cout << "restore_multi " << id << std::endl;
+// TODO
+	saved_r = -1;
+	saved_c = -1;
+#if 0
+	std::cout << "restore_multi: widget_id=" << widget_id << std::endl;
+#endif
 }
 
 void StudyViewWidget::readSettings()

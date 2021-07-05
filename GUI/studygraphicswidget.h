@@ -69,6 +69,7 @@ public:
 	void  set_active();
 	std::vector<ProcessImageThread_*> threads_;
 	std::vector<QThread*> threadsLUT_;
+	unsigned long long widget_id;
 
 private slots:
 	void set_selected_slice(int);

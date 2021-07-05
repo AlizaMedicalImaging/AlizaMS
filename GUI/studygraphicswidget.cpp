@@ -1032,8 +1032,11 @@ template<typename T> void load_image2(
 #endif
 }
 
+static unsigned long long StudyGraphicsWidget_id = 0;
+
 StudyGraphicsWidget::StudyGraphicsWidget()
 {
+	widget_id = ++StudyGraphicsWidget_id;
 	studyview = NULL;
 	slider = NULL;
 	top_label = NULL;
@@ -1392,6 +1395,7 @@ void StudyGraphicsWidget::clear_(bool lock)
 		disconnect(slider, SIGNAL(valueChanged(int)), this, SLOT(set_selected_slice(int)));
 		slider->setValue(0);
 		slider->setMaximum(1);
+		slider->setEnabled(false);
 	}
 	if (top_label)
 	{
@@ -1405,6 +1409,7 @@ void StudyGraphicsWidget::clear_(bool lock)
 	{
 		disconnect(icon_button, SIGNAL(toggled(bool)), this, SLOT(toggle_single(bool)));
 		icon_button->setIcon(QPixmap());
+		icon_button->setEnabled(false);
 	}
 	graphicsview->clear_collision_paths();
 	graphicsview->pr_area->hide();
@@ -1790,6 +1795,7 @@ void StudyGraphicsWidget::set_image(
 		slider->setMaximum(v->di->idimz - 1);
 		slider->setValue(x);
 		connect(slider, SIGNAL(valueChanged(int)), this, SLOT(set_selected_slice(int)));
+		slider->setEnabled(true);
 	}
 	if (icon_button)
 	{
@@ -1798,6 +1804,7 @@ void StudyGraphicsWidget::set_image(
 		pp.fill(c);
 		icon_button->setIcon(pp);
 		connect(icon_button, SIGNAL(toggled(bool)), this, SLOT(toggle_single(bool)));
+		icon_button->setEnabled(true);
 	}
 	//
 	update_image(fit, false);
@@ -2150,17 +2157,11 @@ quit__:
 	mutex.unlock();
 }
 
-void StudyGraphicsWidget::toggle_single(bool t)//TODO
+void StudyGraphicsWidget::toggle_single(bool t)
 {
 	if (!studyview) return;
-	if (t)
-	{
-		studyview->set_single(-1);
-	}
-	else
-	{
-		studyview->restore_multi(-1);
-	}
+	if (t) studyview->set_single(widget_id);
+	else   studyview->restore_multi(widget_id);
 }
 
 void StudyGraphicsWidget::set_active()

@@ -37,8 +37,8 @@ public:
 	void block_signals(bool);
 	void update_null();
 	void update_scouts();
-	void set_single(int);
-	void restore_multi(int);
+	void set_single(const unsigned long long);
+	void restore_multi(const unsigned long long);
 	void writeSettings(QSettings&);
 
 	QList<StudyFrameWidget *> widgets;
