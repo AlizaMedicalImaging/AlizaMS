@@ -35,9 +35,11 @@ public:
 	void set_slider(QSlider*);
 	void set_top_label(QLabel*);
 	void set_left_label(QLabel*);
+	void set_measure_label(QLabel*);
 	void set_icon_button(QToolButton*);
 	void set_top_string(const QString&);
 	void set_left_string(const QString&);
+	void set_measure_text(const QString&);
 	void set_center(double);
 	void set_width(double);
 	void set_lut(short);
@@ -87,6 +89,7 @@ private:
 	QSlider * slider;
 	QLabel  * top_label;
 	QLabel  * left_label;
+	QLabel  * measure_label;
 	QToolButton * icon_button;
 	bool   smooth_;
 	short  mouse_modus;

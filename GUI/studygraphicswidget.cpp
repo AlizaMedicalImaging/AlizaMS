@@ -1159,6 +1159,11 @@ void StudyGraphicsWidget::set_left_label(QLabel * l)
 	left_label = l;
 }
 
+void StudyGraphicsWidget::set_measure_label(QLabel * l)
+{
+	measure_label = l;
+}
+
 void StudyGraphicsWidget::set_icon_button(QToolButton * b)
 {
 	icon_button = b;
@@ -1172,6 +1177,11 @@ void StudyGraphicsWidget::set_top_string(const QString & s)
 void StudyGraphicsWidget::set_left_string(const QString & s)
 {
 	if (left_label) left_label->setText(s);
+}
+
+void StudyGraphicsWidget::set_measure_text(const QString & s)
+{
+	if (measure_label) measure_label->setText(s);
 }
 
 void StudyGraphicsWidget::set_center(double x)
@@ -1452,14 +1462,6 @@ void StudyGraphicsWidget::clear_(bool lock)
 		slider->setMaximum(1);
 		slider->setEnabled(false);
 	}
-	if (top_label)
-	{
-		top_label->setText(QString(""));
-	}
-	if (left_label)
-	{
-		left_label->setText(QString(""));
-	}
 	if (icon_button)
 	{
 		disconnect(icon_button, SIGNAL(toggled(bool)), this, SLOT(toggle_single(bool)));
@@ -1468,6 +1470,9 @@ void StudyGraphicsWidget::clear_(bool lock)
 	}
 	graphicsview->clear_collision_paths();
 	graphicsview->pr_area->hide();
+	set_top_string(QString(""));
+	set_left_string(QString(""));
+	set_measure_text(QString(""));
 	if (image_container.image2D)
 	{
 		image_container.image2D->image_type=-1;
@@ -1624,6 +1629,9 @@ void StudyGraphicsWidget::set_image(
 	graphicsview->clear_shutters();
 	graphicsview->set_empty_distance();
 	graphicsview->pr_area->hide();
+	set_top_string(QString(""));
+	set_left_string(QString(""));
+	set_measure_text(QString(""));
 	image_container.orientation_20_20 = QString("");
 	//
 	if (!v)
@@ -1911,6 +1919,7 @@ bool StudyGraphicsWidget::get_smooth() const
 void StudyGraphicsWidget::set_mouse_modus(short m, bool us_regions)
 {
 	mouse_modus = m;
+	set_measure_text(QString(""));
 	switch(mouse_modus)
 	{
 	case 2: // measure distance
@@ -1983,6 +1992,9 @@ void StudyGraphicsWidget::set_selected_slice(int x)
 	graphicsview->clear_shutters();
 	graphicsview->set_empty_distance();
 	graphicsview->pr_area->hide();
+	set_top_string(QString(""));
+	set_left_string(QString(""));
+	set_measure_text(QString(""));
 	image_container.orientation_20_20 = QString("");
 	image_container.selected_z_slice_ext = x;
 	//
@@ -2403,13 +2415,13 @@ void StudyGraphicsWidget::update_measurement(
 			graphicsview->measurment_line->setPath(path);
 			if (!data_type.isEmpty() && !tmp0.isEmpty())
 				data_type.append(QString(" | "));
-//			measure_label->setText(data_type + tmp0);
+			set_measure_text(data_type + tmp0);
 		}
 		else
 		{
 			QPainterPath path;
 			graphicsview->measurment_line->setPath(path);
-//			measure_label->setText(data_type);
+			set_measure_text(data_type);
 		}
 	}
 	else
@@ -2506,7 +2518,7 @@ void StudyGraphicsWidget::update_measurement(
 			path.lineTo(x1, y1);
 			graphicsview->measurment_line->setPath(path);
 		}
-//		measure_label->setText(tmp0);
+		set_measure_text(tmp0);
 	}
 }
 

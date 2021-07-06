@@ -558,10 +558,8 @@ void StudyGraphicsView::measure()
 			m0_win_pos_y,
 			m1_win_pos_x,
 			m1_win_pos_y);
-/* TODO
 	else
-		parent->set_measure_text("");
-*/
+		parent->set_measure_text(QString(""));
 }
 
 void StudyGraphicsView::flipX()

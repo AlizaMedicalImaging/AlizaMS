@@ -73,6 +73,7 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 		w->set_slider(f->slider);
 		w->set_top_label(f->top_label);
 		w->set_left_label(f->left_label);
+		w->set_measure_label(f->measure_label);
 		w->set_icon_button(f->icon_button);
 		f->hide();
 		widgets.push_back(f);
