@@ -1032,6 +1032,61 @@ template<typename T> void load_image2(
 #endif
 }
 
+static double get_distance4(
+	const double x0,
+	const double y0,
+	const double x1,
+	const double y1)
+{
+	const double x = x1 - x0;
+	const double y = y1 - y0;
+	return sqrt(x*x + y*y);
+}
+
+template<typename T> double get_distance3(
+	const typename T::Pointer & image,
+	const ImageVariant * ivariant,
+	const double x0, const double y0,
+	const double x1, const double y1,
+	unsigned int z)
+{
+	if (image.IsNull()) return -1;
+	if (!ivariant)      return -1;
+	if (x0 < 0 || y0 < 0 || x1 < 0 || y1 < 0) return -1;
+	itk::ContinuousIndex<float, 3> idx0;
+	itk::ContinuousIndex<float, 3> idx1;
+	itk::Point<float,3> j0;
+	itk::Point<float,3> j1;
+	const float x0_ = static_cast<float>(x0);
+	const float y0_ = static_cast<float>(y0);
+	const float x1_ = static_cast<float>(x1);
+	const float y1_ = static_cast<float>(y1);
+	double d = -1;
+	bool ok = false;
+	//
+	if (
+		x0_ < ivariant->di->idimx &&
+		x1_ < ivariant->di->idimx &&
+		y0_ < ivariant->di->idimy &&
+		y1_ < ivariant->di->idimy)
+	{
+		ok = true;
+		idx0[2] = idx1[2] = z;
+		idx0[0] = x0_;
+		idx0[1] = y0_;
+		idx1[0] = x1_;
+		idx1[1] = y1_;
+	}
+	//
+	if (ok)
+	{
+		image->TransformContinuousIndexToPhysicalPoint(idx0, j0);
+		image->TransformContinuousIndexToPhysicalPoint(idx1, j1);
+		d = j0.EuclideanDistanceTo(j1);
+	}
+	return d;
+}
+
 static unsigned long long StudyGraphicsWidget_id = 0;
 
 StudyGraphicsWidget::StudyGraphicsWidget()
@@ -1853,14 +1908,6 @@ bool StudyGraphicsWidget::get_smooth() const
 	return smooth_;
 }
 
-void StudyGraphicsWidget::update_measurement(
-	double x0,
-	double y0,
-	double x1,
-	double y1)
-{
-}
-
 void StudyGraphicsWidget::set_mouse_modus(short m, bool us_regions)
 {
 	mouse_modus = m;
@@ -2168,3 +2215,298 @@ void StudyGraphicsWidget::set_active()
 {
 	if (studyview) studyview->set_active_image(&image_container);
 }
+
+void StudyGraphicsWidget::update_measurement(
+	double x0,
+	double y0,
+	double x1,
+	double y1)
+{
+	if (!image_container.image3D) return;
+	const ImageVariant * ivariant = image_container.image3D;
+	const unsigned int z = image_container.selected_z_slice_ext;
+	QString tmp0("");
+	if (!ivariant->usregions.empty())
+	{
+		QVector<int> ids;
+		QVector<int> ids2;
+		QVector<int> high_priority_regions;
+		for (int x = 0; x < ivariant->usregions.size(); ++x)
+		{
+			if (x0 >= ivariant->usregions.at(x).m_X0 &&
+				y0 >= ivariant->usregions.at(x).m_Y0 &&
+				x0 <= ivariant->usregions.at(x).m_X1 &&
+				y0 <= ivariant->usregions.at(x).m_Y1 &&
+				x1 >= ivariant->usregions.at(x).m_X0 &&
+				y1 >= ivariant->usregions.at(x).m_Y0 &&
+				x1 <= ivariant->usregions.at(x).m_X1 &&
+				y1 <= ivariant->usregions.at(x).m_Y1)
+			{
+				if (!ivariant->usregions.at(x).m_UnitXString.isEmpty()||
+					!ivariant->usregions.at(x).m_UnitYString.isEmpty())
+					ids.push_back(x);
+				ids2.push_back(x);
+			}
+		}
+		for (int x = 0; x < ids.size(); ++x)
+		{
+			if (ivariant->usregions.at(ids.at(x)).m_FlagsBool)
+			{
+				const unsigned int flags =
+					ivariant->usregions.at(ids.at(x)).m_RegionFlags;
+				if ((flags & 1) == 0)
+					high_priority_regions.push_back(ids.at(x));
+			}
+		}
+		//
+		QString data_type("");
+		for (int x = 0; x < ids2.size(); ++x)
+		{
+			if (
+				!ivariant->usregions.at(
+					ids2.at(x)).m_DataTypeString.isEmpty())
+				data_type.append(
+					ivariant->usregions.at(ids2.at(x)).m_DataTypeString);
+			if (ids2.size()>1 && x!=ids2.size()-1 && !data_type.isEmpty())
+				data_type.append(QString("/"));
+		}
+		//
+		if (!ids.empty())
+		{
+			bool tmp1x = false;
+			bool tmp1y = false;
+			const unsigned int id =
+				(high_priority_regions.size()==1)
+				? high_priority_regions.at(0)
+				: ids.at(0);
+			const double dx  =
+				ivariant->usregions.at(id).m_PhysicalDeltaX;
+			const double dy  =
+				ivariant->usregions.at(id).m_PhysicalDeltaY;
+			const double x0_ = x0*dx;
+			const double y0_ = y0*dy;
+			const double x1_ = x1*dx;
+			const double y1_ = y1*dy;
+			const QString measure_textx  =
+				ivariant->usregions.at(id).m_UnitXString;
+			const QString measure_texty  =
+				ivariant->usregions.at(id).m_UnitYString;
+			const unsigned short spatial = 
+				ivariant->usregions.at(id).m_RegionSpatialFormat;
+			QColor color(Qt::cyan);
+			switch(spatial)
+			{
+			case 0x1:
+				color = QColor(0x00,0xff,0x00); // 2D
+				break;
+			case 0x2:
+				color = QColor(0xff,0x00,0x00); // M-Mode
+				break;
+			case 0x3:
+				color = QColor(0x00,0x00,0xff); // Spectral
+				break;
+			case 0x4:
+				color = QColor(0x00,0xff,0xff); // Waveform
+				break;
+			case 0x5:
+				color = QColor(0xff,0x00,0xff); // Graphics
+				break;
+			case 0:
+			default:
+				break;
+			}
+			if (measure_textx == measure_texty)
+			{
+				const double d   = get_distance4(x0_, y0_, x1_, y1_);
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+				tmp0 = QString::asprintf("%.3f",d);
+#else
+				tmp0.sprintf("%.3f",d);
+#endif
+				tmp0.append(QString(" ") + measure_textx);
+			}
+			else
+			{
+				if (!measure_textx.isEmpty())
+				{
+					tmp1x = true;
+					const double d0 = get_distance4(x0_, y0_, x1_, y0_);
+					QString tmp0x;
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+					tmp0x = QString::asprintf("%.3f",d0);
+#else
+					tmp0x.sprintf("%.3f",d0);
+#endif
+					tmp0.append(
+						QString("X: ") +
+						tmp0x +
+						QString(" ") +
+						measure_textx);
+				}
+				if (!measure_textx.isEmpty() && !measure_texty.isEmpty())
+				{
+					tmp0.append(QString(" | "));
+				}
+				if (!measure_texty.isEmpty())
+				{
+					tmp1y = true;
+					const double d1 = get_distance4(x0_, y0_, x0_, y1_);
+					QString tmp0y;
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+					tmp0y = QString::asprintf("%.3f",d1);
+#else
+					tmp0y.sprintf("%.3f",d1);
+#endif
+					tmp0.append(
+						QString("Y: ") +
+						tmp0y +
+						QString(" ") +
+						measure_texty);
+				}
+			}
+			//
+			QPainterPath path;
+			QPen pen;
+			pen.setBrush(QBrush(color));
+			pen.setWidth(0);
+			graphicsview->measurment_line->setPen(pen);
+			if (tmp1x||tmp1y)
+			{
+				if (tmp1x)
+				{
+					const double x0___ = x0;
+					const double y0___ = y0;
+					const double x1___ = x1;
+					const double y1___ = y0;
+					path.moveTo(x0___, y0___);
+					path.lineTo(x1___, y1___);
+				}
+				if (tmp1y)
+				{
+					const double x0___ = x0;
+					const double y0___ = y0;
+					const double x1___ = x0;
+					const double y1___ = y1;
+					path.moveTo(x0___, y0___);
+					path.lineTo(x1___, y1___);
+				}
+			}
+			else
+			{
+				const double x0___ = x0;
+				const double y0___ = y0;
+				const double x1___ = x1;
+				const double y1___ = y1;
+				path.moveTo(x0___, y0___);
+				path.lineTo(x1___, y1___);
+			}
+			graphicsview->measurment_line->setPath(path);
+			if (!data_type.isEmpty() && !tmp0.isEmpty())
+				data_type.append(QString(" | "));
+//			measure_label->setText(data_type + tmp0);
+		}
+		else
+		{
+			QPainterPath path;
+			graphicsview->measurment_line->setPath(path);
+//			measure_label->setText(data_type);
+		}
+	}
+	else
+	{
+		double d = -1;
+		switch(ivariant->image_type)
+		{
+		case 0:
+			d = get_distance3<ImageTypeSS>(ivariant->pSS, ivariant, x0, y0, x1, y1, z);
+			break;
+		case 1:
+			d = get_distance3<ImageTypeUS>(ivariant->pUS, ivariant, x0, y0, x1, y1, z);
+			break;
+		case 2:
+			d = get_distance3<ImageTypeSI>(ivariant->pSI, ivariant, x0, y0, x1, y1, z);
+			break;
+		case 3:
+			d = get_distance3<ImageTypeUI>(ivariant->pUI, ivariant, x0, y0, x1, y1, z);
+			break;
+		case 4:
+			d = get_distance3<ImageTypeUC>(ivariant->pUC, ivariant, x0, y0, x1, y1, z);
+			break;
+		case 5:
+			d = get_distance3<ImageTypeF>(ivariant->pF, ivariant, x0, y0, x1, y1, z);
+			break;
+		case 6:
+			d = get_distance3<ImageTypeD>(ivariant->pD, ivariant, x0, y0, x1, y1, z);
+			break;
+		case 7:
+			d = get_distance3<ImageTypeSLL>(ivariant->pSLL, ivariant, x0, y0, x1, y1, z);
+			break;
+		case 8:
+			d = get_distance3<ImageTypeULL>(ivariant->pULL, ivariant, x0, y0, x1, y1, z);
+			break;
+		case 10:
+			d = get_distance3<RGBImageTypeSS>(ivariant->pSS_rgb, ivariant, x0, y0, x1, y1, z);
+			break;
+		case 11:
+			d = get_distance3<RGBImageTypeUS>(ivariant->pUS_rgb, ivariant, x0, y0, x1, y1, z);
+			break;
+		case 12:
+			d = get_distance3<RGBImageTypeSI>(ivariant->pSI_rgb, ivariant, x0, y0, x1, y1, z);
+			break;
+		case 13:
+			d = get_distance3<RGBImageTypeUI>(ivariant->pUI_rgb, ivariant, x0, y0, x1, y1, z);
+			break;
+		case 14:
+			d = get_distance3<RGBImageTypeUC>(ivariant->pUC_rgb, ivariant, x0, y0, x1, y1, z);
+			break;
+		case 15:
+			d = get_distance3<RGBImageTypeF>(ivariant->pF_rgb, ivariant, x0, y0, x1, y1, z);
+			break;
+		case 16:
+			d = get_distance3<RGBImageTypeD>(ivariant->pD_rgb, ivariant, x0, y0, x1, y1, z);
+			break;
+		case 20:
+			d = get_distance3<RGBAImageTypeSS>(ivariant->pSS_rgba, ivariant, x0, y0, x1, y1, z);
+			break;
+		case 21:
+			d = get_distance3<RGBAImageTypeUS>(ivariant->pUS_rgba, ivariant, x0, y0, x1, y1, z);
+			break;
+		case 22:
+			d = get_distance3<RGBAImageTypeSI>(ivariant->pSI_rgba, ivariant, x0, y0, x1, y1, z);
+			break;
+		case 23:
+			d = get_distance3<RGBAImageTypeUI>(ivariant->pUI_rgba, ivariant, x0, y0, x1, y1, z);
+			break;
+		case 24:
+			d = get_distance3<RGBAImageTypeUC>(ivariant->pUC_rgba, ivariant, x0, y0, x1, y1, z);
+			break;
+		case 25:
+			d = get_distance3<RGBAImageTypeF>(ivariant->pF_rgba, ivariant, x0, y0, x1, y1, z);
+			break;
+		case 26:
+			d = get_distance3<RGBAImageTypeD>(ivariant->pD_rgba, ivariant, x0, y0, x1, y1, z);
+			break;
+		default:
+			break;
+		}
+		if (d >= 0.0)
+		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+			tmp0 = QString::asprintf("%.3f",d);
+#else
+			tmp0.sprintf("%.3f",d);
+#endif
+			tmp0.append(QString(" ") + ivariant->unit_str);
+			QPainterPath path;
+			QPen pen;
+			pen.setBrush(QBrush(Qt::cyan));
+			pen.setWidth(0);
+			graphicsview->measurment_line->setPen(pen);
+			path.moveTo(x0, y0);
+			path.lineTo(x1, y1);
+			graphicsview->measurment_line->setPath(path);
+		}
+//		measure_label->setText(tmp0);
+	}
+}
+

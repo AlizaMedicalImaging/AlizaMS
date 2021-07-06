@@ -60,6 +60,7 @@ private slots:
 	void all_to_fit();
 	void all_to_original();
 	void toggle_scouts(bool);
+	void toggle_measure(bool);
 	void check_close();
 
 signals:
@@ -80,6 +81,7 @@ private:
 	MatrixButton * mbutton;
 	QToolButton * fitall_toolButton;
 	QToolButton * scouts_toolButton;
+	QToolButton * measure_toolButton;
 	LUTWidget * lutwidget;
 	QIcon lockon;
 	QIcon lockoff;

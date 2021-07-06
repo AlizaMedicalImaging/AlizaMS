@@ -59,7 +59,6 @@ public:
 	void  update_background_color();
 	void  set_smooth(bool);
 	bool  get_smooth() const;
-	void  update_measurement(double, double, double, double);
 	void  set_mouse_modus(short,bool);
 	short get_mouse_modus() const;
 	bool  get_enable_shutter() const;
@@ -67,6 +66,7 @@ public:
 	void  set_enable_shutter(bool);
 	void  set_enable_overlays(bool);
 	void  set_active();
+	void  update_measurement(double, double, double, double);
 	std::vector<ProcessImageThread_*> threads_;
 	std::vector<QThread*> threadsLUT_;
 	unsigned long long widget_id;

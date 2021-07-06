@@ -43,6 +43,11 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 	scouts_toolButton->setIconSize(s1);
 	scouts_toolButton->setIcon(QIcon(QString(":/bitmaps/collisions.svg")));
 	scouts_toolButton->setToolTip(QString("Show intersections"));
+	measure_toolButton = new QToolButton(this);
+	measure_toolButton->setCheckable(true);
+	measure_toolButton->setChecked(false);
+	measure_toolButton->setIconSize(s1);
+	measure_toolButton->setIcon(QIcon(QString(":/bitmaps/distance.svg")));
 	QWidget * spacer1 = new QWidget(this);
 	spacer1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	QHBoxLayout * l1 = new QHBoxLayout(toolbar_frame);
@@ -51,6 +56,7 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 	l1->addWidget(mbutton);
 	l1->addWidget(fitall_toolButton);
 	l1->addWidget(scouts_toolButton);
+	l1->addWidget(measure_toolButton);
 	l1->addWidget(spacer1);
 	lutwidget  = new LUTWidget(si);
 	lutwidget->add_items1();
@@ -81,6 +87,9 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 	connect(
 		scouts_toolButton, SIGNAL(toggled(bool)),
 		this, SLOT(toggle_scouts(bool)));
+	connect(
+		measure_toolButton, SIGNAL(toggled(bool)),
+		this, SLOT(toggle_measure(bool)));
 #if MATRIX_BUTTON_CUSTOM_ACT == 1
 	connect(
 		mbutton->p_action, SIGNAL(triggered()),
@@ -837,10 +846,22 @@ void StudyViewWidget::toggle_scouts(bool t)
 	{
 		for (int i = 0; i < widgets.size(); ++i)
 		{
-			if (widgets.at(i) &&widgets.at(i)->graphicswidget)
+			if (widgets.at(i) && widgets.at(i)->graphicswidget)
 			{
-				widgets[i]->graphicswidget->graphicsview->clear_collision_paths();;
+				widgets[i]->graphicswidget->graphicsview->clear_collision_paths();
 			}
+		}
+	}
+}
+
+void StudyViewWidget::toggle_measure(bool t)
+{
+	const short x = (t) ? 2 : 0;
+	for (int i = 0; i < widgets.size(); ++i)
+	{
+		if (widgets.at(i) && widgets.at(i)->graphicswidget)
+		{
+			widgets[i]->graphicswidget->set_mouse_modus(x, true);
 		}
 	}
 }
