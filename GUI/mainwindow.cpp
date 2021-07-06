@@ -1802,7 +1802,7 @@ void MainWindow::writeSettings()
 		QApplication::organizationName(), QApplication::applicationName());
 	settings.setFallbacksEnabled(false);
 	settings.beginGroup(QString("MainWindow"));
-	if (!isMaximized())
+	if (!isMaximized() && !isFullScreen())
 	{
 		settings.setValue(QString("size"), QVariant(size()));
 		settings.setValue(QString("pos"), QVariant(pos()));

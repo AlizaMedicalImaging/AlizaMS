@@ -29,12 +29,14 @@ public slots:
 	void printSR();
 	void saveSR();
 
+private slots:
+	void check_close();
+
 private:
 	QString tmpfile;
 	QShortcut * print_sc;
 	QShortcut * save_sc;
 	QShortcut * close_sc;
-	QShortcut * quit_sc;
 #ifdef __APPLE__
 	QShortcut * minimaze_sc;
 	QShortcut * fullsceen_sc;

@@ -88,7 +88,7 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 #endif
 	connect_tools();
 	//
-	close_sc = new QShortcut(QKeySequence::Close, this, SLOT(close()));
+	close_sc = new QShortcut(QKeySequence::Close, this, SLOT(check_close()));
 	close_sc->setAutoRepeat(false);
 #ifdef __APPLE__
 	minimaze_sc = new QShortcut(QKeySequence("Ctrl+M"), this, SLOT(showMinimized()));
@@ -845,6 +845,17 @@ void StudyViewWidget::toggle_scouts(bool t)
 	}
 }
 
+void StudyViewWidget::check_close() // FIXME
+{
+	if (isFullScreen())
+	{
+		showNormal();
+	}
+	else
+	{
+		close();
+	}
+}
 ////////////////////
 
 void StudyViewWidget::update_locked_window(bool t)
@@ -1049,7 +1060,7 @@ void StudyViewWidget::readSettings()
 void StudyViewWidget::writeSettings(QSettings & settings)
 {
 	settings.beginGroup(QString("StudyViewWidget"));
-	if (!isMaximized())
+	if (!isMaximized() && !isFullScreen())
 	{
 		settings.setValue(QString("size"), QVariant(this->size()));
 		settings.setValue(QString("pos"), QVariant(this->pos()));

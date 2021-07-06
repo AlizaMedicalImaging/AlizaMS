@@ -60,6 +60,7 @@ private slots:
 	void all_to_fit();
 	void all_to_original();
 	void toggle_scouts(bool);
+	void check_close();
 
 signals:
 	void update_scouts_required();

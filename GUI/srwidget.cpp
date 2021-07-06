@@ -35,10 +35,8 @@ SRWidget::SRWidget(float si)
 	print_sc->setAutoRepeat(false);
 	save_sc = new QShortcut(QKeySequence::Save, this, SLOT(saveSR()));
 	save_sc->setAutoRepeat(false);
-	close_sc = new QShortcut(QKeySequence::Close, this, SLOT(close()));
+	close_sc = new QShortcut(QKeySequence::Close, this, SLOT(check_close()));
 	close_sc->setAutoRepeat(false);
-	quit_sc = new QShortcut(QKeySequence::Quit, this, SLOT(close()));
-	quit_sc->setAutoRepeat(false);
 #ifdef __APPLE__
 	minimaze_sc = new QShortcut(QKeySequence("Ctrl+M"), this, SLOT(showMinimized()));
 	minimaze_sc->setAutoRepeat(false);
@@ -151,7 +149,7 @@ void SRWidget::writeSettings()
 		QApplication::applicationName());
 	settings.setFallbacksEnabled(false);
 	settings.beginGroup(QString("SRWidget"));
-	if (!isMaximized())
+	if (!isMaximized() && !isFullScreen())
 	{
 		settings.setValue(QString("size"), QVariant(size()));
 		settings.setValue(QString("pos"),  QVariant(pos()));
@@ -203,3 +201,14 @@ void SRWidget::saveSR()
 	QApplication::restoreOverrideCursor();
 }
 
+void SRWidget::check_close()
+{
+	if (isFullScreen())
+	{
+		showNormal();
+	}
+	else
+	{
+		close();
+	}
+}
