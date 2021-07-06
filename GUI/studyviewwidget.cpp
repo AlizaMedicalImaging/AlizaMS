@@ -30,6 +30,7 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 	lockoff = QIcon(QString(":/bitmaps/unlock.svg"));
 	resetlevel_pushButton->setIconSize(s1);
 	lock_pushButton->setIconSize(s1);
+	level1_frame->hide();
 	mbutton = new MatrixButton(si);
 	fitall_toolButton = new QToolButton(this);
 	fitall_toolButton->setIconSize(s1);
@@ -730,8 +731,20 @@ void StudyViewWidget::toggle_lock_window(bool t)
 {
 	center2_doubleSpinBox->setEnabled(t);
 	width2_doubleSpinBox->setEnabled(t);
-	if (t) lock_pushButton->setIcon(lockon);
-	else   lock_pushButton->setIcon(lockoff);
+	if (t)
+	{
+		lock_pushButton->setIcon(lockon);
+		level1_frame->hide();
+		level0_frame->show();
+		level_spacer->show();
+	}
+	else
+	{
+		lock_pushButton->setIcon(lockoff);
+		level0_frame->hide();
+		level_spacer->hide();
+		level1_frame->show();
+	}
 	for (int i = 0; i < widgets.size(); ++i)
 	{
 		if (widgets.at(i))
@@ -834,8 +847,20 @@ void StudyViewWidget::update_locked_window(bool t)
 	lock_pushButton->setChecked(t);
 	center2_doubleSpinBox->setEnabled(t);
 	width2_doubleSpinBox->setEnabled(t);
-	if (t) lock_pushButton->setIcon(lockon);
-	else   lock_pushButton->setIcon(lockoff);
+	if (t)
+	{
+		lock_pushButton->setIcon(lockon);
+		level1_frame->hide();
+		level0_frame->show();
+		level_spacer->show();
+	}
+	else
+	{
+		lock_pushButton->setIcon(lockoff);
+		level0_frame->hide();
+		level_spacer->hide();
+		level1_frame->show();
+	}
 	level1_frame->setEnabled(!t);
 }
 
