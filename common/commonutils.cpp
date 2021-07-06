@@ -47,13 +47,6 @@
 #include "colorspace/colorspace.h"
 
 typedef Vectormath::Scalar::Vector3 sVector3;
-typedef Vectormath::Scalar::Point3  sPoint3;
-typedef Vectormath::Scalar::Vector4 sVector4;
-typedef Vectormath::Scalar::Matrix4 sMatrix4;
-typedef itk::Image<RGBPixelUS,4> RGBImage4DTypeUS;
-typedef itk::Image<RGBPixelUC,4> RGBImage4DTypeUC;
-typedef itk::Image<RGBPixelF, 4> RGBImage4DTypeF;
-typedef itk::Image<RGBPixelD, 4> RGBImage4DTypeD;
 static QString screenshot_dir("");
 static QString save_dir("");
 static QString open_dir("");

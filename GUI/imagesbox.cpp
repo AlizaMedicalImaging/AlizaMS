@@ -158,7 +158,7 @@ ImagesBox::ImagesBox(float si)
 	actionContours->setCheckable(true);
 	actionContours->setChecked(false);
 	actionROIInfo      = new QAction(QString("ROI Info"), this);
-	actionStudyMenu    = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Study View"),this);
+	actionStudyMenu    = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Multi View"),this);
 	actionStudy        = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open study"), this);
 	actionStudyChecked = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open sel. and checked"), this);
 	actionStudyAll     = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open all"), this);
