@@ -86,6 +86,7 @@ private:
 	int active_id;
 	int saved_r;
 	int saved_c;
+	QShortcut * close_sc;
 #ifdef __APPLE__
 	QShortcut * minimaze_sc;
 	QShortcut * fullsceen_sc;

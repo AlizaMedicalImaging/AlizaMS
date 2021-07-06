@@ -4103,6 +4103,7 @@ void Aliza::delete_checked_unchecked(bool t)
 		ImageVariant * ivariant = get_image(image_ids.at(x));
 		if (ivariant)
 		{
+			remove_from_studyview(ivariant->id);
 			scene3dimages.remove(ivariant->id);
 			delete ivariant;
 		}

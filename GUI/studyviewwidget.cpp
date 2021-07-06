@@ -8,6 +8,7 @@
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QVariant>
+#include <QKeySequence>
 #if MATRIX_BUTTON_CUSTOM_ACT == 1
 #include "tabledialog.h"
 #endif
@@ -86,6 +87,9 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 		this, SLOT(update_grid2()));
 #endif
 	connect_tools();
+	//
+	close_sc = new QShortcut(QKeySequence::Close, this, SLOT(close()));
+	close_sc->setAutoRepeat(false);
 #ifdef __APPLE__
 	minimaze_sc = new QShortcut(QKeySequence("Ctrl+M"), this, SLOT(showMinimized()));
 	minimaze_sc->setAutoRepeat(false);
@@ -94,6 +98,7 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 	normal_sc = new QShortcut(QKeySequence("Esc"),this,SLOT(showNormal()));
 	normal_sc->setAutoRepeat(false);
 #endif
+	//
 	readSettings();
 }
 
