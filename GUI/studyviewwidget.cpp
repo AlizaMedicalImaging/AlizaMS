@@ -48,6 +48,7 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 	measure_toolButton->setChecked(false);
 	measure_toolButton->setIconSize(s1);
 	measure_toolButton->setIcon(QIcon(QString(":/bitmaps/distance.svg")));
+	measure_toolButton->setToolTip(QString("Measurement"));
 	QWidget * spacer1 = new QWidget(this);
 	spacer1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	QHBoxLayout * l1 = new QHBoxLayout(toolbar_frame);
@@ -1030,7 +1031,7 @@ void StudyViewWidget::set_single(const unsigned long long widget_id)
 	if (selected)
 	{
 		QGridLayout * gridLayout = new QGridLayout(frame);
-		gridLayout->addWidget(selected, 1, 1);
+		gridLayout->addWidget(selected, 0, 0);
 		selected->show();
 		if (selected->graphicswidget)
 		{
@@ -1057,9 +1058,32 @@ void StudyViewWidget::set_single(const unsigned long long widget_id)
 
 void StudyViewWidget::restore_multi(const unsigned long long widget_id)
 {
-// TODO
+	if (saved_r == -1 || saved_c == -1)
+	{
+#if 1
+		std::cout << "restore_multi: internal error" << std::endl;
+#endif
+		saved_r = -1;
+		saved_c = -1;
+		active_id = -1;
+		update_null();
+		return;
+	}
+	update_grid(saved_r, saved_c);
 	saved_r = -1;
 	saved_c = -1;
+	for (int x = 0; x < widgets.size(); ++x)
+	{
+		if (widgets.at(x))
+		{
+			if (widgets.at(x)->icon_button->isChecked())
+			{
+				widgets[x]->icon_button->blockSignals(true);
+				widgets[x]->icon_button->setChecked(false);
+				widgets[x]->icon_button->blockSignals(false);
+			}
+		}
+	}
 #if 0
 	std::cout << "restore_multi: widget_id=" << widget_id << std::endl;
 #endif
