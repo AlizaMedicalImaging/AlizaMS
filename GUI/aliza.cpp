@@ -112,7 +112,7 @@ static void g_close_physics()
 {
 	if (g_collisionWorld)
 	{
-		for (int x = g_collisionWorld->getNumCollisionObjects() - 1; x >= 0; x--)
+		for (int x = g_collisionWorld->getNumCollisionObjects() - 1; x >= 0; --x)
 		{
 			btCollisionObject * o = g_collisionWorld->getCollisionObjectArray()[x];
 			if (!o) continue;
@@ -828,11 +828,14 @@ void Aliza::load_dicom_series(QProgressDialog * pb)
 		}
 		catch(std::exception & ex)
 		{
-			std::cout << "Exception in Aliza::load_dicom_series:\n"
+			std::cout << "Exception in Aliza::load_dicom_series\n"
 				<< ex.what() << std::endl;
 		}
 	}
 quit__:
+	imagesbox->listWidget->blockSignals(true);
+	disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
+	disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
 	for (unsigned int x = 0; x < ivariants.size(); ++x)
 	{
 		if (!ivariants.at(x)) continue;
@@ -851,13 +854,22 @@ quit__:
 		}
 #if 0
 		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			QMap<int, QString>::const_iterator it =
 				ivariants.at(x)->image_instance_uids.cbegin();
+#else
+			QMap<int, QString>::const_iterator it =
+				ivariants.at(x)->image_instance_uids.constBegin();
+#endif
 			std::cout
 				<< "Instance UIDs (dimZ="
 				<< ivariants.at(x)->di->idimz <<") :"
 				<< std::endl;
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			while (it != ivariants.at(x)->image_instance_uids.cend())
+#else
+			while (it != ivariants.at(x)->image_instance_uids.constEnd())
+#endif
 			{
 				std::cout
 					<< " " << it.key() << " "
@@ -869,9 +881,6 @@ quit__:
 #endif
 		add_histogram(ivariants.at(x), pb);
 		scene3dimages[ivariants.at(x)->id] = ivariants[x];
-		imagesbox->listWidget->blockSignals(true);
-		disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
-		disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
 		imagesbox->listWidget->reset();
 		imagesbox->add_image(ivariants.at(x)->id, ivariants[x], &ivariants[x]->icon);
 		int r = -1;
@@ -890,10 +899,10 @@ quit__:
 			if (ok3d) glwidget->fit_to_screen(ivariants.at(x));
 			emit image_opened();
 		}
-		connect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
-		connect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
-		imagesbox->listWidget->blockSignals(false);
 	}
+	connect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
+	connect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
+	imagesbox->listWidget->blockSignals(false);
 	ivariants.clear();
 	if (!message_.isEmpty())
 	{
@@ -1010,6 +1019,7 @@ void Aliza::delete_image()
 	ivariant = get_selected_image();
 	if (!ivariant) goto quit__;
 	item__ = imagesbox->listWidget->selectedItems()[0];
+	if (studyview) studyview->block_signals(true);
 	imagesbox->listWidget->blockSignals(true);
 	disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
 	disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
@@ -1017,22 +1027,20 @@ void Aliza::delete_image()
 	graphicswidget_y->clear_();
 	graphicswidget_x->clear_();
 	histogramview->clear__();
-	remove_from_studyview(ivariant->id);
 	if (item__)
 	{
 		imagesbox->listWidget->removeItemWidget(item__);
 		delete item__;
 	}
 	imagesbox->listWidget->reset();
-	if (ivariant)
-	{
-		scene3dimages.remove(ivariant->id);
-		delete ivariant;
-	}
+	remove_from_studyview(ivariant->id);
+	scene3dimages.remove(ivariant->id);
+	delete ivariant;
 	update_selection();
 	connect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
 	connect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
 	imagesbox->listWidget->blockSignals(false);
+	if (studyview) studyview->block_signals(false);
 quit__:
 	mutex0.unlock();
 	if (check_3d()) glwidget->set_skip_draw(false);
@@ -4085,6 +4093,7 @@ void Aliza::delete_checked_unchecked(bool t)
 	graphicswidget_y->clear_();
 	graphicswidget_x->clear_();
 	histogramview->clear__();
+	if (studyview) studyview->block_signals(true);
 	imagesbox->listWidget->blockSignals(true);
 	disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
 	disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
@@ -4111,6 +4120,7 @@ void Aliza::delete_checked_unchecked(bool t)
 		}
 	}
 	imagesbox->listWidget->blockSignals(false);
+	if (studyview) studyview->block_signals(false);
 	update_selection();
 	connect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
 	connect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));

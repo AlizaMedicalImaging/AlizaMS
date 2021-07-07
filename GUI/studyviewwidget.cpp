@@ -66,6 +66,7 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 	l2->setSpacing(0);
 	l2->addWidget(lutwidget);
 	QGridLayout * gridLayout = new QGridLayout(frame);
+	(void)gridLayout;
 	for (int x = 0; x < widgets_size; ++x)
 	{
 		StudyGraphicsWidget * w = new StudyGraphicsWidget();
