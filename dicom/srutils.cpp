@@ -1912,6 +1912,7 @@ QString SRUtils::read_sr_content_sq(
 					"<br />\n<span class='red2'>COMPOSITE"
 					"</span><br />\n");
 			const QStringList & l = read_referenced(nds, s);
+			(void)l;
 		}
 		else if (ValueType == QString("WAVEFORM"))
 		{
@@ -1920,6 +1921,7 @@ QString SRUtils::read_sr_content_sq(
 					"<br />\n<span class='red2'>WAVEFORM"
 					"</span><br />\n");
 			const QStringList & l = read_referenced(nds, s);
+			(void)l;
 		}
 		else if (ValueType == QString("SCOORD3D"))
 		{

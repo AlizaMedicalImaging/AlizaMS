@@ -11012,18 +11012,18 @@ QString DicomUtils::read_dicom(
 				sr->setWindowTitle(s0);
 				const QString s1 =
 					SRUtils::read_sr_content_sq(
-					ds,
-					t00080005,
-					fi.absolutePath(),
-					settings,
-					sr->textBrowser,
-					pb,
-					sr->tmpfiles,
-					sr->srimages,
-					0,
-					srinfo,
-					QString("1"),
-					true);
+						ds,
+						t00080005,
+						fi.absolutePath(),
+						settings,
+						sr->textBrowser,
+						pb,
+						sr->tmpfiles,
+						sr->srimages,
+						0,
+						srinfo,
+						QString("1"),
+						true);
 				sr->initSR(s1);
 				sr->show();
 				sr->activateWindow();

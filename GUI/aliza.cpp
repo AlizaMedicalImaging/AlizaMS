@@ -4465,6 +4465,7 @@ void Aliza::trigger_studyview()
 	//
 	studyview->clear_();
 	studyview->show();
+	if (studyview->isMinimized()) studyview->showNormal();
 	studyview->activateWindow();
 	studyview->raise();
 	qApp->processEvents();
@@ -4546,6 +4547,7 @@ void Aliza::trigger_studyview_checked()
 	//
 	studyview->clear_();
 	studyview->show();
+	if (studyview->isMinimized()) studyview->showNormal();
 	studyview->activateWindow();
 	studyview->raise();
 	qApp->processEvents();
