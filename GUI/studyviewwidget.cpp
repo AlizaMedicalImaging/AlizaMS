@@ -12,7 +12,7 @@
 #if MATRIX_BUTTON_CUSTOM_ACT == 1
 #include "tabledialog.h"
 #endif
-#if 1
+#if 0
 #include <iostream>
 #endif
 
@@ -134,6 +134,8 @@ StudyViewWidget::~StudyViewWidget()
 void StudyViewWidget::clear_()
 {
 	active_id = -1;
+	saved_r = -1;
+	saved_c = -1;
 	update_null();
 	for (int i = 0; i < widgets.size(); ++i)
 	{
@@ -1061,7 +1063,7 @@ void StudyViewWidget::restore_multi(const unsigned long long widget_id)
 {
 	if (saved_r == -1 || saved_c == -1)
 	{
-#if 1
+#if 0
 		std::cout << "restore_multi: internal error" << std::endl;
 #endif
 		saved_r = -1;
