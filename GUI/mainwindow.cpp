@@ -1815,10 +1815,10 @@ void MainWindow::writeSettings()
 		QString("hide_3d_frame"),
 		((show3DAct->isChecked()) ? QVariant(QString("N")) : QVariant(QString("Y"))));
 	settings.endGroup();
-	browser2->writeSettings(settings);
-	anonymizer->writeSettings(settings);
-	settingswidget->writeSettings(settings);
-	studyview->writeSettings(settings);
+	if (browser) browser2->writeSettings(settings);
+	if (anonymizer) anonymizer->writeSettings(settings);
+	if (settingswidget) settingswidget->writeSettings(settings);
+	if (studyview) studyview->writeSettings(settings);
 }
 
 void MainWindow::readSettings()

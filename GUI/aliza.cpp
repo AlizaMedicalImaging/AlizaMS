@@ -650,6 +650,7 @@ Aliza::Aliza()
 	cursorAct = NULL;
 	collisionAct = NULL;
 	segmentAct = NULL;
+	studyview = NULL;
 	rect_selection = false;
 	hide_zoom = false;
 	multiview = false;
@@ -957,6 +958,7 @@ void Aliza::clear_ram()
 	graphicswidget_y->clear_();
 	graphicswidget_x->clear_();
 	histogramview->clear__();
+	if (studyview)
 	{
 		for (int x = 0; x < studyview->widgets.size(); ++x)
 		{
@@ -4472,7 +4474,7 @@ void Aliza::trigger_studyview()
 	const int n = l.size();
 	//
 	studyview->calculate_grid(n);
-	unsigned int x = 0;
+	int x = 0;
 	for (int j = 0; j < n; ++j)
 	{
 		ImageVariant * v2 = l[j];
@@ -4492,6 +4494,7 @@ void Aliza::trigger_studyview()
 
 void Aliza::trigger_studyview_checked()
 {
+	if (!studyview) return;
 	const bool lock = mutex0.tryLock();
 	if (!lock) return;
 	//
@@ -4538,7 +4541,7 @@ void Aliza::trigger_studyview_checked()
 	qApp->processEvents();
 	studyview->calculate_grid(n);
 	qApp->processEvents();
-	unsigned int x = 0;
+	int x = 0;
 	for (int j = 0; j < n; ++j)
 	{
 		ImageVariant * v1 = l[j];

@@ -193,7 +193,6 @@ ImagesBox::ImagesBox(float si)
 	l->setContentsMargins(0,0,0,0);
 	l->setSpacing(0);
 	l->addWidget(toolbar);
-	//
 	studyMenu = new QMenu(this);
 	studyMenu->addAction(actionStudy);
 	studyMenu->addAction(actionStudyChecked);
@@ -202,7 +201,6 @@ ImagesBox::ImagesBox(float si)
 #endif
 	actionStudyMenu->setMenu(studyMenu);
 	toolbar->addAction(actionStudyMenu);
-	//
 	toolbar->addAction(actionReloadHistogram);
 	toolbar->addAction(actionClear);
 	toolbar->addAction(actionClearAll);
