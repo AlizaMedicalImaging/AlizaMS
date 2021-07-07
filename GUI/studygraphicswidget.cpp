@@ -1096,6 +1096,7 @@ StudyGraphicsWidget::StudyGraphicsWidget()
 	slider = NULL;
 	top_label = NULL;
 	left_label = NULL;
+	measure_label = NULL;
 	icon_button = NULL;
 	smooth_ = true;
 	mouse_modus = 0;
