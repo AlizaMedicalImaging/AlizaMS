@@ -451,7 +451,7 @@ CAPICryptographicMessageSyntax::GetCipherObjId() const
     case DES3_CIPHER:
       return szOID_RSA_DES_EDE3_CBC;
   }
-  return 0;
+  return NULL;
 }
 
 bool

@@ -118,7 +118,7 @@ UIDGenerator::Generate()
   unsigned char uuid[16];
   bool          r = UIDGenerator::GenerateUUID(uuid);
   if (!r)
-    return 0;
+    return NULL;
   char   randbytesbuf[64];
   size_t len = System::EncodeBytes(randbytesbuf, uuid, sizeof(uuid));
   assert(len < 64);

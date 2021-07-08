@@ -74,7 +74,7 @@ Filename::GetExtension()
   {
     return GetName() + dot_pos;
   }
-  return 0;
+  return NULL;
 }
 
 const char *
@@ -130,7 +130,7 @@ Filename::EndWith(const char ending[]) const
   size_t       ending_len = strlen(ending);
   if (ending_len > str_len)
     return false;
-  return 0 == strncmp(str + str_len - ending_len, ending, ending_len);
+  return (0 == strncmp(str + str_len - ending_len, ending, ending_len));
 }
 
 } // end namespace mdcm

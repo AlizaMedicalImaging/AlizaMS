@@ -326,7 +326,7 @@ System::GetCurrentProcessFileName()
 #else
   mdcmErrorMacro("Not implementated");
 #endif
-  return 0;
+  return NULL;
 }
 
 /*
