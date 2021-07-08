@@ -60,7 +60,7 @@ endif()
 project(ALIZAMS)
 
 if(APPLE)
-  set(ALIZAMS_OSX_BUNDLE_VERSION "1.4.3")
+  set(ALIZAMS_OSX_BUNDLE_VERSION "1.5.0")
 endif()
 
 if(NOT WIN32)

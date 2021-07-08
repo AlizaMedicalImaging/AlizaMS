@@ -4591,7 +4591,15 @@ void Aliza::remove_from_studyview(int id)
 			{
 				studyview->widgets[x]->graphicswidget->clear_();
 				if (studyview->widgets.at(x)->frame0->frameShape() != QFrame::StyledPanel)
+				{
 					studyview->widgets[x]->frame0->setFrameShape(QFrame::StyledPanel);
+				}
+				if (studyview->widgets.at(x)->icon_button->isChecked())
+				{
+					studyview->widgets[x]->icon_button->blockSignals(true);
+					studyview->widgets[x]->icon_button->setChecked(false);
+					studyview->widgets[x]->icon_button->blockSignals(false);
+				}
 			}
 		}
 	}

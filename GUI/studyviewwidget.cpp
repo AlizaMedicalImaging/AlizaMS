@@ -149,6 +149,12 @@ void StudyViewWidget::clear_()
 			{
 				widgets[i]->frame0->setFrameShape(QFrame::StyledPanel);
 			}
+			if (widgets.at(i)->icon_button->isChecked())
+			{
+				widgets[i]->icon_button->blockSignals(true);
+				widgets[i]->icon_button->setChecked(false);
+				widgets[i]->icon_button->blockSignals(false);
+			}
 		}
 	}
     QGridLayout * layout = static_cast<QGridLayout*>(frame->layout());
