@@ -967,17 +967,7 @@ void Aliza::clear_ram()
 	graphicswidget_y->clear_();
 	graphicswidget_x->clear_();
 	histogramview->clear__();
-	if (studyview)
-	{
-		for (int x = 0; x < studyview->widgets.size(); ++x)
-		{
-			studyview->widgets[x]->graphicswidget->clear_();
-			if (studyview->widgets.at(x)->frame0->frameShape() != QFrame::StyledPanel)
-				studyview->widgets[x]->frame0->setFrameShape(QFrame::StyledPanel);
-		}
-		studyview->set_active_id(-1);
-		studyview->update_null();
-	}
+	if (studyview) studyview->clear_();
 	imagesbox->listWidget->blockSignals(true);
 	disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
 	disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
