@@ -1021,16 +1021,22 @@ void Aliza::delete_image()
 	{
 		imagesbox->listWidget->removeItemWidget(item__);
 		delete item__;
+		item__ = NULL;
 	}
 	imagesbox->listWidget->reset();
 	remove_from_studyview(ivariant->id);
 	scene3dimages.remove(ivariant->id);
 	delete ivariant;
+	ivariant = NULL;
 	update_selection();
 	connect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
 	connect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
 	imagesbox->listWidget->blockSignals(false);
-	if (studyview) studyview->block_signals(false);
+	if (studyview)
+	{
+		studyview->block_signals(false);
+		if (scene3dimages.empty()) studyview->clear_();
+	}
 quit__:
 	mutex0.unlock();
 	if (check_3d()) glwidget->set_skip_draw(false);
@@ -4110,7 +4116,11 @@ void Aliza::delete_checked_unchecked(bool t)
 		}
 	}
 	imagesbox->listWidget->blockSignals(false);
-	if (studyview) studyview->block_signals(false);
+	if (studyview)
+	{
+		studyview->block_signals(false);
+		if (scene3dimages.empty()) studyview->clear_();
+	}
 	update_selection();
 	connect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
 	connect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
