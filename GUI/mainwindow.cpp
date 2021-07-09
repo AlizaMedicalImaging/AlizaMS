@@ -30,7 +30,7 @@ MainWindow::MainWindow(
 	setupUi(this);
 	setDocumentMode(false);
 	scale_icons = 1.0f;
-	adjust_scale_icons = 1.0f;
+	adjust_scale_icons = 1.2f;
 	hide_gl3_frame_later = false;
 	saved_ok3d = false;
 	int dock_area = 2;
@@ -41,7 +41,7 @@ MainWindow::MainWindow(
 			QApplication::organizationName(), QApplication::applicationName());
 		settings.beginGroup(QString("GlobalSettings"));
 		adjust_scale_icons =
-			(float)settings.value(QString("scale_ui_icons"), 1.0).toDouble();
+			(float)settings.value(QString("scale_ui_icons"), 1.2).toDouble();
 		saved_style =
 			settings.value(
 				QString("stylename"),
