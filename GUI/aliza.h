@@ -160,7 +160,9 @@ public slots:
 	void trigger_show_roi_info();
 	void trigger_studyview();
 	void trigger_studyview_checked();
+#if 0
 	void trigger_studyview_all();
+#endif
 	void update_studyview_intersections();
 
 signals:

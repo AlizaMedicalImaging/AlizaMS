@@ -76,7 +76,9 @@ public:
 	QAction * actionStudyMenu;
 	QAction * actionStudy;
 	QAction * actionStudyChecked;
+#if 0
 	QAction * actionStudyAll;
+#endif
 
 private slots:
 	void toggle_info(bool);

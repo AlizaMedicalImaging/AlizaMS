@@ -161,7 +161,9 @@ ImagesBox::ImagesBox(float si)
 	actionStudyMenu    = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Multi View"),this);
 	actionStudy        = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open study"), this);
 	actionStudyChecked = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open sel. and checked"), this);
+#if 0
 	actionStudyAll     = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open all"), this);
+#endif
 	//
 	actionTmp          = new QAction(QString("TMP"),this);
 	//

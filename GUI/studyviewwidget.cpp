@@ -116,6 +116,24 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 
 StudyViewWidget::~StudyViewWidget()
 {
+    QGridLayout * layout = static_cast<QGridLayout*>(frame->layout());
+	if (layout)
+	{
+		const int r = layout->rowCount();
+		const int c = layout->columnCount();
+		for (int x = 0; x < r; ++x)
+		{
+			for (int y = 0; y < c; ++y)
+			{
+				QLayoutItem * li = layout->itemAtPosition(x, y);
+				if (li)
+				{
+					QWidget * w = li->widget();
+					if (w) layout->removeWidget(w);
+				}
+			}
+		}
+	}
 	for (int x = 0; x < widgets.size(); ++x)
 	{
 		if (widgets.at(x))

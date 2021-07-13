@@ -787,8 +787,7 @@ void MainWindow::createMenus()
 	//
 	views_menu = menuBar()->addMenu(QString("Views"));
 	views_menu->addAction(show2DAct);
-	actionViews2DMenu  = new QAction(
-		QString("2D Views"),this);
+	actionViews2DMenu  = new QAction(QString("2D Views"), this);
 	QMenu * views2d_menu = new QMenu(this);
 	views2d_menu->addAction((graphicsAct_Z));
 	views2d_menu->addAction((zyxAct));
@@ -800,8 +799,7 @@ void MainWindow::createMenus()
 	views_menu->addAction(actionViews2DMenu);
 	//
 	views_menu->addAction(show3DAct);
-	actionViews3DMenu  = new QAction(
-		QString("3D Views"),this);
+	actionViews3DMenu  = new QAction(QString("3D Views"), this);
 	QMenu * views3d_menu = new QMenu(this);
 	views3d_menu->addAction((slicesAct));
 	views3d_menu->addAction((raycastAct));
@@ -819,6 +817,14 @@ void MainWindow::createMenus()
 	tools_menu->addAction(imagesbox->actionColor);
 	tools_menu->addAction(imagesbox->actionDICOMMeta);
 	tools_menu->addSeparator();
+	//
+	QAction * actionMultiView = new QAction(QString("Multi View"), this);
+	QMenu * multi_view_menu = new QMenu(this);
+	multi_view_menu->addAction(imagesbox->actionStudy);
+	multi_view_menu->addAction(imagesbox->actionStudyChecked);
+	actionMultiView->setMenu(multi_view_menu);
+	tools_menu->addAction(actionMultiView);
+	//
 	tools_menu->addAction(imagesbox->actionReloadHistogram);
 	tools_menu->addAction(animAct2d);
 	tools_menu->addAction(animAct3d);
@@ -826,15 +832,13 @@ void MainWindow::createMenus()
 	tools_menu->addAction(collisionAct);
 	tools_menu->addAction(distanceAct);
 	tools_menu->addAction(frames2DAct);
-	QAction * actionToolsSelectMenu  = new QAction(
-		QString("Select sub-image"),this);
+	QAction * actionToolsSelectMenu  = new QAction(QString("Select sub-image"), this);
 	QMenu * tools_select_menu = new QMenu(this);
 	tools_select_menu->addAction(rectAct);
 	tools_select_menu->addAction(zrangeAct);
 	actionToolsSelectMenu->setMenu(tools_select_menu);
 	tools_menu->addAction(actionToolsSelectMenu);
-	QAction * actionTools2DMenu  = new QAction(
-		QString("2D Views"),this);
+	QAction * actionTools2DMenu  = new QAction(QString("2D Views"), this);
 	QMenu * tools2d_menu = new QMenu(this);
 	tools2d_menu->addAction(transp2dAct);
 	tools2d_menu->addAction(resetRectAct2);
@@ -842,8 +846,7 @@ void MainWindow::createMenus()
 	tools2d_menu->addAction(flipYAct);
 	actionTools2DMenu->setMenu(tools2d_menu);
 	tools_menu->addAction(actionTools2DMenu);
-	QAction * actionTools3DMenu  = new QAction(
-		QString("3D Views"),this);
+	QAction * actionTools3DMenu  = new QAction(QString("3D Views"), this);
 	QMenu * tools3d_menu = new QMenu(this);
 	tools3d_menu->addAction(trans3DAct);
 	tools3d_menu->addAction(frames3DAct);

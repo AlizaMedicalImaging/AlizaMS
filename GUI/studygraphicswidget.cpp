@@ -1117,7 +1117,7 @@ StudyGraphicsWidget::~StudyGraphicsWidget()
 {
 	if (mutex.tryLock(30000))
 	{
-		for (unsigned int i=0; i<threads_.size(); ++i)
+		for (unsigned int i = 0; i < threads_.size(); ++i)
 		{
 			if (threads_.at(i))
 			{
@@ -1126,7 +1126,7 @@ StudyGraphicsWidget::~StudyGraphicsWidget()
 				threads_[i] = NULL;
 			}
 		}
-		for (unsigned int i=0; i<threadsLUT_.size(); ++i)
+		for (unsigned int i = 0; i < threadsLUT_.size(); ++i)
 		{
 			if (threadsLUT_.at(i))
 			{
@@ -1136,6 +1136,12 @@ StudyGraphicsWidget::~StudyGraphicsWidget()
 				threadsLUT_[i] = NULL;
 			}
 		}
+		if (image_container.image2D)
+		{
+			delete image_container.image2D;
+			image_container.image2D = NULL;
+		}
+		image_container.image3D = NULL;
 		mutex.unlock();
 	}
 }

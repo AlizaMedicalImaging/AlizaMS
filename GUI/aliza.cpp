@@ -697,7 +697,6 @@ void Aliza::close_()
 	graphicswidget_m->clear_();
 	graphicswidget_y->clear_();
 	graphicswidget_x->clear_();
-	histogramview->clear__();
 	if (!selected_images.empty()) selected_images.clear();
 	if (!scene3dimages.empty())
 	{
@@ -1831,7 +1830,9 @@ void Aliza::connect_slots()
 	connect(imagesbox->actionROIInfo,        SIGNAL(triggered()), this, SLOT(trigger_show_roi_info()));
 	connect(imagesbox->actionStudy,          SIGNAL(triggered()), this, SLOT(trigger_studyview()));
 	connect(imagesbox->actionStudyChecked,   SIGNAL(triggered()), this, SLOT(trigger_studyview_checked()));
+#if 0
 	connect(imagesbox->actionStudyAll,       SIGNAL(triggered()), this, SLOT(trigger_studyview_all()));
+#endif
 	//
 	connect(imagesbox->contours_tableWidget, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(update_visible_rois(QTableWidgetItem*)));
 	//
@@ -4570,9 +4571,11 @@ void Aliza::trigger_studyview_checked()
 	qApp->processEvents();
 }
 
+#if 0
 void Aliza::trigger_studyview_all()
 {
 }
+#endif
 
 void Aliza::update_studyview_intersections()
 {
