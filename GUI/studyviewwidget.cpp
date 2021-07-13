@@ -116,7 +116,7 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 
 StudyViewWidget::~StudyViewWidget()
 {
-    QGridLayout * layout = static_cast<QGridLayout*>(frame->layout());
+	QGridLayout * layout = static_cast<QGridLayout*>(frame->layout());
 	if (layout)
 	{
 		const int r = layout->rowCount();
@@ -175,7 +175,7 @@ void StudyViewWidget::clear_()
 			}
 		}
 	}
-    QGridLayout * layout = static_cast<QGridLayout*>(frame->layout());
+	QGridLayout * layout = static_cast<QGridLayout*>(frame->layout());
 	if (!layout) return;
 	const int r = layout->rowCount();
 	const int c = layout->columnCount();
@@ -402,7 +402,7 @@ void StudyViewWidget::closeEvent(QCloseEvent * e)
 
 void StudyViewWidget::update_grid(int r, int c)
 {
-    QGridLayout * layout = static_cast<QGridLayout*>(frame->layout());
+	QGridLayout * layout = static_cast<QGridLayout*>(frame->layout());
 	if (layout)
 	{
 		const int ar = layout->rowCount();
@@ -1003,7 +1003,7 @@ void StudyViewWidget::update_scouts()
 
 void StudyViewWidget::set_single(const unsigned long long widget_id)
 {
-    QGridLayout * layout = static_cast<QGridLayout*>(frame->layout());
+	QGridLayout * layout = static_cast<QGridLayout*>(frame->layout());
 	if (!layout)
 	{
 		// should never happen
