@@ -4316,7 +4316,6 @@ bool DicomUtils::generate_geometry(
 					QVariant((double)direction0.getZ()).toString() + QString("\n") +
 					QString(" ... using image as non-uniform.\n") +
 					QMessageBox mbox;
-					mbox.setWindowModality(Qt::ApplicationModal);
 					mbox.addButton(QMessageBox::Close);
 					mbox.setIcon(QMessageBox::Warning);
 					mbox.setText(z_inv_string);
@@ -10814,7 +10813,6 @@ QString DicomUtils::read_dicom(
 			{
 				if (pb) pb->hide();
 				QMessageBox mbox;
-				mbox.setWindowModality(Qt::ApplicationModal);
 				mbox.addButton(QMessageBox::Close);
 				mbox.setIcon(QMessageBox::Warning);
 				mbox.setText(QString(
@@ -10924,7 +10922,6 @@ QString DicomUtils::read_dicom(
 				{
 					if (pb) pb->hide();
 					QMessageBox mbox;
-					mbox.setWindowModality(Qt::ApplicationModal);
 					mbox.addButton(QMessageBox::Close);
 					mbox.setIcon(QMessageBox::Warning);
 					mbox.setText(spect_message);
@@ -11127,7 +11124,6 @@ QString DicomUtils::read_dicom(
 							{
 								if (pb) pb->hide();
 								QMessageBox mbox;
-								mbox.setWindowModality(Qt::ApplicationModal);
 								mbox.addButton(QMessageBox::Yes);
 								mbox.addButton(QMessageBox::No);
 								mbox.setDefaultButton(QMessageBox::Yes);
@@ -11232,7 +11228,6 @@ QString DicomUtils::read_dicom(
 					if (pb) pb->hide();
 					QApplication::processEvents();
 					QMessageBox mbox;
-					mbox.setWindowModality(Qt::ApplicationModal);
 					mbox.setIcon(QMessageBox::Information);
 					mbox.setText(QString(
 						"Warning:\nModality LUT palette lookup\n"
@@ -12910,7 +12905,6 @@ QString DicomUtils::read_dicom(
 			pr_warn += QString("Advanced Blending Softcopy Presentation\n");
 		pr_warn += QString("is currently not supported");
 		QMessageBox mbox;
-		mbox.setWindowModality(Qt::ApplicationModal);
 		mbox.addButton(QMessageBox::Close);
 		mbox.setIcon(QMessageBox::Warning);
 		mbox.setText(pr_warn);

@@ -453,7 +453,6 @@ void BrowserWidget2::open_DICOMDIR2(const QString & f)
 	if (!warning.isEmpty())
 	{
 		QMessageBox mbox;
-		mbox.setWindowModality(Qt::ApplicationModal);
 		mbox.setIcon(QMessageBox::Warning);
 		mbox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 		mbox.setDefaultButton(QMessageBox::Yes);
@@ -570,7 +569,6 @@ void BrowserWidget2::reload_dir()
 			if (!warning.isEmpty())
 			{
 				QMessageBox mbox;
-				mbox.setWindowModality(Qt::ApplicationModal);
 				mbox.setIcon(QMessageBox::Warning);
 				mbox.setStandardButtons(
 					QMessageBox::Yes | QMessageBox::No);
@@ -706,7 +704,6 @@ void BrowserWidget2::open_DICOMDIR()
 	if (!warning.isEmpty())
 	{
 		QMessageBox mbox;
-		mbox.setWindowModality(Qt::ApplicationModal);
 		mbox.setIcon(QMessageBox::Warning);
 		mbox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 		mbox.setDefaultButton(QMessageBox::Yes);
@@ -1844,7 +1841,6 @@ quit__:
 	if (!warning.isEmpty())
 	{
 		QMessageBox mbox;
-		mbox.setWindowModality(Qt::ApplicationModal);
 		mbox.setIcon(QMessageBox::Warning);
 		mbox.setText(warning);
 		mbox.exec();

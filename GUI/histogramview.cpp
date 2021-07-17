@@ -322,7 +322,6 @@ void HistogramView::get_screen()
 	if (!p.save(file, ext.toLatin1().constData()))
 	{
 		QMessageBox mbox;
-		mbox.setWindowModality(Qt::ApplicationModal);
 		mbox.addButton(QMessageBox::Close);
 		mbox.setIcon(QMessageBox::Warning);
 		mbox.setText(QString("Could not save file"));

@@ -672,7 +672,6 @@ void GLWidget::get_screen(bool white_bg)
 	if (!p.save(f, "PNG"))
 	{
 		QMessageBox mbox;
-		mbox.setWindowModality(Qt::ApplicationModal);
 		mbox.addButton(QMessageBox::Close);
 		mbox.setIcon(QMessageBox::Warning);
 		mbox.setText(QString("Could not save file"));

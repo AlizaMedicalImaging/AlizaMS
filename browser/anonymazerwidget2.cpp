@@ -1617,7 +1617,6 @@ void AnonymazerWidget2::run_()
 	if (out_path == in_path)
 	{
 		QMessageBox mb;
-		mb.setWindowModality(Qt::ApplicationModal);
 		mb.setText(QString(
 			"Error: input and output are the same directory"));
 		mb.exec();
@@ -1693,7 +1692,6 @@ void AnonymazerWidget2::run_()
 	if (!message.isEmpty())
 	{
 		QMessageBox mbox;
-		mbox.setWindowModality(Qt::ApplicationModal);
 		mbox.addButton(QMessageBox::Ok);
 		mbox.setIcon(QMessageBox::Information);
 		mbox.setText(message);

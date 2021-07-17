@@ -922,7 +922,6 @@ quit__:
 			message += message_;
 		}
 		QMessageBox mbox;
-		mbox.setWindowModality(Qt::ApplicationModal);
 		mbox.addButton(QMessageBox::Close);
 		mbox.setIcon(QMessageBox::Warning);
 		mbox.setText(message);
@@ -3269,7 +3268,6 @@ void Aliza::create_group()
 	if (!message_.isEmpty())
 	{
 		QMessageBox mbox;
-		mbox.setWindowModality(Qt::ApplicationModal);
 		mbox.addButton(QMessageBox::Close);
 		mbox.setIcon(QMessageBox::Information);
 		mbox.setText(message_);
@@ -3288,7 +3286,6 @@ void Aliza::remove_group()
 		return;
 	}
 	QMessageBox mbox;
-	mbox.setWindowModality(Qt::ApplicationModal);
 	mbox.addButton(QMessageBox::YesToAll);
 	mbox.addButton(QMessageBox::Yes);
 	mbox.addButton(QMessageBox::Cancel);
@@ -4266,7 +4263,6 @@ quit__:
 	if (!error__.isEmpty())
 	{
 		QMessageBox mbox;
-		mbox.setWindowModality(Qt::ApplicationModal);
 		mbox.addButton(QMessageBox::Close);
 		mbox.setIcon(QMessageBox::Warning);
 		mbox.setText(error__);
@@ -4440,7 +4436,6 @@ void Aliza::trigger_show_roi_info()
 				s0;
 			QMessageBox mbox;
 			mbox.setWindowTitle("ROI Info");
-			mbox.setWindowModality(Qt::ApplicationModal);
 			mbox.addButton(QMessageBox::Close);
 			mbox.setIcon(QMessageBox::Information);
 			mbox.setText(s);
