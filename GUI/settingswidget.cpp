@@ -215,7 +215,7 @@ void SettingsWidget::readSettings()
 	settings.setFallbacksEnabled(true);
 	settings.beginGroup(QString("GlobalSettings"));
 	const int tmp0  = settings.value(QString("enable_gl_3D"),    1).toInt();
-	double tmp1     = settings.value(QString("scale_ui_icons"),1.0).toDouble();
+	double tmp1     = settings.value(QString("scale_ui_icons"),1.2).toDouble();
 	double tmp2     = settings.value(QString("app_font_pt"),   0.0).toDouble();
 	const int tmp3  = settings.value(QString("sr_i_scale"),      0).toInt();
 	const int tmp4  = settings.value(QString("sr_i_width"),    512).toInt();

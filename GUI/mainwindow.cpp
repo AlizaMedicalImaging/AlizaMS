@@ -1277,15 +1277,14 @@ void MainWindow::dropEvent(QDropEvent * e)
 		if (fi.isDir())
 		{
 			browser2->open_dicom_dir2(f);
-			if (tabWidget->currentIndex()!=1) tabWidget->setCurrentIndex(1);
+			if (tabWidget->currentIndex() != 1) tabWidget->setCurrentIndex(1);
 		}
 		else if (
 			fi.isFile() &&
 			fi.fileName().toUpper() == QString("DICOMDIR"))
 		{
-			browser2->open_dicom_dir2(f);
 			browser2->open_DICOMDIR2(f);
-			if (tabWidget->currentIndex()!=1) tabWidget->setCurrentIndex(1);
+			if (tabWidget->currentIndex() != 1) tabWidget->setCurrentIndex(1);
 		}
 		else
 		{

@@ -482,15 +482,15 @@ void BrowserWidget2::open_DICOMDIR2(const QString & f)
 void BrowserWidget2::dropEvent(QDropEvent * e)
 {
 	const QMimeData * mimeData = e->mimeData();
-	QStringList l;
 	if (!mimeData) return;
+	QStringList l;
 	if (mimeData->hasUrls())
 	{
 		QList<QUrl> urls = mimeData->urls();
 		for (int i = 0; i < urls.size() && i < 128; ++i)
 			l.append(urls.at(i).toLocalFile());
 	}
-	if (l.size()>=1)
+	if (l.size() >= 1)
 	{
 		const QString f = l.at(0);
 		QFileInfo fi(f);
@@ -498,7 +498,8 @@ void BrowserWidget2::dropEvent(QDropEvent * e)
 		{
 			open_dicom_dir2(f);
 		}
-		else if (fi.isFile())
+		else if (fi.isFile() &&
+			(fi.fileName().toUpper() == QString("DICOMDIR")))
 		{
 			open_DICOMDIR2(f);
 		}
