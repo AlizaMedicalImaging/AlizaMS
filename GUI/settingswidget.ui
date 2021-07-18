@@ -438,8 +438,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>991</width>
-            <height>540</height>
+            <width>355</width>
+            <height>124</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -666,8 +666,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>482</width>
-            <height>244</height>
+            <width>991</width>
+            <height>540</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -702,7 +702,7 @@
               </sizepolicy>
              </property>
              <property name="title">
-              <string>3D texture</string>
+              <string>3D texture (immediate, may be turned off for huge images)</string>
              </property>
              <property name="checkable">
               <bool>true</bool>
