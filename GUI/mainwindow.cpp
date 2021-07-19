@@ -407,7 +407,7 @@ MainWindow::MainWindow(
 		gl_frame->show();
 		glwidget->show();
 		view3d_label->setText(QString(
-			"Physical space, intensity projection"));
+			"Physical space, intensity projection, GPU"));
 		slicesAct->setChecked(true);
 		raycastAct->setChecked(false);
 	}
@@ -703,12 +703,12 @@ void MainWindow::createActions()
 	transp2dAct->setEnabled(true);
 	view_group = new QActionGroup(this);
 	slicesAct = new QAction(QIcon(QString(":/bitmaps/align.svg")),
-		QString("Physical space, intensity projection"), this);
+		QString("Physical space, intensity projection, GPU"), this);
 	slicesAct->setCheckable(true);
 	slicesAct->setChecked(true);
 	view_group->addAction(slicesAct);
 	raycastAct = new QAction(QIcon(QString(":/bitmaps/ray.svg")),
-		QString("Intensity projection"), this);
+		QString("Intensity projection, GPU"), this);
 	raycastAct->setCheckable(true);
 	view_group->addAction(raycastAct);
 	frames2DAct = new QAction(QIcon(QString(":/bitmaps/cross.svg")),
@@ -1437,7 +1437,7 @@ void MainWindow::set_view_3d(bool t)
 	if (!t) return;
 	if (!aliza) return;
 	if (!aliza->check_3d()) return;
-	view3d_label->setText(QString("Physical space, intensity projection"));
+	view3d_label->setText(QString("Physical space, intensity projection, GPU"));
 	frames3DAct->setVisible(true);
 	trans3DAct->setVisible(true);
 	toolbox->contours_checkBox->setEnabled(true);
@@ -1461,7 +1461,7 @@ void MainWindow::set_view_rc(bool t)
 {
 	if (!t) return;
 	if (!aliza->check_3d()) return;
-	view3d_label->setText(QString("Intensity projection"));
+	view3d_label->setText(QString("Intensity projection, GPU"));
 	frames3DAct->setVisible(false);
 	trans3DAct->setVisible(false);
 	toolbox->alpha_doubleSpinBox->show();

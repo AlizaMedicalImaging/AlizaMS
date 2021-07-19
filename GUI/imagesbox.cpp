@@ -638,12 +638,12 @@ void ImagesBox::set_html(const ImageVariant * v)
 			if      (v->di->filtering==0) texfilt = QString(" (no filtering)");
 			else if (v->di->filtering==1) texfilt = QString(" (bilinear)");
 			else                          texfilt = QString(" (?)");
-			if      (v->di->tex_info==0)  texinfo = QString(" GL_R16F ");
-			else if (v->di->tex_info==1)  texinfo = QString(" GL_R16 ");
-			else if (v->di->tex_info==2)  texinfo = QString(" GL_R8 ");
+			if      (v->di->tex_info==0)  texinfo = QString(" R16F ");
+			else if (v->di->tex_info==1)  texinfo = QString(" R16 ");
+			else if (v->di->tex_info==2)  texinfo = QString(" R8 ");
 			else                          texinfo = QString(" ? ");
 			html.append(
-				QString("<span class='y4'>3D texture:<br />") +
+				QString("<span class='y4'>3D GPU views:<br />") +
 				texinfo +
 				QVariant(v->di->dimx).toString()  + QString("x") +
 				QVariant(v->di->dimy).toString()  + QString("x") +
@@ -655,10 +655,10 @@ void ImagesBox::set_html(const ImageVariant * v)
 			if (v->image_type>=0 && v->image_type<10)
 			{
 				html.append(QString(
-					"<span class='y4'>3D texture"
+					"<span class='y4'>3D GPU views"
 					":</span><br />"
 					"<span class='y7'>Texture "
-					"is disabled</span><br />"));
+					"are disabled</span><br />"));
 			}
 		}
 	}
