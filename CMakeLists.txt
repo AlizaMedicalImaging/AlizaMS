@@ -726,6 +726,7 @@ set(ALIZAMS_SRCS ${ALIZAMS_SRCS}
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/studyviewwidget.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/browser/sqtree.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/browser/browserwidget2.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/browser/helpwidget.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/browser/anonymazerwidget2.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/aliza.cpp)
 
@@ -747,6 +748,7 @@ set(ALIZAMS_MOC_HRDS
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/mainwindow.h
   ${CMAKE_CURRENT_SOURCE_DIR}/browser/sqtree.h
   ${CMAKE_CURRENT_SOURCE_DIR}/browser/browserwidget2.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/browser/helpwidget.h
   ${CMAKE_CURRENT_SOURCE_DIR}/browser/anonymazerwidget2.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/findrefdialog.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/imageinfodialog.h
@@ -821,6 +823,7 @@ set(ALIZAMS_UIS
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/aboutwidget.ui
   ${CMAKE_CURRENT_SOURCE_DIR}/browser/sqtree.ui
   ${CMAKE_CURRENT_SOURCE_DIR}/browser/browserwidget2.ui
+  ${CMAKE_CURRENT_SOURCE_DIR}/browser/helpwidget.ui
   ${CMAKE_CURRENT_SOURCE_DIR}/browser/anonymazerwidget2.ui
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/findrefdialog.ui
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/imagesbox.ui

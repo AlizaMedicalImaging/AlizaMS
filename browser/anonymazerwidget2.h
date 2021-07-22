@@ -14,6 +14,7 @@
 #include <QDragLeaveEvent>
 #include <QSettings>
 #include <set>
+#include "helpwidget.h"
 
 #define ALIZAMS_ROOT_UID "1.2.826.0.1.3680043.10.585"
 
@@ -29,10 +30,7 @@ public slots:
 	void run_();
 	void set_output_dir();
 	void set_input_dir();
-
-private slots:
-	void update_retain_dates(bool);
-	void update_modify_dates(bool);
+	void show_help();
 
 protected:
 	void closeEvent(QCloseEvent*) override;
@@ -48,25 +46,40 @@ private:
 		const QString&,
 		const QMap<QString,QString> &,
 		const QMap<QString,QString> &,
+		const QMap<QString,QString> &,
 		unsigned int*,
 		unsigned int*,
 		const mdcm::Dicts&,
-		QProgressDialog*,
 		const int,
 		const int,
 		const int,
-		const int);
+		const int,
+		const bool,
+		const QString&,
+		const QString&,
+		QProgressDialog*);
 	void init_profile();
 	std::set<mdcm::Tag> pn_tags;
+	std::set<mdcm::Tag> id_tags;
 	std::set<mdcm::Tag> uid_tags;
 	std::set<mdcm::Tag> empty_tags;
 	std::set<mdcm::Tag> remove_tags;
-	std::set<mdcm::Tag> device_tags;
+	std::set<mdcm::Tag> dev_remove_tags;
+	std::set<mdcm::Tag> dev_empty_tags;
+	std::set<mdcm::Tag> dev_replace_tags;
 	std::set<mdcm::Tag> patient_tags;
-	std::set<mdcm::Tag> institution_tags;
+	std::set<mdcm::Tag> inst_remove_tags;
+	std::set<mdcm::Tag> inst_empty_tags;
+	std::set<mdcm::Tag> inst_replace_tags;
 	std::set<mdcm::Tag> time_tags;
+	std::set<mdcm::Tag> descr_remove_tags;
+	std::set<mdcm::Tag> descr_empty_tags;
+	std::set<mdcm::Tag> descr_replace_tags;
+	std::set<mdcm::Tag> struct_zero_tags;
+	std::set<mdcm::Tag> zero_seq_tags;
 	QString output_dir;
 	QString input_dir;
+	HelpWidget * help_widget;
 };
 
 #endif // ANONYMAZERWIDGET2_H__

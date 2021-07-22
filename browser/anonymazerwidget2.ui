@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>847</width>
-    <height>517</height>
+    <width>849</width>
+    <height>553</height>
    </rect>
   </property>
   <property name="acceptDrops">
@@ -62,8 +62,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>24</width>
-          <height>24</height>
+          <width>16</width>
+          <height>16</height>
          </size>
         </property>
        </widget>
@@ -114,8 +114,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>24</width>
-          <height>24</height>
+          <width>16</width>
+          <height>16</height>
          </size>
         </property>
        </widget>
@@ -158,12 +158,116 @@
     </widget>
    </item>
    <item>
-    <widget class="QRadioButton" name="uids_radioButton">
+    <widget class="QFrame" name="frame_4">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <property name="spacing">
+       <number>4</number>
+      </property>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="id_lineEdit">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optional, &lt;span style=&quot; font-weight:600;&quot;&gt;error message will apper if several patient IDs will be detected in a folder&lt;/span&gt;!&lt;/p&gt;&lt;p&gt;Characters must be consistent with &lt;span style=&quot; font-style:italic;&quot;&gt;Specific Character Set (0x0008, 0x0005) &lt;/span&gt;of the data set, prefer ASCII if possible!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="maxLength">
+         <number>512</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="id_label">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optional, &lt;span style=&quot; font-weight:600;&quot;&gt;error message will apper if several patient IDs will be detected in a folder&lt;/span&gt;!&lt;/p&gt;&lt;p&gt;Characters must be consistent with &lt;span style=&quot; font-style:italic;&quot;&gt;Specific Character Set (0x0008, 0x0005) &lt;/span&gt;of the data set, prefer ASCII if possible!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Replace patient ID</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::PlainText</enum>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::NoTextInteraction</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="name_label">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optional, &lt;span style=&quot; font-weight:600;&quot;&gt;error message will apper if several patient IDs will be detected in a folder&lt;/span&gt;!&lt;/p&gt;&lt;p&gt;Formats:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Name Surname&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Surname, Name&lt;/span&gt;&lt;/p&gt;&lt;p&gt;and DICOM &lt;span style=&quot; font-style:italic;&quot;&gt;VR PN.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Characters must be consistent wiht &lt;span style=&quot; font-style:italic;&quot;&gt;Specific Character Set (0x0008, 0x0005) &lt;/span&gt;of the data set.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Replace patient name </string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::PlainText</enum>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::NoTextInteraction</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="name_lineEdit">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optional, &lt;span style=&quot; font-weight:600;&quot;&gt;error message will apper if several patient IDs will be detected in a folder&lt;/span&gt;!&lt;/p&gt;&lt;p&gt;Formats:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Name Surname&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Surname, Name&lt;/span&gt;&lt;/p&gt;&lt;p&gt;and DICOM &lt;span style=&quot; font-style:italic;&quot;&gt;VR PN.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Characters must be consistent wiht &lt;span style=&quot; font-style:italic;&quot;&gt;Specific Character Set (0x0008, 0x0005) &lt;/span&gt;of the data set.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="maxLength">
+         <number>2000</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="random_checkBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Names will look like &lt;span style=&quot; font-style:italic;&quot;&gt;J. W. Smith&lt;/span&gt; if checked, otherwise &lt;span style=&quot; font-style:italic;&quot;&gt;J. W. S.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Common USA surnames will be randomly generated and consistenlty replaced .&lt;/p&gt;&lt;p&gt;Is is applicable to many &lt;span style=&quot; font-style:italic;&quot;&gt;VR PN&lt;/span&gt; attributes in a folder, not only to patient name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Generate random names</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="uids_checkBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;UIDs&lt;/span&gt; will be not modified, if not set &lt;span style=&quot; font-style:italic;&quot;&gt;UIDs&lt;/span&gt; will be &lt;span style=&quot; font-style:italic;&quot;&gt;consistently&lt;/span&gt; replaced with generated values.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
       <string>Retain UIDs</string>
@@ -180,12 +284,15 @@
     </widget>
    </item>
    <item>
-    <widget class="QRadioButton" name="chars_radioButton">
+    <widget class="QCheckBox" name="chars_checkBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Weigth, size, etc. Important for e.g. &lt;span style=&quot; font-style:italic;&quot;&gt;PET&lt;/span&gt; to calculate &lt;span style=&quot; font-style:italic;&quot;&gt;SUV&lt;/span&gt;. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
       <string>Retain patient characteristics</string>
@@ -199,12 +306,15 @@
     </widget>
    </item>
    <item>
-    <widget class="QRadioButton" name="dates_radioButton">
+    <widget class="QCheckBox" name="dates_checkBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dates and times will be preserved as they are and will be &lt;span style=&quot; font-style:italic;&quot;&gt;consistently&lt;/span&gt; modified if not set.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
       <string>Retain dates and time</string>
@@ -215,10 +325,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QRadioButton" name="mdates_radioButton">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
+    <widget class="QCheckBox" name="device_checkBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -226,23 +333,7 @@
       </sizepolicy>
      </property>
      <property name="toolTip">
-      <string/>
-     </property>
-     <property name="text">
-      <string>Modify dates and time</string>
-     </property>
-     <property name="autoExclusive">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QRadioButton" name="device_radioButton">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Device ID and many other related attributes will be preserved.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
       <string>Retain device identification</string>
@@ -253,12 +344,15 @@
     </widget>
    </item>
    <item>
-    <widget class="QRadioButton" name="institution_radioButton">
+    <widget class="QCheckBox" name="institution_checkBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Institution information will be preserved, e.g. station name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
       <string>Retain institution identification</string>
@@ -269,7 +363,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QRadioButton" name="private_radioButton">
+    <widget class="QCheckBox" name="private_checkBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -277,7 +371,7 @@
       </sizepolicy>
      </property>
      <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DICOM private attributes&lt;/span&gt; may contain important information&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DICOM private attributes&lt;/span&gt; may contain important information, but leak private data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
       <string>Remove private attributes</string>
@@ -291,7 +385,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QRadioButton" name="graphics_radioButton">
+    <widget class="QCheckBox" name="graphics_checkBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -299,7 +393,7 @@
       </sizepolicy>
      </property>
      <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remove overlays, curves, etc. Can not remove overlays in pixel data, show warning&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remove overlays, curves, etc., can not remove overlays in pixel data, show warning.&lt;/p&gt;&lt;p&gt;May leak private information.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
       <string>Remove graphics</string>
@@ -311,6 +405,48 @@
       <bool>false</bool>
      </property>
     </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="struct_checkBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Related to &lt;span style=&quot; font-style:italic;&quot;&gt;Structured Report&lt;/span&gt; SOP Classes.&lt;/p&gt;&lt;p&gt;May leak private information.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Remove structured content</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="desc_checkBox">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Series and study descriptions, ROI names and many other attributes.&lt;/p&gt;&lt;p&gt;May leak private information.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Remove descriptions</string>
+     </property>
+     <property name="autoExclusive">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item>
     <widget class="QFrame" name="frame">
@@ -327,6 +463,21 @@
       <enum>QFrame::Plain</enum>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="spacing">
+       <number>4</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>4</number>
+      </property>
       <item>
        <widget class="QLabel" name="label_5">
         <property name="text">
@@ -363,8 +514,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>24</width>
-          <height>24</height>
+          <width>16</width>
+          <height>16</height>
          </size>
         </property>
        </widget>
@@ -382,36 +533,14 @@
         </property>
        </spacer>
       </item>
+      <item>
+       <widget class="QPushButton" name="help_pushButton">
+        <property name="text">
+         <string>Help</string>
+        </property>
+       </widget>
+      </item>
      </layout>
-    </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;a href=&quot;https://sites.google.com/site/alizaviewer/manual/dicom-specification/application-level-confidentiality-profile-attributes&quot;&gt;&lt;span style=&quot; font-weight:600; font-style:italic; text-decoration: underline; color:#0000ff;&quot;&gt;DICOM Application Level Confidentiality Profile PS3.15 E.1&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::RichText</enum>
-     </property>
-     <property name="openExternalLinks">
-      <bool>true</bool>
-     </property>
-     <property name="textInteractionFlags">
-      <set>Qt::LinksAccessibleByMouse</set>
-     </property>
     </widget>
    </item>
   </layout>
@@ -419,15 +548,20 @@
  <tabstops>
   <tabstop>in_pushButton</tabstop>
   <tabstop>out_pushButton</tabstop>
-  <tabstop>uids_radioButton</tabstop>
-  <tabstop>chars_radioButton</tabstop>
-  <tabstop>dates_radioButton</tabstop>
-  <tabstop>mdates_radioButton</tabstop>
-  <tabstop>device_radioButton</tabstop>
-  <tabstop>institution_radioButton</tabstop>
-  <tabstop>private_radioButton</tabstop>
-  <tabstop>graphics_radioButton</tabstop>
+  <tabstop>name_lineEdit</tabstop>
+  <tabstop>id_lineEdit</tabstop>
+  <tabstop>random_checkBox</tabstop>
+  <tabstop>uids_checkBox</tabstop>
+  <tabstop>chars_checkBox</tabstop>
+  <tabstop>dates_checkBox</tabstop>
+  <tabstop>device_checkBox</tabstop>
+  <tabstop>institution_checkBox</tabstop>
+  <tabstop>private_checkBox</tabstop>
+  <tabstop>graphics_checkBox</tabstop>
+  <tabstop>struct_checkBox</tabstop>
+  <tabstop>desc_checkBox</tabstop>
   <tabstop>run_pushButton</tabstop>
+  <tabstop>help_pushButton</tabstop>
  </tabstops>
  <resources>
   <include location="../alizams.qrc"/>
