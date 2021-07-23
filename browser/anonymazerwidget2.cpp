@@ -1247,6 +1247,8 @@ static void anonymize_file__(
 	const bool retain_device_id,
 	const bool retain_patient_chars,
 	const bool retain_institution_id,
+	const bool confirm_clean_pixel,
+	const bool confirm_no_recognizable,
 	const int y_off,
 	const int m_off,
 	const int d_off,
@@ -1390,9 +1392,362 @@ static void anonymize_file__(
 	remove_group_length__(ds, implicit, dicts);
 	//
 	const QString s0("YES");
-	const QString s1("DICOM PS 3.15 E.1 2021b (close to)");
+	const QString s1("DICOM PS 3.15 E.1 2021b");
 	replace__(ds, mdcm::Tag(0x0012,0x0062), s0.toLatin1().constData(), s0.toLatin1().length(), implicit, dicts);
 	replace__(ds, mdcm::Tag(0x0012,0x0063), s1.toLatin1().constData(), s1.toLatin1().length(), implicit, dicts);
+	{
+		const QLatin1String dcm("DCM");
+		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = new mdcm::SequenceOfItems();
+		sq->SetLengthToUndefined();
+		//
+		{
+			const QLatin1String cv("113100");
+			const QLatin1String cm("Basic Application Confidentiality Profile");
+			mdcm::Item item;
+			item.SetVLToUndefined();
+			mdcm::DataSet & nds = item.GetNestedDataSet();
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+				e.SetByteValue(cv.latin1(), cv.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+				e.SetByteValue(dcm.latin1(), dcm.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+				e.SetByteValue(cm.latin1(), cm.size());
+				if (!implicit) e.SetVR(mdcm::VR::LO);
+				nds.Replace(e);
+			}
+			sq->AddItem(item);
+		}
+		//
+		if (confirm_clean_pixel)
+		{
+			const QLatin1String cv("113101");
+			const QLatin1String cm("Clean Pixel Data Option");
+			mdcm::Item item;
+			item.SetVLToUndefined();
+			mdcm::DataSet & nds = item.GetNestedDataSet();
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+				e.SetByteValue(cv.latin1(), cv.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+				e.SetByteValue(dcm.latin1(), dcm.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+				e.SetByteValue(cm.latin1(), cm.size());
+				if (!implicit) e.SetVR(mdcm::VR::LO);
+				nds.Replace(e);
+			}
+			sq->AddItem(item);
+		}
+		//
+		if (confirm_no_recognizable)
+		{
+			const QLatin1String cv("113102");
+			const QLatin1String cm("Clean Recognizable Visual Features Option");
+			mdcm::Item item;
+			item.SetVLToUndefined();
+			mdcm::DataSet & nds = item.GetNestedDataSet();
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+				e.SetByteValue(cv.latin1(), cv.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+				e.SetByteValue(dcm.latin1(), dcm.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+				e.SetByteValue(cm.latin1(), cm.size());
+				if (!implicit) e.SetVR(mdcm::VR::LO);
+				nds.Replace(e);
+			}
+			sq->AddItem(item);
+		}
+		//
+		if (!remove_graphics)
+		{
+			const QLatin1String cv("113103");
+			const QLatin1String cm("Clean Graphics Option");
+			mdcm::Item item;
+			item.SetVLToUndefined();
+			mdcm::DataSet & nds = item.GetNestedDataSet();
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+				e.SetByteValue(cv.latin1(), cv.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+				e.SetByteValue(dcm.latin1(), dcm.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+				e.SetByteValue(cm.latin1(), cm.size());
+				if (!implicit) e.SetVR(mdcm::VR::LO);
+				nds.Replace(e);
+			}
+			sq->AddItem(item);
+		}
+		//
+		if (!remove_struct)
+		{
+			const QLatin1String cv("113104");
+			const QLatin1String cm("Clean Structured Content Option");
+			mdcm::Item item;
+			item.SetVLToUndefined();
+			mdcm::DataSet & nds = item.GetNestedDataSet();
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+				e.SetByteValue(cv.latin1(), cv.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+				e.SetByteValue(dcm.latin1(), dcm.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+				e.SetByteValue(cm.latin1(), cm.size());
+				if (!implicit) e.SetVR(mdcm::VR::LO);
+				nds.Replace(e);
+			}
+			sq->AddItem(item);
+		}
+		//
+		if (!remove_descriptions)
+		{
+			const QLatin1String cv("113105");
+			const QLatin1String cm("Clean Descriptors Option");
+			mdcm::Item item;
+			item.SetVLToUndefined();
+			mdcm::DataSet & nds = item.GetNestedDataSet();
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+				e.SetByteValue(cv.latin1(), cv.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+				e.SetByteValue(dcm.latin1(), dcm.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+				e.SetByteValue(cm.latin1(), cm.size());
+				if (!implicit) e.SetVR(mdcm::VR::LO);
+				nds.Replace(e);
+			}
+			sq->AddItem(item);
+		}
+		//
+		{
+			const QLatin1String cv =
+				retain_dates_times
+				?
+				QLatin1String("113106")
+				:
+				QLatin1String("113107");
+			const QLatin1String cm =
+				retain_dates_times
+				?
+				QLatin1String("Retain Longitudinal Temporal Information Full Dates Option")
+				:
+				QLatin1String("Retain Longitudinal Temporal Information Modified Dates Option");
+			mdcm::Item item;
+			item.SetVLToUndefined();
+			mdcm::DataSet & nds = item.GetNestedDataSet();
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+				e.SetByteValue(cv.latin1(), cv.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+				e.SetByteValue(dcm.latin1(), dcm.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+				e.SetByteValue(cm.latin1(), cm.size());
+				if (!implicit) e.SetVR(mdcm::VR::LO);
+				nds.Replace(e);
+			}
+			sq->AddItem(item);
+		}
+		//
+		if (retain_patient_chars)
+		{
+			const QLatin1String cv("113108");
+			const QLatin1String cm("Retain Patient Characteristics Option");
+			mdcm::Item item;
+			item.SetVLToUndefined();
+			mdcm::DataSet & nds = item.GetNestedDataSet();
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+				e.SetByteValue(cv.latin1(), cv.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+				e.SetByteValue(dcm.latin1(), dcm.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+				e.SetByteValue(cm.latin1(), cm.size());
+				if (!implicit) e.SetVR(mdcm::VR::LO);
+				nds.Replace(e);
+			}
+			sq->AddItem(item);
+		}
+		//
+		if (retain_device_id)
+		{
+			const QLatin1String cv("113109");
+			const QLatin1String cm("Retain Device Identity Option");
+			mdcm::Item item;
+			item.SetVLToUndefined();
+			mdcm::DataSet & nds = item.GetNestedDataSet();
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+				e.SetByteValue(cv.latin1(), cv.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+				e.SetByteValue(dcm.latin1(), dcm.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+				e.SetByteValue(cm.latin1(), cm.size());
+				if (!implicit) e.SetVR(mdcm::VR::LO);
+				nds.Replace(e);
+			}
+			sq->AddItem(item);
+		}
+		//
+		if (preserve_uids)
+		{
+			const QLatin1String cv("113110");
+			const QLatin1String cm("Retain UIDs Option");
+			mdcm::Item item;
+			item.SetVLToUndefined();
+			mdcm::DataSet & nds = item.GetNestedDataSet();
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+				e.SetByteValue(cv.latin1(), cv.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+				e.SetByteValue(dcm.latin1(), dcm.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+				e.SetByteValue(cm.latin1(), cm.size());
+				if (!implicit) e.SetVR(mdcm::VR::LO);
+				nds.Replace(e);
+			}
+			sq->AddItem(item);
+		}
+		//
+		if (!remove_private)
+		{
+			const QLatin1String cv("113111");
+			const QLatin1String cm("Retain Safe Private Option");
+			mdcm::Item item;
+			item.SetVLToUndefined();
+			mdcm::DataSet & nds = item.GetNestedDataSet();
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+				e.SetByteValue(cv.latin1(), cv.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+				e.SetByteValue(dcm.latin1(), dcm.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+				e.SetByteValue(cm.latin1(), cm.size());
+				if (!implicit) e.SetVR(mdcm::VR::LO);
+				nds.Replace(e);
+			}
+			sq->AddItem(item);
+		}
+		//
+		if (retain_institution_id)
+		{
+			const QLatin1String cv("113112");
+			const QLatin1String cm("Retain Institution Identity Option");
+			mdcm::Item item;
+			item.SetVLToUndefined();
+			mdcm::DataSet & nds = item.GetNestedDataSet();
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+				e.SetByteValue(cv.latin1(), cv.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+				e.SetByteValue(dcm.latin1(), dcm.size());
+				if (!implicit) e.SetVR(mdcm::VR::SH);
+				nds.Replace(e);
+			}
+			{
+				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+				e.SetByteValue(cm.latin1(), cm.size());
+				if (!implicit) e.SetVR(mdcm::VR::LO);
+				nds.Replace(e);
+			}
+			sq->AddItem(item);
+		}
+		mdcm::DataElement eDeidentificationMethodCodeSequence(mdcm::Tag(0x0012,0x0064));
+		if (!implicit) eDeidentificationMethodCodeSequence.SetVR(mdcm::VR::SQ);
+		eDeidentificationMethodCodeSequence.SetValue(*sq);
+		ds.Replace(eDeidentificationMethodCodeSequence);
+	}
 	//
 	*ok = true;
 	//
@@ -1857,15 +2212,17 @@ void AnonymazerWidget2::process_directory(
 	const QString & single_id,
 	QProgressDialog * pd)
 {
-	const bool preserve_uids         = uids_checkBox->isChecked();
-	const bool remove_private        = private_checkBox->isChecked();
-	const bool remove_graphics       = graphics_checkBox->isChecked();
-	const bool remove_descriptions   = desc_checkBox->isChecked();
-	const bool remove_struct         = struct_checkBox->isChecked();
-	const bool retain_device_id      = device_checkBox->isChecked();
-	const bool retain_patient_chars  = chars_checkBox->isChecked();
-	const bool retain_institution_id = institution_checkBox->isChecked();
-	const bool retain_dates_times    = dates_checkBox->isChecked();
+	const bool preserve_uids           = uids_checkBox->isChecked();
+	const bool remove_private          = private_checkBox->isChecked();
+	const bool remove_graphics         = graphics_checkBox->isChecked();
+	const bool remove_descriptions     = desc_checkBox->isChecked();
+	const bool remove_struct           = struct_checkBox->isChecked();
+	const bool retain_device_id        = device_checkBox->isChecked();
+	const bool retain_patient_chars    = chars_checkBox->isChecked();
+	const bool retain_institution_id   = institution_checkBox->isChecked();
+	const bool retain_dates_times      = dates_checkBox->isChecked();
+	const bool confirm_clean_pixel     = confirm1_checkBox->isChecked();
+	const bool confirm_no_recognizable = confirm2_checkBox->isChecked();
 	QDir dir(p);
 	QStringList dlist = dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
 	QStringList flist = dir.entryList(QDir::Files);
@@ -1941,6 +2298,8 @@ void AnonymazerWidget2::process_directory(
 				retain_device_id,
 				retain_patient_chars,
 				retain_institution_id,
+				confirm_clean_pixel,
+				confirm_no_recognizable,
 				y_off,
 				m_off,
 				d_off,
@@ -2649,7 +3008,6 @@ void AnonymazerWidget2::init_profile()
 	dev_replace_tags  .insert(mdcm::Tag(0x0018,0x9371));// X-Ray Detector ID
 	dev_remove_tags   .insert(mdcm::Tag(0x0018,0x9373));// X-Ray Detector Label
 	dev_replace_tags  .insert(mdcm::Tag(0x0018,0x9367));// X-Ray Source ID
-	remove_tags       .insert(mdcm::Tag(0x0012,0x0064));// De-identification Method Code Sequence
 }
 // clang-format on
 
