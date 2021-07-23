@@ -1,3 +1,4 @@
+#include "helpwidget.h"
 #include "anonymazerwidget2.h"
 #include <QtGlobal>
 #include <QDir>
@@ -295,8 +296,9 @@ static void replace_pn_recurs__(
 		{
 			if (!single_name.isEmpty() && one_patient && t == mdcm::Tag(0x0010,0x0010))
 			{
-				replace__(
-					ds, t, single_name.toUtf8().constData(), single_name.size(), implicit, dicts);
+				QString sn = single_name.simplified();
+				sn.replace(QString(" "), QString("^"));
+				replace__(ds, t, sn.toUtf8().constData(), sn.size(), implicit, dicts);
 			}
 			else
 			{

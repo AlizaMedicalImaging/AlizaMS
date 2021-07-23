@@ -235,6 +235,7 @@ private:
 	QAction  * anon_open_in_dir;
 	QAction  * anon_open_out_dir;
 	QAction  * anon_run;
+	QAction  * anon_help;
 	QVBoxLayout * frame2D_viewerZ_layout;
 	QVBoxLayout * frame2D_viewer_layout;
 	QVBoxLayout * histogram_frame_layout;

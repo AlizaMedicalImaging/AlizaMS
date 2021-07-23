@@ -181,7 +181,7 @@
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optional, &lt;span style=&quot; font-weight:600;&quot;&gt;error message will apper if several patient IDs will be detected in a folder&lt;/span&gt;!&lt;/p&gt;&lt;p&gt;Characters must be consistent with &lt;span style=&quot; font-style:italic;&quot;&gt;Specific Character Set (0x0008, 0x0005) &lt;/span&gt;of the data set, prefer ASCII if possible!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optional, &lt;span style=&quot; font-weight:600;&quot;&gt;error message will apper if several patient IDs will be detected in a folder&lt;/span&gt;!&lt;/p&gt;&lt;p&gt;Characters must be consistent with &lt;span style=&quot; font-style:italic;&quot;&gt;Specific Character Set (0x0008,&amp;nbsp;0x0005) &lt;/span&gt;of the data set, prefer ASCII if possible!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="maxLength">
          <number>512</number>
@@ -191,7 +191,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="id_label">
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optional, &lt;span style=&quot; font-weight:600;&quot;&gt;error message will apper if several patient IDs will be detected in a folder&lt;/span&gt;!&lt;/p&gt;&lt;p&gt;Characters must be consistent with &lt;span style=&quot; font-style:italic;&quot;&gt;Specific Character Set (0x0008, 0x0005) &lt;/span&gt;of the data set, prefer ASCII if possible!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optional, &lt;span style=&quot; font-weight:600;&quot;&gt;error message will apper if several patient IDs will be detected in a folder&lt;/span&gt;!&lt;/p&gt;&lt;p&gt;Characters must be consistent with &lt;span style=&quot; font-style:italic;&quot;&gt;Specific Character Set (0x0008,&amp;nbsp;0x0005) &lt;/span&gt;of the data set, prefer ASCII if possible!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string>Replace patient ID</string>
@@ -207,7 +207,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="name_label">
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optional, &lt;span style=&quot; font-weight:600;&quot;&gt;error message will apper if several patient IDs will be detected in a folder&lt;/span&gt;!&lt;/p&gt;&lt;p&gt;Formats:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Name Surname&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Surname, Name&lt;/span&gt;&lt;/p&gt;&lt;p&gt;and DICOM &lt;span style=&quot; font-style:italic;&quot;&gt;VR PN.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Characters must be consistent wiht &lt;span style=&quot; font-style:italic;&quot;&gt;Specific Character Set (0x0008, 0x0005) &lt;/span&gt;of the data set.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optional, &lt;span style=&quot; font-weight:600;&quot;&gt;error message will apper if several patient IDs will be detected in a folder&lt;/span&gt;!&lt;/p&gt;&lt;p&gt;Formats:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Name&amp;nbsp;Surname&lt;/span&gt;&lt;/p&gt;&lt;p&gt;and DICOM &lt;span style=&quot; font-style:italic;&quot;&gt;VR&amp;nbsp;PN.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Characters must be consistent wiht &lt;span style=&quot; font-style:italic;&quot;&gt;Specific Character Set (0x0008,&amp;nbsp;0x0005) &lt;/span&gt;of the data set.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string>Replace patient name </string>
@@ -229,7 +229,7 @@
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optional, &lt;span style=&quot; font-weight:600;&quot;&gt;error message will apper if several patient IDs will be detected in a folder&lt;/span&gt;!&lt;/p&gt;&lt;p&gt;Formats:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Name Surname&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Surname, Name&lt;/span&gt;&lt;/p&gt;&lt;p&gt;and DICOM &lt;span style=&quot; font-style:italic;&quot;&gt;VR PN.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Characters must be consistent wiht &lt;span style=&quot; font-style:italic;&quot;&gt;Specific Character Set (0x0008, 0x0005) &lt;/span&gt;of the data set.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optional, &lt;span style=&quot; font-weight:600;&quot;&gt;error message will apper if several patient IDs will be detected in a folder&lt;/span&gt;!&lt;/p&gt;&lt;p&gt;Formats:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Name&amp;nbsp;Surname&lt;/span&gt;&lt;/p&gt;&lt;p&gt;and DICOM &lt;span style=&quot; font-style:italic;&quot;&gt;VR&amp;nbsp;PN.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Characters must be consistent wiht &lt;span style=&quot; font-style:italic;&quot;&gt;Specific Character Set (0x0008,&amp;nbsp;0x0005) &lt;/span&gt;of the data set.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="maxLength">
          <number>2000</number>
@@ -275,7 +275,7 @@
           </sizepolicy>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Names will look like &lt;span style=&quot; font-style:italic;&quot;&gt;J. W. Smith&lt;/span&gt; if checked, otherwise &lt;span style=&quot; font-style:italic;&quot;&gt;J. W. S.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Common USA surnames will be randomly generated and consistenlty replaced .&lt;/p&gt;&lt;p&gt;Is is applicable to many &lt;span style=&quot; font-style:italic;&quot;&gt;VR PN&lt;/span&gt; attributes in a folder, not only to patient name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Names will look like &lt;span style=&quot; font-style:italic;&quot;&gt;J.&amp;nbsp;W.&amp;nbsp;Smith&lt;/span&gt; if checked, otherwise &lt;span style=&quot; font-style:italic;&quot;&gt;J.&amp;nbsp;W.&amp;nbsp;S.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Common USA surnames will be randomly generated and consistenlty replaced .&lt;/p&gt;&lt;p&gt;Is is applicable to many &lt;span style=&quot; font-style:italic;&quot;&gt;VR&amp;nbsp;PN&lt;/span&gt; attributes in a folder, not only to patient name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Generate random names</string>
@@ -401,7 +401,7 @@
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Retain Device Identity Option&lt;/span&gt; if checked.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>Retain device identification</string>
+          <string>Retain device identity</string>
          </property>
          <property name="autoExclusive">
           <bool>false</bool>
@@ -420,7 +420,7 @@
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Retain Institution Identity Option&lt;/span&gt; if checked.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>Retain institution identification</string>
+          <string>Retain institution identity</string>
          </property>
          <property name="autoExclusive">
           <bool>false</bool>

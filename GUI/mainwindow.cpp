@@ -498,6 +498,7 @@ MainWindow::MainWindow(
 	connect(anon_open_in_dir,               SIGNAL(triggered()),         anonymizer,SLOT(set_input_dir()));
 	connect(anon_open_out_dir,              SIGNAL(triggered()),         anonymizer,SLOT(set_output_dir()));
 	connect(anon_run,                       SIGNAL(triggered()),         anonymizer,SLOT(run_()));
+	connect(anon_help,                      SIGNAL(triggered()),         anonymizer,SLOT(show_help()));
 	connect(tabWidget,                      SIGNAL(currentChanged(int)), this,    SLOT(tab_ind_changed(int)));
 	connect(imagesbox->actionDICOMMeta,     SIGNAL(triggered()),         this,    SLOT(trigger_image_dicom_meta()));
 	connect(aliza,                          SIGNAL(image_opened()),      this,    SLOT(set_image_view()));
@@ -774,6 +775,7 @@ void MainWindow::createActions()
 	anon_open_in_dir        = new QAction(QIcon(QString(":/bitmaps/folder.svg")),QString("Open input directory"), this);
 	anon_open_out_dir       = new QAction(QIcon(QString(":/bitmaps/folder.svg")),QString("Open output directory"), this);
 	anon_run                = new QAction(QIcon(QString(":/bitmaps/right0.svg")),QString("De-identify"), this);
+	anon_help               = new QAction(QIcon(QString(":/bitmaps/info2.svg")),QString("Help"), this);
 }
 
 void MainWindow::createMenus()
@@ -882,6 +884,7 @@ void MainWindow::createMenus()
 	deidentify_menu->addAction(anon_open_in_dir);
 	deidentify_menu->addAction(anon_open_out_dir);
 	deidentify_menu->addAction(anon_run);
+	deidentify_menu->addAction(anon_help);
 	deidentify_menu->menuAction()->setVisible(false);
 	//
 	settings_menu = menuBar()->addMenu(QString("Settings"));

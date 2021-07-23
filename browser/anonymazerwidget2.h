@@ -14,9 +14,10 @@
 #include <QDragLeaveEvent>
 #include <QSettings>
 #include <set>
-#include "helpwidget.h"
 
 #define ALIZAMS_ROOT_UID "1.2.826.0.1.3680043.10.585"
+
+class HelpWidget;
 
 class AnonymazerWidget2 : public QWidget, private Ui::AnonymazerWidget2
 {
