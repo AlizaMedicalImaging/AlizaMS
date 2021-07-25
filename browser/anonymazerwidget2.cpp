@@ -1398,31 +1398,52 @@ static void anonymize_file__(
 	replace__(ds, mdcm::Tag(0x0012,0x0062), s0.toLatin1().constData(), s0.toLatin1().length(), implicit, dicts);
 	replace__(ds, mdcm::Tag(0x0012,0x0063), s1.toLatin1().constData(), s1.toLatin1().length(), implicit, dicts);
 	{
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 		const QLatin1String dcm("DCM");
+#else
+		const QString dcm("DCM");
+#endif
 		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = new mdcm::SequenceOfItems();
 		sq->SetLengthToUndefined();
 		//
 		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 			const QLatin1String cv("113100");
 			const QLatin1String cm("Basic Application Confidentiality Profile");
+#else
+			const QString cv("113100");
+			const QString cm("Basic Application Confidentiality Profile");
+#endif
 			mdcm::Item item;
 			item.SetVLToUndefined();
 			mdcm::DataSet & nds = item.GetNestedDataSet();
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cv.latin1(), cv.size());
+#else
+				e.SetByteValue(cv.toLatin1().constData(), cv.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(dcm.latin1(), dcm.size());
+#else
+				e.SetByteValue(dcm.toLatin1().constData(), dcm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cm.latin1(), cm.size());
+#else
+				e.SetByteValue(cm.toLatin1().constData(), cm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::LO);
 				nds.Replace(e);
 			}
@@ -1431,26 +1452,43 @@ static void anonymize_file__(
 		//
 		if (confirm_clean_pixel)
 		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 			const QLatin1String cv("113101");
 			const QLatin1String cm("Clean Pixel Data Option");
+#else
+			const QString cv("113101");
+			const QString cm("Clean Pixel Data Option");
+#endif
 			mdcm::Item item;
 			item.SetVLToUndefined();
 			mdcm::DataSet & nds = item.GetNestedDataSet();
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cv.latin1(), cv.size());
+#else
+				e.SetByteValue(cv.toLatin1().constData(), cv.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(dcm.latin1(), dcm.size());
+#else
+				e.SetByteValue(dcm.toLatin1().constData(), dcm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cm.latin1(), cm.size());
+#else
+				e.SetByteValue(cm.toLatin1().constData(), cm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::LO);
 				nds.Replace(e);
 			}
@@ -1459,26 +1497,43 @@ static void anonymize_file__(
 		//
 		if (confirm_no_recognizable)
 		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 			const QLatin1String cv("113102");
 			const QLatin1String cm("Clean Recognizable Visual Features Option");
+#else
+			const QString cv("113102");
+			const QString cm("Clean Recognizable Visual Features Option");
+#endif
 			mdcm::Item item;
 			item.SetVLToUndefined();
 			mdcm::DataSet & nds = item.GetNestedDataSet();
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cv.latin1(), cv.size());
+#else
+				e.SetByteValue(cv.toLatin1().constData(), cv.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(dcm.latin1(), dcm.size());
+#else
+				e.SetByteValue(dcm.toLatin1().constData(), dcm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cm.latin1(), cm.size());
+#else
+				e.SetByteValue(cm.toLatin1().constData(), cm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::LO);
 				nds.Replace(e);
 			}
@@ -1487,26 +1542,43 @@ static void anonymize_file__(
 		//
 		if (!remove_graphics)
 		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 			const QLatin1String cv("113103");
 			const QLatin1String cm("Clean Graphics Option");
+#else
+			const QString cv("113103");
+			const QString cm("Clean Graphics Option");
+#endif
 			mdcm::Item item;
 			item.SetVLToUndefined();
 			mdcm::DataSet & nds = item.GetNestedDataSet();
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cv.latin1(), cv.size());
+#else
+				e.SetByteValue(cv.toLatin1().constData(), cv.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(dcm.latin1(), dcm.size());
+#else
+				e.SetByteValue(dcm.toLatin1().constData(), dcm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cm.latin1(), cm.size());
+#else
+				e.SetByteValue(cm.toLatin1().constData(), cm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::LO);
 				nds.Replace(e);
 			}
@@ -1515,26 +1587,43 @@ static void anonymize_file__(
 		//
 		if (!remove_struct)
 		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 			const QLatin1String cv("113104");
 			const QLatin1String cm("Clean Structured Content Option");
+#else
+			const QString cv("113104");
+			const QString cm("Clean Structured Content Option");
+#endif
 			mdcm::Item item;
 			item.SetVLToUndefined();
 			mdcm::DataSet & nds = item.GetNestedDataSet();
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cv.latin1(), cv.size());
+#else
+				e.SetByteValue(cv.toLatin1().constData(), cv.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(dcm.latin1(), dcm.size());
+#else
+				e.SetByteValue(dcm.toLatin1().constData(), dcm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cm.latin1(), cm.size());
+#else
+				e.SetByteValue(cm.toLatin1().constData(), cm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::LO);
 				nds.Replace(e);
 			}
@@ -1543,26 +1632,43 @@ static void anonymize_file__(
 		//
 		if (!remove_descriptions)
 		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 			const QLatin1String cv("113105");
 			const QLatin1String cm("Clean Descriptors Option");
+#else
+			const QString cv("113105");
+			const QString cm("Clean Descriptors Option");
+#endif
 			mdcm::Item item;
 			item.SetVLToUndefined();
 			mdcm::DataSet & nds = item.GetNestedDataSet();
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cv.latin1(), cv.size());
+#else
+				e.SetByteValue(cv.toLatin1().constData(), cv.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(dcm.latin1(), dcm.size());
+#else
+				e.SetByteValue(dcm.toLatin1().constData(), dcm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cm.latin1(), cm.size());
+#else
+				e.SetByteValue(cm.toLatin1().constData(), cm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::LO);
 				nds.Replace(e);
 			}
@@ -1570,6 +1676,7 @@ static void anonymize_file__(
 		}
 		//
 		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 			const QLatin1String cv =
 				retain_dates_times
 				?
@@ -1582,24 +1689,50 @@ static void anonymize_file__(
 				QLatin1String("Retain Longitudinal Temporal Information Full Dates Option")
 				:
 				QLatin1String("Retain Longitudinal Temporal Information Modified Dates Option");
+#else
+			const QString cv =
+				retain_dates_times
+				?
+				QString("113106")
+				:
+				QString("113107");
+			const QString cm =
+				retain_dates_times
+				?
+				QString("Retain Longitudinal Temporal Information Full Dates Option")
+				:
+				QString("Retain Longitudinal Temporal Information Modified Dates Option");
+#endif
 			mdcm::Item item;
 			item.SetVLToUndefined();
 			mdcm::DataSet & nds = item.GetNestedDataSet();
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cv.latin1(), cv.size());
+#else
+				e.SetByteValue(cv.toLatin1().constData(), cv.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(dcm.latin1(), dcm.size());
+#else
+				e.SetByteValue(dcm.toLatin1().constData(), dcm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cm.latin1(), cm.size());
+#else
+				e.SetByteValue(cm.toLatin1().constData(), cm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::LO);
 				nds.Replace(e);
 			}
@@ -1608,26 +1741,43 @@ static void anonymize_file__(
 		//
 		if (retain_patient_chars)
 		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 			const QLatin1String cv("113108");
 			const QLatin1String cm("Retain Patient Characteristics Option");
+#else
+			const QString cv("113108");
+			const QString cm("Retain Patient Characteristics Option");
+#endif
 			mdcm::Item item;
 			item.SetVLToUndefined();
 			mdcm::DataSet & nds = item.GetNestedDataSet();
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cv.latin1(), cv.size());
+#else
+				e.SetByteValue(cv.toLatin1().constData(), cv.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(dcm.latin1(), dcm.size());
+#else
+				e.SetByteValue(dcm.toLatin1().constData(), dcm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cm.latin1(), cm.size());
+#else
+				e.SetByteValue(cm.toLatin1().constData(), cm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::LO);
 				nds.Replace(e);
 			}
@@ -1636,26 +1786,43 @@ static void anonymize_file__(
 		//
 		if (retain_device_id)
 		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 			const QLatin1String cv("113109");
 			const QLatin1String cm("Retain Device Identity Option");
+#else
+			const QString cv("113109");
+			const QString cm("Retain Device Identity Option");
+#endif
 			mdcm::Item item;
 			item.SetVLToUndefined();
 			mdcm::DataSet & nds = item.GetNestedDataSet();
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cv.latin1(), cv.size());
+#else
+				e.SetByteValue(cv.toLatin1().constData(), cv.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(dcm.latin1(), dcm.size());
+#else
+				e.SetByteValue(dcm.toLatin1().constData(), dcm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cm.latin1(), cm.size());
+#else
+				e.SetByteValue(cm.toLatin1().constData(), cm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::LO);
 				nds.Replace(e);
 			}
@@ -1664,26 +1831,43 @@ static void anonymize_file__(
 		//
 		if (preserve_uids)
 		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 			const QLatin1String cv("113110");
 			const QLatin1String cm("Retain UIDs Option");
+#else
+			const QString cv("113110");
+			const QString cm("Retain UIDs Option");
+#endif
 			mdcm::Item item;
 			item.SetVLToUndefined();
 			mdcm::DataSet & nds = item.GetNestedDataSet();
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cv.latin1(), cv.size());
+#else
+				e.SetByteValue(cv.toLatin1().constData(), cv.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(dcm.latin1(), dcm.size());
+#else
+				e.SetByteValue(dcm.toLatin1().constData(), dcm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cm.latin1(), cm.size());
+#else
+				e.SetByteValue(cm.toLatin1().constData(), cm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::LO);
 				nds.Replace(e);
 			}
@@ -1692,26 +1876,43 @@ static void anonymize_file__(
 		//
 		if (!remove_private)
 		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 			const QLatin1String cv("113111");
 			const QLatin1String cm("Retain Safe Private Option");
+#else
+			const QString cv("113111");
+			const QString cm("Retain Safe Private Option");
+#endif
 			mdcm::Item item;
 			item.SetVLToUndefined();
 			mdcm::DataSet & nds = item.GetNestedDataSet();
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cv.latin1(), cv.size());
+#else
+				e.SetByteValue(cv.toLatin1().constData(), cv.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(dcm.latin1(), dcm.size());
+#else
+				e.SetByteValue(dcm.toLatin1().constData(), dcm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cm.latin1(), cm.size());
+#else
+				e.SetByteValue(cm.toLatin1().constData(), cm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::LO);
 				nds.Replace(e);
 			}
@@ -1720,26 +1921,43 @@ static void anonymize_file__(
 		//
 		if (retain_institution_id)
 		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 			const QLatin1String cv("113112");
 			const QLatin1String cm("Retain Institution Identity Option");
+#else
+			const QString cv("113112");
+			const QString cm("Retain Institution Identity Option");
+#endif
 			mdcm::Item item;
 			item.SetVLToUndefined();
 			mdcm::DataSet & nds = item.GetNestedDataSet();
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0100));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cv.latin1(), cv.size());
+#else
+				e.SetByteValue(cv.toLatin1().constData(), cv.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0102));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(dcm.latin1(), dcm.size());
+#else
+				e.SetByteValue(dcm.toLatin1().constData(), dcm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::SH);
 				nds.Replace(e);
 			}
 			{
 				mdcm::DataElement e(mdcm::Tag(0x0008, 0x0104));
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 				e.SetByteValue(cm.latin1(), cm.size());
+#else
+				e.SetByteValue(cm.toLatin1().constData(), cm.toLatin1().size());
+#endif
 				if (!implicit) e.SetVR(mdcm::VR::LO);
 				nds.Replace(e);
 			}
