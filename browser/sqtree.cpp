@@ -18,8 +18,9 @@
 #include <mdcmWriter.h>
 #include <mdcmScanner.h>
 #include <mdcmSequenceOfFragments.h>
-#include <mdcmParseException.h>
 #include <mdcmDict.h>
+#include <mdcmSystem.h>
+#include <mdcmParseException.h>
 #include <QString>
 #include <QStringList>
 #include <QVariant>
@@ -898,8 +899,12 @@ void SQtree::closeEvent(QCloseEvent * e)
 	e->accept();
 }
 
-void SQtree::read_file(const QString & f)
+void SQtree::read_file(const QString & f, const bool use_lock)
 {
+#if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
+	const bool lock = (use_lock) ? mutex.tryLock() : false;
+	if (use_lock && !lock) return;
+#endif
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	clear_tree();
 	QFileInfo fi(f);
@@ -927,8 +932,10 @@ void SQtree::read_file(const QString & f)
 		ok = reader.Read();
 		if (!ok)
 		{
-			ms_lineEdit->setText(
-				QString("Error: file is not DICOM or broken."));
+			ms_lineEdit->setText(QString("Error: file is not DICOM or broken."));
+#if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
+			if (lock) mutex.unlock();
+#endif
 			QApplication::restoreOverrideCursor();
 			return;
 		}
@@ -1025,16 +1032,120 @@ void SQtree::read_file(const QString & f)
 	catch(mdcm::ParseException & pe)
 	{
 		std::cout << "mdcm::ParseException in SQtree::read_file("
-			<< f.toStdString() << "):\n"
+			<< f.toStdString() << ", " << use_lock << "):\n"
 			<< pe.GetLastElement().GetTag() << std::endl;
 	}
 	catch(std::exception & ex)
 	{
 		std::cout << "Exception in SQtree::read_file("
-			<< f.toStdString() << "):\n" << ex.what() << std::endl;
+			<< f.toStdString() << ", " << use_lock << "):\n"
+			<< ex.what() << std::endl;
 	}
 	treeWidget->expandToDepth(0);
+#if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
+	if (lock) mutex.unlock();
+#endif
 	QApplication::restoreOverrideCursor();
+}
+
+void SQtree::read_file_and_series(const QString & ff, const bool use_lock)
+{
+#if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
+	const bool lock = (use_lock) ? mutex.tryLock() : false;
+	if (use_lock && !lock) return;
+#endif
+	QString f(ff);
+	QFileInfo fi(f);
+	if (!fi.isFile())
+	{
+		clear_tree();
+#if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
+		if (lock) mutex.unlock();
+#endif
+		return;
+	}
+	f = fi.absoluteFilePath();
+	QString series_uid;
+	QStringList files;
+	bool series_uid_ok = false;
+	try
+	{
+		{
+			std::set<mdcm::Tag> tags;
+			tags.insert(mdcm::Tag(0x0020,0x000e));
+			mdcm::Reader reader;
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+			reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
+#else
+			reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
+#endif
+#else
+			reader.SetFileName(f.toLocal8Bit().constData());
+#endif
+			if (reader.ReadSelectedTags(tags))
+			{
+				const mdcm::File & file = reader.GetFile();
+				const mdcm::DataSet & ds = file.GetDataSet();
+				series_uid_ok =
+					DicomUtils::get_string_value(
+						ds,
+						mdcm::Tag(0x0020,0x000e),
+						series_uid);
+			}
+		}
+		if (series_uid_ok)
+		{
+			get_series_files(f, series_uid, files);
+		}
+	}
+	catch(mdcm::ParseException & pe)
+	{
+		std::cout
+			<< "mdcm::ParseException in SQtree::open_file_and_series:\n"
+			<< pe.GetLastElement().GetTag() << std::endl;
+	}
+	catch(std::exception & ex)
+	{
+		std::cout << "Exception in SQtree::open_file_and_series:\n"
+			<< ex.what() << std::endl;
+	}
+	int idx = -1;
+	const int files_size = files.size();
+	if (files_size > 1)
+	{
+		for (int x = 0; x < files_size; ++x)
+		{
+			QFileInfo fi0(files.at(x));
+			if (fi0.absoluteFilePath() == f)
+			{
+				idx = x;
+				break;
+			}
+		}
+	}
+	//
+	horizontalSlider->blockSignals(true);
+	horizontalSlider->setMinimum(0);
+	if (idx >= 0)
+	{
+		list_of_files = QStringList(files);
+		horizontalSlider->setMaximum(files_size-1);
+		horizontalSlider->setValue(idx);
+		horizontalSlider->show();
+	}
+	else
+	{
+		list_of_files = QStringList(f);
+		horizontalSlider->setMaximum(0);
+		horizontalSlider->setValue(0);
+		horizontalSlider->hide();
+	}
+	horizontalSlider->blockSignals(false);
+	read_file(f, false);
+#if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
+	if (lock) mutex.unlock();
+#endif
 }
 
 void SQtree::dump_csa(const mdcm::DataSet & ds)
@@ -1202,7 +1313,7 @@ void SQtree::dropEvent(QDropEvent * e)
 			horizontalSlider->setValue(0);
 			horizontalSlider->hide();
 			horizontalSlider->blockSignals(false);
-			read_file(l.at(0));
+			read_file(l.at(0), false);
 		}
 	}
 	else
@@ -1267,8 +1378,38 @@ void SQtree::open_file()
 		horizontalSlider->setValue(0);
 		horizontalSlider->hide();
 		horizontalSlider->blockSignals(false);
-		read_file(f);
+		read_file(f, false);
 	}
+#if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
+	mutex.unlock();
+#endif
+}
+
+void SQtree::open_file_and_series()
+{
+#if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
+	const bool lock = mutex.tryLock();
+	if (!lock) return;
+#endif
+	QString f = QFileDialog::getOpenFileName(
+		this,
+		QString("Open file and scan series"),
+		saved_dir,
+		QString(),
+		(QString*)NULL,
+		(QFileDialog::ReadOnly
+		/*| QFileDialog::DontUseNativeDialog*/
+		));
+	QFileInfo fi(f);
+	if (!fi.isFile())
+	{
+		clear_tree();
+#if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
+		mutex.unlock();
+#endif
+		return;
+	}
+	read_file_and_series(f, false);
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
 	mutex.unlock();
 #endif
@@ -1297,114 +1438,6 @@ void SQtree::set_list_of_files(const QStringList & l)
 void SQtree::file_from_slider(int x)
 {
 	if (x >= list_of_files.size()) return;
-	read_file(list_of_files.at(x));
-}
-
-void SQtree::open_file_and_series()
-{
-#if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-	const bool lock = mutex.tryLock();
-	if (!lock) return;
-#endif
-	clear_tree();
-	QString f = QFileDialog::getOpenFileName(
-		this,
-		QString("Open file and scan series"),
-		saved_dir,
-		QString(),
-		(QString*)NULL,
-		(QFileDialog::ReadOnly
-		/*| QFileDialog::DontUseNativeDialog*/
-		));
-	QFileInfo fi(f);
-	if (!fi.isFile())
-	{
-#if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-		mutex.unlock();
-#endif
-		return;
-	}
-	f = fi.absoluteFilePath();
-	QString series_uid;
-	QStringList files;
-	bool series_uid_ok = false;
-	try
-	{
-		{
-			std::set<mdcm::Tag> tags;
-			tags.insert(mdcm::Tag(0x0020,0x000e));
-			mdcm::Reader reader;
-#ifdef _WIN32
-#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-			reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
-#else
-			reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
-#endif
-#else
-			reader.SetFileName(f.toLocal8Bit().constData());
-#endif
-			if (reader.ReadSelectedTags(tags))
-			{
-				const mdcm::File & file = reader.GetFile();
-				const mdcm::DataSet & ds = file.GetDataSet();
-				series_uid_ok =
-					DicomUtils::get_string_value(
-						ds,
-						mdcm::Tag(0x0020,0x000e),
-						series_uid);
-			}
-		}
-		if (series_uid_ok)
-		{
-			get_series_files(f, series_uid, files);
-		}
-	}
-	catch(mdcm::ParseException & pe)
-	{
-		std::cout
-			<< "mdcm::ParseException in SQtree::open_file_and_series:\n"
-			<< pe.GetLastElement().GetTag() << std::endl;
-	}
-	catch(std::exception & ex)
-	{
-		std::cout << "Exception in SQtree::open_file_and_series:\n"
-			<< ex.what() << std::endl;
-	}
-	int idx = -1;
-	const int files_size = files.size();
-	if (files_size > 1)
-	{
-		for (int x = 0; x < files_size; ++x)
-		{
-			QFileInfo fi0(files.at(x));
-			if (fi0.absoluteFilePath() == f)
-			{
-				idx = x;
-				break;
-			}
-		}
-	}
-	//
-	horizontalSlider->blockSignals(true);
-	horizontalSlider->setMinimum(0);
-	if (idx >= 0)
-	{
-		list_of_files = QStringList(files);
-		horizontalSlider->setMaximum(files_size-1);
-		horizontalSlider->setValue(idx);
-		horizontalSlider->show();
-	}
-	else
-	{
-		list_of_files = QStringList(f);
-		horizontalSlider->setMaximum(0);
-		horizontalSlider->setValue(0);
-		horizontalSlider->hide();
-	}
-	horizontalSlider->blockSignals(false);
-	read_file(f);
-#if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-	mutex.unlock();
-#endif
+	read_file(list_of_files.at(x), true);
 }
 

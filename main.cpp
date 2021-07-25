@@ -36,8 +36,10 @@
 #include "browser/sqtree.h"
 
 #if (defined LOG_STDOUT_TO_FILE && LOG_STDOUT_TO_FILE==1)
+#if (QT_VERSION >= QT_VERSION_CHECK(5,0,0))
 #include <QMessageLogContext>
 #include <QDebug>
+#endif
 #ifdef _WIN32
 #include "Windows.h"
 #endif
@@ -68,6 +70,7 @@ static void close_log()
 	fclose(stdout);
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5,0,0))
 void redirect_qdebug(
 	QtMsgType type,
 	const QMessageLogContext & context,
@@ -92,12 +95,16 @@ void redirect_qdebug(
 	}
 }
 #endif
+#endif
 
 int main(int argc, char *argv[])
 {
 	bool force_disable_opengl = false;
 	bool metadata_only = false;
+	bool metadata_series_only = false;
 	int count = 1;
+	bool ok3d = false;
+	bool hide_zoom = false;
 	while (count < argc)
 	{
 		if (!strcmp(argv[count], "-nogl"))
@@ -107,6 +114,18 @@ int main(int argc, char *argv[])
 		else if (!strcmp(argv[count], "--nogl"))
 		{
 			force_disable_opengl = true;
+		}
+		else if (!strcmp(argv[count], "-s"))
+		{
+			metadata_series_only = true;
+			force_disable_opengl = true;
+			break;
+		}
+		else if (!strcmp(argv[count], "--s"))
+		{
+			metadata_series_only = true;
+			force_disable_opengl = true;
+			break;
 		}
 		else if (!strcmp(argv[count], "-m"))
 		{
@@ -126,7 +145,9 @@ int main(int argc, char *argv[])
 #if (defined LOG_STDOUT_TO_FILE && LOG_STDOUT_TO_FILE==1)
 	if (freopen("log.txt", "w", stdout))
 	{
+#if (QT_VERSION >= QT_VERSION_CHECK(5,0,0))
 		qInstallMessageHandler(redirect_qdebug);
+#endif
 		atexit(close_log);
 	}
 #endif
@@ -163,11 +184,11 @@ int main(int argc, char *argv[])
 			<< "\nsize of int         "          << sizeof(int)
 			<< "\nsize of long        "          << sizeof(long)
 			<< "\nsize of long long   "          << sizeof(long long)
+			<< "\nsize of size_t      "          << sizeof(size_t)
+			<< "\nsize of uintptr_t   "          << sizeof(uintptr_t)
 			<< "\nsize of float       "          << sizeof(float)
 			<< "\nsize of double      "          << sizeof(double)
 			<< "\nsize of long double "          << sizeof(long double)
-			<< "\nsize of size_t      "          << sizeof(size_t)
-			<< "\nsize of uintptr_t   "          << sizeof(uintptr_t)
 			<< "\nsize of enum { SHRT_MAX    } " << sizeof(Ea)
 			<< "\nsize of enum { USHRT_MAX   } " << sizeof(E0)
 			<< "\nsize of enum { INT_MAX     } " << sizeof(E1)
@@ -203,9 +224,6 @@ int main(int argc, char *argv[])
 	}
 #endif
 	//
-	bool ok3d = false;
-	bool hide_zoom = true;
-	//
 #if 0
 #if ((QT_VERSION >= QT_VERSION_CHECK(5,6,0)) && (QT_VERSION < QT_VERSION_CHECK(6,0,0)))
 	QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
@@ -223,7 +241,7 @@ int main(int argc, char *argv[])
 #endif
 #endif
 #ifdef USE_SET_DEFAULT_GL_FORMAT
-	if (!metadata_only && !force_disable_opengl)
+	if (!force_disable_opengl)
 	{
 		QSurfaceFormat format;
 #ifdef __APPLE__
@@ -299,7 +317,7 @@ int main(int argc, char *argv[])
 		settings.endGroup();
 		settings.sync();
 		//
-		if (!metadata_only && !force_disable_opengl)
+		if (!force_disable_opengl)
 		{
 #ifdef TMP_USE_GL_TEST
 			if ((enable_gl_3d_ == 1) && (enable_gltest == 1))
@@ -423,28 +441,11 @@ int main(int argc, char *argv[])
 	itk::OutputWindow::SetInstance(itk::TextOutput::New());
 #endif
 	//
-	if (!metadata_only)
-	{
-		MainWindow mainWin(ok3d, hide_zoom);
-		mainWin.show();
-#if (defined USE_SPLASH_SCREEN && USE_SPLASH_SCREEN==1)
-		splash->showMessage(splash_info);
-		QTimer::singleShot(1500, splash, SLOT(close()));
-#endif
-		mainWin.check_3d_frame();
-		if (argc > 1)
-		{
-			QStringList l;
-			for (int x = 1; x < argc; ++x)
-				l.push_back(QString::fromLocal8Bit(argv[x]));
-			mainWin.open_args(l);
-		}
-		return app.exec();
-	}
-	else
+	if (metadata_only||metadata_series_only)
 	{
 #if (defined USE_SPLASH_SCREEN && USE_SPLASH_SCREEN==1)
 		splash->showMessage(splash_info);
+		app.processEvents();
 		QTimer::singleShot(500, splash, SLOT(close()));
 #endif
 		QStringList l;
@@ -454,6 +455,8 @@ int main(int argc, char *argv[])
 			if (
 				f != QString("-m")    &&
 				f != QString("--m")   &&
+				f != QString("-s")    &&
+				f != QString("--s")   &&
 				f != QString("-nogl") &&
 				f != QString("--nogl")) l.push_back(f);
 		}
@@ -461,19 +464,27 @@ int main(int argc, char *argv[])
 		{
 			for (int x = 0; x < l.size(); ++x)
 			{
-				if (x == 256)
+				if (x > 4)
 				{
-					QMessageBox::warning(
+					QMessageBox::information(
 						NULL,
 						QString("Warning"),
 						QString(
-							"Max 256 DICOM files in Metadata Viewer"));
+							"Max 4 Metadata Viewers,\n"
+							"use -s to open and scan series"));
 					break;
 				}
 				SQtree * sqtree = new SQtree(false);
 				sqtree->setAttribute(Qt::WA_DeleteOnClose);
 				sqtree->show();
-				sqtree->read_file(l.at(x));
+				if (metadata_series_only)
+				{
+					sqtree->read_file_and_series(l.at(x), true);
+				}
+				else if (metadata_only)
+				{
+					sqtree->read_file(l.at(x), true);
+				}
 			}
 		}
 		else
@@ -484,11 +495,30 @@ int main(int argc, char *argv[])
 		}
 		return app.exec();
 	}
+	else
+	{
+		MainWindow mainWin(ok3d, hide_zoom);
+		mainWin.show();
+		app.processEvents();
+		mainWin.check_3d_frame();
+		app.processEvents();
+#if (defined USE_SPLASH_SCREEN && USE_SPLASH_SCREEN==1)
+		splash->showMessage(splash_info);
+		app.processEvents();
+		QTimer::singleShot(1500, splash, SLOT(close()));
+#endif
+		if (argc > 1)
+		{
+			QStringList l;
+			for (int x = 1; x < argc; ++x)
+				l.push_back(QString::fromLocal8Bit(argv[x]));
+			mainWin.open_args(l);
+		}
+		return app.exec();
+	}
 }
 
-#ifdef USE_SPLASH_SCREEN
 #undef USE_SPLASH_SCREEN
-#endif
-#ifdef LOG_STDOUT_TO_FILE
 #undef LOG_STDOUT_TO_FILE
-#endif
+#undef PRINT_HOST_INFO
+#undef TMP_USE_GL_TEST

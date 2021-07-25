@@ -26,17 +26,20 @@ Q_OBJECT
 public:
 	SQtree(bool=true);
 	~SQtree();
-	void read_file(const QString&);
+	void read_file(const QString&, const bool);
+	void read_file_and_series(const QString&, const bool);
 	void clear_tree();
 	void set_list_of_files(const QStringList&);
 
 public slots:
+	void open_file();
+	void open_file_and_series();
+
+private slots:
 	void copy_to_clipboard();
 	void collapse_item();
 	void expand_item();
-	void open_file();
 	void file_from_slider(int);
-	void open_file_and_series();
 
 protected:
 	void closeEvent(QCloseEvent*) override;

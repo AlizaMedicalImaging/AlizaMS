@@ -58,6 +58,18 @@ private:
 		const bool,
 		const QString&,
 		const QString&,
+		const bool preserve_uids,
+		const bool remove_private,
+		const bool remove_graphics,
+		const bool remove_descriptions,
+		const bool remove_struct,
+		const bool retain_device_id,
+		const bool retain_patient_chars,
+		const bool retain_institution_id,
+		const bool retain_dates_times,
+		const bool confirm_clean_pixel,
+		const bool confirm_no_recognizable,
+		const bool rename_files,
 		QProgressDialog*);
 	void init_profile();
 	std::set<mdcm::Tag> pn_tags;
