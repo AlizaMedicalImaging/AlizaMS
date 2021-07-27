@@ -14,8 +14,9 @@ public:
 	HelpWidget();
 	~HelpWidget();
 
-#ifdef __APPLE__
 private:
+	void set_text();
+#ifdef __APPLE__
 	QShortcut * minimaze_sc;
 	QShortcut * fullsceen_sc;
 	QShortcut * normal_sc;

@@ -26,6 +26,7 @@
 #include "mdcmVersion.h"
 #include "mdcmParseException.h"
 #include "dicomutils.h"
+#include "codecutils.h"
 #include "alizams_version.h"
 #include <cstdlib>
 #include <chrono>
@@ -281,6 +282,7 @@ static void replace_pn_recurs__(
 	const bool implicit,
 	const bool one_patient,
 	const QString & single_name,
+	const QString & charset,
 	const mdcm::Dicts & dicts)
 {
 	mdcm::DataSet::Iterator it = ds.Begin();
@@ -298,7 +300,24 @@ static void replace_pn_recurs__(
 			{
 				QString sn = single_name.simplified();
 				sn.replace(QString(" "), QString("^"));
-				replace__(ds, t, sn.toUtf8().constData(), sn.size(), implicit, dicts);
+				if (!charset.isEmpty())
+				{
+					bool ok = false;
+					const QByteArray ba = CodecUtils::fromUTF8(
+						sn,
+						charset.toLatin1().constData(),
+						&ok);
+					if (!ok)
+					{
+						std::cout << "Warning: provided Patient Name may be incorrectly encoded"
+							<< std::endl;
+					}
+					replace__(ds, t, ba.constData(), ba.size(), implicit, dicts);
+				}
+				else
+				{
+					replace__(ds, t, sn.toLatin1().constData(), sn.toLatin1().size(), implicit, dicts);
+				}
 			}
 			else
 			{
@@ -333,7 +352,12 @@ static void replace_pn_recurs__(
 						mdcm::Item    & item   = sq->GetItem(i);
 						mdcm::DataSet & nested = item.GetNestedDataSet();
 						replace_pn_recurs__(
-							nested, ts, m, implicit, one_patient, single_name, dicts);
+							nested,
+							ts,
+							m,
+							implicit,
+							one_patient, single_name, charset,
+							dicts);
 					}
 					mdcm::DataElement de_dup = *dup;
 					de_dup.SetValue(*sq);
@@ -352,6 +376,7 @@ static void replace_id_recurs__(
 	const bool implicit,
 	const bool one_patient,
 	const QString & single_id,
+	const QString & charset,
 	const mdcm::Dicts & dicts)
 {
 	mdcm::DataSet::Iterator it = ds.Begin();
@@ -367,7 +392,26 @@ static void replace_id_recurs__(
 		{
 			if (one_patient && t == mdcm::Tag(0x0010,0x0020))
 			{
-				replace__(ds, t, single_id.toUtf8().constData(), single_id.size(), implicit, dicts);
+				QString si = single_id.simplified();
+				si.replace(QString(" "), QString("^"));
+				if (!charset.isEmpty())
+				{
+					bool ok = false;
+					const QByteArray ba = CodecUtils::fromUTF8(
+						si,
+						charset.toLatin1().constData(),
+						&ok);
+					if (!ok)
+					{
+						std::cout << "Warning: provided Patient ID may be incorrectly encoded"
+							<< std::endl;
+					}
+					replace__(ds, t, ba.constData(), ba.size(), implicit, dicts);
+				}
+				else
+				{
+					replace__(ds, t, si.toLatin1().constData(), si.toLatin1().size(), implicit, dicts);
+				}
 			}
 			else
 			{
@@ -402,7 +446,12 @@ static void replace_id_recurs__(
 						mdcm::Item    & item   = sq->GetItem(i);
 						mdcm::DataSet & nested = item.GetNestedDataSet();
 						replace_id_recurs__(
-							nested, ts, m, implicit, one_patient, single_id, dicts);
+							nested,
+							ts,
+							m,
+							implicit,
+							one_patient, single_id, charset,
+							dicts);
 					}
 					mdcm::DataElement de_dup = *dup;
 					de_dup.SetValue(*sq);
@@ -1290,6 +1339,21 @@ static void anonymize_file__(
 	}
 #endif
 	//
+	QString charset("");
+	if (ds.FindDataElement(mdcm::Tag(0x0008,0x0005)))
+	{
+		const mdcm::DataElement & ce_ =
+			ds.GetDataElement(mdcm::Tag(0x0008,0x0005));
+		if (!ce_.IsEmpty() &&
+			!ce_.IsUndefinedLength() &&
+			ce_.GetByteValue())
+		{
+			charset = QString::fromLatin1(
+				ce_.GetByteValue()->GetPointer(),
+				ce_.GetByteValue()->GetLength()).trimmed();
+		}
+	}
+	//
 	if (remove_private)
 	{
 		remove_private__(ds, implicit, dicts);
@@ -1387,9 +1451,9 @@ static void anonymize_file__(
 		replace_uid_recurs__(ds, uid_tags, uid_map, implicit, dicts);
 	}
 	//
-	replace_pn_recurs__(ds, pn_tags, pn_map, implicit, one_patient, single_name, dicts);
+	replace_pn_recurs__(ds, pn_tags, pn_map, implicit, one_patient, single_name, charset, dicts);
 	//
-	replace_id_recurs__(ds, id_tags, id_map, implicit, one_patient, single_id, dicts);
+	replace_id_recurs__(ds, id_tags, id_map, implicit, one_patient, single_id, charset, dicts);
 	//
 	remove_group_length__(ds, implicit, dicts);
 	//

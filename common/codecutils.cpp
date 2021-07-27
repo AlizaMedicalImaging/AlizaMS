@@ -25,6 +25,9 @@
 #endif
 #include <QTextCodec>
 #include "codecutils.h"
+#if 0
+#include <iostream>
+#endif
 
 /* Qt
  *
@@ -341,7 +344,7 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
       }
       else
       {
-	    if (cs == QString("ISO 2022 IR 6"))
+        if (cs == QString("ISO 2022 IR 6"))
         {
           if (ok) *ok = true;
           result += QString::fromLatin1(ba->constData());
@@ -431,6 +434,12 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
     {
       codec = QTextCodec::codecForName("Shift_JIS");
     }
+    // ISO IR 6
+    else if (s.contains(QString("IR 6")))
+    {
+      if (ok) *ok = true;
+	  return QString::fromLatin1(ba->constData());
+    }
     else if (!s.isEmpty())
     {
       codec = QTextCodec::codecForName(s.toLatin1().constData());
@@ -450,6 +459,156 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
     result = QString::fromLatin1(ba->constData());
   }
   return result;
+}
+
+// TODO
+QByteArray CodecUtils::fromUTF8(const QString & i, const char * charset, bool * ok)
+{
+  if (i.isEmpty())
+  {
+    *ok = true;
+    return QByteArray();
+  }
+  const QString cs = QString::fromLatin1(charset);
+  if (cs.isEmpty())
+  {
+    *ok = true;
+    return i.toLatin1();
+  }
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+  const QStringList l = cs.split(QString("\\"), Qt::KeepEmptyParts);
+#else
+  const QStringList l = cs.split(QString("\\"), QString::KeepEmptyParts);
+#endif
+  bool iso2022 = false;
+  for (int x = 0; x < l.size(); ++x)
+  {
+    const QString tmp1 = l.at(x).trimmed().toUpper();
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+    if (tmp1.contains(QRegularExpression(QString("ISO\\s+2022"))))
+#else
+    if (tmp1.contains(QRegExp(QString("ISO\\s+2022"))))
+#endif
+    {
+      iso2022 = true;
+      break;
+    }
+  }
+  if (iso2022)
+  {
+    // TODO
+#if 0
+    std::cout << "Warning: ISO 2022, not supported" << std::endl;
+#endif
+  }
+  if (l.size() == 1)
+  {
+    QTextCodec * codec = NULL;
+    const QString s(l.at(0).trimmed().simplified().toUpper());
+    // ISO IR 100
+    if (s.contains(QString("IR 100")))
+    {
+      codec = QTextCodec::codecForName("ISO-8859-1");
+    }
+    // ISO IR 192
+    else if (s.contains(QString("IR 192")))
+    {
+      *ok = true;
+      return i.toUtf8();
+    }
+    // GB18030
+    else if (s.contains(QString("GB18030")))
+    {
+      codec = QTextCodec::codecForName("GB18030");
+    }
+    // GBK
+    else if (s.contains(QString("GBK")))
+    {
+      codec = QTextCodec::codecForName("GBK");
+    }
+    // ISO IR 166
+    else if (s.contains(QString("IR 166")))
+    {
+      codec = QTextCodec::codecForName("TIS-620");
+    }
+    // ISO IR 148
+    else if (s.contains(QString("IR 148")))
+    {
+      codec = QTextCodec::codecForName("ISO-8859-9");
+    }
+    // ISO IR 144
+    else if (s.contains(QString("IR 144")))
+    {
+      codec = QTextCodec::codecForName("ISO-8859-5");
+    }
+    // ISO IR 138
+    else if (s.contains(QString("IR 138")))
+    {
+      codec = QTextCodec::codecForName("ISO-8859-8");
+    }
+    // ISO IR 127
+    else if (s.contains(QString("IR 127")))
+    {
+      codec = QTextCodec::codecForName("ISO-8859-6");
+    }
+    // ISO IR 126
+    else if (s.contains(QString("IR 126")))
+    {
+      codec = QTextCodec::codecForName("ISO-8859-7");
+    }
+    // ISO IR 110
+    else if (s.contains(QString("IR 110")))
+    {
+      codec = QTextCodec::codecForName("ISO-8859-4");
+    }
+    // ISO IR 109
+    else if (s.contains(QString("IR 109")))
+    {
+      codec = QTextCodec::codecForName("ISO-8859-3");
+    }
+    // ISO IR 101
+    else if (s.contains(QString("IR 101")))
+    {
+      codec = QTextCodec::codecForName("ISO-8859-2");
+    }
+    // ISO IR 13
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+    else if (s.contains(QRegularExpression(QString("IR 13\\D*"))))
+#else
+    else if (s.contains(QRegExp(QString("IR 13\\D*"))))
+#endif
+    {
+      codec = QTextCodec::codecForName("Shift_JIS");
+    }
+    // ISO IR 6
+    else if (s.contains(QString("IR 6")))
+    {
+      *ok = true;
+      return i.toLatin1();
+    }
+    else if (!s.isEmpty())
+    {
+      codec = QTextCodec::codecForName(s.toLatin1().constData());
+    }
+    if (codec)
+    {
+      *ok = true;
+      return codec->fromUnicode(i.toUtf8());
+    }
+    else
+    {
+      *ok = false;
+#if 0
+      std::cout << "fromUtf8 failed for " << charset << std::endl;
+#endif
+      return i.toLatin1();
+    }
+  }
+#if 0
+  std::cout << "Currently not supported" << std::endl;
+#endif
+  *ok = false;
+  return i.toLatin1();
 }
 
 #if 0
