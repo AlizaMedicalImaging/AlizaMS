@@ -207,7 +207,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="name_label">
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optional, &lt;span style=&quot; font-weight:600;&quot;&gt;error message will appear if several patient IDs will be detected in a folder&lt;/span&gt;!&lt;/p&gt;&lt;p&gt;Formats:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Surname&amp;nbsp;Name&lt;/span&gt;&lt;/p&gt;&lt;p&gt;and DICOM &lt;span style=&quot; font-style:italic;&quot;&gt;VR&amp;nbsp;PN.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Characters must be consistent wiht &lt;span style=&quot; font-style:italic;&quot;&gt;Specific Character Set (0x0008,&amp;nbsp;0x0005) &lt;/span&gt;of the data set, not all character sets are supported, s. &lt;span style=&quot; font-style:italic;&quot;&gt;Help&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optional, &lt;span style=&quot; font-weight:600;&quot;&gt;error message will appear if several patient IDs will be detected in a folder&lt;/span&gt;!&lt;/p&gt;&lt;p&gt;Formats:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Surname&amp;nbsp;Name&lt;/span&gt;&lt;/p&gt;&lt;p&gt;and DICOM &lt;span style=&quot; font-style:italic;&quot;&gt;VR&amp;nbsp;PN.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Characters must be consistent with &lt;span style=&quot; font-style:italic;&quot;&gt;Specific Character Set (0x0008,&amp;nbsp;0x0005) &lt;/span&gt;of the data set, not all character sets are supported, s. &lt;span style=&quot; font-style:italic;&quot;&gt;Help&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string>Replace patient name </string>
@@ -229,7 +229,7 @@
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optional, &lt;span style=&quot; font-weight:600;&quot;&gt;error message will appear if several patient IDs will be detected in a folder&lt;/span&gt;!&lt;/p&gt;&lt;p&gt;Formats:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Surname&amp;nbsp;Name&lt;/span&gt;&lt;/p&gt;&lt;p&gt;and DICOM &lt;span style=&quot; font-style:italic;&quot;&gt;VR&amp;nbsp;PN.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Characters must be consistent wiht &lt;span style=&quot; font-style:italic;&quot;&gt;Specific Character Set (0x0008,&amp;nbsp;0x0005) &lt;/span&gt;of the data set, not all character sets are supported, s. &lt;span style=&quot; font-style:italic;&quot;&gt;Help&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optional, &lt;span style=&quot; font-weight:600;&quot;&gt;error message will appear if several patient IDs will be detected in a folder&lt;/span&gt;!&lt;/p&gt;&lt;p&gt;Formats:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Surname&amp;nbsp;Name&lt;/span&gt;&lt;/p&gt;&lt;p&gt;and DICOM &lt;span style=&quot; font-style:italic;&quot;&gt;VR&amp;nbsp;PN.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Characters must be consistent with &lt;span style=&quot; font-style:italic;&quot;&gt;Specific Character Set (0x0008,&amp;nbsp;0x0005) &lt;/span&gt;of the data set, not all character sets are supported, s. &lt;span style=&quot; font-style:italic;&quot;&gt;Help&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="maxLength">
          <number>2000</number>

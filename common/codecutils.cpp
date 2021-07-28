@@ -508,7 +508,8 @@ QByteArray CodecUtils::fromUTF8(const QString & i, const char * charset, bool * 
     // ISO IR 100
     if (s.contains(QString("IR 100")))
     {
-      codec = QTextCodec::codecForName("ISO-8859-1");
+      *ok = true;
+      return i.toLatin1();
     }
     // ISO IR 192
     else if (s.contains(QString("IR 192")))
@@ -593,13 +594,13 @@ QByteArray CodecUtils::fromUTF8(const QString & i, const char * charset, bool * 
     if (codec)
     {
       *ok = true;
-      return codec->fromUnicode(i.toUtf8());
+      return codec->fromUnicode(i);
     }
     else
     {
       *ok = false;
 #if 0
-      std::cout << "fromUtf8 failed for " << charset << std::endl;
+      std::cout << "fromUTF8 failed for " << charset << std::endl;
 #endif
       return i.toLatin1();
     }
