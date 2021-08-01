@@ -33,31 +33,25 @@
 
 /**
  * FileExplicitFilter class
- * After changing a file from Implicit to Explicit representation (see
- * ImageChangeTransferSyntax) one operation is to make sure the VR of each
- * DICOM attribute are accurate and do match the one from PS 3.6. Indeed when a
- * file is written in Implicit reprensentation, the VR is not stored directly
- * in the file.
  *
  * Changing an implicit dataset to an explicit dataset is NOT a
- * trivial task of simply changing the VR to the dict one:
- *  One has to make sure SQ is properly set
- *  One has to recompute the explicit length SQ
- *  One has to make sure that VR is valid for the encoding
- *  One has to make sure that VR 16bits can store the original value length
+ * trivial task of simply changing the VR to the dict:
+ *  - make sure SQ is properly set
+ *  - recompute the explicit length SQ
+ *  - make sure that VR is valid for the encoding
+ *  - make sure that VR 16bits can store the original value length
  */
 
 namespace mdcm
 {
 
-// Decide whether or not to VR'ify private tags
 void
 FileExplicitFilter::SetChangePrivateTags(bool b)
 {
   ChangePrivateTags = b;
 }
 
-// When VR=16bits in explicit but Implicit has a 32bits length, use VR=UN
+// When VR=16bits in explicit, but Implicit has a 32bits length, use VR=UN
 void
 FileExplicitFilter::SetUseVRUN(bool b)
 {
@@ -100,32 +94,11 @@ FileExplicitFilter::Change()
 }
 
 bool
-FileExplicitFilter::ChangeFMI()
-{
-  /*
-      FileMetaInformation &fmi = F->GetHeader();
-      TransferSyntax ts = TransferSyntax::ImplicitVRLittleEndian;
-      {
-        ts = TransferSyntax::ExplicitVRLittleEndian;
-      }
-      const char *tsuid = TransferSyntax::GetTSString(ts);
-      DataElement de(Tag(0x0002,0x0010));
-      de.SetByteValue(tsuid, strlen(tsuid));
-      de.SetVR(Attribute<0x0002, 0x0010>::GetVR());
-      fmi.Replace(de);
-      //fmi.Remove(Tag(0x0002,0x0012)); // will be regenerated
-      //fmi.Remove(Tag(0x0002,0x0013)); //  '   '    '
-      fmi.SetDataSetTransferSyntax(ts);
-  */
-  return true;
-}
-
-bool
 FileExplicitFilter::ProcessDataSet(DataSet & ds, Dicts const & dicts)
 {
   if (RecomputeSequenceLength || RecomputeItemLength)
   {
-    mdcmWarningMacro("Not implemented sorry");
+    mdcmWarningMacro("Not implemented");
     return false;
   }
   DataSet::Iterator it = ds.Begin();
@@ -133,7 +106,7 @@ FileExplicitFilter::ProcessDataSet(DataSet & ds, Dicts const & dicts)
   {
     DataElement  de = *it;
     std::string  strowner;
-    const char * owner = 0;
+    const char * owner = NULL;
     const Tag &  t = de.GetTag();
     if (t.IsPrivate() &&
         !ChangePrivateTags
@@ -154,21 +127,24 @@ FileExplicitFilter::ProcessDataSet(DataSet & ds, Dicts const & dicts)
     }
     const DictEntry & entry = dicts.GetDictEntry(t, owner);
     const VR &        vr = entry.GetVR();
+    VR                cvr = DataSetHelper::ComputeVR(*F, ds, t);
+    VR                oldvr = de.GetVR();
 
-    VR                            cvr = DataSetHelper::ComputeVR(*F, ds, t);
-    VR                            oldvr = de.GetVR();
-    SmartPointer<SequenceOfItems> sqi = 0;
-    if (vr == VR::SQ)
+    SmartPointer<SequenceOfItems> sqi = NULL;
+    if (vr == VR::SQ || cvr == VR::SQ)
     {
       sqi = de.GetValueAsSQ();
       if (!sqi)
       {
-        assert(de.IsEmpty());
+        if (!de.IsEmpty())
+        {
+          mdcmWarningMacro("DICOM file may be unreadable");
+          cvr = VR::UN;
+        }
       }
     }
     if (de.GetByteValue() && !sqi)
     {
-      assert(cvr != VR::INVALID);
       if (cvr != VR::UN)
       {
         if (cvr & VR::VRASCII)

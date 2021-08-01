@@ -57,8 +57,6 @@ public:
 
 protected:
   bool
-  ChangeFMI();
-  bool
   ProcessDataSet(DataSet &, Dicts const &);
 
 private:
