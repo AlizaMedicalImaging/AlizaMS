@@ -549,9 +549,9 @@ Overlay::GetUnpackBufferLength() const
 {
   if (Internal->NumberOfFrames > 0)
   {
-    return (size_t)(Internal->Rows * Internal->Columns * Internal->NumberOfFrames);
+    return ((size_t)Internal->Rows * (size_t)Internal->Columns * (size_t)Internal->NumberOfFrames);
   }
-  return (size_t)(Internal->Rows * Internal->Columns);
+  return ((size_t)Internal->Rows * (size_t)Internal->Columns);
 }
 
 bool

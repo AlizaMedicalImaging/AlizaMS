@@ -216,7 +216,12 @@ JPEGCodec::Decode(DataElement const & in, DataElement & out)
       }
     }
   }
-  const size_t sizeOfOs = (size_t)os.tellp();
+  const unsigned long long sizeOfOs = os.tellp();
+  if (sizeOfOs >= 0xffffffff)
+  {
+    mdcmAlwaysWarnMacro("JPEGCodec: value too big for ByteValue");
+    return false;
+  }
   os.seekp(0, std::ios::beg);
   ByteValue * bv = new ByteValue;
   bv->SetLength((uint32_t)sizeOfOs);

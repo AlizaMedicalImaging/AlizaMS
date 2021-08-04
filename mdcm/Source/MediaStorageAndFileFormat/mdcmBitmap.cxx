@@ -532,7 +532,7 @@ Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
   }
   if (codec.CanDecode(ts))
   {
-    const size_t len = GetBufferLength();
+    const unsigned long long len = GetBufferLength();
     codec.SetNumberOfDimensions(GetNumberOfDimensions());
     codec.SetDimensions(GetDimensions());
     codec.SetPlanarConfiguration(GetPlanarConfiguration());
@@ -595,15 +595,15 @@ Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
       mdcmAlwaysWarnMacro("JPEG: !out.GetByteValue()");
       return false;
     }
-    if (len != (size_t)outbv->GetLength())
+    if (len != (unsigned long long)outbv->GetLength())
     {
-      mdcmAlwaysWarnMacro("JPEG: length is " << len << ", should be " << (size_t)outbv->GetLength());
+      mdcmAlwaysWarnMacro("JPEG: length is " << len << ", should be " << outbv->GetLength());
     }
     if (buffer)
     {
       memcpy(buffer,
              outbv->GetPointer(),
-             (len >= (unsigned long long)outbv->GetLength() ? (size_t)outbv->GetLength() : len));
+             (len >= (unsigned long long)outbv->GetLength() ? (size_t)outbv->GetLength() : (size_t)len));
     }
     lossyflag = codec.IsLossy();
     return true;
@@ -625,7 +625,7 @@ Bitmap::TryJPEGCodec2(std::ostream & os) const
     codec.SetNeedOverlayCleanup(AreOverlaysInPixelData() ||
                                 (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
     DataElement out;
-    bool        r = codec.Code(PixelData, out);
+    const bool  r = codec.Code(PixelData, out);
     if (!r)
       return false;
     const ByteValue * outbv = out.GetByteValue();
@@ -667,7 +667,7 @@ Bitmap::TryPVRGCodec(char * buffer, bool & lossyflag) const
       return false;
     assert(len <= outbv->GetLength());
     if (buffer)
-      memcpy(buffer, outbv->GetPointer(), len);
+      memcpy(buffer, outbv->GetPointer(), (size_t)len);
     lossyflag = codec.IsLossy();
     return r;
   }
@@ -691,7 +691,7 @@ Bitmap::TryJPEGLSCodec(char * buffer, bool & lossyflag) const
       const ByteValue & bv2 = dynamic_cast<const ByteValue &>(frag.GetValue());
       std::stringstream ss;
       ss.write(bv2.GetPointer(), bv2.GetLength());
-      bool b = codec.GetHeaderInfo(ss, ts2);
+      const bool b = codec.GetHeaderInfo(ss, ts2);
       if (!b)
         return false;
       lossyflag = codec.IsLossy();
@@ -711,7 +711,7 @@ Bitmap::TryJPEGLSCodec(char * buffer, bool & lossyflag) const
                                 (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
     codec.SetDimensions(GetDimensions());
     DataElement out;
-    bool        r = codec.Decode(PixelData, out);
+    const bool  r = codec.Decode(PixelData, out);
     if (!r)
       return false;
     const ByteValue * outbv = out.GetByteValue();
@@ -719,7 +719,7 @@ Bitmap::TryJPEGLSCodec(char * buffer, bool & lossyflag) const
       return false;
     assert(len <= outbv->GetLength());
     if (buffer)
-      memcpy(buffer, outbv->GetPointer(), len);
+      memcpy(buffer, outbv->GetPointer(), (size_t)len);
     lossyflag = codec.IsLossy();
     if (codec.IsLossy() != ts.IsLossy())
     {
@@ -745,7 +745,7 @@ Bitmap::TryJPEG2000Codec(char * buffer, bool & lossyflag) const
         return false;
       const Fragment &  frag = sf->GetFragment(0);
       const ByteValue & bv2 = dynamic_cast<const ByteValue &>(frag.GetValue());
-      bool              b = codec.GetHeaderInfo(bv2.GetPointer(), bv2.GetLength(), ts2);
+      const bool        b = codec.GetHeaderInfo(bv2.GetPointer(), bv2.GetLength(), ts2);
       if (!b)
         return false;
       lossyflag = codec.IsLossy();
@@ -795,7 +795,7 @@ Bitmap::TryJPEG2000Codec(char * buffer, bool & lossyflag) const
       return false;
     assert(len <= outbv->GetLength());
     if (buffer)
-      memcpy(buffer, outbv->GetPointer(), len);
+      memcpy(buffer, outbv->GetPointer(), (size_t)len);
     lossyflag = codec.IsLossy();
     if (codec.IsLossy() && !ts.IsLossy())
     {
@@ -840,7 +840,7 @@ Bitmap::TryJPEG2000Codec2(std::ostream & os) const
     codec.SetNeedOverlayCleanup(AreOverlaysInPixelData() ||
                                 (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
     DataElement out;
-    bool        r = codec.Code(PixelData, out);
+    const bool  r = codec.Code(PixelData, out);
     if (!r)
       return false;
     const ByteValue * outbv = out.GetByteValue();
@@ -870,13 +870,13 @@ Bitmap::TryRLECodec(char * buffer, bool & lossyflag) const
                                 (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
     codec.SetBufferLength(len);
     DataElement out;
-    bool        r = codec.Decode(PixelData, out);
+    const bool  r = codec.Decode(PixelData, out);
     if (!r)
       return false;
     const ByteValue * outbv = out.GetByteValue();
     assert(len <= outbv->GetLength());
     if (buffer)
-      memcpy(buffer, outbv->GetPointer(), len);
+      memcpy(buffer, outbv->GetPointer(), (size_t)len);
     lossyflag = false;
     return true;
   }

@@ -138,7 +138,13 @@ JPEGLSCodec::Decode(DataElement const & in, DataElement & out)
     }
     std::string str = os.str();
     assert(str.size());
-    out.SetByteValue(&str[0], (uint32_t)str.size());
+    const unsigned long long str_size = str.size();
+    if (str_size >= 0xffffffff)
+    {
+      mdcmAlwaysWarnMacro("JPEGLSCodec: value too big for ByteValue");
+      return false;
+    }
+    out.SetByteValue(&str[0], (uint32_t)str_size);
     return true;
   }
   return false;

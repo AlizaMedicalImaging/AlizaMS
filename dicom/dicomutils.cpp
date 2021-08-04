@@ -7433,7 +7433,7 @@ QString DicomUtils::read_buffer(
 	if (elscint)
 	{
 		QFileInfo fi(f);
-		elscf = 
+		elscf =
 			QDir::tempPath() +
 			QString("/") +
 			fi.fileName() + QString("ELSCINT.dcm");
@@ -7481,6 +7481,25 @@ QString DicomUtils::read_buffer(
 	const mdcm::TransferSyntax & ts =
 		image_reader.GetFile().GetHeader().GetDataSetTransferSyntax();
 #endif
+	{
+// https://groups.google.com/g/comp.protocols.dicom/c/-tO2v2aH010/m/PNGwaLpBkBsJ
+		const unsigned long long buffer_length = image.GetBufferLength();
+		if (buffer_length > 0xffffffff)
+		{
+#if 0
+			if (!ts.IsLossy()) // TODO
+#endif
+			{
+#if 0
+				std::cout << "Warning: GetBufferLength()=" << buffer_length << std::endl;
+#else
+				if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
+				return (QString("GetBufferLength() is\n") +
+					QVariant(buffer_length).toString());
+#endif
+			}
+		}
+	}
 	//
 	if (mosaic)
 	{
@@ -7514,9 +7533,9 @@ QString DicomUtils::read_buffer(
 	dircos[3] = dircos_[3];
 	dircos[4] = dircos_[4];
 	dircos[5] = dircos_[5];
-	const unsigned int dimx = *dimx_;
-	const unsigned int dimy = *dimy_;
-	const unsigned int dimz = *dimz_;
+	const unsigned long long dimx = *dimx_;
+	const unsigned long long dimy = *dimy_;
+	const unsigned long long dimz = *dimz_;
 	pi = image.GetPhotometricInterpretation();
 	if (overlay_idx!=-2)
 	{
@@ -7672,15 +7691,15 @@ QString DicomUtils::read_buffer(
 		anatomy[anatomy_idx] = a;
 		if (anatomy_idx == 0 && dimz > 1)
 		{
-			for (int x = 1; x < (int)dimz; ++x) anatomy[x] = a;
+			for (size_t x = 1; x < dimz; ++x) anatomy[x] = a;
 		}
 	}
 	//
 	bool rescale_ = false;
-	size_t rescaled_buffer_size = 0;
-	size_t supp_rescaled_buffer_size = 0;
-	size_t not_rescaled_buffer_size = 0;
-	size_t buffer_size = 0;
+	unsigned long long rescaled_buffer_size = 0;
+	unsigned long long supp_rescaled_buffer_size = 0;
+	unsigned long long not_rescaled_buffer_size = 0;
+	unsigned long long buffer_size = 0;
 	char * rescaled_buffer = NULL;
 	char * supp_rescaled_buffer = NULL;
 	char * not_rescaled_buffer = NULL;
@@ -7884,12 +7903,12 @@ QString DicomUtils::read_buffer(
 	else
 	{
 		type_size = (pixelformat.GetBitsAllocated()%8!=0)
-					? static_cast<unsigned int>(ceil((double)pixelformat.GetBitsAllocated()/8.0))
+					? (unsigned int)(ceil((double)pixelformat.GetBitsAllocated()/8.0))
 					: pixelformat.GetBitsAllocated()/8;
 	}
 	if (singlebit)
 	{
-		const size_t singlebit_buffer_size = image.GetBufferLength();
+		const unsigned long long singlebit_buffer_size = image.GetBufferLength();
 		unsigned char * singlebit_buffer;
 		try
 		{
@@ -7932,8 +7951,8 @@ QString DicomUtils::read_buffer(
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return QString("Buffer allocation error");
 		}
-		size_t j = 0;
-		for (size_t x = 0; x < not_rescaled_buffer_size/8; ++x)
+		unsigned long long j = 0;
+		for (unsigned long long x = 0; x < not_rescaled_buffer_size/8; ++x)
 		{
 			const unsigned char c = singlebit_buffer[x];
 			not_rescaled_buffer[j  ] = (c &  0x1) ? (char)255 : 0;
@@ -7968,9 +7987,9 @@ QString DicomUtils::read_buffer(
 				{
 					const QString tmp_s0 =
 						QString("Buffer size wrong\n") +
-						QVariant((int)not_rescaled_buffer_size).toString() +
+						QVariant(not_rescaled_buffer_size).toString() +
 						QString("\nbut must be\n") +
-						QVariant((int)(3*dimx*dimy*dimz*type_size*samples_per_pix)).toString();
+						QVariant(3*dimx*dimy*dimz*type_size*samples_per_pix).toString();
 					if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 					return tmp_s0;
 				}
@@ -7981,9 +8000,9 @@ QString DicomUtils::read_buffer(
 				{
 					const QString tmp_s0 =
 						QString("Buffer size wrong\n") +
-						QVariant(static_cast<int>(not_rescaled_buffer_size)).toString() +
+						QVariant(not_rescaled_buffer_size).toString() +
 						QString("\nbut must be\n") +
-						QVariant(static_cast<int>(dimx*dimy*dimz*type_size*samples_per_pix)).toString();
+						QVariant(dimx*dimy*dimz*type_size*samples_per_pix).toString();
 					if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 					return tmp_s0;
 				}

@@ -130,8 +130,13 @@ RAWCodec::Decode(DataElement const & in, DataElement & out)
   out = in;
   if (this->GetPixelFormat() == PixelFormat::UINT12 || this->GetPixelFormat() == PixelFormat::INT12)
   {
-    const size_t len = str.size() * 16 / 12;
-    char *       copy;
+    const unsigned long long len = str.size() * 16 / 12;
+    if (len >= 0xffffffff)
+    {
+      mdcmAlwaysWarnMacro("RAWCodec: value too big for ByteValue");
+      return false;
+    }
+    char * copy;
     try
     {
       copy = new char[len];
@@ -153,8 +158,13 @@ RAWCodec::Decode(DataElement const & in, DataElement & out)
   }
   else
   {
-    VL::Type strSize = (VL::Type)str.size();
-    out.SetByteValue(&str[0], strSize);
+    const unsigned long long str_size = str.size();
+    if (str_size >= 0xffffffff)
+    {
+      mdcmAlwaysWarnMacro("RAWCodec: value too big for ByteValue");
+      return false;
+    }
+    out.SetByteValue(&str[0], (VL::Type)str_size);
   }
   return r;
 }
