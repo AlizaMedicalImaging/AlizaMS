@@ -47,6 +47,8 @@ public:
   bool
   Decode(DataElement const &, DataElement &) override;
   bool
+  Decode2(DataElement const &, char *, size_t);
+  bool
   Code(DataElement const &, DataElement &) override;
   bool
   GetHeaderInfo(std::istream &, TransferSyntax &) override;

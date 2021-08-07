@@ -5948,56 +5948,129 @@ QString DicomUtils::read_ultrasound(
 	const bool overlays_enabled = wsettings->get_overlays();
 	const int overlays_idx = overlays_enabled ? 0 : -2;
 	int number_of_frames = 0;
-	//
-	mdcm::Reader reader;
-#ifdef _WIN32
-#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-	reader.SetFileName(QDir::toNativeSeparators(images_ipp.at(0)).toUtf8().constData());
-#else
-	reader.SetFileName(QDir::toNativeSeparators(images_ipp.at(0)).toLocal8Bit().constData());
-#endif
-#else
-	reader.SetFileName(images_ipp.at(0).toLocal8Bit().constData());
-#endif
-	*ok = reader.Read();
-	if (*ok == false)
-	{
-		return (QString("can not read file ") + images_ipp.at(0));
-	}
-	const mdcm::File    & file = reader.GetFile();
-	const mdcm::DataSet & ds   = file.GetDataSet();
-	if (ds.FindDataElement(tnumframes))
-	{
-		const mdcm::DataElement & e =
-			ds.GetDataElement(tnumframes);
-		if (
-			!e.IsEmpty() &&
-			!e.IsUndefinedLength() &&
-			e.GetByteValue())
-		{
-			QString numframes("");
-			numframes =
-				QString::fromLatin1(
-					e.GetByteValue()->GetPointer(),
-					e.GetByteValue()->GetLength());
-			const QVariant v(
-				numframes.trimmed().remove(QChar('\0')));
-			bool c_ok = false;
-			const int k = v.toInt(&c_ok);
-			if (c_ok) number_of_frames = k;
-		}
-	}
-	//
-	read_ivariant_info_tags(ds, ivariant);
-	//
-	if (number_of_frames > 1)
-		read_frame_times(ds, ivariant, number_of_frames);
-	//
-	read_us_regions(ds, ivariant);
-	//
 	double tmp_c = -999999.0, tmp_w = -999999.0;
 	short tmp_lut_function = 0;
-	read_window(ds, &tmp_c, &tmp_w, &tmp_lut_function);
+	//
+	{
+		mdcm::Reader reader;
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+		reader.SetFileName(QDir::toNativeSeparators(images_ipp.at(0)).toUtf8().constData());
+#else
+		reader.SetFileName(QDir::toNativeSeparators(images_ipp.at(0)).toLocal8Bit().constData());
+#endif
+#else
+		reader.SetFileName(images_ipp.at(0).toLocal8Bit().constData());
+#endif
+		*ok = reader.Read();
+		if (*ok == false)
+		{
+			return (QString("can not read file ") + images_ipp.at(0));
+		}
+		const mdcm::File    & file = reader.GetFile();
+		const mdcm::DataSet & ds   = file.GetDataSet();
+		if (ds.FindDataElement(tnumframes))
+		{
+			const mdcm::DataElement & e =
+				ds.GetDataElement(tnumframes);
+			if (
+				!e.IsEmpty() &&
+				!e.IsUndefinedLength() &&
+				e.GetByteValue())
+			{
+				QString numframes("");
+				numframes =
+					QString::fromLatin1(
+						e.GetByteValue()->GetPointer(),
+						e.GetByteValue()->GetLength());
+				const QVariant v(
+					numframes.trimmed().remove(QChar('\0')));
+				bool c_ok = false;
+				const int k = v.toInt(&c_ok);
+				if (c_ok) number_of_frames = k;
+			}
+		}
+		//
+		read_ivariant_info_tags(ds, ivariant);
+		//
+		if (number_of_frames > 1)
+			read_frame_times(ds, ivariant, number_of_frames);
+		//
+		read_us_regions(ds, ivariant);
+		//
+		read_window(ds, &tmp_c, &tmp_w, &tmp_lut_function);
+		//
+		if (overwrite_mdcm_spacing)
+		{
+			bool bPhilipsVoxelSpacing = false;
+			bool bPixelAspectRatio = false;
+			if (ds.FindDataElement(tPhilipsVoxelSpacing))
+			{
+				// Partial support Philips private 3D storage, only spacing,
+				// TODO complete
+				QString s;
+				if (priv_get_string_value(ds,tPhilipsVoxelSpacing,s))
+				{
+					const mdcm::DataElement & e =
+						ds.GetDataElement(tPhilipsVoxelSpacing);
+					if (!e.IsEmpty())
+					{
+						const mdcm::ByteValue * bv = e.GetByteValue();
+						if (bv)
+						{
+							const QString tmp0 = QString::fromLatin1(
+								bv->GetPointer(),
+								bv->GetLength());
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+							const QStringList tmp1 = tmp0.split(
+								QString("\\"),
+								Qt::SkipEmptyParts);
+#else
+							const QStringList tmp1 = tmp0.split(
+								QString("\\"),
+								QString::SkipEmptyParts);
+#endif
+							if (tmp1.size() == 3)
+							{
+								bool okx = false, oky = false, okz = false;
+								const double tmp_spacing_x = QVariant(
+									tmp1.at(0).trimmed()).toDouble(&okx);
+								const double tmp_spacing_y = QVariant(
+									tmp1.at(1).trimmed()).toDouble(&oky);
+								const double tmp_spacing_z = QVariant(
+									tmp1.at(2).trimmed()).toDouble(&okz);
+								if (okx && oky && okz)
+								{
+									bPhilipsVoxelSpacing = true;
+									spacing_x = tmp_spacing_x;
+									spacing_y = tmp_spacing_y;
+									spacing_z = tmp_spacing_z;
+								}
+							}
+						}
+					}
+				}
+			}
+			if (!bPhilipsVoxelSpacing && ds.FindDataElement(tPixelAspectRatio))
+			{
+				std::vector<int> tmp0;
+				const bool tmp0_ok = get_is_values(ds,tPixelAspectRatio,tmp0);
+				if (tmp0_ok && tmp0.size()==2)
+				{
+					bPixelAspectRatio = true;
+					spacing_x = tmp0[1];
+					spacing_y = tmp0[0];
+					spacing_z = 1.0;
+				}
+			}
+			if (!(bPhilipsVoxelSpacing || bPixelAspectRatio))
+			{
+				spacing_x = 1.0;
+				spacing_y = 1.0;
+				spacing_z = 1.0;
+			}
+		}
+	}
 	ivariant->di->default_us_window_center =
 		ivariant->di->us_window_center = tmp_c;
 	ivariant->di->default_us_window_width =
@@ -6033,77 +6106,7 @@ QString DicomUtils::read_ultrasound(
 		NULL);
 	if (*ok==false) return buff_error;
 	//
-	if (overwrite_mdcm_spacing)
-	{
-		bool bPhilipsVoxelSpacing = false;
-		bool bPixelAspectRatio = false;
-		if (ds.FindDataElement(tPhilipsVoxelSpacing))
-		{
-			// Partial support Philips private 3D storage, only spacing,
-			// TODO complete
-			QString s;
-			if (priv_get_string_value(ds,tPhilipsVoxelSpacing,s))
-			{
-				const mdcm::DataElement & e =
-					ds.GetDataElement(tPhilipsVoxelSpacing);
-				if (!e.IsEmpty())
-				{
-					const mdcm::ByteValue * bv = e.GetByteValue();
-					if (bv)
-					{
-						const QString tmp0 = QString::fromLatin1(
-							bv->GetPointer(),
-							bv->GetLength());
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-						const QStringList tmp1 = tmp0.split(
-							QString("\\"),
-							Qt::SkipEmptyParts);
-#else
-						const QStringList tmp1 = tmp0.split(
-							QString("\\"),
-							QString::SkipEmptyParts);
-#endif
-						if (tmp1.size() == 3)
-						{
-							bool okx = false, oky = false, okz = false;
-							const double tmp_spacing_x = QVariant(
-								tmp1.at(0).trimmed()).toDouble(&okx);
-							const double tmp_spacing_y = QVariant(
-								tmp1.at(1).trimmed()).toDouble(&oky);
-							const double tmp_spacing_z = QVariant(
-								tmp1.at(2).trimmed()).toDouble(&okz);
-							if (okx && oky && okz)
-							{
-								bPhilipsVoxelSpacing = true;
-								spacing_x = tmp_spacing_x;
-								spacing_y = tmp_spacing_y;
-								spacing_z = tmp_spacing_z;
-							}
-						}
-					}
-				}
-			}
-		}
-		if (!bPhilipsVoxelSpacing && ds.FindDataElement(tPixelAspectRatio))
-		{
-			std::vector<int> tmp0;
-			const bool tmp0_ok = get_is_values(ds,tPixelAspectRatio,tmp0);
-			if (tmp0_ok && tmp0.size()==2)
-			{
-				bPixelAspectRatio = true;
-				spacing_x = tmp0[1];
-				spacing_y = tmp0[0];
-				spacing_z = 1.0;
-			}
-		}
-		if (!(bPhilipsVoxelSpacing || bPixelAspectRatio))
-		{
-			spacing_x = 1.0;
-			spacing_y = 1.0;
-			spacing_z = 1.0;
-		}
-	}
-	else
+	if (!overwrite_mdcm_spacing)
 	{
 		spacing_x = spacing_x_ > 0 ? spacing_x_ : 1.0;
 		spacing_y = spacing_y_ > 0 ? spacing_y_ : 1.0;
@@ -7477,26 +7480,27 @@ QString DicomUtils::read_buffer(
 		return QString("!image_reader.Read()");
 	}
 	mdcm::Image & image = image_reader.GetImage();
-#if 0
 	const mdcm::TransferSyntax & ts =
 		image_reader.GetFile().GetHeader().GetDataSetTransferSyntax();
-#endif
 	{
 // https://groups.google.com/g/comp.protocols.dicom/c/-tO2v2aH010/m/PNGwaLpBkBsJ
 		const unsigned long long buffer_length = image.GetBufferLength();
 		if (buffer_length > 0xffffffff)
 		{
-#if 0
-			if (!ts.IsLossy()) // TODO
-#endif
+			bool skip = true;
+			if (ts.IsEncapsulated())
 			{
-#if 0
-				std::cout << "Warning: GetBufferLength()=" << buffer_length << std::endl;
-#else
+				if (sizeof(void*) >= 8)
+				{
+					skip = false;
+					std::cout << "Warning: GetBufferLength()=" << buffer_length << std::endl;
+				}
+			}
+			if (skip)
+			{
 				if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 				return (QString("GetBufferLength() is\n") +
 					QVariant(buffer_length).toString());
-#endif
 			}
 		}
 	}
@@ -8080,7 +8084,7 @@ QString DicomUtils::read_buffer(
 		}
 	}
 	const size_t xy = buffer_size/dimz;
-	for (unsigned int j = 0; j < dimz; ++j)
+	for (unsigned long long j = 0; j < dimz; ++j)
 	{
 		char * p__ = NULL;
 		bool badalloc = false;

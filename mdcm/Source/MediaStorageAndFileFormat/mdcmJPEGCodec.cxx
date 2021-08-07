@@ -231,6 +231,155 @@ JPEGCodec::Decode(DataElement const & in, DataElement & out)
 }
 
 bool
+JPEGCodec::Decode2(DataElement const & in, std::stringstream & os)
+{
+  assert(Internal);
+  const SequenceOfFragments * sf0 = in.GetSequenceOfFragments();
+  const ByteValue *           jpegbv = in.GetByteValue();
+  if (!sf0 && !jpegbv)
+  {
+    mdcmAlwaysWarnMacro("JPEGCodec: !sf0 && !jpegbv");
+    return false;
+  }
+  if (sf0)
+  {
+    for (unsigned int i = 0; i < sf0->GetNumberOfFragments(); ++i)
+    {
+      std::stringstream is;
+      const Fragment &  frag = sf0->GetFragment(i);
+      if (frag.IsEmpty())
+      {
+        mdcmAlwaysWarnMacro("JPEGCodec: frag.IsEmpty()");
+        return false;
+      }
+      const ByteValue & bv = dynamic_cast<const ByteValue &>(frag.GetValue());
+      const size_t      bv_len = bv.GetLength();
+      char *            mybuffer;
+      try
+      {
+        mybuffer = new char[bv_len];
+      }
+      catch (std::bad_alloc &)
+      {
+        return false;
+      }
+      const bool b = bv.GetBuffer(mybuffer, bv_len);
+      if (!b)
+      {
+        delete[] mybuffer;
+        return false;
+      }
+      is.write(mybuffer, bv_len);
+      delete[] mybuffer;
+      const bool r = DecodeByStreams(is, os);
+      // PHILIPS_Gyroscan-12-MONO2-Jpeg_Lossless.dcm
+      if (!r)
+      {
+        mdcmDebugMacro("JPEGCodec: failed to decompress Frag #" << i);
+        const bool   suspended = Internal->IsStateSuspension();
+        const size_t nfrags = sf0->GetNumberOfFragments();
+        // In case of chunked-jpeg, this is always an error
+        if (suspended)
+        {
+          mdcmAlwaysWarnMacro("JPEGCodec: suspended");
+          return false;
+        }
+        // Ok so we are decoding a multiple frame jpeg DICOM file:
+        // if we are lucky, we might be trying to decode some sort of broken multi-frame
+        // DICOM file. In this case check that we have read all Fragment properly:
+        if (i >= this->GetDimensions()[2])
+        {
+          // JPEGInvalidSecondFrag.dcm
+          assert(nfrags == this->GetNumberOfDimensions());
+          (void)nfrags;
+          mdcmAlwaysWarnMacro("JPEGCodec: invalid fragment found at #" << i + 1 << ", skipped");
+        }
+        else
+        {
+          return false;
+        }
+      }
+    }
+  }
+  else if (jpegbv)
+  {
+    // GEIIS Icon
+    std::stringstream is0;
+    const size_t      jpegbv_len = jpegbv->GetLength();
+    char *            mybuffer0;
+    try
+    {
+      mybuffer0 = new char[jpegbv_len];
+    }
+    catch (std::bad_alloc &)
+    {
+      return false;
+    }
+    const bool b0 = jpegbv->GetBuffer(mybuffer0, jpegbv_len);
+    if (!b0)
+    {
+      delete[] mybuffer0;
+      return false;
+    }
+    is0.write(mybuffer0, jpegbv_len);
+    delete[] mybuffer0;
+    const bool r = DecodeByStreams(is0, os);
+    if (!r)
+    {
+      // Let's try another time: JPEGDefinedLengthSequenceOfFragments.dcm
+      is0.seekg(0);
+      SequenceOfFragments sf_bug;
+      try
+      {
+        sf_bug.Read<SwapperNoOp>(is0, true);
+      }
+      catch (...)
+      {
+        mdcmAlwaysWarnMacro("JPEGCodec: unknown exception");
+        return false;
+      }
+      const SequenceOfFragments * sf = &sf_bug;
+      for (unsigned int i = 0; i < sf->GetNumberOfFragments(); ++i)
+      {
+        std::stringstream is;
+        const Fragment &  frag = sf->GetFragment(i);
+        if (frag.IsEmpty())
+        {
+          mdcmAlwaysWarnMacro("JPEGCodec: frag.IsEmpty() (2)");
+          return false;
+        }
+        const ByteValue & bv = dynamic_cast<const ByteValue &>(frag.GetValue());
+        const size_t      bv_len = bv.GetLength();
+        char *            mybuffer;
+        try
+        {
+          mybuffer = new char[bv_len];
+        }
+        catch (std::bad_alloc &)
+        {
+          return false;
+        }
+        const bool b = bv.GetBuffer(mybuffer, bv_len);
+        if (!b)
+        {
+          delete[] mybuffer;
+          return false;
+        }
+        is.write(mybuffer, bv_len);
+        delete[] mybuffer;
+        const bool r2 = DecodeByStreams(is, os);
+        if (!r2)
+        {
+          mdcmAlwaysWarnMacro("JPEGCodec: !r2");
+          return false;
+        }
+      }
+    }
+  }
+  return true;
+}
+
+bool
 JPEGCodec::Code(DataElement const & in, DataElement & out)
 {
   out = in;

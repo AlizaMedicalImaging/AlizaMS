@@ -136,15 +136,21 @@ protected:
   bool
   TryJPEGCodec2(std::ostream & os) const;
   bool
+  TryJPEGCodec3(char * buffer, bool & lossyflag) const;
+  bool
   TryPVRGCodec(char * buffer, bool & lossyflag) const;
   bool
   TryJPEGLSCodec(char * buffer, bool & lossyflag) const;
+  bool
+  TryJPEGLSCodec2(char * buffer, bool & lossyflag) const;
   bool
   TryJPEG2000Codec(char * buffer, bool & lossyflag) const;
   bool
   TryJPEG2000Codec2(std::ostream & os) const;
   bool
-                                    TryRLECodec(char * buffer, bool & lossyflag) const;
+  TryJPEG2000Codec3(char * buffer, bool & lossyflag) const;
+  bool
+  TryRLECodec(char * buffer, bool & lossyflag) const;
   unsigned int                      PlanarConfiguration;
   unsigned int                      NumberOfDimensions;
   TransferSyntax                    TS;

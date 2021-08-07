@@ -878,6 +878,161 @@ JPEG2000Codec::Decode(DataElement const & in, DataElement & out)
   return false;
 }
 
+bool
+JPEG2000Codec::Decode2(DataElement const & in, char * out_buffer, size_t len)
+{
+  if (NumberOfDimensions == 2)
+  {
+    const SequenceOfFragments * sf = in.GetSequenceOfFragments();
+    const ByteValue *           j2kbv = in.GetByteValue();
+    if (!sf && !j2kbv)
+      return false;
+    SmartPointer<SequenceOfFragments> sf_bug = new SequenceOfFragments;
+    if (j2kbv)
+    {
+      mdcmWarningMacro("Pixel Data is not encapsulated correctly. Continuing anyway");
+      assert(!sf);
+      std::stringstream is;
+      const size_t      j2kbv_len = j2kbv->GetLength();
+      char *            mybuffer;
+      try
+      {
+        mybuffer = new char[j2kbv_len];
+      }
+      catch (std::bad_alloc &)
+      {
+        return false;
+      }
+      const bool b = j2kbv->GetBuffer(mybuffer, (unsigned long long)j2kbv_len);
+      if (b)
+        is.write(mybuffer, j2kbv_len);
+      delete[] mybuffer;
+      if (!b)
+        return false;
+      try
+      {
+        sf_bug->Read<SwapperNoOp>(is, true);
+      }
+      catch (...)
+      {
+        return false;
+      }
+      sf = &*sf_bug;
+    }
+    if (!sf)
+      return false;
+    std::stringstream        is;
+    const unsigned long long totalLen = sf->ComputeByteLength();
+    char *                   buffer;
+    try
+    {
+      buffer = new char[totalLen];
+    }
+    catch (std::bad_alloc &)
+    {
+      return false;
+    }
+    sf->GetBuffer(buffer, totalLen);
+    is.write(buffer, totalLen);
+    delete[] buffer;
+    std::stringstream os;
+    const bool        r = DecodeByStreams(is, os);
+    if (!r)
+      return false;
+    os.seekg(0, std::ios::end);
+    const size_t len2 = os.tellg();
+    if (len != len2)
+    {
+      mdcmAlwaysWarnMacro("JPEG2000Codec::Decode2 len=" << len << " len2=" << len2);
+      if (len > len2)
+      {
+        memset(out_buffer, 0, len);
+      }
+    }
+    os.seekp(0, std::ios::beg);
+#if 1
+    std::stringbuf * pbuf = os.rdbuf();
+    pbuf->sgetn(out_buffer, ((len < len2) ? len : len2));
+#else
+    const std::string & tmp0 = os.str();
+    const char * tmp1 = tmp0.data();
+    memcpy(
+      out_buffer,
+      tmp1,
+      ((len < len2) ? len : len2));
+#endif
+    return r;
+  }
+  else if (NumberOfDimensions == 3)
+  {
+    /* I cannot figure out how to use openjpeg to support multiframes
+     * as encoded in DICOM
+     * MM: Hack. If we are lucky enough the number of encapsulated fragments actually match
+     * the number of Z frames.
+     * MM: hopefully this is the standard so people are following it
+     */
+    const SequenceOfFragments * sf = in.GetSequenceOfFragments();
+    if (!sf)
+      return false;
+    std::stringstream os;
+    if (sf->GetNumberOfFragments() != Dimensions[2])
+    {
+      mdcmErrorMacro("Not handled");
+      return false;
+    }
+    for (unsigned int i = 0; i < sf->GetNumberOfFragments(); ++i)
+    {
+      std::stringstream is;
+      const Fragment &  frag = sf->GetFragment(i);
+      if (frag.IsEmpty())
+        return false;
+      const ByteValue * bv = frag.GetByteValue();
+      if (!bv)
+        return false;
+      const size_t bv_len = bv->GetLength();
+      char *       mybuffer;
+      try
+      {
+        mybuffer = new char[bv_len];
+      }
+      catch (std::bad_alloc &)
+      {
+        return false;
+      }
+      bv->GetBuffer(mybuffer, bv->GetLength());
+      is.write(mybuffer, bv->GetLength());
+      delete[] mybuffer;
+      const bool r = DecodeByStreams(is, os);
+      if (!r)
+        return false;
+    }
+    os.seekg(0, std::ios::end);
+    const size_t len2 = os.tellg();
+    if (len != len2)
+    {
+      mdcmAlwaysWarnMacro("JPEG2000Codec::Decode2 len=" << len << " len2=" << len2);
+      if (len > len2)
+      {
+        memset(out_buffer, 0, len);
+      }
+    }
+    os.seekp(0, std::ios::beg);
+#if 1
+    std::stringbuf * pbuf = os.rdbuf();
+    pbuf->sgetn(out_buffer, ((len < len2) ? len : len2));
+#else
+    const std::string & tmp0 = os.str();
+    const char * tmp1 = tmp0.data();
+    memcpy(
+      out_buffer,
+      tmp1,
+      ((len < len2) ? len : len2));
+#endif
+    return true;
+  }
+  return false;
+}
+
 // Compress into JPEG
 bool
 JPEG2000Codec::Code(DataElement const & in, DataElement & out)
@@ -919,7 +1074,7 @@ bool
 JPEG2000Codec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
 {
   is.seekg(0, std::ios::end);
-  const size_t buf_size = (size_t)is.tellg();
+  const size_t buf_size = is.tellg();
   char *       dummy_buffer;
   try
   {
@@ -1077,15 +1232,16 @@ JPEG2000Codec::DecodeExtent(char *         buffer,
       mdcmErrorMacro("Invalid PixelFormat found (mismatch DICOM vs J2K)");
       return false;
     }
-    char *             raw = raw_len.first;
-    const unsigned int rowsize = xmax - xmin + 1;
-    const unsigned int colsize = ymax - ymin + 1;
-    const unsigned int bytesPerPixel = pf.GetPixelSize();
-    const char *       tmpBuffer1 = raw;
-    unsigned int       z = 0;
-    for (unsigned int y = ymin; y <= ymax; ++y)
+    char *       raw = raw_len.first;
+    const size_t rowsize = xmax - xmin + 1;
+    const size_t colsize = ymax - ymin + 1;
+    const size_t bytesPerPixel = pf.GetPixelSize();
+    const char * tmpBuffer1 = raw;
+    size_t       z = 0;
+    for (size_t y = ymin; y <= ymax; ++y)
     {
-      const size_t theOffset = 0 + (z * dimensions[1] * dimensions[0] + y * dimensions[0] + xmin) * bytesPerPixel;
+      const size_t theOffset =
+        (z * (size_t)dimensions[1] * (size_t)dimensions[0] + y * (size_t)dimensions[0] + xmin) * (size_t)bytesPerPixel;
       tmpBuffer1 = raw + theOffset;
       memcpy(&(buffer[((z - zmin) * rowsize * colsize + (y - ymin) * rowsize) * bytesPerPixel]),
              tmpBuffer1,
@@ -1139,12 +1295,12 @@ JPEG2000Codec::DecodeExtent(char *         buffer,
       {
         return false;
       }
-      char *             raw = raw_len.first;
-      const unsigned int rowsize = xmax - xmin + 1;
-      const unsigned int colsize = ymax - ymin + 1;
-      const unsigned int bytesPerPixel = pf.GetPixelSize();
-      const char *       tmpBuffer1 = raw;
-      for (unsigned int y = ymin; y <= ymax; ++y)
+      char *       raw = raw_len.first;
+      const size_t rowsize = xmax - xmin + 1;
+      const size_t colsize = ymax - ymin + 1;
+      const size_t bytesPerPixel = pf.GetPixelSize();
+      const char * tmpBuffer1 = raw;
+      for (size_t y = ymin; y <= ymax; ++y)
       {
         const size_t theOffset = 0 + (0 * dimensions[1] * dimensions[0] + y * dimensions[0] + xmin) * bytesPerPixel;
         tmpBuffer1 = raw + theOffset;
@@ -1163,7 +1319,7 @@ JPEG2000Codec::DecodeByStreams(std::istream & is, std::ostream & os)
 {
   // TODO may be could be done better?
   is.seekg(0, std::ios::end);
-  const size_t buf_size = (size_t)is.tellg();
+  const size_t buf_size = is.tellg();
   char *       dummy_buffer;
   try
   {
@@ -1243,8 +1399,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
   opj_stream_t *    cio = NULL;
   opj_image_t *     image = NULL;
   unsigned char *   src = (unsigned char *)dummy_buffer;
-  // 32bits truncation should be ok since DICOM cannot have larger than 2Gb image
-  uint32_t file_length = (uint32_t)buf_size;
+  size_t file_length = buf_size;
   // WARNING: OpenJPEG is very picky when there is a trailing 00 at the end of the JPC
   // so we need to make sure to remove it:
   // See for example: DX_J2K_0Padding.dcm
@@ -1398,7 +1553,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
 #endif
   /* close the byte stream */
   opj_stream_destroy(cio);
-  const unsigned long long len = Dimensions[0] * Dimensions[1] * (PF.GetBitsAllocated() / 8) * image->numcomps;
+  const size_t len = (size_t)Dimensions[0] * (size_t)Dimensions[1] * (PF.GetBitsAllocated() / 8) * image->numcomps;
   char *                   raw;
   try
   {

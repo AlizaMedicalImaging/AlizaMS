@@ -388,6 +388,11 @@ RLECodec::Decode(DataElement const & in, DataElement & out)
     if (!sf)
       return false;
     const unsigned long long len = GetBufferLength();
+    if (len >= 0xffffffff)
+    {
+      mdcmAlwaysWarnMacro("RLECodec: value too big for ByteValue");
+      return false;
+    }
     size_t                   pos = 0;
     // Each RLE Frame store a 2D frame, len is the 3d length
     const size_t nframes = sf->GetNumberOfFragments();
@@ -422,11 +427,6 @@ RLECodec::Decode(DataElement const & in, DataElement & out)
     if (!corruption)
     {
       assert(pos == len);
-    }
-    if (len >= 0xffffffff)
-    {
-      mdcmAlwaysWarnMacro("RLECodec: value too big for ByteValue");
-      return false;
     }
     out.SetByteValue(buffer, (uint32_t)len);
     delete[] buffer;

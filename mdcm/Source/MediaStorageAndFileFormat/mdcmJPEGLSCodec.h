@@ -45,7 +45,7 @@ public:
   bool
   Decode(DataElement const &, DataElement &) override;
   bool
-  Decode(DataElement const &, char *, size_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t);
+  Decode2(DataElement const &, char *, size_t);
   bool
   Code(DataElement const &, DataElement &) override;
   unsigned long long
@@ -87,7 +87,9 @@ private:
   bool
   DecodeByStreamsCommon(const char *, size_t, std::vector<unsigned char> &);
   bool
-                     CodeFrameIntoBuffer(char *, size_t, size_t &, const char *, size_t);
+  DecodeByStreamsCommon2(const char *, size_t, char *, size_t);
+  bool
+  CodeFrameIntoBuffer(char *, size_t, size_t &, const char *, size_t);
   unsigned long long BufferLength;
   int                LossyError;
 };

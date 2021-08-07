@@ -445,7 +445,7 @@ ImageCodec::DoYBRFull422(std::istream & is, std::ostream & os)
   std::streampos start = is.tellg();
   assert(0 - start == 0);
   is.seekg(0, std::ios::end);
-  const size_t buf_size = (size_t)is.tellg();
+  const size_t buf_size = is.tellg();
   if (buf_size % 2 != 0)
     return false;
   const size_t rgb_buf_size = buf_size * 3 / 2;

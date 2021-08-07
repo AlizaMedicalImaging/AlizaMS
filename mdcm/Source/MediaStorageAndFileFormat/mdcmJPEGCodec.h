@@ -23,7 +23,7 @@
 #define MDCMJPEGCODEC_H
 
 #include "mdcmImageCodec.h"
-
+#include <sstream>
 /*
  * http://groups.google.com/group/comp.protocols.dicom/browse_thread/thread/625e46919f2080e1
  * http://groups.google.com/group/comp.protocols.dicom/browse_thread/thread/75fdfccc65a6243
@@ -48,6 +48,8 @@ public:
   CanCode(TransferSyntax const &) const override;
   bool
   Decode(DataElement const &, DataElement &) override;
+  bool
+  Decode2(DataElement const &, std::stringstream &);
   bool
   Code(DataElement const &, DataElement &) override;
   void
@@ -100,13 +102,13 @@ protected:
   void
   SetBitSample(int);
   virtual bool
-      IsStateSuspension() const;
+  IsStateSuspension() const;
   int BitSample;
   int Quality;
 
 private:
   void
-              SetupJPEGBitCodec(int);
+  SetupJPEGBitCodec(int);
   JPEGCodec * Internal;
 };
 
