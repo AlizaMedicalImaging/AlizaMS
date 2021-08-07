@@ -1541,7 +1541,7 @@ template<typename T> QString process_dicom_rgba_image1(
 		image->Allocate();
 		image->SetOrigin(origin);
 		image->SetSpacing(spacing);
-		if (!bad_direction) image->SetDirection(direction);
+		if (*bad_direction == false) image->SetDirection(direction);
 	}
 	catch (itk::ExceptionObject & ex)
 	{
