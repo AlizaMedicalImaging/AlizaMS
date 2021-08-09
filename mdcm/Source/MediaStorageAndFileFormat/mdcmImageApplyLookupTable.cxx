@@ -37,12 +37,17 @@ ImageApplyLookupTable::Apply()
     mdcmDebugMacro("Image is not palettized");
     return false;
   }
-  const LookupTable & lut = image.GetLUT();
-  int                 bitsample = lut.GetBitSample();
-  if (!bitsample)
+  const LookupTable &  lut = image.GetLUT();
+  const unsigned short bitsample = lut.GetBitSample();
+  if (bitsample == 0)
     return false;
   const unsigned long long len = image.GetBufferLength();
-  std::vector<char>        v;
+  if ((len * 3) > 0xffffffff)
+  {
+    mdcmAlwaysWarnMacro("ImageApplyLookupTable::Apply(): len = " << len);
+    return false;
+  }
+  std::vector<char> v;
   v.resize(len);
   char * p = &v[0];
   image.GetBuffer(p);
@@ -56,7 +61,6 @@ ImageApplyLookupTable::Apply()
   std::vector<char> v2;
   v2.resize(len * 3);
   lut.Decode(&v2[0], v2.size(), &v[0], v.size());
-  assert(v2.size() < (size_t)std::numeric_limits<uint32_t>::max());
   de.SetByteValue(&v2[0], (uint32_t)v2.size());
   Output->GetLUT().Clear();
   Output->SetPhotometricInterpretation(PhotometricInterpretation::RGB);

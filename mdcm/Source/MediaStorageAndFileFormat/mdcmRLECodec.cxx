@@ -361,6 +361,11 @@ RLECodec::Decode(DataElement const & in, DataElement & out)
     if (!sf)
       return false;
     const unsigned long long len = GetBufferLength();
+    if (len > 0xffffffff)
+    {
+      mdcmAlwaysWarnMacro("RLECodec:: Decode() (1): value too big for ByteValue");
+      return false;
+    }
     std::stringstream        is;
     sf->WriteBuffer(is);
     SetLength(len);
@@ -373,9 +378,9 @@ RLECodec::Decode(DataElement const & in, DataElement & out)
     }
     std::string              str = os.str();
     const unsigned long long str_size = str.size();
-    if (str_size >= 0xffffffff)
+    if (str_size > 0xffffffff)
     {
-      mdcmAlwaysWarnMacro("RLECodec: value too big for ByteValue");
+      mdcmAlwaysWarnMacro("RLECodec:: Decode() (2): value too big for ByteValue");
       return false;
     }
     out.SetByteValue(&str[0], (VL::Type)str_size);
@@ -388,9 +393,9 @@ RLECodec::Decode(DataElement const & in, DataElement & out)
     if (!sf)
       return false;
     const unsigned long long len = GetBufferLength();
-    if (len >= 0xffffffff)
+    if (len > 0xffffffff)
     {
-      mdcmAlwaysWarnMacro("RLECodec: value too big for ByteValue");
+      mdcmAlwaysWarnMacro("RLECodec:: Decode() (3): value too big for ByteValue");
       return false;
     }
     size_t                   pos = 0;
@@ -447,7 +452,7 @@ RLECodec::Code(DataElement const & in, DataElement & out)
     return false;
   }
   const unsigned int * dims = this->GetDimensions();
-  const unsigned int   n = 256 * 256;
+  const size_t         n = 256 * 256;
   char *               outbuf;
   // At most we are encoding a single row at a time, so we would be very unlucky
   // if the row *after* compression would not fit in 256*256 bytes
@@ -661,8 +666,12 @@ RLECodec::Code(DataElement const & in, DataElement & out)
     std::string str = os.str() + datastr;
     assert(str.size());
     Fragment frag;
-    VL::Type strSize = (VL::Type)str.size();
-    frag.SetByteValue(&str[0], strSize);
+    const size_t str_size = str.size();
+    if (str_size > 0xffffffff)
+    {
+      return false;
+    }
+    frag.SetByteValue(&str[0], (VL::Type)str_size);
     sq->AddFragment(frag);
   }
   out.SetValue(*sq);
@@ -734,17 +743,17 @@ RLECodec::DecodeExtent(char *         buffer,
       return false;
     // handle DICOM padding
     std::streampos end = is.tellg();
-    size_t         numberOfReadBytes = (size_t)(end - start);
+    size_t         numberOfReadBytes = end - start;
     if (numberOfReadBytes > frag.GetVL())
     {
       // Special handling for ALOKA_SSD-8-MONO2-RLE-SQ.dcm
       size_t diff = numberOfReadBytes - frag.GetVL();
       assert(diff == 1);
-      os.seekp(0 - (int)diff, std::ios::cur);
+      os.seekp(0 - diff, std::ios::cur);
       os.put(0);
-      end = (size_t)end - 1;
+      end = end - 1;
     }
-    assert(end - start == frag.GetVL() || (size_t)(end - start) + 1 == frag.GetVL());
+    assert(end - start == frag.GetVL() || (end - start + 1) == frag.GetVL());
     // sync is (rle16loo.dcm)
     if ((end - start) % 2 == 1)
     {
@@ -753,10 +762,10 @@ RLECodec::DecodeExtent(char *         buffer,
   } // for each z
   os.seekg(0, std::ios::beg);
   assert(os.good());
-  std::istream *    theStream = &os;
-  unsigned int      rowsize = xmax - xmin + 1;
-  unsigned int      colsize = ymax - ymin + 1;
-  unsigned int      bytesPerPixel = pf.GetPixelSize();
+  std::istream * theStream = &os;
+  const size_t   rowsize = xmax - xmin + 1;
+  const size_t   colsize = ymax - ymin + 1;
+  const size_t   bytesPerPixel = pf.GetPixelSize();
   std::vector<char> buffer1;
   buffer1.resize(rowsize * bytesPerPixel);
   char *         tmpBuffer1 = &buffer1[0];
@@ -787,9 +796,9 @@ RLECodec::DecodeByStreams(std::istream & is, std::ostream & os)
   RLEFrame &        frame = Internals->Frame;
   if (!frame.Read(is))
     return false;
-  unsigned long long numSegments = frame.Header.NumSegments;
-  unsigned long long numberOfReadBytes = 0;
-  unsigned long long length = Length;
+  size_t numSegments = frame.Header.NumSegments;
+  size_t numberOfReadBytes = 0;
+  size_t length = Length;
   assert(length);
   // Special case
   assert(GetPixelFormat().GetBitsAllocated() == 32 || GetPixelFormat().GetBitsAllocated() == 16 ||
@@ -813,7 +822,7 @@ RLECodec::DecodeByStreams(std::istream & is, std::ostream & os)
     RequestPlanarConfiguration = true;
   }
   length /= numSegments;
-  for (unsigned long long i = 0; i < numSegments; ++i)
+  for (size_t i = 0; i < numSegments; ++i)
   {
     numberOfReadBytes = 0;
     std::streampos pos = is.tellg() - start;
@@ -830,8 +839,8 @@ RLECodec::DecodeByStreams(std::istream & is, std::ostream & os)
       (void)check; // warning removal
       is.seekg(frame.Header.Offset[i] + start, std::ios::beg);
     }
-    unsigned long long numOutBytes = 0;
-    signed char        byte;
+    size_t      numOutBytes = 0;
+    signed char byte;
     // FIXME: ALOKA_SSD-8-MONO2-RLE-SQ.dcm I think the RLE decoder is off by
     // one, we are reading in 128001 byte, while only 128000 are present
     while (numOutBytes < length)

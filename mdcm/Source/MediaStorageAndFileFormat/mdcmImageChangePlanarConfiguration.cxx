@@ -55,7 +55,12 @@ ImageChangePlanarConfiguration::Change()
   const Bitmap &       image = *Input;
   const unsigned int * dims = image.GetDimensions();
   unsigned long long   len = image.GetBufferLength();
-  char *               p;
+  if (len > 0xffffffff)
+  {
+    mdcmAlwaysWarnMacro("ImageChangePlanarConfiguration::Change(): can not set length " << len);
+    return false;
+  }
+  char * p;
   try
   {
     p = new char[len];

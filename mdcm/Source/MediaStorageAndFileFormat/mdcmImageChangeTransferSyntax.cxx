@@ -113,8 +113,13 @@ ImageChangeTransferSyntax::Change()
   {
     DataElement    pixeldata(Tag(0x7fe0, 0x0010));
     ByteValue *    bv0 = new ByteValue();
-    const uint32_t len0 = (uint32_t)Input->GetBufferLength();
-    bv0->SetLength(len0);
+    const unsigned long long len0 = Input->GetBufferLength();
+    if (len0 > 0xffffffff)
+    {
+      mdcmAlwaysWarnMacro("ImageChangeTransferSyntax::Change() (1) : can not set length " << len0);
+      return false;
+    }
+    bv0->SetLength((uint32_t)len0);
     const bool b = Input->GetBuffer((char *)bv0->GetPointer());
     if (!b)
     {
@@ -149,8 +154,13 @@ ImageChangeTransferSyntax::Change()
       if (!pixmap->GetIconImage().IsEmpty())
       {
         ByteValue *    bv = new ByteValue();
-        const uint32_t len = (uint32_t)pixmap->GetIconImage().GetBufferLength();
-        bv->SetLength(len);
+        const unsigned long long len = pixmap->GetIconImage().GetBufferLength();
+        if (len > 0xffffffff)
+        {
+          mdcmAlwaysWarnMacro("ImageChangeTransferSyntax::Change() (2) : can not set length " << len);
+          return false;
+        }
+        bv->SetLength((uint32_t)len);
         const bool bb = pixmap->GetIconImage().GetBuffer((char *)bv->GetPointer());
         if (!bb)
         {

@@ -52,8 +52,10 @@ reorganize_mosaic(const unsigned short * input,
     {
       for (unsigned int z = 0; z < outputdims[2]; ++z)
       {
-        const size_t outputidx = x + y * outputdims[0] + z * outputdims[0] * outputdims[1];
-        const size_t inputidx = (x + (z % square) * outputdims[0]) + (y + (z / square) * outputdims[1]) * inputdims[0];
+        const size_t outputidx =
+          x + y * (size_t)outputdims[0] + z * (size_t)outputdims[0] * (size_t)outputdims[1];
+        const size_t inputidx =
+          (x + (z % square) * (size_t)outputdims[0]) + (y + (z / square) * (size_t)outputdims[1]) * (size_t)inputdims[0];
         output[outputidx] = input[inputidx];
       }
     }
@@ -75,8 +77,10 @@ reorganize_mosaic_invert(const unsigned short * input,
     {
       for (unsigned int z = 0; z < outputdims[2]; ++z)
       {
-        const size_t outputidx = x + y * outputdims[0] + (outputdims[2] - 1 - z) * outputdims[0] * outputdims[1];
-        const size_t inputidx = (x + (z % square) * outputdims[0]) + (y + (z / square) * outputdims[1]) * inputdims[0];
+        const size_t outputidx =
+          x + y * (size_t)outputdims[0] + (outputdims[2] - 1 - z) * (size_t)outputdims[0] * (size_t)outputdims[1];
+        const size_t inputidx =
+          (x + (z % square) * (size_t)outputdims[0]) + (y + (z / square) * (size_t)outputdims[1]) * (size_t)inputdims[0];
         output[outputidx] = input[inputidx];
       }
     }
@@ -198,7 +202,7 @@ SplitMosaicFilter::ComputeMOSAICSliceNormal(double slicenormalvector[3], bool & 
       mdcmErrorMacro("Unexpected normal for SliceNormalVector, dot is: " << snv_dot);
       return false;
     }
-    for (int i = 0; i < 3; ++i)
+    for (unsigned int i = 0; i < 3; ++i)
     {
       slicenormalvector[i] = normal[i];
     }
@@ -215,10 +219,10 @@ SplitMosaicFilter::ComputeMOSAICSlicePosition(double pos[3], bool)
   if (!csa.GetMrProtocol(ds, mrprot))
     return false;
   MrProtocol::SliceArray sa;
-  bool                   b = mrprot.GetSliceArray(sa);
+  const bool             b = mrprot.GetSliceArray(sa);
   if (!b)
     return false;
-  size_t size = sa.Slices.size();
+  const size_t size = sa.Slices.size();
   if (!size)
     return false;
 #if 0
@@ -240,7 +244,7 @@ SplitMosaicFilter::ComputeMOSAICSlicePosition(double pos[3], bool)
     }
   }
 #endif
-  size_t                index = 0;
+  const size_t          index = 0;
   MrProtocol::Slice &   slice = sa.Slices[index];
   MrProtocol::Vector3 & p = slice.Position;
   pos[0] = p.dSag;
@@ -278,7 +282,12 @@ SplitMosaicFilter::Split()
     return false;
   }
   unsigned long long l = inputimage.GetBufferLength();
-  std::vector<char>  buf;
+  if (l > 0xffffffff)
+  {
+    mdcmAlwaysWarnMacro("SplitMosaicFilter::Split(): l = " << l);
+    return false;
+  }
+  std::vector<char> buf;
   buf.resize(l);
   inputimage.GetBuffer(&buf[0]);
   DataElement       pixeldata(Tag(0x7fe0, 0x0010));
@@ -299,7 +308,7 @@ SplitMosaicFilter::Split()
   }
   if (!b)
     return false;
-  VL::Type outbufSize = (VL::Type)outbuf.size();
+  const VL::Type outbufSize = outbuf.size();
   pixeldata.SetByteValue(&outbuf[0], outbufSize);
   Image &                image = GetImage();
   const TransferSyntax & ts = image.GetTransferSyntax();
@@ -325,8 +334,6 @@ SplitMosaicFilter::Split()
   ms.SetFromFile(GetFile());
   if (ms == MediaStorage::MRImageStorage)
   {
-    ;
-    ;
   }
   else
   {
@@ -334,8 +341,8 @@ SplitMosaicFilter::Split()
     return false;
   }
   DataElement  de(Tag(0x0008, 0x0016));
-  const char * msstr = MediaStorage::GetMSString(ms);
-  VL::Type     strlenMsstr = (VL::Type)strlen(msstr);
+  const char *   msstr = MediaStorage::GetMSString(ms);
+  const VL::Type strlenMsstr = strlen(msstr);
   de.SetByteValue(msstr, strlenMsstr);
   de.SetVR(Attribute<0x0008, 0x0016>::GetVR());
   ds.Replace(de);
