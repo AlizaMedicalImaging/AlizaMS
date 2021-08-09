@@ -747,11 +747,11 @@ RLECodec::DecodeExtent(char *         buffer,
     if (numberOfReadBytes > frag.GetVL())
     {
       // Special handling for ALOKA_SSD-8-MONO2-RLE-SQ.dcm
-      size_t diff = numberOfReadBytes - frag.GetVL();
+      const long long diff = numberOfReadBytes - frag.GetVL();
       assert(diff == 1);
       os.seekp(0 - diff, std::ios::cur);
       os.put(0);
-      end = end - 1;
+      end = std::streampos((long long)end - 1);
     }
     assert(end - start == frag.GetVL() || (end - start + 1) == frag.GetVL());
     // sync is (rle16loo.dcm)
@@ -776,7 +776,8 @@ RLECodec::DecodeExtent(char *         buffer,
     for (y = ymin; y <= ymax; ++y)
     {
       theStream->seekg(std::ios::beg);
-      theOffset = 0 + ((z - zmin) * dimensions[1] * dimensions[0] + y * dimensions[0] + xmin) * bytesPerPixel;
+      theOffset =
+        ((z - zmin) * (size_t)dimensions[1] * (size_t)dimensions[0] + y * (size_t)dimensions[0] + xmin) * bytesPerPixel;
       theStream->seekg(theOffset);
       theStream->read(tmpBuffer1, rowsize * bytesPerPixel);
       memcpy(&(buffer[((z - zmin) * rowsize * colsize + (y - ymin) * rowsize) * bytesPerPixel]),
