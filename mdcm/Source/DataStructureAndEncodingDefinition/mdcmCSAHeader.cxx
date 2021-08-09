@@ -333,7 +333,7 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
         {
           val = new char[len + 1];
         }
-        catch (std::bad_alloc &)
+        catch (const std::bad_alloc &)
         {
           return false;
         }

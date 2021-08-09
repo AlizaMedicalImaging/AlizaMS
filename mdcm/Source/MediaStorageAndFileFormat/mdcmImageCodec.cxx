@@ -414,7 +414,7 @@ ImageCodec::DoByteSwap(std::istream & is, std::ostream & os)
   {
     dummy_buffer = new char[buf_size];
   }
-  catch (std::bad_alloc &)
+  catch (const std::bad_alloc &)
   {
     return false;
   }
@@ -456,7 +456,7 @@ ImageCodec::DoYBRFull422(std::istream & is, std::ostream & os)
   {
     buffer = new unsigned char[buf_size];
   }
-  catch (std::bad_alloc &)
+  catch (const std::bad_alloc &)
   {
     return false;
   }
@@ -468,7 +468,7 @@ ImageCodec::DoYBRFull422(std::istream & is, std::ostream & os)
   {
     copy = new unsigned char[rgb_buf_size];
   }
-  catch (std::bad_alloc &)
+  catch (const std::bad_alloc &)
   {
     delete[] buffer;
     return false;
@@ -498,7 +498,7 @@ ImageCodec::DoPlanarConfiguration(std::istream & is, std::ostream & os)
   {
     dummy_buffer = new char[buf_size];
   }
-  catch (std::bad_alloc &)
+  catch (const std::bad_alloc &)
   {
     return false;
   }
@@ -513,7 +513,7 @@ ImageCodec::DoPlanarConfiguration(std::istream & is, std::ostream & os)
   {
     copy = new char[buf_size];
   }
-  catch (std::bad_alloc &)
+  catch (const std::bad_alloc &)
   {
     return false;
   }

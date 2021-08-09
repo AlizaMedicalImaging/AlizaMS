@@ -46,7 +46,7 @@ template<typename T> QString calculate_histogramm(
 	{
 		bins = new int[bins_size];
 	}
-	catch (std::bad_alloc&)
+	catch (const std::bad_alloc&)
 	{
 		*ok = false;
 		return QString("!bins");
@@ -192,7 +192,7 @@ template<typename T> QString calculate_histogramm_rgb(
 		bins1 = new int[bins_size];
 		bins2 = new int[bins_size];
 	}
-	catch(std::bad_alloc&) { bins0 = bins1 = bins2 = NULL; }
+	catch(const std::bad_alloc&) { bins0 = bins1 = bins2 = NULL; }
 	if (!bins0||!bins1||!bins2)
 	{ *ok = false; return QString("!bins0||!bins1||!bins2"); }
 	//

@@ -99,7 +99,7 @@ JPEGCodec::Decode(DataElement const & in, DataElement & out)
       {
         mybuffer = new char[bv_len];
       }
-      catch (std::bad_alloc &)
+      catch (const std::bad_alloc &)
       {
         return false;
       }
@@ -151,7 +151,7 @@ JPEGCodec::Decode(DataElement const & in, DataElement & out)
     {
       mybuffer0 = new char[jpegbv_len];
     }
-    catch (std::bad_alloc &)
+    catch (const std::bad_alloc &)
     {
       return false;
     }
@@ -195,7 +195,7 @@ JPEGCodec::Decode(DataElement const & in, DataElement & out)
         {
           mybuffer = new char[bv_len];
         }
-        catch (std::bad_alloc &)
+        catch (const std::bad_alloc &)
         {
           return false;
         }
@@ -259,7 +259,7 @@ JPEGCodec::Decode2(DataElement const & in, std::stringstream & os)
       {
         mybuffer = new char[bv_len];
       }
-      catch (std::bad_alloc &)
+      catch (const std::bad_alloc &)
       {
         return false;
       }
@@ -311,7 +311,7 @@ JPEGCodec::Decode2(DataElement const & in, std::stringstream & os)
     {
       mybuffer0 = new char[jpegbv_len];
     }
-    catch (std::bad_alloc &)
+    catch (const std::bad_alloc &)
     {
       return false;
     }
@@ -355,7 +355,7 @@ JPEGCodec::Decode2(DataElement const & in, std::stringstream & os)
         {
           mybuffer = new char[bv_len];
         }
-        catch (std::bad_alloc &)
+        catch (const std::bad_alloc &)
         {
           return false;
         }

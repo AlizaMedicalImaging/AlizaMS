@@ -7567,7 +7567,7 @@ QString DicomUtils::read_buffer(
 						obuffer_size/NumberOfFrames;
 					char * tmp0;
 					try { tmp0 = new char[obuffer_size]; }
-					catch (std::bad_alloc&) { continue; }
+					catch (const std::bad_alloc&) { continue; }
 					if (!tmp0) continue;
 					const bool obuffer_ok = o.GetUnpackBuffer(
 						tmp0, obuffer_size);
@@ -7623,7 +7623,7 @@ QString DicomUtils::read_buffer(
 						o.GetUnpackBufferLength();
 					char * tmp0;
 					try { tmp0 = new char[obuffer_size]; }
-					catch (std::bad_alloc&) { continue; }
+					catch (const std::bad_alloc&) { continue; }
 					if (!tmp0) continue;
 					const bool obuffer_ok = o.GetUnpackBuffer(
 						tmp0, obuffer_size);
@@ -7814,7 +7814,7 @@ QString DicomUtils::read_buffer(
 					{
 						in_buffer = new char[image.GetBufferLength()];
 					}
-					catch(std::bad_alloc&)
+					catch(const std::bad_alloc&)
 					{
 						if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 						return QString("Buffer allocation error");
@@ -7833,7 +7833,7 @@ QString DicomUtils::read_buffer(
 					rescaled_buffer_size
 						= dimx*dimy*dimz*rescale_type_size*pixelformat.GetSamplesPerPixel();
 					try { rescaled_buffer = new char[rescaled_buffer_size]; }
-					catch(std::bad_alloc&) { return QString("Buffer allocation error"); }
+					catch(const std::bad_alloc&) { return QString("Buffer allocation error"); }
 					if (!rescaled_buffer)
 					{
 						if (in_buffer) delete [] in_buffer;
@@ -7918,7 +7918,7 @@ QString DicomUtils::read_buffer(
 		{
 			singlebit_buffer = new unsigned char[singlebit_buffer_size];
 		}
-		catch(std::bad_alloc&)
+		catch(const std::bad_alloc&)
 		{
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return QString("Buffer allocation error");
@@ -7945,7 +7945,7 @@ QString DicomUtils::read_buffer(
 		{
 			not_rescaled_buffer = new char[not_rescaled_buffer_size];
 		}
-		catch(std::bad_alloc&)
+		catch(const std::bad_alloc&)
 		{
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return QString("Buffer allocation error");
@@ -8012,7 +8012,7 @@ QString DicomUtils::read_buffer(
 				}
 			}
 			try { not_rescaled_buffer = new char[not_rescaled_buffer_size]; }
-			catch(std::bad_alloc&) { return QString("Buffer allocation error"); }
+			catch(const std::bad_alloc&) { return QString("Buffer allocation error"); }
 			if (!not_rescaled_buffer) return QString("Buffer allocation error");
 			if (!image.GetBuffer(not_rescaled_buffer))
 			{
@@ -8053,7 +8053,7 @@ QString DicomUtils::read_buffer(
 				supp_rescaled_buffer =
 					new char[supp_rescaled_buffer_size];
 			}
-			catch(std::bad_alloc&)
+			catch(const std::bad_alloc&)
 			{
 				if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 				return QString("Buffer allocation error");
@@ -8089,7 +8089,7 @@ QString DicomUtils::read_buffer(
 		char * p__ = NULL;
 		bool badalloc = false;
 		try { p__ = new char[xy]; }
-		catch(std::bad_alloc&) { badalloc = true; }
+		catch(const std::bad_alloc&) { badalloc = true; }
 		if (p__ && !badalloc)
 		{
 			memcpy(p__,&(buffer[j*xy]),xy);

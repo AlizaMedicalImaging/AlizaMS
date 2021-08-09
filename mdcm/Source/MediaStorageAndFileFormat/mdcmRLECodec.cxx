@@ -412,7 +412,7 @@ RLECodec::Decode(DataElement const & in, DataElement & out)
     {
       buffer = new char[len];
     }
-    catch (std::bad_alloc &)
+    catch (const std::bad_alloc &)
     {
       return false;
     }
@@ -477,7 +477,7 @@ RLECodec::Code(DataElement const & in, DataElement & out)
     {
       buffer = new char[image_len];
     }
-    catch (std::bad_alloc &)
+    catch (const std::bad_alloc &)
     {
       return false;
     }
@@ -489,7 +489,7 @@ RLECodec::Code(DataElement const & in, DataElement & out)
     {
       bufferrgb = new char[image_len];
     }
-    catch (std::bad_alloc &)
+    catch (const std::bad_alloc &)
     {
       return false;
     }
@@ -966,7 +966,7 @@ RLECodec::DecodeFragment(Fragment const & frag, char * buffer, size_t llen)
   {
     mybuffer = new char[bv_len];
   }
-  catch (std::bad_alloc &)
+  catch (const std::bad_alloc &)
   {
     return false;
   }

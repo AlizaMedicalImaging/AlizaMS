@@ -65,7 +65,7 @@ ImageChangePlanarConfiguration::Change()
   {
     p = new char[len];
   }
-  catch (std::bad_alloc &)
+  catch (const std::bad_alloc &)
   {
     return false;
   }
@@ -80,7 +80,7 @@ ImageChangePlanarConfiguration::Change()
   {
     copy = new char[len];
   }
-  catch (std::bad_alloc &)
+  catch (const std::bad_alloc &)
   {
     return false;
   }

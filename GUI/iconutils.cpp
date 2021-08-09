@@ -100,7 +100,7 @@ template<typename Tin, typename Tout> void extract_icon(
 	spacing_y = spacing_[1];
 	const unsigned int p_size = 3*size_x*size_y;
 	unsigned char * p = NULL;
-	try { p = new unsigned char[p_size]; } catch (std::bad_alloc&) { p = NULL; }
+	try { p = new unsigned char[p_size]; } catch (const std::bad_alloc&) { p = NULL; }
 	if (!p) return;
 	const int num_threads = 8;
 	const int tmp99 = size_y%num_threads;
@@ -314,7 +314,7 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 		size_y = size_[1];
 		unsigned char * p = NULL;
 		try { p = new unsigned char[size[0] * size[1] * 3]; }
-		catch (std::bad_alloc&) { p = NULL; }
+		catch (const std::bad_alloc&) { p = NULL; }
 		if (!p) return;
 		try
 		{
@@ -407,7 +407,7 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 		size_y = size_[1];
 		unsigned char * p = NULL;
 		try { p = new unsigned char[size_[0]*size_[1]*3]; }
-		catch(std::bad_alloc&) { p = NULL; }
+		catch(const std::bad_alloc&) { p = NULL; }
 		if (!p) return;
 		try
 		{
@@ -554,7 +554,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		unsigned char * p = NULL;
 		try { p = new unsigned char[size[0] * size[1] * 4]; }
-		catch (std::bad_alloc&) { p = NULL; }
+		catch (const std::bad_alloc&) { p = NULL; }
 		if (!p) return;
 		try
 		{
@@ -603,7 +603,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 #else
 		unsigned char * p = NULL;
 		try { p = new unsigned char[size[0] * size[1] * 3]; }
-		catch (std::bad_alloc&) { p = NULL; }
+		catch (const std::bad_alloc&) { p = NULL; }
 		if (!p) return;
 		try
 		{
@@ -700,7 +700,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 #else
 		unsigned char * p = NULL;
 		try { p = new unsigned char[size[0]*size[1]*3]; }
-		catch (std::bad_alloc&) { p = NULL; }
+		catch (const std::bad_alloc&) { p = NULL; }
 		if (!p) return;
 		try
 		{
@@ -777,7 +777,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		unsigned char * p = NULL;
 		try { p = new unsigned char[size[0]*size[1]*4]; }
-		catch(std::bad_alloc&) { p = NULL; }
+		catch(const std::bad_alloc&) { p = NULL; }
 		if (!p) return;
 		try
 		{
@@ -826,7 +826,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 #else
 		unsigned char * p = NULL;
 		try { p = new unsigned char[size[0]*size[1]*3]; }
-		catch(std::bad_alloc&) { p = NULL; }
+		catch(const std::bad_alloc&) { p = NULL; }
 		if (!p) return;
 		try
 		{

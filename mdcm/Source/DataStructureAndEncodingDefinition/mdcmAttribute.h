@@ -650,7 +650,7 @@ public:
       {
         Internal = new ArrayType[numel];
       }
-      catch (std::bad_alloc &)
+      catch (const std::bad_alloc &)
       {
         return;
       }
@@ -732,7 +732,7 @@ protected:
     {
       internal = new ArrayType[(VL::Type)bv->GetLength()]; // overallocation
     }
-    catch (std::bad_alloc &)
+    catch (const std::bad_alloc &)
     {
       return;
     }

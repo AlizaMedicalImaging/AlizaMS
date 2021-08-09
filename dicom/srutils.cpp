@@ -90,7 +90,7 @@ template<typename T> SRImage li3(
 	const unsigned int p_size = 3*size[0]*size[1];
 	unsigned char * p = NULL;
 	try { p = new unsigned char[p_size]; }
-	catch (std::bad_alloc&) { p = NULL; }
+	catch (const std::bad_alloc&) { p = NULL; }
 	if (!p) return SRImage();
 	//
 	std::vector<QThread*> threadsLUT_;
@@ -213,7 +213,7 @@ template<typename T> SRImage lrgb3(
 				(high_bit==bits_stored-1))
 				? pow(2, bits_stored) - 1 : static_cast<double>(USHRT_MAX);
 		try { p__ = new unsigned char[size[0] * size[1] * 3]; }
-		catch (std::bad_alloc&) { p__ = NULL; }
+		catch (const std::bad_alloc&) { p__ = NULL; }
 		if (!p__) return SRImage();
 		try
 		{
@@ -242,7 +242,7 @@ template<typename T> SRImage lrgb3(
 	else
 	{
 		try { p__ = new unsigned char[size[0]*size[1]*3]; }
-		catch(std::bad_alloc&) { p__ = NULL; }
+		catch(const std::bad_alloc&) { p__ = NULL; }
 		if (!p__) return SRImage();
 		const double vmin = ivariant->di->vmin;
 		const double vmax = ivariant->di->vmax;

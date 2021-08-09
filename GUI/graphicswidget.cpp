@@ -252,7 +252,7 @@ template<typename T> QString contour_from_path(
 	++a;
 	Contour * c = NULL;
 	try { c = new Contour(); }
-	catch (std::bad_alloc&) { c = NULL; }
+	catch (const std::bad_alloc&) { c = NULL; }
 	if (!c) return QString("std::bad_alloc exeption");
 	c->id = a;
 	c->roiid = roi->id;
@@ -354,7 +354,7 @@ static QString contour_from_path_nonuniform(
 	++a;
 	Contour * c = NULL;
 	try { c = new Contour(); }
-	catch (std::bad_alloc&) { c = NULL; }
+	catch (const std::bad_alloc&) { c = NULL; }
 	if (!c) return QString("std::bad_alloc exeption");
 	c->id = a;
 	c->roiid = roi->id;
@@ -466,7 +466,7 @@ template<typename T> void load_rgb_image(
 				(high_bit==bits_stored-1))
 				? pow(2, bits_stored) - 1 : static_cast<double>(USHRT_MAX);
 		try { p__ = new unsigned char[size[0] * size[1] * 3]; }
-		catch (std::bad_alloc&) { p__ = NULL; }
+		catch (const std::bad_alloc&) { p__ = NULL; }
 		if (!p__) return;
 		try
 		{
@@ -495,7 +495,7 @@ template<typename T> void load_rgb_image(
 	else
 	{
 		try { p__ = new unsigned char[size[0]*size[1]*3]; }
-		catch(std::bad_alloc&) { p__ = NULL; }
+		catch(const std::bad_alloc&) { p__ = NULL; }
 		if (!p__) return;
 		const double vmin = ivariant->di->vmin;
 		const double vmax = ivariant->di->vmax;
@@ -662,7 +662,7 @@ template<typename T> void load_rgba_image(
 				(high_bit==bits_stored-1))
 				? pow(2, bits_stored) - 1 : static_cast<double>(USHRT_MAX);
 		try { p__ = new unsigned char[size[0] * size[1] * 4]; }
-		catch (std::bad_alloc&) { p__ = NULL; }
+		catch (const std::bad_alloc&) { p__ = NULL; }
 		if (!p__) return;
 		try
 		{
@@ -698,7 +698,7 @@ template<typename T> void load_rgba_image(
 		const double vrange = vmax - vmin;
 		if (!(vrange != 0)) return;
 		try { p__ = new unsigned char[size[0]*size[1]*4]; }
-		catch(std::bad_alloc&) { p__ = NULL; }
+		catch(const std::bad_alloc&) { p__ = NULL; }
 		if (!p__) return;
 		try
 		{
@@ -733,7 +733,7 @@ template<typename T> void load_rgba_image(
 				(high_bit==bits_stored-1))
 				? pow(2, bits_stored) - 1 : static_cast<double>(USHRT_MAX);
 		try { p__ = new unsigned char[size[0] * size[1] * 3]; }
-		catch (std::bad_alloc&) { p__ = NULL; }
+		catch (const std::bad_alloc&) { p__ = NULL; }
 		if (!p__) return;
 		try
 		{
@@ -778,7 +778,7 @@ template<typename T> void load_rgba_image(
 		const double vrange = vmax - vmin;
 		if (!(vrange!=0)) return;
 		try { p__ = new unsigned char[size[0]*size[1]*3]; }
-		catch(std::bad_alloc&) { p__ = NULL; }
+		catch(const std::bad_alloc&) { p__ = NULL; }
 		if (!p__) return;
 		try
 		{
@@ -1066,7 +1066,7 @@ template<typename T> void load_rgba_char_image(
 		tmpi = QImage(p,size[0],size[1],4*size[0],QImage::Format_RGBA8888);
 #else
 		try { p = new unsigned char[size[0] * size[1] * 3]; }
-		catch (std::bad_alloc&) { p = NULL; }
+		catch (const std::bad_alloc&) { p = NULL; }
 		if (!p) return;
 		try
 		{
@@ -1192,7 +1192,7 @@ template<typename T> void load_image(
 	const unsigned int p_size = 3*size[0]*size[1];
 	unsigned char * p = NULL;
 	try { p = new unsigned char[p_size]; }
-	catch (std::bad_alloc&) { p = NULL; }
+	catch (const std::bad_alloc&) { p = NULL; }
 	if (!p) return;
 	const short axis = widget->get_axis();
 	//

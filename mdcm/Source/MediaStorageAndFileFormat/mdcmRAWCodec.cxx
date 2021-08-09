@@ -141,7 +141,7 @@ RAWCodec::Decode(DataElement const & in, DataElement & out)
     {
       copy = new char[len];
     }
-    catch (std::bad_alloc &)
+    catch (const std::bad_alloc &)
     {
       return false;
     }
@@ -212,7 +212,7 @@ RAWCodec::DecodeBytes(const char * inBytes, size_t inBufferLength, char * outByt
     {
       copy = new char[len];
     }
-    catch (std::bad_alloc &)
+    catch (const std::bad_alloc &)
     {
       return false;
     }

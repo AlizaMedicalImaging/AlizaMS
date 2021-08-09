@@ -776,7 +776,7 @@ JPEG2000Codec::Decode(DataElement const & in, DataElement & out)
       {
         mybuffer = new char[j2kbv_len];
       }
-      catch (std::bad_alloc &)
+      catch (const std::bad_alloc &)
       {
         return false;
       }
@@ -805,7 +805,7 @@ JPEG2000Codec::Decode(DataElement const & in, DataElement & out)
     {
       buffer = new char[totalLen];
     }
-    catch (std::bad_alloc &)
+    catch (const std::bad_alloc &)
     {
       return false;
     }
@@ -853,7 +853,7 @@ JPEG2000Codec::Decode(DataElement const & in, DataElement & out)
       {
         mybuffer = new char[bv_len];
       }
-      catch (std::bad_alloc &)
+      catch (const std::bad_alloc &)
       {
         return false;
       }
@@ -899,7 +899,7 @@ JPEG2000Codec::Decode2(DataElement const & in, char * out_buffer, size_t len)
       {
         mybuffer = new char[j2kbv_len];
       }
-      catch (std::bad_alloc &)
+      catch (const std::bad_alloc &)
       {
         return false;
       }
@@ -928,7 +928,7 @@ JPEG2000Codec::Decode2(DataElement const & in, char * out_buffer, size_t len)
     {
       buffer = new char[totalLen];
     }
-    catch (std::bad_alloc &)
+    catch (const std::bad_alloc &)
     {
       return false;
     }
@@ -995,7 +995,7 @@ JPEG2000Codec::Decode2(DataElement const & in, char * out_buffer, size_t len)
       {
         mybuffer = new char[bv_len];
       }
-      catch (std::bad_alloc &)
+      catch (const std::bad_alloc &)
       {
         return false;
       }
@@ -1080,7 +1080,7 @@ JPEG2000Codec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
   {
     dummy_buffer = new char[buf_size];
   }
-  catch (std::bad_alloc &)
+  catch (const std::bad_alloc &)
   {
     return false;
   }
@@ -1281,7 +1281,7 @@ JPEG2000Codec::DecodeExtent(char *         buffer,
       {
         dummy_buffer = new char[buf_size];
       }
-      catch (std::bad_alloc &)
+      catch (const std::bad_alloc &)
       {
         return false;
       }
@@ -1325,7 +1325,7 @@ JPEG2000Codec::DecodeByStreams(std::istream & is, std::ostream & os)
   {
     dummy_buffer = new char[buf_size];
   }
-  catch (std::bad_alloc &)
+  catch (const std::bad_alloc &)
   {
     return false;
   }
@@ -1559,7 +1559,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
   {
     raw = new char[len];
   }
-  catch (std::bad_alloc &)
+  catch (const std::bad_alloc &)
   {
     return std::make_pair((char *)NULL, 0);
   }
@@ -1736,7 +1736,7 @@ JPEG2000Codec::CodeFrameIntoBuffer(char *       outdata,
   {
     buffer_j2k = new char[inputlength * 2];
   }
-  catch (std::bad_alloc &)
+  catch (const std::bad_alloc &)
   {
     return false;
   }

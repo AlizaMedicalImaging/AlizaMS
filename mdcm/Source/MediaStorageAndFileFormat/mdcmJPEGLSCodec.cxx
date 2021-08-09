@@ -69,7 +69,7 @@ JPEGLSCodec::Decode(DataElement const & in, DataElement & out)
     {
       buffer = new char[totalLen];
     }
-    catch (std::bad_alloc &)
+    catch (const std::bad_alloc &)
     {
       return false;
     }
@@ -105,7 +105,7 @@ JPEGLSCodec::Decode(DataElement const & in, DataElement & out)
       {
         mybuffer = new char[totalLen];
       }
-      catch (std::bad_alloc &)
+      catch (const std::bad_alloc &)
       {
         return false;
       }
@@ -165,7 +165,7 @@ JPEGLSCodec::Decode2(DataElement const & in, char * out_buffer, size_t len)
     {
       buffer = new char[totalLen];
     }
-    catch (std::bad_alloc &)
+    catch (const std::bad_alloc &)
     {
       return false;
     }
@@ -198,7 +198,7 @@ JPEGLSCodec::Decode2(DataElement const & in, char * out_buffer, size_t len)
       {
         mybuffer = new char[totalLen];
       }
-      catch (std::bad_alloc &)
+      catch (const std::bad_alloc &)
       {
         return false;
       }
@@ -226,7 +226,7 @@ JPEGLSCodec::Decode2(DataElement const & in, char * out_buffer, size_t len)
       {
         tmp0 = new char[tmp0_size];
       }
-      catch (std::bad_alloc &)
+      catch (const std::bad_alloc &)
       {
         delete[] mybuffer;
         return false;
@@ -321,7 +321,7 @@ JPEGLSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
   {
     dummy_buffer = new char[buf_size];
   }
-  catch (std::bad_alloc &)
+  catch (const std::bad_alloc &)
   {
     return false;
   }
@@ -513,7 +513,7 @@ JPEGLSCodec::DecodeExtent(char *         buffer,
       {
         dummy_buffer = new char[buf_size];
       }
-      catch (std::bad_alloc &)
+      catch (const std::bad_alloc &)
       {
         return false;
       }

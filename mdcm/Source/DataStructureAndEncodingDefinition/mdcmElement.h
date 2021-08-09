@@ -706,7 +706,7 @@ public:
         {
           internal = new Type[len / size];
         }
-        catch (std::bad_alloc &)
+        catch (const std::bad_alloc &)
         {
           return;
         }

@@ -176,7 +176,7 @@ void ContourUtils::generate_roi_vbos(
 				const size_t s = 3*c->dpoints.size();
 				GLfloat * v;
 				try { v = new GLfloat[s]; }
-				catch(std::bad_alloc&) { return; }
+				catch(const std::bad_alloc&) { return; }
 				if (!v) return;
 				for (int k = 0; k < c->dpoints.size(); ++k)
 				{

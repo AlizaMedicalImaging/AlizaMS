@@ -2486,7 +2486,7 @@ static void read_overlays(
 			const size_t fbuffer_size = obuffer_size/NumberOfFrames;
 			char * tmp0;
 			try { tmp0 = new char[obuffer_size]; }
-			catch (std::bad_alloc&) { continue; }
+			catch (const std::bad_alloc&) { continue; }
 			if (!tmp0) continue;
 			const bool obuffer_ok = o.GetUnpackBuffer(
 				tmp0, obuffer_size);
@@ -2542,7 +2542,7 @@ static void read_overlays(
 				o.GetUnpackBufferLength();
 			char * tmp0;
 			try { tmp0 = new char[obuffer_size]; }
-			catch (std::bad_alloc&) { continue; }
+			catch (const std::bad_alloc&) { continue; }
 			if (!tmp0) continue;
 			const bool obuffer_ok = o.GetUnpackBuffer(
 				tmp0, obuffer_size);
