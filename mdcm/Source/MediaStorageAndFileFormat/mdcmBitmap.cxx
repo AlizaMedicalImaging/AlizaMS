@@ -530,9 +530,14 @@ Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
     }
     return false;
   }
+  const unsigned long long len = GetBufferLength();
+  if (len > 0xffffffff)
+  {
+    mdcmAlwaysWarnMacro("TryJPEGCodec: value too big for ByteValue" << len);
+    return false;
+  }
   if (codec.CanDecode(ts))
   {
-    const unsigned long long len = GetBufferLength();
     codec.SetNumberOfDimensions(GetNumberOfDimensions());
     codec.SetDimensions(GetDimensions());
     codec.SetPlanarConfiguration(GetPlanarConfiguration());
@@ -715,7 +720,7 @@ Bitmap::TryJPEGCodec3(char * buffer, bool & lossyflag) const
     if (!codec.Decode2(PixelData, os))
     {
       // PHILIPS_Gyroscan-12-MONO2-Jpeg_Lossless.dcm
-      mdcmAlwaysWarnMacro("JPEG: !codec.Decode(PixelData, out)");
+      mdcmAlwaysWarnMacro("JPEG: !codec.Decode2(PixelData, os)");
       return false;
     }
     if (GetPlanarConfiguration() != codec.GetPlanarConfiguration())
@@ -768,7 +773,13 @@ Bitmap::TryJPEGCodec3(char * buffer, bool & lossyflag) const
 bool
 Bitmap::TryPVRGCodec(char * buffer, bool & lossyflag) const
 {
-  unsigned long long     len = GetBufferLength();
+  if (!buffer) return false;
+  const unsigned long long len = GetBufferLength();
+  if (len > 0xffffffff)
+  {
+    mdcmAlwaysWarnMacro("TryPVRGCodec: value too big for ByteValue" << len);
+    return false;
+  }
   const TransferSyntax & ts = GetTransferSyntax();
   PVRGCodec              codec;
   if (codec.CanDecode(ts))
@@ -827,9 +838,14 @@ Bitmap::TryJPEGLSCodec(char * buffer, bool & lossyflag) const
     }
     return false;
   }
+  const unsigned long long len = GetBufferLength();
+  if (len > 0xffffffff)
+  {
+    mdcmAlwaysWarnMacro("TryJPEGLSCodec: value too big for ByteValue" << len);
+    return false;
+  }
   if (codec.CanDecode(ts))
   {
-    const unsigned long long len = GetBufferLength();
     codec.SetPixelFormat(GetPixelFormat());
     codec.SetBufferLength(len);
     codec.SetNumberOfDimensions(GetNumberOfDimensions());
@@ -953,9 +969,14 @@ Bitmap::TryJPEG2000Codec(char * buffer, bool & lossyflag) const
     }
     return false;
   }
+  const unsigned long long len = GetBufferLength();
+  if (len > 0xffffffff)
+  {
+    mdcmAlwaysWarnMacro("TryJPEG2000Codec: value too big for ByteValue" << len);
+    return false;
+  }
   if (codec.CanDecode(ts))
   {
-    unsigned long long len = GetBufferLength();
     codec.SetPixelFormat(GetPixelFormat());
     codec.SetNumberOfDimensions(GetNumberOfDimensions());
     codec.SetPlanarConfiguration(GetPlanarConfiguration());
@@ -1120,7 +1141,13 @@ Bitmap::TryJPEG2000Codec3(char * buffer, bool & lossyflag) const
 bool
 Bitmap::TryRLECodec(char * buffer, bool & lossyflag) const
 {
-  unsigned long long     len = GetBufferLength();
+  if (!buffer) return false;
+  const unsigned long long len = GetBufferLength();
+  if (len > 0xffffffff)
+  {
+    mdcmAlwaysWarnMacro("TryRLECodec: value too big for ByteValue" << len);
+    return false;
+  }
   const TransferSyntax & ts = GetTransferSyntax();
   RLECodec               codec;
   if (codec.CanDecode(ts))
