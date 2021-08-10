@@ -658,7 +658,7 @@ void ImagesBox::set_html(const ImageVariant * v)
 					"<span class='y4'>3D GPU views"
 					":</span><br />"
 					"<span class='y7'>Texture "
-					"are disabled</span><br />"));
+					"is disabled</span><br />"));
 			}
 		}
 	}

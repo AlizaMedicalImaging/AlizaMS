@@ -5311,93 +5311,101 @@ QString DicomUtils::read_enhanced(
 	ImageOverlays image_overlays;
 	mdcm::PhotometricInterpretation pi;
 	mdcm::PixelFormat pixelformat;
-	mdcm::Reader reader;
+	unsigned short rows_    = 0;
+	unsigned short columns_ = 0;
+	bool rows_ok            = false;
+	bool cols_ok            = false;
+	bool clean_unused_bits  = false;
+	bool pred6_bug          = false;
+	bool cornell_bug        = false;
+	QString sop("");
+	{
+		mdcm::Reader reader;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-	reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
+		reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
 #else
-	reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
+		reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
 #endif
 #else
-	reader.SetFileName(f.toLocal8Bit().constData());
+		reader.SetFileName(f.toLocal8Bit().constData());
 #endif
-	if (!reader.Read())
-	{
-		return QString("Can not read file");
-	}
-	const mdcm::File & file = reader.GetFile();
-	const mdcm::DataSet & ds = file.GetDataSet();
-	if (ds.IsEmpty())
-	{
-		return QString("ds.IsEmpty()");
-	}
-	if (pb) pb->setValue(-1);
-	QApplication::processEvents();
-	unsigned short rows_ = 0, columns_ = 0;
-	const mdcm::Tag tRows(0x0028,0x0010);
-	const bool rows_ok = get_us_value(ds,tRows,&rows_);
-	const mdcm::Tag tColumns(0x0028,0x0011);
-	const bool cols_ok = get_us_value(ds,tColumns,&columns_);
-	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
-	const bool pred6_bug = wsettings->get_predictor_workaround();
-	const bool cornell_bug = wsettings->get_cornell_workaround();
-	QString sop("");
-	QString sop_tmp("");
-	QString iod("");
-	const mdcm::Tag tSOPClassUID(0x0008,0x0016);
-	const mdcm::Tag tPerFrameFunctionalGroupsSequence(0x5200,0x9230);
-	const mdcm::Tag tSharedFunctionalGroupsSequence(0x5200,0x9229);
-	if (get_string_value(ds,tSOPClassUID,sop_tmp))
-	{
-		sop = sop_tmp.remove(QChar('\0'));
-		mdcm::UIDs uid;
-		uid.SetFromUID(sop.toLatin1().constData());
-		iod = QString::fromLatin1(uid.GetName());
-	}
-	read_dimension_index_sq(ds, sq);
-	//
-	const size_t sq_size = sq.size();
-	const bool ok_f =
-		read_group_sq(
-			ds,
-			tPerFrameFunctionalGroupsSequence,
-			sq, idx_values, values);
-	const bool ok_g =
-		read_group_sq(
-			ds,
-			tSharedFunctionalGroupsSequence,
-			sq, idx_values, shared_values);
-	if (!ok_f && !ok_g)
-	{
-		return QString(
-			"Functional groups not found,\n"
-			"probably broken DICOM file.");
-	}
-	if (ok_f && idx_values.size()==values.size())
-	{
-		for (size_t x = 0; x < sq_size; ++x)
+		if (!reader.Read())
 		{
-			std::list<unsigned int> tmpl;
-			for (size_t j = 0; j < idx_values.size(); ++j)
-				tmpl.push_back(idx_values.at(j).idx.at(x));
-			tmpl.sort();
-			tmpl.unique();
-			sq[x].size = tmpl.size();
+			return QString("Can not read file");
 		}
-	}
+		const mdcm::File & file = reader.GetFile();
+		const mdcm::DataSet & ds = file.GetDataSet();
+		if (ds.IsEmpty())
+		{
+			return QString("ds.IsEmpty()");
+		}
+		if (pb) pb->setValue(-1);
+		QApplication::processEvents();
+		const mdcm::Tag tRows(0x0028,0x0010);
+		const mdcm::Tag tColumns(0x0028,0x0011);
+		rows_ok = get_us_value(ds, tRows, &rows_);
+		cols_ok = get_us_value(ds, tColumns, &columns_);
+		clean_unused_bits = wsettings->get_clean_unused_bits();
+		pred6_bug = wsettings->get_predictor_workaround();
+		cornell_bug = wsettings->get_cornell_workaround();
+		QString iod("");
+		const mdcm::Tag tSOPClassUID(0x0008,0x0016);
+		const mdcm::Tag tPerFrameFunctionalGroupsSequence(0x5200,0x9230);
+		const mdcm::Tag tSharedFunctionalGroupsSequence(0x5200,0x9229);
+		QString sop_tmp("");
+		if (get_string_value(ds,tSOPClassUID,sop_tmp))
+		{
+			sop = sop_tmp.remove(QChar('\0'));
+			mdcm::UIDs uid;
+			uid.SetFromUID(sop.toLatin1().constData());
+			iod = QString::fromLatin1(uid.GetName());
+		}
+		read_dimension_index_sq(ds, sq);
+		//
+		const size_t sq_size = sq.size();
+		const bool ok_f =
+			read_group_sq(
+				ds,
+				tPerFrameFunctionalGroupsSequence,
+				sq, idx_values, values);
+		const bool ok_g =
+			read_group_sq(
+				ds,
+				tSharedFunctionalGroupsSequence,
+				sq, idx_values, shared_values);
+		if (!ok_f && !ok_g)
+		{
+			return QString(
+				"Functional groups not found,\n"
+				"probably broken DICOM file.");
+		}
+		if (ok_f && idx_values.size() == values.size())
+		{
+			for (size_t x = 0; x < sq_size; ++x)
+			{
+				std::list<unsigned int> tmpl;
+				for (size_t j = 0; j < idx_values.size(); ++j)
+					tmpl.push_back(idx_values.at(j).idx.at(x));
+				tmpl.sort();
+				tmpl.unique();
+				sq[x].size = tmpl.size();
+			}
+		}
 #ifdef ENHANCED_PRINT_INFO
-	if (!min_load)
-	{
-		print_sq(sq);
-		std::cout << std::endl;
-		std::cout << "Group values:" << std::endl;
-		print_func_group(values);
-		std::cout << "Shared group values:" << std::endl;
-		print_func_group(shared_values);
-	}
+		if (!min_load)
+		{
+			print_sq(sq);
+			std::cout << std::endl;
+			std::cout << "Group values:" << std::endl;
+			print_func_group(values);
+			std::cout << "Shared group values:" << std::endl;
+			print_func_group(shared_values);
+		}
 #endif
-	enhanced_process_values(values, shared_values);
-	enhanced_check_rescale(ds, values);
+		enhanced_process_values(values, shared_values);
+		enhanced_check_rescale(ds, values);
+	}
 	//
 	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
@@ -5432,14 +5440,14 @@ QString DicomUtils::read_enhanced(
 			false,
 			pred6_bug,
 			cornell_bug,
-			NULL);
-	if (*ok==false) return message_;
-	if (
-		rows_ok && cols_ok &&
-		(dimx_read!=columns_||dimy_read!=rows_))
+			NULL,
+			pb);
+	if (*ok == false) return message_;
+	if (rows_ok && cols_ok &&
+		(dimx_read != columns_ || dimy_read != rows_))
 	{
-		*ok=false; 
-		for (unsigned int x=0; x < data.size(); ++x)
+		*ok = false; 
+		for (unsigned int x = 0; x < data.size(); ++x)
 		{
 			if (data.at(x)) delete [] data[x];
 		}
@@ -5447,10 +5455,10 @@ QString DicomUtils::read_enhanced(
 		return QString(
 			"dimx_read!=columns_||dimy_read!=rows_");
 	}
-	if (dimz_read!=data.size())
+	if (dimz_read != data.size())
 	{
-		*ok=false;
-		for (unsigned int x=0; x < data.size(); ++x)
+		*ok = false;
+		for (unsigned int x = 0; x < data.size(); ++x)
 		{
 			if (data.at(x)) delete [] data[x];
 		}
@@ -5550,7 +5558,6 @@ QString DicomUtils::read_enhanced(
 		origin_x_read, origin_y_read, origin_z_read,
 		unsused0, unsused1,
 		apply_rescale,
-		ds,
 		pb,
 		tolerance);
 #ifdef ENHANCED_PRINT_INFO
@@ -5584,12 +5591,11 @@ QString DicomUtils::read_enhanced(
 			origin_x_read,  origin_y_read,  origin_z_read,
 			unsused0, unsused1,
 			apply_rescale,
-			ds,
 			pb,
 			tolerance);
 	}
 	*ok = tmp17;
-	for (unsigned int x=0; x < data.size(); ++x)
+	for (unsigned int x = 0; x < data.size(); ++x)
 	{
 		if (data.at(x))
 		{
@@ -5624,79 +5630,88 @@ QString DicomUtils::read_enhanced_supp_palette(
 	ImageOverlays image_overlays; // unused
 	mdcm::PhotometricInterpretation pi;
 	mdcm::PixelFormat pixelformat;
-	mdcm::Reader reader;
-#ifdef _WIN32
-#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-	reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
-#else
-	reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
-#endif
-#else
-	reader.SetFileName(f.toLocal8Bit().constData());
-#endif
-	if (!reader.Read())
-	{
-		return QString("Can not read file");
-	}
-	const mdcm::File & file = reader.GetFile();
-	const mdcm::DataSet & ds = file.GetDataSet();
-	if (ds.IsEmpty())
-	{
-		return QString("ds.IsEmpty()");
-	}
-	if (!has_supp_palette(ds))
-	{
-		return QString("No Supplemental LUT");
-	}
-	if (pb) pb->setValue(-1);
-	QApplication::processEvents();
+	QString sop("");
+	bool ok_f = false;
+	bool ok_g = false;
+	unsigned short rows_ = 0;
+	unsigned short columns_ = 0;
+	bool rows_ok = false;
+	bool cols_ok = false;
+	size_t sq_size = 0;
 	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
 	const bool pred6_bug = wsettings->get_predictor_workaround();
 	const bool cornell_bug = wsettings->get_cornell_workaround();
-	unsigned short rows_ = 0, columns_ = 0;
-	const mdcm::Tag tRows(0x0028,0x0010);
-	const bool rows_ok = get_us_value(ds,tRows,&rows_);
-	const mdcm::Tag tColumns(0x0028,0x0011);
-	const bool cols_ok = get_us_value(ds,tColumns,&columns_);
-	QString sop("");
-	QString sop_tmp("");
-	QString iod("");
-	const mdcm::Tag tSOPClassUID(0x0008,0x0016);
-	const mdcm::Tag tPerFrameFunctionalGroupsSequence(0x5200,0x9230);
-	const mdcm::Tag tSharedFunctionalGroupsSequence(0x5200,0x9229);
-	if (get_string_value(ds,tSOPClassUID,sop_tmp))
 	{
-		sop = sop_tmp.remove(QChar('\0'));
-		mdcm::UIDs uid;
-		uid.SetFromUID(sop.toLatin1().constData());
-		iod = QString::fromLatin1(uid.GetName());
-	}
-	read_dimension_index_sq(ds, sq);
-	//
-	const size_t sq_size = sq.size();
-	const bool ok_f =
-		read_group_sq(
+		mdcm::Reader reader;
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+		reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
+#else
+		reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
+#endif
+#else
+		reader.SetFileName(f.toLocal8Bit().constData());
+#endif
+		if (!reader.Read())
+		{
+			return QString("Can not read file");
+		}
+		const mdcm::File & file = reader.GetFile();
+		const mdcm::DataSet & ds = file.GetDataSet();
+		if (ds.IsEmpty())
+		{
+			return QString("ds.IsEmpty()");
+		}
+		if (!has_supp_palette(ds))
+		{
+			return QString("No Supplemental LUT");
+		}
+		if (pb) pb->setValue(-1);
+		QApplication::processEvents();
+		const mdcm::Tag tRows(0x0028,0x0010);
+		const mdcm::Tag tColumns(0x0028,0x0011);
+		rows_ok = get_us_value(ds,tRows,&rows_);
+		cols_ok = get_us_value(ds,tColumns,&columns_);
+		const mdcm::Tag tSOPClassUID(0x0008,0x0016);
+		const mdcm::Tag tPerFrameFunctionalGroupsSequence(0x5200,0x9230);
+		const mdcm::Tag tSharedFunctionalGroupsSequence(0x5200,0x9229);
+		QString iod("");
+		QString sop_tmp("");
+		if (get_string_value(ds,tSOPClassUID,sop_tmp))
+		{
+			sop = sop_tmp.remove(QChar('\0'));
+			mdcm::UIDs uid;
+			uid.SetFromUID(sop.toLatin1().constData());
+			iod = QString::fromLatin1(uid.GetName());
+		}
+		read_dimension_index_sq(ds, sq);
+		//
+		sq_size = sq.size();
+		ok_f = read_group_sq(
 			ds,
 			tPerFrameFunctionalGroupsSequence,
 			sq, idx_values, values);
-	const bool ok_g =
-		read_group_sq(
+		ok_g = read_group_sq(
 			ds,
 			tSharedFunctionalGroupsSequence,
 			sq, idx_values, shared_values);
-	if (!ok_f && !ok_g)
-	{
-		return QString(
-			"Functional groups not found,\n"
-			"probably broken DICOM file.");
+		if (!ok_f && !ok_g)
+		{
+			return QString(
+				"Functional groups not found,\n"
+				"probably broken DICOM file.");
+		}
 	}
-	if (ok_f && idx_values.size()==values.size())
+	//
+	if (ok_f && idx_values.size() == values.size())
 	{
 		for (size_t x = 0; x < sq_size; ++x)
 		{
 			std::list<unsigned int> tmpl;
 			for (size_t j = 0; j < idx_values.size(); ++j)
+			{
 				tmpl.push_back(idx_values.at(j).idx.at(x));
+			}
 			tmpl.sort();
 			tmpl.unique();
 			sq[x].size = tmpl.size();
@@ -5745,17 +5760,17 @@ QString DicomUtils::read_enhanced_supp_palette(
 			true,
 			pred6_bug,
 			cornell_bug,
-			&red_subscript);
+			&red_subscript,
+			pb);
 #if 0
 	std::cout << "subscript = " << red_subscript << std::endl;
 #endif
 	if (*ok==false) return message_;
-	if (
-		rows_ok && cols_ok &&
-		(dimx_read!=columns_||dimy_read!=rows_))
+	if (rows_ok && cols_ok &&
+		(dimx_read != columns_ || dimy_read != rows_))
 	{
-		*ok=false; 
-		for (unsigned int x=0; x < data.size(); ++x)
+		*ok = false; 
+		for (unsigned int x = 0; x < data.size(); ++x)
 		{
 			if (data.at(x)) delete [] data[x];
 		}
@@ -5763,10 +5778,10 @@ QString DicomUtils::read_enhanced_supp_palette(
 		return QString(
 			"dimx_read!=columns_||dimy_read!=rows_");
 	}
-	if (dimz_read!=data.size())
+	if (dimz_read != data.size())
 	{
 		*ok=false;
-		for (unsigned int x=0; x < data.size(); ++x)
+		for (unsigned int x = 0; x < data.size(); ++x)
 		{
 			if (data.at(x)) delete [] data[x];
 		}
@@ -5866,12 +5881,13 @@ QString DicomUtils::read_enhanced_supp_palette(
 		origin_x_read, origin_y_read, origin_z_read,
 		unsused0, unsused1,
 		false,
-		ds,
 		pb,
 		tolerance);
 #ifdef ENHANCED_PRINT_INFO
 	if (!min_load && !message_.isEmpty())
+	{
 		std::cout << message_.toStdString() << std::endl;
+	}
 #endif
 	if (!tmp17 &&
 		!(
@@ -5882,7 +5898,9 @@ QString DicomUtils::read_enhanced_supp_palette(
 	{
 #ifdef ENHANCED_PRINT_INFO
 		if (!min_load)
+		{
 			std::cout << "  Fallback" << std::endl;
+		}
 #endif
 		message_ = read_enhanced_3d_6d(
 			&tmp17, ivariants, sop, f,
@@ -5900,7 +5918,6 @@ QString DicomUtils::read_enhanced_supp_palette(
 			origin_x_read,  origin_y_read,  origin_z_read,
 			unsused0, unsused1,
 			false,
-			ds,
 			pb,
 			tolerance);
 	}
@@ -5973,8 +5990,7 @@ QString DicomUtils::read_ultrasound(
 		{
 			const mdcm::DataElement & e =
 				ds.GetDataElement(tnumframes);
-			if (
-				!e.IsEmpty() &&
+			if (!e.IsEmpty() &&
 				!e.IsUndefinedLength() &&
 				e.GetByteValue())
 			{
@@ -6055,7 +6071,7 @@ QString DicomUtils::read_ultrasound(
 			{
 				std::vector<int> tmp0;
 				const bool tmp0_ok = get_is_values(ds,tPixelAspectRatio,tmp0);
-				if (tmp0_ok && tmp0.size()==2)
+				if (tmp0_ok && tmp0.size() == 2)
 				{
 					bPixelAspectRatio = true;
 					spacing_x = tmp0[1];
@@ -6103,7 +6119,8 @@ QString DicomUtils::read_ultrasound(
 		false,
 		pred6_bug,
 		cornell_bug,
-		NULL);
+		NULL,
+		pb);
 	if (*ok==false) return buff_error;
 	//
 	if (!overwrite_mdcm_spacing)
@@ -6202,8 +6219,8 @@ QString DicomUtils::read_series(
 	bool apply_rescale)
 {
 	*ok = false;
-	if (!ivariant) return QString("ivariant==NULL");
-	if (!settings) return QString("settings==NULL");
+	if (!ivariant) return QString("ivariant is NULL");
+	if (!settings) return QString("settings is NULL");
 	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
 	const SettingsWidget * wsettings =
@@ -6221,93 +6238,75 @@ QString DicomUtils::read_series(
 	mdcm::PhotometricInterpretation pi;
 	bool geometry_from_image = min_load ? true : false;
 	bool slices_ok = false;
-	const mdcm::Tag tnumframes(0x0028,0x0008);
+	const mdcm::Tag tnumframes(0x0028, 0x0008);
 	const bool overlays_enabled = wsettings->get_overlays();
-	//
 	std::vector<double> levels_;
 	std::vector<double> windows_;
 	std::vector<short>  luts_;
 	//
 	for (int j = 0; j < images_ipp.size(); ++j)
 	{
-		int number_of_frames = 0;
-		mdcm::Reader reader;
+		//
+		{
+			int number_of_frames = 0;
+			mdcm::Reader reader;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-		reader.SetFileName(QDir::toNativeSeparators(images_ipp.at(j)).toUtf8().constData());
+			reader.SetFileName(QDir::toNativeSeparators(images_ipp.at(j)).toUtf8().constData());
 #else
-		reader.SetFileName(QDir::toNativeSeparators(images_ipp.at(j)).toLocal8Bit().constData());
+			reader.SetFileName(QDir::toNativeSeparators(images_ipp.at(j)).toLocal8Bit().constData());
 #endif
 #else
-		reader.SetFileName(images_ipp.at(j).toLocal8Bit().constData());
+			reader.SetFileName(images_ipp.at(j).toLocal8Bit().constData());
 #endif
-		*ok = reader.Read();
-		if (*ok==false)
-			return (QString("can not read file ")+images_ipp.at(j));
-		const mdcm::File & file = reader.GetFile();
-		const mdcm::DataSet & ds = file.GetDataSet();
-		if (j==0)
-		{
-			if (ds.FindDataElement(tnumframes))
+			*ok = reader.Read();
+			if (*ok == false)
 			{
-				const mdcm::DataElement & e =
-					ds.GetDataElement(tnumframes);
-				if (
-					!e.IsEmpty() &&
-					!e.IsUndefinedLength() &&
-					e.GetByteValue())
+				return (QString("can not read file ") + images_ipp.at(j));
+			}
+			const mdcm::File & file = reader.GetFile();
+			const mdcm::DataSet & ds = file.GetDataSet();
+			if (j == 0)
+			{
+				if (ds.FindDataElement(tnumframes))
 				{
-					QString numframes("");
-					numframes =
-						QString::fromLatin1(
-							e.GetByteValue()->GetPointer(),
-							e.GetByteValue()->GetLength());
-					const QVariant v(
-						numframes.trimmed().remove(QChar('\0')));
-					bool c_ok = false; const int k = v.toInt(&c_ok);
-					if (c_ok) number_of_frames = k;
+					const mdcm::DataElement & e = ds.GetDataElement(tnumframes);
+					if (!e.IsEmpty() &&
+						!e.IsUndefinedLength() &&
+						e.GetByteValue())
+					{
+						QString numframes =
+							QString::fromLatin1(
+								e.GetByteValue()->GetPointer(),
+								e.GetByteValue()->GetLength());
+						const QVariant v(numframes.trimmed().remove(QChar('\0')));
+						bool c_ok = false;
+						const int k = v.toInt(&c_ok);
+						if (c_ok) number_of_frames = k;
+					}
 				}
-			}
-			if (!min_load)
-			{
-				read_ivariant_info_tags(ds, ivariant);
-				if (ivariant->sop ==
-					QString("1.2.840.10008.5.1.4.1.1.4"))
-					ivariant->iinfo = read_MRImageModule(ds);
-				else if (ivariant->sop ==
-					QString("1.2.840.10008.5.1.4.1.1.2"))
-					ivariant->iinfo = read_CTImageModule(ds);
-			}
-			if (mosaic)
-			{
-				geometry_from_image = true;
-			}
-			else if (uihgrid)
-			{
 				if (!min_load)
 				{
-					slices_ok =	read_slices_uihgrid(
-						ds,
-						ivariant,
-						ok3d,
-						ivariant->di->skip_texture,
-						gl,
-						pb,
-						tolerance);
-					if (slices_ok) ivariant->iod_supported = true;
-					else geometry_from_image = true;
+					read_ivariant_info_tags(ds, ivariant);
+					if (ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.4"))
+					{
+						ivariant->iinfo = read_MRImageModule(ds);
+					}
+					else if (ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.2"))
+					{
+						ivariant->iinfo = read_CTImageModule(ds);
+					}
 				}
-			}
-			else
-			{
-				if (ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128") || // PET
-					ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.2")   || // CT
-					ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.4"))     // MR
+				if (mosaic)
+				{
+					geometry_from_image = true;
+				}
+				else if (uihgrid)
 				{
 					if (!min_load)
 					{
-						slices_ok =	read_slices(
-							images_ipp,
+						slices_ok =	read_slices_uihgrid(
+							ds,
 							ivariant,
 							ok3d,
 							ivariant->di->skip_texture,
@@ -6316,71 +6315,115 @@ QString DicomUtils::read_series(
 							tolerance);
 						if (slices_ok) ivariant->iod_supported = true;
 						else geometry_from_image = true;
-						ivariant->unit_str = QString(" mm");
-					}
-				}
-				else if (ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.481.2")) // RTDOSE
-				{
-					if (!min_load)
-					{
-						slices_ok =	read_slices_rtdose(
-							images_ipp.at(j),
-							ivariant,
-							ok3d,
-							ivariant->di->skip_texture,
-							gl,
-							pb,
-							0.01f);
-						if (slices_ok) ivariant->iod_supported = true;
-						else geometry_from_image = true;
-						if (slices_ok) load_contour(ds,ivariant);
 					}
 				}
 				else
 				{
-					if (!min_load)
+					if (ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128") || // PET
+						ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.2")   || // CT
+						ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.4"))     // MR
 					{
-						slices_ok =	read_slices(
-							images_ipp,
-							ivariant,
-							ok3d,
-							ivariant->di->skip_texture,
-							gl,
-							pb,
-							tolerance);
-						if (!slices_ok) ivariant->di->skip_texture = true;
+						if (!min_load)
+						{
+							slices_ok =	read_slices(
+								images_ipp,
+								ivariant,
+								ok3d,
+								ivariant->di->skip_texture,
+								gl,
+								pb,
+								tolerance);
+							if (slices_ok) ivariant->iod_supported = true;
+							else geometry_from_image = true;
+							ivariant->unit_str = QString(" mm");
+						}
+					}
+					else if (ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.481.2")) // RTDOSE
+					{
+						if (!min_load)
+						{
+							slices_ok =	read_slices_rtdose(
+								images_ipp.at(j),
+								ivariant,
+								ok3d,
+								ivariant->di->skip_texture,
+								gl,
+								pb,
+								0.01f);
+							if (slices_ok) ivariant->iod_supported = true;
+							else geometry_from_image = true;
+							if (slices_ok) load_contour(ds,ivariant);
+						}
+					}
+					else
+					{
+						if (!min_load)
+						{
+							slices_ok =	read_slices(
+								images_ipp,
+								ivariant,
+								ok3d,
+								ivariant->di->skip_texture,
+								gl,
+								pb,
+								tolerance);
+							if (!slices_ok) ivariant->di->skip_texture = true;
+						}
 					}
 				}
-				if (!min_load && ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128")) // PET
+				//
+				if (!min_load) read_frame_times(ds, ivariant, number_of_frames); //////////
+				//
+				if (!min_load && images_ipp.size() == 1)
 				{
-					;;
+					const int inst_num = read_instance_number(ds);
+					if (inst_num >= 0) ivariant->instance_number = inst_num;
+				}
+				//
+				if (!min_load && !mosaic && !uihgrid)
+				{
+					PRDisplayShutter a;
+					if (read_shutter(ds, a))
+					{
+						if (images_ipp.size() == 1 && number_of_frames > 1)
+						{
+							ivariant->pr_display_shutters.insert(-1, a);
+						}
+						else
+						{
+							ivariant->pr_display_shutters.insert(0, a);
+						}
+					}
+				}
+			}
+			else if (j > 0)
+			{
+				if (!min_load && !mosaic && !uihgrid)
+				{
+					PRDisplayShutter a;
+					if (read_shutter(ds, a))
+					{
+						ivariant->pr_display_shutters.insert(j, a);
+					}
 				}
 			}
 			//
-			if (!min_load) read_frame_times(ds, ivariant, number_of_frames); //////////
-			//
-			if (!min_load && images_ipp.size()==1)
+			if (!min_load)
 			{
-				const int inst_num = read_instance_number(ds);
-				if (inst_num>=0) ivariant->instance_number = inst_num;
+				double tmp_c = -999999.0;
+				double tmp_w = -999999.0;
+				short lut_function = 0;
+				if (wsettings->get_level_for_PET() || !(
+					(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128")) ||
+					(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.130")) ||
+					(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128.1"))))
+				{
+					read_window(ds, &tmp_c, &tmp_w, &lut_function);
+				}
+				levels_.push_back(tmp_c);
+				windows_.push_back(tmp_w);
+				luts_.push_back(lut_function);
 			}
-			//
-		}
-		//
-		if (!min_load)
-		{
-			double tmp_c = -999999.0, tmp_w = -999999.0;
-			short lut_function = 0;
-			if (wsettings->get_level_for_PET() || !(
-				(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128")) ||
-				(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.130")) ||
-				(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128.1"))))
-			{
-				read_window(ds, &tmp_c, &tmp_w, &lut_function);
-			}
-			levels_.push_back(tmp_c);
-			windows_.push_back(tmp_w);
-			luts_.push_back(lut_function);
 		}
 		//
 		double dircos_[] = {0.0,0.0,0.0,0.0,0.0,0.0};
@@ -6392,9 +6435,9 @@ QString DicomUtils::read_series(
 		const int overlays_idx = overlays_enabled ? j : -2;
 		const bool rescale = (!apply_rescale) ? false : wsettings->get_rescale();
 		const bool force_double_pf =
-			(ivariant->sop==QString("1.2.840.10008.5.1.4.1.1.128"))
+			(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128"))
 			? true : false;
-		if (images_ipp.size()>1)
+		if (images_ipp.size() > 1)
 		{
 			std::vector<char*> data_;
 			buff_error = read_buffer(
@@ -6418,8 +6461,9 @@ QString DicomUtils::read_series(
 				false,
 				pred6_bug,
 				cornell_bug,
-				NULL);
-			if (dimz_>1)
+				NULL,
+				pb);
+			if (dimz_ > 1)
 			{
 				*ok = false;
 				ivariant->anatomy.clear();
@@ -6439,7 +6483,7 @@ QString DicomUtils::read_series(
 					"Can not read particular series (2)");
 			}
 		}
-		else if (images_ipp.size()==1)
+		else if (images_ipp.size() == 1)
 		{
 			buff_error = read_buffer(
 				ok,
@@ -6462,7 +6506,8 @@ QString DicomUtils::read_series(
 				false,
 				pred6_bug,
 				cornell_bug,
-				NULL);
+				NULL,
+				pb);
 		}
 		if (*ok == false)
 		{
@@ -6484,7 +6529,7 @@ QString DicomUtils::read_series(
 			}
 			dimx = dimx_;
 			dimy = dimy_;
-			if (images_ipp.size()==1) dimz = dimz_;
+			if (images_ipp.size() == 1) dimz = dimz_;
 			else dimz = images_ipp.size();
 			if (slices_ok)
 			{
@@ -6503,162 +6548,130 @@ QString DicomUtils::read_series(
 						ivariant->di->iz_spacing;
 					if (tmp1_spacing_x <= 0)
 					{
-						std::cout <<
-							"ivariant->di->ix_spacing <= 0 "
+						std::cout << "ivariant->di->ix_spacing <= 0 "
 							<< std::endl;
-						invalidate=true;
+						invalidate = true;
 						ivariant->di->ix_spacing = 1.0;
 					}
 					if (tmp1_spacing_y <= 0)
 					{
-						std::cout <<
-							"ivariant->di->iy_spacing <= 0 "
+						std::cout << "ivariant->di->iy_spacing <= 0 "
 							<< std::endl;
-						invalidate=true;
+						invalidate = true;
 						ivariant->di->iy_spacing = 1.0;
 					}
 					if (tmp1_spacing_z <= 0)
 					{
-						std::cout <<
-							"ivariant->di->iz_spacing <= 0 "
+						std::cout << "ivariant->di->iz_spacing <= 0 "
 							<< std::endl;
-						invalidate=true;
+						invalidate = true;
 						ivariant->di->iz_spacing = 0.00001;
 					}
-					if (tmp0_spacing_x+0.001f<tmp1_spacing_x ||
-						tmp0_spacing_x-0.001f>tmp1_spacing_x)
+					if ((tmp0_spacing_x + 0.001f) < tmp1_spacing_x ||
+						(tmp0_spacing_x - 0.001f) > tmp1_spacing_x)
 					{
-						std::cout
-							<< "tmp0_spacing_x!=tmp1_spacing_x "
+						std::cout << "tmp0_spacing_x!=tmp1_spacing_x "
 							<< tmp0_spacing_x << " "
 							<< tmp1_spacing_x << std::endl;
-						invalidate=true;
+						invalidate = true;
 					}
-					if (tmp0_spacing_y+0.001f<tmp1_spacing_y ||
-						tmp0_spacing_y-0.001f>tmp1_spacing_y)
+					if ((tmp0_spacing_y + 0.001f) < tmp1_spacing_y ||
+						(tmp0_spacing_y - 0.001f) > tmp1_spacing_y)
 					{
-						std::cout
-							<< "tmp0_spacing_y!=tmp1_spacing_y "
+						std::cout << "tmp0_spacing_y!=tmp1_spacing_y "
 							<< tmp0_spacing_y << " "
 							<< tmp1_spacing_y << std::endl;
-						invalidate=true;
+						invalidate = true;
 					}
-					const float tmp0_origin_x = (float)
-						origin_x_;
-					const float tmp0_origin_y = (float)
-						origin_y_;
-					const float tmp0_origin_z = (float)
-						origin_z_;
-					const float tmp1_origin_x = (float)
-						ivariant->di->ix_origin;
-					const float tmp1_origin_y = (float)
-						ivariant->di->iy_origin;
-					const float tmp1_origin_z = (float)
-						ivariant->di->iz_origin;
-					if (tmp0_origin_x+0.001f < tmp1_origin_x ||
-						tmp0_origin_x-0.001f > tmp1_origin_x)
+					const float tmp0_origin_x = (float)origin_x_;
+					const float tmp0_origin_y = (float)origin_y_;
+					const float tmp0_origin_z = (float)origin_z_;
+					const float tmp1_origin_x = (float)ivariant->di->ix_origin;
+					const float tmp1_origin_y = (float)ivariant->di->iy_origin;
+					const float tmp1_origin_z = (float)ivariant->di->iz_origin;
+					if ((tmp0_origin_x + 0.001f) < tmp1_origin_x ||
+						(tmp0_origin_x - 0.001f) > tmp1_origin_x)
 					{
-						std::cout
-							<< "tmp0_origin_x!=tmp1_origin_x "
+						std::cout << "tmp0_origin_x != tmp1_origin_x "
 							<< tmp0_origin_x << " "
 							<< tmp1_origin_x << std::endl;
-						invalidate=true;
+						invalidate = true;
 					}
-					if (tmp0_origin_y+0.001f<tmp1_origin_y ||
-						tmp0_origin_y-0.001f>tmp1_origin_y)
+					if ((tmp0_origin_y + 0.001f) < tmp1_origin_y ||
+						(tmp0_origin_y - 0.001f) > tmp1_origin_y)
 					{
-						std::cout
-							<< "tmp0_origin_y!=tmp1_origin_y "
+						std::cout << "tmp0_origin_y != tmp1_origin_y "
 							<< tmp0_origin_y << " "
 							<< tmp1_origin_y << std::endl;
-						invalidate=true;
+						invalidate = true;
 					}
-					if (tmp0_origin_z+0.001f<tmp1_origin_z ||
-						tmp0_origin_z-0.001f>tmp1_origin_z)
+					if ((tmp0_origin_z + 0.001f) < tmp1_origin_z ||
+						(tmp0_origin_z - 0.001f) > tmp1_origin_z)
 					{
-						std::cout
-							<< "tmp0_origin_z!=tmp1_origin_z "
+						std::cout << "tmp0_origin_z != tmp1_origin_z "
 							<< tmp0_origin_z << " "
 							<< tmp1_origin_z << std::endl;
-						invalidate=true;
+						invalidate = true;
 					}
-					const float tmp0_dircos_0 = (float)
-						dircos_[0];
-					const float tmp0_dircos_1 = (float)
-						dircos_[1];
-					const float tmp0_dircos_2 = (float)
-						dircos_[2];
-					const float tmp0_dircos_3 = (float)
-						dircos_[3];
-					const float tmp0_dircos_4 = (float)
-						dircos_[4];
-					const float tmp0_dircos_5 = (float)
-						dircos_[5];
-					const float tmp1_dircos_0 = (float)
-						ivariant->di->dircos[0];
-					const float tmp1_dircos_1 = (float)
-						ivariant->di->dircos[1];
-					const float tmp1_dircos_2 = (float)
-						ivariant->di->dircos[2];
-					const float tmp1_dircos_3 = (float)
-						ivariant->di->dircos[3];
-					const float tmp1_dircos_4 = (float)
-						ivariant->di->dircos[4];
-					const float tmp1_dircos_5 = (float)
-						ivariant->di->dircos[5];
-					if (tmp0_dircos_0+0.001f<tmp1_dircos_0 ||
-						tmp0_dircos_0-0.01f>tmp1_dircos_0)
+					const float tmp0_dircos_0 = (float)dircos_[0];
+					const float tmp0_dircos_1 = (float)dircos_[1];
+					const float tmp0_dircos_2 = (float)dircos_[2];
+					const float tmp0_dircos_3 = (float)dircos_[3];
+					const float tmp0_dircos_4 = (float)dircos_[4];
+					const float tmp0_dircos_5 = (float)dircos_[5];
+					const float tmp1_dircos_0 = (float)ivariant->di->dircos[0];
+					const float tmp1_dircos_1 = (float)ivariant->di->dircos[1];
+					const float tmp1_dircos_2 = (float)ivariant->di->dircos[2];
+					const float tmp1_dircos_3 = (float)ivariant->di->dircos[3];
+					const float tmp1_dircos_4 = (float)ivariant->di->dircos[4];
+					const float tmp1_dircos_5 = (float)ivariant->di->dircos[5];
+					if ((tmp0_dircos_0 + 0.001f) < tmp1_dircos_0 ||
+						(tmp0_dircos_0 - 0.001f) > tmp1_dircos_0)
 					{
-						std::cout
-							<< "tmp0_dircos_0!=tmp1_dircos_0 "
+						std::cout << "tmp0_dircos_0 != tmp1_dircos_0 "
 							<< tmp0_dircos_0 << " "
 							<< tmp1_dircos_0 << std::endl;
-						invalidate=true;
+						invalidate = true;
 					}
-					if (tmp0_dircos_1+0.001f<tmp1_dircos_1 ||
-						tmp0_dircos_1-0.001f>tmp1_dircos_1)
+					if ((tmp0_dircos_1 + 0.001f) < tmp1_dircos_1 ||
+						(tmp0_dircos_1 - 0.001f) > tmp1_dircos_1)
 					{
-						std::cout
-							<< "tmp0_dircos_1!=tmp1_dircos_1 "
+						std::cout << "tmp0_dircos_1 != tmp1_dircos_1 "
 							<< tmp0_dircos_1 << " "
 							<< tmp1_dircos_1 << std::endl;
-						invalidate=true;
+						invalidate = true;
 					}
-					if (tmp0_dircos_2+0.001f<tmp1_dircos_2 ||
-						tmp0_dircos_2-0.001f>tmp1_dircos_2)
+					if ((tmp0_dircos_2 + 0.001f) < tmp1_dircos_2 ||
+						(tmp0_dircos_2 - 0.001f) > tmp1_dircos_2)
 					{
-						std::cout
-							<< "tmp0_dircos_2!=tmp1_dircos_2 "
+						std::cout << "tmp0_dircos_2 != tmp1_dircos_2 "
 							<< tmp0_dircos_2 << " "
 							<< tmp1_dircos_2 << std::endl;
-						invalidate=true;
+						invalidate = true;
 					}
-					if (tmp0_dircos_3+0.001f<tmp1_dircos_3 ||
-						tmp0_dircos_3-0.001f>tmp1_dircos_3)
+					if ((tmp0_dircos_3 + 0.001f) < tmp1_dircos_3 ||
+						(tmp0_dircos_3 - 0.001f) > tmp1_dircos_3)
 					{
-						std::cout
-							<< "tmp0_dircos_3!=tmp1_dircos_3 "
+						std::cout << "tmp0_dircos_3 != tmp1_dircos_3 "
 							<< tmp0_dircos_3 << " "
 							<< tmp1_dircos_3 << std::endl;
-						invalidate=true;
+						invalidate = true;
 					}
-					if (tmp0_dircos_4+0.001f<tmp1_dircos_4 ||
-						tmp0_dircos_4-0.001f>tmp1_dircos_4)
+					if ((tmp0_dircos_4 + 0.001f) < tmp1_dircos_4 ||
+						(tmp0_dircos_4 - 0.001f) > tmp1_dircos_4)
 					{
-						std::cout
-							<< "tmp0_dircos_4!=tmp1_dircos_4 "
+						std::cout << "tmp0_dircos_4 != tmp1_dircos_4 "
 							<< tmp0_dircos_4 << " "
 							<< tmp1_dircos_4 << std::endl;
-						invalidate=true;
+						invalidate = true;
 					}
-					if (tmp0_dircos_5+0.001f<tmp1_dircos_5 ||
-						tmp0_dircos_5-0.001f>tmp1_dircos_5)
+					if ((tmp0_dircos_5 + 0.001f) < tmp1_dircos_5 ||
+						(tmp0_dircos_5 - 0.001f) > tmp1_dircos_5)
 					{
-						std::cout
-							<< "tmp0_dircos_5!=tmp1_dircos_5 "
+						std::cout << "tmp0_dircos_5 != tmp1_dircos_5 "
 							<< tmp0_dircos_5 << " "
 							<< tmp1_dircos_5 << std::endl;
-						invalidate=true;
+						invalidate = true;
 					}
 				}
 				if (invalidate)
@@ -6666,10 +6679,8 @@ QString DicomUtils::read_series(
 					ivariant->equi = false;
 					ivariant->orientation = 0;
 					ivariant->orientation_string = QString("");
-					std::cout <<
-							"warning: could not validate "
-							"image, using as non-uniform"
-						<< std::endl;
+					std::cout << "warning: could not validate "
+						"image, using as non-uniform" << std::endl;
 				}
 				spacing_x = ivariant->di->ix_spacing > 0 ?
 					ivariant->di->ix_spacing : 1;
@@ -6709,8 +6720,7 @@ QString DicomUtils::read_series(
 			{
 				spacing_x = spacing_x_ > 0 ? spacing_x_ : 1;
 				spacing_y = spacing_y_ > 0 ? spacing_y_ : 1;
-				spacing_z =
-					spacing_z_ > 0.00001 ? spacing_z_ : 0.00001;
+				spacing_z = spacing_z_ > 0.00001 ? spacing_z_ : 0.00001;
 				origin_x = origin_x_;
 				origin_y = origin_y_;
 				origin_z = origin_z_;
@@ -6748,23 +6758,8 @@ QString DicomUtils::read_series(
 				ivariant->di->skip_texture = true;
 #endif
 			}
-			if (!min_load && !mosaic && !uihgrid)
-			{
-				PRDisplayShutter a;
-				if (read_shutter(ds, a))
-				{
-					if (images_ipp.size() == 1 && number_of_frames > 1)
-					{
-						ivariant->pr_display_shutters.insert(-1, a);
-					}
-					else
-					{
-						ivariant->pr_display_shutters.insert(0, a);
-					}
-				}
-			}
 		}
-		if (j > 0)
+		else if (j > 0)
 		{
 			if (
 				(previous_pixelformat.GetBitsAllocated()
@@ -6782,22 +6777,13 @@ QString DicomUtils::read_series(
 				data.clear();
 				ivariant->anatomy.clear();
 				ivariant->image_overlays.all_overlays.clear();
-				return QString(
-					"previous_pixelformat!=pixelformat");
-			}
-			if (!min_load && !mosaic && !uihgrid)
-			{
-				PRDisplayShutter a;
-				if (read_shutter(ds, a))
-				{
-					ivariant->pr_display_shutters.insert(j, a);
-				}
+				return QString("previous_pixelformat!=pixelformat");
 			}
 		}
 		previous_pixelformat = pixelformat;
 	}
 	//
-	if ((images_ipp.size()>1) && data.size()!=dimz)
+	if ((images_ipp.size() > 1) && (data.size() != dimz))
 	{
 		*ok = false;
 		for (unsigned int x = 0; x < data.size(); ++x)
@@ -6807,7 +6793,7 @@ QString DicomUtils::read_series(
 		data.clear();
 		ivariant->anatomy.clear();
 		ivariant->image_overlays.all_overlays.clear();
-		return QString("data.size()!=dimz");
+		return QString("data.size() != dimz");
 	}
 	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
@@ -6828,12 +6814,12 @@ QString DicomUtils::read_series(
 				//
 				if (x > 0)
 				{
-					const bool b3 = luts_.at(x) == luts_.at(x-1);
+					const bool b3 = (luts_.at(x) == luts_.at(x - 1));
 					if (!b3) one_lut = false;
-						const bool b1 =
-					itk::Math::FloatAlmostEqual(levels_.at(x), levels_.at(x-1));
+					const bool b1 =
+						itk::Math::FloatAlmostEqual(levels_.at(x), levels_.at(x - 1));
 					const bool b2 =
-						itk::Math::FloatAlmostEqual(windows_.at(x), windows_.at(x-1));
+						itk::Math::FloatAlmostEqual(windows_.at(x), windows_.at(x - 1));
 					if (!b1 || !b2) one_level = false;
 				}
 			}
@@ -6853,7 +6839,7 @@ QString DicomUtils::read_series(
 	}
 	//
 	const bool allow_geometry_from_image =
-		(mosaic||uihgrid) ? true : false;
+		(mosaic || uihgrid) ? true : false;
 	const bool no_warn_rescale =
 		(apply_rescale)
 		? wsettings->get_rescale()
@@ -6882,8 +6868,8 @@ QString DicomUtils::read_series(
 		}
 	}
 	data.clear();
-	if (*ok==true) IconUtils::icon(ivariant);
-	if (*ok==false)
+	if (*ok == true) IconUtils::icon(ivariant);
+	if (*ok == false)
 	{
 		ivariant->anatomy.clear();
 		ivariant->image_overlays.all_overlays.clear();
@@ -6916,8 +6902,10 @@ QString DicomUtils::read_series(
 	CommonUtils::reset_bb(ivariant);
 	if (ivariant->modality==QString("US") ||
 			(ivariant->modality==QString("XA") &&
-			ivariant->frame_times.size()>1))
+				ivariant->frame_times.size()>1))
+	{
 		ivariant->di->selected_z_slice = 0;
+	}
 	return QString("");
 }
 
@@ -7128,7 +7116,9 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 	{
 		return false;
 	}
-	const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
+	mdcm::File & rfile = reader.GetFile();
+	mdcm::DataSet & ds = rfile.GetDataSet();
+	mdcm::FileMetaInformation & header = rfile.GetHeader();
 	const mdcm::PrivateTag tcompressiontype(0x07a1,0x11,"ELSCINT1");
 	if(!ds.FindDataElement(tcompressiontype))
 	{
@@ -7175,13 +7165,13 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 		if (isrle)
 		{
 			// Create or replace pixel data element 0x7fe0, 0x0010
-			if(!reader.GetFile().GetDataSet().FindDataElement(tpixeldata))
+			if(!ds.FindDataElement(tpixeldata))
 			{
 				pixeldata = mdcm::DataElement(tpixeldata, 0, mdcm::VR::OW);
 			}
 			else
 			{
-				pixeldata = reader.GetFile().GetDataSet().GetDataElement(tpixeldata);
+				pixeldata = ds.GetDataElement(tpixeldata);
 			}
 			pixeldata.SetVR(mdcm::VR::OW);
 			const size_t bv2l = bv2->GetLength();
@@ -7191,7 +7181,7 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 			at2.SetFromDataSet(ds);
 			const size_t w = at1.GetValue();
 			const size_t h = at2.GetValue();
-			const size_t at1l = w*h*sizeof(unsigned short);
+			const size_t at1l =	w*h*sizeof(unsigned short);
 			if(bv2l == at1l)
 			{
 				std::cout << "Warning: Elscint data seems to be not compressed"
@@ -7211,13 +7201,13 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 		else if (isrgb)
 		{
 			// Create or replace pixel data element 0x7fe0, 0x0010
-			if(!reader.GetFile().GetDataSet().FindDataElement(tpixeldata))
+			if(!ds.FindDataElement(tpixeldata))
 			{
 				pixeldata = mdcm::DataElement(tpixeldata, 0, mdcm::VR::OW);
 			}
 			else
 			{
-				pixeldata = reader.GetFile().GetDataSet().GetDataElement(tpixeldata);
+				pixeldata = ds.GetDataElement(tpixeldata);
 			}
 			pixeldata.SetVR(mdcm::VR::OW);
 			mdcm::Attribute<0x0028,0x0006> at0;
@@ -7248,31 +7238,31 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 			}
 		}
 		// Add the pixel data element
-		if(reader.GetFile().GetDataSet().FindDataElement(tpixeldata))
+		if(ds.FindDataElement(tpixeldata))
 		{
-			reader.GetFile().GetDataSet().Replace(pixeldata);
+			ds.Replace(pixeldata);
 		}
 		else
 		{
-			reader.GetFile().GetDataSet().ReplaceEmpty(pixeldata);
+			ds.ReplaceEmpty(pixeldata);
 		}
 		//
 		//
 		//
 		if (ds.FindDataElement(mdcm::Tag(0x07a1,0x0010)))
 		{
-			reader.GetFile().GetDataSet().Remove(mdcm::Tag(0x07a1,0x0010));
+			ds.Remove(mdcm::Tag(0x07a1,0x0010));
 			if (ds.FindDataElement(mdcm::Tag(0x07a1,0x100a)))
 			{
-				reader.GetFile().GetDataSet().Remove(mdcm::Tag(0x07a1,0x100a));
+				ds.Remove(mdcm::Tag(0x07a1,0x100a));
 			}
 			if (ds.FindDataElement(mdcm::Tag(0x07a1,0x1010)))
 			{
-				reader.GetFile().GetDataSet().Remove(mdcm::Tag(0x07a1,0x1010));
+				ds.Remove(mdcm::Tag(0x07a1,0x1010));
 			}
 			if (ds.FindDataElement(mdcm::Tag(0x07a1,0x1011)))
 			{
-				reader.GetFile().GetDataSet().Remove(mdcm::Tag(0x07a1,0x1011));
+				ds.Remove(mdcm::Tag(0x07a1,0x1011));
 			}
 		}
 	}
@@ -7294,7 +7284,7 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 			at2.SetFromDataSet(ds);
 			const size_t w = at1.GetValue();
 			const size_t h = at2.GetValue();
-			const size_t at1l =	w*h*sizeof(unsigned short);
+			const size_t at1l = w*h*sizeof(unsigned short);
 			if(bv2l == at1l)
 			{
 				std::cout
@@ -7303,7 +7293,7 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 			}
 			else
 			{
-				pixeldata = reader.GetFile().GetDataSet().GetDataElement(tpixeldata);
+				pixeldata = ds.GetDataElement(tpixeldata);
 				pixeldata.SetVR(mdcm::VR::OW);
 				std::vector<unsigned short> buffer;
 				delta_decode(bv2->GetPointer(), bv2->GetLength(), buffer);
@@ -7333,7 +7323,7 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 			}
 			else
 			{
-				pixeldata = reader.GetFile().GetDataSet().GetDataElement(tpixeldata);
+				pixeldata = ds.GetDataElement(tpixeldata);
 				pixeldata.SetVR(mdcm::VR::OW);
 				std::vector<unsigned char> buffer;
 				delta_decode_rgb(
@@ -7343,35 +7333,35 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 			}
 		}
 		// Add the pixel data element
-		reader.GetFile().GetDataSet().Replace(pixeldata);
+		ds.Replace(pixeldata);
 		//
 		//
 		//
 		if (ds.FindDataElement(mdcm::Tag(0x07a1,0x0010)))
 		{
-			reader.GetFile().GetDataSet().Remove(mdcm::Tag(0x07a1,0x0010));
+			ds.Remove(mdcm::Tag(0x07a1,0x0010));
 			if (ds.FindDataElement(mdcm::Tag(0x07a1,0x1010)))
 			{
-				reader.GetFile().GetDataSet().Remove(mdcm::Tag(0x07a1,0x1010));
+				ds.Remove(mdcm::Tag(0x07a1,0x1010));
 			}
 			if (ds.FindDataElement(mdcm::Tag(0x07a1,0x1011)))
 			{
-				reader.GetFile().GetDataSet().Remove(mdcm::Tag(0x07a1,0x1011));
+				ds.Remove(mdcm::Tag(0x07a1,0x1011));
 			}
 		}
 	}
 	if (ds.FindDataElement(mdcm::Tag(0x7fe0,0x0)))
 	{
-		reader.GetFile().GetDataSet().Remove(mdcm::Tag(0x7fe0,0x0));
+		ds.Remove(mdcm::Tag(0x7fe0,0x0));
 	}
 	if (ds.FindDataElement(mdcm::Tag(0xfffc,0xfffc)))
 	{
-		reader.GetFile().GetDataSet().Remove(mdcm::Tag(0xfffc,0xfffc));
+		ds.Remove(mdcm::Tag(0xfffc,0xfffc));
 	}
 	//
 	//
 	//
-	reader.GetFile().GetHeader().SetDataSetTransferSyntax(
+	header.SetDataSetTransferSyntax(
 		mdcm::TransferSyntax::ExplicitVRLittleEndian);
 	mdcm::Writer writer;
 	writer.SetFile(reader.GetFile());
@@ -7386,9 +7376,9 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 #endif
 	if(!writer.Write())
 	{
-		std::cout << "Error: can not write tmp Elscint file "
-		<< outf.toStdString()
-		<< std::endl;
+		std::cout << "Error: can not write Elscint file "
+			<< outf.toStdString()
+			<< std::endl;
 		return false;
 	}
 	return true;
@@ -7415,337 +7405,437 @@ QString DicomUtils::read_buffer(
 	const bool supp_palette_color,
 	const bool pred6_bug,
 	const bool cornell_bug,
-	int * red_subscript)
+	int * red_subscript,
+	QProgressDialog * pb)
 {
 	*ok = false;
-	if (rescale)
-		mdcm::ImageHelper::SetForceRescaleInterceptSlope(true);
-	else
-		mdcm::ImageHelper::SetForceRescaleInterceptSlope(false);
-	if (pred6_bug)
-		mdcm::ImageHelper::SetWorkaroundPredictorBug(true);
-	else
-		mdcm::ImageHelper::SetWorkaroundPredictorBug(false);
-	if (cornell_bug)
-		mdcm::ImageHelper::SetWorkaroundCornellBug(true);
-	else
-		mdcm::ImageHelper::SetWorkaroundCornellBug(false);
+	if (rescale)     mdcm::ImageHelper::SetForceRescaleInterceptSlope(true);
+	else             mdcm::ImageHelper::SetForceRescaleInterceptSlope(false);
+	if (pred6_bug)   mdcm::ImageHelper::SetWorkaroundPredictorBug(true);
+	else             mdcm::ImageHelper::SetWorkaroundPredictorBug(false);
+	if (cornell_bug) mdcm::ImageHelper::SetWorkaroundCornellBug(true);
+	else             mdcm::ImageHelper::SetWorkaroundCornellBug(false);
 	mdcm::ImageHelper::SetCleanUnusedBits(clean_unused_bits);
-	mdcm::ImageReader image_reader;
+	//
+	bool rescale_ = false;
+	unsigned long long rescaled_buffer_size = 0;
+	unsigned long long buffer_size = 0;
+	char * rescaled_buffer = NULL;
+	char * not_rescaled_buffer = NULL;
+	unsigned char * singlebit_buffer = NULL;
+	char * buffer = NULL;
+	bool singlebit = false;
+	unsigned int type_size = 0;
+	unsigned int samples_per_pix = 0;
+	double rescale_intercept = 0.0;
+	double rescale_slope     = 1.0;
+	unsigned long long dimx = 0;
+	unsigned long long dimy = 0;
+	unsigned long long dimz = 0;
+	mdcm::PixelFormat image_pixelformat = mdcm::PixelFormat::UNKNOWN;
+	unsigned long long image_buffer_length = 0;
 	QString elscf("");
-	if (elscint)
+	//
+	//
+	//
 	{
-		QFileInfo fi(f);
-		elscf =
-			QDir::tempPath() +
-			QString("/") +
-			fi.fileName() + QString("ELSCINT.dcm");
-		const bool elsc_ok = convert_elscint(f, elscf);
-		if (elsc_ok)
+		mdcm::ImageReader image_reader;
+		if (elscint)
 		{
+			QFileInfo fi(f);
+			elscf =
+				QDir::tempPath() +
+				QString("/") +
+				fi.fileName() + QString("ELSCINT.dcm");
+			const bool elsc_ok = convert_elscint(f, elscf);
+			if (elsc_ok)
+			{
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-			image_reader.SetFileName(QDir::toNativeSeparators(elscf).toUtf8().constData());
+				image_reader.SetFileName(QDir::toNativeSeparators(elscf).toUtf8().constData());
 #else
-			image_reader.SetFileName(QDir::toNativeSeparators(elscf).toLocal8Bit().constData());
+				image_reader.SetFileName(QDir::toNativeSeparators(elscf).toLocal8Bit().constData());
 #endif
 #else
-			image_reader.SetFileName(elscf.toLocal8Bit().constData());
+				image_reader.SetFileName(elscf.toLocal8Bit().constData());
 #endif
+			}
+			else
+			{
+				QFile::remove(elscf);
+				return QString("Can not convert ELSCINT file");
+			}
 		}
 		else
 		{
-			QFile::remove(elscf);
-			return QString("Can not convert ELSCINT file");
-		}
-	}
-	else
-	{
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-		image_reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
+			image_reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
 #else
-		image_reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
+			image_reader.SetFileName(QDir::toNativeSeparators(f).toLocal8Bit().constData());
 #endif
 #else
-		image_reader.SetFileName(f.toLocal8Bit().constData());
+			image_reader.SetFileName(f.toLocal8Bit().constData());
 #endif
-		image_reader.SetApplySupplementalLUT(supp_palette_color);
-	}
-	if (overlay_idx == -2) image_reader.SetProcessOverlays(false);
-	const bool i_ok = image_reader.Read();
-	if (!i_ok)
-	{
-		if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
-		return QString("!image_reader.Read()");
-	}
-	mdcm::Image & image = image_reader.GetImage();
-	const mdcm::TransferSyntax & ts =
-		image_reader.GetFile().GetHeader().GetDataSetTransferSyntax();
-	{
-// https://groups.google.com/g/comp.protocols.dicom/c/-tO2v2aH010/m/PNGwaLpBkBsJ
-		const unsigned long long buffer_length = image.GetBufferLength();
-		if (buffer_length > 0xffffffff)
+			image_reader.SetApplySupplementalLUT(supp_palette_color);
+		}
+		if (overlay_idx == -2) image_reader.SetProcessOverlays(false);
+		const bool i_ok = image_reader.Read();
+		if (!i_ok)
 		{
-			bool skip = true;
-			if (ts.IsEncapsulated())
+			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
+			return QString("!image_reader.Read()");
+		}
+		mdcm::Image & image = image_reader.GetImage();
+		{
+			const unsigned long long buffer_size_tmp = image.GetBufferLength();
+#if 0
+			const double total_ram = CommonUtils::get_total_memory();
+			if (total_ram > 0.0)
 			{
-				if (sizeof(void*) >= 8)
+				const double buffer_gb = buffer_size_tmp / 1073741824.0;
+				if ((buffer_gb * 3) >= total_ram)
 				{
-					skip = false;
-					std::cout << "Warning: GetBufferLength()=" << buffer_length << std::endl;
+					const double buffer_gb_tmp =
+						CommonUtils::set_digits(buffer_gb, 3);
+					if (pb) pb->hide();
+					QMessageBox mbox;
+					mbox.addButton(QMessageBox::Yes);
+					mbox.addButton(QMessageBox::No);
+					mbox.setDefaultButton(QMessageBox::No);
+					mbox.setIcon(QMessageBox::Question);
+					mbox.setText(
+						QString("Image size is ") +
+						QVariant(buffer_gb_tmp).toString() +
+						QString(
+							" GB\nand may require several times more\n"
+							"memory during load (it depends on re-scale type\n"
+							"and other factors). Disabling \"GPU Texture\" in\n"
+							"\"Settings/Accelerated 3D\" may reduce memory\n"
+							"pressure sometimes.\n"
+							"Proceed?"));
+					qApp->processEvents();
+					if (mbox.exec() != QMessageBox::Yes)
+					{
+						return QString("Cancelled");
+					}
+					if (pb) pb->show();
+					qApp->processEvents();
 				}
 			}
-			if (skip)
+#endif
+			if (buffer_size_tmp > 0xffffffff)
 			{
-				if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
-				return (QString("GetBufferLength() is\n") +
-					QVariant(buffer_length).toString());
+// https://groups.google.com/g/comp.protocols.dicom/c/-tO2v2aH010/m/PNGwaLpBkBsJ
+				const mdcm::File & ifile = image_reader.GetFile();
+				const mdcm::FileMetaInformation & iheader = ifile.GetHeader();
+				const mdcm::TransferSyntax & ts = iheader.GetDataSetTransferSyntax();
+				bool skip = true;
+				if (ts.IsEncapsulated())
+				{
+					if (sizeof(void*) >= 8)
+					{
+						skip = false;
+						std::cout << "Warning: GetBufferLength()="
+							<< buffer_size_tmp << std::endl;
+					}
+				}
+				if (skip)
+				{
+					if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
+					return (QString("GetBufferLength() is\n") +
+						QVariant(buffer_size_tmp).toString());
+				}
 			}
 		}
-	}
-	//
-	if (mosaic)
-	{
-		mdcm::SplitMosaicFilter mfilter;
-		mfilter.SetImage(image);
-		mfilter.SetFile(image_reader.GetFile());
-		if (mfilter.Split())
-			image = mfilter.GetImage();
-	}
-	else if (uihgrid)
-	{
-		mdcm::SplitUihGridFilter mfilter;
-		mfilter.SetImage(image);
-		mfilter.SetFile(image_reader.GetFile());
-		if (mfilter.Split())
-			image = mfilter.GetImage();
-	}
-	*dimx_     = image.GetDimension(0);
-	*dimy_     = image.GetDimension(1);
-	*dimz_     = image.GetDimension(2);
-	*origin_x  = image.GetOrigin(0);
-	*origin_y  = image.GetOrigin(1);
-	*origin_z  = image.GetOrigin(2);
-	*spacing_x = image.GetSpacing(0);
-	*spacing_y = image.GetSpacing(1);
-	*spacing_z = image.GetSpacing(2);
-	const double * dircos_ = image.GetDirectionCosines();
-	dircos[0] = dircos_[0];
-	dircos[1] = dircos_[1];
-	dircos[2] = dircos_[2];
-	dircos[3] = dircos_[3];
-	dircos[4] = dircos_[4];
-	dircos[5] = dircos_[5];
-	const unsigned long long dimx = *dimx_;
-	const unsigned long long dimy = *dimy_;
-	const unsigned long long dimz = *dimz_;
-	pi = image.GetPhotometricInterpretation();
-	if (overlay_idx!=-2)
-	{
-		const size_t ov_count = image.GetNumberOfOverlays();
-		if (ov_count>0)
+		//
+		if (mosaic)
 		{
-			QMultiMap<int, SliceOverlay> slice_overlays;
-			for (size_t ov = 0; ov < ov_count; ++ov)
+			mdcm::SplitMosaicFilter mfilter;
+			mfilter.SetImage(image);
+			mfilter.SetFile(image_reader.GetFile());
+			if (mfilter.Split()) image = mfilter.GetImage();
+		}
+		else if (uihgrid)
+		{
+			mdcm::SplitUihGridFilter mfilter;
+			mfilter.SetImage(image);
+			mfilter.SetFile(image_reader.GetFile());
+			if (mfilter.Split()) image = mfilter.GetImage();
+		}
+		*dimx_     = image.GetDimension(0);
+		*dimy_     = image.GetDimension(1);
+		*dimz_     = image.GetDimension(2);
+		dimx = *dimx_;
+		dimy = *dimy_;
+		dimz = *dimz_;
+		*origin_x  = image.GetOrigin(0);
+		*origin_y  = image.GetOrigin(1);
+		*origin_z  = image.GetOrigin(2);
+		*spacing_x = image.GetSpacing(0);
+		*spacing_y = image.GetSpacing(1);
+		*spacing_z = image.GetSpacing(2);
+		const double * dircos_ = image.GetDirectionCosines();
+		dircos[0] = dircos_[0];
+		dircos[1] = dircos_[1];
+		dircos[2] = dircos_[2];
+		dircos[3] = dircos_[3];
+		dircos[4] = dircos_[4];
+		dircos[5] = dircos_[5];
+		pi = image.GetPhotometricInterpretation();
+		if (overlay_idx != -2)
+		{
+			const size_t ov_count = image.GetNumberOfOverlays();
+			if (ov_count>0)
 			{
-				mdcm::Overlay & o = image.GetOverlay(ov);
-				const unsigned int NumberOfFrames =
-					(unsigned int)o.GetNumberOfFrames();
-				const unsigned int FrameOrigin =
-					(unsigned int)o.GetFrameOrigin();
-				const int o_dimx = (int)o.GetColumns();
-				const int o_dimy = (int)o.GetRows();
-				const int o_x    = (int)o.GetOrigin()[0];
-				const int o_y    = (int)o.GetOrigin()[1];
-				if ((NumberOfFrames > 1) && (FrameOrigin > 0) &&
-						(overlay_idx < 0))
+				QMultiMap<int, SliceOverlay> slice_overlays;
+				for (size_t ov = 0; ov < ov_count; ++ov)
 				{
-					const size_t obuffer_size = o.GetUnpackBufferLength();
-					if (obuffer_size%NumberOfFrames != 0) continue;
-					const size_t fbuffer_size =
-						obuffer_size/NumberOfFrames;
-					char * tmp0;
-					try { tmp0 = new char[obuffer_size]; }
-					catch (const std::bad_alloc&) { continue; }
-					if (!tmp0) continue;
-					const bool obuffer_ok = o.GetUnpackBuffer(
-						tmp0, obuffer_size);
-					if (!obuffer_ok)
+					mdcm::Overlay & o = image.GetOverlay(ov);
+					const unsigned int NumberOfFrames = o.GetNumberOfFrames();
+					const unsigned int FrameOrigin = o.GetFrameOrigin();
+					const size_t o_dimx = o.GetColumns();
+					const size_t o_dimy = o.GetRows();
+					const int o_x = o.GetOrigin()[0];
+					const int o_y = o.GetOrigin()[1];
+					if ((NumberOfFrames > 1) && (FrameOrigin > 0) &&
+							(overlay_idx < 0))
 					{
+						const size_t obuffer_size = o.GetUnpackBufferLength();
+						if (obuffer_size%NumberOfFrames != 0) continue;
+						const size_t fbuffer_size = obuffer_size/NumberOfFrames;
+						char * tmp0;
+						try
+						{
+							tmp0 = new char[obuffer_size];
+						}
+						catch (const std::bad_alloc&)
+						{
+							continue;
+						}
+						if (!tmp0)
+						{
+							continue;
+						}
+						const bool obuffer_ok = o.GetUnpackBuffer(tmp0, obuffer_size);
+						if (!obuffer_ok)
+						{
+							delete [] tmp0;
+							continue;
+						}
+						int idx = FrameOrigin - 1;
+						for (unsigned int y = 0; y < NumberOfFrames; ++y)
+						{
+							SliceOverlay overlay;
+							overlay.dimx = o_dimx;
+							overlay.dimy = o_dimy;
+							overlay.x    = o_x;
+							overlay.y    = o_y;
+							const size_t p = idx * o_dimx * o_dimy;
+							++idx;
+							for (size_t j = 0; j < fbuffer_size; ++j)
+							{
+								const size_t jj = p + j;
+								if (jj < obuffer_size)
+								{
+									overlay.data.push_back(tmp0[jj]);
+								}
+								else
+								{
+									std::cout
+										<< "warning: read_buffer() jj="
+										<< jj << " obuffer_size"
+										<< obuffer_size << std::endl;
+								}
+							}
+							slice_overlays.insert(idx - 1, overlay);
+#if 0
+							std::cout << "obuffer_size=" << obuffer_size
+								<< " fbuffer_size=" << fbuffer_size
+								<< " idx=" << idx-1
+								<< " p=" << p << std::endl;
+#endif
+						}
 						delete [] tmp0;
-						continue;
 					}
-					int idx = FrameOrigin - 1;
-					for (unsigned int y = 0; y < NumberOfFrames; ++y)
+					else
 					{
 						SliceOverlay overlay;
 						overlay.dimx = o_dimx;
 						overlay.dimy = o_dimy;
 						overlay.x    = o_x;
 						overlay.y    = o_y;
-						const size_t p = idx*o_dimx*o_dimy;
-						++idx;
-						for (size_t j = 0; j < fbuffer_size; ++j)
+						const size_t obuffer_size = o.GetUnpackBufferLength();
+						char * tmp0;
+						try
 						{
-							const size_t jj = p + j;
-							if (jj < obuffer_size)
-							{
-								overlay.data.push_back(tmp0[jj]);
-							}
-							else
-							{
-								std::cout
-									<< "warning: read_buffer() jj="
-									<< jj << " obuffer_size"
-									<< obuffer_size << std::endl;
-							}
+							tmp0 = new char[obuffer_size];
 						}
-						slice_overlays.insert(idx-1, overlay);
-#if 0
-						std::cout
-							<< "obuffer_size=" << obuffer_size
-							<< " fbuffer_size=" << fbuffer_size
-							<< " idx=" << idx-1
-							<< " p=" << p << std::endl;
-#endif
-					}
-					delete [] tmp0;
-				}
-				else
-				{
-					SliceOverlay overlay;
-					overlay.dimx = o_dimx;
-					overlay.dimy = o_dimy;
-					overlay.x    = o_x;
-					overlay.y    = o_y;
-					const size_t obuffer_size =
-						o.GetUnpackBufferLength();
-					char * tmp0;
-					try { tmp0 = new char[obuffer_size]; }
-					catch (const std::bad_alloc&) { continue; }
-					if (!tmp0) continue;
-					const bool obuffer_ok = o.GetUnpackBuffer(
-						tmp0, obuffer_size);
-					if (!obuffer_ok)
-					{
+						catch (const std::bad_alloc&)
+						{
+							continue;
+						}
+						if (!tmp0)
+						{
+							continue;
+						}
+						const bool obuffer_ok = o.GetUnpackBuffer(tmp0, obuffer_size);
+						if (!obuffer_ok)
+						{
+							delete [] tmp0;
+							continue;
+						}
+						for (size_t j = 0; j < obuffer_size; ++j)
+						{
+							overlay.data.push_back(tmp0[j]);
+						}
 						delete [] tmp0;
-						continue;
-					}
-					for (size_t j = 0; j < obuffer_size; ++j)
-					{
-						overlay.data.push_back(tmp0[j]);
-					}
-					delete [] tmp0;
-					slice_overlays.insert(
-						overlay_idx,
-						overlay);
+						slice_overlays.insert(overlay_idx, overlay);
 #if 0
-						std::cout
-							<< "obuffer_size=" << obuffer_size
-							<< " idx=" << overlay_idx << std::endl;
+							std::cout
+								<< "obuffer_size=" << obuffer_size
+								<< " idx=" << overlay_idx << std::endl;
 #endif
+					}
 				}
+				const QList<int> keys = slice_overlays.keys();
+				for (int x = 0; x < keys.size(); ++x)
+				{
+					const int idx = keys.at(x);
+					SliceOverlays l2 = slice_overlays.values(idx);
+					if (!image_overlays.all_overlays.contains(idx))
+					{
+						image_overlays.all_overlays[idx] = l2;
+#if 0
+							std::cout << "image_overlays.all_overlays["
+								<< idx << "] = l2"
+								<< std::endl;
+#endif
+					}
+					else
+					{
+						for (int j = 0; j < l2.size(); ++j)
+						{
+							image_overlays.all_overlays[idx]
+								.push_back(l2[j]);
+#if 0
+							std::cout << "image_overlays.all_overlays["
+								<< idx << "].push_back(l2[" << j << "])"
+								<< std::endl;
+#endif
+						}
+					}
+				}
+				slice_overlays.clear();
 			}
-			const QList<int> keys = slice_overlays.keys();
-			for (int x = 0; x < keys.size(); ++x)
+		}
+		//
+		if (pb) pb->setValue(-1);
+		qApp->processEvents();
+		//
+		if (anatomy_idx > -1)
+		{
+			const mdcm::File & ifile = image_reader.GetFile();
+			const mdcm::DataSet & ds = ifile.GetDataSet();
+			AnatomyDesc a;
+			a.laterality = read_image_laterality(ds);
+			if (a.laterality.isEmpty())
 			{
-				const int idx = keys.at(x);
-				SliceOverlays l2 = slice_overlays.values(idx);
-				if (!image_overlays.all_overlays.contains(idx))
-				{
-					image_overlays.all_overlays[idx] = l2;
-#if 0
-						std::cout
-							<< "image_overlays.all_overlays["
-							<< idx << "] = l2"
-							<< std::endl;
-#endif
-				}
-				else
-				{
-					for (int j = 0; j < l2.size(); ++j)
-					{
-						image_overlays.all_overlays[idx]
-							.push_back(l2[j]);
-#if 0
-						std::cout
-							<< "image_overlays.all_overlays["
-							<< idx << "].push_back(l2[" << j << "])"
-							<< std::endl;
-#endif
-					}
-				}
+				a.laterality = read_series_laterality(ds);
 			}
-			slice_overlays.clear();
+			a.body_part = read_anatomic_sq(ds);
+			if (a.body_part.isEmpty()) a.body_part = read_body_part(ds);
+			anatomy[anatomy_idx] = a;
+			if (anatomy_idx == 0 && dimz > 1)
+			{
+				for (size_t x = 1; x < dimz; ++x) anatomy[x] = a;
+			}
+		}
+		//
+		if (image.GetPlanarConfiguration() == 1)
+		{
+			mdcm::ImageChangePlanarConfiguration icpc;
+			icpc.SetInput(image);
+			icpc.SetPlanarConfiguration(0);
+			if (icpc.Change())
+			{
+				image = icpc.GetOutput();
+				pixelformat = image.GetPixelFormat();
+			}
+			else
+			{
+				std::cout << "Error: failed to change Planar Configuration 1 to 0"
+					<< std::endl;
+			}
+		}
+		//
+		if (pi == mdcm::PhotometricInterpretation::PALETTE_COLOR)
+		{
+			mdcm::ImageApplyLookupTable ialut;
+			ialut.SetInput(image);
+			ialut.Apply();
+			image = ialut.GetOutput();
+		}
+		else if (supp_palette_color)
+		{
+			if (!red_subscript)
+			{
+				if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
+				return QString(
+					"Error (subscript is NULL),\n"
+					"can not apply Supplemental LUT");
+			}
+			mdcm::ApplySupplementalLUT slut;
+			slut.SetInput(image);
+			slut.Apply();
+			image = slut.GetOutput();
+			*red_subscript = slut.GetRedSubscript();
+		}
+		else if (pi == mdcm::PhotometricInterpretation::MONOCHROME1 ||
+				 pi == mdcm::PhotometricInterpretation::MONOCHROME2)
+		{
+			rescale_intercept = image.GetIntercept();
+			rescale_slope     = image.GetSlope();
+		}
+		//
+		//
+		//
+		image_pixelformat = image.GetPixelFormat();
+		image_buffer_length = image.GetBufferLength();
+		//
+		//
+		//
+		try
+		{
+			not_rescaled_buffer = new char[image_buffer_length];
+		}
+		catch (const std::bad_alloc&)
+		{
+			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
+			return QString("Buffer allocation error");
+		}
+		if (!not_rescaled_buffer)
+		{
+			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
+			return QString("Buffer allocation error");
+		}
+		if (!image.GetBuffer(not_rescaled_buffer))
+		{
+			delete [] not_rescaled_buffer;
+			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
+			return QString("Buffer is NULL");
 		}
 	}
 	//
-	if (anatomy_idx > -1)
-	{
-		const mdcm::DataSet & ds = image_reader.GetFile().GetDataSet();
-		AnatomyDesc a;
-		a.laterality = read_image_laterality(ds);
-		if (a.laterality.isEmpty())
-		{
-			a.laterality = read_series_laterality(ds);
-		}
-		a.body_part = read_anatomic_sq(ds);
-		if (a.body_part.isEmpty()) a.body_part = read_body_part(ds);
-		anatomy[anatomy_idx] = a;
-		if (anatomy_idx == 0 && dimz > 1)
-		{
-			for (size_t x = 1; x < dimz; ++x) anatomy[x] = a;
-		}
-	}
 	//
-	bool rescale_ = false;
-	unsigned long long rescaled_buffer_size = 0;
-	unsigned long long supp_rescaled_buffer_size = 0;
-	unsigned long long not_rescaled_buffer_size = 0;
-	unsigned long long buffer_size = 0;
-	char * rescaled_buffer = NULL;
-	char * supp_rescaled_buffer = NULL;
-	char * not_rescaled_buffer = NULL;
-	char * buffer = NULL;
-	bool singlebit = false;
-	unsigned int type_size = 0;
-	unsigned int samples_per_pix = 0;
 	//
-	if (image.GetPlanarConfiguration()==1)
+	if (pi == mdcm::PhotometricInterpretation::MONOCHROME1 ||
+		pi == mdcm::PhotometricInterpretation::MONOCHROME2)
 	{
-		mdcm::ImageChangePlanarConfiguration icpc;
-		icpc.SetInput(image);
-		icpc.SetPlanarConfiguration(0);
-		if (icpc.Change())
+		if (!supp_palette_color && rescale)
 		{
-			image = icpc.GetOutput();
-			pixelformat = image.GetPixelFormat();
-		}
-		else
-		{
-			std::cout << "Error: failed to change Planar Configuration 1 to 0"
-				<< std::endl;
-		}
-	}
-	//
-	if (pi == mdcm::PhotometricInterpretation::PALETTE_COLOR)
-	{
-		mdcm::ImageApplyLookupTable ialut;
-		ialut.SetInput(image);
-		ialut.Apply();
-		image = ialut.GetOutput();
-		pixelformat = image.GetPixelFormat();
-	}
-	else if (pi==mdcm::PhotometricInterpretation::MONOCHROME1 ||
-			 pi==mdcm::PhotometricInterpretation::MONOCHROME2)
-	{
-		const double rescale_intercept = image.GetIntercept();
-		const double rescale_slope     = image.GetSlope();
-		*shift_tmp = rescale_intercept;
-		*scale_tmp = rescale_slope;
-		if (rescale)
-		{
+			*shift_tmp = rescale_intercept;
+			*scale_tmp = rescale_slope;
 			if (force_double_pf || !(
 				rescale_intercept >= 0        &&
 				rescale_intercept <  0.000001 &&
@@ -7762,13 +7852,12 @@ QString DicomUtils::read_buffer(
 				if (supp_palette_color)
 				{
 					if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
-					return QString(
-						"Re-scale and Suppl. LUT?");
+					return QString("Re-scale and Suppl. LUT?");
 				}
 				mdcm::Rescaler r;
 				r.SetIntercept(rescale_intercept);
 				r.SetSlope(rescale_slope);
-				r.SetPixelFormat(image.GetPixelFormat());
+				r.SetPixelFormat(image_pixelformat);
 				r.SetUseTargetPixelType(true);
 				if (!force_double_pf)
 				{
@@ -7781,7 +7870,7 @@ QString DicomUtils::read_buffer(
 				r.SetTargetPixelType(pixelformat);
 				{
 					unsigned int rescale_type_size = 0;
-					if (pixelformat.GetBitsAllocated()%8!=0)
+					if ((pixelformat.GetBitsAllocated() % 8) != 0)
 					{
 						if (pixelformat.GetBitsAllocated() < 8)
 						{
@@ -7809,47 +7898,36 @@ QString DicomUtils::read_buffer(
 					{
 						rescale_type_size = pixelformat.GetBitsAllocated()/8;
 					}
-					char * in_buffer;
+//
+					rescaled_buffer_size
+						= dimx * dimy * dimz * rescale_type_size * pixelformat.GetSamplesPerPixel();
 					try
 					{
-						in_buffer = new char[image.GetBufferLength()];
+						rescaled_buffer = new char[rescaled_buffer_size];
 					}
 					catch(const std::bad_alloc&)
 					{
-						if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 						return QString("Buffer allocation error");
 					}
-					if (!in_buffer)
-					{
-						if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
-						return QString("Buffer allocation error");
-					}
-					if (!image.GetBuffer(in_buffer))
-					{
-						delete [] in_buffer;
-						if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
-						return QString("Buffer is NULL");
-					}
-					rescaled_buffer_size
-						= dimx*dimy*dimz*rescale_type_size*pixelformat.GetSamplesPerPixel();
-					try { rescaled_buffer = new char[rescaled_buffer_size]; }
-					catch(const std::bad_alloc&) { return QString("Buffer allocation error"); }
 					if (!rescaled_buffer)
 					{
-						if (in_buffer) delete [] in_buffer;
+						if (not_rescaled_buffer) delete [] not_rescaled_buffer;
 						if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 						return QString("Buffer is NULL");
 					}
-					const bool ok_rescale = r.Rescale(rescaled_buffer, in_buffer, image.GetBufferLength());
-					delete [] in_buffer;
+					const bool ok_rescale = r.Rescale(rescaled_buffer, not_rescaled_buffer, image_buffer_length);
 					if (ok_rescale)
 					{
 						rescale_ = true;
+						delete [] not_rescaled_buffer;
+						not_rescaled_buffer = NULL;
 					}
 					else
 					{
 						std::cout << f.toStdString() << " : rescaling failed" << std::endl;
-						pixelformat = image.GetPixelFormat();
+						pixelformat = image_pixelformat;
+						delete [] rescaled_buffer;
+						rescaled_buffer = NULL;
 					}
 				}
 			}
@@ -7863,23 +7941,27 @@ QString DicomUtils::read_buffer(
 //				}
 //				else
 //				{
-					pixelformat = image.GetPixelFormat();
+					pixelformat = image_pixelformat;
 //				}
 			}
 		}
 		else
 		{
-			pixelformat = image.GetPixelFormat();
+			*shift_tmp = 0.0;
+			*scale_tmp = 1.0;
+			pixelformat = image_pixelformat;
 		}
 	}
 	else
 	{
-		pixelformat = image.GetPixelFormat();
+		*shift_tmp = 0.0;
+		*scale_tmp = 1.0;
+		pixelformat = image_pixelformat;
 	}
 	samples_per_pix = pixelformat.GetSamplesPerPixel();
-	if (pixelformat.GetBitsAllocated()<8)
+	if (pixelformat.GetBitsAllocated() < 8)
 	{
-		if (samples_per_pix>1)
+		if (samples_per_pix > 1)
 		{
 			const QString tmp_s0 =
 				QString("Bits allocated = ") +
@@ -7890,9 +7972,10 @@ QString DicomUtils::read_buffer(
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return tmp_s0;
 		}
-		if (pixelformat.GetBitsAllocated()==1)
+		if (pixelformat.GetBitsAllocated() == 1)
 		{
 			singlebit = true;
+			type_size = 1;
 		}
 		else
 		{
@@ -7906,72 +7989,47 @@ QString DicomUtils::read_buffer(
 	}
 	else
 	{
-		type_size = (pixelformat.GetBitsAllocated()%8!=0)
-					? (unsigned int)(ceil((double)pixelformat.GetBitsAllocated()/8.0))
-					: pixelformat.GetBitsAllocated()/8;
+		type_size = ((pixelformat.GetBitsAllocated() % 8) != 0)
+					? (unsigned int)(ceil((double)pixelformat.GetBitsAllocated() / 8.0))
+					: pixelformat.GetBitsAllocated() / 8;
 	}
 	if (singlebit)
 	{
-		const unsigned long long singlebit_buffer_size = image.GetBufferLength();
-		unsigned char * singlebit_buffer;
-		try
+		const unsigned long long singlebit_buffer_size = dimx * dimy * dimz;
+		if (singlebit_buffer_size > image_buffer_length * 8)
 		{
-			singlebit_buffer = new unsigned char[singlebit_buffer_size];
-		}
-		catch(const std::bad_alloc&)
-		{
-			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
-			return QString("Buffer allocation error");
-		}
-		if (!singlebit_buffer)
-		{
-			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
-			return QString("Buffer allocation error");
-		}
-		if (!image.GetBuffer((char*)singlebit_buffer))
-		{
-			delete [] singlebit_buffer;
-			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
-			return QString("Buffer is NULL");
-		}
-		not_rescaled_buffer_size=dimx*dimy*dimz;
-		if (not_rescaled_buffer_size > singlebit_buffer_size*8)
-		{
-			delete [] singlebit_buffer;
+			if (not_rescaled_buffer) delete [] not_rescaled_buffer;
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return QString("Wrong buffer size");
 		}
 		try
 		{
-			not_rescaled_buffer = new char[not_rescaled_buffer_size];
+			singlebit_buffer = new unsigned char[singlebit_buffer_size];
 		}
-		catch(const std::bad_alloc&)
+		catch (const std::bad_alloc&)
 		{
-			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return QString("Buffer allocation error");
 		}
-		if (!not_rescaled_buffer)
+		if (!singlebit_buffer)
 		{
-			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return QString("Buffer allocation error");
 		}
 		unsigned long long j = 0;
-		for (unsigned long long x = 0; x < not_rescaled_buffer_size/8; ++x)
+		for (unsigned long long x = 0; x < image_buffer_length; ++x)
 		{
-			const unsigned char c = singlebit_buffer[x];
-			not_rescaled_buffer[j  ] = (c &  0x1) ? (char)255 : 0;
-			not_rescaled_buffer[j+1] = (c &  0x2) ? (char)255 : 0;
-			not_rescaled_buffer[j+2] = (c &  0x4) ? (char)255 : 0;
-			not_rescaled_buffer[j+3] = (c &  0x8) ? (char)255 : 0;
-			not_rescaled_buffer[j+4] = (c & 0x10) ? (char)255 : 0;
-			not_rescaled_buffer[j+5] = (c & 0x20) ? (char)255 : 0;
-			not_rescaled_buffer[j+6] = (c & 0x40) ? (char)255 : 0;
-			not_rescaled_buffer[j+7] = (c & 0x80) ? (char)255 : 0;
+			const unsigned char c = not_rescaled_buffer[x];
+			singlebit_buffer[j  ] = (c &  0x1) ? (char)255 : 0;
+			singlebit_buffer[j+1] = (c &  0x2) ? (char)255 : 0;
+			singlebit_buffer[j+2] = (c &  0x4) ? (char)255 : 0;
+			singlebit_buffer[j+3] = (c &  0x8) ? (char)255 : 0;
+			singlebit_buffer[j+4] = (c & 0x10) ? (char)255 : 0;
+			singlebit_buffer[j+5] = (c & 0x20) ? (char)255 : 0;
+			singlebit_buffer[j+6] = (c & 0x40) ? (char)255 : 0;
+			singlebit_buffer[j+7] = (c & 0x80) ? (char)255 : 0;
 			j += 8;
 		}
-		delete [] singlebit_buffer;
-		buffer      = not_rescaled_buffer;
-		buffer_size = not_rescaled_buffer_size;
+		buffer      = (char *)singlebit_buffer;
+		buffer_size = singlebit_buffer_size;
 	}
 	else
 	{
@@ -7980,134 +8038,64 @@ QString DicomUtils::read_buffer(
 			buffer      = rescaled_buffer;
 			buffer_size = rescaled_buffer_size;
 		}
-		else
+		else if (not_rescaled_buffer)
 		{
-			not_rescaled_buffer_size = image.GetBufferLength();
-			if (image.GetPhotometricInterpretation()==
-					mdcm::PhotometricInterpretation::PALETTE_COLOR)
+			if (image_buffer_length != dimx * dimy * dimz * type_size * samples_per_pix)
 			{
-				not_rescaled_buffer_size*=3;
-				if (not_rescaled_buffer_size!=3*dimx*dimy*dimz*type_size*samples_per_pix)
-				{
-					const QString tmp_s0 =
-						QString("Buffer size wrong\n") +
-						QVariant(not_rescaled_buffer_size).toString() +
-						QString("\nbut must be\n") +
-						QVariant(3*dimx*dimy*dimz*type_size*samples_per_pix).toString();
-					if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
-					return tmp_s0;
-				}
-			}
-			else
-			{
-				if (not_rescaled_buffer_size!=dimx*dimy*dimz*type_size*samples_per_pix)
-				{
-					const QString tmp_s0 =
-						QString("Buffer size wrong\n") +
-						QVariant(not_rescaled_buffer_size).toString() +
-						QString("\nbut must be\n") +
-						QVariant(dimx*dimy*dimz*type_size*samples_per_pix).toString();
-					if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
-					return tmp_s0;
-				}
-			}
-			try { not_rescaled_buffer = new char[not_rescaled_buffer_size]; }
-			catch(const std::bad_alloc&) { return QString("Buffer allocation error"); }
-			if (!not_rescaled_buffer) return QString("Buffer allocation error");
-			if (!image.GetBuffer(not_rescaled_buffer))
-			{
-				delete [] not_rescaled_buffer;
+				const QString tmp_s0 =
+					QString("Buffer size wrong\n") +
+					QVariant(image_buffer_length).toString() +
+					QString("\nbut must be\n") +
+					QVariant(dimx * dimy * dimz * type_size * samples_per_pix).toString();
 				if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
-				return QString("Buffer is NULL");
+				return tmp_s0;
 			}
 			buffer      = not_rescaled_buffer;
-			buffer_size = not_rescaled_buffer_size;
+			buffer_size = image_buffer_length;
+		}
+		else // should never reach
+		{
+			if (rescaled_buffer)
+			{
+				delete [] rescaled_buffer;
+				rescaled_buffer = NULL;
+			}
+			return QString("Internal error");
 		}
 	}
-	if (supp_palette_color)
-	{
-		if (!red_subscript)
-		{
-			if (not_rescaled_buffer)
-			{
-				delete [] not_rescaled_buffer;
-			}
-			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
-			return QString(
-				"Error (subscript is NULL),\n"
-				"can not apply Supplemental LUT");
-		}
-		*shift_tmp = 0.0;
-		*scale_tmp = 1.0;
-		mdcm::ApplySupplementalLUT slut;
-		slut.SetInput(image);
-		slut.Apply();
-		image = slut.GetOutput();
-		*red_subscript = slut.GetRedSubscript();
-		pixelformat = image.GetPixelFormat();
-		if (!rescale_)
-		{
-			supp_rescaled_buffer_size = image.GetBufferLength();
-			try
-			{
-				supp_rescaled_buffer =
-					new char[supp_rescaled_buffer_size];
-			}
-			catch(const std::bad_alloc&)
-			{
-				if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
-				return QString("Buffer allocation error");
-			}
-			if (!supp_rescaled_buffer)
-			return QString("Buffer allocation error");
-			if (!image.GetBuffer(supp_rescaled_buffer))
-			{
-				delete [] supp_rescaled_buffer;
-				if (not_rescaled_buffer)
-				{
-					delete [] not_rescaled_buffer;
-				}
-				if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
-				return QString("Buffer is NULL");
-			}
-			buffer = supp_rescaled_buffer;
-			buffer_size = supp_rescaled_buffer_size;
-		}
-		else // should not happen
-		{
-			(void)supp_rescaled_buffer_size;
-			if (rescaled_buffer) delete [] rescaled_buffer;
-			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
-			return QString(
-				"Error (buffer rescaled),\n"
-				"can not apply Supplemental LUT");
-		}
-	}
-	const size_t xy = buffer_size/dimz;
+	//
+	if (pb) pb->setValue(-1);
+	qApp->processEvents();
+	//
+	const size_t xy = buffer_size / dimz;
 	for (unsigned long long j = 0; j < dimz; ++j)
 	{
-		char * p__ = NULL;
+		char * p__;
 		bool badalloc = false;
-		try { p__ = new char[xy]; }
-		catch(const std::bad_alloc&) { badalloc = true; }
+		try
+		{
+			p__ = new char[xy];
+		}
+		catch(const std::bad_alloc&)
+		{
+			badalloc = true;
+		}
 		if (p__ && !badalloc)
 		{
-			memcpy(p__,&(buffer[j*xy]),xy);
+			memcpy(p__, &(buffer[j*xy]), xy);
 			data.push_back(p__);
 		}
 		else
 		{
 			if (not_rescaled_buffer)  delete [] not_rescaled_buffer;
 			if (rescaled_buffer)      delete [] rescaled_buffer;
-			if (supp_rescaled_buffer) delete [] supp_rescaled_buffer;
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
-			*ok = false;
 			return QString("Memory allocation error");
 		}
 	}
 	if (not_rescaled_buffer)  delete [] not_rescaled_buffer;
 	if (rescaled_buffer)      delete [] rescaled_buffer;
-	if (supp_rescaled_buffer) delete [] supp_rescaled_buffer;
+	if (singlebit_buffer)     delete [] singlebit_buffer;
 	if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 	*ok = true;
 	return QString("");
@@ -8150,7 +8138,7 @@ QString DicomUtils::read_enhanced_common(
 	const double shift_tmp,
 	const double scale_tmp,
 	const bool apply_rescale,
-	const mdcm::DataSet & ds, QProgressDialog * pb,
+	QProgressDialog * pb,
 	float tolerance)
 {
 #if 0
@@ -8177,8 +8165,8 @@ QString DicomUtils::read_enhanced_common(
 		{
 			const unsigned int idx__ = it->first;
 			if (!(
-					idx__<data.size() && data.at(idx__) &&
-					idx__<values.size()))
+					idx__ < data.size() && data.at(idx__) &&
+					idx__ < values.size()))
 			{
 				*ok = false;
 				return QString("read_enhanced_common error (02)");
@@ -8236,8 +8224,7 @@ QString DicomUtils::read_enhanced_common(
 #endif
 			tmp1.clear();
 		}
-		for (
-			std::map<
+		for (std::map<
 				unsigned int,
 				unsigned int,
 				std::less<unsigned int> >::const_iterator
@@ -8252,8 +8239,7 @@ QString DicomUtils::read_enhanced_common(
 					<< "[" << idx__ << "]";
 			}
 #endif
-			if (
-				idx__<data.size() &&
+			if (idx__<data.size() &&
 				data.at(idx__) &&
 				idx__<values.size())
 			{
@@ -8381,16 +8367,64 @@ QString DicomUtils::read_enhanced_common(
 			const bool enable_gl = min_load ? false : ok3d;
 			// Disable texture for Breast Tomosynthesis
 			bool skip_texture =
-				(min_load || (sop==QString("1.2.840.10008.5.1.4.1.1.13.1.3")))
+				(min_load || (sop == QString("1.2.840.10008.5.1.4.1.1.13.1.3")))
 				? true : !wsettings->get_3d();
 			const int new_id = min_load ? -1 : CommonUtils::get_next_id();
-			const int lut1   = 0;
+			double window_center = -999999;
+			double window_width = -999999;
+			double window_center_tmp = -999999;
+			double window_width_tmp = -999999;
+			short lut_function = -1;
+			short lut_function_tmp = -1;
+			QString instance_uid("");
+			int instance_number = -1;
+			//
 			ImageVariant * ivariant = new ImageVariant(
 				new_id,
 				enable_gl,
 				skip_texture,
 				gl,
-				lut1);
+				0);
+			//
+			{
+				mdcm::Reader reader;
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+				reader.SetFileName(QDir::toNativeSeparators(efilename).toUtf8().constData());
+#else
+				reader.SetFileName(QDir::toNativeSeparators(efilename).toLocal8Bit().constData());
+#endif
+#else
+				reader.SetFileName(efilename.toLocal8Bit().constData());
+#endif
+				if (reader.ReadUpToTag(mdcm::Tag(0x7fe0,0x0000)))
+				{
+					const mdcm::File & rfile = reader.GetFile();
+					const mdcm::DataSet & ds = rfile.GetDataSet();
+					if (sop == QString("1.2.840.10008.5.1.4.1.1.6.2"))
+					{
+						read_us_regions(ds, ivariant);
+					}
+					else if (sop == QString("1.2.840.10008.5.1.4.1.1.4.1") ||
+						sop == QString("1.2.840.10008.5.1.4.1.1.4.4"))
+					{
+						ivariant->iinfo = read_enhmr_spectro_info(ds, false);
+					}
+					else if (sop == QString("1.2.840.10008.5.1.4.1.1.4.2"))
+					{
+						ivariant->iinfo = read_enhmr_spectro_info(ds, true);
+					}
+					else if (sop == QString("1.2.840.10008.5.1.4.1.1.2.1") ||
+						sop == QString("1.2.840.10008.5.1.4.1.1.2.2"))
+					{
+						ivariant->iinfo = read_enhct_info(ds);
+					}
+					read_ivariant_info_tags(ds, ivariant);
+					read_window(ds, &window_center_tmp, &window_width_tmp, &lut_function_tmp);
+					instance_uid = read_instance_uid(ds);
+					instance_number = read_instance_number(ds);
+				}
+			}
 			//
 			for (int i = 0; i < (int)tmp1.size(); ++i)
 			{
@@ -8606,11 +8640,6 @@ QString DicomUtils::read_enhanced_common(
 			}
 			tmp4.clear();
 			//
-			if (sop==QString("1.2.840.10008.5.1.4.1.1.6.2"))
-				read_us_regions(ds, ivariant);
-			//
-			double window_center = -999999, window_width = -999999;
-			short lut_function = -1;
 			const size_t tmp1s = window_centers_l.size();
 			const bool tmp1ok =
 				(tmp1s > 0) &&
@@ -8705,7 +8734,9 @@ QString DicomUtils::read_enhanced_common(
 			}
 			else
 			{
-				read_window(ds, &window_center, &window_width, &lut_function);
+				window_center = window_center_tmp;
+				window_width  = window_width_tmp;
+				lut_function  = lut_function_tmp;	
 			}
 			ivariant->di->default_us_window_center =
 				ivariant->di->us_window_center = window_center;
@@ -8751,8 +8782,7 @@ QString DicomUtils::read_enhanced_common(
 			{
 				// GDCM can not read rescale from per frame groups
 				const bool rescale_tmp =
-					(!apply_rescale ||
-						pixelformat.GetSamplesPerPixel() > 1)
+					(!apply_rescale || pixelformat.GetSamplesPerPixel() > 1)
 					? false : wsettings->get_rescale();
 				const double saved_window_center = ivariant->di->default_us_window_center;
 				const double saved_window_width = ivariant->di->default_us_window_width;
@@ -8859,9 +8889,10 @@ QString DicomUtils::read_enhanced_common(
 				if (geom_ok)
 				{
 					// one inst. UID for all slices
-					const QString instance_uid = read_instance_uid(ds);
 					for (int z = 0; z < ivariant->di->idimz; ++z)
+					{
 						ivariant->image_instance_uids[z] = instance_uid;
+					}
 					//
 					ivariant->di->slices_direction_x = slices_dir_x;
 					ivariant->di->slices_direction_y = slices_dir_y;
@@ -8884,8 +8915,7 @@ QString DicomUtils::read_enhanced_common(
 				}
 				if (ivariant->equi)
 				{
-					if (ivariant->di->idimz < 7)
-						ivariant->di->transparency = false;
+					if (ivariant->di->idimz < 7) ivariant->di->transparency = false;
 				}
 				else
 				{
@@ -8905,33 +8935,9 @@ QString DicomUtils::read_enhanced_common(
 				ivariant->di->shift_tmp = shift_tmp;
 				ivariant->di->scale_tmp = scale_tmp;
 				if (geom_ok) ivariant->iod_supported = true;
-				const int instance_number = read_instance_number(ds);
-				if (instance_number>=0)
+				if (instance_number >= 0)
 				{
-					ivariant->instance_number =
-						read_instance_number(ds);
-				}
-				read_ivariant_info_tags(ds, ivariant);
-				if (sop==QString("1.2.840.10008.5.1.4.1.1.130") ||
-					sop==QString("1.2.840.10008.5.1.4.1.1.128.1"))
-				{
-					;;
-				}
-				else if (
-					sop==QString("1.2.840.10008.5.1.4.1.1.4.1") ||
-					sop==QString("1.2.840.10008.5.1.4.1.1.4.4"))
-				{
-					ivariant->iinfo = read_enhmr_spectro_info(ds, false);
-				}
-				else if (sop==QString("1.2.840.10008.5.1.4.1.1.4.2"))
-				{
-					ivariant->iinfo = read_enhmr_spectro_info(ds, true);
-				}
-				else if (
-					sop==QString("1.2.840.10008.5.1.4.1.1.2.1") ||
-					sop==QString("1.2.840.10008.5.1.4.1.1.2.2"))
-				{
-					ivariant->iinfo = read_enhct_info(ds);
+					ivariant->instance_number = instance_number;
 				}
 				CommonUtils::reset_bb(ivariant);
 				IconUtils::icon(ivariant);
@@ -9136,7 +9142,6 @@ QString DicomUtils::read_enhanced_3d_6d(
 	const double origin_x_read, const double origin_y_read, const double origin_z_read,
 	const double shift_tmp, const double scale_tmp,
 	const bool apply_rescale,
-	const mdcm::DataSet & ds,
 	QProgressDialog * pb,
 	float tolerance)
 {
@@ -9167,7 +9172,6 @@ QString DicomUtils::read_enhanced_3d_6d(
 			origin_x_read, origin_y_read, origin_z_read,
 			shift_tmp, scale_tmp,
 			apply_rescale,
-			ds,
 			pb,
 			tolerance);
 	else
