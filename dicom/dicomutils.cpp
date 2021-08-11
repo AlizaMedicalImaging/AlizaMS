@@ -6271,6 +6271,11 @@ QString DicomUtils::read_series(
 			*ok = reader.Read();
 			if (*ok == false)
 			{
+				for (unsigned int x = 0; x < data.size(); ++x)
+				{
+					if (data.at(x)) delete [] data[x];
+				}
+				data.clear();
 				return (QString("can not read file ") + images_ipp.at(j));
 			}
 			const mdcm::File & file = reader.GetFile();
@@ -6477,22 +6482,26 @@ QString DicomUtils::read_series(
 			if (dimz_ > 1)
 			{
 				*ok = false;
-				ivariant->anatomy.clear();
-				ivariant->image_overlays.all_overlays.clear();
-				return QString("Can not read particular series (1)");
 			}
-			if (!data_.empty() && data_.at(0))
-			{
-				data.push_back(&data_[0][0]);
-			}
-			else
+			if (!(!data_.empty() && data_.at(0)))
 			{
 				*ok = false;
-				ivariant->anatomy.clear();
-				ivariant->image_overlays.all_overlays.clear();
-				return QString(
-					"Can not read particular series (2)");
 			}
+			if (*ok == false)
+			{
+				for (unsigned int x = 0; x < data_.size(); ++x)
+				{
+					if (data_.at(x)) delete [] data_[x];
+				}
+				data_.clear();
+				for (unsigned int x = 0; x < data.size(); ++x)
+				{
+					if (data.at(x)) delete [] data[x];
+				}
+				data.clear();
+				return QString("Buffer read failed");
+			}
+			data.push_back(&data_[0][0]);
 			count_buffers_size += buffers_size;
 #ifdef WARN_RAM_SIZE
 			if (!skip_ram_warning && total_ram > 0.0)
@@ -6526,7 +6535,12 @@ QString DicomUtils::read_series(
 					else
 					{
 						*ok = false;
-						return QString("Cancelled");
+						for (unsigned int x = 0; x < data.size(); ++x)
+						{
+							if (data.at(x)) delete [] data[x];
+						}
+						data.clear();
+						return QString("");
 					}
 					if (pb) pb->show();
 					qApp->processEvents();
@@ -6563,8 +6577,11 @@ QString DicomUtils::read_series(
 		}
 		if (*ok == false)
 		{
-			ivariant->anatomy.clear();
-			ivariant->image_overlays.all_overlays.clear();
+			for (unsigned int x = 0; x < data.size(); ++x)
+			{
+				if (data.at(x)) delete [] data[x];
+			}
+			data.clear();
 			return buff_error;
 		}
 		if (j == 0)
@@ -6827,8 +6844,6 @@ QString DicomUtils::read_series(
 					if (data.at(x)) delete [] data[x];
 				}
 				data.clear();
-				ivariant->anatomy.clear();
-				ivariant->image_overlays.all_overlays.clear();
 				return QString("previous_pixelformat!=pixelformat");
 			}
 		}
@@ -6843,8 +6858,6 @@ QString DicomUtils::read_series(
 			if (data.at(x)) delete [] data[x];
 		}
 		data.clear();
-		ivariant->anatomy.clear();
-		ivariant->image_overlays.all_overlays.clear();
 		return QString("data.size() != dimz");
 	}
 	if (pb) pb->setValue(-1);
@@ -7570,7 +7583,7 @@ QString DicomUtils::read_buffer(
 					qApp->processEvents();
 					if (mbox.exec() != QMessageBox::Yes)
 					{
-						return QString("Cancelled");
+						return QString("");
 					}
 					if (pb) pb->show();
 					qApp->processEvents();
