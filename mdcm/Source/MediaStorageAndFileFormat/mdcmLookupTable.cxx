@@ -88,7 +88,7 @@ LookupTable::Allocate(unsigned short bitsample)
   }
   else
   {
-    mdcmAssertAlwaysMacro(0);
+    assert(0);
   }
   BitSample = bitsample;
 }
@@ -103,8 +103,6 @@ LookupTable::InitializeLUT(LookupTableType type,
   {
     return;
   }
-  assert(type >= RED && type <= BLUE);
-  assert(subscript == 0);
   assert(bitsize == 8 || bitsize == 16);
   if (length == 0)
   {
