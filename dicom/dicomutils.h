@@ -252,6 +252,7 @@ public:
 		const bool,
 		const bool,
 		int*,
+		unsigned long long*,
 		QProgressDialog*);
 	static QString read_enhanced_common(
 		bool*,

@@ -669,6 +669,9 @@ Aliza::Aliza()
 	anchor2_icon = QIcon(QString(":/bitmaps/anchor2.svg"));
 	anim3D_timer = new QTimer();
 	g_init_physics();
+#if 1
+	CommonUtils::save_total_memory();
+#endif
 }
 
 Aliza::~Aliza()

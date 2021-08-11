@@ -1,3 +1,4 @@
+#define WARN_RAM_SIZE
 //#define ENHANCED_PRINT_INFO
 
 #include <QtGlobal>
@@ -5441,6 +5442,7 @@ QString DicomUtils::read_enhanced(
 			pred6_bug,
 			cornell_bug,
 			NULL,
+			NULL,
 			pb);
 	if (*ok == false) return message_;
 	if (rows_ok && cols_ok &&
@@ -5761,6 +5763,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 			pred6_bug,
 			cornell_bug,
 			&red_subscript,
+			NULL,
 			pb);
 #if 0
 	std::cout << "subscript = " << red_subscript << std::endl;
@@ -6120,6 +6123,7 @@ QString DicomUtils::read_ultrasound(
 		pred6_bug,
 		cornell_bug,
 		NULL,
+		NULL,
 		pb);
 	if (*ok==false) return buff_error;
 	//
@@ -6244,6 +6248,11 @@ QString DicomUtils::read_series(
 	std::vector<double> windows_;
 	std::vector<short>  luts_;
 	//
+#ifdef WARN_RAM_SIZE
+	const double total_ram = CommonUtils::get_total_memory_saved();
+	bool skip_ram_warning = false;
+#endif
+	unsigned long long count_buffers_size = 0;
 	for (int j = 0; j < images_ipp.size(); ++j)
 	{
 		//
@@ -6437,6 +6446,7 @@ QString DicomUtils::read_series(
 		const bool force_double_pf =
 			(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128"))
 			? true : false;
+		unsigned long long buffers_size = 0;
 		if (images_ipp.size() > 1)
 		{
 			std::vector<char*> data_;
@@ -6462,6 +6472,7 @@ QString DicomUtils::read_series(
 				pred6_bug,
 				cornell_bug,
 				NULL,
+				&buffers_size,
 				pb);
 			if (dimz_ > 1)
 			{
@@ -6482,6 +6493,46 @@ QString DicomUtils::read_series(
 				return QString(
 					"Can not read particular series (2)");
 			}
+			count_buffers_size += buffers_size;
+#ifdef WARN_RAM_SIZE
+			if (!skip_ram_warning && total_ram > 0.0)
+			{
+				const double count_buffers_gb = count_buffers_size / 1073741824.0;
+				if ((count_buffers_gb * 3) >= total_ram)
+				{
+					const double buffer_gb_tmp =
+						CommonUtils::set_digits(count_buffers_gb, 3);
+					if (pb) pb->hide();
+					QMessageBox mbox;
+					mbox.addButton(QMessageBox::Yes);
+					mbox.addButton(QMessageBox::No);
+					mbox.setDefaultButton(QMessageBox::No);
+					mbox.setIcon(QMessageBox::Question);
+					mbox.setText(
+						QString("Size of frames reached ") +
+						QVariant(buffer_gb_tmp).toString() +
+						QString(
+							" GB\nand may require several times more\n"
+							"memory during load (it depends on re-scale type\n"
+							"and other factors). Disabling \"GPU texture\" in\n"
+							"\"Settings/3D\" may reduce memory\n"
+							"pressure sometimes.\n"
+							"Proceed?"));
+					qApp->processEvents();
+					if (mbox.exec() == QMessageBox::Yes)
+					{
+						skip_ram_warning = true;
+					}
+					else
+					{
+						*ok = false;
+						return QString("Cancelled");
+					}
+					if (pb) pb->show();
+					qApp->processEvents();
+				}
+			}
+#endif
 		}
 		else if (images_ipp.size() == 1)
 		{
@@ -6506,6 +6557,7 @@ QString DicomUtils::read_series(
 				false,
 				pred6_bug,
 				cornell_bug,
+				NULL,
 				NULL,
 				pb);
 		}
@@ -7406,6 +7458,7 @@ QString DicomUtils::read_buffer(
 	const bool pred6_bug,
 	const bool cornell_bug,
 	int * red_subscript,
+	unsigned long long * buffers_size,
 	QProgressDialog * pb)
 {
 	*ok = false;
@@ -7489,8 +7542,8 @@ QString DicomUtils::read_buffer(
 		mdcm::Image & image = image_reader.GetImage();
 		{
 			const unsigned long long buffer_size_tmp = image.GetBufferLength();
-#if 0
-			const double total_ram = CommonUtils::get_total_memory();
+#ifdef WARN_RAM_SIZE
+			const double total_ram = CommonUtils::get_total_memory_saved();
 			if (total_ram > 0.0)
 			{
 				const double buffer_gb = buffer_size_tmp / 1073741824.0;
@@ -7510,8 +7563,8 @@ QString DicomUtils::read_buffer(
 						QString(
 							" GB\nand may require several times more\n"
 							"memory during load (it depends on re-scale type\n"
-							"and other factors). Disabling \"GPU Texture\" in\n"
-							"\"Settings/Accelerated 3D\" may reduce memory\n"
+							"and other factors). Disabling \"GPU texture\" in\n"
+							"\"Settings/3D\" may reduce memory\n"
 							"pressure sometimes.\n"
 							"Proceed?"));
 					qApp->processEvents();
@@ -7802,6 +7855,10 @@ QString DicomUtils::read_buffer(
 		//
 		image_pixelformat = image.GetPixelFormat();
 		image_buffer_length = image.GetBufferLength();
+		if (buffers_size)
+		{
+			*buffers_size = image_buffer_length;
+		}
 		//
 		//
 		//
@@ -12943,4 +13000,8 @@ QString DicomUtils::read_dicom(
 
 #ifdef ENHANCED_PRINT_INFO
 #undef ENHANCED_PRINT_INFO
+#endif
+
+#ifdef WARN_RAM_SIZE
+#undef WARN_RAM_SIZE
 #endif

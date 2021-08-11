@@ -1,3 +1,5 @@
+#define USE_GET_TOTAL_MEM
+
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #ifdef ALIZA_GL_3_2_CORE
@@ -45,6 +47,14 @@
 #include "float.h"
 #include "dicomutils.h"
 #include "colorspace/colorspace.h"
+
+#ifdef USE_GET_TOTAL_MEM
+#if (defined  __FreeBSD__ || defined __APPLE__)
+#include <sys/sysctl.h>
+#elif (defined  __GNUC__ && !defined  _WIN32)
+#include <sys/sysinfo.h>
+#endif
+#endif
 
 typedef Vectormath::Scalar::Vector3 sVector3;
 static QString screenshot_dir("");
@@ -4547,6 +4557,50 @@ void CommonUtils::read_geometry_from_image_(ImageVariant * v)
 	}
 }
 
+static double saved_total_memory = 0.0;
+void CommonUtils::save_total_memory()
+{
+	saved_total_memory = get_total_memory();
+}
+
+double CommonUtils::get_total_memory_saved()
+{
+	return saved_total_memory;
+}
+
+double CommonUtils::get_total_memory()
+{
+#ifdef USE_GET_TOTAL_MEM
+	double total_gb = 0.0;
+#if (defined _WIN32)
+	MEMORYSTATUSEX memory_status;
+	ZeroMemory(&memory_status, sizeof(MEMORYSTATUSEX));
+	memory_status.dwLength = sizeof(MEMORYSTATUSEX);
+	if (GlobalMemoryStatusEx(&memory_status))
+		total_gb = memory_status.ullTotalPhys / 1073741824.0;
+#elif (defined __FreeBSD__ || defined __APPLE__)
+	unsigned long long ctlvalue;
+	size_t len = sizeof(ctlvalue);
+	int mib[2];
+	mib[0] = CTL_HW;
+#if (defined __FreeBSD__)
+	mib[1] = HW_REALMEM;
+#elif (defined __APPLE__)
+	mib[1] = HW_MEMSIZE;
+#endif
+	sysctl(mib, 2, &ctlvalue, &len, NULL, 0);
+	total_gb = ctlvalue / 1073741824.0;
+#elif (defined  __GNUC__)
+	struct sysinfo i;
+	sysinfo(&i);
+	total_gb = i.totalram / 1073741824.0;
+#endif
+	return total_gb;
+#else
+	return 0.0;
+#endif
+}
+
 QString CommonUtils::get_screenshot_dir()
 {
 	if (screenshot_dir.isEmpty())
@@ -4866,3 +4920,7 @@ void CommonUtils::random_RGB(float * R, float * G, float * B)
 	*G = (float)G_;
 	*B = (float)B_;
 }
+
+#ifdef USE_GET_TOTAL_MEM
+#undef USE_GET_TOTAL_MEM
+#endif

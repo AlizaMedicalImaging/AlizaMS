@@ -702,7 +702,7 @@
               </sizepolicy>
              </property>
              <property name="title">
-              <string>GPU 3D texture (immediate, may be turned off for huge images)</string>
+              <string>GPU texture (immediate, may be turned off for huge images)</string>
              </property>
              <property name="checkable">
               <bool>true</bool>

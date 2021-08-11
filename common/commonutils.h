@@ -97,6 +97,9 @@ public:
 		bool=false);
 	static void read_geometry_from_image_(ImageVariant*);
 	static QString get_screenshot_dir();
+	static void save_total_memory();
+	static double get_total_memory_saved();
+	static double get_total_memory();
 	static void set_screenshot_dir(const QString&);
 	static QString get_screenshot_name(const QString&);
 	static QString get_screenshot_name2();
