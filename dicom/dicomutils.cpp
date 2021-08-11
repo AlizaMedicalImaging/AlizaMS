@@ -6518,7 +6518,7 @@ QString DicomUtils::read_series(
 					mbox.setDefaultButton(QMessageBox::No);
 					mbox.setIcon(QMessageBox::Question);
 					mbox.setText(
-						QString("Size of frames reached ") +
+						QString("Size of data reached ") +
 						QVariant(buffer_gb_tmp).toString() +
 						QString(
 							" GB\nand may require several times more\n"
@@ -7571,7 +7571,7 @@ QString DicomUtils::read_buffer(
 					mbox.setDefaultButton(QMessageBox::No);
 					mbox.setIcon(QMessageBox::Question);
 					mbox.setText(
-						QString("Image size is ") +
+						QString("Data size is ") +
 						QVariant(buffer_gb_tmp).toString() +
 						QString(
 							" GB\nand may require several times more\n"
