@@ -14,21 +14,21 @@ Linux
 To start on Linux extract archive and run _alizams.sh_
 
 ```
-cd alizams-1.6.2_linux
+cd alizams-1.6.3_linux
 ./alizams.sh
 ```
 
 Optionally install local desktop menu entry
 
 ```
-cd alizams-1.6.2_linux/install_menu
+cd alizams-1.6.3_linux/install_menu
 ./install_menu.sh
 ```
 
 To remove local menu entry
 
 ```
-cd alizams-1.6.2_linux/install_menu
+cd alizams-1.6.3_linux/install_menu
 ./uninstall_menu.sh
 ```
 
