@@ -357,7 +357,7 @@
           </sizepolicy>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Retain Patient Characteristics Option&lt;/span&gt; if checked.&lt;/p&gt;&lt;p&gt;Weigth, size, etc. are important for e.g. &lt;span style=&quot; font-style:italic;&quot;&gt;PET&lt;/span&gt;  to calculate &lt;span style=&quot; font-style:italic;&quot;&gt;SUV&lt;/span&gt;. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Retain Patient Characteristics Option&lt;/span&gt; if checked.&lt;/p&gt;&lt;p&gt;Weight, size, etc. are important for e.g. &lt;span style=&quot; font-style:italic;&quot;&gt;PET&lt;/span&gt;  to calculate &lt;span style=&quot; font-style:italic;&quot;&gt;SUV&lt;/span&gt;. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Retain patient characteristics</string>

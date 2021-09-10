@@ -327,7 +327,7 @@ void GLWidget::initializeGL()
 		opengl_init_done = true;
 		disable_gl_in_settings();
 		emit opengl3_not_available();
-		std::cout << "Could not initialize OpenGL funtions" << std::endl;
+		std::cout << "Could not initialize OpenGL functions" << std::endl;
 		return;
 	}
 #else // Qt4

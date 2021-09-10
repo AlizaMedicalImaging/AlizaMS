@@ -4434,7 +4434,7 @@ void Aliza::trigger_show_roi_info()
 				v->di->rois.at(tmp0).name +
 				QString("\nType: ") +
 				v->di->rois.at(tmp0).interpreted_type +
-				QString("\nNumber of countours: ") +
+				QString("\nNumber of contours: ") +
 				QVariant(count_contours).toString() +
 				s0;
 			QMessageBox mbox;

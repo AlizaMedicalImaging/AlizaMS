@@ -253,7 +253,7 @@ template<typename T> QString contour_from_path(
 	Contour * c = NULL;
 	try { c = new Contour(); }
 	catch (const std::bad_alloc&) { c = NULL; }
-	if (!c) return QString("std::bad_alloc exeption");
+	if (!c) return QString("std::bad_alloc exception");
 	c->id = a;
 	c->roiid = roi->id;
 	c->color.r = 0.0f;
@@ -355,7 +355,7 @@ static QString contour_from_path_nonuniform(
 	Contour * c = NULL;
 	try { c = new Contour(); }
 	catch (const std::bad_alloc&) { c = NULL; }
-	if (!c) return QString("std::bad_alloc exeption");
+	if (!c) return QString("std::bad_alloc exception");
 	c->id = a;
 	c->roiid = roi->id;
 	c->color.r = 0.0f;

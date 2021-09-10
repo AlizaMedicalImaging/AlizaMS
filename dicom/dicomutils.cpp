@@ -6998,7 +6998,7 @@ static void delta_decode_rgb(
 	union
 	{
 		unsigned char gray;
-	unsigned char rgb[3];
+		unsigned char rgb[3];
 	} pixel;
 	pixel.rgb[0] = pixel.rgb[1] = pixel.rgb[2] = 0;
 	// Start in grayscale mode
@@ -7015,14 +7015,12 @@ static void delta_decode_rgb(
 		dy = 1;
 	}
 	size_t ps = plane_size;
-	// The following is highly unoptimized as we have nested
-	// if statement in a while loop we need to switch from one
-	// algorithm to ther other (RGB <-> GRAY).
+	// Need to switch from one algorithm to other (RGB <-> GRAY).
 	while (ps)
 	{
 		// Next byte
 		unsigned char b = *src++;
-		assert( src < data_in + data_size );
+		assert(src < data_in + data_size);
 		// Mode selection
 		switch (b)
 		{

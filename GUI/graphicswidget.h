@@ -33,7 +33,7 @@ public:
 		bool/*OpenGL*/,
 		QLabel* /*top*/,
 		QLabel* /*left*/,
-		QLabel* /*measurment*/,
+		QLabel* /*measurement*/,
 		QLineEdit* /*value*/,
 		QWidget* /*sinle frame*/,
 		QWidget* /*multi frame*/);

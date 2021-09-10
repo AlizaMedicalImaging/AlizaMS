@@ -107,7 +107,7 @@
               <bool>false</bool>
              </property>
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Try to sort frames in enhanced multi-frame IODs by Image Postion (Patient). Multiple stacks are sorted separately, s. option to process Dimension Organisation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Try to sort frames in enhanced multi-frame IODs by Image Position (Patient). Multiple stacks are sorted separately, s. option to process Dimension Organisation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
               <string>Sort frames in enhanced multi-frame IODs by IPP/IOP</string>
