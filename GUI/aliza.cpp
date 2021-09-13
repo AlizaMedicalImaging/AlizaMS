@@ -4366,6 +4366,7 @@ void Aliza::trigger_show_roi_info()
 		bool has_open_planar = false;
 		bool has_open_non_planar = false;
 		bool has_point = false;
+		bool has_closedplanar_xor = false;
 		{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			QMap<int, Contour*>::const_iterator it =
@@ -4396,6 +4397,9 @@ void Aliza::trigger_show_roi_info()
 					case 4:
 						if (!has_point) has_point = true;
 						break;
+					case 5:
+						if (!has_closedplanar_xor) has_closedplanar_xor = true;
+						break;
 					case 0:
 					default:
 						break;
@@ -4424,6 +4428,11 @@ void Aliza::trigger_show_roi_info()
 			{
 				if (!s0.isEmpty()) s0.append(QString(", "));
 				s0.append(QString("POINT"));
+			}
+			if (has_closedplanar_xor)
+			{
+				if (!s0.isEmpty()) s0.append(QString(", "));
+				s0.append(QString("CLOSEDPLANAR_XOR"));
 			}
 			if (!s0.isEmpty())
 			{

@@ -2098,6 +2098,11 @@ void DicomUtils::load_contour(
 			{
 				contour->type = 4;
 			}
+			else if (qtr_contour_geometric_type ==
+				QString("CLOSEDPLANAR_XOR"))
+			{
+				contour->type = 5;
+			}
 			else
 			{
 				contour->type = 0;

@@ -2271,10 +2271,17 @@ void GLWidget::paint_volume()
 							glBindVertexArray(c->vaoid);
 							switch (c->type)
 							{
-							case 1:  glDrawArrays(GL_LINE_LOOP,  0, c->dpoints.size()); break;
-							case 2:  glDrawArrays(GL_LINE_STRIP, 0, c->dpoints.size()); break;
-							case 3:  glDrawArrays(GL_LINE_STRIP, 0, c->dpoints.size()); break;
-							default: glDrawArrays(GL_POINTS,     0, c->dpoints.size()); break;
+							case 1:
+							case 5:
+								glDrawArrays(GL_LINE_LOOP, 0, c->dpoints.size());
+								break;
+							case 2:
+							case 3:
+								glDrawArrays(GL_LINE_STRIP, 0, c->dpoints.size());
+								break;
+							default:
+								glDrawArrays(GL_POINTS, 0, c->dpoints.size());
+								break;
 							}
 						}
 						++it;

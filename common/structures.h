@@ -241,6 +241,7 @@ public:
 	// 2 - OPEN_PLANAR
 	// 3 - OPEN_NONPLANAR
 	// 4 - POINT
+	// 5 - CLOSEDPLANAR_XOR
 	short type;
 	// axis:
 	// -1 - not set

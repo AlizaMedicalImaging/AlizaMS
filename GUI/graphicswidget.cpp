@@ -94,7 +94,7 @@ static void draw_contours(
 					QPen pen;
 					pen.setBrush(brush);
 					pen.setStyle(Qt::SolidLine);
-					if (c->type == 1 || c->type == 2)
+					if (c->type == 1 || c->type == 2 || c->type == 5)
 					{
 						pen.setWidthF(widget->get_contours_width());
 						GraphicsPathItem * pi_ =

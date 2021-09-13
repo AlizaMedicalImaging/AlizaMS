@@ -26,7 +26,7 @@ template <typename T> void calculate_uvt(
 	ImageVariant * ivariant)
 {
 	if (image.IsNull()) return;
-	unsigned long long count = 0;
+	unsigned int count = 0;
 	for (int x = 0; x < ivariant->di->rois.size(); ++x)
 	{
 		QMap< int, Contour* >::iterator it =
@@ -65,7 +65,7 @@ template <typename T> void calculate_uvt(
 						if (planar) planar = false;
 					}
 				}
-				if (!planar && (c->type == 1 || c->type == 2))
+				if (!planar && (c->type == 1 || c->type == 2 || c->type == 5))
 				{
 					c->type = 0;
 				}
@@ -698,8 +698,8 @@ void ContourUtils::contours_build_path(
 				if (!c) continue;
 				const short contour_type = c->type;
 				QPainterPath path;
-				// CLOSED_PLANAR, OPEN_PLANAR
-				if (contour_type == 1||contour_type == 2)
+				// CLOSED_PLANAR, OPEN_PLANAR, CLOSEDPLANAR_XOR
+				if (contour_type == 1 || contour_type == 2 || contour_type == 5)
 				{
 					for (int k = 0; k < c->dpoints.size(); ++k)
 					{
@@ -714,7 +714,7 @@ void ContourUtils::contours_build_path(
 							path.lineTo(pf_.u, pf_.v);
 						}
 					}
-					if (contour_type == 1) path.closeSubpath();
+					if (contour_type == 1 || contour_type == 5) path.closeSubpath();
 				}
 				// POINT
 				else if (contour_type == 4)
