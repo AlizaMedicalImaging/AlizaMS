@@ -507,6 +507,46 @@ const char * const UIDsStrings[][2] = {
   //
   /////////////////////////////////////////////////////////////////////////
 
+  //////////////////////////////////////////////
+  //
+  // 2021d
+  //
+  { "1.2.840.10008.1.2.1.98", "Encapsulated Uncompressed Explicit VR Little Endian" },
+  { "1.2.840.10008.1.2.7.1", "SMPTE ST 2110-20 Uncompressed Progressive Active Video" },
+  { "1.2.840.10008.1.2.7.2", "SMPTE ST 2110-20 Uncompressed Interlaced Active Video" },
+  { "1.2.840.10008.1.2.7.3", "SMPTE ST 2110-30 PCM Digital Audio" },
+  { "1.2.840.10008.5.1.4.1.1.9.7.1", "Routine Scalp Electroencephalogram Waveform Storage" },
+  { "1.2.840.10008.5.1.4.1.1.9.7.2", "Electromyogram Waveform Storage" },
+  { "1.2.840.10008.5.1.4.1.1.9.7.3", "Electrooculogram Waveform Storage" },
+  { "1.2.840.10008.5.1.4.1.1.9.7.4", "Sleep Electroencephalogram Waveform Storage" },
+  { "1.2.840.10008.5.1.4.1.1.9.8.1", "Body Position Waveform Storage" },
+  { "1.2.840.10008.5.1.4.1.1.77.1.7", "Dermoscopic Photography Image Storage" },
+  { "1.2.840.10008.5.1.4.1.1.88.76", "Enhanced X-Ray Radiation Dose SR Storage" },
+  { "1.2.840.10008.5.1.4.1.1.104.4", "Encapsulated OBJ Storage" },
+  { "1.2.840.10008.5.1.4.1.1.104.5", "Encapsulated MTL Storage" },
+  { "1.2.840.10008.5.1.4.1.1.200.7", "XA Defined Procedure Protocol Storage" },
+  { "1.2.840.10008.5.1.4.1.1.200.8", "XA Performed Procedure Protocol Storage" },
+  { "1.2.840.10008.5.1.4.1.1.481.12", "RT Radiation Set Storage" },
+  { "1.2.840.10008.5.1.4.1.1.481.13", "C-Arm Photon-Electron Radiation Storage" },
+  { "1.2.840.10008.5.1.4.1.1.481.14", "Tomotherapeutic Radiation Storage" },
+  { "1.2.840.10008.5.1.4.1.1.481.15", "Robotic-Arm Radiation Storage" },
+  { "1.2.840.10008.5.1.4.1.1.481.16", "RT Radiation Record Set Storage" },
+  { "1.2.840.10008.5.1.4.1.1.481.17", "RT Radiation Salvage Record Storage" },
+  { "1.2.840.10008.5.1.4.1.1.481.18", "Tomotherapeutic Radiation Record Storage" },
+  { "1.2.840.10008.5.1.4.1.1.481.19", "C-Arm Photon-Electron Radiation Record Storage" },
+  { "1.2.840.10008.5.1.4.1.1.481.20", "Robotic Radiation Record Storage" },
+  { "1.2.840.10008.5.1.4.1.1.481.21", "RT Radiation Set Delivery Instruction Storage" },
+  { "1.2.840.10008.5.1.4.1.1.481.22", "RT Treatment Preparation Storage" },
+  { "1.2.840.10008.5.1.4.34.6.5", "Unified Procedure Step - Query SOP Class" },
+  { "1.2.840.10008.10.1", "Video Endoscopic Image Real-Time Communication" },
+  { "1.2.840.10008.10.2", "Video Photographic Image Real-Time Communication" },
+  { "1.2.840.10008.10.3", "Audio Waveform Real-Time Communication" },
+  { "1.2.840.10008.10.4", "Rendition Selection Document Real-Time Communication" },
+  //
+  //
+  //
+  //////////////////////////////////////////////
+
   { NULL, NULL }
 };
 

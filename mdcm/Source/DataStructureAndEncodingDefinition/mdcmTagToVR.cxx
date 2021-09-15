@@ -25,7 +25,6 @@
 =========================================================================*/
 #include "mdcmVR.h"
 #include "mdcmVM.h"
-#include "mdcmStaticAssert.h"
 
 namespace mdcm
 {
@@ -149,6 +148,26 @@ GetVRFromTag(Tag const & t)
       return VR::AE;
     case 0x00020018:
       return VR::AE;
+    case 0x00020026:
+      return VR::UR;
+    case 0x00020027:
+      return VR::UR;
+    case 0x00020028:
+      return VR::UR;
+    case 0x00020031:
+      return VR::OB;
+    case 0x00020032:
+      return VR::UI;
+    case 0x00020033:
+      return VR::UI;
+    case 0x00020035:
+      return VR::OB;
+    case 0x00020036:
+      return VR::OB;
+    case 0x00020037:
+      return VR::UL;
+    case 0x00020038:
+      return VR::FD;
     case 0x00020100:
       return VR::UI;
     case 0x00020102:
@@ -579,6 +598,8 @@ GetVRFromTag(Tag const & t)
       return VR::SQ;
     case 0x00083001:
       return VR::SQ;
+    case 0x00083002:
+      return VR::UI;
     case 0x00083010:
       return VR::UI;
     case 0x00083011:
@@ -966,6 +987,10 @@ GetVRFromTag(Tag const & t)
     case 0x00143080:
       return VR::OB;
     case 0x00143099:
+      return VR::LT;
+    case 0x00143100:
+      return VR::LT;
+    case 0x00143101:
       return VR::LT;
     case 0x00144002:
       return VR::SQ;
@@ -1411,6 +1436,16 @@ GetVRFromTag(Tag const & t)
       return VR::DT;
     case 0x0016008e:
       return VR::IS;
+    case 0x00161001:
+      return VR::CS;
+    case 0x00161002:
+      return VR::DS;
+    case 0x00161003:
+      return VR::CS;
+    case 0x00161004:
+      return VR::CS;
+    case 0x00161005:
+      return VR::DS;
     case 0x00180010:
       return VR::LO;
     case 0x00180012:
@@ -1537,6 +1572,8 @@ GetVRFromTag(Tag const & t)
       return VR::UT;
     case 0x0018100a:
       return VR::SQ;
+    case 0x0018100b:
+      return VR::UI;
     case 0x00181010:
       return VR::LO;
     case 0x00181011:
@@ -1753,6 +1790,42 @@ GetVRFromTag(Tag const & t)
       return VR::LO;
     case 0x001811a5:
       return VR::DS;
+    case 0x001811b0:
+      return VR::LO;
+    case 0x001811b1:
+      return VR::LO;
+    case 0x001811b2:
+      return VR::CS;
+    case 0x001811b3:
+      return VR::CS;
+    case 0x001811b4:
+      return VR::CS;
+    case 0x001811b5:
+      return VR::IS;
+    case 0x001811b6:
+      return VR::CS;
+    case 0x001811b7:
+      return VR::FD;
+    case 0x001811b8:
+      return VR::SQ;
+    case 0x001811b9:
+      return VR::FD;
+    case 0x001811ba:
+      return VR::SQ;
+    case 0x001811bb:
+      return VR::LO;
+    case 0x001811bc:
+      return VR::SQ;
+    case 0x001811bd:
+      return VR::FD;
+    case 0x001811be:
+      return VR::CS;
+    case 0x001811bf:
+      return VR::SQ;
+    case 0x001811c0:
+      return VR::CS;
+    case 0x001811c1:
+      return VR::SQ;
     case 0x00181200:
       return VR::DA;
     case 0x00181201:
@@ -1871,6 +1944,24 @@ GetVRFromTag(Tag const & t)
       return VR::US;
     case 0x00181624:
       return VR::US;
+    case 0x00181630:
+      return VR::CS;
+    case 0x00181631:
+      return VR::FD;
+    case 0x00181632:
+      return VR::FD;
+    case 0x00181633:
+      return VR::FD;
+    case 0x00181634:
+      return VR::FD;
+    case 0x00181635:
+      return VR::FD;
+    case 0x00181636:
+      return VR::FD;
+    case 0x00181637:
+      return VR::UL;
+    case 0x00181638:
+      return VR::OF;
     case 0x00181700:
       return VR::CS;
     case 0x00181702:
@@ -1943,6 +2034,8 @@ GetVRFromTag(Tag const & t)
       return VR::SH;
     case 0x00185010:
       return VR::LO;
+    case 0x00185011:
+      return VR::SQ;
     case 0x00185012:
       return VR::DS;
     case 0x00185020:
@@ -2071,6 +2164,8 @@ GetVRFromTag(Tag const & t)
       return VR::FL;
     case 0x00186060:
       return VR::FL;
+    case 0x00186070:
+      return VR::US;
     case 0x00187000:
       return VR::CS;
     case 0x00187001:
@@ -4417,6 +4512,30 @@ GetVRFromTag(Tag const & t)
       return VR::LO;
     case 0x00324000:
       return VR::LT;
+    case 0x00340001:
+      return VR::SQ;
+    case 0x00340002:
+      return VR::OB;
+    case 0x00340003:
+      return VR::UI;
+    case 0x00340004:
+      return VR::UL;
+    case 0x00340005:
+      return VR::OB;
+    case 0x00340007:
+      return VR::OB;
+    case 0x00340008:
+      return VR::CS;
+    case 0x00340009:
+      return VR::SQ;
+    case 0x0034000a:
+      return VR::SQ;
+    case 0x0034000b:
+      return VR::SQ;
+    case 0x0034000c:
+      return VR::CS;
+    case 0x0034000d:
+      return VR::SQ;
     case 0x00380004:
       return VR::SQ;
     case 0x00380008:
@@ -4552,6 +4671,20 @@ GetVRFromTag(Tag const & t)
     case 0x003a0301:
       return VR::IS;
     case 0x003a0302:
+      return VR::CS;
+    case 0x003a0310:
+      return VR::UI;
+    case 0x003a0311:
+      return VR::DS;
+    case 0x003a0312:
+      return VR::SQ;
+    case 0x003a0313:
+      return VR::DS;
+    case 0x003a0314:
+      return VR::DT;
+    case 0x003a0315:
+      return VR::DS;
+    case 0x003a0316:
       return VR::CS;
     case 0x00400001:
       return VR::AE;
@@ -4955,6 +5088,8 @@ GetVRFromTag(Tag const & t)
       return VR::DT;
     case 0x0040a032:
       return VR::DT;
+    case 0x0040a033:
+      return VR::DT;
     case 0x0040a040:
       return VR::CS;
     case 0x0040a043:
@@ -5145,6 +5280,22 @@ GetVRFromTag(Tag const & t)
       return VR::SQ;
     case 0x0040a744:
       return VR::SQ;
+    case 0x0040a801:
+      return VR::SQ;
+    case 0x0040a802:
+      return VR::UL;
+    case 0x0040a803:
+      return VR::UL;
+    case 0x0040a804:
+      return VR::UL;
+    case 0x0040a805:
+      return VR::UL;
+    case 0x0040a806:
+      return VR::SQ;
+    case 0x0040a807:
+      return VR::SQ;
+    case 0x0040a808:
+      return VR::SQ;
     case 0x0040a992:
       return VR::ST;
     case 0x0040b020:
@@ -5201,6 +5352,8 @@ GetVRFromTag(Tag const & t)
       return VR::SQ;
     case 0x00420014:
       return VR::LO;
+    case 0x00420015:
+      return VR::UL;
     case 0x00440001:
       return VR::ST;
     case 0x00440002:
@@ -5867,6 +6020,8 @@ GetVRFromTag(Tag const & t)
       return VR::FL;
     case 0x00660021:
       return VR::OF;
+    case 0x00660022:
+      return VR::OD;
     case 0x00660023:
       return VR::OW;
     case 0x00660024:
@@ -6095,6 +6250,42 @@ GetVRFromTag(Tag const & t)
       return VR::CS;
     case 0x00687003:
       return VR::SQ;
+    case 0x00687004:
+      return VR::UI;
+    case 0x00687005:
+      return VR::UR;
+    case 0x006a0001:
+      return VR::CS;
+    case 0x006a0002:
+      return VR::SQ;
+    case 0x006a0003:
+      return VR::UI;
+    case 0x006a0005:
+      return VR::LO;
+    case 0x006a0006:
+      return VR::UT;
+    case 0x006a0007:
+      return VR::CS;
+    case 0x006a0008:
+      return VR::SQ;
+    case 0x006a0009:
+      return VR::SQ;
+    case 0x006a000a:
+      return VR::SQ;
+    case 0x006a000b:
+      return VR::SQ;
+    case 0x006a000c:
+      return VR::UL;
+    case 0x006a000d:
+      return VR::CS;
+    case 0x006a000e:
+      return VR::SH;
+    case 0x006a000f:
+      return VR::CS;
+    case 0x006a0010:
+      return VR::FD;
+    case 0x006a0011:
+      return VR::OL;
     case 0x00700001:
       return VR::SQ;
     case 0x00700002:
@@ -6585,6 +6776,12 @@ GetVRFromTag(Tag const & t)
       return VR::UI;
     case 0x00720080:
       return VR::SQ;
+    case 0x00720081:
+      return VR::OV;
+    case 0x00720082:
+      return VR::SV;
+    case 0x00720083:
+      return VR::UV;
     case 0x00720100:
       return VR::US;
     case 0x00720102:
@@ -7077,6 +7274,10 @@ GetVRFromTag(Tag const & t)
       return VR::OB;
     case 0x04000550:
       return VR::SQ;
+    case 0x04000551:
+      return VR::SQ;
+    case 0x04000552:
+      return VR::OB;
     case 0x04000561:
       return VR::SQ;
     case 0x04000562:
@@ -7481,6 +7682,8 @@ GetVRFromTag(Tag const & t)
       return VR::IS;
     case 0x30060049:
       return VR::IS;
+    case 0x3006004a:
+      return VR::SQ;
     case 0x30060050:
       return VR::DS;
     case 0x30060080:
@@ -7525,6 +7728,12 @@ GetVRFromTag(Tag const & t)
       return VR::DS;
     case 0x300600c8:
       return VR::LO;
+    case 0x300600c9:
+      return VR::SQ;
+    case 0x300600ca:
+      return VR::SQ;
+    case 0x300600cb:
+      return VR::SQ;
     case 0x30080010:
       return VR::SQ;
     case 0x30080012:
@@ -8263,6 +8472,8 @@ GetVRFromTag(Tag const & t)
       return VR::DS;
     case 0x300a02a0:
       return VR::DS;
+    case 0x300a02a1:
+      return VR::IS;
     case 0x300a02a2:
       return VR::IS;
     case 0x300a02a4:
@@ -8427,6 +8638,8 @@ GetVRFromTag(Tag const & t)
       return VR::FL;
     case 0x300a0398:
       return VR::FL;
+    case 0x300a0399:
+      return VR::FL;
     case 0x300a039a:
       return VR::IS;
     case 0x300a03a0:
@@ -8463,6 +8676,8 @@ GetVRFromTag(Tag const & t)
       return VR::IS;
     case 0x300a0425:
       return VR::FL;
+    case 0x300a0426:
+      return VR::DS;
     case 0x300a0431:
       return VR::SQ;
     case 0x300a0432:
@@ -8514,6 +8729,420 @@ GetVRFromTag(Tag const & t)
     case 0x300a0511:
       return VR::CS;
     case 0x300a0512:
+      return VR::CS;
+    case 0x300a0600:
+      return VR::US;
+    case 0x300a0601:
+      return VR::US;
+    case 0x300a0602:
+      return VR::US;
+    case 0x300a0603:
+      return VR::US;
+    case 0x300a0604:
+      return VR::US;
+    case 0x300a0605:
+      return VR::US;
+    case 0x300a0606:
+      return VR::US;
+    case 0x300a0607:
+      return VR::US;
+    case 0x300a0608:
+      return VR::LO;
+    case 0x300a0609:
+      return VR::UI;
+    case 0x300a060a:
+      return VR::SQ;
+    case 0x300a060b:
+      return VR::US;
+    case 0x300a060c:
+      return VR::US;
+    case 0x300a060d:
+      return VR::FD;
+    case 0x300a060e:
+      return VR::US;
+    case 0x300a060f:
+      return VR::CS;
+    case 0x300a0610:
+      return VR::SQ;
+    case 0x300a0611:
+      return VR::LO;
+    case 0x300a0612:
+      return VR::FD;
+    case 0x300a0613:
+      return VR::FD;
+    case 0x300a0614:
+      return VR::SQ;
+    case 0x300a0615:
+      return VR::LO;
+    case 0x300a0616:
+      return VR::SQ;
+    case 0x300a0617:
+      return VR::SQ;
+    case 0x300a0618:
+      return VR::SQ;
+    case 0x300a0619:
+      return VR::LO;
+    case 0x300a061a:
+      return VR::CS;
+    case 0x300a061b:
+      return VR::CS;
+    case 0x300a061c:
+      return VR::SQ;
+    case 0x300a061d:
+      return VR::CS;
+    case 0x300a061e:
+      return VR::FD;
+    case 0x300a061f:
+      return VR::SQ;
+    case 0x300a0620:
+      return VR::SQ;
+    case 0x300a0621:
+      return VR::SQ;
+    case 0x300a0622:
+      return VR::US;
+    case 0x300a0623:
+      return VR::LO;
+    case 0x300a0624:
+      return VR::FD;
+    case 0x300a0625:
+      return VR::FD;
+    case 0x300a0626:
+      return VR::FD;
+    case 0x300a0627:
+      return VR::FD;
+    case 0x300a0628:
+      return VR::FD;
+    case 0x300a0629:
+      return VR::SQ;
+    case 0x300a062a:
+      return VR::LO;
+    case 0x300a062b:
+      return VR::SQ;
+    case 0x300a062c:
+      return VR::FD;
+    case 0x300a062d:
+      return VR::SQ;
+    case 0x300a062e:
+      return VR::FD;
+    case 0x300a062f:
+      return VR::SQ;
+    case 0x300a0630:
+      return VR::SQ;
+    case 0x300a0631:
+      return VR::SQ;
+    case 0x300a0632:
+      return VR::SQ;
+    case 0x300a0634:
+      return VR::FD;
+    case 0x300a0635:
+      return VR::SQ;
+    case 0x300a0636:
+      return VR::US;
+    case 0x300a0637:
+      return VR::CS;
+    case 0x300a0638:
+      return VR::CS;
+    case 0x300a0639:
+      return VR::CS;
+    case 0x300a063a:
+      return VR::SQ;
+    case 0x300a063b:
+      return VR::SQ;
+    case 0x300a063c:
+      return VR::FD;
+    case 0x300a063d:
+      return VR::FD;
+    case 0x300a063e:
+      return VR::SQ;
+    case 0x300a063f:
+      return VR::SQ;
+    case 0x300a0640:
+      return VR::FD;
+    case 0x300a0641:
+      return VR::US;
+    case 0x300a0642:
+      return VR::FD;
+    case 0x300a0643:
+      return VR::FD;
+    case 0x300a0644:
+      return VR::SQ;
+    case 0x300a0645:
+      return VR::FD;
+    case 0x300a0646:
+      return VR::SQ;
+    case 0x300a0647:
+      return VR::SQ;
+    case 0x300a0648:
+      return VR::US;
+    case 0x300a0649:
+      return VR::FD;
+    case 0x300a064a:
+      return VR::FD;
+    case 0x300a064b:
+      return VR::FD;
+    case 0x300a064c:
+      return VR::SQ;
+    case 0x300a064d:
+      return VR::SQ;
+    case 0x300a064e:
+      return VR::CS;
+    case 0x300a064f:
+      return VR::CS;
+    case 0x300a0650:
+      return VR::UI;
+    case 0x300a0651:
+      return VR::SQ;
+    case 0x300a0652:
+      return VR::FD;
+    case 0x300a0653:
+      return VR::FD;
+    case 0x300a0654:
+      return VR::FD;
+    case 0x300a0655:
+      return VR::US;
+    case 0x300a0656:
+      return VR::SQ;
+    case 0x300a0657:
+      return VR::US;
+    case 0x300a0658:
+      return VR::SQ;
+    case 0x300a0659:
+      return VR::SQ;
+    case 0x300a065a:
+      return VR::SQ;
+    case 0x300a065b:
+      return VR::SQ;
+    case 0x300a065c:
+      return VR::CS;
+    case 0x300a065d:
+      return VR::SQ;
+    case 0x300a065e:
+      return VR::US;
+    case 0x300a065f:
+      return VR::US;
+    case 0x300a0660:
+      return VR::SQ;
+    case 0x300a0661:
+      return VR::US;
+    case 0x300a0662:
+      return VR::SQ;
+    case 0x300a0663:
+      return VR::CS;
+    case 0x300a0664:
+      return VR::OF;
+    case 0x300a0665:
+      return VR::OF;
+    case 0x300a0666:
+      return VR::FD;
+    case 0x300a0667:
+      return VR::SQ;
+    case 0x300a0668:
+      return VR::SQ;
+    case 0x300a0669:
+      return VR::FD;
+    case 0x300a066a:
+      return VR::SQ;
+    case 0x300a066b:
+      return VR::OF;
+    case 0x300a066c:
+      return VR::CS;
+    case 0x300a066d:
+      return VR::FD;
+    case 0x300a066e:
+      return VR::FD;
+    case 0x300a066f:
+      return VR::SQ;
+    case 0x300a0670:
+      return VR::US;
+    case 0x300a0671:
+      return VR::SQ;
+    case 0x300a0672:
+      return VR::US;
+    case 0x300a0673:
+      return VR::SQ;
+    case 0x300a0674:
+      return VR::US;
+    case 0x300a0675:
+      return VR::UI;
+    case 0x300a0676:
+      return VR::ST;
+    case 0x300a0677:
+      return VR::SQ;
+    case 0x300a0678:
+      return VR::SQ;
+    case 0x300a0679:
+      return VR::FD;
+    case 0x300a067a:
+      return VR::FD;
+    case 0x300a067b:
+      return VR::SQ;
+    case 0x300a067c:
+      return VR::SH;
+    case 0x300a067d:
+      return VR::ST;
+    case 0x300a067e:
+      return VR::SQ;
+    case 0x300a067f:
+      return VR::SQ;
+    case 0x300a0680:
+      return VR::DS;
+    case 0x300a0681:
+      return VR::DS;
+    case 0x300a0682:
+      return VR::DS;
+    case 0x300a0683:
+      return VR::SQ;
+    case 0x300a0684:
+      return VR::SQ;
+    case 0x300a0685:
+      return VR::US;
+    case 0x300a0686:
+      return VR::SQ;
+    case 0x300a0687:
+      return VR::US;
+    case 0x300a0688:
+      return VR::FD;
+    case 0x300a0689:
+      return VR::SQ;
+    case 0x300a068a:
+      return VR::SQ;
+    case 0x300a0700:
+      return VR::UI;
+    case 0x300a0701:
+      return VR::CS;
+    case 0x300a0702:
+      return VR::SQ;
+    case 0x300a0703:
+      return VR::SQ;
+    case 0x300a0704:
+      return VR::US;
+    case 0x300a0705:
+      return VR::US;
+    case 0x300a0706:
+      return VR::CS;
+    case 0x300a0707:
+      return VR::CS;
+    case 0x300a0708:
+      return VR::CS;
+    case 0x300a0709:
+      return VR::CS;
+    case 0x300a0714:
+      return VR::CS;
+    case 0x300a0715:
+      return VR::SQ;
+    case 0x300a0716:
+      return VR::SQ;
+    case 0x300a0722:
+      return VR::SQ;
+    case 0x300a0723:
+      return VR::CS;
+    case 0x300a0730:
+      return VR::ST;
+    case 0x300a0731:
+      return VR::SQ;
+    case 0x300a0732:
+      return VR::CS;
+    case 0x300a0733:
+      return VR::SQ;
+    case 0x300a0734:
+      return VR::ST;
+    case 0x300a0735:
+      return VR::ST;
+    case 0x300a0736:
+      return VR::DT;
+    case 0x300a073a:
+      return VR::DT;
+    case 0x300a073b:
+      return VR::US;
+    case 0x300a073e:
+      return VR::SQ;
+    case 0x300a073f:
+      return VR::SQ;
+    case 0x300a0740:
+      return VR::SQ;
+    case 0x300a0741:
+      return VR::DT;
+    case 0x300a0742:
+      return VR::ST;
+    case 0x300a0743:
+      return VR::SQ;
+    case 0x300a0744:
+      return VR::SQ;
+    case 0x300a0745:
+      return VR::SQ;
+    case 0x300a0746:
+      return VR::SQ;
+    case 0x300a0760:
+      return VR::DT;
+    case 0x300a0761:
+      return VR::SQ;
+    case 0x300a0762:
+      return VR::SQ;
+    case 0x300a0772:
+      return VR::SQ;
+    case 0x300a0773:
+      return VR::US;
+    case 0x300a0774:
+      return VR::SQ;
+    case 0x300a0780:
+      return VR::SQ;
+    case 0x300a0782:
+      return VR::US;
+    case 0x300a0783:
+      return VR::ST;
+    case 0x300a0784:
+      return VR::SQ;
+    case 0x300a0785:
+      return VR::UI;
+    case 0x300a0786:
+      return VR::US;
+    case 0x300a0787:
+      return VR::SQ;
+    case 0x300a0788:
+      return VR::SQ;
+    case 0x300a0789:
+      return VR::SQ;
+    case 0x300a078a:
+      return VR::SQ;
+    case 0x300a078b:
+      return VR::SQ;
+    case 0x300a078c:
+      return VR::SQ;
+    case 0x300a078d:
+      return VR::SQ;
+    case 0x300a078e:
+      return VR::LT;
+    case 0x300a078f:
+      return VR::SQ;
+    case 0x300a0790:
+      return VR::SQ;
+    case 0x300a0791:
+      return VR::SQ;
+    case 0x300a0792:
+      return VR::LT;
+    case 0x300a0793:
+      return VR::SQ;
+    case 0x300a0794:
+      return VR::LT;
+    case 0x300a0795:
+      return VR::US;
+    case 0x300a0796:
+      return VR::US;
+    case 0x300a0797:
+      return VR::SQ;
+    case 0x300a0798:
+      return VR::SQ;
+    case 0x300a0799:
+      return VR::SQ;
+    case 0x300a079a:
+      return VR::LO;
+    case 0x300a079b:
+      return VR::FD;
+    case 0x300a079c:
+      return VR::SQ;
+    case 0x300a079d:
+      return VR::SQ;
+    case 0x300a079e:
       return VR::CS;
     case 0x300c0002:
       return VR::SQ;
@@ -8682,6 +9311,8 @@ GetVRFromTag(Tag const & t)
     case 0x3010002d:
       return VR::LO;
     case 0x3010002e:
+      return VR::SQ;
+    case 0x3010002f:
       return VR::SQ;
     case 0x30100030:
       return VR::SQ;
@@ -8859,6 +9490,30 @@ GetVRFromTag(Tag const & t)
       return VR::SQ;
     case 0x30100088:
       return VR::SQ;
+    case 0x30100089:
+      return VR::SQ;
+    case 0x30100090:
+      return VR::CS;
+    case 0x30100091:
+      return VR::SQ;
+    case 0x30100092:
+      return VR::UL;
+    case 0x30100093:
+      return VR::FD;
+    case 0x30100094:
+      return VR::FD;
+    case 0x30100095:
+      return VR::FD;
+    case 0x30100096:
+      return VR::FD;
+    case 0x30100097:
+      return VR::SQ;
+    case 0x30100098:
+      return VR::SQ;
+    case 0x30100099:
+      return VR::FD;
+    case 0x3010009a:
+      return VR::FD;
     case 0x40000010:
       return VR::LT;
     case 0x40004000:
