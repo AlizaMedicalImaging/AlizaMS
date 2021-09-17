@@ -65,7 +65,7 @@ public:
   }
   SequenceOfFragments()
     : Table()
-    , SequenceLengthField(0xFFFFFFFF)
+    , SequenceLengthField(0xffffffff)
   {}
   VL
   GetLength() const override
@@ -90,7 +90,7 @@ public:
   bool
   GetFragBuffer(unsigned int, char *, unsigned long long &) const;
   SizeType
-                   GetNumberOfFragments() const;
+  GetNumberOfFragments() const;
   const Fragment & GetFragment(SizeType) const;
   bool
   WriteBuffer(std::ostream &) const;

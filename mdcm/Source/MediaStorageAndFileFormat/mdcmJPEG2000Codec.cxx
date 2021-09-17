@@ -2019,7 +2019,7 @@ JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size, Transfe
   {
     assert(ts.IsLossy());
   }
-  if (ts.IsLossless() && !ts.IsLossy())
+  if (!ts.IsLossy())
   {
     assert(this->GetPhotometricInterpretation().IsLossless());
   }

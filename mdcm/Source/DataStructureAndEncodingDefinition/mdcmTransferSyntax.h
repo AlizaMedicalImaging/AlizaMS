@@ -27,21 +27,6 @@
 namespace mdcm
 {
 
-/**
- * Class to manipulate Transfer Syntax
- * TRANSFER SYNTAX (Standard and Private): A set of encoding rules that allow
- * Application Entities to unambiguously negotiate the encoding techniques
- * (e.g., Data Element structure, byte ordering, compression) they are able to
- * support, thereby allowing these Application Entities to communicate.
- *
- * Todo: The implementation is completely retarded -> see mdcm::UIDs for a replacement
- * We need: IsSupported
- * We need preprocess of raw/xml file
- * We need GetFullName()
- *
- * Need a notion of Private Syntax. As defined in PS 3.5. Section 9.2
- *
- */
 class MDCM_EXPORT TransferSyntax
 {
 public:
@@ -81,6 +66,7 @@ public:
     MPEG2MainProfileHighLevel,
     MPEG4AVCH264HighProfileLevel4_1,
     MPEG4AVCH264BDcompatibleHighProfileLevel4_1,
+    //EncapsulatedUncompressedExplicitVRLittleEndian,
     TS_END
   } TSType;
   static const char * GetTSString(TSType);
@@ -88,9 +74,8 @@ public:
   GetTSType(const char *);
   NegociatedType
   GetNegociatedType() const;
-  // Return the SwapCode associated with the Transfer Syntax. Be careful with
-  // the special GE private syntax the DataSet is written in little endian but
-  // the Pixel Data is in Big Endian.
+  // Caution with the GE private syntax: the dataset is written
+  // little-endian, but the pixel data is big-endian.
   SwapCode
   GetSwapCode() const;
   bool
@@ -112,10 +97,6 @@ public:
   IsEncapsulated() const;
   bool
   IsLossy() const;
-  bool
-  IsLossless() const;
-  bool
-  CanStoreLossy() const;
   const char *
   GetString() const
   {
@@ -125,10 +106,10 @@ public:
   operator<<(std::ostream &, const TransferSyntax &);
 
 private:
-  bool   IsImplicit(TSType) const;
-  bool   IsExplicit(TSType) const;
-  bool   IsLittleEndian(TSType) const;
-  bool   IsBigEndian(TSType) const;
+  bool IsImplicit(TSType) const;
+  bool IsExplicit(TSType) const;
+  bool IsLittleEndian(TSType) const;
+  bool IsBigEndian(TSType) const;
   TSType TSField;
 };
 

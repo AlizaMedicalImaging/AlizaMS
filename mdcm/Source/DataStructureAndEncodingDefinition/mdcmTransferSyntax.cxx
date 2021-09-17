@@ -48,6 +48,7 @@ static const char * TSStrings[] = {
   "1.2.840.10008.1.2.4.101",    // MPEG2 Main Profile @ High Level
   "1.2.840.10008.1.2.4.102",    // MPEG-4 AVC/H.264 High Profile / Level 4.1
   "1.2.840.10008.1.2.4.103",    // MPEG-4 AVC/H.264 BD-compatible High Profile / Level 4.1
+  //"1.2.840.10008.1.2.1.98",     // Encapsulated Uncompressed Explicit VR Little Endian
   "Unknown Transfer Syntax",    // Unknown
   NULL
 };
@@ -111,7 +112,6 @@ TransferSyntax::IsExplicit() const
     return false;
   return !IsImplicit();
 }
-
 bool
 TransferSyntax::IsLossy() const
 {
@@ -126,40 +126,6 @@ TransferSyntax::IsLossy() const
   return false;
 }
 
-// This function really test the kind of compression algorithm and the matching
-// transfer syntax.  If you use the JPEG compression algorithm (ITU-T T.81,
-// ISO/IEC IS 10918-1), You will not be able to declare a lossy compress pixel
-// data using JPEGLosslessProcess14_1 For the same reason using J2K (ITU-T
-// T.800, ISO/IEC IS 15444-1), you shoult not be allowed to stored an
-// irreversible wavelet compressed pixel data in a file declared with transfer
-// syntax JPEG2000Lossless.
-// Same goes for JPEG-LS (ITU-T T.87, ISO/IEC IS 14495-1), and to some extent
-// RLE which does not even allow lossy compression.
-bool
-TransferSyntax::CanStoreLossy() const
-{
-  if (TSField == JPEGLosslessProcess14 || TSField == JPEGLosslessProcess14_1 || TSField == JPEGLSLossless ||
-      TSField == JPEG2000Lossless || TSField == JPEG2000Part2Lossless || TSField == RLELossless)
-  {
-    return false;
-  }
-  return true;
-}
-
-bool
-TransferSyntax::IsLossless() const
-{
-  if (TSField == JPEGBaselineProcess1 || TSField == JPEGExtendedProcess2_4 || TSField == JPEGExtendedProcess3_5 ||
-      TSField == JPEGSpectralSelectionProcess6_8 || TSField == JPEGFullProgressionProcess10_12 ||
-      TSField == MPEG2MainProfile || TSField == MPEG2MainProfileHighLevel ||
-      TSField == MPEG4AVCH264HighProfileLevel4_1 || TSField == MPEG4AVCH264BDcompatibleHighProfileLevel4_1)
-  {
-    return false;
-  }
-  return true;
-}
-
-// By implementation those two functions form a partition
 bool
 TransferSyntax::IsExplicit(TSType ts) const
 {
@@ -216,7 +182,7 @@ TransferSyntax::IsEncoded() const
 bool
 TransferSyntax::IsEncapsulated() const
 {
-  bool ret = false;
+  bool r = false;
   switch (TSField)
   {
     case JPEGBaselineProcess1:
@@ -238,12 +204,13 @@ TransferSyntax::IsEncapsulated() const
     case MPEG2MainProfileHighLevel:
     case MPEG4AVCH264HighProfileLevel4_1:
     case MPEG4AVCH264BDcompatibleHighProfileLevel4_1:
-      ret = true;
+    //case EncapsulatedUncompressedExplicitVRLittleEndian: TODO
+      r = true;
       break;
     default:
       break;
   }
-  return ret;
+  return r;
 }
 
 } // end namespace mdcm

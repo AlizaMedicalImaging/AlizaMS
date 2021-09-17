@@ -384,7 +384,6 @@ JPEGCodec::Code(DataElement const & in, DataElement & out)
 {
   out = in;
   SmartPointer<SequenceOfFragments> sq = new SequenceOfFragments;
-  const Tag                         itemStart(0xfffe, 0xe000);
   const ByteValue *                 bv = in.GetByteValue();
   if (!bv)
     return false;

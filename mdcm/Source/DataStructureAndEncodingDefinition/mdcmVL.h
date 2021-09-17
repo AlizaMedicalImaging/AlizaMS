@@ -31,7 +31,8 @@ namespace mdcm
 
 /**
  * Value Length
- * This is a 4bytes value! Do not try to use it for 2bytes value length
+ *
+ * This is a 4bytes value, do not use it for 2 bytes value length!
  */
 class MDCM_EXPORT VL
 {
@@ -44,24 +45,24 @@ public:
   static uint32_t
   GetVL32Max()
   {
-    return 0xFFFFFFFF;
+    return 0xffffffff;
   }
   static uint16_t
   GetVL16Max()
   {
-    return 0xFFFF;
+    return 0xffff;
   }
 
   bool
   IsUndefined() const
   {
-    return ValueLength == 0xFFFFFFFF;
+    return ValueLength == 0xffffffff;
   }
 
   void
   SetToUndefined()
   {
-    ValueLength = 0xFFFFFFFF;
+    ValueLength = 0xffffffff;
   }
 
   bool
@@ -121,7 +122,7 @@ public:
     is.read((char *)(&copy), sizeof(uint16_t));
     TSwap::SwapArray(&copy, 1);
     ValueLength = copy;
-    assert(ValueLength <= 65535 /*UINT16_MAX*/); // ?? doh !
+    assert(ValueLength <= 65535 /*UINT16_MAX*/);
     return is;
   }
 
