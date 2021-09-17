@@ -66,7 +66,7 @@ GraphicsView::GraphicsView(GraphicsWidget * p)
 	image_item->setZValue(-1.0);
 	scene_->addItem(image_item);
 #endif
-	setViewportUpdateMode(BoundingRectViewportUpdate);
+	setViewportUpdateMode(FullViewportUpdate);
 	setTransformationAnchor(AnchorUnderMouse);
 	setDragMode(QGraphicsView::ScrollHandDrag);
 	//
