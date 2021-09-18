@@ -555,6 +555,7 @@ static void zero_sq_recurs__(
 	}
 }
 
+#if 0
 static void remove_date_time_recurs__(
 	mdcm::DataSet & ds,
 	const std::set<mdcm::Tag> & ts,
@@ -613,6 +614,7 @@ static void remove_date_time_recurs__(
 		}
 	}
 }
+#endif
 
 static bool find_time_less_1h_recurs__(
 	const mdcm::DataSet & ds,
