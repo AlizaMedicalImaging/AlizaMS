@@ -167,7 +167,6 @@ option(MDCM_USE_SYSTEM_OPENJPEG "Use system OpenJPEG" OFF)
 
 option(MDCM_USE_SYSTEM_CHARLS "Use system CharLS" OFF)
 
-# TODO try system, if possible
 set(MDCM_LJPEG_LIBRARIES mdcmjpeg8 mdcmjpeg12 mdcmjpeg16)
 
 if(MDCM_USE_SYSTEM_CHARLS)
