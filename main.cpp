@@ -231,27 +231,19 @@ int main(int argc, char *argv[])
 #endif
 	//
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-#ifdef __APPLE__
-	QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
-#else
-#ifdef __arm__
-	QApplication::setAttribute(Qt::AA_UseDesktopOpenGLES);
+#ifdef USE_OPENGLES
+	QApplication::setAttribute(Qt::AA_UseOpenGLES); // FIXME
 #else
 	QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
-#endif
 #endif
 #ifdef USE_SET_DEFAULT_GL_FORMAT
 	if (!force_disable_opengl)
 	{
 		QSurfaceFormat format;
-#ifdef __APPLE__
-		format.setRenderableType(QSurfaceFormat::OpenGL);
-#else
-#ifdef __arm__
+#ifdef USE_OPENGLES
 		format.setRenderableType(QSurfaceFormat::OpenGLES);
 #else
 		format.setRenderableType(QSurfaceFormat::OpenGL);
-#endif
 #endif
 #ifdef USE_CORE_3_2_PROFILE
 #ifdef USE_GL_MAJOR_3_MINOR_2

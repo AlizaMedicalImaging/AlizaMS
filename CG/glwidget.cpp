@@ -226,14 +226,10 @@ GLWidget::GLWidget()
 #ifdef USE_SET_GL_FORMAT
 #ifndef USE_SET_DEFAULT_GL_FORMAT
 	QSurfaceFormat format;
-#ifdef __APPLE__
-	format.setRenderableType(QSurfaceFormat::OpenGL);
-#else
-#ifdef __arm__
+#ifdef USE_OPENGLES
 	format.setRenderableType(QSurfaceFormat::OpenGLES);
 #else
 	format.setRenderableType(QSurfaceFormat::OpenGL);
-#endif
 #endif
 
 #ifdef USE_CORE_3_2_PROFILE

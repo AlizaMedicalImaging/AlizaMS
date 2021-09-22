@@ -2159,7 +2159,7 @@ void DicomUtils::load_contour(
 				}
 			}
 			//
-			// may be TODO : Contour Slab Thickness, Contour Offset Vector
+			// may be TODO retired Contour Slab Thickness, Contour Offset Vector
 			//
 			contour->vao_initialized = false;
 			roi.contours[contour->id] = contour;

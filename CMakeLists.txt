@@ -60,19 +60,10 @@ endif()
 project(ALIZAMS)
 
 if(APPLE)
-  set(ALIZAMS_OSX_BUNDLE_VERSION "1.6.3")
+  set(ALIZAMS_OSX_BUNDLE_VERSION "1.6.4")
 endif()
 
-if(NOT WIN32)
-  if(NOT (CMAKE_SIZEOF_VOID_P EQUAL 8))
-    if(NOT (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm"))
-      set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} " -msse2")
-      set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} " -msse2")
-    endif()
-  endif()
-endif()
 message(STATUS "CPU: " ${CMAKE_SYSTEM_PROCESSOR})
-message(STATUS "CXX flags: " ${CMAKE_CXX_FLAGS})
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
@@ -88,6 +79,8 @@ endif()
 set(ALIZA_QT_VERSION "QT_VERSION_NOT_SELECTED" CACHE STRING "Qt version")
 set_property(CACHE ALIZA_QT_VERSION PROPERTY STRINGS "QT_VERSION_NOT_SELECTED" "4" "5" "6")
 option(USE_SYSTEM_GLEW_QT4 "Use system GLEW (only Qt4)" OFF)
+option(USE_FORCE_DISABLE_SIMDMATH "Disable SSE/SSE2" OFF)
+#option(USE_OPENGLES "Use OpenGL ES" OFF)
 option(USE_MEDIASTORAGE_MODE "Build for media storage" OFF)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -101,6 +94,18 @@ if(${tmp1_build_type} STREQUAL "DEBUG")
 else()
   add_definitions(-DNDEBUG)
 endif()
+
+if(NOT WIN32)
+  if(NOT (CMAKE_SIZEOF_VOID_P EQUAL 8))
+    if(NOT USE_FORCE_DISABLE_SIMDMATH)
+      if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "i686")
+        set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} " -msse2")
+        set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} " -msse2")
+      endif()
+    endif()
+  endif()
+endif()
+message(STATUS "CXX flags: " ${CMAKE_CXX_FLAGS})
 
 # TMP
 # set "ON" to build with GCC 4.8
@@ -848,12 +853,24 @@ include_directories(
   "${CMAKE_CURRENT_SOURCE_DIR}/dicom"
   ${CMAKE_CURRENT_BINARY_DIR})
 
-# Available defs: -DDISABLE_SIMDMATH to disable SSE2 math
 if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
   link_directories(/usr/local/lib)
 endif()
-if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
+
+# Disable SSE2 math
+if(USE_FORCE_DISABLE_SIMDMATH)
   add_definitions(-DDISABLE_SIMDMATH)
+else()
+  if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
+    add_definitions(-DDISABLE_SIMDMATH)
+  elseif (${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64")
+    add_definitions(-DDISABLE_SIMDMATH)
+  endif()
+endif()
+
+# Use OpenGL ES
+if(USE_OPENGLES)
+  add_definitions(-DUSE_OPENGLES)
 endif()
 
 set(ALIZAMS_SRCS ${ALIZAMS_SRCS} ${MDCM_COMMON_SRCS} ${MDCM_DICT_SRCS} ${MDCM_DSED_SRCS} ${MDCM_MSFF_SRCS})
@@ -932,7 +949,7 @@ elseif(APPLE)
     MACOSX_BUNDLE_COPYRIGHT "© 2015-2021 Aliza Medical Imaging")
   target_link_libraries(AlizaMS ${ALIZAMS_LINK_LIBRARIES})
 else()
-  if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
+  if(USE_OPENGLES)
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GLES)
   else()
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GL)
