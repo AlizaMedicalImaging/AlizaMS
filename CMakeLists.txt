@@ -107,6 +107,22 @@ if(NOT WIN32)
 endif()
 message(STATUS "CXX flags: " ${CMAKE_CXX_FLAGS})
 
+# Disable SSE2 math
+if(USE_FORCE_DISABLE_SIMDMATH)
+  add_definitions(-DDISABLE_SIMDMATH)
+else()
+  if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
+    add_definitions(-DDISABLE_SIMDMATH)
+  elseif (${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64")
+    add_definitions(-DDISABLE_SIMDMATH)
+  endif()
+endif()
+
+# Use OpenGL ES
+if(USE_OPENGLES)
+  add_definitions(-DUSE_OPENGLES)
+endif()
+
 # TMP
 # set "ON" to build with GCC 4.8
 option(USE_FORCE_CXX11 "Set standard to C++11" OFF)
@@ -855,22 +871,6 @@ include_directories(
 
 if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
   link_directories(/usr/local/lib)
-endif()
-
-# Disable SSE2 math
-if(USE_FORCE_DISABLE_SIMDMATH)
-  add_definitions(-DDISABLE_SIMDMATH)
-else()
-  if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
-    add_definitions(-DDISABLE_SIMDMATH)
-  elseif (${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64")
-    add_definitions(-DDISABLE_SIMDMATH)
-  endif()
-endif()
-
-# Use OpenGL ES
-if(USE_OPENGLES)
-  add_definitions(-DUSE_OPENGLES)
 endif()
 
 set(ALIZAMS_SRCS ${ALIZAMS_SRCS} ${MDCM_COMMON_SRCS} ${MDCM_DICT_SRCS} ${MDCM_DSED_SRCS} ${MDCM_MSFF_SRCS})
