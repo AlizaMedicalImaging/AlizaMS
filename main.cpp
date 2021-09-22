@@ -32,6 +32,7 @@
 #include <QDir>
 #include <QFont>
 #include <QProcess>
+#include <cstdlib>
 #include <iostream>
 #include "browser/sqtree.h"
 
@@ -99,6 +100,13 @@ void redirect_qdebug(
 
 int main(int argc, char *argv[])
 {
+#ifndef _WIN32
+#ifndef __APPLE__
+#if (QT_VERSION >= QT_VERSION_CHECK(5,0,0))
+	setenv("QT_QPA_PLATFORM", "xcb", 1);
+#endif
+#endif
+#endif
 	bool force_disable_opengl = false;
 	bool metadata_only = false;
 	bool metadata_series_only = false;
