@@ -48,9 +48,9 @@ endif()
 #https://cmake.org/cmake/help/v3.19/policy/CMP0072.html
 #FindOpenGL prefers GLVND by default when available.
 #https://cmake.org/cmake/help/v3.19/module/FindOpenGL.html
-#if (POLICY CMP0072)
-#  cmake_policy(SET CMP0072 NEW)
-#endif()
+if (POLICY CMP0072)
+  cmake_policy(SET CMP0072 NEW)
+endif()
 #
 #
 #
@@ -78,10 +78,12 @@ endif()
 
 set(ALIZA_QT_VERSION "QT_VERSION_NOT_SELECTED" CACHE STRING "Qt version")
 set_property(CACHE ALIZA_QT_VERSION PROPERTY STRINGS "QT_VERSION_NOT_SELECTED" "4" "5" "6")
-option(USE_SYSTEM_GLEW_QT4 "Use system GLEW (only Qt4)" OFF)
 option(USE_FORCE_DISABLE_SIMDMATH "Disable SSE/SSE2" OFF)
-#option(USE_OPENGLES "Use OpenGL ES" OFF)
 option(USE_MEDIASTORAGE_MODE "Build for media storage" OFF)
+if(UNIX AND NOT APPLE)
+  option(USE_SYSTEM_GLEW_QT4 "Use system GLEW (only Qt4)" OFF)
+endif()
+
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(tmp0_build_type "None")
@@ -116,11 +118,6 @@ else()
   elseif (${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64")
     add_definitions(-DDISABLE_SIMDMATH)
   endif()
-endif()
-
-# Use OpenGL ES
-if(USE_OPENGLES)
-  add_definitions(-DUSE_OPENGLES)
 endif()
 
 # TMP
@@ -514,10 +511,13 @@ if(USE_QT_V_5 OR USE_QT_V_6)
   endif()
 endif()
 
+if(APPLE AND NOT USE_QT_V_6)
+  message(FATAL_ERROR "Only Qt6 is supported with macOS")
+endif()
+
+find_package(OpenGL REQUIRED)
 if(APPLE)
-  find_package(OpenGL REQUIRED)
   add_definitions(-DGL_SILENCE_DEPRECATION)
-  message(STATUS "OpenGL libraries: " ${OPENGL_LIBRARIES})
 endif()
 
 find_package(ITK COMPONENTS
@@ -916,9 +916,8 @@ endif()
 link_directories("${CMAKE_CURRENT_BINARY_DIR}/bin")
 
 if(WIN32)
-  set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} opengl32)
-  if(USE_QT_V_4 AND USE_SYSTEM_GLEW_QT4)
-    set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} glew32)
+  if(USE_QT_V_4)
+    set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} OpenGL::GL)
   endif()
   add_executable(alizams WIN32
     ${ALIZAMS_SRCS}
@@ -927,10 +926,8 @@ if(WIN32)
     ${ALIZAMS_QRCS_RCC})
   target_link_libraries(alizams ${ALIZAMS_LINK_LIBRARIES} crypt32 rpcrt4)
 elseif(APPLE)
-  set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} ${OPENGL_LIBRARIES})
-  if(USE_QT_V_4 AND USE_SYSTEM_GLEW_QT4)
-    set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GLEW)
-  endif()
+  #set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} ${OPENGL_LIBRARIES})
+  set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES})
   set(ALIZAMS_OSX_ICON_NAME "AlizaMS.icns")
   set(ALIZAMS_OSX_ICON ${CMAKE_CURRENT_SOURCE_DIR}/${ALIZAMS_OSX_ICON_NAME})
   set_source_files_properties(${ALIZAMS_OSX_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
@@ -948,13 +945,11 @@ elseif(APPLE)
     MACOSX_BUNDLE_COPYRIGHT "© 2015-2021 Aliza Medical Imaging")
   target_link_libraries(AlizaMS ${ALIZAMS_LINK_LIBRARIES})
 else()
-  if(USE_OPENGLES)
-    set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GLES)
-  else()
-    set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GL)
-  endif()
-  if(USE_QT_V_4 AND USE_SYSTEM_GLEW_QT4)
-    set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GLEW)
+  if(USE_QT_V_4)
+    set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} OpenGL::GL)
+    if(USE_SYSTEM_GLEW_QT4)
+      set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GLEW)
+    endif()
   endif()
   add_executable(alizams
     ${ALIZAMS_SRCS}

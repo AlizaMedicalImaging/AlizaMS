@@ -100,10 +100,12 @@ void redirect_qdebug(
 
 int main(int argc, char *argv[])
 {
+#if 1
 #ifndef _WIN32
 #ifndef __APPLE__
 #if (QT_VERSION >= QT_VERSION_CHECK(5,0,0))
 	setenv("QT_QPA_PLATFORM", "xcb", 1);
+#endif
 #endif
 #endif
 #endif
@@ -239,20 +241,12 @@ int main(int argc, char *argv[])
 #endif
 	//
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-#ifdef USE_OPENGLES
-	QApplication::setAttribute(Qt::AA_UseOpenGLES); // FIXME
-#else
 	QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
-#endif
 #ifdef USE_SET_DEFAULT_GL_FORMAT
 	if (!force_disable_opengl)
 	{
 		QSurfaceFormat format;
-#ifdef USE_OPENGLES
-		format.setRenderableType(QSurfaceFormat::OpenGLES);
-#else
 		format.setRenderableType(QSurfaceFormat::OpenGL);
-#endif
 #ifdef USE_CORE_3_2_PROFILE
 #ifdef USE_GL_MAJOR_3_MINOR_2
 		format.setVersion(3, 2); // may be required sometimes
