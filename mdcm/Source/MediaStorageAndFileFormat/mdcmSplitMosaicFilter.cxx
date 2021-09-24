@@ -282,7 +282,7 @@ SplitMosaicFilter::Split()
     return false;
   }
   unsigned long long l = inputimage.GetBufferLength();
-  if (l > 0xffffffff)
+  if (l >= 0xffffffff)
   {
     mdcmAlwaysWarnMacro("SplitMosaicFilter::Split(): l = " << l);
     return false;
@@ -308,8 +308,13 @@ SplitMosaicFilter::Split()
   }
   if (!b)
     return false;
-  const VL::Type outbufSize = outbuf.size();
-  pixeldata.SetByteValue(&outbuf[0], outbufSize);
+  const unsigned long long outbuf_size = outbuf.size();
+  if (outbuf_size >= 0xffffffff)
+  {
+    mdcmAlwaysWarnMacro("outbuf_size=" << outbuf_size);
+    return false;
+  }
+  pixeldata.SetByteValue(&outbuf[0], (VL::Type)outbuf_size);
   Image &                image = GetImage();
   const TransferSyntax & ts = image.GetTransferSyntax();
   if (ts.IsExplicit())
@@ -340,9 +345,9 @@ SplitMosaicFilter::Split()
     mdcmDebugMacro("Expecting MRImageStorage");
     return false;
   }
-  DataElement  de(Tag(0x0008, 0x0016));
+  DataElement de(Tag(0x0008, 0x0016));
   const char *   msstr = MediaStorage::GetMSString(ms);
-  const VL::Type strlenMsstr = strlen(msstr);
+  const VL::Type strlenMsstr = (VL::Type)strlen(msstr);
   de.SetByteValue(msstr, strlenMsstr);
   de.SetVR(Attribute<0x0008, 0x0016>::GetVR());
   ds.Replace(de);

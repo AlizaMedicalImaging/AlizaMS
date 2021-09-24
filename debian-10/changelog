@@ -1,5 +1,5 @@
-alizams (1.6.4-1) stable; urgency=low
+alizams (1.7.0-1) stable; urgency=low
 
   * Initial upload to Debian.  Closes: #999999.
 
- -- Mikhail Isakov <mihail.isakov@gmail.com>  Wed, 22 Sep 2021 00:00:00 -0000
+ -- Mikhail Isakov <mihail.isakov@gmail.com>  Fri, 24 Sep 2021 00:00:00 -0000
