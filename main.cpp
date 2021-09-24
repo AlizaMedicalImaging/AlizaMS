@@ -100,7 +100,7 @@ void redirect_qdebug(
 
 int main(int argc, char *argv[])
 {
-#if 1
+#ifdef FORCE_PLATFORM_XCB
 #ifndef _WIN32
 #ifndef __APPLE__
 #if (QT_VERSION >= QT_VERSION_CHECK(5,0,0))
