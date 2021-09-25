@@ -59,9 +59,88 @@ endif()
 
 project(ALIZAMS)
 
+######################################
+#
+# Options
+#
+#
+#
+#
 if(APPLE)
   set(ALIZAMS_OSX_BUNDLE_VERSION "1.7.0")
 endif()
+
+set(ALIZA_QT_VERSION "QT_VERSION_NOT_SELECTED" CACHE STRING "Qt version")
+set_property(CACHE ALIZA_QT_VERSION PROPERTY STRINGS "QT_VERSION_NOT_SELECTED" "4" "5" "6")
+
+# C++ version "Not set" is usually the safe option, except e.g.:
+#   - C++11 is required for CCG 4.8
+#   - C++14 may be required to avoid warnings on Debian 10 with distro's ITK 4.12
+#   - testing
+#   - etc.
+# There is no guarantee that the option will work,
+# check "__cplusplus" (s. main.cpp PRINT_HOST_INFO define)
+set(ALIZA_CXX_STANDARD "Not set" CACHE STRING "Select C++ standard, usually not requied")
+set_property(CACHE ALIZA_CXX_STANDARD PROPERTY STRINGS "Not set" "11" "14" "17" "20")
+
+option(ALIZA_DISABLE_SIMDMATH "Disable SSE/SSE2" OFF)
+
+if(UNIX AND NOT APPLE)
+  option(ALIZA_QT5_6_PLATFORM_XCB "Force QT_QPA_PLATFORM=xcb (only Qt5 and Qt6)" ON)
+  option(ALIZA_QT4_SYSTEM_GLEW "Use system GLEW (only Qt4)" OFF)
+endif()
+
+option(ALIZA_MEDIASTORAGE_MODE "Build for media storage" OFF)
+mark_as_advanced(ALIZA_MEDIASTORAGE_MODE)
+
+#
+#
+# MDCM
+#
+#
+
+if(WIN32)
+  option(MDCM_USE_WIN32_UNC "Unicode, long file path (Windows)" ON)
+endif()
+
+option(MDCM_USE_SYSTEM_ZLIB "Use system zlib" OFF)
+
+if(UNIX AND NOT APPLE)
+  option(MDCM_USE_SYSTEM_UUID "Use system uuid" OFF)
+endif()
+
+option(MDCM_USE_SYSTEM_OPENJPEG "Use system OpenJPEG" OFF)
+
+option(MDCM_USE_SYSTEM_CHARLS "Use system CharLS" OFF)
+
+# Set ON for production build.
+option(MDCM_SUPPORT_BROKEN_IMPLEMENTATION "Handle broken DICOM" ON)
+mark_as_advanced(MDCM_SUPPORT_BROKEN_IMPLEMENTATION)
+
+if(FALSE)
+  # OpenSSL is currently unused in AlizaMS.
+  option(MDCM_USE_SYSTEM_OPENSSL "Use system OpenSSL" OFF)
+  mark_as_advanced(MDCM_USE_SYSTEM_OPENSSL)
+  
+  # JPEG library released by the Standford PVRG group,
+  # build (or use system) binary to convert to raw tmp file.
+  option(MDCM_USE_PVRG "Use PVRG" OFF)
+  mark_as_advanced(MDCM_USE_PVRG)
+  if(MDCM_USE_PVRG)
+    option(MDCM_USE_SYSTEM_PVRG "Use system PVRG" OFF)
+    mark_as_advanced(MDCM_USE_SYSTEM_PVRG)
+    if(MDCM_USE_SYSTEM_PVRG)
+      find_package(PVRGJPEG REQUIRED)
+    endif()
+  endif()
+endif()
+#
+#
+#
+#
+#
+#
+######################################
 
 message(STATUS "CPU: " ${CMAKE_SYSTEM_PROCESSOR})
 
@@ -76,17 +155,6 @@ if(NOT LIBRARY_OUTPUT_PATH)
   mark_as_advanced(LIBRARY_OUTPUT_PATH)
 endif()
 
-set(ALIZA_QT_VERSION "QT_VERSION_NOT_SELECTED" CACHE STRING "Qt version")
-set_property(CACHE ALIZA_QT_VERSION PROPERTY STRINGS "QT_VERSION_NOT_SELECTED" "4" "5" "6")
-option(USE_FORCE_DISABLE_SIMDMATH "Disable SSE/SSE2" OFF)
-if(UNIX AND NOT APPLE)
-  option(USE_FORCE_PLATFORM_XCB "Force QT_QPA_PLATFORM=xcb (Qt5, Qt6)" ON)
-  option(USE_SYSTEM_GLEW_QT4 "Use system GLEW (only Qt4)" OFF)
-endif()
-option(USE_MEDIASTORAGE_MODE "Build for media storage" OFF)
-
-set(CMAKE_CXX_EXTENSIONS OFF)
-
 set(tmp0_build_type "None")
 if(CMAKE_BUILD_TYPE)
   set(tmp0_build_type "${CMAKE_BUILD_TYPE}")
@@ -98,9 +166,10 @@ else()
   add_definitions(-DNDEBUG)
 endif()
 
+# Required for x86 32 bit GCC build only
 if(NOT WIN32)
   if(NOT (CMAKE_SIZEOF_VOID_P EQUAL 8))
-    if(NOT USE_FORCE_DISABLE_SIMDMATH)
+    if(NOT ALIZA_DISABLE_SIMDMATH)
       if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "i686")
         set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} " -msse2")
         set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} " -msse2")
@@ -110,14 +179,52 @@ if(NOT WIN32)
 endif()
 message(STATUS "CXX flags: " ${CMAKE_CXX_FLAGS})
 
+if(ALIZA_QT_VERSION STREQUAL "4")
+  set(USE_QT_V_4 TRUE)
+  message(STATUS "Using Qt4")
+elseif(ALIZA_QT_VERSION STREQUAL "5")
+  set(USE_QT_V_5 TRUE)
+  message(STATUS "Using Qt5")
+elseif(ALIZA_QT_VERSION STREQUAL "6")
+  set(USE_QT_V_6 TRUE)
+  message(STATUS "Using Qt6")
+else()
+  message(FATAL_ERROR "Can not determine Qt version to use")
+endif()
+
+if(ALIZA_CXX_STANDARD STREQUAL "Not set")
+else()
+  if(ALIZA_CXX_STANDARD STREQUAL "11")
+    set(CMAKE_CXX_STANDARD 11)
+    message(STATUS "Tried to set C++11")
+  elseif(ALIZA_CXX_STANDARD STREQUAL "14")
+    set(CMAKE_CXX_STANDARD 14)
+    message(STATUS "Tried to set C++14")
+  elseif(ALIZA_CXX_STANDARD STREQUAL "17")
+    set(CMAKE_CXX_STANDARD 17)
+    message(STATUS "Tried to set C++17")
+  elseif(ALIZA_CXX_STANDARD STREQUAL "20")
+    set(CMAKE_CXX_STANDARD 20)
+    message(STATUS "Tried to set C++20")
+  endif()
+  if(UNIX AND NOT APPLE)
+    #
+    # to set GCC e.g. -std=c++11 instead of c++-std=gnu++11
+    # not 100% sure about that option
+    #
+    set(CMAKE_CXX_EXTENSIONS OFF)
+  endif()
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+endif()
+
 if(UNIX AND NOT APPLE)
-  if(USE_FORCE_PLATFORM_XCB)
+  if(ALIZA_QT5_6_PLATFORM_XCB)
     add_definitions(-DFORCE_PLATFORM_XCB)
   endif()
 endif()
 
-# Disable SSE2 math
-if(USE_FORCE_DISABLE_SIMDMATH)
+# TODO better
+if(ALIZA_DISABLE_SIMDMATH)
   add_definitions(-DDISABLE_SIMDMATH)
 else()
   if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
@@ -127,49 +234,11 @@ else()
   endif()
 endif()
 
-# TMP
-# set "ON" to build with GCC 4.8
-option(USE_FORCE_CXX11 "Set standard to C++11" OFF)
-mark_as_advanced(USE_FORCE_CXX11)
-if(USE_FORCE_CXX11)
-  set(CMAKE_CXX_STANDARD 11)
-  if(NOT CMAKE_CXX_STANDARD_REQUIRED)
-    set(CMAKE_CXX_STANDARD_REQUIRED ON)
-  endif()
-endif()
-#
-
-# TMP
-# set "ON" to workaround Debian 10 ITK-4.12 package VNL warning
-option(USE_FORCE_CXX14 "Set standard to C++14" OFF)
-mark_as_advanced(USE_FORCE_CXX14)
-if(USE_FORCE_CXX14)
-  set(CMAKE_CXX_STANDARD 14)
-  if(NOT CMAKE_CXX_STANDARD_REQUIRED)
-    set(CMAKE_CXX_STANDARD_REQUIRED ON)
-  endif()
-endif()
-#
-
 if(WIN32)
-  option(MDCM_USE_WIN32_UNC "Unicode, long file path (Windows)" ON)
   if(MDCM_USE_WIN32_UNC)
     add_definitions(-DMDCM_WIN32_UNC)
   endif()
 endif()
-
-option(MDCM_USE_SYSTEM_ZLIB "Use system zlib" OFF)
-
-#option(MDCM_USE_SYSTEM_OPENSSL "Use system OpenSSL" OFF)
-#mark_as_advanced(MDCM_USE_SYSTEM_OPENSSL)
-
-if(UNIX)
-  option(MDCM_USE_SYSTEM_UUID "Use system uuid" OFF)
-endif()
-
-option(MDCM_USE_SYSTEM_OPENJPEG "Use system OpenJPEG" OFF)
-
-option(MDCM_USE_SYSTEM_CHARLS "Use system CharLS" OFF)
 
 set(MDCM_LJPEG_LIBRARIES mdcmjpeg8 mdcmjpeg12 mdcmjpeg16)
 
@@ -187,18 +256,6 @@ else()
   set(MDCM_OPENJPEG_LIBRARIES mdcmopenjp2)
 endif()
 
-# JPEG library released by the Standford PVRG group,
-# build (or use system) binary to convert to raw tmp file
-option(MDCM_USE_PVRG "Use PVRG, advanced" OFF)
-mark_as_advanced(MDCM_USE_PVRG)
-if(MDCM_USE_PVRG)
-  option(MDCM_USE_SYSTEM_PVRG "Use system PVRG" OFF)
-  mark_as_advanced(MDCM_USE_SYSTEM_PVRG)
-  if(MDCM_USE_SYSTEM_PVRG)
-    find_package(PVRGJPEG REQUIRED)
-  endif()
-endif()
-
 if(MDCM_USE_SYSTEM_ZLIB)
   find_package(ZLIB REQUIRED)
   include_directories(${ZLIB_INCLUDE_DIR})
@@ -207,7 +264,7 @@ else()
   set(MDCM_ZLIB_LIBRARIES "mdcmzlib")
 endif()
 
-if(NOT WIN32)
+if(UNIX AND NOT APPLE)
   if(MDCM_USE_SYSTEM_UUID)
     find_package(UUID REQUIRED)
     set(MDCM_UUID_LIBRARIES ${UUID_LIBRARIES})
@@ -246,9 +303,6 @@ set(MDCM_MINOR_VERSION 2)
 set(MDCM_BUILD_VERSION 0)
 set(MDCM_VERSION "${MDCM_MAJOR_VERSION}.${MDCM_MINOR_VERSION}.${MDCM_BUILD_VERSION}")
 set(MDCM_API_VERSION "${MDCM_MAJOR_VERSION}.${MDCM_MINOR_VERSION}")
-
-option(MDCM_SUPPORT_BROKEN_IMPLEMENTATION "Handle broken DICOM" ON)
-mark_as_advanced(MDCM_SUPPORT_BROKEN_IMPLEMENTATION)
 
 CHECK_INCLUDE_FILE_CONCAT("sys/time.h" MDCM_HAVE_SYS_TIME_H)
 CHECK_INCLUDE_FILE_CONCAT("byteswap.h" MDCM_HAVE_BYTESWAP_FILE_H)
@@ -497,18 +551,7 @@ endif()
 #
 #
 #
-if(ALIZA_QT_VERSION STREQUAL "4")
-  set(USE_QT_V_4 TRUE)
-  message(STATUS "Using Qt4")
-elseif(ALIZA_QT_VERSION STREQUAL "5")
-  set(USE_QT_V_5 TRUE)
-  message(STATUS "Using Qt5")
-elseif(ALIZA_QT_VERSION STREQUAL "6")
-  set(USE_QT_V_6 TRUE)
-  message(STATUS "Using Qt6")
-else()
-  message(FATAL_ERROR "Can not determine Qt version to use")
-endif()
+
 
 if(USE_QT_V_5 OR USE_QT_V_6)
   if(WIN32)
@@ -543,7 +586,7 @@ if(USE_QT_V_6)
     PrintSupport
     Svg
     Core5Compat REQUIRED)
-  if(NOT USE_MEDIASTORAGE_MODE)
+  if(NOT ALIZA_MEDIASTORAGE_MODE)
     find_package(Qt6 COMPONENTS Sql REQUIRED)
   endif()
   include_directories(${Qt6Core5Compat_INCLUDE_DIRS})
@@ -553,7 +596,7 @@ elseif(USE_QT_V_5)
   find_package(Qt5Widgets REQUIRED)
   find_package(Qt5PrintSupport REQUIRED)
   find_package(Qt5Svg REQUIRED)
-  if(NOT USE_MEDIASTORAGE_MODE)
+  if(NOT ALIZA_MEDIASTORAGE_MODE)
     find_package(Qt5Sql REQUIRED)
   endif()
 elseif(USE_QT_V_4)
@@ -562,13 +605,13 @@ elseif(USE_QT_V_4)
   set(QT_USE_QTGUI TRUE)
   set(QT_USE_QTOPENGL TRUE)
   set(QT_USE_QTSVG TRUE)
-  if(NOT USE_MEDIASTORAGE_MODE)
+  if(NOT ALIZA_MEDIASTORAGE_MODE)
     set(QT_USE_QTSQL TRUE)
   endif()
   include(${QT_USE_FILE})
   #add_definitions(${QT_DEFINITIONS})
   #message(STATUS "QT_DEFINITIONS: ${QT_DEFINITIONS}")
-  if(USE_SYSTEM_GLEW_QT4)
+  if(ALIZA_QT4_SYSTEM_GLEW)
     set(LOCAL_GLEW_PATH "")
   else()
     set(LOCAL_GLEW_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CG/glew")
@@ -579,7 +622,7 @@ else()
   message(FATAL_ERROR "Can not determine Qt version to use")
 endif()
 
-if(NOT USE_MEDIASTORAGE_MODE)
+if(NOT ALIZA_MEDIASTORAGE_MODE)
   add_definitions(-DUSE_WORKSTATION_MODE)
 endif()
 
@@ -753,11 +796,11 @@ set(ALIZAMS_SRCS ${ALIZAMS_SRCS}
   ${CMAKE_CURRENT_SOURCE_DIR}/browser/anonymazerwidget2.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/aliza.cpp)
 
-if(NOT USE_MEDIASTORAGE_MODE)
+if(NOT ALIZA_MEDIASTORAGE_MODE)
   set(ALIZAMS_SRCS ${ALIZAMS_SRCS} ${CMAKE_CURRENT_SOURCE_DIR}/browser/ctkdialog.cpp)
 endif()
 
-if(USE_QT_V_4 AND NOT USE_SYSTEM_GLEW_QT4)
+if(USE_QT_V_4 AND NOT ALIZA_QT4_SYSTEM_GLEW)
   set(ALIZAMS_SRCS ${ALIZAMS_SRCS} "${LOCAL_GLEW_PATH}/src/glew.c")
 endif()
 
@@ -830,7 +873,7 @@ else()
   endif()
 endif()
 
-if(NOT USE_MEDIASTORAGE_MODE)
+if(NOT ALIZA_MEDIASTORAGE_MODE)
   set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/browser/ctkdialog.h)
 endif()
 
@@ -854,7 +897,7 @@ set(ALIZAMS_UIS
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/studyviewwidget.ui
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/imageinfodialog.ui)
 
-if(NOT USE_MEDIASTORAGE_MODE)
+if(NOT ALIZA_MEDIASTORAGE_MODE)
   set(ALIZAMS_UIS ${ALIZAMS_UIS} ${CMAKE_CURRENT_SOURCE_DIR}/browser/ctkdialog.ui)
 endif()
 
@@ -885,7 +928,7 @@ if(USE_QT_V_6)
     Qt6::PrintSupport
     Qt6::Svg
     Qt6::Core5Compat)
-  if(NOT USE_MEDIASTORAGE_MODE)
+  if(NOT ALIZA_MEDIASTORAGE_MODE)
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} Qt6::Sql)
   endif()
 elseif(USE_QT_V_5)
@@ -898,7 +941,7 @@ elseif(USE_QT_V_5)
     Qt5::Widgets
     Qt5::PrintSupport
     Qt5::Svg)
-  if(NOT USE_MEDIASTORAGE_MODE)
+  if(NOT ALIZA_MEDIASTORAGE_MODE)
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} Qt5::Sql)
   endif()
 elseif(USE_QT_V_4)
@@ -943,7 +986,7 @@ elseif(APPLE)
 else()
   if(USE_QT_V_4)
     set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} OpenGL::GL)
-    if(USE_SYSTEM_GLEW_QT4)
+    if(ALIZA_QT4_SYSTEM_GLEW)
       set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} GLEW)
     endif()
   endif()
