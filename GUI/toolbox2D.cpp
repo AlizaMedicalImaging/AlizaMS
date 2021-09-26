@@ -9,9 +9,9 @@ ToolBox2D::ToolBox2D(float si)
 	maxwin_pushButton->setIconSize(s1);
 	lock_pushButton->setIconSize(s2);
 	set_style_sheet();
-	red   = QPixmap(QString(":/bitmaps/red.svg"));
-	green = QPixmap(QString(":/bitmaps/green.svg"));
-	blue  = QPixmap(QString(":/bitmaps/blue.svg"));
+	red   = QPixmap(QString(":/bitmaps/red.png"));
+	green = QPixmap(QString(":/bitmaps/green.png"));
+	blue  = QPixmap(QString(":/bitmaps/blue.png"));
 	lockon = QIcon(QString(":/bitmaps/lock2.svg"));
 	lockoff = QIcon(QString(":/bitmaps/unlock2.svg"));
 	anim_label->hide();

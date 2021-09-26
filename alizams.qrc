@@ -34,9 +34,9 @@
 		<file>bitmaps/align.svg</file>
 		<file>bitmaps/play.svg</file>
 		<file>bitmaps/stop.svg</file>
-		<file>bitmaps/red.svg</file>
-		<file>bitmaps/green.svg</file>
-		<file>bitmaps/blue.svg</file>
+		<file>bitmaps/red.png</file>
+		<file>bitmaps/green.png</file>
+		<file>bitmaps/blue.png</file>
 		<file>bitmaps/meta.svg</file>
 		<file>bitmaps/cut1.svg</file>
 		<file>bitmaps/copy2.svg</file>
