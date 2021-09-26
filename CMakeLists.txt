@@ -88,7 +88,7 @@ set_property(CACHE ALIZA_CXX_STANDARD PROPERTY STRINGS "Not set" "11" "14" "17" 
 option(ALIZA_DISABLE_SIMDMATH "Disable SSE/SSE2" OFF)
 
 if(UNIX AND NOT APPLE)
-  # Another platform still can be set with argument, e.g. "alizams -platform vnc".
+  # Another platform still can be set with an argument, e.g. "alizams -platform vnc".
   option(ALIZA_QT5_6_PLATFORM_XCB "Force QT_QPA_PLATFORM=xcb (only Qt5 and Qt6)" ON)
   option(ALIZA_QT4_SYSTEM_GLEW "Use system GLEW (only Qt4)" OFF)
 endif()
@@ -268,7 +268,7 @@ else()
   set(MDCM_ZLIB_LIBRARIES "mdcmzlib")
 endif()
 
-if(UNIX AND NOT APPLE)
+if(UNIX)
   if(MDCM_USE_SYSTEM_UUID)
     find_package(UUID REQUIRED)
     set(MDCM_UUID_LIBRARIES ${UUID_LIBRARIES})
