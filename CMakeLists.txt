@@ -61,8 +61,8 @@ project(ALIZAMS)
 
 ######################################
 #
-# Options
 #
+# Options
 #
 #
 #
@@ -70,26 +70,30 @@ if(APPLE)
   set(ALIZAMS_OSX_BUNDLE_VERSION "1.7.0")
 endif()
 
+#Required.
 set(ALIZA_QT_VERSION "QT_VERSION_NOT_SELECTED" CACHE STRING "Qt version")
 set_property(CACHE ALIZA_QT_VERSION PROPERTY STRINGS "QT_VERSION_NOT_SELECTED" "4" "5" "6")
 
-# C++ version "Not set" is usually the safe option, except e.g.:
+# C++ standard "Not set" is usually safe and recommended, except e.g.:
 #   - C++11 is required for CCG 4.8
 #   - C++14 may be required to avoid warnings on Debian 10 with distro's ITK 4.12
 #   - testing
 #   - etc.
 # There is no guarantee that the option will work,
-# check "__cplusplus" (s. main.cpp PRINT_HOST_INFO define)
+# check "__cplusplus" (s. main.cpp PRINT_HOST_INFO define).
 set(ALIZA_CXX_STANDARD "Not set" CACHE STRING "Select C++ standard, usually not requied")
 set_property(CACHE ALIZA_CXX_STANDARD PROPERTY STRINGS "Not set" "11" "14" "17" "20")
 
+# Force disable SSE/SSE2.
 option(ALIZA_DISABLE_SIMDMATH "Disable SSE/SSE2" OFF)
 
 if(UNIX AND NOT APPLE)
+  # Another platform still can be set with argument, e.g. "alizams -platform vnc".
   option(ALIZA_QT5_6_PLATFORM_XCB "Force QT_QPA_PLATFORM=xcb (only Qt5 and Qt6)" ON)
   option(ALIZA_QT4_SYSTEM_GLEW "Use system GLEW (only Qt4)" OFF)
 endif()
 
+# Only for build to be shipped on media.
 option(ALIZA_MEDIASTORAGE_MODE "Build for media storage" OFF)
 mark_as_advanced(ALIZA_MEDIASTORAGE_MODE)
 
