@@ -70,7 +70,7 @@ if(APPLE)
   set(ALIZAMS_OSX_BUNDLE_VERSION "1.7.0")
 endif()
 
-#Qt major version, required.
+# Qt major version, required.
 set(ALIZA_QT_VERSION "QT_VERSION_NOT_SELECTED" CACHE STRING "Qt major version")
 set_property(CACHE ALIZA_QT_VERSION PROPERTY STRINGS "QT_VERSION_NOT_SELECTED" "4" "5" "6")
 
@@ -88,6 +88,7 @@ set_property(CACHE ALIZA_CXX_STANDARD PROPERTY STRINGS "Not set" "11" "14" "17" 
 option(ALIZA_DISABLE_SIMDMATH "Disable SSE/SSE2" OFF)
 
 if(UNIX AND NOT APPLE)
+  # Force xcb platform on Linux.
   # Another platform still can be set with an argument, e.g. "alizams -platform vnc".
   option(ALIZA_QT5_6_PLATFORM_XCB "Force QT_QPA_PLATFORM=xcb (only Qt5 and Qt6)" ON)
   option(ALIZA_QT4_SYSTEM_GLEW "Use system GLEW (only Qt4)" OFF)
@@ -177,7 +178,7 @@ else()
   add_definitions(-DNDEBUG)
 endif()
 
-# Required for x86 32 bit GCC build only
+# Required for x86 32 bit GCC build only.
 if(NOT WIN32)
   if(NOT (CMAKE_SIZEOF_VOID_P EQUAL 8))
     if(NOT ALIZA_DISABLE_SIMDMATH)
@@ -220,8 +221,8 @@ else()
   endif()
   if(UNIX AND NOT APPLE)
     #
-    # to set GCC e.g. -std=c++11 instead of c++-std=gnu++11
-    # not 100% sure about that option
+    # To set GCC e.g. -std=c++11 instead of -std=gnu++11,
+    # not 100% sure about that option.
     #
     set(CMAKE_CXX_EXTENSIONS OFF)
   endif()
@@ -234,7 +235,7 @@ if(UNIX AND NOT APPLE)
   endif()
 endif()
 
-# TODO better
+# TODO
 if(ALIZA_DISABLE_SIMDMATH)
   add_definitions(-DDISABLE_SIMDMATH)
 else()
@@ -488,7 +489,7 @@ set(MDCM_DSED_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmExplicitImplicitDataElement.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmVR16ExplicitDataElement.cxx)
 
-# Code for segments and surfaces is currently unused
+# Code for segments and surfaces is currently unused.
 set(MDCM_MSFF_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmIconImageFilter.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmFileExplicitFilter.cxx
@@ -567,7 +568,7 @@ endif()
 if(USE_QT_V_5 OR USE_QT_V_6)
   if(WIN32)
 # https://cmake.org/cmake/help/v3.0/policy/CMP0020.html
-# Automatically link Qt executables to qtmain target on Windows
+# Automatically link Qt executables to qtmain target on Windows.
     CMAKE_POLICY(SET CMP0020 NEW)
   endif()
 endif()
