@@ -70,8 +70,8 @@ if(APPLE)
   set(ALIZAMS_OSX_BUNDLE_VERSION "1.7.0")
 endif()
 
-#Required.
-set(ALIZA_QT_VERSION "QT_VERSION_NOT_SELECTED" CACHE STRING "Qt version")
+#Qt major version, required.
+set(ALIZA_QT_VERSION "QT_VERSION_NOT_SELECTED" CACHE STRING "Qt major version")
 set_property(CACHE ALIZA_QT_VERSION PROPERTY STRINGS "QT_VERSION_NOT_SELECTED" "4" "5" "6")
 
 # C++ standard "Not set" is usually safe and recommended, except e.g.:
@@ -91,6 +91,12 @@ if(UNIX AND NOT APPLE)
   # Another platform still can be set with an argument, e.g. "alizams -platform vnc".
   option(ALIZA_QT5_6_PLATFORM_XCB "Force QT_QPA_PLATFORM=xcb (only Qt5 and Qt6)" ON)
   option(ALIZA_QT4_SYSTEM_GLEW "Use system GLEW (only Qt4)" OFF)
+endif()
+
+if(NOT APPLE)
+  # Use OpenGL Core profile with Qt5 (with Qt6 always Core profile).
+  # With Qt4 not defined, Core may work, not tested.
+  option(ALIZA_QT5_COREGL "Use OpenGL Core profile with Qt5" OFF)
 endif()
 
 # Only for build to be shipped on media.
@@ -121,6 +127,7 @@ option(MDCM_USE_SYSTEM_CHARLS "Use system CharLS" OFF)
 option(MDCM_SUPPORT_BROKEN_IMPLEMENTATION "Handle broken DICOM" ON)
 mark_as_advanced(MDCM_SUPPORT_BROKEN_IMPLEMENTATION)
 
+# Currently not used.
 if(FALSE)
   # OpenSSL is currently unused in AlizaMS.
   option(MDCM_USE_SYSTEM_OPENSSL "Use system OpenSSL" OFF)
@@ -858,7 +865,12 @@ elseif(WIN32)
     set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5-core.h)
     add_definitions(-DALIZA_GL_3_2_CORE)
   elseif(USE_QT_V_5)
-    set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5.h)
+    if(ALIZA_QT5_COREGL)
+      set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5-core.h)
+      add_definitions(-DALIZA_GL_3_2_CORE)
+    else()
+      set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5.h)
+    endif()
   elseif(USE_QT_V_4)
     set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt4.h)
   else()
@@ -869,7 +881,12 @@ else()
     set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5-core.h)
     add_definitions(-DALIZA_GL_3_2_CORE)
   elseif(USE_QT_V_5)
-    set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5.h)
+    if(ALIZA_QT5_COREGL)
+      set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5-core.h)
+      add_definitions(-DALIZA_GL_3_2_CORE)
+    else()
+      set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5.h)
+    endif()
   elseif(USE_QT_V_4)
     set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt4.h)
   else()
