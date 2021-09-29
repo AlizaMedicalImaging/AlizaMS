@@ -573,7 +573,12 @@ if(USE_QT_V_5 OR USE_QT_V_6)
   endif()
 endif()
 
-find_package(OpenGL REQUIRED)
+if(USE_QT_V_4)
+  find_package(OpenGL REQUIRED)
+else()
+  find_package(OpenGL QUIET)
+endif()
+
 if(APPLE)
   add_definitions(-DGL_SILENCE_DEPRECATION)
 endif()
