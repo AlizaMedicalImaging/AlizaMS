@@ -98,9 +98,6 @@ BrowserWidget2::BrowserWidget2(float si)
 	eye_icon  = QIcon(QString(":/bitmaps/eye.svg"));
 	eye2_icon = QIcon(QString(":/bitmaps/eye2.svg"));
 	setupUi(this);
-#if 0
-	ctk_pushButton->hide();
-#endif
 	const QSize s = QSize((int)(24*si),(int)(24*si));
 	opendir1_pushButton->setIconSize(s);
 	dicomdir_pushButton->setIconSize(s);
