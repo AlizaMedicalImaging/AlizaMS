@@ -70,7 +70,6 @@ SurfaceWriter::PrepareWrite()
   DataSet &              ds = file.GetDataSet();
   FileMetaInformation &  fmi = file.GetHeader();
   const TransferSyntax & ts = fmi.GetDataSetTransferSyntax();
-  assert(ts.IsExplicit() || ts.IsImplicit());
   // Number Of Surface
   const unsigned long nbSurfaces = this->GetNumberOfSurfaces();
   if (nbSurfaces == 0)
@@ -117,17 +116,15 @@ SurfaceWriter::PrepareWrite()
   unsigned int                                       numSurface = 1;
   for (; it0 != it0End; ++it0)
   {
-    SmartPointer<Segment> segment = *it0;
-    assert(segment);
+    SmartPointer<Segment>                              segment = *it0;
     std::vector<SmartPointer<Surface>>                 surfaces = segment->GetSurfaces();
     std::vector<SmartPointer<Surface>>::const_iterator it1 = surfaces.cbegin();
     std::vector<SmartPointer<Surface>>::const_iterator it1End = surfaces.cend();
     for (; it1 != it1End; ++it1)
     {
       SmartPointer<Surface> surface = *it1;
-      assert(surface);
-      Item &    surfaceItem = surfacesSQ->GetItem(numSurface);
-      DataSet & surfaceDS = surfaceItem.GetNestedDataSet();
+      Item &                surfaceItem = surfacesSQ->GetItem(numSurface);
+      DataSet &             surfaceDS = surfaceItem.GetNestedDataSet();
       // Recommended Display Grayscale Value
       Attribute<0x0062, 0x000C> recommendedDisplayGrayscaleValue;
       recommendedDisplayGrayscaleValue.SetValue(surface->GetRecommendedDisplayGrayscaleValue());
@@ -316,7 +313,6 @@ SurfaceWriter::PrepareWrite()
         // Vector Dimensionality
         Attribute<0x0066, 0x001F> vectorDimensionalityAt;
         unsigned short            vectorDimensionality = surface->GetVectorDimensionality();
-        assert(vectorDimensionality);
         vectorDimensionalityAt.SetValue(vectorDimensionality);
         surfacePointsNormalsDS.Replace(vectorDimensionalityAt.GetAsDataElement());
         // Vector Accuracy (Type 3)
@@ -331,7 +327,6 @@ SurfaceWriter::PrepareWrite()
         DataElement vectorCoordDataDE(Tag(0x0066, 0x0021));
         vectorCoordDataDE.SetVR(VR::OF);
         const Value & vectorCoordinateDataValue = surface->GetVectorCoordinateData().GetValue();
-        assert(&vectorCoordinateDataValue);
         vectorCoordDataDE.SetValue(vectorCoordinateDataValue);
         const ByteValue * bv = vectorCoordDataDE.GetByteValue();
         VL                vl;
@@ -468,8 +463,7 @@ SurfaceWriter::PrepareWrite()
           typedSequenceSQ->SetLengthToUndefined();
           // Fill the Segment Sequence
           const unsigned int numberOfPrimitives = meshPrimitive->GetNumberOfPrimitivesData();
-          assert(numberOfPrimitives);
-          const size_t nbItems = typedSequenceSQ->GetNumberOfItems();
+          const size_t       nbItems = typedSequenceSQ->GetNumberOfItems();
           if (nbItems < numberOfPrimitives)
           {
             const size_t diff = numberOfPrimitives - nbItems;
@@ -493,7 +487,6 @@ SurfaceWriter::PrepareWrite()
             // "Typed" Point Index List
             DataElement   typedPointIndexListDE(typedPrimitiveTag);
             const Value & pointIndexListValue = it->GetValue();
-            assert(&pointIndexListValue);
             typedPointIndexListDE.SetValue(pointIndexListValue);
             const ByteValue * pointIndexListBV = typedPointIndexListDE.GetByteValue();
             VL                pointIndexListVL;
@@ -517,7 +510,6 @@ SurfaceWriter::PrepareWrite()
           // "Typed" Point Index List
           DataElement   typedPointIndexListDE(typedPrimitiveTag);
           const Value & pointIndexListValue = meshPrimitive->GetPrimitiveData().GetValue();
-          assert(&pointIndexListValue);
           typedPointIndexListDE.SetValue(pointIndexListValue);
           const ByteValue * pointIndexListBV = typedPointIndexListDE.GetByteValue();
           VL                pointIndexListVL;
@@ -782,7 +774,6 @@ SurfaceWriter::PrepareWritePointMacro(SmartPointer<Surface> surface, DataSet & s
     // Point Coordinates Data
     DataElement   pointCoordDataDE(Tag(0x0066, 0x0016));
     const Value & pointCoordinateDataValue = surface->GetPointCoordinatesData().GetValue();
-    assert(&pointCoordinateDataValue);
     pointCoordDataDE.SetValue(pointCoordinateDataValue);
     const ByteValue * bv = pointCoordDataDE.GetByteValue();
     VL                vl;
