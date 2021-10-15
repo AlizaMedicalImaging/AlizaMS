@@ -701,10 +701,10 @@ public:
       if (len > Length)
       {
         assert((len / size) * size == len);
-        Type * internal;
+        Type * i;
         try
         {
-          internal = new Type[len / size];
+          i = new Type[len / size];
         }
         catch (const std::bad_alloc &)
         {
@@ -714,10 +714,10 @@ public:
         Save = true; //
         if (Internal)
         {
-          memcpy(internal, Internal, len);
+          memcpy(i, Internal, len);
           delete[] Internal;
         }
-        Internal = internal;
+        Internal = i;
       }
     }
     Length = len / size;
