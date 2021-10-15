@@ -40,9 +40,9 @@ typedef struct
   VM::VMType   vm;
   const char * name;
   bool         ret;
-} DICT_ENTRY;
+} PRIV_DICT_ENTRY;
 
-const DICT_ENTRY DICOMV3DataDict[] = {
+const PRIV_DICT_ENTRY DICOMV3DataDict[] = {
   { 0x2013, 0x0010, "BioDICOMizer", VR::LO, VM::VM1, "Custom Storage Version", false },
   { 0x2013, 0x0011, "BioDICOMizer", VR::ST, VM::VM1, "Custom Storage Former Filename", false },
   { 0x2013, 0x0012, "BioDICOMizer", VR::LO, VM::VM1, "Custom Storage Mime-Type", false },
@@ -11019,8 +11019,8 @@ const DICT_ENTRY DICOMV3DataDict[] = {
 void
 PrivateDict::LoadDefault()
 {
-  unsigned int i = 0;
-  DICT_ENTRY   n = DICOMV3DataDict[i];
+  unsigned int    i = 0;
+  PRIV_DICT_ENTRY n = DICOMV3DataDict[i];
   while (n.name != NULL)
   {
     assert(n.owner != NULL);
