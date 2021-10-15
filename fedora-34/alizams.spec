@@ -43,7 +43,7 @@ cd AlizaMS
 	-DMDCM_USE_SYSTEM_OPENJPEG:BOOL=ON \
   	-DMDCM_USE_SYSTEM_CHARLS:BOOL=ON \
   	-DMDCM_USE_SYSTEM_UUID:BOOL=ON \
-        -DITK_DIR=%{_libdir}/cmake/InsightToolkit
+        -DITK_DIR:PATH=%{_libdir}/cmake/InsightToolkit
 
 %cmake_build
 
