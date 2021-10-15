@@ -19,7 +19,6 @@ subject to the following restrictions:
 #include "btAlignedObjectArray.h"
 #include "btMinMax.h"
 #include "btVector3.h"
-#include <new>
 
 //----------------------------------
 
