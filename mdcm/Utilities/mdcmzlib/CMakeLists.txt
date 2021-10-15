@@ -1,11 +1,8 @@
-if(NOT ZLIB_NAMESPACE)
-  set(ZLIB_NAMESPACE "ZLIB")
-  set(ZLIB_STANDALONE 1)
-endif()
-
 string(TOLOWER ${ZLIB_NAMESPACE} ZLIB_LIBRARY_NAME)
 
 project(${ZLIB_NAMESPACE} C)
+
+set(BUILD_SHARED_LIBS OFF)
 
 include(CheckTypeSize)
 include(CheckFunctionExists)

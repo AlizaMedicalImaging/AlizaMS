@@ -2,6 +2,8 @@ string(TOLOWER ${JPEG_NAMESPACE} JPEG_LIBRARY_NAME)
 
 project(${JPEG_NAMESPACE} C)
 
+set(BUILD_SHARED_LIBS OFF)
+
 foreach(p
     CMP0042
     CMP0063)
@@ -95,11 +97,7 @@ foreach(src
     "${CMAKE_CURRENT_SOURCE_DIR}/${src}")
 endforeach()
 
-if(BUILD_SHARED_LIBS)
-  set(JPEGDLL 1)
-else()
-  set(JPEGSTATIC 1)
-endif()
+set(JPEGSTATIC 1)
 
 # Generate three libraries: jpeg 8bits, 12bits and 16bits
 # using only one source directory

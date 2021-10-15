@@ -1,26 +1,13 @@
-# Main CMakeLists.txt to build the OpenJPEG project using CMake (www.cmake.org)
-# Written by Mathieu Malaterre
-
-# This CMake project will by default create a library called openjpeg
-# But if you want to use this project within your own (CMake) project
-# you will eventually like to prefix the library to avoid linking confusion
-# For this purpose you can define a CMake var: OPENJPEG_NAMESPACE to whatever you like
-# e.g.:
-# set(OPENJPEG_NAMESPACE "MDCMOPENJPEG")
-
 if(COMMAND CMAKE_POLICY)
   cmake_policy(SET CMP0003 NEW)
   cmake_policy(SET CMP0042 NEW)
 endif()
 
-if(NOT OPENJPEG_NAMESPACE)
-  set(OPENJPEG_NAMESPACE "OPENJPEG")
-  set(OPENJPEG_STANDALONE 1)
-endif()
-
 set(OPENJPEG_LIBRARY_NAME mdcmopenjp2)
 
 project(${OPENJPEG_NAMESPACE} C)
+
+set(BUILD_SHARED_LIBS OFF)
 
 include_regular_expression("^.*$")
 

@@ -1,11 +1,8 @@
-if(NOT UUID_NAMESPACE)
-  set(UUID_NAMESPACE "UUID")
-  set(UUID_STANDALONE 1)
-endif()
-
 string(TOLOWER ${UUID_NAMESPACE} UUID_LIBRARY_NAME)
 
 project(${UUID_NAMESPACE} C)
+
+set(BUILD_SHARED_LIBS OFF)
 
 include_regular_expression("^.*$")
 
