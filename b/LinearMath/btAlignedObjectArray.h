@@ -25,7 +25,7 @@ subject to the following restrictions:
 ///see discussion here: http://continuousphysics.com/Bullet/phpBB2/viewtopic.php?t=1231 and
 ///http://www.continuousphysics.com/Bullet/phpBB2/viewtopic.php?t=1240
 
-//#define BT_USE_PLACEMENT_NEW 1
+#define BT_USE_PLACEMENT_NEW 1
 //#define BT_USE_MEMCPY 1 //disable, because it is cumbersome to find out for each platform where memcpy is defined. It can be in <memory.h> or <string.h> or otherwise...
 #define BT_ALLOW_ARRAY_COPY_OPERATOR  // enabling this can accidently perform deep copies of data if you are not careful
 
@@ -34,9 +34,9 @@ subject to the following restrictions:
 #include <string.h>
 #endif  //BT_USE_MEMCPY
 
-//#ifdef BT_USE_PLACEMENT_NEW
+#ifdef BT_USE_PLACEMENT_NEW
 #include <new>  //for placement new
-//#endif          //BT_USE_PLACEMENT_NEW
+#endif          //BT_USE_PLACEMENT_NEW
 
 ///The btAlignedObjectArray template class uses a subset of the stl::vector interface for its methods
 ///It is developed to replace stl::vector to avoid portability issues, including STL alignment issues to add SIMD/SSE data
