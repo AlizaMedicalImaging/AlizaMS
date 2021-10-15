@@ -95,7 +95,11 @@ foreach(src
     "${CMAKE_CURRENT_SOURCE_DIR}/${src}")
 endforeach()
 
-set(JPEGSTATIC 1)
+if(BUILD_SHARED_LIBS)
+  set(JPEGDLL 1)
+else()
+  set(JPEGSTATIC 1)
+endif()
 
 # Generate three libraries: jpeg 8bits, 12bits and 16bits
 # using only one source directory
