@@ -74,9 +74,9 @@ protected:
 		int i;
 		for (i = start; i < end; ++i)
 #ifdef BT_USE_PLACEMENT_NEW
-			new (&dest[i]) T(m_data[i]);
+			new (&dest[(unsigned int)i]) T(m_data[(unsigned int)i]);
 #else
-			dest[i] = m_data[i];
+			dest[(unsigned int)i] = m_data[(unsigned int)i];
 #endif  //BT_USE_PLACEMENT_NEW
 	}
 
@@ -220,7 +220,7 @@ public:
 #ifdef BT_USE_PLACEMENT_NEW
 			for (int i = curSize; i < newsize; i++)
 			{
-				new (&m_data[i]) T(fillData);
+				new (&m_data[(unsigned int)i]) T(fillData);
 			}
 #endif  //BT_USE_PLACEMENT_NEW
 		}
@@ -248,10 +248,10 @@ public:
 		}
 		m_size++;
 #ifdef BT_USE_PLACEMENT_NEW
-		new (&m_data[sz]) T(fillValue);  //use the in-place new (not really allocating heap memory)
+		new (&m_data[(unsigned int)sz]) T(fillValue);  //use the in-place new (not really allocating heap memory)
 #endif
 
-		return m_data[sz];
+		return m_data[(unsigned int)sz];
 	}
 
 	SIMD_FORCE_INLINE void push_back(const T& _Val)
@@ -263,7 +263,7 @@ public:
 		}
 
 #ifdef BT_USE_PLACEMENT_NEW
-		new (&m_data[m_size]) T(_Val);
+		new (&m_data[(unsigned int)m_size]) T(_Val);
 #else
 		m_data[size()] = _Val;
 #endif  //BT_USE_PLACEMENT_NEW
