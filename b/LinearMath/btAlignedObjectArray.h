@@ -265,7 +265,7 @@ public:
 #ifdef BT_USE_PLACEMENT_NEW
 		new (&m_data[(unsigned int)m_size]) T(_Val);
 #else
-		m_data[size()] = _Val;
+		m_data[(unsigned int)size()] = _Val;
 #endif  //BT_USE_PLACEMENT_NEW
 
 		m_size++;
