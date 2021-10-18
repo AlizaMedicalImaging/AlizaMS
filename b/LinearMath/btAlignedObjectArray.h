@@ -71,12 +71,12 @@ protected:
 	}
 	SIMD_FORCE_INLINE void copy(int start, int end, T* dest) const
 	{
-		int i;
-		for (i = start; i < end; ++i)
+		unsigned int i;
+		for (i = start; i < (unsigned int)end; ++i)
 #ifdef BT_USE_PLACEMENT_NEW
-			new (&dest[(unsigned int)i]) T(m_data[(unsigned int)i]);
+			new (&dest[i]) T(m_data[i]);
 #else
-			dest[(unsigned int)i] = m_data[(unsigned int)i];
+			dest[i] = m_data[i];
 #endif  //BT_USE_PLACEMENT_NEW
 	}
 
@@ -218,9 +218,9 @@ public:
 				reserve(newsize);
 			}
 #ifdef BT_USE_PLACEMENT_NEW
-			for (int i = curSize; i < newsize; i++)
+			for (unsigned int i = curSize; i < (unsigned int)newsize; i++)
 			{
-				new (&m_data[(unsigned int)i]) T(fillData);
+				new (&m_data[i]) T(fillData);
 			}
 #endif  //BT_USE_PLACEMENT_NEW
 		}
