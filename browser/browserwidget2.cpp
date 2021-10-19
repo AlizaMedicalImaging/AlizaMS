@@ -1,4 +1,6 @@
 //
+//#define ALIZAMS_ARCHIVE_DISTRO
+//
 #include "browserwidget2.h"
 #include <QtGlobal>
 #include <QFileDialog>
@@ -1531,8 +1533,12 @@ void BrowserWidget2::readSettings()
 	const QString d = QString
 		("/Applications/AlizaMS.app/Contents/Resources/DICOM");
 #else
-	const QString d = 
+#ifdef ALIZAMS_ARCHIVE_DISTRO
+	const QString d =
 		QApplication::applicationDirPath() + QString("/../DICOM");
+#else
+	const QString d = QString("/usr/share/alizams/datasets");
+#endif
 #endif
 	settings.beginGroup(QString("BrowserWidget2"));
 	directory_lineEdit->setText(

@@ -1027,5 +1027,6 @@ else()
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/package/archive/usr/share/icons" DESTINATION "share")
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/package/archive/usr/share/applications" DESTINATION "share")
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/package/archive/usr/share/man" DESTINATION "share")
+  install(DIRECTORY "${CMAKE_SOURCE_DIR}/package/archive/usr/share/alizams" DESTINATION "share")
 endif()
 
