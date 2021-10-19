@@ -2,7 +2,7 @@
 
 Name:    alizams
 Version: 1.7.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Aliza MS DICOM Viewer
 License: GPLv3
 BuildRequires:  cmake
@@ -57,6 +57,7 @@ cd AlizaMS
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
 %{_datadir}/icons/hicolor/*/apps/%{name}.svg
 %{_datadir}/applications/%{name}.desktop
+%{_datadir}/%{name}/*
 %{_mandir}/man1/%{name}.1*
 
 %changelog
