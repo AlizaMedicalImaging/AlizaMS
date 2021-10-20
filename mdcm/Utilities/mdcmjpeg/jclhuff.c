@@ -147,7 +147,7 @@ start_pass_huff(j_compress_ptr cinfo, boolean gather_statistics)
     losslsc->pub.entropy_finish_pass = finish_pass_gather;
 #else
     ERREXIT(cinfo, JERR_NOT_COMPILED);
-    return;
+	return;
 #endif
   }
   else
@@ -391,9 +391,14 @@ encode_mcus_huff(j_compress_ptr cinfo,
       {                          /* instead of temp < 0 */
         temp = (-temp) & 0x7FFF; /* absolute value, mod 2^16 */
         if (temp == 0)           /* special case: magnitude = 32768 */
+        {
           nbits = 16;            /* temp, temp2 are unused */
+          temp2 = 0;
+        }
         else
+        {
           temp2 = ~temp;  /* one's complement of magnitude */
+        }
       }
       else
       {
