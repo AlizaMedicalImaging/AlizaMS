@@ -450,7 +450,6 @@ endif()
 
 set(MDCM_DICT_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmDicts.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmDictEntry.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmDefaultDicts.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmPrivateDefaultDicts.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataDictionary/mdcmGlobal.cxx
