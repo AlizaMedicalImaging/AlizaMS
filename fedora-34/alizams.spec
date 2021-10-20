@@ -32,19 +32,18 @@ Siemens mosaic format. United Imaging Healthcare (UIH) Grid / VFrame format.
 Elscint ELSCINT1 PMSCT_RLE1 and PMSCT_RGB1
 
 %prep
-git clone --recurse-submodules https://github.com/AlizaMedicalImaging/AlizaMS.git
+git clone -b 'v1.7.1' --depth 1 https://github.com/AlizaMedicalImaging/AlizaMS.git
 
 %build
 cd AlizaMS
-
 %cmake -DCMAKE_BUILD_TYPE:STRING=Release \
-	-DALIZA_QT_VERSION:STRING=5 \
-	-DMDCM_USE_SYSTEM_ZLIB:BOOL=ON \
-	-DMDCM_USE_SYSTEM_OPENJPEG:BOOL=ON \
-  	-DMDCM_USE_SYSTEM_CHARLS:BOOL=ON \
-  	-DMDCM_USE_SYSTEM_UUID:BOOL=ON \
-        -DITK_DIR:PATH=%{_libdir}/cmake/InsightToolkit
-
+  -DCMAKE_SKIP_RPATH:BOOL=ON \
+  -DALIZA_QT_VERSION:STRING=5 \
+  -DMDCM_USE_SYSTEM_ZLIB:BOOL=ON \
+  -DMDCM_USE_SYSTEM_OPENJPEG:BOOL=ON \
+  -DMDCM_USE_SYSTEM_CHARLS:BOOL=ON \
+  -DMDCM_USE_SYSTEM_UUID:BOOL=ON \
+  -DITK_DIR:PATH=%{_libdir}/cmake/InsightToolkit
 %cmake_build
 
 %install
