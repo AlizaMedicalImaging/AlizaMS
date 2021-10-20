@@ -22,6 +22,10 @@
 #ifndef MDCMELEMENT_H
 #define MDCMELEMENT_H
 
+//
+#define DS16SIMPLE
+//
+
 #include "mdcmTypes.h"
 #include "mdcmVR.h"
 #include "mdcmTag.h"
@@ -343,26 +347,27 @@ public:
   }
 };
 
-//#define VRDS16ILLEGAL
-#ifdef VRDS16ILLEGAL
-template <typename Float>
-std::string
-to_string(Float data)
+#ifdef DS16SIMPLE
+static void ds16print(char * buf, double f)
 {
-  std::stringstream in;
-  int const         digits =
-    static_cast<int>(-std::log(std::numeric_limits<Float>::epsilon()) / static_cast<Float>(std::log(10.0)));
-  if (in << std::dec << std::setprecision(digits) << data)
+  char line[40];
+  int l = sprintf(line, "%.17g", f);
+  if (l > 16)
   {
-    return (in.str());
+    int prec = 33 - strlen(line);
+    l = sprintf(line, "%.*g", prec, f);
+    while(l > 16)
+    {
+      --prec;
+      l = sprintf(line, "%.*g", prec, f);
+    }
   }
-  else
-  {
-    throw std::logic_error("Impossible conversion");
-  }
+  strcpy(buf, line);
 }
 #else
 // http://stackoverflow.com/questions/32631178/writing-ieee-754-1985-double-as-ascii-on-a-limited-16-bytes-string
+//
+// solution from the above link is too buggy
 static inline void
 clean(char * mant)
 {
@@ -532,23 +537,21 @@ EncodingImplementation<VR::VRASCII>::Write(const double * data, unsigned long le
 {
   if (!data || length < 1)
     return;
-#ifdef VRDS16ILLEGAL
-  _os << to_string(data[0]);
-#else
-  char buf[16 + 1];
-  x16printf(buf, 16, data[0]);
-  _os << buf;
-#endif
   if (length > 1)
   {
-    for (unsigned long i = 1; i < length; ++i)
+    for (unsigned long i = 0; i < length; ++i)
     {
-#ifdef VRDS16ILLEGAL
-      _os << "\\" << to_string(data[i]);
+      char buf[17];
+      memset(buf, 0, 17);
+#ifdef DS16SIMPLE
+      ds16print(buf, data[i]);
 #else
       x16printf(buf, 16, data[i]);
-      _os << "\\" << buf;
 #endif
+      if (i == 0)
+        _os << buf;
+      else
+        _os << "\\" << buf;
     }
   }
 }
@@ -1085,5 +1088,9 @@ class Element<VR::OW, VM::VM1> : public Element<VR::OW, VM::VM1_n>
 {};
 
 } // namespace mdcm
+
+#ifdef DS16SIMPLE
+#undef DS16SIMPLE
+#endif
 
 #endif // MDCMELEMENT_H
