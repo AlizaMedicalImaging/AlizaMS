@@ -147,6 +147,7 @@ start_pass_huff(j_compress_ptr cinfo, boolean gather_statistics)
     losslsc->pub.entropy_finish_pass = finish_pass_gather;
 #else
     ERREXIT(cinfo, JERR_NOT_COMPILED);
+    return;
 #endif
   }
   else
@@ -268,7 +269,10 @@ emit_bits(working_state * state, unsigned int code, int size)
 
   /* if size is 0, caller used an invalid Huffman table entry */
   if (size == 0)
+  {
     ERREXIT(state->cinfo, JERR_HUFF_MISSING_CODE);
+    return FALSE;
+  }
 
   put_buffer &= (((IJG_INT)1) << size) - 1; /* mask off any extra bits in code */
 
@@ -410,7 +414,10 @@ encode_mcus_huff(j_compress_ptr cinfo,
       /* Check for out-of-range difference values.
        */
       if (nbits > MAX_DIFF_BITS)
+      {
         ERREXIT(cinfo, JERR_BAD_DIFF);
+        return 0;
+      }
 
       /* Emit the Huffman-coded symbol for the number of bits */
       if (!emit_bits(&state, dctbl->ehufco[nbits], dctbl->ehufsi[nbits]))
@@ -465,7 +472,10 @@ finish_pass_huff(j_compress_ptr cinfo)
 
   /* Flush out the last data */
   if (!flush_bits(&state))
+  {
     ERREXIT(cinfo, JERR_CANT_SUSPEND);
+    return;
+  }
 
   /* Update state */
   cinfo->dest->next_output_byte = state.next_output_byte;
@@ -558,7 +568,10 @@ encode_mcus_gather(j_compress_ptr cinfo,
       /* Check for out-of-range difference values.
        */
       if (nbits > MAX_DIFF_BITS)
+      {
         ERREXIT(cinfo, JERR_BAD_DIFF);
+        return 0;
+      }
 
       /* Count the Huffman symbol for the number of bits */
       counts[nbits]++;

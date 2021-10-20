@@ -4,6 +4,9 @@
 //
 //  Created by Xuchen Han on 4/4/20.
 //
+
+// modifications github.com/issakomi
+
 #ifndef btReducedVectors_h
 #define btReducedVectors_h
 #include "btVector3.h"
@@ -26,10 +29,10 @@ inline bool operator<(const TwoInts& A, const TwoInts& B)
 class btReducedVector
 {
 public:
+    int m_sz; // all m_indices value < m_sz
     btAlignedObjectArray<int> m_indices;
     btAlignedObjectArray<btVector3> m_vecs;
-    int m_sz; // all m_indices value < m_sz
-public:
+
 	btReducedVector():m_sz(0)
 	{
 		m_indices.resize(0);
