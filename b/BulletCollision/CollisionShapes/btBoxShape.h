@@ -13,6 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
+// modified github.com/issakomi
+
 #ifndef BT_OBB_BOX_MINKOWSKI_H
 #define BT_OBB_BOX_MINKOWSKI_H
 
@@ -163,7 +165,10 @@ public:
 				plane.setValue(btScalar(0.), btScalar(0.), btScalar(-1.), -halfExtents.z());
 				break;
 			default:
+			    // only to silence the warning
+				plane.setValue(btScalar(0.), btScalar(0.), btScalar(0.), btScalar(0.));
 				btAssert(0);
+				break;
 		}
 	}
 
