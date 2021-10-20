@@ -32,7 +32,7 @@ Siemens mosaic format. United Imaging Healthcare (UIH) Grid / VFrame format.
 Elscint ELSCINT1 PMSCT_RLE1 and PMSCT_RGB1
 
 %prep
-git clone -b 'v1.7.1' --depth 1 https://github.com/AlizaMedicalImaging/AlizaMS.git
+git clone https://github.com/AlizaMedicalImaging/AlizaMS.git
 
 %build
 cd AlizaMS
