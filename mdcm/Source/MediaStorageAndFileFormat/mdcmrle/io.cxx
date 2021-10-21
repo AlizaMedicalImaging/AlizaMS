@@ -74,19 +74,18 @@ source::read_into_segments(char * out, int len, image_info const & ii)
         streampos_t pos = tell();
         int         nvalues = read(out + 0 * llen, llen);
         assert(nvalues == llen);
-        (void)nvalues;
         bool b = seek(pos + 1 * plane);
         assert(b);
         nvalues = read(out + 1 * llen, llen);
         assert(nvalues == llen);
-        (void)nvalues;
         b = seek(pos + 2 * plane);
         assert(b);
         nvalues = read(out + 2 * llen, llen);
         assert(nvalues == llen);
-        (void)nvalues;
         b = seek(pos + llen);
         assert(b);
+        (void)nvalues;
+        (void)b;
       }
       else
       {

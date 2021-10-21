@@ -13,6 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
+// modified github.com/issakomi
+
 #include "btConvexConcaveCollisionAlgorithm.h"
 #include "LinearMath/btQuickprof.h"
 #include "BulletCollision/CollisionDispatch/btCollisionObject.h"
@@ -243,6 +245,7 @@ void btConvexConcaveCollisionAlgorithm::processCollision(const btCollisionObject
 						}
 					}
 					resultOut->refreshContactPoints();
+					(void)poly; // FIXME
 				}
 			}
 		}

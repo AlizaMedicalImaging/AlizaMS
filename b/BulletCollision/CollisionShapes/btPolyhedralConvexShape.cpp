@@ -134,6 +134,7 @@ bool btPolyhedralConvexShape::initializePolyhedralFeatures(int shiftVerticesByMa
 			prevVertex = v1;
 			int v01 = edge->getSourceVertex();
 			v1 = edge->getTargetVertex();
+			(void)v01; // FIXME
 		}
 
 		btAssert(combinedFace.m_indices.size() > 2);
