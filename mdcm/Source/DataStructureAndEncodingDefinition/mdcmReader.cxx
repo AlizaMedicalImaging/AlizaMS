@@ -692,16 +692,16 @@ isasciiupper(char c)
 bool
 Reader::CanRead() const
 {
-  // fastpath
+  if (!Stream)
+   return false;
   std::istream & is = *Stream;
   if (is.bad())
     return false;
   if (is.tellg() != std::streampos(0))
     return false;
-  //
   {
-    is.seekg(128, std::ios::beg); // we ignore return value as we test is.good()
     char b[4];
+    is.seekg(128, std::ios::beg);
     if (is.good() && is.read(b, 4) && strncmp(b, "DICM", 4) == 0)
     {
       is.seekg(0, std::ios::beg);
