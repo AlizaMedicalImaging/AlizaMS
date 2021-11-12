@@ -56,7 +56,7 @@ cd AlizaMS
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
 %{_datadir}/icons/hicolor/*/apps/%{name}.svg
 %{_datadir}/applications/%{name}.desktop
-%{_datadir}/%{name}/*
+%{_datadir}/%{name}
 %{_mandir}/man1/%{name}.1*
 
 %changelog
