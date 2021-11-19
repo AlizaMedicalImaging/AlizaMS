@@ -91,7 +91,7 @@ License: BSD-3-clause
 
 Files: mdcm/Source/Common/zipstreamimpl.*
 Copyright: 2003 Jonathan de Halleux
-License: zlib
+License: Zlib
 
 Files: mdcm/Utilities/mdcmcharls/*
 Copyright:
