@@ -89,6 +89,10 @@ Copyright:
   2004-2008 René Nyffenegger
 License: BSD-3-clause
 
+Files: mdcm/Source/Common/zipstreamimpl.*
+Copyright: 2003 Jonathan de Halleux
+License: zlib
+
 Files: mdcm/Utilities/mdcmcharls/*
 Copyright:
   2007-2010 Jan de Vaan
@@ -251,3 +255,11 @@ License: BSD
    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
    POSSIBILITY OF SUCH DAMAGE.
+
+Files: CG/glew/*
+Copyright:
+  2008-2017 Nigel Stewart
+  2002-2008 Milan Ikits
+  2002-2008 Marcelo E. Magallon
+  2002 Lev Povalahev
+License: BSD, MIT
