@@ -28,6 +28,14 @@ DICOM viewer
 
 %prep
 git clone https://github.com/AlizaMedicalImaging/AlizaMS.git
+cd AlizaMS
+rm -fr mdcm/Utilities/mdcmzlib/
+rm -fr mdcm/Utilities/mdcmopenjpeg/
+rm -fr mdcm/Utilities/mdcmcharls/
+rm -fr mdcm/Utilities/mdcmuuid/
+rm -fr mdcm/Utilities/pvrg/
+rm -fr b/
+rm -fr CG/glew/
 
 %build
 cd AlizaMS

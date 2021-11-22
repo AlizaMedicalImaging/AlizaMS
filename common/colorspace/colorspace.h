@@ -2,6 +2,8 @@
  * @author Pascal Getreuer 2005-2010 <getreuer@gmail.com>
  */
 
+// s. cpp file for details
+
 // modified mihail.isakov@gmail.com
 // C++ static class
 
