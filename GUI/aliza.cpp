@@ -44,7 +44,7 @@ static QList<ImageVariant*> selected_images;
 static QList<ImageVariant*> animation_images;
 static QList<double> anim3d_times;
 
-#include "b/btBulletCollisionCommon.h"
+#include "btBulletCollisionCommon.h"
 static btDefaultCollisionConfiguration * g_collisionConfiguration = NULL;
 static btCollisionDispatcher           * g_dispatcher             = NULL;
 static btDbvtBroadphase                * g_broadphase             = NULL;

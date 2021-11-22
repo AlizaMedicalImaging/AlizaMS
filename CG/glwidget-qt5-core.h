@@ -30,7 +30,6 @@
 #include <QKeyEvent>
 #include <QColor>
 #include <QString>
-#include "btBulletCollisionCommon.h"
 
 #define SCENE_ORTHO_SIZE 150
 #define SCENE_POS_Z 400
