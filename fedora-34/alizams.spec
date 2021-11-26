@@ -1,7 +1,5 @@
-%global debug_package %{nil}
-
 Name:    alizams
-Version: 1.7.2
+Version: 1.7.3
 Release: 1%{?dist}
 Summary: Aliza MS DICOM Viewer
 License: GPLv3
@@ -16,19 +14,24 @@ BuildRequires:  vxl-devel
 BuildRequires:  cmake(LIBMINC)
 BuildRequires:  cmake(ITK)
 BuildRequires:  cmake(gdcm)
-BuildRequires:  bullet-devel >= 2.97
+BuildRequires:  bullet-devel
 BuildRequires:  desktop-file-utils
 BuildRequires:  git
 Requires:       hicolor-icon-theme
 Requires:       qt5-qtsvg
 
-
 %description
-DICOM viewer
+A 2D and 3D DICOM viewer with many tools and very fast directory
+scanner and DICOMDIR support.
+It can consistently de-identify DICOM files.
 
 %prep
 git clone https://github.com/AlizaMedicalImaging/AlizaMS.git
 cd AlizaMS
+rm -rf debian-10/
+rm -rf fedora-34/
+rm -rf package/apple/
+rm -rf package/art/
 rm -fr mdcm/Utilities/mdcmzlib/
 rm -fr mdcm/Utilities/mdcmopenjpeg/
 rm -fr mdcm/Utilities/mdcmcharls/
