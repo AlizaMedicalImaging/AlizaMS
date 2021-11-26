@@ -226,6 +226,9 @@ private:
 	QAction  * oneAct;
 	QAction  * browser_open_dir_act;
 	QAction  * browser_open_dcmdir_act;
+#ifdef USE_WORKSTATION_MODE
+	QAction  * browser_open_ctk_act;
+#endif
 	QAction  * browser_reload_act;
 	QAction  * browser_metadata_act;
 	QAction  * browser_copy_act;
