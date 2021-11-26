@@ -89,7 +89,7 @@
         </sizepolicy>
        </property>
        <property name="toolTip">
-        <string>Open DICOMDIR</string>
+        <string>Open CTK database</string>
        </property>
        <property name="text">
         <string/>
