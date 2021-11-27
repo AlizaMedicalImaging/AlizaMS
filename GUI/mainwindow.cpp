@@ -489,6 +489,9 @@ MainWindow::MainWindow(
 	connect(browser2->meta_pushButton,      SIGNAL(clicked()),           this,SLOT(toggle_meta2()));
 	connect(browser_open_dir_act,           SIGNAL(triggered()),         browser2,SLOT(open_dicom_dir()));
 	connect(browser_open_dcmdir_act,        SIGNAL(triggered()),         browser2,SLOT(open_DICOMDIR()));
+#ifdef USE_WORKSTATION_MODE
+	connect(browser_open_ctk_act,           SIGNAL(triggered()),         browser2,SLOT(open_CTK_db()));
+#endif
 	connect(browser_reload_act,             SIGNAL(triggered()),         browser2,SLOT(reload_dir()));
 	connect(browser_metadata_act,           SIGNAL(triggered()),         this,    SLOT(toggle_meta2()));
 	connect(browser_copy_act,               SIGNAL(triggered()),         browser2,SLOT(copy_files()));
@@ -766,6 +769,9 @@ void MainWindow::createActions()
 	oneAct->setEnabled(false);
 	browser_open_dir_act    = new QAction(QIcon(QString(":/bitmaps/folder.svg")),QString("Open directory"), this);
 	browser_open_dcmdir_act = new QAction(QIcon(QString(":/bitmaps/dcmdir.svg")),QString("Open DICOMDIR"), this);
+#ifdef USE_WORKSTATION_MODE
+	browser_open_ctk_act    = new QAction(QIcon(QString(":/bitmaps/ctk.svg")),   QString("Open CTK database"), this);
+#endif
 	browser_reload_act      = new QAction(QIcon(QString(":/bitmaps/reload.svg")),QString("Reload"), this);
 	browser_metadata_act    = new QAction(QIcon(QString(":/bitmaps/meta.svg")),  QString("Show metadata"), this);
 	browser_copy_act        = new QAction(QIcon(QString(":/bitmaps/copy2.svg")), QString("Copy selected"), this);
@@ -869,6 +875,9 @@ void MainWindow::createMenus()
 	browser_menu = menuBar()->addMenu(QString("DICOM scanner"));
 	browser_menu->addAction(browser_open_dir_act);
 	browser_menu->addAction(browser_open_dcmdir_act);
+#ifdef USE_WORKSTATION_MODE
+	browser_menu->addAction(browser_open_ctk_act);
+#endif
 	browser_menu->addAction(browser_reload_act);
 	browser_menu->addAction(browser_metadata_act);
 	browser_menu->addAction(browser_copy_act);
