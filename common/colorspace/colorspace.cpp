@@ -273,9 +273,9 @@ void ColorSpace_::Yiq2Rgb(double *R, double *G, double *B, double Y, double I, d
  */
 void ColorSpace_::Rgb2Hsv(double *H, double *S, double *V, double R, double G, double B)
 {
-	double Max = MAX3(R, G, B);
-	double Min = MIN3(R, G, B);
-	double C = Max - Min;
+	const double Max = MAX3(R, G, B);
+	const double Min = MIN3(R, G, B);
+	const double C = Max - Min;
 
 	*V = Max;
 
@@ -322,13 +322,13 @@ void ColorSpace_::Rgb2Hsv(double *H, double *S, double *V, double R, double G, d
  */
 void ColorSpace_::Hsv2Rgb(double *R, double *G, double *B, double H, double S, double V)
 {
-	double C = S * V;
-	double Min = V - C;
-	double X;
+	const double C = S * V;
+	const double Min = V - C;
 
 	H -= 360*floor(H/360);
 	H /= 60;
-	X = C*(1 - fabs(H - 2*floor(H/2) - 1));
+
+	const double X = C*(1 - fabs(H - 2*floor(H/2) - 1));
 
 	switch((int)H)
 	{
@@ -387,9 +387,9 @@ void ColorSpace_::Hsv2Rgb(double *R, double *G, double *B, double H, double S, d
  */
 void ColorSpace_::Rgb2Hsl(double *H, double *S, double *L, double R, double G, double B)
 {
-	double Max = MAX3(R, G, B);
-	double Min = MIN3(R, G, B);
-	double C = Max - Min;
+	const double Max = MAX3(R, G, B);
+	const double Min = MIN3(R, G, B);
+	const double C = Max - Min;
 
 	*L = (Max + Min)/2;
 
@@ -437,13 +437,13 @@ void ColorSpace_::Rgb2Hsl(double *H, double *S, double *L, double R, double G, d
  */
 void ColorSpace_::Hsl2Rgb(double *R, double *G, double *B, double H, double S, double L)
 {
-	double C = (L <= 0.5) ? (2*L*S) : ((2 - 2*L)*S);
-	double Min = L - 0.5*C;
-	double X;
+	const double C = (L <= 0.5) ? (2*L*S) : ((2 - 2*L)*S);
+	const double Min = L - 0.5*C;
 
 	H -= 360*floor(H/360);
 	H /= 60;
-	X = C*(1 - fabs(H - 2*floor(H/2) - 1));
+
+	const double X = C*(1 - fabs(H - 2*floor(H/2) - 1));
 
 	switch((int)H)
 	{
@@ -500,8 +500,8 @@ void ColorSpace_::Hsl2Rgb(double *R, double *G, double *B, double H, double S, d
  */
 void ColorSpace_::Rgb2Hsi(double *H, double *S, double *I, double R, double G, double B)
 {
-	double alpha = 0.5*(2*R - G - B);
-	double beta = 0.866025403784439*(G - B);
+	const double alpha = 0.5*(2*R - G - B);
+	const double beta = 0.866025403784439*(G - B);
 
 	*I = (R + G + B)/3;
 
@@ -600,13 +600,11 @@ void ColorSpace_::Rgb2Xyz(double *X, double *Y, double *Z, double R, double G, d
  */
 void ColorSpace_::Xyz2Rgb(double *R, double *G, double *B, double X, double Y, double Z)
 {	
-	double R1, B1, G1, Min;
+	double R1 =  3.2406*X - 1.5372*Y - 0.4986*Z;
+	double G1 = -0.9689*X + 1.8758*Y + 0.0415*Z;
+	double B1 =  0.0557*X - 0.2040*Y + 1.0570*Z;
 
-	R1 =  3.2406*X - 1.5372*Y - 0.4986*Z;
-	G1 = -0.9689*X + 1.8758*Y + 0.0415*Z;
-	B1 =  0.0557*X - 0.2040*Y + 1.0570*Z;
-
-	Min = MIN3(R1, G1, B1);
+	const double Min = MIN3(R1, G1, B1);
 
 	/* Force nonnegative values so that gamma correction is well-defined. */
 	if(Min < 0)
@@ -671,9 +669,11 @@ void ColorSpace_::Lab2Xyz(double *X, double *Y, double *Z, double L, double a, d
  */
 void ColorSpace_::Xyz2Luv(double *L, double *u, double *v, double X, double Y, double Z)
 {	
-	double u1, v1, Denom;
+	double u1, v1;
 
-	if((Denom = X + 15*Y + 3*Z) > 0)
+	const double Denom = X + 15*Y + 3*Z;
+
+	if(Denom > 0)
 	{
 		u1 = (4*X) / Denom;
 		v1 = (9*Y) / Denom;
