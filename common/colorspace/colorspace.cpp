@@ -74,8 +74,6 @@
 // C++ static class
 
 #include <cmath>
-#include <cstring>
-#include <cctype>
 #include "colorspace.h"
 
 /** @brief XYZ color of the D65 white point */
