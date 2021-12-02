@@ -505,6 +505,7 @@ void ImagesBox::set_html(const ImageVariant * v)
 			!v->di->hide_orientation &&
 			!v->orientation_string.isEmpty())
 		{
+			html.append(QString("<span class='y2'>RAI-Code: </span>"));
 			if (v->iod_supported && v->di->slices_from_dicom)
 				html.append(
 					QString("<span class='yl1'>") +

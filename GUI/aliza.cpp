@@ -116,7 +116,7 @@ static void g_close_physics()
 		{
 			btCollisionObject * o = g_collisionWorld->getCollisionObjectArray()[x];
 			if (!o) continue;
-			if(o->getUserPointer())
+			if (o->getUserPointer())
 			{
 				int * p = static_cast<int*>(o->getUserPointer());
 				delete [] p;
