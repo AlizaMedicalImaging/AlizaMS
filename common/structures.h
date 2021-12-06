@@ -220,6 +220,12 @@ public:
 
 typedef std::vector<FrameGroup> FrameGroupValues;
 
+typedef struct
+{
+	unsigned int type;
+	QList<QVariant> values;
+} GEMSParam;
+
 class Contour
 {
 public:

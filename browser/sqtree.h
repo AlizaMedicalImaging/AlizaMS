@@ -57,6 +57,7 @@ private:
 		const char*,
 		const bool=false);
 	void dump_csa(const mdcm::DataSet&);
+	void dump_gems(const mdcm::DataSet&);
 	void expand_children(const QModelIndex&);
 	void collapse_children(const QModelIndex&);
 	void process_attribure(const short);

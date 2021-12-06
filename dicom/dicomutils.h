@@ -92,6 +92,13 @@ public:
 		unsigned short*,unsigned short*,unsigned short*,
 		short*,
 		bool*);
+	static bool build_gems_dictionary(
+		QMap<QString,int> &,
+		const mdcm::DataSet&);
+	static void read_gems_params(
+		QMap<int,GEMSParam> &,
+		const mdcm::DataElement&,
+		const QMap<QString,int> &);
 	static bool has_functional_groups(const mdcm::DataSet&);
 	static bool has_supp_palette(const mdcm::DataSet&);
 	static bool has_modality_lut_sq(const mdcm::DataSet&);

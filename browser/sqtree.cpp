@@ -1013,21 +1013,28 @@ void SQtree::read_file(const QString & f, const bool use_lock)
 					ce_.GetByteValue()->GetLength());
 			}
 		}
-		dump_csa(ds);
-		mdcm::Tag tmp_tag;
-		size_t ce = 0;
-		for (mdcm::DataSet::ConstIterator it = ds.Begin();
-			it!=ds.End();
-			++it)
+		//
 		{
-			bool duplicated = false;
-			const mdcm::DataElement & elem = *it;
-			if (ce > 0 && tmp_tag == elem.GetTag()) duplicated = true;
-			process_element(
-				ds, elem, dicts, i, charset.toLatin1().constData(), duplicated);
-			tmp_tag = elem.GetTag();
-			++ce;
+			mdcm::Tag tmp_tag;
+			size_t ce = 0;
+			for (mdcm::DataSet::ConstIterator it = ds.Begin();
+				it!=ds.End();
+				++it)
+			{
+				bool duplicated = false;
+				const mdcm::DataElement & elem = *it;
+				if (ce > 0 && tmp_tag == elem.GetTag()) duplicated = true;
+				process_element(
+					ds, elem, dicts, i, charset.toLatin1().constData(), duplicated);
+				tmp_tag = elem.GetTag();
+				++ce;
+			}
 		}
+		//
+		//
+		//
+		dump_csa(ds);
+		dump_gems(ds);
 	}
 	catch(mdcm::ParseException & pe)
 	{
@@ -1190,6 +1197,548 @@ void SQtree::dump_csa(const mdcm::DataSet & ds)
 			textEdit->setTextCursor(cursor);
 			textEdit->show();
 		}
+	}
+}
+
+void SQtree::dump_gems(const mdcm::DataSet & ds)
+{
+	const mdcm::PrivateTag tgems_us_movie(
+		0x7fe1,0x1,"GEMS_Ultrasound_MovieGroup_001");
+	if (!ds.FindDataElement(tgems_us_movie)) return;
+	const mdcm::DataElement & e1 = ds.GetDataElement(tgems_us_movie);
+	mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 = e1.GetValueAsSQ();
+	if (!(sq1 && sq1->GetNumberOfItems()>0)) return;
+	textEdit->document()->addResource(
+		QTextDocument::StyleSheetResource, QUrl("format.css"), css1);
+	QString gems_us_text = QString(head);
+	const size_t n1 = sq1->GetNumberOfItems();
+	for (size_t x = 0; x < n1; ++x)
+	{
+		gems_us_text.append(
+			"<span class = 'y'>GEMS Ultrasound MovieGroup</span><br/>");
+		QMap<QString,int> gdict;
+		if (!DicomUtils::build_gems_dictionary(gdict,ds)) continue;
+		const mdcm::Item & item1 = sq1->GetItem(x+1);
+		const mdcm::DataSet & subds1 = item1.GetNestedDataSet();
+		const mdcm::PrivateTag tname2(
+			0x7fe1,0x2,"GEMS_Ultrasound_MovieGroup_001");
+		QString qs2("");
+		if (subds1.FindDataElement(tname2))
+		{
+			const mdcm::DataElement & e2 =
+				subds1.GetDataElement(tname2);
+			if (!e2.IsEmpty() && !e2.IsUndefinedLength())
+			{
+				const mdcm::ByteValue * v2 = e2.GetByteValue();
+				if (v2)
+				{
+					const char * b2 = v2->GetPointer();
+					const unsigned int s2   = v2->GetLength();
+					qs2 =
+						QString::fromLatin1(b2, s2).
+							trimmed().remove(QChar('\0')) +
+						QString("&#160;");
+				}
+			}
+		}
+		gems_us_text.append(
+			QString("<span class = 'y5'>")+qs2+
+			QString("</span><span class = 'y4'>(SQ 0x1)")+
+			QString("</span><br/>"));
+		const mdcm::PrivateTag t8(
+			0x7fe1,0x8,"GEMS_Ultrasound_MovieGroup_001");
+		if (subds1.FindDataElement(t8))
+		{
+			const mdcm::DataElement & e8 = subds1.GetDataElement(t8);
+			QMap<int,GEMSParam> m8;
+			DicomUtils::read_gems_params(m8, e8, gdict);
+			QMapIterator<QString, int> itmd(gdict);
+			gems_us_text.append(
+				QString("<span class = 'y4'>")+
+				QString("SQ 0x8:")+
+				QString("</span><br/>"));
+			while (itmd.hasNext())
+			{
+				itmd.next();
+				if (m8.contains(itmd.value()))
+				{
+					const GEMSParam & gp = m8.value(itmd.value());
+					const QList<QVariant> & l8 = gp.values;
+					QString tmp8("");
+					for (int x8 = 0; x8 < l8.size(); ++x8)
+						tmp8.append(l8.at(x8).toString()+QString(" "));
+					gems_us_text.append(itmd.key()+QString(": ")+tmp8+QString("<br/>")); 
+				}
+			}
+		}
+		const mdcm::PrivateTag t10(
+			0x7fe1,0x10,"GEMS_Ultrasound_MovieGroup_001");
+		if (subds1.FindDataElement(t10))
+		{
+			const mdcm::DataElement & e10 = subds1.GetDataElement(t10);
+			mdcm::SmartPointer<mdcm::SequenceOfItems> sq10 =
+				e10.GetValueAsSQ();
+			if (sq10 && sq10->GetNumberOfItems()>0)
+			{
+				const size_t n10 = sq10->GetNumberOfItems();
+				for (size_t x10 = 0; x10 < n10; ++x10)
+				{
+					mdcm::Item & item10 = sq10->GetItem(x10+1);
+					mdcm::DataSet & subds10 =
+						item10.GetNestedDataSet();
+					const mdcm::PrivateTag tname12(
+						0x7fe1,0x12,"GEMS_Ultrasound_MovieGroup_001");
+					QString qs12("");
+					if (subds10.FindDataElement(tname12))
+					{
+						const mdcm::DataElement & e12 =
+							subds10.GetDataElement(tname12);
+						if (!e12.IsEmpty() &&
+							!e12.IsUndefinedLength())
+						{
+							const mdcm::ByteValue * v12 =
+								e12.GetByteValue();
+							if (v12)
+							{
+								const char * b12 = v12->GetPointer();
+								const unsigned int s12   = v12->GetLength();
+								qs12 = QString::fromLatin1(b12, s12).
+									trimmed().remove(QChar('\0'))+
+									QString("&#160;");
+							}
+						}
+					}
+					gems_us_text.append(
+						QString("<span class = 'y5'>&#160;")+qs12+
+						QString("</span><span class = 'y4'>(SQ 0x10)")+
+						QString("</span><br/>"));
+					const mdcm::PrivateTag t18(
+						0x7fe1,0x18,"GEMS_Ultrasound_MovieGroup_001");
+					if (subds10.FindDataElement(t18))
+					{
+						const mdcm::DataElement & e18 =
+							subds10.GetDataElement(t18);
+						QMap<int,GEMSParam> m18;
+						DicomUtils::read_gems_params(m18, e18, gdict);
+						QMapIterator<QString, int> itmd(gdict);
+						gems_us_text.append(
+							QString("<span class = 'y4'>&#160;")+
+							QString("SQ 0x18:")+
+							QString("</span><br/>"));
+						while (itmd.hasNext())
+						{
+							itmd.next();
+							if (m18.contains(itmd.value()))
+							{
+								const GEMSParam & gp = m18.value(itmd.value());
+								const QList<QVariant> & l18 = gp.values;
+								QString tmp18("");
+								for (int x18 = 0;
+									x18 < l18.size();
+									++x18)
+									tmp18.append(
+										l18.at(x18).toString() +
+										QString(" "));
+								gems_us_text.append(
+									QString("&#160;") +
+									itmd.key() +
+									QString(": ")+
+									tmp18+QString("<br/>")); 
+							}
+						}
+					}
+					const mdcm::PrivateTag t20(
+						0x7fe1,0x20,"GEMS_Ultrasound_MovieGroup_001");
+					if (subds10.FindDataElement(t20))
+					{
+						const mdcm::DataElement & e20 =
+							subds10.GetDataElement(t20);
+						mdcm::SmartPointer<mdcm::SequenceOfItems>
+							sq20 = e20.GetValueAsSQ();
+						if (sq20 && sq20->GetNumberOfItems()>0)
+						{
+							const size_t n20 =
+								sq20->GetNumberOfItems();
+							for (size_t x20 = 0; x20 < n20; ++x20)
+							{
+								mdcm::Item & item20 =
+									sq20->GetItem(x20+1);
+								mdcm::DataSet & subds20 =
+									item20.GetNestedDataSet();
+								const mdcm::PrivateTag tname24(
+									0x7fe1,
+									0x24,
+									"GEMS_Ultrasound_MovieGroup_001");
+								QString qs24("");
+								if (subds20.FindDataElement(tname24))
+								{
+									const mdcm::DataElement & e24 =
+										subds20.GetDataElement(
+											tname24);
+									if (!e24.IsEmpty() &&
+										!e24.IsUndefinedLength())
+									{
+										const mdcm::ByteValue * v24 =
+											e24.GetByteValue();
+										if (v24)
+										{
+											const char * b24 =
+												v24->GetPointer();
+											const unsigned int s24 =
+												v24->GetLength();
+											qs24 =
+												QString::fromLatin1(
+													b24, s24).
+														trimmed().
+														remove(
+															QChar('\0'))+
+												QString("&#160;");
+										}
+									}
+								}
+								gems_us_text.append(
+									QString("<span class = 'y5'>&#160;&#160;&#160;&#160;")+
+									qs24+QString("</span><span class = 'y4'>(SQ 0x20)")+
+									QString("</span><br/>"));
+								const mdcm::PrivateTag t26(0x7fe1,0x26,"GEMS_Ultrasound_MovieGroup_001");
+								if (subds20.FindDataElement(t26))
+								{
+									const mdcm::DataElement & e26 = subds20.GetDataElement(t26);
+									QMap<int,GEMSParam> m26;
+									DicomUtils::read_gems_params(m26, e26, gdict);
+									QMapIterator<QString, int> itmd(gdict);
+									gems_us_text.append(
+										QString("<span class = 'y4'>&#160;&#160;&#160;&#160;")+
+										QString("SQ 0x26:")+QString("</span><br/>"));
+									while (itmd.hasNext())
+									{
+										itmd.next();
+										if (m26.contains(itmd.value()))
+										{
+											const GEMSParam & gp = m26.value(itmd.value());
+											const QList<QVariant> & l26 = gp.values;
+											QString tmp26("");
+											for (int x26 = 0; x26 < l26.size(); ++x26)
+												tmp26.append(l26.at(x26).toString()+QString(" "));
+											gems_us_text.append(
+												QString("&#160;&#160;&#160;&#160;")+itmd.key()+QString(": ")+
+												tmp26+QString("<br/>")); 
+										}
+									}
+								}
+								/*
+								const mdcm::PrivateTag t36(0x7fe1,0x36,"GEMS_Ultrasound_MovieGroup_001");
+								if (subds20.FindDataElement(t36))
+								{
+									const mdcm::DataElement & e36 = subds20.GetDataElement(t36);
+									mdcm::SmartPointer<mdcm::SequenceOfItems> sq36 = e36.GetValueAsSQ();
+									const size_t n36 = sq36->GetNumberOfItems();
+									for (size_t x36 = 0; x36 < n36; ++x36)
+									{
+										mdcm::Item & item36 = sq36->GetItem(x36+1);
+										mdcm::DataSet & subds36 = item36.GetNestedDataSet();
+									}
+								}
+								const mdcm::PrivateTag t3a(0x7fe1,0x3a,"GEMS_Ultrasound_MovieGroup_001");
+								if (subds20.FindDataElement(t3a))
+								{
+									const mdcm::DataElement & e3a = subds20.GetDataElement(t3a);
+									mdcm::SmartPointer<mdcm::SequenceOfItems> sq3a = e3a.GetValueAsSQ();
+									const size_t n3a = sq3a->GetNumberOfItems();
+									for (size_t x3a = 0; x3a < n3a; ++x3a)
+									{
+										mdcm::Item & item3a = sq3a->GetItem(x3a+1);
+										mdcm::DataSet & subds3a = item3a.GetNestedDataSet();
+										const mdcm::PrivateTag tname3a(0x7fe1,0x30,"GEMS_Ultrasound_MovieGroup_001");
+										if (subds3a.FindDataElement(tname3a))
+										{
+											const mdcm::DataElement& e30 = subds3a.GetDataElement(tname3a);
+											if (!e30.IsEmpty() && !e30.IsUndefinedLength())
+											{
+												const mdcm::ByteValue * v30 = e30.GetByteValue();
+												if (v30)
+												{
+													const char * b30 = v30->GetPointer();
+													const unsigned int s30   = v30->GetLength();
+												}
+											}
+										}
+									}
+								}
+								*/
+								const mdcm::PrivateTag t83(0x7fe1,0x83,"GEMS_Ultrasound_MovieGroup_001");
+								if (subds20.FindDataElement(t83))
+								{
+									const mdcm::DataElement & e83 = subds20.GetDataElement(t83);
+									mdcm::SmartPointer<mdcm::SequenceOfItems> sq83 = e83.GetValueAsSQ();
+									if (sq83 && sq83->GetNumberOfItems()>0)
+									{
+										const size_t n83 = sq83->GetNumberOfItems();
+										for (size_t x83 = 0; x83 < n83; ++x83)
+										{
+											mdcm::Item & item83 = sq83->GetItem(x83+1);
+											mdcm::DataSet & subds83 = item83.GetNestedDataSet();
+											const mdcm::PrivateTag tname84(0x7fe1,0x84,"GEMS_Ultrasound_MovieGroup_001");
+											QString qs84("");
+											if (subds83.FindDataElement(tname84))
+											{
+												const mdcm::DataElement & e84 = subds83.GetDataElement(tname84);
+												if (!e84.IsEmpty() && !e84.IsUndefinedLength())
+												{
+													const mdcm::ByteValue * v84 = e84.GetByteValue();
+													if (v84)
+													{
+														const char * b84 = v84->GetPointer();
+														const unsigned int s84   = v84->GetLength();
+														qs84 = QString::fromLatin1(b84, s84)
+															.trimmed().remove(QChar('\0'))+QString("&#160;");
+													}
+												}
+											}
+											gems_us_text.append(
+												QString("<span class = 'y5'>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;")+
+												qs84+QString("</span><span class = 'y4'>(SQ 0x83)")+
+												QString("</span><br/>"));
+											const mdcm::PrivateTag t85(0x7fe1,0x85,"GEMS_Ultrasound_MovieGroup_001");
+											if (subds83.FindDataElement(t85))
+											{
+												const mdcm::DataElement & e85 = subds83.GetDataElement(t85);
+												QMap<int,GEMSParam> m85;
+												DicomUtils::read_gems_params(m85, e85, gdict);
+												QMapIterator<QString, int> itmd(gdict);
+												gems_us_text.append(
+													QString("<span class = 'y4'>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;")+
+													QString("SQ 0x85:")+QString("</span><br/>"));
+												while (itmd.hasNext())
+												{
+													itmd.next();
+													if (m85.contains(itmd.value()))
+													{
+														const GEMSParam & gp = m85.value(itmd.value());
+														const QList<QVariant> & l85 = gp.values;
+														QString tmp85("");
+														for (int x85 = 0; x85 < l85.size(); ++x85)
+															tmp85.append(l85.at(x85).toString()+QString(" "));
+														gems_us_text.append(
+															QString("&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;")+
+															itmd.key()+QString(": ")+tmp85+QString("<br/>")); 
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+					const mdcm::PrivateTag t83(
+						0x7fe1,
+						0x83,
+						"GEMS_Ultrasound_MovieGroup_001");
+					if (subds10.FindDataElement(t83))
+					{
+						const mdcm::DataElement & e83 =
+							subds10.GetDataElement(t83);
+						mdcm::SmartPointer<mdcm::SequenceOfItems>
+							sq83 = e83.GetValueAsSQ();
+						if (sq83 && sq83->GetNumberOfItems()>0)
+						{
+							const size_t n83 =
+								sq83->GetNumberOfItems();
+							for (size_t x83 = 0; x83 < n83; ++x83)
+							{
+								mdcm::Item & item83 =
+									sq83->GetItem(x83+1);
+								mdcm::DataSet & subds83 =
+									item83.GetNestedDataSet();
+								const mdcm::PrivateTag tname84(
+									0x7fe1,
+									0x84,
+									"GEMS_Ultrasound_MovieGroup_001");
+								QString qs84("");
+								if (subds83.FindDataElement(tname84))
+								{
+									const mdcm::DataElement& e84 =
+										subds83.GetDataElement(
+											tname84);
+									if (!e84.IsEmpty() &&
+										!e84.IsUndefinedLength())
+									{
+										const mdcm::ByteValue * v84 =
+											e84.GetByteValue();
+										if (v84)
+										{
+											const char * b84 =
+												v84->GetPointer();
+											const unsigned int s84 =
+												v84->GetLength();
+											qs84 =
+												QString::fromLatin1(
+													b84,
+													s84).
+													trimmed().
+													remove(QChar('\0')) +
+												QString("&#160;");
+										}
+									}
+								}
+								gems_us_text.append(QString(
+									"<span class = 'y5'>&#160;")+
+									qs84+
+									QString(
+										"</span><span class = 'y4'>"
+										"(SQ 0x83)</span><br/>"));
+								const mdcm::PrivateTag t85(
+									0x7fe1,
+									0x85,
+									"GEMS_Ultrasound_MovieGroup_001");
+								if (subds83.FindDataElement(t85))
+								{
+									const mdcm::DataElement & e85 =
+										subds83.GetDataElement(t85);
+									QMap<int,GEMSParam> m85;
+									DicomUtils::read_gems_params(
+										m85, e85, gdict);
+									QMapIterator<QString, int>
+										itmd(gdict);
+									gems_us_text.append(QString(
+										"<span class = 'y4'>&#160;") +
+										QString("SQ 0x85:")+
+										QString("</span><br/>"));
+									while (itmd.hasNext())
+									{
+										itmd.next();
+										if (m85.contains(
+											itmd.value()))
+										{
+											const GEMSParam & gp =
+												m85.value(
+													itmd.value());
+											const QList<QVariant> &
+												l85 = gp.values;
+											QString tmp85("");
+											for (int x85 = 0;
+												x85 < l85.size();
+												++x85)
+												tmp85.append(
+													l85.at(x85).
+														toString() +
+													QString(" "));
+											gems_us_text.append(
+												QString(
+													"&#160;") +
+												itmd.key()+
+												QString(": ")+
+												tmp85 +
+												QString("<br/>")); 
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		const mdcm::PrivateTag t73(
+			0x7fe1,
+			0x73,
+			"GEMS_Ultrasound_MovieGroup_001");
+		if (subds1.FindDataElement(t73))
+		{
+			const mdcm::DataElement & e73 =
+				subds1.GetDataElement(t73);
+			mdcm::SmartPointer<mdcm::SequenceOfItems>
+				sq73 = e73.GetValueAsSQ();
+			if (sq73 && sq73->GetNumberOfItems()>0)
+			{
+				const size_t n73 = sq73->GetNumberOfItems();
+				for (size_t x73 = 0; x73 < n73; ++x73)
+				{
+					mdcm::Item & item73 = sq73->GetItem(x73+1);
+					mdcm::DataSet & subds73 =
+						item73.GetNestedDataSet();
+					const mdcm::PrivateTag tname74(
+						0x7fe1,
+						0x74,
+						"GEMS_Ultrasound_MovieGroup_001");
+					QString qs74("");
+					if (subds73.FindDataElement(tname74))
+					{
+						const mdcm::DataElement & e74 =
+							subds73.GetDataElement(tname74);
+						if (!e74.IsEmpty() &&
+							!e74.IsUndefinedLength())
+						{
+							const mdcm::ByteValue * v74 =
+								e74.GetByteValue();
+							if (v74)
+							{
+								const char * b74 = v74->GetPointer();
+								const unsigned int s74   = v74->GetLength();
+								qs74 = QString::fromLatin1(
+									b74, s74).
+										trimmed().remove(QChar('\0')) +
+									QString("&#160;");
+							}
+						}
+					}
+					gems_us_text.append(
+						QString("<span class = 'y5'>") +
+						qs74 +
+						QString(
+							"</span><span class = 'y4'>"
+							"(SQ 0x73)</span><br/>"));
+					const mdcm::PrivateTag t75(
+						0x7fe1,
+						0x75,
+						"GEMS_Ultrasound_MovieGroup_001");
+					if (subds73.FindDataElement(t75))
+					{
+						const mdcm::DataElement & e75 =
+							subds73.GetDataElement(t75);
+						QMap<int,GEMSParam> m75;
+						DicomUtils::read_gems_params(m75, e75, gdict);
+						QMapIterator<QString, int> itmd(gdict);
+						gems_us_text.append(
+							QString("<span class = 'y4'>") +
+							QString("SQ 0x75:") +
+							QString("</span><br/>"));
+						while (itmd.hasNext())
+						{
+							itmd.next();
+							if (m75.contains(itmd.value()))
+							{
+								const GEMSParam & gp =
+									m75.value(itmd.value());
+								const QList<QVariant> & l75 = gp.values;
+								QString tmp75("");
+								for (int x75 = 0;
+									x75 < l75.size();
+									++x75)
+									tmp75.append(
+										l75.at(x75).toString() +
+										QString(" "));
+								gems_us_text.append(
+									itmd.key() +
+									QString(": ") +
+									tmp75 +
+									QString("<br/>")); 
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	gems_us_text.append(foot);
+	if (textEdit->document())
+	{
+		textEdit->document()->setHtml(gems_us_text);
+		QTextCursor cursor = textEdit->textCursor();
+		cursor.setPosition(0);
+		textEdit->setTextCursor(cursor);
+		textEdit->show();
 	}
 }
 
