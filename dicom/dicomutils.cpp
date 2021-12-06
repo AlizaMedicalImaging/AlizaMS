@@ -1615,11 +1615,18 @@ bool DicomUtils::build_gems_dictionary(QMap<QString,int> & m, const mdcm::DataSe
 				{
 					result0.push_back(tmp0[x0]);
 				}
+				delete [] buffer0;
 			}
-			else continue;
-			delete [] buffer0;
+			else
+			{
+				delete [] buffer0;
+				continue;
+			}
 		}
-		else continue;
+		else
+		{
+			continue;
+		}
 		//
 		const mdcm::DataElement & name  = s.GetDataElement(t3);
 		const mdcm::ByteValue * bv1 = name.GetByteValue();
