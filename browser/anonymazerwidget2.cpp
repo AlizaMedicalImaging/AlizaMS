@@ -1280,7 +1280,8 @@ static void anonymize_file__(
 	const std::set<mdcm::Tag> & dev_remove_tags,
 	const std::set<mdcm::Tag> & dev_empty_tags,
 	const std::set<mdcm::Tag> & dev_replace_tags,
-	const std::set<mdcm::Tag> & patient_tags,
+	const std::set<mdcm::Tag> & patient_remove_tags,
+	const std::set<mdcm::Tag> & patient_empty_tags,
 	const std::set<mdcm::Tag> & inst_remove_tags,
 	const std::set<mdcm::Tag> & inst_empty_tags,
 	const std::set<mdcm::Tag> & inst_replace_tags,
@@ -1413,7 +1414,8 @@ static void anonymize_file__(
 	//
 	if (!retain_patient_chars)
 	{
-		remove_recurs__(ds, patient_tags, implicit, dicts);
+		remove_recurs__(ds, patient_remove_tags, implicit, dicts);
+		empty_recurs__(ds, patient_empty_tags, implicit, dicts);
 	}
 	//
 	if (!retain_institution_id)
@@ -2594,7 +2596,8 @@ void AnonymazerWidget2::process_directory(
 				dev_remove_tags,
 				dev_empty_tags,
 				dev_replace_tags,
-				patient_tags,
+				patient_remove_tags,
+				patient_empty_tags,
 				inst_remove_tags,
 				inst_empty_tags,
 				inst_replace_tags,
@@ -2937,465 +2940,465 @@ void AnonymazerWidget2::init_profile()
  * 2021b
  *
  */
-	empty_tags        .insert(mdcm::Tag(0x0008,0x0050));// Accession Number
-	descr_remove_tags .insert(mdcm::Tag(0x0018,0x4000));// Acquisition Comments
-	struct_zero_tags  .insert(mdcm::Tag(0x0040,0x0555));// Acquisition Context Sequence
-	time_tags         .insert(mdcm::Tag(0x0008,0x0022));// Acquisition Date
-	time_tags         .insert(mdcm::Tag(0x0008,0x002a));// Acquisition DateTime
-	descr_remove_tags .insert(mdcm::Tag(0x0018,0x1400));// Acquisition Device Processing Description
-	descr_replace_tags.insert(mdcm::Tag(0x0018,0x11bb));// Acquisition Field Of View Label
-	descr_remove_tags .insert(mdcm::Tag(0x0018,0x9424));// Acquisition Protocol Description
-	time_tags         .insert(mdcm::Tag(0x0008,0x0032));// Acquisition Time
-	remove_tags       .insert(mdcm::Tag(0x0040,0x4035));// ActualHuman Performers Sequence
-	descr_remove_tags .insert(mdcm::Tag(0x0010,0x21b0));// Additional Patient History
-	remove_tags       .insert(mdcm::Tag(0x0040,0xa353));// Address (Trial)	
-	remove_tags       .insert(mdcm::Tag(0x0038,0x0010));// Admission ID
-	time_tags         .insert(mdcm::Tag(0x0038,0x0020));// Admitting Date
-	descr_remove_tags .insert(mdcm::Tag(0x0008,0x1084));// Admitting Diagnoses Code Sequence
-	descr_remove_tags .insert(mdcm::Tag(0x0008,0x1080));// Admitting Diagnoses Description
-	time_tags         .insert(mdcm::Tag(0x0038,0x0021));// Admitting Time
-	//                                 (0x0000,0x1000)  // Affected SOP Instance UID
-	patient_tags      .insert(mdcm::Tag(0x0010,0x2110));// Allergies
-	remove_tags       .insert(mdcm::Tag(0x4000,0x0010));// Arbitrary
-	remove_tags       .insert(mdcm::Tag(0x0040,0xa078));// Author Observer Sequence
-	empty_tags        .insert(mdcm::Tag(0x2200,0x0005));// Barcode Value
-	descr_remove_tags .insert(mdcm::Tag(0x300a,0x00c3));// Beam Description
-	descr_remove_tags .insert(mdcm::Tag(0x300a,0x00dd));// Bolus Description
-	remove_tags       .insert(mdcm::Tag(0x0010,0x1081));// Branch of Service
-	remove_tags       .insert(mdcm::Tag(0x0016,0x004d));// Camera Owner Name
-	dev_remove_tags   .insert(mdcm::Tag(0x0018,0x1007));// Cassette ID
-	inst_empty_tags   .insert(mdcm::Tag(0x0012,0x0060));// Clinical Trial Coordinating Center Name
-	remove_tags       .insert(mdcm::Tag(0x0012,0x0082));// Clinical Trial Protocol Ethics Committee Approval Number
-	inst_replace_tags .insert(mdcm::Tag(0x0012,0x0081));// Clinical Trial Protocol Ethics Committee Name
-	id_tags           .insert(mdcm::Tag(0x0012,0x0020));// Clinical Trial Protocol ID
-	remove_tags       .insert(mdcm::Tag(0x0012,0x0021));// Clinical Trial Protocol Name
-	descr_remove_tags .insert(mdcm::Tag(0x0012,0x0072));// Clinical Trial Series Description
-	remove_tags       .insert(mdcm::Tag(0x0012,0x0071));// Clinical Trial Series ID
-	inst_empty_tags   .insert(mdcm::Tag(0x0012,0x0030));// Clinical Trial Site ID
-	inst_empty_tags   .insert(mdcm::Tag(0x0012,0x0031));// Clinical Trial Site Name
-	pn_tags           .insert(mdcm::Tag(0x0012,0x0010));// Clinical Trial Sponsor Name
-	id_tags           .insert(mdcm::Tag(0x0012,0x0040));// Clinical Trial Subject ID
-	id_tags           .insert(mdcm::Tag(0x0012,0x0042));// Clinical Trial Subject Reading ID
-	descr_remove_tags .insert(mdcm::Tag(0x0012,0x0051));// Clinical Trial Time Point Description
-	empty_tags        .insert(mdcm::Tag(0x0012,0x0050));// Clinical Trial Time Point ID
-	descr_remove_tags .insert(mdcm::Tag(0x0040,0x0310));// Comments on Radiation Dose
-	descr_remove_tags .insert(mdcm::Tag(0x0040,0x0280));// Comments on the Performed Procedure Step
-	descr_remove_tags .insert(mdcm::Tag(0x300a,0x02eb));// Compensator Description
-	uid_tags          .insert(mdcm::Tag(0x0020,0x9161));// Concatenation UID
-	descr_empty_tags  .insert(mdcm::Tag(0x3010,0x000f));// Conceptual Volume Combination Description
-	descr_empty_tags  .insert(mdcm::Tag(0x3010,0x0017));// Conceptual Volume Description
-	uid_tags          .insert(mdcm::Tag(0x3010,0x0006));// Conceptual Volume UID
-	remove_tags       .insert(mdcm::Tag(0x0040,0x3001));// Confidentiality Constrainton Patient Data Description
-	uid_tags          .insert(mdcm::Tag(0x3010,0x0013));// Constituent Conceptual Volume UID
-	pn_tags           .insert(mdcm::Tag(0x0008,0x009c));// Consulting Physician's Name
-	remove_tags       .insert(mdcm::Tag(0x0008,0x009d));// Consulting Physician Identification Sequence
-	remove_tags       .insert(mdcm::Tag(0x0050,0x001b));// Container Component ID
-	descr_empty_tags  .insert(mdcm::Tag(0x0040,0x051a));// Container Description
-	id_tags           .insert(mdcm::Tag(0x0040,0x0512));// Container Identifier
-	remove_tags       .insert(mdcm::Tag(0x0070,0x0086));// Content Creator's Identification Code Sequence
-	pn_tags           .insert(mdcm::Tag(0x0070,0x0084));// Content Creator's Name
-	time_tags         .insert(mdcm::Tag(0x0008,0x0023));// Content Date
-	struct_zero_tags  .insert(mdcm::Tag(0x0040,0xa730));// Content Sequence
-	time_tags         .insert(mdcm::Tag(0x0008,0x0033));// Content Time
-	descr_empty_tags  .insert(mdcm::Tag(0x0018,0x0010));// Contrast / Bolus Agent
-	descr_remove_tags .insert(mdcm::Tag(0x0018,0xa003));// Contribution Description
-	remove_tags       .insert(mdcm::Tag(0x0010,0x2150));// Country of Residence
-	remove_tags       .insert(mdcm::Tag(0x0040,0xa307));// Current Observer (Trial)
-	remove_tags       .insert(mdcm::Tag(0x0038,0x0300));// Current Patient Location
-	//                                 (0x50GG,0xEEEE)  // Curve Data
-	time_tags         .insert(mdcm::Tag(0x0008,0x0025));// Curve Date
-	time_tags         .insert(mdcm::Tag(0x0008,0x0035));// Curve Time
-	remove_tags       .insert(mdcm::Tag(0x0040,0xa07c));// Custodial Organization Sequence
-	remove_tags       .insert(mdcm::Tag(0xfffc,0xfffc));// Data Set Trailing Padding
-	descr_remove_tags .insert(mdcm::Tag(0x0018,0x937f));// Decomposition Description
-	descr_remove_tags .insert(mdcm::Tag(0x0008,0x2111));// Derivation Description
-	dev_replace_tags  .insert(mdcm::Tag(0x0018,0x700a));// Detector ID
-	empty_tags        .insert(mdcm::Tag(0x3010,0x001b));// Device Alternate Identifier
-	dev_remove_tags   .insert(mdcm::Tag(0x0050,0x0020));// Device Description
-	dev_replace_tags  .insert(mdcm::Tag(0x3010,0x002d));// Device Label
-	dev_replace_tags  .insert(mdcm::Tag(0x0018,0x1000));// Device Serial Number
-	descr_remove_tags .insert(mdcm::Tag(0x0016,0x004b));// Device Setting Description
-	uid_tags          .insert(mdcm::Tag(0x0018,0x1002));// Device UID
-	remove_tags       .insert(mdcm::Tag(0xfffa,0xfffa));// Digital Signatures Sequence
-	uid_tags          .insert(mdcm::Tag(0x0400,0x0100));// Digital Signature UID
-	uid_tags          .insert(mdcm::Tag(0x0020,0x9164));// Dimension Organization UID
-	descr_remove_tags .insert(mdcm::Tag(0x0038,0x0040));// Discharge Diagnosis Description
-	remove_tags       .insert(mdcm::Tag(0x4008,0x011a));// Distribution Address
-	remove_tags       .insert(mdcm::Tag(0x4008,0x0119));// Distribution Name
-	descr_remove_tags .insert(mdcm::Tag(0x300a,0x0016));// Dose Reference Description
-	uid_tags          .insert(mdcm::Tag(0x300a,0x0013));// Dose Reference UID
-	uid_tags          .insert(mdcm::Tag(0x3010,0x006e));// Dosimetric Objective UID
-	time_tags         .insert(mdcm::Tag(0x0018,0x9517));// End Acquisition DateTime
-	descr_remove_tags .insert(mdcm::Tag(0x3010,0x0037));// Entity Description
-	descr_replace_tags.insert(mdcm::Tag(0x3010,0x0035));// Entity Label
-	descr_replace_tags.insert(mdcm::Tag(0x3010,0x0038));// Entity Long Label
-	descr_remove_tags .insert(mdcm::Tag(0x3010,0x0036));// Entity Name
-	descr_remove_tags .insert(mdcm::Tag(0x300a,0x0676));// Equipment Frame of Reference Description
-	patient_tags      .insert(mdcm::Tag(0x0010,0x2160));// Ethnic Group
-	time_tags         .insert(mdcm::Tag(0x0040,0x4011));// Expected Completion DateTime
-	remove_tags       .insert(mdcm::Tag(0x0008,0x0058));// Failed SOP Instance UID List FIXME
-	uid_tags          .insert(mdcm::Tag(0x0070,0x031a));// Fiducial UID
-	empty_tags        .insert(mdcm::Tag(0x0040,0x2017));// Filler Order Number / Imaging Service Request
-	time_tags         .insert(mdcm::Tag(0x3008,0x0054));// First Treatment Date
-	descr_remove_tags .insert(mdcm::Tag(0x300a,0x0196));// Fixation Device Description
-	id_tags           .insert(mdcm::Tag(0x0034,0x0002));// Flow Identifier
-	//                                 (0x0034,0x0001)  // Flow Identifier Sequence
-	descr_empty_tags  .insert(mdcm::Tag(0x3010,0x007f));// Fractionation Notes
-	descr_remove_tags .insert(mdcm::Tag(0x300a,0x0072));// Fraction Group Description
-	descr_remove_tags .insert(mdcm::Tag(0x0020,0x9158));// Frame Comments
-	uid_tags          .insert(mdcm::Tag(0x0020,0x0052));// Frame of Reference UID
-	time_tags         .insert(mdcm::Tag(0x0034,0x0007));// Frame Origin Timestamp
-	dev_remove_tags   .insert(mdcm::Tag(0x0018,0x1008));// Gantry ID
-	dev_remove_tags   .insert(mdcm::Tag(0x0018,0x1005));// Generator ID
-	remove_tags       .insert(mdcm::Tag(0x0016,0x0076));// GPS Altitude
-	remove_tags       .insert(mdcm::Tag(0x0016,0x0075));// GPS Altitude Ref
-	remove_tags       .insert(mdcm::Tag(0x0016,0x008c));// GPS Area Information
-	time_tags         .insert(mdcm::Tag(0x0016,0x008d));// GPS Date Stamp
-	remove_tags       .insert(mdcm::Tag(0x0016,0x0088));// GPS Dest Bearing
-	remove_tags       .insert(mdcm::Tag(0x0016,0x0087));// GPS Dest Bearing Ref
-	remove_tags       .insert(mdcm::Tag(0x0016,0x008a));// GPS Dest Distance
-	remove_tags       .insert(mdcm::Tag(0x0016,0x0089));// GPS Dest Distance Ref
-	remove_tags       .insert(mdcm::Tag(0x0016,0x0084));// GPS Dest Latitude
-	remove_tags       .insert(mdcm::Tag(0x0016,0x0083));// GPS Dest Latitude Ref
-	remove_tags       .insert(mdcm::Tag(0x0016,0x0086));// GPS Dest Longitude
-	remove_tags       .insert(mdcm::Tag(0x0016,0x0085));// GPS Dest Longitude Ref
-	remove_tags       .insert(mdcm::Tag(0x0016,0x008e));// GPS Differential
-	remove_tags       .insert(mdcm::Tag(0x0016,0x007b));// GPS DOP
-	remove_tags       .insert(mdcm::Tag(0x0016,0x0081));// GPS Img Direction
-	remove_tags       .insert(mdcm::Tag(0x0016,0x0080));// GPS Img Direction Ref
-	remove_tags       .insert(mdcm::Tag(0x0016,0x0072));// GPS Latitude
-	remove_tags       .insert(mdcm::Tag(0x0016,0x0071));// GPS Latitude Ref
-	remove_tags       .insert(mdcm::Tag(0x0016,0x0074));// GPS Longitude
-	remove_tags       .insert(mdcm::Tag(0x0016,0x0073));// GPS Longitude Ref
-	remove_tags       .insert(mdcm::Tag(0x0016,0x0082));// GPS Map Datum
-	remove_tags       .insert(mdcm::Tag(0x0016,0x007a));// GPS Measure Mode
-	remove_tags       .insert(mdcm::Tag(0x0016,0x008b));// GPS Processing Method
-	remove_tags       .insert(mdcm::Tag(0x0016,0x0078));// GPS Satellites
-	remove_tags       .insert(mdcm::Tag(0x0016,0x007d));// GPS Speed
-	remove_tags       .insert(mdcm::Tag(0x0016,0x007c));// GPS SpeedRef
-	remove_tags       .insert(mdcm::Tag(0x0016,0x0079));// GPS Status
-	remove_tags       .insert(mdcm::Tag(0x0016,0x0077));// GPS TimeStamp
-	remove_tags       .insert(mdcm::Tag(0x0016,0x007f));// GPS Track
-	remove_tags       .insert(mdcm::Tag(0x0016,0x007e));// GPS TrackRef
-	remove_tags       .insert(mdcm::Tag(0x0016,0x0070));// GPS Version ID
-	//                                 (0x0070,0x0001)  // Graphic Annotation Sequence
-	remove_tags       .insert(mdcm::Tag(0x0040,0x4037));// Human Performer's Name
-	remove_tags       .insert(mdcm::Tag(0x0040,0x4036));// Human Performer's Organization
-	remove_tags       .insert(mdcm::Tag(0x0088,0x0200));// Icon Image Sequence
-	descr_remove_tags .insert(mdcm::Tag(0x0008,0x4000));// Identifying Comments
-	descr_remove_tags .insert(mdcm::Tag(0x0020,0x4000));// Image Comments
-	remove_tags       .insert(mdcm::Tag(0x0028,0x4000));// Image Presentation Comments
-	descr_remove_tags .insert(mdcm::Tag(0x0040,0x2400));// Imaging Service Request Comments
-	time_tags         .insert(mdcm::Tag(0x003a,0x0314));// Impedance Measurement DateTime
-	remove_tags       .insert(mdcm::Tag(0x4008,0x0300));// Impressions
-	time_tags         .insert(mdcm::Tag(0x0008,0x0015));// Instance Coercion DateTime
-	uid_tags          .insert(mdcm::Tag(0x0008,0x0014));// Instance Creator UID
-	remove_tags       .insert(mdcm::Tag(0x0400,0x0600));// Instance Origin Status
-	inst_remove_tags  .insert(mdcm::Tag(0x0008,0x0081));// Institution Address
-	inst_remove_tags  .insert(mdcm::Tag(0x0008,0x1040));// Institution Department Name
-	inst_remove_tags  .insert(mdcm::Tag(0x0008,0x1041));// Institution Department Type Code Sequence
-	inst_remove_tags  .insert(mdcm::Tag(0x0008,0x0082));// Institution Code Sequence
-	inst_remove_tags  .insert(mdcm::Tag(0x0008,0x0080));// Institution Name
-	remove_tags       .insert(mdcm::Tag(0x0010,0x1050));// Insurance Plan Identification
-	time_tags         .insert(mdcm::Tag(0x3010,0x004d));// Intended Phase End Date
-	time_tags         .insert(mdcm::Tag(0x3010,0x004c));// Intended Phase Start Date
-	remove_tags       .insert(mdcm::Tag(0x0040,0x1011));// Intended Recipients of Results Identification Sequence
-	time_tags         .insert(mdcm::Tag(0x300a,0x0741));// Interlock DateTime
-	descr_replace_tags.insert(mdcm::Tag(0x300a,0x0741));// Interlock Description
-	descr_replace_tags.insert(mdcm::Tag(0x300a,0x0783));// Interlock Origin Description
-	remove_tags       .insert(mdcm::Tag(0x4008,0x0111));// Interpretation Approver Sequence
-	remove_tags       .insert(mdcm::Tag(0x4008,0x010c));// Interpretation Author
-	descr_remove_tags .insert(mdcm::Tag(0x4008,0x0115));// Interpretation Diagnosis Description
-	remove_tags       .insert(mdcm::Tag(0x4008,0x0202));// Interpretation ID Issuer
-	remove_tags       .insert(mdcm::Tag(0x4008,0x0102));// Interpretation Recorder
-	descr_remove_tags .insert(mdcm::Tag(0x4008,0x010b));// Interpretation Text
-	remove_tags       .insert(mdcm::Tag(0x4008,0x010a));// Interpretation Transcriber
-	uid_tags          .insert(mdcm::Tag(0x0008,0x3010));// Irradiation Event UID
-	remove_tags       .insert(mdcm::Tag(0x0038,0x0011));// Issuer of AdmissionID
-	remove_tags       .insert(mdcm::Tag(0x0038,0x0014));// Issuer of Admission ID Sequence
-	remove_tags       .insert(mdcm::Tag(0x0010,0x0021));// Issuer of Patient ID
-	remove_tags       .insert(mdcm::Tag(0x0038,0x0061));// Issuer of Service Episode ID
-	remove_tags       .insert(mdcm::Tag(0x0038,0x0064));// Issuer of Service Episode ID Sequence
-	zero_seq_tags     .insert(mdcm::Tag(0x0040,0x0513));// Issuer of the Container Identifier Sequence
-	zero_seq_tags     .insert(mdcm::Tag(0x0040,0x0562));// Issuer of the Specimen Identifier Sequence
-	descr_empty_tags  .insert(mdcm::Tag(0x2200,0x0002));// Label Text
-	uid_tags          .insert(mdcm::Tag(0x0028,0x1214));// Large Palette Color Lookup Table UID
-	time_tags         .insert(mdcm::Tag(0x0010,0x21d0));// Last Menstrual Date
-	dev_remove_tags   .insert(mdcm::Tag(0x0016,0x004f));// Lens Make
-	dev_remove_tags   .insert(mdcm::Tag(0x0016,0x0050));// Lens Model
-	dev_remove_tags   .insert(mdcm::Tag(0x0016,0x0051));// Lens Serial Number
-	dev_remove_tags   .insert(mdcm::Tag(0x0016,0x004e));// Lens Specification
-	descr_remove_tags .insert(mdcm::Tag(0x0050,0x0021));// Long Device Description
-	remove_tags       .insert(mdcm::Tag(0x0400,0x0404));// MAC
-	descr_remove_tags .insert(mdcm::Tag(0x0016,0x002b));// Maker Note
-	dev_remove_tags   .insert(mdcm::Tag(0x0018,0x100b));// Manufacturer's Device Class UID
-	dev_empty_tags    .insert(mdcm::Tag(0x3010,0x0043));// Manufacturer's Device Identifier
-	//                                 (0x0002,0x0003)  // Media Storage SOP Instance UID
-	remove_tags       .insert(mdcm::Tag(0x0010,0x2000));// Medical Alerts
-	remove_tags       .insert(mdcm::Tag(0x0010,0x1090));// Medical Record Locator
-	remove_tags       .insert(mdcm::Tag(0x0010,0x1080));// Military Rank
-	remove_tags       .insert(mdcm::Tag(0x0400,0x0550));// Modified Attributes Sequence
-	remove_tags       .insert(mdcm::Tag(0x0020,0x3406));// Modified Image Description
-	remove_tags       .insert(mdcm::Tag(0x0020,0x3401));// Modifying Device ID
-	time_tags         .insert(mdcm::Tag(0x3008,0x0056));// Most Recent Treatment Date
-	descr_remove_tags .insert(mdcm::Tag(0x0018,0x937b));// Multi-energy Acquisition Description
-	uid_tags          .insert(mdcm::Tag(0x003a,0x0310));// Multiplex Group UID
-	remove_tags       .insert(mdcm::Tag(0x0008,0x1060));// Name of Physician(s) Reading Study
-	remove_tags       .insert(mdcm::Tag(0x0040,0x1010));// Names of Intended Recipients of Results
-	remove_tags       .insert(mdcm::Tag(0x0400,0x0551));// Nonconforming Modified Attributes Sequence
-	remove_tags       .insert(mdcm::Tag(0x0400,0x0552));// Nonconforming Data Element Value
-	time_tags         .insert(mdcm::Tag(0x0040,0xa192));// Observation Date (Trial)
-	uid_tags          .insert(mdcm::Tag(0x0040,0xa402));// Observation Subject UID (Trial)
-	time_tags         .insert(mdcm::Tag(0x0040,0xa193));// Observation Time (Trial)
-	uid_tags          .insert(mdcm::Tag(0x0040,0xa171));// Observation UID
-	descr_remove_tags .insert(mdcm::Tag(0x0010,0x2180));// Occupation
-	remove_tags       .insert(mdcm::Tag(0x0008,0x1072));// Operator Identification Sequence
-	pn_tags           .insert(mdcm::Tag(0x0008,0x1070));// Operators' Name
-	remove_tags       .insert(mdcm::Tag(0x0040,0x2010));// Order Callback Phone Number
-	remove_tags       .insert(mdcm::Tag(0x0040,0x2011));// Order Callback Telecom Information
-	remove_tags       .insert(mdcm::Tag(0x0040,0x2008));// Order Entered By
-	remove_tags       .insert(mdcm::Tag(0x0040,0x2009));// Order Enterer's Location
-	remove_tags       .insert(mdcm::Tag(0x0400,0x0561));// Original Attributes Sequence
-	remove_tags       .insert(mdcm::Tag(0x0010,0x1000));// Other Patient IDs
-	remove_tags       .insert(mdcm::Tag(0x0010,0x1002));// Other Patient IDs Sequence
-	remove_tags       .insert(mdcm::Tag(0x0010,0x1001));// Other Patient Names
-	//                                 (0x60xx,0x4000)  // Overlay Comments
-	//                                 (0x60xx,0x3000)  // Overlay Data
-	time_tags         .insert(mdcm::Tag(0x0008,0x0024));// Overlay Date
-	time_tags         .insert(mdcm::Tag(0x0008,0x0034));// Overlay Time
-	time_tags         .insert(mdcm::Tag(0x300a,0x0760));// Overlay DateTime
-	uid_tags          .insert(mdcm::Tag(0x0028,0x1199));// Palette Color Lookup Table UID
-	remove_tags       .insert(mdcm::Tag(0x0040,0xa07a));// Participant Sequence
-	remove_tags       .insert(mdcm::Tag(0x0010,0x1040));// Patient's Address
-	patient_tags      .insert(mdcm::Tag(0x0010,0x1010));// Patient's Age
-	empty_tags        .insert(mdcm::Tag(0x0010,0x0030));// Patient's Birth Date
-	remove_tags       .insert(mdcm::Tag(0x0010,0x1005));// Patient's Birth Name
-	remove_tags       .insert(mdcm::Tag(0x0010,0x0032));// Patient's Birth Time
-	remove_tags       .insert(mdcm::Tag(0x0038,0x0400));// Patient's Institution Residence
-	remove_tags       .insert(mdcm::Tag(0x0010,0x0050));// Patient's Insurance Plan Code Sequence
-	remove_tags       .insert(mdcm::Tag(0x0010,0x1060));// Patient's Mother's Birth Name
-	pn_tags           .insert(mdcm::Tag(0x0010,0x0010));// Patient's Name
-	remove_tags       .insert(mdcm::Tag(0x0010,0x0101));// Patient's Primary Language Code Sequence
-	remove_tags       .insert(mdcm::Tag(0x0010,0x0102));// Patient's Primary Language Modifier Code Sequence
-	remove_tags       .insert(mdcm::Tag(0x0010,0x21f0));// Patient's Religious Preference
-	patient_tags      .insert(mdcm::Tag(0x0010,0x0040));// Patient's Sex
-	patient_tags      .insert(mdcm::Tag(0x0010,0x2203));// Patient's Sex Neutered
-	patient_tags      .insert(mdcm::Tag(0x0010,0x1020));// Patient's Size
-	remove_tags       .insert(mdcm::Tag(0x0010,0x2155));// Patient's Telecom Information
-	remove_tags       .insert(mdcm::Tag(0x0010,0x2154));// Patient's Telephone Numbers
-	patient_tags      .insert(mdcm::Tag(0x0010,0x1030));// Patient's Weight
-	descr_remove_tags .insert(mdcm::Tag(0x0010,0x4000));// Patient Comments
-	id_tags           .insert(mdcm::Tag(0x0010,0x0020));// Patient ID
-	uid_tags          .insert(mdcm::Tag(0x300a,0x0650));// Patient Setup UID
-	descr_remove_tags .insert(mdcm::Tag(0x0038,0x0500));// Patient State
-	remove_tags       .insert(mdcm::Tag(0x0040,0x1004));// Patient Transport Arrangements
-	remove_tags       .insert(mdcm::Tag(0x0040,0x0243));// Performed Location
-	remove_tags       .insert(mdcm::Tag(0x0040,0x0254));// Performed Procedure Step Description
-	time_tags         .insert(mdcm::Tag(0x0040,0x0250));// Performed Procedure Step End Date
-	time_tags         .insert(mdcm::Tag(0x0040,0x4051));// Performed Procedure Step End DateTime
-	time_tags         .insert(mdcm::Tag(0x0040,0x0251));// Performed Procedure Step End Time
-	remove_tags       .insert(mdcm::Tag(0x0040,0x0253));// Performed Procedure Step ID
-	time_tags         .insert(mdcm::Tag(0x0040,0x0244));// Performed Procedure Step Start Date
-	time_tags         .insert(mdcm::Tag(0x0040,0x4050));// Performed Procedure Step Start DateTime
-	time_tags         .insert(mdcm::Tag(0x0040,0x0245));// Performed Procedure Step Start Time
-	dev_remove_tags   .insert(mdcm::Tag(0x0040,0x0241));// Performed Station AE Title
-	dev_remove_tags   .insert(mdcm::Tag(0x0040,0x4030));// Performed Station Geographic Location Code Sequence
-	dev_remove_tags   .insert(mdcm::Tag(0x0040,0x0242));// Performed Station Name
-	dev_remove_tags   .insert(mdcm::Tag(0x0040,0x4028));// Performed Station Name Code Sequence
-	remove_tags       .insert(mdcm::Tag(0x0008,0x1050));// Performing Physician's Name
-	remove_tags       .insert(mdcm::Tag(0x0008,0x1052));// Performing Physician Identification Sequence
-	remove_tags       .insert(mdcm::Tag(0x0040,0x1102));// Person's Address
-	remove_tags       .insert(mdcm::Tag(0x0040,0x1104));// Person's Telecom Information
-	remove_tags       .insert(mdcm::Tag(0x0040,0x1103));// Person's Telephone Numbers
-	//                                 (0x0040,0x1101)  // Person Identification Code Sequence
-	pn_tags           .insert(mdcm::Tag(0x0040,0xa123));// Person Name
-	remove_tags       .insert(mdcm::Tag(0x0008,0x1048));// Physician(s) of Record
-	remove_tags       .insert(mdcm::Tag(0x0008,0x1049));// Physician(s) of Record Identification Sequence
-	remove_tags       .insert(mdcm::Tag(0x0008,0x1062));// Physician(s) Reading Study Identification Sequence
-	remove_tags       .insert(mdcm::Tag(0x4008,0x0114));// Physician Approving Interpretation
-	empty_tags        .insert(mdcm::Tag(0x0040,0x2016));// Placer Order Number / Imaging Service Request
-	dev_remove_tags   .insert(mdcm::Tag(0x0018,0x1004));// Plate ID
-	patient_tags      .insert(mdcm::Tag(0x0010,0x21c0));// Pregnancy Status
-	patient_tags      .insert(mdcm::Tag(0x0040,0x0012));// Pre-Medication
-	descr_remove_tags .insert(mdcm::Tag(0x300a,0x000e));// Prescription Description
-	descr_empty_tags  .insert(mdcm::Tag(0x3010,0x007b));// Prescription Notes
-	descr_remove_tags .insert(mdcm::Tag(0x3010,0x0081));// Prescription Notes Sequence TODO
-	uid_tags          .insert(mdcm::Tag(0x0070,0x1101));// Presentation Display Collection UID
-	uid_tags          .insert(mdcm::Tag(0x0070,0x1102));// Presentation Sequence Collection UID
-	descr_remove_tags .insert(mdcm::Tag(0x3010,0x0061));// Prior Treatment Dose Description
-	//                                 (0xGGGG,0xEEEE)  // Private attributes (GGGG is odd)
-	time_tags         .insert(mdcm::Tag(0x0040,0x4052));// Procedure Step Cancellation DateTime
-	descr_remove_tags .insert(mdcm::Tag(0x0018,0x1030));// Protocol Name
-	descr_replace_tags.insert(mdcm::Tag(0x300a,0x0619));// Radiation Dose Identification Label
-	descr_replace_tags.insert(mdcm::Tag(0x300a,0x0623));// Radiation DoseIn-Vivo Measurement Label
-	descr_empty_tags  .insert(mdcm::Tag(0x300a,0x067d));// Radiation Generation Mode Description
-	descr_replace_tags.insert(mdcm::Tag(0x300a,0x067c));// Radiation Generation Mode Label
-	descr_remove_tags .insert(mdcm::Tag(0x300c,0x0113));// Reason for Omission Description
-	descr_remove_tags .insert(mdcm::Tag(0x0040,0x100a));// Reason for Requested Procedure Code Sequence
-	descr_remove_tags .insert(mdcm::Tag(0x0032,0x1030));// Reason for Study
-	descr_empty_tags  .insert(mdcm::Tag(0x3010,0x005c));// Reason for Superseding
-	descr_remove_tags .insert(mdcm::Tag(0x0040,0x2001));// Reason for the Imaging Service Request
-	descr_remove_tags .insert(mdcm::Tag(0x0040,0x1002));// Reason for the Requested Procedure
-	descr_remove_tags .insert(mdcm::Tag(0x0032,0x1066));// Reason for Visit
-	descr_remove_tags .insert(mdcm::Tag(0x0032,0x1067));// Reason for Visit Code Sequence
-	time_tags         .insert(mdcm::Tag(0x300a,0x073a));// Recorded RT Control Point Date Time
-	uid_tags          .insert(mdcm::Tag(0x3010,0x000b));// Referenced Conceptual Volume UID
-	remove_tags       .insert(mdcm::Tag(0x0400,0x0402));// Referenced Digital Signature Sequence
-	uid_tags          .insert(mdcm::Tag(0x300a,0x0083));// Referenced Dose Reference UID
-	uid_tags          .insert(mdcm::Tag(0x3010,0x006f));// Referenced Dosimetric Objective UID
-	uid_tags          .insert(mdcm::Tag(0x3010,0x0031));// Referenced Fiducials UID
-	uid_tags          .insert(mdcm::Tag(0x3006,0x0024));// Referenced Frame of Reference UID
-	uid_tags          .insert(mdcm::Tag(0x0040,0x4023));// Referenced General Purpose Scheduled Procedure Step Transaction UID
-	//                                 (0x0008,0x1140)  // Referenced Image Sequence
-	uid_tags          .insert(mdcm::Tag(0x0040,0xa172));// Referenced Observation UID (Trial)
-	remove_tags       .insert(mdcm::Tag(0x0038,0x0004));// Referenced Patient Alias Sequence
-	remove_tags       .insert(mdcm::Tag(0x0010,0x1100));// Referenced Patient Photo Sequence
-	remove_tags       .insert(mdcm::Tag(0x0008,0x1120));// Referenced Patient Sequence
-	//                                 (0x0008,0x1111)  // Referenced Performed Procedure Step Sequence
-	remove_tags       .insert(mdcm::Tag(0x0400,0x0403));// Referenced SOP Instance MAC Sequence
-	uid_tags          .insert(mdcm::Tag(0x0008,0x1155));// Referenced SOP Instance UI
-	uid_tags          .insert(mdcm::Tag(0x0004,0x1511));// Referenced SOP Instance UID in File
-	//                                 (0x0008,0x1110)  // Referenced Study Sequence
-	remove_tags       .insert(mdcm::Tag(0x0008,0x0092));// Referring Physician's Address
-	pn_tags           .insert(mdcm::Tag(0x0008,0x0090));// Referring Physician's Name
-	remove_tags       .insert(mdcm::Tag(0x0008,0x0094));// Referring Physician's Telephone Numbers
-	remove_tags       .insert(mdcm::Tag(0x0008,0x0096));// Referring Physician Identification Sequence
-	remove_tags       .insert(mdcm::Tag(0x0010,0x2152));// Region of Residence
-	uid_tags          .insert(mdcm::Tag(0x3006,0x00c2));// Related Frame of Reference UID
-	descr_remove_tags .insert(mdcm::Tag(0x0040,0x0275));// Request Attributes Sequence
-	descr_remove_tags .insert(mdcm::Tag(0x0032,0x1070));// Requested Contrast Agent
-	descr_remove_tags .insert(mdcm::Tag(0x0040,0x1400));// Requested Procedure Comments
-	descr_remove_tags .insert(mdcm::Tag(0x0032,0x1060));// Requested Procedure Description
-	remove_tags       .insert(mdcm::Tag(0x0040,0x1001));// Requested Procedure ID
-	remove_tags       .insert(mdcm::Tag(0x0040,0x1005));// Requested Procedure Location
-	//                                 (0x0000,0x1001)  // Requested SOP Instance UID
-	remove_tags       .insert(mdcm::Tag(0x0032,0x1032));// Requesting Physician
-	remove_tags       .insert(mdcm::Tag(0x0032,0x1033));// Requesting Service
-	descr_remove_tags .insert(mdcm::Tag(0x0018,0x9185));// Respiratory Motion Compensation Technique Description
-	remove_tags       .insert(mdcm::Tag(0x0010,0x2299));// Responsible Organization
-	remove_tags       .insert(mdcm::Tag(0x0010,0x2297));// Responsible Person
-	descr_remove_tags .insert(mdcm::Tag(0x4008,0x4000));// Results Comments
-	remove_tags       .insert(mdcm::Tag(0x4008,0x0118));// Results Distribution List Sequence
-	remove_tags       .insert(mdcm::Tag(0x4008,0x0042));// Results ID Issuer
-	pn_tags           .insert(mdcm::Tag(0x300e,0x0008));// Reviewer Name
-	descr_remove_tags .insert(mdcm::Tag(0x3006,0x0028));// ROI Description
-	descr_remove_tags .insert(mdcm::Tag(0x3006,0x0038));// ROI Generation Description
-	pn_tags           .insert(mdcm::Tag(0x3006,0x00a6));// ROI Interpreter
-	descr_empty_tags  .insert(mdcm::Tag(0x3006,0x0026));// ROI Name
-	descr_empty_tags  .insert(mdcm::Tag(0x3006,0x0088));// ROI Observation Description
-	descr_empty_tags  .insert(mdcm::Tag(0x3006,0x0085));// ROI Observation Label
-	descr_empty_tags  .insert(mdcm::Tag(0x300a,0x0615));// RT Accessory Device Slot ID
-	descr_empty_tags  .insert(mdcm::Tag(0x300a,0x0611));// RT Accessory Holder Slot ID
-	descr_empty_tags  .insert(mdcm::Tag(0x3010,0x005a));// RT Physician Intent Narrative
-	time_tags         .insert(mdcm::Tag(0x300a,0x0006));// RT Plan Date
-	descr_remove_tags .insert(mdcm::Tag(0x300a,0x0004));// RT Plan Description
-	descr_replace_tags.insert(mdcm::Tag(0x300a,0x0002));// RT Plan Label
-	descr_remove_tags .insert(mdcm::Tag(0x300a,0x0003));// RT Plan Name
-	time_tags         .insert(mdcm::Tag(0x300a,0x0007));// RT Plan Time
-	descr_replace_tags.insert(mdcm::Tag(0x3010,0x0054));// RT Prescription Label
-	descr_replace_tags.insert(mdcm::Tag(0x300a,0x062a));// RT Tolerance Set Label
-	descr_remove_tags .insert(mdcm::Tag(0x3010,0x0056));// RT Treatment Approach Label
-	uid_tags          .insert(mdcm::Tag(0x3010,0x003b));// RT Treatment Phase UID
-	remove_tags       .insert(mdcm::Tag(0x0040,0x4034));// Scheduled Human Performers Sequence
-	remove_tags       .insert(mdcm::Tag(0x0038,0x001e));// Scheduled Patient Institution Residence
-	remove_tags       .insert(mdcm::Tag(0x0040,0x0006));// Scheduled Performing Physician's Name
-	remove_tags       .insert(mdcm::Tag(0x0040,0x000b));// Scheduled Performing Physician Identification Sequence
-	remove_tags       .insert(mdcm::Tag(0x0040,0x0007));// Scheduled Procedure Step Description
-	time_tags         .insert(mdcm::Tag(0x0040,0x0004));// Scheduled Procedure Step End Date
-	time_tags         .insert(mdcm::Tag(0x0040,0x0005));// Scheduled Procedure Step End Time
-	time_tags         .insert(mdcm::Tag(0x0040,0x0008));// Scheduled Procedure Step Expiration DateTime
-	remove_tags       .insert(mdcm::Tag(0x0040,0x0009));// Scheduled Procedure Step ID
-	dev_remove_tags   .insert(mdcm::Tag(0x0040,0x0011));// Scheduled Procedure Step Location
-	time_tags         .insert(mdcm::Tag(0x0040,0x0010));// Scheduled Procedure Step Modification DateTime
-	time_tags         .insert(mdcm::Tag(0x0040,0x0002));// Scheduled Procedure Step Start Date
-	time_tags         .insert(mdcm::Tag(0x0040,0x4005));// Scheduled Procedure Step Start DateTime
-	time_tags         .insert(mdcm::Tag(0x0040,0x0003));// Scheduled Procedure Step Start Time
-	dev_remove_tags   .insert(mdcm::Tag(0x0040,0x0001));// Scheduled Station AE Title
-	dev_remove_tags   .insert(mdcm::Tag(0x0040,0x4027));// Scheduled Station Geographic Location Code Sequence
-	dev_remove_tags   .insert(mdcm::Tag(0x0040,0x0010));// Scheduled Station Name
-	dev_remove_tags   .insert(mdcm::Tag(0x0040,0x4025));// Scheduled Station Name Code Sequence
-	dev_remove_tags   .insert(mdcm::Tag(0x0032,0x1020));// Scheduled Study Location
-	dev_remove_tags   .insert(mdcm::Tag(0x0032,0x1021));// Scheduled Study Location AE Title
-	time_tags         .insert(mdcm::Tag(0x0008,0x0021));// Series Date
-	descr_remove_tags .insert(mdcm::Tag(0x0008,0x103e));// Series Description
-	uid_tags          .insert(mdcm::Tag(0x0020,0x000e));// Series Instance UID
-	time_tags         .insert(mdcm::Tag(0x0008,0x0031));// Series Time
-	descr_remove_tags .insert(mdcm::Tag(0x0038,0x0062));// Service Episode Description
-	remove_tags       .insert(mdcm::Tag(0x0038,0x0060));// Service Episode ID
-	descr_remove_tags .insert(mdcm::Tag(0x300a,0x01b2));// Setup Technique Description
-	descr_remove_tags .insert(mdcm::Tag(0x300a,0x01a6));// Shielding Device Description
-	remove_tags       .insert(mdcm::Tag(0x0040,0x06fa));// Slide Identifier
-	patient_tags      .insert(mdcm::Tag(0x0010,0x21a0));// Smoking Status
-	uid_tags          .insert(mdcm::Tag(0x0008,0x0018));// SOP InstanceUID
-	uid_tags          .insert(mdcm::Tag(0x3010,0x0015));// Source Conceptual Volume UID
-	time_tags         .insert(mdcm::Tag(0x0018,0x936a));// Source End DateTime
-	empty_tags        .insert(mdcm::Tag(0x0034,0x0005));// Source Identifier TODO
-	//                                 (0x0008,0x2112)  // Source Image Sequence
-	dev_remove_tags   .insert(mdcm::Tag(0x300a,0x0216));// Source Manufacturer
-	dev_empty_tags    .insert(mdcm::Tag(0x3008,0x0105));// Source Serial Number
-	time_tags         .insert(mdcm::Tag(0x0018,0x9369));// Source Start DateTime
-	patient_tags      .insert(mdcm::Tag(0x0038,0x0050));// Special Needs
-	remove_tags       .insert(mdcm::Tag(0x0040,0x050a));// Specimen Accession Number
-	descr_remove_tags .insert(mdcm::Tag(0x0040,0x0602));// Specimen Detailed Description
-	id_tags           .insert(mdcm::Tag(0x0040,0x0551));// Specimen Identifier
-	struct_zero_tags  .insert(mdcm::Tag(0x0040,0x0610));// Specimen Preparation Sequence
-	descr_remove_tags .insert(mdcm::Tag(0x0040,0x0600));// Specimen Short Description
-	uid_tags          .insert(mdcm::Tag(0x0040,0x0554));// Specimen UID
-	time_tags         .insert(mdcm::Tag(0x0018,0x9516));// Start Acquisition DateTime
-	dev_empty_tags    .insert(mdcm::Tag(0x0008,0x1010));// Station Name
-	uid_tags          .insert(mdcm::Tag(0x0088,0x0140));// Storage Media File-set UID
-	time_tags         .insert(mdcm::Tag(0x3006,0x0008));// Structure Set Date
-	descr_remove_tags .insert(mdcm::Tag(0x3006,0x0006));// Structure Set Description
-	descr_replace_tags.insert(mdcm::Tag(0x3006,0x0002));// Structure Set Label
-	descr_remove_tags .insert(mdcm::Tag(0x3006,0x0004));// Structure Set Name
-	time_tags         .insert(mdcm::Tag(0x3006,0x0009));// Structure Set Time
-	descr_remove_tags .insert(mdcm::Tag(0x0032,0x4000));// Study Comments
-	time_tags         .insert(mdcm::Tag(0x0008,0x0020));// Study Date
-	descr_remove_tags .insert(mdcm::Tag(0x0008,0x1030));// Study Description
-	empty_tags        .insert(mdcm::Tag(0x0020,0x0010));// Study ID
-	remove_tags       .insert(mdcm::Tag(0x0032,0x0012));// Study ID Issuer
-	uid_tags          .insert(mdcm::Tag(0x0020,0x000d));// Study Instance UID
-	time_tags         .insert(mdcm::Tag(0x0008,0x0030));// Study Time
-	uid_tags          .insert(mdcm::Tag(0x0020,0x0200));// Synchronization Frame of Reference UID
-	uid_tags          .insert(mdcm::Tag(0x0018,0x2042));// Target UID
-	remove_tags       .insert(mdcm::Tag(0x0040,0xa354));// Telephone Number (Trial)
-	uid_tags          .insert(mdcm::Tag(0x0040,0xdb0d));// Template Extension Creator UID
-	uid_tags          .insert(mdcm::Tag(0x0040,0xdb0c));// Template Extension Organization UID
-	remove_tags       .insert(mdcm::Tag(0x4000,0x4000));// Text Comments
-	remove_tags       .insert(mdcm::Tag(0x2030,0x0020));// Text String
-	time_tags         .insert(mdcm::Tag(0x0008,0x0201));// Timezone Offset From UTC
-	remove_tags       .insert(mdcm::Tag(0x0088,0x0910));// Topic Author
-	remove_tags       .insert(mdcm::Tag(0x0088,0x0912));// Topic Keywords
-	remove_tags       .insert(mdcm::Tag(0x0088,0x0906));// Topic Subject
-	remove_tags       .insert(mdcm::Tag(0x0088,0x0904));// Topic Title
-	uid_tags          .insert(mdcm::Tag(0x0062,0x0021));// Tracking UID
-	uid_tags          .insert(mdcm::Tag(0x0008,0x1195));// Transaction UID
-	dev_remove_tags   .insert(mdcm::Tag(0x0018,0x5011));// Transducer Identification Sequence
-	time_tags         .insert(mdcm::Tag(0x3008,0x0250));// Treatment Date
-	dev_empty_tags    .insert(mdcm::Tag(0x300a,0x00b2));// Treatment Machine Name
-	descr_replace_tags.insert(mdcm::Tag(0x300a,0x0608));// Treatment Position Group Label
-	uid_tags          .insert(mdcm::Tag(0x300a,0x0609));// Treatment Position Group UID
-	uid_tags          .insert(mdcm::Tag(0x300a,0x0700));// Treatment Session UID
-	descr_replace_tags.insert(mdcm::Tag(0x3010,0x0077));// Treatment Site
-	descr_empty_tags  .insert(mdcm::Tag(0x3010,0x007a));// Treatment Technique Notes
-	time_tags         .insert(mdcm::Tag(0x3008,0x0251));// Treatment Time
-	time_tags         .insert(mdcm::Tag(0x300a,0x0736));// Treatment Tolerance Violation DateTime
-	descr_replace_tags.insert(mdcm::Tag(0x300a,0x0734));// Treatment Tolerance Violation Description
-	dev_remove_tags   .insert(mdcm::Tag(0x0018,0x100a));// UDI Sequence
-	uid_tags          .insert(mdcm::Tag(0x0040,0xa124));// UID
-	dev_remove_tags   .insert(mdcm::Tag(0x0018,0x1009));// Unique Device Identifier
-	descr_replace_tags.insert(mdcm::Tag(0x3010,0x0033));// User Content Label
-	descr_replace_tags.insert(mdcm::Tag(0x3010,0x0034));// User Content Label Long
-	remove_tags       .insert(mdcm::Tag(0x0040,0xa352));// Verbal Source (Trial)
-	remove_tags       .insert(mdcm::Tag(0x0040,0xa358));// Verbal Source Identifier Code Sequence (Trial)
-	zero_seq_tags     .insert(mdcm::Tag(0x0040,0xa088));// Verifying Observer Identification Code Sequence
-	pn_tags           .insert(mdcm::Tag(0x0008,0xa075));// Verifying Observer Name
-	//                                 (0x0040,0xa073)  // Verifying Observer Sequence
-	id_tags           .insert(mdcm::Tag(0x0040,0xa027));// Verifying Organization
-	descr_remove_tags .insert(mdcm::Tag(0x0038,0x4000));// Visit Comments
-	dev_replace_tags  .insert(mdcm::Tag(0x0018,0x9371));// X-Ray Detector ID
-	dev_remove_tags   .insert(mdcm::Tag(0x0018,0x9373));// X-Ray Detector Label
-	dev_replace_tags  .insert(mdcm::Tag(0x0018,0x9367));// X-Ray Source ID
+	empty_tags          .insert(mdcm::Tag(0x0008,0x0050));// Accession Number
+	descr_remove_tags   .insert(mdcm::Tag(0x0018,0x4000));// Acquisition Comments
+	struct_zero_tags    .insert(mdcm::Tag(0x0040,0x0555));// Acquisition Context Sequence
+	time_tags           .insert(mdcm::Tag(0x0008,0x0022));// Acquisition Date
+	time_tags           .insert(mdcm::Tag(0x0008,0x002a));// Acquisition DateTime
+	descr_remove_tags   .insert(mdcm::Tag(0x0018,0x1400));// Acquisition Device Processing Description
+	descr_replace_tags  .insert(mdcm::Tag(0x0018,0x11bb));// Acquisition Field Of View Label
+	descr_remove_tags   .insert(mdcm::Tag(0x0018,0x9424));// Acquisition Protocol Description
+	time_tags           .insert(mdcm::Tag(0x0008,0x0032));// Acquisition Time
+	remove_tags         .insert(mdcm::Tag(0x0040,0x4035));// ActualHuman Performers Sequence
+	descr_remove_tags   .insert(mdcm::Tag(0x0010,0x21b0));// Additional Patient History
+	remove_tags         .insert(mdcm::Tag(0x0040,0xa353));// Address (Trial)	
+	remove_tags         .insert(mdcm::Tag(0x0038,0x0010));// Admission ID
+	time_tags           .insert(mdcm::Tag(0x0038,0x0020));// Admitting Date
+	descr_remove_tags   .insert(mdcm::Tag(0x0008,0x1084));// Admitting Diagnoses Code Sequence
+	descr_remove_tags   .insert(mdcm::Tag(0x0008,0x1080));// Admitting Diagnoses Description
+	time_tags           .insert(mdcm::Tag(0x0038,0x0021));// Admitting Time
+	//                                   (0x0000,0x1000)  // Affected SOP Instance UID
+	patient_remove_tags .insert(mdcm::Tag(0x0010,0x2110));// Allergies
+	remove_tags         .insert(mdcm::Tag(0x4000,0x0010));// Arbitrary
+	remove_tags         .insert(mdcm::Tag(0x0040,0xa078));// Author Observer Sequence
+	empty_tags          .insert(mdcm::Tag(0x2200,0x0005));// Barcode Value
+	descr_remove_tags   .insert(mdcm::Tag(0x300a,0x00c3));// Beam Description
+	descr_remove_tags   .insert(mdcm::Tag(0x300a,0x00dd));// Bolus Description
+	remove_tags         .insert(mdcm::Tag(0x0010,0x1081));// Branch of Service
+	remove_tags         .insert(mdcm::Tag(0x0016,0x004d));// Camera Owner Name
+	dev_remove_tags     .insert(mdcm::Tag(0x0018,0x1007));// Cassette ID
+	inst_empty_tags     .insert(mdcm::Tag(0x0012,0x0060));// Clinical Trial Coordinating Center Name
+	remove_tags         .insert(mdcm::Tag(0x0012,0x0082));// Clinical Trial Protocol Ethics Committee Approval Number
+	inst_replace_tags   .insert(mdcm::Tag(0x0012,0x0081));// Clinical Trial Protocol Ethics Committee Name
+	id_tags             .insert(mdcm::Tag(0x0012,0x0020));// Clinical Trial Protocol ID
+	remove_tags         .insert(mdcm::Tag(0x0012,0x0021));// Clinical Trial Protocol Name
+	descr_remove_tags   .insert(mdcm::Tag(0x0012,0x0072));// Clinical Trial Series Description
+	remove_tags         .insert(mdcm::Tag(0x0012,0x0071));// Clinical Trial Series ID
+	inst_empty_tags     .insert(mdcm::Tag(0x0012,0x0030));// Clinical Trial Site ID
+	inst_empty_tags     .insert(mdcm::Tag(0x0012,0x0031));// Clinical Trial Site Name
+	pn_tags             .insert(mdcm::Tag(0x0012,0x0010));// Clinical Trial Sponsor Name
+	id_tags             .insert(mdcm::Tag(0x0012,0x0040));// Clinical Trial Subject ID
+	id_tags             .insert(mdcm::Tag(0x0012,0x0042));// Clinical Trial Subject Reading ID
+	descr_remove_tags   .insert(mdcm::Tag(0x0012,0x0051));// Clinical Trial Time Point Description
+	empty_tags          .insert(mdcm::Tag(0x0012,0x0050));// Clinical Trial Time Point ID
+	descr_remove_tags   .insert(mdcm::Tag(0x0040,0x0310));// Comments on Radiation Dose
+	descr_remove_tags   .insert(mdcm::Tag(0x0040,0x0280));// Comments on the Performed Procedure Step
+	descr_remove_tags   .insert(mdcm::Tag(0x300a,0x02eb));// Compensator Description
+	uid_tags            .insert(mdcm::Tag(0x0020,0x9161));// Concatenation UID
+	descr_empty_tags    .insert(mdcm::Tag(0x3010,0x000f));// Conceptual Volume Combination Description
+	descr_empty_tags    .insert(mdcm::Tag(0x3010,0x0017));// Conceptual Volume Description
+	uid_tags            .insert(mdcm::Tag(0x3010,0x0006));// Conceptual Volume UID
+	remove_tags         .insert(mdcm::Tag(0x0040,0x3001));// Confidentiality Constrainton Patient Data Description
+	uid_tags            .insert(mdcm::Tag(0x3010,0x0013));// Constituent Conceptual Volume UID
+	pn_tags             .insert(mdcm::Tag(0x0008,0x009c));// Consulting Physician's Name
+	remove_tags         .insert(mdcm::Tag(0x0008,0x009d));// Consulting Physician Identification Sequence
+	remove_tags         .insert(mdcm::Tag(0x0050,0x001b));// Container Component ID
+	descr_empty_tags    .insert(mdcm::Tag(0x0040,0x051a));// Container Description
+	id_tags             .insert(mdcm::Tag(0x0040,0x0512));// Container Identifier
+	remove_tags         .insert(mdcm::Tag(0x0070,0x0086));// Content Creator's Identification Code Sequence
+	pn_tags             .insert(mdcm::Tag(0x0070,0x0084));// Content Creator's Name
+	time_tags           .insert(mdcm::Tag(0x0008,0x0023));// Content Date
+	struct_zero_tags    .insert(mdcm::Tag(0x0040,0xa730));// Content Sequence
+	time_tags           .insert(mdcm::Tag(0x0008,0x0033));// Content Time
+	descr_empty_tags    .insert(mdcm::Tag(0x0018,0x0010));// Contrast / Bolus Agent
+	descr_remove_tags   .insert(mdcm::Tag(0x0018,0xa003));// Contribution Description
+	remove_tags         .insert(mdcm::Tag(0x0010,0x2150));// Country of Residence
+	remove_tags         .insert(mdcm::Tag(0x0040,0xa307));// Current Observer (Trial)
+	remove_tags         .insert(mdcm::Tag(0x0038,0x0300));// Current Patient Location
+	//                                   (0x50GG,0xEEEE)  // Curve Data
+	time_tags           .insert(mdcm::Tag(0x0008,0x0025));// Curve Date
+	time_tags           .insert(mdcm::Tag(0x0008,0x0035));// Curve Time
+	remove_tags         .insert(mdcm::Tag(0x0040,0xa07c));// Custodial Organization Sequence
+	remove_tags         .insert(mdcm::Tag(0xfffc,0xfffc));// Data Set Trailing Padding
+	descr_remove_tags   .insert(mdcm::Tag(0x0018,0x937f));// Decomposition Description
+	descr_remove_tags   .insert(mdcm::Tag(0x0008,0x2111));// Derivation Description
+	dev_replace_tags    .insert(mdcm::Tag(0x0018,0x700a));// Detector ID
+	empty_tags          .insert(mdcm::Tag(0x3010,0x001b));// Device Alternate Identifier
+	dev_remove_tags     .insert(mdcm::Tag(0x0050,0x0020));// Device Description
+	dev_replace_tags    .insert(mdcm::Tag(0x3010,0x002d));// Device Label
+	dev_replace_tags    .insert(mdcm::Tag(0x0018,0x1000));// Device Serial Number
+	descr_remove_tags   .insert(mdcm::Tag(0x0016,0x004b));// Device Setting Description
+	uid_tags            .insert(mdcm::Tag(0x0018,0x1002));// Device UID
+	remove_tags         .insert(mdcm::Tag(0xfffa,0xfffa));// Digital Signatures Sequence
+	uid_tags            .insert(mdcm::Tag(0x0400,0x0100));// Digital Signature UID
+	uid_tags            .insert(mdcm::Tag(0x0020,0x9164));// Dimension Organization UID
+	descr_remove_tags   .insert(mdcm::Tag(0x0038,0x0040));// Discharge Diagnosis Description
+	remove_tags         .insert(mdcm::Tag(0x4008,0x011a));// Distribution Address
+	remove_tags         .insert(mdcm::Tag(0x4008,0x0119));// Distribution Name
+	descr_remove_tags   .insert(mdcm::Tag(0x300a,0x0016));// Dose Reference Description
+	uid_tags            .insert(mdcm::Tag(0x300a,0x0013));// Dose Reference UID
+	uid_tags            .insert(mdcm::Tag(0x3010,0x006e));// Dosimetric Objective UID
+	time_tags           .insert(mdcm::Tag(0x0018,0x9517));// End Acquisition DateTime
+	descr_remove_tags   .insert(mdcm::Tag(0x3010,0x0037));// Entity Description
+	descr_replace_tags  .insert(mdcm::Tag(0x3010,0x0035));// Entity Label
+	descr_replace_tags  .insert(mdcm::Tag(0x3010,0x0038));// Entity Long Label
+	descr_remove_tags   .insert(mdcm::Tag(0x3010,0x0036));// Entity Name
+	descr_remove_tags   .insert(mdcm::Tag(0x300a,0x0676));// Equipment Frame of Reference Description
+	patient_remove_tags .insert(mdcm::Tag(0x0010,0x2160));// Ethnic Group
+	time_tags           .insert(mdcm::Tag(0x0040,0x4011));// Expected Completion DateTime
+	remove_tags         .insert(mdcm::Tag(0x0008,0x0058));// Failed SOP Instance UID List FIXME
+	uid_tags            .insert(mdcm::Tag(0x0070,0x031a));// Fiducial UID
+	empty_tags          .insert(mdcm::Tag(0x0040,0x2017));// Filler Order Number / Imaging Service Request
+	time_tags           .insert(mdcm::Tag(0x3008,0x0054));// First Treatment Date
+	descr_remove_tags   .insert(mdcm::Tag(0x300a,0x0196));// Fixation Device Description
+	id_tags             .insert(mdcm::Tag(0x0034,0x0002));// Flow Identifier
+	//                                   (0x0034,0x0001)  // Flow Identifier Sequence
+	descr_empty_tags    .insert(mdcm::Tag(0x3010,0x007f));// Fractionation Notes
+	descr_remove_tags   .insert(mdcm::Tag(0x300a,0x0072));// Fraction Group Description
+	descr_remove_tags   .insert(mdcm::Tag(0x0020,0x9158));// Frame Comments
+	uid_tags            .insert(mdcm::Tag(0x0020,0x0052));// Frame of Reference UID
+	time_tags           .insert(mdcm::Tag(0x0034,0x0007));// Frame Origin Timestamp
+	dev_remove_tags     .insert(mdcm::Tag(0x0018,0x1008));// Gantry ID
+	dev_remove_tags     .insert(mdcm::Tag(0x0018,0x1005));// Generator ID
+	remove_tags         .insert(mdcm::Tag(0x0016,0x0076));// GPS Altitude
+	remove_tags         .insert(mdcm::Tag(0x0016,0x0075));// GPS Altitude Ref
+	remove_tags         .insert(mdcm::Tag(0x0016,0x008c));// GPS Area Information
+	time_tags           .insert(mdcm::Tag(0x0016,0x008d));// GPS Date Stamp
+	remove_tags         .insert(mdcm::Tag(0x0016,0x0088));// GPS Dest Bearing
+	remove_tags         .insert(mdcm::Tag(0x0016,0x0087));// GPS Dest Bearing Ref
+	remove_tags         .insert(mdcm::Tag(0x0016,0x008a));// GPS Dest Distance
+	remove_tags         .insert(mdcm::Tag(0x0016,0x0089));// GPS Dest Distance Ref
+	remove_tags         .insert(mdcm::Tag(0x0016,0x0084));// GPS Dest Latitude
+	remove_tags         .insert(mdcm::Tag(0x0016,0x0083));// GPS Dest Latitude Ref
+	remove_tags         .insert(mdcm::Tag(0x0016,0x0086));// GPS Dest Longitude
+	remove_tags         .insert(mdcm::Tag(0x0016,0x0085));// GPS Dest Longitude Ref
+	remove_tags         .insert(mdcm::Tag(0x0016,0x008e));// GPS Differential
+	remove_tags         .insert(mdcm::Tag(0x0016,0x007b));// GPS DOP
+	remove_tags         .insert(mdcm::Tag(0x0016,0x0081));// GPS Img Direction
+	remove_tags         .insert(mdcm::Tag(0x0016,0x0080));// GPS Img Direction Ref
+	remove_tags         .insert(mdcm::Tag(0x0016,0x0072));// GPS Latitude
+	remove_tags         .insert(mdcm::Tag(0x0016,0x0071));// GPS Latitude Ref
+	remove_tags         .insert(mdcm::Tag(0x0016,0x0074));// GPS Longitude
+	remove_tags         .insert(mdcm::Tag(0x0016,0x0073));// GPS Longitude Ref
+	remove_tags         .insert(mdcm::Tag(0x0016,0x0082));// GPS Map Datum
+	remove_tags         .insert(mdcm::Tag(0x0016,0x007a));// GPS Measure Mode
+	remove_tags         .insert(mdcm::Tag(0x0016,0x008b));// GPS Processing Method
+	remove_tags         .insert(mdcm::Tag(0x0016,0x0078));// GPS Satellites
+	remove_tags         .insert(mdcm::Tag(0x0016,0x007d));// GPS Speed
+	remove_tags         .insert(mdcm::Tag(0x0016,0x007c));// GPS SpeedRef
+	remove_tags         .insert(mdcm::Tag(0x0016,0x0079));// GPS Status
+	remove_tags         .insert(mdcm::Tag(0x0016,0x0077));// GPS TimeStamp
+	remove_tags         .insert(mdcm::Tag(0x0016,0x007f));// GPS Track
+	remove_tags         .insert(mdcm::Tag(0x0016,0x007e));// GPS TrackRef
+	remove_tags         .insert(mdcm::Tag(0x0016,0x0070));// GPS Version ID
+	//                                   (0x0070,0x0001)  // Graphic Annotation Sequence
+	remove_tags         .insert(mdcm::Tag(0x0040,0x4037));// Human Performer's Name
+	remove_tags         .insert(mdcm::Tag(0x0040,0x4036));// Human Performer's Organization
+	remove_tags         .insert(mdcm::Tag(0x0088,0x0200));// Icon Image Sequence
+	descr_remove_tags   .insert(mdcm::Tag(0x0008,0x4000));// Identifying Comments
+	descr_remove_tags   .insert(mdcm::Tag(0x0020,0x4000));// Image Comments
+	remove_tags         .insert(mdcm::Tag(0x0028,0x4000));// Image Presentation Comments
+	descr_remove_tags   .insert(mdcm::Tag(0x0040,0x2400));// Imaging Service Request Comments
+	time_tags           .insert(mdcm::Tag(0x003a,0x0314));// Impedance Measurement DateTime
+	remove_tags         .insert(mdcm::Tag(0x4008,0x0300));// Impressions
+	time_tags           .insert(mdcm::Tag(0x0008,0x0015));// Instance Coercion DateTime
+	uid_tags            .insert(mdcm::Tag(0x0008,0x0014));// Instance Creator UID
+	remove_tags         .insert(mdcm::Tag(0x0400,0x0600));// Instance Origin Status
+	inst_remove_tags    .insert(mdcm::Tag(0x0008,0x0081));// Institution Address
+	inst_remove_tags    .insert(mdcm::Tag(0x0008,0x1040));// Institution Department Name
+	inst_remove_tags    .insert(mdcm::Tag(0x0008,0x1041));// Institution Department Type Code Sequence
+	inst_remove_tags    .insert(mdcm::Tag(0x0008,0x0082));// Institution Code Sequence
+	inst_remove_tags    .insert(mdcm::Tag(0x0008,0x0080));// Institution Name
+	remove_tags         .insert(mdcm::Tag(0x0010,0x1050));// Insurance Plan Identification
+	time_tags           .insert(mdcm::Tag(0x3010,0x004d));// Intended Phase End Date
+	time_tags           .insert(mdcm::Tag(0x3010,0x004c));// Intended Phase Start Date
+	remove_tags         .insert(mdcm::Tag(0x0040,0x1011));// Intended Recipients of Results Identification Sequence
+	time_tags           .insert(mdcm::Tag(0x300a,0x0741));// Interlock DateTime
+	descr_replace_tags  .insert(mdcm::Tag(0x300a,0x0741));// Interlock Description
+	descr_replace_tags  .insert(mdcm::Tag(0x300a,0x0783));// Interlock Origin Description
+	remove_tags         .insert(mdcm::Tag(0x4008,0x0111));// Interpretation Approver Sequence
+	remove_tags         .insert(mdcm::Tag(0x4008,0x010c));// Interpretation Author
+	descr_remove_tags   .insert(mdcm::Tag(0x4008,0x0115));// Interpretation Diagnosis Description
+	remove_tags         .insert(mdcm::Tag(0x4008,0x0202));// Interpretation ID Issuer
+	remove_tags         .insert(mdcm::Tag(0x4008,0x0102));// Interpretation Recorder
+	descr_remove_tags   .insert(mdcm::Tag(0x4008,0x010b));// Interpretation Text
+	remove_tags         .insert(mdcm::Tag(0x4008,0x010a));// Interpretation Transcriber
+	uid_tags            .insert(mdcm::Tag(0x0008,0x3010));// Irradiation Event UID
+	remove_tags         .insert(mdcm::Tag(0x0038,0x0011));// Issuer of AdmissionID
+	remove_tags         .insert(mdcm::Tag(0x0038,0x0014));// Issuer of Admission ID Sequence
+	remove_tags         .insert(mdcm::Tag(0x0010,0x0021));// Issuer of Patient ID
+	remove_tags         .insert(mdcm::Tag(0x0038,0x0061));// Issuer of Service Episode ID
+	remove_tags         .insert(mdcm::Tag(0x0038,0x0064));// Issuer of Service Episode ID Sequence
+	zero_seq_tags       .insert(mdcm::Tag(0x0040,0x0513));// Issuer of the Container Identifier Sequence
+	zero_seq_tags       .insert(mdcm::Tag(0x0040,0x0562));// Issuer of the Specimen Identifier Sequence
+	descr_empty_tags    .insert(mdcm::Tag(0x2200,0x0002));// Label Text
+	uid_tags            .insert(mdcm::Tag(0x0028,0x1214));// Large Palette Color Lookup Table UID
+	time_tags           .insert(mdcm::Tag(0x0010,0x21d0));// Last Menstrual Date
+	dev_remove_tags     .insert(mdcm::Tag(0x0016,0x004f));// Lens Make
+	dev_remove_tags     .insert(mdcm::Tag(0x0016,0x0050));// Lens Model
+	dev_remove_tags     .insert(mdcm::Tag(0x0016,0x0051));// Lens Serial Number
+	dev_remove_tags     .insert(mdcm::Tag(0x0016,0x004e));// Lens Specification
+	descr_remove_tags   .insert(mdcm::Tag(0x0050,0x0021));// Long Device Description
+	remove_tags         .insert(mdcm::Tag(0x0400,0x0404));// MAC
+	descr_remove_tags   .insert(mdcm::Tag(0x0016,0x002b));// Maker Note
+	dev_remove_tags     .insert(mdcm::Tag(0x0018,0x100b));// Manufacturer's Device Class UID
+	dev_empty_tags      .insert(mdcm::Tag(0x3010,0x0043));// Manufacturer's Device Identifier
+	//                                   (0x0002,0x0003)  // Media Storage SOP Instance UID
+	remove_tags         .insert(mdcm::Tag(0x0010,0x2000));// Medical Alerts
+	remove_tags         .insert(mdcm::Tag(0x0010,0x1090));// Medical Record Locator
+	remove_tags         .insert(mdcm::Tag(0x0010,0x1080));// Military Rank
+	remove_tags         .insert(mdcm::Tag(0x0400,0x0550));// Modified Attributes Sequence
+	remove_tags         .insert(mdcm::Tag(0x0020,0x3406));// Modified Image Description
+	remove_tags         .insert(mdcm::Tag(0x0020,0x3401));// Modifying Device ID
+	time_tags           .insert(mdcm::Tag(0x3008,0x0056));// Most Recent Treatment Date
+	descr_remove_tags   .insert(mdcm::Tag(0x0018,0x937b));// Multi-energy Acquisition Description
+	uid_tags            .insert(mdcm::Tag(0x003a,0x0310));// Multiplex Group UID
+	remove_tags         .insert(mdcm::Tag(0x0008,0x1060));// Name of Physician(s) Reading Study
+	remove_tags         .insert(mdcm::Tag(0x0040,0x1010));// Names of Intended Recipients of Results
+	remove_tags         .insert(mdcm::Tag(0x0400,0x0551));// Nonconforming Modified Attributes Sequence
+	remove_tags         .insert(mdcm::Tag(0x0400,0x0552));// Nonconforming Data Element Value
+	time_tags           .insert(mdcm::Tag(0x0040,0xa192));// Observation Date (Trial)
+	uid_tags            .insert(mdcm::Tag(0x0040,0xa402));// Observation Subject UID (Trial)
+	time_tags           .insert(mdcm::Tag(0x0040,0xa193));// Observation Time (Trial)
+	uid_tags            .insert(mdcm::Tag(0x0040,0xa171));// Observation UID
+	descr_remove_tags   .insert(mdcm::Tag(0x0010,0x2180));// Occupation
+	remove_tags         .insert(mdcm::Tag(0x0008,0x1072));// Operator Identification Sequence
+	pn_tags             .insert(mdcm::Tag(0x0008,0x1070));// Operators' Name
+	remove_tags         .insert(mdcm::Tag(0x0040,0x2010));// Order Callback Phone Number
+	remove_tags         .insert(mdcm::Tag(0x0040,0x2011));// Order Callback Telecom Information
+	remove_tags         .insert(mdcm::Tag(0x0040,0x2008));// Order Entered By
+	remove_tags         .insert(mdcm::Tag(0x0040,0x2009));// Order Enterer's Location
+	remove_tags         .insert(mdcm::Tag(0x0400,0x0561));// Original Attributes Sequence
+	remove_tags         .insert(mdcm::Tag(0x0010,0x1000));// Other Patient IDs
+	remove_tags         .insert(mdcm::Tag(0x0010,0x1002));// Other Patient IDs Sequence
+	remove_tags         .insert(mdcm::Tag(0x0010,0x1001));// Other Patient Names
+	//                                   (0x60xx,0x4000)  // Overlay Comments
+	//                                   (0x60xx,0x3000)  // Overlay Data
+	time_tags           .insert(mdcm::Tag(0x0008,0x0024));// Overlay Date
+	time_tags           .insert(mdcm::Tag(0x0008,0x0034));// Overlay Time
+	time_tags           .insert(mdcm::Tag(0x300a,0x0760));// Overlay DateTime
+	uid_tags            .insert(mdcm::Tag(0x0028,0x1199));// Palette Color Lookup Table UID
+	remove_tags         .insert(mdcm::Tag(0x0040,0xa07a));// Participant Sequence
+	remove_tags         .insert(mdcm::Tag(0x0010,0x1040));// Patient's Address
+	patient_remove_tags .insert(mdcm::Tag(0x0010,0x1010));// Patient's Age
+	empty_tags          .insert(mdcm::Tag(0x0010,0x0030));// Patient's Birth Date
+	remove_tags         .insert(mdcm::Tag(0x0010,0x1005));// Patient's Birth Name
+	remove_tags         .insert(mdcm::Tag(0x0010,0x0032));// Patient's Birth Time
+	remove_tags         .insert(mdcm::Tag(0x0038,0x0400));// Patient's Institution Residence
+	remove_tags         .insert(mdcm::Tag(0x0010,0x0050));// Patient's Insurance Plan Code Sequence
+	remove_tags         .insert(mdcm::Tag(0x0010,0x1060));// Patient's Mother's Birth Name
+	pn_tags             .insert(mdcm::Tag(0x0010,0x0010));// Patient's Name
+	remove_tags         .insert(mdcm::Tag(0x0010,0x0101));// Patient's Primary Language Code Sequence
+	remove_tags         .insert(mdcm::Tag(0x0010,0x0102));// Patient's Primary Language Modifier Code Sequence
+	remove_tags         .insert(mdcm::Tag(0x0010,0x21f0));// Patient's Religious Preference
+	patient_empty_tags  .insert(mdcm::Tag(0x0010,0x0040));// Patient's Sex
+	patient_empty_tags  .insert(mdcm::Tag(0x0010,0x2203));// Patient's Sex Neutered
+	patient_remove_tags .insert(mdcm::Tag(0x0010,0x1020));// Patient's Size
+	remove_tags         .insert(mdcm::Tag(0x0010,0x2155));// Patient's Telecom Information
+	remove_tags         .insert(mdcm::Tag(0x0010,0x2154));// Patient's Telephone Numbers
+	patient_remove_tags .insert(mdcm::Tag(0x0010,0x1030));// Patient's Weight
+	descr_remove_tags   .insert(mdcm::Tag(0x0010,0x4000));// Patient Comments
+	id_tags             .insert(mdcm::Tag(0x0010,0x0020));// Patient ID
+	uid_tags            .insert(mdcm::Tag(0x300a,0x0650));// Patient Setup UID
+	descr_remove_tags   .insert(mdcm::Tag(0x0038,0x0500));// Patient State
+	remove_tags         .insert(mdcm::Tag(0x0040,0x1004));// Patient Transport Arrangements
+	remove_tags         .insert(mdcm::Tag(0x0040,0x0243));// Performed Location
+	remove_tags         .insert(mdcm::Tag(0x0040,0x0254));// Performed Procedure Step Description
+	time_tags           .insert(mdcm::Tag(0x0040,0x0250));// Performed Procedure Step End Date
+	time_tags           .insert(mdcm::Tag(0x0040,0x4051));// Performed Procedure Step End DateTime
+	time_tags           .insert(mdcm::Tag(0x0040,0x0251));// Performed Procedure Step End Time
+	remove_tags         .insert(mdcm::Tag(0x0040,0x0253));// Performed Procedure Step ID
+	time_tags           .insert(mdcm::Tag(0x0040,0x0244));// Performed Procedure Step Start Date
+	time_tags           .insert(mdcm::Tag(0x0040,0x4050));// Performed Procedure Step Start DateTime
+	time_tags           .insert(mdcm::Tag(0x0040,0x0245));// Performed Procedure Step Start Time
+	dev_remove_tags     .insert(mdcm::Tag(0x0040,0x0241));// Performed Station AE Title
+	dev_remove_tags     .insert(mdcm::Tag(0x0040,0x4030));// Performed Station Geographic Location Code Sequence
+	dev_remove_tags     .insert(mdcm::Tag(0x0040,0x0242));// Performed Station Name
+	dev_remove_tags     .insert(mdcm::Tag(0x0040,0x4028));// Performed Station Name Code Sequence
+	remove_tags         .insert(mdcm::Tag(0x0008,0x1050));// Performing Physician's Name
+	remove_tags         .insert(mdcm::Tag(0x0008,0x1052));// Performing Physician Identification Sequence
+	remove_tags         .insert(mdcm::Tag(0x0040,0x1102));// Person's Address
+	remove_tags         .insert(mdcm::Tag(0x0040,0x1104));// Person's Telecom Information
+	remove_tags         .insert(mdcm::Tag(0x0040,0x1103));// Person's Telephone Numbers
+	//                                   (0x0040,0x1101)  // Person Identification Code Sequence
+	pn_tags             .insert(mdcm::Tag(0x0040,0xa123));// Person Name
+	remove_tags         .insert(mdcm::Tag(0x0008,0x1048));// Physician(s) of Record
+	remove_tags         .insert(mdcm::Tag(0x0008,0x1049));// Physician(s) of Record Identification Sequence
+	remove_tags         .insert(mdcm::Tag(0x0008,0x1062));// Physician(s) Reading Study Identification Sequence
+	remove_tags         .insert(mdcm::Tag(0x4008,0x0114));// Physician Approving Interpretation
+	empty_tags          .insert(mdcm::Tag(0x0040,0x2016));// Placer Order Number / Imaging Service Request
+	dev_remove_tags     .insert(mdcm::Tag(0x0018,0x1004));// Plate ID
+	patient_remove_tags .insert(mdcm::Tag(0x0010,0x21c0));// Pregnancy Status
+	patient_remove_tags .insert(mdcm::Tag(0x0040,0x0012));// Pre-Medication
+	descr_remove_tags   .insert(mdcm::Tag(0x300a,0x000e));// Prescription Description
+	descr_empty_tags    .insert(mdcm::Tag(0x3010,0x007b));// Prescription Notes
+	descr_remove_tags   .insert(mdcm::Tag(0x3010,0x0081));// Prescription Notes Sequence TODO
+	uid_tags            .insert(mdcm::Tag(0x0070,0x1101));// Presentation Display Collection UID
+	uid_tags            .insert(mdcm::Tag(0x0070,0x1102));// Presentation Sequence Collection UID
+	descr_remove_tags   .insert(mdcm::Tag(0x3010,0x0061));// Prior Treatment Dose Description
+	//                                   (0xGGGG,0xEEEE)  // Private attributes (GGGG is odd)
+	time_tags           .insert(mdcm::Tag(0x0040,0x4052));// Procedure Step Cancellation DateTime
+	descr_remove_tags   .insert(mdcm::Tag(0x0018,0x1030));// Protocol Name
+	descr_replace_tags  .insert(mdcm::Tag(0x300a,0x0619));// Radiation Dose Identification Label
+	descr_replace_tags  .insert(mdcm::Tag(0x300a,0x0623));// Radiation DoseIn-Vivo Measurement Label
+	descr_empty_tags    .insert(mdcm::Tag(0x300a,0x067d));// Radiation Generation Mode Description
+	descr_replace_tags  .insert(mdcm::Tag(0x300a,0x067c));// Radiation Generation Mode Label
+	descr_remove_tags   .insert(mdcm::Tag(0x300c,0x0113));// Reason for Omission Description
+	descr_remove_tags   .insert(mdcm::Tag(0x0040,0x100a));// Reason for Requested Procedure Code Sequence
+	descr_remove_tags   .insert(mdcm::Tag(0x0032,0x1030));// Reason for Study
+	descr_empty_tags    .insert(mdcm::Tag(0x3010,0x005c));// Reason for Superseding
+	descr_remove_tags   .insert(mdcm::Tag(0x0040,0x2001));// Reason for the Imaging Service Request
+	descr_remove_tags   .insert(mdcm::Tag(0x0040,0x1002));// Reason for the Requested Procedure
+	descr_remove_tags   .insert(mdcm::Tag(0x0032,0x1066));// Reason for Visit
+	descr_remove_tags   .insert(mdcm::Tag(0x0032,0x1067));// Reason for Visit Code Sequence
+	time_tags           .insert(mdcm::Tag(0x300a,0x073a));// Recorded RT Control Point Date Time
+	uid_tags            .insert(mdcm::Tag(0x3010,0x000b));// Referenced Conceptual Volume UID
+	remove_tags         .insert(mdcm::Tag(0x0400,0x0402));// Referenced Digital Signature Sequence
+	uid_tags            .insert(mdcm::Tag(0x300a,0x0083));// Referenced Dose Reference UID
+	uid_tags            .insert(mdcm::Tag(0x3010,0x006f));// Referenced Dosimetric Objective UID
+	uid_tags            .insert(mdcm::Tag(0x3010,0x0031));// Referenced Fiducials UID
+	uid_tags            .insert(mdcm::Tag(0x3006,0x0024));// Referenced Frame of Reference UID
+	uid_tags            .insert(mdcm::Tag(0x0040,0x4023));// Referenced General Purpose Scheduled Procedure Step Transaction UID
+	//                                   (0x0008,0x1140)  // Referenced Image Sequence
+	uid_tags            .insert(mdcm::Tag(0x0040,0xa172));// Referenced Observation UID (Trial)
+	remove_tags         .insert(mdcm::Tag(0x0038,0x0004));// Referenced Patient Alias Sequence
+	remove_tags         .insert(mdcm::Tag(0x0010,0x1100));// Referenced Patient Photo Sequence
+	remove_tags         .insert(mdcm::Tag(0x0008,0x1120));// Referenced Patient Sequence
+	//                                   (0x0008,0x1111)  // Referenced Performed Procedure Step Sequence
+	remove_tags         .insert(mdcm::Tag(0x0400,0x0403));// Referenced SOP Instance MAC Sequence
+	uid_tags            .insert(mdcm::Tag(0x0008,0x1155));// Referenced SOP Instance UI
+	uid_tags            .insert(mdcm::Tag(0x0004,0x1511));// Referenced SOP Instance UID in File
+	//                                   (0x0008,0x1110)  // Referenced Study Sequence
+	remove_tags         .insert(mdcm::Tag(0x0008,0x0092));// Referring Physician's Address
+	pn_tags             .insert(mdcm::Tag(0x0008,0x0090));// Referring Physician's Name
+	remove_tags         .insert(mdcm::Tag(0x0008,0x0094));// Referring Physician's Telephone Numbers
+	remove_tags         .insert(mdcm::Tag(0x0008,0x0096));// Referring Physician Identification Sequence
+	remove_tags         .insert(mdcm::Tag(0x0010,0x2152));// Region of Residence
+	uid_tags            .insert(mdcm::Tag(0x3006,0x00c2));// Related Frame of Reference UID
+	descr_remove_tags   .insert(mdcm::Tag(0x0040,0x0275));// Request Attributes Sequence
+	descr_remove_tags   .insert(mdcm::Tag(0x0032,0x1070));// Requested Contrast Agent
+	descr_remove_tags   .insert(mdcm::Tag(0x0040,0x1400));// Requested Procedure Comments
+	descr_remove_tags   .insert(mdcm::Tag(0x0032,0x1060));// Requested Procedure Description
+	remove_tags         .insert(mdcm::Tag(0x0040,0x1001));// Requested Procedure ID
+	remove_tags         .insert(mdcm::Tag(0x0040,0x1005));// Requested Procedure Location
+	//                                   (0x0000,0x1001)  // Requested SOP Instance UID
+	remove_tags         .insert(mdcm::Tag(0x0032,0x1032));// Requesting Physician
+	remove_tags         .insert(mdcm::Tag(0x0032,0x1033));// Requesting Service
+	descr_remove_tags   .insert(mdcm::Tag(0x0018,0x9185));// Respiratory Motion Compensation Technique Description
+	remove_tags         .insert(mdcm::Tag(0x0010,0x2299));// Responsible Organization
+	remove_tags         .insert(mdcm::Tag(0x0010,0x2297));// Responsible Person
+	descr_remove_tags   .insert(mdcm::Tag(0x4008,0x4000));// Results Comments
+	remove_tags         .insert(mdcm::Tag(0x4008,0x0118));// Results Distribution List Sequence
+	remove_tags         .insert(mdcm::Tag(0x4008,0x0042));// Results ID Issuer
+	pn_tags             .insert(mdcm::Tag(0x300e,0x0008));// Reviewer Name
+	descr_remove_tags   .insert(mdcm::Tag(0x3006,0x0028));// ROI Description
+	descr_remove_tags   .insert(mdcm::Tag(0x3006,0x0038));// ROI Generation Description
+	pn_tags             .insert(mdcm::Tag(0x3006,0x00a6));// ROI Interpreter
+	descr_empty_tags    .insert(mdcm::Tag(0x3006,0x0026));// ROI Name
+	descr_empty_tags    .insert(mdcm::Tag(0x3006,0x0088));// ROI Observation Description
+	descr_empty_tags    .insert(mdcm::Tag(0x3006,0x0085));// ROI Observation Label
+	descr_empty_tags    .insert(mdcm::Tag(0x300a,0x0615));// RT Accessory Device Slot ID
+	descr_empty_tags    .insert(mdcm::Tag(0x300a,0x0611));// RT Accessory Holder Slot ID
+	descr_empty_tags    .insert(mdcm::Tag(0x3010,0x005a));// RT Physician Intent Narrative
+	time_tags           .insert(mdcm::Tag(0x300a,0x0006));// RT Plan Date
+	descr_remove_tags   .insert(mdcm::Tag(0x300a,0x0004));// RT Plan Description
+	descr_replace_tags  .insert(mdcm::Tag(0x300a,0x0002));// RT Plan Label
+	descr_remove_tags   .insert(mdcm::Tag(0x300a,0x0003));// RT Plan Name
+	time_tags           .insert(mdcm::Tag(0x300a,0x0007));// RT Plan Time
+	descr_replace_tags  .insert(mdcm::Tag(0x3010,0x0054));// RT Prescription Label
+	descr_replace_tags  .insert(mdcm::Tag(0x300a,0x062a));// RT Tolerance Set Label
+	descr_remove_tags   .insert(mdcm::Tag(0x3010,0x0056));// RT Treatment Approach Label
+	uid_tags            .insert(mdcm::Tag(0x3010,0x003b));// RT Treatment Phase UID
+	remove_tags         .insert(mdcm::Tag(0x0040,0x4034));// Scheduled Human Performers Sequence
+	remove_tags         .insert(mdcm::Tag(0x0038,0x001e));// Scheduled Patient Institution Residence
+	remove_tags         .insert(mdcm::Tag(0x0040,0x0006));// Scheduled Performing Physician's Name
+	remove_tags         .insert(mdcm::Tag(0x0040,0x000b));// Scheduled Performing Physician Identification Sequence
+	remove_tags         .insert(mdcm::Tag(0x0040,0x0007));// Scheduled Procedure Step Description
+	time_tags           .insert(mdcm::Tag(0x0040,0x0004));// Scheduled Procedure Step End Date
+	time_tags           .insert(mdcm::Tag(0x0040,0x0005));// Scheduled Procedure Step End Time
+	time_tags           .insert(mdcm::Tag(0x0040,0x0008));// Scheduled Procedure Step Expiration DateTime
+	remove_tags         .insert(mdcm::Tag(0x0040,0x0009));// Scheduled Procedure Step ID
+	dev_remove_tags     .insert(mdcm::Tag(0x0040,0x0011));// Scheduled Procedure Step Location
+	time_tags           .insert(mdcm::Tag(0x0040,0x0010));// Scheduled Procedure Step Modification DateTime
+	time_tags           .insert(mdcm::Tag(0x0040,0x0002));// Scheduled Procedure Step Start Date
+	time_tags           .insert(mdcm::Tag(0x0040,0x4005));// Scheduled Procedure Step Start DateTime
+	time_tags           .insert(mdcm::Tag(0x0040,0x0003));// Scheduled Procedure Step Start Time
+	dev_remove_tags     .insert(mdcm::Tag(0x0040,0x0001));// Scheduled Station AE Title
+	dev_remove_tags     .insert(mdcm::Tag(0x0040,0x4027));// Scheduled Station Geographic Location Code Sequence
+	dev_remove_tags     .insert(mdcm::Tag(0x0040,0x0010));// Scheduled Station Name
+	dev_remove_tags     .insert(mdcm::Tag(0x0040,0x4025));// Scheduled Station Name Code Sequence
+	dev_remove_tags     .insert(mdcm::Tag(0x0032,0x1020));// Scheduled Study Location
+	dev_remove_tags     .insert(mdcm::Tag(0x0032,0x1021));// Scheduled Study Location AE Title
+	time_tags           .insert(mdcm::Tag(0x0008,0x0021));// Series Date
+	descr_remove_tags   .insert(mdcm::Tag(0x0008,0x103e));// Series Description
+	uid_tags            .insert(mdcm::Tag(0x0020,0x000e));// Series Instance UID
+	time_tags           .insert(mdcm::Tag(0x0008,0x0031));// Series Time
+	descr_remove_tags   .insert(mdcm::Tag(0x0038,0x0062));// Service Episode Description
+	remove_tags         .insert(mdcm::Tag(0x0038,0x0060));// Service Episode ID
+	descr_remove_tags   .insert(mdcm::Tag(0x300a,0x01b2));// Setup Technique Description
+	descr_remove_tags   .insert(mdcm::Tag(0x300a,0x01a6));// Shielding Device Description
+	remove_tags         .insert(mdcm::Tag(0x0040,0x06fa));// Slide Identifier
+	patient_remove_tags .insert(mdcm::Tag(0x0010,0x21a0));// Smoking Status
+	uid_tags            .insert(mdcm::Tag(0x0008,0x0018));// SOP InstanceUID
+	uid_tags            .insert(mdcm::Tag(0x3010,0x0015));// Source Conceptual Volume UID
+	time_tags           .insert(mdcm::Tag(0x0018,0x936a));// Source End DateTime
+	empty_tags          .insert(mdcm::Tag(0x0034,0x0005));// Source Identifier TODO
+	//                                   (0x0008,0x2112)  // Source Image Sequence
+	dev_remove_tags     .insert(mdcm::Tag(0x300a,0x0216));// Source Manufacturer
+	dev_empty_tags      .insert(mdcm::Tag(0x3008,0x0105));// Source Serial Number
+	time_tags           .insert(mdcm::Tag(0x0018,0x9369));// Source Start DateTime
+	patient_remove_tags .insert(mdcm::Tag(0x0038,0x0050));// Special Needs
+	remove_tags         .insert(mdcm::Tag(0x0040,0x050a));// Specimen Accession Number
+	descr_remove_tags   .insert(mdcm::Tag(0x0040,0x0602));// Specimen Detailed Description
+	id_tags             .insert(mdcm::Tag(0x0040,0x0551));// Specimen Identifier
+	struct_zero_tags    .insert(mdcm::Tag(0x0040,0x0610));// Specimen Preparation Sequence
+	descr_remove_tags   .insert(mdcm::Tag(0x0040,0x0600));// Specimen Short Description
+	uid_tags            .insert(mdcm::Tag(0x0040,0x0554));// Specimen UID
+	time_tags           .insert(mdcm::Tag(0x0018,0x9516));// Start Acquisition DateTime
+	dev_empty_tags      .insert(mdcm::Tag(0x0008,0x1010));// Station Name
+	uid_tags            .insert(mdcm::Tag(0x0088,0x0140));// Storage Media File-set UID
+	time_tags           .insert(mdcm::Tag(0x3006,0x0008));// Structure Set Date
+	descr_remove_tags   .insert(mdcm::Tag(0x3006,0x0006));// Structure Set Description
+	descr_replace_tags  .insert(mdcm::Tag(0x3006,0x0002));// Structure Set Label
+	descr_remove_tags   .insert(mdcm::Tag(0x3006,0x0004));// Structure Set Name
+	time_tags           .insert(mdcm::Tag(0x3006,0x0009));// Structure Set Time
+	descr_remove_tags   .insert(mdcm::Tag(0x0032,0x4000));// Study Comments
+	time_tags           .insert(mdcm::Tag(0x0008,0x0020));// Study Date
+	descr_remove_tags   .insert(mdcm::Tag(0x0008,0x1030));// Study Description
+	empty_tags          .insert(mdcm::Tag(0x0020,0x0010));// Study ID
+	remove_tags         .insert(mdcm::Tag(0x0032,0x0012));// Study ID Issuer
+	uid_tags            .insert(mdcm::Tag(0x0020,0x000d));// Study Instance UID
+	time_tags           .insert(mdcm::Tag(0x0008,0x0030));// Study Time
+	uid_tags            .insert(mdcm::Tag(0x0020,0x0200));// Synchronization Frame of Reference UID
+	uid_tags            .insert(mdcm::Tag(0x0018,0x2042));// Target UID
+	remove_tags         .insert(mdcm::Tag(0x0040,0xa354));// Telephone Number (Trial)
+	uid_tags            .insert(mdcm::Tag(0x0040,0xdb0d));// Template Extension Creator UID
+	uid_tags            .insert(mdcm::Tag(0x0040,0xdb0c));// Template Extension Organization UID
+	remove_tags         .insert(mdcm::Tag(0x4000,0x4000));// Text Comments
+	remove_tags         .insert(mdcm::Tag(0x2030,0x0020));// Text String
+	time_tags           .insert(mdcm::Tag(0x0008,0x0201));// Timezone Offset From UTC
+	remove_tags         .insert(mdcm::Tag(0x0088,0x0910));// Topic Author
+	remove_tags         .insert(mdcm::Tag(0x0088,0x0912));// Topic Keywords
+	remove_tags         .insert(mdcm::Tag(0x0088,0x0906));// Topic Subject
+	remove_tags         .insert(mdcm::Tag(0x0088,0x0904));// Topic Title
+	uid_tags            .insert(mdcm::Tag(0x0062,0x0021));// Tracking UID
+	uid_tags            .insert(mdcm::Tag(0x0008,0x1195));// Transaction UID
+	dev_remove_tags     .insert(mdcm::Tag(0x0018,0x5011));// Transducer Identification Sequence
+	time_tags           .insert(mdcm::Tag(0x3008,0x0250));// Treatment Date
+	dev_empty_tags      .insert(mdcm::Tag(0x300a,0x00b2));// Treatment Machine Name
+	descr_replace_tags  .insert(mdcm::Tag(0x300a,0x0608));// Treatment Position Group Label
+	uid_tags            .insert(mdcm::Tag(0x300a,0x0609));// Treatment Position Group UID
+	uid_tags            .insert(mdcm::Tag(0x300a,0x0700));// Treatment Session UID
+	descr_replace_tags  .insert(mdcm::Tag(0x3010,0x0077));// Treatment Site
+	descr_empty_tags    .insert(mdcm::Tag(0x3010,0x007a));// Treatment Technique Notes
+	time_tags           .insert(mdcm::Tag(0x3008,0x0251));// Treatment Time
+	time_tags           .insert(mdcm::Tag(0x300a,0x0736));// Treatment Tolerance Violation DateTime
+	descr_replace_tags  .insert(mdcm::Tag(0x300a,0x0734));// Treatment Tolerance Violation Description
+	dev_remove_tags     .insert(mdcm::Tag(0x0018,0x100a));// UDI Sequence
+	uid_tags            .insert(mdcm::Tag(0x0040,0xa124));// UID
+	dev_remove_tags     .insert(mdcm::Tag(0x0018,0x1009));// Unique Device Identifier
+	descr_replace_tags  .insert(mdcm::Tag(0x3010,0x0033));// User Content Label
+	descr_replace_tags  .insert(mdcm::Tag(0x3010,0x0034));// User Content Label Long
+	remove_tags         .insert(mdcm::Tag(0x0040,0xa352));// Verbal Source (Trial)
+	remove_tags         .insert(mdcm::Tag(0x0040,0xa358));// Verbal Source Identifier Code Sequence (Trial)
+	zero_seq_tags       .insert(mdcm::Tag(0x0040,0xa088));// Verifying Observer Identification Code Sequence
+	pn_tags             .insert(mdcm::Tag(0x0008,0xa075));// Verifying Observer Name
+	//                                   (0x0040,0xa073)  // Verifying Observer Sequence
+	id_tags             .insert(mdcm::Tag(0x0040,0xa027));// Verifying Organization
+	descr_remove_tags   .insert(mdcm::Tag(0x0038,0x4000));// Visit Comments
+	dev_replace_tags    .insert(mdcm::Tag(0x0018,0x9371));// X-Ray Detector ID
+	dev_remove_tags     .insert(mdcm::Tag(0x0018,0x9373));// X-Ray Detector Label
+	dev_replace_tags    .insert(mdcm::Tag(0x0018,0x9367));// X-Ray Source ID
 }
 // clang-format on
 

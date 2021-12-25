@@ -80,7 +80,8 @@ private:
 	std::set<mdcm::Tag> dev_remove_tags;
 	std::set<mdcm::Tag> dev_empty_tags;
 	std::set<mdcm::Tag> dev_replace_tags;
-	std::set<mdcm::Tag> patient_tags;
+	std::set<mdcm::Tag> patient_remove_tags;
+	std::set<mdcm::Tag> patient_empty_tags;
 	std::set<mdcm::Tag> inst_remove_tags;
 	std::set<mdcm::Tag> inst_empty_tags;
 	std::set<mdcm::Tag> inst_replace_tags;
