@@ -733,7 +733,7 @@ static void modify_date_time_recurs__(
 			const mdcm::ByteValue * bv = de.GetByteValue();
 			if (t == mdcm::Tag(0x0008,0x0201))
 			{
-				const QString r = QString("+0000");
+				QString r = QString("+0000 ");
 				mdcm::DataElement de2(t);
 				if (!implicit) de2.SetVR(mdcm::VR::SH);
 				de2.SetByteValue(r.toLatin1(), r.length());
@@ -943,6 +943,7 @@ static void modify_date_time_recurs__(
 						}
 						mdcm::DataElement de2(t);
 						if (!implicit) de2.SetVR(vr);
+						if ((r.length() % 2) != 0) r.append(QString(" "));
 						de2.SetByteValue(r.toLatin1(), r.length());
 						ds.Replace(de2);
 					}
@@ -1459,15 +1460,15 @@ static void anonymize_file__(
 	//
 	remove_group_length__(ds, implicit, dicts);
 	//
-	const QString s0("YES");
-	const QString s1("DICOM PS 3.15 E.1 2021b");
+	const QString s0("YES ");
+	const QString s1("DICOM PS 3.15 E.1 2021b ");
 	replace__(ds, mdcm::Tag(0x0012,0x0062), s0.toLatin1().constData(), s0.toLatin1().length(), implicit, dicts);
 	replace__(ds, mdcm::Tag(0x0012,0x0063), s1.toLatin1().constData(), s1.toLatin1().length(), implicit, dicts);
 	{
 #if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
-		const QLatin1String dcm("DCM");
+		const QLatin1String dcm("DCM ");
 #else
-		const QString dcm("DCM");
+		const QString dcm("DCM ");
 #endif
 		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = new mdcm::SequenceOfItems();
 		sq->SetLengthToUndefined();
@@ -1475,10 +1476,10 @@ static void anonymize_file__(
 		{
 #if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 			const QLatin1String cv("113100");
-			const QLatin1String cm("Basic Application Confidentiality Profile");
+			const QLatin1String cm("Basic Application Confidentiality Profile ");
 #else
 			const QString cv("113100");
-			const QString cm("Basic Application Confidentiality Profile");
+			const QString cm("Basic Application Confidentiality Profile ");
 #endif
 			mdcm::Item item;
 			item.SetVLToUndefined();
@@ -1520,10 +1521,10 @@ static void anonymize_file__(
 		{
 #if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 			const QLatin1String cv("113101");
-			const QLatin1String cm("Clean Pixel Data Option");
+			const QLatin1String cm("Clean Pixel Data Option ");
 #else
 			const QString cv("113101");
-			const QString cm("Clean Pixel Data Option");
+			const QString cm("Clean Pixel Data Option ");
 #endif
 			mdcm::Item item;
 			item.SetVLToUndefined();
@@ -1565,10 +1566,10 @@ static void anonymize_file__(
 		{
 #if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 			const QLatin1String cv("113102");
-			const QLatin1String cm("Clean Recognizable Visual Features Option");
+			const QLatin1String cm("Clean Recognizable Visual Features Option ");
 #else
 			const QString cv("113102");
-			const QString cm("Clean Recognizable Visual Features Option");
+			const QString cm("Clean Recognizable Visual Features Option ");
 #endif
 			mdcm::Item item;
 			item.SetVLToUndefined();
@@ -1610,10 +1611,10 @@ static void anonymize_file__(
 		{
 #if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 			const QLatin1String cv("113103");
-			const QLatin1String cm("Clean Graphics Option");
+			const QLatin1String cm("Clean Graphics Option ");
 #else
 			const QString cv("113103");
-			const QString cm("Clean Graphics Option");
+			const QString cm("Clean Graphics Option ");
 #endif
 			mdcm::Item item;
 			item.SetVLToUndefined();
@@ -1655,10 +1656,10 @@ static void anonymize_file__(
 		{
 #if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 			const QLatin1String cv("113104");
-			const QLatin1String cm("Clean Structured Content Option");
+			const QLatin1String cm("Clean Structured Content Option ");
 #else
 			const QString cv("113104");
-			const QString cm("Clean Structured Content Option");
+			const QString cm("Clean Structured Content Option ");
 #endif
 			mdcm::Item item;
 			item.SetVLToUndefined();
@@ -1809,10 +1810,10 @@ static void anonymize_file__(
 		{
 #if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 			const QLatin1String cv("113108");
-			const QLatin1String cm("Retain Patient Characteristics Option");
+			const QLatin1String cm("Retain Patient Characteristics Option ");
 #else
 			const QString cv("113108");
-			const QString cm("Retain Patient Characteristics Option");
+			const QString cm("Retain Patient Characteristics Option ");
 #endif
 			mdcm::Item item;
 			item.SetVLToUndefined();
@@ -1854,10 +1855,10 @@ static void anonymize_file__(
 		{
 #if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 			const QLatin1String cv("113109");
-			const QLatin1String cm("Retain Device Identity Option");
+			const QLatin1String cm("Retain Device Identity Option ");
 #else
 			const QString cv("113109");
-			const QString cm("Retain Device Identity Option");
+			const QString cm("Retain Device Identity Option ");
 #endif
 			mdcm::Item item;
 			item.SetVLToUndefined();
