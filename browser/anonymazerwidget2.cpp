@@ -733,7 +733,7 @@ static void modify_date_time_recurs__(
 			const mdcm::ByteValue * bv = de.GetByteValue();
 			if (t == mdcm::Tag(0x0008,0x0201))
 			{
-				QString r = QString("+0000 ");
+				const QString r = QString("+0000 ");
 				mdcm::DataElement de2(t);
 				if (!implicit) de2.SetVR(mdcm::VR::SH);
 				de2.SetByteValue(r.toLatin1(), r.length());
@@ -941,9 +941,9 @@ static void modify_date_time_recurs__(
 								r += QString("\\");
 							}
 						}
+						if ((r.length() % 2) != 0) r.append(QString(" "));
 						mdcm::DataElement de2(t);
 						if (!implicit) de2.SetVR(vr);
-						if ((r.length() % 2) != 0) r.append(QString(" "));
 						de2.SetByteValue(r.toLatin1(), r.length());
 						ds.Replace(de2);
 					}

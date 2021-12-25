@@ -1350,6 +1350,7 @@ template<typename T> QString process_dicom_rgb_image1(
 	const double spacing_x, const double spacing_y, const double spacing_z,
 	const short image_type,
 	const bool ybr,
+	const bool hsv,
 	const int bitsstored,
 	bool * bad_direction,
 	QProgressDialog * pb)
@@ -1440,6 +1441,17 @@ template<typename T> QString process_dicom_rgb_image1(
 						p[0]=static_cast<typename T::PixelType::ValueType>(R < 0 ? 0 : R);
 						p[1]=static_cast<typename T::PixelType::ValueType>(G < 0 ? 0 : G);
 						p[2]=static_cast<typename T::PixelType::ValueType>(B < 0 ? 0 : B);
+					}
+					else if (hsv)
+					{
+						const double H = (p__[j  ]/255.0)*360.0;
+						const double S = p__[j+1]/255.0;
+						const double V = p__[j+2]/255.0;
+						double R, G, B;
+						ColorSpace_::Hsv2Rgb(&R, &G, &B, H, S, V);
+						p[0]=static_cast<typename T::PixelType::ValueType>(R*255.0);
+						p[1]=static_cast<typename T::PixelType::ValueType>(G*255.0);
+						p[2]=static_cast<typename T::PixelType::ValueType>(B*255.0);
 					}
 					else
 					{
@@ -1580,11 +1592,22 @@ template<typename T> QString process_dicom_rgba_image1(
 					{
 						if (cmyk)
 						{
-							// TODO
+							// CMYK (Retired)
+							// Pixel data represent a color image described by cyan, magenta,
+							// yellow, and black image  planes. The minimum sample value for
+							// each CMYK plane represents a minimum intensity of the color.
+							// This value may be used only when Samples per Pixel (0028,0002)
+							// has a value of 4.
 							const float C = (float)p__[j  ];
 							const float M = (float)p__[j+1];
 							const float Y = (float)p__[j+2];
 							const float K = (float)p__[j+3];
+#if 1
+							p[0]=static_cast<typename T::PixelType::ValueType>((C*K)/255.0f);
+							p[1]=static_cast<typename T::PixelType::ValueType>((M*K)/255.0f);
+							p[2]=static_cast<typename T::PixelType::ValueType>((Y*K)/255.0f);
+							p[3]=255;
+#else
 							if (p__[j+3]!=255)
 							{
 								p[0]=static_cast<typename T::PixelType::ValueType>(((255.0f-C)*(255.0f-K))/255.0f); 
@@ -1599,11 +1622,12 @@ template<typename T> QString process_dicom_rgba_image1(
 								p[2]=static_cast<typename T::PixelType::ValueType>(255.0f-Y);
 								p[3]=255;
 							}
+#endif
 						}
 						else if (argb)
 						{
-							// TODO
-							// ARGB = Pixel data represent a color image
+							// ARGB (Retired)
+							// Pixel data represent a color image
 							// described by red, green, blue, and alpha
 							// image planes. The minimum sample value for each
 							// RGB plane represents minimum intensity of the
@@ -1613,6 +1637,7 @@ template<typename T> QString process_dicom_rgba_image1(
 							// lookup table values override the red, green, and
 							// blue, pixel plane colors.
 							//
+							// FIXME
 							const float tmp_max = 255.0f;
 							const float alpha = (float)p__[j+3]/tmp_max;
 							const float one_minus_alpha = 1.0f - alpha;
@@ -3183,6 +3208,11 @@ QString CommonUtils::gen_itk_image(bool * ok,
 		);
 	const bool cmyk = (pi == mdcm::PhotometricInterpretation::CMYK);
 	const bool argb = (pi == mdcm::PhotometricInterpretation::ARGB);
+	const bool hsv  = (pi == mdcm::PhotometricInterpretation::HSV);
+	if (argb)
+	{
+		std::cout << "DICOM ARGB can be opened incorrectly" << std::endl;
+	}
 	const unsigned short bits_allocated = pixelformat.GetBitsAllocated();
 	const unsigned short bits_stored    = pixelformat.GetBitsStored();
 	const unsigned short high_bit       = pixelformat.GetHighBit();
@@ -3998,6 +4028,13 @@ QString CommonUtils::gen_itk_image(bool * ok,
 		}
 	}
 	// RGB
+	//
+	// HSV (Retired)
+	// Pixel data represent a color image described by hue, saturation, and
+	// value image planes. The minimum sample value for each HSV plane
+	// represents a minimum value of each vector. This value may be used only
+	// when Samples per Pixel (0028,0002) has a value of 3
+	//
 	else if (pixelformat.GetSamplesPerPixel() == 3)
 	{
 		if (
@@ -4067,6 +4104,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				spacing_x, spacing_y, spacing_z,
 				14,
 				ybr,
+				hsv,
 				bitsstored,
 				&bad_direction,
 				pb);
@@ -4158,6 +4196,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				spacing_x, spacing_y, spacing_z,
 				11,
 				ybr,
+				false,
 				bitsstored,
 				&bad_direction,
 				pb);
@@ -4248,6 +4287,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				spacing_x, spacing_y, spacing_z,
 				10,
 				false,
+				false,
 				0,
 				&bad_direction,
 				pb);
@@ -4336,6 +4376,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				spacing_x, spacing_y, spacing_z,
 				15,
 				false,
+				false,
 				0,
 				&bad_direction,
 				pb);
@@ -4374,7 +4415,9 @@ QString CommonUtils::gen_itk_image(bool * ok,
 			ivariant->ybr = true;
 		}
 	}
-	// RGBA
+	// Workaround to handle 4-components DICOM,
+	// formats are retired 2001, there no example files
+	// available.
 	else if (pixelformat.GetSamplesPerPixel() == 4)
 	{
 #define USE_4SAMPLES_PER_PIXEL
