@@ -22,10 +22,6 @@
 #ifndef MDCMELEMENT_H
 #define MDCMELEMENT_H
 
-//
-#define DS16SIMPLE
-//
-
 #include "mdcmTypes.h"
 #include "mdcmVR.h"
 #include "mdcmTag.h"
@@ -347,14 +343,13 @@ public:
   }
 };
 
-#ifdef DS16SIMPLE
 static void ds16print(char * buf, double f)
 {
   char line[40];
   int l = sprintf(line, "%.17g", f);
   if (l > 16)
   {
-    int prec = 33 - strlen(line);
+    int prec = 33 - (int)strlen(line);
     l = sprintf(line, "%.*g", prec, f);
     while(l > 16)
     {
@@ -364,172 +359,6 @@ static void ds16print(char * buf, double f)
   }
   strcpy(buf, line);
 }
-#else
-// http://stackoverflow.com/questions/32631178/writing-ieee-754-1985-double-as-ascii-on-a-limited-16-bytes-string
-//
-// solution from the above link is too buggy
-static inline void
-clean(char * mant)
-{
-  char * ix = mant + strlen(mant) - 1;
-  while (('0' == *ix) && (ix > mant))
-  {
-    *ix-- = '\0';
-  }
-  if ('.' == *ix)
-  {
-    *ix = '\0';
-  }
-}
-
-static int
-add1(char * buf, int n)
-{
-  if (n < 0)
-    return 1;
-  if (buf[n] == '9')
-  {
-    buf[n] = '0';
-    return add1(buf, n - 1);
-  }
-  else
-  {
-    buf[n] = (char)(buf[n] + 1);
-  }
-  return 0;
-}
-
-static int
-doround(char * buf, unsigned int n)
-{
-  char c;
-  if (n >= strlen(buf))
-    return 0;
-  c = buf[n];
-  buf[n] = 0;
-  if ((c >= '5') && (c <= '9'))
-    return add1(buf, n - 1);
-  return 0;
-}
-
-static int
-roundat(char * buf, unsigned int i, int iexp)
-{
-  if (doround(buf, i) != 0)
-  {
-    iexp += 1;
-    switch (iexp)
-    {
-      case -2:
-        strcpy(buf, ".01");
-        break;
-      case -1:
-        strcpy(buf, ".1");
-        break;
-      case 0:
-        strcpy(buf, "1.");
-        break;
-      case 1:
-        strcpy(buf, "10");
-        break;
-      case 2:
-        strcpy(buf, "100");
-        break;
-      default:
-        sprintf(buf, "1e%d", iexp);
-    }
-    return 1;
-  }
-  return 0;
-}
-
-template <typename Float>
-static void
-x16printf(char * buf, int size, Float f)
-{
-  char line[40];
-  char * mant = line + 1;
-  int iexp, lexp, i;
-  char exp[6];
-  if (f < 0)
-  {
-    f = -f;
-    size -= 1;
-    *buf++ = '-';
-  }
-  sprintf(line, "%1.16e", f);
-  if (line[0] == '-')
-  {
-    f = -f;
-    size -= 1;
-    *buf++ = '-';
-    sprintf(line, "%1.16e", f);
-  }
-  *mant = line[0];
-  i = (int)strcspn(mant, "eE");
-  mant[i] = '\0';
-  iexp = (int)strtol(mant + i + 1, NULL, 10);
-  lexp = sprintf(exp, "e%d", iexp);
-  if ((iexp >= size) || (iexp < -3))
-  {
-    i = roundat(mant, size - 1 - lexp, iexp);
-    if (i == 1)
-    {
-      strcpy(buf, mant);
-      return;
-    }
-    buf[0] = mant[0];
-    buf[1] = '.';
-    strncpy(buf + i + 2, mant + 1, size - 2 - lexp);
-    buf[size - lexp] = 0;
-    clean(buf);
-    strcat(buf, exp);
-  }
-  else if (iexp >= size - 2)
-  {
-    roundat(mant, iexp + 1, iexp);
-    strcpy(buf, mant);
-  }
-  else if (iexp >= 0)
-  {
-    i = roundat(mant, size - 1, iexp);
-    if (i == 1)
-    {
-      strcpy(buf, mant);
-      return;
-    }
-    strncpy(buf, mant, iexp + 1);
-    buf[iexp + 1] = '.';
-    strncpy(buf + iexp + 2, mant + iexp + 1, size - iexp - 1);
-    buf[size] = 0;
-    clean(buf);
-  }
-  else
-  {
-    i = roundat(mant, size + 1 + iexp, iexp);
-    if (i == 1)
-    {
-      strcpy(buf, mant);
-      return;
-    }
-    buf[0] = '.';
-    for (int j = 0; j < -1 - iexp; ++j)
-    {
-      buf[j + 1] = '0';
-    }
-    /* FIXME dead code
-        if ((i == 1) && (iexp != -1))
-        {
-          buf[-iexp] = '1';
-          buf++;
-        }
-    */
-    strncpy(buf - iexp, mant, size + 1 + iexp);
-    buf[size] = 0;
-    clean(buf);
-  }
-}
-#endif
 
 template <>
 inline void
@@ -543,11 +372,7 @@ EncodingImplementation<VR::VRASCII>::Write(const double * data, unsigned long le
     {
       char buf[17];
       memset(buf, 0, 17);
-#ifdef DS16SIMPLE
       ds16print(buf, data[i]);
-#else
-      x16printf(buf, 16, data[i]);
-#endif
       if (i == 0)
         _os << buf;
       else
@@ -1088,9 +913,5 @@ class Element<VR::OW, VM::VM1> : public Element<VR::OW, VM::VM1_n>
 {};
 
 } // namespace mdcm
-
-#ifdef DS16SIMPLE
-#undef DS16SIMPLE
-#endif
 
 #endif // MDCMELEMENT_H
