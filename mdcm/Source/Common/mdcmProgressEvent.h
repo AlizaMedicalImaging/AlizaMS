@@ -38,11 +38,11 @@ class ProgressEvent : public AnyEvent
 public:
   typedef ProgressEvent Self;
   typedef AnyEvent      Superclass;
-  ProgressEvent(double p = 0)
+  ProgressEvent(double p = 0.0)
     : m_Progress(p)
   {}
   ProgressEvent(const Self & s)
-    : AnyEvent(s)
+    : AnyEvent(s), m_Progress(0.0)
   {}
   ~ProgressEvent() {}
 
@@ -77,8 +77,8 @@ public:
   }
 
 private:
-  void
-         operator=(const Self &);
+  void operator=(const Self &);
+
   double m_Progress;
 };
 

@@ -53,7 +53,9 @@ public:
 
   void
   operator=(const Object &)
-  {}
+  {
+    ReferenceCount = 0;
+  }
 
 protected:
   void

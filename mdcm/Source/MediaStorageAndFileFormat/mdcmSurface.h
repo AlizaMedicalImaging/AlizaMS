@@ -115,10 +115,10 @@ public:
   void
   SetRecommendedPresentationOpacity(const float);
   VIEWType
-       GetRecommendedPresentationType() const;
+  GetRecommendedPresentationType() const;
   void SetRecommendedPresentationType(VIEWType);
   STATES
-       GetFiniteVolume() const;
+  GetFiniteVolume() const;
   void SetFiniteVolume(STATES);
   STATES
   GetManifold() const;
@@ -207,7 +207,7 @@ public:
   MeshPrimitive &
   GetMeshPrimitive();
   void
-  SetMeshPrimitive(MeshPrimitive &);
+  SetMeshPrimitive(const MeshPrimitive &);
 
 private:
   // 0066 0003 UL 1 Surface Number

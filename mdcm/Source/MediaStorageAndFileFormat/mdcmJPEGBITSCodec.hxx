@@ -105,8 +105,8 @@ METHODDEF(void) init_source(j_decompress_ptr cinfo)
 METHODDEF(boolean) fill_input_buffer(j_decompress_ptr cinfo)
 {
   my_src_ptr src = (my_src_ptr)cinfo->src;
-  size_t     nbytes;
-  // FIXME
+  size_t     nbytes = 0;
+  // TODO check
   // nbytes = JFREAD(src->infile, src->buffer, INPUT_BUF_SIZE);
   std::streampos pos = src->infile->tellg();
   std::streampos end = src->infile->seekg(0, std::ios::end).tellg();
@@ -115,7 +115,7 @@ METHODDEF(boolean) fill_input_buffer(j_decompress_ptr cinfo)
   if (end == pos)
   {
     /* Start the I/O suspension simply by returning false here */
-    // FIXME return value seems to be not use below
+    // FIXME return value seems to be not used below
     return FALSE;
   }
   if ((end - pos) < INPUT_BUF_SIZE)
@@ -127,8 +127,7 @@ METHODDEF(boolean) fill_input_buffer(j_decompress_ptr cinfo)
     src->infile->read((char *)src->buffer, INPUT_BUF_SIZE);
   }
   std::streamsize gcount = src->infile->gcount();
-  nbytes = (size_t)gcount;
-  if (nbytes <= 0)
+  if (gcount <= 0)
   {
     if (src->start_of_file) /* Treat empty input file as fatal error */
     {
@@ -139,6 +138,10 @@ METHODDEF(boolean) fill_input_buffer(j_decompress_ptr cinfo)
     src->buffer[0] = (JOCTET)0xFF;
     src->buffer[1] = (JOCTET)JPEG_EOI;
     nbytes = 2;
+  }
+  else
+  {
+    nbytes = (size_t)gcount;
   }
   src->pub.next_input_byte = src->buffer;
   src->pub.bytes_in_buffer = nbytes;

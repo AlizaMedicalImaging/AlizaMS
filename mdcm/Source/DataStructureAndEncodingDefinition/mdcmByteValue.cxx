@@ -37,7 +37,7 @@ ByteValue::ByteValue(const char * array, const VL & vl)
   {
     mdcmDebugMacro("Odd length");
     Internal.resize(vl + 1);
-    Length++;
+    ++Length;
   }
 }
 

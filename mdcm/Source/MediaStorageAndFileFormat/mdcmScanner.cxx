@@ -31,24 +31,24 @@
 #include "mdcmFileNameEvent.h"
 #include <algorithm>
 
-#define stringBinaryVR(type)                                                                                           \
-  case VR::type:                                                                                                       \
-  {                                                                                                                    \
-    Element<VR::type, VM::VM1_n> el;                                                                                   \
-    if (!de.IsEmpty())                                                                                                 \
-    {                                                                                                                  \
-      el.Set(de.GetValue());                                                                                           \
-      if (el.GetLength())                                                                                              \
-      {                                                                                                                \
-        os << el.GetValue();                                                                                           \
-        for (unsigned int i = 1; i < el.GetLength(); ++i)                                                              \
-        {                                                                                                              \
-          os << "\\" << el.GetValue(i);                                                                                \
-        }                                                                                                              \
-        retvalue = os.str();                                                                                           \
-      }                                                                                                                \
-    }                                                                                                                  \
-  }                                                                                                                    \
+#define stringBinaryVR(type)                                \
+  case VR::type:                                            \
+  {                                                         \
+    Element<VR::type, VM::VM1_n> el;                        \
+    if (!de.IsEmpty())                                      \
+    {                                                       \
+      el.Set(de.GetValue());                                \
+      if (el.GetLength())                                   \
+      {                                                     \
+        os << el.GetValue();                                \
+        for (unsigned int i = 1; i < el.GetLength(); ++i)   \
+        {                                                   \
+          os << "\\" << el.GetValue(i);                     \
+        }                                                   \
+        retvalue = os.str();                                \
+      }                                                     \
+    }                                                       \
+  }                                                         \
   break
 
 

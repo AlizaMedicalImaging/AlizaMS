@@ -33,12 +33,10 @@ public:
   typedef DataEvent Self;
   typedef AnyEvent  Superclass;
   DataEvent(const char * bytes = 0, size_t len = 0)
-    : Bytes(bytes)
-    , Length(len)
-  {}
+    : Bytes(bytes), Length(len) {}
   DataEvent(const Self & s)
-    : AnyEvent(s){};
-  ~DataEvent() {}
+    : AnyEvent(s), Bytes(NULL), Length(0) {};
+  ~DataEvent() override {}
   const char *
   GetEventName() const override
   {
@@ -72,8 +70,8 @@ public:
   }
 
 private:
-  void
-               operator=(const Self &);
+  void operator=(const Self &);
+
   const char * Bytes;
   size_t       Length;
 };

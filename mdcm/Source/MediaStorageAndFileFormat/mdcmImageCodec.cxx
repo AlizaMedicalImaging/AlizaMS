@@ -358,8 +358,8 @@ ImageCodec::DecodeByStreams(std::istream & is, std::ostream & os)
       if (!c)
       {
         // try raw/YBR_FULL_422
-        if (DoYBRFull422(*cur_is, pl_os))
-          cur_is = &pl_os;
+        if (DoYBRFull422(*cur_is, pi_os))
+          cur_is = &pi_os;
         else
           return false;
       }

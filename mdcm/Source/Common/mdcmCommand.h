@@ -99,8 +99,8 @@ protected:
   TConstMemberFunctionPointer m_ConstMemberFunction;
   MemberCommand()
     : m_This(NULL)
-    , m_MemberFunction(0)
-    , m_ConstMemberFunction(0)
+    , m_MemberFunction(NULL)
+    , m_ConstMemberFunction(NULL)
   {}
   virtual ~MemberCommand() {}
 

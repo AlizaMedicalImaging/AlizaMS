@@ -27,11 +27,6 @@ namespace mdcm
 static const DictEntry ggl("Generic Group Length", "GenericGroupLength", VR::UL, VM::VM1, true);
 static const DictEntry ill("Illegal Element", "IllegalElement", VR::INVALID, VM::VM0, false);
 static const DictEntry prc("Private Creator", "PrivateCreator", VR::LO, VM::VM1, false);
-static const DictEntry pe0("Private Element Without Private Creator",
-                           "PrivateElementWithoutPrivateCreator",
-                           VR::INVALID,
-                           VM::VM0,
-                           false);
 static const DictEntry pe1("Private Element With Empty Private Creator",
                            "PrivateElementWithEmptyPrivateCreator",
                            VR::INVALID,
@@ -87,10 +82,6 @@ Dicts::GetDictEntry(const Tag & tag, const char * owner) const
       }
       else
       {
-        if (owner && *owner)
-        {
-          return pe0;
-        }
         return pe1;
       }
     }

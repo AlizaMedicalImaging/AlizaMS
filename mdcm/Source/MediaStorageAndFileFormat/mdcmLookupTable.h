@@ -58,8 +58,7 @@ public:
   Clear();
   void
   Allocate(unsigned short = 8 /*bitsample*/);
-  void
-               InitializeLUT(LookupTableType, unsigned short, unsigned short, unsigned short);
+  void InitializeLUT(LookupTableType, unsigned short, unsigned short, unsigned short);
   unsigned int GetLUTLength(LookupTableType) const;
   virtual void
   SetLUT(LookupTableType, const unsigned char *, unsigned int);

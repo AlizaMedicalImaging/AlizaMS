@@ -34,6 +34,9 @@ namespace mdcm
 class MDCM_EXPORT UIDs
 {
 public:
+  UIDs() {}
+  ~UIDs() {}
+
   typedef enum
   {
     uid_1_2_840_10008_1_1 = 1,      // Verification SOP Class

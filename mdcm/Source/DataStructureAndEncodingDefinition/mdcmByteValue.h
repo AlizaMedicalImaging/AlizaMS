@@ -132,7 +132,7 @@ public:
   VL
   GetLength() const override;
   VL
-       ComputeLength() const;
+  ComputeLength() const;
   void SetLength(VL) override;
   void
   Append(ByteValue const &);

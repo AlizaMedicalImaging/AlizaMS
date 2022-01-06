@@ -68,7 +68,7 @@ public:
   bool
   HasObserver(const Event & event) const;
   bool
-  PrintObservers(std::ostream & os, std::string indent) const;
+  PrintObservers(std::ostream & os, std::string & indent) const;
 
 private:
   std::list<Observer *> m_Observers;
@@ -181,7 +181,7 @@ SubjectInternals::HasObserver(const Event & event) const
 }
 
 bool
-SubjectInternals::PrintObservers(std::ostream & os, std::string indent) const
+SubjectInternals::PrintObservers(std::ostream & os, std::string & indent) const
 {
   if (m_Observers.empty())
   {

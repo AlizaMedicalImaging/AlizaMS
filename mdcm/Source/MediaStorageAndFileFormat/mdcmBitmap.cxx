@@ -604,12 +604,9 @@ Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
     {
       mdcmAlwaysWarnMacro("JPEG: length is " << len << ", should be " << outbv->GetLength());
     }
-    if (buffer)
-    {
-      memcpy(buffer,
-             outbv->GetPointer(),
-             (len >= (unsigned long long)outbv->GetLength() ? (size_t)outbv->GetLength() : (size_t)len));
-    }
+    memcpy(buffer,
+           outbv->GetPointer(),
+           (len >= (unsigned long long)outbv->GetLength() ? (size_t)outbv->GetLength() : (size_t)len));
     lossyflag = codec.IsLossy();
     return true;
   }
@@ -805,8 +802,7 @@ Bitmap::TryPVRGCodec(char * buffer, bool & lossyflag) const
     if (!outbv)
       return false;
     assert(len <= outbv->GetLength());
-    if (buffer)
-      memcpy(buffer, outbv->GetPointer(), (size_t)len);
+    memcpy(buffer, outbv->GetPointer(), (size_t)len);
     lossyflag = codec.IsLossy();
     return r;
   }
@@ -862,8 +858,7 @@ Bitmap::TryJPEGLSCodec(char * buffer, bool & lossyflag) const
     if (!outbv)
       return false;
     assert(len <= outbv->GetLength());
-    if (buffer)
-      memcpy(buffer, outbv->GetPointer(), (size_t)len);
+    memcpy(buffer, outbv->GetPointer(), (size_t)len);
     lossyflag = codec.IsLossy();
     if (codec.IsLossy() != ts.IsLossy())
     {
@@ -992,8 +987,7 @@ Bitmap::TryJPEG2000Codec(char * buffer, bool & lossyflag) const
     if (!outbv)
       return false;
     assert(len <= outbv->GetLength());
-    if (buffer)
-      memcpy(buffer, outbv->GetPointer(), (size_t)len);
+    memcpy(buffer, outbv->GetPointer(), (size_t)len);
     lossyflag = codec.IsLossy();
     if (codec.IsLossy() && !ts.IsLossy())
     {
@@ -1167,8 +1161,7 @@ Bitmap::TryRLECodec(char * buffer, bool & lossyflag) const
       return false;
     const ByteValue * outbv = out.GetByteValue();
     assert(len <= outbv->GetLength());
-    if (buffer)
-      memcpy(buffer, outbv->GetPointer(), (size_t)len);
+    memcpy(buffer, outbv->GetPointer(), (size_t)len);
     lossyflag = false;
     return true;
   }

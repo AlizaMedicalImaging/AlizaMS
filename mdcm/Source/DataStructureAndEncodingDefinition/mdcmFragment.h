@@ -97,7 +97,6 @@ public:
       ParseException pe;
       pe.SetLastElement(*this);
       throw pe;
-      return is;
     }
     ValueField = bv;
     return is;
