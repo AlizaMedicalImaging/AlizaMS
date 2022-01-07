@@ -53,8 +53,7 @@ public:
 
   void
   operator=(const Object &)
-  {
-  }
+  {}
 
 protected:
   void
