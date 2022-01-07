@@ -39,7 +39,7 @@ public:
   }
   template <typename T>
   static void
-  SwapArray(T *, unsigned int)
+  SwapArray(T *, size_t)
   {}
 };
 
@@ -51,9 +51,9 @@ public:
   Swap(T val);
   template <typename T>
   static void
-  SwapArray(T * array, unsigned int n)
+  SwapArray(T * array, size_t n)
   {
-    for (unsigned int i = 0; i < n; ++i)
+    for (size_t i = 0; i < n; ++i)
     {
       array[i] = Swap<T>(array[i]);
     }

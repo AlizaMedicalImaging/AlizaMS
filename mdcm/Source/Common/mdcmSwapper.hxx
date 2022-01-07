@@ -22,6 +22,8 @@
 #ifndef MDCMSWAPPER_TXX
 #define MDCMSWAPPER_TXX
 
+#include <cstring>
+
 #if defined(_MSC_VER)
 
 #  include <cstdlib>
@@ -79,6 +81,7 @@ namespace mdcm
 {
 
 #ifdef MDCM_WORDS_BIGENDIAN
+
 template <>
 inline uint16_t
 SwapperNoOp::Swap<uint16_t>(uint16_t val)
@@ -111,7 +114,12 @@ template <>
 inline float
 SwapperNoOp::Swap<float>(float val)
 {
-  return Swap((uint32_t)val);
+  uint32_t i;
+  float f;
+  memcpy(&i, &val, 4);
+  i = Swap(i);
+  memcpy(&f, &i, 4);
+  return f;
 }
 
 template <>
@@ -132,7 +140,12 @@ template <>
 inline double
 SwapperNoOp::Swap<double>(double val)
 {
-  return Swap((uint64_t)val);
+  uint64_t i;
+  double f;
+  memcpy(&i, &val, 8);
+  i = Swap(i);
+  memcpy(&f, &i, 8);
+  return f;
 }
 
 template <>
@@ -144,35 +157,21 @@ SwapperNoOp::Swap<Tag>(Tag val)
 
 template <>
 inline void
-SwapperNoOp::SwapArray(uint8_t *, unsigned int)
+SwapperNoOp::SwapArray(uint8_t *, size_t)
 {}
 
 template <>
 inline void
-SwapperNoOp::SwapArray(float * array, unsigned int n)
+SwapperNoOp::SwapArray(float * array, size_t n)
 {
-  switch (sizeof(float))
-  {
-    case 4:
-      SwapperNoOp::SwapArray<uint32_t>((uint32_t *)array, n);
-      break;
-    default:
-      assert(0);
-  }
+  SwapperNoOp::SwapArray<float>(array, n);
 }
 
 template <>
 inline void
-SwapperNoOp::SwapArray(double * array, unsigned int n)
+SwapperNoOp::SwapArray(double * array, size_t n)
 {
-  switch (sizeof(double))
-  {
-    case 8:
-      SwapperNoOp::SwapArray<uint64_t>((uint64_t *)array, n);
-      break;
-    default:
-      assert(0);
-  }
+  SwapperNoOp::SwapArray<double>(array, n);
 }
 
 #else
@@ -183,6 +182,7 @@ SwapperDoOp::Swap<uint16_t>(uint16_t val)
 {
   return bswap_16(val);
 }
+
 template <>
 inline int16_t
 SwapperDoOp::Swap<int16_t>(int16_t val)
@@ -208,7 +208,12 @@ template <>
 inline float
 SwapperDoOp::Swap<float>(float val)
 {
-  return static_cast<float>(Swap((uint32_t)val));
+  uint32_t i;
+  float f;
+  memcpy(&i, &val, 4);
+  i = Swap(i);
+  memcpy(&f, &i, 4);
+  return f;
 }
 
 template <>
@@ -229,7 +234,12 @@ template <>
 inline double
 SwapperDoOp::Swap<double>(double val)
 {
-  return static_cast<double>(Swap((uint64_t)val));
+  uint64_t i;
+  double f;
+  memcpy(&i, &val, 8);
+  i = Swap(i);
+  memcpy(&f, &i, 8);
+  return f;
 }
 
 template <>
@@ -248,28 +258,14 @@ template <>
 inline void
 SwapperDoOp::SwapArray(float * array, size_t n)
 {
-  switch (sizeof(float))
-  {
-    case 4:
-      SwapperDoOp::SwapArray<uint32_t>((uint32_t *)array, n);
-      break;
-    default:
-      assert(0);
-  }
+  SwapperDoOp::SwapArray<float>(array, n);
 }
 
 template <>
 inline void
 SwapperDoOp::SwapArray(double * array, size_t n)
 {
-  switch (sizeof(double))
-  {
-    case 8:
-      SwapperDoOp::SwapArray<uint64_t>((uint64_t *)array, n);
-      break;
-    default:
-      assert(0);
-  }
+  SwapperDoOp::SwapArray<double>(array, n);
 }
 
 #endif
