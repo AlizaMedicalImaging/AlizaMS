@@ -32,7 +32,7 @@ class DataEvent : public AnyEvent
 public:
   typedef DataEvent Self;
   typedef AnyEvent  Superclass;
-  DataEvent(const char * bytes = 0, size_t len = 0)
+  DataEvent(const char * bytes = NULL, size_t len = 0)
     : Bytes(bytes), Length(len) {}
   DataEvent(const Self & s)
     : AnyEvent(s), Bytes(NULL), Length(0) {};
