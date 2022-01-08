@@ -353,26 +353,26 @@ ImageCodec::DecodeByStreams(std::istream & is, std::ostream & os)
     case PhotometricInterpretation::YBR_FULL:
       break;
     case PhotometricInterpretation::YBR_FULL_422:
-    {
-      const JPEGCodec * c = dynamic_cast<const JPEGCodec *>(this);
-      if (!c)
       {
-        // try raw/YBR_FULL_422
-        if (DoYBRFull422(*cur_is, pi_os))
-          cur_is = &pi_os;
-        else
-          return false;
+        const JPEGCodec * c = dynamic_cast<const JPEGCodec *>(this);
+        if (!c)
+        {
+          // try raw/YBR_FULL_422
+          if (DoYBRFull422(*cur_is, pi_os))
+            cur_is = &pi_os;
+          else
+            return false;
+        }
       }
-    }
-    break;
+      break;
     case PhotometricInterpretation::YBR_PARTIAL_422: // retired
     case PhotometricInterpretation::YBR_PARTIAL_420: // not supported
-    {                                                // try JPEG
-      const JPEGCodec * c = dynamic_cast<const JPEGCodec *>(this);
-      if (!c)
-        return false;
-    }
-    break;
+      {                                                // try JPEG
+        const JPEGCodec * c = dynamic_cast<const JPEGCodec *>(this);
+        if (!c)
+          return false;
+      }
+      break;
     default:
       mdcmErrorMacro("Unhandled PhotometricInterpretation: " << PI);
       return false;

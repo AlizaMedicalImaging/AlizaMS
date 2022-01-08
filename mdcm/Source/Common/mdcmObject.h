@@ -68,9 +68,8 @@ protected:
   {
     assert(ReferenceCount > 0);
     --ReferenceCount;
-    if (ReferenceCount <= 0)
+    if (ReferenceCount == 0)
     {
-      assert(ReferenceCount == 0);
       delete this;
     }
   }
