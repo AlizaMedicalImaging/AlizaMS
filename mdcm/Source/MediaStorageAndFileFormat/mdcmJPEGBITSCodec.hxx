@@ -432,6 +432,8 @@ JPEGBITSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
     else if (cinfo.jpeg_color_space == JCS_YCbCr)
     {
       assert(cinfo.num_components == 3);
+	  // YBR_PARTIAL_422 is theoretically possible too,
+	  // but retired in 2017b and extremely rare.
       PI = PhotometricInterpretation::YBR_FULL_422;
       if (cinfo.process == JPROC_LOSSLESS)
       {
@@ -455,6 +457,7 @@ JPEGBITSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
   }
   if (cinfo.process == JPROC_LOSSLESS)
   {
+    LossyFlag = false;
     const int predictor = cinfo.Ss;
     switch (predictor)
     {
@@ -468,6 +471,7 @@ JPEGBITSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
   }
   else if (cinfo.process == JPROC_SEQUENTIAL)
   {
+    LossyFlag = true;
     if (this->BitSample == 8)
     {
       ts = TransferSyntax::JPEGBaselineProcess1;
@@ -484,6 +488,7 @@ JPEGBITSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
   }
   else if (cinfo.process == JPROC_PROGRESSIVE)
   {
+    LossyFlag = true;
     if (this->BitSample == 8)
     {
       ts = TransferSyntax::JPEGFullProgressionProcess10_12;
@@ -500,16 +505,9 @@ JPEGBITSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
   }
   else
   {
+    LossyFlag = true;
     assert(0);
     return false;
-  }
-  if (cinfo.process == JPROC_LOSSLESS)
-  {
-    LossyFlag = false;
-  }
-  else
-  {
-    LossyFlag = true;
   }
 
   // Pixel density stuff
@@ -704,10 +702,14 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
         }
         break;
       case JCS_YCbCr:
-#if 0
+#if 1
         if((GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL)
 #  if 1
           || (GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422)
+#  endif
+          // Currently don't preserve color-space for YBR_PARTIAL_422
+#  if 0
+          || (GetPhotometricInterpretation() == PhotometricInterpretation::YBR_PARTIAL_422)
 #  endif
         )
 #endif

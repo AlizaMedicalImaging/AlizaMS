@@ -6837,9 +6837,9 @@ QString DicomUtils::read_series(
 			(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128"))
 			? true : false;
 		unsigned long long buffers_size = 0;
+		std::vector<char*> data_;
 		if (images_ipp.size() > 1)
 		{
-			std::vector<char*> data_;
 			buff_error = read_buffer(
 				ok,
 				data_,

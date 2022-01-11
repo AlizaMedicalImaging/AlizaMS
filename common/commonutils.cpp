@@ -3205,6 +3205,9 @@ QString CommonUtils::gen_itk_image(bool * ok,
 #if 1
 		|| pi == mdcm::PhotometricInterpretation::YBR_FULL_422
 #endif
+#if 0
+		|| pi == mdcm::PhotometricInterpretation::YBR_PARTIAL_422
+#endif
 		);
 	const bool cmyk = (pi == mdcm::PhotometricInterpretation::CMYK);
 	const bool argb = (pi == mdcm::PhotometricInterpretation::ARGB);
