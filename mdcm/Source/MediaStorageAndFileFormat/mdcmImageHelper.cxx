@@ -48,6 +48,7 @@ bool ImageHelper::ForcePixelSpacing = false;
 bool ImageHelper::CleanUnusedBits = false;
 bool ImageHelper::WorkaroundCornellBug = false;
 bool ImageHelper::WorkaroundPredictorBug = false;
+bool ImageHelper::PreserveYBRfull = true;
 
 static double
 SetNDigits(double x, int n)
@@ -585,6 +586,18 @@ bool
 ImageHelper::GetWorkaroundPredictorBug()
 {
   return WorkaroundPredictorBug;
+}
+
+void
+ImageHelper::SetPreserveYBRfull(bool b)
+{
+  PreserveYBRfull = b;
+}
+
+bool
+ImageHelper::GetPreserveYBRfull()
+{
+  return PreserveYBRfull;
 }
 
 bool

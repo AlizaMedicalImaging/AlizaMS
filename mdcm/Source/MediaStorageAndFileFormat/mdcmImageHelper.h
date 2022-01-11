@@ -79,6 +79,10 @@ public:
   SetWorkaroundPredictorBug(bool);
   static bool
   GetWorkaroundPredictorBug();
+  static void
+  SetPreserveYBRfull(bool);
+  static bool
+  GetPreserveYBRfull();
   static std::vector<unsigned int>
   GetDimensionsValue(const File &);
   static void
@@ -136,6 +140,7 @@ private:
   static bool CleanUnusedBits;
   static bool WorkaroundCornellBug;
   static bool WorkaroundPredictorBug;
+  static bool PreserveYBRfull;
 };
 
 } // end namespace mdcm

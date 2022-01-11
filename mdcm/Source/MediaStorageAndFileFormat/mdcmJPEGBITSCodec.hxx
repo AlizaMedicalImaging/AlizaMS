@@ -701,7 +701,6 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
         break;
     }
 #endif
-    // clang-format off
     switch (cinfo.jpeg_color_space)
     {
       case JCS_GRAYSCALE:
@@ -715,38 +714,26 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
         }
         break;
       case JCS_YCbCr:
-        if(
-          // Preserve Y'CbCr color-space
-             (GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL)
-          || (GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422)
-          //
-          // Currently don't preserve color-space for YBR_PARTIAL_422,
-          // YBR to RGB formula doesn't work well with YBR_PARTIAL_422.
-#if 0
-          || (GetPhotometricInterpretation() == PhotometricInterpretation::YBR_PARTIAL_422)
-#endif
-          //
-          // Probably should not happed, but lossy JPEG with photo-metric "RGB" and
-          // cinfo.jpeg_color_space JCS_YCbCr exist. Required to open correctly.
-#if 1
-          || (GetPhotometricInterpretation() == PhotometricInterpretation::RGB)
-# endif
-        )
+        // Don't preserve color-space for YBR_PARTIAL_422,
+        // YBR to RGB formula doesn't work well with YBR_PARTIAL_422.
+        if (ImageHelper::GetPreserveYBRfull() &&
+            ((GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL) ||
+             (GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422)))
         {
-          //
-          //
-          //
           cinfo.jpeg_color_space = JCS_UNKNOWN;
           cinfo.out_color_space = JCS_UNKNOWN;
-          //
-          //
-          //
+        }
+        // Probably should not happed, but lossy JPEG with photo-metric "RGB" and
+        // cinfo.jpeg_color_space JCS_YCbCr exist. Required to open correctly.
+        if (GetPhotometricInterpretation() == PhotometricInterpretation::RGB)
+        {
+          cinfo.jpeg_color_space = JCS_UNKNOWN;
+          cinfo.out_color_space = JCS_UNKNOWN;
         }
         break;
       default:
         break;
     }
-    // clang-format on
     /* Step 4: set parameters for decompression */
     /* Not set */
   }
