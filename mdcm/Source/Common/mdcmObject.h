@@ -51,9 +51,10 @@ public:
     : ReferenceCount(0)
   {}
 
-  void
-  operator=(const Object &)
-  {}
+  // clang-format off
+  // cppcheck-suppress operatorEqVarError
+  void operator=(const Object &) {}
+  // clang-format on
 
 protected:
   void

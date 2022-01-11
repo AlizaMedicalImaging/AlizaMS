@@ -8697,13 +8697,12 @@ QString DicomUtils::read_enhanced_common(
 				idx__<values.size())
 			{
 				tmp3.push_back(data.at(idx__));
-				double * ss = new double[9];
 				if (sop==QString("1.2.840.10008.5.1.4.1.1.6.2")) // US
 				{
-					if (
-						values.at(idx__).vol_pos_ok &&
+					if (values.at(idx__).vol_pos_ok &&
 						values.at(idx__).vol_orient_ok)
 					{
+						double * ss = new double[9];
 						ss[0] = values.at(idx__).vol_pos[0];
 						ss[1] = values.at(idx__).vol_pos[1];
 						ss[2] = values.at(idx__).vol_pos[2];
@@ -8715,7 +8714,10 @@ QString DicomUtils::read_enhanced_common(
 						ss[8] = values.at(idx__).vol_orient[5];
 						tmp4.push_back(ss);
 					}
-					else { tmp4_ok = false; delete [] ss; }
+					else
+					{
+						tmp4_ok = false;
+					}
 				}
 /*
 				else if (sop==QString("1.2.840.10008.5.1.4.1.1.77.1.6")) // VL Whole Slide Microscopy
@@ -8740,6 +8742,7 @@ QString DicomUtils::read_enhanced_common(
 								pat_orient);
 						if (ok_o && ok_p)
 						{
+							double * ss = new double[9];
 							ss[0] = pat_pos[0];
 							ss[1] = pat_pos[1];
 							ss[2] = pat_pos[2];
@@ -8751,9 +8754,15 @@ QString DicomUtils::read_enhanced_common(
 							ss[8] = pat_orient[5];
 							tmp4.push_back(ss);
 						}
-						else { tmp4_ok = false; delete [] ss; }
+						else
+						{
+							tmp4_ok = false;
+						}
 					}
-					else { tmp4_ok = false; delete [] ss; }
+					else
+					{
+						tmp4_ok = false;
+					}
 				}
 				QPair< double, double> rp;
 				rp.first  = values.at(idx__).rescale_intercept;

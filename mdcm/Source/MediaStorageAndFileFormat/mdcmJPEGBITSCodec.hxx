@@ -106,8 +106,6 @@ METHODDEF(boolean) fill_input_buffer(j_decompress_ptr cinfo)
 {
   my_src_ptr src = (my_src_ptr)cinfo->src;
   size_t     nbytes = 0;
-  // TODO check
-  // nbytes = JFREAD(src->infile, src->buffer, INPUT_BUF_SIZE);
   std::streampos pos = src->infile->tellg();
   std::streampos end = src->infile->seekg(0, std::ios::end).tellg();
   src->infile->seekg(pos, std::ios::beg);
@@ -318,15 +316,14 @@ JPEGBITSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
       // If we are here, the JPEG code has signaled an error.
       // We need to clean up the JPEG object, close the input file, and return.
       // But first handle the case IJG does not like:
-      if (jerr.pub.msg_code == JERR_BAD_PRECISION /* 18 */)
+      if (jerr.pub.msg_code == JERR_BAD_PRECISION)
       {
         this->BitSample = jerr.pub.msg_parm.i[0];
         assert(this->BitSample == 1 || this->BitSample == 8 || this->BitSample == 12 || this->BitSample == 16);
         assert(this->BitSample == cinfo.data_precision);
       }
       jpeg_destroy_decompress(&cinfo);
-      // TODO: www.dcm4che.org/jira/secure/attachment/10185/ct-implicit-little.dcm
-      // weird Icon Image from GE
+      // TODO: www.dcm4che.org/jira/secure/attachment/10185/ct-implicit-little.dcm weird Icon Image from GE
       return false;
     }
   }
@@ -355,7 +352,7 @@ JPEGBITSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
     {
       Internals->StateSuspension = 2;
     }
-    // First of all are we using the proper JPEG decoder (correct bit sample):
+    // First of all, are we using the proper JPEG decoder (correct bit sample)?
     if (jerr.pub.num_warnings)
     {
       if (jerr.pub.msg_code == 128)
@@ -369,11 +366,11 @@ JPEGBITSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
         assert(0);
       }
     }
-    this->Dimensions[1] = cinfo.image_height; /* Number of rows in image */
-    this->Dimensions[0] = cinfo.image_width;  /* Number of columns in image */
+    this->Dimensions[1] = cinfo.image_height; // Number of rows in image
+    this->Dimensions[0] = cinfo.image_width;  // Number of columns in image
     const int prep = this->PF.GetPixelRepresentation();
     const int precision = cinfo.data_precision;
-    // if lossy it should only be 8 or 12, but for lossless it can be [2-16]
+    // If lossy it should only be 8 or 12
     if (precision == 1)
     {
       this->PF = PixelFormat(PixelFormat::SINGLEBIT);
@@ -388,11 +385,12 @@ JPEGBITSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
     }
     else
     {
+      mdcmAlwaysWarnMacro("Unsupported precision = " << precision);
       assert(0);
+      return false;
     }
     this->PF.SetPixelRepresentation((uint16_t)prep);
     this->PF.SetBitsStored((uint16_t)precision);
-    assert((precision - 1) >= 0);
     this->PlanarConfiguration = 0;
     if (cinfo.jpeg_color_space == JCS_UNKNOWN)
     {
@@ -406,9 +404,17 @@ JPEGBITSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
         PI = PhotometricInterpretation::RGB;
         this->PF.SetSamplesPerPixel(3);
       }
+      else if (cinfo.num_components == 4)
+      {
+        PI = PhotometricInterpretation::CMYK;
+        this->PF.SetSamplesPerPixel(4);
+        mdcmAlwaysWarnMacro("Not supported: JCS_UNKNOWN and cinfo.num_components = 4, trying CMYK");
+      }
       else
       {
+        mdcmAlwaysWarnMacro("Error: JCS_UNKNOWN and cinfo.num_components = " << cinfo.num_components);
         assert(0);
+        return false;
       }
     }
     else if (cinfo.jpeg_color_space == JCS_GRAYSCALE)
@@ -430,24 +436,20 @@ JPEGBITSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
       if (cinfo.process == JPROC_LOSSLESS)
       {
         mdcmAlwaysWarnMacro("JPROC_LOSSLESS and JCS_YCbCr");
-        PI = PhotometricInterpretation::RGB;
       }
       this->PF.SetSamplesPerPixel(3);
       this->PlanarConfiguration = 1;
     }
-    else if (cinfo.jpeg_color_space == JCS_CMYK)
+    else if (cinfo.jpeg_color_space == JCS_CMYK || cinfo.jpeg_color_space == JCS_YCCK)
     {
       assert(cinfo.num_components == 4);
       PI = PhotometricInterpretation::CMYK;
       this->PF.SetSamplesPerPixel(4);
-    }
-    else if (cinfo.jpeg_color_space == JCS_YCCK)
-    {
-      assert(cinfo.num_components == 4);
-      this->PF.SetSamplesPerPixel(4);
+      mdcmAlwaysWarnMacro("JCS_CMYK is not intended to be in DICOM JPEG file");
     }
     else
     {
+      mdcmAlwaysWarnMacro("Error, unknown cinfo.jpeg_color_space");
       assert(0);
     }
   }
@@ -467,9 +469,18 @@ JPEGBITSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
   else if (cinfo.process == JPROC_SEQUENTIAL)
   {
     if (this->BitSample == 8)
+    {
       ts = TransferSyntax::JPEGBaselineProcess1;
+    }
     else if (this->BitSample == 12)
+    {
       ts = TransferSyntax::JPEGExtendedProcess2_4;
+    }
+    else
+    {
+      assert(0);
+      return false;
+    }
   }
   else if (cinfo.process == JPROC_PROGRESSIVE)
   {
@@ -507,7 +518,7 @@ JPEGBITSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
   UINT16 X_density
   UINT16 Y_density
     The resolution information to be written into the JFIF marker;
-    not used otherwise.  density_unit may be 0 for unknown,
+    not used otherwise,  density_unit may be 0 for unknown,
     1 for dots/inch, or 2 for dots/cm.  The default values are 0,1,1
     indicating square pixels of unknown size.
   */
@@ -523,11 +534,12 @@ JPEGBITSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
    * Here we postpone it until after no more JPEG errors are possible,
    * so as to simplify the setjmp error logic above.  (Actually, I don't
    * think that jpeg_destroy can do an error exit, but why assume anything...)
-   */
-  /* At this point you may want to check to see whether any corrupt-data
+   *
+   * At this point you may want to check to see whether any corrupt-data
    * warnings occurred (test whether jerr.pub.num_warnings is nonzero).
+   *
+   * In any case make sure the we reset the internal state suspension
    */
-  /* In any case make sure the we reset the internal state suspension */
   Internals->StateSuspension = 0;
   return true;
 }
@@ -628,6 +640,7 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
                                      << dims[1]);
     }
 #if 0
+    std::cout << "cinfo.jpeg_color_space = ";
     switch (cinfo.jpeg_color_space)
     {
       case JCS_GRAYSCALE:
@@ -642,11 +655,39 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
       case JCS_CMYK:
         std::cout << "JCS_CMYK" << std::endl;
         break;
+      case JCS_YCCK:
+        std::cout << "JCS_YCCK" << std::endl;
+        break;
       case JCS_UNKNOWN:
         std::cout << "JCS_UNKNOWN" << std::endl;
         break;
       default:
-        std::cout << "cinfo.jpeg_color_space ??" << std::endl;
+        std::cout << "?" << std::endl;
+        break;
+    }
+    std::cout << "cinfo.out_color_space  = ";
+    switch (cinfo.out_color_space)
+    {
+      case JCS_GRAYSCALE:
+        std::cout << "JCS_GRAYSCALE" << std::endl;
+        break;
+      case JCS_RGB:
+        std::cout << "JCS_RGB" << std::endl;
+        break;
+      case JCS_YCbCr:
+        std::cout << "JCS_YCbCr" << std::endl;
+        break;
+      case JCS_CMYK:
+        std::cout << "JCS_CMYK" << std::endl;
+        break;
+      case JCS_YCCK:
+        std::cout << "JCS_YCCK" << std::endl;
+        break;
+      case JCS_UNKNOWN:
+        std::cout << "JCS_UNKNOWN" << std::endl;
+        break;
+      default:
+        std::cout << "?" << std::endl;
         break;
     }
 #endif
@@ -664,20 +705,23 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
         break;
       case JCS_YCbCr:
 #if 0
-      if((GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL)
+        if((GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL)
 #  if 1
-        || (GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422)
+          || (GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422)
 #  endif
-      )
+        )
 #endif
-      {
-        cinfo.jpeg_color_space = JCS_UNKNOWN;
-        cinfo.out_color_space = JCS_UNKNOWN;
-      }
-      break;
-      case JCS_RGB:
-      case JCS_CMYK:
-      case JCS_UNKNOWN:
+        {
+          //
+          //
+          //
+          // This allows to load Y'CbCr colorspace!
+          //
+          //
+          //
+          cinfo.jpeg_color_space = JCS_UNKNOWN;
+          cinfo.out_color_space = JCS_UNKNOWN;
+        }
         break;
       default:
         break;
@@ -842,7 +886,7 @@ METHODDEF(boolean) empty_output_buffer(j_compress_ptr cinfo)
 }
 
 /*
- * Terminate destination --- called by jpeg_finish_compress
+ * Terminate destination, called by jpeg_finish_compress
  * after all data has been written.  Usually needs to flush buffer.
  *
  * NB: *not* called by jpeg_abort or jpeg_destroy; surrounding
@@ -975,8 +1019,8 @@ JPEGBITSCodec::InternalCode(const char * input, size_t len, std::ostream & os)
       break;
     case PhotometricInterpretation::YBR_FULL:
     case PhotometricInterpretation::YBR_FULL_422:
-    case PhotometricInterpretation::YBR_PARTIAL_420:
-    case PhotometricInterpretation::YBR_PARTIAL_422:
+    case PhotometricInterpretation::YBR_PARTIAL_420: // MPEG
+    case PhotometricInterpretation::YBR_PARTIAL_422: // Retired
       cinfo.input_components = 3;       /* # of color components per pixel */
       cinfo.in_color_space = JCS_YCbCr; /* colorspace of input image */
       break;

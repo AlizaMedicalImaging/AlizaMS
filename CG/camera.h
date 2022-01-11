@@ -37,7 +37,7 @@
 ALIGN16_PRE class Camera
 {
 public:
-	MY_DECLARE_NEW()
+	MY_DECLARE_NEW();
 
 	Camera();
 	~Camera();

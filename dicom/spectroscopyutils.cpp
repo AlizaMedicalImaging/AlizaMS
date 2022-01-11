@@ -312,22 +312,22 @@ QString SpectroscopyUtils::ProcessData(
 			if (idx__<values.size())
 #endif
 			{
-				double * ss = new double[9];
 				if (!values.at(idx__).pat_pos.isEmpty() &&
 					!values.at(idx__).pat_orient.isEmpty())
 				{
 					double pat_pos[3];
 					double pat_orient[6];
-					const bool ok_p
-						= DicomUtils::get_patient_position(
+					const bool ok_p =
+						DicomUtils::get_patient_position(
 							values.at(idx__).pat_pos,
 							pat_pos);
-					const bool ok_o
-						= DicomUtils::get_patient_orientation(
+					const bool ok_o =
+						DicomUtils::get_patient_orientation(
 							values.at(idx__).pat_orient,
 							pat_orient);
 					if (ok_o && ok_p)
 					{
+						double * ss = new double[9];
 						ss[0] = pat_pos[0];
 						ss[1] = pat_pos[1];
 						ss[2] = pat_pos[2];
@@ -348,7 +348,8 @@ QString SpectroscopyUtils::ProcessData(
 						std::cout << "!(ok_o && ok_p)"
 							<< std::endl;
 #endif
-						error = true; delete [] ss; break;
+						error = true;
+						break;
 					}
 				}
 				else
@@ -357,9 +358,9 @@ QString SpectroscopyUtils::ProcessData(
 					std::cout << "pat_pos / pat_orient empty"
 						<< std::endl;
 #endif
-					error = true; delete [] ss; break;
+					error = true;
+					break;
 				}
-				
 				if (!values.at(idx__).pix_spacing.isEmpty())
 				{
 					tmp5.push_back(values.at(idx__).pix_spacing);

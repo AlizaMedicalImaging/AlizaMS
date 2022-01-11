@@ -50,14 +50,6 @@ public:
     Register();
   }
 
-#if 0
-  SmartPointer(SmartPointer<ObjectType> && p)
-  {
-    Pointer = p.Pointer;
-    p.Pointer = NULL;
-  }
-#endif
-
   SmartPointer(ObjectType * p)
   {
     Pointer = p;

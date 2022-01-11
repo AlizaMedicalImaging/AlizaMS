@@ -740,8 +740,12 @@ JPEGCodec::IsValid(PhotometricInterpretation const & pi)
     case PhotometricInterpretation::RGB:
     case PhotometricInterpretation::YBR_FULL:
     case PhotometricInterpretation::YBR_FULL_422:
-    case PhotometricInterpretation::YBR_PARTIAL_422: // FIXME
-    case PhotometricInterpretation::YBR_PARTIAL_420: // FIXME
+    // Retired, not tested
+    case PhotometricInterpretation::YBR_PARTIAL_422:
+      return true;
+    // Not valid, for MPEG
+    case PhotometricInterpretation::YBR_PARTIAL_420:
+      mdcmAlwaysWarnMacro("YBR_PARTIAL_420 is not intended to be here");
       return true;
     default:
       break;

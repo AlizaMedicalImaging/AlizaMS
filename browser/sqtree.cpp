@@ -548,7 +548,7 @@ void SQtree::process_element(
 					{
 						unsigned short group, element;
 						char group_[2]; char element_[2];
-						char * buffer = new char[4];
+						char buffer[] = { '\0', '\0', '\0', '\0' };
 						if (length==4)
 						{
 							const bool ok0 =
@@ -576,7 +576,6 @@ void SQtree::process_element(
 								str_ = tmp3 + QString("|") + tmp4;
 							}
 						}
-						delete [] buffer;
 					}
 					else if (vr == mdcm::VR::OB)
 					{

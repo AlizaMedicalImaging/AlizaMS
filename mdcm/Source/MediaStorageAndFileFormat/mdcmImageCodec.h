@@ -125,7 +125,7 @@ protected:
   bool
   DoInvertMonochrome(std::istream &, std::ostream &);
   bool
-                                    DoOverlayCleanup(std::istream &, std::ostream &);
+  DoOverlayCleanup(std::istream &, std::ostream &);
   bool                              RequestPlanarConfiguration;
   bool                              RequestPaddedCompositePixelCode;
   unsigned int                      PlanarConfiguration;
