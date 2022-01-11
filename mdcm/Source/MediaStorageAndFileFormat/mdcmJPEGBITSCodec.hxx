@@ -432,8 +432,8 @@ JPEGBITSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
     else if (cinfo.jpeg_color_space == JCS_YCbCr)
     {
       assert(cinfo.num_components == 3);
-	  // YBR_PARTIAL_422 is theoretically possible too,
-	  // but retired in 2017b and extremely rare.
+      // YBR_PARTIAL_422 is theoretically possible too,
+      // but retired in 2017b and extremely rare.
       PI = PhotometricInterpretation::YBR_FULL_422;
       if (cinfo.process == JPROC_LOSSLESS)
       {
