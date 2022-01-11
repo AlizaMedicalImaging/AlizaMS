@@ -646,7 +646,7 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
       mdcmAlwaysWarnMacro("JPEG is " << cinfo.image_width << "x" << cinfo.image_height << ", DICOM " << dims[0] << "x"
                                      << dims[1]);
     }
-#if 1
+#if 0
     std::cout << "cinfo.jpeg_color_space = ";
     switch (cinfo.jpeg_color_space)
     {
