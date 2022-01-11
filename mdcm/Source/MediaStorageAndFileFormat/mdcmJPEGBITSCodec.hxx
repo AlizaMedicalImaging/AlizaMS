@@ -19,6 +19,9 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+
+#define JPEGBITS_PRINT_COLORSPACES 0
+
 #include "mdcmTrace.h"
 #include "mdcmTransferSyntax.h"
 #include "mdcmImageHelper.h"
@@ -53,7 +56,7 @@ typedef struct
 
 typedef my_source_mgr * my_src_ptr;
 
-#define INPUT_BUF_SIZE 4096 /* choose an efficiently fread'able size */
+#define INPUT_BUF_SIZE 4096 // s. jdatasrc.c
 
 /*
  * Initialize source - called by jpeg_read_header
@@ -646,7 +649,7 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
       mdcmAlwaysWarnMacro("JPEG is " << cinfo.image_width << "x" << cinfo.image_height << ", DICOM " << dims[0] << "x"
                                      << dims[1]);
     }
-#if 0
+#if (defined JPEGBITS_PRINT_COLORSPACES && JPEGBITS_PRINT_COLORSPACES == 1)
     std::cout << "cinfo.jpeg_color_space = ";
     switch (cinfo.jpeg_color_space)
     {
@@ -718,13 +721,13 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
           || (GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422)
           //
           // Currently don't preserve color-space for YBR_PARTIAL_422,
-          // YBR to RGB formula doesn't work well.
+          // YBR to RGB formula doesn't work well with YBR_PARTIAL_422.
 #if 0
           || (GetPhotometricInterpretation() == PhotometricInterpretation::YBR_PARTIAL_422)
 #endif
           //
-          // In fact, lossy JPEG with photo-metric "RGB" and cinfo.jpeg_color_space JCS_YCbCr exist
-          // and are highly likely valid. Required to open correctly.
+          // Probably should not happed, but lossy JPEG with photo-metric "RGB" and
+          // cinfo.jpeg_color_space JCS_YCbCr exist. Required to open correctly.
 #if 1
           || (GetPhotometricInterpretation() == PhotometricInterpretation::RGB)
 # endif
@@ -1331,3 +1334,7 @@ JPEGBITSCodec::IsStateSuspension() const
 }
 
 } // end namespace mdcm
+
+#ifdef JPEGBITS_PRINT_COLORSPACES
+#undef JPEGBITS_PRINT_COLORSPACES
+#endif
