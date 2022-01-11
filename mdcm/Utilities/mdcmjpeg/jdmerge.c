@@ -107,8 +107,10 @@ build_ycc_rgb_table(j_decompress_ptr cinfo)
     /* Cb=>B value is nearest int to 1.77200 * x */
     upsample->Cb_b_tab[i] = (int)RIGHT_SHIFT((IJG_INT)((long long)FIX(1.77200) * x + ONE_HALF), SCALEBITS);
 #  else
+    // cppcheck-suppress integerOverflow
     upsample->Cr_r_tab[i] = (int)RIGHT_SHIFT(FIX(1.40200) * x + ONE_HALF, SCALEBITS);
     /* Cb=>B value is nearest int to 1.77200 * x */
+    // cppcheck-suppress integerOverflow
     upsample->Cb_b_tab[i] = (int)RIGHT_SHIFT(FIX(1.77200) * x + ONE_HALF, SCALEBITS);
 #  endif
     /* Cr=>G value is scaled-up -0.71414 * x */

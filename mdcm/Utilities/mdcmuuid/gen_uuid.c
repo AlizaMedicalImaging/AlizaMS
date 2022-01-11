@@ -307,6 +307,7 @@ static int get_node_id(unsigned char *node_id)
 #endif /* HAVE_NET_IF_DL_H */
 #endif /* SIOCGENADDR */
 #endif /* SIOCGIFHWADDR */
+    // cppcheck-suppress uninitvar
     if (!a[0] && !a[1] && !a[2] && !a[3] && !a[4] && !a[5])
       continue;
     if (node_id) {

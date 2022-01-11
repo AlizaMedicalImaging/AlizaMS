@@ -59,6 +59,8 @@ typedef my_source_mgr * my_src_ptr;
  * Initialize source - called by jpeg_read_header
  * before any data is actually read.
  */
+
+// cppcheck-suppress unknownMacro
 METHODDEF(void) init_source(j_decompress_ptr cinfo)
 {
   my_src_ptr src = (my_src_ptr)cinfo->src;
@@ -102,6 +104,7 @@ METHODDEF(void) init_source(j_decompress_ptr cinfo)
  * the front of the buffer rather than discarding it.
  */
 
+// cppcheck-suppress unknownMacro
 METHODDEF(boolean) fill_input_buffer(j_decompress_ptr cinfo)
 {
   my_src_ptr src = (my_src_ptr)cinfo->src;
@@ -158,6 +161,8 @@ METHODDEF(boolean) fill_input_buffer(j_decompress_ptr cinfo)
  * Arranging for additional bytes to be discarded before reloading the input
  * buffer is the application writer's problem.
  */
+
+// cppcheck-suppress unknownMacro
 METHODDEF(void) skip_input_data(j_decompress_ptr cinfo, IJG_LONG num_bytes)
 {
   my_src_ptr src = (my_src_ptr)cinfo->src;
@@ -196,6 +201,8 @@ METHODDEF(void) skip_input_data(j_decompress_ptr cinfo, IJG_LONG num_bytes)
  * application must deal with any cleanup that should happen even
  * for error exit.
  */
+
+// cppcheck-suppress unknownMacro
 METHODDEF(void) term_source(j_decompress_ptr) {}
 
 /*
@@ -203,6 +210,8 @@ METHODDEF(void) term_source(j_decompress_ptr) {}
  * The caller must have already opened the stream, and is responsible
  * for closing it after finishing decompression.
  */
+
+// cppcheck-suppress unknownMacro
 GLOBAL(void) jpeg_stdio_src(j_decompress_ptr cinfo, std::istream & infile, bool flag)
 {
   my_src_ptr src;

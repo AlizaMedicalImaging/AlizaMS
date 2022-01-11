@@ -147,7 +147,7 @@ start_pass_huff(j_compress_ptr cinfo, boolean gather_statistics)
     losslsc->pub.entropy_finish_pass = finish_pass_gather;
 #else
     ERREXIT(cinfo, JERR_NOT_COMPILED);
-	return;
+    return;
 #endif
   }
   else

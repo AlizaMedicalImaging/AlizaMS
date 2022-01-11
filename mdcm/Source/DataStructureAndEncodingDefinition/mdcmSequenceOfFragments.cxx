@@ -36,7 +36,6 @@ SequenceOfFragments::Clear()
 SequenceOfFragments::SizeType
 SequenceOfFragments::GetNumberOfFragments() const
 {
-  // Do not count the last fragment
   return Fragments.size();
 }
 

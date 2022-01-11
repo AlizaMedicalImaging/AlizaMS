@@ -100,6 +100,7 @@ rgb_ycc_start(j_compress_ptr cinfo)
 #if (BITS_IN_JSAMPLE == 16 && REMOVE_OVERFLOW_WARN_JPEG16 == 1)
     rgb_ycc_tab[i + G_Y_OFF] = (IJG_INT)((long long)FIX(0.58700) * i);
 #else
+    // cppcheck-suppress integerOverflow
     rgb_ycc_tab[i + G_Y_OFF] = FIX(0.58700) * i;
 #endif
     rgb_ycc_tab[i + B_Y_OFF] = FIX(0.11400) * i + ONE_HALF;
@@ -112,6 +113,7 @@ rgb_ycc_start(j_compress_ptr cinfo)
 #if (BITS_IN_JSAMPLE == 16 && REMOVE_OVERFLOW_WARN_JPEG16 == 1)
     rgb_ycc_tab[i + B_CB_OFF] = (IJG_INT)((long long)FIX(0.50000) * i + CBCR_OFFSET + ONE_HALF - 1);
 #else
+    // cppcheck-suppress integerOverflow
     rgb_ycc_tab[i + B_CB_OFF] = FIX(0.50000) * i + CBCR_OFFSET + ONE_HALF - 1;
 #endif
     /*  B=>Cb and R=>Cr tables are the same
