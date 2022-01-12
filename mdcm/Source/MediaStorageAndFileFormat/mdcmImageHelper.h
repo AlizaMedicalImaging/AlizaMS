@@ -80,9 +80,9 @@ public:
   static bool
   GetWorkaroundPredictorBug();
   static void
-  SetPreserveYBRfull(bool);
+  SetJpegPreserveYBRfull(bool);
   static bool
-  GetPreserveYBRfull();
+  GetJpegPreserveYBRfull();
   static std::vector<unsigned int>
   GetDimensionsValue(const File &);
   static void
@@ -140,7 +140,7 @@ private:
   static bool CleanUnusedBits;
   static bool WorkaroundCornellBug;
   static bool WorkaroundPredictorBug;
-  static bool PreserveYBRfull;
+  static bool JpegPreserveYBRfull;
 };
 
 } // end namespace mdcm

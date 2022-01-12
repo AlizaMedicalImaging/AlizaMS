@@ -48,7 +48,7 @@ bool ImageHelper::ForcePixelSpacing = false;
 bool ImageHelper::CleanUnusedBits = false;
 bool ImageHelper::WorkaroundCornellBug = false;
 bool ImageHelper::WorkaroundPredictorBug = false;
-bool ImageHelper::PreserveYBRfull = true;
+bool ImageHelper::JpegPreserveYBRfull = true;
 
 static double
 SetNDigits(double x, int n)
@@ -589,15 +589,15 @@ ImageHelper::GetWorkaroundPredictorBug()
 }
 
 void
-ImageHelper::SetPreserveYBRfull(bool b)
+ImageHelper::SetJpegPreserveYBRfull(bool b)
 {
-  PreserveYBRfull = b;
+  JpegPreserveYBRfull = b;
 }
 
 bool
-ImageHelper::GetPreserveYBRfull()
+ImageHelper::GetJpegPreserveYBRfull()
 {
-  return PreserveYBRfull;
+  return JpegPreserveYBRfull;
 }
 
 bool

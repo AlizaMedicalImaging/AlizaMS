@@ -716,7 +716,7 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
       case JCS_YCbCr:
         // Don't preserve color-space for YBR_PARTIAL_422,
         // YBR to RGB formula doesn't work well with YBR_PARTIAL_422.
-        if (ImageHelper::GetPreserveYBRfull() &&
+        if (ImageHelper::GetJpegPreserveYBRfull() &&
             ((GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL) ||
              (GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422)))
         {
