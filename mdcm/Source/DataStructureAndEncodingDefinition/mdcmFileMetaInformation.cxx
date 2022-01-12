@@ -27,14 +27,12 @@
 #include "mdcmByteValue.h"
 #include "mdcmSwapper.h"
 #include "mdcmTagToType.h"
-
 #include "mdcmTag.h"
 
 namespace mdcm
 {
 
-const char FileMetaInformation::MDCM_FILE_META_INFORMATION_VERSION[] = "\0\1";
-
+const char  FileMetaInformation::MDCM_FILE_META_INFORMATION_VERSION[] = "\0\1";
 const char  FileMetaInformation::MDCM_IMPLEMENTATION_CLASS_UID[] = "1.2.826.0.1.3680043.10.135.1." MDCM_VERSION;
 const char  FileMetaInformation::MDCM_IMPLEMENTATION_VERSION_NAME[] = "MDCM " MDCM_VERSION;
 const char  FileMetaInformation::MDCM_SOURCE_APPLICATION_ENTITY_TITLE[] = "MDCM";
@@ -66,7 +64,6 @@ FileMetaInformation::GetMDCMSourceApplicationEntityTitle()
   return MDCM_SOURCE_APPLICATION_ENTITY_TITLE;
 }
 
-// Keep cstor and dstor here to keep API minimal (see dllexport issue with mdcmstrict::)
 FileMetaInformation::FileMetaInformation()
   : DataSetTS(TransferSyntax::TS_END)
   , MetaInformationTS(TransferSyntax::Unknown)
@@ -77,7 +74,7 @@ FileMetaInformation::~FileMetaInformation() {}
 void
 FileMetaInformation::SetImplementationClassUID(const char * imp)
 {
-  // TODO: it would be nice to make sure imp is actually a valid UID
+  // TODO make sure imp is actually a valid UID
   if (imp)
   {
     ImplementationClassUID = imp;
@@ -193,7 +190,7 @@ FileMetaInformation::FillFromDataSet(DataSet const & ds)
       Insert(xde);
     }
   }
-  else // Ok there is a value in (0002,0002) let see if it match (0008,0016)
+  else // There is a value in (0002,0002), see if it match (0008,0016)
   {
     {
       if (!ds.FindDataElement(Tag(0x0008, 0x0016)))
@@ -218,7 +215,7 @@ FileMetaInformation::FillFromDataSet(DataSet const & ds)
       }
     }
   }
-  // Media Storage SOP Instance UID (0002,0003) -> see (0008,0018)
+  // Media Storage SOP Instance UID (0002,0003), see (0008,0018)
   const DataElement & dummy = GetDataElement(Tag(0x0002, 0x0003));
   (void)dummy;
   if (!FindDataElement(Tag(0x0002, 0x0003)) || GetDataElement(Tag(0x0002, 0x0003)).IsEmpty())
@@ -239,7 +236,7 @@ FileMetaInformation::FillFromDataSet(DataSet const & ds)
       throw std::logic_error("No (0x0002,0x0003) and (0x0008,0x0018) elements");
     }
   }
-  else // Ok there is a value in (0002,0003) let see if it match (0008,0018)
+  else // There is a value in (0002,0003), see if it match (0008,0018)
   {
     bool         dirrecsq = ds.FindDataElement(Tag(0x0004, 0x1220)); // Directory Record Sequence
     MediaStorage ms;
@@ -262,7 +259,6 @@ FileMetaInformation::FillFromDataSet(DataSet const & ds)
       }
     }
   }
-  // Transfer Syntax UID (0002,0010) -> ??? (computed at write time at most)
   if (FindDataElement(Tag(0x0002, 0x0010)) && !GetDataElement(Tag(0x0002, 0x0010)).IsEmpty())
   {
     DataElement       tsuid = GetDataElement(Tag(0x0002, 0x0010));
@@ -286,8 +282,7 @@ FileMetaInformation::FillFromDataSet(DataSet const & ds)
   }
   else
   {
-    // Very bad !!
-    // Constuct it from DataSetTS
+    // Bad! Constuct from DataSetTS
     if (DataSetTS == TransferSyntax::TS_END)
     {
       throw std::logic_error("No TransferSyntax specified");
@@ -299,33 +294,24 @@ FileMetaInformation::FillFromDataSet(DataSet const & ds)
     xde.SetTag(Tag(0x0002, 0x0010));
     Insert(xde);
   }
-  // Implementation Class UID (0002,0012) -> ??
   if (!FindDataElement(Tag(0x0002, 0x0012)))
   {
     xde.SetTag(Tag(0x0002, 0x0012));
     xde.SetVR(VR::UI);
-    // const char implementation[] = MDCM_IMPLEMENTATION_CLASS_UID;
     const char * implementation = FileMetaInformation::GetImplementationClassUID();
     VL::Type     strlenImplementation = (VL::Type)strlen(implementation);
     xde.SetByteValue(implementation, strlenImplementation);
     Insert(xde);
   }
-  else
-  {
-    // TODO: Need to check Implementation UID is actually a valid UID...
-  }
-  // Implementation Version Name (0002,0013) -> ??
   if (!FindDataElement(Tag(0x0002, 0x0013)))
   {
     xde.SetTag(Tag(0x0002, 0x0013));
     xde.SetVR(VR::SH);
-    // const char version[] = MDCM_IMPLEMENTATION_VERSION_NAME;
     SHComp   version = FileMetaInformation::GetImplementationVersionName();
     VL::Type strlenVersion = (VL::Type)strlen(version);
     xde.SetByteValue(version, strlenVersion);
     Insert(xde);
   }
-  // Source Application Entity Title (0002,0016) -> ??
   if (!FindDataElement(Tag(0x0002, 0x0016)))
   {
     xde.SetTag(Tag(0x0002, 0x0016));
@@ -335,22 +321,16 @@ FileMetaInformation::FillFromDataSet(DataSet const & ds)
     xde.SetByteValue(title, strlenTitle);
     Insert(xde);
   }
-  // Do this one last!
-  // (Meta) Group Length (0002,0000) -> computed
+  // (Meta) Group Length (0002,0000)
   Attribute<0x0002, 0x0000> filemetagrouplength;
   Remove(filemetagrouplength.GetTag());
   unsigned int glen = GetLength<ExplicitDataElement>();
   assert((glen % 2) == 0);
   filemetagrouplength.SetValue(glen);
   Insert(filemetagrouplength.GetAsDataElement());
-
   assert(!IsEmpty());
 }
 
-// FIXME
-// This code should clearly be rewritten with some template meta programing to
-// enable reuse of code
-//
 template <typename TSwap>
 bool
 ReadExplicitDataElement(std::istream & is, ExplicitDataElement & de)
@@ -366,7 +346,7 @@ ReadExplicitDataElement(std::istream & is, ExplicitDataElement & de)
   if (t.GetGroup() != 0x0002)
   {
     std::streampos currentpos = is.tellg();
-    // old code was fseeking from the beginning of file
+    // Old code was fseeking from the beginning of file
     // which seems to be quite different than fseeking in reverse from
     // the current position?
     assert((start - currentpos) <= 0);
@@ -423,7 +403,7 @@ ReadExplicitDataElement(std::istream & is, ExplicitDataElement & de)
   de.SetTag(t);
   de.SetVR(vr);
   de.SetVL(vl);
-  // FIXME: There should be a way to set the Value to the NULL pointer...
+  // TODO There should be a way to set the Value to the NULL pointer.
   de.SetValue(*bv);
   return true;
 }
@@ -491,10 +471,10 @@ ReadImplicitDataElement(std::istream & is, ImplicitDataElement & de)
  * Note: PS 3.5 specifies that Elements with Tags (0001,xxxx), (0003,xxxx),
  * (0005,xxxx), and (0007,xxxx) shall not be used.
  */
-/// \TODO FIXME
-/// For now I do a Seek back of 6 bytes. It would be better to finish reading
-/// the first element of the FMI so that I can read the group length and
-/// therefore compare it against the actual value we found...
+// \TODO
+// MM: For now I do a Seek back of 6 bytes. It would be better to finish reading
+// the first element of the FMI so that I can read the group length and
+// therefore compare it against the actual value we found...
 std::istream &
 FileMetaInformation::Read(std::istream & is)
 {
@@ -522,7 +502,6 @@ FileMetaInformation::Read(std::istream & is)
   {
     throw std::logic_error("VR is invalid (!UL)");
   }
-  // TODO FIXME: I should not do seekg for valid file this is costly
   is.seekg(-6, std::ios::cur);
   xde.Read<SwapperNoOp>(is);
   Insert(xde);
@@ -600,7 +579,7 @@ FileMetaInformation::ReadCompat(std::istream & is)
     }
     is.seekg(-6, std::ios::cur); // Seek back
   }
-  else if (t.GetGroup() == 0x0800) // Good ol' ACR NEMA
+  else if (t.GetGroup() == 0x0800) // ACR NEMA
   {
     char vr_str[3];
     is.read(vr_str, 2);
@@ -618,7 +597,7 @@ FileMetaInformation::ReadCompat(std::istream & is)
     }
     is.seekg(-6, std::ios::cur); // Seek back
   }
-  else if (t.GetElement() == 0x0010) // Hum, is it a private creator ?
+  else if (t.GetElement() == 0x0010) // Is it a private creator?
   {
     char vr_str[3];
     is.read(vr_str, 2);
@@ -650,7 +629,7 @@ FileMetaInformation::ReadCompat(std::istream & is)
     is.seekg(-6, std::ios::cur); // Seek back
     if (vr != VR::VR_END)
     {
-      // Ok we found a VR, this is 99% likely to be our safe bet
+      // Found a VR, this is 99% likely to be safe
       if (t.GetGroup() > 0xff || t.GetElement() > 0xff)
         DataSetTS = TransferSyntax::ExplicitVRBigEndian;
       else
@@ -663,7 +642,7 @@ FileMetaInformation::ReadCompat(std::istream & is)
       ide.ReadPreValue<SwapperNoOp>(is);
       if (ide.GetTag() == null.GetTag() && ide.GetVL() == 4)
       {
-        // This is insane, we are actually reading an attribute with tag (0,0) !
+        // We are actually reading an attribute with tag (0,0)!
         // something like IM-0001-0066.CommandTag00.dcm was crafted
         ide.ReadValue<SwapperNoOp>(is);
         ReadCompat(is); // this will read the next element
@@ -680,9 +659,9 @@ FileMetaInformation::ReadCompat(std::istream & is)
   return is;
 }
 
-#define ADDVRIMPLICIT(element)                                                                                         \
-  case element:                                                                                                        \
-    de.SetVR((VR::VRType)TagToType<0x0002, element>::VRType);                                                          \
+#define ADDVRIMPLICIT(element)                                \
+  case element:                                               \
+    de.SetVR((VR::VRType)TagToType<0x0002, element>::VRType); \
     break
 
 bool

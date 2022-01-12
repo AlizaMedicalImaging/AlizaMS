@@ -78,10 +78,9 @@ operator<<(std::ostream & os, const BasicOffsetTable & val)
   if (val.ValueField)
   {
     const ByteValue * bv = val.GetByteValue();
-    assert(bv);
-    os << *bv;
+    if (bv)
+      os << *bv;
   }
-
   return os;
 }
 
