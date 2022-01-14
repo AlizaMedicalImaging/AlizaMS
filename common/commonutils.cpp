@@ -1,5 +1,9 @@
 #define USE_GET_TOTAL_MEM
 
+// Caution, must be in sync with mdcmJPEGBITSCodec.hxx,
+// not tested
+#define TRY_SUPPORT_YBR_PARTIAL_422
+
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #ifdef ALIZA_GL_3_2_CORE
@@ -1349,7 +1353,7 @@ template<typename T> QString process_dicom_rgb_image1(
 	const double origin_x, const double origin_y, const double origin_z,
 	const double spacing_x, const double spacing_y, const double spacing_z,
 	const short image_type,
-	const bool ybr,
+	const short ybr, // 0 - no, 1 - full, 2 - partial
 	const bool hsv,
 	const int bitsstored,
 	bool * bad_direction,
@@ -1429,15 +1433,37 @@ template<typename T> QString process_dicom_rgb_image1(
 				while (!it.IsAtEndOfLine())
 				{
 					typename T::PixelType p;
-					if (ybr)
+					if (ybr > 0)
 					{
-						const double Y  = p__[j  ];
-						const double Cb = p__[j+1];
-						const double Cr = p__[j+2];
-						const int hscale = 1 << (bitsstored - 1);
-						const int R = static_cast<int>(Y + 1.402*(Cr-hscale));
-						const int G = static_cast<int>(Y - (0.114*1.772*(Cb-hscale) + 0.299*1.402*(Cr-hscale))/0.587);
-						const int B = static_cast<int>(Y + 1.772*(Cb-hscale));
+						// 8 bits
+						int R, G, B;
+						double Y  = p__[j];
+						const double Cb = p__[j+1] - 128;
+						const double Cr = p__[j+2] - 128;
+						if (ybr == 1)
+						{
+							R = static_cast<int>(Y + (-0.000036820)*Cb +    1.401987577*Cr);
+							G = static_cast<int>(Y + (-0.344113281)*Cb + (-0.714103821)*Cr);
+							B = static_cast<int>(Y +    1.771978117*Cb + (-0.000134583)*Cr);
+						}
+						else if (ybr == 2)
+						{
+							// YBR_PARTIAL_422 is problematic
+							Y -= 16;
+							if (Y < 0) Y = 0; // invalid?
+							R = static_cast<int>(1.164415463*Y + (-0.000095036)*Cb +    1.596001878*Cr);
+							G = static_cast<int>(1.164415463*Y + (-0.391724564)*Cb + (-0.813013368)*Cr);
+							B = static_cast<int>(1.164415463*Y +    2.017290682*Cb + (-0.000135273)*Cr);
+						}
+						else
+						{
+							R = G = B = 0;
+							*ok = false;
+							return QString("Internal error");
+						}
+						if (R > 255) R = 255;
+						if (G > 255) G = 255;
+						if (B > 255) B = 255;
 						p[0]=static_cast<typename T::PixelType::ValueType>(R < 0 ? 0 : R);
 						p[1]=static_cast<typename T::PixelType::ValueType>(G < 0 ? 0 : G);
 						p[2]=static_cast<typename T::PixelType::ValueType>(B < 0 ? 0 : B);
@@ -3200,15 +3226,21 @@ QString CommonUtils::gen_itk_image(bool * ok,
 	const size_t dimz = dimz_;
 	if (data_size < 1) return QString("data.size() < 1");
 	if (!data.at(0)) return QString("!data.at(0)");
-	const bool ybr = !skip_ybr && (
-		pi == mdcm::PhotometricInterpretation::YBR_FULL
-#if 1
-		|| pi == mdcm::PhotometricInterpretation::YBR_FULL_422
+	short ybr = 0;
+	if (!skip_ybr)
+	{
+		if (pi == mdcm::PhotometricInterpretation::YBR_FULL ||
+			pi == mdcm::PhotometricInterpretation::YBR_FULL_422)
+		{
+			ybr = 1;
+		}
+#ifdef TRY_SUPPORT_YBR_PARTIAL_422
+		else if (pi == mdcm::PhotometricInterpretation::YBR_PARTIAL_422)
+		{
+			ybr = 2;
+		}
 #endif
-#if 0
-		|| pi == mdcm::PhotometricInterpretation::YBR_PARTIAL_422
-#endif
-		);
+	}
 	const bool cmyk = (pi == mdcm::PhotometricInterpretation::CMYK);
 	const bool argb = (pi == mdcm::PhotometricInterpretation::ARGB);
 	const bool hsv  = (pi == mdcm::PhotometricInterpretation::HSV);
@@ -4409,11 +4441,11 @@ QString CommonUtils::gen_itk_image(bool * ok,
 			error = QString("pixelformat not supported");
 		}
 		if (error.isEmpty() && skip_ybr &&
-			(pi == mdcm::PhotometricInterpretation::YBR_FULL
-#if 1
-			|| pi == mdcm::PhotometricInterpretation::YBR_FULL_422
+			(pi == mdcm::PhotometricInterpretation::YBR_FULL_422 ||
+#ifdef TRY_SUPPORT_YBR_PARTIAL_422
+			 pi == mdcm::PhotometricInterpretation::YBR_PARTIAL_422 ||
 #endif
-			))
+			 pi == mdcm::PhotometricInterpretation::YBR_FULL))
 		{
 			ivariant->ybr = true;
 		}
@@ -4969,4 +5001,8 @@ void CommonUtils::random_RGB(float * R, float * G, float * B)
 
 #ifdef USE_GET_TOTAL_MEM
 #undef USE_GET_TOTAL_MEM
+#endif
+
+#ifdef TRY_SUPPORT_YBR_PARTIAL_422
+#undef TRY_SUPPORT_YBR_PARTIAL_422
 #endif
