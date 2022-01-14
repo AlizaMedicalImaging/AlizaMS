@@ -463,11 +463,6 @@ JPEGCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
   this->SetDimensions(Internal->GetDimensions());
   this->SetPhotometricInterpretation(Internal->GetPhotometricInterpretation());
   this->PF = Internal->GetPixelFormat(); // Do not call SetPixelFormat
-  if (this->PI != Internal->PI)
-  {
-    mdcmWarningMacro("JPEGCodec: possible Photometric Interpretation issue");
-    this->PI = Internal->PI;
-  }
   return true;
 }
 
@@ -740,11 +735,9 @@ JPEGCodec::IsValid(PhotometricInterpretation const & pi)
     case PhotometricInterpretation::RGB:
     case PhotometricInterpretation::YBR_FULL:
     case PhotometricInterpretation::YBR_FULL_422:
-    // Retired, not tested
-    case PhotometricInterpretation::YBR_PARTIAL_422:
+    case PhotometricInterpretation::YBR_PARTIAL_422: // Retired
       return true;
-    // Not valid, for MPEG
-    case PhotometricInterpretation::YBR_PARTIAL_420:
+    case PhotometricInterpretation::YBR_PARTIAL_420: // MPEG
       mdcmAlwaysWarnMacro("YBR_PARTIAL_420 is not intended to be here");
       return true;
     default:

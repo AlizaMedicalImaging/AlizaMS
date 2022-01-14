@@ -404,6 +404,12 @@ JPEGBITSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
     this->PF.SetPixelRepresentation((uint16_t)prep);
     this->PF.SetBitsStored((uint16_t)precision);
     this->PlanarConfiguration = 0;
+    //
+    //
+    // TODO check, setting PhotometricInterpretation here seems to be useless,
+    // it will overridden later?
+    //
+    //
     if (cinfo.jpeg_color_space == JCS_UNKNOWN)
     {
       if (cinfo.num_components == 1)
@@ -714,11 +720,14 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
         }
         break;
       case JCS_YCbCr:
-        // Don't preserve color-space for YBR_PARTIAL_422,
-        // YBR to RGB formula doesn't work well with YBR_PARTIAL_422.
         if (ImageHelper::GetJpegPreserveYBRfull() &&
-            ((GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL) ||
-             (GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422)))
+            (
+             (GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422) ||
+             (GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL) ||
+#if 1
+             (GetPhotometricInterpretation() == PhotometricInterpretation::YBR_PARTIAL_422)
+#endif
+            ))
         {
           cinfo.jpeg_color_space = JCS_UNKNOWN;
           cinfo.out_color_space = JCS_UNKNOWN;
