@@ -1103,7 +1103,7 @@ QString DicomUtils::convert_pn_value(const QString & n)
 			const QString s1 =
 				tmp2.at(1).trimmed().remove(QChar('\0'));
 			s += s1;
-			if (!s1.isEmpty()) s += QString(" "); 
+			if (!s1.isEmpty()) s += QString(" ");
 			const QString s2 =
 				tmp2.at(2).trimmed().remove(QChar('\0'));
 			s += s2;
@@ -4359,7 +4359,7 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 
 bool DicomUtils::get_patient_position(
 	const QString & p,
-	double * pp) 
+	double * pp)
 {
 	if (pp==NULL || p.isEmpty()) return false;
 	const QString tmp0 = p.trimmed().
@@ -4390,7 +4390,7 @@ bool DicomUtils::get_patient_position(
 
 bool DicomUtils::get_patient_orientation(
 	const QString & o,
-	double * po) 
+	double * po)
 {
 	if (po==NULL || o.isEmpty()) return false;
 	const QString tmp0 = QString(o.trimmed()).
@@ -4643,7 +4643,7 @@ bool DicomUtils::generate_geometry(
 	const float col_dircos_x = (float)dircos[3];
 	const float col_dircos_y = (float)dircos[4];
 	const float col_dircos_z = (float)dircos[5];
-	const float nrm_dircos_x = row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y; 
+	const float nrm_dircos_x = row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
 	const float nrm_dircos_y = row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
 	const float nrm_dircos_z = row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
 	const sVector3 direction1 = normalize(sVector3(nrm_dircos_x,nrm_dircos_y,nrm_dircos_z));
@@ -5017,7 +5017,7 @@ void DicomUtils::enhanced_get_indices(
 	}
 	// Diffusion
 	else if (sq_size==4 &&
-		stack_id_idx>=0 && 
+		stack_id_idx>=0 &&
 		in_stack_pos_idx>=0 &&
 		b_value_idx>=0 &&
 		gradients_idx>=0)
@@ -5833,7 +5833,7 @@ QString DicomUtils::read_enhanced(
 	if (rows_ok && cols_ok &&
 		(dimx_read != columns_ || dimy_read != rows_))
 	{
-		*ok = false; 
+		*ok = false;
 		for (unsigned int x = 0; x < data.size(); ++x)
 		{
 			if (data.at(x)) delete [] data[x];
@@ -6157,7 +6157,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 	if (rows_ok && cols_ok &&
 		(dimx_read != columns_ || dimy_read != rows_))
 	{
-		*ok = false; 
+		*ok = false;
 		for (unsigned int x = 0; x < data.size(); ++x)
 		{
 			if (data.at(x)) delete [] data[x];
@@ -6255,7 +6255,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 #endif
 	message_ = read_enhanced_3d_6d(
 		&tmp17, ivariants, sop, f,
-		data, 
+		data,
 		image_overlays,
 		rows_, columns_, pixelformat, pi,
 		dim6th, dim5th, dim4th, dim3rd,
@@ -6534,7 +6534,7 @@ QString DicomUtils::read_ultrasound(
 	const float col_dircos_y = dircos_[4];
 	const float col_dircos_z = dircos_[5];
 	const float nrm_dircos_x =
-		row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y; 
+		row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
 	const float nrm_dircos_y =
 		row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
 	const float nrm_dircos_z =
@@ -6555,7 +6555,7 @@ QString DicomUtils::read_ultrasound(
 	QString error = CommonUtils::gen_itk_image(ok,
 		data, true,
 		pixelformat, pi,
-		ivariant, 
+		ivariant,
 		direction,
 		dimx, dimy, dimz,
 		origin_x, origin_y, origin_z,
@@ -7153,7 +7153,7 @@ QString DicomUtils::read_series(
 				const float col_dircos_z = ivariant->di->dircos[5];
 				const float nrm_dircos_x =
 					row_dircos_y * col_dircos_z -
-						row_dircos_z * col_dircos_y; 
+						row_dircos_z * col_dircos_y;
 				const float nrm_dircos_y =
 					row_dircos_z * col_dircos_x -
 						row_dircos_x * col_dircos_z;
@@ -7186,7 +7186,7 @@ QString DicomUtils::read_series(
 				const float col_dircos_z = dircos_[5];
 				const float nrm_dircos_x =
 					row_dircos_y * col_dircos_z -
-						row_dircos_z * col_dircos_y; 
+						row_dircos_z * col_dircos_y;
 				const float nrm_dircos_y =
 					row_dircos_z * col_dircos_x -
 						row_dircos_x * col_dircos_z;
@@ -7297,7 +7297,7 @@ QString DicomUtils::read_series(
 	QString error = CommonUtils::gen_itk_image(ok,
 		data, true,
 		pixelformat, pi,
-		ivariant, 
+		ivariant,
 		direction,
 		dimx, dimy, dimz,
 		origin_x, origin_y, origin_z,
@@ -8797,7 +8797,7 @@ QString DicomUtils::read_enhanced_common(
 				//
 				++j;
 			}
-			else 
+			else
 			{
 				error = true;
 				tmp4_ok = false;
@@ -9044,7 +9044,7 @@ QString DicomUtils::read_enhanced_common(
 				const float col_dircos_x = (float)dircos_gen[3];
 				const float col_dircos_y = (float)dircos_gen[4];
 				const float col_dircos_z = (float)dircos_gen[5];
-				const float nrm_dircos_x = row_dircos_y*col_dircos_z - row_dircos_z*col_dircos_y; 
+				const float nrm_dircos_x = row_dircos_y*col_dircos_z - row_dircos_z*col_dircos_y;
 				const float nrm_dircos_y = row_dircos_z*col_dircos_x - row_dircos_x*col_dircos_z;
 				const float nrm_dircos_z = row_dircos_x*col_dircos_y - row_dircos_y*col_dircos_x;
 				direction[0][0] = row_dircos_x;
@@ -9082,7 +9082,7 @@ QString DicomUtils::read_enhanced_common(
 				const float col_dircos_x = (float)dircos_read[3];
 				const float col_dircos_y = (float)dircos_read[4];
 				const float col_dircos_z = (float)dircos_read[5];
-				const float nrm_dircos_x = row_dircos_y*col_dircos_z - row_dircos_z*col_dircos_y; 
+				const float nrm_dircos_x = row_dircos_y*col_dircos_z - row_dircos_z*col_dircos_y;
 				const float nrm_dircos_y = row_dircos_z*col_dircos_x - row_dircos_x*col_dircos_z;
 				const float nrm_dircos_z = row_dircos_x*col_dircos_y - row_dircos_y*col_dircos_x;
 				direction[0][0] = row_dircos_x;
@@ -9198,7 +9198,7 @@ QString DicomUtils::read_enhanced_common(
 			{
 				window_center = window_center_tmp;
 				window_width  = window_width_tmp;
-				lut_function  = lut_function_tmp;	
+				lut_function  = lut_function_tmp;
 			}
 			ivariant->di->default_us_window_center =
 				ivariant->di->us_window_center = window_center;
@@ -9218,7 +9218,7 @@ QString DicomUtils::read_enhanced_common(
 					false,
 					pixelformat,
 					pi,
-					ivariant, 
+					ivariant,
 					direction,
 					columns_,
 					rows_,
@@ -9256,7 +9256,7 @@ QString DicomUtils::read_enhanced_common(
 						false,
 						pixelformat,
 						pi,
-						ivariant, 
+						ivariant,
 						direction,
 						columns_,
 						rows_,
@@ -9323,7 +9323,7 @@ QString DicomUtils::read_enhanced_common(
 						false,
 						pixelformat,
 						pi,
-						ivariant, 
+						ivariant,
 						direction,
 						columns_,
 						rows_,
@@ -9786,7 +9786,7 @@ void DicomUtils::write_encapsulated(
 	if (bv && bv->GetPointer() && (bv->GetLength() > 0))
 	{
 #ifdef _WIN32
-#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC)) 
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
 		const std::wstring uncpath =
 			mdcm::System::ConvertToUtf16((QDir::toNativeSeparators(out_f)).toUtf8().constData());
 		std::ofstream o(uncpath.c_str(), std::ios::binary);
@@ -9856,7 +9856,7 @@ void DicomUtils::write_mpeg(
 	const mdcm::SequenceOfFragments * sf = e.GetSequenceOfFragments();
 	if(!sf) return;
 #ifdef _WIN32
-#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC)) 
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
 	const std::wstring uncpath =
 		mdcm::System::ConvertToUtf16((QDir::toNativeSeparators(out_f)).toUtf8().constData());
 	std::ofstream o(uncpath.c_str(), std::ios::binary);
@@ -9876,7 +9876,7 @@ bool DicomUtils::is_dicom_file(const QString & f)
 	char b[4];
 	std::ifstream fs;
 #ifdef _WIN32
-#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC)) 
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
 	const std::wstring uncpath =
 		mdcm::System::ConvertToUtf16((QDir::toNativeSeparators(f)).toUtf8().constData());
 	fs.open(uncpath.c_str(), std::ios::in|std::ios::binary);
@@ -11153,7 +11153,7 @@ QString DicomUtils::read_enhct_info(
 	return s;
 }
 
-typedef struct 
+typedef struct
 {
 	int rows;
 	int columns;
@@ -11677,7 +11677,7 @@ QString DicomUtils::read_dicom(
 				   sop==QString("1.2.840.10008.5.1.4.1.1.7")       || // SC
 				   sop==QString("1.2.840.10008.5.1.4.1.1.77.1.5.1")|| // Ophthalmic Photography  8 Bit
 				   sop==QString("1.2.840.10008.5.1.4.1.1.77.1.5.2")|| // Ophthalmic Photography 16 Bit
-				   sop==QString("1.2.840.10008.5.1.4.1.1.1")       || // Computed Radiography 
+				   sop==QString("1.2.840.10008.5.1.4.1.1.1")       || // Computed Radiography
 				   sop==QString("1.2.840.10008.5.1.4.1.1.1.1")     || // Digital X-Ray - For Presentation
 				   sop==QString("1.2.840.10008.5.1.4.1.1.1.1.1")   || // Digital X-Ray - For Processing
 				   sop==QString("1.2.840.10008.5.1.4.1.1.1.2")     || // Digital Mammography X-Ray - For Presentation
@@ -12052,7 +12052,7 @@ QString DicomUtils::read_dicom(
 					0);
 				ivariant->di->filtering = wsettings->get_filtering();
 				message_ = read_series(
-					&ok, 
+					&ok,
 					false,
 					false,
 					false,
@@ -13115,7 +13115,7 @@ QString DicomUtils::read_dicom(
 					bool spatial_transform = false;
 					ImageVariant * pr_image =
 						PrConfigUtils::make_pr_monochrome(
-							ref_ivariants.at(z), 
+							ref_ivariants.at(z),
 							refs.at(y),
 							wsettings,
 							gl,
@@ -13284,7 +13284,7 @@ QString DicomUtils::read_dicom(
 						bool spatial_transform = false;
 						ImageVariant * pr_image =
 							PrConfigUtils::make_pr_monochrome(
-								ref_ivariants.at(z), 
+								ref_ivariants.at(z),
 								refs.at(y),
 								wsettings,
 								gl,

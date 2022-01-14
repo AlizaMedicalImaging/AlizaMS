@@ -27,7 +27,7 @@
 #include <QProgressDialog>
 
 //#define LOAD_SPECT_DATA___
- 
+
 bool SpectroscopyUtils::Read(const mdcm::DataSet & ds, SpectroscopyData * s)
 {
 	if (!s) return false;
@@ -42,7 +42,7 @@ bool SpectroscopyUtils::Read(const mdcm::DataSet & ds, SpectroscopyData * s)
 	const mdcm::Tag tSignalDomainRows(0x0028,0x9235);
 	const mdcm::Tag tFirstOrderPhaseCorrectionAngle(0x5600,0x0010);
 	const mdcm::Tag tSpectroscopyData(0x5600,0x0020);
-	
+
 	unsigned short Rows, Columns;
 	unsigned int   DataPointRows, DataPointColumns;
 	if (DicomUtils::get_us_value(ds,tRows,&Rows) &&
@@ -295,7 +295,7 @@ QString SpectroscopyUtils::ProcessData(
 #endif
 			continue;
 		}
-		for (std::map< 
+		for (std::map<
 				unsigned int,
 				unsigned int,
 				std::less<unsigned int> >::const_iterator it =
@@ -372,7 +372,7 @@ QString SpectroscopyUtils::ProcessData(
 				//
 				++j;
 			}
-			else 
+			else
 			{
 				error = true;
 #if 1
@@ -529,7 +529,7 @@ QString SpectroscopyUtils::ProcessData(
 					s.m_SignalDomainRows +
 					QString("</span>");
 				ivariant->iinfo = DicomUtils::read_enhmr_spectro_info(
-					ds, true);	
+					ds, true);
 				ivariants.push_back(ivariant);
 			}
 		}

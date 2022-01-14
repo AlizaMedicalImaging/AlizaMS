@@ -696,7 +696,7 @@ template<typename T> int generate_tex3d(
 		break;
 	}
 	gl->glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	gl->glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);		
+	gl->glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	gl->glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 #else
 	glGenTextures(1, &(ivariant->di->cube_3dtex));
@@ -724,7 +724,7 @@ template<typename T> int generate_tex3d(
 		break;
 	}
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);		
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 #endif
 	//
@@ -733,7 +733,7 @@ template<typename T> int generate_tex3d(
     // 2 rows aligned to even-numbered bytes
     // 4 word-alignment
     // 8 rows start on double-word boundaries
-    //  
+    //
 	switch (texture_type)
 	{
 	case 0:
@@ -832,7 +832,7 @@ template<typename T> int generate_tex3d(
 quit__:
 	if (float_buf) delete [] float_buf;
 	if (short_buf) delete [] short_buf;
-	if (ub_buf)    delete [] ub_buf; 
+	if (ub_buf)    delete [] ub_buf;
 	return error__;
 }
 
@@ -1246,7 +1246,7 @@ template<typename T> QString process_dicom_monochrome_image1(
 	spacing[0] = spacing_x;
 	spacing[1] = spacing_y;
 	spacing[2] = spacing_z;
-	*bad_direction = (	
+	*bad_direction = (
 		direction[0][0]>-0.000001 && direction[0][0]<0.000001 &&
 		direction[1][0]>-0.000001 && direction[1][0]<0.000001 &&
 		direction[2][0]>-0.000001 && direction[2][0]<0.000001 &&
@@ -1282,7 +1282,7 @@ template<typename T> QString process_dicom_monochrome_image1(
 		it.SetFirstDirection(0);
 		it.SetSecondDirection(1);
 		it.GoToBegin();
-		size_t j = 0;	
+		size_t j = 0;
 		while(!it.IsAtEnd())
 		{
 			while (!it.IsAtEndOfSlice())
@@ -1389,7 +1389,7 @@ template<typename T> QString process_dicom_rgb_image1(
 	spacing[0] = spacing_x;
 	spacing[1] = spacing_y;
 	spacing[2] = spacing_z;
-	*bad_direction = (	
+	*bad_direction = (
 		direction[0][0]>-0.000001 && direction[0][0]<0.000001 &&
 		direction[1][0]>-0.000001 && direction[1][0]<0.000001 &&
 		direction[2][0]>-0.000001 && direction[2][0]<0.000001 &&
@@ -1571,7 +1571,7 @@ template<typename T> QString process_dicom_rgba_image1(
 	spacing[0] = spacing_x;
 	spacing[1] = spacing_y;
 	spacing[2] = spacing_z;
-	*bad_direction = (	
+	*bad_direction = (
 		direction[0][0]>-0.000001 && direction[0][0]<0.000001 &&
 		direction[1][0]>-0.000001 && direction[1][0]<0.000001 &&
 		direction[2][0]>-0.000001 && direction[2][0]<0.000001 &&
@@ -1636,8 +1636,8 @@ template<typename T> QString process_dicom_rgba_image1(
 #else
 							if (p__[j+3]!=255)
 							{
-								p[0]=static_cast<typename T::PixelType::ValueType>(((255.0f-C)*(255.0f-K))/255.0f); 
-								p[1]=static_cast<typename T::PixelType::ValueType>(((255.0f-M)*(255.0f-K))/255.0f); 
+								p[0]=static_cast<typename T::PixelType::ValueType>(((255.0f-C)*(255.0f-K))/255.0f);
+								p[1]=static_cast<typename T::PixelType::ValueType>(((255.0f-M)*(255.0f-K))/255.0f);
 								p[2]=static_cast<typename T::PixelType::ValueType>(((255.0f-Y)*(255.0f-K))/255.0f);
 								p[3]=255;
 							}
@@ -1951,7 +1951,7 @@ QString CommonUtils::get_orientation2(const double * pat_orientation)
 	const double col_dircos_x = pat_orientation[3];
 	const double col_dircos_y = pat_orientation[4];
 	const double col_dircos_z = pat_orientation[5];
-	const double nrm_dircos_x = row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y; 
+	const double nrm_dircos_x = row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
 	const double nrm_dircos_y = row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
 	const double nrm_dircos_z = row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
 	bool oblique = false;
@@ -2050,11 +2050,11 @@ void CommonUtils::calculate_center_notuniform(
 			++j;
 			tmpx += (double)cs->fv[z  ];
 			tmpy += (double)cs->fv[z+1];
-			tmpz += (double)cs->fv[z+2]; 
+			tmpz += (double)cs->fv[z+2];
 		}
 	}
 	if (j>0)
-	{	
+	{
 		*center_x = (float)(tmpx/(double)j);
 		*center_y = (float)(tmpy/(double)j);
 		*center_z = (float)(tmpz/(double)j);
@@ -2075,11 +2075,11 @@ void CommonUtils::calculate_center_notuniform(
 			++j;
 			tmpx += (double)cs->fv[z  ];
 			tmpy += (double)cs->fv[z+1];
-			tmpz += (double)cs->fv[z+2]; 
+			tmpz += (double)cs->fv[z+2];
 		}
 	}
 	if (j>0)
-	{	
+	{
 		*center_x = (float)(tmpx/(double)j);
 		*center_y = (float)(tmpy/(double)j);
 		*center_z = (float)(tmpz/(double)j);
@@ -2465,7 +2465,7 @@ void CommonUtils::copy_slices(
 		{
 			if (dest->di->image_slices.at(x))
 			{
-				delete dest->di->image_slices[x];					
+				delete dest->di->image_slices[x];
 			}
 		}
 		dest->di->image_slices.clear();
@@ -2510,7 +2510,7 @@ void CommonUtils::copy_essential(
 	dest->di->skip_texture     = source->di->skip_texture;
 	dest->di->hide_orientation = source->di->hide_orientation;
 	if (
-		source->ybr && 
+		source->ybr &&
 		dest->image_type >= 10 &&
 		dest->image_type < 16 &&
 		source->image_type >= 10 &&
@@ -3207,7 +3207,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 	bool delete_data,
 	const mdcm::PixelFormat & pixelformat,
 	const mdcm::PhotometricInterpretation & pi,
-	ImageVariant * ivariant, 
+	ImageVariant * ivariant,
 	itk::Matrix<itk::SpacePrecisionType,3,3> & direction,
 	unsigned int dimx_, unsigned int dimy_, unsigned int dimz_,
 	double origin_x, double origin_y, double origin_z,

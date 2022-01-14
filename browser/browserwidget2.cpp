@@ -672,7 +672,7 @@ void BrowserWidget2::copy_files()
 			QFileInfo fi(f);
 			if (fi.exists())
 			{
-				const QString f1 = 
+				const QString f1 =
 					dir1 +
 					QString("/") +
 					fi.fileName();
@@ -1484,7 +1484,7 @@ void BrowserWidget2::read_tags_short_(
 						e.GetByteValue()->GetLength()).
 							trimmed().remove(QChar('\0'));
 				// RTSTRUCT
-				if (sop == QString("1.2.840.10008.5.1.4.1.1.481.3")) 
+				if (sop == QString("1.2.840.10008.5.1.4.1.1.481.3"))
 				{
 					is_image_tmp = true;
 				}
@@ -1658,7 +1658,7 @@ void BrowserWidget2::open_CTK_db()
 		{
 			p0 += QString("PatientsName like '%") + ctk_pname + QString("%'");
 		}
-		if (!ctk_pid.isEmpty()) 
+		if (!ctk_pid.isEmpty())
 		{
 			if (!ctk_pname.isEmpty())
 			{
@@ -1767,7 +1767,7 @@ void BrowserWidget2::open_CTK_db()
 						m.value(1).toString(),
 						QString("yyyyMMdd"));
 				series0.study_date = tmp1.toString(QString("d MMM yyyy"));
-				series0.study = m.value(2).toString().trimmed(); 
+				series0.study = m.value(2).toString().trimmed();
 			}
 			m.clear();
 		}

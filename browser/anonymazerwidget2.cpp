@@ -142,7 +142,6 @@ static bool is_date_time(const mdcm::VR & vr, const mdcm::Tag & t)
 			t != mdcm::Tag(0x0040,0xdb07) && // Template Local Version
 			t != mdcm::Tag(0x0044,0x000b))   // Product Expiration DateTime
 		return true;
-		
 	}
 	return false;
 }
@@ -234,7 +233,7 @@ static void replace_uid_recurs__(
 		++it;
 		const mdcm::DataElement & de = *dup;
 		if (ts.find(t) != ts.end() || vr == mdcm::VR::UI)
-		{		
+		{
 			const mdcm::ByteValue * bv = de.GetByteValue();
 			if (bv)
 			{
@@ -2087,12 +2086,12 @@ AnonymazerWidget2::AnonymazerWidget2(float si)
 	input_dir = QString("");
 #else
 #if (defined _WIN32)
-	input_dir = 
+	input_dir =
 		QString(".") +
 		QString("/") +
 		QString("DICOM");
 #else
-	input_dir = 
+	input_dir =
 		QApplication::applicationDirPath() +
 		QString("/") + QString("..") +
 		QString("/") +
@@ -2575,7 +2574,7 @@ void AnonymazerWidget2::process_directory(
 				QFileInfo fi(filenames.at(x));
 				out_filename = fi.fileName();
 			}
-			const QString out_file = 
+			const QString out_file =
 				outp +
 				QString("/") +
 				out_filename;
@@ -2951,7 +2950,7 @@ void AnonymazerWidget2::init_profile()
 	time_tags           .insert(mdcm::Tag(0x0008,0x0032));// Acquisition Time
 	remove_tags         .insert(mdcm::Tag(0x0040,0x4035));// ActualHuman Performers Sequence
 	descr_remove_tags   .insert(mdcm::Tag(0x0010,0x21b0));// Additional Patient History
-	remove_tags         .insert(mdcm::Tag(0x0040,0xa353));// Address (Trial)	
+	remove_tags         .insert(mdcm::Tag(0x0040,0xa353));// Address (Trial)
 	remove_tags         .insert(mdcm::Tag(0x0038,0x0010));// Admission ID
 	time_tags           .insert(mdcm::Tag(0x0038,0x0020));// Admitting Date
 	descr_remove_tags   .insert(mdcm::Tag(0x0008,0x1084));// Admitting Diagnoses Code Sequence

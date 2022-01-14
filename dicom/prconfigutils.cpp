@@ -567,7 +567,7 @@ static void rotate_flip_points(
 				const PRDisplayShutter & a =
 					ivariant->pr_display_shutters.value(idx2);
 				if (!(
-					a.ShutterLeftVerticalEdge    == -1 && 
+					a.ShutterLeftVerticalEdge    == -1 &&
 					a.ShutterRightVerticalEdge   == -1 &&
 					a.ShutterUpperHorizontalEdge == -1 &&
 					a.ShutterLowerHorizontalEdge == -1))
@@ -861,7 +861,7 @@ static void rotate_flip_points(
 				const PRDisplayShutter & a =
 					ivariant->pr_display_shutters.value(idx2);
 				if (!(
-					a.ShutterLeftVerticalEdge    == -1 && 
+					a.ShutterLeftVerticalEdge    == -1 &&
 					a.ShutterRightVerticalEdge   == -1 &&
 					a.ShutterUpperHorizontalEdge == -1 &&
 					a.ShutterLowerHorizontalEdge == -1))
@@ -2168,10 +2168,10 @@ void PrConfigUtils::read_display_areas(
 	// Pixel Origin Interpretation 0048,0301 CS
 		// FRAME
 		// relative to individual frame
-		// 
+		//
 		// VOLUME
 		// relative to Total Image Matrix
-		// 
+		//
 		// If not present, TLHC and BRHC are defined
 		//    relative to the frame pixel origins.
 	// Presentation Size Mode 0070|0100 CS
@@ -2416,13 +2416,13 @@ static void get_overlays(
 			// (6001,0000) UL 28 # 4, 1 PrivateGroupLength
 			// (6001,0010) LT [PAPYRUS 3.0] # 12, 1 PrivateCreator
 			// (6001,1001) LT (no value available) # 0, 0 Unknown Tag & Data
-			// 
+			//
 			// FIXME:
 			// In order to support : mdcmData/SIEMENS_GBS_III-16-ACR_NEMA_1.acr
 			//   mdcmDataExtra/mdcmSampleData/images_of_interest/XA_GE_JPEG_02_with_Overlays.dcm
 			// I cannot simply check for overlay_group,3000 this would not work
 			// I would need a strong euristick
-			// 
+			//
 			t = e.GetTag();
 			mdcm::Tag tOverlayData(t.GetGroup(), 0x3000);
 			if(ds.FindDataElement(tOverlayData))
@@ -2802,7 +2802,7 @@ void PrConfigUtils::read_text_annotations(
 	// TOP, CENTER, BOTTOM
 	const mdcm::Tag tVerticalAlignment(0x0070,0x0243);
 	// NORMAL, OUTLINED, OFF
-	const mdcm::Tag tShadowStyle(0x0070,0x0244);   
+	const mdcm::Tag tShadowStyle(0x0070,0x0244);
 	const mdcm::Tag tShadowOffsetX(0x0070,0x0245);
 	const mdcm::Tag tShadowOffsetY(0x0070,0x0246);
 	const mdcm::Tag tShadowColorCIELabValue(0x0070,0x0247);
@@ -2983,7 +2983,7 @@ void PrConfigUtils::read_text_annotations(
 						c.values.push_back(QVariant((double)0));   // 7
 						c.values.push_back(QVariant((double)0));   // 8
 						c.values.push_back(QVariant(QString(""))); // 9
-						c.values.push_back(QVariant(QString(""))); //10 
+						c.values.push_back(QVariant(QString(""))); //10
 					}
 					if (nestedds2.FindDataElement(tUnformattedTextValue))
 					{
@@ -3328,7 +3328,7 @@ void PrConfigUtils::read_display_shutter(
 		c.values.push_back(
 			QVariant((int)ShutterLeftVerticalEdge)); // 1
 		c.values.push_back(
-			QVariant((int)ShutterRightVerticalEdge)); // 2 
+			QVariant((int)ShutterRightVerticalEdge)); // 2
 		c.values.push_back(
 			QVariant((int)ShutterUpperHorizontalEdge)); // 3
 			c.values.push_back(
@@ -4241,7 +4241,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		QMap<int, QStringList> graphic_images;
 		QMap<int, QString>  GraphicType;
 		QMap<int, QString>  GraphicAnnotationUnits;
-		QMap<int, QVariant> gdata; 
+		QMap<int, QVariant> gdata;
 		////QMap<int, unsigned int> NumberofGraphicPoints;
 		//QMap<int, int> LinePatternOnColorCIELabValue_L;
 		//QMap<int, int> LinePatternOnColorCIELabValue_a;

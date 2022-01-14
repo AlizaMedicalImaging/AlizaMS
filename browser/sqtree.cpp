@@ -270,7 +270,7 @@ void SQtree::process_element(
 					tag.GetElement(),
 					private_creator.toLatin1().constData());
 				const mdcm::DictEntry & pentry =
-					pdict.GetDictEntry(ptag); 
+					pdict.GetDictEntry(ptag);
 				tname = QString(pentry.GetName()).trimmed();
 				if (invalid_vr||unknown_vr) vr = pentry.GetVR();
 			}
@@ -1310,7 +1310,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 					QString tmp8("");
 					for (int x8 = 0; x8 < l8.size(); ++x8)
 						tmp8.append(l8.at(x8).toString()+QString(" "));
-					gems_us_text.append(itmd.key()+QString(": ")+tmp8+QString("<br/>")); 
+					gems_us_text.append(itmd.key()+QString(": ")+tmp8+QString("<br/>"));
 				}
 			}
 		}
@@ -1386,7 +1386,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 									QString("&#160;") +
 									itmd.key() +
 									QString(": ")+
-									tmp18+QString("<br/>")); 
+									tmp18+QString("<br/>"));
 							}
 						}
 					}
@@ -1465,7 +1465,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 												tmp26.append(l26.at(x26).toString()+QString(" "));
 											gems_us_text.append(
 												QString("&#160;&#160;&#160;&#160;")+itmd.key()+QString(": ")+
-												tmp26+QString("<br/>")); 
+												tmp26+QString("<br/>"));
 										}
 									}
 								}
@@ -1564,7 +1564,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 															tmp85.append(l85.at(x85).toString()+QString(" "));
 														gems_us_text.append(
 															QString("&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;")+
-															itmd.key()+QString(": ")+tmp85+QString("<br/>")); 
+															itmd.key()+QString(": ")+tmp85+QString("<br/>"));
 													}
 												}
 											}
@@ -1673,7 +1673,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 												itmd.key()+
 												QString(": ")+
 												tmp85 +
-												QString("<br/>")); 
+												QString("<br/>"));
 										}
 									}
 								}
@@ -1766,7 +1766,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 									itmd.key() +
 									QString(": ") +
 									tmp75 +
-									QString("<br/>")); 
+									QString("<br/>"));
 							}
 						}
 					}

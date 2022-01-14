@@ -65,7 +65,7 @@ bool SplitUihGridFilter::ComputeUihGridDimensions(
 		std::vector<double> result;
 		if (DicomUtils::priv_get_ds_values(
 				ds,tMRNumberOfSliceInVolume,result))
-			z = (int)result[0];	
+			z = (int)result[0];
 	}
 	else if (ds.FindDataElement(Tag(0x0065,0x1050)))
 	{
