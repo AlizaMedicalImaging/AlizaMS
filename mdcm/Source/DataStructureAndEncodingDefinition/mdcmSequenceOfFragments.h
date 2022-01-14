@@ -91,7 +91,7 @@ public:
   GetFragBuffer(unsigned int, char *, unsigned long long &) const;
   SizeType
   GetNumberOfFragments() const;
-  const Fragment & GetFragment(SizeType) const;
+  const Fragment GetFragment(SizeType) const;
   bool
   WriteBuffer(std::ostream &) const;
   const BasicOffsetTable &

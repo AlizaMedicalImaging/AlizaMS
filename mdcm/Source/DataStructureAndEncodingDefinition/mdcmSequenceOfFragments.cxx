@@ -91,13 +91,18 @@ SequenceOfFragments::GetFragBuffer(unsigned int fragNb, char * buffer, unsigned 
   return true;
 }
 
-const Fragment &
+const Fragment
 SequenceOfFragments::GetFragment(SizeType num) const
 {
-  assert(num < Fragments.size());
-  FragmentVector::const_iterator it = Fragments.cbegin();
-  const Fragment &               frag = *(it + num);
-  return frag;
+  if (num < Fragments.size())
+  {
+    FragmentVector::const_iterator it = Fragments.cbegin();
+    const Fragment                 frag = *(it + num);
+    return frag;
+  }
+  assert(0);
+  const Fragment f;
+  return f;
 }
 
 bool
@@ -131,10 +136,16 @@ SequenceOfFragments::WriteBuffer(std::ostream & os) const
   {
     const Fragment &  frag = *it;
     const ByteValue * bv = frag.GetByteValue();
-    assert(bv);
-    const VL len = frag.GetVL();
-    bv->WriteBuffer(os);
-    total += len;
+    if (bv)
+    {
+      const VL len = frag.GetVL();
+      bv->WriteBuffer(os);
+      total += len;
+    }
+    else
+    {
+      assert(0);
+    }
   }
   return true;
 }
