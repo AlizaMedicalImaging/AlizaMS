@@ -142,6 +142,35 @@ static void get_series_files(
 	}
 }
 
+static QString print_length(size_t l)
+{
+	QString r;
+	if (l > 1024*1024)
+	{
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+		r = QString::asprintf("%.2f", l / (1024.0*1024.0));
+#else
+		r.sprintf("%.2f", l / (1024.0*1024.0));
+#endif
+		r += QString(" MB");
+	}
+	else if (l > 1024)
+	{
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+		r = QString::asprintf("%.2f", l/1024.0);
+#else
+		r.sprintf("%.2f", l/1024.0);
+#endif
+		r += QString(" KB");
+	}
+	else
+	{
+		r = QVariant((qulonglong)l).toString() +
+			QString(" B");
+	}
+	return r;
+}
+
 const QString css1 =
 	QString(
 		"span.y4 { color:#050505; font-size: medium; font-weight: bold;}\n"
@@ -260,7 +289,6 @@ void SQtree::process_element(
 	const QBrush brush5(QColor::fromRgbF(0.4,0.4,0.7));
 	const QBrush brush6(QColor::fromRgbF(0.5,0.0,0.0));
 	const QBrush brush7(QColor::fromRgbF(0.5,0.5,0.5));
-	QString length_s("");
 	if (vr == mdcm::VR::SQ)
 	{
 		mdcm::SmartPointer<mdcm::SequenceOfItems> sqi =
@@ -289,32 +317,8 @@ void SQtree::process_element(
 		QString sq_length("");
 		if (!sqi->IsUndefinedLength())
 		{
-			const qlonglong length =
-				static_cast<qlonglong>(sqi->GetLength());
-			QString tmp1;
-			if (length > 1024*1024)
-			{
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-				tmp1 = QString::asprintf("%.2f", length / (1024.0*1024.0));
-#else
-				tmp1.sprintf("%.2f", length / (1024.0*1024.0));
-#endif
-				sq_length = tmp1 + QString(" MB");
-			}
-			else if (length > 1024)
-			{
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-				tmp1 = QString::asprintf("%.2f", length/1024.0);
-#else
-				tmp1.sprintf("%.2f", length/1024.0);
-#endif
-				sq_length = tmp1 + QString(" KB");
-			}
-			else
-			{
-				sq_length = QVariant(length).toString() +
-					QString(" B");
-			}
+		    const size_t length = sqi->GetLength();
+			sq_length = print_length(length);
 		}
 		//
 		QStringList l;
@@ -366,6 +370,69 @@ void SQtree::process_element(
 			}
 		}
 	}
+	else if (e.IsUndefinedLength() && tag == mdcm::Tag(0x7fe0,0x0010))
+	{
+		const mdcm::SequenceOfFragments * sqf = e.GetSequenceOfFragments();
+		const size_t nf = sqf->GetNumberOfFragments();
+		QStringList l;
+		l << QString(tag.PrintAsPipeSeparatedString().c_str())
+			<< tname
+			<< QString(mdcm::VR::GetVRString(vr))
+			<< QString("")
+			<< QString(" [")+
+				QVariant(static_cast<unsigned int>(
+					nf + 1)).toString() +
+					QString("]");
+		QTreeWidgetItem * ci = new QTreeWidgetItem(l);
+		ci->setForeground(4, brush2); // binary
+		if (invalid_vr)  ci->setBackground(2, brush5);
+		if (unknown_vr)  ci->setBackground(2, brush4);
+		if (duplicated)  ci->setForeground(0, brush6);
+		wi->addChild(ci);
+		const mdcm::BasicOffsetTable & bof = sqf->GetTable();
+		QString bof_s("");
+		{
+			std::vector<unsigned int> values;
+			get_bin_values<unsigned int, mdcm::VR::UL>(
+				bof, values);
+			for (unsigned long j = 0; j < values.size(); ++j)
+			{
+				bof_s.append(
+					QVariant(values[j]).toString() +
+					QString(" "));
+			}
+		}
+		const unsigned int bof_length = bof.GetVL();
+		const QString bof_tmp1 = print_length(bof_length);
+		QStringList lt;
+		lt << QString("Basic Offset Table")
+			<< QString("")
+			<< QString("")
+			<< QString(bof_tmp1)
+			<< bof_s;
+		QTreeWidgetItem * cbof = new QTreeWidgetItem(lt);
+		cbof->setForeground(0, brush2);
+		cbof->setForeground(1, brush2);
+		cbof->setForeground(4, brush2);
+		ci->addChild(cbof);
+		for (size_t i = 0; i < nf; ++i)
+		{
+			const mdcm::Fragment & frag = sqf->GetFragment(i);
+			const size_t length = frag.GetVL();
+			const QString tmp1 = print_length(length);
+			QStringList l1;
+			l1 << QString("Fragment")
+				<< QVariant((int)(i+1)).toString()
+				<< QString("")
+				<< QString(tmp1)
+				<< QString("binary");
+			QTreeWidgetItem * cin = new QTreeWidgetItem(l1);
+			cin->setForeground(0, brush2);
+			cin->setForeground(1, brush2);
+			cin->setForeground(4, brush2);
+			ci->addChild(cin);
+		}
+	}
 	else
 	{
 		QString str_("");
@@ -414,35 +481,12 @@ void SQtree::process_element(
 		}
 		else
 		{
+			QString length_s("");
 			const mdcm::ByteValue * bv = e.GetByteValue();
 			if (bv)
 			{
-				const qlonglong length =
-					static_cast<qlonglong>(bv->GetLength());
-				QString tmp1;
-				if (length > 1024*1024)
-				{
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-					tmp1 = QString::asprintf("%.2f", length / (1024.0*1024.0));
-#else
-					tmp1.sprintf("%.2f", length / (1024.0*1024.0));
-#endif	
-					length_s = tmp1 + QString(" MB");
-				}
-				else if (length > 1024)
-				{
-#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-					tmp1 = QString::asprintf("%.2f", length / 1024.0);
-#else
-					tmp1.sprintf("%.2f", length / 1024.0);
-#endif
-					length_s = tmp1 + QString(" KB");
-				}
-				else
-				{
-					length_s = QVariant(length).toString() +
-						QString(" B");
-				}
+				const size_t length = bv->GetLength();
+				length_s = print_length(length);
 				if (mdcm::VR::IsBinary(vr) || mdcm::VR::IsBinary2(vr))
 				{
 					bin_label = true;
