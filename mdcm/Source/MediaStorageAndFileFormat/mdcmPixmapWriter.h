@@ -68,8 +68,11 @@ protected:
   bool
   PrepareWrite(MediaStorage const &);
   void
-                       DoIconImage(DataSet &, Pixmap const &);
+  DoIconImage(DataSet &, Pixmap const &);
   SmartPointer<Pixmap> PixelData;
+
+private:
+
 };
 
 } // end namespace mdcm

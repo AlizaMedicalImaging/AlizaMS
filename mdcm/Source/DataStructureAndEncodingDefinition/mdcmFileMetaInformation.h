@@ -47,7 +47,6 @@ namespace mdcm
 class MDCM_EXPORT FileMetaInformation : public DataSet
 {
 public:
-  // FIXME: TransferSyntax::TS_END -> TransferSyntax::ImplicitDataElement
   FileMetaInformation();
   ~FileMetaInformation();
 
@@ -65,19 +64,22 @@ public:
   {
     return MetaInformationTS;
   }
+
   void
   SetDataSetTransferSyntax(const TransferSyntax & ts);
+
   const TransferSyntax &
   GetDataSetTransferSyntax() const
   {
     return DataSetTS;
   }
+
   MediaStorage
   GetMediaStorage() const;
+
   std::string
   GetMediaStorageAsString() const;
 
-  // FIXME: no virtual function means: duplicate code...
   void
   Insert(const DataElement & de)
   {
@@ -90,6 +92,7 @@ public:
       mdcmErrorMacro("Cannot add element with group != 0x0002 in the file meta header: " << de);
     }
   }
+
   void
   Replace(const DataElement & de)
   {
@@ -100,6 +103,7 @@ public:
   // Read
   std::istream &
   Read(std::istream & is);
+
   std::istream &
   ReadCompat(std::istream & is);
 

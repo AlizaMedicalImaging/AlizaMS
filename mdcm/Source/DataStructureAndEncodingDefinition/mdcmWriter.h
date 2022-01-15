@@ -74,6 +74,10 @@ public:
   CheckFileMetaInformationOff();
   void
   CheckFileMetaInformationOn();
+  void
+  SetSkipUIDs(bool);
+  bool
+  GetSkipUIDs() const;
 
 protected:
   void
@@ -81,14 +85,15 @@ protected:
   std::ostream *
   GetStreamPtr() const;
   bool
-                  GetCheckFileMetaInformation() const;
+  GetCheckFileMetaInformation() const;
   std::ostream *  Stream;
   std::ofstream * Ofstream;
-
+ 
 private:
   SmartPointer<File> F;
   bool               CheckFileMetaInformation;
   bool               WriteDataSetOnly;
+  bool               SkipUIDs;
 };
 
 } // end namespace mdcm

@@ -90,7 +90,7 @@ protected:
   bool
   ReadMetaInformation();
   bool
-                     ReadDataSet();
+  ReadDataSet();
   SmartPointer<File> F;
 
 private:
@@ -98,7 +98,7 @@ private:
   bool
   InternalReadCommon(const T_Caller &);
   TransferSyntax
-                  GuessTransferSyntax();
+  GuessTransferSyntax();
   std::istream *  Stream;
   std::ifstream * Ifstream;
 };

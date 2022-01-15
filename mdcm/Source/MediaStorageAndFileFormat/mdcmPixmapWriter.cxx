@@ -245,13 +245,13 @@ PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
   PixelFormat            pf = PixelData->GetPixelFormat();
   if (!pf.IsValid())
   {
-    mdcmWarningMacro("Pixel format is not valid: " << pf);
+    mdcmAlwaysWarnMacro("Pixel format is not valid: " << pf);
     return false;
   }
   PhotometricInterpretation pi = PixelData->GetPhotometricInterpretation();
   if (pi.GetSamplesPerPixel() != pf.GetSamplesPerPixel())
   {
-    mdcmWarningMacro("Photometric Interpretation and Pixel format are not compatible: "
+    mdcmAlwaysWarnMacro("Photometric Interpretation and Pixel format are not compatible: "
                      << pi.GetSamplesPerPixel() << " vs " << pf.GetSamplesPerPixel());
     return false;
   }
@@ -351,7 +351,6 @@ PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
   // Cleanup LUT here since cant be done within mdcm::ImageApplyLookupTable
   if (pi == PhotometricInterpretation::RGB)
   {
-    // usual tags:
     ds.Remove(Tag(0x0028, 0x1101));
     ds.Remove(Tag(0x0028, 0x1102));
     ds.Remove(Tag(0x0028, 0x1103));
@@ -453,7 +452,8 @@ PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
         static const CSComp newvalues2[] = { "ISO_14495_1" };
         at3.SetValues(newvalues2, 1);
       }
-      else if (ts_orig == TransferSyntax::JPEGBaselineProcess1 || ts_orig == TransferSyntax::JPEGExtendedProcess2_4 ||
+      else if (ts_orig == TransferSyntax::JPEGBaselineProcess1 ||
+               ts_orig == TransferSyntax::JPEGExtendedProcess2_4 ||
                ts_orig == TransferSyntax::JPEGExtendedProcess3_5 ||
                ts_orig == TransferSyntax::JPEGSpectralSelectionProcess6_8 ||
                ts_orig == TransferSyntax::JPEGFullProgressionProcess10_12)
@@ -463,7 +463,7 @@ PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
       }
       else
       {
-        mdcmErrorMacro("Pixel Data is lossy but I cannot find the original transfer syntax");
+        mdcmAlwaysWarnMacro("Pixel Data is lossy but I cannot find the original transfer syntax");
         return false;
       }
       ds.Replace(at3.GetAsDataElement());
@@ -567,7 +567,7 @@ PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
     const ByteValue * bv = ds.GetDataElement(Tag(0x0008, 0x0016)).GetByteValue();
     if (!bv)
     {
-      mdcmErrorMacro("Cant be empty");
+      mdcmErrorMacro("Can not be empty");
       return false;
     }
     if (strncmp(bv->GetPointer(), msstr, bv->GetLength()) != 0)
@@ -583,73 +583,76 @@ PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
     }
   }
   ImageHelper::SetDimensionsValue(file, *PixelData);
-  UIDGenerator uid;
-  if (ds.FindDataElement(Tag(0x0008, 0x0018)) && false) // FIXME
+  if (!GetSkipUIDs())
   {
-    // Reference
-    const Tag                     tsourceImageSequence(0x0008, 0x2112);
-    SmartPointer<SequenceOfItems> sq;
-    if (ds.FindDataElement(tsourceImageSequence))
+    UIDGenerator uid;
+    if (ds.FindDataElement(Tag(0x0008, 0x0018)) && false) // FIXME
     {
-      DataElement & de = const_cast<DataElement &>(ds.GetDataElement(tsourceImageSequence));
-      de.SetVLToUndefined();
-      if (de.IsEmpty())
+      // Reference
+      const Tag                     tsourceImageSequence(0x0008, 0x2112);
+      SmartPointer<SequenceOfItems> sq;
+      if (ds.FindDataElement(tsourceImageSequence))
+      {
+        DataElement & de = const_cast<DataElement &>(ds.GetDataElement(tsourceImageSequence));
+        de.SetVLToUndefined();
+        if (de.IsEmpty())
+        {
+          sq = new SequenceOfItems;
+          de.SetValue(*sq);
+        }
+        sq = de.GetValueAsSQ();
+      }
+      else
       {
         sq = new SequenceOfItems;
-        de.SetValue(*sq);
       }
-      sq = de.GetValueAsSQ();
+      sq->SetLengthToUndefined();
+      Item        item;
+      DataElement referencedSOPClassUID = ds.GetDataElement(Tag(0x0008, 0x0016));
+      referencedSOPClassUID.SetTag(Tag(0x0008, 0x1150));
+      DataElement referencedSOPInstanceUID = ds.GetDataElement(Tag(0x0008, 0x0018));
+      referencedSOPInstanceUID.SetTag(Tag(0x0008, 0x1155));
+      item.SetVLToUndefined();
+      item.InsertDataElement(referencedSOPClassUID);
+      item.InsertDataElement(referencedSOPInstanceUID);
+      sq->AddItem(item);
+      if (!ds.FindDataElement(tsourceImageSequence))
+      {
+        DataElement de(tsourceImageSequence);
+        de.SetVR(VR::SQ);
+        de.SetValue(*sq);
+        de.SetVLToUndefined();
+        ds.Insert(de);
+      }
     }
-    else
     {
-      sq = new SequenceOfItems;
+      const char * sop = uid.Generate();
+      DataElement  de(Tag(0x0008, 0x0018));
+      VL::Type     strlenSOP = (VL::Type)strlen(sop);
+      de.SetByteValue(sop, strlenSOP);
+      de.SetVR(Attribute<0x0008, 0x0018>::GetVR());
+      ds.ReplaceEmpty(de);
     }
-    sq->SetLengthToUndefined();
-    Item        item;
-    DataElement referencedSOPClassUID = ds.GetDataElement(Tag(0x0008, 0x0016));
-    referencedSOPClassUID.SetTag(Tag(0x0008, 0x1150));
-    DataElement referencedSOPInstanceUID = ds.GetDataElement(Tag(0x0008, 0x0018));
-    referencedSOPInstanceUID.SetTag(Tag(0x0008, 0x1155));
-    item.SetVLToUndefined();
-    item.InsertDataElement(referencedSOPClassUID);
-    item.InsertDataElement(referencedSOPInstanceUID);
-    sq->AddItem(item);
-    if (!ds.FindDataElement(tsourceImageSequence))
+    // Create a new UID
+    if (!ds.FindDataElement(Tag(0x0020, 0x000d)))
     {
-      DataElement de(tsourceImageSequence);
-      de.SetVR(VR::SQ);
-      de.SetValue(*sq);
-      de.SetVLToUndefined();
-      ds.Insert(de);
+      const char * study = uid.Generate();
+      DataElement  de(Tag(0x0020, 0x000d));
+      VL::Type     strlenStudy = (VL::Type)strlen(study);
+      de.SetByteValue(study, strlenStudy);
+      de.SetVR(Attribute<0x0020, 0x000d>::GetVR());
+      ds.ReplaceEmpty(de);
     }
-  }
-  {
-    const char * sop = uid.Generate();
-    DataElement  de(Tag(0x0008, 0x0018));
-    VL::Type     strlenSOP = (VL::Type)strlen(sop);
-    de.SetByteValue(sop, strlenSOP);
-    de.SetVR(Attribute<0x0008, 0x0018>::GetVR());
-    ds.ReplaceEmpty(de);
-  }
-  // Create a new UID
-  if (!ds.FindDataElement(Tag(0x0020, 0x000d)))
-  {
-    const char * study = uid.Generate();
-    DataElement  de(Tag(0x0020, 0x000d));
-    VL::Type     strlenStudy = (VL::Type)strlen(study);
-    de.SetByteValue(study, strlenStudy);
-    de.SetVR(Attribute<0x0020, 0x000d>::GetVR());
-    ds.ReplaceEmpty(de);
-  }
-  // Create a new UID
-  if (!ds.FindDataElement(Tag(0x0020, 0x000e)))
-  {
-    const char * series = uid.Generate();
-    DataElement  de(Tag(0x0020, 0x000e));
-    VL::Type     strlenSeries = (VL::Type)strlen(series);
-    de.SetByteValue(series, strlenSeries);
-    de.SetVR(Attribute<0x0020, 0x000e>::GetVR());
-    ds.ReplaceEmpty(de);
+    // Create a new UID
+    if (!ds.FindDataElement(Tag(0x0020, 0x000e)))
+    {
+      const char * series = uid.Generate();
+      DataElement  de(Tag(0x0020, 0x000e));
+      VL::Type     strlenSeries = (VL::Type)strlen(series);
+      de.SetByteValue(series, strlenSeries);
+      de.SetVR(Attribute<0x0020, 0x000e>::GetVR());
+      ds.ReplaceEmpty(de);
+    }
   }
   FileMetaInformation & fmi = file.GetHeader();
   if (GetCheckFileMetaInformation())

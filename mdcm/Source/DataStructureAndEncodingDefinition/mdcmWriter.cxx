@@ -44,6 +44,7 @@ Writer::Writer()
   , F(new File)
   , CheckFileMetaInformation(true)
   , WriteDataSetOnly(false)
+  , SkipUIDs(false)
 {}
 
 Writer::~Writer()
@@ -248,6 +249,18 @@ bool
 Writer::GetCheckFileMetaInformation() const
 {
   return CheckFileMetaInformation;
+}
+
+void
+Writer::SetSkipUIDs(bool b)
+{
+  SkipUIDs = b;
+}
+
+bool
+Writer::GetSkipUIDs() const
+{
+  return SkipUIDs;
 }
 
 } // end namespace mdcm

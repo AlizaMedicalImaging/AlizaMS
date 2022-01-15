@@ -259,6 +259,13 @@ ImageChangeTransferSyntax::TryRAWCodec(const DataElement & pixelde, Bitmap const
       return false;
     DataElement & de = output.GetDataElement();
     de.SetValue(out.GetValue());
+    if (input.GetPixelFormat().GetSamplesPerPixel() == 3)
+    {
+      if (ForceYBRFull || (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422))
+      {
+        output.SetPhotometricInterpretation(PhotometricInterpretation::YBR_FULL);
+      }
+    }
     return true;
   }
   return false;
