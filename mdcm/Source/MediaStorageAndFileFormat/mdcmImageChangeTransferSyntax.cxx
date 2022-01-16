@@ -261,9 +261,15 @@ ImageChangeTransferSyntax::TryRAWCodec(const DataElement & pixelde, Bitmap const
     de.SetValue(out.GetValue());
     if (input.GetPixelFormat().GetSamplesPerPixel() == 3)
     {
-      if (ForceYBRFull || (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422))
+      if (ForceYBRFull ||
+          (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL) ||
+          (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422))
       {
         output.SetPhotometricInterpretation(PhotometricInterpretation::YBR_FULL);
+      }
+      else
+      {
+        output.SetPhotometricInterpretation(PhotometricInterpretation::RGB);
       }
     }
     return true;
@@ -292,9 +298,15 @@ ImageChangeTransferSyntax::TryRLECodec(const DataElement & pixelde, Bitmap const
     de.SetValue(out.GetValue());
     if (input.GetPixelFormat().GetSamplesPerPixel() == 3)
     {
-      if (ForceYBRFull || (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL))
+      if (ForceYBRFull ||
+          (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL) ||
+          (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422))
       {
         output.SetPhotometricInterpretation(PhotometricInterpretation::YBR_FULL);
+      }
+      else
+      {
+        output.SetPhotometricInterpretation(PhotometricInterpretation::RGB);
       }
     }
     return true;
@@ -403,9 +415,18 @@ ImageChangeTransferSyntax::TryJPEGLSCodec(const DataElement & pixelde, Bitmap co
     output.SetPlanarConfiguration(0);
     DataElement & de = output.GetDataElement();
     de.SetValue(out.GetValue());
-    if (ForceYBRFull || (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL))
+    if (input.GetPixelFormat().GetSamplesPerPixel() == 3)
     {
-      output.SetPhotometricInterpretation(PhotometricInterpretation::YBR_FULL);
+      if (ForceYBRFull ||
+          (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL) ||
+          (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422))
+      {
+        output.SetPhotometricInterpretation(PhotometricInterpretation::YBR_FULL);
+      }
+      else
+      {
+        output.SetPhotometricInterpretation(PhotometricInterpretation::RGB);
+      }
     }
     return r;
   }
@@ -438,30 +459,9 @@ ImageChangeTransferSyntax::TryJPEG2000Codec(const DataElement & pixelde, Bitmap 
     output.SetPlanarConfiguration(0);
     if (input.GetPixelFormat().GetSamplesPerPixel() == 3)
     {
-      if (ForceYBRFull || input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL)
-      {
-        output.SetPhotometricInterpretation(PhotometricInterpretation::YBR_FULL); // TODO
-      }
-      else if (input.GetPhotometricInterpretation() == PhotometricInterpretation::RGB ||
-               input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_ICT ||
-               input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_RCT)
-      {
-        if (ts == TransferSyntax::JPEG2000Lossless)
-        {
-          // output.SetPhotometricInterpretation(PhotometricInterpretation::YBR_RCT); // TODO
-          output.SetPhotometricInterpretation(PhotometricInterpretation::RGB);
-        }
-        else
-        {
-          assert(ts == TransferSyntax::JPEG2000);
-          // output.SetPhotometricInterpretation(PhotometricInterpretation::YBR_ICT); // TODO
-          output.SetPhotometricInterpretation(PhotometricInterpretation::RGB);
-        }
-      }
-      // invalid
-      else if (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422 ||
-               input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_PARTIAL_422 || // retired
-               input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_PARTIAL_420)   // not supported
+      if (ForceYBRFull ||
+          (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL) ||
+          (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422))
       {
         output.SetPhotometricInterpretation(PhotometricInterpretation::YBR_FULL);
       }

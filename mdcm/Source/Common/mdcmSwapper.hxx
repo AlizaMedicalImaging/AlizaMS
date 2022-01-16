@@ -19,8 +19,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef MDCMSWAPPER_TXX
-#define MDCMSWAPPER_TXX
+#ifndef MDCMSWAPPER_HXX
+#define MDCMSWAPPER_HXX
 
 #include <cstring>
 
@@ -272,4 +272,4 @@ SwapperDoOp::SwapArray(double * array, size_t n)
 
 } // end namespace mdcm
 
-#endif // MDCMSWAPPER_TXX
+#endif // MDCMSWAPPER_HXX
