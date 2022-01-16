@@ -3,6 +3,8 @@
 Aliza MS - DICOM Viewer
 =======================
 
+[Releases](https://github.com/AlizaMedicalImaging/AlizaMS/releases)
+
 View short introductory videos on [Youtube Channel](https://www.youtube.com/channel/UCPGvoSYX7PC5XCp-81Q4MAg) _(new)_
 
 Quick start
