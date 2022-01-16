@@ -32,103 +32,6 @@
 #include <chrono>
 #include <random>
 
-static mdcm::VR get_vr(
-	const mdcm::DataSet & ds,
-	const mdcm::Tag & t,
-	const bool implicit,
-	const mdcm::Dicts & dicts)
-{
-	mdcm::VR vr = mdcm::VR::INVALID;
-	bool priv = false;
-	if (t.IsIllegal())
-	{
-		return vr; //
-	}
-	else if (t.IsPrivateCreator())
-	{
-		if (!implicit)
-		{
-			if (ds.FindDataElement(t))
-			{
-				vr = ds.GetDataElement(t).GetVR();
-			}
-		}
-		else
-		{
-			vr = mdcm::VR::LO; //
-		}
-	}
-	else if (t.IsPrivate())
-	{
-		priv = true;
-	}
-	if (!priv)
-	{
-		if (!implicit)
-		{
-			if (ds.FindDataElement(t))
-			{
-				vr = ds.GetDataElement(t).GetVR();
-			}
-			else
-			{
-				const mdcm::DictEntry & dictentry = dicts.GetDictEntry(t);
-				vr = dictentry.GetVR();
-			}
-		}
-		else
-		{
-			const mdcm::DictEntry & dictentry = dicts.GetDictEntry(t);
-			vr = dictentry.GetVR();
-		}
-	}
-	else
-	{
-		if (!implicit)
-		{
-			vr = ds.GetDataElement(t).GetVR();
-		}
-		else
-		{
-			const mdcm::PrivateDict & pdict = dicts.GetPrivateDict();
-			mdcm::Tag private_creator_t = t.GetPrivateCreator();
-			if (ds.FindDataElement(private_creator_t))
-			{
-				const mdcm::DataElement & private_creator_e =
-					ds.GetDataElement(private_creator_t);
-				if (!private_creator_e.IsEmpty() &&
-					!private_creator_e.IsUndefinedLength() &&
-					private_creator_e.GetByteValue())
-				{
-					const QString private_creator =
-						QString::fromLatin1(
-							private_creator_e.GetByteValue()->GetPointer(),
-							private_creator_e.GetByteValue()->GetLength());
-					mdcm::PrivateTag pt(
-						t.GetGroup(),
-						t.GetElement(),
-						private_creator.toLatin1().constData());
-					const mdcm::DictEntry & pentry = pdict.GetDictEntry(pt);
-					vr = pentry.GetVR();
-				}
-			}
-		}
-	}
-	return vr;
-}
-
-static bool compatible_sq(
-	const mdcm::DataSet & ds,
-	const mdcm::Tag & t,
-	const bool implicit,
-	const mdcm::Dicts & dicts)
-{
-	if (t.IsIllegal()) return false;
-	mdcm::VR vr = get_vr(ds, t, implicit, dicts);
-	if (vr.Compatible(mdcm::VR::SQ)) return true;
-	return false;
-}
-
 static bool is_date_time(const mdcm::VR & vr, const mdcm::Tag & t)
 {
 	if (vr == mdcm::VR::DA ||
@@ -155,7 +58,7 @@ static void replace__(
 	const mdcm::Dicts & dicts)
 {
 	if (t.GetGroup() < 0x0008) return;
-	mdcm::VR vr = get_vr(ds, t, implicit, dicts);
+	mdcm::VR vr = DicomUtils::get_vr(ds, t, implicit, dicts);
 	mdcm::VL vl = static_cast<mdcm::VL::Type>(size_);
 	if (vr.Compatible(mdcm::VR::SQ))
 	{
@@ -229,7 +132,7 @@ static void replace_uid_recurs__(
 		const mdcm::DataElement & de1 = *it;
 		mdcm::DataSet::Iterator dup = it;
 		mdcm::Tag t = de1.GetTag();
-		mdcm::VR vr = get_vr(ds, t, implicit, dicts);
+		mdcm::VR vr = DicomUtils::get_vr(ds, t, implicit, dicts);
 		++it;
 		const mdcm::DataElement & de = *dup;
 		if (ts.find(t) != ts.end() || vr == mdcm::VR::UI)
@@ -289,7 +192,7 @@ static void replace_pn_recurs__(
 	{
 		const mdcm::DataElement & de1 = *it;
 		mdcm::Tag t = de1.GetTag();
-		mdcm::VR vr = get_vr(ds, t, implicit, dicts);
+		mdcm::VR vr = DicomUtils::get_vr(ds, t, implicit, dicts);
 		mdcm::DataSet::Iterator dup = it;
 		++it;
 		const mdcm::DataElement & de = *dup;
@@ -383,7 +286,7 @@ static void replace_id_recurs__(
 	{
 		const mdcm::DataElement & de1 = *it;
 		mdcm::Tag t = de1.GetTag();
-		mdcm::VR vr = get_vr(ds, t, implicit, dicts);
+		mdcm::VR vr = DicomUtils::get_vr(ds, t, implicit, dicts);
 		mdcm::DataSet::Iterator dup = it;
 		++it;
 		const mdcm::DataElement & de = *dup;
@@ -482,7 +385,7 @@ static void remove_recurs__(
 		else
 		{
 			const mdcm::DataElement & de = *dup;
-			if (compatible_sq(const_cast<const mdcm::DataSet&>(ds), t, implicit, dicts))
+			if (DicomUtils::compatible_sq(const_cast<const mdcm::DataSet&>(ds), t, implicit, dicts))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 				if (sq && sq->GetNumberOfItems() > 0)
@@ -532,7 +435,7 @@ static void zero_sq_recurs__(
 		else
 		{
 			const mdcm::DataElement & de = *dup;
-			if (compatible_sq(const_cast<const mdcm::DataSet&>(ds), t, implicit, dicts))
+			if (DicomUtils::compatible_sq(const_cast<const mdcm::DataSet&>(ds), t, implicit, dicts))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 				if (sq && sq->GetNumberOfItems() > 0)
@@ -566,7 +469,7 @@ static void remove_date_time_recurs__(
 	{
 		const mdcm::DataElement & de1 = *it;
 		mdcm::Tag t = de1.GetTag();
-		mdcm::VR vr = get_vr(ds, t, implicit, dicts);
+		mdcm::VR vr = DicomUtils::get_vr(ds, t, implicit, dicts);
 		mdcm::DataSet::Iterator dup = it;
 		++it;
 		if (t == mdcm::Tag(0x0008,0x0021))
@@ -625,7 +528,7 @@ static bool find_time_less_1h_recurs__(
 	{
 		const mdcm::DataElement & de1 = *it;
 		mdcm::Tag t = de1.GetTag();
-		mdcm::VR vr = get_vr(ds, t, implicit, dicts);
+		mdcm::VR vr = DicomUtils::get_vr(ds, t, implicit, dicts);
 		mdcm::DataSet::ConstIterator dup = it;
 		++it;
 		if (is_date_time(vr, t))
@@ -723,7 +626,7 @@ static void modify_date_time_recurs__(
 	{
 		const mdcm::DataElement & de1 = *it;
 		mdcm::Tag t = de1.GetTag();
-		mdcm::VR vr = get_vr(ds, t, implicit, dicts);
+		mdcm::VR vr = DicomUtils::get_vr(ds, t, implicit, dicts);
 		mdcm::DataSet::Iterator dup = it;
 		++it;
 		if (is_date_time(vr, t))
@@ -995,7 +898,7 @@ static void empty_recurs__(
 		else
 		{
 			const mdcm::DataElement & de = *dup;
-			if (compatible_sq(const_cast<const mdcm::DataSet&>(ds), t, implicit, dicts))
+			if (DicomUtils::compatible_sq(const_cast<const mdcm::DataSet&>(ds), t, implicit, dicts))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 				if (sq && sq->GetNumberOfItems() > 0)
@@ -1036,7 +939,7 @@ static void remove_private__(
 		{
 			const mdcm::DataElement & de = *dup;
 			mdcm::Tag t = de.GetTag();
-			if (compatible_sq(const_cast<const mdcm::DataSet&>(ds), t, implicit, dicts))
+			if (DicomUtils::compatible_sq(const_cast<const mdcm::DataSet&>(ds), t, implicit, dicts))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 				if (sq && sq->GetNumberOfItems() > 0)
@@ -1146,7 +1049,7 @@ static void remove_group_length__(
 		{
 			const mdcm::DataElement & de = *dup;
 			mdcm::Tag t = de.GetTag();
-			if (compatible_sq(const_cast<const mdcm::DataSet&>(ds), t, implicit, dicts))
+			if (DicomUtils::compatible_sq(const_cast<const mdcm::DataSet&>(ds), t, implicit, dicts))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 				if (sq && sq->GetNumberOfItems() > 0)
@@ -2229,7 +2132,7 @@ static void find_pn_recurs__(
 	{
 		const mdcm::DataElement & de = *it;
 		mdcm::Tag t = de.GetTag();
-		mdcm::VR vr = get_vr(ds, t, implicit, dicts);
+		mdcm::VR vr = DicomUtils::get_vr(ds, t, implicit, dicts);
 		++it;
 		if (vr == mdcm::VR::PN)
 		{
@@ -2276,7 +2179,7 @@ static void find_uids_recurs__(
 		}
 		else
 		{
-			if (compatible_sq(const_cast<const mdcm::DataSet&>(ds), t, implicit, dicts))
+			if (DicomUtils::compatible_sq(const_cast<const mdcm::DataSet&>(ds), t, implicit, dicts))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 				if (sq && sq->GetNumberOfItems() > 0)
@@ -2316,7 +2219,7 @@ static void find_ids_recurs__(
 		}
 		else
 		{
-			if (compatible_sq(const_cast<const mdcm::DataSet&>(ds), t, implicit, dicts))
+			if (DicomUtils::compatible_sq(const_cast<const mdcm::DataSet&>(ds), t, implicit, dicts))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 				if (sq && sq->GetNumberOfItems() > 0)
@@ -2332,13 +2235,6 @@ static void find_ids_recurs__(
 			}
 		}
 	}
-}
-
-static QString generate_uid()
-{
-	mdcm::UIDGenerator g;
-	const QString r = QString::fromLatin1(g.Generate());
-	return r;
 }
 
 static void build_maps(
@@ -2416,7 +2312,7 @@ static void build_maps(
 			pd->setValue(-1);
 			if (pd->wasCanceled()) return;
 			const QString s = it0.next();
-			const QString v = generate_uid();
+			const QString v = DicomUtils::generate_uid();
 			m0[s] = v;
 			//std::cout << s.toStdString() << " --> " << v.toStdString() << std::endl;
 		}

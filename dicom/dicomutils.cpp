@@ -11153,6 +11153,110 @@ QString DicomUtils::read_enhct_info(
 	return s;
 }
 
+mdcm::VR DicomUtils::get_vr(
+	const mdcm::DataSet & ds,
+	const mdcm::Tag & t,
+	const bool implicit,
+	const mdcm::Dicts & dicts)
+{
+	mdcm::VR vr = mdcm::VR::INVALID;
+	bool priv = false;
+	if (t.IsIllegal())
+	{
+		return vr; //
+	}
+	else if (t.IsPrivateCreator())
+	{
+		if (!implicit)
+		{
+			if (ds.FindDataElement(t))
+			{
+				vr = ds.GetDataElement(t).GetVR();
+			}
+		}
+		else
+		{
+			vr = mdcm::VR::LO; //
+		}
+	}
+	else if (t.IsPrivate())
+	{
+		priv = true;
+	}
+	if (!priv)
+	{
+		if (!implicit)
+		{
+			if (ds.FindDataElement(t))
+			{
+				vr = ds.GetDataElement(t).GetVR();
+			}
+			else
+			{
+				const mdcm::DictEntry & dictentry = dicts.GetDictEntry(t);
+				vr = dictentry.GetVR();
+			}
+		}
+		else
+		{
+			const mdcm::DictEntry & dictentry = dicts.GetDictEntry(t);
+			vr = dictentry.GetVR();
+		}
+	}
+	else
+	{
+		if (!implicit)
+		{
+			vr = ds.GetDataElement(t).GetVR();
+		}
+		else
+		{
+			const mdcm::PrivateDict & pdict = dicts.GetPrivateDict();
+			mdcm::Tag private_creator_t = t.GetPrivateCreator();
+			if (ds.FindDataElement(private_creator_t))
+			{
+				const mdcm::DataElement & private_creator_e =
+					ds.GetDataElement(private_creator_t);
+				if (!private_creator_e.IsEmpty() &&
+					!private_creator_e.IsUndefinedLength() &&
+					private_creator_e.GetByteValue())
+				{
+					const QString private_creator =
+						QString::fromLatin1(
+							private_creator_e.GetByteValue()->GetPointer(),
+							private_creator_e.GetByteValue()->GetLength());
+					mdcm::PrivateTag pt(
+						t.GetGroup(),
+						t.GetElement(),
+						private_creator.toLatin1().constData());
+					const mdcm::DictEntry & pentry = pdict.GetDictEntry(pt);
+					vr = pentry.GetVR();
+				}
+			}
+		}
+	}
+	return vr;
+}
+
+bool DicomUtils::compatible_sq(
+	const mdcm::DataSet & ds,
+	const mdcm::Tag & t,
+	const bool implicit,
+	const mdcm::Dicts & dicts)
+{
+	if (t.IsIllegal()) return false;
+	mdcm::VR vr = get_vr(ds, t, implicit, dicts);
+	if (vr.Compatible(mdcm::VR::SQ)) return true;
+	return false;
+}
+
+QString DicomUtils::generate_uid()
+{
+	mdcm::UIDGenerator g;
+	const QString r = QString::fromLatin1(g.Generate());
+	return r;
+}
+
 typedef struct
 {
 	int rows;

@@ -11,6 +11,8 @@
 #include <mdcmDataSet.h>
 #include <mdcmPixelFormat.h>
 #include <mdcmPhotometricInterpretation.h>
+#include <mdcmVR.h>
+#include <mdcmDicts.h>
 
 class GLWidget;
 class ShaderObj;
@@ -371,6 +373,17 @@ public:
 		const mdcm::DataSet&);
 	static void global_force_suppllut(
 		short);
+	static mdcm::VR get_vr(
+		const mdcm::DataSet &,
+		const mdcm::Tag&,
+		const bool,
+		const mdcm::Dicts&);
+	static bool compatible_sq(
+		const mdcm::DataSet&,
+		const mdcm::Tag&,
+		const bool,
+		const mdcm::Dicts&);
+	static QString generate_uid();
 	//
 	// Type of object processing
 	//
