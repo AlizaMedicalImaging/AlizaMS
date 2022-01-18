@@ -27,8 +27,6 @@
 namespace mdcm
 {
 
-#ifdef MDCM_WORDS_BIGENDIAN
-
 /*
 In the default case of Little Endian encoding, Big Endian Machines
 interpreting Data Sets shall do 'byte swapping' before interpreting
@@ -54,6 +52,15 @@ an 8-byte Data Element with VR of FD, might be written in
 hexadecimal as 68AF4B2CH, but encoded in Little Endian would
 be 2C4BAF68H.
 */
+
+/*
+Example: A Data Element Tag of (0018,00FF) would be encoded
+as a series of 4 bytes in a Little-Endian Transfer Syntax
+as 18H,00H,FFH,00H.
+*/
+
+
+#ifdef MDCM_WORDS_BIGENDIAN
 
 class SwapperDoOp
 {
