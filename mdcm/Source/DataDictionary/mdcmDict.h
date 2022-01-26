@@ -76,7 +76,9 @@ public:
     MapDictEntry::size_type s = DictInternal.size();
 #endif
     DictInternal.insert(MapDictEntry::value_type(tag, de));
+#ifndef NDEBUG
     assert(s < DictInternal.size());
+#endif
   }
 
   const DictEntry &
@@ -182,7 +184,9 @@ public:
     MapDictEntry::size_type s = DictInternal.size();
 #endif
     DictInternal.insert(MapDictEntry::value_type(tag, de));
+#ifndef NDEBUG
     assert(s < DictInternal.size());
+#endif
   }
 
   bool
