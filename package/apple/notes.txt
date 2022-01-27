@@ -1,13 +1,18 @@
-Qt 6.2.2 is required
+Example
+
+-----------------------------
+
+Qt 6.2.2 or newer is required
 
 export PATH to Qt's bin folder
 
 -----------------------------
 
+arm64 on arm64
+
 /Applications/CMake.app/Contents/bin/cmake -DBUILD_TESTING:BOOL=OFF -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_CONFIGURATION_TYPES:STRING=Release -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=11 ../ITK
 
 /Applications/CMake.app/Contents/bin/cmake -DALIZA_QT_VERSION:STRING=6 -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_CONFIGURATION_TYPES:STRING=Release -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=11 -DITK_DIR:STRING="/Users/mi/mitk/barm64" ../AlizaMS
-
 
 -----------------------------
 
@@ -17,11 +22,30 @@ x86_64 on arm64
 
 /Applications/CMake.app/Contents/bin/cmake -DALIZA_QT_VERSION:STRING=6 -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_CONFIGURATION_TYPES:STRING=Release -DCMAKE_APPLE_SILICON_PROCESSOR:STRING=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.15 -DITK_DIR:STRING="/Users/mi/mitk/bx86_64" ../AlizaMS
 
+-----------------------------
+
+optionally strip both 'AlizaMS.app/Contents/MacOS/AlizaMS'
 
 -----------------------------
 
-macdeployqt AlizaMS.app
+'macdeployqt AlizaMS.app' (both)
+
+remove postgre and obdc plugins (not required) in 'AlizaMS.app/Contents/PlugIns/sqldrivers'
 
 -----------------------------
 
+lipo
 
+copy e.g. arm64 app to e.g. folder 'universal', delete 'AlizaMS.app/Contents/MacOS/AlizaMS' binary
+
+lipo -create barm64/AlizaMS.app/Contents/MacOS/AlizaMS bx86_64/AlizaMS.app/Contents/MacOS/AlizaMS -output universal/AlizaMS.app/Contents/MacOS/AlizaMS
+
+-----------------------------
+
+optionally add stuff to Resources
+
+-----------------------------
+
+optionally sing and notarize
+
+-----------------------------
