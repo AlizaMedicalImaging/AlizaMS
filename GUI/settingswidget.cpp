@@ -116,7 +116,7 @@ void SettingsWidget::set_default()
 #endif
 	styleComboBox->setCurrentIndex(0);
 	gl3D_checkBox->setChecked(true);
-	si_doubleSpinBox->setValue(1.0);
+	si_doubleSpinBox->setValue(1.2);
 	original_radioButton->setChecked(true);
 	resample_radioButton->setChecked(false);
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
