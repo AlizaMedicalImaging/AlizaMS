@@ -975,7 +975,7 @@ void SQtree::read_file(const QString & f, const bool use_lock)
 		ok = reader.Read();
 		if (!ok)
 		{
-			ms_lineEdit->setText(QString("Error: file is not DICOM or broken."));
+			ms_lineEdit->setText(QString("Error: can not process the file."));
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
 			if (lock) mutex.unlock();
 #endif

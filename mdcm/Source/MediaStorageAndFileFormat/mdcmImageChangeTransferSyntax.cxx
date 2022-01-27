@@ -27,6 +27,7 @@
 #include "mdcmPixmap.h"
 #include "mdcmBitmap.h"
 #include "mdcmRAWCodec.h"
+#include "mdcmEncapsulatedRAWCodec.h"
 #include "mdcmJPEGCodec.h"
 #include "mdcmJPEGLSCodec.h"
 #include "mdcmJPEG2000Codec.h"
@@ -138,6 +139,8 @@ ImageChangeTransferSyntax::Change()
       success = TryJPEG2000Codec(pixeldata, *Input, *Output);
     if (!success)
       success = TryRLECodec(pixeldata, *Input, *Output);
+    if (!success)
+      success = TryEncapsulatedRAWCodec(pixeldata, *Input, *Output);
     Output->SetTransferSyntax(TS);
     if (!success)
     {
@@ -178,6 +181,8 @@ ImageChangeTransferSyntax::Change()
           success = TryJPEG2000Codec(iconpixeldata, pixmap->GetIconImage(), outpixmap->GetIconImage());
         if (!success)
           success = TryRLECodec(iconpixeldata, pixmap->GetIconImage(), outpixmap->GetIconImage());
+        if (!success)
+          success = TryEncapsulatedRAWCodec(iconpixeldata, pixmap->GetIconImage(), outpixmap->GetIconImage());
         outpixmap->GetIconImage().SetTransferSyntax(TS);
         if (!success)
         {
@@ -200,6 +205,8 @@ ImageChangeTransferSyntax::Change()
     success = TryJPEGLSCodec(Input->GetDataElement(), *Input, *Output);
   if (!success)
     success = TryRLECodec(Input->GetDataElement(), *Input, *Output);
+  if (!success)
+    success = TryEncapsulatedRAWCodec(Input->GetDataElement(), *Input, *Output);
   Output->SetTransferSyntax(TS);
   if (!success)
   {
@@ -230,6 +237,9 @@ ImageChangeTransferSyntax::Change()
       if (!success)
         success =
           TryRLECodec(pixmap->GetIconImage().GetDataElement(), pixmap->GetIconImage(), outpixmap->GetIconImage());
+      if (!success)
+        success =
+          TryEncapsulatedRAWCodec(pixmap->GetIconImage().GetDataElement(), pixmap->GetIconImage(), outpixmap->GetIconImage());
       outpixmap->GetIconImage().SetTransferSyntax(TS);
       if (!success)
         return false;
@@ -264,6 +274,45 @@ ImageChangeTransferSyntax::TryRAWCodec(const DataElement & pixelde, Bitmap const
       if (ForceYBRFull ||
           (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL) ||
           (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422))
+      {
+        output.SetPhotometricInterpretation(PhotometricInterpretation::YBR_FULL);
+      }
+      else
+      {
+        output.SetPhotometricInterpretation(PhotometricInterpretation::RGB);
+      }
+    }
+    return true;
+  }
+  return false;
+}
+
+bool
+ImageChangeTransferSyntax::TryEncapsulatedRAWCodec(const DataElement & pixelde, Bitmap const & input, Bitmap & output)
+{
+  const ByteValue * bv = pixelde.GetByteValue();
+  if (!bv)
+    return false;
+  const char * buffer = bv->GetPointer();
+  const unsigned long long len = bv->GetLength();
+  const TransferSyntax & ts = GetTransferSyntax();
+  EncapsulatedRAWCodec   codec;
+  if (codec.CanCode(ts))
+  {
+    codec.SetDimensions(input.GetDimensions());
+    codec.SetPlanarConfiguration(input.GetPlanarConfiguration());
+    codec.SetPhotometricInterpretation(input.GetPhotometricInterpretation());
+    codec.SetPixelFormat(input.GetPixelFormat());
+    codec.SetNeedOverlayCleanup(input.AreOverlaysInPixelData() || input.UnusedBitsPresentInPixelData());
+    DataElement out;
+    if (!codec.Code(buffer, len, out))
+      return false;
+    DataElement & de = output.GetDataElement();
+    de.SetValue(out.GetValue());
+    if (input.GetPixelFormat().GetSamplesPerPixel() == 3)
+    {
+      if (ForceYBRFull ||
+          (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL))
       {
         output.SetPhotometricInterpretation(PhotometricInterpretation::YBR_FULL);
       }

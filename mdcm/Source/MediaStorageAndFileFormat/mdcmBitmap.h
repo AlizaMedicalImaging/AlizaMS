@@ -130,27 +130,29 @@ protected:
   bool
   ComputeLossyFlag();
   bool
-  TryRAWCodec(char * buffer, bool & lossyflag) const;
+  TryRAWCodec(char *, bool &) const;
   bool
-  TryJPEGCodec(char * buffer, bool & lossyflag) const;
+  TryEncapsulatedRAWCodec(char *, bool &) const;
   bool
-  TryJPEGCodec2(std::ostream & os) const;
+  TryJPEGCodec(char *, bool &) const;
   bool
-  TryJPEGCodec3(char * buffer, bool & lossyflag) const;
+  TryJPEGCodec2(std::ostream &) const;
   bool
-  TryPVRGCodec(char * buffer, bool & lossyflag) const;
+  TryJPEGCodec3(char *, bool &) const;
   bool
-  TryJPEGLSCodec(char * buffer, bool & lossyflag) const;
+  TryPVRGCodec(char *, bool &) const;
   bool
-  TryJPEGLSCodec2(char * buffer, bool & lossyflag) const;
+  TryJPEGLSCodec(char *, bool &) const;
   bool
-  TryJPEG2000Codec(char * buffer, bool & lossyflag) const;
+  TryJPEGLSCodec2(char *, bool &) const;
   bool
-  TryJPEG2000Codec2(std::ostream & os) const;
+  TryJPEG2000Codec(char *, bool &) const;
   bool
-  TryJPEG2000Codec3(char * buffer, bool & lossyflag) const;
+  TryJPEG2000Codec2(std::ostream &) const;
   bool
-  TryRLECodec(char * buffer, bool & lossyflag) const;
+  TryJPEG2000Codec3(char *, bool &) const;
+  bool
+  TryRLECodec(char *, bool &) const;
   unsigned int                      PlanarConfiguration;
   unsigned int                      NumberOfDimensions;
   TransferSyntax                    TS;

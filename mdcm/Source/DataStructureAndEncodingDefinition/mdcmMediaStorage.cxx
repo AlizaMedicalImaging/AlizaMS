@@ -202,30 +202,48 @@ MediaStorage::GetString() const
   return GetMSString(MSField);
 }
 
-// FIXME
-// Currently the implementation is bogus it only define the TS which
-// are associated with an image so indeed the implementation of IsImage
-// is only the verification of TSType is != TS_END
+// clang-format off
 bool
 MediaStorage::IsImage(MSType ms)
 {
-  if (ms == MS_END // most frequent first, lexicographical order then
-      || ms == BasicVoiceAudioWaveformStorage || ms == CSANonImageStorage || ms == HemodynamicWaveformStorage ||
-      ms == MediaStorageDirectoryStorage || ms == RTPlanStorage ||
-      ms == GrayscaleSoftcopyPresentationStateStorageSOPClass || ms == CardiacElectrophysiologyWaveformStorage ||
-      ms == ToshibaPrivateDataStorage // ?
-      || ms == EnhancedSR || ms == BasicTextSR || ms == ComprehensiveSR || ms == StudyComponentManagementSOPClass ||
-      ms == DetachedVisitManagementSOPClass || ms == DetachedStudyManagementSOPClass || ms == EncapsulatedPDFStorage ||
-      ms == EncapsulatedCDAStorage || ms == XRayRadiationDoseSR || ms == KeyObjectSelectionDocument ||
-      ms == HangingProtocolStorage || ms == MRSpectroscopyStorage || ms == ModalityPerformedProcedureStepSOPClass ||
-      ms == RawDataStorage || ms == RTIonPlanStorage || ms == LeadECGWaveformStorage ||
-      ms == GeneralECGWaveformStorage || ms == RTIonBeamsTreatmentRecordStorage || ms == RTStructureSetStorage ||
-      ms == MammographyCADSR || ms == SurfaceSegmentationStorage || ms == SurfaceScanMeshStorage)
+// FIXME
+  if (ms == MS_END ||
+      ms == BasicVoiceAudioWaveformStorage ||
+      ms == CSANonImageStorage ||
+      ms == HemodynamicWaveformStorage ||
+      ms == MediaStorageDirectoryStorage ||
+      ms == RTPlanStorage ||
+      ms == GrayscaleSoftcopyPresentationStateStorageSOPClass ||
+      ms == CardiacElectrophysiologyWaveformStorage ||
+      ms == ToshibaPrivateDataStorage ||
+      ms == EnhancedSR ||
+      ms == BasicTextSR ||
+      ms == ComprehensiveSR ||
+      ms == StudyComponentManagementSOPClass ||
+      ms == DetachedVisitManagementSOPClass ||
+      ms == DetachedStudyManagementSOPClass ||
+      ms == EncapsulatedPDFStorage ||
+      ms == EncapsulatedCDAStorage ||
+      ms == XRayRadiationDoseSR ||
+      ms == KeyObjectSelectionDocument ||
+      ms == HangingProtocolStorage ||
+      ms == MRSpectroscopyStorage ||
+      ms == ModalityPerformedProcedureStepSOPClass ||
+      ms == RawDataStorage ||
+      ms == RTIonPlanStorage ||
+      ms == LeadECGWaveformStorage ||
+      ms == GeneralECGWaveformStorage ||
+      ms == RTIonBeamsTreatmentRecordStorage ||
+      ms == RTStructureSetStorage ||
+      ms == MammographyCADSR ||
+      ms == SurfaceSegmentationStorage ||
+      ms == SurfaceScanMeshStorage)
   {
     return false;
   }
   return true;
 }
+// clang-format on
 
 struct MSModalityType
 {
@@ -515,7 +533,7 @@ MediaStorage::SetFromModality(DataSet const & ds)
   if (MSField == MediaStorage::MS_END)
   {
     // Return a default SC Object
-    mdcmWarningMacro("Unknown/Unhandle MediaStorage, but Pixel Data element found");
+    mdcmWarningMacro("Unknown MediaStorage, but Pixel Data element found");
     MSField = MediaStorage::SecondaryCaptureImageStorage;
     return false;
   }

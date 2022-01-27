@@ -1950,7 +1950,7 @@ static void anonymize_file__(
 	impl_uid.SetValue(impl_uid_s.toLatin1().constData());
 	header.Replace(impl_uid.GetAsDataElement());
 
-	QString name_s = QString("AlizaMS ") +
+	QString name_s = QString("ALIZAMS") +
 		QVariant(ALIZAMS_VERSION).toString();
 	if (name_s.length()%2!=0) name_s.append(QString(" "));
 	mdcm::Attribute<0x0002,0x0013, mdcm::VR::SH> impl_name;

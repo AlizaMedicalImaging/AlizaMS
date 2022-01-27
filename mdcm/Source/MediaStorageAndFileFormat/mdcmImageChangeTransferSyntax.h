@@ -75,6 +75,8 @@ protected:
   bool
   TryRAWCodec(const DataElement &, Bitmap const &, Bitmap &);
   bool
+  TryEncapsulatedRAWCodec(const DataElement &, Bitmap const &, Bitmap &);
+  bool
   TryRLECodec(const DataElement &, Bitmap const &, Bitmap &);
   bool
   TryJPEGCodec(const DataElement &, Bitmap const &, Bitmap &);

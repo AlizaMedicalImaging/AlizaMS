@@ -688,9 +688,8 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
     }
     else
     {
-      mdcmWarningMacro("Cannot recognize image type. Does not looks like"
-                       "ACR-NEMA and is missing both Sample Per Pixel AND PhotometricInterpretation."
-                       "Please report");
+      mdcmAlwaysWarnMacro("Cannot recognize image type. Does not looks like ACR-NEMA and "
+                          "is missing both Sample Per Pixel AND PhotometricInterpretation.");
       return false;
     }
   }
@@ -715,9 +714,11 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
     Attribute<0x0028, 0x0006> at = { 0 };
     at.SetFromDataElement(de);
     unsigned int pc = at.GetValue();
-    if (pc && PixelData->GetPixelFormat().GetSamplesPerPixel() != 3)
+    if (pc &&
+        (PixelData->GetPixelFormat().GetSamplesPerPixel() != 3 ||
+         PixelData->GetPixelFormat().GetSamplesPerPixel() != 4))
     {
-      mdcmDebugMacro("Cannot have PlanarConfiguration=1, when Sample Per Pixel != 3");
+      mdcmDebugMacro("Cannot have PlanarConfiguration = 1");
       pc = 0;
     }
     PixelData->SetPlanarConfiguration(pc);

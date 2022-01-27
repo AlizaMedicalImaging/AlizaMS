@@ -66,7 +66,7 @@ public:
     MPEG2MainProfileHighLevel,
     MPEG4AVCH264HighProfileLevel4_1,
     MPEG4AVCH264BDcompatibleHighProfileLevel4_1,
-    //EncapsulatedUncompressedExplicitVRLittleEndian,
+    EncapsulatedUncompressedExplicitVRLittleEndian,
     TS_END
   } TSType;
   static const char * GetTSString(TSType);

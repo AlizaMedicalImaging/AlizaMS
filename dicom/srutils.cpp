@@ -42,7 +42,7 @@ template<typename Tin, typename Tout> QString gs3(
 	typename Tin::IndexType index = inRegion.GetIndex();
 	typename Tin::RegionType outRegion;
 	typename Tin::SizeType out_size;
-	if (idx >= (int)size[2])
+	if (idx >= static_cast<int>(size[2]))
 	{
 		return QString("gs3<>() : invalid index");
 	}
@@ -98,10 +98,10 @@ template<typename T> SRImage li3(
 	const int tmp99 = size[1]%num_threads;
 	const double center = ivariant->di->us_window_center;
 	const double width  = ivariant->di->us_window_width;
-	if (tmp99==0)
+	if (tmp99 == 0)
 	{
-		int j=0;
-		for (int i = 0; i < num_threads; ++i)
+		int j = 0;
+		for (int i = 0; i<num_threads; ++i)
 		{
 			const int size_0 = size[0];
 			const int size_1 = size[1]/num_threads;
@@ -124,10 +124,10 @@ template<typename T> SRImage li3(
 		unsigned int block = 64;
 		if (static_cast<float>(size[1])/static_cast<float>(block)>16.0f) block=128;
 		const int tmp100 = size[1]%block;
-		const int incr = (int)floor(size[1]/(double)block);
+		const int incr = static_cast<int>(floor(size[1]/static_cast<double>(block)));
 		if (size[1] > block)
 		{
-			for (int i = 0; i < incr; ++i)
+			for (int i=0; i<incr; ++i)
 			{
 				const int size_0 = size[0];
 				const int index_0 = 0;
@@ -172,9 +172,9 @@ template<typename T> SRImage li3(
 		{
 			if (threadsLUT_.at(i)->isFinished()) { ++b__; }
 		}
-		if (b__==threadsLUT_size) break;
+		if (b__ == threadsLUT_size) break;
 	}
-	for (int i=0; i < threadsLUT_size; ++i)
+	for (int i = 0; i < threadsLUT_size; ++i)
 	{
 		delete threadsLUT_[i];
 	}
@@ -223,13 +223,13 @@ template<typename T> SRImage lrgb3(
 			{
 				p__[j_ + 2] =
 					static_cast<unsigned char>(
-						((double)iterator.Get().GetBlue()  / tmp_max) * 255.0);
+						(static_cast<double>(iterator.Get().GetBlue()) / tmp_max) * 255.0);
 				p__[j_ + 1] =
 					static_cast<unsigned char>(
-						((double)iterator.Get().GetGreen() / tmp_max) * 255.0);
+						(static_cast<double>(iterator.Get().GetGreen()) / tmp_max) * 255.0);
 				p__[j_ + 0] =
 					static_cast<unsigned char>(
-						((double)iterator.Get().GetRed()   / tmp_max) * 255.0);
+						(static_cast<double>(iterator.Get().GetRed()) / tmp_max) * 255.0);
 				j_ += 3;
 				++iterator;
 			}
@@ -247,7 +247,7 @@ template<typename T> SRImage lrgb3(
 		const double vmin = ivariant->di->vmin;
 		const double vmax = ivariant->di->vmax;
 		const double vrange = vmax - vmin;
-		if (vrange!=0)
+		if (vrange != 0)
 		{
 			try
 			{
@@ -628,11 +628,11 @@ endpoints of the minor axis of an ellipse
 								{
 									if (
 										(!itk::Math::FloatAlmostEqual<float>(
-											(float)tmp__0,
-											(float)sg.GraphicData.at(yyy))) ||
+											static_cast<float>(tmp__0),
+											static_cast<float>(sg.GraphicData.at(yyy)))) ||
 										(!itk::Math::FloatAlmostEqual<float>(
-											(float)tmp__1,
-											(float)sg.GraphicData.at(yyy+1)))
+											static_cast<float>(tmp__1),
+											static_cast<float>(sg.GraphicData.at(yyy+1))))
 										)
 									{
 										check_single_point = false;
@@ -779,8 +779,8 @@ endpoints of the minor axis of an ellipse
 						}
 					}
 					if (!itk::Math::FloatAlmostEqual<float>(
-						(float)pm.sx,
-						(float)pm.sy))
+						static_cast<float>(pm.sx),
+						static_cast<float>(pm.sy)))
 					{
 						double coeff_size_0 = 1.0;
 						double coeff_size_1 = 1.0;
@@ -789,8 +789,8 @@ endpoints of the minor axis of an ellipse
 						const double ix = pm.i.width()  * coeff_size_0;
 						const double iy = pm.i.height() * coeff_size_1;
 						QImage si = pm.i.scaled(
-							(int)(ix + 0.5),
-							(int)(iy + 0.5),
+							static_cast<int>(ix + 0.5),
+							static_cast<int>(iy + 0.5),
 							Qt::IgnoreAspectRatio,
 							Qt::SmoothTransformation);
 						pm.i = si;

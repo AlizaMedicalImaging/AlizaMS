@@ -822,7 +822,7 @@ ImageHelper::GetRescaleInterceptSlopeValue(File const & f)
       ms == MediaStorage::PETImageStorage || ms == MediaStorage::SecondaryCaptureImageStorage ||
       ms == MediaStorage::MultiframeGrayscaleWordSecondaryCaptureImageStorage ||
       ms == MediaStorage::MultiframeGrayscaleByteSecondaryCaptureImageStorage ||
-      ms == MediaStorage::DCMTKUnknownStorage || ForceRescaleInterceptSlope)
+      ForceRescaleInterceptSlope)
   {
     bool b = GetRescaleInterceptSlopeValueFromDataSet(ds, interceptslope);
     if (!b)

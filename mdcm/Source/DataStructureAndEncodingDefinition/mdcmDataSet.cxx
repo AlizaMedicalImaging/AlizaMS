@@ -21,6 +21,7 @@
 =========================================================================*/
 #include "mdcmDataSet.h"
 #include "mdcmPrivateTag.h"
+#include "mdcmSystem.h"
 
 namespace mdcm
 {
@@ -239,7 +240,7 @@ DataSet::InsertDataElement(const DataElement & de)
 Tag
 DataSet::ComputeDataElement(const PrivateTag & t) const
 {
-  mdcmDebugMacro("Entering ComputeDataElement");
+  mdcmDebugMacro("ComputeDataElement, tag " << t);
   // First private creator (0x0 -> 0x9 are reserved...)
   const Tag         start(t.GetGroup(), 0x0010);
   const DataElement r(start);
@@ -255,7 +256,7 @@ DataSet::ComputeDataElement(const PrivateTag & t) const
       std::string tmp(bv->GetPointer(), bv->GetLength());
       // trim trailing whitespaces
       tmp.erase(tmp.find_last_not_of(' ') + 1);
-      assert(tmp.size() == 0 || tmp[tmp.size() - 1] != ' '); // FIXME
+      assert(tmp.size() == 0 || tmp[tmp.size() - 1] != ' ');
       if (System::StrCaseCmp(tmp.c_str(), refowner) == 0)
       {
         found = true;
@@ -264,13 +265,13 @@ DataSet::ComputeDataElement(const PrivateTag & t) const
     }
     ++it;
   }
-  mdcmDebugMacro("In compute found is:" << found);
+  mdcmDebugMacro("In ComputeDataElement found = " << found);
   if (!found)
     return Tag(0xffff, 0xffff);
   // we found the Private Creator, let's construct the proper data element
   Tag copy = t;
   copy.SetPrivateCreator(it->GetTag());
-  mdcmDebugMacro("Compute found:" << copy);
+  mdcmDebugMacro("In ComputeDataElement copy = " << copy);
   return copy;
 }
 

@@ -23,6 +23,7 @@
 #include "mdcmBitmap.h"
 #include "mdcmSequenceOfFragments.h"
 #include "mdcmRAWCodec.h"
+#include "mdcmEncapsulatedRAWCodec.h"
 #include "mdcmJPEGCodec.h"
 #include "mdcmPVRGCodec.h"
 #include "mdcmJPEGLSCodec.h"
@@ -462,6 +463,51 @@ Bitmap::TryRAWCodec(char * buffer, bool & lossyflag) const
       mdcmDebugMacro("Pixel Length " << bv->GetLength() << " is different from computed value " << len);
     }
     return r;
+  }
+  return false;
+}
+
+bool
+Bitmap::TryEncapsulatedRAWCodec(char * buffer, bool & lossyflag) const
+{
+  EncapsulatedRAWCodec   codec;
+  const TransferSyntax & ts = GetTransferSyntax();
+  if (!buffer)
+  {
+    if (codec.CanDecode(ts))
+    {
+      lossyflag = false;
+    }
+    return false;
+  }
+  const SequenceOfFragments * sf = PixelData.GetSequenceOfFragments();
+  if (!sf)
+  {
+    mdcmAlwaysWarnMacro("EncapsulatedRAWCodec: SequenceOfFragments is NULL");
+    return false;
+  }
+  if (codec.CanDecode(ts))
+  {
+    unsigned long long len = GetBufferLength();
+    codec.SetNumberOfDimensions(GetNumberOfDimensions());
+    codec.SetDimensions(GetDimensions());
+    codec.SetPlanarConfiguration(GetPlanarConfiguration());
+    codec.SetPhotometricInterpretation(GetPhotometricInterpretation());
+    codec.SetLUT(GetLUT());
+    codec.SetPixelFormat(GetPixelFormat());
+    codec.SetNeedByteSwap(GetNeedByteSwap());
+    codec.SetNeedOverlayCleanup(AreOverlaysInPixelData() ||
+                                (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
+    DataElement out;
+    const bool  r = codec.Decode2(PixelData, buffer, len);
+    if (!r)
+      return false;
+    if (GetNeedByteSwap())
+    {
+      // TODO
+      return false;
+    }
+    return true;
   }
   return false;
 }
@@ -1195,6 +1241,8 @@ Bitmap::GetBufferInternal(char * buffer, bool & lossyflag) const
 #endif
   if (!success)
     success = TryRLECodec(buffer, lossyflag);
+  if (!success)
+    success = TryEncapsulatedRAWCodec(buffer, lossyflag);
   return success;
 }
 #ifdef DATA_MORE_THAN_4GB

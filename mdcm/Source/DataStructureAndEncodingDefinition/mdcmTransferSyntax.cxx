@@ -48,7 +48,7 @@ static const char * TSStrings[] = {
   "1.2.840.10008.1.2.4.101",    // MPEG2 Main Profile @ High Level
   "1.2.840.10008.1.2.4.102",    // MPEG-4 AVC/H.264 High Profile / Level 4.1
   "1.2.840.10008.1.2.4.103",    // MPEG-4 AVC/H.264 BD-compatible High Profile / Level 4.1
-  //"1.2.840.10008.1.2.1.98",     // Encapsulated Uncompressed Explicit VR Little Endian
+  "1.2.840.10008.1.2.1.98",     // Encapsulated Uncompressed Explicit VR Little Endian
   "Unknown Transfer Syntax",    // Unknown
   NULL
 };
@@ -61,7 +61,7 @@ TransferSyntax::GetTSType(const char * cstr)
   std::string::size_type notspace = str.find_last_not_of(" ") + 1;
   if (notspace != str.size())
   {
-    mdcmDebugMacro("BUGGY HEADER: TS contains " << str.size() - notspace << " whitespace character(s)");
+    mdcmDebugMacro("Header (TS) constains " << str.size() - notspace << " whitespace character(s)");
     str.erase(notspace);
   }
   int i = 0;
@@ -204,7 +204,7 @@ TransferSyntax::IsEncapsulated() const
     case MPEG2MainProfileHighLevel:
     case MPEG4AVCH264HighProfileLevel4_1:
     case MPEG4AVCH264BDcompatibleHighProfileLevel4_1:
-    //case EncapsulatedUncompressedExplicitVRLittleEndian: TODO
+    case EncapsulatedUncompressedExplicitVRLittleEndian:
       r = true;
       break;
     default:
