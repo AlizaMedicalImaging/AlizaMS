@@ -1943,16 +1943,17 @@ static void anonymize_file__(
 	*ok = true;
 	//
 	mdcm::Attribute<0x0002,0x0012, mdcm::VR::UI> impl_uid;
-	const QString impl_uid_s =
+	QString impl_uid_s =
 		QVariant(ALIZAMS_ROOT_UID).toString() +
 		QString(".0.0.0.0.") +
 		QVariant(ALIZAMS_VERSION).toString();
+	if ((impl_uid_s.size() % 2) != 0) impl_uid_s.append(QChar('\0'));
 	impl_uid.SetValue(impl_uid_s.toLatin1().constData());
 	header.Replace(impl_uid.GetAsDataElement());
 
 	QString name_s = QString("ALIZAMS") +
 		QVariant(ALIZAMS_VERSION).toString();
-	if (name_s.length()%2!=0) name_s.append(QString(" "));
+	if ((name_s.length() % 2) != 0) name_s.append(QString(" "));
 	mdcm::Attribute<0x0002,0x0013, mdcm::VR::SH> impl_name;
 	impl_name.SetValue(name_s.toLatin1().constData());
 	header.Replace(impl_name.GetAsDataElement());

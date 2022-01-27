@@ -52,6 +52,10 @@ EncapsulatedRAWCodec::Code(const char * in, unsigned long long len, DataElement 
   }
   const size_t        frag_len = len / dims[2];
   const size_t        frag_len2 = (size_t)dims[0] * dims[1] * pf.GetSamplesPerPixel() * (pf.GetBitsAllocated() / 8);
+  if (frag_len > 0xffffffff)
+  {
+    mdcmAlwaysWarnMacro("fragment size is too big");
+  }
   if (frag_len != frag_len2)
   {
     mdcmAlwaysWarnMacro("frag_len != frag_len2, " << frag_len << " != " << frag_len2);
@@ -62,7 +66,7 @@ EncapsulatedRAWCodec::Code(const char * in, unsigned long long len, DataElement 
   {
     const char * data = in + j * frag_len;
     Fragment frag;
-    frag.SetByteValue(data, frag_len);
+    frag.SetByteValue(data, (unsigned int)frag_len);
     sq->AddFragment(frag);
   }
   if (sq->GetNumberOfFragments() != dims[2])
@@ -87,11 +91,11 @@ EncapsulatedRAWCodec::Decode2(DataElement const & in, char * out_buffer, unsigne
   const SequenceOfFragments * sf = in.GetSequenceOfFragments();
   if (!sf)
     return false;
-  const unsigned int n = sf->GetNumberOfFragments();
+  const size_t n = sf->GetNumberOfFragments();
   if (sf->GetNumberOfFragments() != Dimensions[2])
     return false;
   std::stringstream os;
-  for (unsigned int i = 0; i < n; ++i)
+  for (size_t i = 0; i < n; ++i)
   {
     const Fragment & frag = sf->GetFragment(i);
     if (frag.IsEmpty())

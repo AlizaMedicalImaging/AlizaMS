@@ -21,6 +21,7 @@
 =========================================================================*/
 
 #include "mdcmWriter.h"
+#include "mdcmSystem.h"
 #include "mdcmFileMetaInformation.h"
 #include "mdcmDataSet.h"
 #include "mdcmTrace.h"
