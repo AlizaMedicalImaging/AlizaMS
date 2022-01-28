@@ -366,18 +366,15 @@ EncodingImplementation<VR::VRASCII>::Write(const double * data, unsigned long le
 {
   if (!data || length < 1)
     return;
-  if (length > 1)
+  for (unsigned long i = 0; i < length; ++i)
   {
-    for (unsigned long i = 0; i < length; ++i)
-    {
-      char buf[17];
-      memset(buf, 0, 17);
-      ds16print(buf, data[i]);
-      if (i == 0)
-        _os << buf;
-      else
-        _os << "\\" << buf;
-    }
+    char buf[17];
+    memset(buf, 0, 17);
+    ds16print(buf, data[i]);
+    if (i == 0)
+      _os << buf;
+    else
+      _os << "\\" << buf;
   }
 }
 
