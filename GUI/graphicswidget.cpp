@@ -106,12 +106,45 @@ static void draw_contours(
 							editable);
 						if (editable)
 						{
-							pi_->setCursor(Qt::PointingHandCursor);
 							pi_->set_axis(2);
 							pi_->set_slice(idx);
+							pi_->setCursor(Qt::PointingHandCursor);
 						}
 						pi_->setPen(pen);
 						pi_->setPath(c->path);
+						widget->graphicsview->scene()->addItem(
+							static_cast<QGraphicsItem*>(pi_));
+						widget->graphicsview->paths.push_back(pi_);
+					}
+					else if (c->type == 4)
+					{
+						const double cw_ = widget->get_contours_width();
+						pen.setWidthF(cw_ < 1.0 ? 1.0 : cw_);
+						GraphicsPathItem * pi_ =
+							new GraphicsPathItem();
+						pi_->set_roi_id(ivariant->di->rois.at(x).id);
+						pi_->set_contour_id(c->id);
+						pi_->setFlag(
+							QGraphicsItem::ItemIsSelectable,
+							editable);
+						if (editable)
+						{
+							pi_->set_axis(2);
+							pi_->set_slice(idx);
+							pi_->setCursor(Qt::PointingHandCursor);
+						}
+						QPainterPath p;
+						for (int y = 0; y < c->dpoints.size(); ++y)
+						{
+							if (c->dpoints.at(y).t == idx)
+								p.addRect(
+									c->dpoints.at(y).u,
+									c->dpoints.at(y).v,
+									1.0,
+									1.0);
+						}
+						pi_->setPen(pen);
+						pi_->setPath(p);
 						widget->graphicsview->scene()->addItem(
 							static_cast<QGraphicsItem*>(pi_));
 						widget->graphicsview->paths.push_back(pi_);
@@ -127,18 +160,20 @@ static void draw_contours(
 							QGraphicsItem::ItemIsSelectable,
 							editable);
 						if (editable)
+						{
 							pi_->setCursor(Qt::PointingHandCursor);
-						pi_->setPen(pen);
+						}
 						QPainterPath p;
 						for (int y = 0; y < c->dpoints.size(); ++y)
 						{
 							if (c->dpoints.at(y).t == idx)
 								p.addRect(
-									c->dpoints.at(y).u-0.25f,
-									c->dpoints.at(y).v-0.25f,
-									0.5,
-									0.5);
+									c->dpoints.at(y).u,
+									c->dpoints.at(y).v,
+									1.0,
+									1.0);
 						}
+						pi_->setPen(pen);
 						pi_->setPath(p);
 						widget->graphicsview->scene()->addItem(
 							static_cast<QGraphicsItem*>(pi_));
