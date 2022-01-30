@@ -34,11 +34,15 @@ namespace mdcm
 class MDCM_EXPORT UIDs
 {
 public:
-  UIDs() {}
+  UIDs()
+  {
+    UIDField = (UIDType)0;
+  }
   ~UIDs() {}
 
   typedef enum
   {
+    uid_0 = 0,
     uid_1_2_840_10008_1_1 = 1,      // Verification SOP Class
     uid_1_2_840_10008_1_2 = 2,      // Implicit VR Little Endian: Default Transfer Syntax for DICOM
     uid_1_2_840_10008_1_2_1 = 3,    // Explicit VR Little Endian
@@ -550,6 +554,7 @@ public:
 
   typedef enum
   {
+    NullUID = 0,
     VerificationSOPClass = 1, // Verification SOP Class
     ImplicitVRLittleEndianDefaultTransferSyntaxforDICOM =
       2,                                // Implicit VR Little Endian: Default Transfer Syntax for DICOM

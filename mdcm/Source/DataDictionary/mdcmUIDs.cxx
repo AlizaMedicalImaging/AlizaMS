@@ -587,7 +587,7 @@ UIDs::SetFromUID(const char * str)
 {
   if (!str)
     return false;
-  UIDField = (UIDType)0;
+  UIDField = uid_0;
   UIDsStringsType uids = GetUIDsStrings();
   int             i = 1;
   const char *    p = uids[i][0];
