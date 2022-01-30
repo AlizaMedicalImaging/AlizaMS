@@ -34,10 +34,7 @@ namespace mdcm
 class MDCM_EXPORT UIDs
 {
 public:
-  UIDs()
-  {
-    UIDField = (UIDType)0;
-  }
+  UIDs();
   ~UIDs() {}
 
   typedef enum

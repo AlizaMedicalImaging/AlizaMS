@@ -550,6 +550,11 @@ const char * const UIDsStrings[][2] = {
   { NULL, NULL }
 };
 
+UIDs::UIDs()
+{
+  UIDField = uid_0;
+}
+
 unsigned int
 UIDs::GetNumberOfUIDsStrings()
 {
