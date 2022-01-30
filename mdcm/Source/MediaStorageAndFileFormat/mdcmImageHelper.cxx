@@ -998,16 +998,19 @@ ImageHelper::GetZSpacingTagFromMediaStorage(MediaStorage const & ms)
   Tag t;
   switch (ms)
   {
-    case MediaStorage::EnhancedUSVolumeStorage:
     case MediaStorage::MRImageStorage:
+    case MediaStorage::EnhancedUSVolumeStorage:
     case MediaStorage::NuclearMedicineImageStorage:
     case MediaStorage::GeneralElectricMagneticResonanceImageStorage:
       t = Tag(0x0018, 0x0088);
       break;
-    case MediaStorage::PETImageStorage: // ??
+    case MediaStorage::RTDoseStorage:
+      t = Tag(0x3004, 0x000c);
+      break;
+    case MediaStorage::PETImageStorage:
     case MediaStorage::CTImageStorage:
     case MediaStorage::RTImageStorage:
-    case MediaStorage::ComputedRadiographyImageStorage: // ??
+    case MediaStorage::ComputedRadiographyImageStorage:
     case MediaStorage::DigitalXRayImageStorageForPresentation:
     case MediaStorage::DigitalXRayImageStorageForProcessing:
     case MediaStorage::DigitalMammographyImageStorageForPresentation:
@@ -1027,19 +1030,10 @@ ImageHelper::GetZSpacingTagFromMediaStorage(MediaStorage const & ms)
     case MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage: //
     case MediaStorage::HardcopyGrayscaleImageStorage:
     case MediaStorage::HardcopyColorImageStorage:
-      t = Tag(0xffff, 0xffff);
-      break;
-    case MediaStorage::RTDoseStorage:
-      t = Tag(0x3004, 0x000c);
-      break;
     case MediaStorage::GEPrivate3DModelStorage:
     case MediaStorage::Philips3D:
     case MediaStorage::VideoEndoscopicImageStorage:
-      mdcmWarningMacro("FIXME");
-      t = Tag(0xffff, 0xffff);
-      break;
     default:
-      mdcmDebugMacro("Do not handle Z spacing for: " << ms);
       t = Tag(0xffff, 0xffff);
       break;
   }
@@ -1063,8 +1057,8 @@ ImageHelper::GetSpacingValue(File const & f)
       ms == MediaStorage::OphthalmicTomographyImageStorage ||
       ms == MediaStorage::MultiframeGrayscaleWordSecondaryCaptureImageStorage ||
       ms == MediaStorage::MultiframeGrayscaleByteSecondaryCaptureImageStorage ||
-      ms == MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage //
-      || ms == MediaStorage::XRay3DAngiographicImageStorage || ms == MediaStorage::XRay3DCraniofacialImageStorage ||
+      ms == MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage ||
+      ms == MediaStorage::XRay3DAngiographicImageStorage || ms == MediaStorage::XRay3DCraniofacialImageStorage ||
       ms == MediaStorage::SegmentationStorage || ms == MediaStorage::IVOCTForProcessing ||
       ms == MediaStorage::IVOCTForPresentation || ms == MediaStorage::BreastTomosynthesisImageStorage ||
       ms == MediaStorage::BreastProjectionXRayImageStorageForPresentation ||
@@ -1223,7 +1217,7 @@ ImageHelper::GetSpacingValue(File const & f)
         gridframeoffsetvector.SetFromDataElement(de2);
         double v1 = gridframeoffsetvector[0];
         double v2 = gridframeoffsetvector[1];
-        // FIXME. ? check consistency
+        // FIXME check consistency
         sp.push_back(v2 - v1);
       }
     }
@@ -1292,8 +1286,8 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
       ms == MediaStorage::EnhancedMRColorImageStorage || ms == MediaStorage::EnhancedPETImageStorage ||
       ms == MediaStorage::MultiframeGrayscaleWordSecondaryCaptureImageStorage ||
       ms == MediaStorage::MultiframeGrayscaleByteSecondaryCaptureImageStorage ||
-      ms == MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage //
-      || ms == MediaStorage::XRay3DAngiographicImageStorage || ms == MediaStorage::XRay3DCraniofacialImageStorage ||
+      ms == MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage ||
+      ms == MediaStorage::XRay3DAngiographicImageStorage || ms == MediaStorage::XRay3DCraniofacialImageStorage ||
       ms == MediaStorage::SegmentationStorage || ms == MediaStorage::IVOCTForPresentation ||
       ms == MediaStorage::IVOCTForProcessing || ms == MediaStorage::BreastTomosynthesisImageStorage ||
       ms == MediaStorage::BreastProjectionXRayImageStorageForPresentation ||
@@ -1316,7 +1310,7 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
       SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
       if (!sqi)
       {
-        mdcmAlwaysWarnMacro("!sqi");
+        mdcmErrorMacro("!sqi");
         return;
       }
       sqi->SetLengthToUndefined();
@@ -1341,7 +1335,7 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
       SmartPointer<SequenceOfItems> sqi2 = subds.GetDataElement(tpms).GetValueAsSQ();
       if (!sqi2)
       {
-        mdcmAlwaysWarnMacro("!sqi2");
+        mdcmErrorMacro("!sqi2");
         return;
       }
       sqi2->SetLengthToUndefined();
@@ -1380,7 +1374,7 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
           subds.GetDataElement(tMRImageFrameTypeSequence).GetValueAsSQ();
         if (!sqMRImageFrameTypeSequence)
         {
-          mdcmAlwaysWarnMacro("!sqMRImageFrameTypeSequence");
+          mdcmErrorMacro("!sqMRImageFrameTypeSequence");
           return;
         }
         sqMRImageFrameTypeSequence->SetLengthToUndefined();
@@ -1424,7 +1418,7 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
           subds.GetDataElement(tCTImageFrameTypeSequence).GetValueAsSQ();
         if (!sqCTImageFrameTypeSequence)
         {
-          mdcmAlwaysWarnMacro("!sqCTImageFrameTypeSequence");
+          mdcmErrorMacro("!sqCTImageFrameTypeSequence");
           return;
         }
         sqCTImageFrameTypeSequence->SetLengthToUndefined();
@@ -1468,7 +1462,7 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
           subds.GetDataElement(tPTImageFrameTypeSequence).GetValueAsSQ();
         if (!sqPTImageFrameTypeSequence)
         {
-          mdcmAlwaysWarnMacro("!sqPTImageFrameTypeSequence");
+          mdcmErrorMacro("!sqPTImageFrameTypeSequence");
           return;
         }
         sqPTImageFrameTypeSequence->SetLengthToUndefined();
@@ -1514,7 +1508,7 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
           subds.GetDataElement(tUnassignedSharedConvertedAttributesSequence).GetValueAsSQ();
         if (!sqUnassignedSharedConvertedAttributesSequence)
         {
-          mdcmAlwaysWarnMacro("!sqUnassignedSharedConvertedAttributesSequence");
+          mdcmErrorMacro("!sqUnassignedSharedConvertedAttributesSequence");
           return;
         }
         sqUnassignedSharedConvertedAttributesSequence->SetLengthToUndefined();
@@ -1563,7 +1557,7 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
         }
       }
     }
-    // Cleanup root (famous MR -> EMR case)
+    // Cleanup root (MR -> enhanced MR)
     {
       const Tag t1(0x0018, 0x0088);
       ds.Remove(t1);
@@ -1588,7 +1582,7 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
       assert(de.GetVR() == vr || de.GetVR() == VR::INVALID);
       switch (vr)
       {
-        case VR::DS:
+      case VR::DS:
         {
           Element<VR::DS, VM::VM1_n> el;
           el.SetLength(entry.GetVM().GetLength() * vr.GetSizeof());
@@ -1609,7 +1603,7 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
           ds.Replace(de);
         }
         break;
-        case VR::IS:
+      case VR::IS:
         {
           Element<VR::IS, VM::VM1_n> el;
           el.SetLength(entry.GetVM().GetLength() * vr.GetSizeof());
@@ -1628,13 +1622,13 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
           ds.Replace(de);
         }
         break;
-        default:
-          assert(0);
+      default:
+        assert(0);
+        break;
       }
     }
   }
   {
-    // FIXME
     const Tag & currentspacing = zspacingtag;
     if (currentspacing != Tag(0xffff, 0xffff))
     {
@@ -1643,9 +1637,22 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
       const Dicts &     dicts = g.GetDicts();
       const DictEntry & entry = dicts.GetDictEntry(de.GetTag());
       const VR &        vr = entry.GetVR();
-      if (de.GetTag() == Tag(0x3004, 0x000c))
+      if (de.GetTag() == Tag(0x0018, 0x0088))
       {
-        assert(vr == VR::DS);
+        Element<VR::DS, VM::VM1> el;
+        el.SetValue(spacing[2]);
+        std::stringstream os;
+        el.Write(os);
+        de.SetVR(VR::DS);
+        if (os.str().size() % 2)
+          os << " ";
+        VL::Type osStrSize = (VL::Type)os.str().size();
+        de.SetByteValue(os.str().c_str(), osStrSize);
+        ds.Replace(de);
+        mdcmDebugMacro("(0x0018, 0x0088) = " << os.str());
+      }
+      else if (de.GetTag() == Tag(0x3004, 0x000c))
+      {
         if (ds.FindDataElement(Tag(0x0028, 0x0008)))
         {
           const DataElement & de1 = ds.GetDataElement(Tag(0x0028, 0x0008));
@@ -1672,37 +1679,14 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
               VL::Type osStrSize = (VL::Type)os.str().size();
               de.SetByteValue(os.str().c_str(), osStrSize);
               ds.Replace(de);
+              mdcmDebugMacro("(0x3004, 0x000c) = " << os.str());
             }
           }
         }
       }
       else
       {
-        switch (vr)
-        {
-          case VR::DS:
-          {
-            Element<VR::DS, VM::VM1_n> el;
-            el.SetLength(entry.GetVM().GetLength() * vr.GetSizeof());
-            assert(entry.GetVM() == VM::VM1);
-            for (unsigned int i = 0; i < entry.GetVM().GetLength(); ++i)
-            {
-              el.SetValue(spacing[i + 2], i);
-            }
-            std::stringstream os;
-            el.Write(os);
-            de.SetVR(VR::DS);
-            if (os.str().size() % 2)
-              os << " ";
-            VL::Type osStrSize = (VL::Type)os.str().size();
-            de.SetByteValue(os.str().c_str(), osStrSize);
-            ds.Replace(de);
-          }
-          break;
-          default:
-            assert(0);
-            break;
-        }
+        mdcmWarningMacro("SetSpacingValue FIXME");
       }
     }
   }

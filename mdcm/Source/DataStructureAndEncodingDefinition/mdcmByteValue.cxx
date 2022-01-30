@@ -35,7 +35,7 @@ ByteValue::ByteValue(const char * array, const VL & vl)
 {
   if (vl.IsOdd())
   {
-    mdcmDebugMacro("Odd length");
+    mdcmDebugMacro("Resized odd length " << (unsigned int)vl << ", " << array);
     Internal.resize(vl + 1);
     ++Length;
   }
