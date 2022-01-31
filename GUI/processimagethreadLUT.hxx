@@ -48,9 +48,7 @@ public:
 		typename T::IndexType index;
 		index[0] = index_0;
 		index[1] = index_1;
- 		typename T::RegionType region;
-		region.SetSize(size);
-		region.SetIndex(index);
+ 		const typename T::RegionType region(index, size);
 		//
 		const unsigned char * tmp_p1 = NULL;
 		int tmp__size = 0;
