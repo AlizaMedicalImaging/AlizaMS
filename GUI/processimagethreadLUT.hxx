@@ -107,20 +107,6 @@ public:
 							p[j_ + 2] = tmp_p1[z * 3 +2];
 						}
 						break;
-					case 8:
-					case 9:
-					case 10:
-					case 11:
-					case 12:
-						{
-							int z = static_cast<int>(v);
-							if (z < 0) z = 0;
-							if (z > (tmp__size - 1)) z = tmp__size - 1;
-							p[j_ + 0] = tmp_p1[z * 3 + 0];
-							p[j_ + 1] = tmp_p1[z * 3 + 1];
-							p[j_ + 2] = tmp_p1[z * 3 + 2];
-						}
-						break;
 					default:
 						break;
 					}
@@ -154,20 +140,6 @@ public:
 							p[j_ + 2] = tmp_p1[z * 3 + 2];
 						}
 						break;
-					case 8:
-					case 9:
-					case 10:
-					case 11:
-					case 12:
-						{
-							int z = static_cast<int>(v);
-							if (z < 0) z = 0;
-							if (z > (tmp__size - 1)) z = tmp__size - 1;
-							p[j_ + 0] = tmp_p1[z * 3 + 0];
-							p[j_ + 1] = tmp_p1[z * 3 + 1];
-							p[j_ + 2] = tmp_p1[z * 3 + 2];
-						}
-						break;
 					default:
 						break;
 					}
@@ -193,11 +165,6 @@ public:
 					case 5:
 					case 6:
 					case 7:
-					case 8:
-					case 9:
-					case 10:
-					case 11:
-					case 12:
 						{
 							p[j_ + 0] = tmp_p1[0];
 							p[j_ + 1] = tmp_p1[1];
@@ -233,11 +200,6 @@ public:
 					case 5:
 					case 6:
 					case 7:
-					case 8:
-					case 9:
-					case 10:
-					case 11:
-					case 12:
 						if (alt_mode)
 						{
 							p[j_ + 0] = tmp_p1[0];
