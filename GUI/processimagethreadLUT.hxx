@@ -69,7 +69,6 @@ public:
 		const double wmax = window_center + window_width * 0.5;
 		const double div_ = (window_width > 0.0) ? window_width : 0.00001;
 		//
-		unsigned int j_ = j;
 		typename itk::ImageRegionConstIterator<T> iterator(image, region);
 		iterator.GoToBegin();
 		while (!iterator.IsAtEnd())
@@ -86,9 +85,9 @@ public:
 					case 0:
 						{
 							const unsigned char c = static_cast<unsigned char>(UCHAR_MAX * r);
-							p[j_ + 0] = c;
-							p[j_ + 1] = c;
-							p[j_ + 2] = c;
+							p[j + 0] = c;
+							p[j + 1] = c;
+							p[j + 2] = c;
 						}
 						break;
 					case 1:
@@ -102,9 +101,9 @@ public:
 							int z = static_cast<int>(r * tmp__size);
 							if (z < 0) z = 0;
 							if (z > (tmp__size - 1)) z = tmp__size - 1;
-							p[j_ + 0] = tmp_p1[z * 3 +0];
-							p[j_ + 1] = tmp_p1[z * 3 +1];
-							p[j_ + 2] = tmp_p1[z * 3 +2];
+							p[j + 0] = tmp_p1[z * 3 +0];
+							p[j + 1] = tmp_p1[z * 3 +1];
+							p[j + 2] = tmp_p1[z * 3 +2];
 						}
 						break;
 					default:
@@ -119,9 +118,9 @@ public:
 					case 0:
 						{
 							const unsigned char c = static_cast<unsigned char>(UCHAR_MAX * r);
-							p[j_ + 0] = c;
-							p[j_ + 1] = c;
-							p[j_ + 2] = c;
+							p[j + 0] = c;
+							p[j + 1] = c;
+							p[j + 2] = c;
 						}
 						break;
 					case 1:
@@ -135,9 +134,9 @@ public:
 							int z = static_cast<int>(r * tmp__size);
 							if (z < 0) z = 0;
 							if (z > (tmp__size - 1)) z = tmp__size - 1;
-							p[j_ + 0] = tmp_p1[z * 3 + 0];
-							p[j_ + 1] = tmp_p1[z * 3 + 1];
-							p[j_ + 2] = tmp_p1[z * 3 + 2];
+							p[j + 0] = tmp_p1[z * 3 + 0];
+							p[j + 1] = tmp_p1[z * 3 + 1];
+							p[j + 2] = tmp_p1[z * 3 + 2];
 						}
 						break;
 					default:
@@ -153,9 +152,9 @@ public:
 					{
 					case 0:
 						{
-							p[j_ + 0] = 0;
-							p[j_ + 1] = 0;
-							p[j_ + 2] = 0;
+							p[j + 0] = 0;
+							p[j + 1] = 0;
+							p[j + 2] = 0;
 						}
 						break;
 					case 1:
@@ -166,9 +165,9 @@ public:
 					case 6:
 					case 7:
 						{
-							p[j_ + 0] = tmp_p1[0];
-							p[j_ + 1] = tmp_p1[1];
-							p[j_ + 2] = tmp_p1[2];
+							p[j + 0] = tmp_p1[0];
+							p[j + 1] = tmp_p1[1];
+							p[j + 2] = tmp_p1[2];
 						}
 						break;
 					default:
@@ -182,15 +181,15 @@ public:
 					case 0:
 						if (alt_mode)
 						{
-							p[j_ + 0] = 0;
-							p[j_ + 1] = 0;
-							p[j_ + 2] = 0;
+							p[j + 0] = 0;
+							p[j + 1] = 0;
+							p[j + 2] = 0;
 						}
 						else
 						{
-							p[j_ + 0] = UCHAR_MAX;
-							p[j_ + 1] = UCHAR_MAX;
-							p[j_ + 2] = UCHAR_MAX;
+							p[j + 0] = UCHAR_MAX;
+							p[j + 1] = UCHAR_MAX;
+							p[j + 2] = UCHAR_MAX;
 						}
 						break;
 					case 1:
@@ -202,16 +201,16 @@ public:
 					case 7:
 						if (alt_mode)
 						{
-							p[j_ + 0] = tmp_p1[0];
-							p[j_ + 1] = tmp_p1[1];
-							p[j_ + 2] = tmp_p1[2];
+							p[j + 0] = tmp_p1[0];
+							p[j + 1] = tmp_p1[1];
+							p[j + 2] = tmp_p1[2];
 						}
 						else
 						{
 							const unsigned int z = tmp__size - 1;
-							p[j_ + 0] = tmp_p1[z * 3 + 0];
-							p[j_ + 1] = tmp_p1[z * 3 + 1];
-							p[j_ + 2] = tmp_p1[z * 3 + 2];
+							p[j + 0] = tmp_p1[z * 3 + 0];
+							p[j + 1] = tmp_p1[z * 3 + 1];
+							p[j + 2] = tmp_p1[z * 3 + 2];
 						}
 						break;
 					default:
@@ -220,7 +219,7 @@ public:
 				}
 			}
 			//
-			j_ += 3;
+			j += 3;
  			++iterator;
 		}
 	}
@@ -233,7 +232,7 @@ private:
 	const int size_1;
 	const int index_0;
 	const int index_1;
-	const unsigned int j;
+	unsigned int j;
 	const double window_center;
 	const double window_width;
 	const short lut;
