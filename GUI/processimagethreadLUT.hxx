@@ -1,22 +1,28 @@
 #ifndef ProcessImageThreadLUT_H___
 #define ProcessImageThreadLUT_H___
 
-#include <QThread>
+// clang-format off
 
+#include <QThread>
 #include "itkImage.h"
 #include "itkImageRegionConstIterator.h"
-
 #include "luts.h"
+
+typedef itk::Image<unsigned char, 2> ImageSegType;
 
 template<typename T> class ProcessImageThreadLUT_ : public QThread
 {
 public:
 	ProcessImageThreadLUT_(
-		const typename T::Pointer & image_, unsigned char * p_,
+		const typename T::Pointer & image_,
+		unsigned char * p_,
 		const int size_0_,   const int size_1_,
-		const int index_0_,  const int index_1_, const unsigned int j_,
+		const int index_0_,  const int index_1_,
+		const unsigned int j_,
 		const double window_center_, const double window_width_,
-		const short lut_, const bool alt_mode_, const short lut_function_)
+		const short lut_,
+		const bool alt_mode_,
+		const short lut_function_)
 		:
 		image(image_),
 		p(p_),
@@ -45,29 +51,29 @@ public:
  		typename T::RegionType region;
 		region.SetSize(size);
 		region.SetIndex(index);
-		typename itk::ImageRegionConstIterator<T> iterator(image, region);
-		iterator.GoToBegin();
-		unsigned int j_ = j;
 		//
-		unsigned char * tmp_p0 = NULL;
+		const unsigned char * tmp_p1 = NULL;
 		int tmp__size = 0;
-		switch(lut)
+		switch (lut)
 		{
-		case  0: break;
-		case  1: { tmp_p0 = const_cast<unsigned char *>(default_lut);       tmp__size = default_lut_size; } break;
-		case  2: { tmp_p0 = const_cast<unsigned char *>(black_rainbow_lut); tmp__size = black_rainbow_size; } break;
-		case  3: { tmp_p0 = const_cast<unsigned char *>(syngo_lut);         tmp__size = syngo_lut_size; } break;
-		case  4: { tmp_p0 = const_cast<unsigned char *>(hot_iron);          tmp__size = hot_iron_size; } break;
-		case  5: { tmp_p0 = const_cast<unsigned char *>(hot_metal_blue);    tmp__size = hot_metal_blue_size; } break;
-		case  6: { tmp_p0 = const_cast<unsigned char *>(pet_dicom_lut);     tmp__size = pet_dicom_lut_size; } break;
-		case  7: { tmp_p0 = const_cast<unsigned char *>(pet20_dicom_lut);   tmp__size = pet20_dicom_lut_size; } break;
+		case 0: break;
+		case 1: { tmp_p1 = default_lut;       tmp__size = default_lut_size;     } break;
+		case 2: { tmp_p1 = black_rainbow_lut; tmp__size = black_rainbow_size;   } break;
+		case 3: { tmp_p1 = syngo_lut;         tmp__size = syngo_lut_size;       } break;
+		case 4: { tmp_p1 = hot_iron;          tmp__size = hot_iron_size;        } break;
+		case 5: { tmp_p1 = hot_metal_blue;    tmp__size = hot_metal_blue_size;  } break;
+		case 6: { tmp_p1 = pet_dicom_lut;     tmp__size = pet_dicom_lut_size;   } break;
+		case 7: { tmp_p1 = pet20_dicom_lut;   tmp__size = pet20_dicom_lut_size; } break;
 		default: return;
 		}
-		const unsigned char * tmp_p1 = const_cast<const unsigned char *>(tmp_p0);
-		const double wmin = window_center - window_width*0.5;
-		const double wmax = window_center + window_width*0.5;
+		//
+		const double wmin = window_center - window_width * 0.5;
+		const double wmax = window_center + window_width * 0.5;
 		const double div_ = (window_width > 0.0) ? window_width : 0.00001;
 		//
+		unsigned int j_ = j;
+		typename itk::ImageRegionConstIterator<T> iterator(image, region);
+		iterator.GoToBegin();
 		while (!iterator.IsAtEnd())
 		{
 			const float v = static_cast<const float>(iterator.Get());
@@ -75,16 +81,16 @@ public:
 			{
 				if (lut_function == 2)
 				{
-					const double x = -6.0 * ((v-window_center) / div_);
-					const double r = 1.0 / (1.0+exp(x));
-					switch(lut)
+					const double x = -6.0 * ((v - window_center) / div_);
+					const double r = 1.0 / (1.0 + exp(x));
+					switch (lut)
 					{
 					case 0:
 						{
-							const unsigned char c = static_cast<unsigned char>(UCHAR_MAX*r);
-							p[j_+0] = c;
-							p[j_+1] = c;
-							p[j_+2] = c;
+							const unsigned char c = static_cast<unsigned char>(UCHAR_MAX * r);
+							p[j_ + 0] = c;
+							p[j_ + 1] = c;
+							p[j_ + 2] = c;
 						}
 						break;
 					case 1:
@@ -95,12 +101,12 @@ public:
 					case 6:
 					case 7:
 						{
-							int z = static_cast<int>(r*tmp__size);
-							if (z < 0) z=0;
-							if (z > (tmp__size-1)) z = tmp__size-1;
-							p[j_+0] = tmp_p1[z*3+0];
-							p[j_+1] = tmp_p1[z*3+1];
-							p[j_+2] = tmp_p1[z*3+2];
+							int z = static_cast<int>(r * tmp__size);
+							if (z < 0) z = 0;
+							if (z > (tmp__size - 1)) z = tmp__size - 1;
+							p[j_ + 0] = tmp_p1[z * 3 +0];
+							p[j_ + 1] = tmp_p1[z * 3 +1];
+							p[j_ + 2] = tmp_p1[z * 3 +2];
 						}
 						break;
 					case 8:
@@ -110,27 +116,28 @@ public:
 					case 12:
 						{
 							int z = static_cast<int>(v);
-							if (z < 0) z=0;
-							if (z > (tmp__size-1)) z = tmp__size-1;
-							p[j_+0] = tmp_p1[z*3+0];
-							p[j_+1] = tmp_p1[z*3+1];
-							p[j_+2] = tmp_p1[z*3+2];
+							if (z < 0) z = 0;
+							if (z > (tmp__size - 1)) z = tmp__size - 1;
+							p[j_ + 0] = tmp_p1[z * 3 + 0];
+							p[j_ + 1] = tmp_p1[z * 3 + 1];
+							p[j_ + 2] = tmp_p1[z * 3 + 2];
 						}
 						break;
-					default: break;
+					default:
+						break;
 					}
 				}
 				else
 				{
-					const double r = (v-wmin) / div_;
-					switch(lut)
+					const double r = (v - wmin) / div_;
+					switch (lut)
 					{
 					case 0:
 						{
-							const unsigned char c = static_cast<unsigned char>(UCHAR_MAX*r);
-							p[j_+0] = c;
-							p[j_+1] = c;
-							p[j_+2] = c;
+							const unsigned char c = static_cast<unsigned char>(UCHAR_MAX * r);
+							p[j_ + 0] = c;
+							p[j_ + 1] = c;
+							p[j_ + 2] = c;
 						}
 						break;
 					case 1:
@@ -141,12 +148,12 @@ public:
 					case 6:
 					case 7:
 						{
-							int z = static_cast<int>(r*tmp__size);
-							if (z<0) z=0;
-							if (z>(tmp__size-1)) z = tmp__size-1;
-							p[j_+0] = tmp_p1[z*3+0];
-							p[j_+1] = tmp_p1[z*3+1];
-							p[j_+2] = tmp_p1[z*3+2];
+							int z = static_cast<int>(r * tmp__size);
+							if (z < 0) z = 0;
+							if (z > (tmp__size - 1)) z = tmp__size - 1;
+							p[j_ + 0] = tmp_p1[z * 3 + 0];
+							p[j_ + 1] = tmp_p1[z * 3 + 1];
+							p[j_ + 2] = tmp_p1[z * 3 + 2];
 						}
 						break;
 					case 8:
@@ -156,14 +163,15 @@ public:
 					case 12:
 						{
 							int z = static_cast<int>(v);
-							if (z < 0) z=0;
-							if (z > (tmp__size-1)) z = tmp__size-1;
-							p[j_+0] = tmp_p1[z*3+0];
-							p[j_+1] = tmp_p1[z*3+1];
-							p[j_+2] = tmp_p1[z*3+2];
+							if (z < 0) z = 0;
+							if (z > (tmp__size - 1)) z = tmp__size - 1;
+							p[j_ + 0] = tmp_p1[z * 3 + 0];
+							p[j_ + 1] = tmp_p1[z * 3 + 1];
+							p[j_ + 2] = tmp_p1[z * 3 + 2];
 						}
 						break;
-					default: break;
+					default:
+						break;
 					}
 				}
 			}
@@ -171,13 +179,13 @@ public:
 			{
 				if (v < wmin)
 				{
-					switch(lut)
+					switch (lut)
 					{
 					case 0:
 						{
-							p[j_+0] = 0;
-							p[j_+1] = 0;
-							p[j_+2] = 0;
+							p[j_ + 0] = 0;
+							p[j_ + 1] = 0;
+							p[j_ + 2] = 0;
 						}
 						break;
 					case 1:
@@ -193,12 +201,13 @@ public:
 					case 11:
 					case 12:
 						{
-							p[j_+0] = tmp_p1[0];
-							p[j_+1] = tmp_p1[1];
-							p[j_+2] = tmp_p1[2];
+							p[j_ + 0] = tmp_p1[0];
+							p[j_ + 1] = tmp_p1[1];
+							p[j_ + 2] = tmp_p1[2];
 						}
 						break;
-					default: break;
+					default:
+						break;
 					}
 				}
 				else if (v > wmax)
@@ -208,15 +217,15 @@ public:
 					case 0:
 						if (alt_mode)
 						{
-							p[j_+0] = 0;
-							p[j_+1] = 0;
-							p[j_+2] = 0;
+							p[j_ + 0] = 0;
+							p[j_ + 1] = 0;
+							p[j_ + 2] = 0;
 						}
 						else
 						{
-							p[j_+0] = UCHAR_MAX;
-							p[j_+1] = UCHAR_MAX;
-							p[j_+2] = UCHAR_MAX;
+							p[j_ + 0] = UCHAR_MAX;
+							p[j_ + 1] = UCHAR_MAX;
+							p[j_ + 2] = UCHAR_MAX;
 						}
 						break;
 					case 1:
@@ -233,22 +242,22 @@ public:
 					case 12:
 						if (alt_mode)
 						{
-							p[j_+0] = tmp_p1[0];
-							p[j_+1] = tmp_p1[1];
-							p[j_+2] = tmp_p1[2];
+							p[j_ + 0] = tmp_p1[0];
+							p[j_ + 1] = tmp_p1[1];
+							p[j_ + 2] = tmp_p1[2];
 						}
 						else
 						{
-							const unsigned int z = tmp__size-1;
-							p[j_+0] = tmp_p1[z*3+0];
-							p[j_+1] = tmp_p1[z*3+1];
-							p[j_+2] = tmp_p1[z*3+2];
+							const unsigned int z = tmp__size - 1;
+							p[j_ + 0] = tmp_p1[z * 3 + 0];
+							p[j_ + 1] = tmp_p1[z * 3 + 1];
+							p[j_ + 2] = tmp_p1[z * 3 + 2];
 						}
 						break;
-					default: break;
+					default:
+						break;
 					}
 				}
-				else {;;}
 			}
 			//
 			j_ += 3;
@@ -257,7 +266,8 @@ public:
 	}
 
 private:
-	typename T::Pointer image;
+	const typename T::Pointer image;
+	const typename ImageSegType::Pointer image2;
 	unsigned char * p;
 	const int size_0;
 	const int size_1;
@@ -270,5 +280,7 @@ private:
 	const bool  alt_mode;
 	const short lut_function;
 };
+
+// clang-format on
 
 #endif // ProcessImageThreadLUT_H___
