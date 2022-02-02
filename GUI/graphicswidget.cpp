@@ -507,9 +507,9 @@ template<typename T> void load_rgb_image(
 			iterator.GoToBegin();
 			while (!iterator.IsAtEnd())
 			{
-				p__[j_ + 2] = static_cast<unsigned char>((iterator.Get().GetBlue()  / tmp_max) * 255.0);
-				p__[j_ + 1] = static_cast<unsigned char>((iterator.Get().GetGreen() / tmp_max) * 255.0);
-				p__[j_ + 0] = static_cast<unsigned char>((iterator.Get().GetRed()   / tmp_max) * 255.0);
+				p__[j_+2] = static_cast<unsigned char>((iterator.Get().GetBlue() /tmp_max)*255.0);
+				p__[j_+1] = static_cast<unsigned char>((iterator.Get().GetGreen()/tmp_max)*255.0);
+				p__[j_+0] = static_cast<unsigned char>((iterator.Get().GetRed()  /tmp_max)*255.0);
 				j_ += 3;
 				++iterator;
 			}
@@ -694,10 +694,10 @@ template<typename T> void load_rgba_image(
 			iterator.GoToBegin();
 			while (!iterator.IsAtEnd())
 			{
-				p__[j_ + 3] = static_cast<unsigned char>((iterator.Get().GetAlpha() / tmp_max) * 255.0);
-				p__[j_ + 2] = static_cast<unsigned char>((iterator.Get().GetBlue()  / tmp_max) * 255.0);
-				p__[j_ + 1] = static_cast<unsigned char>((iterator.Get().GetGreen() / tmp_max) * 255.0);
-				p__[j_ + 0] = static_cast<unsigned char>((iterator.Get().GetRed()   / tmp_max) * 255.0);
+				p__[j_+3] = static_cast<unsigned char>((iterator.Get().GetAlpha() / tmp_max) * 255.0);
+				p__[j_+2] = static_cast<unsigned char>((iterator.Get().GetBlue()  / tmp_max) * 255.0);
+				p__[j_+1] = static_cast<unsigned char>((iterator.Get().GetGreen() / tmp_max) * 255.0);
+				p__[j_+0] = static_cast<unsigned char>((iterator.Get().GetRed()   / tmp_max) * 255.0);
 				j_ += 4;
 				++iterator;
 			}
@@ -765,15 +765,15 @@ template<typename T> void load_rgba_image(
 					const double tmp_red = tmp_whi + alpha*iterator.Get().GetRed();
 					const double tmp_gre = tmp_whi + alpha*iterator.Get().GetGreen();
 					const double tmp_blu = tmp_whi + alpha*iterator.Get().GetBlue();
-					p__[j_ + 2] = static_cast<unsigned char>((tmp_blu/tmp_max) * 255.0);
-					p__[j_ + 1] = static_cast<unsigned char>((tmp_gre/tmp_max) * 255.0);
-					p__[j_ + 0] = static_cast<unsigned char>((tmp_red/tmp_max) * 255.0);
+					p__[j_+2] = static_cast<unsigned char>((tmp_blu/tmp_max) * 255.0);
+					p__[j_+1] = static_cast<unsigned char>((tmp_gre/tmp_max) * 255.0);
+					p__[j_+0] = static_cast<unsigned char>((tmp_red/tmp_max) * 255.0);
 				}
 				else
 				{
-					p__[j_ + 2] = 255;
-					p__[j_ + 1] = 255;
-					p__[j_ + 0] = 255;
+					p__[j_+2] = 255;
+					p__[j_+1] = 255;
+					p__[j_+0] = 255;
 				}
 				j_ += 3;
 				++iterator;
@@ -799,18 +799,24 @@ template<typename T> void load_rgba_image(
 			iterator.GoToBegin();
 			while(!iterator.IsAtEnd())
 			{
-				const double a = iterator.Get().GetAlpha();
-				const double b = iterator.Get().GetBlue();
-				const double g = iterator.Get().GetGreen();
-				const double r = iterator.Get().GetRed();
-				const double one_minus_alpha = 1.0 - ((a+(-vmin))/vrange);
-				const double tmp_whi = one_minus_alpha * 255.0;
-				const double tmp_red = tmp_whi + a*(255.0*((r+(-vmin))/vrange));
-				const double tmp_gre = tmp_whi + a*(255.0*((g+(-vmin))/vrange));
-				const double tmp_blu = tmp_whi + a*(255.0*((b+(-vmin))/vrange));
-				p__[j_+2] = static_cast<unsigned char>(tmp_blu);
-				p__[j_+1] = static_cast<unsigned char>(tmp_gre);
-				p__[j_+0] = static_cast<unsigned char>(tmp_red);
+				const double alpha = iterator.Get().GetAlpha() / vrange;
+				const double one_minus_alpha = 1.0 - alpha;
+				const double tmp_whi = one_minus_alpha*vrange;
+				const double tmp_red = tmp_whi + alpha*iterator.Get().GetRed();
+				const double tmp_gre = tmp_whi + alpha*iterator.Get().GetGreen();
+				const double tmp_blu = tmp_whi + alpha*iterator.Get().GetBlue();
+				if (alpha > 0)
+				{
+					p__[j_+2] = static_cast<unsigned char>((tmp_blu/vrange)*255.0);
+					p__[j_+1] = static_cast<unsigned char>((tmp_gre/vrange)*255.0);
+					p__[j_+0] = static_cast<unsigned char>((tmp_red/vrange)*255.0);
+				}
+				else
+				{
+					p__[j_+2] = 255;
+					p__[j_+1] = 255;
+					p__[j_+0] = 255;
+				}
 				j_ += 3;
  				++iterator;
 			}
