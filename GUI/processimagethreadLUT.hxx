@@ -73,7 +73,7 @@ public:
 		iterator.GoToBegin();
 		while (!iterator.IsAtEnd())
 		{
-			const float v = static_cast<const float>(iterator.Get());
+			const double v = iterator.Get();
 			if ((v >= wmin) && (v <= wmax))
 			{
 				if (lut_function == 2)
