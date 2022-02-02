@@ -477,10 +477,8 @@ template<typename T> void load_rgb_image(
 		if (spacing[1]>spacing[0]) coeff_size_1 = spacing[1]/spacing[0];
 		else                       coeff_size_0 = spacing[0]/spacing[1];
 	}
-	const double xratio =
-		(double)widget->graphicsview->width()  / (double)(size[0]*coeff_size_0);
-	const double yratio =
-		(double)widget->graphicsview->height() / (double)(size[1]*coeff_size_1);
+	const double xratio = widget->graphicsview->width()  / (size[0]*coeff_size_0);
+	const double yratio = widget->graphicsview->height() / (size[1]*coeff_size_1);
 	if (fit==1)
 	{
 		scale__ = qMin(xratio, yratio);
@@ -509,15 +507,9 @@ template<typename T> void load_rgb_image(
 			iterator.GoToBegin();
 			while (!iterator.IsAtEnd())
 			{
-				p__[j_ + 2] =
-					static_cast<unsigned char>(
-						((double)iterator.Get().GetBlue()  / tmp_max) * 255.0);
-				p__[j_ + 1] =
-					static_cast<unsigned char>(
-						((double)iterator.Get().GetGreen() / tmp_max) * 255.0);
-				p__[j_ + 0] =
-					static_cast<unsigned char>(
-						((double)iterator.Get().GetRed()   / tmp_max) * 255.0);
+				p__[j_ + 2] = static_cast<unsigned char>((iterator.Get().GetBlue()  / tmp_max) * 255.0);
+				p__[j_ + 1] = static_cast<unsigned char>((iterator.Get().GetGreen() / tmp_max) * 255.0);
+				p__[j_ + 0] = static_cast<unsigned char>((iterator.Get().GetRed()   / tmp_max) * 255.0);
 				j_ += 3;
 				++iterator;
 			}
@@ -543,9 +535,9 @@ template<typename T> void load_rgb_image(
 				iterator.GoToBegin();
 				while(!iterator.IsAtEnd())
 				{
-					const double b = static_cast<double>(iterator.Get().GetBlue());
-					const double g = static_cast<double>(iterator.Get().GetGreen());
-					const double r = static_cast<double>(iterator.Get().GetRed());
+					const double b = iterator.Get().GetBlue();
+					const double g = iterator.Get().GetGreen();
+					const double r = iterator.Get().GetRed();
 					p__[j_+2] = static_cast<unsigned char>(255.0*((b+(-vmin))/vrange));
 					p__[j_+1] = static_cast<unsigned char>(255.0*((g+(-vmin))/vrange));
 					p__[j_+0] = static_cast<unsigned char>(255.0*((r+(-vmin))/vrange));
@@ -592,9 +584,8 @@ template<typename T> void load_rgb_image(
 	if (flip_y && flip_x) t = t.scale(-1.0,-1.0);
 	else if (flip_y)      t = t.scale( 1.0,-1.0);
 	else if (flip_x)      t = t.scale(-1.0, 1.0);
-	else ;;
-	if (global_flip_x) { t = t.scale(-1.0, 1.0); }
-	if (global_flip_y) { t = t.scale( 1.0,-1.0); }
+	if (global_flip_x)    t = t.scale(-1.0, 1.0);
+	if (global_flip_y)    t = t.scale( 1.0,-1.0);
 	//
 	const QRectF rectf(0,0,size[0],size[1]);
 	widget->graphicsview->scene()->setSceneRect(rectf);
@@ -672,10 +663,8 @@ template<typename T> void load_rgba_image(
 		if (spacing[1]>spacing[0]) coeff_size_1 = spacing[1]/spacing[0];
 		else                       coeff_size_0 = spacing[0]/spacing[1];
 	}
-	const double xratio =
-		(double)widget->graphicsview->width()  / (double)(size[0]*coeff_size_0);
-	const double yratio =
-		(double)widget->graphicsview->height() / (double)(size[1]*coeff_size_1);
+	const double xratio = widget->graphicsview->width()  / (size[0]*coeff_size_0);
+	const double yratio = widget->graphicsview->height() / (size[1]*coeff_size_1);
 	if (fit==1)
 	{
 		scale__ = qMin(xratio, yratio);
@@ -705,18 +694,10 @@ template<typename T> void load_rgba_image(
 			iterator.GoToBegin();
 			while (!iterator.IsAtEnd())
 			{
-				p__[j_ + 3] =
-					static_cast<unsigned char>(
-						((double)iterator.Get().GetAlpha() / tmp_max) * 255.0);
-				p__[j_ + 2] =
-					static_cast<unsigned char>(
-						((double)iterator.Get().GetBlue()  / tmp_max) * 255.0);
-				p__[j_ + 1] =
-					static_cast<unsigned char>(
-						((double)iterator.Get().GetGreen() / tmp_max) * 255.0);
-				p__[j_ + 0] =
-					static_cast<unsigned char>(
-						((double)iterator.Get().GetRed()   / tmp_max) * 255.0);
+				p__[j_ + 3] = static_cast<unsigned char>((iterator.Get().GetAlpha() / tmp_max) * 255.0);
+				p__[j_ + 2] = static_cast<unsigned char>((iterator.Get().GetBlue()  / tmp_max) * 255.0);
+				p__[j_ + 1] = static_cast<unsigned char>((iterator.Get().GetGreen() / tmp_max) * 255.0);
+				p__[j_ + 0] = static_cast<unsigned char>((iterator.Get().GetRed()   / tmp_max) * 255.0);
 				j_ += 4;
 				++iterator;
 			}
@@ -741,10 +722,10 @@ template<typename T> void load_rgba_image(
 			iterator.GoToBegin();
 			while(!iterator.IsAtEnd())
 			{
-				const double a = static_cast<double>(iterator.Get().GetAlpha());
-				const double b = static_cast<double>(iterator.Get().GetBlue());
-				const double g = static_cast<double>(iterator.Get().GetGreen());
-				const double r = static_cast<double>(iterator.Get().GetRed());
+				const double a = iterator.Get().GetAlpha();
+				const double b = iterator.Get().GetBlue();
+				const double g = iterator.Get().GetGreen();
+				const double r = iterator.Get().GetRed();
 				p__[j_+3] = static_cast<unsigned char>(255.0*((a+(-vmin))/vrange));
 				p__[j_+2] = static_cast<unsigned char>(255.0*((b+(-vmin))/vrange));
 				p__[j_+1] = static_cast<unsigned char>(255.0*((g+(-vmin))/vrange));
@@ -778,15 +759,12 @@ template<typename T> void load_rgba_image(
 			{
 				if (iterator.Get().GetAlpha()>0)
 				{
-					const double alpha = static_cast<double>(iterator.Get().GetAlpha())/tmp_max;
+					const double alpha = iterator.Get().GetAlpha()/tmp_max;
 					const double one_minus_alpha = 1.0 - alpha;
 					const double tmp_whi = one_minus_alpha*USHRT_MAX;
-					const double tmp_red =
-						tmp_whi + alpha*static_cast<double>(iterator.Get().GetRed());
-					const double tmp_gre =
-						tmp_whi + alpha*static_cast<double>(iterator.Get().GetGreen());
-					const double tmp_blu =
-						tmp_whi + alpha*static_cast<double>(iterator.Get().GetBlue());
+					const double tmp_red = tmp_whi + alpha*iterator.Get().GetRed();
+					const double tmp_gre = tmp_whi + alpha*iterator.Get().GetGreen();
+					const double tmp_blu = tmp_whi + alpha*iterator.Get().GetBlue();
 					p__[j_ + 2] = static_cast<unsigned char>((tmp_blu/tmp_max) * 255.0);
 					p__[j_ + 1] = static_cast<unsigned char>((tmp_gre/tmp_max) * 255.0);
 					p__[j_ + 0] = static_cast<unsigned char>((tmp_red/tmp_max) * 255.0);
@@ -821,10 +799,10 @@ template<typename T> void load_rgba_image(
 			iterator.GoToBegin();
 			while(!iterator.IsAtEnd())
 			{
-				const double a = static_cast<double>(iterator.Get().GetAlpha());
-				const double b = static_cast<double>(iterator.Get().GetBlue());
-				const double g = static_cast<double>(iterator.Get().GetGreen());
-				const double r = static_cast<double>(iterator.Get().GetRed());
+				const double a = iterator.Get().GetAlpha();
+				const double b = iterator.Get().GetBlue();
+				const double g = iterator.Get().GetGreen();
+				const double r = iterator.Get().GetRed();
 				const double one_minus_alpha = 1.0 - ((a+(-vmin))/vrange);
 				const double tmp_whi = one_minus_alpha * 255.0;
 				const double tmp_red = tmp_whi + a*(255.0*((r+(-vmin))/vrange));
@@ -872,9 +850,8 @@ template<typename T> void load_rgba_image(
 	if (flip_y && flip_x) t = t.scale(-1.0,-1.0);
 	else if (flip_y)      t = t.scale( 1.0,-1.0);
 	else if (flip_x)      t = t.scale(-1.0, 1.0);
-	else ;;
-	if (global_flip_x) { t = t.scale(-1.0, 1.0); }
-	if (global_flip_y) { t = t.scale( 1.0,-1.0); }
+	if (global_flip_x)    t = t.scale(-1.0, 1.0);
+	if (global_flip_y)    t = t.scale( 1.0,-1.0);
 	//
 	const QRectF rectf(0,0,size[0],size[1]);
 	widget->graphicsview->scene()->setSceneRect(rectf);
@@ -965,10 +942,8 @@ template<typename T> void load_rgb_char_image(
 		if (spacing[1] > spacing[0]) coeff_size_1 = spacing[1]/spacing[0];
 		else                         coeff_size_0 = spacing[0]/spacing[1];
 	}
-	const double xratio =
-		(double)widget->graphicsview->width()  / (double)(size[0]*coeff_size_0);
-	const double yratio =
-		(double)widget->graphicsview->height() / (double)(size[1]*coeff_size_1);
+	const double xratio = widget->graphicsview->width()  / (size[0]*coeff_size_0);
+	const double yratio = widget->graphicsview->height() / (size[1]*coeff_size_1);
 	if (fit == 1)
 	{
 		scale__ = qMin(xratio, yratio);
@@ -1009,9 +984,8 @@ template<typename T> void load_rgb_char_image(
 	if (flip_y && flip_x) t = t.scale(-1.0,-1.0);
 	else if (flip_y)      t = t.scale( 1.0,-1.0);
 	else if (flip_x)      t = t.scale(-1.0, 1.0);
-	else ;;
-	if (global_flip_x) { t = t.scale(-1.0, 1.0); }
-	if (global_flip_y) { t = t.scale( 1.0,-1.0); }
+	if (global_flip_x)    t = t.scale(-1.0, 1.0);
+	if (global_flip_y)    t = t.scale( 1.0,-1.0);
 	//
 	const QRectF rectf(0, 0, size[0], size[1]);
 	widget->graphicsview->scene()->setSceneRect(rectf);
@@ -1079,10 +1053,8 @@ template<typename T> void load_rgba_char_image(
 		if (spacing[1]>spacing[0]) coeff_size_1 = spacing[1]/spacing[0];
 		else                       coeff_size_0 = spacing[0]/spacing[1];
 	}
-	const double xratio =
-		(double)widget->graphicsview->width()  / (double)(size[0]*coeff_size_0);
-	const double yratio =
-		(double)widget->graphicsview->height() / (double)(size[1]*coeff_size_1);
+	const double xratio = widget->graphicsview->width()  / (size[0]*coeff_size_0);
+	const double yratio = widget->graphicsview->height() / (size[1]*coeff_size_1);
 	if (fit==1)
 	{
 		scale__ = qMin(xratio, yratio);
@@ -1112,16 +1084,12 @@ template<typename T> void load_rgba_char_image(
 			{
 				if (iterator.Get().GetAlpha()>0)
 				{
-					const double alpha =
-						static_cast<double>(iterator.Get().GetAlpha())/255.0;
+					const double alpha = iterator.Get().GetAlpha()/255.0;
 					const double one_minus_alpha = 1.0 - alpha;
 					const double tmp_whi = one_minus_alpha * 255.0;
-					const double tmp_red =
-						tmp_whi + alpha*static_cast<double>(iterator.Get().GetRed());
-					const double tmp_gre =
-						tmp_whi + alpha*static_cast<double>(iterator.Get().GetGreen());
-					const double tmp_blu =
-						tmp_whi + alpha*static_cast<double>(iterator.Get().GetBlue());
+					const double tmp_red = tmp_whi + alpha*iterator.Get().GetRed();
+					const double tmp_gre = tmp_whi + alpha*iterator.Get().GetGreen();
+					const double tmp_blu = tmp_whi + alpha*iterator.Get().GetBlue();
 					p[j_+2] = static_cast<unsigned char>(tmp_blu);
 					p[j_+1] = static_cast<unsigned char>(tmp_gre);
 					p[j_+0] = static_cast<unsigned char>(tmp_red);
@@ -1173,9 +1141,8 @@ template<typename T> void load_rgba_char_image(
 	if (flip_y && flip_x) t = t.scale(-1.0,-1.0);
 	else if (flip_y)      t = t.scale( 1.0,-1.0);
 	else if (flip_x)      t = t.scale(-1.0, 1.0);
-	else ;;
-	if (global_flip_x) { t = t.scale(-1.0, 1.0); }
-	if (global_flip_y) { t = t.scale( 1.0,-1.0); }
+	if (global_flip_x)    t = t.scale(-1.0, 1.0);
+	if (global_flip_y)    t = t.scale( 1.0,-1.0);
 	//
 	const QRectF rectf(0,0,size[0],size[1]);
 	widget->graphicsview->scene()->setSceneRect(rectf);
@@ -1302,7 +1269,7 @@ template<typename T> void load_image(
 		unsigned int block = 64;
 		if (static_cast<float>(size[1])/static_cast<float>(block)>16.0f) block=128;
 		const int tmp100 = size[1]%block;
-		const int incr = (int)floor(size[1]/(double)block);
+		const int incr = static_cast<int>(floor(size[1]/static_cast<double>(block)));;
 		if (size[1] > block)
 		{
 			for (int i = 0; i < incr; ++i)
@@ -1359,7 +1326,7 @@ template<typename T> void load_image(
 		unsigned short b__ = 0;
 		for (int i = 0; i < threadsLUT_size; ++i)
 		{
-			if (widget->threadsLUT_.at(i)->isFinished()) { ++b__; }
+			if (widget->threadsLUT_.at(i)->isFinished()) ++b__;
 		}
 		if (b__ == threadsLUT_size) break;
 	}
@@ -1419,8 +1386,8 @@ template<typename T> void load_image(
 			GraphicsUtils::draw_cross_out(tmpi);
 	}
 	//
-	const double xratio = (double)widget->graphicsview->width()  / (double)(size[0]*coeff_size_0);
-	const double yratio = (double)widget->graphicsview->height() / (double)(size[1]*coeff_size_1);
+	const double xratio = widget->graphicsview->width()  / (size[0]*coeff_size_0);
+	const double yratio = widget->graphicsview->height() / (size[1]*coeff_size_1);
 	if (fit==1)
 	{
 		scale__ = qMin(xratio, yratio);
@@ -1447,9 +1414,8 @@ template<typename T> void load_image(
 	if (flip_y && flip_x) t = t.scale(-1.0,-1.0);
 	else if (flip_y)      t = t.scale( 1.0,-1.0);
 	else if (flip_x)      t = t.scale(-1.0, 1.0);
-	else ;;
-	if (global_flip_x) { t = t.scale(-1.0, 1.0); }
-	if (global_flip_y) { t = t.scale( 1.0,-1.0); }
+	if (global_flip_x)    t = t.scale(-1.0, 1.0);
+	if (global_flip_y)    t = t.scale( 1.0,-1.0);
 	//
 	widget->set_top_label_text(top_string);
 	widget->set_left_label_text(left_string);
@@ -2114,7 +2080,7 @@ float GraphicsWidget::get_offset_x()
 	{
 	case 0:
 		{
-			offset_x = 
+			offset_x =
 				(bb)
 				? (float)image_container.image3D->di->irect_index[1]
 				: 0.0f;
@@ -2397,14 +2363,14 @@ void GraphicsWidget::set_slice_2D(
 					v->orientation_string;
 		}
 		break;
-	case 1  : 
+	case 1  :
 		{
 			if (v->equi)
 				image_container.image2D->orientation_string =
 					v->orientation_string;
 		}
 		break;
-	case 2  : 
+	case 2  :
 		{
 			const bool check_consistence =
 				(((int)v->di->image_slices.size() == v->di->idimz) &&
@@ -2773,7 +2739,7 @@ void GraphicsWidget::update_measurement(
 				ivariant->usregions.at(id).m_UnitXString;
 			const QString measure_texty  =
 				ivariant->usregions.at(id).m_UnitYString;
-			const unsigned short spatial = 
+			const unsigned short spatial =
 				ivariant->usregions.at(id).m_RegionSpatialFormat;
 			QColor color(Qt::cyan);
 			switch(spatial)
@@ -3279,35 +3245,35 @@ QString GraphicsWidget::contours_from_selected_paths(
 			{
 			case  0: s1 = contour_from_path<ImageTypeSS>(roi, ivariant->pSS, p);
 				break;
-			case  1: s1 = contour_from_path<ImageTypeUS>(roi, ivariant->pUS, p); 
+			case  1: s1 = contour_from_path<ImageTypeUS>(roi, ivariant->pUS, p);
 				break;
 			case  2: s1 = contour_from_path<ImageTypeSI>(roi, ivariant->pSI, p);
 				break;
-			case  3: s1 = contour_from_path<ImageTypeUI>(roi, ivariant->pUI, p); 
+			case  3: s1 = contour_from_path<ImageTypeUI>(roi, ivariant->pUI, p);
 				break;
-			case  4: s1 = contour_from_path<ImageTypeUC>(roi, ivariant->pUC, p); 
+			case  4: s1 = contour_from_path<ImageTypeUC>(roi, ivariant->pUC, p);
 				break;
 			case  5: s1 = contour_from_path<ImageTypeF>(roi, ivariant->pF, p);
 				break;
-			case  6: s1 = contour_from_path<ImageTypeD>(roi, ivariant->pD, p); 
+			case  6: s1 = contour_from_path<ImageTypeD>(roi, ivariant->pD, p);
 				break;
-			case  7: s1 = contour_from_path<ImageTypeSLL>(roi, ivariant->pSLL, p); 
+			case  7: s1 = contour_from_path<ImageTypeSLL>(roi, ivariant->pSLL, p);
 				break;
-			case  8: s1 = contour_from_path<ImageTypeULL>(roi, ivariant->pULL, p); 
+			case  8: s1 = contour_from_path<ImageTypeULL>(roi, ivariant->pULL, p);
 				break;
 			case 10: s1 = contour_from_path<RGBImageTypeSS>(roi, ivariant->pSS_rgb, p);
 				break;
-			case 11: s1 = contour_from_path<RGBImageTypeUS>(roi, ivariant->pUS_rgb, p); 
+			case 11: s1 = contour_from_path<RGBImageTypeUS>(roi, ivariant->pUS_rgb, p);
 				break;
 			case 12: s1 = contour_from_path<RGBImageTypeSI>(roi, ivariant->pSI_rgb, p);
 				break;
-			case 13: s1 = contour_from_path<RGBImageTypeUI>(roi, ivariant->pUI_rgb, p); 
+			case 13: s1 = contour_from_path<RGBImageTypeUI>(roi, ivariant->pUI_rgb, p);
 				break;
-			case 14: s1 = contour_from_path<RGBImageTypeUC>(roi, ivariant->pUC_rgb, p); 
+			case 14: s1 = contour_from_path<RGBImageTypeUC>(roi, ivariant->pUC_rgb, p);
 				break;
 			case 15: s1 = contour_from_path<RGBImageTypeF>(roi, ivariant->pF_rgb, p);
 				break;
-			case 16: s1 = contour_from_path<RGBImageTypeD>(roi, ivariant->pD_rgb, p); 
+			case 16: s1 = contour_from_path<RGBImageTypeD>(roi, ivariant->pD_rgb, p);
 				break;
 			default: s1 = QString("Image type not supported");
 				break;

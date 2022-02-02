@@ -936,12 +936,12 @@ void StudyViewWidget::update_lut_function(int x)
 }
 
 void StudyViewWidget::update_spinbox_width_d(double i)
-{ 
+{
 	width_doubleSpinBox->setValue(i);
 }
 
 void StudyViewWidget::update_spinbox_center_d(double i)
-{ 
+{
 	center_doubleSpinBox->setValue(i);
 }
 
