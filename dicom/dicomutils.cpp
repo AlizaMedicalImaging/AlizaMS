@@ -565,7 +565,7 @@ static QString read_MRImageModule(const mdcm::DataSet & ds)
 	if (DicomUtils::get_fl_value(ds, tB1rms, &fB1rms))
 	{
 		QString B1rms =
-			QVariant((double)fB1rms).toString();
+			QVariant(static_cast<double>(fB1rms)).toString();
 		B1rms = B1rms.trimmed();
 		if (!B1rms.isEmpty())
 		{
@@ -2225,7 +2225,7 @@ void DicomUtils::read_image_info_rtdose(const QString & f,
 			const QVariant v(numframes.remove(QChar('\0')));
 			bool ok = false;
 			const int k = v.toInt(&ok);
-			if (ok && k>0) *num_frames_ = (unsigned short)k;
+			if (ok && k>0) *num_frames_ = static_cast<unsigned short>(k);
 		}
 	}
 	//
@@ -2415,9 +2415,9 @@ void DicomUtils::load_contour(
 				color_b = color_p[2];
 			}
 		}
-		roi.color.r=(float)color_r/255.0f;
-		roi.color.g=(float)color_g/255.0f;
-		roi.color.b=(float)color_b/255.0f;
+		roi.color.r = color_r/255.0f;
+		roi.color.g = color_g/255.0f;
+		roi.color.b = color_b/255.0f;
 		// ContourSequence
 		const mdcm::Tag tcsq(0x3006, 0x0040);
 		if (!nestedds.FindDataElement(tcsq)) continue;
@@ -2799,7 +2799,7 @@ bool DicomUtils::read_slices(
 		ivariant->di->iz_spacing = size_z==1 ? 1 : spacing_z;
 		for (int x = 0; x < 6; ++x)
 		{
-			ivariant->di->dircos[x] = (float)dircos[x]; ///////
+			ivariant->di->dircos[x] = static_cast<float>(dircos[x]); ///////
 		}
 		//
 		if (ivariant->equi == false)
@@ -3091,7 +3091,7 @@ bool DicomUtils::read_slices_uihgrid(
 		ivariant->di->iy_spacing = spacing_y;
 		ivariant->di->iz_spacing = spacing_z;
 		for (int x = 0; x < 6; ++x)
-			ivariant->di->dircos[x] = (float)dircos[x]; ///////
+			ivariant->di->dircos[x] = static_cast<float>(dircos[x]); ///////
 		//
 		if (ivariant->equi == false)
 		{
@@ -3166,7 +3166,7 @@ bool DicomUtils::read_slices_rtdose(
 		double * p = new double[9];
 		p[0] = pat_pos[0];
 		p[1] = pat_pos[1];
-		p[2] = pat_pos[2] + (float)z_offsets.at(i);
+		p[2] = pat_pos[2] + static_cast<float>(z_offsets.at(i));
 		p[3] = pat_orient[0];
 		p[4] = pat_orient[1];
 		p[5] = pat_orient[2];
@@ -3208,7 +3208,7 @@ bool DicomUtils::read_slices_rtdose(
 		ivariant->di->ix_spacing = spacing_x;
 		ivariant->di->iy_spacing = spacing_y;
 		ivariant->di->iz_spacing = spacing_z;
-		for (int x = 0; x < 6; ++x) ivariant->di->dircos[x] = (float)dircos[x]; ///////
+		for (int x = 0; x < 6; ++x) ivariant->di->dircos[x] = static_cast<float>(dircos[x]); ///////
 		//
 		if (ivariant->equi == false)
 		{
@@ -3486,7 +3486,7 @@ bool DicomUtils::read_group_sq(
 							nestedds1,
 							tInStackPositionNumber,
 							&tmp678);
-						fg.in_stack_pos_num = (int)tmp678;
+						fg.in_stack_pos_num = static_cast<int>(tmp678);
 					}
 				}
 				QString FrameAcquisitionDateTime;
@@ -4375,13 +4375,13 @@ bool DicomUtils::get_patient_position(
 	{
 		bool ok = false;
 		pp[0] = list.at(0).toDouble(&ok);
-		if (!ok) pp[0] = (double)list.at(0).toInt(&ok);
+		if (!ok) pp[0] = list.at(0).toInt(&ok);
 		if (!ok) return false;
 		pp[1] = list.at(1).toDouble(&ok);
-		if (!ok) pp[1] = (double)list.at(1).toInt(&ok);
+		if (!ok) pp[1] = list.at(1).toInt(&ok);
 		if (!ok) return false;
 		pp[2] = list.at(2).toDouble(&ok);
-		if (!ok) pp[2] = (double)list.at(2).toInt(&ok);
+		if (!ok) pp[2] = list.at(2).toInt(&ok);
 		if (!ok) return false;
 		return true;
 	}
@@ -4406,22 +4406,22 @@ bool DicomUtils::get_patient_orientation(
 	{
 		bool ok = false;
 		po[0] = list.at(0).toDouble(&ok);
-		if (!ok) po[0] = (double)list.at(0).toInt(&ok);
+		if (!ok) po[0] = list.at(0).toInt(&ok);
 		if (!ok) return false;
 		po[1] = list.at(1).toDouble(&ok);
-		if (!ok) po[1] = (double)list.at(1).toInt(&ok);
+		if (!ok) po[1] = list.at(1).toInt(&ok);
 		if (!ok) return false;
 		po[2] = list.at(2).toDouble(&ok);
-		if (!ok) po[2] = (double)list.at(2).toInt(&ok);
+		if (!ok) po[2] = list.at(2).toInt(&ok);
 		if (!ok) return false;
 		po[3] = list.at(3).toDouble(&ok);
-		if (!ok) po[3] = (double)list.at(3).toInt(&ok);
+		if (!ok) po[3] = list.at(3).toInt(&ok);
 		if (!ok) return false;
 		po[4] = list.at(4).toDouble(&ok);
-		if (!ok) po[4] = (double)list.at(4).toInt(&ok);
+		if (!ok) po[4] = list.at(4).toInt(&ok);
 		if (!ok) return false;
 		po[5] = list.at(5).toDouble(&ok);
-		if (!ok) po[5] = (double)list.at(5).toInt(&ok);
+		if (!ok) po[5] = list.at(5).toInt(&ok);
 		if (!ok) return false;
 		return true;
 	}
@@ -4440,18 +4440,17 @@ bool DicomUtils::get_pixel_spacing(
 	if (list.size()==1)
 	{
 		ps[0] = ps[1] = list.at(0).toDouble(&ok);
-		if (!ok) ps[0] = ps[1] =
-			(double)list.at(0).toInt(&ok);
+		if (!ok) ps[0] = ps[1] = list.at(0).toInt(&ok);
 		if (!ok) return false;
 		return true;
 	}
 	else if (list.size()==2)
 	{
 		ps[0] = list.at(0).toDouble(&ok);
-		if (!ok) ps[0] = (double)list.at(0).toInt(&ok);
+		if (!ok) ps[0] = list.at(0).toInt(&ok);
 		if (!ok) return false;
 		ps[1] = list.at(1).toDouble(&ok);
-		if (!ok) ps[1] = (double)list.at(1).toInt(&ok);
+		if (!ok) ps[1] = list.at(1).toInt(&ok);
 		if (!ok) return false;
 		return true;
 	}
@@ -4495,20 +4494,20 @@ bool DicomUtils::generate_geometry(
 	{
 		const double * ipp_iop = values.at(i);
 		const sVector4 c0 = sVector4(
-					(float)ipp_iop[3]*spacing_x,
-					(float)ipp_iop[4]*spacing_x,
-					(float)ipp_iop[5]*spacing_x,
+					static_cast<float>(ipp_iop[3])*spacing_x,
+					static_cast<float>(ipp_iop[4])*spacing_x,
+					static_cast<float>(ipp_iop[5])*spacing_x,
 					0.0f);
 		const sVector4 c1 = sVector4(
-					(float)ipp_iop[6]*spacing_y,
-					(float)ipp_iop[7]*spacing_y,
-					(float)ipp_iop[8]*spacing_y,
+					static_cast<float>(ipp_iop[6])*spacing_y,
+					static_cast<float>(ipp_iop[7])*spacing_y,
+					static_cast<float>(ipp_iop[8])*spacing_y,
 					0.0f);
 		const sVector4 c2 = sVector4(0.0f,0.0f,0.0f,0.0f);
 		const sVector4 c3 = sVector4(
-					(float)ipp_iop[0],
-					(float)ipp_iop[1],
-					(float)ipp_iop[2],
+					static_cast<float>(ipp_iop[0]),
+					static_cast<float>(ipp_iop[1]),
+					static_cast<float>(ipp_iop[2]),
 					1.0f);
 #if 0
 		std::cout << "ipp[0]=" << ipp_iop[0] << std::endl;
@@ -4637,12 +4636,12 @@ bool DicomUtils::generate_geometry(
 		tmp_length2 = length2;
 		tmp_length3 = length3;
 	}
-	const float row_dircos_x = (float)dircos[0];
-	const float row_dircos_y = (float)dircos[1];
-	const float row_dircos_z = (float)dircos[2];
-	const float col_dircos_x = (float)dircos[3];
-	const float col_dircos_y = (float)dircos[4];
-	const float col_dircos_z = (float)dircos[5];
+	const float row_dircos_x = static_cast<float>(dircos[0]);
+	const float row_dircos_y = static_cast<float>(dircos[1]);
+	const float row_dircos_z = static_cast<float>(dircos[2]);
+	const float col_dircos_x = static_cast<float>(dircos[3]);
+	const float col_dircos_y = static_cast<float>(dircos[4]);
+	const float col_dircos_z = static_cast<float>(dircos[5]);
 	const float nrm_dircos_x = row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
 	const float nrm_dircos_y = row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
 	const float nrm_dircos_z = row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
@@ -4777,7 +4776,7 @@ void DicomUtils::enhanced_get_indices(
 	int mr_frame_type_idx = -1;
 	int mr_eff_echo_idx   = -1;
 	int segment_idx       = -1;
-	const int sq_size = (int)sq.size();
+	const int sq_size = static_cast<int>(sq.size());
 	for (int x = 0; x < sq_size; ++x)
 	{
 		const size_t i = (size_t)x;
@@ -5107,7 +5106,7 @@ void DicomUtils::enhanced_get_indices(
 			int dim5th_tmp = -1;
 			for (int x = 0; x < 3; ++x)
 			{
-				const size_t i = (size_t)x;
+				const size_t i = static_cast<size_t>(x);
 				if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
 					sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9056))
 				{
@@ -5137,7 +5136,7 @@ void DicomUtils::enhanced_get_indices(
 			int dim6th_tmp = -1;
 			for (int x = 0; x < 4; ++x)
 			{
-				const size_t i = (size_t)x;
+				const size_t i = static_cast<size_t>(x);
 				if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
 					sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9056))
 				{
@@ -5652,7 +5651,7 @@ bool DicomUtils::read_shutter(const mdcm::DataSet & ds, PRDisplayShutter & a)
 				tShutterPresentationValue,
 				&ShutterPresentationValue))
 		{
-			a.ShutterPresentationValue = (int)ShutterPresentationValue;
+			a.ShutterPresentationValue = static_cast<int>(ShutterPresentationValue);
 		}
 		std::vector<unsigned short> ShutterPresentationColorCIELabValue;
 		if (get_us_values(
@@ -6990,16 +6989,11 @@ QString DicomUtils::read_series(
 				bool invalidate = false;
 				if (ivariant->equi)
 				{
-					const float tmp0_spacing_x = (float)
-						spacing_x_;
-					const float tmp0_spacing_y = (float)
-						spacing_y_;
-					const float tmp1_spacing_x = (float)
-						ivariant->di->ix_spacing;
-					const float tmp1_spacing_y = (float)
-						ivariant->di->iy_spacing;
-					const float tmp1_spacing_z = (float)
-						ivariant->di->iz_spacing;
+					const float tmp0_spacing_x = static_cast<float>(spacing_x_);
+					const float tmp0_spacing_y = static_cast<float>(spacing_y_);
+					const float tmp1_spacing_x = static_cast<float>(ivariant->di->ix_spacing);
+					const float tmp1_spacing_y = static_cast<float>(ivariant->di->iy_spacing);
+					const float tmp1_spacing_z = static_cast<float>(ivariant->di->iz_spacing);
 					if (tmp1_spacing_x <= 0)
 					{
 						std::cout << "ivariant->di->ix_spacing <= 0 "
@@ -7037,12 +7031,12 @@ QString DicomUtils::read_series(
 							<< tmp1_spacing_y << std::endl;
 						invalidate = true;
 					}
-					const float tmp0_origin_x = (float)origin_x_;
-					const float tmp0_origin_y = (float)origin_y_;
-					const float tmp0_origin_z = (float)origin_z_;
-					const float tmp1_origin_x = (float)ivariant->di->ix_origin;
-					const float tmp1_origin_y = (float)ivariant->di->iy_origin;
-					const float tmp1_origin_z = (float)ivariant->di->iz_origin;
+					const float tmp0_origin_x = static_cast<float>(origin_x_);
+					const float tmp0_origin_y = static_cast<float>(origin_y_);
+					const float tmp0_origin_z = static_cast<float>(origin_z_);
+					const float tmp1_origin_x = static_cast<float>(ivariant->di->ix_origin);
+					const float tmp1_origin_y = static_cast<float>(ivariant->di->iy_origin);
+					const float tmp1_origin_z = static_cast<float>(ivariant->di->iz_origin);
 					if ((tmp0_origin_x + 0.001f) < tmp1_origin_x ||
 						(tmp0_origin_x - 0.001f) > tmp1_origin_x)
 					{
@@ -7067,18 +7061,18 @@ QString DicomUtils::read_series(
 							<< tmp1_origin_z << std::endl;
 						invalidate = true;
 					}
-					const float tmp0_dircos_0 = (float)dircos_[0];
-					const float tmp0_dircos_1 = (float)dircos_[1];
-					const float tmp0_dircos_2 = (float)dircos_[2];
-					const float tmp0_dircos_3 = (float)dircos_[3];
-					const float tmp0_dircos_4 = (float)dircos_[4];
-					const float tmp0_dircos_5 = (float)dircos_[5];
-					const float tmp1_dircos_0 = (float)ivariant->di->dircos[0];
-					const float tmp1_dircos_1 = (float)ivariant->di->dircos[1];
-					const float tmp1_dircos_2 = (float)ivariant->di->dircos[2];
-					const float tmp1_dircos_3 = (float)ivariant->di->dircos[3];
-					const float tmp1_dircos_4 = (float)ivariant->di->dircos[4];
-					const float tmp1_dircos_5 = (float)ivariant->di->dircos[5];
+					const float tmp0_dircos_0 = static_cast<float>(dircos_[0]);
+					const float tmp0_dircos_1 = static_cast<float>(dircos_[1]);
+					const float tmp0_dircos_2 = static_cast<float>(dircos_[2]);
+					const float tmp0_dircos_3 = static_cast<float>(dircos_[3]);
+					const float tmp0_dircos_4 = static_cast<float>(dircos_[4]);
+					const float tmp0_dircos_5 = static_cast<float>(dircos_[5]);
+					const float tmp1_dircos_0 = static_cast<float>(ivariant->di->dircos[0]);
+					const float tmp1_dircos_1 = static_cast<float>(ivariant->di->dircos[1]);
+					const float tmp1_dircos_2 = static_cast<float>(ivariant->di->dircos[2]);
+					const float tmp1_dircos_3 = static_cast<float>(ivariant->di->dircos[3]);
+					const float tmp1_dircos_4 = static_cast<float>(ivariant->di->dircos[4]);
+					const float tmp1_dircos_5 = static_cast<float>(ivariant->di->dircos[5]);
 					if ((tmp0_dircos_0 + 0.001f) < tmp1_dircos_0 ||
 						(tmp0_dircos_0 - 0.001f) > tmp1_dircos_0)
 					{
@@ -7378,8 +7372,8 @@ static void delta_decode_rgb(
 	const size_t outputlen = 3 * plane_size;
 	new_stream.resize(outputlen);
 	if(data_size == outputlen) return;
-	unsigned char * src  = (unsigned char*)data_in;
-	unsigned char * dest = (unsigned char*)&new_stream[0];
+	const unsigned char * src  = data_in;
+	unsigned char * dest = &new_stream[0];
 	union
 	{
 		unsigned char gray;
@@ -7506,9 +7500,9 @@ static void delta_decode(
 	std::vector<char> temp;
 	for(size_t i = 0; i < length; ++i)
 	{
-		if(inbuffer[i] == (char)0xa5)
+		if(inbuffer[i] == 0xa5)
 		{
-			int repeat = (int)((unsigned char)inbuffer[i+1] + 1);
+			int repeat = static_cast<int>(static_cast<unsigned char>(inbuffer[i+1]) + 1);
 			const char value = inbuffer[i+2];
 			while(repeat > 0)
 			{
@@ -7526,18 +7520,18 @@ static void delta_decode(
 	unsigned short delta = 0;
 	for(size_t i = 0; i < temp.size(); ++i)
 	{
-		if(temp[i] == (char)0x5a)
+		if(temp[i] == 0x5a)
 		{
-			const unsigned char v1 = (unsigned char)temp[i+1];
-			const unsigned char v2 = (unsigned char)temp[i+2];
-			const unsigned short value = (unsigned short)(v2 * 256 + v1);
+			const unsigned char v1 = static_cast<unsigned char>(temp[i+1]);
+			const unsigned char v2 = static_cast<unsigned char>(temp[i+2]);
+			const unsigned short value = static_cast<unsigned short>(v2 * 256 + v1);
 			output.push_back(value);
 			delta = value;
 			i += 2;
 		}
 		else
 		{
-			const unsigned short value = (unsigned short)(temp[i] + delta);
+			const unsigned short value = static_cast<unsigned short>(temp[i] + delta);
 			output.push_back(value);
 			delta = value;
 		}
@@ -8434,7 +8428,7 @@ QString DicomUtils::read_buffer(
 		{
 			const QString tmp_s0 =
 				QString("Bits allocated = ") +
-				QVariant((int)pixelformat.GetBitsAllocated()).toString() +
+				QVariant(static_cast<int>(pixelformat.GetBitsAllocated())).toString() +
 				QString(", not supported.");
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return tmp_s0;
@@ -8443,7 +8437,7 @@ QString DicomUtils::read_buffer(
 	else
 	{
 		type_size = ((pixelformat.GetBitsAllocated() % 8) != 0)
-					? (unsigned int)(ceil((double)pixelformat.GetBitsAllocated() / 8.0))
+					? static_cast<unsigned int>(ceil(pixelformat.GetBitsAllocated() / 8.0))
 					: pixelformat.GetBitsAllocated() / 8;
 	}
 	if (singlebit)
@@ -8471,14 +8465,14 @@ QString DicomUtils::read_buffer(
 		for (unsigned long long x = 0; x < image_buffer_length; ++x)
 		{
 			const unsigned char c = not_rescaled_buffer[x];
-			singlebit_buffer[j  ] = (c &  0x1) ? (char)255 : 0;
-			singlebit_buffer[j+1] = (c &  0x2) ? (char)255 : 0;
-			singlebit_buffer[j+2] = (c &  0x4) ? (char)255 : 0;
-			singlebit_buffer[j+3] = (c &  0x8) ? (char)255 : 0;
-			singlebit_buffer[j+4] = (c & 0x10) ? (char)255 : 0;
-			singlebit_buffer[j+5] = (c & 0x20) ? (char)255 : 0;
-			singlebit_buffer[j+6] = (c & 0x40) ? (char)255 : 0;
-			singlebit_buffer[j+7] = (c & 0x80) ? (char)255 : 0;
+			singlebit_buffer[j  ] = (c &  0x1) ? 255 : 0;
+			singlebit_buffer[j+1] = (c &  0x2) ? 255 : 0;
+			singlebit_buffer[j+2] = (c &  0x4) ? 255 : 0;
+			singlebit_buffer[j+3] = (c &  0x8) ? 255 : 0;
+			singlebit_buffer[j+4] = (c & 0x10) ? 255 : 0;
+			singlebit_buffer[j+5] = (c & 0x20) ? 255 : 0;
+			singlebit_buffer[j+6] = (c & 0x40) ? 255 : 0;
+			singlebit_buffer[j+7] = (c & 0x80) ? 255 : 0;
 			j += 8;
 		}
 		buffer      = (char *)singlebit_buffer;
@@ -8888,7 +8882,7 @@ QString DicomUtils::read_enhanced_common(
 				}
 			}
 			//
-			for (int i = 0; i < (int)tmp1.size(); ++i)
+			for (int i = 0; i < static_cast<int>(tmp1.size()); ++i)
 			{
 				AnatomyDesc anatomy_desc;
 				anatomy_desc.laterality =
@@ -9038,12 +9032,12 @@ QString DicomUtils::read_enhanced_common(
 				origin_x = origin_x_gen;
 				origin_y = origin_y_gen;
 				origin_z = origin_z_gen;
-				const float row_dircos_x = (float)dircos_gen[0];
-				const float row_dircos_y = (float)dircos_gen[1];
-				const float row_dircos_z = (float)dircos_gen[2];
-				const float col_dircos_x = (float)dircos_gen[3];
-				const float col_dircos_y = (float)dircos_gen[4];
-				const float col_dircos_z = (float)dircos_gen[5];
+				const float row_dircos_x = static_cast<float>(dircos_gen[0]);
+				const float row_dircos_y = static_cast<float>(dircos_gen[1]);
+				const float row_dircos_z = static_cast<float>(dircos_gen[2]);
+				const float col_dircos_x = static_cast<float>(dircos_gen[3]);
+				const float col_dircos_y = static_cast<float>(dircos_gen[4]);
+				const float col_dircos_z = static_cast<float>(dircos_gen[5]);
 				const float nrm_dircos_x = row_dircos_y*col_dircos_z - row_dircos_z*col_dircos_y;
 				const float nrm_dircos_y = row_dircos_z*col_dircos_x - row_dircos_x*col_dircos_z;
 				const float nrm_dircos_z = row_dircos_x*col_dircos_y - row_dircos_y*col_dircos_x;
@@ -9076,12 +9070,12 @@ QString DicomUtils::read_enhanced_common(
 				origin_x  = origin_x_read;
 				origin_y  = origin_y_read;
 				origin_z  = origin_z_read;
-				const float row_dircos_x = (float)dircos_read[0];
-				const float row_dircos_y = (float)dircos_read[1];
-				const float row_dircos_z = (float)dircos_read[2];
-				const float col_dircos_x = (float)dircos_read[3];
-				const float col_dircos_y = (float)dircos_read[4];
-				const float col_dircos_z = (float)dircos_read[5];
+				const float row_dircos_x = static_cast<float>(dircos_read[0]);
+				const float row_dircos_y = static_cast<float>(dircos_read[1]);
+				const float row_dircos_z = static_cast<float>(dircos_read[2]);
+				const float col_dircos_x = static_cast<float>(dircos_read[3]);
+				const float col_dircos_y = static_cast<float>(dircos_read[4]);
+				const float col_dircos_z = static_cast<float>(dircos_read[5]);
 				const float nrm_dircos_x = row_dircos_y*col_dircos_z - row_dircos_z*col_dircos_y;
 				const float nrm_dircos_y = row_dircos_z*col_dircos_x - row_dircos_x*col_dircos_z;
 				const float nrm_dircos_z = row_dircos_x*col_dircos_y - row_dircos_y*col_dircos_x;
@@ -9492,15 +9486,15 @@ bool DicomUtils::enhanced_process_indices(
 					for (unsigned int x = 0; x < idx_values.size(); ++x)
 					{
 						const int idx1 =
-							dim6th >= 0 && dim6th < (int)idx_values.at(x).idx.size()
+							dim6th >= 0 && dim6th < static_cast<int>(idx_values.at(x).idx.size())
 							? idx_values.at(x).idx.at(dim6th)
 							: -1;
 						const int idx2 =
-							dim5th >= 0 && dim5th < (int)idx_values.at(x).idx.size()
+							dim5th >= 0 && dim5th < static_cast<int>(idx_values.at(x).idx.size())
 							? idx_values.at(x).idx.at(dim5th)
 							: -1;
 						const int idx3 =
-							dim4th >= 0 && dim4th < (int)idx_values.at(x).idx.size()
+							dim4th >= 0 && dim4th < static_cast<int>(idx_values.at(x).idx.size())
 							? idx_values.at(x).idx.at(dim4th)
 							: -1;
 						const int idx4 =
@@ -9508,9 +9502,9 @@ bool DicomUtils::enhanced_process_indices(
 							? idx_values.at(x).idx.at(dim3rd)
 							: -1;
 						if (
-							(idx1<0 || idx1==(int)*it1) &&
-							(idx2<0 || idx2==(int)*it2) &&
-							(idx3<0 || idx3==(int)*it3))
+							(idx1<0 || idx1==static_cast<int>(*it1)) &&
+							(idx2<0 || idx2==static_cast<int>(*it2)) &&
+							(idx3<0 || idx3==static_cast<int>(*it3)))
 						{
 							if (idx4<0)
 							{
@@ -9895,10 +9889,10 @@ bool DicomUtils::is_dicom_file(const QString & f)
 			if(!fs.fail())
 			{
 				if (
-					b[0] == (char)'D' &&
-					b[1] == (char)'I' &&
-					b[2] == (char)'C' &&
-					b[3] == (char)'M') dicom = true;
+					b[0] == 'D' &&
+					b[1] == 'I' &&
+					b[2] == 'C' &&
+					b[3] == 'M') dicom = true;
 			}
 		}
 	}
@@ -10752,7 +10746,7 @@ QString DicomUtils::read_enhmr_spectro_info(
 								&RFEchoTrainLength))
 						{
 							QString sRFEchoTrainLength =
-								QVariant((int)RFEchoTrainLength)
+								QVariant(static_cast<int>(RFEchoTrainLength))
 									.toString();
 							sRFEchoTrainLength =
 								sRFEchoTrainLength.trimmed();
@@ -10776,7 +10770,7 @@ QString DicomUtils::read_enhmr_spectro_info(
 								&GradientEchoTrainLength))
 						{
 							QString sGradientEchoTrainLength =
-								QVariant((int)GradientEchoTrainLength)
+								QVariant(static_cast<int>(GradientEchoTrainLength))
 									.toString();
 							sGradientEchoTrainLength =
 								sGradientEchoTrainLength
@@ -10829,7 +10823,7 @@ QString DicomUtils::read_enhmr_spectro_info(
 									QString(" nerve stim.");
 							}
 							QString sGradientOutput =
-								QVariant((double)GradientOutput)
+								QVariant(static_cast<double>(GradientOutput))
 									.toString();
 							sGradientOutput = sGradientOutput.trimmed();
 							if (!sGradientOutput.isEmpty())
@@ -10940,7 +10934,7 @@ QString DicomUtils::read_enhmr_spectro_info(
 				tmp0 += QString("<span class='y9'>");
 				tmp0 += QString("Velocity Encoding Directions");
 				tmp0 += QString("</span><br />");
-				for (int i = 0; i < (int)sq->GetNumberOfItems(); ++i)
+				for (int i = 0; i < static_cast<int>(sq->GetNumberOfItems()); ++i)
 				{
 					const mdcm::Item & item = sq->GetItem(i+1);
 					const mdcm::DataSet& nds = item.GetNestedDataSet();
@@ -11048,7 +11042,7 @@ QString DicomUtils::read_enhmr_spectro_info(
 				&NumberofkSpaceTrajectories))
 		{
 			QString sNumberofkSpaceTrajectories =
-				QVariant((int)NumberofkSpaceTrajectories).toString();
+				QVariant(static_cast<int>(NumberofkSpaceTrajectories)).toString();
 			sNumberofkSpaceTrajectories =
 				sNumberofkSpaceTrajectories.trimmed();
 			if (!sNumberofkSpaceTrajectories.isEmpty())
@@ -11120,7 +11114,7 @@ QString DicomUtils::read_enhmr_spectro_info(
 		if (DicomUtils::get_fl_value(ds, tB1rms, &fB1rms))
 		{
 			QString B1rms =
-				QVariant((double)fB1rms).toString();
+				QVariant(static_cast<double>(fB1rms)).toString();
 			B1rms = B1rms.trimmed();
 			if (!B1rms.isEmpty())
 			{
@@ -11855,7 +11849,7 @@ QString DicomUtils::read_dicom(
 		slice_pos_list.unique();
 		const size_t size1 = slice_pos_list.size();
 		if (size0 != size1 &&
-			size0 == (size_t)images.size() &&
+			size0 == static_cast<size_t>(images.size()) &&
 			images.size()%size1 == 0)
 		{
 			multiseries = true;
@@ -11883,7 +11877,7 @@ QString DicomUtils::read_dicom(
 				slices_instance_nums.unique();
 				const size_t inst_size1 = slices_instance_nums.size();
 				if (inst_size0==inst_size1 &&
-					inst_size0==(size_t)images.size())
+					inst_size0==static_cast<size_t>(images.size()))
 				{
 					unique_instance_nums = true;
 				}
@@ -11915,7 +11909,7 @@ QString DicomUtils::read_dicom(
 					for (unsigned int j = 0; j < size1; ++j)
 					{
 						const unsigned int id__= image_ids.at(k+j);
-						if (id__<(unsigned int)images.size())
+						if (id__<static_cast<unsigned int>(images.size()))
 						{
 							images_tmp.push_back(images.at(id__));
 						}
@@ -12001,7 +11995,7 @@ QString DicomUtils::read_dicom(
 									{
 										const unsigned int id_1_ =
 											slices_instance_map[slices_.at(k).at(j)];
-										if (id_1_<(unsigned int)images.size())
+										if (id_1_<static_cast<unsigned int>(images.size()))
 										{
 											images_tmp.push_back(
 												images.at(id_1_));
@@ -12581,11 +12575,11 @@ QString DicomUtils::read_dicom(
 			unsigned short r = 0, c = 0, a = 0;
 			if (get_us_value(ds,tr,&r))
 			{
-				si.rows = (int)r;
+				si.rows = r;
 			}
 			if (get_us_value(ds,tc,&c))
 			{
-				si.columns = (int)c;
+				si.columns = c;
 			}
 			if (get_us_value(ds,ta,&a))
 			{
@@ -12610,7 +12604,7 @@ QString DicomUtils::read_dicom(
 					QString("x") +
 					QString::number(i.columns) +
 					QString("x") +
-					QString::number((int)i.allocated) +
+					QString::number(static_cast<int>(i.allocated)) +
 					(i.localizer ? QString("L") : QString(""));
 				l0.insert(k1, i.file);
 			}

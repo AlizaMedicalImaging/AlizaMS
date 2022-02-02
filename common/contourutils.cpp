@@ -120,9 +120,9 @@ void ContourUtils::calculate_rois_center(ImageVariant * iv)
 				for (int k = 0; k < c->dpoints.size(); ++k)
 				{
 					++z;
-					tmpx += (double)c->dpoints.at(k).x;
-					tmpy += (double)c->dpoints.at(k).y;
-					tmpz += (double)c->dpoints.at(k).z;
+					tmpx += c->dpoints.at(k).x;
+					tmpy += c->dpoints.at(k).y;
+					tmpz += c->dpoints.at(k).z;
 				}
 			}
 			++it;
@@ -130,12 +130,9 @@ void ContourUtils::calculate_rois_center(ImageVariant * iv)
 	}
 	if (z>0)
 	{
-		iv->di->default_center_x = iv->di->center_x =
-			tmpx/(double)z;
-		iv->di->default_center_y = iv->di->center_y =
-			tmpy/(double)z;
-		iv->di->default_center_z = iv->di->center_z =
-			tmpz/(double)z;
+		iv->di->default_center_x = iv->di->center_x = tmpx/z;
+		iv->di->default_center_y = iv->di->center_y = tmpy/z;
+		iv->di->default_center_z = iv->di->center_z = tmpz/z;
 	}
 }
 
@@ -289,7 +286,7 @@ void ContourUtils::calculate_uvt_nonuniform(
 			if (!c) continue;
 			QList<int> slices;
 			for (unsigned int z = 0;
-				z < (unsigned int)ivariant->di->idimz;
+				z < static_cast<unsigned int>(ivariant->di->idimz);
 				++z)
 			{
 				bool in_slice = false;
@@ -449,7 +446,7 @@ void ContourUtils::map_contours_uniform(
 			<< std::endl;
 		return;
 	}
-	const float tolerance = (float)ivariant->di->iz_spacing*0.5f;
+	const float tolerance = static_cast<float>(ivariant->di->iz_spacing)*0.5f;
 	for (int x = 0; x < ivariant->di->rois.size(); ++x)
 	{
 		if (ivariant->di->rois.at(x).id == roi_id)
@@ -469,20 +466,17 @@ void ContourUtils::map_contours_uniform(
 				if (!c) continue;
 				for (int z = 0; z < ivariant->di->idimz; ++z)
 				{
-					const float px =
-						(float)ivariant->di->image_slices.at(z)->v[0];
-					const float py =
-						(float)ivariant->di->image_slices.at(z)->v[1];
-					const float pz =
-						(float)ivariant->di->image_slices.at(z)->v[2];
+					const float px = static_cast<float>(ivariant->di->image_slices.at(z)->v[0]);
+					const float py = static_cast<float>(ivariant->di->image_slices.at(z)->v[1]);
+					const float pz = static_cast<float>(ivariant->di->image_slices.at(z)->v[2]);
 					const sVector3 v1 = sVector3(
-						(float)(ivariant->di->image_slices.at(z)->v[3]) - px,
-						(float)(ivariant->di->image_slices.at(z)->v[4]) - py,
-						(float)(ivariant->di->image_slices.at(z)->v[5]) - pz);
+						static_cast<float>(ivariant->di->image_slices.at(z)->v[3]) - px,
+						static_cast<float>(ivariant->di->image_slices.at(z)->v[4]) - py,
+						static_cast<float>(ivariant->di->image_slices.at(z)->v[5]) - pz);
 					const sVector3 v2 = sVector3(
-						(float)(ivariant->di->image_slices.at(z)->v[6]) - px,
-						(float)(ivariant->di->image_slices.at(z)->v[7]) - py,
-						(float)(ivariant->di->image_slices.at(z)->v[8]) - pz);
+						static_cast<float>(ivariant->di->image_slices.at(z)->v[6]) - px,
+						static_cast<float>(ivariant->di->image_slices.at(z)->v[7]) - py,
+						static_cast<float>(ivariant->di->image_slices.at(z)->v[8]) - pz);
 					const sVector3 n = Vectormath::Scalar::normalize(
 						Vectormath::Scalar::cross(v1,v2));
 					for (int k = 0; k < c->dpoints.size(); ++k)
@@ -548,26 +542,17 @@ void ContourUtils::map_contours_nonuniform(
 				QList<int> slices;
 				for (int z = 0; z < ivariant->di->idimz; ++z)
 				{
-					const float px =
-						(float)ivariant->di->image_slices.at(z)->v[0];
-					const float py =
-						(float)ivariant->di->image_slices.at(z)->v[1];
-					const float pz =
-						(float)ivariant->di->image_slices.at(z)->v[2];
+					const float px = static_cast<float>(ivariant->di->image_slices.at(z)->v[0]);
+					const float py = static_cast<float>(ivariant->di->image_slices.at(z)->v[1]);
+					const float pz = static_cast<float>(ivariant->di->image_slices.at(z)->v[2]);
 					const sVector3 v1 = sVector3(
-						(float)(ivariant->di->image_slices.at(z)->v[3])
-							- px,
-						(float)(ivariant->di->image_slices.at(z)->v[4])
-							- py,
-						(float)(ivariant->di->image_slices.at(z)->v[5])
-							- pz);
+						static_cast<float>(ivariant->di->image_slices.at(z)->v[3]) - px,
+						static_cast<float>(ivariant->di->image_slices.at(z)->v[4]) - py,
+						static_cast<float>(ivariant->di->image_slices.at(z)->v[5]) - pz);
 					const sVector3 v2 = sVector3(
-						(float)(ivariant->di->image_slices.at(z)->v[6])
-							- px,
-						(float)(ivariant->di->image_slices.at(z)->v[7])
-							- py,
-						(float)(ivariant->di->image_slices.at(z)->v[8])
-							- pz);
+						static_cast<float>(ivariant->di->image_slices.at(z)->v[6]) - px,
+						static_cast<float>(ivariant->di->image_slices.at(z)->v[7]) - py,
+						static_cast<float>(ivariant->di->image_slices.at(z)->v[8]) - pz);
 					const sVector3 n = Vectormath::Scalar::normalize(
 						Vectormath::Scalar::cross(v1,v2));
 					for (int k = 0; k < c->dpoints.size(); ++k)
@@ -812,18 +797,12 @@ bool ContourUtils::phys_space_from_slice(
 		return false;
 	}
 #endif
-	const float row_dircos_x =
-		(float)ivariant->di->image_slices.at(x)->ipp_iop[3];
-	const float row_dircos_y =
-		(float)ivariant->di->image_slices.at(x)->ipp_iop[4];
-	const float row_dircos_z =
-		(float)ivariant->di->image_slices.at(x)->ipp_iop[5];
-	const float col_dircos_x =
-		(float)ivariant->di->image_slices.at(x)->ipp_iop[6];
-	const float col_dircos_y =
-		(float)ivariant->di->image_slices.at(x)->ipp_iop[7];
-	const float col_dircos_z =
-		(float)ivariant->di->image_slices.at(x)->ipp_iop[8];
+	const float row_dircos_x = static_cast<float>(ivariant->di->image_slices.at(x)->ipp_iop[3]);
+	const float row_dircos_y = static_cast<float>(ivariant->di->image_slices.at(x)->ipp_iop[4]);
+	const float row_dircos_z = static_cast<float>(ivariant->di->image_slices.at(x)->ipp_iop[5]);
+	const float col_dircos_x = static_cast<float>(ivariant->di->image_slices.at(x)->ipp_iop[6]);
+	const float col_dircos_y = static_cast<float>(ivariant->di->image_slices.at(x)->ipp_iop[7]);
+	const float col_dircos_z = static_cast<float>(ivariant->di->image_slices.at(x)->ipp_iop[8]);
 	if (	
 		row_dircos_x>-0.000001f && row_dircos_x<0.000001f &&
 		row_dircos_y>-0.000001f && row_dircos_y<0.000001f &&
@@ -857,12 +836,9 @@ bool ContourUtils::phys_space_from_slice(
 	spacing[1] = ivariant->di->iy_spacing;
 	spacing[2] = 1;
 	ImageTypeUC::DirectionType direction;
-	const float nrm_dircos_x =
-		row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y; 
-	const float nrm_dircos_y =
-		row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
-	const float nrm_dircos_z =
-		row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
+	const float nrm_dircos_x = row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y; 
+	const float nrm_dircos_y = row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
+	const float nrm_dircos_z = row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
 	direction[0][0] = row_dircos_x;
 	direction[1][0] = row_dircos_y;
 	direction[2][0] = row_dircos_z;
@@ -879,8 +855,7 @@ bool ContourUtils::phys_space_from_slice(
 		image->SetSpacing(spacing);
 		image->SetDirection(direction);
 		image->Allocate();
-		image->FillBuffer(
-			static_cast<ImageTypeUC::PixelType>(0));
+		image->FillBuffer(static_cast<ImageTypeUC::PixelType>(0));
 	}
 	catch (itk::ExceptionObject & ex)
 	{

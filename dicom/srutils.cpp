@@ -170,7 +170,7 @@ template<typename T> SRImage li3(
 		unsigned short b__ = 0;
 		for (int i = 0; i < threadsLUT_size; ++i)
 		{
-			if (threadsLUT_.at(i)->isFinished()) { ++b__; }
+			if (threadsLUT_.at(i)->isFinished()) ++b__;
 		}
 		if (b__ == threadsLUT_size) break;
 	}
@@ -212,7 +212,7 @@ template<typename T> SRImage lrgb3(
 				bits_stored < bits_allocated &&
 				(high_bit==bits_stored-1))
 				? pow(2, bits_stored) - 1 : static_cast<double>(USHRT_MAX);
-		try { p__ = new unsigned char[size[0] * size[1] * 3]; }
+		try { p__ = new unsigned char[size[0]*size[1]*3]; }
 		catch (const std::bad_alloc&) { p__ = NULL; }
 		if (!p__) return SRImage();
 		try
@@ -221,15 +221,9 @@ template<typename T> SRImage lrgb3(
 			iterator.GoToBegin();
 			while (!iterator.IsAtEnd())
 			{
-				p__[j_ + 2] =
-					static_cast<unsigned char>(
-						(static_cast<double>(iterator.Get().GetBlue()) / tmp_max) * 255.0);
-				p__[j_ + 1] =
-					static_cast<unsigned char>(
-						(static_cast<double>(iterator.Get().GetGreen()) / tmp_max) * 255.0);
-				p__[j_ + 0] =
-					static_cast<unsigned char>(
-						(static_cast<double>(iterator.Get().GetRed()) / tmp_max) * 255.0);
+				p__[j_+2] = static_cast<unsigned char>((iterator.Get().GetBlue() /tmp_max)*255.0);
+				p__[j_+1] = static_cast<unsigned char>((iterator.Get().GetGreen()/tmp_max)*255.0);
+				p__[j_+0] = static_cast<unsigned char>((iterator.Get().GetRed()  /tmp_max)*255.0);
 				j_ += 3;
 				++iterator;
 			}
@@ -255,9 +249,9 @@ template<typename T> SRImage lrgb3(
 				iterator.GoToBegin();
 				while(!iterator.IsAtEnd())
 				{
-					const double b = static_cast<double>(iterator.Get().GetBlue());
-					const double g = static_cast<double>(iterator.Get().GetGreen());
-					const double r = static_cast<double>(iterator.Get().GetRed());
+					const double b = iterator.Get().GetBlue();
+					const double g = iterator.Get().GetGreen();
+					const double r = iterator.Get().GetRed();
 					p__[j_+2] = static_cast<unsigned char>(255.0*((b+(-vmin))/vrange));
 					p__[j_+1] = static_cast<unsigned char>(255.0*((g+(-vmin))/vrange));
 					p__[j_+0] = static_cast<unsigned char>(255.0*((r+(-vmin))/vrange));
@@ -697,14 +691,10 @@ endpoints of the minor axis of an ellipse
 							}
 							else if (sg.GraphicType == QString("CIRCLE"))
 							{
-								const double center_x =
-									sg.GraphicData.at(0);
-								const double center_y =
-									sg.GraphicData.at(1);
-								const double point_x  =
-									sg.GraphicData.at(2);
-								const double point_y  =
-									sg.GraphicData.at(3);
+								const double center_x = sg.GraphicData.at(0);
+								const double center_y = sg.GraphicData.at(1);
+								const double point_x  = sg.GraphicData.at(2);
+								const double point_y  = sg.GraphicData.at(3);
 								const double x__ = point_x - center_x;
 								const double y__ = point_y - center_y;
 								const double distance =

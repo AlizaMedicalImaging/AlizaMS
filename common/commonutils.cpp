@@ -94,10 +94,8 @@ template<typename T> void calculate_min_max(
 		min_max_calculator->SetImage(image);
 		min_max_calculator->SetRegion(image->GetLargestPossibleRegion());
 		min_max_calculator->Compute();
-		cubemin =
-			static_cast<double>(min_max_calculator->GetMinimum());
-		cubemax =
-			static_cast<double>(min_max_calculator->GetMaximum());
+		cubemin = min_max_calculator->GetMinimum();
+		cubemax = min_max_calculator->GetMaximum();
 	}
 	catch (itk::ExceptionObject & ex)
 	{
@@ -114,13 +112,13 @@ template<typename T> void calculate_min_max(
 					(iv->di->bits_stored<iv->di->bits_allocated) &&
 					(iv->di->high_bit==iv->di->bits_stored-1))
 				{
-					iv->di->rmin = -(double)pow(2, (iv->di->bits_stored-1))-1;
-					iv->di->rmax =  (double)pow(2, (iv->di->bits_stored-1))-1;
+					iv->di->rmin = -pow(2, (iv->di->bits_stored-1))-1;
+					iv->di->rmax =  pow(2, (iv->di->bits_stored-1))-1;
 				}
 				else
 				{
-					iv->di->rmin = (double)SHRT_MIN;
-					iv->di->rmax = (double)SHRT_MAX;
+					iv->di->rmin = SHRT_MIN;
+					iv->di->rmax = SHRT_MAX;
 				}
 			}
 			break;
@@ -131,12 +129,12 @@ template<typename T> void calculate_min_max(
 					(iv->di->high_bit==iv->di->bits_stored-1))
 				{
 					iv->di->rmin = 0;
-					iv->di->rmax = (double)pow(2, (iv->di->bits_stored))-1;
+					iv->di->rmax = pow(2, (iv->di->bits_stored))-1;
 				}
 				else
 				{
 					iv->di->rmin = 0.0;
-					iv->di->rmax = (double)USHRT_MAX;
+					iv->di->rmax = USHRT_MAX;
 				}
 			}
 			break;
@@ -147,12 +145,12 @@ template<typename T> void calculate_min_max(
 					(iv->di->high_bit==iv->di->bits_stored-1))
 				{
 					iv->di->rmin = 0.0;
-					iv->di->rmax = (double)pow(2, (iv->di->bits_stored))-1;
+					iv->di->rmax = pow(2, (iv->di->bits_stored))-1;
 				}
 				else
 				{
 					iv->di->rmin = 0.0;
-					iv->di->rmax = (double)UCHAR_MAX;
+					iv->di->rmax = UCHAR_MAX;
 				}
 			}
 			break;
@@ -268,12 +266,9 @@ template <typename T> void calculate_rgb_minmax_(
 		iterator.GoToBegin();
 		while(!iterator.IsAtEnd())
 		{
-			const double b =
-				static_cast<double>(iterator.Get().GetBlue());
-			const double g =
-				static_cast<double>(iterator.Get().GetGreen());
-			const double r =
-				static_cast<double>(iterator.Get().GetRed());
+			const double b = iterator.Get().GetBlue();
+			const double g = iterator.Get().GetGreen();
+			const double r = iterator.Get().GetRed();
 			if (b > max_b) max_b = b;
 			if (g > max_g) max_g = g;
 			if (r > max_r) max_r = r;
@@ -330,14 +325,10 @@ template <typename T> void calculate_rgba_minmax_(
 		iterator.GoToBegin();
 		while(!iterator.IsAtEnd())
 		{
-			const double a =
-				static_cast<double>(iterator.Get().GetAlpha());
-			const double b =
-				static_cast<double>(iterator.Get().GetBlue());
-			const double g =
-				static_cast<double>(iterator.Get().GetGreen());
-			const double r =
-				static_cast<double>(iterator.Get().GetRed());
+			const double a = iterator.Get().GetAlpha();
+			const double b = iterator.Get().GetBlue();
+			const double g = iterator.Get().GetGreen();
+			const double r = iterator.Get().GetRed();
 			if (a > max_a) max_a = a;
 			if (b > max_b) max_b = b;
 			if (g > max_g) max_g = g;
@@ -450,8 +441,7 @@ template<typename T> int generate_tex3d(
 	typename T::Pointer out_image;
 	bool scale = true;
 	short texture_type = -1;
-	const typename T::RegionType r__ =
-			image->GetLargestPossibleRegion();
+	const typename T::RegionType r__ = image->GetLargestPossibleRegion();
 	const typename T::SizeType original_size = r__.GetSize();
 	calculate_min_max<T>(image, ivariant);
 	rmin = ivariant->di->rmin;
@@ -620,18 +610,18 @@ template<typename T> int generate_tex3d(
 				while (!inIterator.IsAtEndOfLine())
 				{
 					const typename T::PixelType v = inIterator.Get();
-					const double f = static_cast<const double>(v);
+					const double f = v;
 					// GL_R16F
 					if (texture_type == 0)
 						float_buf[j] = static_cast<float>((f+(-rmin))/max_minus_min);
 					// GL_R16
 					else if(texture_type == 1)
 						short_buf[j] = static_cast<unsigned short>(
-							(double)USHRT_MAX*((f+(-rmin))/max_minus_min));
+							USHRT_MAX*((f+(-rmin))/max_minus_min));
 					// GL_R8
 					else if(texture_type == 2)
 						ub_buf[j] = static_cast<GLubyte>(
-							(double)UCHAR_MAX*((f+(-rmin))/max_minus_min));
+							UCHAR_MAX*((f+(-rmin))/max_minus_min));
 					++j;
 					++inIterator;
 				}
@@ -850,12 +840,12 @@ template<typename T> void read_geometry_from_image(
 	sVector3 up        =  sVector3(0.0f,0.0f,0.0f);
 	const typename T::DirectionType dircos =
 		image->GetDirection();
-	const double d1 = (double)dircos[0][0];
-	const double d2 = (double)dircos[1][0];
-	const double d3 = (double)dircos[2][0];
-	const double d4 = (double)dircos[0][1];
-	const double d5 = (double)dircos[1][1];
-	const double d6 = (double)dircos[2][1];
+	const double d1 = dircos[0][0];
+	const double d2 = dircos[1][0];
+	const double d3 = dircos[2][0];
+	const double d4 = dircos[0][1];
+	const double d5 = dircos[1][1];
+	const double d6 = dircos[2][1];
 	for (size_t z = 0; z < size[2]; ++z)
 	{
 		typename T::IndexType idx0, idx1, idx2, idx3;
@@ -1031,9 +1021,9 @@ template <typename T> bool reload_monochrome_image(
 	isize[0] = size[0];
 	isize[1] = size[1];
 	isize[2] = size[2];
-	dspacing[0] = static_cast<double>(spacing[0]);
-	dspacing[1] = static_cast<double>(spacing[1]);
-	dspacing[2] = static_cast<double>(spacing[2]);
+	dspacing[0] = spacing[0];
+	dspacing[1] = spacing[1];
+	dspacing[2] = spacing[2];
 	//
 	bool ok = false;
 	if (ok3d)
@@ -1624,10 +1614,10 @@ template<typename T> QString process_dicom_rgba_image1(
 							// each CMYK plane represents a minimum intensity of the color.
 							// This value may be used only when Samples per Pixel (0028,0002)
 							// has a value of 4.
-							const float C = (float)p__[j  ];
-							const float M = (float)p__[j+1];
-							const float Y = (float)p__[j+2];
-							const float K = (float)p__[j+3];
+							const float C = static_cast<float>(p__[j  ]);
+							const float M = static_cast<float>(p__[j+1]);
+							const float Y = static_cast<float>(p__[j+2]);
+							const float K = static_cast<float>(p__[j+3]);
 #if 1
 							p[0]=static_cast<typename T::PixelType::ValueType>((C*K)/255.0f);
 							p[1]=static_cast<typename T::PixelType::ValueType>((M*K)/255.0f);
@@ -1665,12 +1655,12 @@ template<typename T> QString process_dicom_rgba_image1(
 							//
 							// FIXME
 							const float tmp_max = 255.0f;
-							const float alpha = (float)p__[j+3]/tmp_max;
+							const float alpha = static_cast<float>(p__[j+3]/tmp_max);
 							const float one_minus_alpha = 1.0f - alpha;
 							const float tmp_oth = one_minus_alpha*0;
-							const float tmp_red = tmp_oth + alpha*(float)(p__[j+0]);
-							const float tmp_gre = tmp_oth + alpha*(float)(p__[j+1]);
-							const float tmp_blu = tmp_oth + alpha*(float)(p__[j+2]);
+							const float tmp_red = tmp_oth + alpha*static_cast<float>(p__[j+0]);
+							const float tmp_gre = tmp_oth + alpha*static_cast<float>(p__[j+1]);
+							const float tmp_blu = tmp_oth + alpha*static_cast<float>(p__[j+2]);
 							p[0]=static_cast<typename T::PixelType::ValueType>((tmp_red/tmp_max)*255.0f);
 							p[1]=static_cast<typename T::PixelType::ValueType>((tmp_gre/tmp_max)*255.0f);
 							p[2]=static_cast<typename T::PixelType::ValueType>((tmp_blu/tmp_max)*255.0f);
@@ -2048,16 +2038,16 @@ void CommonUtils::calculate_center_notuniform(
 		for (size_t z = 0; z <= 9; z+=3)
 		{
 			++j;
-			tmpx += (double)cs->fv[z  ];
-			tmpy += (double)cs->fv[z+1];
-			tmpz += (double)cs->fv[z+2];
+			tmpx += cs->fv[z  ];
+			tmpy += cs->fv[z+1];
+			tmpz += cs->fv[z+2];
 		}
 	}
 	if (j>0)
 	{
-		*center_x = (float)(tmpx/(double)j);
-		*center_y = (float)(tmpy/(double)j);
-		*center_z = (float)(tmpz/(double)j);
+		*center_x = static_cast<float>(tmpx/j);
+		*center_y = static_cast<float>(tmpy/j);
+		*center_z = static_cast<float>(tmpz/j);
 	}
 }
 
@@ -2073,16 +2063,16 @@ void CommonUtils::calculate_center_notuniform(
 		for (size_t z = 0; z <= 9; z+=3)
 		{
 			++j;
-			tmpx += (double)cs->fv[z  ];
-			tmpy += (double)cs->fv[z+1];
-			tmpz += (double)cs->fv[z+2];
+			tmpx += cs->fv[z  ];
+			tmpy += cs->fv[z+1];
+			tmpz += cs->fv[z+2];
 		}
 	}
 	if (j>0)
 	{
-		*center_x = (float)(tmpx/(double)j);
-		*center_y = (float)(tmpy/(double)j);
-		*center_z = (float)(tmpz/(double)j);
+		*center_x = static_cast<float>(tmpx/j);
+		*center_y = static_cast<float>(tmpy/j);
+		*center_z = static_cast<float>(tmpz/j);
 	}
 }
 
@@ -2111,16 +2101,16 @@ void CommonUtils::generate_cubeslice(
 	cs->v[11]  = z3;
 	cs->tc[ 0] = 0.0f;
 	cs->tc[ 1] = 1.0f;
-	cs->tc[ 2] = (float)z/(float)(dimz-1);
+	cs->tc[ 2] = z/static_cast<float>(dimz-1);
 	cs->tc[ 3] = 0.0f;
 	cs->tc[ 4] = 0.0f;
-	cs->tc[ 5] = (float)z/(float)(dimz-1);
+	cs->tc[ 5] = z/static_cast<float>(dimz-1);
 	cs->tc[ 6] = 1.0f;
 	cs->tc[ 7] = 1.0f;
-	cs->tc[ 8] = (float)z/(float)(dimz-1);
+	cs->tc[ 8] = z/static_cast<float>(dimz-1);
 	cs->tc[ 9] = 1.0f;
 	cs->tc[10] = 0.0f;
-	cs->tc[11] = (float)z/(float)(dimz-1);
+	cs->tc[11] = z/static_cast<float>(dimz-1);
 	cs->fv[ 0] = x0;
 	cs->fv[ 1] = y0;
 	cs->fv[ 2] = z0;
@@ -3282,7 +3272,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 							delete [] p__;
 							return QString(
 								QString("!data.at(") +
-								QVariant((unsigned long long)z_).toString() +
+								QVariant(static_cast<unsigned long long>(z_)).toString() +
 								QString(")"));
 						}
 						size_t inc_xy = 0;
@@ -3371,7 +3361,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 							delete [] p__;
 							return QString(
 								QString("!data.at(") +
-								QVariant((unsigned long long)z_).toString() +
+								QVariant(static_cast<unsigned long long>(z_)).toString() +
 								QString(")"));
 						}
 						size_t inc_xy = 0;
@@ -3459,7 +3449,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 							delete [] p__;
 							return QString(
 								QString("!data.at(") +
-								QVariant((unsigned long long)z_).toString() +
+								QVariant(static_cast<unsigned long long>(z_)).toString() +
 								QString(")"));
 						}
 						size_t inc_xy = 0;
@@ -3547,7 +3537,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 							delete [] p__;
 							return QString(
 								QString("!data.at(") +
-								QVariant((unsigned long long)z_).toString() +
+								QVariant(static_cast<unsigned long long>(z_)).toString() +
 								QString(")"));
 						}
 						size_t inc_xy = 0;
@@ -3635,7 +3625,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 							delete [] p__;
 							return QString(
 								QString("!data.at(") +
-								QVariant((unsigned long long)z_).toString() +
+								QVariant(static_cast<unsigned long long>(z_)).toString() +
 								QString(")"));
 						}
 						size_t inc_xy = 0;
@@ -3723,7 +3713,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 							delete [] p__;
 							return QString(
 								QString("!data.at(") +
-								QVariant((unsigned long long)z_).toString() +
+								QVariant(static_cast<unsigned long long>(z_)).toString() +
 								QString(")"));
 						}
 						size_t inc_xy = 0;
@@ -3813,7 +3803,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 							delete [] p__;
 							return QString(
 								QString("!data.at(") +
-								QVariant((unsigned long long)z_).toString() +
+								QVariant(static_cast<unsigned long long>(z_)).toString() +
 								QString(")"));
 						}
 						size_t inc_xy = 0;
@@ -3904,7 +3894,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 							delete [] p__;
 							return QString(
 								QString("!data.at(") +
-								QVariant((unsigned long long)z_).toString() +
+								QVariant(static_cast<unsigned long long>(z_)).toString() +
 								QString(")"));
 						}
 						size_t inc_xy = 0;
@@ -3992,7 +3982,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 							delete [] p__;
 							return QString(
 								QString("!data.at(") +
-								QVariant((unsigned long long)z_).toString() +
+								QVariant(static_cast<unsigned long long>(z_)).toString() +
 								QString(")"));
 						}
 						size_t inc_xy = 0;
@@ -4097,7 +4087,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						delete [] p__;
 						return QString(
 							QString("!data.at(") +
-							QVariant((unsigned long long)z_).toString() +
+							QVariant(static_cast<unsigned long long>(z_)).toString() +
 							QString(")"));
 					}
 					size_t inc_xy = 0;
@@ -4189,7 +4179,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						delete [] p__;
 						return QString(
 							QString("!data.at(") +
-							QVariant((unsigned long long)z_).toString() +
+							QVariant(static_cast<unsigned long long>(z_)).toString() +
 							QString(")"));
 					}
 					size_t inc_xy = 0;
@@ -4280,7 +4270,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						delete [] p__;
 						return QString(
 							QString("!data.at(") +
-							QVariant((unsigned long long)z_).toString() +
+							QVariant(static_cast<unsigned long long>(z_)).toString() +
 							QString(")"));
 					}
 					size_t inc_xy = 0;
@@ -4369,7 +4359,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						delete [] p__;
 						return QString(
 							QString("!data.at(") +
-							QVariant((unsigned long long)z_).toString() +
+							QVariant(static_cast<unsigned long long>(z_)).toString() +
 							QString(")"));
 					}
 					size_t inc_xy = 0;
@@ -4480,7 +4470,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						delete [] p__;
 						return QString(
 							QString("!data.at(") +
-							QVariant((unsigned long long)z_).toString() +
+							QVariant(static_cast<unsigned long long>(z_)).toString() +
 							QString(")"));
 					}
 					size_t inc_xy = 0;
@@ -4765,7 +4755,7 @@ QString CommonUtils::apply_per_slice_rescale(
 	const short image_type = ivariant->image_type;
 	if (!(image_type >= 0 && image_type < 10)) return QString("");
 	bool float64 = false;
-	const double float_max = (double)(1 << FLT_MANT_DIG);
+	const double float_max = (1 << FLT_MANT_DIG);
 	if (ivariant->sop==QString("1.2.840.10008.5.1.4.1.1.128.1") ||
 		ivariant->sop==QString(""))
 	{
@@ -4895,7 +4885,7 @@ template<typename T> double get_value(
 	double r = 0;
 	try
 	{
-		r = static_cast<double>(image->GetPixel(idx));
+		r = image->GetPixel(idx);
 	}
 	catch (itk::ExceptionObject &)
 	{
@@ -4994,9 +4984,9 @@ void CommonUtils::random_RGB(float * R, float * G, float * B)
 	const double V = random_range(0.4,    1.0, seed/3);
 	double R_, G_, B_;
 	ColorSpace_::Hsv2Rgb(&R_, &G_, &B_, 0.1*H, S, V);
-	*R = (float)R_;
-	*G = (float)G_;
-	*B = (float)B_;
+	*R = static_cast<float>(R_);
+	*G = static_cast<float>(G_);
+	*B = static_cast<float>(B_);
 }
 
 #ifdef USE_GET_TOTAL_MEM

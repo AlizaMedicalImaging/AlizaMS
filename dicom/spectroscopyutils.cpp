@@ -190,7 +190,7 @@ QString SpectroscopyUtils::ProcessData(
 	//DicomUtils::print_sq(sq);
 	//DicomUtils::print_func_group(values);
 
-	if (values.size() != (unsigned int)s.m_NumberOfFrames)
+	if (values.size() != static_cast<unsigned int>(s.m_NumberOfFrames))
 	{
 		return QString("values.size() != m_NumberOfFrames");
 	}
@@ -251,7 +251,7 @@ QString SpectroscopyUtils::ProcessData(
 		if (tmp0.at(x).size()<1)
 			return
 				QString("tmp0.at(") +
-				QVariant((int)x).toString() +
+				QVariant(static_cast<int>(x)).toString() +
 				QString(").size()<1");
 	}
 
@@ -512,15 +512,15 @@ QString SpectroscopyUtils::ProcessData(
 				}
 				ivariant->spectroscopy_info =
 					QString("<span class='y6'>") +
-					QVariant((int)s.m_Columns).toString() +
+					QVariant(static_cast<int>(s.m_Columns)).toString() +
 					QString("x") +
-					QVariant((int)s.m_Rows).toString() +
+					QVariant(static_cast<int>(s.m_Rows)).toString() +
 					QString("x") +
-					QVariant((int)tmp4.size()).toString() +
+					QVariant(static_cast<int>(tmp4.size())).toString() +
 					QString("</span><br/><span class='y4'>") +
-					QVariant((int)s.m_DataPointColumns).toString() +
+					QVariant(static_cast<int>(s.m_DataPointColumns)).toString() +
 					QString("x") +
-					QVariant((int)s.m_DataPointRows).toString() +
+					QVariant(static_cast<int>(s.m_DataPointRows)).toString() +
 					QString("</span><span class='y6'>&#160;") +
 					s.m_DataRepresentation.toLower() +
 					QString("<br/>") +
