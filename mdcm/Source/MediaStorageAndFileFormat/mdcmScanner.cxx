@@ -85,6 +85,10 @@ Scanner::GetString(const DataElement & de, const DataSet & ds, const bool implic
   {
     vr = e.GetVR();
   }
+  if (vr == VR::UN)
+  {
+    vr = e.GetVR();
+  }
   if (vr == VR::INVALID || vr == VR::UN)
     return r;
   if (vr == VR::US_SS)
