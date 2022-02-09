@@ -7554,7 +7554,7 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 #else
 	reader.SetFileName(f.toLocal8Bit().constData());
 #endif
-	if(!reader.Read())
+	if (!reader.Read())
 	{
 		return false;
 	}
@@ -7562,7 +7562,7 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 	mdcm::DataSet & ds = rfile.GetDataSet();
 	mdcm::FileMetaInformation & header = rfile.GetHeader();
 	const mdcm::PrivateTag tcompressiontype(0x07a1,0x11,"ELSCINT1");
-	if(!ds.FindDataElement(tcompressiontype))
+	if (!ds.FindDataElement(tcompressiontype))
 	{
 		return false;
 	}
@@ -7577,26 +7577,26 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 	std::string comprgb = "PMSCT_RGB1";
 	bool isrle = false;
 	bool isrgb = false;
-	if(strncmp(
+	if (strncmp(
 		bv->GetPointer(),
 		comprle.c_str(),
 		comprle.size()) == 0)
 	{
 		isrle = true;
 	}
-	else if(strncmp(
+	else if (strncmp(
 		bv->GetPointer(),
 		comprgb.c_str(),
 		comprgb.size()) == 0)
 	{
 		isrgb = true;
 	}
-	if(!isrle && !isrgb)
+	if (!isrle && !isrgb)
 	{
 		return false;
 	}
 	const mdcm::PrivateTag tprivatepixeldata(0x07a1,0x0a,"ELSCINT1");
-	if(ds.FindDataElement(tprivatepixeldata))
+	if (ds.FindDataElement(tprivatepixeldata))
 	{
 		const mdcm::DataElement & compressionpixeldata =
 			ds.GetDataElement(tprivatepixeldata);
@@ -7636,8 +7636,8 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 				delta_decode(bv2->GetPointer(), bv2->GetLength(), buffer);
 				// TODO check that decompress byte buffer match the expected size
 				pixeldata.SetByteValue(
-					(char*)&buffer[0],
-					(uint32_t)(buffer.size() * sizeof(unsigned short)));
+					reinterpret_cast<char*>(&buffer[0]),
+					static_cast<uint32_t>(buffer.size() * sizeof(unsigned short)));
 			}
 		}
 		else if (isrgb)
@@ -7662,7 +7662,7 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 			const size_t w = at1.GetValue();
 			const size_t h = at2.GetValue();
 			const size_t outputlen = 3*h*w;
-			if(bv2l == outputlen)
+			if (bv2l == outputlen)
 			{
 				std::cout
 					<< "Warning: Elscint data seems to be not compressed"
@@ -7674,13 +7674,15 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 			{
 				std::vector<unsigned char> buffer;
 				delta_decode_rgb(
-					(const unsigned char*)bv2->GetPointer(), bv2l, buffer,
+					reinterpret_cast<const unsigned char*>(bv2->GetPointer()), bv2l, buffer,
 					at0.GetValue(), w, h);
-				pixeldata.SetByteValue((char*)&buffer[0], (uint32_t)buffer.size());
+				pixeldata.SetByteValue(
+					reinterpret_cast<char*>(&buffer[0]),
+					static_cast<uint32_t>(buffer.size()));
 			}
 		}
 		// Add the pixel data element
-		if(ds.FindDataElement(tpixeldata))
+		if (ds.FindDataElement(tpixeldata))
 		{
 			ds.Replace(pixeldata);
 		}
@@ -7727,7 +7729,7 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 			const size_t w = at1.GetValue();
 			const size_t h = at2.GetValue();
 			const size_t at1l = w*h*sizeof(unsigned short);
-			if(bv2l == at1l)
+			if (bv2l == at1l)
 			{
 				std::cout
 					<< "Warning: Elscint data seems to be not compressed"
@@ -7741,8 +7743,8 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 				delta_decode(bv2->GetPointer(), bv2->GetLength(), buffer);
 				// TODO check that decompress byte buffer match the expected size
 				pixeldata.SetByteValue(
-					(char*)&buffer[0],
-					(uint32_t)(buffer.size() * sizeof(unsigned short)));
+					reinterpret_cast<char*>(&buffer[0]),
+					static_cast<uint32_t>(buffer.size() * sizeof(unsigned short)));
 			}
 		}
 		else if (isrgb)
@@ -7757,7 +7759,7 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 			const size_t w = at1.GetValue();
 			const size_t h = at2.GetValue();
 			const size_t outputlen = 3*h*w;
-			if(bv2l == outputlen)
+			if (bv2l == outputlen)
 			{
 				std::cout
 					<< "Warning: Elscint data seems to be not compressed"
@@ -7769,9 +7771,11 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 				pixeldata.SetVR(mdcm::VR::OW);
 				std::vector<unsigned char> buffer;
 				delta_decode_rgb(
-					(const unsigned char*)bv2->GetPointer(), bv2->GetLength(), buffer,
+					reinterpret_cast<const unsigned char*>(bv2->GetPointer()), bv2->GetLength(), buffer,
 					at0.GetValue(), w, h);
-				pixeldata.SetByteValue((char*)&buffer[0], (uint32_t)buffer.size());
+				pixeldata.SetByteValue(
+					reinterpret_cast<char*>(&buffer[0]),
+					static_cast<uint32_t>(buffer.size()));
 			}
 		}
 		// Add the pixel data element
@@ -7816,7 +7820,7 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 #else
 	writer.SetFileName(outf.toLocal8Bit().constData());
 #endif
-	if(!writer.Write())
+	if (!writer.Write())
 	{
 		std::cout << "Error: can not write Elscint file "
 			<< outf.toStdString()
