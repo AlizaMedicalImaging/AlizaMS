@@ -7499,9 +7499,9 @@ static void delta_decode(
 {
 	// RLE pass
 	std::vector<char> temp;
-	for(size_t i = 0; i < length; ++i)
+	for (size_t i = 0; i < length; ++i)
 	{
-		if(inbuffer[i] == 0xa5)
+		if (static_cast<unsigned char>(inbuffer[i]) == 0xa5)
 		{
 			int repeat = static_cast<unsigned char>(inbuffer[i+1]) + 1;
 			const char value = inbuffer[i+2];
@@ -7519,9 +7519,9 @@ static void delta_decode(
 	}
 	// Delta encoding pass
 	unsigned short delta = 0;
-	for(size_t i = 0; i < temp.size(); ++i)
+	for (size_t i = 0; i < temp.size(); ++i)
 	{
-		if(temp[i] == 0x5a)
+		if (temp[i] == 0x5a)
 		{
 			const unsigned char v1 = static_cast<unsigned char>(temp[i+1]);
 			const unsigned char v2 = static_cast<unsigned char>(temp[i+2]);
