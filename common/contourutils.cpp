@@ -292,20 +292,17 @@ void ContourUtils::calculate_uvt_nonuniform(
 				bool in_slice = false;
 				if (ivariant->di->image_slices.size() > z)
 				{
-					const float px =
-						(float)ivariant->di->image_slices.at(z)->v[0];
-					const float py =
-						(float)ivariant->di->image_slices.at(z)->v[1];
-					const float pz =
-						(float)ivariant->di->image_slices.at(z)->v[2];
+					const float px = ivariant->di->image_slices.at(z)->v[0];
+					const float py = ivariant->di->image_slices.at(z)->v[1];
+					const float pz = ivariant->di->image_slices.at(z)->v[2];
 					const sVector3 v1 = sVector3(
-						(float)(ivariant->di->image_slices.at(z)->v[3])-px,
-						(float)(ivariant->di->image_slices.at(z)->v[4])-py,
-						(float)(ivariant->di->image_slices.at(z)->v[5])-pz);
+						ivariant->di->image_slices.at(z)->v[3] - px,
+						ivariant->di->image_slices.at(z)->v[4] - py,
+						ivariant->di->image_slices.at(z)->v[5] - pz);
 					const sVector3 v2 = sVector3(
-						(float)(ivariant->di->image_slices.at(z)->v[6])-px,
-						(float)(ivariant->di->image_slices.at(z)->v[7])-py,
-						(float)(ivariant->di->image_slices.at(z)->v[8])-pz);
+						ivariant->di->image_slices.at(z)->v[6] - px,
+						ivariant->di->image_slices.at(z)->v[7] - py,
+						ivariant->di->image_slices.at(z)->v[8] - pz);
 					const sVector3 n = Vectormath::Scalar::normalize(
 						Vectormath::Scalar::cross(v1,v2));
 					for (int k = 0; k < c->dpoints.size(); ++k)
@@ -439,7 +436,7 @@ void ContourUtils::map_contours_uniform(
 	if (!ivariant) return;
 	if (ivariant->di->idimz == 0) return;
 	if (ivariant->di->idimz !=
-		(int)ivariant->di->image_slices.size())
+			static_cast<int>(ivariant->di->image_slices.size()))
 	{
 		std::cout
 			<< "ContourUtils::map_contours: dimz != slices size"
@@ -466,17 +463,17 @@ void ContourUtils::map_contours_uniform(
 				if (!c) continue;
 				for (int z = 0; z < ivariant->di->idimz; ++z)
 				{
-					const float px = static_cast<float>(ivariant->di->image_slices.at(z)->v[0]);
-					const float py = static_cast<float>(ivariant->di->image_slices.at(z)->v[1]);
-					const float pz = static_cast<float>(ivariant->di->image_slices.at(z)->v[2]);
+					const float px = ivariant->di->image_slices.at(z)->v[0];
+					const float py = ivariant->di->image_slices.at(z)->v[1];
+					const float pz = ivariant->di->image_slices.at(z)->v[2];
 					const sVector3 v1 = sVector3(
-						static_cast<float>(ivariant->di->image_slices.at(z)->v[3]) - px,
-						static_cast<float>(ivariant->di->image_slices.at(z)->v[4]) - py,
-						static_cast<float>(ivariant->di->image_slices.at(z)->v[5]) - pz);
+						ivariant->di->image_slices.at(z)->v[3] - px,
+						ivariant->di->image_slices.at(z)->v[4] - py,
+						ivariant->di->image_slices.at(z)->v[5] - pz);
 					const sVector3 v2 = sVector3(
-						static_cast<float>(ivariant->di->image_slices.at(z)->v[6]) - px,
-						static_cast<float>(ivariant->di->image_slices.at(z)->v[7]) - py,
-						static_cast<float>(ivariant->di->image_slices.at(z)->v[8]) - pz);
+						ivariant->di->image_slices.at(z)->v[6] - px,
+						ivariant->di->image_slices.at(z)->v[7] - py,
+						ivariant->di->image_slices.at(z)->v[8] - pz);
 					const sVector3 n = Vectormath::Scalar::normalize(
 						Vectormath::Scalar::cross(v1,v2));
 					for (int k = 0; k < c->dpoints.size(); ++k)
@@ -513,7 +510,7 @@ void ContourUtils::map_contours_nonuniform(
 	if (!ivariant) return;
 	if (ivariant->di->idimz == 0) return;
 	if (ivariant->di->idimz !=
-		(int)ivariant->di->image_slices.size())
+			static_cast<int>(ivariant->di->image_slices.size()))
 	{
 		std::cout
 		<< "ContourUtils::map_contours: dimz != slices size"
@@ -542,17 +539,17 @@ void ContourUtils::map_contours_nonuniform(
 				QList<int> slices;
 				for (int z = 0; z < ivariant->di->idimz; ++z)
 				{
-					const float px = static_cast<float>(ivariant->di->image_slices.at(z)->v[0]);
-					const float py = static_cast<float>(ivariant->di->image_slices.at(z)->v[1]);
-					const float pz = static_cast<float>(ivariant->di->image_slices.at(z)->v[2]);
+					const float px = ivariant->di->image_slices.at(z)->v[0];
+					const float py = ivariant->di->image_slices.at(z)->v[1];
+					const float pz = ivariant->di->image_slices.at(z)->v[2];
 					const sVector3 v1 = sVector3(
-						static_cast<float>(ivariant->di->image_slices.at(z)->v[3]) - px,
-						static_cast<float>(ivariant->di->image_slices.at(z)->v[4]) - py,
-						static_cast<float>(ivariant->di->image_slices.at(z)->v[5]) - pz);
+						ivariant->di->image_slices.at(z)->v[3] - px,
+						ivariant->di->image_slices.at(z)->v[4] - py,
+						ivariant->di->image_slices.at(z)->v[5] - pz);
 					const sVector3 v2 = sVector3(
-						static_cast<float>(ivariant->di->image_slices.at(z)->v[6]) - px,
-						static_cast<float>(ivariant->di->image_slices.at(z)->v[7]) - py,
-						static_cast<float>(ivariant->di->image_slices.at(z)->v[8]) - pz);
+						ivariant->di->image_slices.at(z)->v[6] - px,
+						ivariant->di->image_slices.at(z)->v[7] - py,
+						ivariant->di->image_slices.at(z)->v[8] - pz);
 					const sVector3 n = Vectormath::Scalar::normalize(
 						Vectormath::Scalar::cross(v1,v2));
 					for (int k = 0; k < c->dpoints.size(); ++k)
@@ -708,10 +705,10 @@ void ContourUtils::contours_build_path(
 					{
 						const DPoint & pf_ = c->dpoints.at(k);
 						path.addRect(
-							pf_.u-0.25f,
-							pf_.v-0.25f,
-							0.5,
-							0.5);
+							pf_.u,
+							pf_.v,
+							1.0,
+							1.0);
 					}
 				}
 				// NON-PLANAR, not set
@@ -725,10 +722,10 @@ void ContourUtils::contours_build_path(
 							if (pf_.t == z)
 							{		
 								path.addRect(
-									pf_.u-0.25f,
-									pf_.v-0.25f,
-									0.5,
-									0.5);
+									pf_.u,
+									pf_.v,
+									1.0,
+									1.0);
 							}
 						}
 					}
@@ -777,7 +774,7 @@ bool ContourUtils::phys_space_from_slice(
 {
 	if (!ivariant) return false;
 	if (ivariant->di->idimz !=
-			(int)ivariant->di->image_slices.size())
+			static_cast<int>(ivariant->di->image_slices.size()))
 	{
 		std::cout << "dimz != slices size" << std::endl;
 		return false;
