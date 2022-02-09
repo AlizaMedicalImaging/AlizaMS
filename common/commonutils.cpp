@@ -395,9 +395,9 @@ template<typename T> void get_dimensions(
 	*spacingx = spacing[0];
 	*spacingy = spacing[1];
 	*spacingz = spacing[2];
-	*originx  = (float)origin[0];
-	*originy  = (float)origin[1];
-	*originz  = (float)origin[2];
+	*originx  = static_cast<float>(origin[0]);
+	*originy  = static_cast<float>(origin[1]);
+	*originz  = static_cast<float>(origin[2]);
 }
 
 template<typename T> QString get_orientation(
@@ -925,7 +925,9 @@ template<typename T> void calc_center_from_image(
 		return;
 	}
 	sVector3 v0 = sVector3(
-		(float)origin[0], (float)origin[1], (float)origin[2]);
+		static_cast<float>(origin[0]),
+		static_cast<float>(origin[1]),
+		static_cast<float>(origin[2]));
 	sVector3 v1 = sVector3(p[0], p[1], p[2]);
 	sVector3 cube_center = sVector3((v0+v1)*0.5f);
 	ivariant->di->default_center_x =

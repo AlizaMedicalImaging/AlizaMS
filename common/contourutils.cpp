@@ -177,11 +177,11 @@ void ContourUtils::generate_roi_vbos(
 				if (!v) return;
 				for (int k = 0; k < c->dpoints.size(); ++k)
 				{
-					v[ind] = (GLfloat)(c->dpoints.at(k).x);
+					v[ind] = static_cast<GLfloat>(c->dpoints.at(k).x);
 					++ind;
-					v[ind] = (GLfloat)(c->dpoints.at(k).y);
+					v[ind] = static_cast<GLfloat>(c->dpoints.at(k).y);
 					++ind;
-					v[ind] = (GLfloat)(c->dpoints.at(k).z);
+					v[ind] = static_cast<GLfloat>(c->dpoints.at(k).z);
 					++ind;
 				}
 				if (ind != s)
