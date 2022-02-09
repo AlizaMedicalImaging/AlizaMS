@@ -2337,7 +2337,7 @@ void DicomUtils::load_contour(
 				{
 					roinumber.SetFromDataElement(
 						obsnestedds.GetDataElement(roinumber.GetTag()));
-					if ((int)roinumber.GetValue() == roi_number)
+					if (static_cast<int>(roinumber.GetValue()) == roi_number)
 					{
 						if (obsnestedds.FindDataElement(tinterpretedtype))
 						{
@@ -2850,14 +2850,14 @@ bool DicomUtils::read_slices_uihgrid(
 		std::vector<double> result;
 		if (DicomUtils::priv_get_ds_values(
 			ds,tMRNumberOfSliceInVolume,result))
-			num_slices = (int)result[0];
+			num_slices = static_cast<int>(result[0]);
 	}
 	else if (ds.FindDataElement(mdcm::Tag(0x0065,0x1050)))
 	{
 		std::vector<double> result;
 		if (DicomUtils::get_ds_values(
 			ds,mdcm::Tag(0x0065,0x1050),result))
-			num_slices = (int)result[0];
+			num_slices = static_cast<int>(result[0]);
 	}
 	if (num_slices < 1) return false;
 	//
@@ -2935,7 +2935,7 @@ bool DicomUtils::read_slices_uihgrid(
 		return false;
 	}
 	const unsigned int num_items = sq->GetNumberOfItems();
-	if ((unsigned int)num_slices != num_items) return false;
+	if (static_cast<unsigned int>(num_slices) != num_items) return false;
 	//
 	//
 	// FIXME
@@ -4685,20 +4685,20 @@ bool DicomUtils::generate_geometry(
 #if 0
 				const QString z_inv_string =
 					QString("Direction cosines defined in DICOM file:\n") +
-					QVariant((double)row_dircos_x).toString() + QString("\\") +
-					QVariant((double)row_dircos_y).toString() + QString("\\") +
-					QVariant((double)row_dircos_z).toString() + QString("\\") +
-					QVariant((double)col_dircos_x).toString() + QString("\\") +
-					QVariant((double)col_dircos_y).toString() + QString("\\") +
-					QVariant((double)col_dircos_z).toString() + QString("\n") +
+					QVariant(static_cast<double>(row_dircos_x)).toString() + QString("\\") +
+					QVariant(static_cast<double>(row_dircos_y)).toString() + QString("\\") +
+					QVariant(static_cast<double>(row_dircos_z)).toString() + QString("\\") +
+					QVariant(static_cast<double>(col_dircos_x)).toString() + QString("\\") +
+					QVariant(static_cast<double>(col_dircos_y)).toString() + QString("\\") +
+					QVariant(static_cast<double>(col_dircos_z)).toString() + QString("\n") +
 					QString(" Z direction calculated from defined cosines: ") +
-					QVariant((double)direction1.getX()).toString() + QString(",") +
-					QVariant((double)direction1.getY()).toString() + QString(",") +
-					QVariant((double)direction1.getZ()).toString() + QString("\n") +
+					QVariant(static_cast<double>(direction1.getX())).toString() + QString(",") +
+					QVariant(static_cast<double>(direction1.getY())).toString() + QString(",") +
+					QVariant(static_cast<double>(direction1.getZ())).toString() + QString("\n") +
 					QString(" Z direction calculated from geometry (real): ") +
-					QVariant((double)direction0.getX()).toString() + QString(",") +
-					QVariant((double)direction0.getY()).toString() + QString(",") +
-					QVariant((double)direction0.getZ()).toString() + QString("\n") +
+					QVariant(static_cast<double>(direction0.getX())).toString() + QString(",") +
+					QVariant(static_cast<double>(direction0.getY())).toString() + QString(",") +
+					QVariant(static_cast<double>(direction0.getZ())).toString() + QString("\n") +
 					QString(" ... using image as non-uniform.\n") +
 					QMessageBox mbox;
 					mbox.addButton(QMessageBox::Close);
@@ -4707,6 +4707,7 @@ bool DicomUtils::generate_geometry(
 					mbox.exec();
 					QApplication::processEvents();
 #endif
+
 			}
 		}
 		else
@@ -4779,7 +4780,7 @@ void DicomUtils::enhanced_get_indices(
 	const int sq_size = static_cast<int>(sq.size());
 	for (int x = 0; x < sq_size; ++x)
 	{
-		const size_t i = (size_t)x;
+		const size_t i = x;
 		if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
 			sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9056))
 		{
@@ -5661,11 +5662,11 @@ bool DicomUtils::read_shutter(const mdcm::DataSet & ds, PRDisplayShutter & a)
 			(ShutterPresentationColorCIELabValue.size()==3))
 		{
 			a.ShutterPresentationColorCIELabValue_L =
-				(int)ShutterPresentationColorCIELabValue.at(0);
+				static_cast<int>(ShutterPresentationColorCIELabValue.at(0));
 			a.ShutterPresentationColorCIELabValue_a =
-				(int)ShutterPresentationColorCIELabValue.at(1);
+				static_cast<int>(ShutterPresentationColorCIELabValue.at(1));
 			a.ShutterPresentationColorCIELabValue_b =
-				(int)ShutterPresentationColorCIELabValue.at(2);
+				static_cast<int>(ShutterPresentationColorCIELabValue.at(2));
 		}
 		return true;
 	}
@@ -6583,7 +6584,7 @@ QString DicomUtils::read_ultrasound(
 		return error;
 	}
 	if (!ivariant->frame_times.empty() &&
-		((int)ivariant->frame_times.size()!=ivariant->di->idimz))
+		(static_cast<int>(ivariant->frame_times.size()) != ivariant->di->idimz))
 	{
 		ivariant->frame_times.clear();
 	}
@@ -7320,7 +7321,7 @@ QString DicomUtils::read_series(
 		return error;
 	}
 	if (!ivariant->frame_times.empty() &&
-		((int)ivariant->frame_times.size() !=
+		(static_cast<int>(ivariant->frame_times.size()) !=
 			ivariant->di->idimz))
 	{
 		ivariant->frame_times.clear();
@@ -8416,9 +8417,9 @@ QString DicomUtils::read_buffer(
 		{
 			const QString tmp_s0 =
 				QString("Bits allocated = ") +
-				QVariant((int)pixelformat.GetBitsAllocated()).toString() +
+				QVariant(static_cast<int>(pixelformat.GetBitsAllocated())).toString() +
 				QString(",\n samples per pixel = ") +
-				QVariant((int)samples_per_pix).toString() +
+				QVariant(static_cast<int>(samples_per_pix)).toString() +
 				QString(",\nnot supported.");
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return tmp_s0;
@@ -8479,7 +8480,7 @@ QString DicomUtils::read_buffer(
 			singlebit_buffer[j+7] = (c & 0x80) ? 255 : 0;
 			j += 8;
 		}
-		buffer      = (char *)singlebit_buffer;
+		buffer      = reinterpret_cast<char *>(singlebit_buffer);
 		buffer_size = singlebit_buffer_size;
 	}
 	else
@@ -9103,8 +9104,8 @@ QString DicomUtils::read_enhanced_common(
 			const size_t tmp1s = window_centers_l.size();
 			const bool tmp1ok =
 				(tmp1s > 0) &&
-				((size_t)window_widths_l.size() == tmp1s) &&
-				((size_t)lut_functions_l.size() == tmp1s);
+				(static_cast<size_t>(window_widths_l.size()) == tmp1s) &&
+				(static_cast<size_t>(lut_functions_l.size()) == tmp1s);
 			if (tmp1ok)
 			{
 				QList<double> tmp1w;
@@ -9502,7 +9503,7 @@ bool DicomUtils::enhanced_process_indices(
 							? idx_values.at(x).idx.at(dim4th)
 							: -1;
 						const int idx4 =
-							dim3rd >= 0 && dim3rd < (int)idx_values.at(x).idx.size()
+							dim3rd >= 0 && dim3rd < static_cast<int>(idx_values.at(x).idx.size())
 							? idx_values.at(x).idx.at(dim3rd)
 							: -1;
 						if (
@@ -10450,7 +10451,7 @@ template <typename T> QString supp_palette_grey_to_rgbUS_(
 			{
 				const double k = static_cast<double>(it1.Get());
 				unsigned short c = 0;
-				if (k < (double)red_subscript)
+				if (k < static_cast<double>(red_subscript))
 				{
 					const double r = (k+(-wmin))/div_;
 					if ((k>=wmin) && (k<=wmax))
@@ -10542,7 +10543,7 @@ template <typename T> QString supp_palette_grey_to_rgbUC_(
 			{
 				const double k = static_cast<double>(it1.Get());
 				unsigned char c = 0;
-				if (k < (double)red_subscript)
+				if (k < static_cast<double>(red_subscript))
 				{
 					const double r = (k+(-wmin))/div_;
 					if ((k>=wmin) && (k<=wmax))
