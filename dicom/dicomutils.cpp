@@ -7502,7 +7502,7 @@ static void delta_decode(
 	{
 		if(inbuffer[i] == 0xa5)
 		{
-			int repeat = static_cast<int>(static_cast<unsigned char>(inbuffer[i+1]) + 1);
+			int repeat = static_cast<unsigned char>(inbuffer[i+1]) + 1;
 			const char value = inbuffer[i+2];
 			while(repeat > 0)
 			{
