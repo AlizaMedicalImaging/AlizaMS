@@ -36,6 +36,7 @@
 #  include "mdcmVR16ExplicitDataElement.h"
 #endif
 #include <limits>
+#include <cstring>
 
 namespace mdcm
 {
@@ -714,6 +715,7 @@ Reader::CanRead() const
   is.clear();
   is.seekg(0, std::ios::beg);
   char b[8];
+  memset(b, 0, 8);
   if (is.good() && is.read(b, 8))
   {
     // examine probable group number, assume <= 0x00ff
