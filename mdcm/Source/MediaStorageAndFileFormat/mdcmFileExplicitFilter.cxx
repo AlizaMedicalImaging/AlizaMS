@@ -116,7 +116,6 @@ FileExplicitFilter::ProcessDataSet(DataSet & ds, Dicts const & dicts)
         // This makes the output more readable (and this should be relative safe)
         && !t.IsGroupLength() && !t.IsPrivateCreator())
     {
-      // skip
       ++it;
       continue;
     }
@@ -129,7 +128,6 @@ FileExplicitFilter::ProcessDataSet(DataSet & ds, Dicts const & dicts)
     const VR &        vr = entry.GetVR();
     VR                cvr = DataSetHelper::ComputeVR(*F, ds, t);
     VR                oldvr = de.GetVR();
-
     SmartPointer<SequenceOfItems> sqi = NULL;
     if (vr == VR::SQ || cvr == VR::SQ)
     {

@@ -577,7 +577,12 @@ void Camera::calculate_projective_matrix(
 {
 	// calculate projective matrix =
 	// light mvp scaled and biased * object modeling matrix
+#if 1
+	// to silence Coverity warning
+	Matrix4 modeling_aos = Matrix4::identity();
+#else
 	Matrix4 modeling_aos;
+#endif
 	float_to_matrix4(modeling, modeling_aos);
 	const Matrix4 projective_matrix_aos =
 		m_light_mvp_scaled_biased[id]*modeling_aos;

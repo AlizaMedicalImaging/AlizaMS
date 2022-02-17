@@ -86,13 +86,28 @@ ComputeVRImplicitLittleEndian(DataSet const & ds, const Tag & tag)
 }
 
 VR
-DataSetHelper::ComputeVR(const File & file, const DataSet & ds, const Tag & tag)
+DataSetHelper::ComputeVR(const File & file, const DataSet & ds, const Tag & t)
 {
+  if (ds.FindDataElement(t))
+  {
+    const DataElement & de = ds.GetDataElement(t);
+    const VR & devr = de.GetVR();
+    if (devr != VR::INVALID && devr != VR::UN)
+    {
+      return devr;
+    }
+#if 1
+    // CP-246
+    if (devr == VR::UN && de.IsUndefinedLength())
+    {
+      return VR::SQ;
+    }
+#endif
+  }
   const Global & g = GlobalInstance;
   const Dicts &  dicts = g.GetDicts();
   std::string    strowner;
   const char *   owner = NULL;
-  const Tag &    t = tag;
   if (t.IsPrivate() && !t.IsPrivateCreator())
   {
     strowner = ds.GetPrivateCreator(t);
@@ -115,12 +130,12 @@ DataSetHelper::ComputeVR(const File & file, const DataSet & ds, const Tag & tag)
       const Tag &               pixelrep = at.GetTag();
       assert(pixelrep < t);
       const DataSet & rootds = file.GetDataSet();
-      // FIXME
-      // PhilipsWith15Overlays.dcm has a Private SQ with public elements such as
+      // TODO
+      // MM: PhilipsWith15Overlays.dcm has a Private SQ with public elements such as
       // 0028,3002, so we cannot look up element in current dataset, but have to get the root dataset
       // to loop up.
-      // FIXME
-      // mdcmDataExtra/mdcmSampleData/ImagesPapyrus/TestImages/wristb.pap
+      // TODO
+      // MM: mdcmDataExtra/mdcmSampleData/ImagesPapyrus/TestImages/wristb.pap
       // It's the contrary: root dataset does not have a Pixel Representation, but each SQ does.
       if (ds.FindDataElement(pixelrep))
       {
@@ -215,18 +230,17 @@ DataSetHelper::ComputeVR(const File & file, const DataSet & ds, const Tag & tag)
       vr = VR::INVALID;
     }
   }
-  else if (vr == VR::US_SS_OW)
+  else if (vr == VR::US_SS_OW) // TODO
   {
     vr = VR::OW;
   }
-  // TODO US_SS_OW
   assert(vr.IsVRFile());
   assert(vr != VR::INVALID);
-  if (tag.IsGroupLength())
+  if (t.IsGroupLength())
   {
     assert(vr == VR::UL);
   }
-  if (tag.IsPrivateCreator())
+  if (t.IsPrivateCreator())
   {
     assert(vr == VR::LO);
   }

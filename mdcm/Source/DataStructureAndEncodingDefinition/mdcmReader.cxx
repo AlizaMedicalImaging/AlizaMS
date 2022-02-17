@@ -36,7 +36,6 @@
 #  include "mdcmVR16ExplicitDataElement.h"
 #endif
 #include <limits>
-#include <cstring>
 
 namespace mdcm
 {
@@ -612,7 +611,7 @@ Reader::InternalReadCommon(const T_Caller & caller)
               // Explicit/Implicit
               // mdcmData/c_vf1001.dcm falls into that category, while in fact the fmi could simply
               // be inverted and all would be perfect
-              mdcmAlwaysWarnMacro("Attempt to read file with explicit/implicit");
+              mdcmWarningMacro("Attempt to read file with explicit/implicit");
               F->GetDataSet().Clear();
               caller.template ReadCommon<ExplicitImplicitDataElement, SwapperNoOp>(is);
             }
@@ -629,7 +628,7 @@ Reader::InternalReadCommon(const T_Caller & caller)
       }
       else
       {
-        mdcmAlwaysWarnMacro("Attempt to read the file as mixture of explicit/implicit");
+        mdcmWarningMacro("Attempt to read the file as mixture of explicit/implicit");
         // Try again with an ExplicitImplicitDataElement
         if (ts.GetSwapCode() == SwapCode::LittleEndian && ts.GetNegociatedType() == TransferSyntax::Explicit)
         {
@@ -651,7 +650,7 @@ Reader::InternalReadCommon(const T_Caller & caller)
         }
         else
         {
-          mdcmAlwaysWarnMacro("Exception in Reader.cxx (2)");
+          mdcmWarningMacro("Exception in Reader.cxx (2)");
           success = false;
         }
       }
@@ -663,7 +662,7 @@ Reader::InternalReadCommon(const T_Caller & caller)
     }
     catch (...)
     {
-      mdcmAlwaysWarnMacro("Exception in Reader.cxx (3)");
+      mdcmWarningMacro("Exception in Reader.cxx (3)");
       success = false;
     }
     caller.Check(success, *Stream);
@@ -715,7 +714,6 @@ Reader::CanRead() const
   is.clear();
   is.seekg(0, std::ios::beg);
   char b[8];
-  memset(b, 0, 8);
   if (is.good() && is.read(b, 8))
   {
     // examine probable group number, assume <= 0x00ff
@@ -735,6 +733,12 @@ Reader::CanRead() const
     // else littleendian
     if (isasciiupper(b[4]) && isasciiupper(b[5]))
       explicitvr = true;
+  }
+  else
+  {
+    is.clear();
+    is.seekg(0, std::ios::beg);
+    return false;
   }
   SwapCode                       sc = SwapCode::Unknown;
   TransferSyntax::NegociatedType nts = TransferSyntax::Unknown;

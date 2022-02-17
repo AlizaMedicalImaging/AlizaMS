@@ -2493,6 +2493,12 @@ void DicomUtils::load_contour(
 				point.x = static_cast<float>(varray_p[j+0]);
 				point.y = static_cast<float>(varray_p[j+1]);
 				point.z = static_cast<float>(varray_p[j+2]);
+#if 1
+				// initialize to silence Coverity warning
+				point.u = 0.0f;
+				point.v = 0.0f;
+				point.t = -1;
+#endif
 				contour->dpoints.push_back(point);
 			}
 			// Contour Image Sequence
