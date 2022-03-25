@@ -333,8 +333,6 @@ JPEGLSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
     return false;
   }
   delete[] dummy_buffer;
-  // $1 = {width = 512, height = 512, bitspersample = 8, components = 1, allowedlossyerror = 0, ilv = ILV_NONE,
-  // colorTransform = 0, custom = {MAXVAL = 0, T1 = 0, T2 = 0, T3 = 0, RESET = 0}}
   this->Dimensions[0] = metadata.width;
   this->Dimensions[1] = metadata.height;
   if (metadata.bitsPerSample <= 8)
@@ -343,33 +341,15 @@ JPEGLSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
   }
   else if (metadata.bitsPerSample <= 16)
   {
-    assert(metadata.bitsPerSample > 8);
     this->PF = PixelFormat(PixelFormat::UINT16);
   }
   else
   {
     assert(0);
+    return false;
   }
   this->PF.SetBitsStored((uint16_t)metadata.bitsPerSample);
   assert(this->PF.IsValid());
-#if 0
-  switch(metadata.bitspersample)
-  {
-  case 8:
-    this->PF = PixelFormat(PixelFormat::UINT8);
-    break;
-  case 12:
-    this->PF = PixelFormat(PixelFormat::UINT16);
-    this->PF.SetBitsStored(12);
-    break;
-  case 16:
-    this->PF = PixelFormat(PixelFormat::UINT16);
-    break;
-  default:
-    assert(0);
-    break;
-  }
-#endif
   if (metadata.components == 1)
   {
     PI = PhotometricInterpretation::MONOCHROME2;
@@ -378,7 +358,6 @@ JPEGLSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
   else if (metadata.components == 3)
   {
     PI = PhotometricInterpretation::RGB;
-    PlanarConfiguration = 1;
     this->PF.SetSamplesPerPixel(3);
   }
   else
@@ -607,6 +586,10 @@ JPEGLSCodec::DecodeByStreamsCommon(const char * buffer, size_t totalLen, std::ve
     mdcmDebugMacro("Could not parse JPEG-LS header");
     return false;
   }
+  if (params.colorTransformation != ColorTransformation::None)
+  {
+    mdcmDebugMacro("JPEGLSCodec::DecodeByStreamsCommon: found color transformation " << (int)params.colorTransformation);
+  }
   // allowedlossyerror == 0 => Lossless
   LossyFlag = params.allowedLossyError != 0;
   rgbyteOut.resize((size_t)params.height * (size_t)params.width * ((params.bitsPerSample + 7) / 8) * params.components);
@@ -630,6 +613,10 @@ JPEGLSCodec::DecodeByStreamsCommon2(const char * buffer, size_t totalLen, char *
   {
     mdcmDebugMacro("Could not parse JPEG-LS header");
     return false;
+  }
+  if (params.colorTransformation != ColorTransformation::None)
+  {
+    mdcmDebugMacro("JPEGLSCodec::DecodeByStreamsCommon2: found color transformation " << (int)params.colorTransformation);
   }
   // allowedlossyerror == 0 => Lossless
   LossyFlag = params.allowedLossyError != 0;
@@ -657,7 +644,7 @@ JPEGLSCodec::CodeFrameIntoBuffer(char * outdata, size_t outlen, size_t & complen
   const int            image_width = dims[0];
   const int            image_height = dims[1];
   const PixelFormat &  pf = this->GetPixelFormat();
-  const int            sample_pixel = pf.GetSamplesPerPixel();
+  const int            samples_pixel = pf.GetSamplesPerPixel();
   const int            bitsallocated = pf.GetBitsAllocated();
   const int            bitsstored = pf.GetBitsStored();
   JlsParameters        params = {};
@@ -669,50 +656,25 @@ JPEGLSCodec::CodeFrameIntoBuffer(char * outdata, size_t outlen, size_t & complen
   Lossy/lossless is controlled by the field allowedlossyError. If you put in
   0, encoding is lossless. If it is non-zero, then encoding is lossy. The
   value of 3 is often suggested as a default.
-
-  The nice part about JPEG-LS encoding is that in lossy encoding, there is a
-  guarenteed maximum error for each pixel. So a pixel that has value 12,
-  encoded with a maximum lossy error of 3, may be decoded as a value between 9
-  and 15, but never anything else. In medical imaging this could be a useful
-  guarantee.
-
-  The not so nice part is that you may see striping artifacts when decoding
-  "non-natural" images. I haven't seen the effects myself on medical images,
-  but I suspect screenshots may suffer the most. Also, the bandwidth saving is
-  not as big as with other lossy schemes.
-
-  As for 12 bit, I am about to commit a unit test (with the sample you gave
-  me) that does a successful round trip encoding of 12 bit color. I did notice
-  that for 12 bit, the encoder fails if the unused bits are non-zero, but the
-  sample dit not suffer from that.
-   */
+  */
   params.allowedLossyError = !LossyFlag ? 0 : LossyError;
-  params.components = sample_pixel;
-  // D_CLUNIE_RG3_JPLY.dcm. The famous 16bits allocated / 10 bits stored with the pixel value = 1024
-  // CharLS properly encode 1024 considering it as 10bits data, so the output
-  // Using bitsstored for the encoder gives a slightly better compression ratio, and is indeed the
-  // right way of doing it.
-
-  // mdcmData/PHILIPS_Gyroscan-8-MONO2-Odd_Sequence.dcm
-  if (true || pf.GetPixelRepresentation())
+  params.components = samples_pixel;
+  params.bitsPerSample = bitsallocated;
+  params.height = image_height;
+  params.width = image_width;
+  if (samples_pixel == 1)
   {
-    // mdcmData/CT_16b_signed-UsedBits13.dcm
-    params.bitsPerSample = bitsallocated;
+    params.interleaveMode = InterleaveMode::None;
+  }
+  else if (samples_pixel == 3)
+  {
+    params.interleaveMode = InterleaveMode::Sample;
+    params.colorTransformation = ColorTransformation::None;
   }
   else
   {
-    params.bitsPerSample = bitsstored;
-  }
-  params.height = image_height;
-  params.width = image_width;
-  if (sample_pixel == 4)
-  {
-    params.interleaveMode = InterleaveMode::Line;
-  }
-  else if (sample_pixel == 3)
-  {
-    params.interleaveMode = InterleaveMode::Line;
-    params.colorTransformation = ColorTransformation::HP1;
+    mdcmAlwaysWarnMacro("Not supported: samples per pixel " << samples_pixel);
+    return false;
   }
   ApiResult error = JpegLsEncode(outdata, outlen, &complen, indata, inlen, &params, NULL);
   if (error != ApiResult::OK)
