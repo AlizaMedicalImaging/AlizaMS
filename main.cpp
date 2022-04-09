@@ -32,6 +32,7 @@
 #include <QDir>
 #include <QFont>
 #include <QProcess>
+#include <QObject>
 #include <cstdlib>
 #include <iostream>
 #include "browser/sqtree.h"
@@ -492,6 +493,11 @@ int main(int argc, char *argv[])
 	else
 	{
 		MainWindow mainWin(ok3d, hide_zoom);
+		//
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+		QObject::connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()), Qt::QueuedConnection);
+#endif
+		//
 		mainWin.show();
 		app.processEvents();
 		mainWin.check_3d_frame();

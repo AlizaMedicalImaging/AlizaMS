@@ -614,11 +614,6 @@ void MainWindow::closeEvent(QCloseEvent * e)
 	delete studyview;
 	studyview = NULL;
 	e->accept();
-#if QT_VERSION < QT_VERSION_CHECK(4,8,1)
-	qApp->quit();
-#else
-	qApp->closeAllWindows();
-#endif
 }
 
 void MainWindow::resizeEvent(QResizeEvent * e)
