@@ -1087,7 +1087,7 @@ StudyGraphicsWidget::StudyGraphicsWidget()
 
 StudyGraphicsWidget::~StudyGraphicsWidget()
 {
-	if (mutex.tryLock(30000))
+	if (mutex.tryLock(3000))
 	{
 		for (unsigned int i = 0; i < threads_.size(); ++i)
 		{
