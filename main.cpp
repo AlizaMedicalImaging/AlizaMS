@@ -494,9 +494,7 @@ int main(int argc, char *argv[])
 	{
 		MainWindow mainWin(ok3d, hide_zoom);
 		//
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-		QObject::connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()), Qt::QueuedConnection);
-#endif
+		QObject::connect(&mainWin, SIGNAL(quit_app()), &app, SLOT(quit()), Qt::QueuedConnection);
 		//
 		mainWin.show();
 		app.processEvents();

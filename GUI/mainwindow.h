@@ -77,6 +77,7 @@ protected:
 	void writeSettings();
 
 public slots:
+	void close_app();
 	void exit_null();
 	void set_style(const QString &);
 	void set_no_gl3();
@@ -127,6 +128,9 @@ private slots:
 	void set_zlock_one(bool);
 	void trigger_image_dicom_meta();
 	void ask_close();
+
+signals:
+	void quit_app();
 
 private:
 	void createActions();

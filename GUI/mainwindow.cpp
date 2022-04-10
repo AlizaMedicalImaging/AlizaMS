@@ -22,6 +22,7 @@
 #define DISABLE_LEFT_TOOLBAR__
 
 QMutex mutex;
+static bool init_done = false;
 
 MainWindow::MainWindow(
 	bool ok3d,
@@ -524,6 +525,7 @@ MainWindow::MainWindow(
 	normal_sc->setAutoRepeat(false);
 #endif
 	setAcceptDrops(true);
+	init_done = true;
 }
 
 MainWindow::~MainWindow()
@@ -603,17 +605,27 @@ void MainWindow::open_args(const QStringList & l)
 	mutex.unlock();
 }
 
+void MainWindow::close_app()
+{
+	if (init_done)
+	{
+		writeSettings();
+		aliza->close_();
+		delete aliza;
+		aliza = NULL;
+		delete aboutwidget;
+		aboutwidget = NULL;
+		delete studyview;
+		studyview = NULL;
+		init_done = false;
+	}
+	emit quit_app();
+}
+
 void MainWindow::closeEvent(QCloseEvent * e)
 {
-	writeSettings();
-	aliza->close_();
-	delete aliza;
-	aliza = NULL;
-	delete aboutwidget;
-	aboutwidget = NULL;
-	delete studyview;
-	studyview = NULL;
 	e->accept();
+	close_app();
 }
 
 void MainWindow::resizeEvent(QResizeEvent * e)

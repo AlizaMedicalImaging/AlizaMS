@@ -694,7 +694,7 @@ void Aliza::close_()
 	if (check_3d()) glwidget->set_skip_draw(true);
 	stop_anim();
 	stop_3D_anim();
-	if (!mutex0.tryLock(5000)) return;
+	if (!mutex0.tryLock(3000)) return;
 	disconnect_tools();
 	imagesbox->listWidget->clear();
 	graphicswidget_m->clear_();

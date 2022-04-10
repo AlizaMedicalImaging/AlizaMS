@@ -2020,11 +2020,6 @@ AnonymazerWidget2::~AnonymazerWidget2()
 	help_widget = NULL;
 }
 
-void AnonymazerWidget2::closeEvent(QCloseEvent * e)
-{
-	e->accept();
-}
-
 void AnonymazerWidget2::readSettings()
 {
 	QSettings settings(

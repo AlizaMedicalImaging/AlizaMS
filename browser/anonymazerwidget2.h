@@ -34,7 +34,6 @@ public slots:
 	void show_help();
 
 protected:
-	void closeEvent(QCloseEvent*) override;
 	void readSettings();
 	void dropEvent(QDropEvent*) override;
 	void dragEnterEvent(QDragEnterEvent*) override;
