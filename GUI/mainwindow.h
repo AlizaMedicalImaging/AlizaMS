@@ -77,7 +77,6 @@ protected:
 	void writeSettings();
 
 public slots:
-	void close_app();
 	void exit_app();
 	void exit_null();
 	void set_style(const QString &);
@@ -134,6 +133,7 @@ signals:
 	void quit_app();
 
 private:
+	void close_app();
 	void createActions();
 	void createMenus();
 	void createToolBars();

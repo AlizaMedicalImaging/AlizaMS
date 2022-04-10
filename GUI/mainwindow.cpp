@@ -607,8 +607,8 @@ void MainWindow::open_args(const QStringList & l)
 
 /*
 Closing is a little bit over-complicated, because there was an issue
-with Citrix (Windows Server 2016). Could not reproduce the issue,
-but trying to workaround.
+with Citrix (Windows Server 2016). Can not reproduce the issue,
+but is trying to workaround.
 */
 void MainWindow::close_app()
 {
@@ -621,18 +621,21 @@ void MainWindow::close_app()
 		aboutwidget->close();
 		delete aboutwidget;
 		aboutwidget = NULL;
-		studyview->close();
 		delete studyview;
 		studyview = NULL;
+		// 'init_done' variable is not required, just for logic.
 		init_done = false;
 	}
 	emit quit_app();
 }
 
+// Connected to 'quit_app' signal in main.cpp.
 void MainWindow::exit_app()
 {
 	qApp->closeAllWindows();
 #if 1
+	// S. setQuitOnLastWindowClosed in main.cpp, should be set to 'false',
+	// default is 'true'.
 	qApp->exit(0);
 #endif
 }
@@ -648,6 +651,9 @@ void MainWindow::resizeEvent(QResizeEvent * e)
 	QMainWindow::resizeEvent(e);
 }
 
+// It is used only to let user abort some processes
+// if there is no better way to stop them, bad,
+// should be used only as exception.
 void MainWindow::exit_null()
 {
 	exit(0);
