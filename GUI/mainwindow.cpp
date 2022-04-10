@@ -652,8 +652,8 @@ void MainWindow::resizeEvent(QResizeEvent * e)
 }
 
 // It is used only to let user abort some processes
-// if there is no better way to stop them, bad,
-// should be used only as exception.
+// and exit if there is no better way to stop them,
+// bad, should be used only as exception.
 void MainWindow::exit_null()
 {
 	exit(0);
@@ -891,14 +891,6 @@ void MainWindow::createMenus()
 	actionTools3DMenu->setMenu(tools3d_menu);
 	tools_menu->addAction(actionTools3DMenu);
 	tools_menu->addAction(setLevelAct);
-#if 0
-	QAction * actionToolsUtils  = new QAction(
-		QString("Utilities"),this);
-	QMenu * tools_utils_menu = new QMenu(this);
-	tools_utils_menu->addAction(imagesbox->actionSqlBrowser);
-	actionToolsUtils->setMenu(tools_utils_menu);
-	tools_menu->addAction(actionToolsUtils);
-#endif
 	//
 	browser_menu = menuBar()->addMenu(QString("DICOM scanner"));
 	browser_menu->addAction(browser_open_dir_act);
@@ -926,7 +918,6 @@ void MainWindow::createMenus()
 	//
 	settings_menu = menuBar()->addMenu(QString("Settings"));
 	settings_menu->menuAction()->setVisible(false);
-	//
 }
 
 void MainWindow::createToolBars()
@@ -1001,7 +992,6 @@ void MainWindow::createToolBars()
 	toolbar2->addAction(transp2dAct);
 	toolbar2->addAction(cursorAct);
 	toolbar2->addAction(collisionAct);
-	//
 	//
 	QWidget * spacer1 = new QWidget(this);
 	spacer1->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
