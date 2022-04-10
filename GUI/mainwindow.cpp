@@ -614,7 +614,6 @@ void MainWindow::close_app()
 {
 	if (init_done)
 	{
-		writeSettings();
 		aliza->close_();
 		delete aliza;
 		aliza = NULL;
@@ -642,6 +641,7 @@ void MainWindow::exit_app()
 
 void MainWindow::closeEvent(QCloseEvent * e)
 {
+	writeSettings();
 	e->accept();
 	close_app();
 }
@@ -651,7 +651,7 @@ void MainWindow::resizeEvent(QResizeEvent * e)
 	QMainWindow::resizeEvent(e);
 }
 
-// It is used only to let user abort some processes
+// It is used only to let a user abort some processes
 // and exit if there is no better way to stop them,
 // bad, should be used only as exception.
 void MainWindow::exit_null()
