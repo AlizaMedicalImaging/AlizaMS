@@ -78,6 +78,7 @@ protected:
 
 public slots:
 	void close_app();
+	void exit_app();
 	void exit_null();
 	void set_style(const QString &);
 	void set_no_gl3();

@@ -269,6 +269,9 @@ int main(int argc, char *argv[])
 #endif
 #endif
 	QApplication app(argc, argv);
+#if 1
+	app.setQuitOnLastWindowClosed(false);
+#endif
 	app.setOrganizationName(QString("Aliza"));
 	app.setOrganizationDomain(QString("aliza-dicom-viewer.com"));
 	app.setApplicationName(QString("AlizaMS"));
@@ -359,11 +362,7 @@ int main(int argc, char *argv[])
 							aa.push_back(aa_.at(y));
 						}
 					}
-#if QT_VERSION < QT_VERSION_CHECK(4,8,1)
 					app.quit();
-#else
-					app.closeAllWindows();
-#endif
 #if 1
 					QProcess::startDetached(aa_.at(0), aa);
 #endif
@@ -494,7 +493,7 @@ int main(int argc, char *argv[])
 	{
 		MainWindow mainWin(ok3d, hide_zoom);
 		//
-		QObject::connect(&mainWin, SIGNAL(quit_app()), &app, SLOT(quit()), Qt::QueuedConnection);
+		QObject::connect(&mainWin, SIGNAL(quit_app()), &mainWin, SLOT(exit_app()), Qt::QueuedConnection);
 		//
 		mainWin.show();
 		app.processEvents();

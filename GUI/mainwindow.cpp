@@ -605,6 +605,11 @@ void MainWindow::open_args(const QStringList & l)
 	mutex.unlock();
 }
 
+/*
+Closing is a little bit over-complicated, because there was an issue
+with Citrix (Windows Server 2016). Could not reproduce the issue,
+but trying to workaround.
+*/
 void MainWindow::close_app()
 {
 	if (init_done)
@@ -613,13 +618,23 @@ void MainWindow::close_app()
 		aliza->close_();
 		delete aliza;
 		aliza = NULL;
+		aboutwidget->close();
 		delete aboutwidget;
 		aboutwidget = NULL;
+		studyview->close();
 		delete studyview;
 		studyview = NULL;
 		init_done = false;
 	}
 	emit quit_app();
+}
+
+void MainWindow::exit_app()
+{
+	qApp->closeAllWindows();
+#if 1
+	qApp->exit(0);
+#endif
 }
 
 void MainWindow::closeEvent(QCloseEvent * e)
