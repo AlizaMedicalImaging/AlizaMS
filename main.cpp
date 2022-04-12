@@ -437,6 +437,9 @@ int main(int argc, char *argv[])
 	//
 	if (metadata_only||metadata_series_only)
 	{
+#if 1
+		app.setQuitOnLastWindowClosed(true);
+#endif
 #if (defined USE_SPLASH_SCREEN && USE_SPLASH_SCREEN==1)
 		splash->showMessage(splash_info);
 		app.processEvents();
