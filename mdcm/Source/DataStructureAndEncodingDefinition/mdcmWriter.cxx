@@ -35,6 +35,7 @@
 #include "mdcmSequenceOfItems.h"
 #include "mdcmParseException.h"
 #include "mdcmDeflateStream.h"
+#include <locale>
 
 namespace mdcm
 {
@@ -61,9 +62,13 @@ Writer::~Writer()
 bool
 Writer::Write()
 {
+  //
+  std::locale current_locale = std::locale::global(std::locale::classic());
+  //
   if (!Stream || !*Stream)
   {
     mdcmErrorMacro("No Filename");
+    std::locale::global(current_locale);
     return false;
   }
   std::ostream &        os = *Stream;
@@ -72,6 +77,7 @@ Writer::Write()
   if (DS.IsEmpty())
   {
     mdcmErrorMacro("DS empty");
+    std::locale::global(current_locale);
     return false;
   }
   // Check that 0002,0002 / 0008,0016 and 0002,0003 / 0008,0018 match?
@@ -87,6 +93,7 @@ Writer::Write()
       catch (std::logic_error & ex)
       {
         mdcmAlwaysWarnMacro("Could not recreate the File Meta Header, please report:" << ex.what());
+        std::locale::global(current_locale);
         return false;
       }
       duplicate.Write(os);
@@ -100,6 +107,7 @@ Writer::Write()
   if (!ts.IsValid())
   {
     mdcmErrorMacro("Invalid Transfer Syntax");
+    std::locale::global(current_locale);
     return false;
   }
   if (ts == TransferSyntax::DeflatedExplicitVRLittleEndian)
@@ -112,8 +120,10 @@ Writer::Write()
     }
     catch (...)
     {
+      std::locale::global(current_locale);
       return false;
     }
+    std::locale::global(current_locale);
     return true;
   }
   try
@@ -149,11 +159,13 @@ Writer::Write()
   catch (std::exception & ex)
   {
     mdcmAlwaysWarnMacro(ex.what());
+    std::locale::global(current_locale);
     return false;
   }
   catch (...)
   {
     mdcmAlwaysWarnMacro("Unknown exception");
+    std::locale::global(current_locale);
     return false;
   }
   os.flush();
@@ -161,6 +173,9 @@ Writer::Write()
   {
     Ofstream->close();
   }
+  //
+  std::locale::global(current_locale);
+  //
   return true;
 }
 

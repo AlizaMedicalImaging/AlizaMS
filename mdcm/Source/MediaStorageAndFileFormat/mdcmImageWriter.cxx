@@ -33,6 +33,7 @@
 #include "mdcmLookupTable.h"
 #include "mdcmItem.h"
 #include "mdcmSequenceOfItems.h"
+#include <locale>
 
 namespace mdcm
 {
@@ -104,9 +105,15 @@ ImageWriter::ComputeTargetMediaStorage()
 bool
 ImageWriter::Write()
 {
+  //
+  std::locale current_locale = std::locale::global(std::locale::classic());
+  //
   const MediaStorage ms = ComputeTargetMediaStorage();
   if (!PrepareWrite(ms))
+  {
+    std::locale::global(current_locale);
     return false;
+  }
   File &    file = GetFile();
   DataSet & ds = file.GetDataSet();
   // PatientName
@@ -257,12 +264,16 @@ ImageWriter::Write()
     ImageHelper::SetRescaleInterceptSlopeValue(GetFile(), pixeldata);
     if (ms == MediaStorage::RTDoseStorage && pixeldata.GetIntercept() != 0)
     {
+      std::locale::global(current_locale);
       return false;
     }
     else if (ms == MediaStorage::MRImageStorage && (pixeldata.GetIntercept() != 0 || pixeldata.GetSlope() != 1.0))
     {
       if (!mdcm::ImageHelper::GetForceRescaleInterceptSlope())
+      {
+        std::locale::global(current_locale);
         return false;
+      }
     }
   }
   else if (pi == PhotometricInterpretation::PALETTE_COLOR)
@@ -385,9 +396,12 @@ ImageWriter::Write()
   }
   //
   assert(Stream);
-  if (!Writer::Write())
-    return false;
-  return true;
+  //
+  std::locale::global(current_locale);
+  //
+  // Writer sets classic locale
+  const bool w_ok = Writer::Write();
+  return w_ok;
 }
 
 } // end namespace mdcm

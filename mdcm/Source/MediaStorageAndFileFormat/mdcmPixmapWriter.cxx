@@ -32,6 +32,7 @@
 #include "mdcmLookupTable.h"
 #include "mdcmItem.h"
 #include "mdcmSequenceOfItems.h"
+#include <locale>
 
 namespace mdcm
 {
@@ -693,6 +694,9 @@ PixmapWriter::SetImage(Pixmap const & img)
 bool
 PixmapWriter::Write()
 {
+  //
+  std::locale current_locale = std::locale::global(std::locale::classic());
+  //
   MediaStorage ms;
   if (!ms.SetFromFile(GetFile()))
   {
@@ -705,13 +709,17 @@ PixmapWriter::Write()
                                                       1);
   }
   if (!PrepareWrite(ms))
-    return false;
-  assert(Stream);
-  if (!Writer::Write())
   {
+    std::locale::global(current_locale);
     return false;
   }
-  return true;
+  assert(Stream);
+  //
+  std::locale::global(current_locale);
+  //
+  // Writer sets classic locale
+  const bool w_ok = Writer::Write();
+  return w_ok;
 }
 
 } // end namespace mdcm
