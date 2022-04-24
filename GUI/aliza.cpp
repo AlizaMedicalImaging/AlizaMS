@@ -691,7 +691,8 @@ Aliza::~Aliza()
 
 void Aliza::close_()
 {
-	if (check_3d()) glwidget->set_skip_draw(true);
+	const bool ok3d = check_3d();
+	if (ok3d) glwidget->set_skip_draw(true);
 	stop_anim();
 	stop_3D_anim();
 	if (!mutex0.tryLock(3000)) return;
@@ -712,7 +713,7 @@ void Aliza::close_()
 		}
 		scene3dimages.clear();
 	}
-	if (check_3d()) glwidget->close_();
+	if (ok3d) glwidget->close_();
 	g_close_physics();
 	mutex0.unlock();
 }
@@ -987,7 +988,6 @@ void Aliza::clear_ram()
 		++iv;
 	}
 	scene3dimages.clear();
-	if (ok3d && glwidget->isVisible()) glwidget->updateGL();
 	connect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
 	connect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
 	imagesbox->listWidget->blockSignals(false);
@@ -1005,7 +1005,8 @@ void Aliza::delete_image()
 	QListWidgetItem * item__ = NULL;
 	const bool lock = mutex0.tryLock();
 	if (!lock) return;
-	if (check_3d()) glwidget->set_skip_draw(true);
+	const bool ok3d = check_3d();
+	if (ok3d) glwidget->set_skip_draw(true);
 	if (imagesbox->listWidget->selectedItems().empty()) goto quit__;
 	ivariant = get_selected_image();
 	if (!ivariant) goto quit__;
@@ -1040,7 +1041,7 @@ void Aliza::delete_image()
 	}
 quit__:
 	mutex0.unlock();
-	if (check_3d()) glwidget->set_skip_draw(false);
+	if (ok3d) glwidget->set_skip_draw(false);
 #ifdef ALIZA_PRINT_COUNT_GL_OBJ
 	std::cout << "Num VBOs " << GLWidget::get_count_vbos() << std::endl;
 #endif
@@ -4056,8 +4057,8 @@ void Aliza::trigger_image_color()
 		}
 	}
 quit__:
-	if (ok3d) glwidget->set_skip_draw(false);
 	mutex0.unlock();
+	if (ok3d) glwidget->set_skip_draw(false);
 }
 
 void Aliza::delete_checked_unchecked(bool t)

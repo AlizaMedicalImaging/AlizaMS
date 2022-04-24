@@ -594,6 +594,7 @@ void GLWidget::set_wireframe(bool t)
 
 void GLWidget::set_skip_draw(bool t)
 {
+	skip_draw = t;
 	if (!t) updateGL();
 }
 

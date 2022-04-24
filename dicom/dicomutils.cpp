@@ -1325,9 +1325,14 @@ bool DicomUtils::get_ds_values(
 	if (e.IsEmpty()) return false;
 	const mdcm::ByteValue * bv = e.GetByteValue();
 	if (!bv) return false;
-	const QString tmp0 = QString::fromLatin1(
+	QString tmp0 = QString::fromLatin1(
 		bv->GetPointer(),
 		bv->GetLength());
+	if (tmp0.contains(QString(",")))
+	{
+		// Workaround invalid VR
+		tmp0.replace(QString(","), QString("."));
+	}
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	const QStringList tmp1 = tmp0.split(
 		QString("\\"),
@@ -1363,9 +1368,14 @@ bool DicomUtils::priv_get_ds_values(
 	if (e.IsEmpty()) return false;
 	const mdcm::ByteValue * bv = e.GetByteValue();
 	if (!bv) return false;
-	const QString tmp0 = QString::fromLatin1(
+	QString tmp0 = QString::fromLatin1(
 		bv->GetPointer(),
 		bv->GetLength());
+	if (tmp0.contains(QString(",")))
+	{
+		// Workaround invalid VR
+		tmp0.replace(QString(","), QString("."));
+	}
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	const QStringList tmp1 = tmp0.split(
 		QString("\\"),
@@ -4368,8 +4378,13 @@ bool DicomUtils::get_patient_position(
 	double * pp)
 {
 	if (pp==NULL || p.isEmpty()) return false;
-	const QString tmp0 = p.trimmed().
+	QString tmp0 = p.trimmed().
 		remove(QChar('\0'));
+	if (tmp0.contains(QString(",")))
+	{
+		// Workaround invalid VR
+		tmp0.replace(QString(","), QString("."));
+	}
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	const QStringList list =
 		tmp0.split(QString("\\"), Qt::SkipEmptyParts);
@@ -4399,8 +4414,13 @@ bool DicomUtils::get_patient_orientation(
 	double * po)
 {
 	if (po==NULL || o.isEmpty()) return false;
-	const QString tmp0 = QString(o.trimmed()).
+	QString tmp0 = QString(o.trimmed()).
 		remove(QChar('\0'));
+	if (tmp0.contains(QString(",")))
+	{
+		// Workaround invalid VR
+		tmp0.replace(QString(","), QString("."));
+	}
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	const QStringList list =
 		tmp0.split(QString("\\"), Qt::SkipEmptyParts);
@@ -4438,8 +4458,13 @@ bool DicomUtils::get_pixel_spacing(
 	const QString & s,
 	double * ps)
 {
-	const QString tmp0 =
+	QString tmp0 =
 		QString(s.trimmed()).remove(QChar('\0'));
+	if (tmp0.contains(QString(",")))
+	{
+		// Workaround invalid VR
+		tmp0.replace(QString(","), QString("."));
+	}
 	const QStringList list =
 		tmp0.split(QString("\\"));
 	bool ok = false;
@@ -6428,9 +6453,14 @@ QString DicomUtils::read_ultrasound(
 						const mdcm::ByteValue * bv = e.GetByteValue();
 						if (bv)
 						{
-							const QString tmp0 = QString::fromLatin1(
+							QString tmp0 = QString::fromLatin1(
 								bv->GetPointer(),
 								bv->GetLength());
+							if (tmp0.contains(QString(",")))
+							{
+								// Workaround invalid VR
+								tmp0.replace(QString(","), QString("."));
+							}
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 							const QStringList tmp1 = tmp0.split(
 								QString("\\"),
@@ -9677,8 +9707,13 @@ bool DicomUtils::is_not_interleaved(const QStringList & images)
 			{
 				bool sp_ok = false;
 				long long tmp1 = 0;
-				const QString sp = QString::fromLatin1(
+				QString sp = QString::fromLatin1(
 					sp_.GetByteValue()->GetPointer(),sp_.GetByteValue()->GetLength());
+				if (sp.contains(QString(",")))
+				{
+					// Workaround invalid VR
+					sp.replace(QString(","), QString("."));
+				}
 				const double spvd = QVariant(sp.trimmed().remove(QChar('\0'))).toDouble(&sp_ok);
 				if (sp_ok) tmp1 = 1000 * CommonUtils::set_digits(spvd,3);
 				else return false;
@@ -11659,9 +11694,14 @@ QString DicomUtils::read_dicom(
 					if (!sp_.IsEmpty() && !sp_.IsUndefinedLength() && sp_.GetByteValue())
 					{
 						bool sp_ok = false;
-						const QString sp = QString::fromLatin1(
+						QString sp = QString::fromLatin1(
 							sp_.GetByteValue()->GetPointer(),
 							sp_.GetByteValue()->GetLength());
+						if (sp.contains(QString(",")))
+						{
+							// Workaround invalid VR
+							sp.replace(QString(","), QString("."));
+						}
 						const double spvd =
 							QVariant(sp.trimmed().remove(QChar('\0'))).toDouble(&sp_ok);
 						if (sp_ok)
