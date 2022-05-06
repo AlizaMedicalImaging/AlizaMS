@@ -24,11 +24,10 @@
 
 #include "mdcmTypes.h"
 #ifdef MDCM_USE_SYSTEM_CHARLS
-// FIXME
-#if 1
-#include <CharLS/charls.h>
-#else
+#ifdef MDCM_CHARLS_2_1_OR_HIGHER
 #include <charls/charls.h>
+#else
+#include <CharLS/charls.h>
 #endif
 #else
 #include "mdcmcharls/charls.h"
