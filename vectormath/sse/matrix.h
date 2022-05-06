@@ -62,22 +62,19 @@ inline Matrix3::Matrix3(const FloatInVec & scalar)
 
 inline Matrix3::Matrix3(const Quat & unitQuat)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
     __m128 xyzw_2, wwww, yzxw, zxyw, yzxw_2, zxyw_2;
     __m128 tmp0, tmp1, tmp2, tmp3, tmp4, tmp5;
-
-    VECTORMATH_ALIGNED(unsigned int sx[4]) = { 0xFFFFFFFF, 0, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int sz[4]) = { 0, 0, 0xFFFFFFFF, 0 };
-
-    __m128 select_x = _mm_load_ps((float *)sx);
-    __m128 select_z = _mm_load_ps((float *)sz);
-
+    VECTORMATH_ALIGNED(float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
+    __m128 select_x = _mm_load_ps(sx);
+    __m128 select_z = _mm_load_ps(sz);
     xyzw_2 = _mm_add_ps(unitQuat.get128(), unitQuat.get128());
     wwww = _mm_shuffle_ps(unitQuat.get128(), unitQuat.get128(), _MM_SHUFFLE(3, 3, 3, 3));
     yzxw = _mm_shuffle_ps(unitQuat.get128(), unitQuat.get128(), _MM_SHUFFLE(3, 0, 2, 1));
     zxyw = _mm_shuffle_ps(unitQuat.get128(), unitQuat.get128(), _MM_SHUFFLE(3, 1, 0, 2));
     yzxw_2 = _mm_shuffle_ps(xyzw_2, xyzw_2, _MM_SHUFFLE(3, 0, 2, 1));
     zxyw_2 = _mm_shuffle_ps(xyzw_2, xyzw_2, _MM_SHUFFLE(3, 1, 0, 2));
-
     tmp0 = _mm_mul_ps(yzxw_2, wwww);                                // tmp0 = 2yw, 2zw, 2xw, 2w2
     tmp1 = _mm_sub_ps(_mm_set1_ps(1.0f), _mm_mul_ps(yzxw, yzxw_2)); // tmp1 = 1 - 2y2, 1 - 2z2, 1 - 2x2, 1 - 2w2
     tmp2 = _mm_mul_ps(yzxw, xyzw_2);                                // tmp2 = 2xy, 2yz, 2xz, 2w2
@@ -197,11 +194,12 @@ inline Matrix3 & Matrix3::operator = (const Matrix3 & mat)
 
 inline const Matrix3 transpose(const Matrix3 & mat)
 {
+    VECTORMATH_ALIGNED(float sy[4]) = { 0.0f, bit_cast_uint2float(0xFFFFFFFF), 0.0f, 0.0f };
+    __m128 select_y = _mm_load_ps(sy);
     __m128 tmp0, tmp1, res0, res1, res2;
     tmp0 = _mm_unpacklo_ps(mat.getCol0().get128(), mat.getCol2().get128());
     tmp1 = _mm_unpackhi_ps(mat.getCol0().get128(), mat.getCol2().get128());
-    res0 = _mm_unpacklo_ps(tmp0, mat.getCol1().get128());
-    VECTORMATH_ALIGNED(unsigned int select_y[4]) = { 0, 0xFFFFFFFF, 0, 0 };
+    res0 = _mm_unpacklo_ps(tmp0, mat.getCol1().get128());                                  
     res1 = _mm_shuffle_ps(tmp0, tmp0, _MM_SHUFFLE(0, 3, 2, 2));
     res1 = sseSelect(res1, mat.getCol1().get128(), select_y);
     res2 = _mm_shuffle_ps(tmp1, tmp1, _MM_SHUFFLE(0, 1, 1, 0));
@@ -211,6 +209,8 @@ inline const Matrix3 transpose(const Matrix3 & mat)
 
 inline const Matrix3 inverse(const Matrix3 & mat)
 {
+    VECTORMATH_ALIGNED(float sy[4]) = { 0.0f, bit_cast_uint2float(0xFFFFFFFF), 0.0f, 0.0f };
+    __m128 select_y = _mm_load_ps(sy);
     __m128 tmp0, tmp1, tmp2, tmp3, tmp4, dot, invdet, inv0, inv1, inv2;
     tmp2 = sseVecCross(mat.getCol0().get128(), mat.getCol1().get128());
     tmp0 = sseVecCross(mat.getCol1().get128(), mat.getCol2().get128());
@@ -221,7 +221,6 @@ inline const Matrix3 inverse(const Matrix3 & mat)
     tmp3 = _mm_unpacklo_ps(tmp0, tmp2);
     tmp4 = _mm_unpackhi_ps(tmp0, tmp2);
     inv0 = _mm_unpacklo_ps(tmp3, tmp1);
-    VECTORMATH_ALIGNED(unsigned int select_y[4]) = { 0, 0xFFFFFFFF, 0, 0 };
     inv1 = _mm_shuffle_ps(tmp3, tmp3, _MM_SHUFFLE(0, 3, 2, 2));
     inv1 = sseSelect(inv1, tmp1, select_y);
     inv2 = _mm_shuffle_ps(tmp4, tmp4, _MM_SHUFFLE(0, 1, 1, 0));
@@ -355,10 +354,13 @@ inline const Matrix3 Matrix3::rotationX(float radians)
 
 inline const Matrix3 Matrix3::rotationX(const FloatInVec & radians)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
     __m128 s, c, res1, res2;
     __m128 zero;
-    VECTORMATH_ALIGNED(unsigned int select_y[4]) = { 0, 0xFFFFFFFF, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_z[4]) = { 0, 0, 0xFFFFFFFF, 0 };
+    VECTORMATH_ALIGNED(float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
+    __m128 select_y = _mm_load_ps(sy);
+    __m128 select_z = _mm_load_ps(sz);
     zero = _mm_setzero_ps();
     sseSinfCosf(radians.get128(), &s, &c);
     res1 = sseSelect(zero, c, select_y);
@@ -375,10 +377,13 @@ inline const Matrix3 Matrix3::rotationY(float radians)
 
 inline const Matrix3 Matrix3::rotationY(const FloatInVec & radians)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
     __m128 s, c, res0, res2;
     __m128 zero;
-    VECTORMATH_ALIGNED(unsigned int select_x[4]) = { 0xFFFFFFFF, 0, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_z[4]) = { 0, 0, 0xFFFFFFFF, 0 };
+    VECTORMATH_ALIGNED(float sx[4]) = { ffffffff, 0.0f,  0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
+    __m128 select_x = _mm_load_ps(sx);
+    __m128 select_z = _mm_load_ps(sz);
     zero = _mm_setzero_ps();
     sseSinfCosf(radians.get128(), &s, &c);
     res0 = sseSelect(zero, c, select_x);
@@ -395,10 +400,13 @@ inline const Matrix3 Matrix3::rotationZ(float radians)
 
 inline const Matrix3 Matrix3::rotationZ(const FloatInVec & radians)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
     __m128 s, c, res0, res1;
     __m128 zero;
-    VECTORMATH_ALIGNED(unsigned int select_x[4]) = { 0xFFFFFFFF, 0, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_y[4]) = { 0, 0xFFFFFFFF, 0, 0 };
+    VECTORMATH_ALIGNED(float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
+    __m128 select_x = _mm_load_ps(sx);
+    __m128 select_y = _mm_load_ps(sy);
     zero = _mm_setzero_ps();
     sseSinfCosf(radians.get128(), &s, &c);
     res0 = sseSelect(zero, c, select_x);
@@ -410,14 +418,19 @@ inline const Matrix3 Matrix3::rotationZ(const FloatInVec & radians)
 
 inline const Matrix3 Matrix3::rotationZYX(const Vector3 & radiansXYZ)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+    VECTORMATH_ALIGNED(float sxyz[4]) = { ffffffff,
+                                          ffffffff,
+                                          ffffffff,
+                                          0.0f };
+    __m128 select_xyz = _mm_load_ps(sxyz);
     __m128 angles, s, negS, c, X0, X1, Y0, Y1, Z0, Z1, tmp;
     angles = Vector4(radiansXYZ, 0.0f).get128();
     sseSinfCosf(angles, &s, &c);
     negS = sseNegatef(s);
     Z0 = _mm_unpackhi_ps(c, s);
     Z1 = _mm_unpackhi_ps(negS, c);
-    VECTORMATH_ALIGNED(unsigned int select_xyz[4]) = { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0 };
-    Z1 = _mm_and_ps(Z1, _mm_load_ps((float *)select_xyz));
+    Z1 = _mm_and_ps(Z1, select_xyz);
     Y0 = _mm_shuffle_ps(c, negS, _MM_SHUFFLE(0, 1, 1, 1));
     Y1 = _mm_shuffle_ps(s, c, _MM_SHUFFLE(0, 1, 1, 1));
     X0 = sseSplat(s, 0);
@@ -435,6 +448,13 @@ inline const Matrix3 Matrix3::rotation(float radians, const Vector3 & unitVec)
 
 inline const Matrix3 Matrix3::rotation(const FloatInVec & radians, const Vector3 & unitVec)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+    VECTORMATH_ALIGNED(float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
+    __m128 select_x = _mm_load_ps(sx);
+    __m128 select_y = _mm_load_ps(sy);
+    __m128 select_z = _mm_load_ps(sz);
     __m128 axis, s, c, oneMinusC, axisS, negAxisS, xxxx, yyyy, zzzz, tmp0, tmp1, tmp2;
     axis = unitVec.get128();
     sseSinfCosf(radians.get128(), &s, &c);
@@ -444,9 +464,6 @@ inline const Matrix3 Matrix3::rotation(const FloatInVec & radians, const Vector3
     oneMinusC = _mm_sub_ps(_mm_set1_ps(1.0f), c);
     axisS = _mm_mul_ps(axis, s);
     negAxisS = sseNegatef(axisS);
-    VECTORMATH_ALIGNED(unsigned int select_x[4]) = { 0xFFFFFFFF, 0, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_y[4]) = { 0, 0xFFFFFFFF, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_z[4]) = { 0, 0, 0xFFFFFFFF, 0 };
     tmp0 = _mm_shuffle_ps(axisS, axisS, _MM_SHUFFLE(0, 0, 2, 0));
     tmp0 = sseSelect(tmp0, sseSplat(negAxisS, 1), select_z);
     tmp1 = sseSelect(sseSplat(axisS, 0), sseSplat(negAxisS, 2), select_x);
@@ -467,10 +484,14 @@ inline const Matrix3 Matrix3::rotation(const Quat & unitQuat)
 
 inline const Matrix3 Matrix3::scale(const Vector3 & scaleVec)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
     const __m128 zero = _mm_setzero_ps();
-    VECTORMATH_ALIGNED(unsigned int select_x[4]) = { 0xFFFFFFFF, 0, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_y[4]) = { 0, 0xFFFFFFFF, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_z[4]) = { 0, 0, 0xFFFFFFFF, 0 };
+    VECTORMATH_ALIGNED(float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
+    __m128 select_x = _mm_load_ps(sx);
+    __m128 select_y = _mm_load_ps(sy);
+    __m128 select_z = _mm_load_ps(sz);
     return Matrix3(Vector3(sseSelect(zero, scaleVec.get128(), select_x)),
                    Vector3(sseSelect(zero, scaleVec.get128(), select_y)),
                    Vector3(sseSelect(zero, scaleVec.get128(), select_z)));
@@ -690,15 +711,14 @@ inline const Matrix4 transpose(const Matrix4 & mat)
 
 inline const Matrix4 inverse(const Matrix4 & mat)
 {
-    VECTORMATH_ALIGNED(unsigned int PNPN[4]) = { 0x00000000, 0x80000000, 0x00000000, 0x80000000 };
-    VECTORMATH_ALIGNED(unsigned int NPNP[4]) = { 0x80000000, 0x00000000, 0x80000000, 0x00000000 };
-    VECTORMATH_ALIGNED(float X1_YZ0_W1[4])   = { 1.0f, 0.0f, 0.0f, 1.0f };
-
+    const float f0x80000000 = bit_cast_uint2float(0x80000000);
+    VECTORMATH_ALIGNED(float PNPN[4]) = { 0.0f, f0x80000000, 0.0f, f0x80000000 };
+    VECTORMATH_ALIGNED(float NPNP[4]) = { f0x80000000, 0.0f, f0x80000000, 0.0f };
+    VECTORMATH_ALIGNED(float X1_YZ0_W1[4]) = { 1.0f, 0.0f, 0.0f, 1.0f };
     __m128 Va, Vb, Vc;
     __m128 r1, r2, r3, tt, tt2;
     __m128 sum, Det, RDet;
     __m128 trns0, trns1, trns2, trns3;
-
     __m128 _L1 = mat.getCol0().get128();
     __m128 _L2 = mat.getCol1().get128();
     __m128 _L3 = mat.getCol2().get128();
@@ -727,8 +747,8 @@ inline const Matrix4 inverse(const Matrix4 & mat)
     Det = _mm_mul_ps(sum, _L1);
     Det = _mm_add_ps(Det, _mm_movehl_ps(Det, Det));
 
-    const __m128 Sign_PNPN = _mm_load_ps((float *)PNPN);
-    const __m128 Sign_NPNP = _mm_load_ps((float *)NPNP);
+    const __m128 Sign_PNPN = _mm_load_ps(PNPN);
+    const __m128 Sign_NPNP = _mm_load_ps(NPNP);
 
     __m128 mtL1 = _mm_xor_ps(sum, Sign_PNPN);
 
@@ -763,7 +783,7 @@ inline const Matrix4 inverse(const Matrix4 & mat)
     __m128 mtL3 = _mm_xor_ps(sum, Sign_PNPN);
 
     // Dividing is FASTER than rcp_nr! (Because rcp_nr causes many register-memory RWs).
-    RDet = _mm_div_ss(_mm_load_ss((float *)&X1_YZ0_W1), Det);
+    RDet = _mm_div_ss(_mm_load_ss((float *)&X1_YZ0_W1), Det); // FIXME
     RDet = _mm_shuffle_ps(RDet, RDet, 0x00);
 
     // Devide the first 12 minterms with the determinant.
@@ -1035,10 +1055,13 @@ inline const Matrix4 Matrix4::rotationX(float radians)
 
 inline const Matrix4 Matrix4::rotationX(const FloatInVec & radians)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+    VECTORMATH_ALIGNED(float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
+    __m128 select_y = _mm_load_ps(sy);
+    __m128 select_z = _mm_load_ps(sz);
     __m128 s, c, res1, res2;
     __m128 zero;
-    VECTORMATH_ALIGNED(unsigned int select_y[4]) = { 0, 0xFFFFFFFF, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_z[4]) = { 0, 0, 0xFFFFFFFF, 0 };
     zero = _mm_setzero_ps();
     sseSinfCosf(radians.get128(), &s, &c);
     res1 = sseSelect(zero, c, select_y);
@@ -1058,10 +1081,13 @@ inline const Matrix4 Matrix4::rotationY(float radians)
 
 inline const Matrix4 Matrix4::rotationY(const FloatInVec & radians)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+    VECTORMATH_ALIGNED(float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
+    __m128 select_x = _mm_load_ps(sx);
+    __m128 select_z = _mm_load_ps(sz);
     __m128 s, c, res0, res2;
     __m128 zero;
-    VECTORMATH_ALIGNED(unsigned int select_x[4]) = { 0xFFFFFFFF, 0, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_z[4]) = { 0, 0, 0xFFFFFFFF, 0 };
     zero = _mm_setzero_ps();
     sseSinfCosf(radians.get128(), &s, &c);
     res0 = sseSelect(zero, c, select_x);
@@ -1081,10 +1107,13 @@ inline const Matrix4 Matrix4::rotationZ(float radians)
 
 inline const Matrix4 Matrix4::rotationZ(const FloatInVec & radians)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+    VECTORMATH_ALIGNED(float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
+    __m128 select_x = _mm_load_ps(sx);
+    __m128 select_y = _mm_load_ps(sy);                                        
     __m128 s, c, res0, res1;
     __m128 zero;
-    VECTORMATH_ALIGNED(unsigned int select_x[4]) = { 0xFFFFFFFF, 0, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_y[4]) = { 0, 0xFFFFFFFF, 0, 0 };
     zero = _mm_setzero_ps();
     sseSinfCosf(radians.get128(), &s, &c);
     res0 = sseSelect(zero, c, select_x);
@@ -1099,14 +1128,15 @@ inline const Matrix4 Matrix4::rotationZ(const FloatInVec & radians)
 
 inline const Matrix4 Matrix4::rotationZYX(const Vector3 & radiansXYZ)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+    VECTORMATH_ALIGNED(float sxyz[4]) = { ffffffff, ffffffff, ffffffff, 0.0f };
     __m128 angles, s, negS, c, X0, X1, Y0, Y1, Z0, Z1, tmp;
     angles = Vector4(radiansXYZ, 0.0f).get128();
     sseSinfCosf(angles, &s, &c);
     negS = sseNegatef(s);
     Z0 = _mm_unpackhi_ps(c, s);
     Z1 = _mm_unpackhi_ps(negS, c);
-    VECTORMATH_ALIGNED(unsigned int select_xyz[4]) = { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0 };
-    Z1 = _mm_and_ps(Z1, _mm_load_ps((float *)select_xyz));
+    Z1 = _mm_and_ps(Z1, _mm_load_ps(sxyz));
     Y0 = _mm_shuffle_ps(c, negS, _MM_SHUFFLE(0, 1, 1, 1));
     Y1 = _mm_shuffle_ps(s, c, _MM_SHUFFLE(0, 1, 1, 1));
     X0 = sseSplat(s, 0);
@@ -1125,6 +1155,15 @@ inline const Matrix4 Matrix4::rotation(float radians, const Vector3 & unitVec)
 
 inline const Matrix4 Matrix4::rotation(const FloatInVec & radians, const Vector3 & unitVec)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+    VECTORMATH_ALIGNED(float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
+    VECTORMATH_ALIGNED(float sxyz[4]) = { ffffffff, ffffffff, ffffffff, 0.0f };
+    __m128 select_x = _mm_load_ps(sx);
+    __m128 select_y = _mm_load_ps(sy);
+    __m128 select_z = _mm_load_ps(sz);
+    __m128 select_xyz = _mm_load_ps(sxyz);
     __m128 axis, s, c, oneMinusC, axisS, negAxisS, xxxx, yyyy, zzzz, tmp0, tmp1, tmp2;
     axis = unitVec.get128();
     sseSinfCosf(radians.get128(), &s, &c);
@@ -1134,9 +1173,6 @@ inline const Matrix4 Matrix4::rotation(const FloatInVec & radians, const Vector3
     oneMinusC = _mm_sub_ps(_mm_set1_ps(1.0f), c);
     axisS = _mm_mul_ps(axis, s);
     negAxisS = sseNegatef(axisS);
-    VECTORMATH_ALIGNED(unsigned int select_x[4]) = { 0xFFFFFFFF, 0, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_y[4]) = { 0, 0xFFFFFFFF, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_z[4]) = { 0, 0, 0xFFFFFFFF, 0 };
     tmp0 = _mm_shuffle_ps(axisS, axisS, _MM_SHUFFLE(0, 0, 2, 0));
     tmp0 = sseSelect(tmp0, sseSplat(negAxisS, 1), select_z);
     tmp1 = sseSelect(sseSplat(axisS, 0), sseSplat(negAxisS, 2), select_x);
@@ -1145,11 +1181,10 @@ inline const Matrix4 Matrix4::rotation(const FloatInVec & radians, const Vector3
     tmp0 = sseSelect(tmp0, c, select_x);
     tmp1 = sseSelect(tmp1, c, select_y);
     tmp2 = sseSelect(tmp2, c, select_z);
-    VECTORMATH_ALIGNED(unsigned int select_xyz[4]) = { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0 };
-    axis = _mm_and_ps(axis, _mm_load_ps((float *)select_xyz));
-    tmp0 = _mm_and_ps(tmp0, _mm_load_ps((float *)select_xyz));
-    tmp1 = _mm_and_ps(tmp1, _mm_load_ps((float *)select_xyz));
-    tmp2 = _mm_and_ps(tmp2, _mm_load_ps((float *)select_xyz));
+    axis = _mm_and_ps(axis, select_xyz);
+    tmp0 = _mm_and_ps(tmp0, select_xyz);
+    tmp1 = _mm_and_ps(tmp1, select_xyz);
+    tmp2 = _mm_and_ps(tmp2, select_xyz);
     return Matrix4(Vector4(sseMAdd(_mm_mul_ps(axis, xxxx), oneMinusC, tmp0)),
                    Vector4(sseMAdd(_mm_mul_ps(axis, yyyy), oneMinusC, tmp1)),
                    Vector4(sseMAdd(_mm_mul_ps(axis, zzzz), oneMinusC, tmp2)),
@@ -1163,10 +1198,14 @@ inline const Matrix4 Matrix4::rotation(const Quat & unitQuat)
 
 inline const Matrix4 Matrix4::scale(const Vector3 & scaleVec)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+    VECTORMATH_ALIGNED(float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
+    __m128 select_x = _mm_load_ps(sx);
+    __m128 select_y = _mm_load_ps(sy);
+    __m128 select_z = _mm_load_ps(sz);
     __m128 zero = _mm_setzero_ps();
-    VECTORMATH_ALIGNED(unsigned int select_x[4]) = { 0xFFFFFFFF, 0, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_y[4]) = { 0, 0xFFFFFFFF, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_z[4]) = { 0, 0, 0xFFFFFFFF, 0 };
     return Matrix4(Vector4(sseSelect(zero, scaleVec.get128(), select_x)),
                    Vector4(sseSelect(zero, scaleVec.get128(), select_y)),
                    Vector4(sseSelect(zero, scaleVec.get128(), select_z)),
@@ -1252,6 +1291,11 @@ inline const Matrix4 Matrix4::frustum(float left, float right, float bottom, flo
     /* 2001,2002.                                                      */
     /* S/T/I Confidential Information                                  */
     /* --------------------------------------------------------------  */
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+    VECTORMATH_ALIGNED(float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
+    VECTORMATH_ALIGNED(float sw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
     __m128 lbf, rtn;
     __m128 diff, sum, inv_diff;
     __m128 diagonal, column, near2;
@@ -1274,14 +1318,10 @@ inline const Matrix4 Matrix4::frustum(float left, float right, float bottom, flo
     near2 = _mm_add_ps(near2, near2);
     diagonal = _mm_mul_ps(near2, inv_diff);
     column = _mm_mul_ps(sum, inv_diff);
-    VECTORMATH_ALIGNED(unsigned int select_x[4]) = { 0xFFFFFFFF, 0, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_y[4]) = { 0, 0xFFFFFFFF, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_z[4]) = { 0, 0, 0xFFFFFFFF, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_w[4]) = { 0, 0, 0, 0xFFFFFFFF };
-    return Matrix4(Vector4(sseSelect(zero, diagonal, select_x)),
-                   Vector4(sseSelect(zero, diagonal, select_y)),
-                   Vector4(sseSelect(column, _mm_set1_ps(-1.0f), select_w)),
-                   Vector4(sseSelect(zero, _mm_mul_ps(diagonal, sseSplat(f.m128, 0)), select_z)));
+    return Matrix4(Vector4(sseSelect(zero, diagonal, _mm_load_ps(sx))),
+                   Vector4(sseSelect(zero, diagonal, _mm_load_ps(sy))),
+                   Vector4(sseSelect(column, _mm_set1_ps(-1.0f), _mm_load_ps(sw))),
+                   Vector4(sseSelect(zero, _mm_mul_ps(diagonal, sseSplat(f.m128, 0)), _mm_load_ps(sz))));
 }
 
 inline const Matrix4 Matrix4::orthographic(float left, float right, float bottom, float top, float zNear, float zFar)
@@ -1298,6 +1338,12 @@ inline const Matrix4 Matrix4::orthographic(float left, float right, float bottom
     /* 2001,2002.                                                      */
     /* S/T/I Confidential Information                                  */
     /* --------------------------------------------------------------  */
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+    VECTORMATH_ALIGNED(float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
+    VECTORMATH_ALIGNED(float sw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
+    __m128 select_z = _mm_load_ps(sz);
     __m128 lbf, rtn;
     __m128 diff, sum, inv_diff, neg_inv_diff;
     __m128 diagonal, column;
@@ -1318,15 +1364,11 @@ inline const Matrix4 Matrix4::orthographic(float left, float right, float bottom
     inv_diff = _mm_rcp_ps(diff);
     neg_inv_diff = sseNegatef(inv_diff);
     diagonal = _mm_add_ps(inv_diff, inv_diff);
-    VECTORMATH_ALIGNED(unsigned int select_x[4]) = { 0xFFFFFFFF, 0, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_y[4]) = { 0, 0xFFFFFFFF, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_z[4]) = { 0, 0, 0xFFFFFFFF, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_w[4]) = { 0, 0, 0, 0xFFFFFFFF };
     column = _mm_mul_ps(sum, sseSelect(neg_inv_diff, inv_diff, select_z));
-    return Matrix4(Vector4(sseSelect(zero, diagonal, select_x)),
-                   Vector4(sseSelect(zero, diagonal, select_y)),
+    return Matrix4(Vector4(sseSelect(zero, diagonal, _mm_load_ps(sx))),
+                   Vector4(sseSelect(zero, diagonal, _mm_load_ps(sy))),
                    Vector4(sseSelect(zero, diagonal, select_z)),
-                   Vector4(sseSelect(column, _mm_set1_ps(1.0f), select_w)));
+                   Vector4(sseSelect(column, _mm_set1_ps(1.0f), _mm_load_ps(sw))));
 }
 
 inline const Matrix4 select(const Matrix4 & mat0, const Matrix4 & mat1, bool select1)
@@ -1503,6 +1545,8 @@ inline Transform3 & Transform3::operator = (const Transform3 & tfrm)
 
 inline const Transform3 inverse(const Transform3 & tfrm)
 {
+    VECTORMATH_ALIGNED(float sy[4]) = { 0.0f, bit_cast_uint2float(0xFFFFFFFF), 0.0f, 0.0f };
+    __m128 select_y = _mm_load_ps(sy);                                
     __m128 inv0, inv1, inv2, inv3;
     __m128 tmp0, tmp1, tmp2, tmp3, tmp4, dot, invdet;
     __m128 xxxx, yyyy, zzzz;
@@ -1517,7 +1561,6 @@ inline const Transform3 inverse(const Transform3 & tfrm)
     tmp4 = _mm_unpackhi_ps(tmp0, tmp2);
     inv0 = _mm_unpacklo_ps(tmp3, tmp1);
     xxxx = sseSplat(inv3, 0);
-    VECTORMATH_ALIGNED(unsigned int select_y[4]) = { 0, 0xFFFFFFFF, 0, 0 };
     inv1 = _mm_shuffle_ps(tmp3, tmp3, _MM_SHUFFLE(0, 3, 2, 2));
     inv1 = sseSelect(inv1, tmp1, select_y);
     inv2 = _mm_shuffle_ps(tmp4, tmp4, _MM_SHUFFLE(0, 1, 1, 0));
@@ -1536,6 +1579,8 @@ inline const Transform3 inverse(const Transform3 & tfrm)
 
 inline const Transform3 orthoInverse(const Transform3 & tfrm)
 {
+    VECTORMATH_ALIGNED(float sy[4]) = { 0.0f, bit_cast_uint2float(0xFFFFFFFF), 0.0f, 0.0f };
+    __m128 select_y = _mm_load_ps(sy);
     __m128 inv0, inv1, inv2, inv3;
     __m128 tmp0, tmp1;
     __m128 xxxx, yyyy, zzzz;
@@ -1544,7 +1589,6 @@ inline const Transform3 orthoInverse(const Transform3 & tfrm)
     inv3 = sseNegatef(tfrm.getCol3().get128());
     inv0 = _mm_unpacklo_ps(tmp0, tfrm.getCol1().get128());
     xxxx = sseSplat(inv3, 0);
-    VECTORMATH_ALIGNED(unsigned int select_y[4]) = { 0, 0xFFFFFFFF, 0, 0 };
     inv1 = _mm_shuffle_ps(tmp0, tmp0, _MM_SHUFFLE(0, 3, 2, 2));
     inv1 = sseSelect(inv1, tfrm.getCol1().get128(), select_y);
     inv2 = _mm_shuffle_ps(tmp1, tmp1, _MM_SHUFFLE(0, 1, 1, 0));
@@ -1654,10 +1698,13 @@ inline const Transform3 Transform3::rotationX(float radians)
 
 inline const Transform3 Transform3::rotationX(const FloatInVec & radians)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+    VECTORMATH_ALIGNED(float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
+    __m128 select_y = _mm_load_ps(sy);
+    __m128 select_z = _mm_load_ps(sz);
     __m128 s, c, res1, res2;
     __m128 zero;
-    VECTORMATH_ALIGNED(unsigned int select_y[4]) = { 0, 0xFFFFFFFF, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_z[4]) = { 0, 0, 0xFFFFFFFF, 0 };
     zero = _mm_setzero_ps();
     sseSinfCosf(radians.get128(), &s, &c);
     res1 = sseSelect(zero, c, select_y);
@@ -1677,10 +1724,13 @@ inline const Transform3 Transform3::rotationY(float radians)
 
 inline const Transform3 Transform3::rotationY(const FloatInVec & radians)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+    VECTORMATH_ALIGNED(float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
+    __m128 select_x = _mm_load_ps(sx);
+    __m128 select_z = _mm_load_ps(sz);
     __m128 s, c, res0, res2;
     __m128 zero;
-    VECTORMATH_ALIGNED(unsigned int select_x[4]) = { 0xFFFFFFFF, 0, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_z[4]) = { 0, 0, 0xFFFFFFFF, 0 };
     zero = _mm_setzero_ps();
     sseSinfCosf(radians.get128(), &s, &c);
     res0 = sseSelect(zero, c, select_x);
@@ -1700,9 +1750,12 @@ inline const Transform3 Transform3::rotationZ(float radians)
 
 inline const Transform3 Transform3::rotationZ(const FloatInVec & radians)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+    VECTORMATH_ALIGNED(float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
+    __m128 select_x = _mm_load_ps(sx);
+    __m128 select_y = _mm_load_ps(sy);
     __m128 s, c, res0, res1;
-    VECTORMATH_ALIGNED(unsigned int select_x[4]) = { 0xFFFFFFFF, 0, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_y[4]) = { 0, 0xFFFFFFFF, 0, 0 };
     __m128 zero = _mm_setzero_ps();
     sseSinfCosf(radians.get128(), &s, &c);
     res0 = sseSelect(zero, c, select_x);
@@ -1717,14 +1770,15 @@ inline const Transform3 Transform3::rotationZ(const FloatInVec & radians)
 
 inline const Transform3 Transform3::rotationZYX(const Vector3 & radiansXYZ)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+    VECTORMATH_ALIGNED(float sxyz[4]) = { ffffffff, ffffffff, ffffffff, 0.0f };
     __m128 angles, s, negS, c, X0, X1, Y0, Y1, Z0, Z1, tmp;
     angles = Vector4(radiansXYZ, 0.0f).get128();
     sseSinfCosf(angles, &s, &c);
     negS = sseNegatef(s);
     Z0 = _mm_unpackhi_ps(c, s);
     Z1 = _mm_unpackhi_ps(negS, c);
-    VECTORMATH_ALIGNED(unsigned int select_xyz[4]) = { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0 };
-    Z1 = _mm_and_ps(Z1, _mm_load_ps((float *)select_xyz));
+    Z1 = _mm_and_ps(Z1, _mm_load_ps(sxyz));
     Y0 = _mm_shuffle_ps(c, negS, _MM_SHUFFLE(0, 1, 1, 1));
     Y1 = _mm_shuffle_ps(s, c, _MM_SHUFFLE(0, 1, 1, 1));
     X0 = sseSplat(s, 0);
@@ -1753,10 +1807,14 @@ inline const Transform3 Transform3::rotation(const Quat & unitQuat)
 
 inline const Transform3 Transform3::scale(const Vector3 & scaleVec)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+    VECTORMATH_ALIGNED(float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
+    __m128 select_x = _mm_load_ps(sx);
+    __m128 select_y = _mm_load_ps(sy);
+    __m128 select_z = _mm_load_ps(sz);
     __m128 zero = _mm_setzero_ps();
-    VECTORMATH_ALIGNED(unsigned int select_x[4]) = { 0xFFFFFFFF, 0, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_y[4]) = { 0, 0xFFFFFFFF, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_z[4]) = { 0, 0, 0xFFFFFFFF, 0 };
     return Transform3(Vector3(sseSelect(zero, scaleVec.get128(), select_x)),
                       Vector3(sseSelect(zero, scaleVec.get128(), select_y)),
                       Vector3(sseSelect(zero, scaleVec.get128(), select_z)),
@@ -1809,6 +1867,15 @@ inline const Transform3 select(const Transform3 & tfrm0, const Transform3 & tfrm
 
 inline Quat::Quat(const Matrix3 & tfrm)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+    VECTORMATH_ALIGNED(float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
+    VECTORMATH_ALIGNED(float sw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
+    __m128 select_x = _mm_load_ps(sx);
+    __m128 select_y = _mm_load_ps(sy);
+    __m128 select_z = _mm_load_ps(sz);
+    __m128 select_w = _mm_load_ps(sw);
     __m128 res;
     __m128 col0, col1, col2;
     __m128 xx_yy, xx_yy_zz_xx, yy_zz_xx_yy, zz_xx_yy_zz, diagSum, diagDiff;
@@ -1816,12 +1883,6 @@ inline Quat::Quat(const Matrix3 & tfrm)
     __m128 radicand, invSqrt, scale;
     __m128 res0, res1, res2, res3;
     __m128 xx, yy, zz;
-
-    VECTORMATH_ALIGNED(unsigned int select_x[4]) = { 0xFFFFFFFF, 0, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_y[4]) = { 0, 0xFFFFFFFF, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_z[4]) = { 0, 0, 0xFFFFFFFF, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_w[4]) = { 0, 0, 0, 0xFFFFFFFF };
-
     col0 = tfrm.getCol0().get128();
     col1 = tfrm.getCol1().get128();
     col2 = tfrm.getCol2().get128();
@@ -1903,13 +1964,14 @@ inline const Matrix4 outer(const Vector4 & tfrm0, const Vector4 & tfrm1)
 
 inline const Vector3 rowMul(const Vector3 & vec, const Matrix3 & mat)
 {
+    VECTORMATH_ALIGNED(float sy[4]) = { 0.0f, bit_cast_uint2float(0xFFFFFFFF), 0.0f, 0.0f };
+    __m128 select_y = _mm_load_ps(sy);
     __m128 tmp0, tmp1, mcol0, mcol1, mcol2, res;
     __m128 xxxx, yyyy, zzzz;
     tmp0 = _mm_unpacklo_ps(mat.getCol0().get128(), mat.getCol2().get128());
     tmp1 = _mm_unpackhi_ps(mat.getCol0().get128(), mat.getCol2().get128());
     xxxx = sseSplat(vec.get128(), 0);
     mcol0 = _mm_unpacklo_ps(tmp0, mat.getCol1().get128());
-    VECTORMATH_ALIGNED(unsigned int select_y[4]) = { 0, 0xFFFFFFFF, 0, 0 };
     mcol1 = _mm_shuffle_ps(tmp0, tmp0, _MM_SHUFFLE(0, 3, 2, 2));
     mcol1 = sseSelect(mcol1, mat.getCol1().get128(), select_y);
     mcol2 = _mm_shuffle_ps(tmp1, tmp1, _MM_SHUFFLE(0, 1, 1, 0));
@@ -1924,22 +1986,24 @@ inline const Vector3 rowMul(const Vector3 & vec, const Matrix3 & mat)
 
 inline const Matrix3 crossMatrix(const Vector3 & vec)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+    VECTORMATH_ALIGNED(float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
+    VECTORMATH_ALIGNED(float fx[4]) = { 0.0f, ffffffff, ffffffff, ffffffff };
+    VECTORMATH_ALIGNED(float fy[4]) = { ffffffff, 0.0f, ffffffff, ffffffff };
+    VECTORMATH_ALIGNED(float fz[4]) = { ffffffff, ffffffff, 0.0f, ffffffff };
     __m128 neg, res0, res1, res2;
     neg = sseNegatef(vec.get128());
-    VECTORMATH_ALIGNED(unsigned int select_x[4]) = { 0xFFFFFFFF, 0, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_y[4]) = { 0, 0xFFFFFFFF, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int select_z[4]) = { 0, 0, 0xFFFFFFFF, 0 };
+
     res0 = _mm_shuffle_ps(vec.get128(), vec.get128(), _MM_SHUFFLE(0, 2, 2, 0));
-    res0 = sseSelect(res0, sseSplat(neg, 1), select_z);
-    res1 = sseSelect(sseSplat(vec.get128(), 0), sseSplat(neg, 2), select_x);
+    res0 = sseSelect(res0, sseSplat(neg, 1), _mm_load_ps(sz));
+    res1 = sseSelect(sseSplat(vec.get128(), 0), sseSplat(neg, 2), _mm_load_ps(sx));
     res2 = _mm_shuffle_ps(vec.get128(), vec.get128(), _MM_SHUFFLE(0, 0, 1, 1));
-    res2 = sseSelect(res2, sseSplat(neg, 0), select_y);
-    VECTORMATH_ALIGNED(unsigned int filter_x[4]) = { 0, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF };
-    VECTORMATH_ALIGNED(unsigned int filter_y[4]) = { 0xFFFFFFFF, 0, 0xFFFFFFFF, 0xFFFFFFFF };
-    VECTORMATH_ALIGNED(unsigned int filter_z[4]) = { 0xFFFFFFFF, 0xFFFFFFFF, 0, 0xFFFFFFFF };
-    res0 = _mm_and_ps(res0, _mm_load_ps((float *)filter_x));
-    res1 = _mm_and_ps(res1, _mm_load_ps((float *)filter_y));
-    res2 = _mm_and_ps(res2, _mm_load_ps((float *)filter_z));
+    res2 = sseSelect(res2, sseSplat(neg, 0), _mm_load_ps(sy));
+    res0 = _mm_and_ps(res0, _mm_load_ps(fx));
+    res1 = _mm_and_ps(res1, _mm_load_ps(fy));
+    res2 = _mm_and_ps(res2, _mm_load_ps(fz));
     return Matrix3(Vector3(res0), Vector3(res1), Vector3(res2));
 }
 

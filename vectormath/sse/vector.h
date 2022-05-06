@@ -199,9 +199,10 @@ inline __m128 Vector3::get128() const
 
 inline void storeXYZ(const Vector3 & vec, __m128 * quad)
 {
+    VECTORMATH_ALIGNED(float sw[4]) = { 0.0f, 0.0f, 0.0f, bit_cast_uint2float(0xFFFFFFFF) };
+    __m128 select_w = _mm_load_ps(sw);
     __m128 dstVec = *quad;
-    VECTORMATH_ALIGNED(unsigned int sw[4]) = { 0, 0, 0, 0xFFFFFFFF };
-    dstVec = sseSelect(vec.get128(), dstVec, sw);
+    dstVec = sseSelect(vec.get128(), dstVec, select_w);
     *quad = dstVec;
 }
 
@@ -216,10 +217,13 @@ inline void loadXYZArray(Vector3 & vec0, Vector3 & vec1, Vector3 & vec2, Vector3
 
 inline void storeXYZArray(const Vector3 & vec0, const Vector3 & vec1, const Vector3 & vec2, const Vector3 & vec3, __m128 * threeQuads)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+    VECTORMATH_ALIGNED(float xsw_[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
+    VECTORMATH_ALIGNED(float zsw_[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
+    __m128 xsw = _mm_load_ps(xsw_);
+    __m128 zsw = _mm_load_ps(zsw_);
     __m128 xxxx = _mm_shuffle_ps(vec1.get128(), vec1.get128(), _MM_SHUFFLE(0, 0, 0, 0));
     __m128 zzzz = _mm_shuffle_ps(vec2.get128(), vec2.get128(), _MM_SHUFFLE(2, 2, 2, 2));
-    VECTORMATH_ALIGNED(unsigned int xsw[4]) = { 0, 0, 0, 0xFFFFFFFF };
-    VECTORMATH_ALIGNED(unsigned int zsw[4]) = { 0xFFFFFFFF, 0, 0, 0 };
     threeQuads[0] = sseSelect(vec0.get128(), xxxx, xsw);
     threeQuads[1] = _mm_shuffle_ps(vec1.get128(), vec2.get128(), _MM_SHUFFLE(1, 0, 2, 1));
     threeQuads[2] = sseSelect(_mm_shuffle_ps(vec3.get128(), vec3.get128(), _MM_SHUFFLE(2, 1, 0, 3)), zzzz, zsw);
@@ -631,8 +635,8 @@ inline Vector4 & Vector4::operator = (const Vector4 & vec)
 
 inline Vector4 & Vector4::setXYZ(const Vector3 & vec)
 {
-    VECTORMATH_ALIGNED(unsigned int sw[4]) = { 0, 0, 0, 0xFFFFFFFF };
-    mVec128 = sseSelect(vec.get128(), mVec128, sw);
+    VECTORMATH_ALIGNED(float sw[4]) = { 0.0f, 0.0f, 0.0f, bit_cast_uint2float(0xFFFFFFFF) };
+    mVec128 = sseSelect(vec.get128(), mVec128, _mm_load_ps(sw));
     return *this;
 }
 
@@ -962,9 +966,9 @@ inline __m128 Point3::get128() const
 
 inline void storeXYZ(const Point3 & pnt, __m128 * quad)
 {
+    VECTORMATH_ALIGNED(float sw[4]) = { 0.0f, 0.0f, 0.0f, bit_cast_uint2float(0xFFFFFFFF) };
     __m128 dstVec = *quad;
-    VECTORMATH_ALIGNED(unsigned int sw[4]) = { 0, 0, 0, 0xFFFFFFFF };
-    dstVec = sseSelect(pnt.get128(), dstVec, sw);
+    dstVec = sseSelect(pnt.get128(), dstVec, _mm_load_ps(sw));
     *quad = dstVec;
 }
 
@@ -979,10 +983,13 @@ inline void loadXYZArray(Point3 & pnt0, Point3 & pnt1, Point3 & pnt2, Point3 & p
 
 inline void storeXYZArray(const Point3 & pnt0, const Point3 & pnt1, const Point3 & pnt2, const Point3 & pnt3, __m128 * threeQuads)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+    VECTORMATH_ALIGNED(float xsw_[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
+    VECTORMATH_ALIGNED(float zsw_[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
+    __m128 xsw = _mm_load_ps(xsw_);
+    __m128 zsw = _mm_load_ps(zsw_);
     __m128 xxxx = _mm_shuffle_ps(pnt1.get128(), pnt1.get128(), _MM_SHUFFLE(0, 0, 0, 0));
     __m128 zzzz = _mm_shuffle_ps(pnt2.get128(), pnt2.get128(), _MM_SHUFFLE(2, 2, 2, 2));
-    VECTORMATH_ALIGNED(unsigned int xsw[4]) = { 0, 0, 0, 0xFFFFFFFF };
-    VECTORMATH_ALIGNED(unsigned int zsw[4]) = { 0xFFFFFFFF, 0, 0, 0 };
     threeQuads[0] = sseSelect(pnt0.get128(), xxxx, xsw);
     threeQuads[1] = _mm_shuffle_ps(pnt1.get128(), pnt2.get128(), _MM_SHUFFLE(1, 0, 2, 1));
     threeQuads[2] = sseSelect(_mm_shuffle_ps(pnt3.get128(), pnt3.get128(), _MM_SHUFFLE(2, 1, 0, 3)), zzzz, zsw);

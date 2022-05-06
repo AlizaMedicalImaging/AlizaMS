@@ -30,6 +30,8 @@
 #ifndef VECTORMATH_SSE_INTERNAL_HPP
 #define VECTORMATH_SSE_INTERNAL_HPP
 
+#include "string.h"
+
 namespace Vectormath
 {
 namespace SSE
@@ -58,6 +60,15 @@ static inline __m128 sseUnitVec0100() { return _mm_setr_ps(0.0f, 1.0f, 0.0f, 0.0
 static inline __m128 sseUnitVec0010() { return _mm_setr_ps(0.0f, 0.0f, 1.0f, 0.0f); }
 static inline __m128 sseUnitVec0001() { return _mm_setr_ps(0.0f, 0.0f, 0.0f, 1.0f); }
 
+static inline float bit_cast_uint2float(unsigned int i)
+{
+    static_assert(sizeof(unsigned int) == 4);
+    static_assert(sizeof(float) == 4);
+    float f;
+    memcpy(&f, &i, 4);
+	return f;
+}
+
 // ========================================================
 // Internal helper types and functions
 // ========================================================
@@ -66,11 +77,11 @@ typedef __m128 SSEFloat4V;
 typedef __m128 SSEUint4V;
 typedef __m128 SSEInt4V;
 
-union SSEFloat
+VECTORMATH_ALIGNED_TYPE_PRE union SSEFloat
 {
     __m128 m128;
-    VECTORMATH_ALIGNED(float f[4]);
-};
+    float f[4];
+} VECTORMATH_ALIGNED_TYPE_POST ;
 
 // _MM_SHUFFLE() requires compile-time constants
 #define sseRor(vec, i)       (((i) % 4) ? (_mm_shuffle_ps(vec, vec, _MM_SHUFFLE((unsigned char)(i + 3) % 4, (unsigned char)(i + 2) % 4, (unsigned char)(i + 1) % 4, (unsigned char)(i + 0) % 4))) : (vec))
@@ -79,23 +90,8 @@ union SSEFloat
 
 static inline __m128 sseUintToM128(unsigned int x)
 {
-    union
-    {
-        unsigned int u;
-        float f;
-    } tmp;
-    tmp.u = x;
-    return _mm_set1_ps(tmp.f);
+    return _mm_set1_ps(bit_cast_uint2float(x));
 }
-
-union scalar_converter
-{
-    unsigned int ui;
-    float f;
-    scalar_converter(unsigned int v) : ui(v) {}
-    scalar_converter(float v)        : f(v)  {}
-    scalar_converter() {}
-};
 
 static inline __m128 sseMAdd(__m128 a, __m128 b, __m128 c)
 {
@@ -112,14 +108,9 @@ static inline __m128 sseSelect(__m128 a, __m128 b, __m128 mask)
     return _mm_or_ps(_mm_and_ps(mask, b), _mm_andnot_ps(mask, a));
 }
 
-static inline __m128 sseSelect(__m128 a, __m128 b, const unsigned int * mask)
-{
-    return sseSelect(a, b, _mm_load_ps((const float *)mask));
-}
-
 static inline __m128 sseSelect(__m128 a, __m128 b, unsigned int mask)
 {
-    return sseSelect(a, b, _mm_set1_ps(scalar_converter(mask).f));
+    return sseSelect(a, b, sseUintToM128(mask));
 }
 
 static inline SSEInt4V sseCvtToSignedInts(SSEFloat4V x)

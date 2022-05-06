@@ -149,8 +149,8 @@ inline Quat & Quat::operator = (const Quat & quat)
 
 inline Quat & Quat::setXYZ(const Vector3 & vec)
 {
-    VECTORMATH_ALIGNED(unsigned int sw[4]) = { 0, 0, 0, 0xFFFFFFFF };
-    mVec128 = sseSelect(vec.get128(), mVec128, sw);
+    VECTORMATH_ALIGNED(float sw[4]) = { 0.0f, 0.0f, 0.0f, bit_cast_uint2float(0xFFFFFFFF) };
+    mVec128 = sseSelect(vec.get128(), mVec128, _mm_load_ps(sw));
     return *this;
 }
 
@@ -365,8 +365,8 @@ inline const Quat Quat::rotation(const Vector3 & unitVec0, const Vector3 & unitV
     cosHalfAngleX2 = _mm_mul_ps(recipCosHalfAngleX2, cosAngleX2Plus2);
     crossVec = cross(unitVec0, unitVec1);
     res = _mm_mul_ps(crossVec.get128(), recipCosHalfAngleX2);
-    VECTORMATH_ALIGNED(unsigned int sw[4]) = { 0, 0, 0, 0xFFFFFFFF };
-    res = sseSelect(res, _mm_mul_ps(cosHalfAngleX2, _mm_set1_ps(0.5f)), sw);
+    VECTORMATH_ALIGNED(float sw[4]) = { 0.0f, 0.0f, 0.0f, bit_cast_uint2float(0xFFFFFFFF) };
+    res = sseSelect(res, _mm_mul_ps(cosHalfAngleX2, _mm_set1_ps(0.5f)), _mm_load_ps(sw));
     return Quat(res);
 }
 
@@ -380,8 +380,8 @@ inline const Quat Quat::rotation(const FloatInVec & radians, const Vector3 & uni
     __m128 s, c, angle, res;
     angle = _mm_mul_ps(radians.get128(), _mm_set1_ps(0.5f));
     sseSinfCosf(angle, &s, &c);
-    VECTORMATH_ALIGNED(unsigned int sw[4]) = { 0, 0, 0, 0xFFFFFFFF };
-    res = sseSelect(_mm_mul_ps(unitVec.get128(), s), c, sw);
+    VECTORMATH_ALIGNED(float sw[4]) = { 0.0f, 0.0f, 0.0f, bit_cast_uint2float(0xFFFFFFFF) };
+    res = sseSelect(_mm_mul_ps(unitVec.get128(), s), c, _mm_load_ps(sw));
     return Quat(res);
 }
 
@@ -392,13 +392,14 @@ inline const Quat Quat::rotationX(float radians)
 
 inline const Quat Quat::rotationX(const FloatInVec & radians)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
     __m128 s, c, angle, res;
     angle = _mm_mul_ps(radians.get128(), _mm_set1_ps(0.5f));
     sseSinfCosf(angle, &s, &c);
-    VECTORMATH_ALIGNED(unsigned int xsw[4]) = { 0xFFFFFFFF, 0, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int wsw[4]) = { 0, 0, 0, 0xFFFFFFFF };
-    res = sseSelect(_mm_setzero_ps(), s, xsw);
-    res = sseSelect(res, c, wsw);
+    VECTORMATH_ALIGNED(float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
+    res = sseSelect(_mm_setzero_ps(), s, _mm_load_ps(sx));
+    res = sseSelect(res, c, _mm_load_ps(sw));
     return Quat(res);
 }
 
@@ -409,13 +410,14 @@ inline const Quat Quat::rotationY(float radians)
 
 inline const Quat Quat::rotationY(const FloatInVec & radians)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
     __m128 s, c, angle, res;
     angle = _mm_mul_ps(radians.get128(), _mm_set1_ps(0.5f));
     sseSinfCosf(angle, &s, &c);
-    VECTORMATH_ALIGNED(unsigned int ysw[4]) = { 0, 0xFFFFFFFF, 0, 0 };
-    VECTORMATH_ALIGNED(unsigned int wsw[4]) = { 0, 0, 0, 0xFFFFFFFF };
-    res = sseSelect(_mm_setzero_ps(), s, ysw);
-    res = sseSelect(res, c, wsw);
+    VECTORMATH_ALIGNED(float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
+    VECTORMATH_ALIGNED(float sw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
+    res = sseSelect(_mm_setzero_ps(), s, _mm_load_ps(sy));
+    res = sseSelect(res, c, _mm_load_ps(sw));
     return Quat(res);
 }
 
@@ -426,13 +428,14 @@ inline const Quat Quat::rotationZ(float radians)
 
 inline const Quat Quat::rotationZ(const FloatInVec & radians)
 {
+    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
     __m128 s, c, angle, res;
     angle = _mm_mul_ps(radians.get128(), _mm_set1_ps(0.5f));
     sseSinfCosf(angle, &s, &c);
-    VECTORMATH_ALIGNED(unsigned int zsw[4]) = { 0, 0, 0xFFFFFFFF, 0 };
-    VECTORMATH_ALIGNED(unsigned int wsw[4]) = { 0, 0, 0, 0xFFFFFFFF };
-    res = sseSelect(_mm_setzero_ps(), s, zsw);
-    res = sseSelect(res, c, wsw);
+    VECTORMATH_ALIGNED(float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
+    VECTORMATH_ALIGNED(float sw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
+    res = sseSelect(_mm_setzero_ps(), s, _mm_load_ps(sz));
+    res = sseSelect(res, c, _mm_load_ps(sw));
     return Quat(res);
 }
 
@@ -456,8 +459,8 @@ inline const Quat Quat::operator * (const Quat & quat) const
     qw = sseMSub(l_wxyz, r_wxyz, product);
     xy = sseMAdd(l_wxyz, r_wxyz, product);
     qw = _mm_sub_ps(qw, sseSld(xy, xy, 8));
-    VECTORMATH_ALIGNED(unsigned int sw[4]) = { 0, 0, 0, 0xFFFFFFFF };
-    return Quat(sseSelect(qv, qw, sw));
+    VECTORMATH_ALIGNED(float sw[4]) = { 0.0f, 0.0f, 0.0f, bit_cast_uint2float(0xFFFFFFFF) };
+    return Quat(sseSelect(qv, qw, _mm_load_ps(sw)));
 }
 
 inline Quat & Quat::operator *= (const Quat & quat)
@@ -493,8 +496,9 @@ inline const Vector3 rotate(const Quat & quat, const Vector3 & vec)
 
 inline const Quat conj(const Quat & quat)
 {
-    VECTORMATH_ALIGNED(unsigned int sw[4]) = { 0x80000000, 0x80000000, 0x80000000, 0 };
-    return Quat(_mm_xor_ps(quat.get128(), _mm_load_ps((float *)sw)));
+	const float f = bit_cast_uint2float(0x80000000);
+    VECTORMATH_ALIGNED(float s[4]) = { f, f, f, 0.0f };
+    return Quat(_mm_xor_ps(quat.get128(), _mm_load_ps(s)));
 }
 
 inline const Quat select(const Quat & quat0, const Quat & quat1, bool select1)

@@ -16,6 +16,7 @@
 #include <stdint.h>
 static char * align__pointer__(char * p, size_t x) // x = alignment - 1
 {
+#if 0
   struct PtrSizeT
   {
     union
@@ -29,6 +30,13 @@ static char * align__pointer__(char * p, size_t x) // x = alignment - 1
   j.i += x;
   j.i &= (~x);
   return j.k;
+#else
+  uintptr_t i = (uintptr_t)p;
+  i += x;
+  i &= (~x);
+  char * k = (char *)i;
+  return k;
+#endif
 }
 #endif
 
@@ -37,11 +45,10 @@ static void * aligned__alloc__(size_t size, size_t alignment)
 #if defined _MSC_VER && _MSC_VER >= 1400
   return _aligned_malloc(size, alignment);
 #else
-  const size_t v = sizeof(void*);
   const size_t x = alignment - 1;
-  char * p = (char*)malloc(size + v + x);
+  char * p = (char*)malloc(size + sizeof(void*) + x);
   if(!p) return NULL;
-  void * ptr = (void*)align__pointer__(p + v, x);
+  void * ptr = (void*)align__pointer__(p + sizeof(void*), x);
   *((void**)ptr - 1) = (void*)p;
   return ptr;
 #endif
