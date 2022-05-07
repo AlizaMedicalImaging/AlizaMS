@@ -153,7 +153,7 @@ inline Quat & Quat::operator = (const Quat & quat)
 
 inline Quat & Quat::setXYZ(const Vector3 & vec)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
   mVec128 = sseSelect(vec.get128(), mVec128, _mm_load_ps(sw));
   return *this;
@@ -362,7 +362,7 @@ inline const Quat normalize(const Quat & quat)
 
 inline const Quat Quat::rotation(const Vector3 & unitVec0, const Vector3 & unitVec1)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
   const __m128 cosAngle = sseVecDot3(unitVec0.get128(), unitVec1.get128());
   const __m128 cosAngleX2Plus2 = sseMAdd(cosAngle, _mm_set1_ps(2.0f), _mm_set1_ps(2.0f));
@@ -381,7 +381,7 @@ inline const Quat Quat::rotation(float radians, const Vector3 & unitVec)
 
 inline const Quat Quat::rotation(const FloatInVec & radians, const Vector3 & unitVec)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
   const __m128 angle = _mm_mul_ps(radians.get128(), _mm_set1_ps(0.5f));
   __m128 s, c;
@@ -397,7 +397,7 @@ inline const Quat Quat::rotationX(float radians)
 
 inline const Quat Quat::rotationX(const FloatInVec & radians)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
   const __m128 angle = _mm_mul_ps(radians.get128(), _mm_set1_ps(0.5f));
@@ -415,7 +415,7 @@ inline const Quat Quat::rotationY(float radians)
 
 inline const Quat Quat::rotationY(const FloatInVec & radians)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
   const __m128 angle = _mm_mul_ps(radians.get128(), _mm_set1_ps(0.5f));
@@ -433,7 +433,7 @@ inline const Quat Quat::rotationZ(float radians)
 
 inline const Quat Quat::rotationZ(const FloatInVec & radians)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
   VECTORMATH_ALIGNED(const float sw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
   const __m128 angle = _mm_mul_ps(radians.get128(), _mm_set1_ps(0.5f));
@@ -446,7 +446,7 @@ inline const Quat Quat::rotationZ(const FloatInVec & radians)
 
 inline const Quat Quat::operator * (const Quat & quat) const
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
   const __m128 ldata = mVec128;
   const __m128 rdata = quat.mVec128;
@@ -499,7 +499,7 @@ inline const Vector3 rotate(const Quat & quat, const Vector3 & vec)
 
 inline const Quat conj(const Quat & quat)
 {
-  static const float f = bit_cast_uint2float(0x80000000);
+  static const float f = bit_cast_uint2float(0x80000000U);
   VECTORMATH_ALIGNED(const float s[4]) = { f, f, f, 0.0f };
   return Quat(_mm_xor_ps(quat.get128(), _mm_load_ps(s)));
 }

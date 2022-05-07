@@ -205,7 +205,7 @@ inline __m128 Vector3::get128() const
 
 inline void storeXYZ(const Vector3 & vec, __m128 * quad)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
   __m128 dstVec = *quad;
   dstVec = sseSelect(vec.get128(), dstVec, _mm_load_ps(sw));
@@ -223,7 +223,7 @@ inline void loadXYZArray(Vector3 & vec0, Vector3 & vec1, Vector3 & vec2, Vector3
 
 inline void storeXYZArray(const Vector3 & vec0, const Vector3 & vec1, const Vector3 & vec2, const Vector3 & vec3, __m128 * threeQuads)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float xsw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
   VECTORMATH_ALIGNED(const float zsw[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
   const __m128 xxxx = _mm_shuffle_ps(vec1.get128(), vec1.get128(), _MM_SHUFFLE(0, 0, 0, 0));
@@ -442,7 +442,7 @@ inline const Vector3 absPerElem(const Vector3 & vec)
 
 inline const Vector3 copySignPerElem(const Vector3 & vec0, const Vector3 & vec1)
 {
-  const __m128 vmask = sseUintToM128(0x7FFFFFFF);
+  const __m128 vmask = sseUintToM128(0x7fffffffU);
   return Vector3(
     _mm_or_ps(
     _mm_and_ps(vmask, vec0.get128()),      // Value
@@ -646,7 +646,7 @@ inline Vector4 & Vector4::operator = (const Vector4 & vec)
 
 inline Vector4 & Vector4::setXYZ(const Vector3 & vec)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(float sw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
   mVec128 = sseSelect(vec.get128(), mVec128, _mm_load_ps(sw));
   return *this;
@@ -855,7 +855,7 @@ inline const Vector4 absPerElem(const Vector4 & vec)
 
 inline const Vector4 copySignPerElem(const Vector4 & vec0, const Vector4 & vec1)
 {
-  const __m128 vmask = sseUintToM128(0x7FFFFFFF);
+  const __m128 vmask = sseUintToM128(0x7fffffffU);
   return Vector4(
     _mm_or_ps(
     _mm_and_ps(vmask, vec0.get128()),      // Value
@@ -989,7 +989,7 @@ inline __m128 Point3::get128() const
 
 inline void storeXYZ(const Point3 & pnt, __m128 * quad)
 {
-  VECTORMATH_ALIGNED(const float sw[4]) = { 0.0f, 0.0f, 0.0f, bit_cast_uint2float(0xFFFFFFFF) };
+  VECTORMATH_ALIGNED(const float sw[4]) = { 0.0f, 0.0f, 0.0f, bit_cast_uint2float(0xffffffffU) };
   __m128 dstVec = *quad;
   dstVec = sseSelect(pnt.get128(), dstVec, _mm_load_ps(sw));
   *quad = dstVec;
@@ -1006,7 +1006,7 @@ inline void loadXYZArray(Point3 & pnt0, Point3 & pnt1, Point3 & pnt2, Point3 & p
 
 inline void storeXYZArray(const Point3 & pnt0, const Point3 & pnt1, const Point3 & pnt2, const Point3 & pnt3, __m128 * threeQuads)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float xsw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
   VECTORMATH_ALIGNED(const float zsw[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
   const __m128 xxxx = _mm_shuffle_ps(pnt1.get128(), pnt1.get128(), _MM_SHUFFLE(0, 0, 0, 0));
@@ -1166,7 +1166,7 @@ inline const Point3 absPerElem(const Point3 & pnt)
 
 inline const Point3 copySignPerElem(const Point3 & pnt0, const Point3 & pnt1)
 {
-  const __m128 vmask = sseUintToM128(0x7FFFFFFF);
+  const __m128 vmask = sseUintToM128(0x7fffffffU);
   return Point3(
     _mm_or_ps(
     _mm_and_ps(vmask, pnt0.get128()),      // Value

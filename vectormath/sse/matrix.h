@@ -39,10 +39,6 @@ namespace SSE
 // Matrix3
 // ========================================================
 
-inline Matrix3::Matrix3()
-{
-}
-
 inline Matrix3::Matrix3(const Matrix3 & mat)
 {
   mCol0 = mat.mCol0;
@@ -66,7 +62,7 @@ inline Matrix3::Matrix3(const FloatInVec & scalar)
 
 inline Matrix3::Matrix3(const Quat & unitQuat)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
   const __m128 select_x = _mm_load_ps(sx);
@@ -196,7 +192,7 @@ inline Matrix3 & Matrix3::operator = (const Matrix3 & mat)
 
 inline const Matrix3 transpose(const Matrix3 & mat)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
   const __m128 select_y = _mm_load_ps(sy);
   __m128 tmp0, tmp1, res0, res1, res2;
@@ -212,7 +208,7 @@ inline const Matrix3 transpose(const Matrix3 & mat)
 
 inline const Matrix3 inverse(const Matrix3 & mat)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
   const __m128 select_y = _mm_load_ps(sy);
   const __m128 tmp2 = sseVecCross(mat.getCol0().get128(), mat.getCol1().get128());
@@ -347,7 +343,7 @@ inline const Matrix3 Matrix3::rotationX(float radians)
 
 inline const Matrix3 Matrix3::rotationX(const FloatInVec & radians)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   const __m128 zero = _mm_setzero_ps();
   VECTORMATH_ALIGNED(const float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
@@ -369,7 +365,7 @@ inline const Matrix3 Matrix3::rotationY(float radians)
 
 inline const Matrix3 Matrix3::rotationY(const FloatInVec & radians)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   const __m128 zero = _mm_setzero_ps();
   VECTORMATH_ALIGNED(const float sx[4]) = { ffffffff, 0.0f,  0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
@@ -391,7 +387,7 @@ inline const Matrix3 Matrix3::rotationZ(float radians)
 
 inline const Matrix3 Matrix3::rotationZ(const FloatInVec & radians)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
   const __m128 select_x = _mm_load_ps(sx);
@@ -408,7 +404,7 @@ inline const Matrix3 Matrix3::rotationZ(const FloatInVec & radians)
 
 inline const Matrix3 Matrix3::rotationZYX(const Vector3 & radiansXYZ)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sxyz[4]) = { ffffffff, ffffffff, ffffffff, 0.0f };
   const __m128 select_xyz = _mm_load_ps(sxyz);
   const __m128 angles = Vector4(radiansXYZ, 0.0f).get128();
@@ -436,7 +432,7 @@ inline const Matrix3 Matrix3::rotation(float radians, const Vector3 & unitVec)
 
 inline const Matrix3 Matrix3::rotation(const FloatInVec & radians, const Vector3 & unitVec)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
@@ -473,7 +469,7 @@ inline const Matrix3 Matrix3::rotation(const Quat & unitQuat)
 
 inline const Matrix3 Matrix3::scale(const Vector3 & scaleVec)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   const __m128 zero = _mm_setzero_ps();
   VECTORMATH_ALIGNED(const float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
@@ -519,10 +515,6 @@ inline const Matrix3 select(const Matrix3 & mat0, const Matrix3 & mat1, const Bo
 // ========================================================
 // Matrix4
 // ========================================================
-
-inline Matrix4::Matrix4()
-{
-}
 
 inline Matrix4::Matrix4(const Matrix4 & mat)
 {
@@ -1050,7 +1042,7 @@ inline const Matrix4 Matrix4::rotationX(float radians)
 
 inline const Matrix4 Matrix4::rotationX(const FloatInVec & radians)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
   const __m128 select_y = _mm_load_ps(sy);
@@ -1072,7 +1064,7 @@ inline const Matrix4 Matrix4::rotationY(float radians)
 
 inline const Matrix4 Matrix4::rotationY(const FloatInVec & radians)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
   const __m128 select_x = _mm_load_ps(sx);
@@ -1094,7 +1086,7 @@ inline const Matrix4 Matrix4::rotationZ(float radians)
 
 inline const Matrix4 Matrix4::rotationZ(const FloatInVec & radians)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
   const __m128 select_x = _mm_load_ps(sx);
@@ -1111,7 +1103,7 @@ inline const Matrix4 Matrix4::rotationZ(const FloatInVec & radians)
 
 inline const Matrix4 Matrix4::rotationZYX(const Vector3 & radiansXYZ)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sxyz[4]) = { ffffffff, ffffffff, ffffffff, 0.0f };
   __m128 s, c;
   const __m128 angles = Vector4(radiansXYZ, 0.0f).get128();
@@ -1139,7 +1131,7 @@ inline const Matrix4 Matrix4::rotation(float radians, const Vector3 & unitVec)
 
 inline const Matrix4 Matrix4::rotation(const FloatInVec & radians, const Vector3 & unitVec)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
@@ -1183,7 +1175,7 @@ inline const Matrix4 Matrix4::rotation(const Quat & unitQuat)
 
 inline const Matrix4 Matrix4::scale(const Vector3 & scaleVec)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
@@ -1266,7 +1258,7 @@ inline const Matrix4 Matrix4::frustum(float left, float right, float bottom, flo
   /* 2001,2002.                                                      */
   /* S/T/I Confidential Information                                  */
   /* --------------------------------------------------------------  */
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
@@ -1311,7 +1303,7 @@ inline const Matrix4 Matrix4::orthographic(float left, float right, float bottom
   /* 2001,2002.                                                      */
   /* S/T/I Confidential Information                                  */
   /* --------------------------------------------------------------  */
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
@@ -1363,10 +1355,6 @@ inline const Matrix4 select(const Matrix4 & mat0, const Matrix4 & mat1, const Bo
 // ========================================================
 // Transform3
 // ========================================================
-
-inline Transform3::Transform3()
-{
-}
 
 inline Transform3::Transform3(const Transform3 & tfrm)
 {
@@ -1522,7 +1510,7 @@ inline Transform3 & Transform3::operator = (const Transform3 & tfrm)
 
 inline const Transform3 inverse(const Transform3 & tfrm)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
   const __m128 select_y = _mm_load_ps(sy);
   const __m128 tmp2 = sseVecCross(tfrm.getCol0().get128(), tfrm.getCol1().get128());
@@ -1555,7 +1543,7 @@ inline const Transform3 inverse(const Transform3 & tfrm)
 
 inline const Transform3 orthoInverse(const Transform3 & tfrm)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
   const __m128 select_y = _mm_load_ps(sy);
   const __m128 tmp0 = _mm_unpacklo_ps(tfrm.getCol0().get128(), tfrm.getCol2().get128());
@@ -1672,7 +1660,7 @@ inline const Transform3 Transform3::rotationX(float radians)
 
 inline const Transform3 Transform3::rotationX(const FloatInVec & radians)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
   const __m128 select_y = _mm_load_ps(sy);
@@ -1694,7 +1682,7 @@ inline const Transform3 Transform3::rotationY(float radians)
 
 inline const Transform3 Transform3::rotationY(const FloatInVec & radians)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
   const __m128 select_x = _mm_load_ps(sx);
@@ -1716,7 +1704,7 @@ inline const Transform3 Transform3::rotationZ(float radians)
 
 inline const Transform3 Transform3::rotationZ(const FloatInVec & radians)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
   const __m128 select_x = _mm_load_ps(sx);
@@ -1733,7 +1721,7 @@ inline const Transform3 Transform3::rotationZ(const FloatInVec & radians)
 
 inline const Transform3 Transform3::rotationZYX(const Vector3 & radiansXYZ)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sxyz[4]) = { ffffffff, ffffffff, ffffffff, 0.0f };
   const __m128 angles = Vector4(radiansXYZ, 0.0f).get128();
   __m128 s, c;
@@ -1771,7 +1759,7 @@ inline const Transform3 Transform3::rotation(const Quat & unitQuat)
 
 inline const Transform3 Transform3::scale(const Vector3 & scaleVec)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
@@ -1830,7 +1818,7 @@ inline const Transform3 select(const Transform3 & tfrm0, const Transform3 & tfrm
 
 inline Quat::Quat(const Matrix3 & tfrm)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
@@ -1923,7 +1911,7 @@ inline const Matrix4 outer(const Vector4 & tfrm0, const Vector4 & tfrm1)
 
 inline const Vector3 rowMul(const Vector3 & vec, const Matrix3 & mat)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
   const __m128 select_y = _mm_load_ps(sy);
   __m128 mcol0, mcol1, mcol2, res;
@@ -1945,7 +1933,7 @@ inline const Vector3 rowMul(const Vector3 & vec, const Matrix3 & mat)
 
 inline const Matrix3 crossMatrix(const Vector3 & vec)
 {
-  static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   VECTORMATH_ALIGNED(const float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sy[4]) = { 0.0f, ffffffff, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };

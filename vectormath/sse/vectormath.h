@@ -1064,7 +1064,7 @@ private:
 public:
 
   // Default constructor
-  inline Matrix3();
+  inline Matrix3() {}
 
   // Copy a 3x3 matrix
   inline Matrix3(const Matrix3 & mat);
@@ -1264,7 +1264,7 @@ private:
 public:
 
   // Default constructor
-  inline Matrix4();
+  inline Matrix4() {}
 
   // Copy a 4x4 matrix
   inline Matrix4(const Matrix4 & mat);
@@ -1530,7 +1530,7 @@ private:
 public:
 
   // Default constructor
-  inline Transform3();
+  inline Transform3() {}
 
   // Copy a 3x4 transformation matrix
   inline Transform3(const Transform3 & tfrm);

@@ -143,7 +143,7 @@ inline BoolInVec::BoolInVec(bool b)
   float f;
   if (b)
   {
-    f = bit_cast_uint2float(0xFFFFFFFF);
+    f = bit_cast_uint2float(0xffffffffU);
   }
   else
   {
@@ -158,6 +158,7 @@ inline bool BoolInVec::getAsBool() const
 inline BoolInVec::operator bool() const
 #endif
 {
+  static_assert(sizeof(bool) == 1);
   VECTORMATH_ALIGNED(bool b);
   memcpy(&b, &mData, 1);
   return b;

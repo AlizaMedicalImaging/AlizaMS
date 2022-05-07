@@ -52,17 +52,16 @@ public:
 
   inline VecIdx(__m128 & vec, int idx) : ref(vec), i(idx) { }
 
-  //
-  // implicitly casts to float unless VECTORMATH_NO_SCALAR_CAST defined
+  // Implicitly casts to float unless VECTORMATH_NO_SCALAR_CAST defined
   // in which case, implicitly casts to FloatInVec, and one must call
   // getAsFloat() to convert to float.
-  //
+
 #ifdef VECTORMATH_NO_SCALAR_CAST
   inline operator FloatInVec() const;
   inline float getAsFloat() const;
-#else // !VECTORMATH_NO_SCALAR_CAST
+#else
   inline operator float() const;
-#endif // VECTORMATH_NO_SCALAR_CAST
+#endif
 
   inline float operator = (float scalar);
   inline FloatInVec operator =  (const FloatInVec & scalar);
