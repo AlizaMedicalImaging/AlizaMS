@@ -5,14 +5,14 @@
    Redistribution and use in source and binary forms,
    with or without modification, are permitted provided that the
    following conditions are met:
-    * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
-    * Neither the name of the Sony Computer Entertainment Inc nor the names
-      of its contributors may be used to endorse or promote products derived
-      from this software without specific prior written permission.
+  * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+  * Neither the name of the Sony Computer Entertainment Inc nor the names
+    of its contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
 
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -30,6 +30,8 @@
 #ifndef VECTORMATH_SSE_BOOLINVEC_HPP
 #define VECTORMATH_SSE_BOOLINVEC_HPP
 
+#include "internal.h"
+
 namespace Vectormath
 {
 namespace SSE
@@ -46,57 +48,54 @@ VECTORMATH_ALIGNED_TYPE_PRE class BoolInVec
 {
 private:
 
-    __m128 mData;
+  __m128 mData;
 
-    inline BoolInVec(__m128 vec);
+  inline BoolInVec(__m128 vec);
 
 public:
 
-    inline BoolInVec() { }
+  inline BoolInVec() { }
 
-    // matches standard type conversions
-    //
-    inline BoolInVec(const FloatInVec & vec);
+  // matches standard type conversions
+  //
+  inline BoolInVec(const FloatInVec & vec);
 
-    // explicit cast from bool
-    //
-    explicit inline BoolInVec(bool scalar);
+  // explicit cast from bool
+  //
+  explicit inline BoolInVec(bool scalar);
 
 #ifdef VECTORMATH_NO_SCALAR_CAST
-    // explicit cast to bool
-    inline bool getAsBool() const;
+  // explicit cast to bool
+  inline bool getAsBool() const;
 #else
-    // implicit cast to bool
-    inline operator bool() const;
+  // implicit cast to bool
+  inline operator bool() const;
 #endif // VECTORMATH_NO_SCALAR_CAST
 
-    // get vector data
-    // bool value is splatted across all word slots of vector as 0 (false) or -1 (true)
-    //
-    inline __m128 get128() const;
+  // get vector data
+  // bool value is splatted across all word slots of vector as 0 (false) or -1 (true)
+  inline __m128 get128() const;
 
-    // operators
-    //
-    inline const BoolInVec operator ! () const;
-    inline BoolInVec & operator =  (const BoolInVec & vec);
-    inline BoolInVec & operator &= (const BoolInVec & vec);
-    inline BoolInVec & operator ^= (const BoolInVec & vec);
-    inline BoolInVec & operator |= (const BoolInVec & vec);
+  // operators
+  inline const BoolInVec operator ! () const;
+  inline BoolInVec & operator =  (const BoolInVec & vec);
+  inline BoolInVec & operator &= (const BoolInVec & vec);
+  inline BoolInVec & operator ^= (const BoolInVec & vec);
+  inline BoolInVec & operator |= (const BoolInVec & vec);
 
-    // friend functions
-    //
-    friend inline const BoolInVec operator == (const BoolInVec  & vec0, const BoolInVec  & vec1);
-    friend inline const BoolInVec operator != (const BoolInVec  & vec0, const BoolInVec  & vec1);
-    friend inline const BoolInVec operator <  (const FloatInVec & vec0, const FloatInVec & vec1);
-    friend inline const BoolInVec operator <= (const FloatInVec & vec0, const FloatInVec & vec1);
-    friend inline const BoolInVec operator >  (const FloatInVec & vec0, const FloatInVec & vec1);
-    friend inline const BoolInVec operator >= (const FloatInVec & vec0, const FloatInVec & vec1);
-    friend inline const BoolInVec operator == (const FloatInVec & vec0, const FloatInVec & vec1);
-    friend inline const BoolInVec operator != (const FloatInVec & vec0, const FloatInVec & vec1);
-    friend inline const BoolInVec operator &  (const BoolInVec  & vec0, const BoolInVec  & vec1);
-    friend inline const BoolInVec operator ^  (const BoolInVec  & vec0, const BoolInVec  & vec1);
-    friend inline const BoolInVec operator |  (const BoolInVec  & vec0, const BoolInVec  & vec1);
-    friend inline const BoolInVec select(const BoolInVec & vec0, const BoolInVec & vec1, const BoolInVec & select_vec1);
+  // friend functions
+  friend inline const BoolInVec operator == (const BoolInVec  & vec0, const BoolInVec  & vec1);
+  friend inline const BoolInVec operator != (const BoolInVec  & vec0, const BoolInVec  & vec1);
+  friend inline const BoolInVec operator <  (const FloatInVec & vec0, const FloatInVec & vec1);
+  friend inline const BoolInVec operator <= (const FloatInVec & vec0, const FloatInVec & vec1);
+  friend inline const BoolInVec operator >  (const FloatInVec & vec0, const FloatInVec & vec1);
+  friend inline const BoolInVec operator >= (const FloatInVec & vec0, const FloatInVec & vec1);
+  friend inline const BoolInVec operator == (const FloatInVec & vec0, const FloatInVec & vec1);
+  friend inline const BoolInVec operator != (const FloatInVec & vec0, const FloatInVec & vec1);
+  friend inline const BoolInVec operator &  (const BoolInVec  & vec0, const BoolInVec  & vec1);
+  friend inline const BoolInVec operator ^  (const BoolInVec  & vec0, const BoolInVec  & vec1);
+  friend inline const BoolInVec operator |  (const BoolInVec  & vec0, const BoolInVec  & vec1);
+  friend inline const BoolInVec select(const BoolInVec & vec0, const BoolInVec & vec1, const BoolInVec & select_vec1);
 
 } VECTORMATH_ALIGNED_TYPE_POST;
 
@@ -105,7 +104,6 @@ public:
 // ========================================================
 
 // operators
-//
 inline const BoolInVec operator == (const BoolInVec & vec0, const BoolInVec & vec1);
 inline const BoolInVec operator != (const BoolInVec & vec0, const BoolInVec & vec1);
 inline const BoolInVec operator &  (const BoolInVec & vec0, const BoolInVec & vec1);
@@ -114,7 +112,6 @@ inline const BoolInVec operator |  (const BoolInVec & vec0, const BoolInVec & ve
 
 // select between vec0 and vec1 using BoolInVec.
 // false selects vec0, true selects vec1
-//
 inline const BoolInVec select(const BoolInVec & vec0, const BoolInVec & vec1, const BoolInVec & select_vec1);
 
 } // namespace SSE
@@ -133,33 +130,27 @@ namespace SSE
 
 inline BoolInVec::BoolInVec(__m128 vec)
 {
-    mData = vec;
+  mData = vec;
 }
 
 inline BoolInVec::BoolInVec(const FloatInVec & vec)
 {
-    *this = (vec != FloatInVec(0.0f));
+  *this = (vec != FloatInVec(0.0f));
 }
 
-inline BoolInVec::BoolInVec(bool scalar)
+inline BoolInVec::BoolInVec(bool b)
 {
-    union
-    {
-        unsigned int mask;
-        float f;
-    } tmp;
-
-    tmp.mask = -(int)scalar;
-    mData = _mm_set1_ps(tmp.f);
+  float f;
+  if (b)
+  {
+    f = bit_cast_uint2float(0xFFFFFFFF);
+  }
+  else
+  {
+    f = 0.0f;
+  }
+  mData = _mm_set1_ps(f);
 }
-
-VECTORMATH_ALIGNED_TYPE_PRE union bool_converter
-{
-    __m128 m128;
-    bool   b;
-    bool_converter(__m128 v) : m128(v) {}
-    bool_converter() {}
-} VECTORMATH_ALIGNED_TYPE_POST;
 
 #ifdef VECTORMATH_NO_SCALAR_CAST
 inline bool BoolInVec::getAsBool() const
@@ -167,71 +158,73 @@ inline bool BoolInVec::getAsBool() const
 inline BoolInVec::operator bool() const
 #endif
 {
-	return bool_converter(mData).b;
+  VECTORMATH_ALIGNED(bool b);
+  memcpy(&b, &mData, 1);
+  return b;
 }
 
 inline __m128 BoolInVec::get128() const
 {
-    return mData;
+  return mData;
 }
 
 inline const BoolInVec BoolInVec::operator ! () const
 {
-    return BoolInVec(_mm_andnot_ps(mData, _mm_cmpneq_ps(_mm_setzero_ps(), _mm_setzero_ps())));
+  return BoolInVec(_mm_andnot_ps(mData, _mm_cmpneq_ps(_mm_setzero_ps(), _mm_setzero_ps())));
 }
 
 inline BoolInVec & BoolInVec::operator = (const BoolInVec & vec)
 {
-    mData = vec.mData;
-    return *this;
+  mData = vec.mData;
+  return *this;
 }
 
 inline BoolInVec & BoolInVec::operator &= (const BoolInVec & vec)
 {
-    *this = *this & vec;
-    return *this;
+  *this = *this & vec;
+  return *this;
 }
 
 inline BoolInVec & BoolInVec::operator ^= (const BoolInVec & vec)
 {
-    *this = *this ^ vec;
-    return *this;
+  *this = *this ^ vec;
+  return *this;
 }
 
 inline BoolInVec & BoolInVec::operator |= (const BoolInVec & vec)
 {
-    *this = *this | vec;
-    return *this;
+  *this = *this | vec;
+  return *this;
 }
 
 inline const BoolInVec operator == (const BoolInVec & vec0, const BoolInVec & vec1)
 {
-    return BoolInVec(_mm_cmpeq_ps(vec0.get128(), vec1.get128()));
+  return BoolInVec(_mm_cmpeq_ps(vec0.get128(), vec1.get128()));
 }
 
 inline const BoolInVec operator != (const BoolInVec & vec0, const BoolInVec & vec1)
 {
-    return BoolInVec(_mm_cmpneq_ps(vec0.get128(), vec1.get128()));
+  return BoolInVec(_mm_cmpneq_ps(vec0.get128(), vec1.get128()));
 }
 
 inline const BoolInVec operator & (const BoolInVec & vec0, const BoolInVec & vec1)
 {
-    return BoolInVec(_mm_and_ps(vec0.get128(), vec1.get128()));
+  return BoolInVec(_mm_and_ps(vec0.get128(), vec1.get128()));
 }
 
 inline const BoolInVec operator | (const BoolInVec & vec0, const BoolInVec & vec1)
 {
-    return BoolInVec(_mm_or_ps(vec0.get128(), vec1.get128()));
+  return BoolInVec(_mm_or_ps(vec0.get128(), vec1.get128()));
 }
 
 inline const BoolInVec operator ^ (const BoolInVec & vec0, const BoolInVec & vec1)
 {
-    return BoolInVec(_mm_xor_ps(vec0.get128(), vec1.get128()));
+  return BoolInVec(_mm_xor_ps(vec0.get128(), vec1.get128()));
 }
 
 inline const BoolInVec select(const BoolInVec & vec0, const BoolInVec & vec1, const BoolInVec & select_vec1)
 {
-    return BoolInVec(sseSelect(vec0.get128(), vec1.get128(), select_vec1.get128()));
+  return BoolInVec(sseSelect(vec0.get128(), vec1.get128(), select_vec1.get128()));
 }
 
 } // namespace SSE

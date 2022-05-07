@@ -1,7 +1,7 @@
 #ifndef ALIGNED_ALLOCATOR__H
 #define ALIGNED_ALLOCATOR__H
 
-#include <stdlib.h>
+#include <cstdlib>
 #if defined _MSC_VER
 #define ALIGN16(a) __declspec(align(16)) a
 #define ALIGN16_PRE __declspec(align(16))
