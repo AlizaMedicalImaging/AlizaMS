@@ -92,12 +92,12 @@ inline const Vector3 lerp(float t, const Vector3 & vec0, const Vector3 & vec1)
 
 inline const Vector3 slerp(float t, const Vector3 & unitVec0, const Vector3 & unitVec1)
 {
-    float recipSinAngle, scale0, scale1, cosAngle, angle;
-    cosAngle = dot(unitVec0, unitVec1);
+    float scale0, scale1;
+    const float cosAngle = dot(unitVec0, unitVec1);
     if (cosAngle < VECTORMATHSC_SLERP_TOL)
     {
-        angle = acosf(cosAngle);
-        recipSinAngle = (1.0f / sinf(angle));
+        const float angle = acosf(cosAngle);
+        const float recipSinAngle = (1.0f / sinf(angle));
         scale0 = (sinf(((1.0f - t) * angle)) * recipSinAngle);
         scale1 = (sinf((t * angle)) * recipSinAngle);
     }
@@ -309,8 +309,7 @@ inline const Vector3 maxPerElem(const Vector3 & vec0, const Vector3 & vec1)
 
 inline float maxElem(const Vector3 & vec)
 {
-    float result;
-    result = (vec.getX() > vec.getY()) ? vec.getX() : vec.getY();
+    float result = (vec.getX() > vec.getY()) ? vec.getX() : vec.getY();
     result = (vec.getZ() > result)     ? vec.getZ() : result;
     return result;
 }
@@ -324,24 +323,21 @@ inline const Vector3 minPerElem(const Vector3 & vec0, const Vector3 & vec1)
 
 inline float minElem(const Vector3 & vec)
 {
-    float result;
-    result = (vec.getX() < vec.getY()) ? vec.getX() : vec.getY();
+    float result = (vec.getX() < vec.getY()) ? vec.getX() : vec.getY();
     result = (vec.getZ() < result)     ? vec.getZ() : result;
     return result;
 }
 
 inline float sum(const Vector3 & vec)
 {
-    float result;
-    result = (vec.getX() + vec.getY());
+    float result = (vec.getX() + vec.getY());
     result = (result + vec.getZ());
     return result;
 }
 
 inline float dot(const Vector3 & vec0, const Vector3 & vec1)
 {
-    float result;
-    result = (vec0.getX() * vec1.getX());
+    float result = (vec0.getX() * vec1.getX());
     result = (result + (vec0.getY() * vec1.getY()));
     result = (result + (vec0.getZ() * vec1.getZ()));
     return result;
@@ -349,8 +345,7 @@ inline float dot(const Vector3 & vec0, const Vector3 & vec1)
 
 inline float lengthSqr(const Vector3 & vec)
 {
-    float result;
-    result = (vec.getX() * vec.getX());
+    float result = (vec.getX() * vec.getX());
     result = (result + (vec.getY() * vec.getY()));
     result = (result + (vec.getZ() * vec.getZ()));
     return result;
@@ -363,9 +358,8 @@ inline float length(const Vector3 & vec)
 
 inline const Vector3 normalize(const Vector3 & vec)
 {
-    float lenSqr, lenInv;
-    lenSqr = lengthSqr(vec);
-    lenInv = (1.0f / sqrtf(lenSqr));
+    const float lenSqr = lengthSqr(vec);
+    const float lenInv = (1.0f / sqrtf(lenSqr));
     return Vector3((vec.getX() * lenInv),
                    (vec.getY() * lenInv),
                    (vec.getZ() * lenInv));
@@ -470,12 +464,12 @@ inline const Vector4 lerp(float t, const Vector4 & vec0, const Vector4 & vec1)
 
 inline const Vector4 slerp(float t, const Vector4 & unitVec0, const Vector4 & unitVec1)
 {
-    float recipSinAngle, scale0, scale1, cosAngle, angle;
-    cosAngle = dot(unitVec0, unitVec1);
+    float scale0, scale1;
+    const float cosAngle = dot(unitVec0, unitVec1);
     if (cosAngle < VECTORMATHSC_SLERP_TOL)
     {
-        angle = acosf(cosAngle);
-        recipSinAngle = (1.0f / sinf(angle));
+        const float angle = acosf(cosAngle);
+        const float recipSinAngle = (1.0f / sinf(angle));
         scale0 = (sinf(((1.0f - t) * angle)) * recipSinAngle);
         scale1 = (sinf((t * angle)) * recipSinAngle);
     }
@@ -706,8 +700,7 @@ inline const Vector4 maxPerElem(const Vector4 & vec0, const Vector4 & vec1)
 
 inline float maxElem(const Vector4 & vec)
 {
-    float result;
-    result = (vec.getX() > vec.getY()) ? vec.getX() : vec.getY();
+    float result = (vec.getX() > vec.getY()) ? vec.getX() : vec.getY();
     result = (vec.getZ() > result)     ? vec.getZ() : result;
     result = (vec.getW() > result)     ? vec.getW() : result;
     return result;
@@ -723,8 +716,7 @@ inline const Vector4 minPerElem(const Vector4 & vec0, const Vector4 & vec1)
 
 inline float minElem(const Vector4 & vec)
 {
-    float result;
-    result = (vec.getX() < vec.getY()) ? vec.getX() : vec.getY();
+    float result = (vec.getX() < vec.getY()) ? vec.getX() : vec.getY();
     result = (vec.getZ() < result)     ? vec.getZ() : result;
     result = (vec.getW() < result)     ? vec.getW() : result;
     return result;
@@ -732,8 +724,7 @@ inline float minElem(const Vector4 & vec)
 
 inline float sum(const Vector4 & vec)
 {
-    float result;
-    result = (vec.getX() + vec.getY());
+    float result = (vec.getX() + vec.getY());
     result = (result + vec.getZ());
     result = (result + vec.getW());
     return result;
@@ -741,8 +732,7 @@ inline float sum(const Vector4 & vec)
 
 inline float dot(const Vector4 & vec0, const Vector4 & vec1)
 {
-    float result;
-    result = (vec0.getX() * vec1.getX());
+    float result = (vec0.getX() * vec1.getX());
     result = (result + (vec0.getY() * vec1.getY()));
     result = (result + (vec0.getZ() * vec1.getZ()));
     result = (result + (vec0.getW() * vec1.getW()));
@@ -751,8 +741,7 @@ inline float dot(const Vector4 & vec0, const Vector4 & vec1)
 
 inline float lengthSqr(const Vector4 & vec)
 {
-    float result;
-    result = (vec.getX() * vec.getX());
+    float result = (vec.getX() * vec.getX());
     result = (result + (vec.getY() * vec.getY()));
     result = (result + (vec.getZ() * vec.getZ()));
     result = (result + (vec.getW() * vec.getW()));
@@ -766,9 +755,8 @@ inline float length(const Vector4 & vec)
 
 inline const Vector4 normalize(const Vector4 & vec)
 {
-    float lenSqr, lenInv;
-    lenSqr = lengthSqr(vec);
-    lenInv = (1.0f / sqrtf(lenSqr));
+    const float lenSqr = lengthSqr(vec);
+    const float lenInv = (1.0f / sqrtf(lenSqr));
     return Vector4((vec.getX() * lenInv),
                    (vec.getY() * lenInv),
                    (vec.getZ() * lenInv),
@@ -978,9 +966,8 @@ inline const Point3 maxPerElem(const Point3 & pnt0, const Point3 & pnt1)
 
 inline float maxElem(const Point3 & pnt)
 {
-    float result;
-    result = (pnt.getX() > pnt.getY()) ? pnt.getX() : pnt.getY();
-    result = (pnt.getZ() > result)     ? pnt.getZ() : result;
+    float result = (pnt.getX() > pnt.getY()) ? pnt.getX() : pnt.getY();
+    result = (pnt.getZ() > result) ? pnt.getZ() : result;
     return result;
 }
 
@@ -993,16 +980,14 @@ inline const Point3 minPerElem(const Point3 & pnt0, const Point3 & pnt1)
 
 inline float minElem(const Point3 & pnt)
 {
-    float result;
-    result = (pnt.getX() < pnt.getY()) ? pnt.getX() : pnt.getY();
-    result = (pnt.getZ() < result)     ? pnt.getZ() : result;
+    float result = (pnt.getX() < pnt.getY()) ? pnt.getX() : pnt.getY();
+    result = (pnt.getZ() < result) ? pnt.getZ() : result;
     return result;
 }
 
 inline float sum(const Point3 & pnt)
 {
-    float result;
-    result = (pnt.getX() + pnt.getY());
+    float result = (pnt.getX() + pnt.getY());
     result = (result + pnt.getZ());
     return result;
 }
@@ -1019,8 +1004,7 @@ inline const Point3 scale(const Point3 & pnt, const Vector3 & scaleVec)
 
 inline float projection(const Point3 & pnt, const Vector3 & unitVec)
 {
-    float result;
-    result = (pnt.getX() * unitVec.getX());
+    float result = (pnt.getX() * unitVec.getX());
     result = (result + (pnt.getY() * unitVec.getY()));
     result = (result + (pnt.getZ() * unitVec.getZ()));
     return result;

@@ -55,23 +55,22 @@ inline Matrix3::Matrix3(float scalar)
 
 inline Matrix3::Matrix3(const Quat & unitQuat)
 {
-    float qx, qy, qz, qw, qx2, qy2, qz2, qxqx2, qyqy2, qzqz2, qxqy2, qyqz2, qzqw2, qxqz2, qyqw2, qxqw2;
-    qx = unitQuat.getX();
-    qy = unitQuat.getY();
-    qz = unitQuat.getZ();
-    qw = unitQuat.getW();
-    qx2 = (qx + qx);
-    qy2 = (qy + qy);
-    qz2 = (qz + qz);
-    qxqx2 = (qx * qx2);
-    qxqy2 = (qx * qy2);
-    qxqz2 = (qx * qz2);
-    qxqw2 = (qw * qx2);
-    qyqy2 = (qy * qy2);
-    qyqz2 = (qy * qz2);
-    qyqw2 = (qw * qy2);
-    qzqz2 = (qz * qz2);
-    qzqw2 = (qw * qz2);
+    const float qx = unitQuat.getX();
+    const float qy = unitQuat.getY();
+    const float qz = unitQuat.getZ();
+    const float qw = unitQuat.getW();
+    const float qx2 = (qx + qx);
+    const float qy2 = (qy + qy);
+    const float qz2 = (qz + qz);
+    const float qxqx2 = (qx * qx2);
+    const float qxqy2 = (qx * qy2);
+    const float qxqz2 = (qx * qz2);
+    const float qxqw2 = (qw * qx2);
+    const float qyqy2 = (qy * qy2);
+    const float qyqz2 = (qy * qz2);
+    const float qyqw2 = (qw * qy2);
+    const float qzqz2 = (qz * qz2);
+    const float qzqw2 = (qw * qz2);
     mCol0 = Vector3(((1.0f - qyqy2) - qzqz2), (qxqy2 + qzqw2), (qxqz2 - qyqw2));
     mCol1 = Vector3((qxqy2 - qzqw2), ((1.0f - qxqx2) - qzqz2), (qyqz2 + qxqw2));
     mCol2 = Vector3((qxqz2 + qyqw2), (qyqz2 - qxqw2), ((1.0f - qxqx2) - qyqy2));
@@ -183,12 +182,10 @@ inline const Matrix3 transpose(const Matrix3 & mat)
 
 inline const Matrix3 inverse(const Matrix3 & mat)
 {
-    Vector3 tmp0, tmp1, tmp2;
-    float detinv;
-    tmp0 = cross(mat.getCol1(), mat.getCol2());
-    tmp1 = cross(mat.getCol2(), mat.getCol0());
-    tmp2 = cross(mat.getCol0(), mat.getCol1());
-    detinv = (1.0f / dot(mat.getCol2(), tmp2));
+    const Vector3 tmp0 = cross(mat.getCol1(), mat.getCol2());
+    const Vector3 tmp1 = cross(mat.getCol2(), mat.getCol0());
+    const Vector3 tmp2 = cross(mat.getCol0(), mat.getCol1());
+    const float detinv = (1.0f / dot(mat.getCol2(), tmp2));
     return Matrix3(
         Vector3((tmp0.getX() * detinv), (tmp1.getX() * detinv), (tmp2.getX() * detinv)),
         Vector3((tmp0.getY() * detinv), (tmp1.getY() * detinv), (tmp2.getY() * detinv)),
@@ -286,39 +283,35 @@ inline const Matrix3 Matrix3::identity()
 
 inline const Matrix3 Matrix3::rotationX(float radians)
 {
-    float s, c;
-    s = sinf(radians);
-    c = cosf(radians);
+    const float s = sinf(radians);
+    const float c = cosf(radians);
     return Matrix3(Vector3::xAxis(), Vector3(0.0f, c, s), Vector3(0.0f, -s, c));
 }
 
 inline const Matrix3 Matrix3::rotationY(float radians)
 {
-    float s, c;
-    s = sinf(radians);
-    c = cosf(radians);
+    const float s = sinf(radians);
+    const float c = cosf(radians);
     return Matrix3(Vector3(c, 0.0f, -s), Vector3::yAxis(), Vector3(s, 0.0f, c));
 }
 
 inline const Matrix3 Matrix3::rotationZ(float radians)
 {
-    float s, c;
-    s = sinf(radians);
-    c = cosf(radians);
+    const float s = sinf(radians);
+    const float c = cosf(radians);
     return Matrix3(Vector3(c, s, 0.0f), Vector3(-s, c, 0.0f), Vector3::zAxis());
 }
 
 inline const Matrix3 Matrix3::rotationZYX(const Vector3 & radiansXYZ)
 {
-    float sX, cX, sY, cY, sZ, cZ, tmp0, tmp1;
-    sX = sinf(radiansXYZ.getX());
-    cX = cosf(radiansXYZ.getX());
-    sY = sinf(radiansXYZ.getY());
-    cY = cosf(radiansXYZ.getY());
-    sZ = sinf(radiansXYZ.getZ());
-    cZ = cosf(radiansXYZ.getZ());
-    tmp0 = (cZ * sY);
-    tmp1 = (sZ * sY);
+    const float sX = sinf(radiansXYZ.getX());
+    const float cX = cosf(radiansXYZ.getX());
+    const float sY = sinf(radiansXYZ.getY());
+    const float cY = cosf(radiansXYZ.getY());
+    const float sZ = sinf(radiansXYZ.getZ());
+    const float cZ = cosf(radiansXYZ.getZ());
+    const float tmp0 = (cZ * sY);
+    const float tmp1 = (sZ * sY);
     return Matrix3(Vector3((cZ * cY), (sZ * cY), -sY),
                    Vector3(((tmp0 * sX) - (sZ * cX)), ((tmp1 * sX) + (cZ * cX)), (cY * sX)),
                    Vector3(((tmp0 * cX) + (sZ * sX)), ((tmp1 * cX) - (cZ * sX)), (cY * cX)));
@@ -326,16 +319,15 @@ inline const Matrix3 Matrix3::rotationZYX(const Vector3 & radiansXYZ)
 
 inline const Matrix3 Matrix3::rotation(float radians, const Vector3 & unitVec)
 {
-    float x, y, z, s, c, oneMinusC, xy, yz, zx;
-    s = sinf(radians);
-    c = cosf(radians);
-    x = unitVec.getX();
-    y = unitVec.getY();
-    z = unitVec.getZ();
-    xy = (x * y);
-    yz = (y * z);
-    zx = (z * x);
-    oneMinusC = (1.0f - c);
+    const float s = sinf(radians);
+    const float c = cosf(radians);
+    const float x = unitVec.getX();
+    const float y = unitVec.getY();
+    const float z = unitVec.getZ();
+    const float xy = (x * y);
+    const float yz = (y * z);
+    const float zx = (z * x);
+    const float oneMinusC = (1.0f - c);
     return Matrix3(Vector3((((x * x) * oneMinusC) + c), ((xy * oneMinusC) + (z * s)), ((zx * oneMinusC) - (y * s))),
                    Vector3(((xy * oneMinusC) - (z * s)), (((y * y) * oneMinusC) + c), ((yz * oneMinusC) + (x * s))),
                    Vector3(((zx * oneMinusC) + (y * s)), ((yz * oneMinusC) - (x * s)), (((z * z) * oneMinusC) + c)));
@@ -541,34 +533,33 @@ inline const Matrix4 transpose(const Matrix4 & mat)
 inline const Matrix4 inverse(const Matrix4 & mat)
 {
     Vector4 res0, res1, res2, res3;
-    float mA, mB, mC, mD, mE, mF, mG, mH, mI, mJ, mK, mL, mM, mN, mO, mP, tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, detInv;
-    mA = mat.getCol0().getX();
-    mB = mat.getCol0().getY();
-    mC = mat.getCol0().getZ();
-    mD = mat.getCol0().getW();
-    mE = mat.getCol1().getX();
-    mF = mat.getCol1().getY();
-    mG = mat.getCol1().getZ();
-    mH = mat.getCol1().getW();
-    mI = mat.getCol2().getX();
-    mJ = mat.getCol2().getY();
-    mK = mat.getCol2().getZ();
-    mL = mat.getCol2().getW();
-    mM = mat.getCol3().getX();
-    mN = mat.getCol3().getY();
-    mO = mat.getCol3().getZ();
-    mP = mat.getCol3().getW();
-    tmp0 = ((mK * mD) - (mC * mL));
-    tmp1 = ((mO * mH) - (mG * mP));
-    tmp2 = ((mB * mK) - (mJ * mC));
-    tmp3 = ((mF * mO) - (mN * mG));
-    tmp4 = ((mJ * mD) - (mB * mL));
-    tmp5 = ((mN * mH) - (mF * mP));
+    const float mA = mat.getCol0().getX();
+    const float mB = mat.getCol0().getY();
+    const float mC = mat.getCol0().getZ();
+    const float mD = mat.getCol0().getW();
+    const float mE = mat.getCol1().getX();
+    const float mF = mat.getCol1().getY();
+    const float mG = mat.getCol1().getZ();
+    const float mH = mat.getCol1().getW();
+    const float mI = mat.getCol2().getX();
+    const float mJ = mat.getCol2().getY();
+    const float mK = mat.getCol2().getZ();
+    const float mL = mat.getCol2().getW();
+    const float mM = mat.getCol3().getX();
+    const float mN = mat.getCol3().getY();
+    const float mO = mat.getCol3().getZ();
+    const float mP = mat.getCol3().getW();
+    float tmp0 = ((mK * mD) - (mC * mL));
+    float tmp1 = ((mO * mH) - (mG * mP));
+    float tmp2 = ((mB * mK) - (mJ * mC));
+    float tmp3 = ((mF * mO) - (mN * mG));
+    float tmp4 = ((mJ * mD) - (mB * mL));
+    float tmp5 = ((mN * mH) - (mF * mP));
     res0.setX((((mJ * tmp1) - (mL * tmp3)) - (mK * tmp5)));
     res0.setY((((mN * tmp0) - (mP * tmp2)) - (mO * tmp4)));
     res0.setZ((((mD * tmp3) + (mC * tmp5)) - (mB * tmp1)));
     res0.setW((((mH * tmp2) + (mG * tmp4)) - (mF * tmp0)));
-    detInv = (1.0f / ((((mA * res0.getX()) + (mE * res0.getY())) + (mI * res0.getZ())) + (mM * res0.getW())));
+    const float detInv = (1.0f / ((((mA * res0.getX()) + (mE * res0.getY())) + (mI * res0.getZ())) + (mM * res0.getW())));
     res1.setX((mI * tmp1));
     res1.setY((mM * tmp0));
     res1.setZ((mA * tmp1));
@@ -624,33 +615,32 @@ inline const Matrix4 orthoInverse(const Matrix4 & mat)
 
 inline float determinant(const Matrix4 & mat)
 {
-    float dx, dy, dz, dw, mA, mB, mC, mD, mE, mF, mG, mH, mI, mJ, mK, mL, mM, mN, mO, mP, tmp0, tmp1, tmp2, tmp3, tmp4, tmp5;
-    mA = mat.getCol0().getX();
-    mB = mat.getCol0().getY();
-    mC = mat.getCol0().getZ();
-    mD = mat.getCol0().getW();
-    mE = mat.getCol1().getX();
-    mF = mat.getCol1().getY();
-    mG = mat.getCol1().getZ();
-    mH = mat.getCol1().getW();
-    mI = mat.getCol2().getX();
-    mJ = mat.getCol2().getY();
-    mK = mat.getCol2().getZ();
-    mL = mat.getCol2().getW();
-    mM = mat.getCol3().getX();
-    mN = mat.getCol3().getY();
-    mO = mat.getCol3().getZ();
-    mP = mat.getCol3().getW();
-    tmp0 = ((mK * mD) - (mC * mL));
-    tmp1 = ((mO * mH) - (mG * mP));
-    tmp2 = ((mB * mK) - (mJ * mC));
-    tmp3 = ((mF * mO) - (mN * mG));
-    tmp4 = ((mJ * mD) - (mB * mL));
-    tmp5 = ((mN * mH) - (mF * mP));
-    dx = (((mJ * tmp1) - (mL * tmp3)) - (mK * tmp5));
-    dy = (((mN * tmp0) - (mP * tmp2)) - (mO * tmp4));
-    dz = (((mD * tmp3) + (mC * tmp5)) - (mB * tmp1));
-    dw = (((mH * tmp2) + (mG * tmp4)) - (mF * tmp0));
+    const float mA = mat.getCol0().getX();
+    const float mB = mat.getCol0().getY();
+    const float mC = mat.getCol0().getZ();
+    const float mD = mat.getCol0().getW();
+    const float mE = mat.getCol1().getX();
+    const float mF = mat.getCol1().getY();
+    const float mG = mat.getCol1().getZ();
+    const float mH = mat.getCol1().getW();
+    const float mI = mat.getCol2().getX();
+    const float mJ = mat.getCol2().getY();
+    const float mK = mat.getCol2().getZ();
+    const float mL = mat.getCol2().getW();
+    const float mM = mat.getCol3().getX();
+    const float mN = mat.getCol3().getY();
+    const float mO = mat.getCol3().getZ();
+    const float mP = mat.getCol3().getW();
+    const float tmp0 = ((mK * mD) - (mC * mL));
+    const float tmp1 = ((mO * mH) - (mG * mP));
+    const float tmp2 = ((mB * mK) - (mJ * mC));
+    const float tmp3 = ((mF * mO) - (mN * mG));
+    const float tmp4 = ((mJ * mD) - (mB * mL));
+    const float tmp5 = ((mN * mH) - (mF * mP));
+    const float dx = (((mJ * tmp1) - (mL * tmp3)) - (mK * tmp5));
+    const float dy = (((mN * tmp0) - (mP * tmp2)) - (mO * tmp4));
+    const float dz = (((mD * tmp3) + (mC * tmp5)) - (mB * tmp1));
+    const float dw = (((mH * tmp2) + (mG * tmp4)) - (mF * tmp0));
     return ((((mA * dx) + (mE * dy)) + (mI * dz)) + (mM * dw));
 }
 
@@ -811,9 +801,8 @@ inline const Vector3 Matrix4::getTranslation() const
 
 inline const Matrix4 Matrix4::rotationX(float radians)
 {
-    float s, c;
-    s = sinf(radians);
-    c = cosf(radians);
+    const float s = sinf(radians);
+    const float c = cosf(radians);
     return Matrix4(Vector4::xAxis(),
                    Vector4(0.0f,  c, s, 0.0f),
                    Vector4(0.0f, -s, c, 0.0f),
@@ -822,9 +811,8 @@ inline const Matrix4 Matrix4::rotationX(float radians)
 
 inline const Matrix4 Matrix4::rotationY(float radians)
 {
-    float s, c;
-    s = sinf(radians);
-    c = cosf(radians);
+    const float s = sinf(radians);
+    const float c = cosf(radians);
     return Matrix4(Vector4(c, 0.0f, -s, 0.0f),
                    Vector4::yAxis(),
                    Vector4(s, 0.0f, c, 0.0f),
@@ -833,9 +821,8 @@ inline const Matrix4 Matrix4::rotationY(float radians)
 
 inline const Matrix4 Matrix4::rotationZ(float radians)
 {
-    float s, c;
-    s = sinf(radians);
-    c = cosf(radians);
+    const float s = sinf(radians);
+    const float c = cosf(radians);
     return Matrix4(Vector4( c, s, 0.0f, 0.0f),
                    Vector4(-s, c, 0.0f, 0.0f),
                    Vector4::zAxis(),
@@ -844,15 +831,14 @@ inline const Matrix4 Matrix4::rotationZ(float radians)
 
 inline const Matrix4 Matrix4::rotationZYX(const Vector3 & radiansXYZ)
 {
-    float sX, cX, sY, cY, sZ, cZ, tmp0, tmp1;
-    sX = sinf(radiansXYZ.getX());
-    cX = cosf(radiansXYZ.getX());
-    sY = sinf(radiansXYZ.getY());
-    cY = cosf(radiansXYZ.getY());
-    sZ = sinf(radiansXYZ.getZ());
-    cZ = cosf(radiansXYZ.getZ());
-    tmp0 = (cZ * sY);
-    tmp1 = (sZ * sY);
+    const float sX = sinf(radiansXYZ.getX());
+    const float cX = cosf(radiansXYZ.getX());
+    const float sY = sinf(radiansXYZ.getY());
+    const float cY = cosf(radiansXYZ.getY());
+    const float sZ = sinf(radiansXYZ.getZ());
+    const float cZ = cosf(radiansXYZ.getZ());
+    const float tmp0 = (cZ * sY);
+    const float tmp1 = (sZ * sY);
     return Matrix4(Vector4((cZ * cY), (sZ * cY), -sY, 0.0f),
                    Vector4(((tmp0 * sX) - (sZ * cX)), ((tmp1 * sX) + (cZ * cX)), (cY * sX), 0.0f),
                    Vector4(((tmp0 * cX) + (sZ * sX)), ((tmp1 * cX) - (cZ * sX)), (cY * cX), 0.0f),
@@ -861,16 +847,15 @@ inline const Matrix4 Matrix4::rotationZYX(const Vector3 & radiansXYZ)
 
 inline const Matrix4 Matrix4::rotation(float radians, const Vector3 & unitVec)
 {
-    float x, y, z, s, c, oneMinusC, xy, yz, zx;
-    s = sinf(radians);
-    c = cosf(radians);
-    x = unitVec.getX();
-    y = unitVec.getY();
-    z = unitVec.getZ();
-    xy = (x * y);
-    yz = (y * z);
-    zx = (z * x);
-    oneMinusC = (1.0f - c);
+    const float s = sinf(radians);
+    const float c = cosf(radians);
+    const float x = unitVec.getX();
+    const float y = unitVec.getY();
+    const float z = unitVec.getZ();
+    const float xy = (x * y);
+    const float yz = (y * z);
+    const float zx = (z * x);
+    const float oneMinusC = (1.0f - c);
     return Matrix4(Vector4((((x * x) * oneMinusC) + c), ((xy * oneMinusC) + (z * s)), ((zx * oneMinusC) - (y * s)), 0.0f),
                    Vector4(((xy * oneMinusC) - (z * s)), (((y * y) * oneMinusC) + c), ((yz * oneMinusC) + (x * s)), 0.0f),
                    Vector4(((zx * oneMinusC) + (y * s)), ((yz * oneMinusC) - (x * s)), (((z * z) * oneMinusC) + c), 0.0f),
@@ -900,8 +885,7 @@ inline const Matrix4 appendScale(const Matrix4 & mat, const Vector3 & scaleVec)
 
 inline const Matrix4 prependScale(const Vector3 & scaleVec, const Matrix4 & mat)
 {
-    Vector4 scale4;
-    scale4 = Vector4(scaleVec, 1.0f);
+    Vector4 scale4 = Vector4(scaleVec, 1.0f);
     return Matrix4(mulPerElem(mat.getCol0(), scale4),
                    mulPerElem(mat.getCol1(), scale4),
                    mulPerElem(mat.getCol2(), scale4),
@@ -918,23 +902,19 @@ inline const Matrix4 Matrix4::translation(const Vector3 & translateVec)
 
 inline const Matrix4 Matrix4::lookAt(const Point3 & eyePos, const Point3 & lookAtPos, const Vector3 & upVec)
 {
-    Matrix4 m4EyeFrame;
-    Vector3 v3X, v3Y, v3Z;
-    v3Y = normalize(upVec);
-    v3Z = normalize((eyePos - lookAtPos));
-    v3X = normalize(cross(v3Y, v3Z));
+    Vector3 v3Y = normalize(upVec);
+    const Vector3 v3Z = normalize((eyePos - lookAtPos));
+    const Vector3 v3X = normalize(cross(v3Y, v3Z));
     v3Y = cross(v3Z, v3X);
-    m4EyeFrame = Matrix4(Vector4(v3X), Vector4(v3Y), Vector4(v3Z), Vector4(eyePos));
+    const Matrix4 m4EyeFrame = Matrix4(Vector4(v3X), Vector4(v3Y), Vector4(v3Z), Vector4(eyePos));
     return orthoInverse(m4EyeFrame);
 }
 
 inline const Matrix4 Matrix4::perspective(float fovyRadians, float aspect, float zNear, float zFar)
 {
     static const float VECTORMATHSC_PI_OVER_2 = 1.570796327f;
-
-    float f, rangeInv;
-    f = tanf(VECTORMATHSC_PI_OVER_2 - (0.5f * fovyRadians));
-    rangeInv = (1.0f / (zNear - zFar));
+    const float f = tanf(VECTORMATHSC_PI_OVER_2 - (0.5f * fovyRadians));
+    const float rangeInv = (1.0f / (zNear - zFar));
     return Matrix4(Vector4((f / aspect), 0.0f, 0.0f, 0.0f),
                    Vector4(0.0f, f, 0.0f, 0.0f),
                    Vector4(0.0f, 0.0f, ((zNear + zFar) * rangeInv), -1.0f),
@@ -943,14 +923,13 @@ inline const Matrix4 Matrix4::perspective(float fovyRadians, float aspect, float
 
 inline const Matrix4 Matrix4::frustum(float left, float right, float bottom, float top, float zNear, float zFar)
 {
-    float sum_rl, sum_tb, sum_nf, inv_rl, inv_tb, inv_nf, n2;
-    sum_rl = (right + left);
-    sum_tb = (top + bottom);
-    sum_nf = (zNear + zFar);
-    inv_rl = (1.0f / (right - left));
-    inv_tb = (1.0f / (top - bottom));
-    inv_nf = (1.0f / (zNear - zFar));
-    n2 = (zNear + zNear);
+    const float sum_rl = (right + left);
+    const float sum_tb = (top + bottom);
+    const float sum_nf = (zNear + zFar);
+    const float inv_rl = (1.0f / (right - left));
+    const float inv_tb = (1.0f / (top - bottom));
+    const float inv_nf = (1.0f / (zNear - zFar));
+    const float n2 = (zNear + zNear);
     return Matrix4(Vector4((n2 * inv_rl), 0.0f, 0.0f, 0.0f),
                    Vector4(0.0f, (n2 * inv_tb), 0.0f, 0.0f),
                    Vector4((sum_rl * inv_rl), (sum_tb * inv_tb), (sum_nf * inv_nf), -1.0f),
@@ -959,13 +938,12 @@ inline const Matrix4 Matrix4::frustum(float left, float right, float bottom, flo
 
 inline const Matrix4 Matrix4::orthographic(float left, float right, float bottom, float top, float zNear, float zFar)
 {
-    float sum_rl, sum_tb, sum_nf, inv_rl, inv_tb, inv_nf;
-    sum_rl = (right + left);
-    sum_tb = (top + bottom);
-    sum_nf = (zNear + zFar);
-    inv_rl = (1.0f / (right - left));
-    inv_tb = (1.0f / (top - bottom));
-    inv_nf = (1.0f / (zNear - zFar));
+    const float sum_rl = (right + left);
+    const float sum_tb = (top + bottom);
+    const float sum_nf = (zNear + zFar);
+    const float inv_rl = (1.0f / (right - left));
+    const float inv_tb = (1.0f / (top - bottom));
+    const float inv_nf = (1.0f / (zNear - zFar));
     return Matrix4(Vector4((inv_rl + inv_rl), 0.0f, 0.0f, 0.0f),
                    Vector4(0.0f, (inv_tb + inv_tb), 0.0f, 0.0f),
                    Vector4(0.0f, 0.0f, (inv_nf + inv_nf), 0.0f),
@@ -1124,25 +1102,22 @@ inline Transform3 & Transform3::operator = (const Transform3 & tfrm)
 
 inline const Transform3 inverse(const Transform3 & tfrm)
 {
-    Vector3 tmp0, tmp1, tmp2, inv0, inv1, inv2;
-    float detinv;
-    tmp0 = cross(tfrm.getCol1(), tfrm.getCol2());
-    tmp1 = cross(tfrm.getCol2(), tfrm.getCol0());
-    tmp2 = cross(tfrm.getCol0(), tfrm.getCol1());
-    detinv = (1.0f / dot(tfrm.getCol2(), tmp2));
-    inv0 = Vector3((tmp0.getX() * detinv), (tmp1.getX() * detinv), (tmp2.getX() * detinv));
-    inv1 = Vector3((tmp0.getY() * detinv), (tmp1.getY() * detinv), (tmp2.getY() * detinv));
-    inv2 = Vector3((tmp0.getZ() * detinv), (tmp1.getZ() * detinv), (tmp2.getZ() * detinv));
+    const Vector3 tmp0 = cross(tfrm.getCol1(), tfrm.getCol2());
+    const Vector3 tmp1 = cross(tfrm.getCol2(), tfrm.getCol0());
+    const Vector3 tmp2 = cross(tfrm.getCol0(), tfrm.getCol1());
+    const float detinv = (1.0f / dot(tfrm.getCol2(), tmp2));
+    const Vector3 inv0 = Vector3((tmp0.getX() * detinv), (tmp1.getX() * detinv), (tmp2.getX() * detinv));
+    const Vector3 inv1 = Vector3((tmp0.getY() * detinv), (tmp1.getY() * detinv), (tmp2.getY() * detinv));
+    const Vector3 inv2 = Vector3((tmp0.getZ() * detinv), (tmp1.getZ() * detinv), (tmp2.getZ() * detinv));
     return Transform3(inv0, inv1, inv2,
                       Vector3((-((inv0 * tfrm.getCol3().getX()) + ((inv1 * tfrm.getCol3().getY()) + (inv2 * tfrm.getCol3().getZ()))))));
 }
 
 inline const Transform3 orthoInverse(const Transform3 & tfrm)
 {
-    Vector3 inv0, inv1, inv2;
-    inv0 = Vector3(tfrm.getCol0().getX(), tfrm.getCol1().getX(), tfrm.getCol2().getX());
-    inv1 = Vector3(tfrm.getCol0().getY(), tfrm.getCol1().getY(), tfrm.getCol2().getY());
-    inv2 = Vector3(tfrm.getCol0().getZ(), tfrm.getCol1().getZ(), tfrm.getCol2().getZ());
+    const Vector3 inv0 = Vector3(tfrm.getCol0().getX(), tfrm.getCol1().getX(), tfrm.getCol2().getX());
+    const Vector3 inv1 = Vector3(tfrm.getCol0().getY(), tfrm.getCol1().getY(), tfrm.getCol2().getY());
+    const Vector3 inv2 = Vector3(tfrm.getCol0().getZ(), tfrm.getCol1().getZ(), tfrm.getCol2().getZ());
     return Transform3(inv0, inv1, inv2,
                       Vector3((-((inv0 * tfrm.getCol3().getX()) + ((inv1 * tfrm.getCol3().getY()) + (inv2 * tfrm.getCol3().getZ()))))));
 }
@@ -1225,9 +1200,8 @@ inline const Vector3 Transform3::getTranslation() const
 
 inline const Transform3 Transform3::rotationX(float radians)
 {
-    float s, c;
-    s = sinf(radians);
-    c = cosf(radians);
+    const float s = sinf(radians);
+    const float c = cosf(radians);
     return Transform3(Vector3::xAxis(),
                       Vector3(0.0f,  c, s),
                       Vector3(0.0f, -s, c),
@@ -1236,9 +1210,8 @@ inline const Transform3 Transform3::rotationX(float radians)
 
 inline const Transform3 Transform3::rotationY(float radians)
 {
-    float s, c;
-    s = sinf(radians);
-    c = cosf(radians);
+    const float s = sinf(radians);
+    const float c = cosf(radians);
     return Transform3(Vector3(c, 0.0f, -s),
                       Vector3::yAxis(),
                       Vector3(s, 0.0f, c),
@@ -1247,9 +1220,8 @@ inline const Transform3 Transform3::rotationY(float radians)
 
 inline const Transform3 Transform3::rotationZ(float radians)
 {
-    float s, c;
-    s = sinf(radians);
-    c = cosf(radians);
+    const float s = sinf(radians);
+    const float c = cosf(radians);
     return Transform3(Vector3( c, s, 0.0f),
                       Vector3(-s, c, 0.0f),
                       Vector3::zAxis(),
@@ -1258,15 +1230,14 @@ inline const Transform3 Transform3::rotationZ(float radians)
 
 inline const Transform3 Transform3::rotationZYX(const Vector3 & radiansXYZ)
 {
-    float sX, cX, sY, cY, sZ, cZ, tmp0, tmp1;
-    sX = sinf(radiansXYZ.getX());
-    cX = cosf(radiansXYZ.getX());
-    sY = sinf(radiansXYZ.getY());
-    cY = cosf(radiansXYZ.getY());
-    sZ = sinf(radiansXYZ.getZ());
-    cZ = cosf(radiansXYZ.getZ());
-    tmp0 = (cZ * sY);
-    tmp1 = (sZ * sY);
+    const float sX = sinf(radiansXYZ.getX());
+    const float cX = cosf(radiansXYZ.getX());
+    const float sY = sinf(radiansXYZ.getY());
+    const float cY = cosf(radiansXYZ.getY());
+    const float sZ = sinf(radiansXYZ.getZ());
+    const float cZ = cosf(radiansXYZ.getZ());
+    const float tmp0 = (cZ * sY);
+    const float tmp1 = (sZ * sY);
     return Transform3(Vector3((cZ * cY), (sZ * cY), -sY),
                       Vector3(((tmp0 * sX) - (sZ * cX)), ((tmp1 * sX) + (cZ * cX)), (cY * sX)),
                       Vector3(((tmp0 * cX) + (sZ * sX)), ((tmp1 * cX) - (cZ * sX)), (cY * cX)),
@@ -1329,29 +1300,25 @@ inline const Transform3 select(const Transform3 & tfrm0, const Transform3 & tfrm
 
 inline Quat::Quat(const Matrix3 & tfrm)
 {
-    float trace, radicand, scale, xx, yx, zx, xy, yy, zy, xz, yz, zz, tmpx, tmpy, tmpz, tmpw, qx, qy, qz, qw;
-    int negTrace, ZgtX, ZgtY, YgtX;
-    int largestXorY, largestYorZ, largestZorX;
+    float xx = tfrm.getCol0().getX();
+    float yx = tfrm.getCol0().getY();
+    float zx = tfrm.getCol0().getZ();
+    float xy = tfrm.getCol1().getX();
+    float yy = tfrm.getCol1().getY();
+    float zy = tfrm.getCol1().getZ();
+    float xz = tfrm.getCol2().getX();
+    float yz = tfrm.getCol2().getY();
+    float zz = tfrm.getCol2().getZ();
 
-    xx = tfrm.getCol0().getX();
-    yx = tfrm.getCol0().getY();
-    zx = tfrm.getCol0().getZ();
-    xy = tfrm.getCol1().getX();
-    yy = tfrm.getCol1().getY();
-    zy = tfrm.getCol1().getZ();
-    xz = tfrm.getCol2().getX();
-    yz = tfrm.getCol2().getY();
-    zz = tfrm.getCol2().getZ();
+    const float trace = ((xx + yy) + zz);
 
-    trace = ((xx + yy) + zz);
-
-    negTrace = (trace < 0.0f);
-    ZgtX = zz > xx;
-    ZgtY = zz > yy;
-    YgtX = yy > xx;
-    largestXorY = (!ZgtX || !ZgtY) && negTrace;
-    largestYorZ = ( YgtX ||  ZgtX) && negTrace;
-    largestZorX = ( ZgtY || !YgtX) && negTrace;
+    const int negTrace = (trace < 0.0f);
+    const int ZgtX = zz > xx;
+    const int ZgtY = zz > yy;
+    const int YgtX = yy > xx;
+    const int largestXorY = (!ZgtX || !ZgtY) && negTrace;
+    const int largestYorZ = ( YgtX ||  ZgtX) && negTrace;
+    const int largestZorX = ( ZgtY || !YgtX) && negTrace;
 
     if (largestXorY)
     {
@@ -1369,17 +1336,17 @@ inline Quat::Quat(const Matrix3 & tfrm)
         zx = -zx;
     }
 
-    radicand = (((xx + yy) + zz) + 1.0f);
-    scale = (0.5f * (1.0f / sqrtf(radicand)));
+    const float radicand = (((xx + yy) + zz) + 1.0f);
+    const float scale = (0.5f * (1.0f / sqrtf(radicand)));
 
-    tmpx = ((zy - yz) * scale);
-    tmpy = ((xz - zx) * scale);
-    tmpz = ((yx - xy) * scale);
-    tmpw = (radicand * scale);
-    qx = tmpx;
-    qy = tmpy;
-    qz = tmpz;
-    qw = tmpw;
+    float tmpx = ((zy - yz) * scale);
+    const float tmpy = ((xz - zx) * scale);
+    float tmpz = ((yx - xy) * scale);
+    const float tmpw = (radicand * scale);
+    float qx = tmpx;
+    float qy = tmpy;
+    float qz = tmpz;
+    float qw = tmpw;
 
     if (largestXorY)
     {

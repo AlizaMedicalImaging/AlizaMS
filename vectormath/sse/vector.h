@@ -176,19 +176,18 @@ inline const Vector3 slerp(float t, const Vector3 & unitVec0, const Vector3 & un
 
 inline const Vector3 slerp(const FloatInVec & t, const Vector3 & unitVec0, const Vector3 & unitVec1)
 {
-    __m128 scales, scale0, scale1, cosAngle, angle, tttt, oneMinusT, angles, sines;
-    cosAngle = sseVecDot3(unitVec0.get128(), unitVec1.get128());
-    __m128 selectMask = _mm_cmpgt_ps(_mm_set1_ps(VECTORMATH_SLERP_TOL), cosAngle);
-    angle = sseACosf(cosAngle);
-    tttt = t.get128();
-    oneMinusT = _mm_sub_ps(_mm_set1_ps(1.0f), tttt);
-    angles = _mm_unpacklo_ps(_mm_set1_ps(1.0f), tttt); // angles = 1, t, 1, t
-    angles = _mm_unpacklo_ps(angles, oneMinusT);       // angles = 1, 1-t, t, 1-t
+    const __m128 cosAngle = sseVecDot3(unitVec0.get128(), unitVec1.get128());
+    const __m128 selectMask = _mm_cmpgt_ps(_mm_set1_ps(VECTORMATH_SLERP_TOL), cosAngle);
+    const __m128 angle = sseACosf(cosAngle);
+    const __m128 tttt = t.get128();
+    const __m128 oneMinusT = _mm_sub_ps(_mm_set1_ps(1.0f), tttt);
+    __m128 angles = _mm_unpacklo_ps(_mm_set1_ps(1.0f), tttt); // angles = 1, t,   1, t
+    angles = _mm_unpacklo_ps(angles, oneMinusT);              // angles = 1, 1-t, t, 1-t
     angles = _mm_mul_ps(angles, angle);
-    sines = sseSinf(angles);
-    scales = _mm_div_ps(sines, sseSplat(sines, 0));
-    scale0 = sseSelect(oneMinusT, sseSplat(scales, 1), selectMask);
-    scale1 = sseSelect(tttt, sseSplat(scales, 2), selectMask);
+    const __m128 sines = sseSinf(angles);
+    const __m128 scales = _mm_div_ps(sines, sseSplat(sines, 0));
+    const __m128 scale0 = sseSelect(oneMinusT, sseSplat(scales, 1), selectMask);
+    const __m128 scale1 = sseSelect(tttt, sseSplat(scales, 2), selectMask);
     return Vector3(sseMAdd(unitVec0.get128(), scale0, _mm_mul_ps(unitVec1.get128(), scale1)));
 }
 
@@ -199,10 +198,10 @@ inline __m128 Vector3::get128() const
 
 inline void storeXYZ(const Vector3 & vec, __m128 * quad)
 {
-    VECTORMATH_ALIGNED(float sw[4]) = { 0.0f, 0.0f, 0.0f, bit_cast_uint2float(0xFFFFFFFF) };
-    __m128 select_w = _mm_load_ps(sw);
+    static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+    VECTORMATH_ALIGNED(const float sw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
     __m128 dstVec = *quad;
-    dstVec = sseSelect(vec.get128(), dstVec, select_w);
+    dstVec = sseSelect(vec.get128(), dstVec, _mm_load_ps(sw));
     *quad = dstVec;
 }
 
@@ -217,16 +216,14 @@ inline void loadXYZArray(Vector3 & vec0, Vector3 & vec1, Vector3 & vec2, Vector3
 
 inline void storeXYZArray(const Vector3 & vec0, const Vector3 & vec1, const Vector3 & vec2, const Vector3 & vec3, __m128 * threeQuads)
 {
-    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
-    VECTORMATH_ALIGNED(float xsw_[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
-    VECTORMATH_ALIGNED(float zsw_[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
-    __m128 xsw = _mm_load_ps(xsw_);
-    __m128 zsw = _mm_load_ps(zsw_);
-    __m128 xxxx = _mm_shuffle_ps(vec1.get128(), vec1.get128(), _MM_SHUFFLE(0, 0, 0, 0));
-    __m128 zzzz = _mm_shuffle_ps(vec2.get128(), vec2.get128(), _MM_SHUFFLE(2, 2, 2, 2));
-    threeQuads[0] = sseSelect(vec0.get128(), xxxx, xsw);
+    static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+    VECTORMATH_ALIGNED(const float xsw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
+    VECTORMATH_ALIGNED(const float zsw[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
+    const __m128 xxxx = _mm_shuffle_ps(vec1.get128(), vec1.get128(), _MM_SHUFFLE(0, 0, 0, 0));
+    const __m128 zzzz = _mm_shuffle_ps(vec2.get128(), vec2.get128(), _MM_SHUFFLE(2, 2, 2, 2));
+    threeQuads[0] = sseSelect(vec0.get128(), xxxx, _mm_load_ps(xsw));
     threeQuads[1] = _mm_shuffle_ps(vec1.get128(), vec2.get128(), _MM_SHUFFLE(1, 0, 2, 1));
-    threeQuads[2] = sseSelect(_mm_shuffle_ps(vec3.get128(), vec3.get128(), _MM_SHUFFLE(2, 1, 0, 3)), zzzz, zsw);
+    threeQuads[2] = sseSelect(_mm_shuffle_ps(vec3.get128(), vec3.get128(), _MM_SHUFFLE(2, 1, 0, 3)), zzzz, _mm_load_ps(zsw));
 }
 
 inline Vector3 & Vector3::operator = (const Vector3 & vec)
@@ -606,19 +603,18 @@ inline const Vector4 slerp(float t, const Vector4 & unitVec0, const Vector4 & un
 
 inline const Vector4 slerp(const FloatInVec & t, const Vector4 & unitVec0, const Vector4 & unitVec1)
 {
-    __m128 scales, scale0, scale1, cosAngle, angle, tttt, oneMinusT, angles, sines;
-    cosAngle = sseVecDot4(unitVec0.get128(), unitVec1.get128());
-    __m128 selectMask = _mm_cmpgt_ps(_mm_set1_ps(VECTORMATH_SLERP_TOL), cosAngle);
-    angle = sseACosf(cosAngle);
-    tttt = t.get128();
-    oneMinusT = _mm_sub_ps(_mm_set1_ps(1.0f), tttt);
-    angles = _mm_unpacklo_ps(_mm_set1_ps(1.0f), tttt); // angles = 1, t, 1, t
-    angles = _mm_unpacklo_ps(angles, oneMinusT);       // angles = 1, 1-t, t, 1-t
+    const __m128 cosAngle = sseVecDot4(unitVec0.get128(), unitVec1.get128());
+    const __m128 selectMask = _mm_cmpgt_ps(_mm_set1_ps(VECTORMATH_SLERP_TOL), cosAngle);
+    const __m128 angle = sseACosf(cosAngle);
+    const __m128 tttt = t.get128();
+    const __m128 oneMinusT = _mm_sub_ps(_mm_set1_ps(1.0f), tttt);
+    __m128 angles = _mm_unpacklo_ps(_mm_set1_ps(1.0f), tttt); // angles = 1, t,   1, t
+    angles = _mm_unpacklo_ps(angles, oneMinusT);              // angles = 1, 1-t, t, 1-t
     angles = _mm_mul_ps(angles, angle);
-    sines = sseSinf(angles);
-    scales = _mm_div_ps(sines, sseSplat(sines, 0));
-    scale0 = sseSelect(oneMinusT, sseSplat(scales, 1), selectMask);
-    scale1 = sseSelect(tttt, sseSplat(scales, 2), selectMask);
+    const __m128 sines = sseSinf(angles);
+    const __m128 scales = _mm_div_ps(sines, sseSplat(sines, 0));
+    const __m128 scale0 = sseSelect(oneMinusT, sseSplat(scales, 1), selectMask);
+    const __m128 scale1 = sseSelect(tttt, sseSplat(scales, 2), selectMask);
     return Vector4(sseMAdd(unitVec0.get128(), scale0, _mm_mul_ps(unitVec1.get128(), scale1)));
 }
 
@@ -635,7 +631,8 @@ inline Vector4 & Vector4::operator = (const Vector4 & vec)
 
 inline Vector4 & Vector4::setXYZ(const Vector3 & vec)
 {
-    VECTORMATH_ALIGNED(float sw[4]) = { 0.0f, 0.0f, 0.0f, bit_cast_uint2float(0xFFFFFFFF) };
+    static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+    VECTORMATH_ALIGNED(float sw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
     mVec128 = sseSelect(vec.get128(), mVec128, _mm_load_ps(sw));
     return *this;
 }
@@ -966,7 +963,7 @@ inline __m128 Point3::get128() const
 
 inline void storeXYZ(const Point3 & pnt, __m128 * quad)
 {
-    VECTORMATH_ALIGNED(float sw[4]) = { 0.0f, 0.0f, 0.0f, bit_cast_uint2float(0xFFFFFFFF) };
+    VECTORMATH_ALIGNED(const float sw[4]) = { 0.0f, 0.0f, 0.0f, bit_cast_uint2float(0xFFFFFFFF) };
     __m128 dstVec = *quad;
     dstVec = sseSelect(pnt.get128(), dstVec, _mm_load_ps(sw));
     *quad = dstVec;
@@ -983,16 +980,14 @@ inline void loadXYZArray(Point3 & pnt0, Point3 & pnt1, Point3 & pnt2, Point3 & p
 
 inline void storeXYZArray(const Point3 & pnt0, const Point3 & pnt1, const Point3 & pnt2, const Point3 & pnt3, __m128 * threeQuads)
 {
-    const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
-    VECTORMATH_ALIGNED(float xsw_[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
-    VECTORMATH_ALIGNED(float zsw_[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
-    __m128 xsw = _mm_load_ps(xsw_);
-    __m128 zsw = _mm_load_ps(zsw_);
-    __m128 xxxx = _mm_shuffle_ps(pnt1.get128(), pnt1.get128(), _MM_SHUFFLE(0, 0, 0, 0));
-    __m128 zzzz = _mm_shuffle_ps(pnt2.get128(), pnt2.get128(), _MM_SHUFFLE(2, 2, 2, 2));
-    threeQuads[0] = sseSelect(pnt0.get128(), xxxx, xsw);
+    static const float ffffffff = bit_cast_uint2float(0xFFFFFFFF);
+    VECTORMATH_ALIGNED(const float xsw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
+    VECTORMATH_ALIGNED(const float zsw[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
+    const __m128 xxxx = _mm_shuffle_ps(pnt1.get128(), pnt1.get128(), _MM_SHUFFLE(0, 0, 0, 0));
+    const __m128 zzzz = _mm_shuffle_ps(pnt2.get128(), pnt2.get128(), _MM_SHUFFLE(2, 2, 2, 2));
+    threeQuads[0] = sseSelect(pnt0.get128(), xxxx, _mm_load_ps(xsw));
     threeQuads[1] = _mm_shuffle_ps(pnt1.get128(), pnt2.get128(), _MM_SHUFFLE(1, 0, 2, 1));
-    threeQuads[2] = sseSelect(_mm_shuffle_ps(pnt3.get128(), pnt3.get128(), _MM_SHUFFLE(2, 1, 0, 3)), zzzz, zsw);
+    threeQuads[2] = sseSelect(_mm_shuffle_ps(pnt3.get128(), pnt3.get128(), _MM_SHUFFLE(2, 1, 0, 3)), zzzz, _mm_load_ps(zsw));
 }
 
 inline Point3 & Point3::operator = (const Point3 & pnt)

@@ -30,7 +30,7 @@
 #ifndef VECTORMATH_SSE_INTERNAL_HPP
 #define VECTORMATH_SSE_INTERNAL_HPP
 
-#include "string.h"
+#include "cstring"
 
 namespace Vectormath
 {
