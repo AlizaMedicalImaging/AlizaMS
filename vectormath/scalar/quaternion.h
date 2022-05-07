@@ -39,6 +39,16 @@ namespace Scalar
 // Quat
 // ========================================================
 
+inline Quat::Quat()
+{
+#ifdef VECTORMATH_SCALAR_ALWAYS_INITIALIZE
+  mX = 0.0f;
+  mY = 0.0f;
+  mZ = 0.0f;
+  mW = 0.0f;
+#endif
+}
+
 inline Quat::Quat(const Quat & quat)
 {
   mX = quat.mX;

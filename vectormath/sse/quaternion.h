@@ -39,6 +39,13 @@ namespace SSE
 // Quat
 // ========================================================
 
+inline Quat::Quat()
+{
+#ifdef VECTORMATH_SSE_ALWAYS_INITIALIZE
+  mVec128 = _mm_setzero_ps();
+#endif
+}
+
 inline Quat::Quat(float _x, float _y, float _z, float _w)
 {
   mVec128 = _mm_setr_ps(_x, _y, _z, _w);

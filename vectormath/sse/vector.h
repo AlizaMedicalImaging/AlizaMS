@@ -113,6 +113,13 @@ inline FloatInVec VecIdx::operator -= (const FloatInVec & scalar)
 // Vector3
 // ========================================================
 
+inline Vector3::Vector3()
+{
+#ifdef VECTORMATH_SSE_ALWAYS_INITIALIZE
+  mVec128 = _mm_setzero_ps();
+#endif
+}
+
 inline Vector3::Vector3(float _x, float _y, float _z)
 {
   mVec128 = _mm_setr_ps(_x, _y, _z, 0.0f);
@@ -510,6 +517,13 @@ inline const Vector3 select(const Vector3 & vec0, const Vector3 & vec1, const Bo
 // ========================================================
 // Vector4
 // ========================================================
+
+inline Vector4::Vector4()
+{
+#ifdef VECTORMATH_SSE_ALWAYS_INITIALIZE
+  mVec128 = _mm_setzero_ps();
+#endif
+}
 
 inline Vector4::Vector4(float _x, float _y, float _z, float _w)
 {
@@ -920,6 +934,13 @@ inline const Vector4 select(const Vector4 & vec0, const Vector4 & vec1, const Bo
 // ========================================================
 // Point3
 // ========================================================
+
+inline Point3::Point3()
+{
+#ifdef VECTORMATH_SSE_ALWAYS_INITIALIZE
+  mVec128 = _mm_setzero_ps();
+#endif
+}
 
 inline Point3::Point3(float _x, float _y, float _z)
 {

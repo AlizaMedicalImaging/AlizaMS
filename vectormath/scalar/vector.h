@@ -42,11 +42,24 @@ static const float VECTORMATHSC_SLERP_TOL = 0.999f;
 // Vector3
 // ========================================================
 
+inline Vector3::Vector3()
+{
+#ifdef VECTORMATH_SCALAR_ALWAYS_INITIALIZE
+  mX = 0.0f;
+  mY = 0.0f;
+  mZ = 0.0f;
+  mW = 0.0f;
+#endif
+}
+
 inline Vector3::Vector3(const Vector3 & vec)
 {
   mX = vec.mX;
   mY = vec.mY;
   mZ = vec.mZ;
+#ifdef VECTORMATH_SCALAR_ALWAYS_INITIALIZE
+  mW = 0.0f;
+#endif
 }
 
 inline Vector3::Vector3(float _x, float _y, float _z)
@@ -54,6 +67,9 @@ inline Vector3::Vector3(float _x, float _y, float _z)
   mX = _x;
   mY = _y;
   mZ = _z;
+#ifdef VECTORMATH_SCALAR_ALWAYS_INITIALIZE
+  mW = 0.0f;
+#endif
 }
 
 inline Vector3::Vector3(const Point3 & pnt)
@@ -61,6 +77,9 @@ inline Vector3::Vector3(const Point3 & pnt)
   mX = pnt.getX();
   mY = pnt.getY();
   mZ = pnt.getZ();
+#ifdef VECTORMATH_SCALAR_ALWAYS_INITIALIZE
+  mW = 0.0f;
+#endif
 }
 
 inline Vector3::Vector3(float scalar)
@@ -68,6 +87,9 @@ inline Vector3::Vector3(float scalar)
   mX = scalar;
   mY = scalar;
   mZ = scalar;
+#ifdef VECTORMATH_SCALAR_ALWAYS_INITIALIZE
+  mW = 0.0f;
+#endif
 }
 
 inline const Vector3 Vector3::xAxis()
@@ -369,6 +391,16 @@ inline const Vector3 select(const Vector3 & vec0, const Vector3 & vec1, bool sel
 // ========================================================
 // Vector4
 // ========================================================
+
+inline Vector4::Vector4()
+{
+#ifdef VECTORMATH_SCALAR_ALWAYS_INITIALIZE
+  mX = 0.0f;
+  mY = 0.0f;
+  mZ = 0.0f;
+  mW = 0.0f;
+#endif
+}
 
 inline Vector4::Vector4(const Vector4 & vec)
 {
@@ -776,11 +808,24 @@ inline const Vector4 select(const Vector4 & vec0, const Vector4 & vec1, bool sel
 // Point3
 // ========================================================
 
+inline Point3::Point3()
+{
+#ifdef VECTORMATH_SCALAR_ALWAYS_INITIALIZE
+  mX = 0.0f;
+  mY = 0.0f;
+  mZ = 0.0f;
+  mW = 0.0f;
+#endif
+}
+
 inline Point3::Point3(const Point3 & pnt)
 {
   mX = pnt.mX;
   mY = pnt.mY;
   mZ = pnt.mZ;
+#ifdef VECTORMATH_SCALAR_ALWAYS_INITIALIZE
+  mW = 0.0f;
+#endif
 }
 
 inline Point3::Point3(float _x, float _y, float _z)
@@ -788,6 +833,9 @@ inline Point3::Point3(float _x, float _y, float _z)
   mX = _x;
   mY = _y;
   mZ = _z;
+#ifdef VECTORMATH_SCALAR_ALWAYS_INITIALIZE
+  mW = 0.0f;
+#endif
 }
 
 inline Point3::Point3(const Vector3 & vec)
@@ -795,6 +843,9 @@ inline Point3::Point3(const Vector3 & vec)
   mX = vec.getX();
   mY = vec.getY();
   mZ = vec.getZ();
+#ifdef VECTORMATH_SCALAR_ALWAYS_INITIALIZE
+  mW = 0.0f;
+#endif
 }
 
 inline Point3::Point3(float scalar)
@@ -802,6 +853,9 @@ inline Point3::Point3(float scalar)
   mX = scalar;
   mY = scalar;
   mZ = scalar;
+#ifdef VECTORMATH_SCALAR_ALWAYS_INITIALIZE
+  mW = 0.0f;
+#endif
 }
 
 inline const Point3 lerp(float t, const Point3 & pnt0, const Point3 & pnt1)

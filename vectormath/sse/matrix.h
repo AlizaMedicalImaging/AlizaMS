@@ -39,6 +39,10 @@ namespace SSE
 // Matrix3
 // ========================================================
 
+inline Matrix3::Matrix3()
+{
+}
+
 inline Matrix3::Matrix3(const Matrix3 & mat)
 {
   mCol0 = mat.mCol0;
@@ -515,6 +519,10 @@ inline const Matrix3 select(const Matrix3 & mat0, const Matrix3 & mat1, const Bo
 // ========================================================
 // Matrix4
 // ========================================================
+
+inline Matrix4::Matrix4()
+{
+}
 
 inline Matrix4::Matrix4(const Matrix4 & mat)
 {
@@ -1355,6 +1363,10 @@ inline const Matrix4 select(const Matrix4 & mat0, const Matrix4 & mat1, const Bo
 // ========================================================
 // Transform3
 // ========================================================
+
+inline Transform3::Transform3()
+{
+}
 
 inline Transform3::Transform3(const Transform3 & tfrm)
 {
