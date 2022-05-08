@@ -36,7 +36,7 @@
 // as defect with some analysing tool.
 #define VECTORMATH_SSE_ALWAYS_INITIALIZE
 
-// C++20, otherwise use own implementation
+// 'std::bit_cast' is available in C++20, otherwise use own implementation
 //#define VECTORMATH_SSE_USE_STD_BIT_CAST
 
 #include <cmath>
@@ -129,7 +129,7 @@ public:
 
   // Set the w element of a padded 3-D vector
   // NOTE:
-  // You are free to use the additional w component - if never set, it's value is undefined.
+  // You are free to use the additional w component
   inline Vector3 & setW(float w);
 
   // Set the x element of a 3-D vector (scalar data contained in vector data type)
@@ -143,7 +143,7 @@ public:
 
   // Set the w element of a padded 3-D vector
   // NOTE:
-  // You are free to use the additional w component - if never set, it's value is undefined.
+  // You are free to use the additional w component
   inline Vector3 & setW(const FloatInVec & w);
 
   // Get the x element of a 3-D vector
@@ -157,7 +157,7 @@ public:
 
   // Get the w element of a padded 3-D vector
   // NOTE:
-  // You are free to use the additional w component - if never set, it's value is undefined.
+  // You are free to use the additional w component
   inline const FloatInVec getW() const;
 
   // Set an x, y, or z element of a 3-D vector by index
@@ -648,7 +648,7 @@ public:
 
   // Set the w element of a padded 3-D point
   // NOTE:
-  // You are free to use the additional w component - if never set, it's value is undefined.
+  // You are free to use the additional w component
   inline Point3 & setW(float w);
 
   // Set the x element of a 3-D point (scalar data contained in vector data type)
@@ -662,7 +662,7 @@ public:
 
   // Set the w element of a padded 3-D point
   // NOTE:
-  // You are free to use the additional w component - if never set, it's value is undefined.
+  // You are free to use the additional w component
   inline Point3 & setW(const FloatInVec & w);
 
   // Get the x element of a 3-D point
@@ -676,7 +676,7 @@ public:
 
   // Get the w element of a padded 3-D point
   // NOTE:
-  // You are free to use the additional w component - if never set, it's value is undefined.
+  // You are free to use the additional w component
   inline const FloatInVec getW() const;
 
   // Set an x, y, or z element of a 3-D point by index
