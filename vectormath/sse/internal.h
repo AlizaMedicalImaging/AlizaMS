@@ -269,8 +269,8 @@ static inline void sseSinfCosf(SSEFloat4V x, SSEFloat4V * s, SSEFloat4V * c)
 
   // Use the cosine when the offset is odd and the sin
   // when the offset is even
-  SSEUint4V sinMask = (SSEUint4V)_mm_cmpeq_ps(_mm_and_ps(offsetSin, sseUintToM128(0x1)), _mm_setzero_ps());
-  SSEUint4V cosMask = (SSEUint4V)_mm_cmpeq_ps(_mm_and_ps(offsetCos, sseUintToM128(0x1)), _mm_setzero_ps());
+  SSEUint4V sinMask = (SSEUint4V)_mm_cmpeq_ps(_mm_and_ps(offsetSin, sseUintToM128(0x1U)), _mm_setzero_ps());
+  SSEUint4V cosMask = (SSEUint4V)_mm_cmpeq_ps(_mm_and_ps(offsetCos, sseUintToM128(0x1U)), _mm_setzero_ps());
   *s = sseSelect(cx, sx, sinMask);
   *c = sseSelect(cx, sx, cosMask);
 

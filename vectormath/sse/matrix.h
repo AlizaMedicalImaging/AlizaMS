@@ -695,7 +695,7 @@ inline const Matrix4 transpose(const Matrix4 & mat)
 
 inline const Matrix4 inverse(const Matrix4 & mat)
 {
-  static const float f0x80000000 = bit_cast_uint2float(0x80000000);
+  static const float f0x80000000 = bit_cast_uint2float(0x80000000U);
   VECTORMATH_ALIGNED(const float PNPN[4]) = { 0.0f, f0x80000000, 0.0f, f0x80000000 };
   VECTORMATH_ALIGNED(const float NPNP[4]) = { f0x80000000, 0.0f, f0x80000000, 0.0f };
   VECTORMATH_ALIGNED(const float one) = 1.0f;
