@@ -60,11 +60,9 @@ public:
   inline BoolInVec() { }
 
   // matches standard type conversions
-  //
   inline BoolInVec(const FloatInVec & vec);
 
   // explicit cast from bool
-  //
   explicit inline BoolInVec(bool scalar);
 
 #ifdef VECTORMATH_NO_SCALAR_CAST

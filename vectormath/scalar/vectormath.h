@@ -70,7 +70,7 @@ private:
 
 public:
 
-  // Default constructor; does no initialization
+  // Default constructor
   inline Vector3();
 
   // Copy a 3-D vector
@@ -99,7 +99,7 @@ public:
 
   // Set the w element of a padded 3-D vector
   // NOTE:
-  // You are free to use the additional w component - if never set, it's value is undefined.
+  // You are free to use the additional w component
   inline Vector3 & setW(float w);
 
   // Get the x element of a 3-D vector
@@ -113,7 +113,7 @@ public:
 
   // Get the w element of a padded 3-D vector
   // NOTE:
-  // You are free to use the additional w component - if never set, it's value is undefined.
+  // You are free to use the additional w component
   inline float getW() const;
 
   // Set an x, y, or z element of a 3-D vector by index
@@ -276,7 +276,7 @@ private:
 
 public:
 
-  // Default constructor; does no initialization
+  // Default constructor
   inline Vector4();
 
   // Copy a 4-D vector
@@ -481,7 +481,7 @@ private:
 
 public:
 
-  // Default constructor; does no initialization
+  // Default constructor
   inline Point3();
 
   // Copy a 3-D point
@@ -510,7 +510,7 @@ public:
 
   // Set the w element of a padded 3-D point
   // NOTE:
-  // You are free to use the additional w component - if never set, it's value is undefined.
+  // You are free to use the additional w component
   inline Point3 & setW(float w);
 
   // Get the x element of a 3-D point
@@ -524,7 +524,7 @@ public:
 
   // Get the w element of a padded 3-D point
   // NOTE:
-  // You are free to use the additional w component - if never set, it's value is undefined.
+  // You are free to use the additional w component
   inline float getW() const;
 
   // Set an x, y, or z element of a 3-D point by index
@@ -644,7 +644,7 @@ private:
 
 public:
 
-  // Default constructor; does no initialization
+  // Default constructor
   inline Quat();
 
   // Copy a quaternion
@@ -821,8 +821,8 @@ private:
 
 public:
 
-  // Default constructor; does no initialization
-  inline Matrix3();
+  // Default constructor
+  inline Matrix3() {}
 
   // Copy a 3x3 matrix
   inline Matrix3(const Matrix3 & mat);
@@ -985,8 +985,8 @@ private:
 
 public:
 
-  // Default constructor; does no initialization
-  inline Matrix4();
+  // Default constructor
+  inline Matrix4() {}
 
   // Copy a 4x4 matrix
   inline Matrix4(const Matrix4 & mat);
@@ -1214,8 +1214,8 @@ private:
 
 public:
 
-  // Default constructor; does no initialization
-  inline Transform3();
+  // Default constructor
+  inline Transform3()
 
   // Copy a 3x4 transformation matrix
   inline Transform3(const Transform3 & tfrm);
