@@ -30,11 +30,14 @@
 #ifndef VECTORMATH_SSE_VECTORMATH_HPP
 #define VECTORMATH_SSE_VECTORMATH_HPP
 
-// Initialize values in default constructor to zero,
-// it is not required it costs addional operation,
+// Initialize values in default constructors to zero,
+// it is not required and costs addional operations,
 // but otherwise unitialized members will be reported
 // as defect with some analysing tool.
 #define VECTORMATH_SSE_ALWAYS_INITIALIZE
+
+// C++20, otherwise use own implementation
+//#define VECTORMATH_SSE_USE_STD_BIT_CAST
 
 #include <cmath>
 #include <xmmintrin.h>

@@ -30,10 +30,11 @@
 #ifndef VECTORMATH_SSE_INTERNAL_HPP
 #define VECTORMATH_SSE_INTERNAL_HPP
 
-#include "cstring"
-#if 0
+#ifdef VECTORMATH_SSE_USE_STD_BIT_CAST
 // C++20
 #include <bit>
+#else
+#include "cstring"
 #endif
 
 namespace Vectormath
@@ -66,15 +67,14 @@ static inline __m128 sseUnitVec0001() { return _mm_setr_ps(0.0f, 0.0f, 0.0f, 1.0
 
 static inline float bit_cast_uint2float(unsigned int i)
 {
-#if 1
+#ifdef VECTORMATH_SSE_USE_STD_BIT_CAST
+  return std::bit_cast<float>(i);
+#else
   static_assert(sizeof(unsigned int) == 4);
   static_assert(sizeof(float) == 4);
   float f;
   memcpy(&f, &i, 4);
   return f;
-#else
-  // C++20, defined in header <bit>
-  return bit_cast<float>(i);
 #endif
 }
 

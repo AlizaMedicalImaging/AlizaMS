@@ -31,6 +31,9 @@
 #define VECTORMATH_SSE_BOOLINVEC_HPP
 
 #include "internal.h"
+#ifdef VECTORMATH_SSE_USE_STD_BIT_CAST
+#include "cstring"
+#endif
 
 namespace Vectormath
 {
@@ -158,9 +161,9 @@ inline bool BoolInVec::getAsBool() const
 inline BoolInVec::operator bool() const
 #endif
 {
-  static_assert(sizeof(bool) == 1);
+  static_assert(sizeof(bool) == 1); // just to check, probably not required
   VECTORMATH_ALIGNED(bool b);
-  memcpy(&b, &mData, 1);
+  memcpy(&b, &mData, sizeof(bool));
   return b;
 }
 
