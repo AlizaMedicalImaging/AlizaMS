@@ -1215,7 +1215,7 @@ private:
 public:
 
   // Default constructor
-  inline Transform3()
+  inline Transform3() {}
 
   // Copy a 3x4 transformation matrix
   inline Transform3(const Transform3 & tfrm);
