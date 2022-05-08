@@ -31,7 +31,7 @@
 #define VECTORMATHSC_SCALAR_VECTORMATHSC_HPP
 
 // Initialize values in default constructor to zero,
-// it is not required it costs addional operation,
+// it is not required it costs addional operations,
 // but otherwise unitialized members will be reported
 // as defect with some analysing tool.
 #define VECTORMATH_SCALAR_ALWAYS_INITIALIZE

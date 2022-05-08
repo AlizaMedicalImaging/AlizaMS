@@ -1445,8 +1445,7 @@ inline Transform3 & Transform3::setElem(int col, int row, float val)
 
 inline Transform3 & Transform3::setElem(int col, int row, const FloatInVec & val)
 {
-  Vector3 tmpV3_0;
-  tmpV3_0 = this->getCol(col);
+  Vector3 tmpV3_0 = this->getCol(col);
   tmpV3_0.setElem(row, val);
   this->setCol(col, tmpV3_0);
   return *this;
@@ -1564,10 +1563,11 @@ inline const Transform3 orthoInverse(const Transform3 & tfrm)
 
 inline const Transform3 absPerElem(const Transform3 & tfrm)
 {
-  return Transform3(absPerElem(tfrm.getCol0()),
-      absPerElem(tfrm.getCol1()),
-      absPerElem(tfrm.getCol2()),
-      absPerElem(tfrm.getCol3()));
+  return Transform3(
+    absPerElem(tfrm.getCol0()),
+    absPerElem(tfrm.getCol1()),
+    absPerElem(tfrm.getCol2()),
+    absPerElem(tfrm.getCol3()));
 }
 
 inline const Vector3 Transform3::operator * (const Vector3 & vec) const

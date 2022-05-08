@@ -179,7 +179,7 @@ static inline __m128 sseACosf(__m128 x)
   const __m128 result = sseMAdd(hi, xabs4, lo);
 
   // Adjust the result if x is negative.
-  return sseSelect(_mm_mul_ps(t1, result),               // Positive
+  return sseSelect(_mm_mul_ps(t1, result),                     // Positive
            sseMSub(t1, result, _mm_set1_ps(3.1415926535898f)), // Negative
            select);
 }
@@ -225,7 +225,7 @@ static inline __m128 sseSinf(SSEFloat4V x)
 
   // Flip the sign of the result when (offset mod 4) = 1 or 2
   return sseSelect(_mm_xor_ps(sseUintToM128(0x80000000U), res), // Negative
-           res,                     // Positive
+           res,                                                 // Positive
            _mm_cmpeq_ps(_mm_and_ps(offset, sseUintToM128(0x2U)), _mm_setzero_ps()));
 }
 
