@@ -117,8 +117,7 @@ inline Matrix3 & Matrix3::setRow(int row, const Vector3 & vec)
 
 inline Matrix3 & Matrix3::setElem(int col, int row, float val)
 {
-  Vector3 tmpV3_0;
-  tmpV3_0 = this->getCol(col);
+  Vector3 tmpV3_0 = this->getCol(col);
   tmpV3_0.setElem(row, val);
   this->setCol(col, tmpV3_0);
   return *this;
@@ -423,8 +422,7 @@ inline Matrix4::Matrix4(const Matrix3 & mat, const Vector3 & translateVec)
 
 inline Matrix4::Matrix4(const Quat & unitQuat, const Vector3 & translateVec)
 {
-  Matrix3 mat;
-  mat = Matrix3(unitQuat);
+  Matrix3 mat = Matrix3(unitQuat);
   mCol0 = Vector4(mat.getCol0(), 0.0f);
   mCol1 = Vector4(mat.getCol1(), 0.0f);
   mCol2 = Vector4(mat.getCol2(), 0.0f);
@@ -1074,8 +1072,7 @@ inline Transform3 & Transform3::setRow(int row, const Vector4 & vec)
 
 inline Transform3 & Transform3::setElem(int col, int row, float val)
 {
-  Vector3 tmpV3_0;
-  tmpV3_0 = this->getCol(col);
+  Vector3 tmpV3_0 = this->getCol(col);
   tmpV3_0.setElem(row, val);
   this->setCol(col, tmpV3_0);
   return *this;
