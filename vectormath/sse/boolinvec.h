@@ -32,7 +32,7 @@
 
 #include "internal.h"
 #ifdef VECTORMATH_SSE_USE_STD_BIT_CAST
-#include "cstring"
+#include <cstring>
 #endif
 
 namespace Vectormath
@@ -71,7 +71,7 @@ public:
 #else
   // implicit cast to bool
   inline operator bool() const;
-#endif // VECTORMATH_NO_SCALAR_CAST
+#endif
 
   // get vector data
   // bool value is splatted across all word slots of vector as 0 (false) or -1 (true)

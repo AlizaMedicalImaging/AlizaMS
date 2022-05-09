@@ -68,7 +68,7 @@ public:
 #else
   // implicit cast to float
   inline operator float() const;
-#endif // VECTORMATH_NO_SCALAR_CAST
+#endif
 
   // get vector data
   // float value is splatted across all word slots of vector

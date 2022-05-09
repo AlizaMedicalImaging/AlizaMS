@@ -34,7 +34,7 @@
 // C++20
 #include <bit>
 #else
-#include "cstring"
+#include <cstring>
 #endif
 
 namespace Vectormath
@@ -59,12 +59,17 @@ static const float VECTORMATH_SINCOS_SC2 = -0.1666665247f;
 static const float VECTORMATH_SINCOS_KC1 =  1.57079625129f;
 static const float VECTORMATH_SINCOS_KC2 =  7.54978995489e-8f;
 
+// ========================================================
+// Internal helper types and functions
+// ========================================================
+
 // Shorthand functions to get the unit vectors as __m128
 static inline __m128 sseUnitVec1000() { return _mm_setr_ps(1.0f, 0.0f, 0.0f, 0.0f); }
 static inline __m128 sseUnitVec0100() { return _mm_setr_ps(0.0f, 1.0f, 0.0f, 0.0f); }
 static inline __m128 sseUnitVec0010() { return _mm_setr_ps(0.0f, 0.0f, 1.0f, 0.0f); }
 static inline __m128 sseUnitVec0001() { return _mm_setr_ps(0.0f, 0.0f, 0.0f, 1.0f); }
 
+// Bit cast unsigned int into float
 static inline float bit_cast_uint2float(unsigned int i)
 {
 #ifdef VECTORMATH_SSE_USE_STD_BIT_CAST
@@ -78,10 +83,6 @@ static inline float bit_cast_uint2float(unsigned int i)
 #endif
 }
 
-// ========================================================
-// Internal helper types and functions
-// ========================================================
-
 typedef __m128 SSEFloat4V;
 typedef __m128 SSEUint4V;
 typedef __m128 SSEInt4V;
@@ -92,9 +93,9 @@ VECTORMATH_ALIGNED_TYPE_PRE union SSEFloat
   float f[4];
 } VECTORMATH_ALIGNED_TYPE_POST;
 
-// _MM_SHUFFLE() requires compile-time constants
-#define sseRor(vec, i)     (((i) % 4) ? (_mm_shuffle_ps(vec, vec, _MM_SHUFFLE((unsigned char)(i + 3) % 4, (unsigned char)(i + 2) % 4, (unsigned char)(i + 1) % 4, (unsigned char)(i + 0) % 4))) : (vec))
-#define sseSplat(x, e)     _mm_shuffle_ps(x, x, _MM_SHUFFLE(e, e, e, e))
+// _MM_SHUFFLE requires compile-time constants
+#define sseRor(vec, i) (((i) % 4) ? (_mm_shuffle_ps(vec, vec, _MM_SHUFFLE((unsigned char)(i + 3) % 4, (unsigned char)(i + 2) % 4, (unsigned char)(i + 1) % 4, (unsigned char)(i + 0) % 4))) : (vec))
+#define sseSplat(x, e) _mm_shuffle_ps(x, x, _MM_SHUFFLE(e, e, e, e))
 #define sseSld(vec, vec2, x) sseRor(vec, ((x) / 4))
 
 static inline __m128 sseUintToM128(unsigned int x)
@@ -166,22 +167,26 @@ static inline __m128 sseACosf(__m128 x)
   const __m128 xabs2 = _mm_mul_ps(xabs, xabs);
   const __m128 xabs4 = _mm_mul_ps(xabs2, xabs2);
 
-  const __m128 hi = sseMAdd(sseMAdd(sseMAdd(_mm_set1_ps(-0.0012624911f),
-                         xabs, _mm_set1_ps(0.0066700901f)),
-                    xabs, _mm_set1_ps(-0.0170881256f)),
-                 xabs, _mm_set1_ps(0.0308918810f));
+  const __m128 hi =
+    sseMAdd(
+      sseMAdd(
+        sseMAdd(_mm_set1_ps(-0.0012624911f), xabs, _mm_set1_ps(0.0066700901f)),
+          xabs, _mm_set1_ps(-0.0170881256f)),
+            xabs, _mm_set1_ps(0.0308918810f));
 
-  const __m128 lo = sseMAdd(sseMAdd(sseMAdd(_mm_set1_ps(-0.0501743046f),
-                         xabs, _mm_set1_ps(0.0889789874f)),
-                    xabs, _mm_set1_ps(-0.2145988016f)),
-                 xabs, _mm_set1_ps(1.5707963050f));
+  const __m128 lo =
+    sseMAdd(
+	  sseMAdd(
+	    sseMAdd(_mm_set1_ps(-0.0501743046f), xabs, _mm_set1_ps(0.0889789874f)),
+          xabs, _mm_set1_ps(-0.2145988016f)),
+            xabs, _mm_set1_ps(1.5707963050f));
 
   const __m128 result = sseMAdd(hi, xabs4, lo);
 
   // Adjust the result if x is negative.
   return sseSelect(_mm_mul_ps(t1, result),                     // Positive
            sseMSub(t1, result, _mm_set1_ps(3.1415926535898f)), // Negative
-           select);
+             select);
 }
 
 static inline __m128 sseSinf(SSEFloat4V x)
@@ -210,14 +215,16 @@ static inline __m128 sseSinf(SSEFloat4V x)
   //   sx = xl + xl3 * ((S0 * xl2 + S1) * xl2 + S2)
   const SSEFloat4V cx =
     sseMAdd(
-    sseMAdd(
-    sseMAdd(_mm_set1_ps(VECTORMATH_SINCOS_CC0), xl2, _mm_set1_ps(VECTORMATH_SINCOS_CC1)), xl2, _mm_set1_ps(VECTORMATH_SINCOS_CC2)),
-    xl2, _mm_set1_ps(1.0f));
+      sseMAdd(
+       sseMAdd(_mm_set1_ps(VECTORMATH_SINCOS_CC0), xl2, _mm_set1_ps(VECTORMATH_SINCOS_CC1)),
+	     xl2, _mm_set1_ps(VECTORMATH_SINCOS_CC2)),
+           xl2, _mm_set1_ps(1.0f));
   const SSEFloat4V sx =
     sseMAdd(
-    sseMAdd(
-    sseMAdd(_mm_set1_ps(VECTORMATH_SINCOS_SC0), xl2, _mm_set1_ps(VECTORMATH_SINCOS_SC1)), xl2, _mm_set1_ps(VECTORMATH_SINCOS_SC2)),
-    xl3, xl);
+      sseMAdd(
+        sseMAdd(_mm_set1_ps(VECTORMATH_SINCOS_SC0), xl2, _mm_set1_ps(VECTORMATH_SINCOS_SC1)),
+		  xl2, _mm_set1_ps(VECTORMATH_SINCOS_SC2)),
+            xl3, xl);
 
   // Use the cosine when the offset is odd and the sin
   // when the offset is even
@@ -226,7 +233,7 @@ static inline __m128 sseSinf(SSEFloat4V x)
   // Flip the sign of the result when (offset mod 4) = 1 or 2
   return sseSelect(_mm_xor_ps(sseUintToM128(0x80000000U), res), // Negative
            res,                                                 // Positive
-           _mm_cmpeq_ps(_mm_and_ps(offset, sseUintToM128(0x2U)), _mm_setzero_ps()));
+             _mm_cmpeq_ps(_mm_and_ps(offset, sseUintToM128(0x2U)), _mm_setzero_ps()));
 }
 
 static inline void sseSinfCosf(SSEFloat4V x, SSEFloat4V * s, SSEFloat4V * c)
@@ -244,7 +251,7 @@ static inline void sseSinfCosf(SSEFloat4V x, SSEFloat4V * s, SSEFloat4V * c)
   __m128i temp = _mm_add_epi32(_mm_set1_epi32(1), (__m128i &)offsetSin);
   const SSEInt4V offsetCos = (__m128 &)temp;
 
-  // Remainder in range [-pi/4..pi/4]
+  // Remainder in range [-pi/4 .. pi/4]
   SSEFloat4V qf = sseCvtToFloats(q);
   xl = sseMSub(qf, _mm_set1_ps(VECTORMATH_SINCOS_KC2), sseMSub(qf, _mm_set1_ps(VECTORMATH_SINCOS_KC1), x));
 
@@ -258,14 +265,16 @@ static inline void sseSinfCosf(SSEFloat4V x, SSEFloat4V * s, SSEFloat4V * c)
   //   sx = xl + xl3 * ((S0 * xl2 + S1) * xl2 + S2)
   const SSEFloat4V cx =
     sseMAdd(
-    sseMAdd(
-    sseMAdd(_mm_set1_ps(VECTORMATH_SINCOS_CC0), xl2, _mm_set1_ps(VECTORMATH_SINCOS_CC1)), xl2, _mm_set1_ps(VECTORMATH_SINCOS_CC2)),
-    xl2, _mm_set1_ps(1.0f));
+      sseMAdd(
+        sseMAdd(_mm_set1_ps(VECTORMATH_SINCOS_CC0), xl2, _mm_set1_ps(VECTORMATH_SINCOS_CC1)),
+		  xl2, _mm_set1_ps(VECTORMATH_SINCOS_CC2)),
+            xl2, _mm_set1_ps(1.0f));
   const SSEFloat4V sx =
     sseMAdd(
-    sseMAdd(
-    sseMAdd(_mm_set1_ps(VECTORMATH_SINCOS_SC0), xl2, _mm_set1_ps(VECTORMATH_SINCOS_SC1)), xl2, _mm_set1_ps(VECTORMATH_SINCOS_SC2)),
-    xl3, xl);
+      sseMAdd(
+        sseMAdd(_mm_set1_ps(VECTORMATH_SINCOS_SC0), xl2, _mm_set1_ps(VECTORMATH_SINCOS_SC1)),
+		  xl2, _mm_set1_ps(VECTORMATH_SINCOS_SC2)),
+            xl3, xl);
 
   // Use the cosine when the offset is odd and the sin
   // when the offset is even
@@ -293,7 +302,8 @@ static inline __m128 sseVecDot4(__m128 vec0, __m128 vec1)
   const __m128 result = _mm_mul_ps(vec0, vec1);
   return _mm_add_ps(_mm_shuffle_ps(result, result, _MM_SHUFFLE(0, 0, 0, 0)),
             _mm_add_ps(_mm_shuffle_ps(result, result, _MM_SHUFFLE(1, 1, 1, 1)),
-                 _mm_add_ps(_mm_shuffle_ps(result, result, _MM_SHUFFLE(2, 2, 2, 2)), _mm_shuffle_ps(result, result, _MM_SHUFFLE(3, 3, 3, 3)))));
+              _mm_add_ps(_mm_shuffle_ps(result, result, _MM_SHUFFLE(2, 2, 2, 2)),
+			    _mm_shuffle_ps(result, result, _MM_SHUFFLE(3, 3, 3, 3)))));
 }
 
 static inline __m128 sseVecCross(__m128 vec0, __m128 vec1)
