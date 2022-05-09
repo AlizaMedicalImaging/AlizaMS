@@ -10463,7 +10463,7 @@ template <typename T> QString supp_palette_grey_to_rgbUS_(
 				image->GetDirection()));
 		out_image->Allocate();
 	}
-	catch (itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject & ex)
 	{
 		return QString(ex.GetDescription());
 	}
@@ -10515,7 +10515,7 @@ template <typename T> QString supp_palette_grey_to_rgbUS_(
 			++it2;
 		}
 	}
-	catch(itk::ExceptionObject & ex)
+	catch(const itk::ExceptionObject & ex)
 	{
 		return QString(ex.GetDescription());
 	}
@@ -10550,7 +10550,7 @@ template <typename T> QString supp_palette_grey_to_rgbUC_(
 				image->GetDirection()));
 		out_image->Allocate();
 	}
-	catch (itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject & ex)
 	{
 		return QString(ex.GetDescription());
 	}
@@ -10607,7 +10607,7 @@ template <typename T> QString supp_palette_grey_to_rgbUC_(
 			++it2;
 		}
 	}
-	catch(itk::ExceptionObject & ex)
+	catch(const itk::ExceptionObject & ex)
 	{
 		return QString(ex.GetDescription());
 	}

@@ -97,7 +97,7 @@ template<typename T> void calculate_min_max(
 		cubemin = min_max_calculator->GetMinimum();
 		cubemax = min_max_calculator->GetMaximum();
 	}
-	catch (itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject & ex)
 	{
 		std::cout << ex.GetDescription() << std::endl;
 		return;
@@ -278,7 +278,7 @@ template <typename T> void calculate_rgb_minmax_(
  			++iterator;
 		}
 	}
-	catch (itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject & ex)
 	{
 		std::cout << ex.GetDescription() << std::endl;
 	}
@@ -340,7 +340,7 @@ template <typename T> void calculate_rgba_minmax_(
  			++iterator;
 		}
 	}
-	catch (itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject & ex)
 	{
 		std::cout << ex.GetDescription() << std::endl;
 	}
@@ -384,7 +384,7 @@ template<typename T> void get_dimensions(
 		spacing = image->GetSpacing();
 		origin  = image->GetOrigin();
 	}
-	catch (itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject & ex)
 	{
 		std::cout << ex << std::endl;
 		return;
@@ -527,7 +527,7 @@ template<typename T> int generate_tex3d(
 			scaleFilter->UpdateLargestPossibleRegion();
 			out_image = scaleFilter->GetOutput();
 		}
-		catch (itk::ExceptionObject & ex)
+		catch (const itk::ExceptionObject & ex)
 		{
 			std::cout << ex << std::endl;
 			return 1;
@@ -630,7 +630,7 @@ template<typename T> int generate_tex3d(
 			inIterator.NextSlice();
 		}
 	}
-	catch(itk::ExceptionObject & ex)
+	catch(const itk::ExceptionObject & ex)
 	{
 		std::cout << ex.GetDescription() << std::endl;
 		error__ = 4;
@@ -861,7 +861,7 @@ template<typename T> void read_geometry_from_image(
 			image->TransformIndexToPhysicalPoint(idx2, p2);
 			image->TransformIndexToPhysicalPoint(idx3, p3);
 		}
-		catch (itk::ExceptionObject & ex)
+		catch (const itk::ExceptionObject & ex)
 		{
 			std::cout << ex.GetDescription() << std::endl;
 			continue;
@@ -919,7 +919,7 @@ template<typename T> void calc_center_from_image(
 	{
 		image->TransformIndexToPhysicalPoint(idx, p);
 	}
-	catch (itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject & ex)
 	{
 		std::cout << ex.GetDescription() << std::endl;
 		return;
@@ -1258,7 +1258,7 @@ template<typename T> QString process_dicom_monochrome_image1(
 		image->SetSpacing(spacing);
 		if (*bad_direction == false) image->SetDirection(direction);
 	}
-	catch (itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject & ex)
 	{
 		*ok = false;
 		return QString(ex.GetDescription());
@@ -1290,7 +1290,7 @@ template<typename T> QString process_dicom_monochrome_image1(
 			it.NextSlice();
 		}
 	}
-	catch (itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject & ex)
 	{
 		*ok = false;
 		return QString(ex.GetDescription());
@@ -1401,7 +1401,7 @@ template<typename T> QString process_dicom_rgb_image1(
 		image->SetSpacing(spacing);
 		if (*bad_direction == false) image->SetDirection(direction);
 	}
-	catch (itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject & ex)
 	{
 		*ok = false;
 		return QString(ex.GetDescription());
@@ -1486,7 +1486,7 @@ template<typename T> QString process_dicom_rgb_image1(
 			it.NextSlice();
 		}
 	}
-	catch(itk::ExceptionObject & ex)
+	catch(const itk::ExceptionObject & ex)
 	{
 		*ok = false;
 		return QString(ex.GetDescription());
@@ -1583,7 +1583,7 @@ template<typename T> QString process_dicom_rgba_image1(
 		image->SetSpacing(spacing);
 		if (*bad_direction == false) image->SetDirection(direction);
 	}
-	catch (itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject & ex)
 	{
 		*ok = false;
 		return QString(ex.GetDescription());
@@ -1685,7 +1685,7 @@ template<typename T> QString process_dicom_rgba_image1(
 			it.NextSlice();
 		}
 	}
-	catch(itk::ExceptionObject & ex)
+	catch(const itk::ExceptionObject & ex)
 	{
 		*ok = false;
 		return QString(ex.GetDescription());
@@ -1748,7 +1748,7 @@ QString apply_per_slice_rescale_(
 				image->GetDirection()));
 		out_image->Allocate();
 	}
-	catch (itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject & ex)
 	{
 		return QString(ex.GetDescription());
 	}
@@ -1783,7 +1783,7 @@ QString apply_per_slice_rescale_(
 				++it1;
 			}
 		}
-		catch(itk::ExceptionObject & ex)
+		catch(const itk::ExceptionObject & ex)
 		{
 			return QString(ex.GetDescription());
 		}
@@ -4889,7 +4889,7 @@ template<typename T> double get_value(
 	{
 		r = image->GetPixel(idx);
 	}
-	catch (itk::ExceptionObject &)
+	catch (const itk::ExceptionObject &)
 	{
 		r = 0;
 	}

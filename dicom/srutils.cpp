@@ -60,7 +60,7 @@ template<typename Tin, typename Tout> QString gs3(
 		filter->Update();
 		out_image = filter->GetOutput();
 	}
-	catch (itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject & ex)
 	{
 		return QString(ex.GetDescription());
 	}
@@ -228,7 +228,7 @@ template<typename T> SRImage lrgb3(
 				++iterator;
 			}
 		}
-		catch(itk::ExceptionObject &)
+		catch(const itk::ExceptionObject &)
 		{
 			;;
 		}
@@ -259,7 +259,7 @@ template<typename T> SRImage lrgb3(
 					++iterator;
 				}
 			}
-			catch(itk::ExceptionObject &)
+			catch(const itk::ExceptionObject &)
 			{
 				;;
 			}

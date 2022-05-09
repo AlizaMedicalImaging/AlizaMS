@@ -65,7 +65,7 @@ template<typename T> QString calculate_histogramm(
 			itk::ProgressEvent(), update_qt_command);
 		histogram_generator->Compute();
 	}
-	catch (itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject & ex)
 	{
 		*ok = false;
 		return QString(ex.GetDescription());
@@ -177,7 +177,11 @@ template<typename T> QString calculate_histogramm_rgb(
 		filter->AddObserver(itk::ProgressEvent(), update_qt_command);
 		filter->Update();
 	}
-	catch (itk::ExceptionObject & ex) { *ok = false; return QString(ex.GetDescription()); }
+	catch (const itk::ExceptionObject & ex)
+	{
+		*ok = false;
+		return QString(ex.GetDescription());
+	}
 	//
 	const HistogramType * histogram = filter->GetOutput();
 	if (bins_size > (int)histogram->GetSize()[0])

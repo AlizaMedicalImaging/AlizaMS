@@ -54,8 +54,10 @@ template<typename Tin, typename Tout> QString get_slice2_(
 		filter->SetDirectionCollapseToIdentity();
 		filter->Update();
 	}
-	catch (itk::ExceptionObject & ex)
-	{ return QString(ex.GetDescription()); }
+	catch (const itk::ExceptionObject & ex)
+	{
+		return QString(ex.GetDescription());
+	}
 	out_image = filter->GetOutput();
 	if (out_image.IsNotNull()) out_image->DisconnectPipeline();
 	else return QString("Out image is NULL");
@@ -157,7 +159,7 @@ template<typename T> void load_rgb_image2(
 				++iterator;
 			}
 		}
-		catch(itk::ExceptionObject &)
+		catch(const itk::ExceptionObject &)
 		{
 			return;
 		}
@@ -188,7 +190,7 @@ template<typename T> void load_rgb_image2(
  					++iterator;
 				}
 			}
-			catch(itk::ExceptionObject &)
+			catch(const itk::ExceptionObject &)
 			{
 				return;
 			}
@@ -329,7 +331,7 @@ template<typename T> void load_rgba_image2(
 				++iterator;
 			}
 		}
-		catch(itk::ExceptionObject &)
+		catch(const itk::ExceptionObject &)
 		{
 			return;
 		}
@@ -361,7 +363,7 @@ template<typename T> void load_rgba_image2(
  				++iterator;
 			}
 		}
-		catch(itk::ExceptionObject &)
+		catch(const itk::ExceptionObject &)
 		{
 			return;
 		}
@@ -406,7 +408,7 @@ template<typename T> void load_rgba_image2(
 				++iterator;
 			}
 		}
-		catch(itk::ExceptionObject &)
+		catch(const itk::ExceptionObject &)
 		{
 			return;
 		}
@@ -448,7 +450,7 @@ template<typename T> void load_rgba_image2(
  				++iterator;
 			}
 		}
-		catch(itk::ExceptionObject &)
+		catch(const itk::ExceptionObject &)
 		{
 			return;
 		}
@@ -547,7 +549,11 @@ template<typename T> void load_rgb_char_image2(
 	if (image_type == 14)
 	{
 		try { p = reinterpret_cast<unsigned char *>(image->GetBufferPointer()); }
-		catch (itk::ExceptionObject & ex) { std::cout << ex << std::endl; return; }
+		catch (const itk::ExceptionObject & ex)
+		{
+			std::cout << ex << std::endl;
+			return;
+		}
 	}
 	else
 	{
@@ -671,7 +677,11 @@ template<typename T> void load_rgba_char_image2(
 	{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		try { p = reinterpret_cast<unsigned char *>(image->GetBufferPointer()); }
-		catch (itk::ExceptionObject & ex) { std::cout << ex << std::endl; return; }
+		catch (const itk::ExceptionObject & ex)
+		{
+			std::cout << ex << std::endl;
+			return;
+		}
 		if (!p) return;
 		tmpi = QImage(p,size[0],size[1],4*size[0],QImage::Format_RGBA8888);
 #else
@@ -707,7 +717,7 @@ template<typename T> void load_rgba_char_image2(
 				++iterator;
 			}
 		}
-		catch(itk::ExceptionObject &)
+		catch(const itk::ExceptionObject &)
 		{
 			return;
 		}

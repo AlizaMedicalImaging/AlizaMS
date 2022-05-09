@@ -854,7 +854,7 @@ bool ContourUtils::phys_space_from_slice(
 		image->Allocate();
 		image->FillBuffer(static_cast<ImageTypeUC::PixelType>(0));
 	}
-	catch (itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject & ex)
 	{
 		std::cout << ex.GetDescription() << std::endl;
 		return false;

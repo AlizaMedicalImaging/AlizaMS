@@ -129,7 +129,7 @@ template<typename T> QString to_rgb(
 			++iterator;
 		}
 	}
-	catch (itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject & ex)
 	{
 		return QString(ex.GetDescription());
 	}
@@ -154,7 +154,7 @@ template<typename T> QString intensity_filter2(
 		filter->Update();
 		out_image = filter->GetOutput();
 	}
-	catch (itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject & ex)
 	{ return QString(ex.GetDescription()); }
 	if (out_image.IsNotNull()) out_image->DisconnectPipeline();
 	else return QString("Output image is NULL");
@@ -188,7 +188,7 @@ template<typename T> QString to_char(
 		filter1->Update();
 		out_image = filter1->GetOutput();
 	}
-	catch (itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject & ex)
 	{ return QString( ex.GetDescription()); }
 	if (out_image.IsNotNull()) out_image->DisconnectPipeline();
 	else return QString("Output image is NULL");
@@ -219,7 +219,7 @@ template<typename T> QString to_char_sigm(
 		filter1->Update();
 		out_image = filter1->GetOutput();
 	}
-	catch (itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject & ex)
 	{
 		return QString( ex.GetDescription());
 	}
@@ -256,7 +256,7 @@ template<typename Tin, typename Tout> QString extract_one_slice(
 		filter->Update();
 		out_image = filter->GetOutput();
 	}
-	catch (itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject & ex)
 	{
 		return QString(ex.GetDescription());
 	}
@@ -963,7 +963,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 		out_image->FillBuffer(
 			itk::NumericTraits<typename T::PixelType>::ZeroValue());
 	}
-	catch (itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject & ex)
 	{
 		return QString(ex.GetDescription());
 	}
@@ -1075,7 +1075,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 							tmp1 = filter0->GetOutput();
 						}
 					}
-					catch (itk::ExceptionObject & ex)
+					catch (const itk::ExceptionObject & ex)
 					{
 						return QString(ex.GetDescription());
 					}
@@ -1094,7 +1094,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 						filter->Update();
 						tmp1 = filter->GetOutput();
 					}
-					catch (itk::ExceptionObject & ex)
+					catch (const itk::ExceptionObject & ex)
 					{
 						return QString(ex.GetDescription());
 					}
@@ -1155,7 +1155,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 							filter0->Update();
 							tmp1 = filter0->GetOutput();
 						}
-						catch (itk::ExceptionObject & ex)
+						catch (const itk::ExceptionObject & ex)
 						{
 							return QString(ex.GetDescription());
 						}
@@ -1237,7 +1237,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 								it.NextLine();
 							}
 						}
-						catch(itk::ExceptionObject & ex)
+						catch(const itk::ExceptionObject & ex)
 						{
 							return QString(ex.GetDescription());
 						}
@@ -1294,7 +1294,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 					++j;
 				}
 			}
-			catch(itk::ExceptionObject & ex)
+			catch(const itk::ExceptionObject & ex)
 			{
 				return QString(ex.GetDescription());
 			}
@@ -1345,7 +1345,7 @@ template<typename T, typename T2d> QString levels_slice_by_slice(
 		out_image->Allocate();
 		out_image->FillBuffer(0);
 	}
-	catch (itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject & ex)
 	{
 		return QString(ex.GetDescription());
 	}
@@ -1486,7 +1486,7 @@ template<typename T, typename T2d> QString levels_slice_by_slice(
 								filter1->Update();
 								tmp1 = filter1->GetOutput();
 							}
-							catch (itk::ExceptionObject & ex)
+							catch (const itk::ExceptionObject & ex)
 							{ return QString( ex.GetDescription()); }
 						}
 						else
@@ -1517,7 +1517,7 @@ template<typename T, typename T2d> QString levels_slice_by_slice(
 								filter1->Update();
 								tmp1 = filter1->GetOutput();
 							}
-							catch (itk::ExceptionObject & ex)
+							catch (const itk::ExceptionObject & ex)
 							{ return QString( ex.GetDescription()); }
 						}
 						if (tmp1.IsNull()) return QString("tmp1.IsNull()");
@@ -1567,7 +1567,7 @@ template<typename T, typename T2d> QString levels_slice_by_slice(
 								++j;
 							}
 						}
-						catch(itk::ExceptionObject & ex)
+						catch(const itk::ExceptionObject & ex)
 						{
 							return QString(ex.GetDescription());
 						}
