@@ -176,8 +176,8 @@ static inline __m128 sseACosf(__m128 x)
 
   const __m128 lo =
     sseMAdd(
-	  sseMAdd(
-	    sseMAdd(_mm_set1_ps(-0.0501743046f), xabs, _mm_set1_ps(0.0889789874f)),
+      sseMAdd(
+        sseMAdd(_mm_set1_ps(-0.0501743046f), xabs, _mm_set1_ps(0.0889789874f)),
           xabs, _mm_set1_ps(-0.2145988016f)),
             xabs, _mm_set1_ps(1.5707963050f));
 
@@ -201,7 +201,7 @@ static inline __m128 sseSinf(SSEFloat4V x)
   // Compute an offset based on the quadrant that the angle falls in
   const SSEInt4V offset = _mm_and_ps(q, sseUintToM128(0x3U));
 
-  // Remainder in range [-pi/4..pi/4]
+  // Remainder in range [-pi/4 .. pi/4]
   const SSEFloat4V qf = sseCvtToFloats(q);
   xl = sseMSub(qf, _mm_set1_ps(VECTORMATH_SINCOS_KC2), sseMSub(qf, _mm_set1_ps(VECTORMATH_SINCOS_KC1), x));
 
@@ -217,13 +217,13 @@ static inline __m128 sseSinf(SSEFloat4V x)
     sseMAdd(
       sseMAdd(
        sseMAdd(_mm_set1_ps(VECTORMATH_SINCOS_CC0), xl2, _mm_set1_ps(VECTORMATH_SINCOS_CC1)),
-	     xl2, _mm_set1_ps(VECTORMATH_SINCOS_CC2)),
+         xl2, _mm_set1_ps(VECTORMATH_SINCOS_CC2)),
            xl2, _mm_set1_ps(1.0f));
   const SSEFloat4V sx =
     sseMAdd(
       sseMAdd(
         sseMAdd(_mm_set1_ps(VECTORMATH_SINCOS_SC0), xl2, _mm_set1_ps(VECTORMATH_SINCOS_SC1)),
-		  xl2, _mm_set1_ps(VECTORMATH_SINCOS_SC2)),
+          xl2, _mm_set1_ps(VECTORMATH_SINCOS_SC2)),
             xl3, xl);
 
   // Use the cosine when the offset is odd and the sin
@@ -267,13 +267,13 @@ static inline void sseSinfCosf(SSEFloat4V x, SSEFloat4V * s, SSEFloat4V * c)
     sseMAdd(
       sseMAdd(
         sseMAdd(_mm_set1_ps(VECTORMATH_SINCOS_CC0), xl2, _mm_set1_ps(VECTORMATH_SINCOS_CC1)),
-		  xl2, _mm_set1_ps(VECTORMATH_SINCOS_CC2)),
+          xl2, _mm_set1_ps(VECTORMATH_SINCOS_CC2)),
             xl2, _mm_set1_ps(1.0f));
   const SSEFloat4V sx =
     sseMAdd(
       sseMAdd(
         sseMAdd(_mm_set1_ps(VECTORMATH_SINCOS_SC0), xl2, _mm_set1_ps(VECTORMATH_SINCOS_SC1)),
-		  xl2, _mm_set1_ps(VECTORMATH_SINCOS_SC2)),
+          xl2, _mm_set1_ps(VECTORMATH_SINCOS_SC2)),
             xl3, xl);
 
   // Use the cosine when the offset is odd and the sin
@@ -301,9 +301,9 @@ static inline __m128 sseVecDot4(__m128 vec0, __m128 vec1)
 {
   const __m128 result = _mm_mul_ps(vec0, vec1);
   return _mm_add_ps(_mm_shuffle_ps(result, result, _MM_SHUFFLE(0, 0, 0, 0)),
-            _mm_add_ps(_mm_shuffle_ps(result, result, _MM_SHUFFLE(1, 1, 1, 1)),
-              _mm_add_ps(_mm_shuffle_ps(result, result, _MM_SHUFFLE(2, 2, 2, 2)),
-			    _mm_shuffle_ps(result, result, _MM_SHUFFLE(3, 3, 3, 3)))));
+           _mm_add_ps(_mm_shuffle_ps(result, result, _MM_SHUFFLE(1, 1, 1, 1)),
+             _mm_add_ps(_mm_shuffle_ps(result, result, _MM_SHUFFLE(2, 2, 2, 2)),
+               _mm_shuffle_ps(result, result, _MM_SHUFFLE(3, 3, 3, 3)))));
 }
 
 static inline __m128 sseVecCross(__m128 vec0, __m128 vec1)
