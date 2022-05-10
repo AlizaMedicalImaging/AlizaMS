@@ -3698,14 +3698,14 @@ void GLWidget::makeModelVBO_ArraysT(
 {
 	float * v;
 	try { v = new float[(faces_size/12)*3*3]; }
-	catch(const std::bad_alloc&) { return; }
+	catch (const std::bad_alloc&) { return; }
 	if (!v) return;
 
 	float * n  = NULL; // initialized to avoid warning
 	if (normals)
 	{
 		try { n  = new float[(faces_size/12)*3*3]; }
-		catch(const std::bad_alloc&) { return; }
+		catch (const std::bad_alloc&) { return; }
 		if (!n) return;
 	}
 
@@ -3713,7 +3713,7 @@ void GLWidget::makeModelVBO_ArraysT(
 	if (textures)
 	{
 		try { t  = new float[(faces_size/12)*3*3]; }
-		catch(const std::bad_alloc&) { return; }
+		catch (const std::bad_alloc&) { return; }
 		if (!t) return;
 	}
 
@@ -3721,7 +3721,7 @@ void GLWidget::makeModelVBO_ArraysT(
 	if (tangents)
 	{
 		try { ta = new float[(faces_size/12)*3*3]; }
-		catch(const std::bad_alloc&) { return; }
+		catch (const std::bad_alloc&) { return; }
 		if (!ta) return;
 	}
 
