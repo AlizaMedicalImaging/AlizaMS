@@ -590,35 +590,36 @@ void SQtree::process_element(
 					}
 					else if (vr == mdcm::VR::AT)
 					{
-						unsigned short group, element;
-						char group_[2]; char element_[2];
-						char buffer[] = { '\0', '\0', '\0', '\0' };
-						if (length==4)
+						if (length >= 4 && (length % 4 == 0))
 						{
-							const bool ok0 =
-								bv->GetBuffer(buffer,4);
+							char * buffer = new char[length];
+							const bool ok0 = bv->GetBuffer(buffer, length);
 							if (ok0)
 							{
-								group_[0] = buffer[0];
-								group_[1] = buffer[1];
-								memcpy(&group,group_,2);
-								element_[0] = buffer[2];
-								element_[1] = buffer[3];
-								memcpy(&element,element_,2);
-								QString tmp3;
+								for (size_t at_x = 0; at_x < length; at_x+=4)
+								{
+									char group_[] = { buffer[at_x + 0], buffer[at_x + 1] };
+									char element_[] = { buffer[at_x + 2], buffer[at_x + 3] };
+									unsigned short group, element;
+									memcpy(&group,group_,2);
+									memcpy(&element,element_,2);
+									QString tmp3;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-								tmp3 = QString::asprintf("%04x",group);
+									tmp3 = QString::asprintf("%04x",group);
 #else
-								tmp3.sprintf("%04x",group);
+									tmp3.sprintf("%04x",group);
 #endif
-								QString tmp4;
+									QString tmp4;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-								tmp4 = QString::asprintf("%04x",element);
+									tmp4 = QString::asprintf("%04x",element);
 #else
-								tmp4.sprintf("%04x",element);
+									tmp4.sprintf("%04x",element);
 #endif
-								str_ = tmp3 + QString("|") + tmp4;
+									str_.append(tmp3 + QString("|") + tmp4);
+									if (at_x != length - 4) str_.append(QString(", "));
+								}
 							}
+							delete [] buffer;
 						}
 					}
 					else if (vr == mdcm::VR::OB)

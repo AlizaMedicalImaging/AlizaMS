@@ -964,10 +964,10 @@ static void remove_private__(
 static bool check_overlay_in_pixeldata(const mdcm::DataSet & ds)
 {
 	mdcm::Tag t(0x6000,0x0000);
-	while(true)
+	while (true)
 	{
 		const mdcm::DataElement & de = ds.FindNextDataElement(t);
-		if(de.GetTag().GetGroup() > 0x60ff)
+		if (de.GetTag().GetGroup() > 0x60ff)
 		{
 			break;
 		}
@@ -981,11 +981,11 @@ static bool check_overlay_in_pixeldata(const mdcm::DataSet & ds)
 			t = de.GetTag();
 			mdcm::Tag tOverlayData(t.GetGroup(),0x3000);
 			mdcm::Tag tOverlayBitpos(t.GetGroup(),0x0102);
-			if(ds.FindDataElement(tOverlayData))
+			if (ds.FindDataElement(tOverlayData))
 			{
 				;;
 			}
-			else if(ds.FindDataElement(tOverlayBitpos))
+			else if (ds.FindDataElement(tOverlayBitpos))
 			{
 				return true;
 			}

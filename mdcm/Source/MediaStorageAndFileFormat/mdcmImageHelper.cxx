@@ -1196,6 +1196,10 @@ ImageHelper::GetSpacingValue(File const & f)
             for (unsigned int i = 0; i < el.GetLength(); ++i)
             {
               const double value = el.GetValue(i);
+              if (value <= 0.0)
+              {
+                mdcmDebugMacro("Z spacing is: " << value);
+              }
               sp.push_back(value);
             }
           }
