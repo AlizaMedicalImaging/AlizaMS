@@ -227,6 +227,13 @@ public:
 		const QStringList&,
 		const QWidget*,
 		QProgressDialog*);
+	static QString read_nuclear(
+		bool*,
+		ImageVariant*,
+		const QStringList&,
+		int, GLWidget*, bool,
+		const QWidget*,
+		QProgressDialog*);
 	static QString read_series(
 		bool*,
 		const bool,

@@ -6630,6 +6630,213 @@ QString DicomUtils::read_ultrasound(
 	return QString("");
 }
 
+QString DicomUtils::read_nuclear(
+	bool * ok, ImageVariant * ivariant,
+	const QStringList & images_ipp,
+	int /* max_3d_tex_size */, GLWidget * /* gl */, bool /* ok3d */,
+	const QWidget * settings, QProgressDialog * pb)
+{
+// TODO for image type RECON TOMO volume might be possible
+	if (!ok) return QString("read_nuclear : error (1)");
+	*ok = false;
+	if (!ivariant) return QString("ivariant==NULL");
+	if (!settings) return QString("settings==NULL");
+	if (images_ipp.size() != 1) return QString("read_nuclear reads 1 image");
+	if (pb) pb->setValue(-1);
+	QApplication::processEvents();
+	const SettingsWidget * wsettings =
+		static_cast<const SettingsWidget *>(settings);
+	unsigned int dimx = 0, dimy = 0, dimz = 0;
+	double origin_x  = 0.0, origin_y  = 0.0, origin_z  = 0.0;
+	double spacing_x = 0.0, spacing_y = 0.0, spacing_z = 0.0;
+	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
+	const bool pred6_bug = wsettings->get_predictor_workaround();
+	const bool cornell_bug = wsettings->get_cornell_workaround();
+	std::vector<char*> data;
+	itk::Matrix<itk::SpacePrecisionType,3,3> direction;
+	mdcm::PixelFormat pixelformat;
+	mdcm::PhotometricInterpretation pi;
+	const mdcm::Tag tnumframes(0x0028,0x0008);
+	const bool overlays_enabled = wsettings->get_overlays();
+	const int overlays_idx = overlays_enabled ? 0 : -2;
+#if 0
+	int number_of_frames = 0;
+#endif
+	double tmp_c = -999999.0, tmp_w = -999999.0;
+	short tmp_lut_function = 0;
+	//
+	{
+		mdcm::Reader reader;
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(ALIZA_WIN32_UNC))
+		reader.SetFileName(QDir::toNativeSeparators(images_ipp.at(0)).toUtf8().constData());
+#else
+		reader.SetFileName(QDir::toNativeSeparators(images_ipp.at(0)).toLocal8Bit().constData());
+#endif
+#else
+		reader.SetFileName(images_ipp.at(0).toLocal8Bit().constData());
+#endif
+		*ok = reader.Read();
+		if (*ok == false)
+		{
+			return (QString("can not read file ") + images_ipp.at(0));
+		}
+		const mdcm::File    & file = reader.GetFile();
+		const mdcm::DataSet & ds   = file.GetDataSet();
+#if 0
+		if (ds.FindDataElement(tnumframes))
+		{
+			const mdcm::DataElement & e =
+				ds.GetDataElement(tnumframes);
+			if (!e.IsEmpty() &&
+				!e.IsUndefinedLength() &&
+				e.GetByteValue())
+			{
+				QString numframes("");
+				numframes =
+					QString::fromLatin1(
+						e.GetByteValue()->GetPointer(),
+						e.GetByteValue()->GetLength());
+				const QVariant v(
+					numframes.trimmed().remove(QChar('\0')));
+				bool c_ok = false;
+				const int k = v.toInt(&c_ok);
+				if (c_ok) number_of_frames = k;
+			}
+		}
+#endif
+		//
+		read_ivariant_info_tags(ds, ivariant);
+		//
+		read_window(ds, &tmp_c, &tmp_w, &tmp_lut_function);
+	}
+	ivariant->di->default_us_window_center =
+		ivariant->di->us_window_center = tmp_c;
+	ivariant->di->default_us_window_width =
+		ivariant->di->us_window_width  = tmp_w;
+	ivariant->di->default_lut_function =
+		ivariant->di->lut_function = tmp_lut_function;
+	//
+	double dircos_[] = {0.0,0.0,0.0,0.0,0.0,0.0};
+	unsigned int dimx_, dimy_, dimz_;
+	double origin_x_, origin_y_, origin_z_;
+	double spacing_x_, spacing_y_, spacing_z_;
+	double shift_tmp = 0.0, scale_tmp = 1.0;
+	QString buff_error;
+	buff_error = read_buffer(
+		ok,
+		data,
+		ivariant->image_overlays, overlays_idx,
+		ivariant->anatomy, 0, // TODO check
+		images_ipp.at(0),
+		wsettings->get_rescale(),
+		pixelformat, false,
+		pi,
+		&dimx_, &dimy_, &dimz_,
+		&origin_x_, &origin_y_, &origin_z_,
+		&spacing_x_, &spacing_y_, &spacing_z_,
+		dircos_,
+		&shift_tmp, &scale_tmp,
+		clean_unused_bits,
+		false, false, false,
+		false,
+		pred6_bug,
+		cornell_bug,
+		NULL,
+		NULL,
+		pb);
+	if (*ok==false) return buff_error;
+#if 0
+	std::cout << "Origin: "  << origin_x_  << " " << origin_y_  << " " << origin_z_ << std::endl;
+	std::cout << "Spacing: " << spacing_x_ << " " << spacing_y_ << " " << spacing_z_ << std::endl;
+	std::cout << "Cosines: " << dircos_[0] << " " << dircos_[1] << " " << dircos_[2] << std::endl;
+	std::cout << "         " << dircos_[3] << " " << dircos_[4] << " " << dircos_[5] << std::endl;
+#endif
+	//
+	dimx = dimx_;
+	dimy = dimy_;
+	dimz = dimz_;
+	origin_x = origin_x_;
+	origin_y = origin_y_;
+	origin_z = origin_z_;
+	spacing_x = spacing_x_;
+	spacing_y = spacing_y_;
+/*
+Spacing between slices, in mm, measured from center-to-center of
+each slice along the normal to the first image. The sign of the
+Spacing Between Slices (0018,0088) determines the direction of
+stacking. The normal is determined by the cross product of the
+direction cosines of the first row and first column of the first
+frame, such that a positive spacing indicates slices are stacked
+behind the first slice and a negative spacing indicates slices
+are stacked in front of the first slice. See Image Orientation
+(0020,0037) in the NM Detector Module.
+*/
+	spacing_z = spacing_z_ > 0.0 ? spacing_z_ : -spacing_z_;
+	//
+	const float row_dircos_x = dircos_[0];
+	const float row_dircos_y = dircos_[1];
+	const float row_dircos_z = dircos_[2];
+	const float col_dircos_x = dircos_[3];
+	const float col_dircos_y = dircos_[4];
+	const float col_dircos_z = dircos_[5];
+	const float nrm_dircos_x =
+		row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
+	const float nrm_dircos_y =
+		row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
+	const float nrm_dircos_z =
+		row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
+	direction[0][0] = row_dircos_x;
+	direction[1][0] = row_dircos_y;
+	direction[2][0] = row_dircos_z;
+	direction[0][1] = col_dircos_x;
+	direction[1][1] = col_dircos_y;
+	direction[2][1] = col_dircos_z;
+	direction[0][2] = (spacing_z_ > 0) ? nrm_dircos_x : -nrm_dircos_x;
+	direction[1][2] = (spacing_z_ > 0) ? nrm_dircos_y : -nrm_dircos_y;
+	direction[2][2] = (spacing_z_ > 0) ? nrm_dircos_z : -nrm_dircos_z;
+#if 0
+	std::cout << "Direction: " << direction[0][0] << " " << direction[1][0] << " " << direction[2][0] << std::endl;
+	std::cout << "           " << direction[0][1] << " " << direction[1][1] << " " << direction[2][1] << std::endl;
+	std::cout << "           " << direction[0][2] << " " << direction[1][2] << " " << direction[2][2] << std::endl;
+#endif
+	//
+	if (pb) pb->setValue(-1);
+	QApplication::processEvents();
+	//
+	QString error = CommonUtils::gen_itk_image(ok,
+		data, true,
+		pixelformat, pi,
+		ivariant,
+		direction,
+		dimx, dimy, dimz,
+		origin_x, origin_y, origin_z,
+		spacing_x, spacing_y, spacing_z,
+		false, false, //
+		wsettings->get_resize(),
+		wsettings->get_size_x(), wsettings->get_size_y(),
+		wsettings->get_rescale(),
+		0, NULL, pb,
+		false);
+	for (unsigned int x = 0; x < data.size(); ++x)
+	{
+		if (data.at(x)) delete [] data[x];
+	}
+	data.clear();
+	if (*ok)
+	{
+		IconUtils::icon(ivariant);
+	}
+	else
+	{
+		return error;
+	}
+	//
+	CommonUtils::reset_bb(ivariant);
+	//
+	return QString("");
+}
+
 QString DicomUtils::read_series(
 	bool * ok,
 	const bool min_load,
@@ -11355,6 +11562,7 @@ QString DicomUtils::read_dicom(
 	bool skip_volume  = false;
 	bool multiseries  = false;
 	bool ultrasound   = false;
+	bool nuclear      = false;
 	unsigned short rows_tmp0 = 0, rows_tmp1 = 0;
 	unsigned short columns_tmp0 = 0, columns_tmp1 = 0;
 	unsigned short ba_tmp0 = 0, ba_tmp1 = 0;
@@ -11686,6 +11894,10 @@ QString DicomUtils::read_dicom(
 			{
 				ultrasound = true;
 			}
+			else if (sop==QString("1.2.840.10008.5.1.4.1.1.20"))
+			{
+				nuclear = true;
+			}
 			else
 			{
 				if (ds.FindDataElement(tSlicePosition)) // for possible multiseries
@@ -11833,7 +12045,6 @@ QString DicomUtils::read_dicom(
 				   sop==QString("1.2.840.10008.5.1.4.1.1.1.2.1")   || // Digital Mammography X-Ray - For Processing
 				   sop==QString("1.2.840.10008.5.1.4.1.1.1.3")     || // Digital Intra-Oral X-Ray - For Presentation
 				   sop==QString("1.2.840.10008.5.1.4.1.1.1.3.1")   || // Digital Intra-Oral X-Ray - For Processing
-				   sop==QString("1.2.840.10008.5.1.4.1.1.20")      || // Nuclear Medicine
 				   sop==QString("1.2.840.10008.5.1.4.1.1.12.1")    || // X-Ray Angiographic
 				   sop==QString("1.2.840.10008.5.1.4.1.1.12.2")       // X-Ray RF
 				)
@@ -11888,6 +12099,7 @@ QString DicomUtils::read_dicom(
 	// is multiseries?
 	if (
 		!ultrasound &&
+		!nuclear &&
 		!multiframe &&
 		!enhanced &&
 		!mixed &&
@@ -12112,6 +12324,56 @@ QString DicomUtils::read_dicom(
 				images_tmp,
 				settings,
 				pb);
+			if (ok)
+			{
+				ivariant->filenames = QStringList(images_tmp);
+				ivariants.push_back(ivariant);
+			}
+			else
+			{
+				delete ivariant;
+			}
+		}
+	}
+	else if (nuclear && (load_type == 0 || load_type == 3))
+	{
+		// TODO check PR for nuclear
+		for (int x = 0; x < images.size(); ++x)
+		{
+			if (pb) pb->setValue(-1);
+			QApplication::processEvents();
+			QStringList images_tmp;
+			images_tmp << images.at(x);
+#if 1
+			ImageVariant * ivariant = new ImageVariant(
+				CommonUtils::get_next_id(),
+				false,
+				true,
+				NULL,
+				0);
+			message_ = read_nuclear(
+				&ok,
+				ivariant,
+				images_tmp,
+				0, NULL, false,
+				settings,
+				pb);
+#else
+			ImageVariant * ivariant = new ImageVariant(
+				CommonUtils::get_next_id(),
+				ok3d,
+				!wsettings->get_3d(),
+				gl,
+				0);
+				ivariant->di->filtering = wsettings->get_filtering();
+			message_ = read_nuclear(
+				&ok,
+				ivariant,
+				images_tmp,
+				max_3d_tex_size, gl, ok3d,
+				settings,
+				pb);
+#endif
 			if (ok)
 			{
 				ivariant->filenames = QStringList(images_tmp);
