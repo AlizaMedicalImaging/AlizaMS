@@ -1033,7 +1033,7 @@ else()
     ${ALIZAMS_MOC_SRCS}
     ${ALIZAMS_UIS}
     ${ALIZAMS_QRCS_RCC})
-  target_link_libraries(alizams ${ALIZAMS_LINK_LIBRARIES})
+  target_link_libraries(alizams ${ALIZAMS_LINK_LIBRARIES} lcms2)
   install(TARGETS alizams RUNTIME DESTINATION "bin")
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/package/archive/usr/share/icons" DESTINATION "share")
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/package/archive/usr/share/applications" DESTINATION "share")

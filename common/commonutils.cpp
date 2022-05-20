@@ -1425,7 +1425,7 @@ template<typename T> QString process_dicom_rgb_image1(
 				while (!it.IsAtEndOfLine())
 				{
 					typename T::PixelType p;
-					if (ybr > 0)
+					if (false)//ybr > 0)
 					{
 						// 8 bits
 						int R, G, B;

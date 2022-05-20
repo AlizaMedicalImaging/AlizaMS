@@ -84,6 +84,10 @@
 #include <chrono>
 #include "vectormath/scalar/vectormath.h"
 
+//////////////////////////
+#include "lcms2.h"
+//////////////////////////
+
 typedef Vectormath::Scalar::Vector3 sVector3;
 typedef Vectormath::Scalar::Vector4 sVector4;
 typedef Vectormath::Scalar::Matrix4 sMatrix4;
@@ -8129,6 +8133,10 @@ QString DicomUtils::read_buffer(
 	//
 	//
 	//
+//////////////////////////////////
+	char * icc_profile = NULL;
+	unsigned int icc_size = 0;
+//////////////////////////////////
 	{
 		mdcm::ImageReader image_reader;
 		if (elscint)
@@ -8442,6 +8450,24 @@ QString DicomUtils::read_buffer(
 				for (size_t x = 1; x < dimz; ++x) anatomy[x] = a;
 			}
 		}
+///////////////////////////////
+		if (true)
+		{
+			const mdcm::File & ifile = image_reader.GetFile();
+			const mdcm::DataSet & ds = ifile.GetDataSet();
+			if (ds.FindDataElement(mdcm::Tag(0x0028,0x2000)))
+			{
+				const mdcm::DataElement & icc_e = ds.GetDataElement(mdcm::Tag(0x0028,0x2000));
+				const mdcm::ByteValue * icc_bv = icc_e.GetByteValue();
+				if (icc_bv && icc_bv->GetPointer() && (icc_bv->GetLength() > 0))
+				{
+					icc_size = icc_bv->GetLength();
+					icc_profile = new char[icc_size];
+					memcpy(icc_profile, icc_bv->GetPointer(), icc_size);
+				}
+			}
+		}
+///////////////////////////////
 		//
 		if (image.GetPlanarConfiguration() == 1)
 		{
@@ -8745,8 +8771,43 @@ QString DicomUtils::read_buffer(
 				if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 				return tmp_s0;
 			}
-			buffer      = not_rescaled_buffer;
-			buffer_size = image_buffer_length;
+///////////////////////////////
+			if (icc_size > 0 && icc_profile && type_size == 1 && samples_per_pix == 3)
+			{
+				std::cout << "Using ICC profile" << std::endl;
+				char * icc_buffer = new char[image_buffer_length];
+				cmsHPROFILE hInProfile = cmsOpenProfileFromMem(icc_profile, icc_size);
+				cmsHPROFILE hOutProfile = cmsCreate_sRGBProfile();
+				if (hInProfile && hOutProfile)
+				{
+					cmsHTRANSFORM hTransform =
+						cmsCreateTransform(hInProfile, TYPE_RGB_8, hOutProfile, TYPE_RGB_8, INTENT_PERCEPTUAL, 0);
+					if (hTransform)
+					{
+						cmsDoTransform(hTransform, not_rescaled_buffer, icc_buffer, dimx * dimy * dimz);
+						buffer = icc_buffer;
+						buffer_size = image_buffer_length;
+						delete [] not_rescaled_buffer;
+						not_rescaled_buffer = NULL;
+						cmsDeleteTransform(hTransform);
+					}
+				}
+				else
+				{
+					buffer      = not_rescaled_buffer;
+					buffer_size = image_buffer_length;
+				}
+				if (hInProfile)  cmsCloseProfile(hInProfile);
+				if (hOutProfile) cmsCloseProfile(hOutProfile);
+			}
+			else
+			{
+				buffer      = not_rescaled_buffer;
+				buffer_size = image_buffer_length;
+			}
+///////////////////////////////
+//			buffer      = not_rescaled_buffer;
+//			buffer_size = image_buffer_length;
 		}
 		else // should never reach
 		{
