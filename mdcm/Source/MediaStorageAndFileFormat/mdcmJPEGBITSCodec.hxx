@@ -729,8 +729,8 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
 #endif
             ))
         {
-//          cinfo.jpeg_color_space = JCS_UNKNOWN;
-//          cinfo.out_color_space = JCS_UNKNOWN;
+          cinfo.jpeg_color_space = JCS_UNKNOWN;
+          cinfo.out_color_space = JCS_UNKNOWN;
         }
         // Probably should not happed, but lossy JPEG with photo-metric "RGB" and
         // cinfo.jpeg_color_space JCS_YCbCr exist. Required to open correctly.

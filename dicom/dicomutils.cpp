@@ -8776,6 +8776,23 @@ QString DicomUtils::read_buffer(
 			{
 				std::cout << "Using ICC profile" << std::endl;
 				char * icc_buffer = new char[image_buffer_length];
+				char * icc_tmp = new char[image_buffer_length];
+				for (size_t j = 0; j < image_buffer_length; j+=3)
+				{
+					int R, G, B;
+					double Y  = (unsigned char)not_rescaled_buffer[j];
+					const double Cb = (unsigned char)not_rescaled_buffer[j+1] - 128;
+					const double Cr = (unsigned char)not_rescaled_buffer[j+2] - 128;
+					R = static_cast<int>(Y + (-0.000036820)*Cb +    1.401987577*Cr);
+					G = static_cast<int>(Y + (-0.344113281)*Cb + (-0.714103821)*Cr);
+					B = static_cast<int>(Y +    1.771978117*Cb + (-0.000134583)*Cr);
+					if (R > 255) R = 255;
+					if (G > 255) G = 255;
+					if (B > 255) B = 255;
+					icc_tmp[j+0]=static_cast<char>(R < 0 ? 0 : R);
+					icc_tmp[j+1]=static_cast<char>(G < 0 ? 0 : G);
+					icc_tmp[j+2]=static_cast<char>(B < 0 ? 0 : B);
+				}
 				cmsHPROFILE hInProfile = cmsOpenProfileFromMem(icc_profile, icc_size);
 				cmsHPROFILE hOutProfile = cmsCreate_sRGBProfile();
 				if (hInProfile && hOutProfile)
@@ -8784,7 +8801,7 @@ QString DicomUtils::read_buffer(
 						cmsCreateTransform(hInProfile, TYPE_RGB_8, hOutProfile, TYPE_RGB_8, INTENT_PERCEPTUAL, 0);
 					if (hTransform)
 					{
-						cmsDoTransform(hTransform, not_rescaled_buffer, icc_buffer, dimx * dimy * dimz);
+						cmsDoTransform(hTransform, icc_tmp, icc_buffer, dimx * dimy * dimz);
 						buffer = icc_buffer;
 						buffer_size = image_buffer_length;
 						delete [] not_rescaled_buffer;
@@ -8796,9 +8813,11 @@ QString DicomUtils::read_buffer(
 				{
 					buffer      = not_rescaled_buffer;
 					buffer_size = image_buffer_length;
+					delete [] icc_buffer;
 				}
 				if (hInProfile)  cmsCloseProfile(hInProfile);
 				if (hOutProfile) cmsCloseProfile(hOutProfile);
+				delete [] icc_tmp;
 			}
 			else
 			{
