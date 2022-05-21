@@ -5739,6 +5739,8 @@ QString DicomUtils::read_enhanced(
 	bool clean_unused_bits  = false;
 	bool pred6_bug          = false;
 	bool cornell_bug        = false;
+	bool use_icc            = false;
+	bool icc_ok             = false;
 	QString sop("");
 	{
 		mdcm::Reader reader;
@@ -5770,6 +5772,7 @@ QString DicomUtils::read_enhanced(
 		clean_unused_bits = wsettings->get_clean_unused_bits();
 		pred6_bug = wsettings->get_predictor_workaround();
 		cornell_bug = wsettings->get_cornell_workaround();
+		use_icc = true; // TODO
 		QString iod("");
 		const mdcm::Tag tSOPClassUID(0x0008,0x0016);
 		const mdcm::Tag tPerFrameFunctionalGroupsSequence(0x5200,0x9230);
@@ -5863,6 +5866,7 @@ QString DicomUtils::read_enhanced(
 			cornell_bug,
 			NULL,
 			NULL,
+			use_icc, &icc_ok,
 			pb);
 	if (*ok == false) return message_;
 	if (rows_ok && cols_ok &&
@@ -6160,6 +6164,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 	double spacing_x_read = 0, spacing_y_read = 0, spacing_z_read = 0;
 	double unsused0 = 0.0, unsused1 = 1.0;
 	int red_subscript = INT_MIN;
+	bool icc_ok_dummy = false;
 	AnatomyMap empty_;
 	// do not use GDCM's rescale for enhanced, except for US
 	message_ =
@@ -6184,6 +6189,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 			cornell_bug,
 			&red_subscript,
 			NULL,
+			false, &icc_ok_dummy,
 			pb);
 #if 0
 	std::cout << "subscript = " << red_subscript << std::endl;
@@ -6378,6 +6384,8 @@ QString DicomUtils::read_ultrasound(
 	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
 	const bool pred6_bug = wsettings->get_predictor_workaround();
 	const bool cornell_bug = wsettings->get_cornell_workaround();
+	bool use_icc = true; // TODO
+	bool icc_ok = false;
 	std::vector<char*> data;
 	itk::Matrix<itk::SpacePrecisionType,3,3> direction;
 	mdcm::PixelFormat pixelformat;
@@ -6549,6 +6557,7 @@ QString DicomUtils::read_ultrasound(
 		cornell_bug,
 		NULL,
 		NULL,
+		use_icc, &icc_ok,
 		pb);
 	if (*ok==false) return buff_error;
 	//
@@ -6656,6 +6665,8 @@ QString DicomUtils::read_nuclear(
 	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
 	const bool pred6_bug = wsettings->get_predictor_workaround();
 	const bool cornell_bug = wsettings->get_cornell_workaround();
+	bool use_icc = true;// TODO
+	bool icc_ok = false;
 	std::vector<char*> data;
 	itk::Matrix<itk::SpacePrecisionType,3,3> direction;
 	mdcm::PixelFormat pixelformat;
@@ -6748,6 +6759,7 @@ QString DicomUtils::read_nuclear(
 		cornell_bug,
 		NULL,
 		NULL,
+		use_icc, &icc_ok,
 		pb);
 	if (*ok==false) return buff_error;
 #if 0
@@ -6867,6 +6879,8 @@ QString DicomUtils::read_series(
 	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
 	const bool pred6_bug = wsettings->get_predictor_workaround();
 	const bool cornell_bug = wsettings->get_cornell_workaround();
+	bool use_icc = true;//TODO
+	bool icc_ok = false;
 	std::vector<char*> data;
 	itk::Matrix<itk::SpacePrecisionType,3,3> direction;
 	mdcm::PixelFormat pixelformat;
@@ -7110,6 +7124,7 @@ QString DicomUtils::read_series(
 				cornell_bug,
 				NULL,
 				&buffers_size,
+				use_icc, &icc_ok,
 				pb);
 			if (dimz_ > 1)
 			{
@@ -7205,6 +7220,7 @@ QString DicomUtils::read_series(
 				cornell_bug,
 				NULL,
 				NULL,
+				use_icc, &icc_ok,
 				pb);
 		}
 		if (*ok == false)
@@ -8101,6 +8117,7 @@ QString DicomUtils::read_buffer(
 	const bool cornell_bug,
 	int * red_subscript,
 	unsigned long long * buffers_size,
+	const bool use_icc, bool * has_icc,
 	QProgressDialog * pb)
 {
 	*ok = false;
@@ -8130,13 +8147,9 @@ QString DicomUtils::read_buffer(
 	mdcm::PixelFormat image_pixelformat = mdcm::PixelFormat::UNKNOWN;
 	unsigned long long image_buffer_length = 0;
 	QString elscf("");
-	//
-	//
-	//
-//////////////////////////////////
+	short icc_for_ybr = 0;
 	char * icc_profile = NULL;
 	unsigned int icc_size = 0;
-//////////////////////////////////
 	{
 		mdcm::ImageReader image_reader;
 		if (elscint)
@@ -8450,24 +8463,26 @@ QString DicomUtils::read_buffer(
 				for (size_t x = 1; x < dimz; ++x) anatomy[x] = a;
 			}
 		}
-///////////////////////////////
-		if (true)
+		//
+		if (use_icc)
 		{
 			const mdcm::File & ifile = image_reader.GetFile();
 			const mdcm::DataSet & ds = ifile.GetDataSet();
 			if (ds.FindDataElement(mdcm::Tag(0x0028,0x2000)))
 			{
 				const mdcm::DataElement & icc_e = ds.GetDataElement(mdcm::Tag(0x0028,0x2000));
-				const mdcm::ByteValue * icc_bv = icc_e.GetByteValue();
-				if (icc_bv && icc_bv->GetPointer() && (icc_bv->GetLength() > 0))
+				if (!icc_e.IsEmpty() && !icc_e.IsUndefinedLength())
 				{
-					icc_size = icc_bv->GetLength();
-					icc_profile = new char[icc_size];
-					memcpy(icc_profile, icc_bv->GetPointer(), icc_size);
+					const mdcm::ByteValue * icc_bv = icc_e.GetByteValue();
+					if (icc_bv && icc_bv->GetPointer() && (icc_bv->GetLength() > 0))
+					{
+						icc_size = icc_bv->GetLength();
+						icc_profile = new char[icc_size];
+						memcpy(icc_profile, icc_bv->GetPointer(), icc_size);
+					}
 				}
 			}
 		}
-///////////////////////////////
 		//
 		if (image.GetPlanarConfiguration() == 1)
 		{
@@ -8514,6 +8529,15 @@ QString DicomUtils::read_buffer(
 			rescale_intercept = image.GetIntercept();
 			rescale_slope     = image.GetSlope();
 		}
+		else if (pi == mdcm::PhotometricInterpretation::YBR_FULL ||
+				 pi == mdcm::PhotometricInterpretation::YBR_FULL_422)
+		{
+			if (use_icc) icc_for_ybr = 1;
+		}
+		else if (pi == mdcm::PhotometricInterpretation::YBR_PARTIAL_422)
+		{
+			if (use_icc) icc_for_ybr = 2;
+		}
 		//
 		//
 		//
@@ -8532,8 +8556,7 @@ QString DicomUtils::read_buffer(
 		}
 		catch (const std::bad_alloc&)
 		{
-			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
-			return QString("Buffer allocation error");
+			not_rescaled_buffer = NULL;
 		}
 		if (!not_rescaled_buffer)
 		{
@@ -8565,6 +8588,7 @@ QString DicomUtils::read_buffer(
 			{
 				if (pixelformat.GetBitsAllocated() < 8)
 				{
+					if (not_rescaled_buffer) delete [] not_rescaled_buffer;
 					if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 					return QString(
 						"Bits allocated < 8 and rescale,\n"
@@ -8619,7 +8643,6 @@ QString DicomUtils::read_buffer(
 					{
 						rescale_type_size = pixelformat.GetBitsAllocated()/8;
 					}
-//
 					rescaled_buffer_size
 						= dimx * dimy * dimz * rescale_type_size * pixelformat.GetSamplesPerPixel();
 					try
@@ -8628,7 +8651,7 @@ QString DicomUtils::read_buffer(
 					}
 					catch(const std::bad_alloc&)
 					{
-						return QString("Buffer allocation error");
+						rescaled_buffer = NULL;
 					}
 					if (!rescaled_buffer)
 					{
@@ -8729,10 +8752,11 @@ QString DicomUtils::read_buffer(
 		}
 		catch (const std::bad_alloc&)
 		{
-			return QString("Buffer allocation error");
+			singlebit_buffer = NULL;
 		}
 		if (!singlebit_buffer)
 		{
+			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return QString("Buffer allocation error");
 		}
 		unsigned long long j = 0;
@@ -8768,30 +8792,72 @@ QString DicomUtils::read_buffer(
 					QVariant(image_buffer_length).toString() +
 					QString("\nbut must be\n") +
 					QVariant(dimx * dimy * dimz * type_size * samples_per_pix).toString();
+				if (not_rescaled_buffer)  delete [] not_rescaled_buffer;
+				if (rescaled_buffer)      delete [] rescaled_buffer;
 				if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 				return tmp_s0;
 			}
-///////////////////////////////
 			if (icc_size > 0 && icc_profile && type_size == 1 && samples_per_pix == 3)
 			{
+#if 1
 				std::cout << "Using ICC profile" << std::endl;
-				char * icc_buffer = new char[image_buffer_length];
-				char * icc_tmp = new char[image_buffer_length];
-				for (size_t j = 0; j < image_buffer_length; j+=3)
+#endif
+				char * icc_buffer;
+				try
 				{
-					int R, G, B;
-					double Y  = (unsigned char)not_rescaled_buffer[j];
-					const double Cb = (unsigned char)not_rescaled_buffer[j+1] - 128;
-					const double Cr = (unsigned char)not_rescaled_buffer[j+2] - 128;
-					R = static_cast<int>(Y + (-0.000036820)*Cb +    1.401987577*Cr);
-					G = static_cast<int>(Y + (-0.344113281)*Cb + (-0.714103821)*Cr);
-					B = static_cast<int>(Y +    1.771978117*Cb + (-0.000134583)*Cr);
-					if (R > 255) R = 255;
-					if (G > 255) G = 255;
-					if (B > 255) B = 255;
-					icc_tmp[j+0]=static_cast<char>(R < 0 ? 0 : R);
-					icc_tmp[j+1]=static_cast<char>(G < 0 ? 0 : G);
-					icc_tmp[j+2]=static_cast<char>(B < 0 ? 0 : B);
+					icc_buffer = new char[image_buffer_length];
+				}
+				catch (const std::bad_alloc &)
+				{
+					icc_buffer = NULL;
+					if (not_rescaled_buffer)  delete [] not_rescaled_buffer;
+					if (rescaled_buffer)      delete [] rescaled_buffer;
+					if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
+					return QString("Memory allocation error");
+				}
+				char * icc_tmp = NULL;
+				if (icc_for_ybr > 0)
+				{
+					try
+					{
+						icc_tmp = new char[image_buffer_length];
+					}
+					catch (const std::bad_alloc &)
+					{
+						if (not_rescaled_buffer)  delete [] not_rescaled_buffer;
+						if (rescaled_buffer)      delete [] rescaled_buffer;
+						if (icc_buffer)           delete [] icc_buffer;
+						if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
+						return QString("Memory allocation error");
+					}
+					for (size_t j = 0; j < image_buffer_length; j+=3)
+					{
+						// TODO the code is partially duplicated with commonutils.cpp
+						int R = 0, G = 0, B = 0;
+						double Y        = static_cast<unsigned char>(not_rescaled_buffer[j]);
+						const double Cb = static_cast<unsigned char>(not_rescaled_buffer[j + 1]) - 128;
+						const double Cr = static_cast<unsigned char>(not_rescaled_buffer[j + 2]) - 128;
+						if (icc_for_ybr == 1)
+						{
+							R = static_cast<int>(Y + (-0.000036820)*Cb +    1.401987577*Cr);
+							G = static_cast<int>(Y + (-0.344113281)*Cb + (-0.714103821)*Cr);
+							B = static_cast<int>(Y +    1.771978117*Cb + (-0.000134583)*Cr);
+						}
+						else if (icc_for_ybr == 2)
+						{
+							Y -= 16;
+							if (Y < 0) Y = 0; // invalid?
+							R = static_cast<int>(1.164415463*Y + (-0.000095036)*Cb +    1.596001878*Cr);
+							G = static_cast<int>(1.164415463*Y + (-0.391724564)*Cb + (-0.813013368)*Cr);
+							B = static_cast<int>(1.164415463*Y +    2.017290682*Cb + (-0.000135273)*Cr);
+						}
+						if (R > 255) R = 255;
+						if (G > 255) G = 255;
+						if (B > 255) B = 255;
+						icc_tmp[j    ] = static_cast<char>(R < 0 ? 0 : R);
+						icc_tmp[j + 1] = static_cast<char>(G < 0 ? 0 : G);
+						icc_tmp[j + 2] = static_cast<char>(B < 0 ? 0 : B);
+					}
 				}
 				cmsHPROFILE hInProfile = cmsOpenProfileFromMem(icc_profile, icc_size);
 				cmsHPROFILE hOutProfile = cmsCreate_sRGBProfile();
@@ -8801,20 +8867,24 @@ QString DicomUtils::read_buffer(
 						cmsCreateTransform(hInProfile, TYPE_RGB_8, hOutProfile, TYPE_RGB_8, INTENT_PERCEPTUAL, 0);
 					if (hTransform)
 					{
-						cmsDoTransform(hTransform, icc_tmp, icc_buffer, dimx * dimy * dimz);
+						cmsDoTransform(
+							hTransform,
+							((icc_for_ybr > 0) ? icc_tmp : not_rescaled_buffer),
+							icc_buffer,
+							dimx * dimy * dimz);
 						buffer = icc_buffer;
-						buffer_size = image_buffer_length;
 						delete [] not_rescaled_buffer;
 						not_rescaled_buffer = NULL;
+						*has_icc = true;
 						cmsDeleteTransform(hTransform);
 					}
 				}
 				else
 				{
-					buffer      = not_rescaled_buffer;
-					buffer_size = image_buffer_length;
+					buffer = not_rescaled_buffer;
 					delete [] icc_buffer;
 				}
+				buffer_size = image_buffer_length;
 				if (hInProfile)  cmsCloseProfile(hInProfile);
 				if (hOutProfile) cmsCloseProfile(hOutProfile);
 				delete [] icc_tmp;
@@ -8824,17 +8894,11 @@ QString DicomUtils::read_buffer(
 				buffer      = not_rescaled_buffer;
 				buffer_size = image_buffer_length;
 			}
-///////////////////////////////
-//			buffer      = not_rescaled_buffer;
-//			buffer_size = image_buffer_length;
 		}
 		else // should never reach
 		{
-			if (rescaled_buffer)
-			{
-				delete [] rescaled_buffer;
-				rescaled_buffer = NULL;
-			}
+			if (rescaled_buffer) delete [] rescaled_buffer;
+			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return QString("Internal error");
 		}
 	}
@@ -8864,6 +8928,7 @@ QString DicomUtils::read_buffer(
 		{
 			if (not_rescaled_buffer)  delete [] not_rescaled_buffer;
 			if (rescaled_buffer)      delete [] rescaled_buffer;
+			if (singlebit_buffer)     delete [] singlebit_buffer;
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return QString("Memory allocation error");
 		}
