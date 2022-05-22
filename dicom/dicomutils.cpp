@@ -8826,6 +8826,7 @@ QString DicomUtils::read_buffer(
 				if (rescaled_buffer)     delete [] rescaled_buffer;
 				if (icc_profile)         delete [] icc_profile;
 				if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
+				cms_error = 0;
 				return tmp_s0;
 			}
 			if (icc_size > 0 && icc_profile && type_size == 1 && samples_per_pix == 3)
@@ -8894,11 +8895,9 @@ QString DicomUtils::read_buffer(
 						icc_tmp[j + 2] = static_cast<char>(B < 0 ? 0 : B);
 					}
 				}
-				bool cms_ok = true;
 				cmsSetLogErrorHandler(AlizaLCMS2LogErrorHandler);
 				cmsHPROFILE hInProfile = cmsOpenProfileFromMem(icc_profile, icc_size);
-				if (cms_error != 0) cms_ok = false;
-				if (cms_ok)
+				if (cms_error == 0)
 				{
 					cmsHPROFILE hOutProfile = cmsCreate_sRGBProfile();
 					if (hInProfile && hOutProfile)
