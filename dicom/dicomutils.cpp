@@ -8521,6 +8521,7 @@ QString DicomUtils::read_buffer(
 		{
 			if (!red_subscript)
 			{
+				if (icc_profile) delete [] icc_profile;
 				if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 				return QString(
 					"Error (subscript is NULL),\n"
@@ -8569,12 +8570,14 @@ QString DicomUtils::read_buffer(
 		}
 		if (!not_rescaled_buffer)
 		{
+			if (icc_profile) delete [] icc_profile;
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return QString("Buffer allocation error");
 		}
 		if (!image.GetBuffer(not_rescaled_buffer))
 		{
 			delete [] not_rescaled_buffer;
+			if (icc_profile) delete [] icc_profile;
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return QString("Buffer is NULL");
 		}
@@ -8598,6 +8601,7 @@ QString DicomUtils::read_buffer(
 				if (pixelformat.GetBitsAllocated() < 8)
 				{
 					if (not_rescaled_buffer) delete [] not_rescaled_buffer;
+					if (icc_profile)         delete [] icc_profile;
 					if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 					return QString(
 						"Bits allocated < 8 and rescale,\n"
@@ -8605,6 +8609,7 @@ QString DicomUtils::read_buffer(
 				}
 				if (supp_palette_color)
 				{
+					if (icc_profile) delete [] icc_profile;
 					if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 					return QString("Re-scale and Suppl. LUT?");
 				}
@@ -8644,6 +8649,7 @@ QString DicomUtils::read_buffer(
 						}
 						else
 						{
+							if (icc_profile) delete [] icc_profile;
 							if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 							return QString("Internal error (re-scale)");
 						}
@@ -8665,6 +8671,7 @@ QString DicomUtils::read_buffer(
 					if (!rescaled_buffer)
 					{
 						if (not_rescaled_buffer) delete [] not_rescaled_buffer;
+						if (icc_profile)         delete [] icc_profile;
 						if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 						return QString("Buffer is NULL");
 					}

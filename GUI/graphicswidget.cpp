@@ -516,7 +516,7 @@ template<typename T> void load_rgb_image(
 				++iterator;
 			}
 		}
-		catch(const itk::ExceptionObject &)
+		catch (const itk::ExceptionObject &)
 		{
 			return;
 		}
@@ -547,7 +547,7 @@ template<typename T> void load_rgb_image(
  					++iterator;
 				}
 			}
-			catch(const itk::ExceptionObject &)
+			catch (const itk::ExceptionObject &)
 			{
 				return;
 			}
@@ -704,7 +704,7 @@ template<typename T> void load_rgba_image(
 				++iterator;
 			}
 		}
-		catch(const itk::ExceptionObject &)
+		catch (const itk::ExceptionObject &)
 		{
 			return;
 		}
@@ -736,7 +736,7 @@ template<typename T> void load_rgba_image(
  				++iterator;
 			}
 		}
-		catch(const itk::ExceptionObject &)
+		catch (const itk::ExceptionObject &)
 		{
 			return;
 		}
@@ -781,7 +781,7 @@ template<typename T> void load_rgba_image(
 				++iterator;
 			}
 		}
-		catch(const itk::ExceptionObject &)
+		catch (const itk::ExceptionObject &)
 		{
 			return;
 		}
@@ -823,7 +823,7 @@ template<typename T> void load_rgba_image(
  				++iterator;
 			}
 		}
-		catch(const itk::ExceptionObject &)
+		catch (const itk::ExceptionObject &)
 		{
 			return;
 		}
@@ -936,10 +936,13 @@ template<typename T> void load_rgb_char_image(
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
 	if (image_type == 14)
 	{
-		try { p = reinterpret_cast<unsigned char *>(image->GetBufferPointer()); }
+		try
+		{
+			p = reinterpret_cast<unsigned char *>(image->GetBufferPointer());
+		}
 		catch (const itk::ExceptionObject & ex)
 		{
-			std::cout << ex << std::endl;
+			std::cout << ex.GetDescription() << std::endl;
 			return;
 		}
 	}
@@ -1079,10 +1082,13 @@ template<typename T> void load_rgba_char_image(
 	if (image_type == 24)
 	{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-		try { p = reinterpret_cast<unsigned char *>(image->GetBufferPointer()); }
+		try
+		{
+			p = reinterpret_cast<unsigned char *>(image->GetBufferPointer());
+		}
 		catch (const itk::ExceptionObject & ex)
 		{
-			std::cout << ex << std::endl;
+			std::cout << ex.GetDescription() << std::endl;
 			return;
 		}
 		if (!p) return;
@@ -1120,7 +1126,7 @@ template<typename T> void load_rgba_char_image(
 				++iterator;
 			}
 		}
-		catch(const itk::ExceptionObject &)
+		catch (const itk::ExceptionObject &)
 		{
 			return;
 		}

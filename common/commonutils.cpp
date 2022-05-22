@@ -386,7 +386,7 @@ template<typename T> void get_dimensions(
 	}
 	catch (const itk::ExceptionObject & ex)
 	{
-		std::cout << ex << std::endl;
+		std::cout << ex.GetDescription() << std::endl;
 		return;
 	}
 	*dimx = size[0];
@@ -529,7 +529,7 @@ template<typename T> int generate_tex3d(
 		}
 		catch (const itk::ExceptionObject & ex)
 		{
-			std::cout << ex << std::endl;
+			std::cout << ex.GetDescription() << std::endl;
 			return 1;
 		}
 		if (out_image.IsNotNull()) out_image->DisconnectPipeline();
