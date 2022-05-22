@@ -8103,6 +8103,16 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 	return true;
 }
 
+static cmsUInt32Number cms_error = 0;
+extern "C"
+{
+	void AlizaLCMS2LogErrorHandler(cmsContext ContextID, cmsUInt32Number ErrorCode, const char * t)
+	{
+		cms_error = ErrorCode;
+		printf("%s\n", t);
+	}
+}
+
 QString DicomUtils::read_buffer(
 	bool * ok, std::vector<char*> & data,
 	ImageOverlays & image_overlays,
@@ -8835,6 +8845,7 @@ QString DicomUtils::read_buffer(
 					if (rescaled_buffer)     delete [] rescaled_buffer;
 					if (icc_profile)         delete [] icc_profile;
 					if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
+					cms_error = 0;
 					return QString("Memory allocation error");
 				}
 				char * icc_tmp = NULL;
@@ -8851,6 +8862,7 @@ QString DicomUtils::read_buffer(
 						if (icc_buffer)          delete [] icc_buffer;
 						if (icc_profile)         delete [] icc_profile;
 						if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
+						cms_error = 0;
 						return QString("Memory allocation error");
 					}
 					for (size_t j = 0; j < image_buffer_length; j+=3)
@@ -8882,41 +8894,66 @@ QString DicomUtils::read_buffer(
 						icc_tmp[j + 2] = static_cast<char>(B < 0 ? 0 : B);
 					}
 				}
+				bool cms_ok = true;
+				cmsSetLogErrorHandler(AlizaLCMS2LogErrorHandler);
 				cmsHPROFILE hInProfile = cmsOpenProfileFromMem(icc_profile, icc_size);
-				cmsHPROFILE hOutProfile = cmsCreate_sRGBProfile();
-				if (hInProfile && hOutProfile)
+				if (cms_error != 0) cms_ok = false;
+				if (cms_ok)
 				{
-					cmsHTRANSFORM hTransform =
-						cmsCreateTransform(hInProfile, TYPE_RGB_8, hOutProfile, TYPE_RGB_8, INTENT_PERCEPTUAL, 0);
-					if (hTransform)
+					cmsHPROFILE hOutProfile = cmsCreate_sRGBProfile();
+					if (hInProfile && hOutProfile)
 					{
-						cmsDoTransform(
-							hTransform,
-							((icc_for_ybr > 0) ? icc_tmp : not_rescaled_buffer),
-							icc_buffer,
-							dimx * dimy * dimz);
-						buffer = icc_buffer;
-						delete [] not_rescaled_buffer;
-						not_rescaled_buffer = NULL;
-						*has_icc = true;
-						cmsDeleteTransform(hTransform);
+						cmsHTRANSFORM hTransform =
+							cmsCreateTransform(hInProfile, TYPE_RGB_8, hOutProfile, TYPE_RGB_8, INTENT_PERCEPTUAL, 0);
+						if (hTransform && cms_error == 0)
+						{
+							cmsDoTransform(
+								hTransform,
+								((icc_for_ybr > 0) ? icc_tmp : not_rescaled_buffer),
+								icc_buffer,
+								dimx * dimy * dimz);
+							if (cms_error == 0)
+							{
+								buffer = icc_buffer;
+								delete [] not_rescaled_buffer;
+								not_rescaled_buffer = NULL;
+								*has_icc = true;
+							}
+							else
+							{
+								buffer = not_rescaled_buffer;
+								delete [] icc_buffer;
+							}
+							cmsDeleteTransform(hTransform);
+						}
+						else
+						{
+							buffer = not_rescaled_buffer;
+							delete [] icc_buffer;
+						}
+						cmsCloseProfile(hInProfile);
+						cmsCloseProfile(hOutProfile);
 					}
+					else
+					{
+						buffer = not_rescaled_buffer;
+						delete [] icc_buffer;
+					}
+					buffer_size = image_buffer_length;
+					delete [] icc_tmp;
 				}
 				else
 				{
-					buffer = not_rescaled_buffer;
-					delete [] icc_buffer;
+					buffer      = not_rescaled_buffer;
+					buffer_size = image_buffer_length;
 				}
-				buffer_size = image_buffer_length;
-				if (hInProfile)  cmsCloseProfile(hInProfile);
-				if (hOutProfile) cmsCloseProfile(hOutProfile);
-				delete [] icc_tmp;
 			}
 			else
 			{
 				buffer      = not_rescaled_buffer;
 				buffer_size = image_buffer_length;
 			}
+			cms_error = 0;
 		}
 		else // should never reach
 		{
