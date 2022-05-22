@@ -15,6 +15,7 @@ BuildRequires:  cmake(LIBMINC)
 BuildRequires:  cmake(ITK)
 BuildRequires:  cmake(gdcm)
 BuildRequires:  bullet-devel
+BuildRequires:  lcms2-devel
 BuildRequires:  desktop-file-utils
 BuildRequires:  git
 Requires:       hicolor-icon-theme
@@ -37,6 +38,7 @@ rm -fr mdcm/Utilities/mdcmopenjpeg/
 rm -fr mdcm/Utilities/mdcmcharls/
 rm -fr mdcm/Utilities/mdcmuuid/
 rm -fr mdcm/Utilities/pvrg/
+rm -fr alizalcms2/
 rm -fr b/
 rm -fr CG/glew/
 
@@ -46,6 +48,7 @@ cd AlizaMS
   -DCMAKE_SKIP_RPATH:BOOL=ON \
   -DALIZA_QT_VERSION:STRING=5 \
   -DALIZA_USE_SYSTEM_BULLET:BOOL=ON \
+  -DALIZA_USE_SYSTEM_LCMS2:BOOL=ON \
   -DMDCM_USE_SYSTEM_ZLIB:BOOL=ON \
   -DMDCM_USE_SYSTEM_OPENJPEG:BOOL=ON \
   -DMDCM_USE_SYSTEM_CHARLS:BOOL=ON \
