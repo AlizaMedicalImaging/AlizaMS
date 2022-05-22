@@ -302,6 +302,7 @@ public:
 		const double, const double, const double,
 		const double, const double,
 		const bool,
+		const bool,
 		QProgressDialog*,
 		float);
 	static bool enhanced_process_indices(
@@ -337,6 +338,7 @@ public:
 		const double, const double, const double,
 		const double, const double, const double,
 		const double, const double,
+		const bool,
 		const bool,
 		QProgressDialog*,
 		float);

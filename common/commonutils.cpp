@@ -1425,7 +1425,7 @@ template<typename T> QString process_dicom_rgb_image1(
 				while (!it.IsAtEndOfLine())
 				{
 					typename T::PixelType p;
-					if (false)//ybr > 0)
+					if (ybr > 0)
 					{
 						// 8 bits
 						int R, G, B;
@@ -3207,6 +3207,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 	bool geometry_from_image, bool allow_geometry_from_image,
 	bool resize_, unsigned int size_x, unsigned int size_y,
 	bool no_warn_rescale,
+	bool use_icc,
 	int max_3d_tex_size, GLWidget * gl, QProgressDialog * pb,
 	bool skip_ybr)
 {
@@ -3219,7 +3220,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 	if (data_size < 1) return QString("data.size() < 1");
 	if (!data.at(0)) return QString("!data.at(0)");
 	short ybr = 0;
-	if (!skip_ybr)
+	if (!skip_ybr && !use_icc)
 	{
 		if (pi == mdcm::PhotometricInterpretation::YBR_FULL ||
 			pi == mdcm::PhotometricInterpretation::YBR_FULL_422)

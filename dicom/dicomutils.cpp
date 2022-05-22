@@ -84,9 +84,14 @@
 #include <chrono>
 #include "vectormath/scalar/vectormath.h"
 
-//////////////////////////
+// TODO
+//#define USE_SYSTEM_LCMS2
+
+#ifdef USE_SYSTEM_LCMS2
 #include "lcms2.h"
-//////////////////////////
+#else
+#include "alizalcms/lcms2.h"
+#endif
 
 typedef Vectormath::Scalar::Vector3 sVector3;
 typedef Vectormath::Scalar::Vector4 sVector4;
@@ -5984,6 +5989,7 @@ QString DicomUtils::read_enhanced(
 		origin_x_read, origin_y_read, origin_z_read,
 		unsused0, unsused1,
 		apply_rescale,
+		(use_icc && icc_ok),
 		pb,
 		tolerance);
 #ifdef ENHANCED_PRINT_INFO
@@ -6017,6 +6023,7 @@ QString DicomUtils::read_enhanced(
 			origin_x_read,  origin_y_read,  origin_z_read,
 			unsused0, unsused1,
 			apply_rescale,
+			(use_icc && icc_ok),
 			pb,
 			tolerance);
 	}
@@ -6310,6 +6317,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 		origin_x_read, origin_y_read, origin_z_read,
 		unsused0, unsused1,
 		false,
+		false,
 		pb,
 		tolerance);
 #ifdef ENHANCED_PRINT_INFO
@@ -6346,6 +6354,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 			spacing_x_read, spacing_y_read, spacing_z_read,
 			origin_x_read,  origin_y_read,  origin_z_read,
 			unsused0, unsused1,
+			false,
 			false,
 			pb,
 			tolerance);
@@ -6613,6 +6622,7 @@ QString DicomUtils::read_ultrasound(
 		wsettings->get_resize(),
 		wsettings->get_size_x(), wsettings->get_size_y(),
 		wsettings->get_rescale(),
+		(use_icc && icc_ok),
 		0, NULL, pb,
 		false);
 	for (unsigned int x = 0; x < data.size(); ++x)
@@ -6832,6 +6842,7 @@ are stacked in front of the first slice. See Image Orientation
 		wsettings->get_resize(),
 		wsettings->get_size_x(), wsettings->get_size_y(),
 		wsettings->get_rescale(),
+		(use_icc && icc_ok),
 		0, NULL, pb,
 		false);
 	for (unsigned int x = 0; x < data.size(); ++x)
@@ -7565,6 +7576,7 @@ QString DicomUtils::read_series(
 		wsettings->get_resize(),
 		wsettings->get_size_x(), wsettings->get_size_y(),
 		no_warn_rescale,
+		(use_icc && icc_ok),
 		max_3d_tex_size, gl, pb,
 		false);
 	for (unsigned int x = 0; x < data.size(); ++x)
@@ -8978,6 +8990,7 @@ QString DicomUtils::read_enhanced_common(
 	const double shift_tmp,
 	const double scale_tmp,
 	const bool apply_rescale,
+	const bool use_icc,
 	QProgressDialog * pb,
 	float tolerance)
 {
@@ -9622,6 +9635,7 @@ QString DicomUtils::read_enhanced_common(
 					wsettings->get_size_x(),
 					wsettings->get_size_y(),
 					no_warn_rescale,
+					use_icc,
 					max_3d_tex_size,
 					gl,
 					pb,
@@ -9660,6 +9674,7 @@ QString DicomUtils::read_enhanced_common(
 						wsettings->get_size_x(),
 						wsettings->get_size_y(),
 						no_warn_rescale,
+						use_icc,
 						0,
 						NULL,
 						pb,
@@ -9727,6 +9742,7 @@ QString DicomUtils::read_enhanced_common(
 						wsettings->get_size_x(),
 						wsettings->get_size_y(),
 						no_warn_rescale,
+						use_icc,
 						max_3d_tex_size,
 						gl,
 						pb,
@@ -9991,6 +10007,7 @@ QString DicomUtils::read_enhanced_3d_6d(
 	const double origin_x_read, const double origin_y_read, const double origin_z_read,
 	const double shift_tmp, const double scale_tmp,
 	const bool apply_rescale,
+	const bool use_icc,
 	QProgressDialog * pb,
 	float tolerance)
 {
@@ -10021,6 +10038,7 @@ QString DicomUtils::read_enhanced_3d_6d(
 			origin_x_read, origin_y_read, origin_z_read,
 			shift_tmp, scale_tmp,
 			apply_rescale,
+			use_icc,
 			pb,
 			tolerance);
 	else

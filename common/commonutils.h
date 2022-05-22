@@ -93,6 +93,7 @@ public:
 		bool, bool,
 		bool, unsigned int, unsigned int,
 		bool,
+		bool,
 		int, GLWidget*, QProgressDialog*,
 		bool=false);
 	static void read_geometry_from_image_(ImageVariant*);

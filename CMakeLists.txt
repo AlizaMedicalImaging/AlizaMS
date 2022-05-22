@@ -104,6 +104,10 @@ if(NOT APPLE)
   option(ALIZA_QT5_COREGL "Use OpenGL Core profile with Qt5" OFF)
 endif()
 
+if(UNIX AND NOT APPLE)
+  option(ALIZA_USE_SYSTEM_LCMS2 "Use system lcms2" OFF)
+endif()
+
 # Only for build to be shipped on media.
 option(ALIZA_MEDIASTORAGE_MODE "Build for media storage" OFF)
 mark_as_advanced(ALIZA_MEDIASTORAGE_MODE)
@@ -768,6 +772,20 @@ else()
   include_directories("/usr/include/bullet")
 endif()
 
+#
+#
+#
+#
+#
+if(NOT ALIZA_USE_SYSTEM_LCMS2)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/alizalcms)
+endif()
+#
+#
+#
+#
+#
+
 set(ALIZAMS_SRCS ${ALIZAMS_SRCS}
   ${CMAKE_CURRENT_SOURCE_DIR}/common/commonutils.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/common/contourutils.cpp
@@ -991,6 +1009,15 @@ if(ALIZA_USE_SYSTEM_BULLET)
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} libLinearMath.so libBulletCollision.so)
 endif()
 
+if(ALIZA_USE_SYSTEM_LCMS2)
+  find_package(LCMS2 REQUIRED)
+  include_directories(${LCMS2_INCLUDE_DIRS})
+  set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} ${LCMS2_LIBRARIES})
+  message(STATUS "LCMS2: " ${LCMS2_LIBRARIES})
+else()
+  set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} alizalcms2)
+endif()
+
 link_directories("${CMAKE_CURRENT_BINARY_DIR}/bin")
 
 if(WIN32)
@@ -1033,7 +1060,7 @@ else()
     ${ALIZAMS_MOC_SRCS}
     ${ALIZAMS_UIS}
     ${ALIZAMS_QRCS_RCC})
-  target_link_libraries(alizams ${ALIZAMS_LINK_LIBRARIES} lcms2)
+  target_link_libraries(alizams ${ALIZAMS_LINK_LIBRARIES})
   install(TARGETS alizams RUNTIME DESTINATION "bin")
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/package/archive/usr/share/icons" DESTINATION "share")
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/package/archive/usr/share/applications" DESTINATION "share")
