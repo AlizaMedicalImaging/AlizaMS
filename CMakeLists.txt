@@ -1016,6 +1016,7 @@ if(ALIZA_USE_SYSTEM_LCMS2)
   message(STATUS "LCMS2: " ${LCMS2_LIBRARIES})
 else()
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} alizalcms2)
+  message(STATUS "LCMS2: alizalcms2")
 endif()
 
 link_directories("${CMAKE_CURRENT_BINARY_DIR}/bin")

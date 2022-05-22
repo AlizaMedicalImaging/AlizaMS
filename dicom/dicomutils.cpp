@@ -84,9 +84,6 @@
 #include <chrono>
 #include "vectormath/scalar/vectormath.h"
 
-// TODO
-//#define USE_SYSTEM_LCMS2
-
 #ifdef USE_SYSTEM_LCMS2
 #include "lcms2.h"
 #else
@@ -8725,6 +8722,7 @@ QString DicomUtils::read_buffer(
 				QString(",\n samples per pixel = ") +
 				QVariant(static_cast<int>(samples_per_pix)).toString() +
 				QString(",\nnot supported.");
+			if (icc_profile) delete [] icc_profile;
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return tmp_s0;
 		}
@@ -8739,6 +8737,7 @@ QString DicomUtils::read_buffer(
 				QString("Bits allocated = ") +
 				QVariant(static_cast<int>(pixelformat.GetBitsAllocated())).toString() +
 				QString(", not supported.");
+			if (icc_profile) delete [] icc_profile;
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return tmp_s0;
 		}
@@ -8755,6 +8754,7 @@ QString DicomUtils::read_buffer(
 		if (singlebit_buffer_size > image_buffer_length * 8)
 		{
 			if (not_rescaled_buffer) delete [] not_rescaled_buffer;
+			if (icc_profile)         delete [] icc_profile;
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return QString("Wrong buffer size");
 		}
@@ -8768,6 +8768,7 @@ QString DicomUtils::read_buffer(
 		}
 		if (!singlebit_buffer)
 		{
+			if (icc_profile) delete [] icc_profile;
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return QString("Buffer allocation error");
 		}
@@ -8804,14 +8805,15 @@ QString DicomUtils::read_buffer(
 					QVariant(image_buffer_length).toString() +
 					QString("\nbut must be\n") +
 					QVariant(dimx * dimy * dimz * type_size * samples_per_pix).toString();
-				if (not_rescaled_buffer)  delete [] not_rescaled_buffer;
-				if (rescaled_buffer)      delete [] rescaled_buffer;
+				if (not_rescaled_buffer) delete [] not_rescaled_buffer;
+				if (rescaled_buffer)     delete [] rescaled_buffer;
+				if (icc_profile)         delete [] icc_profile;
 				if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 				return tmp_s0;
 			}
 			if (icc_size > 0 && icc_profile && type_size == 1 && samples_per_pix == 3)
 			{
-#if 1
+#ifndef NDEBUG
 				std::cout << "Using ICC profile" << std::endl;
 #endif
 				char * icc_buffer;
@@ -8822,8 +8824,9 @@ QString DicomUtils::read_buffer(
 				catch (const std::bad_alloc &)
 				{
 					icc_buffer = NULL;
-					if (not_rescaled_buffer)  delete [] not_rescaled_buffer;
-					if (rescaled_buffer)      delete [] rescaled_buffer;
+					if (not_rescaled_buffer) delete [] not_rescaled_buffer;
+					if (rescaled_buffer)     delete [] rescaled_buffer;
+					if (icc_profile)         delete [] icc_profile;
 					if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 					return QString("Memory allocation error");
 				}
@@ -8836,9 +8839,10 @@ QString DicomUtils::read_buffer(
 					}
 					catch (const std::bad_alloc &)
 					{
-						if (not_rescaled_buffer)  delete [] not_rescaled_buffer;
-						if (rescaled_buffer)      delete [] rescaled_buffer;
-						if (icc_buffer)           delete [] icc_buffer;
+						if (not_rescaled_buffer) delete [] not_rescaled_buffer;
+						if (rescaled_buffer)     delete [] rescaled_buffer;
+						if (icc_buffer)          delete [] icc_buffer;
+						if (icc_profile)         delete [] icc_profile;
 						if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 						return QString("Memory allocation error");
 					}
@@ -8910,6 +8914,7 @@ QString DicomUtils::read_buffer(
 		else // should never reach
 		{
 			if (rescaled_buffer) delete [] rescaled_buffer;
+			if (icc_profile)     delete [] icc_profile;
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return QString("Internal error");
 		}
@@ -8938,16 +8943,18 @@ QString DicomUtils::read_buffer(
 		}
 		else
 		{
-			if (not_rescaled_buffer)  delete [] not_rescaled_buffer;
-			if (rescaled_buffer)      delete [] rescaled_buffer;
-			if (singlebit_buffer)     delete [] singlebit_buffer;
+			if (not_rescaled_buffer) delete [] not_rescaled_buffer;
+			if (rescaled_buffer)     delete [] rescaled_buffer;
+			if (singlebit_buffer)    delete [] singlebit_buffer;
+			if (icc_profile)         delete [] icc_profile;
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return QString("Memory allocation error");
 		}
 	}
-	if (not_rescaled_buffer)  delete [] not_rescaled_buffer;
-	if (rescaled_buffer)      delete [] rescaled_buffer;
-	if (singlebit_buffer)     delete [] singlebit_buffer;
+	if (not_rescaled_buffer) delete [] not_rescaled_buffer;
+	if (rescaled_buffer)     delete [] rescaled_buffer;
+	if (singlebit_buffer)    delete [] singlebit_buffer;
+	if (icc_profile)         delete [] icc_profile;
 	if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 	*ok = true;
 	return QString("");
