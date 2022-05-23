@@ -5774,7 +5774,7 @@ QString DicomUtils::read_enhanced(
 		clean_unused_bits = wsettings->get_clean_unused_bits();
 		pred6_bug = wsettings->get_predictor_workaround();
 		cornell_bug = wsettings->get_cornell_workaround();
-		use_icc = true; // TODO
+		use_icc = wsettings->get_apply_icc();
 		QString iod("");
 		const mdcm::Tag tSOPClassUID(0x0008,0x0016);
 		const mdcm::Tag tPerFrameFunctionalGroupsSequence(0x5200,0x9230);
@@ -6390,7 +6390,7 @@ QString DicomUtils::read_ultrasound(
 	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
 	const bool pred6_bug = wsettings->get_predictor_workaround();
 	const bool cornell_bug = wsettings->get_cornell_workaround();
-	bool use_icc = true; // TODO
+	const bool use_icc = wsettings->get_apply_icc();
 	bool icc_ok = false;
 	std::vector<char*> data;
 	itk::Matrix<itk::SpacePrecisionType,3,3> direction;
@@ -6672,7 +6672,7 @@ QString DicomUtils::read_nuclear(
 	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
 	const bool pred6_bug = wsettings->get_predictor_workaround();
 	const bool cornell_bug = wsettings->get_cornell_workaround();
-	bool use_icc = true;// TODO
+	const bool use_icc = wsettings->get_apply_icc();
 	bool icc_ok = false;
 	std::vector<char*> data;
 	itk::Matrix<itk::SpacePrecisionType,3,3> direction;
@@ -6887,7 +6887,7 @@ QString DicomUtils::read_series(
 	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
 	const bool pred6_bug = wsettings->get_predictor_workaround();
 	const bool cornell_bug = wsettings->get_cornell_workaround();
-	bool use_icc = true;//TODO
+	const bool use_icc = wsettings->get_apply_icc();
 	bool icc_ok = false;
 	std::vector<char*> data;
 	itk::Matrix<itk::SpacePrecisionType,3,3> direction;

@@ -148,6 +148,7 @@ void SettingsWidget::set_default()
 	srscale_checkBox->blockSignals(false);
 	srchapters_checkBox->setChecked(true);
 	srskipimage_checkBox->setChecked(false);
+	icc_checkBox->setChecked(true);
 	//
 	pt_doubleSpinBox->setEnabled(false);
 	disconnect(
@@ -225,6 +226,7 @@ void SettingsWidget::readSettings()
 	const int tmp8  = settings.value(QString("dcm_overlays"),    1).toInt();
 	const int tmp9  = settings.value(QString("dcm_mosaic"),      1).toInt();
 	const int tmp10 = settings.value(QString("dcm_sort_mf"),     1).toInt();
+	const int tmp11 = settings.value(QString("apply_icc"),       1).toInt();
 	settings.endGroup();
 	settings.beginGroup(QString("StyleDialog"));
 	saved_idx = settings.value(QString("saved_idx"), 0).toInt();
@@ -256,6 +258,7 @@ void SettingsWidget::readSettings()
 	overlays_checkBox->setChecked((tmp8 == 1));
 	mosaic_checkBox->setChecked((tmp9 == 1));
 	sortframes_checkBox->setChecked((tmp10 == 1));
+	icc_checkBox->setChecked((tmp11 == 1));
 }
 
 void SettingsWidget::writeSettings(QSettings & s)
@@ -273,6 +276,7 @@ void SettingsWidget::writeSettings(QSettings & s)
 	s.setValue(QString("dcm_overlays"),  QVariant((int)(overlays_checkBox->isChecked() ? 1 : 0)));
 	s.setValue(QString("dcm_mosaic"),    QVariant((int)(mosaic_checkBox->isChecked() ? 1 : 0)));
 	s.setValue(QString("dcm_sort_mf"),   QVariant((int)(sortframes_checkBox->isChecked() ? 1 : 0)));
+	s.setValue(QString("apply_icc"),     QVariant((int)(icc_checkBox->isChecked() ? 1 : 0)));
 	s.endGroup();
 	s.beginGroup(QString("StyleDialog"));
 	s.setValue(QString("saved_idx"), QVariant(styleComboBox->currentIndex()));
@@ -328,4 +332,9 @@ bool SettingsWidget::get_cornell_workaround() const
 bool SettingsWidget::get_sort_frames() const
 {
 	return sortframes_checkBox->isChecked();
+}
+
+bool SettingsWidget::get_apply_icc() const
+{
+	return icc_checkBox->isChecked();
 }

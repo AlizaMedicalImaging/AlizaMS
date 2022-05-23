@@ -36,6 +36,7 @@ public:
 	bool   get_predictor_workaround() const;
 	bool   get_cornell_workaround() const;
 	bool   get_sort_frames() const;
+	bool   get_apply_icc() const;
 
 private:
 	int   saved_idx;

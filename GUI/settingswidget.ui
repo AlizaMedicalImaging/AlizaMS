@@ -43,8 +43,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>991</width>
-            <height>540</height>
+            <width>977</width>
+            <height>569</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_14">
@@ -111,6 +111,28 @@
              </property>
              <property name="text">
               <string>Sort frames in enhanced multi-frame IODs by IPP/IOP</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="icc_checkBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="mouseTracking">
+              <bool>false</bool>
+             </property>
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Applicable to RGB image (any photo-metric interpretation, except retired).&lt;/p&gt;&lt;p&gt;Profile will be skipped on error.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Apply ICC color profile, if present</string>
              </property>
              <property name="checked">
               <bool>true</bool>
@@ -290,7 +312,7 @@
                  </sizepolicy>
                 </property>
                 <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Known bug that is a result of &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;16-bit integer overflow in predictor&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;. &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;W&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;ill cause an incorrect decompression of correctly compressed images&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;. &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;The option will &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-style:italic;&quot;&gt;not&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; be saved.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; &quot;&gt;Known bug that is a result of &lt;/span&gt;&lt;span style=&quot; &quot;&gt;16-bit integer overflow in predictor&lt;/span&gt;&lt;span style=&quot; &quot;&gt;. &lt;/span&gt;&lt;span style=&quot;  font-weight:600;&quot;&gt;W&lt;/span&gt;&lt;span style=&quot;  font-weight:600;&quot;&gt;ill cause an incorrect decompression of correctly compressed images&lt;/span&gt;&lt;span style=&quot; &quot;&gt;. &lt;/span&gt;&lt;span style=&quot; &quot;&gt;The option will &lt;/span&gt;&lt;span style=&quot;  font-style:italic;&quot;&gt;not&lt;/span&gt;&lt;span style=&quot; &quot;&gt; be saved.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="text">
                  <string>Workaround JPEG 16 bits &quot;Predictor bug&quot;</string>
@@ -306,7 +328,7 @@
                  </sizepolicy>
                 </property>
                 <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Known bug that leads to invalid values in the Huffmann table when images with 16 bit/sample &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;are compressed. The option will &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-style:italic;&quot;&gt;not&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; be saved.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; &quot;&gt;Known bug that leads to invalid values in the Huffmann table when images with 16 bit/sample &lt;/span&gt;&lt;span style=&quot; &quot;&gt;are compressed. The option will &lt;/span&gt;&lt;span style=&quot;  font-style:italic;&quot;&gt;not&lt;/span&gt;&lt;span style=&quot; &quot;&gt; be saved.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="text">
                  <string>Workaround JPEG 16 bits &quot;Cornell bug&quot;</string>
@@ -666,8 +688,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>991</width>
-            <height>540</height>
+            <width>523</width>
+            <height>244</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -967,6 +989,7 @@
   <tabstop>overlays_checkBox</tabstop>
   <tabstop>mosaic_checkBox</tabstop>
   <tabstop>sortframes_checkBox</tabstop>
+  <tabstop>icc_checkBox</tabstop>
   <tabstop>srchapters_checkBox</tabstop>
   <tabstop>srinfo_checkBox</tabstop>
   <tabstop>srscale_checkBox</tabstop>
