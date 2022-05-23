@@ -8829,7 +8829,7 @@ QString DicomUtils::read_buffer(
 				if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 				return tmp_s0;
 			}
-			if (icc_size > 0 && icc_profile && type_size == 1 && samples_per_pix == 3)
+			if (icc_size > 0 && icc_profile  && (type_size == 1 || type_size == 2) && samples_per_pix == 3)
 			{
 #ifndef NDEBUG
 				std::cout << "Using ICC profile" << std::endl;
@@ -8848,7 +8848,7 @@ QString DicomUtils::read_buffer(
 					if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 					return QString("Memory allocation error");
 				}
-				if (icc_for_ybr > 0)
+				if (icc_for_ybr > 0 && type_size == 1)
 				{
 					try
 					{
@@ -8901,12 +8901,18 @@ QString DicomUtils::read_buffer(
 					if (hInProfile && hOutProfile)
 					{
 						cmsHTRANSFORM hTransform =
-							cmsCreateTransform(hInProfile, TYPE_RGB_8, hOutProfile, TYPE_RGB_8, INTENT_PERCEPTUAL, 0);
+								cmsCreateTransform(
+									hInProfile,
+									((type_size == 1) ? TYPE_RGB_8 : TYPE_RGB_16),
+									hOutProfile,
+									((type_size == 1) ? TYPE_RGB_8 : TYPE_RGB_16),
+									INTENT_PERCEPTUAL,
+									0);
 						if (hTransform && cms_error == 0)
 						{
 							cmsDoTransform(
 								hTransform,
-								((icc_for_ybr > 0) ? icc_tmp : not_rescaled_buffer),
+								((icc_for_ybr > 0 && type_size == 1) ? icc_tmp : not_rescaled_buffer),
 								icc_buffer,
 								dimx * dimy * dimz);
 							if (cms_error == 0)
