@@ -8620,6 +8620,7 @@ QString DicomUtils::read_buffer(
 				}
 				if (supp_palette_color)
 				{
+					if (not_rescaled_buffer) delete [] not_rescaled_buffer;
 					if (icc_profile) delete [] icc_profile;
 					if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 					return QString("Re-scale and Suppl. LUT?");
@@ -8660,6 +8661,7 @@ QString DicomUtils::read_buffer(
 						}
 						else
 						{
+							if (not_rescaled_buffer) delete [] not_rescaled_buffer;
 							if (icc_profile) delete [] icc_profile;
 							if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 							return QString("Internal error (re-scale)");
@@ -8740,6 +8742,7 @@ QString DicomUtils::read_buffer(
 				QString(",\n samples per pixel = ") +
 				QVariant(static_cast<int>(samples_per_pix)).toString() +
 				QString(",\nnot supported.");
+			if (not_rescaled_buffer) delete [] not_rescaled_buffer;
 			if (icc_profile) delete [] icc_profile;
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return tmp_s0;
@@ -8755,6 +8758,7 @@ QString DicomUtils::read_buffer(
 				QString("Bits allocated = ") +
 				QVariant(static_cast<int>(pixelformat.GetBitsAllocated())).toString() +
 				QString(", not supported.");
+			if (not_rescaled_buffer) delete [] not_rescaled_buffer;
 			if (icc_profile) delete [] icc_profile;
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return tmp_s0;
@@ -8786,6 +8790,7 @@ QString DicomUtils::read_buffer(
 		}
 		if (!singlebit_buffer)
 		{
+			if (not_rescaled_buffer) delete [] not_rescaled_buffer;
 			if (icc_profile) delete [] icc_profile;
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return QString("Buffer allocation error");
@@ -8908,19 +8913,27 @@ QString DicomUtils::read_buffer(
 									((type_size == 1) ? TYPE_RGB_8 : TYPE_RGB_16),
 									INTENT_PERCEPTUAL,
 									0);
-						if (hTransform && cms_error == 0)
+						if (hTransform)
 						{
-							cmsDoTransform(
-								hTransform,
-								((icc_for_ybr > 0 && type_size == 1) ? icc_tmp : not_rescaled_buffer),
-								icc_buffer,
-								dimx * dimy * dimz);
 							if (cms_error == 0)
 							{
-								buffer = icc_buffer;
-								delete [] not_rescaled_buffer;
-								not_rescaled_buffer = NULL;
-								*has_icc = true;
+								cmsDoTransform(
+									hTransform,
+									((icc_for_ybr > 0 && type_size == 1) ? icc_tmp : not_rescaled_buffer),
+									icc_buffer,
+									dimx * dimy * dimz);
+								if (cms_error == 0)
+								{
+									buffer = icc_buffer;
+									delete [] not_rescaled_buffer;
+									not_rescaled_buffer = NULL;
+									*has_icc = true;
+								}
+								else
+								{
+									buffer = not_rescaled_buffer;
+									delete [] icc_buffer;
+								}
 							}
 							else
 							{
