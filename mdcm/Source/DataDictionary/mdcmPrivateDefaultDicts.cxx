@@ -177,7 +177,7 @@ const PRIV_DICT_ENTRY DICOMV3DataDict[] = {
   { 0x0021, 0x0081, "SIEMENS MR SDI 02", VR::LO, VM::VM1, "?", false},
   { 0x0021, 0x0088, "SIEMENS MR SDI 02", VR::DS, VM::VM1, "Slice Location", false },
   { 0x0021, 0x008a, "SIEMENS MR SDI 02", VR::IS, VM::VM1, "Instance/Frame Number", false },
-  { 0x0021, 0x008b, "SIEMENS MR SDI 02", VR::LO, VM::VM1, "?", false },
+  { 0x0021, 0x008b, "SIEMENS MR SDI 02", VR::SH, VM::VM1, "?", false },
   { 0x0021, 0x00fe, "SIEMENS MR SDI 02", VR::SQ, VM::VM1, "?", false },
   { 0x0021, 0x00fe, "SIEMENS MR SDS 01", VR::SQ, VM::VM1, "?", false },
   { 0x0089, 0x0054, "SYNGO_IMAGING", VR::OW, VM::VM1, "?", false },

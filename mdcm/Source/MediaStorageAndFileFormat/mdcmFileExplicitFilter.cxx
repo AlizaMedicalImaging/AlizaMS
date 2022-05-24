@@ -149,7 +149,7 @@ FileExplicitFilter::ProcessDataSet(DataSet & ds, Dicts const & dicts)
         {
           // mdcm-JPEG-Extended.dcm has a couple of VR::OB private field
           // is this a good idea to change them to an ASCII when we know this might not work?
-          if (!(oldvr & VR::VRASCII || oldvr == VR::INVALID || oldvr == VR::UN))
+          if (!(oldvr & VR::VRASCII || oldvr == VR::INVALID || oldvr == VR::UN || VR::OB))
           {
             mdcmErrorMacro("Cannot convert VR for tag: " << t << " " << oldvr << " is incompatible with " << cvr
                                                          << " as given by ref. dict.");
@@ -168,7 +168,7 @@ FileExplicitFilter::ProcessDataSet(DataSet & ds, Dicts const & dicts)
         }
         else
         {
-          assert(0); // programmer error
+          assert(0);
         }
         // one more check we are going to make this attribute explicit VR, there is
         // still a special case, when VL is > uint16_max then we must give up:
@@ -202,7 +202,7 @@ FileExplicitFilter::ProcessDataSet(DataSet & ds, Dicts const & dicts)
     }
     else if (de.GetSequenceOfFragments())
     {
-      assert(cvr & VR::OB_OW);
+      assert(cvr & VR::OB);
     }
     else
     {

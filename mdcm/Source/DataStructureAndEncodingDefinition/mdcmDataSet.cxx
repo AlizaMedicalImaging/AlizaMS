@@ -240,7 +240,9 @@ DataSet::InsertDataElement(const DataElement & de)
 Tag
 DataSet::ComputeDataElement(const PrivateTag & t) const
 {
+#if 0
   mdcmDebugMacro("ComputeDataElement, tag " << t);
+#endif
   // First private creator (0x0 -> 0x9 are reserved...)
   const Tag         start(t.GetGroup(), 0x0010);
   const DataElement r(start);
@@ -265,13 +267,17 @@ DataSet::ComputeDataElement(const PrivateTag & t) const
     }
     ++it;
   }
+#if 0
   mdcmDebugMacro("In ComputeDataElement found = " << found);
+#endif
   if (!found)
     return Tag(0xffff, 0xffff);
   // we found the Private Creator, let's construct the proper data element
   Tag copy = t;
   copy.SetPrivateCreator(it->GetTag());
+#if 0
   mdcmDebugMacro("In ComputeDataElement copy = " << copy);
+#endif
   return copy;
 }
 
