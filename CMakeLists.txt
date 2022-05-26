@@ -777,8 +777,12 @@ endif()
 #
 #
 #
-if(NOT ALIZA_USE_SYSTEM_LCMS2)
+if(ALIZA_USE_SYSTEM_LCMS2)
+  find_package(LCMS2 REQUIRED)
+  message(STATUS "LCMS2: " ${LCMS2_LIBRARIES})
+else()
   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/alizalcms)
+  message(STATUS "LCMS2: alizalcms2")
 endif()
 #
 #
@@ -1010,13 +1014,10 @@ if(ALIZA_USE_SYSTEM_BULLET)
 endif()
 
 if(ALIZA_USE_SYSTEM_LCMS2)
-  find_package(LCMS2 REQUIRED)
   include_directories(${LCMS2_INCLUDE_DIRS})
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} ${LCMS2_LIBRARIES})
-  message(STATUS "LCMS2: " ${LCMS2_LIBRARIES})
 else()
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} alizalcms2)
-  message(STATUS "LCMS2: alizalcms2")
 endif()
 
 link_directories("${CMAKE_CURRENT_BINARY_DIR}/bin")

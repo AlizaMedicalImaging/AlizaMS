@@ -83,7 +83,6 @@
 #include <random>
 #include <chrono>
 #include "vectormath/scalar/vectormath.h"
-
 #ifdef USE_SYSTEM_LCMS2
 #include "lcms2.h"
 #else
@@ -11746,8 +11745,7 @@ typedef struct
 // 0 - default
 // 1 - PR reference
 // 2 - RT reference
-// 3 -
-// 4 -
+// 3 - SR reference
 QString DicomUtils::read_dicom(
 	std::vector<ImageVariant*> & ivariants,
 	const QStringList & filenames,
