@@ -1585,7 +1585,7 @@ bool DicomUtils::is_image(
 	if (*r <= 0 || *c <= 0) return false;
 	QString s("");
 	ok = get_string_value(ds, mdcm::Tag(0x0008,0x0008), s);
-	if (ok && s.contains(QString("LOCALIZER"))) *l = true;
+	if (ok && s.toUpper().contains(QString("LOCALIZER"))) *l = true;
 	else *l = false;
 	return true;
 }
@@ -11738,7 +11738,10 @@ typedef struct
 	int columns;
 	short allocated;
 	bool localizer;
+	bool icc;
 	QString file;
+	QString photometric;
+	QString sop;
 } MixedDicomSeriesInfo;
 
 // load_type
@@ -11793,12 +11796,10 @@ QString DicomUtils::read_dicom(
 	unsigned short rows_tmp0 = 0, rows_tmp1 = 0;
 	unsigned short columns_tmp0 = 0, columns_tmp1 = 0;
 	unsigned short ba_tmp0 = 0, ba_tmp1 = 0;
-	unsigned short bs_tmp0 = 0, bs_tmp1 = 0;
-	unsigned short hb_tmp0 = 0, hb_tmp1 = 0;
-	short pr_tmp0 = -1, pr_tmp1 = -1;
 	bool  localizer_tmp0 = false, localizer_tmp1 = false;
 	QString sop_tmp0, sop_tmp1;
 	QString photometric_tmp0, photometric_tmp1;
+	bool icc_found_tmp0 = false, icc_found_tmp1 = false;
 	const SettingsWidget * wsettings =
 		static_cast<const SettingsWidget*>(settings);
 	std::map<unsigned int,SliceInstance> slice_pos_map;
@@ -11827,6 +11828,7 @@ QString DicomUtils::read_dicom(
 		QApplication::processEvents();
 		QString sop;
 		QString photometric;
+		bool icc_found = false;
 		unsigned short columns_ = 0, rows_ = 0;
 		unsigned short ba_ = 0, bs_ = 0, hb_ = 0;
 		short pr_ = -1;
@@ -11870,6 +11872,10 @@ QString DicomUtils::read_dicom(
 			DicomUtils::get_string_value(
 				ds, tPhotometricInterpretation, photometric);
 		(void)tPhotometricInterpretation_ok;
+		if (wsettings->get_apply_icc() && ds.FindDataElement(mdcm::Tag(0x0028,0x2000)))
+		{
+			icc_found = true;
+		}
 #if 1
 		if (sop==QString("1.2.840.10008.5.1.4.1.1.77.1.6")) // TODO
 #else
@@ -12108,11 +12114,9 @@ QString DicomUtils::read_dicom(
 			rows_tmp0 = rows_;
 			columns_tmp0 = columns_;
 			ba_tmp0 = ba_;
-			bs_tmp0 = bs_;
-			hb_tmp0 = hb_;
-			pr_tmp0 = pr_;
 			localizer_tmp0 = localizer_;
 			photometric_tmp0 = photometric;
+			icc_found_tmp0 = icc_found;
 			if (
 				sop==QString("1.2.840.10008.5.1.4.1.1.6.1") ||
 				sop==QString("1.2.840.10008.5.1.4.1.1.6")   ||
@@ -12247,17 +12251,18 @@ QString DicomUtils::read_dicom(
 					std::cout << "Warning: transfer syntax CT-private-ELE"
 						<< std::endl;
 				}
-				if (is_multiframe(ds)) multiframe = true;
+				if (is_multiframe(ds))
+				{
+					multiframe = true;
+				}
 				if ((count_images > 0) && (
-					rows_tmp1        != rows_tmp0      ||
-					columns_tmp1     != columns_tmp0   ||
-					sop_tmp1         != sop_tmp0       ||
-					ba_tmp1          != ba_tmp0        ||
-					bs_tmp0          != bs_tmp1        ||
-					hb_tmp0          != hb_tmp1        ||
-					pr_tmp1          != pr_tmp0        ||
-					localizer_tmp1   != localizer_tmp0 ||
-					photometric_tmp1 != photometric_tmp0))
+					rows_tmp1        != rows_tmp0        ||
+					columns_tmp1     != columns_tmp0     ||
+					ba_tmp1          != ba_tmp0          ||
+					sop_tmp1         != sop_tmp0         ||
+					photometric_tmp1 != photometric_tmp0 ||
+					icc_found_tmp1   != icc_found_tmp0   ||
+					localizer_tmp1   != localizer_tmp0))
 				{
 					mixed = true;
 				}
@@ -12276,7 +12281,6 @@ QString DicomUtils::read_dicom(
 				   sop==QString("1.2.840.10008.5.1.4.1.1.12.2")       // X-Ray RF
 				)
 				{
-					// Force split individual file, don't want volume
 					skip_volume = true;
 				}
 			}
@@ -12286,10 +12290,8 @@ QString DicomUtils::read_dicom(
 			rows_tmp1 = rows_tmp0;
 			columns_tmp1 = columns_tmp0;
 			ba_tmp1 = ba_tmp0;
-			bs_tmp1 = bs_tmp0;
-			hb_tmp1 = hb_tmp0;
-			pr_tmp1 = pr_tmp0;
 			photometric_tmp1 = photometric_tmp0;
+			icc_found_tmp1 = icc_found_tmp0;
 			localizer_tmp1 = localizer_tmp0;
 		}
 #if 1
@@ -12657,7 +12659,6 @@ QString DicomUtils::read_dicom(
 	}
 	else if (multiseries && (load_type == 0))
 	{
-		// TODO
 		for (int k = 0; k < extracted_images.size(); ++k)
 		{
 			if (pb) pb->setValue(-1);
@@ -13082,13 +13083,15 @@ QString DicomUtils::read_dicom(
 			}
 		}
 	}
-	else if (mixed && (load_type == 0||load_type == 2))
+	else if (mixed)
 	{
-		// TODO
 		const mdcm::Tag tt(0x0008,0x0008);
+		const mdcm::Tag sc(0x0008,0x0016);
+		const mdcm::Tag ph(0x0028,0x0004);
 		const mdcm::Tag tr(0x0028,0x0010);
 		const mdcm::Tag tc(0x0028,0x0011);
 		const mdcm::Tag ta(0x0028,0x0100);
+		const mdcm::Tag cc(0x0028,0x2000);
 		std::vector<MixedDicomSeriesInfo> msi;
 		for (int x = 0; x < images.size(); ++x)
 		{
@@ -13097,7 +13100,8 @@ QString DicomUtils::read_dicom(
 			si.columns   = -1;
 			si.allocated =  0;
 			si.localizer =  false;
-			si.file      = QString(images.at(x));
+			si.icc       =  false;
+			si.file      =  QString(images.at(x));
 			mdcm::Reader reader;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
@@ -13108,7 +13112,7 @@ QString DicomUtils::read_dicom(
 #else
 			reader.SetFileName(images.at(x).toLocal8Bit().constData());
 #endif
-			if (!reader.ReadUpToTag(mdcm::Tag(0x0028,0x0101))) continue;
+			if (!reader.ReadUpToTag(mdcm::Tag(0x0028,0x2000))) continue;
 			const mdcm::File    & file = reader.GetFile();
 			const mdcm::DataSet & ds   = file.GetDataSet();
 			if (ds.IsEmpty()) continue;
@@ -13128,9 +13132,16 @@ QString DicomUtils::read_dicom(
 			QString s;
 			if (get_string_value(ds,tt,s))
 			{
-				if (s.contains(QString("LOCALIZER")))
+				if (s.toUpper().contains(QString("LOCALIZER")))
 					si.localizer = true;
 			}
+			QString s1("");
+			get_string_value(ds,ph,s1);
+			si.photometric = s1.trimmed().remove(QChar('\0'));
+			QString s2("");
+			get_string_value(ds,sc,s2);
+			si.sop = s2.trimmed().remove(QChar('\0'));
+			if (ds.FindDataElement(cc)) si.icc = true;
 			msi.push_back(si);
 		}
 		QMultiMap<QString, QString> l0;
@@ -13145,7 +13156,10 @@ QString DicomUtils::read_dicom(
 					QString::number(i.columns) +
 					QString("x") +
 					QString::number(static_cast<int>(i.allocated)) +
-					(i.localizer ? QString("L") : QString(""));
+					(i.localizer ? QString("L") : QString("")) +
+					QString("-") + i.sop +
+					QString("-") + i.photometric + QString("-") +
+					(i.icc ? QString("icc") : QString(""));
 				l0.insert(k1, i.file);
 			}
 		}
@@ -13169,11 +13183,17 @@ QString DicomUtils::read_dicom(
 		while (it1 != s1.constEnd())
 #endif
 		{
+#if 0
+			std::cout << (*it1).toStdString() << std::endl;
+#endif
 			QStringList ff;
 			const QList<QString> & q = l0.values(*it1);
 			for (int y = 0; y < q.size(); ++y)
 			{
 				ff.push_back(q.at(y));
+#if 0
+				std::cout << q.at(y).toStdString() << std::endl;
+#endif
 			}
 			fff.push_back(ff);
 			++it1;
