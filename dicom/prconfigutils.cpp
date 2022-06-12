@@ -4468,13 +4468,3 @@ ImageVariant * PrConfigUtils::make_pr_rgb(
 	return NULL;
 }
 
-ImageVariant * PrConfigUtils::make_levels_monochrome(
-	const ImageVariant * ivariant,
-	const PrRefSeries & ref,
-	const SettingsWidget * w,
-	GLWidget * gl,
-	bool ok3d)
-{
-	// TODO
-	return NULL;
-}

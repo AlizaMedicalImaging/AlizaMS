@@ -1,5 +1,5 @@
 Source: alizams
-Maintainer: Mikhail Isakov <mihail.isakov@gmail.com>
+Maintainer: Package Maintainer <PackageMaintainer@whatever.replace>
 Section: science
 Priority: optional
 Build-Depends: cmake,

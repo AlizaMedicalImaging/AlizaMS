@@ -41,12 +41,6 @@ public:
 		const ImageVariant*,
 		const PrRefSeries &,
 		const SettingsWidget*);
-	static ImageVariant * make_levels_monochrome(
-		const ImageVariant*,
-		const PrRefSeries &,
-		const SettingsWidget*,
-		GLWidget*,
-		bool);
 };
 
 #endif

@@ -2,4 +2,4 @@ alizams (1.7.5-1) stable; urgency=low
 
   * Initial upload to Debian.  Closes: #999999.
 
- -- Mikhail Isakov <mihail.isakov@gmail.com>  Wed, 22 Dec 2021 00:00:00 -0000
+ -- Package Maintainer <PackageMaintainer@whatever.replace>  Wed, 3 Jun 2021 00:00:00 -0000
