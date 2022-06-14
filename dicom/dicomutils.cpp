@@ -11642,17 +11642,7 @@ mdcm::VR DicomUtils::get_vr(
 	}
 	else if (t.IsPrivateCreator())
 	{
-		if (!implicit)
-		{
-			if (ds.FindDataElement(t))
-			{
-				vr = ds.GetDataElement(t).GetVR();
-			}
-		}
-		else
-		{
-			vr = mdcm::VR::LO; //
-		}
+		vr = mdcm::VR::LO; //
 	}
 	else if (t.IsPrivate())
 	{
@@ -11665,6 +11655,12 @@ mdcm::VR DicomUtils::get_vr(
 			if (ds.FindDataElement(t))
 			{
 				vr = ds.GetDataElement(t).GetVR();
+				// CP-246
+				if (vr == mdcm::VR::UN || vr == mdcm::VR::INVALID)
+				{
+					const mdcm::DictEntry & dictentry = dicts.GetDictEntry(t);
+					vr = dictentry.GetVR();
+				}
 			}
 			else
 			{

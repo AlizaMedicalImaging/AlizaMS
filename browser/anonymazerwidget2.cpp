@@ -60,40 +60,7 @@ static void replace__(
 	if (t.GetGroup() < 0x0008) return;
 	mdcm::VR vr = DicomUtils::get_vr(ds, t, implicit, dicts);
 	mdcm::VL vl = static_cast<mdcm::VL::Type>(size_);
-	if (vr.Compatible(mdcm::VR::SQ))
-	{
-		if (vr == mdcm::VR::SQ && vl == 0 && value && *value == 0 )
-		{
-			mdcm::SmartPointer<mdcm::SequenceOfItems>
-				sq = new mdcm::SequenceOfItems();
-			sq->SetLength(0);
-			sq->SetNumberOfItems(0);
-			mdcm::DataElement de(t);
-			if (!implicit) de.SetVR(mdcm::VR::SQ);
-			de.SetValue(*sq);
-			de.SetVLToUndefined();
-			ds.Replace(de);
-		}
-		else
-		{
-			mdcmAlwaysWarnMacro("Cannot process " << t << " " << vr);
-		}
-	}
-	else if (vr & mdcm::VR::VRBINARY)
-	{
-		if (vl == 0)
-		{
-			mdcm::DataElement de(t);
-			if (!implicit) de.SetVR(vr);
-			de.SetByteValue("", 0);
-			ds.Replace(de);
-		}
-		else
-		{
-			mdcmAlwaysWarnMacro("Error " << t << " " << vr);
-		}
-	}
-	else
+	if (mdcm::VR::IsASCII2(vr))
 	{
 		if (value)
 		{
@@ -116,6 +83,38 @@ static void replace__(
 			de.SetByteValue(padded.c_str(), paddedSize);
 			ds.Replace(de);
 		}
+		else // should not happen
+		{
+			mdcm::DataElement de(t);
+			if (!implicit) de.SetVR(vr);
+			de.SetByteValue("", 0);
+			ds.Replace(de);
+		}
+	}
+	else // should not happen
+	{
+		if (vl != 0)
+		{
+			mdcmAlwaysWarnMacro("Cannot replace non-ASCII " << t << " " << vr << ", set to empty");
+		}
+		else
+		{
+			mdcmAlwaysWarnMacro("Set non-ASCII " << t << " " << vr << " to empty");
+		}
+		mdcm::DataElement de(t);
+		if (!implicit)
+		{
+			if (vr.IsDual()) // error
+			{
+				de.SetVR(mdcm::VR::UN);
+			}
+			else
+			{
+				de.SetVR(vr);
+			}
+		}
+		de.SetByteValue("", 0);
+		ds.Replace(de);
 	}
 }
 

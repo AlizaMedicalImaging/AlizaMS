@@ -335,7 +335,7 @@ ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
       VL dummy = sqi->template ComputeLength<ExplicitDataElement>();
       ValueLengthField = dummy;
       sqi->SetLength(dummy);
-      mdcmAssertAlwaysMacro(dummy == ValueLengthField);
+      assert(dummy == ValueLengthField);
     }
   }
   else if (SequenceOfFragments * sqf = dynamic_cast<SequenceOfFragments *>(&GetValue()))
@@ -351,9 +351,8 @@ ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
 
 template <typename TSwap>
 std::istream &
-ExplicitDataElement::ReadWithLength(std::istream & is, VL & length)
+ExplicitDataElement::ReadWithLength(std::istream & is, VL &)
 {
-  (void)length;
   return Read<TSwap>(is);
 }
 
@@ -378,8 +377,8 @@ ExplicitDataElement::Write(std::ostream & os) const
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
     if (ValueLengthField != 0)
     {
-      mdcmWarningMacro("Item Delimitation Item had a length different from 0.");
-      VL zero = 0;
+      mdcmWarningMacro("Item Delimitation Item has length different from 0");
+      const VL zero = 0;
       zero.Write<TSwap>(os);
       return os;
     }
@@ -388,22 +387,24 @@ ExplicitDataElement::Write(std::ostream & os) const
     if (!ValueLengthField.Write<TSwap>(os))
     {
       assert(0 && "Should not happen");
-      return os;
     }
     return os;
   }
-  bool vr16bitsimpossible = (VRField & VR::VL16) && (ValueLengthField > (uint32_t)VL::GetVL16Max());
+  const bool vr16bitsimpossible = (VRField & VR::VL16) && (ValueLengthField > (uint32_t)VL::GetVL16Max());
   if (VRField == VR::INVALID || vr16bitsimpossible)
   {
     if (TagField.IsPrivateCreator())
     {
-      mdcmAssertAlwaysMacro(!vr16bitsimpossible);
-      VR lo = VR::LO;
-      if (TagField.IsGroupLength())
-      {
-        lo = VR::UL;
-      }
+      assert(!vr16bitsimpossible);
+      const VR lo = VR::LO;
       lo.Write(os);
+      ValueLengthField.Write16<TSwap>(os);
+    }
+    else if (TagField.IsGroupLength())
+    {
+      assert(!vr16bitsimpossible);
+      const VR ul = VR::UL;
+      ul.Write(os);
       ValueLengthField.Write16<TSwap>(os);
     }
     else
@@ -413,11 +414,12 @@ ExplicitDataElement::Write(std::ostream & os) const
       if (ValueField && dynamic_cast<const SequenceOfItems *>(&*ValueField))
       {
         VL vl = 0xFFFFFFFF;
-        assert(vl.IsUndefined());
         vl.Write<TSwap>(os);
       }
       else
+      {
         ValueLengthField.Write<TSwap>(os);
+      }
     }
   }
   else
@@ -448,32 +450,7 @@ ExplicitDataElement::Write(std::ostream & os) const
   }
   if (ValueLengthField)
   {
-    // Special case, check SQ
-    if (GetVR() == VR::SQ)
-    {
-      mdcmAssertAlwaysMacro(dynamic_cast<const SequenceOfItems *>(&GetValue()));
-    }
-    // check consistency in Length:
-    if (GetByteValue())
-    {
-      assert(ValueField->GetLength() == ValueLengthField);
-    }
-    else if (const SequenceOfItems * sqi = dynamic_cast<const SequenceOfItems *>(&GetValue()))
-    {
-      assert(ValueField->GetLength() == ValueLengthField);
-      // Recompute the total length:
-      if (!ValueLengthField.IsUndefined())
-      {
-        VL dummy = sqi->template ComputeLength<ExplicitDataElement>();
-        mdcmAssertAlwaysMacro(dummy == ValueLengthField);
-        (void)dummy;
-      }
-    }
-    else if (GetSequenceOfFragments())
-    {
-      assert(ValueField->GetLength() == ValueLengthField);
-    }
-    // We have the length we should be able to write the value
+    // Should be able to write the value
     if (VRField == VR::UN && ValueLengthField.IsUndefined())
     {
       assert(TagField == Tag(0x7fe0, 0x0010) || GetValueAsSQ());
@@ -529,6 +506,7 @@ ExplicitDataElement::Write(std::ostream & os) const
           default:
             failed = true;
             assert(0);
+            break;
         }
       }
       if (failed)

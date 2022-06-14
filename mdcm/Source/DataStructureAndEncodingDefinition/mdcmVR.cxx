@@ -449,9 +449,23 @@ VR::IsASCII(VRType vr)
 bool
 VR::IsASCII2(VRType vr)
 {
-  return vr == VR::UI || vr == VR::AE || vr == VR::AS || vr == VR::CS || vr == VR::DA || vr == VR::DS || vr == VR::DT ||
-         vr == VR::IS || vr == VR::LO || vr == VR::LT || vr == VR::PN || vr == VR::SH || vr == VR::ST || vr == VR::TM ||
-         vr == VR::UT;
+  return (vr == VR::AE ||
+          vr == VR::AS ||
+          vr == VR::CS ||
+          vr == VR::DA ||
+          vr == VR::DS ||
+          vr == VR::DT ||
+          vr == VR::IS ||
+          vr == VR::LO ||
+          vr == VR::LT ||
+          vr == VR::PN ||
+          vr == VR::SH ||
+          vr == VR::ST ||
+          vr == VR::TM ||
+          vr == VR::UC ||
+          vr == VR::UI ||
+          vr == VR::UR ||
+          vr == VR::UT);
 }
 
 bool
@@ -460,11 +474,10 @@ VR::IsBinary(VRType vr)
   switch (vr)
   {
     VRTemplate(VRBINARY)
-    case VR::US_SS_OW:
-      return true;
-    case VR::US_SS:
-      return true;
     case VR::OB_OW:
+    case VR::US_SS:
+    case VR::US_SS_OW:
+    case VR::US_OW:
       return true;
     default:
       return false;
@@ -474,7 +487,7 @@ VR::IsBinary(VRType vr)
 bool
 VR::IsBinary2(VRType vr)
 {
-  return vr == VR::OB || vr == VR::OW || vr == VR::OB_OW || vr == VR::UN || vr == VR::SQ;
+  return (!IsASCII2(vr));
 }
 
 bool

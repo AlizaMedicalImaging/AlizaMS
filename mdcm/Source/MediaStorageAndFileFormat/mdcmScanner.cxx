@@ -91,7 +91,7 @@ Scanner::GetString(const DataElement & de, const DataSet & ds, const bool implic
   }
   if (vr == VR::INVALID || vr == VR::UN)
     return r;
-  if (vr == VR::US_SS)
+  if (vr == VR::US_SS || vr == VR::US_SS_OW)
   {
     vr = VR::SS; // FIXME
   }

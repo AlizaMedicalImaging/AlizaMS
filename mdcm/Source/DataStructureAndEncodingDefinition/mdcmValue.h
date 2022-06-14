@@ -42,8 +42,7 @@ class MDCM_EXPORT Value : public Object
 public:
   Value() {}
   ~Value() {}
-  virtual VL
-               GetLength() const = 0;
+  virtual VL GetLength() const = 0;
   virtual void SetLength(VL) = 0;
   virtual void
   Clear() = 0;

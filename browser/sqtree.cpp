@@ -228,6 +228,7 @@ void SQtree::process_element(
 	bool illegal_tag         = false;
 	bool skipped             = false;
 	bool hdr                 = false;
+	bool bad_vr              = false;
 	if (tag.GetGroup() == 0x0002) hdr = true;
 	mdcm::VR vr = e.GetVR();
 	if (vr == mdcm::VR::INVALID) invalid_vr = true;
@@ -241,11 +242,33 @@ void SQtree::process_element(
 	{
 		private_creator_tag = true;
 		tname = QString("Private Creator");
-		if (invalid_vr||unknown_vr)
+		if (vr == mdcm::VR::LO)
 		{
-			const mdcm::DictEntry & entry =
-				d.GetDictEntry(tag,(const char *)NULL);
-			vr = entry.GetVR();
+			;;
+		}
+		else if (invalid_vr)
+		{
+			vr = mdcm::VR::LO;
+		}
+		else
+		{
+			bad_vr = true;
+		}
+	}
+	else if (tag.IsGroupLength())
+	{
+		tname = QString("Generic Group Length");
+		if (vr == mdcm::VR::UL)
+		{
+			;;
+		}
+		else if (invalid_vr)
+		{
+			vr = mdcm::VR::UL;
+		}
+		else
+		{
+			bad_vr = true;
 		}
 	}
 	else if (tag.IsPrivate())
@@ -280,8 +303,29 @@ void SQtree::process_element(
 	{
 		const mdcm::DictEntry & entry =
 			d.GetDictEntry(tag,(const char *)NULL);
+		const mdcm::VR tmp_vr = entry.GetVR();
 		tname = QString(entry.GetName());
-		if (invalid_vr||unknown_vr) vr = entry.GetVR();
+		if (invalid_vr||unknown_vr)
+		{
+			vr = tmp_vr;
+		}
+		else
+		{
+			if (tmp_vr.IsDual())
+			{
+				if (!vr.Compatible(tmp_vr))
+				{
+					bad_vr = true;
+				}
+			}
+			else
+			{
+				if (vr != tmp_vr)
+				{
+					bad_vr = true;
+				}
+			}
+		}
 	}
 	const QBrush brush0(QColor::fromRgbF(0.0,0.0,0.5));
 	const QBrush brush2(QColor::fromRgbF(0.3,0.0,0.3));
@@ -458,6 +502,7 @@ void SQtree::process_element(
 			if (private_tag) ii->setForeground(1, brush0);
 			if (illegal_tag) ii->setForeground(1, brush6);
 			if (duplicated)  ii->setForeground(0, brush6);
+			if (bad_vr)      ii->setForeground(2, brush6);
 			wi->addChild(ii);
 		}
 		else if (e.IsUndefinedLength())
@@ -477,6 +522,7 @@ void SQtree::process_element(
 			if (private_tag) ii->setForeground(1, brush0);
 			if (illegal_tag) ii->setForeground(1, brush6);
 			if (duplicated)  ii->setForeground(0, brush6);
+			if (bad_vr)      ii->setForeground(2, brush6);
 			wi->addChild(ii);
 		}
 		else
@@ -694,6 +740,7 @@ void SQtree::process_element(
 					if (private_creator_tag) ii->setForeground(4, brush0);
 					if (illegal_tag) ii->setForeground(1, brush6);
 					if (duplicated)  ii->setForeground(0, brush6);
+					if (bad_vr)      ii->setForeground(2, brush6);
 					wi->addChild(ii);
 				}
 				else if (vr == mdcm::VR::INVALID || vr >= mdcm::VR::VR_END)
@@ -715,6 +762,7 @@ void SQtree::process_element(
 					if (private_creator_tag) ii->setForeground(4, brush0);
 					if (illegal_tag) ii->setForeground(1, brush6);
 					if (duplicated)  ii->setForeground(0, brush6);
+					if (bad_vr)      ii->setForeground(2, brush6);
 					wi->addChild(ii);
 				}
 				else if (vr == mdcm::VR::UI)
@@ -743,6 +791,7 @@ void SQtree::process_element(
 					if (private_tag)     ii->setForeground(1, brush0);
 					if (illegal_tag)     ii->setForeground(1, brush6);
 					if (duplicated)      ii->setForeground(0, brush6);
+					if (bad_vr)          ii->setForeground(2, brush6);
 					wi->addChild(ii);
 				}
 				else // ASCII
@@ -912,6 +961,7 @@ void SQtree::process_element(
 					if (private_creator_tag) ii->setForeground(4, brush0);
 					if (illegal_tag) ii->setForeground(1, brush6);
 					if (duplicated)  ii->setForeground(0, brush6);
+					if (bad_vr)      ii->setForeground(2, brush6);
 					wi->addChild(ii);
 				}
 			}
@@ -932,6 +982,7 @@ void SQtree::process_element(
 				if (private_tag) ii->setForeground(1, brush0);
 				if (illegal_tag) ii->setForeground(1, brush6);
 				if (duplicated)  ii->setForeground(0, brush6);
+				if (bad_vr)      ii->setForeground(2, brush6);
 				wi->addChild(ii);
 			}
 		}
