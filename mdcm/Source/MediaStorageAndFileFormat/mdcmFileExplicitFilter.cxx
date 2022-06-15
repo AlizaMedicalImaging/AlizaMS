@@ -148,8 +148,8 @@ FileExplicitFilter::ProcessDataSet(DataSet & ds, Dicts const & dicts)
         if (cvr & VR::VRASCII)
         {
           // mdcm-JPEG-Extended.dcm has a couple of VR::OB private field
-          // is this a good idea to change them to an ASCII when we know this might not work?
-          if (!(oldvr & VR::VRASCII || oldvr == VR::INVALID || oldvr == VR::UN || VR::OB))
+          // MM: Is this a good idea to change them to an ASCII when we know this might not work?
+          if (!(oldvr & VR::VRASCII || oldvr == VR::INVALID || oldvr == VR::UN || oldvr == VR::OB))
           {
             mdcmErrorMacro("Cannot convert VR for tag: " << t << " " << oldvr << " is incompatible with " << cvr
                                                          << " as given by ref. dict.");

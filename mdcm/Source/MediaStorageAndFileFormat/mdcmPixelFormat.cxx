@@ -32,7 +32,7 @@ namespace mdcm
 
 static const char * ScalarTypeStrings[] = {
   "UINT8",  "INT8",  "UINT12",  "INT12",   "UINT16",  "INT16",     "UINT32",  "INT32",
-  "UINT64", "INT64", "FLOAT16", "FLOAT32", "FLOAT64", "SINGLEBIT", "UNKNOWN", NULL,
+  "UINT64", "INT64", "FLOAT32", "FLOAT64", "SINGLEBIT", "UNKNOWN", NULL,
 };
 
 PixelFormat::PixelFormat(ScalarType st)
@@ -217,10 +217,6 @@ PixelFormat::SetScalarType(ScalarType st)
       BitsAllocated = 64;
       PixelRepresentation = 1;
       break;
-    case PixelFormat::FLOAT16:
-      BitsAllocated = 16;
-      PixelRepresentation = 2; // !
-      break;
     case PixelFormat::FLOAT32:
       BitsAllocated = 32;
       PixelRepresentation = 3; // !
@@ -293,11 +289,6 @@ PixelFormat::GetScalarType() const
       assert(type <= INT64);
       // Order properly type in ScalarType
       type = ScalarType(int(type) + 1);
-    }
-    else if (PixelRepresentation == 2)
-    {
-      assert(BitsAllocated == 16);
-      return FLOAT16;
     }
     else if (PixelRepresentation == 3)
     {

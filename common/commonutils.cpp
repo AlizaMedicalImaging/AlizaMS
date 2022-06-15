@@ -3873,8 +3873,6 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					pb);
 			}
 			break;
-		case mdcm::PixelFormat::FLOAT16:
-			return QString("PixelFormat FLOAT16 is not supported");
  		case mdcm::PixelFormat::FLOAT32:
 			{
 				char * p__;

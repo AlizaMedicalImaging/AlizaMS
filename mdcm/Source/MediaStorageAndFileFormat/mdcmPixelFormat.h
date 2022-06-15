@@ -49,7 +49,6 @@ public:
     INT32,
     UINT64,
     INT64,
-    FLOAT16,
     FLOAT32,
     FLOAT64,
     SINGLEBIT,

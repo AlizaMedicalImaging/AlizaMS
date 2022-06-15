@@ -262,6 +262,24 @@ DataElement::GetValueAsSQ() const
       ;
     }
   }
+#if 0
+  else if (GetVR() == VR::OB)
+  {
+    try
+    {
+      std::stringstream ss;
+      ss.str(std::string(bv->GetPointer(), bv->GetLength()));
+      sq->Read<ImplicitDataElement,SwapperNoOp>(ss, true);
+      SmartPointer<SequenceOfItems> sqi = sq;
+      return sqi;
+    }
+    catch (...)
+    {
+      ;
+      ;
+    }
+  }
+#endif
   delete sq;
   return NULL;
 }

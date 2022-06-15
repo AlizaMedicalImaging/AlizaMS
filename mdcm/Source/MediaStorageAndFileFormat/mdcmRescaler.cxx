@@ -40,6 +40,7 @@ RescaleFunction(TOut * out, const TIn * in, double intercept, double slope, size
   }
 }
 
+// MM:
 // no such thing as partial specialization of function in c++
 // so instead use this trick
 template <typename TOut, typename TIn>
@@ -50,7 +51,7 @@ void
 InverseRescaleFunction(TOut * out, const TIn * in, double intercept, double slope, size_t size)
 {
   FImpl<TOut, TIn>::InverseRescaleFunction(out, in, intercept, slope, size);
-} // don't touch this
+} // MM: don't touch this
 
 template <typename TOut, typename TIn>
 struct FImpl
@@ -60,7 +61,7 @@ struct FImpl
                          const TIn * in,
                          double      intercept,
                          double      slope,
-                         size_t      size) // users, go ahead and specialize this
+                         size_t      size)
   {
     size /= sizeof(TIn); // 'size' is in bytes
     for (size_t i = 0; i != size; ++i)
@@ -117,7 +118,7 @@ ComputeBestFit(const PixelFormat & pf, double intercept, double slope)
 {
   PixelFormat::ScalarType st = PixelFormat::UNKNOWN;
 
-  if (pf == PixelFormat::FLOAT16 || pf == PixelFormat::FLOAT32 || pf == PixelFormat::FLOAT64)
+  if (pf == PixelFormat::FLOAT32 || pf == PixelFormat::FLOAT64)
   {
     st = PixelFormat::FLOAT64;
     return st;
@@ -146,7 +147,7 @@ ComputeBestFit(const PixelFormat & pf, double intercept, double slope)
     }
     else if (max <= (double)(std::numeric_limits<uint64_t>::max()))
     {
-      // Very large value in Rescale Slope?
+      // TODO
       return PixelFormat::FLOAT64;
     }
     else
@@ -172,7 +173,7 @@ ComputeBestFit(const PixelFormat & pf, double intercept, double slope)
     else if (max <= (double)(std::numeric_limits<int64_t>::max()) &&
              min >= (double)(std::numeric_limits<int64_t>::min()))
     {
-      // Very large value in Rescale Slope?
+      // TODO
       return PixelFormat::FLOAT64;
     }
     else
@@ -197,7 +198,7 @@ Rescaler::ComputeInterceptSlopePixelType()
   {
     return PixelFormat::SINGLEBIT;
   }
-  if (PF == PixelFormat::FLOAT16 || PF == PixelFormat::FLOAT32 || PF == PixelFormat::FLOAT64)
+  if (PF == PixelFormat::FLOAT32 || PF == PixelFormat::FLOAT64)
   {
     return PixelFormat::FLOAT64;
   }
@@ -218,8 +219,8 @@ template <typename TIn>
 void
 Rescaler::RescaleFunctionIntoBestFit(char * out, const TIn * in, size_t n)
 {
-  double                  intercept = Intercept;
-  double                  slope = Slope;
+  const double            intercept = Intercept;
+  const double            slope = Slope;
   PixelFormat::ScalarType output = ComputeInterceptSlopePixelType();
   if (UseTargetPixelType)
   {
@@ -245,7 +246,6 @@ Rescaler::RescaleFunctionIntoBestFit(char * out, const TIn * in, size_t n)
     case PixelFormat::INT32:
       RescaleFunction<int32_t, TIn>((int32_t *)out, in, intercept, slope, n);
       break;
-    case PixelFormat::FLOAT16:
     case PixelFormat::FLOAT32:
       RescaleFunction<float, TIn>((float *)out, in, intercept, slope, n);
       break;
@@ -344,7 +344,6 @@ Rescaler::Rescale(char * out, const char * in, size_t n)
 {
   if (UseTargetPixelType == false)
   {
-    // fast path
     if (Slope == 1 && Intercept == 0)
     {
       memcpy(out, in, n);
@@ -376,7 +375,6 @@ Rescaler::Rescale(char * out, const char * in, size_t n)
     case PixelFormat::INT32:
       RescaleFunctionIntoBestFit<int32_t>(out, (const int32_t *)in, n);
       break;
-    case PixelFormat::FLOAT16:
     case PixelFormat::FLOAT32:
       RescaleFunctionIntoBestFit<float>(out, (const float *)in, n);
       break;
