@@ -175,10 +175,19 @@ public:
   Write(std::ostream & os) const
   {
     VRType vrfield = VRField;
-    mdcmAssertAlwaysMacro(!IsDual());
-    const char * vr = GetVRString(vrfield);
-    assert(vr[0] && vr[1] && vr[2] == 0);
-    os.write(vr, 2);
+    if (!IsDual())
+    {
+      const char * vr = GetVRString(vrfield);
+      assert(vr[0] && vr[1] && vr[2] == 0);
+      os.write(vr, 2);
+    }
+    else // should never happen
+    {
+      mdcmAlwaysWarnMacro("Error: dual VR is unexpected, replaced with UN");
+      assert(0);
+      const char * vr = "UN";
+      os.write(vr, 2);
+    }
     // See PS 3.5, Data Element Structure With Explicit VR
     if (vrfield & VL32)
     {

@@ -252,7 +252,7 @@ public:
       // Not sure how this happen
       if (TagField == Tag(0xfffe, 0xe0dd))
       {
-        mdcmWarningMacro("SegDelItem found in defined length Sequence");
+        mdcmWarningMacro("SeqDelItem found in sequence with defined length");
         assert(ValueLengthField == 0);
         assert(NestedDataSet.Size() == 0);
       }

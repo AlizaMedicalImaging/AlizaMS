@@ -74,7 +74,11 @@ DataSet::Replace(const DataElement & de)
   if (it != DES.cend())
   {
     // detect loop
-    mdcmAssertAlwaysMacro(&*it != &de);
+    if (!(&*it != &de)) // FIXME
+    {
+      mdcmAlwaysWarnMacro("DataSet::Replace: loop?");
+      assert(0);
+    }
     DES.erase(it);
   }
   DES.insert(de);
@@ -87,7 +91,11 @@ DataSet::ReplaceEmpty(const DataElement & de)
   if (it != DES.cend() && it->IsEmpty())
   {
     // detect loop
-    mdcmAssertAlwaysMacro(&*it != &de);
+    if (!(&*it != &de)) // FIXME
+    {
+      mdcmAlwaysWarnMacro("DataSet::ReplaceEmpty: loop?");
+      assert(0);
+    }
     DES.erase(it);
   }
   DES.insert(de);

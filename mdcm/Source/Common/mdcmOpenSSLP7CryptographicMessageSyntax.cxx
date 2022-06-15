@@ -160,6 +160,7 @@ public:
     return true;
   }
 
+  // TODO check clear memory at 'return false'
   bool
   Encrypt(char * output, size_t & outlen, const char * array, size_t len)
   {
@@ -219,7 +220,7 @@ public:
     // (void)BIO_flush(wbio);
     char * binary;
     long   biolen = BIO_get_mem_data(bio_buffer, &binary);
-    mdcmAssertMacro(biolen >= 0);
+    assert(biolen >= 0);
     if (outlen < (size_t)biolen)
     {
       mdcmErrorMacro("Allocation issue: " << outlen << " vs " << biolen << " from " << len);

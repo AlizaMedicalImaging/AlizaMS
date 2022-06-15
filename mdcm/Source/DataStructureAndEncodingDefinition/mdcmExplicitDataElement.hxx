@@ -450,6 +450,34 @@ ExplicitDataElement::Write(std::ostream & os) const
   }
   if (ValueLengthField)
   {
+// TODO check
+#if 0
+    // Special case, check SQ
+    if (GetVR() == VR::SQ)
+    {
+      mdcmAssertAlwaysMacro(dynamic_cast<const SequenceOfItems *>(&GetValue()));
+    }
+    // check consistency in Length:
+    if (GetByteValue())
+    {
+      assert(ValueField->GetLength() == ValueLengthField);
+    }
+    else if (const SequenceOfItems * sqi = dynamic_cast<const SequenceOfItems *>(&GetValue()))
+    {
+      assert(ValueField->GetLength() == ValueLengthField);
+      // Recompute the total length:
+      if (!ValueLengthField.IsUndefined())
+      {
+        VL dummy = sqi->template ComputeLength<ExplicitDataElement>();
+        mdcmAssertAlwaysMacro(dummy == ValueLengthField);
+        (void)dummy;
+      }
+    }
+    else if (GetSequenceOfFragments())
+    {
+      assert(ValueField->GetLength() == ValueLengthField);
+    }
+#endif
     // Should be able to write the value
     if (VRField == VR::UN && ValueLengthField.IsUndefined())
     {

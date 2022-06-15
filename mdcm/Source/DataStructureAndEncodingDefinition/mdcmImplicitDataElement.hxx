@@ -562,8 +562,16 @@ ImplicitDataElement::Write(std::ostream & os) const
   // Write Value
   if (ValueLengthField)
   {
-    assert(ValueField);
-    mdcmAssertAlwaysMacro(ValueLengthField == ValueField->GetLength());
+    if (!ValueField)
+    {
+      mdcmAlwaysWarnMacro("ImplicitDataElement::Write: !ValueField");
+      throw std::logic_error("!ValueField");
+    }
+    if (ValueLengthField != ValueField->GetLength())
+    {
+      mdcmAlwaysWarnMacro("ValueLengthField != ValueField->GetLength()");
+      assert(0);
+    }
     assert(TagField != Tag(0xfffe, 0xe00d) && TagField != Tag(0xfffe, 0xe0dd));
     if (!ValueIO<ImplicitDataElement, TSwap>::Write(os, *ValueField))
     {

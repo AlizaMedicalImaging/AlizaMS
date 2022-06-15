@@ -53,7 +53,7 @@ Item::GetLength() const
     // we are computing the actual length of an implicit dataset, from an
     // initially read explicit dataset in which case the two length cannot
     // related to each other
-    // mdcmAssertAlwaysMacro( ValueLengthField == nestedlen );
+    // assert( ValueLengthField == nestedlen );
     assert(nestedlen % 2 == 0);
     return TagField.GetLength() /* 4 */ +
            ValueLengthField.GetLength() /* 4 */

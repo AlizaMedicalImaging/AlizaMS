@@ -95,10 +95,13 @@ FileMetaInformation::AppendImplementationClassUID(const char * imp)
 void
 FileMetaInformation::SetImplementationVersionName(const char * version)
 {
-  if (version)
+  if (version && strlen(version) <= 16)
   {
-    mdcmAssertAlwaysMacro(strlen(version) <= 16);
     ImplementationVersionName = version;
+  }
+  else
+  {
+    mdcmAlwaysWarnMacro("Failed SetImplementationVersionName, NULL or > 16"); 
   }
 }
 

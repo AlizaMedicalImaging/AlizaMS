@@ -48,8 +48,6 @@ namespace mdcm
 #    define mdcmDebugMacro(msg) {} 
 #    define mdcmWarningMacro(msg) {}
 #    define mdcmErrorMacro(msg) {}
-#    define mdcmAssertMacro(arg) {}
-#    define mdcmAssertAlwaysMacro(arg) {}
 
 #  else
 
@@ -76,19 +74,6 @@ namespace mdcm
                << msg << "\n\n";                                                                            \
        std::cout << osmacro.str() << std::endl;                                                             \
      }
-
-#    define mdcmAssertMacro(arg)                                                                            \
-     {                                                                                                      \
-       if (!(arg))                                                                                          \
-       {                                                                                                    \
-         std::ostringstream osmacro;                                                                        \
-         osmacro << "Assert: in " __FILE__ ", line " << __LINE__ << ", function " << MDCM_FUNCTION << "\n"; \
-         std::cout << osmacro.str() << std::endl;                                                           \
-         assert(arg);                                                                                       \
-       }                                                                                                    \
-     }
-
-#    define mdcmAssertAlwaysMacro(arg) mdcmAssertMacro(arg)
 
 #  endif
 

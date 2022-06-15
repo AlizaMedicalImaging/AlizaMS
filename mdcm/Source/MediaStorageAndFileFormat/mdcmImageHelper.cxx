@@ -842,10 +842,14 @@ ImageHelper::GetRescaleInterceptSlopeValue(File const & f)
         const Tag trwvlutd(0x0040,0x9212); // Real World Value LUT Data
         if(ds.FindDataElement(trwvlutd))
         {
-          mdcmAssertAlwaysMacro(0); // Not supported !
+          assert(0); // Not supported !
         }
-        // dont know how to handle multiples:
-        mdcmAssertAlwaysMacro(sqi->GetNumberOfItems() == 1);
+        // don't know how to handle multiples:
+        if (sqi->GetNumberOfItems() != 1)
+        {
+          mdcmAlwaysWarnMacro("sqi->GetNumberOfItems() != 1");
+          assert(0);
+        }
         const Item &item = sqi->GetItem(1);
         const DataSet & subds = item.GetNestedDataSet();
         //const Tag trwvi(0x0040,0x9224); // Real World Value Intercept
