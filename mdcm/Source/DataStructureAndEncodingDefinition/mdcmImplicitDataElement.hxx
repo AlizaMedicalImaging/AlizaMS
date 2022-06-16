@@ -48,7 +48,7 @@ ImplicitDataElement::ReadPreValue(std::istream & is)
   // See PS 3.5, 7.1.3 Data Element Structure With Implicit VR
   if (!is)
   {
-    if (!is.eof()) // FIXME This should not be needed
+    if (!is.eof()) // This should not be needed
     {
       assert(0 && "Should not happen");
     }
@@ -60,6 +60,7 @@ ImplicitDataElement::ReadPreValue(std::istream & is)
   // Read Value Length
   if (!ValueLengthField.Read<TSwap>(is))
   {
+    mdcmAlwaysWarnMacro("Impossible ValueLengthField " << TagField);
     throw std::logic_error("Impossible ValueLengthField");
   }
   return is;
@@ -103,13 +104,13 @@ ImplicitDataElement::ReadValue(std::istream & is, bool readvalues)
     else
     {
       mdcmErrorMacro(
-        "Undefined value length is impossible in non-encapsulated Transfer Syntax. Proceeding with caution");
+        "Undefined value length is impossible in non-encapsulated Transfer Syntax " << TagField);
       ValueField = new SequenceOfFragments;
     }
   }
   else
   {
-    if (true /*ValueLengthField < 8 */)
+    if (true /*ValueLengthField < 8 */) // TODO check what it is
     {
       ValueField = new ByteValue;
     }
@@ -199,7 +200,7 @@ ImplicitDataElement::ReadValue(std::istream & is, bool readvalues)
     if (TagField != theralys1 && TagField != theralys2)
     {
       mdcmWarningMacro(
-        "GE,13: Replacing VL=0x000d with VL=0x000a, for Tag=" << TagField << " in order to read a buggy DICOM file.");
+        "GE,13: Replacing VL=0x000d with VL=0x000a, for Tag=" << TagField << " in order to read a buggy DICOM file");
       ValueLengthField = 10;
     }
   }
@@ -208,8 +209,8 @@ ImplicitDataElement::ReadValue(std::istream & is, bool readvalues)
   if (ValueLengthField == 0x31f031c && TagField == Tag(0x031e, 0x0324))
   {
     // TestImages/elbow.pap
-    mdcmWarningMacro("Replacing a VL. To be able to read a supposively "
-                     "broken Papyrus file.");
+    mdcmWarningMacro("Replacing a VL to be able to read a supposively "
+                     "broken Papyrus file");
     ValueLengthField = 202; // 0xca
   }
 #endif
@@ -317,14 +318,14 @@ ImplicitDataElement::ReadValueWithLength(std::istream & is, VL & length, bool re
   {
     if (ValueLengthField != 0)
     {
-      mdcmAlwaysWarnMacro("VL should be set to 0, correcting");
+      mdcmAlwaysWarnMacro("VL should be set to 0, correcting " << TagField);
     }
     ValueField = 0;
     return is;
   }
   if (ValueLengthField > length && !ValueLengthField.IsUndefined())
   {
-    mdcmAlwaysWarnMacro("ValueLengthField > length && !ValueLengthField.IsUndefined()");
+    mdcmAlwaysWarnMacro("ValueLengthField > length && !ValueLengthField.IsUndefined() " << TagField);
     throw std::logic_error("Impossible (more)");
   }
   if (ValueLengthField == 0)
@@ -340,7 +341,7 @@ ImplicitDataElement::ReadValueWithLength(std::istream & is, VL & length, bool re
     }
     else
     {
-      mdcmAlwaysWarnMacro("Undefined value length is impossible in non-encapsulated Transfer Syntax");
+      mdcmAlwaysWarnMacro("Undefined value length is impossible in non-encapsulated Transfer Syntax " << TagField);
       ValueField = new SequenceOfFragments;
     }
   }
@@ -375,7 +376,7 @@ ImplicitDataElement::ReadValueWithLength(std::istream & is, VL & length, bool re
       else if (item == itemPMSStart)
       {
         // MR_Philips_Intera_No_PrivateSequenceImplicitVR.dcm
-        mdcmWarningMacro("Illegal Tag for Item starter: " << TagField << " should be: " << itemStart);
+        mdcmAlwaysWarnMacro("Illegal Tag for Item starter: " << TagField << " should be: " << itemStart);
         // TODO: We READ Explicit ok...but we store Implicit !
         // Indeed when copying the VR will be saved.
         ValueField = new SequenceOfItems;
@@ -438,7 +439,7 @@ ImplicitDataElement::ReadValueWithLength(std::istream & is, VL & length, bool re
     if (TagField != theralys1 && TagField != theralys2)
     {
       mdcmAlwaysWarnMacro(
-        "GE,13: Replacing VL=0x000d with VL=0x000a, for Tag=" << TagField << " in order to read a buggy DICOM file.");
+        "GE,13: Replacing VL=0x000d with VL=0x000a, for Tag=" << TagField << " in order to read a buggy DICOM file");
       ValueLengthField = 10;
     }
   }
@@ -447,7 +448,7 @@ ImplicitDataElement::ReadValueWithLength(std::istream & is, VL & length, bool re
   if (ValueLengthField == 0x31f031c && TagField == Tag(0x031e, 0x0324))
   {
     // TestImages/elbow.pap
-    mdcmAlwaysWarnMacro("Replacing a VL. To be able to read a supposively broken Payrus file.");
+    mdcmAlwaysWarnMacro("Replacing a VL. To be able to read a supposively broken Payrus file");
     ValueLengthField = 202; // 0xca
   }
 #endif

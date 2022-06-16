@@ -438,7 +438,7 @@ DataSet::ReadWithLength(std::istream & is, VL & length)
     else
     {
       // mdcmDataExtra/mdcmBreakers/BuggedDicomWorksImage_Hopeless.dcm
-      mdcmAlwaysWarnMacro("Last Tag is : " << pe.GetLastElement().GetTag());
+      mdcmErrorMacro("Last Tag is : " << pe.GetLastElement().GetTag());
       throw std::logic_error("Unhandled");
     }
   }

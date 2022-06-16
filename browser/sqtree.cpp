@@ -295,7 +295,30 @@ void SQtree::process_element(
 				const mdcm::DictEntry & pentry =
 					pdict.GetDictEntry(ptag);
 				tname = QString(pentry.GetName()).trimmed();
-				if (invalid_vr||unknown_vr) vr = pentry.GetVR();
+				const mdcm::VR tmp_vr = pentry.GetVR();
+				if (invalid_vr||unknown_vr)
+				{
+					vr = tmp_vr;
+				}
+				else
+				{
+					if (!(tmp_vr == mdcm::VR::UN ||
+							tmp_vr == mdcm::VR::INVALID) &&
+						vr != tmp_vr)
+					{
+						if (tmp_vr.IsDual())
+						{
+							if (!vr.Compatible(tmp_vr))
+							{
+								bad_vr = true;
+							}
+						}
+						else
+						{
+							bad_vr = true;
+						}
+					}
+				}
 			}
 		}
 	}

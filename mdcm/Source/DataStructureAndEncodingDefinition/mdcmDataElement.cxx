@@ -263,7 +263,7 @@ DataElement::GetValueAsSQ() const
     }
   }
 #if 0
-  else if (GetVR() == VR::OB)
+  else if (GetVR() & VR::OB_OW)
   {
     try
     {
