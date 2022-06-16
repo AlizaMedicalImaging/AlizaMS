@@ -11638,11 +11638,15 @@ mdcm::VR DicomUtils::get_vr(
 	bool priv = false;
 	if (t.IsIllegal())
 	{
-		return vr; //
+		return vr;
 	}
 	else if (t.IsPrivateCreator())
 	{
-		vr = mdcm::VR::LO; //
+		vr = mdcm::VR::LO;
+	}
+	else if (t.IsGroupLength())
+	{
+		vr = mdcm::VR::UL;
 	}
 	else if (t.IsPrivate())
 	{
@@ -11676,11 +11680,17 @@ mdcm::VR DicomUtils::get_vr(
 	}
 	else
 	{
+		bool ok = false;
 		if (!implicit)
 		{
 			vr = ds.GetDataElement(t).GetVR();
+			// CP-246
+			if (!(vr == mdcm::VR::UN || vr == mdcm::VR::INVALID))
+			{
+				ok = true;
+			}
 		}
-		else
+		if (!ok)
 		{
 			const mdcm::PrivateDict & pdict = dicts.GetPrivateDict();
 			mdcm::Tag private_creator_t = t.GetPrivateCreator();
