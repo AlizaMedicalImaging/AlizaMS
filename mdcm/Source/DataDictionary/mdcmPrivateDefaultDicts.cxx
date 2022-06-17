@@ -1947,83 +1947,83 @@ const PRIV_DICT_ENTRY DICOMV3DataDict[] = {
   { 0x0009, 0x0001, "EMAGEON JPEG2K INFO", VR::DT, VM::VM1, "?", false },
   { 0x0009, 0x0000, "EMAGEON STUDY HOME", VR::LO, VM::VM1, "?", false },
   { 0x0009, 0x0001, "EMAGEON STUDY HOME", VR::LO, VM::VM1, "?", false },
-  { 0x0029, 0x0030, "Eclispe 60", VR::UL, VM::VM1, "Private data", false },
-  { 0x0029, 0x0031, "Eclispe 60", VR::UL, VM::VM1, "Private data", false },
-  { 0x0029, 0x0032, "Eclispe 60", VR::UL, VM::VM1, "Private data", false },
-  { 0x0029, 0x0033, "Eclispe 60", VR::DS, VM::VM1, "Private data", false },
-  { 0x0029, 0x0034, "Eclispe 60", VR::DS, VM::VM1, "Private data", false },
-  { 0x0029, 0x0036, "Eclispe 60", VR::SL, VM::VM1, "Private data", false },
-  { 0x0029, 0x0040, "Eclispe 60", VR::CS, VM::VM1, "Private data", false },
-  { 0x0029, 0x0050, "Eclispe 60", VR::CS, VM::VM1, "Private data", false },
-  { 0x0029, 0x0051, "Eclispe 60", VR::UL, VM::VM1, "Private data", false },
-  { 0x0029, 0x0052, "Eclispe 60", VR::UL, VM::VM1, "Private data", false },
-  { 0x0029, 0x0053, "Eclispe 60", VR::DS, VM::VM1, "Private data", false },
-  { 0x0029, 0x0054, "Eclispe 60", VR::UL, VM::VM1, "Private data", false },
-  { 0x0029, 0x0055, "Eclispe 60", VR::FL, VM::VM1, "Private data", false },
-  { 0x0029, 0x0056, "Eclispe 60", VR::US, VM::VM1, "Private data", false },
-  { 0x0029, 0x0060, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x0031, 0x0030, "Eclispe 60", VR::UL, VM::VM1, "Private data", false },
-  { 0x0031, 0x0031, "Eclispe 60", VR::UL, VM::VM1, "Private data", false },
-  { 0x0031, 0x0032, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x0031, 0x0033, "Eclispe 60", VR::UL, VM::VM1, "Private data", false },
-  { 0x0031, 0x0034, "Eclispe 60", VR::UL, VM::VM1, "Private data", false },
-  { 0x0031, 0x0035, "Eclispe 60", VR::UL, VM::VM1, "Private data", false },
-  { 0x200d, 0x0001, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x200d, 0x0002, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x200d, 0x0003, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x200d, 0x0004, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x200d, 0x0005, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x200d, 0x0006, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x200d, 0x0007, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x200d, 0x0008, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x200d, 0x0009, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x200d, 0x000a, "Eclispe 60", VR::IS, VM::VM1, "Private data", false },
-  { 0x200d, 0x000b, "Eclispe 60", VR::OB, VM::VM1, "Private data", false },
-  { 0x200d, 0x000c, "Eclispe 60", VR::IS, VM::VM1, "Private data", false },
-  { 0x200d, 0x000d, "Eclispe 60", VR::UL, VM::VM1, "Private data", false },
-  { 0x200d, 0x000e, "Eclispe 60", VR::IS, VM::VM1, "Private data", false },
-  { 0x200d, 0x000f, "Eclispe 60", VR::IS, VM::VM1, "Private data", false },
-  { 0x200d, 0x0010, "Eclispe 60", VR::IS, VM::VM1, "Private data", false },
-  { 0x200d, 0x0011, "Eclispe 60", VR::IS, VM::VM1, "Private data", false },
-  { 0x200d, 0x0012, "Eclispe 60", VR::OB, VM::VM1, "Private data", false },
-  { 0x200d, 0x0013, "Eclispe 60", VR::IS, VM::VM1, "Private data", false },
-  { 0x200d, 0x0014, "Eclispe 60", VR::IS, VM::VM1, "Private data", false },
-  { 0x200d, 0x0015, "Eclispe 60", VR::IS, VM::VM1, "Private data", false },
-  { 0x200d, 0x001a, "Eclispe 60", VR::IS, VM::VM1, "Private data", false },
-  { 0x200d, 0x001b, "Eclispe 60", VR::IS, VM::VM1, "Private data", false },
-  { 0x200d, 0x0020, "Eclispe 60", VR::SQ, VM::VM1, "Private data", false },
-  { 0x200d, 0x0027, "Eclispe 60", VR::FD, VM::VM1, "Private data", false },
-  { 0x200d, 0x0028, "Eclispe 60", VR::FD, VM::VM1, "Private data", false },
-  { 0x200d, 0x0030, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x200d, 0x0031, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x200d, 0x0032, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x200d, 0x0033, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x200d, 0x0034, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x200d, 0x0035, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x200d, 0x0036, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x200d, 0x0037, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x200d, 0x0038, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x200d, 0x0039, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x200d, 0x003a, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x200d, 0x0050, "Eclispe 60", VR::CS, VM::VM1, "Private data", false },
-  { 0x200d, 0x0051, "Eclispe 60", VR::CS, VM::VM1, "Private data", false },
-  { 0x200d, 0x0052, "Eclispe 60", VR::FD, VM::VM1, "Private data", false },
-  { 0x200d, 0x0053, "Eclispe 60", VR::CS, VM::VM1, "Private data", false },
-  { 0x200d, 0x0054, "Eclispe 60", VR::CS, VM::VM1, "Private data", false },
-  { 0x200d, 0x0055, "Eclispe 60", VR::FD, VM::VM1, "Private data", false },
-  { 0x200d, 0x0056, "Eclispe 60", VR::FD, VM::VM1, "Private data", false },
-  { 0x200d, 0x0057, "Eclispe 60", VR::FD, VM::VM1, "Private data", false },
-  { 0x200d, 0x0058, "Eclispe 60", VR::IS, VM::VM1, "Private data", false },
-  { 0x200d, 0x0059, "Eclispe 60", VR::FD, VM::VM1, "Private data", false },
-  { 0x200d, 0x005a, "Eclispe 60", VR::FD, VM::VM1, "Private data", false },
-  { 0x200d, 0x005d, "Eclispe 60", VR::CS, VM::VM1, "Private data", false },
-  { 0x200d, 0x005e, "Eclispe 60", VR::CS, VM::VM1, "Private data", false },
-  { 0x200d, 0x00ff, "Eclispe 60", VR::IS, VM::VM1, "Private data", false },
-  { 0x7777, 0x0001, "Eclispe 60", VR::DA, VM::VM1, "Private data", false },
-  { 0x7777, 0x0002, "Eclispe 60", VR::CS, VM::VM1, "Private data", false },
-  { 0x7777, 0x0003, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x7777, 0x0010, "Eclispe 60", VR::LO, VM::VM1, "Private data", false },
-  { 0x7777, 0x0014, "Eclispe 60", VR::LT, VM::VM1, "Private data", false },
+  { 0x0029, 0x0030, "Eclipse 60", VR::UL, VM::VM1, "Private data", false },
+  { 0x0029, 0x0031, "Eclipse 60", VR::UL, VM::VM1, "Private data", false },
+  { 0x0029, 0x0032, "Eclipse 60", VR::UL, VM::VM1, "Private data", false },
+  { 0x0029, 0x0033, "Eclipse 60", VR::DS, VM::VM1, "Private data", false },
+  { 0x0029, 0x0034, "Eclipse 60", VR::DS, VM::VM1, "Private data", false },
+  { 0x0029, 0x0036, "Eclipse 60", VR::SL, VM::VM1, "Private data", false },
+  { 0x0029, 0x0040, "Eclipse 60", VR::CS, VM::VM1, "Private data", false },
+  { 0x0029, 0x0050, "Eclipse 60", VR::CS, VM::VM1, "Private data", false },
+  { 0x0029, 0x0051, "Eclipse 60", VR::UL, VM::VM1, "Private data", false },
+  { 0x0029, 0x0052, "Eclipse 60", VR::UL, VM::VM1, "Private data", false },
+  { 0x0029, 0x0053, "Eclipse 60", VR::DS, VM::VM1, "Private data", false },
+  { 0x0029, 0x0054, "Eclipse 60", VR::UL, VM::VM1, "Private data", false },
+  { 0x0029, 0x0055, "Eclipse 60", VR::FL, VM::VM1, "Private data", false },
+  { 0x0029, 0x0056, "Eclipse 60", VR::US, VM::VM1, "Private data", false },
+  { 0x0029, 0x0060, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x0031, 0x0030, "Eclipse 60", VR::UL, VM::VM1, "Private data", false },
+  { 0x0031, 0x0031, "Eclipse 60", VR::UL, VM::VM1, "Private data", false },
+  { 0x0031, 0x0032, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x0031, 0x0033, "Eclipse 60", VR::UL, VM::VM1, "Private data", false },
+  { 0x0031, 0x0034, "Eclipse 60", VR::UL, VM::VM1, "Private data", false },
+  { 0x0031, 0x0035, "Eclipse 60", VR::UL, VM::VM1, "Private data", false },
+  { 0x200d, 0x0001, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x200d, 0x0002, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x200d, 0x0003, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x200d, 0x0004, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x200d, 0x0005, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x200d, 0x0006, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x200d, 0x0007, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x200d, 0x0008, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x200d, 0x0009, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x200d, 0x000a, "Eclipse 60", VR::IS, VM::VM1, "Private data", false },
+  { 0x200d, 0x000b, "Eclipse 60", VR::OB, VM::VM1, "Private data", false },
+  { 0x200d, 0x000c, "Eclipse 60", VR::IS, VM::VM1, "Private data", false },
+  { 0x200d, 0x000d, "Eclipse 60", VR::UL, VM::VM1, "Private data", false },
+  { 0x200d, 0x000e, "Eclipse 60", VR::IS, VM::VM1, "Private data", false },
+  { 0x200d, 0x000f, "Eclipse 60", VR::IS, VM::VM1, "Private data", false },
+  { 0x200d, 0x0010, "Eclipse 60", VR::IS, VM::VM1, "Private data", false },
+  { 0x200d, 0x0011, "Eclipse 60", VR::IS, VM::VM1, "Private data", false },
+  { 0x200d, 0x0012, "Eclipse 60", VR::OB, VM::VM1, "Private data", false },
+  { 0x200d, 0x0013, "Eclipse 60", VR::IS, VM::VM1, "Private data", false },
+  { 0x200d, 0x0014, "Eclipse 60", VR::IS, VM::VM1, "Private data", false },
+  { 0x200d, 0x0015, "Eclipse 60", VR::IS, VM::VM1, "Private data", false },
+  { 0x200d, 0x001a, "Eclipse 60", VR::IS, VM::VM1, "Private data", false },
+  { 0x200d, 0x001b, "Eclipse 60", VR::IS, VM::VM1, "Private data", false },
+  { 0x200d, 0x0020, "Eclipse 60", VR::SQ, VM::VM1, "Private data", false },
+  { 0x200d, 0x0027, "Eclipse 60", VR::FD, VM::VM1, "Private data", false },
+  { 0x200d, 0x0028, "Eclipse 60", VR::FD, VM::VM1, "Private data", false },
+  { 0x200d, 0x0030, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x200d, 0x0031, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x200d, 0x0032, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x200d, 0x0033, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x200d, 0x0034, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x200d, 0x0035, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x200d, 0x0036, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x200d, 0x0037, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x200d, 0x0038, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x200d, 0x0039, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x200d, 0x003a, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x200d, 0x0050, "Eclipse 60", VR::CS, VM::VM1, "Private data", false },
+  { 0x200d, 0x0051, "Eclipse 60", VR::CS, VM::VM1, "Private data", false },
+  { 0x200d, 0x0052, "Eclipse 60", VR::FD, VM::VM1, "Private data", false },
+  { 0x200d, 0x0053, "Eclipse 60", VR::CS, VM::VM1, "Private data", false },
+  { 0x200d, 0x0054, "Eclipse 60", VR::CS, VM::VM1, "Private data", false },
+  { 0x200d, 0x0055, "Eclipse 60", VR::FD, VM::VM1, "Private data", false },
+  { 0x200d, 0x0056, "Eclipse 60", VR::FD, VM::VM1, "Private data", false },
+  { 0x200d, 0x0057, "Eclipse 60", VR::FD, VM::VM1, "Private data", false },
+  { 0x200d, 0x0058, "Eclipse 60", VR::IS, VM::VM1, "Private data", false },
+  { 0x200d, 0x0059, "Eclipse 60", VR::FD, VM::VM1, "Private data", false },
+  { 0x200d, 0x005a, "Eclipse 60", VR::FD, VM::VM1, "Private data", false },
+  { 0x200d, 0x005d, "Eclipse 60", VR::CS, VM::VM1, "Private data", false },
+  { 0x200d, 0x005e, "Eclipse 60", VR::CS, VM::VM1, "Private data", false },
+  { 0x200d, 0x00ff, "Eclipse 60", VR::IS, VM::VM1, "Private data", false },
+  { 0x7777, 0x0001, "Eclipse 60", VR::DA, VM::VM1, "Private data", false },
+  { 0x7777, 0x0002, "Eclipse 60", VR::CS, VM::VM1, "Private data", false },
+  { 0x7777, 0x0003, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x7777, 0x0010, "Eclipse 60", VR::LO, VM::VM1, "Private data", false },
+  { 0x7777, 0x0014, "Eclipse 60", VR::LT, VM::VM1, "Private data", false },
   { 0x0859, 0x0010, "ETIAM RE UIDENTIFY", VR::SQ, VM::VM1, "Some SQ", false },
   { 0x0009, 0x0004, "FDMS 1.0", VR::SH, VM::VM1, "Image Control Unit", false },
   { 0x0009, 0x0005, "FDMS 1.0", VR::OW, VM::VM1, "Image UID", false },
@@ -2139,6 +2139,7 @@ const PRIV_DICT_ENTRY DICOMV3DataDict[] = {
   { 0x50f1, 0x0008, "FDMS 1.0", VR::CS, VM::VM1, "Energy Subtraction Param. 2", false },
   { 0x50f1, 0x0009, "FDMS 1.0", VR::SL, VM::VM1, "Afin Conversion Coefficient", false },
   { 0x50f1, 0x000a, "FDMS 1.0", VR::SH, VM::VM1, "FNC Parameters", false },
+  { 0x50f1, 0x000b, "FDMS 1.0", VR::SH, VM::VM1, "CRF Parameters", false },
   { 0x50f1, 0x0010, "FDMS 1.0", VR::CS, VM::VM1, "Film Output Format", false },
   { 0x50f1, 0x0020, "FDMS 1.0", VR::CS, VM::VM1, "Image Processing Modification Flag", false },
   { 0x0009, 0x0001, "FFP DATA", VR::UN, VM::VM1, "CR Header Information", false },
@@ -2812,7 +2813,7 @@ const PRIV_DICT_ENTRY DICOMV3DataDict[] = {
   { 0x0019, 0x00dd, "GEMS_DL_IMG_01", VR::DS, VM::VM1_n, "DRM Strength", false },
   { 0x0019, 0x00de, "GEMS_DL_IMG_01", VR::CS, VM::VM1, "Acquisition Plane", false },
   { 0x0019, 0x00df, "GEMS_DL_IMG_01", VR::FL, VM::VM1_n, "LP off longitudinal position Z", false },
-  { 0x0019, 0x00e0, "GEMS_DL_IMG_01", VR::FL, VM::VM1, "DAP of currect record", false },
+  { 0x0019, 0x00e0, "GEMS_DL_IMG_01", VR::FL, VM::VM1, "DAP of current record", false },
   { 0x0019, 0x00e1, "GEMS_DL_IMG_01", VR::FL, VM::VM1, "Pivot Lateral Angle", false },
   { 0x0019, 0x00e2, "GEMS_DL_IMG_01", VR::FL, VM::VM1, "Carm Lateral Angle", false },
   { 0x0019, 0x00e3, "GEMS_DL_IMG_01", VR::FL, VM::VM1_n, "Pivot Lateral Angle increment", false },
@@ -2915,7 +2916,7 @@ const PRIV_DICT_ENTRY DICOMV3DataDict[] = {
   { 0x0015, 0x009b, "GEMS_DL_STUDY_01", VR::IS, VM::VM1, "Study fluoro time lateral", false },
   { 0x0015, 0x009c, "GEMS_DL_STUDY_01", VR::FL, VM::VM1, "Study record dap leteral", false },
   { 0x0015, 0x009d, "GEMS_DL_STUDY_01", VR::IS, VM::VM1, "Study record time lateral", false },
-  { 0x0037, 0x0010, "GEMS_DRS_1", VR::LO, VM::VM1, "Refering Department", false },
+  { 0x0037, 0x0010, "GEMS_DRS_1", VR::LO, VM::VM1, "Referring Department", false },
   { 0x0037, 0x0020, "GEMS_DRS_1", VR::US, VM::VM1, "Screen Number", false },
   { 0x0037, 0x0040, "GEMS_DRS_1", VR::SH, VM::VM1, "Left Orientation", false },
   { 0x0037, 0x0042, "GEMS_DRS_1", VR::SH, VM::VM1, "Right Orientation", false },
@@ -3281,7 +3282,7 @@ const PRIV_DICT_ENTRY DICOMV3DataDict[] = {
   { 0x0045, 0x0002, "GEMS_HELIOS_01", VR::FL, VM::VM1, "Macro width at ISO Center", false },
   { 0x0045, 0x0003, "GEMS_HELIOS_01", VR::SS, VM::VM1, "DAS type", false },
   { 0x0045, 0x0004, "GEMS_HELIOS_01", VR::SS, VM::VM1, "DAS gain", false },
-  { 0x0045, 0x0005, "GEMS_HELIOS_01", VR::SS, VM::VM1, "DAS Temprature", false },
+  { 0x0045, 0x0005, "GEMS_HELIOS_01", VR::SS, VM::VM1, "DAS Temperature", false },
   { 0x0045, 0x0006, "GEMS_HELIOS_01", VR::CS, VM::VM1, "Table Direction", false },
   { 0x0045, 0x0007, "GEMS_HELIOS_01", VR::FL, VM::VM1, "Z smoothing Factor", false },
   { 0x0045, 0x0008, "GEMS_HELIOS_01", VR::SS, VM::VM1, "View Weighting Mode", false },
@@ -3760,7 +3761,7 @@ const PRIV_DICT_ENTRY DICOMV3DataDict[] = {
   { 0x0009, 0x007c, "GEMS_PETD_01", VR::SL, VM::VM1, "PET is_source", false },
   { 0x0009, 0x007d, "GEMS_PETD_01", VR::SL, VM::VM1, "PET is_contents", false },
   { 0x0009, 0x007e, "GEMS_PETD_01", VR::SL, VM::VM1, "PET is_type", false },
-  { 0x0009, 0x007f, "GEMS_PETD_01", VR::DS, VM::VM3, "PET is_reference", false },
+  { 0x0009, 0x007f, "GEMS_PETD_01", VR::DS, VM::VM1_n, "PET is_reference", false },
   { 0x0009, 0x0080, "GEMS_PETD_01", VR::SL, VM::VM1, "PET multi_patient", false },
   { 0x0009, 0x0081, "GEMS_PETD_01", VR::SL, VM::VM1, "PET number_of_normals", false },
   { 0x0009, 0x0082, "GEMS_PETD_01", VR::UI, VM::VM1, "PET color_map_id", false },
@@ -7270,7 +7271,7 @@ const PRIV_DICT_ENTRY DICOMV3DataDict[] = {
   { 0x0019, 0x0042, "SIEMENS CT VA0  GEN", VR::US, VM::VM1_n, "Processing Mask", false },
   { 0x0019, 0x0044, "SIEMENS CT VA0  GEN", VR::UL, VM::VM1_n, "IRS Data Number", false },
   { 0x0019, 0x0045, "SIEMENS CT VA0  GEN", VR::UL, VM::VM1_n, "IRS Data Length", false },
-  { 0x0019, 0x0062, "SIEMENS CT VA0  GEN", VR::IS, VM::VM1, "Number of Virtuell Channels", false },
+  { 0x0019, 0x0062, "SIEMENS CT VA0  GEN", VR::IS, VM::VM1, "Number of Virtual Channels", false },
   { 0x0019, 0x0070, "SIEMENS CT VA0  GEN", VR::IS, VM::VM1, "Number of Reading", false },
   { 0x0019, 0x0071, "SIEMENS CT VA0  GEN", VR::CS, VM::VM1, "Reading Code", false },
   { 0x0019, 0x0074, "SIEMENS CT VA0  GEN", VR::IS, VM::VM1, "Number of Projections", false },
@@ -7385,9 +7386,9 @@ const PRIV_DICT_ENTRY DICOMV3DataDict[] = {
   { 0x0017, 0x0071, "SIEMENS DFR.01 MANIPULATED", VR::LO, VM::VM1, "Landmark Current", false },
   { 0x0017, 0x0072, "SIEMENS DFR.01 MANIPULATED", VR::US, VM::VM1, "Zoom Factor", false },
   { 0x0017, 0x0073, "SIEMENS DFR.01 MANIPULATED", VR::US, VM::VM1, "Roam Horizontal", false },
-  { 0x0017, 0x0074, "SIEMENS DFR.01 MANIPULATED", VR::US, VM::VM1, "Roam Vertikal", false },
+  { 0x0017, 0x0074, "SIEMENS DFR.01 MANIPULATED", VR::US, VM::VM1, "Roam Vertical", false },
   { 0x0017, 0x0077, "SIEMENS DFR.01 MANIPULATED", VR::IS, VM::VM1, "Pixel Shift Horizontal", false },
-  { 0x0017, 0x0078, "SIEMENS DFR.01 MANIPULATED", VR::IS, VM::VM1, "Pixel Shift Vertikal", false },
+  { 0x0017, 0x0078, "SIEMENS DFR.01 MANIPULATED", VR::IS, VM::VM1, "Pixel Shift Vertical", false },
   { 0x0017, 0x0079, "SIEMENS DFR.01 MANIPULATED", VR::US, VM::VM1, "Image Flip", false },
   { 0x0017, 0x007a, "SIEMENS DFR.01 MANIPULATED", VR::US, VM::VM1, "Invers Current", false },
   { 0x0017, 0x0080, "SIEMENS DFR.01 MANIPULATED", VR::US, VM::VM1, "?", false },
@@ -8095,8 +8096,8 @@ const PRIV_DICT_ENTRY DICOMV3DataDict[] = {
   { 0x0031, 0x0017, "SIEMENS MED NM", VR::SS, VM::VM1_n, "?", false },
   { 0x0031, 0x0020, "SIEMENS MED NM", VR::ST, VM::VM1, "?", false },
   { 0x0031, 0x0021, "SIEMENS MED NM", VR::SS, VM::VM1, "?", false },
-  { 0x0033, 0x0000, "SIEMENS MED NM", VR::FL, VM::VM1_n, "Flood correction Matrix Det 1 upto SR 2.0", false },
-  { 0x0033, 0x0001, "SIEMENS MED NM", VR::FL, VM::VM1_n, "Flood correction Matrix Det 2 upto SR 2.0", false },
+  { 0x0033, 0x0000, "SIEMENS MED NM", VR::FL, VM::VM1_n, "Flood correction Matrix Det 1 up to SR 2.0", false },
+  { 0x0033, 0x0001, "SIEMENS MED NM", VR::FL, VM::VM1_n, "Flood correction Matrix Det 2 up to SR 2.0", false },
   { 0x0033, 0x0010, "SIEMENS MED NM", VR::FL, VM::VM1_n, "COR Data for Detector 1", false },
   { 0x0033, 0x0011, "SIEMENS MED NM", VR::FL, VM::VM1_n, "COR Data for Detector 2", false },
   { 0x0033, 0x0014, "SIEMENS MED NM", VR::FL, VM::VM1, "MHR ( Y-Shift) data for detector 1", false },
@@ -11082,17 +11083,17 @@ const PRIV_DICT_ENTRY DICOMV3DataDict[] = {
   { 0x0065, 0x0051, "Image Private Header", VR::SQ, VM::VM1, "MR VFrame Sequence", false },
   //
   { 0x0039, 0x0000, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::LO, VM::VM1, "Release Version", false },
-  { 0x0039, 0x0003, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Volume Acquisition Duration", false }, // TODO
+  { 0x0039, 0x0003, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Volume Acquisition Duration", false },
   { 0x0039, 0x0004, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::LO, VM::VM1_n, "Volume Raw Data Type", false },
   { 0x0039, 0x0005, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::LO, VM::VM1_n, "Scan Type", false },
   { 0x0039, 0x0006, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::FD, VM::VM1, "Z lateral Min", false },
   { 0x0039, 0x0007, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::FD, VM::VM1, "Z lateral Span", false },
   { 0x0039, 0x0008, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::FD, VM::VM1, "Z Radius Of Curvature", false },
   { 0x0039, 0x0009, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::FD, VM::VM1, "Wobble Correction", false },
-  { 0x0039, 0x0010, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Scale Along Width", false }, // TODO
-  { 0x0039, 0x0011, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Scale Along Height", false }, // TODO
-  { 0x0039, 0x0012, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Scale Along Depth", false }, // TODO
-  { 0x0039, 0x0013, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Buffer Size", false }, // TODO
+  { 0x0039, 0x0010, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Scale Along Width", false },
+  { 0x0039, 0x0011, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Scale Along Height", false },
+  { 0x0039, 0x0012, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Scale Along Depth", false },
+  { 0x0039, 0x0013, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Buffer Size", false },
   { 0x0039, 0x0014, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::FD, VM::VM1, "Acquisition Rate", false },
   { 0x0039, 0x0015, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::FD, VM::VM1, "Depth Min Cm", false },
   { 0x0039, 0x0016, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::US, VM::VM1, "Is Left Right Flipped En", false },
@@ -11101,123 +11102,123 @@ const PRIV_DICT_ENTRY DICOMV3DataDict[] = {
   { 0x0039, 0x0019, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::US, VM::VM1, "B Byte Mask Offset", false },
   { 0x0039, 0x0020, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::US, VM::VM1, "B Byte Mask Size", false },
   { 0x0039, 0x0021, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::FD, VM::VM1, "Depth Max Cm", false },
-  { 0x0039, 0x0022, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Acq Plane Rotation Deg", false }, // TODO
+  { 0x0039, 0x0022, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Acq Plane Rotation Deg", false },
   { 0x0039, 0x0023, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::FD, VM::VM1, "Beam Axial Span", false },
   { 0x0039, 0x0024, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::FD, VM::VM1, "Beam Lateral Min", false },
   { 0x0039, 0x0025, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::FD, VM::VM1, "Beam Lateral Span", false },
   { 0x0039, 0x0026, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::FD, VM::VM1, "Beam Axial Min", false },
   { 0x0039, 0x0027, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::US, VM::VM1, "Num Display Samples", false },
-  { 0x0039, 0x0028, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "D Volume Width", false }, // TODO
-  { 0x0039, 0x0029, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "D Volume Depth", false }, // TODO
-  { 0x0039, 0x0030, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "D Volume Height", false }, // TODO
-  { 0x0039, 0x0031, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "D Volume Pos X", false }, // TODO
-  { 0x0039, 0x0032, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "D Volume Pos Y", false }, // TODO
-  { 0x0039, 0x0033, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "D Volume Pos Z", false }, // TODO
-  { 0x0039, 0x0034, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "D Beam Axial Min", false }, // TODO
-  { 0x0039, 0x0035, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "D Beam Axial Span", false }, // TODO
-  { 0x0039, 0x0036, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "D Beam Lateral Min", false }, // TODO
-  { 0x0039, 0x0037, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "D Beam Lateral Span", false }, // TODO
+  { 0x0039, 0x0028, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "D Volume Width", false },
+  { 0x0039, 0x0029, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "D Volume Depth", false },
+  { 0x0039, 0x0030, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "D Volume Height", false },
+  { 0x0039, 0x0031, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "D Volume Pos X", false },
+  { 0x0039, 0x0032, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "D Volume Pos Y", false },
+  { 0x0039, 0x0033, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "D Volume Pos Z", false },
+  { 0x0039, 0x0034, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "D Beam Axial Min", false },
+  { 0x0039, 0x0035, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "D Beam Axial Span", false },
+  { 0x0039, 0x0036, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "D Beam Lateral Min", false },
+  { 0x0039, 0x0037, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "D Beam Lateral Span", false },
   { 0x0039, 0x0038, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::US, VM::VM1, "Num Of Volumes In Sequence", false },
   { 0x0039, 0x0039, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::US, VM::VM1, "D Byte Mask Offset", false },
   { 0x0039, 0x0040, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::US, VM::VM1, "D Byte Mask Size", false },
-  { 0x0039, 0x0041, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::US, VM::VM1, "?", false }, // TODO
-  { 0x0039, 0x0042, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::US, VM::VM1, "?", false }, // TODO
+  { 0x0039, 0x0041, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::US, VM::VM1, "?", false },
+  { 0x0039, 0x0042, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::US, VM::VM1, "?", false },
   { 0x0039, 0x0050, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::LO, VM::VM1, "Private Creator Version Of Bookmark", false },
-  { 0x0039, 0x0051, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Cut Plane Enable", false }, // TODO
-  { 0x0039, 0x0052, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Mpr Color MapI ndex", false }, // TODO
-  { 0x0039, 0x0053, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Mpr Dynamic Range Db", false }, // TODO
-  { 0x0039, 0x0054, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Mpr Gray Map Index", false }, // TODO
-  { 0x0039, 0x0055, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Volume Render Mode", false }, // TODO
-  { 0x0039, 0x0056, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Vr Brightness", false }, // TODO
-  { 0x0039, 0x0057, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Vr Contrast", false }, // TODO
-  { 0x0039, 0x0058, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Vr Color Map Index", false }, // TODO
-  { 0x0039, 0x0059, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Vr Dynamic Range Db", false }, // TODO
-  { 0x0039, 0x005a, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Vr Gray Map Index", false }, // TODO
-  { 0x0039, 0x005b, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Vr Opacity", false }, // TODO
-  { 0x0039, 0x005c, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Vr Threshold High", false }, // TODO
-  { 0x0039, 0x005d, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Vr Threshold Low", false }, // TODO
-  { 0x0039, 0x005e, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Pre Process Filter Mix", false }, // TODO
-  { 0x0039, 0x005f, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Cut Plane Enable", false }, // TODO
-  { 0x0039, 0x0060, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Front Clip Mode", false }, // TODO
-  { 0x0039, 0x0061, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Mpr Color Map Index", false }, // TODO
-  { 0x0039, 0x0062, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Mpr Color Flow Priority Index", false }, // TODO
-  { 0x0039, 0x0063, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Volume Render Mode", false }, // TODO
-  { 0x0039, 0x0064, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Vr Color Map Index", false }, // TODO
-  { 0x0039, 0x0065, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Vr Color Flow Priority Index", false }, // TODO
-  { 0x0039, 0x0066, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Vr Opacity", false }, // TODO
-  { 0x0039, 0x0067, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Vr Threshold High", false }, // TODO
-  { 0x0039, 0x0068, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Vr Threshold Low", false }, // TODO
-  { 0x0039, 0x0069, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Voi Mode", false }, // TODO
-  { 0x0039, 0x006a, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Voi Rotation Offset Deg", false }, // TODO
-  { 0x0039, 0x006b, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Voi Size Ratio X", false }, // TODO
-  { 0x0039, 0x006c, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Voi Size Ratio Y", false }, // TODO
-  { 0x0039, 0x006d, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Voi Size Ratio Z", false }, // TODO
-  { 0x0039, 0x006e, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Voi Sync Plane", false }, // TODO
-  { 0x0039, 0x006f, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Voi View Mode", false }, // TODO
-  { 0x0039, 0x0070, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Vr Orientation A", false }, // TODO
-  { 0x0039, 0x0071, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Mpr Orientation A", false }, // TODO
-  { 0x0039, 0x0072, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Vr Offset Vector", false }, // TODO
-  { 0x0039, 0x0073, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Blending Ratio", false }, // TODO
-  { 0x0039, 0x0074, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Fusion Blend Mode", false }, // TODO
-  { 0x0039, 0x0075, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Quality Factor", false }, // TODO
-  { 0x0039, 0x0076, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Renderer Type", false }, // TODO
+  { 0x0039, 0x0051, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Cut Plane Enable", false },
+  { 0x0039, 0x0052, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Mpr Color MapI ndex", false },
+  { 0x0039, 0x0053, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Mpr Dynamic Range Db", false },
+  { 0x0039, 0x0054, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Mpr Gray Map Index", false },
+  { 0x0039, 0x0055, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Volume Render Mode", false },
+  { 0x0039, 0x0056, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Vr Brightness", false },
+  { 0x0039, 0x0057, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Vr Contrast", false },
+  { 0x0039, 0x0058, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Vr Color Map Index", false },
+  { 0x0039, 0x0059, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Vr Dynamic Range Db", false },
+  { 0x0039, 0x005a, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Vr Gray Map Index", false },
+  { 0x0039, 0x005b, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Vr Opacity", false },
+  { 0x0039, 0x005c, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Vr Threshold High", false },
+  { 0x0039, 0x005d, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Vr Threshold Low", false },
+  { 0x0039, 0x005e, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Pre Process Filter Mix", false },
+  { 0x0039, 0x005f, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Cut Plane Enable", false },
+  { 0x0039, 0x0060, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Front Clip Mode", false },
+  { 0x0039, 0x0061, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Mpr Color Map Index", false },
+  { 0x0039, 0x0062, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Mpr Color Flow Priority Index", false },
+  { 0x0039, 0x0063, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Volume Render Mode", false },
+  { 0x0039, 0x0064, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Vr Color Map Index", false },
+  { 0x0039, 0x0065, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Vr Color Flow Priority Index", false },
+  { 0x0039, 0x0066, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Vr Opacity", false },
+  { 0x0039, 0x0067, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Vr Threshold High", false },
+  { 0x0039, 0x0068, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Vr Threshold Low", false },
+  { 0x0039, 0x0069, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Voi Mode", false },
+  { 0x0039, 0x006a, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Voi Rotation Offset Deg", false },
+  { 0x0039, 0x006b, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Voi Size Ratio X", false },
+  { 0x0039, 0x006c, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Voi Size Ratio Y", false },
+  { 0x0039, 0x006d, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Voi Size Ratio Z", false },
+  { 0x0039, 0x006e, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Voi Sync Plane", false },
+  { 0x0039, 0x006f, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Voi View Mode", false },
+  { 0x0039, 0x0070, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Vr Orientation A", false },
+  { 0x0039, 0x0071, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Mpr Orientation A", false },
+  { 0x0039, 0x0072, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Vr Offset Vector", false },
+  { 0x0039, 0x0073, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Blending Ratio", false },
+  { 0x0039, 0x0074, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Fusion Blend Mode", false },
+  { 0x0039, 0x0075, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Quality Factor", false },
+  { 0x0039, 0x0076, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Renderer Type", false },
   { 0x0039, 0x0077, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Slice Mode", false }, // FIXME double entry by Siemens
-  { 0x0039, 0x0078, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Active Quad", false }, // TODO
-  { 0x0039, 0x0079, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Screen Mode", false }, // TODO
-  { 0x0039, 0x007a, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Cut Plane Side", false }, // TODO
-  { 0x0039, 0x007b, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Wireframe Mode", false }, // TODO
-  { 0x0039, 0x007c, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Crossmark Mode", false }, // TODO
-  { 0x0039, 0x007d, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Mpr Display Type", false }, // TODO
-  { 0x0039, 0x007e, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Volume Display Type", false }, // TODO
-  { 0x0039, 0x007f, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Last Reset", false }, // TODO
-  { 0x0039, 0x0080, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Last Non Full Screen Mode", false }, // TODO
-  { 0x0039, 0x0081, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Mpr Tool Index", false }, // TODO
-  { 0x0039, 0x0082, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Voi Tool Index", false }, // TODO
-  { 0x0039, 0x0083, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Tool Loop Mode", false }, // TODO
-  { 0x0039, 0x0084, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Volume Arb Mode", false }, // TODO
-  { 0x0039, 0x0085, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Mpr Zoom En", false }, // TODO
-  { 0x0039, 0x0086, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Is Volume Zoom En", false }, // TODO
-  { 0x0039, 0x0087, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Zoom Level Mpr", false }, // TODO
-  { 0x0039, 0x0088, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Zoom Level Volume", false }, // TODO
-  { 0x0039, 0x0089, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Is AutoRotate En", false }, // TODO
-  { 0x0039, 0x008a, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Auto Rotate Axis", false }, // TODO
-  { 0x0039, 0x008b, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Auto Rotate Range Index", false }, // TODO
-  { 0x0039, 0x008c, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Auto Rotate Speed Index", false }, // TODO
-  { 0x0039, 0x008d, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Vr Brightness", false }, // TODO
-  { 0x0039, 0x008e, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Flow State Index", false }, // TODO
-  { 0x0039, 0x008f, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Submode Index", false }, // TODO
-  { 0x0039, 0x0090, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Submode Index", false }, // TODO
-  { 0x0039, 0x0091, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Cut Plane", false }, // TODO
-  { 0x0039, 0x0092, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Bookmark Chunk Id", false }, // TODO
-  { 0x0039, 0x0093, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Sequence Min Chunk Id", false }, // TODO
-  { 0x0039, 0x0094, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Sequence Max Chunk Id", false }, // TODO
-  { 0x0039, 0x0095, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Volume Rate Hz", false }, // TODO
-  { 0x0039, 0x009a, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Voi Position Offset X", false }, // TODO
-  { 0x0039, 0x009b, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Voi Position Offset Y", false }, // TODO
-  { 0x0039, 0x009c, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Voi Position Offset Z", false }, // TODO
-  { 0x0039, 0x009d, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Vr Tool Index", false }, // TODO
-  { 0x0039, 0x009e, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Shading Percent", false }, // TODO
-  { 0x0039, 0x009f, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Volume Type", false }, // TODO
-  { 0x0039, 0x00a0, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Vr Quad Display Type", false }, // TODO
-  { 0x0039, 0x00a1, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Mpr Center Location", false }, // TODO
-  { 0x0039, 0x00e0, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Slice Range Type", false }, // TODO
-  { 0x0039, 0x00e1, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Slice MPR Plane", false }, // TODO
-  { 0x0039, 0x00e2, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Slice Layout", false }, // TODO
-  { 0x0039, 0x00e3, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Slice Spacing", false }, // TODO
-  { 0x0039, 0x00e4, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Thin Vr Mode", false }, // TODO
-  { 0x0039, 0x00e5, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Thin Vr Thickness", false }, // TODO
-  { 0x0039, 0x00e6, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Voi Pivot X", false }, // TODO
-  { 0x0039, 0x00e7, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Voi Pivot Y", false }, // TODO
-  { 0x0039, 0x00e8, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Voi Pivot Z", false }, // TODO
-  { 0x0039, 0x00e9, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name C Top Voi Quad", false }, // TODO
-  { 0x0039, 0x00ee, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Is Abvs Volume", false }, // TODO
-  { 0x0039, 0x00ef, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Is Thin Vr Abvs View En", false }, // TODO
+  { 0x0039, 0x0078, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Active Quad", false },
+  { 0x0039, 0x0079, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Screen Mode", false },
+  { 0x0039, 0x007a, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Cut Plane Side", false },
+  { 0x0039, 0x007b, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Wireframe Mode", false },
+  { 0x0039, 0x007c, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Crossmark Mode", false },
+  { 0x0039, 0x007d, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Mpr Display Type", false },
+  { 0x0039, 0x007e, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Volume Display Type", false },
+  { 0x0039, 0x007f, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Last Reset", false },
+  { 0x0039, 0x0080, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Last Non Full Screen Mode", false },
+  { 0x0039, 0x0081, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Mpr Tool Index", false },
+  { 0x0039, 0x0082, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Voi Tool Index", false },
+  { 0x0039, 0x0083, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Tool Loop Mode", false },
+  { 0x0039, 0x0084, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Volume Arb Mode", false },
+  { 0x0039, 0x0085, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Mpr Zoom En", false },
+  { 0x0039, 0x0086, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Is Volume Zoom En", false },
+  { 0x0039, 0x0087, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Zoom Level Mpr", false },
+  { 0x0039, 0x0088, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Zoom Level Volume", false },
+  { 0x0039, 0x0089, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Is AutoRotate En", false },
+  { 0x0039, 0x008a, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Auto Rotate Axis", false },
+  { 0x0039, 0x008b, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Auto Rotate Range Index", false },
+  { 0x0039, 0x008c, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Auto Rotate Speed Index", false },
+  { 0x0039, 0x008d, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Vr Brightness", false },
+  { 0x0039, 0x008e, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Flow State Index", false },
+  { 0x0039, 0x008f, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "B Submode Index", false },
+  { 0x0039, 0x0090, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "C Submode Index", false },
+  { 0x0039, 0x0091, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Cut Plane", false },
+  { 0x0039, 0x0092, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Bookmark Chunk Id", false },
+  { 0x0039, 0x0093, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Sequence Min Chunk Id", false },
+  { 0x0039, 0x0094, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Sequence Max Chunk Id", false },
+  { 0x0039, 0x0095, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Volume Rate Hz", false },
+  { 0x0039, 0x009a, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Voi Position Offset X", false },
+  { 0x0039, 0x009b, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Voi Position Offset Y", false },
+  { 0x0039, 0x009c, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Voi Position Offset Z", false },
+  { 0x0039, 0x009d, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Vr Tool Index", false },
+  { 0x0039, 0x009e, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Shading Percent", false },
+  { 0x0039, 0x009f, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "Volume Type", false },
+  { 0x0039, 0x00a0, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Vr Quad Display Type", false },
+  { 0x0039, 0x00a1, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Mpr Center Location", false },
+  { 0x0039, 0x00e0, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Slice Range Type", false },
+  { 0x0039, 0x00e1, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Slice MPR Plane", false },
+  { 0x0039, 0x00e2, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Slice Layout", false },
+  { 0x0039, 0x00e3, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Slice Spacing", false },
+  { 0x0039, 0x00e4, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Thin Vr Mode", false },
+  { 0x0039, 0x00e5, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Thin Vr Thickness", false },
+  { 0x0039, 0x00e6, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Voi Pivot X", false },
+  { 0x0039, 0x00e7, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Voi Pivot Y", false },
+  { 0x0039, 0x00e8, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Voi Pivot Z", false },
+  { 0x0039, 0x00e9, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name C Top Voi Quad", false },
+  { 0x0039, 0x00ee, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Is Abvs Volume", false },
+  { 0x0039, 0x00ef, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Is Thin Vr Abvs View En", false },
   { 0x0039, 0x00f0, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "?", false }, // FIXME double entry by Siemens
-  { 0x0039, 0x00f1, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Abs Scan Chirality", false }, // TODO
-  { 0x0039, 0x00f2, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Abs Scan Direction", false }, // TODO
-  { 0x0039, 0x00f3, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Abs Scan Location", false }, // TODO
-  { 0x0039, 0x00f4, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Tsi Depth Mm", false }, // TODO
-  { 0x0039, 0x00f7, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::LO, VM::VM1, "?", false }, // TODO
+  { 0x0039, 0x00f1, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Abs Scan Chirality", false },
+  { 0x0039, 0x00f2, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Abs Scan Direction", false },
+  { 0x0039, 0x00f3, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Abs Scan Location", false },
+  { 0x0039, 0x00f4, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::UN, VM::VM1, "DICOM Attr Name Tsi Depth Mm", false },
+  { 0x0039, 0x00f7, "SIEMENS MED SMS USG S2000 3D VOLUME", VR::LO, VM::VM1, "?", false },
   //
   //
   //
