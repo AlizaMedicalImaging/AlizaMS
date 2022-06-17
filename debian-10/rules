@@ -8,12 +8,20 @@ export DEB_CFLAGS_MAINT_APPEND = -Wall -pedantic
 	dh $@ --buildsystem=cmake
 
 # Option -DALIZA_CXX_STANDARD:STRING=14 sets CMAKE_CXX_STANDARD
-# to 14 to get rid of ITK-4.12 dev-package VNL warnings
-# (Debian 10, cmake-3.13.4)
+# to 14 only to get rid of ITK-4.12 dev-package VNL warnings
+# (Debian 10, cmake-3.13.4), should be not required generally,
+# C++ >= 11 is OK for Aliza MS.
+#
+# ITK version 5 is OK too.
+#
+# There is a strange issue with 'CharLS', the name changed after
+# version 2.1.x to 'charls', in fact both should work.
+#
 CMAKEFLAGS = -DALIZA_QT_VERSION:STRING=5 \
  -DCMAKE_SKIP_RPATH:BOOL=ON \
  -DALIZA_CXX_STANDARD:STRING=14 \
  -DALIZA_USE_SYSTEM_BULLET:BOOL=ON \
+ -DALIZA_USE_SYSTEM_LCMS2:BOOL=ON \
  -DMDCM_USE_SYSTEM_UUID:BOOL=ON \
  -DMDCM_USE_SYSTEM_ZLIB:BOOL=ON \
  -DMDCM_USE_SYSTEM_OPENJPEG:BOOL=ON \
