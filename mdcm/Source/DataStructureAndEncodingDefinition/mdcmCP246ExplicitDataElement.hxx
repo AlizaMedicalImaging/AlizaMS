@@ -71,7 +71,7 @@ CP246ExplicitDataElement::ReadPreValue(std::istream & is)
       mdcmDebugMacro("Item Delimitation Item has a length different from 0");
     }
     // Set pointer to NULL to avoid user error
-    ValueField = 0;
+    ValueField = NULL;
     return is;
   }
   // Read VR
@@ -127,8 +127,7 @@ CP246ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
     return is;
   if (ValueLengthField == 0)
   {
-    // Simple fast path
-    ValueField = 0;
+    ValueField = NULL;
     return is;
   }
   // Read the Value
@@ -206,7 +205,7 @@ CP246ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
 #endif
   if (!ValueIO<CP246ExplicitDataElement, TSwap>::Read(is, *ValueField, readvalues))
   {
-    // Might be the famous UN 16bits
+    // Might be the UN 16bits
     ParseException pe;
     pe.SetLastElement(*this);
     throw pe;

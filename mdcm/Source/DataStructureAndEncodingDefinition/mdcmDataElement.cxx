@@ -128,13 +128,13 @@ DataElement::SetValue(Value const & vl)
 bool
 DataElement::IsEmpty() const
 {
-  return (ValueField == 0 || (GetByteValue() && GetByteValue()->IsEmpty()));
+  return (ValueField == NULL || (GetByteValue() && GetByteValue()->IsEmpty()));
 }
 
 void
 DataElement::Empty()
 {
-  ValueField = 0;
+  ValueField = NULL;
   ValueLengthField = 0;
 }
 
@@ -143,7 +143,7 @@ DataElement::Clear()
 {
   TagField = 0;
   VRField = VR::INVALID;
-  ValueField = 0;
+  ValueField = NULL;
   ValueLengthField = 0;
 }
 

@@ -75,7 +75,7 @@ ExplicitDataElement::ReadPreValue(std::istream & is)
     // Reset ValueLengthField to avoid user error
     ValueLengthField = 0;
     // Set pointer to NULL to avoid user error
-    ValueField = 0;
+    ValueField = NULL;
     VRField = VR::INVALID;
     return is;
   }
@@ -180,7 +180,7 @@ ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
     return is;
   if (ValueLengthField == 0)
   {
-    ValueField = 0;
+    ValueField = NULL;
     return is;
   }
   if (VRField == VR::SQ)
@@ -209,7 +209,6 @@ ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
       ValueField->SetLength(ValueLengthField); // perform realloc
       try
       {
-        // if(!ValueIO<ExplicitDataElement,TSwap>::Read(is,*ValueField)) // non cp246
         if (!ValueIO<ImplicitDataElement, TSwap>::Read(is, *ValueField, readvalues)) // cp246 compliant
         {
           assert(0);
@@ -373,7 +372,7 @@ ExplicitDataElement::Write(std::ostream & os) const
   if (TagField == itemDelItem)
   {
     assert(0);
-    assert(ValueField == 0);
+    assert(ValueField == NULL);
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
     if (ValueLengthField != 0)
     {

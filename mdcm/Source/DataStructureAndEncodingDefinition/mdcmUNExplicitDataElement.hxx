@@ -74,7 +74,7 @@ UNExplicitDataElement::ReadPreValue(std::istream & is)
     {
       mdcmDebugMacro("Item Delimitation Item has a length different from 0");
     }
-    ValueField = 0;
+    ValueField = NULL;
     VRField = VR::INVALID;
     return is;
   }
@@ -138,7 +138,7 @@ UNExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
     return is;
   if (ValueLengthField == 0)
   {
-    ValueField = 0;
+    ValueField = NULL;
     return is;
   }
   if (VRField == VR::SQ)

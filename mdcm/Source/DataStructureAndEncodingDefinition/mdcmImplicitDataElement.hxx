@@ -85,12 +85,12 @@ ImplicitDataElement::ReadValue(std::istream & is, bool readvalues)
     {
       mdcmWarningMacro("VL should be set to 0");
     }
-    ValueField = 0;
+    ValueField = NULL;
     return is;
   }
   if (ValueLengthField == 0)
   {
-    ValueField = 0;
+    ValueField = NULL;
     return is;
   }
   else if (ValueLengthField.IsUndefined())
@@ -320,7 +320,7 @@ ImplicitDataElement::ReadValueWithLength(std::istream & is, VL & length, bool re
     {
       mdcmAlwaysWarnMacro("VL should be set to 0, correcting " << TagField);
     }
-    ValueField = 0;
+    ValueField = NULL;
     return is;
   }
   if (ValueLengthField > length && !ValueLengthField.IsUndefined())
@@ -330,7 +330,7 @@ ImplicitDataElement::ReadValueWithLength(std::istream & is, VL & length, bool re
   }
   if (ValueLengthField == 0)
   {
-    ValueField = 0;
+    ValueField = NULL;
     return is;
   }
   else if (ValueLengthField.IsUndefined())
