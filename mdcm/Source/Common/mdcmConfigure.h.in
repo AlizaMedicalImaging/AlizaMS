@@ -77,7 +77,6 @@
 #cmakedefine MDCM_HAVE__STRICMP
 #cmakedefine MDCM_HAVE__STRNICMP
 #cmakedefine MDCM_HAVE__SNPRINTF
-#cmakedefine MDCM_HAVE_LROUND
 #cmakedefine MDCM_HAVE_GETTIMEOFDAY
 #cmakedefine MDCM_HAVE_ATOLL
 #cmakedefine MDCM_SUPPORT_BROKEN_IMPLEMENTATION

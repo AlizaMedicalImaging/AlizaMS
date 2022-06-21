@@ -11198,7 +11198,7 @@ const PRIV_DICT_ENTRY DICOMV3DataDict[] = {
   {0x4d4f,0x0031,"MDCM CONFORMANCE",VR::UV,VM::VM1_n,"VR::UV",false},
   /////////////////////////////////////////////////////////////////////////////
   {0xffff,0xffff,"MDCM Private Sentinel",VR::INVALID,VM::VM0,"",true},
-  {0xffff,0xffff,"",VR::INVALID,VM::VM0,nullptr,true}
+  {0xffff,0xffff,"",VR::INVALID,VM::VM0,NULL,true}
 };
 // clang-format on
 

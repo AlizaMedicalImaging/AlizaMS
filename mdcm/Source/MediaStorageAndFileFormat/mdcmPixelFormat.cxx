@@ -345,10 +345,6 @@ PixelFormat::GetMin() const
     {
       return (double)((int64_t)(~(((1ULL << BitsStored) - 1) >> 1)));
     }
-    else if (PixelRepresentation == 2)
-    {
-      return (double)((int64_t)(~(((1ULL << 16) - 1) >> 1)));
-    }
     else if (PixelRepresentation == 3)
     {
       return -(double)std::numeric_limits<float>::max();
@@ -385,10 +381,6 @@ PixelFormat::GetMax() const
     if (PixelRepresentation == 1)
     {
       return (double)((int64_t)((((1ULL << BitsStored) - 1) >> 1)));
-    }
-    else if (PixelRepresentation == 2)
-    {
-      return (double)((int64_t)((1ULL << 16) - 1));
     }
     else if (PixelRepresentation == 3)
     {

@@ -31,10 +31,6 @@
 #include <iomanip>
 #include <map>
 
-/*
- * TODO class template should work for both a public and a private dict
- */
-
 namespace mdcm
 {
 /**

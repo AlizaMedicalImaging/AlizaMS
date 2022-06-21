@@ -178,12 +178,12 @@ ComputeZSpacingFromIPP(const DataSet & ds, double & zspacing)
     const bool b2 = ImageHelper::GetDirectionCosinesFromDataSet(ds, cosines);
     if (b2)
     {
-      mdcmWarningMacro("Image Orientation (Patient) cannot be stored here!. Continuing");
+      mdcmDebugMacro("Image Orientation (Patient) cannot be stored here! Continuing");
       b1 = b2;
     }
     else
     {
-      mdcmErrorMacro("Image Orientation (Patient) was not found");
+      mdcmDebugMacro("Image Orientation (Patient) was not found");
       cosines[0] = 1;
       cosines[1] = 0;
       cosines[2] = 0;
@@ -265,7 +265,7 @@ ComputeZSpacingFromIPP(const DataSet & ds, double & zspacing)
       const double current = distances[i] - prev;
       if (fabs(current - zspacing) > ZTolerance)
       {
-        mdcmErrorMacro("z-spacing error: probably non-uniform");
+        mdcmDebugMacro("z-spacing not found");
         return false;
       }
       prev = distances[i];

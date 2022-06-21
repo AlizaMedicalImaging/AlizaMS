@@ -22,6 +22,7 @@
 
 #include "mdcmRescaler.h"
 #include "mdcmTrace.h"
+#include "mdcmTypes.h"
 #include <limits>
 #include <cstring>
 #include <cmath>
@@ -31,70 +32,79 @@ namespace mdcm
 
 template <typename TOut, typename TIn>
 void
-RescaleFunction(TOut * out, const TIn * in, double intercept, double slope, size_t size)
+RescaleFunction(TOut *       out,
+                const TIn *  in,
+                const double intercept,
+                const double slope,
+                const size_t s)
 {
-  size /= sizeof(TIn);
-  for (size_t i = 0; i != size; ++i)
+  if ((s % sizeof(TIn)) != 0)
+  {
+    mdcmAlwaysWarnMacro("RescaleFunction: s % sizeof(TIn) != 0");
+  }
+  const size_t size = s / sizeof(TIn);
+  for (size_t i = 0; i < size; ++i)
   {
     out[i] = (TOut)(slope * in[i] + intercept);
   }
 }
 
-// MM:
-// no such thing as partial specialization of function in c++
+// MM: no such thing as partial specialization of function in c++,
 // so instead use this trick
 template <typename TOut, typename TIn>
 struct FImpl;
 
 template <typename TOut, typename TIn>
 void
-InverseRescaleFunction(TOut * out, const TIn * in, double intercept, double slope, size_t size)
+InverseRescaleFunction(TOut *       out,
+                       const TIn *  in,
+                       const double intercept,
+                       const double slope,
+                       const size_t s)
 {
-  FImpl<TOut, TIn>::InverseRescaleFunction(out, in, intercept, slope, size);
-} // MM: don't touch this
+  FImpl<TOut, TIn>::InverseRescaleFunction(out, in, intercept, slope, s);
+}
 
 template <typename TOut, typename TIn>
 struct FImpl
 {
   static void
-  InverseRescaleFunction(TOut *      out,
-                         const TIn * in,
-                         double      intercept,
-                         double      slope,
-                         size_t      size)
+  InverseRescaleFunction(TOut *       out,
+                         const TIn *  in,
+                         const double intercept,
+                         const double slope,
+                         const size_t s)
   {
-    size /= sizeof(TIn); // 'size' is in bytes
-    for (size_t i = 0; i != size; ++i)
+    if ((s % sizeof(TIn)) != 0)
+    {
+      mdcmAlwaysWarnMacro("InverseRescaleFunction: s % sizeof(TIn) != 0");
+    }
+    const size_t size = s / sizeof(TIn);
+    for (size_t i = 0; i < size; ++i)
     {
       out[i] = (TOut)(((double)in[i] - intercept) / slope);
     }
   }
 };
 
-// http://stackoverflow.com/questions/485525/round-for-float-in-c
-// http://en.cppreference.com/w/c/numeric/math/round
-template <typename T>
-static inline T
-round_impl(const double d)
-{
-#ifdef MDCM_HAVE_LROUND
-  // round() is C99, std::round() is C++11
-  return (T)lround(d);
-#else
-  return (T)((d > 0.0) ? floor(d + 0.5) : ceil(d - 0.5));
-#endif
-}
-
 template <typename TOut>
 struct FImpl<TOut, float>
 {
   static void
-  InverseRescaleFunction(TOut * out, const float * in, double intercept, double slope, size_t size)
+  InverseRescaleFunction(TOut *        out,
+                         const float * in,
+                         const double  intercept,
+                         const double  slope,
+                         const size_t  s)
   {
-    size /= sizeof(float);
-    for (size_t i = 0; i != size; ++i)
+    if ((s % sizeof(float)) != 0)
     {
-      out[i] = round_impl<TOut>(((double)in[i] - intercept) / slope);
+      mdcmAlwaysWarnMacro("InverseRescaleFunction: s % sizeof(float) != 0");
+    }
+    const size_t size = s / sizeof(float);
+    for (size_t i = 0; i < size; ++i)
+    {
+      out[i] = (TOut)llround(((double)in[i] - intercept) / slope);
     }
   }
 };
@@ -103,52 +113,69 @@ template <typename TOut>
 struct FImpl<TOut, double>
 {
   static void
-  InverseRescaleFunction(TOut * out, const double * in, double intercept, double slope, size_t size)
+  InverseRescaleFunction(TOut *         out,
+                         const double * in,
+                         const double   intercept,
+                         const double   slope,
+                         const size_t   s)
   {
-    size /= sizeof(double);
-    for (size_t i = 0; i != size; ++i)
+    if ((s % sizeof(double)) != 0)
     {
-      out[i] = round_impl<TOut>(((double)in[i] - intercept) / slope);
+      mdcmAlwaysWarnMacro("InverseRescaleFunction: s % sizeof(double) != 0");
+    }
+    const size_t size = s / sizeof(double);
+    for (size_t i = 0; i < size; ++i)
+    {
+      out[i] = (TOut)llround(((double)in[i] - intercept) / slope);
     }
   }
 };
 
-static inline PixelFormat::ScalarType
-ComputeBestFit(const PixelFormat & pf, double intercept, double slope)
+static PixelFormat::ScalarType
+ComputeBestFit(const PixelFormat & pf, const double intercept, const double slope)
 {
-  PixelFormat::ScalarType st = PixelFormat::UNKNOWN;
-
+  if (!(pf.GetMin() < pf.GetMax()))
+  {
+    mdcmAlwaysWarnMacro("ComputeBestFit !(pf.GetMin() < pf.GetMax())")
+  }
+  if (pf == PixelFormat::SINGLEBIT)
+  {
+    return PixelFormat::SINGLEBIT;
+  }
   if (pf == PixelFormat::FLOAT32 || pf == PixelFormat::FLOAT64)
   {
-    st = PixelFormat::FLOAT64;
-    return st;
+    return PixelFormat::FLOAT64;
   }
-  if (!(pf.GetMin() <= pf.GetMax()))
+  if (fabs(((double)((long long)(intercept))) - intercept) > std::numeric_limits<double>::epsilon())
   {
-    mdcmAlwaysWarnMacro("ComputeBestFit !(pf.GetMin() <= pf.GetMax())")
+    return PixelFormat::FLOAT64;
   }
-  const double pfmin = slope >= 0 ? pf.GetMin() : pf.GetMax();
-  const double pfmax = slope >= 0 ? pf.GetMax() : pf.GetMin();
-  const double min = slope * pfmin + intercept;
-  const double max = slope * pfmax + intercept;
-  if (min >= 0) // unsigned
+  if (fabs(((double)((long long)(slope))) - slope) > std::numeric_limits<double>::epsilon())
   {
-    if (max <= std::numeric_limits<uint8_t>::max())
+    return PixelFormat::FLOAT64;
+  }
+  PixelFormat::ScalarType st = PixelFormat::UNKNOWN;
+  const double pfmin = slope >= 0.0 ? pf.GetMin() : pf.GetMax();
+  const double pfmax = slope >= 0.0 ? pf.GetMax() : pf.GetMin();
+  const double min_ = slope * pfmin + intercept;
+  const double max_ = slope * pfmax + intercept;
+  if (min_ >= 0)
+  {
+    if (max_ <= std::numeric_limits<uint8_t>::max())
     {
       st = PixelFormat::UINT8;
     }
-    else if (max <= std::numeric_limits<uint16_t>::max())
+    else if (max_ <= std::numeric_limits<uint16_t>::max())
     {
       st = PixelFormat::UINT16;
     }
-    else if (max <= std::numeric_limits<uint32_t>::max())
+    else if (max_ <= std::numeric_limits<uint32_t>::max())
     {
       st = PixelFormat::UINT32;
     }
-    else if (max <= (double)(std::numeric_limits<uint64_t>::max()))
+    else if (max_ <= std::numeric_limits<uint64_t>::max())
     {
-      // TODO
-      return PixelFormat::FLOAT64;
+      st = PixelFormat::UINT64;
     }
     else
     {
@@ -158,23 +185,21 @@ ComputeBestFit(const PixelFormat & pf, double intercept, double slope)
   }
   else
   {
-    if (max <= std::numeric_limits<int8_t>::max() && min >= std::numeric_limits<int8_t>::min())
+    if (max_ <= std::numeric_limits<int8_t>::max() && min_ >= std::numeric_limits<int8_t>::min())
     {
       st = PixelFormat::INT8;
     }
-    else if (max <= std::numeric_limits<int16_t>::max() && min >= std::numeric_limits<int16_t>::min())
+    else if (max_ <= std::numeric_limits<int16_t>::max() && min_ >= std::numeric_limits<int16_t>::min())
     {
       st = PixelFormat::INT16;
     }
-    else if (max <= std::numeric_limits<int32_t>::max() && min >= std::numeric_limits<int32_t>::min())
+    else if (max_ <= std::numeric_limits<int32_t>::max() && min_ >= std::numeric_limits<int32_t>::min())
     {
       st = PixelFormat::INT32;
     }
-    else if (max <= (double)(std::numeric_limits<int64_t>::max()) &&
-             min >= (double)(std::numeric_limits<int64_t>::min()))
+    else if (max_ <= std::numeric_limits<int64_t>::max() && min_ >= std::numeric_limits<int64_t>::min())
     {
-      // TODO
-      return PixelFormat::FLOAT64;
+      st = PixelFormat::INT64;
     }
     else
     {
@@ -190,28 +215,11 @@ Rescaler::ComputeInterceptSlopePixelType()
 {
   if (PF.GetSamplesPerPixel() != 1)
   {
-    mdcmErrorMacro("Samples per pixel != 1");
+    mdcmAlwaysWarnMacro("Samples per pixel != 1");
+    assert(0);
     return PF;
   }
-  PixelFormat::ScalarType output = PixelFormat::UNKNOWN;
-  if (PF == PixelFormat::SINGLEBIT)
-  {
-    return PixelFormat::SINGLEBIT;
-  }
-  if (PF == PixelFormat::FLOAT32 || PF == PixelFormat::FLOAT64)
-  {
-    return PixelFormat::FLOAT64;
-  }
-  if (Slope != (int)Slope || Intercept != (int)Intercept)
-  {
-    if (PF.GetBitsAllocated() <= 16)
-      return PixelFormat::FLOAT32;
-    else
-      return PixelFormat::FLOAT64;
-  }
-  const double intercept = Intercept;
-  const double slope = Slope;
-  output = ComputeBestFit(PF, intercept, slope);
+  PixelFormat::ScalarType output = ComputeBestFit(PF, Intercept, Slope);
   return output;
 }
 
@@ -219,40 +227,42 @@ template <typename TIn>
 void
 Rescaler::RescaleFunctionIntoBestFit(char * out, const TIn * in, size_t n)
 {
-  const double            intercept = Intercept;
-  const double            slope = Slope;
-  PixelFormat::ScalarType output = ComputeInterceptSlopePixelType();
-  if (UseTargetPixelType)
-  {
-    output = TargetScalarType;
-  }
-  switch (output)
+  const PixelFormat::ScalarType f =
+    (UseTargetPixelType) ? TargetScalarType : ComputeInterceptSlopePixelType();
+  switch (f)
   {
     case PixelFormat::UINT8:
-      RescaleFunction<uint8_t, TIn>((uint8_t *)out, in, intercept, slope, n);
+      RescaleFunction<uint8_t, TIn>((uint8_t *)out, in, Intercept, Slope, n);
       break;
     case PixelFormat::INT8:
-      RescaleFunction<int8_t, TIn>((int8_t *)out, in, intercept, slope, n);
+      RescaleFunction<int8_t, TIn>((int8_t *)out, in, Intercept, Slope, n);
       break;
     case PixelFormat::UINT16:
-      RescaleFunction<uint16_t, TIn>((uint16_t *)out, in, intercept, slope, n);
+      RescaleFunction<uint16_t, TIn>((uint16_t *)out, in, Intercept, Slope, n);
       break;
     case PixelFormat::INT16:
-      RescaleFunction<int16_t, TIn>((int16_t *)out, in, intercept, slope, n);
+      RescaleFunction<int16_t, TIn>((int16_t *)out, in, Intercept, Slope, n);
       break;
     case PixelFormat::UINT32:
-      RescaleFunction<uint32_t, TIn>((uint32_t *)out, in, intercept, slope, n);
+      RescaleFunction<uint32_t, TIn>((uint32_t *)out, in, Intercept, Slope, n);
       break;
     case PixelFormat::INT32:
-      RescaleFunction<int32_t, TIn>((int32_t *)out, in, intercept, slope, n);
+      RescaleFunction<int32_t, TIn>((int32_t *)out, in, Intercept, Slope, n);
+      break;
+    case PixelFormat::UINT64:
+      RescaleFunction<uint64_t, TIn>((uint64_t *)out, in, Intercept, Slope, n);
+      break;
+    case PixelFormat::INT64:
+      RescaleFunction<int64_t, TIn>((int64_t *)out, in, Intercept, Slope, n);
       break;
     case PixelFormat::FLOAT32:
-      RescaleFunction<float, TIn>((float *)out, in, intercept, slope, n);
+      RescaleFunction<float, TIn>((float *)out, in, Intercept, Slope, n);
       break;
     case PixelFormat::FLOAT64:
-      RescaleFunction<double, TIn>((double *)out, in, intercept, slope, n);
+      RescaleFunction<double, TIn>((double *)out, in, Intercept, Slope, n);
       break;
     default:
+      mdcmAlwaysWarnMacro("RescaleFunctionIntoBestFit: unknown pixel format " << f);
       break;
   }
 }
@@ -261,30 +271,29 @@ template <typename TIn>
 void
 Rescaler::InverseRescaleFunctionIntoBestFit(char * out, const TIn * in, size_t n)
 {
-  const double intercept = Intercept;
-  const double slope = Slope;
-  PixelFormat  output = ComputePixelTypeFromMinMax();
-  switch (output)
+  const PixelFormat f = ComputePixelTypeFromMinMax();
+  switch (f)
   {
     case PixelFormat::UINT8:
-      InverseRescaleFunction<uint8_t, TIn>((uint8_t *)out, in, intercept, slope, n);
+      InverseRescaleFunction<uint8_t, TIn>((uint8_t *)out, in, Intercept, Slope, n);
       break;
     case PixelFormat::INT8:
-      InverseRescaleFunction<int8_t, TIn>((int8_t *)out, in, intercept, slope, n);
+      InverseRescaleFunction<int8_t, TIn>((int8_t *)out, in, Intercept, Slope, n);
       break;
     case PixelFormat::UINT16:
-      InverseRescaleFunction<uint16_t, TIn>((uint16_t *)out, in, intercept, slope, n);
+      InverseRescaleFunction<uint16_t, TIn>((uint16_t *)out, in, Intercept, Slope, n);
       break;
     case PixelFormat::INT16:
-      InverseRescaleFunction<int16_t, TIn>((int16_t *)out, in, intercept, slope, n);
+      InverseRescaleFunction<int16_t, TIn>((int16_t *)out, in, Intercept, Slope, n);
       break;
     case PixelFormat::UINT32:
-      InverseRescaleFunction<uint32_t, TIn>((uint32_t *)out, in, intercept, slope, n);
+      InverseRescaleFunction<uint32_t, TIn>((uint32_t *)out, in, Intercept, Slope, n);
       break;
     case PixelFormat::INT32:
-      InverseRescaleFunction<int32_t, TIn>((int32_t *)out, in, intercept, slope, n);
+      InverseRescaleFunction<int32_t, TIn>((int32_t *)out, in, Intercept, Slope, n);
       break;
     default:
+      mdcmAlwaysWarnMacro("InverseRescaleFunctionIntoBestFit: unknown pixel format " << f);
       break;
   }
 }
@@ -292,21 +301,6 @@ Rescaler::InverseRescaleFunctionIntoBestFit(char * out, const TIn * in, size_t n
 bool
 Rescaler::InverseRescale(char * out, const char * in, size_t n)
 {
-  bool fastpath = true;
-  switch (PF)
-  {
-    case PixelFormat::FLOAT32:
-    case PixelFormat::FLOAT64:
-      fastpath = false;
-      break;
-    default:
-      break;
-  }
-  if (fastpath && Slope == 1 && Intercept == 0)
-  {
-    memcpy(out, in, n);
-    return true;
-  }
   switch (PF)
   {
     case PixelFormat::UINT8:
@@ -334,6 +328,7 @@ Rescaler::InverseRescale(char * out, const char * in, size_t n)
       InverseRescaleFunctionIntoBestFit<double>(out, (const double *)in, n);
       break;
     default:
+      mdcmAlwaysWarnMacro("InverseRescale: unknown pixel format");
       return false;
   }
   return true;
@@ -342,17 +337,10 @@ Rescaler::InverseRescale(char * out, const char * in, size_t n)
 bool
 Rescaler::Rescale(char * out, const char * in, size_t n)
 {
-  if (UseTargetPixelType == false)
-  {
-    if (Slope == 1 && Intercept == 0)
-    {
-      memcpy(out, in, n);
-      return true;
-    }
-  }
   switch (PF)
   {
     case PixelFormat::SINGLEBIT:
+      mdcmAlwaysWarnMacro("Rescale: PixelFormat::SINGLEBIT");
       memcpy(out, in, n);
       break;
     case PixelFormat::UINT8:
@@ -375,6 +363,12 @@ Rescaler::Rescale(char * out, const char * in, size_t n)
     case PixelFormat::INT32:
       RescaleFunctionIntoBestFit<int32_t>(out, (const int32_t *)in, n);
       break;
+    case PixelFormat::UINT64:
+      RescaleFunctionIntoBestFit<uint64_t>(out, (const uint64_t *)in, n);
+      break;
+    case PixelFormat::INT64:
+      RescaleFunctionIntoBestFit<int64_t>(out, (const int64_t *)in, n);
+      break;
     case PixelFormat::FLOAT32:
       RescaleFunctionIntoBestFit<float>(out, (const float *)in, n);
       break;
@@ -383,39 +377,35 @@ Rescaler::Rescale(char * out, const char * in, size_t n)
       break;
     default:
       mdcmAlwaysWarnMacro("Unhandled: " << PF);
-      break;
+      return false;
   }
   return true;
 }
 
 static PixelFormat
-ComputeInverseBestFitFromMinMax(double intercept, double slope, double _min, double _max)
+ComputeInverseBestFitFromMinMax(const double intercept,
+                                const double slope,
+                                const double _min,
+                                const double _max)
 {
   PixelFormat st = PixelFormat::UNKNOWN;
   assert(_min <= _max);
-  double dmin = (_min - intercept) / slope;
-  double dmax = (_max - intercept) / slope;
-  if (slope < 0)
+  const int64_t min_ = (int64_t)((slope < 0.0) ? (_max - intercept) / slope : (_min - intercept) / slope);
+  const int64_t max_ = (int64_t)((slope < 0.0) ? (_min - intercept) / slope : (_max - intercept) / slope);
+  int           log2max = 0;
+  if (min_ >= 0)
   {
-    dmin = (_max - intercept) / slope;
-    dmax = (_min - intercept) / slope;
-  }
-  int64_t min = (int64_t)dmin;
-  int64_t max = (int64_t)dmax;
-  int     log2max = 0;
-
-  if (min >= 0) // unsigned
-  {
-    if (max <= std::numeric_limits<uint8_t>::max())
+    if (max_ <= std::numeric_limits<uint8_t>::max())
     {
       st = PixelFormat::UINT8;
     }
-    else if (max <= std::numeric_limits<uint16_t>::max())
+    else if (max_ <= std::numeric_limits<uint16_t>::max())
     {
       st = PixelFormat::UINT16;
     }
-    else if (max <= std::numeric_limits<uint32_t>::max())
+    else if (max_ <= std::numeric_limits<uint32_t>::max())
     {
+      mdcmAlwaysWarnMacro("ComputeInverseBestFitFromMinMax: UINT32");
       st = PixelFormat::UINT32;
     }
     else
@@ -423,7 +413,7 @@ ComputeInverseBestFitFromMinMax(double intercept, double slope, double _min, dou
       mdcmAlwaysWarnMacro("ComputeInverseBestFitFromMinMax failed (1)");
       return PixelFormat::UNKNOWN;
     }
-    int64_t max2 = max;
+    int64_t max2 = max_;
     while (max2 >>= 1)
       ++log2max;
     // need + 1 in case max == 4095 => 12bits stored required
@@ -431,16 +421,17 @@ ComputeInverseBestFitFromMinMax(double intercept, double slope, double _min, dou
   }
   else
   {
-    if (max <= std::numeric_limits<int8_t>::max() && min >= std::numeric_limits<int8_t>::min())
+    if (max_ <= std::numeric_limits<int8_t>::max() && min_ >= std::numeric_limits<int8_t>::min())
     {
       st = PixelFormat::INT8;
     }
-    else if (max <= std::numeric_limits<int16_t>::max() && min >= std::numeric_limits<int16_t>::min())
+    else if (max_ <= std::numeric_limits<int16_t>::max() && min_ >= std::numeric_limits<int16_t>::min())
     {
       st = PixelFormat::INT16;
     }
-    else if (max <= std::numeric_limits<int32_t>::max() && min >= std::numeric_limits<int32_t>::min())
+    else if (max_ <= std::numeric_limits<int32_t>::max() && min_ >= std::numeric_limits<int32_t>::min())
     {
+      mdcmAlwaysWarnMacro("ComputeInverseBestFitFromMinMax: INT32");
       st = PixelFormat::INT32;
     }
     else
@@ -448,7 +439,7 @@ ComputeInverseBestFitFromMinMax(double intercept, double slope, double _min, dou
       mdcmAlwaysWarnMacro("ComputeInverseBestFitFromMinMax failed (2)");
       return PixelFormat::UNKNOWN;
     }
-    int64_t max2 = max - min;
+    int64_t max2 = max_ - min_;
     while (max2 >>= 1)
       ++log2max;
     const int64_t bs = log2max + 1;
@@ -460,23 +451,15 @@ ComputeInverseBestFitFromMinMax(double intercept, double slope, double _min, dou
 PixelFormat
 Rescaler::ComputePixelTypeFromMinMax()
 {
-  const double      intercept = Intercept;
-  const double      slope = Slope;
-  const PixelFormat output = ComputeInverseBestFitFromMinMax(intercept, slope, ScalarRangeMin, ScalarRangeMax);
-  return output;
+  return ComputeInverseBestFitFromMinMax(Intercept, Slope, ScalarRangeMin, ScalarRangeMax);
 }
 
-// By default (when UseTargetPixelType is false), a best
-// matching Target Pixel Type is computed. However user can override
-// this auto selection by switching UseTargetPixelType:true and
-// also specifying the specifix Target Pixel Type
 void
-Rescaler::SetTargetPixelType(PixelFormat const & targetpf)
+Rescaler::SetTargetPixelType(const PixelFormat & targetpf)
 {
   TargetScalarType = targetpf.GetScalarType();
 }
 
-// Override default behavior of Rescale
 void
 Rescaler::SetUseTargetPixelType(bool b)
 {
@@ -484,18 +467,18 @@ Rescaler::SetUseTargetPixelType(bool b)
 }
 
 void
-Rescaler::SetMinMaxForPixelType(double min, double max)
+Rescaler::SetMinMaxForPixelType(double _min, double _max)
 {
-  if (min < max)
+  if (_min < _max)
   {
-    ScalarRangeMin = min;
-    ScalarRangeMax = max;
+    ScalarRangeMin = _min;
+    ScalarRangeMax = _max;
   }
   else
   {
-    mdcmWarningMacro("Min > Max. Correcting");
-    ScalarRangeMin = max;
-    ScalarRangeMax = min;
+    mdcmWarningMacro("min >= max, correcting");
+    ScalarRangeMin = _max;
+    ScalarRangeMax = _min;
   }
 }
 
@@ -524,7 +507,7 @@ Rescaler::GetSlope() const
 }
 
 void
-Rescaler::SetPixelFormat(PixelFormat const & pf)
+Rescaler::SetPixelFormat(const PixelFormat & pf)
 {
   PF = pf;
 }
