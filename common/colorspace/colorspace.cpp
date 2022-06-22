@@ -28,9 +28,6 @@
  *    Poynton, "Frequently Asked Questions About Gamma"
  *    http://www.poynton.com/notes/colour_and_gamma/GammaFAQ.html
  *
- *    Poynton, "Frequently Asked Questions About Color"
- *    http://www.poynton.com/notes/colour_and_gamma/ColorFAQ.html
- *
  * and Wikipedia articles
  *    http://en.wikipedia.org/wiki/SRGB
  *    http://en.wikipedia.org/wiki/YUV
@@ -274,18 +271,16 @@ void ColorSpace_::Rgb2Hsv(double *H, double *S, double *V, double R, double G, d
 	const double Max = MAX3(R, G, B);
 	const double Min = MIN3(R, G, B);
 	const double C = Max - Min;
-
 	*V = Max;
-
-	if(C > 0)
+	if (C > 0)
 	{
-		if(Max == R)
+		if (Max == R)
 		{
 			*H = (G - B) / C;
 			
 			if(G < B) *H += 6;
 		}
-		else if(Max == G)
+		else if (Max == G)
 		{
 			*H = 2 + (B - R) / C;
 		}
@@ -322,13 +317,10 @@ void ColorSpace_::Hsv2Rgb(double *R, double *G, double *B, double H, double S, d
 {
 	const double C = S * V;
 	const double Min = V - C;
-
 	H -= 360*floor(H/360);
 	H /= 60;
-
 	const double X = C*(1 - fabs(H - 2*floor(H/2) - 1));
-
-	switch((int)H)
+	switch ((int)H)
 	{
 	case 0:
 		*R = Min + C;
@@ -388,19 +380,17 @@ void ColorSpace_::Rgb2Hsl(double *H, double *S, double *L, double R, double G, d
 	const double Max = MAX3(R, G, B);
 	const double Min = MIN3(R, G, B);
 	const double C = Max - Min;
-
 	*L = (Max + Min)/2;
-
-	if(C > 0)
+	if (C > 0)
 	{
-		if(Max == R)
+		if (Max == R)
 		{
 			*H = (G - B) / C;
 			
-			if(G < B)
+			if (G < B)
 				*H += 6;
 		}
-		else if(Max == G)
+		else if (Max == G)
 		{
 			*H = 2 + (B - R) / C;
 		}
@@ -437,13 +427,10 @@ void ColorSpace_::Hsl2Rgb(double *R, double *G, double *B, double H, double S, d
 {
 	const double C = (L <= 0.5) ? (2*L*S) : ((2 - 2*L)*S);
 	const double Min = L - 0.5*C;
-
 	H -= 360*floor(H/360);
 	H /= 60;
-
 	const double X = C*(1 - fabs(H - 2*floor(H/2) - 1));
-
-	switch((int)H)
+	switch ((int)H)
 	{
 	case 0:
 		*R = Min + C;
@@ -500,15 +487,13 @@ void ColorSpace_::Rgb2Hsi(double *H, double *S, double *I, double R, double G, d
 {
 	const double alpha = 0.5*(2*R - G - B);
 	const double beta = 0.866025403784439*(G - B);
-
 	*I = (R + G + B)/3;
-
-	if(*I > 0)
+	if (*I > 0)
 	{
 		*S = 1 - MIN3(R,G,B) / *I;
 		*H = atan2(beta, alpha)*(180/M_PI);
 		
-		if(*H < 0) *H += 360;
+		if (*H < 0) *H += 360;
 	}
 	else
 	{
@@ -534,14 +519,13 @@ void ColorSpace_::Rgb2Hsi(double *H, double *S, double *I, double R, double G, d
 void ColorSpace_::Hsi2Rgb(double *R, double *G, double *B, double H, double S, double I)
 {
 	H -= 360*floor(H/360);
-
-	if(H < 120)
+	if (H < 120)
 	{
 		*B = I*(1 - S);
 		*R = I*(1 + S*cos(H*(M_PI/180))/cos((60 - H)*(M_PI/180)));
 		*G = 3*I - *R - *B;
 	}
-	else if(H < 240)
+	else if (H < 240)
 	{
 		H -= 120;
 		*R = I*(1 - S);
@@ -601,17 +585,14 @@ void ColorSpace_::Xyz2Rgb(double *R, double *G, double *B, double X, double Y, d
 	double R1 =  3.2406*X - 1.5372*Y - 0.4986*Z;
 	double G1 = -0.9689*X + 1.8758*Y + 0.0415*Z;
 	double B1 =  0.0557*X - 0.2040*Y + 1.0570*Z;
-
 	const double Min = MIN3(R1, G1, B1);
-
 	/* Force nonnegative values so that gamma correction is well-defined. */
-	if(Min < 0)
+	if (Min < 0)
 	{
 		R1 -= Min;
 		G1 -= Min;
 		B1 -= Min;
 	}
-
 	/* Transform from RGB to R'G'B' */
 	*R = GAMMACORRECTION(R1);
 	*G = GAMMACORRECTION(G1);
@@ -668,10 +649,8 @@ void ColorSpace_::Lab2Xyz(double *X, double *Y, double *Z, double L, double a, d
 void ColorSpace_::Xyz2Luv(double *L, double *u, double *v, double X, double Y, double Z)
 {	
 	double u1, v1;
-
 	const double Denom = X + 15*Y + 3*Z;
-
-	if(Denom > 0)
+	if (Denom > 0)
 	{
 		u1 = (4*X) / Denom;
 		v1 = (9*Y) / Denom;
@@ -680,7 +659,6 @@ void ColorSpace_::Xyz2Luv(double *L, double *u, double *v, double X, double Y, d
 	{
 		u1 = v1 = 0;
 	}
-
 	Y /= WHITEPOINT_Y;
 	Y = LABF(Y);
 	*L = 116*Y - 16;
@@ -700,13 +678,11 @@ void ColorSpace_::Luv2Xyz(double *X, double *Y, double *Z, double L, double u, d
 {
 	*Y = (L + 16)/116;
 	*Y = WHITEPOINT_Y*LABINVF(*Y);
-
-	if(L != 0)
+	if (L != 0)
 	{
 		u /= L;
 		v /= L;
 	}
-
 	u = u/13 + WHITEPOINT_U;
 	v = v/13 + WHITEPOINT_V;
 	*X = (*Y) * ((9*u)/(4*v));
@@ -726,12 +702,10 @@ void ColorSpace_::Luv2Xyz(double *X, double *Y, double *Z, double L, double u, d
 void ColorSpace_::Xyz2Lch(double *L, double *C, double *H, double X, double Y, double Z)
 {
 	double a, b;
-
 	Xyz2Lab(L, &a, &b, X, Y, Z);
 	*C = sqrt(a*a + b*b);
 	*H = atan2(b, a)*180.0/M_PI;
-
-	if(*H < 0) *H += 360;
+	if (*H < 0) *H += 360;
 }
 
 /**
@@ -744,7 +718,6 @@ void ColorSpace_::Lch2Xyz(double *X, double *Y, double *Z, double L, double C, d
 {
 	double a = C * cos(H*(M_PI/180.0));
 	double b = C * sin(H*(M_PI/180.0));
-
 	Lab2Xyz(X, Y, Z, L, a, b);
 }
 
