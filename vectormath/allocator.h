@@ -13,31 +13,7 @@
 #endif
 
 #if !(defined _MSC_VER && _MSC_VER >= 1400)
-#include <stdint.h>
-static char * align__pointer__(char * p, size_t x) // x = alignment - 1
-{
-#if 0
-  struct PtrSizeT
-  {
-    union
-    {
-      char * k;
-      uintptr_t i;
-    };
-  };
-  PtrSizeT j;
-  j.k = p;
-  j.i += x;
-  j.i &= (~x);
-  return j.k;
-#else
-  uintptr_t i = (uintptr_t)p;
-  i += x;
-  i &= (~x);
-  char * k = (char *)i;
-  return k;
-#endif
-}
+#include <cstdint>
 #endif
 
 static void * aligned__alloc__(size_t size, size_t alignment)
@@ -45,11 +21,14 @@ static void * aligned__alloc__(size_t size, size_t alignment)
 #if defined _MSC_VER && _MSC_VER >= 1400
   return _aligned_malloc(size, alignment);
 #else
-  const size_t x = alignment - 1;
-  char * p = (char*)malloc(size + sizeof(void*) + x);
+  const uintptr_t tmp0 = alignment - 1;
+  const size_t    tmp1 = sizeof(void*) + tmp0;
+  void * p = malloc(size + tmp1);
   if(!p) return NULL;
-  void * ptr = (void*)align__pointer__(p + sizeof(void*), x);
-  *((void**)ptr - 1) = (void*)p;
+  uintptr_t tmp2 = (uintptr_t)p + tmp1;
+  tmp2 &= (~tmp0);
+  void * ptr = (void*)tmp2;
+  *((void**)ptr - 1) = p;
   return ptr;
 #endif
 }
