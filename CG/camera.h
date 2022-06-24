@@ -25,7 +25,7 @@
 #define ALIGN16(a) a
 #define ALIGN16_PRE
 #define ALIGN16_POST
-#define MY_DECLARE_NEW()
+#define ALIGN16_DECLARE_NEW()
 
 #else
 
@@ -37,7 +37,7 @@
 ALIGN16_PRE class Camera
 {
 public:
-	MY_DECLARE_NEW();
+	ALIGN16_DECLARE_NEW();
 
 	Camera();
 	~Camera();

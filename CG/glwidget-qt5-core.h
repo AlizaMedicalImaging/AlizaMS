@@ -94,7 +94,7 @@ public:
 ALIGN16_PRE class CollisionObject
 {
 public:
-	MY_DECLARE_NEW();
+	ALIGN16_DECLARE_NEW();
 
 	CollisionObject();
 	~CollisionObject();
@@ -116,7 +116,7 @@ ALIGN16_PRE class GLWidget : public QOpenGLWidget, public QOpenGLFunctions_3_2_C
 {
 Q_OBJECT
 public:
-	MY_DECLARE_NEW();
+	ALIGN16_DECLARE_NEW();
 
 	GLWidget();
 	~GLWidget();

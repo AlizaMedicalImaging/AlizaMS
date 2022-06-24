@@ -16,6 +16,7 @@
 #include <cstdint>
 #endif
 
+// The behavior is undefined if alignment is not a power of two
 static void * aligned__alloc__(size_t size, size_t alignment)
 {
 #if defined _MSC_VER && _MSC_VER >= 1400
@@ -42,7 +43,7 @@ static void aligned__free__(void * ptr)
 #endif
 }
 
-#define MY_DECLARE_NEW() \
+#define ALIGN16_DECLARE_NEW() \
 inline void* operator new(size_t bytes) {return aligned__alloc__(bytes,16);} \
 inline void  operator delete(void* ptr) {aligned__free__(ptr);} \
 inline void* operator new(size_t, void* ptr) {return ptr; } \
