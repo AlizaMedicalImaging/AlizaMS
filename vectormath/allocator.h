@@ -25,7 +25,7 @@ static void * aligned__alloc__(size_t size, size_t alignment)
   const uintptr_t tmp0 = alignment - 1;
   const size_t    tmp1 = sizeof(void*) + tmp0;
   void * p = malloc(size + tmp1);
-  if(!p) return NULL;
+  if (!p) return NULL;
   uintptr_t tmp2 = (uintptr_t)p + tmp1;
   tmp2 &= (~tmp0);
   void * ptr = (void*)tmp2;
