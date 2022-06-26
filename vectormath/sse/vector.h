@@ -647,7 +647,7 @@ inline Vector4 & Vector4::operator = (const Vector4 & vec)
 inline Vector4 & Vector4::setXYZ(const Vector3 & vec)
 {
   static const float ffffffff = bit_cast_uint2float(0xffffffffU);
-  VECTORMATH_ALIGNED(float sw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
+  VECTORMATH_ALIGNED(const float sw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
   mVec128 = sseSelect(vec.get128(), mVec128, _mm_load_ps(sw));
   return *this;
 }
@@ -989,7 +989,8 @@ inline __m128 Point3::get128() const
 
 inline void storeXYZ(const Point3 & pnt, __m128 * quad)
 {
-  VECTORMATH_ALIGNED(const float sw[4]) = { 0.0f, 0.0f, 0.0f, bit_cast_uint2float(0xffffffffU) };
+  static const float ffffffff = bit_cast_uint2float(0xffffffffU);
+  VECTORMATH_ALIGNED(const float sw[4]) = { 0.0f, 0.0f, 0.0f, ffffffff };
   __m128 dstVec = *quad;
   dstVec = sseSelect(pnt.get128(), dstVec, _mm_load_ps(sw));
   *quad = dstVec;

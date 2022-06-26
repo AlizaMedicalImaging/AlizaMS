@@ -50,7 +50,7 @@ private:
 
 public:
 
-  inline VecIdx(__m128 & vec, int idx) : ref(vec), i(idx) { }
+  inline VecIdx(__m128 & vec, int idx) : ref(vec), i(idx) {}
 
   // Implicitly casts to float unless VECTORMATH_NO_SCALAR_CAST defined
   // in which case, implicitly casts to FloatInVec, and one must call

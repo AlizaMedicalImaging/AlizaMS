@@ -50,7 +50,7 @@ private:
 
 public:
 
-  inline FloatInVec() { }
+  inline FloatInVec() {}
   inline FloatInVec(__m128 vec);
 
   // matches standard type conversions

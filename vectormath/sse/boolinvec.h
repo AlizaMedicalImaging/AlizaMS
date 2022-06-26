@@ -57,7 +57,7 @@ private:
 
 public:
 
-  inline BoolInVec() { }
+  inline BoolInVec() {}
 
   // matches standard type conversions
   inline BoolInVec(const FloatInVec & vec);
