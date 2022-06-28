@@ -60,6 +60,7 @@
 
 #if (defined PRINT_HOST_INFO && PRINT_HOST_INFO==1)
 #include <climits>
+#include <cstddef>
 #endif
 
 #if (defined LOG_STDOUT_TO_FILE && LOG_STDOUT_TO_FILE==1)
@@ -168,12 +169,16 @@ int main(int argc, char *argv[])
 		const unsigned int endian = 1;
 		if (*((const unsigned char*)&endian) == 0)
 		{
-			std::cout << "Big-endian\n";
+			std::cout << "System is big-endian\n";
 		}
 		else
 		{
-			std::cout << "Little-endian\n";
+			std::cout << "System is little-endian\n";
 		}
+		std::cout << "__cplusplus = " << __cplusplus;
+#if 1
+		std::cout << "\nDefault alignement = " << alignof(std::max_align_t);
+#endif
 		enum { Va = (short)SHRT_MAX                } Ea;
 		enum { V0 = (unsigned short)USHRT_MAX      } E0;
 		enum { V1 = (int)INT_MAX                   } E1;
@@ -186,32 +191,31 @@ int main(int argc, char *argv[])
 		enum:long      { V8 = 1                    } E8;
 		enum:long long { V9 = 1                    } E9;
 		std::cout
-			<< "C++ version "                    << __cplusplus
-			<< "\nsize of void*       "          << sizeof(void*)
-			<< "\nsize of char*       "          << sizeof(char*)
-			<< "\nsize of char        "          << sizeof(char)
-			<< "\nsize of wchar_t     "          << sizeof(wchar_t)
-			<< "\nsize of bool        "          << sizeof(bool)
-			<< "\nsize of short       "          << sizeof(short)
-			<< "\nsize of int         "          << sizeof(int)
-			<< "\nsize of long        "          << sizeof(long)
-			<< "\nsize of long long   "          << sizeof(long long)
-			<< "\nsize of size_t      "          << sizeof(size_t)
-			<< "\nsize of uintptr_t   "          << sizeof(uintptr_t)
-			<< "\nsize of float       "          << sizeof(float)
-			<< "\nsize of double      "          << sizeof(double)
-			<< "\nsize of long double "          << sizeof(long double)
-			<< "\nsize of enum { SHRT_MAX    } " << sizeof(Ea)
-			<< "\nsize of enum { USHRT_MAX   } " << sizeof(E0)
-			<< "\nsize of enum { INT_MAX     } " << sizeof(E1)
-			<< "\nsize of enum { UINT_MAX    } " << sizeof(E2)
-			<< "\nsize of enum { LLONG_MAX   } " << sizeof(E3)
-			<< "\nsize of enum { ULLONG_MAX  } " << sizeof(E4)
-			<< "\nsize of enum           { 1 } " << sizeof(E5)
-			<< "\nsize of enum:short     { 1 } " << sizeof(E6)
-			<< "\nsize of enum:int       { 1 } " << sizeof(E7)
-			<< "\nsize of enum:long      { 1 } " << sizeof(E8)
-			<< "\nsize of enum:long long { 1 } " << sizeof(E9)
+			<< "\nsize of void*       = "          << sizeof(void*)
+			<< "\nsize of char*       = "          << sizeof(char*)
+			<< "\nsize of char        = "          << sizeof(char)
+			<< "\nsize of wchar_t     = "          << sizeof(wchar_t)
+			<< "\nsize of bool        = "          << sizeof(bool)
+			<< "\nsize of short       = "          << sizeof(short)
+			<< "\nsize of int         = "          << sizeof(int)
+			<< "\nsize of long        = "          << sizeof(long)
+			<< "\nsize of long long   = "          << sizeof(long long)
+			<< "\nsize of size_t      = "          << sizeof(size_t)
+			<< "\nsize of uintptr_t   = "          << sizeof(uintptr_t)
+			<< "\nsize of float       = "          << sizeof(float)
+			<< "\nsize of double      = "          << sizeof(double)
+			<< "\nsize of long double = "          << sizeof(long double)
+			<< "\nsize of enum { SHRT_MAX    } = " << sizeof(Ea)
+			<< "\nsize of enum { USHRT_MAX   } = " << sizeof(E0)
+			<< "\nsize of enum { INT_MAX     } = " << sizeof(E1)
+			<< "\nsize of enum { UINT_MAX    } = " << sizeof(E2)
+			<< "\nsize of enum { LLONG_MAX   } = " << sizeof(E3)
+			<< "\nsize of enum { ULLONG_MAX  } = " << sizeof(E4)
+			<< "\nsize of enum           { 1 } = " << sizeof(E5)
+			<< "\nsize of enum:short     { 1 } = " << sizeof(E6)
+			<< "\nsize of enum:int       { 1 } = " << sizeof(E7)
+			<< "\nsize of enum:long      { 1 } = " << sizeof(E8)
+			<< "\nsize of enum:long long { 1 } = " << sizeof(E9)
 			<< std::endl;
 #ifdef _WIN32
 #ifdef UNICODE

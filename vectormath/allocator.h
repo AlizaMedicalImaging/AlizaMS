@@ -1,6 +1,8 @@
 #ifndef ALIGNED_ALLOCATOR__H
 #define ALIGNED_ALLOCATOR__H
 
+#define USE_CPP17_ALIGNED_ALLOC 0
+
 #include <cstdlib>
 #if defined _MSC_VER
 #define ALIGN16(a) __declspec(align(16)) a
@@ -13,7 +15,9 @@
 #endif
 
 #if !(defined _MSC_VER && _MSC_VER >= 1400)
+#if !(defined USE_CPP17_ALIGNED_ALLOC && USE_CPP17_ALIGNED_ALLOC == 1)
 #include <cstdint>
+#endif
 #endif
 
 // The behavior is undefined if alignment is not a power of two
@@ -21,6 +25,9 @@ static void * aligned__alloc__(size_t size, size_t alignment)
 {
 #if defined _MSC_VER && _MSC_VER >= 1400
   return _aligned_malloc(size, alignment);
+#else
+#if defined USE_CPP17_ALIGNED_ALLOC && USE_CPP17_ALIGNED_ALLOC == 1
+  return std::aligned_alloc(alignment, size);
 #else
   const uintptr_t tmp0 = alignment - 1;
   const size_t    tmp1 = sizeof(void*) + tmp0;
@@ -32,6 +39,7 @@ static void * aligned__alloc__(size_t size, size_t alignment)
   *((void**)ptr - 1) = p;
   return ptr;
 #endif
+#endif
 }
 
 static void aligned__free__(void * ptr)
@@ -39,7 +47,11 @@ static void aligned__free__(void * ptr)
 #if defined _MSC_VER && _MSC_VER >= 1400
   if (ptr) _aligned_free(ptr);
 #else
+#if defined USE_CPP17_ALIGNED_ALLOC && USE_CPP17_ALIGNED_ALLOC == 1
+  if (ptr) std::free(ptr);
+#else
   if (ptr) free(*((void**)ptr - 1));
+#endif
 #endif
 }
 
