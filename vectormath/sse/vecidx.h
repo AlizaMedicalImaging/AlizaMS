@@ -41,7 +41,7 @@ namespace SSE
 
 // Used in setting elements of Vector3, Vector4, Point3, or Quat
 // with the subscripting operator [].
-VECTORMATH_ALIGNED_TYPE_PRE class VecIdx
+VECTORMATH_ALIGNED_PRE class VecIdx
 {
 private:
 
@@ -49,6 +49,8 @@ private:
   int i;
 
 public:
+
+  VECTORMATH_ALIGNED16_NEW();
 
   inline VecIdx(__m128 & vec, int idx) : ref(vec), i(idx) {}
 
@@ -75,7 +77,7 @@ public:
   inline FloatInVec operator -= (float scalar);
   inline FloatInVec operator -= (const FloatInVec & scalar);
 
-} VECTORMATH_ALIGNED_TYPE_POST;
+} VECTORMATH_ALIGNED_POST;
 
 } // namespace SSE
 } // namespace Vectormath

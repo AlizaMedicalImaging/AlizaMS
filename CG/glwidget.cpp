@@ -1819,9 +1819,9 @@ void GLWidget::paint_raycaster()
 	//
 	const Matrix4 mv_aos  = camera->m_view;
 	const Matrix4 mvp_aos = camera->m_projection * mv_aos;
-	ALIGN16(float mvp_aos_ptr[16]);
+	VECTORMATH_ALIGNED(float mvp_aos_ptr[16]);
 	camera->matrix4_to_float(mvp_aos,mvp_aos_ptr);
-	ALIGN16(float mv_aos_ptr[16]);
+	VECTORMATH_ALIGNED(float mv_aos_ptr[16]);
 	camera->matrix4_to_float(mv_aos,mv_aos_ptr);
 	//
 	// [0]
@@ -2132,7 +2132,7 @@ void GLWidget::paint_volume()
 	//
 	const Matrix4 mv_aos  = camera->m_view;
 	const Matrix4 mvp_aos = camera->m_projection * mv_aos;
-	ALIGN16(float mvp_aos_ptr[16]);
+	VECTORMATH_ALIGNED(float mvp_aos_ptr[16]);
 	camera->matrix4_to_float(mvp_aos,mvp_aos_ptr);
 	//
 	for (int iii = 0; iii < selected_images_size; ++iii)
@@ -3024,7 +3024,7 @@ void GLWidget::render_orient_cube1(
 		0.0f,1.0f,0.0f);
 	const Matrix4 mv_cube_aos  = camera->m_view;
 	const Matrix4 mvp_cube_aos = camera->m_projection * mv_cube_aos;
-	ALIGN16(float mvp_cube_aos_ptr[16]);
+	VECTORMATH_ALIGNED(float mvp_cube_aos_ptr[16]);
 	camera->matrix4_to_float(mvp_cube_aos,mvp_cube_aos_ptr);
 	// modeling is identity
 	// eye position and light direction

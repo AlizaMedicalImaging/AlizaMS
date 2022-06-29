@@ -1,21 +1,25 @@
 #ifndef ALIGNED_ALLOCATOR__H
 #define ALIGNED_ALLOCATOR__H
 
-#define USE_CPP17_ALIGNED_ALLOC 0
+#define VECTORMATH_USE_CPP17_ALIGNED_ALLOC 0
 
 #include <cstdlib>
-#if defined _MSC_VER
-#define ALIGN16(a) __declspec(align(16)) a
-#define ALIGN16_PRE __declspec(align(16))
-#define ALIGN16_POST
+#if defined(_MSC_VER)
+// Visual Studio
+#define VECTORMATH_ALIGNED(a) __declspec(align(16)) a
+#define VECTORMATH_ALIGNED_PRE  __declspec(align(16))
+#define VECTORMATH_ALIGNED_POST
+#elif defined(__GNUC__)
+// GCC or Clang
+#define VECTORMATH_ALIGNED(a) a __attribute__((aligned(16)))
+#define VECTORMATH_ALIGNED_PRE
+#define VECTORMATH_ALIGNED_POST __attribute__((aligned(16)))
 #else
-#define ALIGN16(a) a __attribute__((aligned(16)))
-#define ALIGN16_PRE
-#define ALIGN16_POST __attribute__((aligned(16)))
+#error "Define alignment for the compiler"
 #endif
 
 #if !(defined _MSC_VER && _MSC_VER >= 1400)
-#if !(defined USE_CPP17_ALIGNED_ALLOC && USE_CPP17_ALIGNED_ALLOC == 1)
+#if !(defined VECTORMATH_USE_CPP17_ALIGNED_ALLOC && VECTORMATH_USE_CPP17_ALIGNED_ALLOC == 1)
 #include <cstdint>
 #endif
 #endif
@@ -26,7 +30,7 @@ static void * aligned__alloc__(size_t size, size_t alignment)
 #if defined _MSC_VER && _MSC_VER >= 1400
   return _aligned_malloc(size, alignment);
 #else
-#if defined USE_CPP17_ALIGNED_ALLOC && USE_CPP17_ALIGNED_ALLOC == 1
+#if defined VECTORMATH_USE_CPP17_ALIGNED_ALLOC && VECTORMATH_USE_CPP17_ALIGNED_ALLOC == 1
   return std::aligned_alloc(alignment, size);
 #else
   const uintptr_t tmp0 = alignment - 1;
@@ -47,7 +51,7 @@ static void aligned__free__(void * ptr)
 #if defined _MSC_VER && _MSC_VER >= 1400
   if (ptr) _aligned_free(ptr);
 #else
-#if defined USE_CPP17_ALIGNED_ALLOC && USE_CPP17_ALIGNED_ALLOC == 1
+#if defined VECTORMATH_USE_CPP17_ALIGNED_ALLOC && VECTORMATH_USE_CPP17_ALIGNED_ALLOC == 1
   if (ptr) std::free(ptr);
 #else
   if (ptr) free(*((void**)ptr - 1));
@@ -55,7 +59,7 @@ static void aligned__free__(void * ptr)
 #endif
 }
 
-#define ALIGN16_DECLARE_NEW() \
+#define VECTORMATH_ALIGNED16_NEW() \
 inline void* operator new(size_t bytes) {return aligned__alloc__(bytes,16);} \
 inline void  operator delete(void* ptr) {aligned__free__(ptr);} \
 inline void* operator new(size_t, void* ptr) {return ptr; } \

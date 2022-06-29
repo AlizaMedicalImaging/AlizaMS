@@ -30,6 +30,11 @@
 #ifndef VECTORMATH_SSE_INTERNAL_HPP
 #define VECTORMATH_SSE_INTERNAL_HPP
 
+#include "allocator.h"
+
+// 'std::bit_cast' is available in C++20, otherwise use own implementation
+//#define VECTORMATH_SSE_USE_STD_BIT_CAST
+
 #ifdef VECTORMATH_SSE_USE_STD_BIT_CAST
 // C++20
 #include <bit>
@@ -87,11 +92,11 @@ typedef __m128 SSEFloat4V;
 typedef __m128 SSEUint4V;
 typedef __m128 SSEInt4V;
 
-VECTORMATH_ALIGNED_TYPE_PRE union SSEFloat
+VECTORMATH_ALIGNED_PRE union SSEFloat
 {
   __m128 m128;
   float f[4];
-} VECTORMATH_ALIGNED_TYPE_POST;
+} VECTORMATH_ALIGNED_POST;
 
 // _MM_SHUFFLE requires compile-time constants
 #define sseRor(vec, i) (((i) % 4) ? (_mm_shuffle_ps(vec, vec, _MM_SHUFFLE((unsigned char)(i + 3) % 4, (unsigned char)(i + 2) % 4, (unsigned char)(i + 1) % 4, (unsigned char)(i + 0) % 4))) : (vec))

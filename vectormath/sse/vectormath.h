@@ -36,27 +36,9 @@
 // as defect with some analysing tool.
 #define VECTORMATH_SSE_ALWAYS_INITIALIZE
 
-// 'std::bit_cast' is available in C++20, otherwise use own implementation
-//#define VECTORMATH_SSE_USE_STD_BIT_CAST
-
 #include <cmath>
 #include <xmmintrin.h>
 #include <emmintrin.h>
-
-#if defined(_MSC_VER)
-  // Visual Studio
-  #define VECTORMATH_ALIGNED(a)  __declspec(align(16)) a
-  #define VECTORMATH_ALIGNED_TYPE_PRE   __declspec(align(16))
-  #define VECTORMATH_ALIGNED_TYPE_POST
-#elif defined(__GNUC__)
-  // GCC or Clang
-  #define VECTORMATH_ALIGNED(a)  a __attribute__((aligned(16)))
-  #define VECTORMATH_ALIGNED_TYPE_PRE
-  #define VECTORMATH_ALIGNED_TYPE_POST  __attribute__((aligned(16)))
-#else
-  #error "Define alignment for your compiler!"
-#endif
-
 #include "internal.h"
 #include "floatinvec.h"
 #include "boolinvec.h"
@@ -83,13 +65,15 @@ class Transform3;
 // A 3-D vector in array-of-structures format
 // ========================================================
 
-VECTORMATH_ALIGNED_TYPE_PRE class Vector3
+VECTORMATH_ALIGNED_PRE class Vector3
 {
 private:
 
   __m128 mVec128;
 
 public:
+
+  VECTORMATH_ALIGNED16_NEW();
 
   // Default constructor
   inline Vector3();
@@ -226,7 +210,7 @@ public:
   // Construct z axis
   static inline const Vector3 zAxis();
 
-} VECTORMATH_ALIGNED_TYPE_POST;
+} VECTORMATH_ALIGNED_POST;
 
 // Multiply a 3-D vector by a scalar
 inline const Vector3 operator * (float scalar, const Vector3 & vec);
@@ -348,13 +332,15 @@ inline void storeXYZArray(const Vector3 & vec0, const Vector3 & vec1, const Vect
 // A 4-D vector in array-of-structures format
 // ========================================================
 
-VECTORMATH_ALIGNED_TYPE_PRE class Vector4
+VECTORMATH_ALIGNED_PRE class Vector4
 {
 private:
 
   __m128 mVec128;
 
 public:
+
+  VECTORMATH_ALIGNED16_NEW();
 
   // Default constructor
   inline Vector4();
@@ -505,7 +491,7 @@ public:
   // Construct w axis
   static inline const Vector4 wAxis();
 
-} VECTORMATH_ALIGNED_TYPE_POST;
+} VECTORMATH_ALIGNED_POST;
 
 // Multiply a 4-D vector by a scalar
 inline const Vector4 operator * (float scalar, const Vector4 & vec);
@@ -602,13 +588,15 @@ inline const Vector4 select(const Vector4 & vec0, const Vector4 & vec1, const Bo
 // A 3-D point in array-of-structures format
 // ========================================================
 
-VECTORMATH_ALIGNED_TYPE_PRE class Point3
+VECTORMATH_ALIGNED_PRE class Point3
 {
 private:
 
   __m128 mVec128;
 
 public:
+
+  VECTORMATH_ALIGNED16_NEW();
 
   // Default constructor
   inline Point3();
@@ -709,7 +697,7 @@ public:
   // Perform compound assignment and subtraction by a 3-D vector
   inline Point3 & operator -= (const Vector3 & vec);
 
-} VECTORMATH_ALIGNED_TYPE_POST;
+} VECTORMATH_ALIGNED_POST;
 
 // Multiply two 3-D points per element
 inline const Point3 mulPerElem(const Point3 & pnt0, const Point3 & pnt1);
@@ -804,13 +792,15 @@ inline void storeXYZArray(const Point3 & pnt0, const Point3 & pnt1, const Point3
 // A quaternion in array-of-structures format
 // ========================================================
 
-VECTORMATH_ALIGNED_TYPE_PRE class Quat
+VECTORMATH_ALIGNED_PRE class Quat
 {
 private:
 
   __m128 mVec128;
 
 public:
+
+  VECTORMATH_ALIGNED16_NEW();
 
   // Default constructor
   inline Quat();
@@ -984,7 +974,7 @@ public:
   // Construct a quaternion to rotate around the z axis (scalar data contained in vector data type)
   static inline const Quat rotationZ(const FloatInVec & radians);
 
-} VECTORMATH_ALIGNED_TYPE_POST;
+} VECTORMATH_ALIGNED_POST;
 
 // Multiply a quaternion by a scalar
 inline const Quat operator * (float scalar, const Quat & quat);
@@ -1056,7 +1046,7 @@ inline const Quat select(const Quat & quat0, const Quat & quat1, const BoolInVec
 // A 3x3 matrix in array-of-structures format
 // ========================================================
 
-VECTORMATH_ALIGNED_TYPE_PRE class Matrix3
+VECTORMATH_ALIGNED_PRE class Matrix3
 {
 private:
 
@@ -1065,6 +1055,8 @@ private:
   Vector3 mCol2;
 
 public:
+
+  VECTORMATH_ALIGNED16_NEW();
 
   // Default constructor
   inline Matrix3() {}
@@ -1204,7 +1196,7 @@ public:
   // Construct a 3x3 matrix to perform scaling
   static inline const Matrix3 scale(const Vector3 & scaleVec);
 
-} VECTORMATH_ALIGNED_TYPE_POST;
+} VECTORMATH_ALIGNED_POST;
 
 // Multiply a 3x3 matrix by a scalar
 inline const Matrix3 operator * (float scalar, const Matrix3 & mat);
@@ -1255,7 +1247,7 @@ inline const Matrix3 select(const Matrix3 & mat0, const Matrix3 & mat1, const Bo
 // A 4x4 matrix in array-of-structures format
 // ========================================================
 
-VECTORMATH_ALIGNED_TYPE_PRE class Matrix4
+VECTORMATH_ALIGNED_PRE class Matrix4
 {
 private:
 
@@ -1265,6 +1257,8 @@ private:
   Vector4 mCol3;
 
 public:
+
+  VECTORMATH_ALIGNED16_NEW();
 
   // Default constructor
   inline Matrix4() {}
@@ -1459,7 +1453,7 @@ public:
   // Construct an orthographic projection matrix
   static inline const Matrix4 orthographic(float left, float right, float bottom, float top, float zNear, float zFar);
 
-} VECTORMATH_ALIGNED_TYPE_POST;
+} VECTORMATH_ALIGNED_POST;
 
 // Multiply a 4x4 matrix by a scalar
 inline const Matrix4 operator * (float scalar, const Matrix4 & mat);
@@ -1521,7 +1515,7 @@ inline const Matrix4 select(const Matrix4 & mat0, const Matrix4 & mat1, const Bo
 // A 3x4 transformation matrix in array-of-structs format
 // ========================================================
 
-VECTORMATH_ALIGNED_TYPE_PRE class Transform3
+VECTORMATH_ALIGNED_PRE class Transform3
 {
 private:
 
@@ -1531,6 +1525,8 @@ private:
   Vector3 mCol3;
 
 public:
+
+  VECTORMATH_ALIGNED16_NEW();
 
   // Default constructor
   inline Transform3() {}
@@ -1670,7 +1666,7 @@ public:
   // Construct a 3x4 transformation matrix to perform translation
   static inline const Transform3 translation(const Vector3 & translateVec);
 
-} VECTORMATH_ALIGNED_TYPE_POST;
+} VECTORMATH_ALIGNED_POST;
 
 // Append (post-multiply) a scale transformation to a 3x4 transformation matrix
 // NOTE:

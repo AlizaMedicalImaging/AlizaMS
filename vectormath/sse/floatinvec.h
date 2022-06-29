@@ -42,13 +42,15 @@ class BoolInVec;
 // ========================================================
 
 // Vectorized scalar float.
-VECTORMATH_ALIGNED_TYPE_PRE class FloatInVec
+VECTORMATH_ALIGNED_PRE class FloatInVec
 {
 private:
 
   __m128 mData;
 
 public:
+
+  VECTORMATH_ALIGNED16_NEW();
 
   inline FloatInVec() {}
   inline FloatInVec(__m128 vec);
@@ -93,7 +95,7 @@ public:
   friend inline const FloatInVec operator - (const FloatInVec & vec0, const FloatInVec & vec1);
   friend inline const FloatInVec select(const FloatInVec & vec0, const FloatInVec & vec1, BoolInVec select_vec1);
 
-} VECTORMATH_ALIGNED_TYPE_POST;
+} VECTORMATH_ALIGNED_POST;
 
 // ========================================================
 // FloatInVec functions

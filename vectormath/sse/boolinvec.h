@@ -47,7 +47,7 @@ class FloatInVec;
 // ========================================================
 
 // Vectorized boolean value.
-VECTORMATH_ALIGNED_TYPE_PRE class BoolInVec
+VECTORMATH_ALIGNED_PRE class BoolInVec
 {
 private:
 
@@ -56,6 +56,8 @@ private:
   inline BoolInVec(__m128 vec);
 
 public:
+
+  VECTORMATH_ALIGNED16_NEW();
 
   inline BoolInVec() {}
 
@@ -98,7 +100,7 @@ public:
   friend inline const BoolInVec operator |  (const BoolInVec  & vec0, const BoolInVec  & vec1);
   friend inline const BoolInVec select(const BoolInVec & vec0, const BoolInVec & vec1, const BoolInVec & select_vec1);
 
-} VECTORMATH_ALIGNED_TYPE_POST;
+} VECTORMATH_ALIGNED_POST;
 
 // ========================================================
 // BoolInVec functions

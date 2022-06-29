@@ -86,10 +86,10 @@ public:
 };
 
 #include "btBulletCollisionCommon.h"
-ALIGN16_PRE class CollisionObject
+VECTORMATH_ALIGNED_PRE class CollisionObject
 {
 public:
-	ALIGN16_DECLARE_NEW();
+	VECTORMATH_ALIGNED16_NEW();
 
 	CollisionObject();
 	~CollisionObject();
@@ -105,13 +105,13 @@ public:
 	unsigned int id;
 	btCollisionShape  * shape;
 	qMeshData * mesh_data;
-} ALIGN16_POST;
+} VECTORMATH_ALIGNED_POST;
 
-ALIGN16_PRE class GLWidget : public QGLWidget
+VECTORMATH_ALIGNED_PRE class GLWidget : public QGLWidget
 {
 Q_OBJECT
 public:
-	ALIGN16_DECLARE_NEW();
+	VECTORMATH_ALIGNED16_NEW();
 
 	GLWidget();
 	GLWidget(const QGLFormat&);
@@ -465,6 +465,6 @@ protected:
 
 private:
 	void disable_gl_in_settings();
-} ALIGN16_POST;
+} VECTORMATH_ALIGNED_POST;
 
 #endif

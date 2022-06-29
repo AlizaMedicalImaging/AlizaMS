@@ -22,22 +22,21 @@
 #ifdef DISABLE_SIMDMATH
 
 #include "vectormath/scalar/vectormath.h"
-#define ALIGN16(a) a
-#define ALIGN16_PRE
-#define ALIGN16_POST
-#define ALIGN16_DECLARE_NEW()
+#define VECTORMATH_ALIGNED(a) a
+#define VECTORMATH_ALIGNED_PRE
+#define VECTORMATH_ALIGNED_POST
+#define VECTORMATH_ALIGNED16_NEW()
 
 #else
 
 #include "vectormath/sse/vectormath.h"
-#include "vectormath/allocator.h"
 
 #endif // DISABLE_SIMDMATH
 
-ALIGN16_PRE class Camera
+VECTORMATH_ALIGNED_PRE class Camera
 {
 public:
-	ALIGN16_DECLARE_NEW();
+	VECTORMATH_ALIGNED16_NEW();
 
 	Camera();
 	~Camera();
@@ -153,6 +152,6 @@ public:
 		unsigned short,float*,int);
 	void calculate_projective_matrix(
 		unsigned short,float*,float*);
-} ALIGN16_POST;
+} VECTORMATH_ALIGNED_POST;
 
 #endif // CAMERA_H
