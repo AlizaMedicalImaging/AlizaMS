@@ -3323,48 +3323,62 @@ void Aliza::remove_group()
 		mutex0.unlock();
 		return;
 	}
-	QMessageBox mbox;
-	mbox.addButton(QMessageBox::YesToAll);
-	mbox.addButton(QMessageBox::Yes);
-	mbox.addButton(QMessageBox::Cancel);
-	mbox.setDefaultButton(QMessageBox::Yes);
-	mbox.setIcon(QMessageBox::Question);
-	mbox.setText(QString(
-		"Remove 4D group ID?\n"
-		"Yes to all will remove all group IDs"));
-	const int q = mbox.exec();
-	qApp->processEvents();
-	if (q == QMessageBox::YesToAll)
+	if (v->group_id < 0)
 	{
-		QMap<int, ImageVariant*>::iterator iv =
-			scene3dimages.begin();
-		while (iv != scene3dimages.end())
-		{
-			ImageVariant * v2 = iv.value();
-			if (v2 && v2->group_id >= 0)
-			{
-				v2->group_id = -1;
-				set_us_center(v2, v2->di->default_us_window_center);
-				set_us_width( v2, v2->di->default_us_window_width);
-			}
-			++iv;
-		}
+		QMessageBox mbox;
+		mbox.addButton(QMessageBox::Close);
+		mbox.setIcon(QMessageBox::Information);
+		mbox.setText(QString("Group ID is not set"));
+		mbox.exec();
 	}
-	else if (q == QMessageBox::Yes)
+	else
 	{
-		const int group_id = v->group_id;
-		QMap<int, ImageVariant*>::iterator iv =
-			scene3dimages.begin();
-		while (iv != scene3dimages.end())
+		QMessageBox mbox;
+		mbox.addButton(QMessageBox::YesToAll);
+		mbox.addButton(QMessageBox::Yes);
+		mbox.addButton(QMessageBox::Cancel);
+		mbox.setDefaultButton(QMessageBox::Yes);
+		mbox.setIcon(QMessageBox::Question);
+		mbox.setText(
+			QString("Remove 4D group ID ") +
+			QVariant(v->group_id).toString() +
+			QString(
+				"?\nYes to all will remove all group IDs\n"
+				"from all images."));
+		const int q = mbox.exec();
+		qApp->processEvents();
+		if (q == QMessageBox::YesToAll)
 		{
-			ImageVariant * v2 = iv.value();
-			if (v2 && v2->group_id == group_id)
+			QMap<int, ImageVariant*>::iterator iv =
+				scene3dimages.begin();
+			while (iv != scene3dimages.end())
 			{
-				v2->group_id = -1;
-				set_us_center(v2, v2->di->default_us_window_center);
-				set_us_width( v2, v2->di->default_us_window_width);
+				ImageVariant * v2 = iv.value();
+				if (v2 && v2->group_id >= 0)
+				{
+					v2->group_id = -1;
+					set_us_center(v2, v2->di->default_us_window_center);
+					set_us_width( v2, v2->di->default_us_window_width);
+				}
+				++iv;
 			}
-			++iv;
+		}
+		else if (q == QMessageBox::Yes)
+		{
+			const int group_id = v->group_id;
+			QMap<int, ImageVariant*>::iterator iv =
+				scene3dimages.begin();
+			while (iv != scene3dimages.end())
+			{
+				ImageVariant * v2 = iv.value();
+				if (v2 && v2->group_id == group_id)
+				{
+					v2->group_id = -1;
+					set_us_center(v2, v2->di->default_us_window_center);
+					set_us_width( v2, v2->di->default_us_window_width);
+				}
+				++iv;
+			}
 		}
 	}
 	update_selection();
