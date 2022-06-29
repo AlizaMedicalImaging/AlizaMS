@@ -257,6 +257,7 @@ private:
 		const int=0,
 		const int=0);
 	void delete_checked_unchecked(bool);
+	void delete_group(const int);
 	void clear_contourstable();
 	void set_contourstable(const ImageVariant*);
 };

@@ -1010,6 +1010,30 @@ void Aliza::delete_image()
 	if (imagesbox->listWidget->selectedItems().empty()) goto quit__;
 	ivariant = get_selected_image();
 	if (!ivariant) goto quit__;
+#if 1
+	if (ivariant->group_id >= 0 && scene3dimages.size() > 1)
+	{
+		QMessageBox mbox;
+		mbox.addButton(QMessageBox::Yes);
+		mbox.addButton(QMessageBox::No);
+		mbox.addButton(QMessageBox::Cancel);
+		mbox.setDefaultButton(QMessageBox::No);
+		mbox.setIcon(QMessageBox::Question);
+		mbox.setText(QString("Close all images of 4D group?"));
+		const int q = mbox.exec();
+		if (q == QMessageBox::Cancel)
+		{
+			goto quit__;
+		}
+		else if (q == QMessageBox::Yes)
+		{
+			QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+			delete_group(ivariant->group_id);
+			QApplication::restoreOverrideCursor();
+			goto quit__;
+		}
+	}
+#endif
 	item__ = imagesbox->listWidget->selectedItems()[0];
 	if (studyview) studyview->block_signals(true);
 	imagesbox->listWidget->blockSignals(true);
@@ -3158,7 +3182,7 @@ QString Aliza::create_group_(bool * ok, bool lock_mutex)
 #else
 	QMap<int, ImageVariant*>::const_iterator iv = scene3dimages.constBegin();
 #endif
-	if (scene3dimages.size()<2)
+	if (scene3dimages.size() < 2)
 	{
 		message_ = QString(
 			"At least 2 3D images are required to create 4D group");
@@ -3167,7 +3191,15 @@ QString Aliza::create_group_(bool * ok, bool lock_mutex)
 	v = get_selected_image();
 	if (!v)
 	{
-		message_ = QString("No image is selected");	
+		message_ = QString("No image is selected");
+		goto quit__;
+	}
+	if (v->group_id >= 0)
+	{
+		message_ =
+			QString("Image has the group ID ") +
+			QVariant(v->group_id).toString() +
+			QString(",\n remove group IDs first.");
 		goto quit__;
 	}
 	dimx = v->di->idimx;
@@ -3182,7 +3214,7 @@ QString Aliza::create_group_(bool * ok, bool lock_mutex)
 	{
 		ImageVariant * v2 = iv.value();
 		if (v2 &&
-			v2->group_id == v->group_id &&
+			v2->group_id == -1 &&
 			v2->di->idimx == dimx &&
 			v2->di->idimy == dimy &&
 			v2->di->idimz == dimz &&
@@ -3192,14 +3224,16 @@ QString Aliza::create_group_(bool * ok, bool lock_mutex)
 		}
 		++iv;
 	}
-	if (tmp_images.size()<2)
+	if (tmp_images.size() < 2)
 	{
 		message_ = QString("Failed: < 2 images can be assigned");
 		goto quit__;
 	}
 	{
 		for (int x = 0; x < tmp_images.size(); ++x)
-			map[tmp_images.at(x)->id]=tmp_images.at(x);
+		{
+			map[tmp_images.at(x)->id] = tmp_images.at(x);
+		}
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		QMap<int, ImageVariant*>::const_iterator it = map.cbegin();
 		while (it != map.cend())
@@ -3229,16 +3263,16 @@ QString Aliza::create_group_(bool * ok, bool lock_mutex)
 				((double)tmp0 +
 					(-group_images.at(z)->di->rmin)) /
 					(group_images.at(z)->di->rmax-group_images.at(z)->di->rmin);
-			if (tmp1<0.0) tmp1=0.0;
-			if (tmp1>1.0) tmp1=1.0;
+			if (tmp1 < 0.0) tmp1 = 0.0;
+			if (tmp1 > 1.0) tmp1 = 1.0;
 			int tmp2 = v->di->us_window_width;
 			if (tmp2 > (group_images.at(z)->di->rmax-group_images.at(z)->di->rmin))
 				tmp2 = group_images.at(z)->di->rmax-group_images.at(z)->di->rmin;
 			double tmp3 =
 				(double)tmp2 /
-				(group_images.at(z)->di->rmax-group_images.at(z)->di->rmin);
-			if (tmp3<=0) tmp3 = 1e-9;
-			if (tmp3>1.0) tmp3 = 1.0;
+				(group_images.at(z)->di->rmax - group_images.at(z)->di->rmin);
+			if (tmp3 <= 0.0) tmp3 = 1e-9;
+			if (tmp3 >  1.0) tmp3 = 1.0;
 			group_images[z]->di->us_window_center = tmp0;
 			group_images[z]->di->window_center    = tmp1;
 			group_images[z]->di->us_window_width  = tmp2;
@@ -4135,6 +4169,62 @@ quit__:
 	std::cout << "Num VBOs " << GLWidget::get_count_vbos() << std::endl;
 #endif
 	qApp->processEvents();
+}
+
+void Aliza::delete_group(const int group_id)
+{
+	QList<QListWidgetItem *> items;
+	QList<int> image_ids;
+	for (int x = 0; x < imagesbox->listWidget->count(); ++x)
+	{
+		QListWidgetItem * i = imagesbox->listWidget->item(x);
+		if (i)
+		{
+			const ListWidgetItem2 * j = static_cast<ListWidgetItem2*>(i);
+			const ImageVariant * v = get_image(j->get_id());
+			if (v && v->group_id == group_id) items.push_back(i);
+		}
+	}
+	graphicswidget_m->clear_();
+	graphicswidget_y->clear_();
+	graphicswidget_x->clear_();
+	histogramview->clear__();
+	if (studyview) studyview->block_signals(true);
+	imagesbox->listWidget->blockSignals(true);
+	disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
+	disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
+	for (int x = 0; x < items.size(); ++x)
+	{
+		const ListWidgetItem2 * i = static_cast<const ListWidgetItem2*>(items.at(x));
+		image_ids.push_back(i->get_id());
+	}
+	for (int x = 0; x < items.size(); ++x)
+	{
+		ListWidgetItem2 * i = static_cast<ListWidgetItem2*>(items[x]);
+		imagesbox->listWidget->removeItemWidget(items[x]);
+		delete i;
+	}
+	imagesbox->listWidget->reset();
+	for (int x = 0; x < image_ids.size(); ++x)
+	{
+		ImageVariant * ivariant = get_image(image_ids.at(x));
+		if (ivariant)
+		{
+			remove_from_studyview(ivariant->id);
+			scene3dimages.remove(ivariant->id);
+			delete ivariant;
+			ivariant = NULL;
+		}
+	}
+	update_selection();
+	connect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
+	connect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
+	imagesbox->listWidget->blockSignals(false);
+	if (studyview)
+	{
+		studyview->block_signals(false);
+		if (scene3dimages.empty()) studyview->clear_();
+	}
 }
 
 void Aliza::load_dicom_file(int * image_id,
