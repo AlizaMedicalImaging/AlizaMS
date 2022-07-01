@@ -13359,10 +13359,6 @@ QString DicomUtils::read_dicom(
 							{
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 								QSet<QString> s_uids =
-									(l_uids.empty())
-									?
-									QSet<QString>()
-									:
 									QSet<QString>(l_uids.begin(),l_uids.end());
 #else
 								QSet<QString> s_uids = l_uids.toSet();
@@ -13416,10 +13412,6 @@ QString DicomUtils::read_dicom(
 							{
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 								QSet<QString> s_uids =
-									(l_uids.empty())
-									?
-									QSet<QString>()
-									:
 									QSet<QString>(l_uids.begin(),l_uids.end());
 #else
 								QSet<QString> s_uids = l_uids.toSet();
