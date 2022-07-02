@@ -442,7 +442,7 @@ cmsIOHANDLER* CMSEXPORT cmsOpenIOhandlerFromStream(cmsContext ContextID, FILE* S
     cmsIOHANDLER* iohandler = NULL;
     cmsInt32Number fileSize;
 
-    fileSize = cmsfilelength(Stream);
+    fileSize = (cmsInt32Number)cmsfilelength(Stream);
     if (fileSize < 0)
     {
         cmsSignalError(ContextID, cmsERROR_FILE, "Cannot get size of stream");
@@ -1558,6 +1558,13 @@ void* CMSEXPORT cmsReadTag(cmsHPROFILE hProfile, cmsTagSignature sig)
     if (TagSize < 8) goto Error;
 
     io = Icc ->IOhandler;
+
+    if (io == NULL) { // This is a built-in profile that has been manipulated, abort early
+
+        cmsSignalError(Icc->ContextID, cmsERROR_CORRUPTION_DETECTED, "Corrupted built-in profile.");
+        goto Error;
+    }
+
     // Seek to its location
     if (!io -> Seek(io, Offset))
         goto Error;
