@@ -32,7 +32,7 @@ set(LCMS2_SRCS
   cmswtpnt.c
   cmsxform.c)
 
-set(ALIZALCMS_LIBRARY_PROPERTIES VERSION "2.13.1")
+set(ALIZALCMS_LIBRARY_PROPERTIES VERSION "2.13.2")
 
 include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}")
 add_library(alizalcms2 ${LCMS2_SRCS})
