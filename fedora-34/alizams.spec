@@ -40,7 +40,7 @@ rm -fr mdcm/Utilities/mdcmopenjpeg/
 rm -fr mdcm/Utilities/mdcmcharls/
 rm -fr mdcm/Utilities/mdcmuuid/
 rm -fr mdcm/Utilities/pvrg/
-rm -fr alizalcms2/
+rm -fr alizalcms/
 rm -fr b/
 rm -fr CG/glew/
 
