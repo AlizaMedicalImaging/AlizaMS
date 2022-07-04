@@ -30,6 +30,8 @@ It can consistently de-identify DICOM files.
 git clone https://github.com/AlizaMedicalImaging/AlizaMS.git
 cd AlizaMS
 rm -rf debian-10/
+rm -rf debian-12-qt5/
+rm -rf debian-12-qt6/
 rm -rf fedora-34/
 rm -rf package/apple/
 rm -rf package/art/

@@ -4,12 +4,13 @@ Section: science
 Priority: optional
 Build-Depends: cmake,
  pkg-config,
- debhelper-compat (= 12),
+ debhelper-compat (= 13),
  dh-strip-nondeterminism,
- qtbase5-dev-tools,
- qt5-qmake-bin,
- qtbase5-dev,
- libqt5svg5-dev,
+ qt6-base-dev,
+ qt6-base-dev-tools,
+ libqt6opengl6-dev,
+ libqt6svg6-dev,
+ libqt6core5compat6-dev,
  libbullet-dev,
  uuid-dev,
  libz-dev,
@@ -19,7 +20,7 @@ Build-Depends: cmake,
  libinsighttoolkit4-dev
 Build-Depends-Indep:
 Build-Conflicts:
-Standards-Version: 4.3.0
+Standards-Version: 4.6.0
 Homepage: https://github.com/AlizaMedicalImaging/AlizaMS
 
 Package: alizams
@@ -29,5 +30,3 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Pre-Depends: ${misc:Pre-Depends}
 Description: Aliza MS DICOM Viewer
  The package contains Aliza MS binary and files.
-
-

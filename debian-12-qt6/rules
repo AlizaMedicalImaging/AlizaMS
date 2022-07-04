@@ -1,0 +1,30 @@
+#!/usr/bin/make -f
+#export DH_VERBOSE=1
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+export DEB_CFLAGS_MAINT_APPEND = -Wall -pedantic
+
+%:
+	dh $@ --buildsystem=cmake
+
+# ITK version 5 is OK too
+# C++ standard can be set with e.g. -DALIZA_CXX_STANDARD:STRING=17
+#
+CMAKEFLAGS = -DALIZA_QT_VERSION:STRING=6 \
+ -DALIZA_CXX_STANDARD:STRING=17 \
+ -DCMAKE_SKIP_RPATH:BOOL=ON \
+ -DALIZA_USE_SYSTEM_BULLET:BOOL=ON \
+ -DALIZA_USE_SYSTEM_LCMS2:BOOL=ON \
+ -DMDCM_USE_SYSTEM_UUID:BOOL=ON \
+ -DMDCM_USE_SYSTEM_ZLIB:BOOL=ON \
+ -DMDCM_USE_SYSTEM_OPENJPEG:BOOL=ON \
+ -DMDCM_USE_SYSTEM_CHARLS:BOOL=ON
+
+override_dh_auto_configure:
+	dh_auto_configure -- $(CMAKEFLAGS)
+
+override_dh_auto_test:
+	echo "No tests for this package"
+
+override_dh_auto_install:
+	dh_auto_install --destdir=debian/tmp
