@@ -3,6 +3,7 @@ Maintainer: Package Maintainer <PackageMaintainer@whatever.replace>
 Section: science
 Priority: optional
 Build-Depends: cmake,
+ pkg-config,
  debhelper-compat (= 12),
  dh-strip-nondeterminism,
  qtbase5-dev-tools,
