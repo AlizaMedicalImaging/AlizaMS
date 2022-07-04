@@ -14,9 +14,6 @@ export DEB_CFLAGS_MAINT_APPEND = -Wall -pedantic
 #
 # ITK version 5 is OK too.
 #
-# There is a strange issue with 'CharLS', the name changed after
-# version 2.1.x to 'charls', in fact both should work.
-#
 CMAKEFLAGS = -DALIZA_QT_VERSION:STRING=5 \
  -DCMAKE_SKIP_RPATH:BOOL=ON \
  -DALIZA_CXX_STANDARD:STRING=14 \
