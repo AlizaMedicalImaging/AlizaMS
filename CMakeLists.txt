@@ -67,7 +67,7 @@ project(ALIZAMS)
 #
 #
 if(APPLE)
-  set(ALIZAMS_OSX_BUNDLE_VERSION "1.7.5")
+  set(ALIZAMS_OSX_BUNDLE_VERSION "1.8.0")
 endif()
 
 # Qt major version, required.
@@ -131,10 +131,6 @@ endif()
 option(MDCM_USE_SYSTEM_OPENJPEG "Use system OpenJPEG" OFF)
 
 option(MDCM_USE_SYSTEM_CHARLS "Use system CharLS" OFF)
-
-# Set ON for production build.
-option(MDCM_SUPPORT_BROKEN_IMPLEMENTATION "Handle broken DICOM" ON)
-mark_as_advanced(MDCM_SUPPORT_BROKEN_IMPLEMENTATION)
 
 # Currently not used.
 if(FALSE)
@@ -243,7 +239,6 @@ if(UNIX AND NOT APPLE)
   endif()
 endif()
 
-# TODO
 if(ALIZA_DISABLE_SIMDMATH)
   add_definitions(-DDISABLE_SIMDMATH)
 else()

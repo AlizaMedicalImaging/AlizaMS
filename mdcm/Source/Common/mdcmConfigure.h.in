@@ -52,6 +52,8 @@
 #define MDCM_VERSION "@MDCM_VERSION@"
 #define MDCM_API_VERSION "@MDCM_API_VERSION@"
 
+#define MDCM_SUPPORT_BROKEN_IMPLEMENTATION
+
 #cmakedefine MDCM_USE_SYSTEM_ZLIB
 #cmakedefine MDCM_USE_SYSTEM_UUID
 #cmakedefine MDCM_USE_SYSTEM_OPENSSL
@@ -79,14 +81,7 @@
 #cmakedefine MDCM_HAVE__SNPRINTF
 #cmakedefine MDCM_HAVE_GETTIMEOFDAY
 #cmakedefine MDCM_HAVE_ATOLL
-#cmakedefine MDCM_SUPPORT_BROKEN_IMPLEMENTATION
 #cmakedefine MDCM_USE_COREFOUNDATION_LIBRARY
-
-// MM: I have a feeling that if MDCM_HAVE_WCHAR_IFSTREAM, then UNICODE filename
-// are expected to be specified as UTF-16, but if no API exist for UTF-16
-// at std::ifstream level, then const char* of std::ifstream might accept
-// UTF-8
-#cmakedefine MDCM_HAVE_WCHAR_IFSTREAM
 
 #endif
 

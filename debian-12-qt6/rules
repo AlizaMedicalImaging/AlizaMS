@@ -8,8 +8,6 @@ export DEB_CFLAGS_MAINT_APPEND = -Wall -pedantic
 	dh $@ --buildsystem=cmake
 
 # ITK version 5 is OK too
-# C++ standard can be set with e.g. -DALIZA_CXX_STANDARD:STRING=17
-#
 CMAKEFLAGS = -DALIZA_QT_VERSION:STRING=6 \
  -DALIZA_CXX_STANDARD:STRING=17 \
  -DCMAKE_SKIP_RPATH:BOOL=ON \
