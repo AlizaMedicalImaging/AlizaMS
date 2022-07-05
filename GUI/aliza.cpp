@@ -824,12 +824,12 @@ void Aliza::load_dicom_series(QProgressDialog * pb)
 				message_.append(tmp_message + QString("\n"));
 			}
 		}
-		catch(mdcm::ParseException & pe)
+		catch (mdcm::ParseException & pe)
 		{
 			std::cout << "mdcm::ParseException in Aliza::load_dicom_series:\n"
 				<< pe.GetLastElement().GetTag() << std::endl;
 		}
-		catch(std::exception & ex)
+		catch (std::exception & ex)
 		{
 			std::cout << "Exception in Aliza::load_dicom_series\n"
 				<< ex.what() << std::endl;
@@ -895,7 +895,7 @@ quit__:
 			if (item) id0 = item->get_id();
 			if (id0 == ivariants.at(x)->id) { r = j; break; }
 		}
-		if (x == ivariants.size()-1 && r>-1)
+		if (x == ivariants.size()-1 && r > -1)
 		{
 			imagesbox->listWidget->setCurrentRow(r);
 			update_selection2();
@@ -1186,12 +1186,12 @@ static void process_elscint_dir(
 				}
 			}
 		}
-		catch(mdcm::ParseException & pe)
+		catch (mdcm::ParseException & pe)
 		{
 			std::cout << "mdcm::ParseException in process_elscint_dir:\n"
 				<< pe.GetLastElement().GetTag() << std::endl;
 		}
-		catch(std::exception & ex)
+		catch (std::exception & ex)
 		{
 			std::cout << "Exception in process_elscint_dir:\n"
 				<< ex.what() << std::endl;
@@ -1342,7 +1342,7 @@ void Aliza::reload_3d(
 			break;
 		}
 	}
-	if (update && r>-1)
+	if (update && r > -1)
 	{
 		imagesbox->listWidget->setCurrentRow(r);
 		update_selection();
@@ -4283,12 +4283,12 @@ void Aliza::load_dicom_file(int * image_id,
 			0,
 			settingswidget->get_ignore_dim_org());
 	}
-	catch(mdcm::ParseException & pe)
+	catch (mdcm::ParseException & pe)
 	{
 		std::cout << "mdcm::ParseException in Aliza::load_dicom_file:\n"
 			<< pe.GetLastElement().GetTag() << std::endl;
 	}
-	catch(std::exception & ex)
+	catch (std::exception & ex)
 	{
 		std::cout << "Exception in Aliza::load_dicom_file:\n"
 			<< ex.what() << std::endl;
@@ -4345,7 +4345,7 @@ quit__:
 						if (item) id0 = item->get_id();
 						if (id0 == ivariants.at(j)->id) { r = x; break; }
 					}
-					if (r>-1)
+					if (r > -1)
 					{
 						imagesbox->listWidget->setCurrentRow(r);
 						update_selection2();
