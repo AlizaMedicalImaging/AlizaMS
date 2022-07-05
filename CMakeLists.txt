@@ -100,7 +100,7 @@ endif()
 
 if(NOT APPLE)
   # Use OpenGL Core profile with Qt5 (with Qt6 always Core profile).
-  # With Qt4 not defined, Core may work, not tested.
+  # With Qt4 not defined, may work, not tested.
   option(ALIZA_QT5_COREGL "Use OpenGL Core profile with Qt5" OFF)
 endif()
 
@@ -569,7 +569,6 @@ endif()
 #
 #
 
-
 if(USE_QT_V_5 OR USE_QT_V_6)
   if(WIN32)
 # https://cmake.org/cmake/help/v3.0/policy/CMP0020.html
@@ -591,7 +590,8 @@ find_package(ITK COMPONENTS
   ITKImageGrid
   ITKImageIntensity
   ITKSpatialObjects
-  ITKStatistics)
+  ITKStatistics
+  ITKTransform)
 include(${ITK_USE_FILE})
 message(STATUS "ITK: ${ITK_LIBRARIES}")
 

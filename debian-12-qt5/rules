@@ -7,7 +7,6 @@ export DEB_CFLAGS_MAINT_APPEND = -Wall -pedantic
 %:
 	dh $@ --buildsystem=cmake
 
-# ITK version 5 is OK too.
 CMAKEFLAGS = -DALIZA_QT_VERSION:STRING=5 \
  -DCMAKE_SKIP_RPATH:BOOL=ON \
  -DALIZA_USE_SYSTEM_BULLET:BOOL=ON \
