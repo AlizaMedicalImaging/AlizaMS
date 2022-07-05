@@ -167,7 +167,7 @@ template<typename T> void load_rgb_image2(
 	else
 	{
 		try { p__ = new unsigned char[size[0]*size[1]*3]; }
-		catch(const std::bad_alloc&) { p__ = NULL; }
+		catch (const std::bad_alloc&) { p__ = NULL; }
 		if (!p__) return;
 		const double vmin = ivariant->di->vmin;
 		const double vmax = ivariant->di->vmax;
@@ -343,7 +343,7 @@ template<typename T> void load_rgba_image2(
 		const double vrange = vmax - vmin;
 		if (!(vrange != 0)) return;
 		try { p__ = new unsigned char[size[0]*size[1]*4]; }
-		catch(const std::bad_alloc&) { p__ = NULL; }
+		catch (const std::bad_alloc&) { p__ = NULL; }
 		if (!p__) return;
 		try
 		{
@@ -420,7 +420,7 @@ template<typename T> void load_rgba_image2(
 		const double vrange = vmax - vmin;
 		if (!(vrange != 0)) return;
 		try { p__ = new unsigned char[size[0]*size[1]*3]; }
-		catch(const std::bad_alloc&) { p__ = NULL; }
+		catch (const std::bad_alloc&) { p__ = NULL; }
 		if (!p__) return;
 		try
 		{
