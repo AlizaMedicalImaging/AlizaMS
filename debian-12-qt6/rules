@@ -7,8 +7,11 @@ export DEB_CFLAGS_MAINT_APPEND = -Wall -pedantic
 %:
 	dh $@ --buildsystem=cmake
 
+# -DALIZA_CXX_STANDARD:STRING=17 could be set (required for Qt6),
+# but default for GCC 11 should be C++17
+#
+# ITK_DIR should be detected, otherwise set -DITK_DIR::PATH
 CMAKEFLAGS = -DALIZA_QT_VERSION:STRING=6 \
- -DALIZA_CXX_STANDARD:STRING=17 \
  -DCMAKE_SKIP_RPATH:BOOL=ON \
  -DALIZA_USE_SYSTEM_BULLET:BOOL=ON \
  -DALIZA_USE_SYSTEM_LCMS2:BOOL=ON \
