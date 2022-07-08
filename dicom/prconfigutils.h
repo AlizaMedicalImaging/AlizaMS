@@ -40,7 +40,8 @@ public:
 	static ImageVariant * make_pr_rgb(
 		const ImageVariant*,
 		const PrRefSeries &,
-		const SettingsWidget*);
+		const SettingsWidget*,
+		bool*);
 };
 
 #endif
