@@ -43,6 +43,8 @@
 #include "mdcmItem.h"
 #include "mdcmOverlay.h"
 
+//#define APPLY_RESCALE_INTENSITY_TO_VOI_LUT
+
 template<typename T> void set_spacing(
 	typename T::Pointer & image,
 	double x, double y)
@@ -65,6 +67,7 @@ template<typename T> void set_asp_ratio(
 	image->SetSpacing(s);
 }
 
+#if 0
 template<typename T> void set_darea(
 	ImageVariant * v,
 	const typename T::Pointer & image,
@@ -88,6 +91,7 @@ template<typename T> void set_darea(
 		v->pr_display_areas[x] = a;
 	}
 }
+#endif
 
 template<typename T> QString to_rgb(
 	typename RGBImageTypeUC::Pointer & rgb_image,
@@ -155,12 +159,15 @@ template<typename T> QString intensity_filter2(
 		out_image = filter->GetOutput();
 	}
 	catch (const itk::ExceptionObject & ex)
-	{ return QString(ex.GetDescription()); }
+	{
+		return QString(ex.GetDescription());
+	}
 	if (out_image.IsNotNull()) out_image->DisconnectPipeline();
 	else return QString("Output image is NULL");
 	return QString("");
 }
 
+#if 0
 template<typename T> QString to_char(
 	const typename T::Pointer & image,
 	typename ImageTypeUC::Pointer & out_image,
@@ -169,11 +176,12 @@ template<typename T> QString to_char(
 	if (image.IsNull()) return QString("Image is NULL");
 	typedef  itk::IntensityWindowingImageFilter<T, ImageTypeUC>
 		FilterType;
+	typename FilterType::Pointer filter0 = FilterType::New();
+#ifdef APPLY_RESCALE_INTENSITY_TO_VOI_LUT
 	typedef  itk::RescaleIntensityImageFilter<ImageTypeUC, ImageTypeUC>
 		RescaleFilterType;
-	typename FilterType::Pointer filter0 = FilterType::New();
-	typename RescaleFilterType::Pointer filter1 =
-		RescaleFilterType::New();
+	typename RescaleFilterType::Pointer filter1 = RescaleFilterType::New();
+#endif
 	try
 	{
 		filter0->SetInput(image);
@@ -184,40 +192,14 @@ template<typename T> QString to_char(
 			typename ImageTypeUC::PixelType>(0));
 		filter0->SetOutputMaximum(static_cast<
 			typename ImageTypeUC::PixelType>(255));
+#ifdef APPLY_RESCALE_INTENSITY_TO_VOI_LUT
 		filter1->SetInput(filter0->GetOutput());
 		filter1->Update();
 		out_image = filter1->GetOutput();
-	}
-	catch (const itk::ExceptionObject & ex)
-	{ return QString( ex.GetDescription()); }
-	if (out_image.IsNotNull()) out_image->DisconnectPipeline();
-	else return QString("Output image is NULL");
-	return QString("");
-}
-
-template<typename T> QString to_char_sigm(
-	const typename T::Pointer & image,
-	typename ImageTypeUC::Pointer & out_image,
-	double width_, double center_)
-{
-	if (image.IsNull()) return QString("Image is NULL");
-	typedef  itk::Sigmoid2ImageFilter<T, ImageTypeUC> FilterType;
-	typedef  itk::RescaleIntensityImageFilter<ImageTypeUC, ImageTypeUC>
-		RescaleFilterType;
-	typename FilterType::Pointer filter0 = FilterType::New();
-	typename RescaleFilterType::Pointer filter1 = RescaleFilterType::New();
-	try
-	{
-		filter0->SetInput(image);
-		filter0->SetAlpha(static_cast<typename T::PixelType>(width_));
-		filter0->SetBeta(static_cast<typename T::PixelType>(center_));
-		filter0->SetOutputMinimum(static_cast<
-			typename ImageTypeUC::PixelType>(0));
-		filter0->SetOutputMaximum(static_cast<
-			typename ImageTypeUC::PixelType>(255));
-		filter1->SetInput(filter0->GetOutput());
-		filter1->Update();
-		out_image = filter1->GetOutput();
+#else
+		filter0->Update();
+		out_image = filter0->GetOutput();
+#endif
 	}
 	catch (const itk::ExceptionObject & ex)
 	{
@@ -227,6 +209,49 @@ template<typename T> QString to_char_sigm(
 	else return QString("Output image is NULL");
 	return QString("");
 }
+#endif
+
+#if 0
+template<typename T> QString to_char_sigm(
+	const typename T::Pointer & image,
+	typename ImageTypeUC::Pointer & out_image,
+	double width_, double center_)
+{
+	if (image.IsNull()) return QString("Image is NULL");
+	typedef itk::Sigmoid2ImageFilter<T, ImageTypeUC> FilterType;
+	typename FilterType::Pointer filter0 = FilterType::New();
+#ifdef APPLY_RESCALE_INTENSITY_TO_VOI_LUT
+	typedef itk::RescaleIntensityImageFilter<ImageTypeUC, ImageTypeUC>
+		RescaleFilterType;
+	typename RescaleFilterType::Pointer filter1 = RescaleFilterType::New();
+#endif
+	try
+	{
+		filter0->SetInput(image);
+		filter0->SetAlpha(static_cast<typename T::PixelType>(width_));
+		filter0->SetBeta(static_cast<typename T::PixelType>(center_));
+		filter0->SetOutputMinimum(static_cast<
+			typename ImageTypeUC::PixelType>(0));
+		filter0->SetOutputMaximum(static_cast<
+			typename ImageTypeUC::PixelType>(255));
+#ifdef APPLY_RESCALE_INTENSITY_TO_VOI_LUT
+		filter1->SetInput(filter0->GetOutput());
+		filter1->Update();
+		out_image = filter1->GetOutput();
+#else
+		filter0->Update();
+		out_image = filter0->GetOutput();
+#endif
+	}
+	catch (const itk::ExceptionObject & ex)
+	{
+		return QString( ex.GetDescription());
+	}
+	if (out_image.IsNotNull()) out_image->DisconnectPipeline();
+	else return QString("Output image is NULL");
+	return QString("");
+}
+#endif
 
 template<typename Tin, typename Tout> QString extract_one_slice(
 	const typename Tin::Pointer & image,
@@ -513,13 +538,12 @@ static void rotate_flip_points(
 							.at(k)
 							.GraphicData.size()%2 == 0))
 					{
-						for (
-							unsigned int u = 0;
-							u < ivariant->pr_graphicobjects
-								.value(idx1)
-								.at(k)
-								.GraphicData.size();
-							u+=2)
+						for (unsigned int u = 0;
+								u < ivariant->pr_graphicobjects
+									.value(idx1)
+									.at(k)
+									.GraphicData.size();
+								u+=2)
 						{
 							TransformType::InputPointType in;
 							in[0] = ivariant->pr_graphicobjects
@@ -573,17 +597,13 @@ static void rotate_flip_points(
 					a.ShutterLowerHorizontalEdge == -1))
 				{
 					TransformType::InputPointType in1;
-					in1[0] = (double)
-						a.ShutterLeftVerticalEdge;
-					in1[1] = (double)
-						a.ShutterUpperHorizontalEdge;
+					in1[0] = (double)a.ShutterLeftVerticalEdge;
+					in1[1] = (double)a.ShutterUpperHorizontalEdge;
 					TransformType::OutputPointType out1 =
 						transform->TransformPoint(in1);
 					TransformType::InputPointType in2;
-					in2[0] = (double)
-						a.ShutterRightVerticalEdge;
-					in2[1] = (double)
-						a.ShutterLowerHorizontalEdge;
+					in2[0] = (double)a.ShutterRightVerticalEdge;
+					in2[1] = (double)a.ShutterLowerHorizontalEdge;
 					TransformType::OutputPointType out2 =
 						transform->TransformPoint(in2);
 					if (flip)
@@ -645,10 +665,8 @@ static void rotate_flip_points(
 					a.RadiusofCircularShutter   == -1))
 				{
 					TransformType::InputPointType in;
-					in[0] = (double)
-						a.CenterofCircularShutter_x;
-					in[1] = (double)
-						a.CenterofCircularShutter_y;
+					in[0] = (double)a.CenterofCircularShutter_x;
+					in[1] = (double)a.CenterofCircularShutter_y;
 					TransformType::OutputPointType out =
 						transform->TransformPoint(in);
 					if (flip)
@@ -694,10 +712,8 @@ static void rotate_flip_points(
 						j < a.VerticesofthePolygonalShutter.size(); j+=2)
 					{
 						TransformType::InputPointType in;
-						in[0] = (double)
-							a.VerticesofthePolygonalShutter.at(j+1);
-						in[1] = (double)
-							a.VerticesofthePolygonalShutter.at(j);
+						in[0] = (double)a.VerticesofthePolygonalShutter.at(j+1);
+						in[1] = (double)a.VerticesofthePolygonalShutter.at(j);
 						TransformType::OutputPointType out =
 							transform->TransformPoint(in);
 						if (flip)
@@ -828,13 +844,12 @@ static void rotate_flip_points(
 							.at(k)
 							.GraphicData.size()%2 == 0))
 					{
-						for (
-							unsigned int u = 0;
-							u < ivariant->pr_graphicobjects
-								.value(idx1)
-								.at(k)
-								.GraphicData.size();
-							u+=2)
+						for (unsigned int u = 0;
+								u < ivariant->pr_graphicobjects
+									.value(idx1)
+									.at(k)
+									.GraphicData.size();
+								u+=2)
 						{
 							const double in0 = ivariant->pr_graphicobjects
 								.value(idx1)
@@ -1150,8 +1165,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 							filter0->SetInterpolator(interpolator);
 							filter0->SetDefaultPixelValue(
 								itk::NumericTraits<
-									typename
-										T2d::PixelType>::ZeroValue());
+									typename T2d::PixelType>::ZeroValue());
 							filter0->SetTransform(transform);
 							filter0->SetOutputOrigin(tmp0->GetOrigin());
 							filter0->SetOutputSpacing(tmp0->GetSpacing());
@@ -1202,8 +1216,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 										if (ix >= idimx || ix < 0)
 										{
 											it.Set(itk::NumericTraits<
-												typename
-													T2d::PixelType>::ZeroValue());
+												typename T2d::PixelType>::ZeroValue());
 										}
 										else
 										{
@@ -1219,8 +1232,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 										if (ix >= idimx || ix < 0)
 										{
 											it.Set(itk::NumericTraits<
-												typename
-													T2d::PixelType>::ZeroValue());
+												typename T2d::PixelType>::ZeroValue());
 										}
 										else
 										{
@@ -1288,8 +1300,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 								if (!it0.IsAtEnd())
 								{
 									it2.Set(static_cast<
-										typename T::PixelType>(
-											it0.Get()));
+										typename T::PixelType>(it0.Get()));
 									++it0;
 								}
 								++it2;
@@ -1361,22 +1372,22 @@ template<typename T, typename T2d> QString levels_slice_by_slice(
 		LinearFilterType;
 	typedef itk::Sigmoid2ImageFilter<T2d, Image2DTypeUC>
 		SigmoidFilterType;
+#ifdef APPLY_RESCALE_INTENSITY_TO_VOI_LUT
 	typedef itk::RescaleIntensityImageFilter<Image2DTypeUC, Image2DTypeUC>
 		RescaleFilterType;
+#endif
 	typedef itk::ImageSliceIteratorWithIndex<ImageTypeUC>
 		SliceIterator;
 	typedef itk::ImageLinearConstIteratorWithIndex<Image2DTypeUC>
 		ConstIterator;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	for (
-		QMap<int, QStringList>::const_iterator it = refs.cbegin();
-		it != refs.cend();
-		++it)
+	for (QMap<int, QStringList>::const_iterator it = refs.cbegin();
+			it != refs.cend();
+			++it)
 #else
-	for (
-		QMap<int, QStringList>::const_iterator it = refs.constBegin();
-		it != refs.constEnd();
-		++it)
+	for (QMap<int, QStringList>::const_iterator it = refs.constBegin();
+			it != refs.constEnd();
+			++it)
 #endif
 	{
 		const int k = it.key();
@@ -1473,8 +1484,10 @@ template<typename T, typename T2d> QString levels_slice_by_slice(
 						{
 							typename SigmoidFilterType::Pointer
 								filter0 = SigmoidFilterType::New();
+#ifdef APPLY_RESCALE_INTENSITY_TO_VOI_LUT
 							typename RescaleFilterType::Pointer
 								filter1 = RescaleFilterType::New();
+#endif
 							try
 							{
 								filter0->SetInput(tmp0);
@@ -1485,24 +1498,31 @@ template<typename T, typename T2d> QString levels_slice_by_slice(
 									static_cast<typename T2d::PixelType>(
 										centers.value(k)));
 								filter0->SetOutputMinimum(
-									static_cast<typename
-										Image2DTypeUC::PixelType>(0));
+									static_cast<typename Image2DTypeUC::PixelType>(0));
 								filter0->SetOutputMaximum(
-									static_cast<typename
-										Image2DTypeUC::PixelType>(255));
+									static_cast<typename Image2DTypeUC::PixelType>(255));
+#ifdef APPLY_RESCALE_INTENSITY_TO_VOI_LUT
 								filter1->SetInput(filter0->GetOutput());
 								filter1->Update();
 								tmp1 = filter1->GetOutput();
+#else
+								filter0->Update();
+								tmp1 = filter0->GetOutput();
+#endif
 							}
 							catch (const itk::ExceptionObject & ex)
-							{ return QString( ex.GetDescription()); }
+							{
+								return QString( ex.GetDescription());
+							}
 						}
 						else
 						{
 							typename LinearFilterType::Pointer
 								filter0 = LinearFilterType::New();
+#ifdef APPLY_RESCALE_INTENSITY_TO_VOI_LUT
 							typename RescaleFilterType::Pointer
 								filter1 = RescaleFilterType::New();
+#endif
 							try
 							{
 								filter0->SetInput(tmp0);
@@ -1513,20 +1533,24 @@ template<typename T, typename T2d> QString levels_slice_by_slice(
 										centers.value(k)));
 								filter0->SetOutputMinimum(
 									static_cast<
-										typename
-											Image2DTypeUC::PixelType>(
-												0));
+										typename Image2DTypeUC::PixelType>(0));
 								filter0->SetOutputMaximum(
 									static_cast<
 										typename
-											Image2DTypeUC::PixelType>(
-												255));
+											Image2DTypeUC::PixelType>(255));
+#ifdef APPLY_RESCALE_INTENSITY_TO_VOI_LUT
 								filter1->SetInput(filter0->GetOutput());
 								filter1->Update();
 								tmp1 = filter1->GetOutput();
+#else
+								filter0->Update();
+								tmp1 = filter0->GetOutput();
+#endif
 							}
 							catch (const itk::ExceptionObject & ex)
-							{ return QString( ex.GetDescription()); }
+							{
+								return QString( ex.GetDescription());
+							}
 						}
 						if (tmp1.IsNull()) return QString("tmp1.IsNull()");
 						//
@@ -1559,10 +1583,7 @@ template<typename T, typename T2d> QString levels_slice_by_slice(
 											{
 												it2.Set(
 													static_cast<
-														typename
-															ImageTypeUC::
-																PixelType>(
-													it0.Get()));
+														typename ImageTypeUC::PixelType>(it0.Get()));
 												++it0;
 											}
 											++it2;
@@ -1605,15 +1626,13 @@ static void areas_slice_by_slice(
 {
 	if (!v) return;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	for (
-		QMap<int, QStringList>::const_iterator it = refs.cbegin();
-		it != refs.cend();
-		++it)
+	for (QMap<int, QStringList>::const_iterator it = refs.cbegin();
+			it != refs.cend();
+			++it)
 #else
-	for (
-		QMap<int, QStringList>::const_iterator it = refs.constBegin();
-		it != refs.constEnd();
-		++it)
+	for (QMap<int, QStringList>::const_iterator it = refs.constBegin();
+			it != refs.constEnd();
+			++it)
 #endif
 	{
 		const int k = it.key();
@@ -1749,15 +1768,13 @@ static void text_slice_by_slice(
 {
 	if (!v) return;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	for (
-		QMap<int, QStringList>::const_iterator it = refs.cbegin();
-		it != refs.cend();
-		++it)
+	for (QMap<int, QStringList>::const_iterator it = refs.cbegin();
+			it != refs.cend();
+			++it)
 #else
-	for (
-		QMap<int, QStringList>::const_iterator it = refs.constBegin();
-		it != refs.constEnd();
-		++it)
+	for (QMap<int, QStringList>::const_iterator it = refs.constBegin();
+			it != refs.constEnd();
+			++it)
 #endif
 	{
 		const int k = it.key();
@@ -1904,15 +1921,13 @@ static void graphic_slice_by_slice(
 {
 	if (!v) return;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	for (
-		QMap<int, QStringList>::const_iterator it = refs.cbegin();
-		it != refs.cend();
-		++it)
+	for (QMap<int, QStringList>::const_iterator it = refs.cbegin();
+			it != refs.cend();
+			++it)
 #else
-	for (
-		QMap<int, QStringList>::const_iterator it = refs.constBegin();
-		it != refs.constEnd();
-		++it)
+	for (QMap<int, QStringList>::const_iterator it = refs.constBegin();
+			it != refs.constEnd();
+			++it)
 #endif
 	{
 		const int k = it.key();
@@ -2275,8 +2290,7 @@ void PrConfigUtils::read_display_areas(
 				c.values.push_back(QVariant(QString("")));
 			}
 			std::vector<int> PresentationPixelAspectRatio;
-			if (
-				DicomUtils::get_is_values(
+			if (DicomUtils::get_is_values(
 					nestedds,
 					tPresentationPixelAspectRatio,
 					PresentationPixelAspectRatio) &&
@@ -2293,8 +2307,7 @@ void PrConfigUtils::read_display_areas(
 				c.values.push_back(QVariant((int)1));
 			}
 			std::vector<double> PresentationPixelSpacing;
-			if (
-				DicomUtils::get_ds_values(
+			if (DicomUtils::get_ds_values(
 					nestedds,
 					tPresentationPixelSpacing,
 					PresentationPixelSpacing) &&
@@ -2311,8 +2324,7 @@ void PrConfigUtils::read_display_areas(
 				c.values.push_back(QVariant((double)1));
 			}
 			std::vector<float> PresentationPixelMagnificationRatio;
-			if (
-				DicomUtils::get_fl_values(
+			if (DicomUtils::get_fl_values(
 					nestedds,
 					tPresentationPixelMagnificationRatio,
 					PresentationPixelMagnificationRatio) &&
@@ -2520,8 +2532,14 @@ static void read_overlays(
 			if (obuffer_size%NumberOfFrames != 0) continue;
 			const size_t fbuffer_size = obuffer_size/NumberOfFrames;
 			char * tmp0;
-			try { tmp0 = new char[obuffer_size]; }
-			catch (const std::bad_alloc&) { continue; }
+			try
+			{
+				tmp0 = new char[obuffer_size];
+			}
+			catch (const std::bad_alloc&)
+			{
+				continue;
+			}
 			if (!tmp0) continue;
 			const bool obuffer_ok = o.GetUnpackBuffer(
 				tmp0, obuffer_size);
@@ -2576,8 +2594,14 @@ static void read_overlays(
 			const size_t obuffer_size =
 				o.GetUnpackBufferLength();
 			char * tmp0;
-			try { tmp0 = new char[obuffer_size]; }
-			catch (const std::bad_alloc&) { continue; }
+			try
+			{
+				tmp0 = new char[obuffer_size];
+			}
+			catch (const std::bad_alloc&)
+			{
+				continue;
+			}
 			if (!tmp0) continue;
 			const bool obuffer_ok = o.GetUnpackBuffer(
 				tmp0, obuffer_size);
@@ -3073,8 +3097,7 @@ void PrConfigUtils::read_text_annotations(
 						const mdcm::DataElement & e5 =
 							nestedds2.GetDataElement(
 								tUnformattedTextValue);
-						if (
-							!e5.IsEmpty() &&
+						if (!e5.IsEmpty() &&
 							!e5.IsUndefinedLength() &&
 							e5.GetByteValue())
 						{
@@ -3390,8 +3413,7 @@ void PrConfigUtils::read_display_shutter(
 	int ShutterRightVerticalEdge;
 	int ShutterUpperHorizontalEdge;
 	int ShutterLowerHorizontalEdge;
-	if (
-		DicomUtils::get_is_value(
+	if (DicomUtils::get_is_value(
 			ds,
 			tShutterLeftVerticalEdge,
 			&ShutterLeftVerticalEdge) &&
@@ -3666,13 +3688,13 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		QApplication::processEvents();
 		if (voi_luts > 0)
 		{
+#if 0
 			if (voi_lut_images.empty())
 			{
 #ifdef PRINT_MAKE_PR_MONOCHROME
 					std::cout << "VOI LUT" << std::endl;
 #endif
-				if (
-					lut_functions.contains(0) &&
+				if (lut_functions.contains(0) &&
 					lut_functions.value(0).toUpper() == QString("SIGMOID"))
 				{
 					error =
@@ -3693,6 +3715,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				}
 			}
 			else
+#endif
 			{
 #ifdef PRINT_MAKE_PR_MONOCHROME
 				std::cout << "VOI LUT slice by slice" << std::endl;
@@ -3777,6 +3800,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		}
 		if (areas > 0)
 		{
+#if 0
 			if (area_images.empty())
 			{
 #ifdef PRINT_MAKE_PR_MONOCHROME
@@ -3861,10 +3885,11 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 					else ;;
 				}
 			}
-			else if (!area_images.empty())
+			else
+#endif
 			{
 #ifdef PRINT_MAKE_PR_MONOCHROME
-				std::cout << "Display Areas slice by slice, may skip some params" << std::endl;
+				std::cout << "Display Areas slice by slice" << std::endl;
 #endif
 				const double px = pixel_spacings1.value(0);
 				const double py = pixel_spacings0.value(0);
@@ -4015,7 +4040,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 			if (l.at(x).id == 3 && l.at(x).values.size() == 2)
 			{
 				// Rotation
-				const double d = (double)l.at(x).values.at(1).toInt();
+				const double d = l.at(x).values.at(1).toInt();
 				rotation = l.at(x).values.at(1).toInt();
 				// Flip horiz.
 				const QString f = l.at(x).values.at(0).toString()
@@ -4201,6 +4226,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		}
 		if (texts > 0)
 		{
+#if 0
 			if (text_images.empty())
 			{
 				QList<PRTextAnnotation> tas;
@@ -4251,6 +4277,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				v->pr_text_annotations.insert(-1, tas);
 			}
 			else
+#endif
 			{
 				text_slice_by_slice(
 					v,
@@ -4376,6 +4403,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		}
 		if (graphics > 0)
 		{
+#if 0
 			if (graphic_images.empty())
 			{
 				QList<PRGraphicObject> gs;
@@ -4399,6 +4427,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				v->pr_graphicobjects.insert(-1, gs);
 			}
 			else
+#endif
 			{
 				graphic_slice_by_slice(
 					v,
