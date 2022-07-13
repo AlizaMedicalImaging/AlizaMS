@@ -89,8 +89,7 @@ template<typename T> void calculate_min_max(
 	double cubemin = 0.0, cubemax = 0.0;
 	try
 	{
-		min_max_calculator->AddObserver(
-			itk::ProgressEvent(), update_qt_command);
+		min_max_calculator->AddObserver(itk::ProgressEvent(), update_qt_command);
 		min_max_calculator->SetImage(image);
 		min_max_calculator->SetRegion(image->GetLargestPossibleRegion());
 		min_max_calculator->Compute();
@@ -108,12 +107,21 @@ template<typename T> void calculate_min_max(
 		{
 		case 0:
 			{
-				if (iv->di->bits_allocated>0 && iv->di->bits_stored>0 &&
-					(iv->di->bits_stored<iv->di->bits_allocated) &&
-					(iv->di->high_bit==iv->di->bits_stored-1))
+				if (iv->di->bits_allocated > 0 && iv->di->bits_stored > 0 &&
+					(iv->di->bits_stored < iv->di->bits_allocated) &&
+					(iv->di->high_bit == iv->di->bits_stored - 1))
 				{
-					iv->di->rmin = -pow(2, (iv->di->bits_stored-1))-1;
-					iv->di->rmax =  pow(2, (iv->di->bits_stored-1))-1;
+					const double tmp0 = pow(2, (iv->di->bits_stored - 1));
+					iv->di->rmin = -tmp0;
+					iv->di->rmax = tmp0 - 1;
+					if (cubemin < iv->di->rmin || cubemax > iv->di->rmax)
+					{
+						std::cout << "Warning: bits stored=" << iv->di->bits_stored
+							<< ", but min=" << cubemin
+							<< ", max=" << cubemax << std::endl;
+						iv->di->rmin = SHRT_MIN;
+						iv->di->rmax = SHRT_MAX;
+					}
 				}
 				else
 				{
@@ -124,12 +132,18 @@ template<typename T> void calculate_min_max(
 			break;
 		case 1:
 			{
-				if (iv->di->bits_allocated>0 && iv->di->bits_stored>0 &&
-					(iv->di->bits_stored<iv->di->bits_allocated) &&
-					(iv->di->high_bit==iv->di->bits_stored-1))
+				if (iv->di->bits_allocated > 0 && iv->di->bits_stored > 0 &&
+					(iv->di->bits_stored < iv->di->bits_allocated) &&
+					(iv->di->high_bit == iv->di->bits_stored - 1))
 				{
 					iv->di->rmin = 0;
-					iv->di->rmax = pow(2, (iv->di->bits_stored))-1;
+					iv->di->rmax = pow(2, (iv->di->bits_stored)) - 1;
+					if (cubemax > iv->di->rmax)
+					{
+						std::cout << "Warning: bits stored=" << iv->di->bits_stored
+							<< ", but max=" << cubemax << std::endl;
+						iv->di->rmax = USHRT_MAX;
+					}
 				}
 				else
 				{
@@ -140,12 +154,18 @@ template<typename T> void calculate_min_max(
 			break;
 		case 4:
 			{
-				if (iv->di->bits_allocated>0 && iv->di->bits_stored>0 &&
-					(iv->di->bits_stored<iv->di->bits_allocated) &&
-					(iv->di->high_bit==iv->di->bits_stored-1))
+				if (iv->di->bits_allocated > 0 && iv->di->bits_stored > 0 &&
+					(iv->di->bits_stored < iv->di->bits_allocated) &&
+					(iv->di->high_bit == iv->di->bits_stored - 1))
 				{
 					iv->di->rmin = 0.0;
-					iv->di->rmax = pow(2, (iv->di->bits_stored))-1;
+					iv->di->rmax = pow(2, (iv->di->bits_stored)) - 1;
+					if (cubemax > iv->di->rmax)
+					{
+						std::cout << "Warning: bits stored=" << iv->di->bits_stored
+							<< ", but max=" << cubemax << std::endl;
+						iv->di->rmax = UCHAR_MAX;
+					}
 				}
 				else
 				{
@@ -173,13 +193,65 @@ template<typename T> void calculate_min_max(
 	}
 	else
 	{
+		switch (iv->image_type)
+		{
+		case 0:
+			{
+				if (iv->di->bits_allocated > 0 && iv->di->bits_stored > 0 &&
+					(iv->di->bits_stored < iv->di->bits_allocated) &&
+					(iv->di->high_bit == iv->di->bits_stored - 1))
+				{
+					const double tmp0 = pow(2, (iv->di->bits_stored - 1));
+					const double rmin = -tmp0;
+					const double rmax = tmp0 - 1;
+					if (cubemin < rmin || cubemax > rmax)
+					{
+						std::cout << "Warning: bits stored=" << iv->di->bits_stored
+							<< ", but min=" << cubemin
+							<< ", max=" << cubemax << std::endl;
+					}
+				}
+			}
+			break;
+		case 1:
+			{
+				if (iv->di->bits_allocated > 0 && iv->di->bits_stored > 0 &&
+					(iv->di->bits_stored < iv->di->bits_allocated) &&
+					(iv->di->high_bit == iv->di->bits_stored - 1))
+				{
+					const double rmax = pow(2, (iv->di->bits_stored)) - 1;
+					if (cubemax > rmax)
+					{
+						std::cout << "Warning: bits stored=" << iv->di->bits_stored
+							<< ", but max=" << cubemax << std::endl;
+					}
+				}
+			}
+			break;
+		case 4:
+			{
+				if (iv->di->bits_allocated > 0 && iv->di->bits_stored > 0 &&
+					(iv->di->bits_stored < iv->di->bits_allocated) &&
+					(iv->di->high_bit == iv->di->bits_stored - 1))
+				{
+					const double rmax = pow(2, (iv->di->bits_stored)) - 1;
+					if (cubemax > rmax)
+					{
+						std::cout << "Warning: bits stored=" << iv->di->bits_stored
+							<< ", but max=" << cubemax << std::endl;
+					}
+				}
+			}
+			break;
+		default:
+			break;
+		}
 		iv->di->rmin = iv->di->vmin = cubemin;
 		iv->di->rmax = iv->di->vmax = cubemax;
 	}
-	const double vmax_minus_vmin = iv->di->vmax-iv->di->vmin;
-	const double rmax_minus_rmin = iv->di->rmax-iv->di->rmin;
+	const double vmax_minus_vmin = iv->di->vmax - iv->di->vmin;
+	const double rmax_minus_rmin = iv->di->rmax - iv->di->rmin;
 	if ((iv->di->us_window_width <= -999999.0) ||
-		// TODO check again
 		((iv->di->default_us_window_width > (iv->di->vmax - iv->di->vmin)) ||
 			(iv->di->default_us_window_center > iv->di->vmax ||
 				iv->di->default_us_window_center < iv->di->vmin)))
@@ -191,16 +263,16 @@ template<typename T> void calculate_min_max(
 		}
 		else
 		{
-			const double tmp110 = (vmax_minus_vmin>0) ? vmax_minus_vmin : rmax_minus_rmin;
-			const double tmp111 = (vmax_minus_vmin>0) ? iv->di->vmin    : iv->di->rmin;
+			const double tmp110 = (vmax_minus_vmin > 0) ? vmax_minus_vmin : rmax_minus_rmin;
+			const double tmp111 = (vmax_minus_vmin > 0) ? iv->di->vmin    : iv->di->rmin;
 			if (tmp110 > 0)
 			{
-				iv->di->default_us_window_center = iv->di->us_window_center = ((tmp110/2.0)-(-tmp111));
+				iv->di->default_us_window_center = iv->di->us_window_center = ((tmp110 / 2.0) - (-tmp111));
 				iv->di->default_us_window_width  = iv->di->us_window_width  = tmp110;
 			}
-			else // TODO check again
+			else
 			{
-				iv->di->default_us_window_center = iv->di->us_window_center = 0.5*iv->di->vmax;
+				iv->di->default_us_window_center = iv->di->us_window_center = 0.5 * iv->di->vmax;
 				iv->di->default_us_window_width  = iv->di->us_window_width  = fabs(iv->di->vmax);
 			}
 		}
@@ -237,13 +309,13 @@ template<typename T> void calculate_min_max(
 	}
 	//
 	iv->di->window_center =
-		(iv->di->us_window_center+(-iv->di->rmin))/rmax_minus_rmin;
-	iv->di->window_width  = iv->di->us_window_width/rmax_minus_rmin;
+		(iv->di->us_window_center + (-iv->di->rmin)) / rmax_minus_rmin;
+	iv->di->window_width  = iv->di->us_window_width / rmax_minus_rmin;
 	if (iv->di->window_width  <= 0) iv->di->window_width  = 1e-6;
 	if (iv->di->window_width   > 1) iv->di->window_width  = 1.0;
 	if (iv->di->window_center  < 0) iv->di->window_center = 0.0;
 	if (iv->di->window_center  > 1) iv->di->window_center = 1.0;
-	if ((iv->di->rmax-iv->di->rmin) < 3.0) iv->di->disable_int_level = true;
+	if ((iv->di->rmax - iv->di->rmin) < 3.0) iv->di->disable_int_level = true;
 	else iv->di->disable_int_level = false;
 }
 
