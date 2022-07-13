@@ -212,28 +212,30 @@ ImageCodec::GetNumberOfDimensions() const
 }
 
 bool
-ImageCodec::CleanupUnusedBits(char * data, size_t datalen)
+ImageCodec::CleanupUnusedBits(char * data8, size_t datalen)
 {
-  if (!NeedOverlayCleanup)
-    return true;
+  if (!NeedOverlayCleanup) return true;
+  void * data = data8;
+  assert(PF.GetBitsAllocated() > 8);
   if (PF.GetBitsAllocated() == 16)
   {
-    const uint16_t d = PF.GetBitsAllocated() - PF.GetBitsStored();
-    const uint16_t t = PF.GetBitsStored() - PF.GetHighBit() - 1;
-    // mask unused bits
-    const uint16_t pmask = (uint16_t)(0xffff >> d);
-    if (PF.GetPixelRepresentation() == 1)
+    // pmask: to mask the 'unused bits' (may contain overlays)
+    uint16_t pmask = 0xffff;
+    pmask = (uint16_t)(pmask >> (PF.GetBitsAllocated() - PF.GetBitsStored()));
+    if (PF.GetPixelRepresentation())
     {
-      // check sign
-      const uint16_t smask = (uint16_t)(0x0001 << (16 - (d + 1)));
-      // propagate sign bit on negative values
-      const int16_t nmask = (int16_t)(0x8000 >> (d - 1));
-      uint16_t *    start = (uint16_t *)data;
-      for (uint16_t * p = start; p != start + datalen / 2; ++p)
+      // smask: to check the 'sign' when BitsStored != BitsAllocated
+      uint16_t smask = 0x0001;
+      smask = (uint16_t)(smask << (16 - (PF.GetBitsAllocated() - PF.GetBitsStored() + 1) ));
+      // nmask: to propagate sign bit on negative values
+      int16_t nmask = (int16_t)0x8000;
+      nmask = (int16_t)(nmask >> ( PF.GetBitsAllocated() - PF.GetBitsStored() - 1));
+      uint16_t *start = (uint16_t*)data;
+      for ( uint16_t *p = start ; p != start + datalen / 2; ++p )
       {
         uint16_t c = *p;
-        c = c >> t;
-        if (c & smask)
+        c = (uint16_t)(c >> (PF.GetBitsStored() - PF.GetHighBit() - 1));
+        if ( c & smask )
         {
           c = (uint16_t)(c | nmask);
         }
@@ -244,13 +246,13 @@ ImageCodec::CleanupUnusedBits(char * data, size_t datalen)
         *p = c;
       }
     }
-    else // unsigned
+    else
     {
-      uint16_t * start = (uint16_t *)data;
-      for (uint16_t * p = start; p != start + datalen / 2; ++p)
+      uint16_t *start = (uint16_t*)data;
+      for (uint16_t *p = start ; p != start + datalen / 2; ++p)
       {
         uint16_t c = *p;
-        c = (uint16_t)((c >> t) & pmask);
+        c = (uint16_t)((c >> (PF.GetBitsStored() - PF.GetHighBit() - 1)) & pmask);
         *p = c;
       }
     }
@@ -673,60 +675,84 @@ ImageCodec::DoInvertMonochrome(std::istream & is, std::ostream & os)
   return true;
 }
 
+#if 0
+struct ApplyMask
+{
+  uint16_t operator()(uint16_t c) const
+  {
+    return (uint16_t)((c >> (BitsStored - HighBit - 1)) & pmask);
+  }
+  unsigned short BitsStored;
+  unsigned short HighBit;
+  uint16_t pmask;
+};
+#endif
+
 bool
 ImageCodec::DoOverlayCleanup(std::istream & is, std::ostream & os)
 {
+  assert( PF.GetBitsAllocated() > 8 );
   if (PF.GetBitsAllocated() == 16)
   {
-    const uint16_t d = PF.GetBitsAllocated() - PF.GetBitsStored();
-    const uint16_t t = PF.GetBitsStored() - PF.GetHighBit() - 1;
-    // mask unused bits
-    const uint16_t pmask = (uint16_t)(0xffff >> d);
-    const size_t   s16 = sizeof(uint16_t);
-    const size_t   bsize = 1000;
-    if (PF.GetPixelRepresentation() == 1)
+    // pmask: to mask the 'unused bits' (may contain overlays)
+    uint16_t pmask = 0xffff;
+    pmask = (uint16_t)(pmask >> (PF.GetBitsAllocated() - PF.GetBitsStored()));
+    if (PF.GetPixelRepresentation())
     {
-      // check sign
-      const uint16_t smask = (uint16_t)(0x0001 << (16 - (d + 1)));
-      // propagate sign bit on negative values
-      const int16_t         nmask = (int16_t)(0x8000 >> (d - 1));
-      std::vector<uint16_t> b(bsize);
-      while (is)
+      // smask: to check the 'sign' when BitsStored != BitsAllocated
+      uint16_t smask = 0x0001;
+      smask = (uint16_t)(smask << (16 - (PF.GetBitsAllocated() - PF.GetBitsStored() + 1)));
+      // nmask: to propagate sign bit on negative values
+      int16_t nmask = (int16_t)0x8000;
+      nmask = (int16_t)(nmask >> (PF.GetBitsAllocated() - PF.GetBitsStored() - 1));
+      uint16_t c;
+      while (is.read((char*)&c, 2))
       {
-        is.read((char *)&b[0], bsize * s16);
-        std::streamsize                 read = is.gcount();
-        std::vector<uint16_t>::iterator bend = b.begin() + read / s16;
-        for (std::vector<uint16_t>::iterator it = b.begin(); it != bend; ++it)
+        c = (uint16_t)(c >> (PF.GetBitsStored() - PF.GetHighBit() - 1));
+        if (c & smask)
         {
-          uint16_t c = (*it) >> t;
-          if (c & smask)
-          {
-            c = (uint16_t)(c | nmask);
-          }
-          else
-          {
-            c = c & pmask;
-          }
-          *it = c;
+          c = (uint16_t)(c | nmask);
         }
-        os.write((char *)&b[0], read);
+        else
+        {
+          c = c & pmask;
+        }
+        os.write((char*)&c, 2);
       }
     }
-    else // unsigned
+    else
     {
-      std::vector<uint16_t> b(bsize);
+#if 1
+      // read/mask/write 1000 values at once.
+      const unsigned int bufferSize = 1000;
+      std::vector<uint16_t> buffer(bufferSize);
       while (is)
       {
-        is.read((char *)&b[0], bsize * s16);
-        std::streamsize                 rs = is.gcount();
-        std::vector<uint16_t>::iterator bend = b.begin() + rs / s16;
-        for (std::vector<uint16_t>::iterator it = b.begin(); it != bend; ++it)
+        is.read((char *)&buffer[0], bufferSize * sizeof(uint16_t));
+        std::streamsize bytesRead = is.gcount();
+        std::vector<uint16_t>::iterator validBufferEnd = buffer.begin() + bytesRead / sizeof(uint16_t);
+        for (std::vector<uint16_t>::iterator it = buffer.begin(); it != validBufferEnd; ++it)
         {
-          const uint16_t c = ((*it) >> t) & pmask;
-          *it = c;
+          *it = ((*it >> (PF.GetBitsStored() - PF.GetHighBit() - 1)) & pmask);
         }
-        os.write((char *)&b[0], rs);
+        os.write((char *)&buffer[0], bytesRead);
       }
+#else
+      //std::ostreambuf_iterator<char> end_of_stream_iterator;
+      //std::ostreambuf_iterator<char> out_iter(os.rdbuf());
+      //while( out_iter != end_of_stream_iterator )
+      //{
+      //  *out_iter = (*out_iter >> (PF.GetBitsStored() - PF.GetHighBit() - 1)) & pmask;
+      //}
+      std::istreambuf_iterator<int> it_in(is);
+      std::istreambuf_iterator<int> eos;
+      std::ostreambuf_iterator<int> it_out(os);
+      ApplyMask am;
+      am.BitsStored = PF.GetBitsStored();
+      am.HighBit = PF.GetHighBit();
+      am.pmask = pmask;
+      std::transform(it_in, eos, it_out, am);
+#endif
     }
   }
   else
