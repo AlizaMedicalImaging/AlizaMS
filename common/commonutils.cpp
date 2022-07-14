@@ -116,9 +116,8 @@ template<typename T> void calculate_min_max(
 					iv->di->rmax = tmp0 - 1;
 					if (cubemin < iv->di->rmin || cubemax > iv->di->rmax)
 					{
-						std::cout << "Warning: bits stored=" << iv->di->bits_stored
-							<< ", but min=" << cubemin
-							<< ", max=" << cubemax << std::endl;
+						std::cout << "Warning: bits stored = " << iv->di->bits_stored
+							<< ", min = " << cubemin << ", max = " << cubemax << std::endl;
 						iv->di->rmin = SHRT_MIN;
 						iv->di->rmax = SHRT_MAX;
 					}
@@ -140,8 +139,8 @@ template<typename T> void calculate_min_max(
 					iv->di->rmax = pow(2, (iv->di->bits_stored)) - 1;
 					if (cubemax > iv->di->rmax)
 					{
-						std::cout << "Warning: bits stored=" << iv->di->bits_stored
-							<< ", but max=" << cubemax << std::endl;
+						std::cout << "Warning: bits stored = " << iv->di->bits_stored
+							<< ", min = 0, max = " << cubemax << std::endl;
 						iv->di->rmax = USHRT_MAX;
 					}
 				}
@@ -162,8 +161,8 @@ template<typename T> void calculate_min_max(
 					iv->di->rmax = pow(2, (iv->di->bits_stored)) - 1;
 					if (cubemax > iv->di->rmax)
 					{
-						std::cout << "Warning: bits stored=" << iv->di->bits_stored
-							<< ", but max=" << cubemax << std::endl;
+						std::cout << "Warning: bits stored = " << iv->di->bits_stored
+							<< ", min = 0, max = " << cubemax << std::endl;
 						iv->di->rmax = UCHAR_MAX;
 					}
 				}
@@ -206,9 +205,8 @@ template<typename T> void calculate_min_max(
 					const double rmax = tmp0 - 1;
 					if (cubemin < rmin || cubemax > rmax)
 					{
-						std::cout << "Warning: bits stored=" << iv->di->bits_stored
-							<< ", but min=" << cubemin
-							<< ", max=" << cubemax << std::endl;
+						std::cout << "Warning: bits stored = " << iv->di->bits_stored
+							<< ", min = " << cubemin << ", max = " << cubemax << std::endl;
 					}
 				}
 			}
@@ -222,8 +220,8 @@ template<typename T> void calculate_min_max(
 					const double rmax = pow(2, (iv->di->bits_stored)) - 1;
 					if (cubemax > rmax)
 					{
-						std::cout << "Warning: bits stored=" << iv->di->bits_stored
-							<< ", but max=" << cubemax << std::endl;
+						std::cout << "Warning: bits stored = " << iv->di->bits_stored
+							<< ", min = 0, max = " << cubemax << std::endl;
 					}
 				}
 			}
@@ -237,8 +235,8 @@ template<typename T> void calculate_min_max(
 					const double rmax = pow(2, (iv->di->bits_stored)) - 1;
 					if (cubemax > rmax)
 					{
-						std::cout << "Warning: bits stored=" << iv->di->bits_stored
-							<< ", but max=" << cubemax << std::endl;
+						std::cout << "Warning: bits stored = " << iv->di->bits_stored
+							<< ", min = 0, max = " << cubemax << std::endl;
 					}
 				}
 			}
