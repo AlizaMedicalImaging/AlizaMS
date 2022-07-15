@@ -715,8 +715,8 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
     at.SetFromDataElement(de);
     unsigned int pc = at.GetValue();
     if (pc &&
-        (PixelData->GetPixelFormat().GetSamplesPerPixel() != 3 ||
-         PixelData->GetPixelFormat().GetSamplesPerPixel() != 4))
+        (!(PixelData->GetPixelFormat().GetSamplesPerPixel() == 3 ||
+         PixelData->GetPixelFormat().GetSamplesPerPixel() == 4)))
     {
       mdcmDebugMacro("Cannot have PlanarConfiguration = 1");
       pc = 0;

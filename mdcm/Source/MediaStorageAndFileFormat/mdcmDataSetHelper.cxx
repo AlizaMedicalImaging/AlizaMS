@@ -130,13 +130,14 @@ DataSetHelper::ComputeVR(const File & file, const DataSet & ds, const Tag & t)
       const Tag &               pixelrep = at.GetTag();
       assert(pixelrep < t);
       const DataSet & rootds = file.GetDataSet();
-      // TODO
+      //
       // MM: PhilipsWith15Overlays.dcm has a Private SQ with public elements such as
       // 0028,3002, so we cannot look up element in current dataset, but have to get the root dataset
       // to loop up.
-      // TODO
+      //
       // MM: mdcmDataExtra/mdcmSampleData/ImagesPapyrus/TestImages/wristb.pap
       // It's the contrary: root dataset does not have a Pixel Representation, but each SQ does.
+      //
       if (ds.FindDataElement(pixelrep))
       {
         at.SetFromDataElement(ds.GetDataElement(pixelrep));
@@ -231,6 +232,10 @@ DataSetHelper::ComputeVR(const File & file, const DataSet & ds, const Tag & t)
     }
   }
   else if (vr == VR::US_SS_OW) // TODO
+  {
+    vr = VR::OW;
+  }
+  else if (vr == VR::US_OW) // TODO
   {
     vr = VR::OW;
   }
