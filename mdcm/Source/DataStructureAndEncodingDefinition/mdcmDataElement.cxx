@@ -79,17 +79,9 @@ DataElement::SetVL(const VL & vl)
 void
 DataElement::SetVLToUndefined()
 {
-  try
-  {
-    SequenceOfItems * sqi = dynamic_cast<SequenceOfItems *>(ValueField.GetPointer());
-    if (sqi)
-      sqi->SetLengthToUndefined();
-  }
-  catch (std::bad_cast &)
-  {
-    ;
-    ;
-  }
+  SequenceOfItems * sqi = dynamic_cast<SequenceOfItems *>(ValueField.GetPointer());
+  if (sqi)
+    sqi->SetLengthToUndefined();
   ValueLengthField.SetToUndefined();
 }
 
@@ -168,7 +160,6 @@ DataElement::GetValueAsSQ() const
     return NULL;
   if (GetSequenceOfFragments())
     return NULL;
-  try
   {
     SequenceOfItems * sq = dynamic_cast<SequenceOfItems *>(ValueField.GetPointer());
     if (sq)
@@ -176,11 +167,6 @@ DataElement::GetValueAsSQ() const
       SmartPointer<SequenceOfItems> sqi = sq;
       return sqi;
     }
-  }
-  catch (std::bad_cast &)
-  {
-    ;
-    ;
   }
   const ByteValue * bv = GetByteValue();
   if (!bv)
@@ -287,32 +273,16 @@ DataElement::GetValueAsSQ() const
 const SequenceOfFragments *
 DataElement::GetSequenceOfFragments() const
 {
-  try
-  {
-    const SequenceOfFragments * sqf = dynamic_cast<SequenceOfFragments *>(ValueField.GetPointer());
-    return sqf;
-  }
-  catch (std::bad_cast &)
-  {
-    ;
-    ;
-  }
+  const SequenceOfFragments * sqf = dynamic_cast<SequenceOfFragments *>(ValueField.GetPointer());
+  if (sqf) return sqf;
   return NULL;
 }
 
 SequenceOfFragments *
 DataElement::GetSequenceOfFragments()
 {
-  try
-  {
-    SequenceOfFragments * sqf = dynamic_cast<SequenceOfFragments *>(ValueField.GetPointer());
-    return sqf;
-  }
-  catch (std::bad_cast &)
-  {
-    ;
-    ;
-  }
+  SequenceOfFragments * sqf = dynamic_cast<SequenceOfFragments *>(ValueField.GetPointer());
+  if (sqf) return sqf;
   return NULL;
 }
 
