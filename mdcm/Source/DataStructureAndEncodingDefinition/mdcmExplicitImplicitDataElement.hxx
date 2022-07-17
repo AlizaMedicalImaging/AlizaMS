@@ -134,7 +134,7 @@ ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
 #endif
     }
   }
-  catch (std::logic_error &)
+  catch (const std::logic_error &)
   {
     VRField = VR::INVALID;
     is.seekg(-2, std::ios::cur);
@@ -210,7 +210,7 @@ ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
               assert(0 && "Should not happen");
             }
           }
-          catch (std::exception & ex2)
+          catch (const std::exception & ex2)
           {
             (void)ex2;
             ValueLengthField = ValueField->GetLength();
@@ -353,7 +353,7 @@ ExplicitImplicitDataElement::ReadValue(std::istream & is, bool readvalues)
           assert(0);
         }
       }
-      catch (std::exception &)
+      catch (const std::exception &)
       {
         // Must be one of those non-cp246 file,
         // but for some reason seekg back to previous offset + Read
@@ -407,7 +407,7 @@ ExplicitImplicitDataElement::ReadValue(std::istream & is, bool readvalues)
         bsf.ByteSwap();
       }
     }
-    catch (std::exception & ex)
+    catch (const std::exception & ex)
     {
       ValueLengthField = ValueField->GetLength();
     }

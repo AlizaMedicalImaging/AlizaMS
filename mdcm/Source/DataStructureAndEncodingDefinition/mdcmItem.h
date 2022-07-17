@@ -157,7 +157,7 @@ public:
           ByteSwapFilter bsf(nested);
           bsf.ByteSwap();
         }
-        catch (ParseException &)
+        catch (const ParseException &)
         {
           // MR_Philips_Intera_PrivateSequenceExplicitVR_in_SQ_2001_e05f_item_wrong_lgt_use_NOSHADOWSEQ.dcm
           // You have to byteswap the length but not the tag...sigh

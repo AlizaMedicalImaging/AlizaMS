@@ -548,7 +548,7 @@ JPEGCodec::DecodeExtent(char *         buffer,
       }
       assert(frag.GetTag() == seqDelItem && frag.GetVL() == 0);
     }
-    catch (std::logic_error & ex)
+    catch (const std::logic_error & ex)
     {
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
       // In all cases the whole file was read, because

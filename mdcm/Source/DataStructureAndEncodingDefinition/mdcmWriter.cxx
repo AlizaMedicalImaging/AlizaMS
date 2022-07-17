@@ -90,7 +90,7 @@ Writer::Write()
       {
         duplicate.FillFromDataSet(DS);
       }
-      catch (std::logic_error & ex)
+      catch (const std::logic_error & ex)
       {
         mdcmAlwaysWarnMacro("Could not recreate the File Meta Header, please report:" << ex.what());
         std::locale::global(current_locale);
@@ -156,7 +156,7 @@ Writer::Write()
       }
     }
   }
-  catch (std::exception & ex)
+  catch (const std::exception & ex)
   {
     mdcmAlwaysWarnMacro(ex.what());
     std::locale::global(current_locale);

@@ -383,7 +383,7 @@ Reader::InternalReadCommon(const T_Caller & caller)
     {
       F->GetHeader().GetPreamble().Read(is);
     }
-    catch (std::exception &)
+    catch (const std::exception &)
     {
       // return to beginning of file, hopefully this file is simply missing preamble
       is.clear();
@@ -405,7 +405,7 @@ Reader::InternalReadCommon(const T_Caller & caller)
           hasmetaheader = true;
           assert(!F->GetHeader().IsEmpty());
         }
-        catch (std::exception & ex)
+        catch (const std::exception & ex)
         {
           mdcmWarningMacro(ex.what());
           // weird implicit meta header
@@ -416,7 +416,7 @@ Reader::InternalReadCommon(const T_Caller & caller)
           {
             F->GetHeader().ReadCompat(is);
           }
-          catch (std::exception & ex2)
+          catch (const std::exception & ex2)
           {
             // no meta header
             mdcmAlwaysWarnMacro(ex2.what());
@@ -428,7 +428,7 @@ Reader::InternalReadCommon(const T_Caller & caller)
         F->GetHeader().ReadCompat(is);
       }
     }
-    catch (std::exception &)
+    catch (const std::exception &)
     {
       is.seekg(0, std::ios::beg);
       hasmetaheader = false;
@@ -503,7 +503,7 @@ Reader::InternalReadCommon(const T_Caller & caller)
       }
     }
     // Only catch parse exception at this point
-    catch (ParseException & ex)
+    catch (const ParseException & ex)
     {
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
       if (ex.GetLastElement().GetVR() == VR::UN && ex.GetLastElement().IsUndefinedLength())
@@ -586,7 +586,7 @@ Reader::InternalReadCommon(const T_Caller & caller)
             F->GetDataSet().Insert(ide);
             caller.template ReadCommon<VR16ExplicitDataElement, SwapperNoOp>(is);
           }
-          catch (std::logic_error &)
+          catch (const std::logic_error &)
           {
             try
             {
@@ -615,7 +615,7 @@ Reader::InternalReadCommon(const T_Caller & caller)
               F->GetDataSet().Clear();
               caller.template ReadCommon<ExplicitImplicitDataElement, SwapperNoOp>(is);
             }
-            catch (std::exception &)
+            catch (const std::exception &)
             {
               // MM: UNExplicitImplicitDataElement does not seems to be used anymore to read
               // mdcmData/TheralysMDCM120Bug.dcm, instead the code path goes into

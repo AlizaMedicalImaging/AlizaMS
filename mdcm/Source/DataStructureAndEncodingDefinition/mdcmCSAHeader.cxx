@@ -245,7 +245,7 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
         }
         assert(ss.eof());
       }
-      catch (std::exception &)
+      catch (const std::exception &)
       {
         mdcmErrorMacro("Something went wrong while decoding... please report");
         return false;

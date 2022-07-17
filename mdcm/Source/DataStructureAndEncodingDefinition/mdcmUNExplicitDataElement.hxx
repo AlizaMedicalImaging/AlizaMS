@@ -86,7 +86,7 @@ UNExplicitDataElement::ReadPreValue(std::istream & is)
       return is;
     }
   }
-  catch (std::logic_error &)
+  catch (const std::logic_error &)
   {
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
     // mdcm-MR-PHILIPS-16-Multi-Seq.dcm
@@ -166,7 +166,7 @@ UNExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
           assert(0);
         }
       }
-      catch (std::exception &)
+      catch (const std::exception &)
       {
         // Must be one of those non-cp246 file...
         // but for some reason seekg back to previous offset + Read

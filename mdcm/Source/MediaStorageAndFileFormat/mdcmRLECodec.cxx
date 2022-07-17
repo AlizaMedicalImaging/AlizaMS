@@ -935,7 +935,7 @@ RLECodec::AppendFrameEncode(std::ostream & out, const char * data, size_t datale
       }
     }
   }
-  catch (std::exception &)
+  catch (const std::exception &)
   {
     mdcmErrorMacro("Invalid compression params (not supported)");
     return false;

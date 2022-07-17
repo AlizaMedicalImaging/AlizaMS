@@ -155,7 +155,7 @@ ImplicitDataElement::ReadValue(std::istream & is, bool readvalues)
                            "TransferSyntax=Implicit for tag: "
                            << TagField);
         }
-        catch (std::logic_error &)
+        catch (const std::logic_error &)
         {
           // MR_ELSCINT1_00e1_1042_SQ_feff_00e0_Item.dcm
           std::streampos current = is.tellg();
@@ -164,7 +164,7 @@ ImplicitDataElement::ReadValue(std::istream & is, bool readvalues)
           assert(diff == -14);
           ValueIO<ImplicitDataElement, SwapperDoOp>::Read(is, *ValueField, readvalues);
         }
-        catch (std::exception &)
+        catch (const std::exception &)
         {
           ValueLengthField = ValueField->GetLength();
         }
@@ -392,7 +392,7 @@ ImplicitDataElement::ReadValueWithLength(std::istream & is, VL & length, bool re
                               "TransferSyntax=Implicit for tag: "
                               << TagField);
         }
-        catch (std::logic_error &)
+        catch (const std::logic_error &)
         {
           // MR_ELSCINT1_00e1_1042_SQ_feff_00e0_Item.dcm
           std::streampos current = is.tellg();
@@ -402,7 +402,7 @@ ImplicitDataElement::ReadValueWithLength(std::istream & is, VL & length, bool re
           assert(diff == -14);
           ValueIO<ImplicitDataElement, SwapperDoOp>::Read(is, *ValueField, readvalues);
         }
-        catch (std::exception &)
+        catch (const std::exception &)
         {
           ValueLengthField = ValueField->GetLength();
         }

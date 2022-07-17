@@ -518,7 +518,7 @@ FileMetaInformation::Read(std::istream & is)
       Insert(xde);
     }
   }
-  catch (std::exception & ex)
+  catch (const std::exception & ex)
   {
     (void)ex;
     // we've read a little bit too much. We are possibly in the case where an
@@ -740,7 +740,7 @@ FileMetaInformation::ReadCompatInternal(std::istream & is)
       {
         ComputeDataSetTransferSyntax();
       }
-      catch (std::logic_error &)
+      catch (const std::logic_error &)
       {
         // We were able to read some of the Meta Header, but failed to compute the DataSetTS
         // technically MDCM is able to cope with any value here. But be kind and try to have a good guess

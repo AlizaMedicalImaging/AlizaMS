@@ -164,7 +164,7 @@ public:
       }
       assert(frag.GetTag() == seqDelItem && frag.GetVL() == 0);
     }
-    catch (std::exception & ex)
+    catch (const std::exception & ex)
     {
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
       // In all cases the whole file was read, because

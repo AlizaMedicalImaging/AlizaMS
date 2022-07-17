@@ -44,7 +44,7 @@ DataSet::ReadNested(std::istream & is)
       InsertDataElement(de);
     }
   }
-  catch (ParseException & pe)
+  catch (const ParseException & pe)
   {
     if (pe.GetLastElement().GetTag() == Tag(0xfffe, 0xe0dd))
     {
@@ -408,7 +408,7 @@ DataSet::ReadWithLength(std::istream & is, VL & length)
       }
     }
   }
-  catch (ParseException & pe)
+  catch (const ParseException & pe)
   {
     if (pe.GetLastElement().GetTag() == Tag(0xfffe, 0xe000))
     {
@@ -442,7 +442,7 @@ DataSet::ReadWithLength(std::istream & is, VL & length)
       throw std::logic_error("Unhandled");
     }
   }
-  catch (std::logic_error & pe)
+  catch (const std::logic_error & pe)
   {
     if (strcmp(pe.what(), "Out of Range") == 0)
     {

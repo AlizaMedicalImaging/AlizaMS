@@ -92,7 +92,7 @@ VR16ExplicitDataElement::ReadPreValue(std::istream & is)
       return is;
     }
   }
-  catch (std::logic_error &)
+  catch (const std::logic_error &)
   {
     VRField = VR::INVALID;
     // mdcm-MR-PHILIPS-16-Multi-Seq.dcm
@@ -201,7 +201,7 @@ VR16ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
           assert(0);
         }
       }
-      catch (std::exception &)
+      catch (const std::exception &)
       {
         // Must be one of those non-cp246 file...
         // but for some reason seekg back to previous offset + Read
@@ -262,7 +262,7 @@ VR16ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
         bsf.ByteSwap();
       }
     }
-    catch (std::exception & ex)
+    catch (const std::exception & ex)
     {
       ValueLengthField = ValueField->GetLength();
     }

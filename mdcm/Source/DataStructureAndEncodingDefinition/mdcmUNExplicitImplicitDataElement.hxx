@@ -63,7 +63,7 @@ UNExplicitImplicitDataElement::ReadValue(std::istream & is)
   {
     // de.template ReadValue<UNExplicitDataElement,TSwap>(is);
   }
-  catch (ParseException & ex)
+  catch (const ParseException & ex)
   {
     de.SetVR(VR::INVALID); // EXTREMELY IMPORTANT
     if (ex.GetLastElement().GetTag() == Tag(0xfffe, 0xe0dd))

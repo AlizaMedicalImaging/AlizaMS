@@ -183,7 +183,7 @@ DataElement::GetValueAsSQ() const
       SmartPointer<SequenceOfItems> sqi = sq;
       return sqi;
     }
-    catch (std::logic_error &)
+    catch (const std::logic_error &)
     {
       // fix a broken dicom implementation for Philips
       const Tag itemPMSStart(0xfeff, 0x00e0);

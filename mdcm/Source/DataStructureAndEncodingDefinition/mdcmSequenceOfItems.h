@@ -157,7 +157,7 @@ public:
         {
           item.Read<TDE, TSwap>(is);
         }
-        catch (std::logic_error & ex)
+        catch (const std::logic_error & ex)
         {
           if (strcmp(ex.what(), "Changed Length") == 0)
           {
