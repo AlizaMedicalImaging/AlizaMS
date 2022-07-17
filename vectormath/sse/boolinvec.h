@@ -161,7 +161,9 @@ inline bool BoolInVec::getAsBool() const
 inline BoolInVec::operator bool() const
 #endif
 {
+#if 0
   static_assert(sizeof(bool) == 1); // just to check, probably not required
+#endif
   VECTORMATH_ALIGNED(bool b);
   memcpy(&b, &mData, sizeof(bool));
   return b;

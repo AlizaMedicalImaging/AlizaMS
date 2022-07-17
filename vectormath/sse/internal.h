@@ -80,8 +80,10 @@ static inline float bit_cast_uint2float(unsigned int i)
 #ifdef VECTORMATH_SSE_USE_STD_BIT_CAST
   return std::bit_cast<float>(i);
 #else
+#if 0
   static_assert(sizeof(unsigned int) == 4);
   static_assert(sizeof(float) == 4);
+#endif
   float f;
   memcpy(&f, &i, 4);
   return f;
