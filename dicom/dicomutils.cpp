@@ -14098,7 +14098,7 @@ QString DicomUtils::read_dicom(
 						settings,
 						pb,
 						1,
-						enh_original_frames);
+						true);
 				for (unsigned int z = 0; z < ref_ivariants.size(); ++z)
 				{
 					const int ref_ivariant_type = ref_ivariants.at(z)->image_type;
@@ -14275,7 +14275,7 @@ QString DicomUtils::read_dicom(
 							settings,
 							pb,
 							1,
-							enh_original_frames);
+							true);
 					for (unsigned int z = 0; z < ref_ivariants.size(); ++z)
 					{
 						const int ref_ivariant_type = ref_ivariants.at(z)->image_type;
