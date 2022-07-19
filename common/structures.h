@@ -893,6 +893,7 @@ public:
 	bool rescale_disabled;
 	bool modified;
 	bool ybr;
+	bool dicom_pixel_signed;
 	//
 	ImageTypeSS ::Pointer pSS; //0
 	ImageTypeUS ::Pointer pUS; //1

@@ -222,13 +222,13 @@ public:
 		const QWidget*, QProgressDialog*,
 		float);
 	static QString read_ultrasound(
-		bool*,
+		bool*, const short,
 		ImageVariant*,
 		const QStringList&,
 		const QWidget*,
 		QProgressDialog*);
 	static QString read_nuclear(
-		bool*,
+		bool*, const short,
 		ImageVariant*,
 		const QStringList&,
 		int, GLWidget*, bool,
@@ -394,6 +394,13 @@ public:
 		const bool,
 		const mdcm::Dicts&);
 	static QString generate_uid();
+	static bool read_gray_lut(
+		const mdcm::DataSet&,
+		const mdcm::Tag,
+		QList<QVariant> &,
+		QList<QVariant> &,
+		bool*,
+		bool*);
 	//
 	// Type of object processing
 	//

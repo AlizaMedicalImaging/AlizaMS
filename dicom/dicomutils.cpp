@@ -4108,6 +4108,7 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 	const mdcm::Tag tframe_of_refuid(0x0020,0x0052);
 	const mdcm::Tag tcomment(0x0020,0x4000);
 	const mdcm::Tag tinterpretation(0x0028,0x0004);
+	const mdcm::Tag tpixelrepresentation(0x0028,0x0103);
 	const mdcm::PrivateTag tprivcomment(0x0067,0x01,"ALIZA 001");
 	QString charset_tmp;
 	if (get_string_value(ds, tcharset, charset_tmp))
@@ -4375,6 +4376,11 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 				ivariant->comment += tmp0.trimmed().remove(QChar('\0'));
 			}
 		}
+	}
+	unsigned short PixelRepresentation;
+	if (get_us_value(ds, tpixelrepresentation, &PixelRepresentation))
+	{
+		if (PixelRepresentation == 1) ivariant->dicom_pixel_signed = true;
 	}
 }
 
@@ -6369,7 +6375,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 }
 
 QString DicomUtils::read_ultrasound(
-	bool * ok, ImageVariant * ivariant,
+	bool * ok, const short load_type, ImageVariant * ivariant,
 	const QStringList & images_ipp,
 	const QWidget * settings, QProgressDialog * pb)
 {
@@ -6547,7 +6553,7 @@ QString DicomUtils::read_ultrasound(
 		ivariant->image_overlays, overlays_idx,
 		ivariant->anatomy, 0, // TODO check
 		images_ipp.at(0),
-		wsettings->get_rescale(),
+		(load_type == 0 || load_type == 2 || load_type == 3) ? wsettings->get_rescale() : false,
 		pixelformat, false,
 		pi,
 		&dimx_, &dimy_, &dimz_,
@@ -6650,7 +6656,7 @@ QString DicomUtils::read_ultrasound(
 }
 
 QString DicomUtils::read_nuclear(
-	bool * ok, ImageVariant * ivariant,
+	bool * ok, const short load_type, ImageVariant * ivariant,
 	const QStringList & images_ipp,
 	int /* max_3d_tex_size */, GLWidget * /* gl */, bool /* ok3d */,
 	const QWidget * settings, QProgressDialog * pb)
@@ -6689,7 +6695,7 @@ QString DicomUtils::read_nuclear(
 	{
 		mdcm::Reader reader;
 #ifdef _WIN32
-#if (defined(_MSC_VER) && defined(ALIZA_WIN32_UNC))
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
 		reader.SetFileName(QDir::toNativeSeparators(images_ipp.at(0)).toUtf8().constData());
 #else
 		reader.SetFileName(QDir::toNativeSeparators(images_ipp.at(0)).toLocal8Bit().constData());
@@ -6750,7 +6756,7 @@ QString DicomUtils::read_nuclear(
 		ivariant->image_overlays, overlays_idx,
 		ivariant->anatomy, 0, // TODO check
 		images_ipp.at(0),
-		wsettings->get_rescale(),
+		(load_type == 0 || load_type == 2 || load_type == 3) ? wsettings->get_rescale() : false,
 		pixelformat, false,
 		pi,
 		&dimx_, &dimy_, &dimz_,
@@ -8169,6 +8175,15 @@ QString DicomUtils::read_buffer(
 	short icc_for_ybr = 0;
 	char * icc_profile = NULL;
 	unsigned int icc_size = 0;
+	//
+	const mdcm::Tag tModalityLUTSequence(0x0028, 0x3000);
+	bool has_modality_lut = false;
+	QList<QVariant> lut_descriptor;
+	QList<QVariant> lut_data;
+	bool mapped_implicit = false;
+	bool mapped_signed = false;
+	bool modality_lut_ok = false;
+	//
 	{
 		mdcm::ImageReader image_reader;
 		if (elscint)
@@ -8464,6 +8479,20 @@ QString DicomUtils::read_buffer(
 		if (pb) pb->setValue(-1);
 		qApp->processEvents();
 		//
+		{
+			// Modality LUT
+			const mdcm::File & ifile = image_reader.GetFile();
+			const mdcm::DataSet & ds = ifile.GetDataSet();
+			has_modality_lut = has_modality_lut_sq(ds);
+			if (has_modality_lut)
+			{
+				modality_lut_ok = DicomUtils::read_gray_lut(
+					ds, tModalityLUTSequence,
+					lut_descriptor, lut_data,
+					&mapped_implicit, &mapped_signed);
+			}
+		}
+		//
 		if (anatomy_idx > -1)
 		{
 			const mdcm::File & ifile = image_reader.GetFile();
@@ -8705,22 +8734,224 @@ QString DicomUtils::read_buffer(
 			}
 			else
 			{
-// FIXME Modality LUT
-//				const mdcm::DataSet & ds = image_reader.GetFile().GetDataSet();
-//				if (has_modality_lut_sq(ds))
-//				{
-//					;;
-//				}
-//				else
-//				{
+#if 1
+				// Modality LUT
+				if (has_modality_lut)
+				{
+#if 1
+					std::cout << "Modality LUT sequence" << std::endl;
+#endif
+					const unsigned short pf_ba = image_pixelformat.GetBitsAllocated();
+					if (modality_lut_ok && image_pixelformat.GetSamplesPerPixel() == 1 && (pf_ba == 8 || pf_ba == 16))
+					{
+						const bool pixel_signed = (image_pixelformat.GetPixelRepresentation() == 1);
+						const int d0 = lut_descriptor.at(0).toInt();
+						const int d1 = lut_descriptor.at(1).toInt();
+						const int d2 = lut_descriptor.at(2).toInt();
+						(void)d0;
+						(void)d2;
+						int i1 = 0;
+						bool data_possible_negative = false;
+#if 1
+						if (pixel_signed)
+						{
+							i1 = static_cast<signed short>(d1);
+							data_possible_negative = true;
+						}
+						else
+						{
+							i1 = static_cast<unsigned short>(d1);
+						}
+						(void)mapped_implicit;
+						(void)mapped_signed;
+#else
+						if (mapped_implicit)
+						{
+							if (pixel_signed)
+							{
+								i1 = static_cast<signed short>(d1);
+								data_possible_negative = true;
+							}
+							else
+							{
+								i1 = static_cast<unsigned short>(d1);
+							}
+						}
+						else
+						{
+							if (mapped_signed)
+							{
+								i1 = static_cast<signed short>(d1);
+								data_possible_negative = true;
+							}
+							else
+							{
+								i1 = static_cast<unsigned short>(d1);
+							}
+						}
+#endif
+						mdcm::PixelFormat mod_pixelformat(mdcm::PixelFormat::FLOAT32);
+						rescaled_buffer_size = dimx * dimy * dimz * (mod_pixelformat.GetBitsAllocated() / 8);
+						try
+						{
+							rescaled_buffer = new char[rescaled_buffer_size];
+						}
+						catch (const std::bad_alloc&)
+						{
+							rescaled_buffer = NULL;
+						}
+						if (!rescaled_buffer)
+						{
+							if (not_rescaled_buffer) delete [] not_rescaled_buffer;
+							if (icc_profile)         delete [] icc_profile;
+							if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
+							return QString("Buffer is NULL");
+						}
+						const size_t lut_data_s = lut_data.size();
+						if (pf_ba == 8)
+						{
+							float * tmp_data = reinterpret_cast<float*>(rescaled_buffer);
+							for (size_t x = 0; x < dimx * dimy * dimz; ++x)
+							{
+								float out = 0.0f;
+								int idx = (pixel_signed)
+									? not_rescaled_buffer[x]
+									: static_cast<unsigned char>(not_rescaled_buffer[x]);
+								if (i1 < 0)
+								{
+									idx += (-i1);
+								}
+								if (idx >= 0)
+								{
+									if ((size_t)idx < lut_data_s)
+									{
+										if (data_possible_negative)
+										{
+											out = static_cast<float>(static_cast<signed char>(
+												lut_data.at(idx).toInt()));
+										}
+										else
+										{
+											out = static_cast<float>(static_cast<unsigned char>(
+												lut_data.at(idx).toInt()));
+										}
+									}
+									else if ((size_t)idx >= lut_data_s)
+									{
+										if (data_possible_negative)
+										{
+											out = static_cast<float>(static_cast<signed char>(
+												lut_data.at(lut_data_s - 1).toInt()));
+										}
+										else
+										{
+											out = static_cast<float>(static_cast<unsigned char>(
+												lut_data.at(lut_data_s - 1).toInt()));
+										}
+									}
+								}
+								else
+								{
+									if (data_possible_negative)
+									{
+										out = static_cast<float>(static_cast<signed char>(
+											lut_data.at(0).toInt()));
+									}
+									else
+									{
+										out = static_cast<float>(
+											static_cast<unsigned char>(lut_data.at(0).toInt()));
+									}
+								}
+								tmp_data[x] = out;
+							}
+						}
+						else if (pf_ba == 16)
+						{
+							float * tmp_data = reinterpret_cast<float*>(rescaled_buffer);
+							unsigned short * tmp_not_rescaled = reinterpret_cast<unsigned short*>(not_rescaled_buffer);
+							for (size_t x = 0; x < dimx * dimy * dimz; ++x)
+							{
+								float out = 0.0f;
+								int idx = (pixel_signed)
+									? static_cast<signed short>(tmp_not_rescaled[x])
+									: tmp_not_rescaled[x];
+								if (i1 < 0)
+								{
+									idx += (-i1);
+								}
+								if (idx >= 0)
+								{
+									if ((size_t)idx < lut_data_s)
+									{
+										if (data_possible_negative)
+										{
+											out = static_cast<float>(
+												static_cast<signed short>(lut_data.at(idx).toInt()));
+										}
+										else
+										{
+											out = static_cast<float>(
+												static_cast<unsigned short>(lut_data.at(idx).toInt()));
+										}
+									}
+									else if ((size_t)idx >= lut_data_s)
+									{
+										if (data_possible_negative)
+										{
+											out = static_cast<float>(
+												static_cast<signed short>(lut_data.at(lut_data_s - 1).toInt()));
+										}
+										else
+										{
+											out = static_cast<float>(
+												static_cast<unsigned short>(lut_data.at(lut_data_s - 1).toInt()));
+										}
+									}
+								}
+								else
+								{
+									if (data_possible_negative)
+									{
+										out = static_cast<float>(
+											static_cast<signed short>(lut_data.at(0).toInt()));
+									}
+									else
+									{
+										out = static_cast<float>(
+											static_cast<unsigned short>(lut_data.at(0).toInt()));
+									}
+								}
+								tmp_data[x] = out;
+							}
+						}
+						pixelformat = mod_pixelformat;
+						buffer      = rescaled_buffer;
+						buffer_size = rescaled_buffer_size;
+						rescale_ = true;
+					}
+					else
+					{
+						std::cout << "Warning: failed to apply modality LUT" << std::endl;
+						pixelformat = image_pixelformat;
+					}
+				}
+				else
+#endif
+				{
 					pixelformat = image_pixelformat;
-//				}
+				}
 			}
 		}
 		else
 		{
+#if 1
+			*shift_tmp = rescale_intercept;
+			*scale_tmp = rescale_slope;
+#else
 			*shift_tmp = 0.0;
 			*scale_tmp = 1.0;
+#endif
 			pixelformat = image_pixelformat;
 		}
 	}
@@ -11738,6 +11969,126 @@ QString DicomUtils::generate_uid()
 	return r;
 }
 
+bool DicomUtils::read_gray_lut(
+	const mdcm::DataSet & ds,
+	const mdcm::Tag lut_seq,
+	QList<QVariant> & lut_descriptor,
+	QList<QVariant> & lut_data,
+	bool * mapped_implicit,
+	bool * mapped_signed)
+{
+	const mdcm::Tag tLUTDescriptor(0x0028,0x3002); // US or SS
+	const mdcm::Tag tLUTData(0x0028,0x3006); // US or OW
+	if (!ds.FindDataElement(lut_seq))
+	{
+		return false;
+	}
+	const mdcm::DataElement & de = ds.GetDataElement(lut_seq);
+	const mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
+	if (!sq)
+	{
+		return false;
+	}
+	const unsigned int number_of_items = sq->GetNumberOfItems();
+	if (number_of_items != 1)
+	{
+		return false;
+	}
+	const mdcm::Item & item = sq->GetItem(1);
+	const mdcm::DataSet & nds = item.GetNestedDataSet();
+	std::vector<unsigned short> LUTDescriptorUS;
+	if (!(nds.FindDataElement(tLUTDescriptor) && nds.FindDataElement(tLUTData)))
+	{
+		return false;
+	}
+	const mdcm::DataElement & deLUTDescriptor = nds.GetDataElement(tLUTDescriptor);
+	const mdcm::VR vrLUTDescriptor = deLUTDescriptor.GetVR();
+#if 0
+	std::cout << "vrLUTDescriptor=" << vrLUTDescriptor << std::endl;
+#endif
+	const bool LUTDescriptor_signed = (vrLUTDescriptor == mdcm::VR::SS);
+	if (LUTDescriptor_signed)
+	{
+		*mapped_signed = true;
+	}
+	else
+	{
+		*mapped_signed = false;
+	}
+	if (vrLUTDescriptor == mdcm::VR::INVALID || vrLUTDescriptor == mdcm::VR::UN)
+	{
+		*mapped_implicit = true;
+	}
+	else
+	{
+		*mapped_implicit = false;
+	}
+	const mdcm::DataElement & deLUTData = nds.GetDataElement(tLUTData);
+	const mdcm::VR vrLUTData = deLUTData.GetVR();
+#if 0
+	std::cout << "vrLUTData="<< vrLUTData << std::endl;
+#else
+	(void)vrLUTData;
+#endif
+	if (DicomUtils::get_us_values(nds, tLUTDescriptor, LUTDescriptorUS))
+	{
+		if (LUTDescriptorUS.size() == 3)
+		{
+			lut_descriptor.push_back(QVariant((int)LUTDescriptorUS[0]));
+			lut_descriptor.push_back(QVariant((int)LUTDescriptorUS[1]));
+			lut_descriptor.push_back(QVariant((int)LUTDescriptorUS[2]));
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return false;
+	}
+	const unsigned int lut_data_bits  = lut_descriptor.at(2).toInt();
+	const unsigned int lut_data_size0 = lut_descriptor.at(0).toInt();
+	const mdcm::DataElement & e = nds.GetDataElement(tLUTData);
+	const mdcm::ByteValue * bv = e.GetByteValue();
+	if (!bv)
+	{
+		return false;
+	}
+	const char * p = bv->GetPointer();
+	const size_t lut_data_size1 = bv->GetLength();
+	if (!p)
+	{
+		return false;
+	}
+#if 0
+	std::cout << "lut_data_bits = "  << lut_data_bits  << std::endl;
+	std::cout << "lut_data_size0 = " << lut_data_size0 << std::endl;
+	std::cout << "lut_data_size1 = " << lut_data_size1 << std::endl;
+#endif
+	if (lut_data_bits == 8 && lut_data_size0 == lut_data_size1)
+	{
+		const unsigned char * lut_data8 = reinterpret_cast<const unsigned char *>(p);
+		for (size_t x = 0; x < lut_data_size0; ++x)
+		{
+			lut_data.push_back(QVariant((int)lut_data8[x]));
+		}
+	}
+	else if (lut_data_size0 * 2 == lut_data_size1)
+	{
+		const unsigned short * lut_data16 = reinterpret_cast<const unsigned short *>(p);
+		for (size_t x = 0; x < lut_data_size0; ++x)
+		{
+			lut_data.push_back(QVariant((int)lut_data16[x]));
+		}
+	}
+	else
+	{
+		return false;
+	}
+	return true;
+}
+
 typedef struct
 {
 	int rows;
@@ -11811,7 +12162,9 @@ QString DicomUtils::read_dicom(
 	std::map<unsigned int,SliceInstance> slice_pos_map;
 	std::list<long long> slice_pos_list;
 	bool asked_about_supp_palette = false;
+#if 0
 	bool asked_about_modality_lut = false;
+#endif
 	bool load_image_ref_contour = false;
 	const float tolerance = 0.01f;
 	int count_images = 0;
@@ -12300,7 +12653,7 @@ QString DicomUtils::read_dicom(
 			icc_found_tmp1 = icc_found_tmp0;
 			localizer_tmp1 = localizer_tmp0;
 		}
-#if 1
+#if 0
 		//
 		// Warning about Modality LUT Sequence
 		//
@@ -12538,9 +12891,9 @@ QString DicomUtils::read_dicom(
 		}
 	}
 	//
-	if (ultrasound && (load_type == 0 || load_type == 3))
+	if (ultrasound)
 	{
-		// TODO PR for ultrasound
+		// TODO check PR
 		for (int x = 0; x < images.size(); ++x)
 		{
 			if (pb) pb->setValue(-1);
@@ -12554,7 +12907,7 @@ QString DicomUtils::read_dicom(
 				NULL,
 				0);
 			message_ = read_ultrasound(
-				&ok,
+				&ok, load_type,
 				ivariant,
 				images_tmp,
 				settings,
@@ -12570,7 +12923,7 @@ QString DicomUtils::read_dicom(
 			}
 		}
 	}
-	else if (nuclear && (load_type == 0 || load_type == 3))
+	else if (nuclear)
 	{
 		// TODO check PR for nuclear
 		for (int x = 0; x < images.size(); ++x)
@@ -12579,7 +12932,6 @@ QString DicomUtils::read_dicom(
 			QApplication::processEvents();
 			QStringList images_tmp;
 			images_tmp << images.at(x);
-#if 1
 			ImageVariant * ivariant = new ImageVariant(
 				CommonUtils::get_next_id(),
 				false,
@@ -12587,28 +12939,12 @@ QString DicomUtils::read_dicom(
 				NULL,
 				0);
 			message_ = read_nuclear(
-				&ok,
+				&ok, load_type,
 				ivariant,
 				images_tmp,
 				0, NULL, false,
 				settings,
 				pb);
-#else
-			ImageVariant * ivariant = new ImageVariant(
-				CommonUtils::get_next_id(),
-				ok3d,
-				!wsettings->get_3d(),
-				gl,
-				0);
-				ivariant->di->filtering = wsettings->get_filtering();
-			message_ = read_nuclear(
-				&ok,
-				ivariant,
-				images_tmp,
-				max_3d_tex_size, gl, ok3d,
-				settings,
-				pb);
-#endif
 			if (ok)
 			{
 				ivariant->filenames = QStringList(images_tmp);
@@ -12650,7 +12986,7 @@ QString DicomUtils::read_dicom(
 					settings,
 					pb,
 					tolerance,
-					false);
+					(load_type == 1) ? false : true);
 				if (ok)
 				{
 					ivariant->filenames = QStringList(images_tmp);
@@ -12923,7 +13259,7 @@ QString DicomUtils::read_dicom(
 					settings,
 					pb,
 					tolerance,
-					false);
+					(load_type == 1) ? false : true);
 			}
 		}
 	}
@@ -13076,7 +13412,7 @@ QString DicomUtils::read_dicom(
 					settings,
 					pb,
 					tolerance,
-					false);
+					(load_type == 3) ? true : false);
 				if (ok)
 				{
 					ivariant->filenames = QStringList(images_tmp);
@@ -13284,7 +13620,7 @@ QString DicomUtils::read_dicom(
 					settings,
 					pb,
 					tolerance,
-					false);
+					(load_type == 3) ? true : false);
 				if (ok)
 				{
 					ivariant->filenames = QStringList(images_tmp);
@@ -13398,7 +13734,7 @@ QString DicomUtils::read_dicom(
 					settings,
 					pb,
 					tolerance,
-					false);
+					(load_type == 3) ? true : false);
 				if (ok)
 				{
 					ivariant->filenames = QStringList(images_tmp);
@@ -13728,8 +14064,7 @@ QString DicomUtils::read_dicom(
 		{
 			if (pb)
 			{
-				pb->setLabelText(
-					QString("Searching referenced files"));
+				pb->setLabelText(QString("Searching referenced files"));
 				pb->setValue(-1);
 			}
 			QApplication::processEvents();
@@ -13746,25 +14081,32 @@ QString DicomUtils::read_dicom(
 				QApplication::processEvents();
 				QStringList ref_files;
 				for (int z = 0; z < refs.at(y).images.size(); ++z)
+				{
 					ref_files.push_back(refs.at(y).images.at(z).file);
-				if (ref_files.size() < 1)
-					continue;
+				}
+				if (ref_files.size() < 1) continue;
 				ref_files.sort();
 				std::vector<ImageVariant*> ref_ivariants;
 				const QString message_pr_ref =
 					read_dicom(
 						ref_ivariants,
 						ref_files,
-						max_3d_tex_size,
-						gl,
-						mesh_shader,
-						ok3d,
+						0,
+						NULL,
+						NULL,
+						false,
 						settings,
 						pb,
 						1,
 						enh_original_frames);
 				for (unsigned int z = 0; z < ref_ivariants.size(); ++z)
 				{
+					const int ref_ivariant_type = ref_ivariants.at(z)->image_type;
+					if (!(ref_ivariant_type >= 0 && ref_ivariant_type < 10))
+					{
+						std::cout << "Not a scalar image for GSPS, skipped" << std::endl;
+						continue;
+					}
 					if (pb) pb->setValue(-1);
 					QApplication::processEvents();
 					++count;
@@ -13779,8 +14121,8 @@ QString DicomUtils::read_dicom(
 							&spatial_transform);
 					if (pr_image)
 					{
-						pr_image->filenames = QStringList(
-							grey_softcopy_pr_files.at(x));
+						const bool pr_skip_texture = pr_image->di->skip_texture;
+						//
 						if (ref_ivariants.at(z)->di->slices_generated)
 						{
 							CommonUtils::copy_slices(
@@ -13796,12 +14138,17 @@ QString DicomUtils::read_dicom(
 						CommonUtils::copy_imagevariant_overlays(
 							pr_image,
 							ref_ivariants.at(z));
-						pr_image->modality = QString("OT");
-						pr_image->iod = QString(
-							"Grayscale Softcopy Presentation State");
+						//
+						//
+						//
+						pr_image->di->skip_texture = pr_skip_texture;
+						pr_image->iod = QString("Grayscale Softcopy Presentation State");
 						pr_image->sop = QString("");
-						pr_image->di->skip_texture = !wsettings->get_3d();
 						pr_image->rescale_disabled = false;
+						pr_image->filenames = QStringList(grey_softcopy_pr_files.at(x));
+						//
+						//
+						//
 						if (spatial_transform)
 						{
 							pr_image->equi = false;
@@ -13809,25 +14156,19 @@ QString DicomUtils::read_dicom(
 							pr_image->di->filtering = 0;
 						}
 						bool pr_load_ok = false;
-						if (pb) { pb->setValue(-1); QApplication::processEvents(); }
-						if (
-							pr_image->image_type >=  0 &&
-							pr_image->image_type <  10)
+						if (pb)
 						{
-							pr_load_ok = CommonUtils::reload_monochrome(
-								pr_image,
-								ok3d,
-								gl,
-								max_3d_tex_size,
-								wsettings->get_resize(),
-								wsettings->get_size_x(),
-								wsettings->get_size_y());
+							pb->setValue(-1);
+							QApplication::processEvents();
 						}
-						else if (pr_image->image_type == 14)
-						{
-							pr_load_ok = CommonUtils::reload_rgb_rgba(
-								pr_image);
-						}
+						pr_load_ok = CommonUtils::reload_monochrome(
+							pr_image,
+							ok3d,
+							gl,
+							max_3d_tex_size,
+							wsettings->get_resize(),
+							wsettings->get_size_x(),
+							wsettings->get_size_y());
 						if (pr_load_ok)
 						{
 							if (pr_image->equi)
@@ -13895,6 +14236,7 @@ QString DicomUtils::read_dicom(
 			{
 				return QString("");
 			}
+			// FIXME duplicated code
 			for (int x = 0; x < grey_softcopy_pr_files.size(); ++x)
 			{
 				if (pb)
@@ -13916,7 +14258,9 @@ QString DicomUtils::read_dicom(
 					QApplication::processEvents();
 					QStringList ref_files;
 					for (int z = 0; z < refs.at(y).images.size(); ++z)
+					{
 						ref_files.push_back(refs.at(y).images.at(z).file);
+					}
 					if (ref_files.size() < 1) continue;
 					ref_files.sort();
 					std::vector<ImageVariant*> ref_ivariants;
@@ -13924,16 +14268,22 @@ QString DicomUtils::read_dicom(
 						read_dicom(
 							ref_ivariants,
 							ref_files,
-							max_3d_tex_size,
-							gl,
-							mesh_shader,
-							ok3d,
+							0,
+							NULL,
+							NULL,
+							false,
 							settings,
 							pb,
 							1,
 							enh_original_frames);
 					for (unsigned int z = 0; z < ref_ivariants.size(); ++z)
 					{
+						const int ref_ivariant_type = ref_ivariants.at(z)->image_type;
+						if (!(ref_ivariant_type >= 0 && ref_ivariant_type < 10))
+						{
+							std::cout << "Not a scalar image for GSPS, skipped" << std::endl;
+							continue;
+						}
 						if (pb) pb->setValue(-1);
 						QApplication::processEvents();
 						++count;
@@ -13948,6 +14298,8 @@ QString DicomUtils::read_dicom(
 								&spatial_transform);
 						if (pr_image)
 						{
+							const bool pr_skip_texture = pr_image->di->skip_texture;
+							//
 							if (ref_ivariants.at(z)->di->slices_generated)
 							{
 								CommonUtils::copy_slices(
@@ -13963,12 +14315,17 @@ QString DicomUtils::read_dicom(
 							CommonUtils::copy_imagevariant_overlays(
 								pr_image,
 								ref_ivariants.at(z));
-							pr_image->modality = QString("OT");
-							pr_image->iod = QString(
-								"Grayscale Softcopy Presentation State");
+							//
+							//
+							//
+							pr_image->di->skip_texture = pr_skip_texture;
+							pr_image->iod = QString("Grayscale Softcopy Presentation State");
 							pr_image->sop = QString("");
-							pr_image->di->skip_texture = !wsettings->get_3d();
 							pr_image->rescale_disabled = false;
+							pr_image->filenames = QStringList(grey_softcopy_pr_files.at(x));
+							//
+							//
+							//
 							if (spatial_transform)
 							{
 								pr_image->equi = false;
@@ -13976,25 +14333,19 @@ QString DicomUtils::read_dicom(
 								pr_image->di->filtering = 0;
 							}
 							bool pr_load_ok = false;
-							if (pb) { pb->setValue(-1); QApplication::processEvents(); }
-							if (
-								pr_image->image_type >=  0 &&
-								pr_image->image_type <  10)
+							if (pb)
 							{
-								pr_load_ok = CommonUtils::reload_monochrome(
-									pr_image,
-									ok3d,
-									gl,
-									max_3d_tex_size,
-									wsettings->get_resize(),
-									wsettings->get_size_x(),
-									wsettings->get_size_y());
+								pb->setValue(-1);
+								QApplication::processEvents();
 							}
-							else if (pr_image->image_type == 14)
-							{
-								pr_load_ok = CommonUtils::reload_rgb_rgba(
-									pr_image);
-							}
+							pr_load_ok = CommonUtils::reload_monochrome(
+								pr_image,
+								ok3d,
+								gl,
+								max_3d_tex_size,
+								wsettings->get_resize(),
+								wsettings->get_size_x(),
+								wsettings->get_size_y());
 							if (pr_load_ok)
 							{
 								if (pr_image->equi)

@@ -299,6 +299,7 @@ ImageVariant::ImageVariant(
 	rescale_disabled = false;
 	modified = false;
 	ybr = false;
+	dicom_pixel_signed = false;
 }
 
 ImageVariant::~ImageVariant()

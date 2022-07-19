@@ -32,7 +32,9 @@
 #include "itkResampleImageFilter.h"
 #include "itkFlipImageFilter.h"
 #include "itkAffineTransform.h"
-#include <itkImageDuplicator.h>
+#include "itkInvertIntensityImageFilter.h"
+#include "itkMinimumMaximumImageCalculator.h"
+#include "itkImageDuplicator.h"
 #include <QMap>
 #include <QMultiMap>
 #include <QApplication>
@@ -43,7 +45,358 @@
 #include "mdcmItem.h"
 #include "mdcmOverlay.h"
 
-//#define APPLY_RESCALE_INTENSITY_TO_VOI_LUT
+template<typename T> QString mod_lut_filter(
+	const typename T::Pointer & image,
+	typename ImageTypeF::Pointer & out_image,
+	double shift, double scale)
+{
+	if (image.IsNull()) return QString("Image is NULL");
+	typedef itk::ShiftScaleImageFilter<T, ImageTypeF> ShiftScaleImageFilterType;
+	typename ShiftScaleImageFilterType::Pointer filter = ShiftScaleImageFilterType::New();
+	try
+	{
+		filter->SetInput(image);
+		filter->SetShift(shift);
+		filter->SetScale(scale);
+		filter->Update();
+		out_image = filter->GetOutput();
+	}
+	catch (const itk::ExceptionObject & ex)
+	{
+		return QString(ex.GetDescription());
+	}
+	if (out_image.IsNotNull()) out_image->DisconnectPipeline();
+	else return QString("Output image is NULL");
+	return QString("");
+}
+
+template<typename Tin, typename Tout> QString extract_one_slice(
+	const typename Tin::Pointer & image,
+	typename Tout::Pointer & out_image,
+	const int idx)
+{
+	if (image.IsNull()) return QString("Image is NULL");
+	typedef itk::ExtractImageFilter<Tin, Tout> FilterType;
+	const typename Tin::RegionType inRegion =
+		image->GetLargestPossibleRegion();
+	const typename Tin::SizeType size = inRegion.GetSize();
+	typename Tin::IndexType index     = inRegion.GetIndex();
+	typename Tin::RegionType outRegion;
+	typename Tin::SizeType out_size;
+	typename FilterType::Pointer filter = FilterType::New();
+	index[2] = idx;
+	out_size[0] = size[0];
+	out_size[1] = size[1];
+	out_size[2] = 0;
+	outRegion.SetSize(out_size);
+	outRegion.SetIndex(index);
+	try
+	{
+		filter->SetInput(image);
+		filter->SetExtractionRegion(outRegion);
+		filter->SetDirectionCollapseToIdentity();
+		filter->Update();
+		out_image = filter->GetOutput();
+	}
+	catch (const itk::ExceptionObject & ex)
+	{
+		return QString(ex.GetDescription());
+	}
+	if (out_image.IsNotNull()) out_image->DisconnectPipeline();
+	else return QString("Out image is NULL");
+	return QString("");
+}
+
+template<typename Tin, typename Tout> QString apply_lut(
+	const typename Tin::Pointer & image,
+	typename Tout::Pointer & out_image,
+	const QList<QVariant> & descriptor,
+	const QList<QVariant> & data,
+	const bool pixel_signed,
+	const bool mapped_implicit,
+	const bool mapped_signed)
+{
+	if (image.IsNull()) return QString("Image is NULL");
+	const int d0 = descriptor.at(0).toInt();
+	const int d1 = descriptor.at(1).toInt();
+	const int d2 = descriptor.at(2).toInt();
+	if (d2 > 16)
+	{
+		return QString("Not supported, bits = ") + QVariant(d2).toString();
+	}
+	int i1 = 0;
+	bool data_possible_negative = false;
+#if 1
+	if (pixel_signed)
+	{
+		i1 = static_cast<signed short>(d1);
+		data_possible_negative = true;
+	}
+	else
+	{
+		i1 = static_cast<unsigned short>(d1);
+	}
+	(void)mapped_implicit;
+	(void)mapped_signed;
+#else
+	if (mapped_implicit)
+	{
+		if (pixel_signed)
+		{
+			i1 = static_cast<signed short>(d1);
+			data_possible_negative = true;
+		}
+		else
+		{
+			i1 = static_cast<unsigned short>(d1);
+		}
+	}
+	else
+	{
+		if (mapped_signed)
+		{
+			i1 = static_cast<signed short>(d1);
+			data_possible_negative = true;
+		}
+		else
+		{
+			i1 = static_cast<unsigned short>(d1);
+		}
+	}
+#endif
+#if 0
+	std::cout << "i1=" << i1 << " data_possible_negative=" << (int)data_possible_negative << std::endl;
+#endif
+	try
+	{
+		out_image = Tout::New();
+		out_image->SetRegions(static_cast<typename Tout::RegionType>(image->GetLargestPossibleRegion()));
+		out_image->SetSpacing(static_cast<typename Tout::SpacingType>(image->GetSpacing()));
+		out_image->SetOrigin(static_cast<typename Tout::PointType>(image->GetOrigin()));
+		out_image->SetDirection(static_cast<typename Tout::DirectionType>(image->GetDirection()));
+		out_image->Allocate();
+		typename itk::ImageRegionConstIterator<Tin> iterator(image, image->GetLargestPossibleRegion());
+		typename itk::ImageRegionIterator<Tout> out_iterator(out_image, out_image->GetLargestPossibleRegion());
+		iterator.GoToBegin();
+		out_iterator.GoToBegin();
+		const size_t data_s = data.size();
+		if ((size_t)d0 != data_s)
+		{
+			std::cout << "Warning: LUT descriptor[0]=" << d0 << " does not match LUT data size " << data_s << std::endl;
+		}
+		while (!iterator.IsAtEnd())
+		{
+			int idx = static_cast<int>(iterator.Get());
+			float out = 0.0f;
+			if (i1 < 0)
+			{
+				idx += (-i1);
+			}
+			if (idx >= 0)
+			{
+				if ((size_t)idx < data_s)
+				{
+					if (data_possible_negative)
+					{
+						if (d2 <= 8)
+						{
+							out = static_cast<float>(static_cast<signed char>(data.at(idx).toInt()));
+						}
+						else
+						{
+							out = static_cast<float>(static_cast<signed short>(data.at(idx).toInt()));
+						}
+					}
+					else
+					{
+						if (d2 <= 8)
+						{
+							out = static_cast<float>(static_cast<unsigned char>(data.at(idx).toInt()));
+						}
+						else
+						{
+							out = static_cast<float>(static_cast<unsigned short>(data.at(idx).toInt()));
+						}
+					}
+				}
+				else if ((size_t)idx >= data_s)
+				{
+					if (data_possible_negative)
+					{
+						if (d2 <= 8)
+						{
+							out = static_cast<float>(static_cast<signed char>(data.at(data_s - 1).toInt()));
+						}
+						else
+						{
+							out = static_cast<float>(static_cast<signed short>(data.at(data_s - 1).toInt()));
+						}
+					}
+					else
+					{
+						if (d2 <= 8)
+						{
+							out = static_cast<float>(static_cast<unsigned char>(data.at(data_s - 1).toInt()));
+						}
+						else
+						{
+							out = static_cast<float>(static_cast<unsigned short>(data.at(data_s - 1).toInt()));
+						}
+					}
+				}
+			}
+			else
+			{
+				if (data_possible_negative)
+				{
+					if (d2 <= 8)
+					{
+						out = static_cast<float>(static_cast<signed char>(data.at(0).toInt()));
+					}
+					else
+					{
+						out = static_cast<float>(static_cast<signed short>(data.at(0).toInt()));
+					}
+				}
+				else
+				{
+					if (d2 <= 8)
+					{
+						out = static_cast<float>(static_cast<unsigned char>(data.at(0).toInt()));
+					}
+					else
+					{
+						out = static_cast<float>(static_cast<unsigned short>(data.at(0).toInt()));
+					}
+				}
+			}
+			out_iterator.Set(out);
+			++out_iterator;
+			++iterator;
+		}
+	}
+	catch (const itk::ExceptionObject & ex)
+	{
+		return QString(ex.GetDescription());
+	}
+	return QString("");
+}
+
+template<typename T> QString inverse_filter(
+	const typename T::Pointer & image,
+	typename T::Pointer & out_image)
+{
+	if (image.IsNull()) return QString("image.IsNull()");
+	typedef itk::InvertIntensityImageFilter<T, T> InvertIntensityFilterType;
+	typedef itk::MinimumMaximumImageCalculator<T> MinMaxCalculator;
+	typedef itk::ShiftScaleImageFilter<T, T> ShiftScaleImageFilterType;
+	typename MinMaxCalculator::Pointer min_max_calculator = MinMaxCalculator::New();
+	double min_ = 0.0;
+	double max_ = 0.0;
+	try
+	{
+		min_max_calculator->SetImage(image);
+		min_max_calculator->SetRegion(image->GetLargestPossibleRegion());
+		min_max_calculator->Compute();
+		min_ = min_max_calculator->GetMinimum();
+		max_ = min_max_calculator->GetMaximum();
+	}
+	catch (const itk::ExceptionObject & ex)
+	{
+		return QString(ex.GetDescription());
+	}
+	if (min_ < 0.0)
+	{
+		typename T::Pointer tmp0;
+		typename T::Pointer tmp1;
+		{
+			typename ShiftScaleImageFilterType::Pointer filter = ShiftScaleImageFilterType::New();
+			try
+			{
+				filter->SetInput(image);
+				filter->SetShift(static_cast<typename T::PixelType>(-min_));
+				filter->SetScale(static_cast<typename T::PixelType>(1.0));
+				filter->Update();
+				tmp0 = filter->GetOutput();
+			}
+			catch (const itk::ExceptionObject & ex)
+			{
+				return QString(ex.GetDescription());
+			}
+		}
+		{
+			typename InvertIntensityFilterType::Pointer filter = InvertIntensityFilterType::New();
+			try
+			{
+				filter->SetInput(tmp0);
+				filter->SetMaximum(static_cast<typename T::PixelType>(max_ + (-min_)));
+				filter->Update();
+				tmp1 = filter->GetOutput();
+			}
+			catch (const itk::ExceptionObject & ex)
+			{
+				return QString(ex.GetDescription());
+			}
+		}
+		{
+			tmp0->DisconnectPipeline();
+			tmp0 = NULL;
+			typename ShiftScaleImageFilterType::Pointer filter = ShiftScaleImageFilterType::New();
+			try
+			{
+				filter->SetInput(tmp1);
+				filter->SetShift(static_cast<typename T::PixelType>(min_));
+				filter->SetScale(static_cast<typename T::PixelType>(1.0));
+				filter->Update();
+				out_image = filter->GetOutput();
+			}
+			catch (const itk::ExceptionObject & ex)
+			{
+				return QString(ex.GetDescription());
+			}
+			tmp1->DisconnectPipeline();
+		}
+	}
+	else
+	{
+		typename InvertIntensityFilterType::Pointer filter = InvertIntensityFilterType::New();
+		try
+		{
+			filter->SetInput(image);
+			filter->SetMaximum(static_cast<typename T::PixelType>(max_));
+			filter->Update();
+			out_image = filter->GetOutput();
+		}
+		catch (const itk::ExceptionObject & ex)
+		{
+			return QString(ex.GetDescription());
+		}
+	}
+	if (out_image.IsNotNull()) out_image->DisconnectPipeline();
+	else return QString("Output image is NULL");
+	return QString("");
+}
+
+template<typename T> bool is_signed(const typename T::Pointer & image)
+{
+	if (image.IsNull()) return false;
+	typedef itk::MinimumMaximumImageCalculator<T> MinMaxCalculator;
+	typename MinMaxCalculator::Pointer min_max_calculator = MinMaxCalculator::New();
+	double min_ = 0.0;
+	try
+	{
+		min_max_calculator->SetImage(image);
+		min_max_calculator->SetRegion(image->GetLargestPossibleRegion());
+		min_max_calculator->Compute();
+		min_ = min_max_calculator->GetMinimum();
+	}
+	catch (const itk::ExceptionObject & ex)
+	{
+		std::cout << ex.GetDescription() << std::endl;
+		return false;
+	}
+	return (min_ < 0);
+}
 
 template<typename T> void set_spacing(
 	typename T::Pointer & image,
@@ -67,229 +420,6 @@ template<typename T> void set_asp_ratio(
 	image->SetSpacing(s);
 }
 
-#if 0
-template<typename T> void set_darea(
-	ImageVariant * v,
-	const typename T::Pointer & image,
-	int areaTLx,
-	int areaTLy,
-	int areaBRx,
-	int areaBRy)
-{
-	if (!v) return;
-	if (image.IsNull()) return;
-	const typename T::SizeType s =
-		image->GetLargestPossibleRegion().GetSize();
-	const int dimz = s[2];
-	for (int x = 0; x < dimz; ++x)
-	{
-		PRDisplayArea a;
-		a.top_left_x     = areaTLx;
-		a.top_left_y     = areaTLy;
-		a.bottom_right_x = areaBRx;
-		a.bottom_right_y = areaBRy;
-		v->pr_display_areas[x] = a;
-	}
-}
-#endif
-
-template<typename T> QString to_rgb(
-	typename RGBImageTypeUC::Pointer & rgb_image,
-	const typename T::Pointer & image)
-{
-	if (image.IsNull()) return QString("Image is NULL");
-	try
-	{
-		rgb_image = RGBImageTypeUC::New();
-		rgb_image->SetRegions(
-			static_cast<typename RGBImageTypeUC::RegionType>(
-				image->GetLargestPossibleRegion()));
-		rgb_image->SetSpacing(
-			static_cast<typename RGBImageTypeUC::SpacingType>(
-				image->GetSpacing()));
-		rgb_image->SetOrigin(
-			static_cast<typename RGBImageTypeUC::PointType>(
-				image->GetOrigin()));
-		rgb_image->SetDirection(
-			static_cast<typename RGBImageTypeUC::DirectionType>(
-				image->GetDirection()));
-		rgb_image->Allocate();
-		typename itk::ImageRegionConstIterator<T> iterator(
-			image, image->GetLargestPossibleRegion());
-		typename itk::ImageRegionIterator<RGBImageTypeUC> rgb_iterator(
-			rgb_image, rgb_image->GetLargestPossibleRegion());
-		iterator.GoToBegin();
-		rgb_iterator.GoToBegin();
-		while(!iterator.IsAtEnd())
-		{
-			const unsigned char c =
-				static_cast<unsigned char>(iterator.Get());
-			RGBPixelUC pixel;
-			pixel.SetRed(c);
-			pixel.SetGreen(c);
-			pixel.SetBlue(c);
-			rgb_iterator.Set(pixel);
-			++rgb_iterator;
-			++iterator;
-		}
-	}
-	catch (const itk::ExceptionObject & ex)
-	{
-		return QString(ex.GetDescription());
-	}
-	return QString("");
-}
-
-template<typename T> QString intensity_filter2(
-	const typename T::Pointer & image,
-	typename ImageTypeF::Pointer & out_image,
-	double shift, double scale)
-{
-	if (image.IsNull()) return QString("Image is NULL");
-	typedef itk::ShiftScaleImageFilter<T, ImageTypeF>
-		ShiftScaleImageFilterType;
-	typename ShiftScaleImageFilterType::Pointer filter =
-		ShiftScaleImageFilterType::New();
-	try
-	{
-		filter->SetInput(image);
-		filter->SetShift(shift);
-		filter->SetScale(scale);
-		filter->Update();
-		out_image = filter->GetOutput();
-	}
-	catch (const itk::ExceptionObject & ex)
-	{
-		return QString(ex.GetDescription());
-	}
-	if (out_image.IsNotNull()) out_image->DisconnectPipeline();
-	else return QString("Output image is NULL");
-	return QString("");
-}
-
-#if 0
-template<typename T> QString to_char(
-	const typename T::Pointer & image,
-	typename ImageTypeUC::Pointer & out_image,
-	double width_, double center_)
-{
-	if (image.IsNull()) return QString("Image is NULL");
-	typedef  itk::IntensityWindowingImageFilter<T, ImageTypeUC>
-		FilterType;
-	typename FilterType::Pointer filter0 = FilterType::New();
-#ifdef APPLY_RESCALE_INTENSITY_TO_VOI_LUT
-	typedef  itk::RescaleIntensityImageFilter<ImageTypeUC, ImageTypeUC>
-		RescaleFilterType;
-	typename RescaleFilterType::Pointer filter1 = RescaleFilterType::New();
-#endif
-	try
-	{
-		filter0->SetInput(image);
-		filter0->SetWindowLevel(
-			static_cast<typename T::PixelType>(width_),
-			static_cast<typename T::PixelType>(center_));
-		filter0->SetOutputMinimum(static_cast<
-			typename ImageTypeUC::PixelType>(0));
-		filter0->SetOutputMaximum(static_cast<
-			typename ImageTypeUC::PixelType>(255));
-#ifdef APPLY_RESCALE_INTENSITY_TO_VOI_LUT
-		filter1->SetInput(filter0->GetOutput());
-		filter1->Update();
-		out_image = filter1->GetOutput();
-#else
-		filter0->Update();
-		out_image = filter0->GetOutput();
-#endif
-	}
-	catch (const itk::ExceptionObject & ex)
-	{
-		return QString( ex.GetDescription());
-	}
-	if (out_image.IsNotNull()) out_image->DisconnectPipeline();
-	else return QString("Output image is NULL");
-	return QString("");
-}
-#endif
-
-#if 0
-template<typename T> QString to_char_sigm(
-	const typename T::Pointer & image,
-	typename ImageTypeUC::Pointer & out_image,
-	double width_, double center_)
-{
-	if (image.IsNull()) return QString("Image is NULL");
-	typedef itk::Sigmoid2ImageFilter<T, ImageTypeUC> FilterType;
-	typename FilterType::Pointer filter0 = FilterType::New();
-#ifdef APPLY_RESCALE_INTENSITY_TO_VOI_LUT
-	typedef itk::RescaleIntensityImageFilter<ImageTypeUC, ImageTypeUC>
-		RescaleFilterType;
-	typename RescaleFilterType::Pointer filter1 = RescaleFilterType::New();
-#endif
-	try
-	{
-		filter0->SetInput(image);
-		filter0->SetAlpha(static_cast<typename T::PixelType>(width_));
-		filter0->SetBeta(static_cast<typename T::PixelType>(center_));
-		filter0->SetOutputMinimum(static_cast<
-			typename ImageTypeUC::PixelType>(0));
-		filter0->SetOutputMaximum(static_cast<
-			typename ImageTypeUC::PixelType>(255));
-#ifdef APPLY_RESCALE_INTENSITY_TO_VOI_LUT
-		filter1->SetInput(filter0->GetOutput());
-		filter1->Update();
-		out_image = filter1->GetOutput();
-#else
-		filter0->Update();
-		out_image = filter0->GetOutput();
-#endif
-	}
-	catch (const itk::ExceptionObject & ex)
-	{
-		return QString( ex.GetDescription());
-	}
-	if (out_image.IsNotNull()) out_image->DisconnectPipeline();
-	else return QString("Output image is NULL");
-	return QString("");
-}
-#endif
-
-template<typename Tin, typename Tout> QString extract_one_slice(
-	const typename Tin::Pointer & image,
-	typename Tout::Pointer & out_image,
-	const int idx)
-{
-	if (image.IsNull()) return QString("Image is NULL");
-	typedef itk::ExtractImageFilter<Tin, Tout> FilterType;
-	const typename Tin::RegionType inRegion =
-		image->GetLargestPossibleRegion();
-	const typename Tin::SizeType size = inRegion.GetSize();
-	typename Tin::IndexType index     = inRegion.GetIndex();
-	typename Tin::RegionType outRegion;
-	typename Tin::SizeType out_size;
-	typename FilterType::Pointer filter = FilterType::New();
-	index[2] = idx;
-	out_size[0]=size[0];
-	out_size[1]=size[1];
-	out_size[2]=0;
-	outRegion.SetSize(out_size);
-	outRegion.SetIndex(index);
-	try
-	{
-		filter->SetInput(image);
-		filter->SetExtractionRegion(outRegion);
-		filter->SetDirectionCollapseToIdentity();
-		filter->Update();
-		out_image = filter->GetOutput();
-	}
-	catch (const itk::ExceptionObject & ex)
-	{
-		return QString(ex.GetDescription());
-	}
-	if (out_image.IsNotNull()) out_image->DisconnectPipeline();
-	else return QString("Out image is NULL");
-	return QString("");
-}
-
 static void rotate_flip_points(
 	ImageVariant * ivariant,
 	const double rotation,
@@ -309,26 +439,22 @@ static void rotate_flip_points(
 		int ay = 0;
 		int px = 0;
 		int py = 0;
-		double cx = 0 + dx / 2.0;
-		double cy = 0 + dy / 2.0;
+		double cx = dx / 2.0;
+		double cy = dy / 2.0;
 		if (ivariant->pr_display_areas.contains(z))
 		{
 			if (!(
 				ivariant->pr_display_areas.value(z).top_left_x == 1 &&
 				ivariant->pr_display_areas.value(z).top_left_y == 1 &&
-				dx == ivariant->pr_display_areas.value(z)
-					.bottom_right_x &&
-				dy == ivariant->pr_display_areas.value(z)
-					.bottom_right_y))
+				dx == ivariant->pr_display_areas.value(z).bottom_right_x &&
+				dy == ivariant->pr_display_areas.value(z).bottom_right_y))
 			{
-				ax = ivariant->pr_display_areas.value(z).bottom_right_x -
-						ivariant->pr_display_areas.value(z).top_left_x;
-				ay = ivariant->pr_display_areas.value(z).bottom_right_y -
-						ivariant->pr_display_areas.value(z).top_left_y;
+				ax = ivariant->pr_display_areas.value(z).bottom_right_x - ivariant->pr_display_areas.value(z).top_left_x;
+				ay = ivariant->pr_display_areas.value(z).bottom_right_y - ivariant->pr_display_areas.value(z).top_left_y;
 				px = ivariant->pr_display_areas.value(z).top_left_x;
 				py = ivariant->pr_display_areas.value(z).top_left_y;
-				cx = 0 + px + ax/2.0;
-				cy = 0 + py + ay/2.0;
+				cx = px + (ax / 2.0);
+				cy = py + (ay / 2.0);
 			}
 		}
 		else
@@ -367,8 +493,7 @@ static void rotate_flip_points(
 		}
 		if (rotation != 0)
 		{
-			TransformType::Pointer transform =
-				TransformType::New();
+			TransformType::Pointer transform = TransformType::New();
 			TransformType::OutputVectorType translation1;
 			translation1[0] = -cx;
 			translation1[1] = -cy;
@@ -382,46 +507,31 @@ static void rotate_flip_points(
 			transform->Translate(translation2, false);
 			if (idx0 >= -1)
 			{
-				const int j =
-					ivariant->pr_text_annotations
-						.value(idx0).size();
+				const int j = ivariant->pr_text_annotations.value(idx0).size();
 				for (int k = 0; k < j; ++k)
 				{
-					if (ivariant->pr_text_annotations
-						.value(idx0)
-						.at(k)
-						.BoundingBoxAnnotationUnits == QString("PIXEL"))
+					if (ivariant->pr_text_annotations.value(idx0).at(k).BoundingBoxAnnotationUnits == QString("PIXEL"))
 					{
 						{
 							TransformType::InputPointType in;
-							in[0] = ivariant->pr_text_annotations
-								.value(idx0)
-								.at(k)
-								.bb_top_left_x;
-							in[1] = ivariant->pr_text_annotations
-								.value(idx0)
-								.at(k)
-								.bb_top_left_y;
-							TransformType::OutputPointType out =
-								transform->TransformPoint(in);
+							in[0] = ivariant->pr_text_annotations.value(idx0).at(k).bb_top_left_x;
+							in[1] = ivariant->pr_text_annotations.value(idx0).at(k).bb_top_left_y;
+							TransformType::OutputPointType out = transform->TransformPoint(in);
 							if (flip)
 							{
 								if (out[0] < cx)
 								{
-									const double ix = out[0] + 2*(cx - out[0]);
-									ivariant->pr_text_annotations[idx0][k]
-										.bb_top_left_x = ix;
+									const double ix = out[0] + 2 * (cx - out[0]);
+									ivariant->pr_text_annotations[idx0][k].bb_top_left_x = ix;
 								}
 								else if (out[0] > cx)
 								{
-									const double ix = out[0] - 2*(out[0] - cx);
-									ivariant->pr_text_annotations[idx0][k]
-										.bb_top_left_x = ix;
+									const double ix = out[0] - 2 * (out[0] - cx);
+									ivariant->pr_text_annotations[idx0][k].bb_top_left_x = ix;
 								}
 								else
 								{
-									ivariant->pr_text_annotations[idx0][k]
-										.bb_top_left_x = out[0];
+									ivariant->pr_text_annotations[idx0][k].bb_top_left_x = out[0];
 								}
 								ivariant->pr_text_annotations[idx0][k].bb_top_left_y = out[1];
 							}
@@ -433,34 +543,24 @@ static void rotate_flip_points(
 						}
 						{
 							TransformType::InputPointType in;
-							in[0] = ivariant->pr_text_annotations
-								.value(idx0)
-								.at(k)
-								.bb_bottom_right_x;
-							in[1] = ivariant->pr_text_annotations
-								.value(idx0)
-								.at(k)
-								.bb_bottom_right_y;
-							TransformType::OutputPointType out =
-								transform->TransformPoint(in);
+							in[0] = ivariant->pr_text_annotations.value(idx0).at(k).bb_bottom_right_x;
+							in[1] = ivariant->pr_text_annotations.value(idx0).at(k).bb_bottom_right_y;
+							TransformType::OutputPointType out = transform->TransformPoint(in);
 							if (flip)
 							{
 								if (out[0] < cx)
 								{
-									const double ix = out[0] + 2*(cx - out[0]);
-									ivariant->pr_text_annotations[idx0][k]
-										.bb_bottom_right_x = ix;
+									const double ix = out[0] + 2 * (cx - out[0]);
+									ivariant->pr_text_annotations[idx0][k].bb_bottom_right_x = ix;
 								}
 								else if (out[0] > cx)
 								{
-									const double ix = out[0] - 2*(out[0] - cx);
-									ivariant->pr_text_annotations[idx0][k]
-										.bb_bottom_right_x = ix;
+									const double ix = out[0] - 2 * (out[0] - cx);
+									ivariant->pr_text_annotations[idx0][k].bb_bottom_right_x = ix;
 								}
 								else
 								{
-									ivariant->pr_text_annotations[idx0][k]
-										.bb_bottom_right_x = out[0];
+									ivariant->pr_text_annotations[idx0][k].bb_bottom_right_x = out[0];
 								}
 								ivariant->pr_text_annotations[idx0][k].bb_bottom_right_y = out[1];
 							}
@@ -477,34 +577,24 @@ static void rotate_flip_points(
 						.AnchorPointAnnotationUnits == QString("PIXEL"))
 					{
 						TransformType::InputPointType in;
-						in[0] = ivariant->pr_text_annotations
-							.value(idx0)
-							.at(k)
-							.anchor_x;
-						in[1] = ivariant->pr_text_annotations
-							.value(idx0)
-							.at(k)
-							.anchor_y;
-						TransformType::OutputPointType out =
-							transform->TransformPoint(in);
+						in[0] = ivariant->pr_text_annotations.value(idx0).at(k).anchor_x;
+						in[1] = ivariant->pr_text_annotations.value(idx0).at(k).anchor_y;
+						TransformType::OutputPointType out = transform->TransformPoint(in);
 						if (flip)
 						{
 							if (out[0] < cx)
 							{
-								const double ix = out[0] + 2*(cx - out[0]);
-								ivariant->pr_text_annotations[idx0][k]
-									.anchor_x = ix;
+								const double ix = out[0] + 2 * (cx - out[0]);
+								ivariant->pr_text_annotations[idx0][k].anchor_x = ix;
 							}
 							else if (out[0] > cx)
 							{
-								const double ix = out[0] - 2*(out[0] - cx);
-								ivariant->pr_text_annotations[idx0][k]
-									.anchor_x = ix;
+								const double ix = out[0] - 2 * (out[0] - cx);
+								ivariant->pr_text_annotations[idx0][k].anchor_x = ix;
 							}
 							else
 							{
-								ivariant->pr_text_annotations[idx0][k]
-									.anchor_x = out[0];
+								ivariant->pr_text_annotations[idx0][k].anchor_x = out[0];
 							}
 							ivariant->pr_text_annotations[idx0][k].anchor_y = out[1];
 						}
@@ -518,69 +608,45 @@ static void rotate_flip_points(
 			}
 			if (idx1 >= -1)
 			{
-				const int j =
-					ivariant->pr_graphicobjects
-						.value(idx1).size();
+				const int j = ivariant->pr_graphicobjects.value(idx1).size();
 				for (int k = 0; k < j; ++k)
 				{
-					if ((ivariant->pr_graphicobjects
-							.value(idx1)
-							.at(k)
-							.GraphicAnnotationUnits == QString("PIXEL"))
+					if ((ivariant->pr_graphicobjects.value(idx1).at(k).GraphicAnnotationUnits == QString("PIXEL"))
 						&&
-						(ivariant->pr_graphicobjects
-							.value(idx1)
-							.at(k)
-							.GraphicData.empty() == false)
+						(ivariant->pr_graphicobjects.value(idx1).at(k).GraphicData.empty() == false)
 						&&
-						(ivariant->pr_graphicobjects
-							.value(idx1)
-							.at(k)
-							.GraphicData.size()%2 == 0))
+						(ivariant->pr_graphicobjects.value(idx1).at(k).GraphicData.size()%2 == 0))
 					{
 						for (unsigned int u = 0;
-								u < ivariant->pr_graphicobjects
-									.value(idx1)
-									.at(k)
-									.GraphicData.size();
+								u < ivariant->pr_graphicobjects.value(idx1).at(k).GraphicData.size();
 								u+=2)
 						{
 							TransformType::InputPointType in;
-							in[0] = ivariant->pr_graphicobjects
-								.value(idx1)
-								.at(k)
-								.GraphicData.at(u);
-							in[1] = ivariant->pr_graphicobjects
-								.value(idx1)
-								.at(k)
-								.GraphicData.at(u+1);
-							TransformType::OutputPointType out =
-								transform->TransformPoint(in);
+							in[0] = ivariant->pr_graphicobjects.value(idx1).at(k).GraphicData.at(u);
+							in[1] = ivariant->pr_graphicobjects.value(idx1).at(k).GraphicData.at(u+1);
+							TransformType::OutputPointType out = transform->TransformPoint(in);
 							if (flip)
 							{
 								if (out[0] < cx)
 								{
-									const double ix = out[0] + 2*(cx - out[0]);
-									ivariant->pr_graphicobjects[idx1][k]
-										.GraphicData[u] = ix;
+									const double ix = out[0] + 2 * (cx - out[0]);
+									ivariant->pr_graphicobjects[idx1][k].GraphicData[u] = ix;
 								}
 								else if (out[0] > cx)
 								{
-									const double ix = out[0] - 2*(out[0] - cx);
-									ivariant->pr_graphicobjects[idx1][k]
-										.GraphicData[u] = ix;
+									const double ix = out[0] - 2 * (out[0] - cx);
+									ivariant->pr_graphicobjects[idx1][k].GraphicData[u] = ix;
 								}
 								else
 								{
-									ivariant->pr_graphicobjects[idx1][k]
-										.GraphicData[u] = out[0];
+									ivariant->pr_graphicobjects[idx1][k].GraphicData[u] = out[0];
 								}
-								ivariant->pr_graphicobjects[idx1][k].GraphicData[u+1] = out[1];
+								ivariant->pr_graphicobjects[idx1][k].GraphicData[u + 1] = out[1];
 							}
 							else
 							{
-								ivariant->pr_graphicobjects[idx1][k].GraphicData[u]   = out[0];
-								ivariant->pr_graphicobjects[idx1][k].GraphicData[u+1] = out[1];
+								ivariant->pr_graphicobjects[idx1][k].GraphicData[u]     = out[0];
+								ivariant->pr_graphicobjects[idx1][k].GraphicData[u + 1] = out[1];
 							}
 						}
 					}
@@ -588,8 +654,7 @@ static void rotate_flip_points(
 			}
 			if (idx2 >= -1)
 			{
-				const PRDisplayShutter & a =
-					ivariant->pr_display_shutters.value(idx2);
+				const PRDisplayShutter & a = ivariant->pr_display_shutters.value(idx2);
 				if (!(
 					a.ShutterLeftVerticalEdge    == -1 &&
 					a.ShutterRightVerticalEdge   == -1 &&
@@ -599,64 +664,50 @@ static void rotate_flip_points(
 					TransformType::InputPointType in1;
 					in1[0] = (double)a.ShutterLeftVerticalEdge;
 					in1[1] = (double)a.ShutterUpperHorizontalEdge;
-					TransformType::OutputPointType out1 =
-						transform->TransformPoint(in1);
+					TransformType::OutputPointType out1 = transform->TransformPoint(in1);
 					TransformType::InputPointType in2;
 					in2[0] = (double)a.ShutterRightVerticalEdge;
 					in2[1] = (double)a.ShutterLowerHorizontalEdge;
-					TransformType::OutputPointType out2 =
-						transform->TransformPoint(in2);
+					TransformType::OutputPointType out2 = transform->TransformPoint(in2);
 					if (flip)
 					{
 						if (out1[0] < cx)
 						{
-							const double ix = out1[0] + 2*(cx - out1[0]);
-							ivariant->pr_display_shutters[idx2]
-								.ShutterLeftVerticalEdge = (int)ix;
+							const double ix = out1[0] + 2 * (cx - out1[0]);
+							ivariant->pr_display_shutters[idx2].ShutterLeftVerticalEdge = (int)ix;
 						}
 						else if (out1[0] > cx)
 						{
-							const double ix = out1[0] - 2*(out1[0] - cx);
-							ivariant->pr_display_shutters[idx2]
-								.ShutterLeftVerticalEdge = (int)ix;
+							const double ix = out1[0] - 2 * (out1[0] - cx);
+							ivariant->pr_display_shutters[idx2].ShutterLeftVerticalEdge = (int)ix;
 						}
 						else
 						{
-							ivariant->pr_display_shutters[idx2]
-								.ShutterLeftVerticalEdge = (int)out1[0];
+							ivariant->pr_display_shutters[idx2].ShutterLeftVerticalEdge = (int)out1[0];
 						}
-						ivariant->pr_display_shutters[idx2]
-							.ShutterUpperHorizontalEdge = (int)out1[1];
+						ivariant->pr_display_shutters[idx2].ShutterUpperHorizontalEdge = (int)out1[1];
 						if (out2[0] < cx)
 						{
-							const double ix = out2[0] + 2*(cx - out2[0]);
-							ivariant->pr_display_shutters[idx2]
-								.ShutterRightVerticalEdge = (int)ix;
+							const double ix = out2[0] + 2 * (cx - out2[0]);
+							ivariant->pr_display_shutters[idx2].ShutterRightVerticalEdge = (int)ix;
 						}
 						else if (out2[0] > cx)
 						{
-							const double ix = out2[0] - 2*(out2[0] - cx);
-							ivariant->pr_display_shutters[idx2]
-								.ShutterRightVerticalEdge = (int)ix;
+							const double ix = out2[0] - 2 * (out2[0] - cx);
+							ivariant->pr_display_shutters[idx2].ShutterRightVerticalEdge = (int)ix;
 						}
 						else
 						{
-							ivariant->pr_display_shutters[idx2]
-								.ShutterRightVerticalEdge = (int)out2[0];
+							ivariant->pr_display_shutters[idx2].ShutterRightVerticalEdge = (int)out2[0];
 						}
-						ivariant->pr_display_shutters[idx2]
-							.ShutterLowerHorizontalEdge = (int)out2[1];
+						ivariant->pr_display_shutters[idx2].ShutterLowerHorizontalEdge = (int)out2[1];
 					}
 					else
 					{
-						ivariant->pr_display_shutters[idx2]
-							.ShutterLeftVerticalEdge = (int)out1[0];
-						ivariant->pr_display_shutters[idx2]
-							.ShutterUpperHorizontalEdge = (int)out1[1];
-						ivariant->pr_display_shutters[idx2]
-							.ShutterRightVerticalEdge = (int)out2[0];
-						ivariant->pr_display_shutters[idx2]
-							.ShutterLowerHorizontalEdge = (int)out2[1];
+						ivariant->pr_display_shutters[idx2].ShutterLeftVerticalEdge = (int)out1[0];
+						ivariant->pr_display_shutters[idx2].ShutterUpperHorizontalEdge = (int)out1[1];
+						ivariant->pr_display_shutters[idx2].ShutterRightVerticalEdge = (int)out2[0];
+						ivariant->pr_display_shutters[idx2].ShutterLowerHorizontalEdge = (int)out2[1];
 					}
 				}
 				if (!(
@@ -667,89 +718,61 @@ static void rotate_flip_points(
 					TransformType::InputPointType in;
 					in[0] = (double)a.CenterofCircularShutter_x;
 					in[1] = (double)a.CenterofCircularShutter_y;
-					TransformType::OutputPointType out =
-						transform->TransformPoint(in);
+					TransformType::OutputPointType out = transform->TransformPoint(in);
 					if (flip)
 					{
 						if (out[0] < cx)
 						{
-							const double ix = out[0] + 2*(cx - out[0]);
-							ivariant->pr_display_shutters[idx2]
-								.CenterofCircularShutter_x =
-									(int)ix;
+							const double ix = out[0] + 2 * (cx - out[0]);
+							ivariant->pr_display_shutters[idx2].CenterofCircularShutter_x = (int)ix;
 						}
 						else if (out[0] > cx)
 						{
-							const double ix = out[0] - 2*(out[0] - cx);
-							ivariant->pr_display_shutters[idx2]
-								.CenterofCircularShutter_x =
-									(int)ix;
+							const double ix = out[0] - 2 * (out[0] - cx);
+							ivariant->pr_display_shutters[idx2].CenterofCircularShutter_x = (int)ix;
 						}
 						else
 						{
-							ivariant->pr_display_shutters[idx2]
-								.CenterofCircularShutter_x =
-									(int)out[0];
+							ivariant->pr_display_shutters[idx2].CenterofCircularShutter_x = (int)out[0];
 						}
-						ivariant->pr_display_shutters[idx2]
-							.CenterofCircularShutter_y =
-									(int)out[1];
+						ivariant->pr_display_shutters[idx2].CenterofCircularShutter_y = (int)out[1];
 					}
 					else
 					{
-						ivariant->pr_display_shutters[idx2]
-							.CenterofCircularShutter_x =
-									(int)out[0];
-						ivariant->pr_display_shutters[idx2]
-							.CenterofCircularShutter_y =
-									(int)out[1];
+						ivariant->pr_display_shutters[idx2].CenterofCircularShutter_x = (int)out[0];
+						ivariant->pr_display_shutters[idx2].CenterofCircularShutter_y = (int)out[1];
 					}
 				}
-				if ((a.VerticesofthePolygonalShutter.size() > 1) &&
-						(a.VerticesofthePolygonalShutter.size()%2 == 0))
+				if ((a.VerticesofthePolygonalShutter.size() > 1) && (a.VerticesofthePolygonalShutter.size() % 2 == 0))
 				{
-					for (unsigned int j = 0;
-						j < a.VerticesofthePolygonalShutter.size(); j+=2)
+					for (unsigned int j = 0; j < a.VerticesofthePolygonalShutter.size(); j += 2)
 					{
 						TransformType::InputPointType in;
-						in[0] = (double)a.VerticesofthePolygonalShutter.at(j+1);
+						in[0] = (double)a.VerticesofthePolygonalShutter.at(j + 1);
 						in[1] = (double)a.VerticesofthePolygonalShutter.at(j);
-						TransformType::OutputPointType out =
-							transform->TransformPoint(in);
+						TransformType::OutputPointType out = transform->TransformPoint(in);
 						if (flip)
 						{
 							if (out[0] < cx)
 							{
-								const double ix = out[0] + 2*(cx - out[0]);
-								ivariant->pr_display_shutters[idx2]
-									.VerticesofthePolygonalShutter[j+1] =
-										(int)ix;
+								const double ix = out[0] + 2 * (cx - out[0]);
+								ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j + 1] = (int)ix;
 							}
 							else if (out[0] > cx)
 							{
-								const double ix = out[0] - 2*(out[0] - cx);
-								ivariant->pr_display_shutters[idx2]
-									.VerticesofthePolygonalShutter[j+1] =
-										(int)ix;
+								const double ix = out[0] - 2 * (out[0] - cx);
+								ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j + 1] = (int)ix;
 							}
 							else
 							{
-								ivariant->pr_display_shutters[idx2]
-									.VerticesofthePolygonalShutter[j+1] =
-										(int)out[0];
+								ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j + 1] = (int)out[0];
 							}
-							ivariant->pr_display_shutters[idx2]
-								.VerticesofthePolygonalShutter[j] =
-									(int)out[1];
+							ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j] = (int)out[1];
 						}
 						else
 						{
-							ivariant->pr_display_shutters[idx2]
-								.VerticesofthePolygonalShutter[j+1] =
-									(int)out[0];
-							ivariant->pr_display_shutters[idx2]
-								.VerticesofthePolygonalShutter[j] =
-									(int)out[1];
+							ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j + 1] = (int)out[0];
+							ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j] = (int)out[1];
 						}
 					}
 				}
@@ -762,64 +785,43 @@ static void rotate_flip_points(
 				const int j = ivariant->pr_text_annotations.value(idx0).size();
 				for (int k = 0; k < j; ++k)
 				{
-					if (ivariant->pr_text_annotations
-						.value(idx0)
-						.at(k)
-						.BoundingBoxAnnotationUnits == QString("PIXEL"))
+					if (ivariant->pr_text_annotations.value(idx0).at(k).BoundingBoxAnnotationUnits == QString("PIXEL"))
 					{
-						const double in0 = ivariant->pr_text_annotations
-							.value(idx0)
-							.at(k)
-							.bb_top_left_x;
+						const double in0 = ivariant->pr_text_annotations.value(idx0).at(k).bb_top_left_x;
 						if (in0 < cx)
 						{
-							const double ix = in0 + 2*(cx - in0);
-							ivariant->pr_text_annotations[idx0][k]
-								.bb_top_left_x = ix;
+							const double ix = in0 + 2 * (cx - in0);
+							ivariant->pr_text_annotations[idx0][k].bb_top_left_x = ix;
 						}
 						else if (in0 > cx)
 						{
-							const double ix = in0 - 2*(in0 - cx);
-							ivariant->pr_text_annotations[idx0][k]
-								.bb_top_left_x = ix;
+							const double ix = in0 - 2 * (in0 - cx);
+							ivariant->pr_text_annotations[idx0][k].bb_top_left_x = ix;
 						}
-						const double in1 = ivariant->pr_text_annotations
-							.value(idx0)
-							.at(k)
-							.bb_bottom_right_x;
+						const double in1 = ivariant->pr_text_annotations.value(idx0).at(k).bb_bottom_right_x;
 						if (in1 < cx)
 						{
-							const double ix = in1 + 2*(cx - in1);
-							ivariant->pr_text_annotations[idx0][k]
-								.bb_bottom_right_x = ix;
+							const double ix = in1 + 2 * (cx - in1);
+							ivariant->pr_text_annotations[idx0][k].bb_bottom_right_x = ix;
 						}
 						else if (in1 > cx)
 						{
-							const double ix = in1 - 2*(in1 - cx);
-							ivariant->pr_text_annotations[idx0][k]
-								.bb_bottom_right_x = ix;
+							const double ix = in1 - 2 * (in1 - cx);
+							ivariant->pr_text_annotations[idx0][k].bb_bottom_right_x = ix;
 						}
 					}
-					if (ivariant->pr_text_annotations
-						.value(idx0)
-						.at(k)
-						.AnchorPointAnnotationUnits == QString("PIXEL"))
+					if (ivariant->pr_text_annotations.value(idx0).at(k).AnchorPointAnnotationUnits == QString("PIXEL"))
 					{
-						const double in0 = ivariant->pr_text_annotations
-							.value(idx0)
-							.at(k)
-							.anchor_x;
+						const double in0 = ivariant->pr_text_annotations.value(idx0).at(k).anchor_x;
 						if (in0 < cx)
 						{
-							const double ix = in0 + 2*(cx - in0);
-							ivariant->pr_text_annotations[idx0][k]
-								.anchor_x = ix;
+							const double ix = in0 + 2 * (cx - in0);
+							ivariant->pr_text_annotations[idx0][k].anchor_x = ix;
 						}
 						else if (in0 > cx)
 						{
-							const double ix = in0 - 2*(in0 - cx);
-							ivariant->pr_text_annotations[idx0][k]
-								.anchor_x = ix;
+							const double ix = in0 - 2 * (in0 - cx);
+							ivariant->pr_text_annotations[idx0][k].anchor_x = ix;
 						}
 					}
 				}
@@ -829,43 +831,26 @@ static void rotate_flip_points(
 				const int j = ivariant->pr_graphicobjects.value(idx1).size();
 				for (int k = 0; k < j; ++k)
 				{
-					if ((ivariant->pr_graphicobjects
-							.value(idx1)
-							.at(k)
-							.GraphicAnnotationUnits == QString("PIXEL"))
+					if ((ivariant->pr_graphicobjects.value(idx1).at(k).GraphicAnnotationUnits == QString("PIXEL"))
 						&&
-						(ivariant->pr_graphicobjects
-							.value(idx1)
-							.at(k)
-							.GraphicData.empty() == false)
+						(ivariant->pr_graphicobjects.value(idx1).at(k).GraphicData.empty() == false)
 						&&
-						(ivariant->pr_graphicobjects
-							.value(idx1)
-							.at(k)
-							.GraphicData.size()%2 == 0))
+						(ivariant->pr_graphicobjects.value(idx1).at(k).GraphicData.size() % 2 == 0))
 					{
 						for (unsigned int u = 0;
-								u < ivariant->pr_graphicobjects
-									.value(idx1)
-									.at(k)
-									.GraphicData.size();
+								u < ivariant->pr_graphicobjects.value(idx1).at(k).GraphicData.size();
 								u+=2)
 						{
-							const double in0 = ivariant->pr_graphicobjects
-								.value(idx1)
-								.at(k)
-								.GraphicData.at(u);
+							const double in0 = ivariant->pr_graphicobjects.value(idx1).at(k).GraphicData.at(u);
 							if (in0 < cx)
 							{
-								const double ix = in0 + 2*(cx - in0);
-								ivariant->pr_graphicobjects[idx1][k]
-									.GraphicData[u] = ix;
+								const double ix = in0 + 2 * (cx - in0);
+								ivariant->pr_graphicobjects[idx1][k].GraphicData[u] = ix;
 							}
 							else if (in0 > cx)
 							{
-								const double ix = in0 - 2*(in0 - cx);
-								ivariant->pr_graphicobjects[idx1][k]
-									.GraphicData[u] = ix;
+								const double ix = in0 - 2 * (in0 - cx);
+								ivariant->pr_graphicobjects[idx1][k].GraphicData[u] = ix;
 							}
 						}
 					}
@@ -873,43 +858,34 @@ static void rotate_flip_points(
 			}
 			if (idx2 >= -1)
 			{
-				const PRDisplayShutter & a =
-					ivariant->pr_display_shutters.value(idx2);
+				const PRDisplayShutter & a = ivariant->pr_display_shutters.value(idx2);
 				if (!(
 					a.ShutterLeftVerticalEdge    == -1 &&
 					a.ShutterRightVerticalEdge   == -1 &&
 					a.ShutterUpperHorizontalEdge == -1 &&
 					a.ShutterLowerHorizontalEdge == -1))
 				{
-					const double out1 =
-						ivariant->pr_display_shutters[idx2]
-							.ShutterLeftVerticalEdge;
-					const double out2 =
-						ivariant->pr_display_shutters[idx2]
-							.ShutterRightVerticalEdge;
+					const double out1 = ivariant->pr_display_shutters[idx2].ShutterLeftVerticalEdge;
+					const double out2 = ivariant->pr_display_shutters[idx2].ShutterRightVerticalEdge;
 					if (out1 < cx)
 					{
-						const double ix = out1 + 2*(cx - out1);
-						ivariant->pr_display_shutters[idx2]
-							.ShutterLeftVerticalEdge = (int)ix;
+						const double ix = out1 + 2 * (cx - out1);
+						ivariant->pr_display_shutters[idx2].ShutterLeftVerticalEdge = (int)ix;
 					}
 					else if (out1 > cx)
 					{
-						const double ix = out1 - 2*(out1 - cx);
-						ivariant->pr_display_shutters[idx2]
-							.ShutterLeftVerticalEdge = (int)ix;
+						const double ix = out1 - 2 * (out1 - cx);
+						ivariant->pr_display_shutters[idx2].ShutterLeftVerticalEdge = (int)ix;
 					}
 					if (out2 < cx)
 					{
-						const double ix = out2 + 2*(cx - out2);
-						ivariant->pr_display_shutters[idx2]
-							.ShutterRightVerticalEdge = (int)ix;
+						const double ix = out2 + 2 * (cx - out2);
+						ivariant->pr_display_shutters[idx2].ShutterRightVerticalEdge = (int)ix;
 					}
 					else if (out2 > cx)
 					{
-						const double ix = out2 - 2*(out2 - cx);
-						ivariant->pr_display_shutters[idx2]
-							.ShutterRightVerticalEdge = (int)ix;
+						const double ix = out2 - 2 * (out2 - cx);
+						ivariant->pr_display_shutters[idx2].ShutterRightVerticalEdge = (int)ix;
 					}
 				}
 				if (!(
@@ -917,46 +893,34 @@ static void rotate_flip_points(
 					a.CenterofCircularShutter_y == -1 &&
 					a.RadiusofCircularShutter   == -1))
 				{
-					const double out =
-						ivariant->pr_display_shutters[idx2]
-							.CenterofCircularShutter_x;
+					const double out = ivariant->pr_display_shutters[idx2].CenterofCircularShutter_x;
 					if (out < cx)
 					{
-						const double ix = out + 2*(cx - out);
-						ivariant->pr_display_shutters[idx2]
-							.CenterofCircularShutter_x =
-								(int)ix;
+						const double ix = out + 2 * (cx - out);
+						ivariant->pr_display_shutters[idx2].CenterofCircularShutter_x = (int)ix;
 					}
 					else if (out > cx)
 					{
-						const double ix = out - 2*(out - cx);
-						ivariant->pr_display_shutters[idx2]
-							.CenterofCircularShutter_x =
-								(int)ix;
+						const double ix = out - 2 * (out - cx);
+						ivariant->pr_display_shutters[idx2].CenterofCircularShutter_x = (int)ix;
 					}
 				}
 				if ((a.VerticesofthePolygonalShutter.size() > 1) &&
-						(a.VerticesofthePolygonalShutter.size()%2 == 0))
+						(a.VerticesofthePolygonalShutter.size() % 2 == 0))
 				{
 					for (unsigned int j = 0;
-						j < a.VerticesofthePolygonalShutter.size(); j+=2)
+						j < a.VerticesofthePolygonalShutter.size(); j += 2)
 					{
-						const double out =
-							ivariant->pr_display_shutters[idx2]
-								.VerticesofthePolygonalShutter.at(j+1);
+						const double out = ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter.at(j + 1);
 						if (out < cx)
 						{
-							const double ix = out + 2*(cx - out);
-							ivariant->pr_display_shutters[idx2]
-								.VerticesofthePolygonalShutter[j+1] =
-									(int)ix;
+							const double ix = out + 2 * (cx - out);
+							ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j + 1] = (int)ix;
 						}
 						else if (out > cx)
 						{
-							const double ix = out - 2*(out - cx);
-							ivariant->pr_display_shutters[idx2]
-								.VerticesofthePolygonalShutter[j+1] =
-									(int)ix;
+							const double ix = out - 2 * (out - cx);
+							ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j + 1] = (int)ix;
 						}
 					}
 				}
@@ -964,8 +928,6 @@ static void rotate_flip_points(
 		}
 	}
 }
-
-template class itk::NumericTraits<RGBPixelUC>;
 
 template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 	const typename T::Pointer & image,
@@ -983,8 +945,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 		out_image->SetDirection(image->GetDirection());
 		out_image->SetRegions(image->GetLargestPossibleRegion());
 		out_image->Allocate();
-		out_image->FillBuffer(
-			itk::NumericTraits<typename T::PixelType>::ZeroValue());
+		out_image->FillBuffer(itk::NumericTraits<typename T::PixelType>::ZeroValue());
 	}
 	catch (const itk::ExceptionObject & ex)
 	{
@@ -993,8 +954,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 	typedef itk::FlipImageFilter<T2d> FlipFilterType;
 	typedef itk::ResampleImageFilter<T2d,T2d> ResampleType;
 	typedef itk::AffineTransform<double, 2> TransformType;
-	typedef itk::LinearInterpolateImageFunction<T2d, double>
-		InterpolatorType;
+	typedef itk::LinearInterpolateImageFunction<T2d, double> InterpolatorType;
 	typedef itk::ImageSliceIteratorWithIndex<T> SliceIterator;
 	typedef itk::ImageLinearConstIteratorWithIndex<T2d> ConstIterator;
 	typedef itk::ImageLinearIteratorWithIndex<T2d> LinearIterator;
@@ -1020,17 +980,11 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 				if (!(
 					ivariant->pr_display_areas.value(z).top_left_x == 1 &&
 					ivariant->pr_display_areas.value(z).top_left_y == 1 &&
-					dx == ivariant->pr_display_areas.value(z)
-						.bottom_right_x &&
-					dy == ivariant->pr_display_areas.value(z)
-						.bottom_right_y))
+					dx == ivariant->pr_display_areas.value(z).bottom_right_x &&
+					dy == ivariant->pr_display_areas.value(z).bottom_right_y))
 				{
-					ax = ivariant->pr_display_areas.value(z)
-							.bottom_right_x -
-						ivariant->pr_display_areas.value(z).top_left_x;
-					ay = ivariant->pr_display_areas.value(z)
-							.bottom_right_y -
-						ivariant->pr_display_areas.value(z).top_left_y;
+					ax = ivariant->pr_display_areas.value(z).bottom_right_x - ivariant->pr_display_areas.value(z).top_left_x;
+					ay = ivariant->pr_display_areas.value(z).bottom_right_y - ivariant->pr_display_areas.value(z).top_left_y;
 					px = ivariant->pr_display_areas.value(z).top_left_x;
 					py = ivariant->pr_display_areas.value(z).top_left_y;
 					apply_display_area = true;
@@ -1040,22 +994,16 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 			{
 				if (rotation != 0.0)
 				{
-					const unsigned int dx0 =
-						tmp0->GetLargestPossibleRegion().GetSize()[0];
-					const unsigned int dy0 =
-						tmp0->GetLargestPossibleRegion().GetSize()[1];
+					const unsigned int dx0 = tmp0->GetLargestPossibleRegion().GetSize()[0];
+					const unsigned int dy0 = tmp0->GetLargestPossibleRegion().GetSize()[1];
 					const double sx = tmp0->GetSpacing()[0];
 					const double sy = tmp0->GetSpacing()[1];
 					const double ox = tmp0->GetOrigin()[0];
 					const double oy = tmp0->GetOrigin()[1];
-					typename TransformType::Pointer transform =
-						TransformType::New();
-					typename ResampleType::Pointer filter0 =
-						ResampleType::New();
-					typename InterpolatorType::Pointer interpolator =
-						InterpolatorType::New();
-					typename FlipFilterType::Pointer filter1 =
-						FlipFilterType::New();
+					typename TransformType::Pointer transform = TransformType::New();
+					typename ResampleType::Pointer filter0 = ResampleType::New();
+					typename InterpolatorType::Pointer interpolator = InterpolatorType::New();
+					typename FlipFilterType::Pointer filter1 = FlipFilterType::New();
 					const double cx = ox + dx0 * sx / 2.0;
 					const double cy = oy + dy0 * sy / 2.0;
 					typename TransformType::OutputVectorType translation1;
@@ -1076,15 +1024,12 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 					{
 						filter0->SetInput(tmp0);
 						filter0->SetInterpolator(interpolator);
-						filter0->SetDefaultPixelValue(
-							itk::NumericTraits<
-								typename T2d::PixelType>::ZeroValue());
+						filter0->SetDefaultPixelValue(itk::NumericTraits<typename T2d::PixelType>::ZeroValue());
 						filter0->SetTransform(transform);
 						filter0->SetOutputOrigin(tmp0->GetOrigin());
 						filter0->SetOutputSpacing(tmp0->GetSpacing());
 						filter0->SetOutputDirection(tmp0->GetDirection());
-						filter0->SetSize(
-							tmp0->GetLargestPossibleRegion().GetSize());
+						filter0->SetSize(tmp0->GetLargestPossibleRegion().GetSize());
 						if (flip)
 						{
 							filter1->SetInput(filter0->GetOutput());
@@ -1105,8 +1050,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 				}
 				else if (flip)
 				{
-					typename FlipFilterType::Pointer filter =
-						FlipFilterType::New();
+					typename FlipFilterType::Pointer filter = FlipFilterType::New();
 					itk::FixedArray<bool, 2> f;
 					f[0] = true;
 					f[1] = false;
@@ -1137,24 +1081,18 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 						const double sy = tmp0->GetSpacing()[1];
 						const double ox = tmp0->GetOrigin()[0];
 						const double oy = tmp0->GetOrigin()[1];
-						typename TransformType::Pointer transform =
-							TransformType::New();
-						typename ResampleType::Pointer filter0 =
-							ResampleType::New();
-						typename InterpolatorType::Pointer interpolator =
-							InterpolatorType::New();
-						const double cx = ox + px*sx + ax*sx/2.0;
-						const double cy = oy + py*sy + ay*sy/2.0;
-						typename TransformType::OutputVectorType
-							translation1;
+						typename TransformType::Pointer transform = TransformType::New();
+						typename ResampleType::Pointer filter0 = ResampleType::New();
+						typename InterpolatorType::Pointer interpolator = InterpolatorType::New();
+						const double cx = ox + px * sx + ax * sx / 2.0;
+						const double cy = oy + py * sy + ay * sy / 2.0;
+						typename TransformType::OutputVectorType translation1;
 						translation1[0] = -cx;
 						translation1[1] = -cy;
-						typename TransformType::OutputVectorType
-							translation2;
+						typename TransformType::OutputVectorType translation2;
 						translation2[0] = cx;
 						translation2[1] = cy;
-						const double a =
-							rotation*0.0174532925199432957692369;
+						const double a = rotation*0.0174532925199432957692369;
 						transform->SetIdentity();
 						transform->Translate(translation1);
 						transform->Rotate2D(-a, false);
@@ -1163,17 +1101,12 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 						{
 							filter0->SetInput(tmp0);
 							filter0->SetInterpolator(interpolator);
-							filter0->SetDefaultPixelValue(
-								itk::NumericTraits<
-									typename T2d::PixelType>::ZeroValue());
+							filter0->SetDefaultPixelValue(itk::NumericTraits<typename T2d::PixelType>::ZeroValue());
 							filter0->SetTransform(transform);
 							filter0->SetOutputOrigin(tmp0->GetOrigin());
 							filter0->SetOutputSpacing(tmp0->GetSpacing());
-							filter0->SetOutputDirection(
-								tmp0->GetDirection());
-							filter0->SetSize(
-								tmp0->GetLargestPossibleRegion()
-									.GetSize());
+							filter0->SetOutputDirection(tmp0->GetDirection());
+							filter0->SetSize(tmp0->GetLargestPossibleRegion().GetSize());
 							filter0->Update();
 							tmp1 = filter0->GetOutput();
 						}
@@ -1189,34 +1122,29 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 					if (flip)
 					{
 						typename T2d::Pointer tmp2;
-						typename DuplicatorType::Pointer
-							duplicator = DuplicatorType::New();
+						typename DuplicatorType::Pointer duplicator = DuplicatorType::New();
 						try
 						{
 							duplicator->SetInputImage(tmp1);
 							duplicator->Update();
 							tmp2 = duplicator->GetOutput();
-							LinearIterator it(
-								tmp1,
-								tmp1->GetLargestPossibleRegion());
+							LinearIterator it(tmp1, tmp1->GetLargestPossibleRegion());
 							it.SetDirection(0);
 							it.GoToBegin();
 							const int j__ = px + ax/2;
 							int x__ = 0;
 							int y__ = 0;
-							const int idimx =
-								tmp1->GetLargestPossibleRegion().GetSize()[0];
+							const int idimx = tmp1->GetLargestPossibleRegion().GetSize()[0];
 							while(!it.IsAtEnd())
 							{
 								while(!it.IsAtEndOfLine())
 								{
 									if (x__ < j__)
 									{
-										const int ix = x__ + 2*(j__ - x__);
+										const int ix = x__ + 2 * (j__ - x__);
 										if (ix >= idimx || ix < 0)
 										{
-											it.Set(itk::NumericTraits<
-												typename T2d::PixelType>::ZeroValue());
+											it.Set(itk::NumericTraits<typename T2d::PixelType>::ZeroValue());
 										}
 										else
 										{
@@ -1228,11 +1156,10 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 									}
 									else if (x__ > j__)
 									{
-										const int ix = x__ - 2*(x__ - j__);
+										const int ix = x__ - 2 * (x__ - j__);
 										if (ix >= idimx || ix < 0)
 										{
-											it.Set(itk::NumericTraits<
-												typename T2d::PixelType>::ZeroValue());
+											it.Set(itk::NumericTraits<typename T2d::PixelType>::ZeroValue());
 										}
 										else
 										{
@@ -1269,40 +1196,31 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 				}
 			}
 			if (tmp1.IsNull()) return QString("tmp1.IsNull()");
-			if (tmp1->GetLargestPossibleRegion().GetSize()[0] == 0 ||
-					tmp1->GetLargestPossibleRegion().GetSize()[1] == 0)
+			if (tmp1->GetLargestPossibleRegion().GetSize()[0] == 0 || tmp1->GetLargestPossibleRegion().GetSize()[1] == 0)
 			{
 				return QString("Internal error");
 			}
 			QApplication::processEvents();
 			try
 			{
-				ConstIterator it0(
-					tmp1,
-					tmp1->GetLargestPossibleRegion());
+				ConstIterator it0(tmp1, tmp1->GetLargestPossibleRegion());
 				it0.SetDirection(0);
-				SliceIterator it2(
-					out_image,
-					out_image->GetLargestPossibleRegion());
+				SliceIterator it2(out_image, out_image->GetLargestPossibleRegion());
 				it2.SetFirstDirection(0);
 				it2.SetSecondDirection(1);
 				int j = 0;
 				it0.GoToBegin();
 				it2.GoToBegin();
-				while(!(it2.IsAtEnd() || it0.IsAtEnd()))
+				while(!it2.IsAtEnd())
 				{
 					if (j == z)
 					{
 						while (!(it2.IsAtEndOfSlice() || it0.IsAtEnd()))
 						{
-							while (!it2.IsAtEndOfLine())
+							while (!(it2.IsAtEndOfLine() || it0.IsAtEndOfLine()))
 							{
-								if (!it0.IsAtEnd())
-								{
-									it2.Set(static_cast<
-										typename T::PixelType>(it0.Get()));
-									++it0;
-								}
+								it2.Set(static_cast<typename T::PixelType>(it0.Get()));
+								++it0;
 								++it2;
 							}
 							it0.NextLine();
@@ -1329,103 +1247,51 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 	return QString("");
 }
 
-template QString rotate_flip_slice_by_slice<RGBImageTypeUC, RGBImage2DTypeUC>(
-	const RGBImageTypeUC::Pointer &,
-	RGBImageTypeUC::Pointer &,
-	const ImageVariant *,
-	const double,
-	const bool);
-
-template<typename T, typename T2d> QString levels_slice_by_slice(
-	const typename T::Pointer & image,
-	typename ImageTypeUC::Pointer & out_image,
-	const QMap<int, double> & widths,
-	const QMap<int, double> & centers,
-	const QMap<int, QString> & lut_functions,
+static QString voi_lut_slice_by_slice(
+	const ImageVariant * ivariant,
+	ImageVariant * v,
 	const QMap<int, QStringList> & refs,
-	const SOPInstanceUids & slices_uids)
+	const QMap<int, double>      & centers,
+	const QMap<int, double>      & widths,
+	const QMap<int, QString>     & lut_functions,
+	const QMap<int, QVariant>    & lut_descriptors,
+	const QMap<int, QVariant>    & lut_datas,
+	const QMap<int, bool>        & mapped_implicits,
+	const QMap<int, bool>        & mapped_signeds,
+	const bool signed_image)
 {
-	if (image.IsNull()) return QString("image.IsNull()");
-	try
-	{
-		out_image = ImageTypeUC::New();
-		out_image->SetOrigin(static_cast<
-			typename ImageTypeUC::PointType>(
-				image->GetOrigin()));
-		out_image->SetSpacing(static_cast<
-			typename ImageTypeUC::SpacingType>(
-				image->GetSpacing()));
-		out_image->SetDirection(static_cast<
-			typename ImageTypeUC::DirectionType>(
-				image->GetDirection()));
-		out_image->SetRegions(static_cast<
-			typename ImageTypeUC::RegionType>(
-				image->GetLargestPossibleRegion()));
-		out_image->Allocate();
-		out_image->FillBuffer(0);
-	}
-	catch (const itk::ExceptionObject & ex)
-	{
-		return QString(ex.GetDescription());
-	}
-	typedef itk::IntensityWindowingImageFilter<T2d, Image2DTypeUC>
-		LinearFilterType;
-	typedef itk::Sigmoid2ImageFilter<T2d, Image2DTypeUC>
-		SigmoidFilterType;
-#ifdef APPLY_RESCALE_INTENSITY_TO_VOI_LUT
-	typedef itk::RescaleIntensityImageFilter<Image2DTypeUC, Image2DTypeUC>
-		RescaleFilterType;
-#endif
-	typedef itk::ImageSliceIteratorWithIndex<ImageTypeUC>
-		SliceIterator;
-	typedef itk::ImageLinearConstIteratorWithIndex<Image2DTypeUC>
-		ConstIterator;
+	if (!ivariant) return QString("Input image is NULL");
+	if (!v)        return QString("Output image is NULL");
+	const SOPInstanceUids & slices_uids = ivariant->image_instance_uids;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	for (QMap<int, QStringList>::const_iterator it = refs.cbegin();
-			it != refs.cend();
-			++it)
+	for (QMap<int, QStringList>::const_iterator it = refs.cbegin(); it != refs.cend(); ++it)
 #else
-	for (QMap<int, QStringList>::const_iterator it = refs.constBegin();
-			it != refs.constEnd();
-			++it)
+	for (QMap<int, QStringList>::const_iterator it = refs.constBegin(); it != refs.constEnd(); ++it)
 #endif
 	{
 		const int k = it.key();
 		const QStringList & l = it.value();
-		for (int z = 0; z < l.size(); z+=2)
+		for (int z = 0; z < l.size(); z += 2)
 		{
-			const QString uid =
-				l.at(z+0).trimmed().remove(QChar('\0'));
-			const QString frames =
-				l.at(z+1)
-					.trimmed()
-					.remove(QChar(' '))
-					.remove(QChar('\0'));
+			const QString uid = l.at(z + 0).trimmed().remove(QChar('\0'));
+			const QString frames = l.at(z + 1).trimmed().remove(QChar(' ')).remove(QChar('\0'));
 			QList<int> idxs;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-			const QStringList frames_tmp1 = frames.split(
-				QString("\\"),
-				Qt::SkipEmptyParts);
+			const QStringList frames_tmp1 = frames.split(QString("\\"), Qt::SkipEmptyParts);
 #else
-			const QStringList frames_tmp1 = frames.split(
-				QString("\\"),
-				QString::SkipEmptyParts);
+			const QStringList frames_tmp1 = frames.split(QString("\\"), QString::SkipEmptyParts);
 #endif
 			if (frames_tmp1.size() < 1)
 			{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-				SOPInstanceUids::const_iterator it1 =
-					slices_uids.cbegin();
+				SOPInstanceUids::const_iterator it1 = slices_uids.cbegin();
 				while (it1 != slices_uids.cend())
 #else
-				SOPInstanceUids::const_iterator it1 =
-					slices_uids.constBegin();
+				SOPInstanceUids::const_iterator it1 = slices_uids.constBegin();
 				while (it1 != slices_uids.constEnd())
 #endif
 				{
-					if (uid == it1.value()
-						.trimmed()
-						.remove(QChar('\0')))
+					if (uid == it1.value().trimmed().remove(QChar('\0')))
 					{
 						idxs.push_back(it1.key());
 					}
@@ -1437,22 +1303,16 @@ template<typename T, typename T2d> QString levels_slice_by_slice(
 				for (int x = 0; x < frames_tmp1.size(); ++x)
 				{
 					bool tmp99 = false;
-					const int tmp98 = QVariant(
-						frames_tmp1.at(x)
-							.trimmed()
-							.remove(QChar('\0'))).toInt(&tmp99);
+					const int tmp98 = QVariant(frames_tmp1.at(x).trimmed().remove(QChar('\0'))).toInt(&tmp99);
 					if (tmp99 && tmp98 > 0)
 					{
-						idxs.push_back(tmp98-1);
+						idxs.push_back(tmp98 - 1);
 					}
 				}
 			}
 			if (idxs.empty())
 			{
-				std::cout
-					<< "idxs.size()<1 k=" << k << " "
-					<< uid.toStdString()
-					<< std::endl;
+				std::cout << "idxs.size() < 1 k = " << k << " " << uid.toStdString() << std::endl;
 				continue;
 			}
 			for (int x = 0; x < idxs.size(); ++x)
@@ -1460,158 +1320,143 @@ template<typename T, typename T2d> QString levels_slice_by_slice(
 				const QString uid_ =
 					(slices_uids.contains(idxs.at(x)))
 					?
-					slices_uids.value(idxs.at(x))
-						.trimmed()
-						.remove(QChar('\0'))
+					slices_uids.value(idxs.at(x)).trimmed().remove(QChar('\0'))
 					:
 					QString("");
 				if (!uid_.isEmpty() && (uid_ == uid))
 				{
-					typename T2d::Pointer tmp0;
-					typename Image2DTypeUC::Pointer tmp1;
-					const QString error =
-						extract_one_slice<T,T2d>(image, tmp0, idxs.at(x));
-					if (tmp0.IsNull()) return QString("tmp0.IsNull()");
-					if (error.isEmpty())
+					if (widths.contains(k) && centers.contains(k) && lut_functions.contains(k) &&
+						lut_descriptors.contains(k) && lut_datas.contains(k))
 					{
-						if (
-							lut_functions.contains(k) &&
-							(lut_functions.value(k)
-								.trimmed()
-								.remove(QChar('\0'))
-								.toUpper() ==
-							QString("SIGMOID")))
+						const double c = centers.value(k);
+						const double w = widths.value(k);
+						if (!(c > -0.000001 && c < 0.000001 && w > -0.000001 && w < 0.000001))
 						{
-							typename SigmoidFilterType::Pointer
-								filter0 = SigmoidFilterType::New();
-#ifdef APPLY_RESCALE_INTENSITY_TO_VOI_LUT
-							typename RescaleFilterType::Pointer
-								filter1 = RescaleFilterType::New();
-#endif
-							try
+							FrameLevel fl;
+							fl.us_window_center = c;
+							if (lut_functions.value(k) == QString("SIGMOID"))
 							{
-								filter0->SetInput(tmp0);
-								filter0->SetAlpha(
-									static_cast<typename T2d::PixelType>(
-										widths.value(k)));
-								filter0->SetBeta(
-									static_cast<typename T2d::PixelType>(
-										centers.value(k)));
-								filter0->SetOutputMinimum(
-									static_cast<typename Image2DTypeUC::PixelType>(0));
-								filter0->SetOutputMaximum(
-									static_cast<typename Image2DTypeUC::PixelType>(255));
-#ifdef APPLY_RESCALE_INTENSITY_TO_VOI_LUT
-								filter1->SetInput(filter0->GetOutput());
-								filter1->Update();
-								tmp1 = filter1->GetOutput();
-#else
-								filter0->Update();
-								tmp1 = filter0->GetOutput();
-#endif
+								fl.us_window_width = w;
+								fl.lut_function = 2;
 							}
-							catch (const itk::ExceptionObject & ex)
+							else if (lut_functions.value(k) == QString("LINEAR_EXACT"))
 							{
-								return QString( ex.GetDescription());
+								fl.us_window_width = w;
+								fl.lut_function = 1;
 							}
+							else
+							{
+								fl.us_window_width = (w >= 2) ? w - 1 : w;
+								fl.lut_function = 0;
+							}
+							v->frame_levels[idxs.at(x)] = fl;
 						}
 						else
 						{
-							typename LinearFilterType::Pointer
-								filter0 = LinearFilterType::New();
-#ifdef APPLY_RESCALE_INTENSITY_TO_VOI_LUT
-							typename RescaleFilterType::Pointer
-								filter1 = RescaleFilterType::New();
-#endif
-							try
+							const QList<QVariant> & lut_descriptor = lut_descriptors.value(k).toList();
+							const QList<QVariant> & lut_data       = lut_datas.value(k).toList();
+							if (!lut_descriptor.empty() && !lut_data.empty())
 							{
-								filter0->SetInput(tmp0);
-								filter0->SetWindowLevel(
-									static_cast<typename T2d::PixelType>(
-										widths.value(k)),
-									static_cast<typename T2d::PixelType>(
-										centers.value(k)));
-								filter0->SetOutputMinimum(
-									static_cast<
-										typename Image2DTypeUC::PixelType>(0));
-								filter0->SetOutputMaximum(
-									static_cast<
-										typename
-											Image2DTypeUC::PixelType>(255));
-#ifdef APPLY_RESCALE_INTENSITY_TO_VOI_LUT
-								filter1->SetInput(filter0->GetOutput());
-								filter1->Update();
-								tmp1 = filter1->GetOutput();
-#else
-								filter0->Update();
-								tmp1 = filter0->GetOutput();
-#endif
-							}
-							catch (const itk::ExceptionObject & ex)
-							{
-								return QString( ex.GetDescription());
-							}
-						}
-						if (tmp1.IsNull()) return QString("tmp1.IsNull()");
-						//
-						QApplication::processEvents();
-						//
-						try
-						{
-							ConstIterator it0(
-								tmp1,
-								tmp1->GetLargestPossibleRegion());
-							it0.SetDirection(0);
-							SliceIterator it2(
-								out_image,
-								out_image->GetLargestPossibleRegion());
-							it2.SetFirstDirection(0);
-							it2.SetSecondDirection(1);
-							int j = 0;
-							it0.GoToBegin();
-							it2.GoToBegin();
-							while(!(it2.IsAtEnd() || it0.IsAtEnd()))
-							{
-								if (j == idxs.at(x))
+								Image2DTypeF::Pointer tmp0;
+								QString error = extract_one_slice<ImageTypeF, Image2DTypeF>(v->pF, tmp0, idxs.at(x));
+								if (error.isEmpty())
 								{
-									while (!(it2.IsAtEndOfSlice() ||
-										it0.IsAtEnd()))
+									const bool mapped_implicit =
+										mapped_implicits.contains(k) ? mapped_implicits.value(k) : false;
+									const bool mapped_signed =
+										mapped_signeds.contains(k) ? mapped_signeds.value(k) : false;
+									Image2DTypeF::Pointer tmp1;
+									error = apply_lut<Image2DTypeF, Image2DTypeF>(
+										tmp0, tmp1,
+										lut_descriptor, lut_data,
+										signed_image,
+										mapped_implicit, mapped_signed);
+									if (error.isEmpty())
 									{
-										while (!it2.IsAtEndOfLine())
+										float min_value = 0.0f;
+										float max_value = 0.0f;
+										typedef itk::ImageSliceIteratorWithIndex<ImageTypeF> SliceIterator;
+										typedef itk::ImageLinearConstIteratorWithIndex<Image2DTypeF> ConstIterator;
+										try
 										{
-											if (!it0.IsAtEnd())
+											ConstIterator it0(tmp1, tmp1->GetLargestPossibleRegion());
+											it0.SetDirection(0);
+											SliceIterator it2(v->pF, v->pF->GetLargestPossibleRegion());
+											it2.SetFirstDirection(0);
+											it2.SetSecondDirection(1);
+											int j = 0;
+											long long jj = 0;
+											it0.GoToBegin();
+											it2.GoToBegin();
+											while(!it2.IsAtEnd())
 											{
-												it2.Set(
-													static_cast<
-														typename ImageTypeUC::PixelType>(it0.Get()));
-												++it0;
+												if (j == idxs.at(x))
+												{
+													while (!(it2.IsAtEndOfSlice() || it0.IsAtEnd()))
+													{
+														while (!(it2.IsAtEndOfLine() || it0.IsAtEndOfLine()))
+														{
+															const float v0 = it0.Get();
+															if (jj == 0)
+															{
+																min_value = v0;
+																max_value = v0;
+															}
+															else
+															{
+																if (v0 < min_value) min_value = v0;
+																if (v0 > max_value) max_value = v0;
+															}
+															it2.Set(v0);
+															++it0;
+															++it2;
+															++jj;
+														}
+														it0.NextLine();
+														it2.NextLine();
+													}
+												}
+												it2.NextSlice();
+												++j;
 											}
-											++it2;
 										}
-										it0.NextLine();
-										it2.NextLine();
+										catch (const itk::ExceptionObject & ex)
+										{
+											std::cout << ex.GetDescription() << std::endl;
+											continue;
+										}
+										FrameLevel fl;
+										fl.us_window_width  = max_value - min_value;
+										fl.us_window_center = fl.us_window_width / 2.0f;
+										fl.lut_function = 0;
+										v->frame_levels[idxs.at(x)] = fl;
 									}
 								}
-								it2.NextSlice();
-								++j;
 							}
+#if 0
+							else
+							{
+								if (ivariant->frame_levels.contains(idxs.at(x)))
+								{
+									v->frame_levels[idxs.at(x)] = ivariant->frame_levels.value(idxs.at(x));
+								}
+								else
+								{
+									std::cout << "Internal error, !ivariant->frame_levels.contains("
+										<< idxs.at(x) << ")" << std::endl;
+								}
+							}
+#endif
 						}
-						catch (const itk::ExceptionObject & ex)
-						{
-							return QString(ex.GetDescription());
-						}
-						QApplication::processEvents();
 					}
 					else
 					{
-						return error;
+						std::cout << "Internal error, k = " << k << std::endl;
 					}
 				}
 			}
 		}
 	}
-	if (out_image.IsNotNull()) out_image->DisconnectPipeline();
-	else return QString("Output image is NULL");
 	return QString("");
 }
 
@@ -1639,29 +1484,21 @@ static void areas_slice_by_slice(
 		const QStringList & l = it.value();
 		for (int z = 0; z < l.size(); z+=2)
 		{
-			const QString uid =
-				l.at(z+0).trimmed().remove(QChar('\0'));
-			const QString frames =
-				l.at(z+1).trimmed().remove(QChar(' ')).remove(QChar('\0'));
+			const QString uid = l.at(z + 0).trimmed().remove(QChar('\0'));
+			const QString frames = l.at(z + 1).trimmed().remove(QChar(' ')).remove(QChar('\0'));
 			QList<int> idxs;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-			const QStringList frames_tmp1 = frames.split(
-				QString("\\"),
-				Qt::SkipEmptyParts);
+			const QStringList frames_tmp1 = frames.split(QString("\\"), Qt::SkipEmptyParts);
 #else
-			const QStringList frames_tmp1 = frames.split(
-				QString("\\"),
-				QString::SkipEmptyParts);
+			const QStringList frames_tmp1 = frames.split(QString("\\"), QString::SkipEmptyParts);
 #endif
 			if (frames_tmp1.empty())
 			{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-				SOPInstanceUids::const_iterator it1 =
-					slices_uids.cbegin();
+				SOPInstanceUids::const_iterator it1 = slices_uids.cbegin();
 				while (it1 != slices_uids.cend())
 #else
-				SOPInstanceUids::const_iterator it1 =
-					slices_uids.constBegin();
+				SOPInstanceUids::const_iterator it1 = slices_uids.constBegin();
 				while (it1 != slices_uids.constEnd())
 #endif
 				{
@@ -1677,10 +1514,7 @@ static void areas_slice_by_slice(
 				for (int x = 0; x < frames_tmp1.size(); ++x)
 				{
 					bool tmp99 = false;
-					const int tmp98 = QVariant(
-						frames_tmp1.at(x)
-							.trimmed()
-							.remove(QChar('\0'))).toInt(&tmp99);
+					const int tmp98 = QVariant(frames_tmp1.at(x).trimmed().remove(QChar('\0'))).toInt(&tmp99);
 					if (tmp99 && tmp98 > 0)
 					{
 						idxs.push_back(tmp98-1);
@@ -1689,10 +1523,7 @@ static void areas_slice_by_slice(
 			}
 			if (idxs.empty())
 			{
-				std::cout
-					<< "idxs.size()<1 k=" << k << " "
-					<< uid.toStdString()
-					<< std::endl;
+				std::cout << "idxs.size()<1 k=" << k << " " << uid.toStdString() << std::endl;
 				continue;
 			}
 			for (int x = 0; x < idxs.size(); ++x)
@@ -1700,9 +1531,7 @@ static void areas_slice_by_slice(
 				const QString uid_ =
 					(slices_uids.contains(idxs.at(x)))
 					?
-					slices_uids.value(idxs.at(x))
-						.trimmed()
-						.remove(QChar('\0'))
+					slices_uids.value(idxs.at(x)).trimmed().remove(QChar('\0'))
 					:
 					QString("");
 				if (!uid_.isEmpty() && (uid_ == uid))
@@ -1768,45 +1597,30 @@ static void text_slice_by_slice(
 {
 	if (!v) return;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	for (QMap<int, QStringList>::const_iterator it = refs.cbegin();
-			it != refs.cend();
-			++it)
+	for (QMap<int, QStringList>::const_iterator it = refs.cbegin(); it != refs.cend(); ++it)
 #else
-	for (QMap<int, QStringList>::const_iterator it = refs.constBegin();
-			it != refs.constEnd();
-			++it)
+	for (QMap<int, QStringList>::const_iterator it = refs.constBegin(); it != refs.constEnd(); ++it)
 #endif
 	{
 		const int k = it.key();
 		const QStringList & l = it.value();
 		for (int z = 0; z < l.size(); z+=2)
 		{
-			const QString uid =
-				l.at(z+0).trimmed().remove(QChar('\0'));
-			const QString frames =
-				l.at(z+1)
-					.trimmed()
-					.remove(QChar(' '))
-					.remove(QChar('\0'));
+			const QString uid = l.at(z + 0).trimmed().remove(QChar('\0'));
+			const QString frames = l.at(z + 1).trimmed().remove(QChar(' ')).remove(QChar('\0'));
 			QList<int> idxs;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-			const QStringList frames_tmp1 = frames.split(
-				QString("\\"),
-				Qt::SkipEmptyParts);
+			const QStringList frames_tmp1 = frames.split(QString("\\"), Qt::SkipEmptyParts);
 #else
-			const QStringList frames_tmp1 = frames.split(
-				QString("\\"),
-				QString::SkipEmptyParts);
+			const QStringList frames_tmp1 = frames.split(QString("\\"), QString::SkipEmptyParts);
 #endif
 			if (frames_tmp1.empty())
 			{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-				SOPInstanceUids::const_iterator it1 =
-					slices_uids.cbegin();
+				SOPInstanceUids::const_iterator it1 = slices_uids.cbegin();
 				while (it1 != slices_uids.cend())
 #else
-				SOPInstanceUids::const_iterator it1 =
-					slices_uids.constBegin();
+				SOPInstanceUids::const_iterator it1 = slices_uids.constBegin();
 				while (it1 != slices_uids.constEnd())
 #endif
 				{
@@ -1822,10 +1636,7 @@ static void text_slice_by_slice(
 				for (int x = 0; x < frames_tmp1.size(); ++x)
 				{
 					bool tmp99 = false;
-					const int tmp98 = QVariant(
-						frames_tmp1.at(x)
-							.trimmed()
-							.remove(QChar('\0'))).toInt(&tmp99);
+					const int tmp98 = QVariant(frames_tmp1.at(x).trimmed().remove(QChar('\0'))).toInt(&tmp99);
 					if (tmp99 && tmp98 > 0)
 					{
 						idxs.push_back(tmp98-1);
@@ -1834,10 +1645,7 @@ static void text_slice_by_slice(
 			}
 			if (idxs.empty())
 			{
-				std::cout
-					<< "idxs.size()<1 k=" << k << " "
-					<< uid.toStdString()
-					<< std::endl;
+				std::cout << "idxs.size()<1 k=" << k << " " << uid.toStdString() << std::endl;
 				continue;
 			}
 			for (int x = 0; x < idxs.size(); ++x)
@@ -1845,19 +1653,15 @@ static void text_slice_by_slice(
 				const QString uid_ =
 					(slices_uids.contains(idxs.at(x)))
 					?
-					slices_uids.value(idxs.at(x))
-						.trimmed().remove(QChar('\0'))
+					slices_uids.value(idxs.at(x)).trimmed().remove(QChar('\0'))
 					:
 					QString("");
 				if (!uid_.isEmpty() && (uid_ == uid))
 				{
 					PRTextAnnotation a;
-					a.has_bb = (has_bb.value(k) == 1)
-						? true : false;
-					a.has_anchor = (has_anchor.value(k) == 1)
-						? true : false;
-					a.has_textstyle = (has_textstyle.value(k) == 1)
-						? true : false;
+					a.has_bb                     = (has_bb.value(k) == 1);
+					a.has_anchor                 = (has_anchor.value(k) == 1);
+					a.has_textstyle              = (has_textstyle.value(k) == 1);
 					a.bb_top_left_x              = bb_top_left_x.value(k);
 					a.bb_top_left_y              = bb_top_left_y.value(k);
 					a.bb_bottom_right_x          = bb_bottom_r_x.value(k);
@@ -1871,10 +1675,8 @@ static void text_slice_by_slice(
 					a.FontName                   = FontName.value(k);
 					a.FontNameType               = FontNameType.value(k);
 					a.CSSFontName                = CSSFontName.value(k);
-					a.HorizontalAlignment        =
-						HorizontalAlignment.value(k);
-					a.VerticalAlignment          =
-						VerticalAlignment.value(k);
+					a.HorizontalAlignment        = HorizontalAlignment.value(k);
+					a.VerticalAlignment          = VerticalAlignment.value(k);
 					a.ShadowStyle                = ShadowStyle.value(k);
 					a.Underlined                 = Underlined.value(k);
 					a.Bold                       = Bold.value(k);
@@ -1882,18 +1684,12 @@ static void text_slice_by_slice(
 					a.ShadowOffsetX              = ShadowOffsetX.value(k);
 					a.ShadowOffsetY              = ShadowOffsetY.value(k);
 					a.ShadowOpacity              = ShadowOpacity.value(k);
-					a.TextColorCIELabValue_L     =
-						TextColorCIELabValue_L.value(k);
-					a.TextColorCIELabValue_a     =
-						TextColorCIELabValue_a.value(k);
-					a.TextColorCIELabValue_b     =
-						TextColorCIELabValue_b.value(k);
-					a.ShadowColorCIELabValue_L   =
-						ShadowColorCIELabValue_L.value(k);
-					a.ShadowColorCIELabValue_a   =
-						ShadowColorCIELabValue_a.value(k);
-					a.ShadowColorCIELabValue_b   =
-						ShadowColorCIELabValue_b.value(k);
+					a.TextColorCIELabValue_L     = TextColorCIELabValue_L.value(k);
+					a.TextColorCIELabValue_a     = TextColorCIELabValue_a.value(k);
+					a.TextColorCIELabValue_b     = TextColorCIELabValue_b.value(k);
+					a.ShadowColorCIELabValue_L   = ShadowColorCIELabValue_L.value(k);
+					a.ShadowColorCIELabValue_a   = ShadowColorCIELabValue_a.value(k);
+					a.ShadowColorCIELabValue_b   = ShadowColorCIELabValue_b.value(k);
 					if (v->pr_text_annotations.contains(idxs.at(x)))
 					{
 						v->pr_text_annotations[idxs.at(x)].push_back(a);
@@ -1921,13 +1717,9 @@ static void graphic_slice_by_slice(
 {
 	if (!v) return;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	for (QMap<int, QStringList>::const_iterator it = refs.cbegin();
-			it != refs.cend();
-			++it)
+	for (QMap<int, QStringList>::const_iterator it = refs.cbegin(); it != refs.cend(); ++it)
 #else
-	for (QMap<int, QStringList>::const_iterator it = refs.constBegin();
-			it != refs.constEnd();
-			++it)
+	for (QMap<int, QStringList>::const_iterator it = refs.constBegin(); it != refs.constEnd(); ++it)
 #endif
 	{
 		const int k = it.key();
@@ -1935,31 +1727,25 @@ static void graphic_slice_by_slice(
 		for (int z = 0; z < l.size(); z+=2)
 		{
 			const QString uid =
-				l.at(z+0).trimmed().remove(QChar('\0'));
+				l.at(z + 0).trimmed().remove(QChar('\0'));
 			const QString frames =
-				l.at(z+1)
+				l.at(z + 1)
 					.trimmed()
 					.remove(QChar(' '))
 					.remove(QChar('\0'));
 			QList<int> idxs;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-			const QStringList frames_tmp1 = frames.split(
-				QString("\\"),
-				Qt::SkipEmptyParts);
+			const QStringList frames_tmp1 = frames.split(QString("\\"), Qt::SkipEmptyParts);
 #else
-			const QStringList frames_tmp1 = frames.split(
-				QString("\\"),
-				QString::SkipEmptyParts);
+			const QStringList frames_tmp1 = frames.split(QString("\\"), QString::SkipEmptyParts);
 #endif
 			if (frames_tmp1.empty())
 			{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-				SOPInstanceUids::const_iterator it1 =
-					slices_uids.cbegin();
+				SOPInstanceUids::const_iterator it1 = slices_uids.cbegin();
 				while (it1 != slices_uids.cend())
 #else
-				SOPInstanceUids::const_iterator it1 =
-					slices_uids.constBegin();
+				SOPInstanceUids::const_iterator it1 = slices_uids.constBegin();
 				while (it1 != slices_uids.constEnd())
 #endif
 				{
@@ -1975,10 +1761,7 @@ static void graphic_slice_by_slice(
 				for (int x = 0; x < frames_tmp1.size(); ++x)
 				{
 					bool tmp99 = false;
-					const int tmp98 = QVariant(
-						frames_tmp1.at(x)
-							.trimmed()
-							.remove(QChar('\0'))).toInt(&tmp99);
+					const int tmp98 = QVariant(frames_tmp1.at(x).trimmed().remove(QChar('\0'))).toInt(&tmp99);
 					if (tmp99 && tmp98 > 0)
 					{
 						idxs.push_back(tmp98-1);
@@ -1987,10 +1770,7 @@ static void graphic_slice_by_slice(
 			}
 			if (idxs.empty())
 			{
-				std::cout
-					<< "idxs.size()<1 k=" << k << " "
-					<< uid.toStdString()
-					<< std::endl;
+				std::cout << "idxs.size()<1 k=" << k << " " << uid.toStdString() << std::endl;
 				continue;
 			}
 			for (int x = 0; x < idxs.size(); ++x)
@@ -1998,23 +1778,19 @@ static void graphic_slice_by_slice(
 				const QString uid_ =
 					(slices_uids.contains(idxs.at(x)))
 					?
-					slices_uids.value(idxs.at(x))
-						.trimmed().remove(QChar('\0'))
+					slices_uids.value(idxs.at(x)).trimmed().remove(QChar('\0'))
 					:
 					QString("");
 				if (!uid_.isEmpty() && (uid_ == uid))
 				{
 					PRGraphicObject a;
 					a.GraphicType = GraphicType.value(k);
-					a.GraphicAnnotationUnits =
-						GraphicAnnotationUnits.value(k);
+					a.GraphicAnnotationUnits = GraphicAnnotationUnits.value(k);
 					a.GraphicData.clear();
-					const QList<QVariant> & l465 =
-						gdata.value(k).toList();
+					const QList<QVariant> & l465 = gdata.value(k).toList();
 					for (int z = 0; z < l465.size(); ++z)
 					{
-						a.GraphicData.push_back(
-							static_cast<float>(l465.at(z).toDouble()));
+						a.GraphicData.push_back(static_cast<float>(l465.at(z).toDouble()));
 					}
 					a.GraphicFilled = GraphicFilled.value(k);
 					if (v->pr_graphicobjects.contains(idxs.at(x)))
@@ -2045,42 +1821,67 @@ void PrConfigUtils::read_modality_lut(
 	const mdcm::DataSet & ds,
 	PrRefSeries & ref)
 {
-#if 0
-	// TODO
-	const mdcm::Tag tModalityLUTSequence(0x0028,0x3000);
-	if (ds.FindDataElement(tModalityLUTSequence))
-	{
-		std::cout
-			<< "Presentation State: Modality"
-				" LUT Sequence (0028,3000)" << std::endl;
-	}
-	// LUT Descriptor(0028,3002)
-	// LUT Explanation (0028,3003)
-	  // Modality LUT Type (0028,3004)
-	  // OD The number in the LUT represents thousands of optical density
-	  //   HU Hounsfield Units (CT)
-	  //   US Unspecified
-	  //   Other values are permitted, but are not defined by the
-	  //     DICOM Standard
-	// LUT Data (0028,3006)
-#endif
 	const mdcm::Tag tRescaleIntercept(0x0028,0x1052);
 	const mdcm::Tag tRescaleSlope(0x0028,0x1053);
+	const mdcm::Tag tModalityLUTSequence(0x0028,0x3000);
+	//
+	PrConfig c;
+	c.id = 1;
+	c.desc = QString("Modality LUT");
+	//
 	std::vector<double> RescaleIntercept;
 	std::vector<double> RescaleSlope;
+	bool rescale_ok = false;
 	if (DicomUtils::get_ds_values(ds,tRescaleIntercept,RescaleIntercept)
 		&&
-		DicomUtils::get_ds_values(ds,tRescaleSlope,RescaleSlope) &&
-		RescaleIntercept.size() >= 1 &&
-		RescaleIntercept.size() == RescaleSlope.size())
+		DicomUtils::get_ds_values(ds,tRescaleSlope,RescaleSlope))
 	{
-		PrConfig c;
-		c.id = 1;
-		c.desc = QString("rescale");
 		c.values.push_back(QVariant(RescaleIntercept.at(0))); // 0
 		c.values.push_back(QVariant(RescaleSlope.at(0))); // 1
-		ref.prconfig.push_back(c);
+		rescale_ok = true;
 	}
+	else
+	{
+		c.values.push_back(QVariant((double)0)); // 0
+		c.values.push_back(QVariant((double)1)); // 1
+	}
+	//
+	bool no_lut_seq = false;
+	if (!rescale_ok && ds.FindDataElement(tModalityLUTSequence))
+	{
+		QList<QVariant> lut_descriptor;
+		QList<QVariant> lut_data;
+		bool mapped_implicit = false;
+		bool mapped_signed = false;
+		const bool lut_ok = DicomUtils::read_gray_lut(
+			ds, tModalityLUTSequence,
+			lut_descriptor, lut_data,
+			&mapped_implicit, &mapped_signed);
+		if (lut_ok)
+		{
+			c.values.push_back(QVariant(lut_descriptor));  // 2
+			c.values.push_back(QVariant(lut_data));        // 3
+			c.values.push_back(QVariant(mapped_implicit)); // 4
+			c.values.push_back(QVariant(mapped_signed));   // 5
+		}
+		else
+		{
+			no_lut_seq = true;
+		}
+	}
+	else
+	{
+		no_lut_seq = true;
+	}
+	if (no_lut_seq)
+	{
+		c.values.push_back(QList<QVariant>()); // 2
+		c.values.push_back(QList<QVariant>()); // 3
+		c.values.push_back(QVariant(false));   // 4
+		c.values.push_back(QVariant(false));   // 5
+	}
+	//
+	ref.prconfig.push_back(c);
 }
 
 void PrConfigUtils::read_voi_lut(
@@ -2088,10 +1889,7 @@ void PrConfigUtils::read_voi_lut(
 	PrRefSeries & ref)
 {
 	const mdcm::Tag tSoftcopyVOILUTSequence(0x0028,0x3110);
-	const mdcm::Tag tVOILUTSequence(0x0028,0x3010);  // TODO
-	// LUT Descriptor(0028,3002)
-	// LUT Explanation (0028,3003)
-	// LUT Data (0028,3006)
+	const mdcm::Tag tVOILUTSequence(0x0028,0x3010);
 	const mdcm::Tag tReferencedImageSequence(0x0008,0x1140);
 	const mdcm::Tag tReferencedSOPInstanceUID(0x0008,0x1155);
 	const mdcm::Tag tReferencedFrameNumber(0x0008,0x1160);
@@ -2100,70 +1898,132 @@ void PrConfigUtils::read_voi_lut(
 	const mdcm::Tag tVOILUTFunction(0x0028,0x1056);
 	if (ds.FindDataElement(tSoftcopyVOILUTSequence))
 	{
-		const mdcm::DataElement & de =
-			ds.GetDataElement(tSoftcopyVOILUTSequence);
-		mdcm::SmartPointer<mdcm::SequenceOfItems> sq =
-			de.GetValueAsSQ();
+		const mdcm::DataElement & de = ds.GetDataElement(tSoftcopyVOILUTSequence);
+		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 		if (!sq) return;
-		const unsigned int number_of_items =
-			sq->GetNumberOfItems();
+		const unsigned int number_of_items = sq->GetNumberOfItems();
 		for (unsigned int x = 0; x < number_of_items; ++x)
 		{
-			const mdcm::Item & item = sq->GetItem(x+1);
-			const mdcm::DataSet & nestedds =
-				item.GetNestedDataSet();
+			PrConfig c;
+			c.id = 2;
+			c.desc = QString("VOI LUT");
+			//
+			const mdcm::Item & item = sq->GetItem(x + 1);
+			const mdcm::DataSet & nestedds = item.GetNestedDataSet();
 			std::vector<double> centers;
 			std::vector<double> widths;
-			const bool ok1 = DicomUtils::get_ds_values(
-				nestedds, tWindowCenter, centers);
-			const bool ok2 = DicomUtils::get_ds_values(
-				nestedds, tWindowWidth,  widths);
+			const bool ok1 = DicomUtils::get_ds_values(nestedds, tWindowCenter, centers);
+			const bool ok2 = DicomUtils::get_ds_values(nestedds, tWindowWidth,  widths);
 			if (ok1 && ok2 && !centers.empty() && !widths.empty())
 			{
-				PrConfig c;
-				c.id = 2;
-				c.desc = QString("VOI LUT");
 				c.values.push_back(QVariant(centers.at(0))); // 0
 				c.values.push_back(QVariant(widths.at(0)));  // 1
 				QString s;
-				if (DicomUtils::get_string_value(
-						nestedds,tVOILUTFunction,s))
-					c.values.push_back(QVariant(s));
-				else
-					c.values.push_back(QVariant(QString(""))); // 2
-				if (nestedds.FindDataElement(tReferencedImageSequence))
+				if (DicomUtils::get_string_value(nestedds,tVOILUTFunction,s))
 				{
-					const mdcm::DataElement & de1 =
-						nestedds.GetDataElement(tReferencedImageSequence);
-					mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 =
-						de1.GetValueAsSQ();
-					if (!sq1) continue;
-					const unsigned int number_of_items1 =
-						sq1->GetNumberOfItems();
-					for (unsigned int x1 = 0; x1 < number_of_items1; ++x1)
-					{
-						const mdcm::Item & item1 = sq1->GetItem(x1+1);
-						const mdcm::DataSet & nestedds1 =
-							item1.GetNestedDataSet();
-						QString s1, s2;
-						if (DicomUtils::get_string_value(
-								nestedds1,tReferencedSOPInstanceUID,s1))
-						{
-							c.values.push_back(QVariant(s1)); // 3+
-							if (DicomUtils::get_string_value(
-									nestedds1,tReferencedFrameNumber,s2))
-								c.values.push_back(QVariant(s2)); //
-							else
-								c.values.push_back(QVariant(QString(""))); //
-						}
-
-					}
+					c.values.push_back(QVariant(s)); // 2
 				}
 				else
 				{
-					for (int z = 0; z < ref.images.size(); ++z)
+					c.values.push_back(QVariant(QString(""))); // 2
+				}
+				c.values.push_back(QVariant(QList<QVariant>())); // 3
+				c.values.push_back(QVariant(QList<QVariant>())); // 4
+				c.values.push_back(QVariant(false));             // 5
+				c.values.push_back(QVariant(false));             // 6
+			}
+			else if (nestedds.FindDataElement(tVOILUTSequence))
+			{
+				c.values.push_back(QVariant((double)0));   // 0
+				c.values.push_back(QVariant((double)0));   // 1
+				c.values.push_back(QVariant(QString(""))); // 2
+				QList<QVariant> lut_descriptor;
+				QList<QVariant> lut_data;
+				bool mapped_implicit = false;
+				bool mapped_signed = false;
+				const bool lut_ok = DicomUtils::read_gray_lut(
+					nestedds,
+					tVOILUTSequence, lut_descriptor, lut_data,
+					&mapped_implicit, &mapped_signed);
+				if (lut_ok)
+				{
+					c.values.push_back(QVariant(lut_descriptor));  // 3
+					c.values.push_back(QVariant(lut_data));        // 4
+					c.values.push_back(QVariant(mapped_implicit)); // 5
+					c.values.push_back(QVariant(mapped_signed));   // 6
+				}
+				else
+				{
+					c.values.push_back(QVariant(QList<QVariant>())); // 3
+					c.values.push_back(QVariant(QList<QVariant>())); // 4
+					c.values.push_back(QVariant(false));             // 5
+					c.values.push_back(QVariant(false));             // 6
+				}
+			}
+			else
+			{
+				c.values.push_back(QVariant((double)0));         // 0
+				c.values.push_back(QVariant((double)0));         // 1
+				c.values.push_back(QVariant(QString("")));       // 2
+				c.values.push_back(QVariant(QList<QVariant>())); // 3
+				c.values.push_back(QVariant(QList<QVariant>())); // 4
+				c.values.push_back(QVariant(false));             // 5
+				c.values.push_back(QVariant(false));             // 6
+			}
+			if (nestedds.FindDataElement(tReferencedImageSequence))
+			{
+				const mdcm::DataElement & de1 = nestedds.GetDataElement(tReferencedImageSequence);
+				mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 = de1.GetValueAsSQ();
+				if (!sq1) continue;
+				const unsigned int number_of_items1 = sq1->GetNumberOfItems();
+				if (number_of_items1 < 1)
+				{
+					std::cout << "Warning: empty ref. image sequence" << std::endl;
+					c.values.push_back(QVariant(QString(""))); // 7+
+					c.values.push_back(QVariant(QString(""))); //
+				}
+				else
+				{
+					for (unsigned int x1 = 0; x1 < number_of_items1; ++x1)
 					{
-						c.values.push_back(QVariant(ref.images.at(z).uid)); // 3+
+						const mdcm::Item & item1 = sq1->GetItem(x1 + 1);
+						const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
+						QString s1, s2;
+						if (DicomUtils::get_string_value(nestedds1,tReferencedSOPInstanceUID,s1))
+						{
+							c.values.push_back(QVariant(s1)); // 7+
+							if (DicomUtils::get_string_value(nestedds1,tReferencedFrameNumber,s2))
+							{
+								c.values.push_back(QVariant(s2)); //
+							}
+							else
+							{
+								c.values.push_back(QVariant(QString(""))); //
+							}
+						}
+						else
+						{
+							std::cout << "Warning: could not get ref. sop instance" << std::endl;
+							c.values.push_back(QVariant(QString(""))); // 7+
+							c.values.push_back(QVariant(QString(""))); //
+						}
+					}
+				}
+			}
+			else
+			{
+				const int ref_images_size = ref.images.size();
+				if (ref_images_size < 1)
+				{
+					std::cout << "Warning: ref. images size is 0" << std::endl;
+					c.values.push_back(QVariant(QString(""))); // 7+
+					c.values.push_back(QVariant(QString(""))); //
+				}
+				else
+				{
+					for (int z = 0; z < ref_images_size; ++z)
+					{
+						c.values.push_back(QVariant(ref.images.at(z).uid)); // 7+
 						if (ref.images.at(z).frames.empty())
 						{
 							c.values.push_back(QVariant(QString(""))); //
@@ -2183,10 +2043,72 @@ void PrConfigUtils::read_voi_lut(
 						}
 					}
 				}
-				ref.prconfig.push_back(c);
 			}
+			ref.prconfig.push_back(c);
 		}
 	}
+}
+
+void PrConfigUtils::read_presentation_lut(
+	const mdcm::DataSet & ds,
+	PrRefSeries & ref)
+{
+	const mdcm::Tag tPresentationLUTSequence(0x2050,0x0010);
+	const mdcm::Tag tPresentationLUTShape(0x2050,0x0020);
+	//
+	PrConfig c;
+	c.id = 8;
+	c.desc = QString("Presentation LUT");
+	//
+	//
+	bool no_lut_seq = false;
+	if (ds.FindDataElement(tPresentationLUTSequence))
+	{
+		QList<QVariant> lut_descriptor;
+		QList<QVariant> lut_data;
+		bool mapped_implicit = false;
+		bool mapped_signed = false;
+		const bool lut_ok = DicomUtils::read_gray_lut(
+			ds,
+			tPresentationLUTSequence,
+			lut_descriptor, lut_data,
+			&mapped_implicit, &mapped_signed);
+		if (lut_ok)
+		{
+			c.values.push_back(QVariant(lut_descriptor));  // 0
+			c.values.push_back(QVariant(lut_data));        // 1
+			c.values.push_back(QVariant(mapped_implicit)); // 2
+			c.values.push_back(QVariant(mapped_signed));   // 3
+		}
+		else
+		{
+			no_lut_seq = true;
+		}
+	}
+	else
+	{
+		no_lut_seq = true;
+	}
+	if (no_lut_seq)
+	{
+		c.values.push_back(QVariant(QList<QVariant>())); // 0
+		c.values.push_back(QVariant(QList<QVariant>())); // 1
+		c.values.push_back(QVariant(false));             // 2
+		c.values.push_back(QVariant(false));             // 3
+	}
+	{
+		QString PresentationLUTShape;
+		if (DicomUtils::get_string_value(ds, tPresentationLUTShape, PresentationLUTShape))
+		{
+			c.values.push_back(QVariant(PresentationLUTShape.remove(QChar('\0')))); // 4
+		}
+		else
+		{
+			c.values.push_back(QVariant(QString(""))); // 4
+		}
+	}
+	//
+	ref.prconfig.push_back(c);
 }
 
 void PrConfigUtils::read_display_areas(
@@ -2223,33 +2145,23 @@ void PrConfigUtils::read_display_areas(
 	const mdcm::Tag tReferencedFrameNumber(0x0008,0x1160);
 	if (ds.FindDataElement(tDisplayedAreaSelectionSequence))
 	{
-		const mdcm::DataElement & de =
-			ds.GetDataElement(tDisplayedAreaSelectionSequence);
-		mdcm::SmartPointer<mdcm::SequenceOfItems> sq =
-			de.GetValueAsSQ();
+		const mdcm::DataElement & de = ds.GetDataElement(tDisplayedAreaSelectionSequence);
+		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 		if (!sq) return;
-		const unsigned int number_of_items =
-			sq->GetNumberOfItems();
+		const unsigned int number_of_items = sq->GetNumberOfItems();
 		for (unsigned int x = 0; x < number_of_items; ++x)
 		{
 			PrConfig c;
 			c.id = 4;
 			c.desc = QString("Display Areas");
-			const mdcm::Item & item = sq->GetItem(x+1);
-			const mdcm::DataSet & nestedds =
-				item.GetNestedDataSet();
+			const mdcm::Item & item = sq->GetItem(x + 1);
+			const mdcm::DataSet & nestedds = item.GetNestedDataSet();
 			std::vector<int> AreaTopLeftHandCorner;
-			if (
-				DicomUtils::get_sl_values(
-					nestedds,
-					tAreaTopLeftHandCorner,
-					AreaTopLeftHandCorner) &&
+			if (DicomUtils::get_sl_values(nestedds, tAreaTopLeftHandCorner, AreaTopLeftHandCorner) &&
 				AreaTopLeftHandCorner.size() == 2)
 			{
-				c.values.push_back(QVariant(
-					AreaTopLeftHandCorner.at(0))); // 0
-				c.values.push_back(QVariant(
-					AreaTopLeftHandCorner.at(1))); // 1
+				c.values.push_back(QVariant(AreaTopLeftHandCorner.at(0))); // 0
+				c.values.push_back(QVariant(AreaTopLeftHandCorner.at(1))); // 1
 			}
 			else
 			{
@@ -2257,17 +2169,11 @@ void PrConfigUtils::read_display_areas(
 				c.values.push_back(QVariant((int)-1));
 			}
 			std::vector<int> BottomRightHandCorner;
-			if (
-				DicomUtils::get_sl_values(
-					nestedds,
-					tBottomRightHandCorner,
-					BottomRightHandCorner) &&
+			if (DicomUtils::get_sl_values(nestedds, tBottomRightHandCorner, BottomRightHandCorner) &&
 				BottomRightHandCorner.size() == 2)
 			{
-				c.values.push_back(QVariant(
-					BottomRightHandCorner.at(0))); // 2
-				c.values.push_back(QVariant(
-					BottomRightHandCorner.at(1))); // 3
+				c.values.push_back(QVariant(BottomRightHandCorner.at(0))); // 2
+				c.values.push_back(QVariant(BottomRightHandCorner.at(1))); // 3
 			}
 			else
 			{
@@ -2275,31 +2181,20 @@ void PrConfigUtils::read_display_areas(
 				c.values.push_back(QVariant((int)-1));
 			}
 			QString PresentationSizeMode;
-			if (DicomUtils::get_string_value(
-					nestedds,
-					tPresentationSizeMode,
-					PresentationSizeMode))
+			if (DicomUtils::get_string_value(nestedds, tPresentationSizeMode, PresentationSizeMode))
 			{
-				c.values.push_back(QVariant(
-					PresentationSizeMode
-						.trimmed()
-						.remove(QChar('\0')))); // 4
+				c.values.push_back(QVariant(PresentationSizeMode.trimmed().remove(QChar('\0')))); // 4
 			}
 			else
 			{
 				c.values.push_back(QVariant(QString("")));
 			}
 			std::vector<int> PresentationPixelAspectRatio;
-			if (DicomUtils::get_is_values(
-					nestedds,
-					tPresentationPixelAspectRatio,
-					PresentationPixelAspectRatio) &&
+			if (DicomUtils::get_is_values(nestedds, tPresentationPixelAspectRatio, PresentationPixelAspectRatio) &&
 				PresentationPixelAspectRatio.size() == 2)
 			{
-				c.values.push_back(QVariant(
-					PresentationPixelAspectRatio.at(0))); // 5
-				c.values.push_back(QVariant(
-					PresentationPixelAspectRatio.at(1))); // 6
+				c.values.push_back(QVariant(PresentationPixelAspectRatio.at(0))); // 5
+				c.values.push_back(QVariant(PresentationPixelAspectRatio.at(1))); // 6
 			}
 			else
 			{
@@ -2307,16 +2202,11 @@ void PrConfigUtils::read_display_areas(
 				c.values.push_back(QVariant((int)1));
 			}
 			std::vector<double> PresentationPixelSpacing;
-			if (DicomUtils::get_ds_values(
-					nestedds,
-					tPresentationPixelSpacing,
-					PresentationPixelSpacing) &&
+			if (DicomUtils::get_ds_values(nestedds, tPresentationPixelSpacing, PresentationPixelSpacing) &&
 				PresentationPixelSpacing.size() == 2)
 			{
-				c.values.push_back(QVariant(
-					PresentationPixelSpacing.at(0))); // 7
-				c.values.push_back(QVariant(
-					PresentationPixelSpacing.at(1))); // 8
+				c.values.push_back(QVariant(PresentationPixelSpacing.at(0))); // 7
+				c.values.push_back(QVariant(PresentationPixelSpacing.at(1))); // 8
 			}
 			else
 			{
@@ -2324,16 +2214,11 @@ void PrConfigUtils::read_display_areas(
 				c.values.push_back(QVariant((double)1));
 			}
 			std::vector<float> PresentationPixelMagnificationRatio;
-			if (DicomUtils::get_fl_values(
-					nestedds,
-					tPresentationPixelMagnificationRatio,
-					PresentationPixelMagnificationRatio) &&
+			if (DicomUtils::get_fl_values(nestedds, tPresentationPixelMagnificationRatio, PresentationPixelMagnificationRatio) &&
 				PresentationPixelMagnificationRatio.size() == 2)
 			{
-				c.values.push_back(QVariant((double)
-					PresentationPixelMagnificationRatio.at(0))); // 9
-				c.values.push_back(QVariant((double)
-					PresentationPixelMagnificationRatio.at(1))); // 10
+				c.values.push_back(QVariant((double)PresentationPixelMagnificationRatio.at(0))); // 9
+				c.values.push_back(QVariant((double)PresentationPixelMagnificationRatio.at(1))); // 10
 			}
 			else
 			{
@@ -2343,25 +2228,19 @@ void PrConfigUtils::read_display_areas(
 			//
 			if (nestedds.FindDataElement(tReferencedImageSequence))
 			{
-				const mdcm::DataElement & de1 =
-					nestedds.GetDataElement(tReferencedImageSequence);
-				mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 =
-					de1.GetValueAsSQ();
+				const mdcm::DataElement & de1 = nestedds.GetDataElement(tReferencedImageSequence);
+				mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 = de1.GetValueAsSQ();
 				if (!sq1) continue;
-				const unsigned int number_of_items1 =
-					sq1->GetNumberOfItems();
+				const unsigned int number_of_items1 = sq1->GetNumberOfItems();
 				for (unsigned int x1 = 0; x1 < number_of_items1; ++x1)
 				{
 					const mdcm::Item & item1 = sq1->GetItem(x1+1);
-					const mdcm::DataSet & nestedds1 =
-						item1.GetNestedDataSet();
+					const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
 					QString s1, s2;
-					if (DicomUtils::get_string_value(
-							nestedds1,tReferencedSOPInstanceUID,s1))
+					if (DicomUtils::get_string_value(nestedds1,tReferencedSOPInstanceUID,s1))
 					{
 						c.values.push_back(QVariant(s1)); // 11+
-						if (DicomUtils::get_string_value(
-								nestedds1,tReferencedFrameNumber,s2))
+						if (DicomUtils::get_string_value(nestedds1,tReferencedFrameNumber,s2))
 							c.values.push_back(QVariant(s2)); //
 						else
 							c.values.push_back(QVariant(QString(""))); //
@@ -2415,11 +2294,9 @@ void PrConfigUtils::read_spatial_transformation(
 	const mdcm::Tag tImageRotation(0x0070,0x0042);
 	// clockwise in degrees, 0 90 180 270
 	QString ImageHorizontalFlip("");
-	const bool flip = DicomUtils::get_string_value(
-		ds,tImageHorizontalFlip,ImageHorizontalFlip);
+	const bool flip = DicomUtils::get_string_value(ds,tImageHorizontalFlip,ImageHorizontalFlip);
 	unsigned short ImageRotation = 0;
-	const bool rotation = DicomUtils::get_us_value(
-		ds,tImageRotation,&ImageRotation);
+	const bool rotation = DicomUtils::get_us_value(ds,tImageRotation,&ImageRotation);
 	if (rotation||flip)
 	{
 		PrConfig c;
@@ -2442,7 +2319,7 @@ static void get_overlays(
 	std::vector<uint16_t> & l)
 {
 	mdcm::Tag t(0x6000,0x0000);
-	while(true)
+	while (true)
 	{
 		const mdcm::DataElement & e = ds.FindNextDataElement(t);
 		if (e.GetTag().GetGroup() > 0x60FF)
@@ -2456,28 +2333,12 @@ static void get_overlays(
 		}
 		else
 		{
-			// This is a potential overlay element, let's check this is not a broken LEADTOOL image,
-			// or prova0001.dcm:
-			// (5000,0000) UL 0 # 4, 1 GenericGroupLength
-			// (6000,0000) UL 0 # 4, 1 GenericGroupLength
-			// (6001,0000) UL 28 # 4, 1 PrivateGroupLength
-			// (6001,0010) LT [PAPYRUS 3.0] # 12, 1 PrivateCreator
-			// (6001,1001) LT (no value available) # 0, 0 Unknown Tag & Data
-			//
-			// FIXME:
-			// In order to support : mdcmData/SIEMENS_GBS_III-16-ACR_NEMA_1.acr
-			//   mdcmDataExtra/mdcmSampleData/images_of_interest/XA_GE_JPEG_02_with_Overlays.dcm
-			// I cannot simply check for overlay_group,3000 this would not work
-			// I would need a strong euristick
-			//
 			t = e.GetTag();
 			mdcm::Tag tOverlayData(t.GetGroup(), 0x3000);
 			if (ds.FindDataElement(tOverlayData))
 			{
-				const mdcm::DataElement & eOverlayData =
-					ds.GetDataElement(tOverlayData);
-				if (!eOverlayData.IsEmpty())
-					l.push_back(t.GetGroup());
+				const mdcm::DataElement & eOverlayData = ds.GetDataElement(tOverlayData);
+				if (!eOverlayData.IsEmpty()) l.push_back(t.GetGroup());
 			}
 			t.SetGroup((uint16_t)(t.GetGroup()+2));
 			t.SetElement(0);
@@ -2494,23 +2355,19 @@ static void read_overlays(
 	get_overlays(ds, l);
 	const unsigned int s = l.size();
 	if (s < 1) return;
-	for(unsigned int i = 0; i < s; ++i)
+	for (unsigned int i = 0; i < s; ++i)
 	{
 		mdcm::Overlay o;
 		mdcm::Tag t(0x6000,0x0000);
 		t.SetGroup(l.at(i));
-		const mdcm::DataElement & e =
-			ds.FindNextDataElement(t);
+		const mdcm::DataElement & e = ds.FindNextDataElement(t);
 		mdcm::DataElement e2 = e;
-		while(e2.GetTag().GetGroup() == l.at(i))
+		while (e2.GetTag().GetGroup() == l.at(i))
 		{
 			o.Update(e2);
-			t.SetElement((uint16_t)
-				(e2.GetTag().GetElement()+1));
+			t.SetElement((uint16_t)(e2.GetTag().GetElement() + 1));
 			e2 = ds.FindNextDataElement(t);
 		}
-		//std::ostringstream u;
-		//o.Decompress(u);
 		overlays.push_back(o);
 	}
 	if (overlays.empty()) return;
@@ -2518,10 +2375,8 @@ static void read_overlays(
 	for (unsigned int i = 0; i < overlays.size(); ++i)
 	{
 		mdcm::Overlay & o = overlays[i];
-		const unsigned int NumberOfFrames =
-			(unsigned int)o.GetNumberOfFrames();
-		const unsigned int FrameOrigin =
-			(unsigned int)o.GetFrameOrigin();
+		const unsigned int NumberOfFrames = (unsigned int)o.GetNumberOfFrames();
+		const unsigned int FrameOrigin = (unsigned int)o.GetFrameOrigin();
 		const int o_dimx = (int)o.GetColumns();
 		const int o_dimy = (int)o.GetRows();
 		const int o_x    = (int)o.GetOrigin()[0];
@@ -2529,7 +2384,7 @@ static void read_overlays(
 		if (NumberOfFrames > 0 && FrameOrigin > 0)
 		{
 			const size_t obuffer_size = o.GetUnpackBufferLength();
-			if (obuffer_size%NumberOfFrames != 0) continue;
+			if (obuffer_size % NumberOfFrames != 0) continue;
 			const size_t fbuffer_size = obuffer_size/NumberOfFrames;
 			char * tmp0;
 			try
@@ -2541,8 +2396,7 @@ static void read_overlays(
 				continue;
 			}
 			if (!tmp0) continue;
-			const bool obuffer_ok = o.GetUnpackBuffer(
-				tmp0, obuffer_size);
+			const bool obuffer_ok = o.GetUnpackBuffer(tmp0, obuffer_size);
 			if (!obuffer_ok)
 			{
 				delete [] tmp0;
@@ -2556,7 +2410,7 @@ static void read_overlays(
 				overlay.dimy = o_dimy;
 				overlay.x    = o_x;
 				overlay.y    = o_y;
-				const size_t p = idx*o_dimx*o_dimy;
+				const size_t p = idx * o_dimx * o_dimy;
 				++idx;
 				for (size_t j = 0; j < fbuffer_size; ++j)
 				{
@@ -2567,18 +2421,12 @@ static void read_overlays(
 					}
 					else
 					{
-						std::cout
-							<< "warning: read_overlays() jj="
-							<< jj << " obuffer_size"
-							<< obuffer_size << std::endl;
+						std::cout << "warning: read_overlays() jj=" << jj << " obuffer_size" << obuffer_size << std::endl;
 					}
 				}
-				slice_overlays.insert(idx-1, overlay);
+				slice_overlays.insert(idx - 1, overlay);
 #if 0
-				std::cout
-					<< "obuffer_size=" << obuffer_size
-					<< " fbuffer_size=" << fbuffer_size
-					<< " idx=" << idx-1
+				std::cout << "obuffer_size=" << obuffer_size << " fbuffer_size=" << fbuffer_size << " idx=" << idx-1
 					<< " p=" << p << std::endl;
 #endif
 			}
@@ -2591,8 +2439,7 @@ static void read_overlays(
 			overlay.dimy = o_dimy;
 			overlay.x    = o_x;
 			overlay.y    = o_y;
-			const size_t obuffer_size =
-				o.GetUnpackBufferLength();
+			const size_t obuffer_size = o.GetUnpackBufferLength();
 			char * tmp0;
 			try
 			{
@@ -2603,8 +2450,7 @@ static void read_overlays(
 				continue;
 			}
 			if (!tmp0) continue;
-			const bool obuffer_ok = o.GetUnpackBuffer(
-				tmp0, obuffer_size);
+			const bool obuffer_ok = o.GetUnpackBuffer(tmp0, obuffer_size);
 			if (!obuffer_ok)
 			{
 				delete [] tmp0;
@@ -2631,8 +2477,7 @@ static void read_overlays(
 		{
 			for (int j = 0; j < l2.size(); ++j)
 			{
-				ref.image_overlays.all_overlays[idx]
-					.push_back(l2[j]);
+				ref.image_overlays.all_overlays[idx].push_back(l2[j]);
 			}
 		}
 	}
@@ -2691,43 +2536,32 @@ void PrConfigUtils::read_graphic_objects(
 	const mdcm::Tag tFillPattern(0x0070,0x0256);
 	//
 	QString t00080005("");
-	const bool t00080005_ok =
-		DicomUtils::get_string_value(ds, mdcm::Tag(0x0008,0x0005), t00080005);
+	const bool t00080005_ok = DicomUtils::get_string_value(ds, mdcm::Tag(0x0008,0x0005), t00080005);
 	(void)t00080005_ok;
 	if (ds.FindDataElement(tGraphicAnnotationSequence))
 	{
-		const mdcm::DataElement & de =
-			ds.GetDataElement(tGraphicAnnotationSequence);
-		mdcm::SmartPointer<mdcm::SequenceOfItems> sq =
-			de.GetValueAsSQ();
+		const mdcm::DataElement & de = ds.GetDataElement(tGraphicAnnotationSequence);
+		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 		if (!sq) return;
-		const unsigned int number_of_items =
-			sq->GetNumberOfItems();
+		const unsigned int number_of_items = sq->GetNumberOfItems();
 		for (unsigned int x = 0; x < number_of_items; ++x)
 		{
-			const mdcm::Item & item = sq->GetItem(x+1);
-			const mdcm::DataSet & nestedds =
-				item.GetNestedDataSet();
+			const mdcm::Item & item = sq->GetItem(x + 1);
+			const mdcm::DataSet & nestedds = item.GetNestedDataSet();
 			QStringList ref_sop;
 			if (nestedds.FindDataElement(tReferencedImageSequence))
 			{
-				const mdcm::DataElement & de1 =
-					nestedds.GetDataElement(tReferencedImageSequence);
-				mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 =
-					de1.GetValueAsSQ();
+				const mdcm::DataElement & de1 = nestedds.GetDataElement(tReferencedImageSequence);
+				mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 = de1.GetValueAsSQ();
 				if (!sq1) continue;
-				const unsigned int number_of_items1 =
-					sq1->GetNumberOfItems();
+				const unsigned int number_of_items1 = sq1->GetNumberOfItems();
 				for (unsigned int x1 = 0; x1 < number_of_items1; ++x1)
 				{
 					const mdcm::Item & item1 = sq1->GetItem(x1+1);
-					const mdcm::DataSet & nestedds1 =
-						item1.GetNestedDataSet();
+					const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
 					QString s1, s2;
-					const bool s1_ok = DicomUtils::get_string_value(
-						nestedds1,tReferencedSOPInstanceUID,s1);
-					const bool s2_ok = DicomUtils::get_string_value(
-						nestedds1,tReferencedFrameNumber,s2);
+					const bool s1_ok = DicomUtils::get_string_value(nestedds1,tReferencedSOPInstanceUID,s1);
+					const bool s2_ok = DicomUtils::get_string_value(nestedds1,tReferencedFrameNumber,s2);
 					ref_sop.push_back(s1);
 					ref_sop.push_back(s2);
 					(void)s1_ok;
@@ -2760,54 +2594,34 @@ void PrConfigUtils::read_graphic_objects(
 			}
 			if (nestedds.FindDataElement(tGraphicObjectSequence))
 			{
-				const mdcm::DataElement & de2 =
-					nestedds.GetDataElement(tGraphicObjectSequence);
-				mdcm::SmartPointer<mdcm::SequenceOfItems> sq2 =
-					de2.GetValueAsSQ();
+				const mdcm::DataElement & de2 = nestedds.GetDataElement(tGraphicObjectSequence);
+				mdcm::SmartPointer<mdcm::SequenceOfItems> sq2 = de2.GetValueAsSQ();
 				if (!sq2) continue;
-				const unsigned int number_of_items2 =
-					sq2->GetNumberOfItems();
+				const unsigned int number_of_items2 = sq2->GetNumberOfItems();
 				for (unsigned int x2 = 0; x2 < number_of_items2; ++x2)
 				{
 					PrConfig c;
 					c.id = 6;
 					c.desc = QString("Graphic Object");
 					const mdcm::Item & item2 = sq2->GetItem(x2+1);
-					const mdcm::DataSet & nestedds2 =
-						item2.GetNestedDataSet();
+					const mdcm::DataSet & nestedds2 = item2.GetNestedDataSet();
 					QString GraphicType;
-					if (DicomUtils::get_string_value(
-						nestedds2,
-						tGraphicType,
-						GraphicType))
+					if (DicomUtils::get_string_value(nestedds2, tGraphicType, GraphicType))
 					{
-						GraphicType = GraphicType
-							.trimmed()
-							.toUpper()
-							.remove(QChar('\0'));
+						GraphicType = GraphicType.trimmed().toUpper().remove(QChar('\0'));
 					}
 					std::vector<float> GraphicData;
 					if (!(!GraphicType.isEmpty() &&
-						(DicomUtils::get_fl_values(
-							nestedds2,
-							tGraphicData,
-							GraphicData) && GraphicData.size()>1)))
+						(DicomUtils::get_fl_values(nestedds2, tGraphicData, GraphicData) && GraphicData.size() > 1)))
 					{
 						continue;
 					}
 					c.values.push_back(QVariant(GraphicType)); // 0
 					QString GraphicAnnotationUnits;
-					if (DicomUtils::get_string_value(
-						nestedds2,
-						tGraphicAnnotationUnits,
-						GraphicAnnotationUnits))
+					if (DicomUtils::get_string_value(nestedds2, tGraphicAnnotationUnits, GraphicAnnotationUnits))
 					{
-						GraphicAnnotationUnits = GraphicAnnotationUnits
-							.trimmed()
-							.toUpper()
-							.remove(QChar('\0'));
-						c.values.push_back(QVariant(
-							GraphicAnnotationUnits)); // 1
+						GraphicAnnotationUnits = GraphicAnnotationUnits.trimmed().toUpper().remove(QChar('\0'));
+						c.values.push_back(QVariant(GraphicAnnotationUnits)); // 1
 					}
 					else
 					{
@@ -2815,27 +2629,17 @@ void PrConfigUtils::read_graphic_objects(
 					}
 					{
 						QList<QVariant> q;
-						for (unsigned int x3 = 0;
-							x3 < GraphicData.size();
-							++x3)
+						for (unsigned int x3 = 0; x3 < GraphicData.size(); ++x3)
 						{
-							q.push_back(QVariant(
-								(double)GraphicData.at(x3)));
+							q.push_back(QVariant((double)GraphicData.at(x3)));
 						}
 						c.values.push_back(QVariant(q)); // 2
 					}
 					QString GraphicFilled;
-					if (DicomUtils::get_string_value(
-						nestedds2,
-						tGraphicFilled,
-						GraphicFilled))
+					if (DicomUtils::get_string_value(nestedds2, tGraphicFilled, GraphicFilled))
 					{
-						GraphicFilled = GraphicFilled
-							.trimmed()
-							.toUpper()
-							.remove(QChar('\0'));
-						c.values.push_back(QVariant(
-							GraphicFilled)); // 3
+						GraphicFilled = GraphicFilled.trimmed().toUpper().remove(QChar('\0'));
+						c.values.push_back(QVariant(GraphicFilled)); // 3
 					}
 					else
 					{
@@ -2894,43 +2698,32 @@ void PrConfigUtils::read_text_annotations(
 	const mdcm::Tag tBold(0x0070,0x0249);          // Y, N
 	const mdcm::Tag tItalic(0x0070,0x0250);        // Y, N
 	QString t00080005("");
-	const bool t00080005_ok =
-		DicomUtils::get_string_value(ds, mdcm::Tag(0x0008,0x0005), t00080005);
+	const bool t00080005_ok = DicomUtils::get_string_value(ds, mdcm::Tag(0x0008,0x0005), t00080005);
 	(void)t00080005_ok;
 	if (ds.FindDataElement(tGraphicAnnotationSequence))
 	{
-		const mdcm::DataElement & de =
-			ds.GetDataElement(tGraphicAnnotationSequence);
-		mdcm::SmartPointer<mdcm::SequenceOfItems> sq =
-			de.GetValueAsSQ();
+		const mdcm::DataElement & de = ds.GetDataElement(tGraphicAnnotationSequence);
+		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 		if (!sq) return;
-		const unsigned int number_of_items =
-			sq->GetNumberOfItems();
+		const unsigned int number_of_items = sq->GetNumberOfItems();
 		for (unsigned int x = 0; x < number_of_items; ++x)
 		{
-			const mdcm::Item & item = sq->GetItem(x+1);
-			const mdcm::DataSet & nestedds =
-				item.GetNestedDataSet();
+			const mdcm::Item & item = sq->GetItem(x + 1);
+			const mdcm::DataSet & nestedds = item.GetNestedDataSet();
 			QStringList ref_sop;
 			if (nestedds.FindDataElement(tReferencedImageSequence))
 			{
-				const mdcm::DataElement & de1 =
-					nestedds.GetDataElement(tReferencedImageSequence);
-				mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 =
-					de1.GetValueAsSQ();
+				const mdcm::DataElement & de1 = nestedds.GetDataElement(tReferencedImageSequence);
+				mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 = de1.GetValueAsSQ();
 				if (!sq1) continue;
-				const unsigned int number_of_items1 =
-					sq1->GetNumberOfItems();
+				const unsigned int number_of_items1 = sq1->GetNumberOfItems();
 				for (unsigned int x1 = 0; x1 < number_of_items1; ++x1)
 				{
 					const mdcm::Item & item1 = sq1->GetItem(x1+1);
-					const mdcm::DataSet & nestedds1 =
-						item1.GetNestedDataSet();
+					const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
 					QString s1, s2;
-					const bool s1_ok = DicomUtils::get_string_value(
-						nestedds1,tReferencedSOPInstanceUID,s1);
-					const bool s2_ok = DicomUtils::get_string_value(
-						nestedds1,tReferencedFrameNumber,s2);
+					const bool s1_ok = DicomUtils::get_string_value(nestedds1,tReferencedSOPInstanceUID,s1);
+					const bool s2_ok = DicomUtils::get_string_value(nestedds1,tReferencedFrameNumber,s2);
 					ref_sop.push_back(s1);
 					ref_sop.push_back(s2);
 					(void)s1_ok;
@@ -2963,13 +2756,10 @@ void PrConfigUtils::read_text_annotations(
 			}
 			if (nestedds.FindDataElement(tTextObjectSequence))
 			{
-				const mdcm::DataElement & de2 =
-					nestedds.GetDataElement(tTextObjectSequence);
-				mdcm::SmartPointer<mdcm::SequenceOfItems> sq2 =
-					de2.GetValueAsSQ();
+				const mdcm::DataElement & de2 = nestedds.GetDataElement(tTextObjectSequence);
+				mdcm::SmartPointer<mdcm::SequenceOfItems> sq2 = de2.GetValueAsSQ();
 				if (!sq2) continue;
-				const unsigned int number_of_items2 =
-					sq2->GetNumberOfItems();
+				const unsigned int number_of_items2 = sq2->GetNumberOfItems();
 				for (unsigned int x2 = 0; x2 < number_of_items2; ++x2)
 				{
 					PrConfig c;
@@ -2981,46 +2771,25 @@ void PrConfigUtils::read_text_annotations(
 					std::vector<float> AnchorPoint;
 					std::vector<float> AreaTopLeftHandCorner;
 					std::vector<float> BottomRightHandCorner;
-					if ((DicomUtils::get_fl_values(
-								nestedds2,
-								tBoundingBoxTopLeftHandCorner,
-								AreaTopLeftHandCorner) &&
-									AreaTopLeftHandCorner.size() == 2) &&
-						(DicomUtils::get_fl_values(
-							nestedds2,
-							tBoundingBoxBottomRightHandCorner,
-							BottomRightHandCorner) &&
-								BottomRightHandCorner.size() == 2))
+					if ((DicomUtils::get_fl_values(nestedds2, tBoundingBoxTopLeftHandCorner, AreaTopLeftHandCorner) &&
+							AreaTopLeftHandCorner.size() == 2) &&
+						(DicomUtils::get_fl_values(nestedds2, tBoundingBoxBottomRightHandCorner, BottomRightHandCorner) &&
+							BottomRightHandCorner.size() == 2))
 					{
-						c.values.push_back(QVariant(
-							(int)1));                      // 0
-						c.values.push_back(QVariant(
-							AreaTopLeftHandCorner.at(0))); // 1
-						c.values.push_back(QVariant(
-							AreaTopLeftHandCorner.at(1))); // 2
-						c.values.push_back(QVariant(
-							BottomRightHandCorner.at(0))); // 3
-						c.values.push_back(QVariant(
-							BottomRightHandCorner.at(1))); // 4
+						c.values.push_back(QVariant((int)1));                      // 0
+						c.values.push_back(QVariant(AreaTopLeftHandCorner.at(0))); // 1
+						c.values.push_back(QVariant(AreaTopLeftHandCorner.at(1))); // 2
+						c.values.push_back(QVariant(BottomRightHandCorner.at(0))); // 3
+						c.values.push_back(QVariant(BottomRightHandCorner.at(1))); // 4
 						QString BoundingBoxAnnotationUnits;
-						if (DicomUtils::get_string_value(
-								nestedds2,
-								tBoundingBoxAnnotationUnits,
-								BoundingBoxAnnotationUnits))
+						if (DicomUtils::get_string_value(nestedds2, tBoundingBoxAnnotationUnits, BoundingBoxAnnotationUnits))
 						{
-							BoundingBoxAnnotationUnits =
-								BoundingBoxAnnotationUnits
-									.trimmed()
-									.toUpper()
-									.remove(QChar('\0'));
-							c.values.push_back(
-								QVariant(
-									BoundingBoxAnnotationUnits)); // 5
+							BoundingBoxAnnotationUnits = BoundingBoxAnnotationUnits.trimmed().toUpper().remove(QChar('\0'));
+							c.values.push_back(QVariant(BoundingBoxAnnotationUnits)); // 5
 						}
 						else
 						{
-							c.values.push_back(QVariant(
-								QString(""))); // 5
+							c.values.push_back(QVariant(QString(""))); // 5
 						}
 					}
 					else
@@ -3032,56 +2801,31 @@ void PrConfigUtils::read_text_annotations(
 						c.values.push_back(QVariant((double)0));   // 4
 						c.values.push_back(QVariant(QString(""))); // 5
 					}
-					if (DicomUtils::get_fl_values(
-								nestedds2,
-								tAnchorPoint,
-								AnchorPoint) &&
+					if (DicomUtils::get_fl_values(nestedds2, tAnchorPoint, AnchorPoint) &&
 							AnchorPoint.size() == 2)
 					{
-						c.values.push_back(QVariant(
-							(int)1));            // 6
-						c.values.push_back(QVariant(
-							AnchorPoint.at(0))); // 7
-						c.values.push_back(QVariant(
-							AnchorPoint.at(1))); // 8
+						c.values.push_back(QVariant((int)1));            // 6
+						c.values.push_back(QVariant(AnchorPoint.at(0))); // 7
+						c.values.push_back(QVariant(AnchorPoint.at(1))); // 8
 						QString AnchorPointAnnotationUnits;
-						if (DicomUtils::get_string_value(
-								nestedds2,
-								tAnchorPointAnnotationUnits,
-								AnchorPointAnnotationUnits))
+						if (DicomUtils::get_string_value(nestedds2, tAnchorPointAnnotationUnits, AnchorPointAnnotationUnits))
 						{
-							AnchorPointAnnotationUnits =
-								AnchorPointAnnotationUnits
-									.trimmed()
-									.toUpper()
-									.remove(QChar('\0'));
-							c.values.push_back(
-								QVariant(
-									AnchorPointAnnotationUnits)); // 9
+							AnchorPointAnnotationUnits = AnchorPointAnnotationUnits.trimmed().toUpper().remove(QChar('\0'));
+							c.values.push_back(QVariant(AnchorPointAnnotationUnits)); // 9
 						}
 						else
 						{
-							c.values.push_back(QVariant(
-								QString(""))); // 9
+							c.values.push_back(QVariant(QString(""))); // 9
 						}
 						QString AnchorPointVisibility;
-						if (DicomUtils::get_string_value(
-								nestedds2,
-								tAnchorPointVisibility,
-								AnchorPointVisibility))
+						if (DicomUtils::get_string_value(nestedds2, tAnchorPointVisibility, AnchorPointVisibility))
 						{
-							AnchorPointVisibility =
-								AnchorPointVisibility
-									.trimmed()
-									.toUpper()
-									.remove(QChar('\0'));
-							c.values.push_back(
-								QVariant(AnchorPointVisibility)); // 10
+							AnchorPointVisibility = AnchorPointVisibility.trimmed().toUpper().remove(QChar('\0'));
+							c.values.push_back(QVariant(AnchorPointVisibility)); // 10
 						}
 						else
 						{
-							c.values.push_back(QVariant(
-								QString(""))); // 10
+							c.values.push_back(QVariant(QString(""))); // 10
 						}
 					}
 					else
@@ -3094,20 +2838,11 @@ void PrConfigUtils::read_text_annotations(
 					}
 					if (nestedds2.FindDataElement(tUnformattedTextValue))
 					{
-						const mdcm::DataElement & e5 =
-							nestedds2.GetDataElement(
-								tUnformattedTextValue);
-						if (!e5.IsEmpty() &&
-							!e5.IsUndefinedLength() &&
-							e5.GetByteValue())
+						const mdcm::DataElement & e5 = nestedds2.GetDataElement(tUnformattedTextValue);
+						if (!e5.IsEmpty() && !e5.IsUndefinedLength() && e5.GetByteValue())
 						{
-							QByteArray ba5(
-								e5.GetByteValue()->GetPointer(),
-								e5.GetByteValue()->GetLength());
-							QString tmp5 =
-								CodecUtils::toUTF8(
-									&ba5,
-									t00080005.toLatin1().constData());
+							QByteArray ba5(e5.GetByteValue()->GetPointer(), e5.GetByteValue()->GetLength());
+							QString tmp5 = CodecUtils::toUTF8(&ba5, t00080005.toLatin1().constData());
 							c.values.push_back(tmp5); // 11
 						}
 					}
@@ -3117,186 +2852,102 @@ void PrConfigUtils::read_text_annotations(
 					}
 					if (nestedds2.FindDataElement(tTextStyleSequence))
 					{
-						const mdcm::DataElement & de3 =
-							nestedds2.GetDataElement(tTextStyleSequence);
-						mdcm::SmartPointer<mdcm::SequenceOfItems> sq3 =
-							de3.GetValueAsSQ();
+						const mdcm::DataElement & de3 = nestedds2.GetDataElement(tTextStyleSequence);
+						mdcm::SmartPointer<mdcm::SequenceOfItems> sq3 = de3.GetValueAsSQ();
 						if (sq3 && sq3->GetNumberOfItems() == 1)
 						{
 							c.values.push_back(QVariant((int)1)); // 12
 							const mdcm::Item & item3 = sq3->GetItem(1);
-							const mdcm::DataSet & nestedds3 =
-								item3.GetNestedDataSet();
+							const mdcm::DataSet & nestedds3 = item3.GetNestedDataSet();
 							QString FontName;
-							if (DicomUtils::get_string_value(
-									nestedds3,
-									tFontName,
-									FontName))
+							if (DicomUtils::get_string_value(nestedds3, tFontName, FontName))
 							{
-								FontName =
-									FontName
-										.trimmed()
-										.toUpper()
-										.remove(QChar('\0'));
-								c.values.push_back(
-									QVariant(FontName)); // 13
+								FontName = FontName.trimmed().toUpper().remove(QChar('\0'));
+								c.values.push_back(QVariant(FontName)); // 13
 							}
 							else
 							{
-								c.values.push_back(QVariant(
-									QString(""))); // 13
+								c.values.push_back(QVariant(QString(""))); // 13
 							}
 							QString FontNameType;
-							if (DicomUtils::get_string_value(
-									nestedds3,
-									tFontNameType,
-									FontNameType))
+							if (DicomUtils::get_string_value(nestedds3, tFontNameType, FontNameType))
 							{
-								FontNameType =
-									FontNameType
-										.trimmed()
-										.toUpper()
-										.remove(QChar('\0'));
-								c.values.push_back(
-									QVariant(FontNameType)); // 14
+								FontNameType = FontNameType.trimmed().toUpper().remove(QChar('\0'));
+								c.values.push_back(QVariant(FontNameType)); // 14
 							}
 							else
 							{
-								c.values.push_back(QVariant(
-									QString(""))); // 14
+								c.values.push_back(QVariant(QString(""))); // 14
 							}
 							QString CSSFontName;
-							if (DicomUtils::get_string_value(
-									nestedds3,
-									tCSSFontName,
-									CSSFontName))
+							if (DicomUtils::get_string_value(nestedds3, tCSSFontName, CSSFontName))
 							{
-								CSSFontName =
-									CSSFontName
-										.trimmed()
-										.toUpper()
-										.remove(QChar('\0'));
-								c.values.push_back(
-									QVariant(CSSFontName)); // 15
+								CSSFontName = CSSFontName.trimmed().toUpper().remove(QChar('\0'));
+								c.values.push_back(QVariant(CSSFontName)); // 15
 							}
 							else
 							{
-								c.values.push_back(QVariant(
-									QString(""))); // 15
+								c.values.push_back(QVariant(QString(""))); // 15
 							}
 							QString HorizontalAlignment;
-							if (DicomUtils::get_string_value(
-									nestedds3,
-									tHorizontalAlignment,
-									HorizontalAlignment))
+							if (DicomUtils::get_string_value(nestedds3, tHorizontalAlignment, HorizontalAlignment))
 							{
-								HorizontalAlignment =
-									HorizontalAlignment
-										.trimmed()
-										.toUpper()
-										.remove(QChar('\0'));
-								c.values.push_back(
-									QVariant(HorizontalAlignment)); // 16
+								HorizontalAlignment = HorizontalAlignment.trimmed().toUpper().remove(QChar('\0'));
+								c.values.push_back(QVariant(HorizontalAlignment)); // 16
 							}
 							else
 							{
-								c.values.push_back(QVariant(
-									QString(""))); // 16
+								c.values.push_back(QVariant(QString(""))); // 16
 							}
 							QString VerticalAlignment;
-							if (DicomUtils::get_string_value(
-									nestedds3,
-									tVerticalAlignment,
-									VerticalAlignment))
+							if (DicomUtils::get_string_value(nestedds3, tVerticalAlignment, VerticalAlignment))
 							{
-								VerticalAlignment =
-									VerticalAlignment
-										.trimmed()
-										.toUpper()
-										.remove(QChar('\0'));
-								c.values.push_back(
-									QVariant(VerticalAlignment)); // 17
+								VerticalAlignment = VerticalAlignment.trimmed().toUpper().remove(QChar('\0'));
+								c.values.push_back(QVariant(VerticalAlignment)); // 17
 							}
 							else
 							{
-								c.values.push_back(QVariant(
-									QString(""))); // 17
+								c.values.push_back(QVariant(QString(""))); // 17
 							}
 							QString ShadowStyle;
-							if (DicomUtils::get_string_value(
-									nestedds3,
-									tShadowStyle,
-									ShadowStyle))
+							if (DicomUtils::get_string_value(nestedds3, tShadowStyle, ShadowStyle))
 							{
-								ShadowStyle =
-									ShadowStyle
-										.trimmed()
-										.toUpper()
-										.remove(QChar('\0'));
-								c.values.push_back(
-									QVariant(ShadowStyle)); // 18
+								ShadowStyle = ShadowStyle.trimmed().toUpper().remove(QChar('\0'));
+								c.values.push_back(QVariant(ShadowStyle)); // 18
 							}
 							else
 							{
-								c.values.push_back(QVariant(
-									QString(""))); // 18
+								c.values.push_back(QVariant(QString(""))); // 18
 							}
 							QString Underlined;
-							if (DicomUtils::get_string_value(
-									nestedds3,
-									tUnderlined,
-									Underlined))
+							if (DicomUtils::get_string_value(nestedds3, tUnderlined, Underlined))
 							{
-								Underlined =
-									Underlined
-										.trimmed()
-										.toUpper()
-										.remove(QChar('\0'));
-								c.values.push_back(
-									QVariant(Underlined)); // 19
+								Underlined = Underlined.trimmed().toUpper().remove(QChar('\0'));
+								c.values.push_back(QVariant(Underlined)); // 19
 							}
 							else
 							{
-								c.values.push_back(
-									QVariant(QString(""))); // 19
+								c.values.push_back(QVariant(QString(""))); // 19
 							}
 							QString Bold;
-							if (DicomUtils::get_string_value(
-									nestedds3,
-									tBold,
-									Bold))
+							if (DicomUtils::get_string_value(nestedds3, tBold, Bold))
 							{
-								Bold =
-									Bold
-										.trimmed()
-										.toUpper()
-										.remove(QChar('\0'));
-								c.values.push_back(
-									QVariant(Bold)); // 20
+								Bold = Bold.trimmed().toUpper().remove(QChar('\0'));
+								c.values.push_back(QVariant(Bold)); // 20
 							}
 							else
 							{
-								c.values.push_back(QVariant(
-									QString(""))); // 20
+								c.values.push_back(QVariant(QString(""))); // 20
 							}
 							QString Italic;
-							if (DicomUtils::get_string_value(
-									nestedds3,
-									tItalic,
-									Italic))
+							if (DicomUtils::get_string_value(nestedds3, tItalic, Italic))
 							{
-								Italic =
-									Italic
-										.trimmed()
-										.toUpper()
-										.remove(QChar('\0'));
-								c.values.push_back(
-									QVariant(Italic)); // 21
+								Italic = Italic.trimmed().toUpper().remove(QChar('\0'));
+								c.values.push_back(QVariant(Italic)); // 21
 							}
 							else
 							{
-								c.values.push_back(QVariant(
-									QString(""))); // 21
+								c.values.push_back(QVariant(QString(""))); // 21
 							}
 							//
 							// TODO
@@ -3308,40 +2959,28 @@ void PrConfigUtils::read_text_annotations(
 							c.values.push_back(QVariant((double)1)); // 24
 							//
 							//
-							std::vector<unsigned short>
-								TextColorCIELabValue;
-							if (DicomUtils::get_us_values(nestedds3,
-									tTextColorCIELabValue,
-									TextColorCIELabValue) &&
+							std::vector<unsigned short> TextColorCIELabValue;
+							if (DicomUtils::get_us_values(nestedds3, tTextColorCIELabValue, TextColorCIELabValue) &&
 								TextColorCIELabValue.size()==3)
 							{
 								QList<QVariant> l789;
-								l789.push_back(QVariant(
-									(int)TextColorCIELabValue[0]));
-								l789.push_back(QVariant(
-									(int)TextColorCIELabValue[1]));
-								l789.push_back(QVariant(
-									(int)TextColorCIELabValue[2]));
+								l789.push_back(QVariant((int)TextColorCIELabValue[0]));
+								l789.push_back(QVariant((int)TextColorCIELabValue[1]));
+								l789.push_back(QVariant((int)TextColorCIELabValue[2]));
 								c.values.push_back(QVariant(l789)); // 25
 							}
 							else
 							{
 								c.values.push_back(QVariant()); // 25
 							}
-							std::vector<unsigned short>
-								ShadowColorCIELabValue;
-							if (DicomUtils::get_us_values(nestedds3,
-									tShadowColorCIELabValue,
-									ShadowColorCIELabValue) &&
+							std::vector<unsigned short> ShadowColorCIELabValue;
+							if (DicomUtils::get_us_values(nestedds3, tShadowColorCIELabValue, ShadowColorCIELabValue) &&
 								ShadowColorCIELabValue.size()==3)
 							{
 								QList<QVariant> l789;
-								l789.push_back(QVariant(
-									(int)ShadowColorCIELabValue[0]));
-								l789.push_back(QVariant(
-									(int)ShadowColorCIELabValue[1]));
-								l789.push_back(QVariant(
-									(int)ShadowColorCIELabValue[2]));
+								l789.push_back(QVariant((int)ShadowColorCIELabValue[0]));
+								l789.push_back(QVariant((int)ShadowColorCIELabValue[1]));
+								l789.push_back(QVariant((int)ShadowColorCIELabValue[2]));
 								c.values.push_back(QVariant(l789)); // 26
 							}
 							else
@@ -3352,7 +2991,7 @@ void PrConfigUtils::read_text_annotations(
 					}
 					else
 					{
-						c.values.push_back(QVariant((int)0)); // 12
+						c.values.push_back(QVariant((int)0));      // 12
 						c.values.push_back(QVariant(QString(""))); // 13
 						c.values.push_back(QVariant(QString(""))); // 14
 						c.values.push_back(QVariant(QString(""))); // 15
@@ -3362,11 +3001,11 @@ void PrConfigUtils::read_text_annotations(
 						c.values.push_back(QVariant(QString(""))); // 19
 						c.values.push_back(QVariant(QString(""))); // 20
 						c.values.push_back(QVariant(QString(""))); // 21
-						c.values.push_back(QVariant((double)0)); // 22
-						c.values.push_back(QVariant((double)0)); // 23
-						c.values.push_back(QVariant((double)1)); // 24
-						c.values.push_back(QVariant()); // 25
-						c.values.push_back(QVariant()); // 26
+						c.values.push_back(QVariant((double)0));   // 22
+						c.values.push_back(QVariant((double)0));   // 23
+						c.values.push_back(QVariant((double)1));   // 24
+						c.values.push_back(QVariant());            // 25
+						c.values.push_back(QVariant());            // 26
 					}
 					for (int y = 0; y < ref_sop.size(); ++y)
 					{
@@ -3399,8 +3038,7 @@ void PrConfigUtils::read_display_shutter(
 	const mdcm::Tag tShutterPresentationValue(0x0018,0x1622);
 	const mdcm::Tag tShutterPresentationColorCIELabValue(0x0018,0x1624);
 	QString ShutterShape;
-	if (!DicomUtils::get_string_value(
-			ds, tShutterShape, ShutterShape))
+	if (!DicomUtils::get_string_value(ds, tShutterShape, ShutterShape))
 	{
 		return;
 	}
@@ -3413,31 +3051,15 @@ void PrConfigUtils::read_display_shutter(
 	int ShutterRightVerticalEdge;
 	int ShutterUpperHorizontalEdge;
 	int ShutterLowerHorizontalEdge;
-	if (DicomUtils::get_is_value(
-			ds,
-			tShutterLeftVerticalEdge,
-			&ShutterLeftVerticalEdge) &&
-		DicomUtils::get_is_value(
-			ds,
-			tShutterRightVerticalEdge,
-			&ShutterRightVerticalEdge) &&
-		DicomUtils::get_is_value(
-			ds,
-			tShutterUpperHorizontalEdge,
-			&ShutterUpperHorizontalEdge) &&
-		DicomUtils::get_is_value(
-			ds,
-			tShutterLowerHorizontalEdge,
-			&ShutterLowerHorizontalEdge))
+	if (DicomUtils::get_is_value(ds, tShutterLeftVerticalEdge, &ShutterLeftVerticalEdge) &&
+		DicomUtils::get_is_value(ds, tShutterRightVerticalEdge, &ShutterRightVerticalEdge) &&
+		DicomUtils::get_is_value(ds, tShutterUpperHorizontalEdge, &ShutterUpperHorizontalEdge) &&
+		DicomUtils::get_is_value(ds, tShutterLowerHorizontalEdge, &ShutterLowerHorizontalEdge))
 	{
-		c.values.push_back(
-			QVariant((int)ShutterLeftVerticalEdge)); // 1
-		c.values.push_back(
-			QVariant((int)ShutterRightVerticalEdge)); // 2
-		c.values.push_back(
-			QVariant((int)ShutterUpperHorizontalEdge)); // 3
-			c.values.push_back(
-		QVariant((int)ShutterLowerHorizontalEdge)); // 4
+		c.values.push_back(QVariant((int)ShutterLeftVerticalEdge));    // 1
+		c.values.push_back(QVariant((int)ShutterRightVerticalEdge));   // 2
+		c.values.push_back(QVariant((int)ShutterUpperHorizontalEdge)); // 3
+		c.values.push_back(QVariant((int)ShutterLowerHorizontalEdge)); // 4
 	}
 	else
 	{
@@ -3449,22 +3071,13 @@ void PrConfigUtils::read_display_shutter(
 	std::vector<int> CenterofCircularShutter;
 	int RadiusofCircularShutter;
 	if (
-		DicomUtils::get_is_values(
-			ds,
-			tCenterofCircularShutter,
-			CenterofCircularShutter) &&
+		DicomUtils::get_is_values(ds, tCenterofCircularShutter, CenterofCircularShutter) &&
 		(CenterofCircularShutter.size() == 2) &&
-		DicomUtils::get_is_value(
-			ds,
-			tRadiusofCircularShutter,
-			&RadiusofCircularShutter))
+		DicomUtils::get_is_value(ds, tRadiusofCircularShutter, &RadiusofCircularShutter))
 	{
-		c.values.push_back(
-			QVariant((int)CenterofCircularShutter.at(0))); // 5
-		c.values.push_back(
-			QVariant((int)CenterofCircularShutter.at(1))); // 6
-		c.values.push_back(
-			QVariant((int)RadiusofCircularShutter)); // 7
+		c.values.push_back(QVariant((int)CenterofCircularShutter.at(0))); // 5
+		c.values.push_back(QVariant((int)CenterofCircularShutter.at(1))); // 6
+		c.values.push_back(QVariant((int)RadiusofCircularShutter));       // 7
 	}
 	else
 	{
@@ -3473,19 +3086,13 @@ void PrConfigUtils::read_display_shutter(
 		c.values.push_back(QVariant((int)-1)); // 7
 	}
 	std::vector<int> VerticesofthePolygonalShutter;
-	if (DicomUtils::get_is_values(
-			ds,
-			tVerticesofthePolygonalShutter,
-			VerticesofthePolygonalShutter) &&
+	if (DicomUtils::get_is_values(ds, tVerticesofthePolygonalShutter, VerticesofthePolygonalShutter) &&
 		(VerticesofthePolygonalShutter.size() > 1))
 	{
 		QList<QVariant> l;
-		for (unsigned int x = 0;
-			x < VerticesofthePolygonalShutter.size();
-			++x)
+		for (unsigned int x = 0; x < VerticesofthePolygonalShutter.size(); ++x)
 		{
-			l.push_back(QVariant(
-				(int)VerticesofthePolygonalShutter.at(x)));
+			l.push_back(QVariant((int)VerticesofthePolygonalShutter.at(x)));
 		}
 		c.values.push_back(QVariant(l)); // 8
 	}
@@ -3494,30 +3101,22 @@ void PrConfigUtils::read_display_shutter(
 		c.values.push_back(QVariant()); // 8
 	}
 	unsigned short ShutterPresentationValue;
-	if (DicomUtils::get_us_value(
-			ds,
-			tShutterPresentationValue,
-			&ShutterPresentationValue))
+	if (DicomUtils::get_us_value(ds, tShutterPresentationValue, &ShutterPresentationValue))
 	{
-		c.values.push_back(QVariant(
-			(int)ShutterPresentationValue)); // 9
+		c.values.push_back(QVariant((int)ShutterPresentationValue)); // 9
 	}
 	else
 	{
 		c.values.push_back(QVariant((int)-1)); // 9
 	}
 	std::vector<unsigned short> ShutterPresentationColorCIELabValue;
-	if (DicomUtils::get_us_values(
-			ds,
-			tShutterPresentationColorCIELabValue,
-			ShutterPresentationColorCIELabValue) &&
+	if (DicomUtils::get_us_values(ds, tShutterPresentationColorCIELabValue, ShutterPresentationColorCIELabValue) &&
 		(ShutterPresentationColorCIELabValue.size()==3))
 	{
 		QList<QVariant> l;
 		for (unsigned int x = 0; x < 3; ++x)
 		{
-			l.push_back(QVariant(
-				(int)ShutterPresentationColorCIELabValue.at(x)));
+			l.push_back(QVariant((int)ShutterPresentationColorCIELabValue.at(x)));
 		}
 		c.values.push_back(QVariant(l)); // 10
 	}
@@ -3535,6 +3134,8 @@ void PrConfigUtils::read_pr(
 	read_modality_lut(ds,ref);
 	QApplication::processEvents();
 	read_voi_lut(ds,ref);
+	QApplication::processEvents();
+	read_presentation_lut(ds,ref);
 	QApplication::processEvents();
 	read_display_areas(ds,ref);
 	QApplication::processEvents();
@@ -3560,9 +3161,7 @@ void PrConfigUtils::read_pr(
 		std::cout << ": ";
 		for (int z = 0; z < ref.prconfig.at(x).values.size(); ++z)
 		{
-			std::cout
-				<< ref.prconfig.at(x).values.at(z)
-					.toString().toStdString() << " | ";
+			std::cout << ref.prconfig.at(x).values.at(z) .toString().toStdString() << " | ";
 		}
 #endif
 		std::cout << std::endl;
@@ -3584,11 +3183,23 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 #ifdef PRINT_MAKE_PR_MONOCHROME
 	std::cout << "+++++++++++++"<< std::endl;
 #endif
+#if 0
+	{
+		QMap<int, QString>::const_iterator it = ivariant->image_instance_uids.cbegin();
+		std::cout << "Instance UIDs (dimZ=" << ivariant->di->idimz <<") :" << std::endl;
+		while (it != ivariant->image_instance_uids.cend())
+		{
+			std::cout << " " << it.key() << " " << it.value().toStdString() << std::endl;
+			++it;
+		}
+	}
+#endif
 	QString error("");
-	double shift = 0.0, scale = 1.0;
-	bool rescale_found = false;
 	short rotation = 0;
 	bool flip = false;
+	bool modality = false;
+	bool voi = false;
+	bool presentation = false;
 	const QList<PrConfig> l = ref.prconfig;
 	ImageVariant * v = new ImageVariant(
 		CommonUtils::get_next_id(),
@@ -3601,145 +3212,105 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 	// Modality LUT
 	//
 	{
+		bool rescale_found = false;
+		bool modality_lut_found = false;
+		double shift = 0.0, scale = 1.0;
+		QList<QVariant> m_lut_descriptor;
+		QList<QVariant> m_lut_data;
+		bool mapped_implicit = false;
+		bool mapped_signed = false;
 		for (int x = 0; x < l.size(); ++x)
 		{
 			QApplication::processEvents();
-			if (l.at(x).id == 1 && l.at(x).values.size() >= 2)
+			if (l.at(x).id == 1)
 			{
 				shift = l.at(x).values.at(0).toDouble();
 				scale = l.at(x).values.at(1).toDouble();
-				rescale_found = true;
-#ifdef PRINT_MAKE_PR_MONOCHROME
-				std::cout << "Modality LUT (Intercept, Slope)"
-					<< std::endl;
-#endif
-				break;
-			}
-		}
-		if (!rescale_found)
-		{
-			shift = ivariant->di->shift_tmp;
-			scale = ivariant->di->scale_tmp;
-		}
-#if 0
-		{
-			QMap<int, QString>::const_iterator it =
-				ivariant->image_instance_uids.cbegin();
-			std::cout << "Instance UIDs (dimZ="
-				<< ivariant->di->idimz <<") :" << std::endl;
-			while (it != ivariant->image_instance_uids.cend())
-			{
-				std::cout << " " << it.key() << " "
-					<< it.value().toStdString() << std::endl;
-				++it;
-			}
-		}
-#endif
-		if      (ivariant->image_type==0) error=intensity_filter2<ImageTypeSS> (ivariant->pSS, v->pF,shift,scale);
-		else if (ivariant->image_type==1) error=intensity_filter2<ImageTypeUS> (ivariant->pUS, v->pF,shift,scale);
-		else if (ivariant->image_type==2) error=intensity_filter2<ImageTypeSI> (ivariant->pSI, v->pF,shift,scale);
-		else if (ivariant->image_type==3) error=intensity_filter2<ImageTypeUI> (ivariant->pUI, v->pF,shift,scale);
-		else if (ivariant->image_type==4) error=intensity_filter2<ImageTypeUC> (ivariant->pUC, v->pF,shift,scale);
-		else if (ivariant->image_type==5) error=intensity_filter2<ImageTypeF>  (ivariant->pF,  v->pF,shift,scale);
-		else if (ivariant->image_type==6) error=intensity_filter2<ImageTypeD>  (ivariant->pD,  v->pF,shift,scale);
-		else if (ivariant->image_type==7) error=intensity_filter2<ImageTypeSLL>(ivariant->pSLL,v->pF,shift,scale);
-		else if (ivariant->image_type==8) error=intensity_filter2<ImageTypeULL>(ivariant->pULL,v->pF,shift,scale);
-		else { error = QString("Wrong image type"); }
-		if (error.isEmpty())
-		{
-			v->image_type = 5;
-			v->di->shift_tmp = shift;
-			v->di->scale_tmp = scale;
-		}
-		else
-		{
-			std::cout << error.toStdString() << std::endl;
-			delete v;
-			return NULL;
-		}
-	}
-	//
-	// VOI LUT
-	//
-	{
-		QMap<int, QStringList> voi_lut_images;
-		QMap<int, double>      window_centers;
-		QMap<int, double>      window_widths;
-		QMap<int, QString>     lut_functions;
-		int voi_luts = 0;
-		for (int x = 0; x < l.size(); ++x)
-		{
-			const int values_size = l.at(x).values.size();
-			if (l.at(x).id == 2 &&  values_size >= 3)
-			{
-				window_centers[voi_luts] = l.at(x).values.at(0).toDouble();
-				window_widths[voi_luts]  = l.at(x).values.at(1).toDouble();
-				lut_functions[voi_luts]  = l.at(x).values.at(2).toString();
-				if (values_size >= 4)
+				if (!(scale > 0.999999 && scale < 1.000001 && shift > -0.000001 && shift < 0.000001))
 				{
-					QStringList sl;
-					for (int z = 3; z < values_size; ++z)
-						sl.push_back(l.at(x).values.at(z).toString());
-					if (sl.size() > 0) voi_lut_images[voi_luts] = sl;
-				}
-				++voi_luts;
-			}
-		}
-		QApplication::processEvents();
-		if (voi_luts > 0)
-		{
-#if 0
-			if (voi_lut_images.empty())
-			{
-#ifdef PRINT_MAKE_PR_MONOCHROME
-					std::cout << "VOI LUT" << std::endl;
-#endif
-				if (lut_functions.contains(0) &&
-					lut_functions.value(0).toUpper() == QString("SIGMOID"))
-				{
-					error =
-						to_char_sigm<ImageTypeF>(
-							v->pF,
-							v->pUC,
-							window_widths.value(0),
-							window_centers.value(0));
+					rescale_found = true;
 				}
 				else
 				{
-					error =
-						to_char<ImageTypeF>(
-							v->pF,
-							v->pUC,
-							window_widths.value(0),
-							window_centers.value(0));
-				}
-			}
-			else
-#endif
-			{
+					m_lut_descriptor = l.at(x).values.at(2).toList();
+					m_lut_data       = l.at(x).values.at(3).toList();
+					if (!m_lut_descriptor.empty() && !m_lut_data.empty())
+					{
 #ifdef PRINT_MAKE_PR_MONOCHROME
-				std::cout << "VOI LUT slice by slice" << std::endl;
+						std::cout << "Modality LUT, data size = " << m_lut_data.size() << std::endl;
 #endif
-				error =
-					levels_slice_by_slice<ImageTypeF,Image2DTypeF>(
-						v->pF, v->pUC,
-						window_widths, window_centers,
-						lut_functions,
-						voi_lut_images,
-						ivariant->image_instance_uids);
+						modality_lut_found = true;
+					}
+					mapped_implicit = l.at(x).values.at(4).toBool();
+					mapped_signed   = l.at(x).values.at(5).toBool();
+				}
+				break;
 			}
+		}
+		if (modality_lut_found)
+		{
+			if      (ivariant->image_type == 0)
+				error = apply_lut<ImageTypeSS, ImageTypeF>(
+					ivariant->pSS, v->pF,
+					m_lut_descriptor, m_lut_data,
+					ivariant->dicom_pixel_signed,
+					mapped_implicit, mapped_signed);
+			else if (ivariant->image_type == 1)
+				error = apply_lut<ImageTypeUS, ImageTypeF>(
+					ivariant->pUS, v->pF,
+					m_lut_descriptor, m_lut_data,
+					ivariant->dicom_pixel_signed,
+					mapped_implicit, mapped_signed);
+			else if (ivariant->image_type == 2)
+				error = apply_lut<ImageTypeSI, ImageTypeF>(
+					ivariant->pSI, v->pF,
+					m_lut_descriptor, m_lut_data,
+					ivariant->dicom_pixel_signed,
+					mapped_implicit, mapped_signed);
+			else if (ivariant->image_type == 3)
+				error = apply_lut<ImageTypeUI, ImageTypeF>(
+					ivariant->pUI, 	v->pF,
+					m_lut_descriptor, m_lut_data,
+					ivariant->dicom_pixel_signed,
+					mapped_implicit, mapped_signed);
+			else if (ivariant->image_type == 4)
+				error = apply_lut<ImageTypeUC, ImageTypeF>(
+					ivariant->pUC, v->pF,
+					m_lut_descriptor, m_lut_data,
+					ivariant->dicom_pixel_signed,
+					mapped_implicit, mapped_signed);
+			else if (ivariant->image_type == 5)
+				error = apply_lut<ImageTypeF,  ImageTypeF>(
+					ivariant->pF, v->pF,
+					m_lut_descriptor, m_lut_data,
+					ivariant->dicom_pixel_signed,
+					mapped_implicit, mapped_signed);
+			else if (ivariant->image_type == 6)
+				error = apply_lut<ImageTypeD, ImageTypeF>(
+					ivariant->pD, v->pF,
+					m_lut_descriptor, m_lut_data,
+					ivariant->dicom_pixel_signed,
+					mapped_implicit, mapped_signed);
+			else if (ivariant->image_type == 7)
+				error = apply_lut<ImageTypeSLL, ImageTypeF>(
+					ivariant->pSLL, v->pF,
+					m_lut_descriptor, m_lut_data,
+					ivariant->dicom_pixel_signed,
+					mapped_implicit, mapped_signed);
+			else if (ivariant->image_type == 8)
+				error = apply_lut<ImageTypeULL, ImageTypeF>(
+					ivariant->pULL, v->pF,
+					m_lut_descriptor, m_lut_data,
+					ivariant->dicom_pixel_signed,
+					mapped_implicit, mapped_signed);
+			else
+				error = QString("Wrong image type");
 			if (error.isEmpty())
 			{
-				if (v->pF.IsNotNull()) v->pF->DisconnectPipeline();
-				v->pF = NULL;
-				v->image_type = 4;
-				v->di->us_window_center =
-					v->di->default_us_window_center = 128.0;
-				v->di->us_window_width  =
-					v->di->default_us_window_width  = 255.0;
-				v->di->lut_function = 0;
+				v->image_type = 5;
 				v->di->shift_tmp = 0.0;
 				v->di->scale_tmp = 1.0;
+				modality = true;
 			}
 			else
 			{
@@ -3750,13 +3321,209 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		}
 		else
 		{
-			v->di->us_window_center = v->di->default_us_window_center =
-				ivariant->di->us_window_center;
-			v->di->us_window_width = v->di->default_us_window_width  =
-				ivariant->di->us_window_width;
-			v->di->lut_function =
-				ivariant->di->lut_function;
+			if (!rescale_found)
+			{
+				shift = ivariant->di->shift_tmp;
+				scale = ivariant->di->scale_tmp;
+			}
+			else
+			{
+				modality = true;
+			}
+#ifdef PRINT_MAKE_PR_MONOCHROME
+			std::cout << "Modality LUT ";
+			if (rescale_found)
+			{
+				std::cout << "is defined in PR, ";
+			}
+			else
+			{
+				std::cout << "is not defined, from referenced image: ";
+			}
+			std::cout << "Slope = " << scale << ", Intercept = " << shift << std::endl;
+#endif
+			if      (ivariant->image_type == 0) error = mod_lut_filter<ImageTypeSS> (ivariant->pSS, v->pF,shift,scale);
+			else if (ivariant->image_type == 1) error = mod_lut_filter<ImageTypeUS> (ivariant->pUS, v->pF,shift,scale);
+			else if (ivariant->image_type == 2) error = mod_lut_filter<ImageTypeSI> (ivariant->pSI, v->pF,shift,scale);
+			else if (ivariant->image_type == 3) error = mod_lut_filter<ImageTypeUI> (ivariant->pUI, v->pF,shift,scale);
+			else if (ivariant->image_type == 4) error = mod_lut_filter<ImageTypeUC> (ivariant->pUC, v->pF,shift,scale);
+			else if (ivariant->image_type == 5) error = mod_lut_filter<ImageTypeF>  (ivariant->pF,  v->pF,shift,scale);
+			else if (ivariant->image_type == 6) error = mod_lut_filter<ImageTypeD>  (ivariant->pD,  v->pF,shift,scale);
+			else if (ivariant->image_type == 7) error = mod_lut_filter<ImageTypeSLL>(ivariant->pSLL,v->pF,shift,scale);
+			else if (ivariant->image_type == 8) error = mod_lut_filter<ImageTypeULL>(ivariant->pULL,v->pF,shift,scale);
+			else error=QString("Wrong image type");
+			if (error.isEmpty())
+			{
+				v->image_type = 5;
+				v->di->shift_tmp = shift;
+				v->di->scale_tmp = scale;
+			}
+			else
+			{
+				std::cout << error.toStdString() << std::endl;
+				delete v;
+				return NULL;
+			}
 		}
+	}
+	//
+	// VOI LUT
+	//
+	{
+		QMap<int, QStringList> voi_lut_images;
+		QMap<int, double>      window_centers;
+		QMap<int, double>      window_widths;
+		QMap<int, QString>     lut_functions;
+		QMap<int, QVariant>    lut_descriptors;
+		QMap<int, QVariant>    lut_datas;
+        QMap<int, bool>        mapped_implicits;
+        QMap<int, bool>        mapped_signeds;
+		int voi_luts = 0;
+		for (int x = 0; x < l.size(); ++x)
+		{
+			const int values_size = l.at(x).values.size();
+			if (l.at(x).id == 2 && values_size >= 9)
+			{
+				window_centers[voi_luts]   = l.at(x).values.at(0).toDouble();
+				window_widths[voi_luts]    = l.at(x).values.at(1).toDouble();
+				lut_functions[voi_luts]    = l.at(x).values.at(2).toString();
+				lut_descriptors[voi_luts]  = l.at(x).values.at(3);
+				lut_datas[voi_luts]        = l.at(x).values.at(4);
+				mapped_implicits[voi_luts] = l.at(x).values.at(5).toBool();
+				mapped_signeds[voi_luts]   = l.at(x).values.at(6).toBool();
+				QStringList sl;
+				for (int z = 7; z < values_size; ++z)
+				{
+					sl.push_back(l.at(x).values.at(z).toString());
+				}
+				if (sl.size() > 0) voi_lut_images[voi_luts] = sl;
+				++voi_luts;
+			}
+		}
+		QApplication::processEvents();
+		if (voi_luts > 0)
+		{
+#ifdef PRINT_MAKE_PR_MONOCHROME
+			std::cout << "VOI LUT slice by slice" << std::endl;
+#endif
+			const bool signed_image = is_signed<ImageTypeF>(v->pF); 
+			ImageTypeF::Pointer tmp0;
+			error = voi_lut_slice_by_slice(
+				ivariant,
+				v,
+				voi_lut_images,
+				window_centers,
+				window_widths,
+				lut_functions,
+				lut_descriptors,
+				lut_datas,
+				mapped_implicits,
+				mapped_signeds,
+				signed_image);
+			if (!error.isEmpty())
+			{
+				std::cout << error.toStdString() << std::endl;
+				delete v;
+				return NULL;
+			}
+			voi = true;
+		}
+	}
+	//
+	// Presentation LUT
+	//
+	{
+		QApplication::processEvents();
+		QList<QVariant>  p_lut_descriptor;
+		QList<QVariant>  p_lut_data;
+		QString          p_shape;
+		bool pres_lut_found = false;
+		bool mapped_implicit = false;
+		bool mapped_signed = false;
+		for (int x = 0; x < l.size(); ++x)
+		{
+			if (l.at(x).id == 8)
+			{
+				p_lut_descriptor = l.at(x).values.at(0).toList();
+				p_lut_data       = l.at(x).values.at(1).toList();
+				mapped_implicit  = l.at(x).values.at(2).toBool();
+				mapped_signed    = l.at(x).values.at(3).toBool();
+				p_shape          = l.at(x).values.at(4).toString().trimmed().toUpper().remove(QChar('\0'));
+				if (!p_lut_descriptor.empty() && !p_lut_data.empty())
+				{
+#ifdef PRINT_MAKE_PR_MONOCHROME
+					std::cout << "Presentation LUT, data size = " << p_lut_data.size() << std::endl;
+#endif
+					pres_lut_found = true;
+				}
+				break;
+			}
+		}
+		if (pres_lut_found)
+		{
+			const bool signed_image = is_signed<ImageTypeF>(v->pF); 
+			ImageTypeF::Pointer pres_tmp;
+			error = apply_lut<ImageTypeF, ImageTypeF>(
+				v->pF, pres_tmp,
+				p_lut_descriptor, p_lut_data,
+				signed_image,
+				mapped_implicit, mapped_signed);
+			if (error.isEmpty())
+			{
+				v->pF = pres_tmp;
+				presentation = true;
+			}
+			else
+			{
+				std::cout << error.toStdString() << std::endl;
+				delete v;
+				return NULL;
+			}
+		}
+		else
+		{
+#ifdef PRINT_MAKE_PR_MONOCHROME
+			if (!p_shape.isEmpty())
+			{
+				std::cout << "Presentation LUT, Shape = " << p_shape.toStdString() << std::endl;
+			}
+			else
+			{
+				std::cout << "Presentation LUT is not defined" << std::endl;
+			}
+#endif
+			ImageTypeF::Pointer pres_tmp;
+			if (p_shape == QString("INVERSE"))
+			{
+				error = inverse_filter<ImageTypeF>(v->pF, pres_tmp);
+				if (error.isEmpty())
+				{
+					v->pF = pres_tmp;
+					presentation = true;
+				}
+				else
+				{
+					std::cout << error.toStdString() << std::endl;
+					delete v;
+					return NULL;
+				}
+			}
+		}
+	}
+	//
+	//
+	//
+	{
+#if 1
+		if (!(modality || voi || presentation))
+		{
+			if (!ivariant->frame_levels.empty())
+			{
+				v->frame_levels = ivariant->frame_levels;
+			}
+		}
+#endif
+		CommonUtils::calculate_minmax_scalar(v);
 	}
 	//
 	// Display areas
@@ -3792,7 +3559,9 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				{
 					QStringList sl;
 					for (int z = 11; z < values_size; ++z)
+					{
 						sl.push_back(l.at(x).values.at(z).toString());
+					}
 					if (sl.size() > 0) area_images[areas] = sl;
 				}
 				++areas;
@@ -3800,234 +3569,109 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		}
 		if (areas > 0)
 		{
-#if 0
-			if (area_images.empty())
-			{
 #ifdef PRINT_MAKE_PR_MONOCHROME
-				std::cout << "Display Areas" << std::endl;
+			std::cout << "Display Areas slice by slice" << std::endl;
 #endif
-				const double px = pixel_spacings1.value(0);
-				const double py = pixel_spacings0.value(0);
-				if (!(
-					px > 0.99999 && px < 1.00001 &&
-					py > 0.99999 && py < 1.00001))
-				{
-					if      (v->image_type== 0) set_spacing<ImageTypeSS>   (v->pSS,    px,py);
-					else if (v->image_type== 1) set_spacing<ImageTypeUS>   (v->pUS,    px,py);
-					else if (v->image_type== 2) set_spacing<ImageTypeSI>   (v->pSI,    px,py);
-					else if (v->image_type== 3) set_spacing<ImageTypeUI>   (v->pUI,    px,py);
-					else if (v->image_type== 4) set_spacing<ImageTypeUC>   (v->pUC,    px,py);
-					else if (v->image_type== 5) set_spacing<ImageTypeF>    (v->pF,     px,py);
-					else if (v->image_type== 6) set_spacing<ImageTypeD>    (v->pD,     px,py);
-					else if (v->image_type== 7) set_spacing<ImageTypeSLL>  (v->pSLL,   px,py);
-					else if (v->image_type== 8) set_spacing<ImageTypeULL>  (v->pULL,   px,py);
-					else if (v->image_type==10) set_spacing<RGBImageTypeSS>(v->pSS_rgb,px,py);
-					else if (v->image_type==11) set_spacing<RGBImageTypeUS>(v->pUS_rgb,px,py);
-					else if (v->image_type==12) set_spacing<RGBImageTypeSI>(v->pSI_rgb,px,py);
-					else if (v->image_type==13) set_spacing<RGBImageTypeUI>(v->pUI_rgb,px,py);
-					else if (v->image_type==14) set_spacing<RGBImageTypeUC>(v->pUC_rgb,px,py);
-					else if (v->image_type==15) set_spacing<RGBImageTypeF> (v->pF_rgb, px,py);
-					else if (v->image_type==16) set_spacing<RGBImageTypeD> (v->pD_rgb, px,py);
-					else ;;
-				}
-				//
-				// TODO Presentation Size Mode
-				const double ax = aspect_ratios1.value(0);
-				const double ay = aspect_ratios0.value(0);
-				if (!(
-					ax > 0.99999f && ax < 1.00001 &&
-					ay > 0.99999f && ay < 1.00001))
-				{
-					if      (v->image_type== 0) set_asp_ratio<ImageTypeSS>   (v->pSS,    ax,ay);
-					else if (v->image_type== 1) set_asp_ratio<ImageTypeUS>   (v->pUS,    ax,ay);
-					else if (v->image_type== 2) set_asp_ratio<ImageTypeSI>   (v->pSI,    ax,ay);
-					else if (v->image_type== 3) set_asp_ratio<ImageTypeUI>   (v->pUI,    ax,ay);
-					else if (v->image_type== 4) set_asp_ratio<ImageTypeUC>   (v->pUC,    ax,ay);
-					else if (v->image_type== 5) set_asp_ratio<ImageTypeF>    (v->pF,     ax,ay);
-					else if (v->image_type== 6) set_asp_ratio<ImageTypeD>    (v->pD,     ax,ay);
-					else if (v->image_type== 7) set_asp_ratio<ImageTypeSLL>  (v->pSLL,   ax,ay);
-					else if (v->image_type== 8) set_asp_ratio<ImageTypeULL>  (v->pULL,   ax,ay);
-					else if (v->image_type==10) set_asp_ratio<RGBImageTypeSS>(v->pSS_rgb,ax,ay);
-					else if (v->image_type==11) set_asp_ratio<RGBImageTypeUS>(v->pUS_rgb,ax,ay);
-					else if (v->image_type==12) set_asp_ratio<RGBImageTypeSI>(v->pSI_rgb,ax,ay);
-					else if (v->image_type==13) set_asp_ratio<RGBImageTypeUI>(v->pUI_rgb,ax,ay);
-					else if (v->image_type==14) set_asp_ratio<RGBImageTypeUC>(v->pUC_rgb,ax,ay);
-					else if (v->image_type==15) set_asp_ratio<RGBImageTypeF> (v->pF_rgb, ax,ay);
-					else if (v->image_type==16) set_asp_ratio<RGBImageTypeD> (v->pD_rgb, ax,ay);
-					else ;;
-				}
-				if (!(
-					areasTLx.value(0) == -1 &&
-					areasTLy.value(0) == -1 &&
-					areasBRx.value(0) == -1 &&
-					areasBRy.value(0) == -1))
-				{
-					const int aTLx = areasTLx.value(0);
-					const int aTLy = areasTLy.value(0);
-					const int aBRx = areasBRx.value(0);
-					const int aBRy = areasBRy.value(0);
-					if      (v->image_type== 0) set_darea<ImageTypeSS>   (v, v->pSS,    aTLx, aTLy, aBRx, aBRy);
-					else if (v->image_type== 1) set_darea<ImageTypeUS>   (v, v->pUS,    aTLx, aTLy, aBRx, aBRy);
-					else if (v->image_type== 2) set_darea<ImageTypeSI>   (v, v->pSI,    aTLx, aTLy, aBRx, aBRy);
-					else if (v->image_type== 3) set_darea<ImageTypeUI>   (v, v->pUI,    aTLx, aTLy, aBRx, aBRy);
-					else if (v->image_type== 4) set_darea<ImageTypeUC>   (v, v->pUC,    aTLx, aTLy, aBRx, aBRy);
-					else if (v->image_type== 5) set_darea<ImageTypeF>    (v, v->pF,     aTLx, aTLy, aBRx, aBRy);
-					else if (v->image_type== 6) set_darea<ImageTypeD>    (v, v->pD,     aTLx, aTLy, aBRx, aBRy);
-					else if (v->image_type== 7) set_darea<ImageTypeSLL>  (v, v->pSLL,   aTLx, aTLy, aBRx, aBRy);
-					else if (v->image_type== 8) set_darea<ImageTypeULL>  (v, v->pULL,   aTLx, aTLy, aBRx, aBRy);
-					else if (v->image_type==10) set_darea<RGBImageTypeSS>(v, v->pSS_rgb,aTLx, aTLy, aBRx, aBRy);
-					else if (v->image_type==11) set_darea<RGBImageTypeUS>(v, v->pUS_rgb,aTLx, aTLy, aBRx, aBRy);
-					else if (v->image_type==12) set_darea<RGBImageTypeSI>(v, v->pSI_rgb,aTLx, aTLy, aBRx, aBRy);
-					else if (v->image_type==13) set_darea<RGBImageTypeUI>(v, v->pUI_rgb,aTLx, aTLy, aBRx, aBRy);
-					else if (v->image_type==14) set_darea<RGBImageTypeUC>(v, v->pUC_rgb,aTLx, aTLy, aBRx, aBRy);
-					else if (v->image_type==15) set_darea<RGBImageTypeF> (v, v->pF_rgb, aTLx, aTLy, aBRx, aBRy);
-					else if (v->image_type==16) set_darea<RGBImageTypeD> (v, v->pD_rgb, aTLx, aTLy, aBRx, aBRy);
-					else ;;
-				}
-			}
-			else
-#endif
+			const double px = pixel_spacings1.value(0);
+			const double py = pixel_spacings0.value(0);
+			if (!(px > 0.99999 && px < 1.00001 && py > 0.99999 && py < 1.00001))
 			{
-#ifdef PRINT_MAKE_PR_MONOCHROME
-				std::cout << "Display Areas slice by slice" << std::endl;
-#endif
-				const double px = pixel_spacings1.value(0);
-				const double py = pixel_spacings0.value(0);
-				if (!(
-					px > 0.99999 && px < 1.00001 &&
-					py > 0.99999 && py < 1.00001))
-				{
-					bool one_spacing = true;
+				bool one_spacing = true;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-					QMap<int, double>::const_iterator it0 = pixel_spacings1.cbegin();
-					while (it0 != pixel_spacings1.cend())
+				QMap<int, double>::const_iterator it0 = pixel_spacings1.cbegin();
+				while (it0 != pixel_spacings1.cend())
 #else
-					QMap<int, double>::const_iterator it0 = pixel_spacings1.constBegin();
-					while (it0 != pixel_spacings1.constEnd())
+				QMap<int, double>::const_iterator it0 = pixel_spacings1.constBegin();
+				while (it0 != pixel_spacings1.constEnd())
+#endif
+				{
+					const double tmp0 = it0.value();
+					if (!(px > tmp0-0.00001 && px < tmp0+0.00001))
+					{
+						one_spacing = false;
+						break;
+					}
+					++it0;
+				}
+				if (one_spacing)
+				{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+					QMap<int, double>::const_iterator it1 = pixel_spacings0.cbegin();
+					while (it1 != pixel_spacings0.cend())
+#else
+					QMap<int, double>::const_iterator it1 = pixel_spacings0.constBegin();
+					while (it1 != pixel_spacings0.constEnd())
 #endif
 					{
-						const double tmp0 = it0.value();
-						if (!(px > tmp0-0.00001 && px < tmp0+0.00001))
+						const double tmp1 = it1.value();
+						if (!(py > tmp1-0.00001 && py < tmp1+0.00001))
 						{
 							one_spacing = false;
 							break;
 						}
-						++it0;
-					}
-					if (one_spacing)
-					{
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-						QMap<int, double>::const_iterator it1 = pixel_spacings0.cbegin();
-						while (it1 != pixel_spacings0.cend())
-#else
-						QMap<int, double>::const_iterator it1 = pixel_spacings0.constBegin();
-						while (it1 != pixel_spacings0.constEnd())
-#endif
-						{
-							const double tmp1 = it1.value();
-							if (!(py > tmp1-0.00001 && py < tmp1+0.00001))
-							{
-								one_spacing = false;
-								break;
-							}
-							++it1;
-						}
-					}
-					if (one_spacing)
-					{
-						if      (v->image_type== 0) set_spacing<ImageTypeSS>   (v->pSS,    px,py);
-						else if (v->image_type== 1) set_spacing<ImageTypeUS>   (v->pUS,    px,py);
-						else if (v->image_type== 2) set_spacing<ImageTypeSI>   (v->pSI,    px,py);
-						else if (v->image_type== 3) set_spacing<ImageTypeUI>   (v->pUI,    px,py);
-						else if (v->image_type== 4) set_spacing<ImageTypeUC>   (v->pUC,    px,py);
-						else if (v->image_type== 5) set_spacing<ImageTypeF>    (v->pF,     px,py);
-						else if (v->image_type== 6) set_spacing<ImageTypeD>    (v->pD,     px,py);
-						else if (v->image_type== 7) set_spacing<ImageTypeSLL>  (v->pSLL,   px,py);
-						else if (v->image_type== 8) set_spacing<ImageTypeULL>  (v->pULL,   px,py);
-						else if (v->image_type==10) set_spacing<RGBImageTypeSS>(v->pSS_rgb,px,py);
-						else if (v->image_type==11) set_spacing<RGBImageTypeUS>(v->pUS_rgb,px,py);
-						else if (v->image_type==12) set_spacing<RGBImageTypeSI>(v->pSI_rgb,px,py);
-						else if (v->image_type==13) set_spacing<RGBImageTypeUI>(v->pUI_rgb,px,py);
-						else if (v->image_type==14) set_spacing<RGBImageTypeUC>(v->pUC_rgb,px,py);
-						else if (v->image_type==15) set_spacing<RGBImageTypeF> (v->pF_rgb, px,py);
-						else if (v->image_type==16) set_spacing<RGBImageTypeD> (v->pD_rgb, px,py);
-						else ;;
+						++it1;
 					}
 				}
-				//
-				const double ax = aspect_ratios1.value(0);
-				const double ay = aspect_ratios0.value(0);
-				if (!(
-					ax > 0.99999f && ax < 1.00001 &&
-					ay > 0.99999f && ay < 1.00001))
+				if (one_spacing)
 				{
-					bool one_aspect = true;
+					set_spacing<ImageTypeF>(v->pF, px, py);
+				}
+			}
+			//
+			const double ax = aspect_ratios1.value(0);
+			const double ay = aspect_ratios0.value(0);
+			if (!(ax > 0.99999f && ax < 1.00001 && ay > 0.99999f && ay < 1.00001))
+			{
+				bool one_aspect = true;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-					QMap<int, double>::const_iterator it0 = aspect_ratios1.cbegin();
-					while (it0 != aspect_ratios1.cend())
+				QMap<int, double>::const_iterator it0 = aspect_ratios1.cbegin();
+				while (it0 != aspect_ratios1.cend())
 #else
-					QMap<int, double>::const_iterator it0 = aspect_ratios1.constBegin();
-					while (it0 != aspect_ratios1.constEnd())
+				QMap<int, double>::const_iterator it0 = aspect_ratios1.constBegin();
+				while (it0 != aspect_ratios1.constEnd())
 #endif
+				{
+					const double tmp0 = it0.value();
+					if (!(ax > tmp0-0.00001 && ax < tmp0+0.00001))
 					{
-						const double tmp0 = it0.value();
-						if (!(ax > tmp0-0.00001 && ax < tmp0+0.00001))
+						one_aspect = false;
+						break;
+					}
+					++it0;
+				}
+				if (one_aspect)
+				{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+					QMap<int, double>::const_iterator it1 = aspect_ratios0.cbegin();
+					while (it1 != aspect_ratios0.cend())
+#else
+					QMap<int, double>::const_iterator it1 = aspect_ratios0.constBegin();
+					while (it1 != aspect_ratios0.constEnd())
+#endif
+						{
+						const double tmp1 = it1.value();
+						if (!(ay > tmp1-0.00001 && ay < tmp1+0.00001))
 						{
 							one_aspect = false;
 							break;
 						}
-						++it0;
-					}
-					if (one_aspect)
-					{
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-						QMap<int, double>::const_iterator it1 = aspect_ratios0.cbegin();
-						while (it1 != aspect_ratios0.cend())
-#else
-						QMap<int, double>::const_iterator it1 = aspect_ratios0.constBegin();
-						while (it1 != aspect_ratios0.constEnd())
-#endif
-						{
-							const double tmp1 = it1.value();
-							if (!(ay > tmp1-0.00001 && ay < tmp1+0.00001))
-							{
-								one_aspect = false;
-								break;
-							}
-							++it1;
-						}
-					}
-					if (one_aspect)
-					{
-						if      (v->image_type== 0) set_asp_ratio<ImageTypeSS>   (v->pSS,    ax,ay);
-						else if (v->image_type== 1) set_asp_ratio<ImageTypeUS>   (v->pUS,    ax,ay);
-						else if (v->image_type== 2) set_asp_ratio<ImageTypeSI>   (v->pSI,    ax,ay);
-						else if (v->image_type== 3) set_asp_ratio<ImageTypeUI>   (v->pUI,    ax,ay);
-						else if (v->image_type== 4) set_asp_ratio<ImageTypeUC>   (v->pUC,    ax,ay);
-						else if (v->image_type== 5) set_asp_ratio<ImageTypeF>    (v->pF,     ax,ay);
-						else if (v->image_type== 6) set_asp_ratio<ImageTypeD>    (v->pD,     ax,ay);
-						else if (v->image_type== 7) set_asp_ratio<ImageTypeSLL>  (v->pSLL,   ax,ay);
-						else if (v->image_type== 8) set_asp_ratio<ImageTypeULL>  (v->pULL,   ax,ay);
-						else if (v->image_type==10) set_asp_ratio<RGBImageTypeSS>(v->pSS_rgb,ax,ay);
-						else if (v->image_type==11) set_asp_ratio<RGBImageTypeUS>(v->pUS_rgb,ax,ay);
-						else if (v->image_type==12) set_asp_ratio<RGBImageTypeSI>(v->pSI_rgb,ax,ay);
-						else if (v->image_type==13) set_asp_ratio<RGBImageTypeUI>(v->pUI_rgb,ax,ay);
-						else if (v->image_type==14) set_asp_ratio<RGBImageTypeUC>(v->pUC_rgb,ax,ay);
-						else if (v->image_type==15) set_asp_ratio<RGBImageTypeF> (v->pF_rgb, ax,ay);
-						else if (v->image_type==16) set_asp_ratio<RGBImageTypeD> (v->pD_rgb, ax,ay);
-						else ;;
+						++it1;
 					}
 				}
-				//
-				areas_slice_by_slice(
-					v,
-					areasTLx,
-					areasTLy,
-					areasBRx,
-					areasBRy,
-					area_images,
-					ivariant->image_instance_uids);
+				if (one_aspect)
+				{
+					set_asp_ratio<ImageTypeF>(v->pF, ax, ay);
+				}
 			}
+			//
+			areas_slice_by_slice(
+				v,
+				areasTLx,
+				areasTLy,
+				areasBRx,
+				areasBRy,
+				area_images,
+				ivariant->image_instance_uids);
 		}
 	}
 	//
@@ -4043,56 +3687,19 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				const double d = l.at(x).values.at(1).toInt();
 				rotation = l.at(x).values.at(1).toInt();
 				// Flip horiz.
-				const QString f = l.at(x).values.at(0).toString()
-					.trimmed()
-					.remove(QChar('\0'));
+				const QString f = l.at(x).values.at(0).toString().trimmed() .remove(QChar('\0'));
 				flip = (f == QString("Y"));
 				if (d != 0.0 || flip)
 				{
 					*spatial_transform = true;
-					if (v->image_type == 4)
-					{
-						ImageTypeUC::Pointer tmp0;
-						error = rotate_flip_slice_by_slice<
-							ImageTypeUC,Image2DTypeUC>(
-								v->pUC, tmp0, v, d, (f == QString("Y")));
-						if (error.isEmpty())
-						{
-							if (v->pUC.IsNotNull())
-								v->pUC->DisconnectPipeline();
-							v->pUC = tmp0;
-						}
-					}
-					else if (v->image_type == 5)
 					{
 						ImageTypeF::Pointer tmp0;
-						error = rotate_flip_slice_by_slice<
-							ImageTypeF,Image2DTypeF>(
-								v->pF, tmp0, v, d, (f == QString("Y")));
+						error = rotate_flip_slice_by_slice<ImageTypeF,Image2DTypeF>(v->pF, tmp0, v, d, (f == QString("Y")));
 						if (error.isEmpty())
 						{
-							if (v->pF.IsNotNull())
-								v->pF->DisconnectPipeline();
+							if (v->pF.IsNotNull()) v->pF->DisconnectPipeline();
 							v->pF = tmp0;
 						}
-					}
-					else if (v->image_type == 14)
-					{
-						RGBImageTypeUC::Pointer tmp0;
-						error = rotate_flip_slice_by_slice<
-							RGBImageTypeUC,RGBImage2DTypeUC>(
-								v->pUC_rgb, tmp0, v, d,
-									(f == QString("Y")));
-						if (error.isEmpty())
-						{
-							if (v->pUC_rgb.IsNotNull())
-								v->pUC_rgb->DisconnectPipeline();
-							v->pUC_rgb = tmp0;
-						}
-					}
-					else
-					{
-						error = QString("Wrong image type");
 					}
 					if (!error.isEmpty())
 					{
@@ -4147,7 +3754,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		for (int x = 0; x < l.size(); ++x)
 		{
 			const int values_size = l.at(x).values.size();
-			if (l.at(x).id == 5 && values_size >= 26)
+			if (l.at(x).id == 5 && values_size >= 28)
 			{
 				has_bb[texts]              = l.at(x).values.at( 0).toInt();
 				bb_top_left_x[texts]       = l.at(x).values.at( 1).toDouble();
@@ -4175,16 +3782,12 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				ShadowOffsetY[texts]       = l.at(x).values.at(23).toDouble();
 				ShadowOpacity[texts]       = l.at(x).values.at(24).toDouble();
 				{
-					const QList<QVariant> & l453 =
-						l.at(x).values.at(25).toList();
-					if (l453.size()==3)
+					const QList<QVariant> & l453 = l.at(x).values.at(25).toList();
+					if (l453.size() == 3)
 					{
-						TextColorCIELabValue_L[texts] =
-							l453.at(0).toInt();
-						TextColorCIELabValue_a[texts] =
-							l453.at(1).toInt();
-						TextColorCIELabValue_b[texts] =
-							l453.at(2).toInt();
+						TextColorCIELabValue_L[texts] = l453.at(0).toInt();
+						TextColorCIELabValue_a[texts] = l453.at(1).toInt();
+						TextColorCIELabValue_b[texts] = l453.at(2).toInt();
 					}
 					else
 					{
@@ -4194,16 +3797,12 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 					}
 				}
 				{
-					const QList<QVariant> & l453 =
-						l.at(x).values.at(26).toList();
-					if (l453.size()==3)
+					const QList<QVariant> & l453 = l.at(x).values.at(26).toList();
+					if (l453.size() == 3)
 					{
-						ShadowColorCIELabValue_L[texts] =
-							l453.at(0).toInt();
-						ShadowColorCIELabValue_a[texts] =
-							l453.at(1).toInt();
-						ShadowColorCIELabValue_b[texts] =
-							l453.at(2).toInt();
+						ShadowColorCIELabValue_L[texts] = l453.at(0).toInt();
+						ShadowColorCIELabValue_a[texts] = l453.at(1).toInt();
+						ShadowColorCIELabValue_b[texts] = l453.at(2).toInt();
 					}
 					else
 					{
@@ -4212,122 +3811,62 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 						ShadowColorCIELabValue_b[texts] = -1;
 					}
 				}
-				if (values_size >= 28)
+				QStringList sl;
+				for (int z = 27; z < values_size; ++z)
 				{
-					QStringList sl;
-					for (int z = 27; z < values_size; ++z)
-					{
-						sl.push_back(l.at(x).values.at(z).toString());
-					}
-					if (!sl.empty()) text_images[texts] = sl;
+					sl.push_back(l.at(x).values.at(z).toString());
 				}
+				if (!sl.empty()) text_images[texts] = sl;
 				++texts;
 			}
 		}
 		if (texts > 0)
 		{
-#if 0
-			if (text_images.empty())
-			{
-				QList<PRTextAnnotation> tas;
-				for (int y = 0; y < texts; ++y)
-				{
-					PRTextAnnotation a;
-					a.has_bb = (has_bb.value(y) == 1) ? true : false;
-					a.has_anchor = (has_anchor.value(y) == 1) ? true : false;
-					a.has_textstyle = (has_textstyle.value(y) == 1) ? true : false;
-					a.bb_top_left_x              = bb_top_left_x.value(y);
-					a.bb_top_left_y              = bb_top_left_y.value(y);
-					a.bb_bottom_right_x          = bb_bottom_r_x.value(y);
-					a.bb_bottom_right_y          = bb_bottom_r_y.value(y);
-					a.BoundingBoxAnnotationUnits = bb_unit.value(y);
-					a.anchor_x                   = anchor_x.value(y);
-					a.anchor_y                   = anchor_y.value(y);
-					a.AnchorPointAnnotationUnits = a_unit.value(y);
-					a.AnchorPointVisibility      = a_visibility.value(y);
-					a.UnformattedTextValue       = text.value(y);
-					a.FontName                   = FontName.value(y);
-					a.FontNameType               = FontNameType.value(y);
-					a.CSSFontName                = CSSFontName.value(y);
-					a.HorizontalAlignment        =
-						HorizontalAlignment.value(y);
-					a.VerticalAlignment          =
-						VerticalAlignment.value(y);
-					a.ShadowStyle                = ShadowStyle.value(y);
-					a.Underlined                 = Underlined.value(y);
-					a.Bold                       = Bold.value(y);
-					a.Italic                     = Italic.value(y);
-					a.ShadowOffsetX              = ShadowOffsetX.value(y);
-					a.ShadowOffsetY              = ShadowOffsetY.value(y);
-					a.ShadowOpacity              = ShadowOpacity.value(y);
-					a.TextColorCIELabValue_L     =
-						TextColorCIELabValue_L.value(y);
-					a.TextColorCIELabValue_a     =
-						TextColorCIELabValue_a.value(y);
-					a.TextColorCIELabValue_b     =
-						TextColorCIELabValue_b.value(y);
-					a.ShadowColorCIELabValue_L   =
-						ShadowColorCIELabValue_L.value(y);
-					a.ShadowColorCIELabValue_a   =
-						ShadowColorCIELabValue_a.value(y);
-					a.ShadowColorCIELabValue_b   =
-						ShadowColorCIELabValue_b.value(y);
-					tas.push_back(a);
-				}
-				v->pr_text_annotations.insert(-1, tas);
-			}
-			else
-#endif
-			{
-				text_slice_by_slice(
-					v,
-					has_bb,
-					bb_top_left_x,
-					bb_top_left_y,
-					bb_bottom_r_x,
-					bb_bottom_r_y,
-					bb_unit,
-					has_anchor,
-					anchor_x,
-					anchor_y,
-					a_unit,
-					a_visibility,
-					text,
-					has_textstyle,
-					FontName,
-					FontNameType,
-					CSSFontName,
-					HorizontalAlignment,
-					VerticalAlignment,
-					ShadowStyle,
-					Underlined,
-					Bold,
-					Italic,
-					ShadowOffsetX,
-					ShadowOffsetY,
-					ShadowOpacity,
-					TextColorCIELabValue_L,
-					TextColorCIELabValue_a,
-					TextColorCIELabValue_b,
-					ShadowColorCIELabValue_L,
-					ShadowColorCIELabValue_a,
-					ShadowColorCIELabValue_b,
-					text_images,
-					ivariant->image_instance_uids);
-			}
+			text_slice_by_slice(
+				v,
+				has_bb,
+				bb_top_left_x,
+				bb_top_left_y,
+				bb_bottom_r_x,
+				bb_bottom_r_y,
+				bb_unit,
+				has_anchor,
+				anchor_x,
+				anchor_y,
+				a_unit,
+				a_visibility,
+				text,
+				has_textstyle,
+				FontName,
+				FontNameType,
+				CSSFontName,
+				HorizontalAlignment,
+				VerticalAlignment,
+				ShadowStyle,
+				Underlined,
+				Bold,
+				Italic,
+				ShadowOffsetX,
+				ShadowOffsetY,
+				ShadowOpacity,
+				TextColorCIELabValue_L,
+				TextColorCIELabValue_a,
+				TextColorCIELabValue_b,
+				ShadowColorCIELabValue_L,
+				ShadowColorCIELabValue_a,
+				ShadowColorCIELabValue_b,
+				text_images,
+				ivariant->image_instance_uids);
 #ifdef PRINT_MAKE_PR_MONOCHROME
 			std::cout << "Text annotations" << std::endl;
 			{
-				PRTextAnnotations::const_iterator it8 =
-					v->pr_text_annotations.cbegin();
+				PRTextAnnotations::const_iterator it8 = v->pr_text_annotations.cbegin();
 				while (it8 != v->pr_text_annotations.cend())
 				{
 					const QList< PRTextAnnotation > & lll = it8.value();
 					for (int y = 0; y < lll.size(); ++y)
 					{
-						std::cout << it8.key() << " "
-							<< lll.at(y).UnformattedTextValue.toStdString()
-							<< std::endl;
+						std::cout << "    " << it8.key() << " " << lll.at(y).UnformattedTextValue.toStdString() << std::endl;
 					}
 					++it8;
 				}
@@ -4378,79 +3917,45 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		//QMap<int, QString> TrackingID;
 		//QMap<int, QString> TrackingUID;
 		////std::vector<unsigned char> FillPattern;
-
 		int graphics = 0;
 		for (int x = 0; x < l.size(); ++x)
 		{
 			const int values_size = l.at(x).values.size();
-			if (l.at(x).id == 6 && values_size >= 4)
+			if (l.at(x).id == 6 && values_size >= 6)
 			{
 				GraphicType[graphics] = l.at(x).values.at(0).toString();
 				GraphicAnnotationUnits[graphics] = l.at(x).values.at(1).toString();
 				gdata[graphics] = QVariant(l.at(x).values.at(2).toList());
 				GraphicFilled[graphics] = l.at(x).values.at(3).toString();
-				if (values_size >= 5)
+				QStringList sl;
+				for (int z = 4; z < values_size; ++z)
 				{
-					QStringList sl;
-					for (int z = 4; z < values_size; ++z)
-					{
-						sl.push_back(l.at(x).values.at(z).toString());
-					}
-					if (!sl.empty()) graphic_images[graphics] = sl;
+					sl.push_back(l.at(x).values.at(z).toString());
 				}
+				if (!sl.empty()) graphic_images[graphics] = sl;
 				++graphics;
 			}
 		}
 		if (graphics > 0)
 		{
-#if 0
-			if (graphic_images.empty())
-			{
-				QList<PRGraphicObject> gs;
-				for (int y = 0; y < graphics; ++y)
-				{
-					PRGraphicObject a;
-					a.GraphicType = GraphicType.value(y);
-					a.GraphicAnnotationUnits =
-						GraphicAnnotationUnits.value(y);
-					a.GraphicData.clear();
-					const QList<QVariant> & l465 =
-						gdata.value(y).toList();
-					for (int z = 0; z < l465.size(); ++z)
-					{
-						a.GraphicData.push_back(
-							static_cast<float>(l465.at(z).toDouble()));
-					}
-					a.GraphicFilled = GraphicFilled.value(y);
-					gs.push_back(a);
-				}
-				v->pr_graphicobjects.insert(-1, gs);
-			}
-			else
-#endif
-			{
-				graphic_slice_by_slice(
-					v,
-					GraphicType,
-					GraphicAnnotationUnits,
-					gdata,
-					GraphicFilled,
-					graphic_images,
-					ivariant->image_instance_uids);
-			}
+			graphic_slice_by_slice(
+				v,
+				GraphicType,
+				GraphicAnnotationUnits,
+				gdata,
+				GraphicFilled,
+				graphic_images,
+				ivariant->image_instance_uids);
 #ifdef PRINT_MAKE_PR_MONOCHROME
 			std::cout << "Graphic" << std::endl;
 			{
-				PRGraphicObjects::const_iterator it8 =
-					v->pr_graphicobjects.cbegin();
+				PRGraphicObjects::const_iterator it8 = v->pr_graphicobjects.cbegin();
 				while (it8 != v->pr_graphicobjects.cend())
 				{
 					const QList< PRGraphicObject > & lll = it8.value();
 					for (int y = 0; y < lll.size(); ++y)
 					{
-						std::cout << it8.key() << " "
-							<< lll.at(y).GraphicType.toStdString()
-							<< std::endl;
+						std::cout << "    " << it8.key() << " " << lll.at(y).GraphicType.toStdString() << std::endl;
 					}
 					++it8;
 				}
@@ -4479,12 +3984,11 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				a.RadiusofCircularShutter    = l.at(x).values.at(7).toInt();
 				{
 					const QList<QVariant> & q = l.at(x).values.at(8).toList();
-					if (!q.empty() && (q.size()%2 == 0))
+					if (!q.empty() && (q.size() % 2 == 0))
 					{
 						for (int j = 0; j < q.size(); ++j)
 						{
-							a.VerticesofthePolygonalShutter.push_back(
-								q.at(j).toInt());
+							a.VerticesofthePolygonalShutter.push_back(q.at(j).toInt());
 						}
 					}
 				}
@@ -4493,12 +3997,9 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 					const QList<QVariant> & q = l.at(x).values.at(10).toList();
 					if (q.size() == 3)
 					{
-						a.ShutterPresentationColorCIELabValue_L =
-							q.at(0).toInt();
-						a.ShutterPresentationColorCIELabValue_a =
-							q.at(1).toInt();
-						a.ShutterPresentationColorCIELabValue_b =
-							q.at(2).toInt();
+						a.ShutterPresentationColorCIELabValue_L = q.at(0).toInt();
+						a.ShutterPresentationColorCIELabValue_a = q.at(1).toInt();
+						a.ShutterPresentationColorCIELabValue_b = q.at(2).toInt();
 					}
 				}
 				v->pr_display_shutters.insert(-1, a);
@@ -4508,14 +4009,11 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 #ifdef PRINT_MAKE_PR_MONOCHROME
 		std::cout << "Display shutter" << std::endl;
 		{
-			PRDisplayShutters::const_iterator it8 =
-				v->pr_display_shutters.cbegin();
+			PRDisplayShutters::const_iterator it8 = v->pr_display_shutters.cbegin();
 			while (it8 != v->pr_display_shutters.cend())
 			{
 				const PRDisplayShutter & dsh = it8.value();
-				std::cout << it8.key() << " "
-					<< dsh.ShutterShape.toStdString()
-					<< std::endl;
+				std::cout << "    " << it8.key() << " " << dsh.ShutterShape.toStdString() << std::endl;
 				++it8;
 			}
 		}
@@ -4536,12 +4034,10 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		//
 		QApplication::processEvents();
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-		QMap<int,SliceOverlays>::const_iterator it3 =
-			ref.image_overlays.all_overlays.cbegin();
+		QMap<int,SliceOverlays>::const_iterator it3 = ref.image_overlays.all_overlays.cbegin();
 		while (it3 != ref.image_overlays.all_overlays.cend())
 #else
-		QMap<int,SliceOverlays>::const_iterator it3 =
-			ref.image_overlays.all_overlays.constBegin();
+		QMap<int,SliceOverlays>::const_iterator it3 = ref.image_overlays.all_overlays.constBegin();
 		while (it3 != ref.image_overlays.all_overlays.constEnd())
 #endif
 		{
@@ -4553,8 +4049,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				SliceOverlay o = overlays.at(x);
 				if (!v->image_overlays.all_overlays.contains(key))
 				{
-					v->image_overlays.all_overlays[key] =
-						SliceOverlays();
+					v->image_overlays.all_overlays[key] = SliceOverlays();
 				}
 				v->image_overlays.all_overlays[key].push_back(o);
 			}
