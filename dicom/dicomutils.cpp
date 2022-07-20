@@ -4562,14 +4562,14 @@ bool DicomUtils::generate_geometry(
 	{
 		const double * ipp_iop = values.at(i);
 		const sVector4 c0 = sVector4(
-					static_cast<float>(ipp_iop[3])*spacing_x,
-					static_cast<float>(ipp_iop[4])*spacing_x,
-					static_cast<float>(ipp_iop[5])*spacing_x,
+					static_cast<float>(ipp_iop[3]*spacing_x),
+					static_cast<float>(ipp_iop[4]*spacing_x),
+					static_cast<float>(ipp_iop[5]*spacing_x),
 					0.0f);
 		const sVector4 c1 = sVector4(
-					static_cast<float>(ipp_iop[6])*spacing_y,
-					static_cast<float>(ipp_iop[7])*spacing_y,
-					static_cast<float>(ipp_iop[8])*spacing_y,
+					static_cast<float>(ipp_iop[6]*spacing_y),
+					static_cast<float>(ipp_iop[7]*spacing_y),
+					static_cast<float>(ipp_iop[8]*spacing_y),
 					0.0f);
 		const sVector4 c2 = sVector4(0.0f,0.0f,0.0f,0.0f);
 		const sVector4 c3 = sVector4(
