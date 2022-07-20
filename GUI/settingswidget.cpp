@@ -231,9 +231,9 @@ void SettingsWidget::readSettings()
 	settings.beginGroup(QString("StyleDialog"));
 	saved_idx = settings.value(QString("saved_idx"), 0).toInt();
 	settings.endGroup();
+	gl3D_checkBox->setChecked((tmp0==1));
 	si_doubleSpinBox->setValue(tmp1);
 	QFont f = QApplication::font();
-	gl3D_checkBox->setChecked((tmp0==1));
 	if (tmp2 < 6.0) tmp2 = 6.0; 
 	else            tmp2 = f.pointSizeF();
 	pt_doubleSpinBox->setValue(tmp2);

@@ -30,6 +30,9 @@ public:
 	static bool get_us_value(
 		const mdcm::DataSet&, const mdcm::Tag&,
 		unsigned short*);
+	static bool get_ss_value(
+		const mdcm::DataSet&, const mdcm::Tag&,
+		signed short*);
 	static bool get_sl_value(
 		const mdcm::DataSet&, const mdcm::Tag&,
 		int *);
@@ -51,6 +54,10 @@ public:
 	static bool get_us_values(
 		const mdcm::DataSet&, const mdcm::Tag&,
 		std::vector<unsigned short> &);
+	static bool get_ss_values(
+		const mdcm::DataSet&, const mdcm::Tag&,
+		std::vector<signed short> &);
+
 	static bool get_sl_values(
 		const mdcm::DataSet&, const mdcm::Tag&,
 		std::vector<int> &);

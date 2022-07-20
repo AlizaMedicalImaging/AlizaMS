@@ -1187,6 +1187,17 @@ bool DicomUtils::get_us_value(
 	return ok;
 }
 
+bool DicomUtils::get_ss_value(
+	const mdcm::DataSet & ds,
+	const mdcm::Tag & t,
+	signed short * result)
+{
+	const bool ok =
+		get_vm1_bin_value<signed short, mdcm::VR::SS>(
+			ds, t, result);
+	return ok;
+}
+
 bool DicomUtils::get_sl_value(
 	const mdcm::DataSet & ds,
 	const mdcm::Tag & t,
@@ -1260,6 +1271,17 @@ bool DicomUtils::get_us_values(
 {
 	const bool ok =
 		get_vm1_n_bin_values<unsigned short, mdcm::VR::US>(
+			ds, t, result);
+	return ok;
+}
+
+bool DicomUtils::get_ss_values(
+	const mdcm::DataSet & ds,
+	const mdcm::Tag & t,
+	std::vector<signed short> & result)
+{
+	const bool ok =
+		get_vm1_n_bin_values<signed short, mdcm::VR::SS>(
 			ds, t, result);
 	return ok;
 }
@@ -2649,10 +2671,14 @@ void DicomUtils::read_window(
 		if (!w.empty())
 		{
 			const double k = w.at(0);
-			if      (lut_function_ == 0 && k >= 2) { *width_ = k - 1; }
-			else if (lut_function_ == 1 && k >= 2) { *width_ = k;     }
-			else if (lut_function_ == 2 && k >= 2) { *width_ = k;     }
-			else                                   { *width_ = k;     }
+			if ((lut_function_ <= 0) && k >= 2)
+			{
+				*width_ = k - 1;
+			}
+			else
+			{
+				*width_ = k;
+			}
 		}
 	}
 }
@@ -4822,7 +4848,7 @@ void DicomUtils::enhanced_get_indices(
 	const int sq_size = static_cast<int>(sq.size());
 	for (int x = 0; x < sq_size; ++x)
 	{
-		const size_t i = x;
+		const size_t i = static_cast<size_t>(x);
 		if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
 			sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9056))
 		{
