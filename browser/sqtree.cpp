@@ -440,7 +440,8 @@ void SQtree::process_element(
 	else if (e.IsUndefinedLength() && tag == mdcm::Tag(0x7fe0,0x0010))
 	{
 		const mdcm::SequenceOfFragments * sqf = e.GetSequenceOfFragments();
-		const size_t nf = sqf->GetNumberOfFragments();
+		const size_t nf = sqf ? sqf->GetNumberOfFragments() : 0;
+		const size_t nf1 = (nf > 0) ? nf + 1 : 0;
 		QStringList l;
 		l << QString(tag.PrintAsPipeSeparatedString().c_str())
 			<< tname
@@ -448,7 +449,7 @@ void SQtree::process_element(
 			<< QString("")
 			<< QString(" [")+
 				QVariant(static_cast<unsigned int>(
-					nf + 1)).toString() +
+					nf1)).toString() +
 					QString("]");
 		QTreeWidgetItem * ci = new QTreeWidgetItem(l);
 		ci->setForeground(4, brush2); // binary
@@ -456,48 +457,51 @@ void SQtree::process_element(
 		if (unknown_vr)  ci->setBackground(2, brush4);
 		if (duplicated)  ci->setForeground(0, brush6);
 		wi->addChild(ci);
-		const mdcm::BasicOffsetTable & bof = sqf->GetTable();
-		QString bof_s("");
+		if (sqf)
 		{
-			std::vector<unsigned int> values;
-			get_bin_values<unsigned int, mdcm::VR::UL>(
-				bof, values);
-			for (unsigned long j = 0; j < values.size(); ++j)
+			const mdcm::BasicOffsetTable & bof = sqf->GetTable();
+			QString bof_s("");
 			{
-				bof_s.append(
-					QVariant(values[j]).toString() +
-					QString(" "));
+				std::vector<unsigned int> values;
+				get_bin_values<unsigned int, mdcm::VR::UL>(
+					bof, values);
+				for (unsigned long j = 0; j < values.size(); ++j)
+				{
+					bof_s.append(
+						QVariant(values[j]).toString() +
+						QString(" "));
+				}
 			}
-		}
-		const unsigned int bof_length = bof.GetVL();
-		const QString bof_tmp1 = print_length(bof_length);
-		QStringList lt;
-		lt << QString("Basic Offset Table")
-			<< QString("")
-			<< QString("")
-			<< QString(bof_tmp1)
-			<< bof_s;
-		QTreeWidgetItem * cbof = new QTreeWidgetItem(lt);
-		cbof->setForeground(0, brush2);
-		cbof->setForeground(1, brush2);
-		cbof->setForeground(4, brush2);
-		ci->addChild(cbof);
-		for (size_t i = 0; i < nf; ++i)
-		{
-			const mdcm::Fragment & frag = sqf->GetFragment(i);
-			const size_t length = frag.GetVL();
-			const QString tmp1 = print_length(length);
-			QStringList l1;
-			l1 << QString("Fragment")
-				<< QVariant((int)(i+1)).toString()
+			const unsigned int bof_length = bof.GetVL();
+			const QString bof_tmp1 = print_length(bof_length);
+			QStringList lt;
+			lt << QString("Basic Offset Table")
 				<< QString("")
-				<< QString(tmp1)
-				<< QString("binary");
-			QTreeWidgetItem * cin = new QTreeWidgetItem(l1);
-			cin->setForeground(0, brush2);
-			cin->setForeground(1, brush2);
-			cin->setForeground(4, brush2);
-			ci->addChild(cin);
+				<< QString("")
+				<< QString(bof_tmp1)
+				<< bof_s;
+			QTreeWidgetItem * cbof = new QTreeWidgetItem(lt);
+			cbof->setForeground(0, brush2);
+			cbof->setForeground(1, brush2);
+			cbof->setForeground(4, brush2);
+			ci->addChild(cbof);
+			for (size_t i = 0; i < nf; ++i)
+			{
+				const mdcm::Fragment & frag = sqf->GetFragment(i);
+				const size_t length = frag.GetVL();
+				const QString tmp1 = print_length(length);
+				QStringList l1;
+				l1 << QString("Fragment")
+					<< QVariant((int)(i+1)).toString()
+					<< QString("")
+					<< QString(tmp1)
+					<< QString("binary");
+				QTreeWidgetItem * cin = new QTreeWidgetItem(l1);
+				cin->setForeground(0, brush2);
+				cin->setForeground(1, brush2);
+				cin->setForeground(4, brush2);
+				ci->addChild(cin);
+			}
 		}
 	}
 	else
