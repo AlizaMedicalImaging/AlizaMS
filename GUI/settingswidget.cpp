@@ -135,7 +135,7 @@ void SettingsWidget::set_default()
 	sortframes_checkBox->setChecked(true);
 	time_s__checkBox->setChecked(false);
 	overlays_checkBox->setChecked(true);
-	clean_unused_checkBox->setChecked(false);
+	clean_unused_checkBox->setChecked(true);
 	pred6_checkBox->setChecked(false);
 	cornell_checkBox->setChecked(false);
 	enh_skip_dim_org_checkBox->setChecked(false);
@@ -227,6 +227,7 @@ void SettingsWidget::readSettings()
 	const int tmp9  = settings.value(QString("dcm_mosaic"),      1).toInt();
 	const int tmp10 = settings.value(QString("dcm_sort_mf"),     1).toInt();
 	const int tmp11 = settings.value(QString("apply_icc"),       1).toInt();
+	const int tmp12 = settings.value(QString("clean_unused"),    1).toInt();
 	settings.endGroup();
 	settings.beginGroup(QString("StyleDialog"));
 	saved_idx = settings.value(QString("saved_idx"), 0).toInt();
@@ -259,6 +260,7 @@ void SettingsWidget::readSettings()
 	mosaic_checkBox->setChecked((tmp9 == 1));
 	sortframes_checkBox->setChecked((tmp10 == 1));
 	icc_checkBox->setChecked((tmp11 == 1));
+	clean_unused_checkBox->setChecked((tmp12 == 1));
 }
 
 void SettingsWidget::writeSettings(QSettings & s)
@@ -277,6 +279,7 @@ void SettingsWidget::writeSettings(QSettings & s)
 	s.setValue(QString("dcm_mosaic"),    QVariant((int)(mosaic_checkBox->isChecked() ? 1 : 0)));
 	s.setValue(QString("dcm_sort_mf"),   QVariant((int)(sortframes_checkBox->isChecked() ? 1 : 0)));
 	s.setValue(QString("apply_icc"),     QVariant((int)(icc_checkBox->isChecked() ? 1 : 0)));
+	s.setValue(QString("clean_unused"),  QVariant((int)(clean_unused_checkBox->isChecked() ? 1 : 0)));
 	s.endGroup();
 	s.beginGroup(QString("StyleDialog"));
 	s.setValue(QString("saved_idx"), QVariant(styleComboBox->currentIndex()));
