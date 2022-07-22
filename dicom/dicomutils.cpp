@@ -12127,6 +12127,162 @@ typedef struct
 	QString sop;
 } MixedDicomSeriesInfo;
 
+static unsigned int process_gsps(
+	const QStringList & grey_softcopy_pr_files,
+	const QString & p,
+	const QWidget * settings,
+	const bool ok3d,  const int max_3d_tex_size, GLWidget * gl, ShaderObj * mesh_shader,
+	std::vector<ImageVariant*> & ivariants,
+	QString & message_,
+	QProgressDialog * pb)
+{
+	unsigned int count = 0;
+	const SettingsWidget * wsettings = static_cast<const SettingsWidget *>(settings);
+	for (int x = 0; x < grey_softcopy_pr_files.size(); ++x)
+	{
+		if (pb)
+		{
+			pb->setLabelText(QString("Searching referenced files"));
+			pb->setValue(-1);
+		}
+		QApplication::processEvents();
+		QList<PrRefSeries> refs;
+		DicomUtils::read_pr_ref(p, grey_softcopy_pr_files.at(x), refs, pb);
+		QApplication::processEvents();
+		for (int y = 0; y < refs.size(); ++y)
+		{
+			if (pb)
+			{
+				pb->setLabelText(QString("Loading ... "));
+				pb->setValue(-1);
+			}
+			QApplication::processEvents();
+			QStringList ref_files;
+			for (int z = 0; z < refs.at(y).images.size(); ++z)
+			{
+				ref_files.push_back(refs.at(y).images.at(z).file);
+			}
+			if (ref_files.size() < 1) continue;
+			ref_files.sort();
+			std::vector<ImageVariant*> ref_ivariants;
+			const QString message_pr_ref =
+				DicomUtils::read_dicom(
+					ref_ivariants,
+					ref_files,
+					0,
+					NULL,
+					NULL,
+					false,
+					settings,
+					pb,
+					1,
+					true);
+			for (unsigned int z = 0; z < ref_ivariants.size(); ++z)
+			{
+				const int ref_ivariant_type = ref_ivariants.at(z)->image_type;
+				if (!(ref_ivariant_type >= 0 && ref_ivariant_type < 10))
+				{
+					std::cout << "Not a scalar image for GSPS, skipped" << std::endl;
+					continue;
+				}
+				if (pb) pb->setValue(-1);
+				QApplication::processEvents();
+				++count;
+				bool spatial_transform = false;
+				ImageVariant * pr_image =
+					PrConfigUtils::make_pr_monochrome(
+						ref_ivariants.at(z),
+						refs.at(y),
+						wsettings,
+						gl,
+						ok3d,
+						&spatial_transform);
+				if (pr_image)
+				{
+					const bool pr_skip_texture = pr_image->di->skip_texture;
+					//
+					if (ref_ivariants.at(z)->di->slices_generated)
+					{
+						CommonUtils::copy_slices(
+							pr_image,
+							ref_ivariants.at(z));
+					}
+					else
+					{
+						CommonUtils::copy_essential(
+							pr_image,
+							ref_ivariants.at(z));
+					}
+					CommonUtils::copy_imagevariant_overlays(
+						pr_image,
+						ref_ivariants.at(z));
+					//
+					//
+					//
+					pr_image->di->skip_texture = pr_skip_texture;
+					pr_image->iod = QString("Grayscale Softcopy Presentation State");
+					pr_image->sop = QString("");
+					pr_image->rescale_disabled = false;
+					pr_image->filenames = QStringList(grey_softcopy_pr_files.at(x));
+					//
+					//
+					//
+					if (spatial_transform)
+					{
+						pr_image->equi = false;
+						pr_image->di->hide_orientation = true;
+						pr_image->di->filtering = 0;
+					}
+					bool pr_load_ok = false;
+					if (pb)
+					{
+						pb->setValue(-1);
+						QApplication::processEvents();
+					}
+					pr_load_ok = CommonUtils::reload_monochrome(
+						pr_image,
+						ok3d,
+						gl,
+						max_3d_tex_size,
+						wsettings->get_resize(),
+						wsettings->get_size_x(),
+						wsettings->get_size_y());
+					if (pr_load_ok)
+					{
+						if (pr_image->equi)
+						{
+							if (pr_image->di->idimz < 7)
+								pr_image->di->transparency = false;
+						}
+						else
+						{
+							if (!pr_image->one_direction)
+								pr_image->di->transparency = false;
+							pr_image->di->filtering = 0;
+						}
+						CommonUtils::reset_bb(pr_image);
+						IconUtils::icon(pr_image);
+						ivariants.push_back(pr_image);
+					}
+					else
+					{
+						delete pr_image;
+						pr_image = NULL;
+					}
+				}
+				if (ref_ivariants.at(z))
+				{
+					delete ref_ivariants[z];
+					ref_ivariants[z] = NULL;
+				}
+			}
+			if (!message_pr_ref.isEmpty())
+				message_.append(QString("\n") + message_pr_ref);
+		}
+	}
+	return count;
+}
+
 // load_type
 // 0 - default
 // 1 - PR reference
@@ -14072,7 +14228,6 @@ QString DicomUtils::read_dicom(
 	if (!grey_softcopy_pr_files.empty())
 	{
 		if (pb) pb->show();
-		unsigned int count = 0;
 		const QString file0 = grey_softcopy_pr_files.at(0);
 		QFileInfo p0(file0);
 #ifdef USE_WORKSTATION_MODE
@@ -14086,148 +14241,14 @@ QString DicomUtils::read_dicom(
 #endif
 			);
 #endif
-		for (int x = 0; x < grey_softcopy_pr_files.size(); ++x)
-		{
-			if (pb)
-			{
-				pb->setLabelText(QString("Searching referenced files"));
-				pb->setValue(-1);
-			}
-			QApplication::processEvents();
-			QList<PrRefSeries> refs;
-			read_pr_ref(p, grey_softcopy_pr_files.at(x), refs, pb);
-			QApplication::processEvents();
-			for (int y = 0; y < refs.size(); ++y)
-			{
-				if (pb)
-				{
-					pb->setLabelText(QString("Loading ... "));
-					pb->setValue(-1);
-				}
-				QApplication::processEvents();
-				QStringList ref_files;
-				for (int z = 0; z < refs.at(y).images.size(); ++z)
-				{
-					ref_files.push_back(refs.at(y).images.at(z).file);
-				}
-				if (ref_files.size() < 1) continue;
-				ref_files.sort();
-				std::vector<ImageVariant*> ref_ivariants;
-				const QString message_pr_ref =
-					read_dicom(
-						ref_ivariants,
-						ref_files,
-						0,
-						NULL,
-						NULL,
-						false,
-						settings,
-						pb,
-						1,
-						true);
-				for (unsigned int z = 0; z < ref_ivariants.size(); ++z)
-				{
-					const int ref_ivariant_type = ref_ivariants.at(z)->image_type;
-					if (!(ref_ivariant_type >= 0 && ref_ivariant_type < 10))
-					{
-						std::cout << "Not a scalar image for GSPS, skipped" << std::endl;
-						continue;
-					}
-					if (pb) pb->setValue(-1);
-					QApplication::processEvents();
-					++count;
-					bool spatial_transform = false;
-					ImageVariant * pr_image =
-						PrConfigUtils::make_pr_monochrome(
-							ref_ivariants.at(z),
-							refs.at(y),
-							wsettings,
-							gl,
-							ok3d,
-							&spatial_transform);
-					if (pr_image)
-					{
-						const bool pr_skip_texture = pr_image->di->skip_texture;
-						//
-						if (ref_ivariants.at(z)->di->slices_generated)
-						{
-							CommonUtils::copy_slices(
-								pr_image,
-								ref_ivariants.at(z));
-						}
-						else
-						{
-							CommonUtils::copy_essential(
-								pr_image,
-								ref_ivariants.at(z));
-						}
-						CommonUtils::copy_imagevariant_overlays(
-							pr_image,
-							ref_ivariants.at(z));
-						//
-						//
-						//
-						pr_image->di->skip_texture = pr_skip_texture;
-						pr_image->iod = QString("Grayscale Softcopy Presentation State");
-						pr_image->sop = QString("");
-						pr_image->rescale_disabled = false;
-						pr_image->filenames = QStringList(grey_softcopy_pr_files.at(x));
-						//
-						//
-						//
-						if (spatial_transform)
-						{
-							pr_image->equi = false;
-							pr_image->di->hide_orientation = true;
-							pr_image->di->filtering = 0;
-						}
-						bool pr_load_ok = false;
-						if (pb)
-						{
-							pb->setValue(-1);
-							QApplication::processEvents();
-						}
-						pr_load_ok = CommonUtils::reload_monochrome(
-							pr_image,
-							ok3d,
-							gl,
-							max_3d_tex_size,
-							wsettings->get_resize(),
-							wsettings->get_size_x(),
-							wsettings->get_size_y());
-						if (pr_load_ok)
-						{
-							if (pr_image->equi)
-							{
-								if (pr_image->di->idimz < 7)
-									pr_image->di->transparency = false;
-							}
-							else
-							{
-								if (!pr_image->one_direction)
-									pr_image->di->transparency = false;
-								pr_image->di->filtering = 0;
-							}
-							CommonUtils::reset_bb(pr_image);
-							IconUtils::icon(pr_image);
-							ivariants.push_back(pr_image);
-						}
-						else
-						{
-							delete pr_image;
-							pr_image = NULL;
-						}
-					}
-					if (ref_ivariants.at(z))
-					{
-						delete ref_ivariants[z];
-						ref_ivariants[z] = NULL;
-					}
-				}
-				if (!message_pr_ref.isEmpty())
-					message_.append(QString("\n") + message_pr_ref);
-			}
-		}
+		unsigned int count = process_gsps(
+			grey_softcopy_pr_files,
+			p,
+			wsettings,
+			ok3d, max_3d_tex_size, gl, mesh_shader,
+			ivariants,
+			message_,
+			pb);
 		if (count < 1 && message_.isEmpty())
 		{
 #ifdef USE_WORKSTATION_MODE
@@ -14262,149 +14283,14 @@ QString DicomUtils::read_dicom(
 			{
 				return QString("");
 			}
-			// FIXME duplicated code
-			for (int x = 0; x < grey_softcopy_pr_files.size(); ++x)
-			{
-				if (pb)
-				{
-					pb->setLabelText(QString("Searching referenced files"));
-					pb->setValue(-1);
-				}
-				QApplication::processEvents();
-				QList<PrRefSeries> refs;
-				read_pr_ref(p, grey_softcopy_pr_files.at(x), refs, pb);
-				QApplication::processEvents();
-				for (int y = 0; y < refs.size(); ++y)
-				{
-					if (pb)
-					{
-						pb->setLabelText(QString("Loading ... "));
-						pb->setValue(-1);
-					}
-					QApplication::processEvents();
-					QStringList ref_files;
-					for (int z = 0; z < refs.at(y).images.size(); ++z)
-					{
-						ref_files.push_back(refs.at(y).images.at(z).file);
-					}
-					if (ref_files.size() < 1) continue;
-					ref_files.sort();
-					std::vector<ImageVariant*> ref_ivariants;
-					const QString message_pr_ref =
-						read_dicom(
-							ref_ivariants,
-							ref_files,
-							0,
-							NULL,
-							NULL,
-							false,
-							settings,
-							pb,
-							1,
-							true);
-					for (unsigned int z = 0; z < ref_ivariants.size(); ++z)
-					{
-						const int ref_ivariant_type = ref_ivariants.at(z)->image_type;
-						if (!(ref_ivariant_type >= 0 && ref_ivariant_type < 10))
-						{
-							std::cout << "Not a scalar image for GSPS, skipped" << std::endl;
-							continue;
-						}
-						if (pb) pb->setValue(-1);
-						QApplication::processEvents();
-						++count;
-						bool spatial_transform = false;
-						ImageVariant * pr_image =
-							PrConfigUtils::make_pr_monochrome(
-								ref_ivariants.at(z),
-								refs.at(y),
-								wsettings,
-								gl,
-								ok3d,
-								&spatial_transform);
-						if (pr_image)
-						{
-							const bool pr_skip_texture = pr_image->di->skip_texture;
-							//
-							if (ref_ivariants.at(z)->di->slices_generated)
-							{
-								CommonUtils::copy_slices(
-									pr_image,
-									ref_ivariants.at(z));
-							}
-							else
-							{
-								CommonUtils::copy_essential(
-									pr_image,
-									ref_ivariants.at(z));
-							}
-							CommonUtils::copy_imagevariant_overlays(
-								pr_image,
-								ref_ivariants.at(z));
-							//
-							//
-							//
-							pr_image->di->skip_texture = pr_skip_texture;
-							pr_image->iod = QString("Grayscale Softcopy Presentation State");
-							pr_image->sop = QString("");
-							pr_image->rescale_disabled = false;
-							pr_image->filenames = QStringList(grey_softcopy_pr_files.at(x));
-							//
-							//
-							//
-							if (spatial_transform)
-							{
-								pr_image->equi = false;
-								pr_image->di->hide_orientation = true;
-								pr_image->di->filtering = 0;
-							}
-							bool pr_load_ok = false;
-							if (pb)
-							{
-								pb->setValue(-1);
-								QApplication::processEvents();
-							}
-							pr_load_ok = CommonUtils::reload_monochrome(
-								pr_image,
-								ok3d,
-								gl,
-								max_3d_tex_size,
-								wsettings->get_resize(),
-								wsettings->get_size_x(),
-								wsettings->get_size_y());
-							if (pr_load_ok)
-							{
-								if (pr_image->equi)
-								{
-									if (pr_image->di->idimz < 7)
-										pr_image->di->transparency = false;
-								}
-								else
-								{
-									if (!pr_image->one_direction)
-										pr_image->di->transparency = false;
-									pr_image->di->filtering = 0;
-								}
-								CommonUtils::reset_bb(pr_image);
-								IconUtils::icon(pr_image);
-								ivariants.push_back(pr_image);
-							}
-							else
-							{
-								delete pr_image;
-								pr_image = NULL;
-							}
-						}
-						if (ref_ivariants.at(z))
-						{
-							delete ref_ivariants[z];
-							ref_ivariants[z] = NULL;
-						}
-					}
-					if (!message_pr_ref.isEmpty())
-						message_.append(QString("\n") + message_pr_ref);
-				}
-			}
+			count = process_gsps(
+				grey_softcopy_pr_files,
+				p,
+				wsettings,
+				ok3d, max_3d_tex_size, gl, mesh_shader,
+				ivariants,
+				message_,
+				pb);
 		}
 	}
 	if (
