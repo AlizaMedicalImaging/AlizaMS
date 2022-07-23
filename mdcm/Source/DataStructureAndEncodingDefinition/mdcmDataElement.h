@@ -68,7 +68,7 @@ public:
     : TagField(t)
     , ValueLengthField(vl)
     , VRField(vr)
-    , ValueField(0)
+    , ValueField(NULL)
   {}
   DataElement(const DataElement &);
   const Tag &

@@ -14241,15 +14241,16 @@ QString DicomUtils::read_dicom(
 #endif
 			);
 #endif
+		QString message_pr("");
 		unsigned int count = process_gsps(
 			grey_softcopy_pr_files,
 			p,
 			wsettings,
 			ok3d, max_3d_tex_size, gl, mesh_shader,
 			ivariants,
-			message_,
+			message_pr,
 			pb);
-		if (count < 1 && message_.isEmpty())
+		if (count < 1 && message_pr.isEmpty())
 		{
 #ifdef USE_WORKSTATION_MODE
 			QFileInfo fi99(p);
@@ -14289,15 +14290,18 @@ QString DicomUtils::read_dicom(
 				wsettings,
 				ok3d, max_3d_tex_size, gl, mesh_shader,
 				ivariants,
-				message_,
+				message_pr,
 				pb);
 		}
+		if (!message_pr.isEmpty())
+		{
+			message_.append(message_pr + QString("\n"));
+		}
 	}
-	if (
-		!color_softcopy_pr_files.empty() ||
+	if (!color_softcopy_pr_files.empty()        ||
 		!pseudo_color_softcopy_pr_files.empty() ||
-		!blending_softcopy_pr_files.empty() ||
-		!xaxrf_softcopy_pr_files.empty() ||
+		!blending_softcopy_pr_files.empty()     ||
+		!xaxrf_softcopy_pr_files.empty()        ||
 		!advanced_blending_softcopy_pr_files.empty())
 	{
 		QString pr_warn("");
