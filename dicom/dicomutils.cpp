@@ -7644,7 +7644,21 @@ QString DicomUtils::read_series(
 	if (!ivariant->image_instance_uids.empty() &&
 		ivariant->image_instance_uids.size()!=ivariant->di->idimz)
 	{
-		ivariant->image_instance_uids.clear();
+		if (images_ipp.size() == 1 && ivariant->image_instance_uids.size() == 1 &&
+			ivariant->image_instance_uids.contains(0))
+		{
+			const QString iuid = ivariant->image_instance_uids.value(0);
+			for (int x = 1; x < ivariant->di->idimz; ++x)
+			{
+				ivariant->image_instance_uids[x] = iuid;
+			}
+		}
+		else
+		{
+			std::cout << "Warning: instance UIDs mismatch, cleared UIDs"
+				<< std::endl;
+			ivariant->image_instance_uids.clear();
+		}
 	}
 	//
 	CommonUtils::reset_bb(ivariant);

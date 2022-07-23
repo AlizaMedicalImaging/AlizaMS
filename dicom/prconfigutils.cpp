@@ -1312,7 +1312,8 @@ static QString voi_lut_slice_by_slice(
 			}
 			if (idxs.empty())
 			{
-				std::cout << "idxs.size() < 1 k = " << k << " " << uid.toStdString() << std::endl;
+				std::cout << "Warning: something went wrong (1)\n"
+					<< "    idxs.size() < 1, but k = " << k << " " << uid.toStdString() << std::endl;
 				continue;
 			}
 			for (int x = 0; x < idxs.size(); ++x)
@@ -1517,13 +1518,14 @@ static void areas_slice_by_slice(
 					const int tmp98 = QVariant(frames_tmp1.at(x).trimmed().remove(QChar('\0'))).toInt(&tmp99);
 					if (tmp99 && tmp98 > 0)
 					{
-						idxs.push_back(tmp98-1);
+						idxs.push_back(tmp98 - 1);
 					}
 				}
 			}
 			if (idxs.empty())
 			{
-				std::cout << "idxs.size()<1 k=" << k << " " << uid.toStdString() << std::endl;
+				std::cout << "Warning: something went wrong (2)\n"
+					<< "    idxs.size() < 1, but k = " << k << " " << uid.toStdString() << std::endl;
 				continue;
 			}
 			for (int x = 0; x < idxs.size(); ++x)
@@ -1639,13 +1641,14 @@ static void text_slice_by_slice(
 					const int tmp98 = QVariant(frames_tmp1.at(x).trimmed().remove(QChar('\0'))).toInt(&tmp99);
 					if (tmp99 && tmp98 > 0)
 					{
-						idxs.push_back(tmp98-1);
+						idxs.push_back(tmp98 - 1);
 					}
 				}
 			}
 			if (idxs.empty())
 			{
-				std::cout << "idxs.size()<1 k=" << k << " " << uid.toStdString() << std::endl;
+				std::cout << "Warning: something went wrong (3)\n"
+					<< "    idxs.size() < 1, but k = " << k << " " << uid.toStdString() << std::endl;
 				continue;
 			}
 			for (int x = 0; x < idxs.size(); ++x)
@@ -1764,13 +1767,14 @@ static void graphic_slice_by_slice(
 					const int tmp98 = QVariant(frames_tmp1.at(x).trimmed().remove(QChar('\0'))).toInt(&tmp99);
 					if (tmp99 && tmp98 > 0)
 					{
-						idxs.push_back(tmp98-1);
+						idxs.push_back(tmp98 - 1);
 					}
 				}
 			}
 			if (idxs.empty())
 			{
-				std::cout << "idxs.size()<1 k=" << k << " " << uid.toStdString() << std::endl;
+				std::cout << "Warning: something went wrong (4)\n"
+					<< "    idxs.size() < 1, but k = " << k << " " << uid.toStdString() << std::endl;
 				continue;
 			}
 			for (int x = 0; x < idxs.size(); ++x)
@@ -3574,7 +3578,6 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 #endif
 			const double px = pixel_spacings1.value(0);
 			const double py = pixel_spacings0.value(0);
-			if (!(px > 0.99999 && px < 1.00001 && py > 0.99999 && py < 1.00001))
 			{
 				bool one_spacing = true;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -3586,7 +3589,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 #endif
 				{
 					const double tmp0 = it0.value();
-					if (!(px > tmp0-0.00001 && px < tmp0+0.00001))
+					if (!(px > tmp0 - 0.00001 && px < tmp0 + 0.00001))
 					{
 						one_spacing = false;
 						break;
@@ -3604,7 +3607,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 #endif
 					{
 						const double tmp1 = it1.value();
-						if (!(py > tmp1-0.00001 && py < tmp1+0.00001))
+						if (!(py > tmp1 - 0.00001 && py < tmp1 + 0.00001))
 						{
 							one_spacing = false;
 							break;
@@ -3614,13 +3617,19 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				}
 				if (one_spacing)
 				{
-					set_spacing<ImageTypeF>(v->pF, px, py);
+					if (!(px > 0.99999 && px < 1.00001 && py > 0.99999 && py < 1.00001))
+					{
+						set_spacing<ImageTypeF>(v->pF, px, py);
+					}
+				}
+				else
+				{
+					std::cout << "Warning: possible different spacing for slices in Display Areas, not supported" << std::endl;
 				}
 			}
 			//
 			const double ax = aspect_ratios1.value(0);
 			const double ay = aspect_ratios0.value(0);
-			if (!(ax > 0.99999f && ax < 1.00001 && ay > 0.99999f && ay < 1.00001))
 			{
 				bool one_aspect = true;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -3648,7 +3657,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 					QMap<int, double>::const_iterator it1 = aspect_ratios0.constBegin();
 					while (it1 != aspect_ratios0.constEnd())
 #endif
-						{
+					{
 						const double tmp1 = it1.value();
 						if (!(ay > tmp1-0.00001 && ay < tmp1+0.00001))
 						{
@@ -3660,7 +3669,14 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				}
 				if (one_aspect)
 				{
-					set_asp_ratio<ImageTypeF>(v->pF, ax, ay);
+					if (!(ax > 0.99999 && ax < 1.00001 && ay > 0.99999 && ay < 1.00001))
+					{
+						set_asp_ratio<ImageTypeF>(v->pF, ax, ay);
+					}
+				}
+				else
+				{
+					std::cout << "Warning: possible different aspect for slices in Display Areas, not supported" << std::endl;
 				}
 			}
 			//
