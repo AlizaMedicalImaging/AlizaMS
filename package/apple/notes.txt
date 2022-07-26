@@ -46,6 +46,6 @@ optionally add stuff to Resources
 
 -----------------------------
 
-optionally sing and notarize
+optionally sign and notarize
 
 -----------------------------

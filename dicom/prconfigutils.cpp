@@ -3380,8 +3380,8 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		QMap<int, QString>     lut_functions;
 		QMap<int, QVariant>    lut_descriptors;
 		QMap<int, QVariant>    lut_datas;
-        QMap<int, bool>        mapped_implicits;
-        QMap<int, bool>        mapped_signeds;
+		QMap<int, bool>        mapped_implicits;
+		QMap<int, bool>        mapped_signeds;
 		int voi_luts = 0;
 		for (int x = 0; x < l.size(); ++x)
 		{
@@ -3410,7 +3410,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 #ifdef PRINT_MAKE_PR_MONOCHROME
 			std::cout << "VOI LUT slice by slice" << std::endl;
 #endif
-			const bool signed_image = is_signed<ImageTypeF>(v->pF); 
+			const bool signed_image = is_signed<ImageTypeF>(v->pF);
 			ImageTypeF::Pointer tmp0;
 			error = voi_lut_slice_by_slice(
 				ivariant,
@@ -3465,7 +3465,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		}
 		if (pres_lut_found)
 		{
-			const bool signed_image = is_signed<ImageTypeF>(v->pF); 
+			const bool signed_image = is_signed<ImageTypeF>(v->pF);
 			ImageTypeF::Pointer pres_tmp;
 			error = apply_lut<ImageTypeF, ImageTypeF>(
 				v->pF, pres_tmp,
@@ -3641,7 +3641,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 #endif
 				{
 					const double tmp0 = it0.value();
-					if (!(ax > tmp0-0.00001 && ax < tmp0+0.00001))
+					if (!(ax > tmp0 - 0.00001 && ax < tmp0 + 0.00001))
 					{
 						one_aspect = false;
 						break;
@@ -3659,7 +3659,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 #endif
 					{
 						const double tmp1 = it1.value();
-						if (!(ay > tmp1-0.00001 && ay < tmp1+0.00001))
+						if (!(ay > tmp1 - 0.00001 && ay < tmp1 + 0.00001))
 						{
 							one_aspect = false;
 							break;
