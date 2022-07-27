@@ -13,24 +13,32 @@ Quick start
 Linux
 -----
 
-To start on Linux extract archive and run _alizams.sh_
+Packages:
+
+E.g. __Fedora 34__ and higher: install with _sudo dnf install alizams_
+
+Open from Menu (Graphics section) or run in terminal (type _alizams_)
+
+Archive distribution:
+
+Extract archive and run _alizams.sh_
 
 ```
-cd alizams-1.7.4_linux
+cd alizams-1.8.0_linux
 ./alizams.sh
 ```
 
 Optionally install local desktop menu entry
 
 ```
-cd alizams-1.7.4_linux/install_menu
+cd alizams-1.8.0_linux/install_menu
 ./install_menu.sh
 ```
 
 To remove local menu entry
 
 ```
-cd alizams-1.7.4_linux/install_menu
+cd alizams-1.8.0_linux/install_menu
 ./uninstall_menu.sh
 ```
 
@@ -67,18 +75,17 @@ Highlights
  * Very fast directory scanner, DICOMDIR
  * 2D and 3D views with many tools
  * View uniform and non-uniform series in physical space
- * 2D+t, 3D+t animations
+ * DICOM Study multi-view with intersection lines
+ * Structured report
+ * RTSTRUCT contours
+ * 2D+t and 3D+t animations
  * Consistently de-identify DICOM
  * View DICOM metadata
  * Ultrasound incl. proper measurement in regions, cine
- * Scout (localizer) lines
  * Grayscale softcopy presentation
- * Structured report
- * Compressed images
- * RTSTRUCT contours
  * Siemens mosaic format
  * United Imaging Healthcare (UIH) Grid / VFrame format
- * Elscint ELSCINT1 PMSCT_RLE1 and PMSCT_RGB1
+ * etc.
 
 
 Build

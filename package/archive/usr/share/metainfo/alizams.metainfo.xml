@@ -11,46 +11,33 @@
   <url type="homepage">https://github.com/AlizaMedicalImaging/AlizaMS</url>
 
   <description>
-    <p>Recursive scan directory, 
-      DICOMDIR, 
-      Read from CTK database.
+    <p>2D and 3D views with many tools, 3D view also for non-uniform images, 
+      Volume Rendering, 
+      Multi-planar reconstruction (MPR), 
+      RTSTRUCT contours.
+    <p>DICOM Study multi-view with intersection lines.
     </p>
-    <p>2D and 3D views with many tools, 
-      Study view with intersections, 
-      volume rendering, 
-      3D view also for non-uniform images, 
-      Multi-planar reconstruction, 
-      RTSTRUCT contours. 
-    <p>Consistely de-identify DICOM, preserve integrity.
+    <p>Consistely de-identify DICOM, maintain integrity.
     </p>
     <p>2D+t and 3D+t animations.
     </p>
-    <p>Structured Reports (SR).
-    </p>
-    <p>Grayscale Softcopy Presentation State (PR).
-    </p>
     <p>DICOM metadata viewer.
     </p>
-    <p>Most IODs are supported, 
-      Ultrasound with proper measurement in Calibrated Regions, 
-      Siemens Mosaic, 
-      United Imaging Healthcare (UIH) Grid / VFrame, 
-      sequential and interleaved 4D Series, 
-      Parametric Map, 
-      Supplemental Lookup Palette Color, 
-      Elscint ELSCINT1 PMSCT_RLE1 and PMSCT_RGB1.
+    <p>Most IODs are supported incl. enhanced, Structured Reports (SR), 
+      sequential and interleaved 4D Series, Grayscale Softcopy Presentation State (PR), 
+      Ultrasound with proper measurement in Calibrated Regions, etc.
     </p>
   </description>
 
   <screenshots>
     <screenshot type="default">
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.8.0/package/art/alizams_scr1.jpg</image>
+    </screenshot>
+    <screenshot>
       <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.8.0/package/art/alizams_scr2.jpg</image>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.8.0/package/art/start0.png</image>
-    </screenshot>
-    <screenshot>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.8.0/package/art/alizams_scr1.jpg</image>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.8.0/package/art/alizams_scr3.jpg</image>
     </screenshot>
   </screenshots>
 
