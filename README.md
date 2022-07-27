@@ -24,21 +24,21 @@ Archive distribution:
 Extract archive and run _alizams.sh_
 
 ```
-cd alizams-1.8.0_linux
+cd alizams-1.8.2_linux
 ./alizams.sh
 ```
 
 Optionally install local desktop menu entry
 
 ```
-cd alizams-1.8.0_linux/install_menu
+cd alizams-1.8.2_linux/install_menu
 ./install_menu.sh
 ```
 
 To remove local menu entry
 
 ```
-cd alizams-1.8.0_linux/install_menu
+cd alizams-1.8.2_linux/install_menu
 ./uninstall_menu.sh
 ```
 
