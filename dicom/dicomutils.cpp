@@ -83,7 +83,7 @@
 #include <random>
 #include <chrono>
 #include "vectormath/scalar/vectormath.h"
-#ifdef USE_SYSTEM_LCMS2
+#ifdef ALIZA_USE_SYSTEM_LCMS2
 #include "lcms2.h"
 #else
 #include "alizalcms/lcms2.h"

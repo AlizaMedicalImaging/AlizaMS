@@ -773,6 +773,7 @@ endif()
 #
 if(ALIZA_USE_SYSTEM_LCMS2)
   find_package(LCMS2 REQUIRED)
+  add_definitions(-DALIZA_USE_SYSTEM_LCMS2)
   message(STATUS "LCMS2: " ${LCMS2_LIBRARIES})
 else()
   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/alizalcms)
