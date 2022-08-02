@@ -67,7 +67,7 @@ project(ALIZAMS)
 #
 #
 if(APPLE)
-  set(ALIZAMS_OSX_BUNDLE_VERSION "1.8.3")
+  set(ALIZAMS_OSX_BUNDLE_VERSION "1.8.4")
 endif()
 
 # Qt major version, required.
@@ -1043,7 +1043,7 @@ elseif(APPLE)
     MACOSX_BUNDLE_BUNDLE_VERSION ${ALIZAMS_OSX_BUNDLE_VERSION}
     MACOSX_BUNDLE_GUI_IDENTIFIER "com.aliza.alizams"
     MACOSX_BUNDLE_ICON_FILE ${ALIZAMS_OSX_ICON_NAME}
-    MACOSX_BUNDLE_COPYRIGHT "© 2015-2021 Aliza Medical Imaging")
+    MACOSX_BUNDLE_COPYRIGHT "© 2015-2022 Aliza Medical Imaging")
   target_link_libraries(AlizaMS ${ALIZAMS_LINK_LIBRARIES})
 else()
   if(USE_QT_V_4)
