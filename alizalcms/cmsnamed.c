@@ -182,7 +182,7 @@ cmsBool AddMLUBlock(cmsMLU* mlu, cmsUInt32Number size, const wchar_t *Block,
 // compilers don't properly align beginning of strings
 static
 cmsUInt16Number strTo16(const char str[3])
-{   
+{
     const cmsUInt8Number* ptr8;
     cmsUInt16Number n;
 
@@ -499,7 +499,7 @@ cmsBool CMSEXPORT cmsMLUtranslationsCodes(const cmsMLU* mlu,
     if (idx >= mlu->UsedEntries) return FALSE;
 
     entry = &mlu->Entries[idx];
-    
+
     strFrom16(LanguageCode, entry->Language);
     strFrom16(CountryCode, entry->Country);
 
@@ -542,8 +542,12 @@ cmsBool  GrowNamedColorList(cmsNAMEDCOLORLIST* v)
 // Allocate a list for n elements
 cmsNAMEDCOLORLIST* CMSEXPORT cmsAllocNamedColorList(cmsContext ContextID, cmsUInt32Number n, cmsUInt32Number ColorantCount, const char* Prefix, const char* Suffix)
 {
-    cmsNAMEDCOLORLIST* v = (cmsNAMEDCOLORLIST*) _cmsMallocZero(ContextID, sizeof(cmsNAMEDCOLORLIST));
+    cmsNAMEDCOLORLIST* v;
 
+    if (ColorantCount > cmsMAXCHANNELS)
+        return NULL;
+
+    v = (cmsNAMEDCOLORLIST*)_cmsMallocZero(ContextID, sizeof(cmsNAMEDCOLORLIST));
     if (v == NULL) return NULL;
 
     v ->List      = NULL;
