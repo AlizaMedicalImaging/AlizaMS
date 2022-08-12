@@ -379,7 +379,8 @@ int main(int, char**)
 
 static void ds16print(char * buf, double f)
 {
-  char line[40];
+  char * line = new char[400]; // overallocated, 40 is OK
+  memset(line, 0, 400); // not required
   int l = sprintf(line, "%.17g", f);
   if (l > 16)
   {
@@ -392,6 +393,7 @@ static void ds16print(char * buf, double f)
     }
   }
   strcpy(buf, line);
+  delete [] line;
 }
 
 template <>

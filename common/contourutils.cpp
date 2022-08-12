@@ -439,7 +439,8 @@ void ContourUtils::map_contours_uniform(
 			static_cast<int>(ivariant->di->image_slices.size()))
 	{
 		std::cout
-			<< "ContourUtils::map_contours: dimz != slices size"
+			<< "ContourUtils::map_contours: dimz != slices size, "
+			<< ivariant->di->idimz << " != " << ivariant->di->image_slices.size()
 			<< std::endl;
 		return;
 	}
@@ -513,8 +514,9 @@ void ContourUtils::map_contours_nonuniform(
 			static_cast<int>(ivariant->di->image_slices.size()))
 	{
 		std::cout
-		<< "ContourUtils::map_contours: dimz != slices size"
-		<< std::endl;
+			<< "ContourUtils::map_contours: dimz != slices size, "
+			<< ivariant->di->idimz << " != " << ivariant->di->image_slices.size()
+			<< std::endl;
 		return;
 	}
 	const float tolerance = 0.1f;
