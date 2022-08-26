@@ -762,28 +762,43 @@ ImageHelper::SetDimensionsValue(File & f, const Pixmap & img)
     }
   }
   // Cleanup
-  if (ms == MediaStorage::EnhancedCTImageStorage || ms == MediaStorage::EnhancedMRImageStorage ||
-      ms == MediaStorage::EnhancedMRColorImageStorage || ms == MediaStorage::EnhancedPETImageStorage ||
+  if (ms == MediaStorage::EnhancedCTImageStorage ||
+      ms == MediaStorage::EnhancedMRImageStorage ||
+      ms == MediaStorage::EnhancedMRColorImageStorage ||
+      ms == MediaStorage::EnhancedPETImageStorage ||
       ms == MediaStorage::MultiframeGrayscaleWordSecondaryCaptureImageStorage ||
       ms == MediaStorage::MultiframeGrayscaleByteSecondaryCaptureImageStorage ||
-      ms == MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage //
-      || ms == MediaStorage::XRay3DAngiographicImageStorage || ms == MediaStorage::XRay3DCraniofacialImageStorage ||
-      ms == MediaStorage::SegmentationStorage || ms == MediaStorage::IVOCTForProcessing ||
-      ms == MediaStorage::IVOCTForPresentation || ms == MediaStorage::BreastTomosynthesisImageStorage ||
+      ms == MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage || //
+      ms == MediaStorage::XRay3DAngiographicImageStorage ||
+      ms == MediaStorage::XRay3DCraniofacialImageStorage ||
+      ms == MediaStorage::SegmentationStorage ||
+      ms == MediaStorage::IVOCTForProcessing ||
+      ms == MediaStorage::IVOCTForPresentation ||
+      ms == MediaStorage::BreastTomosynthesisImageStorage ||
       ms == MediaStorage::BreastProjectionXRayImageStorageForPresentation ||
-      ms == MediaStorage::BreastProjectionXRayImageStorageForProcessing || ms == MediaStorage::ParametricMapStorage ||
+      ms == MediaStorage::BreastProjectionXRayImageStorageForProcessing ||
+      ms == MediaStorage::ParametricMapStorage ||
       ms == MediaStorage::LegacyConvertedEnhancedMRImageStorage ||
       ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage ||
       ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
   {
-    const Tag tfgs(0x5200, 0x9230);
-    if (ds.FindDataElement(tfgs))
+    const Tag t(0x5200, 0x9230);
+    if (ds.FindDataElement(t))
     {
-      SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
-      if (sqi && (sqi->GetNumberOfItems() != dims[2]))
+      const DataElement & de = ds.GetDataElement(t);
+      SmartPointer<SequenceOfItems> sqi = de.GetValueAsSQ();
+      if (sqi)
       {
-        // WTF
-        sqi->SetNumberOfItems(dims[2]);
+        if (sqi->GetNumberOfItems() != dims[2])
+        {
+          sqi->SetNumberOfItems(dims[2]);
+        }
+        // undefined length to avoid recomputation
+        DataElement dup(de.GetTag());
+        dup.SetVR(VR::SQ);
+        dup.SetValue(*sqi);
+        dup.SetVLToUndefined();
+        ds.Replace(dup);
       }
     }
   }
