@@ -112,6 +112,9 @@ endif()
 option(ALIZA_MEDIASTORAGE_MODE "Build for media storage" OFF)
 mark_as_advanced(ALIZA_MEDIASTORAGE_MODE)
 
+# Temporary
+set(TMP_USE_53_SPATIAL_ENUMS TRUE)
+
 #
 #
 # MDCM
@@ -1013,6 +1016,10 @@ if(ALIZA_USE_SYSTEM_LCMS2)
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} ${LCMS2_LIBRARIES})
 else()
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} alizalcms2)
+endif()
+
+if(TMP_USE_53_SPATIAL_ENUMS)
+  add_definitions(-DTMP_USE_53_SPATIAL_ENUMS)
 endif()
 
 link_directories("${CMAKE_CURRENT_BINARY_DIR}/bin")

@@ -30,6 +30,7 @@
 #include <cmath>
 #include <iostream>
 #include "luts.h"
+#include "itkVersion.h"
 #include "itkSpatialOrientation.h"
 #include "data/cube_data.h"
 #include "data/letters_data.h"
@@ -3368,150 +3369,297 @@ bool GLWidget::update_raycast_shader_vbo(
 	bool force_skip_cube = false;
 	switch (orientation)
 	{
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIP:
+#if (ITK_VERSION_MAJOR >= 5 && ITK_VERSION_MINOR >= 3 && defined TMP_USE_53_SPATIAL_ENUMS)
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RIP):
 		raycast_cube_RIP(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LIP:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LIP):
 		raycast_cube_LIP(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSP:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RSP):
 		raycast_cube_RSP(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LSP:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LSP):
 		raycast_cube_LSP(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIA:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RIA):
 		raycast_cube_RIA(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LIA:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LIA):
 		raycast_cube_LIA(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSA:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RSA):
 		raycast_cube_RSA(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LSA:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LSA):
 		raycast_cube_LSA(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IRP:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IRP):
 		raycast_cube_IRP(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ILP:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ILP):
 		raycast_cube_ILP(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SRP:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SRP):
 		raycast_cube_SRP(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SLP:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SLP):
 		raycast_cube_SLP(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IRA:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IRA):
 		raycast_cube_IRA(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ILA:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ILA):
 		raycast_cube_ILA(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SRA:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SRA):
 		raycast_cube_SRA(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SLA:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SLA):
 		raycast_cube_SLA(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RPI:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RPI):
 		raycast_cube_RPI(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LPI:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LPI):
 		raycast_cube_LPI(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RAI):
 		raycast_cube_RAI(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LAI:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LAI):
 		raycast_cube_LAI(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RPS:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RPS):
 		raycast_cube_RPS(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LPS:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LPS):
 		raycast_cube_LPS(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAS:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RAS):
 		raycast_cube_RAS(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LAS:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LAS):
 		raycast_cube_LAS(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PRI:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PRI):
 		raycast_cube_PRI(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PLI:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PLI):
 		raycast_cube_PLI(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ARI:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ARI):
 		raycast_cube_ARI(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ALI:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ALI):
 		raycast_cube_ALI(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PRS:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PRS):
 		raycast_cube_PRS(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PLS:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PLS):
 		raycast_cube_PLS(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ARS:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ARS):
 		raycast_cube_ARS(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ALS:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ALS):
 		raycast_cube_ALS(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IPR:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IPR):
 		raycast_cube_IPR(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SPR:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SPR):
 		raycast_cube_SPR(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IAR:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IAR):
 		raycast_cube_IAR(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SAR:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SAR):
 		raycast_cube_SAR(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IPL:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IPL):
 		raycast_cube_IPL(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SPL:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SPL):
 		raycast_cube_SPL(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IAL:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IAL):
 		raycast_cube_IAL(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SAL:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SAL):
 		raycast_cube_SAL(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PIR:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PIR):
 		raycast_cube_PIR(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PSR:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PSR):
 		raycast_cube_PSR(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_AIR:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_AIR):
 		raycast_cube_AIR(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASR:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ASR):
 		raycast_cube_ASR(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PIL:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PIL):
 		raycast_cube_PIL(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PSL:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PSL):
 		raycast_cube_PSL(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_AIL:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_AIL):
 		raycast_cube_AIL(x__,y__,z__,raycastcube0,both);
 		break;
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASL:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ASL):
 		raycast_cube_ASL(x__,y__,z__,raycastcube0,both);
 		break;
+#else
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIP):
+		raycast_cube_RIP(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LIP):
+		raycast_cube_LIP(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSP):
+		raycast_cube_RSP(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LSP):
+		raycast_cube_LSP(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIA):
+		raycast_cube_RIA(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LIA):
+		raycast_cube_LIA(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSA):
+		raycast_cube_RSA(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LSA):
+		raycast_cube_LSA(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IRP):
+		raycast_cube_IRP(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ILP):
+		raycast_cube_ILP(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SRP):
+		raycast_cube_SRP(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SLP):
+		raycast_cube_SLP(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IRA):
+		raycast_cube_IRA(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ILA):
+		raycast_cube_ILA(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SRA):
+		raycast_cube_SRA(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SLA):
+		raycast_cube_SLA(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RPI):
+		raycast_cube_RPI(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LPI):
+		raycast_cube_LPI(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI):
+		raycast_cube_RAI(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LAI):
+		raycast_cube_LAI(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RPS):
+		raycast_cube_RPS(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LPS):
+		raycast_cube_LPS(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAS):
+		raycast_cube_RAS(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LAS):
+		raycast_cube_LAS(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PRI):
+		raycast_cube_PRI(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PLI):
+		raycast_cube_PLI(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ARI):
+		raycast_cube_ARI(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ALI):
+		raycast_cube_ALI(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PRS):
+		raycast_cube_PRS(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PLS):
+		raycast_cube_PLS(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ARS):
+		raycast_cube_ARS(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ALS):
+		raycast_cube_ALS(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IPR):
+		raycast_cube_IPR(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SPR):
+		raycast_cube_SPR(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IAR):
+		raycast_cube_IAR(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SAR):
+		raycast_cube_SAR(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IPL):
+		raycast_cube_IPL(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SPL):
+		raycast_cube_SPL(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IAL):
+		raycast_cube_IAL(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SAL):
+		raycast_cube_SAL(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PIR):
+		raycast_cube_PIR(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PSR):
+		raycast_cube_PSR(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_AIR):
+		raycast_cube_AIR(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASR):
+		raycast_cube_ASR(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PIL):
+		raycast_cube_PIL(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PSL):
+		raycast_cube_PSL(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_AIL):
+		raycast_cube_AIL(x__,y__,z__,raycastcube0,both);
+		break;
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASL):
+		raycast_cube_ASL(x__,y__,z__,raycastcube0,both);
+		break;
+#endif
 	default:
 		force_skip_cube = true;
 		raycast_cube(x__,y__,z__,raycastcube0,both);

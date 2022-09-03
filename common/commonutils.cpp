@@ -479,8 +479,8 @@ template<typename T> QString get_orientation(
 	*result = static_cast<unsigned int>(
 		adapter.FromDirectionCosines(image->GetDirection()));
 	const QString f =
-		CommonUtils::convert_orientation_flag(
-			adapter.FromDirectionCosines(image->GetDirection()));
+		CommonUtils::convert_orientation_flag(static_cast<unsigned int>(
+			adapter.FromDirectionCosines(image->GetDirection())));
 	return f;
 }
 
@@ -1888,106 +1888,211 @@ double CommonUtils::random_range(
 
 QString CommonUtils::convert_orientation_flag(unsigned int in)
 {
- 	switch (in)
+#if (ITK_VERSION_MAJOR >= 5 && ITK_VERSION_MINOR >= 3 && defined TMP_USE_53_SPATIAL_ENUMS)
+	switch (in)
 	{
-  	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIP:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RIP):
 		return QString("RIP");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LIP:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LIP):
 		return QString("LIP");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSP:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RSP):
 		return QString("RSP");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LSP:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LSP):
 		return QString("LSP");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIA:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RIA):
 		return QString("RIA");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LIA:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LIA):
 		return QString("LIA");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSA:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RSA):
 		return QString("RSA");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LSA:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LSA):
 		return QString("LSA");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IRP:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IRP):
 		return QString("IRP");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ILP:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ILP):
 		return QString("ILP");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SRP:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SRP):
 		return QString("SRP");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SLP:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SLP):
 		return QString("SLP");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IRA:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IRA):
 		return QString("IRA");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ILA:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ILA):
 		return QString("ILA");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SRA:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SRA):
 		return QString("SRA");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SLA:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SLA):
 		return QString("SLA");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RPI:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RPI):
 		return QString("RPI");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LPI:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LPI):
 		return QString("LPI");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RAI):
 		return QString("RAI");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LAI:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LAI):
 		return QString("LAI");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RPS:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RPS):
 		return QString("RPS");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LPS:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LPS):
 		return QString("LPS");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAS:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RAS):
 		return QString("RAS");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LAS:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LAS):
 		return QString("LAS");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PRI:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PRI):
 		return QString("PRI");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PLI:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PLI):
 		return QString("PLI");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ARI:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ARI):
 		return QString("ARI");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ALI:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ALI):
 		return QString("ALI");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PRS:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PRS):
 		return QString("PRS");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PLS:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PLS):
 		return QString("PLS");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ARS:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ARS):
 		return QString("ARS");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ALS:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ALS):
 		return QString("ALS");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IPR:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IPR):
 		return QString("IPR");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SPR:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SPR):
 		return QString("SPR");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IAR:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IAR):
 		return QString("IAR");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SAR:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SAR):
 		return QString("SAR");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IPL:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IPL):
 		return QString("IPL");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SPL:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SPL):
 		return QString("SPL");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IAL:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IAL):
 		return QString("IAL");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SAL:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SAL):
 		return QString("SAL");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PIR:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PIR):
 		return QString("PIR");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PSR:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PSR):
 		return QString("PSR");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_AIR:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_AIR):
 		return QString("AIR");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASR:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ASR):
 		return QString("ASR");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PIL:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PIL):
 		return QString("PIL");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PSL:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PSL):
 		return QString("PSL");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_AIL:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_AIL):
 		return QString("AIL");
-	case itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASL:
+	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ASL):
 		return QString("ASL");
-	default:break;
+	default:
+		break;
 	}
+#else
+	switch (in)
+	{
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIP):
+		return QString("RIP");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LIP):
+		return QString("LIP");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSP):
+		return QString("RSP");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LSP):
+		return QString("LSP");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIA):
+		return QString("RIA");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LIA):
+		return QString("LIA");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSA):
+		return QString("RSA");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LSA):
+		return QString("LSA");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IRP):
+		return QString("IRP");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ILP):
+		return QString("ILP");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SRP):
+		return QString("SRP");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SLP):
+		return QString("SLP");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IRA):
+		return QString("IRA");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ILA):
+		return QString("ILA");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SRA):
+		return QString("SRA");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SLA):
+		return QString("SLA");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RPI):
+		return QString("RPI");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LPI):
+		return QString("LPI");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI):
+		return QString("RAI");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LAI):
+		return QString("LAI");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RPS):
+		return QString("RPS");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LPS):
+		return QString("LPS");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAS):
+		return QString("RAS");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LAS):
+		return QString("LAS");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PRI):
+		return QString("PRI");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PLI):
+		return QString("PLI");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ARI):
+		return QString("ARI");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ALI):
+		return QString("ALI");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PRS):
+		return QString("PRS");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PLS):
+		return QString("PLS");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ARS):
+		return QString("ARS");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ALS):
+		return QString("ALS");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IPR):
+		return QString("IPR");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SPR):
+		return QString("SPR");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IAR):
+		return QString("IAR");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SAR):
+		return QString("SAR");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IPL):
+		return QString("IPL");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SPL):
+		return QString("SPL");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IAL):
+		return QString("IAL");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SAL):
+		return QString("SAL");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PIR):
+		return QString("PIR");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PSR):
+		return QString("PSR");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_AIR):
+		return QString("AIR");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASR):
+		return QString("ASR");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PIL):
+		return QString("PIL");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PSL):
+		return QString("PSL");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_AIL):
+		return QString("AIL");
+	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASL):
+		return QString("ASL");
+	default:
+		break;
+	}
+#endif
 	return QString("");
 }
 
