@@ -1,4 +1,8 @@
+// clang-format off
+
 //#define ALWAYS_SHOW_GL_ERROR
+#define FBO_SIZE__0  512
+#define FBO_SIZE__1 1024
 
 #include "structures.h"
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -39,20 +43,15 @@
 #include "data/lettera_data.h"
 #include "data/letterr_data.h"
 #include "data/letterl_data.h"
-
 #ifdef USE_CORE_3_2_PROFILE
 #include "shaders_core.h"
 #else
 #include "shaders.h"
 #endif
-
-#define FBO_SIZE__0  512
-#define FBO_SIZE__1 1024
-
-#ifndef DISABLE_SIMDMATH
-using namespace Vectormath::SSE;
-#else
+#ifdef DISABLE_SIMDMATH
 using namespace Vectormath::Scalar;
+#else
+using namespace Vectormath::SSE;
 #endif
 
 ShaderObj::ShaderObj()
@@ -98,14 +97,14 @@ qMeshData::qMeshData() : shader(NULL)
 	faces_size   = 0;
 	vboid        = new GLuint[VBOIDS_SIZE];
 	vaoid        = 0;
-	get_shadows  = new int[MAX_SHADOWS_];
-	cast_shadows = new int[MAX_SHADOWS_];
+	get_shadows  = new int[CAMERA_MAX_SHADOWS];
+	cast_shadows = new int[CAMERA_MAX_SHADOWS];
 	textures     = new GLuint[TEXTURES_SIZE];
 	tex_units    = new GLuint[TEXTURES_SIZE];
 	for (int x = 0; x < 12; ++x) K[x] = 0;
 	for (int x = 0; x < VBOIDS_SIZE;   ++x) vboid[x] = 0;
-	for (int x = 0; x < MAX_SHADOWS_;  ++x) get_shadows[x] = 0;
-	for (int x = 0; x < MAX_SHADOWS_;  ++x) cast_shadows[x] = 0;
+	for (int x = 0; x < CAMERA_MAX_SHADOWS;  ++x) get_shadows[x] = 0;
+	for (int x = 0; x < CAMERA_MAX_SHADOWS;  ++x) cast_shadows[x] = 0;
 	for (int x = 0; x < TEXTURES_SIZE; ++x) textures[x] = 0;
 	for (int x = 0; x < TEXTURES_SIZE; ++x) tex_units[x] = 0;
 }
@@ -120,8 +119,7 @@ qMeshData::~qMeshData()
 	delete [] tex_units;
 }
 
-CollisionObject::CollisionObject() :
-	collision_object(NULL), id(0), shape(NULL), mesh_data(NULL) {}
+CollisionObject::CollisionObject() : collision_object(NULL), id(0), shape(NULL), mesh_data(NULL) {}
 
 CollisionObject::~CollisionObject() {}
 
@@ -165,25 +163,16 @@ qMeshData * CollisionObject::get_mesh_data()
 	return mesh_data;
 }
 
+static QList<ImageVariant*> * selected_images__ = NULL;
 static long long GLWidget_count_vbos = 0;
 static bool GLWidget_max_vbos_65535  = false;
-
-static QList<ImageVariant*> * selected_images__ = NULL;
-
-const float color_spectro0[] = {(float)0x10/(float)0xff,(float)0x10/(float)0xff,(float)0xf0/(float)0xff,1.0f};
-const float color_spectro1[] = {(float)0x10/(float)0xff,(float)0xe8/(float)0xff,(float)0x10/(float)0xff,1.0f};
-const float color_cube[]     = {0.1f,0.1f,0.1f,0.2f,0.2f,0.2f};
-const float color_letters[]  = {0.5f,0.5f,0.5f,0.8f,0.8f,0.8f};
-//0x90,0xad,0xc6
-//0x30,0x0d,0x0d
-
-// to clear pointers
+static const float color_cube[]    = {0.1f, 0.1f, 0.1f, 0.2f, 0.2f, 0.2f};
+static const float color_letters[] = {0.5f, 0.5f, 0.5f, 0.8f, 0.8f, 0.8f};
 static std::vector<ShaderObj*> shaders;
 static std::vector<GLuint*>    vboids; // size 2
 static std::vector<GLuint>     vaoids;
 static std::vector<GLuint*>    textures;
 static std::vector<qMeshData*> qmeshes;
-
 //static btAlignedObjectArray<CollisionObject*>  collision_objects;
 
 struct MyRayResultCallback : public btCollisionWorld::AllHitsRayResultCallback
@@ -249,21 +238,21 @@ GLWidget::GLWidget()
 #endif
 	//setAttribute(Qt::WA_NoSystemBackground);
 	//setAttribute(Qt::WA_OpaquePaintEvent);
-	setMinimumSize(64,64);
+	setMinimumSize(64, 64);
 	setFocusPolicy(Qt::WheelFocus);
 	init_();
 }
 #else
 GLWidget::GLWidget()
 {
-	setMinimumSize(64,64);
+	setMinimumSize(64, 64);
 	setFocusPolicy(Qt::WheelFocus);
 	init_();
 }
 
 GLWidget::GLWidget(const QGLFormat & frm) : QGLWidget(frm)
 {
-	setMinimumSize(64,64);
+	setMinimumSize(64, 64);
 	setFocusPolicy(Qt::WheelFocus);
 	init_();
 }
@@ -408,8 +397,8 @@ void GLWidget::mouseMoveEvent(QMouseEvent * e)
 	{
 		const QPoint p = e->pos();
 		const int dy = lastPosScale.y() - p.y();
-		const float  tmp0 = ortho_size - (float)dy;
-		const double tmp1 = position_z - (double)dy;
+		const float  tmp0 = ortho_size - static_cast<float>(dy);
+		const double tmp1 = position_z - static_cast<double>(dy);
 		if (tmp0 < 0.001f) ortho_size = 0.001f;
 		else ortho_size = tmp0;
 		if (tmp1 < 0.001) position_z = 0.001;
@@ -431,7 +420,6 @@ void GLWidget::wheelEvent(QWheelEvent * e)
 	{
 		incr = 25.0;
 	}
-	else { ;; }
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	const QPoint p = e->angleDelta();
 	if (p.y() > 0)
@@ -439,7 +427,7 @@ void GLWidget::wheelEvent(QWheelEvent * e)
 	if (e->delta() > 0)
 #endif
 	{
-		ortho_size += (float)incr;
+		ortho_size += static_cast<float>(incr);
 		position_z += incr;
 	}
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
@@ -448,7 +436,7 @@ void GLWidget::wheelEvent(QWheelEvent * e)
 	else if (e->delta() < 0)
 #endif
 	{
-		ortho_size -= (float)incr;
+		ortho_size -= static_cast<float>(incr);
 		position_z -= incr;
 	}
 	if (ortho_size < 0.001f) ortho_size = 0.001f;
@@ -474,25 +462,25 @@ void GLWidget::keyPressEvent(QKeyEvent * e)
 		break;
 	case Qt::Key_Right:
 		{
-			set_pan_delta(1,0);
+			set_pan_delta(1, 0);
 			update_ = true;
 		}
 		break;
 	case Qt::Key_Left:
 		{
-			set_pan_delta(-1,0);
+			set_pan_delta(-1, 0);
 			update_ = true;
 		}
 		break;
 	case Qt::Key_Up:
 		{
-			set_pan_delta(0,-1);
+			set_pan_delta(0, -1);
 			update_ = true;
 		}
 		break;
 	case Qt::Key_Down:
 		{
-			set_pan_delta(0,1);
+			set_pan_delta(0, 1);
 			update_ = true;
 		}
 		break;
@@ -523,13 +511,13 @@ void GLWidget::set_ortho(bool t)
 
 void GLWidget::set_fov(double i)
 {
-	fov = (float)i;
+	fov = static_cast<float>(i);
 	updateGL();
 }
 
 void GLWidget::set_far(double i)
 {
-	far_plane = (float)i;
+	far_plane = static_cast<float>(i);
 	updateGL();
 }
 
@@ -556,7 +544,7 @@ void GLWidget::zoom_in()
 	{
 		incr = 25.0;
 	}
-	ortho_size -= (float)incr;
+	ortho_size -= static_cast<float>(incr);
 	position_z -= incr;
 	if (ortho_size < 0.001f) ortho_size = 0.001f;
 	if (position_z < 0.001)  position_z = 0.001;
@@ -574,7 +562,7 @@ void GLWidget::zoom_out()
 	{
 		incr = 25.0;
 	}
-	ortho_size += (float)incr;
+	ortho_size += static_cast<float>(incr);
 	position_z += incr;
 	if (ortho_size < 0.001f) ortho_size = 0.001f;
 	if (position_z < 0.001)  position_z = 0.001;
@@ -584,7 +572,10 @@ void GLWidget::zoom_out()
 void GLWidget::update_clear_color()
 {
 	QColor color0 = qApp->palette().color(QPalette::Window);
-	set_clear_color((float)color0.redF(),(float)color0.greenF(),(float)color0.blueF());
+	set_clear_color(
+		static_cast<float>(color0.redF()),
+		static_cast<float>(color0.greenF()),
+		static_cast<float>(color0.blueF()));
 }
 
 void GLWidget::set_wireframe(bool t)
@@ -601,13 +592,13 @@ void GLWidget::set_skip_draw(bool t)
 
 void GLWidget::set_alpha(double a)
 {
-	alpha = (float)a;
+	alpha = static_cast<float>(a);
 	updateGL();
 }
 
 void GLWidget::set_brightness(double a)
 {
-	brightness = (float)a;
+	brightness = static_cast<float>(a);
 	updateGL();
 }
 
@@ -779,12 +770,12 @@ void GLWidget::init_()
 	x_rotation = 0;
 	y_rotation = 0;
 	z_rotation = 0;
-	ortho_size  = (float)SCENE_ORTHO_SIZE;
+	ortho_size  = SCENE_ORTHO_SIZE;
 	ortho_proj = true;
-	position_z  = (float)SCENE_POS_Z;
-	fov = (float)SCENE_FOV;
-	far_plane = (float)SCENE_FAR_PLANE;
-	alpha = (float)SCENE_ALPHA;
+	position_z = SCENE_POS_Z;
+	fov        = SCENE_FOV;
+	far_plane  = SCENE_FAR_PLANE;
+	alpha = SCENE_ALPHA;
 	brightness = 1.0f;
 	m_collisionWorld = NULL;
 	draw_frames_3d = false;
@@ -844,13 +835,13 @@ void GLWidget::close_()
 	if (no_opengl3) return;
 	if (!opengl_init_done) return;
 	makeCurrent();
-	if (gradient1>0) {glDeleteTextures(1,&gradient1);gradient1=0;}
-	if (gradient2>0) {glDeleteTextures(1,&gradient2);gradient2=0;}
-	if (gradient3>0) {glDeleteTextures(1,&gradient3);gradient3=0;}
-	if (gradient4>0) {glDeleteTextures(1,&gradient4);gradient4=0;}
-	if (gradient5>0) {glDeleteTextures(1,&gradient5);gradient5=0;}
-	if (gradient6>0) {glDeleteTextures(1,&gradient6);gradient6=0;}
-	if (gradient7>0) {glDeleteTextures(1,&gradient7);gradient7=0;}
+	if (gradient1 > 0) { glDeleteTextures(1, &gradient1); gradient1 = 0; }
+	if (gradient2 > 0) { glDeleteTextures(1, &gradient2); gradient2 = 0; }
+	if (gradient3 > 0) { glDeleteTextures(1, &gradient3); gradient3 = 0; }
+	if (gradient4 > 0) { glDeleteTextures(1, &gradient4); gradient4 = 0; }
+	if (gradient5 > 0) { glDeleteTextures(1, &gradient5); gradient5 = 0; }
+	if (gradient6 > 0) { glDeleteTextures(1, &gradient6); gradient6 = 0; }
+	if (gradient7 > 0) { glDeleteTextures(1, &gradient7); gradient7 = 0; }
 	for (unsigned int x = 0; x < shaders.size(); ++x)
 	{
 		if (shaders.at(x)->program != 0)
@@ -1014,11 +1005,11 @@ void GLWidget::init_opengl(int w, int h)
 	else
 		set_max_vbos_65535(false);
 	//
-	camera->set_position(0.0f,0.0f,(float)SCENE_POS_Z);
+	camera->set_position(0.0f, 0.0f, SCENE_POS_Z);
 	//
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
- 	glEnable(GL_BLEND);
+	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_LINE_SMOOTH);
 	glLineWidth(1.0f);
@@ -1026,11 +1017,9 @@ void GLWidget::init_opengl(int w, int h)
 	GLint max_samples_;
 	glGetIntegerv(GL_MAX_INTEGER_SAMPLES, &max_samples_);
 	std::cout << "GL_MAX_INTEGER_SAMPLES " << max_samples_ << std::endl;
-
 	GLfloat sample_coverage_;
 	glGetFloatv(GL_SAMPLE_COVERAGE_VALUE, &sample_coverage_);
 	std::cout << "GL_SAMPLE_COVERAGE_VALUE " << sample_coverage_ << std::endl;
-
 	GLint samples_;
 	glGetIntegerv(GL_SAMPLES, &samples_);
 	std::cout << "GL_SAMPLES " << samples_ << std::endl;
@@ -1319,7 +1308,7 @@ void GLWidget::init_opengl(int w, int h)
 			&framebuffer,
 			&fbo_tex,
 			&fbo_depth);
-	if (!ok) { std::cout << "create_fbos0() failed"<< std::endl; }
+	if (!ok) { std::cout << "create_fbos0() failed" << std::endl; }
 	create_program(fsquad_vs, fsquad_fs, &fsquad_shader);
 	fsquad_shader.location_sampler[0] = glGetUniformLocation(fsquad_shader.program, "sampler0");
 	fsquad_shader.position_handle     = glGetAttribLocation (fsquad_shader.program, "v_position");
@@ -1334,8 +1323,8 @@ void GLWidget::init_opengl(int w, int h)
 		glGenBuffers(1, &frames_vbo);
 		increment_count_vbos(1);
 		glBindBuffer(GL_ARRAY_BUFFER, frames_vbo);
-		glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
-		glVertexAttribPointer(frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
+		glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
+		glVertexAttribPointer(frame_shader.position_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(frame_shader.position_handle);
 		glBindVertexArray(0);
 		//
@@ -1344,7 +1333,7 @@ void GLWidget::init_opengl(int w, int h)
 		glGenBuffers(1, &origin_vbo);
 		increment_count_vbos(1);
 		glBindBuffer(GL_ARRAY_BUFFER, origin_vbo);
-		glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
 		glVertexAttribPointer(frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(frame_shader.position_handle);
 		glBindVertexArray(0);
@@ -1581,7 +1570,7 @@ void GLWidget::init_opengl(int w, int h)
 		faces_size_lettera,
 		GL_STATIC_DRAW,
 		10.0f);
-	lettera->faces_size = faces_size_lettera/12;
+	lettera->faces_size = faces_size_lettera / 12;
 	lettera->vboid[0] = vboid003[0];
 	lettera->vboid[1] = vboid003[1];
 	lettera->vaoid = vaoid003;
@@ -1606,7 +1595,7 @@ void GLWidget::init_opengl(int w, int h)
 		faces_size_letterp,
 		GL_STATIC_DRAW,
 		10.0f);
-	letterp->faces_size = faces_size_letterp/12;
+	letterp->faces_size = faces_size_letterp / 12;
 	letterp->vboid[0] = vboid004[0];
 	letterp->vboid[1] = vboid004[1];
 	letterp->vaoid    = vaoid004;
@@ -1631,7 +1620,7 @@ void GLWidget::init_opengl(int w, int h)
 		faces_size_letterr,
 		GL_STATIC_DRAW,
 		10.0f);
-	letterr->faces_size = faces_size_letterr/12;
+	letterr->faces_size = faces_size_letterr / 12;
 	letterr->vboid[0] = vboid005[0];
 	letterr->vboid[1] = vboid005[1];
 	letterr->vaoid    = vaoid005;
@@ -1656,7 +1645,7 @@ void GLWidget::init_opengl(int w, int h)
 		faces_size_letterl,
 		GL_STATIC_DRAW,
 		10.0f);
-	letterl->faces_size = faces_size_letterl/12;
+	letterl->faces_size = faces_size_letterl / 12;
 	letterl->vboid[0] = vboid006[0];
 	letterl->vboid[1] = vboid006[1];
 	letterl->vaoid    = vaoid006;
@@ -1683,9 +1672,9 @@ void GLWidget::draw_3d_tex1(
 	const float * t)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 4*3*sizeof(float), v);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 12 * sizeof(float), v);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 4*3*sizeof(float), t);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 12 * sizeof(float), t);
 	glBindVertexArray(*vao);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
@@ -1693,7 +1682,7 @@ void GLWidget::draw_3d_tex1(
 void GLWidget::draw_frame2(const GLfloat * v)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, frames_vbo);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 4*3*sizeof(float), v);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 12 * sizeof(float), v);
 	glBindVertexArray(frames_vao);
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
 }
@@ -1765,9 +1754,9 @@ void GLWidget::paint_raycaster()
 		warn2 = true;
 	}
 	//
-	const float x__ = di->idimx*di->ix_spacing*0.5f;
-	const float y__ = di->idimy*di->iy_spacing*0.5f;
-	const float z__ = di->idimz*di->iz_spacing*0.5f;
+	const float x__ = di->idimx * di->ix_spacing * 0.5f;
+	const float y__ = di->idimy * di->iy_spacing * 0.5f;
+	const float z__ = di->idimz * di->iz_spacing * 0.5f;
 	const unsigned int orientation = selected_images__->at(0)->orientation;
 	const bool force_skip_cube = update_raycast_shader_vbo(
 		orientation,
@@ -1775,11 +1764,11 @@ void GLWidget::paint_raycaster()
 		raycastcube0,
 		true);
 	//
-	const float asp = (win_h>0) ? (float)win_w/(float)win_h : 1;
-	const float fold_win_pos_x =  2.0f * (((float)old_win_pos_x/(float)win_w) - 0.5f);
-	const float fold_win_pos_y = -2.0f * (((float)old_win_pos_y/(float)win_h) - 0.5f);
-	const float fnew_win_pos_x =  2.0f * (((float)new_win_pos_x/(float)win_w) - 0.5f);
-	const float fnew_win_pos_y = -2.0f * (((float)new_win_pos_y/(float)win_h) - 0.5f);
+	const float asp = (win_h > 0) ? static_cast<float>(win_w) / static_cast<float>(win_h) : 1.0f;
+	const float fold_win_pos_x =  2.0f * ((static_cast<float>(old_win_pos_x) / static_cast<float>(win_w)) - 0.5f);
+	const float fold_win_pos_y = -2.0f * ((static_cast<float>(old_win_pos_y) / static_cast<float>(win_h)) - 0.5f);
+	const float fnew_win_pos_x =  2.0f * ((static_cast<float>(new_win_pos_x) / static_cast<float>(win_w)) - 0.5f);
+	const float fnew_win_pos_y = -2.0f * ((static_cast<float>(new_win_pos_y) / static_cast<float>(win_h)) - 0.5f);
 	float dx__ = 0.0f, dy__ = 0.0f;
 	//
 	// orient. cube
@@ -1791,19 +1780,19 @@ void GLWidget::paint_raycaster()
 	//
 	if (ortho_proj)
 	{
-		camera->orthographic(-ortho_size*asp, ortho_size*asp,
+		camera->orthographic(-ortho_size * asp, ortho_size*asp,
 						-ortho_size, ortho_size,
 						-far_plane, far_plane);
-		const float d_ortho = ortho_size / (float)SCENE_ORTHO_SIZE;
-		dx__ = pan_x*d_ortho;
-		dy__ = pan_y*d_ortho;
+		const float d_ortho = ortho_size / SCENE_ORTHO_SIZE;
+		dx__ = pan_x * d_ortho;
+		dy__ = pan_y * d_ortho;
 	}
 	else
 	{
-		camera->perspective(CAMERA_D2R*fov,asp,0.01f,(float)far_plane);
-		const float d_persp = fabs(position_z) / (float)SCENE_POS_Z;
-		dx__ = pan_x*d_persp;
-		dy__ = pan_y*d_persp;
+		camera->perspective(CAMERA_D2R * fov, asp, 0.01f, static_cast<float>(far_plane));
+		const float d_persp = fabs(position_z) / SCENE_POS_Z;
+		dx__ = pan_x * d_persp;
+		dy__ = pan_y * d_persp;
 	}
 	camera->set_trackball_pan_matrix(
 		0.8f,
@@ -1816,34 +1805,35 @@ void GLWidget::paint_raycaster()
 		0.0f, 1.0f, 0.0f,
 		dx__, dy__);
 	//
-	new_win_pos_x = old_win_pos_x; new_win_pos_y = old_win_pos_y;
+	new_win_pos_x = old_win_pos_x;
+	new_win_pos_y = old_win_pos_y;
 	//
 	const Matrix4 mv_aos  = camera->m_view;
 	const Matrix4 mvp_aos = camera->m_projection * mv_aos;
 	VECTORMATH_ALIGNED(float mvp_aos_ptr[16]);
-	camera->matrix4_to_float(mvp_aos,mvp_aos_ptr);
+	camera->matrix4_to_float(mvp_aos, mvp_aos_ptr);
 	VECTORMATH_ALIGNED(float mv_aos_ptr[16]);
-	camera->matrix4_to_float(mv_aos,mv_aos_ptr);
+	camera->matrix4_to_float(mv_aos, mv_aos_ptr);
 	//
 	// [0]
-	mparams[0]  = (float)di->dimx; // X dim
-	mparams[1]  = (float)(di->window_center - di->window_width*0.5);
-	mparams[2]  = (float)(di->window_center + di->window_width*0.5);
-	mparams[3]  = (float)di->window_width;
+	mparams[0]  = static_cast<float>(di->dimx); // X dim
+	mparams[1]  = static_cast<float>(di->window_center - di->window_width * 0.5);
+	mparams[2]  = static_cast<float>(di->window_center + di->window_width * 0.5);
+	mparams[3]  = static_cast<float>(di->window_width);
 	// [1]
-	mparams[4]  = (float)di->idimz; // Z dim
-	mparams[5]  = (float)di->from_slice/(float)di->idimz; // z
-	mparams[6]  = (float)di->to_slice/(float)di->idimz; // z
-	mparams[7]  = (float)di->bb_y_min; // y
+	mparams[4]  = static_cast<float>(di->idimz); // Z dim
+	mparams[5]  = static_cast<float>(di->from_slice) / static_cast<float>(di->idimz); // z
+	mparams[6]  = static_cast<float>(di->to_slice) / static_cast<float>(di->idimz); // z
+	mparams[7]  = static_cast<float>(di->bb_y_min); // y
 	// [2]
-	mparams[8]  = (float)di->bb_y_max; // y
-	mparams[9]  = (float)di->bb_x_min; // x
-	mparams[10] = (float)di->bb_x_max; // x
-	mparams[11] = (float)di->dimy; // Y dim
+	mparams[8]  = static_cast<float>(di->bb_y_max); // y
+	mparams[9]  = static_cast<float>(di->bb_x_min); // x
+	mparams[10] = static_cast<float>(di->bb_x_max); // x
+	mparams[11] = static_cast<float>(di->dimy); // Y dim
 	// [3]
 	mparams[12] = alpha; // premultiply alpha
 	mparams[13] = brightness; // multiply color
-	mparams[14] = (float)di->window_center;
+	mparams[14] = static_cast<float>(di->window_center);
 	mparams[15] = 0.0f; // unused
 	//
 	glEnable(GL_CULL_FACE);
@@ -1898,7 +1888,7 @@ void GLWidget::paint_raycaster()
 			if (rect_selection)
 			{
 				glUseProgram(raycast_shader_bb_sigm.program);
-				glUniform4fv(raycast_shader_bb_sigm.location_mparams, 16/4, mparams);
+				glUniform4fv(raycast_shader_bb_sigm.location_mparams, 4, mparams);
 				glUniformMatrix4fv(raycast_shader_bb_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
 				glUniform1i(raycast_shader_bb_sigm.location_sampler[0], 2);
 				glUniform1i(raycast_shader_bb_sigm.location_sampler[1], 5);
@@ -1911,7 +1901,7 @@ void GLWidget::paint_raycaster()
 			else
 			{
 				glUseProgram(raycast_shader_sigm.program);
-				glUniform4fv(raycast_shader_sigm.location_mparams, 16/4, mparams);
+				glUniform4fv(raycast_shader_sigm.location_mparams, 4, mparams);
 				glUniformMatrix4fv(raycast_shader_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
 				glUniform1i(raycast_shader_sigm.location_sampler[0], 2);
 				glUniform1i(raycast_shader_sigm.location_sampler[1], 5);
@@ -1939,7 +1929,7 @@ void GLWidget::paint_raycaster()
 			if (rect_selection)
 			{
 				glUseProgram(raycast_color_shader_bb_sigm.program);
-				glUniform4fv(raycast_color_shader_bb_sigm.location_mparams, 16/4, mparams);
+				glUniform4fv(raycast_color_shader_bb_sigm.location_mparams, 4, mparams);
 				glUniformMatrix4fv(raycast_color_shader_bb_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
 				glUniform1i(raycast_color_shader_bb_sigm.location_sampler[0], 2);
 				glUniform1i(raycast_color_shader_bb_sigm.location_sampler[1], 5);
@@ -1953,7 +1943,7 @@ void GLWidget::paint_raycaster()
 			else
 			{
 				glUseProgram(raycast_color_shader_sigm.program);
-				glUniform4fv(raycast_color_shader_sigm.location_mparams, 16/4, mparams);
+				glUniform4fv(raycast_color_shader_sigm.location_mparams, 4, mparams);
 				glUniformMatrix4fv(raycast_color_shader_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
 				glUniform1i(raycast_color_shader_sigm.location_sampler[0], 2);
 				glUniform1i(raycast_color_shader_sigm.location_sampler[1], 5);
@@ -1973,7 +1963,7 @@ void GLWidget::paint_raycaster()
 			if (rect_selection)
 			{
 				glUseProgram(raycast_shader_bb.program);
-				glUniform4fv(raycast_shader_bb.location_mparams, 16/4, mparams);
+				glUniform4fv(raycast_shader_bb.location_mparams, 4, mparams);
 				glUniformMatrix4fv(raycast_shader_bb.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
 				glUniform1i(raycast_shader_bb.location_sampler[0], 2);
 				glUniform1i(raycast_shader_bb.location_sampler[1], 5);
@@ -1986,7 +1976,7 @@ void GLWidget::paint_raycaster()
 			else
 			{
 				glUseProgram(raycast_shader.program);
-				glUniform4fv(raycast_shader.location_mparams, 16/4, mparams);
+				glUniform4fv(raycast_shader.location_mparams, 4, mparams);
 				glUniformMatrix4fv(raycast_shader.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
 				glUniform1i(raycast_shader.location_sampler[0], 2);
 				glUniform1i(raycast_shader.location_sampler[1], 5);
@@ -2014,7 +2004,7 @@ void GLWidget::paint_raycaster()
 			if (rect_selection)
 			{
 				glUseProgram(raycast_color_shader_bb.program);
-				glUniform4fv(raycast_color_shader_bb.location_mparams, 16/4, mparams);
+				glUniform4fv(raycast_color_shader_bb.location_mparams, 4, mparams);
 				glUniformMatrix4fv(raycast_color_shader_bb.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
 				glUniform1i(raycast_color_shader_bb.location_sampler[0], 2);
 				glUniform1i(raycast_color_shader_bb.location_sampler[1], 5);
@@ -2028,7 +2018,7 @@ void GLWidget::paint_raycaster()
 			else
 			{
 				glUseProgram(raycast_color_shader.program);
-				glUniform4fv(raycast_color_shader.location_mparams, 16/4, mparams);
+				glUniform4fv(raycast_color_shader.location_mparams, 4, mparams);
 				glUniformMatrix4fv(raycast_color_shader.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
 				glUniform1i(raycast_color_shader.location_sampler[0], 2);
 				glUniform1i(raycast_color_shader.location_sampler[1], 5);
@@ -2084,37 +2074,37 @@ void GLWidget::paint_volume()
 	const int selected_images_size = selected_images__->size();
 	if (selected_images_size < 1) return;
 	//
-	const float fold_win_pos_x =  2.0f * (((float)old_win_pos_x/(float)win_w) - 0.5f);
-	const float fold_win_pos_y = -2.0f * (((float)old_win_pos_y/(float)win_h) - 0.5f);
-	const float fnew_win_pos_x =  2.0f * (((float)new_win_pos_x/(float)win_w) - 0.5f);
-	const float fnew_win_pos_y = -2.0f * (((float)new_win_pos_y/(float)win_h) - 0.5f);
+	const float fold_win_pos_x =  2.0f * ((static_cast<float>(old_win_pos_x) / static_cast<float>(win_w)) - 0.5f);
+	const float fold_win_pos_y = -2.0f * ((static_cast<float>(old_win_pos_y) / static_cast<float>(win_h)) - 0.5f);
+	const float fnew_win_pos_x =  2.0f * ((static_cast<float>(new_win_pos_x) / static_cast<float>(win_w)) - 0.5f);
+	const float fnew_win_pos_y = -2.0f * ((static_cast<float>(new_win_pos_y) / static_cast<float>(win_h)) - 0.5f);
 	unsigned int count = 0;
 	unsigned int count_images = 0;
 	const bool wireframe_ = wireframe;
 	//
 	if (show_cube)
 	{
-		render_orient_cube1(fold_win_pos_x,fold_win_pos_y,fnew_win_pos_x,fnew_win_pos_y);
+		render_orient_cube1(fold_win_pos_x, fold_win_pos_y, fnew_win_pos_x, fnew_win_pos_y);
 	}
 	//
-	const float asp = (win_h>0) ? (float)win_w/(float)win_h : 1;
+	const float asp = (win_h > 0) ? static_cast<float>(win_w) / static_cast<float>(win_h) : 1.0f;
 	float dx__ = 0.0f, dy__ = 0.0f;
-	glViewport(0,0,win_w,win_h);
+	glViewport(0, 0, win_w, win_h);
 	if (ortho_proj)
 	{
-		camera->orthographic(-ortho_size*asp, ortho_size*asp,
+		camera->orthographic(-ortho_size * asp, ortho_size*asp,
 						-ortho_size, ortho_size,
 						-far_plane, far_plane);
-		const float d_ortho = ortho_size / (float)SCENE_ORTHO_SIZE;
-		dx__ = pan_x*d_ortho;
-		dy__ = pan_y*d_ortho;
+		const float d_ortho = ortho_size / SCENE_ORTHO_SIZE;
+		dx__ = pan_x * d_ortho;
+		dy__ = pan_y * d_ortho;
 	}
 	else
 	{
-		camera->perspective(CAMERA_D2R*fov,asp,0.01f,(float)far_plane);
-		const float d_persp = fabs(position_z) / (float)SCENE_POS_Z;
-		dx__ = pan_x*d_persp;
-		dy__ = pan_y*d_persp;
+		camera->perspective(CAMERA_D2R * fov, asp, 0.01f, static_cast<float>(far_plane));
+		const float d_persp = fabs(position_z) / SCENE_POS_Z;
+		dx__ = pan_x * d_persp;
+		dy__ = pan_y * d_persp;
 	}
 	float light_x, light_y, light_z;
 	camera->set_trackball_pan_matrix2(
@@ -2124,17 +2114,18 @@ void GLWidget::paint_volume()
 		selected_images__->at(0)->di->center_x,
 		selected_images__->at(0)->di->center_y,
 		selected_images__->at(0)->di->center_z,
-		0.0f,0.0f,position_z,
-		0.0f,1.0f,0.0f,
+		0.0f, 0.0f, position_z,
+		0.0f, 1.0f, 0.0f,
 		dx__, dy__,
 		&light_x, &light_y, &light_z);
 	//
-	new_win_pos_x = old_win_pos_x; new_win_pos_y = old_win_pos_y;
+	new_win_pos_x = old_win_pos_x;
+	new_win_pos_y = old_win_pos_y;
 	//
 	const Matrix4 mv_aos  = camera->m_view;
 	const Matrix4 mvp_aos = camera->m_projection * mv_aos;
 	VECTORMATH_ALIGNED(float mvp_aos_ptr[16]);
-	camera->matrix4_to_float(mvp_aos,mvp_aos_ptr);
+	camera->matrix4_to_float(mvp_aos, mvp_aos_ptr);
 	//
 	for (int iii = 0; iii < selected_images_size; ++iii)
 	{
@@ -2149,10 +2140,10 @@ void GLWidget::paint_volume()
 			{
 				glUniform4f(
 					frame_shader.location_K,
-					color_spectro0[0],
-					color_spectro0[1],
-					color_spectro0[2],
-					color_spectro0[3]);
+					0.062745098f,
+					0.062745098f,
+					0.941176471f,
+					1.0f);
 				if (di->spectroscopy_slices.at(x)->lsize > 0)
 				{
 					glBindVertexArray(di->spectroscopy_slices.at(x)->lvaoid);
@@ -2161,10 +2152,10 @@ void GLWidget::paint_volume()
 				if (di->spectroscopy_ref == 1)
 					glUniform4f(
 						frame_shader.location_K,
-						color_spectro1[0],
-						color_spectro1[1],
-						color_spectro1[2],
-						color_spectro1[3]);
+						0.062745098f,
+						0.909803922f,
+						0.062745098f,
+						1.0f);
 				if (di->spectroscopy_slices.at(x)->psize > 0)
 				{
 					glBindVertexArray(di->spectroscopy_slices.at(x)->pvaoid);
@@ -2292,9 +2283,9 @@ void GLWidget::paint_volume()
 		//
 		const DisplayInterface * di = selected_images__->at(iii)->di;
 		if (di->skip_texture) continue;
-		if ((di->from_slice < 0)||(di->from_slice >= di->idimz)) continue;
-		if ((di->to_slice < 0)  ||(di->to_slice >=di->idimz))    continue;
-		if ((int)di->image_slices.size() < di->idimz) continue;
+		if ((di->from_slice < 0) || (di->from_slice >= di->idimz)) continue;
+		if ((di->to_slice < 0)  || (di->to_slice >=di->idimz))     continue;
+		if (static_cast<int>(di->image_slices.size()) < di->idimz) continue;
 		//
 		const Vector3 direction_vector = Vector3(
 			di->slices_direction_x,
@@ -2304,23 +2295,23 @@ void GLWidget::paint_volume()
 		//
 		// [0]
 		mparams[0]  = 0.0f; // unused
-		mparams[1]  = (float)(di->window_center - di->window_width*0.5);
-		mparams[2]  = (float)(di->window_center + di->window_width*0.5);
-		mparams[3]  = (float)di->window_width;
+		mparams[1]  = static_cast<float>(di->window_center - di->window_width * 0.5);
+		mparams[2]  = static_cast<float>(di->window_center + di->window_width * 0.5);
+		mparams[3]  = static_cast<float>(di->window_width);
 		// [1]
 		mparams[4]  = 0.0f; // unused
 		mparams[5]  = 0.0f; // unused
 		mparams[6]  = 0.0f; // unused
-		mparams[7]  = (float)di->bb_y_min; // y
+		mparams[7]  = static_cast<float>(di->bb_y_min); // y
 		// [2]
-		mparams[8]  = (float)di->bb_y_max; // y
-		mparams[9]  = (float)di->bb_x_min; // x
-		mparams[10] = (float)di->bb_x_max; // x
+		mparams[8]  = static_cast<float>(di->bb_y_max); // y
+		mparams[9]  = static_cast<float>(di->bb_x_min); // x
+		mparams[10] = static_cast<float>(di->bb_x_max); // x
 		mparams[11] = 0.0f; // unused
 		// [3]
 		mparams[12] = alpha; // premultiply alpha
 		mparams[13] = brightness; // multiply color
-		mparams[14] = (float)di->window_center;
+		mparams[14] = static_cast<float>(di->window_center);
 		mparams[15] = 0.0f; // unused
 		//
 		if (draw_frames_3d)
@@ -2351,7 +2342,7 @@ void GLWidget::paint_volume()
 				if (iii == 0)
 					glUniform4f(frame_shader.location_K, 0.85f, 0.85f, 0.85f, 1.0f);
 				glBindBuffer(GL_ARRAY_BUFFER, origin_vbo);
-				glBufferSubData(GL_ARRAY_BUFFER, 0, 3*sizeof(GLfloat), di->origin);
+				glBufferSubData(GL_ARRAY_BUFFER, 0, 3 * sizeof(GLfloat), di->origin);
 				glBindVertexArray(origin_vao);
 				glDrawArrays(GL_POINTS, 0, 1);
 			}
@@ -2363,7 +2354,7 @@ void GLWidget::paint_volume()
 		//
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_3D, di->cube_3dtex);
-		if (di->selected_lut==0)
+		if (di->selected_lut == 0)
 		{
 			if (rect_selection)
 			{
@@ -2373,9 +2364,9 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_bb_clamp_sigm.program);
 						glUniformMatrix4fv(c3d_shader_bb_clamp_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_bb_clamp_sigm.location_mparams, 16/4, mparams);
+						glUniform4fv(c3d_shader_bb_clamp_sigm.location_mparams, 4, mparams);
 						glUniform1i(c3d_shader_bb_clamp_sigm.location_sampler[0], 0);
-						if (dotv<0)
+						if (dotv < 0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
@@ -2398,9 +2389,9 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_bb_sigm.program);
 						glUniformMatrix4fv(c3d_shader_bb_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_bb_sigm.location_mparams, 16/4, mparams);
+						glUniform4fv(c3d_shader_bb_sigm.location_mparams, 4, mparams);
 						glUniform1i(c3d_shader_bb_sigm.location_sampler[0], 0);
-						if (dotv<0)
+						if (dotv < 0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
@@ -2426,9 +2417,9 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_bb_clamp.program);
 						glUniformMatrix4fv(c3d_shader_bb_clamp.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_bb_clamp.location_mparams, 16/4, mparams);
+						glUniform4fv(c3d_shader_bb_clamp.location_mparams, 4, mparams);
 						glUniform1i(c3d_shader_bb_clamp.location_sampler[0], 0);
-						if (dotv<0)
+						if (dotv < 0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
@@ -2451,9 +2442,9 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_bb.program);
 						glUniformMatrix4fv(c3d_shader_bb.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_bb.location_mparams, 16/4, mparams);
+						glUniform4fv(c3d_shader_bb.location_mparams, 4, mparams);
 						glUniform1i(c3d_shader_bb.location_sampler[0], 0);
-						if (dotv<0)
+						if (dotv < 0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
@@ -2482,9 +2473,9 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_clamp_sigm.program);
 						glUniformMatrix4fv(c3d_shader_clamp_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_clamp_sigm.location_mparams, 16/4, mparams);
+						glUniform4fv(c3d_shader_clamp_sigm.location_mparams, 4, mparams);
 						glUniform1i(c3d_shader_clamp_sigm.location_sampler[0], 0);
-						if (dotv<0)
+						if (dotv < 0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
@@ -2507,9 +2498,9 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_sigm.program);
 						glUniformMatrix4fv(c3d_shader_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_sigm.location_mparams, 16/4, mparams);
+						glUniform4fv(c3d_shader_sigm.location_mparams, 4, mparams);
 						glUniform1i(c3d_shader_sigm.location_sampler[0], 0);
-						if (dotv<0)
+						if (dotv < 0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
@@ -2535,9 +2526,9 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_clamp.program);
 						glUniformMatrix4fv(c3d_shader_clamp.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_clamp.location_mparams, 16/4, mparams);
+						glUniform4fv(c3d_shader_clamp.location_mparams, 4, mparams);
 						glUniform1i(c3d_shader_clamp.location_sampler[0], 0);
-						if (dotv<0)
+						if (dotv < 0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
@@ -2560,9 +2551,9 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader.program);
 						glUniformMatrix4fv(c3d_shader.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader.location_mparams, 16/4, mparams);
+						glUniform4fv(c3d_shader.location_mparams, 4, mparams);
 						glUniform1i(c3d_shader.location_sampler[0], 0);
-						if (dotv<0)
+						if (dotv < 0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
@@ -2606,10 +2597,10 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_gradient_bb_clamp_sigm.program);
 						glUniformMatrix4fv(c3d_shader_gradient_bb_clamp_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_gradient_bb_clamp_sigm.location_mparams, 16/4, mparams);
+						glUniform4fv(c3d_shader_gradient_bb_clamp_sigm.location_mparams, 4, mparams);
 						glUniform1i(c3d_shader_gradient_bb_clamp_sigm.location_sampler[0], 0);
 						glUniform1i(c3d_shader_gradient_bb_clamp_sigm.location_sampler[1], 3);
-						if (dotv<0)
+						if (dotv < 0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
@@ -2632,10 +2623,10 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_gradient_bb_sigm.program);
 						glUniformMatrix4fv(c3d_shader_gradient_bb_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_gradient_bb_sigm.location_mparams, 16/4, mparams);
+						glUniform4fv(c3d_shader_gradient_bb_sigm.location_mparams, 4, mparams);
 						glUniform1i(c3d_shader_gradient_bb_sigm.location_sampler[0], 0);
 						glUniform1i(c3d_shader_gradient_bb_sigm.location_sampler[1], 3);
-						if (dotv<0)
+						if (dotv < 0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
@@ -2661,10 +2652,10 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_gradient_bb_clamp.program);
 						glUniformMatrix4fv(c3d_shader_gradient_bb_clamp.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_gradient_bb_clamp.location_mparams, 16/4, mparams);
+						glUniform4fv(c3d_shader_gradient_bb_clamp.location_mparams, 4, mparams);
 						glUniform1i(c3d_shader_gradient_bb_clamp.location_sampler[0], 0);
 						glUniform1i(c3d_shader_gradient_bb_clamp.location_sampler[1], 3);
-						if (dotv<0)
+						if (dotv < 0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
@@ -2687,10 +2678,10 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_gradient_bb.program);
 						glUniformMatrix4fv(c3d_shader_gradient_bb.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_gradient_bb.location_mparams, 16/4, mparams);
+						glUniform4fv(c3d_shader_gradient_bb.location_mparams, 4, mparams);
 						glUniform1i(c3d_shader_gradient_bb.location_sampler[0], 0);
 						glUniform1i(c3d_shader_gradient_bb.location_sampler[1], 3);
-						if (dotv<0)
+						if (dotv < 0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
@@ -2719,10 +2710,10 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_gradient_clamp_sigm.program);
 						glUniformMatrix4fv(c3d_shader_gradient_clamp_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_gradient_clamp_sigm.location_mparams, 16/4, mparams);
+						glUniform4fv(c3d_shader_gradient_clamp_sigm.location_mparams, 4, mparams);
 						glUniform1i(c3d_shader_gradient_clamp_sigm.location_sampler[0], 0);
 						glUniform1i(c3d_shader_gradient_clamp_sigm.location_sampler[1], 3);
-						if (dotv<0)
+						if (dotv < 0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
@@ -2745,10 +2736,10 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_gradient_sigm.program);
 						glUniformMatrix4fv(c3d_shader_gradient_sigm.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_gradient_sigm.location_mparams, 16/4, mparams);
+						glUniform4fv(c3d_shader_gradient_sigm.location_mparams, 4, mparams);
 						glUniform1i(c3d_shader_gradient_sigm.location_sampler[0], 0);
 						glUniform1i(c3d_shader_gradient_sigm.location_sampler[1], 3);
-						if (dotv<0)
+						if (dotv < 0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
@@ -2774,10 +2765,10 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_gradient_clamp.program);
 						glUniformMatrix4fv(c3d_shader_gradient_clamp.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_gradient_clamp.location_mparams, 16/4, mparams);
+						glUniform4fv(c3d_shader_gradient_clamp.location_mparams, 4, mparams);
 						glUniform1i(c3d_shader_gradient_clamp.location_sampler[0], 0);
 						glUniform1i(c3d_shader_gradient_clamp.location_sampler[1], 3);
-						if (dotv<0)
+						if (dotv < 0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
@@ -2800,10 +2791,10 @@ void GLWidget::paint_volume()
 					{
 						glUseProgram(c3d_shader_gradient.program);
 						glUniformMatrix4fv(c3d_shader_gradient.location_mvp, 1, GL_FALSE, mvp_aos_ptr);
-						glUniform4fv(c3d_shader_gradient.location_mparams, 16/4, mparams);
+						glUniform4fv(c3d_shader_gradient.location_mparams, 4, mparams);
 						glUniform1i(c3d_shader_gradient.location_sampler[0], 0);
 						glUniform1i(c3d_shader_gradient.location_sampler[1], 3);
-						if (dotv<0)
+						if (dotv < 0)
 						{
 							for (int x = di->from_slice; x <= di->to_slice; ++x)
 								draw_3d_tex1(
@@ -2846,7 +2837,7 @@ void GLWidget::resize__(int w, int h)
 
 void GLWidget::gen_lut_tex(const unsigned char * lut, const int size, GLuint * tex)
 {
-	if (!lut||no_opengl3==true) return;
+	if (!lut || no_opengl3) return;
 	glActiveTexture(GL_TEXTURE3);
 	if (*tex > 0)
 	{
@@ -2864,48 +2855,49 @@ void GLWidget::gen_lut_tex(const unsigned char * lut, const int size, GLuint * t
 	// 4 word-alignment
 	// 8 rows start on double-word boundaries
 	//
-	glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB8, size, 0, GL_RGB, GL_UNSIGNED_BYTE, lut);
 	//
 	glBindTexture(GL_TEXTURE_1D, 0);
 	const int glerror = glGetError();
-	if (glerror!=0)
+	if (glerror != 0)
 	{
-		std::cout
-			<< "gen_lut_tex() : OpenGL Error "
-			<< glerror
-			<< std::endl;
+		std::cout << "gen_lut_tex() : OpenGL Error " << glerror << std::endl;
 	}
 }
 
 btVector3 GLWidget::get_ray_from(float x, float y)
 {
-	//std::cout << "get_ray_from(" << x <<  "," << y << ")" << std::endl;
+#if 0
+	std::cout << "get_ray_from(" << x <<  "," << y << ")" << std::endl;
+#endif
 	btVector3 ray_from;
 	if (ortho_proj)
 	{
-		Point3 p         = Point3(x,(float)win_h-y,0.0f);
-		Vector4 viewport = Vector4(0.0f,0.0f,(float)win_w,(float)win_h);
-		Vector4 v        = camera->unproject(p,camera->m_view,camera->m_projection,viewport);
-		ray_from         = btVector3(v.getX(),v.getY(),v.getZ());
+		Point3 p         = Point3(x, static_cast<float>(win_h) - y, 0.0f);
+		Vector4 viewport = Vector4(0.0f, 0.0f, static_cast<float>(win_w), static_cast<float>(win_h));
+		Vector4 v        = camera->unproject(p, camera->m_view, camera->m_projection, viewport);
+		ray_from         = btVector3(v.getX(), v.getY(), v.getZ());
 	}
 	else
 	{
-		ray_from = btVector3(camera->m_position.getX(),camera->m_position.getY(),camera->m_position.getZ());
+		ray_from = btVector3(camera->m_position.getX(), camera->m_position.getY(), camera->m_position.getZ());
 	}
 	return ray_from;
 }
 
 btVector3 GLWidget::get_ray_to(float x, float y)
 {
-	//std::cout << "get_ray_to(" << x << "," << y << ")" << std::endl;
+#if 0
+	std::cout << "get_ray_to(" << x << "," << y << ")" << std::endl;
+#endif
 	btVector3 ray_to;
 	if (ortho_proj)
 	{
-		Point3 p         = Point3(x,(float)win_h-y,1.0f);
-		Vector4 viewport = Vector4(0.0f,0.0f,(float)win_w,(float)win_h);
-		Vector4 v        = camera->unproject(p,camera->m_view,camera->m_projection,viewport);
-		ray_to           = btVector3(v.getX(),v.getY(),v.getZ());
+		Point3 p         = Point3(x, static_cast<float>(win_h) - y, 1.0f);
+		Vector4 viewport = Vector4(0.0f, 0.0f, static_cast<float>(win_w), static_cast<float>(win_h));
+		Vector4 v        = camera->unproject(p, camera->m_view, camera->m_projection, viewport);
+		ray_to           = btVector3(v.getX(), v.getY(), v.getZ());
 	}
 	else
 	{
@@ -2914,14 +2906,14 @@ btVector3 GLWidget::get_ray_to(float x, float y)
 		Vector3 vertical   = camera->m_up_axis;
 		Vector3 horizontal = normalize(cross(forward,vertical));
 		forward *= far_plane;
-		const double tanfov = tanf(0.5*CAMERA_D2R*fov);
-		horizontal *= 2.0*far_plane*tanfov;
-		vertical   *= 2.0*far_plane*tanfov;
-		horizontal *= (float)win_w/(float)win_h;
-		Vector3 dHor  = horizontal * 1.0f/(float)win_w;
-		Vector3 dVert = vertical   * 1.0f/(float)win_h;
+		const double tanfov = tanf(0.5 * CAMERA_D2R * fov);
+		horizontal *= 2.0 * far_plane*tanfov;
+		vertical   *= 2.0 * far_plane*tanfov;
+		horizontal *= static_cast<float>(win_w) / static_cast<float>(win_h);
+		Vector3 dHor  = horizontal * 1.0f / static_cast<float>(win_w);
+		Vector3 dVert = vertical   * 1.0f / static_cast<float>(win_h);
 		Vector3 ray_to_center = from + forward;
-		Vector3 res = ray_to_center - 0.5f*horizontal + 0.5f*vertical;
+		Vector3 res = ray_to_center - 0.5f * horizontal + 0.5f * vertical;
 		res += x*dHor;
 		res -= y*dVert;
 		ray_to = btVector3(res.getX(),res.getY(),res.getZ());
@@ -2932,14 +2924,18 @@ btVector3 GLWidget::get_ray_to(float x, float y)
 void GLWidget::send_ray0(float x, float y)
 {
 	if (!m_collisionWorld) return;
-	//std::cout << "send_ray0(" << x << "," << y << ")" << std::endl;
-	btVector3 from = get_ray_from(x,y);
-	btVector3 to   = get_ray_to(x,y);
-	MyClosestRayResultCallback0 rayResult(from,to);
+#if 0
+	std::cout << "send_ray0(" << x << "," << y << ")" << std::endl;
+#endif
+	btVector3 from = get_ray_from(x, y);
+	btVector3 to   = get_ray_to(x, y);
+	MyClosestRayResultCallback0 rayResult(from, to);
 	m_collisionWorld->rayTest(from, to, rayResult);
 	if (rayResult.hasHit())
 	{
-		//std::cout << "   rayResult.hasHit()" << std::endl;
+#if 0
+		std::cout << "   rayResult.hasHit()" << std::endl;
+#endif
 	}
 }
 
@@ -3015,14 +3011,14 @@ void GLWidget::render_orient_cube1(
 	float fnew_win_pos_y)
 {
 	glViewport(0, 0, 256, 256);
-	camera->orthographic(-20.0f, 20.0f,-20.0f, 20.0f,-50.0f, 50.0f);
+	camera->orthographic(-20.0f, 20.0f, -20.0f, 20.0f, -50.0f, 50.0f);
 	camera->set_trackball_matrix(
 		0.8f,
 		fold_win_pos_x,fold_win_pos_y,
 		fnew_win_pos_x,fnew_win_pos_y,
-		0.0f,0.0f,0.0f,
-		0.0f,0.0f,30.0f,
-		0.0f,1.0f,0.0f);
+		0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 30.0f,
+		0.0f, 1.0f, 0.0f);
 	const Matrix4 mv_cube_aos  = camera->m_view;
 	const Matrix4 mvp_cube_aos = camera->m_projection * mv_cube_aos;
 	VECTORMATH_ALIGNED(float mvp_cube_aos_ptr[16]);
@@ -3168,9 +3164,8 @@ void GLWidget::render_orient_cube1(
 
 void GLWidget::render_orient_cube2()
 {
-	const GLsizei cube_viewport_size =
-		win_w < win_h ? win_w/9 : win_h/9;
-	glViewport(0,0,cube_viewport_size,cube_viewport_size);
+	const GLsizei cube_viewport_size = (win_w < win_h) ? win_w / 9 : win_h / 9;
+	glViewport(0, 0, cube_viewport_size, cube_viewport_size);
 	glDisable(GL_DEPTH_TEST);
 	glUseProgram(fsquad_shader.program);
 	glActiveTexture(GL_TEXTURE4);
@@ -3186,13 +3181,13 @@ void GLWidget::update_screen_size(double delta)
 {
 	if (delta > 0)
 	{
-		ortho_size = 0.5*(delta + delta*0.1);
-		position_z = 1.5*delta;
+		ortho_size = 0.5 * (delta + delta * 0.1);
+		position_z = 1.5 * delta;
 	}
 	else
 	{
-		ortho_size = (float)SCENE_ORTHO_SIZE;
-		position_z = (float)SCENE_POS_Z;
+		ortho_size = SCENE_ORTHO_SIZE;
+		position_z = SCENE_POS_Z;
 	}
 }
 
@@ -3204,7 +3199,7 @@ void GLWidget::update_far_plane(float x)
 	}
 	else
 	{
-		far_plane = (float)SCENE_FAR_PLANE;
+		far_plane = SCENE_FAR_PLANE;
 	}
 }
 
@@ -3215,7 +3210,7 @@ void GLWidget::fit_to_screen(const ImageVariant * ivariant)
 		update_screen_size(-1);
 		return;
 	}
-	if (ivariant->image_type==200)
+	if (ivariant->image_type == 200)
 	{
 		double max_delta = 0;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -3232,7 +3227,7 @@ void GLWidget::fit_to_screen(const ImageVariant * ivariant)
 		}
 		update_screen_size(max_delta);
 	}
-	else if (ivariant->image_type==100)
+	else if (ivariant->image_type == 100)
 	{
 		double max_delta = 0;
 		for (int x = 0; x < ivariant->di->rois.size(); ++x)
@@ -3298,11 +3293,11 @@ void GLWidget::generate_vao1(GLuint * vao, GLuint * vbo, GLuint * attr_v, GLuint
 	glBindVertexArray(*vao);
 	glGenBuffers(2, vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-	glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), v, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), v, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(*attr_v,3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_v);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-	glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), t, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), t, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(*attr_t, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_t);
 	glBindVertexArray(0);
@@ -3332,11 +3327,11 @@ void GLWidget::generate_raycastcube_vao(
 	glGenBuffers(2, vbo);
 	increment_count_vbos(2);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), v, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 54 * sizeof(GLfloat), v, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(*attr_v, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_v);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-	glBufferData(GL_ARRAY_BUFFER, 54*sizeof(GLfloat), c, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 54 * sizeof(GLfloat), c, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(*attr_c, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_c);
 	glBindVertexArray(0);
@@ -3371,298 +3366,298 @@ bool GLWidget::update_raycast_shader_vbo(
 	{
 #if (ITK_VERSION_MAJOR >= 5 && ITK_VERSION_MINOR >= 3 && defined TMP_USE_53_SPATIAL_ENUMS)
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RIP):
-		raycast_cube_RIP(x__,y__,z__,raycastcube0,both);
+		raycast_cube_RIP(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LIP):
-		raycast_cube_LIP(x__,y__,z__,raycastcube0,both);
+		raycast_cube_LIP(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RSP):
-		raycast_cube_RSP(x__,y__,z__,raycastcube0,both);
+		raycast_cube_RSP(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LSP):
-		raycast_cube_LSP(x__,y__,z__,raycastcube0,both);
+		raycast_cube_LSP(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RIA):
-		raycast_cube_RIA(x__,y__,z__,raycastcube0,both);
+		raycast_cube_RIA(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LIA):
-		raycast_cube_LIA(x__,y__,z__,raycastcube0,both);
+		raycast_cube_LIA(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RSA):
-		raycast_cube_RSA(x__,y__,z__,raycastcube0,both);
+		raycast_cube_RSA(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LSA):
-		raycast_cube_LSA(x__,y__,z__,raycastcube0,both);
+		raycast_cube_LSA(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IRP):
-		raycast_cube_IRP(x__,y__,z__,raycastcube0,both);
+		raycast_cube_IRP(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ILP):
-		raycast_cube_ILP(x__,y__,z__,raycastcube0,both);
+		raycast_cube_ILP(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SRP):
-		raycast_cube_SRP(x__,y__,z__,raycastcube0,both);
+		raycast_cube_SRP(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SLP):
-		raycast_cube_SLP(x__,y__,z__,raycastcube0,both);
+		raycast_cube_SLP(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IRA):
-		raycast_cube_IRA(x__,y__,z__,raycastcube0,both);
+		raycast_cube_IRA(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ILA):
-		raycast_cube_ILA(x__,y__,z__,raycastcube0,both);
+		raycast_cube_ILA(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SRA):
-		raycast_cube_SRA(x__,y__,z__,raycastcube0,both);
+		raycast_cube_SRA(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SLA):
-		raycast_cube_SLA(x__,y__,z__,raycastcube0,both);
+		raycast_cube_SLA(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RPI):
-		raycast_cube_RPI(x__,y__,z__,raycastcube0,both);
+		raycast_cube_RPI(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LPI):
-		raycast_cube_LPI(x__,y__,z__,raycastcube0,both);
+		raycast_cube_LPI(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RAI):
-		raycast_cube_RAI(x__,y__,z__,raycastcube0,both);
+		raycast_cube_RAI(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LAI):
-		raycast_cube_LAI(x__,y__,z__,raycastcube0,both);
+		raycast_cube_LAI(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RPS):
-		raycast_cube_RPS(x__,y__,z__,raycastcube0,both);
+		raycast_cube_RPS(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LPS):
-		raycast_cube_LPS(x__,y__,z__,raycastcube0,both);
+		raycast_cube_LPS(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RAS):
-		raycast_cube_RAS(x__,y__,z__,raycastcube0,both);
+		raycast_cube_RAS(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LAS):
-		raycast_cube_LAS(x__,y__,z__,raycastcube0,both);
+		raycast_cube_LAS(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PRI):
-		raycast_cube_PRI(x__,y__,z__,raycastcube0,both);
+		raycast_cube_PRI(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PLI):
-		raycast_cube_PLI(x__,y__,z__,raycastcube0,both);
+		raycast_cube_PLI(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ARI):
-		raycast_cube_ARI(x__,y__,z__,raycastcube0,both);
+		raycast_cube_ARI(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ALI):
-		raycast_cube_ALI(x__,y__,z__,raycastcube0,both);
+		raycast_cube_ALI(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PRS):
-		raycast_cube_PRS(x__,y__,z__,raycastcube0,both);
+		raycast_cube_PRS(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PLS):
-		raycast_cube_PLS(x__,y__,z__,raycastcube0,both);
+		raycast_cube_PLS(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ARS):
-		raycast_cube_ARS(x__,y__,z__,raycastcube0,both);
+		raycast_cube_ARS(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ALS):
-		raycast_cube_ALS(x__,y__,z__,raycastcube0,both);
+		raycast_cube_ALS(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IPR):
-		raycast_cube_IPR(x__,y__,z__,raycastcube0,both);
+		raycast_cube_IPR(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SPR):
-		raycast_cube_SPR(x__,y__,z__,raycastcube0,both);
+		raycast_cube_SPR(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IAR):
-		raycast_cube_IAR(x__,y__,z__,raycastcube0,both);
+		raycast_cube_IAR(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SAR):
-		raycast_cube_SAR(x__,y__,z__,raycastcube0,both);
+		raycast_cube_SAR(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IPL):
-		raycast_cube_IPL(x__,y__,z__,raycastcube0,both);
+		raycast_cube_IPL(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SPL):
-		raycast_cube_SPL(x__,y__,z__,raycastcube0,both);
+		raycast_cube_SPL(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IAL):
-		raycast_cube_IAL(x__,y__,z__,raycastcube0,both);
+		raycast_cube_IAL(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SAL):
-		raycast_cube_SAL(x__,y__,z__,raycastcube0,both);
+		raycast_cube_SAL(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PIR):
-		raycast_cube_PIR(x__,y__,z__,raycastcube0,both);
+		raycast_cube_PIR(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PSR):
-		raycast_cube_PSR(x__,y__,z__,raycastcube0,both);
+		raycast_cube_PSR(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_AIR):
-		raycast_cube_AIR(x__,y__,z__,raycastcube0,both);
+		raycast_cube_AIR(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ASR):
-		raycast_cube_ASR(x__,y__,z__,raycastcube0,both);
+		raycast_cube_ASR(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PIL):
-		raycast_cube_PIL(x__,y__,z__,raycastcube0,both);
+		raycast_cube_PIL(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PSL):
-		raycast_cube_PSL(x__,y__,z__,raycastcube0,both);
+		raycast_cube_PSL(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_AIL):
-		raycast_cube_AIL(x__,y__,z__,raycastcube0,both);
+		raycast_cube_AIL(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ASL):
-		raycast_cube_ASL(x__,y__,z__,raycastcube0,both);
+		raycast_cube_ASL(x__, y__, z__, raycastcube0, both);
 		break;
 #else
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIP):
-		raycast_cube_RIP(x__,y__,z__,raycastcube0,both);
+		raycast_cube_RIP(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LIP):
-		raycast_cube_LIP(x__,y__,z__,raycastcube0,both);
+		raycast_cube_LIP(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSP):
-		raycast_cube_RSP(x__,y__,z__,raycastcube0,both);
+		raycast_cube_RSP(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LSP):
-		raycast_cube_LSP(x__,y__,z__,raycastcube0,both);
+		raycast_cube_LSP(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIA):
-		raycast_cube_RIA(x__,y__,z__,raycastcube0,both);
+		raycast_cube_RIA(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LIA):
-		raycast_cube_LIA(x__,y__,z__,raycastcube0,both);
+		raycast_cube_LIA(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSA):
-		raycast_cube_RSA(x__,y__,z__,raycastcube0,both);
+		raycast_cube_RSA(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LSA):
-		raycast_cube_LSA(x__,y__,z__,raycastcube0,both);
+		raycast_cube_LSA(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IRP):
-		raycast_cube_IRP(x__,y__,z__,raycastcube0,both);
+		raycast_cube_IRP(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ILP):
-		raycast_cube_ILP(x__,y__,z__,raycastcube0,both);
+		raycast_cube_ILP(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SRP):
-		raycast_cube_SRP(x__,y__,z__,raycastcube0,both);
+		raycast_cube_SRP(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SLP):
-		raycast_cube_SLP(x__,y__,z__,raycastcube0,both);
+		raycast_cube_SLP(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IRA):
-		raycast_cube_IRA(x__,y__,z__,raycastcube0,both);
+		raycast_cube_IRA(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ILA):
-		raycast_cube_ILA(x__,y__,z__,raycastcube0,both);
+		raycast_cube_ILA(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SRA):
-		raycast_cube_SRA(x__,y__,z__,raycastcube0,both);
+		raycast_cube_SRA(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SLA):
-		raycast_cube_SLA(x__,y__,z__,raycastcube0,both);
+		raycast_cube_SLA(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RPI):
-		raycast_cube_RPI(x__,y__,z__,raycastcube0,both);
+		raycast_cube_RPI(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LPI):
-		raycast_cube_LPI(x__,y__,z__,raycastcube0,both);
+		raycast_cube_LPI(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI):
-		raycast_cube_RAI(x__,y__,z__,raycastcube0,both);
+		raycast_cube_RAI(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LAI):
-		raycast_cube_LAI(x__,y__,z__,raycastcube0,both);
+		raycast_cube_LAI(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RPS):
-		raycast_cube_RPS(x__,y__,z__,raycastcube0,both);
+		raycast_cube_RPS(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LPS):
-		raycast_cube_LPS(x__,y__,z__,raycastcube0,both);
+		raycast_cube_LPS(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAS):
-		raycast_cube_RAS(x__,y__,z__,raycastcube0,both);
+		raycast_cube_RAS(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LAS):
-		raycast_cube_LAS(x__,y__,z__,raycastcube0,both);
+		raycast_cube_LAS(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PRI):
-		raycast_cube_PRI(x__,y__,z__,raycastcube0,both);
+		raycast_cube_PRI(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PLI):
-		raycast_cube_PLI(x__,y__,z__,raycastcube0,both);
+		raycast_cube_PLI(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ARI):
-		raycast_cube_ARI(x__,y__,z__,raycastcube0,both);
+		raycast_cube_ARI(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ALI):
-		raycast_cube_ALI(x__,y__,z__,raycastcube0,both);
+		raycast_cube_ALI(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PRS):
-		raycast_cube_PRS(x__,y__,z__,raycastcube0,both);
+		raycast_cube_PRS(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PLS):
-		raycast_cube_PLS(x__,y__,z__,raycastcube0,both);
+		raycast_cube_PLS(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ARS):
-		raycast_cube_ARS(x__,y__,z__,raycastcube0,both);
+		raycast_cube_ARS(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ALS):
-		raycast_cube_ALS(x__,y__,z__,raycastcube0,both);
+		raycast_cube_ALS(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IPR):
-		raycast_cube_IPR(x__,y__,z__,raycastcube0,both);
+		raycast_cube_IPR(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SPR):
-		raycast_cube_SPR(x__,y__,z__,raycastcube0,both);
+		raycast_cube_SPR(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IAR):
-		raycast_cube_IAR(x__,y__,z__,raycastcube0,both);
+		raycast_cube_IAR(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SAR):
-		raycast_cube_SAR(x__,y__,z__,raycastcube0,both);
+		raycast_cube_SAR(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IPL):
-		raycast_cube_IPL(x__,y__,z__,raycastcube0,both);
+		raycast_cube_IPL(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SPL):
-		raycast_cube_SPL(x__,y__,z__,raycastcube0,both);
+		raycast_cube_SPL(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IAL):
-		raycast_cube_IAL(x__,y__,z__,raycastcube0,both);
+		raycast_cube_IAL(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SAL):
-		raycast_cube_SAL(x__,y__,z__,raycastcube0,both);
+		raycast_cube_SAL(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PIR):
-		raycast_cube_PIR(x__,y__,z__,raycastcube0,both);
+		raycast_cube_PIR(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PSR):
-		raycast_cube_PSR(x__,y__,z__,raycastcube0,both);
+		raycast_cube_PSR(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_AIR):
-		raycast_cube_AIR(x__,y__,z__,raycastcube0,both);
+		raycast_cube_AIR(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASR):
-		raycast_cube_ASR(x__,y__,z__,raycastcube0,both);
+		raycast_cube_ASR(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PIL):
-		raycast_cube_PIL(x__,y__,z__,raycastcube0,both);
+		raycast_cube_PIL(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PSL):
-		raycast_cube_PSL(x__,y__,z__,raycastcube0,both);
+		raycast_cube_PSL(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_AIL):
-		raycast_cube_AIL(x__,y__,z__,raycastcube0,both);
+		raycast_cube_AIL(x__, y__, z__, raycastcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASL):
-		raycast_cube_ASL(x__,y__,z__,raycastcube0,both);
+		raycast_cube_ASL(x__, y__, z__, raycastcube0, both);
 		break;
 #endif
 	default:
 		force_skip_cube = true;
-		raycast_cube(x__,y__,z__,raycastcube0,both);
+		raycast_cube(x__, y__, z__, raycastcube0, both);
 		break;
 	}
 	return force_skip_cube;
@@ -3684,27 +3679,24 @@ void GLWidget::generate_quad(
 	//
 	if (!v) return;
 	glBindBuffer(GL_ARRAY_BUFFER, vboid[0]);
-	glBufferData(GL_ARRAY_BUFFER, (4*3)*sizeof(GLfloat), v, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), v, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
 	if (t)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vboid[1]);
-		glBufferData(GL_ARRAY_BUFFER, (4*3)*sizeof(GLfloat), t, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), t, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
-
 	if (n)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vboid[2]);
-		glBufferData(GL_ARRAY_BUFFER, (4*3)*sizeof(GLfloat), n, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), n, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
-
 	if (tan)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vboid[3]);
-		glBufferData(GL_ARRAY_BUFFER, (4*3)*sizeof(GLfloat), tan, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), tan, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 }
@@ -3725,11 +3717,34 @@ GLuint GLWidget::load_shader(GLenum shaderType, const char * pSource)
 			if (infoLen)
 			{
 				const unsigned int infoLen__ = infoLen;
-				char * buf = new char[infoLen__];
+				char * buf;
+				try
+				{
+					buf = new char[infoLen__];
+				}
+				catch (const std::bad_alloc&)
+				{
+					buf = NULL;
+				}
 				if (buf)
 				{
 					glGetShaderInfoLog(shader, infoLen, NULL, buf);
-					printf("Could not compile shader %d:\n%s\n", shaderType, buf);
+					const int shaderType_int = static_cast<int>(shaderType);
+					switch (shaderType_int)
+					{
+					case static_cast<int>(GL_VERTEX_SHADER):
+						std::cout << "Could not compile vertex shader\n" << std::endl;
+						break;
+					case static_cast<int>(GL_FRAGMENT_SHADER):
+						std::cout << "Could not compile fragment shader\n" << std::endl;
+						break;
+					default:
+						std::cout << "Could not compile shader (type " << shaderType_int << ")\n" << std::endl;
+						break;
+					}
+#ifdef ALWAYS_SHOW_GL_ERROR
+					std::cout << buf << "\n" << pSource << "\n" << std::endl;
+#endif
 					delete [] buf;
 				}
 			}
@@ -3767,12 +3782,21 @@ bool GLWidget::create_program(
 			{
 				const unsigned int bufLength__ = bufLength;
 				char * buf;
-				try { buf = new char[bufLength__]; }
-				catch (const std::bad_alloc&) { return false; }
+				try
+				{
+					buf = new char[bufLength__];
+				}
+				catch (const std::bad_alloc&)
+				{
+					buf = NULL;
+				}
 				if (buf)
 				{
 					glGetProgramInfoLog(program, bufLength, NULL, buf);
-					printf("Could not link program:\n%s\n", buf);
+					std::cout << "Could not link program" << std::endl;
+#ifdef ALWAYS_SHOW_GL_ERROR
+					std::cout << buf << "\n" << vertex << "\n" << fragment << std::endl;
+#endif
 					delete [] buf;
 				}
 			}
@@ -3789,10 +3813,10 @@ bool GLWidget::create_program(
 
 void GLWidget::checkGLerror(const char * op)
 {
-	const int error__ = (int)glGetError();
+	const int error__ = static_cast<int>(glGetError());
 	if (error__ == 0) return;
 	QString e;
-	switch(error__)
+	switch (error__)
 	{
 	case 0x0500:
 		e = QString("GL_INVALID_ENUM");
@@ -3845,180 +3869,150 @@ void GLWidget::makeModelVBO_ArraysT(
 	float scale)
 {
 	float * v;
-	try { v = new float[(faces_size/12)*3*3]; }
+	try { v = new float[(faces_size / 12) * 9]; }
 	catch (const std::bad_alloc&) { return; }
 	if (!v) return;
-
 	float * n  = NULL; // initialized to avoid warning
 	if (normals)
 	{
-		try { n  = new float[(faces_size/12)*3*3]; }
+		try { n  = new float[(faces_size / 12) * 9]; }
 		catch (const std::bad_alloc&) { return; }
 		if (!n) return;
 	}
-
 	float * t  = NULL; // initialized to avoid warning
 	if (textures)
 	{
-		try { t  = new float[(faces_size/12)*3*3]; }
+		try { t  = new float[(faces_size / 12) * 9]; }
 		catch (const std::bad_alloc&) { return; }
 		if (!t) return;
 	}
-
 	float * ta = NULL; // initialized to avoid warning
 	if (tangents)
 	{
-		try { ta = new float[(faces_size/12)*3*3]; }
+		try { ta = new float[(faces_size / 12) * 9]; }
 		catch (const std::bad_alloc&) { return; }
 		if (!ta) return;
 	}
-
 	unsigned int idx = 0;
-
-	for (int ind = 0; ind < faces_size; ind+=12 )
+	for (int ind = 0; ind < faces_size; ind += 12 )
 	{
-		int c1  = *(faces + ind + 0);
-		int t1  = *(faces + ind + 1);
-		int n1  = *(faces + ind + 2);
-		int ta1 = *(faces + ind + 3);
-
-		int c2   = *(faces + ind + 4);
-		int t2   = *(faces + ind + 5);
-		int n2   = *(faces + ind + 6);
-		int ta2  = *(faces + ind + 7);
-
-		int c3   = *(faces + ind + 8);
-		int t3   = *(faces + ind + 9);
-		int n3   = *(faces + ind + 10);
-		int ta3  = *(faces + ind + 11);
-
+		int c1  = *(faces + ind +  0);
+		int t1  = *(faces + ind +  1);
+		int n1  = *(faces + ind +  2);
+		int ta1 = *(faces + ind +  3);
+		int c2  = *(faces + ind +  4);
+		int t2  = *(faces + ind +  5);
+		int n2  = *(faces + ind +  6);
+		int ta2 = *(faces + ind +  7);
+		int c3  = *(faces + ind +  8);
+		int t3  = *(faces + ind +  9);
+		int n3  = *(faces + ind + 10);
+		int ta3 = *(faces + ind + 11);
 		if (textures)
 		{
-			t[idx + 0 ] =  *(textures + 0 + (t1-1)*3);
-			t[idx + 1 ] =  *(textures + 1 + (t1-1)*3);
-			t[idx + 2 ] =  *(textures + 2 + (t1-1)*3);
+			t[idx + 0] =  *(textures + 0 + (t1 - 1) * 3);
+			t[idx + 1] =  *(textures + 1 + (t1 - 1) * 3);
+			t[idx + 2] =  *(textures + 2 + (t1 - 1) * 3);
 		}
-
 		if (normals)
 		{
-			n[idx + 0 ] = *(normals + 0 + (n1-1)*3);
-			n[idx + 1 ] = *(normals + 1 + (n1-1)*3);
-			n[idx + 2 ] = *(normals + 2 + (n1-1)*3);
+			n[idx + 0] = *(normals + 0 + (n1 - 1) * 3);
+			n[idx + 1] = *(normals + 1 + (n1 - 1) * 3);
+			n[idx + 2] = *(normals + 2 + (n1 - 1) * 3);
 		}
-
 		if (tangents)
 		{
-			ta[idx + 0 ] = *(tangents + 0 + (ta1-1)*3);
-			ta[idx + 1 ] = *(tangents + 1 + (ta1-1)*3);
-			ta[idx + 2 ] = *(tangents + 2 + (ta1-1)*3);
+			ta[idx + 0] = *(tangents + 0 + (ta1 - 1) * 3);
+			ta[idx + 1] = *(tangents + 1 + (ta1 - 1) * 3);
+			ta[idx + 2] = *(tangents + 2 + (ta1 - 1) * 3);
 		}
-
-		v[idx + 0 ] = *(vertices + 0 + (c1-1)*3) * scale;
-		v[idx + 1 ] = *(vertices + 1 + (c1-1)*3) * scale;
-		v[idx + 2 ] = *(vertices + 2 + (c1-1)*3) * scale;
-
+		v[idx + 0] = *(vertices + 0 + (c1 - 1) * 3) * scale;
+		v[idx + 1] = *(vertices + 1 + (c1 - 1) * 3) * scale;
+		v[idx + 2] = *(vertices + 2 + (c1 - 1) * 3) * scale;
 		if (textures)
 		{
-			t[idx + 3 ] = *(textures + 0 + (t2-1)*3);
-			t[idx + 4 ] = *(textures + 1 + (t2-1)*3);
-			t[idx + 5 ] = *(textures + 2 + (t2-1)*3);
+			t[idx + 3] = *(textures + 0 + (t2 - 1) * 3);
+			t[idx + 4] = *(textures + 1 + (t2 - 1) * 3);
+			t[idx + 5] = *(textures + 2 + (t2 - 1) * 3);
 		}
-
 		if (normals)
 		{
-			n[idx + 3] = *(normals + 0 + (n2-1)*3);
-			n[idx + 4] = *(normals + 1 + (n2-1)*3);
-			n[idx + 5] = *(normals + 2 + (n2-1)*3);
+			n[idx + 3] = *(normals + 0 + (n2 - 1) * 3);
+			n[idx + 4] = *(normals + 1 + (n2 - 1) * 3);
+			n[idx + 5] = *(normals + 2 + (n2 - 1) * 3);
 		}
-
 		if (tangents)
 		{
-			ta[idx + 3 ] = *(tangents + 0 + (ta2-1)*3);
-			ta[idx + 4 ] = *(tangents + 1 + (ta2-1)*3);
-			ta[idx + 5 ] = *(tangents + 2 + (ta2-1)*3);
+			ta[idx + 3] = *(tangents + 0 + (ta2 - 1) * 3);
+			ta[idx + 4] = *(tangents + 1 + (ta2 - 1) * 3);
+			ta[idx + 5] = *(tangents + 2 + (ta2 - 1) * 3);
 		}
-
-		v[idx + 3] = *(vertices + 0 + (c2-1)*3) * scale;
-		v[idx + 4] = *(vertices + 1 + (c2-1)*3) * scale;
-		v[idx + 5] = *(vertices + 2 + (c2-1)*3) * scale;
-
+		v[idx + 3] = *(vertices + 0 + (c2 - 1) * 3) * scale;
+		v[idx + 4] = *(vertices + 1 + (c2 - 1) * 3) * scale;
+		v[idx + 5] = *(vertices + 2 + (c2 - 1) * 3) * scale;
 		if (textures)
 		{
-			t[idx + 6] = *(textures + 0 + (t3-1)*3);
-			t[idx + 7] = *(textures + 1 + (t3-1)*3);
-			t[idx + 8] = *(textures + 2 + (t3-1)*3);
+			t[idx + 6] = *(textures + 0 + (t3 - 1) * 3);
+			t[idx + 7] = *(textures + 1 + (t3 - 1) * 3);
+			t[idx + 8] = *(textures + 2 + (t3 - 1) * 3);
 		}
-
 		if (normals)
 		{
 			n[idx + 6] = *(normals + 0 + (n3-1)*3);
 			n[idx + 7] = *(normals + 1 + (n3-1)*3);
 			n[idx + 8] = *(normals + 2 + (n3-1)*3);
 		}
-
 		if (tangents)
 		{
-			ta[idx + 6 ] = *(tangents + 0 + (ta3-1)*3);
-			ta[idx + 7 ] = *(tangents + 1 + (ta3-1)*3);
-			ta[idx + 8 ] = *(tangents + 2 + (ta3-1)*3);
+			ta[idx + 6] = *(tangents + 0 + (ta3 - 1) * 3);
+			ta[idx + 7] = *(tangents + 1 + (ta3 - 1) * 3);
+			ta[idx + 8] = *(tangents + 2 + (ta3 - 1) * 3);
 		}
-
-		v[idx + 6] = *(vertices + 0 + (c3-1)*3) * scale;
-		v[idx + 7] = *(vertices + 1 + (c3-1)*3) * scale;
-		v[idx + 8] = *(vertices + 2 + (c3-1)*3) * scale;
-
+		v[idx + 6] = *(vertices + 0 + (c3 - 1) * 3) * scale;
+		v[idx + 7] = *(vertices + 1 + (c3 - 1) * 3) * scale;
+		v[idx + 8] = *(vertices + 2 + (c3 - 1) * 3) * scale;
 		idx += 9;
 	}
-
 	vboid[0] = 0;
 	vboid[1] = 0;
 	vboid[2] = 0;
 	vboid[3] = 0;
-
 	unsigned int count_buffers = 1;
-
 	if (normals)  ++count_buffers;
 	if (textures) ++count_buffers;
 	if (tangents) ++count_buffers;
-
 	glGenVertexArrays(1, vaoid);
 	glBindVertexArray(*vaoid);
 	glGenBuffers(count_buffers, vboid);
-
 	glBindBuffer(GL_ARRAY_BUFFER, vboid[0]);
-	glBufferData(GL_ARRAY_BUFFER, (faces_size/12)*3*3*sizeof(float), v, usage);
+	glBufferData(GL_ARRAY_BUFFER, (faces_size / 12) * 9 * sizeof(float), v, usage);
 	glVertexAttribPointer(*v_attr, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*v_attr);
-
 	if (normals)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vboid[1]);
-		glBufferData(GL_ARRAY_BUFFER, (faces_size/12)*3*3*sizeof(float), n, usage);
+		glBufferData(GL_ARRAY_BUFFER, (faces_size / 12) * 9 * sizeof(float), n, usage);
 		glVertexAttribPointer(*n_attr, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(*n_attr);
 	}
-
 	if (textures)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vboid[2]);
-		glBufferData(GL_ARRAY_BUFFER, (faces_size/12)*3*3*sizeof(float), t, usage);
+		glBufferData(GL_ARRAY_BUFFER, (faces_size / 12 ) * 9 * sizeof(float), t, usage);
 		glVertexAttribPointer(*t_attr, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(*t_attr);
 	}
-
 	if (tangents)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vboid[3]);
-		glBufferData(GL_ARRAY_BUFFER, (faces_size/12)*3*3*sizeof(float), ta, usage);
+		glBufferData(GL_ARRAY_BUFFER, (faces_size / 12) * 9 * sizeof(float), ta, usage);
 		glVertexAttribPointer(*ta_attr, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(*ta_attr);
 	}
 	glBindVertexArray(0);
-
 	increment_count_vbos(count_buffers);
 	vboids.push_back(vboid);
 	vaoids.push_back(*vaoid);
-
 	delete [] v;
 	if (normals)  delete [] n;
 	if (textures) delete [] t;
@@ -4059,7 +4053,7 @@ void GLWidget::generate_screen_quad(GLuint * vbo, GLuint * vao, GLuint * attr)
 	glGenBuffers(1, vbo);
 	increment_count_vbos(1);
 	glBindBuffer(GL_ARRAY_BUFFER, *vbo);
-	glBufferData(GL_ARRAY_BUFFER, (4*2)*sizeof(GLfloat), v, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), v, GL_STATIC_DRAW);
 	glVertexAttribPointer(*attr, 2, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr);
 	glBindVertexArray(0);
@@ -4101,12 +4095,12 @@ bool GLWidget::create_fbos0(
 	glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexImage2D(target,
 				0,
-				GL_DEPTH_COMPONENT24, //GL_DEPTH_COMPONENT16
+				GL_DEPTH_COMPONENT24,
 				w,
 				h,
 				0,
 				GL_DEPTH_COMPONENT,
-				GL_UNSIGNED_INT, //GL_UNSIGNED_SHORT,
+				GL_UNSIGNED_INT,
 				NULL);
 	glGenTextures(1, color_texture);
 	glBindTexture(target, *color_texture );
@@ -4199,28 +4193,28 @@ void GLWidget::raycast_cube(
 {
 	GLfloat va0[] = {
 			// triangle strip
-			-x,  y, z,
-			-x, -y, z,
-			 x,  y, z,
-			 x, -y, z,
+			-x,  y,  z,
+			-x, -y,  z,
+			 x,  y,  z,
+			 x, -y,  z,
 			 x,  y, -z,
 			 x, -y, -z,
 			-x,  y, -z,
 			-x, -y, -z,
-			-x,  y, z,
-			-x, -y, z,
+			-x,  y,  z,
+			-x, -y,  z,
 			// triangle strip
-			-x, y, -z,
-			-x, y,  z,
-			 x, y, -z,
-			 x, y,  z,
+			-x,  y, -z,
+			-x,  y,  z,
+			 x,  y, -z,
+			 x,  y,  z,
 			 // triangle strip
 			-x, -y,  z,
 			-x, -y, -z,
 			 x, -y,  z,
 			 x, -y, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0);
 	if (b)
 	{
 		GLfloat ca0[] = {
@@ -4246,7 +4240,7 @@ void GLWidget::raycast_cube(
 					1.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4256,26 +4250,26 @@ void GLWidget::raycast_cube_RIP(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_rip[] = {
-			-x,  z, y,
-			-x, -z, y,
-			 x,  z, y,
-			 x, -z, y,
+			-x,  z,  y,
+			-x, -z,  y,
+			 x,  z,  y,
+			 x, -z,  y,
 			 x,  z, -y,
 			 x, -z, -y,
 			-x,  z, -y,
 			-x, -z, -y,
-			-x,  z, y,
-			-x, -z, y,
-			-x, z, -y,
-			-x, z,  y,
-			 x, z, -y,
-			 x, z,  y,
+			-x,  z,  y,
+			-x, -z,  y,
+			-x,  z, -y,
+			-x,  z,  y,
+			 x,  z, -y,
+			 x,  z,  y,
 			-x, -z,  y,
 			-x, -z, -y,
 			 x, -z,  y,
 			 x, -z, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_rip);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_rip);
 	if (b)
 	{
 		GLfloat ca0_rip[] = {
@@ -4298,7 +4292,7 @@ void GLWidget::raycast_cube_RIP(
 					1.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_rip);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_rip);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4308,26 +4302,26 @@ void GLWidget::raycast_cube_LIP(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_lip[] = {
-			-x,  z, y,
-			-x, -z, y,
-			 x,  z, y,
-			 x, -z, y,
+			-x,  z,  y,
+			-x, -z,  y,
+			 x,  z,  y,
+			 x, -z,  y,
 			 x,  z, -y,
 			 x, -z, -y,
 			-x,  z, -y,
 			-x, -z, -y,
-			-x,  z, y,
-			-x, -z, y,
-			-x, z, -y,
-			-x, z,  y,
-			 x, z, -y,
-			 x, z,  y,
+			-x,  z,  y,
+			-x, -z,  y,
+			-x,  z, -y,
+			-x,  z,  y,
+			 x,  z, -y,
+			 x,  z,  y,
 			-x, -z,  y,
 			-x, -z, -y,
 			 x, -z,  y,
 			 x, -z, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_lip);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_lip);
 	if (b)
 	{
 		GLfloat ca0_lip[] = {
@@ -4350,7 +4344,7 @@ void GLWidget::raycast_cube_LIP(
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_lip);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_lip);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4361,26 +4355,26 @@ void GLWidget::raycast_cube_RSP(
 {
 
 	GLfloat va0_rsp[] = {
-			-x,  z, y,
-			-x, -z, y,
-			 x,  z, y,
-			 x, -z, y,
+			-x,  z,  y,
+			-x, -z,  y,
+			 x,  z,  y,
+			 x, -z,  y,
 			 x,  z, -y,
 			 x, -z, -y,
 			-x,  z, -y,
 			-x, -z, -y,
-			-x,  z, y,
-			-x, -z, y,
-			-x, z, -y,
-			-x, z,  y,
-			 x, z, -y,
-			 x, z,  y,
+			-x,  z,  y,
+			-x, -z,  y,
+			-x,  z, -y,
+			-x,  z,  y,
+			 x,  z, -y,
+			 x,  z,  y,
 			-x, -z,  y,
 			-x, -z, -y,
 			 x, -z,  y,
 			 x, -z, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_rsp);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_rsp);
 	if (b)
 	{
 		GLfloat ca0_rsp[] = {
@@ -4403,7 +4397,7 @@ void GLWidget::raycast_cube_RSP(
 					1.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_rsp);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_rsp);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4414,26 +4408,26 @@ void GLWidget::raycast_cube_LSP(
 {
 
 	GLfloat va0_lsp[] = {
-			-x,  z, y,
-			-x, -z, y,
-			 x,  z, y,
-			 x, -z, y,
+			-x,  z,  y,
+			-x, -z,  y,
+			 x,  z,  y,
+			 x, -z,  y,
 			 x,  z, -y,
 			 x, -z, -y,
 			-x,  z, -y,
 			-x, -z, -y,
-			-x,  z, y,
-			-x, -z, y,
-			-x, z, -y,
-			-x, z,  y,
-			 x, z, -y,
-			 x, z,  y,
+			-x,  z,  y,
+			-x, -z,  y,
+			-x,  z, -y,
+			-x,  z,  y,
+			 x,  z, -y,
+			 x,  z,  y,
 			-x, -z,  y,
 			-x, -z, -y,
 			 x, -z,  y,
 			 x, -z, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_lsp);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_lsp);
 	if (b)
 	{
 		GLfloat ca0_lsp[] = {
@@ -4456,7 +4450,7 @@ void GLWidget::raycast_cube_LSP(
 					0.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_lsp);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_lsp);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4466,26 +4460,26 @@ void GLWidget::raycast_cube_RIA(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_ria[] = {
-			-x,  z, y,
-			-x, -z, y,
-			 x,  z, y,
-			 x, -z, y,
+			-x,  z,  y,
+			-x, -z,  y,
+			 x,  z,  y,
+			 x, -z,  y,
 			 x,  z, -y,
 			 x, -z, -y,
 			-x,  z, -y,
 			-x, -z, -y,
-			-x,  z, y,
-			-x, -z, y,
-			-x, z, -y,
-			-x, z,  y,
-			 x, z, -y,
-			 x, z,  y,
+			-x,  z,  y,
+			-x, -z,  y,
+			-x,  z, -y,
+			-x,  z,  y,
+			 x,  z, -y,
+			 x,  z,  y,
 			-x, -z,  y,
 			-x, -z, -y,
 			 x, -z,  y,
 			 x, -z, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ria);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_ria);
 	if (b)
 	{
 		GLfloat ca0_ria[] = {
@@ -4508,7 +4502,7 @@ void GLWidget::raycast_cube_RIA(
 					1.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ria);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_ria);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4518,26 +4512,26 @@ void GLWidget::raycast_cube_LIA(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_lia[] = {
-			-x,  z, y,
-			-x, -z, y,
-			 x,  z, y,
-			 x, -z, y,
+			-x,  z,  y,
+			-x, -z,  y,
+			 x,  z,  y,
+			 x, -z,  y,
 			 x,  z, -y,
 			 x, -z, -y,
 			-x,  z, -y,
 			-x, -z, -y,
-			-x,  z, y,
-			-x, -z, y,
-			-x, z, -y,
-			-x, z,  y,
-			 x, z, -y,
-			 x, z,  y,
+			-x,  z,  y,
+			-x, -z,  y,
+			-x,  z, -y,
+			-x,  z,  y,
+			 x,  z, -y,
+			 x,  z,  y,
 			-x, -z,  y,
 			-x, -z, -y,
 			 x, -z,  y,
 			 x, -z, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_lia);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_lia);
 	if (b)
 	{
 		GLfloat ca0_lia[] = {
@@ -4560,7 +4554,7 @@ void GLWidget::raycast_cube_LIA(
 					0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_lia);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_lia);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4570,26 +4564,26 @@ void GLWidget::raycast_cube_RSA(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_rsa[] = {
-			-x,  z, y,
-			-x, -z, y,
-			 x,  z, y,
-			 x, -z, y,
+			-x,  z,  y,
+			-x, -z,  y,
+			 x,  z,  y,
+			 x, -z,  y,
 			 x,  z, -y,
 			 x, -z, -y,
 			-x,  z, -y,
 			-x, -z, -y,
-			-x,  z, y,
-			-x, -z, y,
-			-x, z, -y,
-			-x, z,  y,
-			 x, z, -y,
-			 x, z,  y,
+			-x,  z,  y,
+			-x, -z,  y,
+			-x,  z, -y,
+			-x,  z,  y,
+			 x,  z, -y,
+			 x,  z,  y,
 			-x, -z,  y,
 			-x, -z, -y,
 			 x, -z,  y,
 			 x, -z, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_rsa);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_rsa);
 	if (b)
 	{
 		GLfloat ca0_rsa[] = {
@@ -4612,7 +4606,7 @@ void GLWidget::raycast_cube_RSA(
 					1.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_rsa);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_rsa);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4622,26 +4616,26 @@ void GLWidget::raycast_cube_LSA(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_lsa[] = {
-			-x,  z, y,
-			-x, -z, y,
-			 x,  z, y,
-			 x, -z, y,
+			-x,  z,  y,
+			-x, -z,  y,
+			 x,  z,  y,
+			 x, -z,  y,
 			 x,  z, -y,
 			 x, -z, -y,
 			-x,  z, -y,
 			-x, -z, -y,
-			-x,  z, y,
-			-x, -z, y,
-			-x, z, -y,
-			-x, z,  y,
-			 x, z, -y,
-			 x, z,  y,
+			-x,  z,  y,
+			-x, -z,  y,
+			-x,  z, -y,
+			-x,  z,  y,
+			 x,  z, -y,
+			 x,  z,  y,
 			-x, -z,  y,
 			-x, -z, -y,
 			 x, -z,  y,
 			 x, -z, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_lsa);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_lsa);
 	if (b)
 	{
 		GLfloat ca0_lsa[] = {
@@ -4664,7 +4658,7 @@ void GLWidget::raycast_cube_LSA(
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_lsa);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_lsa);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4674,26 +4668,26 @@ void GLWidget::raycast_cube_IRP(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_irp[] = {
-			-y,  z, x,
-			-y, -z, x,
-			 y,  z, x,
-			 y, -z, x,
+			-y,  z,  x,
+			-y, -z,  x,
+			 y,  z,  x,
+			 y, -z,  x,
 			 y,  z, -x,
 			 y, -z, -x,
 			-y,  z, -x,
 			-y, -z, -x,
-			-y,  z, x,
-			-y, -z, x,
-			-y, z, -x,
-			-y, z,  x,
-			 y, z, -x,
-			 y, z,  x,
+			-y,  z,  x,
+			-y, -z,  x,
+			-y,  z, -x,
+			-y,  z,  x,
+			 y,  z, -x,
+			 y,  z,  x,
 			-y, -z,  x,
 			-y, -z, -x,
 			 y, -z,  x,
 			 y, -z, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_irp);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_irp);
 	if (b)
 	{
 		GLfloat ca0_irp[] = {
@@ -4715,9 +4709,8 @@ void GLWidget::raycast_cube_IRP(
 					0.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 1.0f };
-
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_irp);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_irp);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4727,26 +4720,26 @@ void GLWidget::raycast_cube_ILP(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_ilp[] = {
-			-y,  z, x,
-			-y, -z, x,
-			 y,  z, x,
-			 y, -z, x,
+			-y,  z,  x,
+			-y, -z,  x,
+			 y,  z,  x,
+			 y, -z,  x,
 			 y,  z, -x,
 			 y, -z, -x,
 			-y,  z, -x,
 			-y, -z, -x,
-			-y,  z, x,
-			-y, -z, x,
-			-y, z, -x,
-			-y, z,  x,
-			 y, z, -x,
-			 y, z,  x,
+			-y,  z,  x,
+			-y, -z,  x,
+			-y,  z, -x,
+			-y,  z,  x,
+			 y,  z, -x,
+			 y,  z,  x,
 			-y, -z,  x,
 			-y, -z, -x,
 			 y, -z,  x,
 			 y, -z, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ilp);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_ilp);
 	if (b)
 	{
 		GLfloat ca0_ilp[] = {
@@ -4768,9 +4761,8 @@ void GLWidget::raycast_cube_ILP(
 					0.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 1.0f };
-
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ilp);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_ilp);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4780,26 +4772,26 @@ void GLWidget::raycast_cube_SRP(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_srp[] = {
-			-y,  z, x,
-			-y, -z, x,
-			 y,  z, x,
-			 y, -z, x,
+			-y,  z,  x,
+			-y, -z,  x,
+			 y,  z,  x,
+			 y, -z,  x,
 			 y,  z, -x,
 			 y, -z, -x,
 			-y,  z, -x,
 			-y, -z, -x,
-			-y,  z, x,
-			-y, -z, x,
-			-y, z, -x,
-			-y, z,  x,
-			 y, z, -x,
-			 y, z,  x,
+			-y,  z,  x,
+			-y, -z,  x,
+			-y,  z, -x,
+			-y,  z,  x,
+			 y,  z, -x,
+			 y,  z,  x,
 			-y, -z,  x,
 			-y, -z, -x,
 			 y, -z,  x,
 			 y, -z, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_srp);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_srp);
 	if (b)
 	{
 		GLfloat ca0_srp[] = {
@@ -4821,9 +4813,8 @@ void GLWidget::raycast_cube_SRP(
 					1.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 1.0f };
-
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_srp);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_srp);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4833,26 +4824,26 @@ void GLWidget::raycast_cube_SLP(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_slp[] = {
-			-y,  z, x,
-			-y, -z, x,
-			 y,  z, x,
-			 y, -z, x,
+			-y,  z,  x,
+			-y, -z,  x,
+			 y,  z,  x,
+			 y, -z,  x,
 			 y,  z, -x,
 			 y, -z, -x,
 			-y,  z, -x,
 			-y, -z, -x,
-			-y,  z, x,
-			-y, -z, x,
-			-y, z, -x,
-			-y, z,  x,
-			 y, z, -x,
-			 y, z,  x,
+			-y,  z,  x,
+			-y, -z,  x,
+			-y,  z, -x,
+			-y,  z,  x,
+			 y,  z, -x,
+			 y,  z,  x,
 			-y, -z,  x,
 			-y, -z, -x,
 			 y, -z,  x,
 			 y, -z, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_slp);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_slp);
 	if (b)
 	{
 		GLfloat ca0_slp[] = {
@@ -4874,9 +4865,8 @@ void GLWidget::raycast_cube_SLP(
 					1.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 1.0f };
-
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_slp);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_slp);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4886,26 +4876,26 @@ void GLWidget::raycast_cube_IRA(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_ira[] = {
-			-y,  z, x,
-			-y, -z, x,
-			 y,  z, x,
-			 y, -z, x,
+			-y,  z,  x,
+			-y, -z,  x,
+			 y,  z,  x,
+			 y, -z,  x,
 			 y,  z, -x,
 			 y, -z, -x,
 			-y,  z, -x,
 			-y, -z, -x,
-			-y,  z, x,
-			-y, -z, x,
-			-y, z, -x,
-			-y, z,  x,
-			 y, z, -x,
-			 y, z,  x,
+			-y,  z,  x,
+			-y, -z,  x,
+			-y,  z, -x,
+			-y,  z,  x,
+			 y,  z, -x,
+			 y,  z,  x,
 			-y, -z,  x,
 			-y, -z, -x,
 			 y, -z,  x,
 			 y, -z, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ira);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_ira);
 	if (b)
 	{
 		GLfloat ca0_ira[] = {
@@ -4928,7 +4918,7 @@ void GLWidget::raycast_cube_IRA(
 					1.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ira);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_ira);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4938,26 +4928,26 @@ void GLWidget::raycast_cube_ILA(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_ila[] = {
-			-y,  z, x,
-			-y, -z, x,
-			 y,  z, x,
-			 y, -z, x,
+			-y,  z,  x,
+			-y, -z,  x,
+			 y,  z,  x,
+			 y, -z,  x,
 			 y,  z, -x,
 			 y, -z, -x,
 			-y,  z, -x,
 			-y, -z, -x,
-			-y,  z, x,
-			-y, -z, x,
-			-y, z, -x,
-			-y, z,  x,
-			 y, z, -x,
-			 y, z,  x,
+			-y,  z,  x,
+			-y, -z,  x,
+			-y,  z, -x,
+			-y,  z,  x,
+			 y,  z, -x,
+			 y,  z,  x,
 			-y, -z,  x,
 			-y, -z, -x,
 			 y, -z,  x,
 			 y, -z, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ila);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_ila);
 	if (b)
 	{
 		GLfloat ca0_ila[] = {
@@ -4980,7 +4970,7 @@ void GLWidget::raycast_cube_ILA(
 					1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ila);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_ila);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -4990,26 +4980,26 @@ void GLWidget::raycast_cube_SRA(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_sra[] = {
-			-y,  z, x,
-			-y, -z, x,
-			 y,  z, x,
-			 y, -z, x,
+			-y,  z,  x,
+			-y, -z,  x,
+			 y,  z,  x,
+			 y, -z,  x,
 			 y,  z, -x,
 			 y, -z, -x,
 			-y,  z, -x,
 			-y, -z, -x,
-			-y,  z, x,
-			-y, -z, x,
-			-y, z, -x,
-			-y, z,  x,
-			 y, z, -x,
-			 y, z,  x,
+			-y,  z,  x,
+			-y, -z,  x,
+			-y,  z, -x,
+			-y,  z,  x,
+			 y,  z, -x,
+			 y,  z,  x,
 			-y, -z,  x,
 			-y, -z, -x,
 			 y, -z,  x,
 			 y, -z, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_sra);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_sra);
 	if (b)
 	{
 		GLfloat ca0_sra[] = {
@@ -5032,7 +5022,7 @@ void GLWidget::raycast_cube_SRA(
 					0.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_sra);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_sra);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5042,26 +5032,26 @@ void GLWidget::raycast_cube_SLA(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_sla[] = {
-			-y,  z, x,
-			-y, -z, x,
-			 y,  z, x,
-			 y, -z, x,
+			-y,  z,  x,
+			-y, -z,  x,
+			 y,  z,  x,
+			 y, -z,  x,
 			 y,  z, -x,
 			 y, -z, -x,
 			-y,  z, -x,
 			-y, -z, -x,
-			-y,  z, x,
-			-y, -z, x,
-			-y, z, -x,
-			-y, z,  x,
-			 y, z, -x,
-			 y, z,  x,
+			-y,  z,  x,
+			-y, -z,  x,
+			-y,  z, -x,
+			-y,  z,  x,
+			 y,  z, -x,
+			 y,  z,  x,
 			-y, -z,  x,
 			-y, -z, -x,
 			 y, -z,  x,
 			 y, -z, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_sla);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_sla);
 	if (b)
 	{
 		GLfloat ca0_sla[] = {
@@ -5084,7 +5074,7 @@ void GLWidget::raycast_cube_SLA(
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_sla);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_sla);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5094,26 +5084,26 @@ void GLWidget::raycast_cube_RPI(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_rpi[] = {
-			-x,  y, z,
-			-x, -y, z,
-			 x,  y, z,
-			 x, -y, z,
+			-x,  y,  z,
+			-x, -y,  z,
+			 x,  y,  z,
+			 x, -y,  z,
 			 x,  y, -z,
 			 x, -y, -z,
 			-x,  y, -z,
 			-x, -y, -z,
-			-x,  y, z,
-			-x, -y, z,
-			-x, y, -z,
-			-x, y,  z,
-			 x, y, -z,
-			 x, y,  z,
+			-x,  y,  z,
+			-x, -y,  z,
+			-x,  y, -z,
+			-x,  y,  z,
+			 x,  y, -z,
+			 x,  y,  z,
 			-x, -y,  z,
 			-x, -y, -z,
 			 x, -y,  z,
 			 x, -y, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_rpi);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_rpi);
 	if (b)
 	{
 		GLfloat ca0_rpi[] = {
@@ -5136,7 +5126,7 @@ void GLWidget::raycast_cube_RPI(
 					1.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_rpi);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_rpi);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5146,26 +5136,26 @@ void GLWidget::raycast_cube_LPI(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_lpi[] = {
-			-x,  y, z,
-			-x, -y, z,
-			 x,  y, z,
-			 x, -y, z,
+			-x,  y,  z,
+			-x, -y,  z,
+			 x,  y,  z,
+			 x, -y,  z,
 			 x,  y, -z,
 			 x, -y, -z,
 			-x,  y, -z,
 			-x, -y, -z,
-			-x,  y, z,
-			-x, -y, z,
-			-x, y, -z,
-			-x, y,  z,
-			 x, y, -z,
-			 x, y,  z,
+			-x,  y,  z,
+			-x, -y,  z,
+			-x,  y, -z,
+			-x,  y,  z,
+			 x,  y, -z,
+			 x,  y,  z,
 			-x, -y,  z,
 			-x, -y, -z,
 			 x, -y,  z,
 			 x, -y, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_lpi);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_lpi);
 	if (b)
 	{
 		GLfloat ca0_lpi[] = {
@@ -5188,7 +5178,7 @@ void GLWidget::raycast_cube_LPI(
 					0.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_lpi);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_lpi);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5198,26 +5188,26 @@ void GLWidget::raycast_cube_RAI(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_rai[] = {
-			-x,  y, z,
-			-x, -y, z,
-			 x,  y, z,
-			 x, -y, z,
+			-x,  y,  z,
+			-x, -y,  z,
+			 x,  y,  z,
+			 x, -y,  z,
 			 x,  y, -z,
 			 x, -y, -z,
 			-x,  y, -z,
 			-x, -y, -z,
-			-x,  y, z,
-			-x, -y, z,
-			-x, y, -z,
-			-x, y,  z,
-			 x, y, -z,
-			 x, y,  z,
+			-x,  y,  z,
+			-x, -y,  z,
+			-x,  y, -z,
+			-x,  y,  z,
+			 x,  y, -z,
+			 x,  y,  z,
 			-x, -y,  z,
 			-x, -y, -z,
 			 x, -y,  z,
 			 x, -y, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_rai);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_rai);
 	if (b)
 	{
 		GLfloat ca0_rai[] = {
@@ -5240,7 +5230,7 @@ void GLWidget::raycast_cube_RAI(
 					1.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_rai);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_rai);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5250,26 +5240,26 @@ void GLWidget::raycast_cube_LAI(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_lai[] = {
-			-x,  y, z,
-			-x, -y, z,
-			 x,  y, z,
-			 x, -y, z,
+			-x,  y,  z,
+			-x, -y,  z,
+			 x,  y,  z,
+			 x, -y,  z,
 			 x,  y, -z,
 			 x, -y, -z,
 			-x,  y, -z,
 			-x, -y, -z,
-			-x,  y, z,
-			-x, -y, z,
-			-x, y, -z,
-			-x, y,  z,
-			 x, y, -z,
-			 x, y,  z,
+			-x,  y,  z,
+			-x, -y,  z,
+			-x,  y, -z,
+			-x,  y,  z,
+			 x,  y, -z,
+			 x,  y,  z,
 			-x, -y,  z,
 			-x, -y, -z,
 			 x, -y,  z,
 			 x, -y, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_lai);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_lai);
 	if (b)
 	{
 		GLfloat ca0_lai[] = {
@@ -5292,7 +5282,7 @@ void GLWidget::raycast_cube_LAI(
 					0.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_lai);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_lai);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5302,26 +5292,26 @@ void GLWidget::raycast_cube_RPS(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_rps[] = {
-			-x,  y, z,
-			-x, -y, z,
-			 x,  y, z,
-			 x, -y, z,
+			-x,  y,  z,
+			-x, -y,  z,
+			 x,  y,  z,
+			 x, -y,  z,
 			 x,  y, -z,
 			 x, -y, -z,
 			-x,  y, -z,
 			-x, -y, -z,
-			-x,  y, z,
-			-x, -y, z,
-			-x, y, -z,
-			-x, y,  z,
-			 x, y, -z,
-			 x, y,  z,
+			-x,  y,  z,
+			-x, -y,  z,
+			-x,  y, -z,
+			-x,  y,  z,
+			 x,  y, -z,
+			 x,  y,  z,
 			-x, -y,  z,
 			-x, -y, -z,
 			 x, -y,  z,
 			 x, -y, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_rps);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_rps);
 	if (b)
 	{
 		GLfloat ca0_rps[] = {
@@ -5344,7 +5334,7 @@ void GLWidget::raycast_cube_RPS(
 					1.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_rps);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_rps);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5354,26 +5344,26 @@ void GLWidget::raycast_cube_LPS(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_lps[] = {
-			-x,  y, z,
-			-x, -y, z,
-			 x,  y, z,
-			 x, -y, z,
+			-x,  y,  z,
+			-x, -y,  z,
+			 x,  y,  z,
+			 x, -y,  z,
 			 x,  y, -z,
 			 x, -y, -z,
 			-x,  y, -z,
 			-x, -y, -z,
-			-x,  y, z,
-			-x, -y, z,
-			-x, y, -z,
-			-x, y,  z,
-			 x, y, -z,
-			 x, y,  z,
+			-x,  y,  z,
+			-x, -y,  z,
+			-x,  y, -z,
+			-x,  y,  z,
+			 x,  y, -z,
+			 x,  y,  z,
 			-x, -y,  z,
 			-x, -y, -z,
 			 x, -y,  z,
 			 x, -y, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_lps);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_lps);
 	if (b)
 	{
 		GLfloat ca0_lps[] = {
@@ -5396,7 +5386,7 @@ void GLWidget::raycast_cube_LPS(
 					0.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_lps);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_lps);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5406,26 +5396,26 @@ void GLWidget::raycast_cube_RAS(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_ras[] = {
-			-x,  y, z,
-			-x, -y, z,
-			 x,  y, z,
-			 x, -y, z,
+			-x,  y,  z,
+			-x, -y,  z,
+			 x,  y,  z,
+			 x, -y,  z,
 			 x,  y, -z,
 			 x, -y, -z,
 			-x,  y, -z,
 			-x, -y, -z,
-			-x,  y, z,
-			-x, -y, z,
-			-x, y, -z,
-			-x, y,  z,
-			 x, y, -z,
-			 x, y,  z,
+			-x,  y,  z,
+			-x, -y,  z,
+			-x,  y, -z,
+			-x,  y,  z,
+			 x,  y, -z,
+			 x,  y,  z,
 			-x, -y,  z,
 			-x, -y, -z,
 			 x, -y,  z,
 			 x, -y, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ras);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_ras);
 	if (b)
 	{
 		GLfloat ca0_ras[] = {
@@ -5448,7 +5438,7 @@ void GLWidget::raycast_cube_RAS(
 					1.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ras);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_ras);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5458,26 +5448,26 @@ void GLWidget::raycast_cube_LAS(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_las[] = {
-			-x,  y, z,
-			-x, -y, z,
-			 x,  y, z,
-			 x, -y, z,
+			-x,  y,  z,
+			-x, -y,  z,
+			 x,  y,  z,
+			 x, -y,  z,
 			 x,  y, -z,
 			 x, -y, -z,
 			-x,  y, -z,
 			-x, -y, -z,
-			-x,  y, z,
-			-x, -y, z,
-			-x, y, -z,
-			-x, y,  z,
-			 x, y, -z,
-			 x, y,  z,
+			-x,  y,  z,
+			-x, -y,  z,
+			-x,  y, -z,
+			-x,  y,  z,
+			 x,  y, -z,
+			 x,  y,  z,
 			-x, -y,  z,
 			-x, -y, -z,
 			 x, -y,  z,
 			 x, -y, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_las);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_las);
 	if (b)
 	{
 		GLfloat ca0_las[] = {
@@ -5500,7 +5490,7 @@ void GLWidget::raycast_cube_LAS(
 					0.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_las);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_las);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5510,26 +5500,26 @@ void GLWidget::raycast_cube_PRI(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_pri[] = {
-			-y,  x, z,
-			-y, -x, z,
-			 y,  x, z,
-			 y, -x, z,
+			-y,  x,  z,
+			-y, -x,  z,
+			 y,  x,  z,
+			 y, -x,  z,
 			 y,  x, -z,
 			 y, -x, -z,
 			-y,  x, -z,
 			-y, -x, -z,
-			-y,  x, z,
-			-y, -x, z,
-			-y, x, -z,
-			-y, x,  z,
-			 y, x, -z,
-			 y, x,  z,
+			-y,  x,  z,
+			-y, -x,  z,
+			-y,  x, -z,
+			-y,  x,  z,
+			 y,  x, -z,
+			 y,  x,  z,
 			-y, -x,  z,
 			-y, -x, -z,
 			 y, -x,  z,
 			 y, -x, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_pri);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_pri);
 	if (b)
 	{
 		GLfloat ca0_pri[] = {
@@ -5552,7 +5542,7 @@ void GLWidget::raycast_cube_PRI(
 					1.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_pri);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_pri);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5562,26 +5552,26 @@ void GLWidget::raycast_cube_PLI(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_pli[] = {
-			-y,  x, z,
-			-y, -x, z,
-			 y,  x, z,
-			 y, -x, z,
+			-y,  x,  z,
+			-y, -x,  z,
+			 y,  x,  z,
+			 y, -x,  z,
 			 y,  x, -z,
 			 y, -x, -z,
 			-y,  x, -z,
 			-y, -x, -z,
-			-y,  x, z,
-			-y, -x, z,
-			-y, x, -z,
-			-y, x,  z,
-			 y, x, -z,
-			 y, x,  z,
+			-y,  x,  z,
+			-y, -x,  z,
+			-y,  x, -z,
+			-y,  x,  z,
+			 y,  x, -z,
+			 y,  x,  z,
 			-y, -x,  z,
 			-y, -x, -z,
 			 y, -x,  z,
 			 y, -x, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_pli);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_pli);
 	if (b)
 	{
 		GLfloat ca0_pli[] = {
@@ -5604,7 +5594,7 @@ void GLWidget::raycast_cube_PLI(
 					1.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_pli);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_pli);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5614,26 +5604,26 @@ void GLWidget::raycast_cube_ARI(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_ari[] = {
-			-y,  x, z,
-			-y, -x, z,
-			 y,  x, z,
-			 y, -x, z,
+			-y,  x,  z,
+			-y, -x,  z,
+			 y,  x,  z,
+			 y, -x,  z,
 			 y,  x, -z,
 			 y, -x, -z,
 			-y,  x, -z,
 			-y, -x, -z,
-			-y,  x, z,
-			-y, -x, z,
-			-y, x, -z,
-			-y, x,  z,
-			 y, x, -z,
-			 y, x,  z,
+			-y,  x,  z,
+			-y, -x,  z,
+			-y,  x, -z,
+			-y,  x,  z,
+			 y,  x, -z,
+			 y,  x,  z,
 			-y, -x,  z,
 			-y, -x, -z,
 			 y, -x,  z,
 			 y, -x, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ari);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_ari);
 	if (b)
 	{
 		GLfloat ca0_ari[] = {
@@ -5656,7 +5646,7 @@ void GLWidget::raycast_cube_ARI(
 					0.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ari);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_ari);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5666,26 +5656,26 @@ void GLWidget::raycast_cube_ALI(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_ali[] = {
-			-y,  x, z,
-			-y, -x, z,
-			 y,  x, z,
-			 y, -x, z,
+			-y,  x,  z,
+			-y, -x,  z,
+			 y,  x,  z,
+			 y, -x,  z,
 			 y,  x, -z,
 			 y, -x, -z,
 			-y,  x, -z,
 			-y, -x, -z,
-			-y,  x, z,
-			-y, -x, z,
-			-y, x, -z,
-			-y, x,  z,
-			 y, x, -z,
-			 y, x,  z,
+			-y,  x,  z,
+			-y, -x,  z,
+			-y,  x, -z,
+			-y,  x,  z,
+			 y,  x, -z,
+			 y,  x,  z,
 			-y, -x,  z,
 			-y, -x, -z,
 			 y, -x,  z,
 			 y, -x, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ali);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_ali);
 	if (b)
 	{
 		GLfloat ca0_ali[] = {
@@ -5708,7 +5698,7 @@ void GLWidget::raycast_cube_ALI(
 					0.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ali);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_ali);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5718,26 +5708,26 @@ void GLWidget::raycast_cube_PRS(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_prs[] = {
-			-y,  x, z,
-			-y, -x, z,
-			 y,  x, z,
-			 y, -x, z,
+			-y,  x,  z,
+			-y, -x,  z,
+			 y,  x,  z,
+			 y, -x,  z,
 			 y,  x, -z,
 			 y, -x, -z,
 			-y,  x, -z,
 			-y, -x, -z,
-			-y,  x, z,
-			-y, -x, z,
-			-y, x, -z,
-			-y, x,  z,
-			 y, x, -z,
-			 y, x,  z,
+			-y,  x,  z,
+			-y, -x,  z,
+			-y,  x, -z,
+			-y,  x,  z,
+			 y,  x, -z,
+			 y,  x,  z,
 			-y, -x,  z,
 			-y, -x, -z,
 			 y, -x,  z,
 			 y, -x, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_prs);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_prs);
 	if (b)
 	{
 		GLfloat ca0_prs[] = {
@@ -5760,7 +5750,7 @@ void GLWidget::raycast_cube_PRS(
 					1.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_prs);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_prs);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5770,26 +5760,26 @@ void GLWidget::raycast_cube_PLS(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_pls[] = {
-			-y,  x, z,
-			-y, -x, z,
-			 y,  x, z,
-			 y, -x, z,
+			-y,  x,  z,
+			-y, -x,  z,
+			 y,  x,  z,
+			 y, -x,  z,
 			 y,  x, -z,
 			 y, -x, -z,
 			-y,  x, -z,
 			-y, -x, -z,
-			-y,  x, z,
-			-y, -x, z,
-			-y, x, -z,
-			-y, x,  z,
-			 y, x, -z,
-			 y, x,  z,
+			-y,  x,  z,
+			-y, -x,  z,
+			-y,  x, -z,
+			-y,  x,  z,
+			 y,  x, -z,
+			 y,  x,  z,
 			-y, -x,  z,
 			-y, -x, -z,
 			 y, -x,  z,
 			 y, -x, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_pls);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_pls);
 	if (b)
 	{
 		GLfloat ca0_pls[] = {
@@ -5812,7 +5802,7 @@ void GLWidget::raycast_cube_PLS(
 					1.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_pls);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_pls);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5822,26 +5812,26 @@ void GLWidget::raycast_cube_ARS(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_ars[] = {
-			-y,  x, z,
-			-y, -x, z,
-			 y,  x, z,
-			 y, -x, z,
+			-y,  x,  z,
+			-y, -x,  z,
+			 y,  x,  z,
+			 y, -x,  z,
 			 y,  x, -z,
 			 y, -x, -z,
 			-y,  x, -z,
 			-y, -x, -z,
-			-y,  x, z,
-			-y, -x, z,
-			-y, x, -z,
-			-y, x,  z,
-			 y, x, -z,
-			 y, x,  z,
+			-y,  x,  z,
+			-y, -x,  z,
+			-y,  x, -z,
+			-y,  x,  z,
+			 y,  x, -z,
+			 y,  x,  z,
 			-y, -x,  z,
 			-y, -x, -z,
 			 y, -x,  z,
 			 y, -x, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ars);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_ars);
 	if (b)
 	{
 		GLfloat ca0_ars[] = {
@@ -5864,7 +5854,7 @@ void GLWidget::raycast_cube_ARS(
 					0.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ars);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_ars);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5874,26 +5864,26 @@ void GLWidget::raycast_cube_ALS(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_als[] = {
-			-y,  x, z,
-			-y, -x, z,
-			 y,  x, z,
-			 y, -x, z,
+			-y,  x,  z,
+			-y, -x,  z,
+			 y,  x,  z,
+			 y, -x,  z,
 			 y,  x, -z,
 			 y, -x, -z,
 			-y,  x, -z,
 			-y, -x, -z,
-			-y,  x, z,
-			-y, -x, z,
-			-y, x, -z,
-			-y, x,  z,
-			 y, x, -z,
-			 y, x,  z,
+			-y,  x,  z,
+			-y, -x,  z,
+			-y,  x, -z,
+			-y,  x,  z,
+			 y,  x, -z,
+			 y,  x,  z,
 			-y, -x,  z,
 			-y, -x, -z,
 			 y, -x,  z,
 			 y, -x, -z };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_als);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_als);
 	if (b)
 	{
 		GLfloat ca0_als[] = {
@@ -5916,7 +5906,7 @@ void GLWidget::raycast_cube_ALS(
 					0.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_als);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_als);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5926,26 +5916,26 @@ void GLWidget::raycast_cube_IPR(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_ipr[] = {
-			-z,  y, x,
-			-z, -y, x,
-			 z,  y, x,
-			 z, -y, x,
+			-z,  y,  x,
+			-z, -y,  x,
+			 z,  y,  x,
+			 z, -y,  x,
 			 z,  y, -x,
 			 z, -y, -x,
 			-z,  y, -x,
 			-z, -y, -x,
-			-z,  y, x,
-			-z, -y, x,
-			-z, y, -x,
-			-z, y,  x,
-			 z, y, -x,
-			 z, y,  x,
+			-z,  y,  x,
+			-z, -y,  x,
+			-z,  y, -x,
+			-z,  y,  x,
+			 z,  y, -x,
+			 z,  y,  x,
 			-z, -y,  x,
 			-z, -y, -x,
 			 z, -y,  x,
 			 z, -y, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ipr);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_ipr);
 	if (b)
 	{
 		GLfloat ca0_ipr[] = {
@@ -5968,7 +5958,7 @@ void GLWidget::raycast_cube_IPR(
 					1.0f, 1.0f, 1.0f,
 					0.0f, 1.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ipr);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_ipr);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -5978,26 +5968,26 @@ void GLWidget::raycast_cube_SPR(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_spr[] = {
-			-z,  y, x,
-			-z, -y, x,
-			 z,  y, x,
-			 z, -y, x,
+			-z,  y,  x,
+			-z, -y,  x,
+			 z,  y,  x,
+			 z, -y,  x,
 			 z,  y, -x,
 			 z, -y, -x,
 			-z,  y, -x,
 			-z, -y, -x,
-			-z,  y, x,
-			-z, -y, x,
-			-z, y, -x,
-			-z, y,  x,
-			 z, y, -x,
-			 z, y,  x,
+			-z,  y,  x,
+			-z, -y,  x,
+			-z,  y, -x,
+			-z,  y,  x,
+			 z,  y, -x,
+			 z,  y,  x,
 			-z, -y,  x,
 			-z, -y, -x,
 			 z, -y,  x,
 			 z, -y, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_spr);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_spr);
 	if (b)
 	{
 		GLfloat ca0_spr[] = {
@@ -6020,7 +6010,7 @@ void GLWidget::raycast_cube_SPR(
 					0.0f, 1.0f, 1.0f,
 					1.0f, 1.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_spr);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_spr);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6030,26 +6020,26 @@ void GLWidget::raycast_cube_IAR(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_iar[] = {
-			-z,  y, x,
-			-z, -y, x,
-			 z,  y, x,
-			 z, -y, x,
+			-z,  y,  x,
+			-z, -y,  x,
+			 z,  y,  x,
+			 z, -y,  x,
 			 z,  y, -x,
 			 z, -y, -x,
 			-z,  y, -x,
 			-z, -y, -x,
-			-z,  y, x,
-			-z, -y, x,
-			-z, y, -x,
-			-z, y,  x,
-			 z, y, -x,
-			 z, y,  x,
+			-z,  y,  x,
+			-z, -y,  x,
+			-z,  y, -x,
+			-z,  y,  x,
+			 z,  y, -x,
+			 z,  y,  x,
 			-z, -y,  x,
 			-z, -y, -x,
 			 z, -y,  x,
 			 z, -y, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_iar);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_iar);
 	if (b)
 	{
 		GLfloat ca0_iar[] = {
@@ -6072,7 +6062,7 @@ void GLWidget::raycast_cube_IAR(
 					1.0f, 0.0f, 1.0f,
 					0.0f, 0.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_iar);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_iar);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6082,26 +6072,26 @@ void GLWidget::raycast_cube_SAR(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_sar[] = {
-			-z,  y, x,
-			-z, -y, x,
-			 z,  y, x,
-			 z, -y, x,
+			-z,  y,  x,
+			-z, -y,  x,
+			 z,  y,  x,
+			 z, -y,  x,
 			 z,  y, -x,
 			 z, -y, -x,
 			-z,  y, -x,
 			-z, -y, -x,
-			-z,  y, x,
-			-z, -y, x,
-			-z, y, -x,
-			-z, y,  x,
-			 z, y, -x,
-			 z, y,  x,
+			-z,  y,  x,
+			-z, -y,  x,
+			-z,  y, -x,
+			-z,  y,  x,
+			 z,  y, -x,
+			 z,  y,  x,
 			-z, -y,  x,
 			-z, -y, -x,
 			 z, -y,  x,
 			 z, -y, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_sar);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_sar);
 	if (b)
 	{
 		GLfloat ca0_sar[] = {
@@ -6124,7 +6114,7 @@ void GLWidget::raycast_cube_SAR(
 					0.0f, 0.0f, 1.0f,
 					1.0f, 0.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_sar);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_sar);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6134,26 +6124,26 @@ void GLWidget::raycast_cube_IPL(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_ipl[] = {
-			-z,  y, x,
-			-z, -y, x,
-			 z,  y, x,
-			 z, -y, x,
+			-z,  y,  x,
+			-z, -y,  x,
+			 z,  y,  x,
+			 z, -y,  x,
 			 z,  y, -x,
 			 z, -y, -x,
 			-z,  y, -x,
 			-z, -y, -x,
-			-z,  y, x,
-			-z, -y, x,
-			-z, y, -x,
-			-z, y,  x,
-			 z, y, -x,
-			 z, y,  x,
+			-z,  y,  x,
+			-z, -y,  x,
+			-z,  y, -x,
+			-z,  y,  x,
+			 z,  y, -x,
+			 z,  y,  x,
 			-z, -y,  x,
 			-z, -y, -x,
 			 z, -y,  x,
 			 z, -y, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ipl);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_ipl);
 	if (b)
 	{
 		GLfloat ca0_ipl[] = {
@@ -6176,7 +6166,7 @@ void GLWidget::raycast_cube_IPL(
 					1.0f, 1.0f, 0.0f,
 					0.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ipl);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_ipl);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6186,26 +6176,26 @@ void GLWidget::raycast_cube_SPL(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_spl[] = {
-			-z,  y, x,
-			-z, -y, x,
-			 z,  y, x,
-			 z, -y, x,
+			-z,  y,  x,
+			-z, -y,  x,
+			 z,  y,  x,
+			 z, -y,  x,
 			 z,  y, -x,
 			 z, -y, -x,
 			-z,  y, -x,
 			-z, -y, -x,
-			-z,  y, x,
-			-z, -y, x,
-			-z, y, -x,
-			-z, y,  x,
-			 z, y, -x,
-			 z, y,  x,
+			-z,  y,  x,
+			-z, -y,  x,
+			-z,  y, -x,
+			-z,  y,  x,
+			 z,  y, -x,
+			 z,  y,  x,
 			-z, -y,  x,
 			-z, -y, -x,
 			 z, -y,  x,
 			 z, -y, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_spl);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_spl);
 	if (b)
 	{
 		GLfloat ca0_spl[] = {
@@ -6228,7 +6218,7 @@ void GLWidget::raycast_cube_SPL(
 					0.0f, 1.0f, 0.0f,
 					1.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_spl);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_spl);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6238,26 +6228,26 @@ void GLWidget::raycast_cube_IAL(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_ial[] = {
-			-z,  y, x,
-			-z, -y, x,
-			 z,  y, x,
-			 z, -y, x,
+			-z,  y,  x,
+			-z, -y,  x,
+			 z,  y,  x,
+			 z, -y,  x,
 			 z,  y, -x,
 			 z, -y, -x,
 			-z,  y, -x,
 			-z, -y, -x,
-			-z,  y, x,
-			-z, -y, x,
-			-z, y, -x,
-			-z, y,  x,
-			 z, y, -x,
-			 z, y,  x,
+			-z,  y,  x,
+			-z, -y,  x,
+			-z,  y, -x,
+			-z,  y,  x,
+			 z,  y, -x,
+			 z,  y,  x,
 			-z, -y,  x,
 			-z, -y, -x,
 			 z, -y,  x,
 			 z, -y, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ial);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_ial);
 	if (b)
 	{
 		GLfloat ca0_ial[] = {
@@ -6280,7 +6270,7 @@ void GLWidget::raycast_cube_IAL(
 					1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ial);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_ial);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6290,26 +6280,26 @@ void GLWidget::raycast_cube_SAL(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_sal[] = {
-			-z,  y, x,
-			-z, -y, x,
-			 z,  y, x,
-			 z, -y, x,
+			-z,  y,  x,
+			-z, -y,  x,
+			 z,  y,  x,
+			 z, -y,  x,
 			 z,  y, -x,
 			 z, -y, -x,
 			-z,  y, -x,
 			-z, -y, -x,
-			-z,  y, x,
-			-z, -y, x,
-			-z, y, -x,
-			-z, y,  x,
-			 z, y, -x,
-			 z, y,  x,
+			-z,  y,  x,
+			-z, -y,  x,
+			-z,  y, -x,
+			-z,  y,  x,
+			 z,  y, -x,
+			 z,  y,  x,
 			-z, -y,  x,
 			-z, -y, -x,
 			 z, -y,  x,
 			 z, -y, -x };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_sal);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_sal);
 	if (b)
 	{
 		GLfloat ca0_sal[] = {
@@ -6332,7 +6322,7 @@ void GLWidget::raycast_cube_SAL(
 					0.0f, 0.0f, 0.0f,
 					1.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_sal);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_sal);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6342,26 +6332,26 @@ void GLWidget::raycast_cube_PIR(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_pir[] = {
-			-z,  x, y,
-			-z, -x, y,
-			 z,  x, y,
-			 z, -x, y,
+			-z,  x,  y,
+			-z, -x,  y,
+			 z,  x,  y,
+			 z, -x,  y,
 			 z,  x, -y,
 			 z, -x, -y,
 			-z,  x, -y,
 			-z, -x, -y,
-			-z,  x, y,
-			-z, -x, y,
-			-z, x, -y,
-			-z, x,  y,
-			 z, x, -y,
-			 z, x,  y,
+			-z,  x,  y,
+			-z, -x,  y,
+			-z,  x, -y,
+			-z,  x,  y,
+			 z,  x, -y,
+			 z,  x,  y,
 			-z, -x,  y,
 			-z, -x, -y,
 			 z, -x,  y,
 			 z, -x, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_pir);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_pir);
 	if (b)
 	{
 		GLfloat ca0_pir[] = {
@@ -6384,7 +6374,7 @@ void GLWidget::raycast_cube_PIR(
 					1.0f, 1.0f, 1.0f,
 					1.0f, 0.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_pir);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_pir);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6394,26 +6384,26 @@ void GLWidget::raycast_cube_PSR(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_psr[] = {
-			-z,  x, y,
-			-z, -x, y,
-			 z,  x, y,
-			 z, -x, y,
+			-z,  x,  y,
+			-z, -x,  y,
+			 z,  x,  y,
+			 z, -x,  y,
 			 z,  x, -y,
 			 z, -x, -y,
 			-z,  x, -y,
 			-z, -x, -y,
-			-z,  x, y,
-			-z, -x, y,
-			-z, x, -y,
-			-z, x,  y,
-			 z, x, -y,
-			 z, x,  y,
+			-z,  x,  y,
+			-z, -x,  y,
+			-z,  x, -y,
+			-z,  x,  y,
+			 z,  x, -y,
+			 z,  x,  y,
 			-z, -x,  y,
 			-z, -x, -y,
 			 z, -x,  y,
 			 z, -x, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_psr);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_psr);
 	if (b)
 	{
 		GLfloat ca0_psr[] = {
@@ -6436,7 +6426,7 @@ void GLWidget::raycast_cube_PSR(
 					1.0f, 0.0f, 1.0f,
 					1.0f, 1.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_psr);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_psr);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6446,26 +6436,26 @@ void GLWidget::raycast_cube_AIR(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_air[] = {
-			-z,  x, y,
-			-z, -x, y,
-			 z,  x, y,
-			 z, -x, y,
+			-z,  x,  y,
+			-z, -x,  y,
+			 z,  x,  y,
+			 z, -x,  y,
 			 z,  x, -y,
 			 z, -x, -y,
 			-z,  x, -y,
 			-z, -x, -y,
-			-z,  x, y,
-			-z, -x, y,
-			-z, x, -y,
-			-z, x,  y,
-			 z, x, -y,
-			 z, x,  y,
+			-z,  x,  y,
+			-z, -x,  y,
+			-z,  x, -y,
+			-z,  x,  y,
+			 z,  x, -y,
+			 z,  x,  y,
 			-z, -x,  y,
 			-z, -x, -y,
 			 z, -x,  y,
 			 z, -x, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_air);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_air);
 	if (b)
 	{
 		GLfloat ca0_air[] = {
@@ -6488,7 +6478,7 @@ void GLWidget::raycast_cube_AIR(
 					0.0f, 1.0f, 1.0f,
 					0.0f, 0.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_air);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_air);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6498,26 +6488,26 @@ void GLWidget::raycast_cube_ASR(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_asr[] = {
-			-z,  x, y,
-			-z, -x, y,
-			 z,  x, y,
-			 z, -x, y,
+			-z,  x,  y,
+			-z, -x,  y,
+			 z,  x,  y,
+			 z, -x,  y,
 			 z,  x, -y,
 			 z, -x, -y,
 			-z,  x, -y,
 			-z, -x, -y,
-			-z,  x, y,
-			-z, -x, y,
-			-z, x, -y,
-			-z, x,  y,
-			 z, x, -y,
-			 z, x,  y,
+			-z,  x,  y,
+			-z, -x,  y,
+			-z,  x, -y,
+			-z,  x,  y,
+			 z,  x, -y,
+			 z,  x,  y,
 			-z, -x,  y,
 			-z, -x, -y,
 			 z, -x,  y,
 			 z, -x, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_asr);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_asr);
 	if (b)
 	{
 		GLfloat ca0_asr[] = {
@@ -6540,7 +6530,7 @@ void GLWidget::raycast_cube_ASR(
 					0.0f, 0.0f, 1.0f,
 					0.0f, 1.0f, 1.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_asr);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_asr);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6550,26 +6540,26 @@ void GLWidget::raycast_cube_PIL(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_pil[] = {
-			-z,  x, y,
-			-z, -x, y,
-			 z,  x, y,
-			 z, -x, y,
+			-z,  x,  y,
+			-z, -x,  y,
+			 z,  x,  y,
+			 z, -x,  y,
 			 z,  x, -y,
 			 z, -x, -y,
 			-z,  x, -y,
 			-z, -x, -y,
-			-z,  x, y,
-			-z, -x, y,
-			-z, x, -y,
-			-z, x,  y,
-			 z, x, -y,
-			 z, x,  y,
+			-z,  x,  y,
+			-z, -x,  y,
+			-z,  x, -y,
+			-z,  x,  y,
+			 z,  x, -y,
+			 z,  x,  y,
 			-z, -x,  y,
 			-z, -x, -y,
 			 z, -x,  y,
 			 z, -x, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_pil);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_pil);
 	if (b)
 	{
 		GLfloat ca0_pil[] = {
@@ -6592,7 +6582,7 @@ void GLWidget::raycast_cube_PIL(
 					1.0f, 1.0f, 0.0f,
 					1.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_pil);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_pil);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6602,26 +6592,26 @@ void GLWidget::raycast_cube_PSL(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_psl[] = {
-			-z,  x, y,
-			-z, -x, y,
-			 z,  x, y,
-			 z, -x, y,
+			-z,  x,  y,
+			-z, -x,  y,
+			 z,  x,  y,
+			 z, -x,  y,
 			 z,  x, -y,
 			 z, -x, -y,
 			-z,  x, -y,
 			-z, -x, -y,
-			-z,  x, y,
-			-z, -x, y,
-			-z, x, -y,
-			-z, x,  y,
-			 z, x, -y,
-			 z, x,  y,
+			-z,  x,  y,
+			-z, -x,  y,
+			-z,  x, -y,
+			-z,  x,  y,
+			 z,  x, -y,
+			 z,  x,  y,
 			-z, -x,  y,
 			-z, -x, -y,
 			 z, -x,  y,
 			 z, -x, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_psl);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_psl);
 	if (b)
 	{
 		GLfloat ca0_psl[] = {
@@ -6644,7 +6634,7 @@ void GLWidget::raycast_cube_PSL(
 					1.0f, 0.0f, 0.0f,
 					1.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_psl);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_psl);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6654,26 +6644,26 @@ void GLWidget::raycast_cube_AIL(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_ail[] = {
-			-z,  x, y,
-			-z, -x, y,
-			 z,  x, y,
-			 z, -x, y,
+			-z,  x,  y,
+			-z, -x,  y,
+			 z,  x,  y,
+			 z, -x,  y,
 			 z,  x, -y,
 			 z, -x, -y,
 			-z,  x, -y,
 			-z, -x, -y,
-			-z,  x, y,
-			-z, -x, y,
-			-z, x, -y,
-			-z, x,  y,
-			 z, x, -y,
-			 z, x,  y,
+			-z,  x,  y,
+			-z, -x,  y,
+			-z,  x, -y,
+			-z,  x,  y,
+			 z,  x, -y,
+			 z,  x,  y,
 			-z, -x,  y,
 			-z, -x, -y,
 			 z, -x,  y,
 			 z, -x, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_ail);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_ail);
 	if (b)
 	{
 		GLfloat ca0_ail[] = {
@@ -6696,7 +6686,7 @@ void GLWidget::raycast_cube_AIL(
 					0.0f, 1.0f, 0.0f,
 					0.0f, 0.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_ail);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_ail);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6706,26 +6696,26 @@ void GLWidget::raycast_cube_ASL(
 	GLuint * vboid0, bool b)
 {
 	GLfloat va0_asl[] = {
-			-z,  x, y,
-			-z, -x, y,
-			 z,  x, y,
-			 z, -x, y,
+			-z,  x,  y,
+			-z, -x,  y,
+			 z,  x,  y,
+			 z, -x,  y,
 			 z,  x, -y,
 			 z, -x, -y,
 			-z,  x, -y,
 			-z, -x, -y,
-			-z,  x, y,
-			-z, -x, y,
-			-z, x, -y,
-			-z, x,  y,
-			 z, x, -y,
-			 z, x,  y,
+			-z,  x,  y,
+			-z, -x,  y,
+			-z,  x, -y,
+			-z,  x,  y,
+			 z,  x, -y,
+			 z,  x,  y,
 			-z, -x,  y,
 			-z, -x, -y,
 			 z, -x,  y,
 			 z, -x, -y };
 	glBindBuffer(GL_ARRAY_BUFFER, vboid0[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), va0_asl);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), va0_asl);
 	if (b)
 	{
 		GLfloat ca0_asl[] = {
@@ -6748,7 +6738,7 @@ void GLWidget::raycast_cube_ASL(
 					0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f };
 		glBindBuffer(GL_ARRAY_BUFFER, vboid0[1]);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, 54*sizeof(GLfloat), ca0_asl);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 54 * sizeof(GLfloat), ca0_asl);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -6827,7 +6817,7 @@ void GLWidget::d_orientcube(
 	glUniformMatrix4fv(s->shader->location_mvp, 1, GL_FALSE, mvp);
 	glUniform3fv(s->shader->location_sparams, 2, sparams);
 	glBindVertexArray(s->vaoid);
-	glDrawArrays(GL_TRIANGLES, 0, s->faces_size*3);
+	glDrawArrays(GL_TRIANGLES, 0, s->faces_size * 3);
 }
 
 void GLWidget::d_mesh(
@@ -6849,7 +6839,7 @@ void GLWidget::d_mesh(
 	glUniform3fv(s->shader->location_sparams, 2, sparams);
 	glUniform4fv(s->shader->location_K, 2, s->K);
 	glBindVertexArray(s->vaoid);
-	glDrawArrays(GL_TRIANGLES, 0, s->faces_size*3);
+	glDrawArrays(GL_TRIANGLES, 0, s->faces_size * 3);
 }
 
 void GLWidget::disable_gl_in_settings()
@@ -6862,7 +6852,7 @@ void GLWidget::disable_gl_in_settings()
 		QApplication::organizationName(),
 		QApplication::applicationName());
 	settings.beginGroup(QString("GlobalSettings"));
-	settings.setValue(QString("enable_gl_3D"), QVariant((int)0));
+	settings.setValue(QString("enable_gl_3D"), QVariant(0));
 	settings.endGroup();
 	settings.sync();
 #endif
@@ -6871,3 +6861,5 @@ void GLWidget::disable_gl_in_settings()
 #ifdef ALWAYS_SHOW_GL_ERROR
 #undef ALWAYS_SHOW_GL_ERROR
 #endif
+
+// clang-format on

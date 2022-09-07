@@ -1,6 +1,6 @@
 /*
-(C) mihail.isakov@googlemail.com 2008-2019
-*/
+ * (C) mihail.isakov@googlemail.com 2008-2022
+ */
 
 #ifndef CAMERA_H
 #define CAMERA_H
@@ -8,8 +8,8 @@
 ////////////////////////////////
 //
 //
-#define MAX_SHADOWS 1
-#define ENABLE_INVTRANS
+#define CAMERA_MAX_SHADOWS 1
+#define CAMERA_ENABLE_INVTRANS
 //
 //
 ////////////////////////////////
@@ -20,18 +20,14 @@
 #define CAMERA_R2D 57.2957795130823208767981548
 
 #ifdef DISABLE_SIMDMATH
-
 #include "vectormath/scalar/vectormath.h"
 #define VECTORMATH_ALIGNED(a) a
 #define VECTORMATH_ALIGNED_PRE
 #define VECTORMATH_ALIGNED_POST
 #define VECTORMATH_ALIGNED16_NEW()
-
 #else
-
 #include "vectormath/sse/vectormath.h"
-
-#endif // DISABLE_SIMDMATH
+#endif
 
 VECTORMATH_ALIGNED_PRE class Camera
 {
@@ -48,9 +44,9 @@ public:
 	Vectormath::Scalar::Matrix4 m_projection;
 	Vectormath::Scalar::Matrix4 m_inv_view;
 	Vectormath::Scalar::Quat m_trackball;
-	Vectormath::Scalar::Matrix4 m_light_mvp_scaled_biased[MAX_SHADOWS];
-	Vectormath::Scalar::Matrix4 m_light_modelview[MAX_SHADOWS];
-	Vectormath::Scalar::Matrix4 m_light_projection[MAX_SHADOWS];
+	Vectormath::Scalar::Matrix4 m_light_mvp_scaled_biased[CAMERA_MAX_SHADOWS];
+	Vectormath::Scalar::Matrix4 m_light_modelview[CAMERA_MAX_SHADOWS];
+	Vectormath::Scalar::Matrix4 m_light_projection[CAMERA_MAX_SHADOWS];
 	Vectormath::Scalar::Matrix4 m_scale_and_bias;
 #else
 	Vectormath::SSE::Point3 m_position;
@@ -60,9 +56,9 @@ public:
 	Vectormath::SSE::Matrix4 m_projection;
 	Vectormath::SSE::Matrix4 m_inv_view;
 	Vectormath::SSE::Quat m_trackball;
-	Vectormath::SSE::Matrix4 m_light_mvp_scaled_biased[MAX_SHADOWS];
-	Vectormath::SSE::Matrix4 m_light_modelview[MAX_SHADOWS];
-	Vectormath::SSE::Matrix4 m_light_projection[MAX_SHADOWS];
+	Vectormath::SSE::Matrix4 m_light_mvp_scaled_biased[CAMERA_MAX_SHADOWS];
+	Vectormath::SSE::Matrix4 m_light_modelview[CAMERA_MAX_SHADOWS];
+	Vectormath::SSE::Matrix4 m_light_projection[CAMERA_MAX_SHADOWS];
 	Vectormath::SSE::Matrix4 m_scale_and_bias;
 #endif
 	float m_heading;

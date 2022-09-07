@@ -26,14 +26,13 @@
 #include <QColor>
 #include <QString>
 
-#define SCENE_ORTHO_SIZE 150
-#define SCENE_POS_Z 400
-#define SCENE_FOV 45
-#define SCENE_FAR_PLANE 10000
-#define SCENE_ALPHA 1.0
+#define SCENE_ORTHO_SIZE 150.0f
+#define SCENE_POS_Z 400.0f
+#define SCENE_FOV 45.0f
+#define SCENE_FAR_PLANE 10000.0f
+#define SCENE_ALPHA 1.0f
 #define VBOIDS_SIZE 4
 #define TEXTURES_SIZE 8
-#define MAX_SHADOWS_ 1
 
 class ImageVariant;
 

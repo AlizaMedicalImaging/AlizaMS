@@ -1888,9 +1888,9 @@ double CommonUtils::random_range(
 
 QString CommonUtils::convert_orientation_flag(unsigned int in)
 {
-#if (ITK_VERSION_MAJOR >= 5 && ITK_VERSION_MINOR >= 3 && defined TMP_USE_53_SPATIAL_ENUMS)
 	switch (in)
 	{
+#if (ITK_VERSION_MAJOR >= 5 && ITK_VERSION_MINOR >= 3 && defined TMP_USE_53_SPATIAL_ENUMS)
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RIP):
 		return QString("RIP");
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LIP):
@@ -1987,12 +1987,7 @@ QString CommonUtils::convert_orientation_flag(unsigned int in)
 		return QString("AIL");
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ASL):
 		return QString("ASL");
-	default:
-		break;
-	}
 #else
-	switch (in)
-	{
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIP):
 		return QString("RIP");
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LIP):
@@ -2089,10 +2084,10 @@ QString CommonUtils::convert_orientation_flag(unsigned int in)
 		return QString("AIL");
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASL):
 		return QString("ASL");
+#endif
 	default:
 		break;
 	}
-#endif
 	return QString("");
 }
 

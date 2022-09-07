@@ -1,5 +1,9 @@
-#include <cstdlib>
+/*
+ * (C) mihail.isakov@googlemail.com 2008-2022
+ */
+
 #include "camera.h"
+#include <cmath>
 
 #ifdef DISABLE_SIMDMATH
 using namespace Vectormath::Scalar;
@@ -73,14 +77,14 @@ void Camera::reset()
 	m_projection = Matrix4::identity();
 	m_inv_view = Matrix4::identity();
 	m_trackball = Quat::identity();
-#ifdef ENABLE_INVTRANS
+#ifdef CAMERA_ENABLE_INVTRANS
 	m_inv_view = Matrix4::identity();
 #endif
 	m_heading = 0.0f;
 	m_pitch = 0.0f;
 	m_forward_vel = 0.0f;
 	m_side_vel = 0.0f;
-	for (unsigned int x = 0; x < MAX_SHADOWS; x++)
+	for (unsigned int x = 0; x < CAMERA_MAX_SHADOWS; x++)
 	{
 		m_light_mvp_scaled_biased[x] = Matrix4::identity();
 		m_light_modelview[x] = Matrix4::identity();
@@ -127,7 +131,7 @@ void Camera::look_at(
 	if (calculate_direction)
 		m_direction_vector = normalize(camera_target - m_position);
 
-#ifdef ENABLE_INVTRANS
+#ifdef CAMERA_ENABLE_INVTRANS
 	// calculate inverse of view matrix
 	const Matrix3 mbasis = m_view.getUpper3x3();
 	const Matrix3 mbasis_inverse = inverse(mbasis);
@@ -481,7 +485,7 @@ void Camera::set_viewer_matrix(float elapsed_time)
 
 	m_view = mres * mtransl;
 
-#ifdef ENABLE_INVTRANS
+#ifdef CAMERA_ENABLE_INVTRANS
 	// calculate inverse of view matrix
 	const Matrix3 mbasis = m_view.getUpper3x3();
 	const Matrix3 mbasis_inverse = inverse(mbasis);
@@ -575,13 +579,14 @@ void Camera::calculate_projective_matrix(
 	float * projective_matrix,
 	float * modeling)
 {
-	// calculate projective matrix =
-	// light mvp scaled and biased * object modeling matrix
+	// projective matrix = light mvp scaled and biased * object modeling matrix
 #if 1
-	// to silence Coverity warning
-	Matrix4 modeling_aos = Matrix4::identity();
-#else
 	Matrix4 modeling_aos;
+#else
+	// silence Coverity warning if vectormath's
+	// VECTORMATH_SSE_ALWAYS_INITIALIZE or VECTORMATH_SCALAR_ALWAYS_INITIALIZE
+	// is not set
+	Matrix4 modeling_aos = Matrix4::identity();
 #endif
 	float_to_matrix4(modeling, modeling_aos);
 	const Matrix4 projective_matrix_aos =
