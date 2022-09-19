@@ -1,9 +1,23 @@
+/*
+ * (C) mihail.isakov@googlemail.com
+ */
+
 #ifndef ALIGNED_ALLOCATOR__H
 #define ALIGNED_ALLOCATOR__H
 
+///////////////////////////////////////////////////////
+//
+//
+//
+//
 #define VECTORMATH_USE_CPP17_ALIGNED_ALLOC 0
+#define VECTORMATH_PRINT 0
+//
+//
+//
+//
+///////////////////////////////////////////////////////
 
-#include <cstdlib>
 #if defined(_MSC_VER)
 // Visual Studio
 #define VECTORMATH_ALIGNED(a) __declspec(align(16)) a
@@ -18,25 +32,34 @@
 #error "Define alignment for the compiler"
 #endif
 
-#if !(defined _MSC_VER && _MSC_VER >= 1400)
+#include <cstdlib>
+
 #if !(defined VECTORMATH_USE_CPP17_ALIGNED_ALLOC && VECTORMATH_USE_CPP17_ALIGNED_ALLOC == 1)
+#if !(defined _MSC_VER && _MSC_VER >= 1400)
 #include <cstdint>
 #endif
+#endif
+
+#if (defined VECTORMATH_PRINT && VECTORMATH_PRINT == 1)
+#include <iostream>
 #endif
 
 // The behavior is undefined if alignment is not a power of two
 static void * aligned__alloc__(size_t size, size_t alignment)
 {
-#if defined _MSC_VER && _MSC_VER >= 1400
-  return _aligned_malloc(size, alignment);
-#else
-#if defined VECTORMATH_USE_CPP17_ALIGNED_ALLOC && VECTORMATH_USE_CPP17_ALIGNED_ALLOC == 1
+#if (defined VECTORMATH_PRINT && VECTORMATH_PRINT == 1)
+  std::cout << "aligned__alloc__(" << size << ", " << alignment << ")" << std::endl;
+#endif
+#if (defined VECTORMATH_USE_CPP17_ALIGNED_ALLOC && VECTORMATH_USE_CPP17_ALIGNED_ALLOC == 1)
   return std::aligned_alloc(alignment, size);
+#else
+#if (defined _MSC_VER && _MSC_VER >= 1400)
+  return _aligned_malloc(size, alignment);
 #else
   const uintptr_t tmp0 = alignment - 1;
   const size_t    tmp1 = sizeof(void*) + tmp0;
   void * p = malloc(size + tmp1);
-  if (!p) return NULL;
+  if (!p) return nullptr;
   uintptr_t tmp2 = (uintptr_t)p + tmp1;
   tmp2 &= (~tmp0);
   void * ptr = (void*)tmp2;
@@ -48,11 +71,14 @@ static void * aligned__alloc__(size_t size, size_t alignment)
 
 static void aligned__free__(void * ptr)
 {
-#if defined _MSC_VER && _MSC_VER >= 1400
-  if (ptr) _aligned_free(ptr);
-#else
-#if defined VECTORMATH_USE_CPP17_ALIGNED_ALLOC && VECTORMATH_USE_CPP17_ALIGNED_ALLOC == 1
+#if (defined VECTORMATH_PRINT && VECTORMATH_PRINT == 1)
+  std::cout << "aligned__free__" << std::endl;
+#endif
+#if (defined VECTORMATH_USE_CPP17_ALIGNED_ALLOC && VECTORMATH_USE_CPP17_ALIGNED_ALLOC == 1)
   if (ptr) std::free(ptr);
+#else
+#if (defined _MSC_VER && _MSC_VER >= 1400)
+  if (ptr) _aligned_free(ptr);
 #else
   if (ptr) free(*((void**)ptr - 1));
 #endif
@@ -60,14 +86,13 @@ static void aligned__free__(void * ptr)
 }
 
 #define VECTORMATH_ALIGNED16_NEW() \
-inline void* operator new(size_t bytes) {return aligned__alloc__(bytes,16);} \
-inline void  operator delete(void* ptr) {aligned__free__(ptr);} \
-inline void* operator new(size_t, void* ptr) {return ptr; } \
-inline void  operator delete(void*, void*) {} \
-inline void* operator new[](size_t bytes) {return aligned__alloc__(bytes,16);} \
-inline void  operator delete[](void* ptr) {aligned__free__(ptr);} \
-inline void* operator new[](size_t, void* ptr) {return ptr;} \
-inline void  operator delete[](void*, void*) {}
+inline void* operator new(size_t bytes) noexcept { return aligned__alloc__(bytes,16); } \
+inline void  operator delete(void* ptr) noexcept { aligned__free__(ptr); } \
+inline void* operator new(size_t, void* ptr) noexcept { return ptr; } \
+inline void  operator delete(void*, void*) noexcept {} \
+inline void* operator new[](size_t bytes) noexcept { return aligned__alloc__(bytes,16); } \
+inline void  operator delete[](void* ptr) noexcept { aligned__free__(ptr); } \
+inline void* operator new[](size_t, void* ptr) noexcept { return ptr; } \
+inline void  operator delete[](void*, void*) noexcept {}
 
 #endif // ALIGNED_ALLOCATOR__H
-
