@@ -36,6 +36,7 @@
 #include <QIcon>
 #include <QSize>
 #include <QPoint>
+#include <QMutex>
 #include "zoomwidget.h"
 #include "aboutwidget.h"
 #include "browser/browserwidget2.h"
@@ -144,6 +145,8 @@ private:
 		QProgressDialog*,
 		bool/*lock*/);
 	void update_info_lines_bg();
+	//
+	mutable QMutex mutex;
 	//
 	QShortcut * close_sc;
 	QShortcut * open_sc;

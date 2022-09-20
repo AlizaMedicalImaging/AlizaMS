@@ -21,7 +21,6 @@
 
 #define DISABLE_LEFT_TOOLBAR__
 
-QMutex mutex;
 static bool init_done = false;
 
 MainWindow::MainWindow(

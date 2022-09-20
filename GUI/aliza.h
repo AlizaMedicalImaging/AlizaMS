@@ -40,6 +40,7 @@
 #include <QProgressDialog>
 #include <QTimer>
 #include <QTableWidgetItem>
+#include <QMutex>
 
 class Aliza : public QObject
 {
@@ -170,6 +171,11 @@ signals:
 	void image_opened();
 
 private:
+	// non-recursive
+	mutable QMutex mutex0; // scene images
+	mutable QMutex mutex2; // 2D animation
+	mutable QMutex mutex3; // 3D animation
+	//
 	GLWidget       * glwidget;
 	ImagesBox      * imagesbox;
 	ToolBox        * toolbox;

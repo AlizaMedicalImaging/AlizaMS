@@ -1,7 +1,6 @@
 //#define ALIZA_PRINT_COUNT_GL_OBJ
 
 #include "aliza.h"
-#include <QMutex>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QProcess>
@@ -33,11 +32,6 @@
 #ifndef WIN32
 #include <unistd.h>
 #endif
-
-// non-recursive
-static QMutex mutex0; // scene images
-static QMutex mutex2; // 2D animation
-static QMutex mutex3; // 3D animation
 
 static QMap<int, ImageVariant*> scene3dimages;
 static QList<ImageVariant*> selected_images;

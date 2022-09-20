@@ -23,7 +23,6 @@
 #include <QThread>
 #include <QPixmap>
 #include <QPainterPath>
-#include <QMutexLocker>
 #include "dicom/ultrasoundregiondata.h"
 #include "dicom/spectroscopydata.h"
 

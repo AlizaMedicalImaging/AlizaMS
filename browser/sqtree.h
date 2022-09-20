@@ -68,7 +68,7 @@ private:
 	bool skip_settings_pos;
 	QStringList list_of_files;
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-	QMutex mutex;
+	mutable QMutex mutex;
 #endif
 };
 

@@ -66,7 +66,7 @@ public:
 		const bool=false/*frame level, to avoid check map twice*/);
 	void clear_(bool=true);
 	void update_frames();
-	QMutex mutex;
+	mutable QMutex mutex;
 	ImageContainer image_container;
 	float get_offset_x();
 	float get_offset_y();

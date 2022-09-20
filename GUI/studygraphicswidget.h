@@ -55,7 +55,7 @@ public:
 		const short /*fit*/,
 		const bool /*lock*/);
 	void clear_(bool=true);
-	QMutex mutex;
+	mutable QMutex mutex;
 	ImageContainer image_container;
 	void  update_pr_area();
 	void  update_background_color();
