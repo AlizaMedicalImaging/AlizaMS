@@ -66,7 +66,6 @@ public:
 		const bool=false/*frame level, to avoid check map twice*/);
 	void clear_(bool=true);
 	void update_frames();
-	mutable QMutex mutex;
 	ImageContainer image_container;
 	float get_offset_x();
 	float get_offset_y();
@@ -140,6 +139,7 @@ private:
 	int    frame_time_unit;
 	int    frametime_2D;
 	double contours_width;
+	mutable     QMutex mutex;
 	QTimer    * anim2D_timer;
 	QLabel    * top_label;
 	QLabel    * left_label;

@@ -55,7 +55,6 @@ public:
 		const short /*fit*/,
 		const bool /*lock*/);
 	void clear_(bool=true);
-	mutable QMutex mutex;
 	ImageContainer image_container;
 	void  update_pr_area();
 	void  update_background_color();
@@ -85,6 +84,7 @@ protected:
 	void leaveEvent(QEvent*) override;
 
 private:
+	mutable QMutex mutex;
 	StudyViewWidget * studyview;
 	QSlider * slider;
 	QLabel  * top_label;
