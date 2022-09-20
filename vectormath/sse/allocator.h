@@ -5,6 +5,8 @@
 #ifndef ALIGNED_ALLOCATOR__H
 #define ALIGNED_ALLOCATOR__H
 
+// clang-format off
+
 ///////////////////////////////////////////////////////
 //
 //
@@ -33,13 +35,12 @@
 #endif
 
 #include <cstdlib>
-
+#include <new>
 #if !(defined VECTORMATH_USE_CPP17_ALIGNED_ALLOC && VECTORMATH_USE_CPP17_ALIGNED_ALLOC == 1)
 #if !(defined _MSC_VER && _MSC_VER >= 1400)
 #include <cstdint>
 #endif
 #endif
-
 #if (defined VECTORMATH_PRINT && VECTORMATH_PRINT == 1)
 #include <iostream>
 #endif
@@ -85,14 +86,56 @@ static void aligned__free__(void * ptr)
 #endif
 }
 
-#define VECTORMATH_ALIGNED16_NEW() \
-inline void* operator new(size_t bytes) noexcept { return aligned__alloc__(bytes,16); } \
-inline void  operator delete(void* ptr) noexcept { aligned__free__(ptr); } \
-inline void* operator new(size_t, void* ptr) noexcept { return ptr; } \
-inline void  operator delete(void*, void*) noexcept {} \
-inline void* operator new[](size_t bytes) noexcept { return aligned__alloc__(bytes,16); } \
-inline void  operator delete[](void* ptr) noexcept { aligned__free__(ptr); } \
-inline void* operator new[](size_t, void* ptr) noexcept { return ptr; } \
-inline void  operator delete[](void*, void*) noexcept {}
+/*
+ * Note: C++17 has new operators with appropriate arguments, e.g.
+ *
+ * void* operator new  (std::size_t count, std::align_val_t al);
+ * void* operator new[](std::size_t count, std::align_val_t al);
+ * void* operator new  (std::size_t count, std::align_val_t al, const std::nothrow_t&);
+ * void* operator new[](std::size_t count, std::align_val_t al, const std::nothrow_t&);
+ *
+ */
+
+#define VECTORMATH_ALIGNED16_NEW()                              \
+void * operator new(size_t b)                                   \
+{                                                               \
+  void * p = aligned__alloc__(b, 16);                           \
+  if (!p) throw std::bad_alloc();                               \
+  return p;                                                     \
+}                                                               \
+void * operator new[](size_t b)                                 \
+{                                                               \
+  void * p = aligned__alloc__(b, 16);                           \
+  if (!p) throw std::bad_alloc();                               \
+  return p;                                                     \
+}                                                               \
+void * operator new(size_t b, const std::nothrow_t&) noexcept   \
+{                                                               \
+  return aligned__alloc__(b, 16);                               \
+}                                                               \
+void * operator new[](size_t b, const std::nothrow_t&) noexcept \
+{                                                               \
+  return aligned__alloc__(b, 16);                               \
+}                                                               \
+void operator delete(void * p) noexcept                         \
+{                                                               \
+  aligned__free__(p);                                           \
+}                                                               \
+void operator delete[](void * p) noexcept                       \
+{                                                               \
+  aligned__free__(p);                                           \
+}                                                               \
+void * operator new(size_t, void * p) noexcept                  \
+{                                                               \
+  return p;                                                     \
+}                                                               \
+void * operator new[](size_t, void * p) noexcept                \
+{                                                               \
+  return p;                                                     \
+}                                                               \
+void operator delete(void *, void *) noexcept {}                \
+void operator delete[](void *, void *) noexcept {}
+
+// clang-format off
 
 #endif // ALIGNED_ALLOCATOR__H
