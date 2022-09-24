@@ -42,7 +42,6 @@
 #endif
 #endif
 #if (defined VECTORMATH_DEBUG_PRINT && VECTORMATH_DEBUG_PRINT == 1)
-#include <cstddef>
 #include <iostream>
 #endif
 
@@ -51,11 +50,8 @@
 inline void * vectormathAlignedAlloc(size_t size, size_t alignment)
 {
 #if (defined VECTORMATH_DEBUG_PRINT && VECTORMATH_DEBUG_PRINT == 1)
-// The default system alignment should be the size of the largest scalar,
-// usually 8 or 16.
   std::cout << "vectormathAlignedAlloc(" << size << ", " << alignment
-            << "), default alignment is " << alignof(std::max_align_t)
-            << std::endl;
+            << ")" << std::endl;
 #endif
 #if (defined VECTORMATH_CPP17_ALIGNED_ALLOC && VECTORMATH_CPP17_ALIGNED_ALLOC == 1)
   return std::aligned_alloc(alignment, size);
@@ -82,27 +78,21 @@ inline void vectormathAlignedFree(void * ptr)
   std::cout << "vectormathAlignedFree(" << reinterpret_cast<uintptr_t>(ptr) << ")"
             << std::endl;
 #endif
-#if (defined VECTORMATH_CPP17_ALIGNED_ALLOC && VECTORMATH_CPP17_ALIGNED_ALLOC == 1)
-// The 'not null' verification should be not required.
   if (ptr)
   {
+#if (defined VECTORMATH_CPP17_ALIGNED_ALLOC && VECTORMATH_CPP17_ALIGNED_ALLOC == 1)
+    // The 'not null' verification should be not required.
     std::free(ptr);
-  }
 #else
 #if (defined _MSC_VER && _MSC_VER >= 1400)
-// The 'not null' verification should be not required.
-  if (ptr)
-  {
+    // The 'not null' verification should be not required.
     _aligned_free(ptr);
-  }
 #else
-// The 'not null' verification is required.
-  if (ptr)
-  {
+    // The 'not null' verification is required.
     std::free(*(reinterpret_cast<void**>(ptr) - 1));
+#endif
+#endif
   }
-#endif
-#endif
 }
 
 /*

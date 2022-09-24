@@ -178,7 +178,14 @@ int main(int argc, char *argv[])
 		}
 		std::cout << "__cplusplus = " << __cplusplus;
 #if 1
-		std::cout << "\nDefault alignement = " << alignof(std::max_align_t);
+		std::cout << "\nalignof(std::max_align_t) = " << alignof(std::max_align_t)
+			<< "\n";
+#ifdef __STDCPP_DEFAULT_NEW_ALIGNMENT__
+		std::cout << "\n__STDCPP_DEFAULT_NEW_ALIGNMENT__ = "
+			<< __STDCPP_DEFAULT_NEW_ALIGNMENT__ << "\n";
+#else
+		std::cout << "__STDCPP_DEFAULT_NEW_ALIGNMENT__ is not defined\n";
+#endif
 #endif
 		enum { Va = (short)SHRT_MAX                } Ea;
 		enum { V0 = (unsigned short)USHRT_MAX      } E0;
