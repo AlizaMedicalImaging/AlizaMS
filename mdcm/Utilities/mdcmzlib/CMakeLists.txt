@@ -84,7 +84,7 @@ if(WIN32 AND BUILD_SHARED_LIBS AND NOT MINGW)
   list(APPEND ZLIB_SRCS win32/zlib1.rc)
 endif()
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 add_library(${ZLIB_LIBRARY_NAME} ${ZLIB_SRCS})
 set_target_properties(${ZLIB_LIBRARY_NAME} PROPERTIES LINKER_LANGUAGE C)
 
