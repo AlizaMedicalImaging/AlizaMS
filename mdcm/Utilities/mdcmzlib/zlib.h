@@ -1,7 +1,7 @@
 /* zlib.h -- interface of the 'zlib' general purpose compression library
-  version 1.2.11.1, January xxth, 2017
+  version 1.2.12.1, March xxth, 2022
 
-  Copyright (C) 1995-2017 Jean-loup Gailly and Mark Adler
+  Copyright (C) 1995-2022 Jean-loup Gailly and Mark Adler
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -37,11 +37,11 @@
 extern "C" {
 #endif
 
-#define ZLIB_VERSION "1.2.11.1-motley"
-#define ZLIB_VERNUM 0x12b1
+#define ZLIB_VERSION "1.2.12.1-motley"
+#define ZLIB_VERNUM 0x12c1
 #define ZLIB_VER_MAJOR 1
 #define ZLIB_VER_MINOR 2
-#define ZLIB_VER_REVISION 11
+#define ZLIB_VER_REVISION 12
 #define ZLIB_VER_SUBREVISION 1
 
 /*
@@ -276,7 +276,7 @@ ZEXTERN int ZEXPORT deflate OF((z_streamp strm, int flush));
   == 0), or after each call of deflate().  If deflate returns Z_OK and with
   zero avail_out, it must be called again after making room in the output
   buffer because there might be more output pending. See deflatePending(),
-  which can be used if desired to determine whether or not there is more ouput
+  which can be used if desired to determine whether or not there is more output
   in that case.
 
     Normally the parameter flush is set to Z_NO_FLUSH, which allows deflate to
@@ -660,7 +660,7 @@ ZEXTERN int ZEXPORT deflateGetDictionary OF((z_streamp strm,
    to dictionary.  dictionary must have enough space, where 32768 bytes is
    always enough.  If deflateGetDictionary() is called with dictionary equal to
    Z_NULL, then only the dictionary length is returned, and nothing is copied.
-   Similary, if dictLength is Z_NULL, then it is not set.
+   Similarly, if dictLength is Z_NULL, then it is not set.
 
      deflateGetDictionary() may return a length less than the window size, even
    when more than the window size in input has been provided. It may return up
@@ -915,7 +915,7 @@ ZEXTERN int ZEXPORT inflateGetDictionary OF((z_streamp strm,
    to dictionary.  dictionary must have enough space, where 32768 bytes is
    always enough.  If inflateGetDictionary() is called with dictionary equal to
    Z_NULL, then only the dictionary length is returned, and nothing is copied.
-   Similary, if dictLength is Z_NULL, then it is not set.
+   Similarly, if dictLength is Z_NULL, then it is not set.
 
      inflateGetDictionary returns Z_OK on success, or Z_STREAM_ERROR if the
    stream state is inconsistent.
@@ -1437,12 +1437,12 @@ ZEXTERN z_size_t ZEXPORT gzfread OF((voidp buf, z_size_t size, z_size_t nitems,
 
      In the event that the end of file is reached and only a partial item is
    available at the end, i.e. the remaining uncompressed data length is not a
-   multiple of size, then the final partial item is nevetheless read into buf
+   multiple of size, then the final partial item is nevertheless read into buf
    and the end-of-file flag is set.  The length of the partial item read is not
    provided, but could be inferred from the result of gztell().  This behavior
    is the same as the behavior of fread() implementations in common libraries,
    but it prevents the direct use of gzfread() to read a concurrently written
-   file, reseting and retrying on end-of-file, when size is not 1.
+   file, resetting and retrying on end-of-file, when size is not 1.
 */
 
 ZEXTERN int ZEXPORT gzwrite OF((gzFile file, voidpc buf, unsigned len));
@@ -1864,13 +1864,13 @@ ZEXTERN int ZEXPORT gzgetc_ OF((gzFile file));  /* backward compatibility */
 
 #if !defined(ZLIB_INTERNAL) && defined(Z_WANT64)
 #  ifdef Z_PREFIX_SET
-#    define mdcmz_gzopen z_gzopen64
-#    define mdcmz_gzseek z_gzseek64
-#    define mdcmz_gztell z_gztell64
-#    define mdcmz_gzoffset z_gzoffset64
-#    define mdcmz_adler32_combine z_adler32_combine64
-#    define mdcmz_crc32_combine z_crc32_combine64
-#    define mdcmz_crc32_combine_gen z_crc32_combine64_gen
+#    define mdcmz_gzopen mdcmz_gzopen64
+#    define mdcmz_gzseek mdcmz_gzseek64
+#    define mdcmz_gztell mdcmz_gztell64
+#    define mdcmz_gzoffset mdcmz_gzoffset64
+#    define mdcmz_adler32_combine mdcmz_adler32_combine64
+#    define mdcmz_crc32_combine mdcmz_crc32_combine64
+#    define mdcmz_crc32_combine_gen mdcmz_crc32_combine_gen64
 #  else
 #    define gzopen gzopen64
 #    define gzseek gzseek64

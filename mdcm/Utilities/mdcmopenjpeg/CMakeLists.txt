@@ -33,7 +33,7 @@ set(CMAKE_MODULE_PATH
     ${${OPENJPEG_NAMESPACE}_SOURCE_DIR}/cmake
     ${CMAKE_MODULE_PATH})
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 set(MANGLE_PREFIX ${MDCM_OPENJPEG_LIBRARIES})
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/lib/openjp2/openjpeg_mangle.h.in

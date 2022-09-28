@@ -373,34 +373,30 @@ include_directories(
 if(MDCM_USE_SYSTEM_CHARLS)
   include_directories(${CHARLS_INCLUDE_DIRS})
 else()
-  include_directories("${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities/mdcmcharls")
+  include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities/mdcmcharls")
 endif()
 
 if(MDCM_USE_SYSTEM_OPENJPEG)
   include_directories(${OPENJPEG_INCLUDE_DIRS})
 else()
-  include_directories(
+  include_directories(BEFORE
     "${CMAKE_CURRENT_BINARY_DIR}/mdcm/Utilities/mdcmopenjpeg"
     "${CMAKE_CURRENT_BINARY_DIR}/mdcm/Utilities/mdcmopenjpeg/src/lib/openjp2"
     "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities/mdcmopenjpeg/src/lib/openjp2")
 endif()
 
 if(NOT MDCM_USE_SYSTEM_ZLIB)
-  include_directories("${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities/mdcmzlib")
-  include_directories("${CMAKE_CURRENT_BINARY_DIR}/mdcm/Utilities/mdcmzlib")
+  include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities/mdcmzlib")
+  include_directories(BEFORE "${CMAKE_CURRENT_BINARY_DIR}/mdcm/Utilities/mdcmzlib")
 endif()
 
 if(MDCM_USE_SYSTEM_UUID)
   include_directories(${UUID_INCLUDE_DIR})
   set(MDCMUUID ${UUID_LIBRARIES})
 else()
-  include_directories("${CMAKE_CURRENT_BINARY_DIR}/mdcm/Utilities/mdcmuuid")
-  include_directories("${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities/mdcmuuid")
+  include_directories(BEFORE "${CMAKE_CURRENT_BINARY_DIR}/mdcm/Utilities/mdcmuuid")
+  include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities/mdcmuuid")
   set(MDCMUUID mdcmuuid)
-endif()
-
-if(NOT MDCM_USE_SYSTEM_ZLIB)
-  include_directories("${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities/mdcmzlib")
 endif()
 
 configure_file(
@@ -661,7 +657,7 @@ endif()
 set(ALIZAMS_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/common/structures.cpp ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
 
 if(NOT ALIZA_USE_SYSTEM_BULLET)
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/b)
+  include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/b)
   SET(BULLET_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/b/LinearMath/btAlignedAllocator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/b/LinearMath/btConvexHull.cpp

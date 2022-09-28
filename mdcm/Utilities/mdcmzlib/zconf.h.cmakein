@@ -61,9 +61,9 @@
 #  define deflate_copyright     mdcmz_deflate_copyright
 #  define get_crc_table         mdcmz_get_crc_table
 #  ifndef Z_SOLO
-#    define gmdcmz_error              mdcmz_gmdcmz_error
-#    define gmdcmz_intmax             mdcmz_gmdcmz_intmax
-#    define gmdcmz_strwinerror        mdcmz_gmdcmz_strwinerror
+#    define gz_error              mdcmz_gz_error
+#    define gz_intmax             mdcmz_gz_intmax
+#    define gz_strwinerror        mdcmz_gz_strwinerror
 #    define gzbuffer              mdcmz_gzbuffer
 #    define gzclearerr            mdcmz_gzclearerr
 #    define gzclose               mdcmz_gzclose
@@ -148,8 +148,8 @@
 #  ifndef Z_SOLO
 #    define gzFile                mdcmz_gzFile
 #  endif
-#  define gmdcmz_header             mdcmz_gmdcmz_header
-#  define gmdcmz_headerp            mdcmz_gmdcmz_headerp
+#  define gz_header             mdcmz_gz_header
+#  define gz_headerp            mdcmz_gz_headerp
 #  define in_func               mdcmz_in_func
 #  define intf                  mdcmz_intf
 #  define out_func              mdcmz_out_func
@@ -162,7 +162,7 @@
 #  define voidpf                mdcmz_voidpf
 
 /* all zlib structs in zlib.h and zconf.h */
-#  define gmdcmz_header_s           mdcmz_gmdcmz_header_s
+#  define gz_header_s           mdcmz_gz_header_s
 #  define internal_state        mdcmz_internal_state
 
 #endif
