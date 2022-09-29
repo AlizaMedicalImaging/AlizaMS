@@ -221,9 +221,9 @@ template<typename T> SRImage lrgb3(
 			iterator.GoToBegin();
 			while (!iterator.IsAtEnd())
 			{
-				p__[j_+2] = static_cast<unsigned char>((iterator.Get().GetBlue() /tmp_max)*255.0);
-				p__[j_+1] = static_cast<unsigned char>((iterator.Get().GetGreen()/tmp_max)*255.0);
-				p__[j_+0] = static_cast<unsigned char>((iterator.Get().GetRed()  /tmp_max)*255.0);
+				p__[j_ + 2] = static_cast<unsigned char>((iterator.Get().GetBlue()  / tmp_max) * 255.0);
+				p__[j_ + 1] = static_cast<unsigned char>((iterator.Get().GetGreen() / tmp_max) * 255.0);
+				p__[j_ + 0] = static_cast<unsigned char>((iterator.Get().GetRed()   / tmp_max) * 255.0);
 				j_ += 3;
 				++iterator;
 			}
@@ -338,12 +338,10 @@ void SRUtils::read_IMAGE(
 			}
 			else
 			{
-				ReferencedSOPClassUID =
-					ReferencedSOPClassUID.trimmed();
 				if (info)
 				{
 					s += QString("<span class='y3'>IMAGE: ") +
-						ReferencedSOPClassUID +
+						ReferencedSOPClassUID.trimmed().remove(QChar('\0')) +
 						QString("</span><br />\n");
 				}
 			}
@@ -357,13 +355,13 @@ void SRUtils::read_IMAGE(
 			if (info)
 			{
 				s += QString("<span class='y3'>IMAGE: ") +
-					ReferencedSOPInstanceUID.trimmed() +
+					ReferencedSOPInstanceUID.trimmed().remove(QChar('\0')) +
 					QString("</span><br />\n");
 			}
 			else if (skip_images)
 			{
 				s += QString("<span class='yy'>IMAGE: ") +
-					ReferencedSOPInstanceUID.trimmed() +
+					ReferencedSOPInstanceUID.trimmed().remove(QChar('\0')) +
 					QString("</span><br />\n");
 			}
 			if (skip_images) continue;
@@ -386,14 +384,14 @@ void SRUtils::read_IMAGE(
 			}
 			QString sf = DicomUtils::find_file_from_uid(
 				QDir::toNativeSeparators(path),
-				ReferencedSOPInstanceUID.trimmed(),
+				ReferencedSOPInstanceUID,
 				pb);
 #ifndef USE_WORKSTATION_MODE
 			if (sf.isEmpty())
 			{
 				sf = DicomUtils::find_file_from_uid(
 					path + QString("/.."),
-					ReferencedSOPInstanceUID.trimmed(),
+					ReferencedSOPInstanceUID,
 					pb);
 			}
 			if (sf.isEmpty())
@@ -407,7 +405,7 @@ void SRUtils::read_IMAGE(
 					);
 				sf = DicomUtils::find_file_from_uid(
 					tmpp,
-					ReferencedSOPInstanceUID.trimmed(),
+					ReferencedSOPInstanceUID,
 					pb);
 			}
 #endif
@@ -829,7 +827,8 @@ endpoints of the minor axis of an ellipse
 				else
 				{
 					s += QString("<span class='yy'>") +
-						QString("IMAGE: ") + ReferencedSOPInstanceUID +
+						QString("IMAGE: ") +
+						ReferencedSOPInstanceUID.trimmed().remove(QChar('\0')) +
 						QString(
 							"</span><br />\n<span class='red2'>"
 							"IMAGE: error (1) ") +
@@ -840,7 +839,8 @@ endpoints of the minor axis of an ellipse
 			else
 			{
 				s += QString("<span class='yy'>") +
-					QString("IMAGE: ") + ReferencedSOPInstanceUID +
+					QString("IMAGE: ") +
+					ReferencedSOPInstanceUID.trimmed().remove(QChar('\0')) +
 					QString(
 						"</span><br />\n<span class='red2'>"
 						"IMAGE: error (2) ") +
@@ -922,11 +922,10 @@ bool SRUtils::read_SCOORD(
 			mdcm::Tag(0x0070,0x031A),
 			FiducialUID))
 	{
-		FiducialUID = FiducialUID.trimmed();
 		if (info)
 		{
 			s += QString("<span class='y3'>") +
-				FiducialUID +
+				FiducialUID.trimmed().remove(QChar('\0'))  +
 				QString("</span><br />\n");
 		}
 	}
@@ -1344,9 +1343,8 @@ void SRUtils::read_SCOORD3D(const mdcm::DataSet & ds, QString & s)
 			mdcm::Tag(0x3006,0x0024),
 			ReferencedFrameofReferenceUID))
 	{
-		ReferencedFrameofReferenceUID =
-			ReferencedFrameofReferenceUID.trimmed();
-		s += QString("<span class='y'>") + ReferencedFrameofReferenceUID +
+		s += QString("<span class='y'>") +
+		ReferencedFrameofReferenceUID.trimmed().remove(QChar('\0')) +
 			QString("</span><br />\n");
 	}
 	QString FiducialUID;
@@ -1355,9 +1353,8 @@ void SRUtils::read_SCOORD3D(const mdcm::DataSet & ds, QString & s)
 			mdcm::Tag(0x0070,0x031A),
 			FiducialUID))
 	{
-		FiducialUID = FiducialUID.trimmed();
 		s += QString("<span class='y'>") +
-			FiducialUID +
+			FiducialUID.trimmed().remove(QChar('\0')) +
 			QString("</span><br />\n");
 	}
 }
@@ -1579,19 +1576,14 @@ QStringList SRUtils::read_referenced(
 				QString::fromLatin1(uid.GetName());
 			if (!uidname.isEmpty())
 			{
-				uidname = uidname.trimmed();
 				s += QString("<span class='y'>") +
 					uidname +
 					QString("</span><br />\n");
 			}
 			else
 			{
-				ReferencedSOPClassUID =
-					ReferencedSOPClassUID
-						.trimmed()
-						.remove(QChar('\0'));
 				s += QString("<span class='y'>") +
-					ReferencedSOPClassUID +
+					ReferencedSOPClassUID.trimmed().remove(QChar('\0')) +
 					QString("</span><br />\n");
 			}
 		}
@@ -1601,7 +1593,7 @@ QStringList SRUtils::read_referenced(
 				mdcm::Tag(0x0008,0x1155),
 				ReferencedSOPInstanceUID))
 		{
-			l.push_back(ReferencedSOPInstanceUID.trimmed());
+			l.push_back(ReferencedSOPInstanceUID);
 			s += QString("<span class='y'>") +
 				ReferencedSOPInstanceUID.trimmed().remove(QChar('\0')) +
 				QString("</span><br />\n");

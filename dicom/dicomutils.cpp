@@ -11032,7 +11032,8 @@ bool DicomUtils::scan_files_for_instance_uid(
 		const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
 		QString uid_("");
 		const bool ok = get_string_value(ds, tSOPInstanceUID, uid_);
-		if (ok && uid == uid_)
+		if (ok &&
+			uid.trimmed().remove(QChar('\0')) == uid_.trimmed().remove(QChar('\0')))
 		{
 			file = tmp0;
 			return true;
