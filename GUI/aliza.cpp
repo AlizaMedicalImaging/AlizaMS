@@ -3951,6 +3951,15 @@ void Aliza::sort_4d(
 			}
 		}
 	}
+#if 0
+	for (int x = 0; x < images.size(); ++x)
+	{
+		std::cout << "id=" << images.at(x)->id
+			<< " acq. date: " << images.at(x)->acquisition_date.toStdString()
+			<< ", acq. time: " << images.at(x)->acquisition_time.toStdString()
+			<< std::endl;
+	}
+#endif
 }
 
 void Aliza::toggle_zlock(bool t)
