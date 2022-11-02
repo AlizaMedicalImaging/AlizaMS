@@ -256,7 +256,7 @@ private:
 		QList<double> &,
 		QMap<int, ImageVariant*> &,
 		QMap<int, ImageVariant*> &,
-		QMap<qlonglong, ImageVariant*> &,
+		QMap<qulonglong, ImageVariant*> &,
 		const int,
 		const bool,
 		const int=0,

@@ -10,6 +10,7 @@
 #include <QDir>
 #include <QColorDialog>
 #include <QDateTime>
+#include <string>
 #include "iconutils.h"
 #include "commonutils.h"
 #include "contourutils.h"
@@ -3394,7 +3395,7 @@ void Aliza::start_3D_anim()
 	{
 		QMap<int, ImageVariant*> map;
 		QMap<int, ImageVariant*> instance_numbers_tmp;
-		QMap<qlonglong, ImageVariant*> acq_times_tmp;
+		QMap<qulonglong, ImageVariant*> acq_times_tmp;
 		sort_4d(
 			animation_images,
 			anim3d_times,
@@ -3473,34 +3474,34 @@ void Aliza::stop_3D_anim()
 void Aliza::animate_()
 {
 	if (!run__) return;
-	if (animation_images.size()<2) return;
+	if (animation_images.size() < 2) return;
 	const qint64 t0 = QDateTime::currentMSecsSinceEpoch();
-	const int tmp0 = anim_idx+1;
-	anim_idx = (tmp0>=animation_images.size()||tmp0<0) ? 0 : tmp0;
+	const int tmp0 = anim_idx + 1;
+	anim_idx = (tmp0 >= animation_images.size() || tmp0 < 0) ? 0 : tmp0;
 	selected_images.clear();
 	selected_images.push_back(animation_images.at(anim_idx));
 	if (check_3d() && glwidget->isVisible()) glwidget->updateGL();
 	if (graphicswidget_m->isVisible())
 	{
-		graphicswidget_m->set_slice_2D(animation_images[anim_idx],0,false);
+		graphicswidget_m->set_slice_2D(animation_images[anim_idx], 0, false);
 		if (multiview)
 		{
-			graphicswidget_y->set_slice_2D(animation_images[anim_idx],0,false);
-			graphicswidget_x->set_slice_2D(animation_images[anim_idx],0,false);
+			graphicswidget_y->set_slice_2D(animation_images[anim_idx], 0, false);
+			graphicswidget_x->set_slice_2D(animation_images[anim_idx], 0, false);
 		}
 	}
 	const qint64 t1 = QDateTime::currentMSecsSinceEpoch();
-	const int dt =(int)(t1-t0);
+	const int dt = static_cast<int>(t1 - t0);
 	const bool acq_time =
 		anim3Dwidget->t_checkBox->isChecked() &&
 		(anim3d_times.size() == animation_images.size());
 	const int t =
 		(acq_time)
 		?
-		(int)(anim3d_times.at(anim_idx))-dt
+		static_cast<int>(round(anim3d_times.at(anim_idx))) - dt
 		:
-		frametime_3D-dt;
-	if (t<=0)
+		frametime_3D - dt;
+	if (t <= 0)
 	{
 		// can not run at required speed
 		anim3D_timer->start(2);
@@ -3520,7 +3521,8 @@ void Aliza::animate_()
 	}
 	if (acq_time)
 	{
-		anim3Dwidget->acq_spinBox->setValue((int)anim3d_times.at(anim_idx));
+		const int i = static_cast<int>(round(anim3d_times.at(anim_idx)));
+		anim3Dwidget->acq_spinBox->setValue(i);
 	}
 }
 
@@ -3768,7 +3770,7 @@ void Aliza::sort_4d(
 	QList<double> & times,
 	QMap<int, ImageVariant*> &map,
 	QMap<int, ImageVariant*>  & instance_numbers_tmp,
-	QMap<qlonglong, ImageVariant*> & acq_times_tmp,
+	QMap<qulonglong, ImageVariant*> & acq_times_tmp,
 	const int group_id,
 	const bool animation,
 	const int selected_x_slice,
@@ -3790,18 +3792,15 @@ void Aliza::sort_4d(
 		{
 			map[v2->id] = v2;
 			instance_numbers_tmp[v2->instance_number] = v2;
-			qlonglong acqtime = 0;
+			qulonglong acqtime = 0ULL;
 			if (!v2->acquisition_time.isEmpty())
 			{
-				bool tmp2_ok = false;
-				const double dacq = QVariant(
-					QString(
-						v2->acquisition_date.trimmed().remove(QChar('\0')) +
-						v2->acquisition_time)
-							.trimmed())
-								.toDouble(&tmp2_ok);
-				if (tmp2_ok && dacq > 0)
-					acqtime = (qlonglong)(dacq*1000.0 + 0.5);
+				const QString dacs = v2->acquisition_date + v2->acquisition_time;
+				const long double dacq = std::stold(dacs.toStdString());
+				if (dacq > 0.0L)
+				{
+					acqtime = static_cast<qulonglong>((dacq * 1000.0L) + 0.5L);
+				}
 			}
 			acq_times_tmp[acqtime] = v2;
 			if (animation)
@@ -3813,68 +3812,47 @@ void Aliza::sort_4d(
 		}
 		++iv;
 	}
-	bool acqtimes_valid = false;
-	if (acq_times_tmp.count() == map.count())
-	{
-		acqtimes_valid = true;
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-		QMap<qlonglong, ImageVariant*>::const_iterator it =
-			acq_times_tmp.cbegin();
-		while (it != acq_times_tmp.cend())
-#else
-		QMap<qlonglong, ImageVariant*>::const_iterator it =
-			acq_times_tmp.constBegin();
-		while (it != acq_times_tmp.constEnd())
-#endif
-		{
-			if (it.key() <= 0)
-			{
-				acqtimes_valid = false;
-				break;
-			}
-			++it;
-		}
-	}
+	bool acqtimes_valid = (acq_times_tmp.count() == map.count());
 	if (acqtimes_valid)
 	{
 		unsigned int tmp5 = 0;
-		bool t0ok = false;
-		double t0 = 0;
+		long double t0 = 0.0L;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-		QMap<qlonglong, ImageVariant*>::const_iterator it =
+		QMap<qulonglong, ImageVariant*>::const_iterator it =
 			acq_times_tmp.cbegin();
 		while (it != acq_times_tmp.cend())
 #else
-		QMap<qlonglong, ImageVariant*>::const_iterator it =
+		QMap<qulonglong, ImageVariant*>::const_iterator it =
 			acq_times_tmp.constBegin();
 		while (it != acq_times_tmp.constEnd())
 #endif
 		{
 			images.push_back(it.value());
-			bool t1ok = false;
-			const double t1 = QVariant(
-				it.value()->acquisition_date.trimmed().remove(QChar('\0')) +
-				it.value()->acquisition_time.trimmed()).toDouble(&t1ok);
-			if (tmp5>0 && t0ok && t1ok)
-				times.push_back((t1 - t0)*1000.0);
+			const QString t1s = it.value()->acquisition_date + it.value()->acquisition_time;
+#if 1
+			std::cout << "t1s = " << t1s.toStdString() << std::endl;
+#endif
+			const long double t1 = std::stold(t1s.toStdString());
+			if (tmp5 > 0 && t1 > 0.0L)
+			{
+				const long double tdld = (t1 - t0) * 1000.0L;
+				const double td = static_cast<double>(tdld);
+#if 1
+				std::cout << "(t1 - t0) * 1000.0L = " << td << std::endl;
+#endif
+				times.push_back(td);
+			}
 			t0 = t1;
-			t0ok = t1ok;
 			++it;
 			++tmp5;
 		}
 		times.push_back(1000.0);
-		if (images.size() != times.size())
-			acqtimes_valid = false;
 		if (images.size() == times.size())
 		{
 #if 0
-			std::cout
-				<< "Acq. times taken to sort 3D images in 4D image"
+			std::cout << "Acq. times taken to sort 3D images in 4D image"
 				<< std::endl;
 #endif
-			if (animation)
-				anim3Dwidget->acq_spinBox->setValue(
-					(int)(anim3d_times[0]+0.5));
 		}
 		else
 		{

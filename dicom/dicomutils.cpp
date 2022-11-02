@@ -3005,7 +3005,7 @@ bool DicomUtils::read_slices_uihgrid(
 	//
 	//
 	//
-	QMap<qlonglong, QString> acqtimes;
+	QMap<qulonglong, QString> acqtimes;
 	std::vector<double*> values;
 	for (unsigned int x = 0; x < num_items; ++x)
 	{
@@ -3032,20 +3032,21 @@ bool DicomUtils::read_slices_uihgrid(
 		const mdcm::Tag tAcquisitionDate(0x0008,0x0022);
 		const mdcm::Tag tAcquisitionTime(0x0008,0x0022);
 		const mdcm::Tag tAcquisitionDateTime(0x0008,0x002a);
-		QString AcquisitionDateTime("");
+		QString AcquisitionDateTime;
 		if (DicomUtils::get_string_value(
 				nds,
 				tAcquisitionDateTime,
 				AcquisitionDateTime))
 		{
-			;;
+			AcquisitionDateTime =
+				AcquisitionDateTime.trimmed().remove(QChar('\0'));
 		}
 		else if (
 			nds.FindDataElement(tAcquisitionDate) &&
 			nds.FindDataElement(tAcquisitionTime))
 		{
-			QString AcquisitionDate("");
-			QString AcquisitionTime("");
+			QString AcquisitionDate;
+			QString AcquisitionTime;
 			if (
 				DicomUtils::get_string_value(
 					nds,
@@ -3056,44 +3057,37 @@ bool DicomUtils::read_slices_uihgrid(
 					tAcquisitionTime,
 					AcquisitionTime))
 			{
-				if (
-					!AcquisitionDate.isEmpty() &&
-					!AcquisitionTime.isEmpty())
+				if (!AcquisitionDate.isEmpty() && !AcquisitionTime.isEmpty())
+				{
 					AcquisitionDateTime =
-						AcquisitionDate
-							.trimmed()
-							.remove(QChar('\0')) +
-						AcquisitionTime.trimmed();
+						AcquisitionDate.trimmed().remove(QChar('\0')) +
+						AcquisitionTime.trimmed().remove(QChar('\0'));
+				}
 			}
 		}
 		if (!AcquisitionDateTime.isEmpty())
 		{
-			bool tmp56_ok = false;
-			const double tmp56 = QVariant(
-				AcquisitionDateTime.trimmed())
-					.toDouble(&tmp56_ok);
-			if (tmp56_ok)
-				acqtimes[(qlonglong)(tmp56*1000.0)] =
+			const long double tmp56 = std::stold(AcquisitionDateTime.toStdString());
+			if (tmp56 > 0.0L)
+			{
+				acqtimes[static_cast<qulonglong>((tmp56 * 1000.0L) + 0.5L)] =
 					AcquisitionDateTime;
+			}
 		}
 	}
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	QMap<qlonglong,QString>::const_iterator acqit =
-		acqtimes.cbegin();
+	QMap<qulonglong,QString>::const_iterator acqit = acqtimes.cbegin();
 	if (acqit != acqtimes.cend())
 #else
-	QMap<qlonglong,QString>::const_iterator acqit =
-		acqtimes.constBegin();
+	QMap<qulonglong,QString>::const_iterator acqit = acqtimes.constBegin();
 	if (acqit != acqtimes.constEnd())
 #endif
 	{
 		const QString tmp57 = acqit.value();
 		if (tmp57.size() >= 14)
 		{
-			ivariant->acquisition_date =
-				tmp57.left(8);
-			ivariant->acquisition_time =
-				tmp57.right(tmp57.size() - 8);
+			ivariant->acquisition_date = tmp57.left(8);
+			ivariant->acquisition_time = tmp57.right(tmp57.size() - 8);
 		}
 	}
 	//
@@ -3145,21 +3139,15 @@ bool DicomUtils::read_slices_uihgrid(
 			float cx = 0.0f, cy = 0.0f, cz = 0.0f;
 			CommonUtils::calculate_center_notuniform(
 				ivariant->di->image_slices,&cx,&cy,&cz);
-			ivariant->di->default_center_x =
-				ivariant->di->center_x = cx;
-			ivariant->di->default_center_y =
-				ivariant->di->center_y = cy;
-			ivariant->di->default_center_z =
-				ivariant->di->center_z = cz;
+			ivariant->di->default_center_x = ivariant->di->center_x = cx;
+			ivariant->di->default_center_y = ivariant->di->center_y = cy;
+			ivariant->di->default_center_z = ivariant->di->center_z = cz;
 		}
 		else
 		{
-			ivariant->di->default_center_x =
-				ivariant->di->center_x = center_x;
-			ivariant->di->default_center_y =
-				ivariant->di->center_y = center_y;
-			ivariant->di->default_center_z =
-				ivariant->di->center_z = center_z;
+			ivariant->di->default_center_x = ivariant->di->center_x = center_x;
+			ivariant->di->default_center_y = ivariant->di->center_y = center_y;
+			ivariant->di->default_center_z = ivariant->di->center_z = center_z;
 		}
 		ivariant->di->slices_generated = true;
 		ivariant->di->slices_from_dicom = true;
@@ -4199,14 +4187,11 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 					tacquisitiondatetime,
 					acquisitiondatetime))
 			{
-				acquisitiondatetime = acquisitiondatetime.trimmed();
+				acquisitiondatetime = acquisitiondatetime.trimmed().remove(QChar('\0'));
 				if (acquisitiondatetime.size() >= 14)
 				{
-					ivariant->acquisition_date =
-						acquisitiondatetime.left(8);
-					ivariant->acquisition_time =
-						acquisitiondatetime.right(
-							acquisitiondatetime.size() - 8);
+					ivariant->acquisition_date = acquisitiondatetime.left(8);
+					ivariant->acquisition_time = acquisitiondatetime.right(acquisitiondatetime.size() - 8);
 					acqdatetime_ok = true;
 				}
 			}
@@ -4225,8 +4210,8 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 					tacquisitiontime,
 					acquisitiontime))
 			{
-				ivariant->acquisition_date = acquisitiondate.trimmed();
-				ivariant->acquisition_time = acquisitiontime.trimmed();
+				ivariant->acquisition_date = acquisitiondate.trimmed().remove(QChar('\0'));
+				ivariant->acquisition_time = acquisitiontime.trimmed().remove(QChar('\0'));
 			}
 		}
 	}
@@ -9522,9 +9507,9 @@ QString DicomUtils::read_enhanced_common(
 				lateralities.push_back(values.at(idx__).frame_laterality);
 				body_parts.push_back(values.at(idx__).frame_body_part);
 				acquisition_datetimes.push_back(
-					values.at(idx__).frame_acquisition_datetime.trimmed());
+					values.at(idx__).frame_acquisition_datetime.trimmed().remove(QChar('\0')));
 				reference_datetimes.push_back(
-					values.at(idx__).frame_reference_datetime.trimmed());
+					values.at(idx__).frame_reference_datetime.trimmed().remove(QChar('\0')));
 				if (image_overlays.all_overlays.contains(idx__))
 				{
 					overlays.all_overlays[it->first] =
@@ -9642,39 +9627,35 @@ QString DicomUtils::read_enhanced_common(
 			}
 			//
 			{
-				QMap<qlonglong, QString> acq_times_tmp;
+				QMap<qulonglong, QString> acq_times_tmp;
 				for (int i = 0; i < acquisition_datetimes.size(); ++i)
 				{
 					if (!acquisition_datetimes.at(i).isEmpty())
 					{
-						bool tmp2_ok = false;
-						const double dacq = QVariant(
-							acquisition_datetimes.at(i))
-								.toDouble(&tmp2_ok);
-						if (tmp2_ok && dacq > 0)
+						const long double dacq = std::stold(acquisition_datetimes.at(i).toStdString());
+						if (dacq > 0.0L)
 						{
-							acq_times_tmp[(qlonglong)(dacq*1000.0 + 0.5)] =
+							acq_times_tmp[static_cast<qulonglong>((dacq * 1000.0L) + 0.5L)] =
 								acquisition_datetimes.at(i);
 						}
 					}
 				}
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-				QMap<qlonglong,QString>::const_iterator acqit =
+				QMap<qulonglong,QString>::const_iterator acqit =
 					acq_times_tmp.cbegin();
 				if (acqit != acq_times_tmp.cend())
 #else
-				QMap<qlonglong,QString>::const_iterator acqit =
+				QMap<qulonglong,QString>::const_iterator acqit =
 					acq_times_tmp.constBegin();
 				if (acqit != acq_times_tmp.constEnd())
 #endif
 				{
-					const QString tmp57 = acqit.value();
+					QString tmp57 = acqit.value();
+					tmp57 = tmp57.trimmed().remove(QChar('\0'));
 					if (tmp57.size() >= 14)
 					{
-						ivariant->acquisition_date =
-							tmp57.left(8);
-						ivariant->acquisition_time =
-							tmp57.right(tmp57.size() - 8);
+						ivariant->acquisition_date = tmp57.left(8);
+						ivariant->acquisition_time = tmp57.right(tmp57.size() - 8);
 					}
 				}
 			}
