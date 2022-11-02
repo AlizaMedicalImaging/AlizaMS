@@ -3829,7 +3829,7 @@ void Aliza::sort_4d(
 		{
 			images.push_back(it.value());
 			const QString t1s = it.value()->acquisition_date + it.value()->acquisition_time;
-#if 1
+#if 0
 			std::cout << "t1s = " << t1s.toStdString() << std::endl;
 #endif
 			const long double t1 = std::stold(t1s.toStdString());
@@ -3837,7 +3837,7 @@ void Aliza::sort_4d(
 			{
 				const long double tdld = (t1 - t0) * 1000.0L;
 				const double td = static_cast<double>(tdld);
-#if 1
+#if 0
 				std::cout << "(t1 - t0) * 1000.0L = " << td << std::endl;
 #endif
 				times.push_back(td);
