@@ -3385,7 +3385,11 @@ void Aliza::start_3D_anim()
 	bool lock = mutex3.tryLock();
 	if (!lock) return;
 	lock = mutex0.tryLock();
-	if (!lock) { mutex3.unlock(); return; }
+	if (!lock)
+	{
+		mutex3.unlock();
+		return;
+	}
 	run__ = true;
 	animation_images.clear();
 	anim3d_times.clear();
@@ -3407,6 +3411,13 @@ void Aliza::start_3D_anim()
 			v->di->selected_x_slice,
 			v->di->selected_y_slice,
 			v->di->selected_z_slice);
+		for (int x = 0; x < animation_images.size(); ++x)
+		{
+			if (animation_images.at(x) && (v->id == animation_images.at(x)->id))
+			{
+				anim_idx = x;
+			}
+		}
 		frames2DAct->setEnabled(false);
 		cursorAct->setEnabled(false);
 		collisionAct->setEnabled(false);
@@ -3443,20 +3454,23 @@ void Aliza::stop_3D_anim()
 	animation_images.clear();
 	anim3d_times.clear();
 	const short mm = saved_mouse_modus;
-	graphicswidget_m->set_mouse_modus(
-		mm, true);
+	graphicswidget_m->set_mouse_modus(mm, true);
 	graphicswidget_y->set_mouse_modus(saved_mouse_modus, false);
 	graphicswidget_x->set_mouse_modus(saved_mouse_modus, false);
-	graphicswidget_m->update_pixel_value(-1,-1);
-	graphicswidget_y->update_pixel_value(-1,-1);
-	graphicswidget_x->update_pixel_value(-1,-1);
+	graphicswidget_m->update_pixel_value(-1, -1);
+	graphicswidget_y->update_pixel_value(-1, -1);
+	graphicswidget_x->update_pixel_value(-1, -1);
 	graphicswidget_m->set_show_cursor(saved_show_cursor);
 	graphicswidget_y->set_show_cursor(saved_show_cursor);
 	graphicswidget_x->set_show_cursor(saved_show_cursor);
-	if (mm==1 || mm==2 || mm==4 || mm==5)
+	if (mm == 1 || mm == 2 || mm == 4 || mm == 5)
+	{
 		rectAct->setIcon(nocut_icon);
+	}
 	else
+	{
 		rectAct->setIcon(cut_icon);
+	}
 	anim3Dwidget->acq_spinBox->clear();
 	frames2DAct->setEnabled(true);
 	cursorAct->setEnabled(true);
@@ -3935,6 +3949,8 @@ void Aliza::sort_4d(
 		std::cout << "id=" << images.at(x)->id
 			<< " acq. date: " << images.at(x)->acquisition_date.toStdString()
 			<< ", acq. time: " << images.at(x)->acquisition_time.toStdString()
+			<< ", series date: " << images.at(x)->series_date.toStdString()
+			<< ", series time: " << images.at(x)->series_time.toStdString()
 			<< std::endl;
 	}
 #endif

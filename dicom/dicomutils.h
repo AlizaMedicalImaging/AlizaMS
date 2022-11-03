@@ -176,6 +176,8 @@ public:
 	static QString read_image_laterality(
 		const mdcm::DataSet&);
 	static QString read_body_part(const mdcm::DataSet&);
+	static void read_acquisition_time(
+		const mdcm::DataSet&, QString&, QString&);
 	static void read_ivariant_info_tags(
 		const mdcm::DataSet&, ImageVariant*);
 	static void read_pet_attributes(

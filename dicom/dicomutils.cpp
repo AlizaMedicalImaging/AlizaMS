@@ -2591,6 +2591,7 @@ void DicomUtils::load_contour(
 	}
 	ivariant->image_type = 100;
 	read_ivariant_info_tags(ds, ivariant);
+	read_acquisition_time(ds, ivariant->acquisition_date, ivariant->acquisition_time);
 }
 #ifdef TMP_PRINT_LOAD_CONTOUR
 #undef TMP_PRINT_LOAD_CONTOUR
@@ -4089,6 +4090,56 @@ QString DicomUtils::read_body_part(const mdcm::DataSet & ds)
 	return QString("");
 }
 
+void DicomUtils::read_acquisition_time(
+	const mdcm::DataSet & ds,
+	QString & acquisitiondate,
+	QString & acquisitiontime)
+{
+	const mdcm::Tag tacquisitiondate(0x0008,0x0022);
+	const mdcm::Tag tacquisitiontime(0x0008,0x0032);
+	const mdcm::Tag tacquisitiondatetime(0x0008,0x002a);
+	bool acqdatetime_ok = false;
+	{
+		QString acquisitiondatetime;
+		if(get_string_value(
+				ds,
+				tacquisitiondatetime,
+				acquisitiondatetime))
+		{
+			acquisitiondatetime = acquisitiondatetime.trimmed().remove(QChar('\0'));
+			if (acquisitiondatetime.size() >= 14)
+			{
+				acquisitiondate = acquisitiondatetime.left(8);
+				acquisitiontime = acquisitiondatetime.right(acquisitiondatetime.size() - 8);
+				acqdatetime_ok = true;
+			}
+		}
+	}
+	if (!acqdatetime_ok)
+	{
+		QString acquisitiondate_tmp;
+		QString acquisitiontime_tmp;
+		if(
+			get_string_value(
+				ds,
+				tacquisitiondate,
+				acquisitiondate_tmp) &&
+			get_string_value(
+				ds,
+				tacquisitiontime,
+				acquisitiontime_tmp))
+		{
+			acquisitiondate = acquisitiondate_tmp.trimmed().remove(QChar('\0'));
+			acquisitiontime = acquisitiontime_tmp.trimmed().remove(QChar('\0'));
+		}
+		else
+		{
+			acquisitiondate = QString("");
+			acquisitiontime = QString("");
+		}
+	}
+}
+
 void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant * ivariant)
 {
 	if (ds.IsEmpty()) return;
@@ -4101,9 +4152,6 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 	const mdcm::Tag tstudytime(0x0008,0x0030);
 	const mdcm::Tag tseriesdate(0x0008,0x0021);
 	const mdcm::Tag tseriestime(0x0008,0x0031);
-	const mdcm::Tag tacquisitiondate(0x0008,0x0022);
-	const mdcm::Tag tacquisitiontime(0x0008,0x0032);
-	const mdcm::Tag tacquisitiondatetime(0x0008,0x002a);
 	const mdcm::Tag tmodality(0x0008,0x0060);
 	const mdcm::Tag tmanufacturer(0x0008,0x0070);
 	const mdcm::Tag tmodel(0x0008,0x1090);
@@ -4173,48 +4221,6 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 	QString seriestime;
 	if(get_string_value(ds,tseriestime,seriestime))
 		ivariant->series_time = seriestime;
-	//
-	// don't override for enhanced
-	if (
-		ivariant->acquisition_date.isEmpty() ||
-		ivariant->acquisition_time.isEmpty())
-	{
-		bool acqdatetime_ok = false;
-		QString acquisitiondatetime;
-		{
-			if(get_string_value(
-					ds,
-					tacquisitiondatetime,
-					acquisitiondatetime))
-			{
-				acquisitiondatetime = acquisitiondatetime.trimmed().remove(QChar('\0'));
-				if (acquisitiondatetime.size() >= 14)
-				{
-					ivariant->acquisition_date = acquisitiondatetime.left(8);
-					ivariant->acquisition_time = acquisitiondatetime.right(acquisitiondatetime.size() - 8);
-					acqdatetime_ok = true;
-				}
-			}
-		}
-		if (!acqdatetime_ok)
-		{
-			QString acquisitiondate;
-			QString acquisitiontime;
-			if(
-				get_string_value(
-					ds,
-					tacquisitiondate,
-					acquisitiondate) &&
-				get_string_value(
-					ds,
-					tacquisitiontime,
-					acquisitiontime))
-			{
-				ivariant->acquisition_date = acquisitiondate.trimmed().remove(QChar('\0'));
-				ivariant->acquisition_time = acquisitiontime.trimmed().remove(QChar('\0'));
-			}
-		}
-	}
 	//
 	QString modality;
 	if (get_string_value(ds,tmodality,modality))
@@ -6461,6 +6467,7 @@ QString DicomUtils::read_ultrasound(
 		}
 		//
 		read_ivariant_info_tags(ds, ivariant);
+		read_acquisition_time(ds, ivariant->acquisition_date, ivariant->acquisition_time);
 		//
 		if (number_of_frames > 1)
 			read_frame_times(ds, ivariant, number_of_frames);
@@ -6745,7 +6752,7 @@ QString DicomUtils::read_nuclear(
 #endif
 		//
 		read_ivariant_info_tags(ds, ivariant);
-		//
+		read_acquisition_time(ds, ivariant->acquisition_date, ivariant->acquisition_time);
 		read_window(ds, &tmp_c, &tmp_w, &tmp_lut_function);
 	}
 	ivariant->di->default_us_window_center =
@@ -6877,6 +6884,16 @@ are stacked in front of the first slice. See Image Orientation
 	return QString("");
 }
 
+static bool acqtime_less_than(const QString & s1, const QString & s2)
+{
+    return s1 < s2;
+}
+
+static bool acqtime_more_than(const QString & s1, const QString & s2)
+{
+    return s1 > s2;
+}
+
 QString DicomUtils::read_series(
 	bool * ok,
 	const bool min_load,
@@ -6917,6 +6934,7 @@ QString DicomUtils::read_series(
 	std::vector<double> levels_;
 	std::vector<double> windows_;
 	std::vector<short>  luts_;
+	QList<QString>      acqtimes;
 	//
 #ifdef WARN_RAM_SIZE
 	const double total_ram = CommonUtils::get_total_memory_saved();
@@ -6972,6 +6990,7 @@ QString DicomUtils::read_series(
 				if (!min_load)
 				{
 					read_ivariant_info_tags(ds, ivariant);
+					//
 					if (ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.4"))
 					{
 						ivariant->iinfo = read_MRImageModule(ds);
@@ -7094,19 +7113,31 @@ QString DicomUtils::read_series(
 			//
 			if (!min_load)
 			{
-				double tmp_c = -999999.0;
-				double tmp_w = -999999.0;
-				short lut_function = 0;
-				if (wsettings->get_level_for_PET() || !(
-					(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128")) ||
-					(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.130")) ||
-					(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128.1"))))
 				{
-					read_window(ds, &tmp_c, &tmp_w, &lut_function);
+					double tmp_c = -999999.0;
+					double tmp_w = -999999.0;
+					short lut_function = 0;
+					if (wsettings->get_level_for_PET() || !(
+						(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128")) ||
+						(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.130")) ||
+						(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128.1"))))
+					{
+						read_window(ds, &tmp_c, &tmp_w, &lut_function);
+					}
+					levels_.push_back(tmp_c);
+					windows_.push_back(tmp_w);
+					luts_.push_back(lut_function);
 				}
-				levels_.push_back(tmp_c);
-				windows_.push_back(tmp_w);
-				luts_.push_back(lut_function);
+				//
+				{
+					QString acqdate_tmp;
+					QString acqtime_tmp;
+					read_acquisition_time(ds, acqdate_tmp, acqtime_tmp);
+					if (!acqdate_tmp.isEmpty() && !acqtime_tmp.isEmpty())
+					{
+						acqtimes.push_back(acqdate_tmp + acqtime_tmp);
+					}
+				}
 			}
 		}
 		//
@@ -7643,6 +7674,52 @@ QString DicomUtils::read_series(
 			std::cout << "Warning: instance UIDs mismatch, cleared UIDs"
 				<< std::endl;
 			ivariant->image_instance_uids.clear();
+		}
+	}
+	//
+	if (!acqtimes.empty())
+	{
+		if (images_ipp.size() == acqtimes.size())
+		{
+			// 0 - acquisition time of the first slice after IPP/IOP sorting
+			// 1 - acquisition time of the slice that was acquired first in series (earliest)
+			// 2 - acqutsition time of the slice that was acquired last in series
+			//
+			// Note: there are also attributes 'Series Date' / 'Series Time'.
+			//
+			const short use_acq_time = 0;
+			//
+			if (use_acq_time == 0)
+			{
+				// don't sort
+			}
+			else
+			{
+				if (use_acq_time == 1)
+				{
+					std::sort(acqtimes.begin(), acqtimes.end(), acqtime_less_than);
+				}
+				else if (use_acq_time == 2)
+				{
+					std::sort(acqtimes.begin(), acqtimes.end(), acqtime_more_than);
+				}
+			}
+			const QString acquisitiondatetime = acqtimes.at(0);
+			if (acquisitiondatetime.size() >= 14)
+			{
+				ivariant->acquisition_date = acquisitiondatetime.left(8);
+				ivariant->acquisition_time = acquisitiondatetime.right(acquisitiondatetime.size() - 8);
+			}
+#if 0
+			std::cout << "acqtimes" << std::endl;
+			for (int k = 0; k < acqtimes.size(); ++k)
+			{
+				std::cout << acqtimes.at(k).toStdString() << std::endl;
+			}
+			std::cout << "series date/time" << std::endl;
+			std::cout << ivariant->series_date.toStdString() << ivariant->series_time.toStdString() << std::endl;
+			std::cout << "---------" << std::endl;
+#endif
 		}
 	}
 	//
