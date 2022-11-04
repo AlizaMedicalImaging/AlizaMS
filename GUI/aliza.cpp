@@ -3399,7 +3399,7 @@ void Aliza::start_3D_anim()
 	{
 		QMap<int, ImageVariant*> map;
 		QMap<int, ImageVariant*> instance_numbers_tmp;
-		QMap<qulonglong, ImageVariant*> acq_times_tmp;
+		QMap<QString, ImageVariant*> acq_times_tmp;
 		sort_4d(
 			animation_images,
 			anim3d_times,
@@ -3784,7 +3784,7 @@ void Aliza::sort_4d(
 	QList<double> & times,
 	QMap<int, ImageVariant*> &map,
 	QMap<int, ImageVariant*>  & instance_numbers_tmp,
-	QMap<qulonglong, ImageVariant*> & acq_times_tmp,
+	QMap<QString, ImageVariant*> & acq_times_tmp,
 	const int group_id,
 	const bool animation,
 	const int selected_x_slice,
@@ -3806,17 +3806,11 @@ void Aliza::sort_4d(
 		{
 			map[v2->id] = v2;
 			instance_numbers_tmp[v2->instance_number] = v2;
-			qulonglong acqtime = 0ULL;
-			if (!v2->acquisition_time.isEmpty())
+			if (!v2->acquisition_date.isEmpty() && !v2->acquisition_time.isEmpty())
 			{
 				const QString dacs = v2->acquisition_date + v2->acquisition_time;
-				const long double dacq = std::stold(dacs.toStdString());
-				if (dacq > 0.0L)
-				{
-					acqtime = static_cast<qulonglong>((dacq * 1000.0L) + 0.5L);
-				}
+				acq_times_tmp[dacs] = v2;
 			}
-			acq_times_tmp[acqtime] = v2;
 			if (animation)
 			{
 				v2->di->selected_x_slice = selected_x_slice;
@@ -3832,11 +3826,11 @@ void Aliza::sort_4d(
 		unsigned int tmp5 = 0;
 		long double t0 = 0.0L;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-		QMap<qulonglong, ImageVariant*>::const_iterator it =
+		QMap<QString, ImageVariant*>::const_iterator it =
 			acq_times_tmp.cbegin();
 		while (it != acq_times_tmp.cend())
 #else
-		QMap<qulonglong, ImageVariant*>::const_iterator it =
+		QMap<QString, ImageVariant*>::const_iterator it =
 			acq_times_tmp.constBegin();
 		while (it != acq_times_tmp.constEnd())
 #endif

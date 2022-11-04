@@ -262,6 +262,16 @@ static void sort_dicom_files_ippiop(
 	std::stable_sort(images_ipp.begin(), images_ipp.end(), files_less_than_ipp());
 }
 
+static bool acqtime_less_than(const QString & s1, const QString & s2)
+{
+    return s1 < s2;
+}
+
+static bool acqtime_more_than(const QString & s1, const QString & s2)
+{
+    return s1 > s2;
+}
+
 static QString generate_string_0(
 	const mdcm::DataSet & ds,
 	const mdcm::Tag t,
@@ -3006,7 +3016,7 @@ bool DicomUtils::read_slices_uihgrid(
 	//
 	//
 	//
-	QMap<qulonglong, QString> acqtimes;
+	QList<QString> acqtimes;
 	std::vector<double*> values;
 	for (unsigned int x = 0; x < num_items; ++x)
 	{
@@ -3068,23 +3078,15 @@ bool DicomUtils::read_slices_uihgrid(
 		}
 		if (!AcquisitionDateTime.isEmpty())
 		{
-			const long double tmp56 = std::stold(AcquisitionDateTime.toStdString());
-			if (tmp56 > 0.0L)
-			{
-				acqtimes[static_cast<qulonglong>((tmp56 * 1000.0L) + 0.5L)] =
-					AcquisitionDateTime;
-			}
+			acqtimes.push_back(AcquisitionDateTime);
 		}
 	}
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	QMap<qulonglong,QString>::const_iterator acqit = acqtimes.cbegin();
-	if (acqit != acqtimes.cend())
-#else
-	QMap<qulonglong,QString>::const_iterator acqit = acqtimes.constBegin();
-	if (acqit != acqtimes.constEnd())
-#endif
+	//
+	if (!acqtimes.empty())
 	{
-		const QString tmp57 = acqit.value();
+		std::sort(acqtimes.begin(), acqtimes.end(), acqtime_less_than);
+		QString tmp57 = acqtimes.at(0);
+		tmp57 = tmp57.trimmed().remove(QChar('\0'));
 		if (tmp57.size() >= 14)
 		{
 			ivariant->acquisition_date = tmp57.left(8);
@@ -6884,16 +6886,6 @@ are stacked in front of the first slice. See Image Orientation
 	return QString("");
 }
 
-static bool acqtime_less_than(const QString & s1, const QString & s2)
-{
-    return s1 < s2;
-}
-
-static bool acqtime_more_than(const QString & s1, const QString & s2)
-{
-    return s1 > s2;
-}
-
 QString DicomUtils::read_series(
 	bool * ok,
 	const bool min_load,
@@ -9703,37 +9695,15 @@ QString DicomUtils::read_enhanced_common(
 				}
 			}
 			//
+			if (!acquisition_datetimes.empty())
 			{
-				QMap<qulonglong, QString> acq_times_tmp;
-				for (int i = 0; i < acquisition_datetimes.size(); ++i)
+				std::sort(acquisition_datetimes.begin(), acquisition_datetimes.end(), acqtime_less_than);
+				QString tmp57 = acquisition_datetimes.at(0);
+				tmp57 = tmp57.trimmed().remove(QChar('\0'));
+				if (tmp57.size() >= 14)
 				{
-					if (!acquisition_datetimes.at(i).isEmpty())
-					{
-						const long double dacq = std::stold(acquisition_datetimes.at(i).toStdString());
-						if (dacq > 0.0L)
-						{
-							acq_times_tmp[static_cast<qulonglong>((dacq * 1000.0L) + 0.5L)] =
-								acquisition_datetimes.at(i);
-						}
-					}
-				}
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-				QMap<qulonglong,QString>::const_iterator acqit =
-					acq_times_tmp.cbegin();
-				if (acqit != acq_times_tmp.cend())
-#else
-				QMap<qulonglong,QString>::const_iterator acqit =
-					acq_times_tmp.constBegin();
-				if (acqit != acq_times_tmp.constEnd())
-#endif
-				{
-					QString tmp57 = acqit.value();
-					tmp57 = tmp57.trimmed().remove(QChar('\0'));
-					if (tmp57.size() >= 14)
-					{
-						ivariant->acquisition_date = tmp57.left(8);
-						ivariant->acquisition_time = tmp57.right(tmp57.size() - 8);
-					}
+					ivariant->acquisition_date = tmp57.left(8);
+					ivariant->acquisition_time = tmp57.right(tmp57.size() - 8);
 				}
 			}
 			//
