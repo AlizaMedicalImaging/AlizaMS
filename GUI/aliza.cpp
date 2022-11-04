@@ -3416,6 +3416,7 @@ void Aliza::start_3D_anim()
 			if (animation_images.at(x) && (v->id == animation_images.at(x)->id))
 			{
 				anim_idx = x;
+				break;
 			}
 		}
 		frames2DAct->setEnabled(false);
