@@ -3904,9 +3904,9 @@ bool DicomUtils::read_group_sq(
 void DicomUtils::read_frame_times(const mdcm::DataSet & ds, ImageVariant * ivariant, int dimz)
 {
 	if (ds.IsEmpty()) return;
-	const mdcm::Tag tframeincrementpointer(0x0028,0x0009);
-	const mdcm::Tag tframetime(0x0018,0x1063);
-	const mdcm::Tag tframetimes(0x0018,0x1065);
+	const mdcm::Tag tframeincrementpointer(0x0028, 0x0009);
+	const mdcm::Tag tframetime(0x0018, 0x1063);
+	const mdcm::Tag tframetimes(0x0018, 0x1065);
 	double frametime = 100.0;
 	//
 	if (ds.FindDataElement(tframeincrementpointer))
@@ -3919,19 +3919,19 @@ void DicomUtils::read_frame_times(const mdcm::DataSet & ds, ImageVariant * ivari
 		if (bv)
 		{
 			char * buffer = new char[4];
-			const qlonglong length = static_cast<qlonglong>(bv->GetLength());
-			if (length==4)
+			const unsigned long long = static_cast<unsigned long long>(bv->GetLength());
+			if (length == 4)
 			{
-				const bool ok0 = bv->GetBuffer(buffer,4);
+				const bool ok0 = bv->GetBuffer(buffer, 4);
 				if (ok0)
 				{
 					group_[0] = buffer[0];
 					group_[1] = buffer[1];
-					memcpy(&group,group_,2);
+					memcpy(&group, group_, 2);
 					element_[0] = buffer[2];
 					element_[1] = buffer[3];
-					memcpy(&element,element_,2);
-					if (group==0x0018 && element==0x1063)
+					memcpy(&element, element_, 2);
+					if (group == 0x0018 && element == 0x1063)
 					{
 						if (ds.FindDataElement(tframetime))
 						{
@@ -3948,7 +3948,7 @@ void DicomUtils::read_frame_times(const mdcm::DataSet & ds, ImageVariant * ivari
 						}
 						for (int x = 0; x < dimz; ++x) ivariant->frame_times.push_back(frametime);
 					}
-					else if (group==0x0018 && element==0x1065)
+					else if (group == 0x0018 && element == 0x1065)
 					{
 						if (ds.FindDataElement(tframetimes))
 						{
