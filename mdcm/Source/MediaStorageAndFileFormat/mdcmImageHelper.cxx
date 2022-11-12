@@ -39,12 +39,16 @@
 #include "mdcmUIDGenerator.h"
 #include <cmath>
 
+// To support bad Extended IODs, unfortunately many
+// SC and other images in the wild.
+#define MDCM_ALWAYS_ALLOW_IPPIOP
+
 namespace mdcm
 {
 
 bool ImageHelper::ForceRescaleInterceptSlope = false;
 bool ImageHelper::PMSRescaleInterceptSlope = true;
-bool ImageHelper::ForcePixelSpacing = false;
+bool ImageHelper::ForcePixelSpacing = true;
 bool ImageHelper::CleanUnusedBits = false;
 bool ImageHelper::WorkaroundCornellBug = false;
 bool ImageHelper::WorkaroundPredictorBug = false;
@@ -324,8 +328,8 @@ ImageHelper::GetOriginValue(File const & f)
       ms == MediaStorage::OphthalmicTomographyImageStorage ||
       ms == MediaStorage::MultiframeGrayscaleWordSecondaryCaptureImageStorage ||
       ms == MediaStorage::MultiframeGrayscaleByteSecondaryCaptureImageStorage ||
-      ms == MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage //
-      || ms == MediaStorage::XRay3DAngiographicImageStorage || ms == MediaStorage::XRay3DCraniofacialImageStorage ||
+      ms == MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage || //
+      ms == MediaStorage::XRay3DAngiographicImageStorage || ms == MediaStorage::XRay3DCraniofacialImageStorage ||
       ms == MediaStorage::SegmentationStorage || ms == MediaStorage::IVOCTForProcessing ||
       ms == MediaStorage::IVOCTForPresentation || ms == MediaStorage::BreastTomosynthesisImageStorage ||
       ms == MediaStorage::BreastProjectionXRayImageStorageForPresentation ||
@@ -373,7 +377,11 @@ ImageHelper::GetOriginValue(File const & f)
   }
   ori.resize(3);
   const Tag timagepositionpatient(0x0020, 0x0032);
-  if (ms != MediaStorage::SecondaryCaptureImageStorage && ds.FindDataElement(timagepositionpatient))
+  if (
+#ifndef MDCM_ALWAYS_ALLOW_IPPIOP
+      ms != MediaStorage::SecondaryCaptureImageStorage &&
+#endif
+      ds.FindDataElement(timagepositionpatient))
   {
     const DataElement &       de = ds.GetDataElement(timagepositionpatient);
     Attribute<0x0020, 0x0032> at = { { 0, 0, 0 } }; // default value if empty
@@ -439,8 +447,8 @@ ImageHelper::GetDirectionCosinesValue(File const & f)
       ms == MediaStorage::EnhancedMRColorImageStorage || ms == MediaStorage::EnhancedPETImageStorage ||
       ms == MediaStorage::MultiframeGrayscaleWordSecondaryCaptureImageStorage ||
       ms == MediaStorage::MultiframeGrayscaleByteSecondaryCaptureImageStorage ||
-      ms == MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage //
-      || ms == MediaStorage::XRay3DAngiographicImageStorage || ms == MediaStorage::XRay3DCraniofacialImageStorage ||
+      ms == MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage || //
+      ms == MediaStorage::XRay3DAngiographicImageStorage || ms == MediaStorage::XRay3DCraniofacialImageStorage ||
       ms == MediaStorage::SegmentationStorage || ms == MediaStorage::IVOCTForPresentation ||
       ms == MediaStorage::IVOCTForProcessing || ms == MediaStorage::BreastTomosynthesisImageStorage ||
       ms == MediaStorage::BreastProjectionXRayImageStorageForPresentation ||
@@ -504,7 +512,11 @@ ImageHelper::GetDirectionCosinesValue(File const & f)
     }
   }
   dircos.resize(6);
-  if (ms == MediaStorage::SecondaryCaptureImageStorage || !GetDirectionCosinesFromDataSet(ds, dircos))
+  if (
+#ifndef MDCM_ALWAYS_ALLOW_IPPIOP
+      ms == MediaStorage::SecondaryCaptureImageStorage ||
+#endif
+      !GetDirectionCosinesFromDataSet(ds, dircos))
   {
     dircos[0] = 1;
     dircos[1] = 0;
@@ -891,7 +903,7 @@ ImageHelper::GetRescaleInterceptSlopeValue(File const & f)
       // "Combine MR Rescaling" was set:
       // PMS DICOM CS states that Modality LUT for MR Image Storage is to be
       // used for image processing. VOI LUT are always recomputed, so output
-      // from MDCM may not look right for display (sorry!)
+      // may not look right for display.
       const DataElement &      priv_rescaleintercept = ds.GetDataElement(tpriv_rescaleintercept);
       const DataElement &      priv_rescaleslope = ds.GetDataElement(tpriv_rescaleslope);
       Element<VR::DS, VM::VM1> el_ri = { { 0 } };
@@ -970,12 +982,12 @@ ImageHelper::GetSpacingTagFromMediaStorage(MediaStorage const & ms)
     case MediaStorage::RTImageStorage:
       t = Tag(0x3002, 0x0011);
       break;
+    case MediaStorage::DCMTKUnknownStorage:
     case MediaStorage::SecondaryCaptureImageStorage:
     case MediaStorage::MultiframeSingleBitSecondaryCaptureImageStorage:
     case MediaStorage::MultiframeGrayscaleByteSecondaryCaptureImageStorage:
     case MediaStorage::MultiframeGrayscaleWordSecondaryCaptureImageStorage:
     case MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage:
-    case MediaStorage::DCMTKUnknownStorage:
       t = Tag(0x0018, 0x2010);
       break;
     case MediaStorage::GEPrivate3DModelStorage:
@@ -1002,12 +1014,6 @@ ImageHelper::GetSpacingTagFromMediaStorage(MediaStorage const & ms)
       t = Tag(0xffff, 0xffff);
       break;
   }
-  // Should only override unless Modality set it already
-  // basically only Secondary Capture should reach that point
-  if (ForcePixelSpacing && t == Tag(0xffff, 0xffff))
-  {
-    t = Tag(0x0028, 0x0030);
-  }
   return t;
 }
 
@@ -1026,32 +1032,6 @@ ImageHelper::GetZSpacingTagFromMediaStorage(MediaStorage const & ms)
     case MediaStorage::RTDoseStorage:
       t = Tag(0x3004, 0x000c);
       break;
-    case MediaStorage::PETImageStorage:
-    case MediaStorage::CTImageStorage:
-    case MediaStorage::RTImageStorage:
-    case MediaStorage::ComputedRadiographyImageStorage:
-    case MediaStorage::DigitalXRayImageStorageForPresentation:
-    case MediaStorage::DigitalXRayImageStorageForProcessing:
-    case MediaStorage::DigitalMammographyImageStorageForPresentation:
-    case MediaStorage::DigitalMammographyImageStorageForProcessing:
-    case MediaStorage::DigitalIntraoralXrayImageStorageForPresentation:
-    case MediaStorage::DigitalIntraoralXRayImageStorageForProcessing:
-    case MediaStorage::XRayAngiographicImageStorage:
-    case MediaStorage::XRayRadiofluoroscopingImageStorage:
-    case MediaStorage::XRayAngiographicBiPlaneImageStorageRetired:
-    case MediaStorage::UltrasoundImageStorage:
-    case MediaStorage::UltrasoundMultiFrameImageStorage:
-    case MediaStorage::UltrasoundImageStorageRetired:
-    case MediaStorage::UltrasoundMultiFrameImageStorageRetired:
-    case MediaStorage::SecondaryCaptureImageStorage:
-    case MediaStorage::MultiframeGrayscaleByteSecondaryCaptureImageStorage:
-    case MediaStorage::MultiframeGrayscaleWordSecondaryCaptureImageStorage:
-    case MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage: //
-    case MediaStorage::HardcopyGrayscaleImageStorage:
-    case MediaStorage::HardcopyColorImageStorage:
-    case MediaStorage::GEPrivate3DModelStorage:
-    case MediaStorage::Philips3D:
-    case MediaStorage::VideoEndoscopicImageStorage:
     default:
       t = Tag(0xffff, 0xffff);
       break;
@@ -1102,82 +1082,93 @@ ImageHelper::GetSpacingValue(File const & f)
     }
     return sp;
   }
-  Tag spacingtag = GetSpacingTagFromMediaStorage(ms);
-  if (spacingtag != Tag(0xffff, 0xffff) && ds.FindDataElement(spacingtag) && !ds.GetDataElement(spacingtag).IsEmpty())
+  if (ForcePixelSpacing && ds.FindDataElement(Tag(0x0028, 0x0030)))
   {
-    const DataElement & de = ds.GetDataElement(spacingtag);
-    const Global &      g = GlobalInstance;
-    const Dicts &       dicts = g.GetDicts();
-    const DictEntry &   entry = dicts.GetDictEntry(de.GetTag());
-    const VR &          vr = entry.GetVR();
-    assert(vr.Compatible(de.GetVR()));
-    switch (vr)
-    {
-      case VR::DS:
-      {
-        Element<VR::DS, VM::VM1_n> el;
-        std::stringstream          ss;
-        const ByteValue *          bv = de.GetByteValue();
-        assert(bv);
-        std::string s = std::string(bv->GetPointer(), bv->GetLength());
-        ss.str(s);
-        el.SetLength(entry.GetVM().GetLength() * entry.GetVR().GetSizeof());
-        std::string::size_type found = s.find('\\');
-        if (found != std::string::npos)
-        {
-          el.Read(ss);
-          assert(el.GetLength() == 2);
-          for (unsigned int i = 0; i < el.GetLength(); ++i)
-          {
-            if (el.GetValue(i))
-            {
-              sp.push_back(el.GetValue(i));
-            }
-            else
-            {
-              mdcmAlwaysWarnMacro("Spacing is 0, forced to 1");
-              sp.push_back(1.0);
-            }
-          }
-          std::swap(sp[0], sp[1]);
-        }
-        else
-        {
-          double singleval;
-          ss >> singleval;
-          if (singleval == 0.0)
-            singleval = 1.0;
-          sp.push_back(singleval);
-          sp.push_back(singleval);
-        }
-        assert(sp.size() == (unsigned int)entry.GetVM());
-      }
-      break;
-      case VR::IS:
-      {
-        Element<VR::IS, VM::VM1_n> el;
-        std::stringstream          ss;
-        const ByteValue *          bv = de.GetByteValue();
-        assert(bv);
-        std::string s = std::string(bv->GetPointer(), bv->GetLength());
-        ss.str(s);
-        el.SetLength(entry.GetVM().GetLength() * entry.GetVR().GetSizeof());
-        el.Read(ss);
-        for (unsigned int i = 0; i < el.GetLength(); ++i)
-          sp.push_back(el.GetValue(i));
-        std::swap(sp[0], sp[1]);
-        assert(sp.size() == (unsigned int)entry.GetVM());
-      }
-      break;
-      default:
-        assert(0);
-        break;
-    }
+    const DataElement & de = ds.GetDataElement(Tag(0x0028, 0x0030));
+    Attribute<0x0028, 0x0030> at;
+    at.SetFromDataElement(de);
+    sp.push_back(at.GetValue(1));
+    sp.push_back(at.GetValue(0));
   }
   else
   {
-    sp.push_back(1.0);
-    sp.push_back(1.0);
+    Tag spacingtag = GetSpacingTagFromMediaStorage(ms);
+    if (spacingtag != Tag(0xffff, 0xffff) && ds.FindDataElement(spacingtag) && !ds.GetDataElement(spacingtag).IsEmpty())
+    {
+      const DataElement & de = ds.GetDataElement(spacingtag);
+      const Global &      g = GlobalInstance;
+      const Dicts &       dicts = g.GetDicts();
+      const DictEntry &   entry = dicts.GetDictEntry(de.GetTag());
+      const VR &          vr = entry.GetVR();
+      assert(vr.Compatible(de.GetVR()));
+      switch (vr)
+      {
+        case VR::DS:
+        {
+          Element<VR::DS, VM::VM1_n> el;
+          std::stringstream          ss;
+          const ByteValue *          bv = de.GetByteValue();
+          assert(bv);
+          std::string s = std::string(bv->GetPointer(), bv->GetLength());
+          ss.str(s);
+          el.SetLength(entry.GetVM().GetLength() * entry.GetVR().GetSizeof());
+          std::string::size_type found = s.find('\\');
+          if (found != std::string::npos)
+          {
+            el.Read(ss);
+            assert(el.GetLength() == 2);
+            for (unsigned int i = 0; i < el.GetLength(); ++i)
+            {
+              if (el.GetValue(i))
+              {
+                sp.push_back(el.GetValue(i));
+              }
+              else
+              {
+                mdcmAlwaysWarnMacro("Spacing is 0, forced to 1");
+                sp.push_back(1.0);
+              }
+            }
+            std::swap(sp[0], sp[1]);
+          }
+          else
+          {
+            double singleval;
+            ss >> singleval;
+            if (singleval == 0.0)
+              singleval = 1.0;
+            sp.push_back(singleval);
+            sp.push_back(singleval);
+          }
+          assert(sp.size() == (unsigned int)entry.GetVM());
+        }
+        break;
+        case VR::IS:
+        {
+          Element<VR::IS, VM::VM1_n> el;
+          std::stringstream          ss;
+          const ByteValue *          bv = de.GetByteValue();
+          assert(bv);
+          std::string s = std::string(bv->GetPointer(), bv->GetLength());
+          ss.str(s);
+          el.SetLength(entry.GetVM().GetLength() * entry.GetVR().GetSizeof());
+          el.Read(ss);
+          for (unsigned int i = 0; i < el.GetLength(); ++i)
+            sp.push_back(el.GetValue(i));
+          std::swap(sp[0], sp[1]);
+          assert(sp.size() == (unsigned int)entry.GetVM());
+        }
+        break;
+        default:
+          assert(0);
+          break;
+      }
+    }
+    else
+    {
+      sp.push_back(1.0);
+      sp.push_back(1.0);
+    }
   }
   assert(sp.size() == 2);
   //
@@ -1785,13 +1776,12 @@ ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
     return;
   }
   if (ms != MediaStorage::CTImageStorage && ms != MediaStorage::MRImageStorage && ms != MediaStorage::RTDoseStorage &&
-      ms != MediaStorage::PETImageStorage
-      //&& ms != MediaStorage::ComputedRadiographyImageStorage
-      && ms != MediaStorage::SegmentationStorage &&
+      ms != MediaStorage::PETImageStorage && //ms != MediaStorage::ComputedRadiographyImageStorage &&
+      ms != MediaStorage::SegmentationStorage &&
       ms != MediaStorage::MultiframeGrayscaleWordSecondaryCaptureImageStorage &&
       ms != MediaStorage::MultiframeGrayscaleByteSecondaryCaptureImageStorage &&
-      ms != MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage //
-      && ms != MediaStorage::XRay3DAngiographicImageStorage && ms != MediaStorage::XRay3DCraniofacialImageStorage &&
+      ms != MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage && //
+      ms != MediaStorage::XRay3DAngiographicImageStorage && ms != MediaStorage::XRay3DCraniofacialImageStorage &&
       ms != MediaStorage::EnhancedMRImageStorage && ms != MediaStorage::EnhancedMRColorImageStorage &&
       ms != MediaStorage::EnhancedPETImageStorage && ms != MediaStorage::EnhancedCTImageStorage &&
       ms != MediaStorage::IVOCTForPresentation && ms != MediaStorage::IVOCTForProcessing &&
@@ -1810,8 +1800,8 @@ ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
       ms == MediaStorage::XRay3DAngiographicImageStorage || ms == MediaStorage::XRay3DCraniofacialImageStorage ||
       ms == MediaStorage::MultiframeGrayscaleWordSecondaryCaptureImageStorage ||
       ms == MediaStorage::MultiframeGrayscaleByteSecondaryCaptureImageStorage ||
-      ms == MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage //
-      || ms == MediaStorage::SegmentationStorage || ms == MediaStorage::IVOCTForPresentation ||
+      ms == MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage || //
+      ms == MediaStorage::SegmentationStorage || ms == MediaStorage::IVOCTForPresentation ||
       ms == MediaStorage::IVOCTForProcessing || ms == MediaStorage::BreastTomosynthesisImageStorage ||
       ms == MediaStorage::BreastProjectionXRayImageStorageForPresentation ||
       ms == MediaStorage::BreastProjectionXRayImageStorageForProcessing || ms == MediaStorage::ParametricMapStorage ||
@@ -2122,8 +2112,8 @@ ImageHelper::SetDirectionCosinesValue(DataSet & ds, const std::vector<double> & 
       ms == MediaStorage::EnhancedMRColorImageStorage || ms == MediaStorage::EnhancedPETImageStorage ||
       ms == MediaStorage::MultiframeGrayscaleWordSecondaryCaptureImageStorage ||
       ms == MediaStorage::MultiframeGrayscaleByteSecondaryCaptureImageStorage ||
-      ms == MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage //
-      || ms == MediaStorage::XRay3DAngiographicImageStorage || ms == MediaStorage::XRay3DCraniofacialImageStorage ||
+      ms == MediaStorage::MultiframeTrueColorSecondaryCaptureImageStorage ||
+      ms == MediaStorage::XRay3DAngiographicImageStorage || ms == MediaStorage::XRay3DCraniofacialImageStorage ||
       ms == MediaStorage::SegmentationStorage || ms == MediaStorage::IVOCTForPresentation ||
       ms == MediaStorage::IVOCTForProcessing || ms == MediaStorage::BreastTomosynthesisImageStorage ||
       ms == MediaStorage::BreastProjectionXRayImageStorageForPresentation ||
@@ -2224,8 +2214,8 @@ ImageHelper::SetRescaleInterceptSlopeValue(File & f, const Image & img)
   assert(MediaStorage::IsImage(ms));
   DataSet & ds = f.GetDataSet();
   if (ms != MediaStorage::CTImageStorage && ms != MediaStorage::ComputedRadiographyImageStorage &&
-      ms != MediaStorage::MRImageStorage //
-      && ms != MediaStorage::PETImageStorage && ms != MediaStorage::RTDoseStorage &&
+      ms != MediaStorage::MRImageStorage && //
+      ms != MediaStorage::PETImageStorage && ms != MediaStorage::RTDoseStorage &&
       ms != MediaStorage::SecondaryCaptureImageStorage &&
       ms != MediaStorage::MultiframeGrayscaleWordSecondaryCaptureImageStorage &&
       ms != MediaStorage::MultiframeGrayscaleByteSecondaryCaptureImageStorage &&

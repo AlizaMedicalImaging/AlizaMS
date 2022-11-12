@@ -12851,7 +12851,9 @@ QString DicomUtils::read_dicom(
 					mixed = true;
 				}
 				if (
+#if 0
 				   sop==QString("1.2.840.10008.5.1.4.1.1.7")       || // SC
+#endif
 				   sop==QString("1.2.840.10008.5.1.4.1.1.77.1.5.1")|| // Ophthalmic Photography  8 Bit
 				   sop==QString("1.2.840.10008.5.1.4.1.1.77.1.5.2")|| // Ophthalmic Photography 16 Bit
 				   sop==QString("1.2.840.10008.5.1.4.1.1.1")       || // Computed Radiography
