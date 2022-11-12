@@ -1,5 +1,6 @@
 #define WARN_RAM_SIZE
 //#define ENHANCED_PRINT_INFO
+//#define TMP_ALWAYS_GEOM_FROM_IMAGE
 
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -3919,7 +3920,8 @@ void DicomUtils::read_frame_times(const mdcm::DataSet & ds, ImageVariant * ivari
 		if (bv)
 		{
 			char * buffer = new char[4];
-			const unsigned long long = static_cast<unsigned long long>(bv->GetLength());
+			const unsigned long long length =
+				static_cast<unsigned long long>(bv->GetLength());
 			if (length == 4)
 			{
 				const bool ok0 = bv->GetBuffer(buffer, 4);
@@ -5168,7 +5170,7 @@ void DicomUtils::enhanced_get_indices(
 			int dim5th_tmp = -1;
 			for (int x = 0; x < 3; ++x)
 			{
-				const size_t i = static_cast<size_t>(x);
+				const size_t i = x;
 				if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
 					sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9056))
 				{
@@ -6640,7 +6642,11 @@ QString DicomUtils::read_ultrasound(
 		dimx, dimy, dimz,
 		origin_x, origin_y, origin_z,
 		spacing_x, spacing_y, spacing_z,
+#ifdef TMP_ALWAYS_GEOM_FROM_IMAGE
 		true, false,
+#else
+		false, false,
+#endif
 		wsettings->get_resize(),
 		wsettings->get_size_x(), wsettings->get_size_y(),
 		wsettings->get_rescale(),
@@ -6860,7 +6866,11 @@ are stacked in front of the first slice. See Image Orientation
 		dimx, dimy, dimz,
 		origin_x, origin_y, origin_z,
 		spacing_x, spacing_y, spacing_z,
-		false, false, //
+#ifdef TMP_ALWAYS_GEOM_FROM_IMAGE
+		true, false,
+#else
+		false, false,
+#endif
 		wsettings->get_resize(),
 		wsettings->get_size_x(), wsettings->get_size_y(),
 		wsettings->get_rescale(),
@@ -7045,9 +7055,15 @@ QString DicomUtils::read_series(
 								gl,
 								pb,
 								0.01f);
-							if (slices_ok) ivariant->iod_supported = true;
-							else geometry_from_image = true;
-							if (slices_ok) load_contour(ds,ivariant);
+							if (slices_ok)
+							{
+								ivariant->iod_supported = true;
+								load_contour(ds,ivariant);
+							}
+							else
+							{
+								geometry_from_image = true;
+							}
 						}
 					}
 					else
@@ -7062,7 +7078,13 @@ QString DicomUtils::read_series(
 								gl,
 								pb,
 								tolerance);
-							if (!slices_ok) ivariant->di->skip_texture = true;
+							if (!slices_ok)
+							{
+								ivariant->di->skip_texture = true;
+#ifdef TMP_ALWAYS_GEOM_FROM_IMAGE
+								geometry_from_image = true;
+#endif
+							}
 						}
 					}
 				}
@@ -9616,10 +9638,10 @@ QString DicomUtils::read_enhanced_common(
 			float  up_dir_x, up_dir_y, up_dir_z;
 			float  center_x, center_y, center_z;
 			std::vector<ImageSlice*> slices;
-			const bool enable_gl = min_load ? false : ok3d;
+			const bool enable_gl = min_load ? false : (ok3d && gl && max_3d_tex_size > 0);
 			// Disable texture for Breast Tomosynthesis
 			bool skip_texture =
-				(min_load || (sop == QString("1.2.840.10008.5.1.4.1.1.13.1.3")))
+				(min_load || !enable_gl || (sop == QString("1.2.840.10008.5.1.4.1.1.13.1.3")))
 				? true : !wsettings->get_3d();
 			const int new_id = min_load ? -1 : CommonUtils::get_next_id();
 			double window_center = -999999;
@@ -11105,8 +11127,7 @@ void DicomUtils::read_pr_ref(
 	if(!(sqReferencedSeriesSequence &&
 			sqReferencedSeriesSequence->GetNumberOfItems()>0))
 		return;
-	for (
-		unsigned int x = 0;
+	for (unsigned int x = 0;
 		x < sqReferencedSeriesSequence->GetNumberOfItems();
 		++x)
 	{
@@ -11133,8 +11154,7 @@ void DicomUtils::read_pr_ref(
 		PrRefSeries series;
 		series.uid = s;
 		//
-		for (
-			unsigned int y = 0;
+		for (unsigned int y = 0;
 			y < sqReferencedImageSequence->GetNumberOfItems();
 			++y)
 		{
@@ -11144,8 +11164,7 @@ void DicomUtils::read_pr_ref(
 			const mdcm::DataSet & nds1 =
 				item1.GetNestedDataSet();
 			QString s0;
-			const bool ok0 = get_string_value(
-				nds1, tReferencedSOPInstanceUID, s0);
+			const bool ok0 = get_string_value(nds1, tReferencedSOPInstanceUID, s0);
 			if (ok0)
 			{
 				PrRefImage ref;

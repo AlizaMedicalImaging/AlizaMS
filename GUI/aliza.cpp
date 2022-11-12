@@ -731,6 +731,8 @@ QProgressDialog * Aliza::create_filters_progress()
 	pb->setMinimumWidth(256);
 	pb->setValue(-1);
 	pb->show();
+	pb->activateWindow();
+	pb->raise();
 	qApp->processEvents();
 	return pb;
 }
@@ -749,6 +751,8 @@ QProgressDialog * Aliza::create_filters_progress2()
 	pb->setMinimumWidth(256);
 	pb->setValue(-1);
 	pb->show();
+	pb->activateWindow();
+	pb->raise();
 	qApp->processEvents();
 	return pb;
 }
@@ -3728,17 +3732,17 @@ void Aliza::reset_3d()
 	disconnect(toolbox->bright_doubleSpinBox,SIGNAL(valueChanged(double)), glwidget, SLOT(set_brightness(double)));
 	disconnect(toolbox->contours_checkBox,   SIGNAL(toggled(bool)),        glwidget, SLOT(set_display_contours(bool)));
 	disconnect(toolbox->cube_checkBox,       SIGNAL(toggled(bool)),        glwidget, SLOT(set_cube(bool)));
-	glwidget->fov = (float)SCENE_FOV;
-	glwidget->alpha = (float)SCENE_ALPHA;
+	glwidget->fov = SCENE_FOV;
+	glwidget->alpha = SCENE_ALPHA;
 	glwidget->brightness = 1.0f;
 	glwidget->pan_x  = 0;
 	glwidget->pan_y  = 0;
 	glwidget->camera->reset();
-	glwidget->camera->set_position(0.0f,0.0f,(float)SCENE_POS_Z);
+	glwidget->camera->set_position(0.0f,0.0f,SCENE_POS_Z);
 	glwidget->set_cube(true);
 	glwidget->set_display_contours(true);
-	toolbox->fov_doubleSpinBox->setValue((double)SCENE_FOV);
-	toolbox->alpha_doubleSpinBox->setValue((double)SCENE_ALPHA);
+	toolbox->fov_doubleSpinBox->setValue(SCENE_FOV);
+	toolbox->alpha_doubleSpinBox->setValue(SCENE_ALPHA);
 	toolbox->bright_doubleSpinBox->setValue(1.0);
 	toolbox->contours_checkBox->setChecked(true);
 	toolbox->cube_checkBox->setChecked(true);
