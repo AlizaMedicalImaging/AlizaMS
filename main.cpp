@@ -176,15 +176,73 @@ int main(int argc, char *argv[])
 		{
 			std::cout << "System is little-endian\n";
 		}
-		std::cout << "__cplusplus = " << __cplusplus;
+#ifdef __cplusplus
+		std::cout << "__cplusplus is defined: " << __cplusplus << "\n";
+#else
+		std::cout << "__cplusplus is not defined\n";
+#endif
+#ifdef __x86_64__
+		std::cout << "__x86_64__ is defined\n";
+#endif
+#ifdef __x86_64
+		std::cout << "__x86_64 is defined\n";
+#endif
+#ifdef __amd64__
+		std::cout << "__amd64__ is defined\n";
+#endif
+#ifdef __amd64
+		std::cout << "__amd64 is defined\n";
+#endif
+#ifdef __arm__
+		std::cout << "__arm__ is defined\n";
+#endif
+#ifdef __arm64__
+		std::cout << "__arm64__ is defined\n";
+#endif
+#ifdef __aarch64__
+		std::cout << "__aarch64__ is defined\n";
+#endif
+#ifdef _M_AMD64
+		std::cout << "_M_AMD64 is defined\n";
+#endif
+#ifdef _M_X64
+		std::cout << "_M_X64 is defined\n";
+#endif
+#ifdef _M_IX86_FP
+		std::cout << "_M_IX86_FP is defined:" << _M_IX86_FP << "\n"
+#endif
+#ifdef _M_ARM
+		std::cout << "_M_ARM is defined\n";
+#endif
+#ifdef _M_ARM64EC
+		std::cout << "_M_ARM64EC is defined\n";
+#endif
 #if 1
-		std::cout << "\nalignof(std::max_align_t) = " << alignof(std::max_align_t)
+		std::cout << "alignof(std::max_align_t) = " << alignof(std::max_align_t)
 			<< "\n";
 #ifdef __STDCPP_DEFAULT_NEW_ALIGNMENT__
-		std::cout << "\n__STDCPP_DEFAULT_NEW_ALIGNMENT__ = "
+		std::cout << "__STDCPP_DEFAULT_NEW_ALIGNMENT__ = "
 			<< __STDCPP_DEFAULT_NEW_ALIGNMENT__ << "\n";
 #else
 		std::cout << "__STDCPP_DEFAULT_NEW_ALIGNMENT__ is not defined\n";
+#endif
+#endif
+#ifdef _WIN32
+#ifdef UNICODE
+		std::cout << "UNICODE is defined\n";
+#else
+		std::cout << "UNICODE is not defined\n";
+#endif
+#if 1
+		UINT acp = GetACP();
+		if (activeCodePage == 65001)
+		{
+			std::cout << "Active code page is UTF-8\n";
+		}
+		else
+		{
+			std::cout << "Active code page: " << acp << "\n";
+		}
 #endif
 #endif
 		enum { Va = (short)SHRT_MAX                } Ea;
@@ -209,6 +267,7 @@ int main(int argc, char *argv[])
 			<< "\nsize of long        = "          << sizeof(long)
 			<< "\nsize of long long   = "          << sizeof(long long)
 			<< "\nsize of size_t      = "          << sizeof(size_t)
+			<< "\nsize of off_t       = "          << sizeof(off_t)
 			<< "\nsize of uintptr_t   = "          << sizeof(uintptr_t)
 			<< "\nsize of float       = "          << sizeof(float)
 			<< "\nsize of double      = "          << sizeof(double)
@@ -225,26 +284,6 @@ int main(int argc, char *argv[])
 			<< "\nsize of enum:long      { 1 } = " << sizeof(E8)
 			<< "\nsize of enum:long long { 1 } = " << sizeof(E9)
 			<< std::endl;
-#ifdef _WIN32
-#ifdef UNICODE
-		std::cout << "UNICODE is defined" << std::endl;
-#else
-		std::cout << "UNICODE is not defined" << std::endl;
-#endif
-#if 1
-		UINT acp = GetACP();
-		if (activeCodePage == 65001)
-		{
-			std::cout << "Active code page is UTF-8"
-				<< std::endl;
-		}
-		else
-		{
-			std::cout << "Active code page is " << acp
-				<< std::endl;
-		}
-#endif
-#endif
 	}
 #endif
 	//
