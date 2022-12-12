@@ -38,8 +38,7 @@ public:
   {}
   virtual ~Observer()
   {
-    if (m_Event)
-      delete m_Event;
+    delete m_Event;
   }
   SmartPointer<Command> m_Command;
   const Event *         m_Event;

@@ -34,8 +34,7 @@ Preamble::Preamble()
 
 Preamble::~Preamble()
 {
-  if (Internal)
-    delete[] Internal;
+  delete[] Internal;
 }
 
 std::istream &

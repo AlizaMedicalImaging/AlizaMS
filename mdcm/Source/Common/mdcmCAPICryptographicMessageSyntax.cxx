@@ -94,10 +94,8 @@ CAPICryptographicMessageSyntax::ParseCertificateFile(const char * filename)
   ret = true;
 
 err:
-  if (certBin)
-    delete[] certBin;
-  if (certHexBuf)
-    delete[] certHexBuf;
+  delete[] certBin;
+  delete[] certHexBuf;
   return ret;
 }
 
