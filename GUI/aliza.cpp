@@ -219,7 +219,7 @@ static void add_slice_collision_plane(
 	const ImageVariant * v,
 	const int z,
 	const int id,
-	btAlignedObjectArray<btCollisionShape*> & tmp_shapes,
+	btAlignedObjectArray<btStaticPlaneShape*> & tmp_shapes,
 	btAlignedObjectArray<btCollisionObject*> & tmp_objects) 
 {
 	if ((int)v->di->image_slices.size() <= z) return;
@@ -238,7 +238,7 @@ static void add_slice_collision_plane(
 		v->di->image_slices.at(z)->v[8] - pz);
 	const Vectormath::Scalar::Vector3 n =
 		Vectormath::Scalar::normalize(Vectormath::Scalar::cross(v1,v2));
-	btCollisionShape * s =
+	btStaticPlaneShape * s =
 		new btStaticPlaneShape(btVector3(n.getX(),n.getY(),n.getZ()),0);
 	tmp_shapes.push_back(s);
 	btCollisionObject * o = new btCollisionObject();
@@ -297,7 +297,7 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 			v->id, v->frame_of_ref_uid, v->study_uid, refs);
 	}
 	if (refs.empty()) return;
-	btAlignedObjectArray<btCollisionShape*> tmp_shapes;
+	btAlignedObjectArray<btStaticPlaneShape*> tmp_shapes;
 	btAlignedObjectArray<btCollisionObject*> tmp_objects;
 	tmp_shapes.resize(0);
 	tmp_objects.resize(0);
@@ -424,12 +424,10 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 	}
 	for (int j = 0; j < tmp_shapes.size(); ++j)
 	{
-		btCollisionShape * k =
-			static_cast<btCollisionShape *>(tmp_shapes[j]);
-		if (k)
+		if (tmp_shapes[j])
 		{
-			delete k;
-			k = NULL;
+			delete tmp_shapes[j];
+			tmp_shapes[j] = NULL;
 		}
 	}
 #if 0
@@ -465,7 +463,7 @@ static void check_slice_collisions2(StudyViewWidget * w)
 				const int z =
 					w->widgets.at(x)->graphicswidget->image_container.selected_z_slice_ext;
 				if ((int)v->di->image_slices.size() <= z) continue;
-				btAlignedObjectArray<btCollisionShape*> tmp_shapes;
+				btAlignedObjectArray<btStaticPlaneShape*> tmp_shapes;
 				btAlignedObjectArray<btCollisionObject*> tmp_objects;
 				tmp_shapes.resize(0);
 				tmp_objects.resize(0);
@@ -603,12 +601,10 @@ static void check_slice_collisions2(StudyViewWidget * w)
 				}
 				for (int j = 0; j < tmp_shapes.size(); ++j)
 				{
-					btCollisionShape * k =
-						static_cast<btCollisionShape *>(tmp_shapes[j]);
-					if (k)
+					if (tmp_shapes[j])
 					{
-						delete k;
-						k = NULL;
+						delete tmp_shapes[j];
+						tmp_shapes[j] = NULL;
 					}
 				}
 			}
