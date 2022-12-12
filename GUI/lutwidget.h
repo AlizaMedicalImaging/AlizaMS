@@ -1,5 +1,5 @@
-#ifndef LUTWIDGET_H
-#define LUTWIDGET_H
+#ifndef A_LUTWIDGET_H
+#define A_LUTWIDGET_H
 
 #include <QWidget>
 #include <QComboBox>
@@ -22,4 +22,4 @@ private:
 	float scale_icons;
 };
 
-#endif // LUTWIDGET_H
+#endif

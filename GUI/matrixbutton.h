@@ -1,5 +1,5 @@
-#ifndef MATRIXBUTTON__H
-#define MATRIXBUTTON__H
+#ifndef A_MATRIXBUTTON_H
+#define A_MATRIXBUTTON_H
 
 #include <QWidget>
 #include <QToolButton>
@@ -26,4 +26,4 @@ private:
 	QMenu * p_menu;
 };
 
-#endif // MATRIXBUTTON__H
+#endif

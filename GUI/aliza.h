@@ -1,5 +1,5 @@
-#ifndef ALIZA_H
-#define ALIZA_H
+#ifndef A_ALIZA_H
+#define A_ALIZA_H
 
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -268,4 +268,4 @@ private:
 	void set_contourstable(const ImageVariant*);
 };
 
-#endif // ALIZA_H
+#endif

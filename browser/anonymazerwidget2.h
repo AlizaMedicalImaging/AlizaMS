@@ -1,5 +1,5 @@
-#ifndef ANONYMAZERWIDGET2_H__
-#define ANONYMAZERWIDGET2_H__
+#ifndef A_ANONYMAZERWIDGET2_H
+#define A_ANONYMAZERWIDGET2_H
 
 #include "ui_anonymazerwidget2.h"
 #include "mdcmTag.h"
@@ -95,4 +95,4 @@ private:
 	HelpWidget * help_widget;
 };
 
-#endif // ANONYMAZERWIDGET2_H__
+#endif

@@ -22,8 +22,8 @@
  ** <http://libqxt.org>  <foundation@libqxt.org>
  **
  ****************************************************************************/
-#ifndef QXTSPANSLIDER_P_H
-#define QXTSPANSLIDER_P_H
+#ifndef A_QXTSPANSLIDER_P_H
+#define A_QXTSPANSLIDER_P_H
 
 #include <QStyle>
 #include <QObject>
@@ -79,4 +79,4 @@ public Q_SLOTS:
     void movePressedHandle();
 };
 
-#endif // QXTSPANSLIDER_P_H
+#endif

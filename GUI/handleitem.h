@@ -1,5 +1,5 @@
-#ifndef HANDLEITEM_H
-#define HANDLEITEM_H
+#ifndef A_HANDLEITEM_H
+#define A_HANDLEITEM_H
  
 #include <QGraphicsItem>
 #include <QGraphicsRectItem>
@@ -33,5 +33,5 @@ private:
 	bool m_pressed;
 };
  
-#endif // HANDLEITEM_H
+#endif
 

@@ -1,5 +1,5 @@
-#ifndef UltrasoundRegionUtils__H
-#define UltrasoundRegionUtils__H
+#ifndef A_ULTRASOUNDREGIONUTILS_H
+#define A_ULTRASOUNDREGIONUTILS_H
 
 #include "ultrasoundregiondata.h"
 #include <mdcmDataSet.h>
@@ -23,4 +23,4 @@ public:
 	static void Read(const mdcm::DataSet&, QList<UltrasoundRegionData> &);
 };
 
-#endif // UltrasoundRegionUtils__H
+#endif

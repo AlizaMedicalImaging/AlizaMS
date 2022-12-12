@@ -26,7 +26,7 @@
 #include "dicomutils.h"
 #include <QProgressDialog>
 
-//#define LOAD_SPECT_DATA___
+//#define LOAD_SPECT_DATA
 
 bool SpectroscopyUtils::Read(const mdcm::DataSet & ds, SpectroscopyData * s)
 {
@@ -80,7 +80,7 @@ bool SpectroscopyUtils::Read(const mdcm::DataSet & ds, SpectroscopyData * s)
 		return false;
 	}
 
-#if LOAD_SPECT_DATA___
+#if LOAD_SPECT_DATA
 	if (!DicomUtils::get_fl_values(ds, tSpectroscopyData, s->m_SpectroscopyData))
 		return false;
 #endif
@@ -97,7 +97,7 @@ bool SpectroscopyUtils::Read(const mdcm::DataSet & ds, SpectroscopyData * s)
 		s->m_SignalDomainRows = SignalDomainRows;
 	}
 
-#if LOAD_SPECT_DATA___
+#if LOAD_SPECT_DATA
 	DicomUtils::get_fl_values(ds, tFirstOrderPhaseCorrectionAngle, s->m_FirstOrderPhaseCorrectionAngle);
 #endif
 
@@ -119,7 +119,7 @@ QString SpectroscopyUtils::ProcessData(
 	DimIndexValues idx_values;
 	FrameGroupValues values;
 	FrameGroupValues shared_values;
-#if LOAD_SPECT_DATA___
+#if LOAD_SPECT_DATA
 	std::vector<float*> data;
 #endif
 	DicomUtils::read_dimension_index_sq(ds, sq);
@@ -255,7 +255,7 @@ QString SpectroscopyUtils::ProcessData(
 				QString(").size()<1");
 	}
 
-#ifdef LOAD_SPECT_DATA___
+#ifdef LOAD_SPECT_DATA
 	const unsigned long xy =
 		s.m_SpectroscopyData.size()/values.size();
 	for (unsigned int j = 0; j < values.size(); ++j)
@@ -304,7 +304,7 @@ QString SpectroscopyUtils::ProcessData(
 			++it)
 		{
 			const unsigned int idx__ = it->second;
-#ifdef LOAD_SPECT_DATA___
+#ifdef LOAD_SPECT_DATA
 			if (idx__<data.size() &&
 				data.at(idx__) &&
 				idx__<values.size())
@@ -338,7 +338,7 @@ QString SpectroscopyUtils::ProcessData(
 						ss[7] = pat_orient[4];
 						ss[8] = pat_orient[5];
 						tmp4.push_back(ss);
-#if LOAD_SPECT_DATA___
+#if LOAD_SPECT_DATA
 						tmp3.push_back(data.at(idx__));
 #endif
 					}
@@ -541,7 +541,7 @@ QString SpectroscopyUtils::ProcessData(
 		tmp4.clear();
 	}
 
-#ifdef LOAD_SPECT_DATA___
+#ifdef LOAD_SPECT_DATA
 	for (unsigned int x=0; x < data.size(); ++x)
 	{
 		if (data.at(x)) delete [] data[x];
@@ -551,7 +551,7 @@ QString SpectroscopyUtils::ProcessData(
 	return QString("");
 }
 
-#ifdef LOAD_SPECT_DATA___
-#undef LOAD_SPECT_DATA___
+#ifdef LOAD_SPECT_DATA
+#undef LOAD_SPECT_DATA
 #endif
 

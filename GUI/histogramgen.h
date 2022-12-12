@@ -1,5 +1,5 @@
-#ifndef HistogramGen_H
-#define HistogramGen_H
+#ifndef A_HISTOGRAMGEN_H
+#define A_HISTOGRAMGEN_H
 
 class ImageVariant;
 
@@ -16,5 +16,5 @@ private:
 	QString error;
 };
 
-#endif // HistogramGen_H
+#endif
 

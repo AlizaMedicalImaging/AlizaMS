@@ -1,5 +1,5 @@
-#ifndef RECTITEM_H
-#define RECTITEM_H
+#ifndef A_RECTITEM_H
+#define A_RECTITEM_H
 
 #include <QGraphicsItem>
 #include <QGraphicsRectItem>
@@ -43,4 +43,4 @@ private:
 	short current_pen;
 };
 
-#endif // RECTITEM_H
+#endif

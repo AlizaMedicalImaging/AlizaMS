@@ -1,5 +1,5 @@
-#ifndef COMMONUTILS__H_
-#define COMMONUTILS__H_
+#ifndef A_COMMONUTILS_H
+#define A_COMMONUTILS_H
 
 #include <QStringList>
 #include <QString>
@@ -122,4 +122,4 @@ public:
 	static void random_RGB(float*, float*, float*);
 };
 
-#endif // COMMONUTILS__H_
+#endif

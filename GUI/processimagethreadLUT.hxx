@@ -1,5 +1,5 @@
-#ifndef ProcessImageThreadLUT_H___
-#define ProcessImageThreadLUT_H___
+#ifndef A_PROCESSIMAGETHREADLUT_H
+#define A_PROCESSIMAGETHREADLUT_H
 
 // clang-format off
 
@@ -242,4 +242,4 @@ private:
 
 // clang-format on
 
-#endif // ProcessImageThreadLUT_H___
+#endif

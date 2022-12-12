@@ -1,5 +1,5 @@
-#ifndef STUDYFRAMEWIDGET__H
-#define STUDYFRAMEWIDGET__H
+#ifndef A_STUDYFRAMEWIDGET_H
+#define A_STUDYFRAMEWIDGET_H
 
 #include "ui_studyframewidget.h"
 #include <QWidget>
@@ -17,4 +17,4 @@ public:
 	StudyGraphicsWidget * graphicswidget;
 };
 
-#endif // STUDYFRAMEWIDGET__H
+#endif

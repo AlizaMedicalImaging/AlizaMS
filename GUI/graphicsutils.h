@@ -1,5 +1,5 @@
-#ifndef GRAPHICSUTILS__H_
-#define GRAPHICSUTILS__H_
+#ifndef A_GRAPHICSUTILS_H
+#define A_GRAPHICSUTILS_H
 
 #include <QString>
 #include <QImage>
@@ -41,4 +41,4 @@ public:
 	static void draw_cross_out(QImage&);
 };
 
-#endif // GRAPHICSUTILS__H_
+#endif

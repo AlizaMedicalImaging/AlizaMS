@@ -1,5 +1,5 @@
-#ifndef STRUCTURES___H
-#define STRUCTURES___H
+#ifndef A_STRUCTURES_H
+#define A_STRUCTURES_H
 
 #include <QtGlobal>
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
@@ -1034,5 +1034,4 @@ private:
 	const unsigned int j;
 };
 
-#endif // STRUCTURES___H
-
+#endif

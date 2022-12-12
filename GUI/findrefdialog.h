@@ -1,5 +1,5 @@
-#ifndef FINDREFDIALOG_H___
-#define FINDREFDIALOG_H___
+#ifndef A_FINDREFDIALOG_H
+#define A_FINDREFDIALOG_H
 
 #include "ui_findrefdialog.h"
 
@@ -17,4 +17,4 @@ private slots:
 	void select_dir();
 };
 
-#endif // FINDREFDIALOG_H___
+#endif

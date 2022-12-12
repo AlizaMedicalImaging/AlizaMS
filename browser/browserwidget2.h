@@ -1,5 +1,5 @@
-#ifndef BROWSERWIDGET2___H
-#define BROWSERWIDGET2___H
+#ifndef A_BROWSERWIDGET2_H
+#define A_BROWSERWIDGET2_H
 
 #include "ui_browserwidget2.h"
 #include <QApplication>
@@ -175,5 +175,5 @@ private:
 	QShortcut * refresh_sc;
 };
 
-#endif // BROWSERWIDGET2___H
+#endif
 

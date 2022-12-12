@@ -1,5 +1,5 @@
-#ifndef MDCMSPLITUIHGRIDFILTER_H
-#define MDCMSPLITUIHGRIDFILTER_H
+#ifndef A_SPLITUIHGRIDFILTER_H
+#define A_SPLITUIHGRIDFILTER_H
 
 #include "mdcmFile.h"
 #include "mdcmImage.h"
@@ -28,4 +28,4 @@ private:
 
 } // end namespace mdcm
 
-#endif //MDCMSPLITUIHGRIDFILTER_H
+#endif

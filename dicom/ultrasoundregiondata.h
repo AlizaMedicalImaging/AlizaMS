@@ -1,5 +1,5 @@
-#ifndef UltrasoundRegionData__H
-#define UltrasoundRegionData__H
+#ifndef A_ULTRASOUNDREGIONDATA_H
+#define A_ULTRASOUNDREGIONDATA_H
 
 #include <QString>
 
@@ -74,4 +74,4 @@ public:
 	int            m_TMLinePositionY1;
 };
 
-#endif // UltrasoundRegionData__H
+#endif

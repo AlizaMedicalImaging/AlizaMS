@@ -1,5 +1,5 @@
-#ifndef PrConfigUtils_H__
-#define PrConfigUtils_H__
+#ifndef A_PrConfigUtils_H
+#define A_PrConfigUtils_H
 
 #include "mdcmDataSet.h"
 #include <QList>

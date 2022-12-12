@@ -16,8 +16,8 @@
 
 =========================================================================*/
 
-#ifndef __CodecUtils_h
-#define __CodecUtils_h
+#ifndef A_CODECUTILS_H
+#define A_CODECUTILS_H
 
 #include <QByteArray>
 #include <QString>

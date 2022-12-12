@@ -1,5 +1,5 @@
-#ifndef SRUTILS_H
-#define SRUTILS_H
+#ifndef A_SRUTILS_H
+#define A_SRUTILS_H
 
 #include <mdcmDataSet.h>
 #include <QString>
@@ -82,4 +82,4 @@ public:
 		bool=false);
 };
 
-#endif // SRUTILS_H
+#endif

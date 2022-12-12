@@ -1,5 +1,5 @@
-#ifndef HELPWIDGET___H
-#define HELPWIDGET___H
+#ifndef A_HELPWIDGET_H
+#define A_HELPWIDGET_H
 
 #include "ui_helpwidget.h"
 #include <QWidget>
@@ -23,4 +23,4 @@ private:
 #endif
 };
 
-#endif // HELPWIDGET___H
+#endif

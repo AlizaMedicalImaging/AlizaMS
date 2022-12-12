@@ -1,5 +1,5 @@
-#ifndef GRAPHICSVIEW_H
-#define GRAPHICSVIEW_H
+#ifndef A_GRAPHICSVIEW_H
+#define A_GRAPHICSVIEW_H
 
 #define DELETE_GRAPHICSIMAGEITEM
 
@@ -130,4 +130,4 @@ private:
 	void flipY();
 };
 
-#endif // GRAPHICSVIEW_H
+#endif

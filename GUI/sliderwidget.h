@@ -1,5 +1,5 @@
-#ifndef SLIDERWIDGET_H
-#define SLIDERWIDGET_H
+#ifndef A_SLIDERWIDGET_H
+#define A_SLIDERWIDGET_H
 
 #include "ui_sliderwidget.h"
 
@@ -16,4 +16,4 @@ public slots:
 	void set_slider_max(int);
 };
 
-#endif // SLIDERWIDGET_H
+#endif

@@ -1,5 +1,5 @@
-#ifndef DICOMUTILS__H_
-#define DICOMUTILS__H_
+#ifndef A_DICOMUTILS_H
+#define A_DICOMUTILS_H
 
 #include "structures.h"
 #include <QString>
@@ -428,4 +428,4 @@ public:
 		bool=false); // skip dimensions organization for enh, orig. frames
 };
 
-#endif // DICOMUTILS__H_
+#endif

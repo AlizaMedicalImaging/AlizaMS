@@ -1,5 +1,5 @@
-#ifndef UpdateQtCommand__H
-#define UpdateQtCommand__H
+#ifndef A_UPDATEQTCOMMAND_H
+#define A_UPDATEQTCOMMAND_H
 
 #include <itkCommand.h>
 #include <itkObject.h>

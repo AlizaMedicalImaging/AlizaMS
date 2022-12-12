@@ -1,5 +1,5 @@
-#ifndef ZoomWidget__H
-#define ZoomWidget__H
+#ifndef A_ZOOMWIDGET_H
+#define A_ZOOMWIDGET_H
 
 #include <QWidget>
 #include <QPushButton>
@@ -14,4 +14,4 @@ public:
 	QPushButton * minus_pushButton;
 };
 
-#endif // ZoomWidget__H
+#endif

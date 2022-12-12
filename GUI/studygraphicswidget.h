@@ -1,5 +1,5 @@
-#ifndef STUDYGRAPHICSWIDGET_H__
-#define STUDYGRAPHICSWIDGET_H__
+#ifndef A_STUDYGRAPHICSWIDGET_H
+#define A_STUDYGRAPHICSWIDGET_H
 
 #include "structures.h"
 #include "studygraphicsview.h"
@@ -97,4 +97,4 @@ private:
 	bool   enable_overlays;
 };
 
-#endif // STUDYGRAPHICSWIDGET_H__
+#endif

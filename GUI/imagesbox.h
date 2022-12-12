@@ -1,5 +1,5 @@
-#ifndef IMAGESBOX_H
-#define IMAGESBOX_H
+#ifndef A_IMAGESBOX_H
+#define A_IMAGESBOX_H
 
 #include "ui_imagesbox.h"
 #include <QListWidget>
@@ -89,4 +89,4 @@ private:
 	QString get_orientation_image(const QString&);
 };
 
-#endif // IMAGESBOX_H
+#endif

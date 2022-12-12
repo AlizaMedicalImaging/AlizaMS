@@ -1,5 +1,5 @@
-#ifndef TOOLBOX_H
-#define TOOLBOX_H
+#ifndef A_TOOLBOX_H
+#define A_TOOLBOX_H
 
 #include "ui_toolbox.h"
 
@@ -11,4 +11,4 @@ public:
 	~ToolBox();
 };
 
-#endif // TOOLBOX_H
+#endif

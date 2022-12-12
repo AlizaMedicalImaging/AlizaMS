@@ -1,5 +1,5 @@
-#ifndef GraphicsPathItem___H
-#define GraphicsPathItem___H
+#ifndef A_GRAPHICSPATHITEM_H
+#define A_GRAPHICSPATHITEM_H
 
 #include <QGraphicsPathItem>
 #include <QPainterPath>
@@ -39,4 +39,4 @@ private:
 	int contour_type;
 };
 
-#endif // GraphicsPathItem___H
+#endif

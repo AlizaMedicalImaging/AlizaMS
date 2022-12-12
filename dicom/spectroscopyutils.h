@@ -1,5 +1,5 @@
-#ifndef SPECTROSCOPYUTILS__H_
-#define SPECTROSCOPYUTILS__H_
+#ifndef SpectroscopyUtils_H
+#define SpectroscopyUtils_H
 
 #include <mdcmDataSet.h>
 #include <vector>
@@ -24,4 +24,4 @@ public:
 		QProgressDialog*,
 		float);
 };
-#endif // SPECTROSCOPYUTILS__H_
+#endif // SpectroscopyUtils_H

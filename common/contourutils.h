@@ -1,5 +1,5 @@
-#ifndef CONTOURUTILS__H_
-#define CONTOURUTILS__H_
+#ifndef A_CONTOURUTILS_H
+#define A_CONTOURUTILS_H
 
 #include "structures.h"
 
@@ -33,4 +33,4 @@ public:
 		const ImageVariant*, unsigned int, ImageTypeUC::Pointer &);
 };
 
-#endif // CONTOURUTILS__H_
+#endif

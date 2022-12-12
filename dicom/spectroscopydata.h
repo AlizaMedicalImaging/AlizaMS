@@ -1,5 +1,5 @@
-#ifndef SPECTROSCOPYDATA__H_
-#define SPECTROSCOPYDATA__H_
+#ifndef A_SpectroscopyData_H
+#define A_SpectroscopyData_H
 
 #include <QString>
 #include <vector>
@@ -33,4 +33,4 @@ public:
 	std::vector<float> m_SpectroscopyData;
 };
 
-#endif // SPECTROSCOPYDATA__H_
+#endif

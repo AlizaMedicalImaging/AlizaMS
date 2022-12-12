@@ -7,8 +7,8 @@
 // modified mihail.isakov@gmail.com
 // C++ static class
 
-#ifndef _COLORSPACE_H_
-#define _COLORSPACE_H_
+#ifndef A_COLORSPACE_H
+#define A_COLORSPACE_H
 
 class ColorSpace_
 {
@@ -53,4 +53,4 @@ public:
 	static void Cat02lms2Rgb(double *R, double *G, double *B, double L, double M, double S);
 };
 
-#endif  // _COLORSPACE_H_
+#endif  // A_COLORSPACE_H

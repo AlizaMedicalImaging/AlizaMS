@@ -1,5 +1,5 @@
-#ifndef SRWIDGET_H
-#define SRWIDGET_H
+#ifndef A_SRWIDGET_H
+#define A_SRWIDGET_H
 
 #include "ui_srwidget.h"
 #include <QCloseEvent>
@@ -44,4 +44,4 @@ private:
 #endif
 };
 
-#endif // SRWIDGET_H
+#endif

@@ -1,5 +1,5 @@
-#ifndef ABOUTWIDGET_H__
-#define ABOUTWIDGET_H__
+#ifndef A_ABOUTWIDGET_H
+#define A_ABOUTWIDGET_H
 
 #include "ui_aboutwidget.h"
 #include <QString>
@@ -23,4 +23,4 @@ private:
 	QString opengl_info;
 };
 
-#endif // ABOUTWIDGET_H__
+#endif

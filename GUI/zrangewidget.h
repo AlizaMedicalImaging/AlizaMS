@@ -1,5 +1,5 @@
-#ifndef ZRANGEWIDGET_H
-#define ZRANGEWIDGET_H
+#ifndef A_ZRANGEWIDGET_H
+#define A_ZRANGEWIDGET_H
 
 #include "qxtspanslider.h"
 
@@ -18,4 +18,4 @@ public slots:
 	void set_span(int, int);
 };
 
-#endif // ZRANGEWIDGET_H
+#endif

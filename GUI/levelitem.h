@@ -1,5 +1,5 @@
-#ifndef LEVELITEM_H
-#define LEVELITEM_H
+#ifndef A_LEVELITEM_H
+#define A_LEVELITEM_H
  
 #include <QGraphicsItem>
 #include <QGraphicsRectItem>
@@ -27,5 +27,4 @@ private:
 	bool m_pressed;
 };
  
-#endif // LEVELITEM_H
-
+#endif

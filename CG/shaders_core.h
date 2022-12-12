@@ -1,5 +1,5 @@
-#ifndef SHADERS_CORE_H___
-#define SHADERS_CORE_H___
+#ifndef A_SHADERS_CORE_H
+#define A_SHADERS_CORE_H
 
 const char c3d_vs[] =
 "#version 150\n"
@@ -970,4 +970,3 @@ const char raycast_color_fs_bb_sigm[] =
 "}\n";
 
 #endif
-

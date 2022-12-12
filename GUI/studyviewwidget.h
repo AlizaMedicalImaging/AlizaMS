@@ -1,5 +1,5 @@
-#ifndef STUDYVIEWWIDGET__H
-#define STUDYVIEWWIDGET__H
+#ifndef A_STUDYVIEWWIDGET_H
+#define A_STUDYVIEWWIDGET_H
 
 #include "ui_studyviewwidget.h"
 #include <QList>
@@ -97,4 +97,4 @@ private:
 #endif
 };
 
-#endif // STUDYVIEWWIDGET__H
+#endif

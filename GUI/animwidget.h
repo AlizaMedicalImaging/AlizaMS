@@ -1,5 +1,5 @@
-#ifndef AnimWidget_H
-#define AnimWidget_H
+#ifndef A_ANIMWIDGET_H
+#define A_ANIMWIDGET_H
 
 #include "ui_animwidget.h"
 
@@ -11,4 +11,4 @@ public:
 	~AnimWidget();
 };
 
-#endif // AnimWidget_H
+#endif

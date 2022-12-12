@@ -2,8 +2,8 @@
  * (C) mihail.isakov@googlemail.com 2008-2022
  */
 
-#ifndef CAMERA_H
-#define CAMERA_H
+#ifndef A_CAMERA_H
+#define A_CAMERA_H
 
 ////////////////////////////////
 //
@@ -150,4 +150,4 @@ public:
 		unsigned short,float*,float*);
 } VECTORMATH_ALIGNED_POST;
 
-#endif // CAMERA_H
+#endif

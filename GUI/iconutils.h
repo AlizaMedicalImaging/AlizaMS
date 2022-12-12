@@ -1,5 +1,5 @@
-#ifndef ICONUTILS__H__
-#define ICONUTILS__H__
+#ifndef A_ICONUTILS_H
+#define A_ICONUTILS_H
 
 class ImageVariant;
 

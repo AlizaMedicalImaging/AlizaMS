@@ -1,5 +1,5 @@
-#ifndef IMAGEINFODIALOG_H
-#define IMAGEINFODIALOG_H
+#ifndef A_IMAGEINFODIALOG_H
+#define A_IMAGEINFODIALOG_H
 
 #include "ui_imageinfodialog.h"
 
@@ -15,4 +15,4 @@ public:
 	void adjust();
 };
 
-#endif // IMAGEINFODIALOG_H
+#endif

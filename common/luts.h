@@ -1,5 +1,5 @@
-#ifndef LUTS_H
-#define LUTS_H
+#ifndef A_LUTS_H
+#define A_LUTS_H
 
 const int default_lut_size = 768;
 const unsigned char default_lut[] =
@@ -6180,4 +6180,4 @@ const unsigned char pet20_dicom_lut[] =
 255
 };
 
-#endif // LUTS_H
+#endif

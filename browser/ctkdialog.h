@@ -1,5 +1,5 @@
-#ifndef CTKDIALOG_H
-#define CTKDIALOG_H
+#ifndef A_CTKDIALOG_H
+#define A_CTKDIALOG_H
 
 #include "ui_ctkdialog.h"
 #include <QDate>
@@ -29,4 +29,4 @@ private slots:
 	void select_file();
 };
 
-#endif // CTKDIALOG_H
+#endif

@@ -1,5 +1,5 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef A_MAINWINDOW_H
+#define A_MAINWINDOW_H
 
 #include "ui_mainwindow.h"
 #include <QtGlobal>
@@ -263,4 +263,3 @@ private:
 };
 
 #endif
-

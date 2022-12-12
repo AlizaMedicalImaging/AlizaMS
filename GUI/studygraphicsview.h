@@ -1,5 +1,5 @@
-#ifndef STUDYGRAPHICSVIEW_H
-#define STUDYGRAPHICSVIEW_H
+#ifndef A_STUDYGRAPHICSVIEW_H
+#define A_STUDYGRAPHICSVIEW_H
 
 #define DELETE_STUDYGRAPHICSIMAGEITEM
 
@@ -97,4 +97,4 @@ private:
 	void flipY();
 };
 
-#endif // STUDYGRAPHICSVIEW_H
+#endif

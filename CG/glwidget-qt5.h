@@ -1,5 +1,5 @@
-#ifndef GLWIDGET_QT5_H
-#define GLWIDGET_QT5_H
+#ifndef A_GLWIDGET_QT5_H
+#define A_GLWIDGET_QT5_H
 
 ////////////////////////////////////////////
 //

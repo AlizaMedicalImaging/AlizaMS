@@ -1,5 +1,5 @@
-#ifndef HISTOGRAMVIEW_H__
-#define HISTOGRAMVIEW_H__
+#ifndef A_HISTOGRAMVIEW_H
+#define A_HISTOGRAMVIEW_H
 
 #include <QObject>
 #include <QWidget>
@@ -65,5 +65,4 @@ private:
 	qreal pwidth;
 };
 
-#endif // HISTOGRAMVIEW_H__
-
+#endif

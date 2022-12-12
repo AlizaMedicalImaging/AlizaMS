@@ -1,5 +1,5 @@
-#ifndef TOOLBOX2D_H
-#define TOOLBOX2D_H
+#ifndef A_TOOLBOX2D_H
+#define A_TOOLBOX2D_H
 
 #include "ui_toolbox2D.h"
 #include <QPixmap>
@@ -50,4 +50,4 @@ private:
 	bool label_is_blue;
 };
 
-#endif // TOOLBOX2D_H
+#endif

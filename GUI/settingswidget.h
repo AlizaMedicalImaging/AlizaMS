@@ -1,5 +1,5 @@
-#ifndef SETTINGSWIDGET_H
-#define SETTINGSWIDGET_H
+#ifndef A_SETTINGSWIDGET_H
+#define A_SETTINGSWIDGET_H
 
 #include "ui_settingswidget.h"
 #include <QWidget>
@@ -54,4 +54,4 @@ protected:
 	void readSettings();
 };
 
-#endif // SETTINGSWIDGET_H
+#endif

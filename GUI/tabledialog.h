@@ -1,5 +1,5 @@
-#ifndef TABLEDIALOG_H
-#define TABLEDIALOG_H
+#ifndef A_TABLEDIALOG_H
+#define A_TABLEDIALOG_H
 
 #include <QDialog>
 #include "ui_tabledialog.h"
@@ -14,4 +14,4 @@ public:
 	int get_columns() const;
 };
 
-#endif  // TABLEDIALOG_H
+#endif

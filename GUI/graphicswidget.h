@@ -1,5 +1,5 @@
-#ifndef GRAPHICSWIDGET_H__
-#define GRAPHICSWIDGET_H__
+#ifndef A_GRAPHICSWIDGET_H
+#define A_GRAPHICSWIDGET_H
 
 #include "graphicsview.h"
 #include "structures.h"
@@ -152,4 +152,4 @@ private:
 	bool show_cursor;
 };
 
-#endif // GRAPHICSWIDGET_H__
+#endif

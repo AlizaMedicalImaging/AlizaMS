@@ -1,5 +1,5 @@
-#ifndef SQTREE__H__
-#define SQTREE__H__
+#ifndef A_SQTREE_H
+#define A_SQTREE_H
 
 #include "ui_sqtree.h"
 #include <QWidget>
@@ -72,4 +72,4 @@ private:
 #endif
 };
 
-#endif // SQTREE__H__
+#endif

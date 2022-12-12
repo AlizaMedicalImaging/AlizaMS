@@ -22,8 +22,8 @@
  ** <http://libqxt.org>  <foundation@libqxt.org>
  **
  ****************************************************************************/
-#ifndef QXTSPANSLIDER_H
-#define QXTSPANSLIDER_H
+#ifndef A_QXTSPANSLIDER_H
+#define A_QXTSPANSLIDER_H
 
 #include <QSlider>
 
@@ -144,4 +144,4 @@ protected:
     virtual void paintEvent(QPaintEvent* event);
 };
 
-#endif // QXTSPANSLIDER_H
+#endif

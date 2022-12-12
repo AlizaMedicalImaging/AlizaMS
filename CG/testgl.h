@@ -1,5 +1,5 @@
-#ifndef TESTGL____H__
-#define TESTGL____H__
+#ifndef A_TESTGL_H
+#define A_TESTGL_H
 
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -27,4 +27,4 @@ protected:
 	void resizeGL(int, int) override;
 };
 
-#endif // TESTGL____H__
+#endif
