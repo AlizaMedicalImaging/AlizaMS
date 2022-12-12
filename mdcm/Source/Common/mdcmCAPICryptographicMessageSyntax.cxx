@@ -160,12 +160,9 @@ CAPICryptographicMessageSyntax::ParseKeyFile(const char * filename)
   ret = true;
 
 err:
-  if (keyHexBuffer)
-    delete[] keyHexBuffer;
-  if (keyBinBuffer)
-    delete[] keyBinBuffer;
-  if (keyBlob)
-    delete[] keyBlob;
+  delete[] keyHexBuffer;
+  delete[] keyBinBuffer;
+  delete[] keyBlob;
   return ret;
 }
 
@@ -397,12 +394,9 @@ CAPICryptographicMessageSyntax::Decrypt(char * output, size_t & outlen, const ch
 err:
   if (hMsg)
     CryptMsgClose(hMsg);
-  if (recipientInfo)
-    delete[] recipientInfo;
-  if (bareContent)
-    delete[] bareContent;
-  if (cekAlg)
-    delete[] cekAlg;
+  delete[] recipientInfo;
+  delete[] bareContent;
+  delete[] cekAlg;
   return ret;
 }
 
