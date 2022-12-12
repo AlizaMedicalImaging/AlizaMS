@@ -557,10 +557,14 @@ Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
           {
             if (cpf.GetBitsStored() < pf.GetBitsStored())
             {
-              mdcmAlwaysWarnMacro("Encapsulated stream has fewer bits stored, fixed");
-              Bitmap * i = const_cast<Bitmap *>(this);
-              i->GetPixelFormat().SetBitsAllocated(cpf.GetBitsAllocated());
-              i->GetPixelFormat().SetBitsStored(cpf.GetBitsStored());
+              mdcmAlwaysWarnMacro("Encapsulated stream has fewer bits stored");
+              if (ImageHelper::GetFixFewerJpegBits())
+              {
+                mdcmAlwaysWarnMacro("... fixed bits stored");
+                Bitmap * i = const_cast<Bitmap *>(this);
+                i->GetPixelFormat().SetBitsAllocated(cpf.GetBitsAllocated());
+                i->GetPixelFormat().SetBitsStored(cpf.GetBitsStored());
+              }
             }
           }
         }
@@ -631,10 +635,14 @@ Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
         {
           if (cpf.GetBitsStored() < pf.GetBitsStored())
           {
-            mdcmAlwaysWarnMacro("Encapsulated stream has fewer bits stored, fixed");
-            Bitmap * i = const_cast<Bitmap *>(this);
-            i->GetPixelFormat().SetBitsAllocated(cpf.GetBitsAllocated());
-            i->GetPixelFormat().SetBitsStored(cpf.GetBitsStored());
+            mdcmAlwaysWarnMacro("Encapsulated stream has fewer bits stored");
+            if (ImageHelper::GetFixFewerJpegBits())
+            {
+              mdcmAlwaysWarnMacro("... fixed bits stored");
+              Bitmap * i = const_cast<Bitmap *>(this);
+              i->GetPixelFormat().SetBitsAllocated(cpf.GetBitsAllocated());
+              i->GetPixelFormat().SetBitsStored(cpf.GetBitsStored());
+            }
           }
         }
       }
@@ -730,10 +738,14 @@ Bitmap::TryJPEGCodec3(char * buffer, bool & lossyflag) const
           {
             if (cpf.GetBitsStored() < pf.GetBitsStored())
             {
-              mdcmAlwaysWarnMacro("Encapsulated stream has fewer bits stored, fixed");
-              Bitmap * i = const_cast<Bitmap *>(this);
-              i->GetPixelFormat().SetBitsAllocated(cpf.GetBitsAllocated());
-              i->GetPixelFormat().SetBitsStored(cpf.GetBitsStored());
+              mdcmAlwaysWarnMacro("Encapsulated stream has fewer bits stored");
+              if (ImageHelper::GetFixFewerJpegBits())
+              {
+                mdcmAlwaysWarnMacro("... fixed bits stored");
+                Bitmap * i = const_cast<Bitmap *>(this);
+                i->GetPixelFormat().SetBitsAllocated(cpf.GetBitsAllocated());
+                i->GetPixelFormat().SetBitsStored(cpf.GetBitsStored());
+              }
             }
           }
         }
