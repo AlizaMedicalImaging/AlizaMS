@@ -724,11 +724,7 @@ JPEG2000Codec::JPEG2000Codec()
 
 JPEG2000Codec::~JPEG2000Codec()
 {
-  if (Internals)
-  {
-    delete Internals;
-    Internals = NULL;
-  }
+  delete Internals;
 }
 
 bool

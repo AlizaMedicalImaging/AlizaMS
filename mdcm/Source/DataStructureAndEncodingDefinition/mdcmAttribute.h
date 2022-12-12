@@ -639,7 +639,9 @@ public:
     if (Internal)
     {
       if (Own)
+      {
         delete[] Internal;
+      }
       Internal = NULL;
     }
     Own = own;

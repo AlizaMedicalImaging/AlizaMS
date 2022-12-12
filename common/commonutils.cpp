@@ -890,9 +890,9 @@ template<typename T> int generate_tex3d(
 	qApp->processEvents();
 	//
 quit__:
-	if (float_buf) delete [] float_buf;
-	if (short_buf) delete [] short_buf;
-	if (ub_buf)    delete [] ub_buf;
+	delete [] float_buf;
+	delete [] short_buf;
+	delete [] ub_buf;
 	return error__;
 }
 

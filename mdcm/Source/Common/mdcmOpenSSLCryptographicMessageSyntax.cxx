@@ -46,8 +46,7 @@ OpenSSLCryptographicMessageSyntax::~OpenSSLCryptographicMessageSyntax()
 {
   EVP_PKEY_free(pkey);
   sk_X509_free(recips);
-  if (password)
-    delete[] password;
+  delete[] password;
 }
 
 void
@@ -67,10 +66,7 @@ bool
 OpenSSLCryptographicMessageSyntax::SetPassword(const char * pass, size_t passLen)
 {
   assert(pass);
-  if (password)
-  {
-    delete[] password;
-  }
+  delete[] password;
   passwordLength = passLen;
   password = new char[passLen];
   memcpy(password, pass, passLen);

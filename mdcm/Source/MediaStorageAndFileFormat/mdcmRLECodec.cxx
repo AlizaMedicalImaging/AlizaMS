@@ -332,11 +332,7 @@ RLECodec::RLECodec()
 
 RLECodec::~RLECodec()
 {
-  if (Internals)
-  {
-    delete Internals;
-    Internals = NULL; // not required
-  }
+  delete Internals;
 }
 
 bool
@@ -509,10 +505,8 @@ RLECodec::Code(DataElement const & in, DataElement & out)
   }
   else
   {
-    if (buffer)
-      delete[] buffer;
-    if (bufferrgb)
-      delete[] bufferrgb;
+    delete[] buffer;
+    delete[] bufferrgb;
     return false;
   }
   if (GetPhotometricInterpretation() == PhotometricInterpretation::RGB ||
@@ -645,10 +639,8 @@ RLECodec::Code(DataElement const & in, DataElement & out)
         if (llength < 0)
         {
           mdcmErrorMacro("RLE compressor error");
-          if (buffer)
-            delete[] buffer;
-          if (bufferrgb)
-            delete[] bufferrgb;
+          delete[] buffer;
+          delete[] bufferrgb;
           return false;
         }
         assert(llength);
@@ -675,10 +667,8 @@ RLECodec::Code(DataElement const & in, DataElement & out)
     sq->AddFragment(frag);
   }
   out.SetValue(*sq);
-  if (buffer)
-    delete[] buffer;
-  if (bufferrgb)
-    delete[] bufferrgb;
+  delete[] buffer;
+  delete[] bufferrgb;
   return true;
 }
 

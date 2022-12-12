@@ -43,11 +43,7 @@ JPEGCodec::JPEGCodec()
 
 JPEGCodec::~JPEGCodec()
 {
-  if (Internal)
-  {
-    delete Internal;
-    Internal = NULL;
-  }
+  delete Internal;
 }
 
 bool

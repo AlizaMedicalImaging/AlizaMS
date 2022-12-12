@@ -796,8 +796,7 @@ Reader::CanRead() const
 void
 Reader::SetFileName(const char * p)
 {
-  if (Ifstream)
-    delete Ifstream;
+  delete Ifstream;
   Ifstream = new std::ifstream();
   if (p && *p)
   {

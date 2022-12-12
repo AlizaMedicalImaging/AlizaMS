@@ -419,13 +419,18 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 			}
 			g_collisionWorld->removeCollisionObject(k);
 			delete k;
+			k = NULL;
 		}
 	}
 	for (int j = 0; j < tmp_shapes.size(); ++j)
 	{
 		btCollisionShape * k =
 			static_cast<btCollisionShape *>(tmp_shapes[j]);
-		if (k) delete k;
+		if (k)
+		{
+			delete k;
+			k = NULL;
+		}
 	}
 #if 0
 	const long long t1 = QDateTime::currentMSecsSinceEpoch();
@@ -593,13 +598,18 @@ static void check_slice_collisions2(StudyViewWidget * w)
 						}
 						g_collisionWorld->removeCollisionObject(k);
 						delete k;
+						k = NULL;
 					}
 				}
 				for (int j = 0; j < tmp_shapes.size(); ++j)
 				{
 					btCollisionShape * k =
 						static_cast<btCollisionShape *>(tmp_shapes[j]);
-					if (k) delete k;
+					if (k)
+					{
+						delete k;
+						k = NULL;
+					}
 				}
 			}
 		}
@@ -676,12 +686,8 @@ Aliza::~Aliza()
 		IconUtils::kill_threads();
 		mutex0.unlock();
 	}
-	if (anim3D_timer)
-	{
-		if (anim3D_timer->isActive()) anim3D_timer->stop();
-		delete anim3D_timer;
-		anim3D_timer = NULL;
-	}
+	if (anim3D_timer->isActive()) anim3D_timer->stop();
+	delete anim3D_timer;
 }
 
 void Aliza::close_()
@@ -704,7 +710,7 @@ void Aliza::close_()
 		{
 			ImageVariant * v = iv.value();
 			++iv;
-			if (v) delete v;
+			delete v;
 		}
 		scene3dimages.clear();
 	}
@@ -4360,7 +4366,7 @@ quit__:
 	{
 		for (unsigned int x = 0; x < ivariants.size(); ++x)
 		{
-			if (ivariants.at(x)) delete ivariants[x];
+			delete ivariants[x];
 		}
 	}
 	ivariants.clear();

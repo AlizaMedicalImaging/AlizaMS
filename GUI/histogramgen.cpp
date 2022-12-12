@@ -94,7 +94,7 @@ template<typename T> QString calculate_histogramm(
 		pixmap = QPixmap(pixmap_w,pixmap_h);
 		if (pixmap.isNull())
 		{
-			if (bins) delete [] bins;
+			delete [] bins;
 			*ok = false;
 			return QString("pixmap.isNull()");
 		}
@@ -231,9 +231,9 @@ template<typename T> QString calculate_histogramm_rgb(
 		pixmap = QPixmap(pixmap_w,pixmap_h);
 		if (pixmap.isNull())
 		{
-			if (bins0) delete [] bins0;
-			if (bins1) delete [] bins1;
-			if (bins2) delete [] bins2;
+			delete [] bins0;
+			delete [] bins1;
+			delete [] bins2;
 			*ok = false;
 			return QString("pixmap.isNull()");
 		}

@@ -331,7 +331,6 @@ ImageVariant::~ImageVariant()
 	//
 	di->close();
 	delete di;
-	di = NULL;
 }
 
 ImageVariant2D::ImageVariant2D()

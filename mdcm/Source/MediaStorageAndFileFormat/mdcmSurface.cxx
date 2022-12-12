@@ -146,16 +146,11 @@ Surface::Surface()
 
 Surface::~Surface()
 {
-  if (PointPositionAccuracy)
-    delete[] PointPositionAccuracy;
-  if (PointsBoundingBoxCoordinates)
-    delete[] PointsBoundingBoxCoordinates;
-  if (AxisOfRotation)
-    delete[] AxisOfRotation;
-  if (CenterOfRotation)
-    delete[] CenterOfRotation;
-  if (VectorAccuracy)
-    delete[] VectorAccuracy;
+  delete[] PointPositionAccuracy;
+  delete[] PointsBoundingBoxCoordinates;
+  delete[] AxisOfRotation;
+  delete[] CenterOfRotation;
+  delete[] VectorAccuracy;
 }
 
 unsigned short

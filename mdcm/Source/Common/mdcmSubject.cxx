@@ -120,8 +120,7 @@ SubjectInternals::RemoveAllObservers()
 {
   for (std::list<Observer *>::iterator i = m_Observers.begin(); i != m_Observers.end(); ++i)
   {
-    if (*i)
-      delete (*i);
+    delete (*i);
   }
   m_Observers.clear();
 }

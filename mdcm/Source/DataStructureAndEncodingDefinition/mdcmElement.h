@@ -526,8 +526,7 @@ public:
   {
     if (Save)
     {
-      if (Internal)
-        delete[] Internal;
+      delete[] Internal;
     }
     Internal = NULL;
   }

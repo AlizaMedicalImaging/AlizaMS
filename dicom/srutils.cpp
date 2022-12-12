@@ -816,7 +816,7 @@ endpoints of the minor axis of an ellipse
 					tmpfiles.push_back(tmpfile);
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 					pm.i = QImage();
-					if (pm.p) delete [] pm.p;
+					delete [] pm.p;
 #endif
 #endif
 					if (s.endsWith(QString("<br />\n"))) s.chop(7);
@@ -849,12 +849,12 @@ endpoints of the minor axis of an ellipse
 			}
 			for (size_t yy = 0; yy < ivariants.size(); ++yy)
 			{
-				if (ivariants.at(yy)) delete ivariants[yy];
+				delete ivariants[yy];
 			}
 			ivariants.clear();
 			for (size_t yy = 0; yy < ivariants2.size(); ++yy)
 			{
-				if (ivariants2.at(yy)) delete ivariants2[yy];
+				delete ivariants2[yy];
 			}
 			ivariants2.clear();
 		}

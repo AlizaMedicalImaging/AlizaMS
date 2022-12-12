@@ -4014,9 +4014,9 @@ void GLWidget::makeModelVBO_ArraysT(
 	vboids.push_back(vboid);
 	vaoids.push_back(*vaoid);
 	delete [] v;
-	if (normals)  delete [] n;
-	if (textures) delete [] t;
-	if (tangents) delete [] ta;
+	delete [] n;
+	delete [] t;
+	delete [] ta;
 }
 
 void GLWidget::generate_screen_quad(GLuint * vbo, GLuint * vao, GLuint * attr)

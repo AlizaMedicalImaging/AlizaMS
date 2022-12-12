@@ -356,7 +356,9 @@ rle_decoder::rle_decoder(source & s, image_info const & ii)
 rle_decoder::~rle_decoder()
 {
   for (int i = 0; i < internals->nsources; ++i)
+  {
     delete internals->sources[i];
+  }
   delete[] internals->sources;
   delete internals;
 }

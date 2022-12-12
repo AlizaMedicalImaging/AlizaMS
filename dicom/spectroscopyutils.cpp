@@ -536,7 +536,7 @@ QString SpectroscopyUtils::ProcessData(
 		//
 		for (unsigned int k = 0; k < tmp4.size(); ++k)
 		{
-			if (tmp4.at(k)) delete [] tmp4[k];
+			delete [] tmp4[k];
 		}
 		tmp4.clear();
 	}
@@ -544,7 +544,7 @@ QString SpectroscopyUtils::ProcessData(
 #ifdef LOAD_SPECT_DATA
 	for (unsigned int x=0; x < data.size(); ++x)
 	{
-		if (data.at(x)) delete [] data[x];
+		delete [] data[x];
 	}
 	data.clear();
 #endif
