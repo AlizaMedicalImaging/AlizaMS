@@ -116,11 +116,7 @@ void DisplayInterface::close(bool clear_geometry)
 	//
 	for (unsigned int x = 0; x < image_slices.size(); ++x)
 	{
-		if (image_slices.at(x))
-		{
-			delete image_slices[x];
-			image_slices[x] = NULL;
-		}
+		delete image_slices[x];
 	}
 	image_slices.clear();
 	slices_generated = false;
@@ -148,42 +144,33 @@ void DisplayInterface::close(bool clear_geometry)
 				if (spectroscopy_slices.at(x)->lvaoid > 0)
 				{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-					gl->glDeleteVertexArrays(
-						1, &(spectroscopy_slices[x]->lvaoid));
-					gl->glDeleteBuffers(
-						1, &(spectroscopy_slices[x]->lvboid));
+					gl->glDeleteVertexArrays(1, &(spectroscopy_slices[x]->lvaoid));
+					gl->glDeleteBuffers(1, &(spectroscopy_slices[x]->lvboid));
 #else
-					glDeleteVertexArrays(
-						1, &(spectroscopy_slices[x]->lvaoid));
-					glDeleteBuffers(
-						1, &(spectroscopy_slices[x]->lvboid));
+					glDeleteVertexArrays(1, &(spectroscopy_slices[x]->lvaoid));
+					glDeleteBuffers(1, &(spectroscopy_slices[x]->lvboid));
 #endif
 					GLWidget::increment_count_vbos(-1);
 				}
 				if (spectroscopy_slices.at(x)->pvboid > 0)
 				{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-					gl->glDeleteVertexArrays(
-						1, &(spectroscopy_slices[x]->pvaoid));
-					gl->glDeleteBuffers(
-						1, &(spectroscopy_slices[x]->pvboid));
+					gl->glDeleteVertexArrays(1, &(spectroscopy_slices[x]->pvaoid));
+					gl->glDeleteBuffers(1, &(spectroscopy_slices[x]->pvboid));
 #else
-					glDeleteVertexArrays(
-						1, &(spectroscopy_slices[x]->pvaoid));
-					glDeleteBuffers(
-						1, &(spectroscopy_slices[x]->pvboid));
+					glDeleteVertexArrays(1, &(spectroscopy_slices[x]->pvaoid));
+					glDeleteBuffers(1, &(spectroscopy_slices[x]->pvboid));
 #endif
 					GLWidget::increment_count_vbos(-1);
 				}
 			}
 			delete spectroscopy_slices[x];
-			spectroscopy_slices[x] = NULL;
 		}
 	}
 	spectroscopy_slices.clear();
 	spectroscopy_generated = false;
-	for (int x = 0; x < 6; ++x) { dircos[x] = 0.0f; }
-	for (int x = 0; x < 3; ++x) { origin[x] = 0.0f; }
+	for (int x = 0; x < 6; ++x) dircos[x] = 0.0f;
+	for (int x = 0; x < 3; ++x) origin[x] = 0.0f;
 	origin_ok = false;
 	for (int k = 0; k < rois.size(); ++k)
 	{
@@ -223,7 +210,6 @@ void DisplayInterface::close(bool clear_geometry)
 					GLWidget::increment_count_vbos(-1);
 				}
 				delete c;
-				c = NULL;
 			}
 		}
 		keys.clear();
@@ -250,13 +236,8 @@ void DisplayInterface::close(bool clear_geometry)
 #endif
 			GLWidget::increment_count_vbos(-2);
 			delete trimesh->qmesh;
-			trimesh->qmesh = NULL;
 		}
-		if (trimesh)
-		{
-			delete trimesh;
-			trimesh = NULL;
-		}
+		delete trimesh;
 	}
 	trimeshes.clear();
 	center_x = center_y = center_z = 0.0f;
