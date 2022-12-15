@@ -677,7 +677,7 @@ Aliza::Aliza()
 
 Aliza::~Aliza()
 {
-	if (mutex0.tryLock(30000))
+	if (mutex0.tryLock(3000))
 	{
 		IconUtils::kill_threads();
 		mutex0.unlock();
