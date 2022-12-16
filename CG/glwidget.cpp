@@ -1220,7 +1220,7 @@ void GLWidget::init_opengl(int w, int h)
 	c3d_shader_gradient_clamp_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient_clamp_sigm.program, "v_texcoord0");
 	c3d_shader_gradient_clamp_sigm.location_mparams    = glGetUniformLocation(c3d_shader_gradient_clamp_sigm.program, "mparams");
 	shaders.push_back(&c3d_shader_gradient_clamp_sigm);
-		generate_vao1(
+	generate_vao1(
 		&c3d_shader_gradient_clamp_sigm_vao,
 		c3d_shader_gradient_clamp_sigm_vbo,
 		&(c3d_shader_gradient_clamp_sigm.position_handle),
@@ -1234,7 +1234,7 @@ void GLWidget::init_opengl(int w, int h)
 	c3d_shader_gradient_bb_clamp_sigm.texture_handle[0]   = glGetAttribLocation (c3d_shader_gradient_bb_clamp_sigm.program, "v_texcoord0");
 	c3d_shader_gradient_bb_clamp_sigm.location_mparams    = glGetUniformLocation(c3d_shader_gradient_bb_clamp_sigm.program, "mparams");
 	shaders.push_back(&c3d_shader_gradient_bb_clamp_sigm);
-		generate_vao1(
+	generate_vao1(
 		&c3d_shader_gradient_bb_clamp_sigm_vao,
 		c3d_shader_gradient_bb_clamp_sigm_vbo,
 		&(c3d_shader_gradient_bb_clamp_sigm.position_handle),
@@ -4014,9 +4014,9 @@ void GLWidget::makeModelVBO_ArraysT(
 	vboids.push_back(vboid);
 	vaoids.push_back(*vaoid);
 	delete [] v;
-	delete [] n;
-	delete [] t;
-	delete [] ta;
+	if (normals)  delete [] n;
+	if (textures) delete [] t;
+	if (tangents) delete [] ta;
 }
 
 void GLWidget::generate_screen_quad(GLuint * vbo, GLuint * vao, GLuint * attr)

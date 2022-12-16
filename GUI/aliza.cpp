@@ -409,17 +409,17 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 	}
 	for (int j = 0; j < tmp_objects.size(); ++j)
 	{
-		btCollisionObject * k = tmp_objects[j];
-		if (k)
+		if (tmp_objects[j])
 		{
-			if(k->getUserPointer())
+			btCollisionObject * k = tmp_objects[j];
+			if (k->getUserPointer())
 			{
 				int * p = static_cast<int*>(k->getUserPointer());
 				delete [] p;
 			}
 			g_collisionWorld->removeCollisionObject(k);
-			delete k;
-			k = NULL;
+			delete tmp_objects[j];
+			tmp_objects[j] = NULL;
 		}
 	}
 	for (int j = 0; j < tmp_shapes.size(); ++j)
@@ -586,17 +586,17 @@ static void check_slice_collisions2(StudyViewWidget * w)
 				}
 				for (int j = 0; j < tmp_objects.size(); ++j)
 				{
-					btCollisionObject * k = tmp_objects[j];
-					if (k)
+					if (tmp_objects[j])
 					{
-						if(k->getUserPointer())
+						btCollisionObject * k = tmp_objects[j];
+						if (k->getUserPointer())
 						{
 							int * p = static_cast<int*>(k->getUserPointer());
 							delete [] p;
 						}
 						g_collisionWorld->removeCollisionObject(k);
-						delete k;
-						k = NULL;
+						delete tmp_objects[j];
+						tmp_objects[j] = NULL;
 					}
 				}
 				for (int j = 0; j < tmp_shapes.size(); ++j)
