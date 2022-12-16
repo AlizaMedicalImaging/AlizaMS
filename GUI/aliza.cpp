@@ -123,22 +123,26 @@ static void g_close_physics()
 	}
 	for (int x = 0; x < g_collision_shapes.size(); ++x)
 	{
-		btCollisionShape * s = static_cast<btCollisionShape *>(g_collision_shapes[x]);
-		if (!s) continue;
-		if (s->getShapeType() == COMPOUND_SHAPE_PROXYTYPE)
+		btCollisionShape * s = static_cast<btCollisionShape*>(g_collision_shapes[x]);
+		if (s)
 		{
-			btCompoundShape * c = (btCompoundShape*)s;
-			for (int z = 0; z < c->getNumChildShapes(); ++z)
+			if (s->getShapeType() == COMPOUND_SHAPE_PROXYTYPE)
 			{
-				btCollisionShape * ch = static_cast<btCollisionShape *>(c->getChildShape(z));
-				if (!ch) continue;
-				c->removeChildShape(ch);
-				delete ch;
-				ch = NULL;
+				btCompoundShape * c = static_cast<btCompoundShape*>(s);
+				for (int z = 0; z < c->getNumChildShapes(); ++z)
+				{
+					btCollisionShape * ch = static_cast<btCollisionShape*>(c->getChildShape(z));
+					if (ch)
+					{
+						c->removeChildShape(ch);
+						delete ch;
+						ch = NULL;
+					}
+				}
 			}
+			delete s;
+			s = NULL;
 		}
-		delete s;
-		s = NULL;
 	}
 	g_collision_shapes.clear();
 	if (g_collisionWorld)
@@ -220,7 +224,7 @@ static void add_slice_collision_plane(
 	const int z,
 	const int id,
 	btAlignedObjectArray<btStaticPlaneShape*> & tmp_shapes,
-	btAlignedObjectArray<btCollisionObject*> & tmp_objects) 
+	btAlignedObjectArray<btCollisionObject*> & tmp_objects)
 {
 	if ((int)v->di->image_slices.size() <= z) return;
 	btTransform t;
@@ -454,7 +458,7 @@ static void check_slice_collisions2(StudyViewWidget * w)
 	for (int x = 0; x < w->widgets.size(); ++x)
 	{
 		if (w->widgets.at(x) && w->widgets.at(x)->graphicswidget)
-		{	
+		{
 			if (w->widgets.at(x)->graphicswidget->image_container.image3D)
 			{
 				const ImageVariant * v =
