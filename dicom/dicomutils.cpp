@@ -869,16 +869,6 @@ Value Multiplicity	1
 Value Representation	Long String (LO)
 */
 
-
-
-
-
-
-
-
-
-
-
 	s += generate_string_0(
 		ds,
 		mdcm::Tag(0x0018,0x115E),

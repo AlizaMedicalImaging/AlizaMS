@@ -100,7 +100,7 @@ int TableWidgetItem2::get_id() const
 	return id;
 }
 
-const QString css1 = QString(
+const QString css1(
 	"span.y     { color:#050505; font-size: medium; }\n"
 	"span.ybl   { color:#050505; font-size: large; font-weight: bold; }\n"
 	"span.ybm   { color:#050505; font-size: medium; font-weight: bold; }\n"
@@ -126,10 +126,10 @@ const QString css1 = QString(
 	"span.y8    { color:#0d0d76; font-size: small;}\n"
 	"span.y9    { color:#0d0d76; font-size: small; font-weight: bold; font-style: italic; }\n"
 	);
-const QString head = QString(
+const QString head(
 	"<html><head><link rel='stylesheet'"
 	" type='text/css' href='format.css'></head><body>");
-const QString foot = QString("</body></html>");
+const QString foot("</body></html>");
 
 ImagesBox::ImagesBox(float si)
 {
