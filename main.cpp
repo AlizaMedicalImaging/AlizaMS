@@ -83,11 +83,7 @@ void redirect_qdebug(
 	switch (type)
 	{
 	case QtDebugMsg:
-		std::cout << msg.toStdString() << std::endl;
-		break;
 	case QtWarningMsg:
-		std::cout << msg.toStdString() << std::endl;
-		break;
 	case QtCriticalMsg:
 		std::cout << msg.toStdString() << std::endl;
 		break;
