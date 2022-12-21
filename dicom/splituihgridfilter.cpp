@@ -8,10 +8,15 @@
 #include "mdcmVR.h"
 #include "mdcmVM.h"
 #include "mdcmVL.h"
-#include <math.h>
-#include <iostream>
+#include <cmath>
 #include <vector>
 #include "dicomutils.h"
+
+#define ALIZA_SPLITUIH_VERBOSE
+
+#ifdef ALIZA_SPLITUIH_VERBOSE
+#include <iostream>
+#endif
 
 template<typename T> bool reorganize_uih_grid(
 	const T * input,
@@ -186,21 +191,28 @@ bool SplitUihGridFilter::Split()
 	unsigned int dims[3] = {0,0,0};
 	if (!ComputeUihGridDimensions(dims))
 	{
-		//std::cout << "!ComputeUihGridDimensions" << std::endl;
+#ifdef ALIZA_SPLITUIH_VERBOSE
+		std::cout << "!ComputeUihGridDimensions" << std::endl;
+#endif
 		return false;
 	}
-/*
+#if 0
+	// TODO check again
 	double normal[3];
 	if (!ComputeUihGridSliceNormal(normal))
 	{
+#ifdef ALIZA_SPLITUIH_VERBOSE
 		std::cout << "!ComputeUihGridSliceNormal" << std::endl;
+#endif
 		return false;
 	}
-*/
+#endif
 	double origin[3];
 	if (!ComputeUihGridSlicePosition(origin))
 	{
-		//std::cout << "!ComputeUihGridSlicePosition" << std::endl;
+#ifdef ALIZA_SPLITUIH_VERBOSE
+		std::cout << "!ComputeUihGridSlicePosition" << std::endl;
+#endif
 		return false;
 	}
 	const Image & inputimage = GetImage();
@@ -211,34 +223,46 @@ bool SplitUihGridFilter::Split()
 	DataElement pixeldata(Tag(0x7fe0,0x0010));
 	std::vector<char> outbuf;
 	outbuf.resize(l);
+	const void * vbuf = static_cast<void*>(&buf[0]);
+	void * voutbuf = static_cast<void*>(&outbuf[0]);
 	bool b = false;
 	if (inputimage.GetPixelFormat() == PixelFormat::UINT16)
+	{
 		b = reorganize_uih_grid<unsigned short>(
-			(unsigned short*)&buf[0],
+			static_cast<const unsigned short*>(vbuf),
 			inputimage.GetDimensions(),
 			dims,
-			(unsigned short*)&outbuf[0]);
+			static_cast<unsigned short*>(voutbuf));
+	}
 	else if (inputimage.GetPixelFormat() == PixelFormat::INT16)
+	{
 		b = reorganize_uih_grid<signed short>(
-			(signed short*)&buf[0],
+			static_cast<const signed short*>(vbuf),
 			inputimage.GetDimensions(),
 			dims,
-			(signed short*)&outbuf[0]);
+			static_cast<signed short*>(voutbuf));
+	}
 	else if (inputimage.GetPixelFormat() == PixelFormat::UINT8)
+	{
 		b = reorganize_uih_grid<unsigned char>(
-			(unsigned char*)&buf[0],
+			static_cast<const unsigned char*>(vbuf),
 			inputimage.GetDimensions(),
 			dims,
-			(unsigned char*)&outbuf[0]);
+			static_cast<unsigned char*>(voutbuf));
+	}
 	else if (inputimage.GetPixelFormat() == PixelFormat::INT8)
+	{
 		b = reorganize_uih_grid<signed char>(
-			(signed char*)&buf[0],
+			static_cast<const signed char*>(vbuf),
 			inputimage.GetDimensions(),
 			dims,
-			(signed char*)&outbuf[0]);
+			static_cast<signed char*>(voutbuf));
+	}
 	if (!b)
 	{
-		//std::cout << "!reorganize_uih_grid" << std::endl;
+#ifdef ALIZA_SPLITUIH_VERBOSE
+		std::cout << "!reorganize_uih_grid" << std::endl;
+#endif
 		return false;
 	}
 	pixeldata.SetByteValue(&outbuf[0], (VL::Type)outbuf.size());

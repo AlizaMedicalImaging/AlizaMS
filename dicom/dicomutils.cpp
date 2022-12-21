@@ -1648,7 +1648,8 @@ bool DicomUtils::build_gems_dictionary(QMap<QString,int> & m, const mdcm::DataSe
 			const bool ok0 = bv0->GetBuffer(buffer0,l0);
 			if (ok0)
 			{
-				int * tmp0 = reinterpret_cast<int*>(buffer0);
+				void * vbuffer0 = static_cast<void*>(buffer0);
+				int * tmp0 = static_cast<int*>(vbuffer0);
 				for (unsigned int x0 = 0; x0 < l0/4; ++x0)
 				{
 					result0.push_back(tmp0[x0]);
@@ -1715,7 +1716,8 @@ void DicomUtils::read_gems_params(
 			const bool ok0 = bv0->GetBuffer(buffer0,l0);
 			if (ok0)
 			{
-				double * tmp0 = reinterpret_cast<double*>(buffer0);
+				void * vbuffer0 = static_cast<void*>(buffer0);
+				double * tmp0 = static_cast<double*>(vbuffer0);
 				for (unsigned int x0 = 0; x0 < l0/8; ++x0)
 				{
 					result0.push_back(tmp0[x0]);
@@ -1731,7 +1733,8 @@ void DicomUtils::read_gems_params(
 			const bool ok0 = bv0->GetBuffer(buffer0,l0);
 			if (ok0)
 			{
-				int * tmp0 = reinterpret_cast<int*>(buffer0);
+				void * vbuffer0 = static_cast<void*>(buffer0);
+				int * tmp0 = static_cast<int*>(vbuffer0);
 				for (size_t x0 = 0; x0 < l0/4; ++x0)
 				{
 					result0.push_back(tmp0[x0]);
@@ -8916,7 +8919,8 @@ QString DicomUtils::read_buffer(
 						const size_t lut_data_s = lut_data.size();
 						if (pf_ba == 8)
 						{
-							float * tmp_data = reinterpret_cast<float*>(rescaled_buffer);
+							void * vrescaled_buffer = static_cast<void*>(rescaled_buffer);
+							float * tmp_data = static_cast<float*>(vrescaled_buffer);
 							for (size_t x = 0; x < dimx * dimy * dimz; ++x)
 							{
 								float out = 0.0f;
@@ -8974,8 +8978,10 @@ QString DicomUtils::read_buffer(
 						}
 						else if (pf_ba == 16)
 						{
-							float * tmp_data = reinterpret_cast<float*>(rescaled_buffer);
-							unsigned short * tmp_not_rescaled = reinterpret_cast<unsigned short*>(not_rescaled_buffer);
+							void * vrescaled_buffer = static_cast<void*>(rescaled_buffer);
+							float * tmp_data = static_cast<float*>(vrescaled_buffer);
+							void * vnot_rescaled_buffer = static_cast<void*>(not_rescaled_buffer);
+							unsigned short * tmp_not_rescaled = static_cast<unsigned short*>(vnot_rescaled_buffer);
 							for (size_t x = 0; x < dimx * dimy * dimz; ++x)
 							{
 								float out = 0.0f;
@@ -12146,7 +12152,8 @@ bool DicomUtils::read_gray_lut(
 #endif
 	if (lut_data_bits == 8 && lut_data_size0 == lut_data_size1)
 	{
-		const unsigned char * lut_data8 = reinterpret_cast<const unsigned char *>(p);
+		const void * void_p = static_cast<const void*>(p);
+		const unsigned char * lut_data8 = static_cast<const unsigned char *>(void_p);
 		for (size_t x = 0; x < lut_data_size0; ++x)
 		{
 			lut_data.push_back(QVariant((int)lut_data8[x]));
@@ -12154,7 +12161,8 @@ bool DicomUtils::read_gray_lut(
 	}
 	else if (lut_data_size0 * 2 == lut_data_size1)
 	{
-		const unsigned short * lut_data16 = reinterpret_cast<const unsigned short *>(p);
+		const void * void_p = static_cast<const void*>(p);
+		const unsigned short * lut_data16 = static_cast<const unsigned short *>(void_p);
 		for (size_t x = 0; x < lut_data_size0; ++x)
 		{
 			lut_data.push_back(QVariant((int)lut_data16[x]));
