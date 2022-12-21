@@ -56,30 +56,31 @@ ByteSwapFilter::ByteSwap()
       assert(!si);
       if (vr & VR::VRBINARY)
       {
+        void * vp = bv->GetVoidPointer();
         switch (vr)
         {
           case VR::OB:
             break;
           case VR::SS:
-            SwapperDoOp::SwapArray((int16_t *)bv->GetPointer(), bv->GetLength() / sizeof(int16_t));
+            SwapperDoOp::SwapArray(static_cast<int16_t *>(vp), bv->GetLength() / sizeof(int16_t));
             break;
           case VR::OW:
           case VR::US:
-            SwapperDoOp::SwapArray((uint16_t *)bv->GetPointer(), bv->GetLength() / sizeof(uint16_t));
+            SwapperDoOp::SwapArray(static_cast<uint16_t *>(vp), bv->GetLength() / sizeof(uint16_t));
             break;
           case VR::SL:
-            SwapperDoOp::SwapArray((int32_t *)bv->GetPointer(), bv->GetLength() / sizeof(int32_t));
+            SwapperDoOp::SwapArray(static_cast<int32_t *>(vp), bv->GetLength() / sizeof(int32_t));
             break;
           case VR::OL:
           case VR::UL:
-            SwapperDoOp::SwapArray((uint32_t *)bv->GetPointer(), bv->GetLength() / sizeof(uint32_t));
+            SwapperDoOp::SwapArray(static_cast<uint32_t *>(vp), bv->GetLength() / sizeof(uint32_t));
             break;
           case VR::OV:
           case VR::UV:
-            SwapperDoOp::SwapArray((uint64_t *)bv->GetPointer(), bv->GetLength() / sizeof(uint64_t));
+            SwapperDoOp::SwapArray(static_cast<uint64_t *>(vp), bv->GetLength() / sizeof(uint64_t));
             break;
           case VR::SV:
-            SwapperDoOp::SwapArray((int64_t *)bv->GetPointer(), bv->GetLength() / sizeof(int64_t));
+            SwapperDoOp::SwapArray(static_cast<int64_t *>(vp), bv->GetLength() / sizeof(int64_t));
             break;
           case VR::FL:
           case VR::OF:

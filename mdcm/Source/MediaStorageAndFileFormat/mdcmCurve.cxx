@@ -61,7 +61,8 @@ public:
     os << "TypeOfData                         :" << TypeOfData << std::endl;
     os << "CurveDescription                   :" << CurveDescription << std::endl;
     os << "DataValueRepresentation            :" << DataValueRepresentation << std::endl;
-    const unsigned short * p = (const unsigned short *)(const void *)&Data[0];
+    const void * dp = static_cast<const void*>(&Data[0]);
+    const unsigned short * p = static_cast<const unsigned short *>(dp);
     for (int i = 0; i < NumberOfPoints; i += 2)
     {
       os << p[i] << "," << p[i + 1] << std::endl;
@@ -101,7 +102,7 @@ Curve::GetNumberOfCurves(DataSet const & ds)
     }
     else if (de.GetTag().IsPrivate())
     {
-      overlay.SetGroup((uint16_t)(de.GetTag().GetGroup() + 1));
+      overlay.SetGroup(static_cast<uint16_t>(de.GetTag().GetGroup() + 1));
       overlay.SetElement(0);
     }
     else
@@ -117,7 +118,7 @@ Curve::GetNumberOfCurves(DataSet const & ds)
       // store found tag in overlay
       overlay = de.GetTag();
       // move on to the next possible one
-      overlay.SetGroup((uint16_t)(overlay.GetGroup() + 2));
+      overlay.SetGroup(static_cast<uint16_t>(overlay.GetGroup() + 2));
       // reset to element 0x0 just in case
       overlay.SetElement(0);
     }
@@ -419,12 +420,12 @@ Curve::GetAsPoints(float * array) const
   if (Internal->CurveDataDescriptor.empty())
   {
     assert(Internal->Data.size() ==
-           (uint32_t)Internal->NumberOfPoints * Internal->Dimensions * getsizeofrep(Internal->DataValueRepresentation));
+           static_cast<uint32_t>(Internal->NumberOfPoints) * Internal->Dimensions * getsizeofrep(Internal->DataValueRepresentation));
   }
   else
   {
     assert(Internal->Data.size() ==
-           (uint32_t)Internal->NumberOfPoints * 1 * getsizeofrep(Internal->DataValueRepresentation));
+           static_cast<uint32_t>(Internal->NumberOfPoints) * 1 * getsizeofrep(Internal->DataValueRepresentation));
   }
   assert(Internal->Dimensions == 1 || Internal->Dimensions == 2);
   const int mult = Internal->Dimensions;
@@ -462,16 +463,17 @@ Curve::GetAsPoints(float * array) const
     (void)beg;
     (void)end;
   }
+  void * vp = static_cast<void*>(&Internal->Data[0]);
   if (Internal->DataValueRepresentation == 0)
   {
     // PS 3.3 - 2004
     // C.10.2.1.5 Curve data descriptor, coordinate start value, coordinate step value
-    uint16_t * p = (uint16_t *)&Internal->Data[0];
+    uint16_t * p = static_cast<uint16_t *>(vp);
     // X
     if (genidx == 0)
     {
       for (int i = 0; i < Internal->NumberOfPoints; ++i)
-        array[3 * i + 0] = (float)ComputeValueFromStartAndStep(i);
+        array[3 * i + 0] = static_cast<float>(ComputeValueFromStartAndStep(i));
     }
     else
     {
@@ -482,7 +484,7 @@ Curve::GetAsPoints(float * array) const
     if (genidx == 1)
     {
       for (int i = 0; i < Internal->NumberOfPoints; ++i)
-        array[3 * i + 1] = (float)ComputeValueFromStartAndStep(i);
+        array[3 * i + 1] = static_cast<float>(ComputeValueFromStartAndStep(i));
     }
     else
     {
@@ -508,7 +510,7 @@ Curve::GetAsPoints(float * array) const
   }
   else if (Internal->DataValueRepresentation == 1)
   {
-    int16_t * p = (int16_t *)&Internal->Data[0];
+    int16_t * p = static_cast<int16_t *>(vp);
     for (int i = 0; i < Internal->NumberOfPoints; ++i)
     {
       array[3 * i + 0] = p[mult * i + 0];
@@ -521,7 +523,7 @@ Curve::GetAsPoints(float * array) const
   }
   else if (Internal->DataValueRepresentation == 2)
   {
-    float * p = (float *)&Internal->Data[0];
+    float * p = static_cast<float *>(vp);
     for (int i = 0; i < Internal->NumberOfPoints; ++i)
     {
       array[3 * i + 0] = p[mult * i + 0];
@@ -534,12 +536,12 @@ Curve::GetAsPoints(float * array) const
   }
   else if (Internal->DataValueRepresentation == 3)
   {
-    double * p = (double *)&Internal->Data[0];
+    double * p = static_cast<double *>(vp);
     for (int i = 0; i < Internal->NumberOfPoints; ++i)
     {
-      array[3 * i + 0] = (float)p[mult * i + 0];
+      array[3 * i + 0] = static_cast<float>(p[mult * i + 0]);
       if (mult > 1)
-        array[3 * i + 1] = (float)p[mult * i + 1];
+        array[3 * i + 1] = static_cast<float>(p[mult * i + 1]);
       else
         array[3 * i + 1] = 0;
       array[3 * i + 2] = 0;
@@ -547,12 +549,12 @@ Curve::GetAsPoints(float * array) const
   }
   else if (Internal->DataValueRepresentation == 4)
   {
-    int32_t * p = (int32_t *)&Internal->Data[0];
+    int32_t * p = static_cast<int32_t *>(vp);
     for (int i = 0; i < Internal->NumberOfPoints; ++i)
     {
-      array[3 * i + 0] = (float)p[mult * i + 0];
+      array[3 * i + 0] = static_cast<float>(p[mult * i + 0]);
       if (mult > 1)
-        array[3 * i + 1] = (float)p[mult * i + 1];
+        array[3 * i + 1] = static_cast<float>(p[mult * i + 1]);
       else
         array[3 * i + 1] = 0;
       array[3 * i + 2] = 0;

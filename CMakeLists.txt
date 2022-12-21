@@ -267,6 +267,8 @@ if(MDCM_USE_SYSTEM_CHARLS)
   if(CHARLS_LOW)
     add_definitions(-DMDCM_CHARLS_LOW)
   endif()
+  # TODO update CharLS to be ready for future v3
+  add_definitions(-DCHARLS_NO_DEPRECATED_WARNING)
 else()
   set(MDCM_CHARLS_LIBRARIES mdcmcharls)
 endif()

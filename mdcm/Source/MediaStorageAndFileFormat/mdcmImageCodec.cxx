@@ -187,9 +187,13 @@ ImageCodec::SetDimensions(const std::vector<unsigned int> & d)
   for (size_t i = 0; i < 3; ++i)
   {
     if (i < s)
+    {
       Dimensions[i] = d[i];
+    }
     else
+    {
       Dimensions[i] = 1;
+    }
   }
 }
 
@@ -215,29 +219,29 @@ bool
 ImageCodec::CleanupUnusedBits(char * data8, size_t datalen)
 {
   if (!NeedOverlayCleanup) return true;
-  void * data = data8;
+  void * data = static_cast<void*>(data8);
   assert(PF.GetBitsAllocated() > 8);
   if (PF.GetBitsAllocated() == 16)
   {
     // pmask: to mask the 'unused bits' (may contain overlays)
     uint16_t pmask = 0xffff;
-    pmask = (uint16_t)(pmask >> (PF.GetBitsAllocated() - PF.GetBitsStored()));
+    pmask = pmask >> static_cast<uint16_t>(PF.GetBitsAllocated() - PF.GetBitsStored());
     if (PF.GetPixelRepresentation())
     {
       // smask: to check the 'sign' when BitsStored != BitsAllocated
       uint16_t smask = 0x0001;
-      smask = (uint16_t)(smask << (16 - (PF.GetBitsAllocated() - PF.GetBitsStored() + 1) ));
+      smask = smask << static_cast<uint16_t>(16 - (PF.GetBitsAllocated() - PF.GetBitsStored() + 1));
       // nmask: to propagate sign bit on negative values
-      int16_t nmask = (int16_t)0x8000;
-      nmask = (int16_t)(nmask >> ( PF.GetBitsAllocated() - PF.GetBitsStored() - 1));
-      uint16_t *start = (uint16_t*)data;
-      for ( uint16_t *p = start ; p != start + datalen / 2; ++p )
+      int16_t nmask = 0x8000;
+      nmask = nmask >> static_cast<int16_t>(PF.GetBitsAllocated() - PF.GetBitsStored() - 1);
+      uint16_t * start = static_cast<uint16_t*>(data);
+      for (uint16_t * p = start ; p != start + datalen / 2; ++p )
       {
         uint16_t c = *p;
-        c = (uint16_t)(c >> (PF.GetBitsStored() - PF.GetHighBit() - 1));
-        if ( c & smask )
+        c = c >> static_cast<uint16_t>(PF.GetBitsStored() - PF.GetHighBit() - 1);
+        if (c & smask)
         {
-          c = (uint16_t)(c | nmask);
+          c = static_cast<uint16_t>(c | nmask);
         }
         else
         {
@@ -248,11 +252,11 @@ ImageCodec::CleanupUnusedBits(char * data8, size_t datalen)
     }
     else
     {
-      uint16_t *start = (uint16_t*)data;
-      for (uint16_t *p = start ; p != start + datalen / 2; ++p)
+      uint16_t * start = static_cast<uint16_t*>(data);
+      for (uint16_t * p = start ; p != start + datalen / 2; ++p)
       {
         uint16_t c = *p;
-        c = (uint16_t)((c >> (PF.GetBitsStored() - PF.GetHighBit() - 1)) & pmask);
+        c = (c >> static_cast<uint16_t>(PF.GetBitsStored() - PF.GetHighBit() - 1)) & pmask;
         *p = c;
       }
     }
@@ -369,10 +373,13 @@ ImageCodec::DecodeByStreams(std::istream & is, std::ostream & os)
       break;
     case PhotometricInterpretation::YBR_PARTIAL_422: // retired
     case PhotometricInterpretation::YBR_PARTIAL_420: // not supported
-      {                                                // try JPEG
+      {
+        // try JPEG
         const JPEGCodec * c = dynamic_cast<const JPEGCodec *>(this);
         if (!c)
+        {
           return false;
+        }
       }
       break;
     default:
@@ -427,13 +434,19 @@ ImageCodec::DoByteSwap(std::istream & is, std::ostream & os)
 #ifdef MDCM_WORDS_BIGENDIAN
   if (PF.GetBitsAllocated() == 16)
   {
-    ByteSwap<uint16_t>::SwapRangeFromSwapCodeIntoSystem((uint16_t *)dummy_buffer, SwapCode::LittleEndian, buf_size / 2);
+    void * vdummy_buffer = static_cast<void*>(dummy_buffer);
+    ByteSwap<uint16_t>::SwapRangeFromSwapCodeIntoSystem(static_cast<uint16_t *>(vdummy_buffer),
+                                                        SwapCode::LittleEndian,
+                                                        buf_size / 2);
   }
 #else
   // GE_DLX-8-MONO2-PrivateSyntax.dcm is 8bits
   if (PF.GetBitsAllocated() == 16)
   {
-    ByteSwap<uint16_t>::SwapRangeFromSwapCodeIntoSystem((uint16_t *)dummy_buffer, SwapCode::BigEndian, buf_size / 2);
+    void * vdummy_buffer = static_cast<void*>(dummy_buffer);
+    ByteSwap<uint16_t>::SwapRangeFromSwapCodeIntoSystem(static_cast<uint16_t *>(vdummy_buffer),
+                                                        SwapCode::BigEndian,
+                                                        buf_size / 2);
   }
 #endif
   os.write(dummy_buffer, buf_size);
@@ -449,10 +462,14 @@ ImageCodec::DoYBRFull422(std::istream & is, std::ostream & os)
   is.seekg(0, std::ios::end);
   const size_t buf_size = is.tellg();
   if (buf_size % 2 != 0)
+  {
     return false;
+  }
   const size_t rgb_buf_size = buf_size * 3 / 2;
   if (rgb_buf_size % 3 != 0)
+  {
     return false;
+  }
   unsigned char * buffer;
   try
   {
@@ -463,7 +480,7 @@ ImageCodec::DoYBRFull422(std::istream & is, std::ostream & os)
     return false;
   }
   is.seekg(start, std::ios::beg);
-  is.read((char *)buffer, buf_size);
+  is.read(reinterpret_cast<char *>(buffer), buf_size);
   is.seekg(start, std::ios::beg);
   unsigned char * copy;
   try
@@ -482,7 +499,7 @@ ImageCodec::DoYBRFull422(std::istream & is, std::ostream & os)
     const unsigned char ybr[] = { ybr422[0], ybr422[2], ybr422[3], ybr422[1], ybr422[2], ybr422[3] };
     memcpy(copy + 6 * j, ybr, 6);
   }
-  os.write((char *)copy, rgb_buf_size);
+  os.write(reinterpret_cast<char *>(copy), rgb_buf_size);
   delete[] copy;
   delete[] buffer;
   return true;
@@ -542,8 +559,16 @@ ImageCodec::DoSimpleCopy(std::istream & is, std::ostream & os)
   std::streampos start = is.tellg();
   assert(0 - start == 0);
   is.seekg(0, std::ios::end);
-  size_t buf_size = (size_t)is.tellg();
-  char * dummy_buffer = new char[(unsigned int)buf_size];
+  size_t buf_size = is.tellg();
+  char * dummy_buffer;
+  try
+  {
+     dummy_buffer = new char[buf_size];
+  }
+  catch (const std::bad_alloc&)
+  {
+    return false;
+  }
   is.seekg(start, std::ios::beg);
   is.read(dummy_buffer, buf_size);
   is.seekg(start, std::ios::beg);
@@ -563,8 +588,16 @@ ImageCodec::DoPaddedCompositePixelCode(std::istream & is, std::ostream & os)
   std::streampos start = is.tellg();
   assert(0 - start == 0);
   is.seekg(0, std::ios::end);
-  size_t buf_size = (size_t)is.tellg();
-  char * dummy_buffer = new char[(unsigned int)buf_size];
+  size_t buf_size = is.tellg();
+  char * dummy_buffer;
+  try
+  {
+     dummy_buffer = new char[buf_size];
+  }
+  catch (const std::bad_alloc&)
+  {
+    return false;
+  }
   is.seekg(start, std::ios::beg);
   is.read(dummy_buffer, buf_size);
   is.seekg(start, std::ios::beg);
@@ -617,10 +650,10 @@ ImageCodec::DoInvertMonochrome(std::istream & is, std::ostream & os)
     if (PF.GetBitsAllocated() == 8)
     {
       uint8_t c;
-      while (is.read((char *)&c, 1))
+      while (is.read(reinterpret_cast<char *>(&c), 1))
       {
-        c = (uint8_t)(255 - c);
-        os.write((char *)&c, 1);
+        c = 255 - c;
+        os.write(reinterpret_cast<char *>(&c), 1);
       }
     }
     else if (PF.GetBitsAllocated() == 16)
@@ -628,10 +661,10 @@ ImageCodec::DoInvertMonochrome(std::istream & is, std::ostream & os)
       assert(PF.GetBitsStored() != 12);
       uint16_t smask16 = 65535;
       uint16_t c;
-      while (is.read((char *)&c, 2))
+      while (is.read(reinterpret_cast<char *>(&c), 2))
       {
-        c = (uint16_t)(smask16 - c);
-        os.write((char *)&c, 2);
+        c = smask16 - c;
+        os.write(reinterpret_cast<char *>(&c), 2);
       }
     }
   }
@@ -640,10 +673,10 @@ ImageCodec::DoInvertMonochrome(std::istream & is, std::ostream & os)
     if (PF.GetBitsAllocated() == 8)
     {
       uint8_t c;
-      while (is.read((char *)&c, 1))
+      while (is.read(reinterpret_cast<char *>(&c), 1))
       {
-        c = (uint8_t)(255 - c);
-        os.write((char *)&c, 1);
+        c = 255 - c;
+        os.write(reinterpret_cast<char *>(&c), 1);
       }
     }
     else if (PF.GetBitsAllocated() == 16)
@@ -651,10 +684,10 @@ ImageCodec::DoInvertMonochrome(std::istream & is, std::ostream & os)
       uint16_t mask = 1;
       for (int j = 0; j < PF.GetBitsStored() - 1; ++j)
       {
-        mask = (uint16_t)((mask << 1) + 1); // will be 0x0fff when BitsStored = 12
+        mask = (mask << 1) + 1; // will be 0x0fff when BitsStored = 12
       }
       uint16_t c;
-      while (is.read((char *)&c, 2))
+      while (is.read(reinterpret_cast<char *>(&c), 2))
       {
         if (c > mask)
         {
@@ -666,27 +699,14 @@ ImageCodec::DoInvertMonochrome(std::istream & is, std::ostream & os)
           c = mask;
         }
         assert(c <= mask);
-        c = (uint16_t)(mask - c);
+        c = mask - c;
         assert(c <= mask);
-        os.write((char *)&c, 2);
+        os.write(reinterpret_cast<char *>(&c), 2);
       }
     }
   }
   return true;
 }
-
-#if 0
-struct ApplyMask
-{
-  uint16_t operator()(uint16_t c) const
-  {
-    return (uint16_t)((c >> (BitsStored - HighBit - 1)) & pmask);
-  }
-  unsigned short BitsStored;
-  unsigned short HighBit;
-  uint16_t pmask;
-};
-#endif
 
 bool
 ImageCodec::DoOverlayCleanup(std::istream & is, std::ostream & os)
@@ -696,63 +716,46 @@ ImageCodec::DoOverlayCleanup(std::istream & is, std::ostream & os)
   {
     // pmask: to mask the 'unused bits' (may contain overlays)
     uint16_t pmask = 0xffff;
-    pmask = (uint16_t)(pmask >> (PF.GetBitsAllocated() - PF.GetBitsStored()));
+    pmask = static_cast<uint16_t>(pmask >> (PF.GetBitsAllocated() - PF.GetBitsStored()));
     if (PF.GetPixelRepresentation())
     {
       // smask: to check the 'sign' when BitsStored != BitsAllocated
       uint16_t smask = 0x0001;
-      smask = (uint16_t)(smask << (16 - (PF.GetBitsAllocated() - PF.GetBitsStored() + 1)));
+      smask = smask << static_cast<uint16_t>(16 - (PF.GetBitsAllocated() - PF.GetBitsStored() + 1));
       // nmask: to propagate sign bit on negative values
-      int16_t nmask = (int16_t)0x8000;
-      nmask = (int16_t)(nmask >> (PF.GetBitsAllocated() - PF.GetBitsStored() - 1));
+      int16_t nmask = 0x8000;
+      nmask = nmask >> static_cast<int16_t>(PF.GetBitsAllocated() - PF.GetBitsStored() - 1);
       uint16_t c;
-      while (is.read((char*)&c, 2))
+      while (is.read(reinterpret_cast<char*>(&c), 2))
       {
-        c = (uint16_t)(c >> (PF.GetBitsStored() - PF.GetHighBit() - 1));
+        c = c >> static_cast<uint16_t>(PF.GetBitsStored() - PF.GetHighBit() - 1);
         if (c & smask)
         {
-          c = (uint16_t)(c | nmask);
+          c = c | nmask;
         }
         else
         {
           c = c & pmask;
         }
-        os.write((char*)&c, 2);
+        os.write(reinterpret_cast<char*>(&c), 2);
       }
     }
     else
     {
-#if 1
       // read/mask/write 1000 values at once.
       const unsigned int bufferSize = 1000;
       std::vector<uint16_t> buffer(bufferSize);
       while (is)
       {
-        is.read((char *)&buffer[0], bufferSize * sizeof(uint16_t));
+        is.read(reinterpret_cast<char *>(&buffer[0]), bufferSize * sizeof(uint16_t));
         std::streamsize bytesRead = is.gcount();
         std::vector<uint16_t>::iterator validBufferEnd = buffer.begin() + bytesRead / sizeof(uint16_t);
         for (std::vector<uint16_t>::iterator it = buffer.begin(); it != validBufferEnd; ++it)
         {
           *it = ((*it >> (PF.GetBitsStored() - PF.GetHighBit() - 1)) & pmask);
         }
-        os.write((char *)&buffer[0], bytesRead);
+        os.write(reinterpret_cast<char *>(&buffer[0]), bytesRead);
       }
-#else
-      //std::ostreambuf_iterator<char> end_of_stream_iterator;
-      //std::ostreambuf_iterator<char> out_iter(os.rdbuf());
-      //while( out_iter != end_of_stream_iterator )
-      //{
-      //  *out_iter = (*out_iter >> (PF.GetBitsStored() - PF.GetHighBit() - 1)) & pmask;
-      //}
-      std::istreambuf_iterator<int> it_in(is);
-      std::istreambuf_iterator<int> eos;
-      std::ostreambuf_iterator<int> it_out(os);
-      ApplyMask am;
-      am.BitsStored = PF.GetBitsStored();
-      am.HighBit = PF.GetHighBit();
-      am.pmask = pmask;
-      std::transform(it_in, eos, it_out, am);
-#endif
     }
   }
   else

@@ -45,7 +45,7 @@ RescaleFunction(TOut *       out,
   const size_t size = s / sizeof(TIn);
   for (size_t i = 0; i < size; ++i)
   {
-    out[i] = (TOut)(slope * in[i] + intercept);
+    out[i] = static_cast<TOut>(slope * in[i] + intercept);
   }
 }
 
@@ -82,7 +82,7 @@ struct FImpl
     const size_t size = s / sizeof(TIn);
     for (size_t i = 0; i < size; ++i)
     {
-      out[i] = (TOut)(((double)in[i] - intercept) / slope);
+      out[i] = (TOut)((static_cast<double>(in[i]) - intercept) / slope);
     }
   }
 };
@@ -104,7 +104,7 @@ struct FImpl<TOut, float>
     const size_t size = s / sizeof(float);
     for (size_t i = 0; i < size; ++i)
     {
-      out[i] = (TOut)llround(((double)in[i] - intercept) / slope);
+      out[i] = (TOut)llround((static_cast<double>(in[i]) - intercept) / slope);
     }
   }
 };
@@ -126,7 +126,7 @@ struct FImpl<TOut, double>
     const size_t size = s / sizeof(double);
     for (size_t i = 0; i < size; ++i)
     {
-      out[i] = (TOut)llround(((double)in[i] - intercept) / slope);
+      out[i] = (TOut)llround((static_cast<double>(in[i]) - intercept) / slope);
     }
   }
 };
@@ -146,11 +146,11 @@ ComputeBestFit(const PixelFormat & pf, const double intercept, const double slop
   {
     return PixelFormat::FLOAT64;
   }
-  if (fabs(((double)((long long)(intercept))) - intercept) > std::numeric_limits<double>::epsilon())
+  if (fabs((static_cast<double>(static_cast<long long>(intercept))) - intercept) > std::numeric_limits<double>::epsilon())
   {
     return PixelFormat::FLOAT64;
   }
-  if (fabs(((double)((long long)(slope))) - slope) > std::numeric_limits<double>::epsilon())
+  if (fabs((static_cast<double>(static_cast<long long>(slope))) - slope) > std::numeric_limits<double>::epsilon())
   {
     return PixelFormat::FLOAT64;
   }
@@ -229,37 +229,38 @@ Rescaler::RescaleFunctionIntoBestFit(char * out, const TIn * in, size_t n)
 {
   const PixelFormat::ScalarType f =
     (UseTargetPixelType) ? TargetScalarType : ComputeInterceptSlopePixelType();
+  void * p = static_cast<void*>(out);
   switch (f)
   {
     case PixelFormat::UINT8:
-      RescaleFunction<uint8_t, TIn>((uint8_t *)out, in, Intercept, Slope, n);
+      RescaleFunction<uint8_t, TIn>(static_cast<uint8_t *>(p), in, Intercept, Slope, n);
       break;
     case PixelFormat::INT8:
-      RescaleFunction<int8_t, TIn>((int8_t *)out, in, Intercept, Slope, n);
+      RescaleFunction<int8_t, TIn>(static_cast<int8_t *>(p), in, Intercept, Slope, n);
       break;
     case PixelFormat::UINT16:
-      RescaleFunction<uint16_t, TIn>((uint16_t *)out, in, Intercept, Slope, n);
+      RescaleFunction<uint16_t, TIn>(static_cast<uint16_t *>(p), in, Intercept, Slope, n);
       break;
     case PixelFormat::INT16:
-      RescaleFunction<int16_t, TIn>((int16_t *)out, in, Intercept, Slope, n);
+      RescaleFunction<int16_t, TIn>(static_cast<int16_t *>(p), in, Intercept, Slope, n);
       break;
     case PixelFormat::UINT32:
-      RescaleFunction<uint32_t, TIn>((uint32_t *)out, in, Intercept, Slope, n);
+      RescaleFunction<uint32_t, TIn>(static_cast<uint32_t *>(p), in, Intercept, Slope, n);
       break;
     case PixelFormat::INT32:
-      RescaleFunction<int32_t, TIn>((int32_t *)out, in, Intercept, Slope, n);
+      RescaleFunction<int32_t, TIn>(static_cast<int32_t *>(p), in, Intercept, Slope, n);
       break;
     case PixelFormat::UINT64:
-      RescaleFunction<uint64_t, TIn>((uint64_t *)out, in, Intercept, Slope, n);
+      RescaleFunction<uint64_t, TIn>(static_cast<uint64_t *>(p), in, Intercept, Slope, n);
       break;
     case PixelFormat::INT64:
-      RescaleFunction<int64_t, TIn>((int64_t *)out, in, Intercept, Slope, n);
+      RescaleFunction<int64_t, TIn>(static_cast<int64_t *>(p), in, Intercept, Slope, n);
       break;
     case PixelFormat::FLOAT32:
-      RescaleFunction<float, TIn>((float *)out, in, Intercept, Slope, n);
+      RescaleFunction<float, TIn>(static_cast<float *>(p), in, Intercept, Slope, n);
       break;
     case PixelFormat::FLOAT64:
-      RescaleFunction<double, TIn>((double *)out, in, Intercept, Slope, n);
+      RescaleFunction<double, TIn>(static_cast<double *>(p), in, Intercept, Slope, n);
       break;
     default:
       mdcmAlwaysWarnMacro("RescaleFunctionIntoBestFit: unknown pixel format " << f);
@@ -272,25 +273,26 @@ void
 Rescaler::InverseRescaleFunctionIntoBestFit(char * out, const TIn * in, size_t n)
 {
   const PixelFormat f = ComputePixelTypeFromMinMax();
+  void * p = static_cast<void*>(out);
   switch (f)
   {
     case PixelFormat::UINT8:
-      InverseRescaleFunction<uint8_t, TIn>((uint8_t *)out, in, Intercept, Slope, n);
+      InverseRescaleFunction<uint8_t, TIn>(static_cast<uint8_t *>(p), in, Intercept, Slope, n);
       break;
     case PixelFormat::INT8:
-      InverseRescaleFunction<int8_t, TIn>((int8_t *)out, in, Intercept, Slope, n);
+      InverseRescaleFunction<int8_t, TIn>(static_cast<int8_t *>(p), in, Intercept, Slope, n);
       break;
     case PixelFormat::UINT16:
-      InverseRescaleFunction<uint16_t, TIn>((uint16_t *)out, in, Intercept, Slope, n);
+      InverseRescaleFunction<uint16_t, TIn>(static_cast<uint16_t *>(p), in, Intercept, Slope, n);
       break;
     case PixelFormat::INT16:
-      InverseRescaleFunction<int16_t, TIn>((int16_t *)out, in, Intercept, Slope, n);
+      InverseRescaleFunction<int16_t, TIn>(static_cast<int16_t *>(p), in, Intercept, Slope, n);
       break;
     case PixelFormat::UINT32:
-      InverseRescaleFunction<uint32_t, TIn>((uint32_t *)out, in, Intercept, Slope, n);
+      InverseRescaleFunction<uint32_t, TIn>(static_cast<uint32_t *>(p), in, Intercept, Slope, n);
       break;
     case PixelFormat::INT32:
-      InverseRescaleFunction<int32_t, TIn>((int32_t *)out, in, Intercept, Slope, n);
+      InverseRescaleFunction<int32_t, TIn>(static_cast<int32_t *>(p), in, Intercept, Slope, n);
       break;
     default:
       mdcmAlwaysWarnMacro("InverseRescaleFunctionIntoBestFit: unknown pixel format " << f);
@@ -301,31 +303,32 @@ Rescaler::InverseRescaleFunctionIntoBestFit(char * out, const TIn * in, size_t n
 bool
 Rescaler::InverseRescale(char * out, const char * in, size_t n)
 {
+  const void * p = static_cast<const void*>(in);
   switch (PF)
   {
     case PixelFormat::UINT8:
-      InverseRescaleFunctionIntoBestFit<uint8_t>(out, (const uint8_t *)in, n);
+      InverseRescaleFunctionIntoBestFit<uint8_t>(out, static_cast<const uint8_t *>(p), n);
       break;
     case PixelFormat::INT8:
-      InverseRescaleFunctionIntoBestFit<int8_t>(out, (const int8_t *)in, n);
+      InverseRescaleFunctionIntoBestFit<int8_t>(out, static_cast<const int8_t *>(p), n);
       break;
     case PixelFormat::UINT16:
-      InverseRescaleFunctionIntoBestFit<uint16_t>(out, (const uint16_t *)in, n);
+      InverseRescaleFunctionIntoBestFit<uint16_t>(out, static_cast<const uint16_t *>(p), n);
       break;
     case PixelFormat::INT16:
-      InverseRescaleFunctionIntoBestFit<int16_t>(out, (const int16_t *)in, n);
+      InverseRescaleFunctionIntoBestFit<int16_t>(out, static_cast<const int16_t *>(p), n);
       break;
     case PixelFormat::UINT32:
-      InverseRescaleFunctionIntoBestFit<uint32_t>(out, (const uint32_t *)in, n);
+      InverseRescaleFunctionIntoBestFit<uint32_t>(out, static_cast<const uint32_t *>(p), n);
       break;
     case PixelFormat::INT32:
-      InverseRescaleFunctionIntoBestFit<int32_t>(out, (const int32_t *)in, n);
+      InverseRescaleFunctionIntoBestFit<int32_t>(out, static_cast<const int32_t *>(p), n);
       break;
     case PixelFormat::FLOAT32:
-      InverseRescaleFunctionIntoBestFit<float>(out, (const float *)in, n);
+      InverseRescaleFunctionIntoBestFit<float>(out, static_cast<const float *>(p), n);
       break;
     case PixelFormat::FLOAT64:
-      InverseRescaleFunctionIntoBestFit<double>(out, (const double *)in, n);
+      InverseRescaleFunctionIntoBestFit<double>(out, static_cast<const double *>(p), n);
       break;
     default:
       mdcmAlwaysWarnMacro("InverseRescale: unknown pixel format");
@@ -337,6 +340,7 @@ Rescaler::InverseRescale(char * out, const char * in, size_t n)
 bool
 Rescaler::Rescale(char * out, const char * in, size_t n)
 {
+  const void * p = static_cast<const void*>(in);
   switch (PF)
   {
     case PixelFormat::SINGLEBIT:
@@ -344,36 +348,36 @@ Rescaler::Rescale(char * out, const char * in, size_t n)
       memcpy(out, in, n);
       break;
     case PixelFormat::UINT8:
-      RescaleFunctionIntoBestFit<uint8_t>(out, (const uint8_t *)in, n);
+      RescaleFunctionIntoBestFit<uint8_t>(out, static_cast<const uint8_t *>(p), n);
       break;
     case PixelFormat::INT8:
-      RescaleFunctionIntoBestFit<int8_t>(out, (const int8_t *)in, n);
+      RescaleFunctionIntoBestFit<int8_t>(out, static_cast<const int8_t *>(p), n);
       break;
     case PixelFormat::UINT12:
     case PixelFormat::UINT16:
-      RescaleFunctionIntoBestFit<uint16_t>(out, (const uint16_t *)in, n);
+      RescaleFunctionIntoBestFit<uint16_t>(out, static_cast<const uint16_t *>(p), n);
       break;
     case PixelFormat::INT12:
     case PixelFormat::INT16:
-      RescaleFunctionIntoBestFit<int16_t>(out, (const int16_t *)in, n);
+      RescaleFunctionIntoBestFit<int16_t>(out, static_cast<const int16_t *>(p), n);
       break;
     case PixelFormat::UINT32:
-      RescaleFunctionIntoBestFit<uint32_t>(out, (const uint32_t *)in, n);
+      RescaleFunctionIntoBestFit<uint32_t>(out, static_cast<const uint32_t *>(p), n);
       break;
     case PixelFormat::INT32:
-      RescaleFunctionIntoBestFit<int32_t>(out, (const int32_t *)in, n);
+      RescaleFunctionIntoBestFit<int32_t>(out, static_cast<const int32_t *>(p), n);
       break;
     case PixelFormat::UINT64:
-      RescaleFunctionIntoBestFit<uint64_t>(out, (const uint64_t *)in, n);
+      RescaleFunctionIntoBestFit<uint64_t>(out, static_cast<const uint64_t *>(p), n);
       break;
     case PixelFormat::INT64:
-      RescaleFunctionIntoBestFit<int64_t>(out, (const int64_t *)in, n);
+      RescaleFunctionIntoBestFit<int64_t>(out, static_cast<const int64_t *>(p), n);
       break;
     case PixelFormat::FLOAT32:
-      RescaleFunctionIntoBestFit<float>(out, (const float *)in, n);
+      RescaleFunctionIntoBestFit<float>(out, static_cast<const float *>(p), n);
       break;
     case PixelFormat::FLOAT64:
-      RescaleFunctionIntoBestFit<double>(out, (const double *)in, n);
+      RescaleFunctionIntoBestFit<double>(out, static_cast<const double *>(p), n);
       break;
     default:
       mdcmAlwaysWarnMacro("Unhandled: " << PF);
@@ -390,8 +394,8 @@ ComputeInverseBestFitFromMinMax(const double intercept,
 {
   PixelFormat st = PixelFormat::UNKNOWN;
   assert(_min <= _max);
-  const int64_t min_ = (int64_t)((slope < 0.0) ? (_max - intercept) / slope : (_min - intercept) / slope);
-  const int64_t max_ = (int64_t)((slope < 0.0) ? (_min - intercept) / slope : (_max - intercept) / slope);
+  const int64_t min_ = static_cast<int64_t>((slope < 0.0) ? (_max - intercept) / slope : (_min - intercept) / slope);
+  const int64_t max_ = static_cast<int64_t>((slope < 0.0) ? (_min - intercept) / slope : (_max - intercept) / slope);
   int           log2max = 0;
   if (min_ >= 0)
   {
@@ -415,9 +419,11 @@ ComputeInverseBestFitFromMinMax(const double intercept,
     }
     int64_t max2 = max_;
     while (max2 >>= 1)
+    {
       ++log2max;
+    }
     // need + 1 in case max == 4095 => 12bits stored required
-    st.SetBitsStored((unsigned short)(log2max + 1));
+    st.SetBitsStored(static_cast<unsigned short>(log2max + 1));
   }
   else
   {
@@ -441,9 +447,11 @@ ComputeInverseBestFitFromMinMax(const double intercept,
     }
     int64_t max2 = max_ - min_;
     while (max2 >>= 1)
+    {
       ++log2max;
+    }
     const int64_t bs = log2max + 1;
-    st.SetBitsStored((unsigned short)bs);
+    st.SetBitsStored(static_cast<unsigned short>(bs));
   }
   return st;
 }

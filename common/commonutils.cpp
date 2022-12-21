@@ -1335,13 +1335,8 @@ template<typename T> QString process_dicom_monochrome_image1(
 	}
 	//
 	ivariant->image_type = image_type;
-#if 1
 	const void * vbuffer = static_cast<void*>(buffer);
 	const typename T::PixelType * p__ = static_cast<const typename T::PixelType*>(vbuffer);
-#else
-	const typename T::PixelType * p__ =
-		reinterpret_cast<typename T::PixelType*>(buffer);
-#endif
 	//
 	try
 	{
@@ -1482,14 +1477,9 @@ template<typename T> QString process_dicom_rgb_image1(
 		return QString(ex.GetDescription());
 	}
 	//
-#if 1
 	const void * vbuffer = static_cast<void*>(buffer);
 	const typename T::PixelType::ValueType * p__ =
 		static_cast<const typename T::PixelType::ValueType*>(vbuffer);
-#else
-	const typename T::PixelType::ValueType * p__ =
-		reinterpret_cast<typename T::PixelType::ValueType*>(buffer);
-#endif
 	ivariant->image_type = image_type;
 	//
 	try

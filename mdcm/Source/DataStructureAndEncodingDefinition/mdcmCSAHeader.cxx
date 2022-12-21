@@ -202,10 +202,11 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
     mdcmErrorMacro("Too short");
     return false;
   }
-  // Some silly software consider the tag to be OW, therefore they byteswap it !!! sigh
+  // Some silly software consider the tag to be OW, therefore they byteswap it
   if (strcmp(signature, "VS01") == 0)
   {
-    SwapperDoOp::SwapArray((unsigned short *)&s[0], (s.size() + 1) / 2);
+    void * vp = static_cast<void*>(&s[0]);
+    SwapperDoOp::SwapArray(static_cast<unsigned short *>(vp), (s.size() + 1) / 2);
     ss.str(s);
     ss.read(signature, 4);
   }
@@ -262,7 +263,7 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
   }
   if (strcmp(signature, "SV10") == 0)
   {
-    // NEW FORMAT !
+    // NEW FORMAT
     ss.read(signature, 4);
     assert(strcmp(signature, "\4\3\2\1") == 0);
     InternalType = SV10;
@@ -271,10 +272,10 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
   mdcmDebugMacro("Found Type: " << (int)InternalType);
 
   uint32_t n;
-  ss.read((char *)&n, sizeof(n));
+  ss.read(reinterpret_cast<char *>(&n), sizeof(n));
   SwapperNoOp::SwapArray(&n, 1);
   uint32_t unused;
-  ss.read((char *)&unused, sizeof(unused));
+  ss.read(reinterpret_cast<char *>(&unused), sizeof(unused));
   SwapperNoOp::SwapArray(&unused, 1);
   if (unused != 77)
   {
@@ -282,7 +283,6 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
     return false;
   }
   assert(unused == 77); // 'M' character...
-
   for (uint32_t i = 0; i < n; ++i)
   {
     CSAElement csael;
@@ -292,7 +292,7 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
     ss.read(name, 64);
     csael.SetName(name);
     uint32_t vm;
-    ss.read((char *)&vm, sizeof(vm));
+    ss.read(reinterpret_cast<char *>(&vm), sizeof(vm));
     SwapperNoOp::SwapArray(&vm, 1);
     csael.SetVM(VM::GetVMTypeFromLength(vm, 1));
     char vr[4];
@@ -300,7 +300,7 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
     assert(vr[2] == 0);
     csael.SetVR(VR::GetVRTypeFromFile(vr));
     uint32_t syngodt;
-    ss.read((char *)&syngodt, sizeof(syngodt));
+    ss.read(reinterpret_cast<char *>(&syngodt), sizeof(syngodt));
     SwapperNoOp::SwapArray(&syngodt, 1);
     bool cm = check_mapping(syngodt, vr);
     if (!cm)
@@ -310,18 +310,18 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
     }
     csael.SetSyngoDT(syngodt);
     uint32_t nitems;
-    ss.read((char *)&nitems, sizeof(nitems));
+    ss.read(reinterpret_cast<char*>(&nitems), sizeof(nitems));
     SwapperNoOp::SwapArray(&nitems, 1);
     csael.SetNoOfItems(nitems);
     uint32_t xx;
-    ss.read((char *)&xx, sizeof(xx));
+    ss.read(reinterpret_cast<char*>(&xx), sizeof(xx));
     SwapperNoOp::SwapArray(&xx, 1);
     assert(xx == 77 || xx == 205);
     std::ostringstream os;
     for (uint32_t j = 0; j < nitems; ++j)
     {
       uint32_t item_xx[4];
-      ss.read((char *)&item_xx, 4 * sizeof(uint32_t));
+      ss.read(reinterpret_cast<char*>(&item_xx), 4 * sizeof(uint32_t));
       SwapperNoOp::SwapArray(item_xx, 4);
       assert(item_xx[2] == 77 || item_xx[2] == 205);
       uint32_t len = item_xx[1]; // 2nd element
@@ -353,7 +353,7 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
     }
     std::string str = os.str();
     if (!str.empty())
-      csael.SetByteValue(&str[0], (uint32_t)str.size());
+      csael.SetByteValue(&str[0], static_cast<uint32_t>(str.size()));
     InternalCSADataSet.insert(csael);
   }
   return true;

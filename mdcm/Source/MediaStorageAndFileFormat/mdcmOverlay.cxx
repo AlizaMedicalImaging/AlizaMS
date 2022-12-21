@@ -25,6 +25,7 @@
 #include "mdcmDataSet.h"
 #include "mdcmAttribute.h"
 #include <vector>
+#include <cstdint>
 
 namespace mdcm
 {
@@ -258,23 +259,24 @@ Overlay::GrabOverlayFromPixelData(DataSet const & ds)
     mdcmWarningMacro("Could not extract overlay from encapsulated stream");
     return false;
   }
-  const char * array = bv->GetPointer();
+  const void * array = bv->GetVoidPointer();
   if (!array)
     return false;
   if (Internal->BitsAllocated == 8)
   {
     const unsigned int length = ovlength * 8;
-    const uint8_t *    p = (const uint8_t *)array;
-    const uint8_t *    end = (const uint8_t *)(array + length);
-    unsigned char *    overlay = (unsigned char *)&Internal->Data[0];
+    const uint8_t *    p = static_cast<const uint8_t *>(array);
+    const uint8_t *    end = reinterpret_cast<const uint8_t*>(reinterpret_cast<uintptr_t>(p) + length);
+    void *             vp = static_cast<void*>(&Internal->Data[0]);
+    unsigned char *    overlay = static_cast<unsigned char *>(vp);
     int                c = 0;
-    uint8_t            pmask = (uint8_t)(1 << Internal->BitPosition);
+    uint8_t            pmask = static_cast<uint8_t>(1 << Internal->BitPosition);
     while (p != end)
     {
       const uint8_t val = *p & pmask;
       if (val != 0)
       {
-        overlay[c / 8] |= (unsigned char)(1 << c % 8);
+        overlay[c / 8] |= static_cast<unsigned char>(1 << c % 8);
       }
       // else overlay[c/8] is already 0
       ++p;
@@ -285,17 +287,18 @@ Overlay::GrabOverlayFromPixelData(DataSet const & ds)
   else if (Internal->BitsAllocated == 16)
   {
     const unsigned int length = ovlength * 16;
-    const uint16_t *   p = (const uint16_t *)array;
-    const uint16_t *   end = (const uint16_t *)(array + length);
-    unsigned char *    overlay = (unsigned char *)&Internal->Data[0];
+    const uint16_t *   p = static_cast<const uint16_t *>(array);
+    const uint16_t *   end = reinterpret_cast<const uint16_t*>(reinterpret_cast<uintptr_t>(p) + length);
+    void *             vp = static_cast<void*>(&Internal->Data[0]);
+    unsigned char *    overlay = static_cast<unsigned char *>(vp);
     int                c = 0;
-    uint16_t           pmask = (uint16_t)(1 << Internal->BitPosition);
+    uint16_t           pmask = static_cast<uint16_t>(1 << Internal->BitPosition);
     while (p != end)
     {
       const uint16_t val = *p & pmask;
       if (val != 0)
       {
-        overlay[c / 8] |= (unsigned char)(1 << c % 8);
+        overlay[c / 8] |= static_cast<unsigned char>(1 << c % 8);
       }
       // else overlay[c/8] is already 0
       ++p;
@@ -385,7 +388,7 @@ static const char * OverlayTypeStrings[] = { "INVALID", "G ", "R " };
 const char *
 Overlay::GetOverlayTypeAsString(OverlayType ot)
 {
-  return OverlayTypeStrings[(int)ot];
+  return OverlayTypeStrings[static_cast<size_t>(ot)];
 }
 
 Overlay::OverlayType
@@ -549,9 +552,9 @@ Overlay::GetUnpackBufferLength() const
 {
   if (Internal->NumberOfFrames > 0)
   {
-    return ((size_t)Internal->Rows * (size_t)Internal->Columns * (size_t)Internal->NumberOfFrames);
+    return ((size_t)Internal->Rows * Internal->Columns * Internal->NumberOfFrames);
   }
-  return ((size_t)Internal->Rows * (size_t)Internal->Columns);
+  return ((size_t)Internal->Rows * Internal->Columns);
 }
 
 bool
@@ -560,7 +563,7 @@ Overlay::GetUnpackBuffer(char * buffer, size_t len) const
   const size_t unpacklen = GetUnpackBufferLength();
   if (len < unpacklen)
     return false;
-  unsigned char *       unpackedbytes = (unsigned char *)buffer;
+  unsigned char *       unpackedbytes = reinterpret_cast<unsigned char *>(buffer);
   const unsigned char * begin = unpackedbytes;
   for (std::vector<char>::const_iterator it = Internal->Data.cbegin(); it != Internal->Data.cend(); ++it)
   {

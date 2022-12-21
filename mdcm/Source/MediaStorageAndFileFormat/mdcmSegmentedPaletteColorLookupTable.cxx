@@ -219,16 +219,22 @@ SegmentedPaletteColorLookupTable::SetLUT(LookupTableType type, const unsigned ch
   }
   else if (BitSample == 16)
   {
-    const uint16_t *      array16 = (uint16_t *)array;
-    const uint16_t *      segment_values = array16;
+    assert(length % 2 == 0);
+    unsigned char * copy = new unsigned char[length];
+    for (size_t x = 0; x < length; ++x)
+    {
+      copy[x] = array[x];
+    }
+    const void *          varray = static_cast<void*>(copy);
+    const uint16_t *      array16 = static_cast<const uint16_t *>(varray);
     std::vector<uint16_t> palette;
     unsigned int          num_entries = GetLUTLength(type);
     palette.reserve(num_entries);
-    assert(length % 2 == 0);
-    // FIXME: inplace byteswapping (BAD!)
-    SwapperNoOp::SwapArray((uint16_t *)segment_values, length / 2);
-    ExpandPalette(segment_values, length, palette);
-    LookupTable::SetLUT(type, (unsigned char *)&palette[0], (unsigned int)(palette.size() * 2));
+    SwapperNoOp::SwapArray(array16, length / 2);
+    ExpandPalette(array16, length, palette);
+    const void * vpalette = static_cast<const void*>(&palette[0]);
+    LookupTable::SetLUT(type, static_cast<const unsigned char *>(vpalette), static_cast<unsigned int>(palette.size() * 2));
+    delete [] copy;
   }
 }
 

@@ -96,10 +96,10 @@ public:
   Read(std::istream & is)
   {
     // header 64 bytes
-    is.read((char *)(&Header), sizeof(uint32_t) * 16);
+    is.read(reinterpret_cast<char *>(&Header), sizeof(uint32_t) * 16);
     assert(sizeof(uint32_t) * 16 == 64);
     assert(sizeof(RLEHeader) == 64);
-    SwapperNoOp::SwapArray((uint32_t *)&Header, 16);
+    SwapperNoOp::SwapArray(reinterpret_cast<uint32_t *>(&Header), 16);
     uint32_t numSegments = Header.NumSegments;
     if (numSegments >= 1)
     {
@@ -130,7 +130,7 @@ count_identical_bytes(const char * start, size_t len)
 {
   const char   ref = start[0];
   unsigned int count = 1;
-  const size_t cmin = std::min((size_t)128, len);
+  const size_t cmin = std::min(static_cast<size_t>(128), len);
   while (count < cmin && start[count] == ref)
   {
     ++count;
@@ -144,7 +144,7 @@ inline int
 count_nonrepetitive_bytes(const char * start, size_t len)
 {
   unsigned int count = 1;
-  const size_t cmin = std::min((size_t)128, len);
+  const size_t cmin = std::min(static_cast<size_t>(128), len);
   // this version properly encode: 0 1 1 0 as: 3 0 1 1 0
   for (count = 1; count < cmin; ++count)
   {
@@ -179,8 +179,10 @@ rle_encode(char * output, size_t outputlength, const char * input, size_t inputl
       // repeat case
       // test first we are allowed to write two bytes
       if (pout + 1 + 1 > output + outputlength)
+      {
         return -1;
-      *pout = (char)(-count + 1);
+      }
+      *pout = static_cast<char>(-count + 1);
       assert(1 - *pout == count);
       assert(*pout <= -1 && *pout >= -127);
       ++pout;
@@ -193,8 +195,10 @@ rle_encode(char * output, size_t outputlength, const char * input, size_t inputl
       count = count_nonrepetitive_bytes(pin, length);
       // first test we are allowed to write 1 + count bytes in the output buffer
       if (pout + count + 1 > output + outputlength)
+      {
         return -1;
-      *pout = (char)(count - 1);
+      }
+      *pout = static_cast<char>(count - 1);
       assert(*pout != -128 && *pout + 1 == count);
       assert(*pout >= 0);
       ++pout;
@@ -204,7 +208,7 @@ rle_encode(char * output, size_t outputlength, const char * input, size_t inputl
     // count byte where read, move pin to new position
     pin += count;
     // compute remaining length
-    assert(count <= (int)length);
+    assert(count <= static_cast<int>(length));
     length -= count;
   }
   return pout - output;
@@ -355,7 +359,9 @@ RLECodec::Decode(DataElement const & in, DataElement & out)
     out = in;
     const SequenceOfFragments * sf = in.GetSequenceOfFragments();
     if (!sf)
+    {
       return false;
+    }
     const unsigned long long len = GetBufferLength();
     if (len > 0xffffffff)
     {
@@ -387,7 +393,9 @@ RLECodec::Decode(DataElement const & in, DataElement & out)
     out = in;
     const SequenceOfFragments * sf = in.GetSequenceOfFragments();
     if (!sf)
+    {
       return false;
+    }
     const unsigned long long len = GetBufferLength();
     if (len > 0xffffffff)
     {
@@ -429,7 +437,7 @@ RLECodec::Decode(DataElement const & in, DataElement & out)
     {
       assert(pos == len);
     }
-    out.SetByteValue(buffer, (uint32_t)len);
+    out.SetByteValue(buffer, static_cast<uint32_t>(len));
     delete[] buffer;
     return !corruption;
   }
@@ -459,7 +467,9 @@ RLECodec::Code(DataElement const & in, DataElement & out)
   const Tag                         itemStart(0xfffe, 0xe000);
   const ByteValue *                 bv = in.GetByteValue();
   if (!bv)
+  {
     return false;
+  }
   const char * input = bv->GetPointer();
   const size_t bvl = bv->GetLength();
   const size_t image_len = bvl / dims[2];
@@ -530,14 +540,18 @@ RLECodec::Code(DataElement const & in, DataElement & out)
     {
       if (GetPixelFormat().GetBitsAllocated() == 8)
       {
-        DoInvertPlanarConfiguration<char>(bufferrgb, ptr_img, (uint32_t)(image_len / sizeof(char)));
+        DoInvertPlanarConfiguration<char>(bufferrgb, ptr_img, static_cast<uint32_t>(image_len / sizeof(char)));
       }
       else /* (GetPixelFormat().GetBitsAllocated() == 16) */
       {
         assert(GetPixelFormat().GetBitsAllocated() == 16);
         // should not happen right?
+        void * vbufferrgb = static_cast<void*>(bufferrgb);
+        const void * vptr_img = static_cast<const void*>(ptr_img);
         DoInvertPlanarConfiguration<short>(
-          (short *)bufferrgb, (const short *)(const void *)ptr_img, (uint32_t)(image_len / sizeof(short)));
+          static_cast<short *>(vbufferrgb),
+          static_cast<const short *>(vptr_img),
+          static_cast<uint32_t>(image_len / sizeof(short)));
       }
       ptr_img = bufferrgb;
     }
@@ -648,7 +662,7 @@ RLECodec::Code(DataElement const & in, DataElement & out)
         length += llength;
       }
       // update header
-      header.Offset[1 + seg] = (uint32_t)(header.Offset[seg] + length);
+      header.Offset[1 + seg] = static_cast<uint32_t>(header.Offset[seg] + length);
       assert(data.str().size() == length);
       datastr += data.str();
     }
@@ -727,10 +741,12 @@ RLECodec::DecodeExtent(char *         buffer,
   {
     frag.ReadPreValue<SwapperNoOp>(is);
     std::streampos start = is.tellg();
-    SetLength((unsigned long long)dimensions[0] * (unsigned long long)dimensions[1] * pf.GetPixelSize());
+    SetLength(static_cast<unsigned long long>(dimensions[0]) * dimensions[1] * pf.GetPixelSize());
     const bool r = DecodeByStreams(is, os);
     if (!r)
+    {
       return false;
+    }
     // handle DICOM padding
     std::streampos end = is.tellg();
     size_t         numberOfReadBytes = end - start;
@@ -741,7 +757,7 @@ RLECodec::DecodeExtent(char *         buffer,
       assert(diff == 1);
       os.seekp(0 - diff, std::ios::cur);
       os.put(0);
-      end = std::streampos((long long)end - 1);
+      end = std::streampos(static_cast<long long>(end) - 1);
     }
     assert(end - start == frag.GetVL() || (end - start + 1) == frag.GetVL());
     // sync is (rle16loo.dcm)
@@ -767,7 +783,7 @@ RLECodec::DecodeExtent(char *         buffer,
     {
       theStream->seekg(std::ios::beg);
       theOffset =
-        ((z - zmin) * (size_t)dimensions[1] * (size_t)dimensions[0] + y * (size_t)dimensions[0] + xmin) * bytesPerPixel;
+        ((z - zmin) * static_cast<size_t>(dimensions[1]) * dimensions[0] + y * static_cast<size_t>(dimensions[0]) + xmin) * bytesPerPixel;
       theStream->seekg(theOffset);
       theStream->read(tmpBuffer1, rowsize * bytesPerPixel);
       memcpy(&(buffer[((z - zmin) * rowsize * colsize + (y - ymin) * rowsize) * bytesPerPixel]),
@@ -786,7 +802,9 @@ RLECodec::DecodeByStreams(std::istream & is, std::ostream & os)
   std::stringstream tmpos;
   RLEFrame &        frame = Internals->Frame;
   if (!frame.Read(is))
+  {
     return false;
+  }
   size_t numSegments = frame.Header.NumSegments;
   size_t numberOfReadBytes = 0;
   size_t length = Length;
@@ -865,7 +883,9 @@ RLECodec::DecodeByStreams(std::istream & is, std::ostream & os)
       }
     }
     if (numOutBytes != length)
+    {
       return false;
+    }
   }
   return ImageCodec::DecodeByStreams(tmpos, os);
 }
@@ -903,7 +923,8 @@ RLECodec::AppendFrameEncode(std::ostream & out, const char * data, size_t datale
     const PixelFormat &  pf = this->GetPixelFormat();
     unsigned int         pc = this->GetPlanarConfiguration();
     bool                 isLittleEndian = !this->GetNeedByteSwap();
-    rle::pixel_info      pi((unsigned char)pf.GetSamplesPerPixel(), (unsigned char)(pf.GetBitsAllocated()));
+    rle::pixel_info      pi(static_cast<unsigned char>(pf.GetSamplesPerPixel()),
+                            static_cast<unsigned char>(pf.GetBitsAllocated()));
     const unsigned int * dimensions = this->GetDimensions();
     rle::image_info      ii(dimensions[0], dimensions[1], pi, pc ? true : false, isLittleEndian);
     const int            h = dimensions[1];
@@ -964,10 +985,12 @@ RLECodec::DecodeFragment(Fragment const & frag, char * buffer, size_t llen)
   is.write(mybuffer, bv.GetLength());
   delete[] mybuffer;
   std::stringstream os;
-  SetLength((unsigned long long)llen);
+  SetLength(static_cast<unsigned long long>(llen));
   const bool r = DecodeByStreams(is, os);
   if (!r)
+  {
     return 0;
+  }
   std::streampos         p = is.tellg();
   std::string::size_type check = os.str().size();
   memcpy(buffer, os.str().c_str(), check);

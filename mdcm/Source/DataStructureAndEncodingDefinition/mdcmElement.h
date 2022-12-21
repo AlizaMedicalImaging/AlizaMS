@@ -351,29 +351,29 @@ public:
 #include <cstdio>
 int main(int, char**)
 {
-	double f = -5558888888889999.345784574857485788888888888888888899999;
-	char buf[50];
-	memset(buf, 0, 50);
-	char line[40];
-	int l = sprintf(line, "%.17g", f);
-	printf("1) l = %d\n", l);
-	if (l > 16)
-	{
-		int prec = 33 - strlen(line);
-		l = sprintf(line, "%.*g", prec, f);
-		printf("2) l = %d\nprec = %d\nline = %s\n", l, prec, line);
-		int count = 2;
-		while(l > 16)
-		{
-			++count;
-			--prec;
-			l = sprintf(line, "%.*g", prec, f);
-			printf("%d) l = %d\nprec = %d\nline = %s\n", count, l, prec, line);
-		}
-	}
-	strcpy(buf, line);
-	printf("buf  = %s\n", buf);
-	return 0;
+    double f = -5558888888889999.345784574857485788888888888888888899999;
+    char buf[50];
+    memset(buf, 0, 50);
+    char line[40];
+    int l = sprintf(line, "%.17g", f);
+    printf("1) l = %d\n", l);
+    if (l > 16)
+    {
+        int prec = 33 - strlen(line);
+        l = sprintf(line, "%.*g", prec, f);
+        printf("2) l = %d\nprec = %d\nline = %s\n", l, prec, line);
+        int count = 2;
+        while(l > 16)
+        {
+            ++count;
+            --prec;
+            l = sprintf(line, "%.*g", prec, f);
+            printf("%d) l = %d\nprec = %d\nline = %s\n", count, l, prec, line);
+        }
+    }
+    strcpy(buf, line);
+    printf("buf  = %s\n", buf);
+    return 0;
 }
 */
 
@@ -492,7 +492,8 @@ public:
     const unsigned int type_size = sizeof(T);
     char * cdata = reinterpret_cast<char *>(&data);
     _is.read(cdata, type_size);
-    SwapperNoOp::SwapArray((T*)cdata, 1);
+    void * vdata = static_cast<void*>(cdata);
+    SwapperNoOp::SwapArray(static_cast<T*>(vdata), 1);
   }
 
   template <typename T>

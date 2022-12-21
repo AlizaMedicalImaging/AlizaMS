@@ -46,16 +46,19 @@ reorganize_mosaic(const unsigned short * input,
                   const unsigned int *   outputdims,
                   unsigned short *       output)
 {
-  for (unsigned int x = 0; x < outputdims[0]; ++x)
+  const size_t outputdims_0 = static_cast<size_t>(outputdims[0]);
+  const size_t outputdims_1 = static_cast<size_t>(outputdims[1]);
+  const size_t outputdims_2 = static_cast<size_t>(outputdims[2]);
+  for (size_t x = 0; x < outputdims_0; ++x)
   {
-    for (unsigned int y = 0; y < outputdims[1]; ++y)
+    for (size_t y = 0; y < outputdims_1; ++y)
     {
-      for (unsigned int z = 0; z < outputdims[2]; ++z)
+      for (size_t z = 0; z < outputdims_2; ++z)
       {
         const size_t outputidx =
-          x + y * (size_t)outputdims[0] + z * (size_t)outputdims[0] * (size_t)outputdims[1];
+          x + y * outputdims_0 + z * outputdims_0 * outputdims_1;
         const size_t inputidx =
-          (x + (z % square) * (size_t)outputdims[0]) + (y + (z / square) * (size_t)outputdims[1]) * (size_t)inputdims[0];
+          (x + (z % square) * outputdims_0) + (y + (z / square) * outputdims_1) * inputdims[0];
         output[outputidx] = input[inputidx];
       }
     }
@@ -71,16 +74,19 @@ reorganize_mosaic_invert(const unsigned short * input,
                          const unsigned int *   outputdims,
                          unsigned short *       output)
 {
-  for (unsigned int x = 0; x < outputdims[0]; ++x)
+  const size_t outputdims_0 = static_cast<size_t>(outputdims[0]);
+  const size_t outputdims_1 = static_cast<size_t>(outputdims[1]);
+  const size_t outputdims_2 = static_cast<size_t>(outputdims[2]);
+  for (size_t x = 0; x < outputdims_0; ++x)
   {
-    for (unsigned int y = 0; y < outputdims[1]; ++y)
+    for (size_t y = 0; y < outputdims_1; ++y)
     {
-      for (unsigned int z = 0; z < outputdims[2]; ++z)
+      for (size_t z = 0; z < outputdims_2; ++z)
       {
         const size_t outputidx =
-          x + y * (size_t)outputdims[0] + (outputdims[2] - 1 - z) * (size_t)outputdims[0] * (size_t)outputdims[1];
+          x + y * outputdims_0 + (outputdims_2 - 1 - z) * outputdims_0 * outputdims_1;
         const size_t inputidx =
-          (x + (z % square) * (size_t)outputdims[0]) + (y + (z / square) * (size_t)outputdims[1]) * (size_t)inputdims[0];
+          (x + (z % square) * outputdims_0) + (y + (z / square) * outputdims_1) * inputdims[0];
         output[outputidx] = input[inputidx];
       }
     }
@@ -144,7 +150,7 @@ SplitMosaicFilter::ComputeMOSAICDimensions(unsigned int dims[3])
   std::vector<unsigned int> colrow = ImageHelper::GetDimensionsValue(GetFile());
   dims[0] = colrow[0];
   dims[1] = colrow[1];
-  const unsigned int div = (unsigned int)ceil(sqrt((double)numberOfImagesInMosaic));
+  const unsigned int div = static_cast<unsigned int>(ceil(sqrt(static_cast<double>(numberOfImagesInMosaic))));
   dims[0] /= div;
   dims[1] /= div;
   dims[2] = numberOfImagesInMosaic;
@@ -217,14 +223,20 @@ SplitMosaicFilter::ComputeMOSAICSlicePosition(double pos[3], bool)
   DataSet &  ds = GetFile().GetDataSet();
   MrProtocol mrprot;
   if (!csa.GetMrProtocol(ds, mrprot))
+  {
     return false;
+  }
   MrProtocol::SliceArray sa;
   const bool             b = mrprot.GetSliceArray(sa);
   if (!b)
+  {
     return false;
+  }
   const size_t size = sa.Slices.size();
   if (!size)
+  {
     return false;
+  }
 #if 0
   {
     double z[3];
@@ -263,7 +275,7 @@ SplitMosaicFilter::Split()
   {
     return false;
   }
-  const unsigned int div = (unsigned int)ceil(sqrt((double)dims[2]));
+  const unsigned int div = static_cast<unsigned int>(ceil(sqrt(static_cast<double>(dims[2]))));
   bool               inverted;
   double             normal[3];
   if (!ComputeMOSAICSliceNormal(normal, inverted))
@@ -293,18 +305,20 @@ SplitMosaicFilter::Split()
   DataElement       pixeldata(Tag(0x7fe0, 0x0010));
   std::vector<char> outbuf;
   outbuf.resize(l);
+  void * vbuf = static_cast<void*>(&buf[0]);
+  void * voutbuf = static_cast<void*>(&outbuf[0]);
   bool b;
 #ifdef SNVINVERT
   if (inverted)
   {
     b = details::reorganize_mosaic_invert(
-      (unsigned short *)&buf[0], inputimage.GetDimensions(), div, dims, (unsigned short *)&outbuf[0]);
+      static_cast<unsigned short *>(vbuf), inputimage.GetDimensions(), div, dims, static_cast<unsigned short *>(voutbuf));
   }
   else
 #endif
   {
     b = details::reorganize_mosaic(
-      (unsigned short *)&buf[0], inputimage.GetDimensions(), div, dims, (unsigned short *)&outbuf[0]);
+      static_cast<unsigned short *>(vbuf), inputimage.GetDimensions(), div, dims, static_cast<unsigned short *>(voutbuf));
   }
   if (!b)
     return false;

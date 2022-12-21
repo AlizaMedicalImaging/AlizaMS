@@ -40,9 +40,13 @@ Unpack12Bits(char * out, const char * in, size_t n)
   // 3 bytes = 2 words
   // http://groups.google.com/group/comp.lang.c/msg/572bc9b085c717f3
   if (n % 3)
+  {
     return false;
-  short *               q = (short *)out;
-  const unsigned char * p = (const unsigned char *)in;
+  }
+  void *                vout = static_cast<void*>(out);
+  const void *          vin = static_cast<const void*>(in);
+  short *               q = static_cast<short *>(vout);
+  const unsigned char * p = static_cast<const unsigned char *>(vin);
   const unsigned char * end = p + n;
   unsigned char         b0, b1, b2;
   while (p != end)
@@ -50,35 +54,11 @@ Unpack12Bits(char * out, const char * in, size_t n)
     b0 = *p++;
     b1 = *p++;
     b2 = *p++;
-    *q++ = (short)(((b1 & 0xf) << 8) + b0);
-    *q++ = (short)((b1 >> 4) + (b2 << 4));
+    *q++ = static_cast<short>(((b1 & 0xf) << 8) + b0);
+    *q++ = static_cast<short>((b1 >> 4) + (b2 << 4));
   }
   return true;
 }
-
-#if 0
-// Pack an array of 16bits where all values are 12bits into a pack form.
-// n is the length in bytes of array in, out will be a fake 8bits array
-// of size (n / 2) * 3
-static bool Pack12Bits(char * out, const char * in, size_t n)
-{
-  // number of words should be even, so that 2 words are split in 3 bytes
-  if(n % 4) return false;
-  unsigned char * q = (unsigned char*)out;
-  const unsigned short * p = (const unsigned short*)(const void*)in;
-  const unsigned short * end = (const unsigned short*)(const void*)(in+n);
-  unsigned short b0, b1;
-  while(p != end)
-  {
-    b0 = *p++;
-    b1 = *p++;
-    *q++ = (unsigned char)(b0 & 0xff);
-    *q++ = (unsigned char)((b0 >> 8) + ((b1 & 0xf) << 4));
-    *q++ = (unsigned char)(b1 >> 4);
-  }
-  return true;
-}
-#endif
 
 RAWCodec::RAWCodec() {}
 
@@ -119,13 +99,17 @@ RAWCodec::Decode(DataElement const & in, DataElement & out)
   }
   const ByteValue * bv = in.GetByteValue();
   if (!bv)
+  {
     return false;
+  }
   std::stringstream is;
   is.write(bv->GetPointer(), bv->GetLength());
   std::stringstream os;
   const bool        r = DecodeByStreams(is, os);
   if (!r)
+  {
     return false;
+  }
   std::string str = os.str();
   out = in;
   if (this->GetPixelFormat() == PixelFormat::UINT12 || this->GetPixelFormat() == PixelFormat::INT12)
@@ -202,7 +186,9 @@ RAWCodec::DecodeBytes(const char * inBytes, size_t inBufferLength, char * outByt
   std::stringstream os;
   const bool        r = DecodeByStreams(is, os);
   if (!r)
+  {
     return false;
+  }
   std::string str = os.str();
   if (this->GetPixelFormat() == PixelFormat::UINT12 || this->GetPixelFormat() == PixelFormat::INT12)
   {
