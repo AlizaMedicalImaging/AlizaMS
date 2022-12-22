@@ -82,7 +82,7 @@ struct FImpl
     const size_t size = s / sizeof(TIn);
     for (size_t i = 0; i < size; ++i)
     {
-      out[i] = (TOut)((static_cast<double>(in[i]) - intercept) / slope);
+      out[i] = static_cast<TOut>((static_cast<double>(in[i]) - intercept) / slope);
     }
   }
 };
@@ -104,7 +104,7 @@ struct FImpl<TOut, float>
     const size_t size = s / sizeof(float);
     for (size_t i = 0; i < size; ++i)
     {
-      out[i] = (TOut)llround((static_cast<double>(in[i]) - intercept) / slope);
+      out[i] = static_cast<TOut>(llround((static_cast<double>(in[i]) - intercept) / slope));
     }
   }
 };
@@ -126,7 +126,7 @@ struct FImpl<TOut, double>
     const size_t size = s / sizeof(double);
     for (size_t i = 0; i < size; ++i)
     {
-      out[i] = (TOut)llround((static_cast<double>(in[i]) - intercept) / slope);
+      out[i] = static_cast<TOut>(llround((static_cast<double>(in[i]) - intercept) / slope));
     }
   }
 };

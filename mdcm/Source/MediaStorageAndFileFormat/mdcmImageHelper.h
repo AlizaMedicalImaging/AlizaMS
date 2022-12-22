@@ -32,7 +32,7 @@
 #include "mdcmSmartPointer.h"
 #include "mdcmLookupTable.h"
 
-// TODO completely replace and remove
+// TODO completely replace and remove the mess
 
 namespace mdcm
 {

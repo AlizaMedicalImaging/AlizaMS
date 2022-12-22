@@ -21,6 +21,9 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+
+// TODO completely replace and remove the mess
+
 #include "mdcmImageHelper.h"
 #include "mdcmMediaStorage.h"
 #include "mdcmFile.h"
@@ -1056,6 +1059,20 @@ ImageHelper::GetZSpacingTagFromMediaStorage(MediaStorage const & ms)
   return t;
 }
 
+// tmp solution
+static int count_backslashes(const std::string & s)
+{
+  int res = 0;
+  for (int i = 0; i < s.length(); ++i)
+  {
+    if (s[i] == '\\')
+    {
+      res++;
+    }
+  }
+  return res;
+}
+
 std::vector<double>
 ImageHelper::GetSpacingValue(File const & f)
 {
@@ -1095,17 +1112,14 @@ ImageHelper::GetSpacingValue(File const & f)
     }
     return sp;
   }
-  if (ForcePixelSpacing && ds.FindDataElement(Tag(0x0028, 0x0030)))
+  Tag spacingtag = GetSpacingTagFromMediaStorage(ms);
+  if (ForcePixelSpacing && ds.FindDataElement(Tag(0x0028, 0x0030)) && !ds.GetDataElement(Tag(0x0028, 0x0030)).IsEmpty())
   {
-    const DataElement & de = ds.GetDataElement(Tag(0x0028, 0x0030));
-    Attribute<0x0028, 0x0030> at;
-    at.SetFromDataElement(de);
-    sp.push_back(at.GetValue(1));
-    sp.push_back(at.GetValue(0));
+    spacingtag = Tag(0x0028, 0x0030);
   }
-  else
+  mdcmDebugMacro("spacingtag " << spacingtag);
+  //
   {
-    Tag spacingtag = GetSpacingTagFromMediaStorage(ms);
     if (spacingtag != Tag(0xffff, 0xffff) && ds.FindDataElement(spacingtag) && !ds.GetDataElement(spacingtag).IsEmpty())
     {
       const DataElement & de = ds.GetDataElement(spacingtag);
@@ -1124,13 +1138,14 @@ ImageHelper::GetSpacingValue(File const & f)
           assert(bv);
           std::string s = std::string(bv->GetPointer(), bv->GetLength());
           ss.str(s);
-          el.SetLength(entry.GetVM().GetLength() * entry.GetVR().GetSizeof());
-          std::string::size_type found = s.find('\\');
-          if (found != std::string::npos)
+          const int found = count_backslashes(s);
+          if (found == 1)
           {
+            el.SetLength(entry.GetVR().GetSizeof() * 2);
             el.Read(ss);
+            mdcmDebugMacro("DS el.GetLength() " << el.GetLength());
             assert(el.GetLength() == 2);
-            for (unsigned int i = 0; i < el.GetLength(); ++i)
+            for (unsigned int i = 0; i < 2; ++i)
             {
               if (el.GetValue(i))
               {
@@ -1138,14 +1153,21 @@ ImageHelper::GetSpacingValue(File const & f)
               }
               else
               {
-                mdcmAlwaysWarnMacro("Spacing is 0, forced to 1");
+                mdcmAlwaysWarnMacro("Spacing is broken, value is 0, forced to 1/1");
+                sp.clear();
                 sp.push_back(1.0);
+                sp.push_back(1.0);
+                break;
               }
             }
             std::swap(sp[0], sp[1]);
           }
-          else
+          else if (found == 0)
           {
+            el.SetLength(entry.GetVR().GetSizeof());
+            el.Read(ss);
+            mdcmDebugMacro("DS el.GetLength() " << el.GetLength());
+            mdcmAlwaysWarnMacro("Spacing is broken, single value, set two");
             double singleval;
             ss >> singleval;
             if (singleval == 0.0)
@@ -1153,7 +1175,38 @@ ImageHelper::GetSpacingValue(File const & f)
             sp.push_back(singleval);
             sp.push_back(singleval);
           }
-          assert(sp.size() == (unsigned int)entry.GetVM());
+          else
+          {
+            el.SetLength(entry.GetVR().GetSizeof() * ((unsigned int)found + 1));
+            el.Read(ss);
+            mdcmDebugMacro("DS el.GetLength() " << el.GetLength());
+            mdcmAlwaysWarnMacro("Spacing is broken, too many values");
+            int count = 0;
+            for (unsigned int i = 0; i < el.GetLength(); ++i)
+            {
+              mdcmDebugMacro("i = " << el.GetValue(i));
+              if (el.GetValue(i) != 0)
+              {
+                sp.push_back(el.GetValue(i));
+                ++count;
+                if (count == 2)
+                {
+                  break;
+                }
+              }
+            }
+            if (sp.size() != 2)
+            {
+              mdcmAlwaysWarnMacro("Spacing is broken, forced to 1/1");
+              sp.clear();
+              sp.push_back(1.0);
+              sp.push_back(1.0);
+            }
+            else
+            {
+              std::swap(sp[0], sp[1]);
+            }
+          }
         }
         break;
         case VR::IS:
@@ -1164,12 +1217,75 @@ ImageHelper::GetSpacingValue(File const & f)
           assert(bv);
           std::string s = std::string(bv->GetPointer(), bv->GetLength());
           ss.str(s);
-          el.SetLength(entry.GetVM().GetLength() * entry.GetVR().GetSizeof());
-          el.Read(ss);
-          for (unsigned int i = 0; i < el.GetLength(); ++i)
-            sp.push_back(el.GetValue(i));
-          std::swap(sp[0], sp[1]);
-          assert(sp.size() == (unsigned int)entry.GetVM());
+          const int found = count_backslashes(s);
+          if (found == 1)
+          {
+            el.SetLength(entry.GetVR().GetSizeof() * 2);
+            el.Read(ss);
+            mdcmDebugMacro("IS el.GetLength() " << el.GetLength());
+            assert(el.GetLength() == 2);
+            for (unsigned int i = 0; i < 2; ++i)
+            {
+              if (el.GetValue(i))
+              {
+                sp.push_back(el.GetValue(i));
+              }
+              else
+              {
+                mdcmAlwaysWarnMacro("Spacing is broken, value is 0, forced to 1/1");
+                sp.clear();
+                sp.push_back(1.0);
+                sp.push_back(1.0);
+                break;
+              }
+            }
+            std::swap(sp[0], sp[1]);
+          }
+          else if (found == 0)
+          {
+            el.SetLength(entry.GetVR().GetSizeof());
+            el.Read(ss);
+            mdcmDebugMacro("IS el.GetLength() " << el.GetLength());
+            mdcmAlwaysWarnMacro("Spacing is broken, single value, set two");
+            double singleval;
+            ss >> singleval;
+            if (singleval == 0.0)
+              singleval = 1.0;
+            sp.push_back(singleval);
+            sp.push_back(singleval);
+          }
+          else
+          {
+            el.SetLength(entry.GetVR().GetSizeof() * ((unsigned int)found + 1));
+            el.Read(ss);
+            mdcmDebugMacro("IS el.GetLength() " << el.GetLength());
+            mdcmAlwaysWarnMacro("Spacing is broken, too many values");
+            int count = 0;
+            for (unsigned int i = 0; i < el.GetLength(); ++i)
+            {
+              mdcmDebugMacro("i = " << el.GetValue(i));
+              if (el.GetValue(i) != 0)
+              {
+                sp.push_back(el.GetValue(i));
+                ++count;
+                if (count == 2)
+                {
+                  break;
+                }
+              }
+            }
+            if (sp.size() != 2)
+            {
+              mdcmAlwaysWarnMacro("Spacing is broken, forced to 1/1");
+              sp.clear();
+              sp.push_back(1.0);
+              sp.push_back(1.0);
+            }
+            else
+            {
+              std::swap(sp[0], sp[1]);
+            }
+          }
         }
         break;
         default:
