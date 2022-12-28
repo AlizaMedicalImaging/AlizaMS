@@ -43,8 +43,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>977</width>
-            <height>569</height>
+            <width>989</width>
+            <height>554</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_14">
@@ -339,6 +339,22 @@
                </widget>
               </item>
               <item>
+               <widget class="QCheckBox" name="jpegprec_checkBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Assume that JPEG header is correct and try to fix wrong &lt;span style=&quot; font-style:italic;&quot;&gt;&amp;quot;Bits Stored&amp;quot;&lt;/span&gt; DICOM tag for JPEG encapsulated files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>Workaround wrong &quot;Bits Stored&quot; DICOM tag for JPEG</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QCheckBox" name="enh_skip_dim_org_checkBox">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -463,8 +479,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>355</width>
-            <height>124</height>
+            <width>295</width>
+            <height>99</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -691,8 +707,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>523</width>
-            <height>244</height>
+            <width>419</width>
+            <height>203</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1001,6 +1017,7 @@
   <tabstop>srskipimage_checkBox</tabstop>
   <tabstop>pred6_checkBox</tabstop>
   <tabstop>cornell_checkBox</tabstop>
+  <tabstop>jpegprec_checkBox</tabstop>
   <tabstop>enh_skip_dim_org_checkBox</tabstop>
   <tabstop>pet_no_level_checkBox</tabstop>
   <tabstop>time_s__checkBox</tabstop>

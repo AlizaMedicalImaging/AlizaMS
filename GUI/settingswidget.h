@@ -37,6 +37,7 @@ public:
 	bool   get_cornell_workaround() const;
 	bool   get_sort_frames() const;
 	bool   get_apply_icc() const;
+	bool   get_try_fix_jpeg_prec() const;
 
 private:
 	int   saved_idx;

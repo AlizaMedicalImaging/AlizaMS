@@ -149,6 +149,7 @@ void SettingsWidget::set_default()
 	srchapters_checkBox->setChecked(true);
 	srskipimage_checkBox->setChecked(false);
 	icc_checkBox->setChecked(true);
+	jpegprec_checkBox->setChecked(false);
 	//
 	pt_doubleSpinBox->setEnabled(false);
 	disconnect(
@@ -340,4 +341,9 @@ bool SettingsWidget::get_sort_frames() const
 bool SettingsWidget::get_apply_icc() const
 {
 	return icc_checkBox->isChecked();
+}
+
+bool SettingsWidget::get_try_fix_jpeg_prec() const
+{
+	return jpegprec_checkBox->isChecked();
 }

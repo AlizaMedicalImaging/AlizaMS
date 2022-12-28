@@ -276,6 +276,7 @@ public:
 		const bool,
 		const bool,
 		const bool,
+		const bool,
 		int*,
 		unsigned long long*,
 		const bool, bool *,

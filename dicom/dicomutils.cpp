@@ -5760,6 +5760,7 @@ QString DicomUtils::read_enhanced(
 	bool clean_unused_bits  = false;
 	bool pred6_bug          = false;
 	bool cornell_bug        = false;
+	bool fix_jpeg_prec      = false;
 	bool use_icc            = false;
 	bool icc_ok             = false;
 	QString sop("");
@@ -5793,6 +5794,7 @@ QString DicomUtils::read_enhanced(
 		clean_unused_bits = wsettings->get_clean_unused_bits();
 		pred6_bug = wsettings->get_predictor_workaround();
 		cornell_bug = wsettings->get_cornell_workaround();
+		fix_jpeg_prec = wsettings->get_try_fix_jpeg_prec();
 		use_icc = wsettings->get_apply_icc();
 		QString iod("");
 		const mdcm::Tag tSOPClassUID(0x0008,0x0016);
@@ -5885,6 +5887,7 @@ QString DicomUtils::read_enhanced(
 			false,
 			pred6_bug,
 			cornell_bug,
+			fix_jpeg_prec,
 			NULL,
 			NULL,
 			use_icc, &icc_ok,
@@ -6086,6 +6089,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
 	const bool pred6_bug = wsettings->get_predictor_workaround();
 	const bool cornell_bug = wsettings->get_cornell_workaround();
+	const bool fix_jpeg_prec = wsettings->get_try_fix_jpeg_prec();
 	{
 		mdcm::Reader reader;
 #ifdef _WIN32
@@ -6206,6 +6210,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 			true,
 			pred6_bug,
 			cornell_bug,
+			fix_jpeg_prec,
 			&red_subscript,
 			NULL,
 			false, &icc_ok_dummy,
@@ -6401,6 +6406,7 @@ QString DicomUtils::read_ultrasound(
 	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
 	const bool pred6_bug = wsettings->get_predictor_workaround();
 	const bool cornell_bug = wsettings->get_cornell_workaround();
+	const bool fix_jpeg_prec = wsettings->get_try_fix_jpeg_prec();
 	const bool use_icc = wsettings->get_apply_icc();
 	bool icc_ok = false;
 	std::vector<char*> data;
@@ -6573,6 +6579,7 @@ QString DicomUtils::read_ultrasound(
 		false,
 		pred6_bug,
 		cornell_bug,
+		fix_jpeg_prec,
 		NULL,
 		NULL,
 		use_icc, &icc_ok,
@@ -6684,6 +6691,7 @@ QString DicomUtils::read_nuclear(
 	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
 	const bool pred6_bug = wsettings->get_predictor_workaround();
 	const bool cornell_bug = wsettings->get_cornell_workaround();
+	const bool fix_jpeg_prec = wsettings->get_try_fix_jpeg_prec();
 	const bool use_icc = wsettings->get_apply_icc();
 	bool icc_ok = false;
 	std::vector<char*> data;
@@ -6776,6 +6784,7 @@ QString DicomUtils::read_nuclear(
 		false,
 		pred6_bug,
 		cornell_bug,
+		fix_jpeg_prec,
 		NULL,
 		NULL,
 		use_icc, &icc_ok,
@@ -6903,6 +6912,7 @@ QString DicomUtils::read_series(
 	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
 	const bool pred6_bug = wsettings->get_predictor_workaround();
 	const bool cornell_bug = wsettings->get_cornell_workaround();
+	const bool fix_jpeg_prec = wsettings->get_try_fix_jpeg_prec();
 	const bool use_icc = wsettings->get_apply_icc();
 	bool icc_ok = false;
 	std::vector<char*> data;
@@ -7172,6 +7182,7 @@ QString DicomUtils::read_series(
 				false,
 				pred6_bug,
 				cornell_bug,
+				fix_jpeg_prec,
 				NULL,
 				&buffers_size,
 				use_icc, &icc_ok,
@@ -7268,6 +7279,7 @@ QString DicomUtils::read_series(
 				false,
 				pred6_bug,
 				cornell_bug,
+				fix_jpeg_prec,
 				NULL,
 				NULL,
 				use_icc, &icc_ok,
@@ -8237,19 +8249,18 @@ QString DicomUtils::read_buffer(
 	const bool supp_palette_color,
 	const bool pred6_bug,
 	const bool cornell_bug,
+	const bool fix_jpeg_prec,
 	int * red_subscript,
 	unsigned long long * buffers_size,
 	const bool use_icc, bool * has_icc,
 	QProgressDialog * pb)
 {
 	*ok = false;
-	if (rescale)     mdcm::ImageHelper::SetForceRescaleInterceptSlope(true);
-	else             mdcm::ImageHelper::SetForceRescaleInterceptSlope(false);
-	if (pred6_bug)   mdcm::ImageHelper::SetWorkaroundPredictorBug(true);
-	else             mdcm::ImageHelper::SetWorkaroundPredictorBug(false);
-	if (cornell_bug) mdcm::ImageHelper::SetWorkaroundCornellBug(true);
-	else             mdcm::ImageHelper::SetWorkaroundCornellBug(false);
+	mdcm::ImageHelper::SetForceRescaleInterceptSlope(rescale);
+	mdcm::ImageHelper::SetWorkaroundPredictorBug(pred6_bug);
+	mdcm::ImageHelper::SetWorkaroundCornellBug(cornell_bug);
 	mdcm::ImageHelper::SetCleanUnusedBits(clean_unused_bits);
+	mdcm::ImageHelper::SetFixJpegBits(fix_jpeg_prec);
 	//
 	bool rescale_ = false;
 	unsigned long long rescaled_buffer_size = 0;
