@@ -560,7 +560,7 @@ Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
               mdcmAlwaysWarnMacro(
                 "Encapsulated stream reports precision " << cpf.GetBitsStored() <<
                 " bits, but DICOM bits stored " << pf.GetBitsStored());
-              if (ImageHelper::GetFixFewerJpegBits())
+              if (ImageHelper::GetFixJpegBits())
               {
                 mdcmAlwaysWarnMacro("... fixed, assumed JPEG header is correct");
                 Bitmap * i = const_cast<Bitmap *>(this);
@@ -640,7 +640,7 @@ Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
             mdcmAlwaysWarnMacro(
               "Encapsulated stream reports precision " << cpf.GetBitsStored() <<
               " bits, but DICOM bits stored " << pf.GetBitsStored());
-            if (ImageHelper::GetFixFewerJpegBits())
+            if (ImageHelper::GetFixJpegBits())
             {
               mdcmAlwaysWarnMacro("... fixed, assumed JPEG header is correct");
               Bitmap * i = const_cast<Bitmap *>(this);
@@ -745,7 +745,7 @@ Bitmap::TryJPEGCodec3(char * buffer, bool & lossyflag) const
               mdcmAlwaysWarnMacro(
                 "Encapsulated stream reports precision " << cpf.GetBitsStored() <<
                 " bits, but DICOM bits stored " << pf.GetBitsStored());
-              if (ImageHelper::GetFixFewerJpegBits())
+              if (ImageHelper::GetFixJpegBits())
               {
                 mdcmAlwaysWarnMacro("... fixed, assumed JPEG header is correct");
                 Bitmap * i = const_cast<Bitmap *>(this);

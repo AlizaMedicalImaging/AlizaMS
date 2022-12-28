@@ -56,7 +56,7 @@ bool ImageHelper::CleanUnusedBits = false;
 bool ImageHelper::WorkaroundCornellBug = false;
 bool ImageHelper::WorkaroundPredictorBug = false;
 bool ImageHelper::JpegPreserveYBRfull = true;
-bool ImageHelper::FixFewerJpegBits = false;
+bool ImageHelper::FixJpegBits = false;
 
 static double
 SetNDigits(double x, int n)
@@ -617,15 +617,15 @@ ImageHelper::GetJpegPreserveYBRfull()
 }
 
 void
-ImageHelper::SetFixFewerJpegBits(bool b)
+ImageHelper::SetFixJpegBits(bool b)
 {
-  FixFewerJpegBits = b;
+  FixJpegBits = b;
 }
 
 bool
-ImageHelper::GetFixFewerJpegBits()
+ImageHelper::GetFixJpegBits()
 {
-  return FixFewerJpegBits;
+  return FixJpegBits;
 }
 
 bool
