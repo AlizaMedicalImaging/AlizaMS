@@ -555,12 +555,14 @@ Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
         {
           if (cpf.GetSamplesPerPixel() == pf.GetSamplesPerPixel())
           {
-            if (cpf.GetBitsStored() < pf.GetBitsStored())
+            if (cpf.GetBitsStored() != pf.GetBitsStored())
             {
-              mdcmAlwaysWarnMacro("Encapsulated stream has fewer bits stored");
+              mdcmAlwaysWarnMacro(
+                "Encapsulated stream reports precision " << cpf.GetBitsStored() <<
+                " bits, but DICOM bits stored " << pf.GetBitsStored());
               if (ImageHelper::GetFixFewerJpegBits())
               {
-                mdcmAlwaysWarnMacro("... fixed bits stored");
+                mdcmAlwaysWarnMacro("... fixed, assumed JPEG header is correct");
                 Bitmap * i = const_cast<Bitmap *>(this);
                 i->GetPixelFormat().SetBitsAllocated(cpf.GetBitsAllocated());
                 i->GetPixelFormat().SetBitsStored(cpf.GetBitsStored());
@@ -633,12 +635,14 @@ Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
       {
         if (cpf.GetSamplesPerPixel() == pf.GetSamplesPerPixel())
         {
-          if (cpf.GetBitsStored() < pf.GetBitsStored())
+          if (cpf.GetBitsStored() != pf.GetBitsStored())
           {
-            mdcmAlwaysWarnMacro("Encapsulated stream has fewer bits stored");
+            mdcmAlwaysWarnMacro(
+              "Encapsulated stream reports precision " << cpf.GetBitsStored() <<
+              " bits, but DICOM bits stored " << pf.GetBitsStored());
             if (ImageHelper::GetFixFewerJpegBits())
             {
-              mdcmAlwaysWarnMacro("... fixed bits stored");
+              mdcmAlwaysWarnMacro("... fixed, assumed JPEG header is correct");
               Bitmap * i = const_cast<Bitmap *>(this);
               i->GetPixelFormat().SetBitsAllocated(cpf.GetBitsAllocated());
               i->GetPixelFormat().SetBitsStored(cpf.GetBitsStored());
@@ -736,12 +740,14 @@ Bitmap::TryJPEGCodec3(char * buffer, bool & lossyflag) const
         {
           if (cpf.GetSamplesPerPixel() == pf.GetSamplesPerPixel())
           {
-            if (cpf.GetBitsStored() < pf.GetBitsStored())
+            if (cpf.GetBitsStored() != pf.GetBitsStored())
             {
-              mdcmAlwaysWarnMacro("Encapsulated stream has fewer bits stored");
+              mdcmAlwaysWarnMacro(
+                "Encapsulated stream reports precision " << cpf.GetBitsStored() <<
+                " bits, but DICOM bits stored " << pf.GetBitsStored());
               if (ImageHelper::GetFixFewerJpegBits())
               {
-                mdcmAlwaysWarnMacro("... fixed bits stored");
+                mdcmAlwaysWarnMacro("... fixed, assumed JPEG header is correct");
                 Bitmap * i = const_cast<Bitmap *>(this);
                 i->GetPixelFormat().SetBitsAllocated(cpf.GetBitsAllocated());
                 i->GetPixelFormat().SetBitsStored(cpf.GetBitsStored());
