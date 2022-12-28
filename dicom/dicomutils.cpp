@@ -6046,11 +6046,7 @@ QString DicomUtils::read_enhanced(
 	*ok = tmp17;
 	for (unsigned int x = 0; x < data.size(); ++x)
 	{
-		if (data.at(x))
-		{
-			delete [] data[x];
-			data[x] = NULL;
-		}
+		delete [] data[x];
 	}
 	data.clear();
 	return message_;
@@ -6378,11 +6374,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 	*ok = tmp17;
 	for (unsigned int x=0; x < data.size(); ++x)
 	{
-		if (data.at(x))
-		{
-			delete [] data[x];
-			data[x] = NULL;
-		}
+		delete [] data[x];
 	}
 	data.clear();
 	return message_;
@@ -6648,11 +6640,7 @@ QString DicomUtils::read_ultrasound(
 		false);
 	for (unsigned int x = 0; x < data.size(); ++x)
 	{
-		if (data.at(x))
-		{
-			delete [] data[x];
-			data[x] = NULL;
-		}
+		delete [] data[x];
 	}
 	data.clear();
 	if (*ok)
@@ -9304,7 +9292,7 @@ QString DicomUtils::read_buffer(
 					buffer      = not_rescaled_buffer;
 					buffer_size = image_buffer_length;
 				}
-				if (icc_tmp) delete [] icc_tmp;
+				delete [] icc_tmp;
 			}
 			else
 			{
@@ -12156,7 +12144,7 @@ bool DicomUtils::read_gray_lut(
 		const unsigned char * lut_data8 = static_cast<const unsigned char *>(void_p);
 		for (size_t x = 0; x < lut_data_size0; ++x)
 		{
-			lut_data.push_back(QVariant((int)lut_data8[x]));
+			lut_data.push_back(QVariant(static_cast<int>(lut_data8[x])));
 		}
 	}
 	else if (lut_data_size0 * 2 == lut_data_size1)
@@ -12165,7 +12153,7 @@ bool DicomUtils::read_gray_lut(
 		const unsigned short * lut_data16 = static_cast<const unsigned short *>(void_p);
 		for (size_t x = 0; x < lut_data_size0; ++x)
 		{
-			lut_data.push_back(QVariant((int)lut_data16[x]));
+			lut_data.push_back(QVariant(static_cast<int>(lut_data16[x])));
 		}
 	}
 	else
@@ -13169,7 +13157,7 @@ QString DicomUtils::read_dicom(
 	}
 	else if (nuclear)
 	{
-		// TODO check PR for nuclear
+		// TODO check PR
 		for (int x = 0; x < images.size(); ++x)
 		{
 			if (pb) pb->setValue(-1);
@@ -13329,11 +13317,7 @@ QString DicomUtils::read_dicom(
 					{
 						for (unsigned int jjj = 0; jjj < supp_color_images.size(); ++jjj)
 						{
-							if (supp_color_images.at(jjj))
-							{
-								delete supp_color_images[jjj];
-								supp_color_images[jjj] = NULL;
-							}
+							delete supp_color_images[jjj];
 						}
 						supp_color_images.clear();
 						supp_palette_failed = true;
@@ -13360,13 +13344,11 @@ QString DicomUtils::read_dicom(
 							for (unsigned int jjj = 0; jjj < supp_color_images.size(); ++jjj)
 							{
 								delete supp_color_images[jjj];
-								supp_color_images[jjj] = NULL;
 							}
 							supp_color_images.clear();
 							for (unsigned int jjj = 0; jjj < supp_grey_images.size(); ++jjj)
 							{
 								delete supp_grey_images[jjj];
-								supp_grey_images[jjj] = NULL;
 							}
 							supp_grey_images.clear();
 							supp_palette_failed = true;

@@ -3686,13 +3686,12 @@ void Aliza::toggle_maxwindow(bool i)
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	qApp->processEvents();
 	v->di->maxwindow = i;
-	CommonUtils::calculate_minmax_scalar(v);
+	load_3d(v, true, true, false, true);
 	if (!v->histogram.isNull()) add_histogram(v,NULL,false);
 	histogramview->update__(v);
-	load_3d(v, true, true, false, true);
 	disconnect_tools();
 	toolbox2D->disconnect_sliders();
-	toolbox2D->set_max_width(v->di->rmax-v->di->rmin);
+	toolbox2D->set_max_width(v->di->rmax - v->di->rmin);
 	toolbox2D->set_window_upper(v->di->rmax);
 	toolbox2D->set_window_lower(v->di->rmin);
 	toolbox2D->set_width(v->di->us_window_width);

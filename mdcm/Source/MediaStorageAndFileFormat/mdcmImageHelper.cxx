@@ -56,7 +56,7 @@ bool ImageHelper::CleanUnusedBits = false;
 bool ImageHelper::WorkaroundCornellBug = false;
 bool ImageHelper::WorkaroundPredictorBug = false;
 bool ImageHelper::JpegPreserveYBRfull = true;
-bool ImageHelper::FixFewerJpegBits = true;
+bool ImageHelper::FixFewerJpegBits = false;
 
 static double
 SetNDigits(double x, int n)
