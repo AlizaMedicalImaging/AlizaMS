@@ -417,11 +417,11 @@ void SQtree::process_element(
 				<< QString("");
 			const mdcm::Item    & item = sqi->GetItem(i+1);
 			const mdcm::DataSet & nds  = item.GetNestedDataSet();
-			QTreeWidgetItem * cin = new QTreeWidgetItem(l1);
-			cin->setForeground(0, brush2);
-			cin->setForeground(1, brush2);
-			if (duplicated) cin->setForeground(0, brush6);
-			ci->addChild(cin);
+			QTreeWidgetItem * twitem = new QTreeWidgetItem(l1);
+			twitem->setForeground(0, brush2);
+			twitem->setForeground(1, brush2);
+			if (duplicated) twitem->setForeground(0, brush6);
+			ci->addChild(twitem);
 			mdcm::DataElement tmp_tag;
 			size_t ce = 0;
 			for (mdcm::DataSet::ConstIterator it = nds.Begin();
@@ -431,7 +431,7 @@ void SQtree::process_element(
 				bool duplicated_ = false;
 				const mdcm::DataElement & elem = *it;
 				if (ce > 0 && tmp_tag == elem.GetTag()) duplicated_ = true;
-				process_element(nds, elem, d, cin, charset, duplicated_);
+				process_element(nds, elem, d, twitem, charset, duplicated_);
 				tmp_tag = elem.GetTag();
 				++ce;
 			}
@@ -496,11 +496,11 @@ void SQtree::process_element(
 					<< QString("")
 					<< QString(tmp1)
 					<< QString("binary");
-				QTreeWidgetItem * cin = new QTreeWidgetItem(l1);
-				cin->setForeground(0, brush2);
-				cin->setForeground(1, brush2);
-				cin->setForeground(4, brush2);
-				ci->addChild(cin);
+				QTreeWidgetItem * twitem = new QTreeWidgetItem(l1);
+				twitem->setForeground(0, brush2);
+				twitem->setForeground(1, brush2);
+				twitem->setForeground(4, brush2);
+				ci->addChild(twitem);
 			}
 		}
 	}
