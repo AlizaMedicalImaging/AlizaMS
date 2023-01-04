@@ -750,10 +750,10 @@ endpoints of the minor axis of an ellipse
 										painter.setTransform(ttt, true);
 									}
 									QRectF r___(-0.5*d0, -0.5*d1, d0, d1);
-									QPainterPath path;
-									path.arcMoveTo(r___, start);
-									path.arcTo(r___, start, span);
-									painter.drawPath(path);
+									QPainterPath path0;
+									path0.arcMoveTo(r___, start);
+									path0.arcTo(r___, start, span);
+									painter.drawPath(path0);
 									painter.restore();
 								}
 								painter.end();
@@ -1794,12 +1794,12 @@ QString SRUtils::read_sr_content_sq(
 		}
 		if (nds.FindDataElement(mdcm::Tag(0x0040,0xa043)))
 		{
-			const QString CodeMeaning =
+			const QString CodeMeaning1 =
 				get_concept_code_meaning(nds, charset);
-			if (!CodeMeaning.isEmpty())
+			if (!CodeMeaning1.isEmpty())
 			{
 				s += QString("<span class='y9'>") +
-					CodeMeaning +
+					CodeMeaning1 +
 					QString("</span><span class='t1'> </span>");
 			}
 		}

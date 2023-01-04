@@ -123,7 +123,7 @@ static void g_close_physics()
 	}
 	for (int x = 0; x < g_collision_shapes.size(); ++x)
 	{
-		btCollisionShape * s = static_cast<btCollisionShape*>(g_collision_shapes[x]);
+		btCollisionShape * s = g_collision_shapes[x];
 		if (s)
 		{
 			if (s->getShapeType() == COMPOUND_SHAPE_PROXYTYPE)
@@ -131,7 +131,7 @@ static void g_close_physics()
 				btCompoundShape * c = static_cast<btCompoundShape*>(s);
 				for (int z = 0; z < c->getNumChildShapes(); ++z)
 				{
-					btCollisionShape * ch = static_cast<btCollisionShape*>(c->getChildShape(z));
+					btCollisionShape * ch = c->getChildShape(z);
 					if (ch)
 					{
 						c->removeChildShape(ch);
@@ -2259,9 +2259,8 @@ void Aliza::calculate_bb()
 	if (!v) return;
 	if (rect_selection)
 	{
-		const double  line_width =
-			static_cast<double>(
-				graphicswidget_m->graphicsview->handle_rect->get_width());
+		const double line_width =
+			graphicswidget_m->graphicsview->handle_rect->get_width();
 		const QRectF  rect =
 			graphicswidget_m->graphicsview->handle_rect->boundingRect();
 		const QPointF tmpp =
@@ -2648,10 +2647,9 @@ void Aliza::update_selection()
 {
 	selected_images.clear();
 	QList<QListWidgetItem*> l = imagesbox->listWidget->selectedItems();
-	QListWidgetItem * s = (l.size()>0) ? l.at(0) : NULL;
+	QListWidgetItem * s = (l.size() > 0) ? l.at(0) : NULL;
 	if (l.size() == 1) // single selection mode
 	{
-		QListWidgetItem * s = l.at(0);
 		ListWidgetItem2 * i = static_cast<ListWidgetItem2*>(s);
 		ImageVariant * v = (i) ? i->get_image_from_item() : NULL;
 		if (v)
@@ -4070,9 +4068,9 @@ void Aliza::trigger_image_color()
 	new_color = QColorDialog::getColor(old_color);
 	if(new_color.isValid())
 	{
-		v->di->R = (double)(new_color.red()  /255.0);
-		v->di->G = (double)(new_color.green()/255.0);
-		v->di->B = (double)(new_color.blue() /255.0);
+		v->di->R = new_color.red()   / 255.0;
+		v->di->G = new_color.green() / 255.0;
+		v->di->B = new_color.blue()  / 255.0;
 		IconUtils::update_icon(v, 96);
 		l = imagesbox->listWidget->selectedItems();
 		if (!l.empty())

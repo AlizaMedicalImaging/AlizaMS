@@ -379,7 +379,7 @@ int main(int argc, char *argv[])
 				if (ok3d)
 				{
 					settings.beginGroup(QString("GlobalSettings"));
-					settings.setValue(QString("enable_gltest"), QVariant((int)0));
+					settings.setValue(QString("enable_gltest"), QVariant(0));
 					settings.endGroup();
 					settings.sync();
 					delete testgl;
@@ -387,7 +387,7 @@ int main(int argc, char *argv[])
 				else
 				{
 					settings.beginGroup(QString("GlobalSettings"));
-					settings.setValue(QString("enable_gl_3D"), QVariant((int)0));
+					settings.setValue(QString("enable_gl_3D"), QVariant(0));
 					settings.endGroup();
 					settings.sync();
 #if 0
@@ -402,10 +402,10 @@ int main(int argc, char *argv[])
 					//
 					QStringList aa;
 					const QStringList aa_ = QApplication::arguments();
-					const size_t aa_size = aa_.size();
+					const int aa_size = aa_.size();
 					if (aa_size > 1)
 					{
-						for (size_t y = 1; y < aa_size; ++y)
+						for (int y = 1; y < aa_size; ++y)
 						{
 							aa.push_back(aa_.at(y));
 						}

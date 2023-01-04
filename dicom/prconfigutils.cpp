@@ -180,7 +180,7 @@ template<typename Tin, typename Tout> QString apply_lut(
 		iterator.GoToBegin();
 		out_iterator.GoToBegin();
 		const size_t data_s = data.size();
-		if ((size_t)d0 != data_s)
+		if (static_cast<size_t>(d0) != data_s)
 		{
 			std::cout << "Warning: LUT descriptor[0]=" << d0 << " does not match LUT data size " << data_s << std::endl;
 		}
@@ -194,7 +194,7 @@ template<typename Tin, typename Tout> QString apply_lut(
 			}
 			if (idx >= 0)
 			{
-				if ((size_t)idx < data_s)
+				if (static_cast<size_t>(idx) < data_s)
 				{
 					if (data_possible_negative)
 					{
@@ -219,7 +219,7 @@ template<typename Tin, typename Tout> QString apply_lut(
 						}
 					}
 				}
-				else if ((size_t)idx >= data_s)
+				else if (static_cast<size_t>(idx) >= data_s)
 				{
 					if (data_possible_negative)
 					{
@@ -500,10 +500,9 @@ static void rotate_flip_points(
 			TransformType::OutputVectorType translation2;
 			translation2[0] = cx;
 			translation2[1] = cy;
-			const double a = rotation*0.0174532925199432957692369;
 			transform->SetIdentity();
 			transform->Translate(translation1);
-			transform->Rotate2D(a, false);
+			transform->Rotate2D(rotation*0.0174532925199432957692369, false);
 			transform->Translate(translation2, false);
 			if (idx0 >= -1)
 			{
@@ -662,52 +661,64 @@ static void rotate_flip_points(
 					a.ShutterLowerHorizontalEdge == -1))
 				{
 					TransformType::InputPointType in1;
-					in1[0] = (double)a.ShutterLeftVerticalEdge;
-					in1[1] = (double)a.ShutterUpperHorizontalEdge;
+					in1[0] = static_cast<double>(a.ShutterLeftVerticalEdge);
+					in1[1] = static_cast<double>(a.ShutterUpperHorizontalEdge);
 					TransformType::OutputPointType out1 = transform->TransformPoint(in1);
 					TransformType::InputPointType in2;
-					in2[0] = (double)a.ShutterRightVerticalEdge;
-					in2[1] = (double)a.ShutterLowerHorizontalEdge;
+					in2[0] = static_cast<double>(a.ShutterRightVerticalEdge);
+					in2[1] = static_cast<double>(a.ShutterLowerHorizontalEdge);
 					TransformType::OutputPointType out2 = transform->TransformPoint(in2);
 					if (flip)
 					{
 						if (out1[0] < cx)
 						{
 							const double ix = out1[0] + 2 * (cx - out1[0]);
-							ivariant->pr_display_shutters[idx2].ShutterLeftVerticalEdge = (int)ix;
+							ivariant->pr_display_shutters[idx2].ShutterLeftVerticalEdge =
+								static_cast<int>(ix);
 						}
 						else if (out1[0] > cx)
 						{
 							const double ix = out1[0] - 2 * (out1[0] - cx);
-							ivariant->pr_display_shutters[idx2].ShutterLeftVerticalEdge = (int)ix;
+							ivariant->pr_display_shutters[idx2].ShutterLeftVerticalEdge =
+								static_cast<int>(ix);
 						}
 						else
 						{
-							ivariant->pr_display_shutters[idx2].ShutterLeftVerticalEdge = (int)out1[0];
+							ivariant->pr_display_shutters[idx2].ShutterLeftVerticalEdge =
+								static_cast<int>(out1[0]);
 						}
-						ivariant->pr_display_shutters[idx2].ShutterUpperHorizontalEdge = (int)out1[1];
+						ivariant->pr_display_shutters[idx2].ShutterUpperHorizontalEdge =
+							static_cast<int>(out1[1]);
 						if (out2[0] < cx)
 						{
 							const double ix = out2[0] + 2 * (cx - out2[0]);
-							ivariant->pr_display_shutters[idx2].ShutterRightVerticalEdge = (int)ix;
+							ivariant->pr_display_shutters[idx2].ShutterRightVerticalEdge =
+								static_cast<int>(ix);
 						}
 						else if (out2[0] > cx)
 						{
 							const double ix = out2[0] - 2 * (out2[0] - cx);
-							ivariant->pr_display_shutters[idx2].ShutterRightVerticalEdge = (int)ix;
+							ivariant->pr_display_shutters[idx2].ShutterRightVerticalEdge =
+								static_cast<int>(ix);
 						}
 						else
 						{
-							ivariant->pr_display_shutters[idx2].ShutterRightVerticalEdge = (int)out2[0];
+							ivariant->pr_display_shutters[idx2].ShutterRightVerticalEdge =
+								static_cast<int>(out2[0]);
 						}
-						ivariant->pr_display_shutters[idx2].ShutterLowerHorizontalEdge = (int)out2[1];
+						ivariant->pr_display_shutters[idx2].ShutterLowerHorizontalEdge =
+							static_cast<int>(out2[1]);
 					}
 					else
 					{
-						ivariant->pr_display_shutters[idx2].ShutterLeftVerticalEdge = (int)out1[0];
-						ivariant->pr_display_shutters[idx2].ShutterUpperHorizontalEdge = (int)out1[1];
-						ivariant->pr_display_shutters[idx2].ShutterRightVerticalEdge = (int)out2[0];
-						ivariant->pr_display_shutters[idx2].ShutterLowerHorizontalEdge = (int)out2[1];
+						ivariant->pr_display_shutters[idx2].ShutterLeftVerticalEdge =
+							static_cast<int>(out1[0]);
+						ivariant->pr_display_shutters[idx2].ShutterUpperHorizontalEdge =
+							static_cast<int>(out1[1]);
+						ivariant->pr_display_shutters[idx2].ShutterRightVerticalEdge =
+							static_cast<int>(out2[0]);
+						ivariant->pr_display_shutters[idx2].ShutterLowerHorizontalEdge =
+							static_cast<int>(out2[1]);
 					}
 				}
 				if (!(
@@ -716,31 +727,37 @@ static void rotate_flip_points(
 					a.RadiusofCircularShutter   == -1))
 				{
 					TransformType::InputPointType in;
-					in[0] = (double)a.CenterofCircularShutter_x;
-					in[1] = (double)a.CenterofCircularShutter_y;
+					in[0] = static_cast<double>(a.CenterofCircularShutter_x);
+					in[1] = static_cast<double>(a.CenterofCircularShutter_y);
 					TransformType::OutputPointType out = transform->TransformPoint(in);
 					if (flip)
 					{
 						if (out[0] < cx)
 						{
 							const double ix = out[0] + 2 * (cx - out[0]);
-							ivariant->pr_display_shutters[idx2].CenterofCircularShutter_x = (int)ix;
+							ivariant->pr_display_shutters[idx2].CenterofCircularShutter_x =
+								static_cast<int>(ix);
 						}
 						else if (out[0] > cx)
 						{
 							const double ix = out[0] - 2 * (out[0] - cx);
-							ivariant->pr_display_shutters[idx2].CenterofCircularShutter_x = (int)ix;
+							ivariant->pr_display_shutters[idx2].CenterofCircularShutter_x =
+								static_cast<int>(ix);
 						}
 						else
 						{
-							ivariant->pr_display_shutters[idx2].CenterofCircularShutter_x = (int)out[0];
+							ivariant->pr_display_shutters[idx2].CenterofCircularShutter_x =
+								static_cast<int>(out[0]);
 						}
-						ivariant->pr_display_shutters[idx2].CenterofCircularShutter_y = (int)out[1];
+						ivariant->pr_display_shutters[idx2].CenterofCircularShutter_y =
+							static_cast<int>(out[1]);
 					}
 					else
 					{
-						ivariant->pr_display_shutters[idx2].CenterofCircularShutter_x = (int)out[0];
-						ivariant->pr_display_shutters[idx2].CenterofCircularShutter_y = (int)out[1];
+						ivariant->pr_display_shutters[idx2].CenterofCircularShutter_x =
+							static_cast<int>(out[0]);
+						ivariant->pr_display_shutters[idx2].CenterofCircularShutter_y =
+							static_cast<int>(out[1]);
 					}
 				}
 				if ((a.VerticesofthePolygonalShutter.size() > 1) && (a.VerticesofthePolygonalShutter.size() % 2 == 0))
@@ -748,31 +765,37 @@ static void rotate_flip_points(
 					for (unsigned int j = 0; j < a.VerticesofthePolygonalShutter.size(); j += 2)
 					{
 						TransformType::InputPointType in;
-						in[0] = (double)a.VerticesofthePolygonalShutter.at(j + 1);
-						in[1] = (double)a.VerticesofthePolygonalShutter.at(j);
+						in[0] = static_cast<double>(a.VerticesofthePolygonalShutter.at(j + 1));
+						in[1] = static_cast<double>(a.VerticesofthePolygonalShutter.at(j));
 						TransformType::OutputPointType out = transform->TransformPoint(in);
 						if (flip)
 						{
 							if (out[0] < cx)
 							{
 								const double ix = out[0] + 2 * (cx - out[0]);
-								ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j + 1] = (int)ix;
+								ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j + 1] =
+									static_cast<int>(ix);
 							}
 							else if (out[0] > cx)
 							{
 								const double ix = out[0] - 2 * (out[0] - cx);
-								ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j + 1] = (int)ix;
+								ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j + 1] =
+									static_cast<int>(ix);
 							}
 							else
 							{
-								ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j + 1] = (int)out[0];
+								ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j + 1] =
+									static_cast<int>(out[0]);
 							}
-							ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j] = (int)out[1];
+							ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j] =
+								static_cast<int>(out[1]);
 						}
 						else
 						{
-							ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j + 1] = (int)out[0];
-							ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j] = (int)out[1];
+							ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j + 1] =
+								static_cast<int>(out[0]);
+							ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j] =
+								static_cast<int>(out[1]);
 						}
 					}
 				}
@@ -870,22 +893,22 @@ static void rotate_flip_points(
 					if (out1 < cx)
 					{
 						const double ix = out1 + 2 * (cx - out1);
-						ivariant->pr_display_shutters[idx2].ShutterLeftVerticalEdge = (int)ix;
+						ivariant->pr_display_shutters[idx2].ShutterLeftVerticalEdge = static_cast<int>(ix);
 					}
 					else if (out1 > cx)
 					{
 						const double ix = out1 - 2 * (out1 - cx);
-						ivariant->pr_display_shutters[idx2].ShutterLeftVerticalEdge = (int)ix;
+						ivariant->pr_display_shutters[idx2].ShutterLeftVerticalEdge = static_cast<int>(ix);
 					}
 					if (out2 < cx)
 					{
 						const double ix = out2 + 2 * (cx - out2);
-						ivariant->pr_display_shutters[idx2].ShutterRightVerticalEdge = (int)ix;
+						ivariant->pr_display_shutters[idx2].ShutterRightVerticalEdge = static_cast<int>(ix);
 					}
 					else if (out2 > cx)
 					{
 						const double ix = out2 - 2 * (out2 - cx);
-						ivariant->pr_display_shutters[idx2].ShutterRightVerticalEdge = (int)ix;
+						ivariant->pr_display_shutters[idx2].ShutterRightVerticalEdge = static_cast<int>(ix);
 					}
 				}
 				if (!(
@@ -897,12 +920,12 @@ static void rotate_flip_points(
 					if (out < cx)
 					{
 						const double ix = out + 2 * (cx - out);
-						ivariant->pr_display_shutters[idx2].CenterofCircularShutter_x = (int)ix;
+						ivariant->pr_display_shutters[idx2].CenterofCircularShutter_x = static_cast<int>(ix);
 					}
 					else if (out > cx)
 					{
 						const double ix = out - 2 * (out - cx);
-						ivariant->pr_display_shutters[idx2].CenterofCircularShutter_x = (int)ix;
+						ivariant->pr_display_shutters[idx2].CenterofCircularShutter_x = static_cast<int>(ix);
 					}
 				}
 				if ((a.VerticesofthePolygonalShutter.size() > 1) &&
@@ -915,12 +938,14 @@ static void rotate_flip_points(
 						if (out < cx)
 						{
 							const double ix = out + 2 * (cx - out);
-							ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j + 1] = (int)ix;
+							ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j + 1] =
+								static_cast<int>(ix);
 						}
 						else if (out > cx)
 						{
 							const double ix = out - 2 * (out - cx);
-							ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j + 1] = (int)ix;
+							ivariant->pr_display_shutters[idx2].VerticesofthePolygonalShutter[j + 1] =
+								static_cast<int>(ix);
 						}
 					}
 				}
@@ -1012,13 +1037,12 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 					typename TransformType::OutputVectorType translation2;
 					translation2[0] = cx;
 					translation2[1] = cy;
-					const double a = rotation*0.0174532925199432957692369;
 					itk::FixedArray<bool, 2> f;
 					f[0] = true;
 					f[1] = false;
 					transform->SetIdentity();
 					transform->Translate(translation1);
-					transform->Rotate2D(-a, false);
+					transform->Rotate2D(-rotation*0.0174532925199432957692369, false);
 					transform->Translate(translation2, false);
 					try
 					{
@@ -1092,10 +1116,9 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 						typename TransformType::OutputVectorType translation2;
 						translation2[0] = cx;
 						translation2[1] = cy;
-						const double a = rotation*0.0174532925199432957692369;
 						transform->SetIdentity();
 						transform->Translate(translation1);
-						transform->Rotate2D(-a, false);
+						transform->Rotate2D(-rotation*0.0174532925199432957692369, false);
 						transform->Translate(translation2, false);
 						try
 						{
@@ -1372,7 +1395,7 @@ static QString voi_lut_slice_by_slice(
 										lut_descriptor, lut_data,
 										signed_image,
 										mapped_implicit, mapped_signed);
-									if (error.isEmpty())
+									if (error.isEmpty() && tmp1.IsNotNull())
 									{
 										float min_value = 0.0f;
 										float max_value = 0.0f;
@@ -1792,9 +1815,9 @@ static void graphic_slice_by_slice(
 					a.GraphicAnnotationUnits = GraphicAnnotationUnits.value(k);
 					a.GraphicData.clear();
 					const QList<QVariant> & l465 = gdata.value(k).toList();
-					for (int z = 0; z < l465.size(); ++z)
+					for (int y = 0; y < l465.size(); ++y)
 					{
-						a.GraphicData.push_back(static_cast<float>(l465.at(z).toDouble()));
+						a.GraphicData.push_back(static_cast<float>(l465.at(y).toDouble()));
 					}
 					a.GraphicFilled = GraphicFilled.value(k);
 					if (v->pr_graphicobjects.contains(idxs.at(x)))
@@ -1846,8 +1869,8 @@ void PrConfigUtils::read_modality_lut(
 	}
 	else
 	{
-		c.values.push_back(QVariant((double)0)); // 0
-		c.values.push_back(QVariant((double)1)); // 1
+		c.values.push_back(QVariant(0.0)); // 0
+		c.values.push_back(QVariant(1.0)); // 1
 	}
 	//
 	bool no_lut_seq = false;
@@ -1938,8 +1961,8 @@ void PrConfigUtils::read_voi_lut(
 			}
 			else if (nestedds.FindDataElement(tVOILUTSequence))
 			{
-				c.values.push_back(QVariant((double)0));   // 0
-				c.values.push_back(QVariant((double)0));   // 1
+				c.values.push_back(QVariant(0.0));   // 0
+				c.values.push_back(QVariant(0.0));   // 1
 				c.values.push_back(QVariant(QString(""))); // 2
 				QList<QVariant> lut_descriptor;
 				QList<QVariant> lut_data;
@@ -1966,8 +1989,8 @@ void PrConfigUtils::read_voi_lut(
 			}
 			else
 			{
-				c.values.push_back(QVariant((double)0));         // 0
-				c.values.push_back(QVariant((double)0));         // 1
+				c.values.push_back(QVariant(0.0));               // 0
+				c.values.push_back(QVariant(0.0));               // 1
 				c.values.push_back(QVariant(QString("")));       // 2
 				c.values.push_back(QVariant(QList<QVariant>())); // 3
 				c.values.push_back(QVariant(QList<QVariant>())); // 4
@@ -2169,8 +2192,8 @@ void PrConfigUtils::read_display_areas(
 			}
 			else
 			{
-				c.values.push_back(QVariant((int)-1));
-				c.values.push_back(QVariant((int)-1));
+				c.values.push_back(QVariant(-1));
+				c.values.push_back(QVariant(-1));
 			}
 			std::vector<int> BottomRightHandCorner;
 			if (DicomUtils::get_sl_values(nestedds, tBottomRightHandCorner, BottomRightHandCorner) &&
@@ -2181,8 +2204,8 @@ void PrConfigUtils::read_display_areas(
 			}
 			else
 			{
-				c.values.push_back(QVariant((int)-1));
-				c.values.push_back(QVariant((int)-1));
+				c.values.push_back(QVariant(-1));
+				c.values.push_back(QVariant(-1));
 			}
 			QString PresentationSizeMode;
 			if (DicomUtils::get_string_value(nestedds, tPresentationSizeMode, PresentationSizeMode))
@@ -2202,8 +2225,8 @@ void PrConfigUtils::read_display_areas(
 			}
 			else
 			{
-				c.values.push_back(QVariant((int)1));
-				c.values.push_back(QVariant((int)1));
+				c.values.push_back(QVariant(1));
+				c.values.push_back(QVariant(1));
 			}
 			std::vector<double> PresentationPixelSpacing;
 			if (DicomUtils::get_ds_values(nestedds, tPresentationPixelSpacing, PresentationPixelSpacing) &&
@@ -2214,20 +2237,20 @@ void PrConfigUtils::read_display_areas(
 			}
 			else
 			{
-				c.values.push_back(QVariant((double)1));
-				c.values.push_back(QVariant((double)1));
+				c.values.push_back(QVariant(1.0));
+				c.values.push_back(QVariant(1.0));
 			}
 			std::vector<float> PresentationPixelMagnificationRatio;
 			if (DicomUtils::get_fl_values(nestedds, tPresentationPixelMagnificationRatio, PresentationPixelMagnificationRatio) &&
 				PresentationPixelMagnificationRatio.size() == 2)
 			{
-				c.values.push_back(QVariant((double)PresentationPixelMagnificationRatio.at(0))); // 9
-				c.values.push_back(QVariant((double)PresentationPixelMagnificationRatio.at(1))); // 10
+				c.values.push_back(QVariant(static_cast<double>(PresentationPixelMagnificationRatio.at(0)))); // 9
+				c.values.push_back(QVariant(static_cast<double>(PresentationPixelMagnificationRatio.at(1)))); // 10
 			}
 			else
 			{
-				c.values.push_back(QVariant((double)1));
-				c.values.push_back(QVariant((double)1));
+				c.values.push_back(QVariant(1.0));
+				c.values.push_back(QVariant(1.0));
 			}
 			//
 			if (nestedds.FindDataElement(tReferencedImageSequence))
@@ -2311,9 +2334,9 @@ void PrConfigUtils::read_spatial_transformation(
 		else
 			c.values.push_back(QVariant(QString("")));
 		if (rotation)  // 1
-			c.values.push_back(QVariant((int)ImageRotation));
+			c.values.push_back(QVariant(static_cast<int>(ImageRotation)));
 		else
-			c.values.push_back(QVariant((int)0));
+			c.values.push_back(QVariant(0));
 		ref.prconfig.push_back(c);
 	}
 }
@@ -2332,7 +2355,7 @@ static void get_overlays(
 		}
 		else if (e.GetTag().IsPrivate())
 		{
-			t.SetGroup((uint16_t)(e.GetTag().GetGroup()+1));
+			t.SetGroup(static_cast<uint16_t>(e.GetTag().GetGroup()+1));
 			t.SetElement(0);
 		}
 		else
@@ -2344,7 +2367,7 @@ static void get_overlays(
 				const mdcm::DataElement & eOverlayData = ds.GetDataElement(tOverlayData);
 				if (!eOverlayData.IsEmpty()) l.push_back(t.GetGroup());
 			}
-			t.SetGroup((uint16_t)(t.GetGroup()+2));
+			t.SetGroup(static_cast<uint16_t>(t.GetGroup()+2));
 			t.SetElement(0);
 		}
 	}
@@ -2369,7 +2392,7 @@ static void read_overlays(
 		while (e2.GetTag().GetGroup() == l.at(i))
 		{
 			o.Update(e2);
-			t.SetElement((uint16_t)(e2.GetTag().GetElement() + 1));
+			t.SetElement(static_cast<uint16_t>(e2.GetTag().GetElement() + 1));
 			e2 = ds.FindNextDataElement(t);
 		}
 		overlays.push_back(o);
@@ -2379,12 +2402,12 @@ static void read_overlays(
 	for (unsigned int i = 0; i < overlays.size(); ++i)
 	{
 		mdcm::Overlay & o = overlays[i];
-		const unsigned int NumberOfFrames = (unsigned int)o.GetNumberOfFrames();
-		const unsigned int FrameOrigin = (unsigned int)o.GetFrameOrigin();
-		const int o_dimx = (int)o.GetColumns();
-		const int o_dimy = (int)o.GetRows();
-		const int o_x    = (int)o.GetOrigin()[0];
-		const int o_y    = (int)o.GetOrigin()[1];
+		const unsigned int NumberOfFrames = o.GetNumberOfFrames();
+		const unsigned int FrameOrigin = o.GetFrameOrigin();
+		const int o_dimx = static_cast<int>(o.GetColumns());
+		const int o_dimy = static_cast<int>(o.GetRows());
+		const int o_x    = o.GetOrigin()[0];
+		const int o_y    = o.GetOrigin()[1];
 		if (NumberOfFrames > 0 && FrameOrigin > 0)
 		{
 			const size_t obuffer_size = o.GetUnpackBufferLength();
@@ -2635,7 +2658,7 @@ void PrConfigUtils::read_graphic_objects(
 						QList<QVariant> q;
 						for (unsigned int x3 = 0; x3 < GraphicData.size(); ++x3)
 						{
-							q.push_back(QVariant((double)GraphicData.at(x3)));
+							q.push_back(QVariant(static_cast<double>(GraphicData.at(x3))));
 						}
 						c.values.push_back(QVariant(q)); // 2
 					}
@@ -2780,7 +2803,7 @@ void PrConfigUtils::read_text_annotations(
 						(DicomUtils::get_fl_values(nestedds2, tBoundingBoxBottomRightHandCorner, BottomRightHandCorner) &&
 							BottomRightHandCorner.size() == 2))
 					{
-						c.values.push_back(QVariant((int)1));                      // 0
+						c.values.push_back(QVariant(1));                           // 0
 						c.values.push_back(QVariant(AreaTopLeftHandCorner.at(0))); // 1
 						c.values.push_back(QVariant(AreaTopLeftHandCorner.at(1))); // 2
 						c.values.push_back(QVariant(BottomRightHandCorner.at(0))); // 3
@@ -2798,17 +2821,17 @@ void PrConfigUtils::read_text_annotations(
 					}
 					else
 					{
-						c.values.push_back(QVariant((int)0));      // 0
-						c.values.push_back(QVariant((double)0));   // 1
-						c.values.push_back(QVariant((double)0));   // 2
-						c.values.push_back(QVariant((double)0));   // 3
-						c.values.push_back(QVariant((double)0));   // 4
+						c.values.push_back(QVariant(0));           // 0
+						c.values.push_back(QVariant(0.0));         // 1
+						c.values.push_back(QVariant(0.0));         // 2
+						c.values.push_back(QVariant(0.0));         // 3
+						c.values.push_back(QVariant(0.0));         // 4
 						c.values.push_back(QVariant(QString(""))); // 5
 					}
 					if (DicomUtils::get_fl_values(nestedds2, tAnchorPoint, AnchorPoint) &&
 							AnchorPoint.size() == 2)
 					{
-						c.values.push_back(QVariant((int)1));            // 6
+						c.values.push_back(QVariant(1));                 // 6
 						c.values.push_back(QVariant(AnchorPoint.at(0))); // 7
 						c.values.push_back(QVariant(AnchorPoint.at(1))); // 8
 						QString AnchorPointAnnotationUnits;
@@ -2834,9 +2857,9 @@ void PrConfigUtils::read_text_annotations(
 					}
 					else
 					{
-						c.values.push_back(QVariant((int)0));      // 6
-						c.values.push_back(QVariant((double)0));   // 7
-						c.values.push_back(QVariant((double)0));   // 8
+						c.values.push_back(QVariant(0));           // 6
+						c.values.push_back(QVariant(0.0));         // 7
+						c.values.push_back(QVariant(0.0));         // 8
 						c.values.push_back(QVariant(QString(""))); // 9
 						c.values.push_back(QVariant(QString(""))); //10
 					}
@@ -2860,7 +2883,7 @@ void PrConfigUtils::read_text_annotations(
 						mdcm::SmartPointer<mdcm::SequenceOfItems> sq3 = de3.GetValueAsSQ();
 						if (sq3 && sq3->GetNumberOfItems() == 1)
 						{
-							c.values.push_back(QVariant((int)1)); // 12
+							c.values.push_back(QVariant(1)); // 12
 							const mdcm::Item & item3 = sq3->GetItem(1);
 							const mdcm::DataSet & nestedds3 = item3.GetNestedDataSet();
 							QString FontName;
@@ -2958,9 +2981,9 @@ void PrConfigUtils::read_text_annotations(
 							//tShadowOffsetX
 							//tShadowOffsetY
 							//tShadowOpacity
-							c.values.push_back(QVariant((double)0)); // 22
-							c.values.push_back(QVariant((double)0)); // 23
-							c.values.push_back(QVariant((double)1)); // 24
+							c.values.push_back(QVariant(0.0)); // 22
+							c.values.push_back(QVariant(0.0)); // 23
+							c.values.push_back(QVariant(1.0)); // 24
 							//
 							//
 							std::vector<unsigned short> TextColorCIELabValue;
@@ -2968,9 +2991,9 @@ void PrConfigUtils::read_text_annotations(
 								TextColorCIELabValue.size()==3)
 							{
 								QList<QVariant> l789;
-								l789.push_back(QVariant((int)TextColorCIELabValue[0]));
-								l789.push_back(QVariant((int)TextColorCIELabValue[1]));
-								l789.push_back(QVariant((int)TextColorCIELabValue[2]));
+								l789.push_back(QVariant(static_cast<int>(TextColorCIELabValue[0])));
+								l789.push_back(QVariant(static_cast<int>(TextColorCIELabValue[1])));
+								l789.push_back(QVariant(static_cast<int>(TextColorCIELabValue[2])));
 								c.values.push_back(QVariant(l789)); // 25
 							}
 							else
@@ -2982,9 +3005,9 @@ void PrConfigUtils::read_text_annotations(
 								ShadowColorCIELabValue.size()==3)
 							{
 								QList<QVariant> l789;
-								l789.push_back(QVariant((int)ShadowColorCIELabValue[0]));
-								l789.push_back(QVariant((int)ShadowColorCIELabValue[1]));
-								l789.push_back(QVariant((int)ShadowColorCIELabValue[2]));
+								l789.push_back(QVariant(static_cast<int>(ShadowColorCIELabValue[0])));
+								l789.push_back(QVariant(static_cast<int>(ShadowColorCIELabValue[1])));
+								l789.push_back(QVariant(static_cast<int>(ShadowColorCIELabValue[2])));
 								c.values.push_back(QVariant(l789)); // 26
 							}
 							else
@@ -2995,7 +3018,7 @@ void PrConfigUtils::read_text_annotations(
 					}
 					else
 					{
-						c.values.push_back(QVariant((int)0));      // 12
+						c.values.push_back(QVariant(0));           // 12
 						c.values.push_back(QVariant(QString(""))); // 13
 						c.values.push_back(QVariant(QString(""))); // 14
 						c.values.push_back(QVariant(QString(""))); // 15
@@ -3005,9 +3028,9 @@ void PrConfigUtils::read_text_annotations(
 						c.values.push_back(QVariant(QString(""))); // 19
 						c.values.push_back(QVariant(QString(""))); // 20
 						c.values.push_back(QVariant(QString(""))); // 21
-						c.values.push_back(QVariant((double)0));   // 22
-						c.values.push_back(QVariant((double)0));   // 23
-						c.values.push_back(QVariant((double)1));   // 24
+						c.values.push_back(QVariant(0.0));         // 22
+						c.values.push_back(QVariant(0.0));         // 23
+						c.values.push_back(QVariant(1.0));         // 24
 						c.values.push_back(QVariant());            // 25
 						c.values.push_back(QVariant());            // 26
 					}
@@ -3060,17 +3083,17 @@ void PrConfigUtils::read_display_shutter(
 		DicomUtils::get_is_value(ds, tShutterUpperHorizontalEdge, &ShutterUpperHorizontalEdge) &&
 		DicomUtils::get_is_value(ds, tShutterLowerHorizontalEdge, &ShutterLowerHorizontalEdge))
 	{
-		c.values.push_back(QVariant((int)ShutterLeftVerticalEdge));    // 1
-		c.values.push_back(QVariant((int)ShutterRightVerticalEdge));   // 2
-		c.values.push_back(QVariant((int)ShutterUpperHorizontalEdge)); // 3
-		c.values.push_back(QVariant((int)ShutterLowerHorizontalEdge)); // 4
+		c.values.push_back(QVariant(ShutterLeftVerticalEdge));    // 1
+		c.values.push_back(QVariant(ShutterRightVerticalEdge));   // 2
+		c.values.push_back(QVariant(ShutterUpperHorizontalEdge)); // 3
+		c.values.push_back(QVariant(ShutterLowerHorizontalEdge)); // 4
 	}
 	else
 	{
-		c.values.push_back(QVariant((int)-1)); // 1
-		c.values.push_back(QVariant((int)-1)); // 2
-		c.values.push_back(QVariant((int)-1)); // 3
-		c.values.push_back(QVariant((int)-1)); // 4
+		c.values.push_back(QVariant(-1)); // 1
+		c.values.push_back(QVariant(-1)); // 2
+		c.values.push_back(QVariant(-1)); // 3
+		c.values.push_back(QVariant(-1)); // 4
 	}
 	std::vector<int> CenterofCircularShutter;
 	int RadiusofCircularShutter;
@@ -3079,15 +3102,15 @@ void PrConfigUtils::read_display_shutter(
 		(CenterofCircularShutter.size() == 2) &&
 		DicomUtils::get_is_value(ds, tRadiusofCircularShutter, &RadiusofCircularShutter))
 	{
-		c.values.push_back(QVariant((int)CenterofCircularShutter.at(0))); // 5
-		c.values.push_back(QVariant((int)CenterofCircularShutter.at(1))); // 6
-		c.values.push_back(QVariant((int)RadiusofCircularShutter));       // 7
+		c.values.push_back(QVariant(CenterofCircularShutter.at(0))); // 5
+		c.values.push_back(QVariant(CenterofCircularShutter.at(1))); // 6
+		c.values.push_back(QVariant(RadiusofCircularShutter));       // 7
 	}
 	else
 	{
-		c.values.push_back(QVariant((int)-1)); // 5
-		c.values.push_back(QVariant((int)-1)); // 6
-		c.values.push_back(QVariant((int)-1)); // 7
+		c.values.push_back(QVariant(-1)); // 5
+		c.values.push_back(QVariant(-1)); // 6
+		c.values.push_back(QVariant(-1)); // 7
 	}
 	std::vector<int> VerticesofthePolygonalShutter;
 	if (DicomUtils::get_is_values(ds, tVerticesofthePolygonalShutter, VerticesofthePolygonalShutter) &&
@@ -3096,7 +3119,7 @@ void PrConfigUtils::read_display_shutter(
 		QList<QVariant> l;
 		for (unsigned int x = 0; x < VerticesofthePolygonalShutter.size(); ++x)
 		{
-			l.push_back(QVariant((int)VerticesofthePolygonalShutter.at(x)));
+			l.push_back(QVariant(VerticesofthePolygonalShutter.at(x)));
 		}
 		c.values.push_back(QVariant(l)); // 8
 	}
@@ -3107,11 +3130,11 @@ void PrConfigUtils::read_display_shutter(
 	unsigned short ShutterPresentationValue;
 	if (DicomUtils::get_us_value(ds, tShutterPresentationValue, &ShutterPresentationValue))
 	{
-		c.values.push_back(QVariant((int)ShutterPresentationValue)); // 9
+		c.values.push_back(QVariant(static_cast<int>(ShutterPresentationValue))); // 9
 	}
 	else
 	{
-		c.values.push_back(QVariant((int)-1)); // 9
+		c.values.push_back(QVariant(-1)); // 9
 	}
 	std::vector<unsigned short> ShutterPresentationColorCIELabValue;
 	if (DicomUtils::get_us_values(ds, tShutterPresentationColorCIELabValue, ShutterPresentationColorCIELabValue) &&
@@ -3120,7 +3143,7 @@ void PrConfigUtils::read_display_shutter(
 		QList<QVariant> l;
 		for (unsigned int x = 0; x < 3; ++x)
 		{
-			l.push_back(QVariant((int)ShutterPresentationColorCIELabValue.at(x)));
+			l.push_back(QVariant(static_cast<int>(ShutterPresentationColorCIELabValue.at(x))));
 		}
 		c.values.push_back(QVariant(l)); // 10
 	}
@@ -3253,62 +3276,82 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		}
 		if (modality_lut_found)
 		{
-			if      (ivariant->image_type == 0)
+			if (ivariant->image_type == 0)
+			{
 				error = apply_lut<ImageTypeSS, ImageTypeF>(
 					ivariant->pSS, v->pF,
 					m_lut_descriptor, m_lut_data,
 					ivariant->dicom_pixel_signed,
 					mapped_implicit, mapped_signed);
+			}
 			else if (ivariant->image_type == 1)
+			{
 				error = apply_lut<ImageTypeUS, ImageTypeF>(
 					ivariant->pUS, v->pF,
 					m_lut_descriptor, m_lut_data,
 					ivariant->dicom_pixel_signed,
 					mapped_implicit, mapped_signed);
+			}
 			else if (ivariant->image_type == 2)
+			{
 				error = apply_lut<ImageTypeSI, ImageTypeF>(
 					ivariant->pSI, v->pF,
 					m_lut_descriptor, m_lut_data,
 					ivariant->dicom_pixel_signed,
 					mapped_implicit, mapped_signed);
+			}
 			else if (ivariant->image_type == 3)
+			{
 				error = apply_lut<ImageTypeUI, ImageTypeF>(
 					ivariant->pUI, 	v->pF,
 					m_lut_descriptor, m_lut_data,
 					ivariant->dicom_pixel_signed,
 					mapped_implicit, mapped_signed);
+			}
 			else if (ivariant->image_type == 4)
+			{
 				error = apply_lut<ImageTypeUC, ImageTypeF>(
 					ivariant->pUC, v->pF,
 					m_lut_descriptor, m_lut_data,
 					ivariant->dicom_pixel_signed,
 					mapped_implicit, mapped_signed);
+			}
 			else if (ivariant->image_type == 5)
+			{
 				error = apply_lut<ImageTypeF,  ImageTypeF>(
 					ivariant->pF, v->pF,
 					m_lut_descriptor, m_lut_data,
 					ivariant->dicom_pixel_signed,
 					mapped_implicit, mapped_signed);
+			}
 			else if (ivariant->image_type == 6)
+			{
 				error = apply_lut<ImageTypeD, ImageTypeF>(
 					ivariant->pD, v->pF,
 					m_lut_descriptor, m_lut_data,
 					ivariant->dicom_pixel_signed,
 					mapped_implicit, mapped_signed);
+			}
 			else if (ivariant->image_type == 7)
+			{
 				error = apply_lut<ImageTypeSLL, ImageTypeF>(
 					ivariant->pSLL, v->pF,
 					m_lut_descriptor, m_lut_data,
 					ivariant->dicom_pixel_signed,
 					mapped_implicit, mapped_signed);
+			}
 			else if (ivariant->image_type == 8)
+			{
 				error = apply_lut<ImageTypeULL, ImageTypeF>(
 					ivariant->pULL, v->pF,
 					m_lut_descriptor, m_lut_data,
 					ivariant->dicom_pixel_signed,
 					mapped_implicit, mapped_signed);
+			}
 			else
+			{
 				error = QString("Wrong image type");
+			}
 			if (error.isEmpty())
 			{
 				v->image_type = 5;
@@ -4041,7 +4084,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 	// Apply spatial tranform to pixel items
 	if (rotation != 0 || flip)
 	{
-		rotate_flip_points(v, (double)rotation, flip);
+		rotate_flip_points(v, static_cast<double>(rotation), flip);
 	}
 	else
 	{

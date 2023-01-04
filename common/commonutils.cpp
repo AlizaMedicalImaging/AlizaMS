@@ -93,8 +93,8 @@ template<typename T> void calculate_min_max(
 		min_max_calculator->SetImage(image);
 		min_max_calculator->SetRegion(image->GetLargestPossibleRegion());
 		min_max_calculator->Compute();
-		cubemin = min_max_calculator->GetMinimum();
-		cubemax = min_max_calculator->GetMaximum();
+		cubemin = static_cast<double>(min_max_calculator->GetMinimum());
+		cubemax = static_cast<double>(min_max_calculator->GetMaximum());
 	}
 	catch (const itk::ExceptionObject & ex)
 	{
@@ -2272,6 +2272,7 @@ void CommonUtils::generate_cubeslice(
 			const double * ipp_iop)
 {
 	ImageSlice * cs = new ImageSlice;
+	const float fz = static_cast<float>(z);
 	cs->v[ 0]  = x0;
 	cs->v[ 1]  = y0;
 	cs->v[ 2]  = z0;
@@ -2286,16 +2287,16 @@ void CommonUtils::generate_cubeslice(
 	cs->v[11]  = z3;
 	cs->tc[ 0] = 0.0f;
 	cs->tc[ 1] = 1.0f;
-	cs->tc[ 2] = z/static_cast<float>(dimz-1);
+	cs->tc[ 2] = fz/static_cast<float>(dimz-1);
 	cs->tc[ 3] = 0.0f;
 	cs->tc[ 4] = 0.0f;
-	cs->tc[ 5] = z/static_cast<float>(dimz-1);
+	cs->tc[ 5] = fz/static_cast<float>(dimz-1);
 	cs->tc[ 6] = 1.0f;
 	cs->tc[ 7] = 1.0f;
-	cs->tc[ 8] = z/static_cast<float>(dimz-1);
+	cs->tc[ 8] = fz/static_cast<float>(dimz-1);
 	cs->tc[ 9] = 1.0f;
 	cs->tc[10] = 0.0f;
-	cs->tc[11] = z/static_cast<float>(dimz-1);
+	cs->tc[11] = fz/static_cast<float>(dimz-1);
 	cs->fv[ 0] = x0;
 	cs->fv[ 1] = y0;
 	cs->fv[ 2] = z0;
@@ -2382,15 +2383,15 @@ void CommonUtils::generate_spectroscopyslice(
 				const sVector3 XN(x2,y2,z2);
 				const float    Xd = length(XN-X0);
 				const float    Yd = length(YN-X0);
-				const sVector3 Xn = sVector3(normalize(XN-X0));
-				const sVector3 Yn = sVector3(normalize(YN-X0));
-				float dx = Xd/(columns_-1);
-				float dy = Yd/(rows_-1);
+				const sVector3 Xn = normalize(XN-X0);
+				const sVector3 Yn = normalize(YN-X0);
+				float dx = Xd/static_cast<float>(columns_-1);
+				float dy = Yd/static_cast<float>(rows_-1);
 				const sVector3 p = X1 + dx*Xn;
 				unsigned long j = 0;
 				for (unsigned int x = 1; x < columns_-1; ++x)
 				{
-					const sVector3 from = X0 + (x*dx)*Xn;
+					const sVector3 from = X0 + (static_cast<float>(x)*dx)*Xn;
 					const sVector3 to   = from + Yd*Yn;
 					v[j  ] = from.getX();
 					v[j+1] = from.getY();
@@ -2402,7 +2403,7 @@ void CommonUtils::generate_spectroscopyslice(
 				}
 				for (unsigned int x = 1; x < rows_-1; ++x)
 				{
-					sVector3 from = X0 + (x*dy)*Yn;
+					sVector3 from = X0 + (static_cast<float>(x)*dy)*Yn;
 					sVector3 to   = from + Xd*Xn;
 					v[j  ] = from.getX();
 					v[j+1] = from.getY();
@@ -3456,10 +3457,9 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						if (!data.at(z_))
 						{
 							delete [] p__;
-							return QString(
-								QString("!data.at(") +
+							return QString("!data.at(") +
 								QVariant(static_cast<unsigned long long>(z_)).toString() +
-								QString(")"));
+								QString(")");
 						}
 						size_t inc_xy = 0;
 						for (size_t y_ = 0; y_ < dimy; ++y_)
@@ -3545,10 +3545,9 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						if (!data.at(z_))
 						{
 							delete [] p__;
-							return QString(
-								QString("!data.at(") +
+							return QString("!data.at(") +
 								QVariant(static_cast<unsigned long long>(z_)).toString() +
-								QString(")"));
+								QString(")");
 						}
 						size_t inc_xy = 0;
 						for (size_t y_ = 0; y_ < dimy; ++y_)
@@ -3633,10 +3632,9 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						if (!data.at(z_))
 						{
 							delete [] p__;
-							return QString(
-								QString("!data.at(") +
+							return QString("!data.at(") +
 								QVariant(static_cast<unsigned long long>(z_)).toString() +
-								QString(")"));
+								QString(")");
 						}
 						size_t inc_xy = 0;
 						for (size_t y_ = 0; y_ < dimy; ++y_)
@@ -3721,10 +3719,9 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						if (!data.at(z_))
 						{
 							delete [] p__;
-							return QString(
-								QString("!data.at(") +
+							return QString("!data.at(") +
 								QVariant(static_cast<unsigned long long>(z_)).toString() +
-								QString(")"));
+								QString(")");
 						}
 						size_t inc_xy = 0;
 						for (size_t y_ = 0; y_ < dimy; ++y_)
@@ -3809,10 +3806,9 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						if (!data.at(z_))
 						{
 							delete [] p__;
-							return QString(
-								QString("!data.at(") +
+							return QString("!data.at(") +
 								QVariant(static_cast<unsigned long long>(z_)).toString() +
-								QString(")"));
+								QString(")");
 						}
 						size_t inc_xy = 0;
 						for (size_t y_ = 0; y_ < dimy; ++y_)
@@ -3897,10 +3893,9 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						if (!data.at(z_))
 						{
 							delete [] p__;
-							return QString(
-								QString("!data.at(") +
+							return QString("!data.at(") +
 								QVariant(static_cast<unsigned long long>(z_)).toString() +
-								QString(")"));
+								QString(")");
 						}
 						size_t inc_xy = 0;
 						for (size_t y_ = 0; y_ < dimy; ++y_)
@@ -3987,10 +3982,9 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						if (!data.at(z_))
 						{
 							delete [] p__;
-							return QString(
-								QString("!data.at(") +
+							return QString("!data.at(") +
 								QVariant(static_cast<unsigned long long>(z_)).toString() +
-								QString(")"));
+								QString(")");
 						}
 						size_t inc_xy = 0;
 						for (size_t y_ = 0; y_ < dimy; ++y_)
@@ -4076,10 +4070,9 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						if (!data.at(z_))
 						{
 							delete [] p__;
-							return QString(
-								QString("!data.at(") +
+							return QString("!data.at(") +
 								QVariant(static_cast<unsigned long long>(z_)).toString() +
-								QString(")"));
+								QString(")");
 						}
 						size_t inc_xy = 0;
 						for (size_t y_ = 0; y_ < dimy; ++y_)
@@ -4164,10 +4157,9 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						if (!data.at(z_))
 						{
 							delete [] p__;
-							return QString(
-								QString("!data.at(") +
+							return QString("!data.at(") +
 								QVariant(static_cast<unsigned long long>(z_)).toString() +
-								QString(")"));
+								QString(")");
 						}
 						size_t inc_xy = 0;
 						for (size_t y_ = 0; y_ < dimy; ++y_)
@@ -4269,10 +4261,9 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					if (!data.at(z_))
 					{
 						delete [] p__;
-						return QString(
-							QString("!data.at(") +
+						return QString("!data.at(") +
 							QVariant(static_cast<unsigned long long>(z_)).toString() +
-							QString(")"));
+							QString(")");
 					}
 					size_t inc_xy = 0;
 					for (size_t y_ = 0; y_ < dimy; ++y_)
@@ -4361,10 +4352,9 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					if (!data.at(z_))
 					{
 						delete [] p__;
-						return QString(
-							QString("!data.at(") +
+						return QString("!data.at(") +
 							QVariant(static_cast<unsigned long long>(z_)).toString() +
-							QString(")"));
+							QString(")");
 					}
 					size_t inc_xy = 0;
 					for (size_t y_ = 0; y_ < dimy; ++y_)
@@ -4452,10 +4442,9 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					if (!data.at(z_))
 					{
 						delete [] p__;
-						return QString(
-							QString("!data.at(") +
+						return QString("!data.at(") +
 							QVariant(static_cast<unsigned long long>(z_)).toString() +
-							QString(")"));
+							QString(")");
 					}
 					size_t inc_xy = 0;
 					for (size_t y_ = 0; y_ < dimy; ++y_)
@@ -4541,10 +4530,9 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					if (!data.at(z_))
 					{
 						delete [] p__;
-						return QString(
-							QString("!data.at(") +
+						return QString("!data.at(") +
 							QVariant(static_cast<unsigned long long>(z_)).toString() +
-							QString(")"));
+							QString(")");
 					}
 					size_t inc_xy = 0;
 					for (size_t y_ = 0; y_ < dimy; ++y_)
@@ -4652,10 +4640,9 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					if (!data.at(z_))
 					{
 						delete [] p__;
-						return QString(
-							QString("!data.at(") +
+						return QString("!data.at(") +
 							QVariant(static_cast<unsigned long long>(z_)).toString() +
-							QString(")"));
+							QString(")");
 					}
 					size_t inc_xy = 0;
 					for (size_t y_ = 0; y_ < dimy; ++y_)
@@ -4829,7 +4816,9 @@ double CommonUtils::get_total_memory()
 	ZeroMemory(&memory_status, sizeof(MEMORYSTATUSEX));
 	memory_status.dwLength = sizeof(MEMORYSTATUSEX);
 	if (GlobalMemoryStatusEx(&memory_status))
-		total_gb = memory_status.ullTotalPhys / 1073741824.0;
+	{
+		total_gb = static_cast<double>(memory_status.ullTotalPhys) / 1073741824.0;
+	}
 #elif (defined __FreeBSD__ || defined __APPLE__)
 	unsigned long long ctlvalue;
 	size_t len = sizeof(ctlvalue);
@@ -4841,11 +4830,11 @@ double CommonUtils::get_total_memory()
 	mib[1] = HW_MEMSIZE;
 #endif
 	sysctl(mib, 2, &ctlvalue, &len, NULL, 0);
-	total_gb = ctlvalue / 1073741824.0;
+	total_gb = static_cast<double>(ctlvalue) / 1073741824.0;
 #elif (defined  __GNUC__)
 	struct sysinfo i;
 	sysinfo(&i);
-	total_gb = i.totalram / 1073741824.0;
+	total_gb = static_cast<double>(i.totalram) / 1073741824.0;
 #endif
 	return total_gb;
 #else

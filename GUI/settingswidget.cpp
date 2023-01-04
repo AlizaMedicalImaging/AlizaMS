@@ -267,20 +267,20 @@ void SettingsWidget::readSettings()
 void SettingsWidget::writeSettings(QSettings & s)
 {
 	s.beginGroup(QString("GlobalSettings"));
-	s.setValue(QString("enable_gl_3D"),  QVariant((int)(gl3D_checkBox->isChecked() ? 1 : 0)));
+	s.setValue(QString("enable_gl_3D"),  QVariant(gl3D_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("scale_ui_icons"),QVariant(si_doubleSpinBox->value()));
 	s.setValue(QString("app_font_pt"),   QVariant(pt_doubleSpinBox->value()));
 	s.setValue(QString("stylename"),     QVariant(styleComboBox->currentText().trimmed()));
-	s.setValue(QString("sr_info2"),      QVariant((int)(srinfo_checkBox->isChecked() ? 1 : 0)));
-	s.setValue(QString("sr_i_scale"),    QVariant((int)(srscale_checkBox->isChecked() ? 1: 0)));
+	s.setValue(QString("sr_info2"),      QVariant(srinfo_checkBox->isChecked() ? 1 : 0));
+	s.setValue(QString("sr_i_scale"),    QVariant(srscale_checkBox->isChecked() ? 1: 0));
 	s.setValue(QString("sr_i_width"),    QVariant(srwidth_spinBox->value()));
-	s.setValue(QString("sr_chapters"),   QVariant((int)(srchapters_checkBox->isChecked() ? 1 : 0)));
-	s.setValue(QString("sr_skip_images"),QVariant((int)(srskipimage_checkBox->isChecked() ? 1 : 0)));
-	s.setValue(QString("dcm_overlays"),  QVariant((int)(overlays_checkBox->isChecked() ? 1 : 0)));
-	s.setValue(QString("dcm_mosaic"),    QVariant((int)(mosaic_checkBox->isChecked() ? 1 : 0)));
-	s.setValue(QString("dcm_sort_mf"),   QVariant((int)(sortframes_checkBox->isChecked() ? 1 : 0)));
-	s.setValue(QString("apply_icc"),     QVariant((int)(icc_checkBox->isChecked() ? 1 : 0)));
-	s.setValue(QString("clean_unused"),  QVariant((int)(clean_unused_checkBox->isChecked() ? 1 : 0)));
+	s.setValue(QString("sr_chapters"),   QVariant(srchapters_checkBox->isChecked() ? 1 : 0));
+	s.setValue(QString("sr_skip_images"),QVariant(srskipimage_checkBox->isChecked() ? 1 : 0));
+	s.setValue(QString("dcm_overlays"),  QVariant(overlays_checkBox->isChecked() ? 1 : 0));
+	s.setValue(QString("dcm_mosaic"),    QVariant(mosaic_checkBox->isChecked() ? 1 : 0));
+	s.setValue(QString("dcm_sort_mf"),   QVariant(sortframes_checkBox->isChecked() ? 1 : 0));
+	s.setValue(QString("apply_icc"),     QVariant(icc_checkBox->isChecked() ? 1 : 0));
+	s.setValue(QString("clean_unused"),  QVariant(clean_unused_checkBox->isChecked() ? 1 : 0));
 	s.endGroup();
 	s.beginGroup(QString("StyleDialog"));
 	s.setValue(QString("saved_idx"), QVariant(styleComboBox->currentIndex()));

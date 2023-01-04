@@ -1142,7 +1142,7 @@ inline const Transform3 inverse(const Transform3 & tfrm)
   const Vector3 inv1 = Vector3((tmp0.getY() * detinv), (tmp1.getY() * detinv), (tmp2.getY() * detinv));
   const Vector3 inv2 = Vector3((tmp0.getZ() * detinv), (tmp1.getZ() * detinv), (tmp2.getZ() * detinv));
   return Transform3(inv0, inv1, inv2,
-            Vector3((-((inv0 * tfrm.getCol3().getX()) + ((inv1 * tfrm.getCol3().getY()) + (inv2 * tfrm.getCol3().getZ()))))));
+            (-((inv0 * tfrm.getCol3().getX()) + ((inv1 * tfrm.getCol3().getY()) + (inv2 * tfrm.getCol3().getZ())))));
 }
 
 inline const Transform3 orthoInverse(const Transform3 & tfrm)
@@ -1151,7 +1151,7 @@ inline const Transform3 orthoInverse(const Transform3 & tfrm)
   const Vector3 inv1 = Vector3(tfrm.getCol0().getY(), tfrm.getCol1().getY(), tfrm.getCol2().getY());
   const Vector3 inv2 = Vector3(tfrm.getCol0().getZ(), tfrm.getCol1().getZ(), tfrm.getCol2().getZ());
   return Transform3(inv0, inv1, inv2,
-            Vector3((-((inv0 * tfrm.getCol3().getX()) + ((inv1 * tfrm.getCol3().getY()) + (inv2 * tfrm.getCol3().getZ()))))));
+            (-((inv0 * tfrm.getCol3().getX()) + ((inv1 * tfrm.getCol3().getY()) + (inv2 * tfrm.getCol3().getZ())))));
 }
 
 inline const Transform3 absPerElem(const Transform3 & tfrm)

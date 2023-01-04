@@ -600,8 +600,8 @@ static bool find_time_less_1h_recurs__(
 					{
 						const mdcm::Item    & item   = sq->GetItem(i);
 						const mdcm::DataSet & nested = item.GetNestedDataSet();
-						const bool t = find_time_less_1h_recurs__(nested, implicit, dicts);
-						if (t) return true;
+						const bool b = find_time_less_1h_recurs__(nested, implicit, dicts);
+						if (b) return true;
 					}
 				}
 			}
@@ -685,9 +685,9 @@ static void modify_date_time_recurs__(
 										}
 										else
 										{
-											QTime t = QTime::fromString(s1, QString("HHmmss"));
-											t = t.addSecs(-s_off);
-											r += t.toString(QString("HHmmss")) + QString(".000000");
+											QTime t1 = QTime::fromString(s1, QString("HHmmss"));
+											t1 = t1.addSecs(-s_off);
+											r += t1.toString(QString("HHmmss")) + QString(".000000");
 										}
 									}
 									else if (tmp0 == -1)
@@ -711,15 +711,15 @@ static void modify_date_time_recurs__(
 											}
 											else if (s0_length == 4)
 											{
-												QTime t = QTime::fromString(s0, QString("HHmm"));
-												t = t.addSecs(-s_off);
-												r += t.toString(QString("HHmm"));
+												QTime t1 = QTime::fromString(s0, QString("HHmm"));
+												t1 = t1.addSecs(-s_off);
+												r += t1.toString(QString("HHmm"));
 											}
 											else if (s0_length == 6)
 											{
-												QTime t = QTime::fromString(s0, QString("HHmmss"));
-												t = t.addSecs(-s_off);
-												r += t.toString(QString("HHmmss"));
+												QTime t1 = QTime::fromString(s0, QString("HHmmss"));
+												t1 = t1.addSecs(-s_off);
+												r += t1.toString(QString("HHmmss"));
 											}
 										}
 									}
@@ -1232,8 +1232,8 @@ static void anonymize_file__(
 	mdcm::File    & file = reader.GetFile();
 	mdcm::DataSet & ds   = file.GetDataSet();
 	mdcm::FileMetaInformation & header = file.GetHeader();
-	mdcm::TransferSyntax ts = header.GetDataSetTransferSyntax();
-	const bool implicit = ts.IsImplicit();
+	mdcm::TransferSyntax tsx = header.GetDataSetTransferSyntax();
+	const bool implicit = tsx.IsImplicit();
 #if 1
 	mdcm::MediaStorage ms;
 	ms.SetFromFile(file);
@@ -2174,7 +2174,7 @@ static void find_uids_recurs__(
 		}
 		else
 		{
-			if (DicomUtils::compatible_sq(const_cast<const mdcm::DataSet&>(ds), t, implicit, dicts))
+			if (DicomUtils::compatible_sq(ds, t, implicit, dicts))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 				if (sq && sq->GetNumberOfItems() > 0)
@@ -2214,7 +2214,7 @@ static void find_ids_recurs__(
 		}
 		else
 		{
-			if (DicomUtils::compatible_sq(const_cast<const mdcm::DataSet&>(ds), t, implicit, dicts))
+			if (DicomUtils::compatible_sq(ds, t, implicit, dicts))
 			{
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 				if (sq && sq->GetNumberOfItems() > 0)

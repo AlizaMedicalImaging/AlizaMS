@@ -266,13 +266,13 @@ void BrowserWidget2::process_directory(const QString & p, const mdcm::Dict & dic
 			bool is_image       = false;
 			bool is_softcopy  = false;
 			const int idx = tableWidget->rowCount();
-			QString ids;
+			QString idxs;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-			ids = QString::asprintf("%010d", idx);
+			idxs = QString::asprintf("%010d", idx);
 #else
-			ids.sprintf("%010d", idx);
+			idxs.sprintf("%010d", idx);
 #endif
-			TableWidgetItem * i = new TableWidgetItem(ids);
+			TableWidgetItem * i = new TableWidgetItem(idxs);
 			std::vector<std::string> files__(
 				s0.GetAllFilenamesFromTagToValue(
 					tSeriesInstanceUID, (*vi).c_str()));
@@ -1628,8 +1628,8 @@ void BrowserWidget2::open_CTK_db()
 		ctk_dir   = QDir::toNativeSeparators(d->get_dir());
 		ctk_pname = d->get_pname().trimmed();
 		ctk_pid   = d->get_pid().trimmed();
-		ctk_from  = QDate(d->get_from()).toString("yyyyMMdd");
-		ctk_to    = QDate(d->get_to()).toString("yyyyMMdd");;
+		ctk_from  = d->get_from().toString("yyyyMMdd");
+		ctk_to    = d->get_to().toString("yyyyMMdd");;
 		ctk_apply_range = d->get_apply_range();
 	}
 	delete d;
@@ -1813,15 +1813,17 @@ void BrowserWidget2::open_CTK_db()
 	for (int x = 0; x < series.size(); ++x)
 	{
 		const int idx = tableWidget->rowCount();
-		QString ids;
+		QString idxs;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-		ids = QString::asprintf("%010d", idx);
+		idxs = QString::asprintf("%010d", idx);
 #else
-		ids.sprintf("%010d", idx);
+		idxs.sprintf("%010d", idx);
 #endif
-		TableWidgetItem * i = new TableWidgetItem(ids);
+		TableWidgetItem * i = new TableWidgetItem(idxs);
 		for (int z = 0; z < series.at(x).files.size(); ++z)
+		{
 			i->files.push_back(series.at(x).files.at(z));
+		}
 		tableWidget->setRowCount(idx+1);
 		tableWidget->setItem(idx,0,static_cast<QTableWidgetItem*>(i));
 #if 0

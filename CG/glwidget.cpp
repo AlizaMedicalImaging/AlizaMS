@@ -387,8 +387,8 @@ void GLWidget::mouseMoveEvent(QMouseEvent * e)
 	else if (e->buttons() & Qt::MiddleButton)
 	{
 		const QPoint p = e->pos();
-		const float deltax = p.x() - lastPanPos.x();
-		const float deltay = p.y() - lastPanPos.y();
+		const int deltax = p.x() - lastPanPos.x();
+		const int deltay = p.y() - lastPanPos.y();
 		set_pan_delta(deltax, deltay);
 		lastPanPos = p;
 		update_ = true;
@@ -671,7 +671,7 @@ quit__:
 
 void GLWidget::set_contours_width(float f)
 {
-	contours_width = (f < 0.1) ? 2.0f : f;
+	contours_width = (f < 0.1f) ? 2.0f : f;
 	if (view == 0) updateGL();
 }
 
@@ -810,13 +810,13 @@ void GLWidget::init_()
 	cubebuffer = 0;
 	cube_tex = 0;
 	cube_depth = 0;
-	cube = 0;
-	letters = 0;
-	letteri = 0;
-	lettera = 0;
-	letterp = 0;
-	letterr = 0;
-	letterl = 0;
+	cube = NULL;
+	letters = NULL;
+	letteri = NULL;
+	lettera = NULL;
+	letterp = NULL;
+	letterr = NULL;
+	letterl = NULL;
 	pan_x  = 0;
 	pan_y  = 0;
 	clear_color_r = 0.9f;
@@ -1754,9 +1754,9 @@ void GLWidget::paint_raycaster()
 		warn2 = true;
 	}
 	//
-	const float x__ = di->idimx * di->ix_spacing * 0.5f;
-	const float y__ = di->idimy * di->iy_spacing * 0.5f;
-	const float z__ = di->idimz * di->iz_spacing * 0.5f;
+	const float x__ = static_cast<float>(di->idimx) * static_cast<float>(di->ix_spacing) * 0.5f;
+	const float y__ = static_cast<float>(di->idimy) * static_cast<float>(di->iy_spacing) * 0.5f;
+	const float z__ = static_cast<float>(di->idimz) * static_cast<float>(di->iz_spacing) * 0.5f;
 	const unsigned int orientation = selected_images__->at(0)->orientation;
 	const bool force_skip_cube = update_raycast_shader_vbo(
 		orientation,
@@ -1784,15 +1784,15 @@ void GLWidget::paint_raycaster()
 						-ortho_size, ortho_size,
 						-far_plane, far_plane);
 		const float d_ortho = ortho_size / SCENE_ORTHO_SIZE;
-		dx__ = pan_x * d_ortho;
-		dy__ = pan_y * d_ortho;
+		dx__ = static_cast<float>(pan_x) * d_ortho;
+		dy__ = static_cast<float>(pan_y) * d_ortho;
 	}
 	else
 	{
-		camera->perspective(CAMERA_D2R * fov, asp, 0.01f, static_cast<float>(far_plane));
+		camera->perspective(CAMERA_D2R * fov, asp, 0.01f, far_plane);
 		const float d_persp = fabs(position_z) / SCENE_POS_Z;
-		dx__ = pan_x * d_persp;
-		dy__ = pan_y * d_persp;
+		dx__ = static_cast<float>(pan_x) * d_persp;
+		dy__ = static_cast<float>(pan_y) * d_persp;
 	}
 	camera->set_trackball_pan_matrix(
 		0.8f,
@@ -2101,7 +2101,7 @@ void GLWidget::paint_volume()
 	}
 	else
 	{
-		camera->perspective(CAMERA_D2R * fov, asp, 0.01f, static_cast<float>(far_plane));
+		camera->perspective(CAMERA_D2R * fov, asp, 0.01f, far_plane);
 		const float d_persp = fabs(position_z) / SCENE_POS_Z;
 		dx__ = pan_x * d_persp;
 		dy__ = pan_y * d_persp;
@@ -2147,7 +2147,7 @@ void GLWidget::paint_volume()
 				if (di->spectroscopy_slices.at(x)->lsize > 0)
 				{
 					glBindVertexArray(di->spectroscopy_slices.at(x)->lvaoid);
-					glDrawArrays(GL_LINES, 0, di->spectroscopy_slices.at(x)->lsize);
+					glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(di->spectroscopy_slices.at(x)->lsize));
 				}
 				if (di->spectroscopy_ref == 1)
 					glUniform4f(
@@ -2159,7 +2159,7 @@ void GLWidget::paint_volume()
 				if (di->spectroscopy_slices.at(x)->psize > 0)
 				{
 					glBindVertexArray(di->spectroscopy_slices.at(x)->pvaoid);
-					glDrawArrays(GL_POINTS, 0, di->spectroscopy_slices.at(x)->psize);
+					glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(di->spectroscopy_slices.at(x)->psize));
 				}
 				if (di->spectroscopy_slices.at(x)->fvboid > 0)
 				{
@@ -3358,7 +3358,7 @@ void GLWidget::generate_raycast_shader_vao(
 bool GLWidget::update_raycast_shader_vbo(
 	unsigned int orientation,
 	float x__, float y__, float z__,
-	GLuint * raycastcube0,
+	GLuint * rcube0,
 	bool both)
 {
 	bool force_skip_cube = false;
@@ -3366,298 +3366,298 @@ bool GLWidget::update_raycast_shader_vbo(
 	{
 #if (ITK_VERSION_MAJOR >= 5 && ITK_VERSION_MINOR >= 3 && defined TMP_USE_53_SPATIAL_ENUMS)
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RIP):
-		raycast_cube_RIP(x__, y__, z__, raycastcube0, both);
+		raycast_cube_RIP(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LIP):
-		raycast_cube_LIP(x__, y__, z__, raycastcube0, both);
+		raycast_cube_LIP(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RSP):
-		raycast_cube_RSP(x__, y__, z__, raycastcube0, both);
+		raycast_cube_RSP(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LSP):
-		raycast_cube_LSP(x__, y__, z__, raycastcube0, both);
+		raycast_cube_LSP(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RIA):
-		raycast_cube_RIA(x__, y__, z__, raycastcube0, both);
+		raycast_cube_RIA(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LIA):
-		raycast_cube_LIA(x__, y__, z__, raycastcube0, both);
+		raycast_cube_LIA(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RSA):
-		raycast_cube_RSA(x__, y__, z__, raycastcube0, both);
+		raycast_cube_RSA(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LSA):
-		raycast_cube_LSA(x__, y__, z__, raycastcube0, both);
+		raycast_cube_LSA(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IRP):
-		raycast_cube_IRP(x__, y__, z__, raycastcube0, both);
+		raycast_cube_IRP(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ILP):
-		raycast_cube_ILP(x__, y__, z__, raycastcube0, both);
+		raycast_cube_ILP(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SRP):
-		raycast_cube_SRP(x__, y__, z__, raycastcube0, both);
+		raycast_cube_SRP(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SLP):
-		raycast_cube_SLP(x__, y__, z__, raycastcube0, both);
+		raycast_cube_SLP(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IRA):
-		raycast_cube_IRA(x__, y__, z__, raycastcube0, both);
+		raycast_cube_IRA(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ILA):
-		raycast_cube_ILA(x__, y__, z__, raycastcube0, both);
+		raycast_cube_ILA(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SRA):
-		raycast_cube_SRA(x__, y__, z__, raycastcube0, both);
+		raycast_cube_SRA(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SLA):
-		raycast_cube_SLA(x__, y__, z__, raycastcube0, both);
+		raycast_cube_SLA(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RPI):
-		raycast_cube_RPI(x__, y__, z__, raycastcube0, both);
+		raycast_cube_RPI(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LPI):
-		raycast_cube_LPI(x__, y__, z__, raycastcube0, both);
+		raycast_cube_LPI(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RAI):
-		raycast_cube_RAI(x__, y__, z__, raycastcube0, both);
+		raycast_cube_RAI(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LAI):
-		raycast_cube_LAI(x__, y__, z__, raycastcube0, both);
+		raycast_cube_LAI(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RPS):
-		raycast_cube_RPS(x__, y__, z__, raycastcube0, both);
+		raycast_cube_RPS(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LPS):
-		raycast_cube_LPS(x__, y__, z__, raycastcube0, both);
+		raycast_cube_LPS(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RAS):
-		raycast_cube_RAS(x__, y__, z__, raycastcube0, both);
+		raycast_cube_RAS(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LAS):
-		raycast_cube_LAS(x__, y__, z__, raycastcube0, both);
+		raycast_cube_LAS(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PRI):
-		raycast_cube_PRI(x__, y__, z__, raycastcube0, both);
+		raycast_cube_PRI(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PLI):
-		raycast_cube_PLI(x__, y__, z__, raycastcube0, both);
+		raycast_cube_PLI(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ARI):
-		raycast_cube_ARI(x__, y__, z__, raycastcube0, both);
+		raycast_cube_ARI(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ALI):
-		raycast_cube_ALI(x__, y__, z__, raycastcube0, both);
+		raycast_cube_ALI(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PRS):
-		raycast_cube_PRS(x__, y__, z__, raycastcube0, both);
+		raycast_cube_PRS(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PLS):
-		raycast_cube_PLS(x__, y__, z__, raycastcube0, both);
+		raycast_cube_PLS(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ARS):
-		raycast_cube_ARS(x__, y__, z__, raycastcube0, both);
+		raycast_cube_ARS(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ALS):
-		raycast_cube_ALS(x__, y__, z__, raycastcube0, both);
+		raycast_cube_ALS(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IPR):
-		raycast_cube_IPR(x__, y__, z__, raycastcube0, both);
+		raycast_cube_IPR(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SPR):
-		raycast_cube_SPR(x__, y__, z__, raycastcube0, both);
+		raycast_cube_SPR(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IAR):
-		raycast_cube_IAR(x__, y__, z__, raycastcube0, both);
+		raycast_cube_IAR(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SAR):
-		raycast_cube_SAR(x__, y__, z__, raycastcube0, both);
+		raycast_cube_SAR(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IPL):
-		raycast_cube_IPL(x__, y__, z__, raycastcube0, both);
+		raycast_cube_IPL(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SPL):
-		raycast_cube_SPL(x__, y__, z__, raycastcube0, both);
+		raycast_cube_SPL(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IAL):
-		raycast_cube_IAL(x__, y__, z__, raycastcube0, both);
+		raycast_cube_IAL(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_SAL):
-		raycast_cube_SAL(x__, y__, z__, raycastcube0, both);
+		raycast_cube_SAL(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PIR):
-		raycast_cube_PIR(x__, y__, z__, raycastcube0, both);
+		raycast_cube_PIR(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PSR):
-		raycast_cube_PSR(x__, y__, z__, raycastcube0, both);
+		raycast_cube_PSR(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_AIR):
-		raycast_cube_AIR(x__, y__, z__, raycastcube0, both);
+		raycast_cube_AIR(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ASR):
-		raycast_cube_ASR(x__, y__, z__, raycastcube0, both);
+		raycast_cube_ASR(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PIL):
-		raycast_cube_PIL(x__, y__, z__, raycastcube0, both);
+		raycast_cube_PIL(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_PSL):
-		raycast_cube_PSL(x__, y__, z__, raycastcube0, both);
+		raycast_cube_PSL(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_AIL):
-		raycast_cube_AIL(x__, y__, z__, raycastcube0, both);
+		raycast_cube_AIL(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ASL):
-		raycast_cube_ASL(x__, y__, z__, raycastcube0, both);
+		raycast_cube_ASL(x__, y__, z__, rcube0, both);
 		break;
 #else
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIP):
-		raycast_cube_RIP(x__, y__, z__, raycastcube0, both);
+		raycast_cube_RIP(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LIP):
-		raycast_cube_LIP(x__, y__, z__, raycastcube0, both);
+		raycast_cube_LIP(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSP):
-		raycast_cube_RSP(x__, y__, z__, raycastcube0, both);
+		raycast_cube_RSP(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LSP):
-		raycast_cube_LSP(x__, y__, z__, raycastcube0, both);
+		raycast_cube_LSP(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIA):
-		raycast_cube_RIA(x__, y__, z__, raycastcube0, both);
+		raycast_cube_RIA(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LIA):
-		raycast_cube_LIA(x__, y__, z__, raycastcube0, both);
+		raycast_cube_LIA(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSA):
-		raycast_cube_RSA(x__, y__, z__, raycastcube0, both);
+		raycast_cube_RSA(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LSA):
-		raycast_cube_LSA(x__, y__, z__, raycastcube0, both);
+		raycast_cube_LSA(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IRP):
-		raycast_cube_IRP(x__, y__, z__, raycastcube0, both);
+		raycast_cube_IRP(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ILP):
-		raycast_cube_ILP(x__, y__, z__, raycastcube0, both);
+		raycast_cube_ILP(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SRP):
-		raycast_cube_SRP(x__, y__, z__, raycastcube0, both);
+		raycast_cube_SRP(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SLP):
-		raycast_cube_SLP(x__, y__, z__, raycastcube0, both);
+		raycast_cube_SLP(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IRA):
-		raycast_cube_IRA(x__, y__, z__, raycastcube0, both);
+		raycast_cube_IRA(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ILA):
-		raycast_cube_ILA(x__, y__, z__, raycastcube0, both);
+		raycast_cube_ILA(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SRA):
-		raycast_cube_SRA(x__, y__, z__, raycastcube0, both);
+		raycast_cube_SRA(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SLA):
-		raycast_cube_SLA(x__, y__, z__, raycastcube0, both);
+		raycast_cube_SLA(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RPI):
-		raycast_cube_RPI(x__, y__, z__, raycastcube0, both);
+		raycast_cube_RPI(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LPI):
-		raycast_cube_LPI(x__, y__, z__, raycastcube0, both);
+		raycast_cube_LPI(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI):
-		raycast_cube_RAI(x__, y__, z__, raycastcube0, both);
+		raycast_cube_RAI(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LAI):
-		raycast_cube_LAI(x__, y__, z__, raycastcube0, both);
+		raycast_cube_LAI(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RPS):
-		raycast_cube_RPS(x__, y__, z__, raycastcube0, both);
+		raycast_cube_RPS(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LPS):
-		raycast_cube_LPS(x__, y__, z__, raycastcube0, both);
+		raycast_cube_LPS(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAS):
-		raycast_cube_RAS(x__, y__, z__, raycastcube0, both);
+		raycast_cube_RAS(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LAS):
-		raycast_cube_LAS(x__, y__, z__, raycastcube0, both);
+		raycast_cube_LAS(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PRI):
-		raycast_cube_PRI(x__, y__, z__, raycastcube0, both);
+		raycast_cube_PRI(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PLI):
-		raycast_cube_PLI(x__, y__, z__, raycastcube0, both);
+		raycast_cube_PLI(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ARI):
-		raycast_cube_ARI(x__, y__, z__, raycastcube0, both);
+		raycast_cube_ARI(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ALI):
-		raycast_cube_ALI(x__, y__, z__, raycastcube0, both);
+		raycast_cube_ALI(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PRS):
-		raycast_cube_PRS(x__, y__, z__, raycastcube0, both);
+		raycast_cube_PRS(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PLS):
-		raycast_cube_PLS(x__, y__, z__, raycastcube0, both);
+		raycast_cube_PLS(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ARS):
-		raycast_cube_ARS(x__, y__, z__, raycastcube0, both);
+		raycast_cube_ARS(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ALS):
-		raycast_cube_ALS(x__, y__, z__, raycastcube0, both);
+		raycast_cube_ALS(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IPR):
-		raycast_cube_IPR(x__, y__, z__, raycastcube0, both);
+		raycast_cube_IPR(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SPR):
-		raycast_cube_SPR(x__, y__, z__, raycastcube0, both);
+		raycast_cube_SPR(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IAR):
-		raycast_cube_IAR(x__, y__, z__, raycastcube0, both);
+		raycast_cube_IAR(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SAR):
-		raycast_cube_SAR(x__, y__, z__, raycastcube0, both);
+		raycast_cube_SAR(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IPL):
-		raycast_cube_IPL(x__, y__, z__, raycastcube0, both);
+		raycast_cube_IPL(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SPL):
-		raycast_cube_SPL(x__, y__, z__, raycastcube0, both);
+		raycast_cube_SPL(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IAL):
-		raycast_cube_IAL(x__, y__, z__, raycastcube0, both);
+		raycast_cube_IAL(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SAL):
-		raycast_cube_SAL(x__, y__, z__, raycastcube0, both);
+		raycast_cube_SAL(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PIR):
-		raycast_cube_PIR(x__, y__, z__, raycastcube0, both);
+		raycast_cube_PIR(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PSR):
-		raycast_cube_PSR(x__, y__, z__, raycastcube0, both);
+		raycast_cube_PSR(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_AIR):
-		raycast_cube_AIR(x__, y__, z__, raycastcube0, both);
+		raycast_cube_AIR(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASR):
-		raycast_cube_ASR(x__, y__, z__, raycastcube0, both);
+		raycast_cube_ASR(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PIL):
-		raycast_cube_PIL(x__, y__, z__, raycastcube0, both);
+		raycast_cube_PIL(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PSL):
-		raycast_cube_PSL(x__, y__, z__, raycastcube0, both);
+		raycast_cube_PSL(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_AIL):
-		raycast_cube_AIL(x__, y__, z__, raycastcube0, both);
+		raycast_cube_AIL(x__, y__, z__, rcube0, both);
 		break;
 	case static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASL):
-		raycast_cube_ASL(x__, y__, z__, raycastcube0, both);
+		raycast_cube_ASL(x__, y__, z__, rcube0, both);
 		break;
 #endif
 	default:
 		force_skip_cube = true;
-		raycast_cube(x__, y__, z__, raycastcube0, both);
+		raycast_cube(x__, y__, z__, rcube0, both);
 		break;
 	}
 	return force_skip_cube;
@@ -3861,7 +3861,7 @@ void GLWidget::makeModelVBO_ArraysT(
 	GLuint * ta_attr,
 	const float * vertices,
 	const float * normals,
-	const float * textures,
+	const float * tex,
 	const float * tangents,
 	const unsigned int * faces,
 	const int faces_size,
@@ -3880,7 +3880,7 @@ void GLWidget::makeModelVBO_ArraysT(
 		if (!n) return;
 	}
 	float * t  = NULL; // initialized to avoid warning
-	if (textures)
+	if (tex)
 	{
 		try { t  = new float[(faces_size / 12) * 9]; }
 		catch (const std::bad_alloc&) { return; }
@@ -3908,11 +3908,11 @@ void GLWidget::makeModelVBO_ArraysT(
 		int t3  = *(faces + ind +  9);
 		int n3  = *(faces + ind + 10);
 		int ta3 = *(faces + ind + 11);
-		if (textures)
+		if (tex)
 		{
-			t[idx + 0] =  *(textures + 0 + (t1 - 1) * 3);
-			t[idx + 1] =  *(textures + 1 + (t1 - 1) * 3);
-			t[idx + 2] =  *(textures + 2 + (t1 - 1) * 3);
+			t[idx + 0] =  *(tex + 0 + (t1 - 1) * 3);
+			t[idx + 1] =  *(tex + 1 + (t1 - 1) * 3);
+			t[idx + 2] =  *(tex + 2 + (t1 - 1) * 3);
 		}
 		if (normals)
 		{
@@ -3929,11 +3929,11 @@ void GLWidget::makeModelVBO_ArraysT(
 		v[idx + 0] = *(vertices + 0 + (c1 - 1) * 3) * scale;
 		v[idx + 1] = *(vertices + 1 + (c1 - 1) * 3) * scale;
 		v[idx + 2] = *(vertices + 2 + (c1 - 1) * 3) * scale;
-		if (textures)
+		if (tex)
 		{
-			t[idx + 3] = *(textures + 0 + (t2 - 1) * 3);
-			t[idx + 4] = *(textures + 1 + (t2 - 1) * 3);
-			t[idx + 5] = *(textures + 2 + (t2 - 1) * 3);
+			t[idx + 3] = *(tex + 0 + (t2 - 1) * 3);
+			t[idx + 4] = *(tex + 1 + (t2 - 1) * 3);
+			t[idx + 5] = *(tex + 2 + (t2 - 1) * 3);
 		}
 		if (normals)
 		{
@@ -3950,11 +3950,11 @@ void GLWidget::makeModelVBO_ArraysT(
 		v[idx + 3] = *(vertices + 0 + (c2 - 1) * 3) * scale;
 		v[idx + 4] = *(vertices + 1 + (c2 - 1) * 3) * scale;
 		v[idx + 5] = *(vertices + 2 + (c2 - 1) * 3) * scale;
-		if (textures)
+		if (tex)
 		{
-			t[idx + 6] = *(textures + 0 + (t3 - 1) * 3);
-			t[idx + 7] = *(textures + 1 + (t3 - 1) * 3);
-			t[idx + 8] = *(textures + 2 + (t3 - 1) * 3);
+			t[idx + 6] = *(tex + 0 + (t3 - 1) * 3);
+			t[idx + 7] = *(tex + 1 + (t3 - 1) * 3);
+			t[idx + 8] = *(tex + 2 + (t3 - 1) * 3);
 		}
 		if (normals)
 		{
@@ -3979,7 +3979,7 @@ void GLWidget::makeModelVBO_ArraysT(
 	vboid[3] = 0;
 	unsigned int count_buffers = 1;
 	if (normals)  ++count_buffers;
-	if (textures) ++count_buffers;
+	if (tex) ++count_buffers;
 	if (tangents) ++count_buffers;
 	glGenVertexArrays(1, vaoid);
 	glBindVertexArray(*vaoid);
@@ -3995,7 +3995,7 @@ void GLWidget::makeModelVBO_ArraysT(
 		glVertexAttribPointer(*n_attr, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(*n_attr);
 	}
-	if (textures)
+	if (tex)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vboid[2]);
 		glBufferData(GL_ARRAY_BUFFER, (faces_size / 12 ) * 9 * sizeof(float), t, usage);
@@ -4015,7 +4015,7 @@ void GLWidget::makeModelVBO_ArraysT(
 	vaoids.push_back(*vaoid);
 	delete [] v;
 	if (normals)  delete [] n;
-	if (textures) delete [] t;
+	if (tex) delete [] t;
 	if (tangents) delete [] ta;
 }
 
@@ -4060,11 +4060,11 @@ void GLWidget::generate_screen_quad(GLuint * vbo, GLuint * vao, GLuint * attr)
 }
 
 void GLWidget::free_fbos0(
-	GLuint * framebuffer,
+	GLuint * fb,
 	GLuint * color_texture,
 	GLuint * depth_texture)
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, *framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, *fb);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,  GL_TEXTURE_2D, 0, 0);
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -4072,7 +4072,7 @@ void GLWidget::free_fbos0(
 #else
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #endif
-	glDeleteFramebuffers(1, framebuffer);
+	glDeleteFramebuffers(1, fb);
 	glDeleteTextures(1, color_texture);
 	glDeleteTextures(1, depth_texture);
 }
@@ -4080,7 +4080,7 @@ void GLWidget::free_fbos0(
 bool GLWidget::create_fbos0(
 	unsigned int w,
 	unsigned int h,
-	GLuint * framebuffer,
+	GLuint * fb,
 	GLuint * color_texture,
 	GLuint * depth_texture,
 	GLenum   format,
@@ -4109,8 +4109,8 @@ bool GLWidget::create_fbos0(
 	glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexImage2D(target, 0, format, w, h, 0, format, type, NULL);
-	glGenFramebuffers(1, framebuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, *framebuffer);
+	glGenFramebuffers(1, fb);
+	glBindFramebuffer(GL_FRAMEBUFFER, *fb);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target, *color_texture, 0);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,  target, *depth_texture, 0);
 	bool ok = false;
@@ -4131,18 +4131,18 @@ bool GLWidget::create_fbos0(
 }
 
 void GLWidget::free_fbos1(
-	GLuint * framebuffer,
+	GLuint * fb,
 	GLuint * color_texture,
 	GLuint * depth_rb)
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, *framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, *fb);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
 #else
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #endif
-	glDeleteFramebuffers(1, framebuffer);
+	glDeleteFramebuffers(1, fb);
 	glDeleteTextures(1, color_texture);
 	glDeleteRenderbuffers(1, depth_rb);
 }
@@ -4150,7 +4150,7 @@ void GLWidget::free_fbos1(
 bool GLWidget::create_fbos1(
 	unsigned int   w,
 	unsigned int   h,
-	GLuint * framebuffer,
+	GLuint * fb,
 	GLuint * color_texture,
 	GLuint * depth_rb,
 	GLenum   format,
@@ -4160,8 +4160,8 @@ bool GLWidget::create_fbos1(
 	glGenRenderbuffers(1, depth_rb);
 	glBindRenderbuffer(GL_RENDERBUFFER, *depth_rb);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, w, h);
-	glGenFramebuffers(1, framebuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, *framebuffer);
+	glGenFramebuffers(1, fb);
+	glBindFramebuffer(GL_FRAMEBUFFER, *fb);
 	glGenTextures(1, color_texture);
 	glBindTexture(target, *color_texture);
 	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -6811,11 +6811,11 @@ void GLWidget::d_orientcube(
 	float * ,
 	float * ,
 	float * ,
-	float * sparams,
+	float * sp,
 	void  * )
 {
 	glUniformMatrix4fv(s->shader->location_mvp, 1, GL_FALSE, mvp);
-	glUniform3fv(s->shader->location_sparams, 2, sparams);
+	glUniform3fv(s->shader->location_sparams, 2, sp);
 	glBindVertexArray(s->vaoid);
 	glDrawArrays(GL_TRIANGLES, 0, s->faces_size * 3);
 }
@@ -6832,11 +6832,11 @@ void GLWidget::d_mesh(
 	float * ,
 	float * ,
 	float * ,
-	float * sparams,
+	float * sp,
 	void  * )
 {
 	glUniformMatrix4fv(s->shader->location_mvp, 1, GL_FALSE, mvp);
-	glUniform3fv(s->shader->location_sparams, 2, sparams);
+	glUniform3fv(s->shader->location_sparams, 2, sp);
 	glUniform4fv(s->shader->location_K, 2, s->K);
 	glBindVertexArray(s->vaoid);
 	glDrawArrays(GL_TRIANGLES, 0, s->faces_size * 3);
