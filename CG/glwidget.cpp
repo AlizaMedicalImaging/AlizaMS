@@ -397,11 +397,11 @@ void GLWidget::mouseMoveEvent(QMouseEvent * e)
 	{
 		const QPoint p = e->pos();
 		const int dy = lastPosScale.y() - p.y();
-		const float  tmp0 = ortho_size - static_cast<float>(dy);
-		const double tmp1 = position_z - static_cast<double>(dy);
+		const float tmp0 = ortho_size - static_cast<float>(dy);
+		const float tmp1 = position_z - static_cast<float>(dy);
 		if (tmp0 < 0.001f) ortho_size = 0.001f;
 		else ortho_size = tmp0;
-		if (tmp1 < 0.001) position_z = 0.001;
+		if (tmp1 < 0.001f) position_z = 0.001f;
 		else position_z = tmp1;
 		lastPosScale = p;
 		update_ = true;
@@ -440,7 +440,7 @@ void GLWidget::wheelEvent(QWheelEvent * e)
 		position_z -= incr;
 	}
 	if (ortho_size < 0.001f) ortho_size = 0.001f;
-	if (position_z < 0.001)  position_z = 0.001;
+	if (position_z < 0.001f) position_z = 0.001f;
 	updateGL();
 }
 
@@ -535,37 +535,37 @@ void GLWidget::set_display_contours(bool t)
 
 void GLWidget::zoom_in()
 {
-	double incr = 4.0;
+	float incr = 4.0f;
 	if (Qt::ControlModifier==QApplication::keyboardModifiers())
 	{
-		incr = 0.1;
+		incr = 0.1f;
 	}
 	else if (Qt::ShiftModifier==QApplication::keyboardModifiers())
 	{
-		incr = 25.0;
+		incr = 25.0f;
 	}
-	ortho_size -= static_cast<float>(incr);
+	ortho_size -= incr;
 	position_z -= incr;
 	if (ortho_size < 0.001f) ortho_size = 0.001f;
-	if (position_z < 0.001)  position_z = 0.001;
+	if (position_z < 0.001f) position_z = 0.001f;
 	updateGL();
 }
 
 void GLWidget::zoom_out()
 {
-	double incr = 4.0;
+	float incr = 4.0f;
 	if (Qt::ControlModifier==QApplication::keyboardModifiers())
 	{
-		incr = 0.1;
+		incr = 0.1f;
 	}
 	else if (Qt::ShiftModifier==QApplication::keyboardModifiers())
 	{
-		incr = 25.0;
+		incr = 25.0f;
 	}
-	ortho_size += static_cast<float>(incr);
+	ortho_size += incr;
 	position_z += incr;
 	if (ortho_size < 0.001f) ortho_size = 0.001f;
-	if (position_z < 0.001)  position_z = 0.001;
+	if (position_z < 0.001f) position_z = 0.001f;
 	updateGL();
 }
 
@@ -1754,9 +1754,9 @@ void GLWidget::paint_raycaster()
 		warn2 = true;
 	}
 	//
-	const float x__ = static_cast<float>(di->idimx) * static_cast<float>(di->ix_spacing) * 0.5f;
-	const float y__ = static_cast<float>(di->idimy) * static_cast<float>(di->iy_spacing) * 0.5f;
-	const float z__ = static_cast<float>(di->idimz) * static_cast<float>(di->iz_spacing) * 0.5f;
+	const float x__ = di->idimx * static_cast<float>(di->ix_spacing) * 0.5f;
+	const float y__ = di->idimy * static_cast<float>(di->iy_spacing) * 0.5f;
+	const float z__ = di->idimz * static_cast<float>(di->iz_spacing) * 0.5f;
 	const unsigned int orientation = selected_images__->at(0)->orientation;
 	const bool force_skip_cube = update_raycast_shader_vbo(
 		orientation,
@@ -1780,19 +1780,20 @@ void GLWidget::paint_raycaster()
 	//
 	if (ortho_proj)
 	{
-		camera->orthographic(-ortho_size * asp, ortho_size*asp,
-						-ortho_size, ortho_size,
-						-far_plane, far_plane);
+		camera->orthographic(
+			-ortho_size * asp, ortho_size * asp,
+			-ortho_size, ortho_size,
+			-far_plane, far_plane);
 		const float d_ortho = ortho_size / SCENE_ORTHO_SIZE;
-		dx__ = static_cast<float>(pan_x) * d_ortho;
-		dy__ = static_cast<float>(pan_y) * d_ortho;
+		dx__ = pan_x * d_ortho;
+		dy__ = pan_y * d_ortho;
 	}
 	else
 	{
 		camera->perspective(CAMERA_D2R * fov, asp, 0.01f, far_plane);
 		const float d_persp = fabs(position_z) / SCENE_POS_Z;
-		dx__ = static_cast<float>(pan_x) * d_persp;
-		dy__ = static_cast<float>(pan_y) * d_persp;
+		dx__ = pan_x * d_persp;
+		dy__ = pan_y * d_persp;
 	}
 	camera->set_trackball_pan_matrix(
 		0.8f,
@@ -3177,12 +3178,12 @@ void GLWidget::render_orient_cube2()
 	glEnable(GL_DEPTH_TEST);
 }
 
-void GLWidget::update_screen_size(double delta)
+void GLWidget::update_screen_size(float d)
 {
-	if (delta > 0)
+	if (d > 0)
 	{
-		ortho_size = 0.5 * (delta + delta * 0.1);
-		position_z = 1.5 * delta;
+		ortho_size = 0.5f * (d + (d * 0.1f));
+		position_z = 1.5f * d;
 	}
 	else
 	{
@@ -3207,7 +3208,7 @@ void GLWidget::fit_to_screen(const ImageVariant * ivariant)
 {
 	if (!ivariant)
 	{
-		update_screen_size(-1);
+		update_screen_size(-1.0f);
 		return;
 	}
 	if (ivariant->image_type == 200)
@@ -3225,7 +3226,7 @@ void GLWidget::fit_to_screen(const ImageVariant * ivariant)
 				max_delta = mi.value()->max_delta;
 			++mi;
 		}
-		update_screen_size(max_delta);
+		update_screen_size(static_cast<float>(max_delta));
 	}
 	else if (ivariant->image_type == 100)
 	{
@@ -3235,7 +3236,7 @@ void GLWidget::fit_to_screen(const ImageVariant * ivariant)
 			if (ivariant->di->rois.at(x).max_delta > max_delta)
 				max_delta = ivariant->di->rois.at(x).max_delta;
 		}
-		update_screen_size(max_delta);
+		update_screen_size(static_cast<float>(max_delta));
 	}
 	else if (ivariant->image_type >= 0 && ivariant->image_type <= 30)
 	{
@@ -3249,11 +3250,11 @@ void GLWidget::fit_to_screen(const ImageVariant * ivariant)
 		const double delta_z = ivariant->di->idimz * ivariant->di->iz_spacing;
 		const double tmp0 = (delta_x > delta_y) ? delta_x : delta_y;
 		const double max_delta = (tmp0 > delta_z) ? tmp0 : delta_z;
-		update_screen_size(max_delta);
+		update_screen_size(static_cast<float>(max_delta));
 	}
 	else
 	{
-		update_screen_size(-1);
+		update_screen_size(-1.0f);
 	}
 }
 

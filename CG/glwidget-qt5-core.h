@@ -155,7 +155,7 @@ public:
 	int   normalize_angle(int);
 	int   x_rotation, y_rotation, z_rotation;
 	float ortho_size;
-	double position_z;
+	float position_z;
 	void draw_3d_tex1(
 		GLuint*,
 		GLuint*,
@@ -204,7 +204,7 @@ public:
 	int pan_x;
 	int pan_y;
 	void set_pan_delta(int, int);
-	void update_screen_size(double);
+	void update_screen_size(float);
 	void update_far_plane(float);
 	void fit_to_screen(const ImageVariant*);
 	//

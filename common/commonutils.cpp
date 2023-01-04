@@ -2272,7 +2272,6 @@ void CommonUtils::generate_cubeslice(
 			const double * ipp_iop)
 {
 	ImageSlice * cs = new ImageSlice;
-	const float fz = static_cast<float>(z);
 	cs->v[ 0]  = x0;
 	cs->v[ 1]  = y0;
 	cs->v[ 2]  = z0;
@@ -2287,16 +2286,16 @@ void CommonUtils::generate_cubeslice(
 	cs->v[11]  = z3;
 	cs->tc[ 0] = 0.0f;
 	cs->tc[ 1] = 1.0f;
-	cs->tc[ 2] = fz/static_cast<float>(dimz-1);
+	cs->tc[ 2] = z / static_cast<float>(dimz-1);
 	cs->tc[ 3] = 0.0f;
 	cs->tc[ 4] = 0.0f;
-	cs->tc[ 5] = fz/static_cast<float>(dimz-1);
+	cs->tc[ 5] = z / static_cast<float>(dimz-1);
 	cs->tc[ 6] = 1.0f;
 	cs->tc[ 7] = 1.0f;
-	cs->tc[ 8] = fz/static_cast<float>(dimz-1);
+	cs->tc[ 8] = z / static_cast<float>(dimz-1);
 	cs->tc[ 9] = 1.0f;
 	cs->tc[10] = 0.0f;
-	cs->tc[11] = fz/static_cast<float>(dimz-1);
+	cs->tc[11] = z / static_cast<float>(dimz-1);
 	cs->fv[ 0] = x0;
 	cs->fv[ 1] = y0;
 	cs->fv[ 2] = z0;
