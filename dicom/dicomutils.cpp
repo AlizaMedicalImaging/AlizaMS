@@ -7630,11 +7630,7 @@ QString DicomUtils::read_series(
 		false);
 	for (unsigned int x = 0; x < data.size(); ++x)
 	{
-		if (data.at(x))
-		{
-			delete [] data[x];
-			data[x] = NULL;
-		}
+		delete [] data[x];
 	}
 	data.clear();
 	if (*ok == true) IconUtils::icon(ivariant);

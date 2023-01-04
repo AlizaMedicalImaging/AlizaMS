@@ -964,7 +964,9 @@ template<typename T> void read_geometry_from_image(
 			last = sVector3(x0, y0, z0);
 		}
 		const double ipp_iop[9] = {
-			(double)x1, (double)y1, (double)z1,
+			static_cast<double>(x1),
+			static_cast<double>(y1),
+			static_cast<double>(z1),
 			d1, d2, d3, d4, d5, d6 };
 		CommonUtils::generate_cubeslice(
 			ivariant->di->image_slices,
@@ -1063,7 +1065,7 @@ template <typename T> bool reload_monochrome_image(
 	spacing = image->GetSpacing();
 	//
 	if (max_3d_tex_size > 0 &&
-		max_3d_tex_size < (int)size[2])
+		max_3d_tex_size < static_cast<int>(size[2]))
 		ivariant->di->skip_texture = true;
 	if (size[0]==1 || size[1]==1)
 		ivariant->di->skip_texture = true;
@@ -1090,24 +1092,24 @@ template <typename T> bool reload_monochrome_image(
 		size_y = size[1];
 	}
 	size_z = size[2];
-	if (size_x > (size_t)max_3d_tex_size) size_x = max_3d_tex_size;
-	if (size_y > (size_t)max_3d_tex_size) size_y = max_3d_tex_size;
-	if (size_z > (size_t)max_3d_tex_size) size_z = max_3d_tex_size;
-	fx = (double)size_x/(double)size[0];
+	if (size_x > static_cast<size_t>(max_3d_tex_size)) size_x = max_3d_tex_size;
+	if (size_y > static_cast<size_t>(max_3d_tex_size)) size_y = max_3d_tex_size;
+	if (size_z > static_cast<size_t>(max_3d_tex_size)) size_z = max_3d_tex_size;
+	fx = size_x/static_cast<double>(size[0]);
 	size[0] *= fx;
 	spacing[0] *= 1.0/fx;
-	fy = (double)size_y/(double)size[1];
+	fy = size_y/static_cast<double>(size[1]);
 	size[1] *= fy;
 	spacing[1] *= 1.0/fy;
-	fz = (double)size_z/(double)size[2];
+	fz = size_z/static_cast<double>(size[2]);
 	size[2] *= fz;
 	spacing[2] *= 1.0/fz;
 	isize[0] = size[0];
 	isize[1] = size[1];
 	isize[2] = size[2];
-	dspacing[0] = spacing[0];
-	dspacing[1] = spacing[1];
-	dspacing[2] = spacing[2];
+	dspacing[0] = static_cast<double>(spacing[0]);
+	dspacing[1] = static_cast<double>(spacing[1]);
+	dspacing[2] = static_cast<double>(spacing[2]);
 	//
 	bool ok = false;
 	if (ok3d)
@@ -1740,7 +1742,7 @@ template<typename T> QString process_dicom_rgba_image1(
 							//
 							// FIXME
 							const float tmp_max = 255.0f;
-							const float alpha = static_cast<float>(p__[j+3]/tmp_max);
+							const float alpha = static_cast<float>(p__[j+3])/tmp_max;
 							const float one_minus_alpha = 1.0f - alpha;
 							const float tmp_oth = one_minus_alpha*0;
 							const float tmp_red = tmp_oth + alpha*static_cast<float>(p__[j+0]);
@@ -1812,7 +1814,7 @@ QString apply_per_slice_rescale_(
 	const size_t size_x = size[0];
 	const size_t size_y = size[1];
 	const size_t size_z = size[2];
-	if (size_z != (size_t)rescale_values.size())
+	if (size_z != static_cast<size_t>(rescale_values.size()))
 		return QString("size_z != rescale_values.size()");
 	try
 	{
@@ -5054,14 +5056,14 @@ template<typename T> double get_value(
 	idx[0] = x;
 	idx[1] = y;
 	idx[2] = z;
-	double r = 0;
+	double r = 0.0;
 	try
 	{
-		r = image->GetPixel(idx);
+		r = static_cast<double>(image->GetPixel(idx));
 	}
 	catch (const itk::ExceptionObject &)
 	{
-		r = 0;
+		;
 	}
 	return r;
 }
