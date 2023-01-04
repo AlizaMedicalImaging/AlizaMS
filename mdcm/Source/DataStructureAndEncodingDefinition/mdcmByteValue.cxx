@@ -176,7 +176,7 @@ const void *
 ByteValue::GetVoidPointer() const
 {
   if (!Internal.empty())
-    return &Internal[0];
+    return static_cast<const void *>(&Internal[0]);
   return NULL;
 }
 
@@ -184,7 +184,7 @@ void *
 ByteValue::GetVoidPointer()
 {
   if (!Internal.empty())
-    return &Internal[0];
+    return static_cast<void *>(&Internal[0]);
   return NULL;
 }
 
