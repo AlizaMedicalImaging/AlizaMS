@@ -400,7 +400,7 @@ Overlay::GetOverlayTypeFromString(const char * s)
     {
       if (strcmp(s, OverlayTypeStrings[i]) == 0)
       {
-        return (OverlayType)i;
+        return static_cast<OverlayType>(i);
       }
     }
   }
@@ -412,7 +412,7 @@ Overlay::GetOverlayTypeFromString(const char * s)
       if (strncmp(s, OverlayTypeStrings[i], 1) == 0)
       {
         mdcmDebugMacro("Invalid Padding for OVerlay Type");
-        return (OverlayType)i;
+        return static_cast<OverlayType>(i);
       }
     }
   }
@@ -552,9 +552,9 @@ Overlay::GetUnpackBufferLength() const
 {
   if (Internal->NumberOfFrames > 0)
   {
-    return ((size_t)Internal->Rows * Internal->Columns * Internal->NumberOfFrames);
+    return (static_cast<size_t>(Internal->Rows) * Internal->Columns * Internal->NumberOfFrames);
   }
-  return ((size_t)Internal->Rows * Internal->Columns);
+  return (static_cast<size_t>(Internal->Rows) * Internal->Columns);
 }
 
 bool

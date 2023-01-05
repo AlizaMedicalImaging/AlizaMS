@@ -93,7 +93,7 @@ template <>
 inline int16_t
 SwapperNoOp::Swap<int16_t>(int16_t val)
 {
-  return Swap((uint16_t)val);
+  return Swap(static_cast<uint16_t>(val));
 }
 
 template <>
@@ -107,7 +107,7 @@ template <>
 inline int32_t
 SwapperNoOp::Swap<int32_t>(int32_t val)
 {
-  return Swap((uint32_t)val);
+  return Swap(static_cast<uint32_t>(val));
 }
 
 template <>
@@ -133,7 +133,7 @@ template <>
 inline int64_t
 SwapperNoOp::Swap<int64_t>(int64_t val)
 {
-  return Swap((uint64_t)val);
+  return Swap(static_cast<uint64_t>(val));
 }
 
 template <>
@@ -187,7 +187,7 @@ template <>
 inline int16_t
 SwapperDoOp::Swap<int16_t>(int16_t val)
 {
-  return Swap((uint16_t)val);
+  return Swap(static_cast<uint16_t>(val));
 }
 
 template <>
@@ -201,7 +201,7 @@ template <>
 inline int32_t
 SwapperDoOp::Swap<int32_t>(int32_t val)
 {
-  return Swap((uint32_t)val);
+  return Swap(static_cast<uint32_t>(val));
 }
 
 template <>
@@ -227,7 +227,7 @@ template <>
 inline int64_t
 SwapperDoOp::Swap<int64_t>(int64_t val)
 {
-  return Swap((uint64_t)val);
+  return Swap(static_cast<uint64_t>(val));
 }
 
 template <>

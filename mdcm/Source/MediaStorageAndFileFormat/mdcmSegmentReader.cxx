@@ -85,7 +85,7 @@ SegmentReader::Read()
   {
     const char *    modality = ms.GetModality();
     const DataSet & dsRoot = F->GetDataSet();
-    if (modality != 0)
+    if (modality != NULL)
     {
       String<> modalityStr(modality);
       if (modalityStr.Trim() == "SEG")
@@ -184,7 +184,7 @@ SegmentReader::ReadSegment(const Item & segmentItem, const unsigned int idx)
   }
   else
   {
-    segment->SetSegmentNumber((unsigned short)idx);
+    segment->SetSegmentNumber(static_cast<unsigned short>(idx));
   }
   // Segment Label
   Attribute<0x0062, 0x0005> segmentLabelAt;

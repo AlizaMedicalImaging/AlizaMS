@@ -119,7 +119,7 @@ Tag::GetPrivateCreator() const
   if (IsPrivate() && !IsPrivateCreator())
   {
     Tag r = *this;
-    r.SetElement((uint16_t)(GetElement() >> 8));
+    r.SetElement(static_cast<uint16_t>(GetElement() >> 8));
     return r;
   }
   if (IsPrivateCreator())
@@ -133,9 +133,9 @@ Tag::SetPrivateCreator(Tag const & t)
   // See PS 3.5 - 7.8.1 PRIVATE DATA ELEMENT TAGS
   // eg: 0x0123,0x0045 -> 0x0123,0x4567
   assert(t.IsPrivate());
-  const uint16_t element = (uint16_t)(t.GetElement() << 8);
-  const uint16_t base = (uint16_t)(GetElement() << 8);
-  SetElement((uint16_t)((base >> 8) + element));
+  const uint16_t element = static_cast<uint16_t>(t.GetElement() << 8);
+  const uint16_t base = static_cast<uint16_t>(GetElement() << 8);
+  SetElement(static_cast<uint16_t>((base >> 8) + element));
   SetGroup(t.GetGroup());
 }
 
@@ -169,7 +169,7 @@ Tag::IsGroupXX(const Tag & t) const
   {
     if (t.IsPrivate())
       return false;
-    uint16_t group = (uint16_t)((GetGroup() >> 8) << 8);
+    uint16_t group = static_cast<uint16_t>((GetGroup() >> 8) << 8);
     return group == t.GetGroup();
   }
   return false;
@@ -189,8 +189,8 @@ Tag::ReadFromCommaSeparatedString(const char * str)
     mdcmDebugMacro("Problem reading Tag: " << str);
     return false;
   }
-  SetGroup((uint16_t)group);
-  SetElement((uint16_t)element);
+  SetGroup(static_cast<uint16_t>(group));
+  SetElement(static_cast<uint16_t>(element));
   return true;
 }
 
@@ -206,8 +206,8 @@ Tag::ReadFromContinuousString(const char * str)
     mdcmDebugMacro("Problem reading Tag: " << str);
     return false;
   }
-  SetGroup((uint16_t)group);
-  SetElement((uint16_t)element);
+  SetGroup(static_cast<uint16_t>(group));
+  SetElement(static_cast<uint16_t>(element));
   return true;
 }
 
@@ -222,8 +222,8 @@ Tag::ReadFromPipeSeparatedString(const char * str)
     mdcmDebugMacro("Problem reading Tag: " << str);
     return false;
   }
-  SetGroup((uint16_t)group);
-  SetElement((uint16_t)element);
+  SetGroup(static_cast<uint16_t>(group));
+  SetElement(static_cast<uint16_t>(element));
   return true;
 }
 

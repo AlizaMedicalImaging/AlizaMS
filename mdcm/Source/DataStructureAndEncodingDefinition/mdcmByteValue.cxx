@@ -35,7 +35,7 @@ ByteValue::ByteValue(const char * array, const VL & vl)
 {
   if (vl.IsOdd())
   {
-    mdcmDebugMacro("Resized odd length " << (unsigned int)vl << ", " << array);
+    mdcmDebugMacro("Resized odd length " << static_cast<unsigned int>(vl) << ", " << array);
     Internal.resize(vl + 1);
     ++Length;
   }
@@ -43,7 +43,7 @@ ByteValue::ByteValue(const char * array, const VL & vl)
 
 ByteValue::ByteValue(std::vector<char> & v)
   : Internal(v)
-  , Length((uint32_t)v.size())
+  , Length(static_cast<uint32_t>(v.size()))
 {}
 
 ByteValue::~ByteValue()
@@ -67,7 +67,7 @@ ByteValue::PrintASCII(std::ostream & os, VL maxlength) const
   for (; it != Internal.cbegin() + length; ++it)
   {
     const char & c = *it;
-    if (!(isprint((unsigned char)c) || isspace((unsigned char)c)))
+    if (!(isprint(static_cast<unsigned char>(c)) || isspace(static_cast<unsigned char>(c))))
       os << ".";
     else
       os << c;
@@ -87,7 +87,7 @@ ByteValue::PrintHex(std::ostream & os, VL maxlength) const
     uint8_t v = *it;
     if (it != Internal.begin())
       os << "\\";
-    os << std::setw(2) << std::setfill('0') << (uint16_t)v;
+    os << std::setw(2) << std::setfill('0') << static_cast<uint16_t>(v);
   }
   os << std::dec;
   os.copyfmt(oldState);

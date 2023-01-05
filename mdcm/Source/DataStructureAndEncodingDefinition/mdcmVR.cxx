@@ -262,7 +262,7 @@ VR::GetIndex(VRType vr)
       break;
     default:
     {
-      long long a = (long long)vr;
+      long long a = static_cast<long long>(vr);
       for (; a > 1; ++l)
         a >>= 1LL;
       l++;
@@ -302,7 +302,7 @@ VR::GetVRTypeFromFile(const char * vr)
     const char * ref = VRStrings[i];
     if (ref[0] == vr[0] && ref[1] == vr[1])
     {
-      r = (VRType)(1LL << (i - 1));
+      r = static_cast<VRType>(1LL << (i - 1));
       break;
     }
   }
@@ -352,7 +352,7 @@ VR::GetVRType(const char * vr)
           break;
         default:
           assert(vr[2] == 0);
-          r = (VRType)(1LL << (i - 1));
+          r = static_cast<VRType>(1LL << (i - 1));
       }
       break;
     }
@@ -396,7 +396,7 @@ VR::IsSwap(const char * vr)
 
 #define VRTemplateCase(type, rep) \
   case VR::type: \
-    return (VR::VRType)VRToEncoding<VR::type>::Mode  \
+    return static_cast<VR::VRType>(VRToEncoding<VR::type>::Mode) \
        == VR::rep;
 
 #define VRTemplate(rep) \

@@ -126,7 +126,7 @@ basic_zip_streambuf<charT, traits>::overflow(int_type c)
   int w = static_cast<int>(this->pptr() - this->pbase());
   if (c != EOF)
   {
-    *this->pptr() = (char)c;
+    *this->pptr() = static_cast<char>(c);
     ++w;
   }
   if (zip_to_stream(this->pbase(), w))
@@ -164,7 +164,7 @@ basic_zip_streambuf<charT, traits>::flush(void)
       written_byte_size = static_cast<std::streamsize>(_output_buffer.size()) - _zip_stream.avail_out;
       total_written_byte_size += written_byte_size;
       // Ouput buffer is full, dumping to ostream
-      _ostream.write((const char_type *)&(_output_buffer[0]),
+      _ostream.write(reinterpret_cast<const char_type *>(&_output_buffer[0]),
                      static_cast<std::streamsize>(written_byte_size / sizeof(char_type) * sizeof(char)));
 
       // Checking if some bytes were not written.
@@ -174,7 +174,7 @@ basic_zip_streambuf<charT, traits>::flush(void)
         std::streamsize theDiff = written_byte_size - remainder;
         // assert (theDiff > 0 && theDiff < std::numeric_limits<unsigned int>::max());
 
-        memcpy(&(_output_buffer[0]), &(_output_buffer[(unsigned int)theDiff]), remainder);
+        memcpy(&(_output_buffer[0]), &(_output_buffer[static_cast<unsigned int>(theDiff)]), remainder);
       }
 
       _zip_stream.avail_out = static_cast<uInt>(_output_buffer.size() - remainder);
@@ -233,7 +233,7 @@ basic_zip_streambuf<charT, traits>::zip_to_stream(char_type * buffer, std::strea
 {
   std::streamsize written_byte_size = 0, total_written_byte_size = 0;
 
-  _zip_stream.next_in = (byte_buffer_type)buffer;
+  _zip_stream.next_in = reinterpret_cast<byte_buffer_type>(buffer);
   _zip_stream.avail_in = static_cast<uInt>(buffer_size * sizeof(char_type));
   _zip_stream.avail_out = static_cast<uInt>(_output_buffer.size());
   _zip_stream.next_out = &_output_buffer[0];
@@ -252,7 +252,7 @@ basic_zip_streambuf<charT, traits>::zip_to_stream(char_type * buffer, std::strea
       total_written_byte_size += written_byte_size;
       // Ouput buffer is full, dumping to ostream
 
-      _ostream.write((const char_type *)&_output_buffer[0],
+      _ostream.write(reinterpret_cast<const char_type *>(&_output_buffer[0]),
                      static_cast<std::streamsize>(written_byte_size / sizeof(char_type)));
 
       // Checking if some bytes were not written.
@@ -261,7 +261,7 @@ basic_zip_streambuf<charT, traits>::zip_to_stream(char_type * buffer, std::strea
         // Copy to the beginning of the stream
         std::streamsize theDiff = written_byte_size - remainder;
         // assert(theDiff > 0 && theDiff < std::numeric_limits<unsigned int>::max());
-        memcpy(&_output_buffer[0], &_output_buffer[(unsigned int)theDiff], remainder);
+        memcpy(&_output_buffer[0], &_output_buffer[static_cast<unsigned int>(theDiff)], remainder);
       }
 
       _zip_stream.avail_out = static_cast<uInt>(_output_buffer.size() - remainder);
@@ -409,7 +409,7 @@ template <class charT, class traits>
 inline std::streamsize
 basic_unzip_streambuf<charT, traits>::unzip_from_stream(char_type * buffer, std::streamsize buffer_size)
 {
-  _zip_stream.next_out = (byte_buffer_type)buffer;
+  _zip_stream.next_out = reinterpret_cast<byte_buffer_type>(buffer);
   _zip_stream.avail_out = static_cast<uInt>(buffer_size * sizeof(char_type));
   size_t count = _zip_stream.avail_in;
 
@@ -424,11 +424,11 @@ basic_unzip_streambuf<charT, traits>::unzip_from_stream(char_type * buffer, std:
     }
   } while (_err == Z_OK && _zip_stream.avail_out != 0 && count != 0);
 
-  std::streamsize theSize = buffer_size - ((std::streamsize)_zip_stream.avail_out) / sizeof(char_type);
+  std::streamsize theSize = buffer_size - (static_cast<std::streamsize>(_zip_stream.avail_out)) / sizeof(char_type);
   // assert (theSize >= 0 && theSize < std::numeric_limits<uInt>::max());
 
   // Updating crc
-  _crc = crc32(_crc, (byte_buffer_type)buffer, static_cast<uInt>(theSize));
+  _crc = crc32(_crc, reinterpret_cast<byte_buffer_type>(buffer), static_cast<uInt>(theSize));
 
   std::streamsize n_read = buffer_size - _zip_stream.avail_out / sizeof(char_type);
 
@@ -444,7 +444,7 @@ inline size_t
 basic_unzip_streambuf<charT, traits>::fill_input_buffer(void)
 {
   _zip_stream.next_in = &_input_buffer[0];
-  _istream.read((char_type *)&_input_buffer[0], static_cast<std::streamsize>(_input_buffer.size() / sizeof(char_type)));
+  _istream.read(reinterpret_cast<char_type *>(&_input_buffer[0]), static_cast<std::streamsize>(_input_buffer.size() / sizeof(char_type)));
   std::streamsize nbytesread = _istream.gcount() * sizeof(char_type);
   if (!_istream)
   {
@@ -453,8 +453,8 @@ basic_unzip_streambuf<charT, traits>::fill_input_buffer(void)
       // Ok so we reached the end of file, since we did not read no header
       // we have to explicitly tell zlib the compress stream ends, therefore
       // we add an extra \0 character...it may not always be needed...
-      assert(nbytesread < (std::streamsize)(_input_buffer.size() / sizeof(char_type)));
-      _input_buffer[(unsigned int)nbytesread] = 0;
+      assert(nbytesread < static_cast<std::streamsize>(_input_buffer.size() / sizeof(char_type)));
+      _input_buffer[static_cast<unsigned int>(nbytesread)] = 0;
       ++nbytesread;
     }
   }
@@ -558,14 +558,14 @@ basic_zip_ostream<charT, traits>::add_footer(void)
   unsigned long crc = this->get_crc();
   for (int n = 0; n < 4; ++n)
   {
-    this->get_ostream().put((char)(crc & 0xff));
+    this->get_ostream().put(static_cast<char>(crc & 0xff));
     crc >>= 8;
   }
 
   unsigned long length = this->get_in_size();
   for (int m = 0; m < 4; ++m)
   {
-    this->get_ostream().put((char)(length & 0xff));
+    this->get_ostream().put(static_cast<char>(length & 0xff));
     length >>= 8;
   }
 
@@ -666,7 +666,7 @@ basic_zip_istream<charT, traits>::check_header(void)
   /* Check the gzip magic header */
   for (len = 0; len < 2; ++len)
   {
-    c = (int)this->get_istream().get();
+    c = static_cast<int>(this->get_istream().get());
     if (c != detail::gz_magic[len])
     {
       if (len != 0)
@@ -683,8 +683,8 @@ basic_zip_istream<charT, traits>::check_header(void)
   }
 
   _is_gzip = true;
-  method = (int)this->get_istream().get();
-  flagsbyte = (int)this->get_istream().get();
+  method = static_cast<int>(this->get_istream().get());
+  flagsbyte = static_cast<int>(this->get_istream().get());
   if (method != Z_DEFLATED || (flagsbyte & detail::gz_reserved) != 0)
   {
     err = Z_DATA_ERROR;
@@ -734,10 +734,10 @@ basic_zip_istream<charT, traits>::read_footer(void)
   {
     _gzip_crc = 0;
     for (int n = 0; n < 4; ++n)
-      _gzip_crc += ((((int)this->get_istream().get()) & 0xff) << (8 * n));
+      _gzip_crc += (((static_cast<int>(this->get_istream().get())) & 0xff) << (8 * n));
 
     _gzip_data_size = 0;
     for (int n = 0; n < 4; ++n)
-      _gzip_data_size += ((((int)this->get_istream().get()) & 0xff) << (8 * n));
+      _gzip_data_size += (((static_cast<int>(this->get_istream().get())) & 0xff) << (8 * n));
   }
 }

@@ -198,7 +198,7 @@ DataSet::ReadSelectedPrivateTags(std::istream &               inputStream,
     assert(selectedPTags.size() == 1);
     const PrivateTag refPTag = *(selectedPTags.rbegin());
     PrivateTag       nextPTag = refPTag;
-    nextPTag.SetElement((uint16_t)(nextPTag.GetElement() + 0x1));
+    nextPTag.SetElement(static_cast<uint16_t>(nextPTag.GetElement() + 0x1));
     assert(nextPTag.GetElement() & 0x00ff); // no wrap
     Tag maxTag;
     maxTag.SetPrivateCreator(nextPTag);
@@ -316,7 +316,7 @@ DataSet::ReadSelectedPrivateTagsWithLength(std::istream &               inputStr
     assert(selectedPTags.size() == 1);
     const PrivateTag refPTag = *(selectedPTags.rbegin());
     PrivateTag       nextPTag = refPTag;
-    nextPTag.SetElement((uint16_t)(nextPTag.GetElement() + 0x1));
+    nextPTag.SetElement(static_cast<uint16_t>(nextPTag.GetElement() + 0x1));
     assert(nextPTag.GetElement()); // no wrap
     Tag maxTag;
     maxTag.SetPrivateCreator(nextPTag);

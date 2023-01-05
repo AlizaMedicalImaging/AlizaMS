@@ -328,7 +328,7 @@ SplitMosaicFilter::Split()
     mdcmAlwaysWarnMacro("outbuf_size=" << outbuf_size);
     return false;
   }
-  pixeldata.SetByteValue(&outbuf[0], (VL::Type)outbuf_size);
+  pixeldata.SetByteValue(&outbuf[0], static_cast<VL::Type>(outbuf_size));
   Image &                image = GetImage();
   const TransferSyntax & ts = image.GetTransferSyntax();
   if (ts.IsExplicit())
@@ -361,7 +361,7 @@ SplitMosaicFilter::Split()
   }
   DataElement de(Tag(0x0008, 0x0016));
   const char *   msstr = MediaStorage::GetMSString(ms);
-  const VL::Type strlenMsstr = (VL::Type)strlen(msstr);
+  const VL::Type strlenMsstr = static_cast<VL::Type>(strlen(msstr));
   de.SetByteValue(msstr, strlenMsstr);
   de.SetVR(Attribute<0x0008, 0x0016>::GetVR());
   ds.Replace(de);

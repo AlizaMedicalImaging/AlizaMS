@@ -78,7 +78,7 @@ ImageFragmentSplitter::Split()
   if (lastfrag)
   {
     Fragment splitfrag;
-    splitfrag.SetByteValue(p + nfrags * FragmentSizeMax, (uint32_t)lastfrag);
+    splitfrag.SetByteValue(p + nfrags * FragmentSizeMax, static_cast<uint32_t>(lastfrag));
     assert(nfrags * FragmentSizeMax + lastfrag == len);
     sq->AddFragment(splitfrag);
   }

@@ -65,10 +65,10 @@ TransferSyntax::GetTSType(const char * cstr)
     str.erase(notspace);
   }
   int i = 0;
-  while (TSStrings[i] != 0)
+  while (TSStrings[i] != NULL)
   {
     if (str == TSStrings[i])
-      return (TSType)i;
+      return static_cast<TSType>(i);
     ++i;
   }
   return TS_END;
@@ -78,7 +78,7 @@ const char *
 TransferSyntax::GetTSString(TSType ts)
 {
   assert(ts <= TS_END);
-  return TSStrings[(int)ts];
+  return TSStrings[static_cast<unsigned int>(ts)];
 }
 
 bool

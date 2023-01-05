@@ -62,7 +62,7 @@ Dicts::GetDictEntry(const Tag & tag, const char * owner) const
     if (owner && *owner)
     {
       const DictEntry & de = GetPrivateDict().GetDictEntry(
-        PrivateTag(tag.GetGroup(), (uint16_t)(((uint16_t)(tag.GetElement() << 8)) >> 8), owner));
+        PrivateTag(tag.GetGroup(), static_cast<uint16_t>((static_cast<uint16_t>(tag.GetElement() << 8)) >> 8), owner));
       return de;
     }
     else

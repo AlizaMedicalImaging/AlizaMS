@@ -135,7 +135,7 @@ RAWCodec::Decode(DataElement const & in, DataElement & out)
       delete[] copy;
       return false;
     }
-    VL::Type lenSize = (VL::Type)len;
+    VL::Type lenSize = static_cast<VL::Type>(len);
     out.SetByteValue(copy, lenSize);
     delete[] copy;
     this->GetPixelFormat().SetBitsAllocated(16);
@@ -148,7 +148,7 @@ RAWCodec::Decode(DataElement const & in, DataElement & out)
       mdcmAlwaysWarnMacro("RAWCodec: value too big for ByteValue");
       return false;
     }
-    out.SetByteValue(&str[0], (VL::Type)str_size);
+    out.SetByteValue(&str[0], static_cast<VL::Type>(str_size));
   }
   return r;
 }

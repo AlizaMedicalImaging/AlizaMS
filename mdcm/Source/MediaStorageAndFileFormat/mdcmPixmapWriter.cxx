@@ -86,10 +86,10 @@ PixmapWriter::DoIconImage(DataSet & rootds, Pixmap const & image)
     sq->SetLengthToUndefined();
     DataSet                   ds;
     Attribute<0x0028, 0x0011> columns;
-    columns.SetValue((uint16_t)icon.GetDimension(0));
+    columns.SetValue(static_cast<uint16_t>(icon.GetDimension(0)));
     ds.Insert(columns.GetAsDataElement());
     Attribute<0x0028, 0x0010> rows;
-    rows.SetValue((uint16_t)icon.GetDimension(1));
+    rows.SetValue(static_cast<uint16_t>(icon.GetDimension(1)));
     ds.Insert(rows.GetAsDataElement());
     PixelFormat               pf = icon.GetPixelFormat();
     Attribute<0x0028, 0x0100> bitsallocated;
@@ -115,7 +115,7 @@ PixmapWriter::DoIconImage(DataSet & rootds, Pixmap const & image)
     if (pf.GetSamplesPerPixel() != 1)
     {
       Attribute<0x0028, 0x0006> planarconf;
-      planarconf.SetValue((uint16_t)icon.GetPlanarConfiguration());
+      planarconf.SetValue(static_cast<uint16_t>(icon.GetPlanarConfiguration()));
       ds.Replace(planarconf.GetAsDataElement());
     }
     PhotometricInterpretation pi = icon.GetPhotometricInterpretation();
@@ -123,7 +123,7 @@ PixmapWriter::DoIconImage(DataSet & rootds, Pixmap const & image)
     const char *              pistr = PhotometricInterpretation::GetPIString(pi);
     {
       DataElement de(Tag(0x0028, 0x0004));
-      VL::Type    strlenPistr = (VL::Type)strlen(pistr);
+      VL::Type    strlenPistr = static_cast<VL::Type>(strlen(pistr));
       de.SetByteValue(pistr, strlenPistr);
       de.SetVR(piat.GetVR());
       ds.Replace(de);
@@ -148,10 +148,10 @@ PixmapWriter::DoIconImage(DataSet & rootds, Pixmap const & image)
       unsigned int l;
       // RED
       memset(rawlut, 0, lutlen * 2);
-      lut.GetLUT(LookupTable::RED, (unsigned char *)rawlut, l);
+      lut.GetLUT(LookupTable::RED, reinterpret_cast<unsigned char *>(rawlut), l);
       DataElement redde(Tag(0x0028, 0x1201));
       redde.SetVR(VR::OW);
-      redde.SetByteValue((char *)rawlut, l);
+      redde.SetByteValue(reinterpret_cast<char *>(rawlut), l);
       ds.Replace(redde);
       // Descriptor
       Attribute<0x0028, 0x1101, VR::US, VM::VM3> reddesc;
@@ -162,10 +162,10 @@ PixmapWriter::DoIconImage(DataSet & rootds, Pixmap const & image)
       ds.Replace(reddesc.GetAsDataElement());
       // GREEN
       memset(rawlut, 0, lutlen * 2);
-      lut.GetLUT(LookupTable::GREEN, (unsigned char *)rawlut, l);
+      lut.GetLUT(LookupTable::GREEN, reinterpret_cast<unsigned char *>(rawlut), l);
       DataElement greende(Tag(0x0028, 0x1202));
       greende.SetVR(VR::OW);
-      greende.SetByteValue((char *)rawlut, l);
+      greende.SetByteValue(reinterpret_cast<char *>(rawlut), l);
       ds.Replace(greende);
       // Descriptor
       Attribute<0x0028, 0x1102, VR::US, VM::VM3> greendesc;
@@ -176,10 +176,10 @@ PixmapWriter::DoIconImage(DataSet & rootds, Pixmap const & image)
       ds.Replace(greendesc.GetAsDataElement());
       // BLUE
       memset(rawlut, 0, lutlen * 2);
-      lut.GetLUT(LookupTable::BLUE, (unsigned char *)rawlut, l);
+      lut.GetLUT(LookupTable::BLUE, reinterpret_cast<unsigned char *>(rawlut), l);
       DataElement bluede(Tag(0x0028, 0x1203));
       bluede.SetVR(VR::OW);
-      bluede.SetByteValue((char *)rawlut, l);
+      bluede.SetByteValue(reinterpret_cast<char *>(rawlut), l);
       ds.Replace(bluede);
       // Descriptor
       Attribute<0x0028, 0x1103, VR::US, VM::VM3> bluedesc;
@@ -260,7 +260,7 @@ PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
     assert(pi != PhotometricInterpretation::UNKNOWN);
     const char * pistr = PhotometricInterpretation::GetPIString(pi);
     DataElement  de(Tag(0x0028, 0x0004));
-    VL::Type     strlenPistr = (VL::Type)strlen(pistr);
+    VL::Type     strlenPistr = static_cast<VL::Type>(strlen(pistr));
     de.SetByteValue(pistr, strlenPistr);
     de.SetVR(Attribute<0x0028, 0x0004>::GetVR());
     ds.Replace(de);
@@ -283,7 +283,7 @@ PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
   if (pf.GetSamplesPerPixel() != 1)
   {
     Attribute<0x0028, 0x0006> planarconf;
-    planarconf.SetValue((uint16_t)PixelData->GetPlanarConfiguration());
+    planarconf.SetValue(static_cast<uint16_t>(PixelData->GetPlanarConfiguration()));
     ds.Replace(planarconf.GetAsDataElement());
   }
   {
@@ -304,10 +304,10 @@ PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
       unsigned int l;
       // RED
       memset(rawlut, 0, lutlen * 2);
-      lut.GetLUT(LookupTable::RED, (unsigned char *)rawlut, l);
+      lut.GetLUT(LookupTable::RED, reinterpret_cast<unsigned char *>(rawlut), l);
       DataElement redde(Tag(0x0028, 0x1201));
       redde.SetVR(VR::OW);
-      redde.SetByteValue((char *)rawlut, l);
+      redde.SetByteValue(reinterpret_cast<char *>(rawlut), l);
       ds.Replace(redde);
       // Descriptor
       Attribute<0x0028, 0x1101, VR::US, VM::VM3> reddesc;
@@ -318,10 +318,10 @@ PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
       ds.Replace(reddesc.GetAsDataElement());
       // GREEN
       memset(rawlut, 0, lutlen * 2);
-      lut.GetLUT(LookupTable::GREEN, (unsigned char *)rawlut, l);
+      lut.GetLUT(LookupTable::GREEN, reinterpret_cast<unsigned char *>(rawlut), l);
       DataElement greende(Tag(0x0028, 0x1202));
       greende.SetVR(VR::OW);
-      greende.SetByteValue((char *)rawlut, l);
+      greende.SetByteValue(reinterpret_cast<char *>(rawlut), l);
       ds.Replace(greende);
       // Descriptor
       Attribute<0x0028, 0x1102, VR::US, VM::VM3> greendesc;
@@ -332,10 +332,10 @@ PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
       ds.Replace(greendesc.GetAsDataElement());
       // BLUE
       memset(rawlut, 0, lutlen * 2);
-      lut.GetLUT(LookupTable::BLUE, (unsigned char *)rawlut, l);
+      lut.GetLUT(LookupTable::BLUE, reinterpret_cast<unsigned char *>(rawlut), l);
       DataElement bluede(Tag(0x0028, 0x1203));
       bluede.SetVR(VR::OW);
-      bluede.SetByteValue((char *)rawlut, l);
+      bluede.SetByteValue(reinterpret_cast<char *>(rawlut), l);
       ds.Replace(bluede);
       // Descriptor
       Attribute<0x0028, 0x1103, VR::US, VM::VM3> bluedesc;
@@ -558,7 +558,7 @@ PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
   if (!ds.FindDataElement(Tag(0x0008, 0x0016)))
   {
     DataElement de(Tag(0x0008, 0x0016));
-    VL::Type    strlenMsstr = (VL::Type)strlen(msstr);
+    VL::Type    strlenMsstr = static_cast<VL::Type>(strlen(msstr));
     de.SetByteValue(msstr, strlenMsstr);
     de.SetVR(Attribute<0x0008, 0x0016>::GetVR());
     ds.Insert(de);
@@ -574,7 +574,7 @@ PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
     if (strncmp(bv->GetPointer(), msstr, bv->GetLength()) != 0)
     {
       DataElement de = ds.GetDataElement(Tag(0x0008, 0x0016));
-      VL::Type    strlenMsstr = (VL::Type)strlen(msstr);
+      VL::Type    strlenMsstr = static_cast<VL::Type>(strlen(msstr));
       de.SetByteValue(msstr, strlenMsstr);
       ds.Replace(de);
     }
@@ -629,7 +629,7 @@ PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
     {
       const char * sop = uid.Generate();
       DataElement  de(Tag(0x0008, 0x0018));
-      VL::Type     strlenSOP = (VL::Type)strlen(sop);
+      VL::Type     strlenSOP = static_cast<VL::Type>(strlen(sop));
       de.SetByteValue(sop, strlenSOP);
       de.SetVR(Attribute<0x0008, 0x0018>::GetVR());
       ds.ReplaceEmpty(de);
@@ -639,7 +639,7 @@ PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
     {
       const char * study = uid.Generate();
       DataElement  de(Tag(0x0020, 0x000d));
-      VL::Type     strlenStudy = (VL::Type)strlen(study);
+      VL::Type     strlenStudy = static_cast<VL::Type>(strlen(study));
       de.SetByteValue(study, strlenStudy);
       de.SetVR(Attribute<0x0020, 0x000d>::GetVR());
       ds.ReplaceEmpty(de);
@@ -649,7 +649,7 @@ PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
     {
       const char * series = uid.Generate();
       DataElement  de(Tag(0x0020, 0x000e));
-      VL::Type     strlenSeries = (VL::Type)strlen(series);
+      VL::Type     strlenSeries = static_cast<VL::Type>(strlen(series));
       de.SetByteValue(series, strlenSeries);
       de.SetVR(Attribute<0x0020, 0x000e>::GetVR());
       ds.ReplaceEmpty(de);
@@ -662,7 +662,7 @@ PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
     {
       const char * tsuid = TransferSyntax::GetTSString(ts);
       DataElement  de(Tag(0x0002, 0x0010));
-      VL::Type     strlenTSUID = (VL::Type)strlen(tsuid);
+      VL::Type     strlenTSUID = static_cast<VL::Type>(strlen(tsuid));
       de.SetByteValue(tsuid, strlenTSUID);
       de.SetVR(Attribute<0x0002, 0x0010>::GetVR());
       fmi.Replace(de);

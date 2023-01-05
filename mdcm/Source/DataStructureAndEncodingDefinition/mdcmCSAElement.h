@@ -139,7 +139,7 @@ public:
   bool
   IsEmpty() const
   {
-    return DataField == 0;
+    return DataField == NULL;
   }
 
   void

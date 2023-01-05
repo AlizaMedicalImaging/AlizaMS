@@ -38,7 +38,7 @@ Fragment::ComputeLength() const
   assert(!ValueLengthField.IsUndefined());
   const ByteValue * bv = GetByteValue();
   assert(bv);
-  return (TagField.GetLength() + ValueLengthField.GetLength() + ((bv) ? bv->ComputeLength() : (VL)0));
+  return (TagField.GetLength() + ValueLengthField.GetLength() + (bv ? bv->ComputeLength() : static_cast<VL>(0)));
 }
 
 } // end namespace mdcm

@@ -167,11 +167,11 @@ MediaStorage::GetMSType(const char * str)
   if (!str)
     return MS_END;
 
-  for (unsigned int i = 0; MSStrings[i] != 0; ++i)
+  for (unsigned int i = 0; MSStrings[i] != NULL; ++i)
   {
     if (strcmp(str, MSStrings[i]) == 0)
     {
-      return (MSType)i;
+      return static_cast<MSType>(i);
     }
   }
   // We did not find anything, that's pretty bad, let's hope that
@@ -179,11 +179,11 @@ MediaStorage::GetMSType(const char * str)
   // string
   CodeString  codestring = str;
   std::string cs = codestring.GetAsString();
-  for (unsigned int i = 0; MSStrings[i] != 0; ++i)
+  for (unsigned int i = 0; MSStrings[i] != NULL; ++i)
   {
     if (strcmp(cs.c_str(), MSStrings[i]) == 0)
     {
-      return (MSType)i;
+      return static_cast<MSType>(i);
     }
   }
   return MS_END;
@@ -193,7 +193,7 @@ const char *
 MediaStorage::GetMSString(MSType ms)
 {
   assert(ms <= MS_END);
-  return MSStrings[(int)ms];
+  return MSStrings[static_cast<unsigned int>(ms)];
 }
 
 const char *
@@ -410,7 +410,7 @@ MediaStorage::GuessFromModality(const char * modality, unsigned int dim)
   }
   if (MSModalityTypes[i].Modality)
   {
-    MSField = (MSType)i;
+    MSField = static_cast<MSType>(i);
   }
 }
 
@@ -557,7 +557,7 @@ MediaStorage::SetFromFile(File const & file)
   std::string                 b1;
   const char *                header_ms_ptr = GetFromHeader(header, b1);
   std::string                 copy1;
-  const char *                header_ms_str = 0;
+  const char *                header_ms_str = NULL;
   if (header_ms_ptr)
   {
     copy1 = header_ms_ptr;
@@ -567,7 +567,7 @@ MediaStorage::SetFromFile(File const & file)
   std::string     b2;
   const char *    ds_ms_ptr = GetFromDataSet(ds, b2);
   std::string     copy2;
-  const char *    ds_ms_str = 0;
+  const char *    ds_ms_str = NULL;
   if (ds_ms_ptr)
   {
     copy2 = ds_ms_ptr;

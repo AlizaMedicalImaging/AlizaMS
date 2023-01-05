@@ -558,7 +558,7 @@ UIDs::UIDs()
 unsigned int
 UIDs::GetNumberOfUIDsStrings()
 {
-  return (unsigned int)(sizeof(UIDsStrings) / sizeof(*UIDsStrings) - 2);
+  return static_cast<unsigned int>(sizeof(UIDsStrings) / sizeof(*UIDsStrings) - 2);
 }
 
 const char * const *

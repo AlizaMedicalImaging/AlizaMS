@@ -83,7 +83,7 @@ public:
       {
         is.read(&Internal[0], Length);
         assert(Internal.size() == Length || Internal.size() == Length + 1);
-        TSwap::SwapArray((TType *)GetVoidPointer(), Internal.size() / sizeof(TType));
+        TSwap::SwapArray(static_cast<TType *>(GetVoidPointer()), Internal.size() / sizeof(TType));
       }
       else
       {
@@ -108,7 +108,7 @@ public:
     if (!Internal.empty())
     {
       std::vector<char> copy = Internal;
-      TSwap::SwapArray((TType *)(void *)&copy[0], Internal.size() / sizeof(TType));
+      TSwap::SwapArray(static_cast<TType *>(static_cast<void *>(&copy[0])), Internal.size() / sizeof(TType));
       os.write(&copy[0], copy.size());
     }
     return os;

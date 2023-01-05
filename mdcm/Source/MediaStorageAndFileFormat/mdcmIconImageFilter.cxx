@@ -74,7 +74,7 @@ IconImageFilter::Extract()
 unsigned int
 IconImageFilter::GetNumberOfIconImages() const
 {
-  return (unsigned int)Internals->icons.size();
+  return static_cast<unsigned int>(Internals->icons.size());
 }
 
 IconImage &
@@ -160,19 +160,19 @@ IconImageFilter::ExtractIconImages()
         lut->Allocate(pf.GetBitsAllocated());
         for (int i = 0; i < 3; ++i)
         {
-          const Tag                tdescriptor(0x0028, (uint16_t)(0x1101 + i));
+          const Tag                tdescriptor(0x0028, static_cast<uint16_t>(0x1101 + i));
           Element<VR::US, VM::VM3> el_us3;
           el_us3.SetFromDataElement(ds[tdescriptor]);
           lut->InitializeLUT(LookupTable::LookupTableType(i), el_us3[0], el_us3[1], el_us3[2]);
-          const Tag tlut(0x0028, (uint16_t)(0x1201 + i));
-          const Tag seglut(0x0028, (uint16_t)(0x1221 + i));
+          const Tag tlut(0x0028, static_cast<uint16_t>(0x1201 + i));
+          const Tag seglut(0x0028, static_cast<uint16_t>(0x1221 + i));
           if (ds.FindDataElement(tlut))
           {
             const ByteValue * lut_raw = ds.GetDataElement(tlut).GetByteValue();
             if (lut_raw)
             {
               lut->SetLUT(
-                LookupTable::LookupTableType(i), (const unsigned char *)lut_raw->GetPointer(), lut_raw->GetLength());
+                LookupTable::LookupTableType(i), reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()), lut_raw->GetLength());
             }
           }
           else if (ds.FindDataElement(seglut))
@@ -181,7 +181,7 @@ IconImageFilter::ExtractIconImages()
             if (lut_raw)
             {
               lut->SetLUT(
-                LookupTable::LookupTableType(i), (const unsigned char *)lut_raw->GetPointer(), lut_raw->GetLength());
+                LookupTable::LookupTableType(i), reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()), lut_raw->GetLength());
             }
           }
           else
@@ -414,7 +414,7 @@ IconImageFilter::ExtractVeproIconImages()
     dims[1] = data.Height;
     assert(dims[0] * dims[1] == len - sizeof(data) - offset);
     DataElement pd;
-    pd.SetByteValue(raw + offset, (uint32_t)(len - sizeof(data) - offset));
+    pd.SetByteValue(raw + offset, static_cast<uint32_t>(len - sizeof(data) - offset));
     SmartPointer<IconImage> si1 = new IconImage;
     IconImage &             pixeldata = *si1;
     pixeldata.SetDataElement(pd);

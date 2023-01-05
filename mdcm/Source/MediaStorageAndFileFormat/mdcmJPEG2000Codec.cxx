@@ -199,7 +199,7 @@ parsej2k_imp(const char * const stream, const size_t file_size, bool * lossless,
       const bool r = read16(&cur, &cur_size, &l);
       if (!r || l < 2)
         break;
-      lenmarker = (size_t)l - 2;
+      lenmarker = static_cast<size_t>(l) - 2;
       if (marker == COD)
       {
         const uint8_t MCTransformation = *(cur + 4);
@@ -322,13 +322,13 @@ opj_read_from_memory(void * p_buffer, OPJ_SIZE_T p_nb_bytes, myfile * p_file)
   }
   else
   {
-    l_nb_read = (OPJ_SIZE_T)(p_file->mem + p_file->len - p_file->cur);
+    l_nb_read = static_cast<OPJ_SIZE_T>(p_file->mem + p_file->len - p_file->cur);
     assert(l_nb_read < p_nb_bytes);
   }
   memcpy(p_buffer, p_file->cur, l_nb_read);
   p_file->cur += l_nb_read;
   assert(p_file->cur <= p_file->mem + p_file->len);
-  return ((l_nb_read) ? l_nb_read : ((OPJ_SIZE_T)-1));
+  return ((l_nb_read) ? l_nb_read : (static_cast<OPJ_SIZE_T>(-1)));
 }
 
 OPJ_SIZE_T
@@ -377,10 +377,10 @@ opj_stream_t * OPJ_CALLCONV
   if (!l_stream)
     return NULL;
   opj_stream_set_user_data(l_stream, p_mem, NULL);
-  opj_stream_set_read_function(l_stream, (opj_stream_read_fn)opj_read_from_memory);
-  opj_stream_set_write_function(l_stream, (opj_stream_write_fn)opj_write_from_memory);
-  opj_stream_set_skip_function(l_stream, (opj_stream_skip_fn)opj_skip_from_memory);
-  opj_stream_set_seek_function(l_stream, (opj_stream_seek_fn)opj_seek_from_memory);
+  opj_stream_set_read_function(l_stream, reinterpret_cast<opj_stream_read_fn>(opj_read_from_memory));
+  opj_stream_set_write_function(l_stream, reinterpret_cast<opj_stream_write_fn>(opj_write_from_memory));
+  opj_stream_set_skip_function(l_stream, reinterpret_cast<opj_stream_skip_fn>(opj_skip_from_memory));
+  opj_stream_set_seek_function(l_stream, reinterpret_cast<opj_stream_seek_fn>(opj_seek_from_memory));
   opj_stream_set_user_data_length(l_stream, p_mem->len);
   return l_stream;
 }
@@ -907,7 +907,7 @@ JPEG2000Codec::Decode2(DataElement const & in, char * out_buffer, size_t len)
       {
         return false;
       }
-      const bool b = j2kbv->GetBuffer(mybuffer, (unsigned long long)j2kbv_len);
+      const bool b = j2kbv->GetBuffer(mybuffer, static_cast<unsigned long long>(j2kbv_len));
       if (b)
         is.write(mybuffer, j2kbv_len);
       delete[] mybuffer;
@@ -1098,8 +1098,8 @@ JPEG2000Codec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
 void
 JPEG2000Codec::SetRate(unsigned int idx, double rate)
 {
-  Internals->coder_param.tcp_rates[idx] = (float)rate;
-  if (Internals->coder_param.tcp_numlayers <= (int)idx)
+  Internals->coder_param.tcp_rates[idx] = static_cast<float>(rate);
+  if (Internals->coder_param.tcp_numlayers <= static_cast<int>(idx))
   {
     Internals->coder_param.tcp_numlayers = idx + 1;
   }
@@ -1109,14 +1109,14 @@ JPEG2000Codec::SetRate(unsigned int idx, double rate)
 double
 JPEG2000Codec::GetRate(unsigned int idx) const
 {
-  return (double)Internals->coder_param.tcp_rates[idx];
+  return Internals->coder_param.tcp_rates[idx];
 }
 
 void
 JPEG2000Codec::SetQuality(unsigned int idx, double q)
 {
-  Internals->coder_param.tcp_distoratio[idx] = (float)q;
-  if (Internals->coder_param.tcp_numlayers <= (int)idx)
+  Internals->coder_param.tcp_distoratio[idx] = static_cast<float>(q);
+  if (Internals->coder_param.tcp_numlayers <= static_cast<int>(idx))
   {
     Internals->coder_param.tcp_numlayers = idx + 1;
   }
@@ -1126,7 +1126,7 @@ JPEG2000Codec::SetQuality(unsigned int idx, double q)
 double
 JPEG2000Codec::GetQuality(unsigned int idx) const
 {
-  return (double)Internals->coder_param.tcp_distoratio[idx];
+  return Internals->coder_param.tcp_distoratio[idx];
 }
 
 void
@@ -1482,7 +1482,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
     opj_destroy_codec(dinfo);
     opj_stream_destroy(cio);
     mdcmErrorMacro("opj_setup_decoder failure");
-    return std::make_pair<char *, size_t>(0, 0);
+    return std::make_pair<char *, size_t>(NULL, 0);
   }
   bResult = opj_read_header(cio, dinfo, &image);
   if (!bResult)
@@ -1490,7 +1490,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
     opj_destroy_codec(dinfo);
     opj_stream_destroy(cio);
     mdcmErrorMacro("opj_setup_decoder failure");
-    return std::make_pair<char *, size_t>(0, 0);
+    return std::make_pair<char *, size_t>(NULL, 0);
   }
 #if 0
   /* Optional if you want decode the entire image */
@@ -1503,7 +1503,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
     opj_destroy_codec(dinfo);
     opj_stream_destroy(cio);
     mdcmErrorMacro("opj_decode failed");
-    return std::make_pair<char *, size_t>(0, 0);
+    return std::make_pair<char *, size_t>(NULL, 0);
   }
   bResult = bResult && (image != NULL);
   bResult = bResult && opj_end_decompress(dinfo, cio);
@@ -1512,7 +1512,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
     opj_destroy_codec(dinfo);
     opj_stream_destroy(cio);
     mdcmErrorMacro("opj_decode failed");
-    return std::make_pair<char *, size_t>(0, 0);
+    return std::make_pair<char *, size_t>(NULL, 0);
   }
   bool reversible = false;
   bool lossless = false;
@@ -1567,7 +1567,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
   {
     return std::make_pair(reinterpret_cast<char *>(NULL), 0);
   }
-  for (unsigned int compno = 0; compno < static_cast<unsigned int>(image->numcomps); ++compno)
+  for (unsigned int compno = 0; compno < image->numcomps; ++compno)
   {
     opj_image_comp_t * comp = &image->comps[compno];
     int                w = image->comps[compno].w;
@@ -1688,7 +1688,7 @@ JPEG2000Codec::CodeFrameIntoBuffer(char *       outdata,
   {
     const char   comment[] = "Created by MDCM/OpenJPEG version %s";
     const char * vers = opj_version();
-    parameters.cp_comment = (char *)malloc(strlen(comment) + 10);
+    parameters.cp_comment = static_cast<char *>(malloc(strlen(comment) + 10));
     snprintf(parameters.cp_comment, strlen(comment) + 10, comment, vers);
     /* no need to delete parameters.cp_comment on exit */
   }
@@ -1711,7 +1711,7 @@ JPEG2000Codec::CodeFrameIntoBuffer(char *       outdata,
   }
   parameters.numresolution = numberOfResolutions;
   /* decode the source image */
-  image = rawtoimage((const char *)inputdata,
+  image = rawtoimage(inputdata,
                      &parameters,
                      inputlength,
                      image_width,
@@ -1779,7 +1779,7 @@ JPEG2000Codec::CodeFrameIntoBuffer(char *       outdata,
   if (codestream_length <= outlen)
   {
     ok = true;
-    memcpy(outdata, reinterpret_cast<char *>(mysrc.mem), codestream_length);
+    memcpy(outdata, mysrc.mem, codestream_length);
   }
   delete[] buffer_j2k;
   /* close and free the byte stream */

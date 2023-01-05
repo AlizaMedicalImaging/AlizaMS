@@ -33,7 +33,7 @@ const char *
 Surface::GetSTATESString(STATES state)
 {
   assert(state <= STATES_END);
-  return STATESStrings[(int)state];
+  return STATESStrings[static_cast<unsigned int>(state)];
 }
 
 Surface::STATES
@@ -51,7 +51,7 @@ Surface::GetSTATES(const char * state)
   {
     if (strcmp(stateClear, STATESStrings[i]) == 0)
     {
-      return (STATES)i;
+      return static_cast<STATES>(i);
     }
   }
   // We did not find anything, that's pretty bad, let's hope that
@@ -63,7 +63,7 @@ Surface::GetSTATES(const char * state)
   {
     if (strcmp(cs.c_str(), STATESStrings[i]) == 0)
     {
-      return (STATES)i;
+      return static_cast<STATES>(i);
     }
   }
   return STATES_END;
@@ -75,7 +75,7 @@ const char *
 Surface::GetVIEWTypeString(VIEWType type)
 {
   assert(type <= VIEWType_END);
-  return VIEWStrings[(int)type];
+  return VIEWStrings[static_cast<unsigned int>(type)];
 }
 
 Surface::VIEWType
@@ -92,7 +92,7 @@ Surface::GetVIEWType(const char * type)
   {
     if (strcmp(typeClear, VIEWStrings[i]) == 0)
     {
-      return (VIEWType)i;
+      return static_cast<VIEWType>(i);
     }
   }
   // Ouch ! We did not find anything, that's pretty bad, let's hope that
@@ -104,7 +104,7 @@ Surface::GetVIEWType(const char * type)
   {
     if (strcmp(cs.c_str(), VIEWStrings[i]) == 0)
     {
-      return (VIEWType)i;
+      return static_cast<VIEWType>(i);
     }
   }
   return VIEWType_END;

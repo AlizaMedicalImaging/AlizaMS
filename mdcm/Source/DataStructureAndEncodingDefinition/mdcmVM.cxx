@@ -22,7 +22,7 @@ namespace mdcm
 static const char * VMStrings[] = { "INVALID", "1",    "2",   "3",    "4",    "5",    "6",      "8",      "9",   "10",
                                     "12",      "16",   "18",  "24",   "28",   "32",   "35",     "99",     "256", "1-2",
                                     "1-3",     "1-4",  "1-5", "1-8",  "1-32", "1-99", "1-n",    "2-2n",   "2-n", "2-4",
-                                    "3-4",     "3-3n", "3-n", "4-4n", "6-6n", "7-7n", "30-30n", "47-47n", 0 };
+                                    "3-4",     "3-3n", "3-n", "4-4n", "6-6n", "7-7n", "30-30n", "47-47n", NULL };
 
 unsigned int
 VM::GetLength() const
@@ -180,7 +180,7 @@ VM::GetIndex(VMType vm)
       break;
     default:
     {
-      unsigned int a = (unsigned int)vm;
+      unsigned int a = static_cast<unsigned int>(vm);
       for (; a > 1; ++l)
         a >>= 1;
       l++;
@@ -209,7 +209,7 @@ VM::GetVMType(const char * vm)
   {
     if (strcmp(VMStrings[i], vm) == 0)
     {
-      return (VM::VMType)(i);
+      return static_cast<VM::VMType>(i);
     }
   }
   return VM::VM_END;
@@ -297,7 +297,7 @@ VM::GetVMTypeFromLength(size_t length, unsigned int size)
 {
   if (!length || length % size)
     return VM::VM0;
-  const unsigned int ratio = (unsigned int)(length / size);
+  const unsigned int ratio = static_cast<unsigned int>(length / size);
   switch (ratio)
   {
     case 1:

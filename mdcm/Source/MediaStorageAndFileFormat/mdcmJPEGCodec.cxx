@@ -220,7 +220,7 @@ JPEGCodec::Decode(DataElement const & in, DataElement & out)
   }
   os.seekp(0, std::ios::beg);
   ByteValue * bv = new ByteValue;
-  bv->SetLength((uint32_t)sizeOfOs);
+  bv->SetLength(static_cast<uint32_t>(sizeOfOs));
   bv->Read<SwapperNoOp>(os);
   out.SetValue(*bv);
   return true;
@@ -401,7 +401,7 @@ JPEGCodec::Code(DataElement const & in, DataElement & out)
     std::string str = os.str();
     assert(str.size());
     Fragment frag;
-    VL::Type strSize = (VL::Type)str.size();
+    VL::Type strSize = static_cast<VL::Type>(str.size());
     frag.SetByteValue(&str[0], strSize);
     sq->AddFragment(frag);
   }
@@ -443,7 +443,7 @@ JPEGCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
         this->SetPhotometricInterpretation(Internal->GetPhotometricInterpretation());
         const int prep = this->GetPixelFormat().GetPixelRepresentation();
         this->PF = Internal->GetPixelFormat(); // Do not call SetPixelFormat
-        this->PF.SetPixelRepresentation((uint16_t)prep);
+        this->PF.SetPixelRepresentation(static_cast<uint16_t>(prep));
         return true;
       }
       else
@@ -465,7 +465,7 @@ JPEGCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
 void
 JPEGCodec::SetQuality(double q)
 {
-  Quality = (int)q;
+  Quality = static_cast<int>(q);
 }
 
 double
@@ -622,7 +622,7 @@ JPEGCodec::DecodeExtent(char *         buffer,
     while (frag.ReadPreValue<SwapperNoOp>(is) && frag.GetTag() != seqDelItem)
     {
       const std::streamoff off = frag.GetVL();
-      offsets.push_back((size_t)off);
+      offsets.push_back(static_cast<size_t>(off));
       is.seekg(off, std::ios::cur);
       ++numfrags;
     }
@@ -635,7 +635,7 @@ JPEGCodec::DecodeExtent(char *         buffer,
     }
     for (unsigned int z = zmin; z <= zmax; ++z)
     {
-      size_t curoffset = std::accumulate(offsets.begin(), offsets.begin() + z, (size_t)0);
+      size_t curoffset = std::accumulate(offsets.begin(), offsets.begin() + z, 0);
       is.seekg(thestart + curoffset + (8 * z), std::ios::beg);
       is.seekg(8, std::ios::cur);
       std::stringstream os;

@@ -109,10 +109,10 @@ unsigned short
 SurfaceHelper::RGBToRecommendedDisplayGrayscale(const std::vector<T> & RGB, const U rangeMax /* = 255*/)
 {
   unsigned short Grayscale = 0;
-  const float    inverseRangeMax = 1.0f / (float)rangeMax;
+  const float    inverseRangeMax = 1.0f / rangeMax;
   // 0xFFFF "=" 255 "=" white
   Grayscale =
-    (unsigned short)((0.2989 * RGB[0] + 0.5870 * RGB[1] + 0.1140 * RGB[2]) * inverseRangeMax // Convert to range 0-1
+    static_cast<unsigned short>((0.2989 * RGB[0] + 0.5870 * RGB[1] + 0.1140 * RGB[2]) * inverseRangeMax // Convert to range 0-1
                      * 0xFFFF); // Convert to range 0x0000-0xFFFF
   return Grayscale;
 }
@@ -124,29 +124,29 @@ SurfaceHelper::RGBToRecommendedDisplayCIELab(const std::vector<T> & RGB, const U
   ColorArray         CIELab(3);
   std::vector<float> tmp(3);
   // Convert to range 0-1
-  const float inverseRangeMax = 1.0f / (float)rangeMax;
-  tmp[0] = (float)(RGB[0] * inverseRangeMax);
-  tmp[1] = (float)(RGB[1] * inverseRangeMax);
-  tmp[2] = (float)(RGB[2] * inverseRangeMax);
+  const float inverseRangeMax = 1.0f / rangeMax;
+  tmp[0] = static_cast<float>(RGB[0] * inverseRangeMax);
+  tmp[1] = static_cast<float>(RGB[1] * inverseRangeMax);
+  tmp[2] = static_cast<float>(RGB[2] * inverseRangeMax);
   tmp = SurfaceHelper::XYZToCIELab(SurfaceHelper::RGBToXYZ(tmp));
   // Convert to range 0x0000-0xFFFF
   // 0xFFFF "=" 127, 0x8080 "=" 0, 0x0000 "=" -128
-  CIELab[0] = (unsigned short)(0xFFFF * (tmp[0] * 0.01f));
+  CIELab[0] = static_cast<unsigned short>(0xFFFF * (tmp[0] * 0.01f));
   if (tmp[1] >= -128 && tmp[1] <= 0)
   {
-    CIELab[1] = (unsigned short)(((float)(0x8080) / 128.0f) * tmp[1] + ((float)0x8080));
+    CIELab[1] = static_cast<unsigned short>((0x8080 / 128.0f) * tmp[1] + 0x8080);
   }
   else if (tmp[1] <= 127 && tmp[1] > 0)
   {
-    CIELab[1] = (unsigned short)(((float)(0xFFFF - 0x8080) / 127.0f) * tmp[1] + (float)(0x8080));
+    CIELab[1] = static_cast<unsigned short>(((0xFFFF - 0x8080) / 127.0f) * tmp[1] + 0x8080);
   }
   if (tmp[2] >= -128 && tmp[2] <= 0)
   {
-    CIELab[2] = (unsigned short)(((float)0x8080 / 128.0f) * tmp[2] + ((float)0x8080));
+    CIELab[2] = static_cast<unsigned short>((0x8080 / 128.0f) * tmp[2] + 0x8080);
   }
   else if (tmp[2] <= 127 && tmp[2] > 0)
   {
-    CIELab[2] = (unsigned short)(((float)(0xFFFF - 0x8080) / 127.0f) * tmp[2] + (float)(0x8080));
+    CIELab[2] = static_cast<unsigned short>(((0xFFFF - 0x8080) / 127.0f) * tmp[2] + 0x8080);
   }
   return CIELab;
 }
@@ -158,28 +158,28 @@ SurfaceHelper::RecommendedDisplayCIELabToRGB(const ColorArray & CIELab, const U 
   std::vector<T>     RGB(3);
   std::vector<float> tmp(3);
   // Convert to range 0-1
-  tmp[0] = 100.0f * CIELab[0] / (float)(0xFFFF);
+  tmp[0] = 100.0f * CIELab[0] / 0xFFFF;
   if (CIELab[1] <= 0x8080)
   {
-    tmp[1] = (float)(((CIELab[1] - 0x8080) * 128.0f) / (float)0x8080);
+    tmp[1] = (((CIELab[1] - 0x8080) * 128.0f) / 0x8080);
   }
   else
   {
-    tmp[1] = (float)((CIELab[1] - 0x8080) * 127.0f / (float)(0xFFFF - 0x8080));
+    tmp[1] = ((CIELab[1] - 0x8080) * 127.0f / (0xFFFF - 0x8080));
   }
   if (CIELab[2] <= 0x8080)
   {
-    tmp[2] = (float)(((CIELab[2] - 0x8080) * 128.0f) / (float)0x8080);
+    tmp[2] = (((CIELab[2] - 0x8080) * 128.0f) / 0x8080);
   }
   else
   {
-    tmp[2] = (float)((CIELab[2] - 0x8080) * 127.0f / (float)(0XFFFF - 0x8080));
+    tmp[2] = ((CIELab[2] - 0x8080) * 127.0f / (0xFFFF - 0x8080));
   }
   tmp = SurfaceHelper::XYZToRGB(SurfaceHelper::CIELabToXYZ(tmp));
   // Convert to range 0-rangeMax
-  RGB[0] = (T)(tmp[0] * rangeMax);
-  RGB[1] = (T)(tmp[1] * rangeMax);
-  RGB[2] = (T)(tmp[2] * rangeMax);
+  RGB[0] = static_cast<T>(tmp[0] * rangeMax);
+  RGB[1] = static_cast<T>(tmp[1] * rangeMax);
+  RGB[2] = static_cast<T>(tmp[2] * rangeMax);
   return RGB;
 }
 

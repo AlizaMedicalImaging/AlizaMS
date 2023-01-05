@@ -137,7 +137,7 @@ public:
     copy[0] = ElementTag.tags[0];
     copy[1] = ElementTag.tags[1];
     TSwap::SwapArray(copy, 2);
-    return os.write((char *)(&copy), 4);
+    return os.write(reinterpret_cast<char *>(&copy), 4);
   }
 
   uint16_t

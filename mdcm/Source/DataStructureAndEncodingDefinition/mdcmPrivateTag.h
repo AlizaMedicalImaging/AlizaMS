@@ -43,14 +43,14 @@ public:
     , Owner(owner ? LOComp::Trim(owner) : "")
   {
     // truncate the high bits
-    SetElement((uint8_t)element);
+    SetElement(static_cast<uint8_t>(element));
   }
   PrivateTag(Tag const & t, const char * owner = "")
     : Tag(t)
     , Owner(owner ? LOComp::Trim(owner) : "")
   {
     // truncate the high bits
-    SetElement((uint8_t)t.GetElement());
+    SetElement(static_cast<uint8_t>(t.GetElement()));
   }
   const char *
   GetOwner() const

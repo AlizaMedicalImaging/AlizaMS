@@ -51,7 +51,7 @@ rle_encoder::rle_encoder(source & s, image_info const & ii)
   internals = new internal;
   internals->img = ii;
   internals->src = s.clone();
-  memset((char *)&internals->rh, 0, sizeof(header));
+  memset(reinterpret_cast<char *>(&internals->rh), 0, sizeof(header));
 }
 
 rle_encoder::~rle_encoder()
@@ -71,13 +71,13 @@ check_header(header const & rh, pixel_info & pt)
 {
   // first operation is to update pixel_info from the header
   const int  ns = pt.compute_num_segments();
-  const bool ok = ns == (int)rh.num_segments;
+  const bool ok = ns == static_cast<int>(rh.num_segments);
   if (!ok)
   {
     // in case num segments is valid, update pt from the derived info
     if (pixel_info::check_num_segments(rh.num_segments))
     {
-      pt = pixel_info((int)rh.num_segments);
+      pt = pixel_info(static_cast<int>(rh.num_segments));
     }
     return false;
   }
@@ -131,7 +131,7 @@ rle_encoder::write_header(dest & d)
     rh.offset[s] += rh.offset[s - 1] + comp_len[s - 1];
   }
   assert(check_header(rh, pt));
-  d.write((char *)&rh, sizeof(rh));
+  d.write(reinterpret_cast<char *>(&rh), sizeof(rh));
   unsigned int         comp_pos[16] = { 0 };
   const unsigned int * offsets = internals->rh.offset;
   for (int s = 0; s < nsegs; ++s)
@@ -295,7 +295,7 @@ rle_encoder::encode_row_internal(byte * dest, int destlen, const byte * source, 
       // Test first we are allowed to write two bytes
       if (pout + 1 + 1 > dest + destlen)
         return -1;
-      *pout = (char)(-count + 1);
+      *pout = static_cast<char>(-count + 1);
       assert(*pout <= -1 && *pout >= -127);
       ++pout;
       *pout = *pin;
@@ -308,7 +308,7 @@ rle_encoder::encode_row_internal(byte * dest, int destlen, const byte * source, 
       // first test we are allowed to write 1 + count bytes in the output buffer
       if (pout + count + 1 > dest + destlen)
         return -1;
-      *pout = (char)(count - 1);
+      *pout = static_cast<char>(count - 1);
       assert(*pout != -128 && *pout + 1 == count);
       assert(*pout >= 0);
       ++pout;
@@ -341,7 +341,7 @@ rle_decoder::rle_decoder(source & s, image_info const & ii)
   : internals(NULL)
 {
   internals = new internal;
-  memset((char *)&internals->rh, 0, sizeof(header));
+  memset(reinterpret_cast<char *>(&internals->rh), 0, sizeof(header));
   internals->img = ii;
   const int ns = ii.get_pixel_info().compute_num_segments();
   internals->sources = new source *[ns];
@@ -572,7 +572,7 @@ rle_decoder::read_header(pixel_info & pi)
   const int size = sizeof(rh);
   source *  s = internals->sources[0];
   assert(s);
-  const int nbytes = s->read((char *)&rh, sizeof(rh));
+  const int nbytes = s->read(reinterpret_cast<char *>(&rh), sizeof(rh));
   // we are positioned exactly at offset 64, to read the first segment
   if (nbytes != size)
     return false;

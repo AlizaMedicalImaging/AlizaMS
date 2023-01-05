@@ -116,7 +116,7 @@ Swap4(T & a, SwapCode const & swapcode)
 {
 #ifndef MDCM_WORDS_BIGENDIAN
   if (swapcode == 4321 || swapcode == 2143)
-    a = (T)((a << 8) | (a >> 8));
+    a = static_cast<T>((a << 8) | (a >> 8));
 #else
   if (swapcode == 1234 || swapcode == 3412)
     a = (a << 8) | (a >> 8);
@@ -187,7 +187,7 @@ Swap8<uint16_t>(uint16_t & a, SwapCode const & swapcode)
       // a= ((a<<16) | (a>>16) );//do nothing, a = a
       break;
     case 2143:
-      a = (uint16_t)(((a << 8) & 0xff00) | ((a >> 8) & 0x00ff));
+      a = static_cast<uint16_t>(((a << 8) & 0xff00) | ((a >> 8) & 0x00ff));
       break;
     default:
       std::cerr << "Unexpected swap code:" << swapcode;

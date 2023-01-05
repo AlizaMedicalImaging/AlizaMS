@@ -221,7 +221,7 @@ ImageWriter::Write()
   {
     const char * modality = ms.GetModality();
     DataElement  de(Tag(0x0008, 0x0060));
-    VL::Type     strlenModality = (VL::Type)strlen(modality);
+    VL::Type     strlenModality = static_cast<VL::Type>(strlen(modality));
     de.SetByteValue(modality, strlenModality);
     de.SetVR(Attribute<0x0008, 0x0060>::GetVR());
     ds.Insert(de);
@@ -248,7 +248,7 @@ ImageWriter::Write()
       // (0008,0064) CS [SI] #   2, 1 ConversionType
       const char  conversion[] = "WSD "; // FIXME
       DataElement de(Tag(0x0008, 0x0064));
-      VL::Type    strlenConversion = (VL::Type)strlen(conversion);
+      VL::Type    strlenConversion = static_cast<VL::Type>(strlen(conversion));
       de.SetByteValue(conversion, strlenConversion);
       de.SetVR(Attribute<0x0008, 0x0064>::GetVR());
       ds.Insert(de);
@@ -293,10 +293,10 @@ ImageWriter::Write()
     unsigned int l;
     // RED
     memset(rawlut, 0, lutlen * 2);
-    lut.GetLUT(LookupTable::RED, (unsigned char *)rawlut, l);
+    lut.GetLUT(LookupTable::RED, reinterpret_cast<unsigned char *>(rawlut), l);
     DataElement redde(Tag(0x0028, 0x1201));
     redde.SetVR(VR::OW);
-    redde.SetByteValue((char *)rawlut, l);
+    redde.SetByteValue(reinterpret_cast<char *>(rawlut), l);
     ds.Replace(redde);
     // descriptor
     Attribute<0x0028, 0x1101, VR::US, VM::VM3> reddesc;
@@ -307,10 +307,10 @@ ImageWriter::Write()
     ds.Replace(reddesc.GetAsDataElement());
     // GREEN
     memset(rawlut, 0, lutlen * 2);
-    lut.GetLUT(LookupTable::GREEN, (unsigned char *)rawlut, l);
+    lut.GetLUT(LookupTable::GREEN, reinterpret_cast<unsigned char *>(rawlut), l);
     DataElement greende(Tag(0x0028, 0x1202));
     greende.SetVR(VR::OW);
-    greende.SetByteValue((char *)rawlut, l);
+    greende.SetByteValue(reinterpret_cast<char *>(rawlut), l);
     ds.Replace(greende);
     // descriptor
     Attribute<0x0028, 0x1102, VR::US, VM::VM3> greendesc;
@@ -321,10 +321,10 @@ ImageWriter::Write()
     ds.Replace(greendesc.GetAsDataElement());
     // BLUE
     memset(rawlut, 0, lutlen * 2);
-    lut.GetLUT(LookupTable::BLUE, (unsigned char *)rawlut, l);
+    lut.GetLUT(LookupTable::BLUE, reinterpret_cast<unsigned char *>(rawlut), l);
     DataElement bluede(Tag(0x0028, 0x1203));
     bluede.SetVR(VR::OW);
-    bluede.SetByteValue((char *)rawlut, l);
+    bluede.SetByteValue(reinterpret_cast<char *>(rawlut), l);
     ds.Replace(bluede);
     // descriptor
     Attribute<0x0028, 0x1103, VR::US, VM::VM3> bluedesc;
@@ -357,7 +357,7 @@ ImageWriter::Write()
   {
     const char * pistr = PhotometricInterpretation::GetPIString(pi);
     DataElement  de(Tag(0x0028, 0x0004));
-    VL::Type     strlenPistr = (VL::Type)strlen(pistr);
+    VL::Type     strlenPistr = static_cast<VL::Type>(strlen(pistr));
     de.SetByteValue(pistr, strlenPistr);
     de.SetVR(piat.GetVR());
     ds.Replace(de);

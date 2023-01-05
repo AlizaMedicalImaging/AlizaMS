@@ -43,7 +43,7 @@ BitmapToBitmapFilter::SetInput(const Bitmap & image)
   {
     Output = new Pixmap;
   }
-  else if (dynamic_cast<const Bitmap *>(p))
+  else if (p != NULL)
   {
     Output = new Bitmap;
   }

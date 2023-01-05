@@ -33,7 +33,7 @@ const char *
 Segment::GetALGOTypeString(ALGOType type)
 {
   assert(type <= ALGOType_END);
-  return ALGOTypeStrings[(int)type];
+  return ALGOTypeStrings[static_cast<unsigned int>(type)];
 }
 
 Segment::ALGOType
@@ -46,11 +46,11 @@ Segment::GetALGOType(const char * type)
   str.Trim();
   std::string  strClearStr = str.Trim();
   const char * strClear = strClearStr.c_str();
-  for (unsigned int i = 0; ALGOTypeStrings[i] != 0; ++i)
+  for (unsigned int i = 0; ALGOTypeStrings[i] != NULL; ++i)
   {
     if (strcmp(strClear, ALGOTypeStrings[i]) == 0)
     {
-      return (ALGOType)i;
+      return static_cast<ALGOType>(i);
     }
   }
   // Did not find anything, that's pretty bad, let's hope that
@@ -58,11 +58,11 @@ Segment::GetALGOType(const char * type)
   // padded binary string.
   CodeString  codestring = strClear;
   std::string cs = codestring.GetAsString();
-  for (unsigned int i = 0; ALGOTypeStrings[i] != 0; ++i)
+  for (unsigned int i = 0; ALGOTypeStrings[i] != NULL; ++i)
   {
     if (strcmp(cs.c_str(), ALGOTypeStrings[i]) == 0)
     {
-      return (ALGOType)i;
+      return static_cast<ALGOType>(i);
     }
   }
   return ALGOType_END;
@@ -251,7 +251,7 @@ Segment::SetSegmentAlgorithmName(const char * name)
 void
 Segment::ComputeSurfaceCount()
 {
-  SurfaceCount = (unsigned long)Surfaces.size();
+  SurfaceCount = Surfaces.size();
 }
 
 unsigned long

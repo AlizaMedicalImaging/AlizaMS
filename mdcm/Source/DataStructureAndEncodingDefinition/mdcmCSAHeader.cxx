@@ -31,7 +31,7 @@
 namespace mdcm
 {
 
-CSAElement CSAHeader::CSAEEnd = CSAElement((unsigned int)-1);
+CSAElement CSAHeader::CSAEEnd = CSAElement(static_cast<unsigned int>(-1));
 
 const CSAElement &
 CSAHeader::GetCSAEEnd() const
@@ -172,8 +172,8 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
   InternalType = UNKNOWN; // reset
   mdcm::Tag t1(0x0029, 0x0010);
   mdcm::Tag t2(0x0029, 0x0020);
-  uint16_t  v = (uint16_t)(de.GetTag().GetElement() << 8);
-  uint16_t  v2 = (uint16_t)(v >> 8);
+  uint16_t  v = static_cast<uint16_t>(de.GetTag().GetElement() << 8);
+  uint16_t  v2 = static_cast<uint16_t>(v >> 8);
   if (v2 == t1.GetElement())
   {
     DataElementTag = t1;
@@ -269,7 +269,7 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
     InternalType = SV10;
   }
   assert(InternalType != UNKNOWN);
-  mdcmDebugMacro("Found Type: " << (int)InternalType);
+  mdcmDebugMacro("Found Type: " << static_cast<int>(InternalType));
 
   uint32_t n;
   ss.read(reinterpret_cast<char *>(&n), sizeof(n));

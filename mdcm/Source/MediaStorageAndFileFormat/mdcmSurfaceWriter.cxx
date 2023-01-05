@@ -78,7 +78,7 @@ SurfaceWriter::PrepareWrite()
     return false;
   }
   Attribute<0x0066, 0x0001> numberOfSurfaces;
-  numberOfSurfaces.SetValue((unsigned int)nbSurfaces);
+  numberOfSurfaces.SetValue(static_cast<unsigned int>(nbSurfaces));
   ds.Replace(numberOfSurfaces.GetAsDataElement());
   // Surface Sequence
   SmartPointer<SequenceOfItems> surfacesSQ;
@@ -138,7 +138,7 @@ SurfaceWriter::PrepareWrite()
       unsigned long             surfaceNumber = surface->GetSurfaceNumber();
       if (surfaceNumber == 0)
         surfaceNumber = numSurface;
-      surfaceNumberAt.SetValue((unsigned int)surfaceNumber);
+      surfaceNumberAt.SetValue(static_cast<unsigned int>(surfaceNumber));
       surfaceDS.Replace(surfaceNumberAt.GetAsDataElement());
       // Surface Comments (Type 3)
       const char * surfaceComments = surface->GetSurfaceComments();
@@ -243,7 +243,7 @@ SurfaceWriter::PrepareWrite()
       // Presentation Type
       Attribute<0x0066, 0x000D> presentationType;
       const char * reconmmendedPresentationType = Surface::GetVIEWTypeString(surface->GetRecommendedPresentationType());
-      if (reconmmendedPresentationType != 0)
+      if (reconmmendedPresentationType != NULL)
         presentationType.SetValue(reconmmendedPresentationType);
       else
         presentationType.SetValue(Surface::GetVIEWTypeString(Surface::SURFACE)); // Is it the right thing to do?
@@ -308,7 +308,7 @@ SurfaceWriter::PrepareWrite()
         DataSet & surfacePointsNormalsDS = surfacePointsNormalsItem.GetNestedDataSet();
         // Number of Vectors
         Attribute<0x0066, 0x001E> numberOfVectors;
-        numberOfVectors.SetValue((unsigned int)surface->GetNumberOfVectors());
+        numberOfVectors.SetValue(static_cast<unsigned int>(surface->GetNumberOfVectors()));
         surfacePointsNormalsDS.Replace(numberOfVectors.GetAsDataElement());
         // Vector Dimensionality
         Attribute<0x0066, 0x001F> vectorDimensionalityAt;
@@ -318,7 +318,7 @@ SurfaceWriter::PrepareWrite()
         // Vector Accuracy (Type 3)
         Attribute<0x0066, 0x0020> vectorAccuracyAt;
         const float *             vectorAccuracy = surface->GetVectorAccuracy();
-        if (vectorAccuracy != 0)
+        if (vectorAccuracy != NULL)
         {
           vectorAccuracyAt.SetValues(vectorAccuracy, vectorDimensionality);
           surfacePointsNormalsDS.Replace(vectorAccuracyAt.GetAsDataElement());
@@ -693,7 +693,7 @@ SurfaceWriter::PrepareWrite()
   {
     const char * SOPClassUID = MediaStorage::GetMSString(MediaStorage::SurfaceSegmentationStorage);
     DataElement  de(Tag(0x0008, 0x0016));
-    VL::Type     strlenSOPClassUID = (VL::Type)strlen(SOPClassUID);
+    VL::Type     strlenSOPClassUID = static_cast<VL::Type>(strlen(SOPClassUID));
     de.SetByteValue(SOPClassUID, strlenSOPClassUID);
     de.SetVR(Attribute<0x0008, 0x0016>::GetVR());
     ds.ReplaceEmpty(de);
@@ -705,7 +705,7 @@ SurfaceWriter::PrepareWrite()
     UIDgen.SetRoot(MediaStorage::GetMSString(MediaStorage::SurfaceSegmentationStorage));
     const char * SOPInstanceUID = UIDgen.Generate();
     DataElement  de(Tag(0x0008, 0x0018));
-    VL::Type     strlenSOPInstanceUID = (VL::Type)strlen(SOPInstanceUID);
+    VL::Type     strlenSOPInstanceUID = static_cast<VL::Type>(strlen(SOPInstanceUID));
     de.SetByteValue(SOPInstanceUID, strlenSOPInstanceUID);
     de.SetVR(Attribute<0x0008, 0x0018>::GetVR());
     ds.ReplaceEmpty(de);
@@ -714,7 +714,7 @@ SurfaceWriter::PrepareWrite()
   {
     const char * tsuid = TransferSyntax::GetTSString(ts);
     DataElement  de(Tag(0x0002, 0x0010));
-    VL::Type     strlenTSUID = (VL::Type)strlen(tsuid);
+    VL::Type     strlenTSUID = static_cast<VL::Type>(strlen(tsuid));
     de.SetByteValue(tsuid, strlenTSUID);
     de.SetVR(Attribute<0x0002, 0x0010>::GetVR());
     fmi.Replace(de);
@@ -790,12 +790,12 @@ SurfaceWriter::PrepareWritePointMacro(SmartPointer<Surface> surface, DataSet & s
     unsigned long             numberOfSurfacePoints = surface->GetNumberOfSurfacePoints();
     if (bv && numberOfSurfacePoints == 0)
       numberOfSurfacePoints = bv->GetLength() / (VR::GetLength(VR::OF) * 3);
-    numberOfSurfacePointsAt.SetValue((unsigned int)numberOfSurfacePoints);
+    numberOfSurfacePointsAt.SetValue(static_cast<unsigned int>(numberOfSurfacePoints));
     surfacePointsDs.Replace(numberOfSurfacePointsAt.GetAsDataElement());
     // Point Position Accuracy (Type 3)
     Attribute<0x0066, 0x0017> pointPositionAccuracyAt;
     const float *             pointPositionAccuracy = surface->GetPointPositionAccuracy();
-    if (pointPositionAccuracy != 0)
+    if (pointPositionAccuracy != NULL)
     {
       pointPositionAccuracyAt.SetValues(pointPositionAccuracy);
       surfacePointsDs.Replace(pointPositionAccuracyAt.GetAsDataElement());
@@ -819,7 +819,7 @@ SurfaceWriter::PrepareWritePointMacro(SmartPointer<Surface> surface, DataSet & s
     // Point Bounding Box Coordinates (Type 3)
     Attribute<0x0066, 0x001a> pointsBoundingBoxCoordinatesAt;
     const float *             pointsBoundingBoxCoordinates = surface->GetPointsBoundingBoxCoordinates();
-    if (pointsBoundingBoxCoordinates != 0)
+    if (pointsBoundingBoxCoordinates != NULL)
     {
       pointsBoundingBoxCoordinatesAt.SetValues(pointsBoundingBoxCoordinates);
       surfacePointsDs.Replace(pointsBoundingBoxCoordinatesAt.GetAsDataElement());
@@ -827,7 +827,7 @@ SurfaceWriter::PrepareWritePointMacro(SmartPointer<Surface> surface, DataSet & s
     // Axis of Rotation (Type 3)
     Attribute<0x0066, 0x001b> axisOfRotationAt;
     const float *             axisOfRotation = surface->GetAxisOfRotation();
-    if (axisOfRotation != 0)
+    if (axisOfRotation != NULL)
     {
       axisOfRotationAt.SetValues(axisOfRotation);
       surfacePointsDs.Replace(axisOfRotationAt.GetAsDataElement());
@@ -835,7 +835,7 @@ SurfaceWriter::PrepareWritePointMacro(SmartPointer<Surface> surface, DataSet & s
     // Center of Rotation (Type 3)
     Attribute<0x0066, 0x001c> centerOfRotationAt;
     const float *             centerOfRotation = surface->GetCenterOfRotation();
-    if (centerOfRotation != 0)
+    if (centerOfRotation != NULL)
     {
       centerOfRotationAt.SetValues(centerOfRotation);
       surfacePointsDs.Replace(centerOfRotationAt.GetAsDataElement());

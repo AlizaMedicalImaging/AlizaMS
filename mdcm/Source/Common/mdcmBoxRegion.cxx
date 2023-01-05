@@ -109,7 +109,7 @@ BoxRegion::Area() const
     // multiplication exceed range of unsigned
     return 0;
   }
-  return (size_t)(tmp * C);
+  return static_cast<size_t>(tmp * C);
 }
 
 unsigned int

@@ -92,12 +92,20 @@ FilenameGenerator::Generate()
       return false;
     }
     bool   success = true;
-    char * internal = new char[internal_len];
+    char * internal;
+    try
+    {
+      internal = new char[internal_len];
+    }
+    catch (std::bad_alloc&)
+    {
+      return false;
+    }
     for (SizeType i = 0; i < numfiles && success; ++i)
     {
       int res = snprintf(internal, internal_len, Pattern.c_str(), i);
       assert(res >= 0);
-      success = (SizeType)res < internal_len;
+      success = static_cast<SizeType>(res) < internal_len;
       if (Pattern.empty())
       {
         Filenames[i] = internal;

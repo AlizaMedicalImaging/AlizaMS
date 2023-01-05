@@ -273,7 +273,7 @@ public:
   tell()
   {
     assert(cur <= ptr + len);
-    return (streampos_t)(cur - ptr);
+    return static_cast<streampos_t>(cur - ptr);
   }
   bool
   seek(streampos_t pos)
@@ -385,7 +385,7 @@ RLECodec::Decode(DataElement const & in, DataElement & out)
       mdcmAlwaysWarnMacro("RLECodec:: Decode() (2): value too big for ByteValue");
       return false;
     }
-    out.SetByteValue(&str[0], (VL::Type)str_size);
+    out.SetByteValue(&str[0], static_cast<VL::Type>(str_size));
     return true;
   }
   else if (NumberOfDimensions == 3)
@@ -668,7 +668,7 @@ RLECodec::Code(DataElement const & in, DataElement & out)
     }
     header.Offset[MaxNumSegments] = 0;
     std::stringstream os;
-    os.write((char *)&header, sizeof(header));
+    os.write(reinterpret_cast<char *>(&header), sizeof(header));
     std::string str = os.str() + datastr;
     assert(str.size());
     Fragment frag;
@@ -677,7 +677,7 @@ RLECodec::Code(DataElement const & in, DataElement & out)
     {
       return false;
     }
-    frag.SetByteValue(&str[0], (VL::Type)str_size);
+    frag.SetByteValue(&str[0], static_cast<VL::Type>(str_size));
     sq->AddFragment(frag);
   }
   out.SetValue(*sq);
@@ -854,7 +854,7 @@ RLECodec::DecodeByStreams(std::istream & is, std::ostream & os)
     // one, we are reading in 128001 byte, while only 128000 are present
     while (numOutBytes < length)
     {
-      is.read((char *)&byte, 1);
+      is.read(reinterpret_cast<char *>(&byte), 1);
       if (!is.good())
       {
         mdcmErrorMacro("Could not decode");

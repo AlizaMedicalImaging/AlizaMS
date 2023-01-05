@@ -67,7 +67,7 @@ PhotometricInterpretation::GetPIType(const char * inputpi)
   CodeString   codestring = inputpi;
   CSComp       cs = codestring.GetAsString();
   const char * pi = cs.c_str();
-  for (unsigned int i = 1; PIStrings[i] != 0; ++i)
+  for (unsigned int i = 1; PIStrings[i] != NULL; ++i)
   {
     if (strcmp(pi, PIStrings[i]) == 0)
     {

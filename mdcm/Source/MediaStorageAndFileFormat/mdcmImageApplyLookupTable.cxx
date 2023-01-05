@@ -61,7 +61,7 @@ ImageApplyLookupTable::Apply()
   std::vector<char> v2;
   v2.resize(len * 3);
   lut.Decode(&v2[0], v2.size(), &v[0], v.size());
-  de.SetByteValue(&v2[0], (uint32_t)v2.size());
+  de.SetByteValue(&v2[0], static_cast<uint32_t>(v2.size()));
   Output->GetLUT().Clear();
   Output->SetPhotometricInterpretation(PhotometricInterpretation::RGB);
   Output->GetPixelFormat().SetSamplesPerPixel(3);

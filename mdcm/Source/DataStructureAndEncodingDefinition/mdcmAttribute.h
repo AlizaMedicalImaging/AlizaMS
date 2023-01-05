@@ -111,10 +111,10 @@ public:
 
   ArrayType Internal[VMToLength<TVM>::Length];
   // VR/VM must be compatible with the public dictionary
-  MDCM_STATIC_ASSERT(((VR::VRType)TVR & (VR::VRType)(TagToType<Group, Element>::VRType)));
-  MDCM_STATIC_ASSERT(((VM::VMType)TVM & (VM::VMType)(TagToType<Group, Element>::VMType)));
-  MDCM_STATIC_ASSERT(((((VR::VRType)TVR & VR::VR_VM1) && ((VM::VMType)TVM == VM::VM1)) ||
-                      !((VR::VRType)TVR & VR::VR_VM1)));
+  MDCM_STATIC_ASSERT((static_cast<VR::VRType>(TVR) & static_cast<VR::VRType>(TagToType<Group, Element>::VRType)));
+  MDCM_STATIC_ASSERT((static_cast<VM::VMType>(TVM) & static_cast<VM::VMType>(TagToType<Group, Element>::VMType)));
+  MDCM_STATIC_ASSERT((((static_cast<VR::VRType>(TVR) & VR::VR_VM1) && (static_cast<VM::VMType>(TVM) == VM::VM1)) ||
+                      !(static_cast<VR::VRType>(TVR) & VR::VR_VM1)));
 
   static Tag
   GetTag()
@@ -125,13 +125,13 @@ public:
   static VR
   GetVR()
   {
-    return (VR::VRType)TVR;
+    return static_cast<VR::VRType>(TVR);
   }
 
   static VM
   GetVM()
   {
-    return (VM::VMType)TVM;
+    return static_cast<VM::VMType>(TVM);
   }
 
   // The following two methods do make sense only in case of public element,
@@ -140,13 +140,13 @@ public:
   static VR
   GetDictVR()
   {
-    return (VR::VRType)(TagToType<Group, Element>::VRType);
+    return static_cast<VR::VRType>(TagToType<Group, Element>::VRType);
   }
 
   static VM
   GetDictVM()
   {
-    return (VM::VMType)(TagToType<Group, Element>::VMType);
+    return static_cast<VM::VMType>(TagToType<Group, Element>::VMType);
   }
 
   unsigned int
@@ -231,7 +231,7 @@ public:
     EncodingImplementation<VRToEncoding<TVR>::Mode>::Write(Internal, GetNumberOfValues(), os);
     ret.SetVR(GetVR());
     assert(ret.GetVR() != VR::SQ);
-    if ((VR::VRType)VRToEncoding<TVR>::Mode == VR::VRASCII)
+    if (static_cast<VR::VRType>(VRToEncoding<TVR>::Mode) == VR::VRASCII)
     {
       if (GetVR() != VR::UI)
       {
@@ -241,7 +241,7 @@ public:
         }
       }
     }
-    VL::Type osStrSize = (VL::Type)os.str().size();
+    VL::Type osStrSize = static_cast<VL::Type>(os.str().size());
     ret.SetByteValue(os.str().c_str(), osStrSize);
     return ret;
   }
@@ -323,16 +323,16 @@ public:
   ArrayType Internal;
   MDCM_STATIC_ASSERT(VMToLength<VM::VM1>::Length == 1);
   // VR/VM must be compatible with the public dictionary
-  MDCM_STATIC_ASSERT(((VR::VRType)TVR & (VR::VRType)(TagToType<Group, Element>::VRType)));
-  MDCM_STATIC_ASSERT(((VM::VMType)VM::VM1 & (VM::VMType)(TagToType<Group, Element>::VMType)));
-  MDCM_STATIC_ASSERT(((((VR::VRType)TVR & VR::VR_VM1) && ((VM::VMType)VM::VM1 == VM::VM1)) ||
-                      !((VR::VRType)TVR & VR::VR_VM1)));
-  MDCM_STATIC_ASSERT((VR::VRType)TVR != VR::OB);
-  MDCM_STATIC_ASSERT((VR::VRType)TVR != VR::OW);
-  MDCM_STATIC_ASSERT((VR::VRType)TVR != VR::OD);
-  MDCM_STATIC_ASSERT((VR::VRType)TVR != VR::OF);
-  MDCM_STATIC_ASSERT((VR::VRType)TVR != VR::OL);
-  MDCM_STATIC_ASSERT((VR::VRType)TVR != VR::OV);
+  MDCM_STATIC_ASSERT((static_cast<VR::VRType>(TVR) & static_cast<VR::VRType>(TagToType<Group, Element>::VRType)));
+  MDCM_STATIC_ASSERT((VM::VM1 & static_cast<VM::VMType>(TagToType<Group, Element>::VMType)));
+  MDCM_STATIC_ASSERT((((static_cast<VR::VRType>(TVR) & VR::VR_VM1) && (VM::VM1 == VM::VM1)) ||
+                      !(static_cast<VR::VRType>(TVR) & VR::VR_VM1)));
+  MDCM_STATIC_ASSERT(static_cast<VR::VRType>(TVR) != VR::OB);
+  MDCM_STATIC_ASSERT(static_cast<VR::VRType>(TVR) != VR::OW);
+  MDCM_STATIC_ASSERT(static_cast<VR::VRType>(TVR) != VR::OD);
+  MDCM_STATIC_ASSERT(static_cast<VR::VRType>(TVR) != VR::OF);
+  MDCM_STATIC_ASSERT(static_cast<VR::VRType>(TVR) != VR::OL);
+  MDCM_STATIC_ASSERT(static_cast<VR::VRType>(TVR) != VR::OV);
 
   static Tag
   GetTag()
@@ -343,13 +343,13 @@ public:
   static VR
   GetVR()
   {
-    return (VR::VRType)TVR;
+    return static_cast<VR::VRType>(TVR);
   }
 
   static VM
   GetVM()
   {
-    return (VM::VMType)VM::VM1;
+    return VM::VM1;
   }
 
   // The following two methods do make sense only in case of public element,
@@ -358,13 +358,13 @@ public:
   static VR
   GetDictVR()
   {
-    return (VR::VRType)(TagToType<Group, Element>::VRType);
+    return static_cast<VR::VRType>(TagToType<Group, Element>::VRType);
   }
 
   static VM
   GetDictVM()
   {
-    return (VM::VMType)(TagToType<Group, Element>::VMType);
+    return static_cast<VM::VMType>(TagToType<Group, Element>::VMType);
   }
 
   unsigned int
@@ -433,7 +433,7 @@ public:
     EncodingImplementation<VRToEncoding<TVR>::Mode>::WriteOne(Internal, 1, os);
     ret.SetVR(GetVR());
     assert(ret.GetVR() != VR::SQ);
-    if ((VR::VRType)VRToEncoding<TVR>::Mode == VR::VRASCII)
+    if (static_cast<VR::VRType>(VRToEncoding<TVR>::Mode) == VR::VRASCII)
     {
       if (GetVR() != VR::UI)
       {
@@ -443,7 +443,7 @@ public:
         }
       }
     }
-    VL::Type osStrSize = (VL::Type)os.str().size();
+    VL::Type osStrSize = static_cast<VL::Type>(os.str().size());
     ret.SetByteValue(os.str().c_str(), osStrSize);
     return ret;
   }
@@ -518,10 +518,11 @@ class Attribute<Group, Element, TVR, VM::VM1_n>
 public:
   typedef typename VRToType<TVR>::Type ArrayType;
   // VR/VM must be compatible with the public dictionary
-  MDCM_STATIC_ASSERT(((VR::VRType)TVR & (VR::VRType)(TagToType<Group, Element>::VRType)));
-  MDCM_STATIC_ASSERT((VM::VM1_n & (VM::VMType)(TagToType<Group, Element>::VMType)));
-  MDCM_STATIC_ASSERT(((((VR::VRType)TVR & VR::VR_VM1) && ((VM::VMType)TagToType<Group, Element>::VMType == VM::VM1)) ||
-                      !((VR::VRType)TVR & VR::VR_VM1)));
+  MDCM_STATIC_ASSERT((static_cast<VR::VRType>(TVR) & static_cast<VR::VRType>(TagToType<Group, Element>::VRType)));
+  MDCM_STATIC_ASSERT((VM::VM1_n & static_cast<VM::VMType>(TagToType<Group, Element>::VMType)));
+  MDCM_STATIC_ASSERT((((static_cast<VR::VRType>(TVR) & VR::VR_VM1) &&
+                        (static_cast<VM::VMType>(TagToType<Group, Element>::VMType) == VM::VM1)) ||
+                      !(static_cast<VR::VRType>(TVR) & VR::VR_VM1)));
 
   static Tag
   GetTag()
@@ -532,7 +533,7 @@ public:
   static VR
   GetVR()
   {
-    return (VR::VRType)TVR;
+    return static_cast<VR::VRType>(TVR);
   }
 
   static VM
@@ -544,7 +545,7 @@ public:
   static VR
   GetDictVR()
   {
-    return (VR::VRType)(TagToType<Group, Element>::VRType);
+    return static_cast<VR::VRType>(TagToType<Group, Element>::VRType);
   }
 
   static VM
@@ -676,7 +677,7 @@ public:
     if (Internal)
     {
       EncodingImplementation<VRToEncoding<TVR>::Mode>::Write(Internal, GetNumberOfValues(), os);
-      if ((VR::VRType)VRToEncoding<TVR>::Mode == VR::VRASCII)
+      if (static_cast<VR::VRType>(VRToEncoding<TVR>::Mode) == VR::VRASCII)
       {
         if (GetVR() != VR::UI)
         {
@@ -689,7 +690,7 @@ public:
     }
     ret.SetVR(GetVR());
     assert(ret.GetVR() != VR::SQ);
-    VL::Type osStrSize = (VL::Type)os.str().size();
+    VL::Type osStrSize = static_cast<VL::Type>(os.str().size());
     ret.SetByteValue(os.str().c_str(), osStrSize);
     return ret;
   }
@@ -732,7 +733,7 @@ protected:
     ArrayType * internal;
     try
     {
-      internal = new ArrayType[(VL::Type)bv->GetLength()]; // overallocation
+      internal = new ArrayType[static_cast<VL::Type>(bv->GetLength())]; // overallocation
     }
     catch (const std::bad_alloc &)
     {

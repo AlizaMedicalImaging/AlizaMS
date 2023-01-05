@@ -42,10 +42,10 @@ PrivateTag::ReadFromCommaSeparatedString(const char * str)
     mdcmDebugMacro("Problem reading Private Tag: " << str);
     return false;
   }
-  SetGroup((uint16_t)group);
+  SetGroup(static_cast<uint16_t>(group));
   // This is not considered an error to specify element as 1010 for example.
   // just keep the lower bits of element:
-  SetElement((uint8_t)element);
+  SetElement(static_cast<uint8_t>(element));
   SetOwner(owner.c_str());
   if (!*GetOwner())
   {
@@ -99,7 +99,7 @@ PrivateTag::GetAsDataElement() const
   std::string copy = Owner;
   if (copy.size() % 2)
     copy.push_back(' ');
-  de.SetByteValue(copy.c_str(), (uint32_t)copy.size());
+  de.SetByteValue(copy.c_str(), static_cast<uint32_t>(copy.size()));
   return de;
 }
 

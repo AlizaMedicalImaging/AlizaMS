@@ -52,10 +52,10 @@ FileDecompressLookupTable::Change()
     unsigned int l;
     // RED
     memset(rawlut, 0, lutlen * 2);
-    lut.GetLUT(LookupTable::RED, (unsigned char *)rawlut, l);
+    lut.GetLUT(LookupTable::RED, reinterpret_cast<unsigned char *>(rawlut), l);
     DataElement redde(Tag(0x0028, 0x1201));
     redde.SetVR(VR::OW);
-    redde.SetByteValue((char *)rawlut, l);
+    redde.SetByteValue(reinterpret_cast<char *>(rawlut), l);
     ds.Replace(redde);
     // Descriptor
     Attribute<0x0028, 0x1101, VR::US, VM::VM3> reddesc;
@@ -66,10 +66,10 @@ FileDecompressLookupTable::Change()
     ds.Replace(reddesc.GetAsDataElement());
     // GREEN
     memset(rawlut, 0, lutlen * 2);
-    lut.GetLUT(LookupTable::GREEN, (unsigned char *)rawlut, l);
+    lut.GetLUT(LookupTable::GREEN, reinterpret_cast<unsigned char *>(rawlut), l);
     DataElement greende(Tag(0x0028, 0x1202));
     greende.SetVR(VR::OW);
-    greende.SetByteValue((char *)rawlut, l);
+    greende.SetByteValue(reinterpret_cast<char *>(rawlut), l);
     ds.Replace(greende);
     // Descriptor
     Attribute<0x0028, 0x1102, VR::US, VM::VM3> greendesc;
@@ -80,10 +80,10 @@ FileDecompressLookupTable::Change()
     ds.Replace(greendesc.GetAsDataElement());
     // BLUE
     memset(rawlut, 0, lutlen * 2);
-    lut.GetLUT(LookupTable::BLUE, (unsigned char *)rawlut, l);
+    lut.GetLUT(LookupTable::BLUE, reinterpret_cast<unsigned char *>(rawlut), l);
     DataElement bluede(Tag(0x0028, 0x1203));
     bluede.SetVR(VR::OW);
-    bluede.SetByteValue((char *)rawlut, l);
+    bluede.SetByteValue(reinterpret_cast<char *>(rawlut), l);
     ds.Replace(bluede);
     // Descriptor
     Attribute<0x0028, 0x1103, VR::US, VM::VM3> bluedesc;

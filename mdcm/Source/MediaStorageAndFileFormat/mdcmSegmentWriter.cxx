@@ -33,7 +33,7 @@ SegmentWriter::~SegmentWriter() {}
 unsigned int
 SegmentWriter::GetNumberOfSegments() const
 {
-  return (unsigned int)Segments.size();
+  return static_cast<unsigned int>(Segments.size());
 }
 
 void
@@ -186,7 +186,7 @@ SegmentWriter::PrepareWrite()
     Attribute<0x0062, 0x0004> segmentNumberAt;
     unsigned short            segmentNumber = segment->GetSegmentNumber();
     if (segmentNumber == 0)
-      segmentNumber = (unsigned short)itemNumber;
+      segmentNumber = static_cast<unsigned short>(itemNumber);
     segmentNumberAt.SetValue(segmentNumber);
     segmentDS.Replace(segmentNumberAt.GetAsDataElement());
     // Segment Label (Type 1)
@@ -208,7 +208,7 @@ SegmentWriter::PrepareWrite()
     }
     // Segment Algorithm Type (Type 1)
     const char * segmentAlgorithmType = Segment::GetALGOTypeString(segment->GetSegmentAlgorithmType());
-    if (segmentAlgorithmType == 0)
+    if (segmentAlgorithmType == NULL)
     {
       mdcmWarningMacro("No segment algorithm type specified");
       Attribute<0x0062, 0x0008> segmentAlgorithmTypeAt;
@@ -268,7 +268,7 @@ SegmentWriter::PrepareWrite()
     {
       // Surface Count
       Attribute<0x0066, 0x002A> surfaceCountAt;
-      surfaceCountAt.SetValue((unsigned int)surfaceCount);
+      surfaceCountAt.SetValue(static_cast<unsigned int>(surfaceCount));
       segmentDS.Replace(surfaceCountAt.GetAsDataElement());
       // Referenced Surface Sequence
       SmartPointer<SequenceOfItems> segmentsRefSQ;
@@ -313,7 +313,7 @@ SegmentWriter::PrepareWrite()
           refSurfaceNumber = surfaceNumber++;
           surface->SetSurfaceNumber(refSurfaceNumber);
         }
-        refSurfaceNumberAt.SetValue((unsigned int)refSurfaceNumber);
+        refSurfaceNumberAt.SetValue(static_cast<unsigned int>(refSurfaceNumber));
         segmentsRefDS.Replace(refSurfaceNumberAt.GetAsDataElement());
         // Segment Surface Source Instance Sequence
         {

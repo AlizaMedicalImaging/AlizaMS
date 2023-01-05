@@ -35,7 +35,7 @@ const char *
 MeshPrimitive::GetMPTypeString(const MPType type)
 {
   assert(type <= MPType_END);
-  return MPStrings[(unsigned int)type];
+  return MPStrings[static_cast<unsigned int>(type)];
 }
 
 MeshPrimitive::MPType
@@ -48,11 +48,11 @@ MeshPrimitive::GetMPType(const char * type)
   str.Trim();
   std::string  typeClearStr = str.Trim();
   const char * typeClear = typeClearStr.c_str();
-  for (unsigned int i = 0; MPStrings[i] != 0; ++i)
+  for (unsigned int i = 0; MPStrings[i] != NULL; ++i)
   {
     if (strcmp(typeClear, MPStrings[i]) == 0)
     {
-      return (MPType)i;
+      return static_cast<MPType>(i);
     }
   }
   // We did not find anything, that's pretty bad, let's hope that
@@ -60,11 +60,11 @@ MeshPrimitive::GetMPType(const char * type)
   // string
   CodeString  codestring = typeClear;
   std::string cs = codestring.GetAsString();
-  for (unsigned int i = 0; MPStrings[i] != 0; ++i)
+  for (unsigned int i = 0; MPStrings[i] != NULL; ++i)
   {
     if (strcmp(cs.c_str(), MPStrings[i]) == 0)
     {
-      return (MPType)i;
+      return static_cast<MPType>(i);
     }
   }
   return MPType_END;
@@ -155,7 +155,7 @@ MeshPrimitive::GetPrimitiveData(const unsigned int idx)
 unsigned int
 MeshPrimitive::GetNumberOfPrimitivesData() const
 {
-  return (unsigned int)PrimitiveData.size();
+  return static_cast<unsigned int>(PrimitiveData.size());
 }
 
 } // namespace mdcm

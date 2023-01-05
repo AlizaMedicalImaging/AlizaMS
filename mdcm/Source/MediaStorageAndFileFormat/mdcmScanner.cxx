@@ -167,7 +167,7 @@ Scanner::Scan(const std::vector<std::string> & filenames, const Dict & dict)
       last = publiclast;
     }
     Progress = 0.0;
-    const double                             progresstick = (filenames_size > 0) ? 1.0 / (double)filenames_size : 0.0;
+    const double                             progresstick = (filenames_size > 0) ? 1.0 / static_cast<double>(filenames_size) : 0.0;
     std::vector<std::string>::const_iterator it = Filenames.cbegin();
     for (; it != Filenames.cend(); ++it)
     {

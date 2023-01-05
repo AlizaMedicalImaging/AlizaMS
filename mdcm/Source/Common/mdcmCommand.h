@@ -153,7 +153,7 @@ protected:
   TMemberFunctionPointer m_MemberFunction;
   SimpleMemberCommand()
     : m_This(NULL)
-    , m_MemberFunction(0)
+    , m_MemberFunction(NULL)
   {}
   virtual ~SimpleMemberCommand() {}
 

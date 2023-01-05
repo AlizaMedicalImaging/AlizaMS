@@ -77,7 +77,7 @@ UIDGenerator::GetMDCMUID()
 }
 
 // http://www.isthe.com/chongo/tech/comp/fnv
-#define FNV1_64_INIT ((uint64_t)0xcbf29ce484222325ULL)
+#define FNV1_64_INIT (static_cast<uint64_t>(0xcbf29ce484222325ULL))
 struct fnv_hash
 {
   static uint64_t
@@ -85,7 +85,7 @@ struct fnv_hash
   {
     uint64_t nHashVal = FNV1_64_INIT, nMagicPrime = 0x00000100000001b3ULL;
 
-    const unsigned char *pFirst = (const unsigned char *)(pBuffer), *pLast = pFirst + nByteLen;
+    const unsigned char *pFirst = reinterpret_cast<const unsigned char *>(pBuffer), *pLast = pFirst + nByteLen;
 
     while (pFirst < pLast)
     {
@@ -136,7 +136,7 @@ UIDGenerator::Generate()
       while ((Unique.size() + len > 64) && i < 8)
       {
         x[7 - i] = 0;
-        uuid[idx] = (unsigned char)x.to_ulong();
+        uuid[idx] = static_cast<unsigned char>(x.to_ulong());
         len = System::EncodeBytes(randbytesbuf, uuid, sizeof(uuid));
         ++i;
       }
@@ -252,7 +252,7 @@ UIDGenerator::IsValid(const std::string & uid)
         }
       }
     }
-    else if (!isdigit((unsigned char)uid[i]))
+    else if (!isdigit(static_cast<unsigned char>(uid[i])))
     {
       return false;
     }

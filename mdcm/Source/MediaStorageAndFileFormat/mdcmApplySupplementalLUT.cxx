@@ -44,7 +44,7 @@ ApplySupplementalLUT::Apply()
   const int RedSubscipt = lut.DecodeSupplemental(&v2[0], v2.size(), &v[0], v.size());
   if (RedSubscipt > INT_MIN)
     m_RedSubscipt = RedSubscipt;
-  de.SetByteValue(&v2[0], (uint32_t)v2.size());
+  de.SetByteValue(&v2[0], static_cast<uint32_t>(v2.size()));
   Output->GetLUT().Clear();
   Output->SetPhotometricInterpretation(PhotometricInterpretation::RGB);
   if (Output->GetPixelFormat().GetPixelRepresentation() != 0)

@@ -34,7 +34,7 @@ SurfaceReader::~SurfaceReader() {}
 unsigned long
 SurfaceReader::GetNumberOfSurfaces() const
 {
-  return (unsigned long)Segments.size();
+  return Segments.size();
 }
 
 bool
@@ -109,7 +109,7 @@ SurfaceReader::ReadSurface(const Item & surfaceItem, const unsigned long idx)
   const unsigned short * array = recommendedDisplayCIELabValue.GetValues();
   unsigned short         CIELavValue[3] = { 0, 0, 0 };
   unsigned int           i = 0;
-  while (array != 0 && i < 3)
+  while (array != NULL && i < 3)
   {
     CIELavValue[i++] = *(array++);
   }
@@ -521,7 +521,7 @@ SurfaceReader::ReadPointMacro(SmartPointer<Surface> surface, const DataSet & sur
   else
   {
     const unsigned long numberOfSurfacePoints =
-      (unsigned long)(pointCoordDataDe.GetVL().GetLength() / (VR::GetLength(VR::OF) * 3));
+      static_cast<unsigned long>(pointCoordDataDe.GetVL().GetLength() / (VR::GetLength(VR::OF) * 3));
     surface->SetNumberOfSurfacePoints(numberOfSurfacePoints);
   }
   // Point Position Accuracy (Type 3)

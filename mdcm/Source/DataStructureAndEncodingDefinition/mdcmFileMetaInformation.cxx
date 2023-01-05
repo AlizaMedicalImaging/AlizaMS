@@ -168,7 +168,7 @@ FileMetaInformation::FillFromDataSet(DataSet const & ds)
       const char * msstr = ms.GetString();
       if (msstr)
       {
-        VL::Type strlenMsstr = (VL::Type)strlen(msstr);
+        VL::Type strlenMsstr = static_cast<VL::Type>(strlen(msstr));
         xde.SetByteValue(msstr, strlenMsstr);
         xde.SetTag(Tag(0x0002, 0x0002));
         {
@@ -272,7 +272,7 @@ FileMetaInformation::FillFromDataSet(DataSet const & ds)
     if (strlen(currentts.c_str()) != strlen(datasetts) || strcmp(currentts.c_str(), datasetts) != 0)
     {
       xde = tsuid;
-      VL::Type strlenDatasetts = (VL::Type)strlen(datasetts);
+      VL::Type strlenDatasetts = static_cast<VL::Type>(strlen(datasetts));
       xde.SetByteValue(datasetts, strlenDatasetts);
       Replace(xde);
     }
@@ -291,7 +291,7 @@ FileMetaInformation::FillFromDataSet(DataSet const & ds)
       throw std::logic_error("No TransferSyntax specified");
     }
     const char * str = TransferSyntax::GetTSString(DataSetTS);
-    VL::Type     strlenStr = (VL::Type)strlen(str);
+    VL::Type     strlenStr = static_cast<VL::Type>(strlen(str));
     xde.SetByteValue(str, strlenStr);
     xde.SetVR(VR::UI);
     xde.SetTag(Tag(0x0002, 0x0010));
@@ -302,7 +302,7 @@ FileMetaInformation::FillFromDataSet(DataSet const & ds)
     xde.SetTag(Tag(0x0002, 0x0012));
     xde.SetVR(VR::UI);
     const char * implementation = FileMetaInformation::GetImplementationClassUID();
-    VL::Type     strlenImplementation = (VL::Type)strlen(implementation);
+    VL::Type     strlenImplementation = static_cast<VL::Type>(strlen(implementation));
     xde.SetByteValue(implementation, strlenImplementation);
     Insert(xde);
   }
@@ -311,7 +311,7 @@ FileMetaInformation::FillFromDataSet(DataSet const & ds)
     xde.SetTag(Tag(0x0002, 0x0013));
     xde.SetVR(VR::SH);
     SHComp   version = FileMetaInformation::GetImplementationVersionName();
-    VL::Type strlenVersion = (VL::Type)strlen(version);
+    VL::Type strlenVersion = static_cast<VL::Type>(strlen(version));
     xde.SetByteValue(version, strlenVersion);
     Insert(xde);
   }
@@ -320,7 +320,7 @@ FileMetaInformation::FillFromDataSet(DataSet const & ds)
     xde.SetTag(Tag(0x0002, 0x0016));
     xde.SetVR(VR::AE);
     const char * title = FileMetaInformation::GetSourceApplicationEntityTitle();
-    VL::Type     strlenTitle = (VL::Type)strlen(title);
+    VL::Type     strlenTitle = static_cast<VL::Type>(strlen(title));
     xde.SetByteValue(title, strlenTitle);
     Insert(xde);
   }
@@ -353,7 +353,7 @@ ReadExplicitDataElement(std::istream & is, ExplicitDataElement & de)
     // which seems to be quite different than fseeking in reverse from
     // the current position?
     assert((start - currentpos) <= 0);
-    assert((int)(start - currentpos) == -4);
+    assert(static_cast<int>(start - currentpos) == -4);
     is.seekg((start - currentpos), std::ios::cur);
     return false;
   }
@@ -437,7 +437,7 @@ ReadImplicitDataElement(std::istream & is, ImplicitDataElement & de)
     assert(0 && "Should not happen");
     return false;
   }
-  ByteValue * bv = 0;
+  ByteValue * bv;
   if (vl.IsUndefined())
   {
     assert(0 && "Should not happen");
@@ -662,9 +662,9 @@ FileMetaInformation::ReadCompat(std::istream & is)
   return is;
 }
 
-#define ADDVRIMPLICIT(element)                                \
-  case element:                                               \
-    de.SetVR((VR::VRType)TagToType<0x0002, element>::VRType); \
+#define ADDVRIMPLICIT(element) \
+  case element: \
+    de.SetVR(static_cast<VR::VRType>(TagToType<0x0002, element>::VRType)); \
     break
 
 bool

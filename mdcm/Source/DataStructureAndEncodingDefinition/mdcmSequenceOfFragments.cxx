@@ -155,14 +155,14 @@ SequenceOfFragments::FillFragmentWithJPEG(Fragment & frag, std::istream & is)
 {
   std::vector<unsigned char> jfif;
   unsigned char              byte;
-  while (is.read((char *)&byte, 1))
+  while (is.read(reinterpret_cast<char *>(&byte), 1))
   {
     jfif.push_back(byte);
     if (byte == 0xd9 && jfif[jfif.size() - 2] == 0xff)
       break;
   }
   const uint32_t len = static_cast<uint32_t>(jfif.size());
-  frag.SetByteValue((char *)&jfif[0], len);
+  frag.SetByteValue(reinterpret_cast<char *>(&jfif[0]), len);
   return true;
 }
 

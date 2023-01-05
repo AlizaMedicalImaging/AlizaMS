@@ -276,7 +276,7 @@ System::FileSize(const char * filename)
   const off_t  size = fs.st_size;
   const size_t size2 = size;
   // off_t can be larger than size_t
-  if (size != (off_t)size2)
+  if (size != static_cast<off_t>(size2))
     return 0;
   return size2;
 }
@@ -340,7 +340,7 @@ getlastdigit(unsigned char * data, unsigned long size)
   for (unsigned int i = 0; i < size; ++i)
   {
     extended = (carry << 8) + data[i];
-    data[i] = (unsigned char)(extended / 10);
+    data[i] = static_cast<unsigned char>(extended / 10);
     carry = extended % 10;
   }
   assert(carry >= 0 && carry < 10);
@@ -359,7 +359,7 @@ System::EncodeBytes(char * out, const unsigned char * data, int size)
   while (!zero)
   {
     res = getlastdigit(addr, size);
-    const char v = (char)('0' + res);
+    const char v = static_cast<char>('0' + res);
     sres.insert(sres.begin(), v);
     zero = true;
     for (int i = 0; i < size; ++i)
@@ -503,7 +503,7 @@ System::ParseDateTime(time_t & timep, long & milliseconds, const char date[22])
   }
 #endif
   timep = mktime(&ptm);
-  if (timep == (time_t)-1)
+  if (timep == static_cast<time_t>(-1))
     return false;
   milliseconds = 0;
   if (len > 14)
@@ -566,7 +566,7 @@ System::FormatDateTime(char date[22], time_t timep, long milliseconds)
   const int    ret2 = snprintf(date, maxsizall, "%s.%06ld", tmp, milliseconds);
   if (ret2 < 0)
     return false;
-  if ((size_t)ret2 >= maxsizall)
+  if (static_cast<size_t>(ret2) >= maxsizall)
   {
     return false;
   }

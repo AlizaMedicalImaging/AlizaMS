@@ -305,25 +305,25 @@ typedef basic_zip_istream<char> zip_istream;
 inline bool
 isGZip(std::istream & is)
 {
-  const int gz_magic[2] = { 0x1f, 0x8b };
+  const int gz_magic[] = { 0x1f, 0x8b };
 
   int c1 = is.get();
   if (c1 != gz_magic[0])
   {
-    is.putback((char)c1);
+    is.putback(static_cast<char>(c1));
     return false;
   }
 
   int c2 = is.get();
   if (c2 != gz_magic[1])
   {
-    is.putback((char)c2);
-    is.putback((char)c1);
+    is.putback(static_cast<char>(c2));
+    is.putback(static_cast<char>(c1));
     return false;
   }
 
-  is.putback((char)c2);
-  is.putback((char)c1);
+  is.putback(static_cast<char>(c2));
+  is.putback(static_cast<char>(c1));
   return true;
 }
 

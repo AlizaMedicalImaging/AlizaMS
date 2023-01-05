@@ -46,8 +46,8 @@ struct static_assert_test
 #define MDCM_JOIN(X, Y) MDCM_DO_JOIN(X, Y)
 #define MDCM_DO_JOIN(X, Y) MDCM_DO_JOIN2(X, Y)
 #define MDCM_DO_JOIN2(X, Y) X##Y
-#define MDCM_STATIC_ASSERT(B)                                                                                          \
-  typedef ::mdcm::static_assert_test<sizeof(::mdcm::STATIC_ASSERTION_FAILURE<(bool)(B)>)> MDCM_JOIN(                   \
+#define MDCM_STATIC_ASSERT(B) \
+  typedef ::mdcm::static_assert_test<sizeof(::mdcm::STATIC_ASSERTION_FAILURE<B>)> MDCM_JOIN( \
     mdcm_static_assert_typedef_, __LINE__)
 
 /* Example:

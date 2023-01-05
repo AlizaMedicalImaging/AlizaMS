@@ -93,7 +93,10 @@ public:
     return tmp;
   }
 
-  operator uint32_t() const { return ValueLength; }
+  operator uint32_t() const
+  {
+    return ValueLength;
+  }
 
   VL
   GetLength() const
@@ -109,7 +112,7 @@ public:
   std::istream &
   Read(std::istream & is)
   {
-    is.read((char *)(&ValueLength), sizeof(uint32_t));
+    is.read(reinterpret_cast<char *>(&ValueLength), sizeof(uint32_t));
     TSwap::SwapArray(&ValueLength, 1);
     return is;
   }
@@ -119,7 +122,7 @@ public:
   Read16(std::istream & is)
   {
     uint16_t copy;
-    is.read((char *)(&copy), sizeof(uint16_t));
+    is.read(reinterpret_cast<char *>(&copy), sizeof(uint16_t));
     TSwap::SwapArray(&copy, 1);
     ValueLength = copy;
     assert(ValueLength <= 65535 /*UINT16_MAX*/);
@@ -136,7 +139,7 @@ public:
       ++copy;
     }
     TSwap::SwapArray(&copy, 1);
-    return os.write((char *)(&copy), sizeof(uint32_t));
+    return os.write(reinterpret_cast<char *>(&copy), sizeof(uint32_t));
   }
 
   template <typename TSwap>
@@ -144,13 +147,13 @@ public:
   Write16(std::ostream & os) const
   {
     assert(ValueLength <= 65535);
-    uint16_t copy = (uint16_t)ValueLength;
+    uint16_t copy = static_cast<uint16_t>(ValueLength);
     if (IsOdd())
     {
       ++copy;
     }
     TSwap::SwapArray(&copy, 1);
-    return os.write((char *)(&copy), sizeof(uint16_t));
+    return os.write(reinterpret_cast<char *>(&copy), sizeof(uint16_t));
   }
 
 private:

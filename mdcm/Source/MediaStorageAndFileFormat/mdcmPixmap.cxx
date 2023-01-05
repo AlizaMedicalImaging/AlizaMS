@@ -40,7 +40,7 @@ Pixmap::AreOverlaysInPixelData() const
   std::vector<Overlay>::const_iterator it = Overlays.begin();
   for (; it != Overlays.end(); ++it)
   {
-    total += (int)it->IsInPixelData();
+    total += static_cast<int>(it->IsInPixelData());
   }
   return total != 0;
 }

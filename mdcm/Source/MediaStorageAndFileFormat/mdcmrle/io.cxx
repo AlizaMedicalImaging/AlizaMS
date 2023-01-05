@@ -70,7 +70,7 @@ source::read_into_segments(char * out, int len, image_info const & ii)
       {
         const int llen = len / numsegs;
         assert(ii.get_width() == llen);
-        size_t      plane = (size_t)ii.get_width() * (size_t)ii.get_height() * 1;
+        size_t      plane = static_cast<size_t>(ii.get_width()) * ii.get_height() * 1;
         streampos_t pos = tell();
         int         nvalues = read(out + 0 * llen, llen);
         assert(nvalues == llen);

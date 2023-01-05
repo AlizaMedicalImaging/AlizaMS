@@ -119,7 +119,7 @@ public:
       if (TagField != itemStart && TagField != seqDelItem)
       {
         ++offset;
-        is.seekg((std::streampos)((size_t)start - offset));
+        is.seekg(static_cast<std::streampos>(static_cast<size_t>(start) - offset));
         mdcmWarningMacro("Fuzzy search, backtrack: " << (start - is.tellg()) << " Offset: " << is.tellg());
         if (offset > max)
         {

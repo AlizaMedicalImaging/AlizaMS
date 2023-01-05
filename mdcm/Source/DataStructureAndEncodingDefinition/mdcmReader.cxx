@@ -488,8 +488,8 @@ Reader::InternalReadCommon(const T_Caller & caller)
             assert(!is.eof());
             assert(is.good());
             std::streamoff theOffset = end - start;
-            assert(theOffset > 0 || (uint32_t)theOffset < std::numeric_limits<uint32_t>::max());
-            VL l = (uint32_t)(theOffset);
+            assert(theOffset > 0 || static_cast<uint32_t>(theOffset) < std::numeric_limits<uint32_t>::max());
+            VL l = static_cast<uint32_t>(theOffset);
             is.seekg(start, std::ios::beg);
             assert(is.good());
             assert(!is.eof());

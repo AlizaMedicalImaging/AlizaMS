@@ -51,7 +51,7 @@ EncapsulatedRAWCodec::Code(const char * in, unsigned long long len, DataElement 
     return false;
   }
   const size_t        frag_len = len / dims[2];
-  const size_t        frag_len2 = (size_t)dims[0] * dims[1] * pf.GetSamplesPerPixel() * (pf.GetBitsAllocated() / 8);
+  const size_t        frag_len2 = static_cast<size_t>(dims[0]) * dims[1] * pf.GetSamplesPerPixel() * (pf.GetBitsAllocated() / 8);
   if (frag_len > 0xffffffff)
   {
     mdcmAlwaysWarnMacro("fragment size is too big");
@@ -66,7 +66,7 @@ EncapsulatedRAWCodec::Code(const char * in, unsigned long long len, DataElement 
   {
     const char * data = in + j * frag_len;
     Fragment frag;
-    frag.SetByteValue(data, (unsigned int)frag_len);
+    frag.SetByteValue(data, static_cast<unsigned int>(frag_len));
     sq->AddFragment(frag);
   }
   if (sq->GetNumberOfFragments() != dims[2])

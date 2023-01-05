@@ -209,7 +209,7 @@ Bitmap::GetBufferLength() const
   {
     assert(PF.GetSamplesPerPixel() == 1);
     const unsigned long long bytesPerRow =
-      ((unsigned long long)Dimensions[0] / 8) + (((unsigned long long)Dimensions[0] % 8 != 0) ? 1 : 0);
+      (static_cast<unsigned long long>(Dimensions[0]) / 8) + ((static_cast<unsigned long long>(Dimensions[0]) % 8 != 0) ? 1 : 0);
     unsigned long long save = bytesPerRow * Dimensions[1];
     if (NumberOfDimensions > 2)
       save *= Dimensions[2];
@@ -658,13 +658,13 @@ Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
       mdcmAlwaysWarnMacro("JPEG: !out.GetByteValue()");
       return false;
     }
-    if (len != (unsigned long long)outbv->GetLength())
+    if (len != static_cast<unsigned long long>(outbv->GetLength()))
     {
       mdcmAlwaysWarnMacro("JPEG: length is " << len << ", should be " << outbv->GetLength());
     }
     memcpy(buffer,
            outbv->GetPointer(),
-           (len >= (unsigned long long)outbv->GetLength() ? (size_t)outbv->GetLength() : (size_t)len));
+           (len >= static_cast<unsigned long long>(outbv->GetLength()) ? static_cast<size_t>(outbv->GetLength()) : static_cast<size_t>(len)));
     lossyflag = codec.IsLossy();
     return true;
   }
@@ -866,7 +866,7 @@ Bitmap::TryPVRGCodec(char * buffer, bool & lossyflag) const
     if (!outbv)
       return false;
     assert(len <= outbv->GetLength());
-    memcpy(buffer, outbv->GetPointer(), (size_t)len);
+    memcpy(buffer, outbv->GetPointer(), static_cast<size_t>(len));
     lossyflag = codec.IsLossy();
     return r;
   }
@@ -922,7 +922,7 @@ Bitmap::TryJPEGLSCodec(char * buffer, bool & lossyflag) const
     if (!outbv)
       return false;
     assert(len <= outbv->GetLength());
-    memcpy(buffer, outbv->GetPointer(), (size_t)len);
+    memcpy(buffer, outbv->GetPointer(), static_cast<size_t>(len));
     lossyflag = codec.IsLossy();
     if (codec.IsLossy() != ts.IsLossy())
     {
@@ -1051,7 +1051,7 @@ Bitmap::TryJPEG2000Codec(char * buffer, bool & lossyflag) const
     if (!outbv)
       return false;
     assert(len <= outbv->GetLength());
-    memcpy(buffer, outbv->GetPointer(), (size_t)len);
+    memcpy(buffer, outbv->GetPointer(), static_cast<size_t>(len));
     lossyflag = codec.IsLossy();
     if (codec.IsLossy() && !ts.IsLossy())
     {
@@ -1225,7 +1225,7 @@ Bitmap::TryRLECodec(char * buffer, bool & lossyflag) const
       return false;
     const ByteValue * outbv = out.GetByteValue();
     assert(len <= outbv->GetLength());
-    memcpy(buffer, outbv->GetPointer(), (size_t)len);
+    memcpy(buffer, outbv->GetPointer(), static_cast<size_t>(len));
     lossyflag = false;
     return true;
   }

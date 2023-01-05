@@ -90,7 +90,7 @@ ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
     is.seekg(0, std::ios::end);
     std::streampos e = is.tellg();
     is.seekg(s, std::ios::beg);
-    ValueField->SetLength((int32_t)(e - s));
+    ValueField->SetLength(static_cast<int32_t>(e - s));
     ValueLengthField = ValueField->GetLength();
     const bool failed = !ValueIO<ExplicitDataElement, TSwap, uint16_t>::Read(is, *ValueField, true);
     if (failed)

@@ -267,18 +267,18 @@ DoIconImage(const DataSet & rootds, Pixmap & image)
       lut->Allocate(pf.GetBitsAllocated());
       for (int i = 0; i < 3; ++i)
       {
-        const Tag                tdescriptor(0x0028, (uint16_t)(0x1101 + i));
+        const Tag                tdescriptor(0x0028, static_cast<uint16_t>(0x1101 + i));
         Element<VR::US, VM::VM3> el_us3;
         el_us3.SetFromDataElement(ds[tdescriptor]);
         lut->InitializeLUT(LookupTable::LookupTableType(i), el_us3[0], el_us3[1], el_us3[2]);
-        const Tag tlut(0x0028, (uint16_t)(0x1201 + i));
-        const Tag seglut(0x0028, (uint16_t)(0x1221 + i));
+        const Tag tlut(0x0028, static_cast<uint16_t>(0x1201 + i));
+        const Tag seglut(0x0028, static_cast<uint16_t>(0x1221 + i));
         if (ds.FindDataElement(tlut))
         {
           const ByteValue * lut_raw = ds.GetDataElement(tlut).GetByteValue();
           assert(lut_raw);
           lut->SetLUT(
-            LookupTable::LookupTableType(i), (const unsigned char *)lut_raw->GetPointer(), lut_raw->GetLength());
+            LookupTable::LookupTableType(i), reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()), lut_raw->GetLength());
           unsigned int check = (el_us3.GetValue(0) ? el_us3.GetValue(0) : 65536) * el_us3.GetValue(2) / 8;
           assert(check == lut_raw->GetLength() || 2 * check == lut_raw->GetLength() ||
                  check + 1 == lut_raw->GetLength());
@@ -289,7 +289,7 @@ DoIconImage(const DataSet & rootds, Pixmap & image)
           const ByteValue * lut_raw = ds.GetDataElement(seglut).GetByteValue();
           assert(lut_raw);
           lut->SetLUT(
-            LookupTable::LookupTableType(i), (const unsigned char *)lut_raw->GetPointer(), lut_raw->GetLength());
+            LookupTable::LookupTableType(i), reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()), lut_raw->GetLength());
         }
         else
         {
@@ -339,7 +339,7 @@ DoCurves(const DataSet & ds, Pixmap & pixeldata)
       }
       else if (de.GetTag().IsPrivate()) // GEMS owns some 0x5003
       {
-        curve.SetGroup((uint16_t)(de.GetTag().GetGroup() + 1));
+        curve.SetGroup(static_cast<uint16_t>(de.GetTag().GetGroup() + 1));
         curve.SetElement(0);
       }
       else
@@ -353,7 +353,7 @@ DoCurves(const DataSet & ds, Pixmap & pixeldata)
         while (de2.GetTag().GetGroup() == currentcurve)
         {
           ov.Update(de2);
-          curve.SetElement((uint16_t)(de2.GetTag().GetElement() + 1));
+          curve.SetElement(static_cast<uint16_t>(de2.GetTag().GetElement() + 1));
           de2 = ds.FindNextDataElement(curve);
         }
       }
@@ -377,7 +377,7 @@ GetNumberOfOverlaysInternal(DataSet const & ds, std::vector<uint16_t> & overlayl
     }
     else if (de.GetTag().IsPrivate())
     {
-      overlay.SetGroup((uint16_t)(de.GetTag().GetGroup() + 1));
+      overlay.SetGroup(static_cast<uint16_t>(de.GetTag().GetGroup() + 1));
       overlay.SetElement(0);
     }
     else
@@ -412,7 +412,7 @@ GetNumberOfOverlaysInternal(DataSet const & ds, std::vector<uint16_t> & overlayl
           overlaylist.push_back(overlay.GetGroup());
         }
       }
-      overlay.SetGroup((uint16_t)(overlay.GetGroup() + 2));
+      overlay.SetGroup(static_cast<uint16_t>(overlay.GetGroup() + 2));
       overlay.SetElement(0);
     }
   }
@@ -449,7 +449,7 @@ DoOverlays(const DataSet & ds, Pixmap & pixeldata)
       while (de2.GetTag().GetGroup() == currentoverlay)
       {
         ov.Update(de2);
-        overlay.SetElement((uint16_t)(de2.GetTag().GetElement() + 1));
+        overlay.SetElement(static_cast<uint16_t>(de2.GetTag().GetElement() + 1));
         de2 = ds.FindNextDataElement(overlay);
       }
       std::ostringstream unpack;
@@ -739,20 +739,20 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
     lut->Allocate(pf.GetBitsAllocated());
     for (int i = 0; i < 3; ++i)
     {
-      const Tag                tdescriptor(0x0028, (uint16_t)(0x1101 + i));
+      const Tag                tdescriptor(0x0028, static_cast<uint16_t>(0x1101 + i));
       Element<VR::US, VM::VM3> el_us3 = { { 0, 0, 0 } };
       // Now pass the byte array to a DICOMizer
       el_us3.SetFromDataElement(ds[tdescriptor]);
       lut->InitializeLUT(LookupTable::LookupTableType(i), el_us3[0], el_us3[1], el_us3[2]);
-      const Tag tlut(0x0028, (uint16_t)(0x1201 + i));
-      const Tag seglut(0x0028, (uint16_t)(0x1221 + i));
+      const Tag tlut(0x0028, static_cast<uint16_t>(0x1201 + i));
+      const Tag seglut(0x0028, static_cast<uint16_t>(0x1221 + i));
       if (ds.FindDataElement(tlut))
       {
         const ByteValue * lut_raw = ds.GetDataElement(tlut).GetByteValue();
         if (lut_raw)
         {
           lut->SetLUT(
-            LookupTable::LookupTableType(i), (const unsigned char *)lut_raw->GetPointer(), lut_raw->GetLength());
+            LookupTable::LookupTableType(i), reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()), lut_raw->GetLength());
           unsigned int check = (el_us3.GetValue(0) ? el_us3.GetValue(0) : 65536) * el_us3.GetValue(2) / 8;
           assert(!lut->Initialized() || check == lut_raw->GetLength());
           (void)check;
@@ -768,7 +768,7 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
         if (lut_raw)
         {
           lut->SetLUT(
-            LookupTable::LookupTableType(i), (const unsigned char *)lut_raw->GetPointer(), lut_raw->GetLength());
+            LookupTable::LookupTableType(i), reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()), lut_raw->GetLength());
         }
         else
         {
@@ -797,13 +797,13 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
     bool lut_ok = true;
     for (int i = 0; i < 3; ++i)
     {
-      const Tag                tdescriptor(0x0028, (uint16_t)(0x1101 + i));
+      const Tag                tdescriptor(0x0028, static_cast<uint16_t>(0x1101 + i));
       Element<VR::US, VM::VM3> el_us3 = { { 0, 0, 0 } };
       // Now pass the byte array to a DICOMizer
       el_us3.SetFromDataElement(ds[tdescriptor]);
       lut->InitializeLUT(LookupTable::LookupTableType(i), el_us3[0], el_us3[1], el_us3[2]);
-      const Tag tlut(0x0028, (uint16_t)(0x1201 + i));
-      const Tag seglut(0x0028, (uint16_t)(0x1221 + i));
+      const Tag tlut(0x0028, static_cast<uint16_t>(0x1201 + i));
+      const Tag seglut(0x0028, static_cast<uint16_t>(0x1221 + i));
       if (ds.FindDataElement(tlut))
       {
         const ByteValue * lut_raw = ds.GetDataElement(tlut).GetByteValue();
@@ -811,7 +811,7 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
         {
           // LookupTableType::SUPPLRED == 4
           lut->SetLUT(
-            LookupTable::LookupTableType(i + 4), (const unsigned char *)lut_raw->GetPointer(), lut_raw->GetLength());
+            LookupTable::LookupTableType(i + 4), reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()), lut_raw->GetLength());
           unsigned int check = (el_us3.GetValue(0) ? el_us3.GetValue(0) : 65536) * el_us3.GetValue(2) / 8;
           assert(!lut->Initialized() || check == lut_raw->GetLength());
           (void)check;
@@ -828,7 +828,7 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
         if (lut_raw)
         {
           lut->SetLUT(
-            LookupTable::LookupTableType(i + 4), (const unsigned char *)lut_raw->GetPointer(), lut_raw->GetLength());
+            LookupTable::LookupTableType(i + 4), reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()), lut_raw->GetLength());
         }
         else
         {

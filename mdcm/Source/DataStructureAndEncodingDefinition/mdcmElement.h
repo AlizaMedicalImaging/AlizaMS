@@ -118,13 +118,13 @@ public:
   static VR
   GetVR()
   {
-    return (VR::VRType)TVR;
+    return static_cast<VR::VRType>(TVR);
   }
 
   static VM
   GetVM()
   {
-    return (VM::VMType)TVM;
+    return static_cast<VM::VMType>(TVM);
   }
 
   unsigned long
@@ -188,9 +188,9 @@ public:
     DataElement        ret;
     std::ostringstream os;
     EncodingImplementation<VRToEncoding<TVR>::Mode>::Write(Internal, GetLength(), os);
-    ret.SetVR((VR::VRType)TVR);
+    ret.SetVR(static_cast<VR::VRType>(TVR));
     assert(ret.GetVR() != VR::SQ);
-    if ((VR::VRType)VRToEncoding<TVR>::Mode == VR::VRASCII)
+    if (static_cast<VR::VRType>(VRToEncoding<TVR>::Mode) == VR::VRASCII)
     {
       if (GetVR() != VR::UI)
       {
@@ -200,7 +200,7 @@ public:
         }
       }
     }
-    VL::Type osStrSize = (VL::Type)os.str().size();
+    VL::Type osStrSize = static_cast<VL::Type>(os.str().size());
     ret.SetByteValue(os.str().c_str(), osStrSize);
     return ret;
   }
@@ -384,7 +384,7 @@ static void ds16print(char * buf, double f)
   int l = sprintf(line, "%.17g", f);
   if (l > 16)
   {
-    int prec = 33 - (int)strlen(line);
+    int prec = 33 - static_cast<int>(strlen(line));
     l = sprintf(line, "%.*g", prec, f);
     while(l > 16)
     {
@@ -535,7 +535,7 @@ public:
   static VR
   GetVR()
   {
-    return (VR::VRType)TVR;
+    return static_cast<VR::VRType>(TVR);
   }
 
   static VM
@@ -643,9 +643,9 @@ public:
     const ByteValue * bv = dynamic_cast<const ByteValue *>(&v);
     if (!bv)
       return;
-    if ((VR::VRType)(VRToEncoding<TVR>::Mode) == VR::VRBINARY)
+    if (static_cast<VR::VRType>(VRToEncoding<TVR>::Mode) == VR::VRBINARY)
     {
-      const Type * array = (const Type *)bv->GetVoidPointer();
+      const Type * array = static_cast<const Type *>(bv->GetVoidPointer());
       if (array)
       {
         assert(Internal == NULL);
@@ -721,13 +721,13 @@ public:
   GetAsDataElement() const
   {
     DataElement ret;
-    ret.SetVR((VR::VRType)TVR);
+    ret.SetVR(static_cast<VR::VRType>(TVR));
     assert(ret.GetVR() != VR::SQ);
     if (Internal)
     {
       std::ostringstream os;
       EncodingImplementation<VRToEncoding<TVR>::Mode>::Write(Internal, GetLength(), os);
-      if ((VR::VRType)VRToEncoding<TVR>::Mode == VR::VRASCII)
+      if (static_cast<VR::VRType>(VRToEncoding<TVR>::Mode) == VR::VRASCII)
       {
         if (GetVR() != VR::UI)
         {
@@ -737,7 +737,7 @@ public:
           }
         }
       }
-      VL::Type osStrSize = (VL::Type)os.str().size();
+      VL::Type osStrSize = static_cast<VL::Type>(os.str().size());
       ret.SetByteValue(os.str().c_str(), osStrSize);
     }
     return ret;
@@ -771,9 +771,9 @@ protected:
     const ByteValue * bv = dynamic_cast<const ByteValue *>(&v);
     if (!bv)
       return;
-    if ((VR::VRType)(VRToEncoding<TVR>::Mode) == VR::VRBINARY)
+    if (static_cast<VR::VRType>(VRToEncoding<TVR>::Mode) == VR::VRBINARY)
     {
-      const Type * array = (const Type *)bv->GetVoidPointer();
+      const Type * array = static_cast<const Type *>(bv->GetVoidPointer());
       if (array)
       {
         assert(Internal == NULL);

@@ -253,7 +253,7 @@ ComputeZSpacingFromIPP(const DataSet & ds, double & zspacing)
   bool timeseries = false;
   if (nitems > 1)
   {
-    meanspacing /= (double)(nitems - 1);
+    meanspacing /= static_cast<double>(nitems - 1);
     if (meanspacing == 0.0)
     {
       mdcmDebugMacro("Assuming time series for Z-spacing");
@@ -760,10 +760,10 @@ ImageHelper::SetDimensionsValue(File & f, const Pixmap & img)
   assert(MediaStorage::IsImage(ms));
   {
     Attribute<0x0028, 0x0010> rows;
-    rows.SetValue((uint16_t)dims[1]);
+    rows.SetValue(static_cast<uint16_t>(dims[1]));
     ds.Replace(rows.GetAsDataElement());
     Attribute<0x0028, 0x0011> columns;
-    columns.SetValue((uint16_t)dims[0]);
+    columns.SetValue(static_cast<uint16_t>(dims[0]));
     ds.Replace(columns.GetAsDataElement());
     Attribute<0x0028, 0x0008> numframes = { 0 };
     numframes.SetValue(dims[2]);
@@ -1177,7 +1177,7 @@ ImageHelper::GetSpacingValue(File const & f)
           }
           else
           {
-            el.SetLength(entry.GetVR().GetSizeof() * ((unsigned int)found + 1));
+            el.SetLength(entry.GetVR().GetSizeof() * (static_cast<unsigned int>(found) + 1));
             el.Read(ss);
             mdcmDebugMacro("DS el.GetLength() " << el.GetLength());
             mdcmAlwaysWarnMacro("Spacing is broken, too many values");
@@ -1256,7 +1256,7 @@ ImageHelper::GetSpacingValue(File const & f)
           }
           else
           {
-            el.SetLength(entry.GetVR().GetSizeof() * ((unsigned int)found + 1));
+            el.SetLength(entry.GetVR().GetSizeof() * (static_cast<unsigned int>(found) + 1));
             el.Read(ss);
             mdcmDebugMacro("IS el.GetLength() " << el.GetLength());
             mdcmAlwaysWarnMacro("Spacing is broken, too many values");
@@ -1741,7 +1741,7 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
           de.SetVR(VR::DS);
           if (os.str().size() % 2)
             os << " ";
-          VL::Type osStrSize = (VL::Type)os.str().size();
+          VL::Type osStrSize = static_cast<VL::Type>(os.str().size());
           de.SetByteValue(os.str().c_str(), osStrSize);
           ds.Replace(de);
         }
@@ -1753,14 +1753,14 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
           assert(entry.GetVM() == VM::VM2);
           for (unsigned int i = 0; i < entry.GetVM().GetLength(); ++i)
           {
-            el.SetValue((int)spacing[i], i);
+            el.SetValue(static_cast<int>(spacing[i]), i);
           }
           std::stringstream os;
           el.Write(os);
           de.SetVR(VR::IS);
           if (os.str().size() % 2)
             os << " ";
-          VL::Type osStrSize = (VL::Type)os.str().size();
+          VL::Type osStrSize = static_cast<VL::Type>(os.str().size());
           de.SetByteValue(os.str().c_str(), osStrSize);
           ds.Replace(de);
         }
@@ -1789,7 +1789,7 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
         de.SetVR(VR::DS);
         if (os.str().size() % 2)
           os << " ";
-        VL::Type osStrSize = (VL::Type)os.str().size();
+        VL::Type osStrSize = static_cast<VL::Type>(os.str().size());
         de.SetByteValue(os.str().c_str(), osStrSize);
         ds.Replace(de);
         mdcmDebugMacro("(0x0018, 0x0088) = " << os.str());
@@ -1809,7 +1809,7 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
               Element<VR::DS, VM::VM2_n> el;
               el.SetLength(number_of_frames * vr.GetSizeof());
               double spacing_start = 0.0;
-              for (unsigned int i = 0; i < (unsigned int)number_of_frames; ++i)
+              for (unsigned int i = 0; i < static_cast<unsigned int>(number_of_frames); ++i)
               {
                 el.SetValue(spacing_start, i);
                 spacing_start += spacing[2];
@@ -1819,7 +1819,7 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
               de.SetVR(VR::DS);
               if (os.str().size() % 2)
                 os << " ";
-              VL::Type osStrSize = (VL::Type)os.str().size();
+              VL::Type osStrSize = static_cast<VL::Type>(os.str().size());
               de.SetByteValue(os.str().c_str(), osStrSize);
               ds.Replace(de);
               mdcmDebugMacro("(0x3004, 0x000c) = " << os.str());
@@ -2594,7 +2594,7 @@ ImageHelper::SetVOILUT(File & f, const Image & img)
     oscenter << scenter;
     if ((oscenter.str().size() % 2) != 0)
       oscenter << " ";
-    center.SetByteValue(oscenter.str().c_str(), (VL::Type)oscenter.str().size());
+    center.SetByteValue(oscenter.str().c_str(), static_cast<VL::Type>(oscenter.str().size()));
     center.SetVR(VR::DS);
     ds.Replace(center);
     DataElement       width(Tag(0x0028, 0x1051));
@@ -2602,7 +2602,7 @@ ImageHelper::SetVOILUT(File & f, const Image & img)
     oswidth << swidth;
     if ((oswidth.str().size() % 2) != 0)
       oswidth << " ";
-    width.SetByteValue(oswidth.str().c_str(), (VL::Type)oswidth.str().size());
+    width.SetByteValue(oswidth.str().c_str(), static_cast<VL::Type>(oswidth.str().size()));
     width.SetVR(VR::DS);
     ds.Replace(width);
     if (!sfunc.empty())
@@ -2612,7 +2612,7 @@ ImageHelper::SetVOILUT(File & f, const Image & img)
       osfunc << sfunc;
       if ((osfunc.str().size() % 2) != 0)
         osfunc << " ";
-      func.SetByteValue(osfunc.str().c_str(), (VL::Type)osfunc.str().size());
+      func.SetByteValue(osfunc.str().c_str(), static_cast<VL::Type>(osfunc.str().size()));
       func.SetVR(VR::CS);
       ds.Replace(func);
     }
@@ -2677,7 +2677,7 @@ ImageHelper::SetVOILUT(File & f, const Image & img)
     oscenter << scenter;
     if ((oscenter.str().size() % 2) != 0)
       oscenter << " ";
-    center.SetByteValue(oscenter.str().c_str(), (VL::Type)oscenter.str().size());
+    center.SetByteValue(oscenter.str().c_str(), static_cast<VL::Type>(oscenter.str().size()));
     center.SetVR(VR::DS);
     nds1.Replace(center);
     DataElement       width(Tag(0x0028, 0x1051));
@@ -2685,7 +2685,7 @@ ImageHelper::SetVOILUT(File & f, const Image & img)
     oswidth << swidth;
     if ((oswidth.str().size() % 2) != 0)
       oswidth << " ";
-    width.SetByteValue(oswidth.str().c_str(), (VL::Type)oswidth.str().size());
+    width.SetByteValue(oswidth.str().c_str(), static_cast<VL::Type>(oswidth.str().size()));
     width.SetVR(VR::DS);
     nds1.Replace(width);
     if (!sfunc.empty())
@@ -2695,7 +2695,7 @@ ImageHelper::SetVOILUT(File & f, const Image & img)
       osfunc << sfunc;
       if ((osfunc.str().size() % 2) != 0)
         osfunc << " ";
-      func.SetByteValue(osfunc.str().c_str(), (VL::Type)osfunc.str().size());
+      func.SetByteValue(osfunc.str().c_str(), static_cast<VL::Type>(osfunc.str().size()));
       func.SetVR(VR::CS);
       nds1.Replace(func);
     }
@@ -2923,7 +2923,7 @@ ImageHelper::GetLUT(File const & f)
     // (0028,1101) US 0\0\16
     // (0028,1102) US 0\0\16
     // (0028,1103) US 0\0\16
-    const Tag tdescriptor(0x0028, (uint16_t)(0x1101 + i));
+    const Tag tdescriptor(0x0028, static_cast<uint16_t>(0x1101 + i));
     // const Tag tdescriptor(0x0028, 0x3002);
     Element<VR::US, VM::VM3> el_us3 = { { 0, 0, 0 } };
     // Now pass the byte array to a DICOMizer:
@@ -2932,13 +2932,13 @@ ImageHelper::GetLUT(File const & f)
     // (0028,1201) OW
     // (0028,1202) OW
     // (0028,1203) OW
-    const Tag tlut(0x0028, (uint16_t)(0x1201 + i));
+    const Tag tlut(0x0028, static_cast<uint16_t>(0x1201 + i));
     // const Tag tlut(0x0028, 0x3006);
     // Segmented LUT
     // (0028,1221) OW
     // (0028,1222) OW
     // (0028,1223) OW
-    const Tag seglut(0x0028, (uint16_t)(0x1221 + i));
+    const Tag seglut(0x0028, static_cast<uint16_t>(0x1221 + i));
     if (ds.FindDataElement(tlut))
     {
       const ByteValue * lut_raw = ds.GetDataElement(tlut).GetByteValue();
@@ -2946,7 +2946,7 @@ ImageHelper::GetLUT(File const & f)
       {
         // LookupTableType::RED == 0
         lut->SetLUT(
-          LookupTable::LookupTableType(i), (const unsigned char *)lut_raw->GetPointer(), lut_raw->GetLength());
+          LookupTable::LookupTableType(i), reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()), lut_raw->GetLength());
       }
       else
       {
@@ -2964,7 +2964,7 @@ ImageHelper::GetLUT(File const & f)
       if (lut_raw)
       {
         lut->SetLUT(
-          LookupTable::LookupTableType(i), (const unsigned char *)lut_raw->GetPointer(), lut_raw->GetLength());
+          LookupTable::LookupTableType(i), reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()), lut_raw->GetLength());
       }
       else
       {

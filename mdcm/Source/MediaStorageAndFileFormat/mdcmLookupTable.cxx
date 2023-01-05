@@ -495,7 +495,7 @@ LookupTable::DecodeSupplemental(char * output, size_t outlen, const char * input
     uint16_t *       rgb = static_cast<uint16_t *>(voutput);
     for (const uint16_t * idx = static_cast<const uint16_t *>(vinput); idx != end; ++idx)
     {
-      if ((unsigned short)*idx >= Internal->Subscript[RED])
+      if (static_cast<unsigned short>(*idx) >= Internal->Subscript[RED])
       {
         rgb[RED] = rgb16[3 * ((*idx) - Internal->Subscript[RED]) + RED];
         rgb[GREEN] = rgb16[3 * ((*idx) - Internal->Subscript[RED]) + GREEN];
