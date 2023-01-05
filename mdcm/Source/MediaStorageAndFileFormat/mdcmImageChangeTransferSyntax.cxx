@@ -120,8 +120,8 @@ ImageChangeTransferSyntax::Change()
     }
     DataElement pixeldata(Tag(0x7fe0, 0x0010));
     ByteValue * bv0 = new ByteValue();
-    bv0->SetLength((uint32_t)len0);
-    const bool b = Input->GetBuffer((char *)bv0->GetPointer());
+    bv0->SetLength(static_cast<uint32_t>(len0));
+    const bool b = Input->GetBuffer(const_cast<char *>(bv0->GetPointer()));
     if (!b)
     {
       mdcmErrorMacro("Error in getting buffer from input image.");
@@ -163,8 +163,8 @@ ImageChangeTransferSyntax::Change()
           return false;
         }
         ByteValue * bv = new ByteValue();
-        bv->SetLength((uint32_t)len);
-        const bool bb = pixmap->GetIconImage().GetBuffer((char *)bv->GetPointer());
+        bv->SetLength(static_cast<uint32_t>(len));
+        const bool bb = pixmap->GetIconImage().GetBuffer(const_cast<char *>(bv->GetPointer()));
         if (!bb)
         {
           return false;
@@ -450,7 +450,7 @@ ImageChangeTransferSyntax::TryJPEGLSCodec(const DataElement & pixelde, Bitmap co
       mdcm::DataElement tmp;
       tmp.SetByteValue(bv->GetPointer(), bv->GetLength());
       bv = tmp.GetByteValue();
-      r = codec->CleanupUnusedBits((char *)bv->GetPointer(), bv->GetLength());
+      r = codec->CleanupUnusedBits(const_cast<char *>(bv->GetPointer()), bv->GetLength());
       if (!r)
         return false;
       r = codec->Code(tmp, out);

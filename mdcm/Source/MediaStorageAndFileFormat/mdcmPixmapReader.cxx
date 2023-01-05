@@ -564,7 +564,7 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
   {
     Attribute<0x0028, 0x0100> at = { 0 };
     at.SetFromDataSet(ds);
-    const unsigned short bit_allocated = (unsigned short)at.GetValue();
+    const unsigned short bit_allocated = at.GetValue();
     if (bit_allocated == 32)
     {
       pf.SetBitsAllocated(32);
@@ -590,7 +590,7 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
   {
     Attribute<0x0028, 0x0100> at = { 0 };
     at.SetFromDataSet(ds);
-    const unsigned short bit_allocated = (unsigned short)at.GetValue();
+    const unsigned short bit_allocated = at.GetValue();
     if (bit_allocated == 32)
     {
       pf.SetBitsAllocated(32);

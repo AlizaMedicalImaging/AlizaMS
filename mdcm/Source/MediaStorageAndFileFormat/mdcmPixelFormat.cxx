@@ -86,7 +86,7 @@ PixelFormat::SetBitsAllocated(unsigned short ba)
     }
     BitsAllocated = ba;
     BitsStored = ba;
-    HighBit = (unsigned short)(ba - 1);
+    HighBit = ba - 1;
   }
   else
   {
@@ -123,7 +123,7 @@ PixelFormat::SetBitsStored(unsigned short bs)
   if (bs <= BitsAllocated && bs)
   {
     BitsStored = bs;
-    SetHighBit((unsigned short)(bs - 1));
+    SetHighBit(bs - 1);
   }
 }
 
@@ -160,13 +160,13 @@ PixelFormat::SetHighBit(unsigned short hb)
 unsigned short
 PixelFormat::GetPixelRepresentation() const
 {
-  return (unsigned short)(PixelRepresentation ? 1 : 0);
+  return PixelRepresentation ? 1 : 0;
 }
 
 void
 PixelFormat::SetPixelRepresentation(unsigned short pr)
 {
-  PixelRepresentation = (unsigned short)(pr ? 1 : 0);
+  PixelRepresentation = pr ? 1 : 0;
 }
 
 // Set PixelFormat based only on the ScalarType
@@ -238,7 +238,7 @@ PixelFormat::SetScalarType(ScalarType st)
       break;
   }
   BitsStored = BitsAllocated;
-  HighBit = (uint16_t)(BitsStored - 1);
+  HighBit = BitsStored - 1;
 }
 
 // ScalarType does not take into account the sample per pixel
@@ -288,7 +288,7 @@ PixelFormat::GetScalarType() const
     {
       assert(type <= INT64);
       // Order properly type in ScalarType
-      type = ScalarType(int(type) + 1);
+      type = ScalarType(static_cast<int>(type) + 1);
     }
     else if (PixelRepresentation == 3)
     {
@@ -322,7 +322,7 @@ PixelFormat::GetScalarTypeAsString() const
 uint8_t
 PixelFormat::GetPixelSize() const
 {
-  uint8_t pixelsize = (uint8_t)(BitsAllocated / 8);
+  uint8_t pixelsize = static_cast<uint8_t>(BitsAllocated / 8);
   if (BitsAllocated == 12)
   {
     pixelsize = 2;
@@ -343,11 +343,11 @@ PixelFormat::GetMin() const
   {
     if (PixelRepresentation == 1)
     {
-      return (double)((int64_t)(~(((1ULL << BitsStored) - 1) >> 1)));
+      return static_cast<double>(static_cast<int64_t>(~(((1ULL << BitsStored) - 1) >> 1)));
     }
     else if (PixelRepresentation == 3)
     {
-      return -(double)std::numeric_limits<float>::max();
+      return -static_cast<double>(std::numeric_limits<float>::max());
     }
     else if (PixelRepresentation == 0)
     {
@@ -358,11 +358,11 @@ PixelFormat::GetMin() const
   {
     if (PixelRepresentation == 1)
     {
-      return (double)std::numeric_limits<signed long long>::min();
+      return static_cast<double>(std::numeric_limits<signed long long>::min());
     }
     else if (PixelRepresentation == 4)
     {
-      return -(double)std::numeric_limits<double>::max();
+      return -std::numeric_limits<double>::max();
     }
     else if (PixelRepresentation == 0)
     {
@@ -380,30 +380,30 @@ PixelFormat::GetMax() const
   {
     if (PixelRepresentation == 1)
     {
-      return (double)((int64_t)((((1ULL << BitsStored) - 1) >> 1)));
+      return static_cast<double>(static_cast<int64_t>((((1ULL << BitsStored) - 1) >> 1)));
     }
     else if (PixelRepresentation == 3)
     {
-      return (double)std::numeric_limits<float>::max();
+      return static_cast<double>(std::numeric_limits<float>::max());
     }
     else if (PixelRepresentation == 0)
     {
-      return (double)((int64_t)((1ULL << BitsStored) - 1));
+      return static_cast<double>(static_cast<int64_t>((1ULL << BitsStored) - 1));
     }
   }
   else if (BitsStored == 64)
   {
     if (PixelRepresentation == 1)
     {
-      return (double)std::numeric_limits<signed long long>::max();
+      return static_cast<double>(std::numeric_limits<signed long long>::max());
     }
     else if (PixelRepresentation == 4)
     {
-      return (double)std::numeric_limits<double>::max();
+      return std::numeric_limits<double>::max();
     }
     else if (PixelRepresentation == 0)
     {
-      return (double)std::numeric_limits<unsigned long long>::max();
+      return static_cast<double>(std::numeric_limits<unsigned long long>::max());
     }
   }
   return 0;

@@ -90,7 +90,7 @@ UUIDGenerator::IsValid(const char * suid)
     return false;
 #if defined(HAVE_UUID_GENERATE)
   uuid_t uu;
-  int    res = uuid_parse((const char *)suid, uu);
+  int    res = uuid_parse(suid, uu);
   if (res)
     return false;
 #elif defined(HAVE_UUID_CREATE)

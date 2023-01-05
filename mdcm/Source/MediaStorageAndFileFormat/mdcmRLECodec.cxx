@@ -528,7 +528,7 @@ RLECodec::Code(DataElement const & in, DataElement & out)
   {
     assert(MaxNumSegments % 3 == 0);
   }
-  RLEHeader header = { static_cast<uint32_t>(MaxNumSegments), { 64 } };
+  RLEHeader header = { MaxNumSegments, { 64 } };
   // Create a RLE Frame for each frame
   for (unsigned int dim = 0; dim < dims[2]; ++dim)
   {
@@ -658,7 +658,7 @@ RLECodec::Code(DataElement const & in, DataElement & out)
           return false;
         }
         assert(llength);
-        data.write((char *)outbuf, llength);
+        data.write(outbuf, llength);
         length += llength;
       }
       // update header

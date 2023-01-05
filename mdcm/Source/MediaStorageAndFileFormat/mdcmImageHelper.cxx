@@ -1993,9 +1993,9 @@ ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
         sqFrameContentSequence->SetLengthToUndefined();
         if (sqFrameContentSequence->GetNumberOfItems() < 1)
         {
-          Item item;
-          item.SetVLToUndefined();
-          sqFrameContentSequence->AddItem(item);
+          Item item1;
+          item1.SetVLToUndefined();
+          sqFrameContentSequence->AddItem(item1);
         }
         Item &                    item3 = sqFrameContentSequence->GetItem(1);
         DataSet &                 subds3 = item3.GetNestedDataSet();
@@ -2003,11 +2003,11 @@ ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
         atStackID.SetValue("1 ");
         subds3.Replace(atStackID.GetAsDataElement());
         Attribute<0x0020, 0x9057> atInStackPositionNumber;
-        atInStackPositionNumber.SetValue((unsigned int)(i + 1));
+        atInStackPositionNumber.SetValue(i + 1);
         subds3.Replace(atInStackPositionNumber.GetAsDataElement());
         Attribute<0x0020, 0x9157, VR::UL, VM::VM2> atDimensionIndexValues = { { 0, 0 } };
         atDimensionIndexValues.SetValue(1, 0);
-        atDimensionIndexValues.SetValue((unsigned int)(i + 1), 1);
+        atDimensionIndexValues.SetValue(i + 1, 1);
         subds3.Replace(atDimensionIndexValues.GetAsDataElement());
         if (ms == MediaStorage::LegacyConvertedEnhancedMRImageStorage ||
             ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage ||
@@ -2033,9 +2033,9 @@ ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
             sqConversionSourceAttributesSequence->SetLengthToUndefined();
             if (sqConversionSourceAttributesSequence->GetNumberOfItems() < 1)
             {
-              Item item;
-              item.SetVLToUndefined();
-              sqConversionSourceAttributesSequence->AddItem(item);
+              Item item1;
+              item1.SetVLToUndefined();
+              sqConversionSourceAttributesSequence->AddItem(item1);
             }
             Item &                    item4 = sqConversionSourceAttributesSequence->GetItem(1);
             DataSet &                 subds4 = item4.GetNestedDataSet();
@@ -2074,9 +2074,9 @@ ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
             sqUnassignedPerFrameConvertedAttributesSequence->SetLengthToUndefined();
             if (sqUnassignedPerFrameConvertedAttributesSequence->GetNumberOfItems() < 1)
             {
-              Item item;
-              item.SetVLToUndefined();
-              sqUnassignedPerFrameConvertedAttributesSequence->AddItem(item);
+              Item item1;
+              item1.SetVLToUndefined();
+              sqUnassignedPerFrameConvertedAttributesSequence->AddItem(item1);
             }
             Item &    item5 = sqUnassignedPerFrameConvertedAttributesSequence->GetItem(1);
             DataSet & subds5 = item5.GetNestedDataSet();
@@ -2125,9 +2125,9 @@ ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
           sqSegmentIdentificationSequence->SetLengthToUndefined();
           if (sqSegmentIdentificationSequence->GetNumberOfItems() < 1)
           {
-            Item item;
-            item.SetVLToUndefined();
-            sqSegmentIdentificationSequence->AddItem(item);
+            Item item1;
+            item1.SetVLToUndefined();
+            sqSegmentIdentificationSequence->AddItem(item1);
           }
           Item &    item4 = sqSegmentIdentificationSequence->GetItem(1);
           DataSet & subds4 = item4.GetNestedDataSet();
