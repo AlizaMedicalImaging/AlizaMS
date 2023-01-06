@@ -640,7 +640,7 @@ RLECodec::Code(DataElement const & in, DataElement & out)
       if (seg == MaxNumSegments - 1)
       {
         partition += image_len % MaxNumSegments;
-        assert((MaxNumSegments - 1) * input_seg_length + partition == (size_t)image_len);
+        assert((MaxNumSegments - 1) * input_seg_length + partition == image_len);
       }
       assert(partition == input_seg_length);
       std::stringstream data;

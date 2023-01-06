@@ -183,7 +183,7 @@ public:
       {
         assert(Fragments.size() == 1);
         const ByteValue * bv = Fragments[0].GetByteValue();
-        assert((unsigned char)bv->GetPointer()[bv->GetLength() - 1] == 0xfe);
+        assert(static_cast<unsigned char>(bv->GetPointer()[bv->GetLength() - 1]) == 0xfe);
         // Yes this is an extra copy, this is a bug anyway
         Fragments[0].SetByteValue(bv->GetPointer(), bv->GetLength() - 1);
         mdcmWarningMacro("JPEG Fragment length was declared with an extra byte"
@@ -203,7 +203,7 @@ public:
         const size_t      lastf = Fragments.size() - 1;
         const ByteValue * bv = Fragments[lastf].GetByteValue();
         const char *      a = bv->GetPointer();
-        assert((unsigned char)a[bv->GetLength() - 1] == 0xfe);
+        assert(static_cast<unsigned char>(a[bv->GetLength() - 1]) == 0xfe);
         (void)a;
         Fragments[lastf].SetByteValue(bv->GetPointer(), bv->GetLength() - 1);
         is.seekg(-9, std::ios::cur);
@@ -228,7 +228,7 @@ public:
         const size_t      lastf = Fragments.size() - 1;
         const ByteValue * bv = Fragments[lastf].GetByteValue();
         const char *      a = bv->GetPointer();
-        assert((unsigned char)a[bv->GetLength() - 2] == 0xfe);
+        assert(static_cast<unsigned char>(a[bv->GetLength() - 2]) == 0xfe);
         (void)a;
         Fragments[lastf].SetByteValue(bv->GetPointer(), bv->GetLength() - 2);
         is.seekg(-10, std::ios::cur);
@@ -253,7 +253,7 @@ public:
         const size_t      lastf = Fragments.size() - 1;
         const ByteValue * bv = Fragments[lastf].GetByteValue();
         const char *      a = bv->GetPointer();
-        assert((unsigned char)a[bv->GetLength() - 3] == 0xfe);
+        assert(static_cast<unsigned char>(a[bv->GetLength() - 3]) == 0xfe);
         (void)a;
         Fragments[lastf].SetByteValue(bv->GetPointer(), bv->GetLength() - 3);
         is.seekg(-11, std::ios::cur);

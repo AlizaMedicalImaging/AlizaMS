@@ -582,7 +582,7 @@ rle_decoder::read_header(pixel_info & pi)
   if (!check_header(rh, pi))
     return false;
   // now is a good time to initialize all sources
-  assert(internals->nsources == (int)internals->rh.num_segments);
+  assert(internals->nsources == static_cast<int>(internals->rh.num_segments));
   for (int i = 1; i < internals->nsources; ++i)
   {
     internals->sources[i] = s->clone();

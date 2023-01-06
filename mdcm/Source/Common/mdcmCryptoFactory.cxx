@@ -61,7 +61,7 @@ CryptoFactory::GetFactoryInstance(CryptoFactory::CryptoLib id)
   std::map<CryptoFactory::CryptoLib, CryptoFactory *>::iterator it = getInstanceMap().find(id);
   if (it == getInstanceMap().end())
   {
-    mdcmErrorMacro("No crypto factory registered with id " << (int)id);
+    mdcmErrorMacro("No crypto factory registered with id " << static_cast<int>(id));
     return NULL;
   }
   assert(it->second);
@@ -89,7 +89,7 @@ CryptoFactory::AddLib(CryptoFactory::CryptoLib id, CryptoFactory * f)
 {
   if (getInstanceMap().insert(std::pair<CryptoFactory::CryptoLib, CryptoFactory *>(id, f)).second == false)
   {
-    mdcmErrorMacro("Library already registered under id " << (int)id);
+    mdcmErrorMacro("Library already registered under id " << static_cast<int>(id));
   }
 }
 

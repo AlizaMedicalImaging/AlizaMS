@@ -616,7 +616,7 @@ JPEGLSCodec::DecodeByStreamsCommon2(const char * buffer, size_t totalLen, char *
   }
   if (params.colorTransformation != ColorTransformation::None)
   {
-    mdcmDebugMacro("JPEGLSCodec::DecodeByStreamsCommon2: found color transformation " << (int)params.colorTransformation);
+    mdcmDebugMacro("JPEGLSCodec::DecodeByStreamsCommon2: found color transformation " << static_cast<int>(params.colorTransformation));
   }
   // allowedlossyerror == 0 => Lossless
   LossyFlag = params.allowedLossyError != 0;

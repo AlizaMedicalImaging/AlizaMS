@@ -59,8 +59,8 @@ zran.c
 
   So I might after all be able to implement seeking :)
 */
-#ifndef _ZIPSTREAM_H_
-#define _ZIPSTREAM_H_
+#ifndef ZIPSTREAMIMPL_H
+#define ZIPSTREAMIMPL_H
 
 #include <vector>
 #include <string>
@@ -331,4 +331,4 @@ isGZip(std::istream & is)
 
 } // namespace zlib_stream
 
-#endif // _ZIPSTREAM_H_
+#endif // ZIPSTREAMIMPL_H

@@ -79,7 +79,7 @@ ImageChangePlanarConfiguration::RGBPlanesToRGBPixels(T * out, const T * r, const
     *pout++ = *g++;
     *pout++ = *b++;
   }
-  assert((size_t)(pout - out) == 3 * s);
+  assert(static_cast<size_t>(pout - out) == 3 * s);
   return pout - out;
 }
 
@@ -94,7 +94,7 @@ ImageChangePlanarConfiguration::RGBPixelsToRGBPlanes(T * r, T * g, T * b, const 
     *g++ = *prgb++;
     *b++ = *prgb++;
   }
-  assert((size_t)(prgb - rgb) == 3 * s);
+  assert(static_cast<size_t>(prgb - rgb) == 3 * s);
   return prgb - rgb;
 }
 

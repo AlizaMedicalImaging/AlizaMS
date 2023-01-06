@@ -562,7 +562,7 @@ JPEGCodec::DecodeExtent(char *         buffer,
       {
         assert(nfrags == 1);
         const ByteValue * bv = frag.GetByteValue();
-        assert((unsigned char)bv->GetPointer()[bv->GetLength() - 1] == 0xfe);
+        assert(static_cast<unsigned char>(bv->GetPointer()[bv->GetLength() - 1]) == 0xfe);
         // Yes this is an extra copy, this is a bug anyway
         frag.SetByteValue(bv->GetPointer(), bv->GetLength() - 1);
         mdcmAlwaysWarnMacro("JPEGCodec: fragment length was declared with an extra byte");

@@ -287,7 +287,7 @@ VR::GetVRStringFromFile(VRType vr)
   static VRType *  end = VRValue + N;
   const VRType *   p = std::lower_bound(start, end, vr);
   assert(*p == vr);
-  assert((p - start) == (long long)GetIndex(vr));
+  assert((p - start) == static_cast<long long>(GetIndex(vr)));
   return VRStrings[p - start];
 }
 

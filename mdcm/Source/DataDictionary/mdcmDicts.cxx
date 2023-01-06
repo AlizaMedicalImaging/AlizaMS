@@ -77,7 +77,7 @@ Dicts::GetDictEntry(const Tag & tag, const char * owner) const
         assert(!tag.IsIllegal());
         assert(tag.GetElement());
         assert(tag.IsPrivate());
-        assert(owner == 0x0);
+        assert(owner == NULL);
         return prc;
       }
       else

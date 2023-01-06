@@ -53,6 +53,9 @@ Altered by: Mikhail Isakov 2020, for MDCM project
  * More info on the following parameters can be found in the zlib documentation.
  */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+
 template <class charT, class traits>
 basic_zip_streambuf<charT, traits>::basic_zip_streambuf(ostream_reference ostream,
                                                         int               level,
@@ -741,3 +744,5 @@ basic_zip_istream<charT, traits>::read_footer(void)
       _gzip_data_size += (((static_cast<int>(this->get_istream().get())) & 0xff) << (8 * n));
   }
 }
+
+#pragma GCC diagnostic pop
