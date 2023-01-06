@@ -41,6 +41,9 @@
 #  define crc32_combine         mdcmz_crc32_combine
 #  define crc32_combine64       mdcmz_crc32_combine64
 #  define crc32_z               mdcmz_crc32_z
+#  define crc32_combine_gen     mdcmz_crc32_combine_gen
+#  define crc32_combine_gen64   mdcmz_crc32_combine_gen64
+#  define crc32_combine_op      mdcmz_crc32_combine_op
 #  define deflate               mdcmz_deflate
 #  define deflateBound          mdcmz_deflateBound
 #  define deflateCopy           mdcmz_deflateCopy
@@ -138,6 +141,7 @@
 #  endif
 #  define zlibCompileFlags      mdcmz_zlibCompileFlags
 #  define zlibVersion           mdcmz_zlibVersion
+#  define z_errmsg              mdcmz_z_errmsg
 
 /* all zlib typedefs in zlib.h and zconf.h */
 #  define Byte                  mdcmz_Byte
