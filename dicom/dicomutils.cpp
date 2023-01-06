@@ -34,6 +34,7 @@
 #include "mdcmSystem.h"
 #include "mdcmReader.h"
 #include "mdcmFile.h"
+#include "mdcmFileMetaInformation.h"
 #include "mdcmAttribute.h"
 #include "mdcmVersion.h"
 #include "mdcmGlobal.h"
@@ -1611,389 +1612,6 @@ bool DicomUtils::is_image(
 	if (ok && s.toUpper().contains(QString("LOCALIZER"))) *l = true;
 	else *l = false;
 	return true;
-}
-
-bool DicomUtils::build_gems_dictionary(QMap<QString,int> & m, const mdcm::DataSet & ds)
-{
-	const mdcm::PrivateTag t0(0x7fe1,0x1, "GEMS_Ultrasound_MovieGroup_001");
-	const mdcm::PrivateTag t1(0x7fe1,0x70,"GEMS_Ultrasound_MovieGroup_001");
-	const mdcm::PrivateTag t2(0x7fe1,0x71,"GEMS_Ultrasound_MovieGroup_001");
-	const mdcm::PrivateTag t3(0x7fe1,0x72,"GEMS_Ultrasound_MovieGroup_001");
-	if(!ds.FindDataElement(t0)) return false;
-	const mdcm::DataElement& s0 = ds.GetDataElement(t0);
-	mdcm::SmartPointer<mdcm::SequenceOfItems> sq0 = s0.GetValueAsSQ();
-	if (!(sq0 && sq0->GetNumberOfItems()==1)) return false; // 1 item ?
-	mdcm::Item & i0 = sq0->GetItem(1);
-	mdcm::DataSet & subds0 = i0.GetNestedDataSet();
-	if(!subds0.FindDataElement(t1)) return false;
-	const mdcm::DataElement& s1 = subds0.GetDataElement(t1);
-	mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 = s1.GetValueAsSQ();
-	if (!(sq1 && sq1->GetNumberOfItems()>0)) return false;
-	const size_t n = sq1->GetNumberOfItems();
-	for (size_t x = 0; x < n; ++x)
-	{
-		mdcm::Item & i = sq1->GetItem(x+1);
-		mdcm::DataSet & s = i.GetNestedDataSet();
-		if(!s.FindDataElement(t2)||!s.FindDataElement(t3)) continue;
-		const mdcm::DataElement& index = s.GetDataElement(t2);
-		if (index.IsEmpty()) continue;
-		//
-		const mdcm::ByteValue * bv0 = index.GetByteValue();
-		if (!bv0) continue;
-		const unsigned int l0 = bv0->GetLength();
-		std::vector<unsigned int> result0;
-		if (l0%4==0 && l0>=4)
-		{
-			char * buffer0 = new char[l0];
-			const bool ok0 = bv0->GetBuffer(buffer0,l0);
-			if (ok0)
-			{
-				void * vbuffer0 = static_cast<void*>(buffer0);
-				int * tmp0 = static_cast<int*>(vbuffer0);
-				for (unsigned int x0 = 0; x0 < l0/4; ++x0)
-				{
-					result0.push_back(tmp0[x0]);
-				}
-				delete [] buffer0;
-			}
-			else
-			{
-				delete [] buffer0;
-				continue;
-			}
-		}
-		else
-		{
-			continue;
-		}
-		//
-		const mdcm::DataElement & name  = s.GetDataElement(t3);
-		const mdcm::ByteValue * bv1 = name.GetByteValue();
-		if (!bv1) continue;
-		QString tmp0 = QString::fromLatin1(bv1->GetPointer(), bv1->GetLength());
-		if (!result0.empty()) m[tmp0.trimmed()] = result0[0];
-	}
-	return true;
-}
-
-void DicomUtils::read_gems_params(
-	QMap<int,GEMSParam> & m,
-	const mdcm::DataElement & de,
-	const QMap<QString,int> & dict)
-{
-	const mdcm::PrivateTag tindex  (0x7fe1,0x48,"GEMS_Ultrasound_MovieGroup_001"); // index
-	const mdcm::PrivateTag t_int   (0x7fe1,0x49,"GEMS_Ultrasound_MovieGroup_001"); // UL
-	const mdcm::PrivateTag t_float1(0x7fe1,0x51,"GEMS_Ultrasound_MovieGroup_001"); // FL
-	const mdcm::PrivateTag t_float (0x7fe1,0x52,"GEMS_Ultrasound_MovieGroup_001"); // FD
-	const mdcm::PrivateTag t_ul    (0x7fe1,0x53,"GEMS_Ultrasound_MovieGroup_001"); // UL
-	const mdcm::PrivateTag t_sl    (0x7fe1,0x54,"GEMS_Ultrasound_MovieGroup_001"); // SL
-	const mdcm::PrivateTag t_ob    (0x7fe1,0x55,"GEMS_Ultrasound_MovieGroup_001"); // OB
-	const mdcm::PrivateTag t_text  (0x7fe1,0x57,"GEMS_Ultrasound_MovieGroup_001"); // LT
-	const mdcm::PrivateTag t_fd_n1 (0x7fe1,0x77,"GEMS_Ultrasound_MovieGroup_001"); // FD / 1-N
-	const mdcm::PrivateTag t_sl_n  (0x7fe1,0x79,"GEMS_Ultrasound_MovieGroup_001"); // SL / 1-N
-	const mdcm::PrivateTag t_sl4   (0x7fe1,0x86,"GEMS_Ultrasound_MovieGroup_001"); // SL / 4
-	const mdcm::PrivateTag t_fd_n  (0x7fe1,0x87,"GEMS_Ultrasound_MovieGroup_001"); // FD / 1-N
-	const mdcm::PrivateTag t_fd2   (0x7fe1,0x88,"GEMS_Ultrasound_MovieGroup_001"); // FD / 2
-
-	mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
-	if (!(sq && sq->GetNumberOfItems()>0)) return;
-	const size_t n = sq->GetNumberOfItems();
-	for( size_t i = 1; i <= n; ++i )
-	{
-		mdcm::Item & item = sq->GetItem(i);
-		mdcm::DataSet & subds = item.GetNestedDataSet();
-		if (!subds.FindDataElement(tindex)) continue;
-		const mdcm::DataElement & index = subds.GetDataElement(tindex);
-		if (index.IsEmpty()) continue;
-		const mdcm::ByteValue * bv0 = index.GetByteValue();
-		if (!bv0) continue;
-		const unsigned int l0 = bv0->GetLength();
-		int idx0 = -1;
-		if (l0%8==0 && l0>=8)
-		{
-			std::vector<double> result0;
-			char * buffer0 = new char[l0];
-			const bool ok0 = bv0->GetBuffer(buffer0,l0);
-			if (ok0)
-			{
-				void * vbuffer0 = static_cast<void*>(buffer0);
-				double * tmp0 = static_cast<double*>(vbuffer0);
-				for (unsigned int x0 = 0; x0 < l0/8; ++x0)
-				{
-					result0.push_back(tmp0[x0]);
-				}
-			}
-			delete [] buffer0;
-			if (!result0.empty()) idx0 = static_cast<int>(result0[0]);
-		}
-		else if (l0==4)
-		{
-			std::vector<int> result0;
-			char * buffer0 = new char[l0];
-			const bool ok0 = bv0->GetBuffer(buffer0,l0);
-			if (ok0)
-			{
-				void * vbuffer0 = static_cast<void*>(buffer0);
-				int * tmp0 = static_cast<int*>(vbuffer0);
-				for (size_t x0 = 0; x0 < l0/4; ++x0)
-				{
-					result0.push_back(tmp0[x0]);
-				}
-			}
-			delete [] buffer0;
-			if (!result0.empty()) idx0 = result0[0];
-		}
-		if (idx0==-1) continue;
-		if (subds.FindDataElement(t_int))
-		{
-			const mdcm::DataElement & v = subds.GetDataElement(t_int);
-			mdcm::Element<mdcm::VR::UL,mdcm::VM::VM1> e;
-			e.SetFromDataElement(v);
-			const int j = e.GetValue();
-			GEMSParam p;
-			QList<QVariant> l;
-			l << QVariant(j);
-			p.type = 0x49;
-			p.values = l;
-			m[idx0] = p;
-		}
-		else if(subds.FindDataElement(t_float1))
-		{
-			const mdcm::DataElement & v = subds.GetDataElement(t_float1);
-			mdcm::Element<mdcm::VR::FL,mdcm::VM::VM1> e;
-			e.SetFromDataElement(v);
-			const double j = e.GetValue();
-			GEMSParam p;
-			QList<QVariant> l;
-			l << QVariant(j);
-			p.type = 0x51;
-			p.values = l;
-			m[idx0] = p;
-		}
-		else if(subds.FindDataElement(t_float))
-		{
-			const mdcm::DataElement & v = subds.GetDataElement(t_float);
-			mdcm::Element<mdcm::VR::FD,mdcm::VM::VM1> e;
-			e.SetFromDataElement(v);
-			const double j = e.GetValue();
-			GEMSParam p;
-			QList<QVariant> l;
-			l << QVariant(j);
-			p.type = 0x52;
-			p.values = l;
-			m[idx0] = p;
-		}
-		else if (subds.FindDataElement(t_ul))
-		{
-			const mdcm::DataElement & v = subds.GetDataElement(t_ul);
-			mdcm::Element<mdcm::VR::UL,mdcm::VM::VM1> e;
-			e.SetFromDataElement(v);
-			const int j = e.GetValue();
-			GEMSParam p;
-			QList<QVariant> l;
-			l << QVariant(j);
-			p.type = 0x53;
-			p.values = l;
-			m[idx0] = p;
-		}
-		else if(subds.FindDataElement(t_sl))
-		{
-			const mdcm::DataElement & v = subds.GetDataElement(t_sl);
-			mdcm::Element<mdcm::VR::SL,mdcm::VM::VM1> e;
-			e.SetFromDataElement(v);
-			const int j = e.GetValue();
-			GEMSParam p;
-			QList<QVariant> l;
-			l << QVariant(j);
-			p.type = 0x54;
-			p.values = l;
-			m[idx0] = p;
-		}
-		else if(subds.FindDataElement(t_ob))
-		{
-			const mdcm::DataElement & e = subds.GetDataElement(t_ob);
-			const mdcm::ByteValue * v = e.GetByteValue();
-			if (v)
-			{
-				GEMSParam p;
-				QList<QVariant> l;
-#if 1
-				l << QVariant(QString("<span class='y5'>&#160;binary (OB)</span>"));
-#else
-				const char * b = v->GetPointer();
-				const unsigned int s = v->GetLength();
-				const QByteArray j = QByteArray(b, s);
-				l << QVariant(j);
-#endif
-				p.type = 0x55;
-				p.values = l;
-				m[idx0] = p;
-			}
-		}
-		else if(subds.FindDataElement(t_text))
-		{
-			const mdcm::DataElement & e = subds.GetDataElement(t_text);
-			const mdcm::ByteValue * v = e.GetByteValue();
-			QString j("");
-			if (v)
-			{
-				const char * b = v->GetPointer();
-				const unsigned long long s   = v->GetLength();
-				j = QString::fromLatin1(b, s);
-			}
-			GEMSParam p;
-			QList<QVariant> l;
-			l << QVariant(j);
-			p.type = 0x57;
-			p.values = l;
-			m[idx0] = p;
-		}
-		else if (subds.FindDataElement(t_sl_n))
-		{
-			const mdcm::DataElement & v = subds.GetDataElement(t_sl_n);
-			mdcm::Element<mdcm::VR::SL,mdcm::VM::VM1_n> e;
-			e.SetFromDataElement(v);
-			GEMSParam p;
-			QList<QVariant> l;
-			for (unsigned int z = 0; z < e.GetLength(); ++z)
-			{
-				const int j = e.GetValue(z);
-				l << QVariant(j);
-			}
-			p.type = 0x79;
-			p.values = l;
-			m[idx0] = p;
-		}
-		else if (subds.FindDataElement(t_sl4))
-		{
-			const mdcm::DataElement & v = subds.GetDataElement(t_sl4);
-			mdcm::Element<mdcm::VR::SL,mdcm::VM::VM4> e;
-			e.SetFromDataElement(v);
-			if (e.GetLength() == 4)
-			{
-				GEMSParam p;
-				QList<QVariant> l;
-				for (unsigned int z = 0; z < 4; ++z)
-				{
-					const int j = e.GetValue(z);
-					l << QVariant(j);
-				}
-				p.type = 0x86;
-				p.values = l;
-				m[idx0] = p;
-			}
-		}
-		else if (subds.FindDataElement(t_fd_n1))
-		{
-			const mdcm::DataElement & v = subds.GetDataElement(t_fd_n1);
-			mdcm::Element<mdcm::VR::FD,mdcm::VM::VM1_n> e;
-			e.SetFromDataElement(v);
-			GEMSParam p;
-			QList<QVariant> l;
-			for (unsigned int z = 0; z < e.GetLength(); ++z)
-			{
-				const double j = e.GetValue(z);
-				l << QVariant(j);
-			}
-			p.type = 0x77;
-			p.values = l;
-			m[idx0] = p;
-		}
-		else if (subds.FindDataElement(t_fd_n))
-		{
-			const mdcm::DataElement & v = subds.GetDataElement(t_fd_n);
-			mdcm::Element<mdcm::VR::FD,mdcm::VM::VM1_n> e;
-			e.SetFromDataElement(v);
-			GEMSParam p;
-			QList<QVariant> l;
-			for (unsigned int z = 0; z < e.GetLength(); ++z)
-			{
-				const double j = e.GetValue(z);
-				l << QVariant(j);
-			}
-			p.type = 0x87;
-			p.values = l;
-			m[idx0] = p;
-		}
-		else if (subds.FindDataElement(t_fd2))
-		{
-			const mdcm::DataElement & v = subds.GetDataElement(t_fd2);
-			mdcm::Element<mdcm::VR::FD,mdcm::VM::VM1_n> e;
-			e.SetFromDataElement(v);
-			if (e.GetLength()==2)
-			{
-				GEMSParam p;
-				QList<QVariant> l;
-				for (unsigned int z = 0; z < 2; ++z)
-				{
-					const double j = e.GetValue(z);
-					l << QVariant(j);
-				}
-				p.type = 0x88;
-				p.values = l;
-				m[idx0] = p;
-			}
-		}
-		else
-		{
-			GEMSParam p;
-			QList<QVariant> l;
-			l << QVariant(QString("Unknown"));
-			p.type = 0;
-			p.values = l;
-			m[idx0] = p;
-#if 0
-			std::cout << "Unknown !" << idx0 << std::endl;
-#endif
-		}
-	}
-//
-//
-// print GEMS parameters
-//
-//
-#if 0
-	std::cout << std::endl;
-	QMap<int,GEMSParam>::const_iterator it = m.cbegin();
-	QList<int> dict_values = dict.values();
-	while (it != m.cend())
-	{
-		if (dict_values.count(it.key()) == 1)
-		{
-			QList<QString> keys = dict.keys(it.key());
-			if (keys.size() == 1)
-			{
-				const QString name = keys.at(0);
-				std::cout << name.toStdString() << ": ";
-				const GEMSParam & p = it.value();
-				for (int x = 0; x < p.values.size(); ++x)
-				{
-					std::cout << " "
-						<< p.values.at(x).toString().toStdString();
-				}
-				std::cout << std::endl;
-			}
-			else
-			{
-				std::cout
-					<< "Something went wrong (1)? key="
-					<< it.key()
-					<< " dictionary keys size ="
-					<< keys.size() << std::endl;
-			}
-		}
-		else
-		{
-			std::cout
-				<< "Something went wrong (2)? dictionary values count("
-				<< it.key() << ")="
-				<< dict_values.count(it.key())
-				<< std::endl;
-		}
-		++it;
-	}
-	std::cout << std::endl;
-#endif
 }
 
 bool DicomUtils::has_functional_groups(const mdcm::DataSet & ds)
@@ -4808,6 +4426,389 @@ bool DicomUtils::generate_geometry(
 	}
 	*spacing_z = (size_ > 1) ? spacing_z_ : 1.0;
 	return true;
+}
+
+bool DicomUtils::build_gems_dictionary(QMap<QString,int> & m, const mdcm::DataSet & ds)
+{
+	const mdcm::PrivateTag t0(0x7fe1,0x1, "GEMS_Ultrasound_MovieGroup_001");
+	const mdcm::PrivateTag t1(0x7fe1,0x70,"GEMS_Ultrasound_MovieGroup_001");
+	const mdcm::PrivateTag t2(0x7fe1,0x71,"GEMS_Ultrasound_MovieGroup_001");
+	const mdcm::PrivateTag t3(0x7fe1,0x72,"GEMS_Ultrasound_MovieGroup_001");
+	if(!ds.FindDataElement(t0)) return false;
+	const mdcm::DataElement& s0 = ds.GetDataElement(t0);
+	mdcm::SmartPointer<mdcm::SequenceOfItems> sq0 = s0.GetValueAsSQ();
+	if (!(sq0 && sq0->GetNumberOfItems()==1)) return false; // 1 item ?
+	mdcm::Item & i0 = sq0->GetItem(1);
+	mdcm::DataSet & subds0 = i0.GetNestedDataSet();
+	if(!subds0.FindDataElement(t1)) return false;
+	const mdcm::DataElement& s1 = subds0.GetDataElement(t1);
+	mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 = s1.GetValueAsSQ();
+	if (!(sq1 && sq1->GetNumberOfItems()>0)) return false;
+	const size_t n = sq1->GetNumberOfItems();
+	for (size_t x = 0; x < n; ++x)
+	{
+		mdcm::Item & i = sq1->GetItem(x+1);
+		mdcm::DataSet & s = i.GetNestedDataSet();
+		if(!s.FindDataElement(t2)||!s.FindDataElement(t3)) continue;
+		const mdcm::DataElement& index = s.GetDataElement(t2);
+		if (index.IsEmpty()) continue;
+		//
+		const mdcm::ByteValue * bv0 = index.GetByteValue();
+		if (!bv0) continue;
+		const unsigned int l0 = bv0->GetLength();
+		std::vector<unsigned int> result0;
+		if (l0%4==0 && l0>=4)
+		{
+			char * buffer0 = new char[l0];
+			const bool ok0 = bv0->GetBuffer(buffer0,l0);
+			if (ok0)
+			{
+				void * vtmp0 = static_cast<void*>(buffer0);
+				int * tmp0 = static_cast<int*>(vtmp0);
+				for (unsigned int x0 = 0; x0 < l0/4; ++x0)
+				{
+					result0.push_back(tmp0[x0]);
+				}
+				delete [] buffer0;
+			}
+			else
+			{
+				delete [] buffer0;
+				continue;
+			}
+		}
+		else
+		{
+			continue;
+		}
+		//
+		const mdcm::DataElement & name  = s.GetDataElement(t3);
+		const mdcm::ByteValue * bv1 = name.GetByteValue();
+		if (!bv1) continue;
+		QString tmp0 = QString::fromLatin1(bv1->GetPointer(), bv1->GetLength());
+		if (!result0.empty()) m[tmp0.trimmed()] = result0[0];
+	}
+	return true;
+}
+
+void DicomUtils::read_gems_params(
+	QMap<int,GEMSParam> & m,
+	const mdcm::DataElement & de,
+	const QMap<QString,int> & dict)
+{
+	const mdcm::PrivateTag tindex  (0x7fe1,0x48,"GEMS_Ultrasound_MovieGroup_001"); // index
+	const mdcm::PrivateTag t_int   (0x7fe1,0x49,"GEMS_Ultrasound_MovieGroup_001"); // UL
+	const mdcm::PrivateTag t_float1(0x7fe1,0x51,"GEMS_Ultrasound_MovieGroup_001"); // FL
+	const mdcm::PrivateTag t_float (0x7fe1,0x52,"GEMS_Ultrasound_MovieGroup_001"); // FD
+	const mdcm::PrivateTag t_ul    (0x7fe1,0x53,"GEMS_Ultrasound_MovieGroup_001"); // UL
+	const mdcm::PrivateTag t_sl    (0x7fe1,0x54,"GEMS_Ultrasound_MovieGroup_001"); // SL
+	const mdcm::PrivateTag t_ob    (0x7fe1,0x55,"GEMS_Ultrasound_MovieGroup_001"); // OB
+	const mdcm::PrivateTag t_text  (0x7fe1,0x57,"GEMS_Ultrasound_MovieGroup_001"); // LT
+	const mdcm::PrivateTag t_fd_n1 (0x7fe1,0x77,"GEMS_Ultrasound_MovieGroup_001"); // FD / 1-N
+	const mdcm::PrivateTag t_sl_n  (0x7fe1,0x79,"GEMS_Ultrasound_MovieGroup_001"); // SL / 1-N
+	const mdcm::PrivateTag t_sl4   (0x7fe1,0x86,"GEMS_Ultrasound_MovieGroup_001"); // SL / 4
+	const mdcm::PrivateTag t_fd_n  (0x7fe1,0x87,"GEMS_Ultrasound_MovieGroup_001"); // FD / 1-N
+	const mdcm::PrivateTag t_fd2   (0x7fe1,0x88,"GEMS_Ultrasound_MovieGroup_001"); // FD / 2
+
+	mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
+	if (!(sq && sq->GetNumberOfItems()>0)) return;
+	const size_t n = sq->GetNumberOfItems();
+	for( size_t i = 1; i <= n; ++i )
+	{
+		mdcm::Item & item = sq->GetItem(i);
+		mdcm::DataSet & subds = item.GetNestedDataSet();
+		if (!subds.FindDataElement(tindex)) continue;
+		const mdcm::DataElement & index = subds.GetDataElement(tindex);
+		if (index.IsEmpty()) continue;
+		const mdcm::ByteValue * bv0 = index.GetByteValue();
+		if (!bv0) continue;
+		const unsigned int l0 = bv0->GetLength();
+		int idx0 = -1;
+		if (l0%8==0 && l0>=8)
+		{
+			std::vector<double> result0;
+			char * buffer0 = new char[l0];
+			const bool ok0 = bv0->GetBuffer(buffer0,l0);
+			if (ok0)
+			{
+				void * vtmp0 = static_cast<void*>(buffer0);
+				double * tmp0 = static_cast<double*>(vtmp0);
+				for (unsigned int x0 = 0; x0 < l0/8; ++x0)
+				{
+					result0.push_back(tmp0[x0]);
+				}
+			}
+			delete [] buffer0;
+			if (!result0.empty()) idx0 = static_cast<int>(result0[0]);
+		}
+		else if (l0==4)
+		{
+			std::vector<int> result0;
+			char * buffer0 = new char[l0];
+			const bool ok0 = bv0->GetBuffer(buffer0,l0);
+			if (ok0)
+			{
+				void * vtmp0 = static_cast<void*>(buffer0);
+				int * tmp0 = static_cast<int*>(vtmp0);
+				for (size_t x0 = 0; x0 < l0/4; ++x0)
+				{
+					result0.push_back(tmp0[x0]);
+				}
+			}
+			delete [] buffer0;
+			if (!result0.empty()) idx0 = result0[0];
+		}
+		if (idx0==-1) continue;
+		if (subds.FindDataElement(t_int))
+		{
+			const mdcm::DataElement & v = subds.GetDataElement(t_int);
+			mdcm::Element<mdcm::VR::UL,mdcm::VM::VM1> e;
+			e.SetFromDataElement(v);
+			const int j = e.GetValue();
+			GEMSParam p;
+			QList<QVariant> l;
+			l << QVariant(j);
+			p.type = 0x49;
+			p.values = l;
+			m[idx0] = p;
+		}
+		else if(subds.FindDataElement(t_float1))
+		{
+			const mdcm::DataElement & v = subds.GetDataElement(t_float1);
+			mdcm::Element<mdcm::VR::FL,mdcm::VM::VM1> e;
+			e.SetFromDataElement(v);
+			const double j = e.GetValue();
+			GEMSParam p;
+			QList<QVariant> l;
+			l << QVariant(j);
+			p.type = 0x51;
+			p.values = l;
+			m[idx0] = p;
+		}
+		else if(subds.FindDataElement(t_float))
+		{
+			const mdcm::DataElement & v = subds.GetDataElement(t_float);
+			mdcm::Element<mdcm::VR::FD,mdcm::VM::VM1> e;
+			e.SetFromDataElement(v);
+			const double j = e.GetValue();
+			GEMSParam p;
+			QList<QVariant> l;
+			l << QVariant(j);
+			p.type = 0x52;
+			p.values = l;
+			m[idx0] = p;
+		}
+		else if (subds.FindDataElement(t_ul))
+		{
+			const mdcm::DataElement & v = subds.GetDataElement(t_ul);
+			mdcm::Element<mdcm::VR::UL,mdcm::VM::VM1> e;
+			e.SetFromDataElement(v);
+			const int j = e.GetValue();
+			GEMSParam p;
+			QList<QVariant> l;
+			l << QVariant(j);
+			p.type = 0x53;
+			p.values = l;
+			m[idx0] = p;
+		}
+		else if(subds.FindDataElement(t_sl))
+		{
+			const mdcm::DataElement & v = subds.GetDataElement(t_sl);
+			mdcm::Element<mdcm::VR::SL,mdcm::VM::VM1> e;
+			e.SetFromDataElement(v);
+			const int j = e.GetValue();
+			GEMSParam p;
+			QList<QVariant> l;
+			l << QVariant(j);
+			p.type = 0x54;
+			p.values = l;
+			m[idx0] = p;
+		}
+		else if(subds.FindDataElement(t_ob))
+		{
+			const mdcm::DataElement & e = subds.GetDataElement(t_ob);
+			const mdcm::ByteValue * v = e.GetByteValue();
+			if (v)
+			{
+				GEMSParam p;
+				QList<QVariant> l;
+#if 1
+				l << QVariant(QString("<span class='y5'>&#160;binary (OB)</span>"));
+#else
+				const char * b = v->GetPointer();
+				const unsigned int s = v->GetLength();
+				const QByteArray j = QByteArray(b, s);
+				l << QVariant(j);
+#endif
+				p.type = 0x55;
+				p.values = l;
+				m[idx0] = p;
+			}
+		}
+		else if(subds.FindDataElement(t_text))
+		{
+			const mdcm::DataElement & e = subds.GetDataElement(t_text);
+			const mdcm::ByteValue * v = e.GetByteValue();
+			QString j("");
+			if (v)
+			{
+				const char * b = v->GetPointer();
+				const unsigned long long s   = v->GetLength();
+				j = QString::fromLatin1(b, s);
+			}
+			GEMSParam p;
+			QList<QVariant> l;
+			l << QVariant(j);
+			p.type = 0x57;
+			p.values = l;
+			m[idx0] = p;
+		}
+		else if (subds.FindDataElement(t_sl_n))
+		{
+			const mdcm::DataElement & v = subds.GetDataElement(t_sl_n);
+			mdcm::Element<mdcm::VR::SL,mdcm::VM::VM1_n> e;
+			e.SetFromDataElement(v);
+			GEMSParam p;
+			QList<QVariant> l;
+			for (unsigned int z = 0; z < e.GetLength(); ++z)
+			{
+				const int j = e.GetValue(z);
+				l << QVariant(j);
+			}
+			p.type = 0x79;
+			p.values = l;
+			m[idx0] = p;
+		}
+		else if (subds.FindDataElement(t_sl4))
+		{
+			const mdcm::DataElement & v = subds.GetDataElement(t_sl4);
+			mdcm::Element<mdcm::VR::SL,mdcm::VM::VM4> e;
+			e.SetFromDataElement(v);
+			if (e.GetLength() == 4)
+			{
+				GEMSParam p;
+				QList<QVariant> l;
+				for (unsigned int z = 0; z < 4; ++z)
+				{
+					const int j = e.GetValue(z);
+					l << QVariant(j);
+				}
+				p.type = 0x86;
+				p.values = l;
+				m[idx0] = p;
+			}
+		}
+		else if (subds.FindDataElement(t_fd_n1))
+		{
+			const mdcm::DataElement & v = subds.GetDataElement(t_fd_n1);
+			mdcm::Element<mdcm::VR::FD,mdcm::VM::VM1_n> e;
+			e.SetFromDataElement(v);
+			GEMSParam p;
+			QList<QVariant> l;
+			for (unsigned int z = 0; z < e.GetLength(); ++z)
+			{
+				const double j = e.GetValue(z);
+				l << QVariant(j);
+			}
+			p.type = 0x77;
+			p.values = l;
+			m[idx0] = p;
+		}
+		else if (subds.FindDataElement(t_fd_n))
+		{
+			const mdcm::DataElement & v = subds.GetDataElement(t_fd_n);
+			mdcm::Element<mdcm::VR::FD,mdcm::VM::VM1_n> e;
+			e.SetFromDataElement(v);
+			GEMSParam p;
+			QList<QVariant> l;
+			for (unsigned int z = 0; z < e.GetLength(); ++z)
+			{
+				const double j = e.GetValue(z);
+				l << QVariant(j);
+			}
+			p.type = 0x87;
+			p.values = l;
+			m[idx0] = p;
+		}
+		else if (subds.FindDataElement(t_fd2))
+		{
+			const mdcm::DataElement & v = subds.GetDataElement(t_fd2);
+			mdcm::Element<mdcm::VR::FD,mdcm::VM::VM1_n> e;
+			e.SetFromDataElement(v);
+			if (e.GetLength()==2)
+			{
+				GEMSParam p;
+				QList<QVariant> l;
+				for (unsigned int z = 0; z < 2; ++z)
+				{
+					const double j = e.GetValue(z);
+					l << QVariant(j);
+				}
+				p.type = 0x88;
+				p.values = l;
+				m[idx0] = p;
+			}
+		}
+		else
+		{
+			GEMSParam p;
+			QList<QVariant> l;
+			l << QVariant(QString("Unknown"));
+			p.type = 0;
+			p.values = l;
+			m[idx0] = p;
+#if 0
+			std::cout << "Unknown !" << idx0 << std::endl;
+#endif
+		}
+	}
+//
+//
+// print GEMS parameters
+//
+//
+#if 0
+	std::cout << std::endl;
+	QMap<int,GEMSParam>::const_iterator it = m.cbegin();
+	QList<int> dict_values = dict.values();
+	while (it != m.cend())
+	{
+		if (dict_values.count(it.key()) == 1)
+		{
+			QList<QString> keys = dict.keys(it.key());
+			if (keys.size() == 1)
+			{
+				const QString name = keys.at(0);
+				std::cout << name.toStdString() << ": ";
+				const GEMSParam & p = it.value();
+				for (int x = 0; x < p.values.size(); ++x)
+				{
+					std::cout << " "
+						<< p.values.at(x).toString().toStdString();
+				}
+				std::cout << std::endl;
+			}
+			else
+			{
+				std::cout
+					<< "Something went wrong (1)? key="
+					<< it.key()
+					<< " dictionary keys size ="
+					<< keys.size() << std::endl;
+			}
+		}
+		else
+		{
+			std::cout
+				<< "Something went wrong (2)? dictionary values count("
+				<< it.key() << ")="
+				<< dict_values.count(it.key())
+				<< std::endl;
+		}
+		++it;
+	}
+	std::cout << std::endl;
+#endif
 }
 
 void DicomUtils::enhanced_get_indices(

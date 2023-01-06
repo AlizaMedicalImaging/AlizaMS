@@ -2886,24 +2886,6 @@ void CommonUtils::copy_imagevariant_info(
 	dest->institution             = source->institution;
 }
 
-void CommonUtils::copy_imagevariant_info_min(
-	ImageVariant * dest,
-	const ImageVariant * source)
-{
-	if (!dest) return;
-	if (!source) return;
-	dest->study_uid          = source->study_uid;
-	dest->study_date         = source->study_date;
-	dest->study_time         = source->study_time;
-	dest->study_id           = source->study_id;
-	dest->series_description = source->series_description;
-	dest->study_description  = source->study_description;
-	dest->pat_name           = source->pat_name;
-	dest->pat_id             = source->pat_id;
-	dest->pat_birthdate      = source->pat_birthdate;
-	dest->pat_sex            = source->pat_sex;
-}
-
 void CommonUtils::copy_frametimes(
 	ImageVariant * dest,
 	const ImageVariant * source)

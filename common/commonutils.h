@@ -70,9 +70,6 @@ public:
 	static bool reload_rgb_rgba(ImageVariant*);
 	static void copy_imagevariant_info(
 		ImageVariant*, const ImageVariant*);
-	static void copy_imagevariant_info_min(
-		ImageVariant*,
-		const ImageVariant*);
 	static void copy_frametimes(ImageVariant*, const ImageVariant*);
 	static void copy_usregions(ImageVariant*, const ImageVariant*);
 	static void copy_imagevariant_overlays(
