@@ -972,7 +972,7 @@ static bool check_overlay_in_pixeldata(const mdcm::DataSet & ds)
 		}
 		else if(de.GetTag().IsPrivate())
 		{
-			t.SetGroup((uint16_t)(de.GetTag().GetGroup() + 1));
+			t.SetGroup(static_cast<uint16_t>(de.GetTag().GetGroup() + 1));
 			t.SetElement(0);
 		}
 		else
@@ -988,7 +988,7 @@ static bool check_overlay_in_pixeldata(const mdcm::DataSet & ds)
 			{
 				return true;
 			}
-			t.SetGroup((uint16_t)(t.GetGroup() + 2));
+			t.SetGroup(static_cast<uint16_t>(t.GetGroup() + 2));
 			t.SetElement(0);
 		}
 	}
@@ -1978,7 +1978,7 @@ static void anonymize_file__(
 AnonymazerWidget2::AnonymazerWidget2(float si)
 {
 	setupUi(this);
-	const QSize s = QSize((int)(16*si),(int)(16*si));
+	const QSize s = QSize(static_cast<int>(16*si),static_cast<int>(16*si));
 	in_pushButton->setIconSize(s);
 	out_pushButton->setIconSize(s);
 	run_pushButton->setIconSize(s);

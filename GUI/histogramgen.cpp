@@ -77,7 +77,7 @@ template<typename T> QString calculate_histogramm(
 		bins[x] = h->GetFrequency(x, 0);
 		if (bins[x] > tmp0) tmp0 = bins[x];
 	}
-	const double tmp2 = tmp0 > 2 ? log((double)tmp0) : 0.30102;
+	const double tmp2 = tmp0 > 2 ? log(static_cast<double>(tmp0)) : 0.30102;
 	//
 	{
 		QPixmap pixmap;
@@ -108,11 +108,11 @@ template<typename T> QString calculate_histogramm(
 		for (int x = 0; x < bins_size; ++x)
 		{
 			const double x_ =
-				pixmap_w*x/(double)bins_size;
+				pixmap_w*x/static_cast<double>(bins_size);
 			const double y_ =
 				(bins[x]>0)
 				?
-				pixmap_h*log((double)bins[x])/tmp2
+				pixmap_h*log(static_cast<double>(bins[x]))/tmp2
 				:
 				0.0;
 			if (x==0)
@@ -184,11 +184,11 @@ template<typename T> QString calculate_histogramm_rgb(
 	}
 	//
 	const HistogramType * histogram = filter->GetOutput();
-	if (bins_size > (int)histogram->GetSize()[0])
+	if (bins_size > static_cast<int>(histogram->GetSize()[0]))
 	{ *ok = false; return QString("bins_size > histogram->GetSize()[0]"); }
-	if (bins_size > (int)histogram->GetSize()[1])
+	if (bins_size > static_cast<int>(histogram->GetSize()[1]))
 	{ *ok = false; return QString("bins_size > histogram->GetSize()[1]"); }
-	if (bins_size > (int)histogram->GetSize()[2])
+	if (bins_size > static_cast<int>(histogram->GetSize()[2]))
 	{ *ok = false; return QString("bins_size > histogram->GetSize()[2]"); }
 	try
 	{
@@ -239,16 +239,16 @@ template<typename T> QString calculate_histogramm_rgb(
 		}
 		pixmap.fill(bgcolor);
 		//
-		const double tmp100 = pixmap_w/((double)bins_size*3.0);
+		const double tmp100 = pixmap_w/(static_cast<double>(bins_size)*3.0);
 		const double tmp101 = 2.0*tmp100;
 		const double tmp102 = 3.0*tmp100;
 		const double tmp103 = 0.8*tmp100;
 		for (int x = 0; x < bins_size; ++x)
 		{
 			const double x_  = tmp102*x;
-			const double y0_ = (bins0[x]>0) ? pixmap_h*log((double)bins0[x])/tmp2 : 0.0;
-			const double y1_ = (bins1[x]>0) ? pixmap_h*log((double)bins1[x])/tmp2 : 0.0;
-			const double y2_ = (bins2[x]>0) ? pixmap_h*log((double)bins2[x])/tmp2 : 0.0;
+			const double y0_ = (bins0[x]>0) ? pixmap_h*log(static_cast<double>(bins0[x]))/tmp2 : 0.0;
+			const double y1_ = (bins1[x]>0) ? pixmap_h*log(static_cast<double>(bins1[x]))/tmp2 : 0.0;
+			const double y2_ = (bins2[x]>0) ? pixmap_h*log(static_cast<double>(bins2[x]))/tmp2 : 0.0;
 			p0.moveTo(x_,        pixmap_h);
 			p0.lineTo(x_,        pixmap_h-y0_);
 			p1.moveTo(x_+tmp100, pixmap_h);

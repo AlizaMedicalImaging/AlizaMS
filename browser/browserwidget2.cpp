@@ -100,7 +100,7 @@ BrowserWidget2::BrowserWidget2(float si)
 	eye_icon  = QIcon(QString(":/bitmaps/eye.svg"));
 	eye2_icon = QIcon(QString(":/bitmaps/eye2.svg"));
 	setupUi(this);
-	const QSize s = QSize((int)(24*si),(int)(24*si));
+	const QSize s = QSize(static_cast<int>(24*si),static_cast<int>(24*si));
 	opendir1_pushButton->setIconSize(s);
 	dicomdir_pushButton->setIconSize(s);
 	ctk_pushButton->setIconSize(s);
@@ -1695,7 +1695,10 @@ void BrowserWidget2::open_CTK_db()
 		{
 			p1.append(QVariant(*it0).toString());
 			++ids_count;
-			if (ids_count < (size_t)ids.size()) p1.append(QString(","));
+			if (ids_count < static_cast<size_t>(ids.size()))
+			{
+				p1.append(QString(","));
+			}
 			++it0;
 		}
 		p1.append(QString(")"));

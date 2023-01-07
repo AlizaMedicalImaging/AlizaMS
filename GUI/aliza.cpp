@@ -176,8 +176,8 @@ static bool check_slices_parallel(
 	const ImageVariant * v1,
 	const int z1)
 {
-	if ((int)v0->di->image_slices.size() <= z0) return false;
-	if ((int)v1->di->image_slices.size() <= z1) return false;
+	if (static_cast<int>(v0->di->image_slices.size()) <= z0) return false;
+	if (static_cast<int>(v1->di->image_slices.size()) <= z1) return false;
 	const float px0 = v0->di->image_slices.at(z0)->v[0];
 	const float py0 = v0->di->image_slices.at(z0)->v[1];
 	const float pz0 = v0->di->image_slices.at(z0)->v[2];
@@ -226,7 +226,7 @@ static void add_slice_collision_plane(
 	btAlignedObjectArray<btStaticPlaneShape*> & tmp_shapes,
 	btAlignedObjectArray<btCollisionObject*> & tmp_objects)
 {
-	if ((int)v->di->image_slices.size() <= z) return;
+	if (static_cast<int>(v->di->image_slices.size()) <= z) return;
 	btTransform t;
 	t.setIdentity();
 	const float px = v->di->image_slices.at(z)->v[0];
@@ -288,7 +288,7 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 	if (v->frame_of_ref_uid.isEmpty()) return;
 #endif
 	const int z = v->di->selected_z_slice;
-	if ((int)v->di->image_slices.size() <= z) return;
+	if (static_cast<int>(v->di->image_slices.size()) <= z) return;
 	QList<const ImageVariant*> refs;
 	if (selected_images.size() > 1)
 	{
@@ -314,7 +314,7 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 	for (int u = 0; u < refs.size(); ++u)
 	{
 		const int z1 = refs.at(u)->di->selected_z_slice;
-		if ((int)refs.at(u)->di->image_slices.size() <= z1)
+		if (static_cast<int>(refs.at(u)->di->image_slices.size()) <= z1)
 		{
 			continue;
 		}
@@ -466,7 +466,10 @@ static void check_slice_collisions2(StudyViewWidget * w)
 				if (v->frame_of_ref_uid.isEmpty()) continue;
 				const int z =
 					w->widgets.at(x)->graphicswidget->image_container.selected_z_slice_ext;
-				if ((int)v->di->image_slices.size() <= z) continue;
+				if (static_cast<int>(v->di->image_slices.size()) <= z)
+				{
+					continue;
+				}
 				btAlignedObjectArray<btStaticPlaneShape*> tmp_shapes;
 				btAlignedObjectArray<btCollisionObject*> tmp_objects;
 				tmp_shapes.resize(0);
@@ -491,7 +494,7 @@ static void check_slice_collisions2(StudyViewWidget * w)
 						continue;
 					}
 					const int z1 = w->widgets.at(u)->graphicswidget->image_container.selected_z_slice_ext;
-					if ((int)v1->di->image_slices.size() <= z1)
+					if (static_cast<int>(v1->di->image_slices.size()) <= z1)
 					{
 						continue;
 					}
@@ -851,7 +854,7 @@ quit__:
 			ivariants.at(x)->di->opengl_ok &&
 			!ivariants.at(x)->di->skip_texture && (
 				ivariants.at(x)->di->idimz !=
-				(int)ivariants.at(x)->di->image_slices.size()))
+				static_cast<int>(ivariants.at(x)->di->image_slices.size())))
 		{
 			std::cout
 				<< "ivariants.at(" << x
@@ -1304,7 +1307,7 @@ bool Aliza::load_3d(
 		ivariant && ivariant->di->opengl_ok &&
 		!ivariant->di->skip_texture &&
 		(ivariant->di->idimz!=
-			(int)ivariant->di->image_slices.size()))
+			static_cast<int>(ivariant->di->image_slices.size())))
 	{
 		std::cout <<
 			"ivariant->di->idimz!="
@@ -1493,7 +1496,7 @@ void Aliza::set_lut(int i)
 {
 	ImageVariant * v = get_selected_image();
 	if (!v) return;
-	v->di->selected_lut = (short)i;
+	v->di->selected_lut = static_cast<short>(i);
 	if (v->group_id >= 0)
 	{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -1509,7 +1512,7 @@ void Aliza::set_lut(int i)
 			ImageVariant * v2 = iv.value();
 			if (v2 && (v->group_id == v2->group_id))
 			{
-				v2->di->selected_lut = (short)i;
+				v2->di->selected_lut = static_cast<short>(i);
 			}
 			++iv;
 		}
@@ -3263,7 +3266,7 @@ QString Aliza::create_group_(bool * ok, bool lock_mutex)
 			if (tmp0 < group_images.at(z)->di->rmin)
 				tmp0 = tmp0>group_images.at(z)->di->rmin;
 			double tmp1 =
-				((double)tmp0 +
+				(static_cast<double>(tmp0) +
 					(-group_images.at(z)->di->rmin)) /
 					(group_images.at(z)->di->rmax-group_images.at(z)->di->rmin);
 			if (tmp1 < 0.0) tmp1 = 0.0;
@@ -3272,7 +3275,7 @@ QString Aliza::create_group_(bool * ok, bool lock_mutex)
 			if (tmp2 > (group_images.at(z)->di->rmax-group_images.at(z)->di->rmin))
 				tmp2 = group_images.at(z)->di->rmax-group_images.at(z)->di->rmin;
 			double tmp3 =
-				(double)tmp2 /
+				static_cast<double>(tmp2) /
 				(group_images.at(z)->di->rmax - group_images.at(z)->di->rmin);
 			if (tmp3 <= 0.0) tmp3 = 1e-9;
 			if (tmp3 >  1.0) tmp3 = 1.0;
@@ -4310,7 +4313,7 @@ quit__:
 				ivariants.at(j)->di->opengl_ok &&
 				!ivariants.at(j)->di->skip_texture &&
 				(ivariants.at(j)->di->idimz !=
-					(int)ivariants.at(j)->di->image_slices.size()))
+					static_cast<int>(ivariants.at(j)->di->image_slices.size())))
 			{
 				std::cout
 					<< "ivariants.at(j)->di->idimz!="

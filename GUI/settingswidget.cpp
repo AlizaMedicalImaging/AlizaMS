@@ -289,7 +289,7 @@ void SettingsWidget::writeSettings(QSettings & s)
 
 float SettingsWidget::get_scale_icons() const
 {
-	return scale_icons*(float)si_doubleSpinBox->value();
+	return scale_icons*static_cast<float>(si_doubleSpinBox->value());
 }
 
 void SettingsWidget::force_no_gl3()

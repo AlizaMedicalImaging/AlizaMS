@@ -100,8 +100,8 @@ class QxtSpanSlider : public QSlider
     Q_ENUMS(HandleMovementMode)
 
 public:
-    explicit QxtSpanSlider(QWidget* parent = 0);
-    explicit QxtSpanSlider(Qt::Orientation orientation, QWidget* parent = 0);
+    explicit QxtSpanSlider(QWidget* parent = NULL);
+    explicit QxtSpanSlider(Qt::Orientation orientation, QWidget* parent = NULL);
     virtual ~QxtSpanSlider();
 
     enum HandleMovementMode

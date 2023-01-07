@@ -20,7 +20,7 @@
 void gImageCleanupHandler2(void * info)
 {
 	if (!info) return;
-	unsigned char * p = (unsigned char*)info;
+	unsigned char * p = static_cast<unsigned char*>(info);
 	delete [] p;
 	info = NULL;
 }
@@ -1817,8 +1817,8 @@ void StudyGraphicsWidget::set_image(
 	//
 	{
 		const bool check_consistence =
-			(((int)v->di->image_slices.size() == v->di->idimz) &&
-				(int)v->di->image_slices.size() > x);
+			((static_cast<int>(v->di->image_slices.size()) == v->di->idimz) &&
+				static_cast<int>(v->di->image_slices.size()) > x);
 		if (v->equi)
 		{
 			image_container.image2D->orientation_string = v->orientation_string;
@@ -1858,7 +1858,10 @@ void StudyGraphicsWidget::set_image(
 	if (icon_button)
 	{
 		QPixmap pp(14, 14);
-		QColor c((int)(v->di->R*255.0f),(int)(v->di->G*255.0f),(int)(v->di->B*255.0f));
+		QColor c(
+			static_cast<int>(v->di->R*255.0f),
+			static_cast<int>(v->di->G*255.0f),
+			static_cast<int>(v->di->B*255.0f));
 		pp.fill(c);
 		icon_button->setIcon(pp);
 		connect(icon_button, SIGNAL(toggled(bool)), this, SLOT(toggle_single(bool)));
@@ -2156,8 +2159,8 @@ void StudyGraphicsWidget::set_selected_slice(int x)
 	//
 	{
 		const bool check_consistence =
-			(((int)image_container.image3D->di->image_slices.size() == image_container.image3D->di->idimz) &&
-				(int)image_container.image3D->di->image_slices.size() > x);
+			((static_cast<int>(image_container.image3D->di->image_slices.size()) == image_container.image3D->di->idimz) &&
+				static_cast<int>(image_container.image3D->di->image_slices.size()) > x);
 		if (image_container.image3D->equi)
 		{
 			image_container.image2D->orientation_string = image_container.image3D->orientation_string;

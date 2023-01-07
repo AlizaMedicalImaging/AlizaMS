@@ -26,7 +26,7 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 	//
 	const int widgets_size = 25;
 	//
-	const QSize s1 = QSize((int)(18*si),(int)(18*si));
+	const QSize s1 = QSize(static_cast<int>(18*si),static_cast<int>(18*si));
 	lockon = QIcon(QString(":/bitmaps/lock.svg"));
 	lockoff = QIcon(QString(":/bitmaps/unlock.svg"));
 	resetlevel_pushButton->setIconSize(s1);

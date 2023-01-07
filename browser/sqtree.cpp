@@ -165,7 +165,7 @@ static QString print_length(size_t l)
 	}
 	else
 	{
-		r = QVariant((qulonglong)l).toString() +
+		r = QVariant(static_cast<qulonglong>(l)).toString() +
 			QString(" B");
 	}
 	return r;
@@ -411,7 +411,7 @@ void SQtree::process_element(
 		{
 			QStringList l1;
 			l1 << QString("Item")
-				<< QVariant((int)(i+1)).toString()
+				<< QVariant(static_cast<int>(i+1)).toString()
 				<< QString("")
 				<< QString("")
 				<< QString("");
@@ -492,7 +492,7 @@ void SQtree::process_element(
 				const QString tmp1 = print_length(length);
 				QStringList l1;
 				l1 << QString("Fragment")
-					<< QVariant((int)(i+1)).toString()
+					<< QVariant(static_cast<int>(i+1)).toString()
 					<< QString("")
 					<< QString(tmp1)
 					<< QString("binary");
@@ -572,7 +572,7 @@ void SQtree::process_element(
 						{
 							str_.append(
 								QVariant(
-									(int)values[j]).toString() +
+									static_cast<int>(values[j])).toString() +
 								QString(" "));
 						}
 					}
@@ -585,7 +585,7 @@ void SQtree::process_element(
 						{
 							str_.append(
 								QVariant(
-									(int)values[j]).toString() +
+									static_cast<int>(values[j])).toString() +
 								QString(" "));
 						}
 					}

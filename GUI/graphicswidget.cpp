@@ -40,7 +40,7 @@
 void gImageCleanupHandler(void * info)
 {
 	if (!info) return;
-	unsigned char * p = (unsigned char*)info;
+	unsigned char * p = static_cast<unsigned char*>(info);
 	delete [] p;
 	info = NULL;
 }
@@ -58,9 +58,9 @@ static void draw_contours(
 	const int idx = ivariant->di->selected_z_slice;
 	for (int x = 0; x < ivariant->di->rois.size(); ++x)
 	{
-		const int c_r = (int)(ivariant->di->rois.at(x).color.r*255.0f);
-		const int c_g = (int)(ivariant->di->rois.at(x).color.g*255.0f);
-		const int c_b = (int)(ivariant->di->rois.at(x).color.b*255.0f);
+		const int c_r = static_cast<int>(ivariant->di->rois.at(x).color.r*255.0f);
+		const int c_g = static_cast<int>(ivariant->di->rois.at(x).color.g*255.0f);
+		const int c_b = static_cast<int>(ivariant->di->rois.at(x).color.b*255.0f);
 		if (ivariant->di->rois.at(x).show)
 		{
 			QList<int> indices;
@@ -86,9 +86,9 @@ static void draw_contours(
 					}
 					else
 					{
-						const int rc_r = (int)(c->color.r*255.0f);
-						const int rc_g = (int)(c->color.g*255.0f);
-						const int rc_b = (int)(c->color.b*255.0f);
+						const int rc_r = static_cast<int>(c->color.r*255.0f);
+						const int rc_g = static_cast<int>(c->color.g*255.0f);
+						const int rc_b = static_cast<int>(c->color.b*255.0f);
 						brush = QBrush(QColor(rc_r,rc_g,rc_b));
 					}
 					QPen pen;
@@ -355,7 +355,7 @@ static QString contour_from_path_nonuniform(
 		const GraphicsPathItem * item)
 {
 	if (!ivariant) return QString("image is NULL");
-	if (ivariant->di->idimz != (int)ivariant->di->image_slices.size())
+	if (ivariant->di->idimz != static_cast<int>(ivariant->di->image_slices.size()))
 		return QString("Failed");
 	if (!roi)  return QString("ROI is NULL");
 	if (!item) return QString("item is NULL");
@@ -1714,13 +1714,13 @@ void GraphicsWidget::update_selection_item()
 			const QRectF r___ = QRectF(
 				QPointF(
 					(get_bb()
-					? (float)image_container.image3D->di->irect_index[1]
+					? static_cast<float>(image_container.image3D->di->irect_index[1])
 					: 0.0f),
-					(float)image_container.image3D->di->from_slice),
+					static_cast<float>(image_container.image3D->di->from_slice)),
 				QSizeF(
 					(get_bb()
-					? (float)image_container.image3D->di->irect_size[1]
-					: (float)image_container.image3D->di->idimy),
+					? static_cast<float>(image_container.image3D->di->irect_size[1])
+					: static_cast<float>(image_container.image3D->di->idimy)),
 					from_to));
 			graphicsview->selection_item->resetTransform();
 			graphicsview->selection_item->setRect(r___);
@@ -1732,13 +1732,13 @@ void GraphicsWidget::update_selection_item()
 			const QRectF r___ = QRectF(
 				QPointF(
 					(get_bb()
-					? (float)image_container.image3D->di->irect_index[0]
+					? static_cast<float>(image_container.image3D->di->irect_index[0])
 					: 0.0f),
-					(float)image_container.image3D->di->from_slice),
+					static_cast<float>(image_container.image3D->di->from_slice)),
 				QSizeF(
 					(get_bb()
-					? (float)image_container.image3D->di->irect_size[0]
-					: (float)image_container.image3D->di->idimx),
+					? static_cast<float>(image_container.image3D->di->irect_size[0])
+					: static_cast<float>(image_container.image3D->di->idimx)),
 					from_to));
 			graphicsview->selection_item->resetTransform();
 			graphicsview->selection_item->setRect(r___);
@@ -2104,7 +2104,7 @@ float GraphicsWidget::get_offset_x()
 		{
 			offset_x =
 				(bb)
-				? (float)image_container.image3D->di->irect_index[1]
+				? static_cast<float>(image_container.image3D->di->irect_index[1])
 				: 0.0f;
 		}
 		break;
@@ -2112,7 +2112,7 @@ float GraphicsWidget::get_offset_x()
 		{
 			offset_x =
 				(bb)
-				? (float)image_container.image3D->di->irect_index[0]
+				? static_cast<float>(image_container.image3D->di->irect_index[0])
 				: 0.0f;
 		}
 		break;
@@ -2140,12 +2140,12 @@ float GraphicsWidget::get_offset_y()
 	{
 	case 0:
 		{
-			offset_y = (float)image_container.image3D->di->from_slice;
+			offset_y = static_cast<float>(image_container.image3D->di->from_slice);
 		}
 		break;
 	case 1:
 		{
-			offset_y = (float)(image_container.image3D->di->from_slice);
+			offset_y = static_cast<float>(image_container.image3D->di->from_slice);
 		}
 		break;
 	case 2:
@@ -2395,8 +2395,8 @@ void GraphicsWidget::set_slice_2D(
 	case 2  :
 		{
 			const bool check_consistence =
-				(((int)v->di->image_slices.size() == v->di->idimz) &&
-					(int)v->di->image_slices.size() > x);
+				((static_cast<int>(v->di->image_slices.size() == v->di->idimz)) &&
+					static_cast<int>(v->di->image_slices.size()) > x);
 			if (v->equi)
 			{
 				image_container.image2D->orientation_string = v->orientation_string;
@@ -2564,7 +2564,7 @@ void GraphicsWidget::animate_()
 			}
 			if (
 				image_container.image3D->frame_times.size() >
-					(unsigned int)k)
+					static_cast<unsigned int>(k))
 			{
 				requested_time =
 					image_container.image3D->frame_times.at(k);

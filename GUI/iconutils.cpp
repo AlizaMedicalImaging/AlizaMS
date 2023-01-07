@@ -23,7 +23,7 @@ void IconUtils::update_icon(ImageVariant * v, const int isize)
 	const int G = round(v->di->G * 255.0f);
 	const int B = round(v->di->B * 255.0f);
 	const unsigned int s__ = isize / 16;
-	const float p__ = (float)(isize - s__);
+	const float p__ = static_cast<float>(isize - s__);
 	QPixmap quad_(s__, s__);
 	quad_.fill(QColor(R, G, B, 255));
 	QPainter painter(&v->icon);
@@ -129,7 +129,7 @@ template<typename Tin, typename Tout> void extract_icon(
 		unsigned int block = 64;
 		if (static_cast<float>(size_y)/static_cast<float>(block)>16.0f) block=128;
 		const int tmp100 = size_y%block;
-		const int incr = (int)floor(size_y/(double)block);
+		const int incr = static_cast<int>(floor(size_y/static_cast<double>(block)));
 		if (size_y > block)
 		{
 			for (int i=0; i<incr; ++i)
@@ -227,11 +227,11 @@ template<typename Tin, typename Tout> void extract_icon(
 		!ivariant->icon.isNull() &&
 		ivariant->di->slices_generated &&
 		ivariant->di->slices_from_dicom &&
-		(ivariant->di->idimz == (int)ivariant->di->image_slices.size()) &&
-		(ivariant->di->idimz == (int)ivariant->image_instance_uids.size()))
+		(ivariant->di->idimz == static_cast<int>(ivariant->di->image_slices.size())) &&
+		(ivariant->di->idimz == ivariant->image_instance_uids.size()))
 	{
 		const unsigned int s__ = isize/16;
-		const float p__ = (float)(isize - s__);
+		const float p__ = static_cast<float>(isize - s__);
 		QPixmap quad_(s__,s__);
 		if (ivariant->equi)
 		{
@@ -324,11 +324,11 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 			while (!iterator.IsAtEnd())
 			{
 				p[j_ + 2] = static_cast<unsigned char>(
-					((double)iterator.Get().GetBlue()  / tmp_max) * 255.0);
+					(static_cast<double>(iterator.Get().GetBlue())  / tmp_max) * 255.0);
 				p[j_ + 1] = static_cast<unsigned char>(
-					((double)iterator.Get().GetGreen() / tmp_max) * 255.0);
+					(static_cast<double>(iterator.Get().GetGreen()) / tmp_max) * 255.0);
 				p[j_ + 0] = static_cast<unsigned char>(
-					((double)iterator.Get().GetRed()   / tmp_max) * 255.0);
+					(static_cast<double>(iterator.Get().GetRed())   / tmp_max) * 255.0);
 				j_ += 3;
 				++iterator;
 			}
@@ -469,11 +469,11 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 		ivariant->equi &&
 		ivariant->di->slices_generated &&
 		ivariant->di->slices_from_dicom &&
-		(ivariant->di->idimz == (int)ivariant->di->image_slices.size()) &&
-		(ivariant->di->idimz == (int)ivariant->image_instance_uids.size()))
+		(ivariant->di->idimz == static_cast<int>(ivariant->di->image_slices.size())) &&
+		(ivariant->di->idimz == ivariant->image_instance_uids.size()))
 	{
 		const unsigned int s__ = isize/16;
-		const float p__ = (float)(isize - s__);
+		const float p__ = static_cast<float>(isize - s__);
 		QPixmap quad_(s__,s__);
 		quad_.fill(QColor(10,240,10));
 		QPainter painter(&ivariant->icon);
@@ -564,13 +564,13 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 			while (!iterator.IsAtEnd())
 			{
 				p[j_ + 3] = static_cast<unsigned char>(
-					((double)iterator.Get().GetAlpha() / tmp_max) * 255.0);
+					(static_cast<double>(iterator.Get().GetAlpha()) / tmp_max) * 255.0);
 				p[j_ + 2] = static_cast<unsigned char>(
-					((double)iterator.Get().GetBlue()  / tmp_max) * 255.0);
+					(static_cast<double>(iterator.Get().GetBlue())  / tmp_max) * 255.0);
 				p[j_ + 1] = static_cast<unsigned char>(
-					((double)iterator.Get().GetGreen() / tmp_max) * 255.0);
+					(static_cast<double>(iterator.Get().GetGreen()) / tmp_max) * 255.0);
 				p[j_ + 0] = static_cast<unsigned char>(
-					((double)iterator.Get().GetRed()   / tmp_max) * 255.0);
+					(static_cast<double>(iterator.Get().GetRed())   / tmp_max) * 255.0);
 				j_ += 4;
 				++iterator;
 			}
@@ -896,11 +896,11 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		ivariant->equi &&
 		ivariant->di->slices_generated &&
 		ivariant->di->slices_from_dicom &&
-		(ivariant->di->idimz == (int)ivariant->di->image_slices.size()) &&
-		(ivariant->di->idimz == (int)ivariant->image_instance_uids.size()))
+		(ivariant->di->idimz == static_cast<int>(ivariant->di->image_slices.size())) &&
+		(ivariant->di->idimz == ivariant->image_instance_uids.size()))
 	{
 		const unsigned int s__ = isize/16;
-		const float p__ = (float)(isize - s__);
+		const float p__ = static_cast<float>(isize - s__);
 		QPixmap quad_(s__,s__);
 		quad_.fill(QColor(10,240,10));
 		QPainter painter(&ivariant->icon);

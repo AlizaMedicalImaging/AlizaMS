@@ -320,7 +320,7 @@ void ColorSpace_::Hsv2Rgb(double *R, double *G, double *B, double H, double S, d
 	H -= 360*floor(H/360);
 	H /= 60;
 	const double X = C*(1 - fabs(H - 2*floor(H/2) - 1));
-	switch ((int)H)
+	switch (static_cast<int>(H))
 	{
 	case 0:
 		*R = Min + C;
@@ -430,7 +430,7 @@ void ColorSpace_::Hsl2Rgb(double *R, double *G, double *B, double H, double S, d
 	H -= 360*floor(H/360);
 	H /= 60;
 	const double X = C*(1 - fabs(H - 2*floor(H/2) - 1));
-	switch ((int)H)
+	switch (static_cast<int>(H))
 	{
 	case 0:
 		*R = Min + C;

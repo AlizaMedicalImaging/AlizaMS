@@ -8927,7 +8927,7 @@ QString DicomUtils::read_buffer(
 								}
 								if (idx >= 0)
 								{
-									if ((size_t)idx < lut_data_s)
+									if (static_cast<size_t>(idx) < lut_data_s)
 									{
 										if (data_possible_negative)
 										{
@@ -8940,7 +8940,7 @@ QString DicomUtils::read_buffer(
 												lut_data.at(idx).toInt()));
 										}
 									}
-									else if ((size_t)idx >= lut_data_s)
+									else if (static_cast<size_t>(idx) >= lut_data_s)
 									{
 										if (data_possible_negative)
 										{
@@ -8988,7 +8988,7 @@ QString DicomUtils::read_buffer(
 								}
 								if (idx >= 0)
 								{
-									if ((size_t)idx < lut_data_s)
+									if (static_cast<size_t>(idx) < lut_data_s)
 									{
 										if (data_possible_negative)
 										{
@@ -9001,7 +9001,7 @@ QString DicomUtils::read_buffer(
 												static_cast<unsigned short>(lut_data.at(idx).toInt()));
 										}
 									}
-									else if ((size_t)idx >= lut_data_s)
+									else if (static_cast<size_t>(idx) >= lut_data_s)
 									{
 										if (data_possible_negative)
 										{
@@ -12111,9 +12111,9 @@ bool DicomUtils::read_gray_lut(
 	{
 		if (LUTDescriptorUS.size() == 3)
 		{
-			lut_descriptor.push_back(QVariant((int)LUTDescriptorUS[0]));
-			lut_descriptor.push_back(QVariant((int)LUTDescriptorUS[1]));
-			lut_descriptor.push_back(QVariant((int)LUTDescriptorUS[2]));
+			lut_descriptor.push_back(QVariant(static_cast<int>(LUTDescriptorUS[0])));
+			lut_descriptor.push_back(QVariant(static_cast<int>(LUTDescriptorUS[1])));
+			lut_descriptor.push_back(QVariant(static_cast<int>(LUTDescriptorUS[2])));
 		}
 		else
 		{

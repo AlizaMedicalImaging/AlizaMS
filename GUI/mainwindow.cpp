@@ -41,7 +41,7 @@ MainWindow::MainWindow(
 			QApplication::organizationName(), QApplication::applicationName());
 		settings.beginGroup(QString("GlobalSettings"));
 		adjust_scale_icons =
-			(float)settings.value(QString("scale_ui_icons"), 1.2).toDouble();
+			static_cast<float>(settings.value(QString("scale_ui_icons"), 1.2).toDouble());
 		saved_style =
 			settings.value(
 				QString("stylename"),
@@ -923,7 +923,8 @@ void MainWindow::createToolBars()
 {
 	toolbar4 = new QToolBar(this);
 	toolbar4->setIconSize(
-		QSize((int)(18*scale_icons*adjust_scale_icons),(int)(18*scale_icons*adjust_scale_icons)));
+		QSize(static_cast<int>(18*scale_icons*adjust_scale_icons),
+			static_cast<int>(18*scale_icons*adjust_scale_icons)));
 	if (toolbar4->layout())
 	{
 		toolbar4->layout()->setContentsMargins(0,0,0,0);
@@ -948,7 +949,8 @@ void MainWindow::createToolBars()
 	//
 	toolbar5 = new QToolBar(this);
 	toolbar5->setIconSize(
-		QSize((int)(18*scale_icons*adjust_scale_icons),(int)(18*scale_icons*adjust_scale_icons)));
+		QSize(static_cast<int>(18*scale_icons*adjust_scale_icons),
+			static_cast<int>(18*scale_icons*adjust_scale_icons)));
 	if (toolbar5->layout())
 	{
 		toolbar5->layout()->setContentsMargins(0,0,0,0);
@@ -971,7 +973,8 @@ void MainWindow::createToolBars()
 	//
 	toolbar2 = new QToolBar(this);
 	toolbar2->setIconSize(
-		QSize((int)(18*scale_icons*adjust_scale_icons),(int)(18*scale_icons*adjust_scale_icons)));
+		QSize(static_cast<int>(18*scale_icons*adjust_scale_icons),
+			static_cast<int>(18*scale_icons*adjust_scale_icons)));
 	if (toolbar2->layout())
 	{
 		toolbar2->layout()->setContentsMargins(0,0,0,0);
@@ -1011,7 +1014,8 @@ void MainWindow::createToolBars()
 	//
 	toolbar3 = new QToolBar(this);
 	toolbar3->setIconSize(
-		QSize((int)(18*scale_icons*adjust_scale_icons),(int)(18*scale_icons*adjust_scale_icons)));
+		QSize(static_cast<int>(18*scale_icons*adjust_scale_icons),
+			static_cast<int>(18*scale_icons*adjust_scale_icons)));
 	if (toolbar3->layout())
 	{
 		toolbar3->layout()->setContentsMargins(0,0,0,0);

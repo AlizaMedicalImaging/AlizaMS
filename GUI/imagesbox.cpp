@@ -184,7 +184,7 @@ ImagesBox::ImagesBox(float si)
 	//
 	QToolBar * toolbar = new QToolBar(this);
 	toolbar->setOrientation(Qt::Horizontal);
-	toolbar->setIconSize(QSize((int)(18*si),(int)(18*si)));
+	toolbar->setIconSize(QSize(static_cast<int>(18*si),static_cast<int>(18*si)));
 	toolbar->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
 	if (toolbar->layout())
 	{
@@ -218,7 +218,7 @@ ImagesBox::ImagesBox(float si)
 	//
 	QToolBar * toolbar2 = new QToolBar(this);
 	toolbar2->setOrientation(Qt::Horizontal);
-	toolbar2->setIconSize(QSize((int)(18*si),(int)(18*si)));
+	toolbar2->setIconSize(QSize(static_cast<int>(18*si),static_cast<int>(18*si)));
 	toolbar2->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
 	toolbar2->setLayoutDirection(Qt::RightToLeft);
 	if (toolbar2->layout())
@@ -466,7 +466,7 @@ void ImagesBox::set_html(const ImageVariant * v)
 		{
 			t.append(
 				QString("&#160;(stored&#160;") +
-				QVariant((int)v->di->bits_stored).toString() +
+				QVariant(static_cast<int>(v->di->bits_stored)).toString() +
 				QString("&#160;bit)"));
 		}
 		if (v->image_type >= 0 && v->image_type < 10)
@@ -740,9 +740,9 @@ void ImagesBox::set_contours(const ImageVariant * v)
 	for (int x = 0; x < v->di->rois.size(); ++x)
 	{
 		const QColor c(
-			(int)(v->di->rois.at(x).color.r*255.0f),
-			(int)(v->di->rois.at(x).color.g*255.0f),
-			(int)(v->di->rois.at(x).color.b*255.0f));
+			static_cast<int>(v->di->rois.at(x).color.r*255.0f),
+			static_cast<int>(v->di->rois.at(x).color.g*255.0f),
+			static_cast<int>(v->di->rois.at(x).color.b*255.0f));
 		const int idx = contours_tableWidget->rowCount();
 		TableWidgetItem2 * i0 = new TableWidgetItem2();
 		i0->setFlags(i0->flags()|Qt::ItemIsUserCheckable);

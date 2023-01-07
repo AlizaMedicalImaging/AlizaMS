@@ -1348,20 +1348,23 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 				l.at(x).TextColorCIELabValue_b == -1))
 			{
 				double R, G, B;
-				double _L = ((double)l.at(x).TextColorCIELabValue_L /
-					(double)0xffff) *
+				double _L = (static_cast<double>(l.at(x).TextColorCIELabValue_L) /
+					65535.0) *
 						100.0;
-				double _a = (((unsigned short)
-					l.at(x).TextColorCIELabValue_a - 0x8080) /
-						(double)0xffff) *
+				double _a = ((static_cast<unsigned short>
+					(l.at(x).TextColorCIELabValue_a) - 0x8080) /
+						65535.0) *
 							0xff;
-				double _b = (((unsigned short)
-					l.at(x).TextColorCIELabValue_b - 0x8080) /
-						(double)0xffff) *
+				double _b = ((static_cast<unsigned short>
+					(l.at(x).TextColorCIELabValue_b) - 0x8080) /
+						65535.0) *
 							0xff;
 				ColorSpace_::Lab2Rgb(&R, &G, &B, _L, _a, _b);
-				i->setDefaultTextColor(
-					QColor((int)(R*255),(int)(G*255),(int)(B*255),255));
+				i->setDefaultTextColor(QColor(
+					static_cast<unsigned int>(R*255),
+					static_cast<unsigned int>(G*255),
+					static_cast<unsigned int>(B*255),
+					255));
 			}
 			else
 			{
@@ -1385,28 +1388,25 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 					l.at(x).ShadowColorCIELabValue_b == -1))
 				{
 					double R, G, B;
-					double _L = ((double)l.at(x).ShadowColorCIELabValue_L /
-						(double)0xffff) *
-							100.0;
-					double _a = (((unsigned short)
-						l.at(x).ShadowColorCIELabValue_a - 0x8080) /
-							(double)0xffff) *
-								0xff;
-					double _b = (((unsigned short)
-						l.at(x).ShadowColorCIELabValue_b - 0x8080) /
-							(double)0xffff) *
-								0xff;
+					double _L = (static_cast<double>(l.at(x).ShadowColorCIELabValue_L) /
+						65535.0) * 100.0;
+					double _a = ((static_cast<unsigned short>
+						(l.at(x).ShadowColorCIELabValue_a) - 0x8080) /
+							65535.0) * 0xff;
+					double _b = ((static_cast<unsigned short>
+						(l.at(x).ShadowColorCIELabValue_b) - 0x8080) /
+							65535.0) * 0xff;
 					ColorSpace_::Lab2Rgb(&R, &G, &B, _L, _a, _b);
 					shadow->setColor(
 						QColor(
-							(int)(R*255),
-							(int)(G*255),
-							(int)(B*255),
-							(int)opacity));
+							static_cast<unsigned int>(R*255),
+							static_cast<unsigned int>(G*255),
+							static_cast<unsigned int>(B*255),
+							static_cast<unsigned int>(opacity)));
 				}
 				else
 				{
-					shadow->setColor(QColor(128,128,128,(int)opacity));
+					shadow->setColor(QColor(128,128,128,static_cast<unsigned int>(opacity)));
 				}
 				i->setGraphicsEffect(shadow);
 			}
