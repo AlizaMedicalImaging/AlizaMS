@@ -54,6 +54,10 @@ using namespace Vectormath::Scalar;
 using namespace Vectormath::SSE;
 #endif
 
+// for glVertexAttribPointer last argument
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
+
 ShaderObj::ShaderObj()
 {
 	program = 0;
@@ -6858,6 +6862,8 @@ void GLWidget::disable_gl_in_settings()
 	settings.sync();
 #endif
 }
+
+#pragma GCC diagnostic pop
 
 #ifdef ALWAYS_SHOW_GL_ERROR
 #undef ALWAYS_SHOW_GL_ERROR

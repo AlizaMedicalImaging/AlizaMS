@@ -70,14 +70,14 @@ bool SplitUihGridFilter::ComputeUihGridDimensions(
 		std::vector<double> result;
 		if (DicomUtils::priv_get_ds_values(
 				ds,tMRNumberOfSliceInVolume,result))
-			z = (int)result[0];
+			z = static_cast<int>(result[0]);
 	}
 	else if (ds.FindDataElement(Tag(0x0065,0x1050)))
 	{
 		std::vector<double> result;
 		if (DicomUtils::get_ds_values(
 				ds,Tag(0x0065,0x1050),result))
-			z = (int)result[0];
+			z = static_cast<int>(result[0]);
 	}
 	else
 	{
@@ -94,7 +94,7 @@ bool SplitUihGridFilter::ComputeUihGridDimensions(
 		idims[1]/ceil(sqrt(z));
 	dims[0] = x;
 	dims[1] = x;
-	dims[2] = (unsigned int)z;
+	dims[2] = static_cast<unsigned int>(z);
 	if (dims[0]*dims[1]*dims[2] >
 			idims[0]*idims[1]*idims[2])
 		return false;
@@ -265,7 +265,7 @@ bool SplitUihGridFilter::Split()
 #endif
 		return false;
 	}
-	pixeldata.SetByteValue(&outbuf[0], (VL::Type)outbuf.size());
+	pixeldata.SetByteValue(&outbuf[0], static_cast<VL::Type>(outbuf.size()));
 	Image & image = GetImage();
 	const TransferSyntax &ts = image.GetTransferSyntax();
 	if (ts.IsExplicit())

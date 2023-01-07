@@ -112,21 +112,21 @@ inline const Quat slerp(float t, const Quat & unitQuat0, const Quat & unitQuat1)
 
 inline const Quat slerp(const FloatInVec & t, const Quat & unitQuat0, const Quat & unitQuat1)
 {
-  SSEFloat4V cosAngle = sseVecDot4(unitQuat0.get128(), unitQuat1.get128());
-  SSEUint4V selectMask = (SSEUint4V)_mm_cmpgt_ps(_mm_setzero_ps(), cosAngle);
+  __m128 cosAngle = sseVecDot4(unitQuat0.get128(), unitQuat1.get128());
+  __m128 selectMask = _mm_cmpgt_ps(_mm_setzero_ps(), cosAngle);
   cosAngle = sseSelect(cosAngle, sseNegatef(cosAngle), selectMask);
   Quat start = Quat(sseSelect(unitQuat0.get128(), sseNegatef(unitQuat0.get128()), selectMask));
-  selectMask = (SSEUint4V)_mm_cmpgt_ps(_mm_set1_ps(VECTORMATH_SLERP_TOL), cosAngle);
-  const SSEFloat4V angle = sseACosf(cosAngle);
-  const SSEFloat4V tttt = t.get128();
-  const SSEFloat4V oneMinusT = _mm_sub_ps(_mm_set1_ps(1.0f), tttt);
-  SSEFloat4V angles = _mm_unpacklo_ps(_mm_set1_ps(1.0f), tttt);
+  selectMask = _mm_cmpgt_ps(_mm_set1_ps(VECTORMATH_SLERP_TOL), cosAngle);
+  const __m128 angle = sseACosf(cosAngle);
+  const __m128 tttt = t.get128();
+  const __m128 oneMinusT = _mm_sub_ps(_mm_set1_ps(1.0f), tttt);
+  __m128 angles = _mm_unpacklo_ps(_mm_set1_ps(1.0f), tttt);
   angles = _mm_unpacklo_ps(angles, oneMinusT);
   angles = sseMAdd(angles, angle, _mm_setzero_ps());
-  const SSEFloat4V sines = sseSinf(angles);
-  const SSEFloat4V scales = _mm_div_ps(sines, sseSplat(sines, 0));
-  const SSEFloat4V scale0 = sseSelect(oneMinusT, sseSplat(scales, 1), selectMask);
-  const SSEFloat4V scale1 = sseSelect(tttt, sseSplat(scales, 2), selectMask);
+  const __m128 sines = sseSinf(angles);
+  const __m128 scales = _mm_div_ps(sines, sseSplat(sines, 0));
+  const __m128 scale0 = sseSelect(oneMinusT, sseSplat(scales, 1), selectMask);
+  const __m128 scale1 = sseSelect(tttt, sseSplat(scales, 2), selectMask);
   return Quat(sseMAdd(start.get128(), scale0, _mm_mul_ps(unitQuat1.get128(), scale1)));
 }
 

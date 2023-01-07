@@ -49,7 +49,7 @@ inline float VecIdx::getAsFloat() const
 inline VecIdx::operator float() const
 #endif
 {
-  return ((float *)&ref)[i];
+  return (reinterpret_cast<float *>(&ref))[i];
 }
 
 inline float VecIdx::operator = (float scalar)
@@ -214,7 +214,7 @@ inline void storeXYZ(const Vector3 & vec, __m128 * quad)
 
 inline void loadXYZArray(Vector3 & vec0, Vector3 & vec1, Vector3 & vec2, Vector3 & vec3, const __m128 * threeQuads)
 {
-  const float * quads = (const float *)threeQuads;
+  const float * quads = reinterpret_cast<const float *>(threeQuads);
   vec0 = Vector3(_mm_load_ps(quads));
   vec1 = Vector3(_mm_loadu_ps(quads + 3));
   vec2 = Vector3(_mm_loadu_ps(quads + 6));
@@ -998,7 +998,7 @@ inline void storeXYZ(const Point3 & pnt, __m128 * quad)
 
 inline void loadXYZArray(Point3 & pnt0, Point3 & pnt1, Point3 & pnt2, Point3 & pnt3, const __m128 * threeQuads)
 {
-  const float * quads = (const float *)threeQuads;
+  const float * quads = reinterpret_cast<const float *>(threeQuads);
   pnt0 = Point3(_mm_load_ps(quads));
   pnt1 = Point3(_mm_loadu_ps(quads + 3));
   pnt2 = Point3(_mm_loadu_ps(quads + 6));

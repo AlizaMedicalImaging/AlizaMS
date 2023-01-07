@@ -72,7 +72,7 @@ template<typename Tin, typename Tout> QString gs3(
 void srImageCleanupHandler(void * info)
 {
 	if (!info) return;
-	unsigned char * p = (unsigned char*)info;
+	unsigned char * p = static_cast<unsigned char*>(info);
 	delete [] p;
 	info = NULL;
 }
@@ -795,9 +795,8 @@ endpoints of the minor axis of an ellipse
 					tmpfile =
 						QString("i")+
 						QVariant(
-							(qulonglong)
-								QDateTime::currentMSecsSinceEpoch())
-									.toString();
+							static_cast<qulonglong>(QDateTime::currentMSecsSinceEpoch()))
+								.toString();
 					textBrowser->document()->addResource(
 						QTextDocument::ImageResource,
 						QUrl(tmpfile),
@@ -1778,8 +1777,8 @@ QString SRUtils::read_sr_content_sq(
 				++z)
 			{
 				identifiers +=
-					QVariant(
-						(int)ReferencedContentItemIdentifier.at(z))
+					QVariant(static_cast<int>
+						(ReferencedContentItemIdentifier.at(z)))
 							.toString();
 				if (z != (s___ - 1)) identifiers += QString(".");
 			}

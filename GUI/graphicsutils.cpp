@@ -41,8 +41,8 @@ template<typename T> QString get_scalar_pixel_value__(
 		{
 			if (ivariant->equi)
 			{
-				if (x_<(unsigned int)ivariant->di->idimy &&
-					y_<(unsigned int)ivariant->di->idimz)
+				if (x_<static_cast<unsigned int>(ivariant->di->idimy) &&
+					y_<static_cast<unsigned int>(ivariant->di->idimz))
 				{
 					ok = true;
 					idx[0] = selected_x_slice;
@@ -56,8 +56,8 @@ template<typename T> QString get_scalar_pixel_value__(
 		{
 			if (ivariant->equi)
 			{
-				if (x_<(unsigned int)ivariant->di->idimx &&
-					y_<(unsigned int)ivariant->di->idimz)
+				if (x_<static_cast<unsigned int>(ivariant->di->idimx) &&
+					y_<static_cast<unsigned int>(ivariant->di->idimz))
 				{
 					ok = true;
 					idx[1] = selected_y_slice;
@@ -69,8 +69,8 @@ template<typename T> QString get_scalar_pixel_value__(
 		break;
 	case 2:
 		{
-			if (x_<(unsigned int)ivariant->di->idimx &&
-				y_<(unsigned int)ivariant->di->idimy)
+			if (x_<static_cast<unsigned int>(ivariant->di->idimx) &&
+				y_<static_cast<unsigned int>(ivariant->di->idimy))
 			{
 				ok = true;
 				idx[2] = selected_z_slice;
@@ -149,8 +149,8 @@ template<typename T> QString get_rgb_pixel_value__(
 		{
 			if (ivariant->equi)
 			{
-				if (x_<(unsigned int)ivariant->di->idimy &&
-					y_<(unsigned int)ivariant->di->idimz)
+				if (x_<static_cast<unsigned int>(ivariant->di->idimy) &&
+					y_<static_cast<unsigned int>(ivariant->di->idimz))
 				{
 					ok = true;
 					idx[0] = sx;
@@ -164,8 +164,8 @@ template<typename T> QString get_rgb_pixel_value__(
 		{
 			if (ivariant->equi)
 			{
-				if (x_<(unsigned int)ivariant->di->idimx &&
-					y_<(unsigned int)ivariant->di->idimz)
+				if (x_<static_cast<unsigned int>(ivariant->di->idimx) &&
+					y_<static_cast<unsigned int>(ivariant->di->idimz))
 				{
 					ok = true;
 					idx[1] = sy;
@@ -177,8 +177,8 @@ template<typename T> QString get_rgb_pixel_value__(
 		break;
 	case 2:
 		{
-			if (x_<(unsigned int)ivariant->di->idimx &&
-				y_<(unsigned int)ivariant->di->idimy)
+			if (x_<static_cast<unsigned int>(ivariant->di->idimx) &&
+				y_<static_cast<unsigned int>(ivariant->di->idimy))
 			{
 				ok = true;
 				idx[2] = sz;
@@ -268,8 +268,8 @@ template<typename T> QString get_rgba_pixel_value__(
 		{
 			if (ivariant->equi)
 			{
-				if (x_<(unsigned int)ivariant->di->idimy &&
-					y_<(unsigned int)ivariant->di->idimz)
+				if (x_<static_cast<unsigned int>(ivariant->di->idimy) &&
+					y_<static_cast<unsigned int>(ivariant->di->idimz))
 				{
 					ok = true;
 					idx[0] = sx;
@@ -283,8 +283,8 @@ template<typename T> QString get_rgba_pixel_value__(
 		{
 			if (ivariant->equi)
 			{
-				if (x_<(unsigned int)ivariant->di->idimx &&
-					y_<(unsigned int)ivariant->di->idimz)
+				if (x_<static_cast<unsigned int>(ivariant->di->idimx) &&
+					y_<static_cast<unsigned int>(ivariant->di->idimz))
 				{
 					ok = true;
 					idx[1] = sy;
@@ -296,8 +296,8 @@ template<typename T> QString get_rgba_pixel_value__(
 		break;
 	case 2:
 		{
-			if (x_<(unsigned int)ivariant->di->idimx &&
-				y_<(unsigned int)ivariant->di->idimy)
+			if (x_<static_cast<unsigned int>(ivariant->di->idimx) &&
+				y_<static_cast<unsigned int>(ivariant->di->idimy))
 			{
 				ok = true;
 				idx[2] = sz;
@@ -617,8 +617,9 @@ void GraphicsUtils::draw_overlays(
 					painter->setCompositionMode(
 						QPainter::CompositionMode_Lighten);
 					painter->drawPixmap(
-						QPointF((float)(ov.at(ox).x-1),
-						(float)(ov.at(ox).y-1)),
+						QPointF(
+							static_cast<float>(ov.at(ox).x-1),
+							static_cast<float>(ov.at(ox).y-1)),
 						QPixmap::fromImage(oi));
 					painter->end();
 					delete painter;
@@ -670,7 +671,7 @@ void GraphicsUtils::print_image_info(
 		QVariant(v->id).toString();
 	QString s1 =
 		QString("Type:  ") +
-		QVariant((int)image_type).toString() +
+		QVariant(static_cast<int>(image_type)).toString() +
 		QString(",  ") + t +
 		((v->ybr) ? QString(", Y'CbCr\n") : QString("\n")) +
 		QString("Uniform:  ") +

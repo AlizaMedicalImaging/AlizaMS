@@ -159,7 +159,7 @@ inline float FloatInVec::getAsFloat() const
 inline FloatInVec::operator float() const
 #endif
 {
-  return *((float *)&mData);
+  return *(reinterpret_cast<const float *>(&mData));
 }
 
 inline __m128 FloatInVec::get128() const

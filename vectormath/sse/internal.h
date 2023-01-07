@@ -90,10 +90,6 @@ static inline float bit_cast_uint2float(unsigned int i)
 #endif
 }
 
-typedef __m128 SSEFloat4V;
-typedef __m128 SSEUint4V;
-typedef __m128 SSEInt4V;
-
 VECTORMATH_ALIGNED_PRE union SSEFloat
 {
   __m128 m128;
@@ -101,9 +97,9 @@ VECTORMATH_ALIGNED_PRE union SSEFloat
 } VECTORMATH_ALIGNED_POST;
 
 // _MM_SHUFFLE requires compile-time constants
-#define sseRor(vec, i) (((i) % 4) ? (_mm_shuffle_ps(vec, vec, _MM_SHUFFLE((unsigned char)(i + 3) % 4, (unsigned char)(i + 2) % 4, (unsigned char)(i + 1) % 4, (unsigned char)(i + 0) % 4))) : (vec))
+#define sseRor(vec, i) ((i % 4) ? (_mm_shuffle_ps(vec, vec, _MM_SHUFFLE(static_cast<unsigned char>(i + 3) % 4, static_cast<unsigned char>(i + 2) % 4, static_cast<unsigned char>(i + 1) % 4, static_cast<unsigned char>(i) % 4))) : vec)
 #define sseSplat(x, e) _mm_shuffle_ps(x, x, _MM_SHUFFLE(e, e, e, e))
-#define sseSld(vec, vec2, x) sseRor(vec, ((x) / 4))
+#define sseSld(vec, vec2, x) sseRor(vec, (x / 4))
 
 static inline __m128 sseUintToM128(unsigned int x)
 {
@@ -130,15 +126,15 @@ static inline __m128 sseSelect(__m128 a, __m128 b, unsigned int mask)
   return sseSelect(a, b, sseUintToM128(mask));
 }
 
-static inline SSEInt4V sseCvtToSignedInts(SSEFloat4V x)
+static inline __m128 sseCvtToSignedInts(__m128 x)
 {
   __m128i result = _mm_cvtps_epi32(x);
-  return (__m128 &)result;
+  return reinterpret_cast<__m128>(result);
 }
 
-static inline SSEFloat4V sseCvtToFloats(SSEInt4V x)
+static inline __m128 sseCvtToFloats(__m128 x)
 {
-  return _mm_cvtepi32_ps((__m128i &)x);
+  return _mm_cvtepi32_ps(reinterpret_cast<__m128i>(x));
 }
 
 static inline __m128 sseNegatef(__m128 x)
@@ -196,37 +192,37 @@ static inline __m128 sseACosf(__m128 x)
              select);
 }
 
-static inline __m128 sseSinf(SSEFloat4V x)
+static inline __m128 sseSinf(__m128 x)
 {
   // Range reduction using : xl = angle * TwoOverPi;
-  SSEFloat4V xl = _mm_mul_ps(x, _mm_set1_ps(0.63661977236f));
+  __m128 xl = _mm_mul_ps(x, _mm_set1_ps(0.63661977236f));
 
   // Find the quadrant the angle falls in
   // using:  q = (int) (ceil(abs(xl))*sign(xl))
-  const SSEInt4V q = sseCvtToSignedInts(xl);
+  const __m128 q = sseCvtToSignedInts(xl);
 
   // Compute an offset based on the quadrant that the angle falls in
-  const SSEInt4V offset = _mm_and_ps(q, sseUintToM128(0x3U));
+  const __m128 offset = _mm_and_ps(q, sseUintToM128(0x3U));
 
   // Remainder in range [-pi/4 .. pi/4]
-  const SSEFloat4V qf = sseCvtToFloats(q);
+  const __m128 qf = sseCvtToFloats(q);
   xl = sseMSub(qf, _mm_set1_ps(VECTORMATH_SINCOS_KC2), sseMSub(qf, _mm_set1_ps(VECTORMATH_SINCOS_KC1), x));
 
   // Compute x^2 and x^3
-  const SSEFloat4V xl2 = _mm_mul_ps(xl, xl);
-  const SSEFloat4V xl3 = _mm_mul_ps(xl2, xl);
+  const __m128 xl2 = _mm_mul_ps(xl, xl);
+  const __m128 xl3 = _mm_mul_ps(xl2, xl);
 
   // Compute both the sin and cos of the angles
   // using a polynomial expression:
   //   cx = 1.0f + xl2 * ((C0 * xl2 + C1) * xl2 + C2), and
   //   sx = xl + xl3 * ((S0 * xl2 + S1) * xl2 + S2)
-  const SSEFloat4V cx =
+  const __m128 cx =
     sseMAdd(
       sseMAdd(
        sseMAdd(_mm_set1_ps(VECTORMATH_SINCOS_CC0), xl2, _mm_set1_ps(VECTORMATH_SINCOS_CC1)),
          xl2, _mm_set1_ps(VECTORMATH_SINCOS_CC2)),
            xl2, _mm_set1_ps(1.0f));
-  const SSEFloat4V sx =
+  const __m128 sx =
     sseMAdd(
       sseMAdd(
         sseMAdd(_mm_set1_ps(VECTORMATH_SINCOS_SC0), xl2, _mm_set1_ps(VECTORMATH_SINCOS_SC1)),
@@ -235,7 +231,7 @@ static inline __m128 sseSinf(SSEFloat4V x)
 
   // Use the cosine when the offset is odd and the sin
   // when the offset is even
-  SSEFloat4V res = sseSelect(cx, sx, _mm_cmpeq_ps(_mm_and_ps(offset, sseUintToM128(0x1U)), _mm_setzero_ps()));
+  __m128 res = sseSelect(cx, sx, _mm_cmpeq_ps(_mm_and_ps(offset, sseUintToM128(0x1U)), _mm_setzero_ps()));
 
   // Flip the sign of the result when (offset mod 4) = 1 or 2
   return sseSelect(_mm_xor_ps(sseUintToM128(0x80000000U), res), // Negative
@@ -243,40 +239,40 @@ static inline __m128 sseSinf(SSEFloat4V x)
              _mm_cmpeq_ps(_mm_and_ps(offset, sseUintToM128(0x2U)), _mm_setzero_ps()));
 }
 
-static inline void sseSinfCosf(SSEFloat4V x, SSEFloat4V * s, SSEFloat4V * c)
+static inline void sseSinfCosf(__m128 x, __m128 * s, __m128 * c)
 {
   // Range reduction using : xl = angle * TwoOverPi;
-  SSEFloat4V xl = _mm_mul_ps(x, _mm_set1_ps(0.63661977236f));
+  __m128 xl = _mm_mul_ps(x, _mm_set1_ps(0.63661977236f));
 
   // Find the quadrant the angle falls in
   // using:  q = (int) (ceil(abs(xl))*sign(xl))
-  const SSEInt4V q = sseCvtToSignedInts(xl);
+  const __m128 q = sseCvtToSignedInts(xl);
 
   // Compute the offset based on the quadrant that the angle falls in.
   // Add 1 to the offset for the cosine.
-  const SSEInt4V offsetSin = _mm_and_ps(q, sseUintToM128(0x3U));
-  __m128i temp = _mm_add_epi32(_mm_set1_epi32(1), (__m128i &)offsetSin);
-  const SSEInt4V offsetCos = (__m128 &)temp;
+  const __m128 offsetSin = _mm_and_ps(q, sseUintToM128(0x3U));
+  __m128i temp = _mm_add_epi32(_mm_set1_epi32(1), reinterpret_cast<__m128i>(offsetSin));
+  const __m128 offsetCos = reinterpret_cast<__m128>(temp);
 
   // Remainder in range [-pi/4 .. pi/4]
-  SSEFloat4V qf = sseCvtToFloats(q);
+  __m128 qf = sseCvtToFloats(q);
   xl = sseMSub(qf, _mm_set1_ps(VECTORMATH_SINCOS_KC2), sseMSub(qf, _mm_set1_ps(VECTORMATH_SINCOS_KC1), x));
 
   // Compute x^2 and x^3
-  const SSEFloat4V xl2 = _mm_mul_ps(xl, xl);
-  const SSEFloat4V xl3 = _mm_mul_ps(xl2, xl);
+  const __m128 xl2 = _mm_mul_ps(xl, xl);
+  const __m128 xl3 = _mm_mul_ps(xl2, xl);
 
   // Compute both the sin and cos of the angles
   // using a polynomial expression:
   //   cx = 1.0f + xl2 * ((C0 * xl2 + C1) * xl2 + C2), and
   //   sx = xl + xl3 * ((S0 * xl2 + S1) * xl2 + S2)
-  const SSEFloat4V cx =
+  const __m128 cx =
     sseMAdd(
       sseMAdd(
         sseMAdd(_mm_set1_ps(VECTORMATH_SINCOS_CC0), xl2, _mm_set1_ps(VECTORMATH_SINCOS_CC1)),
           xl2, _mm_set1_ps(VECTORMATH_SINCOS_CC2)),
             xl2, _mm_set1_ps(1.0f));
-  const SSEFloat4V sx =
+  const __m128 sx =
     sseMAdd(
       sseMAdd(
         sseMAdd(_mm_set1_ps(VECTORMATH_SINCOS_SC0), xl2, _mm_set1_ps(VECTORMATH_SINCOS_SC1)),
@@ -285,8 +281,8 @@ static inline void sseSinfCosf(SSEFloat4V x, SSEFloat4V * s, SSEFloat4V * c)
 
   // Use the cosine when the offset is odd and the sin
   // when the offset is even
-  SSEUint4V sinMask = (SSEUint4V)_mm_cmpeq_ps(_mm_and_ps(offsetSin, sseUintToM128(0x1U)), _mm_setzero_ps());
-  SSEUint4V cosMask = (SSEUint4V)_mm_cmpeq_ps(_mm_and_ps(offsetCos, sseUintToM128(0x1U)), _mm_setzero_ps());
+  __m128 sinMask = _mm_cmpeq_ps(_mm_and_ps(offsetSin, sseUintToM128(0x1U)), _mm_setzero_ps());
+  __m128 cosMask = _mm_cmpeq_ps(_mm_and_ps(offsetCos, sseUintToM128(0x1U)), _mm_setzero_ps());
   *s = sseSelect(cx, sx, sinMask);
   *c = sseSelect(cx, sx, cosMask);
 
@@ -294,8 +290,8 @@ static inline void sseSinfCosf(SSEFloat4V x, SSEFloat4V * s, SSEFloat4V * c)
   sinMask = _mm_cmpeq_ps(_mm_and_ps(offsetSin, sseUintToM128(0x2U)), _mm_setzero_ps());
   cosMask = _mm_cmpeq_ps(_mm_and_ps(offsetCos, sseUintToM128(0x2U)), _mm_setzero_ps());
 
-  *s = sseSelect((SSEFloat4V)_mm_xor_ps(sseUintToM128(0x80000000U), (SSEUint4V)*s), *s, sinMask);
-  *c = sseSelect((SSEFloat4V)_mm_xor_ps(sseUintToM128(0x80000000U), (SSEUint4V)*c), *c, cosMask);
+  *s = sseSelect(_mm_xor_ps(sseUintToM128(0x80000000U), *s), *s, sinMask);
+  *c = sseSelect(_mm_xor_ps(sseUintToM128(0x80000000U), *c), *c, cosMask);
 }
 
 static inline __m128 sseVecDot3(__m128 vec0, __m128 vec1)
@@ -336,7 +332,7 @@ static inline __m128 sseVecInsert(__m128 dst, __m128 src, int slot)
 
 static inline void sseVecSetElement(__m128 & vec, float scalar, int slot)
 {
-  ((float *)&(vec))[slot] = scalar;
+  (reinterpret_cast<float *>(&vec))[slot] = scalar;
 }
 
 } // namespace SSE

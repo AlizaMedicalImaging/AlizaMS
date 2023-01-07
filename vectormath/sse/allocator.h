@@ -1,5 +1,5 @@
 /*
- * (C) mihail.isakov@googlemail.com 2009-2022
+ * (C) mihail.isakov@googlemail.com 2009-2023
  */
 
 #ifndef VECTORMATH_ALIGNED_ALLOCATOR_H
