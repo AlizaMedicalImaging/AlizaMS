@@ -97,9 +97,9 @@ VECTORMATH_ALIGNED_PRE union SSEFloat
 } VECTORMATH_ALIGNED_POST;
 
 // _MM_SHUFFLE requires compile-time constants
-#define sseRor(vec, i) ((i % 4) ? (_mm_shuffle_ps(vec, vec, _MM_SHUFFLE(static_cast<unsigned char>(i + 3) % 4, static_cast<unsigned char>(i + 2) % 4, static_cast<unsigned char>(i + 1) % 4, static_cast<unsigned char>(i) % 4))) : vec)
-#define sseSplat(x, e) _mm_shuffle_ps(x, x, _MM_SHUFFLE(e, e, e, e))
-#define sseSld(vec, vec2, x) sseRor(vec, (x / 4))
+#define sseRor(vec, i) (((i) % 4) ? (_mm_shuffle_ps((vec), (vec), _MM_SHUFFLE((static_cast<unsigned char>((i) + 3) % 4), (static_cast<unsigned char>((i) + 2) % 4), (static_cast<unsigned char>((i) + 1) % 4), (static_cast<unsigned char>(i) % 4)))) : (vec))
+#define sseSplat(x, e) _mm_shuffle_ps((x), (x), _MM_SHUFFLE((e), (e), (e), (e)))
+#define sseSld(vec, vec2, x) sseRor((vec), ((x) / 4))
 
 static inline __m128 sseUintToM128(unsigned int x)
 {

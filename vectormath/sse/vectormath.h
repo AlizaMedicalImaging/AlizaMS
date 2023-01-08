@@ -30,10 +30,7 @@
 #ifndef VECTORMATH_SSE_VECTORMATH_HPP
 #define VECTORMATH_SSE_VECTORMATH_HPP
 
-// Initialize values in default constructors to zero,
-// it is not required and costs addional operations,
-// but otherwise unitialized members will be reported
-// as defect with some analysing tool.
+// Always initialize all values in default constructors to zero.
 #define VECTORMATH_SSE_ALWAYS_INITIALIZE
 
 #include <cmath>

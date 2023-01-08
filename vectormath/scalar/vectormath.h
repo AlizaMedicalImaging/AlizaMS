@@ -30,10 +30,7 @@
 #ifndef VECTORMATHSC_SCALAR_VECTORMATHSC_HPP
 #define VECTORMATHSC_SCALAR_VECTORMATHSC_HPP
 
-// Initialize values in default constructor to zero,
-// it is not required it costs addional operations,
-// but otherwise unitialized members will be reported
-// as defect with some analysing tool.
+// Always initialize all values in default constructors to zero.
 #define VECTORMATH_SCALAR_ALWAYS_INITIALIZE
 
 #include <cmath>
