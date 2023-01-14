@@ -542,7 +542,16 @@ public:
     uid_1_2_840_10008_10_1 = 475,
     uid_1_2_840_10008_10_2 = 476,
     uid_1_2_840_10008_10_3 = 477,
-    uid_1_2_840_10008_10_4 = 478
+    uid_1_2_840_10008_10_4 = 478,
+//
+//
+/////////////////////////////////////////
+
+/////////////////////////////////////////
+//
+// PA Temprorary Image Storage FIXME
+//
+	uid_1_2_840_10008_5_1_2_3_45 = 479
 //
 //
 /////////////////////////////////////////
@@ -1071,7 +1080,16 @@ public:
     VideoEndoscopicImageRealTimeCommunication = 475,
     VideoPhotographicImageRealTimeCommunication = 476,
     AudioWaveformRealTimeCommunication = 477,
-    RenditionSelectionDocumentRealTimeCommunication = 478
+    RenditionSelectionDocumentRealTimeCommunication = 478,
+//
+//
+/////////////////////////////////////////
+
+/////////////////////////////////////////
+//
+// PA Temprorary Image Storage FIXME
+//
+    PATemproraryImageStorage = 479
 //
 //
 /////////////////////////////////////////

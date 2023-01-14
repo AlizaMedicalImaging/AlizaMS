@@ -875,37 +875,6 @@ ImageHelper::GetRescaleInterceptSlopeValue(File const & f)
   }
   else if (ms == MediaStorage::MRImageStorage)
   {
-#if 0
-    const Tag trwvms(0x0040,0x9096); // Real World Value Mapping Sequence
-    if(ds.FindDataElement(trwvms))
-    {
-      SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(trwvms).GetValueAsSQ();
-      if(sqi)
-      {
-        const Tag trwvlutd(0x0040,0x9212); // Real World Value LUT Data
-        if(ds.FindDataElement(trwvlutd))
-        {
-          assert(0); // Not supported !
-        }
-        // don't know how to handle multiples:
-        if (sqi->GetNumberOfItems() != 1)
-        {
-          mdcmAlwaysWarnMacro("sqi->GetNumberOfItems() != 1");
-          assert(0);
-        }
-        const Item &item = sqi->GetItem(1);
-        const DataSet & subds = item.GetNestedDataSet();
-        //const Tag trwvi(0x0040,0x9224); // Real World Value Intercept
-        //const Tag trwvs(0x0040,0x9225); // Real World Value Slope
-        Attribute<0x0040,0x9224> at1 = {0};
-        at1.SetFromDataSet(subds);
-        Attribute<0x0040,0x9225> at2 = {1};
-        at2.SetFromDataSet(subds);
-        interceptslope[0] = at1.GetValue();
-        interceptslope[1] = at2.GetValue();
-      }
-    }
-#else
     // See the long thread at:
     // https://groups.google.com/d/msg/comp.protocols.dicom/M4kdqcrs50Y/_TSx0EjtAQAJ
     // in particular this paper:
@@ -931,9 +900,12 @@ ImageHelper::GetRescaleInterceptSlopeValue(File const & f)
         interceptslope[0] = el_ri.GetValue();
         interceptslope[1] = el_rs.GetValue();
         if (interceptslope[1] == 0)
+        {
           interceptslope[1] = 1;
-        mdcmWarningMacro("PMS Modality LUT loaded for MR Image Storage: [" << interceptslope[0] << ","
-                                                                           << interceptslope[1] << "]");
+          mdcmWarningMacro("Can not use slope 0, set to 1");
+        }
+        mdcmAlwaysWarnMacro("Philips private Modality LUT, intercept " 
+                            << interceptslope[0] << ", slope " << interceptslope[1]);
       }
     }
     else
@@ -944,18 +916,17 @@ ImageHelper::GetRescaleInterceptSlopeValue(File const & f)
         mdcmDebugMacro("Modality LUT unused for MR Image Storage: [" << dummy[0] << "," << dummy[1] << "]");
       }
     }
-#endif
   }
   else if (ms == MediaStorage::RTDoseStorage)
   {
-    // TODO. FrameIncrementPointer ? (0028,0009) AT (3004,000c)
+    // TODO FrameIncrementPointer? (0028,0009) AT (3004,000c)
     Attribute<0x3004, 0x000e> gridscaling = { 0 };
     gridscaling.SetFromDataSet(ds);
     interceptslope[0] = 0;
     interceptslope[1] = gridscaling.GetValue();
     if (interceptslope[1] == 0)
     {
-      mdcmWarningMacro("Cannot have slope == 0. Defaulting to 1.0 instead");
+      mdcmWarningMacro("Can not use slope 0, set to 1");
       interceptslope[1] = 1;
     }
   }
@@ -2487,63 +2458,20 @@ ImageHelper::SetRescaleInterceptSlopeValue(File & f, const Image & img)
   }
   if (ms == MediaStorage::MRImageStorage)
   {
-#if 0
-    /*
-     * http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.16.2.html#table_C.7.6.16-12b
-     (0040,9096) SQ (Sequence with undefined length)                   # u/l,1 Real World Value Mapping Sequence
-     (fffe,e000) na (Item with defined length)
-     (0028,3003) LO [Grey Scale LUT]                               # 14,1 LUT Explanation
-     (0040,08ea) SQ (Sequence with undefined length)               # u/l,1 Measurement Units Code Sequence
-     (fffe,e000) na (Item with defined length)
-     (0008,0100) SH [mm2/s ]                                   # 6,1 Code Value
-     (0008,0102) SH [UCUM]                                     # 4,1 Coding Scheme Designator
-     (0008,0103) SH [1.4 ]                                     # 4,1 Coding Scheme Version
-     (0008,0104) LO [mm2/s ]                                   # 6,1 Code Meaning
-     (fffe,e0dd)
-     (0040,9210) SH [GE_GREY ]                                     # 8,1 LUT Label
-     (0040,9211) US 4904                                           # 2,1 Real World Value Last Value Mapped
-     (0040,9216) US 359                                            # 2,1 Real World Value First Value Mapped
-     (0040,9224) FD 0                                              # 8,1 Real World Value Intercept
-     (0040,9225) FD 1e-06                                          # 8,1 Real World Value Slope
-     */
-    if(img.GetIntercept() != 0.0 || img.GetSlope() != 1.0)
+    if (ForceRescaleInterceptSlope)
     {
-      SmartPointer<SequenceOfItems> sq = new SequenceOfItems;
-      Item it;
-      DataSet & subds = it.GetNestedDataSet();
-      Attribute<0x0040,0x9224> at1 = {0};
+      mdcmDebugMacro("Forced Modality LUT for MR Image Storage, intercept "
+                     << img.GetIntercept() << ", slope" << img.GetSlope());
+      Attribute<0x0028, 0x1052> at1;
       at1.SetValue(img.GetIntercept());
-      Attribute<0x0040,0x9225> at2 = {1};
+      ds.Replace(at1.GetAsDataElement());
+      Attribute<0x0028, 0x1053> at2;
       at2.SetValue(img.GetSlope());
-      subds.Insert(at1.GetAsDataElement());
-      subds.Insert(at2.GetAsDataElement());
-      sq->AddItem(it);
-      const Tag trwvms(0x0040,0x9096); // Real World Value Mapping Sequence
-      DataElement de(trwvms);
-      de.SetVR(VR::SQ);
-      de.SetValue(*sq);
-      ds.Replace(de);
+      ds.Replace(at2.GetAsDataElement());
+      Attribute<0x0028, 0x1054> at3; // Rescale Type
+      at3.SetValue("US");            // Compatible with Enhanced MR Image Storage
+      ds.Replace(at3.GetAsDataElement());
     }
-    ds.Remove(Tag(0x28,0x1052));
-    ds.Remove(Tag(0x28,0x1053));
-    ds.Remove(Tag(0x28,0x1054));
-#else
-    {
-      if (ForceRescaleInterceptSlope)
-      {
-        mdcmDebugMacro("Forcing MR Image Storage / Modality LUT: [" << img.GetIntercept() << "," << img.GetSlope());
-        Attribute<0x0028, 0x1052> at1;
-        at1.SetValue(img.GetIntercept());
-        ds.Replace(at1.GetAsDataElement());
-        Attribute<0x0028, 0x1053> at2;
-        at2.SetValue(img.GetSlope());
-        ds.Replace(at2.GetAsDataElement());
-        Attribute<0x0028, 0x1054> at3; // Rescale Type
-        at3.SetValue("US");            // Compatible with Enhanced MR Image Storage
-        ds.Replace(at3.GetAsDataElement());
-      }
-    }
-#endif
   }
   else
   {
@@ -2708,56 +2636,53 @@ ImageHelper::GetRealWorldValueMappingContent(File const & f, RealWorldValueMappi
   MediaStorage ms;
   ms.SetFromFile(f);
   const DataSet & ds = f.GetDataSet();
-  if (ms == MediaStorage::MRImageStorage)
+  const Tag trwvms(0x0040, 0x9096); // Real World Value Mapping Sequence
+  if (ds.FindDataElement(trwvms))
   {
-    const Tag trwvms(0x0040, 0x9096); // Real World Value Mapping Sequence
-    if (ds.FindDataElement(trwvms))
+    SmartPointer<SequenceOfItems> sqi0 = ds.GetDataElement(trwvms).GetValueAsSQ();
+    if (sqi0 && sqi0->GetNumberOfItems() > 0)
     {
-      SmartPointer<SequenceOfItems> sqi0 = ds.GetDataElement(trwvms).GetValueAsSQ();
-      if (sqi0 && sqi0->GetNumberOfItems() > 0)
+      const Tag trwvlutd(0x0040, 0x9212); // Real World Value LUT Data
+      if (ds.FindDataElement(trwvlutd))
       {
-        const Tag trwvlutd(0x0040, 0x9212); // Real World Value LUT Data
-        if (ds.FindDataElement(trwvlutd))
+        mdcmAlwaysWarnMacro("Not supported (RWV LUT Data)");
+        return false;
+      }
+      if (!(sqi0->GetNumberOfItems() == 1))
+      {
+        mdcmAlwaysWarnMacro("Not supported (RWV multiple items)");
+        return false;
+      }
+      const Item &    item0 = sqi0->GetItem(1);
+      const DataSet & subds0 = item0.GetNestedDataSet();
+      // const Tag trwvi(0x0040,0x9224); // Real World Value Intercept
+      // const Tag trwvs(0x0040,0x9225); // Real World Value Slope
+      {
+        Attribute<0x0040, 0x9224> at1 = { 0 };
+        at1.SetFromDataSet(subds0);
+        Attribute<0x0040, 0x9225> at2 = { 1 };
+        at2.SetFromDataSet(subds0);
+        ret.RealWorldValueIntercept = at1.GetValue();
+        ret.RealWorldValueSlope = at2.GetValue();
+      }
+      const Tag tmucs(0x0040, 0x08ea); // Measurement Units Code Sequence
+      if (subds0.FindDataElement(tmucs))
+      {
+        SmartPointer<SequenceOfItems> sqi = subds0.GetDataElement(tmucs).GetValueAsSQ();
+        if (sqi && sqi->GetNumberOfItems() == 1)
         {
-          mdcmAlwaysWarnMacro("Not supported");
-          return false;
-        }
-        if (!(sqi0->GetNumberOfItems() == 1))
-        {
-          mdcmAlwaysWarnMacro("Not supported (multiple items)");
-          return false;
-        }
-        const Item &    item0 = sqi0->GetItem(1);
-        const DataSet & subds0 = item0.GetNestedDataSet();
-        // const Tag trwvi(0x0040,0x9224); // Real World Value Intercept
-        // const Tag trwvs(0x0040,0x9225); // Real World Value Slope
-        {
-          Attribute<0x0040, 0x9224> at1 = { 0 };
-          at1.SetFromDataSet(subds0);
-          Attribute<0x0040, 0x9225> at2 = { 1 };
-          at2.SetFromDataSet(subds0);
-          ret.RealWorldValueIntercept = at1.GetValue();
-          ret.RealWorldValueSlope = at2.GetValue();
-        }
-        const Tag tmucs(0x0040, 0x08ea); // Measurement Units Code Sequence
-        if (subds0.FindDataElement(tmucs))
-        {
-          SmartPointer<SequenceOfItems> sqi = subds0.GetDataElement(tmucs).GetValueAsSQ();
-          if (sqi && sqi->GetNumberOfItems() == 1)
-          {
-            const Item &              item = sqi->GetItem(1);
-            const DataSet &           subds = item.GetNestedDataSet();
-            Attribute<0x0008, 0x0100> at1;
-            at1.SetFromDataSet(subds);
-            Attribute<0x0008, 0x0104> at2;
-            at2.SetFromDataSet(subds);
-            ret.CodeValue = at1.GetValue().Trim();
-            ret.CodeMeaning = at2.GetValue().Trim();
-          }
+          const Item &              item = sqi->GetItem(1);
+          const DataSet &           subds = item.GetNestedDataSet();
+          Attribute<0x0008, 0x0100> at1;
+          at1.SetFromDataSet(subds);
+          Attribute<0x0008, 0x0104> at2;
+          at2.SetFromDataSet(subds);
+          ret.CodeValue = at1.GetValue().Trim();
+          ret.CodeMeaning = at2.GetValue().Trim();
         }
       }
-      return true;
     }
+    return true;
   }
   return false;
 }

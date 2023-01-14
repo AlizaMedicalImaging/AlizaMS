@@ -149,6 +149,7 @@ public:
     BreastProjectionXRayImageStorageForProcessing,
     HardcopyColorImageStorage,
     DCMTKUnknownStorage,
+    PATemproraryImageStorage, // FIXME
     MS_END
   } MSType;
 
