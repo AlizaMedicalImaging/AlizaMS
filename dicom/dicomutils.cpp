@@ -8251,7 +8251,7 @@ QString DicomUtils::read_buffer(
 	QProgressDialog * pb)
 {
 	*ok = false;
-	mdcm::ImageHelper::SetForceRescaleInterceptSlope(rescale);
+	mdcm::ImageHelper::SetForceRescaleInterceptSlope(true);
 	mdcm::ImageHelper::SetWorkaroundPredictorBug(pred6_bug);
 	mdcm::ImageHelper::SetWorkaroundCornellBug(cornell_bug);
 	mdcm::ImageHelper::SetCleanUnusedBits(clean_unused_bits);
