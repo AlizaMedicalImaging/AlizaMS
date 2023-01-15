@@ -133,18 +133,7 @@ QString SpectroscopyUtils::ProcessData(
 		tSharedFunctionalGroupsSequence,
 		sq, idx_values, shared_values);
 	if (!ok_f && !ok_g) return QString("!ok_f && !ok_g");
-	if (ok_f && idx_values.size()==values.size())
-	{
-		for (unsigned long x = 0; x < sq_size; ++x)
-		{
-			std::list<unsigned int> tmpl;
-			for (unsigned long j = 0; j < idx_values.size(); ++j)
-				tmpl.push_back(idx_values.at(j).idx.at(x));
-			tmpl.sort();
-			tmpl.unique();
-			sq[x].size = tmpl.size();
-		}
-	}
+
 	DicomUtils::enhanced_process_values(values, shared_values);
 
 	// stack id/position number without dimension organisation?

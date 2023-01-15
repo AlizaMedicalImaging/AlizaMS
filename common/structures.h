@@ -137,7 +137,6 @@ typedef struct
 	std::string uid;
 	mdcm::Tag index_pointer;
 	mdcm::Tag group_pointer;
-	unsigned long size;
 } DimIndex;
 
 typedef std::vector<DimIndex> DimIndexSq;

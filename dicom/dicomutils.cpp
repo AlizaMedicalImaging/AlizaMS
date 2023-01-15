@@ -2938,6 +2938,7 @@ void DicomUtils::read_dimension_index_sq(
 					nestedds,
 					tDimensionOrganizationUID,
 					dim_uid);
+			(void)ok2;
 			if (ok0 && ok1)
 			{
 				DimIndex idx;
@@ -3120,9 +3121,9 @@ bool DicomUtils::read_group_sq(
 					{
 #ifdef ENHANCED_PRINT_INFO
 						std::cout << "Dimension Index Values";
-						for (int x = 0; x < sq.size(); ++x)
+						for (size_t y = 0; y < sq.size(); ++y)
 						{
-							std::cout << " " << index_value.idx.at(x);
+							std::cout << " " << index_value.idx.at(y);
 						}
 						std::cout << " (id = " << index_value.id << ")"
 							<< std::endl;
@@ -4847,21 +4848,28 @@ void DicomUtils::enhanced_get_indices(
 	int * dim3rd,
 	int * enh_id)
 {
+	const int sq_size = static_cast<int>(sq.size());
+	if (sq_size < 1)
+	{
+#ifdef ENHANCED_PRINT_INFO
+		std::cout << "Warning: empty DimIndexSq" << std::endl;
+#endif
+		return;
+	}
 	int stack_id_idx      = -1;
 	int in_stack_pos_idx  = -1;
 	int temporal_pos_idx  = -1;
+	int temporal_off_idx  = -1;
 	int contrast_idx      = -1;
 	int b_value_idx       = -1;
 	int gradients_idx     = -1;
 	int lut_label_idx     = -1;
-	int temporal_idx      = -1;
 	int plane_pos_idx     = -1;
 	int datatype_idx      = -1;
 	int mr_frame_type_idx = -1;
 	int mr_eff_echo_idx   = -1;
 	int segment_idx       = -1;
 	std::string dim_uid;
-	const int sq_size = static_cast<int>(sq.size());
 	//
 	std::vector<std::string> dim_uids;
 	for (size_t x = 0; x < sq_size; ++x)
@@ -4877,16 +4885,9 @@ void DicomUtils::enhanced_get_indices(
 			"Warning: multiple dimension organization UIDs, using 1st"
 				<< std::endl;
 	}
-	if (dim_uids_set_size >= 1)
 	{
 		std::set<std::string>::const_iterator it = dim_uids_set.cbegin();
 		dim_uid = *it;
-	}
-	else
-	{
-		dim_uid = std::string("");
-		std::cout << "Error: no dimension organization UID"
-			<< std::endl;
 	}
 #ifdef ENHANCED_PRINT_INFO
 	std::cout << "Using Dimension Organization UID " << dim_uid << std::endl;
@@ -4897,341 +4898,357 @@ void DicomUtils::enhanced_get_indices(
 		const size_t i = static_cast<size_t>(x);
 		if (sq.at(i).uid == dim_uid)
 		{
-			if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-				sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9056))
+			if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+				sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
 			{
 				stack_id_idx = x;
 			}
-			else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-				sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9057))
+			else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+				sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
 			{
 				in_stack_pos_idx = x;
 			}
-			else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-				sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9128))
+			else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+				sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
 			{
 				temporal_pos_idx = x;
 			}
-			else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9117) &&
-				sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9087))
+			else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9310) &&
+				sq.at(i).index_pointer == mdcm::Tag(0x0020,0x930d))
+			{
+				temporal_off_idx = x;
+			}
+			else if (sq.at(i).group_pointer == mdcm::Tag(0x0018,0x9117) &&
+				sq.at(i).index_pointer == mdcm::Tag(0x0018,0x9087))
 			{
 				b_value_idx = x;
 			}
-			else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9117) &&
-				sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9089))
+			else if (sq.at(i).group_pointer == mdcm::Tag(0x0018,0x9117) &&
+				sq.at(i).index_pointer == mdcm::Tag(0x0018,0x9089))
 			{
 				gradients_idx = x;
 			}
-			else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9341)) // TODO check
+			else if (sq.at(i).group_pointer == mdcm::Tag(0x0018,0x9341) &&
+				sq.at(i).index_pointer == mdcm::Tag(0x0018,0x9337))
 			{
 				contrast_idx = x;
 			}
-			else if (sq.at(i).group_pointer==mdcm::Tag(0x0040,0x9096) &&
-				sq.at(i).index_pointer==mdcm::Tag(0x0040,0x9210))
+			else if (sq.at(i).group_pointer == mdcm::Tag(0x0040,0x9096) &&
+				sq.at(i).index_pointer == mdcm::Tag(0x0040,0x9210))
 			{
 				lut_label_idx = x;
 			}
-			else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9310) &&
-				sq.at(i).index_pointer==mdcm::Tag(0x0020,0x930d))
-			{
-				temporal_idx = x;
-			}
-			else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x930e) &&
-				sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9301))
+			else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
+				sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
 			{
 				plane_pos_idx = x;
 			}
-			else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9807) &&
-				sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9808))
+			else if (sq.at(i).group_pointer == mdcm::Tag(0x0018,0x9807) &&
+				sq.at(i).index_pointer == mdcm::Tag(0x0018,0x9808))
 			{
 				datatype_idx = x;
 			}
-			else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9226) &&
-				sq.at(i).index_pointer==mdcm::Tag(0x0008,0x9007))
+			else if (sq.at(i).group_pointer == mdcm::Tag(0x0018,0x9226) &&
+				sq.at(i).index_pointer == mdcm::Tag(0x0008,0x9007))
 			{
 				mr_frame_type_idx = x;
 			}
-			else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9114) &&
-				sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9082))
+			else if (sq.at(i).group_pointer == mdcm::Tag(0x0018,0x9114) &&
+				sq.at(i).index_pointer == mdcm::Tag(0x0018,0x9082))
 			{
 				mr_eff_echo_idx = x;
 			}
-			else if (sq.at(i).group_pointer==mdcm::Tag(0x0062,0x000a) &&
-				sq.at(i).index_pointer==mdcm::Tag(0x0062,0x000b))
+			else if (sq.at(i).group_pointer == mdcm::Tag(0x0062,0x000a) &&
+				sq.at(i).index_pointer == mdcm::Tag(0x0062,0x000b))
 			{
 				segment_idx = x;
 			}
 		}
 	}
 	//
-	//
-	// Workaround to guess temporar tag, e.g. ultrasound
-	if (sq_size==3 &&
-		temporal_idx<0 &&
-		plane_pos_idx==1 &&
-		datatype_idx==2)
-	{
-		temporal_idx = 0;
-	}
-	//
-	//
-	//
 	// Well-known combinations
-	if (sq_size==3 &&
-		temporal_idx>=0 &&
-		plane_pos_idx>=0 &&
-		datatype_idx>=0)
-	{
-		*dim5th = datatype_idx;
-		*dim4th = temporal_idx;
-		*dim3rd = plane_pos_idx;
-		*enh_id = 101;
-	}
-	else if (sq_size==2 &&
-		plane_pos_idx>=0 &&
-		datatype_idx>=0)
-	{
-		*dim4th = datatype_idx;
-		*dim3rd = plane_pos_idx;
-		*enh_id = 103;
-	}
-	else if (sq_size==2 &&
-		plane_pos_idx>=0 &&
-		temporal_idx>=0)
-	{
-		*dim4th = temporal_idx;
-		*dim3rd = plane_pos_idx;
-		*enh_id = 104;
-	}
-	else if (sq_size==1 &&
-		temporal_idx==0)
-	{
-		*dim3rd = temporal_idx;
-		*enh_id = 105;
-	}
-	else if (sq_size==1 &&
-		plane_pos_idx==0)
-	{
-		*dim3rd = plane_pos_idx;
-		*enh_id = 106;
-	}
-	// Generic
-	else if (sq_size==1 &&
-		in_stack_pos_idx==0)
+	//
+	// 3D
+	if (sq_size == 1 &&
+		in_stack_pos_idx == 0)
 	{
 		*enh_id = 1;
 		*dim3rd = in_stack_pos_idx;
 	}
-	else if (sq_size==2 &&
-		in_stack_pos_idx>=0 &&
-		stack_id_idx>=0)
+	else if (sq_size == 2 &&
+		in_stack_pos_idx >= 0 &&
+		stack_id_idx >= 0)
 	{
 		*enh_id = 2;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
-	// Temporal
-	else if (sq_size==3 &&
-		stack_id_idx>=0 &&
-		in_stack_pos_idx>=0 &&
-		temporal_pos_idx>=0)
+	else if (sq_size == 1 &&
+		plane_pos_idx == 0)
 	{
+		*dim3rd = plane_pos_idx;
 		*enh_id = 3;
+	}
+	// Temporal
+	else if (sq_size == 3 &&
+		stack_id_idx >= 0 &&
+		in_stack_pos_idx >= 0 &&
+		temporal_pos_idx >= 0)
+	{
+		*enh_id = 4;
 		*dim5th = temporal_pos_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
-	else if (sq_size==2 &&
-		temporal_pos_idx>=0 &&
-		stack_id_idx>=0)
+	else if (sq_size == 3 &&
+		stack_id_idx >= 0 &&
+		in_stack_pos_idx >= 0 &&
+		temporal_off_idx >= 0)
 	{
-		*enh_id = 4;
+		*enh_id = 5;
+		*dim5th = temporal_off_idx;
+		*dim4th = stack_id_idx;
+		*dim3rd = in_stack_pos_idx;
+	}
+	else if (sq_size == 2 &&
+		temporal_pos_idx >= 0 &&
+		stack_id_idx >= 0)
+	{
+		*enh_id = 6;
 		*dim4th = stack_id_idx;
 		*dim3rd = temporal_pos_idx;
 	}
-	else if (sq_size==1 &&
-		temporal_pos_idx==0)
+	else if (sq_size == 1 &&
+		temporal_pos_idx == 0)
 	{
-		*enh_id = 5;
+		*enh_id = 7;
 		*dim3rd = temporal_pos_idx;
 	}
-	// Contrast
-	else if (sq_size==4 &&
-		temporal_pos_idx>=0 &&
-		in_stack_pos_idx>=0 &&
-		stack_id_idx>=0 &&
-		contrast_idx>=0)
+	else if (sq_size == 1 &&
+		temporal_off_idx == 0)
 	{
-		*enh_id = 6;
+		*enh_id = 8;
+		*dim3rd = temporal_off_idx;
+	}
+	else if (sq_size == 2 &&
+		plane_pos_idx >= 0 &&
+		temporal_off_idx >= 0)
+	{
+		*dim4th = temporal_off_idx;
+		*dim3rd = plane_pos_idx;
+		*enh_id = 9;
+	}
+	else if (sq_size == 1 &&
+		temporal_off_idx == 0)
+	{
+		*dim3rd = temporal_off_idx;
+		*enh_id = 10;
+	}
+	// Data type
+	else if (sq_size == 2 &&
+		plane_pos_idx >= 0 &&
+		datatype_idx >= 0)
+	{
+		*dim4th = datatype_idx;
+		*dim3rd = plane_pos_idx;
+		*enh_id = 11;
+	}
+	else if (sq_size == 3 &&
+		temporal_off_idx >= 0 &&
+		plane_pos_idx >= 0 &&
+		datatype_idx >= 0)
+	{
+		*dim5th = datatype_idx;
+		*dim4th = temporal_off_idx;
+		*dim3rd = plane_pos_idx;
+		*enh_id = 12;
+	}
+	else if (sq_size == 3 &&
+		temporal_pos_idx >= 0 &&
+		plane_pos_idx >= 0 &&
+		datatype_idx >= 0)
+	{
+		*dim5th = datatype_idx;
+		*dim4th = temporal_pos_idx;
+		*dim3rd = plane_pos_idx;
+		*enh_id = 13;
+	}
+	// Contrast
+	else if (sq_size == 4 &&
+		temporal_pos_idx >= 0 &&
+		in_stack_pos_idx >= 0 &&
+		stack_id_idx >= 0 &&
+		contrast_idx >= 0)
+	{
+		*enh_id = 14;
 		*dim6th = contrast_idx;
 		*dim5th = temporal_pos_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
-	else if (sq_size==3 &&
-		in_stack_pos_idx>=0 &&
-		stack_id_idx>=0 &&
-		contrast_idx>=0)
+	else if (sq_size == 3 &&
+		in_stack_pos_idx >= 0 &&
+		stack_id_idx >= 0 &&
+		contrast_idx >= 0)
 	{
-		*enh_id = 7;
+		*enh_id = 15;
 		*dim5th = contrast_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
-	else if (sq_size==2 &&
-		in_stack_pos_idx>=0 &&
-		contrast_idx>=0)
+	else if (sq_size == 2 &&
+		in_stack_pos_idx >= 0 &&
+		contrast_idx >= 0)
 	{
-		*enh_id = 8;
+		*enh_id = 16;
 		*dim4th = contrast_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
 	// MR frame type
-	else if (sq_size==4 &&
-		stack_id_idx>=0 &&
-		in_stack_pos_idx>=0 &&
-		temporal_pos_idx>=0 &&
-		mr_frame_type_idx>=0)
+	else if (sq_size == 4 &&
+		stack_id_idx >= 0 &&
+		in_stack_pos_idx >= 0 &&
+		temporal_pos_idx >= 0 &&
+		mr_frame_type_idx >= 0)
 	{
-		*enh_id = 9;
+		*enh_id = 17;
 		*dim6th = mr_frame_type_idx;
 		*dim5th = temporal_pos_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
-	else if (sq_size==3 &&
-		stack_id_idx>=0 &&
-		in_stack_pos_idx>=0 &&
-		mr_frame_type_idx>=0)
+	else if (sq_size == 3 &&
+		stack_id_idx >= 0 &&
+		in_stack_pos_idx >= 0 &&
+		mr_frame_type_idx >= 0)
 	{
-		*enh_id = 10;
+		*enh_id = 18;
 		*dim5th = mr_frame_type_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
 	// MR eff. echo
-	else if (sq_size==4 &&
-		stack_id_idx>=0 &&
-		in_stack_pos_idx>=0 &&
-		temporal_pos_idx>=0 &&
-		mr_eff_echo_idx>=0)
+	else if (sq_size == 4 &&
+		stack_id_idx >= 0 &&
+		in_stack_pos_idx >= 0 &&
+		temporal_pos_idx >= 0 &&
+		mr_eff_echo_idx >= 0)
 	{
-		*enh_id = 11;
+		*enh_id = 19;
 		*dim6th = mr_eff_echo_idx;
 		*dim5th = temporal_pos_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
-	else if (sq_size==3 &&
-		stack_id_idx>=0 &&
-		in_stack_pos_idx>=0 &&
-		mr_eff_echo_idx>=0)
+	else if (sq_size == 3 &&
+		stack_id_idx >= 0 &&
+		in_stack_pos_idx >= 0 &&
+		mr_eff_echo_idx >= 0)
 	{
-		*enh_id = 12;
+		*enh_id = 20;
 		*dim5th = mr_eff_echo_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
 	// Diffusion
-	else if (sq_size==4 &&
-		stack_id_idx>=0 &&
-		in_stack_pos_idx>=0 &&
-		b_value_idx>=0 &&
-		gradients_idx>=0)
+	else if (sq_size == 4 &&
+		stack_id_idx >= 0 &&
+		in_stack_pos_idx >= 0 &&
+		b_value_idx >= 0 &&
+		gradients_idx >= 0)
 	{
-		*enh_id = 13;
+		*enh_id = 21;
 		*dim6th = b_value_idx;
 		*dim5th = gradients_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
-	else if (sq_size==3 &&
-		in_stack_pos_idx>=0 &&
-		b_value_idx>=0 &&
-		gradients_idx>=0)
+	else if (sq_size == 3 &&
+		in_stack_pos_idx >= 0 &&
+		b_value_idx >= 0 &&
+		gradients_idx >= 0)
 	{
-		*enh_id = 14;
+		*enh_id = 22;
 		*dim5th = b_value_idx;
 		*dim4th = gradients_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
-	else if (sq_size==3 &&
-		stack_id_idx>=0 &&
-		in_stack_pos_idx>=0 &&
-		gradients_idx>=0)
+	else if (sq_size == 3 &&
+		stack_id_idx >= 0 &&
+		in_stack_pos_idx >= 0 &&
+		gradients_idx >= 0)
 	{
-		*enh_id = 15;
+		*enh_id = 23;
 		*dim5th = gradients_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
-	else if (sq_size==3 &&
-		b_value_idx>=0 &&
-		in_stack_pos_idx>=0 &&
-		stack_id_idx>=0)
+	else if (sq_size == 3 &&
+		b_value_idx >= 0 &&
+		in_stack_pos_idx >= 0 &&
+		stack_id_idx >= 0)
 	{
-		*enh_id = 16;
+		*enh_id = 24;
 		*dim5th = b_value_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
 	// LUT
-	else if (sq_size==4 &&
-		stack_id_idx>=0 &&
-		in_stack_pos_idx>=0 &&
-		lut_label_idx>=0 &&
-		temporal_pos_idx>=0)
+	else if (sq_size == 4 &&
+		stack_id_idx >= 0 &&
+		in_stack_pos_idx >= 0 &&
+		lut_label_idx >= 0 &&
+		temporal_pos_idx >= 0)
 	{
-		*enh_id = 17;
+		*enh_id = 25;
 		*dim6th = lut_label_idx;
 		*dim5th = temporal_pos_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
-	else if (sq_size==3 &&
-		in_stack_pos_idx>=0 &&
-		lut_label_idx>=0 &&
-		temporal_pos_idx>=0)
+	else if (sq_size == 3 &&
+		in_stack_pos_idx >= 0 &&
+		lut_label_idx >= 0 &&
+		temporal_pos_idx >= 0)
 	{
-		*enh_id = 18;
+		*enh_id = 26;
 		*dim5th = lut_label_idx;
 		*dim4th = temporal_pos_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
 	// Segmentation
-	// TODO check more examples
-	else if (sq_size==3 &&
-		in_stack_pos_idx>=0 &&
-		segment_idx>=0)
+	else if (sq_size == 3 &&
+		in_stack_pos_idx >= 0 &&
+		segment_idx >= 0)
 	{
-		*enh_id = 19;
+		*enh_id = 27;
 		*dim4th = segment_idx;
 		*dim3rd = in_stack_pos_idx;
 	}
-	else if (sq_size>=2 &&
-		segment_idx>=0)
+	else if (sq_size >= 2 &&
+		segment_idx >= 0)
 	{
-		*enh_id = 20;
+		*enh_id = 28;
 		*dim4th = segment_idx;
 	}
 	// Not recognized, try generic approach
-	if (*enh_id<0)
+	if (*enh_id < 0)
 	{
-		if (sq_size==3 &&
-			stack_id_idx>=0 &&
-			in_stack_pos_idx>=0)
+		if (sq_size == 3 &&
+			stack_id_idx >= 0 &&
+			in_stack_pos_idx >= 0)
 		{
 			int dim5th_tmp = -1;
 			for (int x = 0; x < 3; ++x)
 			{
 				const size_t i = x;
-				if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-					sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9056))
+				if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+					sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
 				{
 					;;
 				}
-				else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-					sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9057))
+				else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+					sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
 				{
 					;;
 				}
@@ -5246,27 +5263,27 @@ void DicomUtils::enhanced_get_indices(
 			*dim4th = stack_id_idx;
 			*dim3rd = in_stack_pos_idx;
 		}
-		else if (sq_size==4 &&
-			stack_id_idx>=0 &&
-			in_stack_pos_idx>=0 &&
-			temporal_pos_idx>=0)
+		else if (sq_size == 4 &&
+			stack_id_idx >= 0 &&
+			in_stack_pos_idx >= 0 &&
+			temporal_pos_idx >= 0)
 		{
 			int dim6th_tmp = -1;
 			for (int x = 0; x < 4; ++x)
 			{
 				const size_t i = static_cast<size_t>(x);
-				if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-					sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9056))
+				if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+					sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
 				{
 					;;
 				}
-				else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-					sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9057))
+				else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+					sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
 				{
 					;;
 				}
-				else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-					sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9128))
+				else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+					sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
 				{
 					;;
 				}
@@ -5282,21 +5299,21 @@ void DicomUtils::enhanced_get_indices(
 			*dim4th = stack_id_idx;
 			*dim3rd = in_stack_pos_idx;
 		}
-		else if (sq_size==3 &&
-			plane_pos_idx>=0 &&
-			temporal_pos_idx>=0)
+		else if (sq_size == 3 &&
+			plane_pos_idx >= 0 &&
+			temporal_pos_idx >= 0)
 		{
 			int dim5th_tmp = -1;
 			for (int x = 0; x < 3; ++x)
 			{
 				const size_t i = static_cast<size_t>(x);
-				if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-					sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9128))
+				if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+					sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
 				{
 					;;
 				}
-				else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x930e) &&
-					sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9301))
+				else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
+					sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
 				{
 					;;
 				}
@@ -5309,23 +5326,23 @@ void DicomUtils::enhanced_get_indices(
 			*dim5th = dim5th_tmp;
 			*dim4th = temporal_pos_idx;
 			*dim3rd = plane_pos_idx;
-			*enh_id = 995;
+			*enh_id = 997;
 		}
-		else if (sq_size==3 &&
-			plane_pos_idx>=0 &&
-			temporal_idx>=0)
+		else if (sq_size == 3 &&
+			plane_pos_idx >= 0 &&
+			temporal_off_idx >= 0)
 		{
 			int dim5th_tmp = -1;
 			for (int x = 0; x < 3; ++x)
 			{
 				const size_t i = static_cast<size_t>(x);
-				if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9310) &&
-					sq.at(i).index_pointer==mdcm::Tag(0x0020,0x930d))
+				if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9310) &&
+					sq.at(i).index_pointer == mdcm::Tag(0x0020,0x930d))
 				{
 					;;
 				}
-				else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x930e) &&
-					sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9301))
+				else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
+					sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
 				{
 					;;
 				}
@@ -5336,13 +5353,13 @@ void DicomUtils::enhanced_get_indices(
 				}
 			}
 			*dim5th = dim5th_tmp;
-			*dim4th = temporal_idx;
+			*dim4th = temporal_off_idx;
 			*dim3rd = plane_pos_idx;
 			*enh_id = 996;
 		}
-		else if (sq_size==1 && sq.at(0).size > 1)
+		else if (sq_size == 1)
 		{
-			*enh_id = 997;
+			*enh_id = 995;
 			*dim3rd = 0;
 		}
 	}
@@ -5534,6 +5551,7 @@ void DicomUtils::print_sq(const DimIndexSq & sq)
 	else
 	{
 		std::cout << "DimIndexSq is empty" << std::endl;
+		return;
 	}
 	for (size_t x = 0; x < sq.size(); ++x)
 	{
@@ -5584,7 +5602,7 @@ void DicomUtils::print_sq(const DimIndexSq & sq)
 			sq.at(x).group_pointer==mdcm::Tag(0x0020,0x9310) &&
 			sq.at(x).index_pointer==mdcm::Tag(0x0020,0x930d))
 		{
-			std::cout << "temporal_idx";
+			std::cout << "temporal_off_idx";
 		}
 		else if (
 			sq.at(x).group_pointer==mdcm::Tag(0x0020,0x930e) &&
@@ -5610,7 +5628,12 @@ void DicomUtils::print_sq(const DimIndexSq & sq)
 		{
 			std::cout << "mr_eff_echo_idx";
 		}
-		std::cout << " " << sq.at(x).size << std::endl;
+		else if (sq.at(x).group_pointer==mdcm::Tag(0x0062,0x000a) &&
+			sq.at(x).index_pointer==mdcm::Tag(0x0062,0x000b))
+		{
+			std::cout << "segment_idx";
+		}
+		std::cout << " UID " << sq.at(x).uid << std::endl;
 	}
 }
 
@@ -5946,18 +5969,6 @@ QString DicomUtils::read_enhanced(
 				"Functional groups not found,\n"
 				"probably broken DICOM file.");
 		}
-		if (ok_f && idx_values.size() == values.size())
-		{
-			for (size_t x = 0; x < sq_size; ++x)
-			{
-				std::list<unsigned int> tmpl;
-				for (size_t j = 0; j < idx_values.size(); ++j)
-					tmpl.push_back(idx_values.at(j).idx.at(x));
-				tmpl.sort();
-				tmpl.unique();
-				sq[x].size = tmpl.size();
-			}
-		}
 #ifdef ENHANCED_PRINT_INFO
 		if (!min_load)
 		{
@@ -6271,20 +6282,6 @@ QString DicomUtils::read_enhanced_supp_palette(
 		}
 	}
 	//
-	if (ok_f && idx_values.size() == values.size())
-	{
-		for (size_t x = 0; x < sq_size; ++x)
-		{
-			std::list<unsigned int> tmpl;
-			for (size_t j = 0; j < idx_values.size(); ++j)
-			{
-				tmpl.push_back(idx_values.at(j).idx.at(x));
-			}
-			tmpl.sort();
-			tmpl.unique();
-			sq[x].size = tmpl.size();
-		}
-	}
 #ifdef ENHANCED_PRINT_INFO
 	if (!min_load)
 	{
