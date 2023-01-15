@@ -4849,7 +4849,7 @@ void DicomUtils::enhanced_get_indices(
 	int * dim3rd,
 	int * enh_id)
 {
-	// If the function fails to process indicies,
+	// If the function fails to process indices,
 	// an image still will have correct spatial information
 	// and acquisition time for every slice, if available.
 	const int sq_size = static_cast<int>(sq.size());
@@ -4898,7 +4898,7 @@ void DicomUtils::enhanced_get_indices(
 #endif
 	//
 	// Search known pointers for well-know combinations.
-	// May work also if a pointer is not recognized.
+	// May work also if a pointer is not recognized here.
 	for (int x = 0; x < sq_size; ++x)
 	{
 		const size_t i = static_cast<size_t>(x);
