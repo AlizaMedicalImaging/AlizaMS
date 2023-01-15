@@ -2920,11 +2920,8 @@ void DicomUtils::read_dimension_index_sq(
 				sqDimensionIndexSequence->GetItem(x+1);
 			const mdcm::DataSet & nestedds =
 				item.GetNestedDataSet();
-			unsigned short
-				group0 = 0,
-				element0 = 0,
-				group1 = 0,
-				element1 = 0;
+			unsigned short group0 = 0, element0 = 0, group1 = 0, element1 = 0;
+			QString dim_uid("");
 			const bool ok0 =
 				get_at_value(
 					nestedds,
@@ -2936,12 +2933,25 @@ void DicomUtils::read_dimension_index_sq(
 					nestedds,
 					tFunctionalGroupPointer,
 					&group1,&element1);
+			const bool ok2 =
+				get_string_value(
+					nestedds,
+					tDimensionOrganizationUID,
+					dim_uid);
 			if (ok0 && ok1)
 			{
 				DimIndex idx;
-				idx.uid = "";
+				idx.uid = dim_uid.trimmed().remove(QChar('\0')).toStdString();
 				idx.index_pointer = mdcm::Tag(group0,element0);
 				idx.group_pointer = mdcm::Tag(group1,element1);
+				sq.push_back(idx);
+			}
+			else if (ok0)
+			{
+				DimIndex idx;
+				idx.uid = dim_uid.trimmed().remove(QChar('\0')).toStdString();
+				idx.index_pointer = mdcm::Tag(group0,element0);
+				idx.group_pointer = mdcm::Tag(0xffff,0xffff);
 				sq.push_back(idx);
 			}
 		}
@@ -3052,6 +3062,18 @@ bool DicomUtils::read_group_sq(
 	const mdcm::Tag tImagePositionVolume(0x0020,0x9301);
 	const mdcm::Tag tImageOrientationVolume(0x0020,0x9302);
 	const mdcm::Tag tDataType(0x0018,0x9808);
+	const mdcm::Tag tMRDiffusionSq(0x0018,0x9117);
+	const mdcm::Tag tDiffusionBValue(0x0018,0x9087);
+	const mdcm::Tag tDiffusionDirectionality(0x0018,0x9075);
+	const mdcm::Tag tDiffusionGradientDirectionSq(0x0018,0x9076);
+	const mdcm::Tag tDiffusionGradientOrientation(0x0018,0x9089);
+	const mdcm::Tag tDiffusionBmatrixSq(0x0018,0x9601);
+	const mdcm::Tag tDiffusionBvalueXX(0x0018,0x9602);
+	const mdcm::Tag tDiffusionBvalueXY(0x0018,0x9603);
+	const mdcm::Tag tDiffusionBvalueXZ(0x0018,0x9604);
+	const mdcm::Tag tDiffusionBvalueYY(0x0018,0x9605);
+	const mdcm::Tag tDiffusionBvalueYZ(0x0018,0x9606);
+	const mdcm::Tag tDiffusionBvalueZZ(0x0018,0x9607);
 	const mdcm::Tag tPixelValueTransformationSequence(0x0028,0x9145);
 	const mdcm::Tag tRescaleIntercept(0x0028,0x1052);
 	const mdcm::Tag tRescaleSlope(0x0028,0x1053);
@@ -3107,7 +3129,25 @@ bool DicomUtils::read_group_sq(
 						tDimensionIndexValues,
 						index_value.idx);
 					if (ok && index_value.idx.size()==sq.size())
+					{
+#ifdef ENHANCED_PRINT_INFO
+						std::cout << "Dimension Index Values";
+						for (int x = 0; x < sq.size(); ++x)
+						{
+							std::cout << " " << index_value.idx.at(x);
+						}
+						std::cout << " (id = " << index_value.id << ")"
+							<< std::endl;
+#endif
 						dim_idx_values.push_back(index_value);
+					}
+#ifdef ENHANCED_PRINT_INFO
+					else
+					{
+						std::cout << "Failed: Dimension Index Values (id) = "
+							<< index_value.id << std::endl;
+					}
+#endif
 				}
 				if (nestedds1.FindDataElement(tStackID))
 				{
@@ -3506,6 +3546,167 @@ bool DicomUtils::read_group_sq(
 				QString tmp3;
 				if (get_string_value(nestedds1, tRescaleType, tmp3))
 					fg.rescale_type = tmp3;
+			}
+		}
+		if (nestedds.FindDataElement(tMRDiffusionSq))
+		{
+			const mdcm::DataElement & deMRDiffusionSq
+				= nestedds.GetDataElement(tMRDiffusionSq);
+			mdcm::SmartPointer<mdcm::SequenceOfItems> sqMRDiffusionSq
+				= deMRDiffusionSq.GetValueAsSQ();
+			if (sqMRDiffusionSq && sqMRDiffusionSq->GetNumberOfItems()==1)
+			{
+				const mdcm::Item & item1 = sqMRDiffusionSq->GetItem(1);
+				const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
+				{
+					double b_;
+					if (get_fd_value(nestedds1, tDiffusionBValue, &b_))
+					{
+						fg.b_ok = true; fg.b = b_;
+					}
+				}
+				if (nestedds1.FindDataElement(tDiffusionDirectionality))
+				{
+					const mdcm::DataElement & de =
+						nestedds1.GetDataElement(tDiffusionDirectionality);
+					if (!de.IsEmpty() &&
+						!de.IsUndefinedLength() &&
+						de.GetByteValue())
+					{
+						fg.diffusion_directionality =
+							QString::fromLatin1(
+								de.GetByteValue()->GetPointer(),
+								de.GetByteValue()->GetLength()).
+									trimmed().remove(QChar('\0'));
+					}
+				}
+				if (nestedds1.FindDataElement(tDiffusionGradientDirectionSq))
+				{
+					const mdcm::DataElement &
+						deDiffusionGradientDirectionSq =
+							nestedds1.GetDataElement(
+								tDiffusionGradientDirectionSq);
+					mdcm::SmartPointer<mdcm::SequenceOfItems>
+						sqDiffusionGradientDirectionSq =
+						deDiffusionGradientDirectionSq.GetValueAsSQ();
+					if (sqDiffusionGradientDirectionSq &&
+						sqDiffusionGradientDirectionSq->GetNumberOfItems()==1)
+					{
+						const mdcm::Item & item2 =
+							sqDiffusionGradientDirectionSq->GetItem(1);
+						const mdcm::DataSet & nestedds2 =
+							item2.GetNestedDataSet();
+						std::vector<double> tmp1;
+						if (get_fd_values(
+							nestedds2,
+							tDiffusionGradientOrientation,
+							tmp1))
+						{
+							if (tmp1.size()==3)
+							{
+								fg.gradients_ok = true;
+								fg.gradient[0] = tmp1.at(0);
+								fg.gradient[1] = tmp1.at(1);
+								fg.gradient[2] = tmp1.at(2);
+							}
+						}
+					}
+				}
+				else if (nestedds1.FindDataElement(tDiffusionBmatrixSq))
+				{
+					const mdcm::DataElement &
+						deDiffusionBmatrixSq =
+							nestedds1.GetDataElement(
+								tDiffusionBmatrixSq);
+					mdcm::SmartPointer<mdcm::SequenceOfItems>
+						sqDiffusionBmatrixSq =
+						deDiffusionBmatrixSq.GetValueAsSQ();
+					if (sqDiffusionBmatrixSq &&
+						sqDiffusionBmatrixSq->GetNumberOfItems()==1)
+					{
+						const mdcm::Item & item3 =
+							sqDiffusionBmatrixSq->GetItem(1);
+						const mdcm::DataSet & nestedds3 =
+							item3.GetNestedDataSet();
+						double DiffusionBvalueXX;
+						double DiffusionBvalueXY;
+						double DiffusionBvalueXZ;
+						double DiffusionBvalueYY;
+						double DiffusionBvalueYZ;
+						double DiffusionBvalueZZ;
+						if (
+							get_fd_value(nestedds3, tDiffusionBvalueXX, &DiffusionBvalueXX) &&
+							get_fd_value(nestedds3, tDiffusionBvalueXY, &DiffusionBvalueXY) &&
+							get_fd_value(nestedds3, tDiffusionBvalueXZ, &DiffusionBvalueXZ) &&
+							get_fd_value(nestedds3, tDiffusionBvalueYY, &DiffusionBvalueYY) &&
+							get_fd_value(nestedds3, tDiffusionBvalueYZ, &DiffusionBvalueYZ) &&
+							get_fd_value(nestedds3, tDiffusionBvalueZZ, &DiffusionBvalueZZ))
+						{
+							double v0, v1, v2;
+							mat33_eig3(
+								DiffusionBvalueXX, DiffusionBvalueXY, DiffusionBvalueXZ,
+								DiffusionBvalueYY, DiffusionBvalueYZ, DiffusionBvalueZZ,
+								&v0, &v1, &v2);
+							fg.gradient[0] = v0;
+							fg.gradient[1] = v1;
+							fg.gradient[2] = v2;
+							fg.gradients_ok = true;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			const mdcm::PrivateTag tPhilipsAqSq       (0x2005,0xf, "PHILIPS MR IMAGING DD 005");
+			const mdcm::PrivateTag tDiffusionBFactor  (0x2001,0x3, "PHILIPS IMAGING DD 001");
+			const mdcm::PrivateTag tDiffusionDirection(0x2001,0x4, "PHILIPS IMAGING DD 001");
+			const mdcm::PrivateTag tGradientVectorX   (0x2005,0xb0,"PHILIPS MR IMAGING DD 001");
+			const mdcm::PrivateTag tGradientVectorY   (0x2005,0xb1,"PHILIPS MR IMAGING DD 001");
+			const mdcm::PrivateTag tGradientVectorZ   (0x2005,0xb2,"PHILIPS MR IMAGING DD 001");
+			if (nestedds.FindDataElement(tPhilipsAqSq))
+			{
+				const mdcm::DataElement & dePhilipsAqSq	= nestedds.GetDataElement(tPhilipsAqSq);
+				mdcm::SmartPointer<mdcm::SequenceOfItems> sqPhilipsAqSq
+					= dePhilipsAqSq.GetValueAsSQ();
+				if (sqPhilipsAqSq && sqPhilipsAqSq->GetNumberOfItems()==1)
+				{
+					const mdcm::Item & item1 = sqPhilipsAqSq->GetItem(1);
+					const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
+					if (nestedds1.FindDataElement(tDiffusionBFactor))
+					{
+						float b_;
+						bool  b_ok_ = priv_get_fl_value(nestedds1,tDiffusionBFactor,&b_);
+						if (b_ok_) { fg.b_ok = true; fg.b = b_; }
+					}
+					if (nestedds1.FindDataElement(tDiffusionDirection))
+					{
+						const mdcm::DataElement & de = nestedds1.GetDataElement(tDiffusionDirection);
+						if (!de.IsEmpty() && !de.IsUndefinedLength() && de.GetByteValue())
+						{
+							fg.diffusion_directionality =
+								QString::fromLatin1(
+									de.GetByteValue()->GetPointer(),
+									de.GetByteValue()->GetLength()).trimmed().remove(QChar('\0'));
+						}
+					}
+					if (nestedds1.FindDataElement(tGradientVectorX) &&
+						nestedds1.FindDataElement(tGradientVectorY) &&
+						nestedds1.FindDataElement(tGradientVectorZ))
+					{
+						float gx = 0, gy = 0, gz = 0;
+						const bool tmp0 = priv_get_fl_value(nestedds1,tGradientVectorX,&gx);
+						const bool tmp1 = priv_get_fl_value(nestedds1,tGradientVectorY,&gy);
+						const bool tmp2 = priv_get_fl_value(nestedds1,tGradientVectorZ,&gz);
+						if (tmp0 && tmp1 && tmp2)
+						{
+							fg.gradients_ok = true;
+							fg.gradient[0] = gx;
+							fg.gradient[1] = gy;
+							fg.gradient[2] = gz;
+						}
+					}
+				}
 			}
 		}
 		values.push_back(fg);
@@ -4832,73 +5033,107 @@ void DicomUtils::enhanced_get_indices(
 	int mr_frame_type_idx = -1;
 	int mr_eff_echo_idx   = -1;
 	int segment_idx       = -1;
+	std::string dim_uid;
 	const int sq_size = static_cast<int>(sq.size());
+	//
+	std::vector<std::string> dim_uids;
+	for (size_t x = 0; x < sq_size; ++x)
+	{
+		dim_uids.push_back(sq.at(x).uid);
+	}
+	const std::set<std::string> dim_uids_set(dim_uids.begin(), dim_uids.end());
+	const size_t dim_uids_set_size = dim_uids_set.size();
+	if (dim_uids_set_size > 1)
+	{
+		// TODO
+		std::cout <<
+			"Warning: multiple dimension organization UIDs, using 1st"
+				<< std::endl;
+	}
+	if (dim_uids_set_size >= 1)
+	{
+		std::set<std::string>::const_iterator it = dim_uids_set.cbegin();
+		dim_uid = *it;
+	}
+	else
+	{
+		dim_uid = std::string("");
+		std::cout << "Error: no dimension organization UID"
+			<< std::endl;
+	}
+#ifdef ENHANCED_PRINT_INFO
+	std::cout << "Using Dimension Organization UID " << dim_uid << std::endl;
+#endif
+	//
 	for (int x = 0; x < sq_size; ++x)
 	{
 		const size_t i = static_cast<size_t>(x);
-		if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9056))
+		if (sq.at(i).uid == dim_uid)
 		{
-			stack_id_idx = x;
-		}
-		else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9057))
-		{
-			in_stack_pos_idx = x;
-		}
-		else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9128))
-		{
-			temporal_pos_idx = x;
-		}
-		else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9117) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9087))
-		{
-			b_value_idx = x;
-		}
-		else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9117) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9089))
-		{
-			gradients_idx = x;
-		}
-		else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9341)) // TODO check
-		{
-			contrast_idx = x;
-		}
-		else if (sq.at(i).group_pointer==mdcm::Tag(0x0040,0x9096) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0040,0x9210))
-		{
-			lut_label_idx = x;
-		}
-		else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9310) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0020,0x930d))
-		{
-			temporal_idx = x;
-		}
-		else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x930e) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9301))
-		{
-			plane_pos_idx = x;
-		}
-		else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9807) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9808))
-		{
-			datatype_idx = x;
-		}
-		else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9226) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0008,0x9007))
-		{
-			mr_frame_type_idx = x;
-		}
-		else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9114) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9082))
-		{
-			mr_eff_echo_idx = x;
-		}
-		else if (sq.at(i).group_pointer==mdcm::Tag(0x0062,0x000a) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0062,0x000b))
-		{
-			segment_idx = x;
+			if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
+				sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9056))
+			{
+				stack_id_idx = x;
+			}
+			else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
+				sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9057))
+			{
+				in_stack_pos_idx = x;
+			}
+			else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
+				sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9128))
+			{
+				temporal_pos_idx = x;
+			}
+			else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9117) &&
+				sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9087))
+			{
+				b_value_idx = x;
+			}
+			else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9117) &&
+				sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9089))
+			{
+				gradients_idx = x;
+			}
+			else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9341)) // TODO check
+			{
+				contrast_idx = x;
+			}
+			else if (sq.at(i).group_pointer==mdcm::Tag(0x0040,0x9096) &&
+				sq.at(i).index_pointer==mdcm::Tag(0x0040,0x9210))
+			{
+				lut_label_idx = x;
+			}
+			else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9310) &&
+				sq.at(i).index_pointer==mdcm::Tag(0x0020,0x930d))
+			{
+				temporal_idx = x;
+			}
+			else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x930e) &&
+				sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9301))
+			{
+				plane_pos_idx = x;
+			}
+			else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9807) &&
+				sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9808))
+			{
+				datatype_idx = x;
+			}
+			else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9226) &&
+				sq.at(i).index_pointer==mdcm::Tag(0x0008,0x9007))
+			{
+				mr_frame_type_idx = x;
+			}
+			else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9114) &&
+				sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9082))
+			{
+				mr_eff_echo_idx = x;
+			}
+			else if (sq.at(i).group_pointer==mdcm::Tag(0x0062,0x000a) &&
+				sq.at(i).index_pointer==mdcm::Tag(0x0062,0x000b))
+			{
+				segment_idx = x;
+			}
 		}
 	}
 	//
@@ -5219,6 +5454,64 @@ void DicomUtils::enhanced_get_indices(
 			*dim5th = temporal_pos_idx;
 			*dim4th = stack_id_idx;
 			*dim3rd = in_stack_pos_idx;
+		}
+		else if (sq_size==3 &&
+			plane_pos_idx>=0 &&
+			temporal_pos_idx>=0)
+		{
+			int dim5th_tmp = -1;
+			for (int x = 0; x < 3; ++x)
+			{
+				const size_t i = static_cast<size_t>(x);
+				if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
+					sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9128))
+				{
+					;;
+				}
+				else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x930e) &&
+					sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9301))
+				{
+					;;
+				}
+				else
+				{
+					dim5th_tmp = x;
+					break;
+				}
+			}
+			*dim5th = dim5th_tmp;
+			*dim4th = temporal_pos_idx;
+			*dim3rd = plane_pos_idx;
+			*enh_id = 995;
+		}
+		else if (sq_size==3 &&
+			plane_pos_idx>=0 &&
+			temporal_idx>=0)
+		{
+			int dim5th_tmp = -1;
+			for (int x = 0; x < 3; ++x)
+			{
+				const size_t i = static_cast<size_t>(x);
+				if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9310) &&
+					sq.at(i).index_pointer==mdcm::Tag(0x0020,0x930d))
+				{
+					;;
+				}
+				else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x930e) &&
+					sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9301))
+				{
+					;;
+				}
+				else
+				{
+					dim5th_tmp = x;
+					break;
+				}
+			}
+			*dim5th = dim5th_tmp;
+			*dim4th = temporal_idx;
+			*dim3rd = plane_pos_idx;
+			*enh_id = 996;
 		}
 		else if (sq_size==1 && sq.at(0).size > 1)
 		{
@@ -9499,7 +9792,9 @@ QString DicomUtils::read_enhanced_common(
 				idx__<values.size())
 			{
 				tmp3.push_back(data.at(idx__));
-				if (sop==QString("1.2.840.10008.5.1.4.1.1.6.2")) // US
+				if (sop==QString("1.2.840.10008.5.1.4.1.1.6.2") // Enhanced US
+					|| sop==QString("1.2.840.10008.5.1.2.3.45") // FIXME Temporary PA!
+				)
 				{
 					if (values.at(idx__).vol_pos_ok &&
 						values.at(idx__).vol_orient_ok)
@@ -12758,6 +13053,9 @@ QString DicomUtils::read_dicom(
 					sop==QString("1.2.840.10008.5.1.4.1.1.2.1")     || // Enhanced CT
 					sop==QString("1.2.840.10008.5.1.4.1.1.130")     || // Enhanced PET
 					sop==QString("1.2.840.10008.5.1.4.1.1.6.2")     || // Enhanced US Volume
+					//
+					sop==QString("1.2.840.10008.5.1.2.3.45")        || // PA Image Storage FIXME
+					//
 					sop==QString("1.2.840.10008.5.1.4.1.1.13.1.1")  || // Enhanced X Ray 3D Angiographic
 					sop==QString("1.2.840.10008.5.1.4.1.1.13.1.2")  || // Enhanced X-Ray 3D Craniofacial
 					sop==QString("1.2.840.10008.5.1.4.1.1.13.1.3")  || // Breast Tomosynthesis
