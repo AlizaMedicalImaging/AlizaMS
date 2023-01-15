@@ -1,5 +1,6 @@
 #define WARN_RAM_SIZE
-//#define ENHANCED_PRINT_INFO
+#define ENHANCED_PRINT_INFO
+//#define ENHANCED_PRINT_GROUPS
 //#define TMP_ALWAYS_GEOM_FROM_IMAGE
 
 #include <QtGlobal>
@@ -4848,6 +4849,9 @@ void DicomUtils::enhanced_get_indices(
 	int * dim3rd,
 	int * enh_id)
 {
+	// If the function fails to process indicies,
+	// an image still will have correct spatial information
+	// and acquisition time for every slice, if available.
 	const int sq_size = static_cast<int>(sq.size());
 	if (sq_size < 1)
 	{
@@ -4858,6 +4862,7 @@ void DicomUtils::enhanced_get_indices(
 	}
 	int stack_id_idx      = -1;
 	int in_stack_pos_idx  = -1;
+	int ipp_idx           = -1;
 	int temporal_pos_idx  = -1;
 	int temporal_off_idx  = -1;
 	int contrast_idx      = -1;
@@ -4880,7 +4885,6 @@ void DicomUtils::enhanced_get_indices(
 	const size_t dim_uids_set_size = dim_uids_set.size();
 	if (dim_uids_set_size > 1)
 	{
-		// TODO
 		std::cout <<
 			"Warning: multiple dimension organization UIDs, using 1st"
 				<< std::endl;
@@ -4893,6 +4897,8 @@ void DicomUtils::enhanced_get_indices(
 	std::cout << "Using Dimension Organization UID " << dim_uid << std::endl;
 #endif
 	//
+	// Search known pointers for well-know combinations.
+	// May work also if a pointer is not recognized.
 	for (int x = 0; x < sq_size; ++x)
 	{
 		const size_t i = static_cast<size_t>(x);
@@ -4907,6 +4913,11 @@ void DicomUtils::enhanced_get_indices(
 				sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
 			{
 				in_stack_pos_idx = x;
+			}
+			else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9113) &&
+				sq.at(i).index_pointer == mdcm::Tag(0x0020,0x0032))
+			{
+				ipp_idx = x;
 			}
 			else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
 				sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
@@ -4969,25 +4980,28 @@ void DicomUtils::enhanced_get_indices(
 	// Well-known combinations
 	//
 	// 3D
-	if (sq_size == 1 &&
-		in_stack_pos_idx == 0)
-	{
-		*enh_id = 1;
-		*dim3rd = in_stack_pos_idx;
-	}
-	else if (sq_size == 2 &&
+	if (sq_size == 2 &&
 		in_stack_pos_idx >= 0 &&
 		stack_id_idx >= 0)
 	{
-		*enh_id = 2;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
+		*enh_id = 1;
 	}
-	else if (sq_size == 1 &&
-		plane_pos_idx == 0)
+	else if (sq_size == 1 && in_stack_pos_idx == 0)
+	{
+		*dim3rd = in_stack_pos_idx;
+		*enh_id = 2;
+	}
+	else if (sq_size == 1 && plane_pos_idx == 0)
 	{
 		*dim3rd = plane_pos_idx;
 		*enh_id = 3;
+	}
+	else if (sq_size == 1 && ipp_idx == 0)
+	{
+		*dim3rd = ipp_idx;
+		*enh_id = 4;
 	}
 	// Temporal
 	else if (sq_size == 3 &&
@@ -4995,40 +5009,44 @@ void DicomUtils::enhanced_get_indices(
 		in_stack_pos_idx >= 0 &&
 		temporal_pos_idx >= 0)
 	{
-		*enh_id = 4;
 		*dim5th = temporal_pos_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
+		*enh_id = 5;
 	}
 	else if (sq_size == 3 &&
 		stack_id_idx >= 0 &&
 		in_stack_pos_idx >= 0 &&
 		temporal_off_idx >= 0)
 	{
-		*enh_id = 5;
 		*dim5th = temporal_off_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
+		*enh_id = 6;
 	}
 	else if (sq_size == 2 &&
 		temporal_pos_idx >= 0 &&
 		stack_id_idx >= 0)
 	{
-		*enh_id = 6;
 		*dim4th = stack_id_idx;
 		*dim3rd = temporal_pos_idx;
-	}
-	else if (sq_size == 1 &&
-		temporal_pos_idx == 0)
-	{
 		*enh_id = 7;
-		*dim3rd = temporal_pos_idx;
 	}
-	else if (sq_size == 1 &&
-		temporal_off_idx == 0)
+	else if (sq_size == 2 &&
+		temporal_off_idx >= 0 &&
+		stack_id_idx >= 0)
 	{
-		*enh_id = 8;
+		*dim4th = stack_id_idx;
 		*dim3rd = temporal_off_idx;
+		*enh_id = 8;
+	}
+	else if (sq_size == 2 &&
+		plane_pos_idx >= 0 &&
+		temporal_pos_idx >= 0)
+	{
+		*dim4th = temporal_pos_idx;
+		*dim3rd = plane_pos_idx;
+		*enh_id = 9;
 	}
 	else if (sq_size == 2 &&
 		plane_pos_idx >= 0 &&
@@ -5036,23 +5054,21 @@ void DicomUtils::enhanced_get_indices(
 	{
 		*dim4th = temporal_off_idx;
 		*dim3rd = plane_pos_idx;
-		*enh_id = 9;
+		*enh_id = 10;
 	}
 	else if (sq_size == 1 &&
 		temporal_off_idx == 0)
 	{
 		*dim3rd = temporal_off_idx;
-		*enh_id = 10;
-	}
-	// Data type
-	else if (sq_size == 2 &&
-		plane_pos_idx >= 0 &&
-		datatype_idx >= 0)
-	{
-		*dim4th = datatype_idx;
-		*dim3rd = plane_pos_idx;
 		*enh_id = 11;
 	}
+	else if (sq_size == 1 &&
+		temporal_pos_idx == 0)
+	{
+		*dim3rd = temporal_pos_idx;
+		*enh_id = 12;
+	}
+	// Data type
 	else if (sq_size == 3 &&
 		temporal_off_idx >= 0 &&
 		plane_pos_idx >= 0 &&
@@ -5061,7 +5077,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim5th = datatype_idx;
 		*dim4th = temporal_off_idx;
 		*dim3rd = plane_pos_idx;
-		*enh_id = 12;
+		*enh_id = 13;
 	}
 	else if (sq_size == 3 &&
 		temporal_pos_idx >= 0 &&
@@ -5071,7 +5087,15 @@ void DicomUtils::enhanced_get_indices(
 		*dim5th = datatype_idx;
 		*dim4th = temporal_pos_idx;
 		*dim3rd = plane_pos_idx;
-		*enh_id = 13;
+		*enh_id = 14;
+	}
+	else if (sq_size == 2 &&
+		plane_pos_idx >= 0 &&
+		datatype_idx >= 0)
+	{
+		*dim4th = datatype_idx;
+		*dim3rd = plane_pos_idx;
+		*enh_id = 15;
 	}
 	// Contrast
 	else if (sq_size == 4 &&
@@ -5080,29 +5104,29 @@ void DicomUtils::enhanced_get_indices(
 		stack_id_idx >= 0 &&
 		contrast_idx >= 0)
 	{
-		*enh_id = 14;
 		*dim6th = contrast_idx;
 		*dim5th = temporal_pos_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
+		*enh_id = 16;
 	}
 	else if (sq_size == 3 &&
 		in_stack_pos_idx >= 0 &&
 		stack_id_idx >= 0 &&
 		contrast_idx >= 0)
 	{
-		*enh_id = 15;
 		*dim5th = contrast_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
+		*enh_id = 17;
 	}
 	else if (sq_size == 2 &&
 		in_stack_pos_idx >= 0 &&
 		contrast_idx >= 0)
 	{
-		*enh_id = 16;
 		*dim4th = contrast_idx;
 		*dim3rd = in_stack_pos_idx;
+		*enh_id = 18;
 	}
 	// MR frame type
 	else if (sq_size == 4 &&
@@ -5111,21 +5135,21 @@ void DicomUtils::enhanced_get_indices(
 		temporal_pos_idx >= 0 &&
 		mr_frame_type_idx >= 0)
 	{
-		*enh_id = 17;
 		*dim6th = mr_frame_type_idx;
 		*dim5th = temporal_pos_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
+		*enh_id = 19;
 	}
 	else if (sq_size == 3 &&
 		stack_id_idx >= 0 &&
 		in_stack_pos_idx >= 0 &&
 		mr_frame_type_idx >= 0)
 	{
-		*enh_id = 18;
 		*dim5th = mr_frame_type_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
+		*enh_id = 20;
 	}
 	// MR eff. echo
 	else if (sq_size == 4 &&
@@ -5134,21 +5158,21 @@ void DicomUtils::enhanced_get_indices(
 		temporal_pos_idx >= 0 &&
 		mr_eff_echo_idx >= 0)
 	{
-		*enh_id = 19;
 		*dim6th = mr_eff_echo_idx;
 		*dim5th = temporal_pos_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
+		*enh_id = 21;
 	}
 	else if (sq_size == 3 &&
 		stack_id_idx >= 0 &&
 		in_stack_pos_idx >= 0 &&
 		mr_eff_echo_idx >= 0)
 	{
-		*enh_id = 20;
 		*dim5th = mr_eff_echo_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
+		*enh_id = 22;
 	}
 	// Diffusion
 	else if (sq_size == 4 &&
@@ -5157,41 +5181,41 @@ void DicomUtils::enhanced_get_indices(
 		b_value_idx >= 0 &&
 		gradients_idx >= 0)
 	{
-		*enh_id = 21;
 		*dim6th = b_value_idx;
 		*dim5th = gradients_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
+		*enh_id = 23;
 	}
 	else if (sq_size == 3 &&
 		in_stack_pos_idx >= 0 &&
 		b_value_idx >= 0 &&
 		gradients_idx >= 0)
 	{
-		*enh_id = 22;
 		*dim5th = b_value_idx;
 		*dim4th = gradients_idx;
 		*dim3rd = in_stack_pos_idx;
+		*enh_id = 24;
 	}
 	else if (sq_size == 3 &&
 		stack_id_idx >= 0 &&
 		in_stack_pos_idx >= 0 &&
 		gradients_idx >= 0)
 	{
-		*enh_id = 23;
 		*dim5th = gradients_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
+		*enh_id = 25;
 	}
 	else if (sq_size == 3 &&
 		b_value_idx >= 0 &&
 		in_stack_pos_idx >= 0 &&
 		stack_id_idx >= 0)
 	{
-		*enh_id = 24;
 		*dim5th = b_value_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
+		*enh_id = 26;
 	}
 	// LUT
 	else if (sq_size == 4 &&
@@ -5200,167 +5224,438 @@ void DicomUtils::enhanced_get_indices(
 		lut_label_idx >= 0 &&
 		temporal_pos_idx >= 0)
 	{
-		*enh_id = 25;
 		*dim6th = lut_label_idx;
 		*dim5th = temporal_pos_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
+		*enh_id = 27;
 	}
 	else if (sq_size == 3 &&
 		in_stack_pos_idx >= 0 &&
 		lut_label_idx >= 0 &&
 		temporal_pos_idx >= 0)
 	{
-		*enh_id = 26;
 		*dim5th = lut_label_idx;
 		*dim4th = temporal_pos_idx;
 		*dim3rd = in_stack_pos_idx;
+		*enh_id = 28;
 	}
 	// Segmentation
-	else if (sq_size == 3 &&
+	else if (sq_size == 2 &&
 		in_stack_pos_idx >= 0 &&
 		segment_idx >= 0)
 	{
-		*enh_id = 27;
 		*dim4th = segment_idx;
 		*dim3rd = in_stack_pos_idx;
+		*enh_id = 29;
+	}
+	else if (sq_size == 2 &&
+		ipp_idx >= 0 &&
+		segment_idx >= 0)
+	{
+		*dim4th = segment_idx;
+		*dim3rd = ipp_idx;
+		*enh_id = 30;
 	}
 	else if (sq_size >= 2 &&
 		segment_idx >= 0)
 	{
-		*enh_id = 28;
 		*dim4th = segment_idx;
+		*enh_id = 31;
 	}
+	//
 	// Not recognized, try generic approach
+	//
 	if (*enh_id < 0)
 	{
-		if (sq_size == 3 &&
-			stack_id_idx >= 0 &&
-			in_stack_pos_idx >= 0)
+		if (sq_size == 4)
 		{
-			int dim5th_tmp = -1;
-			for (int x = 0; x < 3; ++x)
+			if (stack_id_idx >= 0 && in_stack_pos_idx >= 0 &&
+				temporal_pos_idx >= 0)
 			{
-				const size_t i = x;
-				if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-					sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
+				int dim6th_tmp = -1;
+				for (int x = 0; x < sq_size; ++x)
 				{
-					;;
+					const size_t i = static_cast<size_t>(x);
+					if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
+					{
+						;;
+					}
+					else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
+					{
+						;;
+					}
+					else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
+					{
+						;;
+					}
+					else
+					{
+						dim6th_tmp = x;
+						break;
+					}
 				}
-				else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-					sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
-				{
-					;;
-				}
-				else
-				{
-					dim5th_tmp = x;
-					break;
-				}
+				*dim6th = dim6th_tmp;
+				*dim5th = temporal_pos_idx;
+				*dim4th = stack_id_idx;
+				*dim3rd = in_stack_pos_idx;
+				*enh_id = 999;
 			}
-			*enh_id = 999;
-			*dim5th = dim5th_tmp;
-			*dim4th = stack_id_idx;
-			*dim3rd = in_stack_pos_idx;
+			else if (stack_id_idx >= 0 && in_stack_pos_idx >= 0 &&
+				temporal_off_idx >= 0)
+			{
+				int dim6th_tmp = -1;
+				for (int x = 0; x < sq_size; ++x)
+				{
+					const size_t i = static_cast<size_t>(x);
+					if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
+					{
+						;;
+					}
+					else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
+					{
+						;;
+					}
+					else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9310) &&
+						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x930d))
+					{
+						;;
+					}
+					else
+					{
+						dim6th_tmp = x;
+						break;
+					}
+				}
+				*dim6th = dim6th_tmp;
+				*dim5th = temporal_pos_idx;
+				*dim4th = stack_id_idx;
+				*dim3rd = in_stack_pos_idx;
+				*enh_id = 998;
+			}
+			else if (stack_id_idx >= 0 && in_stack_pos_idx >= 0)
+			{
+				int dim6th_tmp = -1;
+				int dim5th_tmp = -1;
+				for (int x = 0; x < sq_size; ++x)
+				{
+					const size_t i = static_cast<size_t>(x);
+					if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
+					{
+						;;
+					}
+					else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
+					{
+						;;
+					}
+					else
+					{
+						dim5th_tmp = x;
+						break;
+					}
+				}
+				if (dim5th_tmp >= 0)
+				{
+					for (int x = 0; x < sq_size; ++x)
+					{
+						const size_t i = static_cast<size_t>(x);
+						if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+							sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
+						{
+							;;
+						}
+						else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+							sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
+						{
+							;;
+						}
+						else
+						{
+							if (x != dim5th_tmp)
+							{
+								dim6th_tmp = x;
+								break;
+							}
+						}
+					}
+
+				}
+				*dim6th = dim6th_tmp;
+				*dim5th = dim5th_tmp;
+				*dim4th = stack_id_idx;
+				*dim3rd = in_stack_pos_idx;
+				*enh_id = 997;
+			}
+			else if (plane_pos_idx >= 0 && temporal_pos_idx >= 0)
+			{
+				int dim6th_tmp = -1;
+				int dim5th_tmp = -1;
+				for (int x = 0; x < sq_size; ++x)
+				{
+					const size_t i = static_cast<size_t>(x);
+					if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
+					{
+						;;
+					}
+					else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
+						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
+					{
+						;;
+					}
+					else
+					{
+						dim5th_tmp = x;
+						break;
+					}
+				}
+				if (dim5th_tmp >= 0)
+				{
+					for (int x = 0; x < sq_size; ++x)
+					{
+						const size_t i = static_cast<size_t>(x);
+						if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+							sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
+						{
+							;;
+						}
+						else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
+							sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
+						{
+							;;
+						}
+						else
+						{
+							if (x != dim5th_tmp)
+							{
+								dim6th_tmp = x;
+								break;
+							}
+						}
+					}
+				}
+				*dim6th = dim6th_tmp;
+				*dim5th = dim5th_tmp;
+				*dim4th = temporal_pos_idx;
+				*dim3rd = plane_pos_idx;
+				*enh_id = 996;
+			}
+			else if (plane_pos_idx >= 0 && temporal_off_idx >= 0)
+			{
+				int dim6th_tmp = -1;
+				int dim5th_tmp = -1;
+				for (int x = 0; x < sq_size; ++x)
+				{
+					const size_t i = static_cast<size_t>(x);
+					if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
+						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
+					{
+						;;
+					}
+					else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9310) &&
+						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x930d))
+					{
+						;;
+					}
+					else
+					{
+						dim5th_tmp = x;
+						break;
+					}
+				}
+				if (dim5th_tmp >= 0)
+				{
+					for (int x = 0; x < sq_size; ++x)
+					{
+						const size_t i = static_cast<size_t>(x);
+						if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
+							sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
+						{
+							;;
+						}
+						else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9310) &&
+							sq.at(i).index_pointer == mdcm::Tag(0x0020,0x930d))
+						{
+							;;
+						}
+						else
+						{
+							if (x != dim5th_tmp)
+							{
+								dim6th_tmp = x;
+								break;
+							}
+						}
+					}
+				}
+				*dim6th = dim6th_tmp;
+				*dim5th = dim5th_tmp;
+				*dim4th = temporal_pos_idx;
+				*dim3rd = plane_pos_idx;
+				*enh_id = 995;
+			}
 		}
-		else if (sq_size == 4 &&
-			stack_id_idx >= 0 &&
-			in_stack_pos_idx >= 0 &&
-			temporal_pos_idx >= 0)
+		else if (sq_size == 3)
 		{
-			int dim6th_tmp = -1;
-			for (int x = 0; x < 4; ++x)
+			if (stack_id_idx >= 0 && in_stack_pos_idx >= 0)
 			{
-				const size_t i = static_cast<size_t>(x);
-				if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-					sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
+				int dim5th_tmp = -1;
+				for (int x = 0; x < sq_size; ++x)
 				{
-					;;
+					const size_t i = x;
+					if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
+					{
+						;;
+					}
+					else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
+					{
+						;;
+					}
+					else
+					{
+						dim5th_tmp = x;
+						break;
+					}
 				}
-				else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-					sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
-				{
-					;;
-				}
-				else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-					sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
-				{
-					;;
-				}
-				else
-				{
-					dim6th_tmp = x;
-					break;
-				}
+				*dim5th = dim5th_tmp;
+				*dim4th = stack_id_idx;
+				*dim3rd = in_stack_pos_idx;
+				*enh_id = 994;
 			}
-			*enh_id = 998;
-			*dim6th = dim6th_tmp;
-			*dim5th = temporal_pos_idx;
-			*dim4th = stack_id_idx;
-			*dim3rd = in_stack_pos_idx;
+			else if (plane_pos_idx >= 0 && temporal_pos_idx >= 0)
+			{
+				int dim5th_tmp = -1;
+				for (int x = 0; x < sq_size; ++x)
+				{
+					const size_t i = static_cast<size_t>(x);
+					if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
+					{
+						;;
+					}
+					else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
+						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
+					{
+						;;
+					}
+					else
+					{
+						dim5th_tmp = x;
+						break;
+					}
+				}
+				*dim5th = dim5th_tmp;
+				*dim4th = temporal_pos_idx;
+				*dim3rd = plane_pos_idx;
+				*enh_id = 993;
+			}
+			else if (plane_pos_idx >= 0 && temporal_off_idx >= 0)
+			{
+				int dim5th_tmp = -1;
+				for (int x = 0; x < sq_size; ++x)
+				{
+					const size_t i = static_cast<size_t>(x);
+					if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9310) &&
+						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x930d))
+					{
+						;;
+					}
+					else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
+						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
+					{
+						;;
+					}
+					else
+					{
+						dim5th_tmp = x;
+						break;
+					}
+				}
+				*dim5th = dim5th_tmp;
+				*dim4th = temporal_off_idx;
+				*dim3rd = plane_pos_idx;
+				*enh_id = 992;
+			}
 		}
-		else if (sq_size == 3 &&
-			plane_pos_idx >= 0 &&
-			temporal_pos_idx >= 0)
+		else if (sq_size == 2)
 		{
-			int dim5th_tmp = -1;
-			for (int x = 0; x < 3; ++x)
+			if (ipp_idx >= 0)
 			{
-				const size_t i = static_cast<size_t>(x);
-				if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-					sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
+				int dim4th_tmp = -1;
+				for (int x = 0; x < sq_size; ++x)
 				{
-					;;
+					const size_t i = static_cast<size_t>(x);
+					if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9113) &&
+						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x0032))
+					{
+						;;
+					}
+					else
+					{
+						dim4th_tmp = x;
+						break;
+					}
 				}
-				else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
-					sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
-				{
-					;;
-				}
-				else
-				{
-					dim5th_tmp = x;
-					break;
-				}
+				*dim4th = dim4th_tmp;
+				*dim3rd = ipp_idx;
+				*enh_id = 991;
 			}
-			*dim5th = dim5th_tmp;
-			*dim4th = temporal_pos_idx;
-			*dim3rd = plane_pos_idx;
-			*enh_id = 997;
-		}
-		else if (sq_size == 3 &&
-			plane_pos_idx >= 0 &&
-			temporal_off_idx >= 0)
-		{
-			int dim5th_tmp = -1;
-			for (int x = 0; x < 3; ++x)
+ 			else if (in_stack_pos_idx >= 0)
 			{
-				const size_t i = static_cast<size_t>(x);
-				if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9310) &&
-					sq.at(i).index_pointer == mdcm::Tag(0x0020,0x930d))
+				int dim4th_tmp = -1;
+				for (int x = 0; x < sq_size; ++x)
 				{
-					;;
+					const size_t i = static_cast<size_t>(x);
+					if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
+					{
+						;;
+					}
+					else
+					{
+						dim4th_tmp = x;
+						break;
+					}
 				}
-				else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
-					sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
-				{
-					;;
-				}
-				else
-				{
-					dim5th_tmp = x;
-					break;
-				}
+				*dim4th = dim4th_tmp;
+				*dim3rd = in_stack_pos_idx;
+				*enh_id = 990;
 			}
-			*dim5th = dim5th_tmp;
-			*dim4th = temporal_off_idx;
-			*dim3rd = plane_pos_idx;
-			*enh_id = 996;
+			else if (plane_pos_idx >= 0)
+			{
+				int dim4th_tmp = -1;
+				for (int x = 0; x < sq_size; ++x)
+				{
+					const size_t i = static_cast<size_t>(x);
+					if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
+						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
+					{
+						;;
+					}
+					else
+					{
+						dim4th_tmp = x;
+						break;
+					}
+				}
+				*dim4th = dim4th_tmp;
+				*dim3rd = plane_pos_idx;
+				*enh_id = 989;
+			}
 		}
 		else if (sq_size == 1)
 		{
-			*enh_id = 995;
 			*dim3rd = 0;
+			*enh_id = 988;
 		}
 	}
 }
@@ -5564,26 +5859,27 @@ void DicomUtils::print_sq(const DimIndexSq & sq)
 		{
 			std::cout << "stack_id_idx";
 		}
-		else if (
-			sq.at(x).group_pointer==mdcm::Tag(0x0020,0x9111) &&
+		else if (sq.at(x).group_pointer==mdcm::Tag(0x0020,0x9111) &&
 			sq.at(x).index_pointer==mdcm::Tag(0x0020,0x9057))
 		{
 			std::cout << "in_stack_pos_idx";
 		}
-		else if (
-			sq.at(x).group_pointer==mdcm::Tag(0x0020,0x9111) &&
+		else if (sq.at(x).group_pointer == mdcm::Tag(0x0020,0x9113) &&
+			sq.at(x).index_pointer == mdcm::Tag(0x0020,0x0032))
+		{
+			std::cout << "ipp_idx";
+		}
+		else if (sq.at(x).group_pointer==mdcm::Tag(0x0020,0x9111) &&
 			sq.at(x).index_pointer==mdcm::Tag(0x0020,0x9128))
 		{
 			std::cout << "temporal_pos_idx";
 		}
-		else if (
-			sq.at(x).group_pointer==mdcm::Tag(0x0018,0x9117) &&
+		else if (sq.at(x).group_pointer==mdcm::Tag(0x0018,0x9117) &&
 			sq.at(x).index_pointer==mdcm::Tag(0x0018,0x9087))
 		{
 			std::cout << "b_value_idx";
 		}
-		else if (
-			sq.at(x).group_pointer==mdcm::Tag(0x0018,0x9117) &&
+		else if (sq.at(x).group_pointer==mdcm::Tag(0x0018,0x9117) &&
 			sq.at(x).index_pointer==mdcm::Tag(0x0018,0x9089))
 		{
 			std::cout << "gradients_idx";
@@ -5592,8 +5888,7 @@ void DicomUtils::print_sq(const DimIndexSq & sq)
 		{
 			std::cout << "contrast_idx";
 		}
-		else if (
-			sq.at(x).group_pointer==mdcm::Tag(0x0040,0x9096) &&
+		else if (sq.at(x).group_pointer==mdcm::Tag(0x0040,0x9096) &&
 			sq.at(x).index_pointer==mdcm::Tag(0x0040,0x9210))
 		{
 			std::cout << "lut_label_idx";
@@ -5604,26 +5899,22 @@ void DicomUtils::print_sq(const DimIndexSq & sq)
 		{
 			std::cout << "temporal_off_idx";
 		}
-		else if (
-			sq.at(x).group_pointer==mdcm::Tag(0x0020,0x930e) &&
+		else if (sq.at(x).group_pointer==mdcm::Tag(0x0020,0x930e) &&
 			sq.at(x).index_pointer==mdcm::Tag(0x0020,0x9301))
 		{
 			std::cout << "plane_pos_idx";
 		}
-		else if (
-			sq.at(x).group_pointer==mdcm::Tag(0x0018,0x9807) &&
+		else if (sq.at(x).group_pointer==mdcm::Tag(0x0018,0x9807) &&
 			sq.at(x).index_pointer==mdcm::Tag(0x0018,0x9808))
 		{
 			std::cout << "datatype_idx";
 		}
-		else if (
-			sq.at(x).group_pointer==mdcm::Tag(0x0018,0x9226) &&
+		else if (sq.at(x).group_pointer==mdcm::Tag(0x0018,0x9226) &&
 			sq.at(x).index_pointer==mdcm::Tag(0x0008,0x9007))
 		{
 			std::cout << "mr_frame_type_idx";
 		}
-		else if (
-			sq.at(x).group_pointer==mdcm::Tag(0x0018,0x9114) &&
+		else if (sq.at(x).group_pointer==mdcm::Tag(0x0018,0x9114) &&
 			sq.at(x).index_pointer==mdcm::Tag(0x0018,0x9082))
 		{
 			std::cout << "mr_eff_echo_idx";
@@ -5632,6 +5923,10 @@ void DicomUtils::print_sq(const DimIndexSq & sq)
 			sq.at(x).index_pointer==mdcm::Tag(0x0062,0x000b))
 		{
 			std::cout << "segment_idx";
+		}
+		else
+		{
+			std::cout << " ***";
 		}
 		std::cout << " UID " << sq.at(x).uid << std::endl;
 	}
@@ -5973,11 +6268,12 @@ QString DicomUtils::read_enhanced(
 		if (!min_load)
 		{
 			print_sq(sq);
-			std::cout << std::endl;
-			std::cout << "Group values:" << std::endl;
+#ifdef ENHANCED_PRINT_GROUPS
+			std::cout << "\nGroup values:" << std::endl;
 			print_func_group(values);
 			std::cout << "Shared group values:" << std::endl;
 			print_func_group(shared_values);
+#endif
 		}
 #endif
 		enhanced_process_values(values, shared_values);
@@ -6286,11 +6582,12 @@ QString DicomUtils::read_enhanced_supp_palette(
 	if (!min_load)
 	{
 		print_sq(sq);
-		std::cout << std::endl;
-		std::cout << "Group values:" << std::endl;
+#ifdef ENHANCED_PRINT_GROUPS
+		std::cout << "\nGroup values:" << std::endl;
 		print_func_group(values);
 		std::cout << "Shared group values:" << std::endl;
 		print_func_group(shared_values);
+#endif
 	}
 #endif
 	enhanced_process_values(values, shared_values);
