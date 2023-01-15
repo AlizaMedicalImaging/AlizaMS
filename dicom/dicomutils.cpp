@@ -165,13 +165,13 @@ static bool sort_frames_ippiop(
 	}
 	std::stable_sort(tmp0.begin(), tmp0.end(), less_than_ipp());
 #ifdef ENHANCED_PRINT_INFO
-	std::cout << "Sorting frames" << std::endl;
+	std::cout << "Sorting frames by IPP/IOP ..." << std::endl;
 #endif
 	for (unsigned int j = 0; j < tmp0.size(); ++j)
 	{
 		const IPPIOP & k = tmp0.at(j);
 		out[k.idx] = j;
-#ifdef ENHANCED_PRINT_INFO
+#if 0
 		std::cout << "out[" << k.idx << "] = " << j << std::endl;
 #endif
 	}
@@ -4897,8 +4897,7 @@ void DicomUtils::enhanced_get_indices(
 	std::cout << "Using Dimension Organization UID " << dim_uid << std::endl;
 #endif
 	//
-	// Search known pointers for well-know combinations.
-	// May work also if a pointer is not recognized here.
+	// Search known pointers for well-know combinations (optional).
 	for (int x = 0; x < sq_size; ++x)
 	{
 		const size_t i = static_cast<size_t>(x);
@@ -4940,7 +4939,7 @@ void DicomUtils::enhanced_get_indices(
 				gradients_idx = x;
 			}
 			else if (sq.at(i).group_pointer == mdcm::Tag(0x0018,0x9341) &&
-				sq.at(i).index_pointer == mdcm::Tag(0x0018,0x9337))
+				sq.at(i).index_pointer == mdcm::Tag(0x0018,0x9344))
 			{
 				contrast_idx = x;
 			}
@@ -5357,11 +5356,11 @@ void DicomUtils::enhanced_get_indices(
 					}
 					else
 					{
-						dim5th_tmp = x;
+						dim6th_tmp = x;
 						break;
 					}
 				}
-				if (dim5th_tmp >= 0)
+				if (dim6th_tmp >= 0)
 				{
 					for (int x = 0; x < sq_size; ++x)
 					{
@@ -5380,7 +5379,7 @@ void DicomUtils::enhanced_get_indices(
 						{
 							if (x != dim5th_tmp)
 							{
-								dim6th_tmp = x;
+								dim5th_tmp = x;
 								break;
 							}
 						}
@@ -5412,11 +5411,11 @@ void DicomUtils::enhanced_get_indices(
 					}
 					else
 					{
-						dim5th_tmp = x;
+						dim6th_tmp = x;
 						break;
 					}
 				}
-				if (dim5th_tmp >= 0)
+				if (dim6th_tmp >= 0)
 				{
 					for (int x = 0; x < sq_size; ++x)
 					{
@@ -5435,7 +5434,7 @@ void DicomUtils::enhanced_get_indices(
 						{
 							if (x != dim5th_tmp)
 							{
-								dim6th_tmp = x;
+								dim5th_tmp = x;
 								break;
 							}
 						}
@@ -5466,11 +5465,11 @@ void DicomUtils::enhanced_get_indices(
 					}
 					else
 					{
-						dim5th_tmp = x;
+						dim6th_tmp = x;
 						break;
 					}
 				}
-				if (dim5th_tmp >= 0)
+				if (dim6th_tmp >= 0)
 				{
 					for (int x = 0; x < sq_size; ++x)
 					{
@@ -5489,7 +5488,7 @@ void DicomUtils::enhanced_get_indices(
 						{
 							if (x != dim5th_tmp)
 							{
-								dim6th_tmp = x;
+								dim5th_tmp = x;
 								break;
 							}
 						}
@@ -5652,10 +5651,40 @@ void DicomUtils::enhanced_get_indices(
 				*enh_id = 989;
 			}
 		}
-		else if (sq_size == 1)
+	}
+	// Unfortunaty it is difficult to be sure which index correspond
+	// to which dimension for the best result, otherwise this code
+	// should be sufficient.
+	// Don't forget there is the option to disable processing
+	// of dimension organization if the result is worse as without.
+	if (*enh_id < 0)
+	{
+		switch(sq_size)
 		{
+		case 4:
+			*dim3rd = 3;
+			*dim4th = 2;
+			*dim5th = 1;
+			*dim6th = 0;
+			*enh_id = 899;
+			break;
+		case 3:
+			*dim3rd = 2;
+			*dim4th = 1;
+			*dim5th = 0;
+			*enh_id = 898;
+			break;
+		case 2:
+			*dim3rd = 1;
+			*dim4th = 0;
+			*enh_id = 897;
+			break;
+		case 1:
 			*dim3rd = 0;
-			*enh_id = 988;
+			*enh_id = 896;
+			break;
+		default:
+			break;
 		}
 	}
 }
@@ -5848,79 +5877,80 @@ void DicomUtils::print_sq(const DimIndexSq & sq)
 		std::cout << "DimIndexSq is empty" << std::endl;
 		return;
 	}
-	for (size_t x = 0; x < sq.size(); ++x)
+	for (size_t i = 0; i < sq.size(); ++i)
 	{
 		std::cout
-			<< " " << x << " "
-			<< sq.at(x).group_pointer << " "
-			<< sq.at(x).index_pointer << " ";
-		if (sq.at(x).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-			sq.at(x).index_pointer==mdcm::Tag(0x0020,0x9056))
+			<< " " << i << " "
+			<< sq.at(i).group_pointer << " "
+			<< sq.at(i).index_pointer << " ";
+		if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9056))
 		{
 			std::cout << "stack_id_idx";
 		}
-		else if (sq.at(x).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-			sq.at(x).index_pointer==mdcm::Tag(0x0020,0x9057))
+		else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9057))
 		{
 			std::cout << "in_stack_pos_idx";
 		}
-		else if (sq.at(x).group_pointer == mdcm::Tag(0x0020,0x9113) &&
-			sq.at(x).index_pointer == mdcm::Tag(0x0020,0x0032))
+		else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9113) &&
+			sq.at(i).index_pointer == mdcm::Tag(0x0020,0x0032))
 		{
 			std::cout << "ipp_idx";
 		}
-		else if (sq.at(x).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-			sq.at(x).index_pointer==mdcm::Tag(0x0020,0x9128))
+		else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9128))
 		{
 			std::cout << "temporal_pos_idx";
 		}
-		else if (sq.at(x).group_pointer==mdcm::Tag(0x0018,0x9117) &&
-			sq.at(x).index_pointer==mdcm::Tag(0x0018,0x9087))
+		else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9117) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9087))
 		{
 			std::cout << "b_value_idx";
 		}
-		else if (sq.at(x).group_pointer==mdcm::Tag(0x0018,0x9117) &&
-			sq.at(x).index_pointer==mdcm::Tag(0x0018,0x9089))
+		else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9117) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9089))
 		{
 			std::cout << "gradients_idx";
 		}
-		else if (sq.at(x).group_pointer==mdcm::Tag(0x0018,0x9341))
+		else if (sq.at(i).group_pointer == mdcm::Tag(0x0018,0x9341) &&
+			sq.at(i).index_pointer == mdcm::Tag(0x0018,0x9344))
 		{
 			std::cout << "contrast_idx";
 		}
-		else if (sq.at(x).group_pointer==mdcm::Tag(0x0040,0x9096) &&
-			sq.at(x).index_pointer==mdcm::Tag(0x0040,0x9210))
+		else if (sq.at(i).group_pointer==mdcm::Tag(0x0040,0x9096) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0040,0x9210))
 		{
 			std::cout << "lut_label_idx";
 		}
 		else if (
-			sq.at(x).group_pointer==mdcm::Tag(0x0020,0x9310) &&
-			sq.at(x).index_pointer==mdcm::Tag(0x0020,0x930d))
+			sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9310) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0020,0x930d))
 		{
 			std::cout << "temporal_off_idx";
 		}
-		else if (sq.at(x).group_pointer==mdcm::Tag(0x0020,0x930e) &&
-			sq.at(x).index_pointer==mdcm::Tag(0x0020,0x9301))
+		else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x930e) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9301))
 		{
 			std::cout << "plane_pos_idx";
 		}
-		else if (sq.at(x).group_pointer==mdcm::Tag(0x0018,0x9807) &&
-			sq.at(x).index_pointer==mdcm::Tag(0x0018,0x9808))
+		else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9807) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9808))
 		{
 			std::cout << "datatype_idx";
 		}
-		else if (sq.at(x).group_pointer==mdcm::Tag(0x0018,0x9226) &&
-			sq.at(x).index_pointer==mdcm::Tag(0x0008,0x9007))
+		else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9226) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0008,0x9007))
 		{
 			std::cout << "mr_frame_type_idx";
 		}
-		else if (sq.at(x).group_pointer==mdcm::Tag(0x0018,0x9114) &&
-			sq.at(x).index_pointer==mdcm::Tag(0x0018,0x9082))
+		else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9114) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9082))
 		{
 			std::cout << "mr_eff_echo_idx";
 		}
-		else if (sq.at(x).group_pointer==mdcm::Tag(0x0062,0x000a) &&
-			sq.at(x).index_pointer==mdcm::Tag(0x0062,0x000b))
+		else if (sq.at(i).group_pointer==mdcm::Tag(0x0062,0x000a) &&
+			sq.at(i).index_pointer==mdcm::Tag(0x0062,0x000b))
 		{
 			std::cout << "segment_idx";
 		}
@@ -5928,7 +5958,7 @@ void DicomUtils::print_sq(const DimIndexSq & sq)
 		{
 			std::cout << " ***";
 		}
-		std::cout << " UID " << sq.at(x).uid << std::endl;
+		std::cout << " UID " << sq.at(i).uid << std::endl;
 	}
 }
 
