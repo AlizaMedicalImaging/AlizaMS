@@ -32,16 +32,8 @@ class DataSet;
 class FileMetaInformation;
 class File;
 
-// WARNING: This class will be deprecated in the future. There is no reason to extend this class.
-// Please check the mdcm::UIDs class if adding new well known UID.
-
-/**
+/*
  * MediaStorage
- *
- * FIXME There should not be any notion of Image and/or PDF at that point
- * Only the codec can answer yes I support this Media Storage or not.
- * For instance an ImageCodec will answer yes to most of them
- * while a PDFCodec will answer only for the Encapsulated PDF.
  *
  */
 class MDCM_EXPORT MediaStorage
@@ -149,7 +141,7 @@ public:
     BreastProjectionXRayImageStorageForProcessing,
     HardcopyColorImageStorage,
     DCMTKUnknownStorage,
-    PATemproraryImageStorage, // FIXME
+    PATemporaryImageStorage, // FIXME
     MS_END
   } MSType;
 

@@ -549,7 +549,7 @@ public:
 
 /////////////////////////////////////////
 //
-// PA Temprorary Image Storage FIXME
+// PA Temporary Image Storage FIXME
 //
 	uid_1_2_840_10008_5_1_2_3_45 = 479
 //
@@ -1089,7 +1089,7 @@ public:
 //
 // PA Temprorary Image Storage FIXME
 //
-    PATemproraryImageStorage = 479
+    PATemporaryImageStorage = 479
 //
 //
 /////////////////////////////////////////
