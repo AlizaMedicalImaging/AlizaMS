@@ -424,8 +424,8 @@ public:
 		ShaderObj*, bool,
 		const QWidget*,
 		QProgressDialog*,
-		short=0, // type of object processing
-		bool=false); // skip dimensions organization for enh, orig. frames
+		short, // type of object processing
+		bool); // skip dimensions organization for enh, orig. frames
 };
 
 #endif
