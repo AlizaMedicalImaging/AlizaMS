@@ -148,14 +148,51 @@ static bool sort_frames_ippiop(
 	std::vector<IPPIOP> tmp0;
 	std::map< unsigned int,unsigned int,std::less<unsigned int> >::const_iterator it =
 		in.cbegin();
+	bool ipv_iov = false; // currently only Enhanced US Volume and PA
+	while (it != in.cend())
+	{
+		const unsigned int x = it->first;
+		if (values.at(x).vol_pos_ok && values.at(x).vol_orient_ok)
+		{
+			ipv_iov = true;
+			break;
+		}
+		++it;
+	}
+	it = in.cbegin();
 	while (it != in.cend())
 	{
 		const unsigned int x = it->first;
 		double ipp[3];
 		double iop[6];
-		const bool ok_p = DicomUtils::get_patient_position(values.at(x).pat_pos, ipp);
-		const bool ok_o = DicomUtils::get_patient_orientation(values.at(x).pat_orient, iop);
-		if (!(ok_o && ok_p)) return false;
+		if (!ipv_iov)
+		{
+			const bool ok_p = DicomUtils::get_patient_position(values.at(x).pat_pos, ipp);
+			const bool ok_o = DicomUtils::get_patient_orientation(values.at(x).pat_orient, iop);
+			if (!(ok_o && ok_p))
+			{
+				return false;
+			}
+		}
+		else
+		{
+			if (values.at(x).vol_pos_ok && values.at(x).vol_orient_ok)
+			{
+				ipp[0] = values.at(x).vol_pos[0];
+				ipp[1] = values.at(x).vol_pos[1];
+				ipp[2] = values.at(x).vol_pos[2];
+				iop[0] = values.at(x).vol_orient[0];
+				iop[1] = values.at(x).vol_orient[1];
+				iop[2] = values.at(x).vol_orient[2];
+				iop[3] = values.at(x).vol_orient[3];
+				iop[4] = values.at(x).vol_orient[4];
+				iop[5] = values.at(x).vol_orient[5];
+			}
+			else
+			{
+				return false;
+			}
+		}
 		IPPIOP tmp1(
 			x,
 			ipp[0], ipp[1], ipp[2],
@@ -10661,7 +10698,9 @@ bool DicomUtils::enhanced_process_indices(
 	if (dim6th>=0)
 	{
 		for (unsigned int x = 0; x < idx_values.size(); ++x)
+		{
 			tmp1_1.push_back(idx_values.at(x).idx.at(dim6th));
+		}
 		tmp1_1.sort();
 		tmp1_1.unique();
 	}
@@ -10672,7 +10711,9 @@ bool DicomUtils::enhanced_process_indices(
 	if (dim5th>=0)
 	{
 		for (unsigned int x = 0; x < idx_values.size(); ++x)
+		{
 			tmp1_2.push_back(idx_values.at(x).idx.at(dim5th));
+		}
 		tmp1_2.sort();
 		tmp1_2.unique();
 	}
@@ -10683,7 +10724,9 @@ bool DicomUtils::enhanced_process_indices(
 	if (dim4th>=0)
 	{
 		for (unsigned int x = 0; x < idx_values.size(); ++x)
+		{
 			tmp1_3.push_back(idx_values.at(x).idx.at(dim4th));
+		}
 		tmp1_3.sort();
 		tmp1_3.unique();
 	}
@@ -10740,8 +10783,18 @@ bool DicomUtils::enhanced_process_indices(
 							}
 							else
 							{
-								const unsigned int tmp2_pos =
+								unsigned int tmp2_pos =
 									idx_values.at(x).idx.at(dim3rd);
+								if (tmp2_pos >= 1)
+								{
+									tmp2_pos -= 1;
+								}
+								else
+								{
+									std::cout << "Error: index can not start with 0" << std::endl;
+									error = true;
+									break;
+								}
 								tmp2[idx_values.at(x).id] = tmp2_pos;
 								tmp2_test.push_back(tmp2_pos);
 							}
