@@ -5652,11 +5652,7 @@ void DicomUtils::enhanced_get_indices(
 			}
 		}
 	}
-	// Unfortunaty it is difficult to be sure which index correspond
-	// to which dimension for the best result, otherwise this code
-	// should be sufficient.
-	// Don't forget there is the option to disable processing
-	// of dimension organization if the result is worse as without.
+	//
 	if (*enh_id < 0)
 	{
 		switch(sq_size)
@@ -5870,11 +5866,11 @@ void DicomUtils::print_sq(const DimIndexSq & sq)
 {
 	if (!sq.empty())
 	{
-		std::cout << "DimIndexSq:" << std::endl;
+		std::cout << "Dimension Index Sequence:" << std::endl;
 	}
 	else
 	{
-		std::cout << "DimIndexSq is empty" << std::endl;
+		std::cout << "Dimension Index Sequence is empty" << std::endl;
 		return;
 	}
 	for (size_t i = 0; i < sq.size(); ++i)
