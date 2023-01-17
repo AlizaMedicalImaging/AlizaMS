@@ -157,7 +157,6 @@ static bool sort_frames_ippiop(
 			ipv_iov = true;
 		}
 	}
-	it = in.cbegin();
 	while (it != in.cend())
 	{
 		const unsigned int x = it->first;
