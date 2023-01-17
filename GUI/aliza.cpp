@@ -831,7 +831,7 @@ void Aliza::load_dicom_series(QProgressDialog * pb)
 				static_cast<QWidget*>(settingswidget),
 				pb,
 				0,
-				settingswidget->get_ignore_dim_org());
+				settingswidget->get_enh_strategy());
 			if (!tmp_message.isEmpty())
 			{
 				++count_messages;
@@ -4289,7 +4289,7 @@ void Aliza::load_dicom_file(int * image_id,
 			static_cast<QWidget*>(settingswidget),
 			pb,
 			0,
-			settingswidget->get_ignore_dim_org());
+			settingswidget->get_enh_strategy());
 	}
 	catch (mdcm::ParseException & pe)
 	{

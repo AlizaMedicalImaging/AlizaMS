@@ -132,13 +132,11 @@ void SettingsWidget::set_default()
 	textureoptions_groupBox->setChecked(true);
 	rescale_checkBox->setChecked(true);
 	mosaic_checkBox->setChecked(true);
-	sortframes_checkBox->setChecked(true);
 	time_s__checkBox->setChecked(false);
 	overlays_checkBox->setChecked(true);
 	clean_unused_checkBox->setChecked(true);
 	pred6_checkBox->setChecked(false);
 	cornell_checkBox->setChecked(false);
-	enh_skip_dim_org_checkBox->setChecked(false);
 	pet_no_level_checkBox->setChecked(false);
 	srinfo_checkBox->setChecked(false);
 	srscale_checkBox->blockSignals(true);
@@ -150,6 +148,11 @@ void SettingsWidget::set_default()
 	srskipimage_checkBox->setChecked(false);
 	icc_checkBox->setChecked(true);
 	jpegprec_checkBox->setChecked(false);
+	//
+	enh_dim_uniform_radioButton->setChecked(true);
+	enh_dim_strict_radioButton->setChecked(false);
+	enh_dim_strict_1_radioButton->setChecked(false);
+	enh_dim_skip_radioButton->setChecked(false);
 	//
 	pt_doubleSpinBox->setEnabled(false);
 	disconnect(
@@ -226,7 +229,7 @@ void SettingsWidget::readSettings()
 	const int tmp7  = settings.value(QString("sr_skip_images"),  0).toInt();
 	const int tmp8  = settings.value(QString("dcm_overlays"),    1).toInt();
 	const int tmp9  = settings.value(QString("dcm_mosaic"),      1).toInt();
-	const int tmp10 = settings.value(QString("dcm_sort_mf"),     1).toInt();
+	const int tmp10 = settings.value(QString("enh_strategy"),    1).toInt();
 	const int tmp11 = settings.value(QString("apply_icc"),       1).toInt();
 	const int tmp12 = settings.value(QString("clean_unused"),    1).toInt();
 	settings.endGroup();
@@ -259,7 +262,34 @@ void SettingsWidget::readSettings()
 	srskipimage_checkBox->setChecked((tmp7 == 1));
 	overlays_checkBox->setChecked((tmp8 == 1));
 	mosaic_checkBox->setChecked((tmp9 == 1));
-	sortframes_checkBox->setChecked((tmp10 == 1));
+	if (tmp10 == 2)
+	{
+		enh_dim_strict_radioButton->setChecked(true);
+		enh_dim_uniform_radioButton->setChecked(false); // not required
+		enh_dim_strict_1_radioButton->setChecked(false); // not required
+		enh_dim_skip_radioButton->setChecked(false); // not required
+	}
+	else if (tmp10 == 3)
+	{
+		enh_dim_strict_1_radioButton->setChecked(true);
+		enh_dim_uniform_radioButton->setChecked(false); // not required
+		enh_dim_skip_radioButton->setChecked(false); // not required
+		enh_dim_strict_radioButton->setChecked(false); // not required
+	}
+	else if (tmp10 == 4)
+	{
+		enh_dim_skip_radioButton->setChecked(true);
+		enh_dim_uniform_radioButton->setChecked(false); // not required
+		enh_dim_strict_radioButton->setChecked(false); // not required
+		enh_dim_strict_1_radioButton->setChecked(false); // not required
+	}
+	else // 1 is default
+	{
+		enh_dim_uniform_radioButton->setChecked(true);
+		enh_dim_strict_radioButton->setChecked(false); // not required
+		enh_dim_strict_1_radioButton->setChecked(false); // not required
+		enh_dim_skip_radioButton->setChecked(false); // not required
+	}
 	icc_checkBox->setChecked((tmp11 == 1));
 	clean_unused_checkBox->setChecked((tmp12 == 1));
 }
@@ -278,9 +308,24 @@ void SettingsWidget::writeSettings(QSettings & s)
 	s.setValue(QString("sr_skip_images"),QVariant(srskipimage_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("dcm_overlays"),  QVariant(overlays_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("dcm_mosaic"),    QVariant(mosaic_checkBox->isChecked() ? 1 : 0));
-	s.setValue(QString("dcm_sort_mf"),   QVariant(sortframes_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("apply_icc"),     QVariant(icc_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("clean_unused"),  QVariant(clean_unused_checkBox->isChecked() ? 1 : 0));
+	if (enh_dim_skip_radioButton->isChecked())
+	{
+		s.setValue(QString("enh_strategy"),  QVariant(4));
+	}
+	else if (enh_dim_strict_1_radioButton->isChecked())
+	{
+		s.setValue(QString("enh_strategy"),  QVariant(3));
+	}
+	else if (enh_dim_strict_radioButton->isChecked())
+	{
+		s.setValue(QString("enh_strategy"),  QVariant(2));
+	}
+	else // default
+	{
+		s.setValue(QString("enh_strategy"),  QVariant(1));
+	}
 	s.endGroup();
 	s.beginGroup(QString("StyleDialog"));
 	s.setValue(QString("saved_idx"), QVariant(styleComboBox->currentIndex()));
@@ -318,11 +363,6 @@ bool SettingsWidget::get_sr_skip_images() const
 	return srskipimage_checkBox->isChecked();
 }
 
-bool SettingsWidget::get_ignore_dim_org() const
-{
-	return enh_skip_dim_org_checkBox->isChecked();
-}
-
 bool SettingsWidget::get_predictor_workaround() const
 {
 	return pred6_checkBox->isChecked();
@@ -333,11 +373,6 @@ bool SettingsWidget::get_cornell_workaround() const
 	return cornell_checkBox->isChecked();
 }
 
-bool SettingsWidget::get_sort_frames() const
-{
-	return sortframes_checkBox->isChecked();
-}
-
 bool SettingsWidget::get_apply_icc() const
 {
 	return icc_checkBox->isChecked();
@@ -346,4 +381,25 @@ bool SettingsWidget::get_apply_icc() const
 bool SettingsWidget::get_try_fix_jpeg_prec() const
 {
 	return jpegprec_checkBox->isChecked();
+}
+
+short SettingsWidget::get_enh_strategy() const
+{
+	if (enh_dim_skip_radioButton->isChecked())
+	{
+		return static_cast<short>(EnhancedIODLoadingType::SkipDimensionOrganization);
+	}
+	else if (enh_dim_strict_1_radioButton->isChecked())
+	{
+		return static_cast<short>(EnhancedIODLoadingType::StrictSingleImage);
+	}
+	else if (enh_dim_strict_radioButton->isChecked())
+	{
+		return static_cast<short>(EnhancedIODLoadingType::StrictMultipleImages);
+	}
+	else if (enh_dim_uniform_radioButton->isChecked())
+	{
+		return static_cast<short>(EnhancedIODLoadingType::PreferUniformVolumes);
+	}
+	return 0; // unreachable
 }

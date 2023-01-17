@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1005</width>
-    <height>620</height>
+    <height>653</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -44,7 +44,7 @@
             <x>0</x>
             <y>0</y>
             <width>989</width>
-            <height>554</height>
+            <height>587</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_14">
@@ -89,28 +89,6 @@
              </property>
              <property name="text">
               <string>Process Siemens Mosaic / UIH Grid</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="sortframes_checkBox">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="mouseTracking">
-              <bool>false</bool>
-             </property>
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Try to sort frames in enhanced multi-frame IODs by Image Position (Patient). Multiple stacks are sorted separately, s. option to process Dimension Organisation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>Sort frames in enhanced multi-frame IODs by IPP/IOP</string>
              </property>
              <property name="checked">
               <bool>true</bool>
@@ -295,6 +273,91 @@
             </widget>
            </item>
            <item>
+            <widget class="QGroupBox" name="enh_groupBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="title">
+              <string>Enhanced multi-frame IODs</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_7">
+              <property name="margin">
+               <number>6</number>
+              </property>
+              <item>
+               <widget class="QRadioButton" name="enh_dim_uniform_radioButton">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Will use &lt;span style=&quot; font-style:italic;&quot;&gt;Dimension Organization&lt;/span&gt;, but attempt to extract uniform volumes and sort frames by IPP/IOP (or IPV/IOV), if possible.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>Use Dimension Organization, prefer uniform volumes sorted by IPP/IOP</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="enh_dim_strict_radioButton">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Dimension Organization&lt;/span&gt; will be stricly followed, if available. Output can be multiple images.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>Strictly follow Dimension Organization, if available, output can be multiple images</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="enh_dim_strict_1_radioButton">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Dimension Organization&lt;/span&gt; will be stricly followed, if available. Output will be always a single image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>Strictly follow Dimension Organization, if available, output will be a single image</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="enh_dim_skip_radioButton">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Dimension Organisation&lt;/span&gt; will be skipped, frames will be not sorted, image will be opened as single image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>Skip Dimension Organization</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
             <widget class="QGroupBox" name="groupBox_2">
              <property name="title">
               <string>Advanced  (not saved)</string>
@@ -351,28 +414,6 @@
                 </property>
                 <property name="text">
                  <string>Workaround wrong &quot;Bits Stored&quot; DICOM tag for JPEG</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="enh_skip_dim_org_checkBox">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="mouseTracking">
-                 <bool>false</bool>
-                </property>
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Skip &lt;span style=&quot; font-style:italic;&quot;&gt;Dimension organization&lt;/span&gt; for enhanced IODs.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="text">
-                 <string>Skip 'Dimension Organization' in enhanced multi-frame IODs</string>
-                </property>
-                <property name="checked">
-                 <bool>false</bool>
                 </property>
                </widget>
               </item>
@@ -1007,7 +1048,6 @@
   <tabstop>scrollArea_3</tabstop>
   <tabstop>overlays_checkBox</tabstop>
   <tabstop>mosaic_checkBox</tabstop>
-  <tabstop>sortframes_checkBox</tabstop>
   <tabstop>icc_checkBox</tabstop>
   <tabstop>clean_unused_checkBox</tabstop>
   <tabstop>srchapters_checkBox</tabstop>
@@ -1015,10 +1055,13 @@
   <tabstop>srscale_checkBox</tabstop>
   <tabstop>srwidth_spinBox</tabstop>
   <tabstop>srskipimage_checkBox</tabstop>
+  <tabstop>enh_dim_uniform_radioButton</tabstop>
+  <tabstop>enh_dim_strict_radioButton</tabstop>
+  <tabstop>enh_dim_strict_1_radioButton</tabstop>
+  <tabstop>enh_dim_skip_radioButton</tabstop>
   <tabstop>pred6_checkBox</tabstop>
   <tabstop>cornell_checkBox</tabstop>
   <tabstop>jpegprec_checkBox</tabstop>
-  <tabstop>enh_skip_dim_org_checkBox</tabstop>
   <tabstop>pet_no_level_checkBox</tabstop>
   <tabstop>time_s__checkBox</tabstop>
   <tabstop>rescale_checkBox</tabstop>

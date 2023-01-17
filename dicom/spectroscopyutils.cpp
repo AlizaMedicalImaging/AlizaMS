@@ -200,7 +200,7 @@ QString SpectroscopyUtils::ProcessData(
 		DicomUtils::enhanced_get_indices(
 			sq,
 			&dim6th, &dim5th, &dim4th, &dim3rd,
-			&enh_id);
+			&enh_id, 1);
 	}
 #if 0
 	std::cout << "N" << enh_id;
