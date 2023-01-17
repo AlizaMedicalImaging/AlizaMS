@@ -140,24 +140,22 @@ struct less_than_ipp
 	}
 };
 
+// Also IPV/IOV (currently only Enhanced US Volume and PA)
 static bool sort_frames_ippiop(
 	const std::map< unsigned int,unsigned int,std::less<unsigned int> > & in,
 	std::map< unsigned int,unsigned int,std::less<unsigned int> > & out,
 	const FrameGroupValues & values)
 {
+	bool ipv_iov = false;
 	std::vector<IPPIOP> tmp0;
 	std::map< unsigned int,unsigned int,std::less<unsigned int> >::const_iterator it =
 		in.cbegin();
-	bool ipv_iov = false; // currently only Enhanced US Volume and PA
-	while (it != in.cend())
 	{
 		const unsigned int x = it->first;
 		if (values.at(x).vol_pos_ok && values.at(x).vol_orient_ok)
 		{
 			ipv_iov = true;
-			break;
 		}
-		++it;
 	}
 	it = in.cbegin();
 	while (it != in.cend())
