@@ -17,6 +17,24 @@
 class GLWidget;
 class ShaderObj;
 
+enum class EnhancedIODLoadingType : short
+{
+	NotDefined = 0,
+	PreferUniformVolumes = 1,
+	StrictMultipleImages = 2,
+	StrictSingleImage = 3,
+	SkipDimensionOrganization = 4
+};
+
+enum class DICOMLoadingType : short
+{
+	Default = 0,
+	PRReference = 1,
+	RTReference = 2,
+	SRReference = 3,
+	RWVReference = 4
+};
+
 class DicomUtils
 {
 public:
@@ -203,7 +221,8 @@ public:
 		const QMap<QString,int> &);
 	static void enhanced_get_indices(
 		const DimIndexSq & sq,
-		int*,int*,int*, int*,int*);
+		int*,int*,int*, int*,int*,
+		const short);
 	static void enhanced_process_values(
 		FrameGroupValues&, const FrameGroupValues&);
 	static void enhanced_check_rescale(
@@ -217,18 +236,18 @@ public:
 	static QString read_enhanced(
 		bool*, const QString&, std::vector<ImageVariant*> &,
 		int, GLWidget*, bool,
-		bool, // min. load
-		bool, // skip dimensions organization for enh, orig. frames
+		const bool,
+		const short,
 		const QWidget*, QProgressDialog*,
-		float,
-		bool);
+		const float,
+		const bool);
 	static QString read_enhanced_supp_palette(
 		bool*, const QString&, std::vector<ImageVariant*> &,
 		int, GLWidget*, bool,
-		bool, // min. load
-		bool, // skip dimensions organization for enh, orig. frames
+		const bool,
+		const short,
 		const QWidget*, QProgressDialog*,
-		float);
+		const float);
 	static QString read_ultrasound(
 		bool*, const short,
 		ImageVariant*,
@@ -313,7 +332,7 @@ public:
 		const bool,
 		const bool,
 		QProgressDialog*,
-		float);
+		const float);
 	static bool enhanced_process_indices(
 		std::vector
 			< std::map
@@ -325,7 +344,7 @@ public:
 		const DimIndexValues&,
 		const FrameGroupValues&,
 		const int, const int, const int, const int,
-		const bool);
+		const short);
 	static QString read_enhanced_3d_6d(
 		bool*,
 		std::vector<ImageVariant*> &,
@@ -350,7 +369,8 @@ public:
 		const bool,
 		const bool,
 		QProgressDialog*,
-		float);
+		const float,
+		const short);
 	static bool is_not_interleaved(const QStringList&);
 	static bool is_mosaic(const mdcm::DataSet&);
 	static bool is_uih_grid(const mdcm::DataSet&);
@@ -368,7 +388,7 @@ public:
 		const QString&, const QString&,
 		std::vector<ImageVariant*> &,
 		int, GLWidget*, bool,
-		bool,
+		short,
 		const QWidget*,
 		QProgressDialog*);
 	static QString find_file_from_uid(
@@ -425,7 +445,11 @@ public:
 		const QWidget*,
 		QProgressDialog*,
 		short, // type of object processing
-		bool); // skip dimensions organization for enh, orig. frames
+		short); // Strategy for enhanced IODs:
+				//  0 - use Dimension Organization, prefer sorted uniform
+				//  1 - strict Dimension Organization
+				//  2 - strict Dimension Organization, single image
+				//  3 - skip Dimension Organization
 };
 
 #endif

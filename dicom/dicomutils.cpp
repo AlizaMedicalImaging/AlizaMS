@@ -536,14 +536,14 @@ static QString read_MRImageModule(const mdcm::DataSet & ds)
 		tTriggerTime,
 		QString("Trigger Time"),
 		QString("ms"));
-#if 0
+/*
 	const mdcm::Tag tImagingFrequency(0x0018,0x0084);
 	s += generate_string_0(
 		ds,
 		tImagingFrequency,
 		QString("Imaging Frequency"),
 		QString("MHz"));
-#endif
+*/
 	const mdcm::Tag tImagedNucleus(0x0018,0x0085);
 	s += generate_string_0(
 		ds,
@@ -904,7 +904,6 @@ Keyword	CodeMeaning
 Value Multiplicity	1
 Value Representation	Long String (LO)
 */
-
 	s += generate_string_0(
 		ds,
 		mdcm::Tag(0x0018,0x115E),
@@ -3113,17 +3112,21 @@ bool DicomUtils::read_group_sq(
 		if (!eSpecificCharacterSet.IsEmpty() &&
 			!eSpecificCharacterSet.IsUndefinedLength() &&
 			eSpecificCharacterSet.GetByteValue())
+		{
 			charset = QString::fromLatin1(
 				eSpecificCharacterSet.GetByteValue()->GetPointer(),
 				eSpecificCharacterSet.GetByteValue()->GetLength()).
 					trimmed();
+		}
 	}
 	//
 	const mdcm::DataElement & deGroup = ds.GetDataElement(t);
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sqGroup =
 		deGroup.GetValueAsSQ();
-	if (!(sqGroup && sqGroup->GetNumberOfItems()>0))
+	if (!(sqGroup && sqGroup->GetNumberOfItems() > 0))
+	{
 		return false;
+	}
 	for (unsigned int x = 0; x < sqGroup->GetNumberOfItems(); ++x)
 	{
 		FrameGroup fg;
@@ -3180,12 +3183,14 @@ bool DicomUtils::read_group_sq(
 					if (!deStackID.IsEmpty() &&
 						!deStackID.IsUndefinedLength() &&
 						deStackID.GetByteValue())
+					{
 						fg.stack_id=
 							QVariant(QString::fromLatin1(
 								deStackID.GetByteValue()->GetPointer(),
 								deStackID.GetByteValue()->GetLength()).
 									trimmed().remove(QChar('\0'))
 								).toInt(&fg.stack_id_ok);
+					}
 				}
 				if (nestedds1.FindDataElement(tInStackPositionNumber))
 				{
@@ -3204,8 +3209,7 @@ bool DicomUtils::read_group_sq(
 					}
 				}
 				QString FrameAcquisitionDateTime;
-				if (
-					get_string_value(
+				if (get_string_value(
 						nestedds1,
 						tFrameAcquisitionDateTime,
 						FrameAcquisitionDateTime))
@@ -3214,8 +3218,7 @@ bool DicomUtils::read_group_sq(
 						FrameAcquisitionDateTime;
 				}
 				QString FrameReferenceDateTime;
-				if (
-					get_string_value(
+				if (get_string_value(
 						nestedds1,
 						tFrameReferenceDateTime,
 						FrameReferenceDateTime))
@@ -3242,11 +3245,13 @@ bool DicomUtils::read_group_sq(
 					if (!deImagePositionPatient.IsEmpty() &&
 						!deImagePositionPatient.IsUndefinedLength() &&
 						deImagePositionPatient.GetByteValue())
+					{
 						fg.pat_pos =
 							QString::fromLatin1(
 								deImagePositionPatient.GetByteValue()->GetPointer(),
 								deImagePositionPatient.GetByteValue()->GetLength()).
 									trimmed().remove(QChar('\0'));
+					}
 				}
 			}
 		}
@@ -3268,11 +3273,13 @@ bool DicomUtils::read_group_sq(
 					if (!deImageOrientationPatient.IsEmpty() &&
 						!deImageOrientationPatient.IsUndefinedLength() &&
 						deImageOrientationPatient.GetByteValue())
+					{
 						fg.pat_orient =
 							QString::fromLatin1(
 								deImageOrientationPatient.GetByteValue()->GetPointer(),
 								deImageOrientationPatient.GetByteValue()->GetLength()).
 									trimmed().remove(QChar('\0'));
+					}
 				}
 			}
 		}
@@ -3293,11 +3300,13 @@ bool DicomUtils::read_group_sq(
 					if (!dePixelSpacing.IsEmpty() &&
 						!dePixelSpacing.IsUndefinedLength() &&
 						dePixelSpacing.GetByteValue())
+					{
 						fg.pix_spacing =
 							QString::fromLatin1(
 								dePixelSpacing.GetByteValue()->GetPointer(),
 								dePixelSpacing.GetByteValue()->GetLength()).
 									trimmed().remove(QChar('\0'));
+					}
 				}
 				else if (nestedds1.FindDataElement(tImagerPixelSpacing))
 				{
@@ -3306,11 +3315,13 @@ bool DicomUtils::read_group_sq(
 					if (!deImagerPixelSpacing.IsEmpty() &&
 						!deImagerPixelSpacing.IsUndefinedLength() &&
 						deImagerPixelSpacing.GetByteValue())
+					{
 						fg.pix_spacing =
 							QString::fromLatin1(
 								deImagerPixelSpacing.GetByteValue()->GetPointer(),
 								deImagerPixelSpacing.GetByteValue()->GetLength()).
 									trimmed().remove(QChar('\0'));
+					}
 				}
 				else if (nestedds1.FindDataElement(tNominalScannedPixelSpacing))
 				{
@@ -3319,11 +3330,13 @@ bool DicomUtils::read_group_sq(
 					if (!deNominalScannedPixelSpacing.IsEmpty() &&
 						!deNominalScannedPixelSpacing.IsUndefinedLength() &&
 						deNominalScannedPixelSpacing.GetByteValue())
+					{
 						fg.pix_spacing =
 							QString::fromLatin1(
 								deNominalScannedPixelSpacing.GetByteValue()->GetPointer(),
 								deNominalScannedPixelSpacing.GetByteValue()->GetLength()).
 									trimmed().remove(QChar('\0'));
+					}
 				}
 				else if (nestedds1.FindDataElement(tPixelAspectRatio))
 				{
@@ -3332,13 +3345,14 @@ bool DicomUtils::read_group_sq(
 					if (!dePixelAspectRatio.IsEmpty() &&
 						!dePixelAspectRatio.IsUndefinedLength() &&
 						dePixelAspectRatio.GetByteValue())
+					{
 						fg.pix_spacing =
 							QString::fromLatin1(
 								dePixelAspectRatio.GetByteValue()->GetPointer(),
 								dePixelAspectRatio.GetByteValue()->GetLength()).
 									trimmed().remove(QChar('\0'));
+					}
 				}
-				else { ;; }
 				if (nestedds1.FindDataElement(tSliceThickness))
 				{
 					const mdcm::DataElement & deSliceThickness
@@ -3346,11 +3360,13 @@ bool DicomUtils::read_group_sq(
 					if (!deSliceThickness.IsEmpty() &&
 						!deSliceThickness.IsUndefinedLength() &&
 						deSliceThickness.GetByteValue())
+					{
 						fg.slice_thick =
 							QString::fromLatin1(
 								deSliceThickness.GetByteValue()->GetPointer(),
 								deSliceThickness.GetByteValue()->GetLength()).
 									trimmed().remove(QChar('\0'));
+					}
 				}
 			}
 		}
@@ -3372,11 +3388,13 @@ bool DicomUtils::read_group_sq(
 					if (!deFrameLaterality.IsEmpty() &&
 						!deFrameLaterality.IsUndefinedLength() &&
 						deFrameLaterality.GetByteValue())
+					{
 						fg.frame_laterality =
 							QString::fromLatin1(
 								deFrameLaterality.GetByteValue()->GetPointer(),
 								deFrameLaterality.GetByteValue()->GetLength()).
 									trimmed().remove(QChar('\0'));
+					}
 				}
 				if (nestedds1.FindDataElement(tAnatomicRegionSequence))
 				{
@@ -3405,10 +3423,12 @@ bool DicomUtils::read_group_sq(
 										&baCodeMeaning,
 										charset.toLatin1().constData());
 								if (!frame_body_part.isEmpty())
+								{
 									fg.frame_body_part =
 										frame_body_part.
 											trimmed().
 												remove(QChar('\0'));
+								}
 							}
 						}
 					}
@@ -3433,11 +3453,13 @@ bool DicomUtils::read_group_sq(
 					if (!deWindowCenter.IsEmpty() &&
 						!deWindowCenter.IsUndefinedLength() &&
 						deWindowCenter.GetByteValue())
+					{
 						fg.window_center =
 							QString::fromLatin1(
 								deWindowCenter.GetByteValue()->GetPointer(),
 								deWindowCenter.GetByteValue()->GetLength()).
 									trimmed().remove(QChar('\0'));
+					}
 				}
 				if (nestedds1.FindDataElement(tWindowWidth))
 				{
@@ -3446,11 +3468,13 @@ bool DicomUtils::read_group_sq(
 					if (!deWindowWidth.IsEmpty() &&
 						!deWindowWidth.IsUndefinedLength() &&
 						deWindowWidth.GetByteValue())
+					{
 						fg.window_width =
 							QString::fromLatin1(
 								deWindowWidth.GetByteValue()->GetPointer(),
 								deWindowWidth.GetByteValue()->GetLength()).
 									trimmed().remove(QChar('\0'));
+					}
 				}
 				if (nestedds1.FindDataElement(tLUTFunction))
 				{
@@ -3459,11 +3483,13 @@ bool DicomUtils::read_group_sq(
 					if (!deLUTFunction.IsEmpty() &&
 						!deLUTFunction.IsUndefinedLength() &&
 						deLUTFunction.GetByteValue())
+					{
 						fg.lut_function =
 							QString::fromLatin1(
 								deLUTFunction.GetByteValue()->GetPointer(),
 								deLUTFunction.GetByteValue()->GetLength()).
 									trimmed().remove(QChar('\0'));
+					}
 				}
 			}
 		}
@@ -3482,11 +3508,13 @@ bool DicomUtils::read_group_sq(
 					sqTemporalPositionSequence->GetItem(1);
 				const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
 				if (nestedds1.FindDataElement(tTemporalPositionTimeOffset))
+				{
 					fg.temp_pos_off_ok =
 						get_fd_value(
 							nestedds1,
 							tTemporalPositionTimeOffset,
 							&fg.temp_pos_off);
+				}
 			}
 		}
 		if (nestedds.FindDataElement(tPlanePositionVolumeSequence))
@@ -3559,8 +3587,7 @@ bool DicomUtils::read_group_sq(
 				const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
 				std::vector<double> tmp1;
 				std::vector<double> tmp2;
-				if (
-					get_ds_values(nestedds1, tRescaleIntercept, tmp1) &&
+				if (get_ds_values(nestedds1, tRescaleIntercept, tmp1) &&
 					get_ds_values(nestedds1, tRescaleSlope, tmp2))
 				{
 					fg.rescale_ok        = true;
@@ -3569,7 +3596,9 @@ bool DicomUtils::read_group_sq(
 				}
 				QString tmp3;
 				if (get_string_value(nestedds1, tRescaleType, tmp3))
+				{
 					fg.rescale_type = tmp3;
+				}
 			}
 		}
 		values.push_back(fg);
@@ -4881,7 +4910,8 @@ void DicomUtils::enhanced_get_indices(
 	int * dim5th,
 	int * dim4th,
 	int * dim3rd,
-	int * enh_id)
+	int * enh_id,
+	const short enh_loading_type)
 {
 	// If the function fails to process indices,
 	// an image still will have correct spatial information
@@ -4890,10 +4920,12 @@ void DicomUtils::enhanced_get_indices(
 	if (sq_size < 1)
 	{
 #ifdef ENHANCED_PRINT_INFO
-		std::cout << "Warning: empty DimIndexSq" << std::endl;
+		std::cout << "Warning: empty Dimension Index Sequence" << std::endl;
 #endif
 		return;
 	}
+	const EnhancedIODLoadingType loading_type =
+		static_cast<EnhancedIODLoadingType>(enh_loading_type);
 	int stack_id_idx      = -1;
 	int in_stack_pos_idx  = -1;
 	int ipp_idx           = -1;
@@ -4909,7 +4941,6 @@ void DicomUtils::enhanced_get_indices(
 	int mr_eff_echo_idx   = -1;
 	int segment_idx       = -1;
 	std::string dim_uid;
-	//
 	std::vector<std::string> dim_uids;
 	for (size_t x = 0; x < sq_size; ++x)
 	{
@@ -4919,101 +4950,141 @@ void DicomUtils::enhanced_get_indices(
 	const size_t dim_uids_set_size = dim_uids_set.size();
 	if (dim_uids_set_size > 1)
 	{
+#ifdef ENHANCED_PRINT_INFO
 		std::cout <<
 			"Warning: multiple dimension organization UIDs, using 1st"
 				<< std::endl;
+#endif
 	}
 	{
 		std::set<std::string>::const_iterator it = dim_uids_set.cbegin();
 		dim_uid = *it;
 	}
+	DimIndexSq sq1;
+	for (size_t x = 0; x < sq_size; ++x)
+	{
+		if (sq.at(x).uid == dim_uid)
+		{
+			sq1.push_back(sq.at(x));
+		}
+	}
+	const int sq1_size = static_cast<int>(sq1.size());
+	if (sq1_size > 4)
+	{
+		std::cout << "Size of Dimension Organization > 4 "
+			<< "(" << sq1_size << ") is currently not supported" << std::endl;
+	}
 #ifdef ENHANCED_PRINT_INFO
 	std::cout << "Using Dimension Organization UID " << dim_uid << std::endl;
 #endif
 	//
+	if (loading_type == EnhancedIODLoadingType::StrictMultipleImages)
+	{
+#ifdef ENHANCED_PRINT_INFO
+		std::cout << "Strictly using \"Dimension Organization\" (multiple images)" << std::endl;
+#endif
+		goto strict;
+	}
+	else if (loading_type == EnhancedIODLoadingType::StrictSingleImage)
+	{
+#ifdef ENHANCED_PRINT_INFO
+		std::cout << "Strictly using \"Dimension Organization\" (single image)" << std::endl;
+#endif
+		goto strict;
+	}
+	else if (loading_type == EnhancedIODLoadingType::PreferUniformVolumes)
+	{
+#ifdef ENHANCED_PRINT_INFO
+		std::cout << "Using \"Dimension Organization\", trying to generate uniform volumes" << std::endl;
+#endif
+	}
+	else
+	{
+#ifdef ENHANCED_PRINT_INFO
+		std::cout << "Not using \"Dimension Organization\"" << std::endl;
+#endif
+		return;
+	}
 	// Search known pointers for well-know combinations (optional).
-	for (int x = 0; x < sq_size; ++x)
+	for (int x = 0; x < sq1_size; ++x)
 	{
 		const size_t i = static_cast<size_t>(x);
-		if (sq.at(i).uid == dim_uid)
+		if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+			sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
 		{
-			if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-				sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
-			{
-				stack_id_idx = x;
-			}
-			else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-				sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
-			{
-				in_stack_pos_idx = x;
-			}
-			else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9113) &&
-				sq.at(i).index_pointer == mdcm::Tag(0x0020,0x0032))
-			{
-				ipp_idx = x;
-			}
-			else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-				sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
-			{
-				temporal_pos_idx = x;
-			}
-			else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9310) &&
-				sq.at(i).index_pointer == mdcm::Tag(0x0020,0x930d))
-			{
-				temporal_off_idx = x;
-			}
-			else if (sq.at(i).group_pointer == mdcm::Tag(0x0018,0x9117) &&
-				sq.at(i).index_pointer == mdcm::Tag(0x0018,0x9087))
-			{
-				b_value_idx = x;
-			}
-			else if (sq.at(i).group_pointer == mdcm::Tag(0x0018,0x9117) &&
-				sq.at(i).index_pointer == mdcm::Tag(0x0018,0x9089))
-			{
-				gradients_idx = x;
-			}
-			else if (sq.at(i).group_pointer == mdcm::Tag(0x0018,0x9341) &&
-				sq.at(i).index_pointer == mdcm::Tag(0x0018,0x9344))
-			{
-				contrast_idx = x;
-			}
-			else if (sq.at(i).group_pointer == mdcm::Tag(0x0040,0x9096) &&
-				sq.at(i).index_pointer == mdcm::Tag(0x0040,0x9210))
-			{
-				lut_label_idx = x;
-			}
-			else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
-				sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
-			{
-				plane_pos_idx = x;
-			}
-			else if (sq.at(i).group_pointer == mdcm::Tag(0x0018,0x9807) &&
-				sq.at(i).index_pointer == mdcm::Tag(0x0018,0x9808))
-			{
-				datatype_idx = x;
-			}
-			else if (sq.at(i).group_pointer == mdcm::Tag(0x0018,0x9226) &&
-				sq.at(i).index_pointer == mdcm::Tag(0x0008,0x9007))
-			{
-				mr_frame_type_idx = x;
-			}
-			else if (sq.at(i).group_pointer == mdcm::Tag(0x0018,0x9114) &&
-				sq.at(i).index_pointer == mdcm::Tag(0x0018,0x9082))
-			{
-				mr_eff_echo_idx = x;
-			}
-			else if (sq.at(i).group_pointer == mdcm::Tag(0x0062,0x000a) &&
-				sq.at(i).index_pointer == mdcm::Tag(0x0062,0x000b))
-			{
-				segment_idx = x;
-			}
+			stack_id_idx = x;
+		}
+		else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+			sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
+		{
+			in_stack_pos_idx = x;
+		}
+		else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9113) &&
+			sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x0032))
+		{
+			ipp_idx = x;
+		}
+		else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+			sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
+		{
+			temporal_pos_idx = x;
+		}
+		else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9310) &&
+			sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x930d))
+		{
+			temporal_off_idx = x;
+		}
+		else if (sq1.at(i).group_pointer == mdcm::Tag(0x0018,0x9117) &&
+			sq1.at(i).index_pointer == mdcm::Tag(0x0018,0x9087))
+		{
+			b_value_idx = x;
+		}
+		else if (sq1.at(i).group_pointer == mdcm::Tag(0x0018,0x9117) &&
+			sq1.at(i).index_pointer == mdcm::Tag(0x0018,0x9089))
+		{
+			gradients_idx = x;
+		}
+		else if (sq1.at(i).group_pointer == mdcm::Tag(0x0018,0x9341) &&
+			sq1.at(i).index_pointer == mdcm::Tag(0x0018,0x9344))
+		{
+			contrast_idx = x;
+		}
+		else if (sq1.at(i).group_pointer == mdcm::Tag(0x0040,0x9096) &&
+			sq1.at(i).index_pointer == mdcm::Tag(0x0040,0x9210))
+		{
+			lut_label_idx = x;
+		}
+		else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
+			sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
+		{
+			plane_pos_idx = x;
+		}
+		else if (sq1.at(i).group_pointer == mdcm::Tag(0x0018,0x9807) &&
+			sq1.at(i).index_pointer == mdcm::Tag(0x0018,0x9808))
+		{
+			datatype_idx = x;
+		}
+		else if (sq1.at(i).group_pointer == mdcm::Tag(0x0018,0x9226) &&
+			sq1.at(i).index_pointer == mdcm::Tag(0x0008,0x9007))
+		{
+			mr_frame_type_idx = x;
+		}
+		else if (sq1.at(i).group_pointer == mdcm::Tag(0x0018,0x9114) &&
+			sq1.at(i).index_pointer == mdcm::Tag(0x0018,0x9082))
+		{
+			mr_eff_echo_idx = x;
+		}
+		else if (sq1.at(i).group_pointer == mdcm::Tag(0x0062,0x000a) &&
+			sq1.at(i).index_pointer == mdcm::Tag(0x0062,0x000b))
+		{
+			segment_idx = x;
 		}
 	}
 	//
 	// Well-known combinations
 	//
 	// 3D
-	if (sq_size == 2 &&
+	if (sq1_size == 2 &&
 		in_stack_pos_idx >= 0 &&
 		stack_id_idx >= 0)
 	{
@@ -5021,23 +5092,23 @@ void DicomUtils::enhanced_get_indices(
 		*dim3rd = in_stack_pos_idx;
 		*enh_id = 1;
 	}
-	else if (sq_size == 1 && in_stack_pos_idx == 0)
+	else if (sq1_size == 1 && in_stack_pos_idx == 0)
 	{
 		*dim3rd = in_stack_pos_idx;
 		*enh_id = 2;
 	}
-	else if (sq_size == 1 && plane_pos_idx == 0)
+	else if (sq1_size == 1 && plane_pos_idx == 0)
 	{
 		*dim3rd = plane_pos_idx;
 		*enh_id = 3;
 	}
-	else if (sq_size == 1 && ipp_idx == 0)
+	else if (sq1_size == 1 && ipp_idx == 0)
 	{
 		*dim3rd = ipp_idx;
 		*enh_id = 4;
 	}
 	// Temporal
-	else if (sq_size == 3 &&
+	else if (sq1_size == 3 &&
 		stack_id_idx >= 0 &&
 		in_stack_pos_idx >= 0 &&
 		temporal_pos_idx >= 0)
@@ -5047,7 +5118,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim3rd = in_stack_pos_idx;
 		*enh_id = 5;
 	}
-	else if (sq_size == 3 &&
+	else if (sq1_size == 3 &&
 		stack_id_idx >= 0 &&
 		in_stack_pos_idx >= 0 &&
 		temporal_off_idx >= 0)
@@ -5057,7 +5128,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim3rd = in_stack_pos_idx;
 		*enh_id = 6;
 	}
-	else if (sq_size == 2 &&
+	else if (sq1_size == 2 &&
 		temporal_pos_idx >= 0 &&
 		stack_id_idx >= 0)
 	{
@@ -5065,7 +5136,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim3rd = temporal_pos_idx;
 		*enh_id = 7;
 	}
-	else if (sq_size == 2 &&
+	else if (sq1_size == 2 &&
 		temporal_off_idx >= 0 &&
 		stack_id_idx >= 0)
 	{
@@ -5073,7 +5144,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim3rd = temporal_off_idx;
 		*enh_id = 8;
 	}
-	else if (sq_size == 2 &&
+	else if (sq1_size == 2 &&
 		plane_pos_idx >= 0 &&
 		temporal_pos_idx >= 0)
 	{
@@ -5081,7 +5152,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim3rd = plane_pos_idx;
 		*enh_id = 9;
 	}
-	else if (sq_size == 2 &&
+	else if (sq1_size == 2 &&
 		plane_pos_idx >= 0 &&
 		temporal_off_idx >= 0)
 	{
@@ -5089,20 +5160,20 @@ void DicomUtils::enhanced_get_indices(
 		*dim3rd = plane_pos_idx;
 		*enh_id = 10;
 	}
-	else if (sq_size == 1 &&
+	else if (sq1_size == 1 &&
 		temporal_off_idx == 0)
 	{
 		*dim3rd = temporal_off_idx;
 		*enh_id = 11;
 	}
-	else if (sq_size == 1 &&
+	else if (sq1_size == 1 &&
 		temporal_pos_idx == 0)
 	{
 		*dim3rd = temporal_pos_idx;
 		*enh_id = 12;
 	}
 	// Data type
-	else if (sq_size == 3 &&
+	else if (sq1_size == 3 &&
 		temporal_off_idx >= 0 &&
 		plane_pos_idx >= 0 &&
 		datatype_idx >= 0)
@@ -5112,7 +5183,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim3rd = plane_pos_idx;
 		*enh_id = 13;
 	}
-	else if (sq_size == 3 &&
+	else if (sq1_size == 3 &&
 		temporal_pos_idx >= 0 &&
 		plane_pos_idx >= 0 &&
 		datatype_idx >= 0)
@@ -5122,7 +5193,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim3rd = plane_pos_idx;
 		*enh_id = 14;
 	}
-	else if (sq_size == 2 &&
+	else if (sq1_size == 2 &&
 		plane_pos_idx >= 0 &&
 		datatype_idx >= 0)
 	{
@@ -5131,7 +5202,7 @@ void DicomUtils::enhanced_get_indices(
 		*enh_id = 15;
 	}
 	// Contrast
-	else if (sq_size == 4 &&
+	else if (sq1_size == 4 &&
 		temporal_pos_idx >= 0 &&
 		in_stack_pos_idx >= 0 &&
 		stack_id_idx >= 0 &&
@@ -5143,7 +5214,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim3rd = in_stack_pos_idx;
 		*enh_id = 16;
 	}
-	else if (sq_size == 3 &&
+	else if (sq1_size == 3 &&
 		in_stack_pos_idx >= 0 &&
 		stack_id_idx >= 0 &&
 		contrast_idx >= 0)
@@ -5153,7 +5224,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim3rd = in_stack_pos_idx;
 		*enh_id = 17;
 	}
-	else if (sq_size == 2 &&
+	else if (sq1_size == 2 &&
 		in_stack_pos_idx >= 0 &&
 		contrast_idx >= 0)
 	{
@@ -5162,7 +5233,7 @@ void DicomUtils::enhanced_get_indices(
 		*enh_id = 18;
 	}
 	// MR frame type
-	else if (sq_size == 4 &&
+	else if (sq1_size == 4 &&
 		stack_id_idx >= 0 &&
 		in_stack_pos_idx >= 0 &&
 		temporal_pos_idx >= 0 &&
@@ -5174,7 +5245,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim3rd = in_stack_pos_idx;
 		*enh_id = 19;
 	}
-	else if (sq_size == 3 &&
+	else if (sq1_size == 3 &&
 		stack_id_idx >= 0 &&
 		in_stack_pos_idx >= 0 &&
 		mr_frame_type_idx >= 0)
@@ -5185,7 +5256,7 @@ void DicomUtils::enhanced_get_indices(
 		*enh_id = 20;
 	}
 	// MR eff. echo
-	else if (sq_size == 4 &&
+	else if (sq1_size == 4 &&
 		stack_id_idx >= 0 &&
 		in_stack_pos_idx >= 0 &&
 		temporal_pos_idx >= 0 &&
@@ -5197,7 +5268,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim3rd = in_stack_pos_idx;
 		*enh_id = 21;
 	}
-	else if (sq_size == 3 &&
+	else if (sq1_size == 3 &&
 		stack_id_idx >= 0 &&
 		in_stack_pos_idx >= 0 &&
 		mr_eff_echo_idx >= 0)
@@ -5208,7 +5279,7 @@ void DicomUtils::enhanced_get_indices(
 		*enh_id = 22;
 	}
 	// Diffusion
-	else if (sq_size == 4 &&
+	else if (sq1_size == 4 &&
 		stack_id_idx >= 0 &&
 		in_stack_pos_idx >= 0 &&
 		b_value_idx >= 0 &&
@@ -5220,7 +5291,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim3rd = in_stack_pos_idx;
 		*enh_id = 23;
 	}
-	else if (sq_size == 3 &&
+	else if (sq1_size == 3 &&
 		in_stack_pos_idx >= 0 &&
 		b_value_idx >= 0 &&
 		gradients_idx >= 0)
@@ -5230,7 +5301,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim3rd = in_stack_pos_idx;
 		*enh_id = 24;
 	}
-	else if (sq_size == 3 &&
+	else if (sq1_size == 3 &&
 		stack_id_idx >= 0 &&
 		in_stack_pos_idx >= 0 &&
 		gradients_idx >= 0)
@@ -5240,7 +5311,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim3rd = in_stack_pos_idx;
 		*enh_id = 25;
 	}
-	else if (sq_size == 3 &&
+	else if (sq1_size == 3 &&
 		b_value_idx >= 0 &&
 		in_stack_pos_idx >= 0 &&
 		stack_id_idx >= 0)
@@ -5251,7 +5322,7 @@ void DicomUtils::enhanced_get_indices(
 		*enh_id = 26;
 	}
 	// LUT
-	else if (sq_size == 4 &&
+	else if (sq1_size == 4 &&
 		stack_id_idx >= 0 &&
 		in_stack_pos_idx >= 0 &&
 		lut_label_idx >= 0 &&
@@ -5263,7 +5334,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim3rd = in_stack_pos_idx;
 		*enh_id = 27;
 	}
-	else if (sq_size == 3 &&
+	else if (sq1_size == 3 &&
 		in_stack_pos_idx >= 0 &&
 		lut_label_idx >= 0 &&
 		temporal_pos_idx >= 0)
@@ -5274,7 +5345,7 @@ void DicomUtils::enhanced_get_indices(
 		*enh_id = 28;
 	}
 	// Segmentation
-	else if (sq_size == 2 &&
+	else if (sq1_size == 2 &&
 		in_stack_pos_idx >= 0 &&
 		segment_idx >= 0)
 	{
@@ -5282,7 +5353,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim3rd = in_stack_pos_idx;
 		*enh_id = 29;
 	}
-	else if (sq_size == 2 &&
+	else if (sq1_size == 2 &&
 		ipp_idx >= 0 &&
 		segment_idx >= 0)
 	{
@@ -5290,7 +5361,7 @@ void DicomUtils::enhanced_get_indices(
 		*dim3rd = ipp_idx;
 		*enh_id = 30;
 	}
-	else if (sq_size >= 2 &&
+	else if (sq1_size >= 2 &&
 		segment_idx >= 0)
 	{
 		*dim4th = segment_idx;
@@ -5301,27 +5372,27 @@ void DicomUtils::enhanced_get_indices(
 	//
 	if (*enh_id < 0)
 	{
-		if (sq_size == 4)
+		if (sq1_size == 4)
 		{
 			if (stack_id_idx >= 0 && in_stack_pos_idx >= 0 &&
 				temporal_pos_idx >= 0)
 			{
 				int dim6th_tmp = -1;
-				for (int x = 0; x < sq_size; ++x)
+				for (int x = 0; x < sq1_size; ++x)
 				{
 					const size_t i = static_cast<size_t>(x);
-					if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
+					if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
 					{
 						;;
 					}
-					else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
+					else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
 					{
 						;;
 					}
-					else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
+					else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
 					{
 						;;
 					}
@@ -5341,21 +5412,21 @@ void DicomUtils::enhanced_get_indices(
 				temporal_off_idx >= 0)
 			{
 				int dim6th_tmp = -1;
-				for (int x = 0; x < sq_size; ++x)
+				for (int x = 0; x < sq1_size; ++x)
 				{
 					const size_t i = static_cast<size_t>(x);
-					if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
+					if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
 					{
 						;;
 					}
-					else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
+					else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
 					{
 						;;
 					}
-					else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9310) &&
-						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x930d))
+					else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9310) &&
+						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x930d))
 					{
 						;;
 					}
@@ -5375,16 +5446,16 @@ void DicomUtils::enhanced_get_indices(
 			{
 				int dim6th_tmp = -1;
 				int dim5th_tmp = -1;
-				for (int x = 0; x < sq_size; ++x)
+				for (int x = 0; x < sq1_size; ++x)
 				{
 					const size_t i = static_cast<size_t>(x);
-					if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
+					if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
 					{
 						;;
 					}
-					else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
+					else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
 					{
 						;;
 					}
@@ -5396,16 +5467,16 @@ void DicomUtils::enhanced_get_indices(
 				}
 				if (dim6th_tmp >= 0)
 				{
-					for (int x = 0; x < sq_size; ++x)
+					for (int x = 0; x < sq1_size; ++x)
 					{
 						const size_t i = static_cast<size_t>(x);
-						if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-							sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
+						if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+							sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
 						{
 							;;
 						}
-						else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-							sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
+						else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+							sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
 						{
 							;;
 						}
@@ -5430,16 +5501,16 @@ void DicomUtils::enhanced_get_indices(
 			{
 				int dim6th_tmp = -1;
 				int dim5th_tmp = -1;
-				for (int x = 0; x < sq_size; ++x)
+				for (int x = 0; x < sq1_size; ++x)
 				{
 					const size_t i = static_cast<size_t>(x);
-					if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
+					if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
 					{
 						;;
 					}
-					else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
-						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
+					else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
+						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
 					{
 						;;
 					}
@@ -5451,16 +5522,16 @@ void DicomUtils::enhanced_get_indices(
 				}
 				if (dim6th_tmp >= 0)
 				{
-					for (int x = 0; x < sq_size; ++x)
+					for (int x = 0; x < sq1_size; ++x)
 					{
 						const size_t i = static_cast<size_t>(x);
-						if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-							sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
+						if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+							sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
 						{
 							;;
 						}
-						else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
-							sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
+						else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
+							sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
 						{
 							;;
 						}
@@ -5484,16 +5555,16 @@ void DicomUtils::enhanced_get_indices(
 			{
 				int dim6th_tmp = -1;
 				int dim5th_tmp = -1;
-				for (int x = 0; x < sq_size; ++x)
+				for (int x = 0; x < sq1_size; ++x)
 				{
 					const size_t i = static_cast<size_t>(x);
-					if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
-						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
+					if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
+						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
 					{
 						;;
 					}
-					else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9310) &&
-						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x930d))
+					else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9310) &&
+						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x930d))
 					{
 						;;
 					}
@@ -5505,16 +5576,16 @@ void DicomUtils::enhanced_get_indices(
 				}
 				if (dim6th_tmp >= 0)
 				{
-					for (int x = 0; x < sq_size; ++x)
+					for (int x = 0; x < sq1_size; ++x)
 					{
 						const size_t i = static_cast<size_t>(x);
-						if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
-							sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
+						if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
+							sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
 						{
 							;;
 						}
-						else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9310) &&
-							sq.at(i).index_pointer == mdcm::Tag(0x0020,0x930d))
+						else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9310) &&
+							sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x930d))
 						{
 							;;
 						}
@@ -5535,21 +5606,21 @@ void DicomUtils::enhanced_get_indices(
 				*enh_id = 995;
 			}
 		}
-		else if (sq_size == 3)
+		else if (sq1_size == 3)
 		{
 			if (stack_id_idx >= 0 && in_stack_pos_idx >= 0)
 			{
 				int dim5th_tmp = -1;
-				for (int x = 0; x < sq_size; ++x)
+				for (int x = 0; x < sq1_size; ++x)
 				{
 					const size_t i = x;
-					if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
+					if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
 					{
 						;;
 					}
-					else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
+					else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
 					{
 						;;
 					}
@@ -5567,16 +5638,16 @@ void DicomUtils::enhanced_get_indices(
 			else if (plane_pos_idx >= 0 && temporal_pos_idx >= 0)
 			{
 				int dim5th_tmp = -1;
-				for (int x = 0; x < sq_size; ++x)
+				for (int x = 0; x < sq1_size; ++x)
 				{
 					const size_t i = static_cast<size_t>(x);
-					if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
+					if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
 					{
 						;;
 					}
-					else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
-						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
+					else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
+						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
 					{
 						;;
 					}
@@ -5594,16 +5665,16 @@ void DicomUtils::enhanced_get_indices(
 			else if (plane_pos_idx >= 0 && temporal_off_idx >= 0)
 			{
 				int dim5th_tmp = -1;
-				for (int x = 0; x < sq_size; ++x)
+				for (int x = 0; x < sq1_size; ++x)
 				{
 					const size_t i = static_cast<size_t>(x);
-					if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9310) &&
-						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x930d))
+					if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9310) &&
+						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x930d))
 					{
 						;;
 					}
-					else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
-						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
+					else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
+						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
 					{
 						;;
 					}
@@ -5619,16 +5690,16 @@ void DicomUtils::enhanced_get_indices(
 				*enh_id = 992;
 			}
 		}
-		else if (sq_size == 2)
+		else if (sq1_size == 2)
 		{
 			if (ipp_idx >= 0)
 			{
 				int dim4th_tmp = -1;
-				for (int x = 0; x < sq_size; ++x)
+				for (int x = 0; x < sq1_size; ++x)
 				{
 					const size_t i = static_cast<size_t>(x);
-					if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9113) &&
-						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x0032))
+					if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9113) &&
+						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x0032))
 					{
 						;;
 					}
@@ -5645,11 +5716,11 @@ void DicomUtils::enhanced_get_indices(
  			else if (in_stack_pos_idx >= 0)
 			{
 				int dim4th_tmp = -1;
-				for (int x = 0; x < sq_size; ++x)
+				for (int x = 0; x < sq1_size; ++x)
 				{
 					const size_t i = static_cast<size_t>(x);
-					if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
+					if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
 					{
 						;;
 					}
@@ -5666,11 +5737,11 @@ void DicomUtils::enhanced_get_indices(
 			else if (plane_pos_idx >= 0)
 			{
 				int dim4th_tmp = -1;
-				for (int x = 0; x < sq_size; ++x)
+				for (int x = 0; x < sq1_size; ++x)
 				{
 					const size_t i = static_cast<size_t>(x);
-					if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
-						sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
+					if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
+						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
 					{
 						;;
 					}
@@ -5686,10 +5757,16 @@ void DicomUtils::enhanced_get_indices(
 			}
 		}
 	}
-	//
+#ifdef ENHANCED_PRINT_INFO
 	if (*enh_id < 0)
 	{
-		switch(sq_size)
+		std::cout << "Could not use known combination" << std::endl;
+	}
+#endif
+strict:
+	if (*enh_id < 0)
+	{
+		switch(sq1_size)
 		{
 		case 4:
 			*dim3rd = 3;
@@ -6231,12 +6308,17 @@ QString DicomUtils::read_enhanced(
 	const QString & f,
 	std::vector<ImageVariant*> & ivariants,
 	int max_3d_tex_size, GLWidget * gl, bool ok3d,
-	bool min_load,
-	bool enh_original_frames,
+	const bool min_load,
+	const short enh_loading_type,
 	const QWidget * settings, QProgressDialog * pb,
-	float tolerance,
-	bool apply_rescale)
+	const float tolerance,
+	const bool apply_rescale)
 {
+#ifdef ENHANCED_PRINT_INFO
+#if 1
+	std::cout << "EnhancedIODLoadingType = " << enh_loading_type << std::endl;
+#endif
+#endif
 	*ok = false;
 	QString message_;
 	if (!settings) return QString("settings==NULL");
@@ -6245,6 +6327,8 @@ QString DicomUtils::read_enhanced(
 	std::vector<char*> data;
 	DimIndexSq sq;
 	DimIndexValues idx_values;
+	const EnhancedIODLoadingType loading_type =
+		static_cast<EnhancedIODLoadingType>(enh_loading_type);
 	FrameGroupValues values;
 	FrameGroupValues shared_values;
 	ImageOverlays image_overlays;
@@ -6348,9 +6432,10 @@ QString DicomUtils::read_enhanced(
 	double spacing_x_read, spacing_y_read, spacing_z_read;
 	double unsused0 = 0.0, unsused1 = 1.0;
 	AnatomyMap empty_;
-	// do not use GDCM's rescale for enhanced, except for US
+	// do not use MDCM's rescale for enhanced, except for US, PA
 	const bool rescale_tmp =
-		(sop==QString("1.2.840.10008.5.1.4.1.1.6.2"))
+		(sop==QString("1.2.840.10008.5.1.4.1.1.6.2") ||
+			sop==QString("1.2.840.10008.5.1.2.3.45")) // FIXME
 		? wsettings->get_rescale()
 		: false;
 	message_ =
@@ -6367,7 +6452,7 @@ QString DicomUtils::read_enhanced(
 			&spacing_x_read, &spacing_y_read, &spacing_z_read,
 			dircos_read,
 			&unsused0,
-			&unsused1, // GDCM's rescale, unused
+			&unsused1, // MDCM's rescale, unused
 			clean_unused_bits,
 			false, false, false,
 			false,
@@ -6412,58 +6497,70 @@ QString DicomUtils::read_enhanced(
 	int dim4th = -1;
 	int dim3rd = -1;
 	int enh_id = -1;
-	if (!enh_original_frames && !idx_values.empty() && !values.empty())
+	if (loading_type == EnhancedIODLoadingType::PreferUniformVolumes ||
+		loading_type == EnhancedIODLoadingType::StrictMultipleImages ||
+		loading_type == EnhancedIODLoadingType::StrictSingleImage)
 	{
-		enhanced_get_indices(
-			sq,
-			&dim6th, &dim5th, &dim4th, &dim3rd,
-			&enh_id);
-	}
-	else if (!enh_original_frames && idx_values.empty() && !values.empty())
-	{
-		// stack id/position number without dimension organisation?
-		// try to re-build
-		bool idx_values_rebuild = false;
-		bool tmp12 = false;
-		DimIndexValues idx_values_tmp;
-		for (unsigned int x = 0; x < values.size(); ++x)
+		if (!idx_values.empty())
 		{
-			if (!(
-				values.at(x).stack_id_ok &&
-				values.at(x).in_stack_pos_num_ok))
-			{
-				tmp12 = true;
-				break;
-			}
+			enhanced_get_indices(
+				sq,
+				&dim6th, &dim5th, &dim4th, &dim3rd,
+				&enh_id,
+				enh_loading_type);
 		}
-		if (!tmp12)
+		else
 		{
-			for (unsigned int x = 0; x < values.size(); ++x)
+			// stack id/position number without dimension organisation?
+			// try to re-build
+			bool idx_values_rebuild = false;
+			bool tmp12 = false;
+			DimIndexValues idx_values_tmp;
+			const size_t values_size = values.size();
+			if (values_size == 2)
 			{
-				DimIndexValue tmp13;
-				tmp13.id = values.at(x).id;
-				tmp13.idx.push_back(values.at(x).stack_id);
-				tmp13.idx.push_back(values.at(x).in_stack_pos_num);
-				idx_values_tmp.push_back(tmp13);
+				for (unsigned int x = 0; x < values_size; ++x)
+				{
+					if (!(
+						values.at(x).stack_id_ok &&
+						values.at(x).in_stack_pos_num_ok))
+					{
+						tmp12 = true;
+						break;
+					}
+				}
 			}
-			for (unsigned int x = 0; x < idx_values_tmp.size(); ++x)
+			if (!tmp12)
 			{
-				idx_values.push_back(idx_values_tmp[x]);
-			}
-			idx_values_tmp.clear();
-			idx_values_rebuild = true;
+				for (unsigned int x = 0; x < values_size; ++x)
+				{
+					DimIndexValue tmp13;
+					tmp13.id = values.at(x).id;
+					tmp13.idx.push_back(values.at(x).stack_id);
+					tmp13.idx.push_back(values.at(x).in_stack_pos_num);
+					idx_values_tmp.push_back(tmp13);
+				}
+				for (unsigned int x = 0; x < idx_values_tmp.size(); ++x)
+				{
+					idx_values.push_back(idx_values_tmp[x]);
+				}
+				idx_values_tmp.clear();
+				idx_values_rebuild = true;
 #ifdef ENHANCED_PRINT_INFO
-			if (!min_load)
-				std::cout
-					<< "stack id and position without dim. org."
-					<< std::endl;
+				if (!min_load)
+				{
+					std::cout
+						<< "Using Stack ID and In-stack Position without Dimension Organization SQ"
+						<< std::endl;
+				}
 #endif
-		}
-		if (idx_values_rebuild)
-		{
-			enh_id = 0;
-			dim4th = 0;
-			dim3rd = 1;
+			}
+			if (idx_values_rebuild)
+			{
+				enh_id = 0;
+				dim4th = 0;
+				dim3rd = 1;
+			}
 		}
 	}
 #ifdef ENHANCED_PRINT_INFO
@@ -6496,7 +6593,8 @@ QString DicomUtils::read_enhanced(
 		apply_rescale,
 		(use_icc && icc_ok),
 		pb,
-		tolerance);
+		tolerance,
+		enh_loading_type);
 #ifdef ENHANCED_PRINT_INFO
 	if (!min_load && !message_.isEmpty())
 		std::cout << message_.toStdString() << std::endl;
@@ -6530,7 +6628,8 @@ QString DicomUtils::read_enhanced(
 			apply_rescale,
 			(use_icc && icc_ok),
 			pb,
-			tolerance);
+			tolerance,
+			0);
 	}
 	*ok = tmp17;
 	for (unsigned int x = 0; x < data.size(); ++x)
@@ -6546,11 +6645,16 @@ QString DicomUtils::read_enhanced_supp_palette(
 	const QString & f,
 	std::vector<ImageVariant*> & ivariants,
 	int max_3d_tex_size, GLWidget * gl, bool ok3d,
-	bool min_load,
-	bool enh_original_frames,
+	const bool min_load,
+	const short enh_loading_type,
 	const QWidget * settings, QProgressDialog * pb,
-	float tolerance)
+	const float tolerance)
 {
+#ifdef ENHANCED_PRINT_INFO
+#if 1
+	std::cout << "EnhancedIODLoadingType = " << enh_loading_type << std::endl;
+#endif
+#endif
 	*ok = false;
 	QString message_;
 	if (!settings) return QString("settings==NULL");
@@ -6559,6 +6663,8 @@ QString DicomUtils::read_enhanced_supp_palette(
 	std::vector<char*> data;
 	DimIndexSq sq;
 	DimIndexValues idx_values;
+	const EnhancedIODLoadingType loading_type =
+		static_cast<EnhancedIODLoadingType>(enh_loading_type);
 	FrameGroupValues values;
 	FrameGroupValues shared_values;
 	ImageOverlays image_overlays; // unused
@@ -6662,7 +6768,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 	int red_subscript = INT_MIN;
 	bool icc_ok_dummy = false;
 	AnatomyMap empty_;
-	// do not use GDCM's rescale for enhanced, except for US
+	// do not use MDCM's rescale for enhanced
 	message_ =
 		read_buffer(
 			ok, data,
@@ -6677,7 +6783,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 			&spacing_x_read, &spacing_y_read, &spacing_z_read,
 			dircos_read,
 			&unsused0,
-			&unsused1, // GDCM's rescale, unused
+			&unsused1, // MDCM's rescale, unused
 			clean_unused_bits,
 			false, false, false,
 			true,
@@ -6725,58 +6831,70 @@ QString DicomUtils::read_enhanced_supp_palette(
 	int dim4th = -1;
 	int dim3rd = -1;
 	int enh_id = -1;
-	if (!enh_original_frames && !idx_values.empty() && !values.empty())
+	if (loading_type == EnhancedIODLoadingType::PreferUniformVolumes ||
+		loading_type == EnhancedIODLoadingType::StrictMultipleImages ||
+		loading_type == EnhancedIODLoadingType::StrictSingleImage)
 	{
-		enhanced_get_indices(
-			sq,
-			&dim6th, &dim5th, &dim4th, &dim3rd,
-			&enh_id);
-	}
-	else if (!enh_original_frames && idx_values.empty() && !values.empty())
-	{
-		// stack id/position number without dimension organisation?
-		// try to re-build
-		bool idx_values_rebuild = false;
-		bool tmp12 = false;
-		DimIndexValues idx_values_tmp;
-		for (unsigned int x = 0; x < values.size(); ++x)
+		if (!idx_values.empty())
 		{
-			if (!(
-				values.at(x).stack_id_ok &&
-				values.at(x).in_stack_pos_num_ok))
-			{
-				tmp12 = true;
-				break;
-			}
+			enhanced_get_indices(
+				sq,
+				&dim6th, &dim5th, &dim4th, &dim3rd,
+				&enh_id,
+				enh_loading_type);
 		}
-		if (!tmp12)
+		else
 		{
-			for (unsigned int x = 0; x < values.size(); ++x)
+			// stack id/position number without dimension organisation?
+			// try to re-build
+			bool idx_values_rebuild = false;
+			bool tmp12 = false;
+			DimIndexValues idx_values_tmp;
+			const size_t values_size = values.size();
+			if (values_size == 2)
 			{
-				DimIndexValue tmp13;
-				tmp13.id = values.at(x).id;
-				tmp13.idx.push_back(values.at(x).stack_id);
-				tmp13.idx.push_back(values.at(x).in_stack_pos_num);
-				idx_values_tmp.push_back(tmp13);
+				for (unsigned int x = 0; x < values_size; ++x)
+				{
+					if (!(
+						values.at(x).stack_id_ok &&
+						values.at(x).in_stack_pos_num_ok))
+					{
+						tmp12 = true;
+						break;
+					}
+				}
 			}
-			for (unsigned int x = 0; x < idx_values_tmp.size(); ++x)
+			if (!tmp12)
 			{
-				idx_values.push_back(idx_values_tmp[x]);
-			}
-			idx_values_tmp.clear();
-			idx_values_rebuild = true;
+				for (unsigned int x = 0; x < values_size; ++x)
+				{
+					DimIndexValue tmp13;
+					tmp13.id = values.at(x).id;
+					tmp13.idx.push_back(values.at(x).stack_id);
+					tmp13.idx.push_back(values.at(x).in_stack_pos_num);
+					idx_values_tmp.push_back(tmp13);
+				}
+				for (unsigned int x = 0; x < idx_values_tmp.size(); ++x)
+				{
+					idx_values.push_back(idx_values_tmp[x]);
+				}
+				idx_values_tmp.clear();
+				idx_values_rebuild = true;
 #ifdef ENHANCED_PRINT_INFO
-			if (!min_load)
-				std::cout
-					<< "stack id and position without dim. org."
-					<< std::endl;
+				if (!min_load)
+				{
+					std::cout
+						<< "Using Stack ID and In-stack Position without Dimension Organization SQ"
+						<< std::endl;
+				}
 #endif
-		}
-		if (idx_values_rebuild)
-		{
-			enh_id = 0;
-			dim4th = 0;
-			dim3rd = 1;
+			}
+			if (idx_values_rebuild)
+			{
+				enh_id = 0;
+				dim4th = 0;
+				dim3rd = 1;
+			}
 		}
 	}
 #ifdef ENHANCED_PRINT_INFO
@@ -6809,7 +6927,8 @@ QString DicomUtils::read_enhanced_supp_palette(
 		false,
 		false,
 		pb,
-		tolerance);
+		tolerance,
+		enh_loading_type);
 #ifdef ENHANCED_PRINT_INFO
 	if (!min_load && !message_.isEmpty())
 	{
@@ -6847,10 +6966,11 @@ QString DicomUtils::read_enhanced_supp_palette(
 			false,
 			false,
 			pb,
-			tolerance);
+			tolerance,
+			0);
 	}
 	*ok = tmp17;
-	for (unsigned int x=0; x < data.size(); ++x)
+	for (unsigned int x = 0; x < data.size(); ++x)
 	{
 		delete [] data[x];
 	}
@@ -6866,9 +6986,14 @@ QString DicomUtils::read_ultrasound(
 	if (!ok) return QString("read_ultrasound : error (1)");
 	*ok = false;
 	const bool overwrite_mdcm_spacing = true;
-	if (!ivariant) return QString("ivariant==NULL");
-	if (!settings) return QString("settings==NULL");
-	if (images_ipp.size() != 1) return QString("read_ultrasound reads 1 image");
+	if (!ivariant)
+	{
+		return QString("ivariant==NULL");
+	}
+	if (images_ipp.size() != 1)
+	{
+		return QString("read_ultrasound reads 1 image");
+	}
 	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
 	const SettingsWidget * wsettings =
@@ -9868,7 +9993,7 @@ QString DicomUtils::read_enhanced_common(
 	const bool apply_rescale,
 	const bool use_icc,
 	QProgressDialog * pb,
-	float tolerance)
+	const float tolerance)
 {
 #if 0
 	std::cout << "common: red_subscript = " << red_subscript << std::endl;
@@ -9885,8 +10010,7 @@ QString DicomUtils::read_enhanced_common(
 			*ok = false;
 			return QString("read_enhanced_common error (01)");
 		}
-		for (
-			std::map<
+		for (std::map<
 				unsigned int,
 				unsigned int,
 				std::less<unsigned int> >::const_iterator
@@ -9924,14 +10048,13 @@ QString DicomUtils::read_enhanced_common(
 		ImageOverlays overlays;
 		unsigned int j = 0;
 #ifdef ENHANCED_PRINT_INFO
-		if (!min_load) std::cout << " Indices:";
+		if (!min_load) std::cout << " Indices: ";
 #endif
 		std::map<
 			unsigned int,
 			unsigned int,
 			std::less<unsigned int> > tmp1;
-		for (
-			std::map<
+		for (std::map<
 				unsigned int,
 				unsigned int,
 				std::less<unsigned int> >::const_iterator
@@ -9939,16 +10062,19 @@ QString DicomUtils::read_enhanced_common(
 		{
 			tmp1[it->second] = it->first;
 		}
-		if (tmp0.at(x).size()!=tmp1.size())
+		if (tmp0.at(x).size() != tmp1.size())
 		{
 			error = true;
 			tmp4_ok = false;
 			*ok = false;
-			message_ = QString("tmp0.at(x).size()!=tmp1.size()");
+			message_ = QString("tmp0.at(x).size() != tmp1.size(), ") +
+				QVariant(static_cast<qulonglong>(tmp0.at(x).size())).toString() +
+				QString(" != ") +
+				QVariant(static_cast<qulonglong>(tmp1.size())).toString();
 #ifdef ENHANCED_PRINT_INFO
 			if (!min_load)
 			{
-				std::cout << " tmp0.at(x).size()!=tmp1.size()";
+				std::cout << message_.toStdString();
 			}
 #endif
 			tmp1.clear();
@@ -9968,13 +10094,13 @@ QString DicomUtils::read_enhanced_common(
 					<< "[" << idx__ << "]";
 			}
 #endif
-			if (idx__<data.size() &&
+			if (idx__ < data.size() &&
 				data.at(idx__) &&
-				idx__<values.size())
+				idx__ < values.size())
 			{
 				tmp3.push_back(data.at(idx__));
-				if (sop==QString("1.2.840.10008.5.1.4.1.1.6.2") // Enhanced US
-					|| sop==QString("1.2.840.10008.5.1.2.3.45") // FIXME Temporary PA!
+				if (sop == QString("1.2.840.10008.5.1.4.1.1.6.2") || // Enhanced US
+					sop == QString("1.2.840.10008.5.1.2.3.45") // FIXME
 				)
 				{
 					if (values.at(idx__).vol_pos_ok &&
@@ -10072,7 +10198,6 @@ QString DicomUtils::read_enhanced_common(
 					overlays.all_overlays[it->first] =
 						image_overlays.all_overlays.value(idx__);
 				}
-				//
 				++j;
 			}
 			else
@@ -10088,7 +10213,6 @@ QString DicomUtils::read_enhanced_common(
 #ifdef ENHANCED_PRINT_INFO
 		if (!min_load) std::cout << std::endl;
 #endif
-		//
 		if (!error)
 		{
 			bool   geom_ok = false;
@@ -10141,7 +10265,7 @@ QString DicomUtils::read_enhanced_common(
 				{
 					const mdcm::File & rfile = reader.GetFile();
 					const mdcm::DataSet & ds = rfile.GetDataSet();
-					if (sop == QString("1.2.840.10008.5.1.4.1.1.6.2"))
+					if (sop == QString("1.2.840.10008.5.1.4.1.1.6.2")) // TODO probably should not be present
 					{
 						read_us_regions(ds, ivariant);
 					}
@@ -10415,7 +10539,7 @@ QString DicomUtils::read_enhanced_common(
 						}
 					}
 				}
-				/////////////////////
+				//
 				const int tmp1c_size = tmp1c.size();
 				if (tmp1c_size > 0)
 				{
@@ -10463,7 +10587,8 @@ QString DicomUtils::read_enhanced_common(
 				(apply_rescale)
 				? wsettings->get_rescale()
 				: true;
-			if (sop==QString("1.2.840.10008.5.1.4.1.1.6.2")) // US
+			if (sop==QString("1.2.840.10008.5.1.4.1.1.6.2") || // US
+				sop==QString("1.2.840.10008.5.1.2.3.45")) // FIXME
 			{
 				message_ = CommonUtils::gen_itk_image(ok,
 					tmp3,
@@ -10495,7 +10620,7 @@ QString DicomUtils::read_enhanced_common(
 			}
 			else
 			{
-				// GDCM can not read rescale from per frame groups
+				// MDCM can not read rescale from per frame groups
 				const bool rescale_tmp =
 					(!apply_rescale || pixelformat.GetSamplesPerPixel() > 1)
 					? false : wsettings->get_rescale();
@@ -10640,8 +10765,7 @@ QString DicomUtils::read_enhanced_common(
 						ivariant->di->transparency = false;
 					ivariant->di->filtering = 0;
 				}
-				if (
-					sop==QString("1.2.840.10008.5.1.4.1.1.4.1") || // Enhanced MR
+				if (sop==QString("1.2.840.10008.5.1.4.1.1.4.1") || // Enhanced MR
 					sop==QString("1.2.840.10008.5.1.4.1.1.2.1") || // Enhanced CT
 					sop==QString("1.2.840.10008.5.1.4.1.1.130") || // Enhanced PET
 					sop==QString("1.2.840.10008.5.1.4.1.1.2.2") || // Legacy CT
@@ -10686,15 +10810,20 @@ bool DicomUtils::enhanced_process_indices(
 	std::vector< std::map< unsigned int,unsigned int,std::less<unsigned int> > > & tmp0,
 	const DimIndexValues & idx_values, const FrameGroupValues & values,
 	const int dim6th, const int dim5th, const int dim4th, const int dim3rd,
-	bool sort_ippiop)
+	const short enh_loading_type)
 {
 	bool error = false;
 	std::list<unsigned int> tmp1_1;
 	std::list<unsigned int> tmp1_2;
 	std::list<unsigned int> tmp1_3;
-	if (dim6th>=0)
+	const EnhancedIODLoadingType loading_type =
+		static_cast<EnhancedIODLoadingType>(enh_loading_type);
+	const size_t idx_values_size = idx_values.size();
+	std::vector< std::map< unsigned int,unsigned int,std::less<unsigned int> > > tmp0single;
+	//
+	if (dim6th >= 0)
 	{
-		for (unsigned int x = 0; x < idx_values.size(); ++x)
+		for (unsigned int x = 0; x < idx_values_size; ++x)
 		{
 			tmp1_1.push_back(idx_values.at(x).idx.at(dim6th));
 		}
@@ -10705,9 +10834,9 @@ bool DicomUtils::enhanced_process_indices(
 	{
 		tmp1_1.push_back(1);
 	}
-	if (dim5th>=0)
+	if (dim5th >= 0)
 	{
-		for (unsigned int x = 0; x < idx_values.size(); ++x)
+		for (unsigned int x = 0; x < idx_values_size; ++x)
 		{
 			tmp1_2.push_back(idx_values.at(x).idx.at(dim5th));
 		}
@@ -10718,9 +10847,9 @@ bool DicomUtils::enhanced_process_indices(
 	{
 		tmp1_2.push_back(1);
 	}
-	if (dim4th>=0)
+	if (dim4th >= 0)
 	{
-		for (unsigned int x = 0; x < idx_values.size(); ++x)
+		for (unsigned int x = 0; x < idx_values_size; ++x)
 		{
 			tmp1_3.push_back(idx_values.at(x).idx.at(dim4th));
 		}
@@ -10731,8 +10860,18 @@ bool DicomUtils::enhanced_process_indices(
 	{
 		tmp1_3.push_back(1);
 	}
-	if (!idx_values.empty())
+	//
+	if (loading_type == EnhancedIODLoadingType::PreferUniformVolumes ||
+		loading_type == EnhancedIODLoadingType::StrictMultipleImages ||
+		loading_type == EnhancedIODLoadingType::StrictSingleImage)
 	{
+#ifdef ENHANCED_PRINT_INFO
+		if (idx_values_size < 1)
+		{
+			std::cout << "Internal error in enhanced_process_indices: idx_values_size < 1"
+				<< std::endl;
+		}
+#endif
 		for (
 			std::list<unsigned int>::const_iterator it1 = tmp1_1.cbegin();
 			it1 != tmp1_1.cend();
@@ -10750,7 +10889,7 @@ bool DicomUtils::enhanced_process_indices(
 				{
 					std::map< unsigned int,unsigned int,std::less<unsigned int> > tmp2;
 					std::list<unsigned int> tmp2_test;
-					for (unsigned int x = 0; x < idx_values.size(); ++x)
+					for (unsigned int x = 0; x < idx_values_size; ++x)
 					{
 						const int idx1 =
 							dim6th >= 0 && dim6th < static_cast<int>(idx_values.at(x).idx.size())
@@ -10769,19 +10908,18 @@ bool DicomUtils::enhanced_process_indices(
 							? idx_values.at(x).idx.at(dim3rd)
 							: -1;
 						if (
-							(idx1<0 || idx1==static_cast<int>(*it1)) &&
-							(idx2<0 || idx2==static_cast<int>(*it2)) &&
-							(idx3<0 || idx3==static_cast<int>(*it3)))
+							(idx1 < 0 || idx1 == static_cast<int>(*it1)) &&
+							(idx2 < 0 || idx2 == static_cast<int>(*it2)) &&
+							(idx3 < 0 || idx3 == static_cast<int>(*it3)))
 						{
-							if (idx4<0)
+							if (idx4 < 0)
 							{
 								tmp2[idx_values.at(x).id] = idx_values.at(x).id;
 								tmp2_test.push_back(idx_values.at(x).id);
 							}
 							else
 							{
-								unsigned int tmp2_pos =
-									idx_values.at(x).idx.at(dim3rd);
+								unsigned int tmp2_pos = idx_values.at(x).idx.at(dim3rd);
 								if (tmp2_pos >= 1)
 								{
 									tmp2_pos -= 1;
@@ -10803,10 +10941,10 @@ bool DicomUtils::enhanced_process_indices(
 						tmp2_test.sort();
 						tmp2_test.unique();
 						const size_t tmp2_test_size1 = tmp2_test.size();
-						if (tmp2_test_size0!=tmp2_test_size1) error = true;
+						if (tmp2_test_size0 != tmp2_test_size1) error = true;
 						if (error) break;
 					}
-					if (sort_ippiop)
+					if (loading_type == EnhancedIODLoadingType::PreferUniformVolumes)
 					{
 						std::map< unsigned int,unsigned int,std::less<unsigned int> > tmp3;
 						const bool ok_sort = sort_frames_ippiop(tmp2, tmp3, values);
@@ -10819,21 +10957,46 @@ bool DicomUtils::enhanced_process_indices(
 							tmp0.push_back(tmp2);
 						}
 					}
-					else
+					else if (loading_type == EnhancedIODLoadingType::StrictMultipleImages)
 					{
 						tmp0.push_back(tmp2);
+					}
+					else if (loading_type == EnhancedIODLoadingType::StrictSingleImage)
+					{
+						tmp0single.push_back(tmp2);
 					}
 				}
 				if (error) break;
 			}
 			if (error) break;
 		}
+		//
+		if (loading_type == EnhancedIODLoadingType::StrictSingleImage)
+		{
+			unsigned int j = 0;
+			std::map< unsigned int,unsigned int,std::less<unsigned int> > tmp;
+			for (size_t x = 0; x < tmp0single.size(); ++x)
+			{
+				std::map< unsigned int,unsigned int,std::less<unsigned int> >::const_iterator it =
+					tmp0single.at(x).cbegin();
+				while (it != tmp0single.at(x).cend())
+				{
+					tmp[it->first] = j;
+					++j;
+					++it;
+				}
+			}
+			tmp0.push_back(tmp);
+		}
 	}
 	else
 	{
 		std::map< unsigned int,unsigned int,std::less<unsigned int> > tmp2;
-		for (unsigned int x = 0; x < values.size(); ++x) tmp2[x] = x;
-		if (sort_ippiop)
+		for (unsigned int x = 0; x < values.size(); ++x)
+		{
+			tmp2[x] = x;
+		}
+		if (loading_type != EnhancedIODLoadingType::SkipDimensionOrganization)
 		{
 			std::map< unsigned int,unsigned int,std::less<unsigned int> > tmp3;
 			const bool ok_sort = sort_frames_ippiop(tmp2, tmp3, values);
@@ -10851,6 +11014,22 @@ bool DicomUtils::enhanced_process_indices(
 			tmp0.push_back(tmp2);
 		}
 	}
+#ifdef ENHANCED_PRINT_INFO
+#if 1
+	{
+		for (int x = 0; x < tmp0.size(); ++x)
+		{
+			std::map< unsigned int,unsigned int,std::less<unsigned int> >::const_iterator it =
+				tmp0.at(x).cbegin();
+			while (it != tmp0.at(x).cend())
+			{
+				std::cout << "x=" << x << " [" << it->first << "]=" << it->second << std::endl;
+				++it;
+			}
+		}
+	}
+#endif
+#endif
 	return !error;
 }
 
@@ -10877,16 +11056,17 @@ QString DicomUtils::read_enhanced_3d_6d(
 	const bool apply_rescale,
 	const bool use_icc,
 	QProgressDialog * pb,
-	float tolerance)
+	const float tolerance,
+	const short enh_loading_type)
 {
 	QString message_ ;
 	std::vector< std::map< unsigned int,unsigned int,std::less<unsigned int> > > tmp0;
 	const SettingsWidget * wsettings = static_cast<const SettingsWidget*>(settings);
-	const bool sort_ippiop = wsettings->get_sort_frames();
 	*ok = enhanced_process_indices(
 		tmp0, idx_values, values,
-		dim6th, dim5th, dim4th, dim3rd, sort_ippiop);
+		dim6th, dim5th, dim4th, dim3rd, enh_loading_type);
 	if (*ok)
+	{
 		message_ = read_enhanced_common(
 			ok,
 			ivariants,
@@ -10909,8 +11089,11 @@ QString DicomUtils::read_enhanced_3d_6d(
 			use_icc,
 			pb,
 			tolerance);
+	}
 	else
-		message_ = QString("Can not build indices");
+	{
+		message_ = QString("Can not build indices for enhanced IOD");
+	}
 	return message_;
 }
 
@@ -11315,7 +11498,7 @@ bool DicomUtils::process_contrours_ref(
 	const QString & path,
 	std::vector<ImageVariant*> & tmp_ivariants,
 	int max_3d_tex_size, GLWidget * gl, bool ok3d,
-	bool enh_original_frames,
+	short enh_loading_type,
 	const QWidget * settings,
 	QProgressDialog * pb)
 {
@@ -11469,7 +11652,7 @@ bool DicomUtils::process_contrours_ref(
 						settings,
 						pb,
 						2,
-						enh_original_frames);
+						enh_loading_type);
 				if (!message_.isEmpty())
 				{
 					std::cout << message_.toStdString() << std::endl;
@@ -11488,7 +11671,7 @@ bool DicomUtils::process_contrours_ref(
 					{
 						if (pb)
 						{
-							pb->setLabelText(QString("Searching ...."));
+							pb->setLabelText(QString("Searching ....."));
 							pb->setValue(-1);
 							QApplication::processEvents();
 						}
@@ -12843,7 +13026,7 @@ QString DicomUtils::read_dicom(
 	const QWidget * settings,
 	QProgressDialog * pb,
 	short load_type,
-	bool enh_original_frames)
+	short enh_loading_type)
 {
 	bool ok = false;
 	QString message_;
@@ -13809,7 +13992,7 @@ QString DicomUtils::read_dicom(
 						supp_color_images,
 						0, NULL, false,
 						false,
-						enh_original_frames,
+						enh_loading_type,
 						settings,
 						pb,
 						tolerance);
@@ -13831,7 +14014,7 @@ QString DicomUtils::read_dicom(
 							supp_grey_images,
 							max_3d_tex_size, gl, ok3d,
 							false,
-							enh_original_frames,
+							enh_loading_type,
 							settings,
 							pb,
 							tolerance,
@@ -13966,7 +14149,7 @@ QString DicomUtils::read_dicom(
 						ivariants,
 						max_3d_tex_size, gl, ok3d,
 						false,
-						enh_original_frames,
+						enh_loading_type,
 						settings,
 						pb,
 						tolerance,
@@ -13981,7 +14164,7 @@ QString DicomUtils::read_dicom(
 					ivariants,
 					0, NULL, false,
 					false,
-					enh_original_frames,
+					enh_loading_type,
 					settings,
 					pb,
 					tolerance,
@@ -14522,7 +14705,7 @@ QString DicomUtils::read_dicom(
 					rtstruct_ref_search_path,
 					tmp_ivariants_rtstruct,
 					max_3d_tex_size, gl, ok3d,
-					enh_original_frames,
+					enh_loading_type,
 					settings,
 					pb);
 			bool ref2_ok = false;
@@ -14552,7 +14735,7 @@ QString DicomUtils::read_dicom(
 					tmpp,
 					tmp_ivariants_rtstruct,
 					max_3d_tex_size, gl, ok3d,
-					enh_original_frames,
+					enh_loading_type,
 					settings,
 					pb);
 				if (ref2_ok)
@@ -14595,7 +14778,7 @@ QString DicomUtils::read_dicom(
 							rtstruct_ref_search_path,
 							tmp_ivariants_rtstruct,
 							max_3d_tex_size, gl, ok3d,
-							enh_original_frames,
+							enh_loading_type,
 							settings,
 							pb);
 						if (ref2_ok)

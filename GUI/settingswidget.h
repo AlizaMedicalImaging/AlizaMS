@@ -32,12 +32,11 @@ public:
 	int    get_sr_image_width() const;
 	bool   get_sr_chapters() const;
 	bool   get_sr_skip_images() const;
-	bool   get_ignore_dim_org() const;
 	bool   get_predictor_workaround() const;
 	bool   get_cornell_workaround() const;
-	bool   get_sort_frames() const;
 	bool   get_apply_icc() const;
 	bool   get_try_fix_jpeg_prec() const;
+	short  get_enh_strategy() const;
 
 private:
 	int   saved_idx;
