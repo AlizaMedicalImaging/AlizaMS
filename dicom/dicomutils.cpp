@@ -10511,6 +10511,13 @@ bool DicomUtils::enhanced_process_indices(
 							tmp0single.push_back(tmp2);
 						}
 					}
+#ifdef ENHANCED_PRINT_INFO
+					else
+					{
+						std::cout << "Warning: indices may be not consistent"
+							<< std::endl;
+					}
+#endif
 				}
 				if (error) break;
 			}
