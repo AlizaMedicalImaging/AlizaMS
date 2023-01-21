@@ -4940,6 +4940,7 @@ void DicomUtils::enhanced_get_indices(
 	int mr_frame_type_idx = -1;
 	int mr_eff_echo_idx   = -1;
 	int segment_idx       = -1;
+	int pa_index_idx      = -1;
 	std::string dim_uid;
 	std::vector<std::string> dim_uids;
 	for (size_t x = 0; x < sq_size; ++x)
@@ -5078,6 +5079,12 @@ void DicomUtils::enhanced_get_indices(
 			sq1.at(i).index_pointer == mdcm::Tag(0x0062,0x000b))
 		{
 			segment_idx = x;
+		}
+		else if (sq1.at(i).group_pointer == mdcm::Tag(0xffff,0xffff) &&
+			sq1.at(i).index_pointer == mdcm::PrivateTag(0x3401,"WG-34 PA Proposed Tags",0x93)) // FIXME
+		{
+std::cout << "QQQQQQQQQQQQQQQQQQQQQQ" << std::endl;
+			pa_index_idx = x;
 		}
 	}
 	//
