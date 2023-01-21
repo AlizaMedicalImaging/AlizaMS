@@ -1,5 +1,5 @@
 #define WARN_RAM_SIZE
-//#define ENHANCED_PRINT_INFO
+#define ENHANCED_PRINT_INFO
 //#define ENHANCED_PRINT_GROUPS
 //#define TMP_ALWAYS_GEOM_FROM_IMAGE
 
@@ -10415,6 +10415,9 @@ bool DicomUtils::enhanced_process_indices(
 				<< std::endl;
 		}
 #endif
+#ifdef ENHANCED_PRINT_INFO
+		bool warning0 = false;
+#endif
 		for (
 			std::list<unsigned int>::const_iterator it1 = tmp1_1.cbegin();
 			it1 != tmp1_1.cend();
@@ -10514,8 +10517,12 @@ bool DicomUtils::enhanced_process_indices(
 #ifdef ENHANCED_PRINT_INFO
 					else
 					{
-						std::cout << "Warning: indices may be not consistent"
-							<< std::endl;
+						if (!warning0)
+						{
+							warning0 = true;
+							std::cout << "Warning: indices may be not consistent"
+								<< std::endl;
+						}
 					}
 #endif
 				}
