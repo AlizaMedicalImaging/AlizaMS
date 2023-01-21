@@ -5081,695 +5081,227 @@ void DicomUtils::enhanced_get_indices(
 			segment_idx = x;
 		}
 		else if (sq1.at(i).group_pointer == mdcm::Tag(0xffff,0xffff) &&
-			sq1.at(i).index_pointer == mdcm::PrivateTag(0x3401,"WG-34 PA Proposed Tags",0x93)) // FIXME
+			sq1.at(i).index_pointer == mdcm::Tag(0x3401,0x1093)) // FIXME
 		{
-std::cout << "QQQQQQQQQQQQQQQQQQQQQQ" << std::endl;
 			pa_index_idx = x;
 		}
 	}
 	//
-	// Well-known combinations
+	// Well-known combinations, re-order indices in some special situations to
+	// try to get a uniform volume instead of an image with intermittent slices.
+	// S. "Settings" widget for "strict" options.
 	//
-	// 3D
-	if (sq1_size == 2 &&
-		in_stack_pos_idx >= 0 &&
-		stack_id_idx >= 0)
+	// Data type
+	if (sq1_size == 3 &&
+		temporal_off_idx == 0 &&
+		plane_pos_idx == 1 &&
+		datatype_idx == 2)
 	{
-		*dim4th = stack_id_idx;
-		*dim3rd = in_stack_pos_idx;
+		*dim5th = datatype_idx;
+		*dim4th = temporal_off_idx;
+		*dim3rd = plane_pos_idx;
 		*enh_id = 1;
 	}
-	else if (sq1_size == 1 && in_stack_pos_idx == 0)
+	else if (sq1_size == 3 &&
+		temporal_pos_idx == 0 &&
+		plane_pos_idx == 1 &&
+		datatype_idx == 2)
 	{
-		*dim3rd = in_stack_pos_idx;
+		*dim5th = datatype_idx;
+		*dim4th = temporal_pos_idx;
+		*dim3rd = plane_pos_idx;
 		*enh_id = 2;
 	}
-	else if (sq1_size == 1 && plane_pos_idx == 0)
-	{
-		*dim3rd = plane_pos_idx;
-		*enh_id = 3;
-	}
-	else if (sq1_size == 1 && ipp_idx == 0)
-	{
-		*dim3rd = ipp_idx;
-		*enh_id = 4;
-	}
-	// Temporal
-	else if (sq1_size == 3 &&
-		stack_id_idx >= 0 &&
-		in_stack_pos_idx >= 0 &&
-		temporal_pos_idx >= 0)
-	{
-		*dim5th = temporal_pos_idx;
-		*dim4th = stack_id_idx;
-		*dim3rd = in_stack_pos_idx;
-		*enh_id = 5;
-	}
-	else if (sq1_size == 3 &&
-		stack_id_idx >= 0 &&
-		in_stack_pos_idx >= 0 &&
-		temporal_off_idx >= 0)
-	{
-		*dim5th = temporal_off_idx;
-		*dim4th = stack_id_idx;
-		*dim3rd = in_stack_pos_idx;
-		*enh_id = 6;
-	}
 	else if (sq1_size == 2 &&
-		temporal_pos_idx >= 0 &&
-		stack_id_idx >= 0)
-	{
-		*dim4th = stack_id_idx;
-		*dim3rd = temporal_pos_idx;
-		*enh_id = 7;
-	}
-	else if (sq1_size == 2 &&
-		temporal_off_idx >= 0 &&
-		stack_id_idx >= 0)
-	{
-		*dim4th = stack_id_idx;
-		*dim3rd = temporal_off_idx;
-		*enh_id = 8;
-	}
-	else if (sq1_size == 2 &&
-		plane_pos_idx >= 0 &&
-		temporal_pos_idx >= 0)
-	{
-		*dim4th = temporal_pos_idx;
-		*dim3rd = plane_pos_idx;
-		*enh_id = 9;
-	}
-	else if (sq1_size == 2 &&
-		plane_pos_idx >= 0 &&
-		temporal_off_idx >= 0)
-	{
-		*dim4th = temporal_off_idx;
-		*dim3rd = plane_pos_idx;
-		*enh_id = 10;
-	}
-	else if (sq1_size == 1 &&
-		temporal_off_idx == 0)
-	{
-		*dim3rd = temporal_off_idx;
-		*enh_id = 11;
-	}
-	else if (sq1_size == 1 &&
-		temporal_pos_idx == 0)
-	{
-		*dim3rd = temporal_pos_idx;
-		*enh_id = 12;
-	}
-	// Data type
-	else if (sq1_size == 3 &&
-		temporal_off_idx >= 0 &&
-		plane_pos_idx >= 0 &&
-		datatype_idx >= 0)
-	{
-		*dim5th = datatype_idx;
-		*dim4th = temporal_off_idx;
-		*dim3rd = plane_pos_idx;
-		*enh_id = 13;
-	}
-	else if (sq1_size == 3 &&
-		temporal_pos_idx >= 0 &&
-		plane_pos_idx >= 0 &&
-		datatype_idx >= 0)
-	{
-		*dim5th = datatype_idx;
-		*dim4th = temporal_pos_idx;
-		*dim3rd = plane_pos_idx;
-		*enh_id = 14;
-	}
-	else if (sq1_size == 2 &&
-		plane_pos_idx >= 0 &&
-		datatype_idx >= 0)
+		plane_pos_idx == 0 &&
+		datatype_idx == 1)
 	{
 		*dim4th = datatype_idx;
 		*dim3rd = plane_pos_idx;
-		*enh_id = 15;
+		*enh_id = 3;
 	}
 	// Contrast
 	else if (sq1_size == 4 &&
-		temporal_pos_idx >= 0 &&
-		in_stack_pos_idx >= 0 &&
-		stack_id_idx >= 0 &&
-		contrast_idx >= 0)
+		temporal_pos_idx == 0 &&
+		stack_id_idx == 1 &&
+		in_stack_pos_idx == 2 &&
+		contrast_idx == 3)
 	{
 		*dim6th = contrast_idx;
 		*dim5th = temporal_pos_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
-		*enh_id = 16;
+		*enh_id = 4;
+	}
+	else if (sq1_size == 4 &&
+		temporal_off_idx == 0 &&
+		stack_id_idx == 1 &&
+		in_stack_pos_idx == 2 &&
+		contrast_idx == 3)
+	{
+		*dim6th = contrast_idx;
+		*dim5th = temporal_off_idx;
+		*dim4th = stack_id_idx;
+		*dim3rd = in_stack_pos_idx;
+		*enh_id = 5;
 	}
 	else if (sq1_size == 3 &&
-		in_stack_pos_idx >= 0 &&
-		stack_id_idx >= 0 &&
-		contrast_idx >= 0)
+		in_stack_pos_idx == 0 &&
+		stack_id_idx == 1 &&
+		contrast_idx == 2)
 	{
 		*dim5th = contrast_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
-		*enh_id = 17;
+		*enh_id = 6;
 	}
 	else if (sq1_size == 2 &&
-		in_stack_pos_idx >= 0 &&
-		contrast_idx >= 0)
+		in_stack_pos_idx == 1 &&
+		contrast_idx == 0)
 	{
 		*dim4th = contrast_idx;
 		*dim3rd = in_stack_pos_idx;
-		*enh_id = 18;
+		*enh_id = 7;
+	}
+	else if (sq1_size == 2 &&
+		plane_pos_idx == 1 &&
+		contrast_idx == 0)
+	{
+		*dim4th = contrast_idx;
+		*dim3rd = plane_pos_idx;
+		*enh_id = 8;
 	}
 	// MR frame type
 	else if (sq1_size == 4 &&
-		stack_id_idx >= 0 &&
-		in_stack_pos_idx >= 0 &&
-		temporal_pos_idx >= 0 &&
-		mr_frame_type_idx >= 0)
+		temporal_pos_idx == 0 &&
+		stack_id_idx == 1 &&
+		in_stack_pos_idx == 2 &&
+		mr_frame_type_idx == 3)
 	{
 		*dim6th = mr_frame_type_idx;
 		*dim5th = temporal_pos_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
-		*enh_id = 19;
+		*enh_id = 9;
 	}
 	else if (sq1_size == 3 &&
-		stack_id_idx >= 0 &&
-		in_stack_pos_idx >= 0 &&
-		mr_frame_type_idx >= 0)
+		stack_id_idx == 0 &&
+		in_stack_pos_idx == 1 &&
+		mr_frame_type_idx == 2)
 	{
 		*dim5th = mr_frame_type_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
-		*enh_id = 20;
+		*enh_id = 10;
 	}
 	// MR eff. echo
 	else if (sq1_size == 4 &&
-		stack_id_idx >= 0 &&
-		in_stack_pos_idx >= 0 &&
-		temporal_pos_idx >= 0 &&
-		mr_eff_echo_idx >= 0)
+		temporal_pos_idx == 0 &&
+		stack_id_idx == 1 &&
+		in_stack_pos_idx == 2 &&
+		mr_eff_echo_idx == 3)
 	{
 		*dim6th = mr_eff_echo_idx;
 		*dim5th = temporal_pos_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
-		*enh_id = 21;
+		*enh_id = 11;
 	}
 	else if (sq1_size == 3 &&
-		stack_id_idx >= 0 &&
-		in_stack_pos_idx >= 0 &&
-		mr_eff_echo_idx >= 0)
+		stack_id_idx == 0 &&
+		in_stack_pos_idx == 1 &&
+		mr_eff_echo_idx == 2)
 	{
 		*dim5th = mr_eff_echo_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
-		*enh_id = 22;
-	}
-	// Diffusion
-	else if (sq1_size == 4 &&
-		stack_id_idx >= 0 &&
-		in_stack_pos_idx >= 0 &&
-		b_value_idx >= 0 &&
-		gradients_idx >= 0)
-	{
-		*dim6th = b_value_idx;
-		*dim5th = gradients_idx;
-		*dim4th = stack_id_idx;
-		*dim3rd = in_stack_pos_idx;
-		*enh_id = 23;
-	}
-	else if (sq1_size == 3 &&
-		in_stack_pos_idx >= 0 &&
-		b_value_idx >= 0 &&
-		gradients_idx >= 0)
-	{
-		*dim5th = b_value_idx;
-		*dim4th = gradients_idx;
-		*dim3rd = in_stack_pos_idx;
-		*enh_id = 24;
-	}
-	else if (sq1_size == 3 &&
-		stack_id_idx >= 0 &&
-		in_stack_pos_idx >= 0 &&
-		gradients_idx >= 0)
-	{
-		*dim5th = gradients_idx;
-		*dim4th = stack_id_idx;
-		*dim3rd = in_stack_pos_idx;
-		*enh_id = 25;
-	}
-	else if (sq1_size == 3 &&
-		b_value_idx >= 0 &&
-		in_stack_pos_idx >= 0 &&
-		stack_id_idx >= 0)
-	{
-		*dim5th = b_value_idx;
-		*dim4th = stack_id_idx;
-		*dim3rd = in_stack_pos_idx;
-		*enh_id = 26;
+		*enh_id = 12;
 	}
 	// LUT
 	else if (sq1_size == 4 &&
-		stack_id_idx >= 0 &&
-		in_stack_pos_idx >= 0 &&
-		lut_label_idx >= 0 &&
-		temporal_pos_idx >= 0)
+		temporal_pos_idx == 0 &&
+		stack_id_idx == 1 &&
+		in_stack_pos_idx == 2 &&
+		lut_label_idx == 3)
 	{
 		*dim6th = lut_label_idx;
 		*dim5th = temporal_pos_idx;
 		*dim4th = stack_id_idx;
 		*dim3rd = in_stack_pos_idx;
-		*enh_id = 27;
+		*enh_id = 13;
 	}
 	else if (sq1_size == 3 &&
-		in_stack_pos_idx >= 0 &&
-		lut_label_idx >= 0 &&
-		temporal_pos_idx >= 0)
+		temporal_pos_idx == 0 &&
+		in_stack_pos_idx == 1 &&
+		lut_label_idx == 2)
 	{
 		*dim5th = lut_label_idx;
 		*dim4th = temporal_pos_idx;
 		*dim3rd = in_stack_pos_idx;
-		*enh_id = 28;
+		*enh_id = 14;
 	}
-	// Segmentation
+	// PA Index
+	else if (sq1_size == 3 &&
+		temporal_pos_idx == 0 &&
+		plane_pos_idx == 1 &&
+		pa_index_idx == 2)
+	{
+		*dim5th = pa_index_idx;
+		*dim4th = temporal_pos_idx;
+		*dim3rd = plane_pos_idx;
+		*enh_id = 15;
+	}
 	else if (sq1_size == 2 &&
-		in_stack_pos_idx >= 0 &&
-		segment_idx >= 0)
+		plane_pos_idx == 0 &&
+		pa_index_idx == 1)
 	{
-		*dim4th = segment_idx;
-		*dim3rd = in_stack_pos_idx;
-		*enh_id = 29;
-	}
-	else if (sq1_size == 2 &&
-		ipp_idx >= 0 &&
-		segment_idx >= 0)
-	{
-		*dim4th = segment_idx;
-		*dim3rd = ipp_idx;
-		*enh_id = 30;
-	}
-	else if (sq1_size >= 2 &&
-		segment_idx >= 0)
-	{
-		*dim4th = segment_idx;
-		*enh_id = 31;
+		*dim4th = pa_index_idx;
+		*dim3rd = plane_pos_idx;
+		*enh_id = 16;
 	}
 	//
-	// Not recognized, try generic approach
+	//
 	//
 	if (*enh_id < 0)
 	{
-		if (sq1_size == 4)
+		if (sq_size == 4)
 		{
-			if (stack_id_idx >= 0 && in_stack_pos_idx >= 0 &&
-				temporal_pos_idx >= 0)
+			if (temporal_pos_idx == 0 &&
+				stack_id_idx == 1 &&
+				in_stack_pos_idx == 2)
 			{
-				int dim6th_tmp = -1;
-				for (int x = 0; x < sq1_size; ++x)
-				{
-					const size_t i = static_cast<size_t>(x);
-					if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
-					{
-						;;
-					}
-					else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
-					{
-						;;
-					}
-					else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
-					{
-						;;
-					}
-					else
-					{
-						dim6th_tmp = x;
-						break;
-					}
-				}
-				*dim6th = dim6th_tmp;
+				*dim6th = 3;
 				*dim5th = temporal_pos_idx;
 				*dim4th = stack_id_idx;
 				*dim3rd = in_stack_pos_idx;
 				*enh_id = 999;
 			}
-			else if (stack_id_idx >= 0 && in_stack_pos_idx >= 0 &&
-				temporal_off_idx >= 0)
+			else if (temporal_off_idx == 0 &&
+				stack_id_idx == 1 &&
+				in_stack_pos_idx == 2)
 			{
-				int dim6th_tmp = -1;
-				for (int x = 0; x < sq1_size; ++x)
-				{
-					const size_t i = static_cast<size_t>(x);
-					if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
-					{
-						;;
-					}
-					else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
-					{
-						;;
-					}
-					else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9310) &&
-						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x930d))
-					{
-						;;
-					}
-					else
-					{
-						dim6th_tmp = x;
-						break;
-					}
-				}
-				*dim6th = dim6th_tmp;
-				*dim5th = temporal_pos_idx;
+				*dim6th = 3;
+				*dim5th = temporal_off_idx;
 				*dim4th = stack_id_idx;
 				*dim3rd = in_stack_pos_idx;
 				*enh_id = 998;
 			}
-			else if (stack_id_idx >= 0 && in_stack_pos_idx >= 0)
+		}
+		else if (sq_size == 3)
+		{
+			if (stack_id_idx == 0 &&
+				in_stack_pos_idx == 1)
 			{
-				int dim6th_tmp = -1;
-				int dim5th_tmp = -1;
-				for (int x = 0; x < sq1_size; ++x)
-				{
-					const size_t i = static_cast<size_t>(x);
-					if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
-					{
-						;;
-					}
-					else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
-					{
-						;;
-					}
-					else
-					{
-						dim6th_tmp = x;
-						break;
-					}
-				}
-				if (dim6th_tmp >= 0)
-				{
-					for (int x = 0; x < sq1_size; ++x)
-					{
-						const size_t i = static_cast<size_t>(x);
-						if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-							sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
-						{
-							;;
-						}
-						else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-							sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
-						{
-							;;
-						}
-						else
-						{
-							if (x != dim5th_tmp)
-							{
-								dim5th_tmp = x;
-								break;
-							}
-						}
-					}
-
-				}
-				*dim6th = dim6th_tmp;
-				*dim5th = dim5th_tmp;
+				*dim5th = 2;
 				*dim4th = stack_id_idx;
 				*dim3rd = in_stack_pos_idx;
 				*enh_id = 997;
 			}
-			else if (plane_pos_idx >= 0 && temporal_pos_idx >= 0)
-			{
-				int dim6th_tmp = -1;
-				int dim5th_tmp = -1;
-				for (int x = 0; x < sq1_size; ++x)
-				{
-					const size_t i = static_cast<size_t>(x);
-					if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
-					{
-						;;
-					}
-					else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
-						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
-					{
-						;;
-					}
-					else
-					{
-						dim6th_tmp = x;
-						break;
-					}
-				}
-				if (dim6th_tmp >= 0)
-				{
-					for (int x = 0; x < sq1_size; ++x)
-					{
-						const size_t i = static_cast<size_t>(x);
-						if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-							sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
-						{
-							;;
-						}
-						else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
-							sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
-						{
-							;;
-						}
-						else
-						{
-							if (x != dim5th_tmp)
-							{
-								dim5th_tmp = x;
-								break;
-							}
-						}
-					}
-				}
-				*dim6th = dim6th_tmp;
-				*dim5th = dim5th_tmp;
-				*dim4th = temporal_pos_idx;
-				*dim3rd = plane_pos_idx;
-				*enh_id = 996;
-			}
-			else if (plane_pos_idx >= 0 && temporal_off_idx >= 0)
-			{
-				int dim6th_tmp = -1;
-				int dim5th_tmp = -1;
-				for (int x = 0; x < sq1_size; ++x)
-				{
-					const size_t i = static_cast<size_t>(x);
-					if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
-						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
-					{
-						;;
-					}
-					else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9310) &&
-						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x930d))
-					{
-						;;
-					}
-					else
-					{
-						dim6th_tmp = x;
-						break;
-					}
-				}
-				if (dim6th_tmp >= 0)
-				{
-					for (int x = 0; x < sq1_size; ++x)
-					{
-						const size_t i = static_cast<size_t>(x);
-						if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
-							sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
-						{
-							;;
-						}
-						else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9310) &&
-							sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x930d))
-						{
-							;;
-						}
-						else
-						{
-							if (x != dim5th_tmp)
-							{
-								dim5th_tmp = x;
-								break;
-							}
-						}
-					}
-				}
-				*dim6th = dim6th_tmp;
-				*dim5th = dim5th_tmp;
-				*dim4th = temporal_pos_idx;
-				*dim3rd = plane_pos_idx;
-				*enh_id = 995;
-			}
-		}
-		else if (sq1_size == 3)
-		{
-			if (stack_id_idx >= 0 && in_stack_pos_idx >= 0)
-			{
-				int dim5th_tmp = -1;
-				for (int x = 0; x < sq1_size; ++x)
-				{
-					const size_t i = x;
-					if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
-					{
-						;;
-					}
-					else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
-					{
-						;;
-					}
-					else
-					{
-						dim5th_tmp = x;
-						break;
-					}
-				}
-				*dim5th = dim5th_tmp;
-				*dim4th = stack_id_idx;
-				*dim3rd = in_stack_pos_idx;
-				*enh_id = 994;
-			}
-			else if (plane_pos_idx >= 0 && temporal_pos_idx >= 0)
-			{
-				int dim5th_tmp = -1;
-				for (int x = 0; x < sq1_size; ++x)
-				{
-					const size_t i = static_cast<size_t>(x);
-					if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
-					{
-						;;
-					}
-					else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
-						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
-					{
-						;;
-					}
-					else
-					{
-						dim5th_tmp = x;
-						break;
-					}
-				}
-				*dim5th = dim5th_tmp;
-				*dim4th = temporal_pos_idx;
-				*dim3rd = plane_pos_idx;
-				*enh_id = 993;
-			}
-			else if (plane_pos_idx >= 0 && temporal_off_idx >= 0)
-			{
-				int dim5th_tmp = -1;
-				for (int x = 0; x < sq1_size; ++x)
-				{
-					const size_t i = static_cast<size_t>(x);
-					if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9310) &&
-						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x930d))
-					{
-						;;
-					}
-					else if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
-						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
-					{
-						;;
-					}
-					else
-					{
-						dim5th_tmp = x;
-						break;
-					}
-				}
-				*dim5th = dim5th_tmp;
-				*dim4th = temporal_off_idx;
-				*dim3rd = plane_pos_idx;
-				*enh_id = 992;
-			}
-		}
-		else if (sq1_size == 2)
-		{
-			if (ipp_idx >= 0)
-			{
-				int dim4th_tmp = -1;
-				for (int x = 0; x < sq1_size; ++x)
-				{
-					const size_t i = static_cast<size_t>(x);
-					if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9113) &&
-						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x0032))
-					{
-						;;
-					}
-					else
-					{
-						dim4th_tmp = x;
-						break;
-					}
-				}
-				*dim4th = dim4th_tmp;
-				*dim3rd = ipp_idx;
-				*enh_id = 991;
-			}
- 			else if (in_stack_pos_idx >= 0)
-			{
-				int dim4th_tmp = -1;
-				for (int x = 0; x < sq1_size; ++x)
-				{
-					const size_t i = static_cast<size_t>(x);
-					if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
-						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
-					{
-						;;
-					}
-					else
-					{
-						dim4th_tmp = x;
-						break;
-					}
-				}
-				*dim4th = dim4th_tmp;
-				*dim3rd = in_stack_pos_idx;
-				*enh_id = 990;
-			}
-			else if (plane_pos_idx >= 0)
-			{
-				int dim4th_tmp = -1;
-				for (int x = 0; x < sq1_size; ++x)
-				{
-					const size_t i = static_cast<size_t>(x);
-					if (sq1.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
-						sq1.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
-					{
-						;;
-					}
-					else
-					{
-						dim4th_tmp = x;
-						break;
-					}
-				}
-				*dim4th = dim4th_tmp;
-				*dim3rd = plane_pos_idx;
-				*enh_id = 989;
-			}
 		}
 	}
-#ifdef ENHANCED_PRINT_INFO
-	if (*enh_id < 0)
-	{
-		std::cout << "Could not use known combination" << std::endl;
-	}
-#endif
+	//
+	//
+	//
 strict:
 	if (*enh_id < 0)
 	{
@@ -11022,7 +10554,7 @@ bool DicomUtils::enhanced_process_indices(
 		}
 	}
 #ifdef ENHANCED_PRINT_INFO
-#if 1
+#if 0
 	{
 		for (int x = 0; x < tmp0.size(); ++x)
 		{
