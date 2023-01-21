@@ -184,6 +184,8 @@ QString SpectroscopyUtils::ProcessData(
 		return QString("values.size() != m_NumberOfFrames");
 	}
 
+	int dim8th = -1;
+	int dim7th = -1;
 	int dim6th = -1;
 	int dim5th = -1;
 	int dim4th = -1;
@@ -199,12 +201,14 @@ QString SpectroscopyUtils::ProcessData(
 	{
 		DicomUtils::enhanced_get_indices(
 			sq,
-			&dim6th, &dim5th, &dim4th, &dim3rd,
+			&dim8th, &dim7th, &dim6th, &dim5th, &dim4th, &dim3rd,
 			&enh_id, 1);
 	}
 #if 0
 	std::cout << "N" << enh_id;
 	std::cout
+		<< " dim8th=" << dim6th
+		<< " dim7th=" << dim6th
 		<< " dim6th=" << dim6th
 		<< " dim5th=" << dim5th
 		<< " dim4th=" << dim4th
@@ -219,7 +223,7 @@ QString SpectroscopyUtils::ProcessData(
 			std::less<unsigned int> > > tmp0;
 	bool ok__ = DicomUtils::enhanced_process_indices(
 		tmp0, idx_values, values,
-		dim6th, dim5th, dim4th, dim3rd, false);
+		dim8th, dim7th, dim6th, dim5th, dim4th, dim3rd, false);
 #if 0
 	std::cout << "enhanced_process_indices = "
 		<< ok__ << std::endl;
@@ -229,7 +233,7 @@ QString SpectroscopyUtils::ProcessData(
 		tmp0.clear();
 		ok__ = DicomUtils::enhanced_process_indices(
 			tmp0, idx_values, values,
-			-1, -1, -1, -1, false);
+			-1, -1, -1, -1, -1, -1, false);
 	}
 	if (!ok__)tmp0.clear();
 	if (tmp0.empty())

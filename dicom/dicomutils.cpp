@@ -4910,6 +4910,8 @@ void DicomUtils::read_gems_params(
 
 void DicomUtils::enhanced_get_indices(
 	const DimIndexSq & sq,
+	int * dim8th,
+	int * dim7th,
 	int * dim6th,
 	int * dim5th,
 	int * dim4th,
@@ -4974,10 +4976,11 @@ void DicomUtils::enhanced_get_indices(
 		}
 	}
 	const int sq1_size = static_cast<int>(sq1.size());
-	if (sq1_size > 4)
+	if (sq1_size > 6)
 	{
-		std::cout << "Size of Dimension Organization > 4 "
+		std::cout << "Size of Dimension Organization > 6 "
 			<< "(" << sq1_size << ") is currently not supported" << std::endl;
+		return;
 	}
 #ifdef ENHANCED_PRINT_INFO
 	std::cout << "Using Dimension Organization UID " << dim_uid << std::endl;
@@ -5311,27 +5314,44 @@ strict:
 	{
 		switch (sq1_size)
 		{
+		case 6:
+			*dim3rd = 5;
+			*dim4th = 4;
+			*dim5th = 3;
+			*dim6th = 2;
+			*dim7th = 1;
+			*dim8th = 0;
+			*enh_id = 899;
+			break;
+		case 5:
+			*dim3rd = 4;
+			*dim4th = 3;
+			*dim5th = 2;
+			*dim6th = 1;
+			*dim7th = 0;
+			*enh_id = 898;
+			break;
 		case 4:
 			*dim3rd = 3;
 			*dim4th = 2;
 			*dim5th = 1;
 			*dim6th = 0;
-			*enh_id = 899;
+			*enh_id = 897;
 			break;
 		case 3:
 			*dim3rd = 2;
 			*dim4th = 1;
 			*dim5th = 0;
-			*enh_id = 898;
+			*enh_id = 896;
 			break;
 		case 2:
 			*dim3rd = 1;
 			*dim4th = 0;
-			*enh_id = 897;
+			*enh_id = 895;
 			break;
 		case 1:
 			*dim3rd = 0;
-			*enh_id = 896;
+			*enh_id = 894;
 			break;
 		default:
 			break;
@@ -6035,6 +6055,8 @@ QString DicomUtils::read_enhanced(
 	//
 	//
 	bool tmp17 = false;
+	int dim8th = -1;
+	int dim7th = -1;
 	int dim6th = -1;
 	int dim5th = -1;
 	int dim4th = -1;
@@ -6048,7 +6070,7 @@ QString DicomUtils::read_enhanced(
 		{
 			enhanced_get_indices(
 				sq,
-				&dim6th, &dim5th, &dim4th, &dim3rd,
+				&dim8th, &dim7th, &dim6th, &dim5th, &dim4th, &dim3rd,
 				&enh_id,
 				enh_loading_type);
 		}
@@ -6111,6 +6133,8 @@ QString DicomUtils::read_enhanced(
 	{
 		std::cout << "ID " << enh_id;
 		std::cout
+			<< " dim8th=" << dim6th
+			<< " dim7th=" << dim6th
 			<< " dim6th=" << dim6th
 			<< " dim5th=" << dim5th
 			<< " dim4th=" << dim4th
@@ -6123,7 +6147,7 @@ QString DicomUtils::read_enhanced(
 		data,
 		image_overlays,
 		rows_, columns_, pixelformat, pi,
-		dim6th, dim5th, dim4th, dim3rd,
+		dim8th, dim7th, dim6th, dim5th, dim4th, dim3rd,
 		idx_values, values,
 		ok3d, max_3d_tex_size, gl,
 		min_load,
@@ -6144,6 +6168,8 @@ QString DicomUtils::read_enhanced(
 #endif
 	if (!tmp17 &&
 		!(
+			dim8th == -1 &&
+			dim7th == -1 &&
 			dim6th == -1 &&
 			dim5th == -1 &&
 			dim4th == -1 &&
@@ -6158,7 +6184,7 @@ QString DicomUtils::read_enhanced(
 			data,
 			image_overlays,
 			rows_, columns_, pixelformat, pi,
-			-1, -1, -1, -1,
+			-1, -1, -1, -1, -1, -1,
 			idx_values, values,
 			ok3d, max_3d_tex_size, gl,
 			min_load,
@@ -6369,6 +6395,8 @@ QString DicomUtils::read_enhanced_supp_palette(
 	//
 	//
 	bool tmp17 = false;
+	int dim8th = -1;
+	int dim7th = -1;
 	int dim6th = -1;
 	int dim5th = -1;
 	int dim4th = -1;
@@ -6382,7 +6410,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 		{
 			enhanced_get_indices(
 				sq,
-				&dim6th, &dim5th, &dim4th, &dim3rd,
+				&dim8th, &dim7th, &dim6th, &dim5th, &dim4th, &dim3rd,
 				&enh_id,
 				enh_loading_type);
 		}
@@ -6445,6 +6473,8 @@ QString DicomUtils::read_enhanced_supp_palette(
 	{
 		std::cout << "ID " << enh_id;
 		std::cout
+			<< " dim8th=" << dim6th
+			<< " dim7th=" << dim6th
 			<< " dim6th=" << dim6th
 			<< " dim5th=" << dim5th
 			<< " dim4th=" << dim4th
@@ -6457,7 +6487,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 		data,
 		image_overlays,
 		rows_, columns_, pixelformat, pi,
-		dim6th, dim5th, dim4th, dim3rd,
+		dim8th, dim7th, dim6th, dim5th, dim4th, dim3rd,
 		idx_values, values,
 		ok3d, max_3d_tex_size, gl,
 		min_load,
@@ -6480,6 +6510,8 @@ QString DicomUtils::read_enhanced_supp_palette(
 #endif
 	if (!tmp17 &&
 		!(
+			dim8th == -1 &&
+			dim7th == -1 &&
 			dim6th == -1 &&
 			dim5th == -1 &&
 			dim4th == -1 &&
@@ -6496,7 +6528,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 			data,
 			image_overlays,
 			rows_, columns_, pixelformat, pi,
-			-1, -1, -1, -1,
+			-1, -1, -1, -1, -1, -1,
 			idx_values, values,
 			ok3d, max_3d_tex_size, gl,
 			min_load,
@@ -10352,23 +10384,25 @@ QString DicomUtils::read_enhanced_common(
 bool DicomUtils::enhanced_process_indices(
 	std::vector< std::map< unsigned int,unsigned int,std::less<unsigned int> > > & tmp0,
 	const DimIndexValues & idx_values, const FrameGroupValues & values,
-	const int dim6th, const int dim5th, const int dim4th, const int dim3rd,
+	const int dim8th, const int dim7th, const int dim6th, const int dim5th, const int dim4th, const int dim3rd,
 	const short enh_loading_type)
 {
 	bool error = false;
 	std::list<unsigned int> tmp1_1;
 	std::list<unsigned int> tmp1_2;
 	std::list<unsigned int> tmp1_3;
+	std::list<unsigned int> tmp1_4;
+	std::list<unsigned int> tmp1_5;
 	const EnhancedIODLoadingType loading_type =
 		static_cast<EnhancedIODLoadingType>(enh_loading_type);
 	const size_t idx_values_size = idx_values.size();
 	std::vector< std::map< unsigned int,unsigned int,std::less<unsigned int> > > tmp0single;
 	//
-	if (dim6th >= 0)
+	if (dim8th >= 0)
 	{
 		for (unsigned int x = 0; x < idx_values_size; ++x)
 		{
-			tmp1_1.push_back(idx_values.at(x).idx.at(dim6th));
+			tmp1_1.push_back(idx_values.at(x).idx.at(dim8th));
 		}
 		tmp1_1.sort();
 		tmp1_1.unique();
@@ -10377,11 +10411,11 @@ bool DicomUtils::enhanced_process_indices(
 	{
 		tmp1_1.push_back(1);
 	}
-	if (dim5th >= 0)
+	if (dim7th >= 0)
 	{
 		for (unsigned int x = 0; x < idx_values_size; ++x)
 		{
-			tmp1_2.push_back(idx_values.at(x).idx.at(dim5th));
+			tmp1_2.push_back(idx_values.at(x).idx.at(dim7th));
 		}
 		tmp1_2.sort();
 		tmp1_2.unique();
@@ -10390,11 +10424,11 @@ bool DicomUtils::enhanced_process_indices(
 	{
 		tmp1_2.push_back(1);
 	}
-	if (dim4th >= 0)
+	if (dim6th >= 0)
 	{
 		for (unsigned int x = 0; x < idx_values_size; ++x)
 		{
-			tmp1_3.push_back(idx_values.at(x).idx.at(dim4th));
+			tmp1_3.push_back(idx_values.at(x).idx.at(dim6th));
 		}
 		tmp1_3.sort();
 		tmp1_3.unique();
@@ -10402,6 +10436,32 @@ bool DicomUtils::enhanced_process_indices(
 	else
 	{
 		tmp1_3.push_back(1);
+	}
+	if (dim5th >= 0)
+	{
+		for (unsigned int x = 0; x < idx_values_size; ++x)
+		{
+			tmp1_4.push_back(idx_values.at(x).idx.at(dim5th));
+		}
+		tmp1_4.sort();
+		tmp1_4.unique();
+	}
+	else
+	{
+		tmp1_4.push_back(1);
+	}
+	if (dim4th >= 0)
+	{
+		for (unsigned int x = 0; x < idx_values_size; ++x)
+		{
+			tmp1_5.push_back(idx_values.at(x).idx.at(dim4th));
+		}
+		tmp1_5.sort();
+		tmp1_5.unique();
+	}
+	else
+	{
+		tmp1_5.push_back(1);
 	}
 	//
 	if (loading_type == EnhancedIODLoadingType::PreferUniformVolumes ||
@@ -10417,6 +10477,7 @@ bool DicomUtils::enhanced_process_indices(
 #endif
 #ifdef ENHANCED_PRINT_INFO
 		bool warning0 = false;
+		bool info0 = false;
 #endif
 		for (
 			std::list<unsigned int>::const_iterator it1 = tmp1_1.cbegin();
@@ -10433,98 +10494,138 @@ bool DicomUtils::enhanced_process_indices(
 					it3 != tmp1_3.cend();
 					++it3)
 				{
-					std::map< unsigned int,unsigned int,std::less<unsigned int> > tmp2;
-					std::list<unsigned int> tmp2_test;
-					for (unsigned int x = 0; x < idx_values_size; ++x)
+					for (
+						std::list<unsigned int>::const_iterator it4 = tmp1_4.cbegin();
+						it4 != tmp1_4.cend();
+						++it4)
 					{
-						const int idx1 =
-							dim6th >= 0 && dim6th < static_cast<int>(idx_values.at(x).idx.size())
-							? idx_values.at(x).idx.at(dim6th)
-							: -1;
-						const int idx2 =
-							dim5th >= 0 && dim5th < static_cast<int>(idx_values.at(x).idx.size())
-							? idx_values.at(x).idx.at(dim5th)
-							: -1;
-						const int idx3 =
-							dim4th >= 0 && dim4th < static_cast<int>(idx_values.at(x).idx.size())
-							? idx_values.at(x).idx.at(dim4th)
-							: -1;
-						const int idx4 =
-							dim3rd >= 0 && dim3rd < static_cast<int>(idx_values.at(x).idx.size())
-							? idx_values.at(x).idx.at(dim3rd)
-							: -1;
-						if (
-							(idx1 < 0 || idx1 == static_cast<int>(*it1)) &&
-							(idx2 < 0 || idx2 == static_cast<int>(*it2)) &&
-							(idx3 < 0 || idx3 == static_cast<int>(*it3)))
+						for (
+							std::list<unsigned int>::const_iterator it5 = tmp1_5.cbegin();
+							it5 != tmp1_5.cend();
+							++it5)
 						{
-							if (idx4 < 0)
+							std::map< unsigned int,unsigned int,std::less<unsigned int> > tmp2;
+							std::list<unsigned int> tmp2_test;
+							for (unsigned int x = 0; x < idx_values_size; ++x)
 							{
-								tmp2[idx_values.at(x).id] = idx_values.at(x).id;
-								tmp2_test.push_back(idx_values.at(x).id);
-							}
-							else
-							{
-								unsigned int tmp2_pos = idx_values.at(x).idx.at(dim3rd);
-								if (tmp2_pos >= 1)
+								const int idx1 =
+									dim8th >= 0 && dim8th < static_cast<int>(idx_values.at(x).idx.size())
+									? idx_values.at(x).idx.at(dim8th)
+									: -1;
+								const int idx2 =
+									dim7th >= 0 && dim7th < static_cast<int>(idx_values.at(x).idx.size())
+									? idx_values.at(x).idx.at(dim7th)
+									: -1;
+								const int idx3 =
+									dim6th >= 0 && dim6th < static_cast<int>(idx_values.at(x).idx.size())
+									? idx_values.at(x).idx.at(dim6th)
+									: -1;
+								const int idx4 =
+									dim5th >= 0 && dim5th < static_cast<int>(idx_values.at(x).idx.size())
+									? idx_values.at(x).idx.at(dim5th)
+									: -1;
+								const int idx5 =
+									dim4th >= 0 && dim4th < static_cast<int>(idx_values.at(x).idx.size())
+									? idx_values.at(x).idx.at(dim4th)
+									: -1;
+								const int idx6 =
+									dim3rd >= 0 && dim3rd < static_cast<int>(idx_values.at(x).idx.size())
+									? idx_values.at(x).idx.at(dim3rd)
+									: -1;
+								if (
+									(idx1 < 0 || idx1 == static_cast<int>(*it1)) &&
+									(idx2 < 0 || idx2 == static_cast<int>(*it2)) &&
+									(idx3 < 0 || idx3 == static_cast<int>(*it3)) &&
+									(idx4 < 0 || idx4 == static_cast<int>(*it4)) &&
+									(idx5 < 0 || idx5 == static_cast<int>(*it5)))
 								{
-									tmp2_pos -= 1;
+									if (idx6 < 0)
+									{
+										tmp2[idx_values.at(x).id] = idx_values.at(x).id;
+										tmp2_test.push_back(idx_values.at(x).id);
+									}
+									else
+									{
+										unsigned int tmp2_pos = idx_values.at(x).idx.at(dim3rd);
+										if (tmp2_pos >= 1)
+										{
+											tmp2_pos -= 1;
+										}
+										else
+										{
+											std::cout << "Error: index can not start with 0" << std::endl;
+											error = true;
+											break;
+										}
+										tmp2[idx_values.at(x).id] = tmp2_pos;
+										tmp2_test.push_back(tmp2_pos);
+									}
 								}
-								else
+							}
+							if (!tmp2.empty())
+							{
+								const size_t tmp2_test_size0 = tmp2_test.size();
+								if (tmp2_test_size0 > 0)
 								{
-									std::cout << "Error: index can not start with 0" << std::endl;
-									error = true;
-									break;
+									tmp2_test.sort();
+									tmp2_test.unique();
+									const size_t tmp2_test_size1 = tmp2_test.size();
+									if (tmp2_test_size0 != tmp2_test_size1) error = true;
+									if (error) break;
 								}
-								tmp2[idx_values.at(x).id] = tmp2_pos;
-								tmp2_test.push_back(tmp2_pos);
-							}
-						}
-					}
-					if (!tmp2.empty())
-					{
-						const size_t tmp2_test_size0 = tmp2_test.size();
-						if (tmp2_test_size0 > 0)
-						{
-							tmp2_test.sort();
-							tmp2_test.unique();
-							const size_t tmp2_test_size1 = tmp2_test.size();
-							if (tmp2_test_size0 != tmp2_test_size1) error = true;
-							if (error) break;
-						}
-						if (loading_type == EnhancedIODLoadingType::PreferUniformVolumes)
-						{
-							std::map< unsigned int,unsigned int,std::less<unsigned int> > tmp3;
-							const bool ok_sort = sort_frames_ippiop(tmp2, tmp3, values);
-							if (ok_sort)
-							{
-								tmp0.push_back(tmp3);
-							}
-							else
-							{
-								tmp0.push_back(tmp2);
-							}
-						}
-						else if (loading_type == EnhancedIODLoadingType::StrictMultipleImages)
-						{
-							tmp0.push_back(tmp2);
-						}
-						else if (loading_type == EnhancedIODLoadingType::StrictSingleImage)
-						{
-							tmp0single.push_back(tmp2);
-						}
-					}
+								if (loading_type == EnhancedIODLoadingType::PreferUniformVolumes)
+								{
+									std::map< unsigned int,unsigned int,std::less<unsigned int> > tmp3;
+									const bool ok_sort = sort_frames_ippiop(tmp2, tmp3, values);
+									if (ok_sort)
+									{
+										tmp0.push_back(tmp3);
+									}
+									else
+									{
+										tmp0.push_back(tmp2);
+									}
 #ifdef ENHANCED_PRINT_INFO
-					else
-					{
-						if (!warning0)
-						{
-							warning0 = true;
-							std::cout << "Warning: indices may be not consistent"
-								<< std::endl;
-						}
-					}
+									if (!info0)
+									{
+										info0 = true;
+										std::cout << "Trying to sort by IPP/OIP ...";
+										if (ok_sort)
+										{
+											std::cout << "success";
+										}
+										else
+										{
+											std::cout << "failed";
+										}
+										std::cout << std::endl;
+									}
 #endif
+								}
+								else if (loading_type == EnhancedIODLoadingType::StrictMultipleImages)
+								{
+									tmp0.push_back(tmp2);
+								}
+								else if (loading_type == EnhancedIODLoadingType::StrictSingleImage)
+								{
+									tmp0single.push_back(tmp2);
+								}
+							}
+#ifdef ENHANCED_PRINT_INFO
+							else
+							{
+								if (!warning0)
+								{
+									warning0 = true;
+									std::cout << "Warning: indices may be not consistent"
+										<< std::endl;
+								}
+							}
+#endif
+						}
+						if (error) break;
+					}
+					if (error) break;
 				}
 				if (error) break;
 			}
@@ -10603,7 +10704,7 @@ QString DicomUtils::read_enhanced_3d_6d(
 	const unsigned int rows_, const unsigned int columns_,
 	const mdcm::PixelFormat & pixelformat,
 	const mdcm::PhotometricInterpretation & pi,
-	const int dim6th, const int dim5th, const int dim4th, const int dim3rd,
+	const int dim8th, const int dim7th, const int dim6th, const int dim5th, const int dim4th, const int dim3rd,
 	const DimIndexValues & idx_values, const FrameGroupValues & values,
 	const bool ok3d, const int max_3d_tex_size, GLWidget * gl,
 	const bool min_load,
@@ -10624,7 +10725,7 @@ QString DicomUtils::read_enhanced_3d_6d(
 	const SettingsWidget * wsettings = static_cast<const SettingsWidget*>(settings);
 	*ok = enhanced_process_indices(
 		tmp0, idx_values, values,
-		dim6th, dim5th, dim4th, dim3rd, enh_loading_type);
+		dim8th, dim7th, dim6th, dim5th, dim4th, dim3rd, enh_loading_type);
 	if (*ok)
 	{
 		message_ = read_enhanced_common(

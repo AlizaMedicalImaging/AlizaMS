@@ -221,7 +221,7 @@ public:
 		const QMap<QString,int> &);
 	static void enhanced_get_indices(
 		const DimIndexSq & sq,
-		int*,int*,int*, int*,int*,
+		int*,int*,int*,int*,int*, int*,int*,
 		const short);
 	static void enhanced_process_values(
 		FrameGroupValues&, const FrameGroupValues&);
@@ -343,7 +343,7 @@ public:
 			> &,
 		const DimIndexValues&,
 		const FrameGroupValues&,
-		const int, const int, const int, const int,
+		const int, const int, const int, const int, const int, const int,
 		const short);
 	static QString read_enhanced_3d_6d(
 		bool*,
@@ -355,7 +355,7 @@ public:
 		const unsigned int, const unsigned int,
 		const mdcm::PixelFormat&,
 		const mdcm::PhotometricInterpretation&,
-		const int, const int, const int, const int,
+		const int, const int, const int, const int, const int, const int,
 		const DimIndexValues&,
 		const FrameGroupValues&,
 		const bool, const int, GLWidget*,
