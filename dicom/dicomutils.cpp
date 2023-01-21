@@ -1,5 +1,5 @@
 #define WARN_RAM_SIZE
-#define ENHANCED_PRINT_INFO
+//#define ENHANCED_PRINT_INFO
 //#define ENHANCED_PRINT_GROUPS
 //#define TMP_ALWAYS_GEOM_FROM_IMAGE
 
@@ -199,7 +199,9 @@ static bool sort_frames_ippiop(
 	}
 	std::stable_sort(tmp0.begin(), tmp0.end(), less_than_ipp());
 #ifdef ENHANCED_PRINT_INFO
+#if 0
 	std::cout << "Sorting frames by IPP/IOP ..." << std::endl;
+#endif
 #endif
 	for (unsigned int j = 0; j < tmp0.size(); ++j)
 	{
@@ -3158,6 +3160,7 @@ bool DicomUtils::read_group_sq(
 					if (ok && index_value.idx.size()==sq.size())
 					{
 #ifdef ENHANCED_PRINT_INFO
+#if 1
 						std::cout << "Dimension Index Values";
 						for (size_t y = 0; y < sq.size(); ++y)
 						{
@@ -3165,6 +3168,7 @@ bool DicomUtils::read_group_sq(
 						}
 						std::cout << " (id = " << index_value.id << ")"
 							<< std::endl;
+#endif
 #endif
 						dim_idx_values.push_back(index_value);
 					}
@@ -5264,7 +5268,7 @@ void DicomUtils::enhanced_get_indices(
 	//
 	if (*enh_id < 0)
 	{
-		if (sq_size == 4)
+		if (sq1_size == 4)
 		{
 			if (temporal_pos_idx == 0 &&
 				stack_id_idx == 1 &&
@@ -5287,7 +5291,7 @@ void DicomUtils::enhanced_get_indices(
 				*enh_id = 998;
 			}
 		}
-		else if (sq_size == 3)
+		else if (sq1_size == 3)
 		{
 			if (stack_id_idx == 0 &&
 				in_stack_pos_idx == 1)
@@ -5305,7 +5309,7 @@ void DicomUtils::enhanced_get_indices(
 strict:
 	if (*enh_id < 0)
 	{
-		switch(sq1_size)
+		switch (sq1_size)
 		{
 		case 4:
 			*dim3rd = 3;
@@ -10474,35 +10478,38 @@ bool DicomUtils::enhanced_process_indices(
 							}
 						}
 					}
-					const size_t tmp2_test_size0 = tmp2_test.size();
-					if (tmp2_test_size0 > 0)
+					if (!tmp2.empty())
 					{
-						tmp2_test.sort();
-						tmp2_test.unique();
-						const size_t tmp2_test_size1 = tmp2_test.size();
-						if (tmp2_test_size0 != tmp2_test_size1) error = true;
-						if (error) break;
-					}
-					if (loading_type == EnhancedIODLoadingType::PreferUniformVolumes)
-					{
-						std::map< unsigned int,unsigned int,std::less<unsigned int> > tmp3;
-						const bool ok_sort = sort_frames_ippiop(tmp2, tmp3, values);
-						if (ok_sort)
+						const size_t tmp2_test_size0 = tmp2_test.size();
+						if (tmp2_test_size0 > 0)
 						{
-							tmp0.push_back(tmp3);
+							tmp2_test.sort();
+							tmp2_test.unique();
+							const size_t tmp2_test_size1 = tmp2_test.size();
+							if (tmp2_test_size0 != tmp2_test_size1) error = true;
+							if (error) break;
 						}
-						else
+						if (loading_type == EnhancedIODLoadingType::PreferUniformVolumes)
+						{
+							std::map< unsigned int,unsigned int,std::less<unsigned int> > tmp3;
+							const bool ok_sort = sort_frames_ippiop(tmp2, tmp3, values);
+							if (ok_sort)
+							{
+								tmp0.push_back(tmp3);
+							}
+							else
+							{
+								tmp0.push_back(tmp2);
+							}
+						}
+						else if (loading_type == EnhancedIODLoadingType::StrictMultipleImages)
 						{
 							tmp0.push_back(tmp2);
 						}
-					}
-					else if (loading_type == EnhancedIODLoadingType::StrictMultipleImages)
-					{
-						tmp0.push_back(tmp2);
-					}
-					else if (loading_type == EnhancedIODLoadingType::StrictSingleImage)
-					{
-						tmp0single.push_back(tmp2);
+						else if (loading_type == EnhancedIODLoadingType::StrictSingleImage)
+						{
+							tmp0single.push_back(tmp2);
+						}
 					}
 				}
 				if (error) break;
@@ -10562,7 +10569,7 @@ bool DicomUtils::enhanced_process_indices(
 				tmp0.at(x).cbegin();
 			while (it != tmp0.at(x).cend())
 			{
-				std::cout << "x=" << x << " [" << it->first << "]=" << it->second << std::endl;
+				std::cout << "x = " << x << " [" << it->first << "]=" << it->second << "\n";
 				++it;
 			}
 		}
