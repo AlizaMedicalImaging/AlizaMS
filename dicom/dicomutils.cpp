@@ -5302,7 +5302,7 @@ void DicomUtils::enhanced_get_indices(
 				*dim5th = 2;
 				*dim4th = stack_id_idx;
 				*dim3rd = in_stack_pos_idx;
-				*enh_id = 997;
+				*enh_id = 899;
 			}
 		}
 	}
@@ -5321,7 +5321,7 @@ strict:
 			*dim6th = 2;
 			*dim7th = 1;
 			*dim8th = 0;
-			*enh_id = 899;
+			*enh_id = 799;
 			break;
 		case 5:
 			*dim3rd = 4;
@@ -5329,29 +5329,29 @@ strict:
 			*dim5th = 2;
 			*dim6th = 1;
 			*dim7th = 0;
-			*enh_id = 898;
+			*enh_id = 798;
 			break;
 		case 4:
 			*dim3rd = 3;
 			*dim4th = 2;
 			*dim5th = 1;
 			*dim6th = 0;
-			*enh_id = 897;
+			*enh_id = 797;
 			break;
 		case 3:
 			*dim3rd = 2;
 			*dim4th = 1;
 			*dim5th = 0;
-			*enh_id = 896;
+			*enh_id = 796;
 			break;
 		case 2:
 			*dim3rd = 1;
 			*dim4th = 0;
-			*enh_id = 895;
+			*enh_id = 795;
 			break;
 		case 1:
 			*dim3rd = 0;
-			*enh_id = 894;
+			*enh_id = 794;
 			break;
 		default:
 			break;
@@ -6133,8 +6133,8 @@ QString DicomUtils::read_enhanced(
 	{
 		std::cout << "ID " << enh_id;
 		std::cout
-			<< " dim8th=" << dim6th
-			<< " dim7th=" << dim6th
+			<< " dim8th=" << dim8th
+			<< " dim7th=" << dim7th
 			<< " dim6th=" << dim6th
 			<< " dim5th=" << dim5th
 			<< " dim4th=" << dim4th
@@ -6473,8 +6473,8 @@ QString DicomUtils::read_enhanced_supp_palette(
 	{
 		std::cout << "ID " << enh_id;
 		std::cout
-			<< " dim8th=" << dim6th
-			<< " dim7th=" << dim6th
+			<< " dim8th=" << dim8th
+			<< " dim7th=" << dim7th
 			<< " dim6th=" << dim6th
 			<< " dim5th=" << dim5th
 			<< " dim4th=" << dim4th
@@ -10547,16 +10547,20 @@ bool DicomUtils::enhanced_process_indices(
 									else
 									{
 										unsigned int tmp2_pos = idx_values.at(x).idx.at(dim3rd);
+#if 1
+										// Indices must start with "1", but there files in the wild
+										// with indices starting with "0".
 										if (tmp2_pos >= 1)
 										{
 											tmp2_pos -= 1;
 										}
 										else
 										{
-											std::cout << "Error: index can not start with 0" << std::endl;
+											std::cout << "Error: indices can not start with \"0\"" << std::endl;
 											error = true;
 											break;
 										}
+#endif
 										tmp2[idx_values.at(x).id] = tmp2_pos;
 										tmp2_test.push_back(tmp2_pos);
 									}
