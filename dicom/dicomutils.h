@@ -345,7 +345,7 @@ public:
 		const FrameGroupValues&,
 		const int, const int, const int, const int, const int, const int,
 		const short);
-	static QString read_enhanced_3d_6d(
+	static QString read_enhanced_3d_8d(
 		bool*,
 		std::vector<ImageVariant*> &,
 		const QString &,

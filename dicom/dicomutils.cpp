@@ -6142,7 +6142,7 @@ QString DicomUtils::read_enhanced(
 			<< std::endl;
 	}
 #endif
-	message_ = read_enhanced_3d_6d(
+	message_ = read_enhanced_3d_8d(
 		&tmp17, ivariants, sop, f,
 		data,
 		image_overlays,
@@ -6179,7 +6179,7 @@ QString DicomUtils::read_enhanced(
 		if (!min_load)
 			std::cout << "  Fallback" << std::endl;
 #endif
-		message_ = read_enhanced_3d_6d(
+		message_ = read_enhanced_3d_8d(
 			&tmp17, ivariants, sop, f,
 			data,
 			image_overlays,
@@ -6482,7 +6482,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 			<< std::endl;
 	}
 #endif
-	message_ = read_enhanced_3d_6d(
+	message_ = read_enhanced_3d_8d(
 		&tmp17, ivariants, sop, f,
 		data,
 		image_overlays,
@@ -6523,7 +6523,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 			std::cout << "  Fallback" << std::endl;
 		}
 #endif
-		message_ = read_enhanced_3d_6d(
+		message_ = read_enhanced_3d_8d(
 			&tmp17, ivariants, sop, f,
 			data,
 			image_overlays,
@@ -10332,12 +10332,17 @@ QString DicomUtils::read_enhanced_common(
 				}
 				if (ivariant->equi)
 				{
-					if (ivariant->di->idimz < 7) ivariant->di->transparency = false;
+					if (ivariant->di->idimz < 7)
+					{
+						ivariant->di->transparency = false;
+					}
 				}
 				else
 				{
 					if (!ivariant->one_direction)
+					{
 						ivariant->di->transparency = false;
+					}
 					ivariant->di->filtering = 0;
 				}
 				if (sop==QString("1.2.840.10008.5.1.4.1.1.4.1") || // Enhanced MR
@@ -10347,10 +10352,15 @@ QString DicomUtils::read_enhanced_common(
 					sop==QString("1.2.840.10008.5.1.4.1.1.4.4") || // Legacy MR
 					sop==QString("1.2.840.10008.5.1.4.1.1.4.3") || // Enhanced MR color
 					sop==QString("1.2.840.10008.5.1.4.1.1.128.1")) // Legacy PET
+				{
 					ivariant->unit_str = QString(" mm");
+				}
 				ivariant->di->shift_tmp = shift_tmp;
 				ivariant->di->scale_tmp = scale_tmp;
-				if (geom_ok) ivariant->iod_supported = true;
+				if (geom_ok)
+				{
+					ivariant->iod_supported = true;
+				}
 				if (instance_number >= 0)
 				{
 					ivariant->instance_number = instance_number;
@@ -10479,30 +10489,25 @@ bool DicomUtils::enhanced_process_indices(
 		bool warning0 = false;
 		bool info0 = false;
 #endif
-		for (
-			std::list<unsigned int>::const_iterator it1 = tmp1_1.cbegin();
+		for (std::list<unsigned int>::const_iterator it1 = tmp1_1.cbegin();
 			it1 != tmp1_1.cend();
 			++it1)
 		{
-			for (
-				std::list<unsigned int>::const_iterator it2 = tmp1_2.cbegin();
-				it2 != tmp1_2.cend();
-				++it2)
+			for (std::list<unsigned int>::const_iterator it2 = tmp1_2.cbegin();
+					it2 != tmp1_2.cend();
+					++it2)
 			{
-				for (
-					std::list<unsigned int>::const_iterator it3 = tmp1_3.cbegin();
-					it3 != tmp1_3.cend();
-					++it3)
+				for (std::list<unsigned int>::const_iterator it3 = tmp1_3.cbegin();
+						it3 != tmp1_3.cend();
+						++it3)
 				{
-					for (
-						std::list<unsigned int>::const_iterator it4 = tmp1_4.cbegin();
-						it4 != tmp1_4.cend();
-						++it4)
+					for (std::list<unsigned int>::const_iterator it4 = tmp1_4.cbegin();
+							it4 != tmp1_4.cend();
+							++it4)
 					{
-						for (
-							std::list<unsigned int>::const_iterator it5 = tmp1_5.cbegin();
-							it5 != tmp1_5.cend();
-							++it5)
+						for (std::list<unsigned int>::const_iterator it5 = tmp1_5.cbegin();
+								it5 != tmp1_5.cend();
+								++it5)
 						{
 							std::map< unsigned int,unsigned int,std::less<unsigned int> > tmp2;
 							std::list<unsigned int> tmp2_test;
@@ -10532,8 +10537,7 @@ bool DicomUtils::enhanced_process_indices(
 									dim3rd >= 0 && dim3rd < static_cast<int>(idx_values.at(x).idx.size())
 									? idx_values.at(x).idx.at(dim3rd)
 									: -1;
-								if (
-									(idx1 < 0 || idx1 == static_cast<int>(*it1)) &&
+								if ((idx1 < 0 || idx1 == static_cast<int>(*it1)) &&
 									(idx2 < 0 || idx2 == static_cast<int>(*it2)) &&
 									(idx3 < 0 || idx3 == static_cast<int>(*it3)) &&
 									(idx4 < 0 || idx4 == static_cast<int>(*it4)) &&
@@ -10548,7 +10552,7 @@ bool DicomUtils::enhanced_process_indices(
 									{
 										unsigned int tmp2_pos = idx_values.at(x).idx.at(dim3rd);
 #if 1
-										// Indices must start with "1", but there files in the wild
+										// Indices must start with "1", but there are files in the wild
 										// with indices starting with "0".
 										if (tmp2_pos >= 1)
 										{
@@ -10698,7 +10702,7 @@ bool DicomUtils::enhanced_process_indices(
 	return !error;
 }
 
-QString DicomUtils::read_enhanced_3d_6d(
+QString DicomUtils::read_enhanced_3d_8d(
 	bool * ok,
 	std::vector<ImageVariant*> & ivariants,
 	const QString & sop,
