@@ -299,7 +299,7 @@
                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Will use &lt;span style=&quot; font-style:italic;&quot;&gt;Dimension Organization&lt;/span&gt;, but attempt to extract uniform volumes and sort frames by IPP/IOP (or IPV/IOV), if possible.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="text">
-                 <string>Use Dimension Organization, prefer sorted uniform volumes</string>
+                 <string>Use Dimension Organization, if available, prefer sorted uniform volumes</string>
                 </property>
                 <property name="checked">
                  <bool>true</bool>
