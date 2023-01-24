@@ -445,11 +445,7 @@ public:
 		const QWidget*,
 		QProgressDialog*,
 		short, // type of object processing
-		short); // Strategy for enhanced IODs:
-				//  0 - use Dimension Organization, prefer sorted uniform
-				//  1 - strict Dimension Organization
-				//  2 - strict Dimension Organization, single image
-				//  3 - skip Dimension Organization
+		short);
 };
 
 #endif
