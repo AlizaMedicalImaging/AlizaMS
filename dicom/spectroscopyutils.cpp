@@ -207,8 +207,8 @@ QString SpectroscopyUtils::ProcessData(
 #if 0
 	std::cout << "N" << enh_id;
 	std::cout
-		<< " dim8th=" << dim6th
-		<< " dim7th=" << dim6th
+		<< " dim8th=" << dim8th
+		<< " dim7th=" << dim7th
 		<< " dim6th=" << dim6th
 		<< " dim5th=" << dim5th
 		<< " dim4th=" << dim4th
@@ -237,15 +237,18 @@ QString SpectroscopyUtils::ProcessData(
 	}
 	if (!ok__)tmp0.clear();
 	if (tmp0.empty())
+	{
 		return QString("tmp0.size()<1");
-
+	}
 	for (unsigned int x = 0; x < tmp0.size(); ++x)
 	{
-		if (tmp0.at(x).size()<1)
+		if (tmp0.at(x).size() < 1)
+		{
 			return
 				QString("tmp0.at(") +
 				QVariant(static_cast<int>(x)).toString() +
 				QString(").size()<1");
+		}
 	}
 
 #ifdef LOAD_SPECT_DATA
