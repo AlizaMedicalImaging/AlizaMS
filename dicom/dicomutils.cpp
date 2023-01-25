@@ -10095,7 +10095,6 @@ QString DicomUtils::read_enhanced_common(
 				{
 					ivariant->di->image_slices.push_back(slices[k]);
 				}
-				ivariant->di->slices_generated = true;
 				if (spacing_z_tmp < 0 ||
 					(spacing_z_tmp <= 0.00001 && one_direction_))
 				{
@@ -10131,6 +10130,7 @@ QString DicomUtils::read_enhanced_common(
 				{
 					ivariant->equi = false;
 				}
+				ivariant->di->slices_generated = true;
 				ivariant->one_direction = one_direction_;
 				ivariant->di->slices_from_dicom = true;
 			}
