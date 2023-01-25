@@ -14490,7 +14490,7 @@ QString DicomUtils::read_dicom(
 					rtstruct_ref_search_path,
 					tmp_ivariants_rtstruct,
 					max_3d_tex_size, gl, ok3d,
-					enh_loading_type,
+					1, // force sorted uniform
 					settings,
 					pb);
 			bool ref2_ok = false;
