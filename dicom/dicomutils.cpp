@@ -1,5 +1,5 @@
 #define WARN_RAM_SIZE
-#define ENHANCED_PRINT_INFO
+//#define ENHANCED_PRINT_INFO
 //#define ENHANCED_PRINT_GROUPS
 //#define TMP_ALWAYS_GEOM_FROM_IMAGE
 
@@ -2479,7 +2479,7 @@ bool DicomUtils::read_slices(
 			values,
 			rows, columns,
 			spacing_x, spacing_y, &spacing_z,
-			ok3d, ivariant->di->skip_texture, gl,
+			ok3d, gl,
 			&ivariant->equi, &ivariant->one_direction,
 			&origin_x, &origin_y, &origin_z,
 			dircos,
@@ -2758,7 +2758,7 @@ bool DicomUtils::read_slices_uihgrid(
 			values,
 			rows, columns,
 			spacing_x, spacing_y, &spacing_z,
-			ok3d, ivariant->di->skip_texture, gl,
+			ok3d, gl,
 			&ivariant->equi, &ivariant->one_direction,
 			&origin_x, &origin_y, &origin_z,
 			dircos,
@@ -2869,7 +2869,7 @@ bool DicomUtils::read_slices_rtdose(
 			values,
 			rows, columns,
 			spacing_x, spacing_y, &spacing_z,
-			ok3d, ivariant->di->skip_texture, gl,
+			ok3d, gl,
 			&ivariant->equi,
 			&ivariant->one_direction,
 			&origin_x, &origin_y, &origin_z,
@@ -4232,7 +4232,7 @@ bool DicomUtils::generate_geometry(
 		const std::vector<double*> & values,
 		const unsigned int rows_, const unsigned int columns_,
 		const double spacing_x, const double spacing_y, double * spacing_z,
-		const bool ok3d, const bool skip_texture, GLWidget * gl,
+		const bool ok3d, GLWidget * gl,
 		bool * equi_,
 		bool * one_direction_,
 		double * origin_x,  double * origin_y,  double * origin_z,
@@ -6121,8 +6121,8 @@ QString DicomUtils::read_enhanced(
 	AnatomyMap empty_;
 	// do not use MDCM's rescale for enhanced, except for US, PA
 	const bool rescale_tmp =
-		(sop==QString("1.2.840.10008.5.1.4.1.1.6.2") ||
-			sop==QString("1.2.840.10008.5.1.2.3.45")) // FIXME
+		(sop == QString("1.2.840.10008.5.1.4.1.1.6.2") ||
+			sop == QString("1.2.840.10008.5.1.2.3.45")) // FIXME
 		? wsettings->get_rescale()
 		: false;
 	message_ =
@@ -9821,7 +9821,7 @@ QString DicomUtils::read_enhanced_common(
 					}
 				}
 /*
-				else if (sop==QString("1.2.840.10008.5.1.4.1.1.77.1.6")) // VL Whole Slide Microscopy
+				else if (sop == QString("1.2.840.10008.5.1.4.1.1.77.1.6")) // VL Whole Slide Microscopy
 				{ // TODO
 				}
 */
@@ -9902,8 +9902,7 @@ QString DicomUtils::read_enhanced_common(
 				error = true;
 				tmp4_ok = false;
 				*ok = false;
-				message_ = QString(
-					"!(idx__<data.size() && data.at(idx__) && idx__<values.size())");
+				message_ = QString("Error (enhanced IOD): index is invalid");
 				break;
 			}
 		}
@@ -10017,8 +10016,8 @@ QString DicomUtils::read_enhanced_common(
 			}
 			//
 			bool invalidate = false;
-			double spacing_tmp0[2] = {0.0, 0.0 };
-			double spacing_tmp1[2] = {0.0, 0.0 };
+			double spacing_tmp0[2] = { 0.0, 0.0 };
+			double spacing_tmp1[2] = { 0.0, 0.0 };
 			bool spacing_ok = false;
 			for (int i = 0; i < tmp5.size(); ++i)
 			{
@@ -10068,7 +10067,7 @@ QString DicomUtils::read_enhanced_common(
 					tmp4,
 					rows_, columns_,
 					spacing_x, spacing_y, &spacing_z_tmp,
-					enable_gl, skip_texture, gl,
+					enable_gl, gl,
 					&equi_, &one_direction_,
 					&origin_x_gen, &origin_y_gen, &origin_z_gen,
 					dircos_gen,
@@ -10078,31 +10077,30 @@ QString DicomUtils::read_enhanced_common(
 					tolerance,
 					false);
 			}
-#if 0
-			std::cout
-				<< "geom_ok=" << geom_ok
-				<< " spacing ok=" << spacing_ok
-				<< " sx=" << spacing_x
-				<< " sy=" << spacing_y
-				<< " sz_tmp=" << spacing_z_tmp <<std::endl;
-#endif
 			//
 			ivariant->equi = equi_;
 			//
+#if 0
+			std::cout
+				<< "geom_ok = " << geom_ok
+				<< " spacing ok = " << spacing_ok
+				<< " sx = " << spacing_x
+				<< " sy = " << spacing_y
+				<< " sz_tmp = " << spacing_z_tmp
+				<< " equi = " << equi_ << std::endl;
+#endif
 			if (geom_ok)
 			{
 				for (unsigned int k = 0; k < slices.size(); ++k)
+				{
 					ivariant->di->image_slices.push_back(slices[k]);
+				}
 				ivariant->di->slices_generated = true;
-				if (spacing_z_tmp < 0)
+				if (spacing_z_tmp < 0 ||
+					(spacing_z_tmp <= 0.00001 && one_direction_))
 				{
 					spacing_z = 0.00001;
 					invalidate = true;
-				}
-				else if (spacing_z_tmp <= 0.00001 && one_direction_)
-				{
-					spacing_z = 0.00001;
-					ivariant->di->skip_texture = true;
 				}
 				else
 				{
@@ -10132,14 +10130,9 @@ QString DicomUtils::read_enhanced_common(
 				if (invalidate)
 				{
 					ivariant->equi = false;
-					ivariant->di->skip_texture = true;
-					ivariant->di->slices_from_dicom = false;
 				}
-				else
-				{
-					ivariant->one_direction = one_direction_;
-					ivariant->di->slices_from_dicom = true;
-				}
+				ivariant->one_direction = one_direction_;
+				ivariant->di->slices_from_dicom = true;
 			}
 			else
 			{
@@ -10168,6 +10161,7 @@ QString DicomUtils::read_enhanced_common(
 				direction[1][2] = nrm_dircos_y;
 				direction[2][2] = nrm_dircos_z;
 				ivariant->di->skip_texture = true;
+				ivariant->di->slices_from_dicom = false;
 			}
 			for (unsigned int k = 0; k < tmp4.size(); ++k)
 			{
@@ -10284,8 +10278,8 @@ QString DicomUtils::read_enhanced_common(
 				(apply_rescale)
 				? wsettings->get_rescale()
 				: true;
-			if (sop==QString("1.2.840.10008.5.1.4.1.1.6.2") || // US
-				sop==QString("1.2.840.10008.5.1.2.3.45")) // FIXME
+			if (sop == QString("1.2.840.10008.5.1.4.1.1.6.2") || // US
+				sop == QString("1.2.840.10008.5.1.2.3.45")) // FIXME
 			{
 				message_ = CommonUtils::gen_itk_image(ok,
 					tmp3,
@@ -10467,13 +10461,13 @@ QString DicomUtils::read_enhanced_common(
 					}
 					ivariant->di->filtering = 0;
 				}
-				if (sop==QString("1.2.840.10008.5.1.4.1.1.4.1") || // Enhanced MR
-					sop==QString("1.2.840.10008.5.1.4.1.1.2.1") || // Enhanced CT
-					sop==QString("1.2.840.10008.5.1.4.1.1.130") || // Enhanced PET
-					sop==QString("1.2.840.10008.5.1.4.1.1.2.2") || // Legacy CT
-					sop==QString("1.2.840.10008.5.1.4.1.1.4.4") || // Legacy MR
-					sop==QString("1.2.840.10008.5.1.4.1.1.4.3") || // Enhanced MR color
-					sop==QString("1.2.840.10008.5.1.4.1.1.128.1")) // Legacy PET
+				if (sop == QString("1.2.840.10008.5.1.4.1.1.4.1") || // Enhanced MR
+					sop == QString("1.2.840.10008.5.1.4.1.1.2.1") || // Enhanced CT
+					sop == QString("1.2.840.10008.5.1.4.1.1.130") || // Enhanced PET
+					sop == QString("1.2.840.10008.5.1.4.1.1.2.2") || // Legacy CT
+					sop == QString("1.2.840.10008.5.1.4.1.1.4.4") || // Legacy MR
+					sop == QString("1.2.840.10008.5.1.4.1.1.4.3") || // Enhanced MR color
+					sop == QString("1.2.840.10008.5.1.4.1.1.128.1")) // Legacy PET
 				{
 					ivariant->unit_str = QString(" mm");
 				}
@@ -12937,7 +12931,7 @@ QString DicomUtils::read_dicom(
 			icc_found = true;
 		}
 #if 1
-		if (sop==QString("1.2.840.10008.5.1.4.1.1.77.1.6")) // TODO
+		if (sop == QString("1.2.840.10008.5.1.4.1.1.77.1.6")) // TODO
 #else
 		if (false)
 #endif
@@ -12958,7 +12952,7 @@ QString DicomUtils::read_dicom(
 			}
 			continue;
 		}
-		else if (sop==QString("1.2.840.10008.5.1.4.1.1.481.3"))
+		else if (sop == QString("1.2.840.10008.5.1.4.1.1.481.3"))
 		{
 			// RTSTRUCT
 			if (load_type == 0)
@@ -12989,7 +12983,7 @@ QString DicomUtils::read_dicom(
 			}
 			continue;
 		}
-		else if (sop==QString("1.2.840.10008.5.1.4.1.1.11.1"))
+		else if (sop == QString("1.2.840.10008.5.1.4.1.1.11.1"))
 		{
 			// Grayscale Softcopy presentation
 			if (load_type == 0)
@@ -12998,7 +12992,7 @@ QString DicomUtils::read_dicom(
 			}
 			continue;
 		}
-		else if (sop==QString("1.2.840.10008.5.1.4.1.1.11.2"))
+		else if (sop == QString("1.2.840.10008.5.1.4.1.1.11.2"))
 		{
 			// Color Softcopy presentation
 			if (load_type == 0)
@@ -13007,7 +13001,7 @@ QString DicomUtils::read_dicom(
 			}
 			continue;
 		}
-		else if (sop==QString("1.2.840.10008.5.1.4.1.1.11.3"))
+		else if (sop == QString("1.2.840.10008.5.1.4.1.1.11.3"))
 		{
 			// Pseudo-color Softcopy presentation
 			if (load_type == 0)
@@ -13016,7 +13010,7 @@ QString DicomUtils::read_dicom(
 			}
 			continue;
 		}
-		else if (sop==QString("1.2.840.10008.5.1.4.1.1.11.4"))
+		else if (sop == QString("1.2.840.10008.5.1.4.1.1.11.4"))
 		{
 			// Blending Softcopy presentation
 			if (load_type == 0)
@@ -13025,7 +13019,7 @@ QString DicomUtils::read_dicom(
 			}
 			continue;
 		}
-		else if (sop==QString("1.2.840.10008.5.1.4.1.1.11.5"))
+		else if (sop == QString("1.2.840.10008.5.1.4.1.1.11.5"))
 		{
 			// XA/XRF Softcopy presentation
 			if (load_type == 0)
@@ -13034,7 +13028,7 @@ QString DicomUtils::read_dicom(
 			}
 			continue;
 		}
-		else if (sop==QString("1.2.840.10008.5.1.4.1.1.11.8"))
+		else if (sop == QString("1.2.840.10008.5.1.4.1.1.11.8"))
 		{
 			// Advanced Blending Softcopy presentation
 			if (load_type == 0)
@@ -13043,7 +13037,7 @@ QString DicomUtils::read_dicom(
 			}
 			continue;
 		}
-		else if (sop==QString("1.2.840.10008.5.1.4.1.1.4.2"))
+		else if (sop == QString("1.2.840.10008.5.1.4.1.1.4.2"))
 		{
 			// Spectroscopy
 			if (load_type == 0)
@@ -13067,13 +13061,13 @@ QString DicomUtils::read_dicom(
 			continue;
 		}
 		else if (
-			sop==QString("1.2.840.10008.5.1.4.1.1.66.5") ||
-			sop==QString("1.2.840.10008.5.1.4.1.1.68.1"))
+			sop == QString("1.2.840.10008.5.1.4.1.1.66.5") ||
+			sop == QString("1.2.840.10008.5.1.4.1.1.68.1"))
 		{
 			// Meshes
 			continue;
 		}
-		else if (sop==QString("1.2.840.10008.5.1.4.1.1.104.1"))
+		else if (sop == QString("1.2.840.10008.5.1.4.1.1.104.1"))
 		{
 			// PDF
 			if (load_type == 0)
@@ -13083,7 +13077,7 @@ QString DicomUtils::read_dicom(
 			}
 			continue;
 		}
-		else if (sop==QString("1.2.840.10008.5.1.4.1.1.104.3"))
+		else if (sop == QString("1.2.840.10008.5.1.4.1.1.104.3"))
 		{
 			// STL
 			if (load_type == 0)
@@ -13094,8 +13088,8 @@ QString DicomUtils::read_dicom(
 			continue;
 		}
 		else if (
-			sop==QString("1.2.840.10008.5.1.4.1.1.77.1.1.1") ||
-			sop==QString("1.2.840.10008.5.1.4.1.1.77.1.4.1"))
+			sop == QString("1.2.840.10008.5.1.4.1.1.77.1.1.1") ||
+			sop == QString("1.2.840.10008.5.1.4.1.1.77.1.4.1"))
 		{
 			// Video Endoscopic Image Storage
 			// Video Photographic Image Storage
@@ -13106,24 +13100,24 @@ QString DicomUtils::read_dicom(
 			continue;
 		}
 		else if (
-			   sop==QString("1.2.840.10008.5.1.4.1.1.88.11") // Basic Text SR Storage
-			|| sop==QString("1.2.840.10008.5.1.4.1.1.88.22") // Enhanced SR Storage
-			|| sop==QString("1.2.840.10008.5.1.4.1.1.88.33") // Comprehensive SR Storage
-			|| sop==QString("1.2.840.10008.5.1.4.1.1.88.34") // Comprehensive 3D SR Storage
-			|| sop==QString("1.2.840.10008.5.1.4.1.1.88.35") // Extensible SR Storage
-			|| sop==QString("1.2.840.10008.5.1.4.1.1.88.40") // Procedure Log Storage
-			|| sop==QString("1.2.840.10008.5.1.4.1.1.88.50") // Mammography CAD SR Storage
-			|| sop==QString("1.2.840.10008.5.1.4.1.1.88.59") // Key Object Selection Storage
-			|| sop==QString("1.2.840.10008.5.1.4.1.1.88.65") // Chest CAD SR Storage
-			|| sop==QString("1.2.840.10008.5.1.4.1.1.88.67") // X-Ray Radiation Dose SR Storage
-			|| sop==QString("1.2.840.10008.5.1.4.1.1.88.68") // Radiopharmaceutical Radiation Dose SR Storage
-			|| sop==QString("1.2.840.10008.5.1.4.1.1.88.69") // Colon CAD SR Storage
-			|| sop==QString("1.2.840.10008.5.1.4.1.1.88.70") // Implantation Plan SR Document Storage
-			|| sop==QString("1.2.840.10008.5.1.4.1.1.88.71") // Acquisition Context SR Storage
-			|| sop==QString("1.2.840.10008.5.1.4.1.1.88.72") // Simplified Adult Echo SR Storage
-			|| sop==QString("1.2.840.10008.5.1.4.1.1.88.73") // Patient Radiation Dose SR Storage
-			|| sop==QString("1.2.840.10008.5.1.4.1.1.88.74") // Planned Imaging Agent Administration SR Storage
-			|| sop==QString("1.2.840.10008.5.1.4.1.1.88.75") // Performed Imaging Agent Administration SR Storage
+			   sop == QString("1.2.840.10008.5.1.4.1.1.88.11") // Basic Text SR Storage
+			|| sop == QString("1.2.840.10008.5.1.4.1.1.88.22") // Enhanced SR Storage
+			|| sop == QString("1.2.840.10008.5.1.4.1.1.88.33") // Comprehensive SR Storage
+			|| sop == QString("1.2.840.10008.5.1.4.1.1.88.34") // Comprehensive 3D SR Storage
+			|| sop == QString("1.2.840.10008.5.1.4.1.1.88.35") // Extensible SR Storage
+			|| sop == QString("1.2.840.10008.5.1.4.1.1.88.40") // Procedure Log Storage
+			|| sop == QString("1.2.840.10008.5.1.4.1.1.88.50") // Mammography CAD SR Storage
+			|| sop == QString("1.2.840.10008.5.1.4.1.1.88.59") // Key Object Selection Storage
+			|| sop == QString("1.2.840.10008.5.1.4.1.1.88.65") // Chest CAD SR Storage
+			|| sop == QString("1.2.840.10008.5.1.4.1.1.88.67") // X-Ray Radiation Dose SR Storage
+			|| sop == QString("1.2.840.10008.5.1.4.1.1.88.68") // Radiopharmaceutical Radiation Dose SR Storage
+			|| sop == QString("1.2.840.10008.5.1.4.1.1.88.69") // Colon CAD SR Storage
+			|| sop == QString("1.2.840.10008.5.1.4.1.1.88.70") // Implantation Plan SR Document Storage
+			|| sop == QString("1.2.840.10008.5.1.4.1.1.88.71") // Acquisition Context SR Storage
+			|| sop == QString("1.2.840.10008.5.1.4.1.1.88.72") // Simplified Adult Echo SR Storage
+			|| sop == QString("1.2.840.10008.5.1.4.1.1.88.73") // Patient Radiation Dose SR Storage
+			|| sop == QString("1.2.840.10008.5.1.4.1.1.88.74") // Planned Imaging Agent Administration SR Storage
+			|| sop == QString("1.2.840.10008.5.1.4.1.1.88.75") // Performed Imaging Agent Administration SR Storage
 			)
 		{
 			if (load_type == 0)
@@ -13178,14 +13172,14 @@ QString DicomUtils::read_dicom(
 			photometric_tmp0 = photometric;
 			icc_found_tmp0 = icc_found;
 			if (
-				sop==QString("1.2.840.10008.5.1.4.1.1.6.1") ||
-				sop==QString("1.2.840.10008.5.1.4.1.1.6")   ||
-				sop==QString("1.2.840.10008.5.1.4.1.1.3.1") ||
-				sop==QString("1.2.840.10008.5.1.4.1.1.3"))
+				sop == QString("1.2.840.10008.5.1.4.1.1.6.1") ||
+				sop == QString("1.2.840.10008.5.1.4.1.1.6")   ||
+				sop == QString("1.2.840.10008.5.1.4.1.1.3.1") ||
+				sop == QString("1.2.840.10008.5.1.4.1.1.3"))
 			{
 				ultrasound = true;
 			}
-			else if (sop==QString("1.2.840.10008.5.1.4.1.1.20"))
+			else if (sop == QString("1.2.840.10008.5.1.4.1.1.20"))
 			{
 				nuclear = true;
 			}
@@ -13220,40 +13214,40 @@ QString DicomUtils::read_dicom(
 					}
 				}
 				if (
-					sop==QString("1.2.840.10008.5.1.4.1.1.4.1")     || // Enhanced MR
-					sop==QString("1.2.840.10008.5.1.4.1.1.2.1")     || // Enhanced CT
-					sop==QString("1.2.840.10008.5.1.4.1.1.130")     || // Enhanced PET
-					sop==QString("1.2.840.10008.5.1.4.1.1.6.2")     || // Enhanced US Volume
+					sop == QString("1.2.840.10008.5.1.4.1.1.4.1")     || // Enhanced MR
+					sop == QString("1.2.840.10008.5.1.4.1.1.2.1")     || // Enhanced CT
+					sop == QString("1.2.840.10008.5.1.4.1.1.130")     || // Enhanced PET
+					sop == QString("1.2.840.10008.5.1.4.1.1.6.2")     || // Enhanced US Volume
 					//
-					sop==QString("1.2.840.10008.5.1.2.3.45")        || // PA Image Storage FIXME
+					sop == QString("1.2.840.10008.5.1.2.3.45")        || // PA Image Storage FIXME
 					//
-					sop==QString("1.2.840.10008.5.1.4.1.1.13.1.1")  || // Enhanced X Ray 3D Angiographic
-					sop==QString("1.2.840.10008.5.1.4.1.1.13.1.2")  || // Enhanced X-Ray 3D Craniofacial
-					sop==QString("1.2.840.10008.5.1.4.1.1.13.1.3")  || // Breast Tomosynthesis
-					sop==QString("1.2.840.10008.5.1.4.1.1.2.2")     || // Legacy Converted Enhanced CT
-					sop==QString("1.2.840.10008.5.1.4.1.1.4.4")     || // Legacy Converted Enhanced MR
-					sop==QString("1.2.840.10008.5.1.4.1.1.128.1")   || // Legacy Converted Enhanced PET
-					sop==QString("1.2.840.10008.5.1.4.1.1.30")      || // Parametric Map
-					sop==QString("1.2.840.10008.5.1.4.1.1.66.4")    || // Segmentation
-					sop==QString("1.2.840.10008.5.1.4.1.1.4.3")     || // Enhanced MR Color
-					sop==QString("1.2.840.10008.5.1.4.1.1.77.1.5.4")|| // Ophthalmic Tomography
-					sop==QString("1.2.840.10008.5.1.4.1.1.14.1")    || // Intravascular Optical Coherence Tomography Image Storage - For Presentation
-					sop==QString("1.2.840.10008.5.1.4.1.1.14.2")    || // Intravascular Optical Coherence Tomography Image Storage - For Processing
+					sop == QString("1.2.840.10008.5.1.4.1.1.13.1.1")  || // Enhanced X Ray 3D Angiographic
+					sop == QString("1.2.840.10008.5.1.4.1.1.13.1.2")  || // Enhanced X-Ray 3D Craniofacial
+					sop == QString("1.2.840.10008.5.1.4.1.1.13.1.3")  || // Breast Tomosynthesis
+					sop == QString("1.2.840.10008.5.1.4.1.1.2.2")     || // Legacy Converted Enhanced CT
+					sop == QString("1.2.840.10008.5.1.4.1.1.4.4")     || // Legacy Converted Enhanced MR
+					sop == QString("1.2.840.10008.5.1.4.1.1.128.1")   || // Legacy Converted Enhanced PET
+					sop == QString("1.2.840.10008.5.1.4.1.1.30")      || // Parametric Map
+					sop == QString("1.2.840.10008.5.1.4.1.1.66.4")    || // Segmentation
+					sop == QString("1.2.840.10008.5.1.4.1.1.4.3")     || // Enhanced MR Color
+					sop == QString("1.2.840.10008.5.1.4.1.1.77.1.5.4")|| // Ophthalmic Tomography
+					sop == QString("1.2.840.10008.5.1.4.1.1.14.1")    || // Intravascular Optical Coherence Tomography Image Storage - For Presentation
+					sop == QString("1.2.840.10008.5.1.4.1.1.14.2")    || // Intravascular Optical Coherence Tomography Image Storage - For Processing
 					// ipp-iop ??
-					sop==QString("1.2.840.10008.5.1.4.1.1.13.1.4")  || // Breast Projection X-Ray Image Storage - For Presentation
-					sop==QString("1.2.840.10008.5.1.4.1.1.13.1.5")  || // Breast Projection X-Ray Image Storage - For Processing
-					sop==QString("1.2.840.10008.5.1.4.1.1.77.1.5.5")|| // Wide Field Ophthalmic Photography Stereographic Projection
-					sop==QString("1.2.840.10008.5.1.4.1.1.77.1.5.6")|| // Wide Field Ophthalmic Photography 3D Coordinates
-					sop==QString("1.2.840.10008.5.1.4.1.1.12.1.1")  || // Enhanced X-Ray Angiographic
-					sop==QString("1.2.840.10008.5.1.4.1.1.12.2.1")     // Enhanced X-Ray RF
+					sop == QString("1.2.840.10008.5.1.4.1.1.13.1.4")  || // Breast Projection X-Ray Image Storage - For Presentation
+					sop == QString("1.2.840.10008.5.1.4.1.1.13.1.5")  || // Breast Projection X-Ray Image Storage - For Processing
+					sop == QString("1.2.840.10008.5.1.4.1.1.77.1.5.5")|| // Wide Field Ophthalmic Photography Stereographic Projection
+					sop == QString("1.2.840.10008.5.1.4.1.1.77.1.5.6")|| // Wide Field Ophthalmic Photography 3D Coordinates
+					sop == QString("1.2.840.10008.5.1.4.1.1.12.1.1")  || // Enhanced X-Ray Angiographic
+					sop == QString("1.2.840.10008.5.1.4.1.1.12.2.1")     // Enhanced X-Ray RF
 					)
 				{
 					enhanced = true;
 				}
 				if (
-					sop==QString("1.2.840.10008.5.1.4.1.1.7.3") || // Multi-frame Grayscale Word SC
-					sop==QString("1.2.840.10008.5.1.4.1.1.7.2") || // Multi-frame Grayscale Byte SC
-					sop==QString("1.2.840.10008.5.1.4.1.1.7.4")    // Multi-frame True Color SC
+					sop == QString("1.2.840.10008.5.1.4.1.1.7.3") || // Multi-frame Grayscale Word SC
+					sop == QString("1.2.840.10008.5.1.4.1.1.7.2") || // Multi-frame Grayscale Byte SC
+					sop == QString("1.2.840.10008.5.1.4.1.1.7.4")    // Multi-frame True Color SC
 					)
 				{
 					if (has_functional_groups(ds)) enhanced = true;
@@ -13331,19 +13325,19 @@ QString DicomUtils::read_dicom(
 				}
 				if (
 #if 0
-				   sop==QString("1.2.840.10008.5.1.4.1.1.7")       || // SC
+				   sop == QString("1.2.840.10008.5.1.4.1.1.7")       || // SC
 #endif
-				   sop==QString("1.2.840.10008.5.1.4.1.1.77.1.5.1")|| // Ophthalmic Photography  8 Bit
-				   sop==QString("1.2.840.10008.5.1.4.1.1.77.1.5.2")|| // Ophthalmic Photography 16 Bit
-				   sop==QString("1.2.840.10008.5.1.4.1.1.1")       || // Computed Radiography
-				   sop==QString("1.2.840.10008.5.1.4.1.1.1.1")     || // Digital X-Ray - For Presentation
-				   sop==QString("1.2.840.10008.5.1.4.1.1.1.1.1")   || // Digital X-Ray - For Processing
-				   sop==QString("1.2.840.10008.5.1.4.1.1.1.2")     || // Digital Mammography X-Ray - For Presentation
-				   sop==QString("1.2.840.10008.5.1.4.1.1.1.2.1")   || // Digital Mammography X-Ray - For Processing
-				   sop==QString("1.2.840.10008.5.1.4.1.1.1.3")     || // Digital Intra-Oral X-Ray - For Presentation
-				   sop==QString("1.2.840.10008.5.1.4.1.1.1.3.1")   || // Digital Intra-Oral X-Ray - For Processing
-				   sop==QString("1.2.840.10008.5.1.4.1.1.12.1")    || // X-Ray Angiographic
-				   sop==QString("1.2.840.10008.5.1.4.1.1.12.2")       // X-Ray RF
+				   sop == QString("1.2.840.10008.5.1.4.1.1.77.1.5.1")|| // Ophthalmic Photography  8 Bit
+				   sop == QString("1.2.840.10008.5.1.4.1.1.77.1.5.2")|| // Ophthalmic Photography 16 Bit
+				   sop == QString("1.2.840.10008.5.1.4.1.1.1")       || // Computed Radiography
+				   sop == QString("1.2.840.10008.5.1.4.1.1.1.1")     || // Digital X-Ray - For Presentation
+				   sop == QString("1.2.840.10008.5.1.4.1.1.1.1.1")   || // Digital X-Ray - For Processing
+				   sop == QString("1.2.840.10008.5.1.4.1.1.1.2")     || // Digital Mammography X-Ray - For Presentation
+				   sop == QString("1.2.840.10008.5.1.4.1.1.1.2.1")   || // Digital Mammography X-Ray - For Processing
+				   sop == QString("1.2.840.10008.5.1.4.1.1.1.3")     || // Digital Intra-Oral X-Ray - For Presentation
+				   sop == QString("1.2.840.10008.5.1.4.1.1.1.3.1")   || // Digital Intra-Oral X-Ray - For Processing
+				   sop == QString("1.2.840.10008.5.1.4.1.1.12.1")    || // X-Ray Angiographic
+				   sop == QString("1.2.840.10008.5.1.4.1.1.12.2")       // X-Ray RF
 				)
 				{
 					skip_volume = true;

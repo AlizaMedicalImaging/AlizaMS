@@ -438,7 +438,7 @@ QString SpectroscopyUtils::ProcessData(
 						tmp4,
 						rows_, columns_,
 						spacing_x, spacing_y, &spacing_z,
-						ok3d, true, gl,
+						ok3d, gl,
 						&equi_, &one_direction_,
 						&origin_x_gen, &origin_y_gen, &origin_z_gen,
 						dircos_gen,

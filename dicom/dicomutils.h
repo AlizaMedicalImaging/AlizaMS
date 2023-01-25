@@ -203,7 +203,7 @@ public:
 			const std::vector<double*> &,
 			const unsigned int_, const unsigned int,
 			const double, const double, double*,
-			const bool, const bool, GLWidget*,
+			const bool, GLWidget*,
 			bool*, bool*,
 			double*, double*, double*,
 			double*,
