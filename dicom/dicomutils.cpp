@@ -242,11 +242,11 @@ struct files_less_than_ipp
 		{
 			const mdcm::DataSet & ds1 = reader1.GetFile().GetDataSet();
 			const mdcm::DataSet & ds2 = reader2.GetFile().GetDataSet();
-			if(!ds1.FindDataElement(ipp) || !ds2.FindDataElement(ipp))
+			if (!ds1.FindDataElement(ipp) || !ds2.FindDataElement(ipp))
 			{
 				return false;
 			}
-			if(!ds1.FindDataElement(iop) || !ds2.FindDataElement(iop))
+			if (!ds1.FindDataElement(iop) || !ds2.FindDataElement(iop))
 			{
 				return false;
 			}
@@ -967,6 +967,48 @@ static QString read_CommonCTMRImageDescriptionMacro(const mdcm::DataSet & ds)
 	if (!s.isEmpty())
 	{
 		s.prepend(QString("<span class='y7'>Common CT/MR Image Description Macro</span><br />"));
+	}
+	return s;
+}
+
+static QString read_PhotoacousticImageModule(const mdcm::DataSet & ds) // TODO FIXME
+{
+	QString s("");
+	const mdcm::Tag tExcitationWavelengthSequence(0x3401,0x1094);
+	const mdcm::Tag tExcitationWavelength(0x3441,0x1005);
+	if (ds.FindDataElement(tExcitationWavelengthSequence))
+	{
+		const mdcm::DataElement & e  = ds.GetDataElement(tExcitationWavelengthSequence);
+		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
+		if (sq)
+		{
+			s += QString("<span class='y9'>Excitation Wavelength Sequence</span><br />");
+			const unsigned int n = sq->GetNumberOfItems();
+			for (unsigned int x = 0; x < n; ++x)
+			{
+				const mdcm::Item & item = sq->GetItem(x + 1);
+				const mdcm::DataSet & nds = item.GetNestedDataSet();
+				if (nds.FindDataElement(tExcitationWavelength))
+				{
+					float ExcitationWavelength;
+					if (DicomUtils::get_fl_value(
+							nds,
+							tExcitationWavelength,
+							&ExcitationWavelength))
+					{
+						s += QString("<span class='y9'>&#160;&#160;") +
+							QVariant(static_cast<qreal>(ExcitationWavelength)).toString() +
+							QString("&#160;nm</span><br />");
+					}
+				}
+			}
+		}
+	}
+
+	// TODO
+	if (!s.isEmpty())
+	{
+		s.prepend(QString("<span class='y7'>Photoacoustic Image Module</span><br />"));
 	}
 	return s;
 }
@@ -1718,7 +1760,7 @@ bool DicomUtils::has_modality_lut_sq(const mdcm::DataSet & ds)
 		{
 			const mdcm::Item & item = sq->GetItem(1);
 			const mdcm::DataSet & nds = item.GetNestedDataSet();
-			if(nds.FindDataElement(mdcm::Tag(0x0028,0x3006)) &&
+			if (nds.FindDataElement(mdcm::Tag(0x0028,0x3006)) &&
 				nds.FindDataElement(mdcm::Tag(0x0028,0x3002)))
 			{
 				const mdcm::DataElement & e1  =
@@ -1749,7 +1791,7 @@ bool DicomUtils::is_multiframe(const mdcm::DataSet & ds)
 		const QVariant v(numframes.remove(QChar('\0')));
 		bool ok = false;
 		const int k = v.toInt(&ok);
-		if (ok && k>1) return true;
+		if (ok && k > 1) return true;
 	}
 	return false;
 }
@@ -1920,7 +1962,7 @@ void DicomUtils::read_image_info_rtdose(const QString & f,
 			const QVariant v(numframes.remove(QChar('\0')));
 			bool ok = false;
 			const int k = v.toInt(&ok);
-			if (ok && k>0) *num_frames_ = static_cast<unsigned short>(k);
+			if (ok && k > 0) *num_frames_ = static_cast<unsigned short>(k);
 		}
 	}
 	//
@@ -2556,14 +2598,18 @@ bool DicomUtils::read_slices_uihgrid(
 		std::vector<double> result;
 		if (DicomUtils::priv_get_ds_values(
 			ds,tMRNumberOfSliceInVolume,result))
+		{
 			num_slices = static_cast<int>(result[0]);
+		}
 	}
 	else if (ds.FindDataElement(mdcm::Tag(0x0065,0x1050)))
 	{
 		std::vector<double> result;
 		if (DicomUtils::get_ds_values(
 			ds,mdcm::Tag(0x0065,0x1050),result))
+		{
 			num_slices = static_cast<int>(result[0]);
+		}
 	}
 	if (num_slices < 1) return false;
 	//
@@ -2625,16 +2671,14 @@ bool DicomUtils::read_slices_uihgrid(
 		const mdcm::DataElement & e  =
 			ds.GetDataElement(tMRVFrameSequence);
 		sq = e.GetValueAsSQ();
-		if (!(sq && sq->GetNumberOfItems()>0))
-			return false;
+		if (!(sq && sq->GetNumberOfItems() > 0)) return false;
 	}
 	else if (ds.FindDataElement(mdcm::Tag(0x0065,0x1051)))
 	{
 		const mdcm::DataElement & e  =
 			ds.GetDataElement(mdcm::Tag(0x0065,0x1051));
 		sq = e.GetValueAsSQ();
-		if (!(sq && sq->GetNumberOfItems()>0))
-			return false;
+		if (!(sq && sq->GetNumberOfItems() > 0)) return false;
 	}
 	else
 	{
@@ -2651,8 +2695,7 @@ bool DicomUtils::read_slices_uihgrid(
 		return false;
 	const mdcm::Tag tColumns(0x0028,0x0011);
 	unsigned short image_columns;
-	if (!get_us_value(ds,tColumns,&image_columns))
-		return false;
+	if (!get_us_value(ds,tColumns,&image_columns)) return false;
 	const unsigned int xx =
 		(image_columns >= image_rows)
 		?
@@ -2841,7 +2884,7 @@ bool DicomUtils::read_slices_rtdose(
 	const bool ok_pos         = get_patient_position(pat_pos_s,pat_pos);
 	const bool ok_orient      = get_patient_orientation(pat_orient_s,pat_orient);
 	const bool pix_spacing_ok = get_pixel_spacing(pix_spacing_s,pix_spacing);
-	if (numframes==0||rows==0||columns==0) goto quit_;
+	if (numframes == 0 || rows == 0 || columns == 0) goto quit_;
 	if (!ok_pos||!ok_orient||!pix_spacing_ok) goto quit_;
 	if (z_offsets.empty()) goto quit_;
 	if (numframes!=z_offsets.size()) goto quit_;
@@ -2894,7 +2937,10 @@ bool DicomUtils::read_slices_rtdose(
 		ivariant->di->ix_spacing = spacing_x;
 		ivariant->di->iy_spacing = spacing_y;
 		ivariant->di->iz_spacing = spacing_z;
-		for (int x = 0; x < 6; ++x) ivariant->di->dircos[x] = static_cast<float>(dircos[x]); ///////
+		for (int x = 0; x < 6; ++x)
+		{
+			ivariant->di->dircos[x] = static_cast<float>(dircos[x]); ///////
+		}
 		//
 		if (ivariant->equi == false)
 		{
@@ -3047,8 +3093,13 @@ bool DicomUtils::read_dimension_index_values(
 								index_value.idx);
 							if (ok && index_value.idx.size() ==
 								idx_sq_size)
+							{
 								values.push_back(index_value);
-							else return false;
+							}
+							else
+							{
+								return false;
+							}
 						}
 					}
 				}
@@ -3143,7 +3194,7 @@ bool DicomUtils::read_group_sq(
 				sqFrameContentSequence =
 					deFrameContentSequence.GetValueAsSQ();
 			if (sqFrameContentSequence &&
-				sqFrameContentSequence->GetNumberOfItems()==1)
+				sqFrameContentSequence->GetNumberOfItems() == 1)
 			{
 				const mdcm::Item & item1 =
 					sqFrameContentSequence->GetItem(1);
@@ -3157,7 +3208,7 @@ bool DicomUtils::read_group_sq(
 						nestedds1,
 						tDimensionIndexValues,
 						index_value.idx);
-					if (ok && index_value.idx.size()==sq.size())
+					if (ok && index_value.idx.size() == sq.size())
 					{
 #ifdef ENHANCED_PRINT_INFO
 #if 1
@@ -3188,7 +3239,7 @@ bool DicomUtils::read_group_sq(
 						!deStackID.IsUndefinedLength() &&
 						deStackID.GetByteValue())
 					{
-						fg.stack_id=
+						fg.stack_id =
 							QVariant(QString::fromLatin1(
 								deStackID.GetByteValue()->GetPointer(),
 								deStackID.GetByteValue()->GetLength()).
@@ -3238,7 +3289,7 @@ bool DicomUtils::read_group_sq(
 				= nestedds.GetDataElement(tPlanePositionSequence);
 			mdcm::SmartPointer<mdcm::SequenceOfItems> sqPlanePositionSequence
 				= dePlanePositionSequence.GetValueAsSQ();
-			if (sqPlanePositionSequence && sqPlanePositionSequence->GetNumberOfItems()==1)
+			if (sqPlanePositionSequence && sqPlanePositionSequence->GetNumberOfItems() == 1)
 			{
 				const mdcm::Item & item1 = sqPlanePositionSequence->GetItem(1);
 				const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
@@ -3266,7 +3317,7 @@ bool DicomUtils::read_group_sq(
 			mdcm::SmartPointer<mdcm::SequenceOfItems> sqPlaneOrientationSequence
 				= dePlaneOrientationSequence.GetValueAsSQ();
 			if (sqPlaneOrientationSequence &&
-				sqPlaneOrientationSequence->GetNumberOfItems()==1)
+				sqPlaneOrientationSequence->GetNumberOfItems() == 1)
 			{
 				const mdcm::Item & item1 = sqPlaneOrientationSequence->GetItem(1);
 				const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
@@ -3293,7 +3344,7 @@ bool DicomUtils::read_group_sq(
 				= nestedds.GetDataElement(tPixelMeasuresSequence);
 			mdcm::SmartPointer<mdcm::SequenceOfItems> sqPixelMeasuresSequence
 				= dePixelMeasuresSequence.GetValueAsSQ();
-			if (sqPixelMeasuresSequence && sqPixelMeasuresSequence->GetNumberOfItems()==1)
+			if (sqPixelMeasuresSequence && sqPixelMeasuresSequence->GetNumberOfItems( )== 1)
 			{
 				const mdcm::Item & item1 = sqPixelMeasuresSequence->GetItem(1);
 				const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
@@ -3381,7 +3432,7 @@ bool DicomUtils::read_group_sq(
 			mdcm::SmartPointer<mdcm::SequenceOfItems> sqFrameAnatomySequence
 				= deFrameAnatomySequence.GetValueAsSQ();
 			if (sqFrameAnatomySequence &&
-				sqFrameAnatomySequence->GetNumberOfItems()==1)
+				sqFrameAnatomySequence->GetNumberOfItems() == 1)
 			{
 				const mdcm::Item & item1 = sqFrameAnatomySequence->GetItem(1);
 				const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
@@ -3407,7 +3458,7 @@ bool DicomUtils::read_group_sq(
 					mdcm::SmartPointer<mdcm::SequenceOfItems> sqAnatomicRegionSequence
 						= deAnatomicRegionSequence.GetValueAsSQ();
 					if (sqAnatomicRegionSequence &&
-						sqAnatomicRegionSequence->GetNumberOfItems()==1)
+						sqAnatomicRegionSequence->GetNumberOfItems() == 1)
 					{
 						const mdcm::Item & item2 = sqAnatomicRegionSequence->GetItem(1);
 						const mdcm::DataSet & nestedds2 = item2.GetNestedDataSet();
@@ -3446,7 +3497,7 @@ bool DicomUtils::read_group_sq(
 			mdcm::SmartPointer<mdcm::SequenceOfItems> sqFrameVOILUTSequence
 				= deFrameVOILUTSequence.GetValueAsSQ();
 			if (sqFrameVOILUTSequence &&
-				sqFrameVOILUTSequence->GetNumberOfItems()==1)
+				sqFrameVOILUTSequence->GetNumberOfItems() == 1)
 			{
 				const mdcm::Item & item1 = sqFrameVOILUTSequence->GetItem(1);
 				const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
@@ -3506,7 +3557,7 @@ bool DicomUtils::read_group_sq(
 				sqTemporalPositionSequence =
 					deTemporalPositionSequence.GetValueAsSQ();
 			if (sqTemporalPositionSequence &&
-				sqTemporalPositionSequence->GetNumberOfItems()==1)
+				sqTemporalPositionSequence->GetNumberOfItems() == 1)
 			{
 				const mdcm::Item & item1 =
 					sqTemporalPositionSequence->GetItem(1);
@@ -3529,7 +3580,7 @@ bool DicomUtils::read_group_sq(
 				sqPlanePositionVolumeSequence =
 				dePlanePositionVolumeSequence.GetValueAsSQ();
 			if (sqPlanePositionVolumeSequence &&
-				sqPlanePositionVolumeSequence->GetNumberOfItems()==1)
+				sqPlanePositionVolumeSequence->GetNumberOfItems() == 1)
 			{
 				const mdcm::Item & item1 =
 					sqPlanePositionVolumeSequence->GetItem(1);
@@ -3541,12 +3592,12 @@ bool DicomUtils::read_group_sq(
 						tImagePositionVolume,
 						tmp1))
 				{
-					if (tmp1.size()==3)
+					if (tmp1.size() == 3)
 					{
 						fg.vol_pos_ok = true;
-						fg.vol_pos[0]=tmp1.at(0);
-						fg.vol_pos[1]=tmp1.at(1);
-						fg.vol_pos[2]=tmp1.at(2);
+						fg.vol_pos[0] = tmp1.at(0);
+						fg.vol_pos[1] = tmp1.at(1);
+						fg.vol_pos[2] = tmp1.at(2);
 					}
 				}
 			}
@@ -3558,7 +3609,7 @@ bool DicomUtils::read_group_sq(
 			mdcm::SmartPointer<mdcm::SequenceOfItems> sqPlaneOrientationVolumeSequence
 				= dePlaneOrientationVolumeSequence.GetValueAsSQ();
 			if (sqPlaneOrientationVolumeSequence &&
-				sqPlaneOrientationVolumeSequence->GetNumberOfItems()==1)
+				sqPlaneOrientationVolumeSequence->GetNumberOfItems() == 1)
 			{
 				const mdcm::Item & item1 = sqPlaneOrientationVolumeSequence->GetItem(1);
 				const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
@@ -3585,7 +3636,7 @@ bool DicomUtils::read_group_sq(
 			mdcm::SmartPointer<mdcm::SequenceOfItems> sqPixelValueTransformationSequence
 				= dePixelValueTransformationSequence.GetValueAsSQ();
 			if (sqPixelValueTransformationSequence &&
-				sqPixelValueTransformationSequence->GetNumberOfItems()==1)
+				sqPixelValueTransformationSequence->GetNumberOfItems() == 1)
 			{
 				const mdcm::Item & item1 = sqPixelValueTransformationSequence->GetItem(1);
 				const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
@@ -3725,7 +3776,7 @@ QString DicomUtils::read_anatomic_sq(const mdcm::DataSet & ds)
 			ds.GetDataElement(tAnatomicRegionSequence);
 		mdcm::SmartPointer<mdcm::SequenceOfItems> sq =
 			e.GetValueAsSQ();
-		if (sq && sq->GetNumberOfItems()==1)
+		if (sq && sq->GetNumberOfItems() == 1)
 		{
 			const mdcm::Item & i = sq->GetItem(1);
 			const mdcm::DataSet & nds = i.GetNestedDataSet();
@@ -4067,8 +4118,7 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 		ivariant->study_id = studyid.remove(QChar('\0'));
 	QString frame_of_refuid;
 	if (get_string_value(ds,tframe_of_refuid,frame_of_refuid))
-		ivariant->frame_of_ref_uid =
-			frame_of_refuid.remove(QChar('\0'));
+		ivariant->frame_of_ref_uid = frame_of_refuid.remove(QChar('\0'));
 	if (ds.FindDataElement(tcomment))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tcomment);
@@ -4080,8 +4130,9 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 			const QString tmp0 =
 				CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
 			if (!tmp0.isEmpty())
-				ivariant->comment = tmp0.trimmed().
-					remove(QChar('\0'));
+			{
+				ivariant->comment = tmp0.trimmed().remove(QChar('\0'));
+			}
 		}
 	}
 	QString interpretation;
@@ -4117,7 +4168,7 @@ bool DicomUtils::get_patient_position(
 	const QString & p,
 	double * pp)
 {
-	if (pp==NULL || p.isEmpty()) return false;
+	if (pp == NULL || p.isEmpty()) return false;
 	QString tmp0 = p.trimmed().
 		remove(QChar('\0'));
 	if (tmp0.contains(QString(",")))
@@ -4213,7 +4264,7 @@ bool DicomUtils::get_pixel_spacing(
 		if (!ok) return false;
 		return true;
 	}
-	else if (list.size()==2)
+	else if (list.size() == 2)
 	{
 		ps[0] = list.at(0).toDouble(&ok);
 		if (!ok) ps[0] = list.at(0).toInt(&ok);
@@ -4311,17 +4362,17 @@ bool DicomUtils::generate_geometry(
 		const QString orientation_string = CommonUtils::get_orientation2(&ipp_iop[3]);
 		if (i == 0)
 		{
-			first = sVector3(x0,y0,z0);
-			v0 = (p0.getXYZ()+p3.getXYZ())*0.5f;
-			sVector3 tmp_up0 = sVector3(x1,y1,z1);
-			sVector3 tmp_up1 = sVector3(x0,y0,z0);
+			first = sVector3(x0, y0, z0);
+			v0 = (p0.getXYZ() + p3.getXYZ()) * 0.5f;
+			sVector3 tmp_up0 = sVector3(x1, y1, z1);
+			sVector3 tmp_up1 = sVector3(x0, y0, z0);
 			up = normalize(tmp_up1 - tmp_up0);
 			*origin_x = ipp_iop[0];
 			*origin_y = ipp_iop[1];
 			*origin_z = ipp_iop[2];
-			for (int j = 0; j < 6; ++j) dircos[j] = ipp_iop[3+j];
+			for (int j = 0; j < 6; ++j) dircos[j] = ipp_iop[3 + j];
 		}
-		if (i == size_-1)
+		if (i == size_ - 1)
 		{
 			last = sVector3(x0,y0,z0);
 			v1 = (p0.getXYZ()+p3.getXYZ())*0.5f;
@@ -4430,7 +4481,7 @@ bool DicomUtils::generate_geometry(
 			*slices_dir_z = direction0.getZ();
 			if (
 				tmp1 &&
-				((tmp2 && (size_ > 2))||size_ == 2) &&
+				((tmp2 && (size_ > 2)) || size_ == 2) &&
 				!(
 				(direction0.getX() < direction1.getX() + 0.001f && direction0.getX() > direction1.getX() - 0.001f) &&
 				(direction0.getY() < direction1.getY() + 0.001f && direction0.getY() > direction1.getY() - 0.001f) &&
@@ -4534,7 +4585,7 @@ bool DicomUtils::build_gems_dictionary(QMap<QString,int> & m, const mdcm::DataSe
 	if(!ds.FindDataElement(t0)) return false;
 	const mdcm::DataElement& s0 = ds.GetDataElement(t0);
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sq0 = s0.GetValueAsSQ();
-	if (!(sq0 && sq0->GetNumberOfItems()==1)) return false; // 1 item ?
+	if (!(sq0 && sq0->GetNumberOfItems() == 1)) return false; // 1 item ?
 	mdcm::Item & i0 = sq0->GetItem(1);
 	mdcm::DataSet & subds0 = i0.GetNestedDataSet();
 	if(!subds0.FindDataElement(t1)) return false;
@@ -4544,7 +4595,7 @@ bool DicomUtils::build_gems_dictionary(QMap<QString,int> & m, const mdcm::DataSe
 	const size_t n = sq1->GetNumberOfItems();
 	for (size_t x = 0; x < n; ++x)
 	{
-		mdcm::Item & i = sq1->GetItem(x+1);
+		mdcm::Item & i = sq1->GetItem(x + 1);
 		mdcm::DataSet & s = i.GetNestedDataSet();
 		if(!s.FindDataElement(t2)||!s.FindDataElement(t3)) continue;
 		const mdcm::DataElement& index = s.GetDataElement(t2);
@@ -4554,7 +4605,7 @@ bool DicomUtils::build_gems_dictionary(QMap<QString,int> & m, const mdcm::DataSe
 		if (!bv0) continue;
 		const unsigned int l0 = bv0->GetLength();
 		std::vector<unsigned int> result0;
-		if (l0%4==0 && l0>=4)
+		if (l0%4 == 0 && l0 >= 4)
 		{
 			char * buffer0 = new char[l0];
 			const bool ok0 = bv0->GetBuffer(buffer0,l0);
@@ -4562,7 +4613,7 @@ bool DicomUtils::build_gems_dictionary(QMap<QString,int> & m, const mdcm::DataSe
 			{
 				void * vtmp0 = static_cast<void*>(buffer0);
 				int * tmp0 = static_cast<int*>(vtmp0);
-				for (unsigned int x0 = 0; x0 < l0/4; ++x0)
+				for (unsigned int x0 = 0; x0 < l0 / 4; ++x0)
 				{
 					result0.push_back(tmp0[x0]);
 				}
@@ -4621,7 +4672,7 @@ void DicomUtils::read_gems_params(
 		if (!bv0) continue;
 		const unsigned int l0 = bv0->GetLength();
 		int idx0 = -1;
-		if (l0%8==0 && l0>=8)
+		if (l0%8 == 0 && l0 >= 8)
 		{
 			std::vector<double> result0;
 			char * buffer0 = new char[l0];
@@ -4630,7 +4681,7 @@ void DicomUtils::read_gems_params(
 			{
 				void * vtmp0 = static_cast<void*>(buffer0);
 				double * tmp0 = static_cast<double*>(vtmp0);
-				for (unsigned int x0 = 0; x0 < l0/8; ++x0)
+				for (unsigned int x0 = 0; x0 < l0 / 8; ++x0)
 				{
 					result0.push_back(tmp0[x0]);
 				}
@@ -4638,7 +4689,7 @@ void DicomUtils::read_gems_params(
 			delete [] buffer0;
 			if (!result0.empty()) idx0 = static_cast<int>(result0[0]);
 		}
-		else if (l0==4)
+		else if (l0 == 4)
 		{
 			std::vector<int> result0;
 			char * buffer0 = new char[l0];
@@ -4647,7 +4698,7 @@ void DicomUtils::read_gems_params(
 			{
 				void * vtmp0 = static_cast<void*>(buffer0);
 				int * tmp0 = static_cast<int*>(vtmp0);
-				for (size_t x0 = 0; x0 < l0/4; ++x0)
+				for (size_t x0 = 0; x0 < l0 / 4; ++x0)
 				{
 					result0.push_back(tmp0[x0]);
 				}
@@ -4750,7 +4801,7 @@ void DicomUtils::read_gems_params(
 			if (v)
 			{
 				const char * b = v->GetPointer();
-				const unsigned long long s   = v->GetLength();
+				const unsigned long long s = v->GetLength();
 				j = QString::fromLatin1(b, s);
 			}
 			GEMSParam p;
@@ -4955,14 +5006,14 @@ void DicomUtils::enhanced_get_indices(
 	}
 	const std::set<std::string> dim_uids_set(dim_uids.begin(), dim_uids.end());
 	const size_t dim_uids_set_size = dim_uids_set.size();
+#ifdef ENHANCED_PRINT_INFO
 	if (dim_uids_set_size > 1)
 	{
-#ifdef ENHANCED_PRINT_INFO
 		std::cout <<
 			"Warning: multiple dimension organization UIDs, using 1st"
 				<< std::endl;
-#endif
 	}
+#endif
 	{
 		std::set<std::string>::const_iterator it = dim_uids_set.cbegin();
 		dim_uid = *it;
@@ -5511,7 +5562,7 @@ void DicomUtils::enhanced_process_values(
 		if (!values.at(x).rescale_ok) rescale_miss = true;
 	}
 	if (vol_pos_miss &&
-		shared_values.size()==1 &&
+		shared_values.size() == 1 &&
 		shared_values.at(0).vol_pos_ok)
 	{
 		for (unsigned int x = 0; x < values.size(); ++x)
@@ -5522,9 +5573,8 @@ void DicomUtils::enhanced_process_values(
 			values[x].vol_pos_ok = true;
 		}
 	}
-	if (
-		vol_orient_miss &&
-		shared_values.size()==1 &&
+	if (vol_orient_miss &&
+		shared_values.size() == 1 &&
 		shared_values.at(0).vol_orient_ok)
 	{
 		for (unsigned int x = 0; x < values.size(); ++x)
@@ -5538,32 +5588,28 @@ void DicomUtils::enhanced_process_values(
 			values[x].vol_orient_ok = true;
 		}
 	}
-	if (
-		pat_pos_miss &&
-		shared_values.size()==1 &&
+	if (pat_pos_miss &&
+		shared_values.size() == 1 &&
 		!shared_values.at(0).pat_pos.isEmpty())
 	{
 		for (unsigned int x = 0; x < values.size(); ++x)
 			values[x].pat_pos = shared_values.at(0).pat_pos;
 	}
-	if (
-		pat_orient_miss &&
-		shared_values.size()==1 &&
+	if (pat_orient_miss &&
+		shared_values.size() == 1 &&
 		!shared_values.at(0).pat_orient.isEmpty())
 	{
 		for (unsigned int x = 0; x < values.size(); ++x)
 			values[x].pat_orient = shared_values.at(0).pat_orient;
 	}
-	if (
-		pix_spacing_miss &&
-		shared_values.size()==1 &&
+	if (pix_spacing_miss &&
+		shared_values.size() == 1 &&
 		!shared_values.at(0).pix_spacing.isEmpty())
 	{
 		for (unsigned int x = 0; x < values.size(); ++x)
 			values[x].pix_spacing = shared_values.at(0).pix_spacing;
 	}
-	if (
-		window_miss && shared_values.size()==1 &&
+	if (window_miss && shared_values.size() == 1 &&
 		!shared_values.at(0).window_center.isEmpty() &&
 		!shared_values.at(0).window_width.isEmpty())
 	{
@@ -5577,8 +5623,7 @@ void DicomUtils::enhanced_process_values(
 			values[x].lut_function  = lut_function;
 		}
 	}
-	if (
-		laterality_miss &&
+	if (laterality_miss &&
 		shared_values.size()==1 &&
 		!shared_values.at(0).frame_laterality.isEmpty())
 	{
@@ -5586,22 +5631,22 @@ void DicomUtils::enhanced_process_values(
 			values[x].frame_laterality =
 				shared_values.at(0).frame_laterality;
 	}
-	if (
-		body_part_miss &&
+	if (body_part_miss &&
 		shared_values.size()==1 &&
 		!shared_values.at(0).frame_body_part.isEmpty())
 	{
 		for (unsigned int x = 0; x < values.size(); ++x)
+		{
 			values[x].frame_body_part =
 				shared_values.at(0).frame_body_part;
+		}
 	}
 	if (rescale_miss)
 	{
 		double  rescale_intercept = 0.0;
 		double  rescale_slope     = 1.0;
 		QString rescale_type("");
-		if (
-			shared_values.size()==1 &&
+		if (shared_values.size()==1 &&
 			shared_values.at(0).rescale_ok)
 		{
 			rescale_intercept =
@@ -5613,12 +5658,9 @@ void DicomUtils::enhanced_process_values(
 		}
 		for (unsigned int x = 0; x < values.size(); ++x)
 		{
-			values[x].rescale_intercept =
-				rescale_intercept;
-			values[x].rescale_slope =
-				rescale_slope;
-			values[x].rescale_type =
-				rescale_type;
+			values[x].rescale_intercept = rescale_intercept;
+			values[x].rescale_slope = rescale_slope;
+			values[x].rescale_type = rescale_type;
 		}
 	}
 }
@@ -5645,8 +5687,7 @@ void DicomUtils::enhanced_check_rescale(
 		ds, tRescaleIntercept, tmp0);
 	const bool ok1 = DicomUtils::get_ds_values(
 		ds, tRescaleSlope, tmp1);
-	if (
-		ok0 &&
+	if (ok0 &&
 		ok1 &&
 		!tmp0.empty() &&
 		!tmp1.empty())
@@ -5677,13 +5718,13 @@ void DicomUtils::print_sq(const DimIndexSq & sq)
 			<< " " << i << " "
 			<< sq.at(i).group_pointer << " "
 			<< sq.at(i).index_pointer << " ";
-		if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9056))
+		if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+			sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9056))
 		{
 			std::cout << "stack_id_idx";
 		}
-		else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9057))
+		else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+			sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9057))
 		{
 			std::cout << "in_stack_pos_idx";
 		}
@@ -5692,18 +5733,18 @@ void DicomUtils::print_sq(const DimIndexSq & sq)
 		{
 			std::cout << "ipp_idx";
 		}
-		else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9111) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9128))
+		else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9111) &&
+			sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9128))
 		{
 			std::cout << "temporal_pos_idx";
 		}
-		else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9117) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9087))
+		else if (sq.at(i).group_pointer == mdcm::Tag(0x0018,0x9117) &&
+			sq.at(i).index_pointer == mdcm::Tag(0x0018,0x9087))
 		{
 			std::cout << "b_value_idx";
 		}
-		else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9117) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9089))
+		else if (sq.at(i).group_pointer == mdcm::Tag(0x0018,0x9117) &&
+			sq.at(i).index_pointer == mdcm::Tag(0x0018,0x9089))
 		{
 			std::cout << "gradients_idx";
 		}
@@ -5712,39 +5753,38 @@ void DicomUtils::print_sq(const DimIndexSq & sq)
 		{
 			std::cout << "contrast_idx";
 		}
-		else if (sq.at(i).group_pointer==mdcm::Tag(0x0040,0x9096) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0040,0x9210))
+		else if (sq.at(i).group_pointer == mdcm::Tag(0x0040,0x9096) &&
+			sq.at(i).index_pointer == mdcm::Tag(0x0040,0x9210))
 		{
 			std::cout << "lut_label_idx";
 		}
-		else if (
-			sq.at(i).group_pointer==mdcm::Tag(0x0020,0x9310) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0020,0x930d))
+		else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x9310) &&
+			sq.at(i).index_pointer == mdcm::Tag(0x0020,0x930d))
 		{
 			std::cout << "temporal_off_idx";
 		}
-		else if (sq.at(i).group_pointer==mdcm::Tag(0x0020,0x930e) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0020,0x9301))
+		else if (sq.at(i).group_pointer == mdcm::Tag(0x0020,0x930e) &&
+			sq.at(i).index_pointer == mdcm::Tag(0x0020,0x9301))
 		{
 			std::cout << "plane_pos_idx";
 		}
-		else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9807) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9808))
+		else if (sq.at(i).group_pointer == mdcm::Tag(0x0018,0x9807) &&
+			sq.at(i).index_pointer == mdcm::Tag(0x0018,0x9808))
 		{
 			std::cout << "datatype_idx";
 		}
-		else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9226) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0008,0x9007))
+		else if (sq.at(i).group_pointer == mdcm::Tag(0x0018,0x9226) &&
+			sq.at(i).index_pointer == mdcm::Tag(0x0008,0x9007))
 		{
 			std::cout << "mr_frame_type_idx";
 		}
-		else if (sq.at(i).group_pointer==mdcm::Tag(0x0018,0x9114) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0018,0x9082))
+		else if (sq.at(i).group_pointer == mdcm::Tag(0x0018,0x9114) &&
+			sq.at(i).index_pointer == mdcm::Tag(0x0018,0x9082))
 		{
 			std::cout << "mr_eff_echo_idx";
 		}
-		else if (sq.at(i).group_pointer==mdcm::Tag(0x0062,0x000a) &&
-			sq.at(i).index_pointer==mdcm::Tag(0x0062,0x000b))
+		else if (sq.at(i).group_pointer == mdcm::Tag(0x0062,0x000a) &&
+			sq.at(i).index_pointer == mdcm::Tag(0x0062,0x000b))
 		{
 			std::cout << "segment_idx";
 		}
@@ -6008,7 +6048,6 @@ QString DicomUtils::read_enhanced(
 #endif
 	*ok = false;
 	QString message_;
-	if (!settings) return QString("settings==NULL");
 	const SettingsWidget * wsettings =
 		static_cast<const SettingsWidget*>(settings);
 	std::vector<char*> data;
@@ -6160,8 +6199,7 @@ QString DicomUtils::read_enhanced(
 			delete [] data[x];
 		}
 		data.clear();
-		return QString(
-			"dimx_read!=columns_||dimy_read!=rows_");
+		return QString("dimx_read!=columns_||dimy_read!=rows_");
 	}
 	if (dimz_read != data.size())
 	{
@@ -6505,7 +6543,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 	}
 	if (dimz_read != data.size())
 	{
-		*ok=false;
+		*ok = false;
 		for (unsigned int x = 0; x < data.size(); ++x)
 		{
 			delete [] data[x];
@@ -6881,7 +6919,7 @@ QString DicomUtils::read_ultrasound(
 		NULL,
 		use_icc, &icc_ok,
 		pb);
-	if (*ok==false) return buff_error;
+	if (*ok == false) return buff_error;
 	//
 	if (!overwrite_mdcm_spacing)
 	{
@@ -6976,7 +7014,6 @@ QString DicomUtils::read_nuclear(
 	if (!ok) return QString("read_nuclear : error (1)");
 	*ok = false;
 	if (!ivariant) return QString("ivariant==NULL");
-	if (!settings) return QString("settings==NULL");
 	if (images_ipp.size() != 1) return QString("read_nuclear reads 1 image");
 	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
@@ -6992,7 +7029,7 @@ QString DicomUtils::read_nuclear(
 	const bool use_icc = wsettings->get_apply_icc();
 	bool icc_ok = false;
 	std::vector<char*> data;
-	itk::Matrix<itk::SpacePrecisionType,3,3> direction;
+	itk::Matrix<itk::SpacePrecisionType, 3, 3> direction;
 	mdcm::PixelFormat pixelformat;
 	mdcm::PhotometricInterpretation pi;
 	const mdcm::Tag tnumframes(0x0028,0x0008);
@@ -7056,7 +7093,7 @@ QString DicomUtils::read_nuclear(
 	ivariant->di->default_lut_function =
 		ivariant->di->lut_function = tmp_lut_function;
 	//
-	double dircos_[] = {0.0,0.0,0.0,0.0,0.0,0.0};
+	double dircos_[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 	unsigned int dimx_, dimy_, dimz_;
 	double origin_x_, origin_y_, origin_z_;
 	double spacing_x_, spacing_y_, spacing_z_;
@@ -7086,7 +7123,7 @@ QString DicomUtils::read_nuclear(
 		NULL,
 		use_icc, &icc_ok,
 		pb);
-	if (*ok==false) return buff_error;
+	if (*ok == false) return buff_error;
 #if 0
 	std::cout << "Origin: "  << origin_x_  << " " << origin_y_  << " " << origin_z_ << std::endl;
 	std::cout << "Spacing: " << spacing_x_ << " " << spacing_y_ << " " << spacing_z_ << std::endl;
@@ -7198,7 +7235,6 @@ QString DicomUtils::read_series(
 {
 	*ok = false;
 	if (!ivariant) return QString("ivariant is NULL");
-	if (!settings) return QString("settings is NULL");
 	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
 	const SettingsWidget * wsettings =
@@ -7749,8 +7785,9 @@ QString DicomUtils::read_series(
 					ivariant->equi = false;
 					ivariant->orientation = 0;
 					ivariant->orientation_string = QString("");
-					std::cout << "warning: could not validate "
-						"image, using as non-uniform" << std::endl;
+					std::cout
+						<< "warning: could not validate image, using as non-uniform"
+						<< std::endl;
 				}
 				spacing_x = ivariant->di->ix_spacing > 0 ?
 					ivariant->di->ix_spacing : 1;
@@ -7768,14 +7805,11 @@ QString DicomUtils::read_series(
 				const float col_dircos_y = ivariant->di->dircos[4];
 				const float col_dircos_z = ivariant->di->dircos[5];
 				const float nrm_dircos_x =
-					row_dircos_y * col_dircos_z -
-						row_dircos_z * col_dircos_y;
+					row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
 				const float nrm_dircos_y =
-					row_dircos_z * col_dircos_x -
-						row_dircos_x * col_dircos_z;
+					row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
 				const float nrm_dircos_z =
-					row_dircos_x * col_dircos_y -
-						row_dircos_y * col_dircos_x;
+					row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
 				direction[0][0] = row_dircos_x;
 				direction[1][0] = row_dircos_y;
 				direction[2][0] = row_dircos_z;
@@ -7801,14 +7835,11 @@ QString DicomUtils::read_series(
 				const float col_dircos_y = dircos_[4];
 				const float col_dircos_z = dircos_[5];
 				const float nrm_dircos_x =
-					row_dircos_y * col_dircos_z -
-						row_dircos_z * col_dircos_y;
+					row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
 				const float nrm_dircos_y =
-					row_dircos_z * col_dircos_x -
-						row_dircos_x * col_dircos_z;
+					row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
 				const float nrm_dircos_z =
-					row_dircos_x * col_dircos_y -
-						row_dircos_y * col_dircos_x;
+					row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
 				direction[0][0] = row_dircos_x;
 				direction[1][0] = row_dircos_y;
 				direction[2][0] = row_dircos_z;
@@ -8022,9 +8053,9 @@ QString DicomUtils::read_series(
 	}
 	//
 	CommonUtils::reset_bb(ivariant);
-	if (ivariant->modality==QString("US") ||
-			(ivariant->modality==QString("XA") &&
-				ivariant->frame_times.size()>1))
+	if (ivariant->modality == QString("US") ||
+			(ivariant->modality == QString("XA") &&
+				ivariant->frame_times.size() > 1))
 	{
 		ivariant->di->selected_z_slice = 0;
 	}
@@ -8180,8 +8211,8 @@ static void delta_decode(
 	{
 		if (static_cast<unsigned char>(inbuffer[i]) == 0xa5)
 		{
-			int repeat = static_cast<unsigned char>(inbuffer[i+1]) + 1;
-			const char value = inbuffer[i+2];
+			int repeat = static_cast<unsigned char>(inbuffer[i + 1]) + 1;
+			const char value = inbuffer[i + 2];
 			while(repeat > 0)
 			{
 				temp.push_back(value);
@@ -8200,8 +8231,8 @@ static void delta_decode(
 	{
 		if (temp[i] == 0x5a)
 		{
-			const unsigned char v1 = static_cast<unsigned char>(temp[i+1]);
-			const unsigned char v2 = static_cast<unsigned char>(temp[i+2]);
+			const unsigned char v1 = static_cast<unsigned char>(temp[i + 1]);
+			const unsigned char v2 = static_cast<unsigned char>(temp[i + 2]);
 			const unsigned short value = static_cast<unsigned short>(v2 * 256 + v1);
 			output.push_back(value);
 			delta = value;
@@ -8301,7 +8332,7 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 			at2.SetFromDataSet(ds);
 			const size_t w = at1.GetValue();
 			const size_t h = at2.GetValue();
-			const size_t at1l =	w*h*sizeof(unsigned short);
+			const size_t at1l =	w * h * sizeof(unsigned short);
 			if(bv2l == at1l)
 			{
 				std::cout << "Warning: Elscint data seems to be not compressed"
@@ -9431,14 +9462,14 @@ QString DicomUtils::read_buffer(
 		for (unsigned long long x = 0; x < image_buffer_length; ++x)
 		{
 			const unsigned char c = not_rescaled_buffer[x];
-			singlebit_buffer[j  ] = (c &  0x1) ? 255 : 0;
-			singlebit_buffer[j+1] = (c &  0x2) ? 255 : 0;
-			singlebit_buffer[j+2] = (c &  0x4) ? 255 : 0;
-			singlebit_buffer[j+3] = (c &  0x8) ? 255 : 0;
-			singlebit_buffer[j+4] = (c & 0x10) ? 255 : 0;
-			singlebit_buffer[j+5] = (c & 0x20) ? 255 : 0;
-			singlebit_buffer[j+6] = (c & 0x40) ? 255 : 0;
-			singlebit_buffer[j+7] = (c & 0x80) ? 255 : 0;
+			singlebit_buffer[j    ] = (c &  0x1) ? 255 : 0;
+			singlebit_buffer[j + 1] = (c &  0x2) ? 255 : 0;
+			singlebit_buffer[j + 2] = (c &  0x4) ? 255 : 0;
+			singlebit_buffer[j + 3] = (c &  0x8) ? 255 : 0;
+			singlebit_buffer[j + 4] = (c & 0x10) ? 255 : 0;
+			singlebit_buffer[j + 5] = (c & 0x20) ? 255 : 0;
+			singlebit_buffer[j + 6] = (c & 0x40) ? 255 : 0;
+			singlebit_buffer[j + 7] = (c & 0x80) ? 255 : 0;
 			j += 8;
 		}
 		buffer      = reinterpret_cast<char *>(singlebit_buffer);
@@ -9509,17 +9540,17 @@ QString DicomUtils::read_buffer(
 						const double Cr = static_cast<unsigned char>(not_rescaled_buffer[j + 2]) - 128;
 						if (icc_for_ybr == 1)
 						{
-							R = static_cast<int>(Y + (-0.000036820)*Cb +    1.401987577*Cr);
-							G = static_cast<int>(Y + (-0.344113281)*Cb + (-0.714103821)*Cr);
-							B = static_cast<int>(Y +    1.771978117*Cb + (-0.000134583)*Cr);
+							R = static_cast<int>(Y + (-0.000036820) * Cb +    1.401987577 * Cr);
+							G = static_cast<int>(Y + (-0.344113281) * Cb + (-0.714103821) * Cr);
+							B = static_cast<int>(Y +    1.771978117 * Cb + (-0.000134583) * Cr);
 						}
 						else if (icc_for_ybr == 2)
 						{
 							Y -= 16;
 							if (Y < 0) Y = 0; // invalid?
-							R = static_cast<int>(1.164415463*Y + (-0.000095036)*Cb +    1.596001878*Cr);
-							G = static_cast<int>(1.164415463*Y + (-0.391724564)*Cb + (-0.813013368)*Cr);
-							B = static_cast<int>(1.164415463*Y +    2.017290682*Cb + (-0.000135273)*Cr);
+							R = static_cast<int>(1.164415463 * Y + (-0.000095036) * Cb +    1.596001878 * Cr);
+							G = static_cast<int>(1.164415463 * Y + (-0.391724564) * Cb + (-0.813013368) * Cr);
+							B = static_cast<int>(1.164415463 * Y +    2.017290682 * Cb + (-0.000135273) * Cr);
 						}
 						if (R > 255) R = 255;
 						if (G > 255) G = 255;
@@ -9915,11 +9946,11 @@ QString DicomUtils::read_enhanced_common(
 			bool   equi_ = false;
 			bool   one_direction_ = false;
 			double origin_x_gen, origin_y_gen, origin_z_gen;
-			itk::Matrix<itk::SpacePrecisionType,3,3> direction;
+			itk::Matrix<itk::SpacePrecisionType, 3, 3> direction;
 			double spacing_x, spacing_y, spacing_z;
 			double origin_x, origin_y, origin_z;
 			double spacing_z_tmp;
-			double dircos_gen[] = {0.0,0.0,0.0,0.0,0.0,0.0};
+			double dircos_gen[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 			float  slices_dir_x, slices_dir_y, slices_dir_z;
 			float  up_dir_x, up_dir_y, up_dir_z;
 			float  center_x, center_y, center_z;
@@ -9965,7 +9996,7 @@ QString DicomUtils::read_enhanced_common(
 					{
 						read_us_regions(ds, ivariant);
 					}
-					else if (sop == QString("1.2.840.10008.5.1.4.1.1.4.1") ||
+					if (sop == QString("1.2.840.10008.5.1.4.1.1.4.1") ||
 						sop == QString("1.2.840.10008.5.1.4.1.1.4.4"))
 					{
 						ivariant->iinfo = read_enhmr_spectro_info(ds, false);
@@ -9978,6 +10009,10 @@ QString DicomUtils::read_enhanced_common(
 						sop == QString("1.2.840.10008.5.1.4.1.1.2.2"))
 					{
 						ivariant->iinfo = read_enhct_info(ds);
+					}
+					else if (sop == QString("1.2.840.10008.5.1.2.3.45")) // FIXME
+					{
+						ivariant->iinfo = read_PhotoacousticImageModule(ds);
 					}
 					read_ivariant_info_tags(ds, ivariant);
 					read_window(ds, &window_center_tmp, &window_width_tmp, &lut_function_tmp);
@@ -10923,7 +10958,7 @@ bool DicomUtils::is_not_interleaved(const QStringList & images)
 				const double spvd = QVariant(sp.trimmed().remove(QChar('\0'))).toDouble(&sp_ok);
 				if (sp_ok) tmp1 = 1000 * CommonUtils::set_digits(spvd,3);
 				else return false;
-				if (x>0 && tmp0>tmp1-10 && tmp0<tmp1+10) return false;
+				if (x > 0 && tmp0 > tmp1 - 10 && tmp0 < tmp1+10) return false;
 				tmp0 = tmp1;
 			}
 		}
@@ -11063,14 +11098,16 @@ QString DicomUtils::suffix_mpeg(const QString & f)
 	{
 		mdcm::FileMetaInformation & h = reader.GetFile().GetHeader();
 		const mdcm::TransferSyntax & ts = h.GetDataSetTransferSyntax();
-		if (
-			ts == mdcm::TransferSyntax::MPEG2MainProfileHighLevel ||
+		if (ts == mdcm::TransferSyntax::MPEG2MainProfileHighLevel ||
 			ts == mdcm::TransferSyntax::MPEG2MainProfile)
+		{
 			return QString(".mpeg");
-		else if (
-			ts == mdcm::TransferSyntax::MPEG4AVCH264HighProfileLevel4_1 ||
+		}
+		else if (ts == mdcm::TransferSyntax::MPEG4AVCH264HighProfileLevel4_1 ||
 			ts == mdcm::TransferSyntax::MPEG4AVCH264BDcompatibleHighProfileLevel4_1)
+		{
 			return QString(".mp4");
+		}
 	}
 	return QString(".bin");
 }
@@ -11673,10 +11710,10 @@ template <typename T> QString supp_palette_grey_to_rgbUS_(
 	}
 	//
 	//
-	const double wmin  = v->di->us_window_center - v->di->us_window_width*0.5;
-	const double wmax  = v->di->us_window_center + v->di->us_window_width*0.5;
-	const double diff_ = (wmax-wmin);
-	const double div_  = (diff_!=0.0) ? diff_ : 1.0;
+	const double wmin  = v->di->us_window_center - v->di->us_window_width * 0.5;
+	const double wmax  = v->di->us_window_center + v->di->us_window_width * 0.5;
+	const double diff_ = (wmax - wmin);
+	const double div_  = (diff_ != 0.0) ? diff_ : 1.0;
 	try
 	{
 		itk::ImageRegionConstIterator<T> it1(image, image->GetLargestPossibleRegion());
@@ -11698,10 +11735,10 @@ template <typename T> QString supp_palette_grey_to_rgbUS_(
 				unsigned short c = 0;
 				if (k < static_cast<double>(red_subscript))
 				{
-					const double r = (k+(-wmin))/div_;
-					if ((k>=wmin) && (k<=wmax))
+					const double r = (k + (-wmin)) / div_;
+					if ((k >= wmin) && (k <= wmax))
 					{
-						c = static_cast<unsigned short>(USHRT_MAX*r);
+						c = static_cast<unsigned short>(USHRT_MAX * r);
 					}
 					else if (k>wmax)
 					{
@@ -11762,10 +11799,10 @@ template <typename T> QString supp_palette_grey_to_rgbUC_(
 	QApplication::processEvents();
 	//
 	unsigned long long tmp37 = 0;
-	const double wmin  = v->di->us_window_center - v->di->us_window_width*0.5;
-	const double wmax  = v->di->us_window_center + v->di->us_window_width*0.5;
-	const double diff_ = (wmax-wmin);
-	const double div_  = (diff_!=0.0) ? diff_ : 1.0;
+	const double wmin  = v->di->us_window_center - v->di->us_window_width * 0.5;
+	const double wmax  = v->di->us_window_center + v->di->us_window_width * 0.5;
+	const double diff_ = (wmax - wmin);
+	const double div_  = (diff_ != 0.0) ? diff_ : 1.0;
 	try
 	{
 		itk::ImageRegionConstIterator<T> it1(image, image->GetLargestPossibleRegion());
@@ -11790,10 +11827,10 @@ template <typename T> QString supp_palette_grey_to_rgbUC_(
 				unsigned char c = 0;
 				if (k < static_cast<double>(red_subscript))
 				{
-					const double r = (k+(-wmin))/div_;
-					if ((k>=wmin) && (k<=wmax))
+					const double r = (k + (-wmin)) / div_;
+					if ((k >= wmin) && (k <= wmax))
 					{
-						c = static_cast<unsigned char>(UCHAR_MAX*r);
+						c = static_cast<unsigned char>(UCHAR_MAX * r);
 					}
 					else if (k>wmax)
 					{
@@ -11949,7 +11986,7 @@ QString DicomUtils::read_enhmr_spectro_info(
 				ds.GetDataElement(tSharedFunctionalGroupsSequence);
 			mdcm::SmartPointer<mdcm::SequenceOfItems> sq =
 				e.GetValueAsSQ();
-			if (sq && sq->GetNumberOfItems()==1)
+			if (sq && sq->GetNumberOfItems() == 1)
 			{
 				const mdcm::Item & item = sq->GetItem(1);
 				const mdcm::DataSet& nds = item.GetNestedDataSet();
@@ -11960,7 +11997,7 @@ QString DicomUtils::read_enhmr_spectro_info(
 						nds.GetDataElement(tMRTimingAndRelatedSQ);
 					mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 =
 						e1.GetValueAsSQ();
-					if (sq1 && sq1->GetNumberOfItems()==1)
+					if (sq1 && sq1->GetNumberOfItems() == 1)
 					{
 						const mdcm::Item & item1 = sq1->GetItem(1);
 						const mdcm::DataSet& nds1 =
@@ -12304,9 +12341,12 @@ QString DicomUtils::read_enhmr_spectro_info(
 				tmp0 += QString("</span><br />");
 			}
 		}
-		if (!tmp0.isEmpty()) s += QString(
-			"<span class='y7'>MR Pulse Sequence Module"
-			"</span><br />") + tmp0;
+		if (!tmp0.isEmpty())
+		{
+			s += QString(
+				"<span class='y7'>MR Pulse Sequence Module"
+				"</span><br />") + tmp0;
+		}
 	}
 	//
 	{
@@ -12375,10 +12415,12 @@ QString DicomUtils::read_enhmr_spectro_info(
 			}
 		}
 		//
-		if (!tmp0.isEmpty()) s += QString(
-			"<span class='y7'>MR Image and Spectroscopy Instance Macro"
-			"</span><br />") + tmp0;
-
+		if (!tmp0.isEmpty())
+		{
+			s += QString(
+				"<span class='y7'>MR Image and Spectroscopy Instance Macro"
+				"</span><br />") + tmp0;
+		}
 	}
 	//
 	if (!s.isEmpty()) s += QString("<br />");
@@ -13171,8 +13213,7 @@ QString DicomUtils::read_dicom(
 			localizer_tmp0 = localizer_;
 			photometric_tmp0 = photometric;
 			icc_found_tmp0 = icc_found;
-			if (
-				sop == QString("1.2.840.10008.5.1.4.1.1.6.1") ||
+			if (sop == QString("1.2.840.10008.5.1.4.1.1.6.1") ||
 				sop == QString("1.2.840.10008.5.1.4.1.1.6")   ||
 				sop == QString("1.2.840.10008.5.1.4.1.1.3.1") ||
 				sop == QString("1.2.840.10008.5.1.4.1.1.3"))
@@ -13213,8 +13254,7 @@ QString DicomUtils::read_dicom(
 						}
 					}
 				}
-				if (
-					sop == QString("1.2.840.10008.5.1.4.1.1.4.1")     || // Enhanced MR
+				if (sop == QString("1.2.840.10008.5.1.4.1.1.4.1")     || // Enhanced MR
 					sop == QString("1.2.840.10008.5.1.4.1.1.2.1")     || // Enhanced CT
 					sop == QString("1.2.840.10008.5.1.4.1.1.130")     || // Enhanced PET
 					sop == QString("1.2.840.10008.5.1.4.1.1.6.2")     || // Enhanced US Volume
@@ -13244,8 +13284,7 @@ QString DicomUtils::read_dicom(
 				{
 					enhanced = true;
 				}
-				if (
-					sop == QString("1.2.840.10008.5.1.4.1.1.7.3") || // Multi-frame Grayscale Word SC
+				if (sop == QString("1.2.840.10008.5.1.4.1.1.7.3") || // Multi-frame Grayscale Word SC
 					sop == QString("1.2.840.10008.5.1.4.1.1.7.2") || // Multi-frame Grayscale Byte SC
 					sop == QString("1.2.840.10008.5.1.4.1.1.7.4")    // Multi-frame True Color SC
 					)
@@ -14673,7 +14712,11 @@ QString DicomUtils::read_dicom(
 			}
 			QApplication::processEvents();
 		}
-		if (pb) { pb->show(); pb->setValue(-1); }
+		if (pb)
+		{
+			pb->show();
+			pb->setValue(-1);
+		}
 		QApplication::processEvents();
 	}
 	//
@@ -14701,7 +14744,11 @@ QString DicomUtils::read_dicom(
 			}
 			QApplication::processEvents();
 		}
-		if (pb) { pb->show(); pb->setValue(-1); }
+		if (pb)
+		{
+			pb->show();
+			pb->setValue(-1);
+		}
 		QApplication::processEvents();
 	}
 	//
@@ -14733,7 +14780,11 @@ QString DicomUtils::read_dicom(
 			}
 			QApplication::processEvents();
 		}
-		if (pb) { pb->show(); pb->setValue(-1); }
+		if (pb)
+		{
+			pb->show();
+			pb->setValue(-1);
+		}
 		QApplication::processEvents();
 	}
 	//
