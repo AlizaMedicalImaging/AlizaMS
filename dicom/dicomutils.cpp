@@ -1072,7 +1072,7 @@ static QString read_PhotoacousticImage(const mdcm::DataSet & ds) // FIXME
 					AcousticCouplingMediumFlag))
 			{
 				s0 += QString(
-						"<span class='y9'>AcousticCoupling Medium Flag</span><br />"
+						"<span class='y9'>Acoustic Coupling Medium Flag</span><br />"
 						"<span class='y8'>&#160;&#160;") +
 					AcousticCouplingMediumFlag +
 					QString("</span><br />");
