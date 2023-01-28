@@ -971,141 +971,338 @@ static QString read_CommonCTMRImageDescriptionMacro(const mdcm::DataSet & ds)
 	return s;
 }
 
-static QString read_PhotoacousticImageModule(const mdcm::DataSet & ds) // TODO FIXME
+static QString read_PhotoacousticImage(const mdcm::DataSet & ds) // FIXME
 {
-	QString s("");
-	const mdcm::Tag tExcitationWavelengthSequence(0x3401,0x1094);
-	const mdcm::Tag tExcitationWavelength(0x3441,0x1005);
-	const mdcm::Tag tIlluminationTypeCodeSequence(0x3401,0x1006);
-	const mdcm::Tag tAcousticCouplingMediumCodeSequence(0x3401,0x1007);
-	const mdcm::Tag tCodeMeaning(0x0008,0x0104);
-	const mdcm::Tag tAcousticCouplingMediumFlag(0x3401,0x1099);
-	const mdcm::Tag tCouplingMediumTemperature(0x3401,0x1008);
-	if (ds.FindDataElement(tExcitationWavelengthSequence))
+	QString s;
+
+	//////////////////////////////////////////////
+	//
+	// Photoacoustic Image Module Attributes
+	//
+	//
 	{
-		const mdcm::DataElement & e = ds.GetDataElement(tExcitationWavelengthSequence);
-		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
-		if (sq)
+		const mdcm::Tag tExcitationWavelengthSequence(0x3401,0x1094);
+		const mdcm::Tag tExcitationWavelength(0x3441,0x1005);
+		const mdcm::Tag tIlluminationTypeCodeSequence(0x3401,0x1006);
+		const mdcm::Tag tIlluminationTranslationFlag(0x3401,0x1092);
+		const mdcm::Tag tAcousticCouplingMediumCodeSequence(0x3401,0x1007);
+		const mdcm::Tag tAcousticCouplingMediumFlag(0x3401,0x1099);
+		const mdcm::Tag tCouplingMediumTemperature(0x3401,0x1008);
+		const mdcm::Tag tPositionMeasuringDeviceUsed(0x0018,0x980c);
+		const mdcm::Tag tCodeMeaning(0x0008,0x0104);
+		QString s0;
+		if (ds.FindDataElement(tExcitationWavelengthSequence))
 		{
-			s += QString("<span class='y9'>Excitation Wavelength Sequence</span><br />");
-			const unsigned int n = sq->GetNumberOfItems();
-			for (unsigned int x = 0; x < n; ++x)
+			const mdcm::DataElement & e = ds.GetDataElement(tExcitationWavelengthSequence);
+			mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
+			if (sq)
 			{
-				const mdcm::Item & item = sq->GetItem(x + 1);
-				const mdcm::DataSet & nds = item.GetNestedDataSet();
-				if (nds.FindDataElement(tExcitationWavelength))
+				s0 += QString("<span class='y9'>Excitation Wavelength Sequence</span><br />");
+				const unsigned int n = sq->GetNumberOfItems();
+				for (unsigned int x = 0; x < n; ++x)
 				{
-					float ExcitationWavelength;
+					const mdcm::Item & item = sq->GetItem(x + 1);
+					const mdcm::DataSet & nds = item.GetNestedDataSet();
+					if (nds.FindDataElement(tExcitationWavelength))
+					{
+						float ExcitationWavelength;
+						if (DicomUtils::get_fl_value(
+								nds,
+								tExcitationWavelength,
+								&ExcitationWavelength))
+						{
+							s0 += QString("<span class='y8'>&#160;&#160;") +
+								QVariant(static_cast<qreal>(ExcitationWavelength)).toString() +
+								QString("&#160;nm</span><br />");
+						}
+					}
+				}
+			}
+		}
+		if (ds.FindDataElement(tIlluminationTranslationFlag))
+		{
+			QString IlluminationTranslationFlag;
+			if (DicomUtils::get_string_value(
+					ds,
+					tIlluminationTranslationFlag,
+					IlluminationTranslationFlag))
+			{
+				s0 += QString(
+						"<span class='y9'>Illumination Translation Flag</span><br />"
+						"<span class='y8'>&#160;&#160;") +
+					IlluminationTranslationFlag +
+					QString("</span><br />");
+			}
+		}
+		if (ds.FindDataElement(tIlluminationTypeCodeSequence))
+		{
+			const mdcm::DataElement & e = ds.GetDataElement(tIlluminationTypeCodeSequence);
+			mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
+			if (sq)
+			{
+				const unsigned int n = sq->GetNumberOfItems();
+				if (n == 1)
+				{
+					const mdcm::Item & item = sq->GetItem(1);
+					const mdcm::DataSet & nds = item.GetNestedDataSet();
+					if (nds.FindDataElement(tCodeMeaning))
+					{
+						QString CodeMeaning;
+						if (DicomUtils::get_string_value(
+								nds,
+								tCodeMeaning,
+								CodeMeaning))
+						{
+							s0 += QString(
+									"<span class='y9'>Illumination Type</span><br />"
+									"<span class='y8'>&#160;&#160;") +
+								CodeMeaning +
+								QString("</span><br />");
+						}
+					}
+				}
+			}
+		}
+		if (ds.FindDataElement(tAcousticCouplingMediumFlag))
+		{
+			QString AcousticCouplingMediumFlag;
+			if (DicomUtils::get_string_value(
+					ds,
+					tAcousticCouplingMediumFlag,
+					AcousticCouplingMediumFlag))
+			{
+				s0 += QString(
+						"<span class='y9'>AcousticCoupling Medium Flag</span><br />"
+						"<span class='y8'>&#160;&#160;") +
+					AcousticCouplingMediumFlag +
+					QString("</span><br />");
+			}
+		}
+		if (ds.FindDataElement(tAcousticCouplingMediumCodeSequence))
+		{
+			const mdcm::DataElement & e = ds.GetDataElement(tAcousticCouplingMediumCodeSequence);
+			mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
+			if (sq)
+			{
+				const unsigned int n = sq->GetNumberOfItems();
+				if (n == 1)
+				{
+					const mdcm::Item & item = sq->GetItem(1);
+					const mdcm::DataSet & nds = item.GetNestedDataSet();
+					if (nds.FindDataElement(tCodeMeaning))
+					{
+						QString CodeMeaning;
+						if (DicomUtils::get_string_value(
+								nds,
+								tCodeMeaning,
+								CodeMeaning))
+						{
+							s0 += QString(
+									"<span class='y9'>Acoustic Coupling Medium</span><br />"
+									"<span class='y8'>&#160;&#160;") +
+								CodeMeaning +
+								QString("</span><br />");
+						}
+					}
+				}
+			}
+		}
+		if (ds.FindDataElement(tCouplingMediumTemperature))
+		{
+			float CouplingMediumTemperature;
+			if (DicomUtils::get_fl_value(
+					ds,
+					tCouplingMediumTemperature,
+					&CouplingMediumTemperature))
+			{
+				s0 += QString(
+						"<span class='y9'>Coupling Medium Temperature</span><br />"
+						"<span class='y8'>&#160;&#160;") +
+					QVariant(static_cast<qreal>(CouplingMediumTemperature)).toString() +
+					QString("&#160;") +
+					QString(QChar(0x00B0)) +
+					QString("</span><br />");
+			}
+		}
+		if (ds.FindDataElement(tPositionMeasuringDeviceUsed))
+		{
+			QString PositionMeasuringDeviceUsed;
+			if (DicomUtils::get_string_value(
+					ds,
+					tPositionMeasuringDeviceUsed,
+					PositionMeasuringDeviceUsed))
+			{
+				s0 += QString(
+						"<span class='y9'>Position Measuring Device Used</span><br />"
+						"<span class='y8'>&#160;&#160;") +
+					PositionMeasuringDeviceUsed +
+					QString("</span><br />");
+			}
+		}
+		if (!s0.isEmpty())
+		{
+			s += QString("<span class='y7'>Photoacoustic Image Module</span><br />") +
+				s0;
+		}
+	}
+	//
+	//
+	//////////////////////////////////////////////
+
+	//////////////////////////////////////////////
+	//
+	// Photoacoustic Transducer Module
+	//
+	//
+	{
+		const mdcm::Tag tTransducerGeometryCodeSequence(0x0018,0x980d);
+		const mdcm::Tag tTransducerTechnologySequence(0x3401,0x1010);
+		const mdcm::Tag tTransducerResponseSequence(0x3401,0x1017);
+		const mdcm::Tag tUpperCutoffFrequency(0x3431,0x1095);
+		const mdcm::Tag tLowerCutoffFrequency(0x3431,0x1096);
+		const mdcm::Tag tFractionalBandwidth(0x3431,0x1097);
+		const mdcm::Tag tCenterFrequency(0x3431,0x1098);
+		const mdcm::Tag tCodeMeaning(0x0008,0x0104);
+		QString s1;
+		if (ds.FindDataElement(tTransducerGeometryCodeSequence))
+		{
+			const mdcm::DataElement & e = ds.GetDataElement(tTransducerGeometryCodeSequence);
+			mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
+			if (sq)
+			{
+				const unsigned int n = sq->GetNumberOfItems();
+				if (n == 1)
+				{
+					const mdcm::Item & item = sq->GetItem(1);
+					const mdcm::DataSet & nds = item.GetNestedDataSet();
+					if (nds.FindDataElement(tCodeMeaning))
+					{
+						QString CodeMeaning;
+						if (DicomUtils::get_string_value(
+								nds,
+								tCodeMeaning,
+								CodeMeaning))
+						{
+							s1 += QString(
+									"<span class='y9'>Transducer Geometry</span><br />"
+									"<span class='y8'>&#160;&#160;") +
+								CodeMeaning +
+								QString("</span><br />");
+						}
+					}
+				}
+			}
+		}
+		if (ds.FindDataElement(tTransducerTechnologySequence))
+		{
+			const mdcm::DataElement & e = ds.GetDataElement(tTransducerTechnologySequence);
+			mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
+			if (sq)
+			{
+				const unsigned int n = sq->GetNumberOfItems();
+				if (n == 1)
+				{
+					const mdcm::Item & item = sq->GetItem(1);
+					const mdcm::DataSet & nds = item.GetNestedDataSet();
+					if (nds.FindDataElement(tCodeMeaning))
+					{
+						QString CodeMeaning;
+						if (DicomUtils::get_string_value(
+								nds,
+								tCodeMeaning,
+								CodeMeaning))
+						{
+							s1 += QString(
+									"<span class='y9'>Transducer Technology</span><br />"
+									"<span class='y8'>&#160;&#160;") +
+								CodeMeaning +
+								QString("</span><br />");
+						}
+					}
+				}
+			}
+		}
+		if (ds.FindDataElement(tTransducerResponseSequence))
+		{
+			const mdcm::DataElement & e = ds.GetDataElement(tTransducerResponseSequence);
+			mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
+			if (sq)
+			{
+				const unsigned int n = sq->GetNumberOfItems();
+				if (n == 1)
+				{
+					QString s2;
+					const mdcm::Item & item = sq->GetItem(1);
+					const mdcm::DataSet & nds = item.GetNestedDataSet();
+					float UpperCutoffFrequency;
+					float LowerCutoffFrequency;
+					float FractionalBandwidth;
+					float CenterFrequency;
 					if (DicomUtils::get_fl_value(
 							nds,
-							tExcitationWavelength,
-							&ExcitationWavelength))
+							tUpperCutoffFrequency,
+							&UpperCutoffFrequency))
 					{
-						s += QString("<span class='y8'>&#160;&#160;") +
-							QVariant(static_cast<qreal>(ExcitationWavelength)).toString() +
-							QString("&#160;nm</span><br />");
+						s2 += QString("<span class='y8'>&#160;&#160;Upper Cutoff Frequency<br />&#160;&#160;") +
+							QVariant(static_cast<qreal>(UpperCutoffFrequency)).toString() +
+							QString("&#160;MHz</span><br />");
 					}
-				}
-			}
-		}
-	}
-	if (ds.FindDataElement(tIlluminationTypeCodeSequence))
-	{
-		const mdcm::DataElement & e = ds.GetDataElement(tIlluminationTypeCodeSequence);
-		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
-		if (sq)
-		{
-			const unsigned int n = sq->GetNumberOfItems();
-			if (n == 1)
-			{
-				const mdcm::Item & item = sq->GetItem(1);
-				const mdcm::DataSet & nds = item.GetNestedDataSet();
-				if (nds.FindDataElement(tCodeMeaning))
-				{
-					QString CodeMeaning;
-					if (DicomUtils::get_string_value(
+					if (DicomUtils::get_fl_value(
 							nds,
-							tCodeMeaning,
-							CodeMeaning))
+							tLowerCutoffFrequency,
+							&LowerCutoffFrequency))
 					{
-						s += QString(
-								"<span class='y9'>Illumination Type</span><br />"
-								"<span class='y8'>&#160;&#160;") +
-							CodeMeaning +
-							QString("</span><br />");
+						s2 += QString("<span class='y8'>&#160;&#160;Lower Cutoff Frequency&#160;") +
+							QVariant(static_cast<qreal>(LowerCutoffFrequency)).toString() +
+							QString("&#160;MHz</span><br />");
 					}
-				}
-			}
-		}
-	}
-	if (ds.FindDataElement(tAcousticCouplingMediumFlag))
-	{
-		QString AcousticCouplingMediumFlag;
-		if (DicomUtils::get_string_value(
-				ds,
-				tAcousticCouplingMediumFlag,
-				AcousticCouplingMediumFlag))
-		{
-			s += QString(
-					"<span class='y9'>AcousticCoupling Medium Flag</span><br />"
-					"<span class='y8'>&#160;&#160;") +
-				AcousticCouplingMediumFlag +
-				QString("</span><br />");
-		}
-	}
-	if (ds.FindDataElement(tAcousticCouplingMediumCodeSequence))
-	{
-		const mdcm::DataElement & e = ds.GetDataElement(tAcousticCouplingMediumCodeSequence);
-		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
-		if (sq)
-		{
-			const unsigned int n = sq->GetNumberOfItems();
-			if (n == 1)
-			{
-				const mdcm::Item & item = sq->GetItem(1);
-				const mdcm::DataSet & nds = item.GetNestedDataSet();
-				if (nds.FindDataElement(tCodeMeaning))
-				{
-					QString CodeMeaning;
-					if (DicomUtils::get_string_value(
+					if (DicomUtils::get_fl_value(
 							nds,
-							tCodeMeaning,
-							CodeMeaning))
+							tFractionalBandwidth,
+							&FractionalBandwidth))
 					{
-						s += QString(
-								"<span class='y9'>Acoustic Coupling Medium</span><br />"
-								"<span class='y8'>&#160;&#160;") +
-							CodeMeaning +
-							QString("</span><br />");
+						s2 += QString("<span class='y8'>&#160;&#160;Fractional Bandwidth&#160;") +
+							QVariant(static_cast<qreal>(FractionalBandwidth)).toString() +
+							QString("&#160;MHz</span><br />");
+					}
+					if (DicomUtils::get_fl_value(
+							nds,
+							tCenterFrequency,
+							&CenterFrequency))
+					{
+						s2 += QString("<span class='y8'>&#160;&#160;Center Frequency&#160;") +
+							QVariant(static_cast<qreal>(CenterFrequency)).toString() +
+							QString("&#160;MHz</span><br />");
+					}
+					if (!s2.isEmpty())
+					{
+						s2.prepend(QString("<span class='y9'>Transducer Response</span><br />"));
+						s1 += s2;
 					}
 				}
 			}
 		}
-	}
-	if (ds.FindDataElement(tCouplingMediumTemperature))
-	{
-		float CouplingMediumTemperature;
-		if (DicomUtils::get_fl_value(
-				ds,
-				tCouplingMediumTemperature,
-				&CouplingMediumTemperature))
+		if (!s1.isEmpty())
 		{
-			s += QString(
-					"<span class='y9'>Coupling Medium Temperature</span><br />"
-					"<span class='y8'>&#160;&#160;") +
-				QVariant(static_cast<qreal>(CouplingMediumTemperature)).toString() +
-				QString("&#160;") +
-				QString(QChar(0x00B0)) +
-				QString("</span><br />");
+			s += QString("<span class='y7'>Photoacoustic Transducer Module</span><br />") +
+				s1;
 		}
 	}
+	//
+	//
+	//////////////////////////////////////////////
 
-	// TODO
-	if (!s.isEmpty())
-	{
-		s.append(QString("<br />"));
-		s.prepend(QString("<span class='y7'>Photoacoustic Image Module</span><br />"));
-	}
+	//////////////////////////////////////////////
+	//
+	// Photoacoustic Reconstruction Module
+	//
+	//
+
+	//
+	//
+	//////////////////////////////////////////////
+
+	s.append(QString("<br />"));
 	return s;
 }
 
@@ -10108,7 +10305,7 @@ QString DicomUtils::read_enhanced_common(
 					}
 					else if (sop == QString("1.2.840.10008.5.1.2.3.45")) // FIXME
 					{
-						ivariant->iinfo = read_PhotoacousticImageModule(ds);
+						ivariant->iinfo = read_PhotoacousticImage(ds);
 					}
 					read_ivariant_info_tags(ds, ivariant);
 					read_window(ds, &window_center_tmp, &window_width_tmp, &lut_function_tmp);
