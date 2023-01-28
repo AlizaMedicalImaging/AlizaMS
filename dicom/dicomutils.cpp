@@ -979,6 +979,8 @@ static QString read_PhotoacousticImageModule(const mdcm::DataSet & ds) // TODO F
 	const mdcm::Tag tIlluminationTypeCodeSequence(0x3401,0x1006);
 	const mdcm::Tag tAcousticCouplingMediumCodeSequence(0x3401,0x1007);
 	const mdcm::Tag tCodeMeaning(0x0008,0x0104);
+	const mdcm::Tag tAcousticCouplingMediumFlag(0x3401,0x1099);
+	const mdcm::Tag tCouplingMediumTemperature(0x3401,0x1008);
 	if (ds.FindDataElement(tExcitationWavelengthSequence))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tExcitationWavelengthSequence);
@@ -1026,13 +1028,29 @@ static QString read_PhotoacousticImageModule(const mdcm::DataSet & ds) // TODO F
 							tCodeMeaning,
 							CodeMeaning))
 					{
-						s += QString("<span class='y9'>Illumination Type</span><br />") +
-							QString("<span class='y8'>&#160;&#160;") +
+						s += QString(
+								"<span class='y9'>Illumination Type</span><br />"
+								"<span class='y8'>&#160;&#160;") +
 							CodeMeaning +
 							QString("</span><br />");
 					}
 				}
 			}
+		}
+	}
+	if (ds.FindDataElement(tAcousticCouplingMediumFlag))
+	{
+		QString AcousticCouplingMediumFlag;
+		if (DicomUtils::get_string_value(
+				ds,
+				tAcousticCouplingMediumFlag,
+				AcousticCouplingMediumFlag))
+		{
+			s += QString(
+					"<span class='y9'>AcousticCoupling Medium Flag</span><br />"
+					"<span class='y8'>&#160;&#160;") +
+				AcousticCouplingMediumFlag +
+				QString("</span><br />");
 		}
 	}
 	if (ds.FindDataElement(tAcousticCouplingMediumCodeSequence))
@@ -1054,8 +1072,9 @@ static QString read_PhotoacousticImageModule(const mdcm::DataSet & ds) // TODO F
 							tCodeMeaning,
 							CodeMeaning))
 					{
-						s += QString("<span class='y9'>Acoustic Coupling Medium</span><br />") +
-							QString("<span class='y8'>&#160;&#160;") +
+						s += QString(
+								"<span class='y9'>Acoustic Coupling Medium</span><br />"
+								"<span class='y8'>&#160;&#160;") +
 							CodeMeaning +
 							QString("</span><br />");
 					}
@@ -1063,9 +1082,28 @@ static QString read_PhotoacousticImageModule(const mdcm::DataSet & ds) // TODO F
 			}
 		}
 	}
+	if (ds.FindDataElement(tCouplingMediumTemperature))
+	{
+		float CouplingMediumTemperature;
+		if (DicomUtils::get_fl_value(
+				ds,
+				tCouplingMediumTemperature,
+				&CouplingMediumTemperature))
+		{
+			s += QString(
+					"<span class='y9'>Coupling Medium Temperature</span><br />"
+					"<span class='y8'>&#160;&#160;") +
+				QVariant(static_cast<qreal>(CouplingMediumTemperature)).toString() +
+				QString("&#160;") +
+				QString(QChar(0x00B0)) +
+				QString("</span><br />");
+		}
+	}
+
 	// TODO
 	if (!s.isEmpty())
 	{
+		s.append(QString("<br />"));
 		s.prepend(QString("<span class='y7'>Photoacoustic Image Module</span><br />"));
 	}
 	return s;
