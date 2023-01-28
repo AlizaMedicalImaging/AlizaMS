@@ -1297,12 +1297,92 @@ static QString read_PhotoacousticImage(const mdcm::DataSet & ds) // FIXME
 	// Photoacoustic Reconstruction Module
 	//
 	//
-
+	{
+		QString s3;
+		const mdcm::Tag tSoundSpeedCorrectionMechanismCodeSequence(0x3401,0x1014);
+		const mdcm::Tag tObjectSoundSpeed(0x3421,0x1015);
+		const mdcm::Tag tCouplingMediumSoundSpeed(0x3421,0x1016);
+		const mdcm::Tag tPAReconstructionIndex(0x3401,0x1093);
+		const mdcm::Tag tCodeMeaning(0x0008,0x0104);
+		unsigned int PAReconstructionIndex;
+		if (DicomUtils::get_ul_value(
+				ds,
+				tPAReconstructionIndex,
+				&PAReconstructionIndex))
+		{
+			s3 += QString(
+					"<span class='y9'>PA Reconstruction Index</span><br />"
+					"<span class='y8'>&#160;&#160;") +
+				QVariant(PAReconstructionIndex).toString() +
+				QString("</span><br />");
+		}
+		if (ds.FindDataElement(tSoundSpeedCorrectionMechanismCodeSequence))
+		{
+			const mdcm::DataElement & e = ds.GetDataElement(tSoundSpeedCorrectionMechanismCodeSequence);
+			mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
+			if (sq)
+			{
+				const unsigned int n = sq->GetNumberOfItems();
+				if (n == 1)
+				{
+					QString s4;
+					const mdcm::Item & item = sq->GetItem(1);
+					const mdcm::DataSet & nds = item.GetNestedDataSet();
+					float ObjectSoundSpeed;
+					float CouplingMediumSoundSpeed;
+					if (nds.FindDataElement(tCodeMeaning))
+					{
+						QString CodeMeaning;
+						if (DicomUtils::get_string_value(
+								nds,
+								tCodeMeaning,
+								CodeMeaning))
+						{
+							s4 += QString("<span class='y8'>&#160;&#160;") +
+								CodeMeaning +
+								QString("</span><br />");
+						}
+					}
+					if (DicomUtils::get_fl_value(
+							nds,
+							tObjectSoundSpeed,
+							&ObjectSoundSpeed))
+					{
+						s4 += QString("<span class='y8'>&#160;&#160;Object Sound Speed&#160;") +
+							QVariant(static_cast<qreal>(ObjectSoundSpeed)).toString() +
+							QString("&#160;m/s</span><br />");
+					}
+					if (DicomUtils::get_fl_value(
+							nds,
+							tCouplingMediumSoundSpeed,
+							&CouplingMediumSoundSpeed))
+					{
+						s4 += QString("<span class='y8'>&#160;&#160;Coupling Medium Sound Speed&#160;") +
+							QVariant(static_cast<qreal>(CouplingMediumSoundSpeed)).toString() +
+							QString("&#160;m/s</span><br />");
+					}
+					if (!s4.isEmpty())
+					{
+						s4.prepend(QString("<span class='y9'>Sound Speed Correction Mechanism</span><br />"));
+						s3 += s4;
+					}
+				}
+			}
+		}
+		if (!s3.isEmpty())
+		{
+			s += QString("<span class='y7'>Photoacoustic Reconstruction Module</span><br />") +
+				s3;
+		}
+	}
 	//
 	//
 	//////////////////////////////////////////////
 
-	s.append(QString("<br />"));
+	if (!s.isEmpty())
+	{
+		s.append(QString("<br />"));
+	}
 	return s;
 }
 
