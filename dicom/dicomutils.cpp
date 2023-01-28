@@ -976,9 +976,12 @@ static QString read_PhotoacousticImageModule(const mdcm::DataSet & ds) // TODO F
 	QString s("");
 	const mdcm::Tag tExcitationWavelengthSequence(0x3401,0x1094);
 	const mdcm::Tag tExcitationWavelength(0x3441,0x1005);
+	const mdcm::Tag tIlluminationTypeCodeSequence(0x3401,0x1006);
+	const mdcm::Tag tAcousticCouplingMediumCodeSequence(0x3401,0x1007);
+	const mdcm::Tag tCodeMeaning(0x0008,0x0104);
 	if (ds.FindDataElement(tExcitationWavelengthSequence))
 	{
-		const mdcm::DataElement & e  = ds.GetDataElement(tExcitationWavelengthSequence);
+		const mdcm::DataElement & e = ds.GetDataElement(tExcitationWavelengthSequence);
 		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
 		if (sq)
 		{
@@ -996,7 +999,7 @@ static QString read_PhotoacousticImageModule(const mdcm::DataSet & ds) // TODO F
 							tExcitationWavelength,
 							&ExcitationWavelength))
 					{
-						s += QString("<span class='y9'>&#160;&#160;") +
+						s += QString("<span class='y8'>&#160;&#160;") +
 							QVariant(static_cast<qreal>(ExcitationWavelength)).toString() +
 							QString("&#160;nm</span><br />");
 					}
@@ -1004,7 +1007,62 @@ static QString read_PhotoacousticImageModule(const mdcm::DataSet & ds) // TODO F
 			}
 		}
 	}
-
+	if (ds.FindDataElement(tIlluminationTypeCodeSequence))
+	{
+		const mdcm::DataElement & e = ds.GetDataElement(tIlluminationTypeCodeSequence);
+		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
+		if (sq)
+		{
+			const unsigned int n = sq->GetNumberOfItems();
+			if (n == 1)
+			{
+				const mdcm::Item & item = sq->GetItem(1);
+				const mdcm::DataSet & nds = item.GetNestedDataSet();
+				if (nds.FindDataElement(tCodeMeaning))
+				{
+					QString CodeMeaning;
+					if (DicomUtils::get_string_value(
+							nds,
+							tCodeMeaning,
+							CodeMeaning))
+					{
+						s += QString("<span class='y9'>Illumination Type</span><br />") +
+							QString("<span class='y8'>&#160;&#160;") +
+							CodeMeaning +
+							QString("</span><br />");
+					}
+				}
+			}
+		}
+	}
+	if (ds.FindDataElement(tAcousticCouplingMediumCodeSequence))
+	{
+		const mdcm::DataElement & e = ds.GetDataElement(tAcousticCouplingMediumCodeSequence);
+		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
+		if (sq)
+		{
+			const unsigned int n = sq->GetNumberOfItems();
+			if (n == 1)
+			{
+				const mdcm::Item & item = sq->GetItem(1);
+				const mdcm::DataSet & nds = item.GetNestedDataSet();
+				if (nds.FindDataElement(tCodeMeaning))
+				{
+					QString CodeMeaning;
+					if (DicomUtils::get_string_value(
+							nds,
+							tCodeMeaning,
+							CodeMeaning))
+					{
+						s += QString("<span class='y9'>Acoustic Coupling Medium</span><br />") +
+							QString("<span class='y8'>&#160;&#160;") +
+							CodeMeaning +
+							QString("</span><br />");
+					}
+				}
+			}
+		}
+	}
 	// TODO
 	if (!s.isEmpty())
 	{
