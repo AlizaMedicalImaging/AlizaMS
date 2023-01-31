@@ -355,19 +355,19 @@ int main(int, char**)
     char buf[50];
     memset(buf, 0, 50);
     char line[40];
-    int l = sprintf(line, "%.17g", f);
+    int l = snprintf(line, sizeof(buf), "%.17g", f);
     printf("1) l = %d\n", l);
     if (l > 16)
     {
         int prec = 33 - strlen(line);
-        l = sprintf(line, "%.*g", prec, f);
+        l = snprintf(line, sizeof(buf), "%.*g", prec, f);
         printf("2) l = %d\nprec = %d\nline = %s\n", l, prec, line);
         int count = 2;
         while(l > 16)
         {
             ++count;
             --prec;
-            l = sprintf(line, "%.*g", prec, f);
+            l = snprintf(line, sizeof(buf), "%.*g", prec, f);
             printf("%d) l = %d\nprec = %d\nline = %s\n", count, l, prec, line);
         }
     }
@@ -381,15 +381,15 @@ static void ds16print(char * buf, double f)
 {
   char * line = new char[400]; // overallocated, 40 is OK
   memset(line, 0, 400); // not required
-  int l = sprintf(line, "%.17g", f);
+  int l = snprintf(line, sizeof(line), "%.17g", f);
   if (l > 16)
   {
     int prec = 33 - static_cast<int>(strlen(line));
-    l = sprintf(line, "%.*g", prec, f);
+    l = snprintf(line, sizeof(line), "%.*g", prec, f);
     while(l > 16)
     {
       --prec;
-      l = sprintf(line, "%.*g", prec, f);
+      l = snprintf(line, sizeof(line),"%.*g", prec, f);
     }
   }
   strcpy(buf, line);

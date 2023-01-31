@@ -208,7 +208,7 @@ MrProtocol::GetSliceArray(MrProtocol::SliceArray & sa) const
       double v[3];
       for (int j = 0; j < 3; ++j)
       {
-        sprintf(buf, templ1, i, dir[j]);
+        snprintf(buf, sizeof(buf), templ1, i, dir[j]);
         const char * valstr = GetMrProtocolByName(buf);
         // when not present this means 0.0
         double val = 0.0;
@@ -225,7 +225,7 @@ MrProtocol::GetSliceArray(MrProtocol::SliceArray & sa) const
       double v[3];
       for (int j = 0; j < 3; ++j)
       {
-        sprintf(buf, templ2, i, dir[j]);
+        snprintf(buf, sizeof(buf), templ2, i, dir[j]);
         const char * valstr = GetMrProtocolByName(buf);
         // when not present this means 0.0
         double val = 0.0;

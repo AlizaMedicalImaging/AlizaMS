@@ -37,7 +37,7 @@ MD5::Compute(const char * buffer, size_t buf_len, char digest_str[33])
   MD5_Final(digest, &ctx);
   for (int di = 0; di < 16; ++di)
   {
-    sprintf(digest_str + 2 * di, "%02x", digest[di]);
+    snprintf(digest_str + 2 * di, 3, "%02x", digest[di]);
   }
   digest_str[2 * 16] = '\0';
   return true;
@@ -83,7 +83,7 @@ MD5::ComputeFile(const char * filename, char digest_str[33])
     return false;
   for (int di = 0; di < 16; ++di)
   {
-    sprintf(digest_str + 2 * di, "%02x", digest[di]);
+    snprintf(digest_str + 2 * di, 3, "%02x", digest[di]);
   }
   digest_str[2 * 16] = '\0';
   return true;

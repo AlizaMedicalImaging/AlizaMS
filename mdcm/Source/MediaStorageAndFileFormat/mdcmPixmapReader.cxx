@@ -436,7 +436,6 @@ DoOverlays(const DataSet & ds, Pixmap & pixeldata)
   {
     updateoverlayinfo.resize(numoverlays, false);
     pixeldata.SetNumberOfOverlays(numoverlays);
-
     for (unsigned int idxoverlays = 0; idxoverlays < numoverlays; ++idxoverlays)
     {
       Overlay & ov = pixeldata.GetOverlay(idxoverlays);
@@ -467,7 +466,6 @@ DoOverlays(const DataSet & ds, Pixmap & pixeldata)
           mdcmWarningMacro("Bits Allocated are wrong. Correcting.");
           ov.SetBitsAllocated(pixeldata.GetPixelFormat().GetBitsAllocated());
         }
-
         if (!ov.GrabOverlayFromPixelData(ds))
         {
           mdcmWarningMacro("Could not extract overlay from pixel data (1)");
@@ -585,7 +583,6 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
     }
   }
 #if 1
-  // Support invalid DICOM files
   else if (!pixeldata_ && (pixeldataf_ || pixeldatad_))
   {
     Attribute<0x0028, 0x0100> at = { 0 };

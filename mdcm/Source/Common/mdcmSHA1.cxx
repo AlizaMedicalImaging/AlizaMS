@@ -62,7 +62,7 @@ SHA1::Compute(const char * buffer, unsigned long buf_len, char digest[])
   SHA1_Final(output, &ctx);
   for (int di = 0; di < 20; ++di)
   {
-    sprintf(digest + 2 * di, "%02x", output[di]);
+    snprintf(digest + 2 * di, 3, "%02x", output[di]);
   }
   digest[2 * 20] = '\0';
   return true;
@@ -118,7 +118,7 @@ SHA1::ComputeFile(const char * filename, char digest_str[20 * 2 + 1])
     return false;
   for (int di = 0; di < 20; ++di)
   {
-    sprintf(digest_str + 2 * di, "%02x", digest[di]);
+    snprintf(digest_str + 2 * di, 3, "%02x", digest[di]);
   }
   digest_str[2 * 20] = '\0';
   return true;
