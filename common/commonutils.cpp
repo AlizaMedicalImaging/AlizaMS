@@ -1028,12 +1028,12 @@ template <typename T> bool reload_monochrome_image(
 	GLWidget * gl,
 	int max_3d_tex_size,
 	QProgressDialog * pb,
-	bool resize=false,
-	size_t size_x_=0,
-	size_t size_y_=0,
-	bool disable_gen_slices=false)
+	bool resize = false,
+	size_t size_x_ = 0,
+	size_t size_y_ = 0,
+	bool disable_gen_slices = false)
 {
-	if (!ivariant||image.IsNull()) return false;
+	if (!ivariant || image.IsNull()) return false;
 	const bool generate_slices =
 		(!disable_gen_slices &&
 			!ivariant->di->slices_generated);
@@ -1110,13 +1110,13 @@ template <typename T> bool reload_monochrome_image(
 	if (size_z > static_cast<size_t>(max_3d_tex_size)) size_z = max_3d_tex_size;
 	fx = size_x/static_cast<double>(size[0]);
 	size[0] *= fx;
-	spacing[0] *= 1.0/fx;
+	spacing[0] *= 1.0 / fx;
 	fy = size_y/static_cast<double>(size[1]);
 	size[1] *= fy;
-	spacing[1] *= 1.0/fy;
+	spacing[1] *= 1.0 / fy;
 	fz = size_z/static_cast<double>(size[2]);
 	size[2] *= fz;
-	spacing[2] *= 1.0/fz;
+	spacing[2] *= 1.0 / fz;
 	isize[0] = size[0];
 	isize[1] = size[1];
 	isize[2] = size[2];
@@ -1169,7 +1169,7 @@ template <typename T> bool reload_monochrome_image(
 				dspacing[1] *= 2.0;
 				if (gl) gl->makeCurrent();
 				ivariant->di->close(generate_slices);
-				if (count__>64)
+				if (count__ > 64)
 				{
 					std::cout
 						<< "exit from loop after "

@@ -2075,7 +2075,7 @@ bool DicomUtils::has_functional_groups(const mdcm::DataSet & ds)
 			ds.GetDataElement(tSharedFunctionalGroupsSequence);
 		mdcm::SmartPointer<mdcm::SequenceOfItems> sq =
 			e.GetValueAsSQ();
-		if (sq && sq->GetNumberOfItems()>0) return true;
+		if (sq && sq->GetNumberOfItems() > 0) return true;
 	}
 	if (ds.FindDataElement(tPerFrameFunctionalGroupsSequence))
 	{
@@ -2083,7 +2083,7 @@ bool DicomUtils::has_functional_groups(const mdcm::DataSet & ds)
 			ds.GetDataElement(tPerFrameFunctionalGroupsSequence);
 		mdcm::SmartPointer<mdcm::SequenceOfItems> sq =
 			e.GetValueAsSQ();
-		if (sq && sq->GetNumberOfItems()>0) return true;
+		if (sq && sq->GetNumberOfItems() > 0) return true;
 	}
 	return false;
 }
@@ -10804,7 +10804,7 @@ QString DicomUtils::read_enhanced_common(
 					{
 						float cx = 0.0f, cy = 0.0f, cz = 0.0f;
 						CommonUtils::calculate_center_notuniform(
-							ivariant->di->image_slices,&cx,&cy,&cz);
+							ivariant->di->image_slices, &cx, &cy, &cz);
 						ivariant->di->default_center_x = ivariant->di->center_x = cx;
 						ivariant->di->default_center_y = ivariant->di->center_y = cy;
 						ivariant->di->default_center_z = ivariant->di->center_z = cz;
@@ -10863,9 +10863,12 @@ QString DicomUtils::read_enhanced_common(
 			}
 			tmp4.clear();
 		}
-		if (!message_.isEmpty()) message.append(QString("\n")+message_);
+		if (!message_.isEmpty()) message.append(QString("\n") + message_);
 #ifdef ENHANCED_PRINT_INFO
-		if (!min_load) std::cout << "*********" << std::endl;
+		if (!min_load)
+		{
+			std::cout << "*********" << std::endl;
+		}
 #endif
 	}
 #ifdef ENHANCED_PRINT_INFO
