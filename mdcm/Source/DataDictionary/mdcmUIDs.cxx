@@ -549,9 +549,9 @@ const char * const UIDsStrings[][2] = {
 
   /////////////////////////////////////////////////////////////////////////
   //
-  // PA Temporary Image Storage FIXME
+  // Test Photoacoustic Image Storage FIXME
   //
-  { "1.2.840.10008.5.1.2.3.45", "PA Temporary Image Storage" },
+  { "1.2.840.10008.5.1.2.3.45", "Test Photoacoustic Image Storage" },
   //
   //
   //

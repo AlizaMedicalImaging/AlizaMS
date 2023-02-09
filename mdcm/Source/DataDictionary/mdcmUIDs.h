@@ -549,7 +549,7 @@ public:
 
 /////////////////////////////////////////
 //
-// PA Temporary Image Storage FIXME
+// Test Photoacoustic Image Storage FIXME
 //
 	uid_1_2_840_10008_5_1_2_3_45 = 479
 //
@@ -1087,9 +1087,9 @@ public:
 
 /////////////////////////////////////////
 //
-// PA Temprorary Image Storage FIXME
+// Test Photoacoustic Image Storage FIXME
 //
-    PATemporaryImageStorage = 479
+    TestPhotoacousticImageStorage = 479
 //
 //
 /////////////////////////////////////////

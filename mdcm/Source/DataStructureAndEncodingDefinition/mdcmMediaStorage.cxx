@@ -158,7 +158,7 @@ static const char * MSStrings[] = {
   "1.2.840.10008.5.1.4.1.1.13.1.5",   // Breast Projection X-Ray Image Storage - For Processing
   "1.2.840.10008.5.1.1.30",           // HardcopyColorImageStorage
   "1.2.276.0.7230010.3.1.0.1",        // DCMTK Unknown, wrong, try to handle like secondary capture
-  "1.2.840.10008.5.1.2.3.45",         // PA Temporary Image Storage FIXME
+  "1.2.840.10008.5.1.2.3.45",         // Test Photoacoustic Image Storage FIXME
   NULL
 };
 
@@ -354,7 +354,7 @@ static const MSModalityType MSModalityTypes[] = {
   { "MG", 3, false },       // BreastProjectionXRayImageStorageForProcessing
   { "  ", 2, false },       // HardcopyColorImageStorage
   { "  ", 2, false },       // DCMTKUnknownStorage
-  { "PA", 3, false },       // PATemporaryImageStorage FIXME
+  { "PA", 3, false },       // TestPhotoacousticImageStorage FIXME
   { NULL, 0, false }        // MS_END
 };
 

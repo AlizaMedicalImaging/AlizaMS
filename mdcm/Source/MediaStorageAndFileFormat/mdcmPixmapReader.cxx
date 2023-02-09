@@ -134,12 +134,12 @@ PixmapReader::Read()
     MediaStorage ms2 = ds.GetMediaStorage();
     if (ms == MediaStorage::MediaStorageDirectoryStorage && ms2 == MediaStorage::MS_END)
     {
-      mdcmDebugMacro("DICOM file is not an Image file but a : " << MediaStorage::GetMSString(ms) << " SOP Class UID");
+      mdcmDebugMacro("DICOM file is not an image but " << MediaStorage::GetMSString(ms) << " SOP Class UID");
       res = false;
     }
     else if (ms == ms2 && ms != MediaStorage::MS_END)
     {
-      mdcmDebugMacro("DICOM file is not an Image file but a : " << MediaStorage::GetMSString(ms) << " SOP Class UID");
+      mdcmDebugMacro("DICOM file is not an image but " << MediaStorage::GetMSString(ms) << " SOP Class UID");
       res = false;
     }
     else
@@ -149,8 +149,7 @@ PixmapReader::Read()
         bool isImage2 = MediaStorage::IsImage(ms2);
         if (isImage2)
         {
-          mdcmDebugMacro("After all it might be a DICOM file "
-                         "(Mallinckrodt-like)");
+          mdcmDebugMacro("It might be a DICOM file, e.g. Mallinckrodt-like");
           res = ReadImage(ms2);
         }
         else
@@ -162,8 +161,8 @@ PixmapReader::Read()
           }
           else
           {
-            mdcmDebugMacro("DICOM file is not an Image file but a : " << MediaStorage::GetMSString(ms2)
-                                                                      << " SOP Class UID");
+            mdcmDebugMacro("DICOM file is not an image but " << MediaStorage::GetMSString(ms2)
+                           << " SOP Class UID");
             res = false;
           }
         }
@@ -173,11 +172,10 @@ PixmapReader::Read()
         mdcmDebugMacro("Looks like an ACR-NEMA file");
         res = ReadACRNEMAImage();
       }
-      else // Unknown Media Storage Syntax
+      else
       {
         assert(ts != TransferSyntax::TS_END && ms == MediaStorage::MS_END);
-        mdcmWarningMacro("Attempting to read this file as a DICOM file"
-                         "\nDesperate attempt");
+        mdcmWarningMacro("Trying to read this file as a DICOM file");
         MediaStorage ms3;
         ms3.SetFromFile(GetFile());
         if (ms3 != MediaStorage::MS_END)
@@ -186,7 +184,12 @@ PixmapReader::Read()
         }
         else
         {
+#if 1
+          mdcmAlwaysWarnMacro("Trying to read unknown Media Storage as image"); 
+          res = ReadImage(ms3);
+#else
           res = false;
+#endif
         }
       }
     }
