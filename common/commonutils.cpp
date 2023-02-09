@@ -1066,9 +1066,19 @@ template <typename T> bool reload_monochrome_image(
 	//
 	if (max_3d_tex_size > 0 &&
 		max_3d_tex_size < static_cast<int>(size[2]))
+	{
+#if 1
+		std::cout << "Warning: can not use 3D texture, Z dim = "
+			<< static_cast<int>(size[2])
+			<< ", 3D max texture size = " << max_3d_tex_size
+			<< std::endl;
+#endif
 		ivariant->di->skip_texture = true;
-	if (size[0]==1 || size[1]==1)
+	}
+	if (size[0] == 1 || size[1] == 1)
+	{
 		ivariant->di->skip_texture = true;
+	}
 	const bool ok3d =
 		(max_3d_tex_size > 0 &&
 		!ivariant->di->skip_texture &&
@@ -1076,10 +1086,13 @@ template <typename T> bool reload_monochrome_image(
 		&& gl);
 	//
 	if (generate_slices)
-		read_geometry_from_image<T>(
-			ivariant, image);
+	{
+		read_geometry_from_image<T>(ivariant, image);
+	}
 	if (calc_center)
+	{
 		calc_center_from_image<T>(ivariant,image);
+	}
 	//
 	if (resize)
 	{
@@ -1131,19 +1144,25 @@ template <typename T> bool reload_monochrome_image(
 			else
 			{
 				if (error__ == 2)
+				{
 					std::cout <<
 							"memory error (system)    "
 							"... reducing texture size"
 						<< std::endl;
+				}
 				else if (error__ == 3)
+				{
 					std::cout <<
 							"memory error (graphics)  "
 							"... reducing texture size"
 						<< std::endl;
+				}
 				else
+				{
 					std::cout
 						<< "error " << error__
 						<< std::endl;
+				}
 				isize[0]    *= 0.5;
 				isize[1]    *= 0.5;
 				dspacing[0] *= 2.0;
