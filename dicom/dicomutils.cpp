@@ -6531,19 +6531,13 @@ QString DicomUtils::read_enhanced(
 	double spacing_x_read, spacing_y_read, spacing_z_read;
 	double unsused0 = 0.0, unsused1 = 1.0;
 	AnatomyMap empty_;
-	// do not use MDCM's rescale for enhanced, except for US, PA
-	const bool rescale_tmp =
-		(sop == QString("1.2.840.10008.5.1.4.1.1.6.2") ||
-			sop == QString("1.2.840.10008.5.1.2.3.45")) // FIXME
-		? wsettings->get_rescale()
-		: false;
 	message_ =
 		read_buffer(
 			ok, data,
 			image_overlays, -1,
 			empty_, -1, // unused in enhanced
 			f,
-			rescale_tmp,
+			false, // do not use MDCM's rescale for enhanced
 			pixelformat, false,
 			pi,
 			&dimx_read, &dimy_read, &dimz_read,
@@ -10128,6 +10122,11 @@ QString DicomUtils::read_enhanced_common(
 		}
 	}
 	//
+	// Both variables just to be sure IPP/IOP and IPV/IOV
+	// are not mixed (it is impossible).
+	bool ipv_iov_found = false;
+	bool ipp_iop_found = false;
+	//
 	for (unsigned int x = 0; x < tmp0.size(); ++x)
 	{
 #ifdef ENHANCED_PRINT_INFO
@@ -10137,7 +10136,7 @@ QString DicomUtils::read_enhanced_common(
 		std::vector<char*>   tmp3;
 		std::vector<double*> tmp4;
 		QStringList tmp5;
-		QList< QPair< double, double> > tmp6;
+		QList< QPair<double, double> > tmp6;
 		bool tmp4_ok = true;
 		QStringList window_centers_l;
 		QStringList window_widths_l;
@@ -10200,23 +10199,52 @@ QString DicomUtils::read_enhanced_common(
 				idx__ < values.size())
 			{
 				tmp3.push_back(data.at(idx__));
-				if (sop == QString("1.2.840.10008.5.1.4.1.1.6.2") || // Enhanced US
-					sop == QString("1.2.840.10008.5.1.2.3.45") // FIXME
-				)
+				if (values.at(idx__).vol_pos_ok &&
+					values.at(idx__).vol_orient_ok &&
+					!ipp_iop_found)
 				{
-					if (values.at(idx__).vol_pos_ok &&
-						values.at(idx__).vol_orient_ok)
+					// IPV/IOV
+					double * ss = new double[9];
+					ss[0] = values.at(idx__).vol_pos[0];
+					ss[1] = values.at(idx__).vol_pos[1];
+					ss[2] = values.at(idx__).vol_pos[2];
+					ss[3] = values.at(idx__).vol_orient[0];
+					ss[4] = values.at(idx__).vol_orient[1];
+					ss[5] = values.at(idx__).vol_orient[2];
+					ss[6] = values.at(idx__).vol_orient[3];
+					ss[7] = values.at(idx__).vol_orient[4];
+					ss[8] = values.at(idx__).vol_orient[5];
+					tmp4.push_back(ss);
+					if (!ipv_iov_found) ipv_iov_found = true;
+				}
+				else if (!values.at(idx__).pat_pos.isEmpty() &&
+					!values.at(idx__).pat_orient.isEmpty() &&
+					!ipv_iov_found)
+				{
+					// IPP/IOP
+					double pat_pos[3];
+					double pat_orient[6];
+					const bool ok_p =
+						get_patient_position(
+							values.at(idx__).pat_pos,
+							pat_pos);
+					const bool ok_o =
+						get_patient_orientation(
+							values.at(idx__).pat_orient,
+							pat_orient);
+					if (!ipp_iop_found) ipp_iop_found = true;
+					if (ok_o && ok_p)
 					{
 						double * ss = new double[9];
-						ss[0] = values.at(idx__).vol_pos[0];
-						ss[1] = values.at(idx__).vol_pos[1];
-						ss[2] = values.at(idx__).vol_pos[2];
-						ss[3] = values.at(idx__).vol_orient[0];
-						ss[4] = values.at(idx__).vol_orient[1];
-						ss[5] = values.at(idx__).vol_orient[2];
-						ss[6] = values.at(idx__).vol_orient[3];
-						ss[7] = values.at(idx__).vol_orient[4];
-						ss[8] = values.at(idx__).vol_orient[5];
+						ss[0] = pat_pos[0];
+						ss[1] = pat_pos[1];
+						ss[2] = pat_pos[2];
+						ss[3] = pat_orient[0];
+						ss[4] = pat_orient[1];
+						ss[5] = pat_orient[2];
+						ss[6] = pat_orient[3];
+						ss[7] = pat_orient[4];
+						ss[8] = pat_orient[5];
 						tmp4.push_back(ss);
 					}
 					else
@@ -10224,52 +10252,12 @@ QString DicomUtils::read_enhanced_common(
 						tmp4_ok = false;
 					}
 				}
-/*
-				else if (sop == QString("1.2.840.10008.5.1.4.1.1.77.1.6")) // VL Whole Slide Microscopy
-				{ // TODO
-				}
-*/
-				// with iop/ipp
+				// TODO other e.g. "1.2.840.10008.5.1.4.1.1.77.1.6" VL Whole Slide Microscopy
 				else
 				{
-					if (!values.at(idx__).pat_pos.isEmpty() &&
-						!values.at(idx__).pat_orient.isEmpty())
-					{
-						double pat_pos[3];
-						double pat_orient[6];
-						const bool ok_p =
-							get_patient_position(
-								values.at(idx__).pat_pos,
-								pat_pos);
-						const bool ok_o =
-							get_patient_orientation(
-								values.at(idx__).pat_orient,
-								pat_orient);
-						if (ok_o && ok_p)
-						{
-							double * ss = new double[9];
-							ss[0] = pat_pos[0];
-							ss[1] = pat_pos[1];
-							ss[2] = pat_pos[2];
-							ss[3] = pat_orient[0];
-							ss[4] = pat_orient[1];
-							ss[5] = pat_orient[2];
-							ss[6] = pat_orient[3];
-							ss[7] = pat_orient[4];
-							ss[8] = pat_orient[5];
-							tmp4.push_back(ss);
-						}
-						else
-						{
-							tmp4_ok = false;
-						}
-					}
-					else
-					{
-						tmp4_ok = false;
-					}
+					tmp4_ok = false;
 				}
-				QPair< double, double> rp;
+				QPair<double, double> rp;
 				rp.first  = values.at(idx__).rescale_intercept;
 				rp.second = values.at(idx__).rescale_slope;
 				tmp6.push_back(rp);
@@ -10686,38 +10674,6 @@ QString DicomUtils::read_enhanced_common(
 				(apply_rescale)
 				? wsettings->get_rescale()
 				: true;
-			if (sop == QString("1.2.840.10008.5.1.4.1.1.6.2") || // US
-				sop == QString("1.2.840.10008.5.1.2.3.45")) // FIXME
-			{
-				message_ = CommonUtils::gen_itk_image(ok,
-					tmp3,
-					false,
-					pixelformat,
-					pi,
-					ivariant,
-					direction,
-					columns_,
-					rows_,
-					tmp1.size(),
-					origin_x,
-					origin_y,
-					origin_z,
-					spacing_x,
-					spacing_y,
-					spacing_z,
-					!geom_ok,
-					false,
-					wsettings->get_resize(),
-					wsettings->get_size_x(),
-					wsettings->get_size_y(),
-					no_warn_rescale,
-					use_icc,
-					max_3d_tex_size,
-					gl,
-					pb,
-					false);
-			}
-			else
 			{
 				// MDCM can not read rescale from per frame groups
 				const bool rescale_tmp =
@@ -10912,6 +10868,12 @@ QString DicomUtils::read_enhanced_common(
 		if (!min_load) std::cout << "*********" << std::endl;
 #endif
 	}
+#ifdef ENHANCED_PRINT_INFO
+	if (ipp_iop_found && ipv_iov_found)
+	{
+		std::cout << "Error: found both, IPP/IOP and IPV/IOV" << std::endl;
+	}
+#endif
 	return message;
 }
 
@@ -13627,42 +13589,39 @@ QString DicomUtils::read_dicom(
 						}
 					}
 				}
-				if (sop == QString("1.2.840.10008.5.1.4.1.1.4.1")     || // Enhanced MR
-					sop == QString("1.2.840.10008.5.1.4.1.1.2.1")     || // Enhanced CT
-					sop == QString("1.2.840.10008.5.1.4.1.1.130")     || // Enhanced PET
-					sop == QString("1.2.840.10008.5.1.4.1.1.6.2")     || // Enhanced US Volume
-					//
-					sop == QString("1.2.840.10008.5.1.2.3.45")        || // PA Image Storage FIXME
-					//
-					sop == QString("1.2.840.10008.5.1.4.1.1.13.1.1")  || // Enhanced X Ray 3D Angiographic
-					sop == QString("1.2.840.10008.5.1.4.1.1.13.1.2")  || // Enhanced X-Ray 3D Craniofacial
-					sop == QString("1.2.840.10008.5.1.4.1.1.13.1.3")  || // Breast Tomosynthesis
-					sop == QString("1.2.840.10008.5.1.4.1.1.2.2")     || // Legacy Converted Enhanced CT
-					sop == QString("1.2.840.10008.5.1.4.1.1.4.4")     || // Legacy Converted Enhanced MR
-					sop == QString("1.2.840.10008.5.1.4.1.1.128.1")   || // Legacy Converted Enhanced PET
-					sop == QString("1.2.840.10008.5.1.4.1.1.30")      || // Parametric Map
-					sop == QString("1.2.840.10008.5.1.4.1.1.66.4")    || // Segmentation
-					sop == QString("1.2.840.10008.5.1.4.1.1.4.3")     || // Enhanced MR Color
-					sop == QString("1.2.840.10008.5.1.4.1.1.77.1.5.4")|| // Ophthalmic Tomography
-					sop == QString("1.2.840.10008.5.1.4.1.1.14.1")    || // Intravascular Optical Coherence Tomography Image Storage - For Presentation
-					sop == QString("1.2.840.10008.5.1.4.1.1.14.2")    || // Intravascular Optical Coherence Tomography Image Storage - For Processing
-					// ipp-iop ??
-					sop == QString("1.2.840.10008.5.1.4.1.1.13.1.4")  || // Breast Projection X-Ray Image Storage - For Presentation
-					sop == QString("1.2.840.10008.5.1.4.1.1.13.1.5")  || // Breast Projection X-Ray Image Storage - For Processing
-					sop == QString("1.2.840.10008.5.1.4.1.1.77.1.5.5")|| // Wide Field Ophthalmic Photography Stereographic Projection
-					sop == QString("1.2.840.10008.5.1.4.1.1.77.1.5.6")|| // Wide Field Ophthalmic Photography 3D Coordinates
-					sop == QString("1.2.840.10008.5.1.4.1.1.12.1.1")  || // Enhanced X-Ray Angiographic
-					sop == QString("1.2.840.10008.5.1.4.1.1.12.2.1")     // Enhanced X-Ray RF
-					)
+				if (has_functional_groups(ds))
 				{
+					// "1.2.840.10008.5.1.4.1.1.4.1"      Enhanced MR
+					// "1.2.840.10008.5.1.4.1.1.2.1"      Enhanced CT
+					// "1.2.840.10008.5.1.4.1.1.130"      Enhanced PET
+					// "1.2.840.10008.5.1.4.1.1.6.2"      Enhanced US Volume
+
+					// "1.2.840.10008.5.1.4.1.1.13.1.1"   Enhanced X Ray 3D Angiographic
+					// "1.2.840.10008.5.1.4.1.1.13.1.2"   Enhanced X-Ray 3D Craniofacial
+					// "1.2.840.10008.5.1.4.1.1.13.1.3"   Breast Tomosynthesis
+					// "1.2.840.10008.5.1.4.1.1.2.2"      Legacy Converted Enhanced CT
+					// "1.2.840.10008.5.1.4.1.1.4.4"      Legacy Converted Enhanced MR
+					// "1.2.840.10008.5.1.4.1.1.128.1"    Legacy Converted Enhanced PET
+					// "1.2.840.10008.5.1.4.1.1.30"       Parametric Map
+					// "1.2.840.10008.5.1.4.1.1.66.4"     Segmentation
+					// "1.2.840.10008.5.1.4.1.1.4.3"      Enhanced MR Color
+					// "1.2.840.10008.5.1.4.1.1.77.1.5.4" Ophthalmic Tomography
+					// "1.2.840.10008.5.1.4.1.1.14.1"     Intravascular Optical Coherence Tomography Image Storage - For Presentation
+					// "1.2.840.10008.5.1.4.1.1.14.2"     Intravascular Optical Coherence Tomography Image Storage - For Processing
+					// "1.2.840.10008.5.1.4.1.1.13.1.4"   Breast Projection X-Ray Image Storage - For Presentation
+					// "1.2.840.10008.5.1.4.1.1.13.1.5"   Breast Projection X-Ray Image Storage - For Processing
+					// "1.2.840.10008.5.1.4.1.1.77.1.5.5" Wide Field Ophthalmic Photography Stereographic Projection
+					// "1.2.840.10008.5.1.4.1.1.77.1.5.6" Wide Field Ophthalmic Photography 3D Coordinates
+					// "1.2.840.10008.5.1.4.1.1.12.1.1"   Enhanced X-Ray Angiographic
+					// "1.2.840.10008.5.1.4.1.1.12.2.1"   Enhanced X-Ray RF
+					//
+					// "1.2.840.10008.5.1.4.1.1.7.3" Multi-frame Grayscale Word SC
+					// "1.2.840.10008.5.1.4.1.1.7.2" Multi-frame Grayscale Byte SC
+					// "1.2.840.10008.5.1.4.1.1.7.4" Multi-frame True Color SC
+					//
+					// and unknown IODs
+					//
 					enhanced = true;
-				}
-				if (sop == QString("1.2.840.10008.5.1.4.1.1.7.3") || // Multi-frame Grayscale Word SC
-					sop == QString("1.2.840.10008.5.1.4.1.1.7.2") || // Multi-frame Grayscale Byte SC
-					sop == QString("1.2.840.10008.5.1.4.1.1.7.4")    // Multi-frame True Color SC
-					)
-				{
-					if (has_functional_groups(ds)) enhanced = true;
 				}
 				if (enhanced)
 				{
