@@ -307,22 +307,6 @@
                </widget>
               </item>
               <item>
-               <widget class="QRadioButton" name="enh_dim_strict_radioButton">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Dimension Organization&lt;/span&gt; will be stricly followed, if available. Output can be multiple images.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="text">
-                 <string>Strictly follow Dimension Organization, output can be multiple images</string>
-                </property>
-               </widget>
-              </item>
-              <item>
                <widget class="QRadioButton" name="enh_dim_strict_1_radioButton">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -335,6 +319,22 @@
                 </property>
                 <property name="text">
                  <string>Strictly follow Dimension Organization, output will be a single image</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="enh_dim_strict_radioButton">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Dimension Organization&lt;/span&gt; will be stricly followed, if available. Output can be multiple images.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>Strictly follow Dimension Organization, output can be multiple images</string>
                 </property>
                </widget>
               </item>
@@ -520,8 +520,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>989</width>
-            <height>587</height>
+            <width>295</width>
+            <height>99</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -748,8 +748,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>989</width>
-            <height>587</height>
+            <width>419</width>
+            <height>203</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1056,8 +1056,8 @@
   <tabstop>srwidth_spinBox</tabstop>
   <tabstop>srskipimage_checkBox</tabstop>
   <tabstop>enh_dim_uniform_radioButton</tabstop>
-  <tabstop>enh_dim_strict_radioButton</tabstop>
   <tabstop>enh_dim_strict_1_radioButton</tabstop>
+  <tabstop>enh_dim_strict_radioButton</tabstop>
   <tabstop>enh_dim_skip_radioButton</tabstop>
   <tabstop>pred6_checkBox</tabstop>
   <tabstop>cornell_checkBox</tabstop>
