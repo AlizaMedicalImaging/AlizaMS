@@ -1023,7 +1023,7 @@ template<typename T> void load_image2(
 #endif
 }
 
-static double get_distance4(
+double get_distance4(
 	const double x0,
 	const double y0,
 	const double x1,
@@ -1078,9 +1078,9 @@ template<typename T> double get_distance3(
 	return d;
 }
 
-static unsigned long long StudyGraphicsWidget_id = 0;
-
 }
+
+static unsigned long long StudyGraphicsWidget_id = 0;
 
 StudyGraphicsWidget::StudyGraphicsWidget()
 {

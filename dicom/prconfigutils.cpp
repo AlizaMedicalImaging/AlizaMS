@@ -423,7 +423,7 @@ template<typename T> void set_asp_ratio(
 	image->SetSpacing(s);
 }
 
-static void rotate_flip_points(
+void rotate_flip_points(
 	ImageVariant * ivariant,
 	const double rotation,
 	const bool flip)
@@ -1273,7 +1273,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 	return QString("");
 }
 
-static QString voi_lut_slice_by_slice(
+QString voi_lut_slice_by_slice(
 	const ImageVariant * ivariant,
 	ImageVariant * v,
 	const QMap<int, QStringList> & refs,
@@ -1487,7 +1487,7 @@ static QString voi_lut_slice_by_slice(
 	return QString("");
 }
 
-static void areas_slice_by_slice(
+void areas_slice_by_slice(
 	ImageVariant * v,
 	const QMap<int, int> & areasTLx,
 	const QMap<int, int> & areasTLy,
@@ -1587,7 +1587,7 @@ static void areas_slice_by_slice(
 	}
 }
 
-static void text_slice_by_slice(
+void text_slice_by_slice(
 	ImageVariant * v,
 	const QMap<int, int>     & has_bb,
 	const QMap<int, double>  & bb_top_left_x,
@@ -1735,7 +1735,7 @@ static void text_slice_by_slice(
 	}
 }
 
-static void graphic_slice_by_slice(
+void graphic_slice_by_slice(
 	ImageVariant * v,
 	const QMap<int, QString>  & GraphicType,
 	const QMap<int, QString>  & GraphicAnnotationUnits,
@@ -1839,7 +1839,7 @@ static void graphic_slice_by_slice(
 	}
 }
 
-static void get_overlays(
+void get_overlays(
 	const mdcm::DataSet & ds,
 	std::vector<uint16_t> & l)
 {
@@ -1871,7 +1871,7 @@ static void get_overlays(
 	}
 }
 
-static void read_overlays(
+void read_overlays(
 	const mdcm::DataSet & ds,
 	PrRefSeries & ref)
 {

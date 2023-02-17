@@ -48,7 +48,7 @@ void gImageCleanupHandler(void * info)
 	info = NULL;
 }
 
-static void draw_contours(
+void draw_contours(
 	const ImageVariant * ivariant,
 	GraphicsWidget * widget)
 {
@@ -352,7 +352,7 @@ template<typename T> QString contour_from_path(
 	return QString("");
 }
 
-static QString contour_from_path_nonuniform(
+QString contour_from_path_nonuniform(
 		ROI * roi,
 		const ImageVariant * ivariant,
 		const GraphicsPathItem * item)
@@ -1464,7 +1464,7 @@ template<typename T> void load_image(
 #endif
 }
 
-static double get_distance2(
+double get_distance2(
 	const double x0,
 	const double y0,
 	const double x1,

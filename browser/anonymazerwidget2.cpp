@@ -32,14 +32,13 @@
 #include <chrono>
 #include <random>
 
-namespace
-{
-
 static unsigned int count_files = 0;
 static unsigned int count_dirs = 0;
 
+namespace
+{
 
-static bool is_date_time(const mdcm::VR & vr, const mdcm::Tag & t)
+bool is_date_time(const mdcm::VR & vr, const mdcm::Tag & t)
 {
 	if (vr == mdcm::VR::DA ||
 		vr == mdcm::VR::DT ||
@@ -56,7 +55,7 @@ static bool is_date_time(const mdcm::VR & vr, const mdcm::Tag & t)
 	return false;
 }
 
-static void replace__(
+void replace__(
 	mdcm::DataSet & ds,
 	const mdcm::Tag & t,
 	const char * value,
@@ -125,7 +124,7 @@ static void replace__(
 	}
 }
 
-static void replace_uid_recurs__(
+void replace_uid_recurs__(
 	mdcm::DataSet & ds,
 	const std::set<mdcm::Tag> & ts,
 	const QMap<QString, QString> & m,
@@ -183,7 +182,7 @@ static void replace_uid_recurs__(
 	}
 }
 
-static void replace_pn_recurs__(
+void replace_pn_recurs__(
 	mdcm::DataSet & ds,
 	const std::set<mdcm::Tag> & ts,
 	const QMap<QString, QString> & m,
@@ -277,7 +276,7 @@ static void replace_pn_recurs__(
 	}
 }
 
-static void replace_id_recurs__(
+void replace_id_recurs__(
 	mdcm::DataSet & ds,
 	const std::set<mdcm::Tag> & ts,
 	const QMap<QString, QString> & m,
@@ -371,7 +370,7 @@ static void replace_id_recurs__(
 	}
 }
 
-static void remove_recurs__(
+void remove_recurs__(
 	mdcm::DataSet & ds,
 	const std::set<mdcm::Tag> & ts,
 	const bool implicit,
@@ -413,7 +412,7 @@ static void remove_recurs__(
 	}
 }
 
-static void zero_sq_recurs__(
+void zero_sq_recurs__(
 	mdcm::DataSet & ds,
 	const std::set<mdcm::Tag> & ts,
 	const bool implicit,
@@ -464,7 +463,7 @@ static void zero_sq_recurs__(
 }
 
 #if 0
-static void remove_date_time_recurs__(
+void remove_date_time_recurs__(
 	mdcm::DataSet & ds,
 	const std::set<mdcm::Tag> & ts,
 	const bool implicit,
@@ -524,7 +523,7 @@ static void remove_date_time_recurs__(
 }
 #endif
 
-static bool find_time_less_1h_recurs__(
+bool find_time_less_1h_recurs__(
 	const mdcm::DataSet & ds,
 	const bool implicit,
 	const mdcm::Dicts & dicts)
@@ -617,7 +616,7 @@ static bool find_time_less_1h_recurs__(
 	return false;
 }
 
-static void modify_date_time_recurs__(
+void modify_date_time_recurs__(
 	mdcm::DataSet & ds,
 	const bool less1h,
 	const bool implicit,
@@ -884,7 +883,7 @@ static void modify_date_time_recurs__(
 	}
 }
 
-static void empty_recurs__(
+void empty_recurs__(
 	mdcm::DataSet & ds,
 	const std::set<mdcm::Tag> & ts,
 	const bool implicit,
@@ -926,7 +925,7 @@ static void empty_recurs__(
 	}
 }
 
-static void remove_private__(
+void remove_private__(
 	mdcm::DataSet & ds,
 	const bool implicit,
 	const mdcm::Dicts & dicts)
@@ -967,7 +966,7 @@ static void remove_private__(
 	}
 }
 
-static bool check_overlay_in_pixeldata(const mdcm::DataSet & ds)
+bool check_overlay_in_pixeldata(const mdcm::DataSet & ds)
 {
 	mdcm::Tag t(0x6000,0x0000);
 	while (true)
@@ -1002,7 +1001,7 @@ static bool check_overlay_in_pixeldata(const mdcm::DataSet & ds)
 	return false;
 }
 
-static void remove_overlays__(mdcm::DataSet & ds)
+void remove_overlays__(mdcm::DataSet & ds)
 {
 	std::vector<mdcm::Tag> tmp0;
 	mdcm::DataSet::Iterator it = ds.Begin();
@@ -1019,7 +1018,7 @@ static void remove_overlays__(mdcm::DataSet & ds)
 	for (unsigned int x = 0; x < tmp0.size(); ++x) ds.Remove(tmp0.at(x));
 }
 
-static void remove_curves__(mdcm::DataSet & ds)
+void remove_curves__(mdcm::DataSet & ds)
 {
 	mdcm::DataSet::Iterator it = ds.Begin();
 	std::vector<mdcm::Tag> tmp0;
@@ -1036,7 +1035,7 @@ static void remove_curves__(mdcm::DataSet & ds)
 	for (unsigned int x = 0; x < tmp0.size(); ++x) ds.Remove(tmp0.at(x));
 }
 
-static void remove_group_length__(
+void remove_group_length__(
 	mdcm::DataSet & ds,
 	const bool implicit,
 	const mdcm::Dicts & dicts)
@@ -1077,7 +1076,7 @@ static void remove_group_length__(
 	}
 }
 
-static QString generate_random_name(const bool random_names)
+QString generate_random_name(const bool random_names)
 {
 	QStringList surnames;
 	if (random_names)
@@ -1173,7 +1172,7 @@ static QString generate_random_name(const bool random_names)
 	return r;
 }
 
-static void anonymize_file__(
+void anonymize_file__(
 	bool * ok,
 	bool * overlay_in_data,
 	const QString & filename,
@@ -1982,7 +1981,7 @@ static void anonymize_file__(
 	if (!writer.Write()) *ok = false;
 }
 
-static void find_pn_recurs__(
+void find_pn_recurs__(
 	const mdcm::DataSet & ds,
 	QStringList & l,
 	const bool implicit,
@@ -2020,7 +2019,7 @@ static void find_pn_recurs__(
 	}
 }
 
-static void find_uids_recurs__(
+void find_uids_recurs__(
 	const mdcm::DataSet & ds,
 	const std::set<mdcm::Tag> & ts,
 	QStringList & l,
@@ -2058,7 +2057,7 @@ static void find_uids_recurs__(
 	}
 }
 
-static void find_ids_recurs__(
+void find_ids_recurs__(
 	const mdcm::DataSet & ds,
 	const std::set<mdcm::Tag> & ts,
 	QStringList & l,
@@ -2098,7 +2097,7 @@ static void find_ids_recurs__(
 	}
 }
 
-static void build_maps(
+void build_maps(
 	const QStringList & l,
 	const std::set<mdcm::Tag> & uid_tags,
 	const std::set<mdcm::Tag> & id_tags,

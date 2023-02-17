@@ -10,10 +10,10 @@
 #include <unistd.h>
 #endif
 
+static std::vector<ProcessImageThread_*> icon_threads;
+
 namespace
 {
-
-static std::vector<ProcessImageThread_*> icon_threads;
 
 template<typename Tin, typename Tout> void extract_icon(
 	const typename Tin::Pointer & image, ImageVariant * ivariant,

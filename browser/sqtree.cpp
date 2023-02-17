@@ -49,10 +49,19 @@
 #include "commonutils.h"
 #include <exception>
 
+static int expanded_items = 0;
+
+const QString css1 =
+	QString(
+		"span.y4 { color:#050505; font-size: medium; font-weight: bold;}\n"
+		"span.y5 { color:#0d0d76; font-size: medium; font-weight: bold;}\n"
+		"span.y  { color:#0d0d76; font-size: large;  font-weight: bold; font-style: italic }");
+const QString head = QString(
+	"<html><head><link rel='stylesheet' type='text/css' href='format.css'></head><body>");
+const QString foot = QString("</body></html>");
+
 namespace
 {
-
-static int expanded_items = 0;
 
 template <typename T, long long TVR>
 void get_bin_values(
@@ -74,7 +83,7 @@ void get_bin_values(
 	}
 }
 
-static void get_series_files(
+void get_series_files(
 	const QString & f,
 	const QString & uid,
 	QStringList & result)
@@ -147,7 +156,7 @@ static void get_series_files(
 	}
 }
 
-static QString print_length(size_t l)
+QString print_length(size_t l)
 {
 	QString r;
 	if (l > 1024*1024)
@@ -175,15 +184,6 @@ static QString print_length(size_t l)
 	}
 	return r;
 }
-
-const QString css1 =
-	QString(
-		"span.y4 { color:#050505; font-size: medium; font-weight: bold;}\n"
-		"span.y5 { color:#0d0d76; font-size: medium; font-weight: bold;}\n"
-		"span.y  { color:#0d0d76; font-size: large;  font-weight: bold; font-style: italic }");
-const QString head = QString(
-	"<html><head><link rel='stylesheet' type='text/css' href='format.css'></head><body>");
-const QString foot = QString("</body></html>");
 
 }
 

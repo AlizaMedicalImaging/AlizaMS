@@ -27,11 +27,11 @@
 #include "itkExtractImageFilter.h"
 #include "itkMath.h"
 
-namespace
-{
-
 static bool SRUtils_asked_for_path_once = false;
 static QString SRUtils_selected_path("");
+
+namespace
+{
 
 template<typename Tin, typename Tout> QString gs3(
 	const typename Tin::Pointer & image,

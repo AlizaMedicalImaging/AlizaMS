@@ -107,10 +107,10 @@ typedef struct
 	QString sop;
 } MixedDicomSeriesInfo;
 
+static short force_suppllut = 0;
 namespace
 {
 
-static short force_suppllut = 0;
 
 struct IPPIOP
 {
@@ -157,7 +157,7 @@ struct less_than_ipp
 };
 
 // Also IPV/IOV (currently only Enhanced US Volume and PA)
-static bool sort_frames_ippiop(
+bool sort_frames_ippiop(
 	const std::map< unsigned int,unsigned int,std::less<unsigned int> > & in,
 	std::map< unsigned int,unsigned int,std::less<unsigned int> > & out,
 	const FrameGroupValues & values)
@@ -306,7 +306,7 @@ struct files_less_than_ipp
 	}
 };
 
-static void sort_dicom_files_ippiop(
+void sort_dicom_files_ippiop(
 	const std::vector<QString> & images,
 	std::vector<QString> & images_ipp)
 {
@@ -317,17 +317,17 @@ static void sort_dicom_files_ippiop(
 	std::stable_sort(images_ipp.begin(), images_ipp.end(), files_less_than_ipp());
 }
 
-static bool acqtime_less_than(const QString & s1, const QString & s2)
+bool acqtime_less_than(const QString & s1, const QString & s2)
 {
     return s1 < s2;
 }
 
-static bool acqtime_more_than(const QString & s1, const QString & s2)
+bool acqtime_more_than(const QString & s1, const QString & s2)
 {
     return s1 > s2;
 }
 
-static QString generate_string_0(
+QString generate_string_0(
 	const mdcm::DataSet & ds,
 	const mdcm::Tag t,
 	const QString & name,
@@ -355,7 +355,7 @@ static QString generate_string_0(
 	return s;
 }
 
-static QString read_MRImageModule(const mdcm::DataSet & ds)
+QString read_MRImageModule(const mdcm::DataSet & ds)
 {
 	QString s("");
 	const mdcm::Tag tSequenceName(0x0018,0x0024);
@@ -657,7 +657,7 @@ static QString read_MRImageModule(const mdcm::DataSet & ds)
 	return s;
 }
 
-static QString read_CTImageModule(const mdcm::DataSet & ds)
+QString read_CTImageModule(const mdcm::DataSet & ds)
 {
 	QString s("");
 
@@ -962,7 +962,7 @@ Value Representation	Long String (LO)
 	return s;
 }
 
-static QString read_CommonCTMRImageDescriptionMacro(const mdcm::DataSet & ds)
+QString read_CommonCTMRImageDescriptionMacro(const mdcm::DataSet & ds)
 {
 	QString s("");
 	s += generate_string_0(
@@ -987,7 +987,7 @@ static QString read_CommonCTMRImageDescriptionMacro(const mdcm::DataSet & ds)
 	return s;
 }
 
-static QString read_PhotoacousticImage(const mdcm::DataSet & ds) // FIXME
+QString read_PhotoacousticImage(const mdcm::DataSet & ds) // FIXME
 {
 	QString s;
 
@@ -1535,7 +1535,7 @@ bool get_priv_vm1_n_bin_values(
 }
 
 #if 1 // no example file
-static void delta_decode_rgb(
+void delta_decode_rgb(
 	const unsigned char * data_in,
 	size_t data_size,
 	std::vector<unsigned char> & new_stream,
@@ -1672,7 +1672,7 @@ static void delta_decode_rgb(
 }
 #endif
 
-static void delta_decode(
+void delta_decode(
 	const char * inbuffer,
 	size_t length,
 	std::vector<unsigned short> & output)
@@ -1902,7 +1902,7 @@ template <typename T> QString supp_palette_grey_to_rgbUC_(
 	return QString("");
 }
 
-static QString supp_palette_grey_to_rgbUS(
+QString supp_palette_grey_to_rgbUS(
 	RGBImageTypeUS::Pointer & out_image,
 	const RGBImageTypeUS::Pointer & color_image,
 	const int red_subscript,
@@ -1945,7 +1945,7 @@ static QString supp_palette_grey_to_rgbUS(
 	return result;
 }
 
-static QString supp_palette_grey_to_rgbUC(
+QString supp_palette_grey_to_rgbUC(
 	RGBImageTypeUC::Pointer & out_image,
 	const RGBImageTypeUC::Pointer & color_image,
 	const int red_subscript,
@@ -1988,7 +1988,7 @@ static QString supp_palette_grey_to_rgbUC(
 	return result;
 }
 
-static unsigned int process_gsps(
+unsigned int process_gsps(
 	const QStringList & grey_softcopy_pr_files,
 	const QString & p,
 	const QWidget * settings,

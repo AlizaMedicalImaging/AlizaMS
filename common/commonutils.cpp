@@ -61,15 +61,15 @@
 
 typedef Vectormath::Scalar::Vector3 sVector3;
 
-namespace
-{
-
 static QString screenshot_dir("");
 static QString save_dir("");
 static QString open_dir("");
 static double saved_total_memory = 0.0;
 
-static double abs_max(double x, double y, double z)
+namespace
+{
+
+double abs_max(double x, double y, double z)
 {
 	const double x_ = fabs(x);
 	const double y_ = fabs(y);
