@@ -51,7 +51,6 @@
 #include "float.h"
 #include "dicomutils.h"
 #include "colorspace/colorspace.h"
-
 #ifdef USE_GET_TOTAL_MEM
 #if (defined  __FreeBSD__ || defined __APPLE__)
 #include <sys/sysctl.h>
@@ -61,9 +60,14 @@
 #endif
 
 typedef Vectormath::Scalar::Vector3 sVector3;
+
+namespace
+{
+
 static QString screenshot_dir("");
 static QString save_dir("");
 static QString open_dir("");
+static double saved_total_memory = 0.0;
 
 static double abs_max(double x, double y, double z)
 {
@@ -1821,8 +1825,7 @@ template<typename T> QString process_dicom_rgba_image2(
 	return QString("");
 }
 
-template <typename Tin, typename Tout>
-QString apply_per_slice_rescale_(
+template <typename Tin, typename Tout> QString apply_per_slice_rescale_(
 	typename Tin::Pointer & image,
 	typename Tout::Pointer & out_image,
 	const QList< QPair<double, double> > rescale_values)
@@ -1895,6 +1898,31 @@ QString apply_per_slice_rescale_(
 	image->DisconnectPipeline();
 	image = NULL;
 	return QString("");
+}
+
+template<typename T> double get_value(
+	const typename T::Pointer & image,
+	const int x,
+	const int y,
+	const int z)
+{
+	if (image.IsNull()) return 0;
+	typename T::IndexType idx;
+	idx[0] = x;
+	idx[1] = y;
+	idx[2] = z;
+	double r = 0.0;
+	try
+	{
+		r = static_cast<double>(image->GetPixel(idx));
+	}
+	catch (const itk::ExceptionObject &)
+	{
+		;
+	}
+	return r;
+}
+
 }
 
 int CommonUtils::get_next_id()
@@ -4798,7 +4826,6 @@ void CommonUtils::read_geometry_from_image_(ImageVariant * v)
 	}
 }
 
-static double saved_total_memory = 0.0;
 void CommonUtils::save_total_memory()
 {
 	saved_total_memory = get_total_memory();
@@ -5044,29 +5071,6 @@ QString CommonUtils::apply_per_slice_rescale(
 		ivariant->di->high_bit = 31;
 	}
 	return s;
-}
-
-template<typename T> double get_value(
-	const typename T::Pointer & image,
-	const int x,
-	const int y,
-	const int z)
-{
-	if (image.IsNull()) return 0;
-	typename T::IndexType idx;
-	idx[0] = x;
-	idx[1] = y;
-	idx[2] = z;
-	double r = 0.0;
-	try
-	{
-		r = static_cast<double>(image->GetPixel(idx));
-	}
-	catch (const itk::ExceptionObject &)
-	{
-		;
-	}
-	return r;
 }
 
 void CommonUtils::get_pixel_values(

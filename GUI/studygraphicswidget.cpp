@@ -17,6 +17,9 @@
 #include <unistd.h>
 #endif
 
+namespace
+{
+
 void gImageCleanupHandler2(void * info)
 {
 	if (!info) return;
@@ -1076,6 +1079,8 @@ template<typename T> double get_distance3(
 }
 
 static unsigned long long StudyGraphicsWidget_id = 0;
+
+}
 
 StudyGraphicsWidget::StudyGraphicsWidget()
 {
@@ -2519,4 +2524,3 @@ void StudyGraphicsWidget::update_measurement(
 		set_measure_text(tmp0);
 	}
 }
-

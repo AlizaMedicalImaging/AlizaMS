@@ -95,6 +95,22 @@
 typedef Vectormath::Scalar::Vector3 sVector3;
 typedef Vectormath::Scalar::Vector4 sVector4;
 typedef Vectormath::Scalar::Matrix4 sMatrix4;
+typedef struct
+{
+	int rows;
+	int columns;
+	short allocated;
+	bool localizer;
+	bool icc;
+	QString file;
+	QString photometric;
+	QString sop;
+} MixedDicomSeriesInfo;
+
+namespace
+{
+
+static short force_suppllut = 0;
 
 struct IPPIOP
 {
@@ -1516,6 +1532,629 @@ bool get_priv_vm1_n_bin_values(
 		result.push_back(static_cast<T>(e.GetValue(x)));
 	}
 	return true;
+}
+
+#if 1 // no example file
+static void delta_decode_rgb(
+	const unsigned char * data_in,
+	size_t data_size,
+	std::vector<unsigned char> & new_stream,
+	unsigned short pc,
+	size_t w,
+	size_t h)
+{
+	enum
+	{
+		COLORMODE = 0x81,
+		ESCMODE = 0x82,
+		REPEATMODE = 0x83
+	};
+	const size_t plane_size = h * w;
+	const size_t outputlen = 3 * plane_size;
+	new_stream.resize(outputlen);
+	if(data_size == outputlen) return;
+	const unsigned char * src  = data_in;
+	unsigned char * dest = &new_stream[0];
+	union
+	{
+		unsigned char gray;
+		unsigned char rgb[3];
+	} pixel;
+	pixel.rgb[0] = pixel.rgb[1] = pixel.rgb[2] = 0;
+	// Start in grayscale mode
+	bool graymode = true;
+	size_t dx = 1;
+	size_t dy = 3;
+	// Algorithm works with both planar configurations.
+	// It does produce surprising greenish background color for
+	// planar configuration is 0, while the nested Icon SQ display
+	// a nice black background.
+	if (pc)
+	{
+		dx = plane_size;
+		dy = 1;
+	}
+	size_t ps = plane_size;
+	// Need to switch from one algorithm to other (RGB <-> GRAY).
+	while (ps)
+	{
+		// Next byte
+		unsigned char b = *src++;
+		assert(src < data_in + data_size);
+		// Mode selection
+		switch (b)
+		{
+		case ESCMODE:
+			// Used to treat a byte 81/82/83 as a normal byte
+			if (graymode)
+			{
+				pixel.gray += *src++;
+				dest[0*dx] = pixel.gray;
+				dest[1*dx] = pixel.gray;
+				dest[2*dx] = pixel.gray;
+			}
+			else
+			{
+				pixel.rgb[0] += *src++;
+				pixel.rgb[1] += *src++;
+				pixel.rgb[2] += *src++;
+				dest[0*dx] = pixel.rgb[0];
+				dest[1*dx] = pixel.rgb[1];
+				dest[2*dx] = pixel.rgb[2];
+			}
+			dest += dy;
+			--ps;
+			break;
+		case REPEATMODE:
+			// Repeat mode (RLE)
+			b = *src++;
+			ps -= b;
+			if (graymode)
+			{
+				while (b-- > 0)
+				{
+					dest[0*dx] = pixel.gray;
+					dest[1*dx] = pixel.gray;
+					dest[2*dx] = pixel.gray;
+					dest += dy;
+				}
+			}
+			else
+			{
+				while (b-- > 0)
+				{
+					dest[0*dx] = pixel.rgb[0];
+					dest[1*dx] = pixel.rgb[1];
+					dest[2*dx] = pixel.rgb[2];
+					dest += dy;
+				}
+			}
+			break;
+		case COLORMODE:
+			// We are swithing from one mode to the other. The stream
+			// contains an intermixed compression of RGB codec and GRAY
+			// codec. Each one not knowing of the other reset old value to 0.
+			if (graymode)
+			{
+				graymode = false;
+				pixel.rgb[0] = pixel.rgb[1] = pixel.rgb[2] = 0;
+			}
+			else
+			{
+				graymode = true;
+				pixel.gray = 0;
+			}
+			break;
+		default:
+			// This is identical to ESCMODE,
+			// it would be nicer to use fall-through
+			if (graymode)
+			{
+				pixel.gray += b;
+				dest[0*dx] = pixel.gray;
+				dest[1*dx] = pixel.gray;
+				dest[2*dx] = pixel.gray;
+			}
+			else
+			{
+				pixel.rgb[0] += b;
+				pixel.rgb[1] += *src++;
+				pixel.rgb[2] += *src++;
+				dest[0*dx] = pixel.rgb[0];
+				dest[1*dx] = pixel.rgb[1];
+				dest[2*dx] = pixel.rgb[2];
+			}
+			dest += dy;
+			--ps;
+			break;
+		}
+	}
+}
+#endif
+
+static void delta_decode(
+	const char * inbuffer,
+	size_t length,
+	std::vector<unsigned short> & output)
+{
+	// RLE pass
+	std::vector<char> temp;
+	for (size_t i = 0; i < length; ++i)
+	{
+		if (static_cast<unsigned char>(inbuffer[i]) == 0xa5)
+		{
+			int repeat = static_cast<unsigned char>(inbuffer[i + 1]) + 1;
+			const char value = inbuffer[i + 2];
+			while(repeat > 0)
+			{
+				temp.push_back(value);
+				--repeat;
+			}
+			i += 2;
+		}
+		else
+		{
+			temp.push_back(inbuffer[i]);
+		}
+	}
+	// Delta encoding pass
+	unsigned short delta = 0;
+	for (size_t i = 0; i < temp.size(); ++i)
+	{
+		if (temp[i] == 0x5a)
+		{
+			const unsigned char v1 = static_cast<unsigned char>(temp[i + 1]);
+			const unsigned char v2 = static_cast<unsigned char>(temp[i + 2]);
+			const unsigned short value = static_cast<unsigned short>(v2 * 256 + v1);
+			output.push_back(value);
+			delta = value;
+			i += 2;
+		}
+		else
+		{
+			const unsigned short value = static_cast<unsigned short>(temp[i] + delta);
+			output.push_back(value);
+			delta = value;
+		}
+	}
+	if (output.size() % 2)
+	{
+		output.resize(output.size() - 1);
+	}
+}
+
+template <typename T> QString supp_palette_grey_to_rgbUS_(
+	RGBImageTypeUS::Pointer & out_image,
+	const typename T::Pointer & image,
+	const RGBImageTypeUS::Pointer & color_image,
+	const int red_subscript,
+	const ImageVariant * v)
+{
+	if (!v) return QString("Image is NULL");
+	if (image.IsNull()) return QString("Image is NULL");
+	if (out_image.IsNull()) return QString("Out image is NULL");
+	if (!(red_subscript > INT_MIN))
+		return QString("Internal error,\nSubscript <= INT_MIN");
+	try
+	{
+		out_image->SetRegions(
+			static_cast<RGBImageTypeUS::RegionType>(
+				image->GetLargestPossibleRegion()));
+		out_image->SetOrigin(
+			static_cast<RGBImageTypeUS::PointType>(
+				image->GetOrigin()));
+		out_image->SetSpacing(
+			static_cast<RGBImageTypeUS::SpacingType>(
+				image->GetSpacing()));
+		out_image->SetDirection(
+			static_cast<RGBImageTypeUS::DirectionType>(
+				image->GetDirection()));
+		out_image->Allocate();
+	}
+	catch (const itk::ExceptionObject & ex)
+	{
+		return QString(ex.GetDescription());
+	}
+	//
+	//
+	const double wmin  = v->di->us_window_center - v->di->us_window_width * 0.5;
+	const double wmax  = v->di->us_window_center + v->di->us_window_width * 0.5;
+	const double diff_ = (wmax - wmin);
+	const double div_  = (diff_ != 0.0) ? diff_ : 1.0;
+	try
+	{
+		itk::ImageRegionConstIterator<T> it1(image, image->GetLargestPossibleRegion());
+		it1.GoToBegin();
+		itk::ImageRegionIterator<RGBImageTypeUS> it0(out_image, out_image->GetLargestPossibleRegion());
+		it0.GoToBegin();
+		itk::ImageRegionConstIterator<RGBImageTypeUS> it2(color_image, color_image->GetLargestPossibleRegion());
+		it2.GoToBegin();
+		while (!(it1.IsAtEnd()||it0.IsAtEnd()||it2.IsAtEnd()))
+		{
+			const RGBPixelUS & pixel = it2.Get();
+			if (pixel.GetRed() > 0 || pixel.GetGreen() > 0 || pixel.GetBlue() > 0)
+			{
+				it0.Set(pixel);
+			}
+			else
+			{
+				const double k = static_cast<double>(it1.Get());
+				unsigned short c = 0;
+				if (k < static_cast<double>(red_subscript))
+				{
+					const double r = (k + (-wmin)) / div_;
+					if ((k >= wmin) && (k <= wmax))
+					{
+						c = static_cast<unsigned short>(USHRT_MAX * r);
+					}
+					else if (k>wmax)
+					{
+						c = static_cast<unsigned short>(USHRT_MAX);
+					}
+				}
+				RGBPixelUS pixel0;
+				pixel0.SetRed  (c);
+				pixel0.SetGreen(c);
+				pixel0.SetBlue (c);
+				it0.Set(pixel0);
+			}
+			++it1;
+			++it0;
+			++it2;
+		}
+	}
+	catch(const itk::ExceptionObject & ex)
+	{
+		return QString(ex.GetDescription());
+	}
+	return QString("");
+}
+
+template <typename T> QString supp_palette_grey_to_rgbUC_(
+	RGBImageTypeUC::Pointer & out_image,
+	const typename T::Pointer & image,
+	const RGBImageTypeUC::Pointer & color_image,
+	const int red_subscript,
+	const ImageVariant * v)
+{
+	if (!v) return QString("Image is NULL");
+	if (image.IsNull()) return QString("Image is NULL");
+	if (out_image.IsNull()) return QString("Out image is NULL");
+	if (!(red_subscript > INT_MIN))
+		return QString("Internal error,\nSubscript <= INT_MIN");
+	try
+	{
+		out_image->SetRegions(
+			static_cast<RGBImageTypeUC::RegionType>(
+				image->GetLargestPossibleRegion()));
+		out_image->SetOrigin(
+			static_cast<RGBImageTypeUC::PointType>(
+				image->GetOrigin()));
+		out_image->SetSpacing(
+			static_cast<RGBImageTypeUC::SpacingType>(
+				image->GetSpacing()));
+		out_image->SetDirection(
+			static_cast<RGBImageTypeUC::DirectionType>(
+				image->GetDirection()));
+		out_image->Allocate();
+	}
+	catch (const itk::ExceptionObject & ex)
+	{
+		return QString(ex.GetDescription());
+	}
+	//
+	QApplication::processEvents();
+	//
+	unsigned long long tmp37 = 0;
+	const double wmin  = v->di->us_window_center - v->di->us_window_width * 0.5;
+	const double wmax  = v->di->us_window_center + v->di->us_window_width * 0.5;
+	const double diff_ = (wmax - wmin);
+	const double div_  = (diff_ != 0.0) ? diff_ : 1.0;
+	try
+	{
+		itk::ImageRegionConstIterator<T> it1(image, image->GetLargestPossibleRegion());
+		it1.GoToBegin();
+		itk::ImageRegionIterator<RGBImageTypeUC> it0(out_image, out_image->GetLargestPossibleRegion());
+		it0.GoToBegin();
+		itk::ImageRegionConstIterator<RGBImageTypeUC> it2(color_image, color_image->GetLargestPossibleRegion());
+		it2.GoToBegin();
+		while (!(it1.IsAtEnd()||it0.IsAtEnd()||it2.IsAtEnd()))
+		{
+			//
+			if (tmp37%9999 == 0) QApplication::processEvents();
+			//
+			const RGBPixelUC & pixel = it2.Get();
+			if (pixel.GetRed() > 0 || pixel.GetGreen() > 0 || pixel.GetBlue() > 0)
+			{
+				it0.Set(pixel);
+			}
+			else
+			{
+				const double k = static_cast<double>(it1.Get());
+				unsigned char c = 0;
+				if (k < static_cast<double>(red_subscript))
+				{
+					const double r = (k + (-wmin)) / div_;
+					if ((k >= wmin) && (k <= wmax))
+					{
+						c = static_cast<unsigned char>(UCHAR_MAX * r);
+					}
+					else if (k>wmax)
+					{
+						c = static_cast<unsigned char>(UCHAR_MAX);
+					}
+				}
+				RGBPixelUC pixel0;
+				pixel0.SetRed  (c);
+				pixel0.SetGreen(c);
+				pixel0.SetBlue (c);
+				it0.Set(pixel0);
+			}
+			++it1;
+			++it0;
+			++it2;
+		}
+	}
+	catch(const itk::ExceptionObject & ex)
+	{
+		return QString(ex.GetDescription());
+	}
+	return QString("");
+}
+
+static QString supp_palette_grey_to_rgbUS(
+	RGBImageTypeUS::Pointer & out_image,
+	const RGBImageTypeUS::Pointer & color_image,
+	const int red_subscript,
+	const ImageVariant * v)
+{
+	QString result("");
+	switch(v->image_type)
+	{
+	case 0:
+		result = supp_palette_grey_to_rgbUS_<ImageTypeSS>(out_image, v->pSS, color_image, red_subscript, v);
+		break;
+	case 1:
+		result = supp_palette_grey_to_rgbUS_<ImageTypeUS>(out_image, v->pUS, color_image, red_subscript, v);
+		break;
+	case 2:
+		result = supp_palette_grey_to_rgbUS_<ImageTypeSI>(out_image, v->pSI, color_image, red_subscript, v);
+		break;
+	case 3:
+		result = supp_palette_grey_to_rgbUS_<ImageTypeUI>(out_image, v->pUI, color_image, red_subscript, v);
+		break;
+	case 4:
+		result = supp_palette_grey_to_rgbUS_<ImageTypeUC>(out_image, v->pUC, color_image, red_subscript, v);
+		break;
+	case 5:
+		result = supp_palette_grey_to_rgbUS_<ImageTypeF>(out_image, v->pF, color_image, red_subscript, v);
+		break;
+	case 6:
+		result = supp_palette_grey_to_rgbUS_<ImageTypeD>(out_image, v->pD, color_image, red_subscript, v);
+		break;
+	case 7:
+		result = supp_palette_grey_to_rgbUS_<ImageTypeSLL>(out_image, v->pSLL, color_image, red_subscript, v);
+		break;
+	case 8:
+		result = supp_palette_grey_to_rgbUS_<ImageTypeULL>(out_image, v->pULL, color_image, red_subscript, v);
+		break;
+	default:
+		result = QString("Wrong image type");
+		break;
+	}
+	return result;
+}
+
+static QString supp_palette_grey_to_rgbUC(
+	RGBImageTypeUC::Pointer & out_image,
+	const RGBImageTypeUC::Pointer & color_image,
+	const int red_subscript,
+	const ImageVariant * v)
+{
+	QString result("");
+	switch(v->image_type)
+	{
+	case 0:
+		result = supp_palette_grey_to_rgbUC_<ImageTypeSS>(out_image, v->pSS, color_image, red_subscript, v);
+		break;
+	case 1:
+		result = supp_palette_grey_to_rgbUC_<ImageTypeUS>(out_image, v->pUS, color_image, red_subscript, v);
+		break;
+	case 2:
+		result = supp_palette_grey_to_rgbUC_<ImageTypeSI>(out_image, v->pSI, color_image, red_subscript, v);
+		break;
+	case 3:
+		result = supp_palette_grey_to_rgbUC_<ImageTypeUI>(out_image, v->pUI, color_image, red_subscript, v);
+		break;
+	case 4:
+		result = supp_palette_grey_to_rgbUC_<ImageTypeUC>(out_image, v->pUC, color_image, red_subscript, v);
+		break;
+	case 5:
+		result = supp_palette_grey_to_rgbUC_<ImageTypeF>(out_image, v->pF, color_image, red_subscript, v);
+		break;
+	case 6:
+		result = supp_palette_grey_to_rgbUC_<ImageTypeD>(out_image, v->pD, color_image, red_subscript, v);
+		break;
+	case 7:
+		result = supp_palette_grey_to_rgbUC_<ImageTypeSLL>(out_image, v->pSLL, color_image, red_subscript, v);
+		break;
+	case 8:
+		result = supp_palette_grey_to_rgbUC_<ImageTypeULL>(out_image, v->pULL, color_image, red_subscript, v);
+		break;
+	default:
+		result = QString("Wrong image type");
+		break;
+	}
+	return result;
+}
+
+static unsigned int process_gsps(
+	const QStringList & grey_softcopy_pr_files,
+	const QString & p,
+	const QWidget * settings,
+	const bool ok3d,  const int max_3d_tex_size, GLWidget * gl, ShaderObj * mesh_shader,
+	std::vector<ImageVariant*> & ivariants,
+	QString & message_,
+	QProgressDialog * pb)
+{
+	unsigned int count = 0;
+	const SettingsWidget * wsettings = static_cast<const SettingsWidget *>(settings);
+	for (int x = 0; x < grey_softcopy_pr_files.size(); ++x)
+	{
+		if (pb)
+		{
+			pb->setLabelText(QString("Searching referenced files"));
+			pb->setValue(-1);
+		}
+		QApplication::processEvents();
+		QList<PrRefSeries> refs;
+		DicomUtils::read_pr_ref(p, grey_softcopy_pr_files.at(x), refs, pb);
+		QApplication::processEvents();
+		for (int y = 0; y < refs.size(); ++y)
+		{
+			if (pb)
+			{
+				pb->setLabelText(QString("Loading ... "));
+				pb->setValue(-1);
+			}
+			QApplication::processEvents();
+			QStringList ref_files;
+			for (int z = 0; z < refs.at(y).images.size(); ++z)
+			{
+				ref_files.push_back(refs.at(y).images.at(z).file);
+			}
+			if (ref_files.size() < 1) continue;
+			ref_files.sort();
+			std::vector<ImageVariant*> ref_ivariants;
+			const QString message_pr_ref =
+				DicomUtils::read_dicom(
+					ref_ivariants,
+					ref_files,
+					0,
+					NULL,
+					NULL,
+					false,
+					settings,
+					pb,
+					1,
+					true);
+			for (unsigned int z = 0; z < ref_ivariants.size(); ++z)
+			{
+				const int ref_ivariant_type = ref_ivariants.at(z)->image_type;
+				if (!(ref_ivariant_type >= 0 && ref_ivariant_type < 10))
+				{
+					std::cout << "Not a scalar image for GSPS, skipped" << std::endl;
+					continue;
+				}
+				if (pb) pb->setValue(-1);
+				QApplication::processEvents();
+				++count;
+				bool spatial_transform = false;
+				ImageVariant * pr_image =
+					PrConfigUtils::make_pr_monochrome(
+						ref_ivariants.at(z),
+						refs.at(y),
+						wsettings,
+						gl,
+						ok3d,
+						&spatial_transform);
+				if (pr_image)
+				{
+					const bool pr_skip_texture = pr_image->di->skip_texture;
+					//
+					if (ref_ivariants.at(z)->di->slices_generated)
+					{
+						CommonUtils::copy_slices(
+							pr_image,
+							ref_ivariants.at(z));
+					}
+					else
+					{
+						CommonUtils::copy_essential(
+							pr_image,
+							ref_ivariants.at(z));
+					}
+					CommonUtils::copy_imagevariant_overlays(
+						pr_image,
+						ref_ivariants.at(z));
+					//
+					//
+					//
+					pr_image->di->skip_texture = pr_skip_texture;
+					pr_image->iod = QString("Grayscale Softcopy Presentation State");
+					pr_image->sop = QString("");
+					pr_image->rescale_disabled = false;
+					pr_image->filenames = QStringList(grey_softcopy_pr_files.at(x));
+					//
+					//
+					//
+					if (spatial_transform)
+					{
+						pr_image->equi = false;
+						pr_image->di->hide_orientation = true;
+						pr_image->di->filtering = 0;
+					}
+					bool pr_load_ok = false;
+					if (pb)
+					{
+						pb->setValue(-1);
+						QApplication::processEvents();
+					}
+					pr_load_ok = CommonUtils::reload_monochrome(
+						pr_image,
+						ok3d,
+						gl,
+						max_3d_tex_size,
+						wsettings->get_resize(),
+						wsettings->get_size_x(),
+						wsettings->get_size_y());
+					if (pr_load_ok)
+					{
+						if (pr_image->equi)
+						{
+							if (pr_image->di->idimz < 7)
+								pr_image->di->transparency = false;
+						}
+						else
+						{
+							if (!pr_image->one_direction)
+								pr_image->di->transparency = false;
+							pr_image->di->filtering = 0;
+						}
+						CommonUtils::reset_bb(pr_image);
+						IconUtils::icon(pr_image);
+						ivariants.push_back(pr_image);
+					}
+					else
+					{
+						delete pr_image;
+						pr_image = NULL;
+					}
+				}
+				if (ref_ivariants.at(z))
+				{
+					delete ref_ivariants[z];
+					ref_ivariants[z] = NULL;
+				}
+			}
+			if (!message_pr_ref.isEmpty())
+				message_.append(QString("\n") + message_pr_ref);
+		}
+	}
+	return count;
+}
+
+}
+
+static cmsUInt32Number cms_error = 0;
+extern "C"
+{
+	static void AlizaLCMS2LogErrorHandler(cmsContext id, cmsUInt32Number e, const char * t)
+	{
+		cms_error = e;
+		printf("lcms2 error: %s\n", t);
+		(void)id;
+	}
 }
 
 QString DicomUtils::convert_pn_value(const QString & n)
@@ -3340,7 +3979,6 @@ quit_:
 	return ok;
 }
 
-static short force_suppllut = 0;
 void DicomUtils::global_force_suppllut(short x)
 {
 	// 1 force apply
@@ -8429,195 +9067,6 @@ QString DicomUtils::read_series(
 	return QString("");
 }
 
-#if 1 // no example file
-static void delta_decode_rgb(
-	const unsigned char * data_in,
-	size_t data_size,
-	std::vector<unsigned char> & new_stream,
-	unsigned short pc,
-	size_t w,
-	size_t h)
-{
-	enum
-	{
-		COLORMODE = 0x81,
-		ESCMODE = 0x82,
-		REPEATMODE = 0x83
-	};
-	const size_t plane_size = h * w;
-	const size_t outputlen = 3 * plane_size;
-	new_stream.resize(outputlen);
-	if(data_size == outputlen) return;
-	const unsigned char * src  = data_in;
-	unsigned char * dest = &new_stream[0];
-	union
-	{
-		unsigned char gray;
-		unsigned char rgb[3];
-	} pixel;
-	pixel.rgb[0] = pixel.rgb[1] = pixel.rgb[2] = 0;
-	// Start in grayscale mode
-	bool graymode = true;
-	size_t dx = 1;
-	size_t dy = 3;
-	// Algorithm works with both planar configurations.
-	// It does produce surprising greenish background color for
-	// planar configuration is 0, while the nested Icon SQ display
-	// a nice black background.
-	if (pc)
-	{
-		dx = plane_size;
-		dy = 1;
-	}
-	size_t ps = plane_size;
-	// Need to switch from one algorithm to other (RGB <-> GRAY).
-	while (ps)
-	{
-		// Next byte
-		unsigned char b = *src++;
-		assert(src < data_in + data_size);
-		// Mode selection
-		switch (b)
-		{
-		case ESCMODE:
-			// Used to treat a byte 81/82/83 as a normal byte
-			if (graymode)
-			{
-				pixel.gray += *src++;
-				dest[0*dx] = pixel.gray;
-				dest[1*dx] = pixel.gray;
-				dest[2*dx] = pixel.gray;
-			}
-			else
-			{
-				pixel.rgb[0] += *src++;
-				pixel.rgb[1] += *src++;
-				pixel.rgb[2] += *src++;
-				dest[0*dx] = pixel.rgb[0];
-				dest[1*dx] = pixel.rgb[1];
-				dest[2*dx] = pixel.rgb[2];
-			}
-			dest += dy;
-			--ps;
-			break;
-		case REPEATMODE:
-			// Repeat mode (RLE)
-			b = *src++;
-			ps -= b;
-			if (graymode)
-			{
-				while (b-- > 0)
-				{
-					dest[0*dx] = pixel.gray;
-					dest[1*dx] = pixel.gray;
-					dest[2*dx] = pixel.gray;
-					dest += dy;
-				}
-			}
-			else
-			{
-				while (b-- > 0)
-				{
-					dest[0*dx] = pixel.rgb[0];
-					dest[1*dx] = pixel.rgb[1];
-					dest[2*dx] = pixel.rgb[2];
-					dest += dy;
-				}
-			}
-			break;
-		case COLORMODE:
-			// We are swithing from one mode to the other. The stream
-			// contains an intermixed compression of RGB codec and GRAY
-			// codec. Each one not knowing of the other reset old value to 0.
-			if (graymode)
-			{
-				graymode = false;
-				pixel.rgb[0] = pixel.rgb[1] = pixel.rgb[2] = 0;
-			}
-			else
-			{
-				graymode = true;
-				pixel.gray = 0;
-			}
-			break;
-		default:
-			// This is identical to ESCMODE,
-			// it would be nicer to use fall-through
-			if (graymode)
-			{
-				pixel.gray += b;
-				dest[0*dx] = pixel.gray;
-				dest[1*dx] = pixel.gray;
-				dest[2*dx] = pixel.gray;
-			}
-			else
-			{
-				pixel.rgb[0] += b;
-				pixel.rgb[1] += *src++;
-				pixel.rgb[2] += *src++;
-				dest[0*dx] = pixel.rgb[0];
-				dest[1*dx] = pixel.rgb[1];
-				dest[2*dx] = pixel.rgb[2];
-			}
-			dest += dy;
-			--ps;
-			break;
-		}
-	}
-}
-#endif
-
-static void delta_decode(
-	const char * inbuffer,
-	size_t length,
-	std::vector<unsigned short> & output)
-{
-	// RLE pass
-	std::vector<char> temp;
-	for (size_t i = 0; i < length; ++i)
-	{
-		if (static_cast<unsigned char>(inbuffer[i]) == 0xa5)
-		{
-			int repeat = static_cast<unsigned char>(inbuffer[i + 1]) + 1;
-			const char value = inbuffer[i + 2];
-			while(repeat > 0)
-			{
-				temp.push_back(value);
-				--repeat;
-			}
-			i += 2;
-		}
-		else
-		{
-			temp.push_back(inbuffer[i]);
-		}
-	}
-	// Delta encoding pass
-	unsigned short delta = 0;
-	for (size_t i = 0; i < temp.size(); ++i)
-	{
-		if (temp[i] == 0x5a)
-		{
-			const unsigned char v1 = static_cast<unsigned char>(temp[i + 1]);
-			const unsigned char v2 = static_cast<unsigned char>(temp[i + 2]);
-			const unsigned short value = static_cast<unsigned short>(v2 * 256 + v1);
-			output.push_back(value);
-			delta = value;
-			i += 2;
-		}
-		else
-		{
-			const unsigned short value = static_cast<unsigned short>(temp[i] + delta);
-			output.push_back(value);
-			delta = value;
-		}
-	}
-	if (output.size() % 2)
-	{
-		output.resize(output.size() - 1);
-	}
-}
-
 bool DicomUtils::convert_elscint(const QString f, const QString outf)
 {
 	mdcm::Reader reader;
@@ -8904,17 +9353,6 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 		return false;
 	}
 	return true;
-}
-
-static cmsUInt32Number cms_error = 0;
-extern "C"
-{
-	static void AlizaLCMS2LogErrorHandler(cmsContext id, cmsUInt32Number e, const char * t)
-	{
-		cms_error = e;
-		printf("lcms2 error: %s\n", t);
-		(void)id;
-	}
 }
 
 QString DicomUtils::read_buffer(
@@ -12014,271 +12452,6 @@ void DicomUtils::read_pr_ref(
 	}
 }
 
-template <typename T> QString supp_palette_grey_to_rgbUS_(
-	RGBImageTypeUS::Pointer & out_image,
-	const typename T::Pointer & image,
-	const RGBImageTypeUS::Pointer & color_image,
-	const int red_subscript,
-	const ImageVariant * v)
-{
-	if (!v) return QString("Image is NULL");
-	if (image.IsNull()) return QString("Image is NULL");
-	if (out_image.IsNull()) return QString("Out image is NULL");
-	if (!(red_subscript > INT_MIN))
-		return QString("Internal error,\nSubscript <= INT_MIN");
-	try
-	{
-		out_image->SetRegions(
-			static_cast<RGBImageTypeUS::RegionType>(
-				image->GetLargestPossibleRegion()));
-		out_image->SetOrigin(
-			static_cast<RGBImageTypeUS::PointType>(
-				image->GetOrigin()));
-		out_image->SetSpacing(
-			static_cast<RGBImageTypeUS::SpacingType>(
-				image->GetSpacing()));
-		out_image->SetDirection(
-			static_cast<RGBImageTypeUS::DirectionType>(
-				image->GetDirection()));
-		out_image->Allocate();
-	}
-	catch (const itk::ExceptionObject & ex)
-	{
-		return QString(ex.GetDescription());
-	}
-	//
-	//
-	const double wmin  = v->di->us_window_center - v->di->us_window_width * 0.5;
-	const double wmax  = v->di->us_window_center + v->di->us_window_width * 0.5;
-	const double diff_ = (wmax - wmin);
-	const double div_  = (diff_ != 0.0) ? diff_ : 1.0;
-	try
-	{
-		itk::ImageRegionConstIterator<T> it1(image, image->GetLargestPossibleRegion());
-		it1.GoToBegin();
-		itk::ImageRegionIterator<RGBImageTypeUS> it0(out_image, out_image->GetLargestPossibleRegion());
-		it0.GoToBegin();
-		itk::ImageRegionConstIterator<RGBImageTypeUS> it2(color_image, color_image->GetLargestPossibleRegion());
-		it2.GoToBegin();
-		while (!(it1.IsAtEnd()||it0.IsAtEnd()||it2.IsAtEnd()))
-		{
-			const RGBPixelUS & pixel = it2.Get();
-			if (pixel.GetRed() > 0 || pixel.GetGreen() > 0 || pixel.GetBlue() > 0)
-			{
-				it0.Set(pixel);
-			}
-			else
-			{
-				const double k = static_cast<double>(it1.Get());
-				unsigned short c = 0;
-				if (k < static_cast<double>(red_subscript))
-				{
-					const double r = (k + (-wmin)) / div_;
-					if ((k >= wmin) && (k <= wmax))
-					{
-						c = static_cast<unsigned short>(USHRT_MAX * r);
-					}
-					else if (k>wmax)
-					{
-						c = static_cast<unsigned short>(USHRT_MAX);
-					}
-				}
-				RGBPixelUS pixel0;
-				pixel0.SetRed  (c);
-				pixel0.SetGreen(c);
-				pixel0.SetBlue (c);
-				it0.Set(pixel0);
-			}
-			++it1;
-			++it0;
-			++it2;
-		}
-	}
-	catch(const itk::ExceptionObject & ex)
-	{
-		return QString(ex.GetDescription());
-	}
-	return QString("");
-}
-
-template <typename T> QString supp_palette_grey_to_rgbUC_(
-	RGBImageTypeUC::Pointer & out_image,
-	const typename T::Pointer & image,
-	const RGBImageTypeUC::Pointer & color_image,
-	const int red_subscript,
-	const ImageVariant * v)
-{
-	if (!v) return QString("Image is NULL");
-	if (image.IsNull()) return QString("Image is NULL");
-	if (out_image.IsNull()) return QString("Out image is NULL");
-	if (!(red_subscript > INT_MIN))
-		return QString("Internal error,\nSubscript <= INT_MIN");
-	try
-	{
-		out_image->SetRegions(
-			static_cast<RGBImageTypeUC::RegionType>(
-				image->GetLargestPossibleRegion()));
-		out_image->SetOrigin(
-			static_cast<RGBImageTypeUC::PointType>(
-				image->GetOrigin()));
-		out_image->SetSpacing(
-			static_cast<RGBImageTypeUC::SpacingType>(
-				image->GetSpacing()));
-		out_image->SetDirection(
-			static_cast<RGBImageTypeUC::DirectionType>(
-				image->GetDirection()));
-		out_image->Allocate();
-	}
-	catch (const itk::ExceptionObject & ex)
-	{
-		return QString(ex.GetDescription());
-	}
-	//
-	QApplication::processEvents();
-	//
-	unsigned long long tmp37 = 0;
-	const double wmin  = v->di->us_window_center - v->di->us_window_width * 0.5;
-	const double wmax  = v->di->us_window_center + v->di->us_window_width * 0.5;
-	const double diff_ = (wmax - wmin);
-	const double div_  = (diff_ != 0.0) ? diff_ : 1.0;
-	try
-	{
-		itk::ImageRegionConstIterator<T> it1(image, image->GetLargestPossibleRegion());
-		it1.GoToBegin();
-		itk::ImageRegionIterator<RGBImageTypeUC> it0(out_image, out_image->GetLargestPossibleRegion());
-		it0.GoToBegin();
-		itk::ImageRegionConstIterator<RGBImageTypeUC> it2(color_image, color_image->GetLargestPossibleRegion());
-		it2.GoToBegin();
-		while (!(it1.IsAtEnd()||it0.IsAtEnd()||it2.IsAtEnd()))
-		{
-			//
-			if (tmp37%9999 == 0) QApplication::processEvents();
-			//
-			const RGBPixelUC & pixel = it2.Get();
-			if (pixel.GetRed() > 0 || pixel.GetGreen() > 0 || pixel.GetBlue() > 0)
-			{
-				it0.Set(pixel);
-			}
-			else
-			{
-				const double k = static_cast<double>(it1.Get());
-				unsigned char c = 0;
-				if (k < static_cast<double>(red_subscript))
-				{
-					const double r = (k + (-wmin)) / div_;
-					if ((k >= wmin) && (k <= wmax))
-					{
-						c = static_cast<unsigned char>(UCHAR_MAX * r);
-					}
-					else if (k>wmax)
-					{
-						c = static_cast<unsigned char>(UCHAR_MAX);
-					}
-				}
-				RGBPixelUC pixel0;
-				pixel0.SetRed  (c);
-				pixel0.SetGreen(c);
-				pixel0.SetBlue (c);
-				it0.Set(pixel0);
-			}
-			++it1;
-			++it0;
-			++it2;
-		}
-	}
-	catch(const itk::ExceptionObject & ex)
-	{
-		return QString(ex.GetDescription());
-	}
-	return QString("");
-}
-
-static QString supp_palette_grey_to_rgbUS(
-	RGBImageTypeUS::Pointer & out_image,
-	const RGBImageTypeUS::Pointer & color_image,
-	const int red_subscript,
-	const ImageVariant * v)
-{
-	QString result("");
-	switch(v->image_type)
-	{
-	case 0:
-		result = supp_palette_grey_to_rgbUS_<ImageTypeSS>(out_image, v->pSS, color_image, red_subscript, v);
-		break;
-	case 1:
-		result = supp_palette_grey_to_rgbUS_<ImageTypeUS>(out_image, v->pUS, color_image, red_subscript, v);
-		break;
-	case 2:
-		result = supp_palette_grey_to_rgbUS_<ImageTypeSI>(out_image, v->pSI, color_image, red_subscript, v);
-		break;
-	case 3:
-		result = supp_palette_grey_to_rgbUS_<ImageTypeUI>(out_image, v->pUI, color_image, red_subscript, v);
-		break;
-	case 4:
-		result = supp_palette_grey_to_rgbUS_<ImageTypeUC>(out_image, v->pUC, color_image, red_subscript, v);
-		break;
-	case 5:
-		result = supp_palette_grey_to_rgbUS_<ImageTypeF>(out_image, v->pF, color_image, red_subscript, v);
-		break;
-	case 6:
-		result = supp_palette_grey_to_rgbUS_<ImageTypeD>(out_image, v->pD, color_image, red_subscript, v);
-		break;
-	case 7:
-		result = supp_palette_grey_to_rgbUS_<ImageTypeSLL>(out_image, v->pSLL, color_image, red_subscript, v);
-		break;
-	case 8:
-		result = supp_palette_grey_to_rgbUS_<ImageTypeULL>(out_image, v->pULL, color_image, red_subscript, v);
-		break;
-	default:
-		result = QString("Wrong image type");
-		break;
-	}
-	return result;
-}
-
-static QString supp_palette_grey_to_rgbUC(
-	RGBImageTypeUC::Pointer & out_image,
-	const RGBImageTypeUC::Pointer & color_image,
-	const int red_subscript,
-	const ImageVariant * v)
-{
-	QString result("");
-	switch(v->image_type)
-	{
-	case 0:
-		result = supp_palette_grey_to_rgbUC_<ImageTypeSS>(out_image, v->pSS, color_image, red_subscript, v);
-		break;
-	case 1:
-		result = supp_palette_grey_to_rgbUC_<ImageTypeUS>(out_image, v->pUS, color_image, red_subscript, v);
-		break;
-	case 2:
-		result = supp_palette_grey_to_rgbUC_<ImageTypeSI>(out_image, v->pSI, color_image, red_subscript, v);
-		break;
-	case 3:
-		result = supp_palette_grey_to_rgbUC_<ImageTypeUI>(out_image, v->pUI, color_image, red_subscript, v);
-		break;
-	case 4:
-		result = supp_palette_grey_to_rgbUC_<ImageTypeUC>(out_image, v->pUC, color_image, red_subscript, v);
-		break;
-	case 5:
-		result = supp_palette_grey_to_rgbUC_<ImageTypeF>(out_image, v->pF, color_image, red_subscript, v);
-		break;
-	case 6:
-		result = supp_palette_grey_to_rgbUC_<ImageTypeD>(out_image, v->pD, color_image, red_subscript, v);
-		break;
-	case 7:
-		result = supp_palette_grey_to_rgbUC_<ImageTypeSLL>(out_image, v->pSLL, color_image, red_subscript, v);
-		break;
-	case 8:
-		result = supp_palette_grey_to_rgbUC_<ImageTypeULL>(out_image, v->pULL, color_image, red_subscript, v);
-		break;
-	default:
-		result = QString("Wrong image type");
-		break;
-	}
-	return result;
-}
-
 QString DicomUtils::read_enhmr_spectro_info(
 	const mdcm::DataSet & ds,
 	bool spectro)
@@ -13006,174 +13179,6 @@ bool DicomUtils::read_gray_lut(
 		return false;
 	}
 	return true;
-}
-
-typedef struct
-{
-	int rows;
-	int columns;
-	short allocated;
-	bool localizer;
-	bool icc;
-	QString file;
-	QString photometric;
-	QString sop;
-} MixedDicomSeriesInfo;
-
-static unsigned int process_gsps(
-	const QStringList & grey_softcopy_pr_files,
-	const QString & p,
-	const QWidget * settings,
-	const bool ok3d,  const int max_3d_tex_size, GLWidget * gl, ShaderObj * mesh_shader,
-	std::vector<ImageVariant*> & ivariants,
-	QString & message_,
-	QProgressDialog * pb)
-{
-	unsigned int count = 0;
-	const SettingsWidget * wsettings = static_cast<const SettingsWidget *>(settings);
-	for (int x = 0; x < grey_softcopy_pr_files.size(); ++x)
-	{
-		if (pb)
-		{
-			pb->setLabelText(QString("Searching referenced files"));
-			pb->setValue(-1);
-		}
-		QApplication::processEvents();
-		QList<PrRefSeries> refs;
-		DicomUtils::read_pr_ref(p, grey_softcopy_pr_files.at(x), refs, pb);
-		QApplication::processEvents();
-		for (int y = 0; y < refs.size(); ++y)
-		{
-			if (pb)
-			{
-				pb->setLabelText(QString("Loading ... "));
-				pb->setValue(-1);
-			}
-			QApplication::processEvents();
-			QStringList ref_files;
-			for (int z = 0; z < refs.at(y).images.size(); ++z)
-			{
-				ref_files.push_back(refs.at(y).images.at(z).file);
-			}
-			if (ref_files.size() < 1) continue;
-			ref_files.sort();
-			std::vector<ImageVariant*> ref_ivariants;
-			const QString message_pr_ref =
-				DicomUtils::read_dicom(
-					ref_ivariants,
-					ref_files,
-					0,
-					NULL,
-					NULL,
-					false,
-					settings,
-					pb,
-					1,
-					true);
-			for (unsigned int z = 0; z < ref_ivariants.size(); ++z)
-			{
-				const int ref_ivariant_type = ref_ivariants.at(z)->image_type;
-				if (!(ref_ivariant_type >= 0 && ref_ivariant_type < 10))
-				{
-					std::cout << "Not a scalar image for GSPS, skipped" << std::endl;
-					continue;
-				}
-				if (pb) pb->setValue(-1);
-				QApplication::processEvents();
-				++count;
-				bool spatial_transform = false;
-				ImageVariant * pr_image =
-					PrConfigUtils::make_pr_monochrome(
-						ref_ivariants.at(z),
-						refs.at(y),
-						wsettings,
-						gl,
-						ok3d,
-						&spatial_transform);
-				if (pr_image)
-				{
-					const bool pr_skip_texture = pr_image->di->skip_texture;
-					//
-					if (ref_ivariants.at(z)->di->slices_generated)
-					{
-						CommonUtils::copy_slices(
-							pr_image,
-							ref_ivariants.at(z));
-					}
-					else
-					{
-						CommonUtils::copy_essential(
-							pr_image,
-							ref_ivariants.at(z));
-					}
-					CommonUtils::copy_imagevariant_overlays(
-						pr_image,
-						ref_ivariants.at(z));
-					//
-					//
-					//
-					pr_image->di->skip_texture = pr_skip_texture;
-					pr_image->iod = QString("Grayscale Softcopy Presentation State");
-					pr_image->sop = QString("");
-					pr_image->rescale_disabled = false;
-					pr_image->filenames = QStringList(grey_softcopy_pr_files.at(x));
-					//
-					//
-					//
-					if (spatial_transform)
-					{
-						pr_image->equi = false;
-						pr_image->di->hide_orientation = true;
-						pr_image->di->filtering = 0;
-					}
-					bool pr_load_ok = false;
-					if (pb)
-					{
-						pb->setValue(-1);
-						QApplication::processEvents();
-					}
-					pr_load_ok = CommonUtils::reload_monochrome(
-						pr_image,
-						ok3d,
-						gl,
-						max_3d_tex_size,
-						wsettings->get_resize(),
-						wsettings->get_size_x(),
-						wsettings->get_size_y());
-					if (pr_load_ok)
-					{
-						if (pr_image->equi)
-						{
-							if (pr_image->di->idimz < 7)
-								pr_image->di->transparency = false;
-						}
-						else
-						{
-							if (!pr_image->one_direction)
-								pr_image->di->transparency = false;
-							pr_image->di->filtering = 0;
-						}
-						CommonUtils::reset_bb(pr_image);
-						IconUtils::icon(pr_image);
-						ivariants.push_back(pr_image);
-					}
-					else
-					{
-						delete pr_image;
-						pr_image = NULL;
-					}
-				}
-				if (ref_ivariants.at(z))
-				{
-					delete ref_ivariants[z];
-					ref_ivariants[z] = NULL;
-				}
-			}
-			if (!message_pr_ref.isEmpty())
-				message_.append(QString("\n") + message_pr_ref);
-		}
-	}
-	return count;
 }
 
 // load_type

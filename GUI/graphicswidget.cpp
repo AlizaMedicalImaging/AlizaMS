@@ -37,6 +37,9 @@
 #include <unistd.h>
 #endif
 
+namespace
+{
+
 void gImageCleanupHandler(void * info)
 {
 	if (!info) return;
@@ -1562,6 +1565,8 @@ template<typename T> double get_distance(
 		d = j0.EuclideanDistanceTo(j1);
 	}
 	return d;
+}
+
 }
 
 GraphicsWidget::GraphicsWidget(
@@ -3424,4 +3429,3 @@ void GraphicsWidget::set_enable_overlays(bool t)
 {
 	enable_overlays = t;
 }
-

@@ -10,26 +10,10 @@
 #include <unistd.h>
 #endif
 
-static std::vector<ProcessImageThread_*> icon_threads;
-
-IconUtils::IconUtils() {}
-
-IconUtils::~IconUtils() {}
-
-void IconUtils::update_icon(ImageVariant * v, const int isize)
+namespace
 {
-	if (v->icon.isNull()) return;
-	const int R = round(v->di->R * 255.0f);
-	const int G = round(v->di->G * 255.0f);
-	const int B = round(v->di->B * 255.0f);
-	const unsigned int s__ = isize / 16;
-	const float p__ = static_cast<float>(isize - s__);
-	QPixmap quad_(s__, s__);
-	quad_.fill(QColor(R, G, B, 255));
-	QPainter painter(&v->icon);
-	painter.drawPixmap(QPointF(0, p__), quad_);
-	painter.end();
-}
+
+static std::vector<ProcessImageThread_*> icon_threads;
 
 template<typename Tin, typename Tout> void extract_icon(
 	const typename Tin::Pointer & image, ImageVariant * ivariant,
@@ -908,6 +892,27 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		painter.end();
 	}
 	IconUtils::update_icon(ivariant, isize);
+}
+
+}
+
+IconUtils::IconUtils() {}
+
+IconUtils::~IconUtils() {}
+
+void IconUtils::update_icon(ImageVariant * v, const int isize)
+{
+	if (v->icon.isNull()) return;
+	const int R = round(v->di->R * 255.0f);
+	const int G = round(v->di->G * 255.0f);
+	const int B = round(v->di->B * 255.0f);
+	const unsigned int s__ = isize / 16;
+	const float p__ = static_cast<float>(isize - s__);
+	QPixmap quad_(s__, s__);
+	quad_.fill(QColor(R, G, B, 255));
+	QPainter painter(&v->icon);
+	painter.drawPixmap(QPointF(0, p__), quad_);
+	painter.end();
 }
 
 void IconUtils::icon(ImageVariant * ivariant)

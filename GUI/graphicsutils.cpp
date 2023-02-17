@@ -6,6 +6,9 @@
 #include <iostream>
 #include "imageinfodialog.h"
 
+namespace
+{
+
 template<typename T> const QString print_itk_info(
 	const typename T::Pointer & image)
 {
@@ -366,6 +369,8 @@ template<typename T> QString get_rgba_pixel_value__(
 		}
 	}
 	return s;
+}
+
 }
 
 QString GraphicsUtils::flip_label(const QString & s)
@@ -965,4 +970,3 @@ void GraphicsUtils::draw_cross_out(QImage & tmpi)
 	painter->end();
 	delete painter;
 }
-

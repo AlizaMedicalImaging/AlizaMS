@@ -45,6 +45,9 @@
 #include "mdcmItem.h"
 #include "mdcmOverlay.h"
 
+namespace
+{
+
 template<typename T> QString mod_lut_filter(
 	const typename T::Pointer & image,
 	typename ImageTypeF::Pointer & out_image,
@@ -1836,6 +1839,178 @@ static void graphic_slice_by_slice(
 	}
 }
 
+static void get_overlays(
+	const mdcm::DataSet & ds,
+	std::vector<uint16_t> & l)
+{
+	mdcm::Tag t(0x6000,0x0000);
+	while (true)
+	{
+		const mdcm::DataElement & e = ds.FindNextDataElement(t);
+		if (e.GetTag().GetGroup() > 0x60FF)
+		{
+			break;
+		}
+		else if (e.GetTag().IsPrivate())
+		{
+			t.SetGroup(static_cast<uint16_t>(e.GetTag().GetGroup()+1));
+			t.SetElement(0);
+		}
+		else
+		{
+			t = e.GetTag();
+			mdcm::Tag tOverlayData(t.GetGroup(), 0x3000);
+			if (ds.FindDataElement(tOverlayData))
+			{
+				const mdcm::DataElement & eOverlayData = ds.GetDataElement(tOverlayData);
+				if (!eOverlayData.IsEmpty()) l.push_back(t.GetGroup());
+			}
+			t.SetGroup(static_cast<uint16_t>(t.GetGroup()+2));
+			t.SetElement(0);
+		}
+	}
+}
+
+static void read_overlays(
+	const mdcm::DataSet & ds,
+	PrRefSeries & ref)
+{
+	std::vector<mdcm::Overlay> overlays;
+	std::vector<uint16_t> l;
+	get_overlays(ds, l);
+	const unsigned int s = l.size();
+	if (s < 1) return;
+	for (unsigned int i = 0; i < s; ++i)
+	{
+		mdcm::Overlay o;
+		mdcm::Tag t(0x6000,0x0000);
+		t.SetGroup(l.at(i));
+		const mdcm::DataElement & e = ds.FindNextDataElement(t);
+		mdcm::DataElement e2 = e;
+		while (e2.GetTag().GetGroup() == l.at(i))
+		{
+			o.Update(e2);
+			t.SetElement(static_cast<uint16_t>(e2.GetTag().GetElement() + 1));
+			e2 = ds.FindNextDataElement(t);
+		}
+		overlays.push_back(o);
+	}
+	if (overlays.empty()) return;
+	QMultiMap<int, SliceOverlay> slice_overlays;
+	for (unsigned int i = 0; i < overlays.size(); ++i)
+	{
+		mdcm::Overlay & o = overlays[i];
+		const unsigned int NumberOfFrames = o.GetNumberOfFrames();
+		const unsigned int FrameOrigin = o.GetFrameOrigin();
+		const int o_dimx = static_cast<int>(o.GetColumns());
+		const int o_dimy = static_cast<int>(o.GetRows());
+		const int o_x    = o.GetOrigin()[0];
+		const int o_y    = o.GetOrigin()[1];
+		if (NumberOfFrames > 0 && FrameOrigin > 0)
+		{
+			const size_t obuffer_size = o.GetUnpackBufferLength();
+			if (obuffer_size % NumberOfFrames != 0) continue;
+			const size_t fbuffer_size = obuffer_size/NumberOfFrames;
+			char * tmp0;
+			try
+			{
+				tmp0 = new char[obuffer_size];
+			}
+			catch (const std::bad_alloc&)
+			{
+				continue;
+			}
+			if (!tmp0) continue;
+			const bool obuffer_ok = o.GetUnpackBuffer(tmp0, obuffer_size);
+			if (!obuffer_ok)
+			{
+				delete [] tmp0;
+				continue;
+			}
+			int idx = FrameOrigin - 1;
+			for (unsigned int y = 0; y < NumberOfFrames; ++y)
+			{
+				SliceOverlay overlay;
+				overlay.dimx = o_dimx;
+				overlay.dimy = o_dimy;
+				overlay.x    = o_x;
+				overlay.y    = o_y;
+				const size_t p = idx * o_dimx * o_dimy;
+				++idx;
+				for (size_t j = 0; j < fbuffer_size; ++j)
+				{
+					const size_t jj = p + j;
+					if (jj < obuffer_size)
+					{
+						overlay.data.push_back(tmp0[jj]);
+					}
+					else
+					{
+						std::cout << "warning: read_overlays() jj=" << jj << " obuffer_size" << obuffer_size << std::endl;
+					}
+				}
+				slice_overlays.insert(idx - 1, overlay);
+#if 0
+				std::cout << "obuffer_size=" << obuffer_size << " fbuffer_size=" << fbuffer_size << " idx=" << idx-1
+					<< " p=" << p << std::endl;
+#endif
+			}
+			delete [] tmp0;
+		}
+		else
+		{
+			SliceOverlay overlay;
+			overlay.dimx = o_dimx;
+			overlay.dimy = o_dimy;
+			overlay.x    = o_x;
+			overlay.y    = o_y;
+			const size_t obuffer_size = o.GetUnpackBufferLength();
+			char * tmp0;
+			try
+			{
+				tmp0 = new char[obuffer_size];
+			}
+			catch (const std::bad_alloc&)
+			{
+				continue;
+			}
+			if (!tmp0) continue;
+			const bool obuffer_ok = o.GetUnpackBuffer(tmp0, obuffer_size);
+			if (!obuffer_ok)
+			{
+				delete [] tmp0;
+				continue;
+			}
+			for (size_t j = 0; j < obuffer_size; ++j)
+			{
+				overlay.data.push_back(tmp0[j]);
+			}
+			delete [] tmp0;
+			slice_overlays.insert(0, overlay);
+		}
+	}
+	const QList<int> keys = slice_overlays.keys();
+	for (int x = 0; x < keys.size(); ++x)
+	{
+		const int idx = keys.at(x);
+		SliceOverlays l2 = slice_overlays.values(idx);
+		if (!ref.image_overlays.all_overlays.contains(idx))
+		{
+			ref.image_overlays.all_overlays[idx] = l2;
+		}
+		else
+		{
+			for (int j = 0; j < l2.size(); ++j)
+			{
+				ref.image_overlays.all_overlays[idx].push_back(l2[j]);
+			}
+		}
+	}
+	slice_overlays.clear();
+}
+
+}
+
 PrConfigUtils::PrConfigUtils()
 {
 }
@@ -2339,176 +2514,6 @@ void PrConfigUtils::read_spatial_transformation(
 			c.values.push_back(QVariant(0));
 		ref.prconfig.push_back(c);
 	}
-}
-
-static void get_overlays(
-	const mdcm::DataSet & ds,
-	std::vector<uint16_t> & l)
-{
-	mdcm::Tag t(0x6000,0x0000);
-	while (true)
-	{
-		const mdcm::DataElement & e = ds.FindNextDataElement(t);
-		if (e.GetTag().GetGroup() > 0x60FF)
-		{
-			break;
-		}
-		else if (e.GetTag().IsPrivate())
-		{
-			t.SetGroup(static_cast<uint16_t>(e.GetTag().GetGroup()+1));
-			t.SetElement(0);
-		}
-		else
-		{
-			t = e.GetTag();
-			mdcm::Tag tOverlayData(t.GetGroup(), 0x3000);
-			if (ds.FindDataElement(tOverlayData))
-			{
-				const mdcm::DataElement & eOverlayData = ds.GetDataElement(tOverlayData);
-				if (!eOverlayData.IsEmpty()) l.push_back(t.GetGroup());
-			}
-			t.SetGroup(static_cast<uint16_t>(t.GetGroup()+2));
-			t.SetElement(0);
-		}
-	}
-}
-
-static void read_overlays(
-	const mdcm::DataSet & ds,
-	PrRefSeries & ref)
-{
-	std::vector<mdcm::Overlay> overlays;
-	std::vector<uint16_t> l;
-	get_overlays(ds, l);
-	const unsigned int s = l.size();
-	if (s < 1) return;
-	for (unsigned int i = 0; i < s; ++i)
-	{
-		mdcm::Overlay o;
-		mdcm::Tag t(0x6000,0x0000);
-		t.SetGroup(l.at(i));
-		const mdcm::DataElement & e = ds.FindNextDataElement(t);
-		mdcm::DataElement e2 = e;
-		while (e2.GetTag().GetGroup() == l.at(i))
-		{
-			o.Update(e2);
-			t.SetElement(static_cast<uint16_t>(e2.GetTag().GetElement() + 1));
-			e2 = ds.FindNextDataElement(t);
-		}
-		overlays.push_back(o);
-	}
-	if (overlays.empty()) return;
-	QMultiMap<int, SliceOverlay> slice_overlays;
-	for (unsigned int i = 0; i < overlays.size(); ++i)
-	{
-		mdcm::Overlay & o = overlays[i];
-		const unsigned int NumberOfFrames = o.GetNumberOfFrames();
-		const unsigned int FrameOrigin = o.GetFrameOrigin();
-		const int o_dimx = static_cast<int>(o.GetColumns());
-		const int o_dimy = static_cast<int>(o.GetRows());
-		const int o_x    = o.GetOrigin()[0];
-		const int o_y    = o.GetOrigin()[1];
-		if (NumberOfFrames > 0 && FrameOrigin > 0)
-		{
-			const size_t obuffer_size = o.GetUnpackBufferLength();
-			if (obuffer_size % NumberOfFrames != 0) continue;
-			const size_t fbuffer_size = obuffer_size/NumberOfFrames;
-			char * tmp0;
-			try
-			{
-				tmp0 = new char[obuffer_size];
-			}
-			catch (const std::bad_alloc&)
-			{
-				continue;
-			}
-			if (!tmp0) continue;
-			const bool obuffer_ok = o.GetUnpackBuffer(tmp0, obuffer_size);
-			if (!obuffer_ok)
-			{
-				delete [] tmp0;
-				continue;
-			}
-			int idx = FrameOrigin - 1;
-			for (unsigned int y = 0; y < NumberOfFrames; ++y)
-			{
-				SliceOverlay overlay;
-				overlay.dimx = o_dimx;
-				overlay.dimy = o_dimy;
-				overlay.x    = o_x;
-				overlay.y    = o_y;
-				const size_t p = idx * o_dimx * o_dimy;
-				++idx;
-				for (size_t j = 0; j < fbuffer_size; ++j)
-				{
-					const size_t jj = p + j;
-					if (jj < obuffer_size)
-					{
-						overlay.data.push_back(tmp0[jj]);
-					}
-					else
-					{
-						std::cout << "warning: read_overlays() jj=" << jj << " obuffer_size" << obuffer_size << std::endl;
-					}
-				}
-				slice_overlays.insert(idx - 1, overlay);
-#if 0
-				std::cout << "obuffer_size=" << obuffer_size << " fbuffer_size=" << fbuffer_size << " idx=" << idx-1
-					<< " p=" << p << std::endl;
-#endif
-			}
-			delete [] tmp0;
-		}
-		else
-		{
-			SliceOverlay overlay;
-			overlay.dimx = o_dimx;
-			overlay.dimy = o_dimy;
-			overlay.x    = o_x;
-			overlay.y    = o_y;
-			const size_t obuffer_size = o.GetUnpackBufferLength();
-			char * tmp0;
-			try
-			{
-				tmp0 = new char[obuffer_size];
-			}
-			catch (const std::bad_alloc&)
-			{
-				continue;
-			}
-			if (!tmp0) continue;
-			const bool obuffer_ok = o.GetUnpackBuffer(tmp0, obuffer_size);
-			if (!obuffer_ok)
-			{
-				delete [] tmp0;
-				continue;
-			}
-			for (size_t j = 0; j < obuffer_size; ++j)
-			{
-				overlay.data.push_back(tmp0[j]);
-			}
-			delete [] tmp0;
-			slice_overlays.insert(0, overlay);
-		}
-	}
-	const QList<int> keys = slice_overlays.keys();
-	for (int x = 0; x < keys.size(); ++x)
-	{
-		const int idx = keys.at(x);
-		SliceOverlays l2 = slice_overlays.values(idx);
-		if (!ref.image_overlays.all_overlays.contains(idx))
-		{
-			ref.image_overlays.all_overlays[idx] = l2;
-		}
-		else
-		{
-			for (int j = 0; j < l2.size(); ++j)
-			{
-				ref.image_overlays.all_overlays[idx].push_back(l2[j]);
-			}
-		}
-	}
-	slice_overlays.clear();
 }
 
 void PrConfigUtils::read_graphic_objects(

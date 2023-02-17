@@ -32,6 +32,13 @@
 #include <chrono>
 #include <random>
 
+namespace
+{
+
+static unsigned int count_files = 0;
+static unsigned int count_dirs = 0;
+
+
 static bool is_date_time(const mdcm::VR & vr, const mdcm::Tag & t)
 {
 	if (vr == mdcm::VR::DA ||
@@ -1975,147 +1982,6 @@ static void anonymize_file__(
 	if (!writer.Write()) *ok = false;
 }
 
-AnonymazerWidget2::AnonymazerWidget2(float si)
-{
-	setupUi(this);
-	const QSize s = QSize(static_cast<int>(16*si),static_cast<int>(16*si));
-	in_pushButton->setIconSize(s);
-	out_pushButton->setIconSize(s);
-	run_pushButton->setIconSize(s);
-	run_pushButton->setEnabled(false);
-	readSettings();
-	init_profile();
-#ifdef USE_WORKSTATION_MODE
-	input_dir = QString("");
-#else
-#if (defined _WIN32)
-	input_dir =
-		QString(".") +
-		QString("/") +
-		QString("DICOM");
-#else
-	input_dir =
-		QApplication::applicationDirPath() +
-		QString("/") + QString("..") +
-		QString("/") +
-		QString("DICOM");
-#endif
-	QFileInfo fi(input_dir);
-	if (fi.exists()) input_dir = fi.absoluteFilePath();
-	else             input_dir = QString("");
-	in_lineEdit->setText(QDir::toNativeSeparators(input_dir));
-#endif
-	help_widget = new HelpWidget();
-	help_widget->hide();
-	connect(out_pushButton,    SIGNAL(clicked()),    this,SLOT(set_output_dir()));
-	connect(in_pushButton,     SIGNAL(clicked()),    this,SLOT(set_input_dir()));
-	connect(help_pushButton,   SIGNAL(clicked()),    this,SLOT(show_help()));
-	connect(run_pushButton,    SIGNAL(clicked()),    this,SLOT(run_()));
-}
-
-AnonymazerWidget2::~AnonymazerWidget2()
-{
-	delete help_widget;
-	help_widget = NULL;
-}
-
-void AnonymazerWidget2::readSettings()
-{
-	QSettings settings(
-		QSettings::IniFormat, QSettings::UserScope,
-		QApplication::organizationName(), QApplication::applicationName());
-	settings.setFallbacksEnabled(true);
-	settings.beginGroup(QString("AnonymazerWidget"));
-	output_dir = settings.value(QString("output_dir"), QString("")).toString();
-	const int tmp01 = settings.value(QString("remove_private"),        0).toInt();
-	const int tmp02 = settings.value(QString("remove_overlays"),       0).toInt();
-	const int tmp03 = settings.value(QString("preserve_uids"),         0).toInt();
-	const int tmp04 = settings.value(QString("retain_device_id"),      0).toInt();
-	const int tmp05 = settings.value(QString("retain_dates_times"),    0).toInt();
-	const int tmp06 = settings.value(QString("retain_patient_chars"),  0).toInt();
-	const int tmp07 = settings.value(QString("retain_institution_id"), 0).toInt();
-	const int tmp08 = settings.value(QString("remove_desc"),           0).toInt();
-	const int tmp09 = settings.value(QString("remove_struct"),         0).toInt();
-	const int tmp10 = settings.value(QString("random_names"),          1).toInt();
-	const int tmp11 = settings.value(QString("rename_files"),          0).toInt();
-	settings.endGroup();
-	private_checkBox->setChecked(    (tmp01 == 1) ? true : false);
-	graphics_checkBox->setChecked(   (tmp02 == 1) ? true : false);
-	uids_checkBox->setChecked(       (tmp03 == 1) ? true : false);
-	device_checkBox->setChecked(     (tmp04 == 1) ? true : false);
-	dates_checkBox->setChecked(      (tmp05 == 1) ? true : false);
-	chars_checkBox->setChecked(      (tmp06 == 1) ? true : false);
-	institution_checkBox->setChecked((tmp07 == 1) ? true : false);
-	desc_checkBox->setChecked(       (tmp08 == 1) ? true : false);
-	struct_checkBox->setChecked(     (tmp09 == 1) ? true : false);
-	random_checkBox->setChecked(     (tmp10 == 1) ? true : false);
-	rename_checkBox->setChecked(     (tmp11 == 1) ? true : false);
-}
-
-void AnonymazerWidget2::writeSettings(QSettings & settings)
-{
-	const int tmp01 = (private_checkBox->isChecked())     ? 1 : 0;
-	const int tmp02 = (graphics_checkBox->isChecked())    ? 1 : 0;
-	const int tmp03 = (uids_checkBox->isChecked())        ? 1 : 0;
-	const int tmp04 = (device_checkBox->isChecked())      ? 1 : 0;
-	const int tmp05 = (chars_checkBox->isChecked())       ? 1 : 0;
-	const int tmp06 = (institution_checkBox->isChecked()) ? 1 : 0;
-	const int tmp07 = (dates_checkBox->isChecked())       ? 1 : 0;
-	const int tmp08 = (desc_checkBox->isChecked())        ? 1 : 0;
-	const int tmp09 = (struct_checkBox->isChecked())      ? 1 : 0;
-	const int tmp10 = (random_checkBox->isChecked())      ? 1 : 0;
-	const int tmp11 = (rename_checkBox->isChecked())      ? 1 : 0;
-	settings.beginGroup(QString("AnonymazerWidget"));
-	settings.setValue(QString("output_dir"),           QVariant(output_dir));
-	settings.setValue(QString("remove_private"),       QVariant(tmp01));
-	settings.setValue(QString("remove_overlays"),      QVariant(tmp02));
-	settings.setValue(QString("preserve_uids"),        QVariant(tmp03));
-	settings.setValue(QString("retain_device_id"),     QVariant(tmp04));
-	settings.setValue(QString("retain_patient_chars"), QVariant(tmp05));
-	settings.setValue(QString("retain_institution_id"),QVariant(tmp06));
-	settings.setValue(QString("retain_dates_times"),   QVariant(tmp07));
-	settings.setValue(QString("remove_desc"),          QVariant(tmp08));
-	settings.setValue(QString("remove_struct"),        QVariant(tmp09));
-	settings.setValue(QString("random_names"),         QVariant(tmp10));
-	settings.setValue(QString("rename_files"),         QVariant(tmp11));
-	settings.endGroup();
-}
-
-void AnonymazerWidget2::dropEvent(QDropEvent * e)
-{
-	const QMimeData * mimeData = e->mimeData();
-	if (!mimeData) return;
-	QStringList l;
-	if (mimeData->hasUrls())
-	{
-		QList<QUrl> urls = mimeData->urls();
-		for (int i = 0; i < urls.size() && i < 1; ++i)
-			l.append(urls.at(i).toLocalFile());
-	}
-	if (l.size() < 1) return;
-	QFileInfo fi(l.at(0));
-	if (fi.isDir())
-	{
-		input_dir = fi.absoluteFilePath();
-		in_lineEdit->setText(QDir::toNativeSeparators(input_dir));
-	}
-}
-
-void AnonymazerWidget2::dragEnterEvent(QDragEnterEvent * e)
-{
-	e->acceptProposedAction();
-}
-
-void AnonymazerWidget2::dragMoveEvent(QDragMoveEvent * e)
-{
-	e->acceptProposedAction();
-}
-
-void AnonymazerWidget2::dragLeaveEvent(QDragLeaveEvent * e)
-{
-	e->accept();
-}
-
 static void find_pn_recurs__(
 	const mdcm::DataSet & ds,
 	QStringList & l,
@@ -2377,8 +2243,149 @@ static void build_maps(
 	}
 }
 
-static unsigned int count_files = 0;
-static unsigned int count_dirs = 0;
+}
+
+AnonymazerWidget2::AnonymazerWidget2(float si)
+{
+	setupUi(this);
+	const QSize s = QSize(static_cast<int>(16*si),static_cast<int>(16*si));
+	in_pushButton->setIconSize(s);
+	out_pushButton->setIconSize(s);
+	run_pushButton->setIconSize(s);
+	run_pushButton->setEnabled(false);
+	readSettings();
+	init_profile();
+#ifdef USE_WORKSTATION_MODE
+	input_dir = QString("");
+#else
+#if (defined _WIN32)
+	input_dir =
+		QString(".") +
+		QString("/") +
+		QString("DICOM");
+#else
+	input_dir =
+		QApplication::applicationDirPath() +
+		QString("/") + QString("..") +
+		QString("/") +
+		QString("DICOM");
+#endif
+	QFileInfo fi(input_dir);
+	if (fi.exists()) input_dir = fi.absoluteFilePath();
+	else             input_dir = QString("");
+	in_lineEdit->setText(QDir::toNativeSeparators(input_dir));
+#endif
+	help_widget = new HelpWidget();
+	help_widget->hide();
+	connect(out_pushButton,    SIGNAL(clicked()),    this,SLOT(set_output_dir()));
+	connect(in_pushButton,     SIGNAL(clicked()),    this,SLOT(set_input_dir()));
+	connect(help_pushButton,   SIGNAL(clicked()),    this,SLOT(show_help()));
+	connect(run_pushButton,    SIGNAL(clicked()),    this,SLOT(run_()));
+}
+
+AnonymazerWidget2::~AnonymazerWidget2()
+{
+	delete help_widget;
+	help_widget = NULL;
+}
+
+void AnonymazerWidget2::readSettings()
+{
+	QSettings settings(
+		QSettings::IniFormat, QSettings::UserScope,
+		QApplication::organizationName(), QApplication::applicationName());
+	settings.setFallbacksEnabled(true);
+	settings.beginGroup(QString("AnonymazerWidget"));
+	output_dir = settings.value(QString("output_dir"), QString("")).toString();
+	const int tmp01 = settings.value(QString("remove_private"),        0).toInt();
+	const int tmp02 = settings.value(QString("remove_overlays"),       0).toInt();
+	const int tmp03 = settings.value(QString("preserve_uids"),         0).toInt();
+	const int tmp04 = settings.value(QString("retain_device_id"),      0).toInt();
+	const int tmp05 = settings.value(QString("retain_dates_times"),    0).toInt();
+	const int tmp06 = settings.value(QString("retain_patient_chars"),  0).toInt();
+	const int tmp07 = settings.value(QString("retain_institution_id"), 0).toInt();
+	const int tmp08 = settings.value(QString("remove_desc"),           0).toInt();
+	const int tmp09 = settings.value(QString("remove_struct"),         0).toInt();
+	const int tmp10 = settings.value(QString("random_names"),          1).toInt();
+	const int tmp11 = settings.value(QString("rename_files"),          0).toInt();
+	settings.endGroup();
+	private_checkBox->setChecked(    (tmp01 == 1) ? true : false);
+	graphics_checkBox->setChecked(   (tmp02 == 1) ? true : false);
+	uids_checkBox->setChecked(       (tmp03 == 1) ? true : false);
+	device_checkBox->setChecked(     (tmp04 == 1) ? true : false);
+	dates_checkBox->setChecked(      (tmp05 == 1) ? true : false);
+	chars_checkBox->setChecked(      (tmp06 == 1) ? true : false);
+	institution_checkBox->setChecked((tmp07 == 1) ? true : false);
+	desc_checkBox->setChecked(       (tmp08 == 1) ? true : false);
+	struct_checkBox->setChecked(     (tmp09 == 1) ? true : false);
+	random_checkBox->setChecked(     (tmp10 == 1) ? true : false);
+	rename_checkBox->setChecked(     (tmp11 == 1) ? true : false);
+}
+
+void AnonymazerWidget2::writeSettings(QSettings & settings)
+{
+	const int tmp01 = (private_checkBox->isChecked())     ? 1 : 0;
+	const int tmp02 = (graphics_checkBox->isChecked())    ? 1 : 0;
+	const int tmp03 = (uids_checkBox->isChecked())        ? 1 : 0;
+	const int tmp04 = (device_checkBox->isChecked())      ? 1 : 0;
+	const int tmp05 = (chars_checkBox->isChecked())       ? 1 : 0;
+	const int tmp06 = (institution_checkBox->isChecked()) ? 1 : 0;
+	const int tmp07 = (dates_checkBox->isChecked())       ? 1 : 0;
+	const int tmp08 = (desc_checkBox->isChecked())        ? 1 : 0;
+	const int tmp09 = (struct_checkBox->isChecked())      ? 1 : 0;
+	const int tmp10 = (random_checkBox->isChecked())      ? 1 : 0;
+	const int tmp11 = (rename_checkBox->isChecked())      ? 1 : 0;
+	settings.beginGroup(QString("AnonymazerWidget"));
+	settings.setValue(QString("output_dir"),           QVariant(output_dir));
+	settings.setValue(QString("remove_private"),       QVariant(tmp01));
+	settings.setValue(QString("remove_overlays"),      QVariant(tmp02));
+	settings.setValue(QString("preserve_uids"),        QVariant(tmp03));
+	settings.setValue(QString("retain_device_id"),     QVariant(tmp04));
+	settings.setValue(QString("retain_patient_chars"), QVariant(tmp05));
+	settings.setValue(QString("retain_institution_id"),QVariant(tmp06));
+	settings.setValue(QString("retain_dates_times"),   QVariant(tmp07));
+	settings.setValue(QString("remove_desc"),          QVariant(tmp08));
+	settings.setValue(QString("remove_struct"),        QVariant(tmp09));
+	settings.setValue(QString("random_names"),         QVariant(tmp10));
+	settings.setValue(QString("rename_files"),         QVariant(tmp11));
+	settings.endGroup();
+}
+
+void AnonymazerWidget2::dropEvent(QDropEvent * e)
+{
+	const QMimeData * mimeData = e->mimeData();
+	if (!mimeData) return;
+	QStringList l;
+	if (mimeData->hasUrls())
+	{
+		QList<QUrl> urls = mimeData->urls();
+		for (int i = 0; i < urls.size() && i < 1; ++i)
+			l.append(urls.at(i).toLocalFile());
+	}
+	if (l.size() < 1) return;
+	QFileInfo fi(l.at(0));
+	if (fi.isDir())
+	{
+		input_dir = fi.absoluteFilePath();
+		in_lineEdit->setText(QDir::toNativeSeparators(input_dir));
+	}
+}
+
+void AnonymazerWidget2::dragEnterEvent(QDragEnterEvent * e)
+{
+	e->acceptProposedAction();
+}
+
+void AnonymazerWidget2::dragMoveEvent(QDragMoveEvent * e)
+{
+	e->acceptProposedAction();
+}
+
+void AnonymazerWidget2::dragLeaveEvent(QDragLeaveEvent * e)
+{
+	e->accept();
+}
+
 void AnonymazerWidget2::process_directory(
 	const QString & p,
 	const QString & outp,

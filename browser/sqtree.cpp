@@ -49,6 +49,11 @@
 #include "commonutils.h"
 #include <exception>
 
+namespace
+{
+
+static int expanded_items = 0;
+
 template <typename T, long long TVR>
 void get_bin_values(
 	const mdcm::DataElement & v,
@@ -179,6 +184,8 @@ const QString css1 =
 const QString head = QString(
 	"<html><head><link rel='stylesheet' type='text/css' href='format.css'></head><body>");
 const QString foot = QString("</body></html>");
+
+}
 
 SQtree::SQtree(bool t) : skip_settings_pos(t)
 {
@@ -1891,7 +1898,6 @@ void SQtree::collapse_item()
 #endif
 }
 
-static int expanded_items = 0;
 void SQtree::expand_item()
 {
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
