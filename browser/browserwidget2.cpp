@@ -87,7 +87,7 @@ void BrowserWidget2::compute_offsets(const mdcm::SequenceOfItems * sq, mdcm::VL 
 	const unsigned int n = sq->GetNumberOfItems();
 	offsets.resize(n);
 	offsets[0] = static_cast<unsigned int>(start);
-	for(unsigned int i = 1; i < n; ++i)
+	for (unsigned int i = 1; i < n; ++i)
 	{
 		const mdcm::Item & item = sq->GetItem(i);
 		offsets[i] = offsets[i-1] + static_cast<unsigned int>(item.GetLength<mdcm::ExplicitDataElement>());
@@ -100,7 +100,7 @@ BrowserWidget2::BrowserWidget2(float si)
 	eye_icon  = QIcon(QString(":/bitmaps/eye.svg"));
 	eye2_icon = QIcon(QString(":/bitmaps/eye2.svg"));
 	setupUi(this);
-	const QSize s = QSize(static_cast<int>(24*si),static_cast<int>(24*si));
+	const QSize s = QSize(static_cast<int>(24 * si),static_cast<int>(24 * si));
 	opendir1_pushButton->setIconSize(s);
 	dicomdir_pushButton->setIconSize(s);
 	ctk_pushButton->setIconSize(s);
@@ -178,13 +178,13 @@ void BrowserWidget2::read_directory(const QString & p)
 		const mdcm::Dict & dict = dicts.GetPublicDict();
 		process_directory(p, dict, pd);
 	}
-	catch(mdcm::ParseException & pe)
+	catch (mdcm::ParseException & pe)
 	{
 		std::cout
 			<< "mdcm::ParseException in BrowserWidget2::read_directory:\n"
 			<< pe.GetLastElement().GetTag() << std::endl;
 	}
-	catch(std::exception & ex)
+	catch (std::exception & ex)
 	{
 		std::cout << "Exception in BrowserWidget2::read_directory:\n"
 			<< ex.what() << std::endl;
@@ -198,8 +198,8 @@ void BrowserWidget2::process_directory(const QString & p, const mdcm::Dict & dic
 {
 	if (p.isEmpty()) return;
 	QDir dir(p);
-	QStringList dlist = dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
-	QStringList flist = dir.entryList(QDir::Files|QDir::Readable,QDir::Name);
+	QStringList dlist = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+	QStringList flist = dir.entryList(QDir::Files | QDir::Readable, QDir::Name);
 	std::vector<std::string> filenames;
 	QStringList filenames_no_series_uid;
 	for (int x = 0; x < flist.size(); ++x)
@@ -256,15 +256,15 @@ void BrowserWidget2::process_directory(const QString & p, const mdcm::Dict & dic
 		mdcm::Scanner::ValuesType::iterator vi = v.begin();
 		for (; vi!=v.end(); ++vi)
 		{
-			QString modality    = QString("");
-			QString name        = QString("");
-			QString birthdate   = QString("");
-			QString study       = QString("");
-			QString study_date  = QString("");
-			QString series      = QString("");
-			QString series_date = QString("");
-			bool is_image       = false;
-			bool is_softcopy  = false;
+			QString modality("");
+			QString name("");
+			QString birthdate("");
+			QString study("");
+			QString study_date("");
+			QString series("");
+			QString series_date("");
+			bool is_image = false;
+			bool is_softcopy = false;
 			const int idx = tableWidget->rowCount();
 			QString idxs;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
@@ -288,13 +288,16 @@ void BrowserWidget2::process_directory(const QString & p, const mdcm::Dict & dic
 				i->files.push_back(tmp_filename);
 			}
 			const unsigned int series_size = i->files.size();
-			if (series_size > 0) read_tags_(
-				i->files.at(0),
-				name,birthdate,
-				modality,
-				study,study_date,
-				series,series_date,
-				&is_image,&is_softcopy);
+			if (series_size > 0)
+			{
+				read_tags_(
+					i->files.at(0),
+					name,birthdate,
+					modality,
+					study,study_date,
+					series,series_date,
+					&is_image,&is_softcopy);
+			}
 			pd->setValue(-1);
 			qApp->processEvents();
 			if (pd->wasCanceled()) return;
@@ -311,31 +314,38 @@ void BrowserWidget2::process_directory(const QString & p, const mdcm::Dict & dic
 					read_tags_short_(
 						i->files.at(series_idx),
 						&is_image_tmp,&is_softcopy);
-					if (is_image_tmp) { is_image = true; break; }
-					else if (is_softcopy) { break; }
+					if (is_image_tmp)
+					{
+						is_image = true;
+						break;
+					}
+					else if (is_softcopy)
+					{
+						break;
+					}
 				}
 				while (series_idx < (series_size - 1));
 			}
 			//
 			tableWidget->setRowCount(idx + 1);
-			tableWidget->setItem(idx,0,static_cast<QTableWidgetItem*>(i));
+			tableWidget->setItem(idx, 0, static_cast<QTableWidgetItem*>(i));
 			if (is_image)
 			{
-				tableWidget->setItem(idx,1,new QTableWidgetItem(eye_icon,QString("")));
+				tableWidget->setItem(idx, 1, new QTableWidgetItem(eye_icon, QString("")));
 			}
 			else if (is_softcopy)
 			{
-				tableWidget->setItem(idx,1,new QTableWidgetItem(eye2_icon,QString("")));
+				tableWidget->setItem(idx, 1, new QTableWidgetItem(eye2_icon, QString("")));
 			}
-			tableWidget->setItem(idx,2,new QTableWidgetItem(modality));
-			tableWidget->setItem(idx,3,new QTableWidgetItem(
+			tableWidget->setItem(idx, 2, new QTableWidgetItem(modality));
+			tableWidget->setItem(idx, 3, new QTableWidgetItem(
 				DicomUtils::convert_pn_value(name.remove(QChar('\0')))));
-			tableWidget->setItem(idx,4,new QTableWidgetItem(birthdate));
-			tableWidget->setItem(idx,5,new QTableWidgetItem(study.remove(QChar('\0'))));
-			tableWidget->setItem(idx,6,new QTableWidgetItem(study_date));
-			tableWidget->setItem(idx,7,new QTableWidgetItem(series.remove(QChar('\0'))));
-			tableWidget->setItem(idx,8,new QTableWidgetItem(series_date));
-			tableWidget->setItem(idx,9,new QTableWidgetItem(QVariant(i->files.size()).toString()));
+			tableWidget->setItem(idx, 4, new QTableWidgetItem(birthdate));
+			tableWidget->setItem(idx, 5, new QTableWidgetItem(study.remove(QChar('\0'))));
+			tableWidget->setItem(idx, 6, new QTableWidgetItem(study_date));
+			tableWidget->setItem(idx, 7, new QTableWidgetItem(series.remove(QChar('\0'))));
+			tableWidget->setItem(idx, 8, new QTableWidgetItem(series_date));
+			tableWidget->setItem(idx, 9, new QTableWidgetItem(QVariant(i->files.size()).toString()));
 			//
 			pd->setValue(-1);
 			qApp->processEvents();
@@ -346,15 +356,15 @@ void BrowserWidget2::process_directory(const QString & p, const mdcm::Dict & dic
 	for (int x = 0; x < filenames_no_series_uid.size(); ++x)
 	{
 		const QString tmp1 = filenames_no_series_uid.at(x);
-		QString modality    = QString("");
-		QString name        = QString("");
-		QString birthdate   = QString("");
-		QString study       = QString("");
-		QString study_date  = QString("");
-		QString series      = QString("");
-		QString series_date = QString("");
-		bool is_image       = false;
-		bool is_softcopy    = false;
+		QString modality("");
+		QString name("");
+		QString birthdate("");
+		QString study("");
+		QString study_date("");
+		QString series("");
+		QString series_date("");
+		bool is_image = false;
+		bool is_softcopy = false;
 		const int idx = tableWidget->rowCount();
 		QString ids;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
@@ -366,30 +376,30 @@ void BrowserWidget2::process_directory(const QString & p, const mdcm::Dict & dic
 		i->files.push_back(tmp1);
 		read_tags_(
 			tmp1,
-			name,birthdate,
+			name, birthdate,
 			modality,
-			study,study_date,
-			series,series_date,
-			&is_image,&is_softcopy);
-		tableWidget->setRowCount(idx+1);
-		tableWidget->setItem(idx,0,static_cast<QTableWidgetItem*>(i));
+			study, study_date,
+			series, series_date,
+			&is_image, &is_softcopy);
+		tableWidget->setRowCount(idx + 1);
+		tableWidget->setItem(idx, 0, static_cast<QTableWidgetItem*>(i));
 		if (is_image)
 		{
-			tableWidget->setItem(idx,1,new QTableWidgetItem(eye_icon,QString("")));
+			tableWidget->setItem(idx, 1, new QTableWidgetItem(eye_icon, QString("")));
 		}
 		else if (is_softcopy)
 		{
-			tableWidget->setItem(idx,1,new QTableWidgetItem(eye2_icon,QString("")));
+			tableWidget->setItem(idx, 1, new QTableWidgetItem(eye2_icon, QString("")));
 		}
-		tableWidget->setItem(idx,2,new QTableWidgetItem(modality));
-		tableWidget->setItem(idx,3,new QTableWidgetItem(
+		tableWidget->setItem(idx, 2, new QTableWidgetItem(modality));
+		tableWidget->setItem(idx, 3, new QTableWidgetItem(
 			DicomUtils::convert_pn_value(name.remove(QChar('\0')))));
-		tableWidget->setItem(idx,4,new QTableWidgetItem(birthdate));
-		tableWidget->setItem(idx,5,new QTableWidgetItem(study.remove(QChar('\0'))));
-		tableWidget->setItem(idx,6,new QTableWidgetItem(study_date));
-		tableWidget->setItem(idx,7,new QTableWidgetItem(series.remove(QChar('\0'))));
-		tableWidget->setItem(idx,8,new QTableWidgetItem(series_date));
-		tableWidget->setItem(idx,9,new QTableWidgetItem(QString("1")));
+		tableWidget->setItem(idx, 4, new QTableWidgetItem(birthdate));
+		tableWidget->setItem(idx, 5, new QTableWidgetItem(study.remove(QChar('\0'))));
+		tableWidget->setItem(idx, 6, new QTableWidgetItem(study_date));
+		tableWidget->setItem(idx, 7, new QTableWidgetItem(series.remove(QChar('\0'))));
+		tableWidget->setItem(idx, 8, new QTableWidgetItem(series_date));
+		tableWidget->setItem(idx, 9, new QTableWidgetItem(QString("1")));
 		pd->setValue(-1);
 		qApp->processEvents();
 		if (pd->wasCanceled()) return;
@@ -400,10 +410,12 @@ void BrowserWidget2::process_directory(const QString & p, const mdcm::Dict & dic
 	if (!pd->wasCanceled())
 	{
 		for (int j = 0; j < dlist.size(); ++j)
+		{
 			process_directory(
 				dir.absolutePath() + QString("/") + dlist.at(j),
 				dict,
 				pd);
+		}
 	}
 	dlist.clear();
 }
@@ -438,13 +450,13 @@ void BrowserWidget2::open_DICOMDIR2(const QString & f)
 	{
 		warning = read_DICOMDIR(f);
 	}
-	catch(mdcm::ParseException & pe)
+	catch (mdcm::ParseException & pe)
 	{
 		std::cout
 			<< "mdcm::ParseException in BrowserWidget2::open_DICOMDIR2:\n"
 			<< pe.GetLastElement().GetTag() << std::endl;
 	}
-	catch(std::exception & ex)
+	catch (std::exception & ex)
 	{
 		std::cout << "Exception in BrowserWidget2::open_DICOMDIR2:\n"
 			<< ex.what() << std::endl;
@@ -456,7 +468,7 @@ void BrowserWidget2::open_DICOMDIR2(const QString & f)
 		mbox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 		mbox.setDefaultButton(QMessageBox::Yes);
 		mbox.setText(warning+QString("\nScan directory?"));
-		int r = mbox.exec();
+		const int r = mbox.exec();
 		bool scan = false;
 		switch (r)
 		{
@@ -487,7 +499,9 @@ void BrowserWidget2::dropEvent(QDropEvent * e)
 	{
 		QList<QUrl> urls = mimeData->urls();
 		for (int i = 0; i < urls.size() && i < 128; ++i)
+		{
 			l.append(urls.at(i).toLocalFile());
+		}
 	}
 	if (l.size() >= 1)
 	{
@@ -555,13 +569,13 @@ void BrowserWidget2::reload_dir()
 				warning = read_DICOMDIR(QDir::fromNativeSeparators(
 							directory_lineEdit->text()));
 			}
-			catch(mdcm::ParseException & pe)
+			catch (mdcm::ParseException & pe)
 			{
 				std::cout
 					<< "mdcm::ParseException in BrowserWidget2::reload_dir:\n"
 					<< pe.GetLastElement().GetTag() << std::endl;
 			}
-			catch(std::exception & ex)
+			catch (std::exception & ex)
 			{
 				std::cout << "Exception in BrowserWidget2::reload_dir:\n"
 					<< ex.what() << std::endl;
@@ -574,7 +588,7 @@ void BrowserWidget2::reload_dir()
 					QMessageBox::Yes | QMessageBox::No);
 				mbox.setDefaultButton(QMessageBox::Yes);
 				mbox.setText(warning+QString("\nScan directory?"));
-				int r = mbox.exec();
+				const int r = mbox.exec();
 				bool scan = false;
 				switch (r)
 				{
@@ -708,7 +722,7 @@ void BrowserWidget2::open_DICOMDIR()
 		mbox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 		mbox.setDefaultButton(QMessageBox::Yes);
 		mbox.setText(warning+QString("\nScan directory?"));
-		int r = mbox.exec();
+		const int r = mbox.exec();
 		bool scan = false;
 		switch (r)
 		{
@@ -799,7 +813,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 	}
 	//
 	std::set<mdcm::DataElement>::const_iterator it = ds.GetDES().cbegin();
-	while(it != ds.GetDES().cend())
+	while (it != ds.GetDES().cend())
 	{
 		if (it->GetTag() == tDirectoryRecordSequence)
 		{
@@ -856,7 +870,10 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 							{
 								const mdcm::DataElement & e1 = nds.GetDataElement(tSpecificCharacterSet);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
-									charset = QString::fromLatin1(e1.GetByteValue()->GetPointer(),e1.GetByteValue()->GetLength());
+								{
+									charset = QString::fromLatin1(
+										e1.GetByteValue()->GetPointer(),e1.GetByteValue()->GetLength());
+								}
 							}
 							if (nds.FindDataElement(tPatientsName))
 							{
@@ -888,7 +905,10 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 							{
 								const mdcm::DataElement & e1 = nds.GetDataElement(tSpecificCharacterSet);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
-									charset = QString::fromLatin1(e1.GetByteValue()->GetPointer(),e1.GetByteValue()->GetLength());
+								{
+									charset = QString::fromLatin1(
+										e1.GetByteValue()->GetPointer(),e1.GetByteValue()->GetLength());
+								}
 							}
 							if (nds.FindDataElement(tStudyDate))
 							{
@@ -920,7 +940,10 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 							{
 								const mdcm::DataElement & e1 = nds.GetDataElement(tSpecificCharacterSet);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
-									charset = QString::fromLatin1(e1.GetByteValue()->GetPointer(),e1.GetByteValue()->GetLength());
+								{
+									charset = QString::fromLatin1(
+										e1.GetByteValue()->GetPointer(),e1.GetByteValue()->GetLength());
+								}
 							}
 							if (nds.FindDataElement(tModality))
 							{
@@ -945,7 +968,6 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 									ed.series_date = qd.toString(QString("d MMM yyyy")) + QString("\n");
 								}
 							}
-
 							if (nds.FindDataElement(tSeriesDescription))
 							{
 								const mdcm::DataElement & e1 = nds.GetDataElement(tSeriesDescription);
@@ -965,7 +987,10 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 							{
 								const mdcm::DataElement & e1 = nds.GetDataElement(tSpecificCharacterSet);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
-									charset = QString::fromLatin1(e1.GetByteValue()->GetPointer(),e1.GetByteValue()->GetLength());
+								{
+									charset = QString::fromLatin1(
+										e1.GetByteValue()->GetPointer(),e1.GetByteValue()->GetLength());
+								}
 							}
 							if (nds.FindDataElement(tReferencedFileID))
 							{
@@ -980,7 +1005,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 									for (int x = 0; x < l2size; ++x)
 									{
 										fpath.append(l2.at(x));
-										if (x!=l2size-1) fpath.append(QString("/"));
+										if (x != l2size - 1) fpath.append(QString("/"));
 									}
 									ed.file = fpath;
 								}
@@ -1031,8 +1056,14 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 						e.birthdate,
 						&not_patient_study_series_model);
 				}
-				if (mi.hasNext()) { mi.next(); }
-				else { break; }
+				if (mi.hasNext())
+				{
+					mi.next();
+				}
+				else
+				{
+					break;
+				}
 			}
 		}
 	}
@@ -1075,25 +1106,27 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 #endif
 		TableWidgetItem * i = new TableWidgetItem(ids);
 		for (int z = 0; z < series.at(x).files.size(); ++z)
+		{
 			i->files.push_back(dir_ + QString("/") + series.at(x).files.at(z));
-		tableWidget->setRowCount(idx+1);
-		tableWidget->setItem(idx,0,static_cast<QTableWidgetItem*>(i));
+		}
+		tableWidget->setRowCount(idx + 1);
+		tableWidget->setItem(idx, 0, static_cast<QTableWidgetItem*>(i));
 		if (series.at(x).eye)
 		{
-			tableWidget->setItem(idx,1,new QTableWidgetItem(eye_icon,QString("")));
+			tableWidget->setItem(idx, 1, new QTableWidgetItem(eye_icon, QString("")));
 		}
 		else if (series.at(x).eye2)
 		{
-			tableWidget->setItem(idx,1,new QTableWidgetItem(eye2_icon,QString("")));
+			tableWidget->setItem(idx, 1, new QTableWidgetItem(eye2_icon, QString("")));
 		}
-		tableWidget->setItem(idx,2,new QTableWidgetItem(series.at(x).modality));
-		tableWidget->setItem(idx,3,new QTableWidgetItem(series.at(x).patient));
-		tableWidget->setItem(idx,4,new QTableWidgetItem(series.at(x).birthdate));
-		tableWidget->setItem(idx,5,new QTableWidgetItem(series.at(x).study));
-		tableWidget->setItem(idx,6,new QTableWidgetItem(series.at(x).study_date));
-		tableWidget->setItem(idx,7,new QTableWidgetItem(series.at(x).series));
-		tableWidget->setItem(idx,8,new QTableWidgetItem(series.at(x).series_date));
-		tableWidget->setItem(idx,9,new QTableWidgetItem(QVariant(i->files.size()).toString()));
+		tableWidget->setItem(idx, 2, new QTableWidgetItem(series.at(x).modality));
+		tableWidget->setItem(idx, 3, new QTableWidgetItem(series.at(x).patient));
+		tableWidget->setItem(idx, 4, new QTableWidgetItem(series.at(x).birthdate));
+		tableWidget->setItem(idx, 5, new QTableWidgetItem(series.at(x).study));
+		tableWidget->setItem(idx, 6, new QTableWidgetItem(series.at(x).study_date));
+		tableWidget->setItem(idx, 7, new QTableWidgetItem(series.at(x).series));
+		tableWidget->setItem(idx, 8, new QTableWidgetItem(series.at(x).series_date));
+		tableWidget->setItem(idx, 9, new QTableWidgetItem(QVariant(i->files.size()).toString()));
 	}
 	//
 	QApplication::restoreOverrideCursor();
@@ -1217,15 +1250,14 @@ unsigned int BrowserWidget2::add_file(
 {
 	if (!m.contains(offset)) return 0;
 	const EntryDICOMDIR & e = m.value(offset);
-	if (e.directoryRecordType==QString("IMAGE") ||
-		e.directoryRecordType==QString("RT STRUCTURE SET") ||
-		e.directoryRecordType==QString("SPECTROSCOPY"))
+	if (e.directoryRecordType == QString("IMAGE") ||
+		e.directoryRecordType == QString("RT STRUCTURE SET") ||
+		e.directoryRecordType == QString("SPECTROSCOPY"))
 	{
 		s.eye = true;
 	}
-	else if(
-		e.directoryRecordType==QString("PRESENTATION") ||
-		e.directoryRecordType==QString("SR DOCUMENT"))
+	else if(e.directoryRecordType == QString("PRESENTATION") ||
+		e.directoryRecordType == QString("SR DOCUMENT"))
 	{
 		s.eye2 = true;
 	}
@@ -1262,12 +1294,14 @@ void BrowserWidget2::read_tags_(
 	QString charset = QString("");
 	QString sop = QString("");
 	//
-	if(ds.FindDataElement(tSpecificCharacterSet))
+	if (ds.FindDataElement(tSpecificCharacterSet))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tSpecificCharacterSet);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
-			charset =
-				QString::fromLatin1(e.GetByteValue()->GetPointer(),e.GetByteValue()->GetLength());
+		{
+			charset = QString::fromLatin1(
+				e.GetByteValue()->GetPointer(), e.GetByteValue()->GetLength());
+		}
 	}
 	//
 	if (ds.FindDataElement(tSOPClassUID))
@@ -1275,13 +1309,13 @@ void BrowserWidget2::read_tags_(
 		const mdcm::DataElement & e = ds.GetDataElement(tSOPClassUID);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
 		{
-			sop =
-				QString::fromLatin1(e.GetByteValue()->GetPointer(),
-									e.GetByteValue()->GetLength()).trimmed().remove(QChar('\0'));
+			sop = QString::fromLatin1(
+				e.GetByteValue()->GetPointer(),
+				e.GetByteValue()->GetLength()).trimmed().remove(QChar('\0'));
 		}
 	}
 	//
-	if(ds.FindDataElement(tStudyDate))
+	if (ds.FindDataElement(tStudyDate))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tStudyDate);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
@@ -1299,12 +1333,12 @@ void BrowserWidget2::read_tags_(
 		const mdcm::DataElement & e = ds.GetDataElement(tModality);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
 		{
-			modality_ =
-				QString::fromLatin1(e.GetByteValue()->GetPointer(),e.GetByteValue()->GetLength());
+			modality_ = QString::fromLatin1(
+				e.GetByteValue()->GetPointer(),e.GetByteValue()->GetLength());
 		}
 	}
 	//
-	if(ds.FindDataElement(tStudyDescription))
+	if (ds.FindDataElement(tStudyDescription))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tStudyDescription);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
@@ -1315,7 +1349,7 @@ void BrowserWidget2::read_tags_(
 		}
 	}
 	//
-	if(ds.FindDataElement(tSeriesDescription))
+	if (ds.FindDataElement(tSeriesDescription))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tSeriesDescription);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
@@ -1326,7 +1360,7 @@ void BrowserWidget2::read_tags_(
 		}
 	}
 	//
-	if(ds.FindDataElement(tSeriesDate))
+	if (ds.FindDataElement(tSeriesDate))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tSeriesDate);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
@@ -1339,7 +1373,7 @@ void BrowserWidget2::read_tags_(
 		}
 	}
 	//
-	if(ds.FindDataElement(tPatientsName))
+	if (ds.FindDataElement(tPatientsName))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tPatientsName);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
@@ -1350,7 +1384,7 @@ void BrowserWidget2::read_tags_(
 		}
 	}
 	//
-	if(ds.FindDataElement(tPatientsBirthDate))
+	if (ds.FindDataElement(tPatientsBirthDate))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tPatientsBirthDate);
 		std::stringstream ss;
@@ -1367,17 +1401,17 @@ void BrowserWidget2::read_tags_(
 	bool has_rows         = false;
 	bool has_colums       = false;
 	bool has_bitallocated = false;
-	if(ds.FindDataElement(tRows))
+	if (ds.FindDataElement(tRows))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tRows);
 		if (!e.IsEmpty()) has_rows = true;
 	}
-	if(ds.FindDataElement(tColumns))
+	if (ds.FindDataElement(tColumns))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tColumns);
 		if (!e.IsEmpty()) has_colums = true;
 	}
-	if(ds.FindDataElement(tBitsAllocated))
+	if (ds.FindDataElement(tBitsAllocated))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tBitsAllocated);
 		if (!e.IsEmpty()) has_bitallocated = true;
@@ -1385,46 +1419,50 @@ void BrowserWidget2::read_tags_(
 	bool is_image_tmp = has_rows && has_colums && has_bitallocated;
 	//
 	// RTSTRUCT, spectroscopy, meshes
-	if (sop==QString("1.2.840.10008.5.1.4.1.1.481.3") ||
-		sop==QString("1.2.840.10008.5.1.4.1.1.4.2")   ||
-		sop==QString("1.2.840.10008.5.1.4.1.1.68.1")  ||
-		sop==QString("1.2.840.10008.5.1.4.1.1.66.5"))
+	if (sop == QString("1.2.840.10008.5.1.4.1.1.481.3") ||
+		sop == QString("1.2.840.10008.5.1.4.1.1.4.2")   ||
+		sop == QString("1.2.840.10008.5.1.4.1.1.68.1")  ||
+		sop == QString("1.2.840.10008.5.1.4.1.1.66.5"))
+	{
 		is_image_tmp = true;
+	}
 	*is_image = is_image_tmp;
 	// Presentation, SR
-	if (   sop==QString("1.2.840.10008.5.1.4.1.1.11.1")  // Grayscale Softcopy Presentation State Storage
+	if (   sop == QString("1.2.840.10008.5.1.4.1.1.11.1")  // Grayscale Softcopy Presentation State Storage
 #if 0
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.11.2")  // Color Softcopy Presentation State Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.11.3")  // Pseudo-Color Softcopy Presentation State Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.11.4")  // Blending Softcopy Presentation State Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.11.5")  // XA/XRF Grayscale Softcopy Presentation State Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.11.6")  // Grayscale Planar MPR Volumetric Presentation State Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.11.7")  // Compositing Planar MPR Volumetric Presentation State Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.11.8")  // Advanced Blending Presentation State Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.11.9")  // Volume Rendering Volumetric Presentation State Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.11.10") // Segmented Volume Rendering Volumetric Presentation State Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.11.11") // Multiple Volume Rendering Volumetric Presentation State Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.11.2")  // Color Softcopy Presentation State Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.11.3")  // Pseudo-Color Softcopy Presentation State Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.11.4")  // Blending Softcopy Presentation State Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.11.5")  // XA/XRF Grayscale Softcopy Presentation State Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.11.6")  // Grayscale Planar MPR Volumetric Presentation State Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.11.7")  // Compositing Planar MPR Volumetric Presentation State Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.11.8")  // Advanced Blending Presentation State Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.11.9")  // Volume Rendering Volumetric Presentation State Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.11.10") // Segmented Volume Rendering Volumetric Presentation State Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.11.11") // Multiple Volume Rendering Volumetric Presentation State Storage
 #endif
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.11") // Basic Text SR Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.22") // Enhanced SR Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.33") // Comprehensive SR Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.34") // Comprehensive 3D SR Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.35") // Extensible SR Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.40") // Procedure Log Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.50") // Mammography CAD SR Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.59") // Key Object Selection Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.65") // Chest CAD SR Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.67") // X-Ray Radiation Dose SR Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.68") // Radiopharmaceutical Radiation Dose SR Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.69") // Colon CAD SR Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.70") // Implantation Plan SR Document Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.71") // Acquisition Context SR Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.72") // Simplified Adult Echo SR Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.73") // Patient Radiation Dose SR Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.74") // Planned Imaging Agent Administration SR Storage
-		|| sop==QString("1.2.840.10008.5.1.4.1.1.88.75") // Performed Imaging Agent Administration SR Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.88.11") // Basic Text SR Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.88.22") // Enhanced SR Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.88.33") // Comprehensive SR Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.88.34") // Comprehensive 3D SR Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.88.35") // Extensible SR Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.88.40") // Procedure Log Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.88.50") // Mammography CAD SR Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.88.59") // Key Object Selection Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.88.65") // Chest CAD SR Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.88.67") // X-Ray Radiation Dose SR Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.88.68") // Radiopharmaceutical Radiation Dose SR Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.88.69") // Colon CAD SR Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.88.70") // Implantation Plan SR Document Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.88.71") // Acquisition Context SR Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.88.72") // Simplified Adult Echo SR Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.88.73") // Patient Radiation Dose SR Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.88.74") // Planned Imaging Agent Administration SR Storage
+		|| sop == QString("1.2.840.10008.5.1.4.1.1.88.75") // Performed Imaging Agent Administration SR Storage
 		)
-		*is_softcopy = true;
+		{
+			*is_softcopy = true;
+		}
 }
 
 void BrowserWidget2::read_tags_short_(
@@ -1450,22 +1488,22 @@ void BrowserWidget2::read_tags_short_(
 	bool has_colums       = false;
 	bool has_bitallocated = false;
 	bool has_pixelrepres  = false;
-	if(ds.FindDataElement(tRows))
+	if (ds.FindDataElement(tRows))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tRows);
 		if (!e.IsEmpty()) has_rows = true;
 	}
-	if(ds.FindDataElement(tColumns))
+	if (ds.FindDataElement(tColumns))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tColumns);
 		if (!e.IsEmpty()) has_colums = true;
 	}
-	if(ds.FindDataElement(tBitsAllocated))
+	if (ds.FindDataElement(tBitsAllocated))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tBitsAllocated);
 		if (!e.IsEmpty()) has_bitallocated = true;
 	}
-	if(ds.FindDataElement(tPixelRepresentation))
+	if (ds.FindDataElement(tPixelRepresentation))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tPixelRepresentation);
 		if (!e.IsEmpty()) has_pixelrepres = true;
@@ -1492,7 +1530,9 @@ void BrowserWidget2::read_tags_short_(
 				else if (
 					sop == QString("1.2.840.10008.5.1.4.1.1.11.1") ||
 					sop == QString("1.2.840.10008.5.1.4.1.1.11.2"))
+				{
 					*is_softcopy = true;
+				}
 			}
 		}
 	}
@@ -1552,7 +1592,7 @@ void BrowserWidget2::readSettings()
 		settings.value(QString("ctk_apply_range"), QString("N")).toString();
 	settings.endGroup();
 	if (r == QString("Y")) ctk_apply_range = true;
-	else ctk_apply_range = false;
+	else                   ctk_apply_range = false;
 #else
 	{
 		const QString f1_ =
@@ -1640,9 +1680,13 @@ void BrowserWidget2::open_CTK_db()
 		QString("/") +
 		QString("ctkDICOM.sql");
 	if (QSqlDatabase::contains(QString("CTKdb")))
+	{
 		db = QSqlDatabase::database("CTKdb");
+	}
 	else
+	{
 		db = QSqlDatabase::addDatabase(QString("QSQLITE"), "CTKdb");
+	}
 	db.setConnectOptions(QString("QSQLITE_OPEN_READONLY"));
 	db.setDatabaseName(dbfile);
 	if (!db.open(QString(""), QString("")))
@@ -1651,7 +1695,7 @@ void BrowserWidget2::open_CTK_db()
 		goto quit__;
 	}
 	p0 = QString("select UID from Patients");
-	if (!ctk_pname.isEmpty()||!ctk_pid.isEmpty())
+	if (!ctk_pname.isEmpty() || !ctk_pid.isEmpty())
 	{
 		p0 += QString(" where ");
 		if (!ctk_pname.isEmpty())
@@ -1668,7 +1712,7 @@ void BrowserWidget2::open_CTK_db()
 		}
 	}
 	p0Query = QSqlQuery(p0, db);
-	while(p0Query.next())
+	while (p0Query.next())
 	{
 		ids << p0Query.value(0).toInt();
 	}
@@ -1679,7 +1723,7 @@ void BrowserWidget2::open_CTK_db()
 		if (ctk_apply_range)
 		{
 			p1.append(QString(" where StudyDate between ") + ctk_from +
-			QString(" and ") + ctk_to);
+				QString(" and ") + ctk_to);
 		}
 	}
 	else
@@ -1705,11 +1749,11 @@ void BrowserWidget2::open_CTK_db()
 		if (ctk_apply_range)
 		{
 			p1.append(QString("and StudyDate between ") + ctk_from +
-			QString(" and ") + ctk_to);
+				QString(" and ") + ctk_to);
 		}
 	}
 	p1Query = QSqlQuery(p1, db);
-	while(p1Query.next())
+	while (p1Query.next())
 	{
 		ctk_studies.push_back(p1Query.value(0).toString());
 	}
@@ -1722,7 +1766,7 @@ void BrowserWidget2::open_CTK_db()
 	}
 	p2.append(QString(")"));
 	p2Query = QSqlQuery(p2, db);
-	while(p2Query.next())
+	while (p2Query.next())
 	{
 		ctk_series.push_back(p2Query.value(0).toString());
 	}
@@ -1827,22 +1871,22 @@ void BrowserWidget2::open_CTK_db()
 		{
 			i->files.push_back(series.at(x).files.at(z));
 		}
-		tableWidget->setRowCount(idx+1);
-		tableWidget->setItem(idx,0,static_cast<QTableWidgetItem*>(i));
+		tableWidget->setRowCount(idx + 1);
+		tableWidget->setItem(idx, 0, static_cast<QTableWidgetItem*>(i));
 #if 0
 		if (series.at(x).eye)
-			tableWidget->setItem(idx,1,new QTableWidgetItem(eye_icon,QString("")));
+			tableWidget->setItem(idx, 1, new QTableWidgetItem(eye_icon, QString("")));
 		else if (series.at(x).eye2)
-			tableWidget->setItem(idx,1,new QTableWidgetItem(eye2_icon,QString("")));
+			tableWidget->setItem(idx, 1, new QTableWidgetItem(eye2_icon, QString("")));
 #endif
-		tableWidget->setItem(idx,2,new QTableWidgetItem(series.at(x).modality));
-		tableWidget->setItem(idx,3,new QTableWidgetItem(series.at(x).patient));
-		tableWidget->setItem(idx,4,new QTableWidgetItem(series.at(x).birthdate));
-		tableWidget->setItem(idx,5,new QTableWidgetItem(series.at(x).study));
-		tableWidget->setItem(idx,6,new QTableWidgetItem(series.at(x).study_date));
-		tableWidget->setItem(idx,7,new QTableWidgetItem(series.at(x).series));
-		tableWidget->setItem(idx,8,new QTableWidgetItem(series.at(x).series_date));
-		tableWidget->setItem(idx,9,new QTableWidgetItem(QVariant(i->files.size()).toString()));
+		tableWidget->setItem(idx, 2, new QTableWidgetItem(series.at(x).modality));
+		tableWidget->setItem(idx, 3, new QTableWidgetItem(series.at(x).patient));
+		tableWidget->setItem(idx, 4, new QTableWidgetItem(series.at(x).birthdate));
+		tableWidget->setItem(idx, 5, new QTableWidgetItem(series.at(x).study));
+		tableWidget->setItem(idx, 6, new QTableWidgetItem(series.at(x).study_date));
+		tableWidget->setItem(idx, 7, new QTableWidgetItem(series.at(x).series));
+		tableWidget->setItem(idx, 8, new QTableWidgetItem(series.at(x).series_date));
+		tableWidget->setItem(idx, 9, new QTableWidgetItem(QVariant(i->files.size()).toString()));
 	}
 	db.close();
 quit__:
@@ -1856,4 +1900,3 @@ quit__:
 	}
 }
 #endif
-
