@@ -18,10 +18,10 @@
 #include <itkContinuousIndex.h>
 #include "vectormath/scalar/vectormath.h"
 
-typedef Vectormath::Scalar::Vector3 sVector3;
-
 namespace
 {
+
+typedef Vectormath::Scalar::Vector3 sVector3;
 
 template <typename T> void calculate_uvt(
 	const typename T::Pointer image,

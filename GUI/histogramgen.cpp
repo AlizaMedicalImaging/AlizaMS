@@ -1,17 +1,17 @@
 #include "structures.h"
 #include "histogramgen.h"
-
 #include "itkImage.h"
 #include "itkScalarImageToHistogramGenerator.h"
 #include "itkImageToHistogramFilter.h"
-
 #include <QPixmap>
 #include <QPainter>
 #include <QPainterPath>
 #include <QApplication>
 #include <QPalette>
-
 #include "updateqtcommand.h"
+
+namespace
+{
 
 template<typename T> QString calculate_histogramm(
 	bool * ok,
@@ -277,6 +277,8 @@ template<typename T> QString calculate_histogramm_rgb(
 	//
 	*ok=true;
 	return QString("");
+}
+
 }
 
 void HistogramGen::run()

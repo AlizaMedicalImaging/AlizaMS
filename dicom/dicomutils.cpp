@@ -92,6 +92,11 @@
 #include "alizalcms/lcms2.h"
 #endif
 
+static short force_suppllut = 0;
+
+namespace
+{
+
 typedef Vectormath::Scalar::Vector3 sVector3;
 typedef Vectormath::Scalar::Vector4 sVector4;
 typedef Vectormath::Scalar::Matrix4 sMatrix4;
@@ -106,11 +111,6 @@ typedef struct
 	QString photometric;
 	QString sop;
 } MixedDicomSeriesInfo;
-
-static short force_suppllut = 0;
-namespace
-{
-
 
 struct IPPIOP
 {

@@ -59,8 +59,6 @@
 #endif
 #endif
 
-typedef Vectormath::Scalar::Vector3 sVector3;
-
 static QString screenshot_dir("");
 static QString save_dir("");
 static QString open_dir("");
@@ -68,6 +66,8 @@ static double saved_total_memory = 0.0;
 
 namespace
 {
+
+typedef Vectormath::Scalar::Vector3 sVector3;
 
 double abs_max(double x, double y, double z)
 {

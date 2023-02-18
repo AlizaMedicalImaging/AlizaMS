@@ -51,6 +51,9 @@
 
 static int expanded_items = 0;
 
+namespace
+{
+
 const QString css1 =
 	QString(
 		"span.y4 { color:#050505; font-size: medium; font-weight: bold;}\n"
@@ -59,9 +62,6 @@ const QString css1 =
 const QString head = QString(
 	"<html><head><link rel='stylesheet' type='text/css' href='format.css'></head><body>");
 const QString foot = QString("</body></html>");
-
-namespace
-{
 
 template <typename T, long long TVR>
 void get_bin_values(
