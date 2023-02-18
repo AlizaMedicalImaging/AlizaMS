@@ -27,9 +27,6 @@
 #include "itkExtractImageFilter.h"
 #include "itkMath.h"
 
-static bool SRUtils_asked_for_path_once = false;
-static QString SRUtils_selected_path("");
-
 namespace
 {
 
@@ -39,7 +36,9 @@ template<typename Tin, typename Tout> QString gs3(
 	int idx)
 {
 	if (image.IsNull())
+	{
 		return QString("gs3<>() : image.IsNull()");
+	}
 	typedef itk::ExtractImageFilter<Tin, Tout> FilterType;
 	typename FilterType::Pointer filter = FilterType::New();
 	const typename Tin::RegionType inRegion =
@@ -53,9 +52,9 @@ template<typename Tin, typename Tout> QString gs3(
 		return QString("gs3<>() : invalid index");
 	}
 	index[2] = idx;
-	out_size[0]=size[0];
-	out_size[1]=size[1];
-	out_size[2]=0;
+	out_size[0] = size[0];
+	out_size[1] = size[1];
+	out_size[2] = 0;
 	outRegion.SetSize(out_size);
 	outRegion.SetIndex(index);
 	try
@@ -87,21 +86,26 @@ template<typename T> SRImage li3(
 	const typename T::Pointer & image,
 	ImageVariant * ivariant)
 {
-	if (image.IsNull()||!ivariant) return SRImage();
+	if (image.IsNull() || !ivariant) return SRImage();
 	const typename T::SpacingType spacing = image->GetSpacing();
 	const typename T::RegionType region   = image->GetLargestPossibleRegion();
 	const typename T::SizeType size       = region.GetSize();
 	const short lut = 0;
 	const int lut_function = 0;
-	const unsigned int p_size = 3*size[0]*size[1];
-	unsigned char * p = NULL;
-	try { p = new unsigned char[p_size]; }
-	catch (const std::bad_alloc&) { p = NULL; }
-	if (!p) return SRImage();
+	const unsigned int p_size = 3 * size[0] * size[1];
+	unsigned char * p;
+	try
+	{
+		p = new unsigned char[p_size];
+	}
+	catch (const std::bad_alloc&)
+	{
+		return SRImage();
+	}
 	//
 	std::vector<QThread*> threadsLUT_;
 	const int num_threads = QThread::idealThreadCount();
-	const int tmp99 = size[1]%num_threads;
+	const int tmp99 = size[1] % num_threads;
 	const double center = ivariant->di->us_window_center;
 	const double width  = ivariant->di->us_window_width;
 	if (tmp99 == 0)
@@ -110,61 +114,68 @@ template<typename T> SRImage li3(
 		for (int i = 0; i<num_threads; ++i)
 		{
 			const int size_0 = size[0];
-			const int size_1 = size[1]/num_threads;
+			const int size_1 = size[1] / num_threads;
 			const int index_0 = 0;
-			const int index_1 = i*size_1;
-			ProcessImageThreadLUT_<T> * t__ = new ProcessImageThreadLUT_<T>(image,
+			const int index_1 = i * size_1;
+			ProcessImageThreadLUT_<T> * t__ = new ProcessImageThreadLUT_<T>(
+						image,
 						p,
 						size_0,  size_1,
 						index_0, index_1, j,
 						center, width,
-						lut, false,lut_function);
-			j += 3*(size_0*size_1);
+						lut, false, lut_function);
+			j += 3 * size_0 * size_1;
 			threadsLUT_.push_back(static_cast<QThread*>(t__));
 			t__->start();
 		}
 	}
 	else
 	{
-		int j=0;
+		int j = 0;
 		unsigned int block = 64;
-		if (static_cast<float>(size[1])/static_cast<float>(block)>16.0f) block=128;
-		const int tmp100 = size[1]%block;
-		const int incr = static_cast<int>(floor(size[1]/static_cast<double>(block)));
+		if (static_cast<float>(size[1]) / static_cast<float>(block) > 16.0f)
+		{
+			block = 128;
+		}
+		const int tmp100 = size[1] % block;
+		const int incr = static_cast<int>(floor(size[1] / static_cast<double>(block)));
 		if (size[1] > block)
 		{
-			for (int i=0; i<incr; ++i)
+			for (int i = 0; i < incr; ++i)
 			{
 				const int size_0 = size[0];
 				const int index_0 = 0;
-				const int index_1 = i*block;
-				ProcessImageThreadLUT_<T> * t__ = new ProcessImageThreadLUT_<T>(image,
+				const int index_1 = i * block;
+				ProcessImageThreadLUT_<T> * t__ = new ProcessImageThreadLUT_<T>(
+							image,
 							p,
 							size_0,  block,
 							index_0, index_1, j,
 							center, width,
-							lut, false,lut_function);
-				j += 3*(size_0*block);
+							lut, false, lut_function);
+				j += 3 * size_0 * block;
 				threadsLUT_.push_back(static_cast<QThread*>(t__));
 				t__->start();
 			}
-			ProcessImageThreadLUT_<T> * lt__ = new ProcessImageThreadLUT_<T>(image,
+			ProcessImageThreadLUT_<T> * lt__ = new ProcessImageThreadLUT_<T>(
+						image,
 						p,
 						size[0],  tmp100,
-						0, incr*block, j,
+						0, incr * block, j,
 						ivariant->di->us_window_center, ivariant->di->us_window_width,
-						lut, false,lut_function);
+						lut, false, lut_function);
 			threadsLUT_.push_back(static_cast<QThread*>(lt__));
 			lt__->start();
 		}
 		else
 		{
-			ProcessImageThreadLUT_<T> * lt__ = new ProcessImageThreadLUT_<T>(image,
+			ProcessImageThreadLUT_<T> * lt__ = new ProcessImageThreadLUT_<T>(
+						image,
 						p,
 						size[0],  size[1],
 						0, 0, 0,
 						center, width,
-						lut, false,lut_function);
+						lut, false, lut_function);
 			threadsLUT_.push_back(static_cast<QThread*>(lt__));
 			lt__->start();
 		}
@@ -190,9 +201,9 @@ template<typename T> SRImage li3(
 	sr.sx = spacing[0];
 	sr.sy = spacing[1];
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	sr.i = QImage(p,size[0],size[1],3*size[0],QImage::Format_RGB888,srImageCleanupHandler,p);
+	sr.i = QImage(p, size[0], size[1], 3 * size[0], QImage::Format_RGB888, srImageCleanupHandler, p);
 #else
-	sr.i = QImage(p,size[0],size[1],3*size[0],QImage::Format_RGB888);
+	sr.i = QImage(p, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
 	sr.p = p;
 #endif
 	return sr;
@@ -202,25 +213,28 @@ template<typename T> SRImage lrgb3(
 	const typename T::Pointer & image,
 	ImageVariant * ivariant)
 {
-	if (!ivariant||image.IsNull()) return SRImage();
+	if (!ivariant || image.IsNull()) return SRImage();
 	const typename T::RegionType region = image->GetLargestPossibleRegion();
 	const typename T::SizeType size = region.GetSize();
 	const typename T::SpacingType spacing = image->GetSpacing();
-	unsigned char * p__  = NULL;
+	const unsigned short bits_allocated = ivariant->di->bits_allocated;
+	const unsigned short bits_stored    = ivariant->di->bits_stored;
+	unsigned char * p__;
 	unsigned int j_ = 0;
-	const unsigned short bits_allocated   = ivariant->di->bits_allocated;
-	const unsigned short bits_stored      = ivariant->di->bits_stored;
-	const unsigned short high_bit         = ivariant->di->high_bit;
 	if (ivariant->image_type == 11)
 	{
 		const double tmp_max
 			= ((bits_allocated > 0 && bits_stored > 0) &&
-				bits_stored < bits_allocated &&
-				(high_bit==bits_stored-1))
+				bits_stored < bits_allocated)
 				? pow(2, bits_stored) - 1 : static_cast<double>(USHRT_MAX);
-		try { p__ = new unsigned char[size[0]*size[1]*3]; }
-		catch (const std::bad_alloc&) { p__ = NULL; }
-		if (!p__) return SRImage();
+		try
+		{
+			p__ = new unsigned char[size[0] * size[1] * 3];
+		}
+		catch (const std::bad_alloc&)
+		{
+			return SRImage();
+		}
 		try
 		{
 			itk::ImageRegionConstIterator<T> iterator(image, region);
@@ -241,9 +255,14 @@ template<typename T> SRImage lrgb3(
 	}
 	else
 	{
-		try { p__ = new unsigned char[size[0]*size[1]*3]; }
-		catch(const std::bad_alloc&) { p__ = NULL; }
-		if (!p__) return SRImage();
+		try
+		{
+			p__ = new unsigned char[size[0] * size[1] * 3];
+		}
+		catch(const std::bad_alloc&)
+		{
+			return SRImage();
+		}
 		const double vmin = ivariant->di->vmin;
 		const double vmax = ivariant->di->vmax;
 		const double vrange = vmax - vmin;
@@ -258,9 +277,9 @@ template<typename T> SRImage lrgb3(
 					const double b = iterator.Get().GetBlue();
 					const double g = iterator.Get().GetGreen();
 					const double r = iterator.Get().GetRed();
-					p__[j_+2] = static_cast<unsigned char>(255.0*((b+(-vmin))/vrange));
-					p__[j_+1] = static_cast<unsigned char>(255.0*((g+(-vmin))/vrange));
-					p__[j_+0] = static_cast<unsigned char>(255.0*((r+(-vmin))/vrange));
+					p__[j_ + 2] = static_cast<unsigned char>(255.0 * ((b + (-vmin)) / vrange));
+					p__[j_ + 1] = static_cast<unsigned char>(255.0 * ((g + (-vmin)) / vrange));
+					p__[j_ + 0] = static_cast<unsigned char>(255.0 * ((r + (-vmin)) / vrange));
 					j_ += 3;
 					++iterator;
 				}
@@ -275,9 +294,9 @@ template<typename T> SRImage lrgb3(
 	sr.sx = spacing[0];
 	sr.sy = spacing[1];
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	sr.i = QImage(p__,size[0],size[1],3*size[0],QImage::Format_RGB888,srImageCleanupHandler,p__);
+	sr.i = QImage(p__, size[0], size[1], 3 * size[0], QImage::Format_RGB888, srImageCleanupHandler, p__);
 #else
-	sr.i = QImage(p__,size[0],size[1],3*size[0],QImage::Format_RGB888);
+	sr.i = QImage(p__, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
 	sr.p = p__;
 #endif
 	return sr;
@@ -285,6 +304,8 @@ template<typename T> SRImage lrgb3(
 
 }
 
+static bool SRUtils_asked_for_path_once = false;
+static QString SRUtils_selected_path("");
 void SRUtils::set_asked_for_path_once(bool t)
 {
 	SRUtils_asked_for_path_once = t;
@@ -426,6 +447,7 @@ void SRUtils::read_IMAGE(
 						"search.</body></html>");
 					QFileInfo fi22(path+QString("/.."));
 					if (pb) pb->hide();
+					QApplication::processEvents();
 					FindRefDialog * d =
 						new FindRefDialog(settings->get_scale_icons());
 					d->set_text(s22);
@@ -480,7 +502,7 @@ void SRUtils::read_IMAGE(
 				pb,
 				3,
 				true);
-			if (e_.isEmpty() && ivariants.size()==1 && ivariants.at(0))
+			if (e_.isEmpty() && ivariants.size() == 1 && ivariants.at(0))
 			{
 				ImageVariant * v = ivariants[0];
 				ImageVariant2D * v2 = new ImageVariant2D();
@@ -489,52 +511,52 @@ void SRUtils::read_IMAGE(
 				switch(v->image_type)
 				{
 				case 0:
-					e_=gs3<ImageTypeSS,Image2DTypeSS>(v->pSS,v2->pSS,idx);
+					e_ = gs3<ImageTypeSS, Image2DTypeSS>(v->pSS, v2->pSS, idx);
 					break;
 				case 1:
-					e_=gs3<ImageTypeUS,Image2DTypeUS>(v->pUS,v2->pUS,idx);
+					e_ = gs3<ImageTypeUS, Image2DTypeUS>(v->pUS, v2->pUS, idx);
 					break;
 				case 2:
-					e_=gs3<ImageTypeSI,Image2DTypeSI>(v->pSI,v2->pSI,idx);
+					e_ = gs3<ImageTypeSI, Image2DTypeSI>(v->pSI, v2->pSI, idx);
 					break;
 				case 3:
-					e_=gs3<ImageTypeUI,Image2DTypeUI>(v->pUI,v2->pUI,idx);
+					e_ = gs3<ImageTypeUI, Image2DTypeUI>(v->pUI, v2->pUI, idx);
 					break;
 				case 4:
-					e_=gs3<ImageTypeUC,Image2DTypeUC>(v->pUC,v2->pUC,idx);
+					e_ = gs3<ImageTypeUC, Image2DTypeUC>(v->pUC, v2->pUC, idx);
 					break;
 				case 5:
-					e_=gs3<ImageTypeF,Image2DTypeF>(v->pF,v2->pF,idx);
+					e_ = gs3<ImageTypeF, Image2DTypeF>(v->pF, v2->pF, idx);
 					break;
 				case 6:
-					e_=gs3<ImageTypeD,Image2DTypeD>(v->pD,v2->pD,idx);
+					e_ = gs3<ImageTypeD, Image2DTypeD>(v->pD, v2->pD, idx);
 					break;
 				case 7:
-					e_=gs3<ImageTypeSLL,Image2DTypeSLL>(v->pSLL,v2->pSLL,idx);
+					e_ = gs3<ImageTypeSLL, Image2DTypeSLL>(v->pSLL, v2->pSLL, idx);
 					break;
 				case 8:
-					e_=gs3<ImageTypeULL,Image2DTypeULL>(v->pULL,v2->pULL,idx);
+					e_ = gs3<ImageTypeULL, Image2DTypeULL>(v->pULL, v2->pULL, idx);
 					break;
 				case 10:
-					e_=gs3<RGBImageTypeSS,RGBImage2DTypeSS>(v->pSS_rgb,v2->pSS_rgb,idx);
+					e_ = gs3<RGBImageTypeSS, RGBImage2DTypeSS>(v->pSS_rgb, v2->pSS_rgb, idx);
 					break;
 				case 11:
-					e_=gs3<RGBImageTypeUS,RGBImage2DTypeUS>(v->pUS_rgb,v2->pUS_rgb,idx);
+					e_ = gs3<RGBImageTypeUS, RGBImage2DTypeUS>(v->pUS_rgb, v2->pUS_rgb, idx);
 					break;
 				case 12:
-					e_=gs3<RGBImageTypeSI,RGBImage2DTypeSI>(v->pSI_rgb,v2->pSI_rgb,idx);
+					e_ = gs3<RGBImageTypeSI, RGBImage2DTypeSI>(v->pSI_rgb, v2->pSI_rgb, idx);
 					break;
 				case 13:
-					e_=gs3<RGBImageTypeUI,RGBImage2DTypeUI>(v->pUI_rgb,v2->pUI_rgb,idx);
+					e_ = gs3<RGBImageTypeUI, RGBImage2DTypeUI>(v->pUI_rgb, v2->pUI_rgb, idx);
 					break;
 				case 14:
-					e_=gs3<RGBImageTypeUC,RGBImage2DTypeUC>(v->pUC_rgb,v2->pUC_rgb,idx);
+					e_ = gs3<RGBImageTypeUC, RGBImage2DTypeUC>(v->pUC_rgb, v2->pUC_rgb, idx);
 					break;
 				case 15:
-					e_=gs3<RGBImageTypeF,RGBImage2DTypeF>(v->pF_rgb,v2->pF_rgb,idx);
+					e_ = gs3<RGBImageTypeF, RGBImage2DTypeF>(v->pF_rgb, v2->pF_rgb, idx);
 					break;
 				case 16:
-					e_=gs3<RGBImageTypeD,RGBImage2DTypeD>(v->pD_rgb,v2->pD_rgb,idx);
+					e_ = gs3<RGBImageTypeD, RGBImage2DTypeD>(v->pD_rgb, v2->pD_rgb, idx);
 					break;
 				default:
 					e_ = QString("image type not supported");
@@ -547,37 +569,37 @@ void SRUtils::read_IMAGE(
 					SRImage pm;
 					switch(v2->image_type)
 					{
-					case 0: pm=li3<Image2DTypeSS>(v2->pSS,v);
+					case 0: pm = li3<Image2DTypeSS>(v2->pSS, v);
 						break;
-					case 1: pm=li3<Image2DTypeUS>(v2->pUS,v);
+					case 1: pm = li3<Image2DTypeUS>(v2->pUS, v);
 						break;
-					case 2: pm=li3<Image2DTypeSI>(v2->pSI,v);
+					case 2: pm = li3<Image2DTypeSI>(v2->pSI, v);
 						break;
-					case 3: pm=li3<Image2DTypeUI>(v2->pUI,v);
+					case 3: pm = li3<Image2DTypeUI>(v2->pUI, v);
 						break;
-					case 4: pm=li3<Image2DTypeUC>(v2->pUC,v);
+					case 4: pm = li3<Image2DTypeUC>(v2->pUC, v);
 						break;
-					case 5: pm=li3<Image2DTypeF>(v2->pF,v);
+					case 5: pm = li3<Image2DTypeF>(v2->pF, v);
 						break;
-					case 6: pm=li3<Image2DTypeD>(v2->pD,v);
+					case 6: pm = li3<Image2DTypeD>(v2->pD, v);
 						break;
-					case 7: pm=li3<Image2DTypeSLL>(v2->pSLL,v);
+					case 7: pm = li3<Image2DTypeSLL>(v2->pSLL, v);
 						break;
-					case 8: pm=li3<Image2DTypeULL>(v2->pULL,v);
+					case 8: pm = li3<Image2DTypeULL>(v2->pULL, v);
 						break;
-					case 10: pm=lrgb3<RGBImage2DTypeSS>(v2->pSS_rgb,v);
+					case 10: pm = lrgb3<RGBImage2DTypeSS>(v2->pSS_rgb, v);
 						break;
-					case 11: pm=lrgb3<RGBImage2DTypeUS>(v2->pUS_rgb,v);
+					case 11: pm = lrgb3<RGBImage2DTypeUS>(v2->pUS_rgb, v);
 						break;
-					case 12: pm=lrgb3<RGBImage2DTypeSI>(v2->pSI_rgb,v);
+					case 12: pm = lrgb3<RGBImage2DTypeSI>(v2->pSI_rgb, v);
 						break;
-					case 13: pm=lrgb3<RGBImage2DTypeUI>(v2->pUI_rgb,v);
+					case 13: pm = lrgb3<RGBImage2DTypeUI>(v2->pUI_rgb, v);
 						break;
-					case 14: pm=lrgb3<RGBImage2DTypeUC>(v2->pUC_rgb,v);
+					case 14: pm = lrgb3<RGBImage2DTypeUC>(v2->pUC_rgb, v);
 						break;
-					case 15: pm=lrgb3<RGBImage2DTypeF>(v2->pF_rgb,v);
+					case 15: pm = lrgb3<RGBImage2DTypeF>(v2->pF_rgb, v);
 						break;
-					case 16: pm=lrgb3<RGBImage2DTypeD>(v2->pD_rgb,v);
+					case 16: pm = lrgb3<RGBImage2DTypeD>(v2->pD_rgb, v);
 						break;
 					default:
 						break;
@@ -608,21 +630,21 @@ endpoints of the minor axis of an ellipse
 					if (!grobjects.empty())
 					{
 						QPen pen;
-						pen.setBrush(QBrush(QColor(255,0,0)));
-						QBrush brush(QColor(255,0,0));
+						pen.setBrush(QBrush(QColor(255, 0, 0)));
+						QBrush brush(QColor(255, 0, 0));
 						brush.setStyle(Qt::SolidPattern);
 						for (size_t yy = 0; yy < grobjects.size(); ++yy)
 						{
 							const SRGraphic & sg = grobjects.at(yy);
 							const size_t gsize = sg.GraphicData.size();
-							if ((gsize < 2) || (gsize%2 != 0)) continue;
+							if ((gsize < 2) || (gsize % 2 != 0)) continue;
 							if (sg.GraphicType == QString("POLYLINE"))
 							{
 #if 1
 								bool check_single_point = true;
 								double tmp__0 = sg.GraphicData.at(0);
 								double tmp__1 = sg.GraphicData.at(1);
-								for (size_t yyy = 2; yyy < gsize; yyy+=2)
+								for (size_t yyy = 2; yyy < gsize; yyy += 2)
 								{
 									if (
 										(!itk::Math::FloatAlmostEqual<float>(
@@ -630,14 +652,14 @@ endpoints of the minor axis of an ellipse
 											static_cast<float>(sg.GraphicData.at(yyy)))) ||
 										(!itk::Math::FloatAlmostEqual<float>(
 											static_cast<float>(tmp__1),
-											static_cast<float>(sg.GraphicData.at(yyy+1))))
+											static_cast<float>(sg.GraphicData.at(yyy + 1))))
 										)
 									{
 										check_single_point = false;
 										break;
 									}
-									tmp__0 = sg.GraphicData.at(yyy  );
-									tmp__1 = sg.GraphicData.at(yyy+1);
+									tmp__0 = sg.GraphicData.at(yyy);
+									tmp__1 = sg.GraphicData.at(yyy + 1);
 								}
 								// workaround error
 								if (gsize == 2 || check_single_point)
@@ -662,7 +684,7 @@ endpoints of the minor axis of an ellipse
 										sg.GraphicData.at(1));
 									for (size_t yyy = 2;
 										yyy < gsize;
-										yyy+=2)
+										yyy += 2)
 									{
 										pp.lineTo(
 											sg.GraphicData.at(yyy),
@@ -675,8 +697,7 @@ endpoints of the minor axis of an ellipse
 									painter.end();
 								}
 							}
-							else if (
-								sg.GraphicType == QString("POINT") ||
+							else if (sg.GraphicType == QString("POINT") ||
 								sg.GraphicType == QString("MULTIPOINT"))
 							{
 								QPainter painter;
@@ -723,18 +744,18 @@ endpoints of the minor axis of an ellipse
 								const float  minor0_y = sg.GraphicData.at(5);
 								const float  minor1_x = sg.GraphicData.at(6);
 								const float  minor1_y = sg.GraphicData.at(7);
-								const double mid_major_x = (major0_x + major1_x)*0.5;
-								const double mid_major_y = (major0_y + major1_y)*0.5;
+								const double mid_major_x = (major0_x + major1_x) * 0.5;
+								const double mid_major_y = (major0_y + major1_y) * 0.5;
 								const double x0__ = major1_x - major0_x;
 								const double y0__ = major1_y - major0_y;
 								const double x1__ = minor1_x - minor0_x;
 								const double y1__ = minor1_y - minor0_y;
-								const double d0   = sqrt(x0__*x0__ + y0__*y0__);
-								const double d1   = sqrt(x1__*x1__ + y1__*y1__);
-								const double ma_j = 1.0/d0;
+								const double d0   = sqrt(x0__ * x0__ + y0__ * y0__);
+								const double d1   = sqrt(x1__ * x1__ + y1__ * y1__);
+								const double ma_j = 1.0 / d0;
 								const double ma_nx = x0__ * ma_j;
 								const double ma_ny = y0__ * ma_j;
-								const double mi_j = 1.0/d1;
+								const double mi_j = 1.0 / d1;
 								const double mi_nx = x1__ * mi_j;
 								const double mi_ny = y1__ * mi_j;
 								const double start = 0.0;
@@ -755,7 +776,7 @@ endpoints of the minor axis of an ellipse
 										ttt.setMatrix(ma_nx, ma_ny, 0, -mi_nx, -mi_ny, 0, 0, 0, 1);
 										painter.setTransform(ttt, true);
 									}
-									QRectF r___(-0.5*d0, -0.5*d1, d0, d1);
+									QRectF r___(-0.5 * d0, -0.5 * d1, d0, d1);
 									QPainterPath path0;
 									path0.arcMoveTo(r___, start);
 									path0.arcTo(r___, start, span);
@@ -1097,7 +1118,7 @@ void SRUtils::read_NUM(
 				mdcm::SmartPointer<mdcm::SequenceOfItems>
 					sq5 =
 						e5.GetValueAsSQ();
-				if (sq5 && (sq5->GetNumberOfItems()==1))
+				if (sq5 && (sq5->GetNumberOfItems() == 1))
 				{
 					const mdcm::Item & item5 =
 						sq5->GetItem(1);
@@ -1106,11 +1127,10 @@ void SRUtils::read_NUM(
 					if (nds5.FindDataElement(
 							mdcm::Tag(0x0008,0x0104)))
 					{
-						const mdcm::DataElement & e7  =
+						const mdcm::DataElement & e7 =
 							nds5.GetDataElement(
 								mdcm::Tag(0x0008,0x0104));
-						if (
-							!e7.IsEmpty() &&
+						if (!e7.IsEmpty() &&
 							!e7.IsUndefinedLength() &&
 							e7.GetByteValue())
 						{
@@ -1132,7 +1152,7 @@ void SRUtils::read_NUM(
 					if (nds5.FindDataElement(
 							mdcm::Tag(0x0008,0x0100)))
 					{
-						const mdcm::DataElement & e7  =
+						const mdcm::DataElement & e7 =
 							nds5.GetDataElement(
 								mdcm::Tag(0x0008,0x0100));
 						if (
@@ -1191,7 +1211,7 @@ void SRUtils::read_CODE(
 		const unsigned int nitems4 = sq4->GetNumberOfItems();
 		for(unsigned int i4 = 0; i4 < nitems4; ++i4)
 		{
-			const mdcm::Item & item4 = sq4->GetItem(i4+1);
+			const mdcm::Item & item4 = sq4->GetItem(i4 + 1);
 			const mdcm::DataSet & nds4 =
 				item4.GetNestedDataSet();
 			if (nds4.FindDataElement(mdcm::Tag(0x0008,0x0104)))
@@ -1258,7 +1278,7 @@ void SRUtils::read_DATETIME(const mdcm::DataSet & ds, QString & s)
 	{
 		const int point_idx =
 			DateTime.indexOf(QString("."));
-		if (point_idx == 14||point_idx == -1)
+		if (point_idx == 14 || point_idx == -1)
 		{
 			const QString time1_s =
 				DateTime.left(14);
@@ -1297,7 +1317,7 @@ void SRUtils::read_TIME(const mdcm::DataSet & ds, QString & s)
 	{
 		const int point_idx =
 			Time.indexOf(QString("."));
-		if (point_idx == 6||point_idx == -1)
+		if (point_idx == 6 || point_idx == -1)
 		{
 			const QString time1_s =
 				Time.left(6);
@@ -1311,7 +1331,7 @@ void SRUtils::read_TIME(const mdcm::DataSet & ds, QString & s)
 			{
 				tmp0.append(QString(".") +
 					Time.right(
-						Time.length()-7));
+						Time.length() - 7));
 			}
 		}
 		else
@@ -1554,7 +1574,7 @@ QStringList SRUtils::read_referenced(
 {
 	if (!nds.FindDataElement(mdcm::Tag(0x0008,0x1199)))
 		return QStringList();
-	const mdcm::DataElement & e8  =
+	const mdcm::DataElement & e8 =
 		nds.GetDataElement(mdcm::Tag(0x0008,0x1199));
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sq8 =
 		e8.GetValueAsSQ();
@@ -1640,7 +1660,7 @@ QString SRUtils::get_concept_code_meaning(
 			const unsigned int nitems4 = sq4->GetNumberOfItems();
 			for(unsigned int i4 = 0; i4 < nitems4; ++i4)
 			{
-				const mdcm::Item & item4 = sq4->GetItem(i4+1);
+				const mdcm::Item & item4 = sq4->GetItem(i4 + 1);
 				const mdcm::DataSet & nds4 =
 					item4.GetNestedDataSet();
 				if (nds4.FindDataElement(mdcm::Tag(0x0008,0x0104)))
@@ -1703,7 +1723,7 @@ QString SRUtils::read_sr_content_sq(
 	{
 		const QString cs =
 			(!chapter.isEmpty())
-			? (chapter + QString(".") + QVariant(i+1).toString())
+			? (chapter + QString(".") + QVariant(i + 1).toString())
 			: (QVariant(i+1).toString());
 		//
 		//
@@ -1735,7 +1755,7 @@ QString SRUtils::read_sr_content_sq(
 		QString TemporalRangeType;
 		std::vector<unsigned int> ReferencedContentItemIdentifier;
 		//
-		const mdcm::Item & item = sq->GetItem(i+1);
+		const mdcm::Item & item = sq->GetItem(i + 1);
 		const mdcm::DataSet & nds =
 			item.GetNestedDataSet();
 		if (DicomUtils::get_string_value(
