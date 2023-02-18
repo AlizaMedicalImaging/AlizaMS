@@ -550,4 +550,3 @@ QString SpectroscopyUtils::ProcessData(
 #ifdef LOAD_SPECT_DATA
 #undef LOAD_SPECT_DATA
 #endif
-

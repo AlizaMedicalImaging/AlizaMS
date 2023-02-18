@@ -46,6 +46,8 @@ static QList<double> anim3d_times;
 #pragma GCC diagnostic ignored "-Wcast-align"
 #include "btBulletCollisionCommon.h"
 #pragma GCC diagnostic pop
+
+// Prefered 'static' functions instead of 'unnamed namespace' for Bullet stuff.
 static btDefaultCollisionConfiguration * g_collisionConfiguration = NULL;
 static btCollisionDispatcher           * g_dispatcher             = NULL;
 static btDbvtBroadphase                * g_broadphase             = NULL;

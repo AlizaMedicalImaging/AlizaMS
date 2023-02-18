@@ -18,6 +18,9 @@
 #include <iostream>
 #endif
 
+namespace
+{
+
 template<typename T> bool reorganize_uih_grid(
 	const T * input,
 	const unsigned int * indims,
@@ -47,6 +50,8 @@ template<typename T> bool reorganize_uih_grid(
 		}
 	}
 	return true;
+}
+
 }
 
 namespace mdcm

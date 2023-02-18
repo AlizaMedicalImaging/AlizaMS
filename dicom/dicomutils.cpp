@@ -92,8 +92,6 @@
 #include "alizalcms/lcms2.h"
 #endif
 
-static short force_suppllut = 0;
-
 namespace
 {
 
@@ -3979,6 +3977,7 @@ quit_:
 	return ok;
 }
 
+static short force_suppllut = 0;
 void DicomUtils::global_force_suppllut(short x)
 {
 	// 1 force apply

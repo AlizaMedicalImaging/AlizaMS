@@ -100,6 +100,9 @@ int TableWidgetItem2::get_id() const
 	return id;
 }
 
+namespace
+{
+
 const QString css1(
 	"span.y     { color:#050505; font-size: medium; }\n"
 	"span.ybl   { color:#050505; font-size: large; font-weight: bold; }\n"
@@ -130,6 +133,8 @@ const QString head(
 	"<html><head><link rel='stylesheet'"
 	" type='text/css' href='format.css'></head><body>");
 const QString foot("</body></html>");
+
+}
 
 ImagesBox::ImagesBox(float si)
 {

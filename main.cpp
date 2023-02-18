@@ -65,7 +65,10 @@
 #endif
 
 #if (defined LOG_STDOUT_TO_FILE && LOG_STDOUT_TO_FILE==1)
-static void close_log()
+namespace
+{
+
+void close_log()
 {
 	std::cout
 		<< "closing logfile \"log.txt\"..."
@@ -95,6 +98,8 @@ void redirect_qdebug(
 	}
 }
 #endif
+
+}
 #endif
 
 int main(int argc, char *argv[])

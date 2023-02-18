@@ -49,8 +49,6 @@
 #include "commonutils.h"
 #include <exception>
 
-static int expanded_items = 0;
-
 namespace
 {
 
@@ -1898,6 +1896,7 @@ void SQtree::collapse_item()
 #endif
 }
 
+static int sqtree_expanded_items = 0;
 void SQtree::expand_item()
 {
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
@@ -1906,7 +1905,7 @@ void SQtree::expand_item()
 #endif
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	treeWidget->blockSignals(true);
-	expanded_items = 0;
+	sqtree_expanded_items = 0;
 	expand_children(treeWidget->currentIndex());
 	treeWidget->blockSignals(false);
 	QApplication::restoreOverrideCursor();
@@ -1924,8 +1923,8 @@ void SQtree::expand_children(const QModelIndex & index)
 	{
 		for (int i = 0; i < index.model()->rowCount(index); ++i)
 		{
-			++expanded_items;
-			if (expanded_items > 65000) break;
+			++sqtree_expanded_items;
+			if (sqtree_expanded_items > 65000) break;
 			expand_children(m->index(i, 0, index));
 		}
 	}
@@ -1934,8 +1933,8 @@ void SQtree::expand_children(const QModelIndex & index)
 #else
 	for (int i = 0; i < index.model()->rowCount(index); ++i)
 	{
-		++expanded_items;
-		if (expanded_items > 65000) break;
+		++sqtree_expanded_items;
+		if (sqtree_expanded_items > 65000) break;
 	    expand_children(index.child(i, 0));
 	}
 	if (!treeWidget->isExpanded(index))
