@@ -47,7 +47,6 @@ static QList<double> anim3d_times;
 #include "btBulletCollisionCommon.h"
 #pragma GCC diagnostic pop
 
-// Prefered 'static' functions instead of 'unnamed namespace' for Bullet stuff.
 static btDefaultCollisionConfiguration * g_collisionConfiguration = NULL;
 static btCollisionDispatcher           * g_dispatcher             = NULL;
 static btDbvtBroadphase                * g_broadphase             = NULL;
@@ -55,6 +54,7 @@ static btCollisionWorld                * g_collisionWorld         = NULL;
 static btAlignedObjectArray<btCollisionShape*> g_collision_shapes;
 static bool show_all_study_collisions = true;
 
+// Preferred 'static' functions instead of unnamed namespace for Bullet stuff.
 static void search_frame_of_ref(
 	const int id,
 	const QString & frame_uid,
