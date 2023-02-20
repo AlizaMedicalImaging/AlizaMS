@@ -233,8 +233,8 @@ template<typename T> SRImage lrgb3(
 	}
 	if (ivariant->image_type == 11)
 	{
-		const double tmp_max
-			= ((bits_allocated > 0 && bits_stored > 0) &&
+		const double tmp_max =
+			((bits_allocated > 0 && bits_stored > 0) &&
 				bits_stored < bits_allocated)
 				? pow(2, bits_stored) - 1 : static_cast<double>(USHRT_MAX);
 		try
@@ -260,7 +260,7 @@ template<typename T> SRImage lrgb3(
 		const double vmin = ivariant->di->vmin;
 		const double vmax = ivariant->di->vmax;
 		const double vrange = vmax - vmin;
-		if (vrange != 0)
+		if (vrange > 0.0)
 		{
 			try
 			{
