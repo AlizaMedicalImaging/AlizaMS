@@ -1,8 +1,8 @@
 #ifndef A_LUTS_H
 #define A_LUTS_H
 
-const int default_lut_size = 768;
-const unsigned char default_lut[] =
+constexpr int default_lut_size = 768;
+constexpr unsigned char default_lut[] =
 {
 0,0,0,
 0,0,0,
@@ -774,8 +774,8 @@ const unsigned char default_lut[] =
 255,255,254
 };
 
-const int black_rainbow_size = 1536;
-const unsigned char black_rainbow_lut[] =
+constexpr int black_rainbow_size = 1536;
+constexpr unsigned char black_rainbow_lut[] =
 {
 0,0,0,
 0,0,0,
@@ -2315,8 +2315,8 @@ const unsigned char black_rainbow_lut[] =
 255,0,0
 };
 
-const int syngo_lut_size = 1792;
-const unsigned char syngo_lut[] =
+constexpr int syngo_lut_size = 1792;
+constexpr unsigned char syngo_lut[] =
 {
 0,0,0,
 0,0,0,
@@ -4112,8 +4112,8 @@ const unsigned char syngo_lut[] =
 255,254,255,
 };
 
-const int hot_iron_size = 256;
-const unsigned char hot_iron[] =
+constexpr int hot_iron_size = 256;
+constexpr unsigned char hot_iron[] =
 {
 0,0,0,
 2,0,0,
@@ -4373,8 +4373,8 @@ const unsigned char hot_iron[] =
 255,255,255
 };
 
-const int pet_dicom_lut_size = 256;
-const unsigned char pet_dicom_lut[] =
+constexpr int pet_dicom_lut_size = 256;
+constexpr unsigned char pet_dicom_lut[] =
 {
 0, 0, 0,
 0, 2, 1,
@@ -4634,8 +4634,8 @@ const unsigned char pet_dicom_lut[] =
 255, 255, 255
 };
 
-const int hot_metal_blue_size = 256;
-const unsigned char hot_metal_blue[] =
+constexpr int hot_metal_blue_size = 256;
+constexpr unsigned char hot_metal_blue[] =
 {
 0,
 0,
@@ -5407,8 +5407,8 @@ const unsigned char hot_metal_blue[] =
 255
 };
 
-const int pet20_dicom_lut_size = 256;
-const unsigned char pet20_dicom_lut[] =
+constexpr int pet20_dicom_lut_size = 256;
+constexpr unsigned char pet20_dicom_lut[] =
 {
 0,
 0,

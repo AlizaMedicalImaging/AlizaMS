@@ -3296,5 +3296,3 @@ void AnonymazerWidget2::init_profile()
 	dev_remove_tags     .insert(mdcm::Tag(0x0018,0x9373));// X-Ray Detector Label
 	dev_replace_tags    .insert(mdcm::Tag(0x0018,0x9367));// X-Ray Source ID
 }
-// clang-format on
-

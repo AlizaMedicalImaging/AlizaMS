@@ -41,6 +41,9 @@
 #include <string>
 #include <exception>
 
+namespace
+{
+
 const mdcm::Tag tOffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity(0x0004,0x1200);
 const mdcm::Tag tDirectoryRecordSequence                    (0x0004,0x1220);
 const mdcm::Tag tOffsetOfTheNextDirectoryRecord             (0x0004,0x1400);
@@ -61,6 +64,8 @@ const mdcm::Tag tRows                                       (0x0028,0x0010);
 const mdcm::Tag tColumns                                    (0x0028,0x0011);
 const mdcm::Tag tBitsAllocated                              (0x0028,0x0100);
 const mdcm::Tag tPixelRepresentation                        (0x0028,0x0103);
+
+}
 
 mdcm::VL BrowserWidget2::compute_offset0(const mdcm::DataSet & ds)
 {
@@ -194,7 +199,10 @@ void BrowserWidget2::read_directory(const QString & p)
 	delete pd;
 }
 
-void BrowserWidget2::process_directory(const QString & p, const mdcm::Dict & dict, QProgressDialog * pd)
+void BrowserWidget2::process_directory(
+	const QString & p,
+	const mdcm::Dict & dict,
+	QProgressDialog * pd)
 {
 	if (p.isEmpty()) return;
 	QDir dir(p);

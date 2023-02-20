@@ -154,6 +154,4 @@ void * operator new[](size_t, void * p) noexcept                \
 void operator delete(void *, void *) noexcept {}                \
 void operator delete[](void *, void *) noexcept {}
 
-// clang-format on
-
 #endif // VECTORMATH_ALIGNED_ALLOCATOR_H

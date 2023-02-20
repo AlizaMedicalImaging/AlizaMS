@@ -240,6 +240,4 @@ private:
 	const short lut_function;
 };
 
-// clang-format on
-
 #endif
