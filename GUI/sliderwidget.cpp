@@ -22,6 +22,7 @@ void SliderWidget::set_slider_max(int i)
 
 void SliderWidget::set_style_sheet()
 {
-	const QString tmp0 = QString("QWidget{selection-background-color: #303947;}");
+	const QString tmp0 = QString(
+		"QWidget{selection-background-color: #303947;}");
 	slices_slider->setStyleSheet(tmp0);
 }

@@ -1,12 +1,11 @@
 #include "zrangewidget.h"
-
 #include <QHBoxLayout>
 
 ZRangeWidget::ZRangeWidget()
 {
 	spanslider  = new QxtSpanSlider(Qt::Horizontal, this);
 	QHBoxLayout * l = new QHBoxLayout(this);
-	l->setContentsMargins(0,0,0,0);
+	l->setContentsMargins(0, 0, 0, 0);
 	l->setSpacing(0);
 	l->addWidget(spanslider);
 }
@@ -34,4 +33,3 @@ void ZRangeWidget::set_span(int l, int h)
 {
 	spanslider->setSpan(l,h);
 }
-

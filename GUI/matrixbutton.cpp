@@ -16,8 +16,13 @@
 #include <QMargins>
 #endif
 
-const int rsize = 5;
-const int csize = 5;
+namespace
+{
+
+constexpr int rsize = 5;
+constexpr int csize = 5;
+
+}
 
 class DimsChooser : public QFrame
 {
@@ -82,7 +87,7 @@ DimsChooser::DimsChooser(MatrixButton * b, QAction * a)
 
 QSize DimsChooser::sizeHint() const
 {
-	return QSize( m_plus_w + csize * m_column_w, m_plus_h + rsize * m_row_h);
+	return QSize(m_plus_w + csize * m_column_w, m_plus_h + rsize * m_row_h);
 }
 
 void DimsChooser::mouseMoveEvent(QMouseEvent * e)
@@ -181,7 +186,8 @@ DimsChooserAction::DimsChooserAction(MatrixButton * b)
 MatrixButton::MatrixButton(float si)
 {
 	setFocusPolicy(Qt::NoFocus);
-	setIconSize(QSize((int)(si*18),(int)(si*18)));
+	setIconSize(QSize(
+		static_cast<int>(si * 18), static_cast<int>(si * 18)));
 	setToolButtonStyle(Qt::ToolButtonIconOnly);
 	setIcon(QIcon(QString(":/bitmaps/grid.svg")));
 	setToolTip(QString("Layout"));

@@ -3,8 +3,10 @@
 ToolBox2D::ToolBox2D(float si)
 {
 	setupUi(this);
-	const QSize s1 = QSize(static_cast<int>(18*si),static_cast<int>(18*si));
-	const QSize s2 = QSize(static_cast<int>(36*si),static_cast<int>(18*si));
+	const QSize s1 = QSize(
+		static_cast<int>(18 * si),static_cast<int>(18 * si));
+	const QSize s2 = QSize(
+		static_cast<int>(36 * si),static_cast<int>(18 * si));
 	resetlevel_pushButton->setIconSize(s1);
 	maxwin_pushButton->setIconSize(s1);
 	lock_pushButton->setIconSize(s2);

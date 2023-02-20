@@ -5,7 +5,7 @@ RectItem::RectItem(
 	qreal y,
 	qreal w,
 	qreal h,
-	QGraphicsItem * p) : QGraphicsRectItem(x,y,w,h,p)
+	QGraphicsItem * p) : QGraphicsRectItem(x, y, w, h, p)
 {
     setFlag(QGraphicsItem::ItemIsMovable, false);
     setFlag(QGraphicsItem::ItemIsFocusable, false);
@@ -42,7 +42,7 @@ void RectItem::set_pen2(
 {
 	current_pen = 2;
 	pwidth = w;
-	QBrush brush(QColor(r,g,b));
+	QBrush brush(QColor(r, g, b));
 	QPen pen;
 	pen.setBrush(brush);
 	pen.setWidthF(w);

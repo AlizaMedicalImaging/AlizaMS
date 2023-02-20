@@ -89,10 +89,10 @@ void draw_contours(
 					}
 					else
 					{
-						const int rc_r = static_cast<int>(c->color.r*255.0f);
-						const int rc_g = static_cast<int>(c->color.g*255.0f);
-						const int rc_b = static_cast<int>(c->color.b*255.0f);
-						brush = QBrush(QColor(rc_r,rc_g,rc_b));
+						const int rc_r = static_cast<int>(c->color.r * 255.0f);
+						const int rc_g = static_cast<int>(c->color.g * 255.0f);
+						const int rc_b = static_cast<int>(c->color.b * 255.0f);
+						brush = QBrush(QColor(rc_r, rc_g, rc_b));
 					}
 					QPen pen;
 					pen.setBrush(brush);
@@ -196,7 +196,9 @@ template<typename Tin, typename Tout> QString get_slice_(
 	int idx)
 {
 	if (image.IsNull())
+	{
 		return QString("get_slice_<>() : image.IsNull()");
+	}
 	typedef itk::ExtractImageFilter<Tin, Tout> FilterType;
 	const typename Tin::RegionType inRegion =
 		image->GetLargestPossibleRegion();
@@ -210,25 +212,25 @@ template<typename Tin, typename Tout> QString get_slice_(
 	case 0:
 		{
 			index[0] = idx;
-			out_size[0]=0;
-			out_size[1]=size[1];
-			out_size[2]=size[2];
+			out_size[0] = 0;
+			out_size[1] = size[1];
+			out_size[2] = size[2];
 		}
 		break;
 	case 1:
 		{
 			index[1] = idx;
-			out_size[0]=size[0];
-			out_size[1]=0;
-			out_size[2]=size[2];
+			out_size[0] = size[0];
+			out_size[1] = 0;
+			out_size[2] = size[2];
 		}
 		break;
 	case 2:
 		{
 			index[2] = idx;
-			out_size[0]=size[0];
-			out_size[1]=size[1];
-			out_size[2]=0;
+			out_size[0] = size[0];
+			out_size[1] = size[1];
+			out_size[2] = 0;
 		}
 		break;
 	default :
@@ -290,10 +292,15 @@ template<typename T> QString contour_from_path(
 	}
 	tmp0.clear();
 	++a;
-	Contour * c = NULL;
-	try { c = new Contour(); }
-	catch (const std::bad_alloc&) { c = NULL; }
-	if (!c) return QString("std::bad_alloc exception");
+	Contour * c;
+	try
+	{
+		c = new Contour();
+	}
+	catch (const std::bad_alloc&)
+	{
+		return QString("std::bad_alloc exception");
+	}
 	c->id = a;
 	c->roiid = roi->id;
 	c->color.r = 0.0f;
@@ -306,23 +313,23 @@ template<typename T> QString contour_from_path(
 		{
 		case 0:
 			{
-				idx[0]=item->get_slice();
-				idx[1]=p.elementAt(x).x;
-				idx[2]=p.elementAt(x).y;
+				idx[0] = item->get_slice();
+				idx[1] = p.elementAt(x).x;
+				idx[2] = p.elementAt(x).y;
 			}
 			break;
 		case 1:
 			{
-				idx[0]=p.elementAt(x).x;
-				idx[1]=item->get_slice();
-				idx[2]=p.elementAt(x).y;
+				idx[0] = p.elementAt(x).x;
+				idx[1] = item->get_slice();
+				idx[2] = p.elementAt(x).y;
 			}
 			break;
 		case 2:
 			{
-				idx[0]=p.elementAt(x).x;
-				idx[1]=p.elementAt(x).y;
-				idx[2]=item->get_slice();
+				idx[0] = p.elementAt(x).x;
+				idx[1] = p.elementAt(x).y;
+				idx[2] = item->get_slice();
 			}
 			break;
 		default:
@@ -332,7 +339,7 @@ template<typename T> QString contour_from_path(
 				return QString("item->get_axis() - unknown value");
 			}
 		}
-		itk::Point<float,3> j;
+		itk::Point<float, 3> j;
 		image->TransformContinuousIndexToPhysicalPoint(idx, j);
 		DPoint point;
 		point.x = j[0];
@@ -343,10 +350,8 @@ template<typename T> QString contour_from_path(
 		point.t = -1;
 		c->dpoints.push_back(point);
 	}
-	if (item->get_axis() == 2)
-		c->type = item->get_type();
-	else
-		c->type = 0;
+	if (item->get_axis() == 2) c->type = item->get_type();
+	else                       c->type = 0;
 	c->vao_initialized = false;
 	roi->contours[c->id] = c;
 	return QString("");
@@ -359,7 +364,9 @@ QString contour_from_path_nonuniform(
 {
 	if (!ivariant) return QString("image is NULL");
 	if (ivariant->di->idimz != static_cast<int>(ivariant->di->image_slices.size()))
+	{
 		return QString("Failed");
+	}
 	if (!roi)  return QString("ROI is NULL");
 	if (!item) return QString("item is NULL");
 	if (item->get_axis() !=2 )
@@ -392,10 +399,15 @@ QString contour_from_path_nonuniform(
 	}
 	tmp0.clear();
 	++a;
-	Contour * c = NULL;
-	try { c = new Contour(); }
-	catch (const std::bad_alloc&) { c = NULL; }
-	if (!c) return QString("std::bad_alloc exception");
+	Contour * c;
+	try
+	{
+		c = new Contour();
+	}
+	catch (const std::bad_alloc&)
+	{
+		return QString("std::bad_alloc exception");
+	}
 	c->id = a;
 	c->roiid = roi->id;
 	c->color.r = 0.0f;
@@ -418,10 +430,8 @@ QString contour_from_path_nonuniform(
 		point.t = -1;
 		c->dpoints.push_back(point);
 	}
-	if (item->get_axis() == 2)
-		c->type = item->get_type();
-	else
-		c->type = 0;
+	if (item->get_axis() == 2) c->type = item->get_type();
+	else                       c->type = 0;
 	c->vao_initialized = false;
 	roi->contours[c->id] = c;
 	return QString("");
@@ -458,7 +468,7 @@ template<typename T> void load_rgb_image(
 	else
 		widget->graphicsview->image_item->setTransformationMode(Qt::FastTransformation);
 	widget->graphicsview->image_item->setCacheMode(QGraphicsItem::NoCache);
-	widget->graphicsview->image_item->setPos(0,0);
+	widget->graphicsview->image_item->setPos(0, 0);
 	widget->graphicsview->image_item->setZValue(-1.0);
 	widget->graphicsview->scene()->addItem(widget->graphicsview->image_item);
 #else
@@ -467,8 +477,6 @@ template<typename T> void load_rgb_image(
 	const typename T::RegionType region = image->GetLargestPossibleRegion();
 	const typename T::SizeType   size   = region.GetSize();
 	const typename T::SpacingType spacing = image->GetSpacing();
-	unsigned char * p__  = NULL;
-	unsigned int j_ = 0;
 	const short axis = widget->get_axis();
 	const bool global_flip_x = widget->graphicsview->global_flip_x;
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
@@ -477,14 +485,14 @@ template<typename T> void load_rgb_image(
 	bool flip_x = false, flip_y = false;
 	double scale__;
 	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
-	if (spacing[0]!=spacing[1])
+	if (spacing[0] != spacing[1])
 	{
-		if (spacing[1]>spacing[0]) coeff_size_1 = spacing[1]/spacing[0];
-		else                       coeff_size_0 = spacing[0]/spacing[1];
+		if (spacing[1] > spacing[0]) coeff_size_1 = spacing[1] / spacing[0];
+		else                         coeff_size_0 = spacing[0] / spacing[1];
 	}
-	const double xratio = widget->graphicsview->width()  / (size[0]*coeff_size_0);
-	const double yratio = widget->graphicsview->height() / (size[1]*coeff_size_1);
-	if (fit==1)
+	const double xratio = widget->graphicsview->width()  / (size[0] * coeff_size_0);
+	const double yratio = widget->graphicsview->height() / (size[1] * coeff_size_1);
+	if (fit == 1)
 	{
 		scale__ = qMin(xratio, yratio);
 		widget->graphicsview->m_scale = scale__;
@@ -496,25 +504,31 @@ template<typename T> void load_rgb_image(
 	const unsigned short high_bit         = ivariant->di->high_bit;
 	const bool           hide_orientation = ivariant->di->hide_orientation;
 	//
+	unsigned char * p__;
+	unsigned int j_ = 0;
+	try
+	{
+		p__ = new unsigned char[size[0] * size[1] * 3];
+	}
+	catch (const std::bad_alloc&)
+	{
+		return;
+	}
 	if (image_type == 11)
 	{
-		const double tmp_max
-			= ((bits_allocated > 0 && bits_stored > 0) &&
-				bits_stored < bits_allocated &&
-				(high_bit==bits_stored-1))
-				? pow(2, bits_stored) - 1 : static_cast<double>(USHRT_MAX);
-		try { p__ = new unsigned char[size[0] * size[1] * 3]; }
-		catch (const std::bad_alloc&) { p__ = NULL; }
-		if (!p__) return;
+		const double tmp_max =
+			(bits_allocated > 0 && bits_stored > 0 && bits_stored < bits_allocated)
+				? pow(2, bits_stored) - 1
+				: static_cast<double>(USHRT_MAX);
 		try
 		{
 			itk::ImageRegionConstIterator<T> iterator(image, region);
 			iterator.GoToBegin();
 			while (!iterator.IsAtEnd())
 			{
-				p__[j_+2] = static_cast<unsigned char>((iterator.Get().GetBlue() /tmp_max)*255.0);
-				p__[j_+1] = static_cast<unsigned char>((iterator.Get().GetGreen()/tmp_max)*255.0);
-				p__[j_+0] = static_cast<unsigned char>((iterator.Get().GetRed()  /tmp_max)*255.0);
+				p__[j_ + 2] = static_cast<unsigned char>((iterator.Get().GetBlue()  / tmp_max) * 255.0);
+				p__[j_ + 1] = static_cast<unsigned char>((iterator.Get().GetGreen() / tmp_max) * 255.0);
+				p__[j_ + 0] = static_cast<unsigned char>((iterator.Get().GetRed()   / tmp_max) * 255.0);
 				j_ += 3;
 				++iterator;
 			}
@@ -526,13 +540,10 @@ template<typename T> void load_rgb_image(
 	}
 	else
 	{
-		try { p__ = new unsigned char[size[0]*size[1]*3]; }
-		catch (const std::bad_alloc&) { p__ = NULL; }
-		if (!p__) return;
 		const double vmin = ivariant->di->vmin;
 		const double vmax = ivariant->di->vmax;
 		const double vrange = vmax - vmin;
-		if (vrange!=0)
+		if (vrange != 0)
 		{
 			try
 			{
@@ -543,9 +554,9 @@ template<typename T> void load_rgb_image(
 					const double b = iterator.Get().GetBlue();
 					const double g = iterator.Get().GetGreen();
 					const double r = iterator.Get().GetRed();
-					p__[j_+2] = static_cast<unsigned char>(255.0*((b+(-vmin))/vrange));
-					p__[j_+1] = static_cast<unsigned char>(255.0*((g+(-vmin))/vrange));
-					p__[j_+0] = static_cast<unsigned char>(255.0*((r+(-vmin))/vrange));
+					p__[j_ + 2] = static_cast<unsigned char>(255.0 *((b + (-vmin)) / vrange));
+					p__[j_ + 1] = static_cast<unsigned char>(255.0 *((g + (-vmin)) / vrange));
+					p__[j_ + 0] = static_cast<unsigned char>(255.0 *((r + (-vmin)) / vrange));
 					j_ += 3;
  					++iterator;
 				}
@@ -557,12 +568,12 @@ template<typename T> void load_rgb_image(
 		}
 	}
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	QImage tmpi(p__,size[0],size[1],3*size[0],QImage::Format_RGB888,gImageCleanupHandler,p__);
+	QImage tmpi(p__, size[0], size[1], 3 * size[0], QImage::Format_RGB888, gImageCleanupHandler, p__);
 #else
-	QImage tmpi(p__,size[0],size[1],3*size[0],QImage::Format_RGB888);
+	QImage tmpi(p__, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
 #endif
 	//
-	if (axis==2)
+	if (axis == 2)
 	{
 		if (widget->get_enable_overlays())
 			GraphicsUtils::draw_overlays(ivariant, tmpi);
@@ -584,19 +595,18 @@ template<typename T> void load_rgb_image(
 		&flip_x, &flip_y);
 	//
 	QTransform t = QTransform();
-	if (spacing[1]!=spacing[0]) t = t.scale(coeff_size_0, coeff_size_1);
+	if (spacing[1] != spacing[0]) t = t.scale(coeff_size_0, coeff_size_1);
 	t = t.scale(scale__, scale__);
-	if (flip_y && flip_x) t = t.scale(-1.0,-1.0);
-	else if (flip_y)      t = t.scale( 1.0,-1.0);
-	else if (flip_x)      t = t.scale(-1.0, 1.0);
-	if (global_flip_x)    t = t.scale(-1.0, 1.0);
-	if (global_flip_y)    t = t.scale( 1.0,-1.0);
+	if (flip_y && flip_x) t = t.scale(-1.0, -1.0);
+	else if (flip_y)      t = t.scale( 1.0, -1.0);
+	else if (flip_x)      t = t.scale(-1.0,  1.0);
+	if (global_flip_x)    t = t.scale(-1.0,  1.0);
+	if (global_flip_y)    t = t.scale( 1.0, -1.0);
 	//
-	const QRectF rectf(0,0,size[0],size[1]);
+	const QRectF rectf(0, 0, size[0], size[1]);
 	widget->graphicsview->scene()->setSceneRect(rectf);
 	//
-	if (redraw_contours && axis==2)
-		draw_contours(ivariant, widget);
+	if (redraw_contours && axis == 2) draw_contours(ivariant, widget);
 	//
 	widget->graphicsview->draw_shutter(ivariant);
 	widget->graphicsview->draw_prgraphics(ivariant);
@@ -644,7 +654,7 @@ template<typename T> void load_rgba_image(
 	else
 		widget->graphicsview->image_item->setTransformationMode(Qt::FastTransformation);
 	widget->graphicsview->image_item->setCacheMode(QGraphicsItem::NoCache);
-	widget->graphicsview->image_item->setPos(0,0);
+	widget->graphicsview->image_item->setPos(0, 0);
 	widget->graphicsview->image_item->setZValue(-1.0);
 	widget->graphicsview->scene()->addItem(widget->graphicsview->image_item);
 #else
@@ -653,8 +663,6 @@ template<typename T> void load_rgba_image(
 	const typename T::RegionType region = image->GetLargestPossibleRegion();
 	const typename T::SizeType   size   = region.GetSize();
 	const typename T::SpacingType spacing = image->GetSpacing();
-	unsigned char * p__   = NULL;
-	unsigned long long j_ = 0;
 	const short axis = widget->get_axis();
 	const bool global_flip_x = widget->graphicsview->global_flip_x;
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
@@ -663,14 +671,14 @@ template<typename T> void load_rgba_image(
 	bool flip_x = false, flip_y = false;
 	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
 	double scale__;
-	if (spacing[0]!=spacing[1])
+	if (spacing[0] != spacing[1])
 	{
-		if (spacing[1]>spacing[0]) coeff_size_1 = spacing[1]/spacing[0];
-		else                       coeff_size_0 = spacing[0]/spacing[1];
+		if (spacing[1] > spacing[0]) coeff_size_1 = spacing[1] / spacing[0];
+		else                         coeff_size_0 = spacing[0] / spacing[1];
 	}
-	const double xratio = widget->graphicsview->width()  / (size[0]*coeff_size_0);
-	const double yratio = widget->graphicsview->height() / (size[1]*coeff_size_1);
-	if (fit==1)
+	const double xratio = widget->graphicsview->width()  / (size[0] * coeff_size_0);
+	const double yratio = widget->graphicsview->height() / (size[1] * coeff_size_1);
+	if (fit == 1)
 	{
 		scale__ = qMin(xratio, yratio);
 		widget->graphicsview->m_scale = scale__;
@@ -682,27 +690,33 @@ template<typename T> void load_rgba_image(
 	const unsigned short high_bit         = ivariant->di->high_bit;
 	const bool           hide_orientation = ivariant->di->hide_orientation;
 	//
+	unsigned char * p__   = NULL;
+	unsigned long long j_ = 0;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+	try
+	{
+		p__ = new unsigned char[size[0] * size[1] * 4];
+	}
+	catch (const std::bad_alloc&)
+	{
+		return;
+	}
 	if (image_type == 21)
 	{
-		const double tmp_max
-			= ((bits_allocated > 0 && bits_stored > 0) &&
-				bits_stored < bits_allocated &&
-				(high_bit==bits_stored-1))
-				? pow(2, bits_stored) - 1 : static_cast<double>(USHRT_MAX);
-		try { p__ = new unsigned char[size[0] * size[1] * 4]; }
-		catch (const std::bad_alloc&) { p__ = NULL; }
-		if (!p__) return;
+		const double tmp_max =
+			(bits_allocated > 0 && bits_stored > 0 && bits_stored < bits_allocated)
+				? pow(2, bits_stored) - 1
+				: static_cast<double>(USHRT_MAX);
 		try
 		{
 			itk::ImageRegionConstIterator<T> iterator(image, region);
 			iterator.GoToBegin();
 			while (!iterator.IsAtEnd())
 			{
-				p__[j_+3] = static_cast<unsigned char>((iterator.Get().GetAlpha() / tmp_max) * 255.0);
-				p__[j_+2] = static_cast<unsigned char>((iterator.Get().GetBlue()  / tmp_max) * 255.0);
-				p__[j_+1] = static_cast<unsigned char>((iterator.Get().GetGreen() / tmp_max) * 255.0);
-				p__[j_+0] = static_cast<unsigned char>((iterator.Get().GetRed()   / tmp_max) * 255.0);
+				p__[j_ + 3] = static_cast<unsigned char>((iterator.Get().GetAlpha() / tmp_max) * 255.0);
+				p__[j_ + 2] = static_cast<unsigned char>((iterator.Get().GetBlue()  / tmp_max) * 255.0);
+				p__[j_ + 1] = static_cast<unsigned char>((iterator.Get().GetGreen() / tmp_max) * 255.0);
+				p__[j_ + 0] = static_cast<unsigned char>((iterator.Get().GetRed()   / tmp_max) * 255.0);
 				j_ += 4;
 				++iterator;
 			}
@@ -718,9 +732,6 @@ template<typename T> void load_rgba_image(
 		const double vmax = ivariant->di->vmax;
 		const double vrange = vmax - vmin;
 		if (!(vrange != 0)) return;
-		try { p__ = new unsigned char[size[0]*size[1]*4]; }
-		catch (const std::bad_alloc&) { p__ = NULL; }
-		if (!p__) return;
 		try
 		{
 			itk::ImageRegionConstIterator<T> iterator(image, region);
@@ -731,10 +742,10 @@ template<typename T> void load_rgba_image(
 				const double b = iterator.Get().GetBlue();
 				const double g = iterator.Get().GetGreen();
 				const double r = iterator.Get().GetRed();
-				p__[j_+3] = static_cast<unsigned char>(255.0*((a+(-vmin))/vrange));
-				p__[j_+2] = static_cast<unsigned char>(255.0*((b+(-vmin))/vrange));
-				p__[j_+1] = static_cast<unsigned char>(255.0*((g+(-vmin))/vrange));
-				p__[j_+0] = static_cast<unsigned char>(255.0*((r+(-vmin))/vrange));
+				p__[j_ + 3] = static_cast<unsigned char>(255.0 * ((a + (-vmin)) / vrange));
+				p__[j_ + 2] = static_cast<unsigned char>(255.0 * ((b + (-vmin)) / vrange));
+				p__[j_ + 1] = static_cast<unsigned char>(255.0 * ((g + (-vmin)) / vrange));
+				p__[j_ + 0] = static_cast<unsigned char>(255.0 * ((r + (-vmin)) / vrange));
 				j_ += 4;
  				++iterator;
 			}
@@ -746,39 +757,43 @@ template<typename T> void load_rgba_image(
 	}
 	QImage tmpi(p__,size[0],size[1],4*size[0],QImage::Format_RGBA8888,gImageCleanupHandler,p__);
 #else
+	try
+	{
+		p__ = new unsigned char[size[0] * size[1] * 3];
+	}
+	catch (const std::bad_alloc&)
+	{
+		return;
+	}
 	if (image_type == 21)
 	{
-		const double tmp_max
-			= ((bits_allocated > 0 && bits_stored > 0) &&
-				bits_stored < bits_allocated &&
-				(high_bit==bits_stored-1))
-				? pow(2, bits_stored) - 1 : static_cast<double>(USHRT_MAX);
-		try { p__ = new unsigned char[size[0] * size[1] * 3]; }
-		catch (const std::bad_alloc&) { p__ = NULL; }
-		if (!p__) return;
+		const double tmp_max =
+			(bits_allocated > 0 && bits_stored > 0 && bits_stored < bits_allocated)
+				? pow(2, bits_stored) - 1
+				: static_cast<double>(USHRT_MAX);
 		try
 		{
 			itk::ImageRegionConstIterator<T> iterator(image, region);
 			iterator.GoToBegin();
 			while (!iterator.IsAtEnd())
 			{
-				if (iterator.Get().GetAlpha()>0)
+				if (iterator.Get().GetAlpha() > 0)
 				{
-					const double alpha = iterator.Get().GetAlpha()/tmp_max;
+					const double alpha = iterator.Get().GetAlpha() / tmp_max;
 					const double one_minus_alpha = 1.0 - alpha;
-					const double tmp_whi = one_minus_alpha*USHRT_MAX;
-					const double tmp_red = tmp_whi + alpha*iterator.Get().GetRed();
-					const double tmp_gre = tmp_whi + alpha*iterator.Get().GetGreen();
-					const double tmp_blu = tmp_whi + alpha*iterator.Get().GetBlue();
-					p__[j_+2] = static_cast<unsigned char>((tmp_blu/tmp_max) * 255.0);
-					p__[j_+1] = static_cast<unsigned char>((tmp_gre/tmp_max) * 255.0);
-					p__[j_+0] = static_cast<unsigned char>((tmp_red/tmp_max) * 255.0);
+					const double tmp_whi = one_minus_alpha * USHRT_MAX;
+					const double tmp_red = tmp_whi + alpha * iterator.Get().GetRed();
+					const double tmp_gre = tmp_whi + alpha * iterator.Get().GetGreen();
+					const double tmp_blu = tmp_whi + alpha * iterator.Get().GetBlue();
+					p__[j_ + 2] = static_cast<unsigned char>((tmp_blu / tmp_max) * 255.0);
+					p__[j_ + 1] = static_cast<unsigned char>((tmp_gre / tmp_max) * 255.0);
+					p__[j_ + 0] = static_cast<unsigned char>((tmp_red / tmp_max) * 255.0);
 				}
 				else
 				{
-					p__[j_+2] = 255;
-					p__[j_+1] = 255;
-					p__[j_+0] = 255;
+					p__[j_ + 2] = 255;
+					p__[j_ + 1] = 255;
+					p__[j_ + 0] = 255;
 				}
 				j_ += 3;
 				++iterator;
@@ -794,10 +809,7 @@ template<typename T> void load_rgba_image(
 		const double vmin = ivariant->di->vmin;
 		const double vmax = ivariant->di->vmax;
 		const double vrange = vmax - vmin;
-		if (!(vrange!=0)) return;
-		try { p__ = new unsigned char[size[0]*size[1]*3]; }
-		catch (const std::bad_alloc&) { p__ = NULL; }
-		if (!p__) return;
+		if (!(vrange != 0)) return;
 		try
 		{
 			itk::ImageRegionConstIterator<T> iterator(image, region);
@@ -806,21 +818,21 @@ template<typename T> void load_rgba_image(
 			{
 				const double alpha = iterator.Get().GetAlpha() / vrange;
 				const double one_minus_alpha = 1.0 - alpha;
-				const double tmp_whi = one_minus_alpha*vrange;
+				const double tmp_whi = one_minus_alpha * vrange;
 				const double tmp_red = tmp_whi + alpha*iterator.Get().GetRed();
 				const double tmp_gre = tmp_whi + alpha*iterator.Get().GetGreen();
 				const double tmp_blu = tmp_whi + alpha*iterator.Get().GetBlue();
 				if (alpha > 0)
 				{
-					p__[j_+2] = static_cast<unsigned char>((tmp_blu/vrange)*255.0);
-					p__[j_+1] = static_cast<unsigned char>((tmp_gre/vrange)*255.0);
-					p__[j_+0] = static_cast<unsigned char>((tmp_red/vrange)*255.0);
+					p__[j_ + 2] = static_cast<unsigned char>((tmp_blu / vrange) * 255.0);
+					p__[j_ + 1] = static_cast<unsigned char>((tmp_gre / vrange) * 255.0);
+					p__[j_ + 0] = static_cast<unsigned char>((tmp_red / vrange) * 255.0);
 				}
 				else
 				{
-					p__[j_+2] = 255;
-					p__[j_+1] = 255;
-					p__[j_+0] = 255;
+					p__[j_ + 2] = 255;
+					p__[j_ + 1] = 255;
+					p__[j_ + 0] = 255;
 				}
 				j_ += 3;
  				++iterator;
@@ -831,10 +843,10 @@ template<typename T> void load_rgba_image(
 			return;
 		}
 	}
-	QImage tmpi(p__,size[0],size[1],3*size[0],QImage::Format_RGB888);
+	QImage tmpi(p__, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
 #endif
 	//
-	if (axis==2)
+	if (axis == 2)
 	{
 		if (widget->get_enable_overlays())
 			GraphicsUtils::draw_overlays(ivariant, tmpi);
@@ -856,13 +868,13 @@ template<typename T> void load_rgba_image(
 		&flip_x, &flip_y);
 	//
 	QTransform t = QTransform();
-	if (spacing[1]!=spacing[0]) t = t.scale(coeff_size_0, coeff_size_1);
+	if (spacing[1] != spacing[0]) t = t.scale(coeff_size_0, coeff_size_1);
 	t = t.scale(scale__, scale__);
-	if (flip_y && flip_x) t = t.scale(-1.0,-1.0);
-	else if (flip_y)      t = t.scale( 1.0,-1.0);
-	else if (flip_x)      t = t.scale(-1.0, 1.0);
-	if (global_flip_x)    t = t.scale(-1.0, 1.0);
-	if (global_flip_y)    t = t.scale( 1.0,-1.0);
+	if (flip_y && flip_x) t = t.scale(-1.0, -1.0);
+	else if (flip_y)      t = t.scale( 1.0, -1.0);
+	else if (flip_x)      t = t.scale(-1.0,  1.0);
+	if (global_flip_x)    t = t.scale(-1.0,  1.0);
+	if (global_flip_y)    t = t.scale( 1.0, -1.0);
 	//
 	const QRectF rectf(0,0,size[0],size[1]);
 	widget->graphicsview->scene()->setSceneRect(rectf);
@@ -920,7 +932,7 @@ template<typename T> void load_rgb_char_image(
 	else
 		widget->graphicsview->image_item->setTransformationMode(Qt::FastTransformation);
 	widget->graphicsview->image_item->setCacheMode(QGraphicsItem::NoCache);
-	widget->graphicsview->image_item->setPos(0,0);
+	widget->graphicsview->image_item->setPos(0, 0);
 	widget->graphicsview->image_item->setZValue(-1.0);
 	widget->graphicsview->scene()->addItem(widget->graphicsview->image_item);
 #else
@@ -929,7 +941,6 @@ template<typename T> void load_rgb_char_image(
 	const typename T::RegionType  region  = image->GetLargestPossibleRegion();
 	const typename T::SizeType    size    = region.GetSize();
 	const typename T::SpacingType spacing = image->GetSpacing();
-	unsigned char * p   = NULL;
 	QString top_string = QString(""), left_string = QString("");
 	bool flip_x = false, flip_y = false;
 	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
@@ -937,6 +948,8 @@ template<typename T> void load_rgb_char_image(
 	const short axis = widget->get_axis();
 	const bool global_flip_x = widget->graphicsview->global_flip_x;
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
+	//
+	unsigned char * p;
 	if (image_type == 14)
 	{
 		try
@@ -945,7 +958,6 @@ template<typename T> void load_rgb_char_image(
 		}
 		catch (const itk::ExceptionObject & ex)
 		{
-			std::cout << ex.GetDescription() << std::endl;
 			return;
 		}
 	}
@@ -953,15 +965,14 @@ template<typename T> void load_rgb_char_image(
 	{
 		return;
 	}
-	if (!p) return;
 	//
 	if (spacing[0] != spacing[1])
 	{
-		if (spacing[1] > spacing[0]) coeff_size_1 = spacing[1]/spacing[0];
-		else                         coeff_size_0 = spacing[0]/spacing[1];
+		if (spacing[1] > spacing[0]) coeff_size_1 = spacing[1] / spacing[0];
+		else                         coeff_size_0 = spacing[0] / spacing[1];
 	}
-	const double xratio = widget->graphicsview->width()  / (size[0]*coeff_size_0);
-	const double yratio = widget->graphicsview->height() / (size[1]*coeff_size_1);
+	const double xratio = widget->graphicsview->width()  / (size[0] * coeff_size_0);
+	const double yratio = widget->graphicsview->height() / (size[1] * coeff_size_1);
 	if (fit == 1)
 	{
 		scale__ = qMin(xratio, yratio);
@@ -972,7 +983,7 @@ template<typename T> void load_rgb_char_image(
 		scale__ = widget->graphicsview->m_scale;
 	}
 	//
-	QImage tmpi = QImage(p,size[0],size[1],3*size[0],QImage::Format_RGB888);
+	QImage tmpi = QImage(p, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
 	//
 	if (axis == 2)
 	{
@@ -999,17 +1010,16 @@ template<typename T> void load_rgb_char_image(
 	QTransform t = QTransform();
 	if (spacing[1] != spacing[0]) t = t.scale(coeff_size_0, coeff_size_1);
 	t = t.scale(scale__, scale__);
-	if (flip_y && flip_x) t = t.scale(-1.0,-1.0);
-	else if (flip_y)      t = t.scale( 1.0,-1.0);
-	else if (flip_x)      t = t.scale(-1.0, 1.0);
-	if (global_flip_x)    t = t.scale(-1.0, 1.0);
-	if (global_flip_y)    t = t.scale( 1.0,-1.0);
+	if (flip_y && flip_x) t = t.scale(-1.0, -1.0);
+	else if (flip_y)      t = t.scale( 1.0, -1.0);
+	else if (flip_x)      t = t.scale(-1.0,  1.0);
+	if (global_flip_x)    t = t.scale(-1.0,  1.0);
+	if (global_flip_y)    t = t.scale( 1.0, -1.0);
 	//
 	const QRectF rectf(0, 0, size[0], size[1]);
 	widget->graphicsview->scene()->setSceneRect(rectf);
 	//
-	if (redraw_contours && axis == 2)
-		draw_contours(ivariant, widget);
+	if (redraw_contours && axis == 2) draw_contours(ivariant, widget);
 	//
 	widget->graphicsview->draw_shutter(ivariant);
 	widget->graphicsview->draw_prgraphics(ivariant);
@@ -1049,7 +1059,7 @@ template<typename T> void load_rgba_char_image(
 	else
 		widget->graphicsview->image_item->setTransformationMode(Qt::FastTransformation);
 	widget->graphicsview->image_item->setCacheMode(QGraphicsItem::NoCache);
-	widget->graphicsview->image_item->setPos(0,0);
+	widget->graphicsview->image_item->setPos(0, 0);
 	widget->graphicsview->image_item->setZValue(-1.0);
 	widget->graphicsview->scene()->addItem(widget->graphicsview->image_item);
 #else
@@ -1066,22 +1076,22 @@ template<typename T> void load_rgba_char_image(
 	const bool global_flip_x = widget->graphicsview->global_flip_x;
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
 	//
-	if (spacing[0]!=spacing[1])
+	if (spacing[0] != spacing[1])
 	{
-		if (spacing[1]>spacing[0]) coeff_size_1 = spacing[1]/spacing[0];
-		else                       coeff_size_0 = spacing[0]/spacing[1];
+		if (spacing[1] > spacing[0]) coeff_size_1 = spacing[1] / spacing[0];
+		else                         coeff_size_0 = spacing[0] / spacing[1];
 	}
-	const double xratio = widget->graphicsview->width()  / (size[0]*coeff_size_0);
-	const double yratio = widget->graphicsview->height() / (size[1]*coeff_size_1);
-	if (fit==1)
+	const double xratio = widget->graphicsview->width()  / (size[0] * coeff_size_0);
+	const double yratio = widget->graphicsview->height() / (size[1] * coeff_size_1);
+	if (fit == 1)
 	{
 		scale__ = qMin(xratio, yratio);
 		widget->graphicsview->m_scale = scale__;
 	}
 	else scale__ = widget->graphicsview->m_scale;
 	//
-	unsigned char * p = NULL;
 	QImage tmpi;
+	unsigned char * p;
 	if (image_type == 24)
 	{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -1091,15 +1101,19 @@ template<typename T> void load_rgba_char_image(
 		}
 		catch (const itk::ExceptionObject & ex)
 		{
-			std::cout << ex.GetDescription() << std::endl;
 			return;
 		}
 		if (!p) return;
-		tmpi = QImage(p,size[0],size[1],4*size[0],QImage::Format_RGBA8888);
+		tmpi = QImage(p, size[0], size[1], 4 * size[0], QImage::Format_RGBA8888);
 #else
-		try { p = new unsigned char[size[0] * size[1] * 3]; }
-		catch (const std::bad_alloc&) { p = NULL; }
-		if (!p) return;
+		try
+		{
+			p = new unsigned char[size[0] * size[1] * 3];
+		}
+		catch (const std::bad_alloc&)
+		{
+			return;
+		}
 		try
 		{
 			unsigned long long j_ = 0;
@@ -1107,23 +1121,23 @@ template<typename T> void load_rgba_char_image(
 			iterator.GoToBegin();
 			while (!iterator.IsAtEnd())
 			{
-				if (iterator.Get().GetAlpha()>0)
+				if (iterator.Get().GetAlpha() > 0)
 				{
-					const double alpha = iterator.Get().GetAlpha()/255.0;
+					const double alpha = iterator.Get().GetAlpha() / 255.0;
 					const double one_minus_alpha = 1.0 - alpha;
 					const double tmp_whi = one_minus_alpha * 255.0;
-					const double tmp_red = tmp_whi + alpha*iterator.Get().GetRed();
-					const double tmp_gre = tmp_whi + alpha*iterator.Get().GetGreen();
-					const double tmp_blu = tmp_whi + alpha*iterator.Get().GetBlue();
-					p[j_+2] = static_cast<unsigned char>(tmp_blu);
-					p[j_+1] = static_cast<unsigned char>(tmp_gre);
-					p[j_+0] = static_cast<unsigned char>(tmp_red);
+					const double tmp_red = tmp_whi + alpha * iterator.Get().GetRed();
+					const double tmp_gre = tmp_whi + alpha * iterator.Get().GetGreen();
+					const double tmp_blu = tmp_whi + alpha * iterator.Get().GetBlue();
+					p[j_ + 2] = static_cast<unsigned char>(tmp_blu);
+					p[j_ + 1] = static_cast<unsigned char>(tmp_gre);
+					p[j_ + 0] = static_cast<unsigned char>(tmp_red);
 				}
 				else
 				{
-					p[j_+2] = 255;
-					p[j_+1] = 255;
-					p[j_+0] = 255;
+					p[j_ + 2] = 255;
+					p[j_ + 1] = 255;
+					p[j_ + 0] = 255;
 				}
 				j_ += 3;
 				++iterator;
@@ -1133,12 +1147,12 @@ template<typename T> void load_rgba_char_image(
 		{
 			return;
 		}
-		tmpi = QImage(p,size[0],size[1],3*size[0],QImage::Format_RGB888);
+		tmpi = QImage(p, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
 #endif
 	}
 	else return;
 	//
-	if (axis==2)
+	if (axis == 2)
 	{
 		if (widget->get_enable_overlays())
 			GraphicsUtils::draw_overlays(ivariant, tmpi);
@@ -1161,19 +1175,18 @@ template<typename T> void load_rgba_char_image(
 		&flip_x, &flip_y);
 	//
 	QTransform t = QTransform();
-	if (spacing[1]!=spacing[0]) t = t.scale(coeff_size_0, coeff_size_1);
+	if (spacing[1] != spacing[0]) t = t.scale(coeff_size_0, coeff_size_1);
 	t = t.scale(scale__, scale__);
-	if (flip_y && flip_x) t = t.scale(-1.0,-1.0);
-	else if (flip_y)      t = t.scale( 1.0,-1.0);
-	else if (flip_x)      t = t.scale(-1.0, 1.0);
-	if (global_flip_x)    t = t.scale(-1.0, 1.0);
-	if (global_flip_y)    t = t.scale( 1.0,-1.0);
+	if (flip_y && flip_x) t = t.scale(-1.0, -1.0);
+	else if (flip_y)      t = t.scale( 1.0, -1.0);
+	else if (flip_x)      t = t.scale(-1.0,  1.0);
+	if (global_flip_x)    t = t.scale(-1.0,  1.0);
+	if (global_flip_y)    t = t.scale( 1.0, -1.0);
 	//
-	const QRectF rectf(0,0,size[0],size[1]);
+	const QRectF rectf(0, 0, size[0], size[1]);
 	widget->graphicsview->scene()->setSceneRect(rectf);
 	//
-	if (redraw_contours && axis==2)
-		draw_contours(ivariant, widget);
+	if (redraw_contours && axis == 2) draw_contours(ivariant, widget);
 	//
 	widget->graphicsview->draw_shutter(ivariant);
 	widget->graphicsview->draw_prgraphics(ivariant);
@@ -1216,11 +1229,16 @@ template<typename T> void load_image(
 	const short lut = ivariant->di->selected_lut;
 	const bool alt_mode = widget->get_alt_mode();
 	//
-	const unsigned int p_size = 3*size[0]*size[1];
-	unsigned char * p = NULL;
-	try { p = new unsigned char[p_size]; }
-	catch (const std::bad_alloc&) { p = NULL; }
-	if (!p) return;
+	const unsigned int p_size = 3 * size[0] * size[1];
+	unsigned char * p;
+	try
+	{
+		p = new unsigned char[p_size];
+	}
+	catch (const std::bad_alloc&)
+	{
+		return;
+	}
 	const short axis = widget->get_axis();
 	//
 	double window_center, window_width;
@@ -1273,9 +1291,9 @@ template<typename T> void load_image(
 		for (int i = 0; i < num_threads; ++i)
 		{
 			const int size_0 = size[0];
-			const int size_1 = size[1]/num_threads;
+			const int size_1 = size[1] / num_threads;
 			const int index_0 = 0;
-			const int index_1 = i*size_1;
+			const int index_1 = i * size_1;
 			ProcessImageThreadLUT_<T> * t__ = new ProcessImageThreadLUT_<T>(
 						image,
 						p,
@@ -1283,7 +1301,7 @@ template<typename T> void load_image(
 						index_0, index_1, j,
 						window_center, window_width,
 						lut, alt_mode,lut_function);
-			j += 3*size_0*size_1;
+			j += 3 * size_0 * size_1;
 			widget->threadsLUT_.push_back(static_cast<QThread*>(t__));
 			t__->start();
 		}
@@ -1292,32 +1310,35 @@ template<typename T> void load_image(
 	{
 		int j = 0;
 		unsigned int block = 64;
-		if (static_cast<float>(size[1])/static_cast<float>(block)>16.0f) block=128;
-		const int tmp100 = size[1]%block;
-		const int incr = static_cast<int>(floor(size[1]/static_cast<double>(block)));;
+		if (static_cast<float>(size[1]) / static_cast<float>(block) > 16.0f)
+		{
+			block = 128;
+		}
+		const int tmp100 = size[1] % block;
+		const int incr = static_cast<int>(floor(size[1] / static_cast<double>(block)));;
 		if (size[1] > block)
 		{
 			for (int i = 0; i < incr; ++i)
 			{
 				const int size_0 = size[0];
 				const int index_0 = 0;
-				const int index_1 = i*block;
+				const int index_1 = i * block;
 				ProcessImageThreadLUT_<T> * t__ = new ProcessImageThreadLUT_<T>(
 							image,
 							p,
-							size_0,  block,
+							size_0, block,
 							index_0, index_1, j,
 							window_center, window_width,
 							lut, alt_mode,lut_function);
-				j += 3*size_0*block;
+				j += 3 * size_0 * block;
 				widget->threadsLUT_.push_back(static_cast<QThread*>(t__));
 				t__->start();
 			}
 			ProcessImageThreadLUT_<T> * lt__ = new ProcessImageThreadLUT_<T>(
 						image,
 						p,
-						size[0],  tmp100,
-						0, incr*block, j,
+						size[0], tmp100,
+						0, incr * block, j,
 						window_center, window_width,
 						lut, alt_mode,lut_function);
 			widget->threadsLUT_.push_back(static_cast<QThread*>(lt__));
@@ -1328,7 +1349,7 @@ template<typename T> void load_image(
 			ProcessImageThreadLUT_<T> * lt__ = new ProcessImageThreadLUT_<T>(
 						image,
 						p,
-						size[0],  size[1],
+						size[0], size[1],
 						0, 0, 0,
 						window_center, window_width,
 						lut, alt_mode,lut_function);
@@ -1363,12 +1384,12 @@ template<typename T> void load_image(
 	widget->threadsLUT_.clear();
 	//
 	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
-	const QRectF rectf(0,0,size[0],size[1]);
+	const QRectF rectf(0, 0, size[0], size[1]);
 	double scale__;
 	if (spacing[0] != spacing[1])
 	{
-		if (spacing[1] > spacing[0]) coeff_size_1 = spacing[1]/spacing[0];
-		else                         coeff_size_0 = spacing[0]/spacing[1];
+		if (spacing[1] > spacing[0]) coeff_size_1 = spacing[1] / spacing[0];
+		else                         coeff_size_0 = spacing[0] / spacing[1];
 	}
 	QString top_string = QString(""), left_string = QString("");
 	bool flip_y = false, flip_x = false;
@@ -1390,17 +1411,17 @@ template<typename T> void load_image(
 	else
 		widget->graphicsview->image_item->setTransformationMode(Qt::FastTransformation);
 	widget->graphicsview->image_item->setCacheMode(QGraphicsItem::NoCache);
-	widget->graphicsview->image_item->setPos(0,0);
+	widget->graphicsview->image_item->setPos(0, 0);
 	widget->graphicsview->image_item->setZValue(-1.0);
 	widget->graphicsview->scene()->addItem(widget->graphicsview->image_item);
 #endif
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	QImage tmpi(p,size[0],size[1],3*size[0],QImage::Format_RGB888,gImageCleanupHandler,p);
+	QImage tmpi(p, size[0], size[1], 3 * size[0], QImage::Format_RGB888, gImageCleanupHandler, p);
 #else
-	QImage tmpi(p,size[0],size[1],3*size[0],QImage::Format_RGB888);
+	QImage tmpi(p, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
 #endif
 	//
-	if (axis==2)
+	if (axis == 2)
 	{
 		if (widget->get_enable_overlays())
 			GraphicsUtils::draw_overlays(ivariant, tmpi);
@@ -1411,9 +1432,9 @@ template<typename T> void load_image(
 			GraphicsUtils::draw_cross_out(tmpi);
 	}
 	//
-	const double xratio = widget->graphicsview->width()  / (size[0]*coeff_size_0);
-	const double yratio = widget->graphicsview->height() / (size[1]*coeff_size_1);
-	if (fit==1)
+	const double xratio = widget->graphicsview->width()  / (size[0] * coeff_size_0);
+	const double yratio = widget->graphicsview->height() / (size[1] * coeff_size_1);
+	if (fit == 1)
 	{
 		scale__ = qMin(xratio, yratio);
 		widget->graphicsview->m_scale = scale__;
@@ -1422,7 +1443,7 @@ template<typename T> void load_image(
 	//
 	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(tmpi));
 	QTransform t = QTransform();
-	if (spacing[1]!=spacing[0]) t = t.scale(coeff_size_0, coeff_size_1);
+	if (spacing[1] != spacing[0]) t = t.scale(coeff_size_0, coeff_size_1);
 	t = t.scale(scale__, scale__);
 	//
 	const bool hide_orientation = ivariant->di->hide_orientation;
@@ -1436,11 +1457,11 @@ template<typename T> void load_image(
 	//
 	//std::cout << "Flip x=" << flip_x << " y=" << flip_y << std::endl;
 	//
-	if (flip_y && flip_x) t = t.scale(-1.0,-1.0);
-	else if (flip_y)      t = t.scale( 1.0,-1.0);
-	else if (flip_x)      t = t.scale(-1.0, 1.0);
-	if (global_flip_x)    t = t.scale(-1.0, 1.0);
-	if (global_flip_y)    t = t.scale( 1.0,-1.0);
+	if (flip_y && flip_x) t = t.scale(-1.0, -1.0);
+	else if (flip_y)      t = t.scale( 1.0, -1.0);
+	else if (flip_x)      t = t.scale(-1.0,  1.0);
+	if (global_flip_x)    t = t.scale(-1.0,  1.0);
+	if (global_flip_y)    t = t.scale( 1.0, -1.0);
 	//
 	widget->set_top_label_text(top_string);
 	widget->set_left_label_text(left_string);
@@ -1487,8 +1508,8 @@ template<typename T> double get_distance(
 	if (x0 < 0 || y0 < 0 || x1 < 0 || y1 < 0) return -1;
 	itk::ContinuousIndex<float, 3> idx0;
 	itk::ContinuousIndex<float, 3> idx1;
-	itk::Point<float,3> j0;
-	itk::Point<float,3> j1;
+	itk::Point<float, 3> j0;
+	itk::Point<float, 3> j1;
 	const float x0_ = static_cast<float>(x0);
 	const float y0_ = static_cast<float>(y0);
 	const float x1_ = static_cast<float>(x1);
@@ -1509,7 +1530,7 @@ template<typename T> double get_distance(
 					y1_<ivariant->di->idimz)
 				{
 					ok = true;
-					idx0[0] = idx1[0]=ivariant->di->selected_x_slice;
+					idx0[0] = idx1[0] = ivariant->di->selected_x_slice;
 					idx0[1] = x0_;
 					idx0[2] = y0_;
 					idx1[1] = x1_;
@@ -1529,7 +1550,7 @@ template<typename T> double get_distance(
 					y1_<ivariant->di->idimz)
 				{
 					ok = true;
-					idx0[1] = idx1[1]=ivariant->di->selected_y_slice;
+					idx0[1] = idx1[1] = ivariant->di->selected_y_slice;
 					idx0[0] = x0_;
 					idx0[2] = y0_;
 					idx1[0] = x1_;
@@ -1547,7 +1568,7 @@ template<typename T> double get_distance(
 				y1_<ivariant->di->idimy)
 			{
 				ok = true;
-				idx0[2] = idx1[2]=ivariant->di->selected_z_slice;
+				idx0[2] = idx1[2] = ivariant->di->selected_z_slice;
 				idx0[0] = x0_;
 				idx0[1] = y0_;
 				idx1[0] = x1_;
@@ -1673,7 +1694,7 @@ void GraphicsWidget::update_selection_rectangle()
 			image_container.image3D->di->irect_size[1]));
 	graphicsview->handle_rect->resetTransform();
 	graphicsview->handle_rect->setRect(r___);
-	graphicsview->handle_rect->setPos(QPointF(0.0f,0.0f));
+	graphicsview->handle_rect->setPos(QPointF(0.0f, 0.0f));
 }
 
 void GraphicsWidget::update_pr_area()
@@ -1729,7 +1750,7 @@ void GraphicsWidget::update_selection_item()
 					from_to));
 			graphicsview->selection_item->resetTransform();
 			graphicsview->selection_item->setRect(r___);
-			graphicsview->selection_item->setPos(QPointF(0.0f,0.0f));
+			graphicsview->selection_item->setPos(QPointF(0.0f, 0.0f));
 		}
 		break;
 	case 1:
@@ -1747,7 +1768,7 @@ void GraphicsWidget::update_selection_item()
 					from_to));
 			graphicsview->selection_item->resetTransform();
 			graphicsview->selection_item->setRect(r___);
-			graphicsview->selection_item->setPos(QPointF(0.0f,0.0f));
+			graphicsview->selection_item->setPos(QPointF(0.0f, 0.0f));
 		}
 		break;
 	default: break;
@@ -1955,7 +1976,7 @@ void GraphicsWidget::clear_(bool lock)
 		delete graphicsview->image_item;
 		graphicsview->image_item = NULL;
 #else
-		QPixmap p(16,16);
+		QPixmap p(16, 16);
 		graphicsview->image_item->setPixmap(p);
 #endif
 	}
@@ -1964,7 +1985,7 @@ void GraphicsWidget::clear_(bool lock)
 	graphicsview->pr_area->hide();
 	if (image_container.image2D)
 	{
-		image_container.image2D->image_type=-1;
+		image_container.image2D->image_type = -1;
 		image_container.image2D->orientation_string = QString("");
 		image_container.image2D->laterality = QString("");
 		image_container.image2D->body_part  = QString("");
@@ -1973,117 +1994,117 @@ void GraphicsWidget::clear_(bool lock)
 		if (image_container.image2D->pSS.IsNotNull())
 		{
 			image_container.image2D->pSS->DisconnectPipeline();
-			image_container.image2D->pSS =NULL;
+			image_container.image2D->pSS = NULL;
 		}
 		if (image_container.image2D->pUS.IsNotNull())
 		{
 			image_container.image2D->pUS->DisconnectPipeline();
-			image_container.image2D->pUS =NULL;
+			image_container.image2D->pUS = NULL;
 		}
 		if (image_container.image2D->pSI.IsNotNull())
 		{
 			image_container.image2D->pSI->DisconnectPipeline();
-			image_container.image2D->pSI =NULL;
+			image_container.image2D->pSI = NULL;
 		}
 		if (image_container.image2D->pUI.IsNotNull())
 		{
 			image_container.image2D->pUI->DisconnectPipeline();
-			image_container.image2D->pUI =NULL;
+			image_container.image2D->pUI = NULL;
 		}
 		if (image_container.image2D->pUC.IsNotNull())
 		{
 			image_container.image2D->pUC->DisconnectPipeline();
-			image_container.image2D->pUC =NULL;
+			image_container.image2D->pUC = NULL;
 		}
 		if (image_container.image2D->pF.IsNotNull())
 		{
 			image_container.image2D->pF->DisconnectPipeline();
-			image_container.image2D->pF =NULL;
+			image_container.image2D->pF = NULL;
 		}
 		if (image_container.image2D->pD.IsNotNull())
 		{
 			image_container.image2D->pD->DisconnectPipeline();
-			image_container.image2D->pD =NULL;
+			image_container.image2D->pD = NULL;
 		}
 		if (image_container.image2D->pSLL.IsNotNull())
 		{
 			image_container.image2D->pSLL->DisconnectPipeline();
-			image_container.image2D->pSLL =NULL;
+			image_container.image2D->pSLL = NULL;
 		}
 		if (image_container.image2D->pULL.IsNotNull())
 		{
 			image_container.image2D->pULL->DisconnectPipeline();
-			image_container.image2D->pULL =NULL;
+			image_container.image2D->pULL = NULL;
 		}
 		if (image_container.image2D->pSS_rgb.IsNotNull())
 		{
 			image_container.image2D->pSS_rgb->DisconnectPipeline();
-			image_container.image2D->pSS_rgb =NULL;
+			image_container.image2D->pSS_rgb = NULL;
 		}
 		if (image_container.image2D->pUS_rgb.IsNotNull())
 		{
 			image_container.image2D->pUS_rgb->DisconnectPipeline();
-			image_container.image2D->pUS_rgb =NULL;
+			image_container.image2D->pUS_rgb = NULL;
 		}
 		if (image_container.image2D->pSI_rgb.IsNotNull())
 		{
 			image_container.image2D->pSI_rgb->DisconnectPipeline();
-			image_container.image2D->pSI_rgb =NULL;
+			image_container.image2D->pSI_rgb = NULL;
 		}
 		if (image_container.image2D->pUI_rgb.IsNotNull())
 		{
 			image_container.image2D->pUI_rgb->DisconnectPipeline();
-			image_container.image2D->pUI_rgb =NULL;
+			image_container.image2D->pUI_rgb = NULL;
 		}
 		if (image_container.image2D->pUC_rgb.IsNotNull())
 		{
 			image_container.image2D->pUC_rgb->DisconnectPipeline();
-			image_container.image2D->pUC_rgb =NULL;
+			image_container.image2D->pUC_rgb = NULL;
 		}
 		if (image_container.image2D->pF_rgb .IsNotNull())
 		{
 			image_container.image2D->pF_rgb->DisconnectPipeline();
-			image_container.image2D->pF_rgb =NULL;
+			image_container.image2D->pF_rgb = NULL;
 		}
 		if (image_container.image2D->pD_rgb.IsNotNull())
 		{
 			image_container.image2D->pD_rgb->DisconnectPipeline();
-			image_container.image2D->pD_rgb =NULL;
+			image_container.image2D->pD_rgb = NULL;
 		}
 		if (image_container.image2D->pSS_rgba.IsNotNull())
 		{
 			image_container.image2D->pSS_rgba->DisconnectPipeline();
-			image_container.image2D->pSS_rgba =NULL;
+			image_container.image2D->pSS_rgba = NULL;
 		}
 		if (image_container.image2D->pUS_rgba.IsNotNull())
 		{
 			image_container.image2D->pUS_rgba->DisconnectPipeline();
-			image_container.image2D->pUS_rgba =NULL;
+			image_container.image2D->pUS_rgba = NULL;
 		}
 		if (image_container.image2D->pSI_rgba.IsNotNull())
 		{
 			image_container.image2D->pSI_rgba->DisconnectPipeline();
-			image_container.image2D->pSI_rgba =NULL;
+			image_container.image2D->pSI_rgba = NULL;
 		}
 		if (image_container.image2D->pUI_rgba.IsNotNull())
 		{
 			image_container.image2D->pUI_rgba->DisconnectPipeline();
-			image_container.image2D->pUI_rgba =NULL;
+			image_container.image2D->pUI_rgba = NULL;
 		}
 		if (image_container.image2D->pUC_rgba.IsNotNull())
 		{
 			image_container.image2D->pUC_rgba->DisconnectPipeline();
-			image_container.image2D->pUC_rgba =NULL;
+			image_container.image2D->pUC_rgba = NULL;
 		}
 		if (image_container.image2D->pF_rgba.IsNotNull())
 		{
 			image_container.image2D->pF_rgba->DisconnectPipeline();
-			image_container.image2D->pF_rgba =NULL;
+			image_container.image2D->pF_rgba = NULL;
 		}
 		if (image_container.image2D->pD_rgba.IsNotNull())
 		{
 			image_container.image2D->pD_rgba->DisconnectPipeline();
-			image_container.image2D->pD_rgba =NULL;
+			image_container.image2D->pD_rgba = NULL;
 		}
 	}
 	image_container.image3D = NULL;
@@ -2128,7 +2149,7 @@ float GraphicsWidget::get_offset_x()
 				?
 				graphicsview->handle_rect->boundingRect().topLeft().x() +
 				graphicsview->handle_rect->pos().x() +
-				0.5f*graphicsview->handle_rect->get_width()
+				0.5f * graphicsview->handle_rect->get_width()
 				:
 				0.0f;
 		}
@@ -2159,7 +2180,7 @@ float GraphicsWidget::get_offset_y()
 			?
 			graphicsview->handle_rect->boundingRect().topLeft().y() +
 			graphicsview->handle_rect->pos().y() +
-			0.5f*graphicsview->handle_rect->get_width()
+			0.5f * graphicsview->handle_rect->get_width()
 			:
 			0.0f;
 		}
@@ -2182,7 +2203,7 @@ void GraphicsWidget::set_slice_2D(
 		delete graphicsview->image_item;
 		graphicsview->image_item = NULL;
 #else
-		QPixmap p(16,16);
+		QPixmap p(16, 16);
 		graphicsview->image_item->setPixmap(p);
 #endif
 	}
@@ -2209,81 +2230,81 @@ void GraphicsWidget::set_slice_2D(
 	//
 	if (!image_container.image2D) goto quit__;
 	//
-	image_container.image2D->image_type=-1;
+	image_container.image2D->image_type = -1;
 	image_container.image2D->orientation_string = QString("");
 	image_container.image2D->laterality = QString("");
 	image_container.image2D->body_part  = QString("");
-	image_container.image2D->idimx=0;
-	image_container.image2D->idimy=0;
+	image_container.image2D->idimx = 0;
+	image_container.image2D->idimy = 0;
 	if (image_container.image2D->pSS.IsNotNull())
 		image_container.image2D->pSS->DisconnectPipeline();
-	image_container.image2D->pSS=NULL;
+	image_container.image2D->pSS = NULL;
 	if (image_container.image2D->pUS.IsNotNull())
 		image_container.image2D->pUS->DisconnectPipeline();
-	image_container.image2D->pUS=NULL;
+	image_container.image2D->pUS = NULL;
 	if (image_container.image2D->pSI.IsNotNull())
 		image_container.image2D->pSI->DisconnectPipeline();
-	image_container.image2D->pSI=NULL;
+	image_container.image2D->pSI = NULL;
 	if (image_container.image2D->pUI.IsNotNull())
 		image_container.image2D->pUI->DisconnectPipeline();
-	image_container.image2D->pUI=NULL;
+	image_container.image2D->pUI = NULL;
 	if (image_container.image2D->pUC.IsNotNull())
 		image_container.image2D->pUC->DisconnectPipeline();
-	image_container.image2D->pUC=NULL;
+	image_container.image2D->pUC = NULL;
 	if (image_container.image2D->pF.IsNotNull())
 		image_container.image2D->pF->DisconnectPipeline();
-	image_container.image2D->pF=NULL;
+	image_container.image2D->pF = NULL;
 	if (image_container.image2D->pD.IsNotNull())
 		image_container.image2D->pD->DisconnectPipeline();
-	image_container.image2D->pD=NULL;
+	image_container.image2D->pD = NULL;
 	if (image_container.image2D->pSLL.IsNotNull())
 		image_container.image2D->pSLL->DisconnectPipeline();
-	image_container.image2D->pSLL=NULL;
+	image_container.image2D->pSLL = NULL;
 	if (image_container.image2D->pULL.IsNotNull())
 		image_container.image2D->pULL->DisconnectPipeline();
-	image_container.image2D->pULL=NULL;
+	image_container.image2D->pULL = NULL;
 	if (image_container.image2D->pSS_rgb.IsNotNull())
 		image_container.image2D->pSS_rgb->DisconnectPipeline();
-	image_container.image2D->pSS_rgb=NULL;
+	image_container.image2D->pSS_rgb = NULL;
 	if (image_container.image2D->pUS_rgb.IsNotNull())
 		image_container.image2D->pUS_rgb->DisconnectPipeline();
-	image_container.image2D->pUS_rgb=NULL;
+	image_container.image2D->pUS_rgb = NULL;
 	if (image_container.image2D->pSI_rgb.IsNotNull())
 		image_container.image2D->pSI_rgb->DisconnectPipeline();
-	image_container.image2D->pSI_rgb=NULL;
+	image_container.image2D->pSI_rgb = NULL;
 	if (image_container.image2D->pUI_rgb.IsNotNull())
 		image_container.image2D->pUI_rgb->DisconnectPipeline();
-	image_container.image2D->pUI_rgb=NULL;
+	image_container.image2D->pUI_rgb = NULL;
 	if (image_container.image2D->pUC_rgb.IsNotNull())
 		image_container.image2D->pUC_rgb ->DisconnectPipeline();
-	image_container.image2D->pUC_rgb=NULL;
+	image_container.image2D->pUC_rgb = NULL;
 	if (image_container.image2D->pF_rgb.IsNotNull())
 		image_container.image2D->pF_rgb->DisconnectPipeline();
-	image_container.image2D->pF_rgb=NULL;
+	image_container.image2D->pF_rgb = NULL;
 	if (image_container.image2D->pD_rgb.IsNotNull())
 		image_container.image2D->pD_rgb->DisconnectPipeline();
-	image_container.image2D->pD_rgb=NULL;
+	image_container.image2D->pD_rgb = NULL;
 	if (image_container.image2D->pSS_rgba.IsNotNull())
 		image_container.image2D->pSS_rgba->DisconnectPipeline();
-	image_container.image2D->pSS_rgba=NULL;
+	image_container.image2D->pSS_rgba = NULL;
 	if (image_container.image2D->pUS_rgba.IsNotNull())
 		image_container.image2D->pUS_rgba->DisconnectPipeline();
-	image_container.image2D->pUS_rgba=NULL;
+	image_container.image2D->pUS_rgba = NULL;
 	if (image_container.image2D->pSI_rgba.IsNotNull())
 		image_container.image2D->pSI_rgba->DisconnectPipeline();
-	image_container.image2D->pSI_rgba=NULL;
+	image_container.image2D->pSI_rgba = NULL;
 	if (image_container.image2D->pUI_rgba.IsNotNull())
 		image_container.image2D->pUI_rgba->DisconnectPipeline();
-	image_container.image2D->pUI_rgba=NULL;
+	image_container.image2D->pUI_rgba = NULL;
 	if (image_container.image2D->pUC_rgba.IsNotNull())
 		image_container.image2D->pUC_rgba->DisconnectPipeline();
-	image_container.image2D->pUC_rgba=NULL;
+	image_container.image2D->pUC_rgba = NULL;
 	if (image_container.image2D->pF_rgba.IsNotNull())
 		image_container.image2D->pF_rgba->DisconnectPipeline();
-	image_container.image2D->pF_rgba=NULL;
+	image_container.image2D->pF_rgba = NULL;
 	if (image_container.image2D->pD_rgba.IsNotNull())
 		image_container.image2D->pD_rgba->DisconnectPipeline();
-	image_container.image2D->pD_rgba=NULL;
+	image_container.image2D->pD_rgba = NULL;
 	//
 	switch(axis)
 	{
@@ -2379,25 +2400,28 @@ void GraphicsWidget::set_slice_2D(
 	{
 		image_container.image2D->image_type = v->image_type;
 	}
-	else { goto quit__; }
+	else
+	{
+		goto quit__;
+	}
 	//
 	switch(axis)
 	{
-	case 0  :
+	case 0:
 		{
 			if (v->equi)
 				image_container.image2D->orientation_string =
 					v->orientation_string;
 		}
 		break;
-	case 1  :
+	case 1:
 		{
 			if (v->equi)
 				image_container.image2D->orientation_string =
 					v->orientation_string;
 		}
 		break;
-	case 2  :
+	case 2:
 		{
 			const bool check_consistence =
 				((static_cast<int>(v->di->image_slices.size() == v->di->idimz)) &&
@@ -2530,7 +2554,7 @@ void GraphicsWidget::animate_()
 	case 0:
 		{
 			k = image_container.image3D->di->selected_x_slice;
-			if (k >= image_container.image3D->di->idimx-1 || k < 0)
+			if (k >= image_container.image3D->di->idimx - 1 || k < 0)
 				k = 0;
 			else
 				++k;
@@ -2540,7 +2564,7 @@ void GraphicsWidget::animate_()
 	case 1:
 		{
 			k = image_container.image3D->di->selected_y_slice;
-			if (k >= image_container.image3D->di->idimy-1 || k < 0)
+			if (k >= image_container.image3D->di->idimy - 1 || k < 0)
 				k = 0;
 			else
 				++k;
@@ -2550,7 +2574,7 @@ void GraphicsWidget::animate_()
 	case 2:
 		{
 			k = image_container.image3D->di->selected_z_slice;
-			if (k >= image_container.image3D->di->idimz-1 || k < 0)
+			if (k >= image_container.image3D->di->idimz - 1 || k < 0)
 				k = 0;
 			else
 				++k;
@@ -2564,7 +2588,7 @@ void GraphicsWidget::animate_()
 				else
 				{
 					image_container.image3D->di->to_slice =
-						image_container.image3D->di->idimz-1;
+						image_container.image3D->di->idimz - 1;
 				}
 			}
 			if (
@@ -2581,14 +2605,14 @@ void GraphicsWidget::animate_()
 		break;
 	default: return;
 	}
-	if (!((axis==2) && (image_container.image3D->di->idimz==1)))
+	if (!((axis==2) && (image_container.image3D->di->idimz == 1)))
 	{
 		set_slice_2D(image_container.image3D, 0, false);
 		aliza->update_slice_from_animation(
 			const_cast<const ImageVariant*>(image_container.image3D));
 	}
 	const qint64 t1 = QDateTime::currentMSecsSinceEpoch();
-	const long long t = static_cast<long long>(requested_time-(t1-t0));
+	const long long t = static_cast<long long>(requested_time- (t1 - t0));
 	if (t <= 0)
 	{
 		// can not run at required speed
@@ -2636,7 +2660,7 @@ void GraphicsWidget::set_measure_text(const QString & s)
 void GraphicsWidget::update_frames()
 {
 	if (!image_container.image3D||!image_container.image2D) return;
-	if (1==get_mouse_modus() && image_container.image3D->equi)
+	if (1 == get_mouse_modus() && image_container.image3D->equi)
 		graphicsview->draw_frames(get_axis());
 }
 
@@ -2742,7 +2766,7 @@ void GraphicsWidget::update_measurement(
 					ids2.at(x)).m_DataTypeString.isEmpty())
 				data_type.append(
 					ivariant->usregions.at(ids2.at(x)).m_DataTypeString);
-			if (ids2.size()>1 && x!=ids2.size()-1 && !data_type.isEmpty())
+			if (ids2.size() > 1 && x != ids2.size() - 1 && !data_type.isEmpty())
 				data_type.append(QString("/"));
 		}
 		//
@@ -2751,17 +2775,17 @@ void GraphicsWidget::update_measurement(
 			bool tmp1x = false;
 			bool tmp1y = false;
 			const unsigned int id =
-				(high_priority_regions.size()==1)
+				(high_priority_regions.size() == 1)
 				? high_priority_regions.at(0)
 				: ids.at(0);
 			const double dx  =
 				ivariant->usregions.at(id).m_PhysicalDeltaX;
 			const double dy  =
 				ivariant->usregions.at(id).m_PhysicalDeltaY;
-			const double x0_ = x0*dx;
-			const double y0_ = y0*dy;
-			const double x1_ = x1*dx;
-			const double y1_ = y1*dy;
+			const double x0_ = x0 * dx;
+			const double y0_ = y0 * dy;
+			const double x1_ = x1 * dx;
+			const double y1_ = y1 * dy;
 			const QString measure_textx  =
 				ivariant->usregions.at(id).m_UnitXString;
 			const QString measure_texty  =
@@ -2772,19 +2796,19 @@ void GraphicsWidget::update_measurement(
 			switch(spatial)
 			{
 			case 0x1:
-				color = QColor(0x00,0xff,0x00); // 2D
+				color = QColor(0x00, 0xff, 0x00); // 2D
 				break;
 			case 0x2:
-				color = QColor(0xff,0x00,0x00); // M-Mode
+				color = QColor(0xff, 0x00, 0x00); // M-Mode
 				break;
 			case 0x3:
-				color = QColor(0x00,0x00,0xff); // Spectral
+				color = QColor(0x00, 0x00, 0xff); // Spectral
 				break;
 			case 0x4:
-				color = QColor(0x00,0xff,0xff); // Waveform
+				color = QColor(0x00, 0xff, 0xff); // Waveform
 				break;
 			case 0x5:
-				color = QColor(0xff,0x00,0xff); // Graphics
+				color = QColor(0xff, 0x00, 0xff); // Graphics
 				break;
 			case 0:
 			default:
@@ -2794,9 +2818,9 @@ void GraphicsWidget::update_measurement(
 			{
 				const double d   = get_distance2(x0_, y0_, x1_, y1_);
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-				tmp0 = QString::asprintf("%.3f",d);
+				tmp0 = QString::asprintf("%.3f", d);
 #else
-				tmp0.sprintf("%.3f",d);
+				tmp0.sprintf("%.3f", d);
 #endif
 				tmp0.append(QString(" ") + measure_textx);
 			}
@@ -2808,9 +2832,9 @@ void GraphicsWidget::update_measurement(
 					const double d0 = get_distance2(x0_, y0_, x1_, y0_);
 					QString tmp0x;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-					tmp0x = QString::asprintf("%.3f",d0);
+					tmp0x = QString::asprintf("%.3f", d0);
 #else
-					tmp0x.sprintf("%.3f",d0);
+					tmp0x.sprintf("%.3f", d0);
 #endif
 					tmp0.append(
 						QString("X: ") +
@@ -2828,9 +2852,9 @@ void GraphicsWidget::update_measurement(
 					const double d1 = get_distance2(x0_, y0_, x0_, y1_);
 					QString tmp0y;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-					tmp0y = QString::asprintf("%.3f",d1);
+					tmp0y = QString::asprintf("%.3f", d1);
 #else
-					tmp0y.sprintf("%.3f",d1);
+					tmp0y.sprintf("%.3f", d1);
 #endif
 					tmp0.append(
 						QString("Y: ") +
@@ -3000,7 +3024,7 @@ void GraphicsWidget::set_mouse_modus(short m, bool us_regions)
 			if (main)
 			{
 				graphicsview->handle_rect->set_pen2(
-					3.0/graphicsview->m_scale);
+					3.0 / graphicsview->m_scale);
 				graphicsview->set_handleitems_cursors(false);
 			}
 			graphicsview->measurment_line->hide();
@@ -3021,7 +3045,7 @@ void GraphicsWidget::set_mouse_modus(short m, bool us_regions)
 			if (main)
 			{
 				graphicsview->handle_rect->set_pen2(
-					3.0/graphicsview->m_scale);
+					3.0 / graphicsview->m_scale);
 				graphicsview->set_handleitems_cursors(false);
 			}
 			graphicsview->measurment_line->show();
@@ -3047,7 +3071,7 @@ void GraphicsWidget::set_mouse_modus(short m, bool us_regions)
 			if (main)
 			{
 				graphicsview->handle_rect->set_pen1(
-					3.0/graphicsview->m_scale);
+					3.0 / graphicsview->m_scale);
 				graphicsview->set_handleitems_cursors(true);
 			}
 			graphicsview->measurment_line->hide();

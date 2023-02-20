@@ -10,7 +10,7 @@ LUTWidget::LUTWidget(float si)
 	setFont(small);
 	scale_icons = si;
 	QHBoxLayout * l = new QHBoxLayout(this);
-	l->setContentsMargins(0,0,0,0);
+	l->setContentsMargins(0, 0, 0, 0);
 	l->setSpacing(0);
 	comboBox = new QComboBox(this);
 	l->addWidget(comboBox);
@@ -41,7 +41,8 @@ void LUTWidget::add_items1()
     sizePolicy.setVerticalStretch(0);
     sizePolicy.setHeightForWidth(comboBox->sizePolicy().hasHeightForWidth());
     comboBox->setSizePolicy(sizePolicy);
-    comboBox->setIconSize(QSize(static_cast<int>(18*scale_icons),static_cast<int>(18*scale_icons)));
+    comboBox->setIconSize(QSize(
+		static_cast<int>(18 * scale_icons), static_cast<int>(18 * scale_icons)));
     comboBox->setFrame(true);
 	comboBox->setCurrentIndex(0);
 }
@@ -62,7 +63,8 @@ void LUTWidget::add_items2()
     sizePolicy.setVerticalStretch(0);
     sizePolicy.setHeightForWidth(comboBox->sizePolicy().hasHeightForWidth());
     comboBox->setSizePolicy(sizePolicy);
-    comboBox->setIconSize(QSize(static_cast<int>(18*scale_icons),static_cast<int>(18*scale_icons)));
+    comboBox->setIconSize(QSize(
+		static_cast<int>(18 * scale_icons), static_cast<int>(18 * scale_icons)));
     comboBox->setFrame(true);
 	comboBox->setCurrentIndex(0);
 }

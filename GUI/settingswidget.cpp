@@ -63,15 +63,21 @@ bool SettingsWidget::get_resize() const
 
 int SettingsWidget::get_size_x() const
 {
-	int x; QVariant v(x_comboBox->currentText());
-	bool ok = false; x = v.toInt(&ok); if (!ok) x = 0;
+	int x;
+	QVariant v(x_comboBox->currentText());
+	bool ok = false;
+	x = v.toInt(&ok);
+	if (!ok) x = 0;
 	return x;
 }
 
 int SettingsWidget::get_size_y() const
 {
-	int x; QVariant v(y_comboBox->currentText());
-	bool ok = false; x = v.toInt(&ok); if (!ok) x = 0;
+	int x;
+	QVariant v(y_comboBox->currentText());
+	bool ok = false;
+	x = v.toInt(&ok);
+	if (!ok) x = 0;
 	return x;
 }
 
@@ -82,8 +88,7 @@ bool SettingsWidget::get_rescale() const
 
 bool SettingsWidget::get_3d() const
 {
-	return (
-		gl3D_checkBox->isChecked() &&
+	return (gl3D_checkBox->isChecked() &&
 		textureoptions_groupBox->isChecked());
 }
 
@@ -334,7 +339,7 @@ void SettingsWidget::writeSettings(QSettings & s)
 
 float SettingsWidget::get_scale_icons() const
 {
-	return scale_icons*static_cast<float>(si_doubleSpinBox->value());
+	return (scale_icons * static_cast<float>(si_doubleSpinBox->value()));
 }
 
 void SettingsWidget::force_no_gl3()

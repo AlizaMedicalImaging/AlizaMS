@@ -632,8 +632,6 @@ void StudyViewWidget::update_level(ImageContainer * c)
 #endif
 }
 
-////////////////////////////////////
-
 void StudyViewWidget::set_center_slider(int x)
 {
 	center_doubleSpinBox->blockSignals(true);
@@ -906,7 +904,6 @@ void StudyViewWidget::check_close() // FIXME
 		close();
 	}
 }
-////////////////////
 
 void StudyViewWidget::update_locked_window(bool t)
 {

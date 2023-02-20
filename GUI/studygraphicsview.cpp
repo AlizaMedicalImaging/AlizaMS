@@ -59,10 +59,10 @@ StudyGraphicsView::StudyGraphicsView(StudyGraphicsWidget * p)
 	//
 	//
 	measurment_line = new QGraphicsPathItem();
-	measurment_line->setZValue(1e+19-1);
+	measurment_line->setZValue(1e+19 - 1);
 	scene_->addItem(measurment_line);
 	//
-	pr_area = new QGraphicsRectItem(0,0,100,100);
+	pr_area = new QGraphicsRectItem(0, 0, 100, 100);
 	pr_area->setFlag(QGraphicsItem::ItemIsMovable, false);
 	pr_area->setFlag(QGraphicsItem::ItemIsFocusable, false);
 	pr_area->setAcceptHoverEvents(false);
@@ -71,7 +71,7 @@ StudyGraphicsView::StudyGraphicsView(StudyGraphicsWidget * p)
 #else
 	pr_area->setAcceptedMouseButtons(0);
 #endif
-	pr_area->setZValue(1e+19-6);
+	pr_area->setZValue(1e+19 - 6);
 	pr_area->hide();
 	//QBrush pbrush(QColor(73, 45, 124));
 	QBrush pbrush(QColor(146, 90, 248));
@@ -182,7 +182,7 @@ void StudyGraphicsView::zoom_in()
 
 void StudyGraphicsView::zoom_out()
 {
-	scale_view(1.0/1.015);
+	scale_view(1.0 / 1.015);
 }
 
 void StudyGraphicsView::clear_collision_paths()
@@ -493,23 +493,23 @@ void StudyGraphicsView::draw_us_regions()
 		const unsigned int priority =
 			(r.m_FlagsBool && ((r.m_RegionFlags & 1) == 0)) ? 0 : 1;
 		const unsigned short spatial = r.m_RegionSpatialFormat;
-		QColor color(0xff,0xff,0xff);
+		QColor color(0xff, 0xff, 0xff);
 		switch(spatial)
 		{
 		case 0x1:
-			color = QColor(0x00,0xff,0x00); // 2D
+			color = QColor(0x00, 0xff, 0x00); // 2D
 			break;
 		case 0x2:
-			color = QColor(0xff,0x00,0x00); // M-Mode
+			color = QColor(0xff, 0x00, 0x00); // M-Mode
 			break;
 		case 0x3:
-			color = QColor(0x00,0x00,0xff); // Spectral
+			color = QColor(0x00, 0x00, 0xff); // Spectral
 			break;
 		case 0x4:
-			color = QColor(0x00,0xff,0xff); // Wave form
+			color = QColor(0x00, 0xff, 0xff); // Wave form
 			break;
 		case 0x5:
-			color = QColor(0xff,0x00,0xff); // Graphics
+			color = QColor(0xff, 0x00, 0xff); // Graphics
 			break;
 		case 0:
 		default:
@@ -580,12 +580,12 @@ void StudyGraphicsView::draw_prtexts(const ImageVariant * ivariant)
 	{
 		double L_, a_, b_;
 		ColorSpace_::Rgb2Lab(
-			&L_, &a_, &b_, 5.0/255.0, 220.0/255.0, 5.0/255.0);
+			&L_, &a_, &b_, 5.0 / 255.0, 220.0 / 255.0, 5.0 / 255.0);
 		const unsigned short L = (unsigned short)((L_/100.0)*0xffff);
 		const unsigned short a =
-			(unsigned short)(((a_+128.0)/255.0)*0xffff);
+			(unsigned short)(((a_ + 128.0) / 255.0) * 0xffff);
 		const unsigned short b =
-			(unsigned short)(((b_+128.0)/255.0)*0xffff);
+			(unsigned short)(((b_ + 128.0) / 255.0) * 0xffff);
 		std::cout <<  L << " " << a << " " << b << std::endl;
 	}
 #endif
@@ -811,7 +811,7 @@ void StudyGraphicsView::draw_prtexts(const ImageVariant * ivariant)
 				aposy = l.at(x).anchor_y;
 			}
 			QPen pen;
-			pen.setBrush(QBrush(QColor(255,127,23)));
+			pen.setBrush(QBrush(QColor(255, 127, 23)));
 			QPainterPath p;
 			p.moveTo(aposx,aposy - 3);
 			p.lineTo(aposx,aposy + 3);
@@ -876,9 +876,9 @@ void StudyGraphicsView::draw_prtexts(const ImageVariant * ivariant)
 						65535.0) * 0xff;
 				ColorSpace_::Lab2Rgb(&R, &G, &B, _L, _a, _b);
 				i->setDefaultTextColor(QColor(
-					static_cast<int>(R*255),
-					static_cast<int>(G*255),
-					static_cast<int>(B*255),
+					static_cast<int>(R * 255),
+					static_cast<int>(G * 255),
+					static_cast<int>(B * 255),
 					255));
 			}
 			else
@@ -914,14 +914,14 @@ void StudyGraphicsView::draw_prtexts(const ImageVariant * ivariant)
 					ColorSpace_::Lab2Rgb(&R, &G, &B, _L, _a, _b);
 					shadow->setColor(
 						QColor(
-							static_cast<int>(R*255),
-							static_cast<int>(G*255),
-							static_cast<int>(B*255),
+							static_cast<int>(R * 255),
+							static_cast<int>(G * 255),
+							static_cast<int>(B * 255),
 							static_cast<int>(opacity)));
 				}
 				else
 				{
-					shadow->setColor(QColor(128,128,128,static_cast<int>(opacity)));
+					shadow->setColor(QColor(128, 128, 128, static_cast<int>(opacity)));
 				}
 				i->setGraphicsEffect(shadow);
 			}
@@ -932,14 +932,14 @@ void StudyGraphicsView::draw_prtexts(const ImageVariant * ivariant)
 		}
 		else
 		{
-			i->setDefaultTextColor(QColor(150,0,150,255));
+			i->setDefaultTextColor(QColor(150, 0, 150, 255));
 			if (true)
 			{
 				QGraphicsDropShadowEffect * shadow =
 					new QGraphicsDropShadowEffect(i);
 				shadow->setXOffset(1.5);
 				shadow->setYOffset(1.5);
-				shadow->setColor(QColor(128,128,128,255));
+				shadow->setColor(QColor(128, 128, 128, 255));
 				i->setGraphicsEffect(shadow);
 			}
 		}
@@ -975,7 +975,7 @@ void StudyGraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 	for (int x = 0; x < l.size(); ++x)
 	{
 		if (!(l.at(x).GraphicData.size() > 1 &&
-				(l.at(x).GraphicData.size()%2 == 0)))
+				(l.at(x).GraphicData.size() % 2 == 0)))
 			continue;
 		const QString t = l.at(x).GraphicType;
 		if (t == QString("POLYLINE"))
@@ -1017,7 +1017,7 @@ void StudyGraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 					if (dimx > 0 && dimy > 0)
 					{
 						for (unsigned int y = 0;
-							y < l.at(x).GraphicData.size(); y+=2)
+							y < l.at(x).GraphicData.size(); y += 2)
 						{
 							const double px =
 								ivariant->pr_display_areas
@@ -1028,7 +1028,7 @@ void StudyGraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 								ivariant->pr_display_areas
 									.value(z)
 									.top_left_y +
-								dimy*l.at(x).GraphicData.at(y+1);
+								dimy*l.at(x).GraphicData.at(y + 1);
 							if (y > 1) p.lineTo(px, py);
 							else p.moveTo(px, py);
 						}
@@ -1037,14 +1037,14 @@ void StudyGraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				else
 				{
 					for (unsigned int y = 0;
-						y < l.at(x).GraphicData.size(); y+=2)
+						y < l.at(x).GraphicData.size(); y += 2)
 					{
 						const double px =
 							ivariant->di->idimx *
 								l.at(x).GraphicData.at(y);
 						const double py =
 							ivariant->di->idimy *
-								l.at(x).GraphicData.at(y+1);
+								l.at(x).GraphicData.at(y + 1);
 						if (y > 1) p.lineTo(px, py);
 						else p.moveTo(px, py);
 					}
@@ -1066,7 +1066,7 @@ void StudyGraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				i->setAcceptHoverEvents(false);
 				if (l.at(x).GraphicFilled == QString("Y"))
 				{
-					QBrush brush(QColor(131,108,154,255));
+					QBrush brush(QColor(131, 108, 154, 255));
 					brush.setStyle(Qt::SolidPattern);
 					i->setPen(QPen(Qt::NoPen));
 					i->setBrush(brush);
@@ -1074,7 +1074,7 @@ void StudyGraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				else
 				{
 					QPen pen;
-					pen.setBrush(QBrush(QColor(192,30,200,255)));
+					pen.setBrush(QBrush(QColor(192, 30, 200, 255)));
 					pen.setWidth(0);
 					pen.setStyle(Qt::SolidLine);
 					pen.setCapStyle(Qt::RoundCap);
@@ -1089,7 +1089,7 @@ void StudyGraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 		}
 		else if (t == QString("ELLIPSE")) // TODO more testing
 		{
-			if (l.at(x).GraphicData.size()!=8) continue;
+			if (l.at(x).GraphicData.size() != 8) continue;
 			double major0_x = 0.0;
 			double major0_y = 0.0;
 			double major1_x = 0.0;
@@ -1210,18 +1210,18 @@ void StudyGraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				continue;
 			}
 			{
-				const double mid_major_x = (major0_x + major1_x)*0.5;
-				const double mid_major_y = (major0_y + major1_y)*0.5;
+				const double mid_major_x = (major0_x + major1_x) * 0.5;
+				const double mid_major_y = (major0_y + major1_y) * 0.5;
 				const double x0__ = major1_x - major0_x;
 				const double y0__ = major1_y - major0_y;
 				const double x1__ = minor1_x - minor0_x;
 				const double y1__ = minor1_y - minor0_y;
 				const double d0   = sqrt(x0__*x0__ + y0__*y0__);
 				const double d1   = sqrt(x1__*x1__ + y1__*y1__);
-				const double ma_j = 1.0/d0;
+				const double ma_j = 1.0 / d0;
 				const double ma_nx = x0__ * ma_j;
 				const double ma_ny = y0__ * ma_j;
-				const double mi_j = 1.0/d1;
+				const double mi_j = 1.0 / d1;
 				const double mi_nx = x1__ * mi_j;
 				const double mi_ny = y1__ * mi_j;
 				const double start = 0.0;
@@ -1237,7 +1237,7 @@ void StudyGraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 					ttt.setMatrix(ma_nx, ma_ny, 0, -mi_nx, -mi_ny, 0, 0, 0, 1);
 					i->setTransform(ttt, true);
 				}
-				QRectF r___(-0.5*d0, -0.5*d1, d0, d1);
+				QRectF r___(-0.5 * d0, -0.5 * d1, d0, d1);
 				QPainterPath path;
 				path.arcMoveTo(r___, start);
 				path.arcTo(r___, start, span);
@@ -1251,7 +1251,7 @@ void StudyGraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				i->setAcceptHoverEvents(false);
 				if (l.at(x).GraphicFilled == QString("Y"))
 				{
-					QBrush brush(QColor(131,108,154,255));
+					QBrush brush(QColor(131, 108, 154, 255));
 					brush.setStyle(Qt::SolidPattern);
 					i->setPen(QPen(Qt::NoPen));
 					i->setBrush(brush);
@@ -1259,7 +1259,7 @@ void StudyGraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				else
 				{
 					QPen pen;
-					pen.setBrush(QBrush(QColor(192,30,200,255)));
+					pen.setBrush(QBrush(QColor(192, 30, 200, 255)));
 					pen.setWidth(0);
 					pen.setStyle(Qt::SolidLine);
 					pen.setCapStyle(Qt::RoundCap);
@@ -1357,13 +1357,13 @@ void StudyGraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 			{
 				const double x__ = point_x - center_x;
 				const double y__ = point_y - center_y;
-				const double distance = sqrt(x__*x__ + y__*y__);
+				const double distance = sqrt(x__ * x__ + y__ * y__);
 				QGraphicsEllipseItem * i =
 					new QGraphicsEllipseItem(
 						center_x - distance,
 						center_y - distance,
-						2*distance,
-						2*distance);
+						2 * distance,
+						2 * distance);
 #if 1
 				i->setFlag(QGraphicsItem::ItemIsMovable, false);
 #else
@@ -1374,7 +1374,7 @@ void StudyGraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				i->setAcceptHoverEvents(false);
 				if (l.at(x).GraphicFilled == QString("Y"))
 				{
-					QBrush brush(QColor(131,108,154,255));
+					QBrush brush(QColor(131, 108, 154, 255));
 					brush.setStyle(Qt::SolidPattern);
 					i->setPen(QPen(Qt::NoPen));
 					i->setBrush(brush);
@@ -1382,7 +1382,7 @@ void StudyGraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				else
 				{
 					QPen pen;
-					pen.setBrush(QBrush(QColor(192,30,200,255)));
+					pen.setBrush(QBrush(QColor(192, 30, 200, 255)));
 					pen.setWidth(0);
 					pen.setStyle(Qt::SolidLine);
 					pen.setCapStyle(Qt::RoundCap);
@@ -1396,7 +1396,7 @@ void StudyGraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 		}
 		else if (t == QString("POINT"))
 		{
-			if (l.at(x).GraphicData.size()!=2) continue;
+			if (l.at(x).GraphicData.size() != 2) continue;
 			double point_x  = 0.0;
 			double point_y  = 0.0;
 			if (l.at(x).GraphicAnnotationUnits ==
@@ -1457,7 +1457,7 @@ void StudyGraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				continue;
 			}
 			{
-				QBrush brush(QColor(192,30,200,255));
+				QBrush brush(QColor(192, 30, 200, 255));
 				brush.setStyle(Qt::SolidPattern);
 				QGraphicsEllipseItem * i =
 					new QGraphicsEllipseItem(
@@ -1538,7 +1538,7 @@ void StudyGraphicsView::draw_shutter(const ImageVariant * ivariant)
 			i->setPen(QPen(Qt::NoPen));
 			i->setBrush(brush);
 			QPainterPath p;
-			p.moveTo(0,0);
+			p.moveTo(0, 0);
 			p.addPolygon(
 				QPolygon(
 					QRect(
@@ -1546,7 +1546,7 @@ void StudyGraphicsView::draw_shutter(const ImageVariant * ivariant)
 						-2,
 						ivariant->di->idimx+2,
 						ivariant->di->idimy+2)));
-			p.moveTo(0,0);
+			p.moveTo(0, 0);
 			p.addPolygon(
 				QPolygon(
 					QRect(
@@ -1583,15 +1583,15 @@ void StudyGraphicsView::draw_shutter(const ImageVariant * ivariant)
 			i->setPen(QPen(Qt::NoPen));
 			i->setBrush(brush);
 			QPainterPath p;
-			p.moveTo(0,0);
+			p.moveTo(0, 0);
 			p.addPolygon(
 				QPolygon(
 					QRect(
 						-2,
 						-2,
-						ivariant->di->idimx+2,
-						ivariant->di->idimy+2)));
-			p.moveTo(0,0);
+						ivariant->di->idimx + 2,
+						ivariant->di->idimy + 2)));
+			p.moveTo(0, 0);
 			const int d = 2*a.RadiusofCircularShutter;
 			p.addEllipse(
 				(a.CenterofCircularShutter_x - 1) - a.RadiusofCircularShutter,
@@ -1610,7 +1610,7 @@ void StudyGraphicsView::draw_shutter(const ImageVariant * ivariant)
 				continue;
 			}
 			if (!(a.VerticesofthePolygonalShutter.size() > 1 &&
-					a.VerticesofthePolygonalShutter.size()%2 == 0))
+					a.VerticesofthePolygonalShutter.size() % 2 == 0))
 			{
 				continue;
 			}
@@ -1619,8 +1619,8 @@ void StudyGraphicsView::draw_shutter(const ImageVariant * ivariant)
 				j < a.VerticesofthePolygonalShutter.size(); j+=2)
 			{
 				points.push_back(QPoint(
-					a.VerticesofthePolygonalShutter.at(j+1) - 1,
-					a.VerticesofthePolygonalShutter.at(  j) - 1));
+					a.VerticesofthePolygonalShutter.at(j + 1) - 1,
+					a.VerticesofthePolygonalShutter.at(j) - 1));
 			}
 			QGraphicsPathItem * i = new QGraphicsPathItem();
 			i->setFlag(QGraphicsItem::ItemIsMovable, false);
@@ -1631,15 +1631,15 @@ void StudyGraphicsView::draw_shutter(const ImageVariant * ivariant)
 			i->setPen(QPen(Qt::NoPen));
 			i->setBrush(brush);
 			QPainterPath p;
-			p.moveTo(0,0);
+			p.moveTo(0, 0);
 			p.addPolygon(
 				QPolygon(
 					QRect(
 						-2,
 						-2,
-						ivariant->di->idimx+2,
-						ivariant->di->idimy+2)));
-			p.moveTo(0,0);
+						ivariant->di->idimx + 2,
+						ivariant->di->idimy + 2)));
+			p.moveTo(0, 0);
 			p.addPolygon(QPolygon(points));
 			i->setPath(p);
 			i->setZValue(1e+16);

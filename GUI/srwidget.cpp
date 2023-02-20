@@ -25,7 +25,7 @@ SRWidget::SRWidget(float si)
 	backward_toolButton->hide();
 	forward_toolButton->hide();
 #endif
-	const QSize s = QSize(static_cast<int>(18*si),static_cast<int>(18*si));
+	const QSize s = QSize(static_cast<int>(18 * si), static_cast<int>(18 * si));
 	print_toolButton->setIconSize(s);
 	toolButton->setIconSize(s);
 	readSettings();
