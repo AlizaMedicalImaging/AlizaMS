@@ -93,6 +93,7 @@ template<typename T> SRImage li3(
 	const short lut = 0;
 	const int lut_function = 0;
 	const unsigned int p_size = 3 * size[0] * size[1];
+	//
 	unsigned char * p;
 	try
 	{
@@ -120,7 +121,7 @@ template<typename T> SRImage li3(
 			ProcessImageThreadLUT_<T> * t__ = new ProcessImageThreadLUT_<T>(
 						image,
 						p,
-						size_0,  size_1,
+						size_0, size_1,
 						index_0, index_1, j,
 						center, width,
 						lut, false, lut_function);
@@ -149,7 +150,7 @@ template<typename T> SRImage li3(
 				ProcessImageThreadLUT_<T> * t__ = new ProcessImageThreadLUT_<T>(
 							image,
 							p,
-							size_0,  block,
+							size_0, block,
 							index_0, index_1, j,
 							center, width,
 							lut, false, lut_function);
@@ -160,7 +161,7 @@ template<typename T> SRImage li3(
 			ProcessImageThreadLUT_<T> * lt__ = new ProcessImageThreadLUT_<T>(
 						image,
 						p,
-						size[0],  tmp100,
+						size[0], tmp100,
 						0, incr * block, j,
 						ivariant->di->us_window_center, ivariant->di->us_window_width,
 						lut, false, lut_function);
@@ -172,7 +173,7 @@ template<typename T> SRImage li3(
 			ProcessImageThreadLUT_<T> * lt__ = new ProcessImageThreadLUT_<T>(
 						image,
 						p,
-						size[0],  size[1],
+						size[0], size[1],
 						0, 0, 0,
 						center, width,
 						lut, false, lut_function);
@@ -219,22 +220,23 @@ template<typename T> SRImage lrgb3(
 	const typename T::SpacingType spacing = image->GetSpacing();
 	const unsigned short bits_allocated = ivariant->di->bits_allocated;
 	const unsigned short bits_stored    = ivariant->di->bits_stored;
-	unsigned char * p__;
+	//
 	unsigned int j_ = 0;
+	unsigned char * p__;
+	try
+	{
+		p__ = new unsigned char[size[0] * size[1] * 3];
+	}
+	catch (const std::bad_alloc&)
+	{
+		return SRImage();
+	}
 	if (ivariant->image_type == 11)
 	{
 		const double tmp_max
 			= ((bits_allocated > 0 && bits_stored > 0) &&
 				bits_stored < bits_allocated)
 				? pow(2, bits_stored) - 1 : static_cast<double>(USHRT_MAX);
-		try
-		{
-			p__ = new unsigned char[size[0] * size[1] * 3];
-		}
-		catch (const std::bad_alloc&)
-		{
-			return SRImage();
-		}
 		try
 		{
 			itk::ImageRegionConstIterator<T> iterator(image, region);
@@ -255,14 +257,6 @@ template<typename T> SRImage lrgb3(
 	}
 	else
 	{
-		try
-		{
-			p__ = new unsigned char[size[0] * size[1] * 3];
-		}
-		catch(const std::bad_alloc&)
-		{
-			return SRImage();
-		}
 		const double vmin = ivariant->di->vmin;
 		const double vmax = ivariant->di->vmax;
 		const double vrange = vmax - vmin;

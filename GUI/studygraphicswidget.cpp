@@ -148,8 +148,8 @@ template<typename T> void load_rgb_image2(
 	const unsigned short high_bit         = ivariant->di->high_bit;
 	const bool           hide_orientation = ivariant->di->hide_orientation;
 	//
-	unsigned char * p__;
 	unsigned int j_ = 0;
+	unsigned char * p__;
 	try
 	{
 		p__ = new unsigned char[size[0] * size[1] * 3];
@@ -180,7 +180,7 @@ template<typename T> void load_rgb_image2(
 		}
 		catch (const itk::ExceptionObject &)
 		{
-			return;
+			;;
 		}
 	}
 	else
@@ -208,7 +208,7 @@ template<typename T> void load_rgb_image2(
 			}
 			catch (const itk::ExceptionObject &)
 			{
-				return;
+				;;
 			}
 		}
 	}
@@ -313,16 +313,18 @@ template<typename T> void load_rgba_image2(
 		scale__ = qMin(xratio, yratio);
 		widget->graphicsview->m_scale = scale__;
 	}
-	else scale__ = widget->graphicsview->m_scale;
+	else
+	{
+		scale__ = widget->graphicsview->m_scale;
+	}
 	//
 	const unsigned short bits_allocated   = ivariant->di->bits_allocated;
 	const unsigned short bits_stored      = ivariant->di->bits_stored;
 	const unsigned short high_bit         = ivariant->di->high_bit;
 	const bool           hide_orientation = ivariant->di->hide_orientation;
 	//
-	unsigned char * p__;
 	unsigned long long j_ = 0;
-	//
+	unsigned char * p__;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	try
 	{
@@ -354,7 +356,7 @@ template<typename T> void load_rgba_image2(
 		}
 		catch (const itk::ExceptionObject &)
 		{
-			return;
+			;;
 		}
 	}
 	else
@@ -383,7 +385,7 @@ template<typename T> void load_rgba_image2(
 		}
 		catch (const itk::ExceptionObject &)
 		{
-			return;
+			;;
 		}
 	}
 	QImage tmpi(p__, size[0], size[1], 4 * size[0], QImage::Format_RGBA8888, gImageCleanupHandler2, p__);
@@ -432,7 +434,7 @@ template<typename T> void load_rgba_image2(
 		}
 		catch (const itk::ExceptionObject &)
 		{
-			return;
+			;;
 		}
 	}
 	else
@@ -471,7 +473,7 @@ template<typename T> void load_rgba_image2(
 		}
 		catch (const itk::ExceptionObject &)
 		{
-			return;
+			;;
 		}
 	}
 	QImage tmpi(p__, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
@@ -528,11 +530,12 @@ template<typename T> void load_rgb_char_image2(
 	if (!image_container.image2D) return;
 	if (!image_container.image3D) return;
 	const ImageVariant * ivariant = image_container.image3D;
+	const short image_type = image_container.image2D->image_type;
+	if (image_type != 14) return;
 	const QString & rai = image_container.image2D->orientation_string;
 	const QString & laterality = image_container.image2D->laterality;
 	const QString & body_part = image_container.image2D->body_part;
 	const QString & orientation_20_20 = image_container.orientation_20_20;
-	const short image_type = image_container.image2D->image_type;
 #ifdef DELETE_STUDYGRAPHICSIMAGEITEM
 	// clear
 	if (widget->graphicsview->image_item)
@@ -566,18 +569,11 @@ template<typename T> void load_rgb_char_image2(
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
 	//
 	unsigned char * p;
-	if (image_type == 14)
+	try
 	{
-		try
-		{
-			p = reinterpret_cast<unsigned char *>(image->GetBufferPointer());
-		}
-		catch (const itk::ExceptionObject &)
-		{
-			return;
-		}
+		p = reinterpret_cast<unsigned char *>(image->GetBufferPointer());
 	}
-	else
+	catch (const itk::ExceptionObject &)
 	{
 		return;
 	}
@@ -645,8 +641,9 @@ template<typename T> void load_rgba_char_image2(
 	if (!image_container.image2D) return;
 	if (!image_container.image3D) return;
 	const ImageVariant * ivariant = image_container.image3D;
-	const QString & rai = image_container.image2D->orientation_string;
 	const short image_type = image_container.image2D->image_type;
+	if (image_type != 24) return;
+	const QString & rai = image_container.image2D->orientation_string;
 #ifdef DELETE_STUDYGRAPHICSIMAGEITEM
 	// clear
 	if (widget->graphicsview->image_item)
@@ -691,72 +688,68 @@ template<typename T> void load_rgba_char_image2(
 		scale__ = qMin(xratio, yratio);
 		widget->graphicsview->m_scale = scale__;
 	}
-	else scale__ = widget->graphicsview->m_scale;
+	else
+	{
+		scale__ = widget->graphicsview->m_scale;
+	}
 	//
 	QImage tmpi;
 	unsigned char * p;
-	if (image_type == 24)
-	{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-		try
-		{
-			p = reinterpret_cast<unsigned char *>(image->GetBufferPointer());
-		}
-		catch (const itk::ExceptionObject & ex)
-		{
-			return;
-		}
-		if (!p) return;
-		tmpi = QImage(p, size[0], size[1], 4 * size[0], QImage::Format_RGBA8888);
-#else
-		try
-		{
-			p = new unsigned char[size[0] * size[1] * 3];
-		}
-		catch (const std::bad_alloc&)
-		{
-			return;
-		}
-		try
-		{
-			unsigned long long j_ = 0;
-			itk::ImageRegionConstIterator<T> iterator(image, region);
-			iterator.GoToBegin();
-			while (!iterator.IsAtEnd())
-			{
-				if (iterator.Get().GetAlpha()>0)
-				{
-					const double alpha = iterator.Get().GetAlpha()/255.0;
-					const double one_minus_alpha = 1.0 - alpha;
-					const double tmp_whi = one_minus_alpha * 255.0;
-					const double tmp_red = tmp_whi + alpha * iterator.Get().GetRed();
-					const double tmp_gre = tmp_whi + alpha * iterator.Get().GetGreen();
-					const double tmp_blu = tmp_whi + alpha * iterator.Get().GetBlue();
-					p[j_ + 2] = static_cast<unsigned char>(tmp_blu);
-					p[j_ + 1] = static_cast<unsigned char>(tmp_gre);
-					p[j_ + 0] = static_cast<unsigned char>(tmp_red);
-				}
-				else
-				{
-					p[j_ + 2] = 255;
-					p[j_ + 1] = 255;
-					p[j_ + 0] = 255;
-				}
-				j_ += 3;
-				++iterator;
-			}
-		}
-		catch (const itk::ExceptionObject &)
-		{
-			return;
-		}
-		tmpi = QImage(p, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
-#endif
+	try
+	{
+		p = reinterpret_cast<unsigned char *>(image->GetBufferPointer());
 	}
-	else
+	catch (const itk::ExceptionObject & ex)
 	{
 		return;
 	}
+	if (!p) return;
+	tmpi = QImage(p, size[0], size[1], 4 * size[0], QImage::Format_RGBA8888);
+#else
+	try
+	{
+		p = new unsigned char[size[0] * size[1] * 3];
+	}
+	catch (const std::bad_alloc&)
+	{
+		return;
+	}
+	try
+	{
+		unsigned long long j_ = 0;
+		itk::ImageRegionConstIterator<T> iterator(image, region);
+		iterator.GoToBegin();
+		while (!iterator.IsAtEnd())
+		{
+			if (iterator.Get().GetAlpha()>0)
+			{
+				const double alpha = iterator.Get().GetAlpha()/255.0;
+				const double one_minus_alpha = 1.0 - alpha;
+				const double tmp_whi = one_minus_alpha * 255.0;
+				const double tmp_red = tmp_whi + alpha * iterator.Get().GetRed();
+				const double tmp_gre = tmp_whi + alpha * iterator.Get().GetGreen();
+				const double tmp_blu = tmp_whi + alpha * iterator.Get().GetBlue();
+				p[j_ + 2] = static_cast<unsigned char>(tmp_blu);
+				p[j_ + 1] = static_cast<unsigned char>(tmp_gre);
+				p[j_ + 0] = static_cast<unsigned char>(tmp_red);
+			}
+			else
+			{
+				p[j_ + 2] = 255;
+				p[j_ + 1] = 255;
+				p[j_ + 0] = 255;
+			}
+			j_ += 3;
+			++iterator;
+		}
+	}
+	catch (const itk::ExceptionObject &)
+	{
+		;;
+	}
+	tmpi = QImage(p, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
+#endif
 	//
 	if (widget->get_enable_overlays())
 	{
@@ -1012,7 +1005,10 @@ template<typename T> void load_image2(
 		scale__ = qMin(xratio, yratio);
 		widget->graphicsview->m_scale = scale__;
 	}
-	else scale__ = widget->graphicsview->m_scale;
+	else
+	{
+		scale__ = widget->graphicsview->m_scale;
+	}
 	//
 	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(tmpi));
 	QTransform t = QTransform();
