@@ -696,8 +696,8 @@ template<typename T> void load_rgba_image(
 	const unsigned short high_bit         = ivariant->di->high_bit;
 	const bool           hide_orientation = ivariant->di->hide_orientation;
 	//
-	unsigned char * p__;
 	unsigned long long j_ = 0;
+	unsigned char * p__;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	try
 	{
