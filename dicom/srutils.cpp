@@ -30,6 +30,14 @@
 namespace
 {
 
+void srImageCleanupHandler(void * info)
+{
+	if (!info) return;
+	unsigned char * p = static_cast<unsigned char*>(info);
+	delete [] p;
+	info = NULL;
+}
+
 template<typename Tin, typename Tout> QString gs3(
 	const typename Tin::Pointer & image,
 	typename Tout::Pointer & out_image,
@@ -72,14 +80,6 @@ template<typename Tin, typename Tout> QString gs3(
 	if (out_image.IsNotNull()) out_image->DisconnectPipeline();
 	else return QString("Output image is NULL");
 	return QString("");
-}
-
-void srImageCleanupHandler(void * info)
-{
-	if (!info) return;
-	unsigned char * p = static_cast<unsigned char*>(info);
-	delete [] p;
-	info = NULL;
 }
 
 template<typename T> SRImage li3(
@@ -717,7 +717,7 @@ endpoints of the minor axis of an ellipse
 								const double x__ = point_x - center_x;
 								const double y__ = point_y - center_y;
 								const double distance =
-									sqrt(x__*x__ + y__*y__);
+									sqrt(x__ * x__ + y__ * y__);
 								QPainter painter;
 								painter.begin(&(pm.i));
 								painter.setPen(pen);
@@ -950,7 +950,6 @@ bool SRUtils::read_SCOORD(
 		}
 	}
 
-/////////////////////
 	size_t other_ = 0;
 	if (ds.FindDataElement(mdcm::Tag(0x0040,0xa730)))
 	{
@@ -1556,8 +1555,6 @@ QString SRUtils::read_sr_title2(
 			VerificationFlag.toLower() +
 			QString("</li>");
 	}
-	//
-	//
 	s += QString("</ul></span>\n");
 	return s;
 }
@@ -1720,7 +1717,6 @@ QString SRUtils::read_sr_content_sq(
 			? (chapter + QString(".") + QVariant(i + 1).toString())
 			: (QVariant(i+1).toString());
 		//
-		//
 #if 1
 		s += QString("<p id=\"") +
 			cs +
@@ -1735,7 +1731,6 @@ QString SRUtils::read_sr_content_sq(
 			QVariant(indent).toString() +
 			QString("px\">");
 #endif
-		//
 		//
 		if (print_chapters)
 		{
@@ -1947,12 +1942,8 @@ QString SRUtils::read_sr_content_sq(
 					QString("</span><br />\n");
 			}
 		}
-		//
-		//
 		if (s.endsWith(QString("<br />\n"))) s.chop(7);
 		s += QString("</p>\n");
-		//
-		//
 //
 //
 //
@@ -1995,4 +1986,3 @@ QString SRUtils::read_sr_content_sq(
 #ifdef TMP_IMAGE_IN_MEMORY
 #undef TMP_IMAGE_IN_MEMORY
 #endif
-
