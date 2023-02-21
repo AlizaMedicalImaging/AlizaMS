@@ -207,7 +207,7 @@ template<typename Tin, typename Tout> QString get_slice_(
 	typename Tin::RegionType outRegion;
 	typename Tin::SizeType out_size;
 	typename FilterType::Pointer filter = FilterType::New();
-	switch(axis)
+	switch (axis)
 	{
 	case 0:
 		{
@@ -309,7 +309,7 @@ template<typename T> QString contour_from_path(
 	for (int x = 0; x < p.elementCount(); ++x)
 	{
 		itk::ContinuousIndex<float, 3> idx;
-		switch(item->get_axis())
+		switch (item->get_axis())
 		{
 		case 0:
 			{
@@ -504,7 +504,6 @@ template<typename T> void load_rgb_image(
 	//
 	const unsigned short bits_allocated   = ivariant->di->bits_allocated;
 	const unsigned short bits_stored      = ivariant->di->bits_stored;
-	const unsigned short high_bit         = ivariant->di->high_bit;
 	const bool           hide_orientation = ivariant->di->hide_orientation;
 	//
 	unsigned int j_ = 0;
@@ -693,7 +692,6 @@ template<typename T> void load_rgba_image(
 	//
 	const unsigned short bits_allocated   = ivariant->di->bits_allocated;
 	const unsigned short bits_stored      = ivariant->di->bits_stored;
-	const unsigned short high_bit         = ivariant->di->high_bit;
 	const bool           hide_orientation = ivariant->di->hide_orientation;
 	//
 	unsigned long long j_ = 0;
@@ -1501,7 +1499,7 @@ double get_distance2(
 {
 	const double x = x1 - x0;
 	const double y = y1 - y0;
-	return sqrt(x*x + y*y);
+	return sqrt(x * x + y * y);
 }
 
 template<typename T> double get_distance(
@@ -1525,7 +1523,7 @@ template<typename T> double get_distance(
 	double d = -1;
 	bool ok = false;
 	//
-	switch(axis)
+	switch (axis)
 	{
 	case 0:
 		{
@@ -1686,7 +1684,7 @@ void GraphicsWidget::closeEvent(QCloseEvent * e)
 
 void GraphicsWidget::leaveEvent(QEvent*)
 {
-	update_pixel_value(-1,-1);
+	update_pixel_value(-1, -1);
 }
 
 void GraphicsWidget::update_selection_rectangle()
@@ -1741,7 +1739,7 @@ void GraphicsWidget::update_selection_item()
 		? (image_container.image3D->di->to_slice + 1 -
 			image_container.image3D->di->from_slice)
 		: 1e-6;
-	switch(axis)
+	switch (axis)
 	{
 	case 0:
 		{
@@ -1794,7 +1792,7 @@ void GraphicsWidget::update_image(
 	//
 	if (lock) mutex.lock();
 	//
-	switch(image_container.image2D->image_type)
+	switch (image_container.image2D->image_type)
 	{
 	case 0: load_image<Image2DTypeSS>(
 				image_container.image2D->pSS,
@@ -2132,7 +2130,7 @@ void GraphicsWidget::clear_(bool lock)
 float GraphicsWidget::get_offset_x()
 {
 	float offset_x = 0.0f;
-	switch(axis)
+	switch (axis)
 	{
 	case 0:
 		{
@@ -2170,7 +2168,7 @@ float GraphicsWidget::get_offset_x()
 float GraphicsWidget::get_offset_y()
 {
 	float offset_y = 0.0f;
-	switch(axis)
+	switch (axis)
 	{
 	case 0:
 		{
@@ -2241,80 +2239,126 @@ void GraphicsWidget::set_slice_2D(
 	image_container.image2D->image_type = -1;
 	image_container.image2D->orientation_string = QString("");
 	image_container.image2D->laterality = QString("");
-	image_container.image2D->body_part  = QString("");
+	image_container.image2D->body_part = QString("");
 	image_container.image2D->idimx = 0;
 	image_container.image2D->idimy = 0;
 	if (image_container.image2D->pSS.IsNotNull())
+	{
 		image_container.image2D->pSS->DisconnectPipeline();
-	image_container.image2D->pSS = NULL;
+		image_container.image2D->pSS = NULL;
+	}
 	if (image_container.image2D->pUS.IsNotNull())
+	{
 		image_container.image2D->pUS->DisconnectPipeline();
-	image_container.image2D->pUS = NULL;
+		image_container.image2D->pUS = NULL;
+	}
 	if (image_container.image2D->pSI.IsNotNull())
+	{
 		image_container.image2D->pSI->DisconnectPipeline();
-	image_container.image2D->pSI = NULL;
+		image_container.image2D->pSI = NULL;
+	}
 	if (image_container.image2D->pUI.IsNotNull())
+	{
 		image_container.image2D->pUI->DisconnectPipeline();
-	image_container.image2D->pUI = NULL;
+		image_container.image2D->pUI = NULL;
+	}
 	if (image_container.image2D->pUC.IsNotNull())
+	{
 		image_container.image2D->pUC->DisconnectPipeline();
-	image_container.image2D->pUC = NULL;
+		image_container.image2D->pUC = NULL;
+	}
 	if (image_container.image2D->pF.IsNotNull())
+	{
 		image_container.image2D->pF->DisconnectPipeline();
-	image_container.image2D->pF = NULL;
+		image_container.image2D->pF = NULL;
+	}
 	if (image_container.image2D->pD.IsNotNull())
+	{
 		image_container.image2D->pD->DisconnectPipeline();
-	image_container.image2D->pD = NULL;
+		image_container.image2D->pD = NULL;
+	}
 	if (image_container.image2D->pSLL.IsNotNull())
+	{
 		image_container.image2D->pSLL->DisconnectPipeline();
-	image_container.image2D->pSLL = NULL;
+		image_container.image2D->pSLL = NULL;
+	}
 	if (image_container.image2D->pULL.IsNotNull())
+	{
 		image_container.image2D->pULL->DisconnectPipeline();
-	image_container.image2D->pULL = NULL;
+		image_container.image2D->pULL = NULL;
+	}
 	if (image_container.image2D->pSS_rgb.IsNotNull())
+	{
 		image_container.image2D->pSS_rgb->DisconnectPipeline();
-	image_container.image2D->pSS_rgb = NULL;
+		image_container.image2D->pSS_rgb = NULL;
+	}
 	if (image_container.image2D->pUS_rgb.IsNotNull())
+	{
 		image_container.image2D->pUS_rgb->DisconnectPipeline();
-	image_container.image2D->pUS_rgb = NULL;
+		image_container.image2D->pUS_rgb = NULL;
+	}
 	if (image_container.image2D->pSI_rgb.IsNotNull())
+	{
 		image_container.image2D->pSI_rgb->DisconnectPipeline();
-	image_container.image2D->pSI_rgb = NULL;
+		image_container.image2D->pSI_rgb = NULL;
+	}
 	if (image_container.image2D->pUI_rgb.IsNotNull())
+	{
 		image_container.image2D->pUI_rgb->DisconnectPipeline();
-	image_container.image2D->pUI_rgb = NULL;
+		image_container.image2D->pUI_rgb = NULL;
+	}
 	if (image_container.image2D->pUC_rgb.IsNotNull())
+	{
 		image_container.image2D->pUC_rgb ->DisconnectPipeline();
-	image_container.image2D->pUC_rgb = NULL;
+		image_container.image2D->pUC_rgb = NULL;
+	}
 	if (image_container.image2D->pF_rgb.IsNotNull())
+	{
 		image_container.image2D->pF_rgb->DisconnectPipeline();
-	image_container.image2D->pF_rgb = NULL;
+		image_container.image2D->pF_rgb = NULL;
+	}
 	if (image_container.image2D->pD_rgb.IsNotNull())
+	{
 		image_container.image2D->pD_rgb->DisconnectPipeline();
-	image_container.image2D->pD_rgb = NULL;
+		image_container.image2D->pD_rgb = NULL;
+	}
 	if (image_container.image2D->pSS_rgba.IsNotNull())
+	{
 		image_container.image2D->pSS_rgba->DisconnectPipeline();
-	image_container.image2D->pSS_rgba = NULL;
+		image_container.image2D->pSS_rgba = NULL;
+	}
 	if (image_container.image2D->pUS_rgba.IsNotNull())
+	{
 		image_container.image2D->pUS_rgba->DisconnectPipeline();
-	image_container.image2D->pUS_rgba = NULL;
+		image_container.image2D->pUS_rgba = NULL;
+	}
 	if (image_container.image2D->pSI_rgba.IsNotNull())
+	{
 		image_container.image2D->pSI_rgba->DisconnectPipeline();
-	image_container.image2D->pSI_rgba = NULL;
+		image_container.image2D->pSI_rgba = NULL;
+	}
 	if (image_container.image2D->pUI_rgba.IsNotNull())
+	{
 		image_container.image2D->pUI_rgba->DisconnectPipeline();
-	image_container.image2D->pUI_rgba = NULL;
+		image_container.image2D->pUI_rgba = NULL;
+	}
 	if (image_container.image2D->pUC_rgba.IsNotNull())
+	{
 		image_container.image2D->pUC_rgba->DisconnectPipeline();
-	image_container.image2D->pUC_rgba = NULL;
+		image_container.image2D->pUC_rgba = NULL;
+	}
 	if (image_container.image2D->pF_rgba.IsNotNull())
+	{
 		image_container.image2D->pF_rgba->DisconnectPipeline();
-	image_container.image2D->pF_rgba = NULL;
+		image_container.image2D->pF_rgba = NULL;
+	}
 	if (image_container.image2D->pD_rgba.IsNotNull())
+	{
 		image_container.image2D->pD_rgba->DisconnectPipeline();
-	image_container.image2D->pD_rgba = NULL;
+		image_container.image2D->pD_rgba = NULL;
+	}
 	//
-	switch(axis)
+	switch (axis)
 	{
 	case   0: x = image_container.image3D->di->selected_x_slice; break;
 	case   1: x = image_container.image3D->di->selected_y_slice; break;
@@ -2326,7 +2370,7 @@ void GraphicsWidget::set_slice_2D(
 		}
 	}
 	//
-	switch(v->image_type)
+	switch (v->image_type)
 	{
 	case 0: error_ = get_slice_<ImageTypeSS, Image2DTypeSS>(
 				axis, v->pSS, image_container.image2D, image_container.image2D->pSS, x);
@@ -2413,7 +2457,7 @@ void GraphicsWidget::set_slice_2D(
 		goto quit__;
 	}
 	//
-	switch(axis)
+	switch (axis)
 	{
 	case 0:
 		{
@@ -2557,7 +2601,7 @@ void GraphicsWidget::animate_()
 	bool time_defined = false;
 	if (!image_container.image3D) return;
 	const qint64 t0 = QDateTime::currentMSecsSinceEpoch();
-	switch(axis)
+	switch (axis)
 	{
 	case 0:
 		{
@@ -2605,7 +2649,7 @@ void GraphicsWidget::animate_()
 			{
 				requested_time =
 					image_container.image3D->frame_times.at(k);
-				if (frame_time_unit == 1) requested_time*=1000;
+				if (frame_time_unit == 1) requested_time *= 1000;
 				time_defined = true;
 			}
 			image_container.image3D->di->selected_z_slice = k;
@@ -2613,14 +2657,14 @@ void GraphicsWidget::animate_()
 		break;
 	default: return;
 	}
-	if (!((axis==2) && (image_container.image3D->di->idimz == 1)))
+	if (!((axis == 2) && (image_container.image3D->di->idimz == 1)))
 	{
 		set_slice_2D(image_container.image3D, 0, false);
 		aliza->update_slice_from_animation(
 			const_cast<const ImageVariant*>(image_container.image3D));
 	}
 	const qint64 t1 = QDateTime::currentMSecsSinceEpoch();
-	const long long t = static_cast<long long>(requested_time- (t1 - t0));
+	const long long t = static_cast<long long>(requested_time - (t1 - t0));
 	if (t <= 0)
 	{
 		// can not run at required speed
@@ -2801,7 +2845,7 @@ void GraphicsWidget::update_measurement(
 			const unsigned short spatial =
 				ivariant->usregions.at(id).m_RegionSpatialFormat;
 			QColor color(Qt::cyan);
-			switch(spatial)
+			switch (spatial)
 			{
 			case 0x1:
 				color = QColor(0x00, 0xff, 0x00); // 2D
@@ -2922,7 +2966,7 @@ void GraphicsWidget::update_measurement(
 	else
 	{
 		double d = -1;
-		switch(ivariant->image_type)
+		switch (ivariant->image_type)
 		{
 		case 0:
 			d = get_distance<ImageTypeSS>(ivariant->pSS, ivariant, a, x0, y0, x1, y1);
@@ -2999,9 +3043,9 @@ void GraphicsWidget::update_measurement(
 		if (d >= 0.0)
 		{
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-			tmp0 = QString::asprintf("%.3f",d);
+			tmp0 = QString::asprintf("%.3f", d);
 #else
-			tmp0.sprintf("%.3f",d);
+			tmp0.sprintf("%.3f", d);
 #endif
 			tmp0.append(QString(" ") + ivariant->unit_str);
 			QPainterPath path;
@@ -3021,7 +3065,7 @@ void GraphicsWidget::set_mouse_modus(short m, bool us_regions)
 {
 	mouse_modus = m;
 	set_measure_text(QString(""));
-	switch(mouse_modus)
+	switch (mouse_modus)
 	{
 	case 1: // set slices
 		{
@@ -3160,7 +3204,7 @@ void GraphicsWidget::update_pixel_value(double x, double  y)
 		return;
 	}
 	QString d;
-	switch(image_container.image3D->image_type)
+	switch (image_container.image3D->image_type)
 	{
 	case 0:
 	case 1:
@@ -3212,7 +3256,7 @@ void GraphicsWidget::update_pixel_value2(double x, double y)
 	const int sy = image_container.image3D->di->selected_y_slice;
 	const int sz = image_container.image3D->di->selected_z_slice;
 	QString d("");
-	switch(image_container.image3D->image_type)
+	switch (image_container.image3D->image_type)
 	{
 	case 0:
 	case 1:
@@ -3291,7 +3335,7 @@ QString GraphicsWidget::contours_from_selected_paths(
 	}
 	for (int x = 0; x < selected_items_size; ++x)
 	{
-		QString s0 = QVariant(x+1).toString() + QString(": ");
+		QString s0 = QVariant(x + 1).toString() + QString(": ");
 		QString s1("");
 		QGraphicsItem * gi = selected_items.at(x);
 		GraphicsPathItem * p = static_cast<GraphicsPathItem*>(gi);
@@ -3300,7 +3344,7 @@ QString GraphicsWidget::contours_from_selected_paths(
 		if (tmp_id >= 0) tmp_ids.push_back(tmp_id);
 		if (ivariant->equi)
 		{
-			switch(ivariant->image_type)
+			switch (ivariant->image_type)
 			{
 			case  0: s1 = contour_from_path<ImageTypeSS>(roi, ivariant->pSS, p);
 				break;

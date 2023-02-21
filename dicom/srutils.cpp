@@ -234,9 +234,9 @@ template<typename T> SRImage lrgb3(
 	if (ivariant->image_type == 11)
 	{
 		const double tmp_max =
-			((bits_allocated > 0 && bits_stored > 0) &&
-				bits_stored < bits_allocated)
-				? pow(2, bits_stored) - 1 : static_cast<double>(USHRT_MAX);
+			(bits_allocated > 0 && bits_stored > 0 && bits_stored < bits_allocated)
+				? pow(2, bits_stored) - 1
+				: static_cast<double>(USHRT_MAX);
 		try
 		{
 			itk::ImageRegionConstIterator<T> iterator(image, region);
@@ -250,7 +250,7 @@ template<typename T> SRImage lrgb3(
 				++iterator;
 			}
 		}
-		catch(const itk::ExceptionObject &)
+		catch (const itk::ExceptionObject &)
 		{
 			;;
 		}
@@ -266,7 +266,7 @@ template<typename T> SRImage lrgb3(
 			{
 				itk::ImageRegionConstIterator<T> iterator(image, region);
 				iterator.GoToBegin();
-				while(!iterator.IsAtEnd())
+				while (!iterator.IsAtEnd())
 				{
 					const double b = iterator.Get().GetBlue();
 					const double g = iterator.Get().GetGreen();
@@ -278,7 +278,7 @@ template<typename T> SRImage lrgb3(
 					++iterator;
 				}
 			}
-			catch(const itk::ExceptionObject &)
+			catch (const itk::ExceptionObject &)
 			{
 				;;
 			}

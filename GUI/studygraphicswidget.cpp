@@ -145,7 +145,6 @@ template<typename T> void load_rgb_image2(
 	//
 	const unsigned short bits_allocated   = ivariant->di->bits_allocated;
 	const unsigned short bits_stored      = ivariant->di->bits_stored;
-	const unsigned short high_bit         = ivariant->di->high_bit;
 	const bool           hide_orientation = ivariant->di->hide_orientation;
 	//
 	unsigned int j_ = 0;
@@ -320,7 +319,6 @@ template<typename T> void load_rgba_image2(
 	//
 	const unsigned short bits_allocated   = ivariant->di->bits_allocated;
 	const unsigned short bits_stored      = ivariant->di->bits_stored;
-	const unsigned short high_bit         = ivariant->di->high_bit;
 	const bool           hide_orientation = ivariant->di->hide_orientation;
 	//
 	unsigned long long j_ = 0;
@@ -1063,7 +1061,7 @@ double get_distance4(
 {
 	const double x = x1 - x0;
 	const double y = y1 - y0;
-	return sqrt(x*x + y*y);
+	return sqrt(x * x + y * y);
 }
 
 template<typename T> double get_distance3(
@@ -1325,7 +1323,7 @@ void StudyGraphicsWidget::update_image(
 	//
 	if (lock) mutex.lock();
 	//
-	switch(image_container.image2D->image_type)
+	switch (image_container.image2D->image_type)
 	{
 	case 0: load_image2<Image2DTypeSS>(
 				image_container.image2D->pSS,
@@ -1509,7 +1507,7 @@ void StudyGraphicsWidget::clear_(bool lock)
 		image_container.image2D->image_type = -1;
 		image_container.image2D->orientation_string = QString("");
 		image_container.image2D->laterality = QString("");
-		image_container.image2D->body_part  = QString("");
+		image_container.image2D->body_part = QString("");
 		image_container.image2D->idimx = 0;
 		image_container.image2D->idimy = 0;
 		if (image_container.image2D->pSS.IsNotNull())
@@ -1690,74 +1688,120 @@ void StudyGraphicsWidget::set_image(
 	image_container.image2D->idimx = 0;
 	image_container.image2D->idimy = 0;
 	if (image_container.image2D->pSS.IsNotNull())
+	{
 		image_container.image2D->pSS->DisconnectPipeline();
-	image_container.image2D->pSS = NULL;
+		image_container.image2D->pSS = NULL;
+	}
 	if (image_container.image2D->pUS.IsNotNull())
+	{
 		image_container.image2D->pUS->DisconnectPipeline();
-	image_container.image2D->pUS = NULL;
+		image_container.image2D->pUS = NULL;
+	}
 	if (image_container.image2D->pSI.IsNotNull())
+	{
 		image_container.image2D->pSI->DisconnectPipeline();
-	image_container.image2D->pSI = NULL;
+		image_container.image2D->pSI = NULL;
+	}
 	if (image_container.image2D->pUI.IsNotNull())
+	{
 		image_container.image2D->pUI->DisconnectPipeline();
-	image_container.image2D->pUI = NULL;
+		image_container.image2D->pUI = NULL;
+	}
 	if (image_container.image2D->pUC.IsNotNull())
+	{
 		image_container.image2D->pUC->DisconnectPipeline();
-	image_container.image2D->pUC = NULL;
+		image_container.image2D->pUC = NULL;
+	}
 	if (image_container.image2D->pF.IsNotNull())
+	{
 		image_container.image2D->pF->DisconnectPipeline();
-	image_container.image2D->pF = NULL;
+		image_container.image2D->pF = NULL;
+	}
 	if (image_container.image2D->pD.IsNotNull())
+	{
 		image_container.image2D->pD->DisconnectPipeline();
-	image_container.image2D->pD = NULL;
+		image_container.image2D->pD = NULL;
+	}
 	if (image_container.image2D->pSLL.IsNotNull())
+	{
 		image_container.image2D->pSLL->DisconnectPipeline();
-	image_container.image2D->pSLL = NULL;
+		image_container.image2D->pSLL = NULL;
+	}
 	if (image_container.image2D->pULL.IsNotNull())
+	{
 		image_container.image2D->pULL->DisconnectPipeline();
-	image_container.image2D->pULL = NULL;
+		image_container.image2D->pULL = NULL;
+	}
 	if (image_container.image2D->pSS_rgb.IsNotNull())
+	{
 		image_container.image2D->pSS_rgb->DisconnectPipeline();
-	image_container.image2D->pSS_rgb = NULL;
+		image_container.image2D->pSS_rgb = NULL;
+	}
 	if (image_container.image2D->pUS_rgb.IsNotNull())
+	{
 		image_container.image2D->pUS_rgb->DisconnectPipeline();
-	image_container.image2D->pUS_rgb = NULL;
+		image_container.image2D->pUS_rgb = NULL;
+	}
 	if (image_container.image2D->pSI_rgb.IsNotNull())
+	{
 		image_container.image2D->pSI_rgb->DisconnectPipeline();
-	image_container.image2D->pSI_rgb = NULL;
+		image_container.image2D->pSI_rgb = NULL;
+	}
 	if (image_container.image2D->pUI_rgb.IsNotNull())
+	{
 		image_container.image2D->pUI_rgb->DisconnectPipeline();
-	image_container.image2D->pUI_rgb = NULL;
+		image_container.image2D->pUI_rgb = NULL;
+	}
 	if (image_container.image2D->pUC_rgb.IsNotNull())
+	{
 		image_container.image2D->pUC_rgb ->DisconnectPipeline();
-	image_container.image2D->pUC_rgb = NULL;
+		image_container.image2D->pUC_rgb = NULL;
+	}
 	if (image_container.image2D->pF_rgb.IsNotNull())
+	{
 		image_container.image2D->pF_rgb->DisconnectPipeline();
-	image_container.image2D->pF_rgb = NULL;
+		image_container.image2D->pF_rgb = NULL;
+	}
 	if (image_container.image2D->pD_rgb.IsNotNull())
+	{
 		image_container.image2D->pD_rgb->DisconnectPipeline();
-	image_container.image2D->pD_rgb = NULL;
+		image_container.image2D->pD_rgb = NULL;
+	}
 	if (image_container.image2D->pSS_rgba.IsNotNull())
+	{
 		image_container.image2D->pSS_rgba->DisconnectPipeline();
-	image_container.image2D->pSS_rgba = NULL;
+		image_container.image2D->pSS_rgba = NULL;
+	}
 	if (image_container.image2D->pUS_rgba.IsNotNull())
+	{
 		image_container.image2D->pUS_rgba->DisconnectPipeline();
-	image_container.image2D->pUS_rgba = NULL;
+		image_container.image2D->pUS_rgba = NULL;
+	}
 	if (image_container.image2D->pSI_rgba.IsNotNull())
+	{
 		image_container.image2D->pSI_rgba->DisconnectPipeline();
-	image_container.image2D->pSI_rgba = NULL;
+		image_container.image2D->pSI_rgba = NULL;
+	}
 	if (image_container.image2D->pUI_rgba.IsNotNull())
+	{
 		image_container.image2D->pUI_rgba->DisconnectPipeline();
-	image_container.image2D->pUI_rgba = NULL;
+		image_container.image2D->pUI_rgba = NULL;
+	}
 	if (image_container.image2D->pUC_rgba.IsNotNull())
+	{
 		image_container.image2D->pUC_rgba->DisconnectPipeline();
-	image_container.image2D->pUC_rgba = NULL;
+		image_container.image2D->pUC_rgba = NULL;
+	}
 	if (image_container.image2D->pF_rgba.IsNotNull())
+	{
 		image_container.image2D->pF_rgba->DisconnectPipeline();
-	image_container.image2D->pF_rgba = NULL;
+		image_container.image2D->pF_rgba = NULL;
+	}
 	if (image_container.image2D->pD_rgba.IsNotNull())
+	{
 		image_container.image2D->pD_rgba->DisconnectPipeline();
-	image_container.image2D->pD_rgba = NULL;
+		image_container.image2D->pD_rgba = NULL;
+	}
 	//
 	x = image_container.image3D->di->idimz / 2;
 	image_container.selected_z_slice_ext = x;
@@ -1767,7 +1811,7 @@ void StudyGraphicsWidget::set_image(
 	image_container.lut_function_ext = v->di->lut_function;
 	image_container.level_locked_ext = v->di->lock_level2D;
 	//
-	switch(v->image_type)
+	switch (v->image_type)
 	{
 	case 0: error_ = get_slice2_<ImageTypeSS, Image2DTypeSS>(
 				v->pSS, image_container.image2D, image_container.image2D->pSS, x);
@@ -1956,7 +2000,7 @@ void StudyGraphicsWidget::set_mouse_modus(short m, bool us_regions)
 {
 	mouse_modus = m;
 	set_measure_text(QString(""));
-	switch(mouse_modus)
+	switch (mouse_modus)
 	{
 	case 2: // measure distance
 		{
@@ -2115,7 +2159,7 @@ void StudyGraphicsWidget::set_selected_slice(int x)
 		image_container.image2D->pD_rgba->DisconnectPipeline();
 	image_container.image2D->pD_rgba = NULL;
 	//
-	switch(image_container.image3D->image_type)
+	switch (image_container.image3D->image_type)
 	{
 	case 0: error_ = get_slice2_<ImageTypeSS, Image2DTypeSS>(
 				image_container.image3D->pSS, image_container.image2D, image_container.image2D->pSS, x);
@@ -2205,8 +2249,7 @@ void StudyGraphicsWidget::set_selected_slice(int x)
 		}
 		else
 		{
-			if (
-				check_consistence &&
+			if (check_consistence &&
 				!image_container.image3D->di->image_slices.at(x)->slice_orientation_string.isEmpty())
 			{
 				image_container.image2D->orientation_string =
@@ -2329,25 +2372,25 @@ void StudyGraphicsWidget::update_measurement(
 			bool tmp1x = false;
 			bool tmp1y = false;
 			const unsigned int id =
-				(high_priority_regions.size()==1)
+				(high_priority_regions.size() == 1)
 				? high_priority_regions.at(0)
 				: ids.at(0);
-			const double dx  =
+			const double dx =
 				ivariant->usregions.at(id).m_PhysicalDeltaX;
-			const double dy  =
+			const double dy =
 				ivariant->usregions.at(id).m_PhysicalDeltaY;
-			const double x0_ = x0*dx;
-			const double y0_ = y0*dy;
-			const double x1_ = x1*dx;
-			const double y1_ = y1*dy;
-			const QString measure_textx  =
+			const double x0_ = x0 * dx;
+			const double y0_ = y0 * dy;
+			const double x1_ = x1 * dx;
+			const double y1_ = y1 * dy;
+			const QString measure_textx =
 				ivariant->usregions.at(id).m_UnitXString;
-			const QString measure_texty  =
+			const QString measure_texty =
 				ivariant->usregions.at(id).m_UnitYString;
 			const unsigned short spatial =
 				ivariant->usregions.at(id).m_RegionSpatialFormat;
 			QColor color(Qt::cyan);
-			switch(spatial)
+			switch (spatial)
 			{
 			case 0x1:
 				color = QColor(0x00, 0xff, 0x00); // 2D
@@ -2372,9 +2415,9 @@ void StudyGraphicsWidget::update_measurement(
 			{
 				const double d   = get_distance4(x0_, y0_, x1_, y1_);
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-				tmp0 = QString::asprintf("%.3f",d);
+				tmp0 = QString::asprintf("%.3f", d);
 #else
-				tmp0.sprintf("%.3f",d);
+				tmp0.sprintf("%.3f", d);
 #endif
 				tmp0.append(QString(" ") + measure_textx);
 			}
@@ -2386,9 +2429,9 @@ void StudyGraphicsWidget::update_measurement(
 					const double d0 = get_distance4(x0_, y0_, x1_, y0_);
 					QString tmp0x;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-					tmp0x = QString::asprintf("%.3f",d0);
+					tmp0x = QString::asprintf("%.3f", d0);
 #else
-					tmp0x.sprintf("%.3f",d0);
+					tmp0x.sprintf("%.3f", d0);
 #endif
 					tmp0.append(
 						QString("X: ") +
@@ -2406,9 +2449,9 @@ void StudyGraphicsWidget::update_measurement(
 					const double d1 = get_distance4(x0_, y0_, x0_, y1_);
 					QString tmp0y;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-					tmp0y = QString::asprintf("%.3f",d1);
+					tmp0y = QString::asprintf("%.3f", d1);
 #else
-					tmp0y.sprintf("%.3f",d1);
+					tmp0y.sprintf("%.3f", d1);
 #endif
 					tmp0.append(
 						QString("Y: ") +
@@ -2455,7 +2498,9 @@ void StudyGraphicsWidget::update_measurement(
 			}
 			graphicsview->measurment_line->setPath(path);
 			if (!data_type.isEmpty() && !tmp0.isEmpty())
+			{
 				data_type.append(QString(" | "));
+			}
 			set_measure_text(data_type + tmp0);
 		}
 		else
@@ -2468,7 +2513,7 @@ void StudyGraphicsWidget::update_measurement(
 	else
 	{
 		double d = -1;
-		switch(ivariant->image_type)
+		switch (ivariant->image_type)
 		{
 		case 0:
 			d = get_distance3<ImageTypeSS>(ivariant->pSS, ivariant, x0, y0, x1, y1, z);
@@ -2545,9 +2590,9 @@ void StudyGraphicsWidget::update_measurement(
 		if (d >= 0.0)
 		{
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-			tmp0 = QString::asprintf("%.3f",d);
+			tmp0 = QString::asprintf("%.3f", d);
 #else
-			tmp0.sprintf("%.3f",d);
+			tmp0.sprintf("%.3f", d);
 #endif
 			tmp0.append(QString(" ") + ivariant->unit_str);
 			QPainterPath path;
