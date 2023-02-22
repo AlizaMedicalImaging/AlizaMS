@@ -62,7 +62,7 @@ GraphicsView::GraphicsView(GraphicsWidget * p)
 		image_item->setTransformationMode(Qt::SmoothTransformation);
 	}
 	image_item->setCacheMode(QGraphicsItem::NoCache);
-	image_item->setPos(0,0);
+	image_item->setPos(0, 0);
 	image_item->setZValue(-1.0);
 	scene_->addItem(image_item);
 #endif
@@ -70,26 +70,26 @@ GraphicsView::GraphicsView(GraphicsWidget * p)
 	setTransformationAnchor(AnchorUnderMouse);
 	setDragMode(QGraphicsView::ScrollHandDrag);
 	//
-	handle_rect  = new RectItem(0, 0, 100, 100);
-	topHandle    = new HandleItem(
+	handle_rect = new RectItem(0, 0, 100, 100);
+	topHandle = new HandleItem(
 		this, handle_rect, HandleItem::TopHandle);
 	topHandle->setParentItem(handle_rect);
-	rightHandle  = new HandleItem(
+	rightHandle = new HandleItem(
 		this, handle_rect, HandleItem::RightHandle);
 	rightHandle->setParentItem(handle_rect);
-	leftHandle   = new HandleItem(
+	leftHandle = new HandleItem(
 		this, handle_rect, HandleItem::LeftHandle);
 	leftHandle->setParentItem(handle_rect);
 	bottomHandle = new HandleItem(
 		this, handle_rect, HandleItem::BottomHandle);
 	bottomHandle->setParentItem(handle_rect);
-	handle_rect->setZValue(1e+19-5);
+	handle_rect->setZValue(1e+19 - 5);
 	handle_rect->hide();
 	scene_->addItem(handle_rect);
 	//
 	selection_item = new RectItem(0, 0, 100, 100);
 	selection_item->set_pen2(1.0);
-	selection_item->setZValue(1e+19-5);
+	selection_item->setZValue(1e+19 - 5);
 	scene_->addItem(selection_item);
 	selection_item->hide();
 	//
@@ -99,7 +99,7 @@ GraphicsView::GraphicsView(GraphicsWidget * p)
 	xpen.setStyle(Qt::DashLine);
 	line_x = new QGraphicsPathItem();
 	line_x->setPen(xpen);
-	line_x->setZValue(1e+19-4);
+	line_x->setZValue(1e+19 - 4);
 	scene_->addItem(line_x);
 	//
 	QPen ypen;
@@ -108,7 +108,7 @@ GraphicsView::GraphicsView(GraphicsWidget * p)
 	ypen.setStyle(Qt::DashLine);
 	line_y = new QGraphicsPathItem();
 	line_y->setPen(ypen);
-	line_y->setZValue(1e+19-3);
+	line_y->setZValue(1e+19 - 3);
 	scene_->addItem(line_y);
 	//
 	QPen zpen;
@@ -117,14 +117,14 @@ GraphicsView::GraphicsView(GraphicsWidget * p)
 	zpen.setStyle(Qt::DashLine);
 	line_z = new QGraphicsPathItem();
 	line_z->setPen(zpen);
-	line_z->setZValue(1e+19-2);
+	line_z->setZValue(1e+19 - 2);
 	scene_->addItem(line_z);
 	//
 	measurment_line = new QGraphicsPathItem();
-	measurment_line->setZValue(1e+19-1);
+	measurment_line->setZValue(1e+19 - 1);
 	scene_->addItem(measurment_line);
 	//
-	pr_area = new QGraphicsRectItem(0,0,100,100);
+	pr_area = new QGraphicsRectItem(0, 0, 100, 100);
 	pr_area->setFlag(QGraphicsItem::ItemIsMovable, false);
 	pr_area->setFlag(QGraphicsItem::ItemIsFocusable, false);
 	pr_area->setAcceptHoverEvents(false);
@@ -133,9 +133,8 @@ GraphicsView::GraphicsView(GraphicsWidget * p)
 #else
 	pr_area->setAcceptedMouseButtons(0);
 #endif
-	pr_area->setZValue(1e+19-6);
+	pr_area->setZValue(1e+19 - 6);
 	pr_area->hide();
-	//QBrush pbrush(QColor(73, 45, 124));
 	QBrush pbrush(QColor(146, 90, 248));
 	QPen ppen;
 	ppen.setBrush(pbrush);
@@ -154,7 +153,7 @@ GraphicsView::GraphicsView(GraphicsWidget * p)
 	paint_brush->setAcceptedMouseButtons(0);
 #endif
 	QPen bpen;
-	bpen.setBrush(QBrush(QColor(Qt::blue))); //0xbc,0x86,0x2b
+	bpen.setBrush(QBrush(QColor(Qt::blue)));
 	bpen.setWidth(0);
 	bpen.setStyle(Qt::SolidLine);
 	bpen.setCapStyle(Qt::RoundCap);
@@ -179,44 +178,44 @@ void GraphicsView::keyPressEvent(QKeyEvent * e)
 {
 	switch (e->key())
 	{
-	case Qt::Key_Plus : zoom_in();
+	case Qt::Key_Plus: zoom_in();
 		break;
-	case Qt::Key_Equal : zoom_in();
+	case Qt::Key_Equal: zoom_in();
 		break;
-	case Qt::Key_Minus : zoom_out();
+	case Qt::Key_Minus: zoom_out();
 		break;
-	case Qt::Key_0 :
+	case Qt::Key_0:
 		{
-			parent->update_image(1,false,true);
+			parent->update_image(1, false, true);
 			update_selection_rect_width();
 		}
 		break;
-	case Qt::Key_1 :
+	case Qt::Key_1:
 		{
 			m_scale = 1.0;
-			parent->update_image(0,false,true);
+			parent->update_image(0, false, true);
 			update_selection_rect_width();
 		}
 		break;
-	case Qt::Key_X : flipX();
+	case Qt::Key_X: flipX();
 		break;
-	case Qt::Key_Y : flipY();
+	case Qt::Key_Y: flipY();
 		break;
-	case Qt::Key_F :
+	case Qt::Key_F:
 		{
-			parent->update_image(1,false,true);
+			parent->update_image(1, false, true);
 			update_selection_rect_width();
 		}
 		break;
-	case Qt::Key_G :
+	case Qt::Key_G:
 		parent->get_screen();
 		break;
-	case Qt::Key_C :
+	case Qt::Key_C:
 		break;
-	case Qt::Key_P :
+	case Qt::Key_P:
 		parent->show_image_info();
 		break;
-	case Qt::Key_S :
+	case Qt::Key_S:
 		{
 			const bool t = parent->get_smooth();
 			parent->set_smooth(!t);
@@ -269,10 +268,10 @@ void GraphicsView::scale_view(double scale_factor)
 void GraphicsView::update_selection_rect_width()
 {
 	if (handle_rect->get_current_pen() == 2)
-		handle_rect->set_pen2(3.0/m_scale);
+		handle_rect->set_pen2(3.0 / m_scale);
 	else
-		handle_rect->set_pen1(2.0/m_scale);
-	selection_item->set_pen2(1.0/m_scale);
+		handle_rect->set_pen1(2.0 / m_scale);
+	selection_item->set_pen2(1.0 / m_scale);
 }
 
 void GraphicsView::zoom_in()
@@ -282,7 +281,7 @@ void GraphicsView::zoom_in()
 
 void GraphicsView::zoom_out()
 {
-	scale_view(1.0/1.015);
+	scale_view(1.0 / 1.015);
 }
 
 void GraphicsView::clear_paths()
@@ -457,32 +456,40 @@ void GraphicsView::clear_shutters()
 
 void GraphicsView::mousePressEvent(QMouseEvent * e)
 {
-	if (e->button()==Qt::RightButton)
+	if (e->button() == Qt::RightButton)
 	{
 		if (parent->slider_m)
 		{
 			int tmp0;
-			if (Qt::ControlModifier==QApplication::keyboardModifiers())
+			if (Qt::ControlModifier == QApplication::keyboardModifiers())
+			{
 				tmp0 = parent->slider_m->slices_slider->value() - 1;
+			}
 			else
+			{
 				tmp0 = parent->slider_m->slices_slider->value() + 1;
-			if (tmp0 < 0) tmp0=parent->slider_m->slices_slider->maximum();
-			if (tmp0 > parent->slider_m->slices_slider->maximum()) tmp0=0;
+			}
+			if (tmp0 < 0) tmp0 = parent->slider_m->slices_slider->maximum();
+			if (tmp0 > parent->slider_m->slices_slider->maximum()) tmp0 = 0;
 			parent->slider_m->set_slice(tmp0);
 		}
 	}
-	else if (e->button()==Qt::MiddleButton)
+	else if (e->button() == Qt::MiddleButton)
 	{
 		const QPoint p0 = e->pos();
 		const QPointF p1 = mapToScene(p0);
 		if (parent->get_show_cursor())
+		{
 			get_pixel_value2(p1.x(), p1.y());
+		}
 		else
+		{
 			get_pixel_value(p1.x(), p1.y());
+		}
 	}
-	else if (e->button()==Qt::LeftButton)
+	else if (e->button() == Qt::LeftButton)
 	{
-		switch(parent->get_mouse_modus())
+		switch (parent->get_mouse_modus())
 		{
 		case 1:
 			{
@@ -522,9 +529,9 @@ void GraphicsView::mouseDoubleClickEvent(QMouseEvent * e)
 
 void GraphicsView::mouseReleaseEvent(QMouseEvent * e)
 {
-	if (e->button()==Qt::LeftButton)
+	if (e->button() == Qt::LeftButton)
 	{
-		switch(parent->get_mouse_modus())
+		switch (parent->get_mouse_modus())
 		{
 		case 1:
 			{
@@ -552,9 +559,9 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent * e)
 			break;
 		}
 	}
-	else if (e->button()==Qt::MiddleButton)
+	else if (e->button() == Qt::MiddleButton)
 	{
-		get_pixel_value(-1,-1);
+		get_pixel_value(-1, -1);
 	}
 	else
 	{
@@ -583,12 +590,18 @@ void GraphicsView::mouseMoveEvent(QMouseEvent * e)
 			const int tmp0 = old_win_pos_x-new_win_pos_x;
 			int tmp1;
 			if (tmp0 > 0)
+			{
 				tmp1 = parent->slider_m->slices_slider->value() - 1;
+			}
 			else
+			{
 				tmp1 = parent->slider_m->slices_slider->value() + 1;
-			if (tmp1 < 0) tmp1=0;
+			}
+			if (tmp1 < 0) tmp1 = 0;
 			if (tmp1 > parent->slider_m->slices_slider->maximum())
-				tmp1=parent->slider_m->slices_slider->maximum();
+			{
+				tmp1 = parent->slider_m->slices_slider->maximum();
+			}
 			parent->slider_m->set_slice(tmp1);
 		}
 	}
@@ -597,13 +610,17 @@ void GraphicsView::mouseMoveEvent(QMouseEvent * e)
 		const QPoint p0 = e->pos();
 		const QPointF p1 = mapToScene(p0);
 		if (parent->get_show_cursor())
+		{
 			get_pixel_value2(p1.x(), p1.y());
+		}
 		else
+		{
 			get_pixel_value(p1.x(), p1.y());
+		}
 	}
 	else if (e->buttons() & Qt::LeftButton)
 	{
-		switch(mm)
+		switch (mm)
 		{
 		case 1:
 			{
@@ -651,9 +668,9 @@ void GraphicsView::animate_flip()
 	m_angle += 10;
 	QRectF r = image_item->boundingRect();
 	image_item->setTransform(QTransform()
-		.translate(r.width()/2.0, r.height()/2.0)
+		.translate(r.width() / 2.0, r.height() / 2.0)
 		.rotate(m_angle, Qt::YAxis)
-		.translate(-r.width()/2.0, -r.height()/2.0));
+		.translate(-r.width() / 2.0, -r.height() / 2.0));
 	QTimer::singleShot(25, this, SLOT(animate_flip()));
 }
 
@@ -690,7 +707,7 @@ void GraphicsView::update_background_color()
 void GraphicsView::draw_frames(short a)
 {
 	if (!parent->image_container.image3D) return;
-	switch(a)
+	switch (a)
 	{
 	case 0:
 		{
@@ -699,11 +716,11 @@ void GraphicsView::draw_frames(short a)
 			QPainterPath path_y_line;
 			path_y_line.moveTo(
 				parent->image_container
-					.image3D->di->selected_y_slice+0.5,
+					.image3D->di->selected_y_slice + 0.5,
 				0);
 			path_y_line.lineTo(
 				parent->image_container
-					.image3D->di->selected_y_slice+0.5,
+					.image3D->di->selected_y_slice + 0.5,
 				parent->image_container
 					.image2D->idimy);
 			line_y->setPath(path_y_line);
@@ -711,12 +728,12 @@ void GraphicsView::draw_frames(short a)
 			path_z_line.moveTo(
 				0,
 				parent->image_container
-					.image3D->di->selected_z_slice+0.5);
+					.image3D->di->selected_z_slice + 0.5);
 			path_z_line.lineTo(
 				parent->image_container
 					.image2D->idimx,
 				parent->image_container
-					.image3D->di->selected_z_slice+0.5);
+					.image3D->di->selected_z_slice + 0.5);
 			line_z->setPath(path_z_line);
 		}
 		break;
@@ -725,11 +742,11 @@ void GraphicsView::draw_frames(short a)
 			QPainterPath path_x_line;
 			path_x_line.moveTo(
 				parent->image_container
-					.image3D->di->selected_x_slice+0.5,
+					.image3D->di->selected_x_slice + 0.5,
 				0);
 			path_x_line.lineTo(
 				parent->image_container
-					.image3D->di->selected_x_slice+0.5,
+					.image3D->di->selected_x_slice + 0.5,
 				parent->image_container
 					.image2D->idimy);
 			line_x->setPath(path_x_line);
@@ -739,12 +756,12 @@ void GraphicsView::draw_frames(short a)
 			path_z_line.moveTo(
 				0,
 				parent->image_container
-					.image3D->di->selected_z_slice+0.5);
+					.image3D->di->selected_z_slice + 0.5);
 			path_z_line.lineTo(
 				parent->image_container
 					.image2D->idimx,
 				parent->image_container
-					.image3D->di->selected_z_slice+0.5);
+					.image3D->di->selected_z_slice + 0.5);
 			line_z->setPath(path_z_line);
 		}
 		break;
@@ -753,11 +770,11 @@ void GraphicsView::draw_frames(short a)
 			QPainterPath path_x_line;
 			path_x_line.moveTo(
 				parent->image_container
-					.image3D->di->selected_x_slice+0.5,
+					.image3D->di->selected_x_slice + 0.5,
 				0);
 			path_x_line.lineTo(
 				parent->image_container
-					.image3D->di->selected_x_slice+0.5,
+					.image3D->di->selected_x_slice + 0.5,
 				parent->image_container
 					.image2D->idimy);
 			line_x->setPath(path_x_line);
@@ -765,25 +782,26 @@ void GraphicsView::draw_frames(short a)
 			path_y_line.moveTo(
 				0,
 				parent->image_container
-					.image3D->di->selected_y_slice+0.5);
+					.image3D->di->selected_y_slice + 0.5);
 			path_y_line.lineTo(
 				parent->image_container
 					.image2D->idimx,
 				parent->image_container
-					.image3D->di->selected_y_slice+0.5);
+					.image3D->di->selected_y_slice + 0.5);
 			line_y->setPath(path_y_line);
 			QPainterPath path_z_line;
 			line_z->setPath(path_z_line);
 		}
 		break;
-	default: break;
+	default:
+		break;
 	}
 }
 
 void GraphicsView::draw_us_regions()
 {
 	clear_us_regions();
-	if (parent->get_axis()!=2) return;
+	if (parent->get_axis() != 2) return;
 	if (!parent->image_container.image3D) return;
 	for (int x = 0;
 		x < parent->image_container.image3D->usregions.size();
@@ -806,23 +824,23 @@ void GraphicsView::draw_us_regions()
 		const unsigned int priority =
 			(r.m_FlagsBool && ((r.m_RegionFlags & 1) == 0)) ? 0 : 1;
 		const unsigned short spatial = r.m_RegionSpatialFormat;
-		QColor color(0xff,0xff,0xff);
-		switch(spatial)
+		QColor color(0xff, 0xff, 0xff);
+		switch (spatial)
 		{
 		case 0x1:
-			color = QColor(0x00,0xff,0x00); // 2D
+			color = QColor(0x00, 0xff, 0x00); // 2D
 			break;
 		case 0x2:
-			color = QColor(0xff,0x00,0x00); // M-Mode
+			color = QColor(0xff, 0x00, 0x00); // M-Mode
 			break;
 		case 0x3:
-			color = QColor(0x00,0x00,0xff); // Spectral
+			color = QColor(0x00, 0x00, 0xff); // Spectral
 			break;
 		case 0x4:
-			color = QColor(0x00,0xff,0xff); // Wave form
+			color = QColor(0x00, 0xff, 0xff); // Wave form
 			break;
 		case 0x5:
-			color = QColor(0xff,0x00,0xff); // Graphics
+			color = QColor(0xff, 0x00, 0xff); // Graphics
 			break;
 		case 0:
 		default:
@@ -832,8 +850,8 @@ void GraphicsView::draw_us_regions()
 		QPen pen;
 		pen.setBrush(QBrush(color));
 		pen.setWidth(0);
-		if (priority==0) pen.setStyle(Qt::SolidLine);
-		else             pen.setStyle(Qt::DotLine);
+		if (priority == 0) pen.setStyle(Qt::SolidLine);
+		else               pen.setStyle(Qt::DotLine);
 		pen.setCapStyle(Qt::RoundCap);
 		pen.setJoinStyle(Qt::RoundJoin);
 		i->setFlag(QGraphicsItem::ItemIsSelectable, false);
@@ -905,15 +923,15 @@ void GraphicsView::set_handleitems_cursors(bool t)
 
 void GraphicsView::lines_at(double x, double y)
 {
-	const QPoint p0(x,y);
+	const QPoint p0(x, y);
 	const QPointF p1 = mapToScene(p0);
 	if (parent->image_container.image3D &&
 		parent->image_container.image3D->equi)
 	{
 		int tmpa = static_cast<int>(p1.x());
-		if (tmpa<0) tmpa = 0;
+		if (tmpa < 0) tmpa = 0;
 		int tmpb = static_cast<int>(p1.y());
-		if (tmpb<0) tmpb = 0;
+		if (tmpb < 0) tmpb = 0;
 		if (parent->is_main())
 		{
 			switch (parent->get_axis())
@@ -921,11 +939,13 @@ void GraphicsView::lines_at(double x, double y)
 			case 0:
 				{
 					if (tmpa >= parent->image_container.image3D->di->idimy)
-						tmpa = parent->image_container
-							.image3D->di->idimy-1;
+					{
+						tmpa = parent->image_container.image3D->di->idimy - 1;
+					}
 					if (tmpb >= parent->image_container.image3D->di->idimz)
-						tmpb = parent->image_container
-							.image3D->di->idimz-1;
+					{
+						tmpb = parent->image_container.image3D->di->idimz - 1;
+					}
 					parent->image_container.image3D->di->selected_y_slice
 						= tmpa;
 					parent->image_container.image3D->di->selected_z_slice
@@ -935,11 +955,13 @@ void GraphicsView::lines_at(double x, double y)
 			case 1:
 				{
 					if (tmpa >= parent->image_container.image3D->di->idimx)
-						tmpa = parent->image_container
-							.image3D->di->idimx-1;
+					{
+						tmpa = parent->image_container.image3D->di->idimx - 1;
+					}
 					if (tmpb >= parent->image_container.image3D->di->idimz)
-						tmpb = parent->image_container
-							.image3D->di->idimz-1;
+					{
+						tmpb = parent->image_container.image3D->di->idimz - 1;
+					}
 					parent->image_container.image3D->di->selected_x_slice
 						= tmpa;
 					parent->image_container.image3D->di->selected_z_slice
@@ -949,34 +971,37 @@ void GraphicsView::lines_at(double x, double y)
 			case 2:
 				{
 					if (tmpa >= parent->image_container.image3D->di->idimx)
-						tmpa = parent->image_container
-							.image3D->di->idimx-1;
+					{
+						tmpa = parent->image_container.image3D->di->idimx - 1;
+					}
 					if (tmpb >= parent->image_container.image3D->di->idimy)
-						tmpb = parent->image_container
-							.image3D->di->idimy-1;
+					{
+						tmpb = parent->image_container.image3D->di->idimy - 1;
+					}
 					if (parent->is_multiview())
 					{
-						if (
-							widget_x && !widget_x->run__ &&
+						if (widget_x && !widget_x->run__ &&
 							widget_x->slider_m)
+						{
 							widget_x->slider_m->set_slice(tmpa);
-						if (
-							widget_y &&
+						}
+						if (widget_y &&
 							!widget_y->run__ && widget_y->slider_m)
+						{
 							widget_y->slider_m->set_slice(tmpb);
+						}
 					}
 					else
 					{
-						parent->image_container
-							.image3D->di->selected_x_slice =
-								tmpa;
-						parent->image_container
-							.image3D->di->selected_y_slice =
-								tmpb;
+						parent->image_container.image3D->di->selected_x_slice =
+							tmpa;
+						parent->image_container.image3D->di->selected_y_slice =
+							tmpb;
 					}
 				}
 				break;
-			default: break;
+			default:
+				break;
 			}
 		}
 		else
@@ -986,32 +1011,45 @@ void GraphicsView::lines_at(double x, double y)
 			case 0:
 				{
 					if (tmpa >= parent->image_container.image3D->di->idimy)
-						tmpa =parent->image_container.image3D->di->idimy-1;
+					{
+						tmpa =parent->image_container.image3D->di->idimy - 1;
+					}
 					if (tmpb >= parent->image_container.image3D->di->idimz)
-						tmpb =parent->image_container.image3D->di->idimz-1;
+					{
+						tmpb =parent->image_container.image3D->di->idimz - 1;
+					}
 					if (widget_y && widget_y->slider_m)
+					{
 						widget_y->slider_m->set_slice(tmpa);
+					}
 					if (widget_m && !widget_m->run__ && widget_m->slider_m)
+					{
 						widget_m->slider_m->set_slice(tmpb);
+					}
 				}
 				break;
 			case 1:
 				{
 					if (tmpa >= parent->image_container.image3D->di->idimx)
-						tmpa = parent->image_container
-							.image3D->di->idimx-1;
+					{
+						tmpa = parent->image_container.image3D->di->idimx - 1;
+					}
 					if (tmpb >= parent->image_container.image3D->di->idimz)
-						tmpb = parent->image_container
-							.image3D->di->idimz-1;
+					{
+						tmpb = parent->image_container.image3D->di->idimz - 1;
+					}
 					if (widget_x && widget_x->slider_m)
+					{
 						widget_x->slider_m->set_slice(tmpa);
-					if (
-						widget_m &&
-						!widget_m->run__ && widget_m->slider_m)
+					}
+					if (widget_m && !widget_m->run__ && widget_m->slider_m)
+					{
 						widget_m->slider_m->set_slice(tmpb);
+					}
 				}
 				break;
-			default: break;
+			default:
+				break;
 			}
 		}
 		draw_frames(parent->get_axis());
@@ -1022,13 +1060,17 @@ void GraphicsView::measure()
 {
 	if (!parent->image_container.image3D) return;
 	if (m0_set && m1_set)
+	{
 		parent->update_measurement(
 			m0_win_pos_x,
 			m0_win_pos_y,
 			m1_win_pos_x,
 			m1_win_pos_y);
+	}
 	else
+	{
 		parent->set_measure_text("");
+	}
 }
 
 void GraphicsView::get_pixel_value(double x, double y)
@@ -1061,12 +1103,12 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 	{
 		double L_, a_, b_;
 		ColorSpace_::Rgb2Lab(
-			&L_, &a_, &b_, 5.0/255.0, 220.0/255.0, 5.0/255.0);
-		const unsigned short L = (unsigned short)((L_/100.0)*0xffff);
+			&L_, &a_, &b_, 5.0 / 255.0, 220.0 / 255.0, 5.0 / 255.0);
+		const unsigned short L = static_cast<unsigned short>((L_ / 100.0) * 0xffff);
 		const unsigned short a =
-			(unsigned short)(((a_+128.0)/255.0)*0xffff);
+			static_cast<unsigned short>(((a_ + 128.0) / 255.0) * 0xffff);
 		const unsigned short b =
-			(unsigned short)(((b_+128.0)/255.0)*0xffff);
+			static_cast<unsigned short>(((b_ + 128.0) / 255.0) * 0xffff);
 		std::cout <<  L << " " << a << " " << b << std::endl;
 	}
 #endif
@@ -1093,12 +1135,7 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 	for (int x = 0; x < l.size(); ++x)
 	{
 		QGraphicsTextItem * i = new QGraphicsTextItem();
-#if 1
 		i->setFlag(QGraphicsItem::ItemIsMovable, false);
-#else
-		i->setFlag(QGraphicsItem::ItemIsMovable, true);
-		i->setFlag(QGraphicsItem::ItemIsSelectable, true);
-#endif
 		i->setFlag(QGraphicsItem::ItemIsFocusable, false);
 		i->setAcceptHoverEvents(false);
 		double posx = 0.0;
@@ -1128,19 +1165,19 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 						posx =
 							ivariant->pr_display_areas.value(z)
 								.top_left_x +
-							dimx*l.at(x).bb_top_left_x;
+							dimx * l.at(x).bb_top_left_x;
 						posy =
 							ivariant->pr_display_areas
 								.value(z).top_left_y +
-							dimy*l.at(x).bb_top_left_y;
+							dimy * l.at(x).bb_top_left_y;
 						bottom_right_posx =
 							ivariant->pr_display_areas
 								.value(z).top_left_x +
-							dimx*l.at(x).bb_bottom_right_x;
+							dimx * l.at(x).bb_bottom_right_x;
 						bottom_right_posy =
 							ivariant->pr_display_areas
 								.value(z).top_left_y +
-							dimy*l.at(x).bb_bottom_right_y;
+							dimy * l.at(x).bb_bottom_right_y;
 					}
 					else
 					{
@@ -1149,42 +1186,38 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 				}
 				else
 				{
-					posx     = ivariant->di->idimx*l.at(x).bb_top_left_x;
-					posy     = ivariant->di->idimy*l.at(x).bb_top_left_y;
+					posx = ivariant->di->idimx * l.at(x).bb_top_left_x;
+					posy = ivariant->di->idimy * l.at(x).bb_top_left_y;
 					bottom_right_posx =
-						ivariant->di->idimx*l.at(x).bb_bottom_right_x;
+						ivariant->di->idimx * l.at(x).bb_bottom_right_x;
 					bottom_right_posy =
-						ivariant->di->idimy*l.at(x).bb_bottom_right_y;
+						ivariant->di->idimy * l.at(x).bb_bottom_right_y;
 				}
 			}
 			else if (l.at(x).BoundingBoxAnnotationUnits ==
 					QString("PIXEL"))
 			{
-				posx     = l.at(x).bb_top_left_x;
-				posy     = l.at(x).bb_top_left_y;
+				posx = l.at(x).bb_top_left_x;
+				posy = l.at(x).bb_top_left_y;
 				bottom_right_posx = l.at(x).bb_bottom_right_x;
 				bottom_right_posy = l.at(x).bb_bottom_right_y;
 			}
-			if (
-				posx < bottom_right_posx &&
+			if (posx < bottom_right_posx &&
 				posy < bottom_right_posy)
 			{
 				;;
 			}
-			else if (
-				posx > bottom_right_posx &&
+			else if (posx > bottom_right_posx &&
 				posy > bottom_right_posy)
 			{
 				r = 180.0;
 			}
-			else if (
-				posx < bottom_right_posx &&
+			else if (posx < bottom_right_posx &&
 				posy > bottom_right_posy)
 			{
 				r = 270.0;
 			}
-			else if (
-				posx > bottom_right_posx &&
+			else if (posx > bottom_right_posx &&
 				posy < bottom_right_posy)
 			{
 				r = 90.0;
@@ -1213,12 +1246,12 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 							ivariant->pr_display_areas
 								.value(z)
 								.top_left_x +
-							dimx*l.at(x).anchor_x;
+							dimx * l.at(x).anchor_x;
 						posy =
 							ivariant->pr_display_areas
 								.value(z)
 								.top_left_y +
-							dimy*l.at(x).anchor_y;
+							dimy * l.at(x).anchor_y;
 					}
 					else
 					{
@@ -1227,8 +1260,8 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 				}
 				else
 				{
-					posx = ivariant->di->idimx*l.at(x).anchor_x;
-					posy = ivariant->di->idimy*l.at(x).anchor_y;
+					posx = ivariant->di->idimx * l.at(x).anchor_x;
+					posy = ivariant->di->idimy * l.at(x).anchor_y;
 				}
 			}
 			else if (l.at(x).AnchorPointAnnotationUnits ==
@@ -1268,12 +1301,12 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 							ivariant->pr_display_areas
 								.value(z)
 								.top_left_x +
-							dimx*l.at(x).anchor_x;
+							dimx * l.at(x).anchor_x;
 						aposy =
 							ivariant->pr_display_areas
 								.value(z)
 								.top_left_y +
-							dimy*l.at(x).anchor_y;
+							dimy * l.at(x).anchor_y;
 					}
 					else
 					{
@@ -1282,8 +1315,8 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 				}
 				else
 				{
-					aposx = ivariant->di->idimx*l.at(x).anchor_x;
-					aposy = ivariant->di->idimy*l.at(x).anchor_y;
+					aposx = ivariant->di->idimx * l.at(x).anchor_x;
+					aposy = ivariant->di->idimy * l.at(x).anchor_y;
 				}
 			}
 			else if (l.at(x).AnchorPointAnnotationUnits ==
@@ -1293,19 +1326,14 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 				aposy = l.at(x).anchor_y;
 			}
 			QPen pen;
-			pen.setBrush(QBrush(QColor(255,127,23)));
+			pen.setBrush(QBrush(QColor(255, 127, 23)));
 			QPainterPath p;
 			p.moveTo(aposx,aposy - 3);
 			p.lineTo(aposx,aposy + 3);
-			p.moveTo(aposx - 3,aposy);
-			p.lineTo(aposx + 3,aposy);
+			p.moveTo(aposx - 3, aposy);
+			p.lineTo(aposx + 3, aposy);
 			GraphicsPathItem * a = new GraphicsPathItem();
-#if 1
 			a->setFlag(QGraphicsItem::ItemIsMovable, false);
-#else
-			a->setFlag(QGraphicsItem::ItemIsMovable, true);
-			a->setFlag(QGraphicsItem::ItemIsSelectable, true);
-#endif
 			a->setFlag(QGraphicsItem::ItemIsFocusable, false);
 			a->setAcceptHoverEvents(false);
 			a->setPath(p);
@@ -1361,14 +1389,14 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 							0xff;
 				ColorSpace_::Lab2Rgb(&R, &G, &B, _L, _a, _b);
 				i->setDefaultTextColor(QColor(
-					static_cast<unsigned int>(R*255),
-					static_cast<unsigned int>(G*255),
-					static_cast<unsigned int>(B*255),
+					static_cast<unsigned int>(R * 255),
+					static_cast<unsigned int>(G * 255),
+					static_cast<unsigned int>(B * 255),
 					255));
 			}
 			else
 			{
-				i->setDefaultTextColor(QColor(150,0,150,255));
+				i->setDefaultTextColor(QColor(150, 0, 150, 255));
 			}
 			i->setFont(font);
 			if (l.at(x).ShadowStyle == QString("NORMAL"))
@@ -1399,14 +1427,14 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 					ColorSpace_::Lab2Rgb(&R, &G, &B, _L, _a, _b);
 					shadow->setColor(
 						QColor(
-							static_cast<unsigned int>(R*255),
-							static_cast<unsigned int>(G*255),
-							static_cast<unsigned int>(B*255),
+							static_cast<unsigned int>(R * 255),
+							static_cast<unsigned int>(G * 255),
+							static_cast<unsigned int>(B * 255),
 							static_cast<unsigned int>(opacity)));
 				}
 				else
 				{
-					shadow->setColor(QColor(128,128,128,static_cast<unsigned int>(opacity)));
+					shadow->setColor(QColor(128, 128, 128, static_cast<unsigned int>(opacity)));
 				}
 				i->setGraphicsEffect(shadow);
 			}
@@ -1417,14 +1445,14 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 		}
 		else
 		{
-			i->setDefaultTextColor(QColor(150,0,150,255));
+			i->setDefaultTextColor(QColor(150, 0, 150, 255));
 			if (true)
 			{
 				QGraphicsDropShadowEffect * shadow =
 					new QGraphicsDropShadowEffect(i);
 				shadow->setXOffset(1.5);
 				shadow->setYOffset(1.5);
-				shadow->setColor(QColor(128,128,128,255));
+				shadow->setColor(QColor(128, 128, 128, 255));
 				i->setGraphicsEffect(shadow);
 			}
 		}
@@ -1461,8 +1489,10 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 	for (int x = 0; x < l.size(); ++x)
 	{
 		if (!(l.at(x).GraphicData.size() > 1 &&
-				(l.at(x).GraphicData.size()%2 == 0)))
+				(l.at(x).GraphicData.size() % 2 == 0)))
+		{
 			continue;
+		}
 		const QString t = l.at(x).GraphicType;
 		if (t == QString("POLYLINE"))
 		{
@@ -1474,11 +1504,11 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 					l.at(x).GraphicData.at(0),
 					l.at(x).GraphicData.at(1));
 				for (unsigned int y = 2;
-					y < l.at(x).GraphicData.size(); y+=2)
+					y < l.at(x).GraphicData.size(); y += 2)
 				{
 					p.lineTo(
 						l.at(x).GraphicData.at(y),
-						l.at(x).GraphicData.at(y+1));
+						l.at(x).GraphicData.at(y + 1));
 				}
 			}
 			else if (l.at(x).GraphicAnnotationUnits ==
@@ -1503,36 +1533,36 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 					if (dimx > 0 && dimy > 0)
 					{
 						for (unsigned int y = 0;
-							y < l.at(x).GraphicData.size(); y+=2)
+							y < l.at(x).GraphicData.size(); y += 2)
 						{
 							const double px =
 								ivariant->pr_display_areas
 									.value(z)
 									.top_left_x +
-								dimx*l.at(x).GraphicData.at(y);
+								dimx * l.at(x).GraphicData.at(y);
 							const double py =
 								ivariant->pr_display_areas
 									.value(z)
 									.top_left_y +
-								dimy*l.at(x).GraphicData.at(y+1);
+								dimy * l.at(x).GraphicData.at(y + 1);
 							if (y > 1) p.lineTo(px, py);
-							else p.moveTo(px, py);
+							else       p.moveTo(px, py);
 						}
 					}
 				}
 				else
 				{
 					for (unsigned int y = 0;
-						y < l.at(x).GraphicData.size(); y+=2)
+						y < l.at(x).GraphicData.size(); y += 2)
 					{
 						const double px =
 							ivariant->di->idimx *
 								l.at(x).GraphicData.at(y);
 						const double py =
 							ivariant->di->idimy *
-								l.at(x).GraphicData.at(y+1);
+								l.at(x).GraphicData.at(y + 1);
 						if (y > 1) p.lineTo(px, py);
-						else p.moveTo(px, py);
+						else       p.moveTo(px, py);
 					}
 				}
 			}
@@ -1542,17 +1572,12 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 			}
 			{
 				QGraphicsPathItem * i = new QGraphicsPathItem();
-#if 1
 				i->setFlag(QGraphicsItem::ItemIsMovable, false);
-#else
-				i->setFlag(QGraphicsItem::ItemIsMovable, true);
-				i->setFlag(QGraphicsItem::ItemIsSelectable, true);
-#endif
 				i->setFlag(QGraphicsItem::ItemIsFocusable, false);
 				i->setAcceptHoverEvents(false);
 				if (l.at(x).GraphicFilled == QString("Y"))
 				{
-					QBrush brush(QColor(131,108,154,255));
+					QBrush brush(QColor(131, 108, 154, 255));
 					brush.setStyle(Qt::SolidPattern);
 					i->setPen(QPen(Qt::NoPen));
 					i->setBrush(brush);
@@ -1560,7 +1585,7 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				else
 				{
 					QPen pen;
-					pen.setBrush(QBrush(QColor(192,30,200,255)));
+					pen.setBrush(QBrush(QColor(192, 30, 200, 255)));
 					pen.setWidth(0);
 					pen.setStyle(Qt::SolidLine);
 					pen.setCapStyle(Qt::RoundCap);
@@ -1575,7 +1600,7 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 		}
 		else if (t == QString("ELLIPSE")) // TODO more testing
 		{
-			if (l.at(x).GraphicData.size()!=8) continue;
+			if (l.at(x).GraphicData.size() != 8) continue;
 			double major0_x = 0.0;
 			double major0_y = 0.0;
 			double major1_x = 0.0;
@@ -1621,42 +1646,42 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 							ivariant->pr_display_areas
 								.value(z)
 								.top_left_x +
-							dimx*l.at(x).GraphicData.at(0);
+							dimx * l.at(x).GraphicData.at(0);
 						major0_y =
 							ivariant->pr_display_areas
 								.value(z)
 								.top_left_y +
-							dimy*l.at(x).GraphicData.at(1);
+							dimy * l.at(x).GraphicData.at(1);
 						major1_x =
 							ivariant->pr_display_areas
 								.value(z)
 								.top_left_x +
-							dimx*l.at(x).GraphicData.at(2);
+							dimx * l.at(x).GraphicData.at(2);
 						major1_y =
 							ivariant->pr_display_areas
 								.value(z)
 								.top_left_y +
-							dimy*l.at(x).GraphicData.at(3);
+							dimy * l.at(x).GraphicData.at(3);
 						minor0_x =
 							ivariant->pr_display_areas
 								.value(z)
 								.top_left_x +
-							dimx*l.at(x).GraphicData.at(4);
+							dimx * l.at(x).GraphicData.at(4);
 						minor0_y =
 							ivariant->pr_display_areas
 								.value(z)
 								.top_left_y +
-							dimy*l.at(x).GraphicData.at(5);
+							dimy * l.at(x).GraphicData.at(5);
 						minor1_x =
 							ivariant->pr_display_areas
 								.value(z)
 								.top_left_x +
-							dimx*l.at(x).GraphicData.at(6);
+							dimx * l.at(x).GraphicData.at(6);
 						minor1_y =
 							ivariant->pr_display_areas
 								.value(z)
 								.top_left_y +
-							dimy*l.at(x).GraphicData.at(7);
+							dimy * l.at(x).GraphicData.at(7);
 					}
 					else
 					{
@@ -1696,18 +1721,18 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				continue;
 			}
 			{
-				const double mid_major_x = (major0_x + major1_x)*0.5;
-				const double mid_major_y = (major0_y + major1_y)*0.5;
+				const double mid_major_x = (major0_x + major1_x) * 0.5;
+				const double mid_major_y = (major0_y + major1_y) * 0.5;
 				const double x0__ = major1_x - major0_x;
 				const double y0__ = major1_y - major0_y;
 				const double x1__ = minor1_x - minor0_x;
 				const double y1__ = minor1_y - minor0_y;
-				const double d0   = sqrt(x0__*x0__ + y0__*y0__);
-				const double d1   = sqrt(x1__*x1__ + y1__*y1__);
-				const double ma_j = 1.0/d0;
+				const double d0   = sqrt(x0__ * x0__ + y0__ * y0__);
+				const double d1   = sqrt(x1__ * x1__ + y1__ * y1__);
+				const double ma_j = 1.0 / d0;
 				const double ma_nx = x0__ * ma_j;
 				const double ma_ny = y0__ * ma_j;
-				const double mi_j = 1.0/d1;
+				const double mi_j = 1.0 / d1;
 				const double mi_nx = x1__ * mi_j;
 				const double mi_ny = y1__ * mi_j;
 				const double start = 0.0;
@@ -1723,21 +1748,16 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 					ttt.setMatrix(ma_nx, ma_ny, 0, -mi_nx, -mi_ny, 0, 0, 0, 1);
 					i->setTransform(ttt, true);
 				}
-				QRectF r___(-0.5*d0, -0.5*d1, d0, d1);
+				QRectF r___(-0.5 * d0, -0.5 * d1, d0, d1);
 				QPainterPath path;
 				path.arcMoveTo(r___, start);
 				path.arcTo(r___, start, span);
-#if 1
 				i->setFlag(QGraphicsItem::ItemIsMovable, false);
-#else
-				i->setFlag(QGraphicsItem::ItemIsMovable, true);
-				i->setFlag(QGraphicsItem::ItemIsSelectable, true);
-#endif
 				i->setFlag(QGraphicsItem::ItemIsFocusable, false);
 				i->setAcceptHoverEvents(false);
 				if (l.at(x).GraphicFilled == QString("Y"))
 				{
-					QBrush brush(QColor(131,108,154,255));
+					QBrush brush(QColor(131, 108, 154, 255));
 					brush.setStyle(Qt::SolidPattern);
 					i->setPen(QPen(Qt::NoPen));
 					i->setBrush(brush);
@@ -1745,7 +1765,7 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				else
 				{
 					QPen pen;
-					pen.setBrush(QBrush(QColor(192,30,200,255)));
+					pen.setBrush(QBrush(QColor(192, 30, 200, 255)));
 					pen.setWidth(0);
 					pen.setStyle(Qt::SolidLine);
 					pen.setCapStyle(Qt::RoundCap);
@@ -1760,7 +1780,7 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 		}
 		else if (t == QString("CIRCLE"))
 		{
-			if (l.at(x).GraphicData.size()!=4) continue;
+			if (l.at(x).GraphicData.size() != 4) continue;
 			double center_x = 0.0;
 			double center_y = 0.0;
 			double point_x  = 0.0;
@@ -1798,22 +1818,22 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 							ivariant->pr_display_areas
 								.value(z)
 								.top_left_x +
-							dimx*l.at(x).GraphicData.at(0);
+							dimx * l.at(x).GraphicData.at(0);
 						center_y =
 							ivariant->pr_display_areas
 								.value(z)
 								.top_left_y +
-							dimy*l.at(x).GraphicData.at(1);
+							dimy * l.at(x).GraphicData.at(1);
 						point_x =
 							ivariant->pr_display_areas
 								.value(z)
 								.top_left_x +
-							dimx*l.at(x).GraphicData.at(2);
+							dimx * l.at(x).GraphicData.at(2);
 						point_y =
 							ivariant->pr_display_areas
 								.value(z)
 								.top_left_y +
-							dimy*l.at(x).GraphicData.at(3);
+							dimy * l.at(x).GraphicData.at(3);
 					}
 					else
 					{
@@ -1843,24 +1863,19 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 			{
 				const double x__ = point_x - center_x;
 				const double y__ = point_y - center_y;
-				const double distance = sqrt(x__*x__ + y__*y__);
+				const double distance = sqrt(x__ * x__ + y__ * y__);
 				QGraphicsEllipseItem * i =
 					new QGraphicsEllipseItem(
 						center_x - distance,
 						center_y - distance,
-						2*distance,
-						2*distance);
-#if 1
+						2 * distance,
+						2 * distance);
 				i->setFlag(QGraphicsItem::ItemIsMovable, false);
-#else
-				i->setFlag(QGraphicsItem::ItemIsMovable, true);
-				i->setFlag(QGraphicsItem::ItemIsSelectable, true);
-#endif
 				i->setFlag(QGraphicsItem::ItemIsFocusable, false);
 				i->setAcceptHoverEvents(false);
 				if (l.at(x).GraphicFilled == QString("Y"))
 				{
-					QBrush brush(QColor(131,108,154,255));
+					QBrush brush(QColor(131, 108, 154, 255));
 					brush.setStyle(Qt::SolidPattern);
 					i->setPen(QPen(Qt::NoPen));
 					i->setBrush(brush);
@@ -1868,7 +1883,7 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				else
 				{
 					QPen pen;
-					pen.setBrush(QBrush(QColor(192,30,200,255)));
+					pen.setBrush(QBrush(QColor(192, 30, 200, 255)));
 					pen.setWidth(0);
 					pen.setStyle(Qt::SolidLine);
 					pen.setCapStyle(Qt::RoundCap);
@@ -1916,12 +1931,12 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 							ivariant->pr_display_areas
 								.value(z)
 								.top_left_x +
-							dimx*l.at(x).GraphicData.at(0);
+							dimx * l.at(x).GraphicData.at(0);
 						point_y =
 							ivariant->pr_display_areas
 								.value(z)
 								.top_left_y +
-							dimy*l.at(x).GraphicData.at(1);
+							dimy * l.at(x).GraphicData.at(1);
 					}
 					else
 					{
@@ -1943,7 +1958,7 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				continue;
 			}
 			{
-				QBrush brush(QColor(192,30,200,255));
+				QBrush brush(QColor(192, 30, 200, 255));
 				brush.setStyle(Qt::SolidPattern);
 				QGraphicsEllipseItem * i =
 					new QGraphicsEllipseItem(
@@ -1951,12 +1966,7 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 						point_y - 1.0,
 						2.0,
 						2.0);
-#if 1
 				i->setFlag(QGraphicsItem::ItemIsMovable, false);
-#else
-				i->setFlag(QGraphicsItem::ItemIsMovable, true);
-				i->setFlag(QGraphicsItem::ItemIsSelectable, true);
-#endif
 				i->setFlag(QGraphicsItem::ItemIsFocusable, false);
 				i->setAcceptHoverEvents(false);
 				i->setPen(QPen(Qt::NoPen));
@@ -2025,15 +2035,15 @@ void GraphicsView::draw_shutter(const ImageVariant * ivariant)
 			i->setPen(QPen(Qt::NoPen));
 			i->setBrush(brush);
 			QPainterPath p;
-			p.moveTo(0,0);
+			p.moveTo(0, 0);
 			p.addPolygon(
 				QPolygon(
 					QRect(
 						-2,
 						-2,
-						ivariant->di->idimx+2,
-						ivariant->di->idimy+2)));
-			p.moveTo(0,0);
+						ivariant->di->idimx + 2,
+						ivariant->di->idimy + 2)));
+			p.moveTo(0, 0);
 			p.addPolygon(
 				QPolygon(
 					QRect(
@@ -2070,16 +2080,16 @@ void GraphicsView::draw_shutter(const ImageVariant * ivariant)
 			i->setPen(QPen(Qt::NoPen));
 			i->setBrush(brush);
 			QPainterPath p;
-			p.moveTo(0,0);
+			p.moveTo(0, 0);
 			p.addPolygon(
 				QPolygon(
 					QRect(
 						-2,
 						-2,
-						ivariant->di->idimx+2,
-						ivariant->di->idimy+2)));
-			p.moveTo(0,0);
-			const int d = 2*a.RadiusofCircularShutter;
+						ivariant->di->idimx + 2,
+						ivariant->di->idimy + 2)));
+			p.moveTo(0, 0);
+			const int d = 2 * a.RadiusofCircularShutter;
 			p.addEllipse(
 				(a.CenterofCircularShutter_x - 1) - a.RadiusofCircularShutter,
 				(a.CenterofCircularShutter_y - 1) - a.RadiusofCircularShutter,
@@ -2097,17 +2107,17 @@ void GraphicsView::draw_shutter(const ImageVariant * ivariant)
 				continue;
 			}
 			if (!(a.VerticesofthePolygonalShutter.size() > 1 &&
-					a.VerticesofthePolygonalShutter.size()%2 == 0))
+					a.VerticesofthePolygonalShutter.size() % 2 == 0))
 			{
 				continue;
 			}
 			QVector<QPoint> points;
 			for (unsigned int j = 0;
-				j < a.VerticesofthePolygonalShutter.size(); j+=2)
+				j < a.VerticesofthePolygonalShutter.size(); j += 2)
 			{
 				points.push_back(QPoint(
-					a.VerticesofthePolygonalShutter.at(j+1) - 1,
-					a.VerticesofthePolygonalShutter.at(  j) - 1));
+					a.VerticesofthePolygonalShutter.at(j + 1) - 1,
+					a.VerticesofthePolygonalShutter.at(    j) - 1));
 			}
 			QGraphicsPathItem * i = new QGraphicsPathItem();
 			i->setFlag(QGraphicsItem::ItemIsMovable, false);
@@ -2118,15 +2128,15 @@ void GraphicsView::draw_shutter(const ImageVariant * ivariant)
 			i->setPen(QPen(Qt::NoPen));
 			i->setBrush(brush);
 			QPainterPath p;
-			p.moveTo(0,0);
+			p.moveTo(0, 0);
 			p.addPolygon(
 				QPolygon(
 					QRect(
 						-2,
 						-2,
-						ivariant->di->idimx+2,
-						ivariant->di->idimy+2)));
-			p.moveTo(0,0);
+						ivariant->di->idimx + 2,
+						ivariant->di->idimy + 2)));
+			p.moveTo(0, 0);
 			p.addPolygon(QPolygon(points));
 			i->setPath(p);
 			i->setZValue(1e+16);
@@ -2135,4 +2145,3 @@ void GraphicsView::draw_shutter(const ImageVariant * ivariant)
 		}
 	}
 }
-
