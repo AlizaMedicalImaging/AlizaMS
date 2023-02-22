@@ -14,13 +14,12 @@ namespace
 {
 
 template<typename T> QString calculate_histogramm(
-	bool * ok,
 	const typename T::Pointer & image,
 	ImageVariant * v)
 {
 	if (image.IsNull() || !v)
 	{
-		*ok = false; return QString("image.IsNull() || !v");
+		return QString("image.IsNull() || !v");
 	}
 	typedef itk::Statistics::ScalarImageToHistogramGenerator<T>
 		HistogramGeneratorType;
@@ -28,17 +27,18 @@ template<typename T> QString calculate_histogramm(
 		HistogramType;
 	typename HistogramGeneratorType::Pointer histogram_generator =
 		HistogramGeneratorType::New();
-	QString error__ = QString("");
+	QString error__("");
 	long long bins_size =
-		static_cast<long long>(round(v->di->rmax-v->di->rmin)) + 1;
-	if (bins_size > 2048) bins_size = 2048; // TODO
-	if (bins_size < 256 && (v->image_type==5||v->image_type==6))
+		static_cast<long long>(round(v->di->rmax - v->di->rmin)) + 1;
+	if (bins_size > 2048) bins_size = 2048;
+	if (bins_size < 256 && (v->image_type == 5 || v->image_type == 6))
+	{
 		bins_size = 256;
+	}
 	if (bins_size <= 0)
 	{
-		*ok = false;
 		return QString("bins_size <= 0");
-	};
+	}
 	int * bins;
 	int tmp0 = 1;
 	//
@@ -48,7 +48,6 @@ template<typename T> QString calculate_histogramm(
 	}
 	catch (const std::bad_alloc&)
 	{
-		*ok = false;
 		return QString("!bins");
 	}
 	//
@@ -67,7 +66,6 @@ template<typename T> QString calculate_histogramm(
 	}
 	catch (const itk::ExceptionObject & ex)
 	{
-		*ok = false;
 		return QString(ex.GetDescription());
 	}
 	//
@@ -91,11 +89,10 @@ template<typename T> QString calculate_histogramm(
 		const unsigned int pixmap_w =
 			bins_size < 2048 ? 2048 : bins_size;
 		const unsigned int pixmap_h = 1024;
-		pixmap = QPixmap(pixmap_w,pixmap_h);
+		pixmap = QPixmap(pixmap_w, pixmap_h);
 		if (pixmap.isNull())
 		{
 			delete [] bins;
-			*ok = false;
 			return QString("pixmap.isNull()");
 		}
 		pixmap.fill(bgcolor);
@@ -103,46 +100,42 @@ template<typename T> QString calculate_histogramm(
 		painter.begin(&pixmap);
 		painter.setPen(pen);
 		painter.setBrush(brush);
-		double first_x = 0.0f;
-		double last_x  = 0.0f;
+		double first_x = 0.0;
+		double last_x  = 0.0;
 		for (int x = 0; x < bins_size; ++x)
 		{
 			const double x_ =
-				pixmap_w*x/static_cast<double>(bins_size);
+				pixmap_w * x / static_cast<double>(bins_size);
 			const double y_ =
-				(bins[x]>0)
-				?
-				pixmap_h*log(static_cast<double>(bins[x]))/tmp2
-				:
-				0.0;
-			if (x==0)
+				(bins[x] > 0)
+				? pixmap_h * log(static_cast<double>(bins[x])) / tmp2
+				: 0.0;
+			if (x == 0)
 			{
 				first_x = x_;
-				p.moveTo(x_,pixmap_h);
-				p.lineTo(x_,pixmap_h-y_);
+				p.moveTo(x_, pixmap_h);
+				p.lineTo(x_, pixmap_h - y_);
 			}
-			else if (x==bins_size-1)
+			else if (x == bins_size-1)
 			{
 				last_x = x_;
-				p.lineTo(x_,pixmap_h-y_);
+				p.lineTo(x_, pixmap_h - y_);
 			}
-			else p.lineTo(x_,pixmap_h-y_);
+			else p.lineTo(x_, pixmap_h - y_);
 		}
 		delete [] bins;
 		p.lineTo(last_x, pixmap_h);
-		p.lineTo(first_x,pixmap_h);
+		p.lineTo(first_x, pixmap_h);
 		painter.drawPath(p);
 		painter.end();
 		//
 		v->histogram = pixmap;
 	}
 	//
-	*ok = true;
 	return QString("");
 }
 
 template<typename T> QString calculate_histogramm_rgb(
-	bool * ok,
 	const typename T::Pointer & image,
 	ImageVariant * v)
 {
@@ -160,13 +153,14 @@ template<typename T> QString calculate_histogramm_rgb(
 	//
 	const int bins_size = 256;
 	size[0] = size[1] = size[2] = bins_size;
-	bin_min[0] = bin_min[1] = bin_min[2] =   0;
+	bin_min[0] = bin_min[1] = bin_min[2] = 0;
 	bin_max[0] = bin_max[1] = bin_max[2] = 255;
-	int * bins0 = NULL, * bins1 = NULL, * bins2 = NULL;
+	int * bins0 = NULL;
+	int * bins1 = NULL;
+	int * bins2 = NULL;
 	int tmp0 = 1;
 	//
-	UpdateQtCommand::Pointer update_qt_command =
-		UpdateQtCommand::New();
+	UpdateQtCommand::Pointer update_qt_command = UpdateQtCommand::New();
 	//
 	try
 	{
@@ -179,26 +173,36 @@ template<typename T> QString calculate_histogramm_rgb(
 	}
 	catch (const itk::ExceptionObject & ex)
 	{
-		*ok = false;
 		return QString(ex.GetDescription());
 	}
 	//
 	const HistogramType * histogram = filter->GetOutput();
 	if (bins_size > static_cast<int>(histogram->GetSize()[0]))
-	{ *ok = false; return QString("bins_size > histogram->GetSize()[0]"); }
+	{
+		return QString("bins_size > histogram->GetSize()[0]");
+	}
 	if (bins_size > static_cast<int>(histogram->GetSize()[1]))
-	{ *ok = false; return QString("bins_size > histogram->GetSize()[1]"); }
+	{
+		return QString("bins_size > histogram->GetSize()[1]");
+	}
 	if (bins_size > static_cast<int>(histogram->GetSize()[2]))
-	{ *ok = false; return QString("bins_size > histogram->GetSize()[2]"); }
+	{
+		return QString("bins_size > histogram->GetSize()[2]");
+	}
 	try
 	{
 		bins0 = new int[bins_size];
 		bins1 = new int[bins_size];
 		bins2 = new int[bins_size];
 	}
-	catch(const std::bad_alloc&) { bins0 = bins1 = bins2 = NULL; }
-	if (!bins0||!bins1||!bins2)
-	{ *ok = false; return QString("!bins0||!bins1||!bins2"); }
+	catch (const std::bad_alloc&)
+	{
+		bins0 = bins1 = bins2 = NULL;
+	}
+	if (!bins0 || !bins1 || !bins2)
+	{
+		return QString("!bins0 || !bins1 || !bins2");
+	}
 	//
 	for (int x = 0; x < bins_size; ++x)
 	{
@@ -209,7 +213,7 @@ template<typename T> QString calculate_histogramm_rgb(
 		bins2[x] = histogram->GetFrequency(x, 2);
 		if (bins2[x] > tmp0) tmp0 = bins2[x];
 	}
-	const double tmp2 = tmp0 > 2 ? log((double)tmp0) : 0.30102;
+	const double tmp2 = tmp0 > 2 ? log(static_cast<double>(tmp0)) : 0.30102;
 	//
 	{
 		QPixmap pixmap;
@@ -219,42 +223,38 @@ template<typename T> QString calculate_histogramm_rgb(
 		QPen pen1;
 		QPen pen2;
 		//
-		QColor bgcolor = qApp->palette().color(
-			QPalette::Window);
+		QColor bgcolor = qApp->palette().color(QPalette::Window);
 		const unsigned long pixmap_w =
-			(bins_size*3 < 2048)
-			?
-			2048
-			:
-			bins_size*3; // curr. always 256 bins
+			(bins_size * 3 < 2048)
+			? 2048
+			: bins_size * 3; // curr. always 256 bins
 		const unsigned long pixmap_h = 1024;
-		pixmap = QPixmap(pixmap_w,pixmap_h);
+		pixmap = QPixmap(pixmap_w, pixmap_h);
 		if (pixmap.isNull())
 		{
 			delete [] bins0;
 			delete [] bins1;
 			delete [] bins2;
-			*ok = false;
 			return QString("pixmap.isNull()");
 		}
 		pixmap.fill(bgcolor);
 		//
-		const double tmp100 = pixmap_w/(static_cast<double>(bins_size)*3.0);
-		const double tmp101 = 2.0*tmp100;
-		const double tmp102 = 3.0*tmp100;
-		const double tmp103 = 0.8*tmp100;
+		const double tmp100 = pixmap_w / (static_cast<double>(bins_size) * 3.0);
+		const double tmp101 = 2.0 * tmp100;
+		const double tmp102 = 3.0 * tmp100;
+		const double tmp103 = 0.8 * tmp100;
 		for (int x = 0; x < bins_size; ++x)
 		{
-			const double x_  = tmp102*x;
-			const double y0_ = (bins0[x]>0) ? pixmap_h*log(static_cast<double>(bins0[x]))/tmp2 : 0.0;
-			const double y1_ = (bins1[x]>0) ? pixmap_h*log(static_cast<double>(bins1[x]))/tmp2 : 0.0;
-			const double y2_ = (bins2[x]>0) ? pixmap_h*log(static_cast<double>(bins2[x]))/tmp2 : 0.0;
-			p0.moveTo(x_,        pixmap_h);
-			p0.lineTo(x_,        pixmap_h-y0_);
-			p1.moveTo(x_+tmp100, pixmap_h);
-			p1.lineTo(x_+tmp100, pixmap_h-y1_);
-			p2.moveTo(x_+tmp101, pixmap_h);
-			p2.lineTo(x_+tmp101, pixmap_h-y2_);
+			const double x_  = tmp102 * x;
+			const double y0_ = (bins0[x] > 0) ? pixmap_h * log(static_cast<double>(bins0[x])) / tmp2 : 0.0;
+			const double y1_ = (bins1[x] > 0) ? pixmap_h * log(static_cast<double>(bins1[x])) / tmp2 : 0.0;
+			const double y2_ = (bins2[x] > 0) ? pixmap_h * log(static_cast<double>(bins2[x])) / tmp2 : 0.0;
+			p0.moveTo(x_,          pixmap_h);
+			p0.lineTo(x_,          pixmap_h - y0_);
+			p1.moveTo(x_ + tmp100, pixmap_h);
+			p1.lineTo(x_ + tmp100, pixmap_h - y1_);
+			p2.moveTo(x_ + tmp101, pixmap_h);
+			p2.lineTo(x_ + tmp101, pixmap_h - y2_);
 		}
 		delete [] bins0;
 		delete [] bins1;
@@ -275,7 +275,6 @@ template<typename T> QString calculate_histogramm_rgb(
 		v->histogram = pixmap;
 	}
 	//
-	*ok=true;
 	return QString("");
 }
 
@@ -284,27 +283,63 @@ template<typename T> QString calculate_histogramm_rgb(
 void HistogramGen::run()
 {
 	QString error__;
-	bool ok = false;
-	if (!ivariant) { error = QString("!ivariant"); return; }
-	switch(ivariant->image_type)
+	if (!ivariant)
 	{
-	case  0: error = calculate_histogramm<ImageTypeSS>(&ok,ivariant->pSS,ivariant); break;
-	case  1: error = calculate_histogramm<ImageTypeUS>(&ok,ivariant->pUS,ivariant); break;
-	case  2: error = calculate_histogramm<ImageTypeSI>(&ok,ivariant->pSI,ivariant); break;
-	case  3: error = calculate_histogramm<ImageTypeUI>(&ok,ivariant->pUI,ivariant); break;
-	case  4: error = calculate_histogramm<ImageTypeUC>(&ok,ivariant->pUC,ivariant); break;
-	case  5: error = calculate_histogramm<ImageTypeF>(&ok,ivariant->pF,ivariant); break;
-	case  6: error = calculate_histogramm<ImageTypeD>(&ok,ivariant->pD,ivariant); break;
-	case  7: error = calculate_histogramm<ImageTypeSLL>(&ok,ivariant->pSLL,ivariant); break;
-	case  8: error = calculate_histogramm<ImageTypeULL>(&ok,ivariant->pULL,ivariant); break;
-	case 10: error = calculate_histogramm_rgb<RGBImageTypeSS>(&ok,ivariant->pSS_rgb,ivariant); break;
-	case 11: error = calculate_histogramm_rgb<RGBImageTypeUS>(&ok,ivariant->pUS_rgb,ivariant); break;
-	case 12: error = calculate_histogramm_rgb<RGBImageTypeSI>(&ok,ivariant->pSI_rgb,ivariant); break;
-	case 13: error = calculate_histogramm_rgb<RGBImageTypeUI>(&ok,ivariant->pUI_rgb,ivariant); break;
-	case 14: error = calculate_histogramm_rgb<RGBImageTypeUC>(&ok,ivariant->pUC_rgb,ivariant); break;
-	case 15: error = calculate_histogramm_rgb<RGBImageTypeF>(&ok,ivariant->pF_rgb,ivariant); break;
-	case 16: error = calculate_histogramm_rgb<RGBImageTypeD>(&ok,ivariant->pD_rgb,ivariant); break;
-	default: break;
+		error = QString("!ivariant");
+		return;
+	}
+	switch (ivariant->image_type)
+	{
+	case  0:
+		error = calculate_histogramm<ImageTypeSS>(ivariant->pSS, ivariant);
+		break;
+	case  1:
+		error = calculate_histogramm<ImageTypeUS>(ivariant->pUS, ivariant);
+		break;
+	case  2:
+		error = calculate_histogramm<ImageTypeSI>(ivariant->pSI, ivariant);
+		break;
+	case  3:
+		error = calculate_histogramm<ImageTypeUI>(ivariant->pUI, ivariant);
+		break;
+	case  4:
+		error = calculate_histogramm<ImageTypeUC>(ivariant->pUC, ivariant);
+		break;
+	case  5:
+		error = calculate_histogramm<ImageTypeF>(ivariant->pF, ivariant);
+		break;
+	case  6:
+		error = calculate_histogramm<ImageTypeD>(ivariant->pD, ivariant);
+		break;
+	case  7:
+		error = calculate_histogramm<ImageTypeSLL>(ivariant->pSLL, ivariant);
+		break;
+	case  8:
+		error = calculate_histogramm<ImageTypeULL>(ivariant->pULL, ivariant);
+		break;
+	case 10:
+		error = calculate_histogramm_rgb<RGBImageTypeSS>(ivariant->pSS_rgb, ivariant);
+		break;
+	case 11:
+		error = calculate_histogramm_rgb<RGBImageTypeUS>(ivariant->pUS_rgb, ivariant);
+		break;
+	case 12:
+		error = calculate_histogramm_rgb<RGBImageTypeSI>(ivariant->pSI_rgb, ivariant);
+		break;
+	case 13:
+		error = calculate_histogramm_rgb<RGBImageTypeUI>(ivariant->pUI_rgb, ivariant);
+		break;
+	case 14:
+		error = calculate_histogramm_rgb<RGBImageTypeUC>(ivariant->pUC_rgb, ivariant);
+		break;
+	case 15:
+		error = calculate_histogramm_rgb<RGBImageTypeF>(ivariant->pF_rgb, ivariant);
+		break;
+	case 16:
+		error = calculate_histogramm_rgb<RGBImageTypeD>(ivariant->pD_rgb, ivariant);
+		break;
+	default:
+		break;
 	}
 }
 
@@ -312,4 +347,3 @@ QString HistogramGen::get_error() const
 {
 	return error;
 }
-
