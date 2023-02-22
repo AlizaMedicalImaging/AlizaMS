@@ -118,7 +118,7 @@ template<typename T> QString get_scalar_pixel_value__(
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 				s += QString::asprintf("%.6f", tmp0);
 #else
-				s.sprintf("%.6f",tmp0);
+				s.sprintf("%.6f", tmp0);
 #endif
 				s.append(idx_);
 			}
@@ -366,7 +366,7 @@ template<typename T> QString get_rgba_pixel_value__(
 				tmp2s.sprintf("%.3f", tmp2);
 				tmp3s.sprintf("%.3f", tmp3);
 #endif
-				s.append(tmp0s+QString(",") + tmp1s+QString(",") + tmp2s + QString(",") + tmp3s);
+				s.append(tmp0s + QString(",") + tmp1s+QString(",") + tmp2s + QString(",") + tmp3s);
 				s.append(idx_);
 			}
 			break;
@@ -652,8 +652,8 @@ void GraphicsUtils::print_image_info(
 	case   2: t = QString("signed int");         break;
 	case   3: t = QString("unsigned int");       break;
 	case   4: t = QString("unsigned char");      break;
-	case   5: t = QString("float");  			 break;
-	case   6: t = QString("double"); 			 break;
+	case   5: t = QString("float");              break;
+	case   6: t = QString("double");             break;
 	case   7: t = QString("signed long long");   break;
 	case   8: t = QString("unsigned long long"); break;
 	case  10: t = QString("RGB signed short");   break;
@@ -974,12 +974,12 @@ void GraphicsUtils::draw_cross_out(QImage & tmpi)
 {
 	const QSize s = tmpi.size();
 	QPen pen;
-	pen.setBrush(QBrush(QColor(255,0,0)));
+	pen.setBrush(QBrush(QColor(255, 0, 0)));
 	QPainter * painter = new QPainter;
 	painter->begin(&tmpi);
 	painter->setPen(pen);
-	painter->drawLine(QPointF(0,0), QPointF(s.width(),s.height()));
-	painter->drawLine(QPointF(0,s.height()), QPointF(s.width(),0));
+	painter->drawLine(QPointF(0, 0), QPointF(s.width(), s.height()));
+	painter->drawLine(QPointF(0, s.height()), QPointF(s.width(), 0));
 	painter->end();
 	delete painter;
 }
