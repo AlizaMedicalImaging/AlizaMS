@@ -38,14 +38,14 @@ template<typename T> QString get_scalar_pixel_value__(
 	typename T::IndexType idx;
 	bool ok = false;
 	//
-	switch(axis)
+	switch (axis)
 	{
 	case 0:
 		{
 			if (ivariant->equi)
 			{
-				if (x_<static_cast<unsigned int>(ivariant->di->idimy) &&
-					y_<static_cast<unsigned int>(ivariant->di->idimz))
+				if (x_ < static_cast<unsigned int>(ivariant->di->idimy) &&
+					y_ < static_cast<unsigned int>(ivariant->di->idimz))
 				{
 					ok = true;
 					idx[0] = selected_x_slice;
@@ -59,8 +59,8 @@ template<typename T> QString get_scalar_pixel_value__(
 		{
 			if (ivariant->equi)
 			{
-				if (x_<static_cast<unsigned int>(ivariant->di->idimx) &&
-					y_<static_cast<unsigned int>(ivariant->di->idimz))
+				if (x_ < static_cast<unsigned int>(ivariant->di->idimx) &&
+					y_ < static_cast<unsigned int>(ivariant->di->idimz))
 				{
 					ok = true;
 					idx[1] = selected_y_slice;
@@ -72,8 +72,8 @@ template<typename T> QString get_scalar_pixel_value__(
 		break;
 	case 2:
 		{
-			if (x_<static_cast<unsigned int>(ivariant->di->idimx) &&
-				y_<static_cast<unsigned int>(ivariant->di->idimy))
+			if (x_ < static_cast<unsigned int>(ivariant->di->idimx) &&
+				y_ < static_cast<unsigned int>(ivariant->di->idimy))
 			{
 				ok = true;
 				idx[2] = selected_z_slice;
@@ -82,7 +82,8 @@ template<typename T> QString get_scalar_pixel_value__(
 			}
 		}
 		break;
-	default: break;
+	default:
+		break;
 	}
 	//
 	if (ok)
@@ -94,7 +95,7 @@ template<typename T> QString get_scalar_pixel_value__(
 			QVariant(static_cast<int>(idx[2])).toString() +
 			QString(" ]");
 		const typename T::PixelType p = image->GetPixel(idx);
-		switch(ivariant->image_type)
+		switch (ivariant->image_type)
 		{
 		case 0:
 		case 1:
@@ -115,14 +116,15 @@ template<typename T> QString get_scalar_pixel_value__(
 				const double tmp0 = static_cast<double>(p);
 				*label = static_cast<long long>(p);
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-				s += QString::asprintf("%.6f",tmp0);
+				s += QString::asprintf("%.6f", tmp0);
 #else
 				s.sprintf("%.6f",tmp0);
 #endif
 				s.append(idx_);
 			}
 			break;
-		default: break;
+		default:
+			break;
 		}
 	}
 	return s;
@@ -146,14 +148,14 @@ template<typename T> QString get_rgb_pixel_value__(
 	typename T::IndexType idx;
 	bool ok = false;
 	//
-	switch(axis)
+	switch (axis)
 	{
 	case 0:
 		{
 			if (ivariant->equi)
 			{
-				if (x_<static_cast<unsigned int>(ivariant->di->idimy) &&
-					y_<static_cast<unsigned int>(ivariant->di->idimz))
+				if (x_ < static_cast<unsigned int>(ivariant->di->idimy) &&
+					y_ < static_cast<unsigned int>(ivariant->di->idimz))
 				{
 					ok = true;
 					idx[0] = sx;
@@ -167,8 +169,8 @@ template<typename T> QString get_rgb_pixel_value__(
 		{
 			if (ivariant->equi)
 			{
-				if (x_<static_cast<unsigned int>(ivariant->di->idimx) &&
-					y_<static_cast<unsigned int>(ivariant->di->idimz))
+				if (x_ < static_cast<unsigned int>(ivariant->di->idimx) &&
+					y_ < static_cast<unsigned int>(ivariant->di->idimz))
 				{
 					ok = true;
 					idx[1] = sy;
@@ -180,8 +182,8 @@ template<typename T> QString get_rgb_pixel_value__(
 		break;
 	case 2:
 		{
-			if (x_<static_cast<unsigned int>(ivariant->di->idimx) &&
-				y_<static_cast<unsigned int>(ivariant->di->idimy))
+			if (x_ < static_cast<unsigned int>(ivariant->di->idimx) &&
+				y_ < static_cast<unsigned int>(ivariant->di->idimy))
 			{
 				ok = true;
 				idx[2] = sz;
@@ -190,7 +192,8 @@ template<typename T> QString get_rgb_pixel_value__(
 			}
 		}
 		break;
-	default: break;
+	default:
+		break;
 	}
 	//
 	if (ok)
@@ -202,7 +205,7 @@ template<typename T> QString get_rgb_pixel_value__(
 			QVariant(static_cast<int>(idx[2])).toString() +
 			QString(" ]");
 		const typename T::PixelType p = image->GetPixel(idx);
-		switch(ivariant->image_type)
+		switch (ivariant->image_type)
 		{
 		case 10:
 		case 11:
@@ -213,9 +216,9 @@ template<typename T> QString get_rgb_pixel_value__(
 				const int tmp0 = static_cast<int>(p.GetRed());
 				const int tmp1 = static_cast<int>(p.GetGreen());
 				const int tmp2 = static_cast<int>(p.GetBlue());
-				s.append(QVariant(tmp0).toString()+QString(",") +
-						QVariant(tmp1).toString()+QString(",") +
-						QVariant(tmp2).toString() + idx_);
+				s.append(QVariant(tmp0).toString() + QString(",") +
+					QVariant(tmp1).toString() + QString(",") +
+					QVariant(tmp2).toString() + idx_);
 			}
 			break;
 		case 15:
@@ -228,19 +231,20 @@ template<typename T> QString get_rgb_pixel_value__(
 				QString tmp1s;
 				QString tmp2s;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-				tmp0s = QString::asprintf("%.3f",tmp0);
-				tmp1s = QString::asprintf("%.3f",tmp1);
-				tmp2s = QString::asprintf("%.3f",tmp2);
+				tmp0s = QString::asprintf("%.3f", tmp0);
+				tmp1s = QString::asprintf("%.3f", tmp1);
+				tmp2s = QString::asprintf("%.3f", tmp2);
 #else
-				tmp0s.sprintf("%.3f",tmp0);
-				tmp1s.sprintf("%.3f",tmp1);
-				tmp2s.sprintf("%.3f",tmp2);
+				tmp0s.sprintf("%.3f", tmp0);
+				tmp1s.sprintf("%.3f", tmp1);
+				tmp2s.sprintf("%.3f", tmp2);
 #endif
-				s.append(tmp0s+QString(",")+tmp1s+QString(",")+tmp2s);
+				s.append(tmp0s + QString(",") + tmp1s + QString(",") + tmp2s);
 				s.append(idx_);
 			}
 			break;
-		default: break;
+		default:
+			break;
 		}
 	}
 	return s;
@@ -265,14 +269,14 @@ template<typename T> QString get_rgba_pixel_value__(
 	typename T::IndexType idx;
 	bool ok = false;
 	//
-	switch(axis)
+	switch (axis)
 	{
 	case 0:
 		{
 			if (ivariant->equi)
 			{
-				if (x_<static_cast<unsigned int>(ivariant->di->idimy) &&
-					y_<static_cast<unsigned int>(ivariant->di->idimz))
+				if (x_ < static_cast<unsigned int>(ivariant->di->idimy) &&
+					y_ < static_cast<unsigned int>(ivariant->di->idimz))
 				{
 					ok = true;
 					idx[0] = sx;
@@ -286,8 +290,8 @@ template<typename T> QString get_rgba_pixel_value__(
 		{
 			if (ivariant->equi)
 			{
-				if (x_<static_cast<unsigned int>(ivariant->di->idimx) &&
-					y_<static_cast<unsigned int>(ivariant->di->idimz))
+				if (x_ < static_cast<unsigned int>(ivariant->di->idimx) &&
+					y_ < static_cast<unsigned int>(ivariant->di->idimz))
 				{
 					ok = true;
 					idx[1] = sy;
@@ -299,8 +303,8 @@ template<typename T> QString get_rgba_pixel_value__(
 		break;
 	case 2:
 		{
-			if (x_<static_cast<unsigned int>(ivariant->di->idimx) &&
-				y_<static_cast<unsigned int>(ivariant->di->idimy))
+			if (x_ < static_cast<unsigned int>(ivariant->di->idimx) &&
+				y_ < static_cast<unsigned int>(ivariant->di->idimy))
 			{
 				ok = true;
 				idx[2] = sz;
@@ -309,7 +313,8 @@ template<typename T> QString get_rgba_pixel_value__(
 			}
 		}
 		break;
-	default: break;
+	default:
+		break;
 	}
 	//
 	if (ok)
@@ -321,7 +326,7 @@ template<typename T> QString get_rgba_pixel_value__(
 			QVariant(static_cast<int>(idx[2])).toString() +
 			QString(" ]");
 		const typename T::PixelType p = image->GetPixel(idx);
-		switch(ivariant->image_type)
+		switch (ivariant->image_type)
 		{
 		case 20:
 		case 21:
@@ -333,10 +338,10 @@ template<typename T> QString get_rgba_pixel_value__(
 				const int tmp1 = static_cast<int>(p.GetGreen());
 				const int tmp2 = static_cast<int>(p.GetBlue());
 				const int tmp3 = static_cast<int>(p.GetAlpha());
-				s.append(QVariant(tmp0).toString()+QString(",") +
-						QVariant(tmp1).toString()+QString(",") +
-						QVariant(tmp2).toString()+QString(",") +
-						QVariant(tmp3).toString() + idx_);
+				s.append(QVariant(tmp0).toString() + QString(",") +
+					QVariant(tmp1).toString() + QString(",") +
+					QVariant(tmp2).toString() + QString(",") +
+					QVariant(tmp3).toString() + idx_);
 			}
 			break;
 		case 25:
@@ -351,21 +356,22 @@ template<typename T> QString get_rgba_pixel_value__(
 				QString tmp2s;
 				QString tmp3s;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-				tmp0s = QString::asprintf("%.3f",tmp0);
-				tmp1s = QString::asprintf("%.3f",tmp1);
-				tmp2s = QString::asprintf("%.3f",tmp2);
-				tmp3s = QString::asprintf("%.3f",tmp3);
+				tmp0s = QString::asprintf("%.3f", tmp0);
+				tmp1s = QString::asprintf("%.3f", tmp1);
+				tmp2s = QString::asprintf("%.3f", tmp2);
+				tmp3s = QString::asprintf("%.3f", tmp3);
 #else
-				tmp0s.sprintf("%.3f",tmp0);
-				tmp1s.sprintf("%.3f",tmp1);
-				tmp2s.sprintf("%.3f",tmp2);
-				tmp3s.sprintf("%.3f",tmp3);
+				tmp0s.sprintf("%.3f", tmp0);
+				tmp1s.sprintf("%.3f", tmp1);
+				tmp2s.sprintf("%.3f", tmp2);
+				tmp3s.sprintf("%.3f", tmp3);
 #endif
-				s.append(tmp0s+QString(",")+tmp1s+QString(",")+tmp2s+QString(",")+tmp3s);
+				s.append(tmp0s+QString(",") + tmp1s+QString(",") + tmp2s + QString(",") + tmp3s);
 				s.append(idx_);
 			}
 			break;
-		default: break;
+		default:
+			break;
 		}
 	}
 	return s;
@@ -382,7 +388,6 @@ QString GraphicsUtils::flip_label(const QString & s)
 	else if (s == QString("P")) return QString("A");
 	else if (s == QString("L")) return QString("R");
 	else if (s == QString("R")) return QString("L");
-	else ;;
 	return QString("");
 }
 
@@ -399,18 +404,18 @@ void GraphicsUtils::gen_labels(
 	const bool global_flip_y,
 	bool * flip_x, bool * flip_y)
 {
-	if (!hide_orientation && !rai.isEmpty() && rai.size()>=3)
+	if (!hide_orientation && !rai.isEmpty() && rai.size() >= 3)
 	{
-		switch(axis)
+		switch (axis)
 		{
 		case 0:
 			{
-				if (rai.at(2)==QChar('I'))
+				if (rai.at(2) == QChar('I'))
 				{
 					*flip_y = true;
 					top_string = QString("S");
 				}
-				else if (rai.at(2)==QChar('P'))
+				else if (rai.at(2) == QChar('P'))
 				{
 					*flip_y = true;
 					top_string = QString("A");
@@ -419,7 +424,7 @@ void GraphicsUtils::gen_labels(
 				{
 					top_string = QString(rai.at(2));
 				}
-				if (rai.at(1)==QChar('L'))
+				if (rai.at(1) == QChar('L'))
 				{
 					*flip_x = true;
 					left_string = QString("R");
@@ -432,12 +437,12 @@ void GraphicsUtils::gen_labels(
 			break;
 		case 1:
 			{
-				if (rai.at(2)==QChar('I'))
+				if (rai.at(2) == QChar('I'))
 				{
 					*flip_y = true;
 					top_string = QString("S");
 				}
-				else if (rai.at(2)==QChar('P'))
+				else if (rai.at(2) == QChar('P'))
 				{
 					*flip_y = true;
 					top_string = QString("A");
@@ -446,7 +451,7 @@ void GraphicsUtils::gen_labels(
 				{
 					top_string = QString(rai.at(2));
 				}
-				if (rai.at(0)==QChar('L'))
+				if (rai.at(0) == QChar('L'))
 				{	
 					*flip_x = true;
 					left_string = QString("R");
@@ -459,7 +464,7 @@ void GraphicsUtils::gen_labels(
 			break;
 		case 2:
 			{
-				if (rai.at(1)==QChar('I'))
+				if (rai.at(1) == QChar('I'))
 				{
 					*flip_y = true;
 					top_string = QString("S");
@@ -473,7 +478,7 @@ void GraphicsUtils::gen_labels(
 				{
 					top_string = QString(rai.at(1));
 				}
-				if (rai.at(0)==QChar('L'))
+				if (rai.at(0) == QChar('L'))
 				{
 					*flip_x = true;
 					left_string = QString("R");
@@ -484,7 +489,8 @@ void GraphicsUtils::gen_labels(
 				}
 			}
 			break;
-		default: break;
+		default:
+			break;
 		}
 		if (global_flip_x)
 		{
@@ -503,8 +509,7 @@ void GraphicsUtils::gen_labels(
 	{
 		if (!orientation_20_20.isEmpty())
 		{
-			top_string =
-				QString("<small>Pat. orient. ") +
+			top_string = QString("<small>Pat. orient. ") +
 				orientation_20_20 +
 				QString("</small>");
 		}
@@ -516,24 +521,24 @@ void GraphicsUtils::gen_labels(
 		if (global_flip_x || global_flip_y)
 		{
 			QString flip_info;
-			if (global_flip_x) flip_info += QString("X");
+			if (global_flip_x)
+			{
+				flip_info += QString("X");
+			}
 			if (global_flip_y)
 			{
-				if (!flip_info.isEmpty())
-					flip_info += QString(", ");
+				if (!flip_info.isEmpty()) flip_info += QString(", ");
 				flip_info += QString("Y");
 			}
 			if (top_string.isEmpty())
 			{
-				top_string +=
-					QString("<small><b>View flipped ") +
+				top_string += QString("<small><b>View flipped ") +
 					flip_info +
 					QString("</b></small>");
 			}
 			else
 			{
-				top_string +=
-					QString("<small><b>, view flipped ") +
+				top_string += QString("<small><b>, view flipped ") +
 					flip_info +
 					QString("</b></small>");
 			}
@@ -623,8 +628,8 @@ void GraphicsUtils::draw_overlays(
 						QPainter::CompositionMode_Lighten);
 					painter->drawPixmap(
 						QPointF(
-							static_cast<float>(ov.at(ox).x-1),
-							static_cast<float>(ov.at(ox).y-1)),
+							static_cast<float>(ov.at(ox).x - 1),
+							static_cast<float>(ov.at(ox).y - 1)),
 						QPixmap::fromImage(oi));
 					painter->end();
 					delete painter;
@@ -640,7 +645,7 @@ void GraphicsUtils::print_image_info(
 	if (!v) return;
 	const short image_type = v->image_type;
 	QString t;
-	switch(image_type)
+	switch (image_type)
 	{
 	case   0: t = QString("signed short");       break;
 	case   1: t = QString("unsigned short");     break;
@@ -681,44 +686,52 @@ void GraphicsUtils::print_image_info(
 		((v->ybr) ? QString(", Y'CbCr\n") : QString("\n")) +
 		QString("Uniform:  ") +
 		QString((v->equi) ? "true" : "false") +
-		QString(
-			(v->di->hide_orientation)
-			?
-			" (disabled)\n"
-			:
-			"\n");
+		QString((v->di->hide_orientation)
+			? " (disabled)\n"
+			: "\n");
 	if (!v->orientation_string.isEmpty())
+	{
 		s1.append(QString("Orient.:  ") +
-		v->orientation_string + QString("\n"));
+			v->orientation_string + QString("\n"));
+	}
 	if (!v->interpretation.isEmpty())
+	{
 		s1.append(QString("Interpret.:  ") +
-		v->interpretation + QString("\n"));
+			v->interpretation + QString("\n"));
+	}
 	if (!v->iod.isEmpty())
+	{
 		s1.append(QString("IOD:  ") + v->iod +
-		QString("\n"));
+			QString("\n"));
+	}
 	if (!v->sop.isEmpty())
+	{
 		s1.append(QString("SOP:  ") + v->sop +
-		QString("\n"));
+			QString("\n"));
+	}
 	if (!v->study_uid.isEmpty())
+	{
 		s1.append(QString("Study:  ") +
-		v->study_uid + QString("\n"));
+			v->study_uid + QString("\n"));
+	}
 	if (!v->frame_of_ref_uid.isEmpty())
+	{
 		s1.append(QString("Fr. of Ref.:  ") +
-		v->frame_of_ref_uid + QString("\n"));
+			v->frame_of_ref_uid + QString("\n"));
+	}
 	if (!v->ioinfo.isEmpty())
+	{
 		s1.append(v->ioinfo + QString("\n"));
-	s1.append(
-		QString("Acq.: ") + v->acquisition_date +
+	}
+	s1.append(QString("Acq.: ") + v->acquisition_date +
 		v->acquisition_time + QString("\n"));
-	s1.append(
-		QString("Inst.: ") +
+	s1.append(QString("Inst.: ") +
 		QVariant(v->instance_number).toString() +
 		QString("\n"));
-	s1.append(
-		QString("4D ID: ") +
+	s1.append(QString("4D ID: ") +
 		QVariant(v->group_id).toString() +
 		QString("\n"));
-	switch(v->image_type)
+	switch (v->image_type)
 	{
 	case 0:
 		s = print_itk_info<ImageTypeSS>(v->pSS);
@@ -821,7 +834,7 @@ QString GraphicsUtils::get_scalar_pixel_value(
 	if (!v) return QString("");
 	QString d("");
 	long long l = -99999999999999;
-	switch(v->image_type)
+	switch (v->image_type)
 	{
 	case 0:
 		d = get_scalar_pixel_value__<ImageTypeSS>(
@@ -875,7 +888,7 @@ QString GraphicsUtils::get_rgb_pixel_value(
 {
 	if (!v) return QString("");
 	QString d("");
-	switch(v->image_type)
+	switch (v->image_type)
 	{
 	case 10:
 		d = get_rgb_pixel_value__<RGBImageTypeSS>(
@@ -921,7 +934,7 @@ QString GraphicsUtils::get_rgba_pixel_value(
 {
 	if (!v) return QString("");
 	QString d("");
-	switch(v->image_type)
+	switch (v->image_type)
 	{
 	case 20:
 		d = get_rgba_pixel_value__<RGBAImageTypeSS>(
