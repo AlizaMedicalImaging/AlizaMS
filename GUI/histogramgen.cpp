@@ -28,27 +28,29 @@ template<typename T> QString calculate_histogramm(
 	typename HistogramGeneratorType::Pointer histogram_generator =
 		HistogramGeneratorType::New();
 	QString error__("");
-	long long bins_size =
-		static_cast<long long>(round(v->di->rmax - v->di->rmin)) + 1;
-	if (bins_size > 2048) bins_size = 2048;
-	if (bins_size < 256 && (v->image_type == 5 || v->image_type == 6))
+	const double range = round(v->di->rmax - v->di->rmin);
+	if (range < 0.0)
+	{
+		return QString("range < 0");
+	}
+	unsigned int bins_size = static_cast<unsigned int>(range) + 1;
+	if (bins_size > 2048)
+	{
+		bins_size = 2048;
+	}
+	else if (bins_size < 256 && (v->image_type == 5 || v->image_type == 6))
 	{
 		bins_size = 256;
 	}
-	if (bins_size <= 0)
-	{
-		return QString("bins_size <= 0");
-	}
-	int * bins;
-	int tmp0 = 1;
 	//
+	int * bins;
 	try
 	{
 		bins = new int[bins_size];
 	}
-	catch (const std::bad_alloc&)
+	catch (const std::bad_alloc &)
 	{
-		return QString("!bins");
+		return QString("std::bad_alloc");
 	}
 	//
 	typename UpdateQtCommand::Pointer update_qt_command =
@@ -69,8 +71,9 @@ template<typename T> QString calculate_histogramm(
 		return QString(ex.GetDescription());
 	}
 	//
+	int tmp0 = 1;
 	const HistogramType * h = histogram_generator->GetOutput();
-	for (int x = 0; x < bins_size; ++x)
+	for (unsigned int x = 0; x < bins_size; ++x)
 	{
 		bins[x] = h->GetFrequency(x, 0);
 		if (bins[x] > tmp0) tmp0 = bins[x];
@@ -86,8 +89,7 @@ template<typename T> QString calculate_histogramm(
 		QBrush brush(Qt::SolidPattern); brush.setColor(fgcolor);
 		QPen pen; pen.setColor(fgcolor);
 		pen.setWidth(3);
-		const unsigned int pixmap_w =
-			bins_size < 2048 ? 2048 : bins_size;
+		const unsigned int pixmap_w = bins_size < 2048 ? 2048 : bins_size;
 		const unsigned int pixmap_h = 1024;
 		pixmap = QPixmap(pixmap_w, pixmap_h);
 		if (pixmap.isNull())
@@ -102,12 +104,10 @@ template<typename T> QString calculate_histogramm(
 		painter.setBrush(brush);
 		double first_x = 0.0;
 		double last_x  = 0.0;
-		for (int x = 0; x < bins_size; ++x)
+		for (unsigned int x = 0; x < bins_size; ++x)
 		{
-			const double x_ =
-				pixmap_w * x / static_cast<double>(bins_size);
-			const double y_ =
-				(bins[x] > 0)
+			const double x_ = pixmap_w * x / static_cast<double>(bins_size);
+			const double y_ = (bins[x] > 0)
 				? pixmap_h * log(static_cast<double>(bins[x])) / tmp2
 				: 0.0;
 			if (x == 0)
@@ -116,7 +116,7 @@ template<typename T> QString calculate_histogramm(
 				p.moveTo(x_, pixmap_h);
 				p.lineTo(x_, pixmap_h - y_);
 			}
-			else if (x == bins_size-1)
+			else if (x == bins_size - 1)
 			{
 				last_x = x_;
 				p.lineTo(x_, pixmap_h - y_);
@@ -151,14 +151,10 @@ template<typename T> QString calculate_histogramm_rgb(
 	HistogramMeasurementVector bin_min(3);
 	HistogramMeasurementVector bin_max(3);
 	//
-	const int bins_size = 256;
+	const unsigned int bins_size = 256;
 	size[0] = size[1] = size[2] = bins_size;
 	bin_min[0] = bin_min[1] = bin_min[2] = 0;
 	bin_max[0] = bin_max[1] = bin_max[2] = 255;
-	int * bins0 = NULL;
-	int * bins1 = NULL;
-	int * bins2 = NULL;
-	int tmp0 = 1;
 	//
 	UpdateQtCommand::Pointer update_qt_command = UpdateQtCommand::New();
 	//
@@ -177,34 +173,35 @@ template<typename T> QString calculate_histogramm_rgb(
 	}
 	//
 	const HistogramType * histogram = filter->GetOutput();
-	if (bins_size > static_cast<int>(histogram->GetSize()[0]))
+	if (bins_size > histogram->GetSize()[0])
 	{
 		return QString("bins_size > histogram->GetSize()[0]");
 	}
-	if (bins_size > static_cast<int>(histogram->GetSize()[1]))
+	if (bins_size > histogram->GetSize()[1])
 	{
 		return QString("bins_size > histogram->GetSize()[1]");
 	}
-	if (bins_size > static_cast<int>(histogram->GetSize()[2]))
+	if (bins_size > histogram->GetSize()[2])
 	{
 		return QString("bins_size > histogram->GetSize()[2]");
 	}
+	//
+	int * bins0;
+	int * bins1;
+	int * bins2;
 	try
 	{
 		bins0 = new int[bins_size];
 		bins1 = new int[bins_size];
 		bins2 = new int[bins_size];
 	}
-	catch (const std::bad_alloc&)
+	catch (const std::bad_alloc &)
 	{
-		bins0 = bins1 = bins2 = NULL;
-	}
-	if (!bins0 || !bins1 || !bins2)
-	{
-		return QString("!bins0 || !bins1 || !bins2");
+		return QString("std::bad_alloc");
 	}
 	//
-	for (int x = 0; x < bins_size; ++x)
+	int tmp0 = 1;
+	for (unsigned int x = 0; x < bins_size; ++x)
 	{
 		bins0[x] = histogram->GetFrequency(x, 0);
 		if (bins0[x] > tmp0) tmp0 = bins0[x];
@@ -224,8 +221,7 @@ template<typename T> QString calculate_histogramm_rgb(
 		QPen pen2;
 		//
 		QColor bgcolor = qApp->palette().color(QPalette::Window);
-		const unsigned long pixmap_w =
-			(bins_size * 3 < 2048)
+		const unsigned long pixmap_w = (bins_size * 3 < 2048)
 			? 2048
 			: bins_size * 3; // curr. always 256 bins
 		const unsigned long pixmap_h = 1024;
@@ -243,7 +239,7 @@ template<typename T> QString calculate_histogramm_rgb(
 		const double tmp101 = 2.0 * tmp100;
 		const double tmp102 = 3.0 * tmp100;
 		const double tmp103 = 0.8 * tmp100;
-		for (int x = 0; x < bins_size; ++x)
+		for (unsigned int x = 0; x < bins_size; ++x)
 		{
 			const double x_  = tmp102 * x;
 			const double y0_ = (bins0[x] > 0) ? pixmap_h * log(static_cast<double>(bins0[x])) / tmp2 : 0.0;
