@@ -95,7 +95,7 @@ void BrowserWidget2::compute_offsets(const mdcm::SequenceOfItems * sq, mdcm::VL 
 	for (unsigned int i = 1; i < n; ++i)
 	{
 		const mdcm::Item & item = sq->GetItem(i);
-		offsets[i] = offsets[i-1] + static_cast<unsigned int>(item.GetLength<mdcm::ExplicitDataElement>());
+		offsets[i] = offsets[i - 1] + static_cast<unsigned int>(item.GetLength<mdcm::ExplicitDataElement>());
 	}
 }
 
@@ -171,7 +171,7 @@ void BrowserWidget2::read_directory(const QString & p)
 	qApp->processEvents();
 	QProgressDialog * pd =
 		new QProgressDialog(
-			QString("Recursive scan"),QString("Stop"),0,0);
+			QString("Recursive scan"), QString("Stop"), 0, 0);
 	pd->setWindowModality(Qt::ApplicationModal);
 	pd->setWindowFlags(
 		pd->windowFlags()^Qt::WindowContextHelpButtonHint);
@@ -183,13 +183,13 @@ void BrowserWidget2::read_directory(const QString & p)
 		const mdcm::Dict & dict = dicts.GetPublicDict();
 		process_directory(p, dict, pd);
 	}
-	catch (mdcm::ParseException & pe)
+	catch (const mdcm::ParseException & pe)
 	{
 		std::cout
 			<< "mdcm::ParseException in BrowserWidget2::read_directory:\n"
 			<< pe.GetLastElement().GetTag() << std::endl;
 	}
-	catch (std::exception & ex)
+	catch (const std::exception & ex)
 	{
 		std::cout << "Exception in BrowserWidget2::read_directory:\n"
 			<< ex.what() << std::endl;
@@ -262,7 +262,7 @@ void BrowserWidget2::process_directory(
 		if (pd->wasCanceled()) return;
 		mdcm::Scanner::ValuesType v = s0.GetValues();
 		mdcm::Scanner::ValuesType::iterator vi = v.begin();
-		for (; vi!=v.end(); ++vi)
+		for (; vi != v.end(); ++vi)
 		{
 			QString modality("");
 			QString name("");
@@ -458,13 +458,13 @@ void BrowserWidget2::open_DICOMDIR2(const QString & f)
 	{
 		warning = read_DICOMDIR(f);
 	}
-	catch (mdcm::ParseException & pe)
+	catch (const mdcm::ParseException & pe)
 	{
 		std::cout
 			<< "mdcm::ParseException in BrowserWidget2::open_DICOMDIR2:\n"
 			<< pe.GetLastElement().GetTag() << std::endl;
 	}
-	catch (std::exception & ex)
+	catch (const std::exception & ex)
 	{
 		std::cout << "Exception in BrowserWidget2::open_DICOMDIR2:\n"
 			<< ex.what() << std::endl;
@@ -577,13 +577,13 @@ void BrowserWidget2::reload_dir()
 				warning = read_DICOMDIR(QDir::fromNativeSeparators(
 							directory_lineEdit->text()));
 			}
-			catch (mdcm::ParseException & pe)
+			catch (const mdcm::ParseException & pe)
 			{
 				std::cout
 					<< "mdcm::ParseException in BrowserWidget2::reload_dir:\n"
 					<< pe.GetLastElement().GetTag() << std::endl;
 			}
-			catch (std::exception & ex)
+			catch (const std::exception & ex)
 			{
 				std::cout << "Exception in BrowserWidget2::reload_dir:\n"
 					<< ex.what() << std::endl;
@@ -798,7 +798,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 		ds.GetDataElement(tDirectoryRecordSequence);
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sqDirectoryRecordSequence =
 		eDirectoryRecordSequence.GetValueAsSQ();
-	if(!(sqDirectoryRecordSequence && sqDirectoryRecordSequence->GetNumberOfItems()>0))
+	if(!(sqDirectoryRecordSequence && sqDirectoryRecordSequence->GetNumberOfItems() > 0))
 	{
 		QApplication::restoreOverrideCursor();
 		return QString("Directory Record Sequence is empty.");
@@ -829,7 +829,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 			mdcm::SmartPointer<mdcm::SequenceOfItems> sqi = de.GetValueAsSQ();
 			for (unsigned int i = 0; i < sqi->GetNumberOfItems(); ++i)
 			{
-				const mdcm::Item    & item = sqi->GetItem(i+1);
+				const mdcm::Item    & item = sqi->GetItem(i + 1);
 				const mdcm::DataSet & nds  = item.GetNestedDataSet();
 
 				EntryDICOMDIR ed;
@@ -873,7 +873,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 						ed.directoryRecordType = directory_record_type;
 						if (directory_record_type == QString("PATIENT"))
 						{
-							QString charset = QString("");
+							QString charset("");
 							if (nds.FindDataElement(tSpecificCharacterSet))
 							{
 								const mdcm::DataElement & e1 = nds.GetDataElement(tSpecificCharacterSet);
@@ -908,7 +908,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 						}
 						else if (directory_record_type == QString("STUDY"))
 						{
-							QString charset = QString("");
+							QString charset("");
 							if (nds.FindDataElement(tSpecificCharacterSet))
 							{
 								const mdcm::DataElement & e1 = nds.GetDataElement(tSpecificCharacterSet);
@@ -943,7 +943,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 						}
 						else if (directory_record_type == QString("SERIES"))
 						{
-							QString charset = QString("");
+							QString charset("");
 							if (nds.FindDataElement(tSpecificCharacterSet))
 							{
 								const mdcm::DataElement & e1 = nds.GetDataElement(tSpecificCharacterSet);
@@ -990,7 +990,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 						else
 						{
 							if (ed.offsetOfReferencedLowerLevelDirectoryEntity!=0) not_patient_study_series_model = true;
-							QString charset = QString("");
+							QString charset("");
 							if (nds.FindDataElement(tSpecificCharacterSet))
 							{
 								const mdcm::DataElement & e1 = nds.GetDataElement(tSpecificCharacterSet);
@@ -1299,8 +1299,8 @@ void BrowserWidget2::read_tags_(
 	if (!f_ok) return;
 	const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
 	if (ds.IsEmpty()) return;
-	QString charset = QString("");
-	QString sop = QString("");
+	QString charset("");
+	QString sop("");
 	//
 	if (ds.FindDataElement(tSpecificCharacterSet))
 	{
@@ -1576,16 +1576,15 @@ void BrowserWidget2::readSettings()
 		QApplication::applicationName());
 	settings.setFallbacksEnabled(true);
 #if (defined _WIN32)
-	const QString d = QString("./DICOM");
+	const QString d("./DICOM");
 #elif (defined __APPLE__)
-	const QString d = QString
-		("/Applications/AlizaMS.app/Contents/Resources/DICOM");
+	const QString d("/Applications/AlizaMS.app/Contents/Resources/DICOM");
 #else
 #ifdef ALIZAMS_ARCHIVE_DISTRO
 	const QString d =
 		QApplication::applicationDirPath() + QString("/../DICOM");
 #else
-	const QString d = QString("/usr/share/alizams/datasets");
+	const QString d("/usr/share/alizams/datasets");
 #endif
 #endif
 	settings.beginGroup(QString("BrowserWidget2"));

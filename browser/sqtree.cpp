@@ -169,9 +169,9 @@ QString print_length(size_t l)
 	else if (l > 1024)
 	{
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-		r = QString::asprintf("%.2f", l/1024.0);
+		r = QString::asprintf("%.2f", l / 1024.0);
 #else
-		r.sprintf("%.2f", l/1024.0);
+		r.sprintf("%.2f", l / 1024.0);
 #endif
 		r += QString(" KB");
 	}
@@ -365,7 +365,7 @@ void SQtree::process_element(
 	{
 		mdcm::SmartPointer<mdcm::SequenceOfItems> sqi =
 			e.GetValueAsSQ();
-		if (!(sqi && sqi->GetNumberOfItems()>0))
+		if (!(sqi && sqi->GetNumberOfItems() > 0))
 		{
 			QStringList l2;
 			l2 << QString(tag.PrintAsPipeSeparatedString().c_str())
@@ -398,7 +398,7 @@ void SQtree::process_element(
 			<< tname
 			<< QString("SQ")
 			<< sq_length
-			<< QString(" [")+
+			<< QString(" [") +
 				QVariant(static_cast<unsigned int>(
 					sqi->GetNumberOfItems())).toString() +
 					QString("]");
@@ -416,11 +416,11 @@ void SQtree::process_element(
 		{
 			QStringList l1;
 			l1 << QString("Item")
-				<< QVariant(static_cast<int>(i+1)).toString()
+				<< QVariant(static_cast<int>(i + 1)).toString()
 				<< QString("")
 				<< QString("")
 				<< QString("");
-			const mdcm::Item    & item = sqi->GetItem(i+1);
+			const mdcm::Item    & item = sqi->GetItem(i + 1);
 			const mdcm::DataSet & nds  = item.GetNestedDataSet();
 			QTreeWidgetItem * twitem = new QTreeWidgetItem(l1);
 			twitem->setForeground(0, brush2);
@@ -452,7 +452,7 @@ void SQtree::process_element(
 			<< tname
 			<< QString(mdcm::VR::GetVRString(vr))
 			<< QString("")
-			<< QString(" [")+
+			<< QString(" [") +
 				QVariant(static_cast<unsigned int>(
 					nf1)).toString() +
 					QString("]");
@@ -497,7 +497,7 @@ void SQtree::process_element(
 				const QString tmp1 = print_length(length);
 				QStringList l1;
 				l1 << QString("Fragment")
-					<< QVariant(static_cast<int>(i+1)).toString()
+					<< QVariant(static_cast<int>(i + 1)).toString()
 					<< QString("")
 					<< QString(tmp1)
 					<< QString("binary");
@@ -674,24 +674,24 @@ void SQtree::process_element(
 							const bool ok0 = bv->GetBuffer(buffer, length);
 							if (ok0)
 							{
-								for (size_t at_x = 0; at_x < length; at_x+=4)
+								for (size_t at_x = 0; at_x < length; at_x += 4)
 								{
 									char group_[] = { buffer[at_x + 0], buffer[at_x + 1] };
 									char element_[] = { buffer[at_x + 2], buffer[at_x + 3] };
 									unsigned short group, element;
-									memcpy(&group,group_,2);
-									memcpy(&element,element_,2);
+									memcpy(&group,group_, 2);
+									memcpy(&element,element_, 2);
 									QString tmp3;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-									tmp3 = QString::asprintf("%04x",group);
+									tmp3 = QString::asprintf("%04x", group);
 #else
-									tmp3.sprintf("%04x",group);
+									tmp3.sprintf("%04x", group);
 #endif
 									QString tmp4;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-									tmp4 = QString::asprintf("%04x",element);
+									tmp4 = QString::asprintf("%04x", element);
 #else
-									tmp4.sprintf("%04x",element);
+									tmp4.sprintf("%04x", element);
 #endif
 									str_.append(tmp3 + QString("|") + tmp4);
 									if (at_x != length - 4) str_.append(QString(", "));
@@ -866,7 +866,7 @@ void SQtree::process_element(
 							{
 								const int point_idx =
 									time0_s.indexOf(QString("."));
-								if (point_idx == 6||point_idx == -1)
+								if (point_idx == 6 || point_idx == -1)
 								{
 									const QString time1_s =
 										time0_s.left(6);
@@ -880,7 +880,7 @@ void SQtree::process_element(
 									{
 										tmp0.append(QString(".") +
 											time0_s.right(
-												time0_s.length()-7));
+												time0_s.length() - 7));
 									}
 									date_time = true;
 								}
@@ -922,7 +922,7 @@ void SQtree::process_element(
 									{
 										tmp0.append(QString(".") +
 											time0_s.right(
-												time0_s.length()-15));
+												time0_s.length() - 15));
 									}
 									date_time = true;
 								}
@@ -939,8 +939,7 @@ void SQtree::process_element(
 					}
 					else
 					{
-						if (
-							vr==mdcm::VR::LO ||
+						if (vr==mdcm::VR::LO ||
 							vr==mdcm::VR::LT ||
 							vr==mdcm::VR::PN ||
 							vr==mdcm::VR::SH ||
@@ -1093,7 +1092,7 @@ void SQtree::read_file(const QString & f, const bool use_lock)
 		{
 			QString tmp0;
 			if (DicomUtils::get_string_value(
-					ds, mdcm::Tag(0x0008, 0x0016), tmp0))
+					ds, mdcm::Tag(0x0008,0x0016), tmp0))
 			{
 				mdcm::UIDs uid;
 				uid.SetFromUID(tmp0.toLatin1().constData());
@@ -1163,13 +1162,13 @@ void SQtree::read_file(const QString & f, const bool use_lock)
 		dump_csa(ds);
 		dump_gems(ds);
 	}
-	catch(mdcm::ParseException & pe)
+	catch (const mdcm::ParseException & pe)
 	{
 		std::cout << "mdcm::ParseException in SQtree::read_file("
 			<< f.toStdString() << ", " << use_lock << "):\n"
 			<< pe.GetLastElement().GetTag() << std::endl;
 	}
-	catch(std::exception & ex)
+	catch (const std::exception & ex)
 	{
 		std::cout << "Exception in SQtree::read_file("
 			<< f.toStdString() << ", " << use_lock << "):\n"
@@ -1233,13 +1232,13 @@ void SQtree::read_file_and_series(const QString & ff, const bool use_lock)
 			get_series_files(f, series_uid, files);
 		}
 	}
-	catch(mdcm::ParseException & pe)
+	catch (const mdcm::ParseException & pe)
 	{
 		std::cout
 			<< "mdcm::ParseException in SQtree::open_file_and_series:\n"
 			<< pe.GetLastElement().GetTag() << std::endl;
 	}
-	catch(std::exception & ex)
+	catch (const std::exception & ex)
 	{
 		std::cout << "Exception in SQtree::open_file_and_series:\n"
 			<< ex.what() << std::endl;
@@ -1334,7 +1333,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 	if (!ds.FindDataElement(tgems_us_movie)) return;
 	const mdcm::DataElement & e1 = ds.GetDataElement(tgems_us_movie);
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 = e1.GetValueAsSQ();
-	if (!(sq1 && sq1->GetNumberOfItems()>0)) return;
+	if (!(sq1 && sq1->GetNumberOfItems() > 0)) return;
 	textEdit->document()->addResource(
 		QTextDocument::StyleSheetResource, QUrl("format.css"), css1);
 	QString gems_us_text = QString(head);
@@ -1345,7 +1344,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 			"<span class = 'y'>GEMS Ultrasound MovieGroup</span><br/>");
 		QMap<QString,int> gdict;
 		if (!DicomUtils::build_gems_dictionary(gdict,ds)) continue;
-		const mdcm::Item & item1 = sq1->GetItem(x+1);
+		const mdcm::Item & item1 = sq1->GetItem(x + 1);
 		const mdcm::DataSet & subds1 = item1.GetNestedDataSet();
 		const mdcm::PrivateTag tname2(
 			0x7fe1,0x2,"GEMS_Ultrasound_MovieGroup_001");
@@ -1369,8 +1368,8 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 			}
 		}
 		gems_us_text.append(
-			QString("<span class = 'y5'>")+qs2+
-			QString("</span><span class = 'y4'>(SQ 0x1)")+
+			QString("<span class = 'y5'>") + qs2 +
+			QString("</span><span class = 'y4'>(SQ 0x1)") +
 			QString("</span><br/>"));
 		const mdcm::PrivateTag t8(
 			0x7fe1,0x8,"GEMS_Ultrasound_MovieGroup_001");
@@ -1381,8 +1380,8 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 			DicomUtils::read_gems_params(m8, e8, gdict);
 			QMapIterator<QString, int> itmd(gdict);
 			gems_us_text.append(
-				QString("<span class = 'y4'>")+
-				QString("SQ 0x8:")+
+				QString("<span class = 'y4'>") +
+				QString("SQ 0x8:") +
 				QString("</span><br/>"));
 			while (itmd.hasNext())
 			{
@@ -1393,8 +1392,8 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 					const QList<QVariant> & l8 = gp.values;
 					QString tmp8("");
 					for (int x8 = 0; x8 < l8.size(); ++x8)
-						tmp8.append(l8.at(x8).toString()+QString(" "));
-					gems_us_text.append(itmd.key()+QString(": ")+tmp8+QString("<br/>"));
+						tmp8.append(l8.at(x8).toString() + QString(" "));
+					gems_us_text.append(itmd.key() + QString(": ") + tmp8 + QString("<br/>"));
 				}
 			}
 		}
@@ -1405,12 +1404,12 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 			const mdcm::DataElement & e10 = subds1.GetDataElement(t10);
 			mdcm::SmartPointer<mdcm::SequenceOfItems> sq10 =
 				e10.GetValueAsSQ();
-			if (sq10 && sq10->GetNumberOfItems()>0)
+			if (sq10 && sq10->GetNumberOfItems() > 0)
 			{
 				const size_t n10 = sq10->GetNumberOfItems();
 				for (size_t x10 = 0; x10 < n10; ++x10)
 				{
-					mdcm::Item & item10 = sq10->GetItem(x10+1);
+					mdcm::Item & item10 = sq10->GetItem(x10 + 1);
 					mdcm::DataSet & subds10 =
 						item10.GetNestedDataSet();
 					const mdcm::PrivateTag tname12(
@@ -1428,16 +1427,16 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 							if (v12)
 							{
 								const char * b12 = v12->GetPointer();
-								const unsigned int s12   = v12->GetLength();
+								const unsigned int s12 = v12->GetLength();
 								qs12 = QString::fromLatin1(b12, s12).
-									trimmed().remove(QChar('\0'))+
+									trimmed().remove(QChar('\0')) +
 									QString("&#160;");
 							}
 						}
 					}
 					gems_us_text.append(
-						QString("<span class = 'y5'>&#160;")+qs12+
-						QString("</span><span class = 'y4'>(SQ 0x10)")+
+						QString("<span class = 'y5'>&#160;") + qs12 +
+						QString("</span><span class = 'y4'>(SQ 0x10)") +
 						QString("</span><br/>"));
 					const mdcm::PrivateTag t18(
 						0x7fe1,0x18,"GEMS_Ultrasound_MovieGroup_001");
@@ -1449,8 +1448,8 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 						DicomUtils::read_gems_params(m18, e18, gdict);
 						QMapIterator<QString, int> itmd(gdict);
 						gems_us_text.append(
-							QString("<span class = 'y4'>&#160;")+
-							QString("SQ 0x18:")+
+							QString("<span class = 'y4'>&#160;") +
+							QString("SQ 0x18:") +
 							QString("</span><br/>"));
 						while (itmd.hasNext())
 						{
@@ -1469,8 +1468,8 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 								gems_us_text.append(
 									QString("&#160;") +
 									itmd.key() +
-									QString(": ")+
-									tmp18+QString("<br/>"));
+									QString(": ") +
+									tmp18 + QString("<br/>"));
 							}
 						}
 					}
@@ -1482,14 +1481,14 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 							subds10.GetDataElement(t20);
 						mdcm::SmartPointer<mdcm::SequenceOfItems>
 							sq20 = e20.GetValueAsSQ();
-						if (sq20 && sq20->GetNumberOfItems()>0)
+						if (sq20 && sq20->GetNumberOfItems() > 0)
 						{
 							const size_t n20 =
 								sq20->GetNumberOfItems();
 							for (size_t x20 = 0; x20 < n20; ++x20)
 							{
 								mdcm::Item & item20 =
-									sq20->GetItem(x20+1);
+									sq20->GetItem(x20 + 1);
 								mdcm::DataSet & subds20 =
 									item20.GetNestedDataSet();
 								const mdcm::PrivateTag tname24(
@@ -1518,14 +1517,14 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 													b24, s24).
 														trimmed().
 														remove(
-															QChar('\0'))+
+															QChar('\0')) +
 												QString("&#160;");
 										}
 									}
 								}
 								gems_us_text.append(
-									QString("<span class = 'y5'>&#160;&#160;&#160;&#160;")+
-									qs24+QString("</span><span class = 'y4'>(SQ 0x20)")+
+									QString("<span class = 'y5'>&#160;&#160;&#160;&#160;") +
+									qs24 + QString("</span><span class = 'y4'>(SQ 0x20)") +
 									QString("</span><br/>"));
 								const mdcm::PrivateTag t26(0x7fe1,0x26,"GEMS_Ultrasound_MovieGroup_001");
 								if (subds20.FindDataElement(t26))
@@ -1535,8 +1534,8 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 									DicomUtils::read_gems_params(m26, e26, gdict);
 									QMapIterator<QString, int> itmd(gdict);
 									gems_us_text.append(
-										QString("<span class = 'y4'>&#160;&#160;&#160;&#160;")+
-										QString("SQ 0x26:")+QString("</span><br/>"));
+										QString("<span class = 'y4'>&#160;&#160;&#160;&#160;") +
+										QString("SQ 0x26:") + QString("</span><br/>"));
 									while (itmd.hasNext())
 									{
 										itmd.next();
@@ -1546,10 +1545,10 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 											const QList<QVariant> & l26 = gp.values;
 											QString tmp26("");
 											for (int x26 = 0; x26 < l26.size(); ++x26)
-												tmp26.append(l26.at(x26).toString()+QString(" "));
+												tmp26.append(l26.at(x26).toString() + QString(" "));
 											gems_us_text.append(
-												QString("&#160;&#160;&#160;&#160;")+itmd.key()+QString(": ")+
-												tmp26+QString("<br/>"));
+												QString("&#160;&#160;&#160;&#160;") + itmd.key() + QString(": ") +
+												tmp26 + QString("<br/>"));
 										}
 									}
 								}
@@ -1562,7 +1561,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 									const size_t n36 = sq36->GetNumberOfItems();
 									for (size_t x36 = 0; x36 < n36; ++x36)
 									{
-										mdcm::Item & item36 = sq36->GetItem(x36+1);
+										mdcm::Item & item36 = sq36->GetItem(x36 + 1);
 										mdcm::DataSet & subds36 = item36.GetNestedDataSet();
 									}
 								}
@@ -1574,7 +1573,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 									const size_t n3a = sq3a->GetNumberOfItems();
 									for (size_t x3a = 0; x3a < n3a; ++x3a)
 									{
-										mdcm::Item & item3a = sq3a->GetItem(x3a+1);
+										mdcm::Item & item3a = sq3a->GetItem(x3a + 1);
 										mdcm::DataSet & subds3a = item3a.GetNestedDataSet();
 										const mdcm::PrivateTag tname3a(0x7fe1,0x30,"GEMS_Ultrasound_MovieGroup_001");
 										if (subds3a.FindDataElement(tname3a))
@@ -1586,7 +1585,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 												if (v30)
 												{
 													const char * b30 = v30->GetPointer();
-													const unsigned int s30   = v30->GetLength();
+													const unsigned int s30 = v30->GetLength();
 												}
 											}
 										}
@@ -1598,12 +1597,12 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 								{
 									const mdcm::DataElement & e83 = subds20.GetDataElement(t83);
 									mdcm::SmartPointer<mdcm::SequenceOfItems> sq83 = e83.GetValueAsSQ();
-									if (sq83 && sq83->GetNumberOfItems()>0)
+									if (sq83 && sq83->GetNumberOfItems() > 0)
 									{
 										const size_t n83 = sq83->GetNumberOfItems();
 										for (size_t x83 = 0; x83 < n83; ++x83)
 										{
-											mdcm::Item & item83 = sq83->GetItem(x83+1);
+											mdcm::Item & item83 = sq83->GetItem(x83 + 1);
 											mdcm::DataSet & subds83 = item83.GetNestedDataSet();
 											const mdcm::PrivateTag tname84(0x7fe1,0x84,"GEMS_Ultrasound_MovieGroup_001");
 											QString qs84("");
@@ -1616,15 +1615,15 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 													if (v84)
 													{
 														const char * b84 = v84->GetPointer();
-														const unsigned int s84   = v84->GetLength();
+														const unsigned int s84 = v84->GetLength();
 														qs84 = QString::fromLatin1(b84, s84)
-															.trimmed().remove(QChar('\0'))+QString("&#160;");
+															.trimmed().remove(QChar('\0')) + QString("&#160;");
 													}
 												}
 											}
 											gems_us_text.append(
-												QString("<span class = 'y5'>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;")+
-												qs84+QString("</span><span class = 'y4'>(SQ 0x83)")+
+												QString("<span class = 'y5'>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;") +
+												qs84 + QString("</span><span class = 'y4'>(SQ 0x83)") +
 												QString("</span><br/>"));
 											const mdcm::PrivateTag t85(0x7fe1,0x85,"GEMS_Ultrasound_MovieGroup_001");
 											if (subds83.FindDataElement(t85))
@@ -1634,8 +1633,9 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 												DicomUtils::read_gems_params(m85, e85, gdict);
 												QMapIterator<QString, int> itmd(gdict);
 												gems_us_text.append(
-													QString("<span class = 'y4'>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;")+
-													QString("SQ 0x85:")+QString("</span><br/>"));
+													QString(
+														"<span class = 'y4'>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;") +
+													QString("SQ 0x85:") + QString("</span><br/>"));
 												while (itmd.hasNext())
 												{
 													itmd.next();
@@ -1645,10 +1645,12 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 														const QList<QVariant> & l85 = gp.values;
 														QString tmp85("");
 														for (int x85 = 0; x85 < l85.size(); ++x85)
-															tmp85.append(l85.at(x85).toString()+QString(" "));
+														{
+															tmp85.append(l85.at(x85).toString() + QString(" "));
+														}
 														gems_us_text.append(
-															QString("&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;")+
-															itmd.key()+QString(": ")+tmp85+QString("<br/>"));
+															QString("&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;") +
+															itmd.key() + QString(": ") + tmp85 + QString("<br/>"));
 													}
 												}
 											}
@@ -1668,14 +1670,14 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 							subds10.GetDataElement(t83);
 						mdcm::SmartPointer<mdcm::SequenceOfItems>
 							sq83 = e83.GetValueAsSQ();
-						if (sq83 && sq83->GetNumberOfItems()>0)
+						if (sq83 && sq83->GetNumberOfItems() > 0)
 						{
 							const size_t n83 =
 								sq83->GetNumberOfItems();
 							for (size_t x83 = 0; x83 < n83; ++x83)
 							{
 								mdcm::Item & item83 =
-									sq83->GetItem(x83+1);
+									sq83->GetItem(x83 + 1);
 								mdcm::DataSet & subds83 =
 									item83.GetNestedDataSet();
 								const mdcm::PrivateTag tname84(
@@ -1710,8 +1712,8 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 									}
 								}
 								gems_us_text.append(QString(
-									"<span class = 'y5'>&#160;")+
-									qs84+
+									"<span class = 'y5'>&#160;") +
+									qs84 +
 									QString(
 										"</span><span class = 'y4'>"
 										"(SQ 0x83)</span><br/>"));
@@ -1730,7 +1732,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 										itmd(gdict);
 									gems_us_text.append(QString(
 										"<span class = 'y4'>&#160;") +
-										QString("SQ 0x85:")+
+										QString("SQ 0x85:") +
 										QString("</span><br/>"));
 									while (itmd.hasNext())
 									{
@@ -1754,8 +1756,8 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 											gems_us_text.append(
 												QString(
 													"&#160;") +
-												itmd.key()+
-												QString(": ")+
+												itmd.key() +
+												QString(": ") +
 												tmp85 +
 												QString("<br/>"));
 										}
@@ -1777,12 +1779,12 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 				subds1.GetDataElement(t73);
 			mdcm::SmartPointer<mdcm::SequenceOfItems>
 				sq73 = e73.GetValueAsSQ();
-			if (sq73 && sq73->GetNumberOfItems()>0)
+			if (sq73 && sq73->GetNumberOfItems() > 0)
 			{
 				const size_t n73 = sq73->GetNumberOfItems();
 				for (size_t x73 = 0; x73 < n73; ++x73)
 				{
-					mdcm::Item & item73 = sq73->GetItem(x73+1);
+					mdcm::Item & item73 = sq73->GetItem(x73 + 1);
 					mdcm::DataSet & subds73 =
 						item73.GetNestedDataSet();
 					const mdcm::PrivateTag tname74(
@@ -1979,7 +1981,9 @@ void SQtree::dropEvent(QDropEvent * e)
 	{
 		urls = mimeData->urls();
 		for (int i = 0; i < urls.size(); ++i)
+		{
 			l.push_back(urls.at(i).toLocalFile());
+		}
 		if (!l.empty())
 		{
 			list_of_files = QStringList(l.at(0));
@@ -2101,7 +2105,7 @@ void SQtree::set_list_of_files(const QStringList & l)
 	const size_t x = list_of_files.size();
 	horizontalSlider->blockSignals(true);
 	horizontalSlider->setMinimum(0);
-	horizontalSlider->setMaximum(x > 0 ? x-1 : 0);
+	horizontalSlider->setMaximum(x > 0 ? x - 1 : 0);
 	horizontalSlider->setValue(0);
 	if (x > 1) horizontalSlider->show();
 	else       horizontalSlider->hide();
@@ -2116,4 +2120,3 @@ void SQtree::file_from_slider(int x)
 	if (x >= list_of_files.size()) return;
 	read_file(list_of_files.at(x), true);
 }
-
