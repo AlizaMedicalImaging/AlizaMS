@@ -189,15 +189,15 @@ ImagesBox::ImagesBox(float si)
 	//
 	QToolBar * toolbar = new QToolBar(this);
 	toolbar->setOrientation(Qt::Horizontal);
-	toolbar->setIconSize(QSize(static_cast<int>(18*si),static_cast<int>(18*si)));
-	toolbar->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+	toolbar->setIconSize(QSize(static_cast<int>(18 * si),static_cast<int>(18 * si)));
+	toolbar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	if (toolbar->layout())
 	{
-		toolbar->layout()->setContentsMargins(0,0,0,0);
+		toolbar->layout()->setContentsMargins(0, 0, 0, 0);
 		toolbar->layout()->setSpacing(0);
 	}
 	QVBoxLayout * l = new QVBoxLayout(toolbar_frame);
-	l->setContentsMargins(0,0,0,0);
+	l->setContentsMargins(0, 0, 0, 0);
 	l->setSpacing(0);
 	l->addWidget(toolbar);
 	studyMenu = new QMenu(this);
@@ -212,9 +212,9 @@ ImagesBox::ImagesBox(float si)
 	toolbar->addAction(actionClear);
 	toolbar->addAction(actionClearAll);
 	QWidget * spacer = new QWidget(this);
-	spacer->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-	spacer->setMinimumSize(96,0);
+	spacer->setMinimumSize(96, 0);
 #endif
 	toolbar->addWidget(spacer);
 	//
@@ -223,20 +223,20 @@ ImagesBox::ImagesBox(float si)
 	//
 	QToolBar * toolbar2 = new QToolBar(this);
 	toolbar2->setOrientation(Qt::Horizontal);
-	toolbar2->setIconSize(QSize(static_cast<int>(18*si),static_cast<int>(18*si)));
-	toolbar2->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+	toolbar2->setIconSize(QSize(static_cast<int>(18 * si),static_cast<int>(18 * si)));
+	toolbar2->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	toolbar2->setLayoutDirection(Qt::RightToLeft);
 	if (toolbar2->layout())
 	{
-		toolbar2->layout()->setContentsMargins(0,0,0,0);
+		toolbar2->layout()->setContentsMargins(0, 0, 0, 0);
 		toolbar2->layout()->setSpacing(0);
 	}
 	QVBoxLayout * l2 = new QVBoxLayout(toolbar2_frame);
-	l2->setContentsMargins(0,0,0,0);
+	l2->setContentsMargins(0, 0, 0, 0);
 	l2->setSpacing(0);
 	l2->addWidget(toolbar2);
 	QWidget * spacer2 = new QWidget(this);
-	spacer2->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+	spacer2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	toolbar2->addWidget(spacer2);
 	toolbar2->addAction(actionContours);
 	toolbar2->addAction(actionInfo);
@@ -263,8 +263,8 @@ void ImagesBox::add_image(int id, ImageVariant * v, QPixmap * pixmap)
 	ListWidgetItem2 * i = new ListWidgetItem2(id, v);
 	if (pixmap && !pixmap->isNull()) i->setIcon(*pixmap);
 	i->setText(
-		QVariant(id).toString()+QString(". ")+
-		v->modality+QString("\n")+v->series_description);
+		QVariant(id).toString() + QString(". ")+
+		v->modality + QString("\n") + v->series_description);
 	listWidget->addItem(static_cast<QListWidgetItem*>(i));
 }
 
@@ -284,29 +284,40 @@ void ImagesBox::set_html(const ImageVariant * v)
 //
 //
 	if (!v->modality.isEmpty())
+	{
 		html.append(
 			QString("<span class='ybl'>") +
 			v->modality +
 			QString("</span> "));
-
+	}
 	if (!v->series_description.isEmpty())
+	{
 		html.append(QString("<span class='y'>") +
 			v->series_description +
 			QString("</span><br />"));
+	}
 	else
+	{
 		html.append(QString("<br />"));
+	}
 	if (!v->iod.isEmpty())
 	{
 		if (v->iod_supported)
+		{
 			html.append(QString("<span class='y3'>") +
 				v->iod + QString("</span><br /><br />"));
+		}
 		else
+		{
 			html.append(QString("<span class='y4'>") +
 				v->iod + QString("</span><br /><br />"));
+		}
 	}
 	if (!v->hardware.isEmpty())
+	{
 		html.append(QString("<span class='y5'>") +
 				v->hardware + QString("</span><br />"));
+	}
 	if (!v->hardware_info.isEmpty())
 	{
 		html.append(
@@ -314,11 +325,16 @@ void ImagesBox::set_html(const ImageVariant * v)
 			v->hardware_info.trimmed() +
 			QString("</span><br /><br />"));
 	}
-	else { html.append(QString("<br />")); }
+	else
+	{
+		html.append(QString("<br />"));
+	}
 	if (!v->study_description.isEmpty())
+	{
 		html.append(QString("<span class='y'>") +
 			v->study_description + QString("</span><br /><br />"));
-	if (!v->pat_name.isEmpty()||!v->pat_birthdate.isEmpty())
+	}
+	if (!v->pat_name.isEmpty() || !v->pat_birthdate.isEmpty())
 	{
 		QString name_s =
 			(!v->pat_name.isEmpty())
@@ -369,7 +385,7 @@ void ImagesBox::set_html(const ImageVariant * v)
 //
 //
 //////////////////////////////////////////////////////////////////
-	if (v->image_type==100)
+	if (v->image_type == 100)
 	{
 //////////////////////////////////////////////////////////////////
 //
@@ -386,7 +402,7 @@ void ImagesBox::set_html(const ImageVariant * v)
 //
 //////////////////////////////////////////////////////////////////
 	}
-	else if (v->image_type==200)
+	else if (v->image_type == 200)
 	{
 //////////////////////////////////////////////////////////////////
 //
@@ -403,7 +419,7 @@ void ImagesBox::set_html(const ImageVariant * v)
 //
 //////////////////////////////////////////////////////////////////
 	}
-	else if (v->image_type==300)
+	else if (v->image_type == 300)
 	{
 //////////////////////////////////////////////////////////////////
 //
@@ -423,7 +439,7 @@ void ImagesBox::set_html(const ImageVariant * v)
 //
 //////////////////////////////////////////////////////////////////
 	}
-	else if (v->image_type>=0 && v->image_type<=26)
+	else if (v->image_type >= 0 && v->image_type <= 26)
 	{
 //////////////////////////////////////////////////////////////////
 //
@@ -432,13 +448,17 @@ void ImagesBox::set_html(const ImageVariant * v)
 //
 		QString t("");
 		if (!v->interpretation.isEmpty())
-			t.append(v->interpretation+QString("<br />"));
-		if (v->di->idimx>0 && v->di->idimy>0 && v->di->idimz>0)
+		{
+			t.append(v->interpretation + QString("<br />"));
+		}
+		if (v->di->idimx > 0 && v->di->idimy > 0 && v->di->idimz > 0)
+		{
 			t.append(QVariant(v->di->idimx).toString() + QString(" x ") +
 					QVariant(v->di->idimy).toString()  + QString(" x ") +
 					QVariant(v->di->idimz).toString()  + QString("<br />"));
+		}
 		const QString cs = v->ybr ? QString("Y'CbCr") : QString("RGB"); // TODO
-		switch(v->image_type)
+		switch (v->image_type)
 		{
 		case  0: t.append(QString("signed short"));       break;
 		case  1: t.append(QString("unsigned short"));     break;
@@ -453,7 +473,7 @@ void ImagesBox::set_html(const ImageVariant * v)
 		case 11: t.append(QString("RGB unsigned short")); break;
 		case 12: t.append(QString("RGB signed int"));     break;
 		case 13: t.append(QString("RGB unsigned int"));   break;
-		case 14: t.append(cs+QString(" unsigned char"));  break;
+		case 14: t.append(cs + QString(" unsigned char"));break;
 		case 15: t.append(QString("RGB float"));          break;
 		case 16: t.append(QString("RGB double"));         break;
 		case 20: t.append(QString("RGBA signed short"));  break;
@@ -465,9 +485,8 @@ void ImagesBox::set_html(const ImageVariant * v)
 		case 26: t.append(QString("RGBA double"));        break;
 		default: break;
 		}
-		if (v->di->bits_allocated>0 && v->di->bits_stored>0 &&
-			(v->di->bits_stored<v->di->bits_allocated) &&
-			(v->di->high_bit==v->di->bits_stored-1))
+		if (v->di->bits_allocated > 0 && v->di->bits_stored > 0 &&
+			(v->di->bits_stored < v->di->bits_allocated))
 		{
 			t.append(
 				QString("&#160;(stored&#160;") +
@@ -505,8 +524,7 @@ void ImagesBox::set_html(const ImageVariant * v)
 // Orientation
 //
 //
-		if (
-			v->equi &&
+		if (v->equi &&
 			!v->di->hide_orientation &&
 			!v->orientation_string.isEmpty())
 		{
@@ -514,16 +532,15 @@ void ImagesBox::set_html(const ImageVariant * v)
 			if (v->iod_supported && v->di->slices_from_dicom)
 				html.append(
 					QString("<span class='yl1'>") +
-					v->orientation_string+QString("</span>"));
+					v->orientation_string + QString("</span>"));
 			else
 				html.append(
 					QString("<span class='yl2'>") +
-					v->orientation_string+QString("</span>"));
+					v->orientation_string + QString("</span>"));
 		}
 		else
 		{
-			if (
-				v->di->slices_from_dicom &&
+			if (v->di->slices_from_dicom &&
 				!v->equi &&
 				!v->di->hide_orientation)
 			{
@@ -551,8 +568,7 @@ void ImagesBox::set_html(const ImageVariant * v)
 			}
 		}
 #if 1
-		if (
-			v->equi &&
+		if (v->equi &&
 			!v->di->hide_orientation &&
 			!v->orientation_string.isEmpty())
 		{
@@ -565,27 +581,27 @@ void ImagesBox::set_html(const ImageVariant * v)
 				QString(
 					"<span class='ybs'>") +
 				QVariant(CommonUtils::set_digits(
-					v->di->image_slices.at(0)->ipp_iop[3],3))
+					v->di->image_slices.at(0)->ipp_iop[3], 3))
 						.toString() +
 				QString("\\") +
 				QVariant(CommonUtils::set_digits(
-					v->di->image_slices.at(0)->ipp_iop[4],3))
+					v->di->image_slices.at(0)->ipp_iop[4], 3))
 						.toString() +
 				QString("\\") +
 				QVariant(CommonUtils::set_digits(
-					v->di->image_slices.at(0)->ipp_iop[5],3))
+					v->di->image_slices.at(0)->ipp_iop[5], 3))
 						.toString() +
 				QString("\\") +
 				QVariant(CommonUtils::set_digits(
-					v->di->image_slices.at(0)->ipp_iop[6],3))
+					v->di->image_slices.at(0)->ipp_iop[6], 3))
 						.toString() +
 				QString("\\") +
 				QVariant(CommonUtils::set_digits(
-					v->di->image_slices.at(0)->ipp_iop[7],3))
+					v->di->image_slices.at(0)->ipp_iop[7], 3))
 						.toString() +
 				QString("\\") +
 				QVariant(CommonUtils::set_digits(
-					v->di->image_slices.at(0)->ipp_iop[8],3))
+					v->di->image_slices.at(0)->ipp_iop[8], 3))
 						.toString() +
 				QString("</span><br />"));
 		}
@@ -641,13 +657,13 @@ void ImagesBox::set_html(const ImageVariant * v)
 		if (!v->di->skip_texture)
 		{
 			QString texfilt, texinfo;
-			if      (v->di->filtering==0) texfilt = QString(" (no filtering)");
-			else if (v->di->filtering==1) texfilt = QString(" (bilinear)");
-			else                          texfilt = QString(" (?)");
-			if      (v->di->tex_info==0)  texinfo = QString(" R16F ");
-			else if (v->di->tex_info==1)  texinfo = QString(" R16 ");
-			else if (v->di->tex_info==2)  texinfo = QString(" R8 ");
-			else                          texinfo = QString(" ? ");
+			if      (v->di->filtering == 0) texfilt = QString(" (no filtering)");
+			else if (v->di->filtering == 1) texfilt = QString(" (bilinear)");
+			else                            texfilt = QString(" (?)");
+			if      (v->di->tex_info == 0)  texinfo = QString(" R16F ");
+			else if (v->di->tex_info == 1)  texinfo = QString(" R16 ");
+			else if (v->di->tex_info == 2)  texinfo = QString(" R8 ");
+			else                            texinfo = QString(" ? ");
 			html.append(
 				QString("<span class='y4'>3D GPU views:<br />") +
 				texinfo +
@@ -658,7 +674,7 @@ void ImagesBox::set_html(const ImageVariant * v)
 		}
 		else
 		{
-			if (v->image_type>=0 && v->image_type<10)
+			if (v->image_type >= 0 && v->image_type < 10)
 			{
 				html.append(QString(
 					"<span class='y4'>3D GPU views"
@@ -691,13 +707,13 @@ QString ImagesBox::get_orientation_image(const QString & rai)
 		s.append(QString("<br />"));
 		s.append(
 			QString("<span class='ybs'>X&#160;</span><span class='y4'>") +
-				map.value(ba.at(0))+QString("</span><br />"));
+				map.value(ba.at(0)) + QString("</span><br />"));
 		s.append(
 			QString("<span class='ybs'>Y&#160;</span><span class='y4'>") +
-				map.value(ba.at(1))+QString("</span><br />"));
+				map.value(ba.at(1)) + QString("</span><br />"));
 		s.append(
 			QString("<span class='ybs'>Z&#160;</span><span class='y4'>") +
-				map.value(ba.at(2))+QString("</span><br />"));
+				map.value(ba.at(2)) + QString("</span><br />"));
 	}
 	return s;
 }
@@ -745,12 +761,12 @@ void ImagesBox::set_contours(const ImageVariant * v)
 	for (int x = 0; x < v->di->rois.size(); ++x)
 	{
 		const QColor c(
-			static_cast<int>(v->di->rois.at(x).color.r*255.0f),
-			static_cast<int>(v->di->rois.at(x).color.g*255.0f),
-			static_cast<int>(v->di->rois.at(x).color.b*255.0f));
+			static_cast<int>(v->di->rois.at(x).color.r * 255.0f),
+			static_cast<int>(v->di->rois.at(x).color.g * 255.0f),
+			static_cast<int>(v->di->rois.at(x).color.b * 255.0f));
 		const int idx = contours_tableWidget->rowCount();
 		TableWidgetItem2 * i0 = new TableWidgetItem2();
-		i0->setFlags(i0->flags()|Qt::ItemIsUserCheckable);
+		i0->setFlags(i0->flags() | Qt::ItemIsUserCheckable);
 		if (v->di->rois.at(x).show)
 		{
 			i0->setCheckState(Qt::Checked);
@@ -760,16 +776,16 @@ void ImagesBox::set_contours(const ImageVariant * v)
 			i0->setCheckState(Qt::Unchecked);
 		}
 		i0->set_id(v->di->rois.at(x).id);
-		contours_tableWidget->setRowCount(idx+1);
+		contours_tableWidget->setRowCount(idx + 1);
 		contours_tableWidget->setItem(
-			idx,0,static_cast<QTableWidgetItem*>(i0));
+			idx, 0, static_cast<QTableWidgetItem*>(i0));
 		QTableWidgetItem * i1 = new QTableWidgetItem();
-		i1->setFlags(i1->flags()^Qt::ItemIsSelectable);
+		i1->setFlags(i1->flags() ^ Qt::ItemIsSelectable);
 		i1->setBackground(QBrush(c));
 		contours_tableWidget->setItem(
-			idx,1,i1);
+			idx, 1, i1);
 		contours_tableWidget->setItem(
-			idx,2,new QTableWidgetItem(v->di->rois.at(x).name));
+			idx, 2, new QTableWidgetItem(v->di->rois.at(x).name));
 	}
 }
 

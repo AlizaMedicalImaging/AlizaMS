@@ -1,11 +1,8 @@
 #include "handleitem.h"
- 
 #include <QPainter>
 #include <QPointF>
-
 #include <cmath>
 #include <iostream>
-
 #include "graphicsview.h"
 
 HandleItem::HandleItem(
@@ -60,11 +57,11 @@ QRectF HandleItem::boundingRect() const
 				m_item->boundingRect().left() -
 					pos().x(),
 				m_item->boundingRect().top() +
-					m_item->boundingRect().height()/2.0);
+					m_item->boundingRect().height() / 2.0);
 			r = QRectF(
 				point-QPointF(
 					18.0,
-					m_item->boundingRect().height()/2.0),
+					m_item->boundingRect().height() / 2.0),
 				QSize(36, m_item->boundingRect().height()));
 		}
 		break;
@@ -74,11 +71,11 @@ QRectF HandleItem::boundingRect() const
 				m_item->boundingRect().right() -
 					pos().x(),
 				m_item->boundingRect().top() +
-					m_item->boundingRect().height()/2.0);
+					m_item->boundingRect().height() / 2.0);
 			r = QRectF(
 				point-QPointF(
 					18.0,
-					m_item->boundingRect().height()/2.0),
+					m_item->boundingRect().height() / 2.0),
 				QSize(36, m_item->boundingRect().height()));
 		}
 		break;
@@ -86,12 +83,12 @@ QRectF HandleItem::boundingRect() const
 		{
 			QPointF point(
 				m_item->boundingRect().left() +
-					m_item->boundingRect().width()/2.0,
+					m_item->boundingRect().width() / 2.0,
 				m_item->boundingRect().top() -
 					pos().y());
 			r = QRectF(
 				point-QPointF(
-					m_item->boundingRect().width()/2.0,
+					m_item->boundingRect().width() / 2.0,
 					18.0),
 				QSize(m_item->boundingRect().width(), 36));
 		}
@@ -100,12 +97,12 @@ QRectF HandleItem::boundingRect() const
 		{
 			QPointF point(
 				m_item->boundingRect().left() +
-					m_item->boundingRect().width()/2.0,
+					m_item->boundingRect().width() / 2.0,
 				m_item->boundingRect().bottom() -
 					pos().y());
 			r = QRectF(
 				point-QPointF(
-					m_item->boundingRect().width()/2.0,
+					m_item->boundingRect().width() / 2.0,
 					18.0),
 				QSize(m_item->boundingRect().width(), 36));
 		}

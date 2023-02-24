@@ -17,7 +17,7 @@ LevelRectItem::LevelRectItem(
 	qreal x, qreal y,
 	qreal w, qreal h,
 	QGraphicsItem * p)
-	: QGraphicsRectItem(x,y,w,h,p)
+	: QGraphicsRectItem(x, y, w, h, p)
 {
 	view = v;
     setFlag(QGraphicsItem::ItemIsMovable, true);
@@ -76,15 +76,15 @@ QVariant LevelRectItem::itemChange(
 	{
 		QPointF newData  = data.toPointF();
 		newData.setY(0.0);
-		if (rect().center().x()+newData.x()>view->scene()->sceneRect().bottomRight().x())
+		if (rect().center().x() + newData.x() > view->scene()->sceneRect().bottomRight().x())
 		{
-			newData.setX(view->scene()->sceneRect().bottomRight().x()-rect().center().x());
+			newData.setX(view->scene()->sceneRect().bottomRight().x() - rect().center().x());
 		}
-		else if (rect().center().x()+newData.x()<view->scene()->sceneRect().bottomLeft().x())
+		else if (rect().center().x() + newData.x() < view->scene()->sceneRect().bottomLeft().x())
 		{
-			newData.setX(view->scene()->sceneRect().bottomLeft().x()-rect().center().x());
+			newData.setX(view->scene()->sceneRect().bottomLeft().x() - rect().center().x());
 		}
-		view->window_center_update(rect().center().x()+newData.x());
+		view->window_center_update(rect().center().x() + newData.x());
  		return QGraphicsItem::itemChange(change, newData);
 	}
 	return QGraphicsItem::itemChange(change, data);
@@ -141,10 +141,10 @@ HistogramView::HistogramView(
 	setTransformationAnchor(NoAnchor);
 	setDragMode(NoDrag);
 	//
-	rect_item = new LevelRectItem(this,0,0,100,100);
-	LevelItem * level_min = new LevelItem(rect_item,0,this);
+	rect_item = new LevelRectItem(this, 0, 0, 100, 100);
+	LevelItem * level_min = new LevelItem(rect_item, 0, this);
 	level_min->setParentItem(rect_item);
-	LevelItem * level_max = new LevelItem(rect_item,1,this);
+	LevelItem * level_max = new LevelItem(rect_item, 1, this);
 	level_max->setParentItem(rect_item);
 	scene->addItem(rect_item);
 	//
@@ -186,10 +186,10 @@ void HistogramView::update__(const ImageVariant * v)
 	if (!v) return;
 	const int w = this->width();
 	const int h = this->height();
-	scene()->setSceneRect(0,0,w,h);
+	scene()->setSceneRect(0, 0, w, h);
 	if (!v->histogram.isNull())
 		pixmap->setPixmap(v->histogram.scaled(
-			w,h,Qt::IgnoreAspectRatio,Qt::SmoothTransformation));
+			w, h, Qt::IgnoreAspectRatio,Qt::SmoothTransformation));
 	else clear__();
 	//
 	update_window(v);
@@ -205,10 +205,10 @@ void HistogramView::update_window(const ImageVariant * v)
 	}
 	const double h = scene()->sceneRect().height();
 	const double w = scene()->sceneRect().width();
-	double p1x = (v->di->window_center-v->di->window_width*0.5)*w;
-	double p2x = (v->di->window_center+v->di->window_width*0.5)*w;
-	rect_item->setRect(QRectF(p1x,0,p2x-p1x,h));
-	rect_item->setPos(QPointF(0,0));
+	double p1x = (v->di->window_center - v->di->window_width * 0.5) * w;
+	double p2x = (v->di->window_center + v->di->window_width * 0.5) * w;
+	rect_item->setRect(QRectF(p1x, 0, p2x - p1x, h));
+	rect_item->setPos(QPointF(0, 0));
 	if (!rect_item->isVisible()) rect_item->show();
 }
 
@@ -218,7 +218,7 @@ void HistogramView::window_width_update_min(qreal x)
 	{
 		Aliza * p = static_cast<Aliza*>(aliza);
 		const double j = scene()->sceneRect().width();
-		p->width_from_histogram_min(j>0?x/j:0);
+		p->width_from_histogram_min(j > 0.0 ? x / j : 0.0);
 	}
 }
 
@@ -228,7 +228,7 @@ void HistogramView::window_width_update_max(qreal x)
 	{
 		Aliza * p = static_cast<Aliza*>(aliza);
 		const double j = scene()->sceneRect().width();
-		p->width_from_histogram_max(j>0?x/j:0);
+		p->width_from_histogram_max(j > 0.0 ? x / j : 0.0);
 	}
 }
 
@@ -237,12 +237,9 @@ void HistogramView::window_center_update(qreal x)
 	if (aliza)
 	{
 		Aliza * p = static_cast<Aliza*>(aliza);
-		const double j =
-			scene()->sceneRect().width() > 0.0
-			?
-			x/scene()->sceneRect().width()
-			:
-			0.0;
+		const double j = scene()->sceneRect().width() > 0.0
+			?  x/scene()->sceneRect().width()
+			: 0.0;
 		p->center_from_histogram(j);
 	}
 }
