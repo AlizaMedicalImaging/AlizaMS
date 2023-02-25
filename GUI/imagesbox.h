@@ -58,6 +58,7 @@ public:
 	void set_contours(const ImageVariant*);
 	int  get_selected_roi_id() const;
 	void update_background_color(bool);
+	QDoubleSpinBox * width_doubleSpinBox;
 	QAction * actionNone;
 	QAction * actionClear;
 	QAction * actionClearChecked;
@@ -76,9 +77,6 @@ public:
 	QAction * actionStudyMenu;
 	QAction * actionStudy;
 	QAction * actionStudyChecked;
-#if 0
-	QAction * actionStudyAll;
-#endif
 
 private slots:
 	void toggle_info(bool);

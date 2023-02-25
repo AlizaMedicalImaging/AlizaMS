@@ -145,9 +145,11 @@ ImagesBox::ImagesBox(float si)
 	contours_tableWidget->setColumnWidth(2, 140);
 	contours_frame->hide();
 	//
-	listWidget->setIconSize(QSize(96,96));
+	listWidget->setIconSize(QSize(96, 96));
 	listWidget->setMovement(QListView::Static);
 	listWidget->setFlow(QListView::TopToBottom);
+	//
+	width_doubleSpinBox = new QDoubleSpinBox();
 	//
 	actionNone         = new QAction(QString(""),this);
 	actionClear        = new QAction(QIcon(QString(":/bitmaps/delete.svg")),QString("Close selected"),this);
@@ -162,13 +164,10 @@ ImagesBox::ImagesBox(float si)
 	actionContours     = new QAction(QIcon(QString(":/bitmaps/circle1.svg")),QString("Toggle contours window"), this);
 	actionContours->setCheckable(true);
 	actionContours->setChecked(false);
-	actionROIInfo      = new QAction(QString("ROI Info"), this);
+	actionROIInfo      = new QAction(QIcon(QString(":/bitmaps/meta.svg")),QString("ROI Info"), this);
 	actionStudyMenu    = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Multi View"),this);
 	actionStudy        = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open study"), this);
 	actionStudyChecked = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open sel. and checked"), this);
-#if 0
-	actionStudyAll     = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open all"), this);
-#endif
 	//
 	actionTmp          = new QAction(QString("TMP"),this);
 	//
@@ -189,7 +188,9 @@ ImagesBox::ImagesBox(float si)
 	//
 	QToolBar * toolbar = new QToolBar(this);
 	toolbar->setOrientation(Qt::Horizontal);
-	toolbar->setIconSize(QSize(static_cast<int>(18 * si),static_cast<int>(18 * si)));
+	toolbar->setIconSize(QSize(
+		static_cast<int>(18 * si),
+		static_cast<int>(18 * si)));
 	toolbar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	if (toolbar->layout())
 	{
@@ -203,9 +204,6 @@ ImagesBox::ImagesBox(float si)
 	studyMenu = new QMenu(this);
 	studyMenu->addAction(actionStudy);
 	studyMenu->addAction(actionStudyChecked);
-#if 0
-	studyMenu->addAction(actionStudyAll);
-#endif
 	actionStudyMenu->setMenu(studyMenu);
 	toolbar->addAction(actionStudyMenu);
 	toolbar->addAction(actionReloadHistogram);
@@ -221,9 +219,37 @@ ImagesBox::ImagesBox(float si)
 	contours_tableWidget->addAction(actionNone);
 	contours_tableWidget->addAction(actionROIInfo);
 	//
+	QToolBar * toolbar1 = new QToolBar(this);
+	toolbar1->setOrientation(Qt::Horizontal);
+	toolbar1->setIconSize(QSize(
+		static_cast<int>(18 * si),
+		static_cast<int>(18 * si)));
+	toolbar1->setSizePolicy(
+		QSizePolicy::Fixed,QSizePolicy::Fixed);
+	QVBoxLayout * l3 = new QVBoxLayout(toolbar1_frame);
+	l3->setContentsMargins(0, 0, 0, 0);
+	l3->setSpacing(0);
+	l3->addWidget(toolbar1);
+	if (toolbar1->layout())
+	{
+		toolbar1->layout()->setContentsMargins(0, 0, 0, 0);
+		toolbar1->layout()->setSpacing(0);
+	}
+	width_doubleSpinBox->setSizePolicy(
+		QSizePolicy::Fixed,QSizePolicy::Fixed);
+	width_doubleSpinBox->setDecimals(1);
+	width_doubleSpinBox->setRange(0.0, 9.9);
+	width_doubleSpinBox->setSingleStep(0.1);
+	width_doubleSpinBox->setSuffix(QString("px"));
+	width_doubleSpinBox->setValue(0.0);
+	toolbar1->addWidget(width_doubleSpinBox);
+	toolbar1->addAction(actionROIInfo);
+	//
 	QToolBar * toolbar2 = new QToolBar(this);
 	toolbar2->setOrientation(Qt::Horizontal);
-	toolbar2->setIconSize(QSize(static_cast<int>(18 * si),static_cast<int>(18 * si)));
+	toolbar2->setIconSize(QSize(
+		static_cast<int>(18 * si),
+		static_cast<int>(18 * si)));
 	toolbar2->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	toolbar2->setLayoutDirection(Qt::RightToLeft);
 	if (toolbar2->layout())

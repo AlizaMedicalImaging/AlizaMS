@@ -123,6 +123,7 @@ private slots:
 	void reset_3d();
 	void set_show_frames_2d(bool);
 	void toggle_distance(bool);
+	void toggle_update_contours_width(double);
 	void trigger_set_level();
 	void tab_ind_changed(int);
 	void set_zlock(bool);

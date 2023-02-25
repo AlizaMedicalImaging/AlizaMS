@@ -483,6 +483,7 @@ MainWindow::MainWindow(
 	connect(anim3Dwidget->stop_pushButton,  SIGNAL(clicked()),           this,SLOT(stop_3D_anim()));
 	connect(anim2Dwidget->start_pushButton, SIGNAL(clicked()),           this,SLOT(start_anim()));
 	connect(anim2Dwidget->stop_pushButton,  SIGNAL(clicked()),           this,SLOT(stop_anim()));
+	connect(imagesbox->width_doubleSpinBox, SIGNAL(valueChanged(double)),this,SLOT(toggle_update_contours_width(double)));
 	connect(setLevelAct,                    SIGNAL(triggered()),         this,SLOT(trigger_set_level()));
 	connect(zlockAct,                       SIGNAL(toggled(bool)),       this,SLOT(set_zlock(bool)));
 	connect(oneAct,                         SIGNAL(toggled(bool)),       this,SLOT(set_zlock_one(bool)));
@@ -1729,16 +1730,18 @@ void MainWindow::toggle_distance(bool t)
 	frames2DAct->blockSignals(false);
 }
 
-/*
 void MainWindow::toggle_update_contours_width(double x)
 {
 	graphicswidget_m->set_contours_width(x);
+#if 0
 	if (glwidget &&
 		glwidget->opengl_init_done &&
 		!glwidget->no_opengl3)
-		glwidget->set_contours_width((float)x);
+	{
+		glwidget->set_contours_width(static_cast<float>(x));
+	}
+#endif
 }
-*/
 
 void MainWindow::trigger_set_level()
 {
