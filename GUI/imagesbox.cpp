@@ -237,10 +237,11 @@ ImagesBox::ImagesBox(float si)
 	}
 	width_doubleSpinBox->setSizePolicy(
 		QSizePolicy::Fixed,QSizePolicy::Fixed);
+	width_doubleSpinBox->setToolTip(QString("Contours width (2D)"));
 	width_doubleSpinBox->setDecimals(1);
 	width_doubleSpinBox->setRange(0.0, 9.9);
 	width_doubleSpinBox->setSingleStep(0.1);
-	width_doubleSpinBox->setSuffix(QString("px"));
+	width_doubleSpinBox->setSuffix(QString(" px"));
 	width_doubleSpinBox->setValue(0.0);
 	toolbar1->addWidget(width_doubleSpinBox);
 	toolbar1->addAction(actionROIInfo);
