@@ -673,11 +673,13 @@ quit__:
 	}
 }
 
+#if 0
 void GLWidget::set_contours_width(float f)
 {
 	contours_width = (f < 0.1f) ? 2.0f : f;
 	if (view == 0) updateGL();
 }
+#endif
 
 void GLWidget::init_()
 {
@@ -795,7 +797,9 @@ void GLWidget::init_()
 	rect_selection = false;
 	show_cube = true;
 	wireframe = false;
+#if 0
 	contours_width = 2.0f;
+#endif
 	framebuffer = 0;
 	fbo_tex = 0;
 	fbo_depth = 0;

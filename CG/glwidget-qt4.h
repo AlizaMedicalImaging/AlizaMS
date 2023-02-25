@@ -215,7 +215,9 @@ public:
 	bool rect_selection;
 	bool show_cube;
 	bool wireframe;
+#if 0
 	float contours_width;
+#endif
 	//
 	float  clear_color_r;
 	float  clear_color_g;
@@ -450,7 +452,9 @@ public slots:
 	void set_alpha(double);
 	void set_brightness(double);
 	void set_cube(bool);
+#if 0
 	void set_contours_width(float);
+#endif
 
 signals:
 	void opengl3_not_available();
