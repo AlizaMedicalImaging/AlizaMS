@@ -3,7 +3,8 @@
 AnimWidget::AnimWidget(float si)
 {
 	setupUi(this);
-	const QSize s = QSize(static_cast<int>(18*si),static_cast<int>(18*si));
+	const QSize s = QSize(
+		static_cast<int>(18 * si),static_cast<int>(18 * si));
 	start_pushButton->setIconSize(s);
 	stop_pushButton->setIconSize(s);
 	group_pushButton->setIconSize(s);

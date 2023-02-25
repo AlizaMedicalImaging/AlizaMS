@@ -249,9 +249,9 @@ static void add_slice_collision_plane(
 		v->di->image_slices.at(z)->v[7] - py,
 		v->di->image_slices.at(z)->v[8] - pz);
 	const Vectormath::Scalar::Vector3 n =
-		Vectormath::Scalar::normalize(Vectormath::Scalar::cross(v1,v2));
+		Vectormath::Scalar::normalize(Vectormath::Scalar::cross(v1, v2));
 	btStaticPlaneShape * s =
-		new btStaticPlaneShape(btVector3(n.getX(),n.getY(),n.getZ()),0);
+		new btStaticPlaneShape(btVector3(n.getX(), n.getY(), n.getZ()), 0);
 	tmp_shapes.push_back(s);
 	btCollisionObject * o = new btCollisionObject();
 	o->setCollisionShape(s);
@@ -335,7 +335,7 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 		for (int q = 0; q < 4; ++q)
 		{
 			int k0 = 0, k1 = 1, k2 = 2, k3 = 3, k4 = 4, k5 = 5;
-			switch(q)
+			switch (q)
 			{
 			case 1:
 				k0 = 3;
@@ -402,9 +402,9 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 		}
 		if (hits.size() == 2)
 		{
-			const int R = round(refs.at(u)->di->R*255.0f);
-			const int G = round(refs.at(u)->di->G*255.0f);
-			const int B = round(refs.at(u)->di->B*255.0f);
+			const int R = round(refs.at(u)->di->R * 255.0f);
+			const int G = round(refs.at(u)->di->G * 255.0f);
+			const int B = round(refs.at(u)->di->B * 255.0f);
 			QPen pen;
 			pen.setBrush(QBrush(QColor(R, G, B, 255)));
 			pen.setStyle(Qt::SolidLine);
@@ -515,7 +515,7 @@ static void check_slice_collisions2(StudyViewWidget * w)
 					for (int q = 0; q < 4; ++q)
 					{
 						int k0 = 0, k1 = 1, k2 = 2, k3 = 3, k4 = 4, k5 = 5;
-						switch(q)
+						switch (q)
 						{
 						case 1:
 							k0 = 3;
@@ -582,9 +582,9 @@ static void check_slice_collisions2(StudyViewWidget * w)
 					}
 					if (hits.size() == 2)
 					{
-						const int R = round(v1->di->R*255.0f);
-						const int G = round(v1->di->G*255.0f);
-						const int B = round(v1->di->B*255.0f);
+						const int R = round(v1->di->R * 255.0f);
+						const int G = round(v1->di->G * 255.0f);
+						const int B = round(v1->di->B * 255.0f);
 						QPen pen;
 						pen.setBrush(QBrush(QColor(R, G, B, 255)));
 						pen.setStyle(Qt::SolidLine);
@@ -840,12 +840,12 @@ void Aliza::load_dicom_series(QProgressDialog * pb)
 				message_.append(tmp_message + QString("\n"));
 			}
 		}
-		catch (mdcm::ParseException & pe)
+		catch (const mdcm::ParseException & pe)
 		{
 			std::cout << "mdcm::ParseException in Aliza::load_dicom_series:\n"
 				<< pe.GetLastElement().GetTag() << std::endl;
 		}
-		catch (std::exception & ex)
+		catch (const std::exception & ex)
 		{
 			std::cout << "Exception in Aliza::load_dicom_series\n"
 				<< ex.what() << std::endl;
@@ -858,15 +858,14 @@ quit__:
 	for (unsigned int x = 0; x < ivariants.size(); ++x)
 	{
 		if (!ivariants.at(x)) continue;
-		if (
-			ivariants.at(x)->di->opengl_ok &&
+		if (ivariants.at(x)->di->opengl_ok &&
 			!ivariants.at(x)->di->skip_texture && (
 				ivariants.at(x)->di->idimz !=
 				static_cast<int>(ivariants.at(x)->di->image_slices.size())))
 		{
 			std::cout
 				<< "ivariants.at(" << x
-				<< ")->di->idimz!=ivariants.at(" << x
+				<< ")->di->idimz != ivariants.at(" << x
 				<< ")->di->image_slices.size()" << std::endl;
 			ivariants[x]->di->close();
 			ivariants[x]->di->skip_texture=true;
@@ -909,9 +908,13 @@ quit__:
 			ListWidgetItem2 * item =
 				static_cast<ListWidgetItem2*>(imagesbox->listWidget->item(j));
 			if (item) id0 = item->get_id();
-			if (id0 == ivariants.at(x)->id) { r = j; break; }
+			if (id0 == ivariants.at(x)->id)
+			{
+				r = j;
+				break;
+			}
 		}
-		if (x == ivariants.size()-1 && r > -1)
+		if (x == ivariants.size() - 1 && r > -1)
 		{
 			imagesbox->listWidget->setCurrentRow(r);
 			update_selection2();
@@ -970,8 +973,13 @@ void Aliza::add_histogram(ImageVariant * v, QProgressDialog * pb, bool check_set
 	}
 	HistogramGen * t = new HistogramGen(v);
 	t->run();
+#if 0
 	const QString tmp0 = t->get_error();
-	if (!tmp0.isEmpty()) { std::cout << tmp0.toStdString() << std::endl; }
+	if (!tmp0.isEmpty())
+	{
+		std::cout << tmp0.toStdString() << std::endl;
+	}
+#endif
 	delete t;
 }
 
@@ -1099,14 +1107,14 @@ void Aliza::delete_unchecked_images()
 
 ImageVariant * Aliza::get_image(int id)
 {
-	if (id<0) return NULL;
+	if (id < 0) return NULL;
 	if (scene3dimages.contains(id)) return scene3dimages[id];
 	return NULL;
 }
 
 const ImageVariant * Aliza::get_image(int id) const
 {
-	if (id<0) return NULL;
+	if (id < 0) return NULL;
 	if (scene3dimages.contains(id)) return scene3dimages.value(id);
 	return NULL;
 }
@@ -1202,12 +1210,12 @@ static void process_elscint_dir(
 				}
 			}
 		}
-		catch (mdcm::ParseException & pe)
+		catch (const mdcm::ParseException & pe)
 		{
 			std::cout << "mdcm::ParseException in process_elscint_dir:\n"
 				<< pe.GetLastElement().GetTag() << std::endl;
 		}
-		catch (std::exception & ex)
+		catch (const std::exception & ex)
 		{
 			std::cout << "Exception in process_elscint_dir:\n"
 				<< ex.what() << std::endl;
@@ -1282,14 +1290,12 @@ bool Aliza::load_3d(
 			ivariant,ok3d,(ok3d ? glwidget : NULL), max_3d_tex_size,
 			change_size, size_x_, size_y_);
 	}
-	else if (
-		ivariant->image_type >= 10 &&
+	else if (ivariant->image_type >= 10 &&
 		ivariant->image_type < 20)
 	{
 		ok = CommonUtils::reload_rgb_rgba(ivariant);
 	}
-	else if (
-		ivariant->image_type >= 20 &&
+	else if (ivariant->image_type >= 20 &&
 		ivariant->image_type < 30)
 	{
 		ok = CommonUtils::reload_rgb_rgba(ivariant);
@@ -1311,18 +1317,16 @@ bool Aliza::load_3d(
 	}
 	if (!skip_icon) IconUtils::icon(ivariant);
 	if (!skip_bb) CommonUtils::reset_bb(ivariant);
-	if (
-		ivariant && ivariant->di->opengl_ok &&
+	if (ivariant && ivariant->di->opengl_ok &&
 		!ivariant->di->skip_texture &&
-		(ivariant->di->idimz!=
+		(ivariant->di->idimz !=
 			static_cast<int>(ivariant->di->image_slices.size())))
 	{
 		std::cout <<
-			"ivariant->di->idimz!="
-			"ivariant->di->image_slices.size()"
-			<< std::endl;
+			"ivariant->di->idimz != ivariant->di->image_slices.size()"
+				<< std::endl;
 		ivariant->di->close();
-		ivariant->di->skip_texture=true;
+		ivariant->di->skip_texture = true;
 	}
 	return ok;
 }
@@ -1392,9 +1396,9 @@ void Aliza::set_us_center(ImageVariant * v, double i)
 			v->di->rmax - v->di->rmin
 			:
 			1e-6;
-		v->di->window_center = (i+(-v->di->rmin))/div_;
-		if (v->di->window_center<0) v->di->window_center=0.0;
-		if (v->di->window_center>1) v->di->window_center=1.0;
+		v->di->window_center = (i + (-v->di->rmin)) / div_;
+		if (v->di->window_center < 0) v->di->window_center = 0.0;
+		if (v->di->window_center > 1) v->di->window_center = 1.0;
 	}
 }
 
@@ -1409,9 +1413,9 @@ void Aliza::set_us_width(ImageVariant * v, double i)
 			v->di->rmax - v->di->rmin
 			:
 			1e-6;
-		v->di->window_width = i/div_;
-		if (v->di->window_width <= 0) v->di->window_width=1e-6;
-		if (v->di->window_width  > 1) v->di->window_width=1.0;
+		v->di->window_width = i / div_;
+		if (v->di->window_width <= 0) v->di->window_width = 1e-6;
+		if (v->di->window_width  > 1) v->di->window_width = 1.0;
 	}
 }
 
@@ -1421,7 +1425,7 @@ void Aliza::center_from_spinbox(double i)
 	if (!v) return;
 	toolbox2D->disconnect_sliders();
 	set_us_center(v, i);
-	if (v->group_id>=0) update_group_center(v);
+	if (v->group_id >= 0) update_group_center(v);
 	toolbox2D->center_horizontalSlider->setValue(v->di->us_window_center);
 #if 0
 	if (!run__)
@@ -1446,7 +1450,7 @@ void Aliza::width_from_spinbox(double i)
 	if (!v) return;
 	toolbox2D->disconnect_sliders();
 	set_us_width(v, i);
-	if (v->group_id>=0) update_group_width(v);
+	if (v->group_id >= 0) update_group_width(v);
 	toolbox2D->width_horizontalSlider->setValue(v->di->us_window_width);
 #if 0
 	if (!run__)
@@ -1469,7 +1473,7 @@ void Aliza::set_lut_function0(int x)
 {
 	ImageVariant * v = get_selected_image();
 	if (!v) return;
-	switch(x)
+	switch (x)
 	{
 	case 1:
 		v->di->lut_function = 2;
@@ -1530,11 +1534,11 @@ void Aliza::set_lut(int i)
 #endif
 	{
 		if (!graphicswidget_m->run__)
-			graphicswidget_m->update_image(0,false,true);
+			graphicswidget_m->update_image(0, false, true);
 		if (multiview)
 		{
-			graphicswidget_y->update_image(0,false,true);
-			graphicswidget_x->update_image(0,false,true);
+			graphicswidget_y->update_image(0, false, true);
+			graphicswidget_x->update_image(0, false, true);
 		}
 		if (check_3d())
 		{
@@ -1781,9 +1785,9 @@ void Aliza::update_toolbox(const ImageVariant * v)
 		set_lut_function0(0);
 	}
 	//
-	const int tmpx = ((v->di->idimx-1) <0) ? 0 : (v->di->idimx-1);
-	const int tmpy = ((v->di->idimy-1) <0) ? 0 : (v->di->idimy-1);
-	const int tmpz = ((v->di->idimz-1) <0) ? 0 : (v->di->idimz-1);
+	const int tmpx = ((v->di->idimx - 1) < 0) ? 0 : (v->di->idimx - 1);
+	const int tmpy = ((v->di->idimy - 1) < 0) ? 0 : (v->di->idimy - 1);
+	const int tmpz = ((v->di->idimz - 1) < 0) ? 0 : (v->di->idimz - 1);
 	if (v->di->lock_2Dview)
 	{
 		zlockAct->setChecked(true);
@@ -1805,7 +1809,7 @@ void Aliza::update_toolbox(const ImageVariant * v)
 	zrangewidget->set_spanslider_max(tmpz);
 	zrangewidget->set_span(v->di->from_slice,v->di->to_slice);
 	zrangewidget->setEnabled(!v->di->lock_2Dview);
-	switch(graphicswidget_m->get_axis())
+	switch (graphicswidget_m->get_axis())
 	{
 	case 0:
 		{
@@ -1953,14 +1957,18 @@ void Aliza::set_selected_slice2D_m(int j)
 	if (v)
 	{
 		const int a = graphicswidget_m->get_axis();
-		switch(a)
+		switch (a)
 		{
-		case 0: v->di->selected_x_slice = j; break;
-		case 1: v->di->selected_y_slice = j; break;
-		case 2: v->di->selected_z_slice = j; break;
-		default: break;
+		case 0: v->di->selected_x_slice = j;
+			break;
+		case 1: v->di->selected_y_slice = j;
+			break;
+		case 2: v->di->selected_z_slice = j;
+			break;
+		default:
+			break;
 		}
-		if (v->group_id>=0)
+		if (v->group_id >= 0)
 		{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			QMap<int, ImageVariant*>::const_iterator iv =
@@ -1977,8 +1985,10 @@ void Aliza::set_selected_slice2D_m(int j)
 				{
 					switch (a)
 					{
-					case 0: v2->di->selected_x_slice = j; break;
-					case 1: v2->di->selected_y_slice = j; break;
+					case 0: v2->di->selected_x_slice = j;
+						break;
+					case 1: v2->di->selected_y_slice = j;
+						break;
 					case 2:
 						{
 							v2->di->selected_z_slice = j;
@@ -1991,14 +2001,17 @@ void Aliza::set_selected_slice2D_m(int j)
 								}
 								else
 								{
-									const int tmp0 = v2->di->idimz > 1 ? v2->di->idimz - 1 : 0;
+									const int tmp0 = (v2->di->idimz > 1)
+										? v2->di->idimz - 1
+										: 0;
 									v2->di->from_slice = j;
 									v2->di->to_slice   = tmp0;
 								}
 							}
 						}
 						break;
-					default: break;
+					default:
+						break;
 					}
 				}
 				++iv;
@@ -2277,27 +2290,27 @@ void Aliza::calculate_bb()
 		const QPointF tmpp =
 			graphicswidget_m->graphicsview->handle_rect->pos() +
 			rect.topLeft() +
-			QPointF(0.5*line_width,0.5*line_width);
+			QPointF(0.5 * line_width, 0.5 * line_width);
 		double x_min = 0.0, x_max = 1.0, y_min = 0.0, y_max = 1.0;
 		double size[2];
-		size[0] = (rect.width() -line_width) > 1.0 ? rect.width() -line_width : 1.0;
-		size[1] = (rect.height()-line_width) > 1.0 ?  rect.height()-line_width : 1.0;
+		size[0] = (rect.width()  -line_width) > 1.0 ? rect.width()  - line_width : 1.0;
+		size[1] = (rect.height() -line_width) > 1.0 ? rect.height() - line_width : 1.0;
 		const int tmpp_x = static_cast<int>(round(tmpp.x()));
 		const int tmpp_y = static_cast<int>(round(tmpp.y()));
 		const int size_0 = static_cast<int>(round(size[0]));
 		const int size_1 = static_cast<int>(round(size[1]));
 		x_min =  static_cast<double>(tmpp_x) / static_cast<double>(v->di->idimx);
-		x_max = (static_cast<double>(tmpp_x+size_0)) / static_cast<double>(v->di->idimx);
+		x_max = (static_cast<double>(tmpp_x + size_0)) / static_cast<double>(v->di->idimx);
 		y_min =  static_cast<double>(tmpp_y) / static_cast<double>(v->di->idimy);
-		y_max = (static_cast<double>(tmpp_y+size_1)) / static_cast<double>(v->di->idimy);
-		if (x_min<0.0) x_min=0.0;
-		if (x_min>1.0) x_min=1.0;
-		if (y_min<0.0) y_min=0.0;
-		if (y_min>1.0) y_min=1.0;
-		if (x_max<0.0) x_max=0.0;
-		if (x_max>1.0) x_max=1.0;
-		if (y_max<0.0) y_max=0.0;
-		if (y_max>1.0) y_max=1.0;
+		y_max = (static_cast<double>(tmpp_y + size_1)) / static_cast<double>(v->di->idimy);
+		if (x_min < 0.0) x_min = 0.0;
+		if (x_min > 1.0) x_min = 1.0;
+		if (y_min < 0.0) y_min = 0.0;
+		if (y_min > 1.0) y_min = 1.0;
+		if (x_max < 0.0) x_max = 0.0;
+		if (x_max > 1.0) x_max = 1.0;
+		if (y_max < 0.0) y_max = 0.0;
+		if (y_max > 1.0) y_max = 1.0;
 		v->di->bb_x_min = x_min;
 		v->di->bb_x_max = x_max;
 		v->di->bb_y_min = y_min;
@@ -2346,7 +2359,7 @@ void Aliza::calculate_bb()
 	}
 	else
 	{
-		if (v->group_id>=0)
+		if (v->group_id >= 0)
 		{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			QMap<int, ImageVariant*>::const_iterator iv =
@@ -2429,8 +2442,7 @@ void Aliza::calculate_bb()
 	if (!run__)
 #endif
 	{
-		if (
-			(2 != graphicswidget_m->get_axis()) &&
+		if ((2 != graphicswidget_m->get_axis()) &&
 			!graphicswidget_m->run__)
 			graphicswidget_m->update_selection_item();
 		if (multiview)
@@ -2446,41 +2458,41 @@ void Aliza::update_center(ImageVariant * v)
 {
 	if (!v) return;
 	if (v->image_type >= 10) return;
-	itk::Point<float,3> p;
+	itk::Point<float, 3> p;
 	int center_idx[3];
 	int tmp0 =
 		rect_selection
 		?
-		v->di->irect_index[0] + v->di->irect_size[0]/2
+		v->di->irect_index[0] + v->di->irect_size[0] / 2
 		:
-		v->di->idimx/2;
+		v->di->idimx / 2;
 	int tmp1 =
 		rect_selection
 		?
-		v->di->irect_index[1] + v->di->irect_size[1]/2
+		v->di->irect_index[1] + v->di->irect_size[1] / 2
 		:
-		v->di->idimy/2;
+		v->di->idimy / 2;
 	int tmp2 =
 		v->di->from_slice +
-		(v->di->to_slice-v->di->from_slice)/2;
+		(v->di->to_slice-v->di->from_slice) / 2;
 	if (tmp0 < 0) tmp0 = 0;
-	if (tmp0 > (v->di->idimx-1)) tmp0 = v->di->idimx-1;
+	if (tmp0 > (v->di->idimx-1)) tmp0 = v->di->idimx - 1;
 	if (tmp1 < 0) tmp1 = 0;
-	if (tmp1 > (v->di->idimy-1)) tmp1 = v->di->idimy-1;
+	if (tmp1 > (v->di->idimy-1)) tmp1 = v->di->idimy - 1;
 	if (tmp2 < 0) tmp2 = 0;
-	if (tmp2 > (v->di->idimz-1)) tmp2 = v->di->idimz-1;
+	if (tmp2 > (v->di->idimz-1)) tmp2 = v->di->idimz - 1;
 	center_idx[0] = tmp0;
 	center_idx[1] = tmp1;
 	center_idx[2] = tmp2;
-	switch(v->image_type)
+	switch (v->image_type)
 	{
 	case 0:
 		{
 			if (v->pSS.IsNull()) return;
 			ImageTypeSS::IndexType idx;
-			idx[0]=center_idx[0];
-			idx[1]=center_idx[1];
-			idx[2]=center_idx[2];
+			idx[0] = center_idx[0];
+			idx[1] = center_idx[1];
+			idx[2] = center_idx[2];
 			v->pSS->TransformIndexToPhysicalPoint(idx, p);
 		}
 		break;
@@ -2488,9 +2500,9 @@ void Aliza::update_center(ImageVariant * v)
 		{
 			if (v->pUS.IsNull()) return;
 			ImageTypeUS::IndexType idx;
-			idx[0]=center_idx[0];
-			idx[1]=center_idx[1];
-			idx[2]=center_idx[2];
+			idx[0] = center_idx[0];
+			idx[1] = center_idx[1];
+			idx[2] = center_idx[2];
 			v->pUS->TransformIndexToPhysicalPoint(idx, p);
 		}
 		break;
@@ -2498,9 +2510,9 @@ void Aliza::update_center(ImageVariant * v)
 		{
 			if (v->pSI.IsNull()) return;
 			ImageTypeSI::IndexType idx;
-			idx[0]=center_idx[0];
-			idx[1]=center_idx[1];
-			idx[2]=center_idx[2];
+			idx[0] = center_idx[0];
+			idx[1] = center_idx[1];
+			idx[2] = center_idx[2];
 			v->pSI->TransformIndexToPhysicalPoint(idx, p);
 		}
 		break;
@@ -2508,9 +2520,9 @@ void Aliza::update_center(ImageVariant * v)
 		{
 			if (v->pUI.IsNull()) return;
 			ImageTypeUI::IndexType idx;
-			idx[0]=center_idx[0];
-			idx[1]=center_idx[1];
-			idx[2]=center_idx[2];
+			idx[0] = center_idx[0];
+			idx[1] = center_idx[1];
+			idx[2] = center_idx[2];
 			v->pUI->TransformIndexToPhysicalPoint(idx, p);
 		}
 		break;
@@ -2518,9 +2530,9 @@ void Aliza::update_center(ImageVariant * v)
 		{
 			if (v->pUC.IsNull()) return;
 			ImageTypeUC::IndexType idx;
-			idx[0]=center_idx[0];
-			idx[1]=center_idx[1];
-			idx[2]=center_idx[2];
+			idx[0] = center_idx[0];
+			idx[1] = center_idx[1];
+			idx[2] = center_idx[2];
 			v->pUC->TransformIndexToPhysicalPoint(idx, p);
 		}
 		break;
@@ -2528,9 +2540,9 @@ void Aliza::update_center(ImageVariant * v)
 		{
 			if (v->pF.IsNull()) return;
 			ImageTypeF::IndexType idx;
-			idx[0]=center_idx[0];
-			idx[1]=center_idx[1];
-			idx[2]=center_idx[2];
+			idx[0] = center_idx[0];
+			idx[1] = center_idx[1];
+			idx[2] = center_idx[2];
 			v->pF->TransformIndexToPhysicalPoint(idx, p);
 		}
 		break;
@@ -2538,9 +2550,9 @@ void Aliza::update_center(ImageVariant * v)
 		{
 			if (v->pD.IsNull()) return;
 			ImageTypeD::IndexType idx;
-			idx[0]=center_idx[0];
-			idx[1]=center_idx[1];
-			idx[2]=center_idx[2];
+			idx[0] = center_idx[0];
+			idx[1] = center_idx[1];
+			idx[2] = center_idx[2];
 			v->pD->TransformIndexToPhysicalPoint(idx, p);
 		}
 		break;
@@ -2548,9 +2560,9 @@ void Aliza::update_center(ImageVariant * v)
 		{
 			if (v->pSLL.IsNull()) return;
 			ImageTypeSLL::IndexType idx;
-			idx[0]=center_idx[0];
-			idx[1]=center_idx[1];
-			idx[2]=center_idx[2];
+			idx[0] = center_idx[0];
+			idx[1] = center_idx[1];
+			idx[2] = center_idx[2];
 			v->pSLL->TransformIndexToPhysicalPoint(idx, p);
 		}
 		break;
@@ -2558,13 +2570,14 @@ void Aliza::update_center(ImageVariant * v)
 		{
 			if (v->pULL.IsNull()) return;
 			ImageTypeULL::IndexType idx;
-			idx[0]=center_idx[0];
-			idx[1]=center_idx[1];
-			idx[2]=center_idx[2];
+			idx[0] = center_idx[0];
+			idx[1] = center_idx[1];
+			idx[2] = center_idx[2];
 			v->pULL->TransformIndexToPhysicalPoint(idx, p);
 		}
 		break;
-	default : return;
+	default:
+		return;
 	}
 	v->di->center_x = p[0];
 	v->di->center_y = p[1];
@@ -2604,7 +2617,7 @@ void Aliza::set_show_frames_3d(bool t)
 			!run__ &&
 #endif
 			glwidget->isVisible() &&
-			glwidget->view==0) glwidget->updateGL();
+			glwidget->view == 0) glwidget->updateGL();
 	}
 }
 
@@ -2614,7 +2627,7 @@ void Aliza::set_transparency(bool t)
 	if (v)
 	{
 		v->di->transparency = t;
-		if (v->group_id>=0)
+		if (v->group_id >= 0)
 		{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 			QMap<int, ImageVariant*>::const_iterator iv =
@@ -2666,8 +2679,8 @@ void Aliza::update_selection()
 		if (v)
 		{
 			graphicswidget_m->set_slice_2D(v, 0, true);
-			if (multiview) graphicswidget_y->set_slice_2D(v,0,false);
-			if (multiview) graphicswidget_x->set_slice_2D(v,0,false);
+			if (multiview) graphicswidget_y->set_slice_2D(v, 0, false);
+			if (multiview) graphicswidget_x->set_slice_2D(v, 0, false);
 			update_selection_common1(v);
 		}
 	}
@@ -2796,7 +2809,7 @@ void Aliza::update_selection_common2(QListWidgetItem * s)
 				if (deltas.at(x) > max_delta) max_delta = deltas.at(x);
 			}
 			disconnect(toolbox->far_doubleSpinBox, SIGNAL(valueChanged(double)), glwidget, SLOT(set_far(double)));
-			const double far_plane = 7*max_delta;
+			const double far_plane = 7 * max_delta;
 			glwidget->update_far_plane(static_cast<float>(far_plane));
 			toolbox->far_doubleSpinBox->setValue(far_plane);
 			connect(toolbox->far_doubleSpinBox, SIGNAL(valueChanged(double)), glwidget, SLOT(set_far(double)));
@@ -2866,7 +2879,7 @@ void Aliza::reset_rect2()
 	if (v)
 	{
 		v->di->from_slice = 0;
-		v->di->to_slice = v->di->idimz-1;
+		v->di->to_slice = v->di->idimz - 1;
 		v->di->irect_index[0] = v->di->irect_index[1] = 0;
 		v->di->irect_size[0] = v->di->idimx;
 		v->di->irect_size[1] = v->di->idimy;
@@ -2912,9 +2925,9 @@ void Aliza::start_anim()
 	graphicswidget_m->set_mouse_modus(0, false);
 	graphicswidget_y->set_mouse_modus(0, false);
 	graphicswidget_x->set_mouse_modus(0, false);
-	graphicswidget_m->update_pixel_value(-1,-1);
-	graphicswidget_y->update_pixel_value(-1,-1);
-	graphicswidget_x->update_pixel_value(-1,-1);
+	graphicswidget_m->update_pixel_value(-1, -1);
+	graphicswidget_y->update_pixel_value(-1, -1);
+	graphicswidget_x->update_pixel_value(-1, -1);
 	graphicswidget_m->set_show_cursor(false);
 	graphicswidget_y->set_show_cursor(false);
 	graphicswidget_x->set_show_cursor(false);
@@ -2939,19 +2952,19 @@ void Aliza::stop_anim()
 	graphicswidget_m->set_mouse_modus(saved_mouse_modus, tmp0);
 	graphicswidget_y->set_mouse_modus(saved_mouse_modus, false);
 	graphicswidget_x->set_mouse_modus(saved_mouse_modus, false);
-	graphicswidget_m->update_pixel_value(-1,-1);
-	graphicswidget_y->update_pixel_value(-1,-1);
-	graphicswidget_x->update_pixel_value(-1,-1);
+	graphicswidget_m->update_pixel_value(-1, -1);
+	graphicswidget_y->update_pixel_value(-1, -1);
+	graphicswidget_x->update_pixel_value(-1, -1);
 	graphicswidget_m->set_show_cursor(saved_show_cursor);
 	graphicswidget_y->set_show_cursor(saved_show_cursor);
 	graphicswidget_x->set_show_cursor(saved_show_cursor);
-	if (saved_mouse_modus==1)
+	if (saved_mouse_modus == 1)
 	{
 		graphicswidget_m->update_frames();
 		graphicswidget_y->update_frames();
 		graphicswidget_x->update_frames();
 	}
-	if (saved_mouse_modus==1||saved_mouse_modus==2)
+	if (saved_mouse_modus == 1 || saved_mouse_modus == 2)
 	{
 		rectAct->setIcon(nocut_icon);
 	}
@@ -2990,7 +3003,7 @@ void Aliza::zoom_minus_3d()
 void Aliza::update_slice_from_animation(const ImageVariant * v)
 {
 	const int a = graphicswidget_m->get_axis();
-	switch(a)
+	switch (a)
 	{
 	case 0:
 		slider_m->set_slice(v->di->selected_x_slice);
@@ -3056,22 +3069,22 @@ void Aliza::width_from_histogram_min(double x)
 	disconnect(toolbox2D->center_doubleSpinBox,SIGNAL(valueChanged(double)),this,SLOT(center_from_spinbox(double)));
 	const double div_ = v->di->rmax - v->di->rmin;
 	double new_width = x;
-	if (new_width<=0) new_width=1e-9;
-	else if (new_width>1.0) new_width=1.0;
-	const double tmp1 = new_width*div_;
+	if (new_width <= 0) new_width = 1e-9;
+	else if (new_width > 1.0) new_width = 1.0;
+	const double tmp1 = new_width * div_;
 	double old_min = v->di->window_center - v->di->window_width*0.5;
 	double new_min = old_min - (new_width - v->di->window_width);
-	double new_center = new_min + new_width*0.5;
-	if (new_center<0.0) new_center=0.0;
-	else if (new_center>1.0) new_center=1.0;
-	double tmp2 = new_center*div_ + v->di->rmin;
+	double new_center = new_min + new_width * 0.5;
+	if (new_center < 0.0) new_center = 0.0;
+	else if (new_center > 1.0) new_center = 1.0;
+	double tmp2 = new_center * div_ + v->di->rmin;
 	if (tmp2 > v->di->rmax) tmp2 = v->di->rmax;
 	else if (tmp2 < v->di->rmin) tmp2 = v->di->rmin;
 	v->di->window_center = new_center;
 	v->di->window_width  = new_width;
 	v->di->us_window_center = tmp2;
 	v->di->us_window_width  = tmp1;
-	if (v->group_id>=0) update_group_width(v);
+	if (v->group_id >= 0) update_group_width(v);
 	toolbox2D->width_doubleSpinBox->setValue(v->di->us_window_width);
 	toolbox2D->center_doubleSpinBox->setValue(v->di->us_window_center);
 	toolbox2D->width_horizontalSlider->setValue(static_cast<int>(v->di->us_window_width));
@@ -3103,22 +3116,22 @@ void Aliza::width_from_histogram_max(double x)
 	disconnect(toolbox2D->center_doubleSpinBox,SIGNAL(valueChanged(double)),this,SLOT(center_from_spinbox(double)));
 	const double div_ = v->di->rmax - v->di->rmin;
 	double new_width = x;
-	if (new_width<=0) new_width=1e-9;
-	else if (new_width>1.0) new_width=1.0;
-	const double tmp1 = new_width*div_;
-	double old_max = v->di->window_center + v->di->window_width*0.5;
+	if (new_width <= 0) new_width = 1e-9;
+	else if (new_width > 1.0) new_width = 1.0;
+	const double tmp1 = new_width * div_;
+	double old_max = v->di->window_center + v->di->window_width * 0.5;
 	double new_max = old_max + (new_width - v->di->window_width);
-	double new_center = new_max-new_width*0.5;
-	if (new_center<0.0) new_center=0.0;
-	else if (new_center>1.0) new_center=1.0;
-	double tmp2 = new_center*div_ + v->di->rmin;
+	double new_center = new_max-new_width * 0.5;
+	if (new_center < 0.0) new_center = 0.0;
+	else if (new_center > 1.0) new_center = 1.0;
+	double tmp2 = new_center * div_ + v->di->rmin;
 	if (tmp2 > v->di->rmax) tmp2 = v->di->rmax;
 	else if (tmp2 < v->di->rmin) tmp2 = v->di->rmin;
 	v->di->window_center = new_center;
 	v->di->window_width = new_width;
 	v->di->us_window_center = tmp2;
 	v->di->us_window_width  = tmp1;
-	if (v->group_id>=0) update_group_width(v);
+	if (v->group_id >= 0) update_group_width(v);
 	toolbox2D->width_doubleSpinBox->setValue(v->di->us_window_width);
 	toolbox2D->center_doubleSpinBox->setValue(v->di->us_window_center);
 	toolbox2D->width_horizontalSlider->setValue(static_cast<int>(v->di->us_window_width));
@@ -3147,12 +3160,12 @@ void Aliza::center_from_histogram(double x)
 	disconnect(toolbox2D->center_doubleSpinBox,SIGNAL(valueChanged(double)),this,SLOT(center_from_spinbox(double)));
 	const double div_ = v->di->rmax - v->di->rmin;
 	double new_center = x;
-	if (new_center<0.0) new_center=0.0;
-	if (new_center>1.0) new_center=1.0;
+	if (new_center < 0.0) new_center = 0.0;
+	if (new_center > 1.0) new_center = 1.0;
 	v->di->us_window_center = new_center*div_+v->di->rmin;
 	v->di->window_center = new_center;
-	v->di->window_width = div_>0 ? v->di->us_window_width/div_ : 1e-9;
-	if (v->group_id>=0) update_group_center(v);
+	v->di->window_width = div_ > 0 ? v->di->us_window_width/div_ : 1e-9;
+	if (v->group_id >= 0) update_group_center(v);
 	toolbox2D->center_doubleSpinBox->setValue(v->di->us_window_center);
 	toolbox2D->center_horizontalSlider->setValue(static_cast<int>(v->di->us_window_center));
 #if 0
@@ -3316,7 +3329,7 @@ quit__:
 void Aliza::create_group()
 {
 	bool ok = false;
-	QString message_ = create_group_(&ok,true);
+	QString message_ = create_group_(&ok, true);
 	if (!message_.isEmpty())
 	{
 		QMessageBox mbox;
@@ -3456,9 +3469,9 @@ void Aliza::start_3D_anim()
 		graphicswidget_m->set_show_cursor(false);
 		graphicswidget_y->set_show_cursor(false);
 		graphicswidget_x->set_show_cursor(false);
-		graphicswidget_m->update_pixel_value(-1,-1);
-		graphicswidget_y->update_pixel_value(-1,-1);
-		graphicswidget_x->update_pixel_value(-1,-1);
+		graphicswidget_m->update_pixel_value(-1, -1);
+		graphicswidget_y->update_pixel_value(-1, -1);
+		graphicswidget_x->update_pixel_value(-1, -1);
 		animate_();
 	}
 }
@@ -3578,7 +3591,10 @@ int Aliza::get_num_images() const
 		mutex0.unlock();
 		return scene3dimages.size();
 	}
-	else { return -1; }
+	else
+	{
+		return -1;
+	}
 }
 
 void Aliza::update_group_width(const ImageVariant * v)
@@ -3603,16 +3619,16 @@ void Aliza::update_group_width(const ImageVariant * v)
 				if (tmp3 < v2->di->rmin) tmp3 = tmp3>v2->di->rmin;
 				double tmp4 =
 					(tmp3 + (-v2->di->rmin)) / (v2->di->rmax - v2->di->rmin);
-				if (tmp4<0.0) tmp4=0.0;
-				if (tmp4>1.0) tmp4=1.0;
+				if (tmp4 < 0.0) tmp4 = 0.0;
+				if (tmp4 > 1.0) tmp4 = 1.0;
 				v2->di->us_window_center = tmp3;
 				v2->di->window_center = tmp4;
 				double tmp5 = v->di->us_window_width;
 				double div2_ = v2->di->rmax - v2->di->rmin;
-				if (div2_<=0) div2_=1e-9;
+				if (div2_ <= 0) div2_ = 1e-9;
 				double tmp6 = tmp5/div2_;
-				if (tmp6<=0) tmp6=1e-9;
-				else if (tmp6>1.0) tmp6=1.0;
+				if (tmp6 <= 0) tmp6 = 1e-9;
+				else if (tmp6 > 1.0) tmp6 = 1.0;
 				v2->di->us_window_width = tmp5;
 				v2->di->window_width = tmp6;
 			}
@@ -3642,10 +3658,10 @@ void Aliza::update_group_center(const ImageVariant * v)
 				if (tmp0 > v2->di->rmax) tmp0 = tmp0>v2->di->rmax;
 				if (tmp0 < v2->di->rmin) tmp0 = tmp0>v2->di->rmin;
 				double div2_ = v2->di->rmax - v2->di->rmin;
-				if (div2_<=0) div2_=1e-9;
+				if (div2_ <= 0) div2_ = 1e-9;
 				double tmp1 = (tmp0 + (-v2->di->rmin)) / div2_;
-				if (tmp1<0.0) tmp1 = 0.0;
-				if (tmp1>1.0) tmp1 = 1.0;
+				if (tmp1 < 0.0) tmp1 = 0.0;
+				if (tmp1 > 1.0) tmp1 = 1.0;
 				v2->di->us_window_center = tmp0;
 				v2->di->window_center = tmp1;
 			}
@@ -3663,7 +3679,7 @@ void Aliza::flipX()
 		!run__ &&
 #endif
 		!graphicswidget_m->run__)
-		graphicswidget_m->update_image(0,false,true);
+		graphicswidget_m->update_image(0, false, true);
 }
 
 void Aliza::flipY()
@@ -3675,7 +3691,7 @@ void Aliza::flipY()
 		!run__ &&
 #endif
 		!graphicswidget_m->run__)
-		graphicswidget_m->update_image(0,false,true);
+		graphicswidget_m->update_image(0, false, true);
 }
 
 void Aliza::toggle_maxwindow(bool i)
@@ -3696,7 +3712,7 @@ void Aliza::toggle_maxwindow(bool i)
 	qApp->processEvents();
 	v->di->maxwindow = i;
 	load_3d(v, true, true, false, true);
-	if (!v->histogram.isNull()) add_histogram(v,NULL,false);
+	if (!v->histogram.isNull()) add_histogram(v, NULL, false);
 	histogramview->update__(v);
 	disconnect_tools();
 	toolbox2D->disconnect_sliders();
@@ -3725,10 +3741,10 @@ void Aliza::toggle_maxwindow(bool i)
 	}
 	toolbox2D->connect_sliders();
 	connect_tools();
-	graphicswidget_m->set_slice_2D(v,0,true);
+	graphicswidget_m->set_slice_2D(v, 0, true);
 	check_slice_collisions(const_cast<const ImageVariant *>(v), graphicswidget_m);
-	if (multiview) graphicswidget_y->set_slice_2D(v,0,false);
-	if (multiview) graphicswidget_x->set_slice_2D(v,0,false);
+	if (multiview) graphicswidget_y->set_slice_2D(v, 0, false);
+	if (multiview) graphicswidget_x->set_slice_2D(v, 0, false);
 	QApplication::restoreOverrideCursor();
 quit__:
 	if (ok3d) glwidget->set_skip_draw(false);
@@ -3752,7 +3768,7 @@ void Aliza::reset_3d()
 	glwidget->pan_x  = 0;
 	glwidget->pan_y  = 0;
 	glwidget->camera->reset();
-	glwidget->camera->set_position(0.0f,0.0f,SCENE_POS_Z);
+	glwidget->camera->set_position(0.0f, 0.0f, SCENE_POS_Z);
 	glwidget->set_cube(true);
 	glwidget->set_display_contours(true);
 	toolbox->fov_doubleSpinBox->setValue(SCENE_FOV);
@@ -3761,7 +3777,7 @@ void Aliza::reset_3d()
 	toolbox->contours_checkBox->setChecked(true);
 	toolbox->cube_checkBox->setChecked(true);
 	glwidget->fit_to_screen(get_selected_image_const());
-	const double far_plane = 7*CommonUtils::calculate_max_delta(get_selected_image_const());
+	const double far_plane = 7 * CommonUtils::calculate_max_delta(get_selected_image_const());
 	glwidget->update_far_plane(static_cast<float>(far_plane));
 	toolbox->far_doubleSpinBox->setValue(far_plane);
 	connect(toolbox->fov_doubleSpinBox,   SIGNAL(valueChanged(double)),glwidget,SLOT(set_fov(double)));
@@ -4073,9 +4089,9 @@ void Aliza::trigger_image_color()
 	ImageVariant * v = get_selected_image();
 	if (!v) goto quit__;
 	old_color = QColor(
-		round(v->di->R*255.0),
-		round(v->di->G*255.0),
-		round(v->di->B*255.0));
+		round(v->di->R * 255.0),
+		round(v->di->G * 255.0),
+		round(v->di->B * 255.0));
 	new_color = QColorDialog::getColor(old_color);
 	if(new_color.isValid())
 	{
@@ -4293,12 +4309,12 @@ void Aliza::load_dicom_file(int * image_id,
 			0,
 			settingswidget->get_enh_strategy());
 	}
-	catch (mdcm::ParseException & pe)
+	catch (const mdcm::ParseException & pe)
 	{
 		std::cout << "mdcm::ParseException in Aliza::load_dicom_file:\n"
 			<< pe.GetLastElement().GetTag() << std::endl;
 	}
-	catch (std::exception & ex)
+	catch (const std::exception & ex)
 	{
 		std::cout << "Exception in Aliza::load_dicom_file:\n"
 			<< ex.what() << std::endl;
@@ -4306,7 +4322,7 @@ void Aliza::load_dicom_file(int * image_id,
 	if (error__.isEmpty())
 	{
 		ok = true;
-		if (ivariants.size()==1 && ivariants.at(0))
+		if (ivariants.size() == 1 && ivariants.at(0))
 		{
 			*image_id = ivariants.at(0)->id;
 		}
@@ -4353,7 +4369,11 @@ quit__:
 							static_cast<ListWidgetItem2*>(
 								imagesbox->listWidget->item(x));
 						if (item) id0 = item->get_id();
-						if (id0 == ivariants.at(j)->id) { r = x; break; }
+						if (id0 == ivariants.at(j)->id)
+						{
+							r = x;
+							break;
+						}
 					}
 					if (r > -1)
 					{
@@ -4498,7 +4518,7 @@ void Aliza::trigger_show_roi_info()
 				{
 					++count_contours;
 					const short ct = c->type;
-					switch(ct)
+					switch (ct)
 					{
 					case 1:
 						if (!has_closed_planar) has_closed_planar = true;
@@ -4692,12 +4712,6 @@ void Aliza::trigger_studyview_checked()
 	mutex0.unlock();
 	qApp->processEvents();
 }
-
-#if 0
-void Aliza::trigger_studyview_all()
-{
-}
-#endif
 
 void Aliza::update_studyview_intersections()
 {

@@ -2141,12 +2141,12 @@ void build_maps(
 			find_pn_recurs__(ds, pids, implicit, dicts);
 			find_ids_recurs__(ds, id_tags, ids, pat_ids_l, implicit, dicts);
 		}
-		catch(mdcm::ParseException & pe)
+		catch (const mdcm::ParseException & pe)
 		{
 			std::cout << "mdcm::ParseException in build_maps:\n"
 				<< pe.GetLastElement().GetTag() << std::endl;
 		}
-		catch(std::exception & ex)
+		catch (const std::exception & ex)
 		{
 			std::cout << "Exception in build_maps:\n"
 				<< ex.what() << std::endl;
@@ -2745,13 +2745,13 @@ void AnonymazerWidget2::run_()
 			rename_files,
 			pd);
 	}
-	catch(mdcm::ParseException & pe)
+	catch (const mdcm::ParseException & pe)
 	{
 		std::cout
 			<< "mdcm::ParseException in AnonymazerWidget2::run_\n"
 			<< pe.GetLastElement().GetTag() << std::endl;
 	}
-	catch(std::exception & ex)
+	catch (const std::exception & ex)
 	{
 		std::cout << "Exception in AnonymazerWidget2::run_\n"
 			<< ex.what() << std::endl;

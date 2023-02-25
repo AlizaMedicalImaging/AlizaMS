@@ -50,8 +50,8 @@ SettingsWidget::~SettingsWidget()
 
 short SettingsWidget::get_filtering() const
 {
-	if      (f_no_radioButton->isChecked())        return 0;
-	else if (f_bilinear_radioButton->isChecked())  return 1;
+	if      (f_no_radioButton->isChecked())       return 0;
+	else if (f_bilinear_radioButton->isChecked()) return 1;
 	return 0;
 }
 
@@ -317,19 +317,19 @@ void SettingsWidget::writeSettings(QSettings & s)
 	s.setValue(QString("clean_unused"),  QVariant(clean_unused_checkBox->isChecked() ? 1 : 0));
 	if (enh_dim_skip_radioButton->isChecked())
 	{
-		s.setValue(QString("enh_strategy"),  QVariant(4));
+		s.setValue(QString("enh_strategy"), QVariant(4));
 	}
 	else if (enh_dim_strict_1_radioButton->isChecked())
 	{
-		s.setValue(QString("enh_strategy"),  QVariant(3));
+		s.setValue(QString("enh_strategy"), QVariant(3));
 	}
 	else if (enh_dim_strict_radioButton->isChecked())
 	{
-		s.setValue(QString("enh_strategy"),  QVariant(2));
+		s.setValue(QString("enh_strategy"), QVariant(2));
 	}
 	else // default
 	{
-		s.setValue(QString("enh_strategy"),  QVariant(1));
+		s.setValue(QString("enh_strategy"), QVariant(1));
 	}
 	s.endGroup();
 	s.beginGroup(QString("StyleDialog"));

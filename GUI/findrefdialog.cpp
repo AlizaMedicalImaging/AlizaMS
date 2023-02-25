@@ -5,7 +5,8 @@
 FindRefDialog::FindRefDialog(float si)
 {
 	setupUi(this);
-	const QSize s = QSize((int)(24*si),(int)(24*si));
+	const QSize s = QSize(
+		static_cast<int>(24 * si),static_cast<int>(24 * si));
 	toolButton->setIconSize(s);
 	connect(toolButton, SIGNAL(clicked()), this, SLOT(select_dir()));
 }

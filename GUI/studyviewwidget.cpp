@@ -26,7 +26,8 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 	//
 	const int widgets_size = 25;
 	//
-	const QSize s1 = QSize(static_cast<int>(18*si),static_cast<int>(18*si));
+	const QSize s1 = QSize(
+		static_cast<int>(18 * si),static_cast<int>(18 * si));
 	lockon = QIcon(QString(":/bitmaps/lock.svg"));
 	lockoff = QIcon(QString(":/bitmaps/unlock.svg"));
 	resetlevel_pushButton->setIconSize(s1);
@@ -52,7 +53,7 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 	QWidget * spacer1 = new QWidget(this);
 	spacer1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	QHBoxLayout * l1 = new QHBoxLayout(toolbar_frame);
-	l1->setContentsMargins(0,0,0,0);
+	l1->setContentsMargins(0, 0, 0, 0);
 	l1->setSpacing(4);
 	l1->addWidget(mbutton);
 	l1->addWidget(fitall_toolButton);
@@ -62,7 +63,7 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 	lutwidget  = new LUTWidget(si);
 	lutwidget->add_items1();
 	QVBoxLayout * l2 = new QVBoxLayout(lut_frame);
-	l2->setContentsMargins(0,0,0,0);
+	l2->setContentsMargins(0, 0, 0, 0);
 	l2->setSpacing(0);
 	l2->addWidget(lutwidget);
 	QGridLayout * gridLayout = new QGridLayout(frame);

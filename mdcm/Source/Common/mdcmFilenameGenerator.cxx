@@ -97,7 +97,7 @@ FilenameGenerator::Generate()
     {
       internal = new char[internal_len];
     }
-    catch (std::bad_alloc&)
+    catch (const std::bad_alloc&)
     {
       return false;
     }

@@ -54,7 +54,7 @@ public:
 	void update_image(
 		const short /*fit*/,
 		const bool /*lock*/);
-	void clear_(bool=true);
+	void clear_(bool = true);
 	ImageContainer image_container;
 	void  update_pr_area();
 	void  update_background_color();

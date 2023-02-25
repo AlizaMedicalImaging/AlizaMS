@@ -48,20 +48,20 @@ MainWindow::MainWindow(
 				QVariant(QString("Dark Fusion"))).toString();
 		settings.endGroup();
 		int width_ = 0, height_ = 0;
-		desktop_layout(&width_,&height_);
-		const int w = static_cast<int>(static_cast<double>(width_)*0.7);
-		const int h = static_cast<int>(static_cast<double>(height_)*0.7);
+		desktop_layout(&width_, &height_);
+		const int w = static_cast<int>(static_cast<double>(width_) * 0.7);
+		const int h = static_cast<int>(static_cast<double>(height_) * 0.7);
 		settings.beginGroup(QString("MainWindow"));
 		dock_area = settings.value(QString("dock_area"), 2).toInt();
-		resize(settings.value(QString("size"), QSize(w,h)).toSize());
-		move(settings.value(QString("pos"), QPoint(50,50)).toPoint());
+		resize(settings.value(QString("size"), QSize(w, h)).toSize());
+		move(settings.value(QString("pos"), QPoint(50, 50)).toPoint());
 #ifdef USE_WORKSTATION_MODE
 		CommonUtils::set_open_dir(settings.value(QString("open_dir"), QString("")).toString());
 #endif
 		settings.endGroup();
 	}
 	dockWidget1 = new QDockWidget(this);
-	dockWidget1->setAllowedAreas(Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea);
+	dockWidget1->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	dockWidget1->setFloating(false);
 	dockWidget1->setFeatures(QDockWidget::DockWidgetMovable);
 	addDockWidget(
@@ -78,7 +78,7 @@ MainWindow::MainWindow(
 	}
 	QVBoxLayout * l1 = new QVBoxLayout(imagesbox_frame1);
 	l1->setSpacing(0);
-	l1->setContentsMargins(0,0,0,0);
+	l1->setContentsMargins(0, 0, 0, 0);
 	l1->addWidget(imagesbox);
 	dockWidget1->setWidget(imagesbox_frame1);
 	imagesbox_frame1->hide();
@@ -104,23 +104,23 @@ MainWindow::MainWindow(
 	if (force_vertical || (sheight > swidth))
 	{
 		QVBoxLayout * vl991 = new QVBoxLayout(views_frame);
-		vl991->setContentsMargins(0,0,0,0);
+		vl991->setContentsMargins(0, 0, 0, 0);
 		vl991->setSpacing(0);
 		vl991->addWidget(frame2D);
 		vl991->addWidget(frame3D);
 #if 1
-		if (sheight > 1920) scale_icons = sheight/1920.0f;
+		if (sheight > 1920) scale_icons = sheight / 1920.0f;
 #endif
 	}
 	else
 	{
 		QHBoxLayout * vl991 = new QHBoxLayout(views_frame);
-		vl991->setContentsMargins(0,0,0,0);
+		vl991->setContentsMargins(0, 0, 0, 0);
 		vl991->setSpacing(0);
 		vl991->addWidget(frame2D);
 		vl991->addWidget(frame3D);
 #if 1
-		if (swidth > 1920) scale_icons = swidth/1920.0f;
+		if (swidth > 1920) scale_icons = swidth / 1920.0f;
 #endif
 	}
 	aboutwidget = new AboutWidget(swidth, sheight);
@@ -128,14 +128,14 @@ MainWindow::MainWindow(
 	//
 	toolbox = new ToolBox();
 	QVBoxLayout * vl0 = new QVBoxLayout(toolbox3D_frame);
-	vl0->setContentsMargins(0,0,0,0);
+	vl0->setContentsMargins(0, 0, 0, 0);
 	vl0->setSpacing(0);
 	vl0->addWidget(toolbox);
 	//
 	anim3Dwidget = new AnimWidget(scale_icons*adjust_scale_icons);
 	anim3Dwidget->label->setText(QString("3D+t"));
 	QVBoxLayout * vl98 = new QVBoxLayout(anim3D_frame);
-	vl98->setContentsMargins(0,0,0,0);
+	vl98->setContentsMargins(0, 0, 0, 0);
 	vl98->setSpacing(0);
 	vl98->addWidget(anim3Dwidget);
 	//
@@ -145,14 +145,14 @@ MainWindow::MainWindow(
 	anim2Dwidget->remove_pushButton->hide();
 	anim2Dwidget->t_checkBox->hide();
 	QVBoxLayout * vl99 = new QVBoxLayout(anim2D_frame);
-	vl99->setContentsMargins(0,0,0,0);
+	vl99->setContentsMargins(0, 0, 0, 0);
 	vl99->setSpacing(0);
 	vl99->addWidget(anim2Dwidget);
 	//
 	toolbox2D = new ToolBox2D(scale_icons*adjust_scale_icons);
 	QVBoxLayout * l2 = new QVBoxLayout(level_frame);
 	l2->setSpacing(0);
-	l2->setContentsMargins(0,0,0,0);
+	l2->setContentsMargins(0, 0, 0, 0);
 	l2->addWidget(toolbox2D);
 	//
 	lutwidget2 = new LUTWidget(scale_icons*adjust_scale_icons);
@@ -171,30 +171,30 @@ MainWindow::MainWindow(
 	//
 	frame2D_viewer_layout = new QVBoxLayout(frame2D_viewer);
 	frame2D_viewer_layout->setSpacing(0);
-	frame2D_viewer_layout->setContentsMargins(0,0,0,0);
+	frame2D_viewer_layout->setContentsMargins(0, 0, 0, 0);
 	//
 	frame2D_viewerZ_layout = new QVBoxLayout(frame2D_viewerZ);
 	frame2D_viewerZ_layout->setSpacing(0);
-	frame2D_viewerZ_layout->setContentsMargins(0,0,0,0);
+	frame2D_viewerZ_layout->setContentsMargins(0, 0, 0, 0);
 	//
 	slider_m  = new SliderWidget();
 	slider_frame_layout = new QVBoxLayout(slider_frame);
 	slider_frame_layout->setSpacing(0);
-	slider_frame_layout->setContentsMargins(0,0,0,0);
+	slider_frame_layout->setContentsMargins(0, 0, 0, 0);
 	slider_frame_layoutZ = new QVBoxLayout(slider_frameZ);
 	slider_frame_layoutZ->setSpacing(0);
-	slider_frame_layoutZ->setContentsMargins(0,0,0,0);
+	slider_frame_layoutZ->setContentsMargins(0, 0, 0, 0);
 	//
 	slider_y  = new SliderWidget();
 	QVBoxLayout * l10 = new QVBoxLayout(slider_frameY);
 	l10->setSpacing(0);
-	l10->setContentsMargins(0,0,0,0);
+	l10->setContentsMargins(0, 0, 0, 0);
 	l10->addWidget(slider_y);
 	//
 	slider_x  = new SliderWidget();
 	QVBoxLayout * l11 = new QVBoxLayout(slider_frameX);
 	l11->setSpacing(0);
-	l11->setContentsMargins(0,0,0,0);
+	l11->setContentsMargins(0, 0, 0, 0);
 	l11->addWidget(slider_x);
 	//
 	graphicswidget_m  = new GraphicsWidget(
@@ -221,7 +221,7 @@ MainWindow::MainWindow(
 		graphicswidget_frame, multi_frame);
 	QVBoxLayout * l7 = new QVBoxLayout(frame2D_viewerY);
 	l7->setSpacing(0);
-	l7->setContentsMargins(0,0,0,0);
+	l7->setContentsMargins(0, 0, 0, 0);
 	l7->addWidget(graphicswidget_y);
 	graphicswidget_y->set_sliderwidget(slider_y);
 	graphicswidget_y->set_toolbox2D_widget(toolbox2D);
@@ -236,7 +236,7 @@ MainWindow::MainWindow(
 		graphicswidget_frame, multi_frame);
 	QVBoxLayout * l8 = new QVBoxLayout(frame2D_viewerX);
 	l8->setSpacing(0);
-	l8->setContentsMargins(0,0,0,0);
+	l8->setContentsMargins(0, 0, 0, 0);
 	l8->addWidget(graphicswidget_x);
 	graphicswidget_x->set_sliderwidget(slider_x);
 	graphicswidget_x->set_toolbox2D_widget(toolbox2D);
@@ -260,30 +260,30 @@ MainWindow::MainWindow(
 	zrangewidget = new ZRangeWidget();
 	QVBoxLayout * l13 = new QVBoxLayout(zrange_frame);
 	l13->setSpacing(0);
-	l13->setContentsMargins(0,0,0,0);
+	l13->setContentsMargins(0, 0, 0, 0);
 	l13->addWidget(zrangewidget);
 	//
 	sqtree = new SQtree(true);
 	QVBoxLayout * vl296 = new QVBoxLayout(metadata_frame);
-	vl296->setContentsMargins(0,0,0,0);
+	vl296->setContentsMargins(0, 0, 0, 0);
 	vl296->setSpacing(0);
 	vl296->addWidget(sqtree);
 	//
 	browser2 = new BrowserWidget2(scale_icons*adjust_scale_icons);
 	QVBoxLayout * vl396 = new QVBoxLayout(browser2_frame);
-	vl396->setContentsMargins(0,0,0,0);
+	vl396->setContentsMargins(0, 0, 0, 0);
 	vl396->setSpacing(0);
 	vl396->addWidget(browser2);
 	//
 	anonymizer = new AnonymazerWidget2(scale_icons*adjust_scale_icons);
 	QVBoxLayout * vl196 = new QVBoxLayout(deidentify_frame);
-	vl196->setContentsMargins(0,0,0,0);
+	vl196->setContentsMargins(0, 0, 0, 0);
 	vl196->setSpacing(0);
 	vl196->addWidget(anonymizer);
 	//
 	settingswidget = new SettingsWidget(scale_icons);
 	QVBoxLayout * vl496 = new QVBoxLayout(settings_frame);
-	vl496->setContentsMargins(0,0,0,0);
+	vl496->setContentsMargins(0, 0, 0, 0);
 	vl496->setSpacing(0);
 	vl496->addWidget(settingswidget);
 	//
@@ -317,7 +317,7 @@ MainWindow::MainWindow(
 #endif
 #endif
 		QVBoxLayout * vl2 = new QVBoxLayout(gl_frame);
-		vl2->setContentsMargins(0,0,0,0);
+		vl2->setContentsMargins(0, 0, 0, 0);
 		vl2->addWidget(glwidget);
 	}
 	else
@@ -390,11 +390,11 @@ MainWindow::MainWindow(
 		this, static_cast<QObject*>(aliza), multi_frame, false);
 	histogram_frame_layout = new QVBoxLayout(histogram_frame);
 	histogram_frame_layout->setSpacing(0);
-	histogram_frame_layout->setContentsMargins(0,0,0,0);
+	histogram_frame_layout->setContentsMargins(0, 0, 0, 0);
 	histogram_frame_layout->addWidget(histogramview);
 	histogram_frame2_layout = new QVBoxLayout(histogram_frame2);
 	histogram_frame2_layout->setSpacing(0);
-	histogram_frame2_layout->setContentsMargins(0,0,0,0);
+	histogram_frame2_layout->setContentsMargins(0, 0, 0, 0);
 	aliza->set_histogramview(histogramview);
 	//
 	first_image_loaded = false;
@@ -541,7 +541,7 @@ void MainWindow::open_args(const QStringList & l)
 	int i = 0;
 	while (i < lsize)
 	{
-		if (l.at(i)==QString("-nogl") || l.at(i)==QString("--nogl"))
+		if (l.at(i) == QString("-nogl") || l.at(i) == QString("--nogl"))
 		{
 			;;
 		}
@@ -551,7 +551,7 @@ void MainWindow::open_args(const QStringList & l)
 		}
 		++i;
 	}
-	if (l2.size()==0)
+	if (l2.size() == 0)
 	{
 		mutex.unlock();
 		return;
@@ -563,12 +563,12 @@ void MainWindow::open_args(const QStringList & l)
 		0);
 	pb->setWindowModality(Qt::ApplicationModal);
 	pb->setWindowFlags(
-		pb->windowFlags()^Qt::WindowContextHelpButtonHint);
-	connect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
+		pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
+	connect(pb,SIGNAL(canceled()), this, SLOT(exit_null()));
 	pb->setMinimumWidth(256);
 	pb->show();
 	pb->setValue(-1);
-	if (l2.size()==1)
+	if (l2.size() == 1)
 	{
 		const QString f = l2.at(0);
 		QFileInfo fi(f);
@@ -587,7 +587,7 @@ void MainWindow::open_args(const QStringList & l)
 			load_any_file(f, pb, true);
 		}
 	}
-	else if (l2.size()>1)
+	else if (l2.size() > 1)
 	{
 		for (int x = 0; x < l2.size(); ++x)
 		{
@@ -597,7 +597,7 @@ void MainWindow::open_args(const QStringList & l)
 			if (fi.isFile()) load_any_file(l2.at(x), pb, true);
 		}
 	}
-	disconnect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
+	disconnect(pb,SIGNAL(canceled()), this, SLOT(exit_null()));
 	pb->close();
 	delete pb;
 	pb = NULL;
@@ -867,13 +867,13 @@ void MainWindow::createMenus()
 	tools_menu->addAction(collisionAct);
 	tools_menu->addAction(distanceAct);
 	tools_menu->addAction(frames2DAct);
-	QAction * actionToolsSelectMenu  = new QAction(QString("Select sub-image"), this);
+	QAction * actionToolsSelectMenu = new QAction(QString("Select sub-image"), this);
 	QMenu * tools_select_menu = new QMenu(this);
 	tools_select_menu->addAction(rectAct);
 	tools_select_menu->addAction(zrangeAct);
 	actionToolsSelectMenu->setMenu(tools_select_menu);
 	tools_menu->addAction(actionToolsSelectMenu);
-	QAction * actionTools2DMenu  = new QAction(QString("2D Views"), this);
+	QAction * actionTools2DMenu = new QAction(QString("2D Views"), this);
 	QMenu * tools2d_menu = new QMenu(this);
 	tools2d_menu->addAction(transp2dAct);
 	tools2d_menu->addAction(resetRectAct2);
@@ -881,7 +881,7 @@ void MainWindow::createMenus()
 	tools2d_menu->addAction(flipYAct);
 	actionTools2DMenu->setMenu(tools2d_menu);
 	tools_menu->addAction(actionTools2DMenu);
-	QAction * actionTools3DMenu  = new QAction(QString("3D Views"), this);
+	QAction * actionTools3DMenu = new QAction(QString("3D Views"), this);
 	QMenu * tools3d_menu = new QMenu(this);
 	tools3d_menu->addAction(trans3DAct);
 	tools3d_menu->addAction(frames3DAct);
@@ -923,19 +923,19 @@ void MainWindow::createToolBars()
 {
 	toolbar4 = new QToolBar(this);
 	toolbar4->setIconSize(
-		QSize(static_cast<int>(18*scale_icons*adjust_scale_icons),
-			static_cast<int>(18*scale_icons*adjust_scale_icons)));
+		QSize(static_cast<int>(18 * scale_icons*adjust_scale_icons),
+			static_cast<int>(18 * scale_icons*adjust_scale_icons)));
 	if (toolbar4->layout())
 	{
-		toolbar4->layout()->setContentsMargins(0,0,0,0);
+		toolbar4->layout()->setContentsMargins(0, 0, 0, 0);
 		toolbar4->layout()->setSpacing(2);
 	}
 	QHBoxLayout * l4 = new QHBoxLayout(view2d_frame);
-	l4->setContentsMargins(0,0,0,0);
+	l4->setContentsMargins(0, 0, 0, 0);
 	l4->setSpacing(0);
 	l4->addWidget(toolbar4);
 	view2d_label->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
-	view2d_label->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
+	view2d_label->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	toolbar4->addWidget(view2d_label);
 	toolbar4->addAction(graphicsAct_Z);
 	toolbar4->addAction(zyxAct);
@@ -949,19 +949,19 @@ void MainWindow::createToolBars()
 	//
 	toolbar5 = new QToolBar(this);
 	toolbar5->setIconSize(
-		QSize(static_cast<int>(18*scale_icons*adjust_scale_icons),
-			static_cast<int>(18*scale_icons*adjust_scale_icons)));
+		QSize(static_cast<int>(18 * scale_icons*adjust_scale_icons),
+			static_cast<int>(18 * scale_icons*adjust_scale_icons)));
 	if (toolbar5->layout())
 	{
-		toolbar5->layout()->setContentsMargins(0,0,0,0);
+		toolbar5->layout()->setContentsMargins(0, 0, 0, 0);
 		toolbar5->layout()->setSpacing(2);
 	}
 	QHBoxLayout * l5 = new QHBoxLayout(view3d_frame);
-	l5->setContentsMargins(0,0,0,0);
+	l5->setContentsMargins(0, 0, 0, 0);
 	l5->setSpacing(0);
 	l5->addWidget(toolbar5);
 	view3d_label->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
-	view3d_label->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
+	view3d_label->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	toolbar5->addWidget(view3d_label);
 	toolbar5->addAction(slicesAct);
 	toolbar5->addAction(raycastAct);
@@ -973,15 +973,15 @@ void MainWindow::createToolBars()
 	//
 	toolbar2 = new QToolBar(this);
 	toolbar2->setIconSize(
-		QSize(static_cast<int>(18*scale_icons*adjust_scale_icons),
-			static_cast<int>(18*scale_icons*adjust_scale_icons)));
+		QSize(static_cast<int>(18 * scale_icons*adjust_scale_icons),
+			static_cast<int>(18 * scale_icons*adjust_scale_icons)));
 	if (toolbar2->layout())
 	{
-		toolbar2->layout()->setContentsMargins(0,0,0,0);
+		toolbar2->layout()->setContentsMargins(0, 0, 0, 0);
 		toolbar2->layout()->setSpacing(2);
 	}
 	QHBoxLayout * l2 = new QHBoxLayout(toolbar2D_frame);
-	l2->setContentsMargins(0,0,0,0);
+	l2->setContentsMargins(0, 0, 0, 0);
 	l2->setSpacing(0);
 	l2->addWidget(toolbar2);
 	toolbar2->addAction(animAct2d);
@@ -1014,15 +1014,15 @@ void MainWindow::createToolBars()
 	//
 	toolbar3 = new QToolBar(this);
 	toolbar3->setIconSize(
-		QSize(static_cast<int>(18*scale_icons*adjust_scale_icons),
-			static_cast<int>(18*scale_icons*adjust_scale_icons)));
+		QSize(static_cast<int>(18 * scale_icons*adjust_scale_icons),
+			static_cast<int>(18 * scale_icons*adjust_scale_icons)));
 	if (toolbar3->layout())
 	{
-		toolbar3->layout()->setContentsMargins(0,0,0,0);
+		toolbar3->layout()->setContentsMargins(0, 0, 0, 0);
 		toolbar3->layout()->setSpacing(2);
 	}
 	QHBoxLayout * l3 = new QHBoxLayout(toolbar3D_frame);
-	l3->setContentsMargins(0,0,0,0);
+	l3->setContentsMargins(0, 0, 0, 0);
 	l3->setSpacing(0);
 	l3->addWidget(toolbar3);
 	if (!hide_zoom && zoomwidget3D)
@@ -1110,9 +1110,9 @@ void MainWindow::toggle_graphicswidget_m_x(bool t)
 	if (!graphicswidget_m) return;
 	multi_frame->hide();
 	histogram_frame->hide();
-	if (frame2D_viewerZ_layout->indexOf(graphicswidget_m)>0)
+	if (frame2D_viewerZ_layout->indexOf(graphicswidget_m) > 0)
 		frame2D_viewerZ_layout->removeWidget(graphicswidget_m);
-	if (frame2D_viewer_layout->indexOf(graphicswidget_m)<0)
+	if (frame2D_viewer_layout->indexOf(graphicswidget_m) < 0)
 	{
 		frame2D_viewer_layout->addWidget(graphicswidget_m);
 		graphicswidget_m->set_top_label(top_label);
@@ -1120,9 +1120,9 @@ void MainWindow::toggle_graphicswidget_m_x(bool t)
 		graphicswidget_m->set_measure_label(measure_label);
 		graphicswidget_m->set_info_line(info_line);
 	}
-	if (slider_frame_layoutZ->indexOf(slider_m)>0)
+	if (slider_frame_layoutZ->indexOf(slider_m) > 0)
 		slider_frame_layoutZ->removeWidget(slider_m);
-	if (slider_frame_layout->indexOf(slider_m)<0)
+	if (slider_frame_layout->indexOf(slider_m) < 0)
 		slider_frame_layout->addWidget(slider_m);
 	if (graphicswidget_y) graphicswidget_y->clear_(true);
 	if (graphicswidget_x) graphicswidget_x->clear_(true);
@@ -1137,9 +1137,9 @@ void MainWindow::toggle_graphicswidget_m_y(bool t)
 	if (!graphicswidget_m) return;
 	multi_frame->hide();
 	histogram_frame->hide();
-	if (frame2D_viewerZ_layout->indexOf(graphicswidget_m)>0)
+	if (frame2D_viewerZ_layout->indexOf(graphicswidget_m) > 0)
 		frame2D_viewerZ_layout->removeWidget(graphicswidget_m);
-	if (frame2D_viewer_layout->indexOf(graphicswidget_m)<0)
+	if (frame2D_viewer_layout->indexOf(graphicswidget_m) < 0)
 	{
 		frame2D_viewer_layout->addWidget(graphicswidget_m);
 		graphicswidget_m->set_top_label(top_label);
@@ -1147,9 +1147,9 @@ void MainWindow::toggle_graphicswidget_m_y(bool t)
 		graphicswidget_m->set_measure_label(measure_label);
 		graphicswidget_m->set_info_line(info_line);
 	}
-	if (slider_frame_layoutZ->indexOf(slider_m)>0)
+	if (slider_frame_layoutZ->indexOf(slider_m) > 0)
 		slider_frame_layoutZ->removeWidget(slider_m);
-	if (slider_frame_layout->indexOf(slider_m)<0)
+	if (slider_frame_layout->indexOf(slider_m) < 0)
 		slider_frame_layout->addWidget(slider_m);
 	if (graphicswidget_y) graphicswidget_y->clear_(true);
 	if (graphicswidget_x) graphicswidget_x->clear_(true);
@@ -1168,9 +1168,9 @@ void MainWindow::toggle_graphicswidget_m_z(bool t)
 	left_label->clear(); left_labelZ->clear();
 	measure_label->clear(); measure_labelZ->clear();
 	info_line->clear(); info_lineZ->clear();
-	if (frame2D_viewerZ_layout->indexOf(graphicswidget_m)>0)
+	if (frame2D_viewerZ_layout->indexOf(graphicswidget_m) > 0)
 		frame2D_viewerZ_layout->removeWidget(graphicswidget_m);
-	if (frame2D_viewer_layout->indexOf(graphicswidget_m)<0)
+	if (frame2D_viewer_layout->indexOf(graphicswidget_m) < 0)
 	{
 		frame2D_viewer_layout->addWidget(graphicswidget_m);
 		graphicswidget_m->set_top_label(top_label);
@@ -1178,9 +1178,9 @@ void MainWindow::toggle_graphicswidget_m_z(bool t)
 		graphicswidget_m->set_measure_label(measure_label);
 		graphicswidget_m->set_info_line(info_line);
 	}
-	if (slider_frame_layoutZ->indexOf(slider_m)>0)
+	if (slider_frame_layoutZ->indexOf(slider_m) > 0)
 		slider_frame_layoutZ->removeWidget(slider_m);
-	if (slider_frame_layout->indexOf(slider_m)<0)
+	if (slider_frame_layout->indexOf(slider_m) < 0)
 		slider_frame_layout->addWidget(slider_m);
 	if (graphicswidget_y) graphicswidget_y->clear_(true);
 	if (graphicswidget_x) graphicswidget_x->clear_(true);
@@ -1198,9 +1198,9 @@ void MainWindow::toggle_histogram(bool t)
 	if (graphicswidget_m) graphicswidget_m->clear_(true);
 	if (graphicswidget_y) graphicswidget_y->clear_(true);
 	if (graphicswidget_x) graphicswidget_x->clear_(true);
-	if (histogram_frame2_layout->indexOf(histogramview)>0)
+	if (histogram_frame2_layout->indexOf(histogramview) > 0)
 		histogram_frame2_layout->removeWidget(histogramview);
-	if (histogram_frame_layout->indexOf(histogramview)<0)
+	if (histogram_frame_layout->indexOf(histogramview) < 0)
 		histogram_frame_layout->addWidget(histogramview);
 	histogram_frame->show();
 	aliza->set_histogram();
@@ -1219,9 +1219,9 @@ void MainWindow::toggle_graphicswidget_zyx(bool t)
 	info_line->clear(); info_lineZ->clear();
 	graphicswidget_frame->hide();
 	histogram_frame->hide();
-	if (frame2D_viewer_layout->indexOf(graphicswidget_m)>0)
+	if (frame2D_viewer_layout->indexOf(graphicswidget_m) > 0)
 		frame2D_viewer_layout->removeWidget(graphicswidget_m);
-	if (frame2D_viewerZ_layout->indexOf(graphicswidget_m)<0)
+	if (frame2D_viewerZ_layout->indexOf(graphicswidget_m) < 0)
 	{
 		frame2D_viewerZ_layout->addWidget(graphicswidget_m);
 		graphicswidget_m->set_top_label(top_labelZ);
@@ -1229,13 +1229,13 @@ void MainWindow::toggle_graphicswidget_zyx(bool t)
 		graphicswidget_m->set_measure_label(measure_labelZ);
 		graphicswidget_m->set_info_line(info_lineZ);
 	}
-	if (slider_frame_layout->indexOf(slider_m)>0)
+	if (slider_frame_layout->indexOf(slider_m) > 0)
 		slider_frame_layout->removeWidget(slider_m);
-	if (slider_frame_layoutZ->indexOf(slider_m)<0)
+	if (slider_frame_layoutZ->indexOf(slider_m) < 0)
 		slider_frame_layoutZ->addWidget(slider_m);
-	if (histogram_frame_layout->indexOf(histogramview)>0)
+	if (histogram_frame_layout->indexOf(histogramview) > 0)
 		histogram_frame_layout->removeWidget(histogramview);
-	if (histogram_frame2_layout->indexOf(histogramview)<0)
+	if (histogram_frame2_layout->indexOf(histogramview) < 0)
 		histogram_frame2_layout->addWidget(histogramview);
 	multi_frame->show();
 	aliza->set_axis_zyx(rectAct->isChecked());
@@ -1328,7 +1328,7 @@ void MainWindow::dropEvent(QDropEvent * e)
 				0);
 			pb->setWindowModality(Qt::ApplicationModal);
 			pb->setWindowFlags(
-				pb->windowFlags()^Qt::WindowContextHelpButtonHint);
+				pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
 			connect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
 			pb->setMinimumWidth(256);
 			pb->setValue(-1);
@@ -1387,7 +1387,7 @@ void MainWindow::load_any()
 	QProgressDialog * pb = new QProgressDialog(QString("Loading..."), QString("Exit"), 0, 0);
 	connect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
 	pb->setWindowModality(Qt::ApplicationModal);
-	pb->setWindowFlags(pb->windowFlags()^Qt::WindowContextHelpButtonHint);
+	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
 	pb->setMinimumWidth(256);
 	pb->setValue(-1);
 	pb->show();
@@ -1397,7 +1397,7 @@ void MainWindow::load_any()
 	{
 		QFileInfo fi(l.at(x));
 		CommonUtils::set_open_dir(fi.absolutePath());
-		if (x == 0 && fi.isFile() && fi.fileName().toUpper()==QString("DICOMDIR"))
+		if (x == 0 && fi.isFile() && fi.fileName().toUpper() == QString("DICOMDIR"))
 		{
 			is_dicomdir = true;
 			browser2->open_DICOMDIR2(l.at(0));
@@ -1405,7 +1405,7 @@ void MainWindow::load_any()
 		}
 		else
 		{
-			load_any_file(l.at(x),pb,true);
+			load_any_file(l.at(x), pb, true);
 		}
 	}
 	l.clear();
@@ -1415,7 +1415,7 @@ void MainWindow::load_any()
 	pb = NULL;
 	if (is_dicomdir)
 	{
-		if (tabWidget->currentIndex()!=1) tabWidget->setCurrentIndex(1);
+		if (tabWidget->currentIndex() != 1) tabWidget->setCurrentIndex(1);
 	}
 	qApp->processEvents();
 	mutex.unlock();
@@ -1549,9 +1549,9 @@ void MainWindow::load_dicom_series2()
 	}
 	QProgressDialog * pb =
 		new QProgressDialog(QString("Loading..."), QString("Exit"), 0, 0);
-	connect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
+	connect(pb,SIGNAL(canceled()), this, SLOT(exit_null()));
 	pb->setWindowModality(Qt::ApplicationModal);
-	pb->setWindowFlags(pb->windowFlags()^Qt::WindowContextHelpButtonHint);
+	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
 	pb->setMinimumWidth(256);
 	pb->setValue(-1);
 	pb->show();
@@ -1631,7 +1631,7 @@ void MainWindow::start_3D_anim()
 	bool ok = false;
 	QString message_ = QString("");
 	if (v->group_id < 0)
-		message_ = aliza->create_group_(&ok,true);
+		message_ = aliza->create_group_(&ok, true);
 	else
 		ok = true;
 	if (ok)
@@ -1643,7 +1643,7 @@ void MainWindow::start_3D_anim()
 		aliza->start_3D_anim();
 	}
 	else QMessageBox::warning(
-		NULL,QString("Warning"),message_);
+		NULL, QString("Warning"), message_);
 }
 
 void MainWindow::stop_3D_anim()
@@ -1859,16 +1859,16 @@ void MainWindow::writeSettings()
 void MainWindow::readSettings()
 {
 	int width_ = 0, height_ = 0;
-	desktop_layout(&width_,&height_);
-	const int w = static_cast<int>(static_cast<double>(width_)*0.7);
-	const int h = static_cast<int>(static_cast<double>(height_)*0.7);
+	desktop_layout(&width_, &height_);
+	const int w = static_cast<int>(static_cast<double>(width_) * 0.7);
+	const int h = static_cast<int>(static_cast<double>(height_) * 0.7);
 	QSettings settings(
 		QSettings::IniFormat, QSettings::UserScope,
 		QApplication::organizationName(), QApplication::applicationName());
 	settings.setFallbacksEnabled(false);
 	settings.beginGroup(QString("MainWindow"));
-	resize(settings.value(QString("size"), QSize(w,h)).toSize());
-	move(settings.value(QString("pos"), QPoint(50,50)).toPoint());
+	resize(settings.value(QString("size"), QSize(w, h)).toSize());
+	move(settings.value(QString("pos"), QPoint(50, 50)).toPoint());
 #ifdef USE_WORKSTATION_MODE
 	CommonUtils::set_open_dir(settings.value(QString("open_dir"), QString("")).toString());
 #endif
@@ -1914,8 +1914,7 @@ void MainWindow::change_style(const QString & s)
 	{
 		QApplication::setStyle(s);
 #if 0
-		if (!(
-			(s.toUpper() == QString("WINDOWSVISTA")) ||
+		if (!((s.toUpper() == QString("WINDOWSVISTA")) ||
 			(s.toUpper() == QString("MACOS"))))
 #endif
 		{

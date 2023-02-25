@@ -102,7 +102,7 @@ void redirect_qdebug(
 }
 #endif
 
-int main(int argc, char *argv[])
+int main(int argc, char * argv[])
 {
 #ifdef FORCE_PLATFORM_XCB
 #ifndef _WIN32
@@ -166,6 +166,7 @@ int main(int argc, char *argv[])
 	}
 #endif
 	//
+// clang-format off
 #if (defined PRINT_HOST_INFO && PRINT_HOST_INFO==1)
 	{
 		const unsigned int endian = 1;
@@ -287,6 +288,7 @@ int main(int argc, char *argv[])
 			<< std::endl;
 	}
 #endif
+// clang-format on
 	//
 #if 0
 #if ((QT_VERSION >= QT_VERSION_CHECK(5,6,0)) && (QT_VERSION < QT_VERSION_CHECK(6,0,0)))
@@ -351,7 +353,7 @@ int main(int argc, char *argv[])
 		const int hide_zoom_ =
 			settings.value(QString("hide_zoom"), 1).toInt();
 		settings.endGroup();
-		hide_zoom = (hide_zoom_==1) ? true : false;
+		hide_zoom = (hide_zoom_ == 1) ? true : false;
 		QFont f = QApplication::font();
 		if (app_font_pt <= 0.0)
 		{
@@ -459,8 +461,7 @@ int main(int argc, char *argv[])
 		else
 		{
 			app.setStyle(saved_style);
-			if (!(
-				(saved_style.toUpper() == QString("WINDOWSVISTA")) ||
+			if (!((saved_style.toUpper() == QString("WINDOWSVISTA")) ||
 				(saved_style.toUpper() == QString("MACOS"))))
 			{
 				app.setPalette(app.style()->standardPalette());
@@ -488,7 +489,7 @@ int main(int argc, char *argv[])
 	itk::OutputWindow::SetInstance(itk::TextOutput::New());
 #endif
 	//
-	if (metadata_only||metadata_series_only)
+	if (metadata_only || metadata_series_only)
 	{
 #if 1
 		app.setQuitOnLastWindowClosed(true);

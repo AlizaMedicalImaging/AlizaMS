@@ -21,13 +21,13 @@ AboutWidget::AboutWidget(int w, int h)
 		QString(
 			"<html><body><h3><a href=\"http://www.aliza-dicom-viewer.com\" style=\"color: #00674d;\""
 			" target=\"_blank\">");
-	const QString link1 = QString("Aliza MS ")+aliza_version+QString("</a>");
+	const QString link1 = QString("Aliza MS ") + aliza_version + QString("</a>");
 	const QString link2 = QString("</h3></body></html>");
-	link_label->setText(link0+link1+link2);
+	link_label->setText(link0 + link1 + link2);
 	link_label->setOpenExternalLinks(true);
 	//
 	adjustSize();
-	move(QPoint((w/2) - (width()/2),(h/2) - (height()/2)));
+	move(QPoint((w / 2) - (width() / 2), (h / 2) - (height() / 2)));
 }
 
 AboutWidget::~AboutWidget()
