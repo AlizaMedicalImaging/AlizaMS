@@ -26,15 +26,15 @@
 #include <QSqlError>
 #include "ctkdialog.h"
 #endif
-#include "mdcmReader.h"
-#include "mdcmScanner.h"
-#include "mdcmAttribute.h"
-#include "mdcmMediaStorage.h"
-#include "mdcmExplicitDataElement.h"
-#include "mdcmFileMetaInformation.h"
-#include "mdcmGlobal.h"
-#include "mdcmDicts.h"
-#include "mdcmParseException.h"
+#include <mdcmReader.h>
+#include <mdcmScanner.h>
+#include <mdcmAttribute.h>
+#include <mdcmMediaStorage.h>
+#include <mdcmExplicitDataElement.h>
+#include <mdcmFileMetaInformation.h>
+#include <mdcmGlobal.h>
+#include <mdcmDicts.h>
+#include <mdcmParseException.h>
 #include "codecutils.h"
 #include "dicomutils.h"
 #include <vector>

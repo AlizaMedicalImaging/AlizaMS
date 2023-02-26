@@ -34,8 +34,8 @@
 #include <cmath>
 #include <iostream>
 #include "luts.h"
-#include "itkVersion.h"
-#include "itkSpatialOrientation.h"
+#include <itkVersion.h>
+#include <itkSpatialOrientation.h>
 #include "data/cube_data.h"
 #include "data/letters_data.h"
 #include "data/letteri_data.h"

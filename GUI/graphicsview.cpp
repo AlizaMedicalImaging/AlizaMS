@@ -9,9 +9,9 @@
 #include <QApplication>
 #include <QList>
 #include <QGraphicsDropShadowEffect>
-#include "itkImageRegionConstIterator.h"
-#include "itkIntensityWindowingImageFilter.h"
-#include "itkMath.h"
+#include <itkImageRegionConstIterator.h>
+#include <itkIntensityWindowingImageFilter.h>
+#include <itkMath.h>
 #include "contourutils.h"
 #include "colorspace/colorspace.h"
 

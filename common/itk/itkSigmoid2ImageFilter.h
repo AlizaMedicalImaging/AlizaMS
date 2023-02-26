@@ -1,8 +1,8 @@
 #ifndef itkSigmoid2ImageFilter_h
 #define itkSigmoid2ImageFilter_h
 
-#include "itkUnaryFunctorImageFilter.h"
-#include "itkMath.h"
+#include <itkUnaryFunctorImageFilter.h>
+#include <itkMath.h>
 
 namespace itk
 {

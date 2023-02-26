@@ -5,14 +5,14 @@
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 #include "CG/glew/include/GL/glew.h"
 #endif
-#include "itkImage.h"
-#include "itkSpatialOrientation.h"
-#include "itkSpatialObjectPoint.h"
-#include "itkSpatialOrientationAdapter.h"
-#include "itkRGBPixel.h"
-#include "itkRGBAPixel.h"
-#include "itkImageRegionConstIterator.h"
-#include "mdcmTag.h"
+#include <itkImage.h>
+#include <itkSpatialOrientation.h>
+#include <itkSpatialObjectPoint.h>
+#include <itkSpatialOrientationAdapter.h>
+#include <itkRGBPixel.h>
+#include <itkRGBAPixel.h>
+#include <itkImageRegionConstIterator.h>
+#include <mdcmTag.h>
 #include <QString>
 #include <QStringList>
 #include <QVector>

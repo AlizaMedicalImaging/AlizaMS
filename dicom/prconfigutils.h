@@ -1,7 +1,7 @@
 #ifndef A_PRCONFIGUTILS_H
 #define A_PRCONFIGUTILS_H
 
-#include "mdcmDataSet.h"
+#include <mdcmDataSet.h>
 #include <QList>
 
 class PrRefSeries;

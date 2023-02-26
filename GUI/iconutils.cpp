@@ -1,6 +1,6 @@
 #include "structures.h"
-#include "itkExtractImageFilter.h"
-#include "itkIntensityWindowingImageFilter.h"
+#include <itkExtractImageFilter.h>
+#include <itkIntensityWindowingImageFilter.h>
 #include <QPainter>
 #include <QImage>
 #include <QColor>

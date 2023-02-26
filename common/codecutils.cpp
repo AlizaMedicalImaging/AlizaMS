@@ -628,9 +628,9 @@ QByteArray CodecUtils::fromUTF8(const QString & i, const char * charset, bool * 
  * 
  * The function is mostly for testing purposes.
  */
-#include "dcmtk/config/osconfig.h"
-#include "dcmtk/dcmdata/dcspchrs.h"
-#include "dcmtk/dcmdata/dctypes.h"
+#include <dcmtk/config/osconfig.h>
+#include <dcmtk/dcmdata/dcspchrs.h>
+#include <dcmtk/dcmdata/dctypes.h>
 
 QString CodecUtils::toUTF8dcmtk(const char* ba, const char* charset, bool * ok)
 {
@@ -653,5 +653,4 @@ QString CodecUtils::toUTF8dcmtk(const char* ba, const char* charset, bool * ok)
   return res;
 }
 #endif
-
 

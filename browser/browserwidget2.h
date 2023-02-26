@@ -15,12 +15,12 @@
 #include <QSettings>
 #include <QShortcut>
 #include <set>
-#include "mdcmTag.h"
-#include "mdcmVL.h"
-#include "mdcmSimpleSubjectWatcher.h"
-#include "mdcmEvent.h"
-#include "mdcmDataSet.h"
-#include "mdcmDict.h"
+#include <mdcmTag.h>
+#include <mdcmVL.h>
+#include <mdcmSimpleSubjectWatcher.h>
+#include <mdcmEvent.h>
+#include <mdcmDataSet.h>
+#include <mdcmDict.h>
 
 class ScannerWatcher : public mdcm::SimpleSubjectWatcher
 {

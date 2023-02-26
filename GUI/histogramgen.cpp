@@ -1,8 +1,8 @@
 #include "structures.h"
 #include "histogramgen.h"
-#include "itkImage.h"
-#include "itkScalarImageToHistogramGenerator.h"
-#include "itkImageToHistogramFilter.h"
+#include <itkImage.h>
+#include <itkScalarImageToHistogramGenerator.h>
+#include <itkImageToHistogramFilter.h>
 #include <QPixmap>
 #include <QPainter>
 #include <QPainterPath>

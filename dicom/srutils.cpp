@@ -24,8 +24,8 @@
 #include "processimagethreadLUT.hxx"
 #include "settingswidget.h"
 #include "findrefdialog.h"
-#include "itkExtractImageFilter.h"
-#include "itkMath.h"
+#include <itkExtractImageFilter.h>
+#include <itkMath.h>
 
 namespace
 {

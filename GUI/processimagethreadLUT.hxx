@@ -4,8 +4,8 @@
 // clang-format off
 
 #include <QThread>
-#include "itkImage.h"
-#include "itkImageRegionConstIterator.h"
+#include <itkImage.h>
+#include <itkImageRegionConstIterator.h>
 #include "luts.h"
 
 typedef itk::Image<unsigned char, 2> ImageSegType;

@@ -3,8 +3,8 @@
 #include <QDate>
 #include <QPoint>
 #include "alizams_version.h"
-#include "mdcmVersion.h"
-#include "itkVersion.h"
+#include <mdcmVersion.h>
+#include <itkVersion.h>
 
 AboutWidget::AboutWidget(int w, int h)
 {

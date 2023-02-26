@@ -1,9 +1,7 @@
 #include "histogramview.h"
 #include "levelitem.h"
- 
 #include <QPainter>
 #include <QPointF>
-
 #include <cmath>
 #include <iostream>
 

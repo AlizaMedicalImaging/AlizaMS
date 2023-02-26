@@ -1,8 +1,8 @@
 #ifndef A_SPLITUIHGRIDFILTER_H
 #define A_SPLITUIHGRIDFILTER_H
 
-#include "mdcmFile.h"
-#include "mdcmImage.h"
+#include <mdcmFile.h>
+#include <mdcmImage.h>
 
 namespace mdcm
 {

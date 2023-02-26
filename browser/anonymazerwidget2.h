@@ -2,8 +2,8 @@
 #define A_ANONYMAZERWIDGET2_H
 
 #include "ui_anonymazerwidget2.h"
-#include "mdcmTag.h"
-#include "mdcmDicts.h"
+#include <mdcmTag.h>
+#include <mdcmDicts.h>
 #include <QStringList>
 #include <QMap>
 #include <QProgressDialog>
