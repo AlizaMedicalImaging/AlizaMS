@@ -2,7 +2,6 @@
 #define A_ABOUTWIDGET_H
 
 #include "ui_aboutwidget.h"
-#include <QString>
 #include <QMouseEvent>
 
 class AboutWidget : public QWidget, public Ui::AboutWidget

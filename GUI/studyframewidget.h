@@ -2,7 +2,6 @@
 #define A_STUDYFRAMEWIDGET_H
 
 #include "ui_studyframewidget.h"
-#include <QWidget>
 
 class StudyGraphicsWidget;
 

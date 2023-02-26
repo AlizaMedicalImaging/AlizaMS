@@ -1,7 +1,6 @@
 #ifndef A_TABLEDIALOG_H
 #define A_TABLEDIALOG_H
 
-#include <QDialog>
 #include "ui_tabledialog.h"
 
 class TableDialog : public QDialog, private Ui::TableDialog

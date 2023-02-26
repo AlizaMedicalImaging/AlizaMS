@@ -2,7 +2,6 @@
 #define A_SETTINGSWIDGET_H
 
 #include "ui_settingswidget.h"
-#include <QWidget>
 #include <QSettings>
 
 class SettingsWidget: public QWidget, public Ui::SettingsWidget
