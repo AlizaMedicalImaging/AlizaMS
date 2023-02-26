@@ -237,7 +237,10 @@ ImagesBox::ImagesBox(float si)
 	}
 	width_doubleSpinBox->setSizePolicy(
 		QSizePolicy::Fixed,QSizePolicy::Fixed);
-	width_doubleSpinBox->setToolTip(QString("Contours width (2D)"));
+	width_doubleSpinBox->setToolTip(QString(
+		"<html><head/><body><p>Contours width (2D)."
+		"</p><p><span style=\" font-style:italic;\">"
+		"0.0</span> is auto.</p></body></html>"));
 	width_doubleSpinBox->setDecimals(1);
 	width_doubleSpinBox->setRange(0.0, 9.9);
 	width_doubleSpinBox->setSingleStep(0.1);
