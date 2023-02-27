@@ -513,9 +513,9 @@ template<typename T> int generate_tex3d(
 		std::cout << "(size[0] < 1||size[1] < 1)" << std::endl;
 		return 1;
 	}
-	typedef itk::NearestNeighborInterpolateImageFunction<T,double> InterpolatorType;
-	typedef itk::IdentityTransform<double,3> IdentityTransformType;
-	typedef itk::ResampleImageFilter<T,T> ScaleFilter;
+	typedef itk::NearestNeighborInterpolateImageFunction<T, double> InterpolatorType;
+	typedef itk::IdentityTransform<double, 3> IdentityTransformType;
+	typedef itk::ResampleImageFilter<T, T> ScaleFilter;
 	typedef itk::ImageSliceConstIteratorWithIndex<T> SliceConstIteratorType;
 	std::string tt;
 	int error__ = 0;
@@ -532,7 +532,7 @@ template<typename T> int generate_tex3d(
 	calculate_min_max<T>(image, ivariant);
 	rmin = ivariant->di->rmin;
 	rmax = ivariant->di->rmax;
-	switch(ivariant->image_type)
+	switch (ivariant->image_type)
 	{
 		case 0:
 		case 1:
@@ -555,7 +555,7 @@ template<typename T> int generate_tex3d(
 #if 0
 	{
 		QString s("?");
-		switch(texture_type)
+		switch (texture_type)
 		{
 		case 0:
 			s = QVariant((int)(
@@ -585,10 +585,12 @@ template<typename T> int generate_tex3d(
 	}
 	qApp->processEvents();
 	//
-	if (
-		size[0]==original_size[0] &&
-		size[1]==original_size[1] &&
-		size[2]==original_size[2]) scale = false;
+	if (size[0] == original_size[0] &&
+		size[1] == original_size[1] &&
+		size[2] == original_size[2])
+	{
+		scale = false;
+	}
 	//
 	if (scale)
 	{
@@ -620,7 +622,10 @@ template<typename T> int generate_tex3d(
 		}
 		if (out_image.IsNotNull()) out_image->DisconnectPipeline();
 	}
-	else { out_image = image; }
+	else
+	{
+		out_image = image;
+	}
 	//
 	if (out_image.IsNotNull())
 	{
@@ -640,39 +645,61 @@ template<typename T> int generate_tex3d(
 	qApp->processEvents();
 	//
 	// array maximum size 0x7fffffff
-	switch(texture_type)
+	switch (texture_type)
 	{
 	case 0:
 		{
-			if ((size[0]*size[1]*size[2])>= 0x7fffffff/sizeof(float))
+			if ((size[0] * size[1] * size[2]) >= 0x7fffffff / sizeof(float))
+			{
 				return 2;
-			try	{ float_buf=new float[(size[0]*size[1]*size[2])]; }
-			catch (const std::bad_alloc&) { float_buf = NULL; }
-			if (!float_buf) return 2;
+			}
+			try
+			{
+				float_buf = new float[(size[0] * size[1] * size[2])];
+			}
+			catch (const std::bad_alloc&)
+			{
+				return 2;
+			}
 			tt = " GL_R16F";
 		}
 		break;
 	case 1:
 		{
-			if ((size[0]*size[1]*size[2]) >= 0x7fffffff/sizeof(unsigned short))
+			if ((size[0] * size[1] * size[2]) >= 0x7fffffff / sizeof(unsigned short))
+			{
 				return 2;
-			try	{ short_buf=new unsigned short[(size[0]*size[1]*size[2])]; }
-			catch (const std::bad_alloc&) { short_buf=NULL; }
-			if (!short_buf) return 2;
+			}
+			try
+			{
+				short_buf = new unsigned short[(size[0] * size[1] * size[2])];
+			}
+			catch (const std::bad_alloc&)
+			{
+				return 2;
+			}
 			tt = " GL_R16";
 		}
 		break;
 	case 2:
 		{
-			if ((size[0]*size[1]*size[2]) >= 0x7fffffff/sizeof(GLubyte))
+			if ((size[0] * size[1] * size[2]) >= 0x7fffffff / sizeof(GLubyte))
+			{
 				return 2;
-			try	{ ub_buf=new GLubyte[(size[0]*size[1]*size[2])]; }
-			catch (const std::bad_alloc&) { ub_buf = NULL; }
-			if (!ub_buf) return 2;
+			}
+			try
+			{
+				ub_buf = new GLubyte[(size[0] * size[1] * size[2])];
+			}
+			catch (const std::bad_alloc&)
+			{
+				return 2;
+			}
 			tt = " GL_R8";
 		}
 		break;
-	default: return 1;
+	default:
+		return 1;
 	}
 	//
 	if (pb) pb->setValue(-1);
@@ -688,7 +715,7 @@ template<typename T> int generate_tex3d(
 		inIterator.GoToBegin();
 		size_t j = 0;
 		const double max_minus_min =
-			(rmax-rmin > 0) ? rmax-rmin : 1e-9;
+			(rmax-rmin > 0) ? rmax - rmin : 1e-9;
 		while(!inIterator.IsAtEnd())
 		{
 			while (!inIterator.IsAtEndOfSlice())
@@ -699,15 +726,15 @@ template<typename T> int generate_tex3d(
 					const double f = v;
 					// GL_R16F
 					if (texture_type == 0)
-						float_buf[j] = static_cast<float>((f+(-rmin))/max_minus_min);
+						float_buf[j] = static_cast<float>((f + (-rmin)) / max_minus_min);
 					// GL_R16
 					else if(texture_type == 1)
 						short_buf[j] = static_cast<unsigned short>(
-							USHRT_MAX*((f+(-rmin))/max_minus_min));
+							USHRT_MAX * ((f + (-rmin)) / max_minus_min));
 					// GL_R8
 					else if(texture_type == 2)
 						ub_buf[j] = static_cast<GLubyte>(
-							UCHAR_MAX*((f+(-rmin))/max_minus_min));
+							UCHAR_MAX * ((f + (-rmin)) / max_minus_min));
 					++j;
 					++inIterator;
 				}
@@ -749,7 +776,7 @@ template<typename T> int generate_tex3d(
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	gl->glGenTextures(1, &(ivariant->di->cube_3dtex));
 	gl->glBindTexture(GL_TEXTURE_3D, ivariant->di->cube_3dtex);
-	switch(ivariant->di->filtering)
+	switch (ivariant->di->filtering)
 	{
 	case 1: // bilinear
 		{
@@ -777,7 +804,7 @@ template<typename T> int generate_tex3d(
 #else
 	glGenTextures(1, &(ivariant->di->cube_3dtex));
 	glBindTexture(GL_TEXTURE_3D, ivariant->di->cube_3dtex);
-	switch(ivariant->di->filtering)
+	switch (ivariant->di->filtering)
 	{
 	case 1: // bilinear
 		{
@@ -892,7 +919,7 @@ template<typename T> int generate_tex3d(
 #endif
 		ivariant->di->cube_3dtex = 0;
 		ivariant->di->tex_info = -1;
-		error__=3;
+		error__ = 3;
 		goto quit__;
 	}
 	else if (glerror__ != 0)
@@ -920,10 +947,10 @@ template<typename T> void read_geometry_from_image(
 	if (image.IsNull()) return;
 	const typename T::SizeType size =
 		image->GetLargestPossibleRegion().GetSize();
-	sVector3 first     =  sVector3(0.0f,0.0f,0.0f);
-	sVector3 last      =  sVector3(0.0f,0.0f,0.0f);
-	sVector3 direction =  sVector3(0.0f,0.0f,0.0f);
-	sVector3 up        =  sVector3(0.0f,0.0f,0.0f);
+	sVector3 first     = sVector3(0.0f, 0.0f, 0.0f);
+	sVector3 last      = sVector3(0.0f, 0.0f, 0.0f);
+	sVector3 direction = sVector3(0.0f, 0.0f, 0.0f);
+	sVector3 up        = sVector3(0.0f, 0.0f, 0.0f);
 	const typename T::DirectionType dircos =
 		image->GetDirection();
 	const double d1 = dircos[0][0];
@@ -935,11 +962,11 @@ template<typename T> void read_geometry_from_image(
 	for (size_t z = 0; z < size[2]; ++z)
 	{
 		typename T::IndexType idx0, idx1, idx2, idx3;
-		itk::Point<float,3> p0, p1, p2, p3;
-		idx0[0] = 0;         idx0[1] = size[1]-1; idx0[2] = z;
-		idx1[0] = 0;         idx1[1] = 0;         idx1[2] = z;
-		idx2[0] = size[0]-1; idx2[1] = size[1]-1; idx2[2] = z;
-		idx3[0] = size[0]-1; idx3[1] = 0;         idx3[2] = z;
+		itk::Point<float, 3> p0, p1, p2, p3;
+		idx0[0] = 0;           idx0[1] = size[1] - 1; idx0[2] = z;
+		idx1[0] = 0;           idx1[1] = 0;           idx1[2] = z;
+		idx2[0] = size[0] - 1; idx2[1] = size[1] - 1; idx2[2] = z;
+		idx3[0] = size[0] - 1; idx3[1] = 0;           idx3[2] = z;
 		try
 		{
 			image->TransformIndexToPhysicalPoint(idx0, p0);
@@ -956,14 +983,14 @@ template<typename T> void read_geometry_from_image(
 		float x1 = p1[0], y1 = p1[1], z1 = p1[2];
 		float x2 = p2[0], y2 = p2[1], z2 = p2[2];
 		float x3 = p3[0], y3 = p3[1], z3 = p3[2];
-		if (z==0)
+		if (z == 0)
 		{
 			first = sVector3(x0, y0, z0);
-			sVector3 tmp_up0 = sVector3(x1,y1,z1);
-			sVector3 tmp_up1 = sVector3(x0,y0,z0);
+			sVector3 tmp_up0 = sVector3(x1, y1, z1);
+			sVector3 tmp_up1 = sVector3(x0, y0, z0);
 			up = sVector3(normalize(tmp_up1-tmp_up0));
 		}
-		else if (z==size[2]-1)
+		else if (z == size[2] - 1)
 		{
 			last = sVector3(x0, y0, z0);
 		}
@@ -1002,7 +1029,7 @@ template<typename T> void calc_center_from_image(
 	idx[0] = size[0];
 	idx[1] = size[1];
 	idx[2] = size[2];
-	itk::Point<float,3> p;
+	itk::Point<float, 3> p;
 	try
 	{
 		image->TransformIndexToPhysicalPoint(idx, p);
@@ -1017,7 +1044,7 @@ template<typename T> void calc_center_from_image(
 		static_cast<float>(origin[1]),
 		static_cast<float>(origin[2]));
 	sVector3 v1 = sVector3(p[0], p[1], p[2]);
-	sVector3 cube_center = sVector3((v0+v1)*0.5f);
+	sVector3 cube_center = sVector3((v0 + v1) * 0.5f);
 	ivariant->di->default_center_x =
 		ivariant->di->center_x = cube_center.getX();
 	ivariant->di->default_center_y =
@@ -1095,7 +1122,7 @@ template <typename T> bool reload_monochrome_image(
 	}
 	if (calc_center)
 	{
-		calc_center_from_image<T>(ivariant,image);
+		calc_center_from_image<T>(ivariant, image);
 	}
 	//
 	if (resize)
@@ -1216,7 +1243,7 @@ template <typename T> bool reload_monochrome_image(
 template<typename T> bool reload_rgb_image(
 	const typename T::Pointer & image,
 	ImageVariant * ivariant,
-	bool disable_gen_slices=false)
+	bool disable_gen_slices = false)
 {
 	if (!ivariant||image.IsNull()) return false;
 	ivariant->di->skip_texture = true;
@@ -1241,7 +1268,7 @@ template<typename T> bool reload_rgb_image(
 	if (generate_slices)
 		read_geometry_from_image<T>(ivariant, image);
 	if (calc_center)
-		calc_center_from_image<T>(ivariant,image);
+		calc_center_from_image<T>(ivariant, image);
 	//
 	calculate_rgb_minmax_<T>(image, ivariant);
 	if (ivariant->equi)
@@ -1260,7 +1287,7 @@ template<typename T> bool reload_rgb_image(
 template<typename T> bool reload_rgba_image(
 	const typename T::Pointer & image,
 	ImageVariant * ivariant,
-	bool disable_gen_slices=false)
+	bool disable_gen_slices = false)
 {
 	if (!ivariant||image.IsNull()) return false;
 	ivariant->di->skip_texture = true;
@@ -1285,7 +1312,7 @@ template<typename T> bool reload_rgba_image(
 	if (generate_slices)
 		read_geometry_from_image<T>(ivariant, image);
 	if (calc_center)
-		calc_center_from_image<T>(ivariant,image);
+		calc_center_from_image<T>(ivariant, image);
 	//
 	calculate_rgba_minmax_<T>(image, ivariant);
 	if (ivariant->equi)
@@ -1306,7 +1333,7 @@ template<typename T> QString process_dicom_monochrome_image1(
 	ImageVariant * ivariant,
 	typename T::Pointer & image,
 	char * buffer,
-	const itk::Matrix<itk::SpacePrecisionType,3,3> & direction,
+	const itk::Matrix<itk::SpacePrecisionType, 3, 3> & direction,
 	const size_t dimx, const size_t dimy, const size_t dimz,
 	const double origin_x, const double origin_y, const double origin_z,
 	const double spacing_x, const double spacing_y, const double spacing_z,
@@ -1318,7 +1345,7 @@ template<typename T> QString process_dicom_monochrome_image1(
 	{
 		*ok = false;
 		return QString(
-			"process_dicom_monochrome_image1 : buffer==NULL");
+			"process_dicom_monochrome_image1: buffer is NULL");
 	}
 	typename T::RegionType region;
 	typename T::SizeType size;
@@ -1346,15 +1373,15 @@ template<typename T> QString process_dicom_monochrome_image1(
 	spacing[1] = spacing_y;
 	spacing[2] = spacing_z;
 	*bad_direction = (
-		direction[0][0]>-0.000001 && direction[0][0]<0.000001 &&
-		direction[1][0]>-0.000001 && direction[1][0]<0.000001 &&
-		direction[2][0]>-0.000001 && direction[2][0]<0.000001 &&
-		direction[0][1]>-0.000001 && direction[0][1]<0.000001 &&
-		direction[1][1]>-0.000001 && direction[1][1]<0.000001 &&
-		direction[2][1]>-0.000001 && direction[2][1]<0.000001 &&
-		direction[0][2]>-0.000001 && direction[0][2]<0.000001 &&
-		direction[1][2]>-0.000001 && direction[1][2]<0.000001 &&
-		direction[2][2]>-0.000001 && direction[2][2]<0.000001)
+		direction[0][0] > -0.000001 && direction[0][0] < 0.000001 &&
+		direction[1][0] > -0.000001 && direction[1][0] < 0.000001 &&
+		direction[2][0] > -0.000001 && direction[2][0] < 0.000001 &&
+		direction[0][1] > -0.000001 && direction[0][1] < 0.000001 &&
+		direction[1][1] > -0.000001 && direction[1][1] < 0.000001 &&
+		direction[2][1] > -0.000001 && direction[2][1] < 0.000001 &&
+		direction[0][2] > -0.000001 && direction[0][2] < 0.000001 &&
+		direction[1][2] > -0.000001 && direction[1][2] < 0.000001 &&
+		direction[2][2] > -0.000001 && direction[2][2] < 0.000001)
 			? true : false;
 	try
 	{
@@ -1447,7 +1474,7 @@ template<typename T> QString process_dicom_rgb_image1(
 	ImageVariant * ivariant,
 	typename T::Pointer & image,
 	char * buffer,
-	const itk::Matrix<itk::SpacePrecisionType,3,3> & direction,
+	const itk::Matrix<itk::SpacePrecisionType, 3, 3> & direction,
 	const size_t dimx, const size_t dimy, const size_t dimz,
 	const double origin_x, const double origin_y, const double origin_z,
 	const double spacing_x, const double spacing_y, const double spacing_z,
@@ -1462,7 +1489,7 @@ template<typename T> QString process_dicom_rgb_image1(
 	{
 		*ok = false;
 		return QString(
-			"process_dicom_rgb_image1 : buffer==NULL");
+			"process_dicom_rgb_image1: buffer is NULL");
 	}
 	typename T::RegionType region;
 	typename T::SizeType size;
@@ -1489,15 +1516,15 @@ template<typename T> QString process_dicom_rgb_image1(
 	spacing[1] = spacing_y;
 	spacing[2] = spacing_z;
 	*bad_direction = (
-		direction[0][0]>-0.000001 && direction[0][0]<0.000001 &&
-		direction[1][0]>-0.000001 && direction[1][0]<0.000001 &&
-		direction[2][0]>-0.000001 && direction[2][0]<0.000001 &&
-		direction[0][1]>-0.000001 && direction[0][1]<0.000001 &&
-		direction[1][1]>-0.000001 && direction[1][1]<0.000001 &&
-		direction[2][1]>-0.000001 && direction[2][1]<0.000001 &&
-		direction[0][2]>-0.000001 && direction[0][2]<0.000001 &&
-		direction[1][2]>-0.000001 && direction[1][2]<0.000001 &&
-		direction[2][2]>-0.000001 && direction[2][2]<0.000001)
+		direction[0][0] > -0.000001 && direction[0][0] < 0.000001 &&
+		direction[1][0] > -0.000001 && direction[1][0] < 0.000001 &&
+		direction[2][0] > -0.000001 && direction[2][0] < 0.000001 &&
+		direction[0][1] > -0.000001 && direction[0][1] < 0.000001 &&
+		direction[1][1] > -0.000001 && direction[1][1] < 0.000001 &&
+		direction[2][1] > -0.000001 && direction[2][1] < 0.000001 &&
+		direction[0][2] > -0.000001 && direction[0][2] < 0.000001 &&
+		direction[1][2] > -0.000001 && direction[1][2] < 0.000001 &&
+		direction[2][2] > -0.000001 && direction[2][2] < 0.000001)
 			? true : false;
 	try
 	{
@@ -1538,22 +1565,22 @@ template<typename T> QString process_dicom_rgb_image1(
 						// 8 bits
 						int R, G, B;
 						double Y  = p__[j];
-						const double Cb = p__[j+1] - 128;
-						const double Cr = p__[j+2] - 128;
+						const double Cb = p__[j + 1] - 128;
+						const double Cr = p__[j + 2] - 128;
 						if (ybr == 1)
 						{
-							R = static_cast<int>(Y + (-0.000036820)*Cb +    1.401987577*Cr);
-							G = static_cast<int>(Y + (-0.344113281)*Cb + (-0.714103821)*Cr);
-							B = static_cast<int>(Y +    1.771978117*Cb + (-0.000134583)*Cr);
+							R = static_cast<int>(Y + (-0.000036820) * Cb +    1.401987577 * Cr);
+							G = static_cast<int>(Y + (-0.344113281) * Cb + (-0.714103821) * Cr);
+							B = static_cast<int>(Y +    1.771978117 * Cb + (-0.000134583) * Cr);
 						}
 						else if (ybr == 2)
 						{
 							// YBR_PARTIAL_422 is problematic
 							Y -= 16;
 							if (Y < 0) Y = 0; // invalid?
-							R = static_cast<int>(1.164415463*Y + (-0.000095036)*Cb +    1.596001878*Cr);
-							G = static_cast<int>(1.164415463*Y + (-0.391724564)*Cb + (-0.813013368)*Cr);
-							B = static_cast<int>(1.164415463*Y +    2.017290682*Cb + (-0.000135273)*Cr);
+							R = static_cast<int>(1.164415463 * Y + (-0.000095036) * Cb +    1.596001878 * Cr);
+							G = static_cast<int>(1.164415463 * Y + (-0.391724564) * Cb + (-0.813013368) * Cr);
+							B = static_cast<int>(1.164415463 * Y +    2.017290682 * Cb + (-0.000135273) * Cr);
 						}
 						else
 						{
@@ -1564,26 +1591,26 @@ template<typename T> QString process_dicom_rgb_image1(
 						if (R > 255) R = 255;
 						if (G > 255) G = 255;
 						if (B > 255) B = 255;
-						p[0]=static_cast<typename T::PixelType::ValueType>(R < 0 ? 0 : R);
-						p[1]=static_cast<typename T::PixelType::ValueType>(G < 0 ? 0 : G);
-						p[2]=static_cast<typename T::PixelType::ValueType>(B < 0 ? 0 : B);
+						p[0] = static_cast<typename T::PixelType::ValueType>(R < 0 ? 0 : R);
+						p[1] = static_cast<typename T::PixelType::ValueType>(G < 0 ? 0 : G);
+						p[2] = static_cast<typename T::PixelType::ValueType>(B < 0 ? 0 : B);
 					}
 					else if (hsv)
 					{
-						const double H = (p__[j  ]/255.0)*360.0;
-						const double S = p__[j+1]/255.0;
-						const double V = p__[j+2]/255.0;
+						const double H = (p__[j] / 255.0) * 360.0;
+						const double S = p__[j + 1]/ 255.0;
+						const double V = p__[j + 2] / 255.0;
 						double R, G, B;
 						ColorSpace_::Hsv2Rgb(&R, &G, &B, H, S, V);
-						p[0]=static_cast<typename T::PixelType::ValueType>(R*255.0);
-						p[1]=static_cast<typename T::PixelType::ValueType>(G*255.0);
-						p[2]=static_cast<typename T::PixelType::ValueType>(B*255.0);
+						p[0] = static_cast<typename T::PixelType::ValueType>(R * 255.0);
+						p[1] = static_cast<typename T::PixelType::ValueType>(G * 255.0);
+						p[2] = static_cast<typename T::PixelType::ValueType>(B * 255.0);
 					}
 					else
 					{
-						p[0]=static_cast<typename T::PixelType::ValueType>(p__[j  ]);
-						p[1]=static_cast<typename T::PixelType::ValueType>(p__[j+1]);
-						p[2]=static_cast<typename T::PixelType::ValueType>(p__[j+2]);
+						p[0] = static_cast<typename T::PixelType::ValueType>(p__[j]);
+						p[1] = static_cast<typename T::PixelType::ValueType>(p__[j + 1]);
+						p[2] = static_cast<typename T::PixelType::ValueType>(p__[j + 2]);
 					}
 					it.Set(p);
 					j+=3;
@@ -1631,7 +1658,7 @@ template<typename T> QString process_dicom_rgba_image1(
 	ImageVariant * ivariant,
 	typename T::Pointer & image,
 	char * buffer,
-	const itk::Matrix<itk::SpacePrecisionType,3,3> & direction,
+	const itk::Matrix<itk::SpacePrecisionType, 3, 3> & direction,
 	const size_t dimx, const size_t dimy, const size_t dimz,
 	const double origin_x, const double origin_y, const double origin_z,
 	const double spacing_x, const double spacing_y, const double spacing_z,
@@ -1645,7 +1672,7 @@ template<typename T> QString process_dicom_rgba_image1(
 	{
 		*ok = false;
 		return QString(
-			"process_dicom_rgba_image : buffer==NULL");
+			"process_dicom_rgba_image: buffer is NULL");
 	}
 	typename T::RegionType region;
 	typename T::SizeType size;
@@ -1672,15 +1699,15 @@ template<typename T> QString process_dicom_rgba_image1(
 	spacing[1] = spacing_y;
 	spacing[2] = spacing_z;
 	*bad_direction = (
-		direction[0][0]>-0.000001 && direction[0][0]<0.000001 &&
-		direction[1][0]>-0.000001 && direction[1][0]<0.000001 &&
-		direction[2][0]>-0.000001 && direction[2][0]<0.000001 &&
-		direction[0][1]>-0.000001 && direction[0][1]<0.000001 &&
-		direction[1][1]>-0.000001 && direction[1][1]<0.000001 &&
-		direction[2][1]>-0.000001 && direction[2][1]<0.000001 &&
-		direction[0][2]>-0.000001 && direction[0][2]<0.000001 &&
-		direction[1][2]>-0.000001 && direction[1][2]<0.000001 &&
-		direction[2][2]>-0.000001 && direction[2][2]<0.000001)
+		direction[0][0] > -0.000001 && direction[0][0] < 0.000001 &&
+		direction[1][0] > -0.000001 && direction[1][0] < 0.000001 &&
+		direction[2][0] > -0.000001 && direction[2][0] < 0.000001 &&
+		direction[0][1] > -0.000001 && direction[0][1] < 0.000001 &&
+		direction[1][1] > -0.000001 && direction[1][1] < 0.000001 &&
+		direction[2][1] > -0.000001 && direction[2][1] < 0.000001 &&
+		direction[0][2] > -0.000001 && direction[0][2] < 0.000001 &&
+		direction[1][2] > -0.000001 && direction[1][2] < 0.000001 &&
+		direction[2][2] > -0.000001 && direction[2][2] < 0.000001)
 			? true : false;
 	try
 	{
@@ -1724,29 +1751,29 @@ template<typename T> QString process_dicom_rgba_image1(
 							// each CMYK plane represents a minimum intensity of the color.
 							// This value may be used only when Samples per Pixel (0028,0002)
 							// has a value of 4.
-							const float C = static_cast<float>(p__[j  ]);
-							const float M = static_cast<float>(p__[j+1]);
-							const float Y = static_cast<float>(p__[j+2]);
-							const float K = static_cast<float>(p__[j+3]);
+							const float C = static_cast<float>(p__[j]);
+							const float M = static_cast<float>(p__[j + 1]);
+							const float Y = static_cast<float>(p__[j + 2]);
+							const float K = static_cast<float>(p__[j + 3]);
 #if 1
-							p[0]=static_cast<typename T::PixelType::ValueType>((C*K)/255.0f);
-							p[1]=static_cast<typename T::PixelType::ValueType>((M*K)/255.0f);
-							p[2]=static_cast<typename T::PixelType::ValueType>((Y*K)/255.0f);
-							p[3]=255;
+							p[0] = static_cast<typename T::PixelType::ValueType>((C * K) / 255.0f);
+							p[1] = static_cast<typename T::PixelType::ValueType>((M * K) / 255.0f);
+							p[2] = static_cast<typename T::PixelType::ValueType>((Y * K) / 255.0f);
+							p[3] = 255;
 #else
-							if (p__[j+3]!=255)
+							if (p__[j+3] != 255)
 							{
-								p[0]=static_cast<typename T::PixelType::ValueType>(((255.0f-C)*(255.0f-K))/255.0f);
-								p[1]=static_cast<typename T::PixelType::ValueType>(((255.0f-M)*(255.0f-K))/255.0f);
-								p[2]=static_cast<typename T::PixelType::ValueType>(((255.0f-Y)*(255.0f-K))/255.0f);
-								p[3]=255;
+								p[0] = static_cast<typename T::PixelType::ValueType>(((255.0f - C) * (255.0f - K)) / 255.0f);
+								p[1] = static_cast<typename T::PixelType::ValueType>(((255.0f - M) * (255.0f - K)) / 255.0f);
+								p[2] = static_cast<typename T::PixelType::ValueType>(((255.0f - Y) * (255.0f - K)) / 255.0f);
+								p[3] = 255;
 							}
 							else
 							{
-								p[0]=static_cast<typename T::PixelType::ValueType>(255.0f-C);
-								p[1]=static_cast<typename T::PixelType::ValueType>(255.0f-M);
-								p[2]=static_cast<typename T::PixelType::ValueType>(255.0f-Y);
-								p[3]=255;
+								p[0] = static_cast<typename T::PixelType::ValueType>(255.0f - C);
+								p[1] = static_cast<typename T::PixelType::ValueType>(255.0f - M);
+								p[2] = static_cast<typename T::PixelType::ValueType>(255.0f - Y);
+								p[3] = 255;
 							}
 #endif
 						}
@@ -1765,27 +1792,27 @@ template<typename T> QString process_dicom_rgba_image1(
 							//
 							// FIXME
 							const float tmp_max = 255.0f;
-							const float alpha = static_cast<float>(p__[j+3])/tmp_max;
+							const float alpha = static_cast<float>(p__[j + 3]) / tmp_max;
 							const float one_minus_alpha = 1.0f - alpha;
 							const float tmp_oth = one_minus_alpha*0;
-							const float tmp_red = tmp_oth + alpha*static_cast<float>(p__[j+0]);
-							const float tmp_gre = tmp_oth + alpha*static_cast<float>(p__[j+1]);
-							const float tmp_blu = tmp_oth + alpha*static_cast<float>(p__[j+2]);
-							p[0]=static_cast<typename T::PixelType::ValueType>((tmp_red/tmp_max)*255.0f);
-							p[1]=static_cast<typename T::PixelType::ValueType>((tmp_gre/tmp_max)*255.0f);
-							p[2]=static_cast<typename T::PixelType::ValueType>((tmp_blu/tmp_max)*255.0f);
-							p[3]=255;
+							const float tmp_red = tmp_oth + alpha*static_cast<float>(p__[j]);
+							const float tmp_gre = tmp_oth + alpha*static_cast<float>(p__[j + 1]);
+							const float tmp_blu = tmp_oth + alpha*static_cast<float>(p__[j + 2]);
+							p[0] = static_cast<typename T::PixelType::ValueType>((tmp_red / tmp_max) * 255.0f);
+							p[1] = static_cast<typename T::PixelType::ValueType>((tmp_gre / tmp_max) * 255.0f);
+							p[2] = static_cast<typename T::PixelType::ValueType>((tmp_blu / tmp_max) * 255.0f);
+							p[3] = 255;
 						}
 						else
 						{
-							p[0]=static_cast<typename T::PixelType::ValueType>(p__[j  ]);
-							p[1]=static_cast<typename T::PixelType::ValueType>(p__[j+1]);
-							p[2]=static_cast<typename T::PixelType::ValueType>(p__[j+2]);
-							p[3]=static_cast<typename T::PixelType::ValueType>(p__[j+3]);
+							p[0] = static_cast<typename T::PixelType::ValueType>(p__[j]);
+							p[1] = static_cast<typename T::PixelType::ValueType>(p__[j + 1]);
+							p[2] = static_cast<typename T::PixelType::ValueType>(p__[j + 2]);
+							p[3] = static_cast<typename T::PixelType::ValueType>(p__[j + 3]);
 						}
 					}
 					it.Set(p);
-					j+=4;
+					j += 4;
 					++it;
 				}
 				it.NextLine();
@@ -2181,27 +2208,27 @@ QString CommonUtils::get_orientation2(const double * pat_orientation)
 	bool oblique = false;
 	for (int i = 0; i < 3; ++i)
 	{
-		double dcos[] = { 0.0, 0.0, 0.0 };
+		double dcos[3] = { 0.0, 0.0, 0.0 };
 		double dabsmax = 0.0;
-		switch(i)
+		switch (i)
 		{
 		case 0:
 			dcos[0] = row_dircos_x;
 			dcos[1] = row_dircos_y;
 			dcos[2] = row_dircos_z;
-			dabsmax = abs_max(row_dircos_x,row_dircos_y,row_dircos_z);
+			dabsmax = abs_max(row_dircos_x, row_dircos_y, row_dircos_z);
 			break;
 		case 1:
 			dcos[0] = col_dircos_x;
 			dcos[1] = col_dircos_y;
 			dcos[2] = col_dircos_z;
-			dabsmax = abs_max(col_dircos_x,col_dircos_y,col_dircos_z);
+			dabsmax = abs_max(col_dircos_x, col_dircos_y, col_dircos_z);
 			break;
 		case 2:
 			dcos[0] = nrm_dircos_x;
 			dcos[1] = nrm_dircos_y;
 			dcos[2] = nrm_dircos_z;
-			dabsmax = abs_max(nrm_dircos_x,nrm_dircos_y,nrm_dircos_z);
+			dabsmax = abs_max(nrm_dircos_x, nrm_dircos_y, nrm_dircos_z);
 			break;
 		}
 		for(int j = 0; j < 3; ++j)
@@ -2243,17 +2270,17 @@ void CommonUtils::get_orientation3(
 	{
 		if (absX > 0.0001 && absX > absY && absX > absZ)
 		{
-			*orientation++=orientationX;
+			*orientation++ = orientationX;
 			absX = 0;
 		}
 		else if (absY > 0.0001 && absY>absX && absY > absZ)
 		{
-			*orientation++=orientationY;
+			*orientation++ = orientationY;
 			absY = 0;
 		}
 		else if (absZ > 0.0001 && absZ > absX && absZ > absY)
 		{
-			*orientation++=orientationZ;
+			*orientation++ = orientationZ;
 			absZ = 0;
 		}
 		else break;
@@ -2269,19 +2296,19 @@ void CommonUtils::calculate_center_notuniform(
 	for (size_t k = 0; k < slices.size(); ++k)
 	{
 		const ImageSlice * cs = slices.at(k);
-		for (size_t z = 0; z <= 9; z+=3)
+		for (size_t z = 0; z <= 9; z += 3)
 		{
 			++j;
-			tmpx += cs->fv[z  ];
-			tmpy += cs->fv[z+1];
-			tmpz += cs->fv[z+2];
+			tmpx += cs->fv[z];
+			tmpy += cs->fv[z + 1];
+			tmpz += cs->fv[z + 2];
 		}
 	}
 	if (j>0)
 	{
-		*center_x = static_cast<float>(tmpx/j);
-		*center_y = static_cast<float>(tmpy/j);
-		*center_z = static_cast<float>(tmpz/j);
+		*center_x = static_cast<float>(tmpx / j);
+		*center_y = static_cast<float>(tmpy / j);
+		*center_z = static_cast<float>(tmpz / j);
 	}
 }
 
@@ -2294,19 +2321,19 @@ void CommonUtils::calculate_center_notuniform(
 	for (size_t k = 0; k < slices.size(); ++k)
 	{
 		const SpectroscopySlice * cs = slices.at(k);
-		for (size_t z = 0; z <= 9; z+=3)
+		for (size_t z = 0; z <= 9; z += 3)
 		{
 			++j;
-			tmpx += cs->fv[z  ];
-			tmpy += cs->fv[z+1];
-			tmpz += cs->fv[z+2];
+			tmpx += cs->fv[z];
+			tmpy += cs->fv[z + 1];
+			tmpz += cs->fv[z + 2];
 		}
 	}
 	if (j>0)
 	{
-		*center_x = static_cast<float>(tmpx/j);
-		*center_y = static_cast<float>(tmpy/j);
-		*center_z = static_cast<float>(tmpz/j);
+		*center_x = static_cast<float>(tmpx / j);
+		*center_y = static_cast<float>(tmpy / j);
+		*center_z = static_cast<float>(tmpz / j);
 	}
 }
 
@@ -2335,16 +2362,16 @@ void CommonUtils::generate_cubeslice(
 	cs->v[11]  = z3;
 	cs->tc[ 0] = 0.0f;
 	cs->tc[ 1] = 1.0f;
-	cs->tc[ 2] = z / static_cast<float>(dimz-1);
+	cs->tc[ 2] = z / static_cast<float>(dimz - 1);
 	cs->tc[ 3] = 0.0f;
 	cs->tc[ 4] = 0.0f;
-	cs->tc[ 5] = z / static_cast<float>(dimz-1);
+	cs->tc[ 5] = z / static_cast<float>(dimz - 1);
 	cs->tc[ 6] = 1.0f;
 	cs->tc[ 7] = 1.0f;
-	cs->tc[ 8] = z / static_cast<float>(dimz-1);
+	cs->tc[ 8] = z / static_cast<float>(dimz - 1);
 	cs->tc[ 9] = 1.0f;
 	cs->tc[10] = 0.0f;
-	cs->tc[11] = z / static_cast<float>(dimz-1);
+	cs->tc[11] = z / static_cast<float>(dimz - 1);
 	cs->fv[ 0] = x0;
 	cs->fv[ 1] = y0;
 	cs->fv[ 2] = z0;
@@ -2403,8 +2430,8 @@ void CommonUtils::generate_spectroscopyslice(
 			gl->glBindVertexArray(cs->fvaoid);
 			gl->glGenBuffers(1, &(cs->fvboid));
 			gl->glBindBuffer(GL_ARRAY_BUFFER, cs->fvboid);
-			gl->glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), cs->fv, GL_STATIC_DRAW);
-			gl->glVertexAttribPointer(gl->frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
+			gl->glBufferData(GL_ARRAY_BUFFER, 4 * 3* sizeof(GLfloat), cs->fv, GL_STATIC_DRAW);
+			gl->glVertexAttribPointer(gl->frame_shader.position_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			gl->glEnableVertexAttribArray(gl->frame_shader.position_handle);
 			gl->glBindVertexArray(0);
 #else
@@ -2413,8 +2440,8 @@ void CommonUtils::generate_spectroscopyslice(
 			glBindVertexArray(cs->fvaoid);
 			glGenBuffers(1, &(cs->fvboid));
 			glBindBuffer(GL_ARRAY_BUFFER, cs->fvboid);
-			glBufferData(GL_ARRAY_BUFFER, 4*3*sizeof(GLfloat), cs->fv, GL_STATIC_DRAW);
-			glVertexAttribPointer(gl->frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
+			glBufferData(GL_ARRAY_BUFFER, 4 * 3* sizeof(GLfloat), cs->fv, GL_STATIC_DRAW);
+			glVertexAttribPointer(gl->frame_shader.position_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			glEnableVertexAttribArray(gl->frame_shader.position_handle);
 			glBindVertexArray(0);
 #endif
@@ -2422,44 +2449,44 @@ void CommonUtils::generate_spectroscopyslice(
 			//
 			if (columns_ > 2 && rows_ > 2)
 			{
-				const unsigned long lines_size = 3*2*(columns_-2+rows_-2);
-				cs->lsize = lines_size/3;
+				const unsigned long lines_size = 3 * 2 * (columns_ - 2 + rows_ - 2);
+				cs->lsize = lines_size / 3;
 				GLfloat * v = new GLfloat[lines_size];
-				const sVector3 X0(x0,y0,z0);
-				const sVector3 X1(x1,y1,z1);
-				const sVector3 YN(x1,y1,z1);
-				const sVector3 XN(x2,y2,z2);
-				const float    Xd = length(XN-X0);
-				const float    Yd = length(YN-X0);
-				const sVector3 Xn = normalize(XN-X0);
-				const sVector3 Yn = normalize(YN-X0);
-				float dx = Xd/static_cast<float>(columns_-1);
-				float dy = Yd/static_cast<float>(rows_-1);
-				const sVector3 p = X1 + dx*Xn;
+				const sVector3 X0(x0, y0, z0);
+				const sVector3 X1(x1, y1, z1);
+				const sVector3 YN(x1, y1, z1);
+				const sVector3 XN(x2, y2, z2);
+				const float    Xd = length(XN - X0);
+				const float    Yd = length(YN - X0);
+				const sVector3 Xn = normalize(XN - X0);
+				const sVector3 Yn = normalize(YN - X0);
+				float dx = Xd/static_cast<float>(columns_ - 1);
+				float dy = Yd/static_cast<float>(rows_ - 1);
+				const sVector3 p = X1 + dx * Xn;
 				unsigned long j = 0;
-				for (unsigned int x = 1; x < columns_-1; ++x)
+				for (unsigned int x = 1; x < columns_ - 1; ++x)
 				{
-					const sVector3 from = X0 + (static_cast<float>(x)*dx)*Xn;
-					const sVector3 to   = from + Yd*Yn;
-					v[j  ] = from.getX();
-					v[j+1] = from.getY();
-					v[j+2] = from.getZ();
-					v[j+3] =   to.getX();
-					v[j+4] =   to.getY();
-					v[j+5] =   to.getZ();
-					j+=6;
+					const sVector3 from = X0 + (static_cast<float>(x) * dx) * Xn;
+					const sVector3 to   = from + Yd * Yn;
+					v[j] = from.getX();
+					v[j + 1] = from.getY();
+					v[j + 2] = from.getZ();
+					v[j + 3] =   to.getX();
+					v[j + 4] =   to.getY();
+					v[j + 5] =   to.getZ();
+					j += 6;
 				}
-				for (unsigned int x = 1; x < rows_-1; ++x)
+				for (unsigned int x = 1; x < rows_ - 1; ++x)
 				{
-					sVector3 from = X0 + (static_cast<float>(x)*dy)*Yn;
-					sVector3 to   = from + Xd*Xn;
-					v[j  ] = from.getX();
-					v[j+1] = from.getY();
-					v[j+2] = from.getZ();
-					v[j+3] =   to.getX();
-					v[j+4] =   to.getY();
-					v[j+5] =   to.getZ();
-					j+=6;
+					sVector3 from = X0 + (static_cast<float>(x) * dy) * Yn;
+					sVector3 to   = from + Xd * Xn;
+					v[j] = from.getX();
+					v[j + 1] = from.getY();
+					v[j + 2] = from.getZ();
+					v[j + 3] =   to.getX();
+					v[j + 4] =   to.getY();
+					v[j + 5] =   to.getZ();
+					j += 6;
 				}
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 				gl->glGenVertexArrays(1, &(cs->lvaoid));
@@ -2467,7 +2494,7 @@ void CommonUtils::generate_spectroscopyslice(
 				gl->glGenBuffers(1, &(cs->lvboid));
 				gl->glBindBuffer(GL_ARRAY_BUFFER, cs->lvboid);
 				gl->glBufferData(GL_ARRAY_BUFFER, lines_size*sizeof(GLfloat), v, GL_STATIC_DRAW);
-				gl->glVertexAttribPointer(gl->frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
+				gl->glVertexAttribPointer(gl->frame_shader.position_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
 				gl->glEnableVertexAttribArray(gl->frame_shader.position_handle);
 				gl->glBindVertexArray(0);
 #else
@@ -2476,7 +2503,7 @@ void CommonUtils::generate_spectroscopyslice(
 				glGenBuffers(1, &(cs->lvboid));
 				glBindBuffer(GL_ARRAY_BUFFER, cs->lvboid);
 				glBufferData(GL_ARRAY_BUFFER, lines_size*sizeof(GLfloat), v, GL_STATIC_DRAW);
-				glVertexAttribPointer(gl->frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
+				glVertexAttribPointer(gl->frame_shader.position_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
 				glEnableVertexAttribArray(gl->frame_shader.position_handle);
 				glBindVertexArray(0);
 #endif
@@ -2495,7 +2522,7 @@ void CommonUtils::generate_spectroscopyslice(
 				gl->glGenBuffers(1, &(cs->pvboid));
 				gl->glBindBuffer(GL_ARRAY_BUFFER, cs->pvboid);
 				gl->glBufferData(GL_ARRAY_BUFFER, 6*sizeof(GLfloat), v1, GL_STATIC_DRAW);
-				gl->glVertexAttribPointer(gl->frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
+				gl->glVertexAttribPointer(gl->frame_shader.position_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
 				gl->glEnableVertexAttribArray(gl->frame_shader.position_handle);
 				gl->glBindVertexArray(0);
 #else
@@ -2504,7 +2531,7 @@ void CommonUtils::generate_spectroscopyslice(
 				glGenBuffers(1, &(cs->pvboid));
 				glBindBuffer(GL_ARRAY_BUFFER, cs->pvboid);
 				glBufferData(GL_ARRAY_BUFFER, 6*sizeof(GLfloat), v1, GL_STATIC_DRAW);
-				glVertexAttribPointer(gl->frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
+				glVertexAttribPointer(gl->frame_shader.position_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
 				glEnableVertexAttribArray(gl->frame_shader.position_handle);
 				glBindVertexArray(0);
 #endif
@@ -2525,9 +2552,9 @@ void CommonUtils::generate_spectroscopyslice(
 			gl->glBindVertexArray(cs->pvaoid);
 			gl->glGenBuffers(1, &(cs->pvboid));
 			gl->glBindBuffer(GL_ARRAY_BUFFER, cs->pvboid);
-			gl->glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat), v1, GL_STATIC_DRAW);
+			gl->glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(GLfloat), v1, GL_STATIC_DRAW);
 			gl->glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-			gl->glVertexAttribPointer(gl->frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
+			gl->glVertexAttribPointer(gl->frame_shader.position_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			gl->glEnableVertexAttribArray(gl->frame_shader.position_handle);
 			gl->glBindVertexArray(0);
 #else
@@ -2535,9 +2562,9 @@ void CommonUtils::generate_spectroscopyslice(
 			glBindVertexArray(cs->pvaoid);
 			glGenBuffers(1, &(cs->pvboid));
 			glBindBuffer(GL_ARRAY_BUFFER, cs->pvboid);
-			glBufferData(GL_ARRAY_BUFFER, 3*sizeof(GLfloat), v1, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(GLfloat), v1, GL_STATIC_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-			glVertexAttribPointer(gl->frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
+			glVertexAttribPointer(gl->frame_shader.position_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			glEnableVertexAttribArray(gl->frame_shader.position_handle);
 			glBindVertexArray(0);
 #endif
@@ -2553,7 +2580,7 @@ void CommonUtils::calculate_rgb_minmax(ImageVariant * ivariant)
 {
 	if (!ivariant) return;
 	const short image_type = ivariant->image_type;
-	switch(image_type)
+	switch (image_type)
 	{
 	case 10:
 		calculate_rgb_minmax_<RGBImageTypeSS>(ivariant->pSS_rgb, ivariant);
@@ -2585,7 +2612,7 @@ void CommonUtils::calculate_rgba_minmax(ImageVariant * ivariant)
 {
 	if (!ivariant) return;
 	const short image_type = ivariant->image_type;
-	switch(image_type)
+	switch (image_type)
 	{
 	case 20:
 		calculate_rgba_minmax_<RGBAImageTypeSS>(ivariant->pSS_rgba, ivariant);
@@ -2750,7 +2777,7 @@ void CommonUtils::calculate_minmax_scalar(
 {
 	if (!ivariant) return;
 	const short image_type = ivariant->image_type;
-	switch(image_type)
+	switch (image_type)
 	{
 	case 0:
 		calculate_min_max<ImageTypeSS>(ivariant->pSS, ivariant);
@@ -2795,69 +2822,69 @@ bool CommonUtils::reload_monochrome(
 {
 	if (!ivariant) return false;
 	bool ok = false;
-	if (ivariant->image_type==0)
+	if (ivariant->image_type == 0)
 	{
 		ok = reload_monochrome_image<ImageTypeSS>(
-			ivariant,ivariant->pSS,gl,max_3d_tex_size,
+			ivariant, ivariant->pSS, gl, max_3d_tex_size,
 			NULL,
-			change_size,size_x_,size_y_);
+			change_size, size_x_, size_y_);
 	}
-	else if (ivariant->image_type==1)
+	else if (ivariant->image_type == 1)
 	{
 		ok = reload_monochrome_image<ImageTypeUS>(
-			ivariant,ivariant->pUS,gl,max_3d_tex_size,
+			ivariant, ivariant->pUS, gl, max_3d_tex_size,
 			NULL,
-			change_size,size_x_,size_y_);
+			change_size, size_x_, size_y_);
 	}
-	else if (ivariant->image_type==2)
+	else if (ivariant->image_type == 2)
 	{
 		ok = reload_monochrome_image<ImageTypeSI>(
-			ivariant,ivariant->pSI,gl,max_3d_tex_size,
+			ivariant, ivariant->pSI, gl, max_3d_tex_size,
 			NULL,
-			change_size,size_x_,size_y_);
+			change_size, size_x_, size_y_);
 	}
-	else if (ivariant->image_type==3)
+	else if (ivariant->image_type == 3)
 	{
 		ok = reload_monochrome_image<ImageTypeUI>(
-			ivariant,ivariant->pUI,gl,max_3d_tex_size,
+			ivariant, ivariant->pUI, gl, max_3d_tex_size,
 			NULL,
-			change_size,size_x_,size_y_);
+			change_size, size_x_, size_y_);
 	}
-	else if (ivariant->image_type==4)
+	else if (ivariant->image_type == 4)
 	{
 		ivariant->di->maxwindow = true;
 		ok = reload_monochrome_image<ImageTypeUC>(
-			ivariant,ivariant->pUC,gl,max_3d_tex_size,
+			ivariant, ivariant->pUC, gl, max_3d_tex_size,
 			NULL,
-			change_size,size_x_,size_y_);
+			change_size, size_x_, size_y_);
 	}
-	else if (ivariant->image_type==5)
+	else if (ivariant->image_type == 5)
 	{
 		ok = reload_monochrome_image<ImageTypeF>(
-			ivariant,ivariant->pF,gl,max_3d_tex_size,
+			ivariant, ivariant->pF, gl, max_3d_tex_size,
 			NULL,
-			change_size,size_x_,size_y_);
+			change_size, size_x_, size_y_);
 	}
-	else if (ivariant->image_type==6)
+	else if (ivariant->image_type == 6)
 	{
 		ok = reload_monochrome_image<ImageTypeD>(
-			ivariant,ivariant->pD,gl,max_3d_tex_size,
+			ivariant, ivariant->pD, gl, max_3d_tex_size,
 			NULL,
-			change_size,size_x_,size_y_);
+			change_size, size_x_, size_y_);
 	}
-	else if (ivariant->image_type==7)
+	else if (ivariant->image_type == 7)
 	{
 		ok = reload_monochrome_image<ImageTypeSLL>(
-			ivariant,ivariant->pSLL,gl,max_3d_tex_size,
+			ivariant, ivariant->pSLL, gl, max_3d_tex_size,
 			NULL,
-			change_size,size_x_,size_y_);
+			change_size, size_x_, size_y_);
 	}
-	else if (ivariant->image_type==8)
+	else if (ivariant->image_type == 8)
 	{
 		ok = reload_monochrome_image<ImageTypeULL>(
-			ivariant,ivariant->pULL,gl,max_3d_tex_size,
+			ivariant, ivariant->pULL, gl, max_3d_tex_size,
 			NULL,
-			change_size,size_x_,size_y_);
+			change_size, size_x_, size_y_);
 	}
 	else
 	{
@@ -2869,33 +2896,33 @@ bool CommonUtils::reload_monochrome(
 bool CommonUtils::reload_rgb_rgba(ImageVariant * ivariant)
 {
 	if (!ivariant) return false;
-	if (ivariant->image_type==10)
+	if (ivariant->image_type == 10)
 		reload_rgb_image<RGBImageTypeSS>(ivariant->pSS_rgb, ivariant);
-	else if (ivariant->image_type==11)
+	else if (ivariant->image_type == 11)
 		reload_rgb_image<RGBImageTypeUS>(ivariant->pUS_rgb, ivariant);
-	else if (ivariant->image_type==12)
+	else if (ivariant->image_type == 12)
 		reload_rgb_image<RGBImageTypeSI>(ivariant->pSI_rgb, ivariant);
-	else if (ivariant->image_type==13)
+	else if (ivariant->image_type == 13)
 		reload_rgb_image<RGBImageTypeUI>(ivariant->pUI_rgb, ivariant);
-	else if (ivariant->image_type==14)
+	else if (ivariant->image_type == 14)
 		reload_rgb_image<RGBImageTypeUC>(ivariant->pUC_rgb, ivariant);
-	else if (ivariant->image_type==15)
+	else if (ivariant->image_type == 15)
 		reload_rgb_image<RGBImageTypeF>(ivariant->pF_rgb, ivariant);
-	else if (ivariant->image_type==16)
+	else if (ivariant->image_type == 16)
 		reload_rgb_image<RGBImageTypeD>(ivariant->pD_rgb, ivariant);
-	else if (ivariant->image_type==20)
+	else if (ivariant->image_type == 20)
 		reload_rgba_image<RGBAImageTypeSS>(ivariant->pSS_rgba, ivariant);
-	else if (ivariant->image_type==21)
+	else if (ivariant->image_type == 21)
 		reload_rgba_image<RGBAImageTypeUS>(ivariant->pUS_rgba, ivariant);
-	else if (ivariant->image_type==22)
+	else if (ivariant->image_type == 22)
 		reload_rgba_image<RGBAImageTypeSI>(ivariant->pSI_rgba, ivariant);
-	else if (ivariant->image_type==23)
+	else if (ivariant->image_type == 23)
 		reload_rgba_image<RGBAImageTypeUI>(ivariant->pUI_rgba, ivariant);
-	else if (ivariant->image_type==24)
+	else if (ivariant->image_type == 24)
 		reload_rgba_image<RGBAImageTypeUC>(ivariant->pUC_rgba, ivariant);
-	else if (ivariant->image_type==25)
+	else if (ivariant->image_type == 25)
 		reload_rgba_image<RGBAImageTypeF>(ivariant->pF_rgba, ivariant);
-	else if (ivariant->image_type==26)
+	else if (ivariant->image_type == 26)
 		reload_rgba_image<RGBAImageTypeD>(ivariant->pD_rgba, ivariant);
 	else return false;
 	return true;
@@ -2907,30 +2934,30 @@ void CommonUtils::copy_imagevariant_info(
 {
 	if (!dest) return;
 	if (!source) return;
-	dest->instance_number         = source->instance_number;
-	dest->study_uid               = source->study_uid;
-	dest->series_uid              = source->series_uid;
-	dest->study_date              = source->study_date;
-	dest->study_time              = source->study_time;
-	dest->study_id                = source->study_id;
-	dest->frame_of_ref_uid        = source->frame_of_ref_uid;
-	dest->modality                = source->modality;
-	dest->iod                     = source->iod;
-	dest->sop                     = source->sop;
-	dest->series_description      = source->series_description;
-	dest->study_description       = source->study_description;
-	dest->pat_name                = source->pat_name;
-	dest->pat_id                  = source->pat_id;
-	dest->pat_birthdate           = source->pat_birthdate;
-	dest->pat_sex                 = source->pat_sex;
-	dest->series_date             = source->series_date;
-	dest->series_time             = source->series_time;
-	dest->acquisition_date        = source->acquisition_date;
-	dest->acquisition_time        = source->acquisition_time;
-	dest->hardware                = source->hardware;
-	dest->hardware_info           = source->hardware_info;
-	dest->iinfo                   = source->iinfo;
-	dest->institution             = source->institution;
+	dest->instance_number    = source->instance_number;
+	dest->study_uid          = source->study_uid;
+	dest->series_uid         = source->series_uid;
+	dest->study_date         = source->study_date;
+	dest->study_time         = source->study_time;
+	dest->study_id           = source->study_id;
+	dest->frame_of_ref_uid   = source->frame_of_ref_uid;
+	dest->modality           = source->modality;
+	dest->iod                = source->iod;
+	dest->sop                = source->sop;
+	dest->series_description = source->series_description;
+	dest->study_description  = source->study_description;
+	dest->pat_name           = source->pat_name;
+	dest->pat_id             = source->pat_id;
+	dest->pat_birthdate      = source->pat_birthdate;
+	dest->pat_sex            = source->pat_sex;
+	dest->series_date        = source->series_date;
+	dest->series_time        = source->series_time;
+	dest->acquisition_date   = source->acquisition_date;
+	dest->acquisition_time   = source->acquisition_time;
+	dest->hardware           = source->hardware;
+	dest->hardware_info      = source->hardware_info;
+	dest->iinfo              = source->iinfo;
+	dest->institution        = source->institution;
 }
 
 void CommonUtils::copy_frametimes(
@@ -3004,14 +3031,14 @@ void CommonUtils::reset_bb(ImageVariant * ivariant)
 	if (!ivariant) return;
 	ivariant->di->irect_index[0] = 0;
 	ivariant->di->irect_index[1] = 0;
-	ivariant->di->irect_size[0]  = ivariant->di->idimx;
-	ivariant->di->irect_size[1]  = ivariant->di->idimy;
+	ivariant->di->irect_size[0] = ivariant->di->idimx;
+	ivariant->di->irect_size[1] = ivariant->di->idimy;
 	ivariant->di->selected_x_slice =
-		(ivariant->di->idimx>0) ? ivariant->di->idimx/2 : 0;
+		(ivariant->di->idimx > 0) ? ivariant->di->idimx / 2 : 0;
 	ivariant->di->selected_y_slice =
-		(ivariant->di->idimy>0) ? ivariant->di->idimy/2 : 0;
+		(ivariant->di->idimy > 0) ? ivariant->di->idimy / 2 : 0;
 	ivariant->di->selected_z_slice =
-		(ivariant->di->idimz>0) ? ivariant->di->idimz/2 : 0;
+		(ivariant->di->idimz > 0) ? ivariant->di->idimz / 2 : 0;
 	ivariant->di->from_slice = 0;
 	ivariant->di->to_slice = ivariant->di->idimz-1;
 }
@@ -3019,7 +3046,7 @@ void CommonUtils::reset_bb(ImageVariant * ivariant)
 void CommonUtils::get_dimensions_(ImageVariant * ivariant)
 {
 	if (!ivariant) return;
-	switch(ivariant->image_type)
+	switch (ivariant->image_type)
 	{
 	case 0:
 		get_dimensions<ImageTypeSS>(
@@ -3331,7 +3358,7 @@ QString CommonUtils::get_orientation1(
 {
 	if (!ivariant) return QString("");
 	QString orient("");
-	switch(ivariant->image_type)
+	switch (ivariant->image_type)
 	{
 	case 0:
 		orient = get_orientation<ImageTypeSS>(ivariant->pSS, result);
@@ -3414,7 +3441,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 	const mdcm::PixelFormat & pixelformat,
 	const mdcm::PhotometricInterpretation & pi,
 	ImageVariant * ivariant,
-	itk::Matrix<itk::SpacePrecisionType,3,3> & direction,
+	itk::Matrix<itk::SpacePrecisionType, 3, 3> & direction,
 	unsigned int dimx_, unsigned int dimy_, unsigned int dimz_,
 	double origin_x, double origin_y, double origin_z,
 	double spacing_x, double spacing_y, double spacing_z,
@@ -4958,8 +4985,8 @@ QString CommonUtils::apply_per_slice_rescale(
 	if (!(image_type >= 0 && image_type < 10)) return QString("");
 	bool float64 = false;
 	const double float_max = (1 << FLT_MANT_DIG);
-	if (ivariant->sop==QString("1.2.840.10008.5.1.4.1.1.128.1") ||
-		ivariant->sop==QString(""))
+	if (ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128.1") ||
+		ivariant->sop == QString(""))
 	{
 		float64 = true;
 	}
@@ -4979,78 +5006,78 @@ QString CommonUtils::apply_per_slice_rescale(
 		}
 	}
 	QString s("");
-	switch(image_type)
+	switch (image_type)
 	{
 	case 0:
 		if (float64)
-			s = apply_per_slice_rescale_<ImageTypeSS,ImageTypeD>(
+			s = apply_per_slice_rescale_<ImageTypeSS, ImageTypeD>(
 				ivariant->pSS, ivariant->pD, rescale_values);
 		else
-			s = apply_per_slice_rescale_<ImageTypeSS,ImageTypeF>(
+			s = apply_per_slice_rescale_<ImageTypeSS, ImageTypeF>(
 				ivariant->pSS, ivariant->pF, rescale_values);
 		break;
 	case 1:
 		if (float64)
-			s = apply_per_slice_rescale_<ImageTypeUS,ImageTypeD>(
+			s = apply_per_slice_rescale_<ImageTypeUS, ImageTypeD>(
 				ivariant->pUS, ivariant->pD, rescale_values);
 		else
-			s = apply_per_slice_rescale_<ImageTypeUS,ImageTypeF>(
+			s = apply_per_slice_rescale_<ImageTypeUS, ImageTypeF>(
 				ivariant->pUS, ivariant->pF, rescale_values);
 		break;
 	case 2:
 		if (float64)
-			s = apply_per_slice_rescale_<ImageTypeSI,ImageTypeD>(
+			s = apply_per_slice_rescale_<ImageTypeSI, ImageTypeD>(
 				ivariant->pSI, ivariant->pD, rescale_values);
 		else
-			s = apply_per_slice_rescale_<ImageTypeSI,ImageTypeF>(
+			s = apply_per_slice_rescale_<ImageTypeSI, ImageTypeF>(
 				ivariant->pSI, ivariant->pF, rescale_values);
 		break;
 	case 3:
 		if (float64)
-			s = apply_per_slice_rescale_<ImageTypeUI,ImageTypeD>(
+			s = apply_per_slice_rescale_<ImageTypeUI, ImageTypeD>(
 				ivariant->pUI, ivariant->pD, rescale_values);
 		else
-			s = apply_per_slice_rescale_<ImageTypeUI,ImageTypeF>(
+			s = apply_per_slice_rescale_<ImageTypeUI, ImageTypeF>(
 				ivariant->pUI, ivariant->pF, rescale_values);
 		break;
 	case 4:
 		if (float64)
-			s = apply_per_slice_rescale_<ImageTypeUC,ImageTypeD>(
+			s = apply_per_slice_rescale_<ImageTypeUC, ImageTypeD>(
 				ivariant->pUC, ivariant->pD, rescale_values);
 		else
-			s = apply_per_slice_rescale_<ImageTypeUC,ImageTypeF>(
+			s = apply_per_slice_rescale_<ImageTypeUC, ImageTypeF>(
 				ivariant->pUC, ivariant->pF, rescale_values);
 		break;
 	case 5:
 		if (float64)
-			s = apply_per_slice_rescale_<ImageTypeF,ImageTypeD>(
+			s = apply_per_slice_rescale_<ImageTypeF, ImageTypeD>(
 				ivariant->pF, ivariant->pD, rescale_values);
 		else
-			s = apply_per_slice_rescale_<ImageTypeF,ImageTypeF>(
+			s = apply_per_slice_rescale_<ImageTypeF, ImageTypeF>(
 				ivariant->pF, ivariant->pF, rescale_values);
 		break;
 	case 6:
 		if (float64)
-			s = apply_per_slice_rescale_<ImageTypeD,ImageTypeD>(
+			s = apply_per_slice_rescale_<ImageTypeD, ImageTypeD>(
 				ivariant->pD, ivariant->pD, rescale_values);
 		else
-			s = apply_per_slice_rescale_<ImageTypeD,ImageTypeF>(
+			s = apply_per_slice_rescale_<ImageTypeD, ImageTypeF>(
 				ivariant->pD, ivariant->pF, rescale_values);
 		break;
 	case 7:
 		if (float64)
-			s = apply_per_slice_rescale_<ImageTypeSLL,ImageTypeD>(
+			s = apply_per_slice_rescale_<ImageTypeSLL, ImageTypeD>(
 				ivariant->pSLL, ivariant->pD, rescale_values);
 		else
-			s = apply_per_slice_rescale_<ImageTypeSLL,ImageTypeF>(
+			s = apply_per_slice_rescale_<ImageTypeSLL, ImageTypeF>(
 				ivariant->pSLL, ivariant->pF, rescale_values);
 		break;
 	case 8:
 		if (float64)
-			s = apply_per_slice_rescale_<ImageTypeULL,ImageTypeD>(
+			s = apply_per_slice_rescale_<ImageTypeULL, ImageTypeD>(
 				ivariant->pULL, ivariant->pD, rescale_values);
 		else
-			s = apply_per_slice_rescale_<ImageTypeULL,ImageTypeF>(
+			s = apply_per_slice_rescale_<ImageTypeULL, ImageTypeF>(
 				ivariant->pULL, ivariant->pF, rescale_values);
 		break;
 	default:
