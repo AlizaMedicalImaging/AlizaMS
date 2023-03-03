@@ -59,12 +59,10 @@ public:
   VL
   GetLength() const
   {
-    return 128 + 4;
+    return 132;
   }
 
 private:
-  void
-         Create();
   char * Internal;
 };
 
