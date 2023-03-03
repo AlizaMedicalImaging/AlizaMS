@@ -29,3 +29,4 @@ void ImageInfoDialog::adjust()
 {
 	adjustSize();
 }
+

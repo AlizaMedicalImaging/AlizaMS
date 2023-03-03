@@ -1038,3 +1038,4 @@ void IconUtils::kill_threads()
 	}
 	icon_threads.clear();
 }
+

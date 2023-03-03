@@ -109,3 +109,4 @@ void LevelItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * e)
 	m_pressed = false;
 	QGraphicsItem::mouseReleaseEvent(e);
 }
+

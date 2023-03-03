@@ -593,3 +593,4 @@ void Camera::calculate_projective_matrix(
 		m_light_mvp_scaled_biased[id]*modeling_aos;
 	matrix4_to_float(projective_matrix_aos, projective_matrix);
 }
+

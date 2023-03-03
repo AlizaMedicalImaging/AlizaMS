@@ -617,3 +617,4 @@ void QxtSpanSlider::paintEvent(QPaintEvent* event)
         break;
     }
 }
+

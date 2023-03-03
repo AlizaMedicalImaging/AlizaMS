@@ -105,3 +105,4 @@ void RectItem::paint(
 {
 	QGraphicsRectItem::paint(painter, option, widget);
 }
+

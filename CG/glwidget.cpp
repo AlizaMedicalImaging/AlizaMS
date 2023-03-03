@@ -6872,3 +6872,4 @@ void GLWidget::disable_gl_in_settings()
 #ifdef ALWAYS_SHOW_GL_ERROR
 #undef ALWAYS_SHOW_GL_ERROR
 #endif
+

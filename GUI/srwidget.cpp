@@ -219,3 +219,4 @@ void SRWidget::check_close()
 		close();
 	}
 }
+

@@ -2145,3 +2145,4 @@ void GraphicsView::draw_shutter(const ImageVariant * ivariant)
 		}
 	}
 }
+

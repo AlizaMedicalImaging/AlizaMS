@@ -115,3 +115,4 @@ void CTKDialog::set_tmp0()
 	dir_toolButton->hide();
 	file_toolButton->show();
 }
+

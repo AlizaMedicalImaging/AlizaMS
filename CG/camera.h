@@ -151,3 +151,4 @@ public:
 } VECTORMATH_ALIGNED_POST;
 
 #endif
+

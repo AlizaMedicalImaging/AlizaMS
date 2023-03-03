@@ -325,3 +325,4 @@ void HistogramView::get_screen()
 		mbox.exec();
 	}
 }
+

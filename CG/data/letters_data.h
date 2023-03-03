@@ -9489,3 +9489,4 @@ const float p_normals_letters[1086]={
 -0.526634f,
 0.707096f};
 #endif // LETTERS_DATA_H
+

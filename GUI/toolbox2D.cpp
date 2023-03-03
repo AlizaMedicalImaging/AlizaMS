@@ -177,3 +177,4 @@ void ToolBox2D::set_locked_width(double x)
 {
 	width2_doubleSpinBox->setValue(x);
 }
+

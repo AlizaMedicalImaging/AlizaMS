@@ -2037,3 +2037,4 @@ void MainWindow::ask_close()
 		this->close();
 	}
 }
+

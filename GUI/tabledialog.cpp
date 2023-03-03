@@ -14,3 +14,4 @@ int TableDialog::get_columns() const
 {
 	return c_spinBox->value();
 }
+

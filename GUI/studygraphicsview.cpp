@@ -1648,3 +1648,4 @@ void StudyGraphicsView::draw_shutter(const ImageVariant * ivariant)
 		}
 	}
 }
+

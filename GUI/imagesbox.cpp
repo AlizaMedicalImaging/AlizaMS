@@ -852,3 +852,4 @@ void ImagesBox::update_background_color(bool b)
 		textBrowser->setStyleSheet("QTextEdit { background-color: rgb(210, 210, 210); }");
 	}
 }
+

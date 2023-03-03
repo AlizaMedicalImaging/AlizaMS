@@ -482,3 +482,4 @@ private:
 } VECTORMATH_ALIGNED_POST;
 
 #endif
+

@@ -27,3 +27,4 @@ ZoomWidget::ZoomWidget(float si)
 ZoomWidget::~ZoomWidget()
 {
 }
+

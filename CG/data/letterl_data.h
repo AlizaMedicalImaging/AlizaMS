@@ -435,3 +435,4 @@ const float p_normals_letterl[36]={
 -0.707120f,
 -0.000000f};
 #endif // LETTERL_DATA_H
+

@@ -408,3 +408,4 @@ short SettingsWidget::get_enh_strategy() const
 	}
 	return 0; // unreachable
 }
+

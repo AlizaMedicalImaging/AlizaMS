@@ -33,3 +33,4 @@ void ZRangeWidget::set_span(int l, int h)
 {
 	spanslider->setSpan(l,h);
 }
+

@@ -2607,3 +2607,4 @@ void StudyGraphicsWidget::update_measurement(
 		set_measure_text(tmp0);
 	}
 }
+

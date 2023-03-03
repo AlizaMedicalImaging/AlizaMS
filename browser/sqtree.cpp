@@ -2120,3 +2120,4 @@ void SQtree::file_from_slider(int x)
 	if (x >= list_of_files.size()) return;
 	read_file(list_of_files.at(x), true);
 }
+

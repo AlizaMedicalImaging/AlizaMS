@@ -197,3 +197,4 @@ void HandleItem::mouseReleaseEvent(
 	m_pressed = false;
 	QGraphicsItem::mouseReleaseEvent(e);
 }
+

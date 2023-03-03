@@ -26,3 +26,4 @@ void SliderWidget::set_style_sheet()
 		"QWidget{selection-background-color: #303947;}");
 	slices_slider->setStyleSheet(tmp0);
 }
+

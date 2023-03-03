@@ -840,3 +840,4 @@ const float p_normals_lettera[72]={
 -0.707097f,
 -0.269899f};
 #endif // LETTERA_DATA_H
+

@@ -13,18 +13,18 @@ class RectItem : public QGraphicsRectItem
 {
 public:
     enum { Type = QGraphicsItem::UserType + 3 };
-    RectItem(qreal, qreal, qreal, qreal, QGraphicsItem(*)=NULL);
+    RectItem(qreal, qreal, qreal, qreal, QGraphicsItem(*) = NULL);
     ~RectItem();
 	void set_pen1(
 		qreal,
-		unsigned int=0xbc,
-		unsigned int=0x86,
-		unsigned int=0x2b);
+		unsigned int = 0xbc,
+		unsigned int = 0x86,
+		unsigned int = 0x2b);
 	void set_pen2(
 		qreal,
-		unsigned int=0xbc,
-		unsigned int=0x86,
-		unsigned int=0x2b);
+		unsigned int = 0xbc,
+		unsigned int = 0x86,
+		unsigned int = 0x2b);
 	qreal  get_width() const;
 	void   set_width(double);
 	short  get_current_pen() const;
@@ -44,3 +44,4 @@ private:
 };
 
 #endif
+

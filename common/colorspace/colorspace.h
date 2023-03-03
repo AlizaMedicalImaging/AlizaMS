@@ -54,3 +54,4 @@ public:
 };
 
 #endif  // A_COLORSPACE_H
+

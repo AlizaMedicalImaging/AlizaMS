@@ -213,3 +213,4 @@ void MatrixButton::emit_matrix_selected(int r, int c)
 	p_menu->hide();
 	emit matrix_selected(r, c);
 }
+

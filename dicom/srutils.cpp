@@ -1986,3 +1986,4 @@ QString SRUtils::read_sr_content_sq(
 #ifdef TMP_IMAGE_IN_MEMORY
 #undef TMP_IMAGE_IN_MEMORY
 #endif
+

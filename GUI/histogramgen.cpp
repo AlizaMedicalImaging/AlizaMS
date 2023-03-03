@@ -343,3 +343,4 @@ QString HistogramGen::get_error() const
 {
 	return error;
 }
+

@@ -17,3 +17,4 @@ AnimWidget::AnimWidget(float si)
 AnimWidget::~AnimWidget()
 {
 }
+
