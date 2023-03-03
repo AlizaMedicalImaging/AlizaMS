@@ -238,12 +238,13 @@ ImagesBox::ImagesBox(float si)
 	width_doubleSpinBox->setSizePolicy(
 		QSizePolicy::Fixed,QSizePolicy::Fixed);
 	width_doubleSpinBox->setToolTip(QString(
-		"<html><head/><body><p>Contours width (2D)."
+		"<html><head/><body><p>Contours width (2D view)."
 		"</p><p><span style=\" font-style:italic;\">"
 		"0.0</span> is auto.</p></body></html>"));
 	width_doubleSpinBox->setDecimals(1);
 	width_doubleSpinBox->setRange(0.0, 9.9);
 	width_doubleSpinBox->setSingleStep(0.1);
+	width_doubleSpinBox->setPrefix(QString("Width "));
 	width_doubleSpinBox->setSuffix(QString(" px"));
 	width_doubleSpinBox->setValue(0.0);
 	toolbar1->addWidget(width_doubleSpinBox);
