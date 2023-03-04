@@ -89,7 +89,7 @@ float ContourUtils::distance_to_plane(
 	float nx, float ny, float nz,
 	float px, float py, float pz)
 {
-	const float d = nx*(x-px) + ny*(y-py) + nz*(z-pz);
+	const float d = nx * (x - px) + ny * (y - py) + nz * (z - pz);
 	if (d < 0) return -d;
 	return d;
 }
@@ -132,7 +132,7 @@ void ContourUtils::calculate_rois_center(ImageVariant * iv)
 			++it;
 		}
 	}
-	if (z>0)
+	if (z > 0)
 	{
 		iv->di->default_center_x = iv->di->center_x = tmpx/z;
 		iv->di->default_center_y = iv->di->center_y = tmpy/z;
@@ -174,11 +174,16 @@ void ContourUtils::generate_roi_vbos(
 			size_t ind = 0;
 			if (ok && !c->vao_initialized)
 			{
-				const size_t s = 3*c->dpoints.size();
+				const size_t s = 3 * c->dpoints.size();
 				GLfloat * v;
-				try { v = new GLfloat[s]; }
-				catch(const std::bad_alloc&) { return; }
-				if (!v) return;
+				try
+				{
+					v = new GLfloat[s];
+				}
+				catch (const std::bad_alloc&)
+				{
+					return;
+				}
 				for (int k = 0; k < c->dpoints.size(); ++k)
 				{
 					v[ind] = static_cast<GLfloat>(c->dpoints.at(k).x);
@@ -190,9 +195,7 @@ void ContourUtils::generate_roi_vbos(
 				}
 				if (ind != s)
 				{
-					std::cout
-						<< "failed generating VBOs (contours)"
-						<< std::endl;
+					std::cout << "failed generating VBOs (contours)" << std::endl;
 					delete [] v;
 					return;
 				}
@@ -204,8 +207,8 @@ void ContourUtils::generate_roi_vbos(
 					gl->glBindVertexArray(c->vaoid);
 					gl->glGenBuffers(1, &(c->vboid));
 					gl->glBindBuffer(GL_ARRAY_BUFFER, c->vboid);
-					gl->glBufferData(GL_ARRAY_BUFFER, s*sizeof(GLfloat), v, GL_STATIC_DRAW);
-					gl->glVertexAttribPointer(gl->frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
+					gl->glBufferData(GL_ARRAY_BUFFER, s * sizeof(GLfloat), v, GL_STATIC_DRAW);
+					gl->glVertexAttribPointer(gl->frame_shader.position_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
 					gl->glEnableVertexAttribArray(gl->frame_shader.position_handle);
 					gl->glBindVertexArray(0);
 #else
@@ -213,8 +216,8 @@ void ContourUtils::generate_roi_vbos(
 					glBindVertexArray(c->vaoid);
 					glGenBuffers(1, &(c->vboid));
 					glBindBuffer(GL_ARRAY_BUFFER, c->vboid);
-					glBufferData(GL_ARRAY_BUFFER, s*sizeof(GLfloat), v, GL_STATIC_DRAW);
-					glVertexAttribPointer(gl->frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
+					glBufferData(GL_ARRAY_BUFFER, s * sizeof(GLfloat), v, GL_STATIC_DRAW);
+					glVertexAttribPointer(gl->frame_shader.position_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
 					glEnableVertexAttribArray(gl->frame_shader.position_handle);
 					glBindVertexArray(0);
 #endif
@@ -256,7 +259,7 @@ void ContourUtils::copy_roi(
 		{
 			Contour * contour = new Contour();
 			contour->id = c->id;
-			contour->roiid = id; 
+			contour->roiid = id;
 			contour->type = c->type;
 			contour->vao_initialized = false;
 			for (int i = 0; i < c->dpoints.size(); ++i)
@@ -333,7 +336,7 @@ void ContourUtils::calculate_uvt_nonuniform(
 				}
 				if (in_slice) slices.push_back(z);
 			}
-			if (slices.size()==1)
+			if (slices.size() == 1)
 			{
 				const int idx = slices.at(0);
 				for (int k = 0; k < c->dpoints.size(); ++k)
@@ -374,7 +377,7 @@ void ContourUtils::calculate_contours_uv(
 	if (ivariant->di->idimz == 0) return;
 	if (ivariant->equi)
 	{
-		switch(ivariant->image_type)
+		switch (ivariant->image_type)
 		{
 		case 0:
 			calculate_uvt<ImageTypeSS>(ivariant->pSS, ivariant);
@@ -424,7 +427,8 @@ void ContourUtils::calculate_contours_uv(
 		case 16:
 			calculate_uvt<RGBImageTypeD>(ivariant->pD_rgb, ivariant);
 			break;
-		default : break;
+		default:
+			break;
 		}
 	}
 	else
@@ -442,13 +446,12 @@ void ContourUtils::map_contours_uniform(
 	if (ivariant->di->idimz !=
 			static_cast<int>(ivariant->di->image_slices.size()))
 	{
-		std::cout
-			<< "ContourUtils::map_contours: dimz != slices size, "
+		std::cout << "ContourUtils::map_contours: dimz != slices size, "
 			<< ivariant->di->idimz << " != " << ivariant->di->image_slices.size()
 			<< std::endl;
 		return;
 	}
-	const float tolerance = static_cast<float>(ivariant->di->iz_spacing)*0.5f;
+	const float tolerance = static_cast<float>(ivariant->di->iz_spacing) * 0.5f;
 	for (int x = 0; x < ivariant->di->rois.size(); ++x)
 	{
 		if (ivariant->di->rois.at(x).id == roi_id)
@@ -517,8 +520,7 @@ void ContourUtils::map_contours_nonuniform(
 	if (ivariant->di->idimz !=
 			static_cast<int>(ivariant->di->image_slices.size()))
 	{
-		std::cout
-			<< "ContourUtils::map_contours: dimz != slices size, "
+		std::cout << "ContourUtils::map_contours: dimz != slices size, "
 			<< ivariant->di->idimz << " != " << ivariant->di->image_slices.size()
 			<< std::endl;
 		return;
@@ -582,7 +584,7 @@ void ContourUtils::map_contours_nonuniform(
 					}
 					if (in_slice) slices.push_back(z);
 				}
-				if (slices.size()==1)
+				if (slices.size() == 1)
 				{
 					const int idx = slices.at(0);
 					ivariant->di->rois[x].map.insert(idx, c->id);
@@ -710,11 +712,7 @@ void ContourUtils::contours_build_path(
 					for (int k = 0; k < c->dpoints.size(); ++k)
 					{
 						const DPoint & pf_ = c->dpoints.at(k);
-						path.addRect(
-							pf_.u,
-							pf_.v,
-							1.0,
-							1.0);
+						path.addRect(pf_.u, pf_.v, 1.0, 1.0);
 					}
 				}
 				// NON-PLANAR, not set
@@ -726,12 +724,8 @@ void ContourUtils::contours_build_path(
 						{
 							const DPoint & pf_ = c->dpoints.at(k);
 							if (pf_.t == z)
-							{		
-								path.addRect(
-									pf_.u,
-									pf_.v,
-									1.0,
-									1.0);
+							{
+								path.addRect(pf_.u, pf_.v, 1.0, 1.0);
 							}
 						}
 					}
@@ -806,17 +800,14 @@ bool ContourUtils::phys_space_from_slice(
 	const float col_dircos_x = static_cast<float>(ivariant->di->image_slices.at(x)->ipp_iop[6]);
 	const float col_dircos_y = static_cast<float>(ivariant->di->image_slices.at(x)->ipp_iop[7]);
 	const float col_dircos_z = static_cast<float>(ivariant->di->image_slices.at(x)->ipp_iop[8]);
-	if (	
-		row_dircos_x>-0.000001f && row_dircos_x<0.000001f &&
-		row_dircos_y>-0.000001f && row_dircos_y<0.000001f &&
-		row_dircos_z>-0.000001f && row_dircos_z<0.000001f &&
-		col_dircos_x>-0.000001f && col_dircos_x<0.000001f &&
-		col_dircos_y>-0.000001f && col_dircos_y<0.000001f &&
-		col_dircos_z>-0.000001f && col_dircos_z<0.000001f)
+	if (row_dircos_x > -0.000001f && row_dircos_x < 0.000001f &&
+		row_dircos_y > -0.000001f && row_dircos_y < 0.000001f &&
+		row_dircos_z > -0.000001f && row_dircos_z < 0.000001f &&
+		col_dircos_x > -0.000001f && col_dircos_x < 0.000001f &&
+		col_dircos_y > -0.000001f && col_dircos_y < 0.000001f &&
+		col_dircos_z > -0.000001f && col_dircos_z < 0.000001f)
 	{
-		std::cout
-			<< "can not process direction cosines"
-			<< std::endl;
+		std::cout << "can not process direction cosines" << std::endl;
 		return false;
 	}
 	ImageTypeUC::IndexType idx;
@@ -839,7 +830,7 @@ bool ContourUtils::phys_space_from_slice(
 	spacing[1] = ivariant->di->iy_spacing;
 	spacing[2] = 1;
 	ImageTypeUC::DirectionType direction;
-	const float nrm_dircos_x = row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y; 
+	const float nrm_dircos_x = row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
 	const float nrm_dircos_y = row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
 	const float nrm_dircos_z = row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
 	direction[0][0] = row_dircos_x;
