@@ -1322,7 +1322,10 @@ void GLWidget::init_opengl(int w, int h)
 			&framebuffer,
 			&fbo_tex,
 			&fbo_depth);
-	if (!ok) { std::cout << "create_fbos0() failed" << std::endl; }
+	if (!ok)
+	{
+		std::cout << "create_fbos0() failed" << std::endl;
+	}
 	create_program(fsquad_vs, fsquad_fs, &fsquad_shader);
 	fsquad_shader.location_sampler[0] = glGetUniformLocation(fsquad_shader.program, "sampler0");
 	fsquad_shader.position_handle     = glGetAttribLocation (fsquad_shader.program, "v_position");
@@ -1366,12 +1369,18 @@ void GLWidget::init_opengl(int w, int h)
 			&backfacebuffer,
 			&backface_tex,
 			&backface_depth);
-	if (!ok) { std::cout << "create_fbos1() failed (1)"<< std::endl; }
+	if (!ok)
+	{
+		std::cout << "create_fbos1() failed (1)"<< std::endl;
+	}
 	ok = create_fbos1(FBO_SIZE__1, FBO_SIZE__1,
 			&frontfacebuffer,
 			&frontface_tex,
 			&frontface_depth);
-	if (!ok) { std::cout << "create_fbos1() failed (2)"<< std::endl; }
+	if (!ok)
+	{
+		std::cout << "create_fbos1() failed (2)"<< std::endl;
+	}
 	create_program(raycast_vs, raycast_fs_bb, &raycast_shader_bb);
 	raycast_shader_bb.location_mvp        = glGetUniformLocation(raycast_shader_bb.program, "mvp");
 	raycast_shader_bb.position_handle     = glGetAttribLocation (raycast_shader_bb.program, "v_position");
@@ -3937,7 +3946,7 @@ void GLWidget::makeModelVBO_ArraysT(
 	{
 		return;
 	}
-	float * n  = NULL; // initialized to avoid warning
+	float * n  = NULL;
 	if (normals)
 	{
 		try
@@ -3946,10 +3955,11 @@ void GLWidget::makeModelVBO_ArraysT(
 		}
 		catch (const std::bad_alloc&)
 		{
+			delete [] v;
 			return;
 		}
 	}
-	float * t  = NULL; // initialized to avoid warning
+	float * t  = NULL;
 	if (tex)
 	{
 		try
@@ -3958,10 +3968,12 @@ void GLWidget::makeModelVBO_ArraysT(
 		}
 		catch (const std::bad_alloc&)
 		{
+			delete [] v;
+			delete [] n;
 			return;
 		}
 	}
-	float * ta = NULL; // initialized to avoid warning
+	float * ta = NULL;
 	if (tangents)
 	{
 		try
@@ -3970,11 +3982,14 @@ void GLWidget::makeModelVBO_ArraysT(
 		}
 		catch (const std::bad_alloc&)
 		{
+			delete [] v;
+			delete [] n;
+			delete [] t;
 			return;
 		}
 	}
 	unsigned int idx = 0;
-	for (int ind = 0; ind < faces_size; ind += 12 )
+	for (int ind = 0; ind < faces_size; ind += 12)
 	{
 		int c1  = *(faces + ind +  0);
 		int t1  = *(faces + ind +  1);
