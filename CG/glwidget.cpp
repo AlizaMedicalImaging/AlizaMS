@@ -1338,22 +1338,22 @@ void GLWidget::init_opengl(int w, int h)
 		glGenVertexArrays(1, &frames_vao);
 		glBindVertexArray(frames_vao);
 		glGenBuffers(1, &frames_vbo);
-		increment_count_vbos(1);
 		glBindBuffer(GL_ARRAY_BUFFER, frames_vbo);
 		glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
 		glVertexAttribPointer(frame_shader.position_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(frame_shader.position_handle);
 		glBindVertexArray(0);
+		increment_count_vbos(1);
 		//
 		glGenVertexArrays(1, &origin_vao);
 		glBindVertexArray(origin_vao);
 		glGenBuffers(1, &origin_vbo);
-		increment_count_vbos(1);
 		glBindBuffer(GL_ARRAY_BUFFER, origin_vbo);
 		glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
-		glVertexAttribPointer(frame_shader.position_handle,3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(frame_shader.position_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(frame_shader.position_handle);
 		glBindVertexArray(0);
+		increment_count_vbos(1);
 		delete [] tmp99;
 	}
 	//
@@ -1518,11 +1518,11 @@ void GLWidget::init_opengl(int w, int h)
 		faces_size_cube,
 		GL_STATIC_DRAW,
 		10.0f);
-	cube->faces_size = faces_size_cube/12;
+	cube->faces_size = faces_size_cube / 12;
 	cube->vboid[0] = vboid000[0];
 	cube->vboid[1] = vboid000[1];
-	cube->vaoid    = vaoid000;
-	cube->shader   = &orientcube_shader;
+	cube->vaoid  = vaoid000;
+	cube->shader = &orientcube_shader;
 	qmeshes.push_back(cube);
 	//
 	letters = new qMeshData;
@@ -1543,10 +1543,10 @@ void GLWidget::init_opengl(int w, int h)
 		faces_size_letters,
 		GL_STATIC_DRAW,
 		10.0f);
-	letters->faces_size = faces_size_letters/12;
+	letters->faces_size = faces_size_letters / 12;
 	letters->vboid[0] = vboid001[0];
 	letters->vboid[1] = vboid001[1];
-	letters->vaoid    = vaoid001;
+	letters->vaoid = vaoid001;
 	letters->shader = &orientcube_shader;
 	qmeshes.push_back(letters);
 	//
@@ -1568,7 +1568,7 @@ void GLWidget::init_opengl(int w, int h)
 		faces_size_letteri,
 		GL_STATIC_DRAW,
 		10.0f);
-	letteri->faces_size = faces_size_letteri/12;
+	letteri->faces_size = faces_size_letteri / 12;
 	letteri->vboid[0] = vboid002[0];
 	letteri->vboid[1] = vboid002[1];
 	letteri->vaoid = vaoid002;
@@ -1621,7 +1621,7 @@ void GLWidget::init_opengl(int w, int h)
 	letterp->faces_size = faces_size_letterp / 12;
 	letterp->vboid[0] = vboid004[0];
 	letterp->vboid[1] = vboid004[1];
-	letterp->vaoid    = vaoid004;
+	letterp->vaoid = vaoid004;
 	letterp->shader = &orientcube_shader;
 	qmeshes.push_back(letterp);
 	//
@@ -1646,7 +1646,7 @@ void GLWidget::init_opengl(int w, int h)
 	letterr->faces_size = faces_size_letterr / 12;
 	letterr->vboid[0] = vboid005[0];
 	letterr->vboid[1] = vboid005[1];
-	letterr->vaoid    = vaoid005;
+	letterr->vaoid = vaoid005;
 	letterr->shader = &orientcube_shader;
 	qmeshes.push_back(letterr);
 	//
@@ -1671,7 +1671,7 @@ void GLWidget::init_opengl(int w, int h)
 	letterl->faces_size = faces_size_letterl / 12;
 	letterl->vboid[0] = vboid006[0];
 	letterl->vboid[1] = vboid006[1];
-	letterl->vaoid    = vaoid006;
+	letterl->vaoid = vaoid006;
 	letterl->shader = &orientcube_shader;
 	qmeshes.push_back(letterl);
 	//
@@ -2146,9 +2146,10 @@ void GLWidget::paint_volume()
 	glViewport(0, 0, win_w, win_h);
 	if (ortho_proj)
 	{
-		camera->orthographic(-ortho_size * asp, ortho_size*asp,
-						-ortho_size, ortho_size,
-						-far_plane, far_plane);
+		camera->orthographic(
+			-ortho_size * asp, ortho_size*asp,
+			-ortho_size, ortho_size,
+			-far_plane, far_plane);
 		const float d_ortho = ortho_size / SCENE_ORTHO_SIZE;
 		dx__ = pan_x * d_ortho;
 		dy__ = pan_y * d_ortho;
@@ -2338,7 +2339,7 @@ void GLWidget::paint_volume()
 		const DisplayInterface * di = selected_images__->at(iii)->di;
 		if (di->skip_texture) continue;
 		if ((di->from_slice < 0) || (di->from_slice >= di->idimz)) continue;
-		if ((di->to_slice < 0)  || (di->to_slice >= di->idimz))     continue;
+		if ((di->to_slice < 0) || (di->to_slice >= di->idimz))     continue;
 		if (static_cast<int>(di->image_slices.size()) < di->idimz) continue;
 		//
 		const Vector3 direction_vector = Vector3(
@@ -3394,7 +3395,6 @@ void GLWidget::generate_raycastcube_vao(
 	glGenVertexArrays(1, vao);
 	glBindVertexArray(*vao);
 	glGenBuffers(2, vbo);
-	increment_count_vbos(2);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
 	glBufferData(GL_ARRAY_BUFFER, 54 * sizeof(GLfloat), v, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(*attr_v, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -3404,6 +3404,7 @@ void GLWidget::generate_raycastcube_vao(
 	glVertexAttribPointer(*attr_c, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr_c);
 	glBindVertexArray(0);
+	increment_count_vbos(2);
 	delete [] v;
 	delete [] c;
 	vaoids.push_back(*vao);
@@ -4146,12 +4147,12 @@ void GLWidget::generate_screen_quad(GLuint * vbo, GLuint * vao, GLuint * attr)
 	glGenVertexArrays(1, vao);
 	glBindVertexArray(*vao);
 	glGenBuffers(1, vbo);
-	increment_count_vbos(1);
 	glBindBuffer(GL_ARRAY_BUFFER, *vbo);
 	glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), v, GL_STATIC_DRAW);
 	glVertexAttribPointer(*attr, 2, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(*attr);
 	glBindVertexArray(0);
+	increment_count_vbos(1);
 }
 
 void GLWidget::free_fbos0(
