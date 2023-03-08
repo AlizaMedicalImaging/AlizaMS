@@ -72,7 +72,7 @@ private:
 namespace
 {
 
-std::vector<ProcessImageThread_*> icon_threads;
+static std::vector<ProcessImageThread_*> icon_threads;
 
 template<typename Tin, typename Tout> void extract_icon(
 	const typename Tin::Pointer & image, ImageVariant * ivariant,
@@ -495,7 +495,7 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 				p[j_ + 1] = static_cast<unsigned char>(255.0 * ((g + (-vmin)) / vrange));
 				p[j_ + 0] = static_cast<unsigned char>(255.0 * ((r + (-vmin)) / vrange));
 				j_ += 3;
- 				++iterator;
+				++iterator;
 			}
 		}
 		catch (const itk::ExceptionObject &)
@@ -879,7 +879,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 				p[j_ + 1] = static_cast<unsigned char>(255.0 * ((g + (-vmin)) / vrange));
 				p[j_ + 0] = static_cast<unsigned char>(255.0 * ((r + (-vmin)) / vrange));
 				j_ += 4;
- 				++iterator;
+				++iterator;
 			}
 		}
 		catch (const itk::ExceptionObject &)
@@ -935,7 +935,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 				p[j_ + 1] = static_cast<unsigned char>(tmp_gre);
 				p[j_ + 0] = static_cast<unsigned char>(tmp_red);
 				j_ += 3;
- 				++iterator;
+				++iterator;
 			}
 		}
 		catch (const itk::ExceptionObject &)
