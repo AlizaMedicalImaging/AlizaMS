@@ -349,27 +349,3 @@ ImageVariant2D::~ImageVariant2D()
 	if(pD_rgba.IsNotNull()) {pD_rgba->DisconnectPipeline(); };pD_rgba =NULL;
 }
 
-void ProcessImageThread_::run()
-{
-	Image2DTypeUC::SizeType size;
-	size[0] = size_0;
-	size[1] = size_1;
-	Image2DTypeUC::IndexType index;
-	index[0] = index_0;
-	index[1] = index_1;
- 	Image2DTypeUC::RegionType region;
-	region.SetSize(size);
-	region.SetIndex(index);
-	itk::ImageRegionConstIterator<Image2DTypeUC>
-		iterator(image, region);
-	iterator.GoToBegin();
-	unsigned int j_ = j;
-	while(!iterator.IsAtEnd())
-	{
-		p[j_+2] = p[j_+1] = p[j_+0] =
-			static_cast<unsigned char>(iterator.Get());
-		j_ += 3;
- 		++iterator;
-	}
-}
-

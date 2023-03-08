@@ -1301,7 +1301,7 @@ template<typename T> void load_image(
 	const int num_threads = QThread::idealThreadCount();
 #else
 	int num_threads = QThread::idealThreadCount();
-	if (num_threads > 0) num_threads - 1;
+	if (num_threads > 1) num_threads - 1;
 #endif
 	const int tmp99 = size[1] % num_threads;
 #if 0

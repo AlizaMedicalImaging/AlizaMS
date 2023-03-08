@@ -20,7 +20,6 @@
 #include <QMultiMap>
 #include <QVariant>
 #include <QList>
-#include <QThread>
 #include <QPixmap>
 #include <QPainterPath>
 #include "dicom/ultrasoundregiondata.h"
@@ -1000,37 +999,6 @@ public:
 	short lut_function_ext;
 	bool  level_locked_ext;
 	QString orientation_20_20;
-};
-
-class ProcessImageThread_ : public QThread
-{
-public:
-	ProcessImageThread_(
-		Image2DTypeUC::Pointer image_,
-		unsigned char * p_,
-		const int size_0_,
-		const int size_1_,
-		const int index_0_,
-		const int index_1_,
-		const unsigned int j_)
-		:
-		image(image_),
-		p(p_),
-		size_0(size_0_),   size_1(size_1_),
-		index_0(index_0_), index_1(index_1_),
-		j(j_)
-	{
-	}
-	~ProcessImageThread_(){}
-	void run();
-private:
-	Image2DTypeUC::Pointer image;
-	unsigned char * p;
-	const int size_0;
-	const int size_1;
-	const int index_0;
-	const int index_1;
-	const unsigned int j;
 };
 
 #endif

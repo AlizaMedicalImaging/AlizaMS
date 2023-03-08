@@ -856,15 +856,22 @@ template<typename T> void load_image2(
 	//
 	const bool global_flip_x = widget->graphicsview->global_flip_x;
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
+#if 1
 	const int num_threads = QThread::idealThreadCount();
+#else
+	int num_threads = QThread::idealThreadCount();
+	if (num_threads > 1) num_threads - 1;
+#endif
 	const int tmp99 = size[1] % num_threads;
+#if 0
 	if (!widget->threadsLUT_.empty())
 	{
-		std::cout << "load_image2<>() : widget->threadsLUT_.size()>0" << std::endl;
+		std::cout << "!widget->threadsLUT_.empty()" << std::endl;
 	}
+#endif
 	if (tmp99 == 0)
 	{
-		int j = 0;
+		unsigned int j = 0;
 		for (int i = 0; i < num_threads; ++i)
 		{
 			const int size_0 = size[0];
@@ -885,7 +892,7 @@ template<typename T> void load_image2(
 	}
 	else
 	{
-		int j = 0;
+		unsigned int j = 0;
 		unsigned int block = 64;
 		if (static_cast<float>(size[1]) / static_cast<float>(block) > 16.0f)
 		{
@@ -935,25 +942,17 @@ template<typename T> void load_image2(
 		}
 	}
 	//
-#if 0
-#ifdef _WIN32
-	Sleep(1);
-#else
-	usleep(1000);
-#endif
-#endif
-	//
-	const unsigned short threadsLUT_size = widget->threadsLUT_.size();
+	const size_t threadsLUT_size = widget->threadsLUT_.size();
 	while (true)
 	{
-		unsigned short b__ = 0;
-		for (int i = 0; i < threadsLUT_size; ++i)
+		size_t b__ = 0;
+		for (size_t i = 0; i < threadsLUT_size; ++i)
 		{
 			if (widget->threadsLUT_.at(i)->isFinished()) ++b__;
 		}
 		if (b__ == threadsLUT_size) break;
 	}
-	for (int i = 0; i < threadsLUT_size; ++i)
+	for (size_t i = 0; i < threadsLUT_size; ++i)
 	{
 		delete widget->threadsLUT_[i];
 		widget->threadsLUT_[i] = NULL;
@@ -1140,15 +1139,6 @@ StudyGraphicsWidget::~StudyGraphicsWidget()
 {
 	if (mutex.tryLock(3000))
 	{
-		for (unsigned int i = 0; i < threads_.size(); ++i)
-		{
-			if (threads_.at(i))
-			{
-				if (threads_.at(i)->isRunning()) threads_[i]->exit();
-				delete threads_[i];
-				threads_[i] = NULL;
-			}
-		}
 		for (unsigned int i = 0; i < threadsLUT_.size(); ++i)
 		{
 			if (threadsLUT_.at(i))

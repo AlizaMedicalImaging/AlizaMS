@@ -68,7 +68,6 @@ public:
 	void  set_enable_overlays(bool);
 	void  set_active();
 	void  update_measurement(double, double, double, double);
-	std::vector<ProcessImageThread_*> threads_;
 	std::vector<QThread*> threadsLUT_;
 	unsigned long long widget_id;
 

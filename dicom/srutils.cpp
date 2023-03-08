@@ -105,14 +105,19 @@ template<typename T> SRImage li3(
 	}
 	//
 	std::vector<QThread*> threadsLUT_;
+#if 1
 	const int num_threads = QThread::idealThreadCount();
+#else
+	int num_threads = QThread::idealThreadCount();
+	if (num_threads > 1) num_threads - 1;
+#endif
 	const int tmp99 = size[1] % num_threads;
 	const double center = ivariant->di->us_window_center;
 	const double width  = ivariant->di->us_window_width;
 	if (tmp99 == 0)
 	{
-		int j = 0;
-		for (int i = 0; i<num_threads; ++i)
+		unsigned int j = 0;
+		for (int i = 0; i < num_threads; ++i)
 		{
 			const int size_0 = size[0];
 			const int size_1 = size[1] / num_threads;
@@ -132,7 +137,7 @@ template<typename T> SRImage li3(
 	}
 	else
 	{
-		int j = 0;
+		unsigned int j = 0;
 		unsigned int block = 64;
 		if (static_cast<float>(size[1]) / static_cast<float>(block) > 16.0f)
 		{
@@ -182,17 +187,17 @@ template<typename T> SRImage li3(
 		}
 	}
 	//
-	const unsigned short threadsLUT_size = threadsLUT_.size();
+	const size_t threadsLUT_size = threadsLUT_.size();
 	while (true)
 	{
-		unsigned short b__ = 0;
-		for (int i = 0; i < threadsLUT_size; ++i)
+		size_t b__ = 0;
+		for (size_t i = 0; i < threadsLUT_size; ++i)
 		{
 			if (threadsLUT_.at(i)->isFinished()) ++b__;
 		}
 		if (b__ == threadsLUT_size) break;
 	}
-	for (int i = 0; i < threadsLUT_size; ++i)
+	for (size_t i = 0; i < threadsLUT_size; ++i)
 	{
 		delete threadsLUT_[i];
 	}

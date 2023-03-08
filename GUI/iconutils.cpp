@@ -4,16 +4,75 @@
 #include <QPainter>
 #include <QImage>
 #include <QColor>
+#include <QThread>
 #include <vector>
 #include "iconutils.h"
 #ifndef _WIN32
 #include <unistd.h>
 #endif
 
-static std::vector<ProcessImageThread_*> icon_threads;
+class ProcessImageThread_ : public QThread
+{
+public:
+	ProcessImageThread_(
+		Image2DTypeUC::Pointer image_,
+		unsigned char * p_,
+		const int size_0_,
+		const int size_1_,
+		const int index_0_,
+		const int index_1_,
+		const unsigned int j_)
+		:
+		image(image_),
+		p(p_),
+		size_0(size_0_), size_1(size_1_),
+		index_0(index_0_), index_1(index_1_),
+		j(j_)
+	{
+	}
+
+	~ProcessImageThread_()
+	{
+	}
+
+	void run()
+	{
+		Image2DTypeUC::SizeType size;
+		size[0] = size_0;
+		size[1] = size_1;
+		Image2DTypeUC::IndexType index;
+		index[0] = index_0;
+		index[1] = index_1;
+	 	Image2DTypeUC::RegionType region;
+		region.SetSize(size);
+		region.SetIndex(index);
+		itk::ImageRegionConstIterator<Image2DTypeUC>
+			iterator(image, region);
+		iterator.GoToBegin();
+		unsigned int j_ = j;
+		while(!iterator.IsAtEnd())
+		{
+			p[j_ + 2] = p[j_ + 1] = p[j_] =
+				static_cast<unsigned char>(iterator.Get());
+			j_ += 3;
+	 		++iterator;
+		}
+	}
+
+private:
+	Image2DTypeUC::Pointer image;
+	unsigned char * p;
+	const int size_0;
+	const int size_1;
+	const int index_0;
+	const int index_1;
+	const unsigned int j;
+};
 
 namespace
 {
+
+std::vector<ProcessImageThread_*> icon_threads;
 
 template<typename Tin, typename Tout> void extract_icon(
 	const typename Tin::Pointer & image, ImageVariant * ivariant,
@@ -90,7 +149,12 @@ template<typename Tin, typename Tout> void extract_icon(
 	{
 		return;
 	}
-	const int num_threads = 8;
+#if 1
+	const int num_threads = QThread::idealThreadCount();
+#else
+	int num_threads = QThread::idealThreadCount();
+	if (num_threads > 1) num_threads - 1;
+#endif
 	const int tmp99 = size_y % num_threads;
 #if 0
 	if (icon_threads.size() > 0)
@@ -100,8 +164,8 @@ template<typename Tin, typename Tout> void extract_icon(
 #endif
 	if (tmp99 == 0)
 	{
-		int j = 0;
-		for (int i = 0; i<num_threads; ++i)
+		unsigned int j = 0;
+		for (int i = 0; i < num_threads; ++i)
 		{
 			const int size_0 = size_x;
 			const int size_1 = size_y / num_threads;
@@ -118,7 +182,7 @@ template<typename Tin, typename Tout> void extract_icon(
 	}
 	else
 	{
-		int j = 0;
+		unsigned int j = 0;
 		unsigned int block = 64;
 		if (static_cast<float>(size_y) / static_cast<float>(block) > 16.0f)
 		{
@@ -128,7 +192,7 @@ template<typename Tin, typename Tout> void extract_icon(
 		const int incr = static_cast<int>(floor(size_y / static_cast<double>(block)));
 		if (size_y > block)
 		{
-			for (int i = 0; i<incr; ++i)
+			for (int i = 0; i < incr; ++i)
 			{
 				const int size_0  = size_x;
 				const int index_0 = 0;
@@ -159,22 +223,26 @@ template<typename Tin, typename Tout> void extract_icon(
 		}
 
 	}
-	const unsigned short threads_size = icon_threads.size();
+	const size_t threads_size = icon_threads.size();
 	while (true)
 	{
-		unsigned short b__ = 0;
+		size_t b__ = 0;
 #ifdef WIN32
 		Sleep(2);
 #else
 		usleep(2000);
 #endif
-		for (int i = 0; i < threads_size; ++i)
+		for (size_t i = 0; i < threads_size; ++i)
 		{
 			if (icon_threads.at(i)->isFinished()) ++b__;
 		}
 		if (b__ == threads_size) break;
 	}
-	for (int i = 0; i < threads_size; ++i) delete icon_threads[i];
+	for (size_t i = 0; i < threads_size; ++i)
+	{
+		delete icon_threads[i];
+		icon_threads[i] = NULL;
+	}
 	icon_threads.clear();
 	//
 	QImage tmpi(p, size_x, size_y, 3 * size_x, QImage::Format_RGB888);
