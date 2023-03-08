@@ -29,14 +29,14 @@ class GraphicsWidget : public QWidget
 Q_OBJECT
 public:
 	GraphicsWidget(
-		short/*axis*/,
-		bool/*OpenGL*/,
-		QLabel* /*top*/,
-		QLabel* /*left*/,
-		QLabel* /*measurement*/,
+		short      /*axis*/,
+		bool       /*OpenGL*/,
+		QLabel*    /*top*/,
+		QLabel*    /*left*/,
+		QLabel*    /*measurement*/,
 		QLineEdit* /*value*/,
-		QWidget* /*sinle frame*/,
-		QWidget* /*multi frame*/);
+		QWidget*   /*sinle frame*/,
+		QWidget*   /*multi frame*/);
 	~GraphicsWidget();
 	void set_axis(int); // 0 x, 1 y, 2 z
 	void set_top_label(QLabel*);
@@ -50,21 +50,20 @@ public:
 	GraphicsView * graphicsview;
 	ToolBox2D    * toolbox2D;
 	SliderWidget * slider_m;
-	std::vector<ProcessImageThread_*> threads_;
 	std::vector<QThread*> threadsLUT_;
 	void set_slice_2D(
 		ImageVariant*,
-		const short/*fit*/,
-		const bool/*alw usregions*/,
-		const bool=false/*frame level, to avoid check map twice*/);
+		const short /*fit*/,
+		const bool  /*alw usregions*/,
+		const bool = false /*frame level, to avoid check map twice*/);
 	void set_toolbox2D_widget(ToolBox2D*);
 	void set_sliderwidget(SliderWidget*);
 	void update_image(
 		const short /*fit*/,
-		const bool /*redraw_contours*/,
-		const bool /*lock*/,
-		const bool=false/*frame level, to avoid check map twice*/);
-	void clear_(bool=true);
+		const bool  /*redraw_contours*/,
+		const bool  /*lock*/,
+		const bool = false /*frame level, to avoid check map twice*/);
+	void clear_(bool = true);
 	void update_frames();
 	ImageContainer image_container;
 	float get_offset_x();

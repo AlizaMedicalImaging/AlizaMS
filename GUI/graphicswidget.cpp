@@ -37,8 +37,20 @@
 #include <unistd.h>
 #endif
 
+//#define A_TMP_BENCHMARK
+#ifdef A_TMP_BENCHMARK
+#include <chrono>
+#endif
+
 namespace
 {
+
+#ifdef A_TMP_BENCHMARK
+inline auto now() noexcept
+{
+	return std::chrono::high_resolution_clock::now();
+}
+#endif
 
 void gImageCleanupHandler(void * info)
 {
@@ -61,9 +73,9 @@ void draw_contours(
 	const int idx = ivariant->di->selected_z_slice;
 	for (int x = 0; x < ivariant->di->rois.size(); ++x)
 	{
-		const int c_r = static_cast<int>(ivariant->di->rois.at(x).color.r*255.0f);
-		const int c_g = static_cast<int>(ivariant->di->rois.at(x).color.g*255.0f);
-		const int c_b = static_cast<int>(ivariant->di->rois.at(x).color.b*255.0f);
+		const int c_r = static_cast<int>(ivariant->di->rois.at(x).color.r * 255.0f);
+		const int c_g = static_cast<int>(ivariant->di->rois.at(x).color.g * 255.0f);
+		const int c_b = static_cast<int>(ivariant->di->rois.at(x).color.b * 255.0f);
 		if (ivariant->di->rois.at(x).show)
 		{
 			QList<int> indices;
@@ -560,7 +572,7 @@ template<typename T> void load_rgb_image(
 					p__[j_ + 1] = static_cast<unsigned char>(255.0 *((g + (-vmin)) / vrange));
 					p__[j_ + 0] = static_cast<unsigned char>(255.0 *((r + (-vmin)) / vrange));
 					j_ += 3;
- 					++iterator;
+					++iterator;
 				}
 			}
 			catch (const itk::ExceptionObject &)
@@ -752,7 +764,7 @@ template<typename T> void load_rgba_image(
 					p__[j_ + 1] = static_cast<unsigned char>(255.0 * ((g + (-vmin)) / vrange));
 					p__[j_ + 0] = static_cast<unsigned char>(255.0 * ((r + (-vmin)) / vrange));
 					j_ += 4;
- 					++iterator;
+					++iterator;
 				}
 			}
 			catch (const itk::ExceptionObject &)
@@ -842,7 +854,7 @@ template<typename T> void load_rgba_image(
 						p__[j_ + 0] = 255;
 					}
 					j_ += 3;
- 					++iterator;
+					++iterator;
 				}
 			}
 			catch (const itk::ExceptionObject &)
@@ -1217,6 +1229,9 @@ template<typename T> void load_image(
 	const short fit,
 	const bool per_frame_level_found)
 {
+#ifdef A_TMP_BENCHMARK
+	const auto start1{ now() };
+#endif
 	if (image.IsNull()) return;
 	if (!image_container.image2D) return;
 	if (!image_container.image3D) return;
@@ -1282,15 +1297,28 @@ template<typename T> void load_image(
 	//
 	const bool global_flip_x = widget->graphicsview->global_flip_x;
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
+#if 1
 	const int num_threads = QThread::idealThreadCount();
+#else
+	int num_threads = QThread::idealThreadCount();
+	if (num_threads > 0) num_threads - 1;
+#endif
 	const int tmp99 = size[1] % num_threads;
+#if 0
 	if (!widget->threadsLUT_.empty())
 	{
-		std::cout << "load_image<>() : widget->threadsLUT_.size()>0" << std::endl;
+		std::cout << "!widget->threadsLUT_.empty()" << std::endl;
 	}
+#endif
+#ifdef A_TMP_BENCHMARK
+#if 0
+	std::cout << num_threads << " threads" << std::endl;
+#endif
+	const auto start2{ now() };
+#endif
 	if (tmp99 == 0)
 	{
-		int j = 0;
+		unsigned int j = 0;
 		for (int i = 0; i < num_threads; ++i)
 		{
 			const int size_0 = size[0];
@@ -1311,14 +1339,14 @@ template<typename T> void load_image(
 	}
 	else
 	{
-		int j = 0;
+		unsigned int j = 0;
 		unsigned int block = 64;
 		if (static_cast<float>(size[1]) / static_cast<float>(block) > 16.0f)
 		{
 			block = 128;
 		}
 		const int tmp100 = size[1] % block;
-		const int incr = static_cast<int>(floor(size[1] / static_cast<double>(block)));;
+		const int incr = static_cast<int>(floor(size[1] / static_cast<double>(block)));
 		if (size[1] > block)
 		{
 			for (int i = 0; i < incr; ++i)
@@ -1361,25 +1389,27 @@ template<typename T> void load_image(
 		}
 	}
 	//
-#if 0
-#ifdef _WIN32
-	Sleep(1);
-#else
-	usleep(1000);
+	const size_t threadsLUT_size = widget->threadsLUT_.size();
+#ifdef A_TMP_BENCHMARK
+	unsigned long long w_times{};
 #endif
-#endif
-	//
-	const unsigned short threadsLUT_size = widget->threadsLUT_.size();
 	while (true)
 	{
-		unsigned short b__ = 0;
-		for (int i = 0; i < threadsLUT_size; ++i)
+#ifdef A_TMP_BENCHMARK
+		++w_times;
+#endif
+		size_t b__ = 0;
+		for (size_t i = 0; i < threadsLUT_size; ++i)
 		{
 			if (widget->threadsLUT_.at(i)->isFinished()) ++b__;
 		}
 		if (b__ == threadsLUT_size) break;
 	}
-	for (int i = 0; i < threadsLUT_size; ++i)
+#ifdef A_TMP_BENCHMARK
+	const std::chrono::duration<double, std::milli> elapsed2{ now() - start2 };
+	std::cout << "spent for image " << elapsed2.count() << " ms, " << "w_times = " << w_times << std::endl;
+#endif
+	for (size_t i = 0; i < threadsLUT_size; ++i)
 	{
 		delete widget->threadsLUT_[i];
 		widget->threadsLUT_[i] = NULL;
@@ -1488,6 +1518,10 @@ template<typename T> void load_image(
 		delete [] p;
 		p = NULL;
 	}
+#endif
+#ifdef A_TMP_BENCHMARK
+	const std::chrono::duration<double, std::milli> elapsed1{ now() - start1 };
+	std::cout << "spent total " << elapsed1.count() << " ms" << std::endl;
 #endif
 }
 
@@ -1648,15 +1682,6 @@ GraphicsWidget::~GraphicsWidget()
 	run__ = false;
 	if (mutex.tryLock(3000))
 	{
-		for (unsigned int i = 0; i < threads_.size(); ++i)
-		{
-			if (threads_.at(i))
-			{
-				if (threads_.at(i)->isRunning()) threads_[i]->exit();
-				delete threads_[i];
-				threads_[i] = NULL;
-			}
-		}
 		for (unsigned int i = 0; i < threadsLUT_.size(); ++i)
 		{
 			if (threadsLUT_.at(i))

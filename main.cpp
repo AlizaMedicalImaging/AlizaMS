@@ -62,6 +62,7 @@
 #include <climits>
 #include <cstddef>
 #include <cstdint>
+#include <new>
 #endif
 
 #if (defined LOG_STDOUT_TO_FILE && LOG_STDOUT_TO_FILE==1)
@@ -179,7 +180,7 @@ int main(int argc, char * argv[])
 			std::cout << "System is little-endian\n";
 		}
 #ifdef __cplusplus
-		std::cout << "__cplusplus is defined: " << __cplusplus << "\n";
+		std::cout << "__cplusplus is defined: " << __cplusplus << '\n';
 #else
 		std::cout << "__cplusplus is not defined\n";
 #endif
@@ -211,7 +212,7 @@ int main(int argc, char * argv[])
 		std::cout << "_M_X64 is defined\n";
 #endif
 #ifdef _M_IX86_FP
-		std::cout << "_M_IX86_FP is defined:" << _M_IX86_FP << "\n"
+		std::cout << "_M_IX86_FP is defined:" << _M_IX86_FP << '\n'
 #endif
 #ifdef _M_ARM
 		std::cout << "_M_ARM is defined\n";
@@ -224,10 +225,16 @@ int main(int argc, char * argv[])
 			<< "\n";
 #ifdef __STDCPP_DEFAULT_NEW_ALIGNMENT__
 		std::cout << "__STDCPP_DEFAULT_NEW_ALIGNMENT__ = "
-			<< __STDCPP_DEFAULT_NEW_ALIGNMENT__ << "\n";
+			<< __STDCPP_DEFAULT_NEW_ALIGNMENT__ << '\n';
 #else
 		std::cout << "__STDCPP_DEFAULT_NEW_ALIGNMENT__ is not defined\n";
 #endif
+#endif
+#ifdef __cpp_lib_hardware_interference_size
+		std::cout << "__cpp_lib_hardware_interference_size is defined, "
+			<< std::hardware_constructive_interference_size << '\n';
+#else
+		std::cout << "__cpp_lib_hardware_interference_size is not defined\n";
 #endif
 #ifdef _WIN32
 #ifdef UNICODE
@@ -243,7 +250,7 @@ int main(int argc, char * argv[])
 		}
 		else
 		{
-			std::cout << "Active code page: " << acp << "\n";
+			std::cout << "Active code page: " << acp << '\n';
 		}
 #endif
 #endif
