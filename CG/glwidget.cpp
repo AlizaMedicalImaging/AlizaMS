@@ -54,7 +54,7 @@ using namespace Vectormath::Scalar;
 using namespace Vectormath::SSE;
 #endif
 
-// for glVertexAttribPointer last argument
+// For the last argument of 'glVertexAttribPointer'
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
 

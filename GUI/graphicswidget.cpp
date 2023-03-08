@@ -1407,7 +1407,7 @@ template<typename T> void load_image(
 	}
 #ifdef A_TMP_BENCHMARK
 	const std::chrono::duration<double, std::milli> elapsed2{ now() - start2 };
-	std::cout << "spent for image " << elapsed2.count() << " ms, " << "w_times = " << w_times << std::endl;
+	std::cout << "spent for image " << elapsed2.count() << " ms, w_times = " << w_times << std::endl;
 #endif
 	for (size_t i = 0; i < threadsLUT_size; ++i)
 	{
@@ -1563,8 +1563,7 @@ template<typename T> double get_distance(
 		{
 			if (ivariant->equi)
 			{
-				if (
-					x0_<ivariant->di->idimy &&
+				if (x0_<ivariant->di->idimy &&
 					x1_<ivariant->di->idimy &&
 					y0_<ivariant->di->idimz &&
 					y1_<ivariant->di->idimz)
@@ -1583,8 +1582,7 @@ template<typename T> double get_distance(
 		{
 			if (ivariant->equi)
 			{
-				if (
-					x0_<ivariant->di->idimx &&
+				if (x0_<ivariant->di->idimx &&
 					x1_<ivariant->di->idimx &&
 					y0_<ivariant->di->idimz &&
 					y1_<ivariant->di->idimz)
@@ -1601,8 +1599,7 @@ template<typename T> double get_distance(
 		break;
 	case 2:
 		{
-			if (
-				x0_<ivariant->di->idimx &&
+			if (x0_<ivariant->di->idimx &&
 				x1_<ivariant->di->idimx &&
 				y0_<ivariant->di->idimy &&
 				y1_<ivariant->di->idimy)
@@ -2019,7 +2016,7 @@ void GraphicsWidget::clear_(bool lock)
 		image_container.image2D->image_type = -1;
 		image_container.image2D->orientation_string = QString("");
 		image_container.image2D->laterality = QString("");
-		image_container.image2D->body_part  = QString("");
+		image_container.image2D->body_part = QString("");
 		image_container.image2D->idimx = 0;
 		image_container.image2D->idimy = 0;
 		if (image_container.image2D->pSS.IsNotNull())
@@ -2177,12 +2174,10 @@ float GraphicsWidget::get_offset_x()
 		{
 			offset_x =
 				(bb)
-				?
-				graphicsview->handle_rect->boundingRect().topLeft().x() +
-				graphicsview->handle_rect->pos().x() +
-				0.5f * graphicsview->handle_rect->get_width()
-				:
-				0.0f;
+				? graphicsview->handle_rect->boundingRect().topLeft().x() +
+					graphicsview->handle_rect->pos().x() +
+					0.5f * graphicsview->handle_rect->get_width()
+				: 0.0f;
 		}
 		break;
 	default : break;
@@ -2208,12 +2203,10 @@ float GraphicsWidget::get_offset_y()
 	case 2:
 		{
 			offset_y = (bb)
-			?
-			graphicsview->handle_rect->boundingRect().topLeft().y() +
-			graphicsview->handle_rect->pos().y() +
-			0.5f * graphicsview->handle_rect->get_width()
-			:
-			0.0f;
+			? graphicsview->handle_rect->boundingRect().topLeft().y() +
+				graphicsview->handle_rect->pos().y() +
+				0.5f * graphicsview->handle_rect->get_width()
+			: 0.0f;
 		}
 		break;
 	default : break;
@@ -2385,9 +2378,12 @@ void GraphicsWidget::set_slice_2D(
 	//
 	switch (axis)
 	{
-	case   0: x = image_container.image3D->di->selected_x_slice; break;
-	case   1: x = image_container.image3D->di->selected_y_slice; break;
-	case   2: x = image_container.image3D->di->selected_z_slice; break;
+	case 0: x = image_container.image3D->di->selected_x_slice;
+		break;
+	case 1: x = image_container.image3D->di->selected_y_slice;
+		break;
+	case 2: x = image_container.image3D->di->selected_z_slice;
+		break;
 	default :
 		{
 			clear_(false);

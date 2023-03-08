@@ -32,9 +32,6 @@
 #include <chrono>
 #include <random>
 
-static unsigned int count_files = 0;
-static unsigned int count_dirs = 0;
-
 namespace
 {
 
@@ -2243,6 +2240,9 @@ void build_maps(
 }
 
 }
+
+static unsigned int count_files = 0;
+static unsigned int count_dirs = 0;
 
 AnonymazerWidget2::AnonymazerWidget2(float si)
 {

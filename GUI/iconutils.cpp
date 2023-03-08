@@ -519,7 +519,7 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 	if (!ivariant->icon.isNull() &&
 		(ivariant->icon.width() < isize || ivariant->icon.height() < isize))
 	{
-		const float x__ = static_cast<float>(isize - ivariant->icon.width() )/ 2.0f;
+		const float x__ = static_cast<float>(isize - ivariant->icon.width() ) / 2.0f;
 		const float y__ = static_cast<float>(isize - ivariant->icon.height()) / 2.0f;
 		QPixmap empty_(isize, isize);
 		empty_.fill(QColor(0, 0, 0));
@@ -588,7 +588,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 	if (tmp0.IsNull()) return;
 	//
 	bool flip_x = false, flip_y = false;
-	if (!ivariant->orientation_string.isEmpty() && ivariant->orientation_string.size()>=3)
+	if (!ivariant->orientation_string.isEmpty() && ivariant->orientation_string.size() >= 3)
 	{
 		if (ivariant->orientation_string.at(1) == QChar('I') ||
 			ivariant->orientation_string.at(1) == QChar('P')) flip_y = true;
