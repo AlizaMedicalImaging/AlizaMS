@@ -202,7 +202,7 @@ template<typename T> void load_rgb_image2(
 					p__[j_ + 1] = static_cast<unsigned char>(255.0 * ((g + (-vmin)) / vrange));
 					p__[j_ + 0] = static_cast<unsigned char>(255.0 * ((r + (-vmin)) / vrange));
 					j_ += 3;
- 					++iterator;
+					++iterator;
 				}
 			}
 			catch (const itk::ExceptionObject &)
@@ -379,7 +379,7 @@ template<typename T> void load_rgba_image2(
 					p__[j_+1] = static_cast<unsigned char>(255.0 * ((g + (-vmin)) / vrange));
 					p__[j_+0] = static_cast<unsigned char>(255.0 * ((r + (-vmin)) / vrange));
 					j_ += 4;
- 					++iterator;
+					++iterator;
 				}
 			}
 			catch (const itk::ExceptionObject &)
@@ -469,7 +469,7 @@ template<typename T> void load_rgba_image2(
 						p__[j_ + 0] = 255;
 					}
 					j_ += 3;
- 					++iterator;
+					++iterator;
 				}
 			}
 			catch (const itk::ExceptionObject &)

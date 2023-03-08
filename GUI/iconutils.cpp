@@ -43,19 +43,18 @@ public:
 		Image2DTypeUC::IndexType index;
 		index[0] = index_0;
 		index[1] = index_1;
-	 	Image2DTypeUC::RegionType region;
+		Image2DTypeUC::RegionType region;
 		region.SetSize(size);
 		region.SetIndex(index);
 		itk::ImageRegionConstIterator<Image2DTypeUC>
 			iterator(image, region);
 		iterator.GoToBegin();
 		unsigned int j_ = j;
-		while(!iterator.IsAtEnd())
+		while (!iterator.IsAtEnd())
 		{
-			p[j_ + 2] = p[j_ + 1] = p[j_] =
-				static_cast<unsigned char>(iterator.Get());
+			p[j_ + 2] = p[j_ + 1] = p[j_] = iterator.Get();
 			j_ += 3;
-	 		++iterator;
+			++iterator;
 		}
 	}
 
@@ -157,9 +156,9 @@ template<typename Tin, typename Tout> void extract_icon(
 #endif
 	const int tmp99 = size_y % num_threads;
 #if 0
-	if (icon_threads.size() > 0)
+	if (!icon_threads.empty())
 	{
-		std::cout << "icon_threads.size()>0" << std::endl;
+		std::cout << "!icon_threads.empty()" << std::endl;
 	}
 #endif
 	if (tmp99 == 0)
@@ -391,7 +390,7 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 					(static_cast<double>(iterator.Get().GetBlue())  / tmp_max) * 255.0);
 				p[j_ + 1] = static_cast<unsigned char>(
 					(static_cast<double>(iterator.Get().GetGreen()) / tmp_max) * 255.0);
-				p[j_ + 0] = static_cast<unsigned char>(
+				p[j_] = static_cast<unsigned char>(
 					(static_cast<double>(iterator.Get().GetRed())   / tmp_max) * 255.0);
 				j_ += 3;
 				++iterator;
@@ -493,7 +492,7 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 				const double r = static_cast<double>(iterator.Get().GetRed());
 				p[j_ + 2] = static_cast<unsigned char>(255.0 * ((b + (-vmin)) / vrange));
 				p[j_ + 1] = static_cast<unsigned char>(255.0 * ((g + (-vmin)) / vrange));
-				p[j_ + 0] = static_cast<unsigned char>(255.0 * ((r + (-vmin)) / vrange));
+				p[j_]     = static_cast<unsigned char>(255.0 * ((r + (-vmin)) / vrange));
 				j_ += 3;
 				++iterator;
 			}
@@ -639,7 +638,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 					(static_cast<double>(iterator.Get().GetBlue())  / tmp_max) * 255.0);
 				p[j_ + 1] = static_cast<unsigned char>(
 					(static_cast<double>(iterator.Get().GetGreen()) / tmp_max) * 255.0);
-				p[j_ + 0] = static_cast<unsigned char>(
+				p[j_] = static_cast<unsigned char>(
 					(static_cast<double>(iterator.Get().GetRed())   / tmp_max) * 255.0);
 				j_ += 4;
 				++iterator;
@@ -685,7 +684,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 			iterator.GoToBegin();
 			while (!iterator.IsAtEnd())
 			{
-				if (iterator.Get().GetAlpha()>0)
+				if (iterator.Get().GetAlpha() > 0)
 				{
 					const double alpha = static_cast<double>(iterator.Get().GetAlpha()) / tmp_max;
 					const double one_minus_alpha = 1.0 - alpha;
@@ -698,13 +697,13 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 						alpha * static_cast<double>(iterator.Get().GetBlue());
 					p[j_ + 2] = static_cast<unsigned char>((tmp_blu / tmp_max) * 255.0);
 					p[j_ + 1] = static_cast<unsigned char>((tmp_gre / tmp_max) * 255.0);
-					p[j_ + 0] = static_cast<unsigned char>((tmp_red / tmp_max) * 255.0);
+					p[j_]     = static_cast<unsigned char>((tmp_red / tmp_max) * 255.0);
 				}
 				else
 				{
 					p[j_ + 2] = 255;
 					p[j_ + 1] = 255;
-					p[j_ + 0] = 255;
+					p[j_]     = 255;
 				}
 				j_ += 3;
 				++iterator;
@@ -803,13 +802,13 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 						a * static_cast<double>(iterator.Get().GetBlue());
 					p[j_ + 2] = static_cast<unsigned char>(tmp_blu);
 					p[j_ + 1] = static_cast<unsigned char>(tmp_gre);
-					p[j_ + 0] = static_cast<unsigned char>(tmp_red);
+					p[j_]     = static_cast<unsigned char>(tmp_red);
 				}
 				else
 				{
 					p[j_ + 2] = 255;
 					p[j_ + 1] = 255;
-					p[j_ + 0] = 255;
+					p[j_]     = 255;
 				}
 				j_ += 3;
 				++iterator;
@@ -877,7 +876,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 				p[j_ + 3] = static_cast<unsigned char>(255.0 * ((a + (-vmin)) / vrange));
 				p[j_ + 2] = static_cast<unsigned char>(255.0 * ((b + (-vmin)) / vrange));
 				p[j_ + 1] = static_cast<unsigned char>(255.0 * ((g + (-vmin)) / vrange));
-				p[j_ + 0] = static_cast<unsigned char>(255.0 * ((r + (-vmin)) / vrange));
+				p[j_]     = static_cast<unsigned char>(255.0 * ((r + (-vmin)) / vrange));
 				j_ += 4;
 				++iterator;
 			}
@@ -933,7 +932,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 				const double tmp_blu = tmp_whi + a * (255.0 * ((b + (-vmin) )/ vrange));
 				p[j_ + 2] = static_cast<unsigned char>(tmp_blu);
 				p[j_ + 1] = static_cast<unsigned char>(tmp_gre);
-				p[j_ + 0] = static_cast<unsigned char>(tmp_red);
+				p[j_]    = static_cast<unsigned char>(tmp_red);
 				j_ += 3;
 				++iterator;
 			}
@@ -1095,7 +1094,7 @@ void IconUtils::icon(ImageVariant * ivariant)
 
 void IconUtils::kill_threads()
 {
-	for (unsigned int i = 0; i<icon_threads.size(); ++i)
+	for (unsigned int i = 0; i < icon_threads.size(); ++i)
 	{
 		if (icon_threads.at(i))
 		{

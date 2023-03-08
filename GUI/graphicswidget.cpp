@@ -2710,7 +2710,7 @@ void GraphicsWidget::animate_()
 			if (!toolbox2D->is_blue())
 				toolbox2D->set_indicator_blue();
 		}
-	}	
+	}
 }
 
 void GraphicsWidget::set_top_label_text(const QString & s)
@@ -3455,7 +3455,7 @@ void GraphicsWidget::get_screen()
 		d,
 		QString("All Files (*)"),
 		(QString*)NULL
-		 //,QFileDialog::DontUseNativeDialog
+		//,QFileDialog::DontUseNativeDialog
 		);
 	if (f.isEmpty()) return;
 	QString file;
