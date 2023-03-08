@@ -8,8 +8,6 @@
 #include <itkImageRegionConstIterator.h>
 #include "luts.h"
 
-typedef itk::Image<unsigned char, 2> ImageSegType;
-
 template<typename T> class ProcessImageThreadLUT_ : public QThread
 {
 public:
@@ -226,7 +224,6 @@ public:
 
 private:
 	const typename T::Pointer image;
-	const typename ImageSegType::Pointer image2;
 	unsigned char * p;
 	const int size_0;
 	const int size_1;
