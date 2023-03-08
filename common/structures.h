@@ -25,7 +25,6 @@
 #include "dicom/ultrasoundregiondata.h"
 #include "dicom/spectroscopydata.h"
 
-// Assumed is size of 'int' is 32 bit.
 // Not tested on big endian platroms (specially MDCM).
 
 class GLWidget;
@@ -230,7 +229,9 @@ public:
 	:
 	id(-1), roiid(-1), vaoid(0), vboid(0), vao_initialized(false), type(0)
 	{
-		color.r = 0; color.g = 0; color.b = 0;
+		color.r = 0;
+		color.g = 0;
+		color.b = 0;
 	}
 	~Contour() {}
 	int id;
@@ -246,11 +247,6 @@ public:
 	// 4 - POINT
 	// 5 - CLOSEDPLANAR_XOR
 	short type;
-	// axis:
-	// -1 - not set
-	//  0 - x
-	//  1 - y
-	//  2 - z
 	Contourcolor color;
 	ListOfDPoints dpoints;
 	QStringList ref_sop_instance_uids;
@@ -269,7 +265,9 @@ public:
 	random_color(false),
 	max_delta(0)
 	{
-		color.r = 0; color.g = 0; color.b = 0;
+		color.r = 0;
+		color.g = 0;
+		color.b = 0;
 	}
 	~ROI() {}
 	int id;
@@ -329,16 +327,13 @@ public:
 		fv      = new float[12];
 		tc      = new float[12];
 		ipp_iop = new double[9];
-		for (int x = 0; x < 12; ++x)
+		for (unsigned int x = 0; x < 12; ++x)
 		{
 			v[x]  = 0.0f;
 			fv[x] = 0.0f;
 			tc[x] = 0.0f;
 		}
-		for (int x = 0; x <  9; ++x)
-		{
-			ipp_iop[x] = 0.0;
-		}
+		for (unsigned int x = 0; x < 9; ++x) ipp_iop[x] = 0.0;
 	}
 	~ImageSlice()
 	{
@@ -368,8 +363,8 @@ public:
 		lvboid  = 0;
 		pvaoid  = 0;
 		pvboid  = 0;
-		fv      = new float[12];
-		for (int x = 0; x < 12; ++x) { fv[x] = 0.0f; }
+		fv = new float[12];
+		for (unsigned int x = 0; x < 12; ++x) fv[x] = 0.0f;
 		lsize = 0;
 		psize = 0;
 	}
@@ -460,7 +455,7 @@ public:
 class PrRefImage
 {
 public:
-	PrRefImage()  {}
+	PrRefImage() {}
 	~PrRefImage() {}
 	QString uid;
 	QString file;
@@ -694,8 +689,7 @@ public:
 				return false;
 			}
 		}
-		if (
-			(o.ShutterLeftVerticalEdge
+		if ((o.ShutterLeftVerticalEdge
 				== ShutterLeftVerticalEdge) &&
 			(o.ShutterRightVerticalEdge
 				== ShutterRightVerticalEdge) &&
@@ -797,7 +791,7 @@ public:
 	SpectroscopySlicesVector spectroscopy_slices;
 	ROIs rois;
 	TriMeshes trimeshes;
-	void close(bool=true);
+	void close(bool = true);
 };
 
 class SRImage
