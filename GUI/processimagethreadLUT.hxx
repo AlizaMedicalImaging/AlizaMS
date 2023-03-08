@@ -14,8 +14,8 @@ public:
 	ProcessImageThreadLUT_(
 		const typename T::Pointer & image_,
 		unsigned char * p_,
-		const int size_0_,   const int size_1_,
-		const int index_0_,  const int index_1_,
+		const int size_0_, const int size_1_,
+		const int index_0_, const int index_1_,
 		const unsigned int j_,
 		const double window_center_, const double window_width_,
 		const short lut_,
@@ -47,20 +47,56 @@ public:
 		index[0] = index_0;
 		index[1] = index_1;
  		const typename T::RegionType region(index, size);
-		//
 		const unsigned char * tmp_p1 = NULL;
 		int tmp__size = 0;
 		switch (lut)
 		{
-		case 0: break;
-		case 1: { tmp_p1 = default_lut;       tmp__size = default_lut_size;     } break;
-		case 2: { tmp_p1 = black_rainbow_lut; tmp__size = black_rainbow_size;   } break;
-		case 3: { tmp_p1 = syngo_lut;         tmp__size = syngo_lut_size;       } break;
-		case 4: { tmp_p1 = hot_iron;          tmp__size = hot_iron_size;        } break;
-		case 5: { tmp_p1 = hot_metal_blue;    tmp__size = hot_metal_blue_size;  } break;
-		case 6: { tmp_p1 = pet_dicom_lut;     tmp__size = pet_dicom_lut_size;   } break;
-		case 7: { tmp_p1 = pet20_dicom_lut;   tmp__size = pet20_dicom_lut_size; } break;
-		default: return;
+		case 0:
+			break;
+		case 1:
+			{
+				tmp_p1 = default_lut;
+				tmp__size = default_lut_size;
+			}
+			break;
+		case 2:
+			{
+				tmp_p1 = black_rainbow_lut;
+				tmp__size = black_rainbow_size;
+			}
+			break;
+		case 3:
+			{
+				tmp_p1 = syngo_lut;
+				tmp__size = syngo_lut_size;
+			}
+			break;
+		case 4:
+			{
+				tmp_p1 = hot_iron;
+				tmp__size = hot_iron_size;
+			}
+			break;
+		case 5:
+			{
+				tmp_p1 = hot_metal_blue;
+				tmp__size = hot_metal_blue_size;
+			}
+			break;
+		case 6:
+			{
+				tmp_p1 = pet_dicom_lut;
+				tmp__size = pet_dicom_lut_size;
+			}
+			break;
+		case 7:
+			{
+				tmp_p1 = pet20_dicom_lut;
+				tmp__size = pet20_dicom_lut_size;
+			}
+			break;
+		default:
+			return;
 		}
 		//
 		const double wmin = window_center - window_width * 0.5;
@@ -83,7 +119,7 @@ public:
 					case 0:
 						{
 							const unsigned char c = static_cast<unsigned char>(UCHAR_MAX * r);
-							p[j + 0] = c;
+							p[j]     = c;
 							p[j + 1] = c;
 							p[j + 2] = c;
 						}
@@ -99,9 +135,9 @@ public:
 							int z = static_cast<int>(r * tmp__size);
 							if (z < 0) z = 0;
 							if (z > (tmp__size - 1)) z = tmp__size - 1;
-							p[j + 0] = tmp_p1[z * 3 +0];
-							p[j + 1] = tmp_p1[z * 3 +1];
-							p[j + 2] = tmp_p1[z * 3 +2];
+							p[j]     = tmp_p1[z * 3];
+							p[j + 1] = tmp_p1[z * 3 + 1];
+							p[j + 2] = tmp_p1[z * 3 + 2];
 						}
 						break;
 					default:
@@ -116,7 +152,7 @@ public:
 					case 0:
 						{
 							const unsigned char c = static_cast<unsigned char>(UCHAR_MAX * r);
-							p[j + 0] = c;
+							p[j]     = c;
 							p[j + 1] = c;
 							p[j + 2] = c;
 						}
@@ -132,7 +168,7 @@ public:
 							int z = static_cast<int>(r * tmp__size);
 							if (z < 0) z = 0;
 							if (z > (tmp__size - 1)) z = tmp__size - 1;
-							p[j + 0] = tmp_p1[z * 3 + 0];
+							p[j]     = tmp_p1[z * 3];
 							p[j + 1] = tmp_p1[z * 3 + 1];
 							p[j + 2] = tmp_p1[z * 3 + 2];
 						}
@@ -150,7 +186,7 @@ public:
 					{
 					case 0:
 						{
-							p[j + 0] = 0;
+							p[j]     = 0;
 							p[j + 1] = 0;
 							p[j + 2] = 0;
 						}
@@ -163,7 +199,7 @@ public:
 					case 6:
 					case 7:
 						{
-							p[j + 0] = tmp_p1[0];
+							p[j]     = tmp_p1[0];
 							p[j + 1] = tmp_p1[1];
 							p[j + 2] = tmp_p1[2];
 						}
@@ -179,13 +215,13 @@ public:
 					case 0:
 						if (alt_mode)
 						{
-							p[j + 0] = 0;
+							p[j]     = 0;
 							p[j + 1] = 0;
 							p[j + 2] = 0;
 						}
 						else
 						{
-							p[j + 0] = UCHAR_MAX;
+							p[j]     = UCHAR_MAX;
 							p[j + 1] = UCHAR_MAX;
 							p[j + 2] = UCHAR_MAX;
 						}
@@ -199,14 +235,14 @@ public:
 					case 7:
 						if (alt_mode)
 						{
-							p[j + 0] = tmp_p1[0];
+							p[j]     = tmp_p1[0];
 							p[j + 1] = tmp_p1[1];
 							p[j + 2] = tmp_p1[2];
 						}
 						else
 						{
 							const unsigned int z = tmp__size - 1;
-							p[j + 0] = tmp_p1[z * 3 + 0];
+							p[j]     = tmp_p1[z * 3];
 							p[j + 1] = tmp_p1[z * 3 + 1];
 							p[j + 2] = tmp_p1[z * 3 + 2];
 						}
@@ -216,7 +252,6 @@ public:
 					}
 				}
 			}
-			//
 			j += 3;
  			++iterator;
 		}
