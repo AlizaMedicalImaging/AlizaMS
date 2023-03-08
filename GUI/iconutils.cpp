@@ -226,11 +226,6 @@ template<typename Tin, typename Tout> void extract_icon(
 	while (true)
 	{
 		size_t b__ = 0;
-#ifdef WIN32
-		Sleep(2);
-#else
-		usleep(2000);
-#endif
 		for (size_t i = 0; i < threads_size; ++i)
 		{
 			if (icon_threads.at(i)->isFinished()) ++b__;
