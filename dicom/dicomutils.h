@@ -35,6 +35,129 @@ enum class DICOMLoadingType : short
 	RWVReference = 4
 };
 
+typedef struct
+{
+	std::string uid;
+	mdcm::Tag index_pointer;
+	mdcm::Tag group_pointer;
+} DimIndex;
+
+typedef std::vector<DimIndex> DimIndexSq;
+
+typedef struct
+{
+	unsigned int id;
+	std::vector<unsigned int> idx;
+} DimIndexValue;
+
+typedef std::vector<DimIndexValue> DimIndexValues;
+
+class FrameGroup
+{
+public:
+	FrameGroup() :
+		id(-1),
+		stack_id(-1),
+		in_stack_pos_num(-1),
+		temp_pos_idx(-1),
+		temp_pos_off(0.0),
+		us_temp_pos_unknown(0.0),
+		rescale_intercept(0.0),
+		rescale_slope(1.0),
+		stack_id_ok(false),
+		in_stack_pos_num_ok(false),
+		temp_pos_idx_ok(false),
+		vol_orient_ok(false),
+		vol_pos_ok(false),
+		temp_pos_off_ok(false),
+		us_temp_pos_unknown_ok(false),
+		rescale_ok(false)
+	{
+		vol_pos[0] = 0.0;
+		vol_pos[1] = 0.0;
+		vol_pos[2] = 0.0;
+		vol_orient[0] = 0.0;
+		vol_orient[1] = 0.0;
+		vol_orient[2] = 0.0;
+		vol_orient[3] = 0.0;
+		vol_orient[4] = 0.0;
+		vol_orient[5] = 0.0;
+	}
+	~FrameGroup()
+	{
+	}
+	int    id;
+	int    stack_id;
+	int    in_stack_pos_num;
+	int    temp_pos_idx;
+	double temp_pos_off;
+	double us_temp_pos_unknown;
+	double rescale_intercept;
+	double rescale_slope;
+	QString pat_pos;
+	QString pat_orient;
+	QString pix_spacing;
+	QString slice_thick;
+	QString window_center;
+	QString window_width;
+	QString lut_function;
+	QString data_type;
+	QString frame_body_part;
+	QString frame_laterality;
+	QString rescale_type;
+	QString frame_acquisition_datetime;
+	QString frame_reference_datetime;
+	bool stack_id_ok;
+	bool in_stack_pos_num_ok;
+	bool temp_pos_idx_ok;
+	bool vol_orient_ok;
+	bool vol_pos_ok;
+	bool temp_pos_off_ok;
+	bool us_temp_pos_unknown_ok;
+	bool rescale_ok;
+	double vol_pos[3];
+	double vol_orient[6];
+};
+
+typedef std::vector<FrameGroup> FrameGroupValues;
+
+typedef struct
+{
+	unsigned int type;
+	QList<QVariant> values;
+} GEMSParam;
+
+class PrConfig
+{
+public:
+	PrConfig() : id(-1), desc(QString("")) {}
+	~PrConfig() {}
+	int id;
+	QString desc;
+	QList<QVariant> values;
+};
+
+class PrRefImage
+{
+public:
+	PrRefImage() {}
+	~PrRefImage() {}
+	QString uid;
+	QString file;
+	QList<unsigned int> frames;
+};
+
+class PrRefSeries
+{
+public:
+	PrRefSeries()  {}
+	~PrRefSeries() {}
+	QString uid;
+	QList<PrRefImage> images;
+	QList<PrConfig> prconfig;
+	ImageOverlays image_overlays;
+};
+
 class DicomUtils
 {
 public:

@@ -37,12 +37,12 @@ DisplayInterface::DisplayInterface(
 	lock_single = false;
 	lock_level2D = true;
 	cube_3dtex = 0;
-	for (int x = 0;x < 3; ++x) { origin[x] = 0.0f; }
+	for (int x = 0; x < 3; ++x) origin[x] = 0.0f;
 	origin_ok = false;
 	tex_info = -1;
 	idimx = idimy = idimz = 0;
 	ix_origin = iy_origin = iz_origin = 0.0f;
-	for (int x = 0; x < 6; ++x) { dircos[x] = 0.0f; }
+	for (int x = 0; x < 6; ++x) dircos[x] = 0.0f;
 	ix_spacing = iy_spacing = iz_spacing = 0.0;
 	dimx = dimy = 0;
 	x_spacing = y_spacing = 0.0;
@@ -274,7 +274,7 @@ ImageVariant::ImageVariant(
 	image_type = -1;
 	equi = false;
 	one_direction = false;
-	orientation = 0; 
+	orientation = 0;
 	orientation_string = QString("");
 	iod_supported = false;
 	rescale_disabled = false;

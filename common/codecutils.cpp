@@ -625,7 +625,7 @@ QByteArray CodecUtils::fromUTF8(const QString & i, const char * charset, bool * 
  * to check whether the underlying character set conversion library is
  * available, it may be not available at all, if not, no conversion between
  * different character sets will be possible with DCMTK.
- * 
+ *
  * The function is mostly for testing purposes.
  */
 #include <dcmtk/config/osconfig.h>

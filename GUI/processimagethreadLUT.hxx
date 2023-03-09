@@ -46,7 +46,7 @@ public:
 		typename T::IndexType index;
 		index[0] = index_0;
 		index[1] = index_1;
- 		const typename T::RegionType region(index, size);
+		const typename T::RegionType region(index, size);
 		const unsigned char * tmp_p1 = NULL;
 		int tmp__size = 0;
 		switch (lut)
@@ -253,7 +253,7 @@ public:
 				}
 			}
 			j += 3;
- 			++iterator;
+			++iterator;
 		}
 	}
 
