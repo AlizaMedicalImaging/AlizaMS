@@ -280,7 +280,7 @@ SplitMosaicFilter::Split()
   double             normal[3];
   if (!ComputeMOSAICSliceNormal(normal, inverted))
   {
-    return false; // TODO
+    return false;
   }
   double origin[3];
   if (!ComputeMOSAICSlicePosition(origin, inverted))
@@ -291,7 +291,7 @@ SplitMosaicFilter::Split()
   unsigned long long l = inputimage.GetBufferLength();
   if (l >= 0xffffffff)
   {
-    mdcmAlwaysWarnMacro("SplitMosaicFilter::Split(): l = " << l);
+    mdcmAlwaysWarnMacro("SplitMosaicFilter: buffer length = " << l);
     return false;
   }
   std::vector<char> buf;
@@ -406,13 +406,9 @@ SplitMosaicFilter::Split()
   // Second part need to fix the Media Storage, now that this is not a single slice anymore
   MediaStorage ms = MediaStorage::SecondaryCaptureImageStorage;
   ms.SetFromFile(GetFile());
-  if (ms == MediaStorage::MRImageStorage)
+  if (ms != MediaStorage::MRImageStorage)
   {
-  }
-  else
-  {
-    mdcmDebugMacro("Expecting MRImageStorage");
-    return false;
+    mdcmAlwaysWarnMacro("SplitMosaicFilter: expected MR Image Storage");
   }
   DataElement de(Tag(0x0008, 0x0016));
   const char *   msstr = MediaStorage::GetMSString(ms);
