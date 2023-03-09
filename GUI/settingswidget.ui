@@ -126,7 +126,7 @@
               </sizepolicy>
              </property>
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Clean unused bits if &lt;span style=&quot; font-style:italic;&quot;&gt;BitsAllocated &amp;gt; BitsStored. &lt;/span&gt;Slower.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Clean unused bits if &lt;span style=&quot; font-style:italic;&quot;&gt;BitsAllocated &amp;gt; BitsStored. &lt;/span&gt;Little slower, but preferred, there is no guarantee that unused bits are zeroed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
               <string>Clean unused bits</string>
