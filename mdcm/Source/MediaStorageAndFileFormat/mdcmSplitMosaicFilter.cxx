@@ -27,24 +27,15 @@
 #include "mdcmDirectionCosines.h"
 #include <cmath>
 
-namespace mdcm
+namespace
 {
 
-SplitMosaicFilter::SplitMosaicFilter()
-  : F(new File)
-  , I(new Image)
-{}
-SplitMosaicFilter::~SplitMosaicFilter() {}
-
-namespace details
-{
-// mdcmDataExtra/mdcmSampleData/images_of_interest/MR-sonata-3D-as-Tile.dcm
-static bool
-reorganize_mosaic(const unsigned short * input,
-                  const unsigned int *   inputdims,
-                  unsigned int           square,
-                  const unsigned int *   outputdims,
-                  unsigned short *       output)
+template<typename T> bool
+reorganize_mosaic(const T *            input,
+                  const unsigned int * inputdims,
+                  unsigned int         square,
+                  const unsigned int * outputdims,
+                  T *                  output)
 {
   const size_t outputdims_0 = static_cast<size_t>(outputdims[0]);
   const size_t outputdims_1 = static_cast<size_t>(outputdims[1]);
@@ -67,12 +58,12 @@ reorganize_mosaic(const unsigned short * input,
 }
 
 #ifdef SNVINVERT
-static bool
-reorganize_mosaic_invert(const unsigned short * input,
-                         const unsigned int *   inputdims,
-                         unsigned int           square,
-                         const unsigned int *   outputdims,
-                         unsigned short *       output)
+template<typename T> bool
+reorganize_mosaic_invert(const T *            input,
+                         const unsigned int * inputdims,
+                         unsigned int         square,
+                         const unsigned int * outputdims,
+                         T *                  output)
 {
   const size_t outputdims_0 = static_cast<size_t>(outputdims[0]);
   const size_t outputdims_1 = static_cast<size_t>(outputdims[1]);
@@ -95,7 +86,16 @@ reorganize_mosaic_invert(const unsigned short * input,
 }
 #endif
 
-} // namespace details
+}
+
+namespace mdcm
+{
+
+SplitMosaicFilter::SplitMosaicFilter()
+  : F(new File)
+  , I(new Image)
+{}
+SplitMosaicFilter::~SplitMosaicFilter() {}
 
 void
 SplitMosaicFilter::SetImage(const Image & image)
@@ -200,12 +200,12 @@ SplitMosaicFilter::ComputeMOSAICSliceNormal(double slicenormalvector[3], bool & 
     }
     else if ((-1. - snv_dot) < 1e-6)
     {
-      mdcmWarningMacro("SliceNormalVector is opposite direction");
+      mdcmAlwaysWarnMacro("SliceNormalVector seems to be inverted");
       inverted = true;
     }
     else
     {
-      mdcmErrorMacro("Unexpected normal for SliceNormalVector, dot is: " << snv_dot);
+      mdcmAlwaysWarnMacro("Unexpected normal for SliceNormalVector, dot is: " << snv_dot);
       return false;
     }
     for (unsigned int i = 0; i < 3; ++i)
@@ -280,7 +280,7 @@ SplitMosaicFilter::Split()
   double             normal[3];
   if (!ComputeMOSAICSliceNormal(normal, inverted))
   {
-    return false;
+    return false; // TODO
   }
   double origin[3];
   if (!ComputeMOSAICSlicePosition(origin, inverted))
@@ -288,11 +288,6 @@ SplitMosaicFilter::Split()
     return false;
   }
   const Image & inputimage = GetImage();
-  if (inputimage.GetPixelFormat() != PixelFormat::UINT16)
-  {
-    mdcmErrorMacro("Expecting UINT16 PixelFormat");
-    return false;
-  }
   unsigned long long l = inputimage.GetBufferLength();
   if (l >= 0xffffffff)
   {
@@ -307,18 +302,78 @@ SplitMosaicFilter::Split()
   outbuf.resize(l);
   void * vbuf = static_cast<void*>(&buf[0]);
   void * voutbuf = static_cast<void*>(&outbuf[0]);
-  bool b;
+  bool b = false;
 #ifdef SNVINVERT
   if (inverted)
   {
-    b = details::reorganize_mosaic_invert(
-      static_cast<unsigned short *>(vbuf), inputimage.GetDimensions(), div, dims, static_cast<unsigned short *>(voutbuf));
+    if (inputimage.GetPixelFormat() == PixelFormat::UINT16)
+    {
+      b = reorganize_mosaic_invert<unsigned short>(static_cast<unsigned short *>(vbuf),
+                                                   inputimage.GetDimensions(),
+                                                   div,
+                                                   dims,
+                                                   static_cast<unsigned short *>(voutbuf));
+    }
+    else if (inputimage.GetPixelFormat() == PixelFormat::INT16)
+    {
+      b = reorganize_mosaic_invert<signed short>(static_cast<signed short *>(vbuf),
+                                                 inputimage.GetDimensions(),
+                                                 div,
+                                                 dims,
+                                                 static_cast<signed short *>(voutbuf));
+    }
+    else if (inputimage.GetPixelFormat() == PixelFormat::UINT8)
+    {
+      b = reorganize_mosaic_invert<unsigned char>(static_cast<unsigned char *>(vbuf),
+                                                  inputimage.GetDimensions(),
+                                                  div,
+                                                  dims,
+                                                  static_cast<unsigned char *>(voutbuf));
+    }
+    else if (inputimage.GetPixelFormat() == PixelFormat::INT8)
+    {
+      b = reorganize_mosaic_invert<signed char>(static_cast<signed char *>(vbuf),
+                                                inputimage.GetDimensions(),
+                                                div,
+                                                dims,
+                                                static_cast<signed char *>(voutbuf));
+    }
   }
   else
 #endif
   {
-    b = details::reorganize_mosaic(
-      static_cast<unsigned short *>(vbuf), inputimage.GetDimensions(), div, dims, static_cast<unsigned short *>(voutbuf));
+    if (inputimage.GetPixelFormat() == PixelFormat::UINT16)
+    {
+      b = reorganize_mosaic<unsigned short>(static_cast<unsigned short *>(vbuf),
+                                            inputimage.GetDimensions(),
+                                            div,
+                                            dims,
+                                            static_cast<unsigned short *>(voutbuf)); 
+    }
+    else if (inputimage.GetPixelFormat() == PixelFormat::INT16)
+    {
+      b = reorganize_mosaic<signed short>(static_cast<signed short *>(vbuf),
+                                          inputimage.GetDimensions(),
+                                          div,
+                                          dims,
+                                          static_cast<signed short *>(voutbuf));
+    }
+    else if (inputimage.GetPixelFormat() == PixelFormat::UINT8)
+    {
+      b = reorganize_mosaic<unsigned char>(static_cast<unsigned char *>(vbuf),
+                                           inputimage.GetDimensions(),
+                                           div,
+                                           dims,
+                                           static_cast<unsigned char *>(voutbuf));
+    }
+    else if (inputimage.GetPixelFormat() == PixelFormat::INT8)
+    {
+      b = reorganize_mosaic<signed char>(static_cast<signed char *>(vbuf),
+                                         inputimage.GetDimensions(),
+                                         div,
+                                         dims,
+                                         static_cast<signed char *>(voutbuf));
+    }
   }
   if (!b)
     return false;
