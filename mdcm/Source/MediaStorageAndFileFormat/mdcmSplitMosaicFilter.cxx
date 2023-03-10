@@ -237,7 +237,7 @@ SplitMosaicFilter::ComputeMOSAICSlicePosition(double pos[3], bool)
   {
     return false;
   }
-#if 0
+/*
   {
     double z[3];
     for(int i = 0; i < size; ++i)
@@ -255,7 +255,7 @@ SplitMosaicFilter::ComputeMOSAICSlicePosition(double pos[3], bool)
       }
     }
   }
-#endif
+*/
   const size_t          index = 0;
   MrProtocol::Slice &   slice = sa.Slices[index];
   MrProtocol::Vector3 & p = slice.Position;
@@ -340,6 +340,11 @@ SplitMosaicFilter::Split()
     }
   }
   else
+#else
+  if (inverted)
+  {
+    mdcmAlwaysWarnMacro("SplitMosaicFilter: slice normal may be inverted");
+  }
 #endif
   {
     if (inputimage.GetPixelFormat() == PixelFormat::UINT16)
