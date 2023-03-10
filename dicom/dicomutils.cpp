@@ -8875,7 +8875,9 @@ QString DicomUtils::read_series(
 					delete [] data[x];
 				}
 				data.clear();
-				return QString("Pixel formats seem to be different");
+				return QString(
+					"Files in series seem to have different\n"
+					"pixel format. Try to load separately.");
 			}
 		}
 		previous_pixelformat = pixelformat;
@@ -8889,7 +8891,7 @@ QString DicomUtils::read_series(
 			delete [] data[x];
 		}
 		data.clear();
-		return QString("data.size() != dimz");
+		return QString("Mismatch data size and number of slices");
 	}
 	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
