@@ -88,17 +88,6 @@ set_property(CACHE ALIZA_CXX_STANDARD PROPERTY STRINGS "Not set" "11" "14" "17" 
 # Force disable SSE/SSE2.
 option(ALIZA_DISABLE_SIMDMATH "Disable SSE/SSE2" OFF)
 
-if(UNIX AND NOT APPLE)
-  # Force xcb platform on Linux.
-  # Another platform still can be set with an argument, e.g. "alizams -platform vnc".
-  option(ALIZA_QT5_6_PLATFORM_XCB "Force QT_QPA_PLATFORM=xcb (only Qt5 and Qt6)" ON)
-  option(ALIZA_QT4_SYSTEM_GLEW "Use system GLEW (only Qt4)" OFF)
-endif()
-
-if(UNIX AND NOT APPLE)
-  option(ALIZA_USE_SYSTEM_BULLET "Use system Bullet" OFF)
-endif()
-
 if(NOT APPLE)
   # Use OpenGL Core profile with Qt5 (with Qt6 always Core profile).
   # With Qt4 not defined, may work, not tested.
@@ -106,6 +95,11 @@ if(NOT APPLE)
 endif()
 
 if(UNIX AND NOT APPLE)
+  # Force xcb platform on Linux.
+  # Another platform still can be set with an argument, e.g. "alizams -platform vnc".
+  option(ALIZA_QT5_6_PLATFORM_XCB "Force QT_QPA_PLATFORM=xcb (only Qt5 and Qt6)" ON)
+  option(ALIZA_QT4_SYSTEM_GLEW "Use system GLEW (only Qt4)" OFF)
+  option(ALIZA_USE_SYSTEM_BULLET "Use system Bullet" OFF)
   option(ALIZA_USE_SYSTEM_LCMS2 "Use system lcms2" OFF)
 endif()
 
