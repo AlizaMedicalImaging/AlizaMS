@@ -7200,7 +7200,7 @@ QString DicomUtils::read_enhanced(
 			delete [] data[x];
 		}
 		data.clear();
-		return QString("dimx_read != columns_ || dimy_read != rows_");
+		return QString("Dimensions mismatch");
 	}
 	if (dimz_read != data.size())
 	{
@@ -7210,7 +7210,7 @@ QString DicomUtils::read_enhanced(
 			delete [] data[x];
 		}
 		data.clear();
-		return QString("dimz_read != data.size()");
+		return QString("Mismatch in data size and number of frames");
 	}
 	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
@@ -7538,8 +7538,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 			delete [] data[x];
 		}
 		data.clear();
-		return QString(
-			"dimx_read != columns_ || dimy_read != rows_");
+		return QString("Dimensions mismatch");
 	}
 	if (dimz_read != data.size())
 	{
@@ -7549,7 +7548,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 			delete [] data[x];
 		}
 		data.clear();
-		return QString("dimz_read != data.size()");
+		return QString("Mismatch in data size and number of frames");
 	}
 	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
