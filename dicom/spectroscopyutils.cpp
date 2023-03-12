@@ -45,10 +45,10 @@ bool SpectroscopyUtils::Read(const mdcm::DataSet & ds, SpectroscopyData * s)
 
 	unsigned short Rows, Columns;
 	unsigned int   DataPointRows, DataPointColumns;
-	if (DicomUtils::get_us_value(ds,tRows,&Rows) &&
-		DicomUtils::get_us_value(ds,tColumns,&Columns) &&
-		DicomUtils::get_ul_value(ds,tDataPointRows,&DataPointRows) &&
-		DicomUtils::get_ul_value(ds,tDataPointColumns,&DataPointColumns))
+	if (DicomUtils::get_us_value(ds, tRows, &Rows) &&
+		DicomUtils::get_us_value(ds, tColumns, &Columns) &&
+		DicomUtils::get_ul_value(ds, tDataPointRows, &DataPointRows) &&
+		DicomUtils::get_ul_value(ds, tDataPointColumns, &DataPointColumns))
 	{
 		s->m_Rows = Rows;
 		s->m_Columns = Columns;
@@ -123,7 +123,6 @@ QString SpectroscopyUtils::ProcessData(
 	std::vector<float*> data;
 #endif
 	DicomUtils::read_dimension_index_sq(ds, sq);
-	const unsigned long sq_size = sq.size();
 	const bool ok_f = DicomUtils::read_group_sq(
 		ds,
 		tPerFrameFunctionalGroupsSequence,
@@ -169,8 +168,7 @@ QString SpectroscopyUtils::ProcessData(
 			idx_values_tmp.clear();
 			idx_values_rebuild = true;
 #if 0
-			std::cout
-				<< "stack id and position without dim. org."
+			std::cout << "stack id and position without dim. org."
 				<< std::endl;
 #endif
 		}
@@ -235,10 +233,10 @@ QString SpectroscopyUtils::ProcessData(
 			tmp0, idx_values, values,
 			-1, -1, -1, -1, -1, -1, false);
 	}
-	if (!ok__)tmp0.clear();
+	if (!ok__) tmp0.clear();
 	if (tmp0.empty())
 	{
-		return QString("tmp0.size()<1");
+		return QString("tmp0.size() < 1");
 	}
 	for (unsigned int x = 0; x < tmp0.size(); ++x)
 	{
@@ -247,7 +245,7 @@ QString SpectroscopyUtils::ProcessData(
 			return
 				QString("tmp0.at(") +
 				QVariant(static_cast<int>(x)).toString() +
-				QString(").size()<1");
+				QString(").size() < 1");
 		}
 	}
 
@@ -257,7 +255,7 @@ QString SpectroscopyUtils::ProcessData(
 	for (unsigned int j = 0; j < values.size(); ++j)
 	{
 		float * p__ = new float[xy];
-		memcpy(p__,&(s.m_SpectroscopyData[j*xy]),xy);
+		memcpy(p__, &(s.m_SpectroscopyData[j * xy]), xy);
 		data.push_back(p__);
 	}
 #endif
@@ -283,10 +281,10 @@ QString SpectroscopyUtils::ProcessData(
 		{
 			tmp1[it->second] = it->first;
 		}
-		if (tmp0.at(x).size()!=tmp1.size())
+		if (tmp0.at(x).size() != tmp1.size())
 		{
 #if 1
-			std::cout << "tmp0.at(x).size()!=tmp1.size()"
+			std::cout << "tmp0.at(x).size() != tmp1.size()"
 				<< std::endl;
 #endif
 			continue;
@@ -372,10 +370,8 @@ QString SpectroscopyUtils::ProcessData(
 			{
 				error = true;
 #if 1
-				std::cout <<
-					"!(idx__<data.size() && data.at(idx__)"
-					" && idx__<values.size())"
-					<< std::endl;
+				std::cout << "!(idx__<data.size() && data.at(idx__)"
+					" && idx__<values.size())" << std::endl;
 #endif
 				break;
 			}
@@ -389,7 +385,7 @@ QString SpectroscopyUtils::ProcessData(
 			bool   one_direction_ = false;
 			double origin_x_gen, origin_y_gen, origin_z_gen;
 			double spacing_z;
-			double dircos_gen[] = {0.0,0.0,0.0,0.0,0.0,0.0};
+			double dircos_gen[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 			float  slices_dir_x, slices_dir_y, slices_dir_z;
 			float  up_dir_x, up_dir_y, up_dir_z;
 			float  center_x, center_y, center_z;
@@ -397,8 +393,8 @@ QString SpectroscopyUtils::ProcessData(
 			std::vector<ImageSlice*> empty__;
 			QString orientation("");
 			double spacing_x, spacing_y;
-			double spacing_tmp0[2] = {0.0, 0.0 };
-			double spacing_tmp1[2] = {0.0, 0.0 };
+			double spacing_tmp0[2] = {0.0, 0.0};
+			double spacing_tmp1[2] = {0.0, 0.0};
 			bool spacing_ok = false;
 			for (int i = 0; i < tmp5.size(); ++i)
 			{
@@ -474,21 +470,25 @@ QString SpectroscopyUtils::ProcessData(
 				if (equi_ && rows_ > 1 && columns_ > 1)
 				{
 					bool no_orientation = false;
-					for (unsigned long k = 0; k < slices.size()-1; ++k)
+					for (unsigned long k = 0; k < slices.size() - 1; ++k)
 					{
 						if (slices.at(k)->slice_orientation_string !=
-							slices.at(k+1)->slice_orientation_string)
+							slices.at(k + 1)->slice_orientation_string)
 						{
 							no_orientation = true;
 							break;
 						}
 					}
 					if (!no_orientation)
+					{
 						ivariant->spect_orientation_string =
 							slices.at(0)->slice_orientation_string;
+					}
 				}
 				for (unsigned int k = 0; k < slices.size(); ++k)
+				{
 					ivariant->di->spectroscopy_slices.push_back(slices[k]);
+				}
 				ivariant->di->spectroscopy_generated = true;
 				DicomUtils::read_ivariant_info_tags(ds, ivariant);
 				if (equi_)
@@ -501,7 +501,7 @@ QString SpectroscopyUtils::ProcessData(
 				{
 					float cx = 0.0f, cy = 0.0f, cz = 0.0f;
 					CommonUtils::calculate_center_notuniform(
-						ivariant->di->spectroscopy_slices,&cx,&cy,&cz);
+						ivariant->di->spectroscopy_slices, &cx, &cy, &cz);
 					ivariant->di->default_center_x = ivariant->di->center_x = cx;
 					ivariant->di->default_center_y = ivariant->di->center_y = cy;
 					ivariant->di->default_center_z = ivariant->di->center_z = cz;
@@ -524,8 +524,7 @@ QString SpectroscopyUtils::ProcessData(
 					QString("&#160;") +
 					s.m_SignalDomainRows +
 					QString("</span>");
-				ivariant->iinfo = DicomUtils::read_enhmr_spectro_info(
-					ds, true);
+				ivariant->iinfo = DicomUtils::read_enhmr_spectro_info(ds, true);
 				ivariants.push_back(ivariant);
 			}
 		}
@@ -538,7 +537,7 @@ QString SpectroscopyUtils::ProcessData(
 	}
 
 #ifdef LOAD_SPECT_DATA
-	for (unsigned int x=0; x < data.size(); ++x)
+	for (unsigned int x = 0; x < data.size(); ++x)
 	{
 		delete [] data[x];
 	}

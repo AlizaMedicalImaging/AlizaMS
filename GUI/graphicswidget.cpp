@@ -2497,16 +2497,15 @@ void GraphicsWidget::set_slice_2D(
 	case 2:
 		{
 			const bool check_consistence =
-				((static_cast<int>(v->di->image_slices.size() == v->di->idimz)) &&
-					static_cast<int>(v->di->image_slices.size()) > x);
+				((static_cast<int>(v->di->image_slices.size()) == v->di->idimz) &&
+					(static_cast<int>(v->di->image_slices.size()) > x));
 			if (v->equi)
 			{
 				image_container.image2D->orientation_string = v->orientation_string;
 			}
 			else
 			{
-				if (
-					check_consistence &&
+				if (check_consistence &&
 					!v->di->image_slices.at(x)->slice_orientation_string.isEmpty())
 				{
 					image_container.image2D->orientation_string =

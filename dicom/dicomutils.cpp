@@ -5979,7 +5979,7 @@ void DicomUtils::enhanced_get_indices(
 	// If the function fails to process indices,
 	// an image still will have correct spatial information
 	// and acquisition time for every slice, if available.
-	const int sq_size = static_cast<int>(sq.size());
+	const size_t sq_size = sq.size();
 	if (sq_size < 1)
 	{
 #ifdef ENHANCED_PRINT_INFO
@@ -6011,9 +6011,8 @@ void DicomUtils::enhanced_get_indices(
 		dim_uids.push_back(sq.at(x).uid);
 	}
 	const std::set<std::string> dim_uids_set(dim_uids.begin(), dim_uids.end());
-	const size_t dim_uids_set_size = dim_uids_set.size();
 #ifdef ENHANCED_PRINT_INFO
-	if (dim_uids_set_size > 1)
+	if (dim_uids_set.size() > 1)
 	{
 		std::cout <<
 			"Warning: multiple dimension organization UIDs, using 1st"
@@ -6149,6 +6148,9 @@ void DicomUtils::enhanced_get_indices(
 		{
 			pa_index_idx = x;
 		}
+		// currently unused
+		(void)segment_idx;
+		(void)ipp_idx;
 	}
 	//
 	// Known combinations, re-order indices in some special situations to
@@ -7124,7 +7126,6 @@ QString DicomUtils::read_enhanced(
 		}
 		read_dimension_index_sq(ds, sq);
 		//
-		const size_t sq_size = sq.size();
 		const bool ok_f =
 			read_group_sq(
 				ds,
@@ -7408,7 +7409,6 @@ QString DicomUtils::read_enhanced_supp_palette(
 	unsigned short columns_ = 0;
 	bool rows_ok = false;
 	bool cols_ok = false;
-	size_t sq_size = 0;
 	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
 	const bool pred6_bug = wsettings->get_predictor_workaround();
 	const bool cornell_bug = wsettings->get_cornell_workaround();
@@ -7458,7 +7458,6 @@ QString DicomUtils::read_enhanced_supp_palette(
 		}
 		read_dimension_index_sq(ds, sq);
 		//
-		sq_size = sq.size();
 		ok_f = read_group_sq(
 			ds,
 			tPerFrameFunctionalGroupsSequence,
@@ -11654,7 +11653,6 @@ QString DicomUtils::read_enhanced_3d_8d(
 {
 	QString message_ ;
 	std::vector< std::map< unsigned int, unsigned int, std::less<unsigned int> > > tmp0;
-	const SettingsWidget * wsettings = static_cast<const SettingsWidget*>(settings);
 	*ok = enhanced_process_indices(
 		tmp0, idx_values, values,
 		dim8th, dim7th, dim6th, dim5th, dim4th, dim3rd, enh_loading_type);
