@@ -431,7 +431,7 @@ rawtoimage_fill2(const T *     inputbuffer,
     uint16_t smask = 0x0001;
     smask = smask << (16 - static_cast<uint16_t>(bitsallocated - bitsstored + 1));
     // nmask : to propagate sign bit on negative values
-    int16_t nmask = 0x8000;
+    int16_t nmask = static_cast<int16_t>(0x8000);
     nmask = nmask >> static_cast<int16_t>(bitsallocated - bitsstored - 1);
     if (pc)
     {

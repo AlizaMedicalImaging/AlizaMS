@@ -646,7 +646,6 @@ JPEGLSCodec::CodeFrameIntoBuffer(char * outdata, size_t outlen, size_t & complen
   const PixelFormat &  pf = this->GetPixelFormat();
   const int            samples_pixel = pf.GetSamplesPerPixel();
   const int            bitsallocated = pf.GetBitsAllocated();
-  const int            bitsstored = pf.GetBitsStored();
   JlsParameters        params = {};
   /*
   The fields in JlsCustomParameters do not control lossy/lossless. They

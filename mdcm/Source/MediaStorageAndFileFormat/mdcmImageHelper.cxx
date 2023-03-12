@@ -1031,10 +1031,10 @@ ImageHelper::GetZSpacingTagFromMediaStorage(MediaStorage const & ms)
 }
 
 // tmp solution
-static int count_backslashes(const std::string & s)
+static size_t count_backslashes(const std::string & s)
 {
-  int res = 0;
-  for (int i = 0; i < s.length(); ++i)
+  size_t res = 0;
+  for (size_t i = 0; i < s.length(); ++i)
   {
     if (s[i] == '\\')
     {
@@ -1109,7 +1109,7 @@ ImageHelper::GetSpacingValue(File const & f)
           assert(bv);
           std::string s = std::string(bv->GetPointer(), bv->GetLength());
           ss.str(s);
-          const int found = count_backslashes(s);
+          const size_t found = count_backslashes(s);
           if (found == 1)
           {
             el.SetLength(entry.GetVR().GetSizeof() * 2);
@@ -1188,7 +1188,7 @@ ImageHelper::GetSpacingValue(File const & f)
           assert(bv);
           std::string s = std::string(bv->GetPointer(), bv->GetLength());
           ss.str(s);
-          const int found = count_backslashes(s);
+          const size_t found = count_backslashes(s);
           if (found == 1)
           {
             el.SetLength(entry.GetVR().GetSizeof() * 2);
