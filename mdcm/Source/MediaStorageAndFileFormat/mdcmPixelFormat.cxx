@@ -238,7 +238,7 @@ PixelFormat::SetScalarType(ScalarType st)
       break;
   }
   BitsStored = BitsAllocated;
-  HighBit = BitsStored - 1;
+  HighBit = (BitsStored > 0) ? BitsStored - 1 : 0;
 }
 
 // ScalarType does not take into account the sample per pixel
