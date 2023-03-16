@@ -11437,28 +11437,28 @@ bool DicomUtils::enhanced_process_indices(
 							for (unsigned int x = 0; x < idx_values_size; ++x)
 							{
 								const int idx1 =
-									dim8th >= 0 && dim8th < static_cast<int>(idx_values.at(x).idx.size())
-									? idx_values.at(x).idx.at(dim8th)
+									(dim8th >= 0 && dim8th < static_cast<int>(idx_values.at(x).idx.size()))
+									? static_cast<int>(idx_values.at(x).idx.at(dim8th))
 									: -1;
 								const int idx2 =
-									dim7th >= 0 && dim7th < static_cast<int>(idx_values.at(x).idx.size())
-									? idx_values.at(x).idx.at(dim7th)
+									(dim7th >= 0 && dim7th < static_cast<int>(idx_values.at(x).idx.size()))
+									? static_cast<int>(idx_values.at(x).idx.at(dim7th))
 									: -1;
 								const int idx3 =
-									dim6th >= 0 && dim6th < static_cast<int>(idx_values.at(x).idx.size())
-									? idx_values.at(x).idx.at(dim6th)
+									(dim6th >= 0 && dim6th < static_cast<int>(idx_values.at(x).idx.size()))
+									? static_cast<int>(idx_values.at(x).idx.at(dim6th))
 									: -1;
 								const int idx4 =
-									dim5th >= 0 && dim5th < static_cast<int>(idx_values.at(x).idx.size())
-									? idx_values.at(x).idx.at(dim5th)
+									(dim5th >= 0 && dim5th < static_cast<int>(idx_values.at(x).idx.size()))
+									? static_cast<int>(idx_values.at(x).idx.at(dim5th))
 									: -1;
 								const int idx5 =
-									dim4th >= 0 && dim4th < static_cast<int>(idx_values.at(x).idx.size())
-									? idx_values.at(x).idx.at(dim4th)
+									(dim4th >= 0 && dim4th < static_cast<int>(idx_values.at(x).idx.size()))
+									? static_cast<int>(idx_values.at(x).idx.at(dim4th))
 									: -1;
 								const int idx6 =
-									dim3rd >= 0 && dim3rd < static_cast<int>(idx_values.at(x).idx.size())
-									? idx_values.at(x).idx.at(dim3rd)
+									(dim3rd >= 0 && dim3rd < static_cast<int>(idx_values.at(x).idx.size()))
+									? static_cast<int>(idx_values.at(x).idx.at(dim3rd))
 									: -1;
 								if ((idx1 < 0 || idx1 == static_cast<int>(*it1)) &&
 									(idx2 < 0 || idx2 == static_cast<int>(*it2)) &&
