@@ -221,14 +221,16 @@ struct ThreadsafeCounter
 	ThreadsafeCounter()
 	{
 		mCounter = 0;
-		--mCounter;  // first count should come back 0
+		//--mCounter;  // first count should come back 0
+		mCounter = static_cast<unsigned int>(-1);
 	}
 
 	unsigned int getNext()
 	{
 		// no need to optimize this with atomics, it is only called ONCE per thread!
 		mMutex.lock();
-		mCounter++;
+		//mCounter++;
+		mCounter = static_cast<unsigned int>(mCounter + 1ul);
 		if (mCounter >= BT_MAX_THREAD_COUNT)
 		{
 			btAssert(!"thread counter exceeded");
