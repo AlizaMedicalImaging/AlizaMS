@@ -113,8 +113,7 @@ public:
   // VR/VM must be compatible with the public dictionary
   MDCM_STATIC_ASSERT(static_cast<bool>(static_cast<VR::VRType>(TVR) & static_cast<VR::VRType>(TagToType<Group, Element>::VRType)));
   MDCM_STATIC_ASSERT(static_cast<bool>(static_cast<VM::VMType>(TVM) & static_cast<VM::VMType>(TagToType<Group, Element>::VMType)));
-  MDCM_STATIC_ASSERT(((static_cast<bool>(static_cast<VR::VRType>(TVR) & VR::VR_VM1) &&
-                        static_cast<bool>(static_cast<VM::VMType>(TVM) == VM::VM1)) ||
+  MDCM_STATIC_ASSERT(((static_cast<bool>(static_cast<VR::VRType>(TVR) & VR::VR_VM1) && (TVM == VM::VM1)) ||
                       !static_cast<bool>(static_cast<VR::VRType>(TVR) & VR::VR_VM1)));
 
   static Tag
@@ -326,8 +325,7 @@ public:
   // VR/VM must be compatible with the public dictionary
   MDCM_STATIC_ASSERT(static_cast<bool>(static_cast<VR::VRType>(TVR) & static_cast<VR::VRType>(TagToType<Group, Element>::VRType)));
   MDCM_STATIC_ASSERT(static_cast<bool>(VM::VM1 & static_cast<VM::VMType>(TagToType<Group, Element>::VMType)));
-  MDCM_STATIC_ASSERT(((static_cast<bool>(static_cast<VR::VRType>(TVR) & VR::VR_VM1) &&
-                        (static_cast<VM::VMType>(VM::VM1) == VM::VM1)) ||
+  MDCM_STATIC_ASSERT((static_cast<bool>(static_cast<VR::VRType>(TVR) & VR::VR_VM1) ||
                       !static_cast<bool>(static_cast<VR::VRType>(TVR) & VR::VR_VM1)));
   MDCM_STATIC_ASSERT(static_cast<VR::VRType>(TVR) != VR::OB);
   MDCM_STATIC_ASSERT(static_cast<VR::VRType>(TVR) != VR::OW);
