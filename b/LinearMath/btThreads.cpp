@@ -15,6 +15,7 @@ subject to the following restrictions:
 #include "btThreads.h"
 #include "btQuickprof.h"
 #include <algorithm>  // for min and max
+#include <limits.h>
 
 #if BT_USE_OPENMP && BT_THREADSAFE
 
@@ -220,9 +221,9 @@ struct ThreadsafeCounter
 
 	ThreadsafeCounter()
 	{
-		mCounter = 0;
+		//mCounter = 0;
 		//--mCounter;  // first count should come back 0
-		mCounter = static_cast<unsigned int>(-1);
+		mCounter = UINT_MAX;
 	}
 
 	unsigned int getNext()
@@ -230,12 +231,12 @@ struct ThreadsafeCounter
 		// no need to optimize this with atomics, it is only called ONCE per thread!
 		mMutex.lock();
 		//mCounter++;
-		mCounter = static_cast<unsigned int>(mCounter + 1ul);
+		mCounter = static_cast<unsigned int>(mCounter + 1ull);
 		if (mCounter >= BT_MAX_THREAD_COUNT)
 		{
 			btAssert(!"thread counter exceeded");
 			// wrap back to the first worker index
-			mCounter = 1;
+			mCounter = 1u;
 		}
 		unsigned int val = mCounter;
 		mMutex.unlock();
