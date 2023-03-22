@@ -160,6 +160,7 @@ bool sort_frames_ippiop(
 	std::map< unsigned int, unsigned int, std::less<unsigned int> > & out,
 	const FrameGroupValues & values)
 {
+	if (in.empty()) return false;
 	bool ipv_iov = false;
 	std::vector<IPPIOP> tmp0;
 	std::map< unsigned int, unsigned int, std::less<unsigned int> >::const_iterator it =
