@@ -371,14 +371,16 @@ MainWindow::MainWindow(
 	aliza->set_3D_views_actions(
 		slicesAct,
 		zlockAct,
-		oneAct);
+		oneAct,
+		show3DAct);
 	aliza->set_2D_views_actions(
 		frames2DAct,
 		distanceAct,
 		rectAct,
 		transp2dAct,
 		cursorAct,
-		collisionAct);
+		collisionAct,
+		show2DAct);
 	aliza->set_uniq_string(date_str);
 	aliza->connect_slots();
 	//
@@ -1661,14 +1663,12 @@ void MainWindow::stop_3D_anim()
 
 void MainWindow::zoom_plus_2d()
 {
-	if (graphicswidget_m && graphicswidget_m->graphicsview)
-		graphicswidget_m->graphicsview->zoom_in();
+	graphicswidget_m->graphicsview->zoom_in();
 }
 
 void MainWindow::zoom_minus_2d()
 {
-	if (graphicswidget_m && graphicswidget_m->graphicsview)
-		graphicswidget_m->graphicsview->zoom_out();
+	graphicswidget_m->graphicsview->zoom_out();
 }
 
 void MainWindow::zoom_plus_3d()

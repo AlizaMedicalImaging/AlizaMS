@@ -666,6 +666,8 @@ Aliza::Aliza()
 	cursorAct = NULL;
 	collisionAct = NULL;
 	segmentAct = NULL;
+	show3DAct = NULL;
+	show2DAct = NULL;
 	studyview = NULL;
 	rect_selection = false;
 	hide_zoom = false;
@@ -1431,13 +1433,16 @@ void Aliza::center_from_spinbox(double i)
 	if (!run__)
 #endif
 	{
-		if (check_3d() && glwidget->isVisible()) glwidget->updateGL();
-		if (!graphicswidget_m->run__)
-			graphicswidget_m->update_image(0, false, true);
-		if (multiview)
+		if (check_3d() && check_3d_visible()) glwidget->updateGL();
+		if (check_2d_visible())
 		{
-			graphicswidget_y->update_image(0, false, true);
-			graphicswidget_x->update_image(0, false, true);
+			if (!graphicswidget_m->run__)
+				graphicswidget_m->update_image(0, false, true);
+			if (multiview)
+			{
+				graphicswidget_y->update_image(0, false, true);
+				graphicswidget_x->update_image(0, false, true);
+			}
 		}
 	}
 	if (histogram_mode) histogramview->update_window(v);
@@ -1456,13 +1461,16 @@ void Aliza::width_from_spinbox(double i)
 	if (!run__)
 #endif
 	{
-		if (check_3d() && glwidget->isVisible()) glwidget->updateGL();
-		if (!graphicswidget_m->run__)
-			graphicswidget_m->update_image(0, false, true);
-		if (multiview)
+		if (check_3d() && check_3d_visible()) glwidget->updateGL();
+		if (check_2d_visible())
 		{
-			graphicswidget_y->update_image(0, false, true);
-			graphicswidget_x->update_image(0, false, true);
+			if (!graphicswidget_m->run__)
+				graphicswidget_m->update_image(0, false, true);
+			if (multiview)
+			{
+				graphicswidget_y->update_image(0, false, true);
+				graphicswidget_x->update_image(0, false, true);
+			}
 		}
 	}
 	if (histogram_mode) histogramview->update_window(v);
@@ -1493,13 +1501,16 @@ void Aliza::set_lut_function1(int x)
 	if (!run__)
 #endif
 	{
-		if (check_3d() && glwidget->isVisible()) glwidget->updateGL();
-		if (!graphicswidget_m->run__)
-			graphicswidget_m->update_image(0, false, true);
-		if (multiview)
+		if (check_3d() && check_3d_visible()) glwidget->updateGL();
+		if (check_2d_visible())
 		{
-			graphicswidget_y->update_image(0, false, true);
-			graphicswidget_x->update_image(0, false, true);
+			if (!graphicswidget_m->run__)
+				graphicswidget_m->update_image(0, false, true);
+			if (multiview)
+			{
+				graphicswidget_y->update_image(0, false, true);
+				graphicswidget_x->update_image(0, false, true);
+			}
 		}
 	}
 }
@@ -1533,16 +1544,16 @@ void Aliza::set_lut(int i)
 	if (!run__)
 #endif
 	{
-		if (!graphicswidget_m->run__)
-			graphicswidget_m->update_image(0, false, true);
-		if (multiview)
+		if (check_3d() && check_3d_visible()) glwidget->updateGL();
+		if (check_2d_visible())
 		{
-			graphicswidget_y->update_image(0, false, true);
-			graphicswidget_x->update_image(0, false, true);
-		}
-		if (check_3d())
-		{
-			if (glwidget->isVisible()) glwidget->updateGL();
+			if (!graphicswidget_m->run__)
+				graphicswidget_m->update_image(0, false, true);
+			if (multiview)
+			{
+				graphicswidget_y->update_image(0, false, true);
+				graphicswidget_x->update_image(0, false, true);
+			}
 		}
 	}
 }
@@ -1651,11 +1662,13 @@ void Aliza::set_axis_actions(
 void Aliza::set_3D_views_actions(
 	QAction * slicesAct_,
 	QAction * zlockAct_,
-	QAction * oneAct_)
+	QAction * oneAct_,
+	QAction * show3DAct_)
 {
 	slicesAct  = slicesAct_;
 	zlockAct   = zlockAct_;
 	oneAct     = oneAct_;
+	show3DAct  = show3DAct_;
 }
 
 void Aliza::set_2D_views_actions(
@@ -1664,7 +1677,8 @@ void Aliza::set_2D_views_actions(
 	QAction * rectAct_,
 	QAction * segmentAct_,
 	QAction * cursorAct_,
-	QAction * collisionAct_)
+	QAction * collisionAct_,
+	QAction * show2DAct_)
 {
 	frames2DAct  = frames2DAct_;
 	distanceAct  = distanceAct_;
@@ -1672,6 +1686,7 @@ void Aliza::set_2D_views_actions(
 	segmentAct   = segmentAct_;
 	cursorAct    = cursorAct_;
 	collisionAct = collisionAct_;
+	show2DAct    = show2DAct_;
 }
 
 void Aliza::set_anim3Dwidget(AnimWidget * i)
@@ -2066,7 +2081,7 @@ void Aliza::set_selected_slice2D_m(int j)
 					v->di->to_slice   = tmp0;
 					zrangewidget->set_span(j, tmp0);
 				}
-				if (check_3d() && glwidget->isVisible()) glwidget->updateGL();
+				if (check_3d() && check_3d_visible()) glwidget->updateGL();
 				zrangewidget->spanslider->blockSignals(false);
 			}
 			if (multiview)
@@ -2155,6 +2170,24 @@ bool Aliza::check_3d()
 	if (glwidget &&
 		glwidget->opengl_init_done &&
 		!glwidget->no_opengl3) return true;
+	return false;
+}
+
+bool Aliza::check_3d_visible()
+{
+	if (show3DAct && show3DAct->isChecked())
+	{
+		return true;
+	}
+	return false;
+}
+
+bool Aliza::check_2d_visible()
+{
+	if (show2DAct && show2DAct->isChecked())
+	{
+		return true;
+	}
 	return false;
 }
 
@@ -2450,7 +2483,7 @@ void Aliza::calculate_bb()
 			graphicswidget_y->update_selection_item();
 			graphicswidget_x->update_selection_item();
 		}
-		if (check_3d() && glwidget->isVisible()) glwidget->updateGL();
+		if (check_3d() && check_3d_visible()) glwidget->updateGL();
 	}
 }
 
@@ -2616,8 +2649,11 @@ void Aliza::set_show_frames_3d(bool t)
 #if 0
 			!run__ &&
 #endif
-			glwidget->isVisible() &&
-			glwidget->view == 0) glwidget->updateGL();
+			check_3d_visible() &&
+			glwidget->view == 0)
+		{
+			glwidget->updateGL();
+		}
 	}
 }
 
@@ -2830,9 +2866,9 @@ void Aliza::clear_views()
 #if 0
 		!run__ &&
 #endif
-		check_3d())
+		check_3d() && check_3d_visible())
 	{
-		if (glwidget->isVisible()) glwidget->updateGL();
+		glwidget->updateGL();
 	}
 	histogramview->clear__();
 }
@@ -2982,7 +3018,7 @@ void Aliza::stop_anim()
 	toolbox2D->width_horizontalSlider->setEnabled(true);
 	toolbox2D->width_doubleSpinBox->setEnabled(true);
 	toolbox2D->width_label->setEnabled(true);
-	if (check_3d() && glwidget->isVisible()) glwidget->updateGL();
+	if (check_3d() && check_3d_visible()) glwidget->updateGL();
 	connect(
 		slider_m->slices_slider, SIGNAL(valueChanged(int)),
 		this, SLOT(set_selected_slice2D_m(int)));
@@ -2992,12 +3028,12 @@ void Aliza::stop_anim()
 
 void Aliza::zoom_plus_3d()
 {
-	if (check_3d() && glwidget->isVisible()) glwidget->zoom_in();
+	if (check_3d()) glwidget->zoom_in(true);
 }
 
 void Aliza::zoom_minus_3d()
 {
-	if (check_3d() && glwidget->isVisible()) glwidget->zoom_out();
+	if (check_3d()) glwidget->zoom_out(true);
 }
 
 void Aliza::update_slice_from_animation(const ImageVariant * v)
@@ -3023,7 +3059,7 @@ void Aliza::update_slice_from_animation(const ImageVariant * v)
 			zrangewidget->spanslider->blockSignals(true);
 			zrangewidget->set_span(v->di->from_slice, v->di->to_slice);
 			zrangewidget->spanslider->blockSignals(false);
-			if (check_3d() && glwidget->isVisible()) glwidget->updateGL();
+			if (check_3d() && check_3d_visible()) glwidget->updateGL();
 			if (multiview)
 			{
 				graphicswidget_y->update_selection_item();
@@ -3093,7 +3129,7 @@ void Aliza::width_from_histogram_min(double x)
 	if (!run__)
 #endif
 	{
-		if (check_3d() && glwidget->isVisible()) glwidget->updateGL();
+		if (check_3d() && check_3d_visible()) glwidget->updateGL();
 		if (!graphicswidget_m->run__) graphicswidget_m->update_image(0, false, true);
 		if (multiview)
 		{
@@ -3140,7 +3176,7 @@ void Aliza::width_from_histogram_max(double x)
 	if (!run__)
 #endif
 	{
-		if (check_3d() && glwidget->isVisible()) glwidget->updateGL();
+		if (check_3d() && check_3d_visible()) glwidget->updateGL();
 		if (!graphicswidget_m->run__) graphicswidget_m->update_image(0, false, true);
 		if (multiview)
 		{
@@ -3172,7 +3208,7 @@ void Aliza::center_from_histogram(double x)
 	if (!run__)
 #endif
 	{
-		if (check_3d() && glwidget->isVisible()) glwidget->updateGL();
+		if (check_3d() && check_3d_visible()) glwidget->updateGL();
 		if (!graphicswidget_m->run__) graphicswidget_m->update_image(0, false, true);
 		if (multiview)
 		{
@@ -3527,8 +3563,8 @@ void Aliza::animate_()
 	anim_idx = (tmp0 >= animation_images.size() || tmp0 < 0) ? 0 : tmp0;
 	selected_images.clear();
 	selected_images.push_back(animation_images.at(anim_idx));
-	if (check_3d() && glwidget->isVisible()) glwidget->updateGL();
-	if (graphicswidget_m->isVisible())
+	if (check_3d() && check_3d_visible()) glwidget->updateGL();
+	if (check_2d_visible())
 	{
 		graphicswidget_m->set_slice_2D(animation_images[anim_idx], 0, false);
 		if (multiview)
@@ -3539,15 +3575,11 @@ void Aliza::animate_()
 	}
 	const qint64 t1 = QDateTime::currentMSecsSinceEpoch();
 	const int dt = static_cast<int>(t1 - t0);
-	const bool acq_time =
-		anim3Dwidget->t_checkBox->isChecked() &&
+	const bool acq_time = anim3Dwidget->t_checkBox->isChecked() &&
 		(anim3d_times.size() == animation_images.size());
-	const int t =
-		(acq_time)
-		?
-		static_cast<int>(round(anim3d_times.at(anim_idx))) - dt
-		:
-		frametime_3D - dt;
+	const int t = (acq_time)
+		? static_cast<int>(round(anim3d_times.at(anim_idx))) - dt
+		: frametime_3D - dt;
 	if (t <= 0)
 	{
 		// can not run at required speed

@@ -124,8 +124,8 @@ public:
 	void updateGL() { update(); }
 	void init_();
 	void close_();
-	void zoom_in();
-	void zoom_out();
+	void zoom_in(bool);
+	void zoom_out(bool);
 	void update_clear_color();
 	void set_wireframe(bool);
 	void get_screen(bool);

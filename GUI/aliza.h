@@ -81,8 +81,10 @@ public:
 	void set_3D_views_actions(
 		QAction*,
 		QAction*,
+		QAction*,
 		QAction*);
 	void set_2D_views_actions(
+		QAction*,
 		QAction*,
 		QAction*,
 		QAction*,
@@ -98,6 +100,8 @@ public:
 	void set_axis_zyx(bool /*rectangle selection mode*/);
 	void toggle_rect(bool);
 	bool check_3d();
+	bool check_3d_visible();
+	bool check_2d_visible();
 	void set_view2d_mouse_modus(short);
 	void set_show_frames_3d(bool);
 	void load_dicom_series(QProgressDialog*);
@@ -206,6 +210,8 @@ private:
 	QAction * cursorAct;
 	QAction * collisionAct;
 	QAction * segmentAct;
+	QAction * show3DAct;
+	QAction * show2DAct;
 	QIcon trans_icon;
 	QIcon notrans_icon;
 	QIcon cut_icon;

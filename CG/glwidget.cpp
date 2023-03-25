@@ -465,12 +465,12 @@ void GLWidget::keyPressEvent(QKeyEvent * e)
 	case Qt::Key_Equal:
 	case Qt::Key_Plus:
 		{
-			zoom_in();
+			zoom_in(true);
 		}
 		break;
 	case Qt::Key_Minus:
 		{
-			zoom_out();
+			zoom_out(true);
 		}
 		break;
 	case Qt::Key_Right:
@@ -546,7 +546,7 @@ void GLWidget::set_display_contours(bool t)
 	if (view == 0) updateGL();
 }
 
-void GLWidget::zoom_in()
+void GLWidget::zoom_in(bool b)
 {
 	float incr = 4.0f;
 	if (Qt::ControlModifier == QApplication::keyboardModifiers())
@@ -561,10 +561,10 @@ void GLWidget::zoom_in()
 	position_z -= incr;
 	if (ortho_size < 0.001f) ortho_size = 0.001f;
 	if (position_z < 0.001f) position_z = 0.001f;
-	updateGL();
+	if (b) updateGL();
 }
 
-void GLWidget::zoom_out()
+void GLWidget::zoom_out(bool b)
 {
 	float incr = 4.0f;
 	if (Qt::ControlModifier == QApplication::keyboardModifiers())
@@ -579,7 +579,7 @@ void GLWidget::zoom_out()
 	position_z += incr;
 	if (ortho_size < 0.001f) ortho_size = 0.001f;
 	if (position_z < 0.001f) position_z = 0.001f;
-	updateGL();
+	if (b) updateGL();
 }
 
 void GLWidget::update_clear_color()
