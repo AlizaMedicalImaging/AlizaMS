@@ -122,6 +122,7 @@ void SettingsWidget::set_default()
 	styleComboBox->setCurrentIndex(0);
 	gl3D_checkBox->setChecked(true);
 	si_doubleSpinBox->setValue(1.2);
+	hidezoom_checkBox->setChecked(true);
 	original_radioButton->setChecked(true);
 	resample_radioButton->setChecked(false);
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -237,12 +238,14 @@ void SettingsWidget::readSettings()
 	const int tmp10 = settings.value(QString("enh_strategy"),    1).toInt();
 	const int tmp11 = settings.value(QString("apply_icc"),       1).toInt();
 	const int tmp12 = settings.value(QString("clean_unused"),    1).toInt();
+	const int tmp13 = settings.value(QString("hide_zoom"),       1).toInt();
 	settings.endGroup();
 	settings.beginGroup(QString("StyleDialog"));
 	saved_idx = settings.value(QString("saved_idx"), 0).toInt();
 	settings.endGroup();
-	gl3D_checkBox->setChecked((tmp0==1));
+	gl3D_checkBox->setChecked((tmp0 == 1));
 	si_doubleSpinBox->setValue(tmp1);
+	hidezoom_checkBox->setChecked((tmp13 == 1));
 	QFont f = QApplication::font();
 	if (tmp2 < 6.0) tmp2 = 6.0; 
 	else            tmp2 = f.pointSizeF();
@@ -305,6 +308,7 @@ void SettingsWidget::writeSettings(QSettings & s)
 	s.setValue(QString("enable_gl_3D"),  QVariant(gl3D_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("scale_ui_icons"),QVariant(si_doubleSpinBox->value()));
 	s.setValue(QString("app_font_pt"),   QVariant(pt_doubleSpinBox->value()));
+	s.setValue(QString("hide_zoom"),     QVariant(hidezoom_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("stylename"),     QVariant(styleComboBox->currentText().trimmed()));
 	s.setValue(QString("sr_info2"),      QVariant(srinfo_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("sr_i_scale"),    QVariant(srscale_checkBox->isChecked() ? 1: 0));

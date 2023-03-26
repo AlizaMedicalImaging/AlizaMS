@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- The icon can be used freely in both personal and commercial projects with no attribution required, but always appreciated. 
+You may NOT sub-license, resell, rent, redistribute or otherwise transfer the icon without express written permission from iconmonstr.com -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   x="0px"
+   y="0px"
+   width="512px"
+   height="512px"
+   viewBox="0 0 512 512"
+   enable-background="new 0 0 512 512"
+   xml:space="preserve"
+   id="svg2"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   sodipodi:docname="zoomin.svg"><metadata
+     id="metadata9"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+     id="defs7" /><sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="992"
+     id="namedview5"
+     showgrid="true"
+     inkscape:zoom="1.5488281"
+     inkscape:cx="256"
+     inkscape:cy="181.87174"
+     inkscape:window-x="0"
+     inkscape:window-y="29"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg2"><inkscape:grid
+       type="xygrid"
+       id="grid3819" /></sodipodi:namedview><path
+     style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.90249997"
+     d="m 128.83414,236.11066 h 254.33174 v 41.30885 H 128.83414 Z"
+     id="minus-2-icon" /><path
+     transform="rotate(90)"
+     style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.90249997"
+     d="m 130.83414,-276.98856 h 254.33174 v 41.30886 H 130.83414 Z"
+     id="minus-2-icon-5" /><path
+     style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:12.86062527;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="M 456.48312,257 A 201.48312,201.48312 0 0 1 255,458.48312 201.48312,201.48312 0 0 1 53.516876,257 201.48312,201.48312 0 0 1 255,55.516876 201.48312,201.48312 0 0 1 456.48312,257 Z"
+     id="path835" /></svg>

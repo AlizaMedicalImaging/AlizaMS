@@ -9,13 +9,13 @@ ZoomWidget::ZoomWidget(float si)
 	l->setContentsMargins(0, 0, 0, 0);
 	l->setSpacing(0);
 	plus_pushButton =
-		new QPushButton(QIcon(QString(":/bitmaps/add.svg")),
+		new QPushButton(QIcon(QString(":/bitmaps/zoomin.svg")),
 		QString(""),
 		this);
 	plus_pushButton->setIconSize(s);
 	plus_pushButton->setAutoRepeat(true);
 	minus_pushButton =
-		new QPushButton(QIcon(QString(":/bitmaps/remove.svg")),
+		new QPushButton(QIcon(QString(":/bitmaps/zoomout.svg")),
 		QString(""),
 		this);
 	minus_pushButton->setIconSize(s);

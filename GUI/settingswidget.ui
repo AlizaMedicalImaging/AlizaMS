@@ -737,6 +737,25 @@
             </layout>
            </item>
            <item>
+            <widget class="QCheckBox" name="hidezoom_checkBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="mouseTracking">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Hide zoom buttons (restart is required)</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
             <spacer name="verticalSpacer">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -773,8 +792,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>989</width>
-            <height>587</height>
+            <width>419</width>
+            <height>203</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1093,6 +1112,7 @@
   <tabstop>scrollArea</tabstop>
   <tabstop>pt_doubleSpinBox</tabstop>
   <tabstop>si_doubleSpinBox</tabstop>
+  <tabstop>hidezoom_checkBox</tabstop>
   <tabstop>scrollArea_2</tabstop>
   <tabstop>gl3D_checkBox</tabstop>
   <tabstop>textureoptions_groupBox</tabstop>

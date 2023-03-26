@@ -74,6 +74,8 @@
 		<file>bitmaps/circle1.svg</file>
 		<file>bitmaps/user.svg</file>
 		<file>bitmaps/f2.svg</file>
+		<file>bitmaps/zoomin.svg</file>
+		<file>bitmaps/zoomout.svg</file>
 	</qresource>
 </RCC>
 
