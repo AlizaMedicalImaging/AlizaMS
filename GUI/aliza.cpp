@@ -1702,8 +1702,7 @@ void Aliza::set_anim2Dwidget(AnimWidget * i)
 QString Aliza::get_opengl_info()
 {
 	QString opengl_info;
-	if (glwidget)
-		opengl_info.append(glwidget->get_system_info());
+	if (glwidget) opengl_info.append(glwidget->get_system_info());
 	return opengl_info;
 }
 
@@ -1714,10 +1713,7 @@ void Aliza::update_toolbox(const ImageVariant * v)
 		toolbox2D->setEnabled(false);
 		return;
 	}
-	else
-	{
-		toolbox2D->setEnabled(true);
-	}
+	toolbox2D->setEnabled(true);
 	disconnect_tools();
 	trans3DAct->blockSignals(true);
 	zlockAct->blockSignals(true);
@@ -2098,71 +2094,61 @@ void Aliza::set_selected_slice2D_m(int j)
 void Aliza::set_selected_slice2D_y(int j)
 {
 	ImageVariant * v = get_selected_image();
-	if (v)
+	if (!v) return;
+	v->di->selected_y_slice = j;
+	if (v->group_id >= 0)
 	{
-		v->di->selected_y_slice = j;
-		if (v->group_id >= 0)
-		{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-			QMap<int, ImageVariant*>::const_iterator iv =
-				scene3dimages.cbegin();
-			while (iv != scene3dimages.cend())
+		QMap<int, ImageVariant*>::const_iterator iv =
+			scene3dimages.cbegin();
+		while (iv != scene3dimages.cend())
 #else
-			QMap<int, ImageVariant*>::const_iterator iv =
-				scene3dimages.constBegin();
-			while (iv != scene3dimages.constEnd())
+		QMap<int, ImageVariant*>::const_iterator iv =
+			scene3dimages.constBegin();
+		while (iv != scene3dimages.constEnd())
 #endif
-			{
-				ImageVariant * v2 = iv.value();
-				if (v2 && (v->group_id == v2->group_id))
-				{
-					v2->di->selected_y_slice = j;
-				}
-				++iv;
-			}
-		}
-		//
 		{
-			graphicswidget_y->set_slice_2D(v, 0, false);
-			graphicswidget_m->update_frames();
-			graphicswidget_x->update_frames();
+			ImageVariant * v2 = iv.value();
+			if (v2 && (v->group_id == v2->group_id))
+			{
+				v2->di->selected_y_slice = j;
+			}
+			++iv;
 		}
 	}
+	graphicswidget_y->set_slice_2D(v, 0, false);
+	graphicswidget_m->update_frames();
+	graphicswidget_x->update_frames();
 }
 
 void Aliza::set_selected_slice2D_x(int j)
 {
 	ImageVariant * v = get_selected_image();
-	if (v)
+	if (!v) return;
+	v->di->selected_x_slice = j;
+	if (v->group_id >= 0)
 	{
-		v->di->selected_x_slice = j;
-		if (v->group_id >= 0)
-		{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-			QMap<int, ImageVariant*>::const_iterator iv =
-				scene3dimages.cbegin();
-			while (iv != scene3dimages.cend())
+		QMap<int, ImageVariant*>::const_iterator iv =
+			scene3dimages.cbegin();
+		while (iv != scene3dimages.cend())
 #else
-			QMap<int, ImageVariant*>::const_iterator iv =
-				scene3dimages.constBegin();
-			while (iv != scene3dimages.constEnd())
+		QMap<int, ImageVariant*>::const_iterator iv =
+			scene3dimages.constBegin();
+		while (iv != scene3dimages.constEnd())
 #endif
-			{
-				ImageVariant * v2 = iv.value();
-				if (v2 && (v->group_id == v2->group_id))
-				{
-					v2->di->selected_x_slice = j;
-				}
-				++iv;
-			}
-		}
-		//
 		{
-			graphicswidget_x->set_slice_2D(v, 0, false);
-			graphicswidget_m->update_frames();
-			graphicswidget_y->update_frames();
+			ImageVariant * v2 = iv.value();
+			if (v2 && (v->group_id == v2->group_id))
+			{
+				v2->di->selected_x_slice = j;
+			}
+			++iv;
 		}
 	}
+	graphicswidget_x->set_slice_2D(v, 0, false);
+	graphicswidget_m->update_frames();
+	graphicswidget_y->update_frames();
 }
 
 bool Aliza::check_3d()
@@ -2197,43 +2183,41 @@ void Aliza::set_axis_2D(int a, bool rect_mode)
 	histogram_mode = false;
 	graphicswidget_m->set_multiview(multiview);
 	ImageVariant * v = get_selected_image();
-	if (v)
+	if (!v) return;
+	graphicswidget_m->set_axis(a);
+	if (rect_mode)
 	{
-		graphicswidget_m->set_axis(a);
-		if (rect_mode)
+		if (graphicswidget_m->get_axis() == 2)
 		{
-			if (graphicswidget_m->get_axis() == 2)
-			{
-				graphicswidget_m->graphicsview->handle_rect->show();
-				graphicswidget_m->graphicsview->selection_item->hide();
-			}
-			else
-			{
-				graphicswidget_m->graphicsview->handle_rect->hide();
-				graphicswidget_m->graphicsview->selection_item->show();
-			}
-			graphicswidget_x->graphicsview->selection_item->show();
-			graphicswidget_y->graphicsview->selection_item->show();
+			graphicswidget_m->graphicsview->handle_rect->show();
+			graphicswidget_m->graphicsview->selection_item->hide();
 		}
 		else
 		{
 			graphicswidget_m->graphicsview->handle_rect->hide();
-			graphicswidget_m->graphicsview->selection_item->hide();
-			graphicswidget_x->graphicsview->selection_item->hide();
-			graphicswidget_y->graphicsview->selection_item->hide();
+			graphicswidget_m->graphicsview->selection_item->show();
 		}
-		update_toolbox(v);
-		if (a==2)
-		{
-			graphicswidget_m->set_slice_2D(v, 1, true);
-			check_slice_collisions(const_cast<const ImageVariant *>(v), graphicswidget_m);
-		}
-		else
-		{
-			graphicswidget_m->set_slice_2D(v, 1, false);
-		}
-		histogramview->clear__();
+		graphicswidget_x->graphicsview->selection_item->show();
+		graphicswidget_y->graphicsview->selection_item->show();
 	}
+	else
+	{
+		graphicswidget_m->graphicsview->handle_rect->hide();
+		graphicswidget_m->graphicsview->selection_item->hide();
+		graphicswidget_x->graphicsview->selection_item->hide();
+		graphicswidget_y->graphicsview->selection_item->hide();
+	}
+	update_toolbox(v);
+	if (a==2)
+	{
+		graphicswidget_m->set_slice_2D(v, 1, true);
+		check_slice_collisions(const_cast<const ImageVariant *>(v), graphicswidget_m);
+	}
+	else
+	{
+		graphicswidget_m->set_slice_2D(v, 1, false);
+	}
+	histogramview->clear__();
 }
 
 void Aliza::set_histogram()
@@ -2251,30 +2235,28 @@ void Aliza::set_axis_zyx(bool rect_mode)
 	histogram_mode = true;
 	graphicswidget_m->set_multiview(multiview);
 	ImageVariant * v = get_selected_image();
-	if (v)
+	if (!v) return;
+	graphicswidget_m->set_axis(2);
+	if (rect_mode)
 	{
-		graphicswidget_m->set_axis(2);
-		if (rect_mode)
-		{
-			graphicswidget_m->graphicsview->handle_rect->show();
-			graphicswidget_x->graphicsview->selection_item->show();
-			graphicswidget_y->graphicsview->selection_item->show();
-			graphicswidget_m->graphicsview->selection_item->hide();
-		}
-		else
-		{
-			graphicswidget_m->graphicsview->handle_rect->hide();
-			graphicswidget_m->graphicsview->selection_item->hide();
-			graphicswidget_x->graphicsview->selection_item->hide();
-			graphicswidget_y->graphicsview->selection_item->hide();
-		}
-		update_toolbox(v);
-		graphicswidget_m->set_slice_2D(v, 1, true);
-		check_slice_collisions(const_cast<const ImageVariant *>(v), graphicswidget_m);
-		graphicswidget_y->set_slice_2D(v, 1, false);
-		graphicswidget_x->set_slice_2D(v, 1, false);
-		histogramview->update__(v);
+		graphicswidget_m->graphicsview->handle_rect->show();
+		graphicswidget_x->graphicsview->selection_item->show();
+		graphicswidget_y->graphicsview->selection_item->show();
+		graphicswidget_m->graphicsview->selection_item->hide();
 	}
+	else
+	{
+		graphicswidget_m->graphicsview->handle_rect->hide();
+		graphicswidget_m->graphicsview->selection_item->hide();
+		graphicswidget_x->graphicsview->selection_item->hide();
+		graphicswidget_y->graphicsview->selection_item->hide();
+	}
+	update_toolbox(v);
+	graphicswidget_m->set_slice_2D(v, 1, true);
+	check_slice_collisions(const_cast<const ImageVariant *>(v), graphicswidget_m);
+	graphicswidget_y->set_slice_2D(v, 1, false);
+	graphicswidget_x->set_slice_2D(v, 1, false);
+	histogramview->update__(v);
 }
 
 void Aliza::toggle_rect(bool t)
@@ -2493,21 +2475,13 @@ void Aliza::update_center(ImageVariant * v)
 	if (v->image_type >= 10) return;
 	itk::Point<float, 3> p;
 	int center_idx[3];
-	int tmp0 =
-		rect_selection
-		?
-		v->di->irect_index[0] + v->di->irect_size[0] / 2
-		:
-		v->di->idimx / 2;
-	int tmp1 =
-		rect_selection
-		?
-		v->di->irect_index[1] + v->di->irect_size[1] / 2
-		:
-		v->di->idimy / 2;
-	int tmp2 =
-		v->di->from_slice +
-		(v->di->to_slice-v->di->from_slice) / 2;
+	int tmp0 = rect_selection
+		? v->di->irect_index[0] + v->di->irect_size[0] / 2
+		: v->di->idimx / 2;
+	int tmp1 = rect_selection
+		? v->di->irect_index[1] + v->di->irect_size[1] / 2
+		: v->di->idimy / 2;
+	int tmp2 = v->di->from_slice + (v->di->to_slice-v->di->from_slice) / 2;
 	if (tmp0 < 0) tmp0 = 0;
 	if (tmp0 > (v->di->idimx-1)) tmp0 = v->di->idimx - 1;
 	if (tmp1 < 0) tmp1 = 0;
@@ -2649,8 +2623,7 @@ void Aliza::set_show_frames_3d(bool t)
 #if 0
 			!run__ &&
 #endif
-			check_3d_visible() &&
-			glwidget->view == 0)
+			check_3d_visible() && glwidget->view == 0)
 		{
 			glwidget->updateGL();
 		}
@@ -2937,7 +2910,11 @@ void Aliza::start_anim()
 	bool lock = mutex2.tryLock();
 	if (!lock) return;
 	lock = mutex0.tryLock();
-	if (!lock) { mutex2.unlock(); return; }
+	if (!lock)
+	{
+		mutex2.unlock();
+		return;
+	}
 	graphicswidget_m->run__ = true;
 	slider_m->slices_slider->setEnabled(false);
 	toolbox2D->resetlevel_pushButton->setEnabled(false);
@@ -3191,7 +3168,8 @@ void Aliza::width_from_histogram_max(double x)
 
 void Aliza::center_from_histogram(double x)
 {
-	ImageVariant * v = get_selected_image(); if (!v) return;
+	ImageVariant * v = get_selected_image();
+	if (!v) return;
 	toolbox2D->disconnect_sliders();
 	disconnect(toolbox2D->center_doubleSpinBox,SIGNAL(valueChanged(double)),this,SLOT(center_from_spinbox(double)));
 	const double div_ = v->di->rmax - v->di->rmin;
@@ -3631,74 +3609,70 @@ int Aliza::get_num_images() const
 
 void Aliza::update_group_width(const ImageVariant * v)
 {
-	if (v)
-	{
+	if (!v) return;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-		QMap<int, ImageVariant*>::const_iterator iv =
-			scene3dimages.cbegin();
-		while (iv != scene3dimages.cend())
+	QMap<int, ImageVariant*>::const_iterator iv =
+		scene3dimages.cbegin();
+	while (iv != scene3dimages.cend())
 #else
-		QMap<int, ImageVariant*>::const_iterator iv =
-			scene3dimages.constBegin();
-		while (iv != scene3dimages.constEnd())
+	QMap<int, ImageVariant*>::const_iterator iv =
+		scene3dimages.constBegin();
+	while (iv != scene3dimages.constEnd())
 #endif
+	{
+		ImageVariant * v2 = iv.value();
+		if (v2 && (v->group_id == v2->group_id))
 		{
-			ImageVariant * v2 = iv.value();
-			if (v2 && (v->group_id == v2->group_id))
-			{
-				double tmp3 = v->di->us_window_center;
-				if (tmp3 > v2->di->rmax) tmp3 = tmp3>v2->di->rmax;
-				if (tmp3 < v2->di->rmin) tmp3 = tmp3>v2->di->rmin;
-				double tmp4 =
-					(tmp3 + (-v2->di->rmin)) / (v2->di->rmax - v2->di->rmin);
-				if (tmp4 < 0.0) tmp4 = 0.0;
-				if (tmp4 > 1.0) tmp4 = 1.0;
-				v2->di->us_window_center = tmp3;
-				v2->di->window_center = tmp4;
-				double tmp5 = v->di->us_window_width;
-				double div2_ = v2->di->rmax - v2->di->rmin;
-				if (div2_ <= 0) div2_ = 1e-9;
-				double tmp6 = tmp5/div2_;
-				if (tmp6 <= 0) tmp6 = 1e-9;
-				else if (tmp6 > 1.0) tmp6 = 1.0;
-				v2->di->us_window_width = tmp5;
-				v2->di->window_width = tmp6;
-			}
-			++iv;
+			double tmp3 = v->di->us_window_center;
+			if (tmp3 > v2->di->rmax) tmp3 = tmp3>v2->di->rmax;
+			if (tmp3 < v2->di->rmin) tmp3 = tmp3>v2->di->rmin;
+			double tmp4 =
+				(tmp3 + (-v2->di->rmin)) / (v2->di->rmax - v2->di->rmin);
+			if (tmp4 < 0.0) tmp4 = 0.0;
+			if (tmp4 > 1.0) tmp4 = 1.0;
+			v2->di->us_window_center = tmp3;
+			v2->di->window_center = tmp4;
+			double tmp5 = v->di->us_window_width;
+			double div2_ = v2->di->rmax - v2->di->rmin;
+			if (div2_ <= 0) div2_ = 1e-9;
+			double tmp6 = tmp5/div2_;
+			if (tmp6 <= 0) tmp6 = 1e-9;
+			else if (tmp6 > 1.0) tmp6 = 1.0;
+			v2->di->us_window_width = tmp5;
+			v2->di->window_width = tmp6;
 		}
+		++iv;
 	}
 }
 
 void Aliza::update_group_center(const ImageVariant * v)
 {
-	if (v)
-	{
+	if (!v) return;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-		QMap<int, ImageVariant*>::const_iterator iv =
-			scene3dimages.cbegin();
-		while (iv != scene3dimages.cend())
+	QMap<int, ImageVariant*>::const_iterator iv =
+		scene3dimages.cbegin();
+	while (iv != scene3dimages.cend())
 #else
-		QMap<int, ImageVariant*>::const_iterator iv =
-			scene3dimages.constBegin();
-		while (iv != scene3dimages.constEnd())
+	QMap<int, ImageVariant*>::const_iterator iv =
+		scene3dimages.constBegin();
+	while (iv != scene3dimages.constEnd())
 #endif
+	{
+		ImageVariant * v2 = iv.value();
+		if (v2 && (v->group_id == v2->group_id))
 		{
-			ImageVariant * v2 = iv.value();
-			if (v2 && (v->group_id == v2->group_id))
-			{
-				double tmp0 = v->di->us_window_center;
-				if (tmp0 > v2->di->rmax) tmp0 = tmp0>v2->di->rmax;
-				if (tmp0 < v2->di->rmin) tmp0 = tmp0>v2->di->rmin;
-				double div2_ = v2->di->rmax - v2->di->rmin;
-				if (div2_ <= 0) div2_ = 1e-9;
-				double tmp1 = (tmp0 + (-v2->di->rmin)) / div2_;
-				if (tmp1 < 0.0) tmp1 = 0.0;
-				if (tmp1 > 1.0) tmp1 = 1.0;
-				v2->di->us_window_center = tmp0;
-				v2->di->window_center = tmp1;
-			}
-			++iv;
+			double tmp0 = v->di->us_window_center;
+			if (tmp0 > v2->di->rmax) tmp0 = tmp0>v2->di->rmax;
+			if (tmp0 < v2->di->rmin) tmp0 = tmp0>v2->di->rmin;
+			double div2_ = v2->di->rmax - v2->di->rmin;
+			if (div2_ <= 0) div2_ = 1e-9;
+			double tmp1 = (tmp0 + (-v2->di->rmin)) / div2_;
+			if (tmp1 < 0.0) tmp1 = 0.0;
+			if (tmp1 > 1.0) tmp1 = 1.0;
+			v2->di->us_window_center = tmp0;
+			v2->di->window_center = tmp1;
 		}
+		++iv;
 	}
 }
 
@@ -4505,13 +4479,13 @@ void Aliza::trigger_show_roi_info()
 {
 	const bool lock = mutex0.tryLock();
 	if (!lock) return;
-	int tmp0 = -1;
 	const ImageVariant * v = get_selected_image_const();
 	if (!v)
 	{
 		mutex0.unlock();
 		return;
 	}
+	int tmp0 = -1;
 	const int roi_id = imagesbox->get_selected_roi_id();
 	if (roi_id < 0)
 	{
