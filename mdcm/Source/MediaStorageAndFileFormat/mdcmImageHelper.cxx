@@ -1938,7 +1938,7 @@ ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
       if (ms == MediaStorage::LegacyConvertedEnhancedMRImageStorage ||
           ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage ||
           ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage ||
-		  ms == MediaStorage::SegmentationStorage)
+          ms == MediaStorage::SegmentationStorage)
       {
         SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
         if (!(sqi && sqi->GetNumberOfItems() > 0))
@@ -1975,7 +1975,7 @@ ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
             ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage ||
             ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
         {
-		  {
+          {
             Attribute<0x0020, 0x9056> atStackID;
             atStackID.SetValue("1 ");
             subds3.Replace(atStackID.GetAsDataElement());
@@ -1986,7 +1986,7 @@ ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
             atDimensionIndexValues.SetValue(1, 0);
             atDimensionIndexValues.SetValue(i + 1, 1);
             subds3.Replace(atDimensionIndexValues.GetAsDataElement());
-		  }
+          }
           {
             if (!subds.FindDataElement(tConversionSourceAttributesSequence))
             {
@@ -2080,12 +2080,12 @@ ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
         else if (ms == MediaStorage::SegmentationStorage)
         {
           // TODO currently only one referenced segm. "1", single binary segment
-		  {
+          {
             Attribute<0x0020, 0x9157, VR::UL, VM::VM2> atDimensionIndexValues = { { 0, 0 } };
             atDimensionIndexValues.SetValue(1, 0);
             atDimensionIndexValues.SetValue(i + 1, 1);
             subds3.Replace(atDimensionIndexValues.GetAsDataElement());
-		  }
+          }
           if (!subds.FindDataElement(tSegmentIdentificationSequence))
           {
             SmartPointer<SequenceOfItems> sqSegmentIdentificationSequence = new SequenceOfItems;
