@@ -71,7 +71,8 @@ public:
 		vol_pos_ok(false),
 		temp_pos_off_ok(false),
 		us_temp_pos_unknown_ok(false),
-		rescale_ok(false)
+		rescale_ok(false),
+		ref_segment_num(-1)
 	{
 		vol_pos[0] = 0.0;
 		vol_pos[1] = 0.0;
@@ -115,6 +116,7 @@ public:
 	bool temp_pos_off_ok;
 	bool us_temp_pos_unknown_ok;
 	bool rescale_ok;
+	int ref_segment_num;
 	double vol_pos[3];
 	double vol_orient[6];
 };

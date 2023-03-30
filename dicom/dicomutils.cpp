@@ -27,6 +27,7 @@
 #include "ultrasoundregionutils.h"
 #include "spectroscopydata.h"
 #include "spectroscopyutils.h"
+#include "colorspace/colorspace.h"
 #include <itkImageSliceIteratorWithIndex.h>
 #include <itkImageRegionIterator.h>
 #include <itkImageRegionConstIterator.h>
@@ -61,6 +62,7 @@
 #include <mdcmUIDs.h>
 #include "splituihgridfilter.h"
 #include <QSet>
+#include <QList>
 #include <QTextCodec>
 #include <QApplication>
 #include <QMessageBox>
@@ -79,6 +81,7 @@
 #include "srwidget.h"
 #include <iostream>
 #include <vector>
+#include <map>
 #include <list>
 #include <string>
 #include <set>
@@ -4163,6 +4166,8 @@ bool DicomUtils::read_group_sq(
 	const mdcm::Tag tRescaleType(0x0028,0x1054);
 	const mdcm::Tag tFrameAcquisitionDateTime(0x0018,0x9074);
 	const mdcm::Tag tFrameReferenceDateTime(0x0018,0x9151);
+	const mdcm::Tag tSegmentIdentificationSequence(0x0062,0x000a);
+	const mdcm::Tag tReferencedSegmentNumber(0x0062,0x000b);
 	if (!ds.FindDataElement(t)) return false;
 	QString charset("");
 	if(ds.FindDataElement(tSpecificCharacterSet))
@@ -4663,6 +4668,38 @@ bool DicomUtils::read_group_sq(
 				}
 			}
 		}
+		if (nestedds.FindDataElement(tSegmentIdentificationSequence))
+		{
+			const mdcm::DataElement & deSegmentIdentificationSequence
+				= nestedds.GetDataElement(tSegmentIdentificationSequence);
+			mdcm::SmartPointer<mdcm::SequenceOfItems> sqSegmentIdentificationSequence
+				= deSegmentIdentificationSequence.GetValueAsSQ();
+			if (sqSegmentIdentificationSequence &&
+				sqSegmentIdentificationSequence->GetNumberOfItems()==1)
+			{
+				const mdcm::Item & item1 = sqSegmentIdentificationSequence->GetItem(1);
+				const mdcm::DataSet & nestedds1 = item1.GetNestedDataSet();
+				if (nestedds1.FindDataElement(tReferencedSegmentNumber))
+				{
+					const mdcm::DataElement & de =
+						nestedds1.GetDataElement(tReferencedSegmentNumber);
+					if (!de.IsEmpty() &&
+						!de.IsUndefinedLength() &&
+						de.GetByteValue())
+					{
+						unsigned short ReferencedSegmentNumber;
+						if (get_us_value(
+								nestedds1,
+								tReferencedSegmentNumber,
+								&ReferencedSegmentNumber))
+						{
+							fg.ref_segment_num = ReferencedSegmentNumber;
+						}
+					}
+				}
+			}
+		}
+		//
 		values.push_back(fg);
 	}
 	return true;
@@ -10581,6 +10618,7 @@ QString DicomUtils::read_enhanced_common(
 		QStringList acquisition_datetimes;
 		QStringList reference_datetimes;
 		ImageOverlays overlays;
+		QList<int> ref_segment_nums;
 		unsigned int j = 0;
 #ifdef ENHANCED_PRINT_INFO
 		if (!min_load) std::cout << " Indices: ";
@@ -10722,6 +10760,10 @@ QString DicomUtils::read_enhanced_common(
 					overlays.all_overlays[it->first] =
 						image_overlays.all_overlays.value(idx__);
 				}
+				if (values.at(idx__).ref_segment_num != -1)
+				{
+					ref_segment_nums.push_back(values.at(idx__).ref_segment_num);
+				}
 				++j;
 			}
 			else
@@ -10765,6 +10807,29 @@ QString DicomUtils::read_enhanced_common(
 			short lut_function_tmp = -1;
 			QString instance_uid("");
 			int instance_number = -1;
+			int ref_segment_num = -1;
+			//
+			if (!ref_segment_nums.empty())
+			{
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+				const QSet<int> ref_segment_nums_set =
+					QSet<int>(ref_segment_nums.begin(), ref_segment_nums.end());
+#else
+				const QSet<int> ref_segment_nums_set = ref_segment_nums.toSet();
+#endif
+				if (ref_segment_nums_set.size() == 1)
+				{
+					ref_segment_num = ref_segment_nums.at(0);
+				}
+				else
+				{
+					std::cout <<
+						"Multiple \"Segment Number\" values for the image,\n"
+						"if the image is from a Enhanced Multi-frame IOD, check Settings."
+						<< std::endl;
+							
+				}
+			}
 			//
 			ImageVariant * ivariant = new ImageVariant(
 				new_id,
@@ -10788,7 +10853,12 @@ QString DicomUtils::read_enhanced_common(
 				{
 					const mdcm::File & rfile = reader.GetFile();
 					const mdcm::DataSet & ds = rfile.GetDataSet();
-					if (sop == QString("1.2.840.10008.5.1.4.1.1.6.2")) // TODO probably should not be present
+					QString charset("");
+					if (get_string_value(ds, mdcm::Tag(0x0008,0x0005), charset))
+					{
+						charset = charset.trimmed().remove(QChar('\0'));
+					}
+					if (sop == QString("1.2.840.10008.5.1.4.1.1.6.2")) // probably should not be present
 					{
 						read_us_regions(ds, ivariant);
 					}
@@ -10814,6 +10884,93 @@ QString DicomUtils::read_enhanced_common(
 					read_window(ds, &window_center_tmp, &window_width_tmp, &lut_function_tmp);
 					instance_uid = read_instance_uid(ds);
 					instance_number = read_instance_number(ds);
+					if (ref_segment_num > -1)
+					{
+						const mdcm::Tag tSegmentSequence(0x0062,0x0002);
+						const mdcm::Tag tSegmentNumber(0x0062,0x0004);
+						const mdcm::Tag tSegmentLabel(0x0062,0x0005);
+						const mdcm::Tag tRecommendedDisplayCIELabValue(0x0062,0x000d);
+						if (ds.FindDataElement(tSegmentSequence))
+						{
+							const mdcm::DataElement & deSegmentSequence =
+								ds.GetDataElement(tSegmentSequence);
+							mdcm::SmartPointer<mdcm::SequenceOfItems> sqSegmentSequence =
+								deSegmentSequence.GetValueAsSQ();
+							if (sqSegmentSequence && sqSegmentSequence->GetNumberOfItems() > 0)
+							{
+								for (unsigned int n = 0;
+									n < sqSegmentSequence->GetNumberOfItems();
+									++n)
+								{
+									const mdcm::Item & item = sqSegmentSequence->GetItem(n + 1);
+									const mdcm::DataSet & nds = item.GetNestedDataSet();
+									if (nds.FindDataElement(tSegmentNumber))
+									{
+										unsigned short SegmentNumber;
+										if (get_us_value(nds, tSegmentNumber, &SegmentNumber))
+										{
+											if (SegmentNumber == ref_segment_num)
+											{
+												ivariant->seg_info.ref_segment_num = ref_segment_num;
+												if (nds.FindDataElement(tSegmentLabel))
+												{
+													const mdcm::DataElement & deSegmentLabel =
+														nds.GetDataElement(tSegmentLabel);
+													if (!deSegmentLabel.IsEmpty() &&
+														!deSegmentLabel.IsUndefinedLength())
+													{
+														const mdcm::ByteValue * bvSegmentLabel =
+															deSegmentLabel.GetByteValue();
+														if (bvSegmentLabel)
+														{
+															const QByteArray baSegmentLabel(
+																bvSegmentLabel->GetPointer(),
+																bvSegmentLabel->GetLength());
+															QString SegmentLabel = CodecUtils::toUTF8(
+																&baSegmentLabel,
+																charset.toLatin1().constData());
+															if (!SegmentLabel.isEmpty())
+															{
+																ivariant->seg_info.label =
+																	SegmentLabel.trimmed().remove(QChar('\0'));
+															}
+														}
+													}
+												}
+												{
+													std::vector<unsigned short> cielab;
+													if (get_us_values(
+															nds,
+															tRecommendedDisplayCIELabValue,
+															cielab))
+													{
+														if (cielab.size() >= 3)
+														{
+															double L_ = (cielab[0] / 65535.0) * 100.0;
+															double a_ = ((cielab[1] - 0x8080) / 65535.0) * 255.0;
+															double b_ = ((cielab[2] - 0x8080) / 65535.0) * 255.0;
+															double R, G, B;
+															ColorSpace_::Lab2Rgb(&R, &G, &B, L_, a_, b_);
+															if      (R < 0.0) R = 0.0;
+															else if (R > 1.0) R = 1.0;
+															if      (G < 0.0) G = 0.0;
+															else if (G > 1.0) G = 1.0;
+															if      (B < 0.0) B = 0.0;
+															else if (B > 1.0) B = 1.0;
+															ivariant->seg_info.R = R * 255.0;
+															ivariant->seg_info.G = G * 255.0;
+															ivariant->seg_info.B = B * 255.0;
+														}
+													}
+												}
+												break;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 			//

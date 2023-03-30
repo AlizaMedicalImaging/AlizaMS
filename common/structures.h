@@ -225,6 +225,18 @@ public:
 };
 typedef QMap<int, AnatomyDesc> AnatomyMap;
 
+class SegmentationInfo
+{
+public:
+	SegmentationInfo() : ref_segment_num(-1), R(0), G(0), B(0) {}
+	~SegmentationInfo() {}
+	int ref_segment_num;
+	int R;
+	int G;
+	int B;
+	QString label;
+};
+
 class ImageSlice
 {
 public:
@@ -755,6 +767,7 @@ public:
 	QStringList filenames;
 	FrameLevels frame_levels;
 	Orientations_20_20 orientations_20_20;
+	SegmentationInfo seg_info;
 	QPixmap icon;
 	QPixmap histogram;
 	bool rescale_disabled;

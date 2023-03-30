@@ -364,6 +364,12 @@ void ImagesBox::set_html(const ImageVariant * v)
 		html.append(QString("<span class='y'>") +
 			v->study_description + QString("</span><br /><br />"));
 	}
+	if (!v->seg_info.label.isEmpty())
+	{
+		html.append(
+			QString("<span class='y2'>Label: </span><span class='y5'>") +
+			v->seg_info.label + QString("</span><br /><br />"));
+	}
 	if (!v->pat_name.isEmpty() || !v->pat_birthdate.isEmpty())
 	{
 		QString name_s =
