@@ -2,7 +2,7 @@
 
   MDCM. DICOM media storage C++ library.
 
-Copyright (c) 2018-2021 Mikhail Isakov
+Copyright (c) 2018-2023 Mikhail Isakov
 
   GDCM (Grassroots DICOM)
 
