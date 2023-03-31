@@ -39,6 +39,7 @@
 #define opj_bio_numbytes                                @MANGLE_PREFIX@opj_bio_numbytes
 #define opj_bio_read                                    @MANGLE_PREFIX@opj_bio_read
 #define opj_bio_write                                   @MANGLE_PREFIX@opj_bio_write
+#define opj_bio_putbit                                  @MANGLE_PREFIX@opj_bio_putbit
 #define opj_read_bytes_BE                               @MANGLE_PREFIX@opj_read_bytes_BE
 #define opj_read_bytes_LE                               @MANGLE_PREFIX@opj_read_bytes_LE
 #define opj_read_double_BE                              @MANGLE_PREFIX@opj_read_double_BE
@@ -87,6 +88,7 @@
 #define opj_dwt_getnorm_real                            @MANGLE_PREFIX@opj_dwt_getnorm_real
 #define opj_event_msg                                   @MANGLE_PREFIX@opj_event_msg
 #define opj_set_default_event_handler                   @MANGLE_PREFIX@opj_set_default_event_handler
+#define opj_t1_ht_decode_cblk                           @MANGLE_PREFIX@opj_t1_ht_decode_cblk
 #define opj_copy_image_header                           @MANGLE_PREFIX@opj_copy_image_header
 #define opj_image_comp_header_update                    @MANGLE_PREFIX@opj_image_comp_header_update
 #define opj_image_create                                @MANGLE_PREFIX@opj_image_create
@@ -121,6 +123,8 @@
 #define opj_j2k_setup_mct_encoding                      @MANGLE_PREFIX@opj_j2k_setup_mct_encoding
 #define opj_j2k_start_compress                          @MANGLE_PREFIX@opj_j2k_start_compress
 #define opj_j2k_write_tile                              @MANGLE_PREFIX@opj_j2k_write_tile
+#define opj_j2k_decoder_set_strict_mode                 @MANGLE_PREFIX@opj_j2k_decoder_set_strict_mode
+#define opj_j2k_encoder_set_extra_options               @MANGLE_PREFIX@opj_j2k_encoder_set_extra_options
 #define jp2_dump                                        @MANGLE_PREFIX@jp2_dump
 #define jp2_get_cstr_index                              @MANGLE_PREFIX@jp2_get_cstr_index
 #define jp2_get_cstr_info                               @MANGLE_PREFIX@jp2_get_cstr_info
@@ -142,6 +146,8 @@
 #define opj_jp2_setup_encoder                           @MANGLE_PREFIX@opj_jp2_setup_encoder
 #define opj_jp2_start_compress                          @MANGLE_PREFIX@opj_jp2_start_compress
 #define opj_jp2_write_tile                              @MANGLE_PREFIX@opj_jp2_write_tile
+#define opj_jp2_decoder_set_strict_mode                 @MANGLE_PREFIX@opj_jp2_decoder_set_strict_mode
+#define opj_jp2_encoder_set_extra_options               @MANGLE_PREFIX@opj_jp2_encoder_set_extra_options
 #define opj_calculate_norms                             @MANGLE_PREFIX@opj_calculate_norms
 #define opj_mct_decode                                  @MANGLE_PREFIX@opj_mct_decode
 #define opj_mct_decode_custom                           @MANGLE_PREFIX@opj_mct_decode_custom
@@ -170,6 +176,7 @@
 #define opj_mqc_segmark_enc                             @MANGLE_PREFIX@opj_mqc_segmark_enc
 #define opj_mqc_setstate                                @MANGLE_PREFIX@opj_mqc_setstate
 #define opq_mqc_finish_dec                              @MANGLE_PREFIX@opq_mqc_finish_dec
+#define opj_mqc_byteout                                 @MANGLE_PREFIX@opj_mqc_byteout
 #define opj_codec_set_threads                           @MANGLE_PREFIX@opj_codec_set_threads
 #define opj_create_compress                             @MANGLE_PREFIX@opj_create_compress
 #define opj_create_decompress                           @MANGLE_PREFIX@opj_create_decompress
@@ -205,6 +212,8 @@
 #define opj_stream_create_file_stream                   @MANGLE_PREFIX@opj_stream_create_file_stream
 #define opj_version                                     @MANGLE_PREFIX@opj_version
 #define opj_write_tile                                  @MANGLE_PREFIX@opj_write_tile
+#define opj_decoder_set_strict_mode                     @MANGLE_PREFIX@opj_decoder_set_strict_mode
+#define opj_encoder_set_extra_options                   @MANGLE_PREFIX@opj_encoder_set_extra_options
 #define opj_clock                                       @MANGLE_PREFIX@opj_clock
 #define opj_pi_create_decode                            @MANGLE_PREFIX@opj_pi_create_decode
 #define opj_pi_create_encode                            @MANGLE_PREFIX@opj_pi_create_encode
@@ -212,6 +221,7 @@
 #define opj_pi_initialise_encode                        @MANGLE_PREFIX@opj_pi_initialise_encode
 #define opj_pi_next                                     @MANGLE_PREFIX@opj_pi_next
 #define opj_pi_update_encoding_parameters               @MANGLE_PREFIX@opj_pi_update_encoding_parameters
+#define opj_get_encoding_packet_count                   @MANGLE_PREFIX@opj_get_encoding_packet_count
 #define opj_t1_create                                   @MANGLE_PREFIX@opj_t1_create
 #define opj_t1_decode_cblks                             @MANGLE_PREFIX@opj_t1_decode_cblks
 #define opj_t1_destroy                                  @MANGLE_PREFIX@opj_t1_destroy
@@ -239,6 +249,9 @@
 #define opj_tcd_rateallocate_fixed                      @MANGLE_PREFIX@opj_tcd_rateallocate_fixed
 #define opj_tcd_reinit_segment                          @MANGLE_PREFIX@opj_tcd_reinit_segment
 #define opj_tcd_update_tile_data                        @MANGLE_PREFIX@opj_tcd_update_tile_data
+#define opj_tcd_get_encoder_input_buffer_size           @MANGLE_PREFIX@opj_tcd_get_encoder_input_buffer_size
+#define opj_tcd_marker_info_create                      @MANGLE_PREFIX@opj_tcd_marker_info_create
+#define opj_tcd_marker_info_destroy                     @MANGLE_PREFIX@opj_tcd_marker_info_destroy
 #define opj_tgt_create                                  @MANGLE_PREFIX@opj_tgt_create
 #define opj_tgt_decode                                  @MANGLE_PREFIX@opj_tgt_decode
 #define opj_tgt_destroy                                 @MANGLE_PREFIX@opj_tgt_destroy

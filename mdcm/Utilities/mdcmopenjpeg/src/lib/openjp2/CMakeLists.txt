@@ -16,6 +16,7 @@ set(OPENJPEG_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/dwt.h
   ${CMAKE_CURRENT_SOURCE_DIR}/event.c
   ${CMAKE_CURRENT_SOURCE_DIR}/event.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/ht_dec.c
   ${CMAKE_CURRENT_SOURCE_DIR}/image.c
   ${CMAKE_CURRENT_SOURCE_DIR}/image.h
   ${CMAKE_CURRENT_SOURCE_DIR}/invert.c
@@ -52,7 +53,8 @@ set(OPENJPEG_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/opj_malloc.h
   ${CMAKE_CURRENT_SOURCE_DIR}/opj_stdint.h
   ${CMAKE_CURRENT_SOURCE_DIR}/sparse_array.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/sparse_array.h)
+  ${CMAKE_CURRENT_SOURCE_DIR}/sparse_array.h
+)
 
 option(OPJ_DISABLE_TPSOT_FIX "Disable TPsot==TNsot fix. See https://github.com/uclouvain/openjpeg/issues/254." OFF)
 mark_as_advanced(OPJ_DISABLE_TPSOT_FIX)
@@ -100,6 +102,16 @@ if(NOT ${CMAKE_VERSION} VERSION_LESS "2.8.12")
   target_compile_options(${OPENJPEG_LIBRARY_NAME} PRIVATE ${OPENJP2_COMPILE_OPTIONS})
 endif()
 
+# Install library
+install(TARGETS ${OPENJPEG_LIBRARY_NAME}
+  EXPORT ${MDCM_TARGETS_NAME}
+  RUNTIME DESTINATION ${OPENJPEG_INSTALL_BIN_DIR} COMPONENT Applications
+  LIBRARY DESTINATION ${OPENJPEG_INSTALL_LIB_DIR} COMPONENT Libraries
+  ARCHIVE DESTINATION ${OPENJPEG_INSTALL_LIB_DIR} COMPONENT Libraries)
+
+# Install includes files
+install(FILES openjpeg.h opj_stdint.h
+  DESTINATION ${OPENJPEG_INSTALL_INCLUDE_DIR} COMPONENT Headers)
 
 #if(BUILD_DOC)
 ## install man page of the library
