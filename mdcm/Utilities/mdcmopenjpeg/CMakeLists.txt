@@ -1,22 +1,13 @@
-if(NOT DEFINED CMAKE_MINIMUM_REQUIRED_VERSION)
-  cmake_minimum_required(VERSION 3.0.0)
-endif()
-
 if(COMMAND CMAKE_POLICY)
   cmake_policy(SET CMP0003 NEW)
-  if (NOT (${CMAKE_VERSION} VERSION_LESS 3.0))
-    cmake_policy(SET CMP0042 NEW)
-  endif()
-endif()
-
-if(NOT OPENJPEG_NAMESPACE)
-  set(OPENJPEG_NAMESPACE "OPENJPEG")
-  set(OPENJPEG_STANDALONE 1)
+  cmake_policy(SET CMP0042 NEW)
 endif()
 
 set(OPENJPEG_LIBRARY_NAME mdcmopenjp2)
 
 project(${OPENJPEG_NAMESPACE} C)
+
+set(BUILD_SHARED_LIBS OFF)
 
 include_regular_expression("^.*$")
 
@@ -192,62 +183,4 @@ configure_file(
  ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/openjp2/opj_config_private.h.cmake.in
  ${CMAKE_CURRENT_BINARY_DIR}/src/lib/openjp2/opj_config_private.h
  @ONLY)
-
-# Buld Testing
-#option(BUILD_TESTING "Build the tests." OFF)
-#if(BUILD_TESTING)
-#  if(BUILD_CODEC)
-#    enable_testing()
-#    include(CTest)
-#
-#    # Search openjpeg data needed for the tests
-#    # They could be found via git on the OpenJPEG GitHub code project
-#    # git clone https://github.com/uclouvain/openjpeg-data.git
-#    find_path(OPJ_DATA_ROOT README-OPJ-Data
-#      PATHS $ENV{OPJ_DATA_ROOT} ${CMAKE_SOURCE_DIR}/../data
-#      NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
-#
-#    # Add repository where to find tests
-#    add_subdirectory(tests)
-#
-#  else()
-#    #message(FATAL_ERROR "You need build codec to run the tests")
-#  endif()
-#endif()
-
-# install all targets referenced as OPENJPEGTargets
-#install(EXPORT OpenJPEGTargets DESTINATION ${OPENJPEG_INSTALL_PACKAGE_DIR})
-
-configure_file(${${OPENJPEG_NAMESPACE}_SOURCE_DIR}/cmake/OpenJPEGConfig.cmake.in
-  ${${OPENJPEG_NAMESPACE}_BINARY_DIR}/OpenJPEGConfig.cmake
-  @ONLY)
-
-install(FILES ${${OPENJPEG_NAMESPACE}_BINARY_DIR}/OpenJPEGConfig.cmake
-  DESTINATION ${OPENJPEG_INSTALL_PACKAGE_DIR})
-
-## install CHANGES and LICENSE
-#if(BUILD_DOC)
-#if(EXISTS ${OPENJPEG_SOURCE_DIR}/CHANGES)
-#  install(FILES CHANGES DESTINATION ${OPENJPEG_INSTALL_DOC_DIR})
-#endif()
-#
-#install(FILES LICENSE DESTINATION ${OPENJPEG_INSTALL_DOC_DIR})
-#endif()
-#
-##include (cmake/OpenJPEGCPack.cmake)
-#
-## pkgconfig support
-## enabled by default on Unix, disabled by default on other platforms
-#if(UNIX)
-#  option(BUILD_PKGCONFIG_FILES "Build and install pkg-config files" ON)
-#else()
-#  option(BUILD_PKGCONFIG_FILES "Build and install pkg-config files" OFF)
-#endif()
-#if(BUILD_PKGCONFIG_FILES)
-#  # install in lib and not share (see multi-arch note above)
-#  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/lib/openjp2/libopenjp2.pc.cmake.in
-#    ${CMAKE_CURRENT_BINARY_DIR}/libopenjp2.pc @ONLY)
-#  install( FILES  ${CMAKE_CURRENT_BINARY_DIR}/libopenjp2.pc DESTINATION
-#    ${OPENJPEG_INSTALL_LIB_DIR}/pkgconfig )
-#endif()
 
