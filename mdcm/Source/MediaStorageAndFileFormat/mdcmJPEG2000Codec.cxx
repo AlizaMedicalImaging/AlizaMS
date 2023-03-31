@@ -602,7 +602,7 @@ rawtoimage(const char *        inputbuffer,
   for (int i = 0; i < numcomps; ++i)
   {
     cmptparm[i].prec = bitsallocated; // TODO check 'bitsstored'
-#if !((OPJ_VERSION_MAJOR == 2 && OPJ_VERSION_MINOR >= 3) || OPJ_VERSION_MAJOR > 2)
+#if ((OPJ_VERSION_MAJOR == 2 && OPJ_VERSION_MINOR <= 3) || OPJ_VERSION_MAJOR < 2)
     cmptparm[i].bpp = bitsallocated;
 #endif
     cmptparm[i].sgnd = sign;
