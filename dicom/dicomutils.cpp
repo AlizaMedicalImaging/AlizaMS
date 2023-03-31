@@ -10825,7 +10825,7 @@ QString DicomUtils::read_enhanced_common(
 				{
 					std::cout <<
 						"Multiple \"Segment Number\" values for the image,\n"
-						"if the image is from a Enhanced Multi-frame IOD, check Settings."
+						"if the image is from an Enhanced Multi-frame IOD, check Settings."
 						<< std::endl;
 							
 				}
@@ -10904,67 +10904,64 @@ QString DicomUtils::read_enhanced_common(
 								{
 									const mdcm::Item & item = sqSegmentSequence->GetItem(n + 1);
 									const mdcm::DataSet & nds = item.GetNestedDataSet();
-									if (nds.FindDataElement(tSegmentNumber))
+									unsigned short SegmentNumber;
+									if (get_us_value(nds, tSegmentNumber, &SegmentNumber))
 									{
-										unsigned short SegmentNumber;
-										if (get_us_value(nds, tSegmentNumber, &SegmentNumber))
+										if (SegmentNumber == ref_segment_num)
 										{
-											if (SegmentNumber == ref_segment_num)
+											ivariant->seg_info.ref_segment_num = ref_segment_num;
+											if (nds.FindDataElement(tSegmentLabel))
 											{
-												ivariant->seg_info.ref_segment_num = ref_segment_num;
-												if (nds.FindDataElement(tSegmentLabel))
+												const mdcm::DataElement & deSegmentLabel =
+													nds.GetDataElement(tSegmentLabel);
+												if (!deSegmentLabel.IsEmpty() &&
+													!deSegmentLabel.IsUndefinedLength())
 												{
-													const mdcm::DataElement & deSegmentLabel =
-														nds.GetDataElement(tSegmentLabel);
-													if (!deSegmentLabel.IsEmpty() &&
-														!deSegmentLabel.IsUndefinedLength())
+													const mdcm::ByteValue * bvSegmentLabel =
+														deSegmentLabel.GetByteValue();
+													if (bvSegmentLabel)
 													{
-														const mdcm::ByteValue * bvSegmentLabel =
-															deSegmentLabel.GetByteValue();
-														if (bvSegmentLabel)
+														const QByteArray baSegmentLabel(
+															bvSegmentLabel->GetPointer(),
+															bvSegmentLabel->GetLength());
+														QString SegmentLabel = CodecUtils::toUTF8(
+															&baSegmentLabel,
+															charset.toLatin1().constData());
+														if (!SegmentLabel.isEmpty())
 														{
-															const QByteArray baSegmentLabel(
-																bvSegmentLabel->GetPointer(),
-																bvSegmentLabel->GetLength());
-															QString SegmentLabel = CodecUtils::toUTF8(
-																&baSegmentLabel,
-																charset.toLatin1().constData());
-															if (!SegmentLabel.isEmpty())
-															{
-																ivariant->seg_info.label =
-																	SegmentLabel.trimmed().remove(QChar('\0'));
-															}
+															ivariant->seg_info.label =
+																SegmentLabel.trimmed().remove(QChar('\0'));
 														}
 													}
 												}
-												{
-													std::vector<unsigned short> cielab;
-													if (get_us_values(
-															nds,
-															tRecommendedDisplayCIELabValue,
-															cielab))
-													{
-														if (cielab.size() >= 3)
-														{
-															double L_ = (cielab[0] / 65535.0) * 100.0;
-															double a_ = ((cielab[1] - 0x8080) / 65535.0) * 255.0;
-															double b_ = ((cielab[2] - 0x8080) / 65535.0) * 255.0;
-															double R, G, B;
-															ColorSpace_::Lab2Rgb(&R, &G, &B, L_, a_, b_);
-															if      (R < 0.0) R = 0.0;
-															else if (R > 1.0) R = 1.0;
-															if      (G < 0.0) G = 0.0;
-															else if (G > 1.0) G = 1.0;
-															if      (B < 0.0) B = 0.0;
-															else if (B > 1.0) B = 1.0;
-															ivariant->seg_info.R = R * 255.0;
-															ivariant->seg_info.G = G * 255.0;
-															ivariant->seg_info.B = B * 255.0;
-														}
-													}
-												}
-												break;
 											}
+											{
+												std::vector<unsigned short> cielab;
+												if (get_us_values(
+														nds,
+														tRecommendedDisplayCIELabValue,
+														cielab))
+												{
+													if (cielab.size() >= 3)
+													{
+														double L_ = (cielab[0] / 65535.0) * 100.0;
+														double a_ = ((cielab[1] - 0x8080) / 65535.0) * 255.0;
+														double b_ = ((cielab[2] - 0x8080) / 65535.0) * 255.0;
+														double R, G, B;
+														ColorSpace_::Lab2Rgb(&R, &G, &B, L_, a_, b_);
+														if      (R < 0.0) R = 0.0;
+														else if (R > 1.0) R = 1.0;
+														if      (G < 0.0) G = 0.0;
+														else if (G > 1.0) G = 1.0;
+														if      (B < 0.0) B = 0.0;
+														else if (B > 1.0) B = 1.0;
+														ivariant->seg_info.R = R * 255.0;
+														ivariant->seg_info.G = G * 255.0;
+														ivariant->seg_info.B = B * 255.0;
+													}
+												}
+											}
+											break;
 										}
 									}
 								}
