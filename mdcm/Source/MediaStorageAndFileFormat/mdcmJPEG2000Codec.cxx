@@ -601,9 +601,10 @@ rawtoimage(const char *        inputbuffer,
   memset(&cmptparm[0], 0, 3 * sizeof(opj_image_cmptparm_t));
   for (int i = 0; i < numcomps; ++i)
   {
-    // cmptparm[i].prec = bitsstored;
-    cmptparm[i].prec = bitsallocated; // FIXME
+    cmptparm[i].prec = bitsallocated; // TODO check 'bitsstored'
+#if !((OPJ_VERSION_MAJOR == 2 && OPJ_VERSION_MINOR >= 3) || OPJ_VERSION_MAJOR > 2)
     cmptparm[i].bpp = bitsallocated;
+#endif
     cmptparm[i].sgnd = sign;
     cmptparm[i].dx = subsampling_dx;
     cmptparm[i].dy = subsampling_dy;
@@ -715,7 +716,7 @@ check_comp_valid(opj_image_t * image)
 JPEG2000Codec::JPEG2000Codec()
 {
   Internals = new JPEG2000Internals;
-#if (OPJ_VERSION_MAJOR == 2 && OPJ_VERSION_MINOR >= 3)
+#if ((OPJ_VERSION_MAJOR == 2 && OPJ_VERSION_MINOR >= 3) || OPJ_VERSION_MAJOR > 2)
   if (opj_has_thread_support())
   {
     const int x = opj_get_num_cpus();
@@ -1455,7 +1456,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
       mdcmErrorMacro("Error: parameters.decod_format");
       return std::make_pair<char *, size_t>(reinterpret_cast<char *>(NULL), 0);
   }
-#if (OPJ_VERSION_MAJOR == 2 && OPJ_VERSION_MINOR >= 3)
+#if ((OPJ_VERSION_MAJOR == 2 && OPJ_VERSION_MINOR >= 3) || OPJ_VERSION_MAJOR > 2)
   if (opj_has_thread_support())
   {
     opj_codec_set_threads(dinfo, Internals->nNumberOfThreadsForDecompression);
@@ -1835,7 +1836,7 @@ JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size, Transfe
     default:
       return false;
   }
-#if (OPJ_VERSION_MAJOR == 2 && OPJ_VERSION_MINOR >= 3)
+#if ((OPJ_VERSION_MAJOR == 2 && OPJ_VERSION_MINOR >= 3) || OPJ_VERSION_MAJOR > 2)
   if (opj_has_thread_support())
   {
     opj_codec_set_threads(dinfo, Internals->nNumberOfThreadsForDecompression);
