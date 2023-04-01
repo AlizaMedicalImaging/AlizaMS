@@ -487,13 +487,22 @@ ImageChangeTransferSyntax::TryJPEG2000Codec(const DataElement & pixelde, Bitmap 
 {
   const unsigned long long len = input.GetBufferLength();
   (void)len;
+  bool mct = false;
+  bool reversible = false;
   const TransferSyntax & ts = GetTransferSyntax();
-  JPEG2000Codec          j2kcodec;
-  ImageCodec *           codec = &j2kcodec;
-  JPEG2000Codec *        usercodec = dynamic_cast<JPEG2000Codec *>(UserCodec);
+  JPEG2000Codec j2kcodec;
+  ImageCodec *    codec = &j2kcodec;
+  JPEG2000Codec * usercodec = dynamic_cast<JPEG2000Codec *>(UserCodec);
   if (usercodec && usercodec->CanCode(ts))
   {
     codec = usercodec;
+    mct = usercodec->GetMCT();
+    reversible = usercodec->GetReversible();
+  }
+  else
+  {
+    mct = j2kcodec.GetMCT();
+    reversible = j2kcodec.GetReversible();
   }
   if (codec->CanCode(ts))
   {
@@ -510,13 +519,29 @@ ImageChangeTransferSyntax::TryJPEG2000Codec(const DataElement & pixelde, Bitmap 
     {
       if (ForceYBRFull ||
           (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL) ||
+          // TODO this is probably impossible
           (input.GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422))
       {
+        if (mct)
+        {
+          mdcmAlwaysWarnMacro("Can not set MCT=1 and YBR_FULL");
+          return false;
+        }
         output.SetPhotometricInterpretation(PhotometricInterpretation::YBR_FULL);
       }
       else
       {
-        output.SetPhotometricInterpretation(PhotometricInterpretation::RGB);
+        if (mct)
+        {
+          if (!reversible)
+            output.SetPhotometricInterpretation(PhotometricInterpretation::YBR_ICT);
+          else
+            output.SetPhotometricInterpretation(PhotometricInterpretation::YBR_RCT);
+        }
+        else
+        {
+          output.SetPhotometricInterpretation(PhotometricInterpretation::RGB);
+        }
       }
     }
     else

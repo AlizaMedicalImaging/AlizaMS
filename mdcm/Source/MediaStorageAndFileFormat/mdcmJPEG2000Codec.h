@@ -68,6 +68,10 @@ public:
   SetReversible(bool);
   void
   SetMCT(bool);
+  bool
+  GetReversible() const;
+  bool
+  GetMCT() const;
 
 protected:
   bool
@@ -100,7 +104,7 @@ private:
   bool
   CodeFrameIntoBuffer(char *, size_t, size_t &, const char *, size_t);
   bool
-                      GetHeaderInfo(const char *, size_t, TransferSyntax &);
+  GetHeaderInfo(const char *, size_t, TransferSyntax &);
   JPEG2000Internals * Internals;
 };
 

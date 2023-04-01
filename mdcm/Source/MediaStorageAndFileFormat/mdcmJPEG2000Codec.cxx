@@ -34,6 +34,8 @@
 #endif
 #include "mdcm_openjpeg.h"
 
+//#define MDCM_JPEG2000_VERBOSE
+
 namespace mdcm
 {
 
@@ -1146,10 +1148,14 @@ JPEG2000Codec::SetNumberOfResolutions(unsigned int nres)
 }
 
 void
-JPEG2000Codec::SetReversible(bool res)
+JPEG2000Codec::SetReversible(bool b)
 {
-  LossyFlag = !res;
-  Internals->coder_param.irreversible = !res;
+  // 1 : use the irreversible DWT 9-7, 0 : use lossless compression (default)
+  LossyFlag = !b;
+  if (b)
+    Internals->coder_param.irreversible = 0;
+  else
+    Internals->coder_param.irreversible = 1;
 }
 
 /*
@@ -1182,10 +1188,28 @@ Input PI + MCT 1 -> Not allowed
 void
 JPEG2000Codec::SetMCT(bool mct)
 {
-  // Set the Multiple Component Transformation value (COD -> SGcod)
+  // Set the Multiple Component Transformation (COD -> SGcod)
   // 0 for none, 1 to apply to components 0, 1, 2
-  if (mct) Internals->coder_param.tcp_mct = 1;
-  else     Internals->coder_param.tcp_mct = 0;
+  if (mct)
+    Internals->coder_param.tcp_mct = 1;
+  else
+    Internals->coder_param.tcp_mct = 0;
+}
+
+bool
+JPEG2000Codec::GetReversible() const
+{
+  if (Internals->coder_param.irreversible == 0)
+    return true;
+  return false;
+}
+
+bool
+JPEG2000Codec::GetMCT() const
+{
+  if (Internals->coder_param.tcp_mct == 1)
+    return true;
+  return false;
 }
 
 bool
@@ -1537,30 +1561,35 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
   LossyFlag = !reversible;
   assert(image->numcomps == this->GetPixelFormat().GetSamplesPerPixel());
   assert(image->numcomps == this->GetPhotometricInterpretation().GetSamplesPerPixel());
-#if 0
-  std::cout << "GetPhotometricInterpretation() = "
-    << this->GetPhotometricInterpretation() << ", mct = " << (int)mct << std::endl;
-#endif
-#if 0
-  if (this->GetPhotometricInterpretation() == PhotometricInterpretation::RGB
-#  if 1
-     || this->GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL
-#  endif
-    )
+#ifdef MDCM_JPEG2000_VERBOSE
+  std::cout << "Photometric " << this->GetPhotometricInterpretation()
+    << ", MCT " << static_cast<int>(mct)
+    << ", reversible " <<  static_cast<int>(reversible) << std::endl;
+  if (this->GetPhotometricInterpretation() == PhotometricInterpretation::RGB ||
+      this->GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL)
   {
     if (mct)
-      mdcmAlwaysWarnMacro("JPEG2000 warning: (RGB || YBR_FULL), mct = " << (int)mct);
+      std::cout << this->GetPhotometricInterpretation() << ", but MCT is 1" << std::endl;
   }
-  else if (this->GetPhotometricInterpretation() == PhotometricInterpretation::YBR_RCT ||
-           this->GetPhotometricInterpretation() == PhotometricInterpretation::YBR_ICT)
+  else if (this->GetPhotometricInterpretation() == PhotometricInterpretation::YBR_RCT)
   {
-    if(!mct)
-      mdcmAlwaysWarnMacro("JPEG2000 warning: (YBR_ICT || YBR_RCT), mct = " << (int)mct);
+    if (!mct)
+      std::cout << "YBR_RCT, but MCT is 0" << std::endl;
+    if (!reversible)
+      std::cout << "YBR_RCT, but is not reversible" << std::endl;
+  }
+  else if (this->GetPhotometricInterpretation() == PhotometricInterpretation::YBR_ICT)
+  {
+    if (!mct)
+      std::cout << "YBR_ICT, but MCT is 0" << std::endl;;
+    if (reversible)
+      std::cout << "YBR_ICT, but is reversible" << std::endl;;
   }
 #endif
   // Close the byte stream
   opj_stream_destroy(cio);
-  const size_t len = static_cast<size_t>(Dimensions[0]) * Dimensions[1] * (PF.GetBitsAllocated() / 8) * image->numcomps;
+  const size_t len =
+    static_cast<size_t>(Dimensions[0]) * Dimensions[1] * (PF.GetBitsAllocated() / 8) * image->numcomps;
   char *       raw;
   try
   {
