@@ -1433,16 +1433,13 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
     // mdcmData/MAROTECH_CT_JP2Lossy.dcm
     mdcmWarningMacro("J2K start like JPEG-2000 compressed image data instead of codestream");
     parameters.decod_format = JP2_CFMT;
-    assert(parameters.decod_format == JP2_CFMT);
   }
   else
   {
     // JPEG-2000 codestream
     parameters.decod_format = J2K_CFMT;
-    assert(parameters.decod_format == J2K_CFMT);
   }
   parameters.cod_format = PGX_DFMT;
-  assert(parameters.cod_format == PGX_DFMT);
   // Get a decoder handle
   switch (parameters.decod_format)
   {
@@ -1545,18 +1542,20 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
     << this->GetPhotometricInterpretation() << ", mct = " << (int)mct << std::endl;
 #endif
 #if 0
-  if(this->GetPhotometricInterpretation() == PhotometricInterpretation::RGB
+  if (this->GetPhotometricInterpretation() == PhotometricInterpretation::RGB
 #  if 1
      || this->GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL
 #  endif
     )
   {
-    if(mct) mdcmAlwaysWarnMacro("JPEG2000 warning: (RGB || YBR_FULL), mct = " << (int)mct);
+    if (mct)
+      mdcmAlwaysWarnMacro("JPEG2000 warning: (RGB || YBR_FULL), mct = " << (int)mct);
   }
-  else if(this->GetPhotometricInterpretation() == PhotometricInterpretation::YBR_RCT ||
-          this->GetPhotometricInterpretation() == PhotometricInterpretation::YBR_ICT)
+  else if (this->GetPhotometricInterpretation() == PhotometricInterpretation::YBR_RCT ||
+           this->GetPhotometricInterpretation() == PhotometricInterpretation::YBR_ICT)
   {
-    if(!mct) mdcmAlwaysWarnMacro("JPEG2000 warning: (YBR_ICT || YBR_RCT), mct = " << (int)mct);
+    if(!mct)
+      mdcmAlwaysWarnMacro("JPEG2000 warning: (YBR_ICT || YBR_RCT), mct = " << (int)mct);
   }
 #endif
   // Close the byte stream
@@ -1569,6 +1568,8 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
   }
   catch (const std::bad_alloc &)
   {
+    opj_destroy_codec(dinfo);
+    opj_image_destroy(image);
     return std::make_pair<char *, size_t>(NULL, 0);
   }
   for (unsigned int compno = 0; compno < image->numcomps; ++compno)
@@ -1599,7 +1600,11 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
       PF.SetHighBit(static_cast<unsigned short>(comp->prec - 1));
     }
     assert(PF.IsValid());
-    assert(comp->prec <= 32);
+    if (comp->prec > 32)
+    {
+      mdcmAlwaysWarnMacro("JPEG2000Codec: prec is not supported, " << comp->prec);
+      return std::make_pair<char *, size_t>(NULL, 0);
+    }
     void * vraw = static_cast<void*>(raw);
     if (comp->prec <= 8)
     {
@@ -1622,7 +1627,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
         data16 += image->numcomps;
       }
     }
-    else if (comp->prec <= 32)
+    else
     {
       uint32_t * data32 = static_cast<uint32_t *>(vraw) + compno;
       for (int i = 0; i < wr * hr; ++i)
@@ -1632,18 +1637,9 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
         data32 += image->numcomps;
       }
     }
-    else
-    {
-      mdcmAlwaysWarnMacro("JPEG2000Codec:: prec. not supported, " << comp->prec);
-      return std::make_pair<char *, size_t>(NULL, 0);
-    }
   }
-  // Free remaining structures
-  if (dinfo)
-  {
-    opj_destroy_codec(dinfo);
-  }
-  // Free image data structure
+  // Free
+  opj_destroy_codec(dinfo);
   opj_image_destroy(image);
   return std::make_pair(raw, len);
 }
@@ -1883,13 +1879,13 @@ JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size, Transfe
     reversible = lossless;
     mct = mctb;
 #if 0
-    std::cout << "MCT: " << (int)mct << " reversible: " << (int)reversible << std::endl;
+    std::cout << "MCT " << static_cast<int>(mct) << ",reversible " << static_cast<int>(reversible) << std::endl;
 #endif
   }
 #if 0
   else
   {
-    std::cout << "Warning: parameters.decod_format=" << parameters.decod_format << std::endl;
+    std::cout << "parameters.decod_format " << parameters.decod_format << std::endl;
   }
 #endif
   LossyFlag = !reversible;
