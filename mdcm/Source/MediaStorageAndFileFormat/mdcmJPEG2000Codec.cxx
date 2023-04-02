@@ -1632,6 +1632,9 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
     if (comp->prec > 32)
     {
       mdcmAlwaysWarnMacro("JPEG2000Codec: prec is not supported, " << comp->prec);
+      opj_destroy_codec(dinfo);
+      opj_image_destroy(image);
+      delete[] raw;
       return std::make_pair<char *, size_t>(NULL, 0);
     }
     void * vraw = static_cast<void*>(raw);

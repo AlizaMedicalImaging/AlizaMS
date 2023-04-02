@@ -9861,6 +9861,8 @@ QString DicomUtils::read_buffer(
 		image_buffer_length = image.GetBufferLength();
 		if (image_buffer_length == 0)
 		{
+			delete [] icc_profile;
+			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return QString("Buffer size is invalid");
 		}
 		if (buffers_size)
