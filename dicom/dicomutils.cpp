@@ -10280,13 +10280,6 @@ QString DicomUtils::read_buffer(
 	if (singlebit)
 	{
 		const unsigned long long singlebit_buffer_size = dimx * dimy * dimz;
-		if (singlebit_buffer_size < image_buffer_length * 8)
-		{
-			delete [] not_rescaled_buffer;
-			delete [] icc_profile;
-			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
-			return QString("Wrong buffer size");
-		}
 		try
 		{
 			singlebit_buffer = new unsigned char[singlebit_buffer_size];
@@ -10306,15 +10299,22 @@ QString DicomUtils::read_buffer(
 		for (unsigned long long x = 0; x < image_buffer_length; ++x)
 		{
 			const unsigned char c = not_rescaled_buffer[x];
-			singlebit_buffer[j    ] = (c &  0x1) ? 255 : 0;
-			singlebit_buffer[j + 1] = (c &  0x2) ? 255 : 0;
-			singlebit_buffer[j + 2] = (c &  0x4) ? 255 : 0;
-			singlebit_buffer[j + 3] = (c &  0x8) ? 255 : 0;
-			singlebit_buffer[j + 4] = (c & 0x10) ? 255 : 0;
-			singlebit_buffer[j + 5] = (c & 0x20) ? 255 : 0;
-			singlebit_buffer[j + 6] = (c & 0x40) ? 255 : 0;
-			singlebit_buffer[j + 7] = (c & 0x80) ? 255 : 0;
-			j += 8;
+			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c &  0x1) ? 255 : 0;
+			++j;
+			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c &  0x2) ? 255 : 0;
+			++j;
+			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c &  0x4) ? 255 : 0;
+			++j;
+			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c &  0x8) ? 255 : 0;
+			++j;
+			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c & 0x10) ? 255 : 0;
+			++j;
+			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c & 0x20) ? 255 : 0;
+			++j;
+			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c & 0x40) ? 255 : 0;
+			++j;
+			if (j < singlebit_buffer_size) singlebit_buffer[j] = (c & 0x80) ? 255 : 0;
+			++j;
 		}
 		buffer      = reinterpret_cast<char *>(singlebit_buffer);
 		buffer_size = singlebit_buffer_size;
