@@ -211,7 +211,7 @@ Bitmap::GetBufferLength() const
     {
       mdcmAlwaysWarnMacro("Impossible: SINGLEBIT and SamplesPerPixel "
                           << PF.GetSamplesPerPixel());
-      return false;
+      return 0;
     }
     unsigned long long size_bits = static_cast<unsigned long long>(Dimensions[0]) * Dimensions[1];
 	if (GetTransferSyntax().IsEncapsulated())
@@ -240,7 +240,7 @@ Bitmap::GetBufferLength() const
       unsigned long long ref = bv->GetLength() / tmp0;
       if (!GetTransferSyntax().IsEncapsulated())
       {
-        mdcmAlwaysWarnMacro("GetBufferLength(): bv->GetLength()%tmp0 != 0");
+        mdcmAlwaysWarnMacro("GetBufferLength(): bv->GetLength() % tmp0 != 0");
       }
       tmp0 *= ref;
     }
