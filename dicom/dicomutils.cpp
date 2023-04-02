@@ -9859,6 +9859,10 @@ QString DicomUtils::read_buffer(
 		//
 		image_pixelformat = image.GetPixelFormat();
 		image_buffer_length = image.GetBufferLength();
+		if (image_buffer_length == 0)
+		{
+			return QString("Buffer size is invalid");
+		}
 		if (buffers_size)
 		{
 			*buffers_size = image_buffer_length;
@@ -10274,7 +10278,7 @@ QString DicomUtils::read_buffer(
 	if (singlebit)
 	{
 		const unsigned long long singlebit_buffer_size = dimx * dimy * dimz;
-		if (singlebit_buffer_size > image_buffer_length * 8)
+		if (singlebit_buffer_size < image_buffer_length * 8)
 		{
 			delete [] not_rescaled_buffer;
 			delete [] icc_profile;

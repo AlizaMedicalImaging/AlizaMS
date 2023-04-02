@@ -200,7 +200,6 @@ ComputeZSpacingFromIPP(const DataSet & ds, double & zspacing)
       cosines[5] = 0;
     }
   }
-  assert(b1 && cosines.size() == 6);
   const Tag tfgs(0x5200, 0x9230);
   if (!ds.FindDataElement(tfgs))
     return false;

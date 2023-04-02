@@ -176,8 +176,13 @@ RAWCodec::DecodeBytes(const char * inBytes, size_t inBufferLength, char * outByt
     }
     else
     {
-      mdcmWarningMacro("Truncating result");
+      mdcmAlwaysWarnMacro("RAWCodec::DecodeBytes: can not truncate, inBufferLength=" << inBufferLength
+                          << ", inOutBufferLength=" << inOutBufferLength);
+#if 1
+      return false;
+#else
       memcpy(outBytes, inBytes, inBufferLength);
+#endif
     }
     return true;
   }

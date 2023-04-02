@@ -195,25 +195,41 @@ Bitmap::GetBufferLength() const
     assert(Dimensions[2] == 1);
   }
   unsigned long long                        len = 0;
-  unsigned long long                        mul = 1;
+  unsigned long long                        tmp0 = 1;
   std::vector<unsigned int>::const_iterator it = Dimensions.cbegin();
   for (; it != Dimensions.cend(); ++it)
   {
-    mul *= *it;
+    tmp0 *= *it;
   }
   if (PF == PixelFormat::UINT12 || PF == PixelFormat::INT12)
   {
-    mul *= PF.GetPixelSize();
+    tmp0 *= PF.GetPixelSize();
   }
   else if (PF == PixelFormat::SINGLEBIT)
   {
-    assert(PF.GetSamplesPerPixel() == 1);
-    const unsigned long long bytesPerRow =
-      (static_cast<unsigned long long>(Dimensions[0]) / 8) + ((static_cast<unsigned long long>(Dimensions[0]) % 8 != 0) ? 1 : 0);
-    unsigned long long save = bytesPerRow * Dimensions[1];
+    if (PF.GetSamplesPerPixel() != 1)
+    {
+      mdcmAlwaysWarnMacro("Impossible: SINGLEBIT and SamplesPerPixel "
+                          << PF.GetSamplesPerPixel());
+      return false;
+    }
+    unsigned long long size_bits = static_cast<unsigned long long>(Dimensions[0]) * Dimensions[1];
+	if (GetTransferSyntax().IsEncapsulated())
+	{
+	  if (size_bits % 8 != 0)
+	  {
+        mdcmAlwaysWarnMacro(
+		  "Currently not supported: SINGLEBIT, encapsulated transfer syntax and "
+		  << Dimensions[0] << " x " << Dimensions[1]);
+		return 0;
+	  }
+	}
     if (NumberOfDimensions > 2)
-      save *= Dimensions[2];
-    mul = save;
+      size_bits *= static_cast<unsigned long long>(Dimensions[2]);
+    if (size_bits % 8 != 0)
+      tmp0 = size_bits / 8 + 1;
+    else
+      tmp0 = size_bits / 8;
   }
   else if (PF.GetBitsAllocated() % 8 != 0)
   {
@@ -221,22 +237,22 @@ Bitmap::GetBufferLength() const
     const ByteValue * bv = PixelData.GetByteValue();
     if (bv)
     {
-      unsigned long long ref = bv->GetLength() / mul;
+      unsigned long long ref = bv->GetLength() / tmp0;
       if (!GetTransferSyntax().IsEncapsulated())
       {
-        mdcmAlwaysWarnMacro("GetBufferLength(): bv->GetLength()%mul != 0");
+        mdcmAlwaysWarnMacro("GetBufferLength(): bv->GetLength()%tmp0 != 0");
       }
-      mul *= ref;
+      tmp0 *= ref;
     }
   }
   else
   {
-    mul *= PF.GetPixelSize();
+    tmp0 *= PF.GetPixelSize();
   }
-  len = mul;
+  len = tmp0;
   if (len == 0)
   {
-    mdcmAlwaysWarnMacro("GetBufferLength() = 0");
+    mdcmAlwaysWarnMacro("GetBufferLength() is 0");
   }
   return len;
 }
