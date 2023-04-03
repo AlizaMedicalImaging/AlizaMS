@@ -189,6 +189,7 @@ Bitmap::GetBufferLength() const
 {
   if (PF == PixelFormat::UNKNOWN)
   {
+    mdcmAlwaysWarnMacro("Unknown Pixel Format");
     return 0;
   }
   {
