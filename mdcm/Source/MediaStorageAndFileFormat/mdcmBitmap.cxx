@@ -196,13 +196,11 @@ Bitmap::GetBufferLength() const
     const size_t dims_size = Dimensions.size();
     if (NumberOfDimensions == 2 && dims_size == 3 && Dimensions[2] != 1)
     {
-      mdcmAlwaysWarnMacro("NumberOfDimensions is " << NumberOfDimensions
-                          << ", but Z dimension is " << Dimensions[2]);
+      mdcmAlwaysWarnMacro("NumberOfDimensions is 2, but Z dimension is " << Dimensions[2]);
     }
     else if (NumberOfDimensions == 3 && dims_size < 3) // probably unreachable
     {
-      mdcmAlwaysWarnMacro("NumberOfDimensions is " << NumberOfDimensions
-                          << ", but Dimensions.size() is " << Dimensions.size());
+      mdcmAlwaysWarnMacro("NumberOfDimensions is 3, but Dimensions.size() is " << dims_size);
       return 0;
     }
   }
@@ -213,7 +211,7 @@ Bitmap::GetBufferLength() const
 #if 1
     if (PF.GetSamplesPerPixel() != 1)
     {
-      mdcmAlwaysWarnMacro("Error: SINGLEBIT and SamplesPerPixel " << PF.GetSamplesPerPixel());
+      mdcmAlwaysWarnMacro("SINGLEBIT and SamplesPerPixel " << PF.GetSamplesPerPixel());
       return 0;
     }
 #endif
