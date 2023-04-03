@@ -188,42 +188,45 @@ unsigned long long
 Bitmap::GetBufferLength() const
 {
   if (PF == PixelFormat::UNKNOWN)
+  {
     return 0;
-  assert(NumberOfDimensions);
-  if (NumberOfDimensions != Dimensions.size())
-  {
-    assert(Dimensions[2] == 1);
   }
-  unsigned long long                        len = 0;
-  unsigned long long                        tmp0 = 1;
-  std::vector<unsigned int>::const_iterator it = Dimensions.cbegin();
-  for (; it != Dimensions.cend(); ++it)
   {
-    tmp0 *= *it;
-  }
-  if (PF == PixelFormat::UINT12 || PF == PixelFormat::INT12)
-  {
-    tmp0 *= PF.GetPixelSize();
-  }
-  else if (PF == PixelFormat::SINGLEBIT)
-  {
-    if (PF.GetSamplesPerPixel() != 1)
+    const size_t dims_size = Dimensions.size();
+    if (NumberOfDimensions == 2 && dims_size == 3 && Dimensions[2] != 1)
     {
-      mdcmAlwaysWarnMacro("Impossible: SINGLEBIT and SamplesPerPixel "
-                          << PF.GetSamplesPerPixel());
+      mdcmAlwaysWarnMacro("NumberOfDimensions is " << NumberOfDimensions
+                          << ", but Z dimension is " << Dimensions[2]);
+    }
+    else if (NumberOfDimensions == 3 && dims_size < 3) // probably unreachable
+    {
+      mdcmAlwaysWarnMacro("NumberOfDimensions is " << NumberOfDimensions
+                          << ", but Dimensions.size() is " << Dimensions.size());
       return 0;
     }
+  }
+  unsigned long long len = 0;
+  unsigned long long tmp0 = 1;
+  if (PF == PixelFormat::SINGLEBIT)
+  {
+#if 1
+    if (PF.GetSamplesPerPixel() != 1)
+    {
+      mdcmAlwaysWarnMacro("Error: SINGLEBIT and SamplesPerPixel " << PF.GetSamplesPerPixel());
+      return 0;
+    }
+#endif
     unsigned long long size_bits = static_cast<unsigned long long>(Dimensions[0]) * Dimensions[1];
-	if (GetTransferSyntax().IsEncapsulated())
-	{
-	  if (size_bits % 8 != 0)
-	  {
+    if (GetTransferSyntax().IsEncapsulated())
+    {
+      if (size_bits % 8 != 0)
+      {
         mdcmAlwaysWarnMacro(
-		  "Currently not supported: SINGLEBIT, encapsulated transfer syntax and "
-		  << Dimensions[0] << " x " << Dimensions[1]);
-		return 0;
-	  }
-	}
+          "Currently not supported: SINGLEBIT, encapsulated transfer syntax and "
+          << Dimensions[0] << " x " << Dimensions[1]);
+        return 0;
+      }
+    }
     if (NumberOfDimensions > 2)
       size_bits *= static_cast<unsigned long long>(Dimensions[2]);
     if (size_bits % 8 != 0)
@@ -231,29 +234,30 @@ Bitmap::GetBufferLength() const
     else
       tmp0 = size_bits / 8;
   }
-  else if (PF.GetBitsAllocated() % 8 != 0)
-  {
-    assert(PF.GetSamplesPerPixel() == 1);
-    const ByteValue * bv = PixelData.GetByteValue();
-    if (bv)
-    {
-      unsigned long long ref = bv->GetLength() / tmp0;
-      if (!GetTransferSyntax().IsEncapsulated())
-      {
-        mdcmAlwaysWarnMacro("GetBufferLength(): bv->GetLength() % tmp0 != 0");
-      }
-      tmp0 *= ref;
-    }
-  }
   else
   {
-    tmp0 *= PF.GetPixelSize();
+    tmp0 *= static_cast<unsigned long long>(Dimensions[0]);
+    tmp0 *= static_cast<unsigned long long>(Dimensions[1]);
+    if (NumberOfDimensions > 2)
+      tmp0 *= static_cast<unsigned long long>(Dimensions[2]);
+    if (PF.GetBitsAllocated() % 8 != 0)
+    {
+      mdcmAlwaysWarnMacro("Bits Allocated " << PF.GetBitsAllocated() << " is invalid");
+      if (PF == PixelFormat::UINT12 || PF == PixelFormat::INT12)
+      {
+        tmp0 *= PF.GetPixelSize();
+      }
+      else
+      {
+        return 0;
+      }
+    }
+    else
+    {
+      tmp0 *= PF.GetPixelSize();
+    }
   }
   len = tmp0;
-  if (len == 0)
-  {
-    mdcmAlwaysWarnMacro("GetBufferLength() is 0");
-  }
   return len;
 }
 
