@@ -10831,7 +10831,7 @@ QString DicomUtils::read_enhanced_common(
 				{
 					std::cout <<
 						"Multiple \"Segment Number\" values for the image,\n"
-						"if the image is from an Enhanced Multi-frame IOD, check Settings."
+						"check Settings for Enhanced Multi-frame IODs."
 						<< std::endl;
 							
 				}
