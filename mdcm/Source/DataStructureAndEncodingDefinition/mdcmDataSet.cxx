@@ -136,11 +136,11 @@ DataSet::GetPrivateCreator(const Tag & t) const
       if (!bv)
         return "";
       std::string owner = std::string(bv->GetPointer(), bv->GetLength());
-      while (owner.size() && owner[owner.size() - 1] == ' ')
+      while (!owner.empty() && owner[owner.size() - 1] == ' ')
       {
         owner.erase(owner.size() - 1, 1);
       }
-      assert(owner.size() == 0 || owner[owner.size() - 1] != ' ');
+      assert(owner.empty() || owner[owner.size() - 1] != ' ');
       return owner;
     }
   }

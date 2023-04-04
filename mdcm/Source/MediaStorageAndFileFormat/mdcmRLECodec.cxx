@@ -670,7 +670,7 @@ RLECodec::Code(DataElement const & in, DataElement & out)
     std::stringstream os;
     os.write(reinterpret_cast<char *>(&header), sizeof(header));
     std::string str = os.str() + datastr;
-    assert(str.size());
+    assert(!str.empty());
     Fragment frag;
     const size_t str_size = str.size();
     if (str_size > 0xffffffff)
@@ -806,7 +806,6 @@ RLECodec::DecodeByStreams(std::istream & is, std::ostream & os)
     return false;
   }
   size_t numSegments = frame.Header.NumSegments;
-  size_t numberOfReadBytes = 0;
   size_t length = Length;
   assert(length);
   // Special case
@@ -833,7 +832,7 @@ RLECodec::DecodeByStreams(std::istream & is, std::ostream & os)
   length /= numSegments;
   for (size_t i = 0; i < numSegments; ++i)
   {
-    numberOfReadBytes = 0;
+    size_t         numberOfReadBytes = 0;
     std::streampos pos = is.tellg() - start;
     if (frame.Header.Offset[i] - pos != 0)
     {

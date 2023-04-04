@@ -193,7 +193,7 @@ SubjectInternals::PrintObservers(std::ostream & os, std::string & indent) const
     (void)c;
     if (e)
     {
-      os << indent << e->GetEventName() << ")\n";
+      os << indent << e->GetEventName() << '\n';
     }
   }
   return true;

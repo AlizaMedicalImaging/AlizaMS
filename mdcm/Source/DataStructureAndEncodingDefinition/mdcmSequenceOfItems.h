@@ -101,7 +101,7 @@ public:
   IsEmpty() const
   {
     return Items.empty();
-  };
+  }
   SizeType
   GetNumberOfItems() const
   {

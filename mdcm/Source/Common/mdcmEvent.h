@@ -60,30 +60,24 @@ operator<<(std::ostream & os, Event & e)
   {                                                        \
   public:                                                  \
     typedef classname Self;                                \
-    typedef super     Superclass;                          \
+    typedef super Superclass;                              \
     classname() {}                                         \
     virtual ~classname() {}                                \
-    virtual const char *                                   \
-    GetEventName() const                                   \
+    virtual const char * GetEventName() const              \
     {                                                      \
       return #classname;                                   \
     }                                                      \
-    virtual bool                                           \
-    CheckEvent(const ::mdcm::Event * e) const              \
+    virtual bool CheckEvent(const ::mdcm::Event * e) const \
     {                                                      \
       return dynamic_cast<const Self *>(e) ? true : false; \
     }                                                      \
-    virtual ::mdcm::Event *                                \
-    MakeObject() const                                     \
+    virtual ::mdcm::Event * MakeObject() const             \
     {                                                      \
       return new Self;                                     \
     }                                                      \
-    classname(const Self & s)                              \
-      : super(s){};                                        \
-                                                           \
+    classname(const Self & s) : super(s) {}                \
   private:                                                 \
-    void                                                   \
-    operator=(const Self &);                               \
+    void operator=(const Self &);                          \
   }
 
 mdcmEventMacro(NoEvent, Event);

@@ -28,7 +28,8 @@
 #include <cstring>
 #include "mdcm_charls.h"
 
-#if defined(__GNUC__) && GCC_VERSION < 50101
+#if defined(__GNUC__) && defined(GCC_VERSION) && GCC_VERSION < 50101
+#  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #endif
 
@@ -137,7 +138,7 @@ JPEGLSCodec::Decode(DataElement const & in, DataElement & out)
       os.write(reinterpret_cast<const char *>(&rgbyteOut[0]), rgbyteOut.size());
     }
     std::string str = os.str();
-    assert(str.size());
+    assert(!str.empty());
     const unsigned long long str_size = str.size();
     if (str_size >= 0xffffffff)
     {
@@ -686,3 +687,8 @@ JPEGLSCodec::CodeFrameIntoBuffer(char * outdata, size_t outlen, size_t & complen
 }
 
 } // end namespace mdcm
+
+#if defined(__GNUC__) && defined(GCC_VERSION) && GCC_VERSION < 50101
+#  pragma GCC diagnostic pop
+#endif
+

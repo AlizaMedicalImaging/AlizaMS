@@ -58,7 +58,7 @@ public:
     return new Self;
   }
   DataSetEvent(const Self & s)
-    : AnyEvent(s){};
+    : AnyEvent(s) {}
   DataSet const &
   GetDataSet() const
   {

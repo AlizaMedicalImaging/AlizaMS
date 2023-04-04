@@ -28,14 +28,14 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <errno.h>
+#include <cerrno>
 #include <sys/stat.h>
 #include <limits.h> // PATH_MAX
 
 #ifdef MDCM_HAVE_SYS_TIME_H
 #  include <sys/time.h>
 #endif
-#include <time.h>
+#include <ctime>
 #ifdef _WIN32
 #  include <windows.h>
 #endif
@@ -336,10 +336,10 @@ System::GetCurrentProcessFileName()
 static int
 getlastdigit(unsigned char * data, unsigned long size)
 {
-  int extended, carry = 0;
+  int carry = 0;
   for (unsigned int i = 0; i < size; ++i)
   {
-    extended = (carry << 8) + data[i];
+    const int extended = (carry << 8) + data[i];
     data[i] = static_cast<unsigned char>(extended / 10);
     carry = extended % 10;
   }
@@ -351,14 +351,13 @@ size_t
 System::EncodeBytes(char * out, const unsigned char * data, int size)
 {
   bool            zero = false;
-  int             res;
   std::string     sres;
   unsigned char   buffer[32];
   unsigned char * addr = buffer;
   memcpy(addr, data, size);
   while (!zero)
   {
-    res = getlastdigit(addr, size);
+    const int res = getlastdigit(addr, size);
     const char v = static_cast<char>('0' + res);
     sres.insert(sres.begin(), v);
     zero = true;

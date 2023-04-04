@@ -58,7 +58,7 @@ TransferSyntax::GetTSType(const char * cstr)
 {
   // trim trailing whitespace
   std::string            str = cstr;
-  std::string::size_type notspace = str.find_last_not_of(" ") + 1;
+  std::string::size_type notspace = str.find_last_not_of(' ') + 1;
   if (notspace != str.size())
   {
     mdcmDebugMacro("Header (TS) constains " << str.size() - notspace << " whitespace character(s)");

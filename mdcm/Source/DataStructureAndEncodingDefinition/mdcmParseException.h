@@ -38,7 +38,8 @@ public:
     : std::logic_error(arg)
   {}
   explicit ParseException(const char * arg)
-    : std::logic_error(arg){};
+    : std::logic_error(arg)
+  {}
   void
   SetLastElement(const DataElement & de)
   {

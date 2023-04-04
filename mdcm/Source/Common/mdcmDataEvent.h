@@ -35,7 +35,7 @@ public:
   DataEvent(const char * bytes = NULL, size_t len = 0)
     : Bytes(bytes), Length(len) {}
   DataEvent(const Self & s)
-    : AnyEvent(s), Bytes(NULL), Length(0) {};
+    : AnyEvent(s), Bytes(NULL), Length(0) {}
   ~DataEvent() override {}
   const char *
   GetEventName() const override
@@ -71,7 +71,6 @@ public:
 
 private:
   void operator=(const Self &);
-
   const char * Bytes;
   size_t       Length;
 };

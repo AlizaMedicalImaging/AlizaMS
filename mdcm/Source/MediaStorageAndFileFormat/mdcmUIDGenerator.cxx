@@ -125,13 +125,12 @@ UIDGenerator::Generate()
   Unique += "."; // separate root from suffix
   if (Unique.size() + len > 64)
   {
-    int            idx = 0;
-    bool           found = false;
-    std::bitset<8> x;
+    int  idx = 0;
+    bool found = false;
     while (!found && idx < 16)
     {
       // randbytesbuf is too long, try to truncate the high bits
-      x = uuid[idx];
+      std::bitset<8> x = uuid[idx];
       unsigned int i = 0;
       while ((Unique.size() + len > 64) && i < 8)
       {

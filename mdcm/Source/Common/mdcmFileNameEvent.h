@@ -42,7 +42,7 @@ public:
     : m_FileName(s)
   {}
   FileNameEvent(const Self & s)
-    : AnyEvent(s){};
+    : AnyEvent(s) {}
   ~FileNameEvent() {}
 
   const char *

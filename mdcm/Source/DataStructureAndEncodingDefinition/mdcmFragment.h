@@ -61,8 +61,6 @@ public:
   std::istream &
   ReadPreValue(std::istream & is)
   {
-    const Tag itemStart(0xfffe, 0xe000);
-    const Tag seqDelItem(0xfffe, 0xe0dd);
     TagField.Read<TSwap>(is);
     if (!is)
     {
@@ -73,6 +71,8 @@ public:
       throw std::logic_error("Problem #2");
     }
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
+    const Tag itemStart(0xfffe, 0xe000);
+    const Tag seqDelItem(0xfffe, 0xe0dd);
     if (TagField != itemStart && TagField != seqDelItem)
     {
       throw std::logic_error("Problem #3");
@@ -85,8 +85,6 @@ public:
   std::istream &
   ReadValue(std::istream & is)
   {
-    const Tag               itemStart(0xfffe, 0xe000);
-    const Tag               seqDelItem(0xfffe, 0xe0dd);
     SmartPointer<ByteValue> bv = new ByteValue;
     bv->SetLength(ValueLengthField);
     if (!bv->Read<TSwap>(is))

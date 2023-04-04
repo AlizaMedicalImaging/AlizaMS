@@ -152,9 +152,7 @@ template <class charT, class traits>
 std::streamsize
 basic_zip_streambuf<charT, traits>::flush(void)
 {
-  std::streamsize written_byte_size = 0, total_written_byte_size = 0;
-
-  size_t remainder = 0;
+  std::streamsize total_written_byte_size = 0;
 
   // Updating crc
   _crc = crc32(_crc, _zip_stream.next_in, _zip_stream.avail_in);
@@ -164,19 +162,18 @@ basic_zip_streambuf<charT, traits>::flush(void)
     _err = deflate(&_zip_stream, Z_FINISH);
     if (_err == Z_OK || _err == Z_STREAM_END)
     {
-      written_byte_size = static_cast<std::streamsize>(_output_buffer.size()) - _zip_stream.avail_out;
+      const std::streamsize written_byte_size = static_cast<std::streamsize>(_output_buffer.size()) - _zip_stream.avail_out;
       total_written_byte_size += written_byte_size;
       // Ouput buffer is full, dumping to ostream
       _ostream.write(reinterpret_cast<const char_type *>(&_output_buffer[0]),
                      static_cast<std::streamsize>(written_byte_size / sizeof(char_type) * sizeof(char)));
 
       // Checking if some bytes were not written.
-      if ((remainder = written_byte_size % sizeof(char_type)) != 0)
+      const size_t remainder = written_byte_size % sizeof(char_type) != 0;
+      if (remainder != 0)
       {
         // Copy to the beginning of the stream
         std::streamsize theDiff = written_byte_size - remainder;
-        // assert (theDiff > 0 && theDiff < std::numeric_limits<unsigned int>::max());
-
         memcpy(&(_output_buffer[0]), &(_output_buffer[static_cast<unsigned int>(theDiff)]), remainder);
       }
 
@@ -234,13 +231,12 @@ template <class charT, class traits>
 bool
 basic_zip_streambuf<charT, traits>::zip_to_stream(char_type * buffer, std::streamsize buffer_size)
 {
-  std::streamsize written_byte_size = 0, total_written_byte_size = 0;
+  std::streamsize total_written_byte_size = 0;
 
   _zip_stream.next_in = reinterpret_cast<byte_buffer_type>(buffer);
   _zip_stream.avail_in = static_cast<uInt>(buffer_size * sizeof(char_type));
   _zip_stream.avail_out = static_cast<uInt>(_output_buffer.size());
   _zip_stream.next_out = &_output_buffer[0];
-  size_t remainder = 0;
 
   // Updating crc
   _crc = crc32(_crc, _zip_stream.next_in, _zip_stream.avail_in);
@@ -251,7 +247,7 @@ basic_zip_streambuf<charT, traits>::zip_to_stream(char_type * buffer, std::strea
 
     if (_err == Z_OK || _err == Z_STREAM_END)
     {
-      written_byte_size = static_cast<std::streamsize>(_output_buffer.size()) - _zip_stream.avail_out;
+      const std::streamsize written_byte_size = static_cast<std::streamsize>(_output_buffer.size()) - _zip_stream.avail_out;
       total_written_byte_size += written_byte_size;
       // Ouput buffer is full, dumping to ostream
 
@@ -259,7 +255,8 @@ basic_zip_streambuf<charT, traits>::zip_to_stream(char_type * buffer, std::strea
                      static_cast<std::streamsize>(written_byte_size / sizeof(char_type)));
 
       // Checking if some bytes were not written.
-      if ((remainder = written_byte_size % sizeof(char_type)) != 0)
+      const size_t remainder = written_byte_size % sizeof(char_type);
+      if (remainder != 0)
       {
         // Copy to the beginning of the stream
         std::streamsize theDiff = written_byte_size - remainder;

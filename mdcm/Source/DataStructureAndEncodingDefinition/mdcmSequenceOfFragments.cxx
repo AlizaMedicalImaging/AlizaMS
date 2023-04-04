@@ -147,6 +147,7 @@ SequenceOfFragments::WriteBuffer(std::ostream & os) const
       assert(0);
     }
   }
+  (void)total;
   return true;
 }
 

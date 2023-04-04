@@ -872,7 +872,7 @@ JPEG2000Codec::Decode(DataElement const & in, DataElement & out)
         return false;
     }
     std::string str = os.str();
-    assert(str.size());
+    assert(!str.empty());
     const unsigned long long str_size = str.size();
     if (str_size >= 0xffffffff)
     {
@@ -1900,7 +1900,7 @@ JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size, Transfe
   bool reversible = false;
   int  mct = 0;
   bool lossless = false;
-  bool mctb;
+  bool mctb = false;
   bool b = false;
   if (parameters.decod_format == JP2_CFMT)
     b = parsejp2_imp(dummy_buffer, buf_size, &lossless, &mctb);

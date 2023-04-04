@@ -155,7 +155,7 @@ Bitmap::Clear()
 bool
 Bitmap::IsEmpty() const
 {
-  return (Dimensions.size() == 0);
+  return (Dimensions.empty());
 }
 
 const PhotometricInterpretation &
@@ -405,20 +405,26 @@ Bitmap::Print(std::ostream & os) const
   Object::Print(os);
   if (!IsEmpty())
   {
-    os << "NumberOfDimensions: " << NumberOfDimensions << "\n";
-    assert(Dimensions.size());
-    os << "Dimensions: (";
-    std::vector<unsigned int>::const_iterator it = Dimensions.cbegin();
-    os << *it;
-    for (; it != Dimensions.cend(); ++it)
+    os << "NumberOfDimensions: " << NumberOfDimensions << '\n';
+    if (!Dimensions.empty())
     {
-      os << "," << *it;
+      os << "Dimensions: (";
+      std::vector<unsigned int>::const_iterator it = Dimensions.cbegin();
+      os << *it;
+      for (; it != Dimensions.cend(); ++it)
+      {
+        os << ", " << *it;
+      }
+      os << ")\n";
     }
-    os << ")\n";
+    else
+    {
+      assert(0);
+    }
     PF.Print(os);
-    os << "PhotometricInterpretation: " << PI << "\n";
-    os << "PlanarConfiguration: " << PlanarConfiguration << "\n";
-    os << "TransferSyntax: " << TS << "\n";
+    os << "PhotometricInterpretation: " << PI << '\n';
+    os << "PlanarConfiguration: " << PlanarConfiguration << '\n';
+    os << "TransferSyntax: " << TS << '\n';
   }
 }
 
