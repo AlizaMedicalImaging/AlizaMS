@@ -190,7 +190,7 @@ Bitmap::GetBufferLength() const
   if (PF == PixelFormat::UNKNOWN)
   {
     mdcmAlwaysWarnMacro("Unknown Pixel Format");
-    return 0;
+    return 0ull;
   }
   {
     const size_t dims_size = Dimensions.size();
@@ -198,21 +198,20 @@ Bitmap::GetBufferLength() const
     {
       mdcmAlwaysWarnMacro("NumberOfDimensions is 2, but Z dimension is " << Dimensions[2]);
     }
-    else if (NumberOfDimensions == 3 && dims_size < 3) // probably unreachable
+    else if (NumberOfDimensions == 3 && dims_size < 3) // unreachable
     {
       mdcmAlwaysWarnMacro("NumberOfDimensions is 3, but Dimensions.size() is " << dims_size);
-      return 0;
+      return 0ull;
     }
   }
-  unsigned long long len = 0;
-  unsigned long long tmp0 = 1;
+  unsigned long long tmp0 = 1ull;
   if (PF == PixelFormat::SINGLEBIT)
   {
 #if 1
-    if (PF.GetSamplesPerPixel() != 1)
+    if (PF.GetSamplesPerPixel() != 1u)
     {
       mdcmAlwaysWarnMacro("SINGLEBIT and SamplesPerPixel " << PF.GetSamplesPerPixel());
-      return 0;
+      return 0ull;
     }
 #endif
     unsigned long long size_bits = static_cast<unsigned long long>(Dimensions[0]) * Dimensions[1];
@@ -223,32 +222,41 @@ Bitmap::GetBufferLength() const
         mdcmAlwaysWarnMacro(
           "Currently not supported: SINGLEBIT, encapsulated transfer syntax and "
           << Dimensions[0] << " x " << Dimensions[1]);
-        return 0;
+        return 0ull;
       }
     }
-    if (NumberOfDimensions > 2)
-      size_bits *= static_cast<unsigned long long>(Dimensions[2]);
+    if (NumberOfDimensions > 2u)
+    {
+      size_bits *= Dimensions[2];
+    }
     if (size_bits % 8 != 0)
-      tmp0 = size_bits / 8 + 1;
+    {
+      tmp0 = size_bits / 8ull + 1ull;
+    }
     else
-      tmp0 = size_bits / 8;
+    {
+      tmp0 = size_bits / 8ull;
+    }
   }
   else
   {
-    tmp0 *= static_cast<unsigned long long>(Dimensions[0]);
-    tmp0 *= static_cast<unsigned long long>(Dimensions[1]);
-    if (NumberOfDimensions > 2)
-      tmp0 *= static_cast<unsigned long long>(Dimensions[2]);
-    if (PF.GetBitsAllocated() % 8 != 0)
+    tmp0 *= Dimensions[0];
+    tmp0 *= Dimensions[1];
+    if (NumberOfDimensions > 2u)
     {
-      mdcmAlwaysWarnMacro("Bits Allocated " << PF.GetBitsAllocated() << " is invalid");
+      tmp0 *= Dimensions[2];
+    }
+    const unsigned short bits_allocated = PF.GetBitsAllocated();
+    if (bits_allocated % 8 != 0)
+    {
+      mdcmAlwaysWarnMacro("Bits Allocated " << bits_allocated << " is invalid");
       if (PF == PixelFormat::UINT12 || PF == PixelFormat::INT12)
       {
-        tmp0 *= PF.GetPixelSize();
+        tmp0 *= 2ull;
       }
       else
       {
-        return 0;
+        return 0ull;
       }
     }
     else
@@ -256,8 +264,7 @@ Bitmap::GetBufferLength() const
       tmp0 *= PF.GetPixelSize();
     }
   }
-  len = tmp0;
-  return len;
+  return tmp0;
 }
 
 bool
