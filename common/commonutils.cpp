@@ -1973,7 +1973,7 @@ QString CommonUtils::convert_orientation_flag(unsigned int in)
 {
 	switch (in)
 	{
-#if (ITK_VERSION_MAJOR >= 5 && ITK_VERSION_MINOR >= 3 && defined TMP_USE_53_SPATIAL_ENUMS)
+#if (((ITK_VERSION_MAJOR == 5 && ITK_VERSION_MINOR >= 3) || ITK_VERSION_MAJOR > 5) && defined TMP_USE_53_SPATIAL_ENUMS)
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RIP):
 		return QString("RIP");
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LIP):

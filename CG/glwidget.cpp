@@ -3434,7 +3434,7 @@ bool GLWidget::update_raycast_shader_vbo(
 	bool force_skip_cube = false;
 	switch (orientation)
 	{
-#if (ITK_VERSION_MAJOR >= 5 && ITK_VERSION_MINOR >= 3 && defined TMP_USE_53_SPATIAL_ENUMS)
+#if (((ITK_VERSION_MAJOR == 5 && ITK_VERSION_MINOR >= 3) || ITK_VERSION_MAJOR > 5) && defined TMP_USE_53_SPATIAL_ENUMS)
 	case static_cast<unsigned int>(itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RIP):
 		raycast_cube_RIP(x__, y__, z__, rcube0, both);
 		break;
