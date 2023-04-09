@@ -393,8 +393,10 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 							point[0] = hit.getX();
 							point[1] = hit.getY();
 							point[2] = hit.getZ();
-							image->TransformPhysicalPointToContinuousIndex(point,index);
+							const bool is_inside =
+								image->TransformPhysicalPointToContinuousIndex(point,index);
 							hits.push_back(btVector3(index[0], index[1], z));
+							(void)is_inside;
 						}
 					}
 				}
@@ -573,8 +575,10 @@ static void check_slice_collisions2(StudyViewWidget * w)
 										point[0] = hit.getX();
 										point[1] = hit.getY();
 										point[2] = hit.getZ();
-										image->TransformPhysicalPointToContinuousIndex(point,index);
+										const bool is_inside =
+											image->TransformPhysicalPointToContinuousIndex(point,index);
 										hits.push_back(btVector3(index[0], index[1], z));
+										(void)is_inside;
 									}
 								}
 							}
