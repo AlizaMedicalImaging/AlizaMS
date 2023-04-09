@@ -1,4 +1,5 @@
 //#define ALIZA_PRINT_COUNT_GL_OBJ
+//#define ALIZA_PERF_COLLISION
 
 #include "aliza.h"
 #include <QFileDialog>
@@ -32,6 +33,9 @@
 #include <itkMath.h>
 #ifndef WIN32
 #include <unistd.h>
+#endif
+#ifdef ALIZA_PERF_COLLISION
+#include <chrono>
 #endif
 
 static QMap<int, ImageVariant*> scene3dimages;
@@ -283,8 +287,8 @@ struct ClosestRayResultCallback1 : public btCollisionWorld::ClosestRayResultCall
 
 static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 {
-#if 0
-	const qint64 t0 = QDateTime::currentMSecsSinceEpoch();
+#ifdef ALIZA_PERF_COLLISION
+	auto t0 = std::chrono::steady_clock::now();
 #endif
 	if (!w) return;
 	if (w->get_axis() != 2) return;
@@ -385,18 +389,21 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 						const btVector3 hit = rayResult.m_hitPointWorld;
 						ImageTypeUC::Pointer image = ImageTypeUC::New();
 						const bool image_ok =
-							ContourUtils::phys_space_from_slice(v,z,image);
+							ContourUtils::phys_space_from_slice(v, z, image);
 						if (image_ok)
 						{
-							itk::ContinuousIndex<float, 3> index;
 							ImageTypeUC::PointType point;
 							point[0] = hit.getX();
 							point[1] = hit.getY();
 							point[2] = hit.getZ();
-							const bool is_inside =
-								image->TransformPhysicalPointToContinuousIndex(point,index);
+#if ((ITK_VERSION_MAJOR == 5 && ITK_VERSION_MINOR >= 4) || ITK_VERSION_MAJOR > 5)
+							const auto index =
+								image->template TransformPhysicalPointToContinuousIndex<float>(point);
+#else
+							itk::ContinuousIndex<float, 3> index;
+							image->TransformPhysicalPointToContinuousIndex(point, index);
+#endif
 							hits.push_back(btVector3(index[0], index[1], z));
-							(void)is_inside;
 						}
 					}
 				}
@@ -444,17 +451,17 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 			tmp_shapes[j] = NULL;
 		}
 	}
-#if 0
-	const long long t1 = QDateTime::currentMSecsSinceEpoch();
-	const long long ts = t1 - t0;
-	std::cout << "ts=" << ts << " t0=" << t0 << " t1=" << t1 << std::endl;
+#ifdef ALIZA_PERF_COLLISION
+	auto t1 = std::chrono::steady_clock::now();
+	auto ts = std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0);
+	std::cout << "ts=" << ts.count() << std::endl;
 #endif
 }
 
 static void check_slice_collisions2(StudyViewWidget * w)
 {
-#if 0
-	const qint64 t0 = QDateTime::currentMSecsSinceEpoch();
+#ifdef ALIZA_PERF_COLLISION
+	auto t0 = std::chrono::steady_clock::now();
 #endif
 	if (!w) return;
 	if (!g_collisionWorld) return;
@@ -567,18 +574,21 @@ static void check_slice_collisions2(StudyViewWidget * w)
 									const btVector3 hit = rayResult.m_hitPointWorld;
 									ImageTypeUC::Pointer image = ImageTypeUC::New();
 									const bool image_ok =
-										ContourUtils::phys_space_from_slice(v,z,image);
+										ContourUtils::phys_space_from_slice(v, z, image);
 									if (image_ok)
 									{
-										itk::ContinuousIndex<float, 3> index;
 										ImageTypeUC::PointType point;
 										point[0] = hit.getX();
 										point[1] = hit.getY();
 										point[2] = hit.getZ();
-										const bool is_inside =
-											image->TransformPhysicalPointToContinuousIndex(point,index);
+#if ((ITK_VERSION_MAJOR == 5 && ITK_VERSION_MINOR >= 4) || ITK_VERSION_MAJOR > 5)
+										const auto index =
+											image->template TransformPhysicalPointToContinuousIndex<float>(point);
+#else
+										itk::ContinuousIndex<float, 3> index;
+										image->TransformPhysicalPointToContinuousIndex(point, index);
+#endif
 										hits.push_back(btVector3(index[0], index[1], z));
-										(void)is_inside;
 									}
 								}
 							}
@@ -629,10 +639,10 @@ static void check_slice_collisions2(StudyViewWidget * w)
 			}
 		}
 	}
-#if 0
-	const long long t1 = QDateTime::currentMSecsSinceEpoch();
-	const long long ts = t1 - t0;
-	std::cout << "ts=" << ts << " t0=" << t0 << " t1=" << t1 << std::endl;
+#ifdef ALIZA_PERF_COLLISION
+	auto t1 = std::chrono::steady_clock::now();
+	auto ts = std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0);
+	std::cout << "ts=" << ts.count() << std::endl;
 #endif
 }
 
