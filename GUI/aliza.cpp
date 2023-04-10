@@ -76,7 +76,8 @@ static void search_frame_of_ref(
 		if (v &&
 			(v->id != id) &&
 			(v->frame_of_ref_uid == frame_uid) &&
-			(v->study_uid == study_uid))
+			(v->study_uid == study_uid) &&
+			(v->image_type < 100))
 		{
 			l.push_back(v);
 		}
@@ -96,7 +97,8 @@ static void search_frame_of_ref2(
 		if (v &&
 			(v->id != id) &&
 			(v->frame_of_ref_uid == frame_uid) &&
-			(v->study_uid == study_uid))
+			(v->study_uid == study_uid) &&
+			(v->image_type < 100))
 		{
 			l.push_back(v);
 		}
@@ -121,15 +123,17 @@ static void g_close_physics()
 		for (int x = g_collisionWorld->getNumCollisionObjects() - 1; x >= 0; --x)
 		{
 			btCollisionObject * o = g_collisionWorld->getCollisionObjectArray()[x];
-			if (!o) continue;
-			if (o->getUserPointer())
+			if (o)
 			{
-				int * p = static_cast<int*>(o->getUserPointer());
-				delete [] p;
+				if (o->getUserPointer())
+				{
+					int * p = static_cast<int*>(o->getUserPointer());
+					delete [] p;
+				}
+				g_collisionWorld->removeCollisionObject(o);
+				delete o;
+				o = NULL;
 			}
-			g_collisionWorld->removeCollisionObject(o);
-			delete o;
-			o = NULL;
 		}
 	}
 	for (int x = 0; x < g_collision_shapes.size(); ++x)
