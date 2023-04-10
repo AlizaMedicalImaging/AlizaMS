@@ -298,7 +298,7 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 #endif
 	const int z = v->di->selected_z_slice;
 	const int slices_size = v->di->image_slices.size();
-	if (v->di->idimz != v->di->image_slices.size()) return;
+	if (v->di->idimz != slices_size) return;
 	if (z >= slices_size) return;
 	QList<const ImageVariant*> refs;
 	if (selected_images.size() > 1)
