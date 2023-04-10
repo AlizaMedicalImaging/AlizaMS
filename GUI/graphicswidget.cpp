@@ -32,10 +32,7 @@
 #include "contourutils.h"
 #include "aliza.h"
 #include "updateqtcommand.h"
-#include <limits>
-#ifndef WIN32
-#include <unistd.h>
-#endif
+#include <climits>
 
 //#define A_TMP_BENCHMARK
 #ifdef A_TMP_BENCHMARK
@@ -48,7 +45,7 @@ namespace
 #ifdef A_TMP_BENCHMARK
 inline auto now() noexcept
 {
-	return std::chrono::high_resolution_clock::now();
+	return std::chrono::steady_clock::now();
 }
 #endif
 

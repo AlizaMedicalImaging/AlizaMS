@@ -12,10 +12,7 @@
 #include "graphicsutils.h"
 #include "commonutils.h"
 #include "updateqtcommand.h"
-#include <limits>
-#ifndef WIN32
-#include <unistd.h>
-#endif
+#include <climits>
 
 namespace
 {

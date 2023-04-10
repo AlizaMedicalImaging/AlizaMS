@@ -12,6 +12,7 @@
 #include <QColorDialog>
 #include <QDateTime>
 #include <string>
+#include <array>
 #include "iconutils.h"
 #include "commonutils.h"
 #include "contourutils.h"
@@ -31,9 +32,6 @@
 #include <mdcmParseException.h>
 #include "vectormath/scalar/vectormath.h"
 #include <itkMath.h>
-#ifndef WIN32
-#include <unistd.h>
-#endif
 #ifdef ALIZA_PERF_COLLISION
 #include <chrono>
 #endif
@@ -43,6 +41,7 @@ static QList<ImageVariant*> selected_images;
 static QList<ImageVariant*> animation_images;
 static QList<double> anim3d_times;
 
+// These flags are used only for diagnostig build sometimes
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 //#pragma GCC diagnostic ignored "-Wuseless-cast"
@@ -455,7 +454,7 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 #ifdef ALIZA_PERF_COLLISION
 	auto t1 = std::chrono::steady_clock::now();
 	auto ts = std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0);
-	std::cout << "ts=" << ts.count() << std::endl;
+	std::cout << ts.count() << " ns" << std::endl;
 #endif
 }
 
@@ -640,7 +639,7 @@ static void check_slice_collisions2(StudyViewWidget * w)
 #ifdef ALIZA_PERF_COLLISION
 	auto t1 = std::chrono::steady_clock::now();
 	auto ts = std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0);
-	std::cout << "ts=" << ts.count() << std::endl;
+	std::cout << ts.count() << " ns" << std::endl;
 #endif
 }
 

@@ -7,9 +7,6 @@
 #include <QThread>
 #include <vector>
 #include "iconutils.h"
-#ifndef _WIN32
-#include <unistd.h>
-#endif
 
 class ProcessImageThread_ : public QThread
 {
@@ -244,8 +241,14 @@ template<typename Tin, typename Tout> void extract_icon(
 	if (!ivariant->orientation_string.isEmpty() && ivariant->orientation_string.size() >= 3)
 	{
 		if (ivariant->orientation_string.at(1) == QChar('I') ||
-			ivariant->orientation_string.at(1) == QChar('P')) flip_y = true;
-		if (ivariant->orientation_string.at(0) == QChar('L')) flip_x = true;
+			ivariant->orientation_string.at(1) == QChar('P'))
+		{
+			flip_y = true;
+		}
+		if (ivariant->orientation_string.at(0) == QChar('L'))
+		{
+			flip_x = true;
+		}
 	}
 	if (flip_x && flip_y) tmpi = tmpi.mirrored(true, true);
 	else if (flip_y)      tmpi = tmpi.mirrored(false, true);
@@ -346,8 +349,14 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 	if (!ivariant->orientation_string.isEmpty() && ivariant->orientation_string.size() >= 3)
 	{
 		if (ivariant->orientation_string.at(1) == QChar('I') ||
-			ivariant->orientation_string.at(1) == QChar('P')) flip_y = true;
-		if (ivariant->orientation_string.at(0) == QChar('L')) flip_x = true;
+			ivariant->orientation_string.at(1) == QChar('P'))
+		{
+			flip_y = true;
+		}
+		if (ivariant->orientation_string.at(0) == QChar('L'))
+		{
+			flip_x = true;
+		}
 	}
 	//
 	if (ivariant->image_type == 11)
@@ -591,8 +600,14 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 	if (!ivariant->orientation_string.isEmpty() && ivariant->orientation_string.size() >= 3)
 	{
 		if (ivariant->orientation_string.at(1) == QChar('I') ||
-			ivariant->orientation_string.at(1) == QChar('P')) flip_y = true;
-		if (ivariant->orientation_string.at(0) == QChar('L')) flip_x = true;
+			ivariant->orientation_string.at(1) == QChar('P'))
+		{
+			flip_y = true;
+		}
+		if (ivariant->orientation_string.at(0) == QChar('L'))
+		{
+			flip_x = true;
+		}
 	}
 	//
 	if (ivariant->image_type == 21)
@@ -996,9 +1011,9 @@ IconUtils::~IconUtils() {}
 void IconUtils::update_icon(ImageVariant * v, const int isize)
 {
 	if (v->icon.isNull()) return;
-	const int R = round(v->di->R * 255.0f);
-	const int G = round(v->di->G * 255.0f);
-	const int B = round(v->di->B * 255.0f);
+	const int R = static_cast<int>(v->di->R * 255.0f);
+	const int G = static_cast<int>(v->di->G * 255.0f);
+	const int B = static_cast<int>(v->di->B * 255.0f);
 	const unsigned int s__ = isize / 16;
 	const float p__ = static_cast<float>(isize - s__);
 	QPixmap quad_(s__, s__);

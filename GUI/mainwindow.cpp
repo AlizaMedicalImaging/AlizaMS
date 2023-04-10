@@ -14,9 +14,6 @@
 #include <QDesktopWidget>
 #endif
 #include <QDateTime>
-#ifndef WIN32
-#include <unistd.h>
-#endif
 #include "commonutils.h"
 
 #define DISABLE_LEFT_TOOLBAR__
