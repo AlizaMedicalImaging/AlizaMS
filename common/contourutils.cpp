@@ -283,6 +283,8 @@ void ContourUtils::calculate_uvt_nonuniform(
 	ImageVariant * ivariant)
 {
 	if (!ivariant) return;
+	const int slices_size = ivariant->di->image_slices.size();
+	if (ivariant->di->idimz != slices_size) return;
 	for (int x = 0; x < ivariant->di->rois.size(); ++x)
 	{
 		QMap< int, Contour* >::iterator it =
@@ -297,7 +299,7 @@ void ContourUtils::calculate_uvt_nonuniform(
 				++z)
 			{
 				bool in_slice = false;
-				if (ivariant->di->image_slices.size() > z)
+				if (static_cast<int>(z) < slices_size)
 				{
 					const float px = ivariant->di->image_slices.at(z)->v[0];
 					const float py = ivariant->di->image_slices.at(z)->v[1];
@@ -339,27 +341,29 @@ void ContourUtils::calculate_uvt_nonuniform(
 			if (slices.size() == 1)
 			{
 				const int idx = slices.at(0);
-				for (int k = 0; k < c->dpoints.size(); ++k)
+				if (idx < slices_size)
 				{
-					ImageTypeUC::Pointer image = ImageTypeUC::New();
-					const bool image_ok =
-						phys_space_from_slice(
-							ivariant,idx,image);
-					if (image_ok)
+					for (int k = 0; k < c->dpoints.size(); ++k)
 					{
-						itk::ContinuousIndex<float, 3> index;
-						ImageTypeUC::PointType point;
-						point[0] = c->dpoints.at(k).x;
-						point[1] = c->dpoints.at(k).y;
-						point[2] = c->dpoints.at(k).z;
-						const bool ok = image->
-							TransformPhysicalPointToContinuousIndex(
-								point,index);
-						if (ok)
+						ImageTypeUC::Pointer image = ImageTypeUC::New();
+						const bool image_ok =
+							phys_space_from_slice(ivariant, idx, image);
+						if (image_ok)
 						{
-							c->dpoints[k].u = index[0];
-							c->dpoints[k].v = index[1];
-							c->dpoints[k].t = idx;
+							itk::ContinuousIndex<float, 3> index;
+							itk::Point<float, 3> point;
+							point[0] = c->dpoints.at(k).x;
+							point[1] = c->dpoints.at(k).y;
+							point[2] = c->dpoints.at(k).z;
+							const bool ok =
+								image->TransformPhysicalPointToContinuousIndex(
+									point, index);
+							if (ok)
+							{
+								c->dpoints[k].u = index[0];
+								c->dpoints[k].v = index[1];
+								c->dpoints[k].t = idx;
+							}
 						}
 					}
 				}
@@ -772,21 +776,23 @@ bool ContourUtils::phys_space_from_slice(
 	unsigned int x,
 	ImageTypeUC::Pointer & image)
 {
+#if 0
+	// Should be checked before!
 	if (!ivariant) return false;
-	if (ivariant->di->idimz !=
-			static_cast<int>(ivariant->di->image_slices.size()))
+	const unsigned int slices_size = ivariant->di->image_slices.size();
+	if (ivariant->di->idimz != slices_size)
 	{
 		std::cout << "dimz != slices size" << std::endl;
 		return false;
 	}
-	if (x >= ivariant->di->image_slices.size())
+	if (x >= slices_size)
 	{
 		std::cout << "index out of range" << std::endl;
 		return false;
 	}
+#endif
 #if 0
-	if (ivariant->di->image_slices
-			.at(x)->slice_orientation_string.isEmpty())
+	if (ivariant->di->image_slices.at(x)->slice_orientation_string.isEmpty())
 	{
 		std::cout
 			<< "slice orientation string is empty"
@@ -848,8 +854,11 @@ bool ContourUtils::phys_space_from_slice(
 		image->SetOrigin(origin);
 		image->SetSpacing(spacing);
 		image->SetDirection(direction);
+#if 0
+		image->Allocate(true);
+#else
 		image->Allocate();
-		image->FillBuffer(static_cast<ImageTypeUC::PixelType>(0));
+#endif
 	}
 	catch (const itk::ExceptionObject & ex)
 	{

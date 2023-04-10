@@ -375,13 +375,14 @@ QString contour_from_path_nonuniform(
 		const GraphicsPathItem * item)
 {
 	if (!ivariant) return QString("image is NULL");
-	if (ivariant->di->idimz != static_cast<int>(ivariant->di->image_slices.size()))
+	const int slices_size = ivariant->di->image_slices.size();
+	if (ivariant->di->idimz != slices_size)
 	{
 		return QString("Failed");
 	}
 	if (!roi)  return QString("ROI is NULL");
 	if (!item) return QString("item is NULL");
-	if (item->get_axis() !=2 )
+	if (item->get_axis() != 2 )
 		return QString("Only original slices are supported");
 	if (item->get_roi_id() >= 0 && item->get_roi_id() == roi->id)
 	{
@@ -391,9 +392,14 @@ QString contour_from_path_nonuniform(
 			QString(" is already in ROI ") +
 			QVariant(item->get_roi_id()).toString();
 	}
+	const int item_slice = item->get_slice();
+	if (item_slice >= slices_size)
+	{
+		return QString("Internal error: slice out of range");
+	}
 	ImageTypeUC::Pointer image = ImageTypeUC::New();
 	const bool ok = ContourUtils::phys_space_from_slice(
-		ivariant, item->get_slice(), image);
+		ivariant, item_slice, image);
 	if (!ok) return QString("Could not extract slice");
 	const QPainterPath & p = item->path();
 	QVector<int> tmp0;
@@ -428,10 +434,10 @@ QString contour_from_path_nonuniform(
 	for (int x = 0; x < p.elementCount(); ++x)
 	{
 		itk::ContinuousIndex<float, 3> idx;
-		idx[0]=p.elementAt(x).x;
-		idx[1]=p.elementAt(x).y;
-		idx[2]=0;
-		itk::Point<float,3> j;
+		idx[0] = p.elementAt(x).x;
+		idx[1] = p.elementAt(x).y;
+		idx[2] = 0;
+		itk::Point<float, 3> j;
 		image->TransformContinuousIndexToPhysicalPoint(idx, j);
 		DPoint point;
 		point.x = j[0];

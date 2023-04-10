@@ -1,5 +1,5 @@
 //#define ALIZA_PRINT_COUNT_GL_OBJ
-//#define ALIZA_PERF_COLLISION
+#define ALIZA_PERF_COLLISION
 
 #include "aliza.h"
 #include <QFileDialog>
@@ -300,17 +300,17 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 	if (v->frame_of_ref_uid.isEmpty()) return;
 #endif
 	const int z = v->di->selected_z_slice;
-	if (static_cast<int>(v->di->image_slices.size()) <= z) return;
+	const int slices_size = v->di->image_slices.size();
+	if (v->di->idimz != v->di->image_slices.size()) return;
+	if (z >= slices_size) return;
 	QList<const ImageVariant*> refs;
 	if (selected_images.size() > 1)
 	{
-		search_frame_of_ref2(
-			v->id, v->frame_of_ref_uid, v->study_uid, refs);
+		search_frame_of_ref2(v->id, v->frame_of_ref_uid, v->study_uid, refs);
 	}
 	else
 	{
-		search_frame_of_ref(
-			v->id, v->frame_of_ref_uid, v->study_uid, refs);
+		search_frame_of_ref(v->id, v->frame_of_ref_uid, v->study_uid, refs);
 	}
 	if (refs.empty()) return;
 	btAlignedObjectArray<btStaticPlaneShape*> tmp_shapes;
@@ -323,10 +323,15 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 		2,
 		tmp_shapes,
 		tmp_objects);
+#if 1
+	// TODO check, maybe computeOverlappingPairs() is enough
+	// or nothing?
+	g_collisionWorld->performDiscreteCollisionDetection();
+#endif
 	for (int u = 0; u < refs.size(); ++u)
 	{
 		const int z1 = refs.at(u)->di->selected_z_slice;
-		if (static_cast<int>(refs.at(u)->di->image_slices.size()) <= z1)
+		if (z1 >= static_cast<int>(refs.at(u)->di->image_slices.size()))
 		{
 			continue;
 		}
@@ -334,8 +339,7 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 		{
 			continue;
 		}
-		g_collisionWorld->performDiscreteCollisionDetection();
-		btAlignedObjectArray<btVector3> hits;
+		std::vector< std::array<float, 2> > hits;
 		for (int q = 0; q < 4; ++q)
 		{
 			int k0 = 0, k1 = 1, k2 = 2, k3 = 3, k4 = 4, k5 = 5;
@@ -376,7 +380,7 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 				refs.at(u)->di->image_slices.at(z1)->fv[k3],
 				refs.at(u)->di->image_slices.at(z1)->fv[k4],
 				refs.at(u)->di->image_slices.at(z1)->fv[k5]);
-			ClosestRayResultCallback1 rayResult(from,to);
+			ClosestRayResultCallback1 rayResult(from, to);
 			g_collisionWorld->rayTest(from, to, rayResult);
 			if (rayResult.hasHit())
 			{
@@ -392,7 +396,7 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 							ContourUtils::phys_space_from_slice(v, z, image);
 						if (image_ok)
 						{
-							ImageTypeUC::PointType point;
+							itk::Point<float, 3> point;
 							point[0] = hit.getX();
 							point[1] = hit.getY();
 							point[2] = hit.getZ();
@@ -403,7 +407,7 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 							itk::ContinuousIndex<float, 3> index;
 							image->TransformPhysicalPointToContinuousIndex(point, index);
 #endif
-							hits.push_back(btVector3(index[0], index[1], z));
+							hits.push_back({ { index[0], index[1] } });
 						}
 					}
 				}
@@ -411,16 +415,16 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 		}
 		if (hits.size() == 2)
 		{
-			const int R = round(refs.at(u)->di->R * 255.0f);
-			const int G = round(refs.at(u)->di->G * 255.0f);
-			const int B = round(refs.at(u)->di->B * 255.0f);
+			const int R = static_cast<int>(refs.at(u)->di->R * 255.0f);
+			const int G = static_cast<int>(refs.at(u)->di->G * 255.0f);
+			const int B = static_cast<int>(refs.at(u)->di->B * 255.0f);
 			QPen pen;
 			pen.setBrush(QBrush(QColor(R, G, B, 255)));
 			pen.setStyle(Qt::SolidLine);
 			pen.setWidth(0);
 			QPainterPath pp;
-			pp.moveTo(hits.at(0).getX(),hits.at(0).getY());
-			pp.lineTo(hits.at(1).getX(),hits.at(1).getY());
+			pp.moveTo(hits.at(0).at(0), hits.at(0).at(1));
+			pp.lineTo(hits.at(1).at(0), hits.at(1).at(1));
 			QGraphicsPathItem * g = new QGraphicsPathItem();
 			g->setPen(pen);
 			g->setPath(pp);
@@ -465,14 +469,15 @@ static void check_slice_collisions2(StudyViewWidget * w)
 #endif
 	if (!w) return;
 	if (!g_collisionWorld) return;
-	for (int x = 0; x < w->widgets.size(); ++x)
+	const int widgets_size = w->widgets.size();
+	for (int x = 0; x < widgets_size; ++x)
 	{
 		if (w->widgets.at(x) && w->widgets.at(x)->graphicswidget)
 		{
 			w->widgets[x]->graphicswidget->graphicsview->clear_collision_paths();
 		}
 	}
-	for (int x = 0; x < w->widgets.size(); ++x)
+	for (int x = 0; x < widgets_size; ++x)
 	{
 		if (w->widgets.at(x) && w->widgets.at(x)->graphicswidget)
 		{
@@ -480,13 +485,13 @@ static void check_slice_collisions2(StudyViewWidget * w)
 			{
 				const ImageVariant * v =
 					w->widgets.at(x)->graphicswidget->image_container.image3D;
+				if (!v) continue;
 				if (v->frame_of_ref_uid.isEmpty()) continue;
+				const int slices_size = v->di->image_slices.size();
+				if (v->di->idimz != slices_size) continue;
 				const int z =
 					w->widgets.at(x)->graphicswidget->image_container.selected_z_slice_ext;
-				if (static_cast<int>(v->di->image_slices.size()) <= z)
-				{
-					continue;
-				}
+				if (z >= slices_size) continue;
 				btAlignedObjectArray<btStaticPlaneShape*> tmp_shapes;
 				btAlignedObjectArray<btCollisionObject*> tmp_objects;
 				tmp_shapes.resize(0);
@@ -497,12 +502,13 @@ static void check_slice_collisions2(StudyViewWidget * w)
 					2,
 					tmp_shapes,
 					tmp_objects);
-				for (int u = 0; u < w->widgets.size(); ++u)
+#if 1
+				// TODO check
+				g_collisionWorld->performDiscreteCollisionDetection();
+#endif
+				for (int u = 0; u < widgets_size; ++u)
 				{
-					if (!(w->widgets.at(u) && w->widgets.at(u)->graphicswidget))
-					{
-						continue;
-					}
+					if (!(w->widgets.at(u) && w->widgets.at(u)->graphicswidget)) continue;
 					const ImageVariant * v1 = w->widgets.at(u)->graphicswidget->image_container.image3D;
 					if (!v1) continue;
 					if (v->id == v1->id) continue;
@@ -511,16 +517,11 @@ static void check_slice_collisions2(StudyViewWidget * w)
 						continue;
 					}
 					const int z1 = w->widgets.at(u)->graphicswidget->image_container.selected_z_slice_ext;
-					if (static_cast<int>(v1->di->image_slices.size()) <= z1)
-					{
-						continue;
-					}
-					if (check_slices_parallel(v, z, v1, z1))
-					{
-						continue;
-					}
-					g_collisionWorld->performDiscreteCollisionDetection();
-					btAlignedObjectArray<btVector3> hits;
+					const int v1_slices_size = v1->di->image_slices.size();
+					if ( v1->di->idimz != v1_slices_size) continue;
+					if (z1 >= v1_slices_size) continue;
+					if (check_slices_parallel(v, z, v1, z1)) continue;
+					std::vector< std::array<float, 2> > hits;
 					for (int q = 0; q < 4; ++q)
 					{
 						int k0 = 0, k1 = 1, k2 = 2, k3 = 3, k4 = 4, k5 = 5;
@@ -561,7 +562,7 @@ static void check_slice_collisions2(StudyViewWidget * w)
 							v1->di->image_slices.at(z1)->fv[k3],
 							v1->di->image_slices.at(z1)->fv[k4],
 							v1->di->image_slices.at(z1)->fv[k5]);
-						ClosestRayResultCallback1 rayResult(from,to);
+						ClosestRayResultCallback1 rayResult(from, to);
 						g_collisionWorld->rayTest(from, to, rayResult);
 						if (rayResult.hasHit())
 						{
@@ -577,7 +578,7 @@ static void check_slice_collisions2(StudyViewWidget * w)
 										ContourUtils::phys_space_from_slice(v, z, image);
 									if (image_ok)
 									{
-										ImageTypeUC::PointType point;
+										itk::Point<float, 3> point;
 										point[0] = hit.getX();
 										point[1] = hit.getY();
 										point[2] = hit.getZ();
@@ -588,7 +589,7 @@ static void check_slice_collisions2(StudyViewWidget * w)
 										itk::ContinuousIndex<float, 3> index;
 										image->TransformPhysicalPointToContinuousIndex(point, index);
 #endif
-										hits.push_back(btVector3(index[0], index[1], z));
+										hits.push_back({ { index[0], index[1] } });
 									}
 								}
 							}
@@ -596,16 +597,16 @@ static void check_slice_collisions2(StudyViewWidget * w)
 					}
 					if (hits.size() == 2)
 					{
-						const int R = round(v1->di->R * 255.0f);
-						const int G = round(v1->di->G * 255.0f);
-						const int B = round(v1->di->B * 255.0f);
+						const int R = static_cast<int>(v1->di->R * 255.0f);
+						const int G = static_cast<int>(v1->di->G * 255.0f);
+						const int B = static_cast<int>(v1->di->B * 255.0f);
 						QPen pen;
 						pen.setBrush(QBrush(QColor(R, G, B, 255)));
 						pen.setStyle(Qt::SolidLine);
 						pen.setWidth(0);
 						QPainterPath pp;
-						pp.moveTo(hits.at(0).getX(),hits.at(0).getY());
-						pp.lineTo(hits.at(1).getX(),hits.at(1).getY());
+						pp.moveTo(hits.at(0).at(0), hits.at(0).at(1));
+						pp.lineTo(hits.at(1).at(0), hits.at(1).at(1));
 						QGraphicsPathItem * g = new QGraphicsPathItem();
 						g->setPen(pen);
 						g->setPath(pp);
