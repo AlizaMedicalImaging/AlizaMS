@@ -188,8 +188,6 @@ static bool check_slices_parallel(
 	const ImageVariant * v1,
 	const int z1)
 {
-	if (static_cast<int>(v0->di->image_slices.size()) <= z0) return false;
-	if (static_cast<int>(v1->di->image_slices.size()) <= z1) return false;
 	const float px0 = v0->di->image_slices.at(z0)->v[0];
 	const float py0 = v0->di->image_slices.at(z0)->v[1];
 	const float pz0 = v0->di->image_slices.at(z0)->v[2];
@@ -215,7 +213,7 @@ static bool check_slices_parallel(
 		v1->di->image_slices.at(z1)->v[7] - py1,
 		v1->di->image_slices.at(z1)->v[8] - pz1);
 	const Vectormath::Scalar::Vector3 n1 =
-		Vectormath::Scalar::normalize(Vectormath::Scalar::cross(v1v1,v1v2));
+		Vectormath::Scalar::normalize(Vectormath::Scalar::cross(v1v1, v1v2));
 	if ((
 		(itk::Math::FloatAlmostEqual(n0.getX(), n1.getX())) &&
 		(itk::Math::FloatAlmostEqual(n0.getY(), n1.getY())) &&
