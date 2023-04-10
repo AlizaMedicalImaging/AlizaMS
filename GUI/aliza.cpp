@@ -1,5 +1,5 @@
 //#define ALIZA_PRINT_COUNT_GL_OBJ
-#define ALIZA_PERF_COLLISION
+//#define ALIZA_PERF_COLLISION
 
 #include "aliza.h"
 #include <QFileDialog>
@@ -238,7 +238,6 @@ static void add_slice_collision_plane(
 	btAlignedObjectArray<btStaticPlaneShape*> & tmp_shapes,
 	btAlignedObjectArray<btCollisionObject*> & tmp_objects)
 {
-	if (static_cast<int>(v->di->image_slices.size()) <= z) return;
 	btTransform t;
 	t.setIdentity();
 	const float px = v->di->image_slices.at(z)->v[0];
