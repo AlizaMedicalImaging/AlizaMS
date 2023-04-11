@@ -372,11 +372,11 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 			default:
 				break;
 			}
-			const btVector3 from = btVector3(
+			const btVector3 from(
 				refs.at(u)->di->image_slices.at(z1)->fv[k0],
 				refs.at(u)->di->image_slices.at(z1)->fv[k1],
 				refs.at(u)->di->image_slices.at(z1)->fv[k2]);
-			const btVector3 to = btVector3(
+			const btVector3 to(
 				refs.at(u)->di->image_slices.at(z1)->fv[k3],
 				refs.at(u)->di->image_slices.at(z1)->fv[k4],
 				refs.at(u)->di->image_slices.at(z1)->fv[k5]);
@@ -392,15 +392,14 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 					{
 						const btVector3 hit = rayResult.m_hitPointWorld;
 						ImageTypeUC::Pointer image = ImageTypeUC::New();
-						const bool image_ok =
-							ContourUtils::phys_space_from_slice(v, z, image);
+						const bool image_ok = ContourUtils::phys_space_from_slice(v, z, image);
 						if (image_ok)
 						{
 							itk::Point<float, 3> point;
 							point[0] = hit.getX();
 							point[1] = hit.getY();
 							point[2] = hit.getZ();
-#if ((ITK_VERSION_MAJOR == 5 && ITK_VERSION_MINOR >= 4) || ITK_VERSION_MAJOR > 5)
+#if ITK_VERSION_MAJOR >= 5
 							const auto index =
 								image->template TransformPhysicalPointToContinuousIndex<float>(point);
 #else
@@ -554,11 +553,11 @@ static void check_slice_collisions2(StudyViewWidget * w)
 						default:
 							break;
 						}
-						const btVector3 from = btVector3(
+						const btVector3 from(
 							v1->di->image_slices.at(z1)->fv[k0],
 							v1->di->image_slices.at(z1)->fv[k1],
 							v1->di->image_slices.at(z1)->fv[k2]);
-						const btVector3 to = btVector3(
+						const btVector3 to(
 							v1->di->image_slices.at(z1)->fv[k3],
 							v1->di->image_slices.at(z1)->fv[k4],
 							v1->di->image_slices.at(z1)->fv[k5]);
@@ -574,15 +573,14 @@ static void check_slice_collisions2(StudyViewWidget * w)
 								{
 									const btVector3 hit = rayResult.m_hitPointWorld;
 									ImageTypeUC::Pointer image = ImageTypeUC::New();
-									const bool image_ok =
-										ContourUtils::phys_space_from_slice(v, z, image);
+									const bool image_ok = ContourUtils::phys_space_from_slice(v, z, image);
 									if (image_ok)
 									{
 										itk::Point<float, 3> point;
 										point[0] = hit.getX();
 										point[1] = hit.getY();
 										point[2] = hit.getZ();
-#if ((ITK_VERSION_MAJOR == 5 && ITK_VERSION_MINOR >= 4) || ITK_VERSION_MAJOR > 5)
+#if ITK_VERSION_MAJOR >= 5
 										const auto index =
 											image->template TransformPhysicalPointToContinuousIndex<float>(point);
 #else
