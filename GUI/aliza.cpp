@@ -518,7 +518,7 @@ static void check_slice_collisions2(StudyViewWidget * w)
 					}
 					const int z1 = w->widgets.at(u)->graphicswidget->image_container.selected_z_slice_ext;
 					const int v1_slices_size = v1->di->image_slices.size();
-					if ( v1->di->idimz != v1_slices_size) continue;
+					if (v1->di->idimz != v1_slices_size) continue;
 					if (z1 >= v1_slices_size) continue;
 					if (check_slices_parallel(v, z, v1, z1)) continue;
 					std::vector< std::array<float, 2> > hits;
@@ -554,11 +554,11 @@ static void check_slice_collisions2(StudyViewWidget * w)
 						default:
 							break;
 						}
-						btVector3 from = btVector3(
+						const btVector3 from = btVector3(
 							v1->di->image_slices.at(z1)->fv[k0],
 							v1->di->image_slices.at(z1)->fv[k1],
 							v1->di->image_slices.at(z1)->fv[k2]);
-						btVector3 to = btVector3(
+						const btVector3 to = btVector3(
 							v1->di->image_slices.at(z1)->fv[k3],
 							v1->di->image_slices.at(z1)->fv[k4],
 							v1->di->image_slices.at(z1)->fv[k5]);
