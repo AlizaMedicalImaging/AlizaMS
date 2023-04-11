@@ -372,11 +372,11 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 			default:
 				break;
 			}
-			btVector3 from = btVector3(
+			const btVector3 from = btVector3(
 				refs.at(u)->di->image_slices.at(z1)->fv[k0],
 				refs.at(u)->di->image_slices.at(z1)->fv[k1],
 				refs.at(u)->di->image_slices.at(z1)->fv[k2]);
-			btVector3 to = btVector3(
+			const btVector3 to = btVector3(
 				refs.at(u)->di->image_slices.at(z1)->fv[k3],
 				refs.at(u)->di->image_slices.at(z1)->fv[k4],
 				refs.at(u)->di->image_slices.at(z1)->fv[k5]);
