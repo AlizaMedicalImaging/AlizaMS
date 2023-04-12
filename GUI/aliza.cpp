@@ -136,30 +136,34 @@ static void g_close_physics()
 			}
 		}
 	}
-	for (int x = 0; x < g_collision_shapes.size(); ++x)
+	const int g_collision_shapes_size = g_collision_shapes.size();
+	if (g_collision_shapes_size > 0)
 	{
-		btCollisionShape * s = g_collision_shapes[x];
-		if (s)
+		for (int x = 0; x < g_collision_shapes_size; ++x)
 		{
-			if (s->getShapeType() == COMPOUND_SHAPE_PROXYTYPE)
+			btCollisionShape * s = g_collision_shapes[x];
+			if (s)
 			{
-				btCompoundShape * c = static_cast<btCompoundShape*>(s);
-				for (int z = 0; z < c->getNumChildShapes(); ++z)
+				if (s->getShapeType() == COMPOUND_SHAPE_PROXYTYPE)
 				{
-					btCollisionShape * ch = c->getChildShape(z);
-					if (ch)
+					btCompoundShape * c = static_cast<btCompoundShape*>(s);
+					for (int z = 0; z < c->getNumChildShapes(); ++z)
 					{
-						c->removeChildShape(ch);
-						delete ch;
-						ch = NULL;
+						btCollisionShape * ch = c->getChildShape(z);
+						if (ch)
+						{
+							c->removeChildShape(ch);
+							delete ch;
+							ch = NULL;
+						}
 					}
 				}
+				delete s;
+				s = NULL;
 			}
-			delete s;
-			s = NULL;
 		}
+		g_collision_shapes.clear();
 	}
-	g_collision_shapes.clear();
 	if (g_collisionWorld)
 	{
 		delete g_collisionWorld;
