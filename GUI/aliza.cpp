@@ -194,11 +194,11 @@ static bool check_slices_parallel(
 	const float px0 = v0->di->image_slices.at(z0)->v[0];
 	const float py0 = v0->di->image_slices.at(z0)->v[1];
 	const float pz0 = v0->di->image_slices.at(z0)->v[2];
-	const Vectormath::Scalar::Vector3 v0v1 = Vectormath::Scalar::Vector3(
+	const Vectormath::Scalar::Vector3 v0v1(
 		v0->di->image_slices.at(z0)->v[3] - px0,
 		v0->di->image_slices.at(z0)->v[4] - py0,
 		v0->di->image_slices.at(z0)->v[5] - pz0);
-	const Vectormath::Scalar::Vector3 v0v2 = Vectormath::Scalar::Vector3(
+	const Vectormath::Scalar::Vector3 v0v2(
 		v0->di->image_slices.at(z0)->v[6] - px0,
 		v0->di->image_slices.at(z0)->v[7] - py0,
 		v0->di->image_slices.at(z0)->v[8] - pz0);
@@ -207,11 +207,11 @@ static bool check_slices_parallel(
 	const float px1 = v1->di->image_slices.at(z1)->v[0];
 	const float py1 = v1->di->image_slices.at(z1)->v[1];
 	const float pz1 = v1->di->image_slices.at(z1)->v[2];
-	const Vectormath::Scalar::Vector3 v1v1 = Vectormath::Scalar::Vector3(
+	const Vectormath::Scalar::Vector3 v1v1(
 		v1->di->image_slices.at(z1)->v[3] - px1,
 		v1->di->image_slices.at(z1)->v[4] - py1,
 		v1->di->image_slices.at(z1)->v[5] - pz1);
-	const Vectormath::Scalar::Vector3 v1v2 = Vectormath::Scalar::Vector3(
+	const Vectormath::Scalar::Vector3 v1v2(
 		v1->di->image_slices.at(z1)->v[6] - px1,
 		v1->di->image_slices.at(z1)->v[7] - py1,
 		v1->di->image_slices.at(z1)->v[8] - pz1);
@@ -244,11 +244,11 @@ static void add_slice_collision_plane(
 	const float px = v->di->image_slices.at(z)->v[0];
 	const float py = v->di->image_slices.at(z)->v[1];
 	const float pz = v->di->image_slices.at(z)->v[2];
-	const Vectormath::Scalar::Vector3 v1 = Vectormath::Scalar::Vector3(
+	const Vectormath::Scalar::Vector3 v1(
 		v->di->image_slices.at(z)->v[3] - px,
 		v->di->image_slices.at(z)->v[4] - py,
 		v->di->image_slices.at(z)->v[5] - pz);
-	const Vectormath::Scalar::Vector3 v2 = Vectormath::Scalar::Vector3(
+	const Vectormath::Scalar::Vector3 v2(
 		v->di->image_slices.at(z)->v[6] - px,
 		v->di->image_slices.at(z)->v[7] - py,
 		v->di->image_slices.at(z)->v[8] - pz);
