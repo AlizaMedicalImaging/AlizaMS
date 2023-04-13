@@ -43,6 +43,7 @@ private:
 
 private slots:
 	void set_default();
+	void set_force_cp1251(bool);
 
 public slots:
 	void update_font_pt(double);

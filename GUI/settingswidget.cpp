@@ -21,6 +21,7 @@
 #include <QFileInfo>
 #include "commonutils.h"
 #include "dicomutils.h"
+#include "codecutils.h"
 
 SettingsWidget::SettingsWidget(float si)
 {
@@ -42,6 +43,7 @@ SettingsWidget::SettingsWidget(float si)
 	styleComboBox->setCurrentIndex(saved_idx);
 	connect(reload_pushButton,SIGNAL(clicked()),this,SLOT(set_default()));
 	connect(pt_doubleSpinBox,SIGNAL(valueChanged(double)),this,SLOT(update_font_pt(double)));
+	connect(cp1251_checkBox,SIGNAL(toggled(bool)),this,SLOT(set_force_cp1251(bool)));
 }
 
 SettingsWidget::~SettingsWidget()
@@ -165,6 +167,16 @@ void SettingsWidget::set_default()
 		pt_doubleSpinBox,SIGNAL(valueChanged(double)),
 		this,SLOT(update_font_pt(double)));
 	pt_doubleSpinBox->setValue(0.0);
+	//
+	cp1251_checkBox->blockSignals(true);
+	cp1251_checkBox->setChecked(false);
+	set_force_cp1251(false);
+	cp1251_checkBox->blockSignals(false);
+}
+
+void SettingsWidget::set_force_cp1251(bool b)
+{
+	CodecUtils::set_force_cp1251(b);
 }
 
 int SettingsWidget::get_time_unit() const
@@ -239,6 +251,7 @@ void SettingsWidget::readSettings()
 	const int tmp11 = settings.value(QString("apply_icc"),       1).toInt();
 	const int tmp12 = settings.value(QString("clean_unused"),    1).toInt();
 	const int tmp13 = settings.value(QString("hide_zoom"),       1).toInt();
+	const int tmp14 = settings.value(QString("force_cp1241"),    0).toInt();
 	settings.endGroup();
 	settings.beginGroup(QString("StyleDialog"));
 	saved_idx = settings.value(QString("saved_idx"), 0).toInt();
@@ -300,6 +313,12 @@ void SettingsWidget::readSettings()
 	}
 	icc_checkBox->setChecked((tmp11 == 1));
 	clean_unused_checkBox->setChecked((tmp12 == 1));
+	//
+	const bool force_cp1241 = (tmp14 == 1);
+	cp1251_checkBox->blockSignals(true);
+	cp1251_checkBox->setChecked(force_cp1241);
+	CodecUtils::set_force_cp1251(force_cp1241);
+	cp1251_checkBox->blockSignals(false);
 }
 
 void SettingsWidget::writeSettings(QSettings & s)
@@ -319,6 +338,7 @@ void SettingsWidget::writeSettings(QSettings & s)
 	s.setValue(QString("dcm_mosaic"),    QVariant(mosaic_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("apply_icc"),     QVariant(icc_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("clean_unused"),  QVariant(clean_unused_checkBox->isChecked() ? 1 : 0));
+	s.setValue(QString("force_cp1241"),  QVariant(cp1251_checkBox->isChecked() ? 1 : 0));
 	if (enh_dim_skip_radioButton->isChecked())
 	{
 		s.setValue(QString("enh_strategy"), QVariant(4));

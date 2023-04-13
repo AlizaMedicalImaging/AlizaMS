@@ -65,7 +65,7 @@ private:
 	QAction * copyAct;
 	QAction * collapseAct;
 	QAction * expandAct;
-	bool skip_settings_pos;
+	bool in_tabwidget;
 	QStringList list_of_files;
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
 	mutable QMutex mutex;

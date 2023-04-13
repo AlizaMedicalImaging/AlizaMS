@@ -44,6 +44,8 @@
 #include <QMessageBox>
 #include <QAction>
 #include <QAbstractItemModel>
+#include <QSettings>
+#include <QApplication>
 #include "codecutils.h"
 #include "dicomutils.h"
 #include "commonutils.h"
@@ -185,7 +187,7 @@ QString print_length(size_t l)
 
 }
 
-SQtree::SQtree(bool t) : skip_settings_pos(t)
+SQtree::SQtree(bool t) : in_tabwidget(t)
 {
 	setupUi(this);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -204,6 +206,20 @@ SQtree::SQtree(bool t) : skip_settings_pos(t)
 	treeWidget->setColumnWidth(1, 300);
 	treeWidget->setColumnWidth(2,  60);
 	treeWidget->setRootIsDecorated(true);
+	if (!in_tabwidget)
+	{
+		QSettings settings(
+			QSettings::IniFormat,
+			QSettings::UserScope,
+			QApplication::organizationName(),
+			QApplication::applicationName());
+		settings.setFallbacksEnabled(true);
+		settings.beginGroup(QString("GlobalSettings"));
+		const int tmp1 = settings.value(QString("force_cp1241"), 0).toInt();
+		settings.endGroup();
+		const bool tmp2 = (tmp1 == 1);
+		CodecUtils::set_force_cp1251(tmp2);
+	}
 	connect(copyAct,         SIGNAL(triggered()),      this,SLOT(copy_to_clipboard()));
 	connect(collapseAct,     SIGNAL(triggered()),      this,SLOT(collapse_item()));
 	connect(expandAct,       SIGNAL(triggered()),      this,SLOT(expand_item()));

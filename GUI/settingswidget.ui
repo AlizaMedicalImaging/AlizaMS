@@ -44,7 +44,7 @@
             <x>0</x>
             <y>0</y>
             <width>973</width>
-            <height>596</height>
+            <height>622</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_14">
@@ -133,6 +133,22 @@
              </property>
              <property name="checked">
               <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="cp1251_checkBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;There are many cyrillic data sets with undefined &lt;span style=&quot; font-style:italic;&quot;&gt;Specific Character Set &lt;/span&gt;(0x0008,0x0005) attribute, but using &lt;span style=&quot; font-weight:600;&quot;&gt;WINDOWS-1251&lt;/span&gt; encoding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Force WINDOWS-1251 if Specific Character Set is not defined</string>
              </property>
             </widget>
            </item>
@@ -545,8 +561,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>989</width>
-            <height>587</height>
+            <width>295</width>
+            <height>125</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -1094,6 +1110,7 @@
   <tabstop>mosaic_checkBox</tabstop>
   <tabstop>icc_checkBox</tabstop>
   <tabstop>clean_unused_checkBox</tabstop>
+  <tabstop>cp1251_checkBox</tabstop>
   <tabstop>srchapters_checkBox</tabstop>
   <tabstop>srinfo_checkBox</tabstop>
   <tabstop>srscale_checkBox</tabstop>
