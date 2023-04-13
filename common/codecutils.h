@@ -39,7 +39,11 @@ public:
 #if 0
   static QString toUTF8dcmtk(const char* ba, const char* charset, bool* ok = NULL);
 #endif
+  static void set_force_cp1251(bool);
+  static bool get_force_cp1251();
+
+private:
+  static bool force_cp1251;
 };
 
 #endif
-

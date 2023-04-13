@@ -29,6 +29,8 @@
 #include <iostream>
 #endif
 
+bool CodecUtils::force_cp1251 = false;
+
 /* Qt
  *
  * Convert using Qt utilities. Code extension techniques for e.g.
@@ -47,8 +49,20 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
   QString cs = QString::fromLatin1(charset);
   if (cs.isEmpty())
   {
-    if (ok) *ok = true;
-    return QString::fromLatin1(ba->constData());
+    if (force_cp1251)
+    {
+      QTextCodec * codec = QTextCodec::codecForName("windows-1251");
+      if (codec)
+      {
+        if (ok) *ok = true;
+        return codec->toUnicode(*ba);
+      }
+    }
+    else
+    {
+      if (ok) *ok = true;
+      return QString::fromLatin1(ba->constData());
+    }
   }
   if (ok) *ok = false;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
@@ -653,4 +667,14 @@ QString CodecUtils::toUTF8dcmtk(const char* ba, const char* charset, bool * ok)
   return res;
 }
 #endif
+
+void CodecUtils::set_force_cp1251(bool b)
+{
+  force_cp1251 = b;
+}
+
+bool CodecUtils::get_force_cp1251()
+{
+  return force_cp1251;
+}
 
