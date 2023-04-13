@@ -215,7 +215,7 @@ SQtree::SQtree(bool t) : in_tabwidget(t)
 			QApplication::applicationName());
 		settings.setFallbacksEnabled(true);
 		settings.beginGroup(QString("GlobalSettings"));
-		const int tmp1 = settings.value(QString("force_cp1241"), 0).toInt();
+		const int tmp1 = settings.value(QString("force_cp1251"), 0).toInt();
 		settings.endGroup();
 		const bool tmp2 = (tmp1 == 1);
 		CodecUtils::set_force_cp1251(tmp2);
