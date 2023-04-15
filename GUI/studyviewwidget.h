@@ -37,6 +37,8 @@ public:
 	void block_signals(bool);
 	void update_null();
 	void update_scouts();
+	bool get_anchored_sliders() const;
+	void update_all_sliders(int, int, int);
 	void set_single(const unsigned long long);
 	void restore_multi(const unsigned long long);
 	void writeSettings(QSettings&);
@@ -62,6 +64,7 @@ private slots:
 	void toggle_scouts(bool);
 	void toggle_measure(bool);
 	void check_close();
+	void toggle_lock_frames(bool);
 
 signals:
 	void update_scouts_required();
@@ -82,6 +85,7 @@ private:
 	QToolButton * fitall_toolButton;
 	QToolButton * scouts_toolButton;
 	QToolButton * measure_toolButton;
+	QToolButton * lock_frames_toolButton;
 	LUTWidget * lutwidget;
 	QIcon lockon;
 	QIcon lockoff;

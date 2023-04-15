@@ -1,5 +1,6 @@
 #include "studygraphicswidget.h"
 #include "studyviewwidget.h"
+#include "studyframewidget.h"
 #include <QtGlobal>
 #include <QVBoxLayout>
 #include <QImage>
@@ -2039,7 +2040,21 @@ void StudyGraphicsWidget::set_enable_overlays(bool t)
 	enable_overlays = t;
 }
 
+void StudyGraphicsWidget::set_slider_only(int x)
+{
+	if (!slider) return; // TODO not required
+	slider->blockSignals(true);
+	slider->setSliderPosition(x);
+	slider->blockSignals(false);
+}
+
 void StudyGraphicsWidget::set_selected_slice(int x)
+{
+	if (!studyview || !slider) return; // TODO not required
+	set_selected_slice2(x, studyview->get_anchored_sliders());
+}
+
+void StudyGraphicsWidget::set_selected_slice2(int x, bool update_all)
 {
 	if (graphicsview->image_item)
 	{
@@ -2063,9 +2078,11 @@ void StudyGraphicsWidget::set_selected_slice(int x)
 	set_left_string(QString(""));
 	set_measure_text(QString(""));
 	image_container.orientation_20_20 = QString("");
-	image_container.selected_z_slice_ext = x;
 	//
 	if (!image_container.image3D) return;
+	if (x >= image_container.image3D->di->idimz) return;
+	image_container.selected_z_slice_ext = x;
+	//
 	QString error_;
 	//
 	mutex.lock();
@@ -2276,7 +2293,17 @@ void StudyGraphicsWidget::set_selected_slice(int x)
 		{
 			studyview->update_level(&image_container);
 		}
-		studyview->update_scouts();
+		if (update_all)
+		{
+			studyview->update_all_sliders(
+				x,
+				image_container.image3D->id,
+				image_container.image3D->di->idimz);
+		}
+		else
+		{
+			studyview->update_scouts();
+		}
 	}
 quit__:
 	mutex.unlock();

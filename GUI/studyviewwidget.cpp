@@ -9,6 +9,7 @@
 #include <QGridLayout>
 #include <QVariant>
 #include <QKeySequence>
+#include <cmath>
 #if MATRIX_BUTTON_CUSTOM_ACT == 1
 #include "tabledialog.h"
 #endif
@@ -50,6 +51,12 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 	measure_toolButton->setIconSize(s1);
 	measure_toolButton->setIcon(QIcon(QString(":/bitmaps/distance.svg")));
 	measure_toolButton->setToolTip(QString("Measurement"));
+	lock_frames_toolButton = new QToolButton(this);
+	lock_frames_toolButton->setCheckable(true);
+	lock_frames_toolButton->setChecked(false);
+	lock_frames_toolButton->setIconSize(s1);
+	lock_frames_toolButton->setIcon(QIcon(QString(":/bitmaps/anchor.svg")));
+	lock_frames_toolButton->setToolTip(QString("Anchor sliders for side-by-side view"));
 	QWidget * spacer1 = new QWidget(this);
 	spacer1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	QHBoxLayout * l1 = new QHBoxLayout(toolbar_frame);
@@ -59,6 +66,7 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 	l1->addWidget(fitall_toolButton);
 	l1->addWidget(scouts_toolButton);
 	l1->addWidget(measure_toolButton);
+	l1->addWidget(lock_frames_toolButton);
 	l1->addWidget(spacer1);
 	lutwidget  = new LUTWidget(si);
 	lutwidget->add_items1();
@@ -94,6 +102,9 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 	connect(
 		measure_toolButton, SIGNAL(toggled(bool)),
 		this, SLOT(toggle_measure(bool)));
+	connect(
+		lock_frames_toolButton, SIGNAL(toggled(bool)),
+		this, SLOT(toggle_lock_frames(bool)));
 #if MATRIX_BUTTON_CUSTOM_ACT == 1
 	connect(
 		mbutton->p_action, SIGNAL(triggered()),
@@ -906,6 +917,10 @@ void StudyViewWidget::check_close() // FIXME
 	}
 }
 
+void StudyViewWidget::toggle_lock_frames(bool)
+{
+}
+
 void StudyViewWidget::update_locked_window(bool t)
 {
 	lock_pushButton->setChecked(t);
@@ -997,6 +1012,36 @@ void StudyViewWidget::update_scouts()
 	{
 		emit update_scouts_required();
 	}
+}
+
+bool StudyViewWidget::get_anchored_sliders() const
+{
+	return lock_frames_toolButton->isChecked();
+}
+
+void StudyViewWidget::update_all_sliders(int x, int id, int dimz)
+{
+	for (int k = 0; k < widgets.size(); ++k)
+	{
+		if (widgets.at(k) && widgets.at(k)->graphicswidget)
+		{
+			if (widgets.at(k)->graphicswidget->image_container.image3D &&
+				widgets.at(k)->graphicswidget->image_container.image3D->id != id)
+			{
+				const int z = widgets.at(k)->graphicswidget->image_container.image3D->di->idimz;
+				int j = x;
+				if (z != dimz)
+				{
+					j = static_cast<int>(round((static_cast<double>(x) * (z - 1)) / static_cast<double>(dimz - 1)));
+				}
+				if (j < 0) j = 0;
+				if (j >= z) j = z - 1;
+				widgets[k]->graphicswidget->set_slider_only(j);
+				widgets[k]->graphicswidget->set_selected_slice2(j, false);
+			}
+		}
+	}
+	update_scouts();
 }
 
 void StudyViewWidget::set_single(const unsigned long long widget_id)
@@ -1138,4 +1183,5 @@ void StudyViewWidget::writeSettings(QSettings & settings)
 	}
 	settings.endGroup();
 }
+
 

@@ -70,8 +70,10 @@ public:
 	void  update_measurement(double, double, double, double);
 	std::vector<QThread*> threadsLUT_;
 	unsigned long long widget_id;
+	void set_slider_only(int);
+	void set_selected_slice2(int, bool);
 
-private slots:
+public slots:
 	void set_selected_slice(int);
 	void toggle_single(bool);
 
