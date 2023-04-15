@@ -73,7 +73,7 @@ public:
 	void set_slider_only(int);
 	void set_selected_slice2(int, bool);
 
-public slots:
+private slots:
 	void set_selected_slice(int);
 	void toggle_single(bool);
 
