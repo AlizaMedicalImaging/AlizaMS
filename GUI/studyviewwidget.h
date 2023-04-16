@@ -64,7 +64,6 @@ private slots:
 	void toggle_scouts(bool);
 	void toggle_measure(bool);
 	void check_close();
-	void toggle_lock_frames(bool);
 
 signals:
 	void update_scouts_required();
@@ -85,7 +84,7 @@ private:
 	QToolButton * fitall_toolButton;
 	QToolButton * scouts_toolButton;
 	QToolButton * measure_toolButton;
-	QToolButton * lock_frames_toolButton;
+	QToolButton * anchor_toolButton;
 	LUTWidget * lutwidget;
 	QIcon lockon;
 	QIcon lockoff;
