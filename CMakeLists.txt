@@ -14,7 +14,7 @@ cmake_minimum_required(VERSION 3.11.0)
 
 # https://cmake.org/cmake/help/v3.0/policy/CMP0003.html
 # Libraries linked via full path no longer produce linker search paths
-CMAKE_POLICY(SET CMP0003 NEW)
+cmake_policy(SET CMP0003 NEW)
 
 # https://cmake.org/cmake/help/v3.0/policy/CMP0022.html
 # Link
@@ -208,6 +208,11 @@ endif()
 
 if(ALIZA_CXX_STANDARD STREQUAL "Not set")
 else()
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+  if(UNIX AND NOT APPLE)
+    # To set GCC e.g. -std=c++11 instead of -std=gnu++11,
+    set(CMAKE_CXX_EXTENSIONS OFF)
+  endif()
   if(ALIZA_CXX_STANDARD STREQUAL "11")
     set(CMAKE_CXX_STANDARD 11)
     message(STATUS "Tried to set C++11")
@@ -221,14 +226,6 @@ else()
     set(CMAKE_CXX_STANDARD 20)
     message(STATUS "Tried to set C++20")
   endif()
-  if(UNIX AND NOT APPLE)
-    #
-    # To set GCC e.g. -std=c++11 instead of -std=gnu++11,
-    # not 100% sure about that option.
-    #
-    set(CMAKE_CXX_EXTENSIONS OFF)
-  endif()
-  set(CMAKE_CXX_STANDARD_REQUIRED ON)
 endif()
 
 if(UNIX AND NOT APPLE)
