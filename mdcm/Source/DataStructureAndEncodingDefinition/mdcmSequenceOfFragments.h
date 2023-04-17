@@ -154,7 +154,6 @@ public:
   ReadValue(std::istream & is, bool /*readvalues*/)
   {
     const Tag seqDelItem(0xfffe, 0xe0dd);
-    // not used
     Fragment frag;
     try
     {
@@ -167,38 +166,37 @@ public:
     catch (const std::exception & ex)
     {
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
-      // In all cases the whole file was read, because
+      // MM: In all cases the whole file was read, because
       // Fragment::Read only fail on eof() reached 1.
       // SIEMENS-JPEG-CorruptFrag.dcm is more difficult to deal with, we have a
       // partial fragment, we decide to add it anyway to the stack of
-      // fragments (eof was reached so we need to clear error bit)
+      // fragments (eof was reached so we need to clear error bit).
       if (frag.GetTag() == Tag(0xfffe, 0xe000))
       {
-        mdcmWarningMacro("Pixel Data Fragment could be corrupted. Use file at own risk");
+        mdcmAlwaysWarnMacro("PixelData fragment could be corrupted, use the file at your own risk");
         Fragments.push_back(frag);
         is.clear();
       }
-      // 2. GENESIS_SIGNA-JPEG-CorruptFrag.dcm
+      // GENESIS_SIGNA-JPEG-CorruptFrag.dcm
       else if (frag.GetTag() == Tag(0xddff, 0x00e0))
       {
         assert(Fragments.size() == 1);
         const ByteValue * bv = Fragments[0].GetByteValue();
         assert(static_cast<unsigned char>(bv->GetPointer()[bv->GetLength() - 1]) == 0xfe);
-        // Yes this is an extra copy, this is a bug anyway
+        // MM: Yes this is an extra copy, this is a bug anyway.
         Fragments[0].SetByteValue(bv->GetPointer(), bv->GetLength() - 1);
-        mdcmWarningMacro("JPEG Fragment length was declared with an extra byte"
-                         " at the end: stripped !");
-        is.clear(); // clear the error bit
+        mdcmAlwaysWarnMacro("Fragment length was declared with an extra byte at the end, stripped");
+        is.clear();
       }
-      // 3. LEICA/WSI
+      // LEICA/WSI
       else if ((frag.GetTag().GetGroup() == 0x00ff) && ((frag.GetTag().GetElement() & 0x00ff) == 0xe0))
       {
-        // Looks like there is a mess with offset and odd byte array
+        // MM: Looks like there is a mess with offset and odd byte array
         // We are going first to backtrack one byte back, and then use a
         // ReadBacktrack function which in turn may backtrack up to 10 bytes
         // backward. This appears to be working on a set of DICOM/WSI files from
-        // LEICA
-        mdcmWarningMacro("Trying to fix the even-but-odd value length bug #1");
+        // LEICA.
+        mdcmAlwaysWarnMacro("Fragment: odd value length, fixed (1)");
         assert(Fragments.size());
         const size_t      lastf = Fragments.size() - 1;
         const ByteValue * bv = Fragments[lastf].GetByteValue();
@@ -210,20 +208,20 @@ public:
         assert(is.good());
         while (frag.ReadBacktrack<TSwap>(is) && frag.GetTag() != seqDelItem)
         {
-          mdcmDebugMacro("Frag: " << frag);
+          mdcmDebugMacro("Fragment: " << frag);
           Fragments.push_back(frag);
         }
         assert(frag.GetTag() == seqDelItem && frag.GetVL() == 0);
       }
-      // 4. LEICA/WSI (bis)
+      // LEICA/WSI (bis)
       else if (frag.GetTag().GetGroup() == 0xe000)
       {
-        // Looks like there is a mess with offset and odd byte array
+        // MM: Looks like there is a mess with offset and odd byte array
         // We are going first to backtrack one byte back, and then use a
         // ReadBacktrack function which in turn may backtrack up to 10 bytes
         // backward. This appears to be working on a set of DICOM/WSI files from
-        // LEICA
-        mdcmWarningMacro("Trying to fix the even-but-odd value length bug #2");
+        // LEICA.
+        mdcmAlwaysWarnMacro("Fragment: odd value length, fixed (2)");
         assert(Fragments.size());
         const size_t      lastf = Fragments.size() - 1;
         const ByteValue * bv = Fragments[lastf].GetByteValue();
@@ -235,20 +233,21 @@ public:
         assert(is.good());
         while (frag.ReadBacktrack<TSwap>(is) && frag.GetTag() != seqDelItem)
         {
-          mdcmDebugMacro("Frag: " << frag);
+          mdcmDebugMacro("Fragment: " << frag);
           Fragments.push_back(frag);
         }
         assert(frag.GetTag() == seqDelItem && frag.GetVL() == 0);
       }
-      // 5. LEICA/WSI (ter)
-      else if ((frag.GetTag().GetGroup() & 0x00ff) == 0x00e0 && (frag.GetTag().GetElement() & 0xff00) == 0x0000)
+      // LEICA/WSI (ter)
+      else if ((frag.GetTag().GetGroup() & 0x00ff) == 0x00e0 &&
+               (frag.GetTag().GetElement() & 0xff00) == 0x0000)
       {
-        // Looks like there is a mess with offset and odd byte array
+        // MM: Looks like there is a mess with offset and odd byte array
         // We are going first to backtrack one byte back, and then use a
         // ReadBacktrack function which in turn may backtrack up to 10 bytes
         // backward. This appears to be working on a set of DICOM/WSI files from
-        // LEICA
-        mdcmWarningMacro("Trying to fix the even-but-odd value length bug #3");
+        // LEICA.
+        mdcmAlwaysWarnMacro("Fragment: odd value length, fixed (3)");
         assert(Fragments.size());
         const size_t      lastf = Fragments.size() - 1;
         const ByteValue * bv = Fragments[lastf].GetByteValue();
@@ -260,18 +259,17 @@ public:
         assert(is.good());
         while (frag.ReadBacktrack<TSwap>(is) && frag.GetTag() != seqDelItem)
         {
-          mdcmDebugMacro("Frag: " << frag);
+          mdcmDebugMacro("Fragment: " << frag);
           Fragments.push_back(frag);
         }
         assert(frag.GetTag() == seqDelItem && frag.GetVL() == 0);
       }
       else
       {
-        // 3. mdcm-JPEG-LossLess3a.dcm: easy case, an extra tag was found
+        // MM: mdcm-JPEG-LossLess3a.dcm: easy case, an extra tag was found
         // instead of terminator (eof is the next char)
-        mdcmAlwaysWarnMacro("Reading failed at Tag:" << frag.GetTag() << " Index #" << Fragments.size() << " Offset "
-                                                     << is.tellg() << ". Use file at own risk.\n"
-                                                     << ex.what());
+        mdcmAlwaysWarnMacro("Failed at " << frag.GetTag() << " Index #" << Fragments.size()
+                            << " Offset " << is.tellg() << '\n' << ex.what());
       }
 #endif /* MDCM_SUPPORT_BROKEN_IMPLEMENTATION */
     }
