@@ -1177,4 +1177,3 @@ void StudyViewWidget::writeSettings(QSettings & settings)
 	settings.endGroup();
 }
 
-

@@ -71,17 +71,13 @@ GraphicsView::GraphicsView(GraphicsWidget * p)
 	setDragMode(QGraphicsView::ScrollHandDrag);
 	//
 	handle_rect = new RectItem(0, 0, 100, 100);
-	topHandle = new HandleItem(
-		this, handle_rect, HandleItem::TopHandle);
+	topHandle = new HandleItem(this, handle_rect, HandleItem::TopHandle);
 	topHandle->setParentItem(handle_rect);
-	rightHandle = new HandleItem(
-		this, handle_rect, HandleItem::RightHandle);
+	rightHandle = new HandleItem(this, handle_rect, HandleItem::RightHandle);
 	rightHandle->setParentItem(handle_rect);
-	leftHandle = new HandleItem(
-		this, handle_rect, HandleItem::LeftHandle);
+	leftHandle = new HandleItem(this, handle_rect, HandleItem::LeftHandle);
 	leftHandle->setParentItem(handle_rect);
-	bottomHandle = new HandleItem(
-		this, handle_rect, HandleItem::BottomHandle);
+	bottomHandle = new HandleItem(this, handle_rect, HandleItem::BottomHandle);
 	bottomHandle->setParentItem(handle_rect);
 	handle_rect->setZValue(1e+19 - 5);
 	handle_rect->hide();
@@ -178,11 +174,14 @@ void GraphicsView::keyPressEvent(QKeyEvent * e)
 {
 	switch (e->key())
 	{
-	case Qt::Key_Plus: zoom_in();
+	case Qt::Key_Plus:
+		zoom_in();
 		break;
-	case Qt::Key_Equal: zoom_in();
+	case Qt::Key_Equal:
+		zoom_in();
 		break;
-	case Qt::Key_Minus: zoom_out();
+	case Qt::Key_Minus:
+		zoom_out();
 		break;
 	case Qt::Key_0:
 		{
@@ -197,9 +196,11 @@ void GraphicsView::keyPressEvent(QKeyEvent * e)
 			update_selection_rect_width();
 		}
 		break;
-	case Qt::Key_X: flipX();
+	case Qt::Key_X:
+		flipX();
 		break;
-	case Qt::Key_Y: flipY();
+	case Qt::Key_Y:
+		flipY();
 		break;
 	case Qt::Key_F:
 		{
@@ -291,8 +292,7 @@ void GraphicsView::clear_paths()
 	{
 		if (paths.at(i))
 		{
-			scene()->removeItem(
-				static_cast<QGraphicsItem*>(paths[i]));
+			scene()->removeItem(static_cast<QGraphicsItem*>(paths[i]));
 			delete paths[i];
 			paths[i] = NULL;
 		}
@@ -307,8 +307,7 @@ void GraphicsView::clear_collision_paths()
 	{
 		if (collision_paths.at(i))
 		{
-			scene()->removeItem(
-				static_cast<QGraphicsItem*>(collision_paths[i]));
+			scene()->removeItem(static_cast<QGraphicsItem*>(collision_paths[i]));
 			delete collision_paths[i];
 			collision_paths[i] = NULL;
 		}
@@ -323,8 +322,7 @@ void GraphicsView::clear_us_regions()
 	{
 		if (us_regions.at(i))
 		{
-			scene()->removeItem(
-				static_cast<QGraphicsItem*>(us_regions[i]));
+			scene()->removeItem(static_cast<QGraphicsItem*>(us_regions[i]));
 			delete us_regions[i];
 			us_regions[i] = NULL;
 		}
@@ -340,8 +338,7 @@ void GraphicsView::clear_prtexts_items()
 		{
 			if (prtexts.at(i))
 			{
-				scene()->removeItem(
-					static_cast<QGraphicsItem*>(prtexts[i]));
+				scene()->removeItem(static_cast<QGraphicsItem*>(prtexts[i]));
 				delete prtexts[i];
 				prtexts[i] = NULL;
 			}
@@ -354,8 +351,7 @@ void GraphicsView::clear_prtexts_items()
 		{
 			if (prtextanchors.at(i))
 			{
-				scene()->removeItem(
-					static_cast<QGraphicsItem*>(prtextanchors[i]));
+				scene()->removeItem(static_cast<QGraphicsItem*>(prtextanchors[i]));
 				delete prtextanchors[i];
 				prtextanchors[i] = NULL;
 			}
@@ -372,8 +368,7 @@ void GraphicsView::clear_prgraphicobjects_items()
 		{
 			if (prpoints.at(i))
 			{
-				scene()->removeItem(
-					static_cast<QGraphicsItem*>(prpoints[i]));
+				scene()->removeItem(static_cast<QGraphicsItem*>(prpoints[i]));
 				delete prpoints[i];
 				prpoints[i] = NULL;
 			}
@@ -386,8 +381,7 @@ void GraphicsView::clear_prgraphicobjects_items()
 		{
 			if (prpolylines.at(i))
 			{
-				scene()->removeItem(
-					static_cast<QGraphicsItem*>(prpolylines[i]));
+				scene()->removeItem(static_cast<QGraphicsItem*>(prpolylines[i]));
 				delete prpolylines[i];
 				prpolylines[i] = NULL;
 			}
@@ -400,8 +394,7 @@ void GraphicsView::clear_prgraphicobjects_items()
 		{
 			if (printerpolated.at(i))
 			{
-				scene()->removeItem(
-					static_cast<QGraphicsItem*>(printerpolated[i]));
+				scene()->removeItem(static_cast<QGraphicsItem*>(printerpolated[i]));
 				delete printerpolated[i];
 				printerpolated[i] = NULL;
 			}
@@ -414,8 +407,7 @@ void GraphicsView::clear_prgraphicobjects_items()
 		{
 			if (prcircles.at(i))
 			{
-				scene()->removeItem(
-					static_cast<QGraphicsItem*>(prcircles[i]));
+				scene()->removeItem(static_cast<QGraphicsItem*>(prcircles[i]));
 				delete prcircles[i];
 				prcircles[i] = NULL;
 			}
@@ -428,8 +420,7 @@ void GraphicsView::clear_prgraphicobjects_items()
 		{
 			if (prellipses.at(i))
 			{
-				scene()->removeItem(
-					static_cast<QGraphicsItem*>(prellipses[i]));
+				scene()->removeItem(static_cast<QGraphicsItem*>(prellipses[i]));
 				delete prellipses[i];
 				prellipses[i] = NULL;
 			}
@@ -445,8 +436,7 @@ void GraphicsView::clear_shutters()
 	{
 		if (display_shutters.at(i))
 		{
-			scene()->removeItem(
-				static_cast<QGraphicsItem*>(display_shutters[i]));
+			scene()->removeItem(static_cast<QGraphicsItem*>(display_shutters[i]));
 			delete display_shutters[i];
 			display_shutters[i] = NULL;
 		}
@@ -572,9 +562,7 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent * e)
 void GraphicsView::mouseMoveEvent(QMouseEvent * e)
 {
 	const short mm = parent->get_mouse_modus();
-	if (
-		parent->get_show_cursor() &&
-		!(e->buttons() & Qt::MiddleButton))
+	if (parent->get_show_cursor() && !(e->buttons() & Qt::MiddleButton))
 	{
 		const QPoint p0 = e->pos();
 		const QPointF p1 = mapToScene(p0);
@@ -715,25 +703,19 @@ void GraphicsView::draw_frames(short a)
 			line_x->setPath(path_x_line);
 			QPainterPath path_y_line;
 			path_y_line.moveTo(
-				parent->image_container
-					.image3D->di->selected_y_slice + 0.5,
+				parent->image_container.image3D->di->selected_y_slice + 0.5,
 				0);
 			path_y_line.lineTo(
-				parent->image_container
-					.image3D->di->selected_y_slice + 0.5,
-				parent->image_container
-					.image2D->idimy);
+				parent->image_container.image3D->di->selected_y_slice + 0.5,
+				parent->image_container.image2D->idimy);
 			line_y->setPath(path_y_line);
 			QPainterPath path_z_line;
 			path_z_line.moveTo(
 				0,
-				parent->image_container
-					.image3D->di->selected_z_slice + 0.5);
+				parent->image_container.image3D->di->selected_z_slice + 0.5);
 			path_z_line.lineTo(
-				parent->image_container
-					.image2D->idimx,
-				parent->image_container
-					.image3D->di->selected_z_slice + 0.5);
+				parent->image_container.image2D->idimx,
+				parent->image_container.image3D->di->selected_z_slice + 0.5);
 			line_z->setPath(path_z_line);
 		}
 		break;
@@ -741,27 +723,21 @@ void GraphicsView::draw_frames(short a)
 		{
 			QPainterPath path_x_line;
 			path_x_line.moveTo(
-				parent->image_container
-					.image3D->di->selected_x_slice + 0.5,
+				parent->image_container.image3D->di->selected_x_slice + 0.5,
 				0);
 			path_x_line.lineTo(
-				parent->image_container
-					.image3D->di->selected_x_slice + 0.5,
-				parent->image_container
-					.image2D->idimy);
+				parent->image_container.image3D->di->selected_x_slice + 0.5,
+				parent->image_container.image2D->idimy);
 			line_x->setPath(path_x_line);
 			QPainterPath path_y_line;
 			line_y->setPath(path_y_line);
 			QPainterPath path_z_line;
 			path_z_line.moveTo(
 				0,
-				parent->image_container
-					.image3D->di->selected_z_slice + 0.5);
+				parent->image_container.image3D->di->selected_z_slice + 0.5);
 			path_z_line.lineTo(
-				parent->image_container
-					.image2D->idimx,
-				parent->image_container
-					.image3D->di->selected_z_slice + 0.5);
+				parent->image_container.image2D->idimx,
+				parent->image_container.image3D->di->selected_z_slice + 0.5);
 			line_z->setPath(path_z_line);
 		}
 		break;
@@ -769,25 +745,19 @@ void GraphicsView::draw_frames(short a)
 		{
 			QPainterPath path_x_line;
 			path_x_line.moveTo(
-				parent->image_container
-					.image3D->di->selected_x_slice + 0.5,
+				parent->image_container.image3D->di->selected_x_slice + 0.5,
 				0);
 			path_x_line.lineTo(
-				parent->image_container
-					.image3D->di->selected_x_slice + 0.5,
-				parent->image_container
-					.image2D->idimy);
+				parent->image_container.image3D->di->selected_x_slice + 0.5,
+				parent->image_container.image2D->idimy);
 			line_x->setPath(path_x_line);
 			QPainterPath path_y_line;
 			path_y_line.moveTo(
 				0,
-				parent->image_container
-					.image3D->di->selected_y_slice + 0.5);
+				parent->image_container.image3D->di->selected_y_slice + 0.5);
 			path_y_line.lineTo(
-				parent->image_container
-					.image2D->idimx,
-				parent->image_container
-					.image3D->di->selected_y_slice + 0.5);
+				parent->image_container.image2D->idimx,
+				parent->image_container.image3D->di->selected_y_slice + 0.5);
 			line_y->setPath(path_y_line);
 			QPainterPath path_z_line;
 			line_z->setPath(path_z_line);
@@ -946,10 +916,8 @@ void GraphicsView::lines_at(double x, double y)
 					{
 						tmpb = parent->image_container.image3D->di->idimz - 1;
 					}
-					parent->image_container.image3D->di->selected_y_slice
-						= tmpa;
-					parent->image_container.image3D->di->selected_z_slice
-						= tmpb;
+					parent->image_container.image3D->di->selected_y_slice = tmpa;
+					parent->image_container.image3D->di->selected_z_slice = tmpb;
 				}
 				break;
 			case 1:
@@ -962,10 +930,8 @@ void GraphicsView::lines_at(double x, double y)
 					{
 						tmpb = parent->image_container.image3D->di->idimz - 1;
 					}
-					parent->image_container.image3D->di->selected_x_slice
-						= tmpa;
-					parent->image_container.image3D->di->selected_z_slice
-						= tmpb;
+					parent->image_container.image3D->di->selected_x_slice = tmpa;
+					parent->image_container.image3D->di->selected_z_slice = tmpb;
 				}
 				break;
 			case 2:
@@ -980,23 +946,19 @@ void GraphicsView::lines_at(double x, double y)
 					}
 					if (parent->is_multiview())
 					{
-						if (widget_x && !widget_x->run__ &&
-							widget_x->slider_m)
+						if (widget_x && !widget_x->run__ && widget_x->slider_m)
 						{
 							widget_x->slider_m->set_slice(tmpa);
 						}
-						if (widget_y &&
-							!widget_y->run__ && widget_y->slider_m)
+						if (widget_y && !widget_y->run__ && widget_y->slider_m)
 						{
 							widget_y->slider_m->set_slice(tmpb);
 						}
 					}
 					else
 					{
-						parent->image_container.image3D->di->selected_x_slice =
-							tmpa;
-						parent->image_container.image3D->di->selected_y_slice =
-							tmpb;
+						parent->image_container.image3D->di->selected_x_slice = tmpa;
+						parent->image_container.image3D->di->selected_y_slice = tmpb;
 					}
 				}
 				break;
@@ -1088,13 +1050,13 @@ void GraphicsView::get_pixel_value2(double x, double y)
 void GraphicsView::flipX()
 {
 	global_flip_x = !global_flip_x;
-	parent->update_image(0,false,true);
+	parent->update_image(0, false, true);
 }
 
 void GraphicsView::flipY()
 {
 	global_flip_y = !global_flip_y;
-	parent->update_image(0,false,true);
+	parent->update_image(0, false, true);
 }
 
 void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
@@ -1145,38 +1107,29 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 		{
 			double bottom_right_posx = 0.0;
 			double bottom_right_posy = 0.0;
-			if (l.at(x).BoundingBoxAnnotationUnits ==
-					QString("DISPLAY"))
+			if (l.at(x).BoundingBoxAnnotationUnits == QString("DISPLAY"))
 			{
 				if (ivariant->pr_display_areas.contains(z))
 				{
 					int dimx =
-						ivariant->pr_display_areas
-							.value(z)
-							.bottom_right_x -
+						ivariant->pr_display_areas.value(z).bottom_right_x -
 						ivariant->pr_display_areas.value(z).top_left_x;
 					int dimy =
-						ivariant->pr_display_areas
-							.value(z)
-							.bottom_right_y -
+						ivariant->pr_display_areas.value(z).bottom_right_y -
 						ivariant->pr_display_areas.value(z).top_left_y;
 					if (dimx > 0 && dimy > 0)
 					{
 						posx =
-							ivariant->pr_display_areas.value(z)
-								.top_left_x +
+							ivariant->pr_display_areas.value(z).top_left_x +
 							dimx * l.at(x).bb_top_left_x;
 						posy =
-							ivariant->pr_display_areas
-								.value(z).top_left_y +
+							ivariant->pr_display_areas.value(z).top_left_y +
 							dimy * l.at(x).bb_top_left_y;
 						bottom_right_posx =
-							ivariant->pr_display_areas
-								.value(z).top_left_x +
+							ivariant->pr_display_areas.value(z).top_left_x +
 							dimx * l.at(x).bb_bottom_right_x;
 						bottom_right_posy =
-							ivariant->pr_display_areas
-								.value(z).top_left_y +
+							ivariant->pr_display_areas.value(z).top_left_y +
 							dimy * l.at(x).bb_bottom_right_y;
 					}
 					else
@@ -1188,14 +1141,11 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 				{
 					posx = ivariant->di->idimx * l.at(x).bb_top_left_x;
 					posy = ivariant->di->idimy * l.at(x).bb_top_left_y;
-					bottom_right_posx =
-						ivariant->di->idimx * l.at(x).bb_bottom_right_x;
-					bottom_right_posy =
-						ivariant->di->idimy * l.at(x).bb_bottom_right_y;
+					bottom_right_posx = ivariant->di->idimx * l.at(x).bb_bottom_right_x;
+					bottom_right_posy = ivariant->di->idimy * l.at(x).bb_bottom_right_y;
 				}
 			}
-			else if (l.at(x).BoundingBoxAnnotationUnits ==
-					QString("PIXEL"))
+			else if (l.at(x).BoundingBoxAnnotationUnits == QString("PIXEL"))
 			{
 				posx = l.at(x).bb_top_left_x;
 				posy = l.at(x).bb_top_left_y;
@@ -1225,32 +1175,23 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 		}
 		else if (l.at(x).has_anchor)
 		{
-			if (l.at(x).AnchorPointAnnotationUnits ==
-					QString("DISPLAY"))
+			if (l.at(x).AnchorPointAnnotationUnits == QString("DISPLAY"))
 			{
 				if (ivariant->pr_display_areas.contains(z))
 				{
 					int dimx =
-						ivariant->pr_display_areas
-							.value(z)
-							.bottom_right_x -
+						ivariant->pr_display_areas.value(z).bottom_right_x -
 						ivariant->pr_display_areas.value(z).top_left_x;
 					int dimy =
-						ivariant->pr_display_areas
-							.value(z)
-							.bottom_right_y -
+						ivariant->pr_display_areas.value(z).bottom_right_y -
 						ivariant->pr_display_areas.value(z).top_left_y;
 					if (dimx > 0 && dimy > 0)
 					{
 						posx =
-							ivariant->pr_display_areas
-								.value(z)
-								.top_left_x +
+							ivariant->pr_display_areas.value(z).top_left_x +
 							dimx * l.at(x).anchor_x;
 						posy =
-							ivariant->pr_display_areas
-								.value(z)
-								.top_left_y +
+							ivariant->pr_display_areas.value(z).top_left_y +
 							dimy * l.at(x).anchor_y;
 					}
 					else
@@ -1264,8 +1205,7 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 					posy = ivariant->di->idimy * l.at(x).anchor_y;
 				}
 			}
-			else if (l.at(x).AnchorPointAnnotationUnits ==
-					QString("PIXEL"))
+			else if (l.at(x).AnchorPointAnnotationUnits == QString("PIXEL"))
 			{
 				posx = l.at(x).anchor_x;
 				posy = l.at(x).anchor_y;
@@ -1278,34 +1218,23 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 		{
 			double aposx = 0.0;
 			double aposy = 0.0;
-			if (l.at(x).AnchorPointAnnotationUnits ==
-					QString("DISPLAY"))
+			if (l.at(x).AnchorPointAnnotationUnits == QString("DISPLAY"))
 			{
 				if (ivariant->pr_display_areas.contains(z))
 				{
 					int dimx =
-						ivariant->pr_display_areas
-							.value(z)
-							.bottom_right_x -
-						ivariant->pr_display_areas
-							.value(z)
-							.top_left_x;
+						ivariant->pr_display_areas.value(z).bottom_right_x -
+						ivariant->pr_display_areas.value(z).top_left_x;
 					int dimy =
-						ivariant->pr_display_areas
-							.value(z)
-							.bottom_right_y -
+						ivariant->pr_display_areas.value(z).bottom_right_y -
 						ivariant->pr_display_areas.value(z).top_left_y;
 					if (dimx > 0 && dimy > 0)
 					{
 						aposx =
-							ivariant->pr_display_areas
-								.value(z)
-								.top_left_x +
+							ivariant->pr_display_areas.value(z).top_left_x +
 							dimx * l.at(x).anchor_x;
 						aposy =
-							ivariant->pr_display_areas
-								.value(z)
-								.top_left_y +
+							ivariant->pr_display_areas.value(z).top_left_y +
 							dimy * l.at(x).anchor_y;
 					}
 					else
@@ -1319,8 +1248,7 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 					aposy = ivariant->di->idimy * l.at(x).anchor_y;
 				}
 			}
-			else if (l.at(x).AnchorPointAnnotationUnits ==
-					QString("PIXEL"))
+			else if (l.at(x).AnchorPointAnnotationUnits == QString("PIXEL"))
 			{
 				aposx = l.at(x).anchor_x;
 				aposy = l.at(x).anchor_y;
@@ -1357,18 +1285,15 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 			}
 			if (!l.at(x).Bold.isEmpty())
 			{
-				if (l.at(x).Bold == QString("Y"))
-					font.setBold(true);
+				if (l.at(x).Bold == QString("Y")) font.setBold(true);
 			}
 			if (!l.at(x).Italic.isEmpty())
 			{
-				if (l.at(x).Italic == QString("Y"))
-					font.setItalic(true);
+				if (l.at(x).Italic == QString("Y")) font.setItalic(true);
 			}
 			if (!l.at(x).Underlined.isEmpty())
 			{
-				if (l.at(x).Underlined == QString("Y"))
-					font.setUnderline(true);
+				if (l.at(x).Underlined == QString("Y")) font.setUnderline(true);
 			}
 			if (!(
 				l.at(x).TextColorCIELabValue_L == -1 &&
@@ -1401,8 +1326,7 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 			i->setFont(font);
 			if (l.at(x).ShadowStyle == QString("NORMAL"))
 			{
-				QGraphicsDropShadowEffect * shadow =
-					new QGraphicsDropShadowEffect(i);
+				QGraphicsDropShadowEffect * shadow = new QGraphicsDropShadowEffect(i);
 				shadow->setXOffset(1.5); // not supported
 				shadow->setYOffset(1.5); // not supported
 				double opacity = 255.0;
@@ -1448,8 +1372,7 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 			i->setDefaultTextColor(QColor(150, 0, 150, 255));
 			if (true)
 			{
-				QGraphicsDropShadowEffect * shadow =
-					new QGraphicsDropShadowEffect(i);
+				QGraphicsDropShadowEffect * shadow = new QGraphicsDropShadowEffect(i);
 				shadow->setXOffset(1.5);
 				shadow->setYOffset(1.5);
 				shadow->setColor(QColor(128, 128, 128, 255));
@@ -1484,12 +1407,10 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 	{
 		return;
 	}
-	const QList<PRGraphicObject> & l =
-		ivariant->pr_graphicobjects.value(idx);
+	const QList<PRGraphicObject> & l = ivariant->pr_graphicobjects.value(idx);
 	for (int x = 0; x < l.size(); ++x)
 	{
-		if (!(l.at(x).GraphicData.size() > 1 &&
-				(l.at(x).GraphicData.size() % 2 == 0)))
+		if (!(l.at(x).GraphicData.size() > 1 && (l.at(x).GraphicData.size() % 2 == 0)))
 		{
 			continue;
 		}
@@ -1497,53 +1418,37 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 		if (t == QString("POLYLINE"))
 		{
 			QPainterPath p;
-			if (l.at(x).GraphicAnnotationUnits ==
-					QString("PIXEL"))
+			if (l.at(x).GraphicAnnotationUnits == QString("PIXEL"))
 			{
 				p.moveTo(
 					l.at(x).GraphicData.at(0),
 					l.at(x).GraphicData.at(1));
-				for (unsigned int y = 2;
-					y < l.at(x).GraphicData.size(); y += 2)
+				for (unsigned int y = 2; y < l.at(x).GraphicData.size(); y += 2)
 				{
 					p.lineTo(
 						l.at(x).GraphicData.at(y),
 						l.at(x).GraphicData.at(y + 1));
 				}
 			}
-			else if (l.at(x).GraphicAnnotationUnits ==
-					QString("DISPLAY"))
+			else if (l.at(x).GraphicAnnotationUnits == QString("DISPLAY"))
 			{
 				if (ivariant->pr_display_areas.contains(z))
 				{
 					const int dimx =
-						ivariant->pr_display_areas
-							.value(z)
-							.bottom_right_x -
-						ivariant->pr_display_areas
-								.value(z)
-								.top_left_x;
+						ivariant->pr_display_areas.value(z).bottom_right_x -
+						ivariant->pr_display_areas.value(z).top_left_x;
 					const int dimy =
-						ivariant->pr_display_areas
-							.value(z)
-							.bottom_right_y -
-						ivariant->pr_display_areas
-							.value(z)
-							.top_left_y;
+						ivariant->pr_display_areas.value(z).bottom_right_y -
+						ivariant->pr_display_areas.value(z).top_left_y;
 					if (dimx > 0 && dimy > 0)
 					{
-						for (unsigned int y = 0;
-							y < l.at(x).GraphicData.size(); y += 2)
+						for (unsigned int y = 0; y < l.at(x).GraphicData.size(); y += 2)
 						{
 							const double px =
-								ivariant->pr_display_areas
-									.value(z)
-									.top_left_x +
+								ivariant->pr_display_areas.value(z).top_left_x +
 								dimx * l.at(x).GraphicData.at(y);
 							const double py =
-								ivariant->pr_display_areas
-									.value(z)
-									.top_left_y +
+								ivariant->pr_display_areas.value(z).top_left_y +
 								dimy * l.at(x).GraphicData.at(y + 1);
 							if (y > 1) p.lineTo(px, py);
 							else       p.moveTo(px, py);
@@ -1555,12 +1460,8 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 					for (unsigned int y = 0;
 						y < l.at(x).GraphicData.size(); y += 2)
 					{
-						const double px =
-							ivariant->di->idimx *
-								l.at(x).GraphicData.at(y);
-						const double py =
-							ivariant->di->idimy *
-								l.at(x).GraphicData.at(y + 1);
+						const double px = ivariant->di->idimx * l.at(x).GraphicData.at(y);
+						const double py = ivariant->di->idimy * l.at(x).GraphicData.at(y + 1);
 						if (y > 1) p.lineTo(px, py);
 						else       p.moveTo(px, py);
 					}
@@ -1598,7 +1499,7 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				prpolylines.push_back(i);
 			}
 		}
-		else if (t == QString("ELLIPSE")) // TODO more testing
+		else if (t == QString("ELLIPSE"))
 		{
 			if (l.at(x).GraphicData.size() != 8) continue;
 			double major0_x = 0.0;
@@ -1609,8 +1510,7 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 			double minor0_y = 0.0;
 			double minor1_x = 0.0;
 			double minor1_y = 0.0;
-			if (l.at(x).GraphicAnnotationUnits ==
-					QString("PIXEL"))
+			if (l.at(x).GraphicAnnotationUnits == QString("PIXEL"))
 			{
 				major0_x = l.at(x).GraphicData.at(0);
 				major0_y = l.at(x).GraphicData.at(1);
@@ -1621,66 +1521,41 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				minor1_x = l.at(x).GraphicData.at(6);
 				minor1_y = l.at(x).GraphicData.at(7);
 			}
-			else if (l.at(x).GraphicAnnotationUnits ==
-					QString("DISPLAY"))
+			else if (l.at(x).GraphicAnnotationUnits == QString("DISPLAY"))
 			{
 				if (ivariant->pr_display_areas.contains(z))
 				{
 					const int dimx =
-						ivariant->pr_display_areas
-							.value(z)
-							.bottom_right_x -
-						ivariant->pr_display_areas
-								.value(z)
-								.top_left_x;
+						ivariant->pr_display_areas.value(z).bottom_right_x -
+						ivariant->pr_display_areas.value(z).top_left_x;
 					const int dimy =
-						ivariant->pr_display_areas
-							.value(z)
-							.bottom_right_y -
-						ivariant->pr_display_areas
-							.value(z)
-							.top_left_y;
+						ivariant->pr_display_areas.value(z).bottom_right_y -
+						ivariant->pr_display_areas.value(z).top_left_y;
 					if (dimx > 0 && dimy > 0)
 					{
 						major0_x =
-							ivariant->pr_display_areas
-								.value(z)
-								.top_left_x +
+							ivariant->pr_display_areas.value(z).top_left_x +
 							dimx * l.at(x).GraphicData.at(0);
 						major0_y =
-							ivariant->pr_display_areas
-								.value(z)
-								.top_left_y +
+							ivariant->pr_display_areas.value(z).top_left_y +
 							dimy * l.at(x).GraphicData.at(1);
 						major1_x =
-							ivariant->pr_display_areas
-								.value(z)
-								.top_left_x +
+							ivariant->pr_display_areas.value(z).top_left_x +
 							dimx * l.at(x).GraphicData.at(2);
 						major1_y =
-							ivariant->pr_display_areas
-								.value(z)
-								.top_left_y +
+							ivariant->pr_display_areas.value(z).top_left_y +
 							dimy * l.at(x).GraphicData.at(3);
 						minor0_x =
-							ivariant->pr_display_areas
-								.value(z)
-								.top_left_x +
+							ivariant->pr_display_areas.value(z).top_left_x +
 							dimx * l.at(x).GraphicData.at(4);
 						minor0_y =
-							ivariant->pr_display_areas
-								.value(z)
-								.top_left_y +
+							ivariant->pr_display_areas.value(z).top_left_y +
 							dimy * l.at(x).GraphicData.at(5);
 						minor1_x =
-							ivariant->pr_display_areas
-								.value(z)
-								.top_left_x +
+							ivariant->pr_display_areas.value(z).top_left_x +
 							dimx * l.at(x).GraphicData.at(6);
 						minor1_y =
-							ivariant->pr_display_areas
-								.value(z)
-								.top_left_y +
+							ivariant->pr_display_areas.value(z).top_left_y +
 							dimy * l.at(x).GraphicData.at(7);
 					}
 					else
@@ -1690,30 +1565,14 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				}
 				else
 				{
-					major0_x =
-						ivariant->di->idimx *
-							l.at(x).GraphicData.at(0);
-					major0_y =
-						ivariant->di->idimy *
-							l.at(x).GraphicData.at(1);
-					major1_x =
-						ivariant->di->idimx *
-							l.at(x).GraphicData.at(2);
-					major1_y =
-						ivariant->di->idimy *
-							l.at(x).GraphicData.at(3);
-					minor0_x =
-						ivariant->di->idimx *
-							l.at(x).GraphicData.at(4);
-					minor0_y =
-						ivariant->di->idimy *
-							l.at(x).GraphicData.at(5);
-					minor1_x =
-						ivariant->di->idimx *
-							l.at(x).GraphicData.at(6);
-					minor1_y =
-						ivariant->di->idimy *
-							l.at(x).GraphicData.at(7);
+					major0_x = ivariant->di->idimx * l.at(x).GraphicData.at(0);
+					major0_y = ivariant->di->idimy * l.at(x).GraphicData.at(1);
+					major1_x = ivariant->di->idimx * l.at(x).GraphicData.at(2);
+					major1_y = ivariant->di->idimy * l.at(x).GraphicData.at(3);
+					minor0_x = ivariant->di->idimx * l.at(x).GraphicData.at(4);
+					minor0_y = ivariant->di->idimy * l.at(x).GraphicData.at(5);
+					minor1_x = ivariant->di->idimx * l.at(x).GraphicData.at(6);
+					minor1_y = ivariant->di->idimy * l.at(x).GraphicData.at(7);
 				}
 			}
 			else
@@ -1793,46 +1652,29 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				point_x  = l.at(x).GraphicData.at(2);
 				point_y  = l.at(x).GraphicData.at(3);
 			}
-			else if (l.at(x).GraphicAnnotationUnits ==
-					QString("DISPLAY"))
+			else if (l.at(x).GraphicAnnotationUnits == QString("DISPLAY"))
 			{
 				if (ivariant->pr_display_areas.contains(z))
 				{
 					const int dimx =
-						ivariant->pr_display_areas
-							.value(z)
-							.bottom_right_x -
-						ivariant->pr_display_areas
-								.value(z)
-								.top_left_x;
+						ivariant->pr_display_areas.value(z).bottom_right_x -
+						ivariant->pr_display_areas.value(z).top_left_x;
 					const int dimy =
-						ivariant->pr_display_areas
-							.value(z)
-							.bottom_right_y -
-						ivariant->pr_display_areas
-							.value(z)
-							.top_left_y;
+						ivariant->pr_display_areas.value(z).bottom_right_y -
+						ivariant->pr_display_areas.value(z).top_left_y;
 					if (dimx > 0 && dimy > 0)
 					{
 						center_x =
-							ivariant->pr_display_areas
-								.value(z)
-								.top_left_x +
+							ivariant->pr_display_areas.value(z).top_left_x +
 							dimx * l.at(x).GraphicData.at(0);
 						center_y =
-							ivariant->pr_display_areas
-								.value(z)
-								.top_left_y +
+							ivariant->pr_display_areas.value(z).top_left_y +
 							dimy * l.at(x).GraphicData.at(1);
 						point_x =
-							ivariant->pr_display_areas
-								.value(z)
-								.top_left_x +
+							ivariant->pr_display_areas.value(z).top_left_x +
 							dimx * l.at(x).GraphicData.at(2);
 						point_y =
-							ivariant->pr_display_areas
-								.value(z)
-								.top_left_y +
+							ivariant->pr_display_areas.value(z).top_left_y +
 							dimy * l.at(x).GraphicData.at(3);
 					}
 					else
@@ -1842,18 +1684,10 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				}
 				else
 				{
-					center_x =
-						ivariant->di->idimx *
-							l.at(x).GraphicData.at(0);
-					center_y =
-						ivariant->di->idimy *
-							l.at(x).GraphicData.at(1);
-					point_x =
-						ivariant->di->idimx *
-							l.at(x).GraphicData.at(2);
-					point_y =
-						ivariant->di->idimy *
-							l.at(x).GraphicData.at(3);
+					center_x = ivariant->di->idimx * l.at(x).GraphicData.at(0);
+					center_y = ivariant->di->idimy * l.at(x).GraphicData.at(1);
+					point_x = ivariant->di->idimx * l.at(x).GraphicData.at(2);
+					point_y = ivariant->di->idimy * l.at(x).GraphicData.at(3);
 				}
 			}
 			else
@@ -1906,36 +1740,23 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				point_x  = l.at(x).GraphicData.at(0);
 				point_y  = l.at(x).GraphicData.at(1);
 			}
-			else if (l.at(x).GraphicAnnotationUnits ==
-					QString("DISPLAY"))
+			else if (l.at(x).GraphicAnnotationUnits == QString("DISPLAY"))
 			{
 				if (ivariant->pr_display_areas.contains(z))
 				{
 					const int dimx =
-						ivariant->pr_display_areas
-							.value(z)
-							.bottom_right_x -
-						ivariant->pr_display_areas
-								.value(z)
-								.top_left_x;
+						ivariant->pr_display_areas.value(z).bottom_right_x -
+						ivariant->pr_display_areas.value(z).top_left_x;
 					const int dimy =
-						ivariant->pr_display_areas
-							.value(z)
-							.bottom_right_y -
-						ivariant->pr_display_areas
-							.value(z)
-							.top_left_y;
+						ivariant->pr_display_areas.value(z).bottom_right_y -
+						ivariant->pr_display_areas.value(z).top_left_y;
 					if (dimx > 0 && dimy > 0)
 					{
 						point_x =
-							ivariant->pr_display_areas
-								.value(z)
-								.top_left_x +
+							ivariant->pr_display_areas.value(z).top_left_x +
 							dimx * l.at(x).GraphicData.at(0);
 						point_y =
-							ivariant->pr_display_areas
-								.value(z)
-								.top_left_y +
+							ivariant->pr_display_areas.value(z).top_left_y +
 							dimy * l.at(x).GraphicData.at(1);
 					}
 					else
@@ -1945,12 +1766,8 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 				}
 				else
 				{
-					point_x =
-						ivariant->di->idimx *
-							l.at(x).GraphicData.at(0);
-					point_y =
-						ivariant->di->idimy *
-							l.at(x).GraphicData.at(1);
+					point_x = ivariant->di->idimx * l.at(x).GraphicData.at(0);
+					point_y = ivariant->di->idimy * l.at(x).GraphicData.at(1);
 				}
 			}
 			else
@@ -2018,8 +1835,7 @@ void GraphicsView::draw_shutter(const ImageVariant * ivariant)
 	{
 		if (l.at(x).trimmed() == QString("RECTANGULAR"))
 		{
-			if (
-				a.ShutterLeftVerticalEdge    == -1 &&
+			if (a.ShutterLeftVerticalEdge    == -1 &&
 				a.ShutterRightVerticalEdge   == -1 &&
 				a.ShutterUpperHorizontalEdge == -1 &&
 				a.ShutterLowerHorizontalEdge == -1)
@@ -2060,8 +1876,7 @@ void GraphicsView::draw_shutter(const ImageVariant * ivariant)
 		}
 		else if (l.at(x).trimmed() == QString("CIRCULAR"))
 		{
-			if (
-				a.CenterofCircularShutter_x == -1 &&
+			if (a.CenterofCircularShutter_x == -1 &&
 				a.CenterofCircularShutter_y == -1 &&
 				a.RadiusofCircularShutter   == -1)
 			{
