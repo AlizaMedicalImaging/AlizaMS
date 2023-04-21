@@ -145,10 +145,10 @@
               </sizepolicy>
              </property>
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;There are many cyrillic data sets with undefined &lt;span style=&quot; font-style:italic;&quot;&gt;Specific Character Set &lt;/span&gt;(0x0008,0x0005) attribute, but using &lt;span style=&quot; font-weight:600;&quot;&gt;WINDOWS-1251&lt;/span&gt; encoding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;There are many Cyrillic data sets with undefined &lt;span style=&quot; font-style:italic;&quot;&gt;Specific Character Set &lt;/span&gt;(0x0008,0x0005) attribute, but using &lt;span style=&quot; font-weight:600;&quot;&gt;Windows-1251&lt;/span&gt; encoding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
-              <string>Force WINDOWS-1251 if Specific Character Set is not defined</string>
+              <string>Use Windows-1251 (Cyrillic) if Specific Character Set is not defined</string>
              </property>
             </widget>
            </item>
