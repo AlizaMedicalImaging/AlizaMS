@@ -120,7 +120,7 @@ template<typename T> void load_rgb_image2(
 	const bool global_flip_x = widget->graphicsview->global_flip_x;
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
 	//
-	QString top_string = QString(""), left_string = QString("");
+	QString top_string, left_string;
 	bool flip_x = false, flip_y = false;
 	double scale__;
 	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
@@ -294,7 +294,7 @@ template<typename T> void load_rgba_image2(
 	const bool global_flip_x = widget->graphicsview->global_flip_x;
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
 	//
-	QString top_string = QString(""), left_string = QString("");
+	QString top_string, left_string;
 	bool flip_x = false, flip_y = false;
 	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
 	double scale__;
@@ -561,7 +561,7 @@ template<typename T> void load_rgb_char_image2(
 	const typename T::RegionType  region  = image->GetLargestPossibleRegion();
 	const typename T::SizeType    size    = region.GetSize();
 	const typename T::SpacingType spacing = image->GetSpacing();
-	QString top_string = QString(""), left_string = QString("");
+	QString top_string, left_string;
 	bool flip_x = false, flip_y = false;
 	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
 	double scale__;
@@ -669,7 +669,7 @@ template<typename T> void load_rgba_char_image2(
 	const typename T::RegionType region   = image->GetLargestPossibleRegion();
 	const typename T::SizeType   size     = region.GetSize();
 	const typename T::SpacingType spacing = image->GetSpacing();
-	QString top_string = QString(""), left_string = QString("");
+	QString top_string, left_string;
 	bool flip_x = false, flip_y = false;
 	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
 	double scale__;
@@ -965,7 +965,7 @@ template<typename T> void load_image2(
 		if (spacing[1] > spacing[0]) coeff_size_1 = spacing[1] / spacing[0];
 		else                         coeff_size_0 = spacing[0] / spacing[1];
 	}
-	QString top_string = QString(""), left_string = QString("");
+	QString top_string, left_string;
 	bool flip_y = false, flip_x = false;
 	//
 	widget->graphicsview->scene()->setSceneRect(rectf);

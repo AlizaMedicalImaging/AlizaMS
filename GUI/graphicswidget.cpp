@@ -496,7 +496,7 @@ template<typename T> void load_rgb_image(
 	const bool global_flip_x = widget->graphicsview->global_flip_x;
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
 	//
-	QString top_string = QString(""), left_string = QString("");
+	QString top_string, left_string;
 	bool flip_x = false, flip_y = false;
 	double scale__;
 	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
@@ -684,7 +684,7 @@ template<typename T> void load_rgba_image(
 	const bool global_flip_x = widget->graphicsview->global_flip_x;
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
 	//
-	QString top_string = QString(""), left_string = QString("");
+	QString top_string, left_string;
 	bool flip_x = false, flip_y = false;
 	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
 	double scale__;
@@ -965,7 +965,7 @@ template<typename T> void load_rgb_char_image(
 	const typename T::RegionType  region  = image->GetLargestPossibleRegion();
 	const typename T::SizeType    size    = region.GetSize();
 	const typename T::SpacingType spacing = image->GetSpacing();
-	QString top_string = QString(""), left_string = QString("");
+	QString top_string, left_string;
 	bool flip_x = false, flip_y = false;
 	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
 	double scale__;
@@ -1087,7 +1087,7 @@ template<typename T> void load_rgba_char_image(
 	const typename T::RegionType region   = image->GetLargestPossibleRegion();
 	const typename T::SizeType   size     = region.GetSize();
 	const typename T::SpacingType spacing = image->GetSpacing();
-	QString top_string = QString(""), left_string = QString("");
+	QString top_string, left_string;
 	bool flip_x = false, flip_y = false;
 	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
 	double scale__;
@@ -1427,7 +1427,7 @@ template<typename T> void load_image(
 		if (spacing[1] > spacing[0]) coeff_size_1 = spacing[1] / spacing[0];
 		else                         coeff_size_0 = spacing[0] / spacing[1];
 	}
-	QString top_string = QString(""), left_string = QString("");
+	QString top_string, left_string;
 	bool flip_y = false, flip_x = false;
 	//
 	widget->graphicsview->scene()->setSceneRect(rectf);
@@ -1616,7 +1616,8 @@ template<typename T> double get_distance(
 			}
 		}
 		break;
-	default: return false;
+	default:
+		break;
 	}
 	//
 	if (ok)
@@ -1673,7 +1674,7 @@ GraphicsWidget::GraphicsWidget(
 	QVBoxLayout * l = new QVBoxLayout(this);
 	l->addWidget(graphicsview);
 	l->setSpacing(0);
-	l->setContentsMargins(0,0,0,0);
+	l->setContentsMargins(0, 0, 0, 0);
 	setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);
 }
 
@@ -1802,7 +1803,8 @@ void GraphicsWidget::update_selection_item()
 			graphicsview->selection_item->setPos(QPointF(0.0f, 0.0f));
 		}
 		break;
-	default: break;
+	default:
+		break;
 	}
 }
 
@@ -2183,7 +2185,8 @@ float GraphicsWidget::get_offset_x()
 				: 0.0f;
 		}
 		break;
-	default : break;
+	default:
+		break;
 	}
 	return offset_x;
 }
@@ -2212,7 +2215,8 @@ float GraphicsWidget::get_offset_y()
 			: 0.0f;
 		}
 		break;
-	default : break;
+	default:
+		break;
 	}
 	return offset_y;
 }
@@ -2387,7 +2391,7 @@ void GraphicsWidget::set_slice_2D(
 		break;
 	case 2: x = image_container.image3D->di->selected_z_slice;
 		break;
-	default :
+	default:
 		{
 			clear_(false);
 			goto quit__;
@@ -2530,7 +2534,7 @@ void GraphicsWidget::set_slice_2D(
 			}
 		}
 		break;
-	default :
+	default:
 		break;
 	}
 	update_image(fit, true, false, per_frame_level_found);
@@ -2666,8 +2670,7 @@ void GraphicsWidget::animate_()
 						image_container.image3D->di->idimz - 1;
 				}
 			}
-			if (
-				image_container.image3D->frame_times.size() >
+			if (image_container.image3D->frame_times.size() >
 					static_cast<unsigned int>(k))
 			{
 				requested_time =
@@ -2678,7 +2681,8 @@ void GraphicsWidget::animate_()
 			image_container.image3D->di->selected_z_slice = k;
 		}
 		break;
-	default: return;
+	default:
+		return;
 	}
 	if (!((axis == 2) && (image_container.image3D->di->idimz == 1)))
 	{
