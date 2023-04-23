@@ -196,9 +196,9 @@ SQtree::SQtree(bool t) : in_tabwidget(t)
 #if 1
 	options_toolButton->hide();
 #endif
-	copyAct      = new QAction(QString("Copy selected text"),   this);
-	expandAct    = new QAction(QString("Expand child items"),   this);
-	collapseAct  = new QAction(QString("Collapse child items"), this);
+	copyAct     = new QAction(QString("Copy selected text"),   this);
+	expandAct   = new QAction(QString("Expand child items"),   this);
+	collapseAct = new QAction(QString("Collapse child items"), this);
 	treeWidget->addAction(copyAct);
 	treeWidget->addAction(expandAct);
 	treeWidget->addAction(collapseAct);
@@ -371,12 +371,12 @@ void SQtree::process_element(
 			}
 		}
 	}
-	const QBrush brush0(QColor::fromRgbF(0.0,0.0,0.5));
-	const QBrush brush2(QColor::fromRgbF(0.3,0.0,0.3));
-	const QBrush brush4(QColor::fromRgbF(0.5,0.5,0.5));
-	const QBrush brush5(QColor::fromRgbF(0.4,0.4,0.7));
-	const QBrush brush6(QColor::fromRgbF(0.5,0.0,0.0));
-	const QBrush brush7(QColor::fromRgbF(0.5,0.5,0.5));
+	const QBrush brush0(QColor::fromRgbF(0.0, 0.0, 0.5));
+	const QBrush brush2(QColor::fromRgbF(0.3, 0.0, 0.3));
+	const QBrush brush4(QColor::fromRgbF(0.5, 0.5, 0.5));
+	const QBrush brush5(QColor::fromRgbF(0.4, 0.4, 0.7));
+	const QBrush brush6(QColor::fromRgbF(0.5, 0.0, 0.0));
+	const QBrush brush7(QColor::fromRgbF(0.5, 0.5, 0.5));
 	if (vr == mdcm::VR::SQ)
 	{
 		mdcm::SmartPointer<mdcm::SequenceOfItems> sqi =

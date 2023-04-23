@@ -87,7 +87,10 @@ mdcm::VL BrowserWidget2::compute_offset0(const mdcm::DataSet & ds)
 	return len;
 }
 
-void BrowserWidget2::compute_offsets(const mdcm::SequenceOfItems * sq, mdcm::VL start, std::vector<unsigned int> & offsets)
+void BrowserWidget2::compute_offsets(
+	const mdcm::SequenceOfItems * sq,
+	mdcm::VL start,
+	std::vector<unsigned int> & offsets)
 {
 	const unsigned int n = sq->GetNumberOfItems();
 	offsets.resize(n);
@@ -95,7 +98,9 @@ void BrowserWidget2::compute_offsets(const mdcm::SequenceOfItems * sq, mdcm::VL 
 	for (unsigned int i = 1; i < n; ++i)
 	{
 		const mdcm::Item & item = sq->GetItem(i);
-		offsets[i] = offsets[i - 1] + static_cast<unsigned int>(item.GetLength<mdcm::ExplicitDataElement>());
+		offsets[i] =
+			offsets[i - 1] +
+			static_cast<unsigned int>(item.GetLength<mdcm::ExplicitDataElement>());
 	}
 }
 
@@ -264,13 +269,13 @@ void BrowserWidget2::process_directory(
 		mdcm::Scanner::ValuesType::iterator vi = v.begin();
 		for (; vi != v.end(); ++vi)
 		{
-			QString modality("");
-			QString name("");
-			QString birthdate("");
-			QString study("");
-			QString study_date("");
-			QString series("");
-			QString series_date("");
+			QString modality;
+			QString name;
+			QString birthdate;
+			QString study;
+			QString study_date;
+			QString series;
+			QString series_date;
 			bool is_image = false;
 			bool is_softcopy = false;
 			const int idx = tableWidget->rowCount();
@@ -364,13 +369,13 @@ void BrowserWidget2::process_directory(
 	for (int x = 0; x < filenames_no_series_uid.size(); ++x)
 	{
 		const QString tmp1 = filenames_no_series_uid.at(x);
-		QString modality("");
-		QString name("");
-		QString birthdate("");
-		QString study("");
-		QString study_date("");
-		QString series("");
-		QString series_date("");
+		QString modality;
+		QString name;
+		QString birthdate;
+		QString study;
+		QString study_date;
+		QString series;
+		QString series_date;
 		bool is_image = false;
 		bool is_softcopy = false;
 		const int idx = tableWidget->rowCount();
@@ -595,7 +600,7 @@ void BrowserWidget2::reload_dir()
 				mbox.setStandardButtons(
 					QMessageBox::Yes | QMessageBox::No);
 				mbox.setDefaultButton(QMessageBox::Yes);
-				mbox.setText(warning+QString("\nScan directory?"));
+				mbox.setText(warning + QString("\nScan directory?"));
 				const int r = mbox.exec();
 				bool scan = false;
 				switch (r)
@@ -729,7 +734,7 @@ void BrowserWidget2::open_DICOMDIR()
 		mbox.setIcon(QMessageBox::Warning);
 		mbox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 		mbox.setDefaultButton(QMessageBox::Yes);
-		mbox.setText(warning+QString("\nScan directory?"));
+		mbox.setText(warning + QString("\nScan directory?"));
 		const int r = mbox.exec();
 		bool scan = false;
 		switch (r)
@@ -829,14 +834,15 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 			mdcm::SmartPointer<mdcm::SequenceOfItems> sqi = de.GetValueAsSQ();
 			for (unsigned int i = 0; i < sqi->GetNumberOfItems(); ++i)
 			{
-				const mdcm::Item    & item = sqi->GetItem(i + 1);
+				const mdcm::Item & item = sqi->GetItem(i + 1);
 				const mdcm::DataSet & nds  = item.GetNestedDataSet();
 
 				EntryDICOMDIR ed;
 				if (nds.FindDataElement(tOffsetOfTheNextDirectoryRecord))
 				{
 					unsigned int off1 = 0;
-					const bool ok_off1 = DicomUtils::get_ul_value(nds,tOffsetOfTheNextDirectoryRecord,&off1);
+					const bool ok_off1 =
+						DicomUtils::get_ul_value(nds,tOffsetOfTheNextDirectoryRecord, &off1);
 					if (ok_off1)
 					{
 						ed.offsetOfTheNextDirectoryRecord = off1;
@@ -844,13 +850,17 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 					else
 					{
 						QApplication::restoreOverrideCursor();
-						return QString("Error reading \"Offset of the Next Directory Record\".");
+						return QString(
+							"Error reading \"Offset of the Next Directory Record\".");
 					}
 				}
 				if (nds.FindDataElement(tOffsetOfReferencedLowerLevelDirectoryEntity))
 				{
 					unsigned int off2 = 0;
-					const bool ok_off2 = DicomUtils::get_ul_value(nds,tOffsetOfReferencedLowerLevelDirectoryEntity,&off2);
+					const bool ok_off2 =
+						DicomUtils::get_ul_value(
+							nds,tOffsetOfReferencedLowerLevelDirectoryEntity,
+							&off2);
 					if (ok_off2)
 					{
 						ed.offsetOfReferencedLowerLevelDirectoryEntity = off2;
@@ -858,7 +868,8 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 					else
 					{
 						QApplication::restoreOverrideCursor();
-						return QString("Error reading \"Offset of Referenced Lower Level Directory Entity\".");
+						return QString(
+							"Error reading \"Offset of Referenced Lower Level Directory Entity\".");
 					}
 				}
 				if (nds.FindDataElement(tDirectoryRecordType))
@@ -873,7 +884,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 						ed.directoryRecordType = directory_record_type;
 						if (directory_record_type == QString("PATIENT"))
 						{
-							QString charset("");
+							QString charset;
 							if (nds.FindDataElement(tSpecificCharacterSet))
 							{
 								const mdcm::DataElement & e1 = nds.GetDataElement(tSpecificCharacterSet);
@@ -888,8 +899,11 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 								const mdcm::DataElement & e1 = nds.GetDataElement(tPatientsName);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
 								{
-									QByteArray ba(e1.GetByteValue()->GetPointer(), e1.GetByteValue()->GetLength());
-									const QString tmp0 = CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
+									QByteArray ba(
+										e1.GetByteValue()->GetPointer(),
+										e1.GetByteValue()->GetLength());
+									const QString tmp0 =
+										CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
 									ed.patient = tmp0.trimmed().remove(QChar('\0'));
 								}
 							}
@@ -898,9 +912,9 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 								const mdcm::DataElement & e1 = nds.GetDataElement(tPatientsBirthDate);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
 								{
-									const QString birthdate_s =
-										QString::fromLatin1(e1.GetByteValue()->GetPointer(),
-															e1.GetByteValue()->GetLength()).trimmed();
+									const QString birthdate_s = QString::fromLatin1(
+										e1.GetByteValue()->GetPointer(),
+										e1.GetByteValue()->GetLength()).trimmed();
 									const QDate qd = QDate::fromString(birthdate_s, QString("yyyyMMdd"));
 									ed.birthdate = qd.toString(QString("d MMM yyyy")) + QString("\n");
 								}
@@ -908,14 +922,15 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 						}
 						else if (directory_record_type == QString("STUDY"))
 						{
-							QString charset("");
+							QString charset;
 							if (nds.FindDataElement(tSpecificCharacterSet))
 							{
 								const mdcm::DataElement & e1 = nds.GetDataElement(tSpecificCharacterSet);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
 								{
 									charset = QString::fromLatin1(
-										e1.GetByteValue()->GetPointer(),e1.GetByteValue()->GetLength());
+										e1.GetByteValue()->GetPointer(),
+										e1.GetByteValue()->GetLength());
 								}
 							}
 							if (nds.FindDataElement(tStudyDate))
@@ -923,9 +938,9 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 								const mdcm::DataElement & e1 = nds.GetDataElement(tStudyDate);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
 								{
-									const QString date_s =
-										QString::fromLatin1(e1.GetByteValue()->GetPointer(),
-															e1.GetByteValue()->GetLength()).trimmed();
+									const QString date_s = QString::fromLatin1(
+										e1.GetByteValue()->GetPointer(),
+										e1.GetByteValue()->GetLength()).trimmed();
 									const QDate qd = QDate::fromString(date_s, QString("yyyyMMdd"));
 									ed.study_date = qd.toString(QString("d MMM yyyy")) + QString("\n");
 								}
@@ -935,31 +950,38 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 								const mdcm::DataElement & e1 = nds.GetDataElement(tStudyDescription);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
 								{
-									QByteArray ba(e1.GetByteValue()->GetPointer(), e1.GetByteValue()->GetLength());
-									const QString tmp0 = CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
+									QByteArray ba(
+										e1.GetByteValue()->GetPointer(),
+										e1.GetByteValue()->GetLength());
+									const QString tmp0 =
+										CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
 									ed.study_desc = tmp0.trimmed().remove(QChar('\0'));
 								}
 							}
 						}
 						else if (directory_record_type == QString("SERIES"))
 						{
-							QString charset("");
+							QString charset;
 							if (nds.FindDataElement(tSpecificCharacterSet))
 							{
-								const mdcm::DataElement & e1 = nds.GetDataElement(tSpecificCharacterSet);
+								const mdcm::DataElement & e1 =
+									nds.GetDataElement(tSpecificCharacterSet);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
 								{
 									charset = QString::fromLatin1(
-										e1.GetByteValue()->GetPointer(),e1.GetByteValue()->GetLength());
+										e1.GetByteValue()->GetPointer(),
+										e1.GetByteValue()->GetLength());
 								}
 							}
 							if (nds.FindDataElement(tModality))
 							{
-								const mdcm::DataElement & e1 = nds.GetDataElement(tModality);
+								const mdcm::DataElement & e1 =
+									nds.GetDataElement(tModality);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
 								{
-									const QString tmp0 =
-										QString::fromLatin1(e1.GetByteValue()->GetPointer(),e1.GetByteValue()->GetLength());
+									const QString tmp0 = QString::fromLatin1(
+										e1.GetByteValue()->GetPointer(),
+										e1.GetByteValue()->GetLength());
 									ed.modality = tmp0.trimmed();
 								}
 							}
@@ -969,9 +991,9 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 								const mdcm::DataElement & e1 = nds.GetDataElement(tSeriesDate);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
 								{
-									const QString date_s =
-										QString::fromLatin1(e1.GetByteValue()->GetPointer(),
-															e1.GetByteValue()->GetLength()).trimmed();
+									const QString date_s = QString::fromLatin1(
+										e1.GetByteValue()->GetPointer(),
+										e1.GetByteValue()->GetLength()).trimmed();
 									const QDate qd = QDate::fromString(date_s, QString("yyyyMMdd"));
 									ed.series_date = qd.toString(QString("d MMM yyyy")) + QString("\n");
 								}
@@ -981,23 +1003,31 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 								const mdcm::DataElement & e1 = nds.GetDataElement(tSeriesDescription);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
 								{
-									QByteArray ba(e1.GetByteValue()->GetPointer(), e1.GetByteValue()->GetLength());
-									const QString tmp0 = CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
+									QByteArray ba(
+										e1.GetByteValue()->GetPointer(),
+										e1.GetByteValue()->GetLength());
+									const QString tmp0 =
+										CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
 									ed.series_desc = tmp0.trimmed().remove(QChar('\0'));
 								}
 							}
 						}
 						else
 						{
-							if (ed.offsetOfReferencedLowerLevelDirectoryEntity!=0) not_patient_study_series_model = true;
-							QString charset("");
+							if (ed.offsetOfReferencedLowerLevelDirectoryEntity != 0)
+							{
+								not_patient_study_series_model = true;
+							}
+							QString charset;
 							if (nds.FindDataElement(tSpecificCharacterSet))
 							{
-								const mdcm::DataElement & e1 = nds.GetDataElement(tSpecificCharacterSet);
+								const mdcm::DataElement & e1 =
+									nds.GetDataElement(tSpecificCharacterSet);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
 								{
 									charset = QString::fromLatin1(
-										e1.GetByteValue()->GetPointer(),e1.GetByteValue()->GetLength());
+										e1.GetByteValue()->GetPointer(),
+										e1.GetByteValue()->GetLength());
 								}
 							}
 							if (nds.FindDataElement(tReferencedFileID))
@@ -1005,11 +1035,14 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 								const mdcm::DataElement & e1 = nds.GetDataElement(tReferencedFileID);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
 								{
-									QByteArray ba(e1.GetByteValue()->GetPointer(), e1.GetByteValue()->GetLength());
-									const QString tmp0 = CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
+									QByteArray ba(
+										e1.GetByteValue()->GetPointer(),
+										e1.GetByteValue()->GetLength());
+									const QString tmp0 =
+										CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
 									const QStringList l2 = tmp0.trimmed().split(QString("\\"));
 									const int l2size = l2.size();
-									QString fpath("");
+									QString fpath;
 									for (int x = 0; x < l2size; ++x)
 									{
 										fpath.append(l2.at(x));
@@ -1027,15 +1060,17 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 		++it;
 	}
 	//
-	QString warning("");
+	QString warning;
 	//
 	QList<SeriesDICOMDIR> series;
 	if (ok_first_root_off)
 	{
-		unsigned int offset_next = add_roots(m, first_root_off, series, &not_patient_study_series_model);
+		unsigned int offset_next =
+			add_roots(m, first_root_off, series, &not_patient_study_series_model);
 		while (offset_next > 0)
 		{
-			offset_next = add_roots(m, offset_next, series, &not_patient_study_series_model);
+			offset_next =
+				add_roots(m, offset_next, series, &not_patient_study_series_model);
 		}
 	}
 	else
@@ -1044,7 +1079,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 		while (mi.hasNext())
 		{
 			mi.next();
-			while (mi.value().directoryRecordType==QString("PATIENT"))
+			while (mi.value().directoryRecordType == QString("PATIENT"))
 			{
 				const EntryDICOMDIR & e = mi.value();
 				unsigned int offset_next = add_study(
@@ -1076,7 +1111,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 		}
 	}
 	//
-	if (series.size()==0)
+	if (series.size() == 0)
 	{
 		QApplication::restoreOverrideCursor();
 		return QString("Error, found no series");
@@ -1202,7 +1237,8 @@ unsigned int BrowserWidget2::add_study(
 			warn);
 		while (offset_next > 0)
 		{
-			offset_next = add_series(m,offset_next,l,patient,birthdate,study_desc,study_date,warn);
+			offset_next =
+				add_series(m,offset_next,l,patient,birthdate,study_desc,study_date,warn);
 		}
 	}
 	else
@@ -1299,8 +1335,8 @@ void BrowserWidget2::read_tags_(
 	if (!f_ok) return;
 	const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
 	if (ds.IsEmpty()) return;
-	QString charset("");
-	QString sop("");
+	QString charset;
+	QString sop;
 	//
 	if (ds.FindDataElement(tSpecificCharacterSet))
 	{
@@ -1342,7 +1378,7 @@ void BrowserWidget2::read_tags_(
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
 		{
 			modality_ = QString::fromLatin1(
-				e.GetByteValue()->GetPointer(),e.GetByteValue()->GetLength());
+				e.GetByteValue()->GetPointer(), e.GetByteValue()->GetLength());
 		}
 	}
 	//
@@ -1373,9 +1409,9 @@ void BrowserWidget2::read_tags_(
 		const mdcm::DataElement & e = ds.GetDataElement(tSeriesDate);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
 		{
-			const QString date_s =
-				QString::fromLatin1(e.GetByteValue()->GetPointer(),
-									e.GetByteValue()->GetLength()).trimmed();
+			const QString date_s = QString::fromLatin1(
+				e.GetByteValue()->GetPointer(),
+				e.GetByteValue()->GetLength()).trimmed();
 			const QDate qd = QDate::fromString(date_s, QString("yyyyMMdd"));
 			series_date_ = qd.toString(QString("d MMM yyyy")) + QString("\n");
 		}
@@ -1398,9 +1434,9 @@ void BrowserWidget2::read_tags_(
 		std::stringstream ss;
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
 		{
-			const QString birthdate_s =
-				QString::fromLatin1(e.GetByteValue()->GetPointer(),
-									e.GetByteValue()->GetLength()).trimmed();
+			const QString birthdate_s = QString::fromLatin1(
+				e.GetByteValue()->GetPointer(),
+				e.GetByteValue()->GetLength()).trimmed();
 			const QDate qd = QDate::fromString(birthdate_s, QString("yyyyMMdd"));
 			birthdate_ = qd.toString(QString("d MMM yyyy")) + QString("\n");
 		}
@@ -1527,16 +1563,14 @@ void BrowserWidget2::read_tags_short_(
 				const QString sop =
 					QString::fromLatin1(
 						e.GetByteValue()->GetPointer(),
-						e.GetByteValue()->GetLength()).
-							trimmed().remove(QChar('\0'));
+						e.GetByteValue()->GetLength()).trimmed().remove(QChar('\0'));
 				// RTSTRUCT
 				if (sop == QString("1.2.840.10008.5.1.4.1.1.481.3"))
 				{
 					is_image_tmp = true;
 				}
 				// Softcopy
-				else if (
-					sop == QString("1.2.840.10008.5.1.4.1.1.11.1") ||
+				else if (sop == QString("1.2.840.10008.5.1.4.1.1.11.1") ||
 					sop == QString("1.2.840.10008.5.1.4.1.1.11.2"))
 				{
 					*is_softcopy = true;
@@ -1636,7 +1670,7 @@ void BrowserWidget2::open_CTK_db()
 	tableWidget->clearContents();
 	tableWidget->setRowCount(0);
 	directory_lineEdit->clear();
-	QString warning("");
+	QString warning;
 	bool ok = false;
 	QList<SeriesDICOMDIR> series;
 	QSqlDatabase db;
@@ -1668,7 +1702,7 @@ void BrowserWidget2::open_CTK_db()
 	d->set_from(ctk_from);
 	d->set_to(ctk_to);
 	d->set_apply_range(ctk_apply_range);
-	QString range_string("");
+	QString range_string;
 	if (d->exec() == QDialog::Accepted)
 	{
 		ok = true;

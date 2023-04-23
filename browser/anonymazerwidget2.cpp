@@ -540,7 +540,7 @@ bool find_time_less_1h_recurs__(
 			const mdcm::ByteValue * bv = de.GetByteValue();
 			if (bv)
 			{
-				QString r("");
+				QString r;
 				const QString s = QString::fromLatin1(
 					bv->GetPointer(),
 					bv->GetLength()).trimmed().remove(QChar('\0'));
@@ -637,7 +637,7 @@ void modify_date_time_recurs__(
 			const mdcm::ByteValue * bv = de.GetByteValue();
 			if (t == mdcm::Tag(0x0008,0x0201))
 			{
-				const QString r = QString("+0000 ");
+				const QString r("+0000 ");
 				mdcm::DataElement de2(t);
 				if (!implicit) de2.SetVR(mdcm::VR::SH);
 				de2.SetByteValue(r.toLatin1(), r.length());
@@ -647,7 +647,7 @@ void modify_date_time_recurs__(
 			{
 				if (bv)
 				{
-					QString r("");
+					QString r;
 					const QString s = QString::fromLatin1(
 						bv->GetPointer(),
 						bv->GetLength()).trimmed().remove(QChar('\0'));
@@ -731,7 +731,7 @@ void modify_date_time_recurs__(
 								{
 									const int tmp0 = s0.indexOf(QString("-"));
 									const int tmp1 = s0.indexOf(QString("+"));
-									QString s1("");
+									QString s1;
 									if (tmp0 == -1 && tmp1 == -1)
 									{
 										s1 = s0;
@@ -1247,7 +1247,7 @@ void anonymize_file__(
 	}
 #endif
 	//
-	QString charset("");
+	QString charset;
 	if (ds.FindDataElement(mdcm::Tag(0x0008,0x0005)))
 	{
 		const mdcm::DataElement & ce_ =
@@ -1650,8 +1650,7 @@ void anonymize_file__(
 		//
 		{
 #if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
-			const QLatin1String cv =
-				retain_dates_times
+			const QLatin1String cv = retain_dates_times
 				?
 				QLatin1String("113106")
 				:
@@ -1663,14 +1662,12 @@ void anonymize_file__(
 				:
 				QLatin1String("Retain Longitudinal Temporal Information Modified Dates Option");
 #else
-			const QString cv =
-				retain_dates_times
+			const QString cv = retain_dates_times
 				?
 				QString("113106")
 				:
 				QString("113107");
-			const QString cm =
-				retain_dates_times
+			const QString cm = retain_dates_times
 				?
 				QString("Retain Longitudinal Temporal Information Full Dates Option")
 				:
@@ -2152,8 +2149,7 @@ void build_maps(
 // UIDs
 	{
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-		QSet<QString> uset =
-			(uids.empty())
+		QSet<QString> uset = uids.empty()
 			?
 			QSet<QString>()
 			:
@@ -2177,8 +2173,7 @@ void build_maps(
 // PNs
 	{
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-		QSet<QString> pset =
-			(pids.empty())
+		QSet<QString> pset = pids.empty()
 			?
 			QSet<QString>()
 			:
@@ -2202,8 +2197,7 @@ void build_maps(
 // IDs
 	{
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-		QSet<QString> iset =
-			(ids.empty())
+		QSet<QString> iset = ids.empty()
 			?
 			QSet<QString>()
 			:
@@ -2227,8 +2221,7 @@ void build_maps(
 //
 	{
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-		pat_ids_set =
-			(pat_ids_l.empty())
+		pat_ids_set = pat_ids_l.empty()
 			?
 			QSet<QString>()
 			:
@@ -2247,7 +2240,8 @@ static unsigned int count_dirs = 0;
 AnonymazerWidget2::AnonymazerWidget2(float si)
 {
 	setupUi(this);
-	const QSize s = QSize(static_cast<int>(16*si),static_cast<int>(16*si));
+	const QSize s =
+		QSize(static_cast<int>(16 * si),static_cast<int>(16 * si));
 	in_pushButton->setIconSize(s);
 	out_pushButton->setIconSize(s);
 	run_pushButton->setIconSize(s);
@@ -2276,10 +2270,10 @@ AnonymazerWidget2::AnonymazerWidget2(float si)
 #endif
 	help_widget = new HelpWidget();
 	help_widget->hide();
-	connect(out_pushButton,    SIGNAL(clicked()),    this,SLOT(set_output_dir()));
-	connect(in_pushButton,     SIGNAL(clicked()),    this,SLOT(set_input_dir()));
-	connect(help_pushButton,   SIGNAL(clicked()),    this,SLOT(show_help()));
-	connect(run_pushButton,    SIGNAL(clicked()),    this,SLOT(run_()));
+	connect(out_pushButton,  SIGNAL(clicked()), this, SLOT(set_output_dir()));
+	connect(in_pushButton,   SIGNAL(clicked()), this, SLOT(set_input_dir()));
+	connect(help_pushButton, SIGNAL(clicked()), this, SLOT(show_help()));
+	connect(run_pushButton,  SIGNAL(clicked()), this, SLOT(run_()));
 }
 
 AnonymazerWidget2::~AnonymazerWidget2()
@@ -2668,7 +2662,7 @@ void AnonymazerWidget2::run_()
 	QMap<QString, QString> id_m;
 	QSet<QString> pat_ids_set; // to check for one patient
 	QProgressDialog * pd =
-		new QProgressDialog(QString("De-identifying"),QString("Cancel"),0,0);
+		new QProgressDialog(QString("De-identifying"), QString("Cancel"), 0, 0);
 	pd->setWindowModality(Qt::ApplicationModal);
 	pd->setWindowFlags(
 		pd->windowFlags()^Qt::WindowContextHelpButtonHint);
@@ -2756,7 +2750,7 @@ void AnonymazerWidget2::run_()
 		std::cout << "Exception in AnonymazerWidget2::run_\n"
 			<< ex.what() << std::endl;
 	}
-	QString message("");
+	QString message;
 	if (count_errors > 0)
 	{
 		message = QString("Warning:\n") + QVariant(count_errors).toString() +

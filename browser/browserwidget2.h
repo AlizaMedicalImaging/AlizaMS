@@ -25,7 +25,8 @@
 class ScannerWatcher : public mdcm::SimpleSubjectWatcher
 {
 public:
-	ScannerWatcher(mdcm::Subject * s, const char * comment = "") : mdcm::SimpleSubjectWatcher(s, comment) {}
+	ScannerWatcher(mdcm::Subject * s, const char * comment = "")
+		: mdcm::SimpleSubjectWatcher(s, comment) {}
 	void StartFilter() override
 	{
 		QApplication::processEvents();
@@ -83,8 +84,10 @@ public:
 class TableWidgetItem : public QTableWidgetItem
 {
 public:
-	TableWidgetItem()                  : QTableWidgetItem(QTableWidgetItem::UserType+1)    {}
-	TableWidgetItem(const QString & s) : QTableWidgetItem(s, QTableWidgetItem::UserType+1) {}
+	TableWidgetItem()
+		: QTableWidgetItem(QTableWidgetItem::UserType + 1) {}
+	TableWidgetItem(const QString & s)
+		: QTableWidgetItem(s, QTableWidgetItem::UserType + 1) {}
 	~TableWidgetItem() {}
 	QStringList files;
 };
@@ -95,7 +98,7 @@ Q_OBJECT
 public:
 	BrowserWidget2(float);
 	~BrowserWidget2();
-	bool          is_first_run()  const;
+	bool          is_first_run() const;
 	const QString read_DICOMDIR(const QString&);
 	QStringList   get_files_of_1st();
 	void          writeSettings(QSettings&);

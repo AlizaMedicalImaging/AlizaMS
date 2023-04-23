@@ -24,7 +24,7 @@ class SQtree: public QWidget, private Ui::SQtree
 {
 Q_OBJECT
 public:
-	SQtree(bool=true);
+	SQtree(bool = true);
 	~SQtree();
 	void read_file(const QString&, const bool);
 	void read_file_and_series(const QString&, const bool);
@@ -55,7 +55,7 @@ private:
 		const mdcm::Dicts&,
 		QTreeWidgetItem*,
 		const char*,
-		const bool=false);
+		const bool = false);
 	void dump_csa(const mdcm::DataSet&);
 	void dump_gems(const mdcm::DataSet&);
 	void expand_children(const QModelIndex&);
