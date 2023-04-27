@@ -120,14 +120,6 @@ set(EXECUTABLE_OUTPUT_PATH ${OPENJPEG_BINARY_DIR}/bin CACHE PATH "Single output 
 set(LIBRARY_OUTPUT_PATH ${OPENJPEG_BINARY_DIR}/bin CACHE PATH "Single output directory for building all libraries.")
 mark_as_advanced(LIBRARY_OUTPUT_PATH EXECUTABLE_OUTPUT_PATH)
 
-# Compiler specific flags
-if(CMAKE_COMPILER_IS_GNUCC)
-  # For all builds, make sure openjpeg is std99 compliant:
-  # set(CMAKE_C_FLAGS "-Wall -std=c99 ${CMAKE_C_FLAGS}") # FIXME: this setting prevented us from setting a coverage build.
-  # Do not use ffast-math for all build, it would produce incorrect results, only set for release:
-  set(OPENJPEG_LIBRARY_COMPILE_OPTIONS ${OPENJPEG_LIBRARY_COMPILE_OPTIONS} "$<$<CONFIG:Release>:-ffast-math>")
-endif()
-
 # opj_config.h generation (1/2)
 
 # Check if some include files are provided by the system
