@@ -176,6 +176,9 @@ qMeshData * CollisionObject::get_mesh_data()
 	return mesh_data;
 }
 
+namespace
+{
+
 static QList<ImageVariant*> * selected_images__ = NULL;
 static long long GLWidget_count_vbos = 0;
 static bool GLWidget_max_vbos_65535  = false;
@@ -222,6 +225,8 @@ struct MyClosestRayResultCallback0 : public btCollisionWorld::ClosestRayResultCa
 		return false;
 	}
 };
+
+}
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 GLWidget::GLWidget()

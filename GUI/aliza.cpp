@@ -36,11 +36,6 @@
 #include <chrono>
 #endif
 
-static QMap<int, ImageVariant*> scene3dimages;
-static QList<ImageVariant*> selected_images;
-static QList<ImageVariant*> animation_images;
-static QList<double> anim3d_times;
-
 // These flags are used only for diagnostig build sometimes
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
@@ -50,6 +45,14 @@ static QList<double> anim3d_times;
 #include "btBulletCollisionCommon.h"
 #pragma GCC diagnostic pop
 
+namespace
+{
+
+static QMap<int, ImageVariant*> scene3dimages;
+static QList<ImageVariant*> selected_images;
+static QList<ImageVariant*> animation_images;
+static QList<double> anim3d_times;
+
 static btDefaultCollisionConfiguration * g_collisionConfiguration = NULL;
 static btCollisionDispatcher           * g_dispatcher             = NULL;
 static btDbvtBroadphase                * g_broadphase             = NULL;
@@ -57,8 +60,22 @@ static btCollisionWorld                * g_collisionWorld         = NULL;
 static btAlignedObjectArray<btCollisionShape*> g_collision_shapes;
 static bool show_all_study_collisions = true;
 
-// Preferred 'static' functions instead of unnamed namespace for Bullet stuff.
-static void search_frame_of_ref(
+struct ClosestRayResultCallback1 : public btCollisionWorld::ClosestRayResultCallback
+{
+	ClosestRayResultCallback1 (const btVector3 & rayFrom,const btVector3 & rayTo)
+		: btCollisionWorld::ClosestRayResultCallback(rayFrom, rayTo) {}
+	virtual ~ClosestRayResultCallback1() {}
+	bool needsCollision(btBroadphaseProxy * proxy0) const
+	{
+		btCollisionObject * b =
+			static_cast<btCollisionObject *>(proxy0->m_clientObject);
+		const int * p = static_cast<int*>(b->getUserPointer());
+		if (p && (p[2] == 2)) return true;
+		return false;
+	}
+};
+
+void search_frame_of_ref(
 	const int id,
 	const QString & frame_uid,
 	const QString & study_uid,
@@ -85,7 +102,7 @@ static void search_frame_of_ref(
 	}
 }
 
-static void search_frame_of_ref2(
+void search_frame_of_ref2(
 	const int id,
 	const QString & frame_uid,
 	const QString & study_uid,
@@ -105,7 +122,7 @@ static void search_frame_of_ref2(
 	}
 }
 
-static void g_init_physics()
+void g_init_physics()
 {
 	g_collisionConfiguration = new btDefaultCollisionConfiguration();
 	g_dispatcher = new btCollisionDispatcher(g_collisionConfiguration);
@@ -116,7 +133,7 @@ static void g_init_physics()
 #endif
 }
 
-static void g_close_physics()
+void g_close_physics()
 {
 	if (g_collisionWorld)
 	{
@@ -189,7 +206,7 @@ static void g_close_physics()
 #endif
 }
 
-static bool check_slices_parallel(
+bool check_slices_parallel(
 	const ImageVariant * v0,
 	const int z0,
 	const ImageVariant * v1,
@@ -236,7 +253,7 @@ static bool check_slices_parallel(
 	return false;
 }
 
-static void add_slice_collision_plane(
+void add_slice_collision_plane(
 	const ImageVariant * v,
 	const int z,
 	const int id,
@@ -274,22 +291,7 @@ static void add_slice_collision_plane(
 	g_collisionWorld->addCollisionObject(o);
 }
 
-struct ClosestRayResultCallback1 : public btCollisionWorld::ClosestRayResultCallback
-{
-	ClosestRayResultCallback1 (const btVector3 & rayFrom,const btVector3 & rayTo)
-		: btCollisionWorld::ClosestRayResultCallback(rayFrom, rayTo) {}
-	virtual ~ClosestRayResultCallback1() {}
-	bool needsCollision(btBroadphaseProxy * proxy0) const
-	{
-		btCollisionObject * b =
-			static_cast<btCollisionObject *>(proxy0->m_clientObject);
-		const int * p = static_cast<int*>(b->getUserPointer());
-		if (p && (p[2] == 2)) return true;
-		return false;
-	}
-};
-
-static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
+void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 {
 #ifdef ALIZA_PERF_COLLISION
 	auto t0 = std::chrono::steady_clock::now();
@@ -465,7 +467,7 @@ static void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 #endif
 }
 
-static void check_slice_collisions2(StudyViewWidget * w)
+void check_slice_collisions2(StudyViewWidget * w)
 {
 #ifdef ALIZA_PERF_COLLISION
 	auto t0 = std::chrono::steady_clock::now();
@@ -647,6 +649,8 @@ static void check_slice_collisions2(StudyViewWidget * w)
 	auto ts = std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0);
 	std::cout << ts.count() << " ns" << std::endl;
 #endif
+}
+
 }
 
 Aliza::Aliza()
