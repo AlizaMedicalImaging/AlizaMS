@@ -566,11 +566,11 @@ void StudyGraphicsView::draw_prtexts(const ImageVariant * ivariant)
 		double L_, a_, b_;
 		ColorSpace_::Rgb2Lab(
 			&L_, &a_, &b_, 5.0 / 255.0, 220.0 / 255.0, 5.0 / 255.0);
-		const unsigned short L = (unsigned short)((L_/100.0)*0xffff);
+		const unsigned short L = (unsigned short)((L_ / 100.0) * 65535.0);
 		const unsigned short a =
-			(unsigned short)(((a_ + 128.0) / 255.0) * 0xffff);
+			(unsigned short)(((a_ + 128.0) / 255.0) * 65535.0);
 		const unsigned short b =
-			(unsigned short)(((b_ + 128.0) / 255.0) * 0xffff);
+			(unsigned short)(((b_ + 128.0) / 255.0) * 65535.0);
 		std::cout <<  L << " " << a << " " << b << std::endl;
 	}
 #endif
@@ -808,19 +808,16 @@ void StudyGraphicsView::draw_prtexts(const ImageVariant * ivariant)
 				l.at(x).TextColorCIELabValue_b == -1))
 			{
 				double R, G, B;
-				double _L = (static_cast<double>(l.at(x).TextColorCIELabValue_L) /
-					65535.0) * 100.0;
+				double _L = (static_cast<double>(l.at(x).TextColorCIELabValue_L) / 65535.0) * 100.0;
 				double _a = ((static_cast<unsigned short>
-					(l.at(x).TextColorCIELabValue_a) - 0x8080) /
-						65535.0) * 0xff;
+					(l.at(x).TextColorCIELabValue_a) - 0x8080) / 65535.0) * 255.0;
 				double _b = ((static_cast<unsigned short>
-					(l.at(x).TextColorCIELabValue_b) - 0x8080) /
-						65535.0) * 0xff;
+					(l.at(x).TextColorCIELabValue_b) - 0x8080) / 65535.0) * 255.0;
 				ColorSpace_::Lab2Rgb(&R, &G, &B, _L, _a, _b);
 				i->setDefaultTextColor(QColor(
-					static_cast<int>(R * 255),
-					static_cast<int>(G * 255),
-					static_cast<int>(B * 255),
+					static_cast<int>(R * 255.0),
+					static_cast<int>(G * 255.0),
+					static_cast<int>(B * 255.0),
 					255));
 			}
 			else
@@ -845,20 +842,17 @@ void StudyGraphicsView::draw_prtexts(const ImageVariant * ivariant)
 					l.at(x).ShadowColorCIELabValue_b == -1))
 				{
 					double R, G, B;
-					double _L = (static_cast<double>(l.at(x).ShadowColorCIELabValue_L) /
-						65535.0) * 100.0;
+					double _L = (static_cast<double>(l.at(x).ShadowColorCIELabValue_L) / 65535.0) * 100.0;
 					double _a = ((static_cast<unsigned short>
-						(l.at(x).ShadowColorCIELabValue_a) - 0x8080) /
-							65535.0) * 0xff;
+						(l.at(x).ShadowColorCIELabValue_a) - 0x8080) / 65535.0) * 255.0;
 					double _b = ((static_cast<unsigned short>
-						(l.at(x).ShadowColorCIELabValue_b) - 0x8080) /
-							65535.0) * 0xff;
+						(l.at(x).ShadowColorCIELabValue_b) - 0x8080) / 65535.0) * 255.0;
 					ColorSpace_::Lab2Rgb(&R, &G, &B, _L, _a, _b);
 					shadow->setColor(
 						QColor(
-							static_cast<int>(R * 255),
-							static_cast<int>(G * 255),
-							static_cast<int>(B * 255),
+							static_cast<int>(R * 255.0),
+							static_cast<int>(G * 255.0),
+							static_cast<int>(B * 255.0),
 							static_cast<int>(opacity)));
 				}
 				else
