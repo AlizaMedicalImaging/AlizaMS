@@ -21,9 +21,6 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 {
 	setupUi(this);
 	horizontal = !vertical;
-	active_id = -1;
-	saved_r = -1;
-	saved_c = -1;
 	//
 	const int widgets_size = 25;
 	//
@@ -152,7 +149,7 @@ StudyViewWidget::~StudyViewWidget()
 				widgets[x]->graphicswidget->clear_();
 			}
 			delete widgets[x];
-			widgets[x] = NULL;
+			widgets[x] = nullptr;
 		}
 	}
 	widgets.clear();
@@ -433,7 +430,7 @@ void StudyViewWidget::update_grid(int r, int c)
 			}
 		}
 		delete layout;
-		layout = NULL;
+		layout = nullptr;
 	}
 	QGridLayout * gridLayout = new QGridLayout(frame);
 	int j = 0;
@@ -546,7 +543,7 @@ void StudyViewWidget::set_active_image(ImageContainer * c)
 void StudyViewWidget::update_full(ImageContainer * c)
 {
 	block_signals(true);
-	const ImageVariant * v = c->image3D; // checked NULL before
+	const ImageVariant * v = c->image3D; // checked nullptr before
 	update_max_width(v->di->rmax-v->di->rmin);
 	update_window_upper(v->di->rmax);
 	update_window_lower(v->di->rmin);
@@ -1051,7 +1048,7 @@ void StudyViewWidget::set_single(const unsigned long long widget_id)
 	}
 	saved_r = layout->rowCount();
 	saved_c = layout->columnCount();
-	StudyFrameWidget * selected = NULL;
+	StudyFrameWidget * selected = nullptr;
 	for (int x = 0; x < saved_r; ++x)
 	{
 		for (int y = 0; y < saved_c; ++y)
@@ -1088,7 +1085,7 @@ void StudyViewWidget::set_single(const unsigned long long widget_id)
 		}
 	}
 	delete layout;
-	layout = NULL;
+	layout = nullptr;
 	active_id = -1;
 	qApp->processEvents();
 	if (selected)

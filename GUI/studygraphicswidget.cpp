@@ -23,7 +23,7 @@ void gImageCleanupHandler2(void * info)
 	if (!info) return;
 	unsigned char * p = static_cast<unsigned char*>(info);
 	delete [] p;
-	info = NULL;
+	info = nullptr;
 }
 
 template<typename Tin, typename Tout> QString get_slice2_(
@@ -68,7 +68,7 @@ template<typename Tin, typename Tout> QString get_slice2_(
 	}
 	else
 	{
-		return QString("Out image is NULL");
+		return QString("Out image is nullptr");
 	}
 	if (v2d)
 	{
@@ -99,7 +99,7 @@ template<typename T> void load_rgb_image2(
 	{
 		widget->graphicsview->scene()->removeItem(widget->graphicsview->image_item);
 		delete widget->graphicsview->image_item;
-		widget->graphicsview->image_item = NULL;
+		widget->graphicsview->image_item = nullptr;
 	}
 	widget->graphicsview->image_item = new QGraphicsPixmapItem();
 	widget->graphicsview->image_item->setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
@@ -250,7 +250,7 @@ template<typename T> void load_rgb_image2(
 	if (p__)
 	{
 		delete [] p__;
-		p__ = NULL;
+		p__ = nullptr;
 	}
 #endif
 }
@@ -273,7 +273,7 @@ template<typename T> void load_rgba_image2(
 	{
 		widget->graphicsview->scene()->removeItem(widget->graphicsview->image_item);
 		delete widget->graphicsview->image_item;
-		widget->graphicsview->image_item = NULL;
+		widget->graphicsview->image_item = nullptr;
 	}
 	widget->graphicsview->image_item = new QGraphicsPixmapItem();
 	widget->graphicsview->image_item->setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
@@ -515,7 +515,7 @@ template<typename T> void load_rgba_image2(
 	if (p__)
 	{
 		delete [] p__;
-		p__ = NULL;
+		p__ = nullptr;
 	}
 #endif
 }
@@ -542,7 +542,7 @@ template<typename T> void load_rgb_char_image2(
 	{
 		widget->graphicsview->scene()->removeItem(widget->graphicsview->image_item);
 		delete widget->graphicsview->image_item;
-		widget->graphicsview->image_item = NULL;
+		widget->graphicsview->image_item = nullptr;
 	}
 	//
 	widget->graphicsview->image_item = new QGraphicsPixmapItem();
@@ -650,7 +650,7 @@ template<typename T> void load_rgba_char_image2(
 	{
 		widget->graphicsview->scene()->removeItem(widget->graphicsview->image_item);
 		delete widget->graphicsview->image_item;
-		widget->graphicsview->image_item = NULL;
+		widget->graphicsview->image_item = nullptr;
 	}
 	//
 	widget->graphicsview->image_item = new QGraphicsPixmapItem();
@@ -790,7 +790,7 @@ template<typename T> void load_rgba_char_image2(
 	if (p)
 	{
 		delete [] p;
-		p = NULL;
+		p = nullptr;
 	}
 #endif
 }
@@ -953,7 +953,7 @@ template<typename T> void load_image2(
 	for (size_t i = 0; i < threadsLUT_size; ++i)
 	{
 		delete widget->threadsLUT_[i];
-		widget->threadsLUT_[i] = NULL;
+		widget->threadsLUT_[i] = nullptr;
 	}
 	widget->threadsLUT_.clear();
 	//
@@ -975,7 +975,7 @@ template<typename T> void load_image2(
 	{
 		widget->graphicsview->scene()->removeItem(widget->graphicsview->image_item);
 		delete widget->graphicsview->image_item;
-		widget->graphicsview->image_item = NULL;
+		widget->graphicsview->image_item = nullptr;
 	}
 	//
 	widget->graphicsview->image_item = new QGraphicsPixmapItem();
@@ -1045,7 +1045,7 @@ template<typename T> void load_image2(
 	if (p)
 	{
 		delete [] p;
-		p = NULL;
+		p = nullptr;
 	}
 #endif
 }
@@ -1112,17 +1112,7 @@ static unsigned long long StudyGraphicsWidget_id = 0;
 StudyGraphicsWidget::StudyGraphicsWidget()
 {
 	widget_id = ++StudyGraphicsWidget_id;
-	studyview = NULL;
-	slider = NULL;
-	top_label = NULL;
-	left_label = NULL;
-	measure_label = NULL;
-	icon_button = NULL;
-	smooth_ = true;
-	mouse_modus = 0;
-	enable_shutter = true;
-	enable_overlays = true;
-	image_container.image3D = NULL;
+	image_container.image3D = nullptr;
 	image_container.axis = 2;
 	image_container.image2D = new ImageVariant2D();
 	graphicsview = new StudyGraphicsView(this);
@@ -1143,15 +1133,15 @@ StudyGraphicsWidget::~StudyGraphicsWidget()
 			{
 				if (threadsLUT_.at(i)->isRunning()) threadsLUT_[i]->exit();
 				delete threadsLUT_[i];
-				threadsLUT_[i] = NULL;
+				threadsLUT_[i] = nullptr;
 			}
 		}
 		if (image_container.image2D)
 		{
 			delete image_container.image2D;
-			image_container.image2D = NULL;
+			image_container.image2D = nullptr;
 		}
-		image_container.image3D = NULL;
+		image_container.image3D = nullptr;
 		mutex.unlock();
 	}
 }
@@ -1466,7 +1456,7 @@ void StudyGraphicsWidget::clear_(bool lock)
 #ifdef DELETE_STUDYGRAPHICSIMAGEITEM
 		if (graphicsview->scene()) graphicsview->scene()->removeItem(graphicsview->image_item);
 		delete graphicsview->image_item;
-		graphicsview->image_item = NULL;
+		graphicsview->image_item = nullptr;
 #else
 		QPixmap p(16, 16);
 		graphicsview->image_item->setPixmap(p);
@@ -1501,120 +1491,120 @@ void StudyGraphicsWidget::clear_(bool lock)
 		if (image_container.image2D->pSS.IsNotNull())
 		{
 			image_container.image2D->pSS->DisconnectPipeline();
-			image_container.image2D->pSS = NULL;
+			image_container.image2D->pSS = nullptr;
 		}
 		if (image_container.image2D->pUS.IsNotNull())
 		{
 			image_container.image2D->pUS->DisconnectPipeline();
-			image_container.image2D->pUS = NULL;
+			image_container.image2D->pUS = nullptr;
 		}
 		if (image_container.image2D->pSI.IsNotNull())
 		{
 			image_container.image2D->pSI->DisconnectPipeline();
-			image_container.image2D->pSI = NULL;
+			image_container.image2D->pSI = nullptr;
 		}
 		if (image_container.image2D->pUI.IsNotNull())
 		{
 			image_container.image2D->pUI->DisconnectPipeline();
-			image_container.image2D->pUI = NULL;
+			image_container.image2D->pUI = nullptr;
 		}
 		if (image_container.image2D->pUC.IsNotNull())
 		{
 			image_container.image2D->pUC->DisconnectPipeline();
-			image_container.image2D->pUC = NULL;
+			image_container.image2D->pUC = nullptr;
 		}
 		if (image_container.image2D->pF.IsNotNull())
 		{
 			image_container.image2D->pF->DisconnectPipeline();
-			image_container.image2D->pF = NULL;
+			image_container.image2D->pF = nullptr;
 		}
 		if (image_container.image2D->pD.IsNotNull())
 		{
 			image_container.image2D->pD->DisconnectPipeline();
-			image_container.image2D->pD = NULL;
+			image_container.image2D->pD = nullptr;
 		}
 		if (image_container.image2D->pSLL.IsNotNull())
 		{
 			image_container.image2D->pSLL->DisconnectPipeline();
-			image_container.image2D->pSLL = NULL;
+			image_container.image2D->pSLL = nullptr;
 		}
 		if (image_container.image2D->pULL.IsNotNull())
 		{
 			image_container.image2D->pULL->DisconnectPipeline();
-			image_container.image2D->pULL = NULL;
+			image_container.image2D->pULL = nullptr;
 		}
 		if (image_container.image2D->pSS_rgb.IsNotNull())
 		{
 			image_container.image2D->pSS_rgb->DisconnectPipeline();
-			image_container.image2D->pSS_rgb = NULL;
+			image_container.image2D->pSS_rgb = nullptr;
 		}
 		if (image_container.image2D->pUS_rgb.IsNotNull())
 		{
 			image_container.image2D->pUS_rgb->DisconnectPipeline();
-			image_container.image2D->pUS_rgb = NULL;
+			image_container.image2D->pUS_rgb = nullptr;
 		}
 		if (image_container.image2D->pSI_rgb.IsNotNull())
 		{
 			image_container.image2D->pSI_rgb->DisconnectPipeline();
-			image_container.image2D->pSI_rgb = NULL;
+			image_container.image2D->pSI_rgb = nullptr;
 		}
 		if (image_container.image2D->pUI_rgb.IsNotNull())
 		{
 			image_container.image2D->pUI_rgb->DisconnectPipeline();
-			image_container.image2D->pUI_rgb = NULL;
+			image_container.image2D->pUI_rgb = nullptr;
 		}
 		if (image_container.image2D->pUC_rgb.IsNotNull())
 		{
 			image_container.image2D->pUC_rgb->DisconnectPipeline();
-			image_container.image2D->pUC_rgb = NULL;
+			image_container.image2D->pUC_rgb = nullptr;
 		}
 		if (image_container.image2D->pF_rgb .IsNotNull())
 		{
 			image_container.image2D->pF_rgb->DisconnectPipeline();
-			image_container.image2D->pF_rgb = NULL;
+			image_container.image2D->pF_rgb = nullptr;
 		}
 		if (image_container.image2D->pD_rgb.IsNotNull())
 		{
 			image_container.image2D->pD_rgb->DisconnectPipeline();
-			image_container.image2D->pD_rgb = NULL;
+			image_container.image2D->pD_rgb = nullptr;
 		}
 		if (image_container.image2D->pSS_rgba.IsNotNull())
 		{
 			image_container.image2D->pSS_rgba->DisconnectPipeline();
-			image_container.image2D->pSS_rgba = NULL;
+			image_container.image2D->pSS_rgba = nullptr;
 		}
 		if (image_container.image2D->pUS_rgba.IsNotNull())
 		{
 			image_container.image2D->pUS_rgba->DisconnectPipeline();
-			image_container.image2D->pUS_rgba = NULL;
+			image_container.image2D->pUS_rgba = nullptr;
 		}
 		if (image_container.image2D->pSI_rgba.IsNotNull())
 		{
 			image_container.image2D->pSI_rgba->DisconnectPipeline();
-			image_container.image2D->pSI_rgba = NULL;
+			image_container.image2D->pSI_rgba = nullptr;
 		}
 		if (image_container.image2D->pUI_rgba.IsNotNull())
 		{
 			image_container.image2D->pUI_rgba->DisconnectPipeline();
-			image_container.image2D->pUI_rgba = NULL;
+			image_container.image2D->pUI_rgba = nullptr;
 		}
 		if (image_container.image2D->pUC_rgba.IsNotNull())
 		{
 			image_container.image2D->pUC_rgba->DisconnectPipeline();
-			image_container.image2D->pUC_rgba = NULL;
+			image_container.image2D->pUC_rgba = nullptr;
 		}
 		if (image_container.image2D->pF_rgba.IsNotNull())
 		{
 			image_container.image2D->pF_rgba->DisconnectPipeline();
-			image_container.image2D->pF_rgba = NULL;
+			image_container.image2D->pF_rgba = nullptr;
 		}
 		if (image_container.image2D->pD_rgba.IsNotNull())
 		{
 			image_container.image2D->pD_rgba->DisconnectPipeline();
-			image_container.image2D->pD_rgba = NULL;
+			image_container.image2D->pD_rgba = nullptr;
 		}
 	}
-	image_container.image3D = NULL;
+	image_container.image3D = nullptr;
 	graphicsview->set_empty_distance();
 	graphicsview->clear_us_regions();
 	graphicsview->clear_prtexts_items();
@@ -1633,7 +1623,7 @@ void StudyGraphicsWidget::set_image(
 #ifdef DELETE_STUDYGRAPHICSIMAGEITEM
 		graphicsview->scene()->removeItem(graphicsview->image_item);
 		delete graphicsview->image_item;
-		graphicsview->image_item = NULL;
+		graphicsview->image_item = nullptr;
 #else
 		QPixmap p(16, 16);
 		graphicsview->image_item->setPixmap(p);
@@ -1678,117 +1668,117 @@ void StudyGraphicsWidget::set_image(
 	if (image_container.image2D->pSS.IsNotNull())
 	{
 		image_container.image2D->pSS->DisconnectPipeline();
-		image_container.image2D->pSS = NULL;
+		image_container.image2D->pSS = nullptr;
 	}
 	if (image_container.image2D->pUS.IsNotNull())
 	{
 		image_container.image2D->pUS->DisconnectPipeline();
-		image_container.image2D->pUS = NULL;
+		image_container.image2D->pUS = nullptr;
 	}
 	if (image_container.image2D->pSI.IsNotNull())
 	{
 		image_container.image2D->pSI->DisconnectPipeline();
-		image_container.image2D->pSI = NULL;
+		image_container.image2D->pSI = nullptr;
 	}
 	if (image_container.image2D->pUI.IsNotNull())
 	{
 		image_container.image2D->pUI->DisconnectPipeline();
-		image_container.image2D->pUI = NULL;
+		image_container.image2D->pUI = nullptr;
 	}
 	if (image_container.image2D->pUC.IsNotNull())
 	{
 		image_container.image2D->pUC->DisconnectPipeline();
-		image_container.image2D->pUC = NULL;
+		image_container.image2D->pUC = nullptr;
 	}
 	if (image_container.image2D->pF.IsNotNull())
 	{
 		image_container.image2D->pF->DisconnectPipeline();
-		image_container.image2D->pF = NULL;
+		image_container.image2D->pF = nullptr;
 	}
 	if (image_container.image2D->pD.IsNotNull())
 	{
 		image_container.image2D->pD->DisconnectPipeline();
-		image_container.image2D->pD = NULL;
+		image_container.image2D->pD = nullptr;
 	}
 	if (image_container.image2D->pSLL.IsNotNull())
 	{
 		image_container.image2D->pSLL->DisconnectPipeline();
-		image_container.image2D->pSLL = NULL;
+		image_container.image2D->pSLL = nullptr;
 	}
 	if (image_container.image2D->pULL.IsNotNull())
 	{
 		image_container.image2D->pULL->DisconnectPipeline();
-		image_container.image2D->pULL = NULL;
+		image_container.image2D->pULL = nullptr;
 	}
 	if (image_container.image2D->pSS_rgb.IsNotNull())
 	{
 		image_container.image2D->pSS_rgb->DisconnectPipeline();
-		image_container.image2D->pSS_rgb = NULL;
+		image_container.image2D->pSS_rgb = nullptr;
 	}
 	if (image_container.image2D->pUS_rgb.IsNotNull())
 	{
 		image_container.image2D->pUS_rgb->DisconnectPipeline();
-		image_container.image2D->pUS_rgb = NULL;
+		image_container.image2D->pUS_rgb = nullptr;
 	}
 	if (image_container.image2D->pSI_rgb.IsNotNull())
 	{
 		image_container.image2D->pSI_rgb->DisconnectPipeline();
-		image_container.image2D->pSI_rgb = NULL;
+		image_container.image2D->pSI_rgb = nullptr;
 	}
 	if (image_container.image2D->pUI_rgb.IsNotNull())
 	{
 		image_container.image2D->pUI_rgb->DisconnectPipeline();
-		image_container.image2D->pUI_rgb = NULL;
+		image_container.image2D->pUI_rgb = nullptr;
 	}
 	if (image_container.image2D->pUC_rgb.IsNotNull())
 	{
 		image_container.image2D->pUC_rgb ->DisconnectPipeline();
-		image_container.image2D->pUC_rgb = NULL;
+		image_container.image2D->pUC_rgb = nullptr;
 	}
 	if (image_container.image2D->pF_rgb.IsNotNull())
 	{
 		image_container.image2D->pF_rgb->DisconnectPipeline();
-		image_container.image2D->pF_rgb = NULL;
+		image_container.image2D->pF_rgb = nullptr;
 	}
 	if (image_container.image2D->pD_rgb.IsNotNull())
 	{
 		image_container.image2D->pD_rgb->DisconnectPipeline();
-		image_container.image2D->pD_rgb = NULL;
+		image_container.image2D->pD_rgb = nullptr;
 	}
 	if (image_container.image2D->pSS_rgba.IsNotNull())
 	{
 		image_container.image2D->pSS_rgba->DisconnectPipeline();
-		image_container.image2D->pSS_rgba = NULL;
+		image_container.image2D->pSS_rgba = nullptr;
 	}
 	if (image_container.image2D->pUS_rgba.IsNotNull())
 	{
 		image_container.image2D->pUS_rgba->DisconnectPipeline();
-		image_container.image2D->pUS_rgba = NULL;
+		image_container.image2D->pUS_rgba = nullptr;
 	}
 	if (image_container.image2D->pSI_rgba.IsNotNull())
 	{
 		image_container.image2D->pSI_rgba->DisconnectPipeline();
-		image_container.image2D->pSI_rgba = NULL;
+		image_container.image2D->pSI_rgba = nullptr;
 	}
 	if (image_container.image2D->pUI_rgba.IsNotNull())
 	{
 		image_container.image2D->pUI_rgba->DisconnectPipeline();
-		image_container.image2D->pUI_rgba = NULL;
+		image_container.image2D->pUI_rgba = nullptr;
 	}
 	if (image_container.image2D->pUC_rgba.IsNotNull())
 	{
 		image_container.image2D->pUC_rgba->DisconnectPipeline();
-		image_container.image2D->pUC_rgba = NULL;
+		image_container.image2D->pUC_rgba = nullptr;
 	}
 	if (image_container.image2D->pF_rgba.IsNotNull())
 	{
 		image_container.image2D->pF_rgba->DisconnectPipeline();
-		image_container.image2D->pF_rgba = NULL;
+		image_container.image2D->pF_rgba = nullptr;
 	}
 	if (image_container.image2D->pD_rgba.IsNotNull())
 	{
 		image_container.image2D->pD_rgba->DisconnectPipeline();
-		image_container.image2D->pD_rgba = NULL;
+		image_container.image2D->pD_rgba = nullptr;
 	}
 	//
 	x = image_container.image3D->di->idimz / 2;
@@ -2061,7 +2051,7 @@ void StudyGraphicsWidget::set_selected_slice2(int x, bool update_all)
 #ifdef DELETE_STUDYGRAPHICSIMAGEITEM
 		graphicsview->scene()->removeItem(graphicsview->image_item);
 		delete graphicsview->image_item;
-		graphicsview->image_item = NULL;
+		graphicsview->image_item = nullptr;
 #else
 		QPixmap p(16, 16);
 		graphicsview->image_item->setPixmap(p);
@@ -2095,73 +2085,73 @@ void StudyGraphicsWidget::set_selected_slice2(int x, bool update_all)
 	image_container.image2D->idimy = 0;
 	if (image_container.image2D->pSS.IsNotNull())
 		image_container.image2D->pSS->DisconnectPipeline();
-	image_container.image2D->pSS = NULL;
+	image_container.image2D->pSS = nullptr;
 	if (image_container.image2D->pUS.IsNotNull())
 		image_container.image2D->pUS->DisconnectPipeline();
-	image_container.image2D->pUS = NULL;
+	image_container.image2D->pUS = nullptr;
 	if (image_container.image2D->pSI.IsNotNull())
 		image_container.image2D->pSI->DisconnectPipeline();
-	image_container.image2D->pSI = NULL;
+	image_container.image2D->pSI = nullptr;
 	if (image_container.image2D->pUI.IsNotNull())
 		image_container.image2D->pUI->DisconnectPipeline();
-	image_container.image2D->pUI = NULL;
+	image_container.image2D->pUI = nullptr;
 	if (image_container.image2D->pUC.IsNotNull())
 		image_container.image2D->pUC->DisconnectPipeline();
-	image_container.image2D->pUC = NULL;
+	image_container.image2D->pUC = nullptr;
 	if (image_container.image2D->pF.IsNotNull())
 		image_container.image2D->pF->DisconnectPipeline();
-	image_container.image2D->pF = NULL;
+	image_container.image2D->pF = nullptr;
 	if (image_container.image2D->pD.IsNotNull())
 		image_container.image2D->pD->DisconnectPipeline();
-	image_container.image2D->pD = NULL;
+	image_container.image2D->pD = nullptr;
 	if (image_container.image2D->pSLL.IsNotNull())
 		image_container.image2D->pSLL->DisconnectPipeline();
-	image_container.image2D->pSLL = NULL;
+	image_container.image2D->pSLL = nullptr;
 	if (image_container.image2D->pULL.IsNotNull())
 		image_container.image2D->pULL->DisconnectPipeline();
-	image_container.image2D->pULL = NULL;
+	image_container.image2D->pULL = nullptr;
 	if (image_container.image2D->pSS_rgb.IsNotNull())
 		image_container.image2D->pSS_rgb->DisconnectPipeline();
-	image_container.image2D->pSS_rgb = NULL;
+	image_container.image2D->pSS_rgb = nullptr;
 	if (image_container.image2D->pUS_rgb.IsNotNull())
 		image_container.image2D->pUS_rgb->DisconnectPipeline();
-	image_container.image2D->pUS_rgb = NULL;
+	image_container.image2D->pUS_rgb = nullptr;
 	if (image_container.image2D->pSI_rgb.IsNotNull())
 		image_container.image2D->pSI_rgb->DisconnectPipeline();
-	image_container.image2D->pSI_rgb = NULL;
+	image_container.image2D->pSI_rgb = nullptr;
 	if (image_container.image2D->pUI_rgb.IsNotNull())
 		image_container.image2D->pUI_rgb->DisconnectPipeline();
-	image_container.image2D->pUI_rgb = NULL;
+	image_container.image2D->pUI_rgb = nullptr;
 	if (image_container.image2D->pUC_rgb.IsNotNull())
 		image_container.image2D->pUC_rgb ->DisconnectPipeline();
-	image_container.image2D->pUC_rgb = NULL;
+	image_container.image2D->pUC_rgb = nullptr;
 	if (image_container.image2D->pF_rgb.IsNotNull())
 		image_container.image2D->pF_rgb->DisconnectPipeline();
-	image_container.image2D->pF_rgb = NULL;
+	image_container.image2D->pF_rgb = nullptr;
 	if (image_container.image2D->pD_rgb.IsNotNull())
 		image_container.image2D->pD_rgb->DisconnectPipeline();
-	image_container.image2D->pD_rgb = NULL;
+	image_container.image2D->pD_rgb = nullptr;
 	if (image_container.image2D->pSS_rgba.IsNotNull())
 		image_container.image2D->pSS_rgba->DisconnectPipeline();
-	image_container.image2D->pSS_rgba = NULL;
+	image_container.image2D->pSS_rgba = nullptr;
 	if (image_container.image2D->pUS_rgba.IsNotNull())
 		image_container.image2D->pUS_rgba->DisconnectPipeline();
-	image_container.image2D->pUS_rgba = NULL;
+	image_container.image2D->pUS_rgba = nullptr;
 	if (image_container.image2D->pSI_rgba.IsNotNull())
 		image_container.image2D->pSI_rgba->DisconnectPipeline();
-	image_container.image2D->pSI_rgba = NULL;
+	image_container.image2D->pSI_rgba = nullptr;
 	if (image_container.image2D->pUI_rgba.IsNotNull())
 		image_container.image2D->pUI_rgba->DisconnectPipeline();
-	image_container.image2D->pUI_rgba = NULL;
+	image_container.image2D->pUI_rgba = nullptr;
 	if (image_container.image2D->pUC_rgba.IsNotNull())
 		image_container.image2D->pUC_rgba->DisconnectPipeline();
-	image_container.image2D->pUC_rgba = NULL;
+	image_container.image2D->pUC_rgba = nullptr;
 	if (image_container.image2D->pF_rgba.IsNotNull())
 		image_container.image2D->pF_rgba->DisconnectPipeline();
-	image_container.image2D->pF_rgba = NULL;
+	image_container.image2D->pF_rgba = nullptr;
 	if (image_container.image2D->pD_rgba.IsNotNull())
 		image_container.image2D->pD_rgba->DisconnectPipeline();
-	image_container.image2D->pD_rgba = NULL;
+	image_container.image2D->pD_rgba = nullptr;
 	//
 	switch (image_container.image3D->image_type)
 	{

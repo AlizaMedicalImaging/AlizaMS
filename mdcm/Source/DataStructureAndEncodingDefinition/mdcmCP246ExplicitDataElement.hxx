@@ -70,8 +70,8 @@ CP246ExplicitDataElement::ReadPreValue(std::istream & is)
     {
       mdcmDebugMacro("Item Delimitation Item has a length different from 0");
     }
-    // Set pointer to NULL to avoid user error
-    ValueField = NULL;
+    // Set pointer to nullptr to avoid user error
+    ValueField = nullptr;
     return is;
   }
   // Read VR
@@ -127,7 +127,7 @@ CP246ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
     return is;
   if (ValueLengthField == 0)
   {
-    ValueField = NULL;
+    ValueField = nullptr;
     return is;
   }
   // Read the Value

@@ -2279,7 +2279,7 @@ AnonymazerWidget2::AnonymazerWidget2(float si)
 AnonymazerWidget2::~AnonymazerWidget2()
 {
 	delete help_widget;
-	help_widget = NULL;
+	help_widget = nullptr;
 }
 
 void AnonymazerWidget2::readSettings()
@@ -2606,7 +2606,7 @@ void AnonymazerWidget2::run_()
 	{
 		run_pushButton->setEnabled(false);
 		QMessageBox::information(
-			NULL,
+			nullptr,
 			QString("De-identify"),
 			QString("Select input and output directories"));
 		return;
@@ -2615,7 +2615,7 @@ void AnonymazerWidget2::run_()
 	if (out_path == in_path)
 	{
 		QMessageBox::information(
-			NULL,
+			nullptr,
 			QString("De-identify"),
 			QString("Error: input and output are the same directory"));
 		return;
@@ -2698,7 +2698,7 @@ void AnonymazerWidget2::run_()
 			pd->close();
 			delete pd;
 			QMessageBox::information(
-				NULL,
+				nullptr,
 				QString("De-identify"),
 				QString(
 					"Error: can not replace Patient Name/ID -\n"

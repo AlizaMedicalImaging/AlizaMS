@@ -37,7 +37,7 @@ public:
   Dicts();
   ~Dicts();
   const DictEntry &
-  GetDictEntry(const Tag &, const char(*) = NULL) const;
+  GetDictEntry(const Tag &, const char(*) = nullptr) const;
   const DictEntry &
   GetDictEntry(const PrivateTag &) const;
   const Dict &

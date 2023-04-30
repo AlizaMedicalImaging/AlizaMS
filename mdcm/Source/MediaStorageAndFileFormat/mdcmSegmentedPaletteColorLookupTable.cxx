@@ -166,7 +166,7 @@ ExpandPalette(const EntryType * raw_values, uint32_t length, std::vector<EntryTy
   const EntryType *                        raw_seg = raw_values;
   while ((std::distance(raw_values, raw_seg) * sizeof(EntryType)) < length)
   {
-    Segment<EntryType> * segment = NULL;
+    Segment<EntryType> * segment = nullptr;
     if (*raw_seg == 0)
     {
       segment = new DiscreteSegment<EntryType>(raw_seg);

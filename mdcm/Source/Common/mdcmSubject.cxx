@@ -161,7 +161,7 @@ SubjectInternals::GetCommand(unsigned long tag)
       return (*i)->m_Command;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 bool

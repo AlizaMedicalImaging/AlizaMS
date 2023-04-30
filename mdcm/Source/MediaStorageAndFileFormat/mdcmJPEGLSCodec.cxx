@@ -120,7 +120,7 @@ JPEGLSCodec::Decode(DataElement const & in, DataElement & out)
       assert(totalLen > 0 && pbyteCompressed[totalLen - 1] == 0xd9);
       size_t        cbyteCompressed = totalLen;
       JlsParameters params = {};
-      if (JpegLsReadHeader(pbyteCompressed, cbyteCompressed, &params, NULL) != ApiResult::OK)
+      if (JpegLsReadHeader(pbyteCompressed, cbyteCompressed, &params, nullptr) != ApiResult::OK)
       {
         mdcmDebugMacro("Could not parse JPEG-LS header");
         return false;
@@ -129,7 +129,7 @@ JPEGLSCodec::Decode(DataElement const & in, DataElement & out)
       LossyFlag = params.allowedLossyError != 0;
       std::vector<unsigned char> rgbyteOut;
       rgbyteOut.resize(static_cast<size_t>(params.height) * static_cast<size_t>(params.width) * ((params.bitsPerSample + 7) / 8) * params.components);
-      ApiResult result = JpegLsDecode(&rgbyteOut[0], rgbyteOut.size(), pbyteCompressed, cbyteCompressed, &params, NULL);
+      ApiResult result = JpegLsDecode(&rgbyteOut[0], rgbyteOut.size(), pbyteCompressed, cbyteCompressed, &params, nullptr);
       delete[] mybuffer;
       if (result != ApiResult::OK)
       {
@@ -213,7 +213,7 @@ JPEGLSCodec::Decode2(DataElement const & in, char * out_buffer, size_t len)
       assert(totalLen > 0 && pbyteCompressed[totalLen - 1] == 0xd9);
       size_t        cbyteCompressed = totalLen;
       JlsParameters params = {};
-      if (JpegLsReadHeader(pbyteCompressed, cbyteCompressed, &params, NULL) != ApiResult::OK)
+      if (JpegLsReadHeader(pbyteCompressed, cbyteCompressed, &params, nullptr) != ApiResult::OK)
       {
         mdcmDebugMacro("Could not parse JPEG-LS header");
         return false;
@@ -232,7 +232,7 @@ JPEGLSCodec::Decode2(DataElement const & in, char * out_buffer, size_t len)
         delete[] mybuffer;
         return false;
       }
-      ApiResult result = JpegLsDecode(tmp0, tmp0_size, pbyteCompressed, cbyteCompressed, &params, NULL);
+      ApiResult result = JpegLsDecode(tmp0, tmp0_size, pbyteCompressed, cbyteCompressed, &params, nullptr);
       delete[] mybuffer;
       if (result != ApiResult::OK)
       {
@@ -329,7 +329,7 @@ JPEGLSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
   is.seekg(0, std::ios::beg);
   is.read(dummy_buffer, buf_size);
   JlsParameters metadata = {};
-  if (JpegLsReadHeader(dummy_buffer, buf_size, &metadata, NULL) != ApiResult::OK)
+  if (JpegLsReadHeader(dummy_buffer, buf_size, &metadata, nullptr) != ApiResult::OK)
   {
     return false;
   }
@@ -415,7 +415,7 @@ JPEGLSCodec::DecodeExtent(char *         buffer,
   assert(pf != PixelFormat::UINT12 && pf != PixelFormat::INT12);
   if (NumberOfDimensions == 2)
   {
-    char *            dummy_buffer = NULL;
+    char *            dummy_buffer = nullptr;
     std::vector<char> vdummybuffer;
     size_t            buf_size = 0;
     const Tag         seqDelItem(0xfffe, 0xe0dd);
@@ -582,7 +582,7 @@ JPEGLSCodec::DecodeByStreamsCommon(const char * buffer, size_t totalLen, std::ve
   const unsigned char * pbyteCompressed = reinterpret_cast<const unsigned char *>(buffer);
   const size_t          cbyteCompressed = totalLen;
   JlsParameters         params = {};
-  if (JpegLsReadHeader(pbyteCompressed, cbyteCompressed, &params, NULL) != ApiResult::OK)
+  if (JpegLsReadHeader(pbyteCompressed, cbyteCompressed, &params, nullptr) != ApiResult::OK)
   {
     mdcmDebugMacro("Could not parse JPEG-LS header");
     return false;
@@ -594,7 +594,7 @@ JPEGLSCodec::DecodeByStreamsCommon(const char * buffer, size_t totalLen, std::ve
   // allowedlossyerror == 0 => Lossless
   LossyFlag = params.allowedLossyError != 0;
   rgbyteOut.resize(static_cast<size_t>(params.height) * static_cast<size_t>(params.width) * ((params.bitsPerSample + 7) / 8) * params.components);
-  ApiResult result = JpegLsDecode(&rgbyteOut[0], rgbyteOut.size(), pbyteCompressed, cbyteCompressed, &params, NULL);
+  ApiResult result = JpegLsDecode(&rgbyteOut[0], rgbyteOut.size(), pbyteCompressed, cbyteCompressed, &params, nullptr);
   if (result != ApiResult::OK)
   {
     mdcmErrorMacro("Could not decode JPEG-LS stream");
@@ -610,7 +610,7 @@ JPEGLSCodec::DecodeByStreamsCommon2(const char * buffer, size_t totalLen, char *
   const unsigned char * pbyteCompressed = reinterpret_cast<const unsigned char *>(buffer);
   const size_t          cbyteCompressed = totalLen;
   JlsParameters         params = {};
-  if (JpegLsReadHeader(pbyteCompressed, cbyteCompressed, &params, NULL) != ApiResult::OK)
+  if (JpegLsReadHeader(pbyteCompressed, cbyteCompressed, &params, nullptr) != ApiResult::OK)
   {
     mdcmDebugMacro("Could not parse JPEG-LS header");
     return false;
@@ -628,7 +628,7 @@ JPEGLSCodec::DecodeByStreamsCommon2(const char * buffer, size_t totalLen, char *
     mdcmAlwaysWarnMacro("DecodeByStreamsCommon2: out_size=" << out_size << " out_size2=" << out_size2);
   }
   ApiResult result = JpegLsDecode(
-    out, ((out_size > out_size2) ? out_size : out_size2), pbyteCompressed, cbyteCompressed, &params, NULL);
+    out, ((out_size > out_size2) ? out_size : out_size2), pbyteCompressed, cbyteCompressed, &params, nullptr);
   if (result != ApiResult::OK)
   {
     mdcmErrorMacro("Could not decode JPEG-LS stream");
@@ -676,7 +676,7 @@ JPEGLSCodec::CodeFrameIntoBuffer(char * outdata, size_t outlen, size_t & complen
     mdcmAlwaysWarnMacro("Not supported: samples per pixel " << samples_pixel);
     return false;
   }
-  ApiResult error = JpegLsEncode(outdata, outlen, &complen, indata, inlen, &params, NULL);
+  ApiResult error = JpegLsEncode(outdata, outlen, &complen, indata, inlen, &params, nullptr);
   if (error != ApiResult::OK)
   {
     mdcmErrorMacro("Error compressing: " << static_cast<int>(error));

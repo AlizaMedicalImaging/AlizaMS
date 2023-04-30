@@ -60,7 +60,7 @@ static const char * VRStrings[] = { "??",             //  0
                                     "US or SS",       // 36
                                     "US or SS or OW", // 37
                                     "US or OW",       // 38
-                                    NULL };
+                                    nullptr };
 
 static VR::VRType VRValue[] = { VR::INVALID, VR::AE, VR::AS, VR::AT, VR::CS, VR::DA, VR::DS, VR::DT, VR::FD,
                                 VR::FL,      VR::IS, VR::LO, VR::LT, VR::OB, VR::OF, VR::OW, VR::PN, VR::SH,
@@ -297,7 +297,7 @@ VR::VRType
 VR::GetVRTypeFromFile(const char * vr)
 {
   VRType r = VR::VR_END;
-  for (int i = 1; VRStrings[i] != NULL; ++i)
+  for (int i = 1; VRStrings[i] != nullptr; ++i)
   {
     const char * ref = VRStrings[i];
     if (ref[0] == vr[0] && ref[1] == vr[1])
@@ -326,7 +326,7 @@ VR::GetVRType(const char * vr)
   VRType r = VR::VR_END;
   if (!vr)
     return r;
-  for (int i = 0; VRStrings[i] != NULL; ++i)
+  for (int i = 0; VRStrings[i] != nullptr; ++i)
   {
     if (strcmp(VRStrings[i], vr) == 0)
     {
@@ -363,7 +363,7 @@ VR::GetVRType(const char * vr)
 bool
 VR::IsValid(const char * vr)
 {
-  for (int i = 1; VRStrings[i] != NULL; ++i)
+  for (int i = 1; VRStrings[i] != nullptr; ++i)
   {
     const char * ref = VRStrings[i];
     if (ref[0] == vr[0] && ref[1] == vr[1])

@@ -27,7 +27,7 @@
 namespace mdcm
 {
 
-static const char * STATESStrings[] = { "NO", "YES", "UNKNOWN", NULL };
+static const char * STATESStrings[] = { "NO", "YES", "UNKNOWN", nullptr };
 
 const char *
 Surface::GetSTATESString(STATES state)
@@ -47,7 +47,7 @@ Surface::GetSTATES(const char * state)
   std::string  stateClearStr = str.Trim();
   const char * stateClear = stateClearStr.c_str();
 
-  for (unsigned int i = 0; STATESStrings[i] != NULL; ++i)
+  for (unsigned int i = 0; STATESStrings[i] != nullptr; ++i)
   {
     if (strcmp(stateClear, STATESStrings[i]) == 0)
     {
@@ -59,7 +59,7 @@ Surface::GetSTATES(const char * state)
   // string
   CodeString  codestring = stateClear;
   std::string cs = codestring.GetAsString();
-  for (unsigned int i = 0; STATESStrings[i] != NULL; ++i)
+  for (unsigned int i = 0; STATESStrings[i] != nullptr; ++i)
   {
     if (strcmp(cs.c_str(), STATESStrings[i]) == 0)
     {
@@ -69,7 +69,7 @@ Surface::GetSTATES(const char * state)
   return STATES_END;
 }
 
-static const char * VIEWStrings[] = { "SURFACE", "WIREFRAME", "POINTS", NULL };
+static const char * VIEWStrings[] = { "SURFACE", "WIREFRAME", "POINTS", nullptr };
 
 const char *
 Surface::GetVIEWTypeString(VIEWType type)
@@ -88,7 +88,7 @@ Surface::GetVIEWType(const char * type)
   str.Trim();
   std::string  typeClearStr = str.Trim();
   const char * typeClear = typeClearStr.c_str();
-  for (unsigned int i = 0; VIEWStrings[i] != NULL; ++i)
+  for (unsigned int i = 0; VIEWStrings[i] != nullptr; ++i)
   {
     if (strcmp(typeClear, VIEWStrings[i]) == 0)
     {
@@ -100,7 +100,7 @@ Surface::GetVIEWType(const char * type)
   // string
   CodeString  codestring = typeClear;
   std::string cs = codestring.GetAsString();
-  for (unsigned int i = 0; VIEWStrings[i] != NULL; ++i)
+  for (unsigned int i = 0; VIEWStrings[i] != nullptr; ++i)
   {
     if (strcmp(cs.c_str(), VIEWStrings[i]) == 0)
     {
@@ -127,15 +127,15 @@ Surface::Surface()
   , AlgorithmName("")
   , NumberOfSurfacePoints(0)
   , PointCoordinatesData()
-  , PointPositionAccuracy(NULL)
+  , PointPositionAccuracy(nullptr)
   , MeanPointDistance(0)
   , MaximumPointDistance(0)
-  , PointsBoundingBoxCoordinates(NULL)
-  , AxisOfRotation(NULL)
-  , CenterOfRotation(NULL)
+  , PointsBoundingBoxCoordinates(nullptr)
+  , AxisOfRotation(nullptr)
+  , CenterOfRotation(nullptr)
   , NumberOfVectors(0)
   , VectorDimensionality(0)
-  , VectorAccuracy(NULL)
+  , VectorAccuracy(nullptr)
   , VectorCoordinateData()
   , Primitive(new MeshPrimitive)
 {

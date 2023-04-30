@@ -32,7 +32,7 @@ namespace mdcm
 
 static const char * ScalarTypeStrings[] = {
   "UINT8",  "INT8",  "UINT12",  "INT12",   "UINT16",  "INT16",     "UINT32",  "INT32",
-  "UINT64", "INT64", "FLOAT32", "FLOAT64", "SINGLEBIT", "UNKNOWN", NULL,
+  "UINT64", "INT64", "FLOAT32", "FLOAT64", "SINGLEBIT", "UNKNOWN", nullptr,
 };
 
 PixelFormat::PixelFormat(ScalarType st)

@@ -26,7 +26,7 @@
 namespace mdcm
 {
 
-static const char * OrientationStrings[] = { "UNKNOWN", "AXIAL", "CORONAL", "SAGITTAL", "OBLIQUE", NULL };
+static const char * OrientationStrings[] = { "UNKNOWN", "AXIAL", "CORONAL", "SAGITTAL", "OBLIQUE", nullptr };
 
 // http://public.kitware.com/pipermail/insight-users/2005-March/012246.html
 // 0.5477 would be the square root of 1 (unit vector sum of squares)

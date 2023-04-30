@@ -74,8 +74,8 @@ ExplicitDataElement::ReadPreValue(std::istream & is)
     }
     // Reset ValueLengthField to avoid user error
     ValueLengthField = 0;
-    // Set pointer to NULL to avoid user error
-    ValueField = NULL;
+    // Set pointer to nullptr to avoid user error
+    ValueField = nullptr;
     VRField = VR::INVALID;
     return is;
   }
@@ -180,7 +180,7 @@ ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
     return is;
   if (ValueLengthField == 0)
   {
-    ValueField = NULL;
+    ValueField = nullptr;
     return is;
   }
   if (VRField == VR::SQ)
@@ -372,7 +372,7 @@ ExplicitDataElement::Write(std::ostream & os) const
   if (TagField == itemDelItem)
   {
     assert(0);
-    assert(ValueField == NULL);
+    assert(ValueField == nullptr);
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
     if (ValueLengthField != 0)
     {

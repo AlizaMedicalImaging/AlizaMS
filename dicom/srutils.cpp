@@ -35,7 +35,7 @@ void srImageCleanupHandler(void * info)
 	if (!info) return;
 	unsigned char * p = static_cast<unsigned char*>(info);
 	delete [] p;
-	info = NULL;
+	info = nullptr;
 }
 
 template<typename Tin, typename Tout> QString gs3(
@@ -45,7 +45,7 @@ template<typename Tin, typename Tout> QString gs3(
 {
 	if (image.IsNull())
 	{
-		return QString("gs3<>() : image.IsNull()");
+		return QString("Image is null");
 	}
 	typedef itk::ExtractImageFilter<Tin, Tout> FilterType;
 	typename FilterType::Pointer filter = FilterType::New();
@@ -57,7 +57,7 @@ template<typename Tin, typename Tout> QString gs3(
 	typename Tin::SizeType out_size;
 	if (idx >= static_cast<int>(size[2]))
 	{
-		return QString("gs3<>() : invalid index");
+		return QString("Image is null");
 	}
 	index[2] = idx;
 	out_size[0] = size[0];
@@ -78,7 +78,7 @@ template<typename Tin, typename Tout> QString gs3(
 		return QString(ex.GetDescription());
 	}
 	if (out_image.IsNotNull()) out_image->DisconnectPipeline();
-	else return QString("Output image is NULL");
+	else return QString("Output image is null");
 	return QString("");
 }
 
@@ -324,7 +324,7 @@ void SRUtils::read_IMAGE(
 	const QWidget * wsettings,
 	QProgressDialog * pb)
 {
-	QString tmpfile("");
+	QString tmpfile;
 	const mdcm::DataElement & e8  =
 		ds.GetDataElement(mdcm::Tag(0x0008,0x1199));
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sq8 =
@@ -494,8 +494,8 @@ void SRUtils::read_IMAGE(
 				ivariants,
 				QStringList(sf),
 				0,
-				NULL,
-				NULL,
+				nullptr,
+				nullptr,
 				false,
 				wsettings,
 				pb,
@@ -729,8 +729,8 @@ endpoints of the minor axis of an ellipse
 								painter.drawEllipse(
 									center_x - distance,
 									center_y - distance,
-									2*distance,
-									2*distance);
+									2.0 * distance,
+									2.0 * distance);
 								painter.end();
 							}
 							else if (sg.GraphicType == QString("ELLIPSE"))
@@ -1289,8 +1289,7 @@ void SRUtils::read_DATETIME(const mdcm::DataSet & ds, QString & s)
 			if (point_idx == 14)
 			{
 				tmp0.append(QString(".") +
-					DateTime.right(
-						DateTime.length()-15));
+					DateTime.right(DateTime.length() - 15));
 			}
 		}
 		else
@@ -1328,8 +1327,7 @@ void SRUtils::read_TIME(const mdcm::DataSet & ds, QString & s)
 			if (point_idx == 6)
 			{
 				tmp0.append(QString(".") +
-					Time.right(
-						Time.length() - 7));
+					Time.right(Time.length() - 7));
 			}
 		}
 		else
@@ -1625,7 +1623,7 @@ QStringList SRUtils::read_referenced(
 				mdcm::Tag(0x0008,0x1160),
 				refframes))
 		{
-			QString ff("");
+			QString ff;
 			for (size_t k = 0; k < refframes.size(); ++k)
 			{
 				ff.append(
@@ -1644,7 +1642,7 @@ QString SRUtils::get_concept_code_meaning(
 	const mdcm::DataSet & ds,
 	const QString & charset)
 {
-	QString CodeMeaning("");
+	QString CodeMeaning;
 	if (ds.FindDataElement(mdcm::Tag(0x0040,0xa043)))
 	{
 		const mdcm::DataElement & e4  =
@@ -1708,9 +1706,9 @@ QString SRUtils::read_sr_content_sq(
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sq =
 		e.GetValueAsSQ();
 	if (!sq) return QString("");
-	QString s("");
+	QString s;
 	if (title) s += read_sr_title2(ds, charset);
-	QString tmp_chapter("");
+	QString tmp_chapter;
 	const SettingsWidget * settings =
 		static_cast<const SettingsWidget*>(wsettings);
 	const bool print_chapters = settings->get_sr_chapters();
@@ -1791,8 +1789,7 @@ QString SRUtils::read_sr_content_sq(
 			QString identifiers("");
 			const size_t s___ =
 				ReferencedContentItemIdentifier.size();
-			for (
-				unsigned int z = 0;
+			for (unsigned int z = 0;
 				z < s___;
 				++z)
 			{

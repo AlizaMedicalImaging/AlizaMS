@@ -70,7 +70,7 @@ VR16ExplicitDataElement::ReadPreValue(std::istream & is)
     {
       mdcmAlwaysWarnMacro("Item Delimitation Item has a length different from 0 and is: " << ValueLengthField);
     }
-    ValueField = NULL;
+    ValueField = nullptr;
     return is;
   }
 
@@ -173,7 +173,7 @@ VR16ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
     return is;
   if (ValueLengthField == 0)
   {
-    ValueField = NULL;
+    ValueField = nullptr;
     return is;
   }
   if (VRField == VR::SQ)

@@ -38,7 +38,7 @@ public:
 	short  get_enh_strategy() const;
 
 private:
-	int   saved_idx;
+	int   saved_idx{};
 	float scale_icons;
 
 private slots:

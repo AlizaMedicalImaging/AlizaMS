@@ -66,26 +66,26 @@ bool
 CAPICryptographicMessageSyntax::ParseCertificateFile(const char * filename)
 {
   bool  ret = false;
-  BYTE *certHexBuf = NULL, *certBin = NULL;
+  BYTE *certHexBuf = nullptr, *certBin = nullptr;
   DWORD certHexBufLen, certBinLen;
   if (!LoadFile(filename, certHexBuf, certHexBufLen))
     goto err;
   // Call to get the needed amount of space
-  if (!CryptStringToBinaryA((LPCSTR)certHexBuf, 0, CRYPT_STRING_BASE64_ANY, NULL, &certBinLen, NULL, NULL))
+  if (!CryptStringToBinaryA((LPCSTR)certHexBuf, 0, CRYPT_STRING_BASE64_ANY, nullptr, &certBinLen, nullptr, nullptr))
   {
     mdcmErrorMacro("CryptStringToBinary failed with error 0x" << std::hex << GetLastError());
     goto err;
   }
   certBin = new BYTE[certBinLen];
   // Convert from PEM format to DER format - removes header and footer and decodes from base64
-  if (!CryptStringToBinaryA((LPCSTR)certHexBuf, 0, CRYPT_STRING_BASE64_ANY, certBin, &certBinLen, NULL, NULL))
+  if (!CryptStringToBinaryA((LPCSTR)certHexBuf, 0, CRYPT_STRING_BASE64_ANY, certBin, &certBinLen, nullptr, nullptr))
   {
     mdcmErrorMacro("CryptStringToBinary failed with error 0x" << std::hex << GetLastError());
     goto err;
   }
   PCCERT_CONTEXT certContext;
   certContext = CertCreateCertificateContext(X509_ASN_ENCODING, certBin, certBinLen);
-  if (certContext == NULL)
+  if (certContext == nullptr)
   {
     mdcmErrorMacro("CertCreateCertificateContext failed with error 0x" << std::hex << GetLastError());
     goto err;
@@ -103,12 +103,12 @@ bool
 CAPICryptographicMessageSyntax::ParseKeyFile(const char * filename)
 {
   bool      ret = false;
-  BYTE *    keyHexBuffer = NULL, *keyBinBuffer = NULL, *keyBlob = NULL;
+  BYTE *    keyHexBuffer = nullptr, *keyBinBuffer = nullptr, *keyBlob = nullptr;
   DWORD     keyHexBufferLen, keyBinBufferLen, keyBlobLen;
   HCRYPTKEY hKey = 0;
   if (!LoadFile(filename, keyHexBuffer, keyHexBufferLen))
     goto err;
-  if (!CryptStringToBinaryA((LPCSTR)keyHexBuffer, 0, CRYPT_STRING_BASE64_ANY, NULL, &keyBinBufferLen, NULL, NULL))
+  if (!CryptStringToBinaryA((LPCSTR)keyHexBuffer, 0, CRYPT_STRING_BASE64_ANY, nullptr, &keyBinBufferLen, nullptr, nullptr))
   {
     mdcmErrorMacro("Failed to convert from BASE64. CryptStringToBinary failed with error 0x" << std::hex
                                                                                              << GetLastError());
@@ -116,7 +116,7 @@ CAPICryptographicMessageSyntax::ParseKeyFile(const char * filename)
   }
   keyBinBuffer = new BYTE[keyBinBufferLen];
   if (!CryptStringToBinaryA(
-        (LPCSTR)keyHexBuffer, 0, CRYPT_STRING_BASE64_ANY, keyBinBuffer, &keyBinBufferLen, NULL, NULL))
+        (LPCSTR)keyHexBuffer, 0, CRYPT_STRING_BASE64_ANY, keyBinBuffer, &keyBinBufferLen, nullptr, nullptr))
   {
     mdcmErrorMacro("Failed to convert from BASE64. CryptStringToBinary failed with error 0x" << std::hex
                                                                                              << GetLastError());
@@ -127,8 +127,8 @@ CAPICryptographicMessageSyntax::ParseKeyFile(const char * filename)
                            keyBinBuffer,
                            keyBinBufferLen,
                            0,
-                           NULL,
-                           NULL,
+                           nullptr,
+                           nullptr,
                            &keyBlobLen))
   {
     mdcmErrorMacro("Failed to parse private key. CryptDecodeObjectEx failed with error 0x" << std::hex
@@ -141,7 +141,7 @@ CAPICryptographicMessageSyntax::ParseKeyFile(const char * filename)
                            keyBinBuffer,
                            keyBinBufferLen,
                            0,
-                           NULL,
+                           nullptr,
                            keyBlob,
                            &keyBlobLen))
   {
@@ -222,11 +222,11 @@ bool
 CAPICryptographicMessageSyntax::Decrypt(char * output, size_t & outlen, const char * array, size_t len) const
 {
   bool                        ret = false;
-  BYTE *                      cek = NULL;
-  HCRYPTMSG                   hMsg = NULL;
-  PCMSG_CMS_RECIPIENT_INFO    recipientInfo = NULL;
-  PCRYPT_ALGORITHM_IDENTIFIER cekAlg = NULL;
-  BYTE *                      bareContent = NULL;
+  BYTE *                      cek = nullptr;
+  HCRYPTMSG                   hMsg = nullptr;
+  PCMSG_CMS_RECIPIENT_INFO    recipientInfo = nullptr;
+  PCRYPT_ALGORITHM_IDENTIFIER cekAlg = nullptr;
+  BYTE *                      bareContent = nullptr;
 
   struct
   {
@@ -244,8 +244,8 @@ CAPICryptographicMessageSyntax::Decrypt(char * output, size_t & outlen, const ch
                                     0,
                                     CMSG_ENVELOPED_DATA_PKCS_1_5_VERSION,
                                     0,
-                                    NULL,
-                                    NULL)))
+                                    nullptr,
+                                    nullptr)))
   {
     mdcmErrorMacro("MsgOpenToDecode failed with error 0x" << std::hex << GetLastError());
     goto err;
@@ -292,7 +292,7 @@ CAPICryptographicMessageSyntax::Decrypt(char * output, size_t & outlen, const ch
       if (recipientInfo)
         delete[] recipientInfo;
       DWORD cbRecipientInfoLen;
-      if (!CryptMsgGetParam(hMsg, CMSG_CMS_RECIPIENT_INFO_PARAM, i, NULL, &cbRecipientInfoLen))
+      if (!CryptMsgGetParam(hMsg, CMSG_CMS_RECIPIENT_INFO_PARAM, i, nullptr, &cbRecipientInfoLen))
       {
         mdcmErrorMacro("MsgGetParam CMSG_CMS_RECIPIENT_INFO_PARAM size failed with error 0x" << std::hex
                                                                                              << GetLastError());
@@ -325,7 +325,7 @@ CAPICryptographicMessageSyntax::Decrypt(char * output, size_t & outlen, const ch
   }
 
   DWORD cekAlgLen;
-  if (!CryptMsgGetParam(hMsg, CMSG_ENVELOPE_ALGORITHM_PARAM, 0, NULL, &cekAlgLen))
+  if (!CryptMsgGetParam(hMsg, CMSG_ENVELOPE_ALGORITHM_PARAM, 0, nullptr, &cekAlgLen))
   {
     mdcmErrorMacro("MsgGetParam CMSG_ENVELOPE_ALGORITHM_PARAM failed with error 0x" << std::hex << GetLastError());
     goto err;
@@ -366,7 +366,7 @@ CAPICryptographicMessageSyntax::Decrypt(char * output, size_t & outlen, const ch
   }
 
   DWORD bareContentLen;
-  if (!CryptMsgGetParam(hMsg, CMSG_CONTENT_PARAM, 0, NULL, &bareContentLen))
+  if (!CryptMsgGetParam(hMsg, CMSG_CONTENT_PARAM, 0, nullptr, &bareContentLen))
   {
     mdcmErrorMacro("MsgGetParam CMSG_BARE_CONTENT_PARAM size failed with error 0x" << std::hex << GetLastError());
     goto err;
@@ -443,7 +443,7 @@ CAPICryptographicMessageSyntax::GetCipherObjId() const
     case DES3_CIPHER:
       return szOID_RSA_DES_EDE3_CBC;
   }
-  return NULL;
+  return nullptr;
 }
 
 bool
@@ -452,9 +452,9 @@ CAPICryptographicMessageSyntax::Initialize()
   DWORD dwResult;
 // FIXME
 #if 1
-  if (!CryptAcquireContextA(&hProv, NULL, MS_ENH_RSA_AES_PROV_A, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+  if (!CryptAcquireContextA(&hProv, nullptr, MS_ENH_RSA_AES_PROV_A, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
 #else
-  if (!CryptAcquireContextA(&hProv, NULL, MS_ENH_RSA_AES_PROV, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+  if (!CryptAcquireContextA(&hProv, nullptr, MS_ENH_RSA_AES_PROV, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
 #endif
   // CRYPT_VERIFYCONTEXT aes decr in cryptmsgcontrol not working
   {
@@ -463,9 +463,9 @@ CAPICryptographicMessageSyntax::Initialize()
     {
 #if 1
       if (!CryptAcquireContextA(
-            &hProv, NULL, MS_ENH_RSA_AES_PROV_A, PROV_RSA_AES, CRYPT_NEWKEYSET | CRYPT_VERIFYCONTEXT))
+            &hProv, nullptr, MS_ENH_RSA_AES_PROV_A, PROV_RSA_AES, CRYPT_NEWKEYSET | CRYPT_VERIFYCONTEXT))
 #else
-      if (!CryptAcquireContextA(&hProv, NULL, MS_ENH_RSA_AES_PROV, PROV_RSA_AES, CRYPT_NEWKEYSET | CRYPT_VERIFYCONTEXT))
+      if (!CryptAcquireContextA(&hProv, nullptr, MS_ENH_RSA_AES_PROV, PROV_RSA_AES, CRYPT_NEWKEYSET | CRYPT_VERIFYCONTEXT))
 #endif
       {
         dwResult = GetLastError();
@@ -478,7 +478,7 @@ CAPICryptographicMessageSyntax::Initialize()
       // Probably WinXP
       mdcmWarningMacro("Certificate based encryption is supported on Windows XP only using 3DES.");
       if (!CryptAcquireContextA(&hProv,
-                                NULL,
+                                nullptr,
                                 MS_ENH_RSA_AES_PROV_A
                                 " (Prototype)" /*"Microsoft Enhanced RSA and AES Cryptographic Provider (Prototype)"*/,
                                 PROV_RSA_AES,
@@ -489,7 +489,7 @@ CAPICryptographicMessageSyntax::Initialize()
         {
           if (!CryptAcquireContextA(
                 &hProv,
-                NULL,
+                nullptr,
                 MS_ENH_RSA_AES_PROV_A
                 " (Prototype)" /*"Microsoft Enhanced RSA and AES Cryptographic Provider (Prototype)"*/,
                 PROV_RSA_AES,
@@ -533,7 +533,7 @@ CAPICryptographicMessageSyntax::LoadFile(const char * filename, BYTE *& buffer, 
 {
   assert(!buffer);
   FILE * f = fopen(filename, "rb");
-  if (f == NULL)
+  if (f == nullptr)
   {
     mdcmErrorMacro("Couldn't open the file: " << filename);
     fclose(f);

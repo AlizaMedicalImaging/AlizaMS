@@ -159,7 +159,7 @@ static const char * MSStrings[] = {
   "1.2.840.10008.5.1.1.30",           // HardcopyColorImageStorage
   "1.2.276.0.7230010.3.1.0.1",        // DCMTK Unknown, wrong, try to handle like secondary capture
   "1.2.840.10008.5.1.2.3.45",         // Test Photoacoustic Image Storage FIXME
-  NULL
+  nullptr
 };
 
 MediaStorage::MSType
@@ -168,7 +168,7 @@ MediaStorage::GetMSType(const char * str)
   if (!str)
     return MS_END;
 
-  for (unsigned int i = 0; MSStrings[i] != NULL; ++i)
+  for (unsigned int i = 0; MSStrings[i] != nullptr; ++i)
   {
     if (strcmp(str, MSStrings[i]) == 0)
     {
@@ -180,7 +180,7 @@ MediaStorage::GetMSType(const char * str)
   // string
   CodeString  codestring = str;
   std::string cs = codestring.GetAsString();
-  for (unsigned int i = 0; MSStrings[i] != NULL; ++i)
+  for (unsigned int i = 0; MSStrings[i] != nullptr; ++i)
   {
     if (strcmp(cs.c_str(), MSStrings[i]) == 0)
     {
@@ -355,7 +355,7 @@ static const MSModalityType MSModalityTypes[] = {
   { "  ", 2, false },       // HardcopyColorImageStorage
   { "  ", 2, false },       // DCMTKUnknownStorage
   { "PA", 3, false },       // TestPhotoacousticImageStorage FIXME
-  { NULL, 0, false }        // MS_END
+  { nullptr, 0, false }        // MS_END
 };
 
 unsigned int
@@ -386,7 +386,7 @@ const char *
 MediaStorage::GetModality() const
 {
   if (!MSModalityTypes[MSField].Modality)
-    return NULL;
+    return nullptr;
   return MSModalityTypes[MSField].Modality;
 }
 
@@ -423,7 +423,7 @@ MediaStorage::GetFromDataSetOrHeader(DataSet const & ds, const Tag & tag, std::s
   {
     const ByteValue * sopclassuid = ds.GetDataElement(tag).GetByteValue();
     if (!sopclassuid || !sopclassuid->GetPointer())
-      return NULL;
+      return nullptr;
     std::string sopclassuid_str(sopclassuid->GetPointer(), sopclassuid->GetLength());
     if (sopclassuid_str.find(' ') != std::string::npos)
     {
@@ -434,7 +434,7 @@ MediaStorage::GetFromDataSetOrHeader(DataSet const & ds, const Tag & tag, std::s
     buf = sopclassuid_str.c_str();
     return buf.c_str();
   }
-  return NULL;
+  return nullptr;
 }
 
 bool
@@ -559,7 +559,7 @@ MediaStorage::SetFromFile(File const & file)
   std::string                 b1;
   const char *                header_ms_ptr = GetFromHeader(header, b1);
   std::string                 copy1;
-  const char *                header_ms_str = NULL;
+  const char *                header_ms_str = nullptr;
   if (header_ms_ptr)
   {
     copy1 = header_ms_ptr;
@@ -569,7 +569,7 @@ MediaStorage::SetFromFile(File const & file)
   std::string     b2;
   const char *    ds_ms_ptr = GetFromDataSet(ds, b2);
   std::string     copy2;
-  const char *    ds_ms_str = NULL;
+  const char *    ds_ms_str = nullptr;
   if (ds_ms_ptr)
   {
     copy2 = ds_ms_ptr;

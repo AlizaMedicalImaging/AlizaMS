@@ -85,7 +85,7 @@ SegmentReader::Read()
   {
     const char *    modality = ms.GetModality();
     const DataSet & dsRoot = F->GetDataSet();
-    if (modality != NULL)
+    if (modality != nullptr)
     {
       String<> modalityStr(modality);
       if (modalityStr.Trim() == "SEG")

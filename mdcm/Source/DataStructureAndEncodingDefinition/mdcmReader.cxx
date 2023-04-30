@@ -43,8 +43,8 @@ namespace mdcm
 Reader::Reader()
   : F(new File)
 {
-  Stream = NULL;
-  Ifstream = NULL;
+  Stream = nullptr;
+  Ifstream = nullptr;
 }
 
 Reader::~Reader()
@@ -53,8 +53,8 @@ Reader::~Reader()
   {
     Ifstream->close();
     delete Ifstream;
-    Ifstream = NULL;
-    Stream = NULL;
+    Ifstream = nullptr;
+    Stream = nullptr;
   }
 }
 
@@ -820,8 +820,8 @@ Reader::SetFileName(const char * p)
   {
     mdcmAlwaysWarnMacro("Reader failed (2)");
     delete Ifstream;
-    Ifstream = NULL;
-    Stream = NULL;
+    Ifstream = nullptr;
+    Stream = nullptr;
   }
 }
 

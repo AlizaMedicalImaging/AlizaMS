@@ -120,13 +120,13 @@ DataElement::SetValue(Value const & vl)
 bool
 DataElement::IsEmpty() const
 {
-  return (ValueField == NULL || (GetByteValue() && GetByteValue()->IsEmpty()));
+  return (ValueField == nullptr || (GetByteValue() && GetByteValue()->IsEmpty()));
 }
 
 void
 DataElement::Empty()
 {
-  ValueField = NULL;
+  ValueField = nullptr;
   ValueLengthField = 0;
 }
 
@@ -135,7 +135,7 @@ DataElement::Clear()
 {
   TagField = 0;
   VRField = VR::INVALID;
-  ValueField = NULL;
+  ValueField = nullptr;
   ValueLengthField = 0;
 }
 
@@ -157,9 +157,9 @@ SmartPointer<SequenceOfItems>
 DataElement::GetValueAsSQ() const
 {
   if (IsEmpty())
-    return NULL;
+    return nullptr;
   if (GetSequenceOfFragments())
-    return NULL;
+    return nullptr;
   {
     SequenceOfItems * sq = dynamic_cast<SequenceOfItems *>(ValueField.GetPointer());
     if (sq)
@@ -170,7 +170,7 @@ DataElement::GetValueAsSQ() const
   }
   const ByteValue * bv = GetByteValue();
   if (!bv)
-    return NULL;
+    return nullptr;
   SequenceOfItems * sq = new SequenceOfItems;
   sq->SetLength(bv->GetLength());
   if (GetVR() == VR::INVALID)
@@ -267,7 +267,7 @@ DataElement::GetValueAsSQ() const
   }
 #endif
   delete sq;
-  return NULL;
+  return nullptr;
 }
 
 const SequenceOfFragments *
@@ -275,7 +275,7 @@ DataElement::GetSequenceOfFragments() const
 {
   const SequenceOfFragments * sqf = dynamic_cast<SequenceOfFragments *>(ValueField.GetPointer());
   if (sqf) return sqf;
-  return NULL;
+  return nullptr;
 }
 
 SequenceOfFragments *
@@ -283,7 +283,7 @@ DataElement::GetSequenceOfFragments()
 {
   SequenceOfFragments * sqf = dynamic_cast<SequenceOfFragments *>(ValueField.GetPointer());
   if (sqf) return sqf;
-  return NULL;
+  return nullptr;
 }
 
 bool

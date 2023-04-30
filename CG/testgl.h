@@ -18,8 +18,8 @@ class TestGL : public QGLWidget
 public:
 	TestGL();
 	~TestGL() {}
-	bool opengl_init_done;
-	bool no_opengl3;
+	bool opengl_init_done{};
+	bool no_opengl3{true};
 
 protected:
 	void initializeGL() override;

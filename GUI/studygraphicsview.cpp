@@ -11,20 +11,11 @@
 #include "colorspace/colorspace.h"
 
 StudyGraphicsView::StudyGraphicsView(StudyGraphicsWidget * p)
+	: parent(p)
 {
 	setAcceptDrops(false);
-	parent = p;
-	m_scale = 1.0;
-	global_flip_x = false;
-	global_flip_y = false;
 	setFrameStyle(QFrame::Plain);
 	setFrameShape(QFrame::NoFrame);
-	new_win_pos_x = new_win_pos_y = 0;
-	old_win_pos_x = old_win_pos_y = 0;
-	last_win_pos_x = last_win_pos_y = -9999;
-	m0_win_pos_x = m0_win_pos_y = -1;
-	m1_win_pos_x = m1_win_pos_y = -1;
-	m0_set = m1_set = false;
 	QGraphicsScene * scene_ = new QGraphicsScene(this);
 	scene_->setItemIndexMethod(QGraphicsScene::NoIndex);
 	const QRectF rectf(0, 0, 100, 100);
@@ -36,7 +27,7 @@ StudyGraphicsView::StudyGraphicsView(StudyGraphicsWidget * p)
 	//setCacheMode(CacheNone);
 	setRenderHints(QPainter::Antialiasing);//QPainter::SmoothPixmapTransform);
 #ifdef DELETE_GRAPHICSIMAGEITEM
-	image_item = NULL;
+	image_item = nullptr;
 #else
 	image_item = new QGraphicsPixmapItem();
 	image_item->setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
@@ -194,7 +185,7 @@ void StudyGraphicsView::clear_collision_paths()
 		{
 			scene()->removeItem(static_cast<QGraphicsItem*>(collision_paths[i]));
 			delete collision_paths[i];
-			collision_paths[i] = NULL;
+			collision_paths[i] = nullptr;
 		}
 	}
 	collision_paths.clear();
@@ -209,7 +200,7 @@ void StudyGraphicsView::clear_us_regions()
 		{
 			scene()->removeItem(static_cast<QGraphicsItem*>(us_regions[i]));
 			delete us_regions[i];
-			us_regions[i] = NULL;
+			us_regions[i] = nullptr;
 		}
 	}
 	us_regions.clear();
@@ -225,7 +216,7 @@ void StudyGraphicsView::clear_prtexts_items()
 			{
 				scene()->removeItem(static_cast<QGraphicsItem*>(prtexts[i]));
 				delete prtexts[i];
-				prtexts[i] = NULL;
+				prtexts[i] = nullptr;
 			}
 		}
 		prtexts.clear();
@@ -238,7 +229,7 @@ void StudyGraphicsView::clear_prtexts_items()
 			{
 				scene()->removeItem(static_cast<QGraphicsItem*>(prtextanchors[i]));
 				delete prtextanchors[i];
-				prtextanchors[i] = NULL;
+				prtextanchors[i] = nullptr;
 			}
 		}
 		prtextanchors.clear();
@@ -255,7 +246,7 @@ void StudyGraphicsView::clear_prgraphicobjects_items()
 			{
 				scene()->removeItem(static_cast<QGraphicsItem*>(prpoints[i]));
 				delete prpoints[i];
-				prpoints[i] = NULL;
+				prpoints[i] = nullptr;
 			}
 		}
 		prpoints.clear();
@@ -268,7 +259,7 @@ void StudyGraphicsView::clear_prgraphicobjects_items()
 			{
 				scene()->removeItem(static_cast<QGraphicsItem*>(prpolylines[i]));
 				delete prpolylines[i];
-				prpolylines[i] = NULL;
+				prpolylines[i] = nullptr;
 			}
 		}
 		prpolylines.clear();
@@ -281,7 +272,7 @@ void StudyGraphicsView::clear_prgraphicobjects_items()
 			{
 				scene()->removeItem(static_cast<QGraphicsItem*>(printerpolated[i]));
 				delete printerpolated[i];
-				printerpolated[i] = NULL;
+				printerpolated[i] = nullptr;
 			}
 		}
 		printerpolated.clear();
@@ -294,7 +285,7 @@ void StudyGraphicsView::clear_prgraphicobjects_items()
 			{
 				scene()->removeItem(static_cast<QGraphicsItem*>(prcircles[i]));
 				delete prcircles[i];
-				prcircles[i] = NULL;
+				prcircles[i] = nullptr;
 			}
 		}
 		prcircles.clear();
@@ -307,7 +298,7 @@ void StudyGraphicsView::clear_prgraphicobjects_items()
 			{
 				scene()->removeItem(static_cast<QGraphicsItem*>(prellipses[i]));
 				delete prellipses[i];
-				prellipses[i] = NULL;
+				prellipses[i] = nullptr;
 			}
 		}
 		prellipses.clear();
@@ -323,7 +314,7 @@ void StudyGraphicsView::clear_shutters()
 		{
 			scene()->removeItem(static_cast<QGraphicsItem*>(display_shutters[i]));
 			delete display_shutters[i];
-			display_shutters[i] = NULL;
+			display_shutters[i] = nullptr;
 		}
 	}
 	display_shutters.clear();

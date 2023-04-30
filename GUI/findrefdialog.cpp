@@ -32,7 +32,7 @@ void FindRefDialog::select_dir()
 			this,
 			QString("Select directory"),
 			lineEdit->text(),
-			(QFileDialog::ShowDirsOnly|QFileDialog::ReadOnly
+			(QFileDialog::ShowDirsOnly | QFileDialog::ReadOnly
 			/* | QFileDialog::DontUseNativeDialog*/
 			));
 	if (!d.isEmpty())

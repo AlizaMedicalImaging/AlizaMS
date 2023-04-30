@@ -157,8 +157,8 @@ MainWindow::MainWindow(
 	//
 	if (hide_zoom)
 	{
-		zoomwidget2D = NULL;
-		zoomwidget3D = NULL;
+		zoomwidget2D = nullptr;
+		zoomwidget3D = nullptr;
 	}
 	else
 	{
@@ -319,7 +319,7 @@ MainWindow::MainWindow(
 	}
 	else
 	{
-		glwidget = NULL;
+		glwidget = nullptr;
 	}
 	//
 	aliza = new Aliza();
@@ -600,7 +600,7 @@ void MainWindow::open_args(const QStringList & l)
 	disconnect(pb,SIGNAL(canceled()), this, SLOT(exit_null()));
 	pb->close();
 	delete pb;
-	pb = NULL;
+	pb = nullptr;
 	mutex.unlock();
 }
 
@@ -615,12 +615,12 @@ void MainWindow::close_app()
 	{
 		aliza->close_();
 		delete aliza;
-		aliza = NULL;
+		aliza = nullptr;
 		aboutwidget->close();
 		delete aboutwidget;
-		aboutwidget = NULL;
+		aboutwidget = nullptr;
 		delete studyview;
-		studyview = NULL;
+		studyview = nullptr;
 		// 'init_done' variable is not required, just for logic.
 		init_done = false;
 	}
@@ -1350,7 +1350,7 @@ void MainWindow::dropEvent(QDropEvent * e)
 			disconnect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
 			pb->close();
 			delete pb;
-			pb = NULL;
+			pb = nullptr;
 		}
 	}
 	mutex.unlock();
@@ -1380,7 +1380,7 @@ void MainWindow::load_any()
 		QString("Open Files"),
 		CommonUtils::get_open_dir(),
 		QString(),
-		(QString*)NULL,
+		nullptr,
 		(QFileDialog::ReadOnly
 		//| QFileDialog::DontUseNativeDialog
 		));
@@ -1412,7 +1412,7 @@ void MainWindow::load_any()
 	disconnect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
 	pb->close();
 	delete pb;
-	pb = NULL;
+	pb = nullptr;
 	if (is_dicomdir)
 	{
 		if (tabWidget->currentIndex() != 1) tabWidget->setCurrentIndex(1);
@@ -1561,7 +1561,7 @@ void MainWindow::load_dicom_series2()
 	disconnect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
 	pb->close();
 	delete pb;
-	pb = NULL;
+	pb = nullptr;
 	qApp->processEvents();
 	mutex.unlock();
 }
@@ -1643,7 +1643,7 @@ void MainWindow::start_3D_anim()
 		aliza->start_3D_anim();
 	}
 	else QMessageBox::warning(
-		NULL, QString("Warning"), message_);
+		nullptr, QString("Warning"), message_);
 }
 
 void MainWindow::stop_3D_anim()
@@ -1743,7 +1743,7 @@ void MainWindow::toggle_update_contours_width(double x)
 void MainWindow::trigger_set_level()
 {
 	QMessageBox::information(
-		NULL,
+		nullptr,
 		QString("Set Level/Window"),
 		QString(
 			"Use histogram widget or tool\n"
@@ -1989,7 +1989,7 @@ void MainWindow::trigger_image_dicom_meta()
 	if (l.empty())
 	{
 		QMessageBox::information(
-			NULL,
+			nullptr,
 			QString("Information"),
 			QString("DICOM source files are not available"));
 		return;
@@ -2028,7 +2028,7 @@ void MainWindow::update_info_lines_bg()
 void MainWindow::ask_close()
 {
 	QMessageBox::StandardButton r;
-	r = QMessageBox::question(NULL, QString("Close Application"), QString("Close application?"));
+	r = QMessageBox::question(nullptr, QString("Close Application"), QString("Close application?"));
 	if (r == QMessageBox::Yes || r == QMessageBox::Ok)
 	{
 		this->close();

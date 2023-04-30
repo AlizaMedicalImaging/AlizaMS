@@ -65,7 +65,7 @@ ASN1::ParseDump(const char * array, size_t length)
     return !length;
   int   indent = 1; // 0 is not visually nice
   int   dump = 0;   // -1 => will print hex stuff
-  BIO * out = NULL;
+  BIO * out = nullptr;
   out = BIO_new(BIO_s_file());
   assert(out);
   BIO_set_fp(out, stdout, BIO_NOCLOSE | BIO_FP_TEXT);

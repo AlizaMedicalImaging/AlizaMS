@@ -47,9 +47,9 @@ public:
 	void clear_prtexts_items();
 	void clear_prgraphicobjects_items();
 	void clear_shutters();
-	double m_scale;
-	bool global_flip_x;
-	bool global_flip_y;
+	double m_scale{1.0};
+	bool global_flip_x{};
+	bool global_flip_y{};
 	void update_background_color();
 	void draw_frames(short);
 	void draw_us_regions();
@@ -75,18 +75,18 @@ protected:
 	void drawForeground(QPainter*, const QRectF&) override;
 
 private:
-	int old_win_pos_x;
-	int old_win_pos_y;
-	int new_win_pos_x;
-	int new_win_pos_y;
-	int last_win_pos_x;
-	int last_win_pos_y;
-	double m0_win_pos_x;
-	double m0_win_pos_y;
-	double m1_win_pos_x;
-	double m1_win_pos_y;
-	bool m0_set;
-	bool m1_set;
+	int old_win_pos_x{};
+	int old_win_pos_y{};
+	int new_win_pos_x{};
+	int new_win_pos_y{};
+	int last_win_pos_x{-9999};
+	int last_win_pos_y{-9999};
+	double m0_win_pos_x{-1};
+	double m0_win_pos_y{-1};
+	double m1_win_pos_x{-1};
+	double m1_win_pos_y{-1};
+	bool m0_set{};
+	bool m1_set{};
 	StudyGraphicsWidget * parent;
 	QColor shutter_color;
 	void set_win_old_position(int, int);

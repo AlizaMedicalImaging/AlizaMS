@@ -38,7 +38,7 @@ class DataSetEvent : public AnyEvent
 public:
   typedef DataSetEvent Self;
   typedef AnyEvent     Superclass;
-  DataSetEvent(DataSet const * ds = NULL)
+  DataSetEvent(DataSet const * ds = nullptr)
     : m_DataSet(ds)
   {}
   virtual ~DataSetEvent() {}
@@ -50,7 +50,7 @@ public:
   virtual bool
   CheckEvent(const ::mdcm::Event * e) const override
   {
-    return (dynamic_cast<const Self *>(e) == NULL ? false : true);
+    return (dynamic_cast<const Self *>(e) == nullptr ? false : true);
   }
   virtual ::mdcm::Event *
   MakeObject() const override

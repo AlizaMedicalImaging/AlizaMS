@@ -53,10 +53,10 @@ static QList<ImageVariant*> selected_images;
 static QList<ImageVariant*> animation_images;
 static QList<double> anim3d_times;
 
-static btDefaultCollisionConfiguration * g_collisionConfiguration = NULL;
-static btCollisionDispatcher           * g_dispatcher             = NULL;
-static btDbvtBroadphase                * g_broadphase             = NULL;
-static btCollisionWorld                * g_collisionWorld         = NULL;
+static btDefaultCollisionConfiguration * g_collisionConfiguration = nullptr;
+static btCollisionDispatcher           * g_dispatcher = nullptr;
+static btDbvtBroadphase                * g_broadphase = nullptr;
+static btCollisionWorld                * g_collisionWorld = nullptr;
 static btAlignedObjectArray<btCollisionShape*> g_collision_shapes;
 static bool show_all_study_collisions = true;
 
@@ -149,7 +149,7 @@ void g_close_physics()
 				}
 				g_collisionWorld->removeCollisionObject(o);
 				delete o;
-				o = NULL;
+				o = nullptr;
 			}
 		}
 	}
@@ -171,12 +171,12 @@ void g_close_physics()
 						{
 							c->removeChildShape(ch);
 							delete ch;
-							ch = NULL;
+							ch = nullptr;
 						}
 					}
 				}
 				delete s;
-				s = NULL;
+				s = nullptr;
 			}
 		}
 		g_collision_shapes.clear();
@@ -184,22 +184,22 @@ void g_close_physics()
 	if (g_collisionWorld)
 	{
 		delete g_collisionWorld;
-		g_collisionWorld = NULL;
+		g_collisionWorld = nullptr;
 	}
 	if (g_collisionConfiguration)
 	{
 		delete g_collisionConfiguration;
-		g_collisionConfiguration = NULL;
+		g_collisionConfiguration = nullptr;
 	}
 	if (g_dispatcher)
 	{
 		delete g_dispatcher;
-		g_dispatcher = NULL;
+		g_dispatcher = nullptr;
 	}
 	if (g_broadphase)
 	{
 		delete g_broadphase;
-		g_broadphase = NULL;
+		g_broadphase = nullptr;
 	}
 #if 0
 	std::cout << "Bullet closed" << std::endl;
@@ -449,7 +449,7 @@ void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 			}
 			g_collisionWorld->removeCollisionObject(k);
 			delete tmp_objects[j];
-			tmp_objects[j] = NULL;
+			tmp_objects[j] = nullptr;
 		}
 	}
 	for (int j = 0; j < tmp_shapes.size(); ++j)
@@ -457,7 +457,7 @@ void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 		if (tmp_shapes[j])
 		{
 			delete tmp_shapes[j];
-			tmp_shapes[j] = NULL;
+			tmp_shapes[j] = nullptr;
 		}
 	}
 #ifdef ALIZA_PERF_COLLISION
@@ -630,7 +630,7 @@ void check_slice_collisions2(StudyViewWidget * w)
 						}
 						g_collisionWorld->removeCollisionObject(k);
 						delete tmp_objects[j];
-						tmp_objects[j] = NULL;
+						tmp_objects[j] = nullptr;
 					}
 				}
 				for (int j = 0; j < tmp_shapes.size(); ++j)
@@ -638,7 +638,7 @@ void check_slice_collisions2(StudyViewWidget * w)
 					if (tmp_shapes[j])
 					{
 						delete tmp_shapes[j];
-						tmp_shapes[j] = NULL;
+						tmp_shapes[j] = nullptr;
 					}
 				}
 			}
@@ -655,51 +655,6 @@ void check_slice_collisions2(StudyViewWidget * w)
 
 Aliza::Aliza()
 {
-	glwidget  = NULL;
-	imagesbox = NULL;
-	toolbox = NULL;
-	toolbox2D = NULL;
-	browser2  = NULL;
-	settingswidget = NULL;
-	graphicswidget_m = NULL;
-	graphicswidget_y = NULL;
-	graphicswidget_x = NULL;
-	slider_m = NULL;
-	slider_y = NULL;
-	slider_x = NULL;
-	zrangewidget = NULL;
-	histogramview = NULL;
-	anim2Dwidget = NULL;
-	anim3Dwidget = NULL;
-	lutwidget2 = NULL;
-	zlockAct = NULL;
-	oneAct = NULL;
-	trans3DAct = NULL;
-	graphicsAct_Z = NULL;
-	graphicsAct_Y = NULL;
-	graphicsAct_X = NULL;
-	zyxAct = NULL;
-	histogramAct = NULL;
-	slicesAct  = NULL;
-	frames2DAct = NULL;
-	distanceAct = NULL;
-	rectAct = NULL;
-	cursorAct = NULL;
-	collisionAct = NULL;
-	segmentAct = NULL;
-	show3DAct = NULL;
-	show2DAct = NULL;
-	studyview = NULL;
-	rect_selection = false;
-	hide_zoom = false;
-	multiview = false;
-	histogram_mode = false;
-	run__ = false;
-	load_reported_to_mainwin = false;
-	anim_idx = -1;
-	saved_mouse_modus = 0;
-	saved_show_cursor = false;
-	frametime_3D = 120;
 	trans_icon = QIcon(QString(":/bitmaps/trans1.svg"));
 	notrans_icon = QIcon(QString(":/bitmaps/notrans1.svg"));
 	cut_icon = QIcon(QString(":bitmaps/cut.svg"));
@@ -803,7 +758,7 @@ void Aliza::close_filters_progress(QProgressDialog * pb)
 	{
 		pb->close();
 		delete pb;
-		pb = NULL;
+		pb = nullptr;
 	}
 }
 
@@ -814,7 +769,7 @@ void Aliza::load_dicom_series(QProgressDialog * pb)
 	std::vector<ImageVariant*> ivariants;
 	std::vector<int> rows;
 	QStringList filenames;
-	ShaderObj * mesh_shader = NULL;
+	ShaderObj * mesh_shader = nullptr;
 	int max_3d_tex_size = 0;
 	QModelIndexList selection;
 	const bool ok3d = check_3d();
@@ -850,7 +805,7 @@ void Aliza::load_dicom_series(QProgressDialog * pb)
 				ivariants,
 				filenames,
 				max_3d_tex_size,
-				(ok3d ? glwidget : NULL),
+				(ok3d ? glwidget : nullptr),
 				mesh_shader,
 				ok3d,
 				static_cast<QWidget*>(settingswidget),
@@ -1021,7 +976,7 @@ void Aliza::clear_ram()
 	disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
 	disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
 	imagesbox->listWidget->clear();
-	imagesbox->set_html(NULL);
+	imagesbox->set_html(nullptr);
 	clear_contourstable();
 	selected_images.clear();
 	QMap<int, ImageVariant*>::iterator iv = scene3dimages.begin();
@@ -1048,8 +1003,8 @@ void Aliza::clear_ram()
 
 void Aliza::delete_image()
 {
-	ImageVariant * ivariant = NULL;
-	QListWidgetItem * item__ = NULL;
+	ImageVariant * ivariant = nullptr;
+	QListWidgetItem * item__ = nullptr;
 	const bool lock = mutex0.tryLock();
 	if (!lock) return;
 	const bool ok3d = check_3d();
@@ -1094,13 +1049,13 @@ void Aliza::delete_image()
 	{
 		imagesbox->listWidget->removeItemWidget(item__);
 		delete item__;
-		item__ = NULL;
+		item__ = nullptr;
 	}
 	imagesbox->listWidget->reset();
 	remove_from_studyview(ivariant->id);
 	scene3dimages.remove(ivariant->id);
 	delete ivariant;
-	ivariant = NULL;
+	ivariant = nullptr;
 	update_selection();
 	connect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
 	connect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
@@ -1130,16 +1085,16 @@ void Aliza::delete_unchecked_images()
 
 ImageVariant * Aliza::get_image(int id)
 {
-	if (id < 0) return NULL;
+	if (id < 0) return nullptr;
 	if (scene3dimages.contains(id)) return scene3dimages[id];
-	return NULL;
+	return nullptr;
 }
 
 const ImageVariant * Aliza::get_image(int id) const
 {
-	if (id < 0) return NULL;
+	if (id < 0) return nullptr;
 	if (scene3dimages.contains(id)) return scene3dimages.value(id);
-	return NULL;
+	return nullptr;
 }
 
 int Aliza::get_selected_image_id()
@@ -1162,7 +1117,7 @@ ImageVariant * Aliza::get_selected_image()
 		ListWidgetItem2 * i = static_cast<ListWidgetItem2*>(l.at(0));
 		if (i) return i->get_image_from_item();
 	}
-	return NULL;
+	return nullptr;
 }
 
 const ImageVariant * Aliza::get_selected_image_const() const
@@ -1173,7 +1128,7 @@ const ImageVariant * Aliza::get_selected_image_const() const
 		const ListWidgetItem2 * i = static_cast<const ListWidgetItem2*>(l.at(0));
 		if (i) return i->get_image_from_item_const();
 	}
-	return NULL;
+	return nullptr;
 }
 
 static long long count_elscint = 0;
@@ -1310,7 +1265,7 @@ bool Aliza::load_3d(
 		ivariant->image_type < 10)
 	{
 		ok = CommonUtils::reload_monochrome(
-			ivariant,ok3d,(ok3d ? glwidget : NULL), max_3d_tex_size,
+			ivariant,ok3d,(ok3d ? glwidget : nullptr), max_3d_tex_size,
 			change_size, size_x_, size_y_);
 	}
 	else if (ivariant->image_type >= 10 &&
@@ -2434,7 +2389,7 @@ void Aliza::calculate_bb()
 				tmpz += static_cast<double>(tmpv->di->center_z);
 			}
 		}
-		if (j>0)
+		if (j > 0)
 		{
 			v->di->center_x = tmpx/static_cast<double>(j);
 			v->di->center_y = tmpy/static_cast<double>(j);
@@ -2701,11 +2656,11 @@ void Aliza::update_selection()
 {
 	selected_images.clear();
 	QList<QListWidgetItem*> l = imagesbox->listWidget->selectedItems();
-	QListWidgetItem * s = (l.size() > 0) ? l.at(0) : NULL;
+	QListWidgetItem * s = (l.size() > 0) ? l.at(0) : nullptr;
 	if (l.size() == 1) // single selection mode
 	{
 		ListWidgetItem2 * i = static_cast<ListWidgetItem2*>(s);
-		ImageVariant * v = (i) ? i->get_image_from_item() : NULL;
+		ImageVariant * v = (i) ? i->get_image_from_item() : nullptr;
 		if (v)
 		{
 			graphicswidget_m->set_slice_2D(v, 0, true);
@@ -2721,11 +2676,11 @@ void Aliza::update_selection2()
 {
 	selected_images.clear();
 	QList<QListWidgetItem*> l = imagesbox->listWidget->selectedItems();
-	QListWidgetItem * s = (!l.empty()) ? l.at(0) : NULL;
+	QListWidgetItem * s = (!l.empty()) ? l.at(0) : nullptr;
 	if (l.size() == 1) // single selection mode
 	{
 		ListWidgetItem2 * i = static_cast<ListWidgetItem2*>(s);
-		ImageVariant * v = (i) ? i->get_image_from_item() : NULL;
+		ImageVariant * v = (i) ? i->get_image_from_item() : nullptr;
 		if (v)
 		{
 			graphicswidget_m->graphicsview->global_flip_x = false;
@@ -2850,8 +2805,8 @@ void Aliza::update_selection_common2(QListWidgetItem * s)
 
 void Aliza::clear_views()
 {
-	update_toolbox(NULL);
-	imagesbox->set_html(NULL);
+	update_toolbox(nullptr);
+	imagesbox->set_html(nullptr);
 	clear_contourstable();
 	graphicswidget_m->clear_();
 	graphicswidget_y->clear_();
@@ -3086,7 +3041,7 @@ void Aliza::trigger_reload_histogram()
 	ImageVariant * v = get_selected_image();
 	if (v)
 	{
-		add_histogram(v, NULL, false);
+		add_histogram(v, nullptr, false);
 		histogramview->update__(v);
 	}
 	QApplication::restoreOverrideCursor();
@@ -3723,7 +3678,7 @@ void Aliza::flipY()
 
 void Aliza::toggle_maxwindow(bool i)
 {
-	ImageVariant * v = NULL;
+	ImageVariant * v = nullptr;
 	const bool ok3d = check_3d();
 	if (ok3d) glwidget->set_skip_draw(true);
 	const bool lock = mutex0.tryLock();
@@ -3739,7 +3694,7 @@ void Aliza::toggle_maxwindow(bool i)
 	qApp->processEvents();
 	v->di->maxwindow = i;
 	load_3d(v, true, true, false, true);
-	if (!v->histogram.isNull()) add_histogram(v, NULL, false);
+	if (!v->histogram.isNull()) add_histogram(v, nullptr, false);
 	histogramview->update__(v);
 	disconnect_tools();
 	toolbox2D->disconnect_sliders();
@@ -4280,7 +4235,7 @@ void Aliza::delete_group(const int group_id)
 			remove_from_studyview(ivariant->id);
 			scene3dimages.remove(ivariant->id);
 			delete ivariant;
-			ivariant = NULL;
+			ivariant = nullptr;
 		}
 	}
 	update_selection();
@@ -4308,7 +4263,7 @@ void Aliza::load_dicom_file(int * image_id,
 	QFileInfo fi(f);
 	const bool ok3d = check_3d();
 	ShaderObj * mesh_shader =
-		(ok3d) ? &(glwidget->mesh_shader) : NULL;
+		(ok3d) ? &(glwidget->mesh_shader) : nullptr;
 	int max_3d_tex_size =
 		(ok3d) ? glwidget->max_3d_texture_size : 0;
 	QStringList tmp_filenames__;
@@ -4328,7 +4283,7 @@ void Aliza::load_dicom_file(int * image_id,
 			ivariants,
 			tmp_filenames__,
 			max_3d_tex_size,
-			(ok3d ? glwidget : NULL),
+			(ok3d ? glwidget : nullptr),
 			mesh_shader,
 			ok3d,
 			static_cast<QWidget*>(settingswidget),
@@ -4485,7 +4440,7 @@ void Aliza::toggle_lock_window(bool t)
 void Aliza::clear_contourstable()
 {
 	imagesbox->contours_tableWidget->blockSignals(true);
-	imagesbox->set_contours(NULL);
+	imagesbox->set_contours(nullptr);
 	imagesbox->contours_tableWidget->blockSignals(false);
 }
 
@@ -4628,7 +4583,7 @@ void Aliza::trigger_studyview()
 	ImageVariant * v = get_selected_image();
 	if (!v)
 	{
-		QMessageBox::information(NULL, QString("Information"), QString("Select image"));
+		QMessageBox::information(nullptr, QString("Information"), QString("Select image"));
 		mutex0.unlock();
 		return;
 	}
@@ -4710,7 +4665,7 @@ void Aliza::trigger_studyview_checked()
 	const int n = l.size();
 	if (n == 0)
 	{
-		QMessageBox::information(NULL, QString("Information"), QString("Nothing selected"));
+		QMessageBox::information(nullptr, QString("Information"), QString("Nothing selected"));
 		mutex0.unlock();
 		return;
 	}

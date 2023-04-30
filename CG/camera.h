@@ -1,5 +1,5 @@
 /*
- * (C) mihail.isakov@googlemail.com 2008-2022
+ * (C) mihail.isakov@googlemail.com 2008-2023
  */
 
 #ifndef A_CAMERA_H
@@ -66,40 +66,40 @@ public:
 	float m_forward_vel;
 	float m_side_vel;
 #ifdef DISABLE_SIMDMATH
-	void matrix4_to_float(const Vectormath::Scalar::Matrix4&,float*);
-	void matrix3_to_float(const Vectormath::Scalar::Matrix3&,float*);
-	void float_to_matrix4(const float*,Vectormath::Scalar::Matrix4&);
-	void float_to_matrix3(const float*,Vectormath::Scalar::Matrix3&);
+	void matrix4_to_float(const Vectormath::Scalar::Matrix4&, float*);
+	void matrix3_to_float(const Vectormath::Scalar::Matrix3&, float*);
+	void float_to_matrix4(const float*, Vectormath::Scalar::Matrix4&);
+	void float_to_matrix3(const float*, Vectormath::Scalar::Matrix3&);
 #else
 	inline void matrix4_to_float(
 		const Vectormath::SSE::Matrix4 & m_,
 		float * m)
 	{
-		_mm_storeu_ps((m   ), m_.getCol0().get128());
-		_mm_storeu_ps((m+4 ), m_.getCol1().get128());
-		_mm_storeu_ps((m+8 ), m_.getCol2().get128());
-		_mm_storeu_ps((m+12), m_.getCol3().get128());
+		_mm_storeu_ps((m),      m_.getCol0().get128());
+		_mm_storeu_ps((m +  4), m_.getCol1().get128());
+		_mm_storeu_ps((m +  8), m_.getCol2().get128());
+		_mm_storeu_ps((m + 12), m_.getCol3().get128());
 	}
 	void matrix3_to_float(const Vectormath::SSE::Matrix3&, float*);
-	void float_to_matrix4(const float*,Vectormath::SSE::Matrix4&);
-	void float_to_matrix3(const float*,Vectormath::SSE::Matrix3&);
+	void float_to_matrix4(const float*, Vectormath::SSE::Matrix4&);
+	void float_to_matrix3(const float*, Vectormath::SSE::Matrix3&);
 #endif
 	void reset();
 	void look_at(
-		float,float,float,float,
-		float,float,float,float,
-		float,bool=true);
+		float, float, float, float,
+		float, float, float, float,
+		float,bool = true);
 	void perspective(
-		float,float,float,float);
+		float, float, float, float);
 	void orthographic(
-		float,float,float,float,
-		float,float);
+		float, float, float, float,
+		float, float);
 #ifdef DISABLE_SIMDMATH
 	void project(
 		Vectormath::Scalar::Point3&,
-		float*,float*,float*,float*);
+		float*, float*, float*, float*);
 	void project_compat(
-		Vectormath::Scalar::Point3&,int*,float*,float*);
+		Vectormath::Scalar::Point3&, int*, float*, float*);
 	Vectormath::Scalar::Vector4 unproject(
 		Vectormath::Scalar::Point3&,
 		Vectormath::Scalar::Matrix4&,
@@ -108,9 +108,9 @@ public:
 #else
 	void project(
 		Vectormath::SSE::Point3&,
-		float*,float*,float*,float*);
+		float*, float*, float*, float*);
 	void project_compat(
-		Vectormath::SSE::Point3&,int*,float*,float*);
+		Vectormath::SSE::Point3&, int*, float*, float*);
 	Vectormath::SSE::Vector4 unproject(
 		Vectormath::SSE::Point3&,
 		Vectormath::SSE::Matrix4&,
@@ -118,24 +118,24 @@ public:
 		Vectormath::SSE::Vector4&);
 #endif
 	float project_to_sphere(
-		float,float,float);
+		float, float, float);
 	void set_trackball(
-		float,float,float,float,float);
+		float, float, float, float, float);
 	void set_trackball_matrix(
-		float,float,float,float, float,float,
-		float,float,float,float,
-		float,float,float,float);
+		float, float, float, float, float,float,
+		float, float, float, float,
+		float, float, float, float);
 	void set_trackball_pan_matrix(
-		float,float,float,float, float,float,
-		float,float,float,float,
-		float,float,float,float,
-		float,float);
+		float, float, float, float, float,float,
+		float, float, float, float,
+		float, float, float, float,
+		float, float);
 	void set_trackball_pan_matrix2(
-		float,float,float,float, float,float,
-		float,float,float,float,
-		float,float,float,float,
-		float,float,
-		float*,float*,float*);
+		float, float, float, float, float,float,
+		float, float, float, float,
+		float, float, float, float,
+		float, float,
+		float*, float*, float*);
 	void change_heading(float);
 	void set_heading(float);
 	void change_pitch(float);
@@ -143,11 +143,11 @@ public:
 	void set_velocity(float);
 	void set_side_velocity(float);
 	void set_viewer_matrix(float);
-	void set_position(float,float,float);
+	void set_position(float, float, float);
 	void calculate_light_matrices(
-		unsigned short,float*,int);
+		unsigned short, float*, int);
 	void calculate_projective_matrix(
-		unsigned short,float*,float*);
+		unsigned short, float*, float*);
 } VECTORMATH_ALIGNED_POST;
 
 #endif

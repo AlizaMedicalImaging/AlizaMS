@@ -86,16 +86,16 @@ protected:
 
 private:
 	mutable QMutex mutex;
-	StudyViewWidget * studyview;
-	QSlider * slider;
-	QLabel  * top_label;
-	QLabel  * left_label;
-	QLabel  * measure_label;
-	QToolButton * icon_button;
-	bool   smooth_;
-	short  mouse_modus;
-	bool   enable_shutter;
-	bool   enable_overlays;
+	StudyViewWidget * studyview{};
+	QSlider * slider{};
+	QLabel  * top_label{};
+	QLabel  * left_label{};
+	QLabel  * measure_label{};
+	QToolButton * icon_button{};
+	bool   smooth_{true};
+	short  mouse_modus{};
+	bool   enable_shutter{true};
+	bool   enable_overlays{true};
 };
 
 #endif

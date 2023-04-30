@@ -32,10 +32,10 @@ class DataEvent : public AnyEvent
 public:
   typedef DataEvent Self;
   typedef AnyEvent  Superclass;
-  DataEvent(const char * bytes = NULL, size_t len = 0)
+  DataEvent(const char * bytes = nullptr, size_t len = 0)
     : Bytes(bytes), Length(len) {}
   DataEvent(const Self & s)
-    : AnyEvent(s), Bytes(NULL), Length(0) {}
+    : AnyEvent(s), Bytes(nullptr), Length(0) {}
   ~DataEvent() override {}
   const char *
   GetEventName() const override
@@ -45,7 +45,7 @@ public:
   bool
   CheckEvent(const ::mdcm::Event * e) const override
   {
-    return (dynamic_cast<const Self *>(e) == NULL ? false : true);
+    return (dynamic_cast<const Self *>(e) == nullptr ? false : true);
   }
   ::mdcm::Event *
   MakeObject() const override

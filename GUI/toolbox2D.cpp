@@ -18,9 +18,6 @@ ToolBox2D::ToolBox2D(float si)
 	lockoff = QIcon(QString(":/bitmaps/unlock2.svg"));
 	anim_label->hide();
 	anim_label->setPixmap(green);
-	label_is_red   = false;
-	label_is_green = false;
-	label_is_blue  = false;
 	connect_sliders();
 }
 

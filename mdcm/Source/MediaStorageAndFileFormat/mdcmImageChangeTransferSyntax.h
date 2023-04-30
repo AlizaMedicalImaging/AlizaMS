@@ -53,7 +53,7 @@ public:
     , Force(false)
     , CompressIconImage(false)
     , ForceYBRFull(false)
-    , UserCodec(NULL)
+    , UserCodec(nullptr)
   {}
   ~ImageChangeTransferSyntax() {}
   void

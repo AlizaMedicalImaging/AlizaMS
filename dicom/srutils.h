@@ -79,7 +79,7 @@ public:
 		int,
 		bool,
 		const QString&,
-		bool=false);
+		bool = false);
 };
 
 #endif

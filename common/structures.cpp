@@ -25,70 +25,11 @@ DisplayInterface::DisplayInterface(
 	id(id_),
 	opengl_ok(opengl_ok_),
 	skip_texture(skip_texture_),
-	gl(gl_)
+	gl(gl_),
+	selected_lut(default_lut_)
 {
-	lookup_id = -1;
-	paint_id  = -1;
-	disable_int_level = false;
-	maxwindow = false;
-	filtering = 0; // 0 - no, 1 - "bilinear", 2 - "trilinear"
-	transparency = true; // 3D phys. space view
-	lock_2Dview = false;
-	lock_single = false;
-	lock_level2D = true;
-	cube_3dtex = 0;
-	for (int x = 0; x < 3; ++x) origin[x] = 0.0f;
-	origin_ok = false;
-	tex_info = -1;
-	idimx = idimy = idimz = 0;
-	ix_origin = iy_origin = iz_origin = 0.0f;
-	for (int x = 0; x < 6; ++x) dircos[x] = 0.0f;
-	ix_spacing = iy_spacing = iz_spacing = 0.0;
-	dimx = dimy = 0;
-	x_spacing = y_spacing = 0.0;
-	vmin = vmax = 0.0f;
-	rmin = rmax = 0.0f;
 	supp_palette_subsciptor = INT_MIN;
-	center_x = center_y = center_z = 0.0f;
-	default_center_x = default_center_y = default_center_z = 0.0f;
-	slices_direction_x = slices_direction_y = 0.0f;
-	slices_direction_z = 1.0;
-	up_direction_x = up_direction_z = 0.0f;
-	up_direction_y = 1.0f;
-	// -1 - not set,
-	// 0 - linear,
-	// 1 - linear_exact,
-	// 2 - sigmoid
-	lut_function = -1;
-	default_lut_function = -1;
-	us_window_center = us_window_width = -999999.0;
-	default_us_window_center = default_us_window_width = -999999.0;
-	window_center = 0.5;
-	window_width = 1.0;
-	slices_generated = false;
-	slices_from_dicom = false;
-	spectroscopy_generated = false;
-	hide_orientation = true;
-	spectroscopy_ref = 0;
-	selected_lut  = default_lut_;
-	from_slice = to_slice = 0;
-	irect_index[0] = irect_index[1] = 0;
-	irect_size[0]  = irect_size[1]  = 0;
-	selected_x_slice = selected_y_slice = selected_z_slice = 0;
-	bb_x_min = 0.0;
-	bb_x_max = 1.0;
-	bb_y_min = 0.0;
-	bb_y_max = 1.0;
-	bits_allocated = 0;
-	bits_stored = 0;
-	high_bit = 0;
-	shift_tmp = 0.0;
-	scale_tmp = 1.0;
-	CommonUtils::random_RGB(&R,&G,&B);
-}
-
-DisplayInterface::~DisplayInterface()
-{
+	CommonUtils::random_RGB(&R, &G, &B);
 }
 
 void DisplayInterface::close(bool clear_geometry)
@@ -269,83 +210,63 @@ ImageVariant::ImageVariant(
 		skip_texture_,
 		gl_,
 		default_lut_);
-	group_id = -1;
-	instance_number = -1;
-	image_type = -1;
-	equi = false;
-	one_direction = false;
-	orientation = 0;
-	orientation_string = QString("");
-	iod_supported = false;
-	rescale_disabled = false;
-	modified = false;
-	ybr = false;
-	dicom_pixel_signed = false;
 }
 
 ImageVariant::~ImageVariant()
 {
 	// highly likely not required
-	if(pSS.IsNotNull())     {pSS->DisconnectPipeline();     };pSS     =NULL;
-	if(pUS.IsNotNull())     {pUS->DisconnectPipeline();     };pUS     =NULL;
-	if(pSI.IsNotNull())     {pSI->DisconnectPipeline();     };pSI     =NULL;
-	if(pUI.IsNotNull())     {pUI->DisconnectPipeline();     };pUI     =NULL;
-	if(pUC.IsNotNull())     {pUC->DisconnectPipeline();     };pUC     =NULL;
-	if(pF.IsNotNull())      {pF->DisconnectPipeline();      };pF      =NULL;
-	if(pD.IsNotNull())      {pD->DisconnectPipeline();      };pD      =NULL;
-	if(pSLL.IsNotNull())    {pSLL->DisconnectPipeline();    };pSLL    =NULL;
-	if(pULL.IsNotNull())    {pULL->DisconnectPipeline();    };pULL    =NULL;
-	if(pSS_rgb.IsNotNull()) {pSS_rgb->DisconnectPipeline(); };pSS_rgb =NULL;
-	if(pUS_rgb.IsNotNull()) {pUS_rgb->DisconnectPipeline(); };pUS_rgb =NULL;
-	if(pSI_rgb.IsNotNull()) {pSI_rgb->DisconnectPipeline(); };pSI_rgb =NULL;
-	if(pUI_rgb.IsNotNull()) {pUI_rgb->DisconnectPipeline(); };pUI_rgb =NULL;
-	if(pUC_rgb.IsNotNull()) {pUC_rgb->DisconnectPipeline(); };pUC_rgb =NULL;
-	if(pF_rgb.IsNotNull())  {pF_rgb->DisconnectPipeline();  };pF_rgb  =NULL;
-	if(pD_rgb.IsNotNull())  {pD_rgb->DisconnectPipeline();  };pD_rgb  =NULL;
-	if(pSS_rgba.IsNotNull()){pSS_rgba->DisconnectPipeline();};pSS_rgba=NULL;
-	if(pUS_rgba.IsNotNull()){pUS_rgba->DisconnectPipeline();};pUS_rgba=NULL;
-	if(pSI_rgba.IsNotNull()){pSI_rgba->DisconnectPipeline();};pSI_rgba=NULL;
-	if(pUI_rgba.IsNotNull()){pUI_rgba->DisconnectPipeline();};pUI_rgba=NULL;
-	if(pUC_rgba.IsNotNull()){pUC_rgba->DisconnectPipeline();};pUC_rgba=NULL;
-	if(pF_rgba.IsNotNull()) {pF_rgba->DisconnectPipeline(); };pF_rgba =NULL;
-	if(pD_rgba.IsNotNull()) {pD_rgba->DisconnectPipeline(); };pD_rgba =NULL;
+	if(pSS.IsNotNull())     {pSS->DisconnectPipeline();     };pSS     =nullptr;
+	if(pUS.IsNotNull())     {pUS->DisconnectPipeline();     };pUS     =nullptr;
+	if(pSI.IsNotNull())     {pSI->DisconnectPipeline();     };pSI     =nullptr;
+	if(pUI.IsNotNull())     {pUI->DisconnectPipeline();     };pUI     =nullptr;
+	if(pUC.IsNotNull())     {pUC->DisconnectPipeline();     };pUC     =nullptr;
+	if(pF.IsNotNull())      {pF->DisconnectPipeline();      };pF      =nullptr;
+	if(pD.IsNotNull())      {pD->DisconnectPipeline();      };pD      =nullptr;
+	if(pSLL.IsNotNull())    {pSLL->DisconnectPipeline();    };pSLL    =nullptr;
+	if(pULL.IsNotNull())    {pULL->DisconnectPipeline();    };pULL    =nullptr;
+	if(pSS_rgb.IsNotNull()) {pSS_rgb->DisconnectPipeline(); };pSS_rgb =nullptr;
+	if(pUS_rgb.IsNotNull()) {pUS_rgb->DisconnectPipeline(); };pUS_rgb =nullptr;
+	if(pSI_rgb.IsNotNull()) {pSI_rgb->DisconnectPipeline(); };pSI_rgb =nullptr;
+	if(pUI_rgb.IsNotNull()) {pUI_rgb->DisconnectPipeline(); };pUI_rgb =nullptr;
+	if(pUC_rgb.IsNotNull()) {pUC_rgb->DisconnectPipeline(); };pUC_rgb =nullptr;
+	if(pF_rgb.IsNotNull())  {pF_rgb->DisconnectPipeline();  };pF_rgb  =nullptr;
+	if(pD_rgb.IsNotNull())  {pD_rgb->DisconnectPipeline();  };pD_rgb  =nullptr;
+	if(pSS_rgba.IsNotNull()){pSS_rgba->DisconnectPipeline();};pSS_rgba=nullptr;
+	if(pUS_rgba.IsNotNull()){pUS_rgba->DisconnectPipeline();};pUS_rgba=nullptr;
+	if(pSI_rgba.IsNotNull()){pSI_rgba->DisconnectPipeline();};pSI_rgba=nullptr;
+	if(pUI_rgba.IsNotNull()){pUI_rgba->DisconnectPipeline();};pUI_rgba=nullptr;
+	if(pUC_rgba.IsNotNull()){pUC_rgba->DisconnectPipeline();};pUC_rgba=nullptr;
+	if(pF_rgba.IsNotNull()) {pF_rgba->DisconnectPipeline(); };pF_rgba =nullptr;
+	if(pD_rgba.IsNotNull()) {pD_rgba->DisconnectPipeline(); };pD_rgba =nullptr;
 	//
 	di->close();
 	delete di;
 }
 
-ImageVariant2D::ImageVariant2D()
-{
-	image_type = -1;
-	orientation_string = QString("");
-	idimx = 0;
-	idimy = 0;
-}
-
 ImageVariant2D::~ImageVariant2D()
 {
-	if(pSS.IsNotNull())     {pSS->DisconnectPipeline();     };pSS     =NULL;
-	if(pUS.IsNotNull())     {pUS->DisconnectPipeline();     };pUS     =NULL;
-	if(pSI.IsNotNull())     {pSI->DisconnectPipeline();     };pSI     =NULL;
-	if(pUI.IsNotNull())     {pUI->DisconnectPipeline();     };pUI     =NULL;
-	if(pUC.IsNotNull())     {pUC->DisconnectPipeline();     };pUC     =NULL;
-	if(pF.IsNotNull())      {pF->DisconnectPipeline();      };pF      =NULL;
-	if(pD.IsNotNull())      {pD->DisconnectPipeline();      };pD      =NULL;
-	if(pSLL.IsNotNull())    {pSLL->DisconnectPipeline();    };pSLL    =NULL;
-	if(pULL.IsNotNull())    {pULL->DisconnectPipeline();    };pULL    =NULL;
-	if(pSS_rgb.IsNotNull()) {pSS_rgb->DisconnectPipeline(); };pSS_rgb =NULL;
-	if(pUS_rgb.IsNotNull()) {pUS_rgb->DisconnectPipeline(); };pUS_rgb =NULL;
-	if(pSI_rgb.IsNotNull()) {pSI_rgb->DisconnectPipeline(); };pSI_rgb =NULL;
-	if(pUI_rgb.IsNotNull()) {pUI_rgb->DisconnectPipeline(); };pUI_rgb =NULL;
-	if(pUC_rgb.IsNotNull()) {pUC_rgb->DisconnectPipeline(); };pUC_rgb =NULL;
-	if(pF_rgb.IsNotNull())  {pF_rgb->DisconnectPipeline();  };pF_rgb  =NULL;
-	if(pD_rgb.IsNotNull())  {pD_rgb->DisconnectPipeline();  };pD_rgb  =NULL;
-	if(pSS_rgba.IsNotNull()){pSS_rgba->DisconnectPipeline();};pSS_rgba=NULL;
-	if(pUS_rgba.IsNotNull()){pUS_rgba->DisconnectPipeline();};pUS_rgba=NULL;
-	if(pSI_rgba.IsNotNull()){pSI_rgba->DisconnectPipeline();};pSI_rgba=NULL;
-	if(pUI_rgba.IsNotNull()){pUI_rgba->DisconnectPipeline();};pUI_rgba=NULL;
-	if(pUC_rgba.IsNotNull()){pUC_rgba->DisconnectPipeline();};pUC_rgba=NULL;
-	if(pF_rgba.IsNotNull()) {pF_rgba->DisconnectPipeline(); };pF_rgba =NULL;
-	if(pD_rgba.IsNotNull()) {pD_rgba->DisconnectPipeline(); };pD_rgba =NULL;
+	if(pSS.IsNotNull())     {pSS->DisconnectPipeline();     };pSS     =nullptr;
+	if(pUS.IsNotNull())     {pUS->DisconnectPipeline();     };pUS     =nullptr;
+	if(pSI.IsNotNull())     {pSI->DisconnectPipeline();     };pSI     =nullptr;
+	if(pUI.IsNotNull())     {pUI->DisconnectPipeline();     };pUI     =nullptr;
+	if(pUC.IsNotNull())     {pUC->DisconnectPipeline();     };pUC     =nullptr;
+	if(pF.IsNotNull())      {pF->DisconnectPipeline();      };pF      =nullptr;
+	if(pD.IsNotNull())      {pD->DisconnectPipeline();      };pD      =nullptr;
+	if(pSLL.IsNotNull())    {pSLL->DisconnectPipeline();    };pSLL    =nullptr;
+	if(pULL.IsNotNull())    {pULL->DisconnectPipeline();    };pULL    =nullptr;
+	if(pSS_rgb.IsNotNull()) {pSS_rgb->DisconnectPipeline(); };pSS_rgb =nullptr;
+	if(pUS_rgb.IsNotNull()) {pUS_rgb->DisconnectPipeline(); };pUS_rgb =nullptr;
+	if(pSI_rgb.IsNotNull()) {pSI_rgb->DisconnectPipeline(); };pSI_rgb =nullptr;
+	if(pUI_rgb.IsNotNull()) {pUI_rgb->DisconnectPipeline(); };pUI_rgb =nullptr;
+	if(pUC_rgb.IsNotNull()) {pUC_rgb->DisconnectPipeline(); };pUC_rgb =nullptr;
+	if(pF_rgb.IsNotNull())  {pF_rgb->DisconnectPipeline();  };pF_rgb  =nullptr;
+	if(pD_rgb.IsNotNull())  {pD_rgb->DisconnectPipeline();  };pD_rgb  =nullptr;
+	if(pSS_rgba.IsNotNull()){pSS_rgba->DisconnectPipeline();};pSS_rgba=nullptr;
+	if(pUS_rgba.IsNotNull()){pUS_rgba->DisconnectPipeline();};pUS_rgba=nullptr;
+	if(pSI_rgba.IsNotNull()){pSI_rgba->DisconnectPipeline();};pSI_rgba=nullptr;
+	if(pUI_rgba.IsNotNull()){pUI_rgba->DisconnectPipeline();};pUI_rgba=nullptr;
+	if(pUC_rgba.IsNotNull()){pUC_rgba->DisconnectPipeline();};pUC_rgba=nullptr;
+	if(pF_rgba.IsNotNull()) {pF_rgba->DisconnectPipeline(); };pF_rgba =nullptr;
+	if(pD_rgba.IsNotNull()) {pD_rgba->DisconnectPipeline(); };pD_rgba =nullptr;
 }
 

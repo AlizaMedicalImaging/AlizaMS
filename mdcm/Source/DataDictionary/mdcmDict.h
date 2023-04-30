@@ -96,7 +96,7 @@ public:
     MapDictEntry::const_iterator it = DictInternal.find(tag);
     if (it == DictInternal.cend())
     {
-      return NULL;
+      return nullptr;
     }
     assert(DictInternal.count(tag) == 1);
     return it->second.GetKeyword();

@@ -50,7 +50,7 @@ static const char * TSStrings[] = {
   "1.2.840.10008.1.2.4.103",    // MPEG-4 AVC/H.264 BD-compatible High Profile / Level 4.1
   "1.2.840.10008.1.2.1.98",     // Encapsulated Uncompressed Explicit VR Little Endian
   "Unknown Transfer Syntax",    // Unknown
-  NULL
+  nullptr
 };
 
 TransferSyntax::TSType
@@ -65,7 +65,7 @@ TransferSyntax::GetTSType(const char * cstr)
     str.erase(notspace);
   }
   int i = 0;
-  while (TSStrings[i] != NULL)
+  while (TSStrings[i] != nullptr)
   {
     if (str == TSStrings[i])
       return static_cast<TSType>(i);

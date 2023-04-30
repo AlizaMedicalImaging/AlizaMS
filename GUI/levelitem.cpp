@@ -6,7 +6,7 @@
 #include <iostream>
 
 LevelItem::LevelItem(QGraphicsRectItem * item, int role, HistogramView * v)
-	: QGraphicsItem(NULL)
+	: QGraphicsItem()
 {
 	if (role == 0) m_role = LeftHandle;
 	else           m_role = RightHandle;
@@ -19,7 +19,7 @@ LevelItem::LevelItem(QGraphicsRectItem * item, int role, HistogramView * v)
 	setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
 	setCursor(Qt::SizeHorCursor);
 }
- 
+
 void LevelItem::paint(QPainter * paint, const QStyleOptionGraphicsItem *, QWidget *)
 {
 	//paint->drawRect(boundingRect());
@@ -36,7 +36,7 @@ QRectF LevelItem::boundingRect() const
 				m_item->boundingRect().left()-pos().x(),
 				m_item->boundingRect().top() + m_item->boundingRect().height() / 2.0);
 			r = QRectF(
-					point-QPointF(12.0, m_item->boundingRect().height() / 2.0),
+					point - QPointF(12.0, m_item->boundingRect().height() / 2.0),
 					QSize(24, m_item->boundingRect().height()));
 		}
 		break;
@@ -46,7 +46,7 @@ QRectF LevelItem::boundingRect() const
 				m_item->boundingRect().right()-pos().x(),
 				m_item->boundingRect().top() + m_item->boundingRect().height() / 2.0);
 			r = QRectF(
-				point-QPointF(12.0, m_item->boundingRect().height() / 2.0),
+				point - QPointF(12.0, m_item->boundingRect().height() / 2.0),
 				QSize(24, m_item->boundingRect().height()));
 		}
 		break;
@@ -97,13 +97,13 @@ QVariant LevelItem::itemChange(GraphicsItemChange change, const QVariant & data)
 	}
 	return QGraphicsItem::itemChange(change, data);
 }
- 
+
 void LevelItem::mousePressEvent(QGraphicsSceneMouseEvent * e)
 {
 	m_pressed = true;
 	QGraphicsItem::mousePressEvent(e);
 }
- 
+
 void LevelItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * e)
 {
 	m_pressed = false;

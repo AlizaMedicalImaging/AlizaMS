@@ -28,7 +28,7 @@ namespace mdcm
 {
 
 static const char * MPStrings[] = {
-  "VERTEX", "EDGE", "TRIANGLE", "TRIANGLESTRIP", "TRIANGLEFAN", "LINE", "FACET", NULL
+  "VERTEX", "EDGE", "TRIANGLE", "TRIANGLESTRIP", "TRIANGLEFAN", "LINE", "FACET", nullptr
 };
 
 const char *
@@ -48,7 +48,7 @@ MeshPrimitive::GetMPType(const char * type)
   str.Trim();
   std::string  typeClearStr = str.Trim();
   const char * typeClear = typeClearStr.c_str();
-  for (unsigned int i = 0; MPStrings[i] != NULL; ++i)
+  for (unsigned int i = 0; MPStrings[i] != nullptr; ++i)
   {
     if (strcmp(typeClear, MPStrings[i]) == 0)
     {
@@ -60,7 +60,7 @@ MeshPrimitive::GetMPType(const char * type)
   // string
   CodeString  codestring = typeClear;
   std::string cs = codestring.GetAsString();
-  for (unsigned int i = 0; MPStrings[i] != NULL; ++i)
+  for (unsigned int i = 0; MPStrings[i] != nullptr; ++i)
   {
     if (strcmp(cs.c_str(), MPStrings[i]) == 0)
     {

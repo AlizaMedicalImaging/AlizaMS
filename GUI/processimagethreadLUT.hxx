@@ -24,7 +24,7 @@ public:
 		:
 		image(image_),
 		p(p_),
-		size_0(size_0_),   size_1(size_1_),
+		size_0(size_0_), size_1(size_1_),
 		index_0(index_0_), index_1(index_1_),
 		j(j_),
 		window_center(window_center_), window_width(window_width_),
@@ -47,7 +47,7 @@ public:
 		index[0] = index_0;
 		index[1] = index_1;
 		const typename T::RegionType region(index, size);
-		const unsigned char * tmp_p1 = NULL;
+		const unsigned char * tmp_p1 = nullptr;
 		int tmp__size = 0;
 		switch (lut)
 		{

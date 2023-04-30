@@ -35,8 +35,8 @@ namespace mdcm
 
 OpenSSLCryptographicMessageSyntax::OpenSSLCryptographicMessageSyntax()
   : recips(sk_X509_new_null())
-  , pkey(NULL)
-  , password(NULL)
+  , pkey(nullptr)
+  , password(nullptr)
 {
   cipherType = AES128_CIPHER;
   internalCipherType = CreateCipher(cipherType);
@@ -76,8 +76,8 @@ OpenSSLCryptographicMessageSyntax::SetPassword(const char * pass, size_t passLen
 bool
 OpenSSLCryptographicMessageSyntax::Encrypt(char * output, size_t & outlen, const char * array, size_t len) const
 {
-  BIO *             in = NULL, *out = NULL;
-  CMS_ContentInfo * cms = NULL;
+  BIO *             in = nullptr, *out = nullptr;
+  CMS_ContentInfo * cms = nullptr;
   int               flags = CMS_BINARY | CMS_PARTIAL;
   bool              ret = false;
   if (!password && ::sk_X509_num(recips) == 0)
@@ -120,13 +120,13 @@ OpenSSLCryptographicMessageSyntax::Encrypt(char * output, size_t & outlen, const
     unsigned char * pwri_tmp = (unsigned char *)BUF_memdup(password, passwordLength);
     if (!pwri_tmp)
       goto err;
-    if (!CMS_add0_recipient_password(cms, -1, NID_undef, NID_undef, pwri_tmp, passwordLength, NULL))
+    if (!CMS_add0_recipient_password(cms, -1, NID_undef, NID_undef, pwri_tmp, passwordLength, nullptr))
     {
       goto err;
     }
-    pwri_tmp = NULL;
+    pwri_tmp = nullptr;
   }
-  if (!CMS_final(cms, in, NULL, flags))
+  if (!CMS_final(cms, in, nullptr, flags))
     goto err;
   if (!i2d_CMS_bio(out, cms))
   {
@@ -147,7 +147,7 @@ err:
   if (!ret)
   {
     outlen = 0;
-    mdcmErrorMacro(ERR_error_string(ERR_peek_error(), NULL));
+    mdcmErrorMacro(ERR_error_string(ERR_peek_error(), nullptr));
   }
   if (cms)
     CMS_ContentInfo_free(cms);
@@ -161,11 +161,11 @@ err:
 bool
 OpenSSLCryptographicMessageSyntax::Decrypt(char * output, size_t & outlen, const char * array, size_t len) const
 {
-  BIO *             in = NULL, *out = NULL;
-  CMS_ContentInfo * cms = NULL;
+  BIO *             in = nullptr, *out = nullptr;
+  CMS_ContentInfo * cms = nullptr;
   bool              ret = false;
   int               flags = /*CMS_DETACHED | */ CMS_BINARY;
-  if (!password && pkey == NULL)
+  if (!password && pkey == nullptr)
   {
     mdcmErrorMacro("No password or private key specified.");
     goto err;
@@ -176,7 +176,7 @@ OpenSSLCryptographicMessageSyntax::Decrypt(char * output, size_t & outlen, const
     mdcmErrorMacro("Error at creating the input memory buffer.");
     goto err;
   }
-  cms = d2i_CMS_bio(in, NULL);
+  cms = d2i_CMS_bio(in, nullptr);
   if (!cms)
   {
     mdcmErrorMacro("Error when parsing the CMS structure.");
@@ -196,7 +196,7 @@ OpenSSLCryptographicMessageSyntax::Decrypt(char * output, size_t & outlen, const
       goto err;
     }
   }
-  if (!CMS_decrypt(cms, pkey, NULL, NULL, out, flags))
+  if (!CMS_decrypt(cms, pkey, nullptr, nullptr, out, flags))
   {
     mdcmErrorMacro("Error at decrypting CMS structure");
     goto err;
@@ -215,7 +215,7 @@ err:
   if (!ret)
   {
     outlen = 0;
-    mdcmErrorMacro(ERR_error_string(ERR_peek_error(), NULL));
+    mdcmErrorMacro(ERR_error_string(ERR_peek_error(), nullptr));
   }
   if (cms)
     CMS_ContentInfo_free(cms);
@@ -231,17 +231,17 @@ OpenSSLCryptographicMessageSyntax::ParseKeyFile(const char * keyfile)
 {
   ::BIO *      in;
   ::EVP_PKEY * new_pkey;
-  if ((in = ::BIO_new_file(keyfile, "r")) == NULL)
+  if ((in = ::BIO_new_file(keyfile, "r")) == nullptr)
   {
     return false;
   }
   (void)BIO_reset(in);
-  if ((new_pkey = PEM_read_bio_PrivateKey(in, NULL, NULL, NULL)) == NULL)
+  if ((new_pkey = PEM_read_bio_PrivateKey(in, nullptr, nullptr, nullptr)) == nullptr)
   {
     return false;
   }
   BIO_free(in);
-  if (pkey != NULL)
+  if (pkey != nullptr)
   {
     EVP_PKEY_free(pkey);
   }
@@ -253,19 +253,19 @@ bool
 OpenSSLCryptographicMessageSyntax::ParseCertificateFile(const char * keyfile)
 {
   assert(recips);
-  ::X509 * x509 = NULL;
+  ::X509 * x509 = nullptr;
   ::BIO *  in;
   if (!(in = ::BIO_new_file(keyfile, "r")))
   {
     return false;
   }
   // -> LEAK reported by valgrind...
-  if (!(x509 = ::PEM_read_bio_X509(in, NULL, NULL, NULL)))
+  if (!(x509 = ::PEM_read_bio_X509(in, nullptr, nullptr, nullptr)))
   {
     return false;
   }
   ::BIO_free(in);
-  in = NULL;
+  in = nullptr;
   ::sk_X509_push(recips, x509);
   return true;
 }

@@ -245,7 +245,7 @@ Scanner::GetValue(const char * filename, const Tag & t) const
   {
     return ftv.find(t)->second;
   }
-  return NULL;
+  return nullptr;
 }
 
 const Scanner::ValuesType &
@@ -308,7 +308,7 @@ Scanner::GetMapping(const char * filename) const
 const char *
 Scanner::GetFilenameFromTagToValue(const Tag & t, const char * valueref) const
 {
-  const char * filenameref = NULL;
+  const char * filenameref = nullptr;
   if (valueref)
   {
     std::vector<std::string>::const_iterator file = Filenames.cbegin();

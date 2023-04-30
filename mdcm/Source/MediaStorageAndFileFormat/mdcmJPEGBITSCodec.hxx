@@ -229,7 +229,7 @@ GLOBAL(void) jpeg_stdio_src(j_decompress_ptr cinfo, std::istream & infile, bool 
    * This makes it unsafe to use this manager and a different source
    * manager serially with the same JPEG object.  Caveat programmer.
    */
-  if (cinfo->src == NULL)
+  if (cinfo->src == nullptr)
   { /* first time for this JPEG object? */
     cinfo->src =
       (struct jpeg_source_mgr *)(*cinfo->mem->alloc_small)((j_common_ptr)cinfo, JPOOL_PERMANENT, SIZEOF(my_source_mgr));
@@ -247,7 +247,7 @@ GLOBAL(void) jpeg_stdio_src(j_decompress_ptr cinfo, std::istream & infile, bool 
   if (flag)
   {
     src->pub.bytes_in_buffer = 0;    /* forces fill_input_buffer on first read */
-    src->pub.next_input_byte = NULL; /* until buffer loaded */
+    src->pub.next_input_byte = nullptr; /* until buffer loaded */
   }
 }
 
@@ -394,7 +394,7 @@ GLOBAL(void) jpeg_stdio_dest(j_compress_ptr cinfo, std::ostream * outfile)
    * manager serially with the same JPEG object, because their private object
    * sizes may be different.  Caveat programmer.
    */
-  if (cinfo->dest == NULL)
+  if (cinfo->dest == nullptr)
   {
     /* first time for this JPEG object? */
     cinfo->dest = (struct jpeg_destination_mgr *)(*cinfo->mem->alloc_small)(
@@ -415,7 +415,7 @@ public:
     , cinfo_comp()
     , jerr()
     , StateSuspension(0)
-    , SampBuffer(NULL)
+    , SampBuffer(nullptr)
   {}
   jpeg_decompress_struct cinfo;
   jpeg_compress_struct   cinfo_comp;

@@ -27,7 +27,7 @@ namespace mdcm
 {
 
 const char * const UIDsStrings[][2] = {
-  { NULL, NULL },
+  { nullptr, nullptr },
   { "1.2.840.10008.1.1", "Verification SOP Class" },
   { "1.2.840.10008.1.2", "Implicit VR Little Endian: Default Transfer Syntax for DICOM" },
   { "1.2.840.10008.1.2.1", "Explicit VR Little Endian" },
@@ -353,13 +353,13 @@ const char * const UIDsStrings[][2] = {
   { "1.2.840.10008.5.1.4.1.1.11.9", "Volume Rendering Volumetric Presentation State Storage" },
   { "1.2.840.10008.5.1.4.1.1.11.10", "Segmented Volume Rendering Volumetric Presentation State Storage" },
   { "1.2.840.10008.5.1.4.1.1.11.11", "Multiple Volume Rendering Volumetric Presentation State Storage" },
-  { "1.2.840.10008.5.1.4.1.1.12.77", "NULL" },
+  { "1.2.840.10008.5.1.4.1.1.12.77", "null" },
   { "1.2.840.10008.5.1.4.1.1.13.1.4", "Breast Projection X-Ray Image Storage - For Presentation" },
   { "1.2.840.10008.5.1.4.1.1.13.1.5", "Breast Projection X-Ray Image Storage - For Processing" },
   { "1.2.840.10008.5.1.4.1.1.14.1", "Intravascular Optical Coherence Tomography Image Storage - For Presentation" },
   { "1.2.840.10008.5.1.4.1.1.14.2", "Intravascular Optical Coherence Tomography Image Storage - For Processing" },
   { "1.2.840.10008.5.1.4.1.1.30", "Parametric Map Storage" },
-  { "1.2.840.10008.5.1.4.1.1.40", "NULL" },
+  { "1.2.840.10008.5.1.4.1.1.40", "null" },
   { "1.2.840.10008.5.1.4.1.1.66.6", "Tractography Results Storage" },
   { "1.2.840.10008.5.1.4.1.1.68.1", "Surface Scan Mesh Storage" },
   { "1.2.840.10008.5.1.4.1.1.68.2", "Surface Scan Point Cloud Storage" },
@@ -557,7 +557,7 @@ const char * const UIDsStrings[][2] = {
   //
   //////////////////////////////////////////////
 
-  { NULL, NULL }
+  { nullptr, nullptr }
 };
 
 UIDs::UIDs()
@@ -606,7 +606,7 @@ UIDs::SetFromUID(const char * str)
   UIDsStringsType uids = GetUIDsStrings();
   int             i = 1;
   const char *    p = uids[i][0];
-  while (p != NULL)
+  while (p != nullptr)
   {
     if (strcmp(p, str) == 0)
     {

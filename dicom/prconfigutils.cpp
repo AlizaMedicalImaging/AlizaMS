@@ -53,7 +53,7 @@ template<typename T> QString mod_lut_filter(
 	typename ImageTypeF::Pointer & out_image,
 	double shift, double scale)
 {
-	if (image.IsNull()) return QString("Image is NULL");
+	if (image.IsNull()) return QString("Image is null");
 	typedef itk::ShiftScaleImageFilter<T, ImageTypeF> ShiftScaleImageFilterType;
 	typename ShiftScaleImageFilterType::Pointer filter = ShiftScaleImageFilterType::New();
 	try
@@ -69,7 +69,7 @@ template<typename T> QString mod_lut_filter(
 		return QString(ex.GetDescription());
 	}
 	if (out_image.IsNotNull()) out_image->DisconnectPipeline();
-	else return QString("Output image is NULL");
+	else return QString("Output image is null");
 	return QString("");
 }
 
@@ -78,7 +78,7 @@ template<typename Tin, typename Tout> QString extract_one_slice(
 	typename Tout::Pointer & out_image,
 	const int idx)
 {
-	if (image.IsNull()) return QString("Image is NULL");
+	if (image.IsNull()) return QString("Image is null");
 	typedef itk::ExtractImageFilter<Tin, Tout> FilterType;
 	const typename Tin::RegionType inRegion =
 		image->GetLargestPossibleRegion();
@@ -106,7 +106,7 @@ template<typename Tin, typename Tout> QString extract_one_slice(
 		return QString(ex.GetDescription());
 	}
 	if (out_image.IsNotNull()) out_image->DisconnectPipeline();
-	else return QString("Out image is NULL");
+	else return QString("Out image is null");
 	return QString("");
 }
 
@@ -119,7 +119,7 @@ template<typename Tin, typename Tout> QString apply_lut(
 	const bool mapped_implicit,
 	const bool mapped_signed)
 {
-	if (image.IsNull()) return QString("Image is NULL");
+	if (image.IsNull()) return QString("Image is null");
 	const int d0 = descriptor.at(0).toInt();
 	const int d1 = descriptor.at(1).toInt();
 	const int d2 = descriptor.at(2).toInt();
@@ -343,7 +343,7 @@ template<typename T> QString inverse_filter(
 		}
 		{
 			tmp0->DisconnectPipeline();
-			tmp0 = NULL;
+			tmp0 = nullptr;
 			typename ShiftScaleImageFilterType::Pointer filter = ShiftScaleImageFilterType::New();
 			try
 			{
@@ -376,7 +376,7 @@ template<typename T> QString inverse_filter(
 		}
 	}
 	if (out_image.IsNotNull()) out_image->DisconnectPipeline();
-	else return QString("Output image is NULL");
+	else return QString("Output image is null");
 	return QString("");
 }
 
@@ -1269,7 +1269,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 		}
 	}
 	if (out_image.IsNotNull()) out_image->DisconnectPipeline();
-	else return QString("Output image is NULL");
+	else return QString("Output image is null");
 	return QString("");
 }
 
@@ -1286,8 +1286,8 @@ QString voi_lut_slice_by_slice(
 	const QMap<int, bool>        & mapped_signeds,
 	const bool signed_image)
 {
-	if (!ivariant) return QString("Input image is NULL");
-	if (!v)        return QString("Output image is NULL");
+	if (!ivariant) return QString("Input image is null");
+	if (!v)        return QString("Output image is null");
 	const SOPInstanceUids & slices_uids = ivariant->image_instance_uids;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	for (QMap<int, QStringList>::const_iterator it = refs.cbegin(); it != refs.cend(); ++it)
@@ -3211,7 +3211,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 	bool ok3d,
 	bool * spatial_transform)
 {
-	if (!ivariant) return NULL;
+	if (!ivariant) return nullptr;
 #ifdef PRINT_MAKE_PR_MONOCHROME
 	std::cout << "+++++++++++++"<< std::endl;
 #endif
@@ -3368,7 +3368,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 			{
 				std::cout << error.toStdString() << std::endl;
 				delete v;
-				return NULL;
+				return nullptr;
 			}
 		}
 		else
@@ -3414,7 +3414,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 			{
 				std::cout << error.toStdString() << std::endl;
 				delete v;
-				return NULL;
+				return nullptr;
 			}
 		}
 	}
@@ -3476,7 +3476,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 			{
 				std::cout << error.toStdString() << std::endl;
 				delete v;
-				return NULL;
+				return nullptr;
 			}
 			voi = true;
 		}
@@ -3529,7 +3529,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 			{
 				std::cout << error.toStdString() << std::endl;
 				delete v;
-				return NULL;
+				return nullptr;
 			}
 		}
 		else
@@ -3557,7 +3557,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				{
 					std::cout << error.toStdString() << std::endl;
 					delete v;
-					return NULL;
+					return nullptr;
 				}
 			}
 		}
@@ -3769,7 +3769,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 					{
 						std::cout << error.toStdString() << std::endl;
 						delete v;
-						return NULL;
+						return nullptr;
 					}
 				}
 				break;
@@ -4138,6 +4138,6 @@ ImageVariant * PrConfigUtils::make_pr_rgb(
 	bool * spatial_transform)
 {
 	// TODO
-	return NULL;
+	return nullptr;
 }
 

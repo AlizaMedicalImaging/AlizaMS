@@ -38,7 +38,7 @@ CAPICryptoFactory::CreateCMSProvider()
   if (capicms && !capicms->GetInitialized())
   {
     delete capicms;
-    return NULL;
+    return nullptr;
   }
   return capicms;
 }

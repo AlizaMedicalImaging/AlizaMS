@@ -86,7 +86,7 @@ Image::GetOrigin() const
   assert(NumberOfDimensions);
   if (!Origin.empty())
     return &Origin[0];
-  return NULL;
+  return nullptr;
 }
 
 double
@@ -133,7 +133,7 @@ Image::GetDirectionCosines() const
   assert(NumberOfDimensions);
   if (!DirectionCosines.empty())
     return &DirectionCosines[0];
-  return NULL;
+  return nullptr;
 }
 double
 Image::GetDirectionCosines(unsigned int idx) const

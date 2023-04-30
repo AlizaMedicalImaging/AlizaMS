@@ -177,7 +177,7 @@ public:
 };
 
 DimsChooserAction::DimsChooserAction(MatrixButton * b)
- : QWidgetAction(NULL)
+	: QWidgetAction(nullptr)
 {
 	m_widget = new DimsChooser(b, this);
 	setDefaultWidget(m_widget);

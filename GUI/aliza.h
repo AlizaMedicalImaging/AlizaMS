@@ -113,7 +113,7 @@ public:
 	void set_histogram_mode(bool);
 	bool is_animation_running() const;
 	int  get_num_images() const;
-	QString create_group_(bool*,bool/*lock_mutex*/);
+	QString create_group_(bool*, bool/*lock_mutex*/);
 	void width_from_histogram_min(double);
 	void width_from_histogram_max(double);
 	void center_from_histogram(double);
@@ -123,7 +123,7 @@ public:
 	void set_uniq_string(const QString &);
 	void toggle_collisions(bool);
 	void update_slice_from_animation(const ImageVariant*);
-	void load_dicom_file(int*,const QString&,QProgressDialog*,bool);
+	void load_dicom_file(int*, const QString&, QProgressDialog*, bool);
 	void remove_from_studyview(int);
 
 public slots:
@@ -177,57 +177,57 @@ private:
 	mutable QMutex mutex2; // 2D animation
 	mutable QMutex mutex3; // 3D animation
 	//
-	GLWidget       * glwidget;
-	ImagesBox      * imagesbox;
-	ToolBox        * toolbox;
-	ToolBox2D      * toolbox2D;
-	BrowserWidget2 * browser2;
-	SettingsWidget * settingswidget;
-	GraphicsWidget * graphicswidget_m;
-	GraphicsWidget * graphicswidget_y;
-	GraphicsWidget * graphicswidget_x;
-	SliderWidget   * slider_m;
-	SliderWidget   * slider_y;
-	SliderWidget   * slider_x;
-	ZRangeWidget   * zrangewidget;
-	LUTWidget      * lutwidget2;
-	HistogramView  * histogramview;
-	AnimWidget     * anim3Dwidget;
-	AnimWidget     * anim2Dwidget;
-	StudyViewWidget * studyview;
-	QAction * graphicsAct_Z;
-	QAction * graphicsAct_Y;
-	QAction * graphicsAct_X;
-	QAction * zyxAct;
-	QAction * histogramAct;
-	QAction * slicesAct;
-	QAction * zlockAct;
-	QAction * oneAct;
-	QAction * trans3DAct;
-	QAction * frames2DAct;
-	QAction * distanceAct;
-	QAction * rectAct;
-	QAction * cursorAct;
-	QAction * collisionAct;
-	QAction * segmentAct;
-	QAction * show3DAct;
-	QAction * show2DAct;
+	GLWidget       * glwidget{};
+	ImagesBox      * imagesbox{};
+	ToolBox        * toolbox{};
+	ToolBox2D      * toolbox2D{};
+	BrowserWidget2 * browser2{};
+	SettingsWidget * settingswidget{};
+	GraphicsWidget * graphicswidget_m{};
+	GraphicsWidget * graphicswidget_y{};
+	GraphicsWidget * graphicswidget_x{};
+	SliderWidget   * slider_m{};
+	SliderWidget   * slider_y{};
+	SliderWidget   * slider_x{};
+	ZRangeWidget   * zrangewidget{};
+	LUTWidget      * lutwidget2{};
+	HistogramView  * histogramview{};
+	AnimWidget     * anim3Dwidget{};
+	AnimWidget     * anim2Dwidget{};
+	StudyViewWidget * studyview{};
+	QAction * graphicsAct_Z{};
+	QAction * graphicsAct_Y{};
+	QAction * graphicsAct_X{};
+	QAction * zyxAct{};
+	QAction * histogramAct{};
+	QAction * slicesAct{};
+	QAction * zlockAct{};
+	QAction * oneAct{};
+	QAction * trans3DAct{};
+	QAction * frames2DAct{};
+	QAction * distanceAct{};
+	QAction * rectAct{};
+	QAction * cursorAct{};
+	QAction * collisionAct{};
+	QAction * segmentAct{};
+	QAction * show3DAct{};
+	QAction * show2DAct{};
 	QIcon trans_icon;
 	QIcon notrans_icon;
 	QIcon cut_icon;
 	QIcon nocut_icon;
 	QIcon anchor_icon;
 	QIcon anchor2_icon;
-  	bool rect_selection;
-	bool hide_zoom;
-	bool multiview;
-	bool histogram_mode;
-	bool run__;
-	bool load_reported_to_mainwin;
-	int anim_idx;
-	short saved_mouse_modus;
-	bool saved_show_cursor;
-	int frametime_3D;
+	bool rect_selection{};
+	bool hide_zoom{};
+	bool multiview{};
+	bool histogram_mode{};
+	bool run__{};
+	bool load_reported_to_mainwin{};
+	int anim_idx{-1};
+	short saved_mouse_modus{};
+	bool saved_show_cursor{};
+	int frametime_3D{120};
 	QString uniq_string;
 	QTimer * anim3D_timer;
 	QProgressDialog * create_filters_progress();
@@ -237,19 +237,23 @@ private:
 	void disconnect_tools();
 	void reload_3d(
 		ImageVariant*,
-		bool=true,
-		bool=false,
-		bool=false,
-		bool=false,
-		bool=false);
+		bool = true,
+		bool = false,
+		bool = false,
+		bool = false,
+		bool = false);
 	bool load_3d(
-		ImageVariant*,bool=false,bool=false,bool=false,bool=false);
+		ImageVariant*,
+		bool = false,
+		bool = false,
+		bool = false,
+		bool = false);
 	void update_center(ImageVariant*);
-	void add_histogram(ImageVariant*,QProgressDialog*,bool=true);
+	void add_histogram(ImageVariant*, QProgressDialog*, bool = true);
 	void update_group_center(const ImageVariant*);
 	void update_group_width(const ImageVariant*);
-	void set_us_center(ImageVariant*,double);
-	void set_us_width(ImageVariant*,double);
+	void set_us_center(ImageVariant*, double);
+	void set_us_width(ImageVariant*, double);
 	void set_lut_function0(int);
 	void update_selection_common1(ImageVariant*);
 	void update_selection_common2(QListWidgetItem*);
@@ -262,9 +266,9 @@ private:
 		QMap<QString, ImageVariant*> &,
 		const int,
 		const bool,
-		const int=0,
-		const int=0,
-		const int=0);
+		const int = 0,
+		const int = 0,
+		const int = 0);
 	void delete_checked_unchecked(bool);
 	void delete_group(const int);
 	void clear_contourstable();

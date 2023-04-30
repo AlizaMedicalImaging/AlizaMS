@@ -106,7 +106,7 @@ FileExplicitFilter::ProcessDataSet(DataSet & ds, Dicts const & dicts)
   {
     DataElement  de = *it;
     std::string  strowner;
-    const char * owner = NULL;
+    const char * owner = nullptr;
     const Tag &  t = de.GetTag();
     if (t.IsPrivate() &&
         !ChangePrivateTags
@@ -128,7 +128,7 @@ FileExplicitFilter::ProcessDataSet(DataSet & ds, Dicts const & dicts)
     const VR &        vr = entry.GetVR();
     VR                cvr = DataSetHelper::ComputeVR(*F, ds, t);
     VR                oldvr = de.GetVR();
-    SmartPointer<SequenceOfItems> sqi = NULL;
+    SmartPointer<SequenceOfItems> sqi = nullptr;
     if (vr == VR::SQ || cvr == VR::SQ)
     {
       sqi = de.GetValueAsSQ();

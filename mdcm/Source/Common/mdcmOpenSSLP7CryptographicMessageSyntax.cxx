@@ -71,10 +71,10 @@ class CryptographicMessageSyntaxInternals
 #ifdef MDCM_USE_SYSTEM_OPENSSL
 public:
   CryptographicMessageSyntaxInternals()
-    : recips(NULL)
-    , pkey(NULL)
+    : recips(nullptr)
+    , pkey(nullptr)
     , CipherType(CryptographicMessageSyntax::AES256_CIPHER)
-    , cipher(NULL)
+    , cipher(nullptr)
     , p7(PKCS7_new())
   {
     recips = sk_X509_new_null();
@@ -87,7 +87,7 @@ public:
   {
     EVP_PKEY_free(pkey);
     PKCS7_free(p7);
-    p7 = NULL;
+    p7 = nullptr;
     BIO_free_all(bio_buffer);
   }
 
@@ -187,7 +187,7 @@ public:
     }
     char  buf[256];
     BIO * p7bio;
-    if ((p7bio = PKCS7_dataInit(p7, NULL)) == NULL)
+    if ((p7bio = PKCS7_dataInit(p7, nullptr)) == nullptr)
       return false;
     for (;;)
     {
@@ -320,9 +320,9 @@ OpenSSLP7CryptographicMessageSyntax::Decrypt(char * output, size_t & outlen, con
   ::PKCS7 *                             p7;
 #  undef PKCS7_SIGNER_INFO
   ::PKCS7_SIGNER_INFO * si;
-  X509_STORE_CTX *      cert_ctx = NULL;
-  X509_STORE *          cert_store = NULL;
-  BIO *                 data, *detached = NULL, *p7bio = NULL;
+  X509_STORE_CTX *      cert_ctx = nullptr;
+  X509_STORE *          cert_store = nullptr;
+  BIO *                 data, *detached = nullptr, *p7bio = nullptr;
   char                  buf[1024 * 4];
   unsigned char *       pp;
   int                   i;
@@ -332,7 +332,7 @@ OpenSSLP7CryptographicMessageSyntax::Decrypt(char * output, size_t & outlen, con
   OpenSSL_add_all_algorithms();
   // bio_err=BIO_new_fp(stderr,BIO_NOCLOSE);
   // data=BIO_new(BIO_s_file());
-  pp = NULL;
+  pp = nullptr;
   EVP_PKEY * pkey = x509->GetPrivateKey();
   if (len > (size_t)std::numeric_limits<int>::max())
   {
@@ -342,11 +342,11 @@ OpenSSLP7CryptographicMessageSyntax::Decrypt(char * output, size_t & outlen, con
   data = BIO_new_mem_buf((const void *)array, (int)len);
   if (!data)
     goto err;
-  if (pp == NULL)
+  if (pp == nullptr)
     BIO_set_fp(data, stdin, BIO_NOCLOSE);
   /* Load the PKCS7 object from a file */
-  // if ((p7=PEM_read_bio_PKCS7(data,NULL,NULL,NULL)) == NULL) goto err;
-  if ((p7 = d2i_PKCS7_bio(data, NULL)) == NULL)
+  // if ((p7=PEM_read_bio_PKCS7(data,nullptr,nullptr,nullptr)) == nullptr) goto err;
+  if ((p7 = d2i_PKCS7_bio(data, nullptr)) == nullptr)
     goto err;
   if (!PKCS7_type_is_enveloped(p7))
   {
@@ -364,13 +364,13 @@ OpenSSLP7CryptographicMessageSyntax::Decrypt(char * output, size_t & outlen, con
    * cert_stre=SSL_CTX_get_cert_store(ssl_ctx); */
   cert_store = X509_STORE_new();
   X509_STORE_set_default_paths(cert_store);
-  X509_STORE_load_locations(cert_store, NULL, "../../certs");
+  X509_STORE_load_locations(cert_store, nullptr, "../../certs");
   // X509_STORE_set_verify_cb_func(cert_store,verify_callback);
   ERR_clear_error();
   /* We need to process the data */
   /* We cannot support detached encryption */
-  p7bio = PKCS7_dataDecode(p7, pkey, detached, NULL);
-  if (p7bio == NULL)
+  p7bio = PKCS7_dataDecode(p7, pkey, detached, nullptr);
+  if (p7bio == nullptr)
   {
     printf("problems decoding\n");
     goto err;
@@ -389,7 +389,7 @@ OpenSSLP7CryptographicMessageSyntax::Decrypt(char * output, size_t & outlen, con
   }
   /* We can now verify signatures */
   sk = PKCS7_get_signer_info(p7);
-  if (sk == NULL)
+  if (sk == nullptr)
   {
     // fprintf(stderr, "there are no signatures on this data\n");
   }
@@ -413,7 +413,7 @@ OpenSSLP7CryptographicMessageSyntax::Decrypt(char * output, size_t & outlen, con
   X509_STORE_free(cert_store);
   BIO_free_all(p7bio);
   PKCS7_free(p7);
-  p7 = NULL;
+  p7 = nullptr;
   BIO_free(data);
   return true;
 err:
@@ -436,13 +436,13 @@ OpenSSLP7CryptographicMessageSyntax::ParseKeyFile(const char * keyfile)
 #ifdef MDCM_USE_SYSTEM_OPENSSL
   ::BIO *      in;
   ::EVP_PKEY * pkey;
-  if ((in = ::BIO_new_file(keyfile, "r")) == NULL)
+  if ((in = ::BIO_new_file(keyfile, "r")) == nullptr)
   {
     return false;
   }
-  // if ((x509=openssl::PEM_read_bio_X509(in,NULL,NULL,NULL)) == NULL) goto err;
+  // if ((x509=openssl::PEM_read_bio_X509(in,nullptr,nullptr,nullptr)) == nullptr) goto err;
   (void)BIO_reset(in);
-  if ((pkey = PEM_read_bio_PrivateKey(in, NULL, NULL, NULL)) == NULL)
+  if ((pkey = PEM_read_bio_PrivateKey(in, nullptr, nullptr, nullptr)) == nullptr)
   {
     return false;
   }
@@ -462,19 +462,19 @@ OpenSSLP7CryptographicMessageSyntax::ParseCertificateFile(const char * keyfile)
 #ifdef MDCM_USE_SYSTEM_OPENSSL
   STACK_OF(X509) * recips = Internals->GetRecipients();
   assert(recips);
-  ::X509 * x509 = NULL;
+  ::X509 * x509 = nullptr;
   ::BIO *  in;
   if (!(in = ::BIO_new_file(keyfile, "r")))
   {
     return false;
   }
   // -> LEAK reported by valgrind...
-  if (!(x509 = ::PEM_read_bio_X509(in, NULL, NULL, NULL)))
+  if (!(x509 = ::PEM_read_bio_X509(in, nullptr, nullptr, nullptr)))
   {
     return false;
   }
   ::BIO_free(in);
-  in = NULL;
+  in = nullptr;
   ::sk_X509_push(recips, x509);
   return true;
 #else

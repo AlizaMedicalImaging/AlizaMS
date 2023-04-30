@@ -77,7 +77,7 @@ ByteValue::PrintASCII(std::ostream & os, VL maxlength) const
 void
 ByteValue::PrintHex(std::ostream & os, VL maxlength) const
 {
-  std::ios oldState(NULL);
+  std::ios oldState(nullptr);
   oldState.copyfmt(os);
   VL                                length = std::min(maxlength, Length);
   std::vector<char>::const_iterator it = Internal.begin();
@@ -169,7 +169,7 @@ ByteValue::GetPointer() const
 {
   if (!Internal.empty())
     return &Internal[0];
-  return NULL;
+  return nullptr;
 }
 
 const void *
@@ -177,7 +177,7 @@ ByteValue::GetVoidPointer() const
 {
   if (!Internal.empty())
     return static_cast<const void *>(&Internal[0]);
-  return NULL;
+  return nullptr;
 }
 
 void *
@@ -185,7 +185,7 @@ ByteValue::GetVoidPointer()
 {
   if (!Internal.empty())
     return static_cast<void *>(&Internal[0]);
-  return NULL;
+  return nullptr;
 }
 
 void

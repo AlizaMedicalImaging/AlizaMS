@@ -32,12 +32,12 @@ public:
    *
    * Applicable to value representations LO, LT, PN, SH, ST, UC and UT.
    */
-  static QString toUTF8(const QByteArray*, const char*, bool(*) = NULL);
+  static QString toUTF8(const QByteArray*, const char*, bool(*) = nullptr);
   /* Convert from Utf8
    */
   static QByteArray fromUTF8(const QString&, const char*, bool*);
 #if 0
-  static QString toUTF8dcmtk(const char* ba, const char* charset, bool* ok = NULL);
+  static QString toUTF8dcmtk(const char* ba, const char* charset, bool* ok = nullptr);
 #endif
   static void set_force_cp1251(bool);
   static bool get_force_cp1251();

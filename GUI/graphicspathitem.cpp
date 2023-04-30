@@ -2,13 +2,6 @@
 #include <QPainterPathStroker>
 
 GraphicsPathItem::GraphicsPathItem()
-	:
-	contour_id(-1),
-	roi_id(-1),
-	tmp_id(-1),
-	axis(-1),
-	slice(-1),
-	contour_type(2)
 {
 }
 

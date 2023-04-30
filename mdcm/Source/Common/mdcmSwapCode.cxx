@@ -27,7 +27,7 @@ namespace mdcm
 {
 
 static const char * SwapCodeStrings[] = { "Unknown",         "LittleEndian", "BigEndian",
-                                          "BadLittleEndian", "BadBigEndian", NULL };
+                                          "BadLittleEndian", "BadBigEndian", nullptr };
 
 int
 SwapCode::GetIndex(SwapCode const & sc)

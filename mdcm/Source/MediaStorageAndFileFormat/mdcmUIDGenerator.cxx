@@ -113,12 +113,12 @@ UIDGenerator::Generate()
   // 62 is simply the highest possible limit
   if (Unique.empty() || Unique.size() > 62)
   {
-    return NULL;
+    return nullptr;
   }
   unsigned char uuid[16];
   bool          r = UIDGenerator::GenerateUUID(uuid);
   if (!r)
-    return NULL;
+    return nullptr;
   char   randbytesbuf[64];
   size_t len = System::EncodeBytes(randbytesbuf, uuid, sizeof(uuid));
   assert(len < 64);
@@ -154,7 +154,7 @@ UIDGenerator::Generate()
     if (!found)
     {
       mdcmWarningMacro("Root is too long for current implementation");
-      return NULL;
+      return nullptr;
     }
   }
   Unique += randbytesbuf;
@@ -204,12 +204,12 @@ UIDGenerator::IsValid(const std::string & uid)
        (the DICOM default character repertoire).
     - Components shall be separated by the character "." (2EH).
     - If ending on an odd byte boundary, except when used for
-      network negotiation (See PS 3.8), one trailing NULL (00H),
+      network negotiation (See PS 3.8), one trailing null (00H),
       as a padding character, shall follow the last component in
       order to align the UID on an even byte boundary.
     - UID's, shall not exceed 64 total characters, including the
       digits of each component, separators between components,
-      and the NULL (00H) padding character if needed.
+      and the null (00H) padding character if needed.
   */
   if (uid.empty())
     return false;

@@ -54,7 +54,7 @@ void gImageCleanupHandler(void * info)
 	if (!info) return;
 	unsigned char * p = static_cast<unsigned char*>(info);
 	delete [] p;
-	info = NULL;
+	info = nullptr;
 }
 
 void draw_contours(
@@ -260,7 +260,7 @@ template<typename Tin, typename Tout> QString get_slice_(
 	}
 	out_image = filter->GetOutput();
 	if (out_image.IsNotNull()) out_image->DisconnectPipeline();
-	else return QString("Out image is NULL");
+	else return QString("Out image is null");
 	if (v2d)
 	{
 		v2d->idimx = out_image->GetLargestPossibleRegion().GetSize()[0];
@@ -274,9 +274,9 @@ template<typename T> QString contour_from_path(
 		const typename T::Pointer & image,
 		const GraphicsPathItem * item)
 {
-	if (image.IsNull()) return QString("image is NULL");
-	if (!roi)           return QString("ROI is NULL");
-	if (!item)          return QString("item is NULL");
+	if (image.IsNull()) return QString("image is null");
+	if (!roi)           return QString("ROI is null");
+	if (!item)          return QString("item is null");
 	if (item->get_roi_id() >= 0 && item->get_roi_id() == roi->id)
 	{
 		return
@@ -344,7 +344,7 @@ template<typename T> QString contour_from_path(
 		default:
 			{
 				delete c;
-				c = NULL;
+				c = nullptr;
 				return QString("item->get_axis() - unknown value");
 			}
 		}
@@ -371,14 +371,14 @@ QString contour_from_path_nonuniform(
 		const ImageVariant * ivariant,
 		const GraphicsPathItem * item)
 {
-	if (!ivariant) return QString("image is NULL");
+	if (!ivariant) return QString("image is null");
 	const int slices_size = ivariant->di->image_slices.size();
 	if (ivariant->di->idimz != slices_size)
 	{
 		return QString("Failed");
 	}
-	if (!roi)  return QString("ROI is NULL");
-	if (!item) return QString("item is NULL");
+	if (!roi)  return QString("ROI is null");
+	if (!item) return QString("item is null");
 	if (item->get_axis() != 2 )
 		return QString("Only original slices are supported");
 	if (item->get_roi_id() >= 0 && item->get_roi_id() == roi->id)
@@ -474,7 +474,7 @@ template<typename T> void load_rgb_image(
 	{
 		widget->graphicsview->scene()->removeItem(widget->graphicsview->image_item);
 		delete widget->graphicsview->image_item;
-		widget->graphicsview->image_item = NULL;
+		widget->graphicsview->image_item = nullptr;
 	}
 	widget->graphicsview->image_item = new QGraphicsPixmapItem();
 	widget->graphicsview->image_item->setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
@@ -638,7 +638,7 @@ template<typename T> void load_rgb_image(
 	if (p__)
 	{
 		delete [] p__;
-		p__ = NULL;
+		p__ = nullptr;
 	}
 #endif
 }
@@ -662,7 +662,7 @@ template<typename T> void load_rgba_image(
 	{
 		widget->graphicsview->scene()->removeItem(widget->graphicsview->image_item);
 		delete widget->graphicsview->image_item;
-		widget->graphicsview->image_item = NULL;
+		widget->graphicsview->image_item = nullptr;
 	}
 	widget->graphicsview->image_item = new QGraphicsPixmapItem();
 	widget->graphicsview->image_item->setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
@@ -918,7 +918,7 @@ template<typename T> void load_rgba_image(
 	if (p__)
 	{
 		delete [] p__;
-		p__ = NULL;
+		p__ = nullptr;
 	}
 #endif
 }
@@ -946,7 +946,7 @@ template<typename T> void load_rgb_char_image(
 	{
 		widget->graphicsview->scene()->removeItem(widget->graphicsview->image_item);
 		delete widget->graphicsview->image_item;
-		widget->graphicsview->image_item = NULL;
+		widget->graphicsview->image_item = nullptr;
 	}
 	//
 	widget->graphicsview->image_item = new QGraphicsPixmapItem();
@@ -1068,7 +1068,7 @@ template<typename T> void load_rgba_char_image(
 	{
 		widget->graphicsview->scene()->removeItem(widget->graphicsview->image_item);
 		delete widget->graphicsview->image_item;
-		widget->graphicsview->image_item = NULL;
+		widget->graphicsview->image_item = nullptr;
 	}
 	//
 	widget->graphicsview->image_item = new QGraphicsPixmapItem();
@@ -1219,7 +1219,7 @@ template<typename T> void load_rgba_char_image(
 	if (p)
 	{
 		delete [] p;
-		p = NULL;
+		p = nullptr;
 	}
 #endif
 }
@@ -1415,7 +1415,7 @@ template<typename T> void load_image(
 	for (size_t i = 0; i < threadsLUT_size; ++i)
 	{
 		delete widget->threadsLUT_[i];
-		widget->threadsLUT_[i] = NULL;
+		widget->threadsLUT_[i] = nullptr;
 	}
 	widget->threadsLUT_.clear();
 	//
@@ -1437,7 +1437,7 @@ template<typename T> void load_image(
 	{
 		widget->graphicsview->scene()->removeItem(widget->graphicsview->image_item);
 		delete widget->graphicsview->image_item;
-		widget->graphicsview->image_item = NULL;
+		widget->graphicsview->image_item = nullptr;
 	}
 	//
 	widget->graphicsview->image_item = new QGraphicsPixmapItem();
@@ -1519,7 +1519,7 @@ template<typename T> void load_image(
 	if (p)
 	{
 		delete [] p;
-		p = NULL;
+		p = nullptr;
 	}
 #endif
 #ifdef A_TMP_BENCHMARK
@@ -1640,35 +1640,19 @@ GraphicsWidget::GraphicsWidget(
 	QLineEdit * info_line_,
 	QWidget * single_frame,
 	QWidget * multi_frame)
+	:
+	axis(a),
+	top_label(top_label_),
+	left_label(left_label_),
+	measure_label(measure_label_),
+	info_line(info_line_),
+	single_frame_ptr(single_frame),
+	multi_frame_ptr(multi_frame)
 {
-	run__ = false;
-	axis = a;
-	main = false;
-	multi = false;
-	bb = false;
-	gl = false;
-	smooth_ = true;
-	top_label  = top_label_;
-	left_label = left_label_;
-	measure_label = measure_label_;
-	info_line = info_line_;
-	aliza = NULL;
-	single_frame_ptr = single_frame;
-	multi_frame_ptr = multi_frame;
-	alt_mode = false;
-	show_cursor = false;
-	mouse_modus = 0;
-	enable_shutter = true;
-	enable_overlays = true;
-	frame_time_unit = 0; // 0 - ms; 1 - s
-	frametime_2D = 120;
-	contours_width = 0.0;
-	toolbox2D = NULL;
-	slider_m = NULL;
 	anim2D_timer = new QTimer(this);
 	anim2D_timer->setSingleShot(true);
 	connect(anim2D_timer, SIGNAL(timeout()), this, SLOT(animate_()));
-	image_container.image3D = NULL;
+	image_container.image3D = nullptr;
 	image_container.image2D = new ImageVariant2D();
 	graphicsview = new GraphicsView(this);
 	QVBoxLayout * l = new QVBoxLayout(this);
@@ -1690,15 +1674,15 @@ GraphicsWidget::~GraphicsWidget()
 				if (threadsLUT_.at(i)->isRunning())
 					threadsLUT_[i]->exit();
 				delete threadsLUT_[i];
-				threadsLUT_[i] = NULL;
+				threadsLUT_[i] = nullptr;
 			}
 		}
 		if (image_container.image2D)
 		{
 			delete image_container.image2D;
-			image_container.image2D = NULL;
+			image_container.image2D = nullptr;
 		}
-		image_container.image3D = NULL;
+		image_container.image3D = nullptr;
 		mutex.unlock();
 	}
 }
@@ -2007,7 +1991,7 @@ void GraphicsWidget::clear_(bool lock)
 		if (graphicsview->scene())
 			graphicsview->scene()->removeItem(graphicsview->image_item);
 		delete graphicsview->image_item;
-		graphicsview->image_item = NULL;
+		graphicsview->image_item = nullptr;
 #else
 		QPixmap p(16, 16);
 		graphicsview->image_item->setPixmap(p);
@@ -2027,120 +2011,120 @@ void GraphicsWidget::clear_(bool lock)
 		if (image_container.image2D->pSS.IsNotNull())
 		{
 			image_container.image2D->pSS->DisconnectPipeline();
-			image_container.image2D->pSS = NULL;
+			image_container.image2D->pSS = nullptr;
 		}
 		if (image_container.image2D->pUS.IsNotNull())
 		{
 			image_container.image2D->pUS->DisconnectPipeline();
-			image_container.image2D->pUS = NULL;
+			image_container.image2D->pUS = nullptr;
 		}
 		if (image_container.image2D->pSI.IsNotNull())
 		{
 			image_container.image2D->pSI->DisconnectPipeline();
-			image_container.image2D->pSI = NULL;
+			image_container.image2D->pSI = nullptr;
 		}
 		if (image_container.image2D->pUI.IsNotNull())
 		{
 			image_container.image2D->pUI->DisconnectPipeline();
-			image_container.image2D->pUI = NULL;
+			image_container.image2D->pUI = nullptr;
 		}
 		if (image_container.image2D->pUC.IsNotNull())
 		{
 			image_container.image2D->pUC->DisconnectPipeline();
-			image_container.image2D->pUC = NULL;
+			image_container.image2D->pUC = nullptr;
 		}
 		if (image_container.image2D->pF.IsNotNull())
 		{
 			image_container.image2D->pF->DisconnectPipeline();
-			image_container.image2D->pF = NULL;
+			image_container.image2D->pF = nullptr;
 		}
 		if (image_container.image2D->pD.IsNotNull())
 		{
 			image_container.image2D->pD->DisconnectPipeline();
-			image_container.image2D->pD = NULL;
+			image_container.image2D->pD = nullptr;
 		}
 		if (image_container.image2D->pSLL.IsNotNull())
 		{
 			image_container.image2D->pSLL->DisconnectPipeline();
-			image_container.image2D->pSLL = NULL;
+			image_container.image2D->pSLL = nullptr;
 		}
 		if (image_container.image2D->pULL.IsNotNull())
 		{
 			image_container.image2D->pULL->DisconnectPipeline();
-			image_container.image2D->pULL = NULL;
+			image_container.image2D->pULL = nullptr;
 		}
 		if (image_container.image2D->pSS_rgb.IsNotNull())
 		{
 			image_container.image2D->pSS_rgb->DisconnectPipeline();
-			image_container.image2D->pSS_rgb = NULL;
+			image_container.image2D->pSS_rgb = nullptr;
 		}
 		if (image_container.image2D->pUS_rgb.IsNotNull())
 		{
 			image_container.image2D->pUS_rgb->DisconnectPipeline();
-			image_container.image2D->pUS_rgb = NULL;
+			image_container.image2D->pUS_rgb = nullptr;
 		}
 		if (image_container.image2D->pSI_rgb.IsNotNull())
 		{
 			image_container.image2D->pSI_rgb->DisconnectPipeline();
-			image_container.image2D->pSI_rgb = NULL;
+			image_container.image2D->pSI_rgb = nullptr;
 		}
 		if (image_container.image2D->pUI_rgb.IsNotNull())
 		{
 			image_container.image2D->pUI_rgb->DisconnectPipeline();
-			image_container.image2D->pUI_rgb = NULL;
+			image_container.image2D->pUI_rgb = nullptr;
 		}
 		if (image_container.image2D->pUC_rgb.IsNotNull())
 		{
 			image_container.image2D->pUC_rgb->DisconnectPipeline();
-			image_container.image2D->pUC_rgb = NULL;
+			image_container.image2D->pUC_rgb = nullptr;
 		}
 		if (image_container.image2D->pF_rgb .IsNotNull())
 		{
 			image_container.image2D->pF_rgb->DisconnectPipeline();
-			image_container.image2D->pF_rgb = NULL;
+			image_container.image2D->pF_rgb = nullptr;
 		}
 		if (image_container.image2D->pD_rgb.IsNotNull())
 		{
 			image_container.image2D->pD_rgb->DisconnectPipeline();
-			image_container.image2D->pD_rgb = NULL;
+			image_container.image2D->pD_rgb = nullptr;
 		}
 		if (image_container.image2D->pSS_rgba.IsNotNull())
 		{
 			image_container.image2D->pSS_rgba->DisconnectPipeline();
-			image_container.image2D->pSS_rgba = NULL;
+			image_container.image2D->pSS_rgba = nullptr;
 		}
 		if (image_container.image2D->pUS_rgba.IsNotNull())
 		{
 			image_container.image2D->pUS_rgba->DisconnectPipeline();
-			image_container.image2D->pUS_rgba = NULL;
+			image_container.image2D->pUS_rgba = nullptr;
 		}
 		if (image_container.image2D->pSI_rgba.IsNotNull())
 		{
 			image_container.image2D->pSI_rgba->DisconnectPipeline();
-			image_container.image2D->pSI_rgba = NULL;
+			image_container.image2D->pSI_rgba = nullptr;
 		}
 		if (image_container.image2D->pUI_rgba.IsNotNull())
 		{
 			image_container.image2D->pUI_rgba->DisconnectPipeline();
-			image_container.image2D->pUI_rgba = NULL;
+			image_container.image2D->pUI_rgba = nullptr;
 		}
 		if (image_container.image2D->pUC_rgba.IsNotNull())
 		{
 			image_container.image2D->pUC_rgba->DisconnectPipeline();
-			image_container.image2D->pUC_rgba = NULL;
+			image_container.image2D->pUC_rgba = nullptr;
 		}
 		if (image_container.image2D->pF_rgba.IsNotNull())
 		{
 			image_container.image2D->pF_rgba->DisconnectPipeline();
-			image_container.image2D->pF_rgba = NULL;
+			image_container.image2D->pF_rgba = nullptr;
 		}
 		if (image_container.image2D->pD_rgba.IsNotNull())
 		{
 			image_container.image2D->pD_rgba->DisconnectPipeline();
-			image_container.image2D->pD_rgba = NULL;
+			image_container.image2D->pD_rgba = nullptr;
 		}
 	}
-	image_container.image3D = NULL;
+	image_container.image3D = nullptr;
 	set_top_label_text(QString(""));
 	set_left_label_text(QString(""));
 	set_info_line_text(QString(""));
@@ -2232,7 +2216,7 @@ void GraphicsWidget::set_slice_2D(
 #ifdef DELETE_GRAPHICSIMAGEITEM
 		graphicsview->scene()->removeItem(graphicsview->image_item);
 		delete graphicsview->image_item;
-		graphicsview->image_item = NULL;
+		graphicsview->image_item = nullptr;
 #else
 		QPixmap p(16, 16);
 		graphicsview->image_item->setPixmap(p);
@@ -2270,117 +2254,117 @@ void GraphicsWidget::set_slice_2D(
 	if (image_container.image2D->pSS.IsNotNull())
 	{
 		image_container.image2D->pSS->DisconnectPipeline();
-		image_container.image2D->pSS = NULL;
+		image_container.image2D->pSS = nullptr;
 	}
 	if (image_container.image2D->pUS.IsNotNull())
 	{
 		image_container.image2D->pUS->DisconnectPipeline();
-		image_container.image2D->pUS = NULL;
+		image_container.image2D->pUS = nullptr;
 	}
 	if (image_container.image2D->pSI.IsNotNull())
 	{
 		image_container.image2D->pSI->DisconnectPipeline();
-		image_container.image2D->pSI = NULL;
+		image_container.image2D->pSI = nullptr;
 	}
 	if (image_container.image2D->pUI.IsNotNull())
 	{
 		image_container.image2D->pUI->DisconnectPipeline();
-		image_container.image2D->pUI = NULL;
+		image_container.image2D->pUI = nullptr;
 	}
 	if (image_container.image2D->pUC.IsNotNull())
 	{
 		image_container.image2D->pUC->DisconnectPipeline();
-		image_container.image2D->pUC = NULL;
+		image_container.image2D->pUC = nullptr;
 	}
 	if (image_container.image2D->pF.IsNotNull())
 	{
 		image_container.image2D->pF->DisconnectPipeline();
-		image_container.image2D->pF = NULL;
+		image_container.image2D->pF = nullptr;
 	}
 	if (image_container.image2D->pD.IsNotNull())
 	{
 		image_container.image2D->pD->DisconnectPipeline();
-		image_container.image2D->pD = NULL;
+		image_container.image2D->pD = nullptr;
 	}
 	if (image_container.image2D->pSLL.IsNotNull())
 	{
 		image_container.image2D->pSLL->DisconnectPipeline();
-		image_container.image2D->pSLL = NULL;
+		image_container.image2D->pSLL = nullptr;
 	}
 	if (image_container.image2D->pULL.IsNotNull())
 	{
 		image_container.image2D->pULL->DisconnectPipeline();
-		image_container.image2D->pULL = NULL;
+		image_container.image2D->pULL = nullptr;
 	}
 	if (image_container.image2D->pSS_rgb.IsNotNull())
 	{
 		image_container.image2D->pSS_rgb->DisconnectPipeline();
-		image_container.image2D->pSS_rgb = NULL;
+		image_container.image2D->pSS_rgb = nullptr;
 	}
 	if (image_container.image2D->pUS_rgb.IsNotNull())
 	{
 		image_container.image2D->pUS_rgb->DisconnectPipeline();
-		image_container.image2D->pUS_rgb = NULL;
+		image_container.image2D->pUS_rgb = nullptr;
 	}
 	if (image_container.image2D->pSI_rgb.IsNotNull())
 	{
 		image_container.image2D->pSI_rgb->DisconnectPipeline();
-		image_container.image2D->pSI_rgb = NULL;
+		image_container.image2D->pSI_rgb = nullptr;
 	}
 	if (image_container.image2D->pUI_rgb.IsNotNull())
 	{
 		image_container.image2D->pUI_rgb->DisconnectPipeline();
-		image_container.image2D->pUI_rgb = NULL;
+		image_container.image2D->pUI_rgb = nullptr;
 	}
 	if (image_container.image2D->pUC_rgb.IsNotNull())
 	{
 		image_container.image2D->pUC_rgb ->DisconnectPipeline();
-		image_container.image2D->pUC_rgb = NULL;
+		image_container.image2D->pUC_rgb = nullptr;
 	}
 	if (image_container.image2D->pF_rgb.IsNotNull())
 	{
 		image_container.image2D->pF_rgb->DisconnectPipeline();
-		image_container.image2D->pF_rgb = NULL;
+		image_container.image2D->pF_rgb = nullptr;
 	}
 	if (image_container.image2D->pD_rgb.IsNotNull())
 	{
 		image_container.image2D->pD_rgb->DisconnectPipeline();
-		image_container.image2D->pD_rgb = NULL;
+		image_container.image2D->pD_rgb = nullptr;
 	}
 	if (image_container.image2D->pSS_rgba.IsNotNull())
 	{
 		image_container.image2D->pSS_rgba->DisconnectPipeline();
-		image_container.image2D->pSS_rgba = NULL;
+		image_container.image2D->pSS_rgba = nullptr;
 	}
 	if (image_container.image2D->pUS_rgba.IsNotNull())
 	{
 		image_container.image2D->pUS_rgba->DisconnectPipeline();
-		image_container.image2D->pUS_rgba = NULL;
+		image_container.image2D->pUS_rgba = nullptr;
 	}
 	if (image_container.image2D->pSI_rgba.IsNotNull())
 	{
 		image_container.image2D->pSI_rgba->DisconnectPipeline();
-		image_container.image2D->pSI_rgba = NULL;
+		image_container.image2D->pSI_rgba = nullptr;
 	}
 	if (image_container.image2D->pUI_rgba.IsNotNull())
 	{
 		image_container.image2D->pUI_rgba->DisconnectPipeline();
-		image_container.image2D->pUI_rgba = NULL;
+		image_container.image2D->pUI_rgba = nullptr;
 	}
 	if (image_container.image2D->pUC_rgba.IsNotNull())
 	{
 		image_container.image2D->pUC_rgba->DisconnectPipeline();
-		image_container.image2D->pUC_rgba = NULL;
+		image_container.image2D->pUC_rgba = nullptr;
 	}
 	if (image_container.image2D->pF_rgba.IsNotNull())
 	{
 		image_container.image2D->pF_rgba->DisconnectPipeline();
-		image_container.image2D->pF_rgba = NULL;
+		image_container.image2D->pF_rgba = nullptr;
 	}
 	if (image_container.image2D->pD_rgba.IsNotNull())
 	{
 		image_container.image2D->pD_rgba->DisconnectPipeline();
-		image_container.image2D->pD_rgba = NULL;
+		image_container.image2D->pD_rgba = nullptr;
 	}
 	//
 	switch (axis)
@@ -3344,8 +3328,8 @@ QString GraphicsWidget::contours_from_selected_paths(
 	ImageVariant * ivariant,
 	ROI * roi)
 {
-	if (!ivariant) return QString("Image is NULL");
-	if (!roi)      return QString("ROI is NULL");
+	if (!ivariant) return QString("Image is null");
+	if (!roi)      return QString("ROI is null");
 	QString message("");
 	int selected_items_size = 0;
 	QList<long long> tmp_ids;
@@ -3452,11 +3436,11 @@ void GraphicsWidget::get_screen()
 	const QString saved_dir = CommonUtils::get_screenshot_dir();
 	const QString d = CommonUtils::get_screenshot_name(saved_dir);
 	const QString f = QFileDialog::getSaveFileName(
-		NULL,
+		nullptr,
 		QString("Select file: format by extension"),
 		d,
 		QString("All Files (*)"),
-		(QString*)NULL
+		nullptr
 		//,QFileDialog::DontUseNativeDialog
 		);
 	if (f.isEmpty()) return;

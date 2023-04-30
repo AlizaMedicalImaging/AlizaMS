@@ -42,7 +42,7 @@ struct rle_encoder::internal
 };
 
 rle_encoder::rle_encoder(source & s, image_info const & ii)
-  : internals(NULL)
+  : internals(nullptr)
 {
   if (!ii.is_little_endian())
   {
@@ -338,7 +338,7 @@ struct rle_decoder::internal
 };
 
 rle_decoder::rle_decoder(source & s, image_info const & ii)
-  : internals(NULL)
+  : internals(nullptr)
 {
   internals = new internal;
   memset(reinterpret_cast<char *>(&internals->rh), 0, sizeof(header));
@@ -347,7 +347,7 @@ rle_decoder::rle_decoder(source & s, image_info const & ii)
   internals->sources = new source *[ns];
   internals->sources[0] = s.clone(); // only one for now (minimum for read_header)
   for (int i = 1; i < ns; ++i)
-    internals->sources[i] = NULL;
+    internals->sources[i] = nullptr;
   internals->nsources = ns;
   for (int i = 0; i < 16; ++i)
     internals->nstorage[i] = 0;

@@ -55,46 +55,16 @@ typedef std::vector<DimIndexValue> DimIndexValues;
 class FrameGroup
 {
 public:
-	FrameGroup() :
-		id(-1),
-		stack_id(-1),
-		in_stack_pos_num(-1),
-		temp_pos_idx(-1),
-		temp_pos_off(0.0),
-		us_temp_pos_unknown(0.0),
-		rescale_intercept(0.0),
-		rescale_slope(1.0),
-		stack_id_ok(false),
-		in_stack_pos_num_ok(false),
-		temp_pos_idx_ok(false),
-		vol_orient_ok(false),
-		vol_pos_ok(false),
-		temp_pos_off_ok(false),
-		us_temp_pos_unknown_ok(false),
-		rescale_ok(false),
-		ref_segment_num(-1)
-	{
-		vol_pos[0] = 0.0;
-		vol_pos[1] = 0.0;
-		vol_pos[2] = 0.0;
-		vol_orient[0] = 0.0;
-		vol_orient[1] = 0.0;
-		vol_orient[2] = 0.0;
-		vol_orient[3] = 0.0;
-		vol_orient[4] = 0.0;
-		vol_orient[5] = 0.0;
-	}
-	~FrameGroup()
-	{
-	}
-	int    id;
-	int    stack_id;
-	int    in_stack_pos_num;
-	int    temp_pos_idx;
-	double temp_pos_off;
-	double us_temp_pos_unknown;
-	double rescale_intercept;
-	double rescale_slope;
+	FrameGroup() {}
+	~FrameGroup() {}
+	int    id{-1};
+	int    stack_id{-1};
+	int    in_stack_pos_num{-1};
+	int    temp_pos_idx{-1};
+	double temp_pos_off{};
+	double us_temp_pos_unknown{};
+	double rescale_intercept{};
+	double rescale_slope{1.0};
 	QString pat_pos;
 	QString pat_orient;
 	QString pix_spacing;
@@ -108,17 +78,17 @@ public:
 	QString rescale_type;
 	QString frame_acquisition_datetime;
 	QString frame_reference_datetime;
-	bool stack_id_ok;
-	bool in_stack_pos_num_ok;
-	bool temp_pos_idx_ok;
-	bool vol_orient_ok;
-	bool vol_pos_ok;
-	bool temp_pos_off_ok;
-	bool us_temp_pos_unknown_ok;
-	bool rescale_ok;
-	int ref_segment_num;
-	double vol_pos[3];
-	double vol_orient[6];
+	bool stack_id_ok{};
+	bool in_stack_pos_num_ok{};
+	bool temp_pos_idx_ok{};
+	bool vol_orient_ok{};
+	bool vol_pos_ok{};
+	bool temp_pos_off_ok{};
+	bool us_temp_pos_unknown_ok{};
+	bool rescale_ok{};
+	int ref_segment_num{-1};
+	double vol_pos[3]{};
+	double vol_orient[6]{};
 };
 
 typedef std::vector<FrameGroup> FrameGroupValues;
@@ -132,9 +102,9 @@ typedef struct
 class PrConfig
 {
 public:
-	PrConfig() : id(-1), desc(QString("")) {}
+	PrConfig() {}
 	~PrConfig() {}
-	int id;
+	int id{-1};
 	QString desc;
 	QList<QVariant> values;
 };
