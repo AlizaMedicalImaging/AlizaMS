@@ -51,7 +51,7 @@ Global::~Global()
   if (--GlobalCount == 0)
   {
     delete Internals;
-    Internals = NULL;
+    Internals = nullptr;
   }
 }
 

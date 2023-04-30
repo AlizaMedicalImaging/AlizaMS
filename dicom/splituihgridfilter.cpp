@@ -28,10 +28,10 @@ template<typename T> bool reorganize_uih_grid(
 	T * output)
 {
 	const unsigned int div =
-		(unsigned int)ceil(sqrt((double)outdims[2]));
+		static_cast<unsigned int>(ceil(sqrt(static_cast<double>(outdims[2]))));
 	if (!(div > 0)) return false;
-	const size_t insize  = indims[0]*indims[1]*indims[2];
-	const size_t outsize = outdims[0]*outdims[1]*outdims[2];
+	const size_t insize  = indims[0] * indims[1] * indims[2];
+	const size_t outsize = outdims[0] * outdims[1] * outdims[2];
 	for (unsigned int x = 0; x < outdims[0]; ++x)
 	{
 		for (unsigned int y = 0; y < outdims[1]; ++y)
@@ -39,10 +39,10 @@ template<typename T> bool reorganize_uih_grid(
 			for (unsigned int z = 0; z < outdims[2]; ++z)
 			{
 				const size_t outidx =
-					x + y*outdims[0] + z*outdims[0]*outdims[1];
+					x + y * outdims[0] + z * outdims[0] * outdims[1];
 				const size_t inidx =
-					(x + (z%div)*outdims[0]) +
-					(y + (z/div)*outdims[1])*indims[0];
+					(x + (z % div) * outdims[0]) +
+					(y + (z / div) * outdims[1]) * indims[0];
 				if (!(outidx < outsize && inidx < insize))
 					return false;
 				output[outidx] = input[inidx];
@@ -94,14 +94,14 @@ bool SplitUihGridFilter::ComputeUihGridDimensions(
 	const unsigned int x =
 		(idims[0] >= idims[1])
 		?
-		idims[0]/ceil(sqrt(z))
+		idims[0] / ceil(sqrt(z))
 		:
-		idims[1]/ceil(sqrt(z));
+		idims[1] / ceil(sqrt(z));
 	dims[0] = x;
 	dims[1] = x;
 	dims[2] = static_cast<unsigned int>(z);
-	if (dims[0]*dims[1]*dims[2] >
-			idims[0]*idims[1]*idims[2])
+	if (dims[0] * dims[1] * dims[2] >
+			idims[0] * idims[1] * idims[2])
 		return false;
 	return true;
 }
@@ -154,7 +154,7 @@ bool SplitUihGridFilter::ComputeUihGridSlicePosition(
 	SmartPointer<SequenceOfItems> sq;
 	if (ds.FindDataElement(tMRVFrameSequence))
 	{
-		const DataElement & e  =
+		const DataElement & e =
 			ds.GetDataElement(tMRVFrameSequence);
 		sq = e.GetValueAsSQ();
 		if (!(sq && sq->GetNumberOfItems()>0))
@@ -162,7 +162,7 @@ bool SplitUihGridFilter::ComputeUihGridSlicePosition(
 	}
 	else if (ds.FindDataElement(Tag(0x0065,0x1051)))
 	{
-		const DataElement & e  =
+		const DataElement & e =
 			ds.GetDataElement(Tag(0x0065,0x1051));
 		sq = e.GetValueAsSQ();
 		if (!(sq && sq->GetNumberOfItems()>0))
@@ -193,7 +193,7 @@ bool SplitUihGridFilter::ComputeUihGridSlicePosition(
 
 bool SplitUihGridFilter::Split()
 {
-	unsigned int dims[3] = {0,0,0};
+	unsigned int dims[3]{};
 	if (!ComputeUihGridDimensions(dims))
 	{
 #ifdef ALIZA_SPLITUIH_VERBOSE
@@ -292,5 +292,5 @@ bool SplitUihGridFilter::Split()
 	return true;
 }
 
-} // end namespace mdcm
+}
 

@@ -346,7 +346,7 @@ void SQtree::process_element(
 	else
 	{
 		const mdcm::DictEntry & entry =
-			d.GetDictEntry(tag,(const char *)NULL);
+			d.GetDictEntry(tag, nullptr);
 		const mdcm::VR tmp_vr = entry.GetVR();
 		tname = QString(entry.GetName());
 		if (invalid_vr||unknown_vr)
@@ -1019,7 +1019,7 @@ void SQtree::process_element(
 					<< keyword_qs
 					<< QString(mdcm::VR::GetVRString(vr))
 					<< QString("")
-					<< QString("NULL");
+					<< QString("null");
 				QTreeWidgetItem * ii = new QTreeWidgetItem(l);
 				ii->setForeground(4, brush2);
 				if (invalid_vr)  ii->setBackground(2, brush5);
@@ -2060,7 +2060,7 @@ void SQtree::open_file()
 		QString("Open File"),
 		saved_dir,
 		QString(),
-		(QString*)NULL,
+		nullptr,
 		(QFileDialog::ReadOnly
 		/*| QFileDialog::DontUseNativeDialog*/
 		));
@@ -2092,7 +2092,7 @@ void SQtree::open_file_and_series()
 		QString("Open file and scan series"),
 		saved_dir,
 		QString(),
-		(QString*)NULL,
+		nullptr,
 		(QFileDialog::ReadOnly
 		/*| QFileDialog::DontUseNativeDialog*/
 		));

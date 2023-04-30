@@ -521,7 +521,7 @@ LookupTable::GetPointer() const
   {
     return &Internal->RGB[0];
   }
-  return NULL;
+  return nullptr;
 }
 
 bool

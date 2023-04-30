@@ -35,7 +35,7 @@ PrivateTag::ReadFromCommaSeparatedString(const char * str)
     return false;
   unsigned int group = 0, element = 0;
   std::string  owner;
-  owner.resize(strlen(str)); // str != NULL
+  owner.resize(strlen(str)); // str != nullptr
   if (sscanf(str, "%04x,%04x,%[^\"]", &group, &element, &owner[0]) != 3 ||
       group > std::numeric_limits<uint16_t>::max() || element > std::numeric_limits<uint16_t>::max())
   {

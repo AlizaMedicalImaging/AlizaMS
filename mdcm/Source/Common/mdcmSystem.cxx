@@ -162,7 +162,7 @@ utf8_decode(const std::string & str)
 {
   if (str.empty())
     return std::wstring();
-  const int    len = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
+  const int    len = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), nullptr, 0);
   std::wstring ret(len, 0);
   MultiByteToWideChar(CP_UTF8, 0, &str[0], -1, &ret[0], len);
   return ret;
@@ -173,9 +173,9 @@ utf8_encode(const std::wstring & wstr)
 {
   if (wstr.empty())
     return std::string();
-  const int   len = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+  const int   len = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), nullptr, 0, nullptr, nullptr);
   std::string ret(len, 0);
-  WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &ret[0], len, NULL, NULL);
+  WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &ret[0], len, nullptr, nullptr);
   return ret;
 }
 
@@ -326,7 +326,7 @@ System::GetCurrentProcessFileName()
 #else
   mdcmErrorMacro("Not implementated");
 #endif
-  return NULL;
+  return nullptr;
 }
 
 /*
@@ -383,7 +383,7 @@ gettimeofday(struct timeval * tv, struct timezone * tz)
 {
   /*
   The use of the timezone structure is obsolete; the tz  argument  should
-  normally  be  specified  as  NULL.  The tz_dsttime field has never been
+  normally  be  specified  as  nullptr.  The tz_dsttime field has never been
   used under Linux; it has not been and will not be supported by libc  or
   glibc.   Each  and  every occurrence of this field in the kernel source
   (other than the declaration) is a bug. Thus, the following is purely of
@@ -392,7 +392,7 @@ gettimeofday(struct timeval * tv, struct timezone * tz)
   assert(tz == 0);
   FILETIME         ft;
   unsigned __int64 tmpres = 0;
-  if (NULL != tv)
+  if (nullptr != tv)
   {
     GetSystemTimeAsFileTime(&ft);
     tmpres |= ft.dwHighDateTime;
@@ -524,7 +524,7 @@ System::GetTimezoneOffsetFromUTC()
 {
   static std::string buffer;
   char               outstr[10];
-  time_t             t = time(NULL);
+  time_t             t = time(nullptr);
   struct tm *        tmp = localtime(&t);
   size_t             l = strftime(outstr, sizeof(outstr), "%z", tmp);
   assert(l == 5);
@@ -597,18 +597,18 @@ System::GetCurrentDateTime(char date[22])
     int tz_dsttime;         // type of DST correction
   };
 
-  If  either  tv or tz is NULL, the corresponding structure is not set or
+  If  either  tv or tz is nullptr, the corresponding structure is not set or
   returned.
 
   The use of the timezone structure is obsolete; the tz  argument  should
-  normally  be  specified  as  NULL.  The tz_dsttime field has never been
+  normally  be  specified  as  nullptr.  The tz_dsttime field has never been
   used under Linux; it has not been and will not be supported by libc  or
   glibc.   Each  and  every occurrence of this field in the kernel source
   (other than the declaration) is a bug. Thus, the following is purely of
   historic interest.
   */
   struct timeval tv;
-  gettimeofday(&tv, NULL);
+  gettimeofday(&tv, nullptr);
   timep = tv.tv_sec;
   // A concatenated date-time character string in the format:
   // YYYYMMDDHHMMSS.FFFFFF&ZZXX
@@ -664,14 +664,14 @@ System::StrTokR(char * str, const char * delim, char ** nextp)
 {
 #if 1
   char * ret;
-  if (str == NULL)
+  if (str == nullptr)
   {
     str = *nextp;
   }
   str += strspn(str, delim);
   if (*str == '\0')
   {
-    return NULL;
+    return nullptr;
   }
   ret = str;
   str += strcspn(str, delim);
@@ -691,8 +691,8 @@ System::StrSep(char ** sp, const char * sep)
 {
 #if 1
   char *p, *s;
-  if (sp == NULL || *sp == NULL || **sp == '\0')
-    return NULL;
+  if (sp == nullptr || *sp == nullptr || **sp == '\0')
+    return nullptr;
   s = *sp;
   p = s + strcspn(s, sep);
   if (*p != '\0')

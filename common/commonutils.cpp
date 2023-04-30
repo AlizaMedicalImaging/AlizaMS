@@ -515,9 +515,9 @@ template<typename T> int generate_tex3d(
 	int error__ = 0;
 	GLuint glerror__ = 0;
 	double rmin = 0.0, rmax = 0.0;
-	float * float_buf = NULL;
-	unsigned short * short_buf = NULL;
-	GLubyte * ub_buf = NULL;
+	float * float_buf = nullptr;
+	unsigned short * short_buf = nullptr;
+	GLubyte * ub_buf = nullptr;
 	typename T::Pointer out_image;
 	bool scale = true;
 	short texture_type = -1;
@@ -1339,7 +1339,7 @@ template<typename T> QString process_dicom_monochrome_image1(
 	{
 		*ok = false;
 		return QString(
-			"process_dicom_monochrome_image1: buffer is NULL");
+			"process_dicom_monochrome_image1: buffer is null");
 	}
 	typename T::RegionType region;
 	typename T::SizeType size;
@@ -1483,7 +1483,7 @@ template<typename T> QString process_dicom_rgb_image1(
 	{
 		*ok = false;
 		return QString(
-			"process_dicom_rgb_image1: buffer is NULL");
+			"process_dicom_rgb_image1: buffer is null");
 	}
 	typename T::RegionType region;
 	typename T::SizeType size;
@@ -1666,7 +1666,7 @@ template<typename T> QString process_dicom_rgba_image1(
 	{
 		*ok = false;
 		return QString(
-			"process_dicom_rgba_image: buffer is NULL");
+			"process_dicom_rgba_image: buffer is null");
 	}
 	typename T::RegionType region;
 	typename T::SizeType size;
@@ -1917,7 +1917,7 @@ template <typename Tin, typename Tout> QString apply_per_slice_rescale_(
 		}
 	}
 	image->DisconnectPipeline();
-	image = NULL;
+	image = nullptr;
 	return QString("");
 }
 
@@ -2177,14 +2177,14 @@ QString CommonUtils::convert_orientation_flag(unsigned int in)
 double CommonUtils::set_digits(double i, int digits)
 {
     const double t = pow(10.0, digits);
-    return floor(i*t)/t;
+    return floor(i * t) / t;
 }
 
 QString CommonUtils::get_orientation2(const double * pat_orientation)
 {
 	const bool print_oblique = false;
 	const char RAI_codes[3][2] = { {'R', 'L'}, {'A', 'P'}, {'I', 'S'} };
-	QString s("");
+	QString s;
 	char rai[4];
 	rai[0] = 'x';
 	rai[1] = 'x';
@@ -2202,8 +2202,8 @@ QString CommonUtils::get_orientation2(const double * pat_orientation)
 	bool oblique = false;
 	for (int i = 0; i < 3; ++i)
 	{
-		double dcos[3] = { 0.0, 0.0, 0.0 };
-		double dabsmax = 0.0;
+		double dcos[3]{};
+		double dabsmax{};
 		switch (i)
 		{
 		case 0:
@@ -2225,15 +2225,15 @@ QString CommonUtils::get_orientation2(const double * pat_orientation)
 			dabsmax = abs_max(nrm_dircos_x, nrm_dircos_y, nrm_dircos_z);
 			break;
 		}
-		for(int j = 0; j < 3; ++j)
+		for (int j = 0; j < 3; ++j)
 		{
 			double dabs = fabs(dcos[j]);
 			unsigned int dsgn = dcos[j] > 0 ? 0 : 1;
-			if(dabs == 1.0)
+			if (dabs == 1.0)
 			{
 				rai[i] = RAI_codes[j][dsgn];
 			}
-			else if(dabs == dabsmax)
+			else if (dabs == dabsmax)
 			{
 				oblique = true;
 				rai[i] = RAI_codes[j][dsgn];
@@ -2820,28 +2820,28 @@ bool CommonUtils::reload_monochrome(
 	{
 		ok = reload_monochrome_image<ImageTypeSS>(
 			ivariant, ivariant->pSS, gl, max_3d_tex_size,
-			NULL,
+			nullptr,
 			change_size, size_x_, size_y_);
 	}
 	else if (ivariant->image_type == 1)
 	{
 		ok = reload_monochrome_image<ImageTypeUS>(
 			ivariant, ivariant->pUS, gl, max_3d_tex_size,
-			NULL,
+			nullptr,
 			change_size, size_x_, size_y_);
 	}
 	else if (ivariant->image_type == 2)
 	{
 		ok = reload_monochrome_image<ImageTypeSI>(
 			ivariant, ivariant->pSI, gl, max_3d_tex_size,
-			NULL,
+			nullptr,
 			change_size, size_x_, size_y_);
 	}
 	else if (ivariant->image_type == 3)
 	{
 		ok = reload_monochrome_image<ImageTypeUI>(
 			ivariant, ivariant->pUI, gl, max_3d_tex_size,
-			NULL,
+			nullptr,
 			change_size, size_x_, size_y_);
 	}
 	else if (ivariant->image_type == 4)
@@ -2849,35 +2849,35 @@ bool CommonUtils::reload_monochrome(
 		ivariant->di->maxwindow = true;
 		ok = reload_monochrome_image<ImageTypeUC>(
 			ivariant, ivariant->pUC, gl, max_3d_tex_size,
-			NULL,
+			nullptr,
 			change_size, size_x_, size_y_);
 	}
 	else if (ivariant->image_type == 5)
 	{
 		ok = reload_monochrome_image<ImageTypeF>(
 			ivariant, ivariant->pF, gl, max_3d_tex_size,
-			NULL,
+			nullptr,
 			change_size, size_x_, size_y_);
 	}
 	else if (ivariant->image_type == 6)
 	{
 		ok = reload_monochrome_image<ImageTypeD>(
 			ivariant, ivariant->pD, gl, max_3d_tex_size,
-			NULL,
+			nullptr,
 			change_size, size_x_, size_y_);
 	}
 	else if (ivariant->image_type == 7)
 	{
 		ok = reload_monochrome_image<ImageTypeSLL>(
 			ivariant, ivariant->pSLL, gl, max_3d_tex_size,
-			NULL,
+			nullptr,
 			change_size, size_x_, size_y_);
 	}
 	else if (ivariant->image_type == 8)
 	{
 		ok = reload_monochrome_image<ImageTypeULL>(
 			ivariant, ivariant->pULL, gl, max_3d_tex_size,
-			NULL,
+			nullptr,
 			change_size, size_x_, size_y_);
 	}
 	else
@@ -3501,7 +3501,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						return QString("const std::bad_alloc");
 					}
-					if (!p__) return QString("p__ == NULL");
+					if (!p__) return QString("p__ is null");
 					size_t inc = 0;
 					for (size_t z_ = 0; z_ < dimz; ++z_)
 					{
@@ -3528,7 +3528,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						if (delete_data)
 						{
 							delete [] data[z_];
-							data[z_] = NULL;
+							data[z_] = nullptr;
 						}
 					}
 				}
@@ -3558,7 +3558,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					if (delete_data)
 					{
 						delete [] data[0];
-						data[0] = NULL;
+						data[0] = nullptr;
 					}
 				}
 				if (!error.isEmpty()) return error;
@@ -3589,7 +3589,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						return QString("const std::bad_alloc");
 					}
-					if (!p__) return QString("p__ == NULL");
+					if (!p__) return QString("p__ is null");
 					size_t inc = 0;
 					for (size_t z_ = 0; z_ < dimz; ++z_)
 					{
@@ -3616,7 +3616,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						if (delete_data)
 						{
 							delete [] data[z_];
-							data[z_] = NULL;
+							data[z_] = nullptr;
 						}
 					}
 				}
@@ -3646,7 +3646,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					if (delete_data)
 					{
 						delete [] data[0];
-						data[0] = NULL;
+						data[0] = nullptr;
 					}
 				}
 				if (!error.isEmpty()) return error;
@@ -3676,7 +3676,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						return QString("const std::bad_alloc");
 					}
-					if (!p__) return QString("p__ == NULL");
+					if (!p__) return QString("p__ is null");
 					size_t inc = 0;
 					for (size_t z_ = 0; z_ < dimz; ++z_)
 					{
@@ -3703,7 +3703,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						if (delete_data)
 						{
 							delete [] data[z_];
-							data[z_] = NULL;
+							data[z_] = nullptr;
 						}
 					}
 				}
@@ -3733,7 +3733,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					if (delete_data)
 					{
 						delete [] data[0];
-						data[0] = NULL;
+						data[0] = nullptr;
 					}
 				}
 				if (!error.isEmpty()) return error;
@@ -3763,7 +3763,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						return QString("const std::bad_alloc");
 					}
-					if (!p__) return QString("p__ == NULL");
+					if (!p__) return QString("p__ is null");
 					size_t inc = 0;
 					for (unsigned int z_ = 0; z_ < dimz; ++z_)
 					{
@@ -3790,7 +3790,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						if (delete_data)
 						{
 							delete [] data[z_];
-							data[z_] = NULL;
+							data[z_] = nullptr;
 						}
 					}
 				}
@@ -3820,7 +3820,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					if (delete_data)
 					{
 						delete [] data[0];
-						data[0] = NULL;
+						data[0] = nullptr;
 					}
 				}
 				if (!error.isEmpty()) return error;
@@ -3850,7 +3850,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						return QString("const std::bad_alloc");
 					}
-					if (!p__) return QString("p__ == NULL");
+					if (!p__) return QString("p__ is null");
 					size_t inc = 0;
 					for (size_t z_ = 0; z_ < dimz; ++z_)
 					{
@@ -3877,7 +3877,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						if (delete_data)
 						{
 							delete [] data[z_];
-							data[z_] = NULL;
+							data[z_] = nullptr;
 						}
 					}
 				}
@@ -3907,7 +3907,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					if (delete_data)
 					{
 						delete [] data[0];
-						data[0] = NULL;
+						data[0] = nullptr;
 					}
 				}
 				if (!error.isEmpty()) return error;
@@ -3937,7 +3937,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						return QString("const std::bad_alloc");
 					}
-					if (!p__) return QString("p__ == NULL");
+					if (!p__) return QString("p__ is null");
 					size_t inc = 0;
 					for (size_t z_ = 0; z_ < dimz; ++z_)
 					{
@@ -3964,7 +3964,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						if (delete_data)
 						{
 							delete [] data[z_];
-							data[z_] = NULL;
+							data[z_] = nullptr;
 						}
 					}
 				}
@@ -3994,7 +3994,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					if (delete_data)
 					{
 						delete [] data[0];
-						data[0] = NULL;
+						data[0] = nullptr;
 					}
 				}
 				if (!error.isEmpty()) return error;
@@ -4026,7 +4026,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						return QString("const std::bad_alloc");
 					}
-					if (!p__) return QString("p__ == NULL");
+					if (!p__) return QString("p__ is null");
 					size_t inc = 0;
 					for (size_t z_ = 0; z_ < dimz; ++z_)
 					{
@@ -4053,7 +4053,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						if (delete_data)
 						{
 							delete [] data[z_];
-							data[z_] = NULL;
+							data[z_] = nullptr;
 						}
 					}
 				}
@@ -4084,7 +4084,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					if (delete_data)
 					{
 						delete [] data[0];
-						data[0] = NULL;
+						data[0] = nullptr;
 					}
 				}
 				if (!error.isEmpty()) return error;
@@ -4114,7 +4114,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						return QString("const std::bad_alloc");
 					}
-					if (!p__) return QString("p__ == NULL");
+					if (!p__) return QString("p__ is null");
 					size_t inc = 0;
 					for (size_t z_ = 0; z_ < dimz; ++z_)
 					{
@@ -4141,7 +4141,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						if (delete_data)
 						{
 							delete [] data[z_];
-							data[z_] = NULL;
+							data[z_] = nullptr;
 						}
 					}
 				}
@@ -4171,7 +4171,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					if (delete_data)
 					{
 						delete [] data[0];
-						data[0] = NULL;
+						data[0] = nullptr;
 					}
 				}
 				if (!error.isEmpty()) return error;
@@ -4201,7 +4201,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					{
 						return QString("const std::bad_alloc");
 					}
-					if (!p__) return QString("p__ == NULL");
+					if (!p__) return QString("p__ is null");
 					size_t inc = 0;
 					for (size_t z_ = 0; z_ < dimz; ++z_)
 					{
@@ -4228,7 +4228,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						if (delete_data)
 						{
 							delete [] data[z_];
-							data[z_] = NULL;
+							data[z_] = nullptr;
 						}
 					}
 				}
@@ -4258,7 +4258,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					if (delete_data)
 					{
 						delete [] data[0];
-						data[0] = NULL;
+						data[0] = nullptr;
 					}
 				}
 				if (!error.isEmpty()) return error;
@@ -4305,7 +4305,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				{
 					return QString("const std::bad_alloc");
 				}
-				if (!p__) return QString("p__ == NULL");
+				if (!p__) return QString("p__ is null");
 				size_t inc = 0;
 				for (size_t z_ = 0; z_ < dimz; ++z_)
 				{
@@ -4335,7 +4335,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					if (delete_data)
 					{
 						delete [] data[z_];
-						data[z_] = NULL;
+						data[z_] = nullptr;
 					}
 				}
 			}
@@ -4368,7 +4368,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				if (delete_data)
 				{
 					delete [] data[0];
-					data[0] = NULL;
+					data[0] = nullptr;
 				}
 			}
 			if (!error.isEmpty()) return error;
@@ -4396,7 +4396,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				{
 					return QString("const std::bad_alloc");
 				}
-				if (!p__) return QString("p__ == NULL");
+				if (!p__) return QString("p__ is null");
 				size_t inc = 0;
 				for (size_t z_ = 0; z_ < dimz; ++z_)
 				{
@@ -4426,7 +4426,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					if (delete_data)
 					{
 						delete [] data[z_];
-						data[z_] = NULL;
+						data[z_] = nullptr;
 					}
 				}
 			}
@@ -4459,7 +4459,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				if (delete_data)
 				{
 					delete [] data[0];
-					data[0] = NULL;
+					data[0] = nullptr;
 				}
 			}
 			if (!error.isEmpty()) return error;
@@ -4486,7 +4486,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				{
 					return QString("const std::bad_alloc");
 				}
-				if (!p__) return QString("p__ == NULL");
+				if (!p__) return QString("p__ is null");
 				size_t inc = 0;
 				for (size_t z_ = 0; z_ < dimz; ++z_)
 				{
@@ -4516,7 +4516,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					if (delete_data)
 					{
 						delete [] data[z_];
-						data[z_] = NULL;
+						data[z_] = nullptr;
 					}
 				}
 			}
@@ -4549,7 +4549,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				if (delete_data)
 				{
 					delete [] data[0];
-					data[0] = NULL;
+					data[0] = nullptr;
 				}
 			}
 			if (!error.isEmpty()) return error;
@@ -4574,7 +4574,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				{
 					return QString("const std::bad_alloc");
 				}
-				if (!p__) return QString("p__ == NULL");
+				if (!p__) return QString("p__ is null");
 				size_t inc = 0;
 				for (size_t z_ = 0; z_ < dimz; ++z_)
 				{
@@ -4604,7 +4604,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					if (delete_data)
 					{
 						delete [] data[z_];
-						data[z_] = NULL;
+						data[z_] = nullptr;
 					}
 				}
 			}
@@ -4637,7 +4637,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				if (delete_data)
 				{
 					delete [] data[0];
-					data[0] = NULL;
+					data[0] = nullptr;
 				}
 			}
 			if (!error.isEmpty()) return error;
@@ -4684,7 +4684,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				{
 					return QString("const std::bad_alloc");
 				}
-				if (!p__) return QString("p__ == NULL");
+				if (!p__) return QString("p__ is null");
 				size_t inc = 0;
 				for (size_t z_ = 0; z_ < dimz; ++z_)
 				{
@@ -4714,7 +4714,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					if (delete_data)
 					{
 						delete [] data[z_];
-						data[z_] = NULL;
+						data[z_] = nullptr;
 					}
 				}
 			}
@@ -4746,7 +4746,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				if (delete_data)
 				{
 					delete [] data[0];
-					data[0] = NULL;
+					data[0] = nullptr;
 				}
 			}
 			if (!error.isEmpty()) return error;
@@ -4879,7 +4879,7 @@ double CommonUtils::get_total_memory()
 #elif (defined __APPLE__)
 	mib[1] = HW_MEMSIZE;
 #endif
-	sysctl(mib, 2, &ctlvalue, &len, NULL, 0);
+	sysctl(mib, 2, &ctlvalue, &len, nullptr, 0);
 	total_gb = static_cast<double>(ctlvalue) / 1073741824.0;
 #elif (defined  __GNUC__)
 	struct sysinfo i;

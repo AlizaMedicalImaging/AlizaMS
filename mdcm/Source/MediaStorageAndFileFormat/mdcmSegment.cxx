@@ -27,7 +27,7 @@
 namespace mdcm
 {
 
-static const char * ALGOTypeStrings[] = { "AUTOMATIC", "SEMIAUTOMATIC", "MANUAL", NULL };
+static const char * ALGOTypeStrings[] = { "AUTOMATIC", "SEMIAUTOMATIC", "MANUAL", nullptr };
 
 const char *
 Segment::GetALGOTypeString(ALGOType type)
@@ -46,7 +46,7 @@ Segment::GetALGOType(const char * type)
   str.Trim();
   std::string  strClearStr = str.Trim();
   const char * strClear = strClearStr.c_str();
-  for (unsigned int i = 0; ALGOTypeStrings[i] != NULL; ++i)
+  for (unsigned int i = 0; ALGOTypeStrings[i] != nullptr; ++i)
   {
     if (strcmp(strClear, ALGOTypeStrings[i]) == 0)
     {
@@ -58,7 +58,7 @@ Segment::GetALGOType(const char * type)
   // padded binary string.
   CodeString  codestring = strClear;
   std::string cs = codestring.GetAsString();
-  for (unsigned int i = 0; ALGOTypeStrings[i] != NULL; ++i)
+  for (unsigned int i = 0; ALGOTypeStrings[i] != nullptr; ++i)
   {
     if (strcmp(cs.c_str(), ALGOTypeStrings[i]) == 0)
     {

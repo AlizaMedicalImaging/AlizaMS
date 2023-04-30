@@ -49,7 +49,7 @@ namespace mdcm
 
 const char * PIStrings[] = {
   "UNKNOWN",  "MONOCHROME1 ", "MONOCHROME2 ",     "PALETTE COLOR ",   "RGB ",     "HSV ",     "ARGB", "CMYK",
-  "YBR_FULL", "YBR_FULL_422", "YBR_PARTIAL_422 ", "YBR_PARTIAL_420 ", "YBR_ICT ", "YBR_RCT ", NULL
+  "YBR_FULL", "YBR_FULL_422", "YBR_PARTIAL_422 ", "YBR_PARTIAL_420 ", "YBR_ICT ", "YBR_RCT ", nullptr
 };
 
 const char *
@@ -67,7 +67,7 @@ PhotometricInterpretation::GetPIType(const char * inputpi)
   CodeString   codestring = inputpi;
   CSComp       cs = codestring.GetAsString();
   const char * pi = cs.c_str();
-  for (unsigned int i = 1; PIStrings[i] != NULL; ++i)
+  for (unsigned int i = 1; PIStrings[i] != nullptr; ++i)
   {
     if (strcmp(pi, PIStrings[i]) == 0)
     {

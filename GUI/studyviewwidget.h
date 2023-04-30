@@ -89,9 +89,9 @@ private:
 	QIcon lockon;
 	QIcon lockoff;
 	bool horizontal;
-	int active_id;
-	int saved_r;
-	int saved_c;
+	int active_id{-1};
+	int saved_r{-1};
+	int saved_c{-1};
 	QShortcut * close_sc;
 #ifdef __APPLE__
 	QShortcut * minimaze_sc;

@@ -132,20 +132,13 @@ typedef QList<DPoint> ListOfDPoints;
 class Contour
 {
 public:
-	Contour()
-	:
-	id(-1), roiid(-1), vaoid(0), vboid(0), vao_initialized(false), type(0)
-	{
-		color.r = 0;
-		color.g = 0;
-		color.b = 0;
-	}
+	Contour() {}
 	~Contour() {}
-	int id;
-	int roiid;
-	quint32 vaoid; // have to be 32 bit (GLuint)
-	quint32 vboid; // have to be 32 bit (GLuint)
-	bool vao_initialized;
+	int id{-1};
+	int roiid{-1};
+	quint32 vaoid{}; // GLuint
+	quint32 vboid{}; // GLuint
+	bool vao_initialized{};
 	// type:
 	// 0 - not set
 	// 1 - CLOSED_PLANAR
@@ -153,8 +146,8 @@ public:
 	// 3 - OPEN_NONPLANAR
 	// 4 - POINT
 	// 5 - CLOSEDPLANAR_XOR
-	short type;
-	Contourcolor color;
+	short type{};
+	Contourcolor color{};
 	ListOfDPoints dpoints;
 	QStringList ref_sop_instance_uids;
 	QPainterPath path;
@@ -165,25 +158,15 @@ typedef QMultiMap<int,int> ContoursMap;
 class ROI
 {
 public:
-	ROI()
-	:
-	id(-1),
-	show(true),
-	random_color(false),
-	max_delta(0)
-	{
-		color.r = 0;
-		color.g = 0;
-		color.b = 0;
-	}
+	ROI() {}
 	~ROI() {}
-	int id;
-	bool show;
-	bool random_color;
-	double max_delta;
+	int id{-1};
+	bool show{true};
+	bool random_color{};
+	double max_delta{};
 	QString name;
 	QString interpreted_type;
-	ROIcolor color;
+	ROIcolor color{};
 	QString ref_frame_of_ref;
 	Contours contours;
 	ContoursMap map;
@@ -193,25 +176,16 @@ typedef QList<ROI> ROIs;
 class TriMesh
 {
 public:
-	TriMesh()
-	:
-	id(-1),
-	visible(true),
-	qmesh(NULL),
-	initialized(false),
-	max_delta(0),
-	R(0.9),
-	G(0.9),
-	B(0.9) {}
+	TriMesh() {}
 	~TriMesh() {}
-	int id;
-	bool visible;
-	qMeshData * qmesh;
-	bool initialized;
-	double max_delta;
-	double R;
-	double G;
-	double B;
+	int id{-1};
+	bool visible{true};
+	qMeshData * qmesh{};
+	bool initialized{};
+	double max_delta{};
+	double R{0.9};
+	double G{0.9};
+	double B{0.9};
 };
 typedef QMap<int, TriMesh*> TriMeshes;
 
@@ -228,12 +202,12 @@ typedef QMap<int, AnatomyDesc> AnatomyMap;
 class SegmentationInfo
 {
 public:
-	SegmentationInfo() : ref_segment_num(-1), R(0), G(0), B(0) {}
+	SegmentationInfo() {}
 	~SegmentationInfo() {}
-	int ref_segment_num;
-	int R;
-	int G;
-	int B;
+	int ref_segment_num{-1};
+	int R{};
+	int G{};
+	int B{};
 	QString label;
 };
 
@@ -242,17 +216,10 @@ class ImageSlice
 public:
 	ImageSlice()
 	{
-		v       = new float[12];
-		fv      = new float[12];
-		tc      = new float[12];
-		ipp_iop = new double[9];
-		for (unsigned int x = 0; x < 12; ++x)
-		{
-			v[x]  = 0.0f;
-			fv[x] = 0.0f;
-			tc[x] = 0.0f;
-		}
-		for (unsigned int x = 0; x < 9; ++x) ipp_iop[x] = 0.0;
+		v       = new float[12]{};
+		fv      = new float[12]{};
+		tc      = new float[12]{};
+		ipp_iop = new double[9]{};
 	}
 	~ImageSlice()
 	{
@@ -276,30 +243,21 @@ class SpectroscopySlice
 public:
 	SpectroscopySlice()
 	{
-		fvaoid  = 0;
-		fvboid  = 0;
-		lvaoid  = 0;
-		lvboid  = 0;
-		pvaoid  = 0;
-		pvboid  = 0;
-		fv = new float[12];
-		for (unsigned int x = 0; x < 12; ++x) fv[x] = 0.0f;
-		lsize = 0;
-		psize = 0;
+		fv = new float[12]{};
 	}
 	~SpectroscopySlice()
 	{
 		delete [] fv;
 	}
-	quint32 fvaoid;
-	quint32 fvboid;
-	quint32 lvaoid;
-	quint32 lvboid;
-	quint32 pvaoid;
-	quint32 pvboid;
+	quint32 fvaoid{};
+	quint32 fvboid{};
+	quint32 lvaoid{};
+	quint32 lvboid{};
+	quint32 pvaoid{};
+	quint32 pvboid{};
 	float * fv;
-	unsigned long lsize;
-	unsigned long psize;
+	unsigned long lsize{};
+	unsigned long psize{};
 	QString slice_orientation_string;
 };
 typedef std::vector<SpectroscopySlice*> SpectroscopySlicesVector;
@@ -377,64 +335,40 @@ public:
 class PRDisplayArea : public PresentationStateObj
 {
 public:
-	PRDisplayArea() :
-		top_left_x(-1),
-		top_left_y(-1),
-		bottom_right_x(-1),
-		bottom_right_y(-1) {}
+	PRDisplayArea() {}
 	virtual ~PRDisplayArea() {}
-	int top_left_x;
-	int top_left_y;
-	int bottom_right_x;
-	int bottom_right_y;
+	int top_left_x{-1};
+	int top_left_y{-1};
+	int bottom_right_x{-1};
+	int bottom_right_y{-1};
 };
 typedef QMap<int, PRDisplayArea> PRDisplayAreas;
 
 class PRTextAnnotation : public PresentationStateObj
 {
 public:
-	PRTextAnnotation() :
-		has_bb(false),
-		has_anchor(false),
-		has_textstyle(false),
-		bb_top_left_x(-1),
-		bb_top_left_y(-1),
-		bb_bottom_right_x(-1),
-		bb_bottom_right_y(-1),
-		anchor_x(-1),
-		anchor_y(-1),
-		ShadowOffsetX(0.0),
-		ShadowOffsetY(0.0),
-		ShadowOpacity(1.0),
-		TextColorCIELabValue_L(-1),
-		TextColorCIELabValue_a(-1),
-		TextColorCIELabValue_b(-1),
-		ShadowColorCIELabValue_L(-1),
-		ShadowColorCIELabValue_a(-1),
-		ShadowColorCIELabValue_b(-1),
-		CompoundGraphicInstanceID(-1),
-		GraphicGroupID(-1) {}
+	PRTextAnnotation() {}
 	virtual ~PRTextAnnotation() {}
-	bool    has_bb;
-	bool    has_anchor;
-	bool    has_textstyle;
-	double  bb_top_left_x;
-	double  bb_top_left_y;
-	double  bb_bottom_right_x;
-	double  bb_bottom_right_y;
-	double  anchor_x;
-	double  anchor_y;
-	double  ShadowOffsetX;
-	double  ShadowOffsetY;
-	double  ShadowOpacity;
-	int     TextColorCIELabValue_L;
-	int     TextColorCIELabValue_a;
-	int     TextColorCIELabValue_b;
-	int     ShadowColorCIELabValue_L;
-	int     ShadowColorCIELabValue_a;
-	int     ShadowColorCIELabValue_b;
-	int     CompoundGraphicInstanceID;
-	int     GraphicGroupID;
+	bool    has_bb{};
+	bool    has_anchor{};
+	bool    has_textstyle{};
+	double  bb_top_left_x{-1};
+	double  bb_top_left_y{-1};
+	double  bb_bottom_right_x{-1};
+	double  bb_bottom_right_y{-1};
+	double  anchor_x{-1};
+	double  anchor_y{-1};
+	double  ShadowOffsetX{};
+	double  ShadowOffsetY{};
+	double  ShadowOpacity{1.0};
+	int     TextColorCIELabValue_L{-1};
+	int     TextColorCIELabValue_a{-1};
+	int     TextColorCIELabValue_b{-1};
+	int     ShadowColorCIELabValue_L{-1};
+	int     ShadowColorCIELabValue_a{-1};
+	int     ShadowColorCIELabValue_b{-1};
+	int     CompoundGraphicInstanceID{-1};
+	int     GraphicGroupID{-1};
 	QString BoundingBoxAnnotationUnits;
 	QString AnchorPointAnnotationUnits;
 	QString UnformattedTextValue;
@@ -457,62 +391,34 @@ typedef QMap< int, QList<PRTextAnnotation > > PRTextAnnotations;
 class PRGraphicObject : public PresentationStateObj
 {
 public:
-	PRGraphicObject() :
-		NumberofGraphicPoints(0),
-		LinePatternOnColorCIELabValue_L(0),
-		LinePatternOnColorCIELabValue_a(0),
-		LinePatternOnColorCIELabValue_b(0),
-		LinePatternOffColorCIELabValue_L(0),
-		LinePatternOffColorCIELabValue_a(0),
-		LinePatternOffColorCIELabValue_b(0),
-		LinePatternOnOpacity(1.0),
-		LinePatternOffOpacity(1.0),
-		LineThickness(0.0),
-		LinePattern(1),
-		ShadowOffsetX(0.0),
-		ShadowOffsetY(0.0),
-		ShadowColorCIELabValue_L(0),
-		ShadowColorCIELabValue_a(0),
-		ShadowColorCIELabValue_b(0),
-		ShadowOpacity(1.0),
-		FillPatternOnColorCIELabValue_L(0),
-		FillPatternOnColorCIELabValue_a(0),
-		FillPatternOnColorCIELabValue_b(0),
-		FillPatternOffColorCIELabValue_L(0),
-		FillPatternOffColorCIELabValue_a(0),
-		FillPatternOffColorCIELabValue_b(0),
-		FillPatternOnOpacity(1.0),
-		FillPatternOffOpacity(1.0),
-		CompoundGraphicInstanceID(0),
-		GraphicGroupID(0) {}
-	virtual ~PRGraphicObject() {}
-	unsigned int NumberofGraphicPoints;
-	int LinePatternOnColorCIELabValue_L;
-	int LinePatternOnColorCIELabValue_a;
-	int LinePatternOnColorCIELabValue_b;
-	int LinePatternOffColorCIELabValue_L;
-	int LinePatternOffColorCIELabValue_a;
-	int LinePatternOffColorCIELabValue_b;
-	double LinePatternOnOpacity;
-	double LinePatternOffOpacity;
-	double LineThickness;
-	unsigned int LinePattern;
-	double ShadowOffsetX;
-	double ShadowOffsetY;
-	int ShadowColorCIELabValue_L;
-	int ShadowColorCIELabValue_a;
-	int ShadowColorCIELabValue_b;
-	double ShadowOpacity;
-	int FillPatternOnColorCIELabValue_L;
-	int FillPatternOnColorCIELabValue_a;
-	int FillPatternOnColorCIELabValue_b;
-	int FillPatternOffColorCIELabValue_L;
-	int FillPatternOffColorCIELabValue_a;
-	int FillPatternOffColorCIELabValue_b;
-	double FillPatternOnOpacity;
-	double FillPatternOffOpacity;
-	int CompoundGraphicInstanceID;
-	int GraphicGroupID;
+	PRGraphicObject() {}
+	unsigned int NumberofGraphicPoints{};
+	int LinePatternOnColorCIELabValue_L{};
+	int LinePatternOnColorCIELabValue_a{};
+	int LinePatternOnColorCIELabValue_b{};
+	int LinePatternOffColorCIELabValue_L{};
+	int LinePatternOffColorCIELabValue_a{};
+	int LinePatternOffColorCIELabValue_b{};
+	double LinePatternOnOpacity{1.0};
+	double LinePatternOffOpacity{1.0};
+	double LineThickness{};
+	unsigned int LinePattern{1};
+	double ShadowOffsetX{};
+	double ShadowOffsetY{};
+	int ShadowColorCIELabValue_L{};
+	int ShadowColorCIELabValue_a{};
+	int ShadowColorCIELabValue_b{};
+	double ShadowOpacity{1.0};
+	int FillPatternOnColorCIELabValue_L{};
+	int FillPatternOnColorCIELabValue_a{};
+	int FillPatternOnColorCIELabValue_b{};
+	int FillPatternOffColorCIELabValue_L{};
+	int FillPatternOffColorCIELabValue_a{};
+	int FillPatternOffColorCIELabValue_b{};
+	double FillPatternOnOpacity{1.0};
+	double FillPatternOffOpacity{1.0};
+	int CompoundGraphicInstanceID{};
+	int GraphicGroupID{};
 	QString GraphicType;
 	QString GraphicAnnotationUnits;
 	QString LineDashingStyle;
@@ -530,30 +436,19 @@ typedef QMap< int, QList<PRGraphicObject > > PRGraphicObjects;
 class PRDisplayShutter : public PresentationStateObj
 {
 public:
-	PRDisplayShutter() :
-		ShutterLeftVerticalEdge(-1),
-		ShutterRightVerticalEdge(-1),
-		ShutterUpperHorizontalEdge(-1),
-		ShutterLowerHorizontalEdge(-1),
-		CenterofCircularShutter_x(-1),
-		CenterofCircularShutter_y(-1),
-		RadiusofCircularShutter(-1),
-		ShutterPresentationValue(0),
-		ShutterPresentationColorCIELabValue_L(-1),
-		ShutterPresentationColorCIELabValue_a(-1),
-		ShutterPresentationColorCIELabValue_b(-1) {}
+	PRDisplayShutter() {}
 	virtual ~PRDisplayShutter() {}
-	int ShutterLeftVerticalEdge;
-	int ShutterRightVerticalEdge;
-	int ShutterUpperHorizontalEdge;
-	int ShutterLowerHorizontalEdge;
-	int CenterofCircularShutter_x;
-	int CenterofCircularShutter_y;
-	int RadiusofCircularShutter;
-	int ShutterPresentationValue;
-	int ShutterPresentationColorCIELabValue_L;
-	int ShutterPresentationColorCIELabValue_a;
-	int ShutterPresentationColorCIELabValue_b;
+	int ShutterLeftVerticalEdge{-1};
+	int ShutterRightVerticalEdge{-1};
+	int ShutterUpperHorizontalEdge{-1};
+	int ShutterLowerHorizontalEdge{-1};
+	int CenterofCircularShutter_x{-1};
+	int CenterofCircularShutter_y{-1};
+	int RadiusofCircularShutter{-1};
+	int ShutterPresentationValue{};
+	int ShutterPresentationColorCIELabValue_L{-1};
+	int ShutterPresentationColorCIELabValue_a{-1};
+	int ShutterPresentationColorCIELabValue_b{-1};
 	QString ShutterShape;
 	std::vector<int> VerticesofthePolygonalShutter;
 	bool operator==(const PRDisplayShutter & o) const
@@ -622,58 +517,89 @@ class DisplayInterface
 {
 public:
 	DisplayInterface(const int, const bool, bool, GLWidget*, int);
-	~DisplayInterface();
+	~DisplayInterface() {}
 	const int id;
-	int lookup_id;
-	int paint_id;
 	const bool opengl_ok;
 	bool skip_texture;
 	GLWidget * gl;
-	bool disable_int_level;
-	bool maxwindow;
-	short filtering;
-	bool transparency;
-	bool lock_2Dview;
-	bool lock_single;
-	bool lock_level2D;
-	quint32 cube_3dtex;
-	float origin[3];
-	bool  origin_ok;
-	short tex_info;
-	int idimx, idimy, idimz;
-	float ix_origin, iy_origin, iz_origin;
-	float dircos[6];
-	double ix_spacing, iy_spacing, iz_spacing;
-	int dimx, dimy;
-	double x_spacing, y_spacing;
-	double vmin, vmax;
-	double rmin, rmax;
-	int   supp_palette_subsciptor;
-	float center_x, center_y, center_z;
-	float default_center_x, default_center_y, default_center_z;
-	float slices_direction_x, slices_direction_y, slices_direction_z;
-	float up_direction_x, up_direction_y, up_direction_z;
-	short lut_function;
-	short default_lut_function;
-	double us_window_center, us_window_width;
-	double default_us_window_center, default_us_window_width;
-	double window_center, window_width;
-	bool slices_generated;
-	bool slices_from_dicom;
-	bool spectroscopy_generated;
-	bool hide_orientation;
-	short spectroscopy_ref;
 	short selected_lut;
-	int from_slice;
-	int to_slice;
-	int irect_index[2];
-	int irect_size[2];
-	int selected_x_slice;
-	int selected_y_slice;
-	int selected_z_slice;
-	double bb_x_min, bb_x_max, bb_y_min, bb_y_max;
-	unsigned short bits_allocated, bits_stored, high_bit;
-	double shift_tmp, scale_tmp;
+	int lookup_id{-1};
+	int paint_id{-1};
+	bool disable_int_level{};
+	bool maxwindow{};
+	short filtering{}; // 0 - no, 1 - "bilinear", 2 - "trilinear"
+	bool transparency{true};
+	bool lock_2Dview{};
+	bool lock_single{};
+	bool lock_level2D{true};
+	quint32 cube_3dtex{};
+	float origin[3]{};
+	bool origin_ok{};
+	short tex_info{-1};
+	int idimx{};
+	int idimy{};
+	int idimz{};
+	float ix_origin{};
+	float iy_origin{};
+	float iz_origin{};
+	float dircos[6]{};
+	double ix_spacing{};
+	double iy_spacing{};
+	double iz_spacing{};
+	int dimx{};
+	int dimy{};
+	double x_spacing{};
+	double y_spacing{};
+	double vmin{};
+	double vmax{};
+	double rmin{};
+	double rmax{};
+	float center_x{};
+	float center_y{};
+	float center_z{};
+	float default_center_x{};
+	float default_center_y{};
+	float default_center_z{};
+	float slices_direction_x{};
+	float slices_direction_y{};
+	float slices_direction_z{1.0f};
+	float up_direction_x{};
+	float up_direction_y{};
+	float up_direction_z{1.0f};
+	// -1 - not set,
+	// 0 - linear,
+	// 1 - linear_exact,
+	// 2 - sigmoid
+	short lut_function{-1};
+	short default_lut_function{-1};
+	double us_window_center{-999999.0};
+	double us_window_width{-999999.0};
+	double default_us_window_center{-999999.0};
+	double default_us_window_width{-999999.0};
+	double window_center{0.5};
+	double window_width{1.0};
+	bool slices_generated{};
+	bool slices_from_dicom{};
+	bool spectroscopy_generated{};
+	bool hide_orientation{true};
+	short spectroscopy_ref{};
+	int from_slice{};
+	int to_slice{};
+	int irect_index[2]{};
+	int irect_size[2]{};
+	int selected_x_slice{};
+	int selected_y_slice{};
+	int selected_z_slice{};
+	double bb_x_min{};
+	double bb_x_max{1.0};
+	double bb_y_min{};
+	double bb_y_max{1.0};
+	unsigned short bits_allocated{};
+	unsigned short bits_stored{};
+	unsigned short high_bit{};
+	double shift_tmp{};
+	double scale_tmp{1.0};
+	int supp_palette_subsciptor;
 	float R, G, B;
 	SlicesVector image_slices;
 	SpectroscopySlicesVector spectroscopy_slices;
@@ -685,10 +611,10 @@ public:
 class SRImage
 {
 public:
-	SRImage() : sx(1.0), sy(1.0), p(NULL) {}
-	double sx;
-	double sy;
-	unsigned char * p;
+	SRImage() {}
+	double sx{1.0};
+	double sy{1.0};
+	unsigned char * p{};
 	QImage i;
 	SRImage & operator=(const SRImage & j)
 	{
@@ -714,13 +640,18 @@ public:
 	ImageVariant(int, bool, bool, GLWidget*, int);
 	~ImageVariant();
 	const int id;
-	int group_id;
-	int instance_number;
-	short image_type;
-	bool equi;
-	bool one_direction;
-	unsigned int orientation;
-	bool iod_supported;
+	DisplayInterface * di;
+	int group_id{-1};
+	int instance_number{-1};
+	short image_type{-1};
+	bool equi{};
+	bool one_direction{};
+	unsigned int orientation{};
+	bool iod_supported{};
+	bool rescale_disabled{};
+	bool modified{};
+	bool ybr{};
+	bool dicom_pixel_signed{};
 	FrameTimes frame_times; // ms
 	QString imagetype;
 	QString study_uid;
@@ -755,7 +686,6 @@ public:
 	QString unit_str;
 	QString comment;
 	QString ioinfo;
-	DisplayInterface * di;
 	ImageOverlays image_overlays;
 	SOPInstanceUids image_instance_uids;
 	USRegions usregions;
@@ -770,10 +700,6 @@ public:
 	SegmentationInfo seg_info;
 	QPixmap icon;
 	QPixmap histogram;
-	bool rescale_disabled;
-	bool modified;
-	bool ybr;
-	bool dicom_pixel_signed;
 	//
 	ImageTypeSS ::Pointer pSS; //0
 	ImageTypeUS ::Pointer pUS; //1
@@ -809,10 +735,11 @@ public:
 class ImageVariant2D
 {
 public:
-	ImageVariant2D();
+	ImageVariant2D() {}
 	~ImageVariant2D();
-	short image_type;
-	unsigned int idimx, idimy;
+	short image_type{-1};
+	unsigned int idimx{};
+	unsigned int idimy{};
 	QString orientation_string;
 	QString laterality;
 	QString body_part;
@@ -842,45 +769,32 @@ public:
 	RGBAImage2DTypeUC::Pointer pUC_rgba;//24
 	RGBAImage2DTypeF ::Pointer pF_rgba; //25
 	RGBAImage2DTypeD ::Pointer pD_rgba; //26
-	//
 };
 
 class ImageContainer
 {
 public:
-	ImageContainer() :
-		axis(-1),
-		image3D(NULL),
-		image2D(NULL),
-		selected_x_slice_ext(-1),
-		selected_y_slice_ext(-1),
-		selected_z_slice_ext(-1),
-		us_window_center_ext(0.0),
-		us_window_width_ext(1e-6),
-		selected_lut_ext(0),
-		lut_function_ext(0),
-		level_locked_ext(true)
-	{}
+	ImageContainer() {}
 	~ImageContainer()
 	{
 		if (image2D)
 		{
 			delete image2D;
-			image2D = NULL;
+			image2D = nullptr;
 		}
-		image3D = NULL;
+		image3D = nullptr;
 	}
-	short            axis;
-	ImageVariant   * image3D;
-	ImageVariant2D * image2D;
-	int selected_x_slice_ext;
-	int selected_y_slice_ext;
-	int selected_z_slice_ext;
-	double us_window_center_ext;
-	double us_window_width_ext;
-	short selected_lut_ext;
-	short lut_function_ext;
-	bool  level_locked_ext;
+	short axis{-1};
+	ImageVariant * image3D{};
+	ImageVariant2D * image2D{};
+	int selected_x_slice_ext{-1};
+	int selected_y_slice_ext{-1};
+	int selected_z_slice_ext{-1};
+	double us_window_center_ext{};
+	double us_window_width_ext{1e-6};
+	short selected_lut_ext{};
+	short lut_function_ext{};
+	bool  level_locked_ext{true};
 	QString orientation_20_20;
 };
 

@@ -41,7 +41,7 @@ class SmartPointer
 {
 public:
   SmartPointer()
-    : Pointer(NULL)
+    : Pointer(nullptr)
   {}
 
   SmartPointer(const SmartPointer<ObjectType> & p)
@@ -65,7 +65,7 @@ public:
   ~SmartPointer()
   {
     UnRegister();
-    Pointer = NULL;
+    Pointer = nullptr;
   }
 
   // Overload operator ->

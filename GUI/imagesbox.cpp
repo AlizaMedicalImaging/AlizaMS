@@ -16,8 +16,8 @@ ListWidgetItem2::ListWidgetItem2(QListWidget * p, int t)
 	: QListWidgetItem(p, t)
 {
 	id = -1;
-	ivariant = NULL;
-	setFlags(flags()|Qt::ItemIsUserCheckable);
+	ivariant = nullptr;
+	setFlags(flags() | Qt::ItemIsUserCheckable);
 	setCheckState(Qt::Unchecked);
 }
 
@@ -28,8 +28,8 @@ ListWidgetItem2::ListWidgetItem2(
 	: QListWidgetItem(p, t)
 {
 	id = -1;
-	ivariant = NULL;
-	setFlags(flags()|Qt::ItemIsUserCheckable);
+	ivariant = nullptr;
+	setFlags(flags() | Qt::ItemIsUserCheckable);
 	setCheckState(Qt::Unchecked);
 }
 
@@ -41,8 +41,8 @@ ListWidgetItem2::ListWidgetItem2(
 	: QListWidgetItem(p, t)
 {
 	id = -1;
-	ivariant = NULL;
-	setFlags(flags()|Qt::ItemIsUserCheckable);
+	ivariant = nullptr;
+	setFlags(flags() | Qt::ItemIsUserCheckable);
 	setCheckState(Qt::Unchecked);
 }
 
@@ -55,7 +55,7 @@ ListWidgetItem2::ListWidgetItem2(
 	:
 	QListWidgetItem(p, t), id(id_), ivariant(v)
 {
-	setFlags(flags()|Qt::ItemIsUserCheckable);
+	setFlags(flags() | Qt::ItemIsUserCheckable);
 	setCheckState(Qt::Unchecked);
 }
 
@@ -67,7 +67,7 @@ ListWidgetItem2::ListWidgetItem2(
 	:
 	QListWidgetItem(p, t), id(id_), ivariant(v)
 {
-	setFlags(flags()|Qt::ItemIsUserCheckable);
+	setFlags(flags() | Qt::ItemIsUserCheckable);
 	setCheckState(Qt::Unchecked);
 }
 

@@ -101,7 +101,7 @@ FileMetaInformation::SetImplementationVersionName(const char * version)
   }
   else
   {
-    mdcmAlwaysWarnMacro("Failed SetImplementationVersionName, NULL or > 16"); 
+    mdcmAlwaysWarnMacro("Failed SetImplementationVersionName, null or > 16");
   }
 }
 
@@ -380,7 +380,7 @@ ReadExplicitDataElement(std::istream & is, ExplicitDataElement & de)
     vl.template Read16<TSwap>(is);
   }
   // Read the Value
-  ByteValue * bv = NULL;
+  ByteValue * bv = nullptr;
   if (vr == VR::SQ)
   {
     assert(0 && "Should not happen");
@@ -406,7 +406,7 @@ ReadExplicitDataElement(std::istream & is, ExplicitDataElement & de)
   de.SetTag(t);
   de.SetVR(vr);
   de.SetVL(vl);
-  // TODO There should be a way to set the Value to the NULL pointer.
+  // TODO There should be a way to set the Value to the nullptr pointer.
   de.SetValue(*bv);
   return true;
 }

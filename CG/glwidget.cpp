@@ -54,41 +54,10 @@ using namespace Vectormath::Scalar;
 using namespace Vectormath::SSE;
 #endif
 
-// For the last argument of 'glVertexAttribPointer'
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
-
 ShaderObj::ShaderObj()
 {
-	program = 0;
-	vshader = 0;
-	fshader = 0;
-	position_handle = 0;
-	normal_handle = 0;
-	tangent_handle = 0;
-	random_handle = 0;
-	color_handle = 0;
-	time_handle = 0;
-	velocity_handle = 0;
-	location_mvp = 0;
-	location_mv = 0;
-	location_modeling = 0;
-	location_modeling_inv_t = 0;
-	location_K = 0;
-	location_shininess = 0;
-	location_mparams = 0;
-	location_fparams = 0;
-	location_sparams = 0;
-	location_iparams = 0;
-	location_coparams = 0;
-	location_pparams = 0;
-	texture_handle   = new GLuint[TEXTURES_SIZE];
-	location_sampler = new GLuint[TEXTURES_SIZE];
-	for (int x = 0; x < TEXTURES_SIZE; ++x)
-	{
-		texture_handle[x] = 0;
-		location_sampler[x] = 0;
-	}
+	texture_handle   = new GLuint[TEXTURES_SIZE]{};
+	location_sampler = new GLuint[TEXTURES_SIZE]{};
 }
 
 ShaderObj::~ShaderObj()
@@ -97,29 +66,14 @@ ShaderObj::~ShaderObj()
 	delete [] location_sampler;
 }
 
-qMeshData::qMeshData() : shader(NULL)
+qMeshData::qMeshData()
 {
-	K            = new float[12];
-	shininess    = 0.0f;
-	faces_size   = 0;
-	vboid        = new GLuint[VBOIDS_SIZE];
-	vaoid        = 0;
-	get_shadows  = new int[CAMERA_MAX_SHADOWS];
-	cast_shadows = new int[CAMERA_MAX_SHADOWS];
-	textures     = new GLuint[TEXTURES_SIZE];
-	tex_units    = new GLuint[TEXTURES_SIZE];
-	for (int x = 0; x < 12; ++x) K[x] = 0;
-	for (int x = 0; x < VBOIDS_SIZE; ++x) vboid[x] = 0;
-	for (int x = 0; x < CAMERA_MAX_SHADOWS; ++x)
-	{
-		get_shadows[x] = 0;
-		cast_shadows[x] = 0;
-	}
-	for (int x = 0; x < TEXTURES_SIZE; ++x)
-	{
-		textures[x] = 0;
-		tex_units[x] = 0;
-	}
+	K            = new float[12]{};
+	vboid        = new GLuint[VBOIDS_SIZE]{};
+	get_shadows  = new int[CAMERA_MAX_SHADOWS]{};
+	cast_shadows = new int[CAMERA_MAX_SHADOWS]{};
+	textures     = new GLuint[TEXTURES_SIZE]{};
+	tex_units    = new GLuint[TEXTURES_SIZE]{};
 }
 
 qMeshData::~qMeshData()
@@ -132,7 +86,7 @@ qMeshData::~qMeshData()
 	delete [] tex_units;
 }
 
-CollisionObject::CollisionObject() : collision_object(NULL), id(0), shape(NULL), mesh_data(NULL) {}
+CollisionObject::CollisionObject() : collision_object(nullptr), id(0), shape(nullptr), mesh_data(nullptr) {}
 
 CollisionObject::~CollisionObject() {}
 
@@ -179,10 +133,10 @@ qMeshData * CollisionObject::get_mesh_data()
 namespace
 {
 
-static QList<ImageVariant*> * selected_images__ = NULL;
+static QList<ImageVariant*> * selected_images__ = nullptr;
 static long long GLWidget_count_vbos = 0;
-static bool GLWidget_max_vbos_65535  = false;
-static const float color_cube[6]    = {0.1f, 0.1f, 0.1f, 0.2f, 0.2f, 0.2f};
+static bool GLWidget_max_vbos_65535 = false;
+static const float color_cube[6] = {0.1f, 0.1f, 0.1f, 0.2f, 0.2f, 0.2f};
 static const float color_letters[6] = {0.5f, 0.5f, 0.5f, 0.8f, 0.8f, 0.8f};
 static std::vector<ShaderObj*> shaders;
 static std::vector<GLuint*>    vboids; // size 2
@@ -258,6 +212,7 @@ GLWidget::GLWidget()
 	//setAttribute(Qt::WA_OpaquePaintEvent);
 	setMinimumSize(64, 64);
 	setFocusPolicy(Qt::WheelFocus);
+	camera = new Camera;
 	init_();
 }
 #else
@@ -265,6 +220,7 @@ GLWidget::GLWidget()
 {
 	setMinimumSize(64, 64);
 	setFocusPolicy(Qt::WheelFocus);
+	camera = new Camera;
 	init_();
 }
 
@@ -272,6 +228,7 @@ GLWidget::GLWidget(const QGLFormat & frm) : QGLWidget(frm)
 {
 	setMinimumSize(64, 64);
 	setFocusPolicy(Qt::WheelFocus);
+	camera = new Camera;
 	init_();
 }
 #endif
@@ -285,7 +242,7 @@ void GLWidget::initializeGL()
 		opengl_init_done = true;
 		disable_gl_in_settings();
 		emit opengl3_not_available();
-		std::cout << "OpenGL context is NULL " << std::endl;
+		std::cout << "OpenGL context is nullptr " << std::endl;
 		return;
 	}
 	if (!c->isValid())
@@ -336,7 +293,7 @@ void GLWidget::initializeGL()
 		opengl_init_done = true;
 		disable_gl_in_settings();
 		emit opengl3_not_available();
-		std::cout << "OpenGL context is NULL " << std::endl;
+		std::cout << "OpenGL context is nullptr " << std::endl;
 		return;
 	}
 	if (!c->isValid())
@@ -651,11 +608,11 @@ void GLWidget::get_screen(bool white_bg)
 	saved_dir = CommonUtils::get_screenshot_dir();
 	d = CommonUtils::get_screenshot_name(saved_dir);
 	f = QFileDialog::getSaveFileName(
-		NULL,
+		nullptr,
 		QString("Save PNG file"),
 		d,
 		QString("All Files (*)"),
-		(QString*)NULL
+		nullptr
 		//, QFileDialog::DontUseNativeDialog
 		);
 	if (f.isEmpty()) goto quit__;
@@ -695,6 +652,10 @@ void GLWidget::set_contours_width(float f)
 }
 #endif
 
+// Initialization is intentionally done here to
+// keep the the function re-entrant. Currently
+// it not required, init_() and close_() run once,
+// but it is potentially useful.
 void GLWidget::init_()
 {
 	skip_draw = false;
@@ -728,6 +689,9 @@ void GLWidget::init_()
 	c3d_shader_gradient_sigm.program = 0;
 	c3d_shader_bb_sigm.program = 0;
 	c3d_shader_gradient_bb_sigm.program = 0;
+	//
+	// Should be always pushed into 'vboids' to free
+	// in close_(), initialization is not required.
 	c3d_shader_clamp_vbo = new GLuint[2];
 	c3d_shader_gradient_clamp_vbo = new GLuint[2];
 	c3d_shader_bb_clamp_vbo = new GLuint[2];
@@ -745,6 +709,7 @@ void GLWidget::init_()
 	c3d_shader_bb_sigm_vbo = new GLuint[2];
 	c3d_shader_gradient_bb_sigm_vbo = new GLuint[2];
 	raycastcube0 = new GLuint[2];
+	//
 	raycastcube0_vao = 0;
 	raycast_shader_vao = 0;
 	raycast_color_shader_vao = 0;
@@ -780,34 +745,34 @@ void GLWidget::init_()
 	win_h = 0;
 	view = 0;
 	axis = 2;
-	gradient1  = 0;
-	gradient2  = 0;
-	gradient3  = 0;
-	gradient4  = 0;
-	gradient5  = 0;
-	gradient6  = 0;
-	gradient7  = 0;
+	gradient1 = 0;
+	gradient2 = 0;
+	gradient3 = 0;
+	gradient4 = 0;
+	gradient5 = 0;
+	gradient6 = 0;
+	gradient7 = 0;
 	x_rotation = 0;
 	y_rotation = 0;
 	z_rotation = 0;
-	ortho_size  = SCENE_ORTHO_SIZE;
+	ortho_size = SCENE_ORTHO_SIZE;
 	ortho_proj = true;
 	position_z = SCENE_POS_Z;
-	fov        = SCENE_FOV;
-	far_plane  = SCENE_FAR_PLANE;
+	fov = SCENE_FOV;
+	far_plane = SCENE_FAR_PLANE;
 	alpha = SCENE_ALPHA;
 	brightness = 1.0f;
-	m_collisionWorld = NULL;
+	m_collisionWorld = nullptr;
 	draw_frames_3d = false;
 	display_contours = true;
 	m_left = 0;
 	m_right = 0;
 	m_forw = 0;
 	m_back = 0;
-	old_win_pos_x  = 0;
-	old_win_pos_y  = 0;
-	new_win_pos_x  = 0;
-	new_win_pos_y  = 0;
+	old_win_pos_x = 0;
+	old_win_pos_y = 0;
+	new_win_pos_x = 0;
+	new_win_pos_y = 0;
 	rect_selection = false;
 	show_cube = true;
 	wireframe = false;
@@ -832,19 +797,18 @@ void GLWidget::init_()
 	cubebuffer = 0;
 	cube_tex = 0;
 	cube_depth = 0;
-	cube = NULL;
-	letters = NULL;
-	letteri = NULL;
-	lettera = NULL;
-	letterp = NULL;
-	letterr = NULL;
-	letterl = NULL;
-	pan_x  = 0;
-	pan_y  = 0;
+	cube = nullptr;
+	letters = nullptr;
+	letteri = nullptr;
+	lettera = nullptr;
+	letterp = nullptr;
+	letterr = nullptr;
+	letterl = nullptr;
+	pan_x = 0;
+	pan_y = 0;
 	clear_color_r = 0.9f;
 	clear_color_g = 0.9f;
 	clear_color_b = 0.9f;
-	camera = new Camera;
 }
 
 GLWidget::~GLWidget()
@@ -882,7 +846,7 @@ void GLWidget::close_()
 		if (qmeshes.at(x))
 		{
 			delete qmeshes[x];
-			qmeshes[x] = NULL;
+			qmeshes[x] = nullptr;
 		}
 	}
 	qmeshes.clear();
@@ -893,7 +857,7 @@ void GLWidget::close_()
 		if (vboids.at(x))
 		{
 			delete[] vboids[x];
-			vboids[x] = NULL;
+			vboids[x] = nullptr;
 		}
 	}
 	vboids.clear();
@@ -1289,7 +1253,7 @@ void GLWidget::init_opengl(int w, int h)
 	sphere0_shader.location_shininess      = glGetUniformLocation(sphere0_shader.program, "shininess");
 	sphere0_shader.location_mvp            = glGetUniformLocation(sphere0_shader.program, "mvp");
 	sphere0_shader.location_modeling       = glGetUniformLocation(sphere0_shader.program, "modeling");
-	sphere0_shader.location_modeling_inv_t = glGetUniformLocation(sphere0_shader.program, "modeling_inv_t");
+	sphere0_shader.location_modeling_inv = glGetUniformLocation(sphere0_shader.program, "modeling_inv_t");
 	sphere0_shader.location_sparams        = glGetUniformLocation(sphere0_shader.program, "sparams");
 	sphere0_shader.location_sampler[0]     = glGetUniformLocation(sphere0_shader.program, "sampler0");
 	sphere0_shader.location_sampler[1]     = glGetUniformLocation(sphere0_shader.program, "sampler1");
@@ -1302,7 +1266,7 @@ void GLWidget::init_opengl(int w, int h)
 	color_shader.location_shininess      = glGetUniformLocation(color_shader.program, "shininess");
 	color_shader.location_mvp            = glGetUniformLocation(color_shader.program, "mvp");
 	color_shader.location_modeling       = glGetUniformLocation(color_shader.program, "modeling");
-	color_shader.location_modeling_inv_t = glGetUniformLocation(color_shader.program, "modeling_inv_t");
+	color_shader.location_modeling_inv = glGetUniformLocation(color_shader.program, "modeling_inv_t");
 	color_shader.location_sparams        = glGetUniformLocation(color_shader.program, "sparams");
 	shaders.push_back(&color_shader);
 	*/
@@ -1345,7 +1309,7 @@ void GLWidget::init_opengl(int w, int h)
 		glGenBuffers(1, &frames_vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, frames_vbo);
 		glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
-		glVertexAttribPointer(frame_shader.position_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(frame_shader.position_handle, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 		glEnableVertexAttribArray(frame_shader.position_handle);
 		glBindVertexArray(0);
 		increment_count_vbos(1);
@@ -1355,7 +1319,7 @@ void GLWidget::init_opengl(int w, int h)
 		glGenBuffers(1, &origin_vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, origin_vbo);
 		glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(GLfloat), tmp99, GL_DYNAMIC_DRAW);
-		glVertexAttribPointer(frame_shader.position_handle, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(frame_shader.position_handle, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 		glEnableVertexAttribArray(frame_shader.position_handle);
 		glBindVertexArray(0);
 		increment_count_vbos(1);
@@ -1513,12 +1477,12 @@ void GLWidget::init_opengl(int w, int h)
 		&vaoid000,
 		&(orientcube_shader.position_handle),
 		&(orientcube_shader.normal_handle),
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 		p_vertices_cube,
 		p_normals_cube,
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 		p_faces_cube,
 		faces_size_cube,
 		GL_STATIC_DRAW,
@@ -1538,12 +1502,12 @@ void GLWidget::init_opengl(int w, int h)
 		&vaoid001,
 		&(orientcube_shader.position_handle),
 		&(orientcube_shader.normal_handle),
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 		p_vertices_letters,
 		p_normals_letters,
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 		p_faces_letters,
 		faces_size_letters,
 		GL_STATIC_DRAW,
@@ -1563,12 +1527,12 @@ void GLWidget::init_opengl(int w, int h)
 		&vaoid002,
 		&(orientcube_shader.position_handle),
 		&(orientcube_shader.normal_handle),
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 		p_vertices_letteri,
 		p_normals_letteri,
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 		p_faces_letteri,
 		faces_size_letteri,
 		GL_STATIC_DRAW,
@@ -1588,12 +1552,12 @@ void GLWidget::init_opengl(int w, int h)
 		&vaoid003,
 		&(orientcube_shader.position_handle),
 		&(orientcube_shader.normal_handle),
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 		p_vertices_lettera,
 		p_normals_lettera,
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 		p_faces_lettera,
 		faces_size_lettera,
 		GL_STATIC_DRAW,
@@ -1613,12 +1577,12 @@ void GLWidget::init_opengl(int w, int h)
 		&vaoid004,
 		&(orientcube_shader.position_handle),
 		&(orientcube_shader.normal_handle),
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 		p_vertices_letterp,
 		p_normals_letterp,
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 		p_faces_letterp,
 		faces_size_letterp,
 		GL_STATIC_DRAW,
@@ -1638,12 +1602,12 @@ void GLWidget::init_opengl(int w, int h)
 		&vaoid005,
 		&(orientcube_shader.position_handle),
 		&(orientcube_shader.normal_handle),
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 		p_vertices_letterr,
 		p_normals_letterr,
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 		p_faces_letterr,
 		faces_size_letterr,
 		GL_STATIC_DRAW,
@@ -1663,12 +1627,12 @@ void GLWidget::init_opengl(int w, int h)
 		&vaoid006,
 		&(orientcube_shader.position_handle),
 		&(orientcube_shader.normal_handle),
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 		p_vertices_letterl,
 		p_normals_letterl,
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 		p_faces_letterl,
 		faces_size_letterl,
 		GL_STATIC_DRAW,
@@ -2255,18 +2219,18 @@ void GLWidget::paint_volume()
 				if (tm && tm->initialized && tm->visible && tm->qmesh)
 				{
 					d_mesh(tm->qmesh,
-						NULL,
-						NULL,
+						nullptr,
+						nullptr,
 						mvp_aos_ptr,
-						NULL,
-						NULL,
-						NULL,
-						NULL,
-						NULL,
-						NULL,
-						NULL,
+						nullptr,
+						nullptr,
+						nullptr,
+						nullptr,
+						nullptr,
+						nullptr,
+						nullptr,
 						sparams,
-						NULL);
+						nullptr);
 				}
 				++mi;
 			}
@@ -3131,97 +3095,97 @@ void GLWidget::render_orient_cube1(
 	glUseProgram(orientcube_shader.program);
 	glUniform3fv(orientcube_shader.location_K, 2, color_cube);
 	d_orientcube(cube,
-				 NULL,
-				 NULL,
+				 nullptr,
+				 nullptr,
 				 mvp_cube_aos_ptr,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
 				 sparams,
-				 NULL);
+				 nullptr);
 	glUniform3fv(orientcube_shader.location_K, 2, color_letters);
 	d_orientcube(letters,
-				 NULL,
-				 NULL,
+				 nullptr,
+				 nullptr,
 				 mvp_cube_aos_ptr,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
 				 sparams,
-				 NULL);
+				 nullptr);
 	d_orientcube(letteri,
-				 NULL,
-				 NULL,
+				 nullptr,
+				 nullptr,
 				 mvp_cube_aos_ptr,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
 				 sparams,
-				 NULL);
+				 nullptr);
 	d_orientcube(lettera,
-				 NULL,
-				 NULL,
+				 nullptr,
+				 nullptr,
 				 mvp_cube_aos_ptr,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
 				 sparams,
-				 NULL);
+				 nullptr);
 	d_orientcube(letterp,
-				 NULL,
-				 NULL,
+				 nullptr,
+				 nullptr,
 				 mvp_cube_aos_ptr,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
 				 sparams,
-				 NULL);
+				 nullptr);
 	d_orientcube(letterr,
-				 NULL,
-				 NULL,
+				 nullptr,
+				 nullptr,
 				 mvp_cube_aos_ptr,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
 				 sparams,
-				 NULL);
+				 nullptr);
 	d_orientcube(letterl,
-				 NULL,
-				 NULL,
+				 nullptr,
+				 nullptr,
 				 mvp_cube_aos_ptr,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
+				 nullptr,
 				 sparams,
-				 NULL);
+				 nullptr);
 	//
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebufferObject());
@@ -3357,23 +3321,18 @@ void GLWidget::generate_vao1(GLuint * vao, GLuint * vbo, GLuint * attr_v, GLuint
 	*vao = 0;
 	vbo[0] = 0;
 	vbo[1] = 0;
-	GLfloat * v = new GLfloat[12];
-	GLfloat * t = new GLfloat[12];
-	for (int x = 0; x < 12; ++x)
-	{
-		v[x] = 0.0f;
-		t[x] = 0.0f;
-	}
+	GLfloat * v = new GLfloat[12]{};
+	GLfloat * t = new GLfloat[12]{};
 	glGenVertexArrays(1, vao);
 	glBindVertexArray(*vao);
 	glGenBuffers(2, vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
 	glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), v, GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(*attr_v, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(*attr_v, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	glEnableVertexAttribArray(*attr_v);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
 	glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), t, GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(*attr_t, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(*attr_t, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	glEnableVertexAttribArray(*attr_t);
 	glBindVertexArray(0);
 	increment_count_vbos(2);
@@ -3390,23 +3349,18 @@ void GLWidget::generate_raycastcube_vao(
 	*vao = 0;
 	vbo[0] = 0;
 	vbo[1] = 0;
-	GLfloat * v = new GLfloat[54];
-	GLfloat * c = new GLfloat[54];
-	for (int x  = 0; x < 54; ++x)
-	{
-		v[x] = 0.0f;
-		c[x] = 0.0f;
-	}
+	GLfloat * v = new GLfloat[54]{};
+	GLfloat * c = new GLfloat[54]{};
 	glGenVertexArrays(1, vao);
 	glBindVertexArray(*vao);
 	glGenBuffers(2, vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
 	glBufferData(GL_ARRAY_BUFFER, 54 * sizeof(GLfloat), v, GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(*attr_v, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(*attr_v, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	glEnableVertexAttribArray(*attr_v);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
 	glBufferData(GL_ARRAY_BUFFER, 54 * sizeof(GLfloat), c, GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(*attr_c, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(*attr_c, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	glEnableVertexAttribArray(*attr_c);
 	glBindVertexArray(0);
 	increment_count_vbos(2);
@@ -3425,7 +3379,7 @@ void GLWidget::generate_raycast_shader_vao(
 	glGenVertexArrays(1, &(vao[0]));
 	glBindVertexArray(vao[0]);
 	glBindBuffer(GL_ARRAY_BUFFER, *vbo0);
-	glVertexAttribPointer(*attr_v, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(*attr_v, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	glEnableVertexAttribArray(*attr_v);
 	glBindVertexArray(0);
 }
@@ -3781,7 +3735,7 @@ GLuint GLWidget::load_shader(GLenum shaderType, const char * pSource)
 	GLuint shader = glCreateShader(shaderType);
 	if (shader)
 	{
-		glShaderSource(shader, 1, &pSource, NULL);
+		glShaderSource(shader, 1, &pSource, nullptr);
 		glCompileShader(shader);
 		GLint compiled = 0;
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
@@ -3799,11 +3753,11 @@ GLuint GLWidget::load_shader(GLenum shaderType, const char * pSource)
 				}
 				catch (const std::bad_alloc&)
 				{
-					buf = NULL;
+					buf = nullptr;
 				}
 				if (buf)
 				{
-					glGetShaderInfoLog(shader, infoLen, NULL, buf);
+					glGetShaderInfoLog(shader, infoLen, nullptr, buf);
 					const int shaderType_int = static_cast<int>(shaderType);
 					switch (shaderType_int)
 					{
@@ -3863,11 +3817,11 @@ bool GLWidget::create_program(
 				}
 				catch (const std::bad_alloc&)
 				{
-					buf = NULL;
+					buf = nullptr;
 				}
 				if (buf)
 				{
-					glGetProgramInfoLog(program, bufLength, NULL, buf);
+					glGetProgramInfoLog(program, bufLength, nullptr, buf);
 					std::cout << "Could not link program" << std::endl;
 #ifdef ALWAYS_SHOW_GL_ERROR
 					std::cout << buf << "\n" << vertex << "\n" << fragment << std::endl;
@@ -3952,7 +3906,7 @@ void GLWidget::makeModelVBO_ArraysT(
 	{
 		return;
 	}
-	float * n  = NULL;
+	float * n  = nullptr;
 	if (normals)
 	{
 		try
@@ -3965,7 +3919,7 @@ void GLWidget::makeModelVBO_ArraysT(
 			return;
 		}
 	}
-	float * t  = NULL;
+	float * t  = nullptr;
 	if (tex)
 	{
 		try
@@ -3979,7 +3933,7 @@ void GLWidget::makeModelVBO_ArraysT(
 			return;
 		}
 	}
-	float * ta = NULL;
+	float * ta = nullptr;
 	if (tangents)
 	{
 		try
@@ -4087,27 +4041,27 @@ void GLWidget::makeModelVBO_ArraysT(
 	glGenBuffers(count_buffers, vboid);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid[0]);
 	glBufferData(GL_ARRAY_BUFFER, (faces_size / 12) * 9 * sizeof(float), v, usage);
-	glVertexAttribPointer(*v_attr, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(*v_attr, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	glEnableVertexAttribArray(*v_attr);
 	if (normals)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vboid[1]);
 		glBufferData(GL_ARRAY_BUFFER, (faces_size / 12) * 9 * sizeof(float), n, usage);
-		glVertexAttribPointer(*n_attr, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(*n_attr, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 		glEnableVertexAttribArray(*n_attr);
 	}
 	if (tex)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vboid[2]);
 		glBufferData(GL_ARRAY_BUFFER, (faces_size / 12 ) * 9 * sizeof(float), t, usage);
-		glVertexAttribPointer(*t_attr, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(*t_attr, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 		glEnableVertexAttribArray(*t_attr);
 	}
 	if (tangents)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vboid[3]);
 		glBufferData(GL_ARRAY_BUFFER, (faces_size / 12) * 9 * sizeof(float), ta, usage);
-		glVertexAttribPointer(*ta_attr, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(*ta_attr, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 		glEnableVertexAttribArray(*ta_attr);
 	}
 	glBindVertexArray(0);
@@ -4154,7 +4108,7 @@ void GLWidget::generate_screen_quad(GLuint * vbo, GLuint * vao, GLuint * attr)
 	glGenBuffers(1, vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, *vbo);
 	glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), v, GL_STATIC_DRAW);
-	glVertexAttribPointer(*attr, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(*attr, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 	glEnableVertexAttribArray(*attr);
 	glBindVertexArray(0);
 	increment_count_vbos(1);
@@ -4202,14 +4156,14 @@ bool GLWidget::create_fbos0(
 				0,
 				GL_DEPTH_COMPONENT,
 				GL_UNSIGNED_INT,
-				NULL);
+				nullptr);
 	glGenTextures(1, color_texture);
 	glBindTexture(target, *color_texture );
 	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(target, 0, format, w, h, 0, format, type, NULL);
+	glTexImage2D(target, 0, format, w, h, 0, format, type, nullptr);
 	glGenFramebuffers(1, fb);
 	glBindFramebuffer(GL_FRAMEBUFFER, *fb);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target, *color_texture, 0);
@@ -4275,7 +4229,7 @@ bool GLWidget::create_fbos1(
 	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(target, 0, format, w, h, 0, format, type, NULL);
+	glTexImage2D(target, 0, format, w, h, 0, format, type, nullptr);
 	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target, *color_texture, 0);
 	bool ok = false;
 	switch (glCheckFramebufferStatus(GL_FRAMEBUFFER))
@@ -6970,8 +6924,6 @@ void GLWidget::disable_gl_in_settings()
 	settings.sync();
 #endif
 }
-
-#pragma GCC diagnostic pop
 
 #ifdef ALWAYS_SHOW_GL_ERROR
 #undef ALWAYS_SHOW_GL_ERROR

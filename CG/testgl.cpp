@@ -6,9 +6,7 @@
 
 TestGL::TestGL()
 {
-	no_opengl3 = true;
-	opengl_init_done = false;
-	setMinimumSize(128,128);
+	setMinimumSize(128, 128);
 }
 
 void TestGL::initializeGL()

@@ -23,11 +23,9 @@
 #include "dicomutils.h"
 #include "codecutils.h"
 
-SettingsWidget::SettingsWidget(float si)
+SettingsWidget::SettingsWidget(float si) : scale_icons(si)
 {
 	setupUi(this);
-	saved_idx = 0;
-	scale_icons = si;
 	x_comboBox->addItem(QString("256"));
 	x_comboBox->addItem(QString("128"));
 	x_comboBox->addItem(QString("64"));

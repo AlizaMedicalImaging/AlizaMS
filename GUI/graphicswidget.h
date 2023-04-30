@@ -48,8 +48,8 @@ public:
 	void start_animation();
 	void stop_animation();
 	GraphicsView * graphicsview;
-	ToolBox2D    * toolbox2D;
-	SliderWidget * slider_m;
+	ToolBox2D    * toolbox2D{};
+	SliderWidget * slider_m{};
 	std::vector<QThread*> threadsLUT_;
 	void set_slice_2D(
 		ImageVariant*,
@@ -75,7 +75,7 @@ public:
 		const QMap< int, QString> &);
 	void  set_bb(bool);
 	bool  get_bb() const;
-	bool  run__;
+	bool  run__{};
 	void  update_selection_rectangle();
 	void  update_pr_area();
 	void  update_selection_item();
@@ -127,28 +127,28 @@ protected:
 
 private:
 	short  axis;
-	bool   main;
-	bool   multi;
-	bool   bb;
-	bool   smooth_;
-	bool   gl;
-	short  mouse_modus;
-	bool   enable_shutter;
-	bool   enable_overlays;
-	int    frame_time_unit;
-	int    frametime_2D;
-	double contours_width;
+	bool   main{};
+	bool   multi{};
+	bool   bb{};
+	bool   smooth_{true};
+	bool   gl{};
+	short  mouse_modus{};
+	bool   enable_shutter{true};
+	bool   enable_overlays{true};
+	int    frame_time_unit{}; // 0 - ms; 1 - s
+	int    frametime_2D{120};
+	double contours_width{};
 	mutable     QMutex mutex;
 	QTimer    * anim2D_timer;
 	QLabel    * top_label;
 	QLabel    * left_label;
 	QLabel    * measure_label;
 	QLineEdit * info_line;
-	Aliza     * aliza;
+	Aliza     * aliza{};
 	QWidget * single_frame_ptr;
 	QWidget * multi_frame_ptr;
-	bool alt_mode;
-	bool show_cursor;
+	bool alt_mode{};
+	bool show_cursor{};
 };
 
 #endif

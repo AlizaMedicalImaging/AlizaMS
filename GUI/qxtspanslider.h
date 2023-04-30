@@ -31,117 +31,117 @@ template <typename PUB>
 class QxtPrivate
 {
 public:
-    virtual ~QxtPrivate()
-    {}
-    inline void QXT_setPublic(PUB* pub)
-    {
-        qxt_p_ptr = pub;
-    }
+	virtual ~QxtPrivate()
+	{}
+	inline void QXT_setPublic(PUB* pub)
+	{
+		qxt_p_ptr = pub;
+	}
 
 protected:
-    inline PUB& qxt_p()
-    {
-        return *qxt_p_ptr;
-    }
-    inline const PUB& qxt_p() const
-    {
-        return *qxt_p_ptr;
-    }
+	inline PUB& qxt_p()
+	{
+		return *qxt_p_ptr;
+	}
+	inline const PUB& qxt_p() const
+	{
+		return *qxt_p_ptr;
+	}
 
 private:
-    PUB* qxt_p_ptr;
+	PUB* qxt_p_ptr;
 };
 
 template <typename PUB, typename PVT>
 class QxtPrivateInterface
 {
-    friend class QxtPrivate<PUB>;
+	friend class QxtPrivate<PUB>;
 public:
-    QxtPrivateInterface()
-    {
-        pvt = new PVT;
-    }
-    ~QxtPrivateInterface()
-    {
-        delete pvt;
-    }
+	QxtPrivateInterface()
+	{
+		pvt = new PVT;
+	}
+	~QxtPrivateInterface()
+	{
+		delete pvt;
+	}
 
-    inline void setPublic(PUB* pub)
-    {
-        pvt->QXT_setPublic(pub);
-    }
-    inline PVT& operator()()
-    {
-        return *static_cast<PVT*>(pvt);
-    }
-    inline const PVT& operator()() const
-    {
-        return *static_cast<PVT*>(pvt);
-    }
+	inline void setPublic(PUB* pub)
+	{
+		pvt->QXT_setPublic(pub);
+	}
+	inline PVT& operator()()
+	{
+		return *static_cast<PVT*>(pvt);
+	}
+	inline const PVT& operator()() const
+	{
+		return *static_cast<PVT*>(pvt);
+	}
 private:
-    QxtPrivateInterface(const QxtPrivateInterface&) {}
-    // cppcheck-suppress operatorEqVarError
-    void operator=(const QxtPrivateInterface&) {}
-    QxtPrivate<PUB>* pvt;
+	QxtPrivateInterface(const QxtPrivateInterface&) {}
+	// cppcheck-suppress operatorEqVarError
+	void operator=(const QxtPrivateInterface&) {}
+	QxtPrivate<PUB>* pvt;
 };
 
 class QxtSpanSliderPrivate;
 
 class QxtSpanSlider : public QSlider
 {
-    Q_OBJECT
+	Q_OBJECT
 	friend class QxtSpanSliderPrivate;
 	QxtPrivateInterface<QxtSpanSlider, QxtSpanSliderPrivate> qxt_d;
-    Q_PROPERTY(int lowerValue READ lowerValue WRITE setLowerValue)
-    Q_PROPERTY(int upperValue READ upperValue WRITE setUpperValue)
-    Q_PROPERTY(int lowerPosition READ lowerPosition WRITE setLowerPosition)
-    Q_PROPERTY(int upperPosition READ upperPosition WRITE setUpperPosition)
-    Q_PROPERTY(HandleMovementMode handleMovementMode READ handleMovementMode WRITE setHandleMovementMode)
-    Q_ENUMS(HandleMovementMode)
+	Q_PROPERTY(int lowerValue READ lowerValue WRITE setLowerValue)
+	Q_PROPERTY(int upperValue READ upperValue WRITE setUpperValue)
+	Q_PROPERTY(int lowerPosition READ lowerPosition WRITE setLowerPosition)
+	Q_PROPERTY(int upperPosition READ upperPosition WRITE setUpperPosition)
+	Q_PROPERTY(HandleMovementMode handleMovementMode READ handleMovementMode WRITE setHandleMovementMode)
+	Q_ENUMS(HandleMovementMode)
 
 public:
-    explicit QxtSpanSlider(QWidget* parent = NULL);
-    explicit QxtSpanSlider(Qt::Orientation orientation, QWidget* parent = NULL);
-    virtual ~QxtSpanSlider();
+	explicit QxtSpanSlider(QWidget* parent = nullptr);
+	explicit QxtSpanSlider(Qt::Orientation orientation, QWidget* parent = nullptr);
+	virtual ~QxtSpanSlider();
 
-    enum HandleMovementMode
-    {
-        FreeMovement,
-        NoCrossing,
-        NoOverlapping
-    };
+	enum HandleMovementMode
+	{
+		FreeMovement,
+		NoCrossing,
+		NoOverlapping
+	};
 
-    HandleMovementMode handleMovementMode() const;
-    void setHandleMovementMode(HandleMovementMode mode);
+	HandleMovementMode handleMovementMode() const;
+	void setHandleMovementMode(HandleMovementMode mode);
 
-    int lowerValue() const;
-    int upperValue() const;
+	int lowerValue() const;
+	int upperValue() const;
 
-    int lowerPosition() const;
-    int upperPosition() const;
+	int lowerPosition() const;
+	int upperPosition() const;
 
 public Q_SLOTS:
-    void setLowerValue(int lower);
-    void setUpperValue(int upper);
-    void setSpan(int lower, int upper);
+	void setLowerValue(int lower);
+	void setUpperValue(int upper);
+	void setSpan(int lower, int upper);
 
-    void setLowerPosition(int lower);
-    void setUpperPosition(int upper);
+	void setLowerPosition(int lower);
+	void setUpperPosition(int upper);
 
 Q_SIGNALS:
-    void spanChanged(int lower, int upper);
-    void lowerValueChanged(int lower);
-    void upperValueChanged(int upper);
+	void spanChanged(int lower, int upper);
+	void lowerValueChanged(int lower);
+	void upperValueChanged(int upper);
 
-    void lowerPositionChanged(int lower);
-    void upperPositionChanged(int upper);
+	void lowerPositionChanged(int lower);
+	void upperPositionChanged(int upper);
 
 protected:
-    virtual void keyPressEvent(QKeyEvent* event);
-    virtual void mousePressEvent(QMouseEvent* event);
-    virtual void mouseMoveEvent(QMouseEvent* event);
-    virtual void mouseReleaseEvent(QMouseEvent* event);
-    virtual void paintEvent(QPaintEvent* event);
+	virtual void keyPressEvent(QKeyEvent* event);
+	virtual void mousePressEvent(QMouseEvent* event);
+	virtual void mouseMoveEvent(QMouseEvent* event);
+	virtual void mouseReleaseEvent(QMouseEvent* event);
+	virtual void paintEvent(QPaintEvent* event);
 };
 
 #endif

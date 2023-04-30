@@ -2925,7 +2925,7 @@ ImageHelper::GetPointerFromElement(Tag const & tag, const File & inF)
     const DataElement & de = ds.GetDataElement(tag);
     return de.GetByteValue();
   }
-  return NULL;
+  return nullptr;
 }
 
 MediaStorage

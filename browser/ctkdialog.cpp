@@ -90,7 +90,7 @@ void CTKDialog::select_file()
 		QString("Select file"),
 		dir_lineEdit->text(),
 		QString(),
-		(QString*)NULL,
+		nullptr,
 		(QFileDialog::ReadOnly
 		/*| QFileDialog::DontUseNativeDialog*/
 		));

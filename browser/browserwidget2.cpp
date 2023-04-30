@@ -106,7 +106,6 @@ void BrowserWidget2::compute_offsets(
 
 BrowserWidget2::BrowserWidget2(float si)
 {
-	once = false;
 	eye_icon  = QIcon(QString(":/bitmaps/eye.svg"));
 	eye2_icon = QIcon(QString(":/bitmaps/eye2.svg"));
 	setupUi(this);
@@ -721,7 +720,7 @@ void BrowserWidget2::open_DICOMDIR()
 		QString("Open DICOMDIR"),
 		d__,
 		QString(),
-		(QString*)NULL,
+		nullptr,
 		(QFileDialog::ReadOnly
 		/*| QFileDialog::DontUseNativeDialog*/
 		));

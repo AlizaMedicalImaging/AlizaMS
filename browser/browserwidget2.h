@@ -45,12 +45,10 @@ public:
 class EntryDICOMDIR
 {
 public:
-	EntryDICOMDIR() :
-		offsetOfTheNextDirectoryRecord(0),
-		offsetOfReferencedLowerLevelDirectoryEntity(0) {}
+	EntryDICOMDIR() {}
 	~EntryDICOMDIR() {}
-	unsigned int offsetOfTheNextDirectoryRecord;
-	unsigned int offsetOfReferencedLowerLevelDirectoryEntity;
+	unsigned int offsetOfTheNextDirectoryRecord{};
+	unsigned int offsetOfReferencedLowerLevelDirectoryEntity{};
 	QString directoryRecordType;
 	QString modality;
 	QString patient;
@@ -65,11 +63,10 @@ public:
 class SeriesDICOMDIR
 {
 public:
-	SeriesDICOMDIR() :
-		eye(false), eye2(false) {} 
+	SeriesDICOMDIR() {}
 	~SeriesDICOMDIR() {}
-	bool    eye;
-	bool    eye2;
+	bool    eye{};
+	bool    eye2{};
 	QString UID;
 	QString modality;
 	QString patient;
@@ -124,7 +121,7 @@ public slots:
 #endif
 
 private:
-	bool once;
+	bool once{};
 	QString saved_copy_dir;
 	QIcon eye_icon;
 	QIcon eye2_icon;

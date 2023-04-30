@@ -34,49 +34,49 @@ QT_FORWARD_DECLARE_CLASS(QStyleOptionSlider)
 
 class QxtSpanSliderPrivate : public QObject, public QxtPrivate<QxtSpanSlider>
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    friend class QxtSpanSlider;
+	friend class QxtSpanSlider;
 
-    enum SpanHandle
-    {
-        NoHandle,
-        LowerHandle,
-        UpperHandle
-    };
+	enum SpanHandle
+	{
+		NoHandle,
+		LowerHandle,
+		UpperHandle
+	};
 
-    QxtSpanSliderPrivate();
-    void initStyleOption(QStyleOptionSlider* option, SpanHandle handle = UpperHandle) const;
-    int pick(const QPoint& pt) const
-    {
-        return qxt_p().orientation() == Qt::Horizontal ? pt.x() : pt.y();
-    }
-    int pixelPosToRangeValue(int pos) const;
-    void handleMousePress(const QPoint& pos, QStyle::SubControl& control, int value, SpanHandle handle);
-    void drawHandle(QStylePainter* painter, SpanHandle handle) const;
-    void setupPainter(QPainter* painter, Qt::Orientation orientation, qreal x1, qreal y1, qreal x2, qreal y2) const;
-    void drawSpan(QStylePainter* painter, const QRect& rect) const;
-    void triggerAction(QAbstractSlider::SliderAction action, bool main);
-    void swapControls();
+	QxtSpanSliderPrivate();
+	void initStyleOption(QStyleOptionSlider* option, SpanHandle handle = UpperHandle) const;
+	int pick(const QPoint& pt) const
+	{
+		return qxt_p().orientation() == Qt::Horizontal ? pt.x() : pt.y();
+	}
+	int pixelPosToRangeValue(int pos) const;
+	void handleMousePress(const QPoint& pos, QStyle::SubControl& control, int value, SpanHandle handle);
+	void drawHandle(QStylePainter* painter, SpanHandle handle) const;
+	void setupPainter(QPainter* painter, Qt::Orientation orientation, qreal x1, qreal y1, qreal x2, qreal y2) const;
+	void drawSpan(QStylePainter* painter, const QRect& rect) const;
+	void triggerAction(QAbstractSlider::SliderAction action, bool main);
+	void swapControls();
 
-    int lower;
-    int upper;
-    int lowerPos;
-    int upperPos;
-    int offset;
-    int position;
-    SpanHandle lastPressed;
-    SpanHandle mainControl;
-    QStyle::SubControl lowerPressed;
-    QStyle::SubControl upperPressed;
-    QxtSpanSlider::HandleMovementMode movement;
-    bool firstMovement;
-    bool blockTracking;
+	int lower{};
+	int upper{};
+	int lowerPos{};
+	int upperPos{};
+	int offset{};
+	int position{};
+	SpanHandle lastPressed{NoHandle};
+	SpanHandle mainControl{LowerHandle};
+	QStyle::SubControl lowerPressed{QStyle::SC_None};
+	QStyle::SubControl upperPressed{QStyle::SC_None};
+	QxtSpanSlider::HandleMovementMode movement{QxtSpanSlider::FreeMovement};
+	bool firstMovement{};
+	bool blockTracking{};
 
 public Q_SLOTS:
-    void updateRange(int min, int max);
-    void movePressedHandle();
+	void updateRange(int min, int max);
+	void movePressedHandle();
 };
 
 #endif

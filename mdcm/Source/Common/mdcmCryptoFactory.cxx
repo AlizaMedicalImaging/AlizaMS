@@ -62,7 +62,7 @@ CryptoFactory::GetFactoryInstance(CryptoFactory::CryptoLib id)
   if (it == getInstanceMap().end())
   {
     mdcmErrorMacro("No crypto factory registered with id " << static_cast<int>(id));
-    return NULL;
+    return nullptr;
   }
   assert(it->second);
   return it->second;

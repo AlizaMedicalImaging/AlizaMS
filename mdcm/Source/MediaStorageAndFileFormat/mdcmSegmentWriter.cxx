@@ -208,7 +208,7 @@ SegmentWriter::PrepareWrite()
     }
     // Segment Algorithm Type (Type 1)
     const char * segmentAlgorithmType = Segment::GetALGOTypeString(segment->GetSegmentAlgorithmType());
-    if (segmentAlgorithmType == NULL)
+    if (segmentAlgorithmType == nullptr)
     {
       mdcmWarningMacro("No segment algorithm type specified");
       Attribute<0x0062, 0x0008> segmentAlgorithmTypeAt;

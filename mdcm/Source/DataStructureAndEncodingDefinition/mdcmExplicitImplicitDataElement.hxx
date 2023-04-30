@@ -74,7 +74,7 @@ ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
     {
       mdcmDebugMacro("Item Delimitation Item has a length different from 0 and is: " << ValueLengthField);
     }
-    ValueField = NULL;
+    ValueField = nullptr;
     VRField = VR::INVALID;
     return is;
   }
@@ -147,7 +147,7 @@ ExplicitImplicitDataElement::ReadPreValue(std::istream & is)
     }
     if (ValueLengthField == 0)
     {
-      ValueField = NULL;
+      ValueField = nullptr;
       return is;
     }
     else if (ValueLengthField.IsUndefined())
@@ -325,7 +325,7 @@ ExplicitImplicitDataElement::ReadValue(std::istream & is, bool readvalues)
     return is;
   if (ValueLengthField == 0)
   {
-    ValueField = NULL;
+    ValueField = nullptr;
     return is;
   }
   if (VRField == VR::SQ)

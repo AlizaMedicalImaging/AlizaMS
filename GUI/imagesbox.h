@@ -17,11 +17,11 @@ class ImageVariant;
 class ListWidgetItem2 : public QListWidgetItem
 {
 public:
-	ListWidgetItem2(QListWidget(*)= NULL, int= Type);
-	ListWidgetItem2(const QString&, QListWidget(*)=NULL, int=Type);
-	ListWidgetItem2(const QIcon&, const QString&, QListWidget(*)=NULL, int=Type);
-	ListWidgetItem2(int, ImageVariant*, const QIcon&, const QString&, QListWidget(*)=NULL, int=Type);
-	ListWidgetItem2(int, ImageVariant*, QListWidget(*)=NULL, int=Type);
+	ListWidgetItem2(QListWidget(*) = nullptr, int = Type);
+	ListWidgetItem2(const QString&, QListWidget(*) = nullptr, int = Type);
+	ListWidgetItem2(const QIcon&, const QString&, QListWidget(*) = nullptr, int = Type);
+	ListWidgetItem2(int, ImageVariant*, const QIcon&, const QString&, QListWidget(*) = nullptr, int = Type);
+	ListWidgetItem2(int, ImageVariant*, QListWidget(*) = nullptr, int = Type);
 	~ListWidgetItem2();
 	int get_id() const;
 	ImageVariant * get_image_from_item();
@@ -35,14 +35,14 @@ private:
 class TableWidgetItem2 : public QTableWidgetItem
 {
 public:
-	TableWidgetItem2()                  : QTableWidgetItem(QTableWidgetItem::UserType+1),    id(-1) {}
-	TableWidgetItem2(const QString & s) : QTableWidgetItem(s, QTableWidgetItem::UserType+1), id(-1) {}
+	TableWidgetItem2()                  : QTableWidgetItem(QTableWidgetItem::UserType + 1) {}
+	TableWidgetItem2(const QString & s) : QTableWidgetItem(s, QTableWidgetItem::UserType + 1) {}
 	~TableWidgetItem2() {}
 	void set_id(int);
 	int  get_id() const;
 
 private:
-	int id;
+	int id{-1};
 };
 
 class ImagesBox: public QWidget, public Ui::ImagesBox
@@ -51,7 +51,7 @@ Q_OBJECT
 public:
 	ImagesBox(float);
 	~ImagesBox();
-	void add_image(int, ImageVariant*, QPixmap(*)=NULL);
+	void add_image(int, ImageVariant*, QPixmap(*) = nullptr);
 	void set_html(const ImageVariant*);
 	void check_all();
 	void uncheck_all();

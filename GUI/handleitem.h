@@ -1,6 +1,6 @@
 #ifndef A_HANDLEITEM_H
 #define A_HANDLEITEM_H
- 
+
 #include <QGraphicsItem>
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneMouseEvent>
@@ -30,8 +30,8 @@ private:
 	GraphicsView * view;
 	QGraphicsRectItem * m_item;
 	HandleRole m_role;
-	bool m_pressed;
+	bool m_pressed{};
 };
- 
+
 #endif
 

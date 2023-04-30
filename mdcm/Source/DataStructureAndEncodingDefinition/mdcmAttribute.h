@@ -556,7 +556,7 @@ public:
 
   explicit Attribute()
   {
-    Internal = NULL;
+    Internal = nullptr;
     Length = 0;
     Own = true;
   }
@@ -567,7 +567,7 @@ public:
     {
       delete[] Internal;
     }
-    Internal = NULL;
+    Internal = nullptr;
   }
 
   unsigned int
@@ -579,7 +579,7 @@ public:
   void
   SetNumberOfValues(unsigned int n)
   {
-    SetValues(NULL, n, true);
+    SetValues(nullptr, n, true);
   }
 
   const ArrayType *
@@ -643,7 +643,7 @@ public:
       {
         delete[] Internal;
       }
-      Internal = NULL;
+      Internal = nullptr;
     }
     Own = own;
     Length = numel;

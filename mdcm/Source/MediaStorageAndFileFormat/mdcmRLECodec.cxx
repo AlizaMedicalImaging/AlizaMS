@@ -474,9 +474,9 @@ RLECodec::Code(DataElement const & in, DataElement & out)
   const size_t bvl = bv->GetLength();
   const size_t image_len = bvl / dims[2];
   // If > 8 bits, need to do the padded composite
-  char * buffer = NULL;
+  char * buffer = nullptr;
   // if 3 comp. need to the planar configuration
-  char * bufferrgb = NULL;
+  char * bufferrgb = nullptr;
   if (GetPixelFormat().GetBitsAllocated() > 8)
   {
     try

@@ -93,7 +93,7 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
       // detect by ESC sequence
       for (int z = 0; z < iso.size(); ++z)
       {
-        QTextCodec * codec = NULL;
+        QTextCodec * codec = nullptr;
         QByteArray a = iso[z];
         // ISO 2022 IR 6
         if (a.size() >= 2 && a.at(0) == 40 && a.at(1) == 66)
@@ -292,7 +292,7 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
     else // ISO 2022, but no ESC character
     {
       cs = cs.trimmed();
-      QTextCodec * codec = NULL;
+      QTextCodec * codec = nullptr;
       if (cs == QString("ISO 2022 IR 149")) // data sets exist, tested
       {
         codec = QTextCodec::codecForName("iso-ir-149");
@@ -372,7 +372,7 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
   }
   else if (l.size() == 1) // single value, not ISO 2022, tested
   {
-    QTextCodec * codec = NULL;
+    QTextCodec * codec = nullptr;
     const QString s(l.at(0).trimmed().simplified().toUpper());
     // ISO IR 100
     if (s.contains(QString("IR 100")))
@@ -517,7 +517,7 @@ QByteArray CodecUtils::fromUTF8(const QString & i, const char * charset, bool * 
   }
   if (l.size() == 1)
   {
-    QTextCodec * codec = NULL;
+    QTextCodec * codec = nullptr;
     const QString s(l.at(0).trimmed().simplified().toUpper());
     // ISO IR 100
     if (s.contains(QString("IR 100")))

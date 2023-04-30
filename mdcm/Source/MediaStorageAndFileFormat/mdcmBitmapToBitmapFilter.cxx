@@ -43,13 +43,13 @@ BitmapToBitmapFilter::SetInput(const Bitmap & image)
   {
     Output = new Pixmap;
   }
-  else if (p != NULL)
+  else if (p != nullptr)
   {
     Output = new Bitmap;
   }
   else
   {
-    Output = NULL;
+    Output = nullptr;
   }
 }
 

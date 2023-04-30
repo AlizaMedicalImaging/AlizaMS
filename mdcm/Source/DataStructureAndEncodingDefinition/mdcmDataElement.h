@@ -55,7 +55,7 @@ class SequenceOfFragments;
  * Design:
  * A DataElement in MDCM always store VL (Value Length) on a 32 bits integer even when VL is 16 bits
  * A DataElement always store the VR even for Implicit TS, in which case VR is defaulted to VR::INVALID
- * For Item start/end (See 0xfffe tags), Value is NULL
+ * For Item start/end (See 0xfffe tags), Value is nullptr
  *
  */
 class MDCM_EXPORT DataElement
@@ -68,7 +68,7 @@ public:
     : TagField(t)
     , ValueLengthField(vl)
     , VRField(vr)
-    , ValueField(NULL)
+    , ValueField(nullptr)
   {}
   DataElement(const DataElement &);
   const Tag &
@@ -116,14 +116,14 @@ public:
   GetByteValue() const;
   // Interpret the Value stored in the DataElement. This is more robust (but also more
   // expensive) to call this function rather than the simpliest form: GetSequenceOfItems()
-  // It also return NULL when the Value is NOT of type SequenceOfItems
+  // It also return nullptr when the Value is NOT of type SequenceOfItems
   // Warning: in case GetSequenceOfItems() succeed the function return this value, otherwise
   // it creates a new SequenceOfItems, you should handle that in your case, for instance:
   // SmartPointer<SequenceOfItems> sqi = de.GetValueAsSQ();
   SmartPointer<SequenceOfItems>
   GetValueAsSQ() const;
   // Return the Value of DataElement as a Sequence Of Fragments (if possible)
-  // Warning: You need to check for NULL return value
+  // Warning: You need to check for nullptr return value
   const SequenceOfFragments *
   GetSequenceOfFragments() const;
   SequenceOfFragments *

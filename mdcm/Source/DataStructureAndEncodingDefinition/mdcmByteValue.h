@@ -38,7 +38,7 @@ namespace mdcm
 class MDCM_EXPORT ByteValue : public Value
 {
 public:
-  ByteValue(const char * array = NULL, const VL & vl = 0);
+  ByteValue(const char * array = nullptr, const VL & vl = 0);
   ByteValue(std::vector<char> &);
   ~ByteValue();
 

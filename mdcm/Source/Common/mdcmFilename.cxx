@@ -74,7 +74,7 @@ Filename::GetExtension()
   {
     return GetName() + dot_pos;
   }
-  return NULL;
+  return nullptr;
 }
 
 const char *

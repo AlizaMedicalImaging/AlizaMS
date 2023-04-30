@@ -139,7 +139,7 @@ public:
   bool
   IsEmpty() const
   {
-    return DataField == NULL;
+    return DataField == nullptr;
   }
 
   void
@@ -150,12 +150,12 @@ public:
   }
 
   // Return the Value of CSAElement as a ByteValue (if possible),
-  // check for NULL return value
+  // check for nullptr return value
   const ByteValue *
   GetByteValue() const
   {
     const ByteValue * bv = dynamic_cast<const ByteValue *>(DataField.GetPointer());
-    return bv; // Will return NULL if not ByteValue
+    return bv; // Will return nullptr if not ByteValue
   }
 
   bool

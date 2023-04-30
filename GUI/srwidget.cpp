@@ -20,7 +20,6 @@
 SRWidget::SRWidget(float si)
 {
 	setupUi(this);
-	tmpfile = QString("");
 #if 1
 	backward_toolButton->hide();
 	forward_toolButton->hide();

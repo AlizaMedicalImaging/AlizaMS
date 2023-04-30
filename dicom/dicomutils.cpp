@@ -1732,9 +1732,9 @@ template <typename T> QString supp_palette_grey_to_rgbUS_(
 	const int red_subscript,
 	const ImageVariant * v)
 {
-	if (!v) return QString("Image is NULL");
-	if (image.IsNull()) return QString("Image is NULL");
-	if (out_image.IsNull()) return QString("Out image is NULL");
+	if (!v) return QString("Image is null");
+	if (image.IsNull()) return QString("Image is null");
+	if (out_image.IsNull()) return QString("Out image is null");
 	if (!(red_subscript > INT_MIN))
 		return QString("Internal error,\nSubscript <= INT_MIN");
 	try
@@ -1819,9 +1819,9 @@ template <typename T> QString supp_palette_grey_to_rgbUC_(
 	const int red_subscript,
 	const ImageVariant * v)
 {
-	if (!v) return QString("Image is NULL");
-	if (image.IsNull()) return QString("Image is NULL");
-	if (out_image.IsNull()) return QString("Out image is NULL");
+	if (!v) return QString("Image is null");
+	if (image.IsNull()) return QString("Image is null");
+	if (out_image.IsNull()) return QString("Out image is null");
 	if (!(red_subscript > INT_MIN))
 		return QString("Internal error,\nSubscript <= INT_MIN");
 	try
@@ -2033,8 +2033,8 @@ unsigned int process_gsps(
 					ref_ivariants,
 					ref_files,
 					0,
-					NULL,
-					NULL,
+					nullptr,
+					nullptr,
 					false,
 					settings,
 					pb,
@@ -2130,13 +2130,13 @@ unsigned int process_gsps(
 					else
 					{
 						delete pr_image;
-						pr_image = NULL;
+						pr_image = nullptr;
 					}
 				}
 				if (ref_ivariants.at(z))
 				{
 					delete ref_ivariants[z];
-					ref_ivariants[z] = NULL;
+					ref_ivariants[z] = nullptr;
 				}
 			}
 			if (!message_pr_ref.isEmpty())
@@ -3029,7 +3029,7 @@ void DicomUtils::load_contour(
 	if (!(sqi && sqi->GetNumberOfItems() > 0)) return;
 	if (!(ssqi && ssqi->GetNumberOfItems() > 0)) return;
 	// RTROIObservationsSequence
-	mdcm::SmartPointer<mdcm::SequenceOfItems> obssq = NULL;
+	mdcm::SmartPointer<mdcm::SequenceOfItems> obssq = nullptr;
 	const mdcm::Tag tobservationssq(0x3006,0x0080);
 	if (ds.FindDataElement(tobservationssq))
 	{
@@ -3157,7 +3157,7 @@ void DicomUtils::load_contour(
 				nestedds.GetDataElement(troidc);
 			color.SetFromDataElement(decolor);
 			const int * color_p = color.GetValues();
-			if (color.GetNumberOfValues()==3)
+			if (color.GetNumberOfValues() == 3)
 			{
 				color_r = color_p[0];
 				color_g = color_p[1];
@@ -3426,7 +3426,7 @@ bool DicomUtils::read_slices(
 		up_dir_y,
 		up_dir_z;
 	float center_x, center_y, center_z;
-	double dircos[9] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+	double dircos[9]{};
 	if (pb)
 	{
 		const QString info_ = QString(
@@ -3802,7 +3802,7 @@ bool DicomUtils::read_slices_uihgrid(
 		up_dir_y,
 		up_dir_z;
 	float center_x, center_y, center_z;
-	double dircos[9] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+	double dircos[9]{};
 	const bool ok = generate_geometry(
 			ivariant->di->image_slices,
 			ivariant->di->spectroscopy_slices,
@@ -3886,7 +3886,7 @@ bool DicomUtils::read_slices_rtdose(
 	double spacing_x, spacing_y, spacing_z, origin_x, origin_y, origin_z;
 	float slices_dir_x, slices_dir_y, slices_dir_z, up_dir_x, up_dir_y, up_dir_z;
 	float center_x, center_y, center_z;
-	double dircos[9] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+	double dircos[9]{};
 	QString pat_pos_s(""), pat_orient_s(""), pix_spacing_s("");
 	read_image_info_rtdose(filename_,
 		&numframes, &rows, &columns,
@@ -5212,7 +5212,7 @@ bool DicomUtils::get_patient_position(
 	const QString & p,
 	double * pp)
 {
-	if (pp == NULL || p.isEmpty()) return false;
+	if (pp == nullptr || p.isEmpty()) return false;
 	QString tmp0 = p.trimmed().
 		remove(QChar('\0'));
 	if (tmp0.contains(QString(",")))
@@ -5248,7 +5248,7 @@ bool DicomUtils::get_patient_orientation(
 	const QString & o,
 	double * po)
 {
-	if (po == NULL || o.isEmpty()) return false;
+	if (po == nullptr || o.isEmpty()) return false;
 	QString tmp0 = o.trimmed().remove(QChar('\0'));
 	if (tmp0.contains(QString(",")))
 	{
@@ -7198,7 +7198,7 @@ QString DicomUtils::read_enhanced(
 	//
 	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
-	double dircos_read[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+	double dircos_read[6]{};
 	unsigned int dimx_read, dimy_read, dimz_read;
 	double origin_x_read,  origin_y_read,  origin_z_read;
 	double spacing_x_read, spacing_y_read, spacing_z_read;
@@ -7225,8 +7225,8 @@ QString DicomUtils::read_enhanced(
 			pred6_bug,
 			cornell_bug,
 			fix_jpeg_prec,
-			NULL,
-			NULL,
+			nullptr,
+			nullptr,
 			use_icc, &icc_ok,
 			pb);
 	if (*ok == false) return message_;
@@ -7528,7 +7528,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 	//
 	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
-	double dircos_read[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+	double dircos_read[6]{};
 	unsigned int dimx_read = 0, dimy_read = 0, dimz_read = 0;
 	double origin_x_read = 0, origin_y_read = 0, origin_z_read = 0;
 	double spacing_x_read = 0, spacing_y_read = 0, spacing_z_read = 0;
@@ -7559,7 +7559,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 			cornell_bug,
 			fix_jpeg_prec,
 			&red_subscript,
-			NULL,
+			nullptr,
 			false, &icc_ok_dummy,
 			pb);
 #if 0
@@ -7761,7 +7761,7 @@ QString DicomUtils::read_ultrasound(
 	const bool overwrite_mdcm_spacing = true;
 	if (!ivariant)
 	{
-		return QString("ivariant is NULL");
+		return QString("ivariant is null");
 	}
 	if (images_ipp.size() != 1)
 	{
@@ -7925,7 +7925,7 @@ QString DicomUtils::read_ultrasound(
 	ivariant->di->default_lut_function =
 		ivariant->di->lut_function = tmp_lut_function;
 	//
-	double dircos_[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+	double dircos_[6]{};
 	unsigned int dimx_, dimy_, dimz_;
 	double origin_x_, origin_y_, origin_z_;
 	double spacing_x_, spacing_y_, spacing_z_;
@@ -7951,8 +7951,8 @@ QString DicomUtils::read_ultrasound(
 		pred6_bug,
 		cornell_bug,
 		fix_jpeg_prec,
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 		use_icc, &icc_ok,
 		pb);
 	if (*ok == false) return buff_error;
@@ -8014,7 +8014,7 @@ QString DicomUtils::read_ultrasound(
 		wsettings->get_size_x(), wsettings->get_size_y(),
 		wsettings->get_rescale(),
 		(use_icc && icc_ok),
-		0, NULL, pb,
+		0, nullptr, pb,
 		false);
 	for (unsigned int x = 0; x < data.size(); ++x)
 	{
@@ -8049,7 +8049,7 @@ QString DicomUtils::read_nuclear(
 // TODO for image type RECON TOMO volume might be possible
 	if (!ok) return QString("read_nuclear : error (1)");
 	*ok = false;
-	if (!ivariant) return QString("ivariant is NULL");
+	if (!ivariant) return QString("ivariant is null");
 	if (images_ipp.size() != 1) return QString("read_nuclear reads 1 image");
 	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
@@ -8129,7 +8129,7 @@ QString DicomUtils::read_nuclear(
 	ivariant->di->default_lut_function =
 		ivariant->di->lut_function = tmp_lut_function;
 	//
-	double dircos_[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+	double dircos_[6]{};
 	unsigned int dimx_, dimy_, dimz_;
 	double origin_x_, origin_y_, origin_z_;
 	double spacing_x_, spacing_y_, spacing_z_;
@@ -8155,8 +8155,8 @@ QString DicomUtils::read_nuclear(
 		pred6_bug,
 		cornell_bug,
 		fix_jpeg_prec,
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 		use_icc, &icc_ok,
 		pb);
 	if (*ok == false) return buff_error;
@@ -8235,7 +8235,7 @@ are stacked in front of the first slice. See Image Orientation
 		wsettings->get_size_x(), wsettings->get_size_y(),
 		wsettings->get_rescale(),
 		(use_icc && icc_ok),
-		0, NULL, pb,
+		0, nullptr, pb,
 		false);
 	for (unsigned int x = 0; x < data.size(); ++x)
 	{
@@ -8270,7 +8270,7 @@ QString DicomUtils::read_series(
 	bool apply_rescale)
 {
 	*ok = false;
-	if (!ivariant) return QString("ivariant is NULL");
+	if (!ivariant) return QString("ivariant is null");
 	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
 	const SettingsWidget * wsettings =
@@ -8515,7 +8515,7 @@ QString DicomUtils::read_series(
 			}
 		}
 		//
-		double dircos_[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+		double dircos_[6]{};
 		unsigned int dimx_ = 0, dimy_ = 0, dimz_ = 0;
 		double origin_x_ = 0.0, origin_y_ = 0.0, origin_z_ = 0.0;
 		double spacing_x_ = 0.0, spacing_y_ = 0.0, spacing_z_ = 0.0;
@@ -8551,7 +8551,7 @@ QString DicomUtils::read_series(
 				pred6_bug,
 				cornell_bug,
 				fix_jpeg_prec,
-				NULL,
+				nullptr,
 				&buffers_size,
 				use_icc, &icc_ok,
 				pb);
@@ -8648,8 +8648,8 @@ QString DicomUtils::read_series(
 				pred6_bug,
 				cornell_bug,
 				fix_jpeg_prec,
-				NULL,
-				NULL,
+				nullptr,
+				nullptr,
 				use_icc, &icc_ok,
 				pb);
 		}
@@ -9424,10 +9424,10 @@ QString DicomUtils::read_buffer(
 	bool rescale_ = false;
 	unsigned long long rescaled_buffer_size = 0;
 	unsigned long long buffer_size = 0;
-	char * rescaled_buffer = NULL;
-	char * not_rescaled_buffer = NULL;
-	unsigned char * singlebit_buffer = NULL;
-	char * buffer = NULL;
+	char * rescaled_buffer = nullptr;
+	char * not_rescaled_buffer = nullptr;
+	unsigned char * singlebit_buffer = nullptr;
+	char * buffer = nullptr;
 	bool singlebit = false;
 	unsigned int type_size = 0;
 	unsigned int samples_per_pix = 0;
@@ -9440,7 +9440,7 @@ QString DicomUtils::read_buffer(
 	unsigned long long image_buffer_length = 0;
 	QString elscf("");
 	short icc_for_ybr = 0;
-	char * icc_profile = NULL;
+	char * icc_profile = nullptr;
 	unsigned int icc_size = 0;
 	//
 	const mdcm::Tag tModalityLUTSequence(0x0028, 0x3000);
@@ -9830,7 +9830,7 @@ QString DicomUtils::read_buffer(
 				delete [] icc_profile;
 				if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 				return QString(
-					"Error (subscript is NULL),\n"
+					"Error (subscript is null),\n"
 					"can not apply Supplemental LUT");
 			}
 			mdcm::ApplySupplementalLUT slut;
@@ -9878,7 +9878,7 @@ QString DicomUtils::read_buffer(
 		}
 		catch (const std::bad_alloc&)
 		{
-			not_rescaled_buffer = NULL;
+			not_rescaled_buffer = nullptr;
 		}
 		if (!not_rescaled_buffer)
 		{
@@ -9891,7 +9891,7 @@ QString DicomUtils::read_buffer(
 			delete [] not_rescaled_buffer;
 			delete [] icc_profile;
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
-			return QString("Buffer is NULL");
+			return QString("Buffer is null");
 		}
 	}
 	//
@@ -9980,28 +9980,28 @@ QString DicomUtils::read_buffer(
 					}
 					catch(const std::bad_alloc&)
 					{
-						rescaled_buffer = NULL;
+						rescaled_buffer = nullptr;
 					}
 					if (!rescaled_buffer)
 					{
 						delete [] not_rescaled_buffer;
 						delete [] icc_profile;
 						if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
-						return QString("Buffer is NULL");
+						return QString("Buffer is nullptr");
 					}
 					const bool ok_rescale = r.Rescale(rescaled_buffer, not_rescaled_buffer, image_buffer_length);
 					if (ok_rescale)
 					{
 						rescale_ = true;
 						delete [] not_rescaled_buffer;
-						not_rescaled_buffer = NULL;
+						not_rescaled_buffer = nullptr;
 					}
 					else
 					{
 						std::cout << f.toStdString() << " : rescaling failed" << std::endl;
 						pixelformat = image_pixelformat;
 						delete [] rescaled_buffer;
-						rescaled_buffer = NULL;
+						rescaled_buffer = nullptr;
 					}
 				}
 			}
@@ -10072,14 +10072,14 @@ QString DicomUtils::read_buffer(
 						}
 						catch (const std::bad_alloc&)
 						{
-							rescaled_buffer = NULL;
+							rescaled_buffer = nullptr;
 						}
 						if (!rescaled_buffer)
 						{
 							delete [] not_rescaled_buffer;
 							delete [] icc_profile;
 							if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
-							return QString("Buffer is NULL");
+							return QString("Buffer is null");
 						}
 						const size_t lut_data_s = lut_data.size();
 						if (pf_ba == 8)
@@ -10286,7 +10286,7 @@ QString DicomUtils::read_buffer(
 		}
 		catch (const std::bad_alloc&)
 		{
-			singlebit_buffer = NULL;
+			singlebit_buffer = nullptr;
 		}
 		if (!singlebit_buffer)
 		{
@@ -10347,7 +10347,7 @@ QString DicomUtils::read_buffer(
 #ifndef NDEBUG
 				std::cout << "Using ICC profile" << std::endl;
 #endif
-				char * icc_tmp = NULL;
+				char * icc_tmp = nullptr;
 				char * icc_buffer;
 				try
 				{
@@ -10434,7 +10434,7 @@ QString DicomUtils::read_buffer(
 								{
 									buffer = icc_buffer;
 									delete [] not_rescaled_buffer;
-									not_rescaled_buffer = NULL;
+									not_rescaled_buffer = nullptr;
 									*has_icc = true;
 								}
 								else
@@ -10794,7 +10794,7 @@ QString DicomUtils::read_enhanced_common(
 			double spacing_x, spacing_y, spacing_z;
 			double origin_x, origin_y, origin_z;
 			double spacing_z_tmp;
-			double dircos_gen[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+			double dircos_gen[6]{};
 			float  slices_dir_x, slices_dir_y, slices_dir_z;
 			float  up_dir_x, up_dir_y, up_dir_z;
 			float  center_x, center_y, center_z;
@@ -11007,8 +11007,8 @@ QString DicomUtils::read_enhanced_common(
 			}
 			//
 			bool invalidate = false;
-			double spacing_tmp0[2] = { 0.0, 0.0 };
-			double spacing_tmp1[2] = { 0.0, 0.0 };
+			double spacing_tmp0[2]{};
+			double spacing_tmp1[2]{};
 			bool spacing_ok = false;
 			for (int i = 0; i < tmp5.size(); ++i)
 			{
@@ -11303,7 +11303,7 @@ QString DicomUtils::read_enhanced_common(
 						no_warn_rescale,
 						use_icc,
 						0,
-						NULL,
+						nullptr,
 						pb,
 						false);
 					if (*ok)
@@ -12281,7 +12281,7 @@ bool DicomUtils::process_contrours_ref(
 	const mdcm::File & file = reader.GetFile();
 	const mdcm::DataSet & ds = file.GetDataSet();
 	if (ds.IsEmpty()) return false;
-	ImageVariant * tmp_ivariant = new ImageVariant(-1, false, false, NULL, 0);
+	ImageVariant * tmp_ivariant = new ImageVariant(-1, false, false, nullptr, 0);
 	load_contour(ds, tmp_ivariant);
 	QSet<QString> ref_frame_of_refs_set;
 	for (int z = 0; z < tmp_ivariant->di->rois.size(); ++z)
@@ -12405,7 +12405,7 @@ bool DicomUtils::process_contrours_ref(
 					read_dicom(
 						ivariants,
 						detected_files_tmp,
-						max_3d_tex_size, gl, NULL, ok3d,
+						max_3d_tex_size, gl, nullptr, ok3d,
 						settings,
 						pb,
 						2,
@@ -14141,7 +14141,7 @@ QString DicomUtils::read_dicom(
 				CommonUtils::get_next_id(),
 				false,
 				true,
-				NULL,
+				nullptr,
 				0);
 			message_ = read_ultrasound(
 				&ok, load_type,
@@ -14173,13 +14173,13 @@ QString DicomUtils::read_dicom(
 				CommonUtils::get_next_id(),
 				false,
 				true,
-				NULL,
+				nullptr,
 				0);
 			message_ = read_nuclear(
 				&ok, load_type,
 				ivariant,
 				images_tmp,
-				0, NULL, false,
+				0, nullptr, false,
 				settings,
 				pb);
 			if (ok)
@@ -14207,7 +14207,7 @@ QString DicomUtils::read_dicom(
 					CommonUtils::get_next_id(),
 					false,
 					true,
-					NULL,
+					nullptr,
 					0);
 				message_ = read_series(
 					&ok,
@@ -14218,7 +14218,7 @@ QString DicomUtils::read_dicom(
 					ivariant,
 					images_tmp,
 					0,
-					NULL,
+					nullptr,
 					false,
 					settings,
 					pb,
@@ -14312,7 +14312,7 @@ QString DicomUtils::read_dicom(
 						&ok,
 						images.at(x),
 						supp_color_images,
-						0, NULL, false,
+						0, nullptr, false,
 						false,
 						enh_loading_type,
 						settings,
@@ -14455,9 +14455,9 @@ QString DicomUtils::read_dicom(
 								v->filenames = supp_color_images.at(jjj)->filenames;
 								ivariants.push_back(v);
 								delete supp_grey_images[jjj];
-								supp_grey_images[jjj] = NULL;
+								supp_grey_images[jjj] = nullptr;
 								delete supp_color_images[jjj];
-								supp_color_images[jjj] = NULL;
+								supp_color_images[jjj] = nullptr;
 							}
 						}
 					}
@@ -14484,7 +14484,7 @@ QString DicomUtils::read_dicom(
 					&ok,
 					images.at(x),
 					ivariants,
-					0, NULL, false,
+					0, nullptr, false,
 					false,
 					enh_loading_type,
 					settings,
@@ -14627,7 +14627,7 @@ QString DicomUtils::read_dicom(
 					CommonUtils::get_next_id(),
 					false,
 					true,
-					NULL,
+					nullptr,
 					0);
 				message_ = read_series(
 					&ok,
@@ -14638,7 +14638,7 @@ QString DicomUtils::read_dicom(
 					ivariant,
 					images_tmp,
 					0,
-					NULL,
+					nullptr,
 					false,
 					settings,
 					pb,
@@ -14835,7 +14835,7 @@ QString DicomUtils::read_dicom(
 					CommonUtils::get_next_id(),
 					false,
 					true,
-					NULL,
+					nullptr,
 					0);
 				message_ = read_series(
 					&ok,
@@ -14846,7 +14846,7 @@ QString DicomUtils::read_dicom(
 					ivariant,
 					images_tmp,
 					0,
-					NULL,
+					nullptr,
 					false,
 					settings,
 					pb,
@@ -14949,7 +14949,7 @@ QString DicomUtils::read_dicom(
 					CommonUtils::get_next_id(),
 					false,
 					true,
-					NULL,
+					nullptr,
 					0);
 				message_ = read_series(
 					&ok,
@@ -14960,7 +14960,7 @@ QString DicomUtils::read_dicom(
 					ivariant,
 					images_tmp,
 					0,
-					NULL,
+					nullptr,
 					false,
 					settings,
 					pb,
@@ -15192,14 +15192,14 @@ QString DicomUtils::read_dicom(
 		for (int x = 0; x < pdf_files.size(); ++x)
 		{
 			const QString pdff = QFileDialog::getSaveFileName(
-				NULL,
+				nullptr,
 				QString("Select file"),
 				CommonUtils::get_save_dir() +
 					QString("/") +
 					CommonUtils::get_save_name() +
 					QString(".pdf"),
 				QString("All Files (*)"),
-				(QString*)NULL
+				nullptr
 				 //, QFileDialog::DontUseNativeDialog
 				);
 			if (!pdff.isEmpty())
@@ -15224,14 +15224,14 @@ QString DicomUtils::read_dicom(
 		for (int x = 0; x < stl_files.size(); ++x)
 		{
 			const QString stlf = QFileDialog::getSaveFileName(
-				NULL,
+				nullptr,
 				QString("Select file"),
 				CommonUtils::get_save_dir() +
 					QString("/") +
 					CommonUtils::get_save_name() +
 					QString(".stl"),
 				QString("All Files (*)"),
-				(QString*)NULL
+				nullptr
 				 //, QFileDialog::DontUseNativeDialog
 				);
 			if (!stlf.isEmpty())
@@ -15260,14 +15260,14 @@ QString DicomUtils::read_dicom(
 			const QString suf = suffix_mpeg(tmp943);
 			const QString video_file_name =
 				QFileDialog::getSaveFileName(
-					NULL,
+					nullptr,
 					QString("Select file"),
 					CommonUtils::get_save_dir() +
 						QString("/") +
 						CommonUtils::get_save_name() +
 						suf,
 					QString("All Files (*)"),
-					(QString*)NULL
+					nullptr
 					 //, QFileDialog::DontUseNativeDialog
 					);
 			if (!video_file_name.isEmpty())

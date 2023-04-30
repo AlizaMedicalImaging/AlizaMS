@@ -29,14 +29,14 @@ protected:
 	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;
 
 private:
-	int contour_id;
-	int roi_id;
-	long long tmp_id;
-	int axis;
-	int slice;
+	int contour_id{-1};
+	int roi_id{-1};
+	long long tmp_id{-1};
+	int axis{-1};
+	int slice{-1};
 	// 1 - closed planar
 	// 2 - open planar
-	int contour_type;
+	int contour_type{2};
 };
 
 #endif

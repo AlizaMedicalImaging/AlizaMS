@@ -45,9 +45,9 @@ private:
 	QPixmap blue;
 	QIcon lockon;
 	QIcon lockoff;
-	bool label_is_red;
-	bool label_is_green;
-	bool label_is_blue;
+	bool label_is_red{};
+	bool label_is_green{};
+	bool label_is_blue{};
 };
 
 #endif

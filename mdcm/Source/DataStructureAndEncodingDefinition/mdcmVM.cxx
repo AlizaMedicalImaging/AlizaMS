@@ -22,7 +22,7 @@ namespace mdcm
 static const char * VMStrings[] = { "INVALID", "1",    "2",   "3",    "4",    "5",    "6",      "8",      "9",   "10",
                                     "12",      "16",   "18",  "24",   "28",   "32",   "35",     "99",     "256", "1-2",
                                     "1-3",     "1-4",  "1-5", "1-8",  "1-32", "1-99", "1-n",    "2-2n",   "2-n", "2-4",
-                                    "3-4",     "3-3n", "3-n", "4-4n", "6-6n", "7-7n", "30-30n", "47-47n", NULL };
+                                    "3-4",     "3-3n", "3-n", "4-4n", "6-6n", "7-7n", "30-30n", "47-47n", nullptr };
 
 unsigned int
 VM::GetLength() const
@@ -205,7 +205,7 @@ VM::GetVMType(const char * vm)
     return VM::VM_END;
   if (!*vm)
     return VM::VM0; // FIXME
-  for (int i = 0; VMStrings[i] != NULL; ++i)
+  for (int i = 0; VMStrings[i] != nullptr; ++i)
   {
     if (strcmp(VMStrings[i], vm) == 0)
     {

@@ -39,8 +39,8 @@ namespace mdcm
 {
 
 Writer::Writer()
-  : Stream(NULL)
-  , Ofstream(NULL)
+  : Stream(nullptr)
+  , Ofstream(nullptr)
   , F(new File)
   , CheckFileMetaInformation(true)
   , WriteDataSetOnly(false)
@@ -52,8 +52,8 @@ Writer::~Writer()
   if (Ofstream)
   {
     delete Ofstream;
-    Ofstream = NULL;
-    Stream = NULL;
+    Ofstream = nullptr;
+    Stream = nullptr;
   }
 }
 

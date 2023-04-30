@@ -79,7 +79,7 @@ public:
   CSAHeader()
     : InternalDataSet()
     , InternalType(UNKNOWN)
-    , InterfileData(NULL)
+    , InterfileData(nullptr)
   {}
   ~CSAHeader() {}
 

@@ -20,10 +20,10 @@ LevelRectItem::LevelRectItem(
 	: QGraphicsRectItem(x, y, w, h, p)
 {
 	view = v;
-    setFlag(QGraphicsItem::ItemIsMovable, true);
-    setFlag(QGraphicsItem::ItemIsFocusable, false);
+	setFlag(QGraphicsItem::ItemIsMovable, true);
+	setFlag(QGraphicsItem::ItemIsFocusable, false);
 	setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
-    setAcceptHoverEvents(false);
+	setAcceptHoverEvents(false);
 	setCursor(Qt::OpenHandCursor);
 	pwidth = 3.0;
 	QBrush brush(QColor(0xbc, 0x86, 0x2b));
@@ -65,7 +65,7 @@ QRectF LevelRectItem::boundingRect() const
 
 int LevelRectItem::type() const
 {
-    return Type;
+	return Type;
 }
 
 QVariant LevelRectItem::itemChange(
@@ -85,7 +85,7 @@ QVariant LevelRectItem::itemChange(
 			newData.setX(view->scene()->sceneRect().bottomLeft().x() - rect().center().x());
 		}
 		view->window_center_update(rect().center().x() + newData.x());
- 		return QGraphicsItem::itemChange(change, newData);
+		return QGraphicsItem::itemChange(change, newData);
 	}
 	return QGraphicsItem::itemChange(change, data);
 }
@@ -294,11 +294,11 @@ void HistogramView::get_screen()
 	const QString saved_dir = CommonUtils::get_screenshot_dir();
 	const QString d = CommonUtils::get_screenshot_name(saved_dir);
 	const QString f = QFileDialog::getSaveFileName(
-		NULL,
+		nullptr,
 		QString("Select file: format by extension"),
 		d,
 		QString("All Files (*)"),
-		(QString*)NULL
+		nullptr
 		 //,QFileDialog::DontUseNativeDialog
 		);
 	if (f.isEmpty()) return;

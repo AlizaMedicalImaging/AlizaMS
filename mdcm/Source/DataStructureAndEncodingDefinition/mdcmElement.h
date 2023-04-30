@@ -518,7 +518,7 @@ class Element<TVR, VM::VM1_n>
 public:
   explicit Element()
   {
-    Internal = NULL;
+    Internal = nullptr;
     Length = 0;
     Save = false;
   }
@@ -529,7 +529,7 @@ public:
     {
       delete[] Internal;
     }
-    Internal = NULL;
+    Internal = nullptr;
   }
 
   static VR
@@ -596,12 +596,12 @@ public:
     else
     {
       assert(Length == 0);
-      assert(Internal == NULL);
+      assert(Internal == nullptr);
       assert(Save == false);
       Length = len / sizeof(Type);
       if ((len / sizeof(Type)) * sizeof(Type) != len)
       {
-        Internal = NULL;
+        Internal = nullptr;
         Length = 0;
       }
       else
@@ -648,7 +648,7 @@ public:
       const Type * array = static_cast<const Type *>(bv->GetVoidPointer());
       if (array)
       {
-        assert(Internal == NULL);
+        assert(Internal == nullptr);
         SetArray(array, bv->GetLength());
       }
     }
@@ -754,10 +754,10 @@ public:
   Element &
   operator=(const Element & _val)
   {
-    if (Length > 0 && Internal != NULL)
+    if (Length > 0 && Internal != nullptr)
     {
       // TODO check delete
-      Internal = NULL;
+      Internal = nullptr;
       Length = 0;
     }
     SetArray(_val.Internal, _val.Length, true);
@@ -776,7 +776,7 @@ protected:
       const Type * array = static_cast<const Type *>(bv->GetVoidPointer());
       if (array)
       {
-        assert(Internal == NULL);
+        assert(Internal == nullptr);
         SetArray(array, bv->GetLength());
       }
     }

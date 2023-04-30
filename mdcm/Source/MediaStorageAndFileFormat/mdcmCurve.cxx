@@ -294,7 +294,7 @@ static const char * const TypeOfDataDescription[][2] = { { "TAC", "time activity
                                                          { "FLOW", "flow data" },
                                                          { "PHYSIO", "physio data" },
                                                          { "RESP", "Respiration trace" },
-                                                         { NULL, NULL } };
+                                                         { nullptr, nullptr } };
 
 const char *
 Curve::GetTypeOfDataDescription() const

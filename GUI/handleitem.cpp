@@ -8,17 +8,18 @@
 HandleItem::HandleItem(
 	GraphicsView * v,
 	QGraphicsRectItem * item,
-	HandleItem::HandleRole role) : QGraphicsItem(NULL)
+	HandleItem::HandleRole role)
+	:
+	QGraphicsItem(),
+	view(v),
+	m_item(item),
+	m_role(role)
 {
-	view = v;
-	m_role = role;
-	m_item = item;
-	m_pressed = false;
 	setZValue(1);
 	setFlag(QGraphicsItem::ItemIsMovable, true);
-    setFlag(QGraphicsItem::ItemIsFocusable, true);
+	setFlag(QGraphicsItem::ItemIsFocusable, true);
 	setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
-	switch(m_role)
+	switch (role)
 	{
 	case LeftHandle:
 		setCursor(Qt::SizeHorCursor);
@@ -32,10 +33,11 @@ HandleItem::HandleItem(
 	case BottomHandle:
 		setCursor(Qt::SizeVerCursor);
 		break;
-	default: break;
+	default:
+		break;
 	}
 }
- 
+
 void HandleItem::paint(
 	QPainter * paint,
 	const QStyleOptionGraphicsItem *,
@@ -49,7 +51,7 @@ void HandleItem::paint(
 QRectF HandleItem::boundingRect() const
 {
 	QRectF r = QRectF();
-	switch(m_role)
+	switch (m_role)
 	{
 	case LeftHandle:
 		{
@@ -121,12 +123,12 @@ QVariant HandleItem::itemChange(
 		QPointF movement;
 		QPointF newData = data.toPointF();
 		QRectF  newRect = m_item->rect();
-		switch(m_role)
+		switch (m_role)
 		{
 		case LeftHandle:
 			{
 				newData.setY(0);
- 				movement = newData - pos();
+				movement = newData - pos();
 				newRect.setLeft(
 					m_item->rect().left()+movement.x()
 						< m_item->rect().right()
@@ -179,18 +181,18 @@ QVariant HandleItem::itemChange(
 		}
 		m_item->setRect(newRect);
 		if (view) view->emit_bb_update();
- 		return QGraphicsItem::itemChange(change, newData);
+		return QGraphicsItem::itemChange(change, newData);
 	}
 	return QGraphicsItem::itemChange(change, data);
 }
- 
+
 void HandleItem::mousePressEvent(
 	QGraphicsSceneMouseEvent * e)
 {
 	m_pressed = true;  
 	QGraphicsItem::mousePressEvent(e);
 }
- 
+
 void HandleItem::mouseReleaseEvent(
 	QGraphicsSceneMouseEvent * e)
 {

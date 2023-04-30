@@ -7,9 +7,9 @@ RectItem::RectItem(
 	qreal h,
 	QGraphicsItem * p) : QGraphicsRectItem(x, y, w, h, p)
 {
-    setFlag(QGraphicsItem::ItemIsMovable, false);
-    setFlag(QGraphicsItem::ItemIsFocusable, false);
-    setAcceptHoverEvents(false);
+	setFlag(QGraphicsItem::ItemIsMovable, false);
+	setFlag(QGraphicsItem::ItemIsFocusable, false);
+	setAcceptHoverEvents(false);
 	pwidth = 3.0;
 	set_pen1(pwidth);
 }
@@ -72,7 +72,7 @@ QRectF RectItem::boundingRect() const
 
 int RectItem::type() const
 {
-    return Type;
+	return Type;
 }
 
 void RectItem::mouseMoveEvent(

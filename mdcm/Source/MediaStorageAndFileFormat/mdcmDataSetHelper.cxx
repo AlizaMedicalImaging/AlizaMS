@@ -107,7 +107,7 @@ DataSetHelper::ComputeVR(const File & file, const DataSet & ds, const Tag & t)
   const Global & g = GlobalInstance;
   const Dicts &  dicts = g.GetDicts();
   std::string    strowner;
-  const char *   owner = NULL;
+  const char *   owner = nullptr;
   if (t.IsPrivate() && !t.IsPrivateCreator())
   {
     strowner = ds.GetPrivateCreator(t);

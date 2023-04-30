@@ -38,7 +38,7 @@ JPEGCodec::JPEGCodec()
   : BitSample(0)
   , Quality(100)
 {
-  Internal = NULL;
+  Internal = nullptr;
 }
 
 JPEGCodec::~JPEGCodec()
@@ -801,7 +801,7 @@ JPEGCodec::SetupJPEGBitCodec(int b)
 {
   BitSample = b;
   delete Internal;
-  Internal = NULL;
+  Internal = nullptr;
   if (BitSample <= 8)
   {
     Internal = new JPEG8Codec;

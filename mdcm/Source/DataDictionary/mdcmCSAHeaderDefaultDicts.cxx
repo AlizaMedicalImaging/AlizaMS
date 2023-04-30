@@ -718,7 +718,7 @@ static const CSA_DICT_ENTRY CSAHeaderDataDict[] = {
   */
   { "sSliceArray.ucMode", "1", VR::US, VM::VM1, "slice ordering 0x1,0x2,0x4 resp. asc,desc,inter" },
 
-  { NULL, NULL, VR::INVALID, VM::VM0, NULL }
+  { nullptr, nullptr, VR::INVALID, VM::VM0, nullptr }
 };
 
 void
@@ -726,7 +726,7 @@ CSAHeaderDict::LoadDefault()
 {
   unsigned int   i = 0;
   CSA_DICT_ENTRY n = CSAHeaderDataDict[i];
-  while (n.name != NULL)
+  while (n.name != nullptr)
   {
     CSAHeaderDictEntry e(n.name, n.vr, n.vm, n.description);
     AddCSAHeaderDictEntry(e);

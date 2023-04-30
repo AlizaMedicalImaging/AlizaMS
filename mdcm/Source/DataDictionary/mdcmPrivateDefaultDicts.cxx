@@ -11221,7 +11221,7 @@ const PRIV_DICT_ENTRY DICOMV3DataDict[] = {
   {0x3461,0xa1,"WG-34 PA Image Frame Seq",VR::SQ,VM::VM1,"PAImageFrameTypeSequence",false},
   /////////////////////////////////////////////////////////////////////////////
   {0xffff,0xffff,"MDCM Private Sentinel",VR::INVALID,VM::VM0,"",true},
-  {0xffff,0xffff,"",VR::INVALID,VM::VM0,NULL,true}
+  {0xffff,0xffff,"",VR::INVALID,VM::VM0,nullptr,true}
 };
 // clang-format on
 
@@ -11230,9 +11230,9 @@ PrivateDict::LoadDefault()
 {
   unsigned int    i = 0;
   PRIV_DICT_ENTRY n = DICOMV3DataDict[i];
-  while (n.name != NULL)
+  while (n.name != nullptr)
   {
-    assert(n.owner != NULL);
+    assert(n.owner != nullptr);
     assert((n.group % 2) != 0 || n.group == 0xffff);
     assert(n.element <= 0xff || n.element == 0xffff);
     PrivateTag t(n.group, n.element, n.owner);

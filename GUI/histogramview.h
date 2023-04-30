@@ -15,8 +15,8 @@ class HistogramView : public QGraphicsView
 {
 Q_OBJECT
 public:
-    HistogramView(QWidget*,QObject*,QWidget*,bool);
-    ~HistogramView();
+	HistogramView(QWidget*,QObject*,QWidget*,bool);
+	~HistogramView();
 	void update__(const ImageVariant*);
 	void update_window(const ImageVariant*);
 	void clear__();
@@ -31,8 +31,8 @@ public slots:
 protected:
 	void drawBackground(QPainter*, const QRectF&) override;
 	void drawForeground(QPainter*, const QRectF&) override;
-    void keyPressEvent(QKeyEvent*) override;
-    void keyReleaseEvent(QKeyEvent*) override;
+	void keyPressEvent(QKeyEvent*) override;
+	void keyReleaseEvent(QKeyEvent*) override;
 
 private:
 	QGraphicsPixmapItem * pixmap;
@@ -44,9 +44,9 @@ private:
 class LevelRectItem : public QGraphicsRectItem
 {
 public:
-    enum { Type = QGraphicsItem::UserType + 4 };
-    LevelRectItem(HistogramView*, qreal, qreal, qreal, qreal, QGraphicsItem(*)=NULL);
-    ~LevelRectItem();
+	enum { Type = QGraphicsItem::UserType + 4 };
+	LevelRectItem(HistogramView*, qreal, qreal, qreal, qreal, QGraphicsItem(*) = nullptr);
+	~LevelRectItem();
 	qreal  get_width() const;
 	void   set_width(double);
 	QRectF boundingRect() const override;
@@ -54,11 +54,11 @@ public:
 protected:
 	QVariant itemChange(GraphicsItemChange, const QVariant &) override;
 	void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;
-    void mouseMoveEvent(QGraphicsSceneMouseEvent*) override;
-    void mousePressEvent(QGraphicsSceneMouseEvent*) override;
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent*) override;
-    void keyPressEvent(QKeyEvent*) override;
-    int  type() const override;
+	void mouseMoveEvent(QGraphicsSceneMouseEvent*) override;
+	void mousePressEvent(QGraphicsSceneMouseEvent*) override;
+	void mouseReleaseEvent(QGraphicsSceneMouseEvent*) override;
+	void keyPressEvent(QKeyEvent*) override;
+	int  type() const override;
 
 private:
 	HistogramView * view;

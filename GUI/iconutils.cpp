@@ -232,7 +232,7 @@ template<typename Tin, typename Tout> void extract_icon(
 	for (size_t i = 0; i < threads_size; ++i)
 	{
 		delete icon_threads[i];
-		icon_threads[i] = NULL;
+		icon_threads[i] = nullptr;
 	}
 	icon_threads.clear();
 	//
@@ -1110,7 +1110,7 @@ void IconUtils::kill_threads()
 		{
 			if (icon_threads.at(i)->isRunning()) icon_threads[i]->exit();
 			delete icon_threads[i];
-			icon_threads[i] = NULL;
+			icon_threads[i] = nullptr;
 		}
 	}
 	icon_threads.clear();

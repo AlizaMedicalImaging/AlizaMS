@@ -57,10 +57,10 @@ UUIDGenerator::Generate()
   uuid_t   g;
   uuid_create(&g, &rv);
   if (rv != uuid_s_ok)
-    return NULL;
+    return nullptr;
   uuid_to_string(&g, &uuid_data, &rv);
   if (rv != uuid_s_ok)
-    return NULL;
+    return nullptr;
 #elif defined(HAVE_UUIDCREATE)
   UUID uuid;
   UuidCreate(&uuid);

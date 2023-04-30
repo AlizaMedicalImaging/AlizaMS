@@ -98,9 +98,9 @@ protected:
   TMemberFunctionPointer      m_MemberFunction;
   TConstMemberFunctionPointer m_ConstMemberFunction;
   MemberCommand()
-    : m_This(NULL)
-    , m_MemberFunction(NULL)
-    , m_ConstMemberFunction(NULL)
+    : m_This(nullptr)
+    , m_MemberFunction(nullptr)
+    , m_ConstMemberFunction(nullptr)
   {}
   virtual ~MemberCommand() {}
 
@@ -152,8 +152,8 @@ protected:
   T *                    m_This;
   TMemberFunctionPointer m_MemberFunction;
   SimpleMemberCommand()
-    : m_This(NULL)
-    , m_MemberFunction(NULL)
+    : m_This(nullptr)
+    , m_MemberFunction(nullptr)
   {}
   virtual ~SimpleMemberCommand() {}
 

@@ -58,7 +58,7 @@ Preamble::Read(std::istream & is)
   if (Internal)
   {
     delete[] Internal;
-    Internal = NULL;
+    Internal = nullptr;
   }
   throw std::logic_error("Not a DICOM V3 file (No Preamble)");
 }
@@ -69,7 +69,7 @@ Preamble::Remove()
   if (Internal)
   {
     delete[] Internal;
-    Internal = NULL;
+    Internal = nullptr;
   }
 }
 

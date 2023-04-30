@@ -371,13 +371,13 @@ opj_seek_from_memory(OPJ_OFF_T p_nb_bytes, myfile * p_file)
 opj_stream_t * OPJ_CALLCONV
                opj_stream_create_memory_stream(myfile * p_mem, OPJ_SIZE_T p_size, bool p_is_read_stream)
 {
-  opj_stream_t * l_stream = NULL;
+  opj_stream_t * l_stream = nullptr;
   if (!p_mem)
-    return NULL;
+    return nullptr;
   l_stream = opj_stream_create(p_size, p_is_read_stream);
   if (!l_stream)
-    return NULL;
-  opj_stream_set_user_data(l_stream, p_mem, NULL);
+    return nullptr;
+  opj_stream_set_user_data(l_stream, p_mem, nullptr);
   opj_stream_set_read_function(l_stream, reinterpret_cast<opj_stream_read_fn>(opj_read_from_memory));
   opj_stream_set_write_function(l_stream, reinterpret_cast<opj_stream_write_fn>(opj_write_from_memory));
   opj_stream_set_skip_function(l_stream, reinterpret_cast<opj_stream_skip_fn>(opj_skip_from_memory));
@@ -567,7 +567,7 @@ rawtoimage(const char *        inputbuffer,
   int                  numcomps;
   OPJ_COLOR_SPACE      color_space;
   opj_image_cmptparm_t cmptparm[3]; // maximum of 3 components
-  opj_image_t *        image = NULL;
+  opj_image_t *        image = nullptr;
   const void * vinputbuffer = static_cast<const void*>(inputbuffer);
   if (sample_pixel == 1)
   {
@@ -583,12 +583,12 @@ rawtoimage(const char *        inputbuffer,
   else
   {
     mdcmAlwaysWarnMacro("JPEG2000: samples per pixel not supported " << sample_pixel);
-    return NULL;
+    return nullptr;
   }
   if (bitsallocated % 8 != 0)
   {
     mdcmAlwaysWarnMacro("JPEG2000: Bits Allocated not supported " << bitsallocated);
-    return NULL;
+    return nullptr;
   }
   // eg. fragment_size == 63532 and 181 * 117 * 3 * 8 == 63531
   assert(((fragment_size + 1) / 2) * 2 ==
@@ -615,7 +615,7 @@ rawtoimage(const char *        inputbuffer,
   // Create the image
   image = opj_image_create(numcomps, &cmptparm[0], color_space);
   if (!image)
-    return NULL;
+    return nullptr;
   // Set image offset and reference grid
   image->x0 = parameters->image_offset_x0;
   image->y0 = parameters->image_offset_y0;
@@ -675,7 +675,7 @@ rawtoimage(const char *        inputbuffer,
   {
     mdcmAlwaysWarnMacro("JPEG2000: Bits Allocated not supported " << bitsallocated);
     opj_image_destroy(image);
-    return NULL;
+    return nullptr;
   }
   return image;
 }
@@ -1232,7 +1232,7 @@ JPEG2000Codec::DecodeExtent(char *         buffer,
   assert(pf != PixelFormat::UINT12 && pf != PixelFormat::INT12);
   if (NumberOfDimensions == 2)
   {
-    char *            dummy_buffer = NULL;
+    char *            dummy_buffer = nullptr;
     std::vector<char> vdummybuffer;
     size_t            buf_size = 0;
     const Tag         seqDelItem(0xfffe, 0xe0dd);
@@ -1423,11 +1423,11 @@ std::pair<char *, size_t>
 JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
 {
   if (!dummy_buffer)
-    return std::make_pair<char *, size_t>(NULL, 0);
+    return std::make_pair<char *, size_t>(nullptr, 0);
   opj_dparameters_t parameters;   // decompression parameters
-  opj_codec_t *     dinfo = NULL; // handle to a decompressor
-  opj_stream_t *    cio = NULL;
-  opj_image_t *     image = NULL;
+  opj_codec_t *     dinfo = nullptr; // handle to a decompressor
+  opj_stream_t *    cio = nullptr;
+  opj_image_t *     image = nullptr;
   unsigned char *   src = reinterpret_cast<unsigned char *>(dummy_buffer);
   size_t file_length = buf_size;
   // OpenJPEG is very picky when there is a trailing 00 at the end of the JPC,
@@ -1441,11 +1441,11 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
   }
   if (file_length < 1)
   {
-    return std::make_pair<char *, size_t>(NULL, 0);
+    return std::make_pair<char *, size_t>(nullptr, 0);
   }
   if (src[file_length - 1] != 0xd9)
   {
-    return std::make_pair<char *, size_t>(NULL, 0);
+    return std::make_pair<char *, size_t>(nullptr, 0);
   }
   // Set decoding parameters to default values
   opj_set_default_decoder_parameters(&parameters);
@@ -1475,7 +1475,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
       break;
     default:
       mdcmErrorMacro("Error: parameters.decod_format");
-      return std::make_pair<char *, size_t>(NULL, 0);
+      return std::make_pair<char *, size_t>(nullptr, 0);
   }
 #if ((OPJ_VERSION_MAJOR == 2 && OPJ_VERSION_MINOR >= 3) || OPJ_VERSION_MAJOR > 2)
   if (opj_has_thread_support())
@@ -1493,7 +1493,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
   // to deal with zero length Psot.
   OPJ_UINT32 fl = file_length - 100;
   s[0] = &fl;
-  s[1] = NULL;
+  s[1] = nullptr;
   opj_set_error_handler(dinfo, mdcm_error_callback, s);
   cio = opj_stream_create_memory_stream(fsrc, OPJ_J2K_STREAM_CHUNK_SIZE, true);
   // Setup the decoder decoding parameters using user parameters
@@ -1504,7 +1504,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
     opj_destroy_codec(dinfo);
     opj_stream_destroy(cio);
     mdcmErrorMacro("opj_setup_decoder failure");
-    return std::make_pair<char *, size_t>(NULL, 0);
+    return std::make_pair<char *, size_t>(nullptr, 0);
   }
   bResult = opj_read_header(cio, dinfo, &image);
   if (!bResult)
@@ -1512,7 +1512,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
     opj_destroy_codec(dinfo);
     opj_stream_destroy(cio);
     mdcmErrorMacro("opj_setup_decoder failure");
-    return std::make_pair<char *, size_t>(NULL, 0);
+    return std::make_pair<char *, size_t>(nullptr, 0);
   }
 #if 0
   // Optional if you want decode the entire image
@@ -1529,16 +1529,16 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
     opj_destroy_codec(dinfo);
     opj_stream_destroy(cio);
     mdcmErrorMacro("opj_decode failed");
-    return std::make_pair<char *, size_t>(NULL, 0);
+    return std::make_pair<char *, size_t>(nullptr, 0);
   }
-  bResult = bResult && (image != NULL);
+  bResult = bResult && (image != nullptr);
   bResult = bResult && opj_end_decompress(dinfo, cio);
   if (!image || !check_comp_valid(image))
   {
     opj_destroy_codec(dinfo);
     opj_stream_destroy(cio);
     mdcmErrorMacro("opj_decode failed");
-    return std::make_pair<char *, size_t>(NULL, 0);
+    return std::make_pair<char *, size_t>(nullptr, 0);
   }
   bool reversible = false;
   bool lossless = false;
@@ -1599,7 +1599,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
   {
     opj_destroy_codec(dinfo);
     opj_image_destroy(image);
-    return std::make_pair<char *, size_t>(NULL, 0);
+    return std::make_pair<char *, size_t>(nullptr, 0);
   }
   for (unsigned int compno = 0; compno < image->numcomps; ++compno)
   {
@@ -1635,7 +1635,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
       opj_destroy_codec(dinfo);
       opj_image_destroy(image);
       delete[] raw;
-      return std::make_pair<char *, size_t>(NULL, 0);
+      return std::make_pair<char *, size_t>(nullptr, 0);
     }
     void * vraw = static_cast<void*>(raw);
     if (comp->prec <= 8)
@@ -1707,7 +1707,7 @@ JPEG2000Codec::CodeFrameIntoBuffer(char *       outdata,
   (void)numZ;
 #endif
   opj_cparameters_t parameters; // compression parameters
-  opj_image_t *     image = NULL;
+  opj_image_t *     image = nullptr;
   memcpy(&parameters, &(Internals->coder_param), sizeof(parameters));
   if ((parameters.cp_disto_alloc || parameters.cp_fixed_alloc || parameters.cp_fixed_quality) &&
       (!(parameters.cp_disto_alloc ^ parameters.cp_fixed_alloc ^ parameters.cp_fixed_quality)))
@@ -1724,7 +1724,7 @@ JPEG2000Codec::CodeFrameIntoBuffer(char *       outdata,
     parameters.tcp_numlayers = 1;
     parameters.cp_disto_alloc = 1;
   }
-  if (parameters.cp_comment == NULL)
+  if (parameters.cp_comment == nullptr)
   {
     const char   comment[] = "Created by MDCM/OpenJPEG version %s";
     const char * vers = opj_version();
@@ -1768,8 +1768,8 @@ JPEG2000Codec::CodeFrameIntoBuffer(char *       outdata,
   // Encode the destination image
   parameters.cod_format = J2K_CFMT; // J2K format output
   size_t         codestream_length;
-  opj_codec_t *  cinfo = NULL;
-  opj_stream_t * cio = NULL;
+  opj_codec_t *  cinfo = nullptr;
+  opj_stream_t * cio = nullptr;
   // Get a J2K compressor handle
   cinfo = opj_create_compress(CODEC_J2K);
   // Setup the encoder parameters using the current image and using user parameters
@@ -1844,9 +1844,9 @@ JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size, Transfe
   if (!dummy_buffer)
     return false;
   opj_dparameters_t     parameters;   // decompression parameters
-  opj_codec_t *         dinfo = NULL; // handle to a decompressor
-  opj_stream_t *        cio = NULL;
-  opj_image_t *         image = NULL;
+  opj_codec_t *         dinfo = nullptr; // handle to a decompressor
+  opj_stream_t *        cio = nullptr;
+  opj_image_t *         image = nullptr;
   const unsigned char * src = reinterpret_cast<const unsigned char *>(dummy_buffer);
   const size_t          file_length = buf_size;
   // Set decoding parameters to default values
@@ -1887,7 +1887,7 @@ JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size, Transfe
   fsrc->mem = fsrc->cur = const_cast<char*>(reinterpret_cast<const char *>(src));
   fsrc->len = file_length;
   // The hack is not used when reading meta-info of a j2k stream
-  opj_set_error_handler(dinfo, mdcm_error_callback, NULL);
+  opj_set_error_handler(dinfo, mdcm_error_callback, nullptr);
   cio = opj_stream_create_memory_stream(fsrc, OPJ_J2K_STREAM_CHUNK_SIZE, true);
   // Setup the decoder decoding parameters using user parameters
   opj_setup_decoder(dinfo, &parameters);
