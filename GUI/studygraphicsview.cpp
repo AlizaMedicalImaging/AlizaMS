@@ -566,11 +566,11 @@ void StudyGraphicsView::draw_prtexts(const ImageVariant * ivariant)
 		double L_, a_, b_;
 		ColorSpace_::Rgb2Lab(
 			&L_, &a_, &b_, 5.0 / 255.0, 220.0 / 255.0, 5.0 / 255.0);
-		const unsigned short L = (unsigned short)((L_ / 100.0) * 65535.0);
+		const unsigned short L = static_cast<unsigned short>((L_ / 100.0) * 65535.0);
 		const unsigned short a =
-			(unsigned short)(((a_ + 128.0) / 255.0) * 65535.0);
+			static_cast<unsigned short>(((a_ + 128.0) / 255.0) * 65535.0);
 		const unsigned short b =
-			(unsigned short)(((b_ + 128.0) / 255.0) * 65535.0);
+			static_cast<unsigned short>(((b_ + 128.0) / 255.0) * 65535.0);
 		std::cout <<  L << " " << a << " " << b << std::endl;
 	}
 #endif
@@ -832,7 +832,7 @@ void StudyGraphicsView::draw_prtexts(const ImageVariant * ivariant)
 				shadow->setXOffset(1.5); // not supported
 				shadow->setYOffset(1.5); // not supported
 				double opacity = 255.0;
-				if (l.at(x).ShadowOpacity > 0 && l.at(x).ShadowOpacity < 1)
+				if (l.at(x).ShadowOpacity > 0.0 && l.at(x).ShadowOpacity < 1.0)
 				{
 					opacity *= l.at(x).ShadowOpacity;
 				}
