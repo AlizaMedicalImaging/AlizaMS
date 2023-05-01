@@ -56,6 +56,7 @@ public:
 	const ImageVariant * get_selected_image_const() const;
 	void update_toolbox(const ImageVariant*);
 	void set_imagesbox(ImagesBox*);
+	const ImagesBox * get_imagesbox() const;
 	void set_browser2(BrowserWidget2*);
 	void set_settingswidget(SettingsWidget*);
 	void set_toolbox(ToolBox*);
@@ -165,6 +166,7 @@ public slots:
 	void trigger_show_roi_info();
 	void trigger_studyview();
 	void trigger_studyview_checked();
+	void trigger_studyview_empty();
 	void update_studyview_intersections();
 
 signals:

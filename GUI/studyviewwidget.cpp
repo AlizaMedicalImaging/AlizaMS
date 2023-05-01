@@ -3,6 +3,7 @@
 #include "lutwidget.h"
 #include "studyframewidget.h"
 #include "studygraphicswidget.h"
+#include "aliza.h"
 #include "studyviewwidget.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -73,38 +74,6 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 	l2->addWidget(lutwidget);
 	QGridLayout * gridLayout = new QGridLayout(frame);
 	(void)gridLayout;
-	for (int x = 0; x < widgets_size; ++x)
-	{
-		StudyGraphicsWidget * w = new StudyGraphicsWidget();
-		StudyFrameWidget * f = new StudyFrameWidget(w);
-		w->set_studyview(this);
-		w->set_slider(f->slider);
-		w->set_top_label(f->top_label);
-		w->set_left_label(f->left_label);
-		w->set_measure_label(f->measure_label);
-		w->set_icon_button(f->icon_button);
-		f->hide();
-		widgets.push_back(f);
-	}
-	update_null();
-	connect(
-		mbutton, SIGNAL(matrix_selected(int, int)),
-		this, SLOT(update_grid(int, int)));
-	connect(
-		fitall_toolButton, SIGNAL(clicked()),
-		this, SLOT(all_to_fit()));
-	connect(
-		scouts_toolButton, SIGNAL(toggled(bool)),
-		this, SLOT(toggle_scouts(bool)));
-	connect(
-		measure_toolButton, SIGNAL(toggled(bool)),
-		this, SLOT(toggle_measure(bool)));
-#if MATRIX_BUTTON_CUSTOM_ACT == 1
-	connect(
-		mbutton->p_action, SIGNAL(triggered()),
-		this, SLOT(update_grid2()));
-#endif
-	connect_tools();
 	//
 	close_sc = new QShortcut(QKeySequence::Close, this, SLOT(check_close()));
 	close_sc->setAutoRepeat(false);
@@ -153,6 +122,46 @@ StudyViewWidget::~StudyViewWidget()
 		}
 	}
 	widgets.clear();
+}
+
+void StudyViewWidget::init_(Aliza * a)
+{
+	aliza = a;
+	const int widgets_size = 25;
+	for (int x = 0; x < widgets_size; ++x)
+	{
+		StudyGraphicsWidget * w = new StudyGraphicsWidget();
+		StudyFrameWidget * f = new StudyFrameWidget(w);
+		w->set_id(x);
+		w->set_studyview(this);
+		w->set_aliza(aliza);
+		w->set_slider(f->slider);
+		w->set_top_label(f->top_label);
+		w->set_left_label(f->left_label);
+		w->set_measure_label(f->measure_label);
+		w->set_icon_button(f->icon_button);
+		f->hide();
+		widgets.push_back(f);
+	}
+	update_null();
+	connect(
+		mbutton, SIGNAL(matrix_selected(int, int)),
+		this, SLOT(update_grid(int, int)));
+	connect(
+		fitall_toolButton, SIGNAL(clicked()),
+		this, SLOT(all_to_fit()));
+	connect(
+		scouts_toolButton, SIGNAL(toggled(bool)),
+		this, SLOT(toggle_scouts(bool)));
+	connect(
+		measure_toolButton, SIGNAL(toggled(bool)),
+		this, SLOT(toggle_measure(bool)));
+#if MATRIX_BUTTON_CUSTOM_ACT == 1
+	connect(
+		mbutton->p_action, SIGNAL(triggered()),
+		this, SLOT(update_grid2()));
+#endif
+	connect_tools();
 }
 
 void StudyViewWidget::clear_()
@@ -489,9 +498,9 @@ bool StudyViewWidget::get_scouts() const
 	return scouts_toolButton->isChecked();
 }
 
-void StudyViewWidget::set_active_image(ImageContainer * c)
+void StudyViewWidget::set_active_image(int id)
 {
-	if (!(c && c->image3D))
+	if (id < 0)
 	{
 		active_id = -1;
 		for (int i = 0; i < widgets.size(); ++i)
@@ -507,7 +516,8 @@ void StudyViewWidget::set_active_image(ImageContainer * c)
 		update_null();
 		return;
 	}
-	active_id = c->image3D->id;
+	active_id = id;
+	ImageContainer * c{};
 	for (int i = 0; i < widgets.size(); ++i)
 	{
 		if (widgets.at(i))
@@ -516,8 +526,9 @@ void StudyViewWidget::set_active_image(ImageContainer * c)
 			{
 				if (widgets.at(i)->graphicswidget->image_container.image3D)
 				{
-					if (widgets.at(i)->graphicswidget->image_container.image3D->id == active_id)
+					if (widgets.at(i)->graphicswidget->get_id() == active_id)
 					{
+						c = &widgets.at(i)->graphicswidget->image_container;
 						widgets[i]->frame0->setFrameShape(QFrame::Box);
 					}
 					else
@@ -542,8 +553,10 @@ void StudyViewWidget::set_active_image(ImageContainer * c)
 
 void StudyViewWidget::update_full(ImageContainer * c)
 {
+	if (!c) return; // not required
+	const ImageVariant * v = c->image3D;
+	if (!v) return; // not required
 	block_signals(true);
-	const ImageVariant * v = c->image3D; // checked nullptr before
 	update_max_width(v->di->rmax-v->di->rmin);
 	update_window_upper(v->di->rmax);
 	update_window_lower(v->di->rmin);
@@ -595,7 +608,6 @@ void StudyViewWidget::update_level(ImageContainer * c)
 {
 	if (!c) return;
 	if (!c->image3D) return;
-	if (c->image3D->id != active_id) return;
 	const ImageVariant * v = c->image3D;
 	if (c->level_locked_ext)
 	{
@@ -650,7 +662,7 @@ void StudyViewWidget::set_center_slider(int x)
 			{
 				if (widgets.at(i)->graphicswidget->image_container.image3D)
 				{
-					if (widgets.at(i)->graphicswidget->image_container.image3D->id == active_id)
+					if (widgets.at(i)->graphicswidget->get_id() == active_id)
 					{
 						widgets[i]->graphicswidget->set_center(k);
 					}
@@ -674,7 +686,7 @@ void StudyViewWidget::set_width_slider(int x)
 			{
 				if (widgets.at(i)->graphicswidget->image_container.image3D)
 				{
-					if (widgets.at(i)->graphicswidget->image_container.image3D->id == active_id)
+					if (widgets.at(i)->graphicswidget->get_id() == active_id)
 					{
 						widgets[i]->graphicswidget->set_width(k);
 					}
@@ -697,7 +709,7 @@ void StudyViewWidget::set_center_spinbox(double x)
 			{
 				if (widgets.at(i)->graphicswidget->image_container.image3D)
 				{
-					if (widgets.at(i)->graphicswidget->image_container.image3D->id == active_id)
+					if (widgets.at(i)->graphicswidget->get_id() == active_id)
 					{
 						widgets[i]->graphicswidget->set_center(x);
 					}
@@ -720,7 +732,7 @@ void StudyViewWidget::set_width_spinbox(double x)
 			{
 				if (widgets.at(i)->graphicswidget->image_container.image3D)
 				{
-					if (widgets.at(i)->graphicswidget->image_container.image3D->id == active_id)
+					if (widgets.at(i)->graphicswidget->get_id() == active_id)
 					{
 						widgets[i]->graphicswidget->set_width(x);
 					}
@@ -743,7 +755,7 @@ void StudyViewWidget::set_lut_function(int x)
 			{
 				if (widgets.at(i)->graphicswidget->image_container.image3D)
 				{
-					if (widgets.at(i)->graphicswidget->image_container.image3D->id == active_id)
+					if (widgets.at(i)->graphicswidget->get_id() == active_id)
 					{
 						widgets[i]->graphicswidget->set_lut_function(k);
 					}
@@ -764,7 +776,7 @@ void StudyViewWidget::set_lut(int x)
 			{
 				if (widgets.at(i)->graphicswidget->image_container.image3D)
 				{
-					if (widgets.at(i)->graphicswidget->image_container.image3D->id == active_id)
+					if (widgets.at(i)->graphicswidget->get_id() == active_id)
 					{
 						widgets[i]->graphicswidget->set_lut(k);
 					}
@@ -800,7 +812,7 @@ void StudyViewWidget::toggle_lock_window(bool t)
 			{
 				if (widgets.at(i)->graphicswidget->image_container.image3D)
 				{
-					if (widgets.at(i)->graphicswidget->image_container.image3D->id == active_id)
+					if (widgets.at(i)->graphicswidget->get_id() == active_id)
 					{
 						widgets[i]->graphicswidget->set_locked_window(t);
 					}
@@ -825,7 +837,7 @@ void StudyViewWidget::reset_level()
 			{
 				if (widgets.at(i)->graphicswidget->image_container.image3D)
 				{
-					if (widgets.at(i)->graphicswidget->image_container.image3D->id == active_id)
+					if (widgets.at(i)->graphicswidget->get_id() == active_id)
 					{
 						widgets[i]->graphicswidget->reset_level();
 						if (!once)
@@ -1096,7 +1108,7 @@ void StudyViewWidget::set_single(const unsigned long long widget_id)
 		if (selected->graphicswidget)
 		{
 			selected->graphicswidget->show();
-			set_active_image(&(selected->graphicswidget->image_container));
+			set_active_image(selected->graphicswidget->get_id());
 			selected->graphicswidget->update_image(1, true);
 		}
 		else

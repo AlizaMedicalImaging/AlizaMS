@@ -5,6 +5,12 @@
 #include <QVBoxLayout>
 #include <QImage>
 #include <QGraphicsPixmapItem>
+#include <QMimeData>
+#include <QByteArray>
+#include <QDataStream>
+#include <QMap>
+#include <QListWidget>
+#include <QListWidgetItem>
 #include <itkExtractImageFilter.h>
 #include <itkRegionOfInterestImageFilter.h>
 #include <itkImageRegionIterator.h>
@@ -13,6 +19,8 @@
 #include "graphicsutils.h"
 #include "commonutils.h"
 #include "updateqtcommand.h"
+#include "aliza.h"
+#include "imagesbox.h"
 #include <climits>
 
 namespace
@@ -1082,8 +1090,7 @@ template<typename T> double get_distance3(
 	double d = -1;
 	bool ok = false;
 	//
-	if (
-		x0_ < ivariant->di->idimx &&
+	if (x0_ < ivariant->di->idimx &&
 		x1_ < ivariant->di->idimx &&
 		y0_ < ivariant->di->idimy &&
 		y1_ < ivariant->di->idimy)
@@ -1121,6 +1128,7 @@ StudyGraphicsWidget::StudyGraphicsWidget()
 	l->setSpacing(0);
 	l->setContentsMargins(0, 0, 0, 0);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	setAcceptDrops(true);
 }
 
 StudyGraphicsWidget::~StudyGraphicsWidget()
@@ -1146,9 +1154,24 @@ StudyGraphicsWidget::~StudyGraphicsWidget()
 	}
 }
 
+void StudyGraphicsWidget::set_id(int x)
+{
+	id = x;
+}
+
+int StudyGraphicsWidget::get_id() const
+{
+	return id;
+}
+
 void StudyGraphicsWidget::set_studyview(StudyViewWidget * v)
 {
 	studyview = v;
+}
+
+void StudyGraphicsWidget::set_aliza(Aliza * a)
+{
+	aliza = a;
 }
 
 void StudyGraphicsWidget::set_slider(QSlider * s)
@@ -1265,6 +1288,71 @@ void StudyGraphicsWidget::closeEvent(QCloseEvent * e)
 
 void StudyGraphicsWidget::leaveEvent(QEvent*)
 {
+}
+
+void StudyGraphicsWidget::dropEvent(QDropEvent * e)
+{
+	const bool lock = mutex.tryLock();
+	if (!lock) return;
+	int id{-1};
+	const QMimeData * mimeData = e->mimeData();
+	if (mimeData && mimeData->hasFormat("application/x-qabstractitemmodeldatalist")) // FIXME
+	{
+		QByteArray encoded = mimeData->data("application/x-qabstractitemmodeldatalist");
+		QDataStream stream(&encoded, QIODevice::ReadOnly);
+		while (!stream.atEnd())
+		{
+			int r{-1};
+			int c{-1};
+			QMap<int, QVariant> role;
+			stream >> r >> c >> role;
+#if 0
+			std::cout << "row = " << r << ", column = " << c << std::endl;
+#endif
+			(void)c;
+			(void)role;
+			//
+			if (aliza)
+			{
+				const ImagesBox * imagesbox = aliza->get_imagesbox();
+				if (imagesbox)
+				{
+					const ListWidgetItem2 * item =
+						static_cast<const ListWidgetItem2*>(imagesbox->listWidget->item(r));
+					if (item)
+					{
+						id = item->get_id();
+						break; // not really required, single selection
+					}
+				}
+			}
+		}
+	}
+	if (id >= 0)
+	{
+		ImageVariant * ivariant = aliza->get_image(id);
+		if (ivariant)
+		{
+			clear_(false);
+			set_image(ivariant, 1, true, false);
+		}
+	}
+	mutex.unlock();
+}
+
+void StudyGraphicsWidget::dragEnterEvent(QDragEnterEvent * e)
+{
+	e->acceptProposedAction();
+}
+
+void StudyGraphicsWidget::dragMoveEvent(QDragMoveEvent * e)
+{
+	e->acceptProposedAction();
+}
+
+void StudyGraphicsWidget::dragLeaveEvent(QDragLeaveEvent * e)
+{
+	e->accept();
 }
 
 void StudyGraphicsWidget::update_pr_area()
@@ -1616,7 +1704,8 @@ void StudyGraphicsWidget::clear_(bool lock)
 void StudyGraphicsWidget::set_image(
 	ImageVariant * v,
 	const short fit,
-	const bool /* always draw US regions */)
+	const bool, /* always draw US regions */
+	const bool lock_mutex)
 {
 	if (graphicsview->image_item)
 	{
@@ -1655,7 +1744,7 @@ void StudyGraphicsWidget::set_image(
 	int x = 0;
 	QString error_;
 	//
-	mutex.lock();
+	if (lock_mutex) mutex.lock();
 	//
 	image_container.image3D = v;
 	//
@@ -1940,7 +2029,7 @@ void StudyGraphicsWidget::set_image(
 		if (graphicsview->pr_area->isVisible()) graphicsview->pr_area->hide();
 	}
 quit__:
-	mutex.unlock();
+	if (lock_mutex) mutex.unlock();
 }
 
 void StudyGraphicsWidget::update_background_color()
@@ -2279,7 +2368,7 @@ void StudyGraphicsWidget::set_selected_slice2(int x, bool update_all)
 	//
 	if (studyview)
 	{
-		if (studyview->get_active_id() == image_container.image3D->id)
+		if (studyview->get_active_id() == id)
 		{
 			studyview->update_level(&image_container);
 		}
@@ -2308,7 +2397,7 @@ void StudyGraphicsWidget::toggle_single(bool t)
 
 void StudyGraphicsWidget::set_active()
 {
-	if (studyview) studyview->set_active_image(&image_container);
+	if (studyview) studyview->set_active_image(id);
 }
 
 void StudyGraphicsWidget::update_measurement(

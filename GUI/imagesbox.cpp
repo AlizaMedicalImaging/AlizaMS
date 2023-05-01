@@ -148,6 +148,7 @@ ImagesBox::ImagesBox(float si)
 	listWidget->setIconSize(QSize(96, 96));
 	listWidget->setMovement(QListView::Static);
 	listWidget->setFlow(QListView::TopToBottom);
+	listWidget->setDragDropMode(QAbstractItemView::DragOnly);
 	//
 	width_doubleSpinBox = new QDoubleSpinBox();
 	//
@@ -168,6 +169,7 @@ ImagesBox::ImagesBox(float si)
 	actionStudyMenu    = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Multi View"),this);
 	actionStudy        = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open study"), this);
 	actionStudyChecked = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open sel. and checked"), this);
+	actionStudyEmpty   = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open empty (drag)"), this);
 	//
 	actionTmp          = new QAction(QString("TMP"),this);
 	//
@@ -204,6 +206,7 @@ ImagesBox::ImagesBox(float si)
 	studyMenu = new QMenu(this);
 	studyMenu->addAction(actionStudy);
 	studyMenu->addAction(actionStudyChecked);
+	studyMenu->addAction(actionStudyEmpty);
 	actionStudyMenu->setMenu(studyMenu);
 	toolbar->addAction(actionStudyMenu);
 	toolbar->addAction(actionReloadHistogram);
