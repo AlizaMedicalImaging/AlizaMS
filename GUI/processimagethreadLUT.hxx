@@ -95,6 +95,12 @@ public:
 				tmp__size = pet20_dicom_lut_size;
 			}
 			break;
+		case 8:
+			{
+				tmp_p1 = labels_lut;
+				tmp__size = labels_lut_size;
+			}
+			break;
 		default:
 			return;
 		}
@@ -140,6 +146,16 @@ public:
 							p[j + 2] = tmp_p1[z * 3 + 2];
 						}
 						break;
+					case 8:
+						{
+							int z = static_cast<int>(v);
+							if (z < 0) z = 0;
+							if (z > (tmp__size - 1)) z = tmp__size - 1;
+							p[j + 0] = tmp_p1[z * 3];
+							p[j + 1] = tmp_p1[z * 3 + 1];
+							p[j + 2] = tmp_p1[z * 3 + 2];
+						}
+						break;
 					default:
 						break;
 					}
@@ -173,6 +189,16 @@ public:
 							p[j + 2] = tmp_p1[z * 3 + 2];
 						}
 						break;
+					case 8:
+						{
+							int z = static_cast<int>(v);
+							if (z < 0) z = 0;
+							if (z > (tmp__size - 1)) z = tmp__size - 1;
+							p[j + 0] = tmp_p1[z * 3 + 0];
+							p[j + 1] = tmp_p1[z * 3 + 1];
+							p[j + 2] = tmp_p1[z * 3 + 2];
+						}
+						break;
 					default:
 						break;
 					}
@@ -198,6 +224,7 @@ public:
 					case 5:
 					case 6:
 					case 7:
+					case 8:
 						{
 							p[j]     = tmp_p1[0];
 							p[j + 1] = tmp_p1[1];
@@ -210,7 +237,7 @@ public:
 				}
 				else if (v > wmax)
 				{
-					switch(lut)
+					switch (lut)
 					{
 					case 0:
 						if (alt_mode)
@@ -233,6 +260,7 @@ public:
 					case 5:
 					case 6:
 					case 7:
+					case 8:
 						if (alt_mode)
 						{
 							p[j]     = tmp_p1[0];

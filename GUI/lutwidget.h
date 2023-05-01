@@ -11,7 +11,6 @@ public:
 	LUTWidget(float);
 	~LUTWidget();
 	void add_items1();
-	void add_items2();
 	int get_lut() const;
 	QComboBox * comboBox;
 
