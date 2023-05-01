@@ -1335,6 +1335,10 @@ void StudyGraphicsWidget::dropEvent(QDropEvent * e)
 		{
 			clear_(false);
 			set_image(ivariant, 1, true, false);
+			if (studyview) // not required
+			{
+				studyview->update_scouts();
+			}
 		}
 	}
 	mutex.unlock();

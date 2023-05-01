@@ -169,7 +169,7 @@ ImagesBox::ImagesBox(float si)
 	actionStudyMenu    = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Multi View"),this);
 	actionStudy        = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open study"), this);
 	actionStudyChecked = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open sel. and checked"), this);
-	actionStudyEmpty   = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open empty (drag)"), this);
+	actionStudyEmpty   = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open empty, drag-and-drop)"), this);
 	//
 	actionTmp          = new QAction(QString("TMP"),this);
 	//
@@ -205,8 +205,8 @@ ImagesBox::ImagesBox(float si)
 	l->addWidget(toolbar);
 	studyMenu = new QMenu(this);
 	studyMenu->addAction(actionStudy);
-	studyMenu->addAction(actionStudyChecked);
 	studyMenu->addAction(actionStudyEmpty);
+	studyMenu->addAction(actionStudyChecked);
 	actionStudyMenu->setMenu(studyMenu);
 	toolbar->addAction(actionStudyMenu);
 	toolbar->addAction(actionReloadHistogram);

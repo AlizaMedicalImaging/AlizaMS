@@ -859,8 +859,8 @@ void MainWindow::createMenus()
 	QAction * actionMultiView = new QAction(QString("Multi View"), this);
 	QMenu * multi_view_menu = new QMenu(this);
 	multi_view_menu->addAction(imagesbox->actionStudy);
-	multi_view_menu->addAction(imagesbox->actionStudyChecked);
 	multi_view_menu->addAction(imagesbox->actionStudyEmpty);
+	multi_view_menu->addAction(imagesbox->actionStudyChecked);
 	actionMultiView->setMenu(multi_view_menu);
 	tools_menu->addAction(actionMultiView);
 	//
