@@ -231,7 +231,7 @@ public:
 	float * v;
 	float * fv;
 	float * tc;
-	double  * ipp_iop;
+	double * ipp_iop;
 	QString slice_orientation_string;
 };
 typedef std::vector<ImageSlice*> SlicesVector;
@@ -457,8 +457,7 @@ public:
 		{
 			return false;
 		}
-		if (o.VerticesofthePolygonalShutter.size() !=
-			VerticesofthePolygonalShutter.size())
+		if (o.VerticesofthePolygonalShutter.size() != VerticesofthePolygonalShutter.size())
 		{
 			return false;
 		}
@@ -466,34 +465,22 @@ public:
 			x < VerticesofthePolygonalShutter.size();
 			++x)
 		{
-			if (o.VerticesofthePolygonalShutter.at(x) !=
-				VerticesofthePolygonalShutter.at(x))
+			if (o.VerticesofthePolygonalShutter.at(x) != VerticesofthePolygonalShutter.at(x))
 			{
 				return false;
 			}
 		}
-		if ((o.ShutterLeftVerticalEdge
-				== ShutterLeftVerticalEdge) &&
-			(o.ShutterRightVerticalEdge
-				== ShutterRightVerticalEdge) &&
-			(o.ShutterUpperHorizontalEdge
-				== ShutterUpperHorizontalEdge) &&
-			(o.ShutterLowerHorizontalEdge
-				== ShutterLowerHorizontalEdge) &&
-			(o.CenterofCircularShutter_x
-				== CenterofCircularShutter_x) &&
-			(o.CenterofCircularShutter_y
-				== CenterofCircularShutter_y) &&
-			(o.RadiusofCircularShutter
-				== RadiusofCircularShutter) &&
-			(o.ShutterPresentationValue
-				== ShutterPresentationValue) &&
-			(o.ShutterPresentationColorCIELabValue_L
-				== ShutterPresentationColorCIELabValue_L) &&
-			(o.ShutterPresentationColorCIELabValue_a
-				== ShutterPresentationColorCIELabValue_a) &&
-			(o.ShutterPresentationColorCIELabValue_b
-				== ShutterPresentationColorCIELabValue_b))
+		if ((o.ShutterLeftVerticalEdge == ShutterLeftVerticalEdge) &&
+			(o.ShutterRightVerticalEdge == ShutterRightVerticalEdge) &&
+			(o.ShutterUpperHorizontalEdge == ShutterUpperHorizontalEdge) &&
+			(o.ShutterLowerHorizontalEdge == ShutterLowerHorizontalEdge) &&
+			(o.CenterofCircularShutter_x == CenterofCircularShutter_x) &&
+			(o.CenterofCircularShutter_y == CenterofCircularShutter_y) &&
+			(o.RadiusofCircularShutter == RadiusofCircularShutter) &&
+			(o.ShutterPresentationValue == ShutterPresentationValue) &&
+			(o.ShutterPresentationColorCIELabValue_L == ShutterPresentationColorCIELabValue_L) &&
+			(o.ShutterPresentationColorCIELabValue_a == ShutterPresentationColorCIELabValue_a) &&
+			(o.ShutterPresentationColorCIELabValue_b == ShutterPresentationColorCIELabValue_b))
 		{
 			return true;
 		}
@@ -794,7 +781,7 @@ public:
 	double us_window_width_ext{1e-6};
 	short selected_lut_ext{};
 	short lut_function_ext{};
-	bool  level_locked_ext{true};
+	bool level_locked_ext{true};
 	QString orientation_20_20;
 };
 
