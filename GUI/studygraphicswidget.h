@@ -19,8 +19,13 @@
 #include <QMouseEvent>
 #include <QEvent>
 #include <QCloseEvent>
+#include <QDropEvent>
+#include <QDragEnterEvent>
+#include <QDragMoveEvent>
+#include <QDragLeaveEvent>
 
 class StudyViewWidget;
+class Aliza;
 
 class StudyGraphicsWidget : public QWidget
 {
@@ -31,7 +36,10 @@ public:
 	StudyGraphicsWidget();
 	~StudyGraphicsWidget();
 	StudyGraphicsView * graphicsview;
+	void set_id(int);
+	int  get_id() const;
 	void set_studyview(StudyViewWidget*);
+	void set_aliza(Aliza*);
 	void set_slider(QSlider*);
 	void set_top_label(QLabel*);
 	void set_left_label(QLabel*);
@@ -49,11 +57,12 @@ public:
 	void update_image_color(int, int, int);
 	void set_image(
 		ImageVariant*,
-		const short/*fit*/,
-		const bool/*alw usregions*/);
+		const short /* fit */,
+		const bool, /* alw usregions */
+		const bool  /* lock */);
 	void update_image(
-		const short /*fit*/,
-		const bool /*lock*/);
+		const short /* fit */,
+		const bool  /* lock */);
 	void clear_(bool = true);
 	ImageContainer image_container;
 	void  update_pr_area();
@@ -83,10 +92,16 @@ signals:
 protected:
 	void closeEvent(QCloseEvent*) override;
 	void leaveEvent(QEvent*) override;
+	void dropEvent(QDropEvent*) override;
+	void dragEnterEvent(QDragEnterEvent*) override;
+	void dragMoveEvent(QDragMoveEvent*) override;
+	void dragLeaveEvent(QDragLeaveEvent*) override;
 
 private:
 	mutable QMutex mutex;
+	int id{-1};
 	StudyViewWidget * studyview{};
+	Aliza   * aliza{};
 	QSlider * slider{};
 	QLabel  * top_label{};
 	QLabel  * left_label{};

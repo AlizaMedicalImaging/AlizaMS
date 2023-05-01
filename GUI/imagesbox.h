@@ -39,7 +39,7 @@ public:
 	TableWidgetItem2(const QString & s) : QTableWidgetItem(s, QTableWidgetItem::UserType + 1) {}
 	~TableWidgetItem2() {}
 	void set_id(int);
-	int  get_id() const;
+	int get_id() const;
 
 private:
 	int id{-1};
@@ -77,6 +77,7 @@ public:
 	QAction * actionStudyMenu;
 	QAction * actionStudy;
 	QAction * actionStudyChecked;
+	QAction * actionStudyEmpty;
 
 private slots:
 	void toggle_info(bool);

@@ -1549,6 +1549,11 @@ void Aliza::set_imagesbox(ImagesBox * i)
 	imagesbox = i;
 }
 
+const ImagesBox * Aliza::get_imagesbox() const
+{
+	return imagesbox;
+}
+
 void Aliza::set_toolbox(ToolBox * i)
 {
 	toolbox = i;
@@ -1864,9 +1869,7 @@ void Aliza::connect_slots()
 	connect(imagesbox->actionROIInfo,        SIGNAL(triggered()), this, SLOT(trigger_show_roi_info()));
 	connect(imagesbox->actionStudy,          SIGNAL(triggered()), this, SLOT(trigger_studyview()));
 	connect(imagesbox->actionStudyChecked,   SIGNAL(triggered()), this, SLOT(trigger_studyview_checked()));
-#if 0
-	connect(imagesbox->actionStudyAll,       SIGNAL(triggered()), this, SLOT(trigger_studyview_all()));
-#endif
+	connect(imagesbox->actionStudyEmpty,     SIGNAL(triggered()), this, SLOT(trigger_studyview_empty()));
 	//
 	connect(imagesbox->contours_tableWidget, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(update_visible_rois(QTableWidgetItem*)));
 	//
@@ -4617,7 +4620,7 @@ void Aliza::trigger_studyview()
 		if (v2 && (x < studyview->widgets.size()))
 		{
 			studyview->widgets[x]->graphicswidget->clear_();
-			studyview->widgets[x]->graphicswidget->set_image(v2, 1, true);
+			studyview->widgets[x]->graphicswidget->set_image(v2, 1, true, true);
 		}
 		++x;
 	}
@@ -4684,12 +4687,33 @@ void Aliza::trigger_studyview_checked()
 		ImageVariant * v1 = l[j];
 		if (v1 && (x < studyview->widgets.size()))
 		{
-			studyview->widgets[x]->graphicswidget->set_image(v1, 1, true);
+			studyview->widgets[x]->graphicswidget->set_image(v1, 1, true, true);
 		}
 		++x;
 	}
 	//
 	check_slice_collisions2(studyview);
+	//
+	mutex0.unlock();
+	qApp->processEvents();
+}
+
+void Aliza::trigger_studyview_empty()
+{
+	if (!studyview) return;
+	const bool lock = mutex0.tryLock();
+	if (!lock) return;
+	//
+	const int n = 2;
+	//
+	studyview->clear_();
+	studyview->show();
+	if (studyview->isMinimized()) studyview->showNormal();
+	studyview->activateWindow();
+	studyview->raise();
+	qApp->processEvents();
+	studyview->calculate_grid(n);
+	qApp->processEvents();
 	//
 	mutex0.unlock();
 	qApp->processEvents();

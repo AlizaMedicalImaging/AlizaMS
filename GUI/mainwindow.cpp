@@ -32,6 +32,10 @@ MainWindow::MainWindow(
 	saved_ok3d = false;
 	int dock_area = 2;
 	QString saved_style;
+	//
+	QDateTime date_ = QDateTime::currentDateTime();
+	QString date_str = date_.toString(QString("hhmmsszzz"));
+	//
 	{
 		QSettings settings(
 			QSettings::IniFormat, QSettings::UserScope,
@@ -67,7 +71,7 @@ MainWindow::MainWindow(
 	imagesbox_frame1 = new QFrame(this);
 	imagesbox_frame1->setFrameShape(QFrame::NoFrame);
 	imagesbox_frame1->setFrameShadow(QFrame::Plain);
-	imagesbox = new ImagesBox(scale_icons*adjust_scale_icons);
+	imagesbox = new ImagesBox(scale_icons * adjust_scale_icons);
 	if (saved_style != QString("Dark Fusion"))
 	{
 		update_info_lines_bg();
@@ -331,14 +335,11 @@ MainWindow::MainWindow(
 	anchor_icon = QIcon(QString(":/bitmaps/anchor.svg"));
 	anchor2_icon = QIcon(QString(":/bitmaps/anchor2.svg"));
 	//
-	studyview = new StudyViewWidget(scale_icons*adjust_scale_icons, (sheight > swidth));
+	studyview = new StudyViewWidget(scale_icons * adjust_scale_icons, (sheight > swidth));
 	//
 	createActions();
 	createMenus();
 	createToolBars();
-	//
-	QDateTime date_    = QDateTime::currentDateTime();
-	QString   date_str = date_.toString(QString("hhmmsszzz"));
 	//
 	aliza->set_hide_zoom(hide_zoom);
 	aliza->set_browser2(browser2);
@@ -384,6 +385,8 @@ MainWindow::MainWindow(
 	graphicswidget_m->set_aliza(aliza);
 	graphicswidget_x->set_aliza(aliza);
 	graphicswidget_y->set_aliza(aliza);
+	//
+	studyview->init_(aliza);
 	//
 	histogramview = new HistogramView(
 		this, static_cast<QObject*>(aliza), multi_frame, false);
@@ -857,6 +860,7 @@ void MainWindow::createMenus()
 	QMenu * multi_view_menu = new QMenu(this);
 	multi_view_menu->addAction(imagesbox->actionStudy);
 	multi_view_menu->addAction(imagesbox->actionStudyChecked);
+	multi_view_menu->addAction(imagesbox->actionStudyEmpty);
 	actionMultiView->setMenu(multi_view_menu);
 	tools_menu->addAction(actionMultiView);
 	//

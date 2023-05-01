@@ -14,6 +14,7 @@ class StudyGraphicsWidget;
 class MatrixButton;
 class ImageContainer;
 class LUTWidget;
+class Aliza;
 
 class StudyViewWidget : public QWidget, public Ui::StudyViewWidget
 {
@@ -23,13 +24,14 @@ Q_OBJECT
 public:
 	StudyViewWidget(float, bool);
 	~StudyViewWidget();
+	void init_(Aliza*);
 	void clear_();
 	void set_horizontal(bool);
 	void calculate_grid(int);
 	int  get_active_id() const;
 	void set_active_id(int);
 	bool get_scouts() const;
-	void set_active_image(ImageContainer*);
+	void set_active_image(int);
 	void update_full(ImageContainer*);
 	void update_level(ImageContainer*);
 	void connect_tools();
@@ -86,6 +88,7 @@ private:
 	QToolButton * measure_toolButton;
 	QToolButton * anchor_toolButton;
 	LUTWidget * lutwidget;
+	Aliza * aliza{};
 	QIcon lockon;
 	QIcon lockoff;
 	bool horizontal;
