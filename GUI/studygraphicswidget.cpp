@@ -1,6 +1,7 @@
-#include "studygraphicswidget.h"
+#include "aliza.h"
 #include "studyviewwidget.h"
 #include "studyframewidget.h"
+#include "studygraphicswidget.h"
 #include <QtGlobal>
 #include <QVBoxLayout>
 #include <QImage>
@@ -19,7 +20,6 @@
 #include "graphicsutils.h"
 #include "commonutils.h"
 #include "updateqtcommand.h"
-#include "aliza.h"
 #include "imagesbox.h"
 #include <climits>
 
@@ -1294,7 +1294,7 @@ void StudyGraphicsWidget::dropEvent(QDropEvent * e)
 {
 	const bool lock = mutex.tryLock();
 	if (!lock) return;
-	int id{-1};
+	int i{-1};
 	const QMimeData * mimeData = e->mimeData();
 	if (mimeData && mimeData->hasFormat("application/x-qabstractitemmodeldatalist")) // FIXME
 	{
@@ -1321,16 +1321,16 @@ void StudyGraphicsWidget::dropEvent(QDropEvent * e)
 						static_cast<const ListWidgetItem2*>(imagesbox->listWidget->item(r));
 					if (item)
 					{
-						id = item->get_id();
+						i = item->get_id();
 						break; // not really required, single selection
 					}
 				}
 			}
 		}
 	}
-	if (id >= 0)
+	if (i >= 0)
 	{
-		ImageVariant * ivariant = aliza->get_image(id);
+		ImageVariant * ivariant = aliza->get_image(i);
 		if (ivariant)
 		{
 			clear_(false);
@@ -2468,24 +2468,24 @@ void StudyGraphicsWidget::update_measurement(
 		{
 			bool tmp1x = false;
 			bool tmp1y = false;
-			const unsigned int id =
+			const unsigned int i =
 				(high_priority_regions.size() == 1)
 				? high_priority_regions.at(0)
 				: ids.at(0);
 			const double dx =
-				ivariant->usregions.at(id).m_PhysicalDeltaX;
+				ivariant->usregions.at(i).m_PhysicalDeltaX;
 			const double dy =
-				ivariant->usregions.at(id).m_PhysicalDeltaY;
+				ivariant->usregions.at(i).m_PhysicalDeltaY;
 			const double x0_ = x0 * dx;
 			const double y0_ = y0 * dy;
 			const double x1_ = x1 * dx;
 			const double y1_ = y1 * dy;
 			const QString measure_textx =
-				ivariant->usregions.at(id).m_UnitXString;
+				ivariant->usregions.at(i).m_UnitXString;
 			const QString measure_texty =
-				ivariant->usregions.at(id).m_UnitYString;
+				ivariant->usregions.at(i).m_UnitYString;
 			const unsigned short spatial =
-				ivariant->usregions.at(id).m_RegionSpatialFormat;
+				ivariant->usregions.at(i).m_RegionSpatialFormat;
 			QColor color(Qt::cyan);
 			switch (spatial)
 			{
