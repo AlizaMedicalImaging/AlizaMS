@@ -9,7 +9,6 @@
 #include <QMap>
 #include <QList>
 #include <QToolBar>
-#include <QMenu>
 #include <QDoubleSpinBox>
 
 class ImageVariant;
@@ -73,8 +72,6 @@ public:
 	QAction * actionDICOMMeta;
 	QAction * actionContours;
 	QAction * actionROIInfo;
-	QMenu   * studyMenu;
-	QAction * actionStudyMenu;
 	QAction * actionStudy;
 	QAction * actionStudyChecked;
 	QAction * actionStudyEmpty;

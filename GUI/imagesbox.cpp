@@ -6,6 +6,7 @@
 #include <QByteArray>
 #include <QStringList>
 #include <QTextDocument>
+#include <QMenu>
 #include <QToolButton>
 #include <QDate>
 #include "structures.h"
@@ -166,7 +167,6 @@ ImagesBox::ImagesBox(float si)
 	actionContours->setCheckable(true);
 	actionContours->setChecked(false);
 	actionROIInfo      = new QAction(QIcon(QString(":/bitmaps/meta.svg")),QString("ROI Info"), this);
-	actionStudyMenu    = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Multi View"),this);
 	actionStudy        = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open study"), this);
 	actionStudyChecked = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open sel. and checked"), this);
 	actionStudyEmpty   = new QAction(QIcon(QString(":/bitmaps/user.svg")),QString("Open empty, drag-and-drop"), this);
@@ -203,12 +203,16 @@ ImagesBox::ImagesBox(float si)
 	l->setContentsMargins(0, 0, 0, 0);
 	l->setSpacing(0);
 	l->addWidget(toolbar);
-	studyMenu = new QMenu(this);
+	QMenu * studyMenu = new QMenu(this);
 	studyMenu->addAction(actionStudy);
 	studyMenu->addAction(actionStudyEmpty);
 	studyMenu->addAction(actionStudyChecked);
-	actionStudyMenu->setMenu(studyMenu);
-	toolbar->addAction(actionStudyMenu);
+	QToolButton * toolButton7 = new QToolButton();
+	toolButton7->setIcon(QIcon(QString(":/bitmaps/user.svg")));
+	toolButton7->setToolTip(QString("Multiview"));
+	toolButton7->setMenu(studyMenu);
+	toolButton7->setPopupMode(QToolButton::InstantPopup);
+	toolbar->addWidget(toolButton7);
 	toolbar->addAction(actionReloadHistogram);
 	toolbar->addAction(actionClear);
 	toolbar->addAction(actionClearAll);
