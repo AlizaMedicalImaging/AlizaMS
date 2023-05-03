@@ -406,7 +406,7 @@ int main(int argc, char * argv[])
 					settings.sync();
 #if 0
 					QMessageBox::information(
-						NULL,
+						nullptr,
 						QString("Aliza MS"),
 						QString("OpenGL 3 is not available"));
 #else
@@ -525,7 +525,7 @@ int main(int argc, char * argv[])
 				if (x > 4)
 				{
 					QMessageBox::information(
-						NULL,
+						nullptr,
 						QString("Warning"),
 						QString(
 							"Max 4 Metadata Viewers,\n"

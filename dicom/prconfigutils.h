@@ -9,6 +9,7 @@ class ImageVariant;
 class PrConfig;
 class SettingsWidget;
 class GLWidget;
+
 class PrConfigUtils
 {
 public:
