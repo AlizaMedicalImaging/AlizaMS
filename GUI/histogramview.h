@@ -62,7 +62,7 @@ protected:
 
 private:
 	HistogramView * view;
-	qreal pwidth;
+	qreal pwidth{3.0};
 };
 
 #endif

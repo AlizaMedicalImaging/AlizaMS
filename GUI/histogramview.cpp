@@ -17,15 +17,15 @@ LevelRectItem::LevelRectItem(
 	qreal x, qreal y,
 	qreal w, qreal h,
 	QGraphicsItem * p)
-	: QGraphicsRectItem(x, y, w, h, p)
+	:
+	view(v),
+	QGraphicsRectItem(x, y, w, h, p)
 {
-	view = v;
 	setFlag(QGraphicsItem::ItemIsMovable, true);
 	setFlag(QGraphicsItem::ItemIsFocusable, false);
 	setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
 	setAcceptHoverEvents(false);
 	setCursor(Qt::OpenHandCursor);
-	pwidth = 3.0;
 	QBrush brush(QColor(0xbc, 0x86, 0x2b));
 	QPen pen;
 	pen.setBrush(brush);
