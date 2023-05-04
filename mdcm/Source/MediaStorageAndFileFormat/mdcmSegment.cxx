@@ -70,8 +70,6 @@ Segment::GetALGOType(const char * type)
 
 Segment::Segment()
   : SegmentNumber(0)
-  , SegmentLabel("")
-  , SegmentDescription("")
   , AnatomicRegion()
   , AnatomicRegionModifiers()
   , PropertyCategory()

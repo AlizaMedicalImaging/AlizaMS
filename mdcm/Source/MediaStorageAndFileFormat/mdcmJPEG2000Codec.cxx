@@ -26,6 +26,7 @@
 #include "mdcmDataElement.h"
 #include "mdcmSequenceOfFragments.h"
 #include "mdcmSwapper.h"
+#include "mdcmVersion.h"
 #include <cstring>
 #include <cstdio>
 #include <numeric>
@@ -1724,13 +1725,22 @@ JPEG2000Codec::CodeFrameIntoBuffer(char *       outdata,
     parameters.tcp_numlayers = 1;
     parameters.cp_disto_alloc = 1;
   }
-  if (parameters.cp_comment == nullptr)
+  if (!parameters.cp_comment)
   {
-    const char   comment[] = "Created by MDCM/OpenJPEG version %s";
-    const char * vers = opj_version();
-    parameters.cp_comment = static_cast<char *>(malloc(strlen(comment) + 10));
-    snprintf(parameters.cp_comment, strlen(comment) + 10, comment, vers);
-    // No need to delete parameters.cp_comment on exit
+    const char * comment = "MDCM %s, OpenJPEG version %s"; // strlen - 4
+    const char * jp_v = opj_version();
+    const char * mdcm_v = mdcm::Version::GetVersion();
+	const size_t f_size = strlen(comment) - 4 + strlen(jp_v) + strlen(mdcm_v) + 1;
+    parameters.cp_comment = static_cast<char *>(malloc(f_size));
+    const int n = snprintf(parameters.cp_comment, f_size, comment, mdcm_v, jp_v);
+#if 0
+    std::cout << "strlen=" << strlen(parameters.cp_comment)
+              << ", n=" << n
+              << ", f_size=" << f_size << " "
+              << parameters.cp_comment << std::endl;
+#else
+    (void)n;
+#endif
   }
   // Compute the proper number of resolutions to use.
   // This is mostly done for images smaller than 64 pixels
@@ -1764,7 +1774,10 @@ JPEG2000Codec::CodeFrameIntoBuffer(char *       outdata,
                      quality,
                      this->GetPlanarConfiguration());
   if (!image)
+  {
+    free(parameters.cp_comment);
     return false;
+  }
   // Encode the destination image
   parameters.cod_format = J2K_CFMT; // J2K format output
   size_t         codestream_length;
@@ -1783,6 +1796,7 @@ JPEG2000Codec::CodeFrameIntoBuffer(char *       outdata,
   }
   catch (const std::bad_alloc &)
   {
+    free(parameters.cp_comment);
     return false;
   }
   fsrc->mem = fsrc->cur = buffer_j2k;
@@ -1791,6 +1805,7 @@ JPEG2000Codec::CodeFrameIntoBuffer(char *       outdata,
   cio = opj_stream_create_memory_stream(fsrc, OPJ_J2K_STREAM_CHUNK_SIZE, false);
   if (!cio)
   {
+    free(parameters.cp_comment);
     return false;
   }
   // Encode the image
@@ -1800,6 +1815,7 @@ JPEG2000Codec::CodeFrameIntoBuffer(char *       outdata,
   if (!ok)
   {
     opj_stream_destroy(cio);
+    free(parameters.cp_comment);
     return false;
   }
   codestream_length = mysrc.len;
@@ -1829,10 +1845,11 @@ JPEG2000Codec::CodeFrameIntoBuffer(char *       outdata,
   opj_destroy_codec(cinfo);
   complen = codestream_length;
   // Free user parameters structure
-  if (parameters.cp_comment)
-    free(parameters.cp_comment);
-  if (parameters.cp_matrice)
-    free(parameters.cp_matrice);
+  free(parameters.cp_comment);
+#if 1
+  // TODO check, seems to be always null here
+  free(parameters.cp_matrice);
+#endif
   // Free image data
   opj_image_destroy(image);
   return ok;
