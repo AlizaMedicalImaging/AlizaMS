@@ -1556,7 +1556,7 @@ void delta_decode_rgb(
 	new_stream.resize(outputlen);
 	if(data_size == outputlen) return;
 	const unsigned char * src  = data_in;
-	unsigned char * dest = &new_stream[0];
+	unsigned char * dest = new_stream.data();
 	union
 	{
 		unsigned char gray;
@@ -9193,7 +9193,7 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 				delta_decode(bv2->GetPointer(), bv2->GetLength(), buffer);
 				// TODO check that decompress byte buffer match the expected size
 				pixeldata.SetByteValue(
-					reinterpret_cast<char*>(&buffer[0]),
+					reinterpret_cast<char*>(buffer.data()),
 					static_cast<uint32_t>(buffer.size() * sizeof(unsigned short)));
 			}
 		}
@@ -9234,7 +9234,7 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 					reinterpret_cast<const unsigned char*>(bv2->GetPointer()), bv2l, buffer,
 					at0.GetValue(), w, h);
 				pixeldata.SetByteValue(
-					reinterpret_cast<char*>(&buffer[0]),
+					reinterpret_cast<char*>(buffer.data()),
 					static_cast<uint32_t>(buffer.size()));
 			}
 		}
@@ -9300,7 +9300,7 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 				delta_decode(bv2->GetPointer(), bv2->GetLength(), buffer);
 				// TODO check that decompress byte buffer match the expected size
 				pixeldata.SetByteValue(
-					reinterpret_cast<char*>(&buffer[0]),
+					reinterpret_cast<char*>(buffer.data()),
 					static_cast<uint32_t>(buffer.size() * sizeof(unsigned short)));
 			}
 		}
@@ -9331,7 +9331,7 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 					reinterpret_cast<const unsigned char*>(bv2->GetPointer()), bv2->GetLength(), buffer,
 					at0.GetValue(), w, h);
 				pixeldata.SetByteValue(
-					reinterpret_cast<char*>(&buffer[0]),
+					reinterpret_cast<char*>(buffer.data()),
 					static_cast<uint32_t>(buffer.size()));
 			}
 		}
