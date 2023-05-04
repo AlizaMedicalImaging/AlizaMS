@@ -1870,7 +1870,7 @@ ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
   assert(MediaStorage::IsImage(ms));
   if (ms == MediaStorage::SecondaryCaptureImageStorage)
   {
-    // https://sourceforge.net/p/mdcm/bugs/322/
+    // https://sourceforge.net/p/gdcm/bugs/322/
     // default behavior is simply to pass
     return;
   }
@@ -2176,7 +2176,7 @@ ImageHelper::SetDirectionCosinesValue(DataSet & ds, const std::vector<double> & 
   assert(MediaStorage::IsImage(ms));
   if (ms == MediaStorage::SecondaryCaptureImageStorage)
   {
-    // https://sourceforge.net/p/mdcm/bugs/322/
+    // https://sourceforge.net/p/gdcm/bugs/322/
     // default behavior is simply to pass
     return;
   }
