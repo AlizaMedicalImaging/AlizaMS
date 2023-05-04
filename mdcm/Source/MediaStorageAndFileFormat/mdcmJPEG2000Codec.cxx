@@ -1730,7 +1730,7 @@ JPEG2000Codec::CodeFrameIntoBuffer(char *       outdata,
     const char * comment = "MDCM %s, OpenJPEG version %s"; // strlen - 4
     const char * jp_v = opj_version();
     const char * mdcm_v = mdcm::Version::GetVersion();
-	const size_t f_size = strlen(comment) - 4 + strlen(jp_v) + strlen(mdcm_v) + 1;
+    const size_t f_size = strlen(comment) - 4 + strlen(jp_v) + strlen(mdcm_v) + 1;
     parameters.cp_comment = static_cast<char *>(malloc(f_size));
     const int n = snprintf(parameters.cp_comment, f_size, comment, mdcm_v, jp_v);
 #if 0
