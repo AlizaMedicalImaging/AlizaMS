@@ -81,7 +81,7 @@ JPEGLSCodec::Decode(DataElement const & in, DataElement & out)
       return false;
     delete[] buffer;
     out = in;
-    out.SetByteValue(reinterpret_cast<char *>(&rgbyteOut[0]), static_cast<uint32_t>(rgbyteOut.size()));
+    out.SetByteValue(reinterpret_cast<char *>(rgbyteOut.data()), static_cast<uint32_t>(rgbyteOut.size()));
     return true;
   }
   else if (NumberOfDimensions == 3)
@@ -129,13 +129,13 @@ JPEGLSCodec::Decode(DataElement const & in, DataElement & out)
       LossyFlag = params.allowedLossyError != 0;
       std::vector<unsigned char> rgbyteOut;
       rgbyteOut.resize(static_cast<size_t>(params.height) * static_cast<size_t>(params.width) * ((params.bitsPerSample + 7) / 8) * params.components);
-      ApiResult result = JpegLsDecode(&rgbyteOut[0], rgbyteOut.size(), pbyteCompressed, cbyteCompressed, &params, nullptr);
+      ApiResult result = JpegLsDecode(rgbyteOut.data(), rgbyteOut.size(), pbyteCompressed, cbyteCompressed, &params, nullptr);
       delete[] mybuffer;
       if (result != ApiResult::OK)
       {
         return false;
       }
-      os.write(reinterpret_cast<const char *>(&rgbyteOut[0]), rgbyteOut.size());
+      os.write(reinterpret_cast<const char *>(rgbyteOut.data()), rgbyteOut.size());
     }
     std::string str = os.str();
     assert(!str.empty());
@@ -145,7 +145,7 @@ JPEGLSCodec::Decode(DataElement const & in, DataElement & out)
       mdcmAlwaysWarnMacro("JPEGLSCodec: value too big for ByteValue");
       return false;
     }
-    out.SetByteValue(&str[0], static_cast<uint32_t>(str_size));
+    out.SetByteValue(str.data(), static_cast<uint32_t>(str_size));
     return true;
   }
   return false;
@@ -287,11 +287,11 @@ JPEGLSCodec::Code(DataElement const & in, DataElement & out)
     rgbyteCompressed.resize(static_cast<size_t>(image_width) * static_cast<size_t>(image_height) * 4 * 2); // overallocate
     size_t     cbyteCompressed;
     const bool b = this->CodeFrameIntoBuffer(
-      reinterpret_cast<char *>(&rgbyteCompressed[0]), rgbyteCompressed.size(), cbyteCompressed, inputdata, inputlength);
+      reinterpret_cast<char *>(rgbyteCompressed.data()), rgbyteCompressed.size(), cbyteCompressed, inputdata, inputlength);
     if (!b)
       return false;
     Fragment frag;
-    frag.SetByteValue(reinterpret_cast<char *>(&rgbyteCompressed[0]), static_cast<uint32_t>(cbyteCompressed));
+    frag.SetByteValue(reinterpret_cast<char *>(rgbyteCompressed.data()), static_cast<uint32_t>(cbyteCompressed));
     sq->AddFragment(frag);
   }
   assert(sq->GetNumberOfFragments() == dims[2]);
@@ -426,7 +426,7 @@ JPEGLSCodec::DecodeExtent(char *         buffer,
       const size_t oldlen = vdummybuffer.size();
       buf_size = fraglen + oldlen;
       vdummybuffer.resize(buf_size);
-      dummy_buffer = &vdummybuffer[0];
+      dummy_buffer = vdummybuffer.data();
       is.read(&vdummybuffer[oldlen], fraglen);
     }
     assert(frag.GetTag() == seqDelItem && frag.GetVL() == 0);
@@ -436,7 +436,7 @@ JPEGLSCodec::DecodeExtent(char *         buffer,
     const bool                 b = DecodeByStreamsCommon(dummy_buffer, buf_size, outv);
     if (!b)
       return false;
-    unsigned char *    raw = &outv[0];
+    unsigned char *    raw = outv.data();
     const size_t       rowsize = static_cast<size_t>(xmax) - static_cast<size_t>(xmin) + 1;
     const size_t       colsize = static_cast<size_t>(ymax) - static_cast<size_t>(ymin) + 1;
     const unsigned int bytesPerPixel = pf.GetPixelSize();
@@ -503,7 +503,7 @@ JPEGLSCodec::DecodeExtent(char *         buffer,
       delete[] dummy_buffer;
       if (!b)
         return false;
-      unsigned char *    raw = &outv[0];
+      unsigned char *    raw = outv.data();
       const size_t       rowsize = static_cast<size_t>(xmax) - static_cast<size_t>(xmin) + 1;
       const size_t       colsize = static_cast<size_t>(ymax) - static_cast<size_t>(ymin) + 1;
       const unsigned int bytesPerPixel = pf.GetPixelSize();
@@ -562,10 +562,10 @@ JPEGLSCodec::AppendFrameEncode(std::ostream & out, const char * data, size_t dat
   rgbyteCompressed.resize( static_cast<size_t>(dimensions[0]) *  static_cast<size_t>(dimensions[1]) * 4);
   size_t     cbyteCompressed;
   const bool b =
-    this->CodeFrameIntoBuffer(reinterpret_cast<char *>(&rgbyteCompressed[0]), rgbyteCompressed.size(), cbyteCompressed, data, datalen);
+    this->CodeFrameIntoBuffer(reinterpret_cast<char *>(rgbyteCompressed.data()), rgbyteCompressed.size(), cbyteCompressed, data, datalen);
   if (!b)
     return false;
-  out.write(reinterpret_cast<char *>(&rgbyteCompressed[0]), cbyteCompressed);
+  out.write(reinterpret_cast<char *>(rgbyteCompressed.data()), cbyteCompressed);
   return true;
 }
 
@@ -594,7 +594,7 @@ JPEGLSCodec::DecodeByStreamsCommon(const char * buffer, size_t totalLen, std::ve
   // allowedlossyerror == 0 => Lossless
   LossyFlag = params.allowedLossyError != 0;
   rgbyteOut.resize(static_cast<size_t>(params.height) * static_cast<size_t>(params.width) * ((params.bitsPerSample + 7) / 8) * params.components);
-  ApiResult result = JpegLsDecode(&rgbyteOut[0], rgbyteOut.size(), pbyteCompressed, cbyteCompressed, &params, nullptr);
+  ApiResult result = JpegLsDecode(rgbyteOut.data(), rgbyteOut.size(), pbyteCompressed, cbyteCompressed, &params, nullptr);
   if (result != ApiResult::OK)
   {
     mdcmErrorMacro("Could not decode JPEG-LS stream");

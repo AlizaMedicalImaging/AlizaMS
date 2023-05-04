@@ -23,14 +23,14 @@ ApplySupplementalLUT::Apply()
   if (!bitsample)
     return false;
   const unsigned long long len = image.GetBufferLength();
-  if (len*3 > 0xffffffff)
+  if (len * 3 > 0xffffffff)
   {
     mdcmAlwaysWarnMacro("ApplySupplementalLUT::Apply() : len " << len);
     return false;
   }
   std::vector<char> v;
   v.resize(len);
-  char * p = &v[0];
+  char * p = v.data();
   image.GetBuffer(p);
   std::stringstream is;
   if (!is.write(p, len))
@@ -41,10 +41,10 @@ ApplySupplementalLUT::Apply()
   DataElement &     de = Output->GetDataElement();
   std::vector<char> v2;
   v2.resize(len * 3);
-  const int RedSubscipt = lut.DecodeSupplemental(&v2[0], v2.size(), &v[0], v.size());
+  const int RedSubscipt = lut.DecodeSupplemental(v2.data(), v2.size(), v.data(), v.size());
   if (RedSubscipt > INT_MIN)
     m_RedSubscipt = RedSubscipt;
-  de.SetByteValue(&v2[0], static_cast<uint32_t>(v2.size()));
+  de.SetByteValue(v2.data(), static_cast<uint32_t>(v2.size()));
   Output->GetLUT().Clear();
   Output->SetPhotometricInterpretation(PhotometricInterpretation::RGB);
   if (Output->GetPixelFormat().GetPixelRepresentation() != 0)

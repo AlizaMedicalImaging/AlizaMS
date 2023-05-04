@@ -196,11 +196,11 @@ PVRGCodec::Decode(DataElement const & in, DataElement & out)
     std::ifstream is(rawfile, std::ios::binary);
     std::string   buf;
     buf.resize(len);
-    is.read(&buf[0], len);
+    is.read(buf.data(), len);
     out.SetTag(Tag(0x7fe0, 0x0010));
     if (PF.GetBitsAllocated() == 16)
     {
-      ByteSwap<uint16_t>::SwapRangeFromSwapCodeIntoSystem((uint16_t *)&buf[0],
+      ByteSwap<uint16_t>::SwapRangeFromSwapCodeIntoSystem(reinterpret_cast<uint16_t *>(buf.data()),
 #  ifdef MDCM_WORDS_BIGENDIAN
                                                           SwapCode::LittleEndian,
 #  else
@@ -214,7 +214,7 @@ PVRGCodec::Decode(DataElement const & in, DataElement & out)
       mdcmErrorMacro("Could not delete output: " << rawfile);
     }
   }
-  out.SetByteValue(&wholebuf[0], (uint32_t)wholebuf.size());
+  out.SetByteValue(wholebuf.data(), static_cast<uint32_t>(wholebuf.size()));
   if (numoutfile == 3)
   {
     this->PlanarConfiguration = 1;

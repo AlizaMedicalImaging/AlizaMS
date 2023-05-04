@@ -49,7 +49,7 @@ ImageApplyLookupTable::Apply()
   }
   std::vector<char> v;
   v.resize(len);
-  char * p = &v[0];
+  char * p = v.data();
   image.GetBuffer(p);
   std::stringstream is;
   if (!is.write(p, len))
@@ -60,8 +60,8 @@ ImageApplyLookupTable::Apply()
   DataElement &     de = Output->GetDataElement();
   std::vector<char> v2;
   v2.resize(len * 3);
-  lut.Decode(&v2[0], v2.size(), &v[0], v.size());
-  de.SetByteValue(&v2[0], static_cast<uint32_t>(v2.size()));
+  lut.Decode(v2.data(), v2.size(), v.data(), v.size());
+  de.SetByteValue(v2.data(), static_cast<uint32_t>(v2.size()));
   Output->GetLUT().Clear();
   Output->SetPhotometricInterpretation(PhotometricInterpretation::RGB);
   Output->GetPixelFormat().SetSamplesPerPixel(3);

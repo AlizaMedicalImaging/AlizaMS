@@ -887,9 +887,8 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
       mdcmWarningMacro("No Pixel Data Found");
       return false;
     }
-    // FIXME:
+    // FIXME
     // We should check that when PixelData is RAW that Col * Dim == PixelData->GetLength()
-    // PixelFormat guesspf = PixelFormat->GuessPixelFormat();
     const unsigned int * dims = PixelData->GetDimensions();
     if (dims[0] == 0 || dims[1] == 0)
     {
@@ -902,7 +901,7 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
         const SequenceOfFragments * sqf = de.GetSequenceOfFragments();
         if (!sqf)
         {
-          mdcmDebugMacro("File is declared as JPEG compressed but does not contains Fragments explicitly.");
+          mdcmDebugMacro("File is declared as JPEG compressed but does not contains Fragments");
           return false;
         }
         sqf->WriteBuffer(ss);
@@ -920,7 +919,7 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
           assert(jpeg.GetDimensions()[1]);
           v[0] = jpeg.GetDimensions()[0];
           v[1] = jpeg.GetDimensions()[1];
-          PixelData->SetDimensions(&v[0]);
+          PixelData->SetDimensions(v.data());
           if (PixelData->GetPixelFormat().GetSamplesPerPixel() != jpeg.GetPixelFormat().GetSamplesPerPixel())
           {
             mdcmDebugMacro("Fix samples per pixel.");

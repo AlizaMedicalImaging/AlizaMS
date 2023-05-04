@@ -162,9 +162,9 @@ utf8_decode(const std::string & str)
 {
   if (str.empty())
     return std::wstring();
-  const int    len = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), nullptr, 0);
+  const int    len = MultiByteToWideChar(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), nullptr, 0);
   std::wstring ret(len, 0);
-  MultiByteToWideChar(CP_UTF8, 0, &str[0], -1, &ret[0], len);
+  MultiByteToWideChar(CP_UTF8, 0, str.data(), -1, ret.data(), len);
   return ret;
 }
 
@@ -173,9 +173,9 @@ utf8_encode(const std::wstring & wstr)
 {
   if (wstr.empty())
     return std::string();
-  const int   len = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), nullptr, 0, nullptr, nullptr);
+  const int   len = WideCharToMultiByte(CP_UTF8, 0, wstr.data(), static_cast<int>(wstr.size()), nullptr, 0, nullptr, nullptr);
   std::string ret(len, 0);
-  WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &ret[0], len, nullptr, nullptr);
+  WideCharToMultiByte(CP_UTF8, 0, wstr.data(), static_cast<int>(wstr.size()), ret.data(), len, nullptr, nullptr);
   return ret;
 }
 
@@ -189,7 +189,7 @@ ComputeFullPath(const std::wstring & in, std::wstring & out)
   if (0 == requiredBufferLength)
     return false;
   out.resize(requiredBufferLength);
-  wchar_t * buffer = &out[0];
+  wchar_t * buffer = out.data();
   DWORD     result = GetFullPathNameW(fileName, requiredBufferLength, buffer, nullptr);
   if (0 == result)
     return false;
@@ -297,7 +297,7 @@ System::GetCurrentProcessFileName()
   CFURLRef    pathURL = CFBundleCopyExecutableURL(CFBundleGetMainBundle());
   if (pathURL)
   {
-    success = CFURLGetFileSystemRepresentation(pathURL, true /*resolveAgainstBase*/, (unsigned char *)buf, PATH_MAX);
+    success = CFURLGetFileSystemRepresentation(pathURL, true /*resolveAgainstBase*/, reinterpret_cast<unsigned char *>(buf), PATH_MAX);
     CFRelease(pathURL);
   }
   if (success)
@@ -401,8 +401,8 @@ gettimeofday(struct timeval * tv, struct timezone * tz)
     // converting file time to unix epoch
     tmpres /= 10; // convert into microseconds
     tmpres -= DELTA_EPOCH_IN_MICROSECS;
-    tv->tv_sec = (long)(tmpres / 1000000UL);
-    tv->tv_usec = (long)(tmpres % 1000000UL);
+    tv->tv_sec = static_cast<long>(tmpres / 1000000UL);
+    tv->tv_usec = static_cast<long>(tmpres % 1000000UL);
   }
   return 0;
 }

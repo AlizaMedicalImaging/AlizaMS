@@ -368,7 +368,7 @@ RLECodec::Decode(DataElement const & in, DataElement & out)
       mdcmAlwaysWarnMacro("RLECodec:: Decode() (1): value too big for ByteValue");
       return false;
     }
-    std::stringstream        is;
+    std::stringstream is;
     sf->WriteBuffer(is);
     SetLength(len);
     std::stringstream os;
@@ -385,7 +385,7 @@ RLECodec::Decode(DataElement const & in, DataElement & out)
       mdcmAlwaysWarnMacro("RLECodec:: Decode() (2): value too big for ByteValue");
       return false;
     }
-    out.SetByteValue(&str[0], static_cast<VL::Type>(str_size));
+    out.SetByteValue(str.data(), static_cast<VL::Type>(str_size));
     return true;
   }
   else if (NumberOfDimensions == 3)
@@ -677,7 +677,7 @@ RLECodec::Code(DataElement const & in, DataElement & out)
     {
       return false;
     }
-    frag.SetByteValue(&str[0], static_cast<VL::Type>(str_size));
+    frag.SetByteValue(str.data(), static_cast<VL::Type>(str_size));
     sq->AddFragment(frag);
   }
   out.SetValue(*sq);
@@ -774,7 +774,7 @@ RLECodec::DecodeExtent(char *         buffer,
   const size_t   bytesPerPixel = pf.GetPixelSize();
   std::vector<char> buffer1;
   buffer1.resize(rowsize * bytesPerPixel);
-  char *         tmpBuffer1 = &buffer1[0];
+  char *         tmpBuffer1 = buffer1.data();
   unsigned int   y, z;
   std::streamoff theOffset;
   for (z = zmin; z <= zmax; ++z)

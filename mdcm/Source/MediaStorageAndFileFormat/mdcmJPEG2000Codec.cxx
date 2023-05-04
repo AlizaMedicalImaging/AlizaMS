@@ -825,7 +825,7 @@ JPEG2000Codec::Decode(DataElement const & in, DataElement & out)
       mdcmAlwaysWarnMacro("JPEG2000Codec: value too big for ByteValue");
       return false;
     }
-    out.SetByteValue(&str[0], static_cast<uint32_t>(str_size));
+    out.SetByteValue(str.data(), static_cast<uint32_t>(str_size));
     return r;
   }
   else if (NumberOfDimensions == 3)
@@ -880,7 +880,7 @@ JPEG2000Codec::Decode(DataElement const & in, DataElement & out)
       mdcmAlwaysWarnMacro("JPEGLSCodec: value too big for ByteValue");
       return false;
     }
-    out.SetByteValue(&str[0], static_cast<uint32_t>(str_size));
+    out.SetByteValue(str.data(), static_cast<uint32_t>(str_size));
     return true;
   }
   return false;
@@ -1066,12 +1066,12 @@ JPEG2000Codec::Code(DataElement const & in, DataElement & out)
     rgbyteCompressed.resize(image_width * image_height * 4);
     size_t     cbyteCompressed;
     const bool b = this->CodeFrameIntoBuffer(
-      &rgbyteCompressed[0], rgbyteCompressed.size(), cbyteCompressed, inputdata, inputlength);
+      rgbyteCompressed.data(), rgbyteCompressed.size(), cbyteCompressed, inputdata, inputlength);
     if (!b)
       return false;
     Fragment frag;
     assert(cbyteCompressed <= rgbyteCompressed.size()); // default alloc would be bogus
-    frag.SetByteValue(&rgbyteCompressed[0], static_cast<uint32_t>(cbyteCompressed));
+    frag.SetByteValue(rgbyteCompressed.data(), static_cast<uint32_t>(cbyteCompressed));
     sq->AddFragment(frag);
   }
   assert(sq->GetNumberOfFragments() == dims[2]);
@@ -1246,7 +1246,7 @@ JPEG2000Codec::DecodeExtent(char *         buffer,
         break;
       buf_size = fraglen + oldlen;
       vdummybuffer.resize(buf_size);
-      dummy_buffer = &vdummybuffer[0];
+      dummy_buffer = vdummybuffer.data();
       is.read(&vdummybuffer[oldlen], fraglen);
     }
     assert(frag.GetTag() == seqDelItem && frag.GetVL() == 0);
@@ -1407,10 +1407,10 @@ JPEG2000Codec::AppendFrameEncode(std::ostream & out, const char * data, size_t d
   rgbyteCompressed.resize(dimensions[0] * dimensions[1] * 4);
   size_t     cbyteCompressed;
   const bool b =
-    this->CodeFrameIntoBuffer(&rgbyteCompressed[0], rgbyteCompressed.size(), cbyteCompressed, data, datalen);
+    this->CodeFrameIntoBuffer(rgbyteCompressed.data(), rgbyteCompressed.size(), cbyteCompressed, data, datalen);
   if (!b)
     return false;
-  out.write(&rgbyteCompressed[0], cbyteCompressed);
+  out.write(rgbyteCompressed.data(), cbyteCompressed);
   return true;
 }
 

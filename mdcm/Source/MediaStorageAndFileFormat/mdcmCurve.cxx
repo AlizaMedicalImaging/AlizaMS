@@ -61,7 +61,7 @@ public:
     os << "TypeOfData                         :" << TypeOfData << std::endl;
     os << "CurveDescription                   :" << CurveDescription << std::endl;
     os << "DataValueRepresentation            :" << DataValueRepresentation << std::endl;
-    const void * dp = static_cast<const void*>(&Data[0]);
+    const void * dp = static_cast<const void*>(Data.data());
     const unsigned short * p = static_cast<const unsigned short *>(dp);
     for (int i = 0; i < NumberOfPoints; i += 2)
     {

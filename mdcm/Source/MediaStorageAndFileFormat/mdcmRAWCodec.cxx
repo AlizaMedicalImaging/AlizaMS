@@ -129,7 +129,7 @@ RAWCodec::Decode(DataElement const & in, DataElement & out)
     {
       return false;
     }
-    const bool b = Unpack12Bits(copy, &str[0], str.size());
+    const bool b = Unpack12Bits(copy, str.data(), str.size());
     if (!b)
     {
       delete[] copy;
@@ -148,7 +148,7 @@ RAWCodec::Decode(DataElement const & in, DataElement & out)
       mdcmAlwaysWarnMacro("RAWCodec: value too big for ByteValue");
       return false;
     }
-    out.SetByteValue(&str[0], static_cast<VL::Type>(str_size));
+    out.SetByteValue(str.data(), static_cast<VL::Type>(str_size));
   }
   return r;
 }
@@ -207,7 +207,7 @@ RAWCodec::DecodeBytes(const char * inBytes, size_t inBufferLength, char * outByt
     {
       return false;
     }
-    const bool b = Unpack12Bits(copy, &str[0], str.size());
+    const bool b = Unpack12Bits(copy, str.data(), str.size());
     if (!b)
     {
       delete[] copy;

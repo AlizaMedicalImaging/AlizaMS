@@ -205,7 +205,7 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
   // Some silly software consider the tag to be OW, therefore they byteswap it
   if (strcmp(signature, "VS01") == 0)
   {
-    void * vp = static_cast<void*>(&s[0]);
+    void * vp = const_cast<void*>(static_cast<const void*>(s.data()));
     SwapperDoOp::SwapArray(static_cast<unsigned short *>(vp), (s.size() + 1) / 2);
     ss.str(s);
     ss.read(signature, 4);
@@ -353,7 +353,7 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
     }
     std::string str = os.str();
     if (!str.empty())
-      csael.SetByteValue(&str[0], static_cast<uint32_t>(str.size()));
+      csael.SetByteValue(str.data(), static_cast<uint32_t>(str.size()));
     InternalCSADataSet.insert(csael);
   }
   return true;

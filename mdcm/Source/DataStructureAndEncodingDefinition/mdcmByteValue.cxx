@@ -168,7 +168,7 @@ const char *
 ByteValue::GetPointer() const
 {
   if (!Internal.empty())
-    return &Internal[0];
+    return Internal.data();
   return nullptr;
 }
 
@@ -176,7 +176,7 @@ const void *
 ByteValue::GetVoidPointer() const
 {
   if (!Internal.empty())
-    return static_cast<const void *>(&Internal[0]);
+    return static_cast<const void *>(Internal.data());
   return nullptr;
 }
 
@@ -184,7 +184,7 @@ void *
 ByteValue::GetVoidPointer()
 {
   if (!Internal.empty())
-    return static_cast<void *>(&Internal[0]);
+    return static_cast<void *>(Internal.data());
   return nullptr;
 }
 
@@ -202,7 +202,7 @@ ByteValue::GetBuffer(char * buffer, unsigned long long length) const
   if (length <= Internal.size())
   {
     if (!Internal.empty())
-      memcpy(buffer, &Internal[0], length);
+      memcpy(buffer, Internal.data(), length);
     return true;
   }
   mdcmAlwaysWarnMacro("Could not handle length = " << length);
@@ -215,7 +215,7 @@ ByteValue::WriteBuffer(std::ostream & os) const
   if (Length)
   {
     assert(!(Internal.size() % 2));
-    os.write(&Internal[0], Internal.size());
+    os.write(Internal.data(), Internal.size());
   }
   return true;
 }

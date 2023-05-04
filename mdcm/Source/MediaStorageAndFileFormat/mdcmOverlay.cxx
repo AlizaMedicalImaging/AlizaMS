@@ -267,7 +267,7 @@ Overlay::GrabOverlayFromPixelData(DataSet const & ds)
     const unsigned int length = ovlength * 8;
     const uint8_t *    p = static_cast<const uint8_t *>(array);
     const uint8_t *    end = reinterpret_cast<const uint8_t*>(reinterpret_cast<uintptr_t>(p) + length);
-    void *             vp = static_cast<void*>(&Internal->Data[0]);
+    void *             vp = static_cast<void*>(Internal->Data.data());
     unsigned char *    overlay = static_cast<unsigned char *>(vp);
     int                c = 0;
     uint8_t            pmask = static_cast<uint8_t>(1 << Internal->BitPosition);
@@ -289,7 +289,7 @@ Overlay::GrabOverlayFromPixelData(DataSet const & ds)
     const unsigned int length = ovlength * 16;
     const uint16_t *   p = static_cast<const uint16_t *>(array);
     const uint16_t *   end = reinterpret_cast<const uint16_t*>(reinterpret_cast<uintptr_t>(p) + length);
-    void *             vp = static_cast<void*>(&Internal->Data[0]);
+    void *             vp = static_cast<void*>(Internal->Data.data());
     unsigned char *    overlay = static_cast<unsigned char *>(vp);
     int                c = 0;
     uint16_t           pmask = static_cast<uint16_t>(1 << Internal->BitPosition);

@@ -29,6 +29,7 @@
 #include <iterator>
 #include <vector>
 #include <deque>
+#include <cmath>
 
 namespace mdcm
 {
@@ -110,9 +111,8 @@ public:
     double    y01 = y1 - y0;
     for (EntryType i = 0; i < length; ++i)
     {
-      double    value_float = static_cast<double>(y0) + (static_cast<double>(i) / static_cast<double>(length)) * y01;
-      EntryType value_int = static_cast<EntryType>(value_float + 0.5);
-      expanded.push_back(value_int);
+      const double v = round(static_cast<double>(y0) + (static_cast<double>(i) / static_cast<double>(length)) * y01);
+      expanded.push_back(static_cast<EntryType>(v));
     }
     return true;
   }
@@ -232,7 +232,7 @@ SegmentedPaletteColorLookupTable::SetLUT(LookupTableType type, const unsigned ch
     palette.reserve(num_entries);
     SwapperNoOp::SwapArray(array16, length / 2);
     ExpandPalette(array16, length, palette);
-    const void * vpalette = static_cast<const void*>(&palette[0]);
+    const void * vpalette = static_cast<const void*>(palette.data());
     LookupTable::SetLUT(type, static_cast<const unsigned char *>(vpalette), static_cast<unsigned int>(palette.size() * 2));
     delete [] copy;
   }

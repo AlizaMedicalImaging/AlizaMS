@@ -163,7 +163,7 @@ SequenceOfFragments::FillFragmentWithJPEG(Fragment & frag, std::istream & is)
       break;
   }
   const uint32_t len = static_cast<uint32_t>(jfif.size());
-  frag.SetByteValue(reinterpret_cast<char *>(&jfif[0]), len);
+  frag.SetByteValue(reinterpret_cast<char *>(jfif.data()), len);
   return true;
 }
 

@@ -71,7 +71,7 @@ ImageReader::ReadImage(const MediaStorage & ms)
   {
     // In MR, you can have a Z spacing, but store a 2D image
     assert(spacing.size() >= pixeldata.GetNumberOfDimensions());
-    pixeldata.SetSpacing(&spacing[0]);
+    pixeldata.SetSpacing(spacing.data());
     if (spacing.size() > pixeldata.GetNumberOfDimensions()) // HACK
     {
       pixeldata.SetSpacing(pixeldata.GetNumberOfDimensions(), spacing[pixeldata.GetNumberOfDimensions()]);
@@ -81,7 +81,7 @@ ImageReader::ReadImage(const MediaStorage & ms)
   std::vector<double> origin = ImageHelper::GetOriginValue(*F);
   if (!origin.empty())
   {
-    pixeldata.SetOrigin(&origin[0]);
+    pixeldata.SetOrigin(origin.data());
     if (origin.size() > pixeldata.GetNumberOfDimensions()) // HACK
     {
       pixeldata.SetOrigin(pixeldata.GetNumberOfDimensions(), origin[pixeldata.GetNumberOfDimensions()]);
@@ -90,7 +90,7 @@ ImageReader::ReadImage(const MediaStorage & ms)
   std::vector<double> dircos = ImageHelper::GetDirectionCosinesValue(*F);
   if (!dircos.empty())
   {
-    pixeldata.SetDirectionCosines(&dircos[0]);
+    pixeldata.SetDirectionCosines(dircos.data());
   }
   std::vector<double> is = ImageHelper::GetRescaleInterceptSlopeValue(*F);
   pixeldata.SetIntercept(is[0]);

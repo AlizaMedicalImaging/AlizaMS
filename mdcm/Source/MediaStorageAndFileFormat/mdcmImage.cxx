@@ -55,7 +55,7 @@ const double *
 Image::GetSpacing() const
 {
   assert(NumberOfDimensions);
-  return &Spacing[0];
+  return Spacing.data();
 }
 
 double
@@ -85,7 +85,7 @@ Image::GetOrigin() const
 {
   assert(NumberOfDimensions);
   if (!Origin.empty())
-    return &Origin[0];
+    return Origin.data();
   return nullptr;
 }
 
@@ -132,7 +132,7 @@ Image::GetDirectionCosines() const
 {
   assert(NumberOfDimensions);
   if (!DirectionCosines.empty())
-    return &DirectionCosines[0];
+    return DirectionCosines.data();
   return nullptr;
 }
 double

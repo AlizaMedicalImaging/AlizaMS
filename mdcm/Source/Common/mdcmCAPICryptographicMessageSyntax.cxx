@@ -201,7 +201,7 @@ CAPICryptographicMessageSyntax::Encrypt(char * output, size_t & outlen, const ch
   }
   if (!CryptEncryptMessage(&EncryptParams,
                            (DWORD)certifList.size(),
-                           (PCCERT_CONTEXT *)&certifList[0],
+                           (PCCERT_CONTEXT *)certifList.data(),
                            (BYTE *)array,
                            (DWORD)len,
                            (BYTE *)output,

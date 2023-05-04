@@ -402,7 +402,7 @@ JPEGCodec::Code(DataElement const & in, DataElement & out)
     assert(str.size());
     Fragment frag;
     VL::Type strSize = static_cast<VL::Type>(str.size());
-    frag.SetByteValue(&str[0], strSize);
+    frag.SetByteValue(str.data(), strSize);
     sq->AddFragment(frag);
   }
   assert(sq->GetNumberOfFragments() == dims[2]);
@@ -580,7 +580,7 @@ JPEGCodec::DecodeExtent(char *         buffer,
     assert(zmin == zmax);
     assert(zmin == 0);
     std::stringstream iis;
-    iis.write(&vdummybuffer[0], vdummybuffer.size());
+    iis.write(vdummybuffer.data(), vdummybuffer.size());
     std::stringstream os;
     if (!DecodeByStreams(iis, os))
     {
@@ -595,7 +595,7 @@ JPEGCodec::DecodeExtent(char *         buffer,
     std::istream *    theStream = &os;
     std::vector<char> buffer1;
     buffer1.resize(rowsize * bytesPerPixel);
-    char *         tmpBuffer1 = &buffer1[0];
+    char *         tmpBuffer1 = buffer1.data();
     unsigned int   y, z;
     std::streamoff theOffset;
     for (z = zmin; z <= zmax; ++z)
@@ -652,7 +652,7 @@ JPEGCodec::DecodeExtent(char *         buffer,
       const unsigned int bytesPerPixel = pf.GetPixelSize();
       std::vector<char>  buffer1;
       buffer1.resize(rowsize * bytesPerPixel);
-      char *         tmpBuffer1 = &buffer1[0];
+      char *         tmpBuffer1 = buffer1.data();
       unsigned int   y;
       std::streamoff theOffset;
       for (y = ymin; y <= ymax; ++y)

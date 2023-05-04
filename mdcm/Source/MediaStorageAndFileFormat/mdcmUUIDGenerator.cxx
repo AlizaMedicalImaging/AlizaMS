@@ -46,7 +46,7 @@ const char *
 UUIDGenerator::Generate()
 {
   Unique.resize(36);
-  char * uuid_data = &Unique[0];
+  char * uuid_data = const_cast<char *>(Unique.data());
 #if defined(HAVE_UUID_GENERATE)
   assert(sizeof(uuid_t) == 16);
   uuid_t g;
@@ -70,14 +70,14 @@ UUIDGenerator::Generate()
 #  else
   UuidToString(&uuid, &str);
 #  endif
-  Unique = (char *)str;
+  Unique = (char *)str; // TODO
 #  if 1
   RpcStringFreeA(&str);
 #  else
   RpcStringFree(&str);
 #  endif
 #else
-#  error should not happen
+#  error "should not happen"
 #endif
   assert(IsValid(Unique.c_str()));
   return Unique.c_str();
@@ -102,15 +102,15 @@ UUIDGenerator::IsValid(const char * suid)
 #elif defined(HAVE_UUIDCREATE)
   UUID uuid;
 #  if 1
-  if (FAILED(UuidFromStringA((unsigned char *)suid, &uuid)))
+  if (FAILED(UuidFromStringA(reinterpret_cast<unsigned char *>(suid), &uuid)))
 #  else
-  if (FAILED(UuidFromString((unsigned char *)suid, &uuid)))
+  if (FAILED(UuidFromString(reinterpret_cast<unsigned char *>(suid), &uuid)))
 #  endif
   {
     return false;
   }
 #else
-#  error should not happen
+#  error "should not happen"
 #endif
   return true;
 }

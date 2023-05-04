@@ -296,12 +296,12 @@ SplitMosaicFilter::Split()
   }
   std::vector<char> buf;
   buf.resize(l);
-  inputimage.GetBuffer(&buf[0]);
+  inputimage.GetBuffer(buf.data());
   DataElement       pixeldata(Tag(0x7fe0, 0x0010));
   std::vector<char> outbuf;
   outbuf.resize(l);
-  void * vbuf = static_cast<void*>(&buf[0]);
-  void * voutbuf = static_cast<void*>(&outbuf[0]);
+  void * vbuf = static_cast<void*>(buf.data());
+  void * voutbuf = static_cast<void*>(outbuf.data());
   bool b = false;
 #ifdef SNVINVERT
   if (inverted)
@@ -388,7 +388,7 @@ SplitMosaicFilter::Split()
     mdcmAlwaysWarnMacro("outbuf_size=" << outbuf_size);
     return false;
   }
-  pixeldata.SetByteValue(&outbuf[0], static_cast<VL::Type>(outbuf_size));
+  pixeldata.SetByteValue(outbuf.data(), static_cast<VL::Type>(outbuf_size));
   Image &                image = GetImage();
   const TransferSyntax & ts = image.GetTransferSyntax();
   if (ts.IsExplicit())

@@ -189,7 +189,7 @@ LookupTable::SetLUT(LookupTableType enhanced_type, const unsigned char * array, 
   else if (BitSample == 16)
   {
     assert(Internal->Length[type] * (BitSample / 8) == length);
-    void *           p = static_cast<void*>(&Internal->RGB[0]);
+    void *           p = static_cast<void*>(Internal->RGB.data());
     const void *     varray = static_cast<const void*>(array);
     uint16_t *       uchar16 = static_cast<uint16_t *>(p);
     const uint16_t * array16 = static_cast<const uint16_t *>(varray);
@@ -224,7 +224,7 @@ LookupTable::GetLUT(LookupTableType type, unsigned char * array, unsigned int & 
   else if (BitSample == 16)
   {
     length = Internal->Length[type] * (BitSample / 8);
-    void *     p = static_cast<void*>(&Internal->RGB[0]);
+    void *     p = static_cast<void*>(Internal->RGB.data());
     void *     varray = static_cast<void*>(array);
     uint16_t * uchar16 = static_cast<uint16_t *>(p);
     uint16_t * array16 = static_cast<uint16_t *>(varray);
@@ -332,7 +332,9 @@ struct ltstr16
 inline void
 printrgb(const unsigned char * rgb)
 {
-  std::cout << int(rgb[0]) << "," << int(rgb[1]) << "," << int(rgb[2]);
+  std::cout << static_cast<int>(rgb[0]) << ','
+            << static_cast<int>(rgb[1]) << ','
+            << static_cast<int>(rgb[2]);
 }
 
 void
@@ -362,7 +364,7 @@ LookupTable::Decode(std::istream & is, std::ostream & os) const
   }
   else if (BitSample == 16)
   {
-    const void * p = static_cast<void*>(&Internal->RGB[0]);
+    const void * p = static_cast<void*>(Internal->RGB.data());
     const uint16_t * rgb16 = static_cast<const uint16_t *>(p);
     while (!is.eof())
     {
@@ -413,16 +415,16 @@ LookupTable::Decode(char * output, size_t outlen, const char * input, size_t inl
         assert(*idx < Internal->Length[GREEN]);
         assert(*idx < Internal->Length[BLUE]);
       }
-      rgb[RED] = Internal->RGB[3 * *idx + RED];
-      rgb[GREEN] = Internal->RGB[3 * *idx + GREEN];
-      rgb[BLUE] = Internal->RGB[3 * *idx + BLUE];
+      rgb[RED] = Internal->RGB[3 * (*idx) + RED];
+      rgb[GREEN] = Internal->RGB[3 * (*idx) + GREEN];
+      rgb[BLUE] = Internal->RGB[3 * (*idx) + BLUE];
       rgb += 3;
     }
     success = true;
   }
   else if (BitSample == 16)
   {
-    const void * p = static_cast<void*>(&Internal->RGB[0]);
+    const void * p = static_cast<void*>(Internal->RGB.data());
     const uint16_t * rgb16 = static_cast<const uint16_t *>(p);
     assert(inlen % 2 == 0);
     const void *     vinput = static_cast<const void*>(input);
@@ -437,9 +439,9 @@ LookupTable::Decode(char * output, size_t outlen, const char * input, size_t inl
         assert(*idx < Internal->Length[GREEN]);
         assert(*idx < Internal->Length[BLUE]);
       }
-      rgb[RED] = rgb16[3 * *idx + RED];
-      rgb[GREEN] = rgb16[3 * *idx + GREEN];
-      rgb[BLUE] = rgb16[3 * *idx + BLUE];
+      rgb[RED] = rgb16[3 * (*idx) + RED];
+      rgb[GREEN] = rgb16[3 * (*idx) + GREEN];
+      rgb[BLUE] = rgb16[3 * (*idx) + BLUE];
       rgb += 3;
     }
     success = true;
@@ -486,7 +488,7 @@ LookupTable::DecodeSupplemental(char * output, size_t outlen, const char * input
   }
   else if (BitSample == 16)
   {
-    const void *     p = static_cast<void *>(&Internal->RGB[0]);
+    const void *     p = static_cast<void *>(Internal->RGB.data());
     const void *     vinput = static_cast<const void*>(input);
     void *           voutput = static_cast<void*>(output);
     const uint16_t * rgb16 = static_cast<const uint16_t *>(p);
@@ -519,7 +521,7 @@ LookupTable::GetPointer() const
 {
   if (BitSample == 8)
   {
-    return &Internal->RGB[0];
+    return Internal->RGB.data();
   }
   return nullptr;
 }
@@ -546,7 +548,7 @@ LookupTable::GetBufferAsRGBA(unsigned char * rgba) const
   }
   else if (BitSample == 16)
   {
-    void *     p = static_cast<void*>(&Internal->RGB[0]);
+    void *     p = static_cast<void*>(Internal->RGB.data());
     void *     vrgba = static_cast<void*>(rgba);
     uint16_t * uchar16 = static_cast<uint16_t *>(p);
     uint16_t * rgba16 = static_cast<uint16_t *>(vrgba);
@@ -592,7 +594,7 @@ LookupTable::WriteBufferAsRGBA(const unsigned char * rgba)
   }
   else if (BitSample == 16)
   {
-    void *           p = static_cast<void*>(&Internal->RGB[0]);
+    void *           p = static_cast<void*>(Internal->RGB.data());
     const void *     vrgba = static_cast<const void*>(rgba);
     uint16_t *       uchar16 = static_cast<uint16_t *>(p);
     const uint16_t * rgba16 = static_cast<const uint16_t *>(vrgba);
