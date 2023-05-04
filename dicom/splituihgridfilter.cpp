@@ -224,12 +224,12 @@ bool SplitUihGridFilter::Split()
 	unsigned long l = inputimage.GetBufferLength();
 	std::vector<char> buf;
 	buf.resize(l);
-	inputimage.GetBuffer(&buf[0]);
+	inputimage.GetBuffer(buf.data());
 	DataElement pixeldata(Tag(0x7fe0,0x0010));
 	std::vector<char> outbuf;
 	outbuf.resize(l);
-	const void * vbuf = static_cast<void*>(&buf[0]);
-	void * voutbuf = static_cast<void*>(&outbuf[0]);
+	const void * vbuf = static_cast<void*>(buf.data());
+	void * voutbuf = static_cast<void*>(outbuf.data());
 	bool b = false;
 	if (inputimage.GetPixelFormat() == PixelFormat::UINT16)
 	{
@@ -270,7 +270,7 @@ bool SplitUihGridFilter::Split()
 #endif
 		return false;
 	}
-	pixeldata.SetByteValue(&outbuf[0], static_cast<VL::Type>(outbuf.size()));
+	pixeldata.SetByteValue(outbuf.data(), static_cast<VL::Type>(outbuf.size()));
 	Image & image = GetImage();
 	const TransferSyntax &ts = image.GetTransferSyntax();
 	if (ts.IsExplicit())
