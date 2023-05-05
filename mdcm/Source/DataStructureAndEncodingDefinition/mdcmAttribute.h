@@ -207,7 +207,7 @@ public:
   SetValue(ArrayType v, unsigned int idx = 0)
   {
     assert(idx < GetNumberOfValues());
-    Internal[idx] = v;
+    Internal[idx] = std::move(v);
   }
 
   void
@@ -416,7 +416,7 @@ public:
   void
   SetValue(ArrayType v)
   {
-    Internal = v;
+    Internal = std::move(v);
   }
 
   const ArrayType *

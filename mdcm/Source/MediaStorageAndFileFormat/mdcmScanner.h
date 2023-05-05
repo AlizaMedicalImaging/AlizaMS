@@ -66,7 +66,8 @@ public:
   ~Scanner();
   std::string
   GetString(const DataElement &, const DataSet &, const bool, const Dict &) const;
-  // struct to map a filename to a value
+  // Map a filename to a value
+  // MM:
   // Implementation note:
   // all std::map in this class will be using const char * and
   // not std::string since we are pointing to existing std::string
@@ -138,6 +139,7 @@ private:
   std::vector<std::string> Filenames;
   MappingType              Mappings;
   double                   Progress;
+  const TagToValue         NoOpTagToValue;
 };
 
 } // end namespace mdcm

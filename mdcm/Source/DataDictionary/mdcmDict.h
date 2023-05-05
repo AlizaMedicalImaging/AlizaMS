@@ -36,6 +36,9 @@ namespace mdcm
 /**
  * Class to represent a map of DictEntry
  */
+
+static const DictEntry tagNotFound("", "", VR::INVALID, VM::VM0, true);
+
 class MDCM_EXPORT Dict
 {
 public:
@@ -83,15 +86,14 @@ public:
     MapDictEntry::const_iterator it = DictInternal.find(tag);
     if (it == DictInternal.cend())
     {
-      it = DictInternal.find(Tag(0xffff, 0xffff));
-      return it->second;
+      return tagNotFound;
     }
     assert(DictInternal.count(tag) == 1);
     return it->second;
   }
 
   const char *
-  GetKeywordFromTag(Tag const & tag) const
+  GetKeywordFromTag(const Tag & tag) const
   {
     MapDictEntry::const_iterator it = DictInternal.find(tag);
     if (it == DictInternal.cend())
@@ -123,13 +125,8 @@ public:
     }
     else
     {
-      it = DictInternal.end();
-    }
-    if (it == DictInternal.end())
-    {
       tag = Tag(0xffff, 0xffff);
-      it = DictInternal.find(tag);
-      return it->second;
+      return tagNotFound;
     }
     assert(DictInternal.count(tag) == 1);
     return it->second;
@@ -210,9 +207,7 @@ public:
     MapDictEntry::const_iterator it = DictInternal.find(tag);
     if (it == DictInternal.cend())
     {
-      it = DictInternal.find(PrivateTag(0xffff, 0xffff, "MDCM Private Sentinel"));
-      assert(it != DictInternal.end());
-      return it->second;
+      return tagNotFound;
     }
     assert(DictInternal.count(tag) == 1);
     return it->second;

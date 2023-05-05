@@ -151,7 +151,7 @@ Scanner::Scan(const std::vector<std::string> & filenames, const Dict & dict)
   {
     Mappings.clear();
     TagToValue d0;
-    Mappings[""] = d0;
+    Mappings[""] = std::move(d0);
     const size_t filenames_size = filenames.size();
     Filenames.clear();
     for (size_t x = 0; x < filenames_size; ++x)
@@ -302,7 +302,11 @@ Scanner::GetMapping(const char * filename) const
       return Mappings.find(filename)->second;
     }
   }
-  return Mappings.find("")->second;
+  if (Mappings.find("") != Mappings.end()) // to silence Synopsys Coverity detection
+  {
+    return Mappings.find("")->second;
+  }
+  return NoOpTagToValue;
 }
 
 const char *
@@ -378,9 +382,10 @@ Scanner::ProcessPublicTag(const char * filename, const File & file, const Dict &
         const DataElement & de = header.GetDataElement(*tag);
         std::string         s(GetString(de, header, implicit, dict));
         Values.insert(s);
-        assert(Values.find(s) != Values.end());
-        const char * value = Values.find(s)->c_str();
-        mapping.insert(TagToValue::value_type(*tag, value));
+        if (Values.find(s) != Values.end()) // to silence Synopsys Coverity detection
+        {
+          mapping.insert(TagToValue::value_type(*tag, Values.find(s)->c_str()));
+        }
       }
     }
     else
@@ -390,9 +395,10 @@ Scanner::ProcessPublicTag(const char * filename, const File & file, const Dict &
         const DataElement & de = ds.GetDataElement(*tag);
         std::string         s(GetString(de, ds, implicit, dict));
         Values.insert(s);
-        assert(Values.find(s) != Values.end());
-        const char * value = Values.find(s)->c_str();
-        mapping.insert(TagToValue::value_type(*tag, value));
+        if (Values.find(s) != Values.end()) // to silence Synopsys Coverity detection
+        {
+          mapping.insert(TagToValue::value_type(*tag, Values.find(s)->c_str()));
+        }
       }
     }
   }
