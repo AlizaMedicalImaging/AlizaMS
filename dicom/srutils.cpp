@@ -807,7 +807,7 @@ endpoints of the minor axis of an ellipse
 							static_cast<int>(iy + 0.5),
 							Qt::IgnoreAspectRatio,
 							Qt::SmoothTransformation);
-						pm.i = si;
+						pm.i = std::move(si);
 					}
 					const int max_width = settings->get_sr_image_width();
 					if (max_width >= 64 && pm.i.width() > max_width)
@@ -815,7 +815,7 @@ endpoints of the minor axis of an ellipse
 						QImage si = pm.i.scaledToWidth(
 							max_width,
 							Qt::SmoothTransformation);
-						pm.i = si;
+						pm.i = std::move(si);
 					}
 #ifdef TMP_IMAGE_IN_MEMORY
 					tmpfile =

@@ -12,7 +12,7 @@ class ProcessImageThread_ : public QThread
 {
 public:
 	ProcessImageThread_(
-		Image2DTypeUC::Pointer image_,
+		const Image2DTypeUC::Pointer & image_,
 		unsigned char * p_,
 		const int size_0_,
 		const int size_1_,
