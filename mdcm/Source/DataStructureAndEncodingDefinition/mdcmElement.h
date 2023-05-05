@@ -352,14 +352,15 @@ public:
 int main(int, char**)
 {
     double f = -5558888888889999.345784574857485788888888888888888899999;
-    char buf[50];
-    memset(buf, 0, 50);
-    char line[40];
+    char buf[400];
+    memset(buf, 0, 400);
+    char line[400];
     int l = snprintf(line, sizeof(line), "%.17g", f);
     printf("1) l = %d\n", l);
     if (l > 16)
     {
-        int prec = 33 - strlen(line);
+        const int strl = strlen(line);
+		int prec = strl > 1 ? strl - 1 : 1; // not required, to be sure prec is positive
         l = snprintf(line, sizeof(line), "%.*g", prec, f);
         printf("2) l = %d\nprec = %d\nline = %s\n", l, prec, line);
         int count = 2;
@@ -374,22 +375,22 @@ int main(int, char**)
     strcpy(buf, line);
     printf("buf  = %s\n", buf);
     return 0;
-}
-*/
+}*/
 
 static void ds16print(char * buf, double f)
 {
-  char * line = new char[100]; // overallocated
-  memset(line, 0, 100);
-  int l = snprintf(line, 100, "%.17g", f);
+  char * line = new char[400]; // overallocated
+  memset(line, 0, 400);
+  int l = snprintf(line, 400, "%.17g", f);
   if (l > 16)
   {
-    int prec = 33 - static_cast<int>(strlen(line));
-    l = snprintf(line, 100, "%.*g", prec, f);
-    while(l > 16)
+    const int strl = static_cast<int>(strlen(line));
+	int prec = strl > 1 ? strl - 1 : 1; // not required, to be sure prec is positive
+    l = snprintf(line, 400, "%.*g", prec, f);
+    while (l > 16)
     {
       --prec;
-      l = snprintf(line, 100,"%.*g", prec, f);
+      l = snprintf(line, 400,"%.*g", prec, f);
     }
   }
   strcpy(buf, line);
