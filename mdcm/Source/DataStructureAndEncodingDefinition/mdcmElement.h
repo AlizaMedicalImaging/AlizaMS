@@ -360,7 +360,7 @@ int main(int, char**)
     if (l > 16)
     {
         const int strl = strlen(line);
-		int prec = strl > 1 ? strl - 1 : 1; // not required, to be sure prec is positive
+        int prec = strl > 1 ? strl - 1 : 1; // not required, to be sure prec is positive
         l = snprintf(line, sizeof(line), "%.*g", prec, f);
         printf("2) l = %d\nprec = %d\nline = %s\n", l, prec, line);
         int count = 2;
@@ -385,7 +385,7 @@ static void ds16print(char * buf, double f)
   if (l > 16)
   {
     const int strl = static_cast<int>(strlen(line));
-	int prec = strl > 1 ? strl - 1 : 1; // not required, to be sure prec is positive
+    int prec = strl > 1 ? strl - 1 : 1; // not required, to be sure prec is positive
     l = snprintf(line, 400, "%.*g", prec, f);
     while (l > 16)
     {
