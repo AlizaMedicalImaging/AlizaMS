@@ -1,6 +1,6 @@
 #include "structures.h"
-#include "histogramview.h"
 #include "levelitem.h"
+#include "histogramview.h"
 #include "aliza.h"
 #include "commonutils.h"
 #include <QtGlobal>
@@ -18,8 +18,8 @@ LevelRectItem::LevelRectItem(
 	qreal w, qreal h,
 	QGraphicsItem * p)
 	:
-	view(v),
-	QGraphicsRectItem(x, y, w, h, p)
+	QGraphicsRectItem(x, y, w, h, p),
+	view(v)
 {
 	setFlag(QGraphicsItem::ItemIsMovable, true);
 	setFlag(QGraphicsItem::ItemIsFocusable, false);

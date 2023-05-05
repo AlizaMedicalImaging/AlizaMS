@@ -23,8 +23,6 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 	setupUi(this);
 	horizontal = !vertical;
 	//
-	const int widgets_size = 25;
-	//
 	const QSize s1 = QSize(
 		static_cast<int>(18 * si),static_cast<int>(18 * si));
 	lockon = QIcon(QString(":/bitmaps/lock.svg"));
