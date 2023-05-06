@@ -1633,7 +1633,7 @@ void MainWindow::start_3D_anim()
 		aliza->get_selected_image_const();
 	if (!v) return;
 	bool ok = false;
-	QString message_ = QString("");
+	QString message_;
 	if (v->group_id < 0)
 		message_ = aliza->create_group_(&ok, true);
 	else

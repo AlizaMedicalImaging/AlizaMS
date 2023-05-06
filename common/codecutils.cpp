@@ -40,7 +40,7 @@ bool CodecUtils::force_cp1251 = false;
  */
 QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
 {
-  QString result("");
+  QString result;
   if (!ba)
   {
     if (ok) *ok = true;

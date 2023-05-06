@@ -241,7 +241,7 @@ void SQtree::process_element(
 	const bool duplicated)
 {
 	const mdcm::Tag & tag = e.GetTag();
-	QString tname("");
+	QString tname;
 	bool invalid_vr          = false;
 	bool unknown_vr          = false;
 	bool private_tag         = false;
@@ -402,7 +402,7 @@ void SQtree::process_element(
 			return;
 		}
 		//
-		QString sq_length("");
+		QString sq_length;
 		if (!sqi->IsUndefinedLength())
 		{
 		    const size_t length = sqi->GetLength();
@@ -481,7 +481,7 @@ void SQtree::process_element(
 		if (sqf)
 		{
 			const mdcm::BasicOffsetTable & bof = sqf->GetTable();
-			QString bof_s("");
+			QString bof_s;
 			{
 				std::vector<unsigned int> values;
 				get_bin_values<unsigned int, mdcm::VR::UL>(
@@ -527,8 +527,8 @@ void SQtree::process_element(
 	}
 	else
 	{
-		QString str_("");
-		QString entry_qs("");
+		QString str_;
+		QString entry_qs;
 		QString keyword_qs = tname;
 		std::string entry_s = tag.PrintAsPipeSeparatedString();
 		bool bin_label = false;
@@ -575,7 +575,7 @@ void SQtree::process_element(
 		}
 		else
 		{
-			QString length_s("");
+			QString length_s;
 			const mdcm::ByteValue * bv = e.GetByteValue();
 			if (bv)
 			{
@@ -1086,7 +1086,7 @@ void SQtree::read_file(const QString & f, const bool use_lock)
 		const mdcm::DataSet & ds = file.GetDataSet();
 		const mdcm::FileMetaInformation & header = file.GetHeader();
 		//
-		QString tmp1("");
+		QString tmp1;
 		QString ms0_ = QString::fromStdString(
 			header.GetMediaStorageAsString());
 		if (!ms0_.isEmpty())
@@ -1141,7 +1141,7 @@ void SQtree::read_file(const QString & f, const bool use_lock)
 			const mdcm::DataElement & elem = *it;
 			process_element(ds /* unused */, elem, dicts, i, "");
 		}
-		QString charset("");
+		QString charset;
 		if (ds.FindDataElement(mdcm::Tag(0x0008,0x0005)))
 		{
 			const mdcm::DataElement & ce_ =
@@ -1300,7 +1300,7 @@ void SQtree::read_file_and_series(const QString & ff, const bool use_lock)
 void SQtree::dump_csa(const mdcm::DataSet & ds)
 {
 	mdcm::CSAHeader csa1, csa2;
-	QString csa_text("");
+	QString csa_text;
 	const mdcm::PrivateTag t1 = csa1.GetCSAImageHeaderInfoTag();
 	const mdcm::PrivateTag t2 = csa2.GetCSASeriesHeaderInfoTag();
 	const bool f_t1 = ds.FindDataElement(t1);
@@ -1364,7 +1364,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 		const mdcm::DataSet & subds1 = item1.GetNestedDataSet();
 		const mdcm::PrivateTag tname2(
 			0x7fe1,0x2,"GEMS_Ultrasound_MovieGroup_001");
-		QString qs2("");
+		QString qs2;
 		if (subds1.FindDataElement(tname2))
 		{
 			const mdcm::DataElement & e2 =
@@ -1406,7 +1406,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 				{
 					const GEMSParam & gp = m8.value(itmd.value());
 					const QList<QVariant> & l8 = gp.values;
-					QString tmp8("");
+					QString tmp8;
 					for (int x8 = 0; x8 < l8.size(); ++x8)
 						tmp8.append(l8.at(x8).toString() + QString(" "));
 					gems_us_text.append(itmd.key() + QString(": ") + tmp8 + QString("<br/>"));
@@ -1430,7 +1430,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 						item10.GetNestedDataSet();
 					const mdcm::PrivateTag tname12(
 						0x7fe1,0x12,"GEMS_Ultrasound_MovieGroup_001");
-					QString qs12("");
+					QString qs12;
 					if (subds10.FindDataElement(tname12))
 					{
 						const mdcm::DataElement & e12 =
@@ -1474,7 +1474,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 							{
 								const GEMSParam & gp = m18.value(itmd.value());
 								const QList<QVariant> & l18 = gp.values;
-								QString tmp18("");
+								QString tmp18;
 								for (int x18 = 0;
 									x18 < l18.size();
 									++x18)
@@ -1511,7 +1511,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 									0x7fe1,
 									0x24,
 									"GEMS_Ultrasound_MovieGroup_001");
-								QString qs24("");
+								QString qs24;
 								if (subds20.FindDataElement(tname24))
 								{
 									const mdcm::DataElement & e24 =
@@ -1559,7 +1559,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 										{
 											const GEMSParam & gp = m26.value(itmd.value());
 											const QList<QVariant> & l26 = gp.values;
-											QString tmp26("");
+											QString tmp26;
 											for (int x26 = 0; x26 < l26.size(); ++x26)
 												tmp26.append(l26.at(x26).toString() + QString(" "));
 											gems_us_text.append(
@@ -1621,7 +1621,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 											mdcm::Item & item83 = sq83->GetItem(x83 + 1);
 											mdcm::DataSet & subds83 = item83.GetNestedDataSet();
 											const mdcm::PrivateTag tname84(0x7fe1,0x84,"GEMS_Ultrasound_MovieGroup_001");
-											QString qs84("");
+											QString qs84;
 											if (subds83.FindDataElement(tname84))
 											{
 												const mdcm::DataElement & e84 = subds83.GetDataElement(tname84);
@@ -1659,7 +1659,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 													{
 														const GEMSParam & gp = m85.value(itmd.value());
 														const QList<QVariant> & l85 = gp.values;
-														QString tmp85("");
+														QString tmp85;
 														for (int x85 = 0; x85 < l85.size(); ++x85)
 														{
 															tmp85.append(l85.at(x85).toString() + QString(" "));
@@ -1700,7 +1700,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 									0x7fe1,
 									0x84,
 									"GEMS_Ultrasound_MovieGroup_001");
-								QString qs84("");
+								QString qs84;
 								if (subds83.FindDataElement(tname84))
 								{
 									const mdcm::DataElement& e84 =
@@ -1761,7 +1761,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 													itmd.value());
 											const QList<QVariant> &
 												l85 = gp.values;
-											QString tmp85("");
+											QString tmp85;
 											for (int x85 = 0;
 												x85 < l85.size();
 												++x85)
@@ -1807,7 +1807,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 						0x7fe1,
 						0x74,
 						"GEMS_Ultrasound_MovieGroup_001");
-					QString qs74("");
+					QString qs74;
 					if (subds73.FindDataElement(tname74))
 					{
 						const mdcm::DataElement & e74 =
@@ -1857,7 +1857,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 								const GEMSParam & gp =
 									m75.value(itmd.value());
 								const QList<QVariant> & l75 = gp.values;
-								QString tmp75("");
+								QString tmp75;
 								for (int x75 = 0;
 									x75 < l75.size();
 									++x75)

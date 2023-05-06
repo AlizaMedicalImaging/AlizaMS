@@ -391,7 +391,7 @@ QString SpectroscopyUtils::ProcessData(
 			float  center_x, center_y, center_z;
 			std::vector<SpectroscopySlice*> slices;
 			std::vector<ImageSlice*> empty__;
-			QString orientation("");
+			QString orientation;
 			double spacing_x, spacing_y;
 			double spacing_tmp0[2] = {0.0, 0.0};
 			double spacing_tmp1[2] = {0.0, 0.0};

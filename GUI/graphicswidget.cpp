@@ -2787,7 +2787,7 @@ void GraphicsWidget::update_measurement(
 	if (!image_container.image3D) return;
 	const ImageVariant * ivariant = image_container.image3D;
 	const int a = get_axis();
-	QString tmp0("");
+	QString tmp0;
 	if (!ivariant->usregions.empty() && a == 2)
 	{
 		QVector<int> ids;
@@ -2821,7 +2821,7 @@ void GraphicsWidget::update_measurement(
 			}
 		}
 		//
-		QString data_type("");
+		QString data_type;
 		for (int x = 0; x < ids2.size(); ++x)
 		{
 			if (
@@ -3266,7 +3266,7 @@ void GraphicsWidget::update_pixel_value2(double x, double y)
 	const int sx = image_container.image3D->di->selected_x_slice;
 	const int sy = image_container.image3D->di->selected_y_slice;
 	const int sz = image_container.image3D->di->selected_z_slice;
-	QString d("");
+	QString d;
 	switch (image_container.image3D->image_type)
 	{
 	case 0:
@@ -3330,7 +3330,7 @@ QString GraphicsWidget::contours_from_selected_paths(
 {
 	if (!ivariant) return QString("Image is null");
 	if (!roi)      return QString("ROI is null");
-	QString message("");
+	QString message;
 	int selected_items_size = 0;
 	QList<long long> tmp_ids;
 	QList<QGraphicsItem*> selected_items;
@@ -3347,7 +3347,7 @@ QString GraphicsWidget::contours_from_selected_paths(
 	for (int x = 0; x < selected_items_size; ++x)
 	{
 		QString s0 = QVariant(x + 1).toString() + QString(": ");
-		QString s1("");
+		QString s1;
 		QGraphicsItem * gi = selected_items.at(x);
 		GraphicsPathItem * p = static_cast<GraphicsPathItem*>(gi);
 		if (!p) continue;

@@ -1041,7 +1041,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 										CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
 									const QStringList l2 = tmp0.trimmed().split(QString("\\"));
 									const int l2size = l2.size();
-									QString fpath("");
+									QString fpath;
 									for (int x = 0; x < l2size; ++x)
 									{
 										fpath.append(l2.at(x));

@@ -3351,7 +3351,7 @@ QString CommonUtils::get_orientation1(
 	unsigned int * result)
 {
 	if (!ivariant) return QString("");
-	QString orient("");
+	QString orient;
 	switch (ivariant->image_type)
 	{
 	case 0:
@@ -3447,7 +3447,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 	bool skip_ybr)
 {
 	*ok = false;
-	QString error = QString("");
+	QString error;
 	const size_t data_size = data.size();
 	const size_t dimx = dimx_;
 	const size_t dimy = dimy_;
@@ -4999,7 +4999,7 @@ QString CommonUtils::apply_per_slice_rescale(
 			}
 		}
 	}
-	QString s("");
+	QString s;
 	switch (image_type)
 	{
 	case 0:

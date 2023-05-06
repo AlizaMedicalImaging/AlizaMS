@@ -2413,7 +2413,7 @@ void StudyGraphicsWidget::update_measurement(
 	if (!image_container.image3D) return;
 	const ImageVariant * ivariant = image_container.image3D;
 	const unsigned int z = image_container.selected_z_slice_ext;
-	QString tmp0("");
+	QString tmp0;
 	if (!ivariant->usregions.empty())
 	{
 		QVector<int> ids;
@@ -2449,7 +2449,7 @@ void StudyGraphicsWidget::update_measurement(
 			}
 		}
 		//
-		QString data_type("");
+		QString data_type;
 		for (int x = 0; x < ids2.size(); ++x)
 		{
 			if (!ivariant->usregions.at(

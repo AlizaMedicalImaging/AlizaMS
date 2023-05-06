@@ -764,7 +764,7 @@ void Aliza::close_filters_progress(QProgressDialog * pb)
 
 void Aliza::load_dicom_series(QProgressDialog * pb)
 {
-	QString message_("");
+	QString message_;
 	unsigned int count_messages = 0;
 	std::vector<ImageVariant*> ivariants;
 	std::vector<int> rows;
@@ -4259,7 +4259,7 @@ void Aliza::load_dicom_file(int * image_id,
 {
 	*image_id = -1;
 	bool ok = false;
-	QString error__("");
+	QString error__;
 	std::vector<ImageVariant*> ivariants;
 	std::string us_window_center;
 	std::string us_window_width;
@@ -4529,7 +4529,7 @@ void Aliza::trigger_show_roi_info()
 			}
 		}
 		{
-			QString s0("");
+			QString s0;
 			if (has_closed_planar)
 			{
 				s0.append(QString("CLOSED_PLANAR"));

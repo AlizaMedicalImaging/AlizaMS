@@ -29,7 +29,7 @@ template<typename T> QString get_scalar_pixel_value__(
 	const int selected_z_slice,
 	long long * label)
 {
-	QString s("");
+	QString s;
 	if (x < 0 || y < 0) return s;
 	if (image.IsNull()) return s;
 	if (!ivariant)      return s;
@@ -139,7 +139,7 @@ template<typename T> QString get_rgb_pixel_value__(
 	const int sy,
 	const int sz)
 {
-	QString s("");
+	QString s;
 	if (x < 0 || y < 0) return s;
 	if (image.IsNull()) return s;
 	if (!ivariant)      return s;
@@ -260,7 +260,7 @@ template<typename T> QString get_rgba_pixel_value__(
 	const int sy,
 	const int sz)
 {
-	QString s("");
+	QString s;
 	if (x < 0 || y < 0) return s;
 	if (image.IsNull()) return s;
 	if (!ivariant)      return s;
@@ -675,7 +675,7 @@ void GraphicsUtils::print_image_info(
 	case 300: t = QString("Spectroscopy");       break;
 	default : t = QString("unknown");            break;
 	}
-	QString s("");
+	QString s;
 	QString s0 =
 		QString("Object ID ") +
 		QVariant(v->id).toString();
@@ -832,7 +832,7 @@ QString GraphicsUtils::get_scalar_pixel_value(
 	const bool)
 {
 	if (!v) return QString("");
-	QString d("");
+	QString d;
 	long long l = -99999999999999;
 	switch (v->image_type)
 	{
@@ -887,7 +887,7 @@ QString GraphicsUtils::get_rgb_pixel_value(
 	const int sz)
 {
 	if (!v) return QString("");
-	QString d("");
+	QString d;
 	switch (v->image_type)
 	{
 	case 10:
@@ -933,7 +933,7 @@ QString GraphicsUtils::get_rgba_pixel_value(
 	const int sz)
 {
 	if (!v) return QString("");
-	QString d("");
+	QString d;
 	switch (v->image_type)
 	{
 	case 20:

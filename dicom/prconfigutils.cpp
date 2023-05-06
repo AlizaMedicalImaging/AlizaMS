@@ -2495,7 +2495,7 @@ void PrConfigUtils::read_spatial_transformation(
 	// Y N
 	const mdcm::Tag tImageRotation(0x0070,0x0042);
 	// clockwise in degrees, 0 90 180 270
-	QString ImageHorizontalFlip("");
+	QString ImageHorizontalFlip;
 	const bool flip = DicomUtils::get_string_value(ds,tImageHorizontalFlip,ImageHorizontalFlip);
 	unsigned short ImageRotation = 0;
 	const bool rotation = DicomUtils::get_us_value(ds,tImageRotation,&ImageRotation);
@@ -2567,7 +2567,7 @@ void PrConfigUtils::read_graphic_objects(
 	//one bit value corresponds to one display pixel.
 	const mdcm::Tag tFillPattern(0x0070,0x0256);
 	//
-	QString t00080005("");
+	QString t00080005;
 	const bool t00080005_ok = DicomUtils::get_string_value(ds, mdcm::Tag(0x0008,0x0005), t00080005);
 	(void)t00080005_ok;
 	if (ds.FindDataElement(tGraphicAnnotationSequence))
@@ -2729,7 +2729,7 @@ void PrConfigUtils::read_text_annotations(
 	const mdcm::Tag tUnderlined(0x0070,0x0248);    // Y, N
 	const mdcm::Tag tBold(0x0070,0x0249);          // Y, N
 	const mdcm::Tag tItalic(0x0070,0x0250);        // Y, N
-	QString t00080005("");
+	QString t00080005;
 	const bool t00080005_ok = DicomUtils::get_string_value(ds, mdcm::Tag(0x0008,0x0005), t00080005);
 	(void)t00080005_ok;
 	if (ds.FindDataElement(tGraphicAnnotationSequence))
@@ -3226,7 +3226,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		}
 	}
 #endif
-	QString error("");
+	QString error;
 	short rotation = 0;
 	bool flip = false;
 	bool modality = false;

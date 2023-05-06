@@ -359,7 +359,7 @@ QString generate_string_0(
 
 QString read_MRImageModule(const mdcm::DataSet & ds)
 {
-	QString s("");
+	QString s;
 	const mdcm::Tag tSequenceName(0x0018,0x0024);
 	s += generate_string_0(
 		ds,
@@ -661,8 +661,7 @@ QString read_MRImageModule(const mdcm::DataSet & ds)
 
 QString read_CTImageModule(const mdcm::DataSet & ds)
 {
-	QString s("");
-
+	QString s;
 	s += generate_string_0(
 		ds,
 		mdcm::Tag(0x0018,0x9361),
@@ -966,7 +965,7 @@ Value Representation	Long String (LO)
 
 QString read_CommonCTMRImageDescriptionMacro(const mdcm::DataSet & ds)
 {
-	QString s("");
+	QString s;
 	s += generate_string_0(
 		ds,
 		mdcm::Tag(0x0008,0x9205),
@@ -1910,7 +1909,7 @@ QString supp_palette_grey_to_rgbUS(
 	const int red_subscript,
 	const ImageVariant * v)
 {
-	QString result("");
+	QString result;
 	switch(v->image_type)
 	{
 	case 0:
@@ -1953,7 +1952,7 @@ QString supp_palette_grey_to_rgbUC(
 	const int red_subscript,
 	const ImageVariant * v)
 {
-	QString result("");
+	QString result;
 	switch(v->image_type)
 	{
 	case 0:
@@ -2161,8 +2160,8 @@ extern "C"
 
 QString DicomUtils::convert_pn_value(const QString & n)
 {
-	//family name, given name, middle name, name prefix, name suffix
-	QString s("");
+	// family name, given name, middle name, name prefix, name suffix
+	QString s;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	const QStringList tmp1 = n.split(
 		QString("="),
@@ -3003,7 +3002,7 @@ void DicomUtils::load_contour(
 	ImageVariant * ivariant)
 {
 	if (!ivariant) return;
-	QString charset("");
+	QString charset;
 	const mdcm::Tag tcharset(0x0008,0x0005);
 	{
 		QString charset_;
@@ -3887,7 +3886,7 @@ bool DicomUtils::read_slices_rtdose(
 	float slices_dir_x, slices_dir_y, slices_dir_z, up_dir_x, up_dir_y, up_dir_z;
 	float center_x, center_y, center_z;
 	double dircos[9]{};
-	QString pat_pos_s(""), pat_orient_s(""), pix_spacing_s("");
+	QString pat_pos_s, pat_orient_s, pix_spacing_s;
 	read_image_info_rtdose(filename_,
 		&numframes, &rows, &columns,
 		pat_pos_s, pat_orient_s, pix_spacing_s, z_offsets);
@@ -4013,7 +4012,7 @@ void DicomUtils::read_dimension_index_sq(
 			const mdcm::DataSet & nestedds =
 				item.GetNestedDataSet();
 			unsigned short group0 = 0, element0 = 0, group1 = 0, element1 = 0;
-			QString dim_uid("");
+			QString dim_uid;
 			const bool ok0 =
 				get_at_value(
 					nestedds,
@@ -4169,7 +4168,7 @@ bool DicomUtils::read_group_sq(
 	const mdcm::Tag tSegmentIdentificationSequence(0x0062,0x000a);
 	const mdcm::Tag tReferencedSegmentNumber(0x0062,0x000b);
 	if (!ds.FindDataElement(t)) return false;
-	QString charset("");
+	QString charset;
 	if(ds.FindDataElement(tSpecificCharacterSet))
 	{
 		const mdcm::DataElement & eSpecificCharacterSet =
@@ -4804,7 +4803,7 @@ QString DicomUtils::read_anatomic_sq(const mdcm::DataSet & ds)
 	if (ds.FindDataElement(tAnatomicRegionSequence))
 	{
 		const mdcm::Tag tSpecificCharacterSet(0x0008,0x0005);
-		QString charset("");
+		QString charset;
 		if(ds.FindDataElement(tSpecificCharacterSet))
 		{
 			const mdcm::DataElement & eSpecificCharacterSet =
@@ -4951,7 +4950,7 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 {
 	if (ds.IsEmpty()) return;
 	if (!ivariant)    return;
-	QString charset("");
+	QString charset;
 	const mdcm::Tag tcharset(0x0008,0x0005);
 	const mdcm::Tag timagetype(0x0008,0x0008);
 	const mdcm::Tag tsop(0x0008,0x0016);
@@ -4988,7 +4987,7 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 		imagetype = imagetype.trimmed();
 		if (!imagetype.isEmpty())
 		{
-			QString imagetype_("");
+			QString imagetype_;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 			const QStringList l = imagetype.toLower().split(
 				QString("\\"),
@@ -5345,7 +5344,7 @@ bool DicomUtils::generate_geometry(
 	sVector3 v0 = sVector3(0.0f, 0.0f, 0.0f);
 	sVector3 v1 = sVector3(0.0f, 0.0f, 0.0f);
 	sVector3 up = sVector3(0.0f, 0.0f, 0.0f);
-	QString tmp0("");
+	QString tmp0;
 	bool tmp1 = true, tmp2 = true;
 	sVector3 tmp_p0 = sVector3(0.0f, 0.0f, 0.0f);
 	sVector3 tmp_p1 = sVector3(0.0f, 0.0f, 0.0f);
@@ -5841,7 +5840,7 @@ void DicomUtils::read_gems_params(
 		{
 			const mdcm::DataElement & e = subds.GetDataElement(t_text);
 			const mdcm::ByteValue * v = e.GetByteValue();
-			QString j("");
+			QString j;
 			if (v)
 			{
 				const char * b = v->GetPointer();
@@ -6693,7 +6692,7 @@ void DicomUtils::enhanced_process_values(
 	{
 		double  rescale_intercept = 0.0;
 		double  rescale_slope     = 1.0;
-		QString rescale_type("");
+		QString rescale_type;
 		if (shared_values.size() == 1 &&
 			shared_values.at(0).rescale_ok)
 		{
@@ -7117,7 +7116,7 @@ QString DicomUtils::read_enhanced(
 	bool fix_jpeg_prec      = false;
 	bool use_icc            = false;
 	bool icc_ok             = false;
-	QString sop("");
+	QString sop;
 	{
 		mdcm::Reader reader;
 #ifdef _WIN32
@@ -7150,11 +7149,11 @@ QString DicomUtils::read_enhanced(
 		cornell_bug = wsettings->get_cornell_workaround();
 		fix_jpeg_prec = wsettings->get_try_fix_jpeg_prec();
 		use_icc = wsettings->get_apply_icc();
-		QString iod("");
+		QString iod;
 		const mdcm::Tag tSOPClassUID(0x0008,0x0016);
 		const mdcm::Tag tPerFrameFunctionalGroupsSequence(0x5200,0x9230);
 		const mdcm::Tag tSharedFunctionalGroupsSequence(0x5200,0x9229);
-		QString sop_tmp("");
+		QString sop_tmp;
 		if (get_string_value(ds, tSOPClassUID, sop_tmp))
 		{
 			sop = sop_tmp.remove(QChar('\0'));
@@ -7440,7 +7439,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 	ImageOverlays image_overlays; // unused
 	mdcm::PhotometricInterpretation pi;
 	mdcm::PixelFormat pixelformat;
-	QString sop("");
+	QString sop;
 	bool ok_f = false;
 	bool ok_g = false;
 	unsigned short rows_ = 0;
@@ -7485,8 +7484,8 @@ QString DicomUtils::read_enhanced_supp_palette(
 		const mdcm::Tag tSOPClassUID(0x0008,0x0016);
 		const mdcm::Tag tPerFrameFunctionalGroupsSequence(0x5200,0x9230);
 		const mdcm::Tag tSharedFunctionalGroupsSequence(0x5200,0x9229);
-		QString iod("");
-		QString sop_tmp("");
+		QString iod;
+		QString sop_tmp;
 		if (get_string_value(ds, tSOPClassUID, sop_tmp))
 		{
 			sop = sop_tmp.remove(QChar('\0'));
@@ -7819,7 +7818,7 @@ QString DicomUtils::read_ultrasound(
 				!e.IsUndefinedLength() &&
 				e.GetByteValue())
 			{
-				QString numframes("");
+				QString numframes;
 				numframes =
 					QString::fromLatin1(
 						e.GetByteValue()->GetPointer(),
@@ -8104,7 +8103,7 @@ QString DicomUtils::read_nuclear(
 				!e.IsUndefinedLength() &&
 				e.GetByteValue())
 			{
-				QString numframes("");
+				QString numframes;
 				numframes =
 					QString::fromLatin1(
 						e.GetByteValue()->GetPointer(),
@@ -9438,7 +9437,7 @@ QString DicomUtils::read_buffer(
 	unsigned long long dimz = 0;
 	mdcm::PixelFormat image_pixelformat = mdcm::PixelFormat::UNKNOWN;
 	unsigned long long image_buffer_length = 0;
-	QString elscf("");
+	QString elscf;
 	short icc_for_ybr = 0;
 	char * icc_profile = nullptr;
 	unsigned int icc_size = 0;
@@ -10571,7 +10570,7 @@ QString DicomUtils::read_enhanced_common(
 #if 0
 	std::cout << "common: red_subscript = " << red_subscript << std::endl;
 #endif
-	QString message("");
+	QString message;
 	bool error = false;
 	const SettingsWidget * wsettings =
 		static_cast<const SettingsWidget *>(settings);
@@ -10610,7 +10609,7 @@ QString DicomUtils::read_enhanced_common(
 #ifdef ENHANCED_PRINT_INFO
 		if (!min_load) std::cout << "Image: " << x << std::endl;
 #endif
-		QString message_("");
+		QString message_;
 		std::vector<char*>   tmp3;
 		std::vector<double*> tmp4;
 		QStringList tmp5;
@@ -10811,7 +10810,7 @@ QString DicomUtils::read_enhanced_common(
 			double window_width_tmp = -999999;
 			short lut_function = -1;
 			short lut_function_tmp = -1;
-			QString instance_uid("");
+			QString instance_uid;
 			int instance_number = -1;
 			int ref_segment_num = -1;
 			//
@@ -10859,7 +10858,7 @@ QString DicomUtils::read_enhanced_common(
 				{
 					const mdcm::File & rfile = reader.GetFile();
 					const mdcm::DataSet & ds = rfile.GetDataSet();
-					QString charset("");
+					QString charset;
 					if (get_string_value(ds, mdcm::Tag(0x0008,0x0005), charset))
 					{
 						charset = charset.trimmed().remove(QChar('\0'));
@@ -12321,7 +12320,7 @@ bool DicomUtils::process_contrours_ref(
 				pb->setValue(-1);
 			}
 			QApplication::processEvents();
-			QString sop_instance_uid("");
+			QString sop_instance_uid;
 			std::set<mdcm::Tag> tags;
 			mdcm::Tag tsopinstance(0x0008,0x0018);
 			tags.insert(tsopinstance);
@@ -12454,7 +12453,7 @@ QString DicomUtils::find_file_from_uid(
 	const QString & uid,
 	QProgressDialog * pb)
 {
-	QString f("");
+	QString f;
 	if (p.isEmpty())   return f;
 	if (uid.isEmpty()) return f;
 	bool ok = scan_files_for_instance_uid(p, uid, f, pb);
@@ -12502,7 +12501,7 @@ bool DicomUtils::scan_files_for_instance_uid(
 #endif
 		if (!reader.ReadSelectedTags(tags)) continue;
 		const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
-		QString uid_("");
+		QString uid_;
 		const bool ok = get_string_value(ds, tSOPInstanceUID, uid_);
 		if (ok &&
 			uid.trimmed().remove(QChar('\0')) == uid_.trimmed().remove(QChar('\0')))
@@ -12615,7 +12614,7 @@ QString DicomUtils::read_enhmr_spectro_info(
 	const mdcm::DataSet & ds,
 	bool spectro)
 {
-	QString s("");
+	QString s;
 	//
 	if (!spectro)
 	{
@@ -12647,7 +12646,7 @@ QString DicomUtils::read_enhmr_spectro_info(
 		// PER_NERVE_STIM percentage of peripheral nerve stimulation
 		//
 		//
-		QString tmp0("");
+		QString tmp0;
 		//
 		const mdcm::Tag tSharedFunctionalGroupsSequence(0x5200,0x9229);
 		if (ds.FindDataElement(tSharedFunctionalGroupsSequence))
@@ -12752,7 +12751,7 @@ QString DicomUtils::read_enhmr_spectro_info(
 						{
 							const mdcm::Tag tGradientOutputType(
 								0x0018,0x9180);
-							QString GradientOutputType("");
+							QString GradientOutputType;
 							const bool tGradientOutputType_ok =
 								get_string_value(
 									nds1,
@@ -12833,7 +12832,7 @@ QString DicomUtils::read_enhmr_spectro_info(
 		//Coverage of k-Space (0018,9094)
 		//Number of k-Space Trajectories (0018,9093)
 		//
-		QString tmp0("");
+		QString tmp0;
 		//
 		const mdcm::Tag tPulseSequenceName(0x0018,0x9005);
 		tmp0 += generate_string_0(
@@ -13031,7 +13030,7 @@ QString DicomUtils::read_enhmr_spectro_info(
 		//Applicable Safety Standard Description (0018,9175)
 		//B1rms(0018,1320)
 		//
-		QString tmp0("");
+		QString tmp0;
 		//
 		const mdcm::Tag tContentQualification(0x0018,0x9104);
 		tmp0 += generate_string_0(
@@ -13100,7 +13099,7 @@ QString DicomUtils::read_enhmr_spectro_info(
 QString DicomUtils::read_enhct_info(
 	const mdcm::DataSet & ds)
 {
-	QString s("");
+	QString s;
 	//
 	s += read_CommonCTMRImageDescriptionMacro(ds);
 	//
@@ -14389,7 +14388,7 @@ QString DicomUtils::read_dicom(
 									return QString("Supplemental LUT failed,\ninternal error");
 								}
 								CommonUtils::calculate_minmax_scalar(supp_grey_images[jjj]);
-								QString supp_palette_error("");
+								QString supp_palette_error;
 								ImageVariant * v = new ImageVariant(
 									CommonUtils::get_next_id(), ok3d, true, gl, 0);
 								if (supp_color_images.at(jjj)->image_type == 11)
@@ -14708,10 +14707,10 @@ QString DicomUtils::read_dicom(
 				if (s.toUpper().contains(QString("LOCALIZER")))
 					si.localizer = true;
 			}
-			QString s1("");
+			QString s1;
 			get_string_value(ds, ph, s1);
 			si.photometric = s1.trimmed().remove(QChar('\0'));
-			QString s2("");
+			QString s2;
 			get_string_value(ds, sc, s2);
 			si.sop = s2.trimmed().remove(QChar('\0'));
 			if (ds.FindDataElement(cc)) si.icc = true;
@@ -15302,7 +15301,7 @@ QString DicomUtils::read_dicom(
 #endif
 			);
 #endif
-		QString message_pr("");
+		QString message_pr;
 		unsigned int count = process_gsps(
 			grey_softcopy_pr_files,
 			p,
@@ -15365,7 +15364,7 @@ QString DicomUtils::read_dicom(
 		!xaxrf_softcopy_pr_files.empty()        ||
 		!advanced_blending_softcopy_pr_files.empty())
 	{
-		QString pr_warn("");
+		QString pr_warn;
 		if (!color_softcopy_pr_files.empty())
 			pr_warn += QString("Color Softcopy Presentation\n");
 		if (!pseudo_color_softcopy_pr_files.empty())

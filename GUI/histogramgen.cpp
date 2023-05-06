@@ -27,7 +27,7 @@ template<typename T> QString calculate_histogramm(
 		HistogramType;
 	typename HistogramGeneratorType::Pointer histogram_generator =
 		HistogramGeneratorType::New();
-	QString error__("");
+	QString error__;
 	const double range = round(v->di->rmax - v->di->rmin);
 	if (range < 0.0)
 	{

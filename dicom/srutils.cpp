@@ -1106,7 +1106,7 @@ void SRUtils::read_NUM(
 				mdcm::Tag(0x0040,0xa30a),
 				NumericValue))
 		{
-			QString unit("");
+			QString unit;
 			if (nds3.FindDataElement(
 					mdcm::Tag(0x0040,0x08ea)))
 			{
@@ -1459,7 +1459,7 @@ QString SRUtils::read_sr_title2(
 	const mdcm::DataSet & ds,
 	const QString & charset)
 {
-	QString s("");
+	QString s;
 	if (ds.FindDataElement(
 		mdcm::Tag(0x0010,0x0010)))
 	{
@@ -1786,7 +1786,7 @@ QString SRUtils::read_sr_content_sq(
 				mdcm::Tag(0x0040,0xdb73),
 				ReferencedContentItemIdentifier))
 		{
-			QString identifiers("");
+			QString identifiers;
 			const size_t s___ =
 				ReferencedContentItemIdentifier.size();
 			for (unsigned int z = 0;

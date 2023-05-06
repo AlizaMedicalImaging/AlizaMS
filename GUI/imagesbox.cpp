@@ -385,7 +385,7 @@ void ImagesBox::set_html(const ImageVariant * v)
 			DicomUtils::convert_pn_value(v->pat_name)
 			:
 			QString("");
-		QString birthdate_s("");
+		QString birthdate_s;
 		if (!v->pat_birthdate.isEmpty())
 		{
 			const QDate qd =
@@ -489,7 +489,7 @@ void ImagesBox::set_html(const ImageVariant * v)
 // Image pixel
 //
 //
-		QString t("");
+		QString t;
 		if (!v->interpretation.isEmpty())
 		{
 			t.append(v->interpretation + QString("<br />"));
@@ -743,7 +743,7 @@ void ImagesBox::set_html(const ImageVariant * v)
 QString ImagesBox::get_orientation_image(const QString & rai)
 {
 	if (rai.isEmpty()) return QString("");
-	QString s("");
+	QString s;
 	const QByteArray ba = rai.toLatin1().constData();
 	if (ba.size() >= 3)
 	{
