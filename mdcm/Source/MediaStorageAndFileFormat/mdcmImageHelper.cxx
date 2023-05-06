@@ -2322,7 +2322,6 @@ ImageHelper::SetRescaleInterceptSlopeValue(File & f, const Image & img)
   assert(MediaStorage::IsImage(ms));
   DataSet & ds = f.GetDataSet();
   if (ms != MediaStorage::CTImageStorage && ms != MediaStorage::ComputedRadiographyImageStorage &&
-      ms != MediaStorage::MRImageStorage && //
       ms != MediaStorage::PETImageStorage && ms != MediaStorage::RTDoseStorage &&
       ms != MediaStorage::SecondaryCaptureImageStorage &&
       ms != MediaStorage::MultiframeGrayscaleWordSecondaryCaptureImageStorage &&
@@ -2338,7 +2337,7 @@ ImageHelper::SetRescaleInterceptSlopeValue(File & f, const Image & img)
       ms != MediaStorage::LegacyConvertedEnhancedCTImageStorage &&
       ms != MediaStorage::LegacyConvertedEnhancedPETImageStorage)
   {
-    if (img.GetIntercept() != 0. || img.GetSlope() != 1.)
+    if (img.GetIntercept() != 0.0 || img.GetSlope() != 1.0)
     {
       mdcmWarningMacro("Re-scale not expected");
     }
@@ -2466,10 +2465,10 @@ ImageHelper::SetRescaleInterceptSlopeValue(File & f, const Image & img)
   }
   if (ms == MediaStorage::MRImageStorage)
   {
-    if (ForceRescaleInterceptSlope)
+    if (img.GetIntercept() != 0.0 || img.GetSlope() != 1.0)
     {
-      mdcmDebugMacro("Forced Modality LUT for MR Image Storage, intercept "
-                     << img.GetIntercept() << ", slope" << img.GetSlope());
+      mdcmAlwaysWarnMacro("Forced Modality LUT for MR Image Storage, intercept "
+                          << img.GetIntercept() << ", slope" << img.GetSlope());
       Attribute<0x0028, 0x1052> at1;
       at1.SetValue(img.GetIntercept());
       ds.Replace(at1.GetAsDataElement());
