@@ -1685,6 +1685,7 @@ void BrowserWidget2::open_CTK_db()
 	QSet<int> ids;
 	QSet<int>::const_iterator it0;
 	size_t ids_count = 0;
+	size_t count_missing_files = 0;
 	QStringList ctk_studies;
 	QStringList ctk_series;
 	if (ctk_from.isEmpty() || ctk_to.isEmpty())
@@ -1909,7 +1910,24 @@ void BrowserWidget2::open_CTK_db()
 		TableWidgetItem * i = new TableWidgetItem(idxs);
 		for (int z = 0; z < series.at(x).files.size(); ++z)
 		{
-			i->files.push_back(series.at(x).files.at(z));
+			QString f = series.at(x).files.at(z);
+			{
+				QFileInfo fi(f);
+				if (fi.isRelative())
+				{
+					f.prepend(ctk_dir + QDir::separator());
+				}
+			}
+			QFileInfo fi1(f);
+			const QString f1 = fi1.absoluteFilePath();
+			if (!fi1.exists())
+			{
+				++count_missing_files;
+#if 1
+				std::cout << "File not found: " << f1.toStdString() << std::endl;
+#endif
+			}
+			i->files.push_back(QDir::toNativeSeparators(f1));
 		}
 		tableWidget->setRowCount(idx + 1);
 		tableWidget->setItem(idx, 0, static_cast<QTableWidgetItem*>(i));
