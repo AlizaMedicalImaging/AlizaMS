@@ -6,7 +6,6 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QSettings>
-#include <QProgressDialog>
 #include <QDate>
 #include <QUrl>
 #include <QMimeData>
@@ -173,19 +172,22 @@ void BrowserWidget2::read_directory(const QString & p)
 	tableWidget->clearContents();
 	tableWidget->setRowCount(0);
 	qApp->processEvents();
-	QProgressDialog * pd =
-		new QProgressDialog(
-			QString("Recursive scan"), QString("Stop"), 0, 0);
-	pd->setWindowModality(Qt::ApplicationModal);
-	pd->setWindowFlags(
-		pd->windowFlags()^Qt::WindowContextHelpButtonHint);
-	pd->show();
+	QProgressDialog * pb = new QProgressDialog(
+		QString("Recursive scan"),
+		QString("Stop"),
+		0,
+		0);
+	pb->setModal(true);
+	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
+	pb->show();
+	pb->activateWindow();
+	pb->raise();
 	try
 	{
 		const mdcm::Global & g = mdcm::GlobalInstance;
 		const mdcm::Dicts & dicts = g.GetDicts();
 		const mdcm::Dict & dict = dicts.GetPublicDict();
-		process_directory(p, dict, pd);
+		process_directory(p, dict, pb);
 	}
 	catch (const mdcm::ParseException & pe)
 	{
@@ -198,15 +200,15 @@ void BrowserWidget2::read_directory(const QString & p)
 		std::cout << "Exception in BrowserWidget2::read_directory:\n"
 			<< ex.what() << std::endl;
 	}
-	pd->close();
+	pb->close();
 	qApp->processEvents();
-	delete pd;
+	delete pb;
 }
 
 void BrowserWidget2::process_directory(
 	const QString & p,
 	const mdcm::Dict & dict,
-	QProgressDialog * pd)
+	QProgressDialog * pb)
 {
 	if (p.isEmpty()) return;
 	QDir dir(p);
@@ -216,9 +218,8 @@ void BrowserWidget2::process_directory(
 	QStringList filenames_no_series_uid;
 	for (int x = 0; x < flist.size(); ++x)
 	{
-		pd->setValue(-1);
 		qApp->processEvents();
-		if (pd->wasCanceled()) return;
+		if (pb->wasCanceled()) return;
 		const QString tmp0 = dir.absolutePath() + QString("/") + flist.at(x);
 		{
 			mdcm::Reader reader;
@@ -261,9 +262,8 @@ void BrowserWidget2::process_directory(
 		ScannerWatcher sw(&s0);
 		s0.AddTag(tSeriesInstanceUID);
 		s0.Scan(filenames, dict);
-		pd->setValue(-1);
 		qApp->processEvents();
-		if (pd->wasCanceled()) return;
+		if (pb->wasCanceled()) return;
 		mdcm::Scanner::ValuesType v = s0.GetValues();
 		mdcm::Scanner::ValuesType::iterator vi = v.begin();
 		for (; vi != v.end(); ++vi)
@@ -310,9 +310,8 @@ void BrowserWidget2::process_directory(
 					series,series_date,
 					&is_image,&is_softcopy);
 			}
-			pd->setValue(-1);
 			qApp->processEvents();
-			if (pd->wasCanceled()) return;
+			if (pb->wasCanceled()) return;
 			//
 			if (!is_image && series_size > 1)
 			{
@@ -321,7 +320,7 @@ void BrowserWidget2::process_directory(
 				{
 					++series_idx;
 					qApp->processEvents();
-					if (pd->wasCanceled()) return;
+					if (pb->wasCanceled()) return;
 					bool is_image_tmp = false;
 					read_tags_short_(
 						i->files.at(series_idx),
@@ -359,9 +358,8 @@ void BrowserWidget2::process_directory(
 			tableWidget->setItem(idx, 8, new QTableWidgetItem(series_date));
 			tableWidget->setItem(idx, 9, new QTableWidgetItem(QVariant(i->files.size()).toString()));
 			//
-			pd->setValue(-1);
 			qApp->processEvents();
-			if (pd->wasCanceled()) return;
+			if (pb->wasCanceled()) return;
 		}
 	}
 	//
@@ -412,21 +410,20 @@ void BrowserWidget2::process_directory(
 		tableWidget->setItem(idx, 7, new QTableWidgetItem(series.remove(QChar('\0'))));
 		tableWidget->setItem(idx, 8, new QTableWidgetItem(series_date));
 		tableWidget->setItem(idx, 9, new QTableWidgetItem(QString("1")));
-		pd->setValue(-1);
 		qApp->processEvents();
-		if (pd->wasCanceled()) return;
+		if (pb->wasCanceled()) return;
 	}
 	filenames.clear();
 	filenames_no_series_uid.clear();
 	//
-	if (!pd->wasCanceled())
+	if (!pb->wasCanceled())
 	{
 		for (int j = 0; j < dlist.size(); ++j)
 		{
 			process_directory(
 				dir.absolutePath() + QString("/") + dlist.at(j),
 				dict,
-				pd);
+				pb);
 		}
 	}
 	dlist.clear();

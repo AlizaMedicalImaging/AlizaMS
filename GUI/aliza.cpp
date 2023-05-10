@@ -720,11 +720,10 @@ QProgressDialog * Aliza::create_filters_progress()
 		pb->findChildren<QPushButton *>();
 	if (progress_buttons_list.size() == 1)
 		progress_buttons_list[0]->hide();
-	pb->setWindowModality(Qt::ApplicationModal);
-	pb->setWindowFlags(
-		pb->windowFlags()^Qt::WindowContextHelpButtonHint);
+	pb->setModal(true);
+	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
 	pb->setMinimumWidth(256);
-	pb->setValue(-1);
+	pb->setRange(0, 0);
 	pb->show();
 	pb->activateWindow();
 	pb->raise();
@@ -740,11 +739,10 @@ QProgressDialog * Aliza::create_filters_progress2()
 			QString("Exit"),
 			0,
 			0);
-	pb->setWindowModality(Qt::ApplicationModal);
-	pb->setWindowFlags(
-		pb->windowFlags()^Qt::WindowContextHelpButtonHint);
+	pb->setModal(true);
+	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
 	pb->setMinimumWidth(256);
-	pb->setValue(-1);
+	pb->setRange(0, 0);
 	pb->show();
 	pb->activateWindow();
 	pb->raise();

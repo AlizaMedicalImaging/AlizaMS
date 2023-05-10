@@ -564,13 +564,14 @@ void MainWindow::open_args(const QStringList & l)
 		QString("Exit"),
 		0,
 		0);
-	pb->setWindowModality(Qt::ApplicationModal);
-	pb->setWindowFlags(
-		pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
+	pb->setModal(true);
+	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
 	connect(pb,SIGNAL(canceled()), this, SLOT(exit_null()));
 	pb->setMinimumWidth(256);
+	pb->setRange(0, 0);
 	pb->show();
-	pb->setValue(-1);
+	pb->activateWindow();
+	pb->raise();
 	if (l2.size() == 1)
 	{
 		const QString f = l2.at(0);
@@ -603,7 +604,6 @@ void MainWindow::open_args(const QStringList & l)
 	disconnect(pb,SIGNAL(canceled()), this, SLOT(exit_null()));
 	pb->close();
 	delete pb;
-	pb = nullptr;
 	mutex.unlock();
 }
 
@@ -1330,13 +1330,14 @@ void MainWindow::dropEvent(QDropEvent * e)
 				QString("Exit"),
 				0,
 				0);
-			pb->setWindowModality(Qt::ApplicationModal);
-			pb->setWindowFlags(
-				pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
+			pb->setModal(true);
+			pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
 			connect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
 			pb->setMinimumWidth(256);
-			pb->setValue(-1);
+			pb->setRange(0, 0);
 			pb->show();
+			pb->activateWindow();
+			pb->raise();
 			qApp->processEvents();
 			for (int i = 0; i < l.size(); ++i)
 			{
@@ -1354,7 +1355,6 @@ void MainWindow::dropEvent(QDropEvent * e)
 			disconnect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
 			pb->close();
 			delete pb;
-			pb = nullptr;
 		}
 	}
 	mutex.unlock();
@@ -1390,11 +1390,13 @@ void MainWindow::load_any()
 		));
 	QProgressDialog * pb = new QProgressDialog(QString("Loading..."), QString("Exit"), 0, 0);
 	connect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
-	pb->setWindowModality(Qt::ApplicationModal);
+	pb->setModal(true);
 	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
 	pb->setMinimumWidth(256);
-	pb->setValue(-1);
+	pb->setRange(0, 0);
 	pb->show();
+	pb->activateWindow();
+	pb->raise();
 	qApp->processEvents();
 	bool is_dicomdir = false;
 	for (int x = 0; x < l.size(); ++x)
@@ -1416,7 +1418,6 @@ void MainWindow::load_any()
 	disconnect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
 	pb->close();
 	delete pb;
-	pb = nullptr;
 	if (is_dicomdir)
 	{
 		if (tabWidget->currentIndex() != 1) tabWidget->setCurrentIndex(1);
@@ -1554,18 +1555,19 @@ void MainWindow::load_dicom_series2()
 	QProgressDialog * pb =
 		new QProgressDialog(QString("Loading..."), QString("Exit"), 0, 0);
 	connect(pb,SIGNAL(canceled()), this, SLOT(exit_null()));
-	pb->setWindowModality(Qt::ApplicationModal);
+	pb->setModal(true);
 	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
 	pb->setMinimumWidth(256);
-	pb->setValue(-1);
+	pb->setRange(0, 0);
 	pb->show();
+	pb->activateWindow();
+	pb->raise();
 	set_ui();
 	qApp->processEvents();
 	aliza->load_dicom_series(pb);
 	disconnect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
 	pb->close();
 	delete pb;
-	pb = nullptr;
 	qApp->processEvents();
 	mutex.unlock();
 }

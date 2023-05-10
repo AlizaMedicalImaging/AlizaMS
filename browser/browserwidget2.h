@@ -5,7 +5,6 @@
 #include <QApplication>
 #include <QWidget>
 #include <QModelIndex>
-#include <QProgressDialog>
 #include <QDropEvent>
 #include <QDragEnterEvent>
 #include <QDragMoveEvent>
@@ -14,6 +13,7 @@
 #include <QIcon>
 #include <QSettings>
 #include <QShortcut>
+#include <QProgressDialog>
 #include <set>
 #include <mdcmTag.h>
 #include <mdcmVL.h>
@@ -132,7 +132,10 @@ private:
 		const mdcm::SequenceOfItems*,
 		mdcm::VL,
 		std::vector<unsigned int> &);
-	void process_directory(const QString&, const mdcm::Dict&, QProgressDialog*);
+	void process_directory(
+		const QString&,
+		const mdcm::Dict&,
+		QProgressDialog*);
 	unsigned int add_roots(
 		const QMap<unsigned int, EntryDICOMDIR> &,
 		unsigned int,
