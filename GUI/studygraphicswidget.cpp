@@ -954,11 +954,8 @@ template<typename T> void load_image2(
 			if (widget->threadsLUT_.at(i)->isFinished()) ++b__;
 		}
 		if (b__ == threadsLUT_size) break;
-		if (num_threads > 1)
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(2));
-			qApp->processEvents();
-		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(2));
+		qApp->processEvents();
 	}
 	for (size_t i = 0; i < threadsLUT_size; ++i)
 	{
