@@ -944,8 +944,6 @@ void Aliza::add_histogram(ImageVariant * v, QProgressDialog * pb, bool check_set
 	{
 		pb->setLabelText(QString("Calculating histogram"));
 		qApp->processEvents();
-		pb->setValue(-1);
-		qApp->processEvents();
 	}
 	HistogramGen * t = new HistogramGen(v);
 	t->run();
@@ -1138,11 +1136,7 @@ static void process_elscint_dir(
 {
 	if (p.isEmpty()) return;
 	QApplication::processEvents();
-	if (pb)
-	{
-		if (pb->wasCanceled()) return;
-		pb->setValue(-1);
-	}
+	if (pb && pb->wasCanceled()) return;
 	QDir dir(p);
 	QStringList dlist = dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
 	QStringList flist =
@@ -1151,11 +1145,7 @@ static void process_elscint_dir(
 	for (int x = 0; x < flist.size(); ++x)
 	{
 		QApplication::processEvents();
-		if (pb)
-		{
-			if (pb->wasCanceled()) return;
-			pb->setValue(-1);
-		}
+		if (pb && pb->wasCanceled()) return;
 		const QString tmp0 =
 			dir.absolutePath() + QString("/") + flist.at(x);
 		if (DicomUtils::is_dicom_file(tmp0)) filenames.push_back(tmp0);
@@ -1165,11 +1155,7 @@ static void process_elscint_dir(
 	for (int x = 0; x < filenames.size(); ++x)
 	{
 		QApplication::processEvents();
-		if (pb)
-		{
-			if (pb->wasCanceled()) return;
-			pb->setValue(-1);
-		}
+		if (pb && pb->wasCanceled()) return;
 		QFileInfo fi(filenames.at(x));
 		const QString tmp9 = outp + QString("/") + fi.fileName();
 		try
@@ -1202,11 +1188,7 @@ static void process_elscint_dir(
 	for (int j = 0; j < dlist.size(); ++j)
 	{
 		QApplication::processEvents();
-		if (pb)
-		{
-			if (pb->wasCanceled()) return;
-			pb->setValue(-1);
-		}
+		if (pb && pb->wasCanceled()) return;
 		QDir d(outp + QString("/") + dlist.at(j));
 		if (!d.exists()) d.mkpath(d.absolutePath());
 		process_elscint_dir(
@@ -4274,7 +4256,6 @@ void Aliza::load_dicom_file(int * image_id,
 		lock = mutex0.tryLock();
 		if (!lock) goto quit__;
 	}
-	if (pb) pb->setValue(-1);
 	if (ok3d) glwidget->set_skip_draw(true);
 	qApp->processEvents();
 	tmp_filenames__.push_back(f);

@@ -575,7 +575,6 @@ template<typename T> int generate_tex3d(
 	if (pb)
 	{
 		pb->setLabelText(QString("Generating OpenGL texture"));
-		pb->setValue(-1);
 	}
 	qApp->processEvents();
 	//
@@ -635,7 +634,6 @@ template<typename T> int generate_tex3d(
 		return 1;
 	}
 	//
-	if (pb) pb->setValue(-1);
 	qApp->processEvents();
 	//
 	// array maximum size 0x7fffffff
@@ -696,7 +694,6 @@ template<typename T> int generate_tex3d(
 		return 1;
 	}
 	//
-	if (pb) pb->setValue(-1);
 	qApp->processEvents();
 	//
 	try
@@ -744,7 +741,6 @@ template<typename T> int generate_tex3d(
 		goto quit__;
 	}
 	//
-	if (pb) pb->setValue(-1);
 	qApp->processEvents();
 	//
 	gl->makeCurrent();
@@ -923,7 +919,6 @@ template<typename T> int generate_tex3d(
 			<< glerror__ << std::endl;
 	}
 	//
-	if (pb) pb->setValue(-1);
 	qApp->processEvents();
 	//
 quit__:
@@ -1351,7 +1346,6 @@ template<typename T> QString process_dicom_monochrome_image1(
 	if (pb)
 	{
 		pb->setLabelText(QString("Loading data... please wait"));
-		pb->setValue(-1);
 	}
 	qApp->processEvents();
 	start.Fill(0);
@@ -1494,7 +1488,6 @@ template<typename T> QString process_dicom_rgb_image1(
 	if (pb)
 	{
 		pb->setLabelText(QString("Loading data... please wait"));
-		pb->setValue(-1);
 	}
 	qApp->processEvents();
 	start.Fill(0);
@@ -1677,7 +1670,6 @@ template<typename T> QString process_dicom_rgba_image1(
 	if (pb)
 	{
 		pb->setLabelText(QString("Loading data... please wait"));
-		pb->setValue(-1);
 	}
 	qApp->processEvents();
 	start.Fill(0);

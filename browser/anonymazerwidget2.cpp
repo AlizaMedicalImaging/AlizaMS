@@ -2110,7 +2110,6 @@ void build_maps(
 	for (int x = 0; x < l.size(); ++x)
 	{
 		QApplication::processEvents();
-		pd->setValue(-1);
 		if (pd->wasCanceled()) return;
 		try
 		{
@@ -2162,7 +2161,6 @@ void build_maps(
 		while (it0.hasNext())
 		{
 			QApplication::processEvents();
-			pd->setValue(-1);
 			if (pd->wasCanceled()) return;
 			const QString s = it0.next();
 			const QString v = DicomUtils::generate_uid();
@@ -2186,7 +2184,6 @@ void build_maps(
 		while (it1.hasNext())
 		{
 			QApplication::processEvents();
-			pd->setValue(-1);
 			if (pd->wasCanceled()) return;
 			const QString s = it1.next();
 			const QString v = generate_random_name(random_names);
@@ -2210,7 +2207,6 @@ void build_maps(
 		while (it2.hasNext())
 		{
 			QApplication::processEvents();
-			pd->setValue(-1);
 			if (pd->wasCanceled()) return;
 			const QString s = it2.next();
 			const QString v = DicomUtils::generate_id();
@@ -2418,7 +2414,6 @@ void AnonymazerWidget2::process_directory(
 		QStringList filenames;
 		for (int x = 0; x < flist.size(); ++x)
 		{
-			pd->setValue(-1);
 			QApplication::processEvents();
 			if (pd->wasCanceled()) return;
 			const QString tmp0 = dir.absolutePath() + QString("/") + flist.at(x);
@@ -2427,7 +2422,6 @@ void AnonymazerWidget2::process_directory(
 		for (int x = 0; x < filenames.size(); ++x)
 		{
 			++count_files;
-			pd->setValue(-1);
 			QApplication::processEvents();
 			if (pd->wasCanceled()) return;
 			QString out_filename;
@@ -2678,7 +2672,6 @@ void AnonymazerWidget2::run_()
 			{
 				filenames.push_back(fi.absoluteFilePath());
 			}
-			pd->setValue(-1);
 			QApplication::processEvents();
 			if (pd->wasCanceled()) return;
 		}

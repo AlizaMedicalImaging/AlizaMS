@@ -2005,7 +2005,6 @@ unsigned int process_gsps(
 		if (pb)
 		{
 			pb->setLabelText(QString("Searching referenced files"));
-			pb->setValue(-1);
 		}
 		QApplication::processEvents();
 		QList<PrRefSeries> refs;
@@ -2016,7 +2015,6 @@ unsigned int process_gsps(
 			if (pb)
 			{
 				pb->setLabelText(QString("Loading ... "));
-				pb->setValue(-1);
 			}
 			QApplication::processEvents();
 			QStringList ref_files;
@@ -2047,7 +2045,6 @@ unsigned int process_gsps(
 					std::cout << "Not a scalar image for GSPS, skipped" << std::endl;
 					continue;
 				}
-				if (pb) pb->setValue(-1);
 				QApplication::processEvents();
 				++count;
 				bool spatial_transform = false;
@@ -2096,11 +2093,7 @@ unsigned int process_gsps(
 						pr_image->di->filtering = 0;
 					}
 					bool pr_load_ok = false;
-					if (pb)
-					{
-						pb->setValue(-1);
-						QApplication::processEvents();
-					}
+					QApplication::processEvents();
 					pr_load_ok = CommonUtils::reload_monochrome(
 						pr_image,
 						ok3d,
@@ -3433,7 +3426,6 @@ bool DicomUtils::read_slices(
 			QVariant(size_z).toString()+
 			QString(" files");
 		pb->setLabelText(info_);
-		pb->setValue(-1);
 	}
 	QApplication::processEvents();
 	for (unsigned int i = 0; i < size_z; ++i)
@@ -3523,7 +3515,6 @@ bool DicomUtils::read_slices(
 		if (i == size_z - 1) std::cout << std::endl;
 #endif
 	}
-	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
 	if (failed) goto quit_;
 	ok = generate_geometry(
@@ -3870,7 +3861,6 @@ bool DicomUtils::read_slices_rtdose(
 {
 	if (!ivariant) return false;
 	//
-	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
 	//
 	bool ok = false;
@@ -3913,7 +3903,6 @@ bool DicomUtils::read_slices_rtdose(
 		p[8] = pat_orient[5];
 		values.push_back(p);
 	}
-	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
 	ok = generate_geometry(
 			ivariant->di->image_slices,
@@ -7138,7 +7127,6 @@ QString DicomUtils::read_enhanced(
 		{
 			return QString("ds.IsEmpty()");
 		}
-		if (pb) pb->setValue(-1);
 		QApplication::processEvents();
 		const mdcm::Tag tRows(0x0028,0x0010);
 		const mdcm::Tag tColumns(0x0028,0x0011);
@@ -7195,7 +7183,6 @@ QString DicomUtils::read_enhanced(
 		enhanced_check_rescale(ds, values);
 	}
 	//
-	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
 	double dircos_read[6]{};
 	unsigned int dimx_read, dimy_read, dimz_read;
@@ -7250,7 +7237,6 @@ QString DicomUtils::read_enhanced(
 		data.clear();
 		return QString("Mismatch in data size and number of frames");
 	}
-	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
 	//
 	//
@@ -7475,7 +7461,6 @@ QString DicomUtils::read_enhanced_supp_palette(
 		{
 			return QString("No Supplemental LUT");
 		}
-		if (pb) pb->setValue(-1);
 		QApplication::processEvents();
 		const mdcm::Tag tRows(0x0028,0x0010);
 		const mdcm::Tag tColumns(0x0028,0x0011);
@@ -7525,7 +7510,6 @@ QString DicomUtils::read_enhanced_supp_palette(
 #endif
 	enhanced_process_values(values, shared_values);
 	//
-	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
 	double dircos_read[6]{};
 	unsigned int dimx_read = 0, dimy_read = 0, dimz_read = 0;
@@ -7586,7 +7570,6 @@ QString DicomUtils::read_enhanced_supp_palette(
 		data.clear();
 		return QString("Mismatch in data size and number of frames");
 	}
-	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
 	//
 	//
@@ -7766,7 +7749,6 @@ QString DicomUtils::read_ultrasound(
 	{
 		return QString("read_ultrasound reads 1 image");
 	}
-	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
 	const SettingsWidget * wsettings =
 		static_cast<const SettingsWidget *>(settings);
@@ -7993,7 +7975,6 @@ QString DicomUtils::read_ultrasound(
 	direction[1][2] = nrm_dircos_y;
 	direction[2][2] = nrm_dircos_z;
 	//
-	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
 	//
 	QString error = CommonUtils::gen_itk_image(ok,
@@ -8050,7 +8031,6 @@ QString DicomUtils::read_nuclear(
 	*ok = false;
 	if (!ivariant) return QString("ivariant is null");
 	if (images_ipp.size() != 1) return QString("read_nuclear reads 1 image");
-	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
 	const SettingsWidget * wsettings =
 		static_cast<const SettingsWidget *>(settings);
@@ -8214,7 +8194,6 @@ are stacked in front of the first slice. See Image Orientation
 	std::cout << "           " << direction[0][2] << " " << direction[1][2] << " " << direction[2][2] << std::endl;
 #endif
 	//
-	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
 	//
 	QString error = CommonUtils::gen_itk_image(ok,
@@ -8270,7 +8249,6 @@ QString DicomUtils::read_series(
 {
 	*ok = false;
 	if (!ivariant) return QString("ivariant is null");
-	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
 	const SettingsWidget * wsettings =
 		static_cast<const SettingsWidget *>(settings);
@@ -8928,7 +8906,6 @@ QString DicomUtils::read_series(
 		data.clear();
 		return QString("Mismatch data size and number of slices");
 	}
-	if (pb) pb->setValue(-1);
 	QApplication::processEvents();
 	//
 	{
@@ -9742,7 +9719,6 @@ QString DicomUtils::read_buffer(
 			}
 		}
 		//
-		if (pb) pb->setValue(-1);
 		qApp->processEvents();
 		//
 		{
@@ -10486,7 +10462,6 @@ QString DicomUtils::read_buffer(
 		}
 	}
 	//
-	if (pb) pb->setValue(-1);
 	qApp->processEvents();
 	//
 	const size_t xy = buffer_size / dimz;
@@ -12262,7 +12237,6 @@ bool DicomUtils::process_contrours_ref(
 	if (pb)
 	{
 		pb->setLabelText(QString("Searching ."));
-		pb->setValue(-1);
 	}
 	QApplication::processEvents();
 	mdcm::Reader reader;
@@ -12317,7 +12291,6 @@ bool DicomUtils::process_contrours_ref(
 			if (pb)
 			{
 				pb->setLabelText(QString("Searching .."));
-				pb->setValue(-1);
 			}
 			QApplication::processEvents();
 			QString sop_instance_uid;
@@ -12368,9 +12341,8 @@ bool DicomUtils::process_contrours_ref(
 						if (pb)
 						{
 							pb->setLabelText(QString("Searching ..."));
-							pb->setValue(-1);
-							QApplication::processEvents();
 						}
+						QApplication::processEvents();
 						const Contour * c = it.value();
 						for (int j = 0;
 							j < c->ref_sop_instance_uids.size();
@@ -12394,9 +12366,8 @@ bool DicomUtils::process_contrours_ref(
 				if (pb)
 				{
 					pb->setLabelText(QString("Searching ...."));
-					pb->setValue(-1);
-					QApplication::processEvents();
 				}
+				QApplication::processEvents();
 				std::vector<ImageVariant*> ivariants;
 				QStringList detected_files_tmp = detected_files.at(z);
 				detected_files_tmp.sort();
@@ -12428,9 +12399,8 @@ bool DicomUtils::process_contrours_ref(
 						if (pb)
 						{
 							pb->setLabelText(QString("Searching ....."));
-							pb->setValue(-1);
-							QApplication::processEvents();
 						}
+						QApplication::processEvents();
 						ROI roi;
 						roi.id = tmp_ivariant->di->rois.at(i).id;
 						ContourUtils::copy_roi(roi, tmp_ivariant->di->rois.at(i));
@@ -12485,7 +12455,6 @@ bool DicomUtils::scan_files_for_instance_uid(
 	QApplication::processEvents();
 	for (int x = 0; x < flist.size(); ++x)
 	{
-		if (pb) pb->setValue(-1);
 		QApplication::processEvents();
 		const QString tmp0 =
 			dir.absolutePath() + QString("/") + flist.at(x);
@@ -13420,7 +13389,6 @@ QString DicomUtils::read_dicom(
 			pb->setLabelText(QString("Loading ... ") +
 				QString::number(x) + filenames_num);
 			pb->show();
-			pb->setValue(-1);
 		}
 		QApplication::processEvents();
 		QString sop;
@@ -13505,7 +13473,6 @@ QString DicomUtils::read_dicom(
 				load_image_ref_contour = true;
 				if (!load_image_ref_contour)
 				{
-					if (pb) pb->setValue(-1);
 					QApplication::processEvents();
 					ImageVariant * ivariant =
 						new ImageVariant(
@@ -14132,7 +14099,6 @@ QString DicomUtils::read_dicom(
 		// TODO check PR
 		for (int x = 0; x < images.size(); ++x)
 		{
-			if (pb) pb->setValue(-1);
 			QApplication::processEvents();
 			QStringList images_tmp;
 			images_tmp << images.at(x);
@@ -14164,7 +14130,6 @@ QString DicomUtils::read_dicom(
 		// TODO check PR
 		for (int x = 0; x < images.size(); ++x)
 		{
-			if (pb) pb->setValue(-1);
 			QApplication::processEvents();
 			QStringList images_tmp;
 			images_tmp << images.at(x);
@@ -14196,7 +14161,6 @@ QString DicomUtils::read_dicom(
 	{
 		for (int x = 0; x < images.size(); ++x)
 		{
-			if (pb) pb->setValue(-1);
 			QApplication::processEvents();
 			QStringList images_tmp;
 			images_tmp << images.at(x);
@@ -14239,7 +14203,6 @@ QString DicomUtils::read_dicom(
 	{
 		for (int k = 0; k < extracted_images.size(); ++k)
 		{
-			if (pb) pb->setValue(-1);
 			QApplication::processEvents();
 			std::vector<QString> images__;
 			std::vector<QString> images_ipp;
@@ -14299,7 +14262,6 @@ QString DicomUtils::read_dicom(
 	{
 		for (int x = 0; x < images.size(); ++x)
 		{
-			if (pb) pb->setValue(-1);
 			QApplication::processEvents();
 			if (load_type == 0||load_type == 2)
 			{
@@ -14498,7 +14460,6 @@ QString DicomUtils::read_dicom(
 		// TODO
 		for (int x = 0; x < images.size(); ++x)
 		{
-			if (pb) pb->setValue(-1);
 			QApplication::processEvents();
 			QStringList images_tmp;
 			images_tmp << images.at(x);
@@ -14540,7 +14501,6 @@ QString DicomUtils::read_dicom(
 		// TODO
 		for (int x = 0; x < images.size(); ++x)
 		{
-			if (pb) pb->setValue(-1);
 			QApplication::processEvents();
 			QStringList images_tmp;
 			images_tmp << images.at(x);
@@ -14581,7 +14541,6 @@ QString DicomUtils::read_dicom(
 	{
 		for (int x = 0; x < images.size(); ++x)
 		{
-			if (pb) pb->setValue(-1);
 			QApplication::processEvents();
 			QStringList images_tmp;
 			images_tmp << images.at(x);
@@ -14772,7 +14731,6 @@ QString DicomUtils::read_dicom(
 		}
 		for (int x = 0; x < fff.size(); ++x)
 		{
-			if (pb) pb->setValue(-1);
 			QApplication::processEvents();
 			std::vector<QString> images__;
 			std::vector<QString> images_ipp;
@@ -14867,7 +14825,6 @@ QString DicomUtils::read_dicom(
 	{
 		if (!images.empty())
 		{
-			if (pb) pb->setValue(-1);
 			QApplication::processEvents();
 			std::vector<QString> images__;
 			std::vector<QString> images_ipp;
@@ -15143,7 +15100,6 @@ QString DicomUtils::read_dicom(
 				}
 			}
 		}
-		if (pb) pb->setValue(-1);
 		QApplication::processEvents();
 	}
 	//
@@ -15212,7 +15168,6 @@ QString DicomUtils::read_dicom(
 		if (pb)
 		{
 			pb->show();
-			pb->setValue(-1);
 		}
 		QApplication::processEvents();
 	}
@@ -15244,7 +15199,6 @@ QString DicomUtils::read_dicom(
 		if (pb)
 		{
 			pb->show();
-			pb->setValue(-1);
 		}
 		QApplication::processEvents();
 	}
@@ -15280,7 +15234,6 @@ QString DicomUtils::read_dicom(
 		if (pb)
 		{
 			pb->show();
-			pb->setValue(-1);
 		}
 		QApplication::processEvents();
 	}

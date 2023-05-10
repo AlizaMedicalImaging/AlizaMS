@@ -595,7 +595,6 @@ void MainWindow::open_args(const QStringList & l)
 	{
 		for (int x = 0; x < l2.size(); ++x)
 		{
-			pb->setValue(-1);
 			const QString f = l2.at(x);
 			QFileInfo fi(f);
 			if (fi.isFile()) load_any_file(l2.at(x), pb, true);
