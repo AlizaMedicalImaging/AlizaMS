@@ -33,11 +33,10 @@
 #include "aliza.h"
 #include "updateqtcommand.h"
 #include <climits>
+#include <chrono>
+#include <thread>
 
 //#define A_TMP_BENCHMARK
-#ifdef A_TMP_BENCHMARK
-#include <chrono>
-#endif
 
 namespace
 {
@@ -1393,20 +1392,19 @@ template<typename T> void load_image(
 	}
 	//
 	const size_t threadsLUT_size = widget->threadsLUT_.size();
-#ifdef A_TMP_BENCHMARK
-	unsigned long long w_times{};
-#endif
 	while (true)
 	{
-#ifdef A_TMP_BENCHMARK
-		++w_times;
-#endif
 		size_t b__ = 0;
 		for (size_t i = 0; i < threadsLUT_size; ++i)
 		{
 			if (widget->threadsLUT_.at(i)->isFinished()) ++b__;
 		}
 		if (b__ == threadsLUT_size) break;
+		if (num_threads > 1)
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(2));
+			qApp->processEvents();
+		}
 	}
 #ifdef A_TMP_BENCHMARK
 	const std::chrono::duration<double, std::milli> elapsed2{ now() - start2 };

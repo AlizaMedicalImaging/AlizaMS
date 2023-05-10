@@ -22,6 +22,8 @@
 #include "updateqtcommand.h"
 #include "imagesbox.h"
 #include <climits>
+#include <chrono>
+#include <thread>
 
 namespace
 {
@@ -862,12 +864,7 @@ template<typename T> void load_image2(
 	//
 	const bool global_flip_x = widget->graphicsview->global_flip_x;
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
-#if 1
 	const int num_threads = QThread::idealThreadCount();
-#else
-	int num_threads = QThread::idealThreadCount();
-	if (num_threads > 1) num_threads - 1;
-#endif
 	const int tmp99 = size[1] % num_threads;
 #if 0
 	if (!widget->threadsLUT_.empty())
@@ -957,6 +954,12 @@ template<typename T> void load_image2(
 			if (widget->threadsLUT_.at(i)->isFinished()) ++b__;
 		}
 		if (b__ == threadsLUT_size) break;
+		qApp->processEvents();
+		if (num_threads > 1)
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(2));
+			qApp->processEvents();
+		}
 	}
 	for (size_t i = 0; i < threadsLUT_size; ++i)
 	{

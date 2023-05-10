@@ -5,8 +5,11 @@
 #include <QImage>
 #include <QColor>
 #include <QThread>
+#include <QApplication>
 #include <vector>
 #include "iconutils.h"
+#include <chrono>
+#include <thread>
 
 class ProcessImageThread_ : public QThread
 {
@@ -228,6 +231,11 @@ template<typename Tin, typename Tout> void extract_icon(
 			if (icon_threads.at(i)->isFinished()) ++b__;
 		}
 		if (b__ == threads_size) break;
+		if (num_threads > 1)
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			QApplication::processEvents();
+		}
 	}
 	for (size_t i = 0; i < threads_size; ++i)
 	{
