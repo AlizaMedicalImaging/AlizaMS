@@ -1127,8 +1127,8 @@ void MainWindow::toggle_graphicswidget_m_x(bool t)
 		slider_frame_layoutZ->removeWidget(slider_m);
 	if (slider_frame_layout->indexOf(slider_m) < 0)
 		slider_frame_layout->addWidget(slider_m);
-	if (graphicswidget_y) graphicswidget_y->clear_(true);
-	if (graphicswidget_x) graphicswidget_x->clear_(true);
+	if (graphicswidget_y) graphicswidget_y->clear_();
+	if (graphicswidget_x) graphicswidget_x->clear_();
 	graphicswidget_frame->show();
 	aliza->set_axis_2D(0, rectAct->isChecked());
 }
@@ -1154,8 +1154,8 @@ void MainWindow::toggle_graphicswidget_m_y(bool t)
 		slider_frame_layoutZ->removeWidget(slider_m);
 	if (slider_frame_layout->indexOf(slider_m) < 0)
 		slider_frame_layout->addWidget(slider_m);
-	if (graphicswidget_y) graphicswidget_y->clear_(true);
-	if (graphicswidget_x) graphicswidget_x->clear_(true);
+	if (graphicswidget_y) graphicswidget_y->clear_();
+	if (graphicswidget_x) graphicswidget_x->clear_();
 	graphicswidget_frame->show();
 	aliza->set_axis_2D(1, rectAct->isChecked());
 }
@@ -1185,8 +1185,8 @@ void MainWindow::toggle_graphicswidget_m_z(bool t)
 		slider_frame_layoutZ->removeWidget(slider_m);
 	if (slider_frame_layout->indexOf(slider_m) < 0)
 		slider_frame_layout->addWidget(slider_m);
-	if (graphicswidget_y) graphicswidget_y->clear_(true);
-	if (graphicswidget_x) graphicswidget_x->clear_(true);
+	if (graphicswidget_y) graphicswidget_y->clear_();
+	if (graphicswidget_x) graphicswidget_x->clear_();
 	graphicswidget_frame->show();
 	aliza->set_axis_2D(2, rectAct->isChecked());
 }
@@ -1198,9 +1198,9 @@ void MainWindow::toggle_histogram(bool t)
 	if (!graphicswidget_m) return;
 	multi_frame->hide();
 	graphicswidget_frame->hide();
-	if (graphicswidget_m) graphicswidget_m->clear_(true);
-	if (graphicswidget_y) graphicswidget_y->clear_(true);
-	if (graphicswidget_x) graphicswidget_x->clear_(true);
+	if (graphicswidget_m) graphicswidget_m->clear_();
+	if (graphicswidget_y) graphicswidget_y->clear_();
+	if (graphicswidget_x) graphicswidget_x->clear_();
 	if (histogram_frame2_layout->indexOf(histogramview) > 0)
 		histogram_frame2_layout->removeWidget(histogramview);
 	if (histogram_frame_layout->indexOf(histogramview) < 0)

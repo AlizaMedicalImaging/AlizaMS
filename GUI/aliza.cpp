@@ -1388,11 +1388,11 @@ void Aliza::center_from_spinbox(double i)
 		if (check_2d_visible())
 		{
 			if (!graphicswidget_m->run__)
-				graphicswidget_m->update_image(0, false, true);
+				graphicswidget_m->update_image(0, false);
 			if (multiview)
 			{
-				graphicswidget_y->update_image(0, false, true);
-				graphicswidget_x->update_image(0, false, true);
+				graphicswidget_y->update_image(0, false);
+				graphicswidget_x->update_image(0, false);
 			}
 		}
 	}
@@ -1416,11 +1416,11 @@ void Aliza::width_from_spinbox(double i)
 		if (check_2d_visible())
 		{
 			if (!graphicswidget_m->run__)
-				graphicswidget_m->update_image(0, false, true);
+				graphicswidget_m->update_image(0, false);
 			if (multiview)
 			{
-				graphicswidget_y->update_image(0, false, true);
-				graphicswidget_x->update_image(0, false, true);
+				graphicswidget_y->update_image(0, false);
+				graphicswidget_x->update_image(0, false);
 			}
 		}
 	}
@@ -1456,11 +1456,11 @@ void Aliza::set_lut_function1(int x)
 		if (check_2d_visible())
 		{
 			if (!graphicswidget_m->run__)
-				graphicswidget_m->update_image(0, false, true);
+				graphicswidget_m->update_image(0, false);
 			if (multiview)
 			{
-				graphicswidget_y->update_image(0, false, true);
-				graphicswidget_x->update_image(0, false, true);
+				graphicswidget_y->update_image(0, false);
+				graphicswidget_x->update_image(0, false);
 			}
 		}
 	}
@@ -1499,11 +1499,11 @@ void Aliza::set_lut(int i)
 		if (check_2d_visible())
 		{
 			if (!graphicswidget_m->run__)
-				graphicswidget_m->update_image(0, false, true);
+				graphicswidget_m->update_image(0, false);
 			if (multiview)
 			{
-				graphicswidget_y->update_image(0, false, true);
-				graphicswidget_x->update_image(0, false, true);
+				graphicswidget_y->update_image(0, false);
+				graphicswidget_x->update_image(0, false);
 			}
 		}
 	}
@@ -2557,7 +2557,7 @@ void Aliza::set_view2d_mouse_modus(short m)
 	{
 		if (!graphicswidget_m->run__)
 		{
-			graphicswidget_m->update_image(0, true, true);
+			graphicswidget_m->update_image(0, true);
 			graphicswidget_m->update_frames();
 		}
 		if (multiview)
@@ -2682,8 +2682,8 @@ void Aliza::update_selection_common1(ImageVariant * v)
 	{
 		if (!multiview)
 		{
-			graphicswidget_y->clear_(true);
-			graphicswidget_x->clear_(true);
+			graphicswidget_y->clear_();
+			graphicswidget_x->clear_();
 		}
 		histogramview->update__(v);
 	}
@@ -2826,7 +2826,7 @@ void Aliza::update_visible_rois(QTableWidgetItem * i)
 				}
 			}
 		}
-		graphicswidget_m->update_image(0, true, true);
+		graphicswidget_m->update_image(0, true);
 		if (ok3d) glwidget->set_skip_draw(false);
 	}
 	QApplication::restoreOverrideCursor();
@@ -3061,11 +3061,11 @@ void Aliza::width_from_histogram_min(double x)
 #endif
 	{
 		if (check_3d() && check_3d_visible()) glwidget->updateGL();
-		if (!graphicswidget_m->run__) graphicswidget_m->update_image(0, false, true);
+		if (!graphicswidget_m->run__) graphicswidget_m->update_image(0, false);
 		if (multiview)
 		{
-			graphicswidget_y->update_image(0, false, true);
-			graphicswidget_x->update_image(0, false, true);
+			graphicswidget_y->update_image(0, false);
+			graphicswidget_x->update_image(0, false);
 		}
 	}
 	connect(toolbox2D->center_doubleSpinBox,SIGNAL(valueChanged(double)),this,SLOT(center_from_spinbox(double)));
@@ -3108,11 +3108,11 @@ void Aliza::width_from_histogram_max(double x)
 #endif
 	{
 		if (check_3d() && check_3d_visible()) glwidget->updateGL();
-		if (!graphicswidget_m->run__) graphicswidget_m->update_image(0, false, true);
+		if (!graphicswidget_m->run__) graphicswidget_m->update_image(0, false);
 		if (multiview)
 		{
-			graphicswidget_y->update_image(0, false, true);
-			graphicswidget_x->update_image(0, false, true);
+			graphicswidget_y->update_image(0, false);
+			graphicswidget_x->update_image(0, false);
 		}
 	}
 	connect(toolbox2D->center_doubleSpinBox,SIGNAL(valueChanged(double)),this,SLOT(center_from_spinbox(double)));
@@ -3141,11 +3141,11 @@ void Aliza::center_from_histogram(double x)
 #endif
 	{
 		if (check_3d() && check_3d_visible()) glwidget->updateGL();
-		if (!graphicswidget_m->run__) graphicswidget_m->update_image(0, false, true);
+		if (!graphicswidget_m->run__) graphicswidget_m->update_image(0, false);
 		if (multiview)
 		{
-			graphicswidget_y->update_image(0, false, true);
-			graphicswidget_x->update_image(0, false, true);
+			graphicswidget_y->update_image(0, false);
+			graphicswidget_x->update_image(0, false);
 		}
 	}
 	connect(toolbox2D->center_doubleSpinBox,SIGNAL(valueChanged(double)),this,SLOT(center_from_spinbox(double)));
@@ -3639,7 +3639,7 @@ void Aliza::flipX()
 		!run__ &&
 #endif
 		!graphicswidget_m->run__)
-		graphicswidget_m->update_image(0, false, true);
+		graphicswidget_m->update_image(0, false);
 }
 
 void Aliza::flipY()
@@ -3651,7 +3651,7 @@ void Aliza::flipY()
 		!run__ &&
 #endif
 		!graphicswidget_m->run__)
-		graphicswidget_m->update_image(0, false, true);
+		graphicswidget_m->update_image(0, false);
 }
 
 void Aliza::toggle_maxwindow(bool i)
@@ -4594,7 +4594,7 @@ void Aliza::trigger_studyview()
 		if (v2 && (x < studyview->widgets.size()))
 		{
 			studyview->widgets[x]->graphicswidget->clear_();
-			studyview->widgets[x]->graphicswidget->set_image(v2, 1, true, true);
+			studyview->widgets[x]->graphicswidget->set_image(v2, 1, true);
 		}
 		++x;
 	}
@@ -4661,7 +4661,7 @@ void Aliza::trigger_studyview_checked()
 		ImageVariant * v1 = l[j];
 		if (v1 && (x < studyview->widgets.size()))
 		{
-			studyview->widgets[x]->graphicswidget->set_image(v1, 1, true, true);
+			studyview->widgets[x]->graphicswidget->set_image(v1, 1, true);
 		}
 		++x;
 	}

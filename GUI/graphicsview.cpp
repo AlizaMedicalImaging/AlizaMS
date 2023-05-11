@@ -167,14 +167,14 @@ void GraphicsView::keyPressEvent(QKeyEvent * e)
 		break;
 	case Qt::Key_0:
 		{
-			parent->update_image(1, false, true);
+			parent->update_image(1, false);
 			update_selection_rect_width();
 		}
 		break;
 	case Qt::Key_1:
 		{
 			m_scale = 1.0;
-			parent->update_image(0, false, true);
+			parent->update_image(0, false);
 			update_selection_rect_width();
 		}
 		break;
@@ -186,7 +186,7 @@ void GraphicsView::keyPressEvent(QKeyEvent * e)
 		break;
 	case Qt::Key_F:
 		{
-			parent->update_image(1, false, true);
+			parent->update_image(1, false);
 			update_selection_rect_width();
 		}
 		break;
@@ -1032,13 +1032,13 @@ void GraphicsView::get_pixel_value2(double x, double y)
 void GraphicsView::flipX()
 {
 	global_flip_x = !global_flip_x;
-	parent->update_image(0, false, true);
+	parent->update_image(0, false);
 }
 
 void GraphicsView::flipY()
 {
 	global_flip_y = !global_flip_y;
-	parent->update_image(0, false, true);
+	parent->update_image(0, false);
 }
 
 void GraphicsView::draw_prtexts(const ImageVariant * ivariant)

@@ -1649,16 +1649,12 @@ GraphicsWidget::GraphicsWidget(
 GraphicsWidget::~GraphicsWidget()
 {
 	run__ = false;
-	if (mutex.tryLock(3000))
+	if (image_container.image2D)
 	{
-		if (image_container.image2D)
-		{
-			delete image_container.image2D;
-			image_container.image2D = nullptr;
-		}
-		image_container.image3D = nullptr;
-		mutex.unlock();
+		delete image_container.image2D;
+		image_container.image2D = nullptr;
 	}
+	image_container.image3D = nullptr;
 }
 
 void GraphicsWidget::closeEvent(QCloseEvent * e)
@@ -1769,13 +1765,10 @@ void GraphicsWidget::update_selection_item()
 void GraphicsWidget::update_image(
 	const short fit,
 	const bool redraw_contours,
-	const bool lock,
 	const bool per_frame_level_found)
 {
 	if (!image_container.image3D) return;
 	if (!image_container.image2D) return;
-	//
-	if (lock) mutex.lock();
 	//
 	switch (image_container.image2D->image_type)
 	{
@@ -1952,13 +1945,10 @@ void GraphicsWidget::update_image(
 	default:
 		break;
 	}
-	//
-	if (lock) mutex.unlock();
 }
 
-void GraphicsWidget::clear_(bool lock)
+void GraphicsWidget::clear_()
 {
-	if (lock) mutex.lock();
 	if (graphicsview->image_item)
 	{
 #ifdef DELETE_GRAPHICSIMAGEITEM
@@ -2109,7 +2099,6 @@ void GraphicsWidget::clear_(bool lock)
 	graphicsview->clear_prtexts_items();
 	graphicsview->clear_prgraphicobjects_items();
 	graphicsview->clear_shutters();
-	if (lock) mutex.unlock();
 }
 
 float GraphicsWidget::get_offset_x()
@@ -2213,11 +2202,9 @@ void GraphicsWidget::set_slice_2D(
 	int x = 0;
 	QString error_;
 	//
-	mutex.lock();
-	//
 	image_container.image3D = v;
 	//
-	if (!image_container.image2D) goto quit__;
+	if (!image_container.image2D) return;
 	//
 	image_container.image2D->image_type = -1;
 	image_container.image2D->orientation_string = QString("");
@@ -2351,8 +2338,8 @@ void GraphicsWidget::set_slice_2D(
 		break;
 	default:
 		{
-			clear_(false);
-			goto quit__;
+			clear_();
+			return;
 		}
 	}
 	//
@@ -2429,8 +2416,8 @@ void GraphicsWidget::set_slice_2D(
 		break;
 	default:
 		{
-			clear_(false);
-			goto quit__;
+			clear_();
+			return;
 		}
 	}
 	//
@@ -2440,7 +2427,7 @@ void GraphicsWidget::set_slice_2D(
 	}
 	else
 	{
-		goto quit__;
+		return;
 	}
 	//
 	switch (axis)
@@ -2495,7 +2482,7 @@ void GraphicsWidget::set_slice_2D(
 	default:
 		break;
 	}
-	update_image(fit, true, false, per_frame_level_found);
+	update_image(fit, true, per_frame_level_found);
 	//
 	if (alw_usregs) graphicsview->draw_us_regions();
 	graphicsview->update_selection_rect_width();
@@ -2513,8 +2500,6 @@ void GraphicsWidget::set_slice_2D(
 			if (graphicsview->pr_area->isVisible()) graphicsview->pr_area->hide();
 		}
 	}
-quit__:
-	mutex.unlock();
 }
 
 void GraphicsWidget::set_axis(int a)
@@ -2744,7 +2729,7 @@ void GraphicsWidget::set_smooth(bool t)
 		}
 	}
 #endif
-	update_image(0, false, true);
+	update_image(0, false);
 }
 
 bool GraphicsWidget::get_smooth() const
@@ -3290,7 +3275,7 @@ void GraphicsWidget::set_frame_time_unit(bool t)
 void GraphicsWidget::set_alt_mode(bool t)
 {
 	alt_mode = t;
-	update_image(0, false, true);
+	update_image(0, false);
 }
 
 bool GraphicsWidget::get_alt_mode() const
@@ -3308,15 +3293,12 @@ QString GraphicsWidget::contours_from_selected_paths(
 	int selected_items_size = 0;
 	QList<long long> tmp_ids;
 	QList<QGraphicsItem*> selected_items;
-	const bool lock = mutex.tryLock();
-	if (!lock) goto quit__;
 	selected_items = graphicsview->scene()->selectedItems();
 	selected_items_size = selected_items.size();
 	graphicsview->scene()->clearSelection();
 	if (selected_items_size < 1)
 	{
-		message = QString("Nothing selected,\nclick at contour");
-		goto quit__;
+		return QString("Nothing selected,\nclick at contour");
 	}
 	for (int x = 0; x < selected_items_size; ++x)
 	{
@@ -3374,8 +3356,6 @@ QString GraphicsWidget::contours_from_selected_paths(
 		if (!s1.isEmpty()) message.append(s0 + s1 + QString("\n"));
 	}
 	graphicsview->clear_paths();
-quit__:
-	mutex.unlock();
 	return message;
 }
 

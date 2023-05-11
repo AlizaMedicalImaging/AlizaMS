@@ -15,7 +15,6 @@
 #include <QPointF>
 #include <QPen>
 #include <QTimer>
-#include <QMutex>
 #include <QMouseEvent>
 #include <QEvent>
 #include <QCloseEvent>
@@ -58,12 +57,9 @@ public:
 	void set_image(
 		ImageVariant*,
 		const short /* fit */,
-		const bool, /* alw usregions */
-		const bool  /* lock */);
-	void update_image(
-		const short /* fit */,
-		const bool  /* lock */);
-	void clear_(bool = true);
+		const bool /* alw usregions */);
+	void update_image(const short /* fit */);
+	void clear_();
 	ImageContainer image_container;
 	void  update_pr_area();
 	void  update_background_color();
@@ -97,7 +93,6 @@ protected:
 	void dragLeaveEvent(QDragLeaveEvent*) override;
 
 private:
-	mutable QMutex mutex;
 	int id{-1};
 	StudyViewWidget * studyview{};
 	Aliza   * aliza{};

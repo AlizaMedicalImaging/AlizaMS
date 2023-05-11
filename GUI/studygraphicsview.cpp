@@ -96,12 +96,12 @@ void StudyGraphicsView::keyPressEvent(QKeyEvent * e)
 		zoom_out();
 		break;
 	case Qt::Key_0:
-		parent->update_image(1, true);
+		parent->update_image(1);
 		break;
 	case Qt::Key_1:
 		{
 			m_scale = 1.0;
-			parent->update_image(0, true);
+			parent->update_image(0);
 		}
 		break;
 	case Qt::Key_X:
@@ -111,7 +111,7 @@ void StudyGraphicsView::keyPressEvent(QKeyEvent * e)
 		flipY();
 		break;
 	case Qt::Key_F:
-		parent->update_image(1, true);
+		parent->update_image(1);
 		break;
 	case Qt::Key_C:
 		break;
@@ -550,13 +550,13 @@ void StudyGraphicsView::measure()
 void StudyGraphicsView::flipX()
 {
 	global_flip_x = !global_flip_x;
-	parent->update_image(0, true);
+	parent->update_image(0);
 }
 
 void StudyGraphicsView::flipY()
 {
 	global_flip_y = !global_flip_y;
-	parent->update_image(0, true);
+	parent->update_image(0);
 }
 
 void StudyGraphicsView::draw_prtexts(const ImageVariant * ivariant)

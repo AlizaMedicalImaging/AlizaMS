@@ -456,7 +456,7 @@ void StudyViewWidget::update_grid(int r, int c)
 	{
 		for (int y = 0; y < c; ++y)
 		{
-			widgets[j]->graphicswidget->update_image(1, true);
+			widgets[j]->graphicswidget->update_image(1);
 			++j;
 		}
 	}
@@ -868,7 +868,7 @@ void StudyViewWidget::all_to_fit()
 			{
 				if (widgets.at(i)->graphicswidget->image_container.image3D)
 				{
-					widgets[i]->graphicswidget->update_image(1, true);
+					widgets[i]->graphicswidget->update_image(1);
 				}
 			}
 		}
@@ -1107,7 +1107,7 @@ void StudyViewWidget::set_single(const unsigned long long widget_id)
 		{
 			selected->graphicswidget->show();
 			set_active_image(selected->graphicswidget->get_id());
-			selected->graphicswidget->update_image(1, true);
+			selected->graphicswidget->update_image(1);
 		}
 		else
 		{

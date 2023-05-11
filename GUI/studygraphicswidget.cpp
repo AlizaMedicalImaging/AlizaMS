@@ -1126,16 +1126,12 @@ StudyGraphicsWidget::StudyGraphicsWidget()
 
 StudyGraphicsWidget::~StudyGraphicsWidget()
 {
-	if (mutex.tryLock(3000))
+	if (image_container.image2D)
 	{
-		if (image_container.image2D)
-		{
-			delete image_container.image2D;
-			image_container.image2D = nullptr;
-		}
-		image_container.image3D = nullptr;
-		mutex.unlock();
+		delete image_container.image2D;
+		image_container.image2D = nullptr;
 	}
+	image_container.image3D = nullptr;
 }
 
 void StudyGraphicsWidget::set_id(int x)
@@ -1200,47 +1196,36 @@ void StudyGraphicsWidget::set_measure_text(const QString & s)
 
 void StudyGraphicsWidget::set_center(double x)
 {
-	mutex.lock();
 	image_container.us_window_center_ext = x;
-	update_image(0, false);
-	mutex.unlock();
+	update_image(0);
 }
 
 void StudyGraphicsWidget::set_width(double x)
 {
-	mutex.lock();
 	image_container.us_window_width_ext = x;
-	update_image(0, false);
-	mutex.unlock();
+	update_image(0);
 }
 
 void StudyGraphicsWidget::set_lut(short x)
 {
-	mutex.lock();
 	image_container.selected_lut_ext = x;
-	update_image(0, false);
-	mutex.unlock();
+	update_image(0);
 }
 
 void StudyGraphicsWidget::set_lut_function(short x)
 {
-	mutex.lock();
 	image_container.lut_function_ext = x;
-	update_image(0, false);
-	mutex.unlock();
+	update_image(0);
 }
 
 void StudyGraphicsWidget::set_locked_window(bool t)
 {
-	mutex.lock();
 	image_container.level_locked_ext = t;
-	update_image(0, false);
-	mutex.unlock();
+	update_image(0);
 }
 
 void StudyGraphicsWidget::reset_level()
 {
-	mutex.lock();
 	if (image_container.image3D)
 	{
 		image_container.us_window_center_ext =
@@ -1249,9 +1234,8 @@ void StudyGraphicsWidget::reset_level()
 			image_container.image3D->di->default_us_window_width;
 		image_container.lut_function_ext =
 			image_container.image3D->di->default_lut_function;
-		update_image(0, false);
+		update_image(0);
 	}
-	mutex.unlock();
 }
 
 void StudyGraphicsWidget::update_image_color(int r, int g, int b)
@@ -1276,8 +1260,6 @@ void StudyGraphicsWidget::leaveEvent(QEvent*)
 
 void StudyGraphicsWidget::dropEvent(QDropEvent * e)
 {
-	const bool lock = mutex.tryLock();
-	if (!lock) return;
 	int i{-1};
 	const QMimeData * mimeData = e->mimeData();
 	if (mimeData && mimeData->hasFormat("application/x-qabstractitemmodeldatalist")) // FIXME
@@ -1317,15 +1299,14 @@ void StudyGraphicsWidget::dropEvent(QDropEvent * e)
 		ImageVariant * ivariant = aliza->get_image(i);
 		if (ivariant)
 		{
-			clear_(false);
-			set_image(ivariant, 1, true, false);
+			clear_();
+			set_image(ivariant, 1, true);
 			if (studyview) // not required
 			{
 				studyview->update_scouts();
 			}
 		}
 	}
-	mutex.unlock();
 }
 
 void StudyGraphicsWidget::dragEnterEvent(QDragEnterEvent * e)
@@ -1369,13 +1350,10 @@ void StudyGraphicsWidget::update_pr_area()
 }
 
 void StudyGraphicsWidget::update_image(
-	const short fit,
-	const bool lock)
+	const short fit)
 {
 	if (!image_container.image3D) return;
 	if (!image_container.image2D) return;
-	//
-	if (lock) mutex.lock();
 	//
 	switch (image_container.image2D->image_type)
 	{
@@ -1520,13 +1498,10 @@ void StudyGraphicsWidget::update_image(
 	default:
 		break;
 	}
-	//
-	if (lock) mutex.unlock();
 }
 
-void StudyGraphicsWidget::clear_(bool lock)
+void StudyGraphicsWidget::clear_()
 {
-	if (lock) mutex.lock();
 	if (graphicsview->image_item)
 	{
 #ifdef DELETE_STUDYGRAPHICSIMAGEITEM
@@ -1686,14 +1661,12 @@ void StudyGraphicsWidget::clear_(bool lock)
 	graphicsview->clear_prtexts_items();
 	graphicsview->clear_prgraphicobjects_items();
 	graphicsview->clear_shutters();
-	if (lock) mutex.unlock();
 }
 
 void StudyGraphicsWidget::set_image(
 	ImageVariant * v,
 	const short fit,
-	const bool, /* always draw US regions */
-	const bool lock_mutex)
+	const bool /* always draw US regions */)
 {
 	if (graphicsview->image_item)
 	{
@@ -1731,8 +1704,6 @@ void StudyGraphicsWidget::set_image(
 	//
 	int x = 0;
 	QString error_;
-	//
-	if (lock_mutex) mutex.lock();
 	//
 	image_container.image3D = v;
 	//
@@ -1939,8 +1910,8 @@ void StudyGraphicsWidget::set_image(
 		break;
 	default:
 		{
-			clear_(false);
-			goto quit__;
+			clear_();
+			return;
 		}
 	}
 	//
@@ -1950,7 +1921,7 @@ void StudyGraphicsWidget::set_image(
 	}
 	else
 	{
-		goto quit__;
+		return;
 	}
 	//
 	{
@@ -2005,7 +1976,7 @@ void StudyGraphicsWidget::set_image(
 		icon_button->setEnabled(true);
 	}
 	//
-	update_image(fit, false);
+	update_image(fit);
 	//
 	graphicsview->draw_us_regions();
 	if (!v->pr_display_areas.empty())
@@ -2016,8 +1987,6 @@ void StudyGraphicsWidget::set_image(
 	{
 		if (graphicsview->pr_area->isVisible()) graphicsview->pr_area->hide();
 	}
-quit__:
-	if (lock_mutex) mutex.unlock();
 }
 
 void StudyGraphicsWidget::update_background_color()
@@ -2043,7 +2012,7 @@ void StudyGraphicsWidget::set_smooth(bool t)
 		}
 	}
 #endif
-	update_image(0, true);
+	update_image(0);
 }
 
 bool StudyGraphicsWidget::get_smooth() const
@@ -2151,8 +2120,6 @@ void StudyGraphicsWidget::set_selected_slice2(int x, bool update_all)
 	image_container.selected_z_slice_ext = x;
 	//
 	QString error_;
-	//
-	mutex.lock();
 	//
 	image_container.image2D->image_type = image_container.image3D->image_type;
 	image_container.image2D->orientation_string = QString("");
@@ -2303,12 +2270,12 @@ void StudyGraphicsWidget::set_selected_slice2(int x, bool update_all)
 		break;
 	default:
 		{
-			clear_(false);
-			goto quit__;
+			clear_();
+			return;
 		}
 	}
 	//
-	if (!error_.isEmpty()) goto quit__;
+	if (!error_.isEmpty()) return;
 	//
 	{
 		const bool check_consistence =
@@ -2342,7 +2309,7 @@ void StudyGraphicsWidget::set_selected_slice2(int x, bool update_all)
 		image_container.image2D->body_part  = image_container.image3D->anatomy.value(x).body_part;
 	}
 	//
-	update_image(0, false);
+	update_image(0);
 	//
 	graphicsview->draw_us_regions();
 	if (!image_container.image3D->pr_display_areas.empty())
@@ -2372,8 +2339,6 @@ void StudyGraphicsWidget::set_selected_slice2(int x, bool update_all)
 			studyview->update_scouts();
 		}
 	}
-quit__:
-	mutex.unlock();
 }
 
 void StudyGraphicsWidget::toggle_single(bool t)

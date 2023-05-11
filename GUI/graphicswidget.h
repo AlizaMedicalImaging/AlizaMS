@@ -15,7 +15,6 @@
 #include <QPointF>
 #include <QPen>
 #include <QTimer>
-#include <QMutex>
 #include <QMouseEvent>
 #include <QEvent>
 #include <QCloseEvent>
@@ -60,9 +59,8 @@ public:
 	void update_image(
 		const short /*fit*/,
 		const bool  /*redraw_contours*/,
-		const bool  /*lock*/,
 		const bool = false /*frame level, to avoid check map twice*/);
-	void clear_(bool = true);
+	void clear_();
 	void update_frames();
 	ImageContainer image_container;
 	float get_offset_x();
@@ -137,7 +135,6 @@ private:
 	int    frame_time_unit{}; // 0 - ms; 1 - s
 	int    frametime_2D{120};
 	double contours_width{};
-	mutable     QMutex mutex;
 	QTimer    * anim2D_timer;
 	QLabel    * top_label;
 	QLabel    * left_label;
