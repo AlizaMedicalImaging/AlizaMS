@@ -848,11 +848,11 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		else
 		{
 			const unsigned int tmp_size_x = static_cast<unsigned int>(
-				ceil(size_ x * (spacing_x / spacing_y)));
+				ceil(size_x * (spacing_x / spacing_y)));
 			QPixmap tmp_pixmap = QPixmap::fromImage(tmpi)
 				.scaled(tmp_size_x, size_y, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 			ivariant->icon = tmp_pixmap
-				.scaled(QSize(isize,isize),Qt::KeepAspectRatio, Qt::SmoothTransformation);
+				.scaled(QSize(isize, isize), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 		}
 		delete [] p;
 #endif
@@ -860,7 +860,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 	else
 	{
 		const typename Tout::RegionType region = tmp0->GetLargestPossibleRegion();
-		const typename Tout::SizeType   size_ = region.GetSize();
+		const typename Tout::SizeType size_ = region.GetSize();
 		const typename Tout::SpacingType spacing_ = tmp0->GetSpacing();
 		spacing_x = spacing_[0];
 		spacing_y = spacing_[1];
