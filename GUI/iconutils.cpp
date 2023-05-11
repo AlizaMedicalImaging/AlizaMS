@@ -148,12 +148,7 @@ template<typename Tin, typename Tout> void extract_icon(
 	{
 		return;
 	}
-#if 1
 	const int num_threads = QThread::idealThreadCount();
-#else
-	int num_threads = QThread::idealThreadCount();
-	if (num_threads > 1) num_threads - 1;
-#endif
 	const int tmp99 = size_y % num_threads;
 #if 0
 	if (!icon_threads.empty())
@@ -231,11 +226,7 @@ template<typename Tin, typename Tout> void extract_icon(
 			if (icon_threads.at(i)->isFinished()) ++b__;
 		}
 		if (b__ == threads_size) break;
-		if (num_threads > 1)
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(1));
-			QApplication::processEvents();
-		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 	for (size_t i = 0; i < threads_size; ++i)
 	{

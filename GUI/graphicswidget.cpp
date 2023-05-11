@@ -1396,7 +1396,6 @@ template<typename T> void load_image(
 		}
 		if (b__ == threadsLUT_size) break;
 		std::this_thread::sleep_for(std::chrono::milliseconds(2));
-		qApp->processEvents();
 	}
 #ifdef A_TMP_BENCHMARK
 	const std::chrono::duration<double, std::milli> elapsed2{ now() - start2 };
