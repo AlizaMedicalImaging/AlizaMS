@@ -1301,12 +1301,7 @@ template<typename T> void load_image(
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
 	const int num_threads = QThread::idealThreadCount();
 	const int tmp99 = size[1] % num_threads;
-#if 0
-	if (!widget->threadsLUT_.empty())
-	{
-		std::cout << "!widget->threadsLUT_.empty()" << std::endl;
-	}
-#endif
+	std::vector<QThread*> threadsLUT_;
 #ifdef A_TMP_BENCHMARK
 #if 0
 	std::cout << num_threads << " threads" << std::endl;
@@ -1330,7 +1325,7 @@ template<typename T> void load_image(
 						window_center, window_width,
 						lut, alt_mode,lut_function);
 			j += 3 * size_0 * size_1;
-			widget->threadsLUT_.push_back(static_cast<QThread*>(t__));
+			threadsLUT_.push_back(static_cast<QThread*>(t__));
 			t__->start();
 		}
 	}
@@ -1359,7 +1354,7 @@ template<typename T> void load_image(
 							window_center, window_width,
 							lut, alt_mode,lut_function);
 				j += 3 * size_0 * block;
-				widget->threadsLUT_.push_back(static_cast<QThread*>(t__));
+				threadsLUT_.push_back(static_cast<QThread*>(t__));
 				t__->start();
 			}
 			ProcessImageThreadLUT_<T> * lt__ = new ProcessImageThreadLUT_<T>(
@@ -1369,7 +1364,7 @@ template<typename T> void load_image(
 						0, incr * block, j,
 						window_center, window_width,
 						lut, alt_mode,lut_function);
-			widget->threadsLUT_.push_back(static_cast<QThread*>(lt__));
+			threadsLUT_.push_back(static_cast<QThread*>(lt__));
 			lt__->start();
 		}
 		else
@@ -1381,21 +1376,21 @@ template<typename T> void load_image(
 						0, 0, 0,
 						window_center, window_width,
 						lut, alt_mode,lut_function);
-			widget->threadsLUT_.push_back(static_cast<QThread*>(lt__));
+			threadsLUT_.push_back(static_cast<QThread*>(lt__));
 			lt__->start();
 		}
 	}
 	//
-	const size_t threadsLUT_size = widget->threadsLUT_.size();
+	const size_t threadsLUT_size = threadsLUT_.size();
 	while (true)
 	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(2));
 		size_t b__ = 0;
 		for (size_t i = 0; i < threadsLUT_size; ++i)
 		{
-			if (widget->threadsLUT_.at(i)->isFinished()) ++b__;
+			if (threadsLUT_.at(i)->isFinished()) ++b__;
 		}
 		if (b__ == threadsLUT_size) break;
-		std::this_thread::sleep_for(std::chrono::milliseconds(2));
 	}
 #ifdef A_TMP_BENCHMARK
 	const std::chrono::duration<double, std::milli> elapsed2{ now() - start2 };
@@ -1403,10 +1398,10 @@ template<typename T> void load_image(
 #endif
 	for (size_t i = 0; i < threadsLUT_size; ++i)
 	{
-		delete widget->threadsLUT_[i];
-		widget->threadsLUT_[i] = nullptr;
+		delete threadsLUT_[i];
+		threadsLUT_[i] = nullptr;
 	}
-	widget->threadsLUT_.clear();
+	threadsLUT_.clear();
 	//
 	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
 	const QRectF rectf(0, 0, size[0], size[1]);
@@ -1656,16 +1651,6 @@ GraphicsWidget::~GraphicsWidget()
 	run__ = false;
 	if (mutex.tryLock(3000))
 	{
-		for (unsigned int i = 0; i < threadsLUT_.size(); ++i)
-		{
-			if (threadsLUT_.at(i))
-			{
-				if (threadsLUT_.at(i)->isRunning())
-					threadsLUT_[i]->exit();
-				delete threadsLUT_[i];
-				threadsLUT_[i] = nullptr;
-			}
-		}
 		if (image_container.image2D)
 		{
 			delete image_container.image2D;

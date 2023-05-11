@@ -71,8 +71,6 @@ private:
 namespace
 {
 
-static std::vector<ProcessImageThread_*> icon_threads;
-
 template<typename Tin, typename Tout> void extract_icon(
 	const typename Tin::Pointer & image, ImageVariant * ivariant,
 	const int isize = 96)
@@ -150,12 +148,7 @@ template<typename Tin, typename Tout> void extract_icon(
 	}
 	const int num_threads = QThread::idealThreadCount();
 	const int tmp99 = size_y % num_threads;
-#if 0
-	if (!icon_threads.empty())
-	{
-		std::cout << "!icon_threads.empty()" << std::endl;
-	}
-#endif
+	std::vector<ProcessImageThread_*> icon_threads;
 	if (tmp99 == 0)
 	{
 		unsigned int j = 0;
@@ -220,13 +213,13 @@ template<typename Tin, typename Tout> void extract_icon(
 	const size_t threads_size = icon_threads.size();
 	while (true)
 	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		size_t b__ = 0;
 		for (size_t i = 0; i < threads_size; ++i)
 		{
 			if (icon_threads.at(i)->isFinished()) ++b__;
 		}
 		if (b__ == threads_size) break;
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 	for (size_t i = 0; i < threads_size; ++i)
 	{
@@ -1099,19 +1092,5 @@ void IconUtils::icon(ImageVariant * ivariant)
 	default :
 		break;
 	}
-}
-
-void IconUtils::kill_threads()
-{
-	for (unsigned int i = 0; i < icon_threads.size(); ++i)
-	{
-		if (icon_threads.at(i))
-		{
-			if (icon_threads.at(i)->isRunning()) icon_threads[i]->exit();
-			delete icon_threads[i];
-			icon_threads[i] = nullptr;
-		}
-	}
-	icon_threads.clear();
 }
 

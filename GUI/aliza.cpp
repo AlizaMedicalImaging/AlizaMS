@@ -670,11 +670,6 @@ Aliza::Aliza()
 
 Aliza::~Aliza()
 {
-	if (mutex0.tryLock(3000))
-	{
-		IconUtils::kill_threads();
-		mutex0.unlock();
-	}
 	if (anim3D_timer->isActive()) anim3D_timer->stop();
 	delete anim3D_timer;
 }

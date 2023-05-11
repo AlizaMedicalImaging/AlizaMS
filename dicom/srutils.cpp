@@ -26,6 +26,8 @@
 #include "findrefdialog.h"
 #include <itkExtractImageFilter.h>
 #include <itkMath.h>
+#include <chrono>
+#include <thread>
 
 namespace
 {
@@ -105,12 +107,7 @@ template<typename T> SRImage li3(
 	}
 	//
 	std::vector<QThread*> threadsLUT_;
-#if 1
 	const int num_threads = QThread::idealThreadCount();
-#else
-	int num_threads = QThread::idealThreadCount();
-	if (num_threads > 1) num_threads - 1;
-#endif
 	const int tmp99 = size[1] % num_threads;
 	const double center = ivariant->di->us_window_center;
 	const double width  = ivariant->di->us_window_width;
@@ -190,6 +187,7 @@ template<typename T> SRImage li3(
 	const size_t threadsLUT_size = threadsLUT_.size();
 	while (true)
 	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(2));
 		size_t b__ = 0;
 		for (size_t i = 0; i < threadsLUT_size; ++i)
 		{

@@ -50,7 +50,6 @@ public:
 	GraphicsView * graphicsview;
 	ToolBox2D    * toolbox2D{};
 	SliderWidget * slider_m{};
-	std::vector<QThread*> threadsLUT_;
 	void set_slice_2D(
 		ImageVariant*,
 		const short /*fit*/,
