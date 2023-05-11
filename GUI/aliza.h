@@ -105,7 +105,7 @@ public:
 	bool check_2d_visible();
 	void set_view2d_mouse_modus(short);
 	void set_show_frames_3d(bool);
-	void load_dicom_series(QProgressDialog*);
+	QString load_dicom_series(QProgressDialog*);
 	void start_anim();
 	void stop_anim();
 	void zoom_plus_3d();
@@ -124,7 +124,7 @@ public:
 	void set_uniq_string(const QString &);
 	void toggle_collisions(bool);
 	void update_slice_from_animation(const ImageVariant*);
-	void load_dicom_file(int*, const QString&, QProgressDialog*, bool);
+	QString load_dicom_file(int*, const QString&, QProgressDialog*, bool);
 	void remove_from_studyview(int);
 
 public slots:
@@ -232,9 +232,6 @@ private:
 	int frametime_3D{120};
 	QString uniq_string;
 	QTimer * anim3D_timer;
-	QProgressDialog * create_filters_progress();
-	QProgressDialog * create_filters_progress2();
-	void close_filters_progress(QProgressDialog*);
 	void connect_tools();
 	void disconnect_tools();
 	void reload_3d(

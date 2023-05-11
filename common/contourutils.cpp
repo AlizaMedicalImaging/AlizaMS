@@ -75,7 +75,6 @@ template <typename T> void calculate_uvt(
 			if (count == 5)
 			{
 				count = 0;
-				QApplication::processEvents();
 			}
 			++it;
 		}
@@ -368,7 +367,6 @@ void ContourUtils::calculate_uvt_nonuniform(
 					}
 				}
 			}
-			QApplication::processEvents();
 			++it;
 		}
 	}
@@ -507,7 +505,6 @@ void ContourUtils::map_contours_uniform(
 						}
 					}
 				}
-				QApplication::processEvents();
 				++it;
 			}
 			break;
@@ -604,7 +601,6 @@ void ContourUtils::map_contours_nonuniform(
 						<< ")" << std::endl;
 #endif
 				}
-				QApplication::processEvents();
 				++it;
 			}
 			break;
@@ -750,7 +746,6 @@ void ContourUtils::contours_build_path_all(
 	for (int x = 0; x < ivariant->di->rois.size(); ++x)
 	{
 		contours_build_path(ivariant, ivariant->di->rois.at(x).id);
-		QApplication::processEvents();
 	}
 }
 

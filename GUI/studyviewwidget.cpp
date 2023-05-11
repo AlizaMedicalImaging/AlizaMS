@@ -477,7 +477,6 @@ void StudyViewWidget::update_grid2()
 	}
 	delete d;
 	if (ok) update_grid(r, c);
-	qApp->processEvents();
 #endif
 }
 
@@ -1097,7 +1096,6 @@ void StudyViewWidget::set_single(const unsigned long long widget_id)
 	delete layout;
 	layout = nullptr;
 	active_id = -1;
-	qApp->processEvents();
 	if (selected)
 	{
 		QGridLayout * gridLayout = new QGridLayout(frame);

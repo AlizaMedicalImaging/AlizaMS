@@ -141,7 +141,7 @@ private:
 	void createToolBars();
 	void load_dicom_dir();
 	void desktop_layout(int*,int*);
-	void load_any_file(
+	QString load_any_file(
 		const QString&,
 		QProgressDialog*,
 		bool/*lock*/);
