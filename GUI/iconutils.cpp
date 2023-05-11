@@ -46,8 +46,7 @@ public:
 		Image2DTypeUC::RegionType region;
 		region.SetSize(size);
 		region.SetIndex(index);
-		itk::ImageRegionConstIterator<Image2DTypeUC>
-			iterator(image, region);
+		itk::ImageRegionConstIterator<Image2DTypeUC> iterator(image, region);
 		iterator.GoToBegin();
 		unsigned int j_ = j;
 		while (!iterator.IsAtEnd())
@@ -84,7 +83,7 @@ template<typename Tin, typename Tout> void extract_icon(
 	typename Tout::Pointer tmp0;
 	typename Image2DTypeUC::Pointer tmp1;
 	unsigned int size_x, size_y;
-	double   spacing_x, spacing_y;
+	double spacing_x, spacing_y;
 	typename FilterType::Pointer filter = FilterType::New();
 	typename Tin::RegionType inRegion = image->GetLargestPossibleRegion();
 	typename Tin::SizeType size = inRegion.GetSize();
@@ -249,7 +248,7 @@ template<typename Tin, typename Tout> void extract_icon(
 	if (spacing_x == spacing_y)
 	{
 		ivariant->icon = QPixmap::fromImage(tmpi)
-			.scaled(QSize(isize,isize),Qt::KeepAspectRatio,Qt::SmoothTransformation);
+			.scaled(QSize(isize, isize), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 	}
 	else
 	{
@@ -258,7 +257,7 @@ template<typename Tin, typename Tout> void extract_icon(
 		QPixmap tmp_pixmap = QPixmap::fromImage(tmpi)
 			.scaled(tmp_size_x, size_y, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 		ivariant->icon = tmp_pixmap
-			.scaled(QSize(isize,isize), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+			.scaled(QSize(isize, isize), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 	}
 	delete [] p;
 	//
@@ -267,7 +266,7 @@ template<typename Tin, typename Tout> void extract_icon(
 	{
 		const float x__ = static_cast<float>(isize - ivariant->icon.width()) / 2.0f;
 		const float y__ = static_cast<float>(isize - ivariant->icon.height()) / 2.0f;
-		QPixmap empty_(isize,isize);
+		QPixmap empty_(isize, isize);
 		empty_.fill(QColor(0, 0, 0));
 		QPainter painter(&empty_);
 		painter.drawPixmap(QPointF(x__,y__), ivariant->icon);
@@ -309,7 +308,7 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 	typedef  itk::ExtractImageFilter<Tin, Tout> FilterType;
 	typename Tout::Pointer tmp0;
 	unsigned int size_x, size_y;
-	double   spacing_x, spacing_y;
+	double spacing_x, spacing_y;
 	typename FilterType::Pointer filter = FilterType::New();
 	typename Tin::RegionType inRegion = image->GetLargestPossibleRegion();
 	typename Tin::SizeType size = inRegion.GetSize();
@@ -359,8 +358,8 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 			(bits_allocated > 0 && bits_stored > 0 && bits_stored < bits_allocated)
 				? pow(2, bits_stored) - 1
 				: static_cast<double>(USHRT_MAX);
-		const typename Tout::RegionType region    = tmp0->GetLargestPossibleRegion();
-		const typename Tout::SizeType   size_     = region.GetSize();
+		const typename Tout::RegionType region = tmp0->GetLargestPossibleRegion();
+		const typename Tout::SizeType size_ = region.GetSize();
 		const typename Tout::SpacingType spacing_ = tmp0->GetSpacing();
 		spacing_x = spacing_[0];
 		spacing_y = spacing_[1];
@@ -403,7 +402,7 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 		if (spacing_x == spacing_y)
 		{
 			ivariant->icon = QPixmap::fromImage(tmpi)
-				.scaled(QSize(isize,isize),Qt::KeepAspectRatio,Qt::SmoothTransformation);
+				.scaled(QSize(isize, isize), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 		}
 		else
 		{
@@ -412,7 +411,7 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 			QPixmap tmp_pixmap = QPixmap::fromImage(tmpi)
 				.scaled(tmp_size_x, size_y, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 			ivariant->icon = tmp_pixmap
-				.scaled(QSize(isize,isize), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+				.scaled(QSize(isize, isize), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 		}
 		delete [] p;
 	}
@@ -428,8 +427,8 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 			return;
 		}
 		if (!p_) return;
-		const typename Tout::RegionType region    = tmp0->GetLargestPossibleRegion();
-		const typename Tout::SizeType   size_     = region.GetSize();
+		const typename Tout::RegionType region = tmp0->GetLargestPossibleRegion();
+		const typename Tout::SizeType size_ = region.GetSize();
 		const typename Tout::SpacingType spacing_ = tmp0->GetSpacing();
 		spacing_x = spacing_[0];
 		spacing_y = spacing_[1];
@@ -442,7 +441,7 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 		if (spacing_x == spacing_y)
 		{
 			ivariant->icon = QPixmap::fromImage(tmpi)
-				.scaled(QSize(isize,isize),Qt::KeepAspectRatio,Qt::SmoothTransformation);
+				.scaled(QSize(isize, isize), Qt::KeepAspectRatio,Qt::SmoothTransformation);
 		}
 		else
 		{
@@ -451,7 +450,7 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 			QPixmap tmp_pixmap = QPixmap::fromImage(tmpi)
 				.scaled(tmp_size_x, size_y, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 			ivariant->icon = tmp_pixmap
-				.scaled(QSize(isize,isize), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+				.scaled(QSize(isize, isize), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 		}
 	}
 	else
@@ -460,8 +459,8 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 		const double vmax = ivariant->di->vmax;
 		const double vrange = vmax - vmin;
 		if (vrange <= 0.0) return;
-		const typename Tout::RegionType region    = tmp0->GetLargestPossibleRegion();
-		const typename Tout::SizeType   size_     = region.GetSize();
+		const typename Tout::RegionType region = tmp0->GetLargestPossibleRegion();
+		const typename Tout::SizeType size_ = region.GetSize();
 		const typename Tout::SpacingType spacing_ = tmp0->GetSpacing();
 		spacing_x = spacing_[0];
 		spacing_y = spacing_[1];
@@ -504,7 +503,7 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 		if (spacing_x == spacing_y)
 		{
 			ivariant->icon = QPixmap::fromImage(tmpi)
-				.scaled(QSize(isize, isize),Qt::KeepAspectRatio, Qt::SmoothTransformation);
+				.scaled(QSize(isize, isize), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 		}
 		else
 		{
@@ -556,7 +555,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 	typedef  itk::ExtractImageFilter<Tin, Tout> FilterType;
 	typename Tout::Pointer tmp0;
 	unsigned int size_x, size_y;
-	double   spacing_x, spacing_y;
+	double spacing_x, spacing_y;
 	typename FilterType::Pointer filter;
 	typename Tin::RegionType inRegion;
 	typename Tin::SizeType size;
@@ -569,7 +568,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		inRegion = image->GetLargestPossibleRegion();
 		size = inRegion.GetSize();
 		index = inRegion.GetIndex();
-		index[2]    = size[2] / 2;
+		index[2] = size[2] / 2;
 		out_size[0] = size[0];
 		out_size[1] = size[1];
 		out_size[2] = 0;
@@ -610,8 +609,8 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 			(bits_allocated > 0 && bits_stored > 0 && bits_stored < bits_allocated)
 				? pow(2, bits_stored) - 1
 				: static_cast<double>(USHRT_MAX);
-		const typename Tout::RegionType region    = tmp0->GetLargestPossibleRegion();
-		const typename Tout::SizeType   size_     = region.GetSize();
+		const typename Tout::RegionType region = tmp0->GetLargestPossibleRegion();
+		const typename Tout::SizeType size_ = region.GetSize();
 		const typename Tout::SpacingType spacing_ = tmp0->GetSpacing();
 		spacing_x = spacing_[0];
 		spacing_y = spacing_[1];
@@ -657,7 +656,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		if (spacing_x == spacing_y)
 		{
 			ivariant->icon = QPixmap::fromImage(tmpi)
-				.scaled(QSize(isize, isize),Qt::KeepAspectRatio, Qt::SmoothTransformation);
+				.scaled(QSize(isize, isize), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 		}
 		else
 		{
@@ -722,7 +721,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		if (spacing_x == spacing_y)
 		{
 			ivariant->icon = QPixmap::fromImage(tmpi)
-				.scaled(QSize(isize,isize), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+				.scaled(QSize(isize, isize), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 		}
 		else
 		{
@@ -731,15 +730,15 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 			QPixmap tmp_pixmap = QPixmap::fromImage(tmpi)
 				.scaled(tmp_size_x, size_y, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 			ivariant->icon = tmp_pixmap
-				.scaled(QSize(isize,isize), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+				.scaled(QSize(isize, isize), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 		}
 		delete [] p;
 #endif
 	}
 	else if (ivariant->image_type == 24)
 	{
-		const typename Tout::RegionType region    = tmp0->GetLargestPossibleRegion();
-		const typename Tout::SizeType   size_     = region.GetSize();
+		const typename Tout::RegionType region = tmp0->GetLargestPossibleRegion();
+		const typename Tout::SizeType size_ = region.GetSize();
 		const typename Tout::SpacingType spacing_ = tmp0->GetSpacing();
 		spacing_x = spacing_[0];
 		spacing_y = spacing_[1];
@@ -887,7 +886,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		{
 			;;
 		}
-		QImage tmpi(p, size[0], size[1],4 * size[0], QImage::Format_RGBA8888);
+		QImage tmpi(p, size[0], size[1], 4 * size[0], QImage::Format_RGBA8888);
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true, true);
 		else if (flip_y)      tmpi = tmpi.mirrored(false, true);
 		else if (flip_x)      tmpi = tmpi.mirrored(true, false);
@@ -927,14 +926,14 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 				const double b = static_cast<double>(iterator.Get().GetBlue());
 				const double g = static_cast<double>(iterator.Get().GetGreen());
 				const double r = static_cast<double>(iterator.Get().GetRed());
-				const double one_minus_alpha = 1.0 - (( a + (-vmin)) / vrange);
+				const double one_minus_alpha = 1.0 - ((a + (-vmin)) / vrange);
 				const double tmp_whi = one_minus_alpha * 255.0;
 				const double tmp_red = tmp_whi + a * (255.0 * ((r + (-vmin)) / vrange));
 				const double tmp_gre = tmp_whi + a * (255.0 * ((g + (-vmin)) / vrange));
 				const double tmp_blu = tmp_whi + a * (255.0 * ((b + (-vmin) )/ vrange));
 				p[j_ + 2] = static_cast<unsigned char>(tmp_blu);
 				p[j_ + 1] = static_cast<unsigned char>(tmp_gre);
-				p[j_]    = static_cast<unsigned char>(tmp_red);
+				p[j_]     = static_cast<unsigned char>(tmp_red);
 				j_ += 3;
 				++iterator;
 			}
@@ -969,7 +968,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 	{
 		const float x__ = static_cast<float>(isize - ivariant->icon.width()) / 2.0f;
 		const float y__ = static_cast<float>(isize - ivariant->icon.height()) / 2.0f;
-		QPixmap empty_(isize,isize);
+		QPixmap empty_(isize, isize);
 		empty_.fill(QColor(0, 0, 0));
 		QPainter painter(&empty_);
 		painter.drawPixmap(QPointF(x__, y__), ivariant->icon);
