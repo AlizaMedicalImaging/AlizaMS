@@ -18,7 +18,12 @@
 
 #define DISABLE_LEFT_TOOLBAR__
 
+namespace
+{
+
 static bool init_done = false;
+
+}
 
 MainWindow::MainWindow(
 	bool ok3d,
@@ -541,6 +546,7 @@ void MainWindow::open_args(const QStringList & l)
 	bool lock = mutex.tryLock();
 	if (!lock) return;
 	QStringList l2;
+	QString message;
 	int i = 0;
 	while (i < lsize)
 	{
@@ -569,15 +575,13 @@ void MainWindow::open_args(const QStringList & l)
 	connect(pb,SIGNAL(canceled()), this, SLOT(exit_null()));
 	pb->setMinimumWidth(256);
 	pb->setRange(0, 0);
-	pb->show();
-	pb->activateWindow();
-	pb->raise();
+	pb->setMinimumDuration(0);
+	pb->setValue(0);
 	if (l2.size() == 1)
 	{
 		const QString f = l2.at(0);
 		QFileInfo fi(f);
-		if (
-			fi.isFile() &&
+		if (fi.isFile() &&
 			fi.fileName().toUpper() == QString("DICOMDIR"))
 		{
 			browser2->open_DICOMDIR2(fi.absoluteFilePath());
@@ -588,7 +592,7 @@ void MainWindow::open_args(const QStringList & l)
 		}
 		else if (fi.isFile())
 		{
-			load_any_file(f, pb, true);
+			message = load_any_file(f, pb, true);
 		}
 	}
 	else if (l2.size() > 1)
@@ -597,12 +601,23 @@ void MainWindow::open_args(const QStringList & l)
 		{
 			const QString f = l2.at(x);
 			QFileInfo fi(f);
-			if (fi.isFile()) load_any_file(l2.at(x), pb, true);
+			if (fi.isFile())
+			{
+				message = load_any_file(l2.at(x), pb, true);
+			}
 		}
 	}
 	disconnect(pb,SIGNAL(canceled()), this, SLOT(exit_null()));
 	pb->close();
 	delete pb;
+	if (!message.isEmpty())
+	{
+		QMessageBox mbox;
+		mbox.addButton(QMessageBox::Close);
+		mbox.setIcon(QMessageBox::Information);
+		mbox.setText(message);
+		mbox.exec();
+	}
 	mutex.unlock();
 }
 
@@ -627,6 +642,7 @@ void MainWindow::close_app()
 		init_done = false;
 	}
 	emit quit_app();
+	qApp->processEvents();
 }
 
 // Connected to 'quit_app' signal in main.cpp.
@@ -1049,11 +1065,13 @@ void MainWindow::toggle_browser()
 		browser2->open_dicom_dir();
 	else
 		tabWidget->setCurrentIndex(1);
+	qApp->processEvents();
 }
 
 void MainWindow::toggle_settingswidget()
 {
 	tabWidget->setCurrentIndex(4);
+	qApp->processEvents();
 }
 
 void MainWindow::toggle_showgl(bool t)
@@ -1131,6 +1149,7 @@ void MainWindow::toggle_graphicswidget_m_x(bool t)
 	if (graphicswidget_x) graphicswidget_x->clear_();
 	graphicswidget_frame->show();
 	aliza->set_axis_2D(0, rectAct->isChecked());
+	qApp->processEvents();
 }
 
 void MainWindow::toggle_graphicswidget_m_y(bool t)
@@ -1158,6 +1177,7 @@ void MainWindow::toggle_graphicswidget_m_y(bool t)
 	if (graphicswidget_x) graphicswidget_x->clear_();
 	graphicswidget_frame->show();
 	aliza->set_axis_2D(1, rectAct->isChecked());
+	qApp->processEvents();
 }
 
 void MainWindow::toggle_graphicswidget_m_z(bool t)
@@ -1189,6 +1209,7 @@ void MainWindow::toggle_graphicswidget_m_z(bool t)
 	if (graphicswidget_x) graphicswidget_x->clear_();
 	graphicswidget_frame->show();
 	aliza->set_axis_2D(2, rectAct->isChecked());
+	qApp->processEvents();
 }
 
 void MainWindow::toggle_histogram(bool t)
@@ -1207,6 +1228,7 @@ void MainWindow::toggle_histogram(bool t)
 		histogram_frame_layout->addWidget(histogramview);
 	histogram_frame->show();
 	aliza->set_histogram();
+	qApp->processEvents();
 }
 
 void MainWindow::toggle_graphicswidget_zyx(bool t)
@@ -1242,12 +1264,14 @@ void MainWindow::toggle_graphicswidget_zyx(bool t)
 		histogram_frame2_layout->addWidget(histogramview);
 	multi_frame->show();
 	aliza->set_axis_zyx(rectAct->isChecked());
+	qApp->processEvents();
 }
 
 void MainWindow::toggle_toolbox()
 {
 	if (toolbox3D_frame->isVisible()) toolbox3D_frame->hide();
 	else toolbox3D_frame->show();
+	qApp->processEvents();
 }
 
 void MainWindow::toggle_meta2()
@@ -1277,6 +1301,7 @@ void MainWindow::toggle_animwidget3d(bool t)
 	{
 		anim3D_frame->hide();
 	}
+	qApp->processEvents();
 }
 
 void MainWindow::toggle_animwidget2d(bool t)
@@ -1293,6 +1318,7 @@ void MainWindow::toggle_animwidget2d(bool t)
 	{
 		anim2D_frame->hide();
 	}
+	qApp->processEvents();
 }
 
 void MainWindow::dropEvent(QDropEvent * e)
@@ -1301,6 +1327,7 @@ void MainWindow::dropEvent(QDropEvent * e)
 	if (!lock) return;
 	const QMimeData * mimeData = e->mimeData();
 	QStringList l;
+	QString message;
 	if (mimeData && mimeData->hasUrls())
 	{
 		for (int i = 0; i < mimeData->urls().size(); ++i)
@@ -1334,27 +1361,36 @@ void MainWindow::dropEvent(QDropEvent * e)
 			connect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
 			pb->setMinimumWidth(256);
 			pb->setRange(0, 0);
-			pb->show();
-			pb->activateWindow();
-			pb->raise();
-			qApp->processEvents();
+			pb->setMinimumDuration(0);
+			pb->setValue(0);
 			for (int i = 0; i < l.size(); ++i)
 			{
 				if (i == 0 && fi.isFile())
 				{
-					load_any_file(f, pb, true);
+					message = load_any_file(f, pb, true);
 				}
 				else
 				{
 					const QString f1 = l.at(i);
 					QFileInfo fi1(f1);
-					if (fi1.isFile()) load_any_file(f1, pb, true);
+					if (fi1.isFile())
+					{
+						message = load_any_file(f1, pb, true);
+					}
 				}
 			}
 			disconnect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
 			pb->close();
 			delete pb;
 		}
+	}
+	if (!message.isEmpty())
+	{
+		QMessageBox mbox;
+		mbox.addButton(QMessageBox::Close);
+		mbox.setIcon(QMessageBox::Information);
+		mbox.setText(message);
+		mbox.exec();
 	}
 	mutex.unlock();
 }
@@ -1378,6 +1414,7 @@ void MainWindow::load_any()
 {
 	bool lock = mutex.tryLock();
 	if (!lock) return;
+	QString message;
 	QStringList l = QFileDialog::getOpenFileNames(
 		this,
 		QString("Open Files"),
@@ -1393,10 +1430,8 @@ void MainWindow::load_any()
 	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
 	pb->setMinimumWidth(256);
 	pb->setRange(0, 0);
-	pb->show();
-	pb->activateWindow();
-	pb->raise();
-	qApp->processEvents();
+	pb->setMinimumDuration(0);
+	pb->setValue(0);
 	bool is_dicomdir = false;
 	for (int x = 0; x < l.size(); ++x)
 	{
@@ -1410,7 +1445,7 @@ void MainWindow::load_any()
 		}
 		else
 		{
-			load_any_file(l.at(x), pb, true);
+			message = load_any_file(l.at(x), pb, true);
 		}
 	}
 	l.clear();
@@ -1421,7 +1456,14 @@ void MainWindow::load_any()
 	{
 		if (tabWidget->currentIndex() != 1) tabWidget->setCurrentIndex(1);
 	}
-	qApp->processEvents();
+	if (!message.isEmpty())
+	{
+		QMessageBox mbox;
+		mbox.addButton(QMessageBox::Close);
+		mbox.setIcon(QMessageBox::Information);
+		mbox.setText(message);
+		mbox.exec();
+	}
 	mutex.unlock();
 }
 
@@ -1492,6 +1534,7 @@ void MainWindow::set_view_3d(bool t)
 	if (gl_frame->isHidden()) gl_frame->show();
 	glwidget->set_view_3d();
 	glwidget->updateGL();
+	qApp->processEvents();
 }
 
 void MainWindow::set_view_rc(bool t)
@@ -1508,6 +1551,7 @@ void MainWindow::set_view_rc(bool t)
 	if (gl_frame->isHidden()) gl_frame->show();
 	glwidget->set_view_rc();
 	glwidget->updateGL();
+	qApp->processEvents();
 }
 
 void MainWindow::set_show_frames_3d(bool t)
@@ -1537,6 +1581,7 @@ void MainWindow::set_ui()
 			view3d_frame->show();
 		}
 		first_image_loaded = true;
+		qApp->processEvents();
 	}
 }
 
@@ -1551,6 +1596,7 @@ void MainWindow::load_dicom_series2()
 		mutex.unlock();
 		return;
 	}
+	set_ui();
 	QProgressDialog * pb =
 		new QProgressDialog(QString("Loading..."), QString("Exit"), 0, 0);
 	connect(pb,SIGNAL(canceled()), this, SLOT(exit_null()));
@@ -1558,27 +1604,32 @@ void MainWindow::load_dicom_series2()
 	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
 	pb->setMinimumWidth(256);
 	pb->setRange(0, 0);
-	pb->show();
-	pb->activateWindow();
-	pb->raise();
-	set_ui();
-	qApp->processEvents();
-	aliza->load_dicom_series(pb);
+	pb->setMinimumDuration(0);
+	pb->setValue(0);
+	const QString message = aliza->load_dicom_series(pb);
 	disconnect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
 	pb->close();
 	delete pb;
-	qApp->processEvents();
+	if (!message.isEmpty())
+	{
+		QMessageBox mbox;
+		mbox.addButton(QMessageBox::Close);
+		mbox.setIcon(QMessageBox::Information);
+		mbox.setText(message);
+		mbox.exec();
+	}
 	mutex.unlock();
 }
 
-void MainWindow::load_any_file(
+QString MainWindow::load_any_file(
 	const QString & f,
 	QProgressDialog * pb,
 	bool lock)
 {
 	int image_id = -1;
 	set_ui();
-	aliza->load_dicom_file(&image_id, f, pb, lock);
+	const QString message = aliza->load_dicom_file(&image_id, f, pb, lock);
+	return message;
 }
 
 void MainWindow::reset_rect2()
@@ -1647,8 +1698,10 @@ void MainWindow::start_3D_anim()
 		toolbox2D->anim_label->show();
 		aliza->start_3D_anim();
 	}
-	else QMessageBox::warning(
-		nullptr, QString("Warning"), message_);
+	else
+	{
+		QMessageBox::information(nullptr, QString("Warning"), message_);
+	}
 }
 
 void MainWindow::stop_3D_anim()
@@ -1759,7 +1812,7 @@ void MainWindow::trigger_set_level()
 
 void MainWindow::tab_ind_changed(int i)
 {
-	switch(i)
+	switch (i)
 	{
 	case 0:
 		file_menu->menuAction()->setVisible(true);
@@ -1826,11 +1879,13 @@ void MainWindow::set_zlock(bool t)
 	else   zlockAct->setIcon(anchor2_icon);
 	oneAct->setEnabled(t);
 	aliza->toggle_zlock(t);
+	qApp->processEvents();
 }
 
 void MainWindow::set_zlock_one(bool t)
 {
 	aliza->toggle_zlock_one(t);
+	qApp->processEvents();
 }
 
 void MainWindow::writeSettings()
@@ -1883,6 +1938,7 @@ void MainWindow::readSettings()
 void MainWindow::set_style(const QString & s)
 {
 	change_style(s.trimmed());
+	qApp->processEvents();
 }
 
 void MainWindow::change_style(const QString & s)
@@ -1953,6 +2009,7 @@ void MainWindow::set_no_gl3()
 	const QString a("\nFailed to initialize OpenGL 3\n");
 	std::cout << a.toStdString() << std::endl;
 #endif
+	qApp->processEvents();
 }
 
 void MainWindow::check_3d_frame()
@@ -2005,7 +2062,6 @@ void MainWindow::trigger_image_dicom_meta()
 	sqtree->read_file(l.at(0), true);
 	tabWidget->setCurrentIndex(2);
 	qApp->restoreOverrideCursor();
-	qApp->processEvents();
 }
 
 void MainWindow::set_image_view()
@@ -2014,6 +2070,7 @@ void MainWindow::set_image_view()
 	{
 		tabWidget->setCurrentIndex(0);
 	}
+	qApp->processEvents();
 }
 
 void MainWindow::update_info_lines_bg()

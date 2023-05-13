@@ -444,7 +444,6 @@ void SRUtils::read_IMAGE(
 						"search.</body></html>");
 					QFileInfo fi22(path+QString("/.."));
 					if (pb) pb->hide();
-					QApplication::processEvents();
 					FindRefDialog * d =
 						new FindRefDialog(settings->get_scale_icons());
 					d->set_text(s22);

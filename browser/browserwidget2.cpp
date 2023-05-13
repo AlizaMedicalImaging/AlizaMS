@@ -171,7 +171,6 @@ void BrowserWidget2::read_directory(const QString & p)
 	if (!once) once = true;
 	tableWidget->clearContents();
 	tableWidget->setRowCount(0);
-	qApp->processEvents();
 	QProgressDialog * pb = new QProgressDialog(
 		QString("Recursive scan"),
 		QString("Stop"),
@@ -179,9 +178,9 @@ void BrowserWidget2::read_directory(const QString & p)
 		0);
 	pb->setModal(true);
 	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
-	pb->show();
-	pb->activateWindow();
-	pb->raise();
+	pb->setRange(0, 0);
+	pb->setMinimumDuration(0);
+	pb->setValue(0);
 	try
 	{
 		const mdcm::Global & g = mdcm::GlobalInstance;
@@ -201,7 +200,6 @@ void BrowserWidget2::read_directory(const QString & p)
 			<< ex.what() << std::endl;
 	}
 	pb->close();
-	qApp->processEvents();
 	delete pb;
 }
 
@@ -700,7 +698,6 @@ void BrowserWidget2::copy_files()
 					QString("/") +
 					fi.fileName();
 				QFile::copy(f, f1);
-				qApp->processEvents();
 			}
 		}
 	}

@@ -1859,10 +1859,8 @@ template <typename T> QString supp_palette_grey_to_rgbUC_(
 		it0.GoToBegin();
 		itk::ImageRegionConstIterator<RGBImageTypeUC> it2(color_image, color_image->GetLargestPossibleRegion());
 		it2.GoToBegin();
-		while (!(it1.IsAtEnd()||it0.IsAtEnd()||it2.IsAtEnd()))
+		while (!(it1.IsAtEnd() || it0.IsAtEnd() || it2.IsAtEnd()))
 		{
-			//
-			if (tmp37%9999 == 0) QApplication::processEvents();
 			//
 			const RGBPixelUC & pixel = it2.Get();
 			if (pixel.GetRed() > 0 || pixel.GetGreen() > 0 || pixel.GetBlue() > 0)
@@ -2004,7 +2002,7 @@ unsigned int process_gsps(
 	{
 		if (pb)
 		{
-			pb->setLabelText(QString("Searching referenced files"));
+			pb->setLabelText(QString("Loading ... "));
 		}
 		QApplication::processEvents();
 		QList<PrRefSeries> refs;
@@ -2012,11 +2010,6 @@ unsigned int process_gsps(
 		QApplication::processEvents();
 		for (int y = 0; y < refs.size(); ++y)
 		{
-			if (pb)
-			{
-				pb->setLabelText(QString("Loading ... "));
-			}
-			QApplication::processEvents();
 			QStringList ref_files;
 			for (int z = 0; z < refs.at(y).images.size(); ++z)
 			{
@@ -2045,7 +2038,6 @@ unsigned int process_gsps(
 					std::cout << "Not a scalar image for GSPS, skipped" << std::endl;
 					continue;
 				}
-				QApplication::processEvents();
 				++count;
 				bool spatial_transform = false;
 				ImageVariant * pr_image =
@@ -2093,7 +2085,6 @@ unsigned int process_gsps(
 						pr_image->di->filtering = 0;
 					}
 					bool pr_load_ok = false;
-					QApplication::processEvents();
 					pr_load_ok = CommonUtils::reload_monochrome(
 						pr_image,
 						ok3d,
@@ -3861,8 +3852,6 @@ bool DicomUtils::read_slices_rtdose(
 {
 	if (!ivariant) return false;
 	//
-	QApplication::processEvents();
-	//
 	bool ok = false;
 	std::vector<double*> values;
 	unsigned short numframes = 0;
@@ -3982,7 +3971,6 @@ void DicomUtils::read_dimension_index_sq(
 	const mdcm::Tag tDimensionOrganizationUID(0x0020,0x9164);
 	const mdcm::Tag tDimensionIndexPointer(0x0020,0x9165);
 	const mdcm::Tag tFunctionalGroupPointer(0x0020,0x9167);
-
 	if (ds.FindDataElement(tDimensionIndexSequence))
 	{
 		const mdcm::DataElement &
@@ -5557,7 +5545,6 @@ bool DicomUtils::generate_geometry(
 					mbox.setIcon(QMessageBox::Warning);
 					mbox.setText(z_inv_string);
 					mbox.exec();
-					QApplication::processEvents();
 #endif
 
 			}
@@ -7749,7 +7736,6 @@ QString DicomUtils::read_ultrasound(
 	{
 		return QString("read_ultrasound reads 1 image");
 	}
-	QApplication::processEvents();
 	const SettingsWidget * wsettings =
 		static_cast<const SettingsWidget *>(settings);
 	unsigned int dimx = 0, dimy = 0, dimz = 0;
@@ -8031,7 +8017,6 @@ QString DicomUtils::read_nuclear(
 	*ok = false;
 	if (!ivariant) return QString("ivariant is null");
 	if (images_ipp.size() != 1) return QString("read_nuclear reads 1 image");
-	QApplication::processEvents();
 	const SettingsWidget * wsettings =
 		static_cast<const SettingsWidget *>(settings);
 	unsigned int dimx = 0, dimy = 0, dimz = 0;
@@ -8249,7 +8234,6 @@ QString DicomUtils::read_series(
 {
 	*ok = false;
 	if (!ivariant) return QString("ivariant is null");
-	QApplication::processEvents();
 	const SettingsWidget * wsettings =
 		static_cast<const SettingsWidget *>(settings);
 	unsigned int dimx = 0, dimy = 0, dimz = 0;
@@ -8580,7 +8564,6 @@ QString DicomUtils::read_series(
 							"\"Settings/3D\" may reduce memory\n"
 							"pressure sometimes.\n"
 							"Proceed?"));
-					qApp->processEvents();
 					if (mbox.exec() == QMessageBox::Yes)
 					{
 						skip_ram_warning = true;
@@ -8596,7 +8579,6 @@ QString DicomUtils::read_series(
 						return QString("");
 					}
 					if (pb) pb->show();
-					qApp->processEvents();
 				}
 			}
 #endif
@@ -9503,13 +9485,11 @@ QString DicomUtils::read_buffer(
 							"\"Settings/3D\" may reduce memory\n"
 							"pressure sometimes.\n"
 							"Proceed?"));
-					qApp->processEvents();
 					if (mbox.exec() != QMessageBox::Yes)
 					{
 						return QString("");
 					}
 					if (pb) pb->show();
-					qApp->processEvents();
 				}
 			}
 #endif
@@ -12139,7 +12119,6 @@ void DicomUtils::scan_files_for_rtstruct_image(
 	std::vector<std::string> filenames;
 	for (int x = 0; x < flist.size(); ++x)
 	{
-		QApplication::processEvents();
 		const QString tmp0 =
 			dir.absolutePath() + QString("/") + flist.at(x);
 #ifdef _WIN32
@@ -12167,7 +12146,6 @@ void DicomUtils::scan_files_for_rtstruct_image(
 		mdcm::Scanner::ValuesType::iterator vi0 = v0.begin();
 		for (; vi0 != v0.end(); ++vi0)
 		{
-			QApplication::processEvents();
 			std::vector<std::string> files__ =
 				s0.GetAllFilenamesFromTagToValue(t0, (*vi0).c_str());
 			for (unsigned int j = 0; j < files__.size(); ++j)
@@ -12199,7 +12177,6 @@ void DicomUtils::scan_files_for_rtstruct_image(
 		mdcm::Scanner::ValuesType::iterator vi1 = v1.begin();
 		for (; vi1 != v1.end(); ++vi1)
 		{
-			QApplication::processEvents();
 			std::vector<std::string> files__ =
 				s1.GetAllFilenamesFromTagToValue(t1, (*vi1).c_str());
 			QStringList t1_tmp;
@@ -12220,8 +12197,6 @@ void DicomUtils::scan_files_for_rtstruct_image(
 			ref_files.push_back(t1_tmp);
 		}
 	}
-	//
-	QApplication::processEvents();
 }
 
 bool DicomUtils::process_contrours_ref(
@@ -12234,11 +12209,7 @@ bool DicomUtils::process_contrours_ref(
 	QProgressDialog * pb)
 {
 	unsigned short count_ = 0;
-	if (pb)
-	{
-		pb->setLabelText(QString("Searching ."));
-	}
-	QApplication::processEvents();
+	if (pb) pb->setLabelText(QString("Searching ."));
 	mdcm::Reader reader;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
@@ -12288,10 +12259,6 @@ bool DicomUtils::process_contrours_ref(
 		bool referenced_slice_found = false;
 		for (int k = 0; k < detected_files.at(z).size(); ++k)
 		{
-			if (pb)
-			{
-				pb->setLabelText(QString("Searching .."));
-			}
 			QApplication::processEvents();
 			QString sop_instance_uid;
 			std::set<mdcm::Tag> tags;
@@ -12338,11 +12305,6 @@ bool DicomUtils::process_contrours_ref(
 					while (it != tmp_ivariant->di->rois.at(y).contours.constEnd())
 #endif
 					{
-						if (pb)
-						{
-							pb->setLabelText(QString("Searching ..."));
-						}
-						QApplication::processEvents();
 						const Contour * c = it.value();
 						for (int j = 0;
 							j < c->ref_sop_instance_uids.size();
@@ -12363,11 +12325,6 @@ bool DicomUtils::process_contrours_ref(
 			}
 			if (referenced_slice_found)
 			{
-				if (pb)
-				{
-					pb->setLabelText(QString("Searching ...."));
-				}
-				QApplication::processEvents();
 				std::vector<ImageVariant*> ivariants;
 				QStringList detected_files_tmp = detected_files.at(z);
 				detected_files_tmp.sort();
@@ -12396,11 +12353,6 @@ bool DicomUtils::process_contrours_ref(
 				{
 					for (int i = 0; i < tmp_ivariant->di->rois.size(); ++i)
 					{
-						if (pb)
-						{
-							pb->setLabelText(QString("Searching ....."));
-						}
-						QApplication::processEvents();
 						ROI roi;
 						roi.id = tmp_ivariant->di->rois.at(i).id;
 						ContourUtils::copy_roi(roi, tmp_ivariant->di->rois.at(i));
@@ -12434,7 +12386,6 @@ QString DicomUtils::find_file_from_uid(
 		ok = scan_files_for_instance_uid(it.next(), uid, f, pb);
 		if (ok) break;
 	}
-	QApplication::processEvents();
 	return f;
 }
 
@@ -12452,7 +12403,6 @@ bool DicomUtils::scan_files_for_instance_uid(
 	QDir dir(p);
 	QStringList flist =
 		dir.entryList(QDir::Files|QDir::Readable, QDir::Name);
-	QApplication::processEvents();
 	for (int x = 0; x < flist.size(); ++x)
 	{
 		QApplication::processEvents();
@@ -12521,7 +12471,6 @@ void DicomUtils::read_pr_ref(
 		x < sqReferencedSeriesSequence->GetNumberOfItems();
 		++x)
 	{
-		QApplication::processEvents();
 		const mdcm::Item & item0 =
 			sqReferencedSeriesSequence->GetItem(x + 1);
 		const mdcm::DataSet & nds0 =
@@ -12548,7 +12497,6 @@ void DicomUtils::read_pr_ref(
 			y < sqReferencedImageSequence->GetNumberOfItems();
 			++y)
 		{
-			QApplication::processEvents();
 			const mdcm::Item & item1 =
 				sqReferencedImageSequence->GetItem(y + 1);
 			const mdcm::DataSet & nds1 =
@@ -13388,7 +13336,6 @@ QString DicomUtils::read_dicom(
 		{
 			pb->setLabelText(QString("Loading ... ") +
 				QString::number(x) + filenames_num);
-			pb->show();
 		}
 		QApplication::processEvents();
 		QString sop;
@@ -13459,7 +13406,6 @@ QString DicomUtils::read_dicom(
 					"is currently not supported"));
 				mbox.exec();
 				if (pb) pb->show();
-				QApplication::processEvents();
 			}
 			continue;
 		}
@@ -13473,7 +13419,6 @@ QString DicomUtils::read_dicom(
 				load_image_ref_contour = true;
 				if (!load_image_ref_contour)
 				{
-					QApplication::processEvents();
 					ImageVariant * ivariant =
 						new ImageVariant(
 							CommonUtils::get_next_id(),
@@ -13566,7 +13511,6 @@ QString DicomUtils::read_dicom(
 					mbox.exec();
 					if (pb) pb->show();
 				}
-				QApplication::processEvents();
 			}
 			continue;
 		}
@@ -13639,7 +13583,6 @@ QString DicomUtils::read_dicom(
 				(void)t00080005_ok;
 				const QString s0 =
 					SRUtils::read_sr_title1(ds, t00080005);
-				if (pb) pb->hide();
 				SRUtils::set_asked_for_path_once(false);
 				SRWidget * sr =
 					new SRWidget(wsettings->get_scale_icons());
@@ -13770,15 +13713,12 @@ QString DicomUtils::read_dicom(
 								mbox.addButton(QMessageBox::No);
 								mbox.setDefaultButton(QMessageBox::Yes);
 								mbox.setIcon(QMessageBox::Question);
-								mbox.setText(QString(
-									"Apply Supplemental Palette?"));
-								qApp->processEvents();
+								mbox.setText(QString("Apply Supplemental Palette?"));
 								if (mbox.exec() == QMessageBox::Yes)
 								{
 									supp_palette = true;
 								}
 								if (pb) pb->show();
-								qApp->processEvents();
 								asked_about_supp_palette = true;
 							}
 						}
@@ -13857,33 +13797,6 @@ QString DicomUtils::read_dicom(
 			icc_found_tmp1 = icc_found_tmp0;
 			localizer_tmp1 = localizer_tmp0;
 		}
-#if 0
-		//
-		// Warning about Modality LUT Sequence
-		//
-		{
-			if (!asked_about_modality_lut)
-			{
-				if (has_modality_lut_sq(ds))
-				{
-					if (pb) pb->hide();
-					QApplication::processEvents();
-					QMessageBox mbox;
-					mbox.setIcon(QMessageBox::Information);
-					mbox.setText(QString(
-						"Warning:\nModality LUT palette lookup\n"
-						"is currently not supported.\n"
-						"Adjust level/window manually, if required."));
-					mbox.exec();
-					if (pb) pb->show();
-				}
-				asked_about_modality_lut = true;
-			}
-		}
-		//
-		//
-		//
-#endif
 	}
 	//
 	//
@@ -14099,7 +14012,6 @@ QString DicomUtils::read_dicom(
 		// TODO check PR
 		for (int x = 0; x < images.size(); ++x)
 		{
-			QApplication::processEvents();
 			QStringList images_tmp;
 			images_tmp << images.at(x);
 			ImageVariant * ivariant = new ImageVariant(
@@ -14130,7 +14042,6 @@ QString DicomUtils::read_dicom(
 		// TODO check PR
 		for (int x = 0; x < images.size(); ++x)
 		{
-			QApplication::processEvents();
 			QStringList images_tmp;
 			images_tmp << images.at(x);
 			ImageVariant * ivariant = new ImageVariant(
@@ -14161,7 +14072,6 @@ QString DicomUtils::read_dicom(
 	{
 		for (int x = 0; x < images.size(); ++x)
 		{
-			QApplication::processEvents();
 			QStringList images_tmp;
 			images_tmp << images.at(x);
 			{
@@ -14203,7 +14113,6 @@ QString DicomUtils::read_dicom(
 	{
 		for (int k = 0; k < extracted_images.size(); ++k)
 		{
-			QApplication::processEvents();
 			std::vector<QString> images__;
 			std::vector<QString> images_ipp;
 			for (int j = 0; j < extracted_images.at(k).size(); ++j)
@@ -14262,7 +14171,6 @@ QString DicomUtils::read_dicom(
 	{
 		for (int x = 0; x < images.size(); ++x)
 		{
-			QApplication::processEvents();
 			if (load_type == 0||load_type == 2)
 			{
 				bool supp_palette_failed = false;
@@ -14460,7 +14368,6 @@ QString DicomUtils::read_dicom(
 		// TODO
 		for (int x = 0; x < images.size(); ++x)
 		{
-			QApplication::processEvents();
 			QStringList images_tmp;
 			images_tmp << images.at(x);
 			ImageVariant * ivariant = new ImageVariant(
@@ -14501,7 +14408,6 @@ QString DicomUtils::read_dicom(
 		// TODO
 		for (int x = 0; x < images.size(); ++x)
 		{
-			QApplication::processEvents();
 			QStringList images_tmp;
 			images_tmp << images.at(x);
 			ImageVariant * ivariant = new ImageVariant(
@@ -14541,7 +14447,6 @@ QString DicomUtils::read_dicom(
 	{
 		for (int x = 0; x < images.size(); ++x)
 		{
-			QApplication::processEvents();
 			QStringList images_tmp;
 			images_tmp << images.at(x);
 			if (load_type == 0||load_type == 2)
@@ -14731,7 +14636,6 @@ QString DicomUtils::read_dicom(
 		}
 		for (int x = 0; x < fff.size(); ++x)
 		{
-			QApplication::processEvents();
 			std::vector<QString> images__;
 			std::vector<QString> images_ipp;
 			for (int k = 0; k < fff.at(x).size(); ++k)
@@ -14825,7 +14729,6 @@ QString DicomUtils::read_dicom(
 	{
 		if (!images.empty())
 		{
-			QApplication::processEvents();
 			std::vector<QString> images__;
 			std::vector<QString> images_ipp;
 			for (int k = 0; k < images.size(); ++k)
@@ -15048,7 +14951,6 @@ QString DicomUtils::read_dicom(
 					}
 					delete d;
 					if (pb) pb->show();
-					QApplication::processEvents();
 					if (ok22)
 					{
 						ref2_ok = process_contrours_ref(
@@ -15163,13 +15065,8 @@ QString DicomUtils::read_dicom(
 				CommonUtils::set_save_dir(pfi.absolutePath());
 				write_encapsulated(pdf_files.at(x), pdff);
 			}
-			QApplication::processEvents();
 		}
-		if (pb)
-		{
-			pb->show();
-		}
-		QApplication::processEvents();
+		if (pb) pb->show();
 	}
 	//
 	if (!stl_files.empty())
@@ -15194,13 +15091,8 @@ QString DicomUtils::read_dicom(
 				CommonUtils::set_save_dir(sfi.absolutePath());
 				write_encapsulated(stl_files.at(x), stlf);
 			}
-			QApplication::processEvents();
 		}
-		if (pb)
-		{
-			pb->show();
-		}
-		QApplication::processEvents();
+		if (pb) pb->show();
 	}
 	//
 	if (!video_files.empty())
@@ -15229,13 +15121,8 @@ QString DicomUtils::read_dicom(
 				CommonUtils::set_save_dir(vfi.absolutePath());
 				write_mpeg(tmp943, video_file_name);
 			}
-			QApplication::processEvents();
 		}
-		if (pb)
-		{
-			pb->show();
-		}
-		QApplication::processEvents();
+		if (pb) pb->show();
 	}
 	//
 	if (!grey_softcopy_pr_files.empty())
@@ -15280,7 +15167,6 @@ QString DicomUtils::read_dicom(
 				"</p>"
 				"</body></html>");
 			if (pb) pb->hide();
-			QApplication::processEvents();
 			FindRefDialog * d =
 				new FindRefDialog(wsettings->get_scale_icons());
 			d->set_text(s);

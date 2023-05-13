@@ -597,7 +597,6 @@ void GLWidget::get_screen(bool white_bg)
 	{
 		set_clear_color(1.0, 1.0, 1.0);
 		updateGL();
-		QApplication::processEvents();
 	}
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	QImage p = grabFramebuffer();

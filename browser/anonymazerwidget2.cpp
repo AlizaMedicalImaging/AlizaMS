@@ -2519,7 +2519,6 @@ void AnonymazerWidget2::process_directory(
 			{
 				(*count_errors)++;
 			}
-			QApplication::processEvents();
 		}
 	}
 	//
@@ -2527,7 +2526,6 @@ void AnonymazerWidget2::process_directory(
 		for (int j = 0; j < dlist.size(); ++j)
 		{
 			++count_dirs;
-			QApplication::processEvents();
 			QDir d;
 			if (rename_files)
 			{
@@ -2755,7 +2753,6 @@ void AnonymazerWidget2::run_()
 	}
 	pd->close();
 	delete pd;
-	QApplication::processEvents();
 	if (!message.isEmpty())
 	{
 		QMessageBox mbox;

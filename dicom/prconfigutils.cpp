@@ -1226,7 +1226,6 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 			{
 				return QString("Internal error");
 			}
-			QApplication::processEvents();
 			try
 			{
 				ConstIterator it0(tmp1, tmp1->GetLargestPossibleRegion());
@@ -1261,7 +1260,6 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 			{
 				return QString(ex.GetDescription());
 			}
-			QApplication::processEvents();
 		}
 		else
 		{
@@ -3163,26 +3161,16 @@ void PrConfigUtils::read_pr(
 	const mdcm::DataSet & ds,
 	PrRefSeries & ref)
 {
-	read_modality_lut(ds,ref);
-	QApplication::processEvents();
-	read_voi_lut(ds,ref);
-	QApplication::processEvents();
-	read_presentation_lut(ds,ref);
-	QApplication::processEvents();
-	read_display_areas(ds,ref);
-	QApplication::processEvents();
-	read_graphic_layers(ds,ref);
-	QApplication::processEvents();
-	read_spatial_transformation(ds,ref);
-	QApplication::processEvents();
-	read_overlays(ds,ref);
-	QApplication::processEvents();
-	read_text_annotations(ds,ref);
-	QApplication::processEvents();
-	read_graphic_objects(ds,ref);
-	QApplication::processEvents();
-	read_display_shutter(ds,ref);
-	QApplication::processEvents();
+	read_modality_lut(ds, ref);
+	read_voi_lut(ds, ref);
+	read_presentation_lut(ds, ref);
+	read_display_areas(ds, ref);
+	read_graphic_layers(ds, ref);
+	read_spatial_transformation(ds, ref);
+	read_overlays(ds, ref);
+	read_text_annotations(ds, ref);
+	read_graphic_objects(ds, ref);
+	read_display_shutter(ds, ref);
 //
 #if 0
 	std::cout << "-------" << std::endl;
@@ -3200,6 +3188,7 @@ void PrConfigUtils::read_pr(
 	}
 	std::cout << "-------" << std::endl;
 #endif
+	QApplication::processEvents();
 }
 
 //#define PRINT_MAKE_PR_MONOCHROME
@@ -3253,7 +3242,6 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		bool mapped_signed = false;
 		for (int x = 0; x < l.size(); ++x)
 		{
-			QApplication::processEvents();
 			if (l.at(x).id == 1)
 			{
 				shift = l.at(x).values.at(0).toDouble();
@@ -3452,7 +3440,6 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				++voi_luts;
 			}
 		}
-		QApplication::processEvents();
 		if (voi_luts > 0)
 		{
 #ifdef PRINT_MAKE_PR_MONOCHROME
@@ -3485,7 +3472,6 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 	// Presentation LUT
 	//
 	{
-		QApplication::processEvents();
 		QList<QVariant>  p_lut_descriptor;
 		QList<QVariant>  p_lut_data;
 		QString          p_shape;
@@ -3581,7 +3567,6 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 	// Display areas
 	//
 	{
-		QApplication::processEvents();
 		QMap<int, QStringList> area_images;
 		QMap<int, int>         areasTLx;
 		QMap<int, int>         areasTLy;
@@ -3742,7 +3727,6 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 	// Spatial transform
 	//
 	{
-		QApplication::processEvents();
 		for (int x = 0; x < l.size(); ++x)
 		{
 			if (l.at(x).id == 3 && l.at(x).values.size() == 2)
@@ -3781,7 +3765,6 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 	// Text annotations
 	//
 	{
-		QApplication::processEvents();
 		QMap<int, QStringList> text_images;
 		QMap<int, int>     has_bb;
 		QMap<int, double>  bb_top_left_x;
@@ -3942,7 +3925,6 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 	// Graphic annotations
 	//
 	{
-		QApplication::processEvents();
 		QMap<int, QStringList> graphic_images;
 		QMap<int, QString>  GraphicType;
 		QMap<int, QString>  GraphicAnnotationUnits;
@@ -4031,7 +4013,6 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 	// Display shutter
 	//
 	{
-		QApplication::processEvents();
 		for (int x = 0; x < l.size(); ++x)
 		{
 			const int values_size = l.at(x).values.size();
@@ -4096,7 +4077,6 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		//
 		// Overlays
 		//
-		QApplication::processEvents();
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		QMap<int,SliceOverlays>::const_iterator it3 = ref.image_overlays.all_overlays.cbegin();
 		while (it3 != ref.image_overlays.all_overlays.cend())

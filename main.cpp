@@ -489,7 +489,6 @@ int main(int argc, char * argv[])
 	splash->setAttribute(Qt::WA_DeleteOnClose);
 	splash->show();
 	splash->showMessage(splash_info + QString("  Loading ..."));
-	app.processEvents();
 #endif
 	//
 #ifdef _WIN32
@@ -500,11 +499,6 @@ int main(int argc, char * argv[])
 	{
 #if 1
 		app.setQuitOnLastWindowClosed(true);
-#endif
-#if (defined USE_SPLASH_SCREEN && USE_SPLASH_SCREEN==1)
-		splash->showMessage(splash_info);
-		app.processEvents();
-		QTimer::singleShot(500, splash, SLOT(close()));
 #endif
 		QStringList l;
 		for (int x = 1; x < argc; ++x)
@@ -560,12 +554,9 @@ int main(int argc, char * argv[])
 		QObject::connect(&mainWin, SIGNAL(quit_app()), &mainWin, SLOT(exit_app()), Qt::QueuedConnection);
 		//
 		mainWin.show();
-		app.processEvents();
 		mainWin.check_3d_frame();
-		app.processEvents();
 #if (defined USE_SPLASH_SCREEN && USE_SPLASH_SCREEN==1)
 		splash->showMessage(splash_info);
-		app.processEvents();
 		QTimer::singleShot(1500, splash, SLOT(close()));
 #endif
 		if (argc > 1)
