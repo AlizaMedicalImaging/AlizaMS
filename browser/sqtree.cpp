@@ -446,7 +446,7 @@ void SQtree::process_element(
 			mdcm::DataElement tmp_tag;
 			size_t ce = 0;
 			for (mdcm::DataSet::ConstIterator it = nds.Begin();
-				it!=nds.End();
+				it != nds.End();
 				++it)
 			{
 				bool duplicated_ = false;
@@ -1133,8 +1133,7 @@ void SQtree::read_file(const QString & f, const bool use_lock)
 		const QString ts_string = QString::fromLatin1(uid.GetName());
 		ts_lineEdit->setText(ts_string);
 		//
-		for (
-			mdcm::FileMetaInformation::ConstIterator it = header.Begin();
+		for (mdcm::FileMetaInformation::ConstIterator it = header.Begin();
 			it!=header.End();
 			++it)
 		{
@@ -1160,7 +1159,7 @@ void SQtree::read_file(const QString & f, const bool use_lock)
 			mdcm::Tag tmp_tag;
 			size_t ce = 0;
 			for (mdcm::DataSet::ConstIterator it = ds.Begin();
-				it!=ds.End();
+				it != ds.End();
 				++it)
 			{
 				bool duplicated = false;

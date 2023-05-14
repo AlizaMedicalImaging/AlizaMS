@@ -162,7 +162,7 @@ void replace_uid_recurs__(
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 				if (sq && sq->GetNumberOfItems() > 0)
 				{
-					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
+					const mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
 					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; ++i)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
@@ -250,7 +250,7 @@ void replace_pn_recurs__(
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 				if (sq && sq->GetNumberOfItems() > 0)
 				{
-					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
+					const mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
 					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; ++i)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
@@ -344,7 +344,7 @@ void replace_id_recurs__(
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 				if (sq && sq->GetNumberOfItems() > 0)
 				{
-					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
+					const mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
 					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; ++i)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
@@ -392,7 +392,7 @@ void remove_recurs__(
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 				if (sq && sq->GetNumberOfItems() > 0)
 				{
-					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
+					const mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
 					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; ++i)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
@@ -442,7 +442,7 @@ void zero_sq_recurs__(
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 				if (sq && sq->GetNumberOfItems() > 0)
 				{
-					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
+					const mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
 					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; ++i)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
@@ -502,7 +502,7 @@ void remove_date_time_recurs__(
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 				if (sq && sq->GetNumberOfItems() > 0)
 				{
-					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
+					const mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
 					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; ++i)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
@@ -862,7 +862,7 @@ void modify_date_time_recurs__(
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 				if (sq && sq->GetNumberOfItems() > 0)
 				{
-					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
+					const mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
 					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; ++i)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
@@ -905,7 +905,7 @@ void empty_recurs__(
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 				if (sq && sq->GetNumberOfItems() > 0)
 				{
-					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
+					const mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
 					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; ++i)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
@@ -946,7 +946,7 @@ void remove_private__(
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 				if (sq && sq->GetNumberOfItems() > 0)
 				{
-					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
+					const mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
 					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; ++i)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
@@ -1056,7 +1056,7 @@ void remove_group_length__(
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 				if (sq && sq->GetNumberOfItems() > 0)
 				{
-					mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
+					const mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
 					for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; ++i)
 					{
 						mdcm::Item    & item   = sq->GetItem(i);
