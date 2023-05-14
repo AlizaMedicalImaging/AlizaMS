@@ -52,6 +52,39 @@ bool is_date_time(const mdcm::VR & vr, const mdcm::Tag & t)
 	return false;
 }
 
+bool find_duplicated_recursive__(
+	const mdcm::DataSet & ds,
+	const bool implicit,
+	const mdcm::Dicts & dicts)
+{
+	mdcm::Tag tmp_tag;
+	size_t ce = 0;
+	for (mdcm::DataSet::ConstIterator it = ds.Begin(); it != ds.End(); ++it)
+	{
+		const mdcm::DataElement & de = *it;
+		const mdcm::Tag t = de.GetTag();
+		if (ce > 0 && tmp_tag == t) return true;
+		tmp_tag = t;
+		++ce;
+		if (DicomUtils::compatible_sq(ds, t, implicit, dicts))
+		{
+			const mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
+			if (sq && sq->GetNumberOfItems() > 0)
+			{
+				const mdcm::SequenceOfItems::SizeType n = sq->GetNumberOfItems();
+				for (mdcm::SequenceOfItems::SizeType i = 1; i <= n; ++i)
+				{
+					const mdcm::Item    & item   = sq->GetItem(i);
+					const mdcm::DataSet & nested = item.GetNestedDataSet();
+					const bool duplicated = find_duplicated_recursive__(nested, implicit, dicts);
+					if (duplicated) return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
 void replace__(
 	mdcm::DataSet & ds,
 	const mdcm::Tag & t,
@@ -1228,8 +1261,14 @@ void anonymize_file__(
 #endif
 	if (!reader.Read())
 	{
-		if (DicomUtils::is_dicom_file(filename)) *ok = false;
-		else *ok = true;
+		if (DicomUtils::is_dicom_file(filename))
+		{
+			*ok = false;
+		}
+		else
+		{
+			*ok = true;
+		}
 		return;
 	}
 	mdcm::File    & file = reader.GetFile();
@@ -1246,6 +1285,15 @@ void anonymize_file__(
 		return;
 	}
 #endif
+	//
+	if (find_duplicated_recursive__(
+			ds,
+			implicit,
+			dicts))
+	{
+		*ok = false;
+		return;
+	}
 	//
 	QString charset;
 	if (ds.FindDataElement(mdcm::Tag(0x0008,0x0005)))
@@ -1972,7 +2020,10 @@ void anonymize_file__(
 	writer.SetFileName(outfilename.toLocal8Bit().constData());
 #endif
 	writer.SetFile(file);
-	if (!writer.Write()) *ok = false;
+	if (!writer.Write())
+	{
+		*ok = false;
+	}
 }
 
 void find_pn_recurs__(
@@ -2228,16 +2279,15 @@ void build_maps(
 	}
 }
 
-}
-
 static unsigned int count_files = 0;
 static unsigned int count_dirs = 0;
+
+}
 
 AnonymazerWidget2::AnonymazerWidget2(float si)
 {
 	setupUi(this);
-	const QSize s =
-		QSize(static_cast<int>(16 * si),static_cast<int>(16 * si));
+	const QSize s = QSize(static_cast<int>(16 * si), static_cast<int>(16 * si));
 	in_pushButton->setIconSize(s);
 	out_pushButton->setIconSize(s);
 	run_pushButton->setIconSize(s);
@@ -2519,6 +2569,8 @@ void AnonymazerWidget2::process_directory(
 			{
 				(*count_errors)++;
 			}
+			QApplication::processEvents();
+			if (pd->wasCanceled()) return;
 		}
 	}
 	//
@@ -2655,10 +2707,11 @@ void AnonymazerWidget2::run_()
 	QSet<QString> pat_ids_set; // to check for one patient
 	QProgressDialog * pd =
 		new QProgressDialog(QString("De-identifying"), QString("Cancel"), 0, 0);
-	pd->setWindowModality(Qt::ApplicationModal);
-	pd->setWindowFlags(
-		pd->windowFlags()^Qt::WindowContextHelpButtonHint);
-	pd->show();
+	pd->setModal(true);
+	pd->setWindowFlags(pd->windowFlags() ^ Qt::WindowContextHelpButtonHint);
+	pd->setRange(0, 0);
+	pd->setMinimumDuration(0);
+	pd->setValue(0);
 	{
 		QStringList filenames;
 		QDir dir(in_path);
