@@ -80,12 +80,12 @@ public:
   GetSkipUIDs() const;
   void
   SetWriteDataSetOnly(bool);
-  std::ostream *
-  GetStreamPtr() const;
   bool
   GetCheckFileMetaInformation() const;
 
 protected:
+  std::ostream *
+  GetStreamPtr() const;
   std::ostream *  Stream;
   std::ofstream * Ofstream;
 
