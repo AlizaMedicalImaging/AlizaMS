@@ -78,17 +78,17 @@ public:
   SetSkipUIDs(bool);
   bool
   GetSkipUIDs() const;
-
-protected:
   void
   SetWriteDataSetOnly(bool);
   std::ostream *
   GetStreamPtr() const;
   bool
   GetCheckFileMetaInformation() const;
+
+protected:
   std::ostream *  Stream;
   std::ofstream * Ofstream;
- 
+
 private:
   SmartPointer<File> F;
   bool               CheckFileMetaInformation;

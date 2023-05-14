@@ -2022,7 +2022,11 @@ void anonymize_file__(
 	writer.SetFile(file);
 	if (!writer.Write())
 	{
-		*ok = false;
+		writer.SetWriteDataSetOnly(true);
+		if (!writer.Write())
+		{
+			*ok = false;
+		}
 	}
 }
 
