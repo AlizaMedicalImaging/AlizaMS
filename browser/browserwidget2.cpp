@@ -193,15 +193,11 @@ void BrowserWidget2::read_directory(const QString & p)
 		std::cout
 			<< "mdcm::ParseException in BrowserWidget2::read_directory:\n"
 			<< pe.GetLastElement().GetTag() << std::endl;
-		pb->close();
-		delete pb;
 	}
 	catch (const std::exception & ex)
 	{
 		std::cout << "Exception in BrowserWidget2::read_directory:\n"
 			<< ex.what() << std::endl;
-		pb->close();
-		delete pb;
 	}
 	pb->close();
 	delete pb;
