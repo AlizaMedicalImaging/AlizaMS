@@ -408,15 +408,13 @@ void SRUtils::read_IMAGE(
 			}
 			QString sf = DicomUtils::find_file_from_uid(
 				QDir::toNativeSeparators(path),
-				ReferencedSOPInstanceUID,
-				pb);
+				ReferencedSOPInstanceUID);
 #ifndef USE_WORKSTATION_MODE
 			if (sf.isEmpty())
 			{
 				sf = DicomUtils::find_file_from_uid(
 					path + QString("/.."),
-					ReferencedSOPInstanceUID,
-					pb);
+					ReferencedSOPInstanceUID);
 			}
 			if (sf.isEmpty())
 			{
@@ -429,8 +427,7 @@ void SRUtils::read_IMAGE(
 					);
 				sf = DicomUtils::find_file_from_uid(
 					tmpp,
-					ReferencedSOPInstanceUID,
-					pb);
+					ReferencedSOPInstanceUID);
 			}
 #endif
 			if (sf.isEmpty())
@@ -467,8 +464,7 @@ void SRUtils::read_IMAGE(
 				{
 					sf = DicomUtils::find_file_from_uid(
 						QDir::toNativeSeparators(SRUtils_selected_path),
-						ReferencedSOPInstanceUID,
-						pb);
+						ReferencedSOPInstanceUID);
 				}
 				else
 				{
@@ -487,15 +483,17 @@ void SRUtils::read_IMAGE(
 			}
 			std::vector<ImageVariant*> ivariants;
 			std::vector<ImageVariant2D*> ivariants2;
+			QStringList dummy;
 			QString e_ = DicomUtils::read_dicom(
 				ivariants,
+				dummy,
+				dummy,
+				dummy,
+				dummy,
+				dummy,
 				QStringList(sf),
-				0,
-				nullptr,
-				nullptr,
 				false,
 				wsettings,
-				pb,
 				3,
 				true);
 			if (e_.isEmpty() && ivariants.size() == 1 && ivariants.at(0))

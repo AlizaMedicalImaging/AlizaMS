@@ -634,8 +634,6 @@ template<typename T> int generate_tex3d(
 		return 1;
 	}
 	//
-	qApp->processEvents();
-	//
 	// array maximum size 0x7fffffff
 	switch (texture_type)
 	{
@@ -694,8 +692,6 @@ template<typename T> int generate_tex3d(
 		return 1;
 	}
 	//
-	qApp->processEvents();
-	//
 	try
 	{
 		SliceConstIteratorType inIterator(
@@ -742,7 +738,6 @@ template<typename T> int generate_tex3d(
 	}
 	//
 	qApp->processEvents();
-	//
 	gl->makeCurrent();
 #if 0
 	if (!gl->isValid())
@@ -918,9 +913,6 @@ template<typename T> int generate_tex3d(
 			<< "warning : OpenGL error\n"
 			<< glerror__ << std::endl;
 	}
-	//
-	qApp->processEvents();
-	//
 quit__:
 	delete [] float_buf;
 	delete [] short_buf;
@@ -1078,7 +1070,7 @@ template <typename T> bool reload_monochrome_image(
 	typename T::SpacingType spacing;
 	short count__ = 0;
 	double fx = 0.0, fy = 0.0, fz = 0.0;
-	if (gl) gl->makeCurrent();
+	//if (gl) gl->makeCurrent();
 	ivariant->di->close(generate_slices);
 	region  = image->GetLargestPossibleRegion();
 	size    = region.GetSize();
@@ -1327,8 +1319,7 @@ template<typename T> QString process_dicom_monochrome_image1(
 	const double origin_x, const double origin_y, const double origin_z,
 	const double spacing_x, const double spacing_y, const double spacing_z,
 	const short image_type,
-	bool * bad_direction,
-	QProgressDialog * pb)
+	bool * bad_direction)
 {
 	if (!buffer)
 	{
@@ -1343,11 +1334,6 @@ template<typename T> QString process_dicom_monochrome_image1(
 	typename T::SpacingType spacing;
 	typedef itk::ImageSliceIteratorWithIndex<T> SliceIterator;
 	typename UpdateQtCommand::Pointer update_qt_command;
-	if (pb)
-	{
-		pb->setLabelText(QString("Loading data... please wait"));
-	}
-	qApp->processEvents();
 	start.Fill(0);
 	size[0] = dimx;
 	size[1] = dimy;
@@ -1420,29 +1406,39 @@ template<typename T> QString process_dicom_monochrome_image1(
 	return QString("");
 }
 
-template<typename T> QString process_dicom_monochrome_image2(
-	bool * ok,
+template<typename T> void process_dicom_monochrome_image2(
 	ImageVariant * ivariant,
 	typename T::Pointer & image,
-	int max_3d_tex_size,
 	const bool gen_vertices,
-	GLWidget * gl,
-	const bool resize_,
-	const size_t size_x_, const size_t size_y_,
-	const bool bad_direction,
-	QProgressDialog * pb) // TODO
+	const bool bad_direction)
 {
-	*ok = reload_monochrome_image<T>(
-		ivariant,
-		image,
-		gl,
-		max_3d_tex_size,
-		pb,
-		resize_,
-		size_x_,
-		size_y_,
-		!gen_vertices);
-	if (*ok == false) return QString("reload_monochrome_image failed");
+	const bool generate_slices =
+		(gen_vertices && !ivariant->di->slices_generated);
+	get_dimensions<T>(image,
+		&(ivariant->di->idimx),
+		&(ivariant->di->idimy),
+		&(ivariant->di->idimz),
+		&(ivariant->di->ix_spacing),
+		&(ivariant->di->iy_spacing),
+		&(ivariant->di->iz_spacing),
+		&(ivariant->di->ix_origin),
+		&(ivariant->di->iy_origin),
+		&(ivariant->di->iz_origin));
+	if (generate_slices)
+	{
+		read_geometry_from_image<T>(ivariant, image);
+	}
+	calculate_min_max<T>(image, ivariant);
+	if (ivariant->equi)
+	{
+		ivariant->orientation_string = get_orientation<T>(
+			image, &ivariant->orientation);
+	}
+	else
+	{
+		ivariant->orientation = 0;
+		ivariant->orientation_string = QString("");
+	}
 	if (bad_direction)
 	{
 		ivariant->equi = false;
@@ -1454,7 +1450,6 @@ template<typename T> QString process_dicom_monochrome_image2(
 				QString("");
 		}
 	}
-	return QString("");
 }
 
 template<typename T> QString process_dicom_rgb_image1(
@@ -1470,8 +1465,7 @@ template<typename T> QString process_dicom_rgb_image1(
 	const short ybr, // 0 - no, 1 - full, 2 - partial
 	const bool hsv,
 	const int bitsstored,
-	bool * bad_direction,
-	QProgressDialog * pb)
+	bool * bad_direction)
 {
 	if (!buffer)
 	{
@@ -1485,11 +1479,6 @@ template<typename T> QString process_dicom_rgb_image1(
 	typename T::PointType origin;
 	typename T::SpacingType spacing;
 	typedef itk::ImageSliceIteratorWithIndex<T> SliceIterator;
-	if (pb)
-	{
-		pb->setLabelText(QString("Loading data... please wait"));
-	}
-	qApp->processEvents();
 	start.Fill(0);
 	size[0] = dimx;
 	size[1] = dimy;
@@ -1616,16 +1605,41 @@ template<typename T> QString process_dicom_rgb_image1(
 	return QString("");
 }
 
-template<typename T> QString process_dicom_rgb_image2(
-	bool * ok,
+template<typename T> void process_dicom_rgb_image2(
 	ImageVariant * ivariant,
 	typename T::Pointer & image,
 	const bool gen_vertices,
-	const bool bad_direction,
-	QProgressDialog * pb) // TODO
+	const bool bad_direction)
 {
-	*ok = reload_rgb_image<T>(image, ivariant, !gen_vertices);
-	if (*ok == false) return QString("reload_rgb_image failed");
+	ivariant->di->skip_texture = true;
+	const bool generate_slices =
+		(gen_vertices && !ivariant->di->slices_generated);
+	get_dimensions<T>(
+		image,
+		&(ivariant->di->idimx),
+		&(ivariant->di->idimy),
+		&(ivariant->di->idimz),
+		&(ivariant->di->ix_spacing),
+		&(ivariant->di->iy_spacing),
+		&(ivariant->di->iz_spacing),
+		&(ivariant->di->ix_origin),
+		&(ivariant->di->iy_origin),
+		&(ivariant->di->iz_origin));
+	if (generate_slices)
+	{
+		read_geometry_from_image<T>(ivariant, image);
+	}
+	calculate_rgb_minmax_<T>(image, ivariant);
+	if (ivariant->equi)
+	{
+		ivariant->orientation_string = get_orientation<T>(
+			image, &ivariant->orientation);
+	}
+	else
+	{
+		ivariant->orientation = 0;
+		ivariant->orientation_string = QString("");
+	}
 	if (bad_direction)
 	{
 		ivariant->equi = false;
@@ -1637,7 +1651,6 @@ template<typename T> QString process_dicom_rgb_image2(
 				QString("");
 		}
 	}
-	return QString("");
 }
 
 template<typename T> QString process_dicom_rgba_image1(
@@ -1652,8 +1665,7 @@ template<typename T> QString process_dicom_rgba_image1(
 	const short image_type,
 	const bool cmyk,
 	const bool argb,
-	bool * bad_direction,
-	QProgressDialog * pb)
+	bool * bad_direction)
 {
 	if (!buffer)
 	{
@@ -1667,11 +1679,6 @@ template<typename T> QString process_dicom_rgba_image1(
 	typename T::PointType origin;
 	typename T::SpacingType spacing;
 	typedef itk::ImageSliceIteratorWithIndex<T> SliceIterator;
-	if (pb)
-	{
-		pb->setLabelText(QString("Loading data... please wait"));
-	}
-	qApp->processEvents();
 	start.Fill(0);
 	size[0] = dimx;
 	size[1] = dimy;
@@ -1814,16 +1821,41 @@ template<typename T> QString process_dicom_rgba_image1(
 	return QString("");
 }
 
-template<typename T> QString process_dicom_rgba_image2(
-	bool * ok,
+template<typename T> void process_dicom_rgba_image2(
 	ImageVariant * ivariant,
 	typename T::Pointer & image,
 	const bool gen_vertices,
-	const bool bad_direction,
-	QProgressDialog * pb)
+	const bool bad_direction)
 {
-	*ok = reload_rgba_image<T>(image, ivariant, !gen_vertices);
-	if (*ok == false) return QString("reload_rgba_image failed");
+	ivariant->di->skip_texture = true;
+	const bool generate_slices =
+		(gen_vertices && !ivariant->di->slices_generated);
+	get_dimensions<T>(
+		image,
+		&(ivariant->di->idimx),
+		&(ivariant->di->idimy),
+		&(ivariant->di->idimz),
+		&(ivariant->di->ix_spacing),
+		&(ivariant->di->iy_spacing),
+		&(ivariant->di->iz_spacing),
+		&(ivariant->di->ix_origin),
+		&(ivariant->di->iy_origin),
+		&(ivariant->di->iz_origin));
+	if (generate_slices)
+	{
+		read_geometry_from_image<T>(ivariant, image);
+	}
+	calculate_rgba_minmax_<T>(image, ivariant);
+	if (ivariant->equi)
+	{
+		ivariant->orientation_string = get_orientation<T>(
+			image, &ivariant->orientation);
+	}
+	else
+	{
+		ivariant->orientation = 0;
+		ivariant->orientation_string = QString("");
+	}
 	if (bad_direction)
 	{
 		ivariant->equi = false;
@@ -1835,7 +1867,6 @@ template<typename T> QString process_dicom_rgba_image2(
 				QString("");
 		}
 	}
-	return QString("");
 }
 
 template <typename Tin, typename Tout> QString apply_per_slice_rescale_(
@@ -3435,7 +3466,6 @@ QString CommonUtils::gen_itk_image(bool * ok,
 	bool resize_, unsigned int size_x, unsigned int size_y,
 	bool no_warn_rescale,
 	bool use_icc,
-	int max_3d_tex_size, GLWidget * gl, QProgressDialog * pb,
 	bool skip_ybr)
 {
 	*ok = false;
@@ -3539,8 +3569,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					origin_x, origin_y, origin_z,
 					spacing_x, spacing_y, spacing_z,
 					0,
-					&bad_direction,
-					pb);
+					&bad_direction);
 				if (data_size > 1)
 				{
 					delete [] p__;
@@ -3554,17 +3583,11 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					}
 				}
 				if (!error.isEmpty()) return error;
-				error = process_dicom_monochrome_image2<ImageTypeSS>(
-					ok,
+				process_dicom_monochrome_image2<ImageTypeSS>(
 					ivariant,
 					ivariant->pSS,
-					max_3d_tex_size,
 					geometry_from_image,
-					gl,
-					resize_,
-					size_x, size_y,
-					bad_direction,
-					pb);
+					bad_direction);
 			}
 			break;
 		case mdcm::PixelFormat::UINT12:
@@ -3627,8 +3650,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					origin_x, origin_y, origin_z,
 					spacing_x, spacing_y, spacing_z,
 					1,
-					&bad_direction,
-					pb);
+					&bad_direction);
 				if (data_size > 1)
 				{
 					delete [] p__;
@@ -3642,17 +3664,11 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					}
 				}
 				if (!error.isEmpty()) return error;
-				error = process_dicom_monochrome_image2<ImageTypeUS>(
-					ok,
+				process_dicom_monochrome_image2<ImageTypeUS>(
 					ivariant,
 					ivariant->pUS,
-					max_3d_tex_size,
 					geometry_from_image,
-					gl,
-					resize_,
-					size_x, size_y,
-					bad_direction,
-					pb);
+					bad_direction);
 			}
 			break;
 		case mdcm::PixelFormat::INT32:
@@ -3714,8 +3730,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					origin_x, origin_y, origin_z,
 					spacing_x, spacing_y, spacing_z,
 					2,
-					&bad_direction,
-					pb);
+					&bad_direction);
 				if (data_size > 1)
 				{
 					delete [] p__;
@@ -3729,17 +3744,11 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					}
 				}
 				if (!error.isEmpty()) return error;
-				error = process_dicom_monochrome_image2<ImageTypeSI>(
-					ok,
+				process_dicom_monochrome_image2<ImageTypeSI>(
 					ivariant,
 					ivariant->pSI,
-					max_3d_tex_size,
 					geometry_from_image,
-					gl,
-					resize_,
-					size_x, size_y,
-					bad_direction,
-					pb);
+					bad_direction);
 			}
 			break;
 		case mdcm::PixelFormat::UINT32:
@@ -3801,8 +3810,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					origin_x, origin_y, origin_z,
 					spacing_x, spacing_y, spacing_z,
 					3,
-					&bad_direction,
-					pb);
+					&bad_direction);
 				if (data_size > 1)
 				{
 					delete [] p__;
@@ -3816,17 +3824,11 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					}
 				}
 				if (!error.isEmpty()) return error;
-				error = process_dicom_monochrome_image2<ImageTypeUI>(
-					ok,
+				process_dicom_monochrome_image2<ImageTypeUI>(
 					ivariant,
 					ivariant->pUI,
-					max_3d_tex_size,
 					geometry_from_image,
-					gl,
-					resize_,
-					size_x, size_y,
-					bad_direction,
-					pb);
+					bad_direction);
 			}
 			break;
 		case mdcm::PixelFormat::INT64:
@@ -3888,8 +3890,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					origin_x, origin_y, origin_z,
 					spacing_x, spacing_y, spacing_z,
 					7,
-					&bad_direction,
-					pb);
+					&bad_direction);
 				if (data_size > 1)
 				{
 					delete [] p__;
@@ -3903,17 +3904,11 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					}
 				}
 				if (!error.isEmpty()) return error;
-				error = process_dicom_monochrome_image2<ImageTypeSLL>(
-					ok,
+				process_dicom_monochrome_image2<ImageTypeSLL>(
 					ivariant,
 					ivariant->pSLL,
-					max_3d_tex_size,
 					geometry_from_image,
-					gl,
-					resize_,
-					size_x, size_y,
-					bad_direction,
-					pb);
+					bad_direction);
 			}
 			break;
 		case mdcm::PixelFormat::UINT64:
@@ -3975,8 +3970,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					origin_x, origin_y, origin_z,
 					spacing_x, spacing_y, spacing_z,
 					8,
-					&bad_direction,
-					pb);
+					&bad_direction);
 				if (data_size > 1)
 				{
 					delete [] p__;
@@ -3990,17 +3984,11 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					}
 				}
 				if (!error.isEmpty()) return error;
-				error = process_dicom_monochrome_image2<ImageTypeULL>(
-					ok,
+				process_dicom_monochrome_image2<ImageTypeULL>(
 					ivariant,
 					ivariant->pULL,
-					max_3d_tex_size,
 					geometry_from_image,
-					gl,
-					resize_,
-					size_x, size_y,
-					bad_direction,
-					pb);
+					bad_direction);
 			}
 			break;
 		case mdcm::PixelFormat::INT8:
@@ -4065,8 +4053,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					origin_x, origin_y, origin_z,
 					spacing_x, spacing_y, spacing_z,
 					4,
-					&bad_direction,
-					pb);
+					&bad_direction);
 				if (data_size > 1)
 				{
 					delete [] p__;
@@ -4080,17 +4067,11 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					}
 				}
 				if (!error.isEmpty()) return error;
-				error = process_dicom_monochrome_image2<ImageTypeUC>(
-					ok,
+				process_dicom_monochrome_image2<ImageTypeUC>(
 					ivariant,
 					ivariant->pUC,
-					max_3d_tex_size,
 					geometry_from_image,
-					gl,
-					resize_,
-					size_x, size_y,
-					bad_direction,
-					pb);
+					bad_direction);
 			}
 			break;
  		case mdcm::PixelFormat::FLOAT32:
@@ -4152,8 +4133,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					origin_x, origin_y, origin_z,
 					spacing_x, spacing_y, spacing_z,
 					5,
-					&bad_direction,
-					pb);
+					&bad_direction);
 				if (data_size > 1)
 				{
 					delete [] p__;
@@ -4167,17 +4147,11 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					}
 				}
 				if (!error.isEmpty()) return error;
-				error = process_dicom_monochrome_image2<ImageTypeF>(
-					ok,
+				process_dicom_monochrome_image2<ImageTypeF>(
 					ivariant,
 					ivariant->pF,
-					max_3d_tex_size,
 					geometry_from_image,
-					gl,
-					resize_,
-					size_x, size_y,
-					bad_direction,
-					pb);
+					bad_direction);
 			}
 			break;
 		case mdcm::PixelFormat::FLOAT64:
@@ -4239,8 +4213,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					origin_x, origin_y, origin_z,
 					spacing_x, spacing_y, spacing_z,
 					6,
-					&bad_direction,
-					pb);
+					&bad_direction);
 				if (data_size > 1)
 				{
 					delete [] p__;
@@ -4254,17 +4227,11 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					}
 				}
 				if (!error.isEmpty()) return error;
-				error = process_dicom_monochrome_image2<ImageTypeD>(
-					ok,
+				process_dicom_monochrome_image2<ImageTypeD>(
 					ivariant,
 					ivariant->pD,
-					max_3d_tex_size,
 					geometry_from_image,
-					gl,
-					resize_,
-					size_x, size_y,
-					bad_direction,
-					pb);
+					bad_direction);
 			}
 			break;
 		default:
@@ -4349,8 +4316,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				ybr,
 				hsv,
 				bitsstored,
-				&bad_direction,
-				pb);
+				&bad_direction);
 			if (data_size > 1)
 			{
 				delete [] p__;
@@ -4364,13 +4330,11 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				}
 			}
 			if (!error.isEmpty()) return error;
-			error = process_dicom_rgb_image2<RGBImageTypeUC>(
-				ok,
+			process_dicom_rgb_image2<RGBImageTypeUC>(
 				ivariant,
 				ivariant->pUC_rgb,
 				geometry_from_image,
-				bad_direction,
-				pb);
+				bad_direction);
 		}
 		else if (
 			pixelformat == mdcm::PixelFormat::UINT16 ||
@@ -4440,8 +4404,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				ybr,
 				false,
 				bitsstored,
-				&bad_direction,
-				pb);
+				&bad_direction);
 			if (data_size > 1)
 			{
 				delete [] p__;
@@ -4455,13 +4418,11 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				}
 			}
 			if (!error.isEmpty()) return error;
-			error = process_dicom_rgb_image2<RGBImageTypeUS>(
-				ok,
+			process_dicom_rgb_image2<RGBImageTypeUS>(
 				ivariant,
 				ivariant->pUS_rgb,
 				geometry_from_image,
-				bad_direction,
-				pb);
+				bad_direction);
 		}
 		else if (
 			pixelformat == mdcm::PixelFormat::INT16 ||
@@ -4530,8 +4491,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				false,
 				false,
 				0,
-				&bad_direction,
-				pb);
+				&bad_direction);
 			if (data_size > 1)
 			{
 				delete [] p__;
@@ -4545,13 +4505,11 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				}
 			}
 			if (!error.isEmpty()) return error;
-			error = process_dicom_rgb_image2<RGBImageTypeSS>(
-				ok,
+			process_dicom_rgb_image2<RGBImageTypeSS>(
 				ivariant,
 				ivariant->pSS_rgb,
 				geometry_from_image,
-				bad_direction,
-				pb);
+				bad_direction);
 		}
 		else if (pixelformat == mdcm::PixelFormat::FLOAT32)
 		{
@@ -4618,8 +4576,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				false,
 				false,
 				0,
-				&bad_direction,
-				pb);
+				&bad_direction);
 			if (data_size > 1)
 			{
 				delete [] p__;
@@ -4633,13 +4590,11 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				}
 			}
 			if (!error.isEmpty()) return error;
-			error = process_dicom_rgb_image2<RGBImageTypeF>(
-				ok,
+			process_dicom_rgb_image2<RGBImageTypeF>(
 				ivariant,
 				ivariant->pF_rgb,
 				geometry_from_image,
-				bad_direction,
-				pb);
+				bad_direction);
 		}
 		else
 		{
@@ -4727,8 +4682,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				24,
 				cmyk,
 				argb,
-				&bad_direction,
-				pb);
+				&bad_direction);
 			if (data_size > 1)
 			{
 				delete [] p__;
@@ -4742,13 +4696,11 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				}
 			}
 			if (!error.isEmpty()) return error;
-			error = process_dicom_rgba_image2<RGBAImageTypeUC>(
-				ok,
+			process_dicom_rgba_image2<RGBAImageTypeUC>(
 				ivariant,
 				ivariant->pUC_rgba,
 				geometry_from_image,
-				bad_direction,
-				pb);
+				bad_direction);
 		}
 		else
 		{
@@ -4780,6 +4732,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 	{
 		ivariant->di->hide_orientation = false;
 	}
+	if (error.isEmpty()) *ok = true; // TODO remove "ok"
 	return error;
 }
 

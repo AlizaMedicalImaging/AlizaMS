@@ -153,6 +153,7 @@ void SettingsWidget::set_default()
 	srchapters_checkBox->setChecked(true);
 	srskipimage_checkBox->setChecked(false);
 	icc_checkBox->setChecked(true);
+	supplut_checkBox->setChecked(true);
 	jpegprec_checkBox->setChecked(false);
 	//
 	enh_dim_uniform_radioButton->setChecked(true);
@@ -250,6 +251,7 @@ void SettingsWidget::readSettings()
 	const int tmp12 = settings.value(QString("clean_unused"),    1).toInt();
 	const int tmp13 = settings.value(QString("hide_zoom"),       1).toInt();
 	const int tmp14 = settings.value(QString("force_cp1251"),    0).toInt();
+	const int tmp15 = settings.value(QString("apply_suppl"),     1).toInt();
 	settings.endGroup();
 	settings.beginGroup(QString("StyleDialog"));
 	saved_idx = settings.value(QString("saved_idx"), 0).toInt();
@@ -310,6 +312,7 @@ void SettingsWidget::readSettings()
 		enh_dim_skip_radioButton->setChecked(false); // not required
 	}
 	icc_checkBox->setChecked((tmp11 == 1));
+	supplut_checkBox->setChecked((tmp15 == 1));
 	clean_unused_checkBox->setChecked((tmp12 == 1));
 	//
 	const bool force_cp1251 = (tmp14 == 1);
@@ -335,6 +338,7 @@ void SettingsWidget::writeSettings(QSettings & s)
 	s.setValue(QString("dcm_overlays"),  QVariant(overlays_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("dcm_mosaic"),    QVariant(mosaic_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("apply_icc"),     QVariant(icc_checkBox->isChecked() ? 1 : 0));
+	s.setValue(QString("apply_suppl"),   QVariant(supplut_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("clean_unused"),  QVariant(clean_unused_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("force_cp1251"),  QVariant(cp1251_checkBox->isChecked() ? 1 : 0));
 	if (enh_dim_skip_radioButton->isChecked())
@@ -429,5 +433,10 @@ short SettingsWidget::get_enh_strategy() const
 		return static_cast<short>(EnhancedIODLoadingType::PreferUniformVolumes);
 	}
 	return 0; // unreachable
+}
+
+bool SettingsWidget::get_apply_supplemental_lut() const
+{
+	return supplut_checkBox->isChecked();
 }
 

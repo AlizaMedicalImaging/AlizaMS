@@ -785,6 +785,7 @@ set(ALIZAMS_SRCS ${ALIZAMS_SRCS}
   ${CMAKE_CURRENT_SOURCE_DIR}/dicom/splituihgridfilter.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/dicom/spectroscopyutils.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/dicom/srutils.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/dicom/loaddicom.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/CG/camera.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/CG/testgl.cpp
@@ -814,6 +815,7 @@ set(ALIZAMS_SRCS ${ALIZAMS_SRCS}
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/aboutwidget.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/zoomwidget.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/findrefdialog.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/infodialog.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/imageinfodialog.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/srwidget.cpp
   #${CMAKE_CURRENT_SOURCE_DIR}/GUI/tabledialog.cpp
@@ -846,7 +848,9 @@ set(ALIZAMS_MOC_HRDS
   ${CMAKE_CURRENT_SOURCE_DIR}/browser/browserwidget2.h
   ${CMAKE_CURRENT_SOURCE_DIR}/browser/helpwidget.h
   ${CMAKE_CURRENT_SOURCE_DIR}/browser/anonymazerwidget2.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/dicom/loaddicom.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/findrefdialog.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/infodialog.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/imageinfodialog.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/settingswidget.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/qxtspanslider_p.h
@@ -926,6 +930,7 @@ set(ALIZAMS_UIS
   ${CMAKE_CURRENT_SOURCE_DIR}/browser/helpwidget.ui
   ${CMAKE_CURRENT_SOURCE_DIR}/browser/anonymazerwidget2.ui
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/findrefdialog.ui
+  ${CMAKE_CURRENT_SOURCE_DIR}/GUI/infodialog.ui
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/imagesbox.ui
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/toolbox.ui
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/animwidget.ui

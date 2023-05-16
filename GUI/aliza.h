@@ -16,7 +16,6 @@
 #endif
 #endif
 #include "structures.h"
-#include <QThread>
 #include <vector>
 #include "toolbox.h"
 #include "imagesbox.h"
@@ -41,6 +40,7 @@
 #include <QTimer>
 #include <QTableWidgetItem>
 #include <QMutex>
+#include "dicomutils.h"
 
 class Aliza : public QObject
 {
@@ -124,7 +124,7 @@ public:
 	void set_uniq_string(const QString &);
 	void toggle_collisions(bool);
 	void update_slice_from_animation(const ImageVariant*);
-	QString load_dicom_file(int*, const QString&, QProgressDialog*, bool);
+	QString load_dicom_file(const QString&, QProgressDialog*);
 	void remove_from_studyview(int);
 
 public slots:
@@ -272,6 +272,14 @@ private:
 	void delete_group(const int);
 	void clear_contourstable();
 	void set_contourstable(const ImageVariant*);
+	QString process_dicom(
+		std::vector<ImageVariant*> &,
+		const QStringList &,
+		const QStringList &,
+		const QStringList &,
+		const QStringList &,
+		const QStringList &,
+		QProgressDialog*);
 };
 
 #endif

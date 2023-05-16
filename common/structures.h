@@ -505,6 +505,7 @@ class DisplayInterface
 public:
 	DisplayInterface(const int, const bool, bool, GLWidget*, int);
 	~DisplayInterface() {}
+	void set_glwidget(GLWidget*);
 	const int id;
 	const bool opengl_ok;
 	bool skip_texture;
