@@ -4602,7 +4602,8 @@ QString Aliza::process_dicom(
 	imagesbox->listWidget->blockSignals(true);
 	disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
 	disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
-	for (unsigned int x = 0; x < ivariants.size(); ++x)
+	const unsigned int ivariants_size = ivariants.size();
+	for (unsigned int x = 0; x < ivariants_size; ++x)
 	{
 		if (!ivariants.at(x))
 		{
@@ -4654,7 +4655,7 @@ QString Aliza::process_dicom(
 		{
 			ivariants[x]->di->set_glwidget(glwidget);
 		}
-		if (ivariants.size() - 1 == x) reload_3d(ivariants[x]);
+		if (ivariants_size - 1 == x) reload_3d(ivariants[x]);
 		else reload_3d(ivariants[x], false);
 		//
 		{
@@ -4687,7 +4688,7 @@ QString Aliza::process_dicom(
 				break;
 			}
 		}
-		if (x == ivariants.size() - 1 && r > -1)
+		if (x == ivariants_size - 1 && r > -1)
 		{
 			imagesbox->listWidget->setCurrentRow(r);
 			update_selection2();
