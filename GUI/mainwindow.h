@@ -140,11 +140,10 @@ private:
 	void createMenus();
 	void createToolBars();
 	void load_dicom_dir();
-	void desktop_layout(int*,int*);
+	void desktop_layout(int*, int*);
 	QString load_any_file(
 		const QString&,
-		QProgressDialog*,
-		bool/*lock*/);
+		QProgressDialog*);
 	void update_info_lines_bg();
 	//
 	mutable QMutex mutex;

@@ -44,7 +44,7 @@
             <x>0</x>
             <y>0</y>
             <width>973</width>
-            <height>622</height>
+            <height>648</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_14">
@@ -111,6 +111,22 @@
              </property>
              <property name="text">
               <string>Apply ICC color profile, if present</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="supplut_checkBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Apply Supplemental LUT, if present</string>
              </property>
              <property name="checked">
               <bool>true</bool>
@@ -561,8 +577,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>295</width>
-            <height>125</height>
+            <width>989</width>
+            <height>587</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -808,8 +824,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>419</width>
-            <height>203</height>
+            <width>989</width>
+            <height>587</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1109,6 +1125,7 @@
   <tabstop>overlays_checkBox</tabstop>
   <tabstop>mosaic_checkBox</tabstop>
   <tabstop>icc_checkBox</tabstop>
+  <tabstop>supplut_checkBox</tabstop>
   <tabstop>clean_unused_checkBox</tabstop>
   <tabstop>cp1251_checkBox</tabstop>
   <tabstop>srchapters_checkBox</tabstop>

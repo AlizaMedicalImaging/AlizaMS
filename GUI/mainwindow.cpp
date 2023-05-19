@@ -15,6 +15,7 @@
 #endif
 #include <QDateTime>
 #include "commonutils.h"
+#include "infodialog.h"
 
 #define DISABLE_LEFT_TOOLBAR__
 
@@ -592,7 +593,7 @@ void MainWindow::open_args(const QStringList & l)
 		}
 		else if (fi.isFile())
 		{
-			message = load_any_file(f, pb, true);
+			message = load_any_file(f, pb);
 		}
 	}
 	else if (l2.size() > 1)
@@ -603,7 +604,7 @@ void MainWindow::open_args(const QStringList & l)
 			QFileInfo fi(f);
 			if (fi.isFile())
 			{
-				message = load_any_file(l2.at(x), pb, true);
+				message = load_any_file(l2.at(x), pb);
 			}
 		}
 	}
@@ -1367,7 +1368,7 @@ void MainWindow::dropEvent(QDropEvent * e)
 			{
 				if (i == 0 && fi.isFile())
 				{
-					message = load_any_file(f, pb, true);
+					message = load_any_file(f, pb);
 				}
 				else
 				{
@@ -1375,7 +1376,7 @@ void MainWindow::dropEvent(QDropEvent * e)
 					QFileInfo fi1(f1);
 					if (fi1.isFile())
 					{
-						message = load_any_file(f1, pb, true);
+						message = load_any_file(f1, pb);
 					}
 				}
 			}
@@ -1445,7 +1446,7 @@ void MainWindow::load_any()
 		}
 		else
 		{
-			message = load_any_file(l.at(x), pb, true);
+			message = load_any_file(l.at(x), pb);
 		}
 	}
 	l.clear();
@@ -1612,23 +1613,21 @@ void MainWindow::load_dicom_series2()
 	delete pb;
 	if (!message.isEmpty())
 	{
-		QMessageBox mbox;
-		mbox.addButton(QMessageBox::Close);
-		mbox.setIcon(QMessageBox::Information);
-		mbox.setText(message);
-		mbox.exec();
+		InfoDialog * info = new InfoDialog();
+		info->set_text(message);
+		info->exec();
+		delete info;
 	}
+	qApp->processEvents();
 	mutex.unlock();
 }
 
 QString MainWindow::load_any_file(
 	const QString & f,
-	QProgressDialog * pb,
-	bool lock)
+	QProgressDialog * pb)
 {
-	int image_id = -1;
 	set_ui();
-	const QString message = aliza->load_dicom_file(&image_id, f, pb, lock);
+	const QString message = aliza->load_dicom_file(f, pb);
 	return message;
 }
 

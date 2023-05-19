@@ -8,7 +8,6 @@ class PrRefSeries;
 class ImageVariant;
 class PrConfig;
 class SettingsWidget;
-class GLWidget;
 
 class PrConfigUtils
 {
@@ -36,7 +35,6 @@ public:
 		const ImageVariant*,
 		const PrRefSeries &,
 		const SettingsWidget*,
-		GLWidget*,
 		bool,
 		bool*);
 	static ImageVariant * make_pr_rgb(

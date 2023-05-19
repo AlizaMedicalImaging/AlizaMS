@@ -3188,7 +3188,6 @@ void PrConfigUtils::read_pr(
 	}
 	std::cout << "-------" << std::endl;
 #endif
-	QApplication::processEvents();
 }
 
 //#define PRINT_MAKE_PR_MONOCHROME
@@ -3196,7 +3195,6 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 	const ImageVariant * ivariant,
 	const PrRefSeries & ref,
 	const SettingsWidget * w,
-	GLWidget * gl,
 	bool ok3d,
 	bool * spatial_transform)
 {
@@ -3226,7 +3224,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		CommonUtils::get_next_id(),
 		ok3d,
 		!w->get_3d(),
-		gl,
+		nullptr,
 		0);
 	v->di->filtering = w->get_filtering();
 	//

@@ -22,7 +22,6 @@
 #include "codecutils.h"
 #include "contourutils.h"
 #include "prconfigutils.h"
-#include "srutils.h"
 #include "ultrasoundregiondata.h"
 #include "ultrasoundregionutils.h"
 #include "spectroscopydata.h"
@@ -78,7 +77,6 @@
 #include "iconutils.h"
 #include "updateqtcommand.h"
 #include "findrefdialog.h"
-#include "srwidget.h"
 #include <iostream>
 #include <vector>
 #include <map>
@@ -1735,7 +1733,7 @@ template <typename T> QString supp_palette_grey_to_rgbUS_(
 	if (image.IsNull()) return QString("Image is null");
 	if (out_image.IsNull()) return QString("Out image is null");
 	if (!(red_subscript > INT_MIN))
-		return QString("Internal error,\nSubscript <= INT_MIN");
+		return QString("Internal error, Subscript <= INT_MIN");
 	try
 	{
 		out_image->SetRegions(
@@ -1822,7 +1820,7 @@ template <typename T> QString supp_palette_grey_to_rgbUC_(
 	if (image.IsNull()) return QString("Image is null");
 	if (out_image.IsNull()) return QString("Out image is null");
 	if (!(red_subscript > INT_MIN))
-		return QString("Internal error,\nSubscript <= INT_MIN");
+		return QString("Internal error, Subscript <= INT_MIN");
 	try
 	{
 		out_image->SetRegions(
@@ -1843,8 +1841,6 @@ template <typename T> QString supp_palette_grey_to_rgbUC_(
 	{
 		return QString(ex.GetDescription());
 	}
-	//
-	QApplication::processEvents();
 	//
 	unsigned long long tmp37 = 0;
 	const double wmin  = v->di->us_window_center - v->di->us_window_width * 0.5;
@@ -1991,23 +1987,16 @@ unsigned int process_gsps(
 	const QStringList & grey_softcopy_pr_files,
 	const QString & p,
 	const QWidget * settings,
-	const bool ok3d,  const int max_3d_tex_size, GLWidget * gl, ShaderObj * mesh_shader,
+	const bool ok3d,
 	std::vector<ImageVariant*> & ivariants,
-	QString & message_,
-	QProgressDialog * pb)
+	QString & message_)
 {
 	unsigned int count = 0;
 	const SettingsWidget * wsettings = static_cast<const SettingsWidget *>(settings);
 	for (int x = 0; x < grey_softcopy_pr_files.size(); ++x)
 	{
-		if (pb)
-		{
-			pb->setLabelText(QString("Loading ... "));
-		}
-		QApplication::processEvents();
 		QList<PrRefSeries> refs;
-		DicomUtils::read_pr_ref(p, grey_softcopy_pr_files.at(x), refs, pb);
-		QApplication::processEvents();
+		DicomUtils::read_pr_ref(p, grey_softcopy_pr_files.at(x), refs);
 		for (int y = 0; y < refs.size(); ++y)
 		{
 			QStringList ref_files;
@@ -2018,16 +2007,18 @@ unsigned int process_gsps(
 			if (ref_files.size() < 1) continue;
 			ref_files.sort();
 			std::vector<ImageVariant*> ref_ivariants;
+			QStringList dummy;
 			const QString message_pr_ref =
 				DicomUtils::read_dicom(
 					ref_ivariants,
+					dummy,
+					dummy,
+					dummy,
+					dummy,
+					dummy,
 					ref_files,
-					0,
-					nullptr,
-					nullptr,
 					false,
 					settings,
-					pb,
 					1,
 					true);
 			for (unsigned int z = 0; z < ref_ivariants.size(); ++z)
@@ -2045,7 +2036,6 @@ unsigned int process_gsps(
 						ref_ivariants.at(z),
 						refs.at(y),
 						wsettings,
-						gl,
 						ok3d,
 						&spatial_transform);
 				if (pr_image)
@@ -2088,8 +2078,8 @@ unsigned int process_gsps(
 					pr_load_ok = CommonUtils::reload_monochrome(
 						pr_image,
 						ok3d,
-						gl,
-						max_3d_tex_size,
+						nullptr,
+						0,
 						wsettings->get_resize(),
 						wsettings->get_size_x(),
 						wsettings->get_size_y());
@@ -3388,8 +3378,7 @@ void DicomUtils::read_us_regions(
 
 bool DicomUtils::read_slices(
 	const QStringList & filenames_, ImageVariant * ivariant,
-	const bool ok3d, const bool skip_texture, GLWidget * gl,
-	QProgressDialog * pb,
+	const bool ok3d, const bool skip_texture,
 	float tolerance)
 {
 	if (!ivariant) return false;
@@ -3410,15 +3399,6 @@ bool DicomUtils::read_slices(
 		up_dir_z;
 	float center_x, center_y, center_z;
 	double dircos[9]{};
-	if (pb)
-	{
-		const QString info_ = QString(
-			"Loading geometry from ") +
-			QVariant(size_z).toString()+
-			QString(" files");
-		pb->setLabelText(info_);
-	}
-	QApplication::processEvents();
 	for (unsigned int i = 0; i < size_z; ++i)
 	{
 		QString
@@ -3506,23 +3486,19 @@ bool DicomUtils::read_slices(
 		if (i == size_z - 1) std::cout << std::endl;
 #endif
 	}
-	QApplication::processEvents();
 	if (failed) goto quit_;
 	ok = generate_geometry(
 			ivariant->di->image_slices,
-			ivariant->di->spectroscopy_slices,
 			values,
 			rows, columns,
 			spacing_x, spacing_y, &spacing_z,
-			ok3d, gl,
 			&ivariant->equi, &ivariant->one_direction,
 			&origin_x, &origin_y, &origin_z,
 			dircos,
 			&slices_dir_x, &slices_dir_y, &slices_dir_z,
 			&up_dir_x, &up_dir_y, &up_dir_z,
 			&center_x, &center_y, &center_z,
-			tolerance,
-			false);
+			tolerance);
 	if (ok)
 	{
 		ivariant->di->slices_direction_x = slices_dir_x;
@@ -3577,8 +3553,7 @@ quit_:
 
 bool DicomUtils::read_slices_uihgrid(
 	const mdcm::DataSet & ds, ImageVariant * ivariant,
-	const bool ok3d, const bool skip_texture, GLWidget * gl,
-	QProgressDialog * pb,
+	const bool ok3d, const bool skip_texture,
 	float tolerance)
 {
 	if (!ivariant) return false;
@@ -3608,8 +3583,7 @@ bool DicomUtils::read_slices_uihgrid(
 	//
 	const mdcm::Tag tImageOrientationPatient(0x0020,0x0037);
 	std::vector<double> pat_orient;
-	if (get_ds_values(
-			ds, tImageOrientationPatient, pat_orient))
+	if (get_ds_values(ds, tImageOrientationPatient, pat_orient))
 	{
 		if (pat_orient.size() != 6) return false;
 	}
@@ -3689,8 +3663,8 @@ bool DicomUtils::read_slices_uihgrid(
 	unsigned short image_columns;
 	if (!get_us_value(ds, tColumns, &image_columns)) return false;
 	const unsigned int xx = (image_columns >= image_rows)
-		? image_columns/ceil(sqrt(num_slices))
-		: image_rows/ceil(sqrt(num_slices));
+		? image_columns / ceil(sqrt(num_slices))
+		: image_rows / ceil(sqrt(num_slices));
 	unsigned short rows = xx;
 	unsigned short columns = xx;
 	//
@@ -3704,8 +3678,7 @@ bool DicomUtils::read_slices_uihgrid(
 		const mdcm::DataSet & nds = item.GetNestedDataSet();
 		const mdcm::Tag tImagePositionPatient(0x0020,0x0032);
 		std::vector<double> pat_pos;
-		if (DicomUtils::get_ds_values(
-				nds, tImagePositionPatient, pat_pos))
+		if (DicomUtils::get_ds_values(nds, tImagePositionPatient, pat_pos))
 		{
 			if (pat_pos.size() != 3) return false;
 		}
@@ -3738,8 +3711,7 @@ bool DicomUtils::read_slices_uihgrid(
 		{
 			QString AcquisitionDate;
 			QString AcquisitionTime;
-			if (
-				DicomUtils::get_string_value(
+			if (DicomUtils::get_string_value(
 					nds,
 					tAcquisitionDate,
 					AcquisitionDate) &&
@@ -3786,19 +3758,16 @@ bool DicomUtils::read_slices_uihgrid(
 	double dircos[9]{};
 	const bool ok = generate_geometry(
 			ivariant->di->image_slices,
-			ivariant->di->spectroscopy_slices,
 			values,
 			rows, columns,
 			spacing_x, spacing_y, &spacing_z,
-			ok3d, gl,
 			&ivariant->equi, &ivariant->one_direction,
 			&origin_x, &origin_y, &origin_z,
 			dircos,
 			&slices_dir_x, &slices_dir_y, &slices_dir_z,
 			&up_dir_x, &up_dir_y, &up_dir_z,
 			&center_x, &center_y, &center_z,
-			tolerance,
-			false);
+			tolerance);
 	if (ok)
 	{
 		ivariant->di->slices_direction_x = slices_dir_x;
@@ -3846,8 +3815,7 @@ bool DicomUtils::read_slices_uihgrid(
 
 bool DicomUtils::read_slices_rtdose(
 	const QString & filename_, ImageVariant * ivariant,
-	const bool ok3d, const bool skip_texture, GLWidget * gl,
-	QProgressDialog * pb,
+	const bool ok3d, const bool skip_texture,
 	float tolerance)
 {
 	if (!ivariant) return false;
@@ -3892,14 +3860,11 @@ bool DicomUtils::read_slices_rtdose(
 		p[8] = pat_orient[5];
 		values.push_back(p);
 	}
-	QApplication::processEvents();
 	ok = generate_geometry(
 			ivariant->di->image_slices,
-			ivariant->di->spectroscopy_slices,
 			values,
 			rows, columns,
 			spacing_x, spacing_y, &spacing_z,
-			ok3d, gl,
 			&ivariant->equi,
 			&ivariant->one_direction,
 			&origin_x, &origin_y, &origin_z,
@@ -3907,8 +3872,7 @@ bool DicomUtils::read_slices_rtdose(
 			&slices_dir_x, &slices_dir_y, &slices_dir_z,
 			&up_dir_x, &up_dir_y, &up_dir_z,
 			&center_x, &center_y, &center_z,
-			tolerance,
-			false);
+			tolerance);
 	if (ok)
 	{
 		ivariant->di->slices_direction_x = slices_dir_x;
@@ -5299,11 +5263,9 @@ bool DicomUtils::get_pixel_spacing(
 
 bool DicomUtils::generate_geometry(
 		std::vector<ImageSlice*> & cubeslices,
-		std::vector<SpectroscopySlice*> & spectorscopyslices,
 		const std::vector<double*> & values,
 		const unsigned int rows_, const unsigned int columns_,
 		const double spacing_x, const double spacing_y, double * spacing_z,
-		const bool ok3d, GLWidget * gl,
 		bool * equi_,
 		bool * one_direction_,
 		double * origin_x,  double * origin_y,  double * origin_z,
@@ -5311,8 +5273,7 @@ bool DicomUtils::generate_geometry(
 		float * slices_dir_x, float * slices_dir_y, float * slices_dir_z,
 		float * up_dir_x, float * up_dir_y, float * up_dir_z,
 		float * center_x, float * center_y, float * center_z,
-		float tolerance,
-		const bool spectroscopy)
+		float tolerance)
 {
 	const unsigned int size_ = values.size();
 	if (size_ < 1) return false;
@@ -5397,24 +5358,12 @@ bool DicomUtils::generate_geometry(
 			last = sVector3(x0, y0, z0);
 			v1 = (p0.getXYZ()+p3.getXYZ()) * 0.5f;
 		}
-		if (spectroscopy)
-		{
-			CommonUtils::generate_spectroscopyslice(
-				spectorscopyslices,
-				orientation_string,
-				ok3d, gl,
-				x0, y0, z0, x1, y1, z1, x2, y2, z2, x3, y3, z3,
-				columns_, rows_);
-		}
-		else
-		{
-			CommonUtils::generate_cubeslice(
-				cubeslices,
-				orientation_string,
-				size_, i,
-				x0, y0, z0, x1, y1, z1, x2, y2, z2, x3, y3, z3,
-				ipp_iop);
-		}
+		CommonUtils::generate_cubeslice(
+			cubeslices,
+			orientation_string,
+			size_, i,
+			x0, y0, z0, x1, y1, z1, x2, y2, z2, x3, y3, z3,
+			ipp_iop);
 		const float length0 = Vectormath::Scalar::length(p0.getXYZ()-tmp_p0);
 		const float length1 = Vectormath::Scalar::length(p1.getXYZ()-tmp_p1);
 		const float length2 = Vectormath::Scalar::length(p2.getXYZ()-tmp_p2);
@@ -5499,8 +5448,7 @@ bool DicomUtils::generate_geometry(
 			*slices_dir_x = direction0.getX();
 			*slices_dir_y = direction0.getY();
 			*slices_dir_z = direction0.getZ();
-			if (
-				tmp1 &&
+			if (tmp1 &&
 				((tmp2 && (size_ > 2)) || size_ == 2) &&
 				!(
 				(direction0.getX() < direction1.getX() + 0.001f && direction0.getX() > direction1.getX() - 0.001f) &&
@@ -7056,10 +7004,10 @@ QString DicomUtils::read_enhanced(
 	bool * ok,
 	const QString & f,
 	std::vector<ImageVariant*> & ivariants,
-	int max_3d_tex_size, GLWidget * gl, bool ok3d,
+	bool ok3d,
 	const bool min_load,
 	const short enh_loading_type,
-	const QWidget * settings, QProgressDialog * pb,
+	const QWidget * settings,
 	const float tolerance,
 	const bool apply_rescale)
 {
@@ -7114,7 +7062,6 @@ QString DicomUtils::read_enhanced(
 		{
 			return QString("ds.IsEmpty()");
 		}
-		QApplication::processEvents();
 		const mdcm::Tag tRows(0x0028,0x0010);
 		const mdcm::Tag tColumns(0x0028,0x0011);
 		rows_ok = get_us_value(ds, tRows, &rows_);
@@ -7151,7 +7098,7 @@ QString DicomUtils::read_enhanced(
 		if (!ok_f && !ok_g)
 		{
 			return QString(
-				"Functional groups not found,\n"
+				"Functional groups not found, "
 				"probably broken DICOM file.");
 		}
 #ifdef ENHANCED_PRINT_INFO
@@ -7170,7 +7117,6 @@ QString DicomUtils::read_enhanced(
 		enhanced_check_rescale(ds, values);
 	}
 	//
-	QApplication::processEvents();
 	double dircos_read[6]{};
 	unsigned int dimx_read, dimy_read, dimz_read;
 	double origin_x_read,  origin_y_read,  origin_z_read;
@@ -7200,8 +7146,7 @@ QString DicomUtils::read_enhanced(
 			fix_jpeg_prec,
 			nullptr,
 			nullptr,
-			use_icc, &icc_ok,
-			pb);
+			use_icc, &icc_ok);
 	if (*ok == false) return message_;
 	if (rows_ok && cols_ok &&
 		(dimx_read != columns_ || dimy_read != rows_))
@@ -7224,7 +7169,6 @@ QString DicomUtils::read_enhanced(
 		data.clear();
 		return QString("Mismatch in data size and number of frames");
 	}
-	QApplication::processEvents();
 	//
 	//
 	//
@@ -7323,7 +7267,7 @@ QString DicomUtils::read_enhanced(
 		rows_, columns_, pixelformat, pi,
 		dim8th, dim7th, dim6th, dim5th, dim4th, dim3rd,
 		idx_values, values,
-		ok3d, max_3d_tex_size, gl,
+		ok3d,
 		min_load,
 		settings,
 		dircos_read,
@@ -7333,7 +7277,6 @@ QString DicomUtils::read_enhanced(
 		unsused0, unsused1,
 		apply_rescale,
 		(use_icc && icc_ok),
-		pb,
 		tolerance,
 		enh_loading_type);
 #ifdef ENHANCED_PRINT_INFO
@@ -7360,7 +7303,7 @@ QString DicomUtils::read_enhanced(
 			rows_, columns_, pixelformat, pi,
 			-1, -1, -1, -1, -1, -1,
 			idx_values, values,
-			ok3d, max_3d_tex_size, gl,
+			ok3d,
 			min_load,
 			settings,
 			dircos_read,
@@ -7370,7 +7313,6 @@ QString DicomUtils::read_enhanced(
 			unsused0, unsused1,
 			apply_rescale,
 			(use_icc && icc_ok),
-			pb,
 			tolerance,
 			0);
 	}
@@ -7387,10 +7329,10 @@ QString DicomUtils::read_enhanced_supp_palette(
 	bool * ok,
 	const QString & f,
 	std::vector<ImageVariant*> & ivariants,
-	int max_3d_tex_size, GLWidget * gl, bool ok3d,
+	bool ok3d,
 	const bool min_load,
 	const short enh_loading_type,
-	const QWidget * settings, QProgressDialog * pb,
+	const QWidget * settings,
 	const float tolerance)
 {
 #ifdef ENHANCED_PRINT_INFO
@@ -7448,7 +7390,6 @@ QString DicomUtils::read_enhanced_supp_palette(
 		{
 			return QString("No Supplemental LUT");
 		}
-		QApplication::processEvents();
 		const mdcm::Tag tRows(0x0028,0x0010);
 		const mdcm::Tag tColumns(0x0028,0x0011);
 		rows_ok = get_us_value(ds, tRows, &rows_);
@@ -7497,7 +7438,6 @@ QString DicomUtils::read_enhanced_supp_palette(
 #endif
 	enhanced_process_values(values, shared_values);
 	//
-	QApplication::processEvents();
 	double dircos_read[6]{};
 	unsigned int dimx_read = 0, dimy_read = 0, dimz_read = 0;
 	double origin_x_read = 0, origin_y_read = 0, origin_z_read = 0;
@@ -7530,8 +7470,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 			fix_jpeg_prec,
 			&red_subscript,
 			nullptr,
-			false, &icc_ok_dummy,
-			pb);
+			false, &icc_ok_dummy);
 #if 0
 	std::cout << "subscript = " << red_subscript << std::endl;
 #endif
@@ -7557,7 +7496,6 @@ QString DicomUtils::read_enhanced_supp_palette(
 		data.clear();
 		return QString("Mismatch in data size and number of frames");
 	}
-	QApplication::processEvents();
 	//
 	//
 	//
@@ -7656,7 +7594,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 		rows_, columns_, pixelformat, pi,
 		dim8th, dim7th, dim6th, dim5th, dim4th, dim3rd,
 		idx_values, values,
-		ok3d, max_3d_tex_size, gl,
+		ok3d,
 		min_load,
 		settings,
 		dircos_read,
@@ -7666,7 +7604,6 @@ QString DicomUtils::read_enhanced_supp_palette(
 		unsused0, unsused1,
 		false,
 		false,
-		pb,
 		tolerance,
 		enh_loading_type);
 #ifdef ENHANCED_PRINT_INFO
@@ -7697,7 +7634,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 			rows_, columns_, pixelformat, pi,
 			-1, -1, -1, -1, -1, -1,
 			idx_values, values,
-			ok3d, max_3d_tex_size, gl,
+			ok3d,
 			min_load,
 			settings,
 			dircos_read,
@@ -7707,7 +7644,6 @@ QString DicomUtils::read_enhanced_supp_palette(
 			unsused0, unsused1,
 			false,
 			false,
-			pb,
 			tolerance,
 			0);
 	}
@@ -7723,7 +7659,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 QString DicomUtils::read_ultrasound(
 	bool * ok, const short load_type, ImageVariant * ivariant,
 	const QStringList & images_ipp,
-	const QWidget * settings, QProgressDialog * pb)
+	const QWidget * settings)
 {
 	if (!ok) return QString("read_ultrasound : error (1)");
 	*ok = false;
@@ -7920,8 +7856,7 @@ QString DicomUtils::read_ultrasound(
 		fix_jpeg_prec,
 		nullptr,
 		nullptr,
-		use_icc, &icc_ok,
-		pb);
+		use_icc, &icc_ok);
 	if (*ok == false) return buff_error;
 	//
 	if (!overwrite_mdcm_spacing)
@@ -7961,8 +7896,6 @@ QString DicomUtils::read_ultrasound(
 	direction[1][2] = nrm_dircos_y;
 	direction[2][2] = nrm_dircos_z;
 	//
-	QApplication::processEvents();
-	//
 	QString error = CommonUtils::gen_itk_image(ok,
 		data, true,
 		pixelformat, pi,
@@ -7980,7 +7913,6 @@ QString DicomUtils::read_ultrasound(
 		wsettings->get_size_x(), wsettings->get_size_y(),
 		wsettings->get_rescale(),
 		(use_icc && icc_ok),
-		0, nullptr, pb,
 		false);
 	for (unsigned int x = 0; x < data.size(); ++x)
 	{
@@ -8009,8 +7941,8 @@ QString DicomUtils::read_ultrasound(
 QString DicomUtils::read_nuclear(
 	bool * ok, const short load_type, ImageVariant * ivariant,
 	const QStringList & images_ipp,
-	int /* max_3d_tex_size */, GLWidget * /* gl */, bool /* ok3d */,
-	const QWidget * settings, QProgressDialog * pb)
+	bool /* ok3d */,
+	const QWidget * settings)
 {
 // TODO for image type RECON TOMO volume might be possible
 	if (!ok) return QString("read_nuclear : error (1)");
@@ -8121,8 +8053,7 @@ QString DicomUtils::read_nuclear(
 		fix_jpeg_prec,
 		nullptr,
 		nullptr,
-		use_icc, &icc_ok,
-		pb);
+		use_icc, &icc_ok);
 	if (*ok == false) return buff_error;
 #if 0
 	std::cout << "Origin: "  << origin_x_  << " " << origin_y_  << " " << origin_z_ << std::endl;
@@ -8179,8 +8110,6 @@ are stacked in front of the first slice. See Image Orientation
 	std::cout << "           " << direction[0][2] << " " << direction[1][2] << " " << direction[2][2] << std::endl;
 #endif
 	//
-	QApplication::processEvents();
-	//
 	QString error = CommonUtils::gen_itk_image(ok,
 		data, true,
 		pixelformat, pi,
@@ -8198,7 +8127,6 @@ are stacked in front of the first slice. See Image Orientation
 		wsettings->get_size_x(), wsettings->get_size_y(),
 		wsettings->get_rescale(),
 		(use_icc && icc_ok),
-		0, nullptr, pb,
 		false);
 	for (unsigned int x = 0; x < data.size(); ++x)
 	{
@@ -8227,8 +8155,8 @@ QString DicomUtils::read_series(
 	const bool elscint,
 	ImageVariant * ivariant,
 	const QStringList & images_ipp,
-	int max_3d_tex_size, GLWidget * gl, bool ok3d,
-	const QWidget * settings, QProgressDialog * pb,
+	bool ok3d,
+	const QWidget * settings,
 	float tolerance,
 	bool apply_rescale)
 {
@@ -8336,8 +8264,6 @@ QString DicomUtils::read_series(
 							ivariant,
 							ok3d,
 							ivariant->di->skip_texture,
-							gl,
-							pb,
 							tolerance);
 						if (slices_ok) ivariant->iod_supported = true;
 						else geometry_from_image = true;
@@ -8356,8 +8282,6 @@ QString DicomUtils::read_series(
 								ivariant,
 								ok3d,
 								ivariant->di->skip_texture,
-								gl,
-								pb,
 								tolerance);
 							if (slices_ok) ivariant->iod_supported = true;
 							else geometry_from_image = true;
@@ -8373,8 +8297,6 @@ QString DicomUtils::read_series(
 								ivariant,
 								ok3d,
 								ivariant->di->skip_texture,
-								gl,
-								pb,
 								0.01f);
 							if (slices_ok)
 							{
@@ -8396,8 +8318,6 @@ QString DicomUtils::read_series(
 								ivariant,
 								ok3d,
 								ivariant->di->skip_texture,
-								gl,
-								pb,
 								tolerance);
 							if (!slices_ok)
 							{
@@ -8514,8 +8434,7 @@ QString DicomUtils::read_series(
 				fix_jpeg_prec,
 				nullptr,
 				&buffers_size,
-				use_icc, &icc_ok,
-				pb);
+				use_icc, &icc_ok);
 			if (dimz_ > 1)
 			{
 				*ok = false;
@@ -8540,6 +8459,7 @@ QString DicomUtils::read_series(
 			}
 			data.push_back(&data_[0][0]);
 			count_buffers_size += buffers_size;
+/*
 #ifdef WARN_RAM_SIZE
 			if (!skip_ram_warning && total_ram > 0.0)
 			{
@@ -8582,6 +8502,7 @@ QString DicomUtils::read_series(
 				}
 			}
 #endif
+*/
 		}
 		else if (images_ipp.size() == 1)
 		{
@@ -8609,8 +8530,7 @@ QString DicomUtils::read_series(
 				fix_jpeg_prec,
 				nullptr,
 				nullptr,
-				use_icc, &icc_ok,
-				pb);
+				use_icc, &icc_ok);
 		}
 		if (*ok == false)
 		{
@@ -8871,7 +8791,7 @@ QString DicomUtils::read_series(
 				}
 				data.clear();
 				return QString(
-					"Files in series seem to have different\n"
+					"Files in series seem to have different "
 					"pixel format. Try to load separately.");
 			}
 		}
@@ -8888,7 +8808,6 @@ QString DicomUtils::read_series(
 		data.clear();
 		return QString("Mismatch data size and number of slices");
 	}
-	QApplication::processEvents();
 	//
 	{
 		const size_t levels_size = levels_.size();
@@ -8949,7 +8868,6 @@ QString DicomUtils::read_series(
 		wsettings->get_size_x(), wsettings->get_size_y(),
 		no_warn_rescale,
 		(use_icc && icc_ok),
-		max_3d_tex_size, gl, pb,
 		false);
 	for (unsigned int x = 0; x < data.size(); ++x)
 	{
@@ -9369,8 +9287,7 @@ QString DicomUtils::read_buffer(
 	const bool fix_jpeg_prec,
 	int * red_subscript,
 	unsigned long long * buffers_size,
-	const bool use_icc, bool * has_icc,
-	QProgressDialog * pb)
+	const bool use_icc, bool * has_icc)
 {
 	*ok = false;
 	mdcm::ImageHelper::SetForceRescaleInterceptSlope(true);
@@ -9460,6 +9377,7 @@ QString DicomUtils::read_buffer(
 		mdcm::Image & image = image_reader.GetImage();
 		{
 			const unsigned long long buffer_size_tmp = image.GetBufferLength();
+/*
 #ifdef WARN_RAM_SIZE
 			const double total_ram = CommonUtils::get_total_memory_saved();
 			if (total_ram > 0.0)
@@ -9493,6 +9411,7 @@ QString DicomUtils::read_buffer(
 				}
 			}
 #endif
+*/
 			if (buffer_size_tmp > 0xffffffff)
 			{
 // https://groups.google.com/g/comp.protocols.dicom/c/-tO2v2aH010/m/PNGwaLpBkBsJ
@@ -9512,7 +9431,7 @@ QString DicomUtils::read_buffer(
 				if (skip)
 				{
 					if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
-					return (QString("GetBufferLength() is\n") +
+					return (QString("GetBufferLength() is ") +
 						QVariant(buffer_size_tmp).toString());
 				}
 			}
@@ -9699,8 +9618,6 @@ QString DicomUtils::read_buffer(
 			}
 		}
 		//
-		qApp->processEvents();
-		//
 		{
 			// Modality LUT
 			const mdcm::File & ifile = image_reader.GetFile();
@@ -9785,7 +9702,7 @@ QString DicomUtils::read_buffer(
 				delete [] icc_profile;
 				if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 				return QString(
-					"Error (subscript is null),\n"
+					"Error (subscript is null), "
 					"can not apply Supplemental LUT");
 			}
 			mdcm::ApplySupplementalLUT slut;
@@ -9871,7 +9788,7 @@ QString DicomUtils::read_buffer(
 					delete [] icc_profile;
 					if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 					return QString(
-						"Bits allocated < 8 and rescale,\n"
+						"Bits allocated < 8 and rescale, "
 						"not supported.");
 				}
 				if (supp_palette_color)
@@ -9966,7 +9883,7 @@ QString DicomUtils::read_buffer(
 				// Modality LUT
 				if (has_modality_lut)
 				{
-#if 1
+#if 0
 					std::cout << "Modality LUT sequence" << std::endl;
 #endif
 					const unsigned short pf_ba = image_pixelformat.GetBitsAllocated();
@@ -10201,9 +10118,9 @@ QString DicomUtils::read_buffer(
 			const QString tmp_s0 =
 				QString("Bits allocated = ") +
 				QVariant(static_cast<int>(pixelformat.GetBitsAllocated())).toString() +
-				QString(",\n samples per pixel = ") +
+				QString(", samples per pixel = ") +
 				QVariant(static_cast<int>(samples_per_pix)).toString() +
-				QString(",\nnot supported.");
+				QString(", not supported.");
 			delete [] not_rescaled_buffer;
 			delete [] icc_profile;
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
@@ -10286,9 +10203,9 @@ QString DicomUtils::read_buffer(
 			if (image_buffer_length != dimx * dimy * dimz * type_size * samples_per_pix)
 			{
 				const QString tmp_s0 =
-					QString("Buffer size wrong\n") +
+					QString("Buffer size wrong ") +
 					QVariant(image_buffer_length).toString() +
-					QString("\nbut must be\n") +
+					QString(" but must be ") +
 					QVariant(dimx * dimy * dimz * type_size * samples_per_pix).toString();
 				delete [] not_rescaled_buffer;
 				delete [] rescaled_buffer;
@@ -10442,8 +10359,6 @@ QString DicomUtils::read_buffer(
 		}
 	}
 	//
-	qApp->processEvents();
-	//
 	const size_t xy = buffer_size / dimz;
 	for (unsigned long long j = 0; j < dimz; ++j)
 	{
@@ -10503,8 +10418,6 @@ QString DicomUtils::read_enhanced_common(
 	const DimIndexValues & idx_values,
 	const FrameGroupValues & values,
 	const bool ok3d,
-	const int max_3d_tex_size,
-	GLWidget * gl,
 	const bool min_load,
 	const QWidget * settings,
 	double * dircos_read,
@@ -10519,7 +10432,6 @@ QString DicomUtils::read_enhanced_common(
 	const double scale_tmp,
 	const bool apply_rescale,
 	const bool use_icc,
-	QProgressDialog * pb,
 	const float tolerance)
 {
 #if 0
@@ -10753,7 +10665,7 @@ QString DicomUtils::read_enhanced_common(
 			float  up_dir_x, up_dir_y, up_dir_z;
 			float  center_x, center_y, center_z;
 			std::vector<ImageSlice*> slices;
-			const bool enable_gl = min_load ? false : (ok3d && gl && max_3d_tex_size > 0);
+			const bool enable_gl = min_load ? false : ok3d;
 			// Disable texture for Breast Tomosynthesis
 			bool skip_texture =
 				(min_load || !enable_gl || (sop == QString("1.2.840.10008.5.1.4.1.1.13.1.3")))
@@ -10795,7 +10707,7 @@ QString DicomUtils::read_enhanced_common(
 				new_id,
 				enable_gl,
 				skip_texture,
-				gl,
+				nullptr,
 				0);
 			//
 			{
@@ -11006,21 +10918,18 @@ QString DicomUtils::read_enhanced_common(
 			//
 			if (tmp4_ok)
 			{
-				std::vector<SpectroscopySlice*> empty__;
 				geom_ok = generate_geometry(
-					slices, empty__,
+					slices,
 					tmp4,
 					rows_, columns_,
 					spacing_x, spacing_y, &spacing_z_tmp,
-					enable_gl, gl,
 					&equi_, &one_direction_,
 					&origin_x_gen, &origin_y_gen, &origin_z_gen,
 					dircos_gen,
 					&slices_dir_x, &slices_dir_y, &slices_dir_z,
 					&up_dir_x, &up_dir_y, &up_dir_z,
 					&center_x, &center_y, &center_z,
-					tolerance,
-					false);
+					tolerance);
 			}
 			//
 			ivariant->equi = equi_;
@@ -11256,9 +11165,6 @@ QString DicomUtils::read_enhanced_common(
 						wsettings->get_size_y(),
 						no_warn_rescale,
 						use_icc,
-						0,
-						nullptr,
-						pb,
 						false);
 					if (*ok)
 					{
@@ -11291,8 +11197,8 @@ QString DicomUtils::read_enhanced_common(
 							CommonUtils::reload_monochrome(
 								ivariant,
 								enable_gl,
-								gl,
-								max_3d_tex_size,
+								nullptr,
+								0,
 								wsettings->get_resize(),
 								wsettings->get_size_x(),
 								wsettings->get_size_y());
@@ -11324,9 +11230,6 @@ QString DicomUtils::read_enhanced_common(
 						wsettings->get_size_y(),
 						no_warn_rescale,
 						use_icc,
-						max_3d_tex_size,
-						gl,
-						pb,
 						false);
 				}
 			}
@@ -11752,7 +11655,7 @@ QString DicomUtils::read_enhanced_3d_8d(
 	const mdcm::PhotometricInterpretation & pi,
 	const int dim8th, const int dim7th, const int dim6th, const int dim5th, const int dim4th, const int dim3rd,
 	const DimIndexValues & idx_values, const FrameGroupValues & values,
-	const bool ok3d, const int max_3d_tex_size, GLWidget * gl,
+	const bool ok3d,
 	const bool min_load,
 	const QWidget * settings,
 	double * dircos_read,
@@ -11762,7 +11665,6 @@ QString DicomUtils::read_enhanced_3d_8d(
 	const double shift_tmp, const double scale_tmp,
 	const bool apply_rescale,
 	const bool use_icc,
-	QProgressDialog * pb,
 	const float tolerance,
 	const short enh_loading_type)
 {
@@ -11784,7 +11686,8 @@ QString DicomUtils::read_enhanced_3d_8d(
 			pixelformat, pi,
 			tmp0,
 			idx_values,  values,
-			ok3d, max_3d_tex_size, gl, min_load,
+			ok3d,
+			min_load,
 			settings,
 			dircos_read,
 			red_subscript,
@@ -11793,7 +11696,6 @@ QString DicomUtils::read_enhanced_3d_8d(
 			shift_tmp, scale_tmp,
 			apply_rescale,
 			use_icc,
-			pb,
 			tolerance);
 	}
 	else
@@ -12203,13 +12105,11 @@ bool DicomUtils::process_contrours_ref(
 	const QString & f,
 	const QString & path,
 	std::vector<ImageVariant*> & tmp_ivariants,
-	int max_3d_tex_size, GLWidget * gl, bool ok3d,
+	bool ok3d,
 	short enh_loading_type,
-	const QWidget * settings,
-	QProgressDialog * pb)
+	const QWidget * settings)
 {
 	unsigned short count_ = 0;
-	if (pb) pb->setLabelText(QString("Searching ."));
 	mdcm::Reader reader;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
@@ -12221,7 +12121,6 @@ bool DicomUtils::process_contrours_ref(
 	reader.SetFileName(f.toLocal8Bit().constData());
 #endif
 	if (!reader.Read()) return false;
-	QApplication::processEvents();
 	const mdcm::File & file = reader.GetFile();
 	const mdcm::DataSet & ds = file.GetDataSet();
 	if (ds.IsEmpty()) return false;
@@ -12259,7 +12158,6 @@ bool DicomUtils::process_contrours_ref(
 		bool referenced_slice_found = false;
 		for (int k = 0; k < detected_files.at(z).size(); ++k)
 		{
-			QApplication::processEvents();
 			QString sop_instance_uid;
 			std::set<mdcm::Tag> tags;
 			mdcm::Tag tsopinstance(0x0008,0x0018);
@@ -12328,13 +12226,18 @@ bool DicomUtils::process_contrours_ref(
 				std::vector<ImageVariant*> ivariants;
 				QStringList detected_files_tmp = detected_files.at(z);
 				detected_files_tmp.sort();
+				QStringList dummy;
 				const QString message_ =
 					read_dicom(
 						ivariants,
+						dummy,
+						dummy,
+						dummy,
+						dummy,
+						dummy,
 						detected_files_tmp,
-						max_3d_tex_size, gl, nullptr, ok3d,
+						ok3d,
 						settings,
-						pb,
 						2,
 						enh_loading_type);
 				if (!message_.isEmpty())
@@ -12372,18 +12275,17 @@ bool DicomUtils::process_contrours_ref(
 
 QString DicomUtils::find_file_from_uid(
 	const QString & p,
-	const QString & uid,
-	QProgressDialog * pb)
+	const QString & uid)
 {
 	QString f;
 	if (p.isEmpty())   return f;
 	if (uid.isEmpty()) return f;
-	bool ok = scan_files_for_instance_uid(p, uid, f, pb);
+	bool ok = scan_files_for_instance_uid(p, uid, f);
 	if (ok) return f;
 	QDirIterator it(p, QDir::Dirs|QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
 	while (it.hasNext())
 	{
-		ok = scan_files_for_instance_uid(it.next(), uid, f, pb);
+		ok = scan_files_for_instance_uid(it.next(), uid, f);
 		if (ok) break;
 	}
 	return f;
@@ -12392,8 +12294,7 @@ QString DicomUtils::find_file_from_uid(
 bool DicomUtils::scan_files_for_instance_uid(
 	const QString & p,
 	const QString & uid,
-	QString & file,
-	QProgressDialog * pb)
+	QString & file)
 {
 	if (p.isEmpty())   return false;
 	if (uid.isEmpty()) return false;
@@ -12405,7 +12306,6 @@ bool DicomUtils::scan_files_for_instance_uid(
 		dir.entryList(QDir::Files|QDir::Readable, QDir::Name);
 	for (int x = 0; x < flist.size(); ++x)
 	{
-		QApplication::processEvents();
 		const QString tmp0 =
 			dir.absolutePath() + QString("/") + flist.at(x);
 		mdcm::Reader reader;
@@ -12435,8 +12335,7 @@ bool DicomUtils::scan_files_for_instance_uid(
 void DicomUtils::read_pr_ref(
 	const QString & p,
 	const QString & f,
-	QList<PrRefSeries> & refs,
-	QProgressDialog * pb)
+	QList<PrRefSeries> & refs)
 {
 	if (f.isEmpty()) return;
 	const mdcm::Tag tReferencedSeriesSequence(0x0008,0x1115);
@@ -12507,7 +12406,7 @@ void DicomUtils::read_pr_ref(
 			{
 				PrRefImage ref;
 				ref.uid = s0;
-				ref.file = find_file_from_uid(p, ref.uid, pb);
+				ref.file = find_file_from_uid(p, ref.uid);
 				if (ref.file.isEmpty()) continue;
 				std::vector<int> frames;
 				const bool ok1 = get_is_values(
@@ -13263,13 +13162,14 @@ bool DicomUtils::read_gray_lut(
 // 3 - SR reference
 QString DicomUtils::read_dicom(
 	std::vector<ImageVariant*> & ivariants,
+	QStringList & pdf_files,
+	QStringList & stl_files,
+	QStringList & video_files,
+	QStringList & spectroscopy_files,
+	QStringList & sr_images,
 	const QStringList & filenames,
-	int max_3d_tex_size,
-	GLWidget * gl,
-	ShaderObj * mesh_shader,
 	bool ok3d,
 	const QWidget * settings,
-	QProgressDialog * pb,
 	short load_type,
 	short enh_loading_type)
 {
@@ -13279,9 +13179,6 @@ QString DicomUtils::read_dicom(
 	const mdcm::Tag tSlicePosition(0x0020,0x1041);
 	const mdcm::Tag tPhotometricInterpretation(0x0028,0x0004);
 	QStringList images;
-	QStringList pdf_files;
-	QStringList stl_files;
-	QStringList video_files;
 	QStringList rtstruct_ref_search;
 	QString     rtstruct_ref_search_path;
 	QStringList grey_softcopy_pr_files;
@@ -13292,7 +13189,6 @@ QString DicomUtils::read_dicom(
 	QStringList advanced_blending_softcopy_pr_files;
 	std::vector<ImageVariant*> rtstructs;
 	std::vector<ImageVariant*> meshes;
-	std::vector<ImageVariant*> spectroscopy_images;
 	QVector<QStringList> extracted_images;
 	bool enhanced     = false;
 	bool supp_palette = false;
@@ -13312,14 +13208,10 @@ QString DicomUtils::read_dicom(
 	QString sop_tmp0, sop_tmp1;
 	QString photometric_tmp0, photometric_tmp1;
 	bool icc_found_tmp0 = false, icc_found_tmp1 = false;
-	const SettingsWidget * wsettings =
-		static_cast<const SettingsWidget*>(settings);
+	const SettingsWidget * const wsettings =
+		static_cast<const SettingsWidget * const>(settings);
 	std::map<unsigned int, SliceInstance> slice_pos_map;
 	std::list<long long> slice_pos_list;
-	bool asked_about_supp_palette = false;
-#if 0
-	bool asked_about_modality_lut = false;
-#endif
 	bool load_image_ref_contour = false;
 	const float tolerance = 0.01f;
 	int count_images = 0;
@@ -13332,12 +13224,6 @@ QString DicomUtils::read_dicom(
 		QString::number(filenames_size);
 	for (int x = 0; x < filenames_size; ++x)
 	{
-		if (pb)
-		{
-			pb->setLabelText(QString("Loading ... ") +
-				QString::number(x) + filenames_num);
-		}
-		QApplication::processEvents();
 		QString sop;
 		QString photometric;
 		bool icc_found = false;
@@ -13397,15 +13283,9 @@ QString DicomUtils::read_dicom(
 			// VL Whole Slide Microscopy Image Storage
 			if (load_type == 0)
 			{
-				if (pb) pb->hide();
-				QMessageBox mbox;
-				mbox.addButton(QMessageBox::Close);
-				mbox.setIcon(QMessageBox::Warning);
-				mbox.setText(QString(
-					"VL Whole Slide Microscopy Image Storage\n"
-					"is currently not supported"));
-				mbox.exec();
-				if (pb) pb->show();
+				if (!message_.isEmpty()) message_ += QChar('\0');
+				message_ += QString(
+					"VL Whole Slide Microscopy Image Storage");
 			}
 			continue;
 		}
@@ -13424,7 +13304,7 @@ QString DicomUtils::read_dicom(
 							CommonUtils::get_next_id(),
 							ok3d,
 							!wsettings->get_3d(),
-							gl,
+							nullptr,
 							0);
 					ivariant->filenames = QStringList(filenames.at(x));
 					load_contour(ds, ivariant);
@@ -13497,20 +13377,7 @@ QString DicomUtils::read_dicom(
 			// Spectroscopy
 			if (load_type == 0)
 			{
-				const QString spect_message =
-					SpectroscopyUtils::ProcessData(
-						ds, spectroscopy_images,
-						max_3d_tex_size, gl, ok3d, pb, tolerance);
-				if (!spect_message.isEmpty())
-				{
-					if (pb) pb->hide();
-					QMessageBox mbox;
-					mbox.addButton(QMessageBox::Close);
-					mbox.setIcon(QMessageBox::Warning);
-					mbox.setText(spect_message);
-					mbox.exec();
-					if (pb) pb->show();
-				}
+				spectroscopy_files.push_back(filenames.at(x));
 			}
 			continue;
 		}
@@ -13576,36 +13443,7 @@ QString DicomUtils::read_dicom(
 		{
 			if (load_type == 0)
 			{
-				const bool srinfo = wsettings->get_sr_info();
-				QString t00080005;
-				const bool t00080005_ok = get_string_value(
-					ds, mdcm::Tag(0x0008,0x0005), t00080005);
-				(void)t00080005_ok;
-				const QString s0 =
-					SRUtils::read_sr_title1(ds, t00080005);
-				SRUtils::set_asked_for_path_once(false);
-				SRWidget * sr =
-					new SRWidget(wsettings->get_scale_icons());
-				sr->setAttribute(Qt::WA_DeleteOnClose);
-				sr->setWindowTitle(s0);
-				const QString s1 =
-					SRUtils::read_sr_content_sq(
-						ds,
-						t00080005,
-						fi.absolutePath(),
-						settings,
-						sr->textBrowser,
-						pb,
-						sr->tmpfiles,
-						sr->srimages,
-						0,
-						srinfo,
-						QString("1"),
-						true);
-				sr->initSR(s1);
-				sr->show();
-				sr->activateWindow();
-				sr->raise();
+				sr_images.push_back(filenames.at(x));
 			}
 			continue;
 		}
@@ -13705,22 +13543,7 @@ QString DicomUtils::read_dicom(
 					{
 						if ((load_type == 0||load_type == 2) && has_supp_palette(ds))
 						{
-							if (!asked_about_supp_palette)
-							{
-								if (pb) pb->hide();
-								QMessageBox mbox;
-								mbox.addButton(QMessageBox::Yes);
-								mbox.addButton(QMessageBox::No);
-								mbox.setDefaultButton(QMessageBox::Yes);
-								mbox.setIcon(QMessageBox::Question);
-								mbox.setText(QString("Apply Supplemental Palette?"));
-								if (mbox.exec() == QMessageBox::Yes)
-								{
-									supp_palette = true;
-								}
-								if (pb) pb->show();
-								asked_about_supp_palette = true;
-							}
+							supp_palette = wsettings->get_apply_supplemental_lut();
 						}
 					}
 					else if (force_suppllut == 1)
@@ -13802,8 +13625,7 @@ QString DicomUtils::read_dicom(
 	//
 	//
 	// is multiseries?
-	if (
-		!ultrasound &&
+	if (!ultrasound &&
 		!nuclear &&
 		!multiframe &&
 		!enhanced &&
@@ -14024,8 +13846,7 @@ QString DicomUtils::read_dicom(
 				&ok, load_type,
 				ivariant,
 				images_tmp,
-				settings,
-				pb);
+				settings);
 			if (ok)
 			{
 				ivariant->filenames = images_tmp;
@@ -14054,9 +13875,8 @@ QString DicomUtils::read_dicom(
 				&ok, load_type,
 				ivariant,
 				images_tmp,
-				0, nullptr, false,
-				settings,
-				pb);
+				false,
+				settings);
 			if (ok)
 			{
 				ivariant->filenames = images_tmp;
@@ -14090,11 +13910,8 @@ QString DicomUtils::read_dicom(
 					false,
 					ivariant,
 					images_tmp,
-					0,
-					nullptr,
 					false,
 					settings,
-					pb,
 					tolerance,
 					(load_type == 1) ? false : true);
 				if (ok)
@@ -14137,7 +13954,7 @@ QString DicomUtils::read_dicom(
 					CommonUtils::get_next_id(),
 					ok3d,
 					!wsettings->get_3d(),
-					gl,
+					nullptr,
 					0);
 				ivariant->di->filtering = wsettings->get_filtering();
 				message_ = read_series(
@@ -14148,11 +13965,8 @@ QString DicomUtils::read_dicom(
 					elscint,
 					ivariant,
 					images_tmp,
-					max_3d_tex_size,
-					gl,
 					ok3d,
 					settings,
-					pb,
 					tolerance,
 					true);
 				if (ok)
@@ -14181,11 +13995,10 @@ QString DicomUtils::read_dicom(
 						&ok,
 						images.at(x),
 						supp_color_images,
-						0, nullptr, false,
+						false,
 						false,
 						enh_loading_type,
 						settings,
-						pb,
 						tolerance);
 					if (!message_.isEmpty() || !ok)
 					{
@@ -14203,11 +14016,10 @@ QString DicomUtils::read_dicom(
 							&ok,
 							images.at(x),
 							supp_grey_images,
-							max_3d_tex_size, gl, ok3d,
+							ok3d,
 							false,
 							enh_loading_type,
 							settings,
-							pb,
 							tolerance,
 							true);
 						if (
@@ -14260,7 +14072,7 @@ QString DicomUtils::read_dicom(
 								CommonUtils::calculate_minmax_scalar(supp_grey_images[jjj]);
 								QString supp_palette_error;
 								ImageVariant * v = new ImageVariant(
-									CommonUtils::get_next_id(), ok3d, true, gl, 0);
+									CommonUtils::get_next_id(), ok3d, true, nullptr, 0);
 								if (supp_color_images.at(jjj)->image_type == 11)
 								{
 									v->pUS_rgb = RGBImageTypeUS::New();
@@ -14291,7 +14103,7 @@ QString DicomUtils::read_dicom(
 									{
 										delete supp_grey_images[zzz];
 									}
-									return QString("Supplemental LUT failed,\nwrong image type");
+									return QString("Supplemental LUT failed, wrong image type");
 								}
 								if (!supp_palette_error.isEmpty())
 								{
@@ -14306,7 +14118,7 @@ QString DicomUtils::read_dicom(
 										delete supp_grey_images[zzz];
 									}
 									delete v;
-									return QString("Internal error,\n") + supp_palette_error;
+									return QString("Internal error, ") + supp_palette_error;
 								}
 								CommonUtils::copy_slices(v, supp_grey_images.at(jjj));
 								CommonUtils::reload_rgb_rgba(v);
@@ -14338,11 +14150,10 @@ QString DicomUtils::read_dicom(
 						&ok,
 						images.at(x),
 						ivariants,
-						max_3d_tex_size, gl, ok3d,
+						ok3d,
 						false,
 						enh_loading_type,
 						settings,
-						pb,
 						tolerance,
 						true);
 				}
@@ -14353,11 +14164,10 @@ QString DicomUtils::read_dicom(
 					&ok,
 					images.at(x),
 					ivariants,
-					0, nullptr, false,
+					false,
 					false,
 					enh_loading_type,
 					settings,
-					pb,
 					tolerance,
 					(load_type == 1) ? false : true);
 			}
@@ -14374,7 +14184,7 @@ QString DicomUtils::read_dicom(
 				CommonUtils::get_next_id(),
 				ok3d,
 				!wsettings->get_3d(),
-				gl,
+				nullptr,
 				0);
 			ivariant->di->filtering = wsettings->get_filtering();
 			message_ = read_series(
@@ -14385,11 +14195,8 @@ QString DicomUtils::read_dicom(
 				false,
 				ivariant,
 				images_tmp,
-				max_3d_tex_size,
-				gl,
 				ok3d,
 				settings,
-				pb,
 				tolerance,
 				true);
 			if (ok)
@@ -14414,7 +14221,7 @@ QString DicomUtils::read_dicom(
 				CommonUtils::get_next_id(),
 				ok3d,
 				!wsettings->get_3d(),
-				gl,
+				nullptr,
 				0);
 			ivariant->di->filtering = wsettings->get_filtering();
 			message_ = read_series(
@@ -14425,11 +14232,8 @@ QString DicomUtils::read_dicom(
 				false,
 				ivariant,
 				images_tmp,
-				max_3d_tex_size,
-				gl,
 				ok3d,
 				settings,
-				pb,
 				tolerance,
 				true);
 			if (ok)
@@ -14455,7 +14259,7 @@ QString DicomUtils::read_dicom(
 					CommonUtils::get_next_id(),
 					ok3d,
 					!wsettings->get_3d(),
-					gl,
+					nullptr,
 					0);
 				ivariant->di->filtering = wsettings->get_filtering();
 				message_ = read_series(
@@ -14466,11 +14270,8 @@ QString DicomUtils::read_dicom(
 					false,
 					ivariant,
 					images_tmp,
-					max_3d_tex_size,
-					gl,
 					ok3d,
 					settings,
-					pb,
 					tolerance,
 					true);
 				if (ok)
@@ -14500,11 +14301,8 @@ QString DicomUtils::read_dicom(
 					false,
 					ivariant,
 					images_tmp,
-					0,
-					nullptr,
 					false,
 					settings,
-					pb,
 					tolerance,
 					(load_type == 3));
 				if (ok)
@@ -14661,7 +14459,7 @@ QString DicomUtils::read_dicom(
 					CommonUtils::get_next_id(),
 					ok3d,
 					!wsettings->get_3d(),
-					gl,
+					nullptr,
 					0);
 				ivariant->di->filtering = wsettings->get_filtering();
 				message_ = read_series(
@@ -14672,11 +14470,8 @@ QString DicomUtils::read_dicom(
 					elscint,
 					ivariant,
 					images_tmp,
-					max_3d_tex_size,
-					gl,
 					ok3d,
 					settings,
-					pb,
 					tolerance,
 					true);
 				if (ok)
@@ -14706,11 +14501,8 @@ QString DicomUtils::read_dicom(
 					elscint,
 					ivariant,
 					images_tmp,
-					0,
-					nullptr,
 					false,
 					settings,
-					pb,
 					tolerance,
 					(load_type == 3));
 				if (ok)
@@ -14754,7 +14546,7 @@ QString DicomUtils::read_dicom(
 					CommonUtils::get_next_id(),
 					ok3d,
 					!wsettings->get_3d(),
-					gl,
+					nullptr,
 					0);
 				ivariant->di->filtering = wsettings->get_filtering();
 				message_ = read_series(
@@ -14765,11 +14557,8 @@ QString DicomUtils::read_dicom(
 					elscint,
 					ivariant,
 					images_tmp,
-					max_3d_tex_size,
-					gl,
 					ok3d,
 					settings,
-					pb,
 					tolerance,
 					true);
 				if (ok)
@@ -14818,11 +14607,8 @@ QString DicomUtils::read_dicom(
 					elscint,
 					ivariant,
 					images_tmp,
-					0,
-					nullptr,
 					false,
 					settings,
-					pb,
 					tolerance,
 					(load_type == 3));
 				if (ok)
@@ -14858,7 +14644,7 @@ QString DicomUtils::read_dicom(
 	}
 	if (count_uid_errors > 0)
 	{
-		if (!message_.isEmpty()) message_.append(QString("\n"));
+		if (!message_.isEmpty()) message_.append(QChar('\n'));
 		message_.append(
 			QString("Warning: UIDs are not unique (") +
 			QVariant(count_uid_errors).toString() +
@@ -14870,8 +14656,6 @@ QString DicomUtils::read_dicom(
 	//
 	for (size_t x = 0; x < rtstructs.size(); ++x)
 		ivariants.push_back(rtstructs[x]);
-	for (size_t x = 0; x < spectroscopy_images.size(); ++x)
-		ivariants.push_back(spectroscopy_images[x]);
 	for (size_t x = 0; x < meshes.size(); ++x)
 		ivariants.push_back(meshes[x]);
 	//
@@ -14885,10 +14669,9 @@ QString DicomUtils::read_dicom(
 					rtstruct_ref_search.at(x),
 					rtstruct_ref_search_path,
 					tmp_ivariants_rtstruct,
-					max_3d_tex_size, gl, ok3d,
+					ok3d,
 					1, // force sorted uniform
-					settings,
-					pb);
+					settings);
 			bool ref2_ok = false;
 			if (ref_ok)
 			{
@@ -14915,10 +14698,9 @@ QString DicomUtils::read_dicom(
 					rtstruct_ref_search.at(x),
 					tmpp,
 					tmp_ivariants_rtstruct,
-					max_3d_tex_size, gl, ok3d,
+					ok3d,
 					enh_loading_type,
-					settings,
-					pb);
+					settings);
 				if (ref2_ok)
 				{
 					for (unsigned int y = 0;
@@ -14933,46 +14715,11 @@ QString DicomUtils::read_dicom(
 				if (!ref2_ok)
 #endif
 				{
-					bool ok22 = false;
-					const QString s(
-						"<html><head/><body><p align=\"center\">"
-						"<p>Select directory to start recursive "
-						"search.</body></html>");
-					if (pb) pb->hide();
-					QFileInfo reffi(filenames.at(x));
-					FindRefDialog * d =
-						new FindRefDialog(wsettings->get_scale_icons());
-					d->set_text(s);
-					d->set_path(QDir::toNativeSeparators(reffi.absolutePath()));
-					if (d->exec() == QDialog::Accepted)
-					{
-						rtstruct_ref_search_path = d->get_path();
-						ok22 = true;
-					}
-					delete d;
-					if (pb) pb->show();
-					if (ok22)
-					{
-						ref2_ok = process_contrours_ref(
-							rtstruct_ref_search.at(x),
-							rtstruct_ref_search_path,
-							tmp_ivariants_rtstruct,
-							max_3d_tex_size, gl, ok3d,
-							enh_loading_type,
-							settings,
-							pb);
-						if (ref2_ok)
-						{
-							for (unsigned int y = 0;
-								y < tmp_ivariants_rtstruct.size();
-								++y)
-							{
-								tmp_ivariants_rtstruct[y]->filenames =
-									QStringList(rtstruct_ref_search.at(x));
-								ivariants.push_back(tmp_ivariants_rtstruct[y]);
-							}
-						}
-					}
+					if (!message_.isEmpty()) message_.append(QChar('\n'));
+					message_.append(QString(
+						"Could not find series referenced in RTSTRUCT, "
+						"try to use DICOM scan from the directory containing both,"
+						"RTSTRUCT and referenced series"));
 				}
 			}
 			if (!(ref_ok || ref2_ok))
@@ -14992,7 +14739,7 @@ QString DicomUtils::read_dicom(
 				{
 					ImageVariant * ivariant = new ImageVariant(
 						CommonUtils::get_next_id(),
-						ok3d, !wsettings->get_3d(), gl, 0);
+						ok3d, !wsettings->get_3d(), nullptr, 0);
 					ivariant->filenames = QStringList(rtstruct_ref_search.at(x));
 					const mdcm::File & file = reader.GetFile();
 					const mdcm::DataSet & ds = file.GetDataSet();
@@ -15002,132 +14749,10 @@ QString DicomUtils::read_dicom(
 				}
 			}
 		}
-		QApplication::processEvents();
-	}
-	//
-	// init contours
-	for (unsigned int x = 0; x < ivariants.size(); ++x)
-	{
-		ImageVariant * v = ivariants[x];
-		if (!v->di->rois.empty())
-		{
-			ContourUtils::calculate_contours_uv(v);
-			if (ok3d && gl)
-			{
-				long long contours_count = 0;
-				for (int j = 0; j < v->di->rois.size(); ++j)
-				{
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-					Contours::const_iterator ic =
-						v->di->rois.at(j).contours.cbegin();
-					while (ic != v->di->rois.at(j).contours.cend())
-#else
-					Contours::const_iterator ic =
-						v->di->rois.at(j).contours.constBegin();
-					while (ic != v->di->rois.at(j).contours.constEnd())
-#endif
-					{
-						const Contour * c = ic.value();
-						if (c) ++contours_count;
-						++ic;
-					}
-				}
-				for (int z = 0; z < v->di->rois.size(); ++z)
-				{
-					ContourUtils::generate_roi_vbos(
-						gl, v->di->rois[z], false);
-				}
-			}
-			ContourUtils::map_contours_all(v);
-			ContourUtils::contours_build_path_all(v);
-		}
-	}
-	//
-	if (!pdf_files.empty())
-	{
-		if (pb) pb->hide();
-		for (int x = 0; x < pdf_files.size(); ++x)
-		{
-			const QString pdff = QFileDialog::getSaveFileName(
-				nullptr,
-				QString("Select file"),
-				CommonUtils::get_save_dir() +
-					QString("/") +
-					CommonUtils::get_save_name() +
-					QString(".pdf"),
-				QString("All Files (*)"),
-				nullptr
-				 //, QFileDialog::DontUseNativeDialog
-				);
-			if (!pdff.isEmpty())
-			{
-				QFileInfo pfi(pdff);
-				CommonUtils::set_save_dir(pfi.absolutePath());
-				write_encapsulated(pdf_files.at(x), pdff);
-			}
-		}
-		if (pb) pb->show();
-	}
-	//
-	if (!stl_files.empty())
-	{
-		if (pb) pb->hide();
-		for (int x = 0; x < stl_files.size(); ++x)
-		{
-			const QString stlf = QFileDialog::getSaveFileName(
-				nullptr,
-				QString("Select file"),
-				CommonUtils::get_save_dir() +
-					QString("/") +
-					CommonUtils::get_save_name() +
-					QString(".stl"),
-				QString("All Files (*)"),
-				nullptr
-				 //, QFileDialog::DontUseNativeDialog
-				);
-			if (!stlf.isEmpty())
-			{
-				QFileInfo sfi(stlf);
-				CommonUtils::set_save_dir(sfi.absolutePath());
-				write_encapsulated(stl_files.at(x), stlf);
-			}
-		}
-		if (pb) pb->show();
-	}
-	//
-	if (!video_files.empty())
-	{
-		if (pb) pb->hide();
-		for (int x = 0; x < video_files.size(); ++x)
-		{
-			if (pb) pb->hide();
-			const QString tmp943 = video_files.at(x);
-			const QString suf = suffix_mpeg(tmp943);
-			const QString video_file_name =
-				QFileDialog::getSaveFileName(
-					nullptr,
-					QString("Select file"),
-					CommonUtils::get_save_dir() +
-						QString("/") +
-						CommonUtils::get_save_name() +
-						suf,
-					QString("All Files (*)"),
-					nullptr
-					 //, QFileDialog::DontUseNativeDialog
-					);
-			if (!video_file_name.isEmpty())
-			{
-				QFileInfo vfi(video_file_name);
-				CommonUtils::set_save_dir(vfi.absolutePath());
-				write_mpeg(tmp943, video_file_name);
-			}
-		}
-		if (pb) pb->show();
 	}
 	//
 	if (!grey_softcopy_pr_files.empty())
 	{
-		if (pb) pb->show();
 		const QString file0 = grey_softcopy_pr_files.at(0);
 		QFileInfo p0(file0);
 #ifdef USE_WORKSTATION_MODE
@@ -15146,10 +14771,10 @@ QString DicomUtils::read_dicom(
 			grey_softcopy_pr_files,
 			p,
 			wsettings,
-			ok3d, max_3d_tex_size, gl, mesh_shader,
+			ok3d,
 			ivariants,
-			message_pr,
-			pb);
+			message_pr);
+/*
 		if (count < 1 && message_pr.isEmpty())
 		{
 #ifdef USE_WORKSTATION_MODE
@@ -15192,6 +14817,7 @@ QString DicomUtils::read_dicom(
 				message_pr,
 				pb);
 		}
+*/
 		if (!message_pr.isEmpty())
 		{
 			message_.append(message_pr + QString("\n"));
@@ -15205,21 +14831,23 @@ QString DicomUtils::read_dicom(
 	{
 		QString pr_warn;
 		if (!color_softcopy_pr_files.empty())
-			pr_warn += QString("Color Softcopy Presentation\n");
+			pr_warn += QString("Color Softcopy Presentation ");
 		if (!pseudo_color_softcopy_pr_files.empty())
-			pr_warn += QString("Pseudo-color Softcopy Presentation\n");
+			pr_warn += QString("Pseudo-color Softcopy Presentation ");
 		if (!blending_softcopy_pr_files.empty())
-			pr_warn += QString("Blending Softcopy Presentation\n");
+			pr_warn += QString("Blending Softcopy Presentation ");
 		if (!xaxrf_softcopy_pr_files.empty())
-			pr_warn += QString("XA/XRF Grayscale Softcopy Presentation\n");
+			pr_warn += QString("XA/XRF Grayscale Softcopy Presentation ");
 		if (!advanced_blending_softcopy_pr_files.empty())
-			pr_warn += QString("Advanced Blending Softcopy Presentation\n");
+			pr_warn += QString("Advanced Blending Softcopy Presentation ");
 		pr_warn += QString("is currently not supported");
+/*
 		QMessageBox mbox;
 		mbox.addButton(QMessageBox::Close);
 		mbox.setIcon(QMessageBox::Warning);
 		mbox.setText(pr_warn);
 		mbox.exec();
+*/
 	}
 	//
 	return message_;

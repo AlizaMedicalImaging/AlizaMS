@@ -16,11 +16,15 @@
 #include "iconutils.h"
 #include "commonutils.h"
 #include "contourutils.h"
+#include "srutils.h"
 #include "dicomutils.h"
+#include "spectroscopyutils.h"
 #include "updateqtcommand.h"
 #include "histogramgen.h"
 #include "studyframewidget.h"
 #include "studygraphicswidget.h"
+#include "srwidget.h"
+#include "loaddicom.h"
 #include <itkVersion.h>
 #include <itkImage.h>
 #include <itkIndex.h>
@@ -32,9 +36,8 @@
 #include <mdcmParseException.h>
 #include "vectormath/scalar/vectormath.h"
 #include <itkMath.h>
-#ifdef ALIZA_PERF_COLLISION
 #include <chrono>
-#endif
+#include <thread>
 
 // These flags are used only for diagnostig build sometimes
 #pragma GCC diagnostic push
@@ -705,31 +708,36 @@ void Aliza::close_()
 
 QString Aliza::load_dicom_series(QProgressDialog * pb)
 {
-	QString message_;
-	unsigned int count_messages = 0;
+	if (!mutex0.tryLock()) return QString("");
+	QString message;
+	unsigned int count_messages{};
 	std::vector<ImageVariant*> ivariants;
+	QStringList pdf_files;
+	QStringList stl_files;
+	QStringList video_files;
+	QStringList spectroscopy_files;
+	QStringList sr_images;
 	std::vector<int> rows;
 	QStringList filenames;
-	ShaderObj * mesh_shader = nullptr;
-	int max_3d_tex_size = 0;
-	QModelIndexList selection;
+	int max_3d_tex_size{};
 	const bool ok3d = check_3d();
 	if (ok3d)
 	{
 		glwidget->set_skip_draw(true);
 		max_3d_tex_size = glwidget->max_3d_texture_size;
-		mesh_shader = &(glwidget->mesh_shader);
 	}
-	const bool lock = mutex0.tryLock();
-	if (!lock) goto quit__;
-	selection =
+	const QModelIndexList selection =
 		browser2->tableWidget->selectionModel()->selectedRows();
-	for(int x = 0; x < selection.count(); ++x)
+	for (int x = 0; x < selection.count(); ++x)
 	{
 		const QModelIndex index = selection.at(x);
 		rows.push_back(index.row());
 	}
-	if (rows.empty()) goto quit__;
+	if (rows.empty())
+	{
+		mutex0.unlock();
+		return QString("");
+	}
 	for (unsigned int x = 0; x < rows.size(); ++x)
 	{
 		const int row = rows.at(x);
@@ -740,137 +748,75 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 		if (!item) continue;
 		if ((item->files.empty())) continue;
 		filenames = item->files;
-		try
+		LoadDicom * lt = new LoadDicom(
+			filenames,
+			ok3d,
+			static_cast<const QWidget * const>(
+				const_cast<const SettingsWidget * const>(settingswidget)),
+			0,
+			settingswidget->get_enh_strategy());
+		lt->start();
+		while (!lt->isFinished())
 		{
-			const QString tmp_message = DicomUtils::read_dicom(
-				ivariants,
-				filenames,
-				max_3d_tex_size,
-				(ok3d ? glwidget : nullptr),
-				mesh_shader,
-				ok3d,
-				static_cast<QWidget*>(settingswidget),
-				pb,
-				0,
-				settingswidget->get_enh_strategy());
-			if (!tmp_message.isEmpty())
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+			qApp->processEvents();
+		}
+		const QString message_ = lt->message;
+		if (!message_.isEmpty())
+		{
+			const int filenames_size = filenames.size();
+			if (!message.isEmpty()) message.append(QChar('\n'));
+			if (filenames_size == 1)
 			{
-				++count_messages;
-				message_.append(tmp_message + QString("\n"));
+				message.append(filenames.at(0) + QString(":\n    "));
 			}
+			else if (filenames_size >= 1)
+			{
+				message.append(filenames.at(0) + QString(" (1st file):\n    "));
+			}
+			message.append(message_ + QString("\n\n"));
 		}
-		catch (const mdcm::ParseException & pe)
+		for (size_t k = 0; k < lt->ivariants.size(); ++k)
 		{
-			std::cout << "mdcm::ParseException in Aliza::load_dicom_series:\n"
-				<< pe.GetLastElement().GetTag() << std::endl;
+			ivariants.push_back(lt->ivariants[k]);
 		}
-		catch (const std::exception & ex)
+		for (int k = 0; k < lt->pdf_files.size(); ++k)
 		{
-			std::cout << "Exception in Aliza::load_dicom_series\n"
-				<< ex.what() << std::endl;
+			pdf_files.push_back(lt->pdf_files.at(k));
 		}
+		for (int k = 0; k < lt->stl_files.size(); ++k)
+		{
+			stl_files.push_back(lt->stl_files.at(k));
+		}
+		for (int k = 0; k < lt->video_files.size(); ++k)
+		{
+			video_files.push_back(lt->video_files.at(k));
+		}
+		for (int k = 0; k < lt->spectroscopy_files.size(); ++k)
+		{
+			spectroscopy_files.push_back(lt->spectroscopy_files.at(k));
+		}
+		for (int k = 0; k < lt->sr_images.size(); ++k)
+		{
+			sr_images.push_back(lt->sr_images.at(k));
+		}
+		delete lt;
 	}
-quit__:
-	imagesbox->listWidget->blockSignals(true);
-	disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
-	disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
-	for (unsigned int x = 0; x < ivariants.size(); ++x)
-	{
-		if (!ivariants.at(x)) continue;
-		if (ivariants.at(x)->di->opengl_ok &&
-			!ivariants.at(x)->di->skip_texture && (
-				ivariants.at(x)->di->idimz !=
-				static_cast<int>(ivariants.at(x)->di->image_slices.size())))
-		{
-			std::cout
-				<< "ivariants.at(" << x
-				<< ")->di->idimz != ivariants.at(" << x
-				<< ")->di->image_slices.size()" << std::endl;
-			ivariants[x]->di->close();
-			ivariants[x]->di->skip_texture=true;
-		}
-#if 0
-		{
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-			QMap<int, QString>::const_iterator it =
-				ivariants.at(x)->image_instance_uids.cbegin();
-#else
-			QMap<int, QString>::const_iterator it =
-				ivariants.at(x)->image_instance_uids.constBegin();
-#endif
-			std::cout
-				<< "Instance UIDs (dimZ="
-				<< ivariants.at(x)->di->idimz <<") :"
-				<< std::endl;
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-			while (it != ivariants.at(x)->image_instance_uids.cend())
-#else
-			while (it != ivariants.at(x)->image_instance_uids.constEnd())
-#endif
-			{
-				std::cout
-					<< " " << it.key() << " "
-					<< it.value().toStdString()
-					<< std::endl;
-				++it;
-			}
-		}
-#endif
-		add_histogram(ivariants.at(x), pb);
-		scene3dimages[ivariants.at(x)->id] = ivariants[x];
-		imagesbox->listWidget->reset();
-		imagesbox->add_image(ivariants.at(x)->id, ivariants[x], &ivariants[x]->icon);
-		int r = -1;
-		for (int j = 0; j < imagesbox->listWidget->count(); ++j)
-		{
-			short id0 = -1;
-			ListWidgetItem2 * item =
-				static_cast<ListWidgetItem2*>(imagesbox->listWidget->item(j));
-			if (item) id0 = item->get_id();
-			if (id0 == ivariants.at(x)->id)
-			{
-				r = j;
-				break;
-			}
-		}
-		if (x == ivariants.size() - 1 && r > -1)
-		{
-			imagesbox->listWidget->setCurrentRow(r);
-			update_selection2();
-			if (ok3d) glwidget->fit_to_screen(ivariants.at(x));
-			emit image_opened();
-		}
-	}
-	connect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
-	connect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
-	imagesbox->listWidget->blockSignals(false);
-	ivariants.clear();
+	//
+	const QString message_ = process_dicom(
+		ivariants,
+		pdf_files,
+		stl_files,
+		video_files,
+		spectroscopy_files,
+		sr_images,
+		pb);
 	if (!message_.isEmpty())
 	{
-		QString message;
-		if (count_messages > 1)
-		{
-			message = QVariant(count_messages).toString() +
-				QString(" errors or warnings\n");
-		}
-		if (message_.size() > 500)
-		{
-			message_.truncate(500);
-			message += message_;
-			message += QString("\n<truncated>");
-		}
-		else
-		{
-			message += message_;
-		}
-		message_ = message;
+		message.append(message_);
 	}
-	if (ok3d) glwidget->set_skip_draw(false);
-	if (lock) mutex0.unlock();
-#ifdef ALIZA_PRINT_COUNT_GL_OBJ
-	std::cout << "Num VBOs " << GLWidget::get_count_vbos() << std::endl;
-#endif
-	return message_;
+	mutex0.unlock();
+	return message;
 }
 
 void Aliza::add_histogram(ImageVariant * v, QProgressDialog * pb, bool check_settings)
@@ -4161,141 +4107,97 @@ void Aliza::delete_group(const int group_id)
 	}
 }
 
-QString Aliza::load_dicom_file(int * image_id,
+QString Aliza::load_dicom_file(
 	const QString & f,
-	QProgressDialog * pb,
-	bool lock_mutex)
+	QProgressDialog * pb)
 {
-	*image_id = -1;
-	bool ok = false;
+	if (!mutex0.tryLock()) return QString("");
 	QString message;
+	unsigned int count_messages{};
 	std::vector<ImageVariant*> ivariants;
-	std::string us_window_center;
-	std::string us_window_width;
-	QFileInfo fi(f);
+	QStringList pdf_files;
+	QStringList stl_files;
+	QStringList video_files;
+	QStringList spectroscopy_files;
+	QStringList sr_images;
+	QStringList filenames;
+	filenames.push_back(f);
+	int max_3d_tex_size{};
 	const bool ok3d = check_3d();
-	ShaderObj * mesh_shader =
-		(ok3d) ? &(glwidget->mesh_shader) : nullptr;
-	int max_3d_tex_size =
-		(ok3d) ? glwidget->max_3d_texture_size : 0;
-	QStringList tmp_filenames__;
-	bool lock = false;
-	if (lock_mutex)
+	if (ok3d)
 	{
-		lock = mutex0.tryLock();
-		if (!lock) goto quit__;
+		glwidget->set_skip_draw(true);
+		max_3d_tex_size = glwidget->max_3d_texture_size;
 	}
-	if (ok3d) glwidget->set_skip_draw(true);
-	tmp_filenames__.push_back(f);
-	try
 	{
-		message = DicomUtils::read_dicom(
-			ivariants,
-			tmp_filenames__,
-			max_3d_tex_size,
-			(ok3d ? glwidget : nullptr),
-			mesh_shader,
+		LoadDicom * lt = new LoadDicom(
+			filenames,
 			ok3d,
-			static_cast<QWidget*>(settingswidget),
-			pb,
+			static_cast<const QWidget * const>(
+				const_cast<const SettingsWidget * const>(settingswidget)),
 			0,
 			settingswidget->get_enh_strategy());
-	}
-	catch (const mdcm::ParseException & pe)
-	{
-		std::cout << "mdcm::ParseException in Aliza::load_dicom_file:\n"
-			<< pe.GetLastElement().GetTag() << std::endl;
-	}
-	catch (const std::exception & ex)
-	{
-		std::cout << "Exception in Aliza::load_dicom_file:\n"
-			<< ex.what() << std::endl;
-	}
-	if (message.isEmpty())
-	{
-		ok = true;
-		if (ivariants.size() == 1 && ivariants.at(0))
+		lt->start();
+		while (!lt->isFinished())
 		{
-			*image_id = ivariants.at(0)->id;
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+			qApp->processEvents();
 		}
-	}
-quit__:
-	if (ok)
-	{
-		for (unsigned int j = 0; j < ivariants.size(); ++j)
+		const QString message_ = lt->message;
+		if (!message_.isEmpty())
 		{
-			if (!ivariants.at(j)) continue;
-			if (ivariants.at(j) &&
-				ivariants.at(j)->di->opengl_ok &&
-				!ivariants.at(j)->di->skip_texture &&
-				(ivariants.at(j)->di->idimz !=
-					static_cast<int>(ivariants.at(j)->di->image_slices.size())))
+			const int filenames_size = filenames.size();
+			if (!message.isEmpty()) message.append(QChar('\n'));
+			if (filenames_size == 1)
 			{
-				std::cout
-					<< "ivariants.at(j)->di->idimz!="
-						"ivariants.at(j)->di->image_slices.size()"
-					<< std::endl;
-				ivariants[j]->di->close();
-				ivariants[j]->di->skip_texture=true;
+				message.append(filenames.at(0) + QString(":\n    "));
 			}
-			scene3dimages[ivariants.at(j)->id] = ivariants[j];
-			if (true)
+			else if (filenames_size >= 1)
 			{
-				imagesbox->listWidget->blockSignals(true);
-				disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
-				disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
-				imagesbox->listWidget->reset();
-				imagesbox->add_image(
-					ivariants.at(j)->id,
-					ivariants.at(j),
-					&ivariants.at(j)->icon);
-				if (j == ivariants.size() - 1)
-				{
-					int r = -1;
-					for (int x = 0;
-						x < imagesbox->listWidget->count();
-						++x)
-					{
-						short id0 = -1;
-						ListWidgetItem2 * item =
-							static_cast<ListWidgetItem2*>(
-								imagesbox->listWidget->item(x));
-						if (item) id0 = item->get_id();
-						if (id0 == ivariants.at(j)->id)
-						{
-							r = x;
-							break;
-						}
-					}
-					if (r > -1)
-					{
-						imagesbox->listWidget->setCurrentRow(r);
-						update_selection2();
-						if (ok3d)
-							glwidget->fit_to_screen(
-								ivariants.at(j));
-					}
-				}
-				connect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
-				connect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
-				imagesbox->listWidget->blockSignals(false);
+				message.append(filenames.at(0) + QString(" (1st file):\n    "));
 			}
+			message.append(message_ + QString("\n\n"));
 		}
-	}
-	else
-	{
-		for (unsigned int x = 0; x < ivariants.size(); ++x)
+		for (size_t k = 0; k < lt->ivariants.size(); ++k)
 		{
-			delete ivariants[x];
+			ivariants.push_back(lt->ivariants[k]);
 		}
+		for (int k = 0; k < lt->pdf_files.size(); ++k)
+		{
+			pdf_files.push_back(lt->pdf_files.at(k));
+		}
+		for (int k = 0; k < lt->stl_files.size(); ++k)
+		{
+			stl_files.push_back(lt->stl_files.at(k));
+		}
+		for (int k = 0; k < lt->video_files.size(); ++k)
+		{
+			video_files.push_back(lt->video_files.at(k));
+		}
+		for (int k = 0; k < lt->spectroscopy_files.size(); ++k)
+		{
+			spectroscopy_files.push_back(lt->spectroscopy_files.at(k));
+		}
+		for (int k = 0; k < lt->sr_images.size(); ++k)
+		{
+			sr_images.push_back(lt->sr_images.at(k));
+		}
+		delete lt;
 	}
-	ivariants.clear();
 	//
-	if (lock_mutex && lock) mutex0.unlock();
-	if (ok3d) glwidget->set_skip_draw(false);
-#ifdef ALIZA_PRINT_COUNT_GL_OBJ
-	std::cout << "Num VBOs " << GLWidget::get_count_vbos() << std::endl;
-#endif
+	const QString message_ = process_dicom(
+		ivariants,
+		pdf_files,
+		stl_files,
+		video_files,
+		spectroscopy_files,
+		sr_images,
+		pb);
+	if (!message_.isEmpty())
+	{
+		message.append(message_);
+	}
+	mutex0.unlock();
 	return message;
 }
 
@@ -4629,6 +4531,356 @@ void Aliza::remove_from_studyview(int id)
 		studyview->update_null();
 	}
 	check_slice_collisions2(studyview);
+}
+
+QString Aliza::process_dicom(
+	std::vector<ImageVariant*> & ivariants,
+	const QStringList & pdf_files,
+	const QStringList & stl_files,
+	const QStringList & video_files,
+	const QStringList & spectroscopy_files,
+	const QStringList & sr_images,
+	QProgressDialog * pb)
+{
+	QString message;
+	int max_3d_tex_size{};
+	const bool ok3d = check_3d();
+	if (ok3d)
+	{
+		max_3d_tex_size = glwidget->max_3d_texture_size;
+	}
+	if (!spectroscopy_files.isEmpty())
+	{
+		for (int k = 0; k < spectroscopy_files.size(); ++k)
+		{
+			qApp->processEvents();
+			try
+			{
+				mdcm::Reader reader;
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+				reader.SetFileName(QDir::toNativeSeparators(spectroscopy_files.at(k)).toUtf8().constData());
+#else
+				reader.SetFileName(QDir::toNativeSeparators(spectroscopy_files.at(k)).toLocal8Bit().constData());
+#endif
+#else
+				reader.SetFileName(spectroscopy_files.at(k).toLocal8Bit().constData());
+#endif
+				if (!reader.Read()) continue;
+				const mdcm::File & file = reader.GetFile();
+				const mdcm::DataSet & ds = file.GetDataSet();
+				if (ds.IsEmpty()) continue;
+				const QString spect_message =
+					SpectroscopyUtils::ProcessData(
+						ds, ivariants, max_3d_tex_size, glwidget, ok3d, pb, 0.01f);
+				const int filenames_size = spectroscopy_files.size();
+				if (!spect_message.isEmpty())
+				{
+					if (!message.isEmpty()) message.append(QChar('\n'));
+					if (filenames_size == 1)
+					{
+						message.append(spectroscopy_files.at(0) + QString(":\n    "));
+					}
+					else if (filenames_size >= 1)
+					{
+						message.append(spectroscopy_files.at(0) + QString(" (1st file):\n    "));
+					}
+					message.append(spect_message + QString("\n\n"));
+				}
+			}
+			catch (const mdcm::ParseException & pe)
+			{
+				std::cout << pe.GetLastElement().GetTag() << std::endl;
+			}
+			catch (const std::exception & ex)
+			{
+				std::cout << ex.what() << std::endl;
+			}
+		}
+	}
+	//
+	imagesbox->listWidget->blockSignals(true);
+	disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
+	disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
+	for (unsigned int x = 0; x < ivariants.size(); ++x)
+	{
+		if (!ivariants.at(x))
+		{
+			std::cout << "ivariants.at(" << x << ") is null" << std::endl;
+			continue;
+		}
+		if (ivariants.at(x)->di->opengl_ok &&
+			!ivariants.at(x)->di->skip_texture && (
+				ivariants.at(x)->di->idimz !=
+				static_cast<int>(ivariants.at(x)->di->image_slices.size())))
+		{
+			std::cout
+				<< "ivariants.at(" << x
+				<< ")->di->idimz != ivariants.at(" << x
+				<< ")->di->image_slices.size()" << std::endl;
+			ivariants[x]->di->close();
+			ivariants[x]->di->skip_texture = true;
+		}
+#if 0
+		{
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+			QMap<int, QString>::const_iterator it =
+				ivariants.at(x)->image_instance_uids.cbegin();
+#else
+			QMap<int, QString>::const_iterator it =
+				ivariants.at(x)->image_instance_uids.constBegin();
+#endif
+			std::cout
+				<< "Instance UIDs (dimZ="
+				<< ivariants.at(x)->di->idimz <<") :"
+				<< std::endl;
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+			while (it != ivariants.at(x)->image_instance_uids.cend())
+#else
+			while (it != ivariants.at(x)->image_instance_uids.constEnd())
+#endif
+			{
+				std::cout
+					<< " " << it.key() << " "
+					<< it.value().toStdString()
+					<< std::endl;
+				++it;
+			}
+		}
+#endif
+		add_histogram(ivariants.at(x), pb);
+		//
+		if (ivariants.at(x)->di->opengl_ok)
+		{
+			ivariants[x]->di->set_glwidget(glwidget);
+		}
+		if (ivariants.size() - 1 == x) reload_3d(ivariants[x]);
+		else reload_3d(ivariants[x], false);
+		//
+		{
+			ContourUtils::calculate_contours_uv(ivariants[x]);
+			ContourUtils::map_contours_all(ivariants[x]);
+			ContourUtils::contours_build_path_all(ivariants[x]);
+			if (ivariants.at(x)->di->opengl_ok)
+			{
+				for (int z = 0; z < ivariants.at(x)->di->rois.size(); ++z)
+				{
+					ContourUtils::generate_roi_vbos(
+						glwidget, ivariants[x]->di->rois[z], false);
+				}
+			}
+		}
+		//
+		scene3dimages[ivariants.at(x)->id] = ivariants[x];
+		imagesbox->listWidget->reset();
+		imagesbox->add_image(ivariants.at(x)->id, ivariants[x], &ivariants[x]->icon);
+		int r = -1;
+		for (int j = 0; j < imagesbox->listWidget->count(); ++j)
+		{
+			short id0 = -1;
+			ListWidgetItem2 * item =
+				static_cast<ListWidgetItem2*>(imagesbox->listWidget->item(j));
+			if (item) id0 = item->get_id();
+			if (id0 == ivariants.at(x)->id)
+			{
+				r = j;
+				break;
+			}
+		}
+		if (x == ivariants.size() - 1 && r > -1)
+		{
+			imagesbox->listWidget->setCurrentRow(r);
+			update_selection2();
+			if (ok3d) glwidget->fit_to_screen(ivariants.at(x));
+			emit image_opened();
+		}
+	}
+	connect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
+	connect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
+	imagesbox->listWidget->blockSignals(false);
+	ivariants.clear();
+	if (ok3d) glwidget->set_skip_draw(false);
+	//
+	if (!sr_images.empty())
+	{
+		for (int k = 0; k < sr_images.size(); ++k)
+		{
+			qApp->processEvents();
+			QFileInfo fi(sr_images.at(k));
+			try
+			{
+				mdcm::Reader reader;
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+				reader.SetFileName(QDir::toNativeSeparators(sr_images.at(k)).toUtf8().constData());
+#else
+				reader.SetFileName(QDir::toNativeSeparators(sr_images.at(k)).toLocal8Bit().constData());
+#endif
+#else
+				reader.SetFileName(sr_images.at(k).toLocal8Bit().constData());
+#endif
+				if (!reader.Read()) continue;
+				const mdcm::File & file = reader.GetFile();
+				const mdcm::DataSet & ds = file.GetDataSet();
+				if (ds.IsEmpty()) continue;
+				const bool srinfo = settingswidget->get_sr_info();
+				QString t00080005;
+				const bool t00080005_ok = DicomUtils::get_string_value(
+						ds, mdcm::Tag(0x0008,0x0005), t00080005);
+				(void)t00080005_ok;
+				const QString s0 =
+					SRUtils::read_sr_title1(ds, t00080005);
+				SRUtils::set_asked_for_path_once(false);
+				SRWidget * sr = new SRWidget(settingswidget->get_scale_icons());
+				sr->setAttribute(Qt::WA_DeleteOnClose);
+				sr->setWindowTitle(s0);
+				const QString s1 =
+					SRUtils::read_sr_content_sq(
+						ds,
+						t00080005,
+						fi.absolutePath(),
+						static_cast<QWidget*>(settingswidget),
+						sr->textBrowser,
+						pb,
+						sr->tmpfiles,
+						sr->srimages,
+						0,
+						srinfo,
+						QString("1"),
+						true);
+				sr->initSR(s1);
+				sr->show();
+				sr->activateWindow();
+				sr->raise();
+			}
+			catch (const mdcm::ParseException & pe)
+			{
+				std::cout << pe.GetLastElement().GetTag() << std::endl;
+			}
+			catch (const std::exception & ex)
+			{
+				std::cout << ex.what() << std::endl;
+			}
+		}
+	}
+	//
+	if (!pdf_files.empty())
+	{
+		if (pb) pb->hide();
+		for (int k = 0; k < pdf_files.size(); ++k)
+		{
+			const QString pdff = QFileDialog::getSaveFileName(
+				nullptr,
+				QString("Select file"),
+				CommonUtils::get_save_dir() +
+					QString("/") +
+					CommonUtils::get_save_name() +
+					QString(".pdf"),
+				QString("All Files (*)"),
+				nullptr
+				 //, QFileDialog::DontUseNativeDialog
+				);
+			if (!pdff.isEmpty())
+			{
+				QFileInfo pfi(pdff);
+				CommonUtils::set_save_dir(pfi.absolutePath());
+				try
+				{
+					DicomUtils::write_encapsulated(pdf_files.at(k), pdff);
+				}
+				catch (const mdcm::ParseException & pe)
+				{
+					std::cout << pe.GetLastElement().GetTag() << std::endl;
+				}
+				catch (const std::exception & ex)
+				{
+					std::cout << ex.what() << std::endl;
+				}
+			}
+		}
+		if (pb) pb->show();
+	}
+	//
+	if (!stl_files.empty())
+	{
+		if (pb) pb->hide();
+		for (int k = 0; k < stl_files.size(); ++k)
+		{
+			const QString stlf = QFileDialog::getSaveFileName(
+				nullptr,
+				QString("Select file"),
+				CommonUtils::get_save_dir() +
+					QString("/") +
+					CommonUtils::get_save_name() +
+					QString(".stl"),
+				QString("All Files (*)"),
+				nullptr
+				 //, QFileDialog::DontUseNativeDialog
+				);
+			if (!stlf.isEmpty())
+			{
+				QFileInfo sfi(stlf);
+				CommonUtils::set_save_dir(sfi.absolutePath());			
+				try
+				{
+					DicomUtils::write_encapsulated(stl_files.at(k), stlf);
+				}
+				catch (const mdcm::ParseException & pe)
+				{
+					std::cout << pe.GetLastElement().GetTag() << std::endl;
+				}
+				catch (const std::exception & ex)
+				{
+					std::cout << ex.what() << std::endl;
+				}
+			}
+		}
+		if (pb) pb->show();
+	}
+	//
+	if (!video_files.empty())
+	{
+		if (pb) pb->hide();
+		for (int k = 0; k < video_files.size(); ++k)
+		{
+			const QString tmp943 = video_files.at(k);
+			const QString suf = DicomUtils::suffix_mpeg(tmp943);
+			const QString video_file_name =
+				QFileDialog::getSaveFileName(
+					nullptr,
+					QString("Select file"),
+					CommonUtils::get_save_dir() +
+						QString("/") +
+						CommonUtils::get_save_name() +
+						suf,
+					QString("All Files (*)"),
+					nullptr
+					 //, QFileDialog::DontUseNativeDialog
+					);
+			if (!video_file_name.isEmpty())
+			{
+				QFileInfo vfi(video_file_name);
+				CommonUtils::set_save_dir(vfi.absolutePath());
+				try
+				{
+					DicomUtils::write_mpeg(tmp943, video_file_name);
+				}
+				catch (const mdcm::ParseException & pe)
+				{
+					std::cout << pe.GetLastElement().GetTag() << std::endl;
+				}
+				catch (const std::exception & ex)
+				{
+					std::cout << ex.what() << std::endl;
+				}
+			}
+		}
+		if (pb) pb->show();
+	}
+#ifdef ALIZA_PRINT_COUNT_GL_OBJ
+	std::cout << "Num VBOs " << GLWidget::get_count_vbos() << std::endl;
+#endif
+	return message;
 }
 
 #ifdef ALIZA_PRINT_COUNT_GL_OBJ

@@ -25,8 +25,301 @@
 #include "commonutils.h"
 #include "dicomutils.h"
 #include <QProgressDialog>
+#include "vectormath/scalar/vectormath.h"
 
 //#define LOAD_SPECT_DATA
+
+namespace
+{
+
+typedef Vectormath::Scalar::Vector3 sVector3;
+typedef Vectormath::Scalar::Vector4 sVector4;
+typedef Vectormath::Scalar::Matrix4 sMatrix4;
+
+bool generate_spectorscopy_geometry(
+		std::vector<SpectroscopySlice*> & spectorscopyslices,
+		const std::vector<double*> & values,
+		const unsigned int rows_, const unsigned int columns_,
+		const double spacing_x, const double spacing_y, double * spacing_z,
+		const bool ok3d, GLWidget * gl,
+		bool * equi_,
+		bool * one_direction_,
+		double * origin_x,  double * origin_y,  double * origin_z,
+		double * dircos,
+		float * slices_dir_x, float * slices_dir_y, float * slices_dir_z,
+		float * up_dir_x, float * up_dir_y, float * up_dir_z,
+		float * center_x, float * center_y, float * center_z,
+		float tolerance)
+{
+	const unsigned int size_ = values.size();
+	if (size_ < 1) return false;
+	sVector3 first = sVector3(0.0f, 0.0f, 0.0f);
+	sVector3 last  = sVector3(0.0f, 0.0f, 0.0f);
+	sVector3 v0 = sVector3(0.0f, 0.0f, 0.0f);
+	sVector3 v1 = sVector3(0.0f, 0.0f, 0.0f);
+	sVector3 up = sVector3(0.0f, 0.0f, 0.0f);
+	QString tmp0;
+	bool tmp1 = true, tmp2 = true;
+	sVector3 tmp_p0 = sVector3(0.0f, 0.0f, 0.0f);
+	sVector3 tmp_p1 = sVector3(0.0f, 0.0f, 0.0f);
+	sVector3 tmp_p2 = sVector3(0.0f, 0.0f, 0.0f);
+	sVector3 tmp_p3 = sVector3(0.0f, 0.0f, 0.0f);
+	float tmp_length0 = 0.0f, tmp_length1 = 0.0f, tmp_length2 = 0.0f, tmp_length3 = 0.0f;
+	double spacing_z_ = 0;
+	bool invalidate_volume = false;
+	for (unsigned int i = 0; i < size_; ++i)
+	{
+		const double * ipp_iop = values.at(i);
+		const sVector4 c0 = sVector4(
+					static_cast<float>(ipp_iop[3] * spacing_x),
+					static_cast<float>(ipp_iop[4] * spacing_x),
+					static_cast<float>(ipp_iop[5] * spacing_x),
+					0.0f);
+		const sVector4 c1 = sVector4(
+					static_cast<float>(ipp_iop[6] * spacing_y),
+					static_cast<float>(ipp_iop[7] * spacing_y),
+					static_cast<float>(ipp_iop[8] * spacing_y),
+					0.0f);
+		const sVector4 c2 = sVector4(0.0f, 0.0f, 0.0f, 0.0f);
+		const sVector4 c3 = sVector4(
+					static_cast<float>(ipp_iop[0]),
+					static_cast<float>(ipp_iop[1]),
+					static_cast<float>(ipp_iop[2]),
+					1.0f);
+#if 0
+		std::cout << "ipp[0]=" << ipp_iop[0] << std::endl;
+		std::cout << "ipp[1]=" << ipp_iop[1] << std::endl;
+		std::cout << "ipp[2]=" << ipp_iop[2] << std::endl;
+#endif
+		sMatrix4 m0 = sMatrix4::identity();
+		m0.setCol0(c0);
+		m0.setCol1(c1);
+		m0.setCol2(c2);
+		m0.setCol3(c3);
+		const float r_ = rows_ - 1;
+		const float c_ = columns_ - 1;
+		const sVector4 ind0 = sVector4(0.0f ,  r_, 0.0f, 1.0f);
+		const sVector4 ind1 = sVector4(0.0f, 0.0f, 0.0f, 1.0f);
+		const sVector4 ind2 = sVector4(  c_,   r_, 0.0f, 1.0f);
+		const sVector4 ind3 = sVector4(  c_, 0.0f, 0.0f, 1.0f);
+		const sVector4 p0 = m0*ind0;
+		const sVector4 p1 = m0*ind1;
+		const sVector4 p2 = m0*ind2;
+		const sVector4 p3 = m0*ind3;
+		const float x0 = p0.getX(), y0 = p0.getY(), z0 = p0.getZ();
+		const float x1 = p1.getX(), y1 = p1.getY(), z1 = p1.getZ();
+		const float x2 = p2.getX(), y2 = p2.getY(), z2 = p2.getZ();
+		const float x3 = p3.getX(), y3 = p3.getY(), z3 = p3.getZ();
+#if 0
+		std::cout << "x0=" << x0 << " y0=" << y0 << " z0=" << z0 << std::endl;
+		std::cout << "x1=" << x1 << " y1=" << y1 << " z1=" << z1 << std::endl;
+		std::cout << "x2=" << x2 << " y2=" << y2 << " z2=" << z2 << std::endl;
+		std::cout << "x3=" << x3 << " y3=" << y3 << " z3=" << z3 << std::endl;
+#endif
+		const QString orientation_string = CommonUtils::get_orientation2(&ipp_iop[3]);
+		if (i == 0)
+		{
+			first = sVector3(x0, y0, z0);
+			v0 = (p0.getXYZ() + p3.getXYZ()) * 0.5f;
+			sVector3 tmp_up0 = sVector3(x1, y1, z1);
+			sVector3 tmp_up1 = sVector3(x0, y0, z0);
+			up = normalize(tmp_up1 - tmp_up0);
+			*origin_x = ipp_iop[0];
+			*origin_y = ipp_iop[1];
+			*origin_z = ipp_iop[2];
+			for (int j = 0; j < 6; ++j) dircos[j] = ipp_iop[3 + j];
+		}
+		if (i == size_ - 1)
+		{
+			last = sVector3(x0, y0, z0);
+			v1 = (p0.getXYZ()+p3.getXYZ()) * 0.5f;
+		}
+		CommonUtils::generate_spectroscopyslice(
+			spectorscopyslices,
+			orientation_string,
+			ok3d, gl,
+			x0, y0, z0, x1, y1, z1, x2, y2, z2, x3, y3, z3,
+			columns_, rows_);
+		const float length0 = Vectormath::Scalar::length(p0.getXYZ()-tmp_p0);
+		const float length1 = Vectormath::Scalar::length(p1.getXYZ()-tmp_p1);
+		const float length2 = Vectormath::Scalar::length(p2.getXYZ()-tmp_p2);
+		const float length3 = Vectormath::Scalar::length(p3.getXYZ()-tmp_p3);
+		// check orientation
+		if (i != 0)
+		{
+			if (tmp1)
+			{
+				if (tmp0 != orientation_string) tmp1 = false;
+				if ((length0 > (length1+tolerance))||(length0 < (length1-tolerance)))
+					tmp1 = false;
+				if ((length1 > (length2+tolerance))||(length1 < (length2-tolerance)))
+					tmp1 = false;
+				if ((length2 > (length3+tolerance))||(length2 < (length3-tolerance)))
+					tmp1 = false;
+				if ((length3 > (length0+tolerance))||(length3 < (length0-tolerance)))
+					tmp1 = false;
+			}
+		}
+		// check equidistance, requires 3 slices
+		if (i >= 2)
+		{
+			if (tmp2)
+			{
+				if ((length0 > (tmp_length0+tolerance))||(length0 < (tmp_length0-tolerance)))
+					tmp2 = false;
+				if ((length1 > (tmp_length1+tolerance))||(length1 < (tmp_length1-tolerance)))
+					tmp2 = false;
+				if ((length2 > (tmp_length2+tolerance))||(length2 < (tmp_length2-tolerance)))
+					tmp2 = false;
+				if ((length3 > (tmp_length3+tolerance))||(length3 < (tmp_length3-tolerance)))
+					tmp2 = false;
+			}
+		}
+#if 0
+		std::cout << "length0=" << length0 << std::endl;
+		std::cout << "length1=" << length1 << std::endl;
+		std::cout << "length2=" << length2 << std::endl;
+		std::cout << "length3=" << length3 << std::endl;
+		std::cout << "tmp1=" << tmp1 << std::endl;
+		std::cout << "tmp2=" << tmp2 << std::endl;
+		std::cout << "------------------------" << std::endl;
+#endif
+		if (i == size_ - 1)
+		{
+			spacing_z_ = length1;
+#if 0
+			std::cout << "spacing_z_=" << spacing_z_ << std::endl;
+#endif
+		}
+		tmp0 = orientation_string;
+		tmp_p0 = p0.getXYZ();
+		tmp_p1 = p1.getXYZ();
+		tmp_p2 = p2.getXYZ();
+		tmp_p3 = p3.getXYZ();
+		tmp_length0 = length0;
+		tmp_length1 = length1;
+		tmp_length2 = length2;
+		tmp_length3 = length3;
+	}
+	const float row_dircos_x = static_cast<float>(dircos[0]);
+	const float row_dircos_y = static_cast<float>(dircos[1]);
+	const float row_dircos_z = static_cast<float>(dircos[2]);
+	const float col_dircos_x = static_cast<float>(dircos[3]);
+	const float col_dircos_y = static_cast<float>(dircos[4]);
+	const float col_dircos_z = static_cast<float>(dircos[5]);
+	const float nrm_dircos_x = row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
+	const float nrm_dircos_y = row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
+	const float nrm_dircos_z = row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
+	const sVector3 direction1 = normalize(sVector3(nrm_dircos_x, nrm_dircos_y, nrm_dircos_z));
+	if (size_ > 1)
+	{
+		const sVector3 direction0_tmp = last - first;
+		if (!(
+			(direction0_tmp.getX() > -0.00001f && direction0_tmp.getX() < 0.00001f) &&
+			(direction0_tmp.getY() > -0.00001f && direction0_tmp.getY() < 0.00001f) &&
+			(direction0_tmp.getZ() > -0.00001f && direction0_tmp.getZ() < 0.00001f)
+			))
+		{
+			const sVector3 direction0 = normalize(direction0_tmp);
+			*slices_dir_x = direction0.getX();
+			*slices_dir_y = direction0.getY();
+			*slices_dir_z = direction0.getZ();
+			if (tmp1 &&
+				((tmp2 && (size_ > 2)) || size_ == 2) &&
+				!(
+				(direction0.getX() < direction1.getX() + 0.001f && direction0.getX() > direction1.getX() - 0.001f) &&
+				(direction0.getY() < direction1.getY() + 0.001f && direction0.getY() > direction1.getY() - 0.001f) &&
+				(direction0.getZ() < direction1.getZ() + 0.001f && direction0.getZ() > direction1.getZ() - 0.001f)
+				))
+			{
+				invalidate_volume = true;
+#if 1
+				std::cout
+					<< "Warning:\n"
+					<< "Direction cosines defined in DICOM file: "
+					<< row_dircos_x << "\\" << row_dircos_y << "\\" << row_dircos_z << "\\"
+					<< col_dircos_x << "\\" << col_dircos_y << "\\" << col_dircos_z << "\n"
+					<< " Z direction calculated from defined cosines: "
+					<< direction1.getX() << "," << direction1.getY() << "," << direction1.getZ() << "\n"
+					<< " Z direction from geometry (real): "
+					<< direction0.getX() << "," << direction0.getY() << "," << direction0.getZ() << "\n"
+					<< " ... using image as non-uniform.\n"
+					<< std::endl;
+#endif
+#if 0
+				const QString z_inv_string =
+					QString("Direction cosines defined in DICOM file:\n") +
+					QVariant(static_cast<double>(row_dircos_x)).toString() + QString("\\") +
+					QVariant(static_cast<double>(row_dircos_y)).toString() + QString("\\") +
+					QVariant(static_cast<double>(row_dircos_z)).toString() + QString("\\") +
+					QVariant(static_cast<double>(col_dircos_x)).toString() + QString("\\") +
+					QVariant(static_cast<double>(col_dircos_y)).toString() + QString("\\") +
+					QVariant(static_cast<double>(col_dircos_z)).toString() + QString("\n") +
+					QString(" Z direction calculated from defined cosines: ") +
+					QVariant(static_cast<double>(direction1.getX())).toString() + QString(",") +
+					QVariant(static_cast<double>(direction1.getY())).toString() + QString(",") +
+					QVariant(static_cast<double>(direction1.getZ())).toString() + QString("\n") +
+					QString(" Z direction calculated from geometry (real): ") +
+					QVariant(static_cast<double>(direction0.getX())).toString() + QString(",") +
+					QVariant(static_cast<double>(direction0.getY())).toString() + QString(",") +
+					QVariant(static_cast<double>(direction0.getZ())).toString() + QString("\n") +
+					QString(" ... using image as non-uniform.\n") +
+					QMessageBox mbox;
+					mbox.addButton(QMessageBox::Close);
+					mbox.setIcon(QMessageBox::Warning);
+					mbox.setText(z_inv_string);
+					mbox.exec();
+#endif
+
+			}
+		}
+		else
+		{
+			*slices_dir_x = direction1.getX();
+			*slices_dir_y = direction1.getY();
+			*slices_dir_z = direction1.getZ();
+			invalidate_volume = true;
+		}
+	}
+	else
+	{
+		*slices_dir_x = direction1.getX();
+		*slices_dir_y = direction1.getY();
+		*slices_dir_z = direction1.getZ();
+		*equi_ = true;
+	}
+	//
+	if (invalidate_volume)
+	{
+		*equi_ = false;
+	}
+	else
+	{
+		if      (size_ >  2) *equi_ = (tmp1 && tmp2);
+		else if (size_ == 2) *equi_ = tmp1;
+	}
+	//
+	*up_dir_x = up.getX();
+	*up_dir_y = up.getY();
+	*up_dir_z = up.getZ();
+	if (*equi_ == true)
+	{
+		const sVector3 cube_center = 0.5f * (v0 + v1);
+		*center_x = cube_center.getX();
+		*center_y = cube_center.getY();
+		*center_z = cube_center.getZ();
+		*one_direction_ = true;
+	}
+	else
+	{
+		if (tmp1 && size_ > 1) *one_direction_ = true;
+		else *one_direction_ = false;
+	}
+	*spacing_z = (size_ > 1) ? spacing_z_ : 1.0;
+	return true;
+}
+
+}
 
 bool SpectroscopyUtils::Read(const mdcm::DataSet & ds, SpectroscopyData * s)
 {
@@ -390,7 +683,6 @@ QString SpectroscopyUtils::ProcessData(
 			float  up_dir_x, up_dir_y, up_dir_z;
 			float  center_x, center_y, center_z;
 			std::vector<SpectroscopySlice*> slices;
-			std::vector<ImageSlice*> empty__;
 			QString orientation;
 			double spacing_x, spacing_y;
 			double spacing_tmp0[2] = {0.0, 0.0};
@@ -428,21 +720,19 @@ QString SpectroscopyUtils::ProcessData(
 #endif
 				continue;
 			}
-			const bool geom_ok = DicomUtils::generate_geometry(
-						empty__,
-						slices,
-						tmp4,
-						rows_, columns_,
-						spacing_x, spacing_y, &spacing_z,
-						ok3d, gl,
-						&equi_, &one_direction_,
-						&origin_x_gen, &origin_y_gen, &origin_z_gen,
-						dircos_gen,
-						&slices_dir_x, &slices_dir_y, &slices_dir_z,
-						&up_dir_x, &up_dir_y, &up_dir_z,
-						&center_x, &center_y, &center_z,
-						tolerance,
-						true);
+			const bool geom_ok = generate_spectorscopy_geometry(
+				slices,
+				tmp4,
+				rows_, columns_,
+				spacing_x, spacing_y, &spacing_z,
+				ok3d, gl,
+				&equi_, &one_direction_,
+				&origin_x_gen, &origin_y_gen, &origin_z_gen,
+				dircos_gen,
+				&slices_dir_x, &slices_dir_y, &slices_dir_z,
+				&up_dir_x, &up_dir_y, &up_dir_z,
+				&center_x, &center_y, &center_z,
+				0.01f);
 			if (!geom_ok)
 			{
 #if 1

@@ -4,7 +4,6 @@
 #include "structures.h"
 #include <QString>
 #include <QStringList>
-#include <QProgressDialog>
 #include <QWidget>
 #include <mdcmTag.h>
 #include <mdcmPrivateTag.h>
@@ -13,9 +12,6 @@
 #include <mdcmPhotometricInterpretation.h>
 #include <mdcmVR.h>
 #include <mdcmDicts.h>
-
-class GLWidget;
-class ShaderObj;
 
 enum class EnhancedIODLoadingType : short
 {
@@ -247,18 +243,15 @@ public:
 		ImageVariant*);
 	static bool read_slices(
 		const QStringList&, ImageVariant*,
-		const bool, const bool, GLWidget*,
-		QProgressDialog*,
+		const bool, const bool,
 		float);
 	static bool read_slices_uihgrid(
 		const mdcm::DataSet&, ImageVariant*,
-		const bool, const bool, GLWidget*,
-		QProgressDialog*,
+		const bool, const bool,
 		float);
 	static bool read_slices_rtdose(
 		const QString&, ImageVariant*,
-		const bool, const bool, GLWidget*,
-		QProgressDialog*,
+		const bool, const bool,
 		float);
 	static void read_dimension_index_sq(
 		const mdcm::DataSet&, DimIndexSq&);
@@ -294,19 +287,16 @@ public:
 	static bool get_pixel_spacing(const QString&, double*);
 	static bool generate_geometry(
 			std::vector<ImageSlice*> &,
-			std::vector<SpectroscopySlice*> &,
 			const std::vector<double*> &,
-			const unsigned int_, const unsigned int,
+			const unsigned int, const unsigned int,
 			const double, const double, double*,
-			const bool, GLWidget*,
 			bool*, bool*,
 			double*, double*, double*,
 			double*,
 			float*,float*,float*,
 			float*,float*,float*,
 			float*,float*,float*,
-			float,
-			const bool);
+			float);
 	static bool build_gems_dictionary(
 		QMap<QString,int> &,
 		const mdcm::DataSet&);
@@ -330,32 +320,30 @@ public:
 		PRDisplayShutter&);
 	static QString read_enhanced(
 		bool*, const QString&, std::vector<ImageVariant*> &,
-		int, GLWidget*, bool,
+		bool,
 		const bool,
 		const short,
-		const QWidget*, QProgressDialog*,
+		const QWidget*,
 		const float,
 		const bool);
 	static QString read_enhanced_supp_palette(
 		bool*, const QString&, std::vector<ImageVariant*> &,
-		int, GLWidget*, bool,
+		bool,
 		const bool,
 		const short,
-		const QWidget*, QProgressDialog*,
+		const QWidget*,
 		const float);
 	static QString read_ultrasound(
 		bool*, const short,
 		ImageVariant*,
 		const QStringList&,
-		const QWidget*,
-		QProgressDialog*);
+		const QWidget*);
 	static QString read_nuclear(
 		bool*, const short,
 		ImageVariant*,
 		const QStringList&,
-		int, GLWidget*, bool,
-		const QWidget*,
-		QProgressDialog*);
+		bool,
+		const QWidget*);
 	static QString read_series(
 		bool*,
 		const bool,
@@ -363,8 +351,8 @@ public:
 		const bool,
 		const bool,
 		ImageVariant*, const QStringList&,
-		int, GLWidget*, bool,
-		const QWidget*, QProgressDialog*,
+		bool,
+		const QWidget*,
 		float,
 		bool);
 	static bool convert_elscint(
@@ -392,8 +380,7 @@ public:
 		const bool,
 		int*,
 		unsigned long long*,
-		const bool, bool *,
-		QProgressDialog*);
+		const bool, bool *);
 	static QString read_enhanced_common(
 		bool*,
 		std::vector<ImageVariant*> &,
@@ -415,8 +402,6 @@ public:
 		const DimIndexValues&,
 		const FrameGroupValues&,
 		const bool,
-		const int,
-		GLWidget*,
 		const bool,
 		const QWidget*,
 		double*,
@@ -426,7 +411,6 @@ public:
 		const double, const double,
 		const bool,
 		const bool,
-		QProgressDialog*,
 		const float);
 	static bool enhanced_process_indices(
 		std::vector
@@ -453,7 +437,7 @@ public:
 		const int, const int, const int, const int, const int, const int,
 		const DimIndexValues&,
 		const FrameGroupValues&,
-		const bool, const int, GLWidget*,
+		const bool,
 		const bool,
 		const QWidget*,
 		double*,
@@ -463,7 +447,6 @@ public:
 		const double, const double,
 		const bool,
 		const bool,
-		QProgressDialog*,
 		const float,
 		const short);
 	static bool is_not_interleaved(const QStringList&);
@@ -482,24 +465,20 @@ public:
 	static bool process_contrours_ref(
 		const QString&, const QString&,
 		std::vector<ImageVariant*> &,
-		int, GLWidget*, bool,
+		bool,
 		short,
-		const QWidget*,
-		QProgressDialog*);
+		const QWidget*);
 	static QString find_file_from_uid(
 		const QString&,
-		const QString&,
-		QProgressDialog*);
+		const QString&);
 	static bool scan_files_for_instance_uid(
 		const QString&,
 		const QString&,
-		QString&,
-		QProgressDialog*);
+		QString&);
 	static void read_pr_ref(
 		const QString&,
 		const QString&,
-		QList<PrRefSeries> &,
-		QProgressDialog*);
+		QList<PrRefSeries> &);
 	static QString read_enhmr_spectro_info(
 		const mdcm::DataSet&,
 		bool);
@@ -534,11 +513,14 @@ public:
 	// 3 referenced in SR
 	static QString read_dicom(
 		std::vector<ImageVariant*> & ,
+		QStringList &,
+		QStringList &,
+		QStringList &,
+		QStringList &,
+		QStringList &,
 		const QStringList&,
-		int, GLWidget*,
-		ShaderObj*, bool,
+		bool,
 		const QWidget*,
-		QProgressDialog*,
 		short, // type of object processing
 		short);
 };

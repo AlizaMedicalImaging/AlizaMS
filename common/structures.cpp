@@ -32,6 +32,11 @@ DisplayInterface::DisplayInterface(
 	CommonUtils::random_RGB(&R, &G, &B);
 }
 
+void DisplayInterface::set_glwidget(GLWidget * w)
+{
+	gl = w;
+}
+
 void DisplayInterface::close(bool clear_geometry)
 {
 	if (opengl_ok && gl) gl->makeCurrent();
