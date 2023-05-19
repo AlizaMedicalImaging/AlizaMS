@@ -24,8 +24,6 @@
 #include "prconfigutils.h"
 #include "ultrasoundregiondata.h"
 #include "ultrasoundregionutils.h"
-#include "spectroscopydata.h"
-#include "spectroscopyutils.h"
 #include "colorspace/colorspace.h"
 #include <itkImageSliceIteratorWithIndex.h>
 #include <itkImageRegionIterator.h>
@@ -64,9 +62,7 @@
 #include <QList>
 #include <QTextCodec>
 #include <QApplication>
-#include <QMessageBox>
 #include <QFileInfo>
-#include <QFileDialog>
 #include <QApplication>
 #include <QDir>
 #include <QDirIterator>
@@ -77,10 +73,7 @@
 #include "iconutils.h"
 #include "updateqtcommand.h"
 #include <iostream>
-#include <vector>
-#include <map>
 #include <list>
-#include <string>
 #include <set>
 #include <algorithm>
 #include <random>
@@ -5469,31 +5462,6 @@ bool DicomUtils::generate_geometry(
 					<< " ... using image as non-uniform.\n"
 					<< std::endl;
 #endif
-#if 0
-				const QString z_inv_string =
-					QString("Direction cosines defined in DICOM file:\n") +
-					QVariant(static_cast<double>(row_dircos_x)).toString() + QString("\\") +
-					QVariant(static_cast<double>(row_dircos_y)).toString() + QString("\\") +
-					QVariant(static_cast<double>(row_dircos_z)).toString() + QString("\\") +
-					QVariant(static_cast<double>(col_dircos_x)).toString() + QString("\\") +
-					QVariant(static_cast<double>(col_dircos_y)).toString() + QString("\\") +
-					QVariant(static_cast<double>(col_dircos_z)).toString() + QString("\n") +
-					QString(" Z direction calculated from defined cosines: ") +
-					QVariant(static_cast<double>(direction1.getX())).toString() + QString(",") +
-					QVariant(static_cast<double>(direction1.getY())).toString() + QString(",") +
-					QVariant(static_cast<double>(direction1.getZ())).toString() + QString("\n") +
-					QString(" Z direction calculated from geometry (real): ") +
-					QVariant(static_cast<double>(direction0.getX())).toString() + QString(",") +
-					QVariant(static_cast<double>(direction0.getY())).toString() + QString(",") +
-					QVariant(static_cast<double>(direction0.getZ())).toString() + QString("\n") +
-					QString(" ... using image as non-uniform.\n") +
-					QMessageBox mbox;
-					mbox.addButton(QMessageBox::Close);
-					mbox.setIcon(QMessageBox::Warning);
-					mbox.setText(z_inv_string);
-					mbox.exec();
-#endif
-
 			}
 		}
 		else

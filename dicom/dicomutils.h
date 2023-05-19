@@ -12,6 +12,9 @@
 #include <mdcmPhotometricInterpretation.h>
 #include <mdcmVR.h>
 #include <mdcmDicts.h>
+#include <vector>
+#include <map>
+#include <string>
 
 enum class EnhancedIODLoadingType : short
 {
