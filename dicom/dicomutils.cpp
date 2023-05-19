@@ -76,7 +76,6 @@
 #include "settingswidget.h"
 #include "iconutils.h"
 #include "updateqtcommand.h"
-#include "findrefdialog.h"
 #include <iostream>
 #include <vector>
 #include <map>
