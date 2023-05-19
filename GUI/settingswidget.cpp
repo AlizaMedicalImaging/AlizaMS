@@ -155,6 +155,7 @@ void SettingsWidget::set_default()
 	icc_checkBox->setChecked(true);
 	supplut_checkBox->setChecked(true);
 	jpegprec_checkBox->setChecked(false);
+	ram_checkBox->setChecked(false);
 	//
 	enh_dim_uniform_radioButton->setChecked(true);
 	enh_dim_strict_radioButton->setChecked(false);
@@ -440,3 +441,7 @@ bool SettingsWidget::get_apply_supplemental_lut() const
 	return supplut_checkBox->isChecked();
 }
 
+bool SettingsWidget::get_skip_too_large() const
+{
+	return !ram_checkBox->isChecked();
+}

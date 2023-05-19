@@ -44,7 +44,7 @@
             <x>0</x>
             <y>0</y>
             <width>973</width>
-            <height>648</height>
+            <height>674</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_14">
@@ -427,6 +427,22 @@
                <number>6</number>
               </property>
               <item>
+               <widget class="QCheckBox" name="ram_checkBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Try to load files even if there is not enough RAM.&lt;/p&gt;&lt;p&gt;Please note that this is applicable to individual file or single series only.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>Ignore RAM shortage</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QCheckBox" name="pred6_checkBox">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -577,8 +593,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>989</width>
-            <height>587</height>
+            <width>295</width>
+            <height>125</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -824,8 +840,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>989</width>
-            <height>587</height>
+            <width>419</width>
+            <height>203</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1137,6 +1153,7 @@
   <tabstop>enh_dim_strict_1_radioButton</tabstop>
   <tabstop>enh_dim_strict_radioButton</tabstop>
   <tabstop>enh_dim_skip_radioButton</tabstop>
+  <tabstop>ram_checkBox</tabstop>
   <tabstop>pred6_checkBox</tabstop>
   <tabstop>cornell_checkBox</tabstop>
   <tabstop>jpegprec_checkBox</tabstop>

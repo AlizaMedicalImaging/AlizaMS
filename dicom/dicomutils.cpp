@@ -7034,12 +7034,13 @@ QString DicomUtils::read_enhanced(
 	unsigned short columns_ = 0;
 	bool rows_ok            = false;
 	bool cols_ok            = false;
-	bool clean_unused_bits  = false;
-	bool pred6_bug          = false;
-	bool cornell_bug        = false;
-	bool fix_jpeg_prec      = false;
-	bool use_icc            = false;
 	bool icc_ok             = false;
+	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
+	const bool pred6_bug = wsettings->get_predictor_workaround();
+	const bool cornell_bug = wsettings->get_cornell_workaround();
+	const bool fix_jpeg_prec = wsettings->get_try_fix_jpeg_prec();
+	const bool use_icc = wsettings->get_apply_icc();
+	const bool skip_too_large = wsettings->get_skip_too_large();
 	QString sop;
 	{
 		mdcm::Reader reader;
@@ -7066,11 +7067,6 @@ QString DicomUtils::read_enhanced(
 		const mdcm::Tag tColumns(0x0028,0x0011);
 		rows_ok = get_us_value(ds, tRows, &rows_);
 		cols_ok = get_us_value(ds, tColumns, &columns_);
-		clean_unused_bits = wsettings->get_clean_unused_bits();
-		pred6_bug = wsettings->get_predictor_workaround();
-		cornell_bug = wsettings->get_cornell_workaround();
-		fix_jpeg_prec = wsettings->get_try_fix_jpeg_prec();
-		use_icc = wsettings->get_apply_icc();
 		QString iod;
 		const mdcm::Tag tSOPClassUID(0x0008,0x0016);
 		const mdcm::Tag tPerFrameFunctionalGroupsSequence(0x5200,0x9230);
@@ -7144,6 +7140,7 @@ QString DicomUtils::read_enhanced(
 			pred6_bug,
 			cornell_bug,
 			fix_jpeg_prec,
+			skip_too_large,
 			nullptr,
 			nullptr,
 			use_icc, &icc_ok);
@@ -7365,6 +7362,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 	const bool pred6_bug = wsettings->get_predictor_workaround();
 	const bool cornell_bug = wsettings->get_cornell_workaround();
 	const bool fix_jpeg_prec = wsettings->get_try_fix_jpeg_prec();
+	const bool skip_too_large = wsettings->get_skip_too_large();
 	{
 		mdcm::Reader reader;
 #ifdef _WIN32
@@ -7468,6 +7466,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 			pred6_bug,
 			cornell_bug,
 			fix_jpeg_prec,
+			skip_too_large,
 			&red_subscript,
 			nullptr,
 			false, &icc_ok_dummy);
@@ -7682,6 +7681,7 @@ QString DicomUtils::read_ultrasound(
 	const bool cornell_bug = wsettings->get_cornell_workaround();
 	const bool fix_jpeg_prec = wsettings->get_try_fix_jpeg_prec();
 	const bool use_icc = wsettings->get_apply_icc();
+	const bool skip_too_large = wsettings->get_skip_too_large();
 	bool icc_ok = false;
 	std::vector<char*> data;
 	itk::Matrix<itk::SpacePrecisionType,3,3> direction;
@@ -7854,6 +7854,7 @@ QString DicomUtils::read_ultrasound(
 		pred6_bug,
 		cornell_bug,
 		fix_jpeg_prec,
+		skip_too_large,
 		nullptr,
 		nullptr,
 		use_icc, &icc_ok);
@@ -7959,6 +7960,7 @@ QString DicomUtils::read_nuclear(
 	const bool cornell_bug = wsettings->get_cornell_workaround();
 	const bool fix_jpeg_prec = wsettings->get_try_fix_jpeg_prec();
 	const bool use_icc = wsettings->get_apply_icc();
+	const bool skip_too_large = wsettings->get_skip_too_large();
 	bool icc_ok = false;
 	std::vector<char*> data;
 	itk::Matrix<itk::SpacePrecisionType, 3, 3> direction;
@@ -8051,6 +8053,7 @@ QString DicomUtils::read_nuclear(
 		pred6_bug,
 		cornell_bug,
 		fix_jpeg_prec,
+		skip_too_large,
 		nullptr,
 		nullptr,
 		use_icc, &icc_ok);
@@ -8172,6 +8175,7 @@ QString DicomUtils::read_series(
 	const bool cornell_bug = wsettings->get_cornell_workaround();
 	const bool fix_jpeg_prec = wsettings->get_try_fix_jpeg_prec();
 	const bool use_icc = wsettings->get_apply_icc();
+	const bool skip_too_large = wsettings->get_skip_too_large();
 	bool icc_ok = false;
 	std::vector<char*> data;
 	itk::Matrix<itk::SpacePrecisionType,3,3> direction;
@@ -8189,7 +8193,6 @@ QString DicomUtils::read_series(
 	//
 #ifdef WARN_RAM_SIZE
 	const double total_ram = CommonUtils::get_total_memory_saved();
-	bool skip_ram_warning = false;
 #endif
 	unsigned long long count_buffers_size = 0;
 	for (int j = 0; j < images_ipp.size(); ++j)
@@ -8432,6 +8435,7 @@ QString DicomUtils::read_series(
 				pred6_bug,
 				cornell_bug,
 				fix_jpeg_prec,
+				skip_too_large,
 				nullptr,
 				&buffers_size,
 				use_icc, &icc_ok);
@@ -8459,50 +8463,24 @@ QString DicomUtils::read_series(
 			}
 			data.push_back(&data_[0][0]);
 			count_buffers_size += buffers_size;
-/*
 #ifdef WARN_RAM_SIZE
-			if (!skip_ram_warning && total_ram > 0.0)
+			if (skip_too_large && total_ram > 0.0)
 			{
 				const double count_buffers_gb = count_buffers_size / 1073741824.0;
 				if ((count_buffers_gb * 3) >= total_ram)
 				{
-					const double buffer_gb_tmp =
-						CommonUtils::set_digits(count_buffers_gb, 3);
-					if (pb) pb->hide();
-					QMessageBox mbox;
-					mbox.addButton(QMessageBox::Yes);
-					mbox.addButton(QMessageBox::No);
-					mbox.setDefaultButton(QMessageBox::No);
-					mbox.setIcon(QMessageBox::Question);
-					mbox.setText(
-						QString("Size of data reached ") +
-						QVariant(buffer_gb_tmp).toString() +
-						QString(
-							" GB\nand may require several times more\n"
-							"memory during load (it depends on re-scale type\n"
-							"and other factors). Disabling \"GPU texture\" in\n"
-							"\"Settings/3D\" may reduce memory\n"
-							"pressure sometimes.\n"
-							"Proceed?"));
-					if (mbox.exec() == QMessageBox::Yes)
+					*ok = false;
+					for (unsigned int x = 0; x < data.size(); ++x)
 					{
-						skip_ram_warning = true;
+						delete [] data[x];
 					}
-					else
-					{
-						*ok = false;
-						for (unsigned int x = 0; x < data.size(); ++x)
-						{
-							delete [] data[x];
-						}
-						data.clear();
-						return QString("");
-					}
-					if (pb) pb->show();
+					data.clear();
+					return QString(
+						"The file seems to be too large, "
+						"to try to load check \"Ignore RAM shortage\" in Settings");
 				}
 			}
 #endif
-*/
 		}
 		else if (images_ipp.size() == 1)
 		{
@@ -8528,6 +8506,7 @@ QString DicomUtils::read_series(
 				pred6_bug,
 				cornell_bug,
 				fix_jpeg_prec,
+				skip_too_large,
 				nullptr,
 				nullptr,
 				use_icc, &icc_ok);
@@ -9285,6 +9264,7 @@ QString DicomUtils::read_buffer(
 	const bool pred6_bug,
 	const bool cornell_bug,
 	const bool fix_jpeg_prec,
+	const bool skip_too_large,
 	int * red_subscript,
 	unsigned long long * buffers_size,
 	const bool use_icc, bool * has_icc)
@@ -9377,41 +9357,19 @@ QString DicomUtils::read_buffer(
 		mdcm::Image & image = image_reader.GetImage();
 		{
 			const unsigned long long buffer_size_tmp = image.GetBufferLength();
-/*
 #ifdef WARN_RAM_SIZE
 			const double total_ram = CommonUtils::get_total_memory_saved();
-			if (total_ram > 0.0)
+			if (skip_too_large && total_ram > 0.0)
 			{
 				const double buffer_gb = buffer_size_tmp / 1073741824.0;
 				if ((buffer_gb * 3) >= total_ram)
 				{
-					const double buffer_gb_tmp =
-						CommonUtils::set_digits(buffer_gb, 3);
-					if (pb) pb->hide();
-					QMessageBox mbox;
-					mbox.addButton(QMessageBox::Yes);
-					mbox.addButton(QMessageBox::No);
-					mbox.setDefaultButton(QMessageBox::No);
-					mbox.setIcon(QMessageBox::Question);
-					mbox.setText(
-						QString("Data size is ") +
-						QVariant(buffer_gb_tmp).toString() +
-						QString(
-							" GB\nand may require several times more\n"
-							"memory during load (it depends on re-scale type\n"
-							"and other factors). Disabling \"GPU texture\" in\n"
-							"\"Settings/3D\" may reduce memory\n"
-							"pressure sometimes.\n"
-							"Proceed?"));
-					if (mbox.exec() != QMessageBox::Yes)
-					{
-						return QString("");
-					}
-					if (pb) pb->show();
+					return QString(
+						"The file seems to be too large, "
+						"to try to load check \"Ignore RAM shortage\" in Settings");
 				}
 			}
 #endif
-*/
 			if (buffer_size_tmp > 0xffffffff)
 			{
 // https://groups.google.com/g/comp.protocols.dicom/c/-tO2v2aH010/m/PNGwaLpBkBsJ
@@ -14774,53 +14732,17 @@ QString DicomUtils::read_dicom(
 			ok3d,
 			ivariants,
 			message_pr);
-/*
 		if (count < 1 && message_pr.isEmpty())
 		{
-#ifdef USE_WORKSTATION_MODE
-			QFileInfo fi99(p);
-			p = fi99.absolutePath();
-#else
-			p = QString();
-#endif
-			const QString s(
-				"<html><head/><body>"
-				"<span style=\"font-style:italic;\">"
-				"Grayscale Softcopy Presentation</span>"
-				"<p>"
-				"Select directory for recursive scan"
-				"</p>"
-				"</body></html>");
-			if (pb) pb->hide();
-			FindRefDialog * d =
-				new FindRefDialog(wsettings->get_scale_icons());
-			d->set_text(s);
-			d->set_path(QDir::toNativeSeparators(p));
-			bool _ok = false;
-			if (d->exec() == QDialog::Accepted)
-			{
-				_ok = true;
-				p = d->get_path();
-			}
-			delete d;
-			if (pb) pb->show();
-			if (!_ok)
-			{
-				return QString("");
-			}
-			count = process_gsps(
-				grey_softcopy_pr_files,
-				p,
-				wsettings,
-				ok3d, max_3d_tex_size, gl, mesh_shader,
-				ivariants,
-				message_pr,
-				pb);
+			if (!message_.isEmpty()) message_.append(QChar('\n'));
+			message_.append(QString(
+				"Can not find series referenced in Grayscale Softcopy Presentation,"
+				"try to scan the folder containing both, GSPS and referenced series"));
 		}
-*/
-		if (!message_pr.isEmpty())
+		else if (!message_pr.isEmpty())
 		{
-			message_.append(message_pr + QString("\n"));
+			if (!message_.isEmpty()) message_.append(QChar('\n'));
+			message_.append(message_pr);
 		}
 	}
 	if (!color_softcopy_pr_files.empty()        ||
@@ -14841,13 +14763,11 @@ QString DicomUtils::read_dicom(
 		if (!advanced_blending_softcopy_pr_files.empty())
 			pr_warn += QString("Advanced Blending Softcopy Presentation ");
 		pr_warn += QString("is currently not supported");
-/*
-		QMessageBox mbox;
-		mbox.addButton(QMessageBox::Close);
-		mbox.setIcon(QMessageBox::Warning);
-		mbox.setText(pr_warn);
-		mbox.exec();
-*/
+		if (!pr_warn.isEmpty())
+		{
+			if (message_.isEmpty()) message_.append(QChar('\n'));
+			message_.append(pr_warn);
+		}
 	}
 	//
 	return message_;
