@@ -4,6 +4,7 @@
 #include "structures.h"
 #include <QString>
 #include <QStringList>
+#include <QList>
 #include <QWidget>
 #include <mdcmTag.h>
 #include <mdcmPrivateTag.h>

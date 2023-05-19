@@ -59,16 +59,9 @@
 #include <mdcmUIDs.h>
 #include "splituihgridfilter.h"
 #include <QSet>
-#include <QList>
-#include <QTextCodec>
-#include <QApplication>
 #include <QFileInfo>
-#include <QApplication>
 #include <QDir>
 #include <QDirIterator>
-#include <QDateTime>
-#include <QDate>
-#include <QTime>
 #include "settingswidget.h"
 #include "iconutils.h"
 #include "updateqtcommand.h"

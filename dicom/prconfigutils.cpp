@@ -37,7 +37,6 @@
 #include <itkImageDuplicator.h>
 #include <QMap>
 #include <QMultiMap>
-#include <QApplication>
 #include <vector>
 #include <iostream>
 #include <mdcmDataElement.h>

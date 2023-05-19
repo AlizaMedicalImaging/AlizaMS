@@ -1,13 +1,12 @@
 #include "structures.h"
+#include "iconutils.h"
 #include <itkExtractImageFilter.h>
 #include <itkIntensityWindowingImageFilter.h>
 #include <QPainter>
 #include <QImage>
 #include <QColor>
 #include <QThread>
-#include <QApplication>
 #include <vector>
-#include "iconutils.h"
 #include <chrono>
 #include <thread>
 
