@@ -547,15 +547,6 @@ public:
 //
 /////////////////////////////////////////
 
-/////////////////////////////////////////
-//
-// Test Photoacoustic Image Storage FIXME
-//
-	uid_1_2_840_10008_5_1_2_3_45 = 479
-//
-//
-/////////////////////////////////////////
-
   } UIDType;
 
   typedef enum
@@ -1081,15 +1072,6 @@ public:
     VideoPhotographicImageRealTimeCommunication = 476,
     AudioWaveformRealTimeCommunication = 477,
     RenditionSelectionDocumentRealTimeCommunication = 478,
-//
-//
-/////////////////////////////////////////
-
-/////////////////////////////////////////
-//
-// Test Photoacoustic Image Storage FIXME
-//
-    TestPhotoacousticImageStorage = 479
 //
 //
 /////////////////////////////////////////

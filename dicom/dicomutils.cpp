@@ -10706,10 +10706,12 @@ QString DicomUtils::read_enhanced_common(
 					{
 						ivariant->iinfo = read_enhct_info(ds);
 					}
-					else if (sop == QString("1.2.840.10008.5.1.2.3.45")) // FIXME
+/*
+					else if (sop == QString("")) // FIXME
 					{
 						ivariant->iinfo = read_PhotoacousticImage(ds);
 					}
+*/
 					read_ivariant_info_tags(ds, ivariant);
 					read_window(ds, &window_center_tmp, &window_width_tmp, &lut_function_tmp);
 					instance_uid = read_instance_uid(ds);

@@ -141,7 +141,6 @@ public:
     BreastProjectionXRayImageStorageForProcessing,
     HardcopyColorImageStorage,
     DCMTKUnknownStorage,
-    TestPhotoacousticImageStorage, // FIXME
     MS_END
   } MSType;
 
@@ -214,7 +213,7 @@ private:
   const char *
   GetFromHeader(FileMetaInformation const &, std::string &);
   const char *
-         GetFromDataSet(DataSet const &, std::string &);
+  GetFromDataSet(DataSet const &, std::string &);
   MSType MSField;
 };
 
