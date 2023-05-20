@@ -11882,8 +11882,7 @@ bool DicomUtils::is_dicom_file(const QString & f)
 			fs.read(b, 4);
 			if(!fs.fail())
 			{
-				if (
-					b[0] == 'D' &&
+				if (b[0] == 'D' &&
 					b[1] == 'I' &&
 					b[2] == 'C' &&
 					b[3] == 'M')
@@ -11905,8 +11904,7 @@ bool DicomUtils::is_dicom_file(const QString & f)
 			itk::ByteSwapper<unsigned short>::SwapFromSystemToLittleEndian(
 				&group_no);
 			// 0x0003 and 0x0005 are illegal, but files exist
-			if(
-				group_no == 0x0002 ||
+			if (group_no == 0x0002 ||
 				group_no == 0x0003 ||
 				group_no == 0x0005 ||
 				group_no == 0x0008)
@@ -12536,9 +12534,8 @@ QString DicomUtils::read_enhmr_spectro_info(
 		if (!tmp0.isEmpty())
 		{
 			s += QString(
-			"<span class='y7'>MR Timing and Related Parameters Macro"
-			"</span><br />");
-			s += tmp0;
+				"<span class='y7'>MR Timing and Related Parameters Macro"
+				"</span><br />") + tmp0;
 		}
 	}
 	//
@@ -13132,7 +13129,6 @@ QString DicomUtils::read_dicom(
 		static_cast<const SettingsWidget * const>(settings);
 	std::map<unsigned int, SliceInstance> slice_pos_map;
 	std::list<long long> slice_pos_list;
-	bool load_image_ref_contour = false;
 	const float tolerance = 0.01f;
 	int count_images = 0;
 	int count_uid_errors = 0;
@@ -13216,25 +13212,7 @@ QString DicomUtils::read_dicom(
 			{
 				QFileInfo reffi(filenames.at(x));
 				rtstruct_ref_search_path = reffi.absolutePath();
-				load_image_ref_contour = true;
-				if (!load_image_ref_contour)
-				{
-					ImageVariant * ivariant =
-						new ImageVariant(
-							CommonUtils::get_next_id(),
-							ok3d,
-							!wsettings->get_3d(),
-							nullptr,
-							0);
-					ivariant->filenames = QStringList(filenames.at(x));
-					load_contour(ds, ivariant);
-					ContourUtils::calculate_rois_center(ivariant);
-					rtstructs.push_back(ivariant);
-				}
-				else
-				{
-					rtstruct_ref_search.push_back(filenames.at(x));
-				}
+				rtstruct_ref_search.push_back(filenames.at(x));
 			}
 			continue;
 		}
