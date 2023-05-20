@@ -14,6 +14,7 @@ void LoadDicom::run()
 			video_files,
 			spectroscopy_files,
 			sr_images,
+			root,
 			filenames,
 			ok3d,
 			settingswidget,

@@ -738,6 +738,7 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 		mutex0.unlock();
 		return QString("");
 	}
+	const QString root = browser2->get_root();
 	for (unsigned int x = 0; x < rows.size(); ++x)
 	{
 		const int row = rows.at(x);
@@ -749,6 +750,7 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 		if ((item->files.empty())) continue;
 		filenames = item->files;
 		LoadDicom * lt = new LoadDicom(
+			root,
 			filenames,
 			ok3d,
 			static_cast<const QWidget * const>(
@@ -4131,6 +4133,7 @@ QString Aliza::load_dicom_file(
 	}
 	{
 		LoadDicom * lt = new LoadDicom(
+			QString(""),
 			filenames,
 			ok3d,
 			static_cast<const QWidget * const>(

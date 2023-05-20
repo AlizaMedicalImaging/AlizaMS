@@ -15,12 +15,14 @@ Q_OBJECT
 
 public:
 	LoadDicom(
+		const QString root_,
 		const QStringList & filenames_,
 		const bool ok3d_,
 		const QWidget * const settingswidget_,
 		const short load_type_,
 		const short enh_type_)
 		:
+		root(root_),
 		filenames(filenames_),
 		ok3d(ok3d_),
 		settingswidget(settingswidget_),
@@ -37,6 +39,7 @@ public:
 	QStringList sr_images;
 
 private:
+	const QString root;
 	const QStringList filenames;
 	const bool ok3d;
 	const QWidget * const settingswidget;

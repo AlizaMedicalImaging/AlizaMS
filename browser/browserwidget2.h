@@ -99,6 +99,7 @@ public:
 	const QString read_DICOMDIR(const QString&);
 	QStringList   get_files_of_1st();
 	void          writeSettings(QSettings&);
+	QString       get_root() const;
 
 protected:
 	void closeEvent(QCloseEvent*) override;

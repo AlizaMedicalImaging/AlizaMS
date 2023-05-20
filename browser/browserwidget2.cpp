@@ -637,6 +637,25 @@ QStringList BrowserWidget2::get_files_of_1st()
 	return current_item->files;
 }
 
+QString BrowserWidget2::get_root() const
+{
+	QString r;
+	const QString p = directory_lineEdit->text().trimmed();
+	QFileInfo fi(p);
+	if (fi.exists())
+	{
+		if (fi.isFile())
+		{
+			return QDir::toNativeSeparators(fi.absolutePath());
+		}
+		else if (fi.isDir())
+		{
+			return QDir::toNativeSeparators(fi.absoluteFilePath());
+		}
+	}
+	return QString("");
+}
+
 void BrowserWidget2::copy_files()
 {
 	static unsigned long long count2 = 0;

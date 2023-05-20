@@ -523,6 +523,7 @@ public:
 		QStringList &,
 		QStringList &,
 		QStringList &,
+		const QString&,
 		const QStringList&,
 		bool,
 		const QWidget*,

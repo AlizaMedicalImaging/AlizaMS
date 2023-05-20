@@ -491,6 +491,7 @@ void SRUtils::read_IMAGE(
 				dummy,
 				dummy,
 				dummy,
+				QString(""),
 				QStringList(sf),
 				false,
 				wsettings,

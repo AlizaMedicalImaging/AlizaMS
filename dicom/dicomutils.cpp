@@ -2001,6 +2001,7 @@ unsigned int process_gsps(
 					dummy,
 					dummy,
 					dummy,
+					QString(""),
 					ref_files,
 					false,
 					settings,
@@ -2098,7 +2099,7 @@ unsigned int process_gsps(
 				}
 			}
 			if (!message_pr_ref.isEmpty())
-				message_.append(QString("\n") + message_pr_ref);
+				message_.append(QChar('\n') + message_pr_ref);
 		}
 	}
 	return count;
@@ -12153,6 +12154,7 @@ bool DicomUtils::process_contrours_ref(
 						dummy,
 						dummy,
 						dummy,
+						QString(""),
 						detected_files_tmp,
 						ok3d,
 						settings,
@@ -13084,6 +13086,7 @@ QString DicomUtils::read_dicom(
 	QStringList & video_files,
 	QStringList & spectroscopy_files,
 	QStringList & sr_images,
+	const QString & root,
 	const QStringList & filenames,
 	bool ok3d,
 	const QWidget * settings,
@@ -13104,8 +13107,6 @@ QString DicomUtils::read_dicom(
 	QStringList blending_softcopy_pr_files;
 	QStringList xaxrf_softcopy_pr_files;
 	QStringList advanced_blending_softcopy_pr_files;
-	std::vector<ImageVariant*> rtstructs;
-	std::vector<ImageVariant*> meshes;
 	QVector<QStringList> extracted_images;
 	bool enhanced     = false;
 	bool supp_palette = false;
@@ -14549,13 +14550,7 @@ QString DicomUtils::read_dicom(
 			QString(")"));
 	}
 	//
-	//
 	if (load_type != 0) return message_;
-	//
-	for (size_t x = 0; x < rtstructs.size(); ++x)
-		ivariants.push_back(rtstructs[x]);
-	for (size_t x = 0; x < meshes.size(); ++x)
-		ivariants.push_back(meshes[x]);
 	//
 	if (!rtstruct_ref_search.empty())
 	{
@@ -14582,19 +14577,11 @@ QString DicomUtils::read_dicom(
 					ivariants.push_back(tmp_ivariants_rtstruct[y]);
 				}
 			}
-			else
+			else if (!root.isEmpty())
 			{
-#ifndef USE_WORKSTATION_MODE
-				const QString tmpp = QString(
-#ifdef _WIN32
-					"DICOM/"
-#else
-					"../DICOM/"
-#endif
-				);
 				ref2_ok = process_contrours_ref(
 					rtstruct_ref_search.at(x),
-					tmpp,
+					root,
 					tmp_ivariants_rtstruct,
 					ok3d,
 					enh_loading_type,
@@ -14610,18 +14597,14 @@ QString DicomUtils::read_dicom(
 						ivariants.push_back(tmp_ivariants_rtstruct[y]);
 					}
 				}
-				if (!ref2_ok)
-#endif
-				{
-					if (!message_.isEmpty()) message_.append(QChar('\n'));
-					message_.append(QString(
-						"Could not find series referenced in RTSTRUCT, "
-						"try to use DICOM scan from the directory containing both,"
-						"RTSTRUCT and referenced series"));
-				}
 			}
 			if (!(ref_ok || ref2_ok))
 			{
+				if (!message_.isEmpty()) message_.append(QChar('\n'));
+				message_.append(QString(
+					"Could not find series referenced in RTSTRUCT, "
+					"try to use DICOM scan from the directory containing both,"
+					"RTSTRUCT and referenced series"));
 				mdcm::Reader reader;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
@@ -14653,36 +14636,34 @@ QString DicomUtils::read_dicom(
 	{
 		const QString file0 = grey_softcopy_pr_files.at(0);
 		QFileInfo p0(file0);
-#ifdef USE_WORKSTATION_MODE
-		QString p = p0.absolutePath();
-#else
-		QString p = QString(
-#ifdef _WIN32
-			"DICOM/"
-#else
-			"../DICOM/"
-#endif
-			);
-#endif
 		QString message_pr;
+		QString root_tmp;
+		if (root.isEmpty())
+		{
+			root_tmp = p0.absolutePath();
+		}
+		else
+		{
+			root_tmp = root;
+		}
 		unsigned int count = process_gsps(
 			grey_softcopy_pr_files,
-			p,
+			root_tmp,
 			wsettings,
 			ok3d,
 			ivariants,
 			message_pr);
-		if (count < 1 && message_pr.isEmpty())
-		{
-			if (!message_.isEmpty()) message_.append(QChar('\n'));
-			message_.append(QString(
-				"Can not find series referenced in Grayscale Softcopy Presentation,"
-				"try to scan the folder containing both, GSPS and referenced series"));
-		}
-		else if (!message_pr.isEmpty())
+		if (!message_pr.isEmpty())
 		{
 			if (!message_.isEmpty()) message_.append(QChar('\n'));
 			message_.append(message_pr);
+		}
+		if (count < 1)
+		{
+			if (!message_.isEmpty()) message_.append(QChar('\n'));
+			message_.append(QString(
+				"Can not find or load series referenced in Grayscale Softcopy Presentation,"
+				"try to scan the folder containing both, GSPS and referenced series"));
 		}
 	}
 	if (!color_softcopy_pr_files.empty()        ||
