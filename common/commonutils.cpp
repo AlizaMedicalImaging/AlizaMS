@@ -501,8 +501,8 @@ template<typename T> int generate_tex3d(
 	QProgressDialog * pb,
 	GLWidget * gl)
 {
-	if (image.IsNull()||!ivariant||!gl) return 1;
-	if (size[0] < 1||size[1] < 1)
+	if (image.IsNull() || !ivariant||!gl) return 1;
+	if (size[0] < 1 || size[1] < 1)
 	{
 		std::cout << "(size[0] < 1||size[1] < 1)" << std::endl;
 		return 1;
@@ -701,9 +701,8 @@ template<typename T> int generate_tex3d(
 		inIterator.SetSecondDirection(1); // Y axis
 		inIterator.GoToBegin();
 		size_t j = 0;
-		const double max_minus_min =
-			(rmax-rmin > 0) ? rmax - rmin : 1e-9;
-		while(!inIterator.IsAtEnd())
+		const double max_minus_min = (rmax-rmin > 0) ? rmax - rmin : 1e-9;
+		while (!inIterator.IsAtEnd())
 		{
 			while (!inIterator.IsAtEndOfSlice())
 			{
@@ -730,7 +729,7 @@ template<typename T> int generate_tex3d(
 			inIterator.NextSlice();
 		}
 	}
-	catch(const itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject & ex)
 	{
 		std::cout << ex.GetDescription() << std::endl;
 		error__ = 4;
@@ -880,7 +879,8 @@ template<typename T> int generate_tex3d(
 #endif
 		}
 		break;
-	default: break;
+	default:
+		break;
 	}
 	//
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -1070,7 +1070,6 @@ template <typename T> bool reload_monochrome_image(
 	typename T::SpacingType spacing;
 	short count__ = 0;
 	double fx = 0.0, fy = 0.0, fz = 0.0;
-	//if (gl) gl->makeCurrent();
 	ivariant->di->close(generate_slices);
 	region  = image->GetLargestPossibleRegion();
 	size    = region.GetSize();

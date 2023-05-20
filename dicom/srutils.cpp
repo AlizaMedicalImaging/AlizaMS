@@ -502,7 +502,7 @@ void SRUtils::read_IMAGE(
 				ImageVariant2D * v2 = new ImageVariant2D();
 				CommonUtils::get_dimensions_(v);
 				CommonUtils::calculate_minmax_scalar(v);
-				switch(v->image_type)
+				switch (v->image_type)
 				{
 				case 0:
 					e_ = gs3<ImageTypeSS, Image2DTypeSS>(v->pSS, v2->pSS, idx);
@@ -561,7 +561,7 @@ void SRUtils::read_IMAGE(
 				{
 					v2->image_type = v->image_type;
 					SRImage pm;
-					switch(v2->image_type)
+					switch (v2->image_type)
 					{
 					case 0: pm = li3<Image2DTypeSS>(v2->pSS, v);
 						break;
