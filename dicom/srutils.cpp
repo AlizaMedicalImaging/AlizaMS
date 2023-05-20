@@ -496,9 +496,10 @@ void SRUtils::read_IMAGE(
 				{
 					set_asked_for_path_once(true);
 					const QString s22(
-						"<html><head/><body><p align=\"center\">"
-						"<p>Select directory to start recursive "
-						"search.</body></html>");
+						"<html><head/><body>"
+						"<p>Select a directory to start a recursive search.</p>"
+						"<p>The directory one level up is suggested below.</p>"
+						"</body></html>");
 					QFileInfo fi22(path + QString("/.."));
 					if (pb) pb->hide();
 					FindRefDialog * d =
