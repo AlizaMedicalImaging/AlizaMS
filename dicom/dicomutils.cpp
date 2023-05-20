@@ -9777,7 +9777,7 @@ QString DicomUtils::read_buffer(
 						delete [] not_rescaled_buffer;
 						delete [] icc_profile;
 						if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
-						return QString("Buffer is nullptr");
+						return QString("Buffer is null");
 					}
 					const bool ok_rescale = r.Rescale(rescaled_buffer, not_rescaled_buffer, image_buffer_length);
 					if (ok_rescale)
@@ -12202,7 +12202,7 @@ QString DicomUtils::find_file_from_uid(
 	if (uid.isEmpty()) return f;
 	bool ok = scan_files_for_instance_uid(p, uid, f);
 	if (ok) return f;
-	QDirIterator it(p, QDir::Dirs|QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+	QDirIterator it(p, QDir::Dirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
 	while (it.hasNext())
 	{
 		ok = scan_files_for_instance_uid(it.next(), uid, f);

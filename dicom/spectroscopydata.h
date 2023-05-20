@@ -1,5 +1,5 @@
-#ifndef A_SpectroscopyData_H
-#define A_SpectroscopyData_H
+#ifndef A_SPECTROSCOPYDATA_H
+#define A_SPECTROSCOPYDATA_H
 
 #include <QString>
 #include <vector>
@@ -8,7 +8,7 @@ class SpectroscopyData
 {
 public:
 	SpectroscopyData() {}
-	~SpectroscopyData(){}
+	~SpectroscopyData() {}
 	int            m_NumberOfFrames{1};
 	unsigned short m_Rows{};
 	unsigned short m_Columns{};
