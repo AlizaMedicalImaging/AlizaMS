@@ -9,12 +9,14 @@
 #include <mdcmSmartPointer.h>
 #include <mdcmDataElement.h>
 #include <mdcmSequenceOfItems.h>
+#include <mdcmReader.h>
 #include <mdcmUIDs.h>
 #include <QtGlobal>
 #include <QByteArray>
 #include <QDate>
 #include <QDateTime>
 #include <QDir>
+#include <QDirIterator>
 #include <QFileInfo>
 #include <QImage>
 #include <QUrl>
@@ -22,6 +24,7 @@
 #include <QPainterPath>
 #include <QPen>
 #include <QBrush>
+#include <QApplication>
 #include "processimagethreadLUT.hxx"
 #include "settingswidget.h"
 #include "findrefdialog.h"
@@ -300,6 +303,68 @@ template<typename T> SRImage lrgb3(
 	return sr;
 }
 
+bool scan_files_for_instance_uid2(
+	const QString & p,
+	const QString & uid,
+	QString & file)
+{
+	if (p.isEmpty())   return false;
+	if (uid.isEmpty()) return false;
+	QApplication::processEvents();
+	std::set<mdcm::Tag> tags;
+	mdcm::Tag tSOPInstanceUID(0x0008,0x0018);
+	tags.insert(tSOPInstanceUID);
+	QDir dir(p);
+	QStringList flist =
+		dir.entryList(QDir::Files|QDir::Readable, QDir::Name);
+	for (int x = 0; x < flist.size(); ++x)
+	{
+		QApplication::processEvents();
+		const QString tmp0 =
+			dir.absolutePath() + QString("/") + flist.at(x);
+		mdcm::Reader reader;
+#ifdef _WIN32
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+		reader.SetFileName(QDir::toNativeSeparators(tmp0).toUtf8().constData());
+#else
+		reader.SetFileName(QDir::toNativeSeparators(tmp0).toLocal8Bit().constData());
+#endif
+#else
+		reader.SetFileName(tmp0.toLocal8Bit().constData());
+#endif
+		if (!reader.ReadSelectedTags(tags)) continue;
+		const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
+		QString uid_;
+		const bool ok = DicomUtils::get_string_value(ds, tSOPInstanceUID, uid_);
+		if (ok &&
+			uid.trimmed().remove(QChar('\0')) == uid_.trimmed().remove(QChar('\0')))
+		{
+			file = tmp0;
+			return true;
+		}
+	}
+	return false;
+}
+
+QString find_file_from_uid2(
+	const QString & p,
+	const QString & uid)
+{
+	QString f;
+	if (p.isEmpty())   return f;
+	if (uid.isEmpty()) return f;
+	bool ok = scan_files_for_instance_uid2(p, uid, f);
+	QApplication::processEvents();
+	if (ok) return f;
+	QDirIterator it(p, QDir::Dirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+	while (it.hasNext())
+	{
+		ok = scan_files_for_instance_uid2(it.next(), uid, f);
+		if (ok) break;
+	}
+	return f;
+}
+
 }
 
 static bool SRUtils_asked_for_path_once = false;
@@ -407,7 +472,7 @@ void SRUtils::read_IMAGE(
 			{
 				pb->setLabelText(QString("Searching referenced files"));
 			}
-			QString sf = DicomUtils::find_file_from_uid(
+			QString sf = find_file_from_uid2(
 				QDir::toNativeSeparators(path),
 				ReferencedSOPInstanceUID);
 #ifndef USE_WORKSTATION_MODE
@@ -420,20 +485,9 @@ void SRUtils::read_IMAGE(
 					"../DICOM/"
 #endif
 					);
-				sf = DicomUtils::find_file_from_uid(
+				sf = find_file_from_uid2(
 					tmpp,
 					ReferencedSOPInstanceUID);
-			}
-#else
-			if (sf.isEmpty())
-			{
-				QFileInfo fi5(path + QString("/.."));
-				if (fi5.exists())
-				{
-					sf = DicomUtils::find_file_from_uid(
-						fi5.absoluteFilePath(),
-						ReferencedSOPInstanceUID);
-				}
 			}
 #endif
 			if (sf.isEmpty())
@@ -445,14 +499,13 @@ void SRUtils::read_IMAGE(
 						"<html><head/><body><p align=\"center\">"
 						"<p>Select directory to start recursive "
 						"search.</body></html>");
-					QFileInfo fi22(path+QString("/.."));
+					QFileInfo fi22(path + QString("/.."));
 					if (pb) pb->hide();
 					FindRefDialog * d =
 						new FindRefDialog(settings->get_scale_icons());
 					d->set_text(s22);
 					d->set_path(
-						QDir::toNativeSeparators(
-							fi22.absoluteFilePath()));
+						QDir::toNativeSeparators(fi22.absoluteFilePath()));
 					if (d->exec() == QDialog::Accepted)
 					{
 						SRUtils_selected_path = d->get_path();
@@ -468,7 +521,7 @@ void SRUtils::read_IMAGE(
 				if (SRUtils_asked_for_path_once &&
 					(!SRUtils_selected_path.isEmpty()))
 				{
-					sf = DicomUtils::find_file_from_uid(
+					sf = find_file_from_uid2(
 						QDir::toNativeSeparators(SRUtils_selected_path),
 						ReferencedSOPInstanceUID);
 				}
