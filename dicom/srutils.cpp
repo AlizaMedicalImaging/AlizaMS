@@ -15,6 +15,7 @@
 #include <QDate>
 #include <QDateTime>
 #include <QDir>
+#include <QFileInfo>
 #include <QImage>
 #include <QUrl>
 #include <QPainter>
@@ -412,12 +413,6 @@ void SRUtils::read_IMAGE(
 #ifndef USE_WORKSTATION_MODE
 			if (sf.isEmpty())
 			{
-				sf = DicomUtils::find_file_from_uid(
-					path + QString("/.."),
-					ReferencedSOPInstanceUID);
-			}
-			if (sf.isEmpty())
-			{
 				const QString tmpp = QString(
 #ifdef _WIN32
 					"DICOM/"
@@ -428,6 +423,17 @@ void SRUtils::read_IMAGE(
 				sf = DicomUtils::find_file_from_uid(
 					tmpp,
 					ReferencedSOPInstanceUID);
+			}
+#else
+			if (sf.isEmpty())
+			{
+				QFileInfo fi5(path + QString("/.."));
+				if (fi5.exists())
+				{
+					sf = DicomUtils::find_file_from_uid(
+						fi5.absoluteFilePath(),
+						ReferencedSOPInstanceUID);
+				}
 			}
 #endif
 			if (sf.isEmpty())

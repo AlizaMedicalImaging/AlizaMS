@@ -5139,8 +5139,7 @@ bool DicomUtils::get_patient_position(
 	double * pp)
 {
 	if (pp == nullptr || p.isEmpty()) return false;
-	QString tmp0 = p.trimmed().
-		remove(QChar('\0'));
+	QString tmp0 = p.trimmed().remove(QChar('\0'));
 	if (tmp0.contains(QString(",")))
 	{
 		// Workaround invalid VR
@@ -5447,12 +5446,12 @@ bool DicomUtils::generate_geometry(
 				std::cout
 					<< "Warning:\n"
 					<< "Direction cosines defined in DICOM file: "
-					<< row_dircos_x << "\\" << row_dircos_y << "\\" << row_dircos_z << "\\"
-					<< col_dircos_x << "\\" << col_dircos_y << "\\" << col_dircos_z << "\n"
+					<< row_dircos_x << "\\" << row_dircos_y << "\\" << row_dircos_z << '\\'
+					<< col_dircos_x << "\\" << col_dircos_y << "\\" << col_dircos_z << '\n'
 					<< " Z direction calculated from defined cosines: "
-					<< direction1.getX() << "," << direction1.getY() << "," << direction1.getZ() << "\n"
+					<< direction1.getX() << "," << direction1.getY() << "," << direction1.getZ() << '\n'
 					<< " Z direction from geometry (real): "
-					<< direction0.getX() << "," << direction0.getY() << "," << direction0.getZ() << "\n"
+					<< direction0.getX() << "," << direction0.getY() << "," << direction0.getZ() << '\n'
 					<< " ... using image as non-uniform.\n"
 					<< std::endl;
 #endif
@@ -11236,7 +11235,7 @@ QString DicomUtils::read_enhanced_common(
 			}
 			tmp4.clear();
 		}
-		if (!message_.isEmpty()) message.append(QString("\n") + message_);
+		if (!message_.isEmpty()) message.append(QChar('\n') + message_);
 #ifdef ENHANCED_PRINT_INFO
 		if (!min_load)
 		{
@@ -11554,7 +11553,7 @@ bool DicomUtils::enhanced_process_indices(
 				tmp0.at(x).cbegin();
 			while (it != tmp0.at(x).cend())
 			{
-				std::cout << "x = " << x << " [" << it->first << "]=" << it->second << "\n";
+				std::cout << "x = " << x << " [" << it->first << "]=" << it->second << '\n';
 				++it;
 			}
 		}
@@ -14577,15 +14576,33 @@ QString DicomUtils::read_dicom(
 					ivariants.push_back(tmp_ivariants_rtstruct[y]);
 				}
 			}
-			else if (!root.isEmpty())
+			else
 			{
-				ref2_ok = process_contrours_ref(
-					rtstruct_ref_search.at(x),
-					root,
-					tmp_ivariants_rtstruct,
-					ok3d,
-					enh_loading_type,
-					settings);
+				if (!root.isEmpty())
+				{
+					ref2_ok = process_contrours_ref(
+						rtstruct_ref_search.at(x),
+						root,
+						tmp_ivariants_rtstruct,
+						ok3d,
+						enh_loading_type,
+						settings);
+				}
+				else
+				{
+					// Try to go one directory up
+					QFileInfo fi5(rtstruct_ref_search_path + QString("/.."));
+					if (fi5.exists())
+					{
+						ref2_ok = process_contrours_ref(
+							rtstruct_ref_search.at(x),
+							QDir::toNativeSeparators(fi5.absoluteFilePath()),
+							tmp_ivariants_rtstruct,
+							ok3d,
+							enh_loading_type,
+							settings);
+					}
+				}
 				if (ref2_ok)
 				{
 					for (unsigned int y = 0;
@@ -14603,7 +14620,7 @@ QString DicomUtils::read_dicom(
 				if (!message_.isEmpty()) message_.append(QChar('\n'));
 				message_.append(QString(
 					"Could not find series referenced in RTSTRUCT, "
-					"try to use DICOM scan from the directory containing both,"
+					"try to use DICOM scanner from the directory containing both, "
 					"RTSTRUCT and referenced series"));
 				mdcm::Reader reader;
 #ifdef _WIN32
@@ -14653,6 +14670,21 @@ QString DicomUtils::read_dicom(
 			ok3d,
 			ivariants,
 			message_pr);
+		if (root.isEmpty() && count < 1 && message_pr.isEmpty())
+		{
+			// Try to go one directory up
+			QFileInfo fi5(root_tmp + QString("/.."));
+			if (fi5.exists())
+			{
+				count = process_gsps(
+					grey_softcopy_pr_files,
+					QDir::toNativeSeparators(fi5.absoluteFilePath()),
+					wsettings,
+					ok3d,
+					ivariants,
+					message_pr);
+			}
+		}
 		if (!message_pr.isEmpty())
 		{
 			if (!message_.isEmpty()) message_.append(QChar('\n'));
@@ -14662,8 +14694,8 @@ QString DicomUtils::read_dicom(
 		{
 			if (!message_.isEmpty()) message_.append(QChar('\n'));
 			message_.append(QString(
-				"Can not find or load series referenced in Grayscale Softcopy Presentation,"
-				"try to scan the folder containing both, GSPS and referenced series"));
+				"Could not find or load series referenced in Grayscale Softcopy Presentation, "
+				"try to use DICOM scanner from folder containing both, GSPS and referenced series"));
 		}
 	}
 	if (!color_softcopy_pr_files.empty()        ||
