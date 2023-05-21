@@ -59,13 +59,14 @@
 #endif
 #endif
 
+
+namespace
+{
+
 static QString screenshot_dir("");
 static QString save_dir("");
 static QString open_dir("");
 static double saved_total_memory = 0.0;
-
-namespace
-{
 
 typedef Vectormath::Scalar::Vector3 sVector3;
 
@@ -74,10 +75,10 @@ double abs_max(double x, double y, double z)
 	const double x_ = fabs(x);
 	const double y_ = fabs(y);
 	const double z_ = fabs(z);
-    double r;
-    r = (x_ > y_) ? x_ : y_;
-    r = (z_ > r)  ? z_ : r;
-    return r;
+	double r;
+	r = (x_ > y_) ? x_ : y_;
+	r = (z_ > r)  ? z_ : r;
+	return r;
 }
 
 template<typename T> void calculate_min_max(
@@ -355,7 +356,7 @@ template <typename T> void calculate_rgb_minmax_(
 			if (b < min_b) min_b = b;
 			if (g < min_g) min_g = g;
 			if (r < min_r) min_r = r;
- 			++iterator;
+			++iterator;
 		}
 	}
 	catch (const itk::ExceptionObject & ex)
@@ -389,8 +390,7 @@ template <typename T> void calculate_rgba_minmax_(
 	ImageVariant * ivariant)
 {
 	if (image.IsNull()) return;
-	const typename T::RegionType region =
-		image->GetLargestPossibleRegion();
+	const typename T::RegionType region = image->GetLargestPossibleRegion();
 	double max_r = std::numeric_limits<double>::min();
 	double max_g = std::numeric_limits<double>::min();
 	double max_b = std::numeric_limits<double>::min();
@@ -417,7 +417,7 @@ template <typename T> void calculate_rgba_minmax_(
 			if (b < min_b) min_b = b;
 			if (g < min_g) min_g = g;
 			if (r < min_r) min_r = r;
- 			++iterator;
+			++iterator;
 		}
 	}
 	catch (const itk::ExceptionObject & ex)
@@ -736,7 +736,6 @@ template<typename T> int generate_tex3d(
 		goto quit__;
 	}
 	//
-	qApp->processEvents();
 	gl->makeCurrent();
 #if 0
 	if (!gl->isValid())
@@ -752,9 +751,8 @@ template<typename T> int generate_tex3d(
 #if 0
 	if (glerror__ != 0)
 	{
-		std::cout
-			<< "warning : OpenGL error (before texture generation)\n"
-			<< glerror__ << std::endl;
+		std::cout << "warning : OpenGL error (before texture generation)"
+			<< std::endl;
 	}
 #endif
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -817,10 +815,10 @@ template<typename T> int generate_tex3d(
 	//
 	// GL_UNPACK_ALIGNMENT/GL_PACK_ALIGNMENT
 	// 1 byte-alignment
-    // 2 rows aligned to even-numbered bytes
-    // 4 word-alignment
-    // 8 rows start on double-word boundaries
-    //
+	// 2 rows aligned to even-numbered bytes
+	// 4 word-alignment
+	// 8 rows start on double-word boundaries
+	//
 	switch (texture_type)
 	{
 	case 0:
@@ -891,9 +889,8 @@ template<typename T> int generate_tex3d(
 	if (glerror__ == 0x505)
 	{
 #if 0
-		std::cout
-			<< "error : OpenGL error 0x505\n"
-			<< glerror__ << std::endl;
+		std::cout << "error : OpenGL error 0x505"
+			<< std::endl;
 #endif
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		gl->glBindTexture(GL_TEXTURE_3D, 0);
@@ -926,14 +923,12 @@ template<typename T> void read_geometry_from_image(
 {
 	if (!ivariant) return;
 	if (image.IsNull()) return;
-	const typename T::SizeType size =
-		image->GetLargestPossibleRegion().GetSize();
+	const typename T::SizeType size = image->GetLargestPossibleRegion().GetSize();
 	sVector3 first     = sVector3(0.0f, 0.0f, 0.0f);
 	sVector3 last      = sVector3(0.0f, 0.0f, 0.0f);
 	sVector3 direction = sVector3(0.0f, 0.0f, 0.0f);
 	sVector3 up        = sVector3(0.0f, 0.0f, 0.0f);
-	const typename T::DirectionType dircos =
-		image->GetDirection();
+	const typename T::DirectionType dircos = image->GetDirection();
 	const double d1 = dircos[0][0];
 	const double d2 = dircos[1][0];
 	const double d3 = dircos[2][0];
@@ -944,10 +939,18 @@ template<typename T> void read_geometry_from_image(
 	{
 		typename T::IndexType idx0, idx1, idx2, idx3;
 		itk::Point<float, 3> p0, p1, p2, p3;
-		idx0[0] = 0;           idx0[1] = size[1] - 1; idx0[2] = z;
-		idx1[0] = 0;           idx1[1] = 0;           idx1[2] = z;
-		idx2[0] = size[0] - 1; idx2[1] = size[1] - 1; idx2[2] = z;
-		idx3[0] = size[0] - 1; idx3[1] = 0;           idx3[2] = z;
+		idx0[0] = 0;
+		idx1[0] = 0;
+		idx2[0] = size[0] - 1;
+		idx3[0] = size[0] - 1;
+		idx0[1] = size[1] - 1;
+		idx1[1] = 0;
+		idx2[1] = size[1] - 1;
+		idx3[1] = 0;
+		idx0[2] = z;
+		idx1[2] = z;
+		idx2[2] = z;
+		idx3[2] = z;
 		try
 		{
 			image->TransformIndexToPhysicalPoint(idx0, p0);
@@ -1047,11 +1050,9 @@ template <typename T> bool reload_monochrome_image(
 {
 	if (!ivariant || image.IsNull()) return false;
 	const bool generate_slices =
-		(!disable_gen_slices &&
-			!ivariant->di->slices_generated);
+		(!disable_gen_slices && !ivariant->di->slices_generated);
 	const bool calc_center =
-		(!disable_gen_slices &&
-			!ivariant->di->slices_generated);
+		(!disable_gen_slices && !ivariant->di->slices_generated);
 	get_dimensions<T>(image,
 		&(ivariant->di->idimx),
 		&(ivariant->di->idimy),
@@ -1174,8 +1175,8 @@ template <typename T> bool reload_monochrome_image(
 						<< "error " << error__
 						<< std::endl;
 				}
-				isize[0]    *= 0.5;
-				isize[1]    *= 0.5;
+				isize[0] *= 0.5;
+				isize[1] *= 0.5;
 				dspacing[0] *= 2.0;
 				dspacing[1] *= 2.0;
 				if (gl) gl->makeCurrent();
@@ -1228,11 +1229,9 @@ template<typename T> bool reload_rgb_image(
 	if (!ivariant||image.IsNull()) return false;
 	ivariant->di->skip_texture = true;
 	const bool generate_slices =
-		(!disable_gen_slices &&
-			!ivariant->di->slices_generated);
+		(!disable_gen_slices && !ivariant->di->slices_generated);
 	const bool calc_center =
-		(!disable_gen_slices &&
-			!ivariant->di->slices_generated);
+		(!disable_gen_slices && !ivariant->di->slices_generated);
 	get_dimensions<T>(
 		image,
 		&(ivariant->di->idimx),
@@ -1272,11 +1271,9 @@ template<typename T> bool reload_rgba_image(
 	if (!ivariant||image.IsNull()) return false;
 	ivariant->di->skip_texture = true;
 	const bool generate_slices =
-		(!disable_gen_slices &&
-			!ivariant->di->slices_generated);
+		(!disable_gen_slices && !ivariant->di->slices_generated);
 	const bool calc_center =
-		(!disable_gen_slices &&
-			!ivariant->di->slices_generated);
+		(!disable_gen_slices && !ivariant->di->slices_generated);
 	get_dimensions<T>(
 		image,
 		&(ivariant->di->idimx),
@@ -1323,8 +1320,7 @@ template<typename T> QString process_dicom_monochrome_image1(
 	if (!buffer)
 	{
 		*ok = false;
-		return QString(
-			"process_dicom_monochrome_image1: buffer is null");
+		return QString("process_dicom_monochrome_image1: buffer is null");
 	}
 	typename T::RegionType region;
 	typename T::SizeType size;
@@ -1354,8 +1350,7 @@ template<typename T> QString process_dicom_monochrome_image1(
 		direction[2][1] > -0.000001 && direction[2][1] < 0.000001 &&
 		direction[0][2] > -0.000001 && direction[0][2] < 0.000001 &&
 		direction[1][2] > -0.000001 && direction[1][2] < 0.000001 &&
-		direction[2][2] > -0.000001 && direction[2][2] < 0.000001)
-			? true : false;
+		direction[2][2] > -0.000001 && direction[2][2] < 0.000001);
 	try
 	{
 		image = T::New();
@@ -1469,8 +1464,7 @@ template<typename T> QString process_dicom_rgb_image1(
 	if (!buffer)
 	{
 		*ok = false;
-		return QString(
-			"process_dicom_rgb_image1: buffer is null");
+		return QString("process_dicom_rgb_image1: buffer is null");
 	}
 	typename T::RegionType region;
 	typename T::SizeType size;
@@ -1499,8 +1493,7 @@ template<typename T> QString process_dicom_rgb_image1(
 		direction[2][1] > -0.000001 && direction[2][1] < 0.000001 &&
 		direction[0][2] > -0.000001 && direction[0][2] < 0.000001 &&
 		direction[1][2] > -0.000001 && direction[1][2] < 0.000001 &&
-		direction[2][2] > -0.000001 && direction[2][2] < 0.000001)
-			? true : false;
+		direction[2][2] > -0.000001 && direction[2][2] < 0.000001);
 	try
 	{
 		image = T::New();
@@ -1669,8 +1662,7 @@ template<typename T> QString process_dicom_rgba_image1(
 	if (!buffer)
 	{
 		*ok = false;
-		return QString(
-			"process_dicom_rgba_image: buffer is null");
+		return QString("process_dicom_rgba_image: buffer is null");
 	}
 	typename T::RegionType region;
 	typename T::SizeType size;
@@ -1699,8 +1691,7 @@ template<typename T> QString process_dicom_rgba_image1(
 		direction[2][1] > -0.000001 && direction[2][1] < 0.000001 &&
 		direction[0][2] > -0.000001 && direction[0][2] < 0.000001 &&
 		direction[1][2] > -0.000001 && direction[1][2] < 0.000001 &&
-		direction[2][2] > -0.000001 && direction[2][2] < 0.000001)
-			? true : false;
+		direction[2][2] > -0.000001 && direction[2][2] < 0.000001);
 	try
 	{
 		image = T::New();
@@ -2198,8 +2189,8 @@ QString CommonUtils::convert_orientation_flag(unsigned int in)
 
 double CommonUtils::set_digits(double i, int digits)
 {
-    const double t = pow(10.0, digits);
-    return floor(i * t) / t;
+	const double t = pow(10.0, digits);
+	return floor(i * t) / t;
 }
 
 QString CommonUtils::get_orientation2(const double * pat_orientation)
@@ -2772,16 +2763,13 @@ void CommonUtils::copy_essential(
 	ImageVariant * dest,
 	const ImageVariant * source)
 {
-	if (!dest||!source) return;
-	dest->equi                 = source->equi;
-	dest->di->skip_texture     = source->di->skip_texture;
+	if (!dest || !source) return;
+	dest->equi = source->equi;
+	dest->di->skip_texture = source->di->skip_texture;
 	dest->di->hide_orientation = source->di->hide_orientation;
-	if (
-		source->ybr &&
-		dest->image_type >= 10 &&
-		dest->image_type < 16 &&
-		source->image_type >= 10 &&
-		source->image_type < 16)
+	if (source->ybr &&
+		dest->image_type >= 10 && dest->image_type < 16 &&
+		source->image_type >= 10 && source->image_type < 16)
 	{
 		dest->ybr = true;
 	}
@@ -3020,8 +3008,7 @@ void CommonUtils::copy_imagevariant_overlays(
 		const SliceOverlays & source_overlays = it.value();
 		for (int x = 0; x < source_overlays.size(); ++x)
 		{
-			const SliceOverlay source_overlay =
-				source_overlays.at(x);
+			const SliceOverlay source_overlay = source_overlays.at(x);
 			SliceOverlay overlay;
 			overlay.dimx = source_overlay.dimx;
 			overlay.dimy = source_overlay.dimy;
@@ -4073,7 +4060,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					bad_direction);
 			}
 			break;
- 		case mdcm::PixelFormat::FLOAT32:
+		case mdcm::PixelFormat::FLOAT32:
 			{
 				char * p__;
 				if (data_size > 1)
@@ -4720,14 +4707,12 @@ QString CommonUtils::gen_itk_image(bool * ok,
 		ivariant->orientation = 0;
 		ivariant->orientation_string = QString("");
 	}
-	if (ivariant->image_type >= 0 &&
-		ivariant->image_type < 10 &&
+	if (ivariant->image_type >= 0 && ivariant->image_type < 10 &&
 		!no_warn_rescale)
 	{
 		ivariant->rescale_disabled = true;
 	}
-	if (ivariant->di->slices_from_dicom ||
-		allow_geometry_from_image)
+	if (ivariant->di->slices_from_dicom || allow_geometry_from_image)
 	{
 		ivariant->di->hide_orientation = false;
 	}
@@ -4787,7 +4772,8 @@ void CommonUtils::read_geometry_from_image_(ImageVariant * v)
 		break;
 	case 26: read_geometry_from_image<RGBAImageTypeD>(v, v->pD_rgba);
 		break;
-	default: break;
+	default:
+		break;
 	}
 }
 
@@ -4841,9 +4827,7 @@ QString CommonUtils::get_screenshot_dir()
 	if (screenshot_dir.isEmpty())
 	{
 #ifdef _WIN32
-		return (QDir::homePath() +
-			QString("/") +
-			QString("Desktop"));
+		return (QDir::homePath() + QString("/") + QString("Desktop"));
 #else
 		return QDir::homePath();
 #endif
@@ -4858,24 +4842,20 @@ void CommonUtils::set_screenshot_dir(const QString & s)
 
 QString CommonUtils::get_screenshot_name(const QString & s)
 {
-	QString d = (s.isEmpty())
+	const QString d = (s.isEmpty())
 		?
-			QDateTime::currentDateTime().toString(
-				QString("yyyyMMdd-hhmmss")) +
+		QDateTime::currentDateTime().toString(QString("yyyyMMdd-hhmmss")) +
 			QString(".png")
 		:
-			s + QString("/") +
-			QDateTime::currentDateTime().toString(
+		s + QString("/") + QDateTime::currentDateTime().toString(
 				QString("yyyyMMdd-hhmmss")) +
-				QString(".png");
+					QString(".png");
 	return d;
 }
 
 QString CommonUtils::get_screenshot_name2()
 {
-	return
-		QDateTime::currentDateTime().toString(
-			QString("yyyyMMdd-hhmmss"));
+	return (QDateTime::currentDateTime().toString(QString("yyyyMMdd-hhmmss")));
 }
 
 QString CommonUtils::get_save_dir()
@@ -4883,9 +4863,7 @@ QString CommonUtils::get_save_dir()
 	if (save_dir.isEmpty())
 	{
 #ifdef _WIN32
-		return (QDir::homePath() +
-			QString("/") +
-			QString("Desktop"));
+		return (QDir::homePath() + QString("/") + QString("Desktop"));
 #else
 		return QDir::homePath();
 #endif
@@ -4900,8 +4878,7 @@ void CommonUtils::set_save_dir(const QString & s)
 
 QString CommonUtils::get_save_name()
 {
-	return QDateTime::currentDateTime().
-		toString(QString("yyyyMMdd-hhmmss"));
+	return QDateTime::currentDateTime().toString(QString("yyyyMMdd-hhmmss"));
 }
 
 QString CommonUtils::get_open_dir()
@@ -5120,9 +5097,7 @@ double CommonUtils::calculate_max_delta(const ImageVariant * v)
 void CommonUtils::random_RGB(float * R, float * G, float * B)
 {
 	const unsigned long long seed =
-		std::chrono::high_resolution_clock::now()
-			.time_since_epoch()
-			.count();
+		std::chrono::high_resolution_clock::now().time_since_epoch().count();
 	const double H = random_range(0.0, 3600.0, seed  );
 	const double S = random_range(0.5,    1.0, seed/7);
 	const double V = random_range(0.4,    1.0, seed/3);
