@@ -613,11 +613,9 @@ void MainWindow::open_args(const QStringList & l)
 	delete pb;
 	if (!message.isEmpty())
 	{
-		QMessageBox mbox;
-		mbox.addButton(QMessageBox::Close);
-		mbox.setIcon(QMessageBox::Information);
-		mbox.setText(message);
-		mbox.exec();
+		InfoDialog info;
+		info.set_text(message);
+		info.exec();
 	}
 	mutex.unlock();
 }
@@ -1387,11 +1385,9 @@ void MainWindow::dropEvent(QDropEvent * e)
 	}
 	if (!message.isEmpty())
 	{
-		QMessageBox mbox;
-		mbox.addButton(QMessageBox::Close);
-		mbox.setIcon(QMessageBox::Information);
-		mbox.setText(message);
-		mbox.exec();
+		InfoDialog info;
+		info.set_text(message);
+		info.exec();
 	}
 	mutex.unlock();
 }
@@ -1459,11 +1455,9 @@ void MainWindow::load_any()
 	}
 	if (!message.isEmpty())
 	{
-		QMessageBox mbox;
-		mbox.addButton(QMessageBox::Close);
-		mbox.setIcon(QMessageBox::Information);
-		mbox.setText(message);
-		mbox.exec();
+		InfoDialog info;
+		info.set_text(message);
+		info.exec();
 	}
 	mutex.unlock();
 }
@@ -1613,10 +1607,9 @@ void MainWindow::load_dicom_series2()
 	delete pb;
 	if (!message.isEmpty())
 	{
-		InfoDialog * info = new InfoDialog();
-		info->set_text(message);
-		info->exec();
-		delete info;
+		InfoDialog info;
+		info.set_text(message);
+		info.exec();
 	}
 	qApp->processEvents();
 	mutex.unlock();

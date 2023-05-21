@@ -3539,7 +3539,7 @@ quit_:
 
 bool DicomUtils::read_slices_uihgrid(
 	const mdcm::DataSet & ds, ImageVariant * ivariant,
-	const bool ok3d, const bool skip_texture,
+	const bool ok3d,
 	float tolerance)
 {
 	if (!ivariant) return false;
@@ -3801,7 +3801,7 @@ bool DicomUtils::read_slices_uihgrid(
 
 bool DicomUtils::read_slices_rtdose(
 	const QString & filename_, ImageVariant * ivariant,
-	const bool ok3d, const bool skip_texture,
+	const bool ok3d,
 	float tolerance)
 {
 	if (!ivariant) return false;
@@ -8226,7 +8226,6 @@ QString DicomUtils::read_series(
 							ds,
 							ivariant,
 							ok3d,
-							ivariant->di->skip_texture,
 							tolerance);
 						if (slices_ok) ivariant->iod_supported = true;
 						else geometry_from_image = true;
@@ -8259,7 +8258,6 @@ QString DicomUtils::read_series(
 								images_ipp.at(j),
 								ivariant,
 								ok3d,
-								ivariant->di->skip_texture,
 								0.01f);
 							if (slices_ok)
 							{
@@ -14619,9 +14617,9 @@ QString DicomUtils::read_dicom(
 			{
 				if (!message_.isEmpty()) message_.append(QChar('\n'));
 				message_.append(QString(
-					"Could not find series referenced in RTSTRUCT, "
-					"try to use DICOM scanner from the directory containing both, "
-					"RTSTRUCT and referenced series"));
+					"The series referenced in the Grayscale Soft Copy presentation "
+					"could not be found. Try using a DICOM scanner from a "
+					"folder containing both the RTSTRUCT and the referenced series."));
 				mdcm::Reader reader;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
@@ -14694,8 +14692,9 @@ QString DicomUtils::read_dicom(
 		{
 			if (!message_.isEmpty()) message_.append(QChar('\n'));
 			message_.append(QString(
-				"Could not find or load series referenced in Grayscale Softcopy Presentation, "
-				"try to use DICOM scanner from folder containing both, GSPS and referenced series"));
+				"The series referenced in the Grayscale Soft Copy presentation "
+				"could not be found or opened. Try using a DICOM scanner from a "
+				"folder containing both the GSPS series and the referenced series."));
 		}
 	}
 	if (!color_softcopy_pr_files.empty()        ||

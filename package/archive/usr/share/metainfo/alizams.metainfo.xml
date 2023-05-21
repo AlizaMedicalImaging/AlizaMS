@@ -43,11 +43,11 @@
   </screenshots>
 
   <releases>
-    <release version="1.8.3" date="2022-07-27">
+    <release version="1.9.0" date="2023-05-20">
       <description>
-        <p>Release 1.8.3</p>
+        <p>Release 1.9.0</p>
       </description>
-      <url>https://github.com/AlizaMedicalImaging/AlizaMS/releases/tag/v1.8.3</url>
+      <url>https://github.com/AlizaMedicalImaging/AlizaMS/releases/tag/v1.9.0</url>
     </release>
   </releases>
 

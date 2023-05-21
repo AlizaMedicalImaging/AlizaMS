@@ -1,5 +1,5 @@
-alizams (1.8.4-1) stable; urgency=low
+alizams (1.9.0-1) stable; urgency=low
 
   * Initial upload to Debian.  Closes: #999999.
 
- -- Replace Maintainer <alizaviewer@web.de>  Wed, 27 Jul 2022 00:00:00 -0000
+ -- Replace Maintainer <alizaviewer@web.de>  Sat, 20 May 2023 00:00:00 -0000
