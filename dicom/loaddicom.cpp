@@ -13,7 +13,7 @@ void LoadDicom::run()
 			stl_files,
 			video_files,
 			spectroscopy_files,
-			sr_images,
+			sr_files,
 			root,
 			filenames,
 			ok3d,

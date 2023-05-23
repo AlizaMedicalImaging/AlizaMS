@@ -716,7 +716,7 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 	QStringList stl_files;
 	QStringList video_files;
 	QStringList spectroscopy_files;
-	QStringList sr_images;
+	QStringList sr_files;
 	std::vector<int> rows;
 	QStringList filenames;
 	int max_3d_tex_size{};
@@ -798,9 +798,9 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 		{
 			spectroscopy_files.push_back(lt->spectroscopy_files.at(k));
 		}
-		for (int k = 0; k < lt->sr_images.size(); ++k)
+		for (int k = 0; k < lt->sr_files.size(); ++k)
 		{
-			sr_images.push_back(lt->sr_images.at(k));
+			sr_files.push_back(lt->sr_files.at(k));
 		}
 		delete lt;
 	}
@@ -811,7 +811,7 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 		stl_files,
 		video_files,
 		spectroscopy_files,
-		sr_images,
+		sr_files,
 		pb);
 	if (!message_.isEmpty())
 	{
@@ -4121,7 +4121,7 @@ QString Aliza::load_dicom_file(
 	QStringList stl_files;
 	QStringList video_files;
 	QStringList spectroscopy_files;
-	QStringList sr_images;
+	QStringList sr_files;
 	QStringList filenames;
 	filenames.push_back(f);
 	int max_3d_tex_size{};
@@ -4181,9 +4181,9 @@ QString Aliza::load_dicom_file(
 		{
 			spectroscopy_files.push_back(lt->spectroscopy_files.at(k));
 		}
-		for (int k = 0; k < lt->sr_images.size(); ++k)
+		for (int k = 0; k < lt->sr_files.size(); ++k)
 		{
-			sr_images.push_back(lt->sr_images.at(k));
+			sr_files.push_back(lt->sr_files.at(k));
 		}
 		delete lt;
 	}
@@ -4194,7 +4194,7 @@ QString Aliza::load_dicom_file(
 		stl_files,
 		video_files,
 		spectroscopy_files,
-		sr_images,
+		sr_files,
 		pb);
 	if (!message_.isEmpty())
 	{
@@ -4542,7 +4542,7 @@ QString Aliza::process_dicom(
 	const QStringList & stl_files,
 	const QStringList & video_files,
 	const QStringList & spectroscopy_files,
-	const QStringList & sr_images,
+	const QStringList & sr_files,
 	QProgressDialog * pb)
 {
 	QString message;
@@ -4705,23 +4705,23 @@ QString Aliza::process_dicom(
 	ivariants.clear();
 	if (ok3d) glwidget->set_skip_draw(false);
 	//
-	if (!sr_images.empty())
+	if (!sr_files.empty())
 	{
-		for (int k = 0; k < sr_images.size(); ++k)
+		for (int k = 0; k < sr_files.size(); ++k)
 		{
 			qApp->processEvents();
-			QFileInfo fi(sr_images.at(k));
+			QFileInfo fi(sr_files.at(k));
 			try
 			{
 				mdcm::Reader reader;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
-				reader.SetFileName(QDir::toNativeSeparators(sr_images.at(k)).toUtf8().constData());
+				reader.SetFileName(QDir::toNativeSeparators(sr_files.at(k)).toUtf8().constData());
 #else
-				reader.SetFileName(QDir::toNativeSeparators(sr_images.at(k)).toLocal8Bit().constData());
+				reader.SetFileName(QDir::toNativeSeparators(sr_files.at(k)).toLocal8Bit().constData());
 #endif
 #else
-				reader.SetFileName(sr_images.at(k).toLocal8Bit().constData());
+				reader.SetFileName(sr_files.at(k).toLocal8Bit().constData());
 #endif
 				if (!reader.Read()) continue;
 				const mdcm::File & file = reader.GetFile();

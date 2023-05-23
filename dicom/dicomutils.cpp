@@ -304,12 +304,12 @@ void sort_dicom_files_ippiop(
 
 bool acqtime_less_than(const QString & s1, const QString & s2)
 {
-    return s1 < s2;
+	return s1 < s2;
 }
 
 bool acqtime_more_than(const QString & s1, const QString & s2)
 {
-    return s1 > s2;
+	return s1 > s2;
 }
 
 QString generate_string_0(
@@ -10615,7 +10615,6 @@ QString DicomUtils::read_enhanced_common(
 						"Multiple \"Segment Number\" values for the image,\n"
 						"check Settings for Enhanced Multi-frame IODs."
 						<< std::endl;
-							
 				}
 			}
 			//
@@ -13082,7 +13081,7 @@ QString DicomUtils::read_dicom(
 	QStringList & stl_files,
 	QStringList & video_files,
 	QStringList & spectroscopy_files,
-	QStringList & sr_images,
+	QStringList & sr_files,
 	const QString & root,
 	const QStringList & filenames,
 	bool ok3d,
@@ -13134,8 +13133,7 @@ QString DicomUtils::read_dicom(
 	//
 	//
 	const int filenames_size = filenames.size();
-	const QString filenames_num = QString(" / ") +
-		QString::number(filenames_size);
+	const QString filenames_num = QString(" / ") + QString::number(filenames_size);
 	for (int x = 0; x < filenames_size; ++x)
 	{
 		QString sop;
@@ -13198,8 +13196,7 @@ QString DicomUtils::read_dicom(
 			if (load_type == 0)
 			{
 				if (!message_.isEmpty()) message_ += QChar('\0');
-				message_ += QString(
-					"VL Whole Slide Microscopy Image Storage");
+				message_ += QString("VL Whole Slide Microscopy Image Storage");
 			}
 			continue;
 		}
@@ -13339,7 +13336,7 @@ QString DicomUtils::read_dicom(
 		{
 			if (load_type == 0)
 			{
-				sr_images.push_back(filenames.at(x));
+				sr_files.push_back(filenames.at(x));
 			}
 			continue;
 		}

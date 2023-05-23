@@ -36,7 +36,7 @@ public:
 	QStringList stl_files;
 	QStringList video_files;
 	QStringList spectroscopy_files;
-	QStringList sr_images;
+	QStringList sr_files;
 
 private:
 	const QString root;
