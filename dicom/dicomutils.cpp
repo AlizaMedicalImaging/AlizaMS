@@ -10626,6 +10626,7 @@ QString DicomUtils::read_enhanced_common(
 				skip_texture,
 				nullptr,
 				0);
+			ivariant->di->filtering = wsettings->get_filtering();
 			//
 			{
 				mdcm::Reader reader;
