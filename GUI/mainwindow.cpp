@@ -567,7 +567,7 @@ void MainWindow::open_args(const QStringList & l)
 		return;
 	}
 	QProgressDialog * pb = new QProgressDialog(
-		QString("Loading..."),
+		QString("Loading ..."),
 		QString("Exit"),
 		0,
 		0);
@@ -1278,7 +1278,6 @@ void MainWindow::toggle_meta2()
 	const QStringList & l = browser2->get_files_of_1st();
 	if (l.empty()) return;
 	qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
-	qApp->processEvents();
 	sqtree->set_list_of_files(l);
 	sqtree->read_file(l.at(0), true);
 	tabWidget->setCurrentIndex(2);
@@ -1351,7 +1350,7 @@ void MainWindow::dropEvent(QDropEvent * e)
 		else
 		{
 			QProgressDialog * pb = new QProgressDialog(
-				QString("Loading..."),
+				QString("Loading ..."),
 				QString("Exit"),
 				0,
 				0);
@@ -1421,7 +1420,7 @@ void MainWindow::load_any()
 		(QFileDialog::ReadOnly
 		//| QFileDialog::DontUseNativeDialog
 		));
-	QProgressDialog * pb = new QProgressDialog(QString("Loading..."), QString("Exit"), 0, 0);
+	QProgressDialog * pb = new QProgressDialog(QString("Loading ..."), QString("Exit"), 0, 0);
 	connect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
 	pb->setModal(true);
 	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
@@ -1593,7 +1592,7 @@ void MainWindow::load_dicom_series2()
 	}
 	set_ui();
 	QProgressDialog * pb =
-		new QProgressDialog(QString("Loading..."), QString("Exit"), 0, 0);
+		new QProgressDialog(QString("Loading ..."), QString("Exit"), 0, 0);
 	connect(pb,SIGNAL(canceled()), this, SLOT(exit_null()));
 	pb->setModal(true);
 	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
@@ -1611,7 +1610,6 @@ void MainWindow::load_dicom_series2()
 		info.set_text(message);
 		info.exec();
 	}
-	qApp->processEvents();
 	mutex.unlock();
 }
 
