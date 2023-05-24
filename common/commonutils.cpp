@@ -48,7 +48,7 @@
 #include <random>
 #include <chrono>
 #include <functional>
-#include <float.h>
+#include <cfloat>
 #include "dicomutils.h"
 #include "colorspace/colorspace.h"
 #ifdef USE_GET_TOTAL_MEM
@@ -751,8 +751,8 @@ template<typename T> int generate_tex3d(
 #if 0
 	if (glerror__ != 0)
 	{
-		std::cout << "warning : OpenGL error (before texture generation)"
-			<< std::endl;
+		std::cout << "warning : OpenGL error (before texture generation) "
+			<< std::hex << glerror__ << std::dec << std::endl;
 	}
 #endif
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -889,8 +889,7 @@ template<typename T> int generate_tex3d(
 	if (glerror__ == 0x505)
 	{
 #if 0
-		std::cout << "error : OpenGL error 0x505"
-			<< std::endl;
+		std::cout << "error : OpenGL error 0x505" << std::endl;
 #endif
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		gl->glBindTexture(GL_TEXTURE_3D, 0);
@@ -906,9 +905,8 @@ template<typename T> int generate_tex3d(
 	}
 	else if (glerror__ != 0)
 	{
-		std::cout
-			<< "warning : OpenGL error\n"
-			<< glerror__ << std::endl;
+		std::cout << "warning : OpenGL error " << std::hex << glerror__
+			<< std::dec << std::endl;
 	}
 quit__:
 	delete [] float_buf;
@@ -1076,8 +1074,7 @@ template <typename T> bool reload_monochrome_image(
 	size    = region.GetSize();
 	spacing = image->GetSpacing();
 	//
-	if (max_3d_tex_size > 0 &&
-		max_3d_tex_size < static_cast<int>(size[2]))
+	if (max_3d_tex_size > 0 && max_3d_tex_size < static_cast<int>(size[2]))
 	{
 #if 1
 		std::cout << "Warning: can not use 3D texture, Z dim = "
@@ -1179,7 +1176,6 @@ template <typename T> bool reload_monochrome_image(
 				isize[1] *= 0.5;
 				dspacing[0] *= 2.0;
 				dspacing[1] *= 2.0;
-				if (gl) gl->makeCurrent();
 				ivariant->di->close(generate_slices);
 				if (count__ > 64)
 				{
@@ -2197,7 +2193,6 @@ QString CommonUtils::get_orientation2(const double * pat_orientation)
 {
 	const bool print_oblique = false;
 	const char RAI_codes[3][2] = { {'R', 'L'}, {'A', 'P'}, {'I', 'S'} };
-	QString s;
 	char rai[4];
 	rai[0] = 'x';
 	rai[1] = 'x';
@@ -2213,7 +2208,7 @@ QString CommonUtils::get_orientation2(const double * pat_orientation)
 	const double nrm_dircos_y = row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
 	const double nrm_dircos_z = row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
 	bool oblique = false;
-	for (int i = 0; i < 3; ++i)
+	for (unsigned int i = 0; i < 3; ++i)
 	{
 		double dcos[3]{};
 		double dabsmax{};
@@ -2238,15 +2233,15 @@ QString CommonUtils::get_orientation2(const double * pat_orientation)
 			dabsmax = abs_max(nrm_dircos_x, nrm_dircos_y, nrm_dircos_z);
 			break;
 		}
-		for (int j = 0; j < 3; ++j)
+		for(unsigned int j = 0; j < 3; ++j)
 		{
 			double dabs = fabs(dcos[j]);
 			unsigned int dsgn = dcos[j] > 0 ? 0 : 1;
-			if (dabs == 1.0)
+			if(dabs == 1.0)
 			{
 				rai[i] = RAI_codes[j][dsgn];
 			}
-			else if (dabs == dabsmax)
+			else if(dabs == dabsmax)
 			{
 				oblique = true;
 				rai[i] = RAI_codes[j][dsgn];
@@ -2255,10 +2250,9 @@ QString CommonUtils::get_orientation2(const double * pat_orientation)
 	}
 	if (print_oblique && oblique)
 	{
-		std::cout << "Oblique, closest to " << rai
-			<< std::endl;
+		std::cout << "Oblique, closest to " << rai << std::endl;
 	}
-	s = QString::fromLatin1(rai);
+	QString s = QString::fromLatin1(rai);
 	s.remove(QChar('\0'));
 	return s;
 }
@@ -2269,9 +2263,9 @@ void CommonUtils::get_orientation3(
 	float y,
 	float z)
 {
-	char orientationX = x < 0 ? 'R' : 'L';
-	char orientationY = y < 0 ? 'A' : 'P';
-	char orientationZ = z < 0 ? 'F' : 'H';
+	char orientationX = x < 0.0f ? 'R' : 'L';
+	char orientationY = y < 0.0f ? 'A' : 'P';
+	char orientationZ = z < 0.0f ? 'F' : 'H';
 	double absX = fabs(x), absY = fabs(y), absZ = fabs(z);
 	for (int i = 0; i < 3; ++i)
 	{
@@ -2290,7 +2284,10 @@ void CommonUtils::get_orientation3(
 			*orientation++ = orientationZ;
 			absZ = 0;
 		}
-		else break;
+		else
+		{
+			break;
+		}
 	}
 }
 
@@ -2586,8 +2583,7 @@ void CommonUtils::generate_spectroscopyslice(
 void CommonUtils::calculate_rgb_minmax(ImageVariant * ivariant)
 {
 	if (!ivariant) return;
-	const short image_type = ivariant->image_type;
-	switch (image_type)
+	switch (ivariant->image_type)
 	{
 	case 10:
 		calculate_rgb_minmax_<RGBImageTypeSS>(ivariant->pSS_rgb, ivariant);
@@ -2618,8 +2614,7 @@ void CommonUtils::calculate_rgb_minmax(ImageVariant * ivariant)
 void CommonUtils::calculate_rgba_minmax(ImageVariant * ivariant)
 {
 	if (!ivariant) return;
-	const short image_type = ivariant->image_type;
-	switch (image_type)
+	switch (ivariant->image_type)
 	{
 	case 20:
 		calculate_rgba_minmax_<RGBAImageTypeSS>(ivariant->pSS_rgba, ivariant);
@@ -2780,8 +2775,7 @@ void CommonUtils::calculate_minmax_scalar(
 	ImageVariant * ivariant)
 {
 	if (!ivariant) return;
-	const short image_type = ivariant->image_type;
-	switch (image_type)
+	switch (ivariant->image_type)
 	{
 	case 0:
 		calculate_min_max<ImageTypeSS>(ivariant->pSS, ivariant);
@@ -4723,8 +4717,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 void CommonUtils::read_geometry_from_image_(ImageVariant * v)
 {
 	if (!v) return;
-	const short image_type = v->image_type;
-	switch (image_type)
+	switch (v->image_type)
 	{
 	case  0: read_geometry_from_image<ImageTypeSS>(v, v->pSS);
 		break;
@@ -5098,11 +5091,11 @@ void CommonUtils::random_RGB(float * R, float * G, float * B)
 {
 	const unsigned long long seed =
 		std::chrono::high_resolution_clock::now().time_since_epoch().count();
-	const double H = random_range(0.0, 3600.0, seed  );
-	const double S = random_range(0.5,    1.0, seed/7);
-	const double V = random_range(0.4,    1.0, seed/3);
+	const double H = random_range(0.0, 3600.0, seed);
+	const double S = random_range(0.5,    1.0, seed / 7);
+	const double V = random_range(0.4,    1.0, seed / 3);
 	double R_, G_, B_;
-	ColorSpace_::Hsv2Rgb(&R_, &G_, &B_, 0.1*H, S, V);
+	ColorSpace_::Hsv2Rgb(&R_, &G_, &B_, 0.1 * H, S, V);
 	*R = static_cast<float>(R_);
 	*G = static_cast<float>(G_);
 	*B = static_cast<float>(B_);

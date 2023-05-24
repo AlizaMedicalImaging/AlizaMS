@@ -3874,7 +3874,7 @@ void GLWidget::checkGLerror(const char * op)
 		e = QString("GL_TABLE_TOO_LARGE");
 		break;
 	default:
-		e = QString("Error ") + QVariant(error__).toString();
+		e = QString("Error 0x") + QString::number(error__, 16);
 		break;
 	}
 	std::cout << e.toStdString() << " after " << op << std::endl;
