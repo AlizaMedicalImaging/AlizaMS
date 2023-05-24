@@ -5,14 +5,17 @@
 #include <cmath>
 #include <iostream>
 
-LevelItem::LevelItem(QGraphicsRectItem * item, int role, HistogramView * v)
-	: QGraphicsItem()
+LevelItem::LevelItem(
+	QGraphicsRectItem * item,
+	int role,
+	HistogramView * v)
+	:
+	QGraphicsItem(),
+	m_item(item),
+	view(v)
 {
 	if (role == 0) m_role = LeftHandle;
 	else           m_role = RightHandle;
-	view = v;
-	m_item = item;
-	m_pressed = false;
 	setZValue(1);
 	setFlag(QGraphicsItem::ItemIsMovable, true);
 	setFlag(QGraphicsItem::ItemIsFocusable, true);

@@ -972,6 +972,7 @@ QString read_CommonCTMRImageDescriptionMacro(const mdcm::DataSet & ds)
 	return s;
 }
 
+#if 0
 QString read_PhotoacousticImage(const mdcm::DataSet & ds) // FIXME
 {
 	QString s;
@@ -1386,6 +1387,7 @@ QString read_PhotoacousticImage(const mdcm::DataSet & ds) // FIXME
 	}
 	return s;
 }
+#endif
 
 template <typename T, long long TVR>
 bool get_vm1_bin_value(
@@ -1828,7 +1830,6 @@ template <typename T> QString supp_palette_grey_to_rgbUC_(
 		return QString(ex.GetDescription());
 	}
 	//
-	unsigned long long tmp37 = 0;
 	const double wmin  = v->di->us_window_center - v->di->us_window_width * 0.5;
 	const double wmax  = v->di->us_window_center + v->di->us_window_width * 0.5;
 	const double diff_ = (wmax - wmin);

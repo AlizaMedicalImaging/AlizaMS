@@ -710,7 +710,6 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 {
 	if (!mutex0.tryLock()) return QString("");
 	QString message;
-	unsigned int count_messages{};
 	std::vector<ImageVariant*> ivariants;
 	QStringList pdf_files;
 	QStringList stl_files;
@@ -719,12 +718,10 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 	QStringList sr_files;
 	std::vector<int> rows;
 	QStringList filenames;
-	int max_3d_tex_size{};
 	const bool ok3d = check_3d();
 	if (ok3d)
 	{
 		glwidget->set_skip_draw(true);
-		max_3d_tex_size = glwidget->max_3d_texture_size;
 	}
 	const QModelIndexList selection =
 		browser2->tableWidget->selectionModel()->selectedRows();
@@ -4115,7 +4112,6 @@ QString Aliza::load_dicom_file(
 {
 	if (!mutex0.tryLock()) return QString("");
 	QString message;
-	unsigned int count_messages{};
 	std::vector<ImageVariant*> ivariants;
 	QStringList pdf_files;
 	QStringList stl_files;
@@ -4124,12 +4120,10 @@ QString Aliza::load_dicom_file(
 	QStringList sr_files;
 	QStringList filenames;
 	filenames.push_back(f);
-	int max_3d_tex_size{};
 	const bool ok3d = check_3d();
 	if (ok3d)
 	{
 		glwidget->set_skip_draw(true);
-		max_3d_tex_size = glwidget->max_3d_texture_size;
 	}
 	{
 		LoadDicom * lt = new LoadDicom(

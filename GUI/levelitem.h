@@ -1,6 +1,6 @@
 #ifndef A_LEVELITEM_H
 #define A_LEVELITEM_H
- 
+
 #include <QGraphicsItem>
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneMouseEvent>
@@ -10,8 +10,8 @@ class HistogramView;
 class LevelItem : public QGraphicsItem
 {
 public:
-	enum HandleRole {LeftHandle,RightHandle};
-	LevelItem(QGraphicsRectItem*,int,HistogramView*);
+	enum HandleRole {LeftHandle, RightHandle};
+	LevelItem(QGraphicsRectItem*, int, HistogramView*);
 	QRectF boundingRect() const override;
 
 protected:
@@ -21,11 +21,11 @@ protected:
 	QVariant itemChange(GraphicsItemChange, const QVariant &) override;
 
 private:
-	HistogramView * view;
 	QGraphicsRectItem * m_item;
+	HistogramView * view;
 	HandleRole m_role;
-	bool m_pressed;
+	bool m_pressed{};
 };
- 
+
 #endif
 
