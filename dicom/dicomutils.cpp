@@ -84,6 +84,7 @@ namespace
 typedef Vectormath::Scalar::Vector3 sVector3;
 typedef Vectormath::Scalar::Vector4 sVector4;
 typedef Vectormath::Scalar::Matrix4 sMatrix4;
+
 typedef struct
 {
 	int rows;
@@ -7625,7 +7626,7 @@ QString DicomUtils::read_ultrasound(
 	const bool overwrite_mdcm_spacing = true;
 	if (!ivariant)
 	{
-		return QString("ivariant is null");
+		return QString("Image is null");
 	}
 	if (images_ipp.size() != 1)
 	{
@@ -7908,7 +7909,7 @@ QString DicomUtils::read_nuclear(
 // TODO for image type RECON TOMO volume might be possible
 	if (!ok) return QString("read_nuclear : error (1)");
 	*ok = false;
-	if (!ivariant) return QString("ivariant is null");
+	if (!ivariant) return QString("Image is null");
 	if (images_ipp.size() != 1) return QString("read_nuclear reads 1 image");
 	const SettingsWidget * wsettings =
 		static_cast<const SettingsWidget *>(settings);
@@ -8124,7 +8125,7 @@ QString DicomUtils::read_series(
 	bool apply_rescale)
 {
 	*ok = false;
-	if (!ivariant) return QString("ivariant is null");
+	if (!ivariant) return QString("Image is null");
 	const SettingsWidget * wsettings =
 		static_cast<const SettingsWidget *>(settings);
 	unsigned int dimx = 0, dimy = 0, dimz = 0;
@@ -13915,8 +13916,7 @@ QString DicomUtils::read_dicom(
 							settings,
 							tolerance,
 							true);
-						if (
-							!message_.isEmpty() ||
+						if (!message_.isEmpty() ||
 							!ok ||
 							(supp_color_images.size() != supp_grey_images.size()))
 						{
