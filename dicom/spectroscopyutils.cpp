@@ -24,7 +24,6 @@
 #include "spectroscopydata.h"
 #include "commonutils.h"
 #include "dicomutils.h"
-#include <QProgressDialog>
 #include "vectormath/scalar/vectormath.h"
 
 //#define LOAD_SPECT_DATA

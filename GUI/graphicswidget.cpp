@@ -11,7 +11,6 @@
 #include <QBrush>
 #include <QPen>
 #include <QGraphicsPathItem>
-#include <QProgressDialog>
 #include <QDateTime>
 #include <QPainter>
 #include <QFileDialog>

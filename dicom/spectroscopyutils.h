@@ -4,11 +4,11 @@
 #include <mdcmDataSet.h>
 #include <vector>
 #include <QString>
+#include <QProgressDialog>
 
 class SpectroscopyData;
 class ImageVariant;
 class GLWidget;
-class QProgressDialog;
 class SpectroscopyUtils
 {
 public:

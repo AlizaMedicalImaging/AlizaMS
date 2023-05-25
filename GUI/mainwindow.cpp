@@ -578,6 +578,9 @@ void MainWindow::open_args(const QStringList & l)
 	pb->setRange(0, 0);
 	pb->setMinimumDuration(0);
 	pb->setValue(0);
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+	pb->show();
+#endif
 	if (l2.size() == 1)
 	{
 		const QString f = l2.at(0);
@@ -1361,6 +1364,9 @@ void MainWindow::dropEvent(QDropEvent * e)
 			pb->setRange(0, 0);
 			pb->setMinimumDuration(0);
 			pb->setValue(0);
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+			pb->show();
+#endif
 			for (int i = 0; i < l.size(); ++i)
 			{
 				if (i == 0 && fi.isFile())
@@ -1428,6 +1434,9 @@ void MainWindow::load_any()
 	pb->setRange(0, 0);
 	pb->setMinimumDuration(0);
 	pb->setValue(0);
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+	pb->show();
+#endif
 	bool is_dicomdir = false;
 	for (int x = 0; x < l.size(); ++x)
 	{
@@ -1600,6 +1609,9 @@ void MainWindow::load_dicom_series2()
 	pb->setRange(0, 0);
 	pb->setMinimumDuration(0);
 	pb->setValue(0);
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+	pb->show();
+#endif
 	const QString message = aliza->load_dicom_series(pb);
 	disconnect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
 	pb->close();
