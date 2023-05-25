@@ -164,7 +164,7 @@ utf8_decode(const std::string & str)
     return std::wstring();
   const int    len = MultiByteToWideChar(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), nullptr, 0);
   std::wstring ret(len, 0);
-  MultiByteToWideChar(CP_UTF8, 0, str.data(), -1, ret.data(), len);
+  MultiByteToWideChar(CP_UTF8, 0, str.data(), -1, &ret[0], len);
   return ret;
 }
 
@@ -175,7 +175,7 @@ utf8_encode(const std::wstring & wstr)
     return std::string();
   const int   len = WideCharToMultiByte(CP_UTF8, 0, wstr.data(), static_cast<int>(wstr.size()), nullptr, 0, nullptr, nullptr);
   std::string ret(len, 0);
-  WideCharToMultiByte(CP_UTF8, 0, wstr.data(), static_cast<int>(wstr.size()), ret.data(), len, nullptr, nullptr);
+  WideCharToMultiByte(CP_UTF8, 0, wstr.data(), static_cast<int>(wstr.size()), &ret[0], len, nullptr, nullptr);
   return ret;
 }
 
@@ -189,7 +189,7 @@ ComputeFullPath(const std::wstring & in, std::wstring & out)
   if (0 == requiredBufferLength)
     return false;
   out.resize(requiredBufferLength);
-  wchar_t * buffer = out.data();
+  wchar_t * buffer = &out[0];
   DWORD     result = GetFullPathNameW(fileName, requiredBufferLength, buffer, nullptr);
   if (0 == result)
     return false;

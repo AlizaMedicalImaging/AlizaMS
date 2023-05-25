@@ -102,9 +102,9 @@ UUIDGenerator::IsValid(const char * suid)
 #elif defined(HAVE_UUIDCREATE)
   UUID uuid;
 #  if 1
-  if (FAILED(UuidFromStringA(reinterpret_cast<unsigned char *>(suid), &uuid)))
+  if (FAILED(UuidFromStringA(reinterpret_cast<unsigned char*>(const_cast<char*>(suid)), &uuid)))
 #  else
-  if (FAILED(UuidFromString(reinterpret_cast<unsigned char *>(suid), &uuid)))
+  if (FAILED(UuidFromString(reinterpret_cast<unsigned char*>(const_cast<char*>(suid)), &uuid)))
 #  endif
   {
     return false;
