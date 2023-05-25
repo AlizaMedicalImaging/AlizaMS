@@ -129,12 +129,12 @@ static inline __m128 sseSelect(__m128 a, __m128 b, unsigned int mask)
 static inline __m128 sseCvtToSignedInts(__m128 x)
 {
   __m128i result = _mm_cvtps_epi32(x);
-  return reinterpret_cast<__m128>(result);
+  return _mm_castsi128_ps(result);
 }
 
 static inline __m128 sseCvtToFloats(__m128 x)
 {
-  return _mm_cvtepi32_ps(reinterpret_cast<__m128i>(x));
+  return _mm_cvtepi32_ps(_mm_castps_si128(x));
 }
 
 static inline __m128 sseNegatef(__m128 x)
@@ -251,8 +251,8 @@ static inline void sseSinfCosf(__m128 x, __m128 * s, __m128 * c)
   // Compute the offset based on the quadrant that the angle falls in.
   // Add 1 to the offset for the cosine.
   const __m128 offsetSin = _mm_and_ps(q, sseUintToM128(0x3U));
-  __m128i temp = _mm_add_epi32(_mm_set1_epi32(1), reinterpret_cast<__m128i>(offsetSin));
-  const __m128 offsetCos = reinterpret_cast<__m128>(temp);
+  __m128i temp = _mm_add_epi32(_mm_set1_epi32(1), _mm_castps_si128(offsetSin));
+  const __m128 offsetCos = _mm_castsi128_ps(temp);
 
   // Remainder in range [-pi/4 .. pi/4]
   __m128 qf = sseCvtToFloats(q);
