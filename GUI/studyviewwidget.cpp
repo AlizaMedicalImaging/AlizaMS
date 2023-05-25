@@ -1018,14 +1018,14 @@ bool StudyViewWidget::get_anchored_sliders() const
 	return anchor_toolButton->isChecked();
 }
 
-void StudyViewWidget::update_all_sliders(int x, int id, int dimz)
+void StudyViewWidget::update_all_sliders(int wid, int x, int dimz)
 {
 	for (int k = 0; k < widgets.size(); ++k)
 	{
 		if (widgets.at(k) && widgets.at(k)->graphicswidget)
 		{
 			if (widgets.at(k)->graphicswidget->image_container.image3D &&
-				widgets.at(k)->graphicswidget->image_container.image3D->id != id)
+				widgets.at(k)->graphicswidget->get_id() != wid)
 			{
 				const int z = widgets.at(k)->graphicswidget->image_container.image3D->di->idimz;
 				int j = x;
@@ -1043,7 +1043,7 @@ void StudyViewWidget::update_all_sliders(int x, int id, int dimz)
 	update_scouts();
 }
 
-void StudyViewWidget::set_single(const unsigned long long widget_id)
+void StudyViewWidget::set_single(int wid)
 {
 	QGridLayout * layout = static_cast<QGridLayout*>(frame->layout());
 	if (!layout)
@@ -1070,7 +1070,7 @@ void StudyViewWidget::set_single(const unsigned long long widget_id)
 				{
 					layout->removeWidget(w);
 					StudyFrameWidget * f = static_cast<StudyFrameWidget*>(w);
-					if (f->graphicswidget && f->graphicswidget->widget_id == widget_id)
+					if (f->graphicswidget && f->graphicswidget->get_id() == wid)
 					{
 						selected = f;
 					}
@@ -1119,18 +1119,12 @@ void StudyViewWidget::set_single(const unsigned long long widget_id)
 		update_null();
 	}
 	qApp->processEvents();
-#if 0
-	std::cout << "set_single: widget_id=" << widget_id << std::endl;
-#endif
 }
 
-void StudyViewWidget::restore_multi(const unsigned long long widget_id)
+void StudyViewWidget::restore_multi()
 {
 	if (saved_r == -1 || saved_c == -1)
 	{
-#if 0
-		std::cout << "restore_multi: internal error" << std::endl;
-#endif
 		saved_r = -1;
 		saved_c = -1;
 		active_id = -1;
@@ -1152,9 +1146,6 @@ void StudyViewWidget::restore_multi(const unsigned long long widget_id)
 			}
 		}
 	}
-#if 0
-	std::cout << "restore_multi: widget_id=" << widget_id << std::endl;
-#endif
 }
 
 void StudyViewWidget::readSettings()

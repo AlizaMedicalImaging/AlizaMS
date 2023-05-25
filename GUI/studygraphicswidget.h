@@ -73,7 +73,6 @@ public:
 	void  set_enable_overlays(bool);
 	void  set_active();
 	void  update_measurement(double, double, double, double);
-	unsigned long long widget_id;
 	void set_slider_only(int);
 	void set_selected_slice2(int, bool);
 

@@ -1107,11 +1107,8 @@ template<typename T> double get_distance3(
 
 }
 
-static unsigned long long StudyGraphicsWidget_id = 0;
-
 StudyGraphicsWidget::StudyGraphicsWidget()
 {
-	widget_id = ++StudyGraphicsWidget_id;
 	image_container.image3D = nullptr;
 	image_container.axis = 2;
 	image_container.image2D = new ImageVariant2D();
@@ -2330,8 +2327,8 @@ void StudyGraphicsWidget::set_selected_slice2(int x, bool update_all)
 		if (update_all)
 		{
 			studyview->update_all_sliders(
+				id,
 				x,
-				image_container.image3D->id,
 				image_container.image3D->di->idimz);
 		}
 		else
@@ -2344,8 +2341,8 @@ void StudyGraphicsWidget::set_selected_slice2(int x, bool update_all)
 void StudyGraphicsWidget::toggle_single(bool t)
 {
 	if (!studyview) return;
-	if (t) studyview->set_single(widget_id);
-	else   studyview->restore_multi(widget_id);
+	if (t) studyview->set_single(id);
+	else   studyview->restore_multi();
 }
 
 void StudyGraphicsWidget::set_active()

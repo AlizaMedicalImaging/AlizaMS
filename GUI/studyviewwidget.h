@@ -41,8 +41,8 @@ public:
 	void update_scouts();
 	bool get_anchored_sliders() const;
 	void update_all_sliders(int, int, int);
-	void set_single(const unsigned long long);
-	void restore_multi(const unsigned long long);
+	void set_single(int);
+	void restore_multi();
 	void writeSettings(QSettings&);
 
 	QList<StudyFrameWidget *> widgets;
