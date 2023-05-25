@@ -92,7 +92,7 @@ protected:
 	void dragLeaveEvent(QDragLeaveEvent*) override;
 
 private:
-	int id{-1};
+	int m_id{-1};
 	StudyViewWidget * studyview{};
 	Aliza   * aliza{};
 	QSlider * slider{};

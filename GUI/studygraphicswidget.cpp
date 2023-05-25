@@ -1133,12 +1133,12 @@ StudyGraphicsWidget::~StudyGraphicsWidget()
 
 void StudyGraphicsWidget::set_id(int x)
 {
-	id = x;
+	m_id = x;
 }
 
 int StudyGraphicsWidget::get_id() const
 {
-	return id;
+	return m_id;
 }
 
 void StudyGraphicsWidget::set_studyview(StudyViewWidget * v)
@@ -2320,14 +2320,14 @@ void StudyGraphicsWidget::set_selected_slice2(int x, bool update_all)
 	//
 	if (studyview)
 	{
-		if (studyview->get_active_id() == id)
+		if (studyview->get_active_id() == m_id)
 		{
 			studyview->update_level(&image_container);
 		}
 		if (update_all)
 		{
 			studyview->update_all_sliders(
-				id,
+				m_id,
 				x,
 				image_container.image3D->di->idimz);
 		}
@@ -2341,13 +2341,13 @@ void StudyGraphicsWidget::set_selected_slice2(int x, bool update_all)
 void StudyGraphicsWidget::toggle_single(bool t)
 {
 	if (!studyview) return;
-	if (t) studyview->set_single(id);
+	if (t) studyview->set_single(m_id);
 	else   studyview->restore_multi();
 }
 
 void StudyGraphicsWidget::set_active()
 {
-	if (studyview) studyview->set_active_image(id);
+	if (studyview) studyview->set_active_image(m_id);
 }
 
 void StudyGraphicsWidget::update_measurement(
