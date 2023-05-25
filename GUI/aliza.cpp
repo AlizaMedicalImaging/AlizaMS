@@ -4724,10 +4724,9 @@ QString Aliza::process_dicom(
 				const bool srinfo = settingswidget->get_sr_info();
 				QString t00080005;
 				const bool t00080005_ok = DicomUtils::get_string_value(
-						ds, mdcm::Tag(0x0008,0x0005), t00080005);
+					ds, mdcm::Tag(0x0008,0x0005), t00080005);
 				(void)t00080005_ok;
-				const QString s0 =
-					SRUtils::read_sr_title1(ds, t00080005);
+				const QString s0 = SRUtils::read_sr_title1(ds, t00080005);
 				SRUtils::set_asked_for_path_once(false);
 				SRWidget * sr = new SRWidget(settingswidget->get_scale_icons());
 				sr->setAttribute(Qt::WA_DeleteOnClose);
@@ -4764,9 +4763,9 @@ QString Aliza::process_dicom(
 	//
 	if (!pdf_files.empty())
 	{
-		if (pb) pb->hide();
 		for (int k = 0; k < pdf_files.size(); ++k)
 		{
+			if (pb) pb->hide();
 			const QString pdff = QFileDialog::getSaveFileName(
 				nullptr,
 				QString("Select file"),
@@ -4780,6 +4779,7 @@ QString Aliza::process_dicom(
 				);
 			if (!pdff.isEmpty())
 			{
+				if (pb) pb->show();
 				QFileInfo pfi(pdff);
 				CommonUtils::set_save_dir(pfi.absolutePath());
 				try
@@ -4796,14 +4796,13 @@ QString Aliza::process_dicom(
 				}
 			}
 		}
-		if (pb) pb->show();
 	}
 	//
 	if (!stl_files.empty())
 	{
-		if (pb) pb->hide();
 		for (int k = 0; k < stl_files.size(); ++k)
 		{
+			if (pb) pb->hide();
 			const QString stlf = QFileDialog::getSaveFileName(
 				nullptr,
 				QString("Select file"),
@@ -4817,6 +4816,7 @@ QString Aliza::process_dicom(
 				);
 			if (!stlf.isEmpty())
 			{
+				if (pb) pb->show();
 				QFileInfo sfi(stlf);
 				CommonUtils::set_save_dir(sfi.absolutePath());			
 				try
@@ -4833,14 +4833,13 @@ QString Aliza::process_dicom(
 				}
 			}
 		}
-		if (pb) pb->show();
 	}
 	//
 	if (!video_files.empty())
 	{
-		if (pb) pb->hide();
 		for (int k = 0; k < video_files.size(); ++k)
 		{
+			if (pb) pb->hide();
 			const QString tmp943 = video_files.at(k);
 			const QString suf = DicomUtils::suffix_mpeg(tmp943);
 			const QString video_file_name =
@@ -4857,6 +4856,7 @@ QString Aliza::process_dicom(
 					);
 			if (!video_file_name.isEmpty())
 			{
+				if (pb) pb->show();
 				QFileInfo vfi(video_file_name);
 				CommonUtils::set_save_dir(vfi.absolutePath());
 				try
@@ -4873,7 +4873,6 @@ QString Aliza::process_dicom(
 				}
 			}
 		}
-		if (pb) pb->show();
 	}
 #ifdef ALIZA_PRINT_COUNT_GL_OBJ
 	std::cout << "Num VBOs " << GLWidget::get_count_vbos() << std::endl;
