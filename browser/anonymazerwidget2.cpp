@@ -2717,7 +2717,7 @@ void AnonymazerWidget2::run_()
 	pd->setMinimumDuration(0);
 	pd->setValue(0);
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-	pb->show();
+	pd->show();
 #endif
 	{
 		QStringList filenames;
