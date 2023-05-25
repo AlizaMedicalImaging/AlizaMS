@@ -415,6 +415,18 @@ void StudyViewWidget::closeEvent(QCloseEvent * e)
 
 void StudyViewWidget::update_grid(int r, int c)
 {
+	for (int x = 0; x < widgets.size(); ++x)
+	{
+		if (widgets.at(x))
+		{
+			if (widgets.at(x)->icon_button->isChecked())
+			{
+				widgets[x]->icon_button->blockSignals(true);
+				widgets[x]->icon_button->setChecked(false);
+				widgets[x]->icon_button->blockSignals(false);
+			}
+		}
+	}
 	QGridLayout * layout = static_cast<QGridLayout*>(frame->layout());
 	if (layout)
 	{
