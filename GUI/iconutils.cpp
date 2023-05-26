@@ -749,7 +749,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		{
 			p_ = reinterpret_cast<unsigned char *>(tmp0->GetBufferPointer());
 		}
-		catch (const itk::ExceptionObject & ex)
+		catch (const itk::ExceptionObject &)
 		{
 			return;
 		}

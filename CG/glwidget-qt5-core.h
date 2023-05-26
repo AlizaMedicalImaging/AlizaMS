@@ -89,13 +89,21 @@ public:
 	ShaderObj * shader{};
 };
 
+// These flags are used only for diagnostic build sometimes
+#ifndef _WIN32
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 //#pragma GCC diagnostic ignored "-Wuseless-cast"
 #pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
 #pragma GCC diagnostic ignored "-Wcast-align"
+#endif
+
 #include "btBulletCollisionCommon.h"
+
+#ifndef _WIN32
 #pragma GCC diagnostic pop
+#endif
+
 VECTORMATH_ALIGNED_PRE class CollisionObject
 {
 public:

@@ -187,7 +187,7 @@ template<typename T> void load_rgb_image2(
 		}
 		catch (const itk::ExceptionObject &)
 		{
-			;;
+			;
 		}
 	}
 	else
@@ -215,7 +215,7 @@ template<typename T> void load_rgb_image2(
 			}
 			catch (const itk::ExceptionObject &)
 			{
-				;;
+				;
 			}
 		}
 	}
@@ -362,7 +362,7 @@ template<typename T> void load_rgba_image2(
 		}
 		catch (const itk::ExceptionObject &)
 		{
-			;;
+			;
 		}
 	}
 	else
@@ -392,7 +392,7 @@ template<typename T> void load_rgba_image2(
 			}
 			catch (const itk::ExceptionObject &)
 			{
-				;;
+				;
 			}
 		}
 	}
@@ -442,7 +442,7 @@ template<typename T> void load_rgba_image2(
 		}
 		catch (const itk::ExceptionObject &)
 		{
-			;;
+			;
 		}
 	}
 	else
@@ -482,7 +482,7 @@ template<typename T> void load_rgba_image2(
 			}
 			catch (const itk::ExceptionObject &)
 			{
-				;;
+				;
 			}
 		}
 	}
@@ -710,7 +710,7 @@ template<typename T> void load_rgba_char_image2(
 	{
 		p = reinterpret_cast<unsigned char *>(image->GetBufferPointer());
 	}
-	catch (const itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject &)
 	{
 		return;
 	}
@@ -756,7 +756,7 @@ template<typename T> void load_rgba_char_image2(
 	}
 	catch (const itk::ExceptionObject &)
 	{
-		;;
+		;
 	}
 	tmpi = QImage(p, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
 #endif

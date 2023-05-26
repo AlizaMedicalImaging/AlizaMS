@@ -550,7 +550,7 @@ template<typename T> void load_rgb_image(
 		}
 		catch (const itk::ExceptionObject &)
 		{
-			;;
+			;
 		}
 	}
 	else
@@ -578,7 +578,7 @@ template<typename T> void load_rgb_image(
 			}
 			catch (const itk::ExceptionObject &)
 			{
-				;;
+				;
 			}
 		}
 	}
@@ -740,7 +740,7 @@ template<typename T> void load_rgba_image(
 		}
 		catch (const itk::ExceptionObject &)
 		{
-			;;
+			;
 		}
 	}
 	else
@@ -770,7 +770,7 @@ template<typename T> void load_rgba_image(
 			}
 			catch (const itk::ExceptionObject &)
 			{
-				;;
+				;
 			}
 		}
 	}
@@ -820,7 +820,7 @@ template<typename T> void load_rgba_image(
 		}
 		catch (const itk::ExceptionObject &)
 		{
-			;;
+			;
 		}
 	}
 	else
@@ -860,7 +860,7 @@ template<typename T> void load_rgba_image(
 			}
 			catch (const itk::ExceptionObject &)
 			{
-				;;
+				;
 			}
 		}
 	}
@@ -976,7 +976,7 @@ template<typename T> void load_rgb_char_image(
 	{
 		p = reinterpret_cast<unsigned char *>(image->GetBufferPointer());
 	}
-	catch (const itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject &)
 	{
 		return;
 	}
@@ -1117,7 +1117,7 @@ template<typename T> void load_rgba_char_image(
 	{
 		p = reinterpret_cast<unsigned char *>(image->GetBufferPointer());
 	}
-	catch (const itk::ExceptionObject & ex)
+	catch (const itk::ExceptionObject &)
 	{
 		return;
 	}

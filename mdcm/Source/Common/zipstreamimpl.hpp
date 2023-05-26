@@ -53,8 +53,10 @@ Altered by: Mikhail Isakov 2020, for MDCM project
  * More info on the following parameters can be found in the zlib documentation.
  */
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wold-style-cast"
+#ifndef _WIN32
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
 
 template <class charT, class traits>
 basic_zip_streambuf<charT, traits>::basic_zip_streambuf(ostream_reference ostream,
@@ -742,4 +744,6 @@ basic_zip_istream<charT, traits>::read_footer(void)
   }
 }
 
-#pragma GCC diagnostic pop
+#ifndef _WIN32
+#  pragma GCC diagnostic pop
+#endif

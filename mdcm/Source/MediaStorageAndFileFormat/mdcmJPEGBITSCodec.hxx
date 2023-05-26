@@ -43,9 +43,11 @@
 
 /* this is not a core library module, so it doesn't define JPEG_INTERNALS */
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wuseless-cast"
+#ifndef _WIN32
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wold-style-cast"
+#  pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
 
 namespace mdcm
 {
@@ -1335,7 +1337,9 @@ JPEGBITSCodec::IsStateSuspension() const
 
 } // end namespace mdcm
 
-#pragma GCC diagnostic pop
+#ifndef _WIN32
+#  pragma GCC diagnostic pop
+#endif
 
 #ifdef JPEGBITS_PRINT_COLORSPACES
 #undef JPEGBITS_PRINT_COLORSPACES
