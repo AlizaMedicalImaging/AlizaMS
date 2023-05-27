@@ -915,6 +915,42 @@ quit__:
 	return error__;
 }
 
+template<typename T> void calc_center_from_image(
+	ImageVariant * ivariant,
+	const typename T::Pointer & image)
+{
+	if (image.IsNull()||!ivariant) return;
+	const typename T::SizeType size =
+		image->GetLargestPossibleRegion().GetSize();
+	const typename T::PointType origin = image->GetOrigin();
+	typename T::IndexType idx;
+	idx[0] = size[0];
+	idx[1] = size[1];
+	idx[2] = size[2];
+	itk::Point<float, 3> p;
+	try
+	{
+		image->TransformIndexToPhysicalPoint(idx, p);
+	}
+	catch (const itk::ExceptionObject & ex)
+	{
+		std::cout << ex.GetDescription() << std::endl;
+		return;
+	}
+	sVector3 v0 = sVector3(
+		static_cast<float>(origin[0]),
+		static_cast<float>(origin[1]),
+		static_cast<float>(origin[2]));
+	sVector3 v1 = sVector3(p[0], p[1], p[2]);
+	sVector3 cube_center = sVector3((v0 + v1) * 0.5f);
+	ivariant->di->default_center_x =
+		ivariant->di->center_x = cube_center.getX();
+	ivariant->di->default_center_y =
+		ivariant->di->center_y = cube_center.getY();
+	ivariant->di->default_center_z =
+		ivariant->di->center_z = cube_center.getZ();
+}
+
 template<typename T> void read_geometry_from_image(
 	ImageVariant * ivariant,
 	const typename T::Pointer & image)
@@ -995,44 +1031,9 @@ template<typename T> void read_geometry_from_image(
 	ivariant->di->up_direction_x = up.getX();
 	ivariant->di->up_direction_y = up.getY();
 	ivariant->di->up_direction_z = up.getZ();
+	calc_center_from_image<T>(ivariant, image);
 	ivariant->equi = true;
 	ivariant->di->slices_generated = true;
-}
-
-template<typename T> void calc_center_from_image(
-	ImageVariant * ivariant,
-	const typename T::Pointer & image)
-{
-	if (image.IsNull()||!ivariant) return;
-	const typename T::SizeType size =
-		image->GetLargestPossibleRegion().GetSize();
-	const typename T::PointType origin = image->GetOrigin();
-	typename T::IndexType idx;
-	idx[0] = size[0];
-	idx[1] = size[1];
-	idx[2] = size[2];
-	itk::Point<float, 3> p;
-	try
-	{
-		image->TransformIndexToPhysicalPoint(idx, p);
-	}
-	catch (const itk::ExceptionObject & ex)
-	{
-		std::cout << ex.GetDescription() << std::endl;
-		return;
-	}
-	sVector3 v0 = sVector3(
-		static_cast<float>(origin[0]),
-		static_cast<float>(origin[1]),
-		static_cast<float>(origin[2]));
-	sVector3 v1 = sVector3(p[0], p[1], p[2]);
-	sVector3 cube_center = sVector3((v0 + v1) * 0.5f);
-	ivariant->di->default_center_x =
-		ivariant->di->center_x = cube_center.getX();
-	ivariant->di->default_center_y =
-		ivariant->di->center_y = cube_center.getY();
-	ivariant->di->default_center_z =
-		ivariant->di->center_z = cube_center.getZ();
 }
 
 template <typename T> bool reload_monochrome_image(

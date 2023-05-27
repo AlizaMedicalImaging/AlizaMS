@@ -11169,9 +11169,6 @@ QString DicomUtils::read_enhanced_common(
 					ivariant->di->up_direction_x = up_dir_x;
 					ivariant->di->up_direction_y = up_dir_y;
 					ivariant->di->up_direction_z = up_dir_z;
-					ivariant->di->default_center_x = ivariant->di->center_x = center_x;
-					ivariant->di->default_center_y = ivariant->di->center_y = center_y;
-					ivariant->di->default_center_z = ivariant->di->center_z = center_z;
 					if (!ivariant->equi)
 					{
 						float cx = 0.0f, cy = 0.0f, cz = 0.0f;
@@ -11180,6 +11177,12 @@ QString DicomUtils::read_enhanced_common(
 						ivariant->di->default_center_x = ivariant->di->center_x = cx;
 						ivariant->di->default_center_y = ivariant->di->center_y = cy;
 						ivariant->di->default_center_z = ivariant->di->center_z = cz;
+					}
+					else
+					{
+						ivariant->di->default_center_x = ivariant->di->center_x = center_x;
+						ivariant->di->default_center_y = ivariant->di->center_y = center_y;
+						ivariant->di->default_center_z = ivariant->di->center_z = center_z;
 					}
 				}
 				if (ivariant->equi)
