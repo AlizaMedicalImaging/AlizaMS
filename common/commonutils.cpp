@@ -40,7 +40,6 @@
 #include <QDirIterator>
 #include <QDateTime>
 #include "settingswidget.h"
-#include "iconutils.h"
 #include "updateqtcommand.h"
 #include <iostream>
 #include <list>
