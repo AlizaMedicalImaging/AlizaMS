@@ -310,7 +310,7 @@ int main(int argc, char * argv[])
 	{
 		QSurfaceFormat format;
 		format.setRenderableType(QSurfaceFormat::OpenGL);
-#ifdef USE_CORE_3_2_PROFILE
+#ifdef ALIZA_GL_3_2_CORE
 #ifdef USE_GL_MAJOR_3_MINOR_2
 		format.setVersion(3, 2); // may be required sometimes
 #endif
@@ -380,7 +380,7 @@ int main(int argc, char * argv[])
 		if (!force_disable_opengl)
 		{
 #ifdef TMP_USE_GL_TEST
-			if ((enable_gl_3d_ == 1) && (enable_gltest == 1))
+			if (enable_gl_3d_ == 1 && enable_gltest == 1)
 			{
 				TestGL * testgl = new TestGL();
 				testgl->show();
@@ -404,19 +404,13 @@ int main(int argc, char * argv[])
 					settings.setValue(QString("enable_gl_3D"), QVariant(0));
 					settings.endGroup();
 					settings.sync();
-#if 0
-					QMessageBox::information(
-						nullptr,
-						QString("Aliza MS"),
-						QString("OpenGL 3 is not available"));
-#else
 					std::cout << "Aliza MS: OpenGL 3 is not available" << std::endl;
-#endif
 					delete testgl;
 					//
 					QStringList aa;
 					const QStringList aa_ = QApplication::arguments();
 					const int aa_size = aa_.size();
+					aa.push_back(QString("--nogl"));
 					if (aa_size > 1)
 					{
 						for (int y = 1; y < aa_size; ++y)
@@ -424,21 +418,18 @@ int main(int argc, char * argv[])
 							aa.push_back(aa_.at(y));
 						}
 					}
-					app.quit();
-#if 1
 					QProcess::startDetached(aa_.at(0), aa);
-#endif
-					return 0;
+					exit(0);
 				}
 			}
+			else
 #endif
-			if (enable_gl_3d_ == 1)
 			{
-				ok3d = true;
+				if (enable_gl_3d_ == 1) ok3d = true;
 			}
 		}
 		//
-		if (saved_style==QString("Dark Fusion"))
+		if (saved_style == QString("Dark Fusion"))
 		{
 			QColor bg(0x53, 0x59, 0x60);
 			QColor tt(0x30, 0x39, 0x47);
@@ -468,8 +459,9 @@ int main(int argc, char * argv[])
 		else
 		{
 			app.setStyle(saved_style);
-			if (!((saved_style.toUpper() == QString("WINDOWSVISTA")) ||
-				(saved_style.toUpper() == QString("MACOS"))))
+			if (!(
+				saved_style.toUpper() == QString("WINDOWSVISTA") ||
+				saved_style.toUpper() == QString("MACOS")))
 			{
 				app.setPalette(app.style()->standardPalette());
 			}

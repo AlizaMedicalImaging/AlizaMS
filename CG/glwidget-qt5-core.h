@@ -7,7 +7,6 @@
 //
 //
 #define USE_SET_GL_FORMAT
-#define USE_CORE_3_2_PROFILE
 #define USE_GL_MAJOR_3_MINOR_2
 #ifdef __APPLE__
 #define USE_SET_DEFAULT_GL_FORMAT
@@ -469,9 +468,6 @@ public slots:
 	void set_contours_width(float);
 #endif
 
-signals:
-	void opengl3_not_available();
-
 protected:
 	void initializeGL() override;
 	void paintGL() override;
@@ -486,7 +482,7 @@ protected:
 	QPoint lastPosScale;
 
 private:
-	void disable_gl_in_settings();
+	void disable_gl_and_restart();
 } VECTORMATH_ALIGNED_POST;
 
 #endif

@@ -85,13 +85,13 @@ set_property(CACHE ALIZA_QT_VERSION PROPERTY STRINGS "QT_VERSION_NOT_SELECTED" "
 set(ALIZA_CXX_STANDARD "Not set" CACHE STRING "Select C++ standard, usually not requied")
 set_property(CACHE ALIZA_CXX_STANDARD PROPERTY STRINGS "Not set" "11" "14" "17" "20")
 
-# Force disable SSE/SSE2.
+# Force-disable SSE/SSE2.
 option(ALIZA_DISABLE_SIMDMATH "Disable SSE/SSE2" OFF)
 
 if(NOT APPLE)
   # Use OpenGL Core profile with Qt5 (with Qt6 always Core profile).
   # With Qt4 not defined, may work, not tested.
-  option(ALIZA_QT5_COREGL "Use OpenGL Core profile with Qt5" OFF)
+  option(ALIZA_COREGL "Use OpenGL Core Profile" OFF)
 endif()
 
 if(UNIX AND NOT APPLE)
@@ -566,11 +566,21 @@ if(USE_QT_V_5 OR USE_QT_V_6)
   endif()
 endif()
 
+#
+#
+#
+if(ALIZA_COREGL)
+  add_definitions(-DALIZA_GL_3_2_CORE)
+endif()
+
 find_package(OpenGL REQUIRED)
 
 if(APPLE)
-  add_definitions(-DGL_SILENCE_DEPRECATION)
+  add_definitions(-DALIZA_GL_3_2_CORE -DGL_SILENCE_DEPRECATION)
 endif()
+#
+#
+#
 
 find_package(ITK COMPONENTS
   ITKCommon
@@ -879,39 +889,28 @@ set(ALIZAMS_MOC_HRDS
 if(APPLE)
   if(USE_QT_V_6)
     set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5-core.h)
-    add_definitions(-DALIZA_GL_3_2_CORE)
   else()
     message(FATAL_ERROR "Only Qt6 is supported with macOS")
   endif()
-elseif(WIN32)
-  if(USE_QT_V_6)
-    set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5-core.h)
-    add_definitions(-DALIZA_GL_3_2_CORE)
-  elseif(USE_QT_V_5)
-    if(ALIZA_QT5_COREGL)
-      set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5-core.h)
-      add_definitions(-DALIZA_GL_3_2_CORE)
-    else()
-      set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5.h)
-    endif()
-  elseif(USE_QT_V_4)
-    set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt4.h)
-  else()
-    message(FATAL_ERROR "Can not determine Qt version to use")
-  endif()
 else()
   if(USE_QT_V_6)
-    set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5-core.h)
-    add_definitions(-DALIZA_GL_3_2_CORE)
-  elseif(USE_QT_V_5)
-    if(ALIZA_QT5_COREGL)
+    if(ALIZA_COREGL)
       set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5-core.h)
-      add_definitions(-DALIZA_GL_3_2_CORE)
+    else()
+      set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5.h)
+    endif()
+  elseif(USE_QT_V_5)
+    if(ALIZA_COREGL)
+      set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5-core.h)
     else()
       set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt5.h)
     endif()
   elseif(USE_QT_V_4)
-    set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt4.h)
+    if(ALIZA_COREGL)
+      set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt4-core.h)
+    else()
+      set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget-qt4.h)
+    endif()
   else()
     message(FATAL_ERROR "Can not determine Qt version to use")
   endif()

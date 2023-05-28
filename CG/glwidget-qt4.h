@@ -464,9 +464,6 @@ public slots:
 	void set_contours_width(float);
 #endif
 
-signals:
-	void opengl3_not_available();
-
 protected:
 	void initializeGL() override;
 	void paintGL() override;
@@ -481,7 +478,7 @@ protected:
 	QPoint lastPosScale;
 
 private:
-	void disable_gl_in_settings();
+	void disable_gl_and_restart();
 } VECTORMATH_ALIGNED_POST;
 
 #endif

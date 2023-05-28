@@ -30,6 +30,7 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QDir>
+#include <QProcess>
 #include "commonutils.h"
 #include <cmath>
 #include <iostream>
@@ -43,7 +44,7 @@
 #include "data/lettera_data.h"
 #include "data/letterr_data.h"
 #include "data/letterl_data.h"
-#ifdef USE_CORE_3_2_PROFILE
+#ifdef ALIZA_GL_3_2_CORE
 #include "shaders_core.h"
 #else
 #include "shaders.h"
@@ -189,7 +190,7 @@ GLWidget::GLWidget()
 #ifndef USE_SET_DEFAULT_GL_FORMAT
 	QSurfaceFormat format;
 	format.setRenderableType(QSurfaceFormat::OpenGL);
-#ifdef USE_CORE_3_2_PROFILE
+#ifdef ALIZA_GL_3_2_CORE
 #ifdef USE_GL_MAJOR_3_MINOR_2
 	format.setVersion(3, 2); // may be required sometimes
 #endif
@@ -240,17 +241,13 @@ void GLWidget::initializeGL()
 	if (!c)
 	{
 		opengl_init_done = true;
-		disable_gl_in_settings();
-		emit opengl3_not_available();
-		std::cout << "OpenGL context is nullptr " << std::endl;
+		disable_gl_and_restart();
 		return;
 	}
 	if (!c->isValid())
 	{
 		opengl_init_done = true;
-		disable_gl_in_settings();
-		emit opengl3_not_available();
-		std::cout << "OpenGL context is invalid" << std::endl;
+		disable_gl_and_restart();
 		return;
 	}
 	{
@@ -258,14 +255,12 @@ void GLWidget::initializeGL()
 		if (f.majorVersion() < 3)
 		{
 			opengl_init_done = true;
-			disable_gl_in_settings();
-			emit opengl3_not_available();
-			std::cout << "OpenGL context's major version < 3" << std::endl;
+			disable_gl_and_restart();
 			return;
 		}
 	}
 	initializeOpenGLFunctions();
-#ifdef USE_CORE_3_2_PROFILE
+#ifdef ALIZA_GL_3_2_CORE
 #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
 	QOpenGLFunctions_3_2_Core * funcs = QOpenGLVersionFunctionsFactory::get<QOpenGLFunctions_3_2_Core>();
 #else
@@ -281,9 +276,7 @@ void GLWidget::initializeGL()
 	if (!funcs)
 	{
 		opengl_init_done = true;
-		disable_gl_in_settings();
-		emit opengl3_not_available();
-		std::cout << "Could not initialize OpenGL functions" << std::endl;
+		disable_gl_and_restart();
 		return;
 	}
 #else // Qt4
@@ -291,17 +284,13 @@ void GLWidget::initializeGL()
 	if (!c)
 	{
 		opengl_init_done = true;
-		disable_gl_in_settings();
-		emit opengl3_not_available();
-		std::cout << "OpenGL context is nullptr " << std::endl;
+		disable_gl_and_restart();
 		return;
 	}
 	if (!c->isValid())
 	{
 		opengl_init_done = true;
-		disable_gl_in_settings();
-		emit opengl3_not_available();
-		std::cout << "OpenGL context is invalid" << std::endl;
+		disable_gl_and_restart();
 		return;
 	}
 #endif
@@ -912,8 +901,7 @@ void GLWidget::init_opengl(int w, int h)
 	if (GLEW_OK != err)
 	{
 		opengl_info.append(QString("\nOpenGL modules disabled (1)"));
-		disable_gl_in_settings();
-		emit opengl3_not_available();
+		disable_gl_and_restart();
 		return;
 	}
 	if (glewIsSupported("GL_VERSION_3_0"))
@@ -923,8 +911,7 @@ void GLWidget::init_opengl(int w, int h)
 	else
 	{
 		opengl_info.append(QString("\nOpenGL modules disabled (2)"));
-		disable_gl_in_settings();
-		emit opengl3_not_available();
+		disable_gl_and_restart();
 		return;
 	}
 #else
@@ -939,16 +926,14 @@ void GLWidget::init_opengl(int w, int h)
 		else
 		{
 			opengl_info.append(QString("\nOpenGL modules disabled (1)"));
-			disable_gl_in_settings();
-			emit opengl3_not_available();
+			disable_gl_and_restart();
 			return;
 		}
 	}
 	else
 	{
 		opengl_info.append(QString("\nOpenGL modules disabled (2)"));
-		disable_gl_in_settings();
-		emit opengl3_not_available();
+		disable_gl_and_restart();
 		return;
 	}
 #endif
@@ -6908,10 +6893,8 @@ void GLWidget::d_mesh(
 	glDrawArrays(GL_TRIANGLES, 0, s->faces_size * 3);
 }
 
-void GLWidget::disable_gl_in_settings()
+void GLWidget::disable_gl_and_restart()
 {
-	// Bad if program is here
-#if 1
 	QSettings settings(
 		QSettings::IniFormat,
 		QSettings::UserScope,
@@ -6921,9 +6904,11 @@ void GLWidget::disable_gl_in_settings()
 	settings.setValue(QString("enable_gl_3D"), QVariant(0));
 	settings.endGroup();
 	settings.sync();
-#endif
+	QStringList aa;
+	aa.push_back(QString("--nogl"));
+	QProcess::startDetached(QApplication::applicationFilePath(), aa);
+	exit(0);
 }
-
 #ifdef ALWAYS_SHOW_GL_ERROR
 #undef ALWAYS_SHOW_GL_ERROR
 #endif

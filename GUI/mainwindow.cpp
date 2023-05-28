@@ -301,7 +301,7 @@ MainWindow::MainWindow(
 #else
 #ifdef USE_SET_GL_FORMAT
 		QGLFormat fmt;
-#ifdef USE_CORE_3_2_PROFILE
+#ifdef ALIZA_GL_3_2_CORE
 #ifdef USE_GL_MAJOR_3_MINOR_2
 		fmt.setVersion(3, 2); // may be required sometimes
 #endif
@@ -411,11 +411,9 @@ MainWindow::MainWindow(
 	if (ok3d && glwidget)
 	{
 		saved_ok3d = true;
-		connect(glwidget,SIGNAL(opengl3_not_available()),this,SLOT(set_no_gl3()));
 		gl_frame->show();
 		glwidget->show();
-		view3d_label->setText(QString(
-			"Physical space, intensity projection, GPU"));
+		view3d_label->setText(QString("Physical space, intensity projection, GPU"));
 		slicesAct->setChecked(true);
 		raycastAct->setChecked(false);
 	}
@@ -1999,19 +1997,6 @@ void MainWindow::change_style(const QString & s)
 	else
 		imagesbox->update_background_color(false);
 	update_info_lines_bg();
-}
-
-void MainWindow::set_no_gl3()
-{
-	settingswidget->force_no_gl3();
-	settingswidget->set_gl_visible(false);
-	hide_gl3_frame_later = true;
-	saved_ok3d = false;
-#if 1
-	const QString a("\nFailed to initialize OpenGL 3\n");
-	std::cout << a.toStdString() << std::endl;
-#endif
-	qApp->processEvents();
 }
 
 void MainWindow::check_3d_frame()
