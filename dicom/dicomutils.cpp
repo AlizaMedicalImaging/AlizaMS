@@ -2085,7 +2085,6 @@ unsigned int process_gsps(
 							pr_image->di->filtering = 0;
 						}
 						CommonUtils::reset_bb(pr_image);
-						IconUtils::icon(pr_image);
 						ivariants.push_back(pr_image);
 					}
 					else
@@ -7882,11 +7881,7 @@ QString DicomUtils::read_ultrasound(
 		delete [] data[x];
 	}
 	data.clear();
-	if (*ok)
-	{
-		IconUtils::icon(ivariant);
-	}
-	else
+	if (*ok == false)
 	{
 		return error;
 	}
@@ -8098,11 +8093,7 @@ are stacked in front of the first slice. See Image Orientation
 		delete [] data[x];
 	}
 	data.clear();
-	if (*ok)
-	{
-		IconUtils::icon(ivariant);
-	}
-	else
+	if (*ok == false)
 	{
 		return error;
 	}
@@ -8813,7 +8804,6 @@ QString DicomUtils::read_series(
 		delete [] data[x];
 	}
 	data.clear();
-	if (*ok == true) IconUtils::icon(ivariant);
 	if (*ok == false)
 	{
 		ivariant->anatomy.clear();
@@ -11221,7 +11211,6 @@ QString DicomUtils::read_enhanced_common(
 					ivariant->instance_number = instance_number;
 				}
 				CommonUtils::reset_bb(ivariant);
-				IconUtils::icon(ivariant);
 				ivariant->filenames = QStringList(efilename);
 				ivariants.push_back(ivariant);
 			}
@@ -14030,7 +14019,6 @@ QString DicomUtils::read_dicom(
 									v->di->filtering = 0;
 								}
 								CommonUtils::reset_bb(v);
-								IconUtils::icon(v);
 								v->filenames = supp_color_images.at(jjj)->filenames;
 								ivariants.push_back(v);
 								delete supp_grey_images[jjj];

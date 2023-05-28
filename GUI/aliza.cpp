@@ -4610,7 +4610,9 @@ QString Aliza::process_dicom(
 	{
 		if (!ivariants.at(x))
 		{
+#if 0
 			std::cout << "ivariants.at(" << x << ") is null" << std::endl;
+#endif
 			continue;
 		}
 		if (ivariants.at(x)->di->opengl_ok &&
@@ -4653,6 +4655,7 @@ QString Aliza::process_dicom(
 		}
 #endif
 		add_histogram(ivariants.at(x), pb);
+		IconUtils::icon(ivariants[x]);
 		//
 		if (ivariants.at(x)->di->opengl_ok)
 		{
