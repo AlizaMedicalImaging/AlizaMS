@@ -68,7 +68,7 @@ project(ALIZAMS)
 #
 #
 if(APPLE)
-  set(ALIZAMS_OSX_BUNDLE_VERSION "1.9.0")
+  set(ALIZAMS_OSX_BUNDLE_VERSION "1.9.1")
 endif()
 
 # Qt major version, required.
