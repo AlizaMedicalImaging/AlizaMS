@@ -407,9 +407,9 @@ int main(int argc, char * argv[])
 					std::cout << "Aliza MS: OpenGL 3 is not available" << std::endl;
 					delete testgl;
 					//
-					QStringList aa;
 					const QStringList aa_ = QApplication::arguments();
 					const int aa_size = aa_.size();
+					QStringList aa;
 					aa.push_back(QString("--nogl"));
 					if (aa_size > 1)
 					{
