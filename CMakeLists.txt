@@ -91,7 +91,7 @@ option(ALIZA_DISABLE_SIMDMATH "Disable SSE/SSE2" OFF)
 if(NOT APPLE)
   # Use OpenGL Core profile with Qt5 (with Qt6 always Core profile).
   # With Qt4 not defined, may work, not tested.
-  option(ALIZA_COREGL "Use OpenGL Core Profile" OFF)
+  option(ALIZA_COREGL "Use OpenGL Core Profile" ON)
 endif()
 
 if(UNIX AND NOT APPLE)
