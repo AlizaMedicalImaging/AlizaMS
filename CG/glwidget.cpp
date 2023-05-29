@@ -977,7 +977,11 @@ void GLWidget::init_opengl(int w, int h)
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
+#if 0
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+#else
+	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+#endif
 	glEnable(GL_LINE_SMOOTH);
 	glLineWidth(1.0f);
 #if 0
