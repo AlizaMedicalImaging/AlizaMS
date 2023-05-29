@@ -87,6 +87,7 @@ private:
 	QToolButton * scouts_toolButton;
 	QToolButton * measure_toolButton;
 	QToolButton * anchor_toolButton;
+	QToolButton * close_toolButton;
 	LUTWidget * lutwidget;
 	Aliza * aliza{};
 	QIcon lockon;

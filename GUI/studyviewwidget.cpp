@@ -53,6 +53,12 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 	anchor_toolButton->setIconSize(s1);
 	anchor_toolButton->setIcon(QIcon(QString(":/bitmaps/anchor.svg")));
 	anchor_toolButton->setToolTip(QString("Anchor sliders for side-by-side view"));
+	close_toolButton = new QToolButton(this);
+	close_toolButton->setCheckable(false);
+	close_toolButton->setChecked(false);
+	close_toolButton->setIconSize(s1);
+	close_toolButton->setIcon(QIcon(QString(":/bitmaps/delete2.svg")));
+	close_toolButton->setToolTip(QString("Close"));
 	QWidget * spacer1 = new QWidget(this);
 	spacer1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	QHBoxLayout * l1 = new QHBoxLayout(toolbar_frame);
@@ -64,6 +70,7 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 	l1->addWidget(measure_toolButton);
 	l1->addWidget(anchor_toolButton);
 	l1->addWidget(spacer1);
+	l1->addWidget(close_toolButton);
 	lutwidget  = new LUTWidget(si);
 	lutwidget->add_items1();
 	QVBoxLayout * l2 = new QVBoxLayout(lut_frame);
@@ -159,6 +166,9 @@ void StudyViewWidget::init_(Aliza * a)
 		mbutton->p_action, SIGNAL(triggered()),
 		this, SLOT(update_grid2()));
 #endif
+	connect(
+		close_toolButton, SIGNAL(clicked()),
+		this, SLOT(close()));
 	connect_tools();
 }
 
