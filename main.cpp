@@ -495,13 +495,23 @@ int main(int argc, char * argv[])
 			if (!skip_next)
 			{
 				const QString f = QString::fromLocal8Bit(argv[x]);
-				if (f == QString("-platform") || f == QString("--platform"))
+				if (f == QString("-platform")    ||
+					f == QString("--platform")   ||
+					f == QString("-style")       ||
+					f == QString("--style")      ||
+					f == QString("-stylesheet")  ||
+					f == QString("--stylesheet"))
 				{
 					skip_next = true;
 				}
 				else if (!f.startsWith(QString("-")))
 				{
 					l.push_back(f);
+					skip_next = false;
+				}
+				else
+				{
+					skip_next = false;
 				}
 			}
 		}

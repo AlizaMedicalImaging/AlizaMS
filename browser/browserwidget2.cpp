@@ -677,6 +677,7 @@ void BrowserWidget2::copy_files()
 		saved_copy_dir,
 		(QFileDialog::ShowDirsOnly));
 	if (dirname.isEmpty()) return;
+	qApp->processEvents();
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	saved_copy_dir = dirname;
 	QList<QStringList> files;

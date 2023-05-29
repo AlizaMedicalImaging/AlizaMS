@@ -540,26 +540,34 @@ MainWindow::~MainWindow()
 
 void MainWindow::open_args(const QStringList & l)
 {
-	const int lsize = l.size();
-	if (lsize < 1) return;
+	if (l.empty()) return;
 	bool lock = mutex.tryLock();
 	if (!lock) return;
-	QStringList l2;
 	QString message;
-	int i = 0;
 	bool skip_next{};
-	for (int i = 0; i < lsize; ++i)
+	QStringList l2;
+	for (int i = 0; i < l.size(); ++i)
 	{
 		if (!skip_next)
 		{
 			const QString f = l.at(i);
-			if (f == QString("-platform") || f == QString("--platform"))
+			if (f == QString("-platform")    ||
+				f == QString("--platform")   ||
+				f == QString("-style")       ||
+				f == QString("--style")      ||
+				f == QString("-stylesheet")  ||
+				f == QString("--stylesheet"))
 			{
 				skip_next = true;
 			}
 			else if (!f.startsWith(QString("-")))
 			{
 				l2.push_back(f);
+				skip_next = false;
+			}
+			else
+			{
+				skip_next = false;
 			}
 		}
 	}
