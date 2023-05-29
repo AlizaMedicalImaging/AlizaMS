@@ -408,15 +408,11 @@ int main(int argc, char * argv[])
 					delete testgl;
 					//
 					const QStringList aa_ = QApplication::arguments();
-					const int aa_size = aa_.size();
 					QStringList aa;
 					aa.push_back(QString("--nogl"));
-					if (aa_size > 1)
+					for (int y = 1; y < aa_.size(); ++y)
 					{
-						for (int y = 1; y < aa_size; ++y)
-						{
-							aa.push_back(aa_.at(y));
-						}
+						aa.push_back(aa_.at(y));
 					}
 					QProcess::startDetached(aa_.at(0), aa);
 					exit(0);
@@ -493,16 +489,21 @@ int main(int argc, char * argv[])
 		app.setQuitOnLastWindowClosed(true);
 #endif
 		QStringList l;
+		bool skip_next{};
 		for (int x = 1; x < argc; ++x)
 		{
-			const QString f = QString::fromLocal8Bit(argv[x]);
-			if (
-				f != QString("-m")    &&
-				f != QString("--m")   &&
-				f != QString("-s")    &&
-				f != QString("--s")   &&
-				f != QString("-nogl") &&
-				f != QString("--nogl")) l.push_back(f);
+			if (!skip_next)
+			{
+				const QString f = QString::fromLocal8Bit(argv[x]);
+				if (f == QString("-platform") || f == QString("--platform"))
+				{
+					skip_next = true;
+				}
+				else if (!f.startsWith(QString("-")))
+				{
+					l.push_back(f);
+				}
+			}
 		}
 		if (!l.empty())
 		{

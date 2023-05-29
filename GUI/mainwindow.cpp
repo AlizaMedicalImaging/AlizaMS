@@ -547,17 +547,21 @@ void MainWindow::open_args(const QStringList & l)
 	QStringList l2;
 	QString message;
 	int i = 0;
-	while (i < lsize)
+	bool skip_next{};
+	for (int i = 0; i < lsize; ++i)
 	{
-		if (l.at(i) == QString("-nogl") || l.at(i) == QString("--nogl"))
+		if (!skip_next)
 		{
-			;;
+			const QString f = l.at(i);
+			if (f == QString("-platform") || f == QString("--platform"))
+			{
+				skip_next = true;
+			}
+			else if (!f.startsWith(QString("-")))
+			{
+				l2.push_back(f);
+			}
 		}
-		else
-		{
-			l2.push_back(l.at(i));
-		}
-		++i;
 	}
 	if (l2.size() == 0)
 	{
@@ -575,10 +579,6 @@ void MainWindow::open_args(const QStringList & l)
 	pb->setMinimumWidth(256);
 	pb->setRange(0, 0);
 	pb->setMinimumDuration(0);
-	pb->setValue(0);
-#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-	pb->show();
-#endif
 	if (l2.size() == 1)
 	{
 		const QString f = l2.at(0);
@@ -587,18 +587,28 @@ void MainWindow::open_args(const QStringList & l)
 			fi.fileName().toUpper() == QString("DICOMDIR"))
 		{
 			browser2->open_DICOMDIR2(fi.absoluteFilePath());
+			tabWidget->setCurrentIndex(1);
 		}
 		else if (fi.isDir())
 		{
 			browser2->open_dicom_dir2(fi.absoluteFilePath());
+			tabWidget->setCurrentIndex(1);
 		}
 		else if (fi.isFile())
 		{
+			pb->setValue(0);
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+			pb->show();
+#endif
 			message = load_any_file(f, pb);
 		}
 	}
 	else if (l2.size() > 1)
 	{
+		pb->setValue(0);
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+		pb->show();
+#endif
 		for (int x = 0; x < l2.size(); ++x)
 		{
 			const QString f = l2.at(x);
@@ -1627,6 +1637,8 @@ QString MainWindow::load_any_file(
 	const QString & f,
 	QProgressDialog * pb)
 {
+	QFileInfo fi(f);
+	if (!fi.isFile()) return QString("");
 	set_ui();
 	const QString message = aliza->load_dicom_file(f, pb);
 	return message;

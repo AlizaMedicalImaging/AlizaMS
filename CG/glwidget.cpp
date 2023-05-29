@@ -6910,6 +6910,11 @@ void GLWidget::disable_gl_and_restart()
 	settings.sync();
 	QStringList aa;
 	aa.push_back(QString("--nogl"));
+	const QStringList aa_ = QApplication::arguments();
+	for (int y = 1; y < aa_.size(); ++y)
+	{
+		aa.push_back(aa_.at(y));
+	}
 	QProcess::startDetached(QApplication::applicationFilePath(), aa);
 	exit(0);
 }
