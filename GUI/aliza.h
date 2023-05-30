@@ -95,7 +95,6 @@ public:
 	void set_anim3Dwidget(AnimWidget*);
 	void set_anim2Dwidget(AnimWidget*);
 	void connect_slots();
-	QString get_opengl_info();
 	void set_axis_2D(int, bool /*rectangle selection mode*/);
 	void set_histogram();
 	void set_axis_zyx(bool /*rectangle selection mode*/);

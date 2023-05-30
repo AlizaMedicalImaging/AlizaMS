@@ -690,7 +690,7 @@ void MainWindow::exit_null()
 
 void MainWindow::about()
 {
-	const QString tmp0 = aliza->get_opengl_info();
+	const QString tmp0 = glwidget ? glwidget->get_system_info() : QString("");
 	aboutwidget->set_opengl_info(tmp0);
 	aboutwidget->set_info();
 	aboutwidget->show();

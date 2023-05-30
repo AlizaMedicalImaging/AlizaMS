@@ -328,6 +328,7 @@ int main(int argc, char * argv[])
 #if 1
 	app.setQuitOnLastWindowClosed(false);
 #endif
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	{
 		// Have to set some stuff related to OpenGL before the QApplication is initialized,
 		// but can check platform only after (and maybe disable OpenGL for VNC).
@@ -346,6 +347,7 @@ int main(int argc, char * argv[])
 			force_disable_opengl = true;
 		}
 	}
+#endif
 	app.setOrganizationName(QString("Aliza"));
 	app.setOrganizationDomain(QString("aliza-dicom-viewer.com"));
 	app.setApplicationName(QString("AlizaMS"));

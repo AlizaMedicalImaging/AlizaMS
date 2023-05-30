@@ -1547,13 +1547,6 @@ void Aliza::set_anim2Dwidget(AnimWidget * i)
 	anim2Dwidget = i;
 }
 
-QString Aliza::get_opengl_info()
-{
-	QString opengl_info;
-	if (glwidget) opengl_info.append(glwidget->get_system_info());
-	return opengl_info;
-}
-
 void Aliza::update_toolbox(const ImageVariant * v)
 {
 	if (!v)
