@@ -14606,7 +14606,7 @@ QString DicomUtils::read_dicom(
 			{
 				if (!message_.isEmpty()) message_.append(QChar('\n'));
 				message_.append(QString(
-					"The series referenced in the Grayscale Soft Copy presentation "
+					"The series referenced in the RTSTRUCT "
 					"could not be found. Try using the DICOM scanner from a "
 					"folder containing both the RTSTRUCT and the referenced series."));
 				mdcm::Reader reader;

@@ -57,7 +57,6 @@
 #cmakedefine MDCM_USE_SYSTEM_ZLIB
 #cmakedefine MDCM_USE_SYSTEM_UUID
 #cmakedefine MDCM_USE_SYSTEM_OPENSSL
-#cmakedefine MDCM_USE_SYSTEM_LJPEG
 #cmakedefine MDCM_USE_SYSTEM_OPENJPEG
 #cmakedefine MDCM_USE_SYSTEM_CHARLS
 #cmakedefine MDCM_USE_SYSTEM_PVRG

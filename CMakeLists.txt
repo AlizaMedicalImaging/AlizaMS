@@ -89,8 +89,7 @@ set_property(CACHE ALIZA_CXX_STANDARD PROPERTY STRINGS "Not set" "11" "14" "17" 
 option(ALIZA_DISABLE_SIMDMATH "Disable SSE/SSE2" OFF)
 
 if(NOT APPLE)
-  # Use OpenGL Core profile with Qt5 (with Qt6 always Core profile).
-  # With Qt4 not defined, may work, not tested.
+  # Use OpenGL Core profile.
   option(ALIZA_COREGL "Use OpenGL Core Profile" ON)
 endif()
 

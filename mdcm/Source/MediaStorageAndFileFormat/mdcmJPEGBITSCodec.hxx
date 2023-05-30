@@ -733,7 +733,6 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
       jpeg_destroy_decompress(&cinfo);
       // www.dcm4che.org/jira/secure/attachment/10185/ct-implicit-little.dcm
       // weird Icon Image from GE
-      mdcmAlwaysWarnMacro("JPEG error (1)");
       return false;
     }
   }

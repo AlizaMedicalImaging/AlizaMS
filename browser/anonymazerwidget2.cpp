@@ -2719,6 +2719,7 @@ void AnonymazerWidget2::run_()
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 	pd->show();
 #endif
+	qApp->processEvents();
 	{
 		QStringList filenames;
 		QDir dir(in_path);

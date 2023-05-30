@@ -184,6 +184,7 @@ void BrowserWidget2::read_directory(const QString & p)
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 	pb->show();
 #endif
+	qApp->processEvents();
 	try
 	{
 		const mdcm::Global & g = mdcm::GlobalInstance;

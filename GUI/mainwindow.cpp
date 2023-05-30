@@ -602,6 +602,7 @@ void MainWindow::open_args(const QStringList & l)
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 			pb->show();
 #endif
+			qApp->processEvents();
 			message = load_any_file(f, pb);
 		}
 	}
@@ -611,6 +612,7 @@ void MainWindow::open_args(const QStringList & l)
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 		pb->show();
 #endif
+		qApp->processEvents();
 		for (int x = 0; x < l2.size(); ++x)
 		{
 			const QString f = l2.at(x);
@@ -1377,7 +1379,7 @@ void MainWindow::dropEvent(QDropEvent * e)
 				0);
 			pb->setModal(true);
 			pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
-			connect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
+			connect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
 			pb->setMinimumWidth(256);
 			pb->setRange(0, 0);
 			pb->setMinimumDuration(0);
@@ -1385,6 +1387,7 @@ void MainWindow::dropEvent(QDropEvent * e)
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 			pb->show();
 #endif
+			qApp->processEvents();
 			for (int i = 0; i < l.size(); ++i)
 			{
 				if (i == 0 && fi.isFile())
@@ -1445,7 +1448,7 @@ void MainWindow::load_any()
 		//| QFileDialog::DontUseNativeDialog
 		));
 	QProgressDialog * pb = new QProgressDialog(QString("Loading ..."), QString("Exit"), 0, 0);
-	connect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
+	connect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
 	pb->setModal(true);
 	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
 	pb->setMinimumWidth(256);
@@ -1455,6 +1458,7 @@ void MainWindow::load_any()
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 	pb->show();
 #endif
+	qApp->processEvents();
 	bool is_dicomdir = false;
 	for (int x = 0; x < l.size(); ++x)
 	{
@@ -1620,7 +1624,7 @@ void MainWindow::load_dicom_series2()
 	set_ui();
 	QProgressDialog * pb =
 		new QProgressDialog(QString("Loading ..."), QString("Exit"), 0, 0);
-	connect(pb,SIGNAL(canceled()), this, SLOT(exit_null()));
+	connect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
 	pb->setModal(true);
 	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
 	pb->setMinimumWidth(256);
@@ -1630,6 +1634,7 @@ void MainWindow::load_dicom_series2()
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 	pb->show();
 #endif
+	qApp->processEvents();
 	const QString message = aliza->load_dicom_series(pb);
 	disconnect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
 	pb->close();
