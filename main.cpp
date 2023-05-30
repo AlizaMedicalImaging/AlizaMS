@@ -331,6 +331,21 @@ int main(int argc, char * argv[])
 #endif
 #endif
 	QApplication app(argc, argv);
+	{
+		const QString platform_name = app.platformName().trimmed().remove(QChar('\0'));
+#if (defined PRINT_HOST_INFO && PRINT_HOST_INFO==1)
+		std::cout << "\nQt platform: " << platform_name.toStdString() <<
+			"\nLocale: " << QLocale::system().name().toStdString() << std::endl;
+#endif
+		// From this list the only useful one on a usual computer is VNC.
+		if (platform_name == QString("vnc")      ||
+			platform_name == QString("linuxfb")  ||
+			platform_name == QString("directfb") ||
+			platform_name == QString("eglfs")) // EGLFS probably doesn't work with OpenGL 3
+		{
+			force_disable_opengl = true;
+		}
+	}
 #if 1
 	app.setQuitOnLastWindowClosed(false);
 #endif
@@ -352,15 +367,12 @@ int main(int argc, char * argv[])
 			QString("stylename"),
 			QVariant(QString("Dark Fusion"))).toString();
 #ifdef TMP_USE_GL_TEST
-		const int enable_gltest =
-			settings.value(QString("enable_gltest"), 1).toInt();
+		const int enable_gltest = settings.value(QString("enable_gltest"), 1).toInt();
 #endif
-		int enable_gl_3d_ =
-			settings.value(QString("enable_gl_3D"), 1).toInt();
-		const int hide_zoom_ =
-			settings.value(QString("hide_zoom"), 1).toInt();
+		int enable_gl_3d_ = settings.value(QString("enable_gl_3D"), 1).toInt();
+		const int hide_zoom_ = settings.value(QString("hide_zoom"), 1).toInt();
 		settings.endGroup();
-		hide_zoom = (hide_zoom_ == 1) ? true : false;
+		hide_zoom = hide_zoom_ == 1;
 		QFont f = QApplication::font();
 		if (app_font_pt <= 0.0)
 		{
@@ -425,41 +437,44 @@ int main(int argc, char * argv[])
 			}
 		}
 		//
-		if (saved_style == QString("Dark Fusion"))
+		if (!saved_style.isEmpty())
 		{
-			QColor bg(0x53, 0x59, 0x60);
-			QColor tt(0x30, 0x39, 0x47);
-			QPalette p;
-			p.setColor(QPalette::Window,          bg);
-			p.setColor(QPalette::WindowText,      Qt::white);
-			p.setColor(QPalette::Text,            Qt::white);
-			p.setColor(QPalette::Disabled,        QPalette::WindowText, Qt::gray);
-			p.setColor(QPalette::Disabled,        QPalette::Text,       Qt::gray);
-			p.setColor(QPalette::Base,            bg);
-			p.setColor(QPalette::AlternateBase,   bg);
-			p.setColor(QPalette::ToolTipBase,     tt);
-			p.setColor(QPalette::ToolTipText,     Qt::white);
-			p.setColor(QPalette::Button,          bg);
-			p.setColor(QPalette::ButtonText,      Qt::white);
-			p.setColor(QPalette::BrightText,      Qt::white);
-			p.setColor(QPalette::Link,            Qt::darkBlue);
-			p.setColor(QPalette::Highlight,       Qt::lightGray);
-			p.setColor(QPalette::HighlightedText, Qt::black);
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-			app.setStyle(QString("Fusion"));
-#else
-			app.setStyle(QString("Plastique"));
-#endif
-			app.setPalette(p);
-		}
-		else
-		{
-			app.setStyle(saved_style);
-			if (!(
-				saved_style.toUpper() == QString("WINDOWSVISTA") ||
-				saved_style.toUpper() == QString("MACOS")))
+			if (saved_style == QString("Dark Fusion"))
 			{
-				app.setPalette(app.style()->standardPalette());
+				QColor bg(0x53, 0x59, 0x60);
+				QColor tt(0x30, 0x39, 0x47);
+				QPalette p;
+				p.setColor(QPalette::Window,          bg);
+				p.setColor(QPalette::WindowText,      Qt::white);
+				p.setColor(QPalette::Text,            Qt::white);
+				p.setColor(QPalette::Disabled,        QPalette::WindowText, Qt::gray);
+				p.setColor(QPalette::Disabled,        QPalette::Text,       Qt::gray);
+				p.setColor(QPalette::Base,            bg);
+				p.setColor(QPalette::AlternateBase,   bg);
+				p.setColor(QPalette::ToolTipBase,     tt);
+				p.setColor(QPalette::ToolTipText,     Qt::white);
+				p.setColor(QPalette::Button,          bg);
+				p.setColor(QPalette::ButtonText,      Qt::white);
+				p.setColor(QPalette::BrightText,      Qt::white);
+				p.setColor(QPalette::Link,            Qt::darkBlue);
+				p.setColor(QPalette::Highlight,       Qt::lightGray);
+				p.setColor(QPalette::HighlightedText, Qt::black);
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+				app.setStyle(QString("Fusion"));
+#else
+				app.setStyle(QString("Plastique"));
+#endif
+				app.setPalette(p);
+			}
+			else
+			{
+				app.setStyle(saved_style);
+				if (!(
+					saved_style.toUpper() == QString("WINDOWSVISTA") ||
+					saved_style.toUpper() == QString("MACOS")))
+				{
+					app.setPalette(app.style()->standardPalette());
+				}
 			}
 		}
 	}
@@ -469,7 +484,6 @@ int main(int argc, char * argv[])
 		QString("\n        Aliza MS ") +
 		QString::fromLatin1(
 			QVariant(ALIZAMS_VERSION).toByteArray().constData()) +
-		QString("    ") + QLocale::system().name() +
 		QString("\n\n");
 	QSplashScreen * splash =
 		new QSplashScreen(QPixmap(":/bitmaps/empty_splash.png"));
@@ -487,6 +501,9 @@ int main(int argc, char * argv[])
 	{
 #if 1
 		app.setQuitOnLastWindowClosed(true);
+#endif
+#if (defined USE_SPLASH_SCREEN && USE_SPLASH_SCREEN==1)
+		QTimer::singleShot(500, splash, SLOT(close()));
 #endif
 		QStringList l;
 		bool skip_next{};
@@ -559,7 +576,6 @@ int main(int argc, char * argv[])
 		mainWin.show();
 		mainWin.check_3d_frame();
 #if (defined USE_SPLASH_SCREEN && USE_SPLASH_SCREEN==1)
-		splash->showMessage(splash_info);
 		QTimer::singleShot(1500, splash, SLOT(close()));
 #endif
 		if (argc > 1)

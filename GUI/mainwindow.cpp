@@ -34,8 +34,6 @@ MainWindow::MainWindow(
 	setDocumentMode(false);
 	scale_icons = 1.0f;
 	adjust_scale_icons = 1.2f;
-	hide_gl3_frame_later = false;
-	saved_ok3d = false;
 	int dock_area = 2;
 	QString saved_style;
 	//
@@ -406,11 +404,10 @@ MainWindow::MainWindow(
 	aliza->set_histogramview(histogramview);
 	//
 	first_image_loaded = false;
-	connect(aliza,SIGNAL(report_load_to_mainwin()),this,SLOT(set_ui()));
+	connect(aliza, SIGNAL(report_load_to_mainwin()), this, SLOT(set_ui()));
 	//
 	if (ok3d && glwidget)
 	{
-		saved_ok3d = true;
 		gl_frame->show();
 		glwidget->show();
 		view3d_label->setText(QString("Physical space, intensity projection, GPU"));
@@ -419,18 +416,15 @@ MainWindow::MainWindow(
 	}
 	else
 	{
-		saved_ok3d = false;
 		gl_frame->hide();
-		slicesAct->setChecked(false);
-		raycastAct->setChecked(false);
+		slicesAct->setEnabled(false);
+		raycastAct->setEnabled(false);
 		trans3DAct->setEnabled(false);
 		gloptionsAct->setEnabled(false);
 		frames3DAct->setEnabled(false);
 		frame3D->hide();
 		settingswidget->set_gl_visible(false);
-		show3DAct->blockSignals(true);
-		show3DAct->setChecked(false);
-		show3DAct->blockSignals(false);
+		show3DAct->setEnabled(false);
 	}
 	//
 	toolbar2D_frame->hide();
@@ -872,8 +866,8 @@ void MainWindow::createMenus()
 	views_menu->addAction(show3DAct);
 	actionViews3DMenu  = new QAction(QString("3D Views"), this);
 	QMenu * views3d_menu = new QMenu(this);
-	views3d_menu->addAction((slicesAct));
-	views3d_menu->addAction((raycastAct));
+	views3d_menu->addAction(slicesAct);
+	views3d_menu->addAction(raycastAct);
 	actionViews3DMenu->setMenu(views3d_menu);
 	views_menu->addAction(actionViews3DMenu);
 	actionViews3DMenu->setEnabled(false);
@@ -1097,30 +1091,25 @@ void MainWindow::toggle_showgl(bool t)
 	if (t)
 	{
 		frame3D->show();
-		if (saved_ok3d)
-		{
-			toolbar3D_frame->show();
-			view3d_frame->show();
-		}
-		else
-		{
-			toolbar3D_frame->hide();
-			view3d_frame->hide();
-		}
+		toolbar3D_frame->show();
+		view3d_frame->show();
 	}
 	else
 	{
 		frame3D->hide();
 	}
-	if (frame2D->isHidden() && frame3D->isHidden())
+	if (first_image_loaded)
 	{
-		level_frame->hide();
-		zrange_frame->hide();
-	}
-	else
-	{
-		level_frame->show();
-		zrange_frame->show();
+		if (frame2D->isHidden() && frame3D->isHidden())
+		{
+			level_frame->hide();
+			zrange_frame->hide();
+		}
+		else
+		{
+			level_frame->show();
+			zrange_frame->show();
+		}
 	}
 	qApp->processEvents();
 }
@@ -1138,6 +1127,19 @@ void MainWindow::toggle_show2D(bool t)
 	{
 		level_frame->show();
 		zrange_frame->show();
+	}
+	if (first_image_loaded)
+	{
+		if (frame2D->isHidden() && frame3D->isHidden())
+		{
+			level_frame->hide();
+			zrange_frame->hide();
+		}
+		else
+		{
+			level_frame->show();
+			zrange_frame->show();
+		}
 	}
 	qApp->processEvents();
 }
@@ -1592,7 +1594,7 @@ void MainWindow::set_ui()
 		info_line->show();
 		view2d_label->setText("Slice view (Z)");
 		actionViews2DMenu->setEnabled(true);
-		if (saved_ok3d)
+		if (glwidget && !glwidget->no_opengl3)
 		{
 			show3DAct->setEnabled(true);
 			actionViews3DMenu->setEnabled(true);
@@ -1824,10 +1826,10 @@ void MainWindow::trigger_set_level()
 		nullptr,
 		QString("Set Level/Window"),
 		QString(
-			"Use histogram widget or tool\n"
-			"at the bottom of mainwindow,\n"
-			"(image must be opened), use\n"
-			"sliders/spinboxes."));
+			"Use sliders/spinboxes or histogram widget.\n"
+			"Toggle \"Lock\" button to switch in 2D view\n"
+			"for original slice (Z) between defined\n"
+			"per-slicer level and and free selection."));
 }
 
 void MainWindow::tab_ind_changed(int i)
@@ -2021,32 +2023,21 @@ void MainWindow::change_style(const QString & s)
 
 void MainWindow::check_3d_frame()
 {
-	if (hide_gl3_frame_later)
+	QSettings settings(
+		QSettings::IniFormat,
+		QSettings::UserScope,
+		QApplication::organizationName(),
+		QApplication::applicationName());
+	settings.setFallbacksEnabled(true);
+	settings.beginGroup(QString("MainWindow"));
+	const QString s = settings.value(QString("hide_3d_frame"), QString("N")).toString();
+	settings.endGroup();
+	if (s == QString("Y"))
 	{
 		show3DAct->blockSignals(true);
 		toggle_showgl(false);
 		show3DAct->setChecked(false);
 		show3DAct->blockSignals(false);
-	}
-	else
-	{
-		QSettings settings(
-			QSettings::IniFormat,
-			QSettings::UserScope,
-			QApplication::organizationName(),
-			QApplication::applicationName());
-		settings.setFallbacksEnabled(true);
-		settings.beginGroup(QString("MainWindow"));
-		const QString s = settings.value(
-			QString("hide_3d_frame"), QString("N")).toString();
-		settings.endGroup();
-		if (s == QString("Y"))
-		{
-			show3DAct->blockSignals(true);
-			toggle_showgl(false);
-			show3DAct->setChecked(false);
-			show3DAct->blockSignals(false);
-		}
 	}
 }
 
@@ -2060,7 +2051,7 @@ void MainWindow::trigger_image_dicom_meta()
 		QMessageBox::information(
 			nullptr,
 			QString("Information"),
-			QString("DICOM source files are not available"));
+			QString("Not a DICOM image or empty list"));
 		return;
 	}
 	qApp->setOverrideCursor(QCursor(Qt::WaitCursor));

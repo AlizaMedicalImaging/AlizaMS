@@ -158,8 +158,6 @@ private:
 	QPoint mainwindow_pos;
 	float  scale_icons;
 	float  adjust_scale_icons;
-	bool   hide_gl3_frame_later;
-	bool   saved_ok3d;
 	//
 	Aliza             * aliza;
 	GLWidget          * glwidget;
