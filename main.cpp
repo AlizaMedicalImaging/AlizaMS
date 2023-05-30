@@ -297,17 +297,11 @@ int main(int argc, char * argv[])
 #endif
 // clang-format on
 	//
-#if 0
-#if ((QT_VERSION >= QT_VERSION_CHECK(5,6,0)) && (QT_VERSION < QT_VERSION_CHECK(6,0,0)))
-	QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
-#endif
-#endif
-	//
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
-#ifdef USE_SET_DEFAULT_GL_FORMAT
 	if (!force_disable_opengl)
 	{
+		QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
+#ifdef USE_SET_DEFAULT_GL_FORMAT
 		QSurfaceFormat format;
 		format.setRenderableType(QSurfaceFormat::OpenGL);
 #ifdef ALIZA_GL_3_2_CORE
@@ -327,12 +321,18 @@ int main(int argc, char * argv[])
 		//format.setSamples(4);
 #endif
 		QSurfaceFormat::setDefaultFormat(format);
+#endif
 	}
 #endif
-#endif
 	QApplication app(argc, argv);
+#if 1
+	app.setQuitOnLastWindowClosed(false);
+#endif
 	{
-		const QString platform_name = app.platformName().trimmed().remove(QChar('\0'));
+		// Have to set some stuff related to OpenGL before the QApplication is initialized,
+		// but can check platform only after (and maybe disable OpenGL for VNC).
+		// But there seems to be no negative effect either.
+		const QString platform_name = QApplication::platformName().trimmed().remove(QChar('\0'));
 #if (defined PRINT_HOST_INFO && PRINT_HOST_INFO==1)
 		std::cout << "\nQt platform: " << platform_name.toStdString() <<
 			"\nLocale: " << QLocale::system().name().toStdString() << std::endl;
@@ -346,9 +346,6 @@ int main(int argc, char * argv[])
 			force_disable_opengl = true;
 		}
 	}
-#if 1
-	app.setQuitOnLastWindowClosed(false);
-#endif
 	app.setOrganizationName(QString("Aliza"));
 	app.setOrganizationDomain(QString("aliza-dicom-viewer.com"));
 	app.setApplicationName(QString("AlizaMS"));
