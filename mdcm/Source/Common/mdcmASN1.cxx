@@ -32,6 +32,7 @@
 #  include <openssl/x509.h>
 #endif
 #include <fstream>
+#include <cassert>
 
 namespace mdcm
 {

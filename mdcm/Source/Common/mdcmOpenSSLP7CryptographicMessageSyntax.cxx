@@ -485,7 +485,7 @@ OpenSSLP7CryptographicMessageSyntax::ParseCertificateFile(const char * keyfile)
 }
 
 bool
-OpenSSLP7CryptographicMessageSyntax::SetPassword(const char *, size_t) override
+OpenSSLP7CryptographicMessageSyntax::SetPassword(const char *, size_t)
 {
   mdcmWarningMacro("Openssl using PKCS7 does not support Password Based Encryption.");
   return false;
