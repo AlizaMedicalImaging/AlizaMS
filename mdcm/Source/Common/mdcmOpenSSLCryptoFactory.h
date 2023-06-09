@@ -24,6 +24,7 @@
 
 #include "mdcmCryptoFactory.h"
 #include "mdcmOpenSSLCryptographicMessageSyntax.h"
+#include "mdcmTrace.h"
 
 namespace mdcm
 {
@@ -31,14 +32,14 @@ namespace mdcm
 class MDCM_EXPORT OpenSSLCryptoFactory : public CryptoFactory
 {
 public:
-  OpenSSLCryptoFactory(CryptoLib id)
-    : CryptoFactory(id);
-  CryptographicMessageSyntax *
-  CreateCMSProvider() override;
+  OpenSSLCryptoFactory(CryptoLib id) : CryptoFactory(id)
+  {
+    mdcmDebugMacro("OpenSSL Factory registered.");
+  }
+  CryptographicMessageSyntax * CreateCMSProvider() override;
 
 protected:
-  void
-  InitOpenSSL();
+  void InitOpenSSL();
 
 private:
   OpenSSLCryptoFactory() {}
