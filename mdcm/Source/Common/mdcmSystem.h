@@ -80,8 +80,6 @@ public:
   // consistent func for C99 spec of strcasecmp/strncasecmp
   static int
   StrCaseCmp(const char *, const char *);
-  static int
-  StrNCaseCmp(const char *, const char *, size_t); // n != 0
   // strtok_r
   static char *
   StrTokR(char *, const char *, char **);

@@ -23,12 +23,14 @@
 #include "mdcmOpenSSLCryptographicMessageSyntax.h"
 #include <limits>
 #include <cstring>
+#include <cassert>
 #include <openssl/cms.h>
 #include <openssl/evp.h>
 #include <openssl/bio.h>
 #include <openssl/pem.h>
 #include <openssl/err.h>
 #include <openssl/rand.h>
+#include "mdcmTrace.h"
 
 namespace mdcm
 {

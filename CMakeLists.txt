@@ -129,7 +129,8 @@ option(MDCM_USE_SYSTEM_OPENJPEG "Use system OpenJPEG" OFF)
 
 option(MDCM_USE_SYSTEM_CHARLS "Use system CharLS" OFF)
 
-# Currently not used.
+# OpenSSL is currently not used, don't enable!
+# PVRG is rather bad, don't use!
 if(FALSE)
   # OpenSSL is currently unused in AlizaMS.
   option(MDCM_USE_SYSTEM_OPENSSL "Use system OpenSSL" OFF)
@@ -283,6 +284,12 @@ if(UNIX)
   endif()
 endif()
 
+if(MDCM_USE_SYSTEM_OPENSSL)
+  find_package(OpenSSL REQUIRED)
+  message(STATUS "OpenSSL include: " ${OPENSSL_INCLUDE_DIR})
+  message(STATUS "OpenSSL libraries: " ${OPENSSL_LIBRARIES})
+endif()
+
 set(MDCM_LIBRARIES
   ${MDCM_LJPEG_LIBRARIES}
   ${MDCM_OPENJPEG_LIBRARIES}
@@ -310,7 +317,7 @@ endmacro()
 
 set(MDCM_MAJOR_VERSION 1)
 set(MDCM_MINOR_VERSION 3)
-set(MDCM_BUILD_VERSION 1)
+set(MDCM_BUILD_VERSION 2)
 set(MDCM_VERSION "${MDCM_MAJOR_VERSION}.${MDCM_MINOR_VERSION}.${MDCM_BUILD_VERSION}")
 set(MDCM_API_VERSION "${MDCM_MAJOR_VERSION}.${MDCM_MINOR_VERSION}")
 
@@ -322,31 +329,22 @@ if(MDCM_HAVE_BYTESWAP_FILE_H)
   CHECK_CXX_SOURCE_COMPILES("\#include <byteswap.h>\nint main(){return bswap_32(42);}" MDCM_HAVE_BYTESWAP_H)
 endif()
 CHECK_INCLUDE_FILE("rpc.h" MDCM_HAVE_RPC_H)
-CHECK_INCLUDE_FILE("langinfo.h" MDCM_HAVE_LANGINFO_H)
 
 include(CheckFunctionExists)
 include(CheckSymbolExists)
 
 CHECK_SYMBOL_EXISTS(strcasecmp "strings.h" MDCM_HAVE_STRCASECMP)
-CHECK_SYMBOL_EXISTS(strncasecmp "strings.h" MDCM_HAVE_STRNCASECMP)
-CHECK_SYMBOL_EXISTS(snprintf "stdio.h" MDCM_HAVE_SNPRINTF)
-CHECK_FUNCTION_EXISTS(strptime MDCM_HAVE_STRPTIME)
+CHECK_SYMBOL_EXISTS(snprintf "cstdio" MDCM_HAVE_SNPRINTF)
 CHECK_FUNCTION_EXISTS(_stricmp MDCM_HAVE__STRICMP)
-CHECK_FUNCTION_EXISTS(_strnicmp MDCM_HAVE__STRNICMP)
 CHECK_FUNCTION_EXISTS(_snprintf MDCM_HAVE__SNPRINTF)
 CHECK_FUNCTION_EXISTS(gettimeofday MDCM_HAVE_GETTIMEOFDAY)
-CHECK_INCLUDE_FILE("stdint.h" MDCM_HAVE_STDINT_H)
-if(UNIX)
-  CHECK_INCLUDE_FILE("inttypes.h" MDCM_HAVE_INTTYPES_H)
-endif()
 
 include(CheckCXXSourceCompiles)
 CHECK_CXX_SOURCE_COMPILES("int main(){const char *f =__FUNCTION__;return 0;}" MDCM_CXX_HAS_FUNCTION)
-CHECK_CXX_SOURCE_COMPILES("\#include <fstream>\nint main(){const wchar_t fn[10]={};std::ifstream is(fn);return 0;}" MDCM_HAVE_WCHAR_IFSTREAM)
 
 if(MDCM_USE_SYSTEM_OPENSSL)
   set(CMAKE_REQUIRED_INCLUDES ${OPENSSL_INCLUDE_DIR})
-  set(CMAKE_REQUIRED_LIBRARIES ${OPENSSL_LIBRARIES} ${CMAKE_DL_LIBS}) #FIXME
+  set(CMAKE_REQUIRED_LIBRARIES ${OPENSSL_LIBRARIES} ${CMAKE_DL_LIBS})
   CHECK_CXX_SOURCE_COMPILES("\#include <openssl/cms.h>\nint main(){CMS_add0_recipient_password(0,0,0,0,0,0,0);return 0;}" MDCM_HAVE_CMS_RECIPIENT_PASSWORD)
 endif()
 
@@ -377,6 +375,10 @@ endif()
 if(NOT MDCM_USE_SYSTEM_ZLIB)
   include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities/mdcmzlib")
   include_directories(BEFORE "${CMAKE_CURRENT_BINARY_DIR}/mdcm/Utilities/mdcmzlib")
+endif()
+
+if(MDCM_USE_SYSTEM_OPENSSL)
+  include_directories(${OPENSSL_INCLUDE_DIR})
 endif()
 
 if(MDCM_USE_SYSTEM_UUID)
@@ -1008,7 +1010,7 @@ else()
 endif()
 
 if (MDCM_USE_SYSTEM_OPENSSL)
-  set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} ssl crypto)
+  set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} ${OPENSSL_LIBRARIES})
 endif()
 
 if(TMP_USE_53_SPATIAL_ENUMS)

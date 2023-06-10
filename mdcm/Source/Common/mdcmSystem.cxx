@@ -436,13 +436,6 @@ System::ParseDateTime(time_t & timep, long & milliseconds, const char date[22])
   if (len > 21)
     return false;
   struct tm ptm;
-#if defined(MDCM_HAVE_STRPTIME) && 0
-  char * ptr1 = strptime(date, "%Y%m%d%H%M%S", &ptm);
-  if (ptr1 != date + 14)
-  {
-    return false;
-  }
-#else
   int year, mon, day, hour, min, sec, n;
   if ((n = sscanf(date, "%4d%2d%2d%2d%2d%2d", &year, &mon, &day, &hour, &min, &sec)) >= 1)
   {
@@ -500,7 +493,6 @@ System::ParseDateTime(time_t & timep, long & milliseconds, const char date[22])
   {
     return false;
   }
-#endif
   timep = mktime(&ptm);
   if (timep == static_cast<time_t>(-1))
     return false;
@@ -623,30 +615,11 @@ System::GetCurrentDateTime(char date[22])
 }
 
 int
-System::StrNCaseCmp(const char * s1, const char * s2, size_t n)
-{
-#if defined(MDCM_HAVE_STRNCASECMP)
-  return strncasecmp(s1, s2, n);
-#elif defined(MDCM_HAVE__STRNICMP)
-  return _strnicmp(s1, s2, n);
-#else
-#  error
-  assert(n); // TODO
-  while (--n && *s1 && (tolower(*s1) == tolower(*s2)))
-  {
-    ++s1;
-    ++s2;
-  }
-  return tolower(*s1) - tolower(*s2);
-#endif
-}
-
-int
 System::StrCaseCmp(const char * s1, const char * s2)
 {
 #if defined(MDCM_HAVE_STRCASECMP)
   return strcasecmp(s1, s2);
-#elif defined(MDCM_HAVE__STRNICMP)
+#elif defined(MDCM_HAVE__STRICMP)
   return _stricmp(s1, s2);
 #else
 #  error
