@@ -3415,7 +3415,7 @@ void GraphicsWidget::get_screen()
 	{
 		QMessageBox mbox;
 		mbox.addButton(QMessageBox::Close);
-		mbox.setIcon(QMessageBox::Warning);
+		mbox.setIcon(QMessageBox::Information);
 		mbox.setText(QString("Could not save file"));
 		mbox.exec();
 	}

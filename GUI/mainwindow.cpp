@@ -575,6 +575,13 @@ void MainWindow::open_args(const QStringList & l)
 		QString("Exit"),
 		0,
 		0);
+	{
+		QList<QPushButton *> lb = pb->findChildren<QPushButton*>();
+		for (int x = 0; x < lb.size(); ++x) // one button
+		{
+			lb[x]->setStyleSheet("QPushButton { color: #8B0000; }");
+		}
+	}
 	pb->setModal(true);
 	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
 	connect(pb,SIGNAL(canceled()), this, SLOT(exit_null()));
@@ -1377,6 +1384,13 @@ void MainWindow::dropEvent(QDropEvent * e)
 				QString("Exit"),
 				0,
 				0);
+			{
+				QList<QPushButton *> lb = pb->findChildren<QPushButton*>();
+				for (int x = 0; x < lb.size(); ++x) // one button
+				{
+					lb[x]->setStyleSheet("QPushButton { color: #8B0000; }");
+				}
+			}
 			pb->setModal(true);
 			pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
 			connect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
@@ -1448,6 +1462,13 @@ void MainWindow::load_any()
 		//| QFileDialog::DontUseNativeDialog
 		));
 	QProgressDialog * pb = new QProgressDialog(QString("Loading ..."), QString("Exit"), 0, 0);
+	{
+		QList<QPushButton *> lb = pb->findChildren<QPushButton*>();
+		for (int x = 0; x < lb.size(); ++x) // one button
+		{
+			lb[x]->setStyleSheet("QPushButton { color: #8B0000; }");
+		}
+	}
 	connect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
 	pb->setModal(true);
 	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
@@ -1624,6 +1645,13 @@ void MainWindow::load_dicom_series2()
 	set_ui();
 	QProgressDialog * pb =
 		new QProgressDialog(QString("Loading ..."), QString("Exit"), 0, 0);
+	{
+		QList<QPushButton *> lb = pb->findChildren<QPushButton*>();
+		for (int x = 0; x < lb.size(); ++x) // one button
+		{
+			lb[x]->setStyleSheet("QPushButton { color: #8B0000; }");
+		}
+	}
 	connect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
 	pb->setModal(true);
 	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);

@@ -265,7 +265,7 @@ bool generate_spectorscopy_geometry(
 					QString(" ... using image as non-uniform.\n") +
 					QMessageBox mbox;
 					mbox.addButton(QMessageBox::Close);
-					mbox.setIcon(QMessageBox::Warning);
+					mbox.setIcon(QMessageBox::Information);
 					mbox.setText(z_inv_string);
 					mbox.exec();
 #endif

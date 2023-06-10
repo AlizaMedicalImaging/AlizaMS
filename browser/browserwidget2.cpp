@@ -474,7 +474,7 @@ void BrowserWidget2::open_DICOMDIR2(const QString & f)
 	if (!warning.isEmpty())
 	{
 		QMessageBox mbox;
-		mbox.setIcon(QMessageBox::Warning);
+		mbox.setIcon(QMessageBox::Information);
 		mbox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 		mbox.setDefaultButton(QMessageBox::Yes);
 		mbox.setText(warning+QString("\nScan directory?"));
@@ -593,7 +593,7 @@ void BrowserWidget2::reload_dir()
 			if (!warning.isEmpty())
 			{
 				QMessageBox mbox;
-				mbox.setIcon(QMessageBox::Warning);
+				mbox.setIcon(QMessageBox::Information);
 				mbox.setStandardButtons(
 					QMessageBox::Yes | QMessageBox::No);
 				mbox.setDefaultButton(QMessageBox::Yes);
@@ -747,7 +747,7 @@ void BrowserWidget2::open_DICOMDIR()
 	if (!warning.isEmpty())
 	{
 		QMessageBox mbox;
-		mbox.setIcon(QMessageBox::Warning);
+		mbox.setIcon(QMessageBox::Information);
 		mbox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 		mbox.setDefaultButton(QMessageBox::Yes);
 		mbox.setText(warning + QString("\nScan directory?"));
@@ -1969,7 +1969,7 @@ quit__:
 	if (!warning.isEmpty())
 	{
 		QMessageBox mbox;
-		mbox.setIcon(QMessageBox::Warning);
+		mbox.setIcon(QMessageBox::Information);
 		mbox.setText(warning);
 		mbox.exec();
 	}
