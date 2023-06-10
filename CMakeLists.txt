@@ -129,15 +129,20 @@ option(MDCM_USE_SYSTEM_OPENJPEG "Use system OpenJPEG" OFF)
 
 option(MDCM_USE_SYSTEM_CHARLS "Use system CharLS" OFF)
 
-# OpenSSL is currently not used, don't enable!
-# PVRG is rather bad, don't use!
 if(FALSE)
-  # OpenSSL is currently unused in AlizaMS.
+#
+# OpenSSL is currently not used, don't enable!
+#
   option(MDCM_USE_SYSTEM_OPENSSL "Use system OpenSSL" OFF)
   mark_as_advanced(MDCM_USE_SYSTEM_OPENSSL)
   
-  # JPEG library released by the Standford PVRG group,
-  # build (or use system) binary to convert to raw tmp file.
+#
+# PVRG (broken JPEG library released by the Standford PVRG group)
+# support is rather bad, just a very bad implemented hack to write
+# to temp. file using some external binary. PVRG encoded DICOM files
+# are extremely rare nowadays.
+# Don't use!
+#
   option(MDCM_USE_PVRG "Use PVRG" OFF)
   mark_as_advanced(MDCM_USE_PVRG)
   if(MDCM_USE_PVRG)
@@ -1009,7 +1014,7 @@ else()
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} alizalcms2)
 endif()
 
-if (MDCM_USE_SYSTEM_OPENSSL)
+if(MDCM_USE_SYSTEM_OPENSSL)
   set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} ${OPENSSL_LIBRARIES})
 endif()
 
