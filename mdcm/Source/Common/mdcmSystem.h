@@ -38,14 +38,14 @@ public:
   FileIsSymlink(const char *);
   static time_t
   FileTime(const char *);
-  static const char *
-  GetLastSystemError();
   static std::wstring
   ConvertToUtf16(const char *);
   static size_t
   FileSize(const char *);
+#ifdef MDCM_USE_PVRG
   static const char *
   GetCurrentProcessFileName(); // not thread safe
+#endif
   // In the following the size '22' is explicitly listed. You need to pass in
   // at least 22bytes of array. If the string is an output it will be
   // automatically padded ( array[21] == 0 ) for you.
