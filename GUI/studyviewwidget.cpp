@@ -419,7 +419,6 @@ void StudyViewWidget::block_signals(bool t)
 void StudyViewWidget::closeEvent(QCloseEvent * e)
 {
 	clear_();
-	update_null();
 	e->accept();
 }
 
