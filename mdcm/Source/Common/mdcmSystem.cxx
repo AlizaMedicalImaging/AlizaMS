@@ -66,10 +66,15 @@
 #  include <strings.h>
 #endif
 
-#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
+#if (!defined(MDCM_HAVE_STRCASECMP) && !defined(MDCM_HAVE__STRICMP))
+#  include <cctype>
+#  include <algorithm>
+#endif
+
 namespace
 {
 
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
 std::wstring
 utf8_decode(const std::string & str)
 {
@@ -141,9 +146,24 @@ HandleMaxPath(const std::wstring & in)
   }
   return in;
 }
+#endif
 
+#if (!defined(MDCM_HAVE_STRCASECMP) && !defined(MDCM_HAVE__STRICMP))
+std::string to_lower(std::string s)
+{
+  std::transform(
+    s.begin(),
+    s.end(),
+    s.begin(),
+    [](unsigned char c)
+    {
+      return std::tolower(c);
+    });
+  return s;
 }
 #endif
+
+}
 
 namespace mdcm
 {
@@ -626,13 +646,13 @@ System::StrCaseCmp(const char * s1, const char * s2)
 #elif defined(MDCM_HAVE__STRICMP)
   return _stricmp(s1, s2);
 #else
-#  error
-  while (*s1 && (tolower(*s1) == tolower(*s2)))
-  {
-    ++s1;
-    ++s2;
-  }
-  return tolower(*s1) - tolower(*s2);
+  const std::string str1(to_lower(std::string(s1)));
+  const std::string str2(to_lower(std::string(s2)));
+  if (str1 == str2)
+    return 0;
+  else if (str1 > str2)
+    return 1;
+  return -1;
 #endif
 }
 
