@@ -1,3 +1,5 @@
+[![build result](https://build.opensuse.org/projects/home:issakomi/packages/alizams/badge.svg?type=default)](https://build.opensuse.org/package/show/home:issakomi/alizams)
+
 ![Aliza MS](package/archive/usr/share/icons/hicolor/128x128/apps/alizams.png)
 
 Aliza MS - DICOM Viewer
@@ -18,45 +20,6 @@ Packages:
 E.g. __Fedora 34__ and higher: install with _sudo dnf install alizams_
 
 Open from Menu (Graphics section) or run in terminal (type _alizams_)
-
-Archive distribution:
-
-Extract archive and run _alizams.sh_
-
-```
-cd alizams-1.9.0_linux
-./alizams.sh
-```
-
-Optionally install local desktop menu entry
-
-```
-cd alizams-1.9.0_linux/install_menu
-./install_menu.sh
-```
-
-To remove local menu entry
-
-```
-cd alizams-1.8.3_linux/install_menu
-./uninstall_menu.sh
-```
-
-macOS
------
-
-Open DMG file (signed and notarized), in the window move icon onto Applications, eject,
-
-s. _Launchpad_ or use from terminal
-
-```
-/Applications/AlizaMS.app/Contents/MacOS/AlizaMS
-```
-
-Windows
--------
-
-Extract archive, click or run from terminal _alizams.exe_.
 
 View
 ----
@@ -87,6 +50,11 @@ Highlights
  * United Imaging Healthcare (UIH) Grid / VFrame format
  * etc.
 
+![](https://github.com/AlizaMedicalImaging/AlizaMS/blob/master/package/art/alizams_scr1.jpg)
+
+![](https://github.com/AlizaMedicalImaging/AlizaMS/blob/master/package/art/alizams_scr2.jpg)
+
+![](https://github.com/AlizaMedicalImaging/AlizaMS/blob/master/package/art/alizams_scr3.jpg)
 
 Build
 -----
