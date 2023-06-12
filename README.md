@@ -9,6 +9,27 @@ Aliza MS - DICOM Viewer
 
 View short introductory videos on [Youtube Channel](https://www.youtube.com/channel/UCPGvoSYX7PC5XCp-81Q4MAg) _(new)_
 
+Get
+---
+
+- __FreeBSD__:
+  - Packages
+  - [Ports](https://www.freshports.org/graphics/alizams/)
+- __Linux__:
+  -  [Flathub](https://flathub.org/apps/details/com.github.AlizaMedicalImaging.AlizaMS)
+  - Packages are currently available for
+    - Arch Linux
+    - [Fedora](http://rpmfind.net/linux/rpm2html/search.php?query=alizams) 34 or newer: `sudo dnf install alizams`
+    - Open Build Service
+      - [Ubuntu 22.04](https://software.opensuse.org//download.html?project=home%3Aissakomi&package=alizams)
+      - [Ubuntu other](https://software.opensuse.org//download.html?project=home%3AAndnoVember%3ADebian&package=alizams)
+      - [openSUSE Qt6](https://software.opensuse.org//download.html?project=home%3AAndnoVember%3ALXQt%3AQt6&package=alizams)
+      - [openSUSE Qt5](https://software.opensuse.org//download.html?project=home%3AAndnoVember%3Atest&package=alizams)
+
+
+S. [www.aliza-dicom-viewer.com](https://www.aliza-dicom-viewer.com) for other options.
+
+
 Quick start
 -----------
 
