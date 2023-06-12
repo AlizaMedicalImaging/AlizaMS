@@ -30,9 +30,6 @@
 #include <cstring>
 #include <cstdio>
 #include <numeric>
-#ifdef _WIN32
-#  define snprintf _snprintf
-#endif
 #include "mdcm_openjpeg.h"
 
 //#define MDCM_JPEG2000_VERBOSE

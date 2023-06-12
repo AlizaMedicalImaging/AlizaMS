@@ -326,31 +326,25 @@ set(MDCM_BUILD_VERSION 2)
 set(MDCM_VERSION "${MDCM_MAJOR_VERSION}.${MDCM_MINOR_VERSION}.${MDCM_BUILD_VERSION}")
 set(MDCM_API_VERSION "${MDCM_MAJOR_VERSION}.${MDCM_MINOR_VERSION}")
 
-CHECK_INCLUDE_FILE_CONCAT("sys/time.h" MDCM_HAVE_SYS_TIME_H)
-CHECK_INCLUDE_FILE_CONCAT("byteswap.h" MDCM_HAVE_BYTESWAP_FILE_H)
+check_include_file_concat("sys/time.h" MDCM_HAVE_SYS_TIME_H)
+check_include_file_concat("byteswap.h" MDCM_HAVE_BYTESWAP_FILE_H)
 # s. GDCM bug #324
 if(MDCM_HAVE_BYTESWAP_FILE_H)
   include(CheckCXXSourceCompiles)
-  CHECK_CXX_SOURCE_COMPILES("\#include <byteswap.h>\nint main(){return bswap_32(42);}" MDCM_HAVE_BYTESWAP_H)
+  check_cxx_source_compiles("#include <byteswap.h>\nint main(){return bswap_32(42);}" MDCM_HAVE_BYTESWAP_H)
 endif()
-CHECK_INCLUDE_FILE("rpc.h" MDCM_HAVE_RPC_H)
+check_include_file("rpc.h" MDCM_HAVE_RPC_H)
 
 include(CheckFunctionExists)
-include(CheckSymbolExists)
-
-CHECK_SYMBOL_EXISTS(strcasecmp "strings.h" MDCM_HAVE_STRCASECMP)
-CHECK_SYMBOL_EXISTS(snprintf "cstdio" MDCM_HAVE_SNPRINTF)
-CHECK_FUNCTION_EXISTS(_stricmp MDCM_HAVE__STRICMP)
-CHECK_FUNCTION_EXISTS(_snprintf MDCM_HAVE__SNPRINTF)
-CHECK_FUNCTION_EXISTS(gettimeofday MDCM_HAVE_GETTIMEOFDAY)
+check_function_exists(gettimeofday MDCM_HAVE_GETTIMEOFDAY)
 
 include(CheckCXXSourceCompiles)
-CHECK_CXX_SOURCE_COMPILES("int main(){const char *f =__FUNCTION__;return 0;}" MDCM_CXX_HAS_FUNCTION)
+check_cxx_source_compiles("int main(){const char *f =__FUNCTION__;return 0;}" MDCM_CXX_HAS_FUNCTION)
 
 if(MDCM_USE_SYSTEM_OPENSSL)
   set(CMAKE_REQUIRED_INCLUDES ${OPENSSL_INCLUDE_DIR})
   set(CMAKE_REQUIRED_LIBRARIES ${OPENSSL_LIBRARIES} ${CMAKE_DL_LIBS})
-  CHECK_CXX_SOURCE_COMPILES("\#include <openssl/cms.h>\nint main(){CMS_add0_recipient_password(0,0,0,0,0,0,0);return 0;}" MDCM_HAVE_CMS_RECIPIENT_PASSWORD)
+  check_cxx_source_compiles("#include <openssl/cms.h>\nint main(){CMS_add0_recipient_password(0,0,0,0,0,0,0);return 0;}" MDCM_HAVE_CMS_RECIPIENT_PASSWORD)
 endif()
 
 include_directories(

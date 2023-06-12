@@ -36,8 +36,6 @@ public:
   FileIsDirectory(const char *);
   static bool
   FileIsSymlink(const char *);
-  static time_t
-  FileTime(const char *);
   static std::wstring
   ConvertToUtf16(const char *);
   static size_t
@@ -70,24 +68,6 @@ public:
   // Parse a date stored as ASCII text into a time_t structured and millisecond
   static bool
   ParseDateTime(time_t &, long &, const char[22]);
-  // Return the value for Timezone Offset From UTC as string.
-  static const char *
-  GetTimezoneOffsetFromUTC();
-  // Used internally by the UIDGenerator class to convert a uuid tape to a
-  // DICOM VR:UI type
-  static size_t
-  EncodeBytes(char *, const unsigned char *, int);
-  // consistent func for C99 spec of strcasecmp/strncasecmp
-  static int
-  StrCaseCmp(const char *, const char *);
-  // strtok_r
-  static char *
-  StrTokR(char *, const char *, char **);
-  // strsep
-  // param stringp is passed by pointer, it may be modified, you'll need to
-  // make a copy, in case you want to free the memory pointed at
-  static char *
-  StrSep(char **, const char *);
 };
 
 } // end namespace mdcm

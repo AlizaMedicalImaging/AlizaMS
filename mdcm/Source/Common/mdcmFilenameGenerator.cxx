@@ -13,12 +13,8 @@
 =========================================================================*/
 #include "mdcmFilenameGenerator.h"
 #include "mdcmTrace.h"
-
-#include <cstring> // strchr
-#include <cstdio>  // snprintf
-#ifdef _WIN32
-#  define snprintf _snprintf
-#endif
+#include <cstring>
+#include <cstdio>
 
 namespace mdcm
 {

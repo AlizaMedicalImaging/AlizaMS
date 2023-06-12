@@ -77,20 +77,7 @@ PrivateTag::operator<(const PrivateTag & _val) const
     {
       assert(s2[strlen(s2) - 1] != ' ');
     }
-    bool res = strcmp(s1, s2) < 0;
-#if 0
-    if (*s1 && *s2 && mdcm::System::StrCaseCmp(s1, s2) == 0 && strcmp(s1, s2) != 0)
-    {
-      // This should only happen with e.g. "Philips MR Imaging DD 001" vs "PHILIPS MR IMAGING DD 001"
-      // or "Philips Imaging DD 001" vs "PHILIPS IMAGING DD 001"
-      // assert(strcmp(Owner.c_str(), _val.GetOwner()) == 0);
-      // return true;
-      const bool res2 = mdcm::System::StrCaseCmp(s1, s2) < 0;
-      res = res2;
-      assert(0);
-    }
-#endif
-    return res;
+    return (strcmp(s1, s2) < 0);
   }
   else
   {

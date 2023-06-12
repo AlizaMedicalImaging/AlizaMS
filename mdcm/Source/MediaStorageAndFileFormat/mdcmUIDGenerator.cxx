@@ -40,6 +40,46 @@
 #  include <rpc.h>
 #endif
 
+namespace
+{
+
+int getlastdigit(unsigned char * data, unsigned long size)
+{
+  int carry = 0;
+  for (unsigned int i = 0; i < size; ++i)
+  {
+    const int extended = (carry << 8) + data[i];
+    data[i] = static_cast<unsigned char>(extended / 10);
+    carry = extended % 10;
+  }
+  assert(carry >= 0 && carry < 10);
+  return carry;
+}
+
+size_t encodeBytes(char * out, const unsigned char * data, int size)
+{
+  bool            zero = false;
+  std::string     sres;
+  unsigned char   buffer[32];
+  unsigned char * addr = buffer;
+  memcpy(addr, data, size);
+  while (!zero)
+  {
+    const int res = getlastdigit(addr, size);
+    const char v = static_cast<char>('0' + res);
+    sres.insert(sres.begin(), v);
+    zero = true;
+    for (int i = 0; i < size; ++i)
+    {
+      zero = zero && (addr[i] == 0);
+    }
+  }
+  strcpy(out, sres.c_str());
+  return sres.size();
+}
+
+}
+
 namespace mdcm
 {
 /*
@@ -120,7 +160,7 @@ UIDGenerator::Generate()
   if (!r)
     return nullptr;
   char   randbytesbuf[64];
-  size_t len = System::EncodeBytes(randbytesbuf, uuid, sizeof(uuid));
+  size_t len = encodeBytes(randbytesbuf, uuid, sizeof(uuid));
   assert(len < 64);
   Unique += "."; // separate root from suffix
   if (Unique.size() + len > 64)
@@ -136,7 +176,7 @@ UIDGenerator::Generate()
       {
         x[7 - i] = 0;
         uuid[idx] = static_cast<unsigned char>(x.to_ulong());
-        len = System::EncodeBytes(randbytesbuf, uuid, sizeof(uuid));
+        len = encodeBytes(randbytesbuf, uuid, sizeof(uuid));
         ++i;
       }
       if ((Unique.size() + len > 64) && i == 8)

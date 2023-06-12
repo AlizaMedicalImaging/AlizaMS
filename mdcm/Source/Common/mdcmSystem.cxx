@@ -40,11 +40,6 @@
 #  include <windows.h>
 #endif
 
-#if defined(MDCM_HAVE_SNPRINTF)
-#elif defined(MDCM_HAVE__SNPRINTF)
-#  define snprintf _snprintf
-#endif
-
 #ifdef MDCM_USE_PVRG
 #  include <climits> // PATH_MAX
 #  ifdef MDCM_USE_COREFOUNDATION_LIBRARY
@@ -66,15 +61,10 @@
 #  include <strings.h>
 #endif
 
-#if (!defined(MDCM_HAVE_STRCASECMP) && !defined(MDCM_HAVE__STRICMP))
-#  include <cctype>
-#  include <algorithm>
-#endif
-
+#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
 namespace
 {
 
-#if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
 std::wstring
 utf8_decode(const std::string & str)
 {
@@ -146,24 +136,9 @@ HandleMaxPath(const std::wstring & in)
   }
   return in;
 }
-#endif
-
-#if (!defined(MDCM_HAVE_STRCASECMP) && !defined(MDCM_HAVE__STRICMP))
-std::string to_lower(std::string s)
-{
-  std::transform(
-    s.begin(),
-    s.end(),
-    s.begin(),
-    [](unsigned char c)
-    {
-      return std::tolower(c);
-    });
-  return s;
-}
-#endif
 
 }
+#endif
 
 namespace mdcm
 {
@@ -230,29 +205,6 @@ System::FileIsSymlink(const char * name)
   }
 #endif
   return false;
-}
-
-// TODO st_mtimensec
-time_t
-System::FileTime(const char * filename)
-{
-  struct stat fs;
-  if (stat(filename, &fs) == 0)
-  {
-    // man 2 stat
-    // time_t    st_atime;   /* time of last access */
-    // time_t    st_mtime;   /* time of last modification */
-    // time_t    st_ctime;   /* time of last status change */
-    return fs.st_mtime;
-    // Since  kernel 2.5.48, the stat structure supports nanosecond resolution
-    // for the three file timestamp fields.  Glibc exposes the nanosecond com-
-    // ponent of each field using names either of the form st_atim.tv_nsec, if
-    // the _BSD_SOURCE or _SVID_SOURCE feature test macro is  defined,  or  of
-    // the  form st_atimensec, if neither of these macros is defined.  On file
-    // systems that do not support  sub-second  timestamps,  these  nanosecond
-    // fields are returned with the value 0.
-  }
-  return 0;
 }
 
 std::wstring
@@ -352,47 +304,6 @@ System::GetCurrentProcessFileName()
   return nullptr;
 }
 #endif
-
-/*
- * Encode the mac address on a fixed length string of 15 characters.
- * we save space this way.
- */
-static int
-getlastdigit(unsigned char * data, unsigned long size)
-{
-  int carry = 0;
-  for (unsigned int i = 0; i < size; ++i)
-  {
-    const int extended = (carry << 8) + data[i];
-    data[i] = static_cast<unsigned char>(extended / 10);
-    carry = extended % 10;
-  }
-  assert(carry >= 0 && carry < 10);
-  return carry;
-}
-
-size_t
-System::EncodeBytes(char * out, const unsigned char * data, int size)
-{
-  bool            zero = false;
-  std::string     sres;
-  unsigned char   buffer[32];
-  unsigned char * addr = buffer;
-  memcpy(addr, data, size);
-  while (!zero)
-  {
-    const int res = getlastdigit(addr, size);
-    const char v = static_cast<char>('0' + res);
-    sres.insert(sres.begin(), v);
-    zero = true;
-    for (int i = 0; i < size; ++i)
-    {
-      zero = zero && (addr[i] == 0);
-    }
-  }
-  strcpy(out, sres.c_str());
-  return sres.size();
-}
 
 #if defined(_WIN32) && !defined(MDCM_HAVE_GETTIMEOFDAY)
 
@@ -535,20 +446,6 @@ System::ParseDateTime(time_t & timep, long & milliseconds, const char date[22])
   return true;
 }
 
-const char *
-System::GetTimezoneOffsetFromUTC()
-{
-  static std::string buffer;
-  char               outstr[10];
-  time_t             t = time(nullptr);
-  struct tm *        tmp = localtime(&t);
-  size_t             l = strftime(outstr, sizeof(outstr), "%z", tmp);
-  assert(l == 5);
-  (void)l;
-  buffer = outstr;
-  return buffer.c_str();
-}
-
 bool
 System::FormatDateTime(char date[22], time_t timep, long milliseconds)
 {
@@ -636,69 +533,6 @@ System::GetCurrentDateTime(char date[22])
   assert(tv.tv_usec >= 0 && tv.tv_usec < 1000000);
   milliseconds = tv.tv_usec;
   return FormatDateTime(date, timep, milliseconds);
-}
-
-int
-System::StrCaseCmp(const char * s1, const char * s2)
-{
-#if defined(MDCM_HAVE_STRCASECMP)
-  return strcasecmp(s1, s2);
-#elif defined(MDCM_HAVE__STRICMP)
-  return _stricmp(s1, s2);
-#else
-  const std::string str1(to_lower(std::string(s1)));
-  const std::string str2(to_lower(std::string(s2)));
-  if (str1 == str2)
-    return 0;
-  else if (str1 > str2)
-    return 1;
-  return -1;
-#endif
-}
-
-char *
-System::StrTokR(char * str, const char * delim, char ** nextp)
-{
-#if 1
-  char * ret;
-  if (str == nullptr)
-  {
-    str = *nextp;
-  }
-  str += strspn(str, delim);
-  if (*str == '\0')
-  {
-    return nullptr;
-  }
-  ret = str;
-  str += strcspn(str, delim);
-  if (*str)
-  {
-    *str++ = '\0';
-  }
-  *nextp = str;
-  return ret;
-#else
-  return strtok_r(str, delim, nextp);
-#endif
-}
-
-char *
-System::StrSep(char ** sp, const char * sep)
-{
-#if 1
-  char *p, *s;
-  if (sp == nullptr || *sp == nullptr || **sp == '\0')
-    return nullptr;
-  s = *sp;
-  p = s + strcspn(s, sep);
-  if (*p != '\0')
-    *p++ = '\0';
-  *sp = p;
-  return s;
-#else
-  return strsep(sp, sep);
-#endif
 }
 
 } // end namespace mdcm
