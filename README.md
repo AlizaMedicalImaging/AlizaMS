@@ -12,18 +12,6 @@ View short introductory videos on [Youtube Channel](https://www.youtube.com/chan
 Quick start
 -----------
 
-Linux
------
-
-Packages:
-
-E.g. __Fedora 34__ and higher: install with _sudo dnf install alizams_
-
-Open from Menu (Graphics section) or run in terminal (type _alizams_)
-
-View
-----
-
 Select _DICOM scanner_ tab, open directory with DICOM files or DICOMDIR file (or drag-and-drop).
 
 Select one or more series and click _arrow_ action (or double-click selected row) to load.
