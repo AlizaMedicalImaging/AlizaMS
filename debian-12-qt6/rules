@@ -1,8 +1,8 @@
 #!/usr/bin/make -f
 #export DH_VERBOSE=1
-export DEB_BUILD_MAINT_OPTIONS = hardening=+all
-export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
-export DEB_CFLAGS_MAINT_APPEND = -Wall -pedantic
+export DEB_BUILD_MAINT_OPTIONS=hardening=+all
+export DEB_LDFLAGS_MAINT_APPEND=-Wl,--as-needed
+export DEB_CFLAGS_MAINT_APPEND=-Wall -pedantic
 
 %:
 	dh $@ --buildsystem=cmake
@@ -11,7 +11,7 @@ export DEB_CFLAGS_MAINT_APPEND = -Wall -pedantic
 # but default for GCC 11 should be C++17
 #
 # ITK_DIR should be detected, otherwise set -DITK_DIR::PATH
-CMAKEFLAGS = -DALIZA_QT_VERSION:STRING=6 \
+CMAKEFLAGS=-DALIZA_QT_VERSION:STRING=6 \
  -DCMAKE_SKIP_RPATH:BOOL=ON \
  -DALIZA_USE_SYSTEM_BULLET:BOOL=ON \
  -DALIZA_USE_SYSTEM_LCMS2:BOOL=ON \

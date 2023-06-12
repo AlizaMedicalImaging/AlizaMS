@@ -1,8 +1,8 @@
 #!/usr/bin/make -f
 #export DH_VERBOSE=1
-export DEB_BUILD_MAINT_OPTIONS = hardening=+all
-export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
-export DEB_CFLAGS_MAINT_APPEND = -Wall -pedantic
+export DEB_BUILD_MAINT_OPTIONS=hardening=+all
+export DEB_LDFLAGS_MAINT_APPEND=-Wl,--as-needed
+export DEB_CFLAGS_MAINT_APPEND=-Wall -pedantic
 
 %:
 	dh $@ --buildsystem=cmake
@@ -10,7 +10,7 @@ export DEB_CFLAGS_MAINT_APPEND = -Wall -pedantic
 # Option -DALIZA_CXX_STANDARD:STRING=14 sets CMAKE_CXX_STANDARD
 # to 14 to get rid of ITK-4.12 dev-package VNL warnings
 # on Debian 10.
-CMAKEFLAGS = -DALIZA_QT_VERSION:STRING=5 \
+CMAKEFLAGS=-DALIZA_QT_VERSION:STRING=5 \
  -DCMAKE_SKIP_RPATH:BOOL=ON \
  -DALIZA_CXX_STANDARD:STRING=14 \
  -DALIZA_USE_SYSTEM_BULLET:BOOL=ON \
