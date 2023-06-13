@@ -21,6 +21,7 @@ Get
     - Arch Linux
     - [Fedora](http://rpmfind.net/linux/rpm2html/search.php?query=alizams) 34 or newer: `sudo dnf install alizams`
     - Open Build Service
+      - [Ubuntu 20.04](https://software.opensuse.org//download.html?project=home%3Aissakomi%3AUbuntu-20.04&package=alizams)
       - [Ubuntu 22.04](https://software.opensuse.org//download.html?project=home%3Aissakomi&package=alizams)
       - [Ubuntu other](https://software.opensuse.org//download.html?project=home%3AAndnoVember%3ADebian&package=alizams)
       - [openSUSE Qt6](https://software.opensuse.org//download.html?project=home%3AAndnoVember%3ALXQt%3AQt6&package=alizams)
