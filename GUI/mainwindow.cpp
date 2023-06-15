@@ -52,15 +52,14 @@ MainWindow::MainWindow(
 		adjust_scale_icons =
 			static_cast<float>(settings.value(QString("scale_ui_icons"), 1.2).toDouble());
 		saved_style =
-			settings.value(
-				QString("stylename"),
-				QVariant(QString("Dark Fusion"))).toString();
+			settings.value(QString("stylename"), QVariant(QString("Dark Fusion"))).toString();
 		settings.endGroup();
 		const int w = static_cast<int>(static_cast<double>(swidth) * 0.7);
 		const int h = static_cast<int>(static_cast<double>(sheight) * 0.7);
+		const QSize s = (w > 0 && h > 0) ? QSize(w, h) : QSize(1280, 720);
 		settings.beginGroup(QString("MainWindow"));
 		dock_area = settings.value(QString("dock_area"), 2).toInt();
-		if (w > 0 && h > 0) resize(settings.value(QString("size"), QSize(w, h)).toSize());
+		resize(settings.value(QString("size"), s).toSize());
 		move(settings.value(QString("pos"), QPoint(50, 50)).toPoint());
 #ifdef USE_WORKSTATION_MODE
 		CommonUtils::set_open_dir(settings.value(QString("open_dir"), QString("")).toString());
