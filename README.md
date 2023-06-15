@@ -22,7 +22,7 @@ Select one or more series and click _arrow_ action (or double-click selected row
 ![Open](package/art/start0.png)
 
 
-View short introductory videos on [Youtube Channel](https://www.youtube.com/channel/UCPGvoSYX7PC5XCp-81Q4MAg) _(new)_
+View short introductory videos on [Youtube Channel](https://www.youtube.com/channel/UCPGvoSYX7PC5XCp-81Q4MAg) _(new, WIP)_
 
 Highlights
 ----------
