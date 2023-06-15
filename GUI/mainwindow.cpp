@@ -34,11 +34,15 @@ MainWindow::MainWindow(
 	setDocumentMode(false);
 	scale_icons = 1.0f;
 	adjust_scale_icons = 1.2f;
-	int dock_area = 2;
+	int dock_area{2};
 	QString saved_style;
 	//
-	QDateTime date_ = QDateTime::currentDateTime();
-	QString date_str = date_.toString(QString("hhmmsszzz"));
+	QDateTime date_(QDateTime::currentDateTime());
+	QString date_str(date_.toString(QString("hhmmsszzz")));
+	//
+	int swidth{};
+	int sheight{};
+	desktop_layout(&swidth, &sheight);
 	//
 	{
 		QSettings settings(
@@ -52,13 +56,11 @@ MainWindow::MainWindow(
 				QString("stylename"),
 				QVariant(QString("Dark Fusion"))).toString();
 		settings.endGroup();
-		int width_ = 0, height_ = 0;
-		desktop_layout(&width_, &height_);
-		const int w = static_cast<int>(static_cast<double>(width_) * 0.7);
-		const int h = static_cast<int>(static_cast<double>(height_) * 0.7);
+		const int w = static_cast<int>(static_cast<double>(swidth) * 0.7);
+		const int h = static_cast<int>(static_cast<double>(sheight) * 0.7);
 		settings.beginGroup(QString("MainWindow"));
 		dock_area = settings.value(QString("dock_area"), 2).toInt();
-		resize(settings.value(QString("size"), QSize(w, h)).toSize());
+		if (w > 0 && h > 0) resize(settings.value(QString("size"), QSize(w, h)).toSize());
 		move(settings.value(QString("pos"), QPoint(50, 50)).toPoint());
 #ifdef USE_WORKSTATION_MODE
 		CommonUtils::set_open_dir(settings.value(QString("open_dir"), QString("")).toString());
@@ -103,9 +105,6 @@ MainWindow::MainWindow(
 	hide_zoom = hide_zoom_;
 	//
 	const bool force_vertical = false;
-	int swidth = 0;
-	int sheight = 0;
-	desktop_layout(&swidth, &sheight);
 	if (force_vertical || (sheight > swidth))
 	{
 		QVBoxLayout * vl991 = new QVBoxLayout(views_frame);
@@ -1956,8 +1955,8 @@ void MainWindow::writeSettings()
 	{
 		settings.setValue(QString("size"), QVariant(size()));
 		settings.setValue(QString("pos"), QVariant(pos()));
-		settings.setValue(QString("dock_area"), QVariant(area));
 	}
+	settings.setValue(QString("dock_area"), QVariant(area));
 #ifdef USE_WORKSTATION_MODE
 	settings.setValue(QString("open_dir"),QVariant(CommonUtils::get_open_dir()));
 #endif
