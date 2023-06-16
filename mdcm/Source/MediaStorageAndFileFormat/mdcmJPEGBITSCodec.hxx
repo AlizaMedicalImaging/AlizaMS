@@ -25,6 +25,8 @@
 #include "mdcmTrace.h"
 #include "mdcmTransferSyntax.h"
 #include "mdcmImageHelper.h"
+#include <csetjmp>
+
 /*
  * jdatasrc.c
  *

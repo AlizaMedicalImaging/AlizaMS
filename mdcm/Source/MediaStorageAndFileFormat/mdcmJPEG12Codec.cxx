@@ -21,7 +21,6 @@
 =========================================================================*/
 #include "mdcmJPEG12Codec.h"
 #include "mdcm_ljpeg12.h"
-#include <setjmp.h>
 
 #define JPEGBITSCodec JPEG12Codec
 #define my_error_mgr my_error_mgr_12BIT
