@@ -897,10 +897,10 @@ template<typename T> void load_rgba_image(
 	if (global_flip_x)    t = t.scale(-1.0,  1.0);
 	if (global_flip_y)    t = t.scale( 1.0, -1.0);
 	//
-	const QRectF rectf(0,0,size[0],size[1]);
+	const QRectF rectf(0, 0, size[0], size[1]);
 	widget->graphicsview->scene()->setSceneRect(rectf);
 	//
-	if (redraw_contours && axis==2)
+	if (redraw_contours && axis == 2)
 		draw_contours(ivariant, widget);
 	//
 	widget->graphicsview->draw_shutter(ivariant);
@@ -1163,7 +1163,7 @@ template<typename T> void load_rgba_char_image(
 	}
 	catch (const itk::ExceptionObject &)
 	{
-		;;
+		;
 	}
 	tmpi = QImage(p, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
 #endif
