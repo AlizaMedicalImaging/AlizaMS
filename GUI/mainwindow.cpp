@@ -1090,6 +1090,11 @@ void MainWindow::toggle_browser()
 void MainWindow::toggle_settingswidget()
 {
 	tabWidget->setCurrentIndex(4);
+#ifdef __APPLE__
+	if (isMinimized()) showNormal();
+	raise();
+	activateWindow();
+#endif
 	qApp->processEvents();
 }
 
