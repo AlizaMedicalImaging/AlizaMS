@@ -132,6 +132,7 @@ private slots:
 	void trigger_studyview();
 	void trigger_studyview_checked();
 	void trigger_studyview_empty();
+	void trigger_default_settings();
 
 signals:
 	void quit_app();
@@ -250,6 +251,7 @@ private:
 	QAction  * anon_open_out_dir;
 	QAction  * anon_run;
 	QAction  * anon_help;
+	QAction  * set_default_settings;
 	QVBoxLayout * frame2D_viewerZ_layout;
 	QVBoxLayout * frame2D_viewer_layout;
 	QVBoxLayout * histogram_frame_layout;

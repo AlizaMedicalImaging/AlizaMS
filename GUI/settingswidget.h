@@ -44,10 +44,10 @@ private:
 	float scale_icons;
 
 private slots:
-	void set_default();
 	void set_force_cp1251(bool);
 
 public slots:
+	void set_default();
 	void update_font_pt(double);
 	void force_no_gl3();
 

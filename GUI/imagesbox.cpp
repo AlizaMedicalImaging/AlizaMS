@@ -209,7 +209,7 @@ ImagesBox::ImagesBox(float si)
 	studyMenu->addAction(actionStudyChecked);
 	QToolButton * toolButton7 = new QToolButton();
 	toolButton7->setIcon(QIcon(QString(":/bitmaps/user.svg")));
-	toolButton7->setToolTip(QString("Multiview"));
+	toolButton7->setToolTip(QString("Multi view"));
 	toolButton7->setMenu(studyMenu);
 	toolButton7->setPopupMode(QToolButton::InstantPopup);
 	toolbar->addWidget(toolButton7);

@@ -793,10 +793,10 @@
               </sizepolicy>
              </property>
              <property name="toolTip">
-              <string>Multi-view widget is a separate window, show as a tab otherwise.</string>
+              <string>Multi view widget is a separate window, show as a tab otherwise.</string>
              </property>
              <property name="text">
-              <string>Multi-view widget is a separate window (restart is required)</string>
+              <string>Multi view widget is a separate window (restart is required)</string>
              </property>
             </widget>
            </item>

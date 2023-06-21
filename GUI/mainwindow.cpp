@@ -344,7 +344,7 @@ MainWindow::MainWindow(
 		studyview = new StudyViewWidget((sheight > swidth), true, scale_icons * adjust_scale_icons);
 		studyview->setAutoFillBackground(true);
 		tabWidget->setUpdatesEnabled(false);
-		tabWidget->insertTab(1, static_cast<QWidget*>(studyview), QString("Multi-view"));
+		tabWidget->insertTab(1, static_cast<QWidget*>(studyview), QString("Multi view"));
 		tabWidget->setUpdatesEnabled(true);
 	}
 	else
@@ -520,10 +520,11 @@ MainWindow::MainWindow(
 	connect(imagesbox->actionStudy,         SIGNAL(triggered()),         this,    SLOT(trigger_studyview()));
 	connect(imagesbox->actionStudyChecked,  SIGNAL(triggered()),         this,    SLOT(trigger_studyview_checked()));
 	connect(imagesbox->actionStudyEmpty,    SIGNAL(triggered()),         this,    SLOT(trigger_studyview_empty()));
+	connect(set_default_settings,           SIGNAL(triggered()),         this,    SLOT(trigger_default_settings()));
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-	connect(settingswidget->styleComboBox,  SIGNAL(currentTextChanged(const QString&)),this,SLOT(set_style(const QString&)));
+	connect(settingswidget->styleComboBox,  SIGNAL(currentTextChanged(const QString&)),this, SLOT(set_style(const QString&)));
 #else
-	connect(settingswidget->styleComboBox,  SIGNAL(currentIndexChanged(const QString&)),this,SLOT(set_style(const QString&)));
+	connect(settingswidget->styleComboBox,  SIGNAL(currentIndexChanged(const QString&)),this, SLOT(set_style(const QString&)));
 #endif
 	//
 	close_sc = new QShortcut(QKeySequence::Close, this, SLOT(ask_close()));
@@ -863,6 +864,7 @@ void MainWindow::createActions()
 	anon_open_out_dir       = new QAction(QIcon(QString(":/bitmaps/folder.svg")),QString("Open output directory"), this);
 	anon_run                = new QAction(QIcon(QString(":/bitmaps/right0.svg")),QString("De-identify"), this);
 	anon_help               = new QAction(QIcon(QString(":/bitmaps/info2.svg")), QString("Help"), this);
+	set_default_settings    = new QAction(QString("Reset to defaults (restart is required)"), this);
 }
 
 void MainWindow::createMenus()
@@ -907,7 +909,7 @@ void MainWindow::createMenus()
 	tools_menu->addAction(imagesbox->actionDICOMMeta);
 	tools_menu->addSeparator();
 	//
-	QAction * actionMultiView = new QAction(QString("Multi View"), this);
+	QAction * actionMultiView = new QAction(QString("Multi view"), this);
 	QMenu * multi_view_menu = new QMenu(this);
 	multi_view_menu->addAction(imagesbox->actionStudy);
 	multi_view_menu->addAction(imagesbox->actionStudyEmpty);
@@ -948,7 +950,7 @@ void MainWindow::createMenus()
 	//
 	if (multiview_tab)
 	{
-		multiview_menu = menuBar()->addMenu(QString("Multi-view"));
+		multiview_menu = menuBar()->addMenu(QString("Multi view"));
 		multiview_menu->addAction(studyview->fitall_Action);
 		multiview_menu->addAction(studyview->scouts_Action);
 		multiview_menu->addAction(studyview->measure_Action);
@@ -985,6 +987,7 @@ void MainWindow::createMenus()
 	deidentify_menu->menuAction()->setVisible(false);
 	//
 	settings_menu = menuBar()->addMenu(QString("Settings"));
+	settings_menu->addAction(set_default_settings);
 	settings_menu->menuAction()->setVisible(false);
 }
 
@@ -2273,5 +2276,10 @@ void MainWindow::trigger_studyview_empty()
 	}
 	if (aliza) aliza->trigger_studyview_empty();
 	qApp->processEvents();
+}
+
+void MainWindow::trigger_default_settings()
+{
+	settingswidget->set_default();
 }
 

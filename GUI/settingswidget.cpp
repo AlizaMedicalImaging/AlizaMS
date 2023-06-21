@@ -39,9 +39,9 @@ SettingsWidget::SettingsWidget(float si) : scale_icons(si)
 	}
 	readSettings();
 	styleComboBox->setCurrentIndex(saved_idx);
-	connect(reload_pushButton,SIGNAL(clicked()),this,SLOT(set_default()));
-	connect(pt_doubleSpinBox,SIGNAL(valueChanged(double)),this,SLOT(update_font_pt(double)));
-	connect(cp1251_checkBox,SIGNAL(toggled(bool)),this,SLOT(set_force_cp1251(bool)));
+	connect(reload_pushButton, SIGNAL(clicked()),           this, SLOT(set_default()));
+	connect(pt_doubleSpinBox,  SIGNAL(valueChanged(double)),this, SLOT(update_font_pt(double)));
+	connect(cp1251_checkBox,   SIGNAL(toggled(bool)),       this, SLOT(set_force_cp1251(bool)));
 }
 
 SettingsWidget::~SettingsWidget()
