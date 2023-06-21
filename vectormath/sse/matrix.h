@@ -367,7 +367,7 @@ inline const Matrix3 Matrix3::rotationY(const FloatInVec & radians)
 {
   static const float ffffffff = bit_cast_uint2float(0xffffffffU);
   const __m128 zero = _mm_setzero_ps();
-  VECTORMATH_ALIGNED(const float sx[4]) = { ffffffff, 0.0f,  0.0f, 0.0f };
+  VECTORMATH_ALIGNED(const float sx[4]) = { ffffffff, 0.0f, 0.0f, 0.0f };
   VECTORMATH_ALIGNED(const float sz[4]) = { 0.0f, 0.0f, ffffffff, 0.0f };
   const __m128 select_x = _mm_load_ps(sx);
   const __m128 select_z = _mm_load_ps(sz);
