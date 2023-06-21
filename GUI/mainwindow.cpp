@@ -53,7 +53,9 @@ MainWindow::MainWindow(
 			static_cast<float>(settings.value(QString("scale_ui_icons"), 1.2).toDouble());
 		saved_style =
 			settings.value(QString("stylename"), QVariant(QString("Dark Fusion"))).toString();
+		const int mvsep = settings.value(QString("mvsep"), 0).toInt();
 		settings.endGroup();
+		multiview_tab = (mvsep != 1);
 		const int w = static_cast<int>(static_cast<double>(swidth) * 0.7);
 		const int h = static_cast<int>(static_cast<double>(sheight) * 0.7);
 		const QSize s = (w > 0 && h > 0) ? QSize(w, h) : QSize(1280, 720);
@@ -337,7 +339,18 @@ MainWindow::MainWindow(
 	anchor_icon = QIcon(QString(":/bitmaps/anchor.svg"));
 	anchor2_icon = QIcon(QString(":/bitmaps/anchor2.svg"));
 	//
-	studyview = new StudyViewWidget(scale_icons * adjust_scale_icons, (sheight > swidth));
+	if (multiview_tab)
+	{
+		studyview = new StudyViewWidget((sheight > swidth), true, scale_icons * adjust_scale_icons);
+		studyview->setAutoFillBackground(true);
+		tabWidget->setUpdatesEnabled(false);
+		tabWidget->insertTab(1, static_cast<QWidget*>(studyview), QString("Multi-view"));
+		tabWidget->setUpdatesEnabled(true);
+	}
+	else
+	{
+		studyview = new StudyViewWidget((sheight > swidth), false, scale_icons * adjust_scale_icons);
+	}
 	//
 	createActions();
 	createMenus();
@@ -504,6 +517,9 @@ MainWindow::MainWindow(
 	connect(tabWidget,                      SIGNAL(currentChanged(int)), this,    SLOT(tab_ind_changed(int)));
 	connect(imagesbox->actionDICOMMeta,     SIGNAL(triggered()),         this,    SLOT(trigger_image_dicom_meta()));
 	connect(aliza,                          SIGNAL(image_opened()),      this,    SLOT(set_image_view()));
+	connect(imagesbox->actionStudy,         SIGNAL(triggered()),         this,    SLOT(trigger_studyview()));
+	connect(imagesbox->actionStudyChecked,  SIGNAL(triggered()),         this,    SLOT(trigger_studyview_checked()));
+	connect(imagesbox->actionStudyEmpty,    SIGNAL(triggered()),         this,    SLOT(trigger_studyview_empty()));
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 	connect(settingswidget->styleComboBox,  SIGNAL(currentTextChanged(const QString&)),this,SLOT(set_style(const QString&)));
 #else
@@ -588,18 +604,19 @@ void MainWindow::open_args(const QStringList & l)
 	pb->setMinimumDuration(0);
 	if (l2.size() == 1)
 	{
+		const int t = (multiview_tab) ? 2 : 1;
 		const QString f = l2.at(0);
 		QFileInfo fi(f);
 		if (fi.isFile() &&
 			fi.fileName().toUpper() == QString("DICOMDIR"))
 		{
 			browser2->open_DICOMDIR2(fi.absoluteFilePath());
-			tabWidget->setCurrentIndex(1);
+			tabWidget->setCurrentIndex(t);
 		}
 		else if (fi.isDir())
 		{
 			browser2->open_dicom_dir2(fi.absoluteFilePath());
-			tabWidget->setCurrentIndex(1);
+			tabWidget->setCurrentIndex(t);
 		}
 		else if (fi.isFile())
 		{
@@ -929,6 +946,20 @@ void MainWindow::createMenus()
 	tools_menu->addAction(actionTools3DMenu);
 	tools_menu->addAction(setLevelAct);
 	//
+	if (multiview_tab)
+	{
+		multiview_menu = menuBar()->addMenu(QString("Multi-view"));
+		multiview_menu->addAction(studyview->fitall_Action);
+		multiview_menu->addAction(studyview->scouts_Action);
+		multiview_menu->addAction(studyview->measure_Action);
+		multiview_menu->addAction(studyview->anchor_Action);
+		multiview_menu->menuAction()->setVisible(false);
+	}
+	else
+	{
+		multiview_menu = nullptr;
+	}
+	//
 	browser_menu = menuBar()->addMenu(QString("DICOM scanner"));
 	browser_menu->addAction(browser_open_dir_act);
 	browser_menu->addAction(browser_open_dcmdir_act);
@@ -1080,16 +1111,18 @@ void MainWindow::createToolBars()
 
 void MainWindow::toggle_browser()
 {
-	if (tabWidget->currentIndex() == 1)
+	const int t = (multiview_tab) ? 2 : 1;
+	if (tabWidget->currentIndex() == t)
 		browser2->open_dicom_dir();
 	else
-		tabWidget->setCurrentIndex(1);
+		tabWidget->setCurrentIndex(t);
 	qApp->processEvents();
 }
 
 void MainWindow::toggle_settingswidget()
 {
-	tabWidget->setCurrentIndex(4);
+	const int t = (multiview_tab) ? 5 : 4;
+	tabWidget->setCurrentIndex(t);
 #ifdef __APPLE__
 	if (isMinimized()) showNormal();
 	raise();
@@ -1311,9 +1344,10 @@ void MainWindow::toggle_meta2()
 	const QStringList & l = browser2->get_files_of_1st();
 	if (l.empty()) return;
 	qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
+	const int t = (multiview_tab) ? 3 : 2;
 	sqtree->set_list_of_files(l);
 	sqtree->read_file(l.at(0), true);
-	tabWidget->setCurrentIndex(2);
+	tabWidget->setCurrentIndex(t);
 	qApp->restoreOverrideCursor();
 	qApp->processEvents();
 }
@@ -1366,19 +1400,20 @@ void MainWindow::dropEvent(QDropEvent * e)
 	}
 	if (l.size() > 0)
 	{
+		const int t = (multiview_tab) ? 2 : 1;
 		const QString f = l.at(0);
 		QFileInfo fi(f);
 		if (fi.isDir())
 		{
 			browser2->open_dicom_dir2(f);
-			if (tabWidget->currentIndex() != 1) tabWidget->setCurrentIndex(1);
+			if (tabWidget->currentIndex() != t) tabWidget->setCurrentIndex(t);
 		}
 		else if (
 			fi.isFile() &&
 			fi.fileName().toUpper() == QString("DICOMDIR"))
 		{
 			browser2->open_DICOMDIR2(f);
-			if (tabWidget->currentIndex() != 1) tabWidget->setCurrentIndex(1);
+			if (tabWidget->currentIndex() != t) tabWidget->setCurrentIndex(t);
 		}
 		else
 		{
@@ -1505,7 +1540,8 @@ void MainWindow::load_any()
 	delete pb;
 	if (is_dicomdir)
 	{
-		if (tabWidget->currentIndex() != 1) tabWidget->setCurrentIndex(1);
+		const int t = (multiview_tab) ? 2 : 1;
+		if (tabWidget->currentIndex() != t) tabWidget->setCurrentIndex(t);
 	}
 	if (!message.isEmpty())
 	{
@@ -1870,63 +1906,143 @@ void MainWindow::trigger_set_level()
 
 void MainWindow::tab_ind_changed(int i)
 {
-	switch (i)
+	if (multiview_tab)
 	{
-	case 0:
-		file_menu->menuAction()->setVisible(true);
-		settings_menu->menuAction()->setVisible(false);
-		metadata_menu->menuAction()->setVisible(false);
-		deidentify_menu->menuAction()->setVisible(false);
-		browser_menu->menuAction()->setVisible(false);
-		views_menu->menuAction()->setVisible(true);
-		tools_menu->menuAction()->setVisible(true);
-		break;
-	case 1:
-		settings_menu->menuAction()->setVisible(false);
-		metadata_menu->menuAction()->setVisible(false);
-		deidentify_menu->menuAction()->setVisible(false);
-		tools_menu->menuAction()->setVisible(false);
-		views_menu->menuAction()->setVisible(false);
-		file_menu->menuAction()->setVisible(true);
-		browser_menu->menuAction()->setVisible(true);
-		if (browser2->is_first_run()) browser2->reload_dir();
-		break;
-	case 2:
-		file_menu->menuAction()->setVisible(true);
-		metadata_menu->menuAction()->setVisible(true);
-		deidentify_menu->menuAction()->setVisible(false);
-		settings_menu->menuAction()->setVisible(false);
-		browser_menu->menuAction()->setVisible(false);
-		views_menu->menuAction()->setVisible(false);
-		tools_menu->menuAction()->setVisible(false);
-		break;
-	case 3:
-		file_menu->menuAction()->setVisible(true);
-		settings_menu->menuAction()->setVisible(false);
-		metadata_menu->menuAction()->setVisible(false);
-		deidentify_menu->menuAction()->setVisible(true);
-		browser_menu->menuAction()->setVisible(false);
-		views_menu->menuAction()->setVisible(false);
-		tools_menu->menuAction()->setVisible(false);
-		break;
-	case 4:
-		file_menu->menuAction()->setVisible(true);
-		settings_menu->menuAction()->setVisible(true);
-		metadata_menu->menuAction()->setVisible(false);
-		deidentify_menu->menuAction()->setVisible(false);
-		browser_menu->menuAction()->setVisible(false);
-		views_menu->menuAction()->setVisible(false);
-		tools_menu->menuAction()->setVisible(false);
-		break;
-	default:
-		file_menu->menuAction()->setVisible(true);
-		settings_menu->menuAction()->setVisible(false);
-		metadata_menu->menuAction()->setVisible(false);
-		deidentify_menu->menuAction()->setVisible(false);
-		browser_menu->menuAction()->setVisible(false);
-		views_menu->menuAction()->setVisible(false);
-		tools_menu->menuAction()->setVisible(false);
-		break;
+		switch (i)
+		{
+		case 0:
+			file_menu->menuAction()->setVisible(true);
+			settings_menu->menuAction()->setVisible(false);
+			metadata_menu->menuAction()->setVisible(false);
+			deidentify_menu->menuAction()->setVisible(false);
+			browser_menu->menuAction()->setVisible(false);
+			views_menu->menuAction()->setVisible(true);
+			tools_menu->menuAction()->setVisible(true);
+			multiview_menu->menuAction()->setVisible(false);
+			break;
+		case 1:
+			file_menu->menuAction()->setVisible(true);
+			multiview_menu->menuAction()->setVisible(true);
+			settings_menu->menuAction()->setVisible(false);
+			metadata_menu->menuAction()->setVisible(false);
+			deidentify_menu->menuAction()->setVisible(false);
+			browser_menu->menuAction()->setVisible(false);
+			views_menu->menuAction()->setVisible(false);
+			tools_menu->menuAction()->setVisible(false);
+			break;
+		case 2:
+			browser_menu->menuAction()->setVisible(true);
+			settings_menu->menuAction()->setVisible(false);
+			metadata_menu->menuAction()->setVisible(false);
+			deidentify_menu->menuAction()->setVisible(false);
+			tools_menu->menuAction()->setVisible(false);
+			views_menu->menuAction()->setVisible(false);
+			file_menu->menuAction()->setVisible(true);
+			multiview_menu->menuAction()->setVisible(false);
+			if (browser2->is_first_run()) browser2->reload_dir();
+			break;
+		case 3:
+			file_menu->menuAction()->setVisible(true);
+			metadata_menu->menuAction()->setVisible(true);
+			deidentify_menu->menuAction()->setVisible(false);
+			settings_menu->menuAction()->setVisible(false);
+			browser_menu->menuAction()->setVisible(false);
+			views_menu->menuAction()->setVisible(false);
+			tools_menu->menuAction()->setVisible(false);
+			multiview_menu->menuAction()->setVisible(false);
+			break;
+		case 4:
+			file_menu->menuAction()->setVisible(true);
+			settings_menu->menuAction()->setVisible(false);
+			metadata_menu->menuAction()->setVisible(false);
+			deidentify_menu->menuAction()->setVisible(true);
+			browser_menu->menuAction()->setVisible(false);
+			views_menu->menuAction()->setVisible(false);
+			tools_menu->menuAction()->setVisible(false);
+			multiview_menu->menuAction()->setVisible(false);
+			break;
+		case 5:
+			file_menu->menuAction()->setVisible(true);
+			settings_menu->menuAction()->setVisible(true);
+			metadata_menu->menuAction()->setVisible(false);
+			deidentify_menu->menuAction()->setVisible(false);
+			browser_menu->menuAction()->setVisible(false);
+			views_menu->menuAction()->setVisible(false);
+			tools_menu->menuAction()->setVisible(false);
+			multiview_menu->menuAction()->setVisible(false);
+			break;
+		default:
+			file_menu->menuAction()->setVisible(true);
+			settings_menu->menuAction()->setVisible(false);
+			metadata_menu->menuAction()->setVisible(false);
+			deidentify_menu->menuAction()->setVisible(false);
+			browser_menu->menuAction()->setVisible(false);
+			views_menu->menuAction()->setVisible(false);
+			tools_menu->menuAction()->setVisible(false);
+			multiview_menu->menuAction()->setVisible(false);
+			break;
+		}
+	}
+	else
+	{
+		switch (i)
+		{
+		case 0:
+			file_menu->menuAction()->setVisible(true);
+			settings_menu->menuAction()->setVisible(false);
+			metadata_menu->menuAction()->setVisible(false);
+			deidentify_menu->menuAction()->setVisible(false);
+			browser_menu->menuAction()->setVisible(false);
+			views_menu->menuAction()->setVisible(true);
+			tools_menu->menuAction()->setVisible(true);
+			break;
+		case 1:
+			file_menu->menuAction()->setVisible(true);
+			browser_menu->menuAction()->setVisible(true);
+			settings_menu->menuAction()->setVisible(false);
+			metadata_menu->menuAction()->setVisible(false);
+			deidentify_menu->menuAction()->setVisible(false);
+			tools_menu->menuAction()->setVisible(false);
+			views_menu->menuAction()->setVisible(false);
+			if (browser2->is_first_run()) browser2->reload_dir();
+			break;
+		case 2:
+			file_menu->menuAction()->setVisible(true);
+			metadata_menu->menuAction()->setVisible(true);
+			deidentify_menu->menuAction()->setVisible(false);
+			settings_menu->menuAction()->setVisible(false);
+			browser_menu->menuAction()->setVisible(false);
+			views_menu->menuAction()->setVisible(false);
+			tools_menu->menuAction()->setVisible(false);
+			break;
+		case 3:
+			file_menu->menuAction()->setVisible(true);
+			settings_menu->menuAction()->setVisible(false);
+			metadata_menu->menuAction()->setVisible(false);
+			deidentify_menu->menuAction()->setVisible(true);
+			browser_menu->menuAction()->setVisible(false);
+			views_menu->menuAction()->setVisible(false);
+			tools_menu->menuAction()->setVisible(false);
+			break;
+		case 4:
+			file_menu->menuAction()->setVisible(true);
+			settings_menu->menuAction()->setVisible(true);
+			metadata_menu->menuAction()->setVisible(false);
+			deidentify_menu->menuAction()->setVisible(false);
+			browser_menu->menuAction()->setVisible(false);
+			views_menu->menuAction()->setVisible(false);
+			tools_menu->menuAction()->setVisible(false);
+			break;
+		default:
+			file_menu->menuAction()->setVisible(true);
+			settings_menu->menuAction()->setVisible(false);
+			metadata_menu->menuAction()->setVisible(false);
+			deidentify_menu->menuAction()->setVisible(false);
+			browser_menu->menuAction()->setVisible(false);
+			views_menu->menuAction()->setVisible(false);
+			tools_menu->menuAction()->setVisible(false);
+			break;
+		}
 	}
 	qApp->processEvents();
 }
@@ -2094,16 +2210,14 @@ void MainWindow::trigger_image_dicom_meta()
 	qApp->processEvents();
 	sqtree->set_list_of_files(l);
 	sqtree->read_file(l.at(0), true);
-	tabWidget->setCurrentIndex(2);
+	const int t = (multiview_tab) ? 3 : 2;
+	tabWidget->setCurrentIndex(t);
 	qApp->restoreOverrideCursor();
 }
 
 void MainWindow::set_image_view()
 {
-	if (tabWidget->currentIndex() != 0)
-	{
-		tabWidget->setCurrentIndex(0);
-	}
+	if (tabWidget->currentIndex() != 0) tabWidget->setCurrentIndex(0);
 	qApp->processEvents();
 }
 
@@ -2129,5 +2243,35 @@ void MainWindow::ask_close()
 	{
 		this->close();
 	}
+}
+
+void MainWindow::trigger_studyview()
+{
+	if (multiview_tab)
+	{
+		if (tabWidget->currentIndex() != 1) tabWidget->setCurrentIndex(1);
+	}
+	if (aliza) aliza->trigger_studyview();
+	qApp->processEvents();
+}
+
+void MainWindow::trigger_studyview_checked()
+{
+	if (multiview_tab)
+	{
+		if (tabWidget->currentIndex() != 1) tabWidget->setCurrentIndex(1);
+	}
+	if (aliza) aliza->trigger_studyview_checked();
+	qApp->processEvents();
+}
+
+void MainWindow::trigger_studyview_empty()
+{
+	if (multiview_tab)
+	{
+		if (tabWidget->currentIndex() != 1) tabWidget->setCurrentIndex(1);
+	}
+	if (aliza) aliza->trigger_studyview_empty();
+	qApp->processEvents();
 }
 

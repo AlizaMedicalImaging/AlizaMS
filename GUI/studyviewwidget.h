@@ -22,11 +22,11 @@ class StudyViewWidget : public QWidget, public Ui::StudyViewWidget
 Q_OBJECT
 
 public:
-	StudyViewWidget(float, bool);
+	StudyViewWidget(bool, bool, float);
 	~StudyViewWidget();
 	void init_(Aliza*);
 	void clear_();
-	void set_horizontal(bool);
+	bool get_in_tab() const;
 	void calculate_grid(int);
 	int  get_active_id() const;
 	void set_active_id(int);
@@ -44,7 +44,10 @@ public:
 	void set_single(int);
 	void restore_multi();
 	void writeSettings(QSettings&);
-
+	QAction * fitall_Action;
+	QAction * scouts_Action;
+	QAction * measure_Action;
+	QAction * anchor_Action;
 	QList<StudyFrameWidget *> widgets;
 
 protected:
@@ -81,18 +84,14 @@ private:
 	void update_locked_center(double);
 	void update_locked_width(double);
 	void readSettings();
-
+	const bool horizontal;
+	const bool in_tab;
 	MatrixButton * mbutton;
-	QToolButton * fitall_toolButton;
-	QToolButton * scouts_toolButton;
-	QToolButton * measure_toolButton;
-	QToolButton * anchor_toolButton;
-	QToolButton * close_toolButton;
+	QAction * close_Action;
 	LUTWidget * lutwidget;
 	Aliza * aliza{};
 	QIcon lockon;
 	QIcon lockoff;
-	bool horizontal;
 	int active_id{-1};
 	int saved_r{-1};
 	int saved_c{-1};

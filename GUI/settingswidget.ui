@@ -785,6 +785,22 @@
             </layout>
            </item>
            <item>
+            <widget class="QCheckBox" name="mvsep_checkBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>Multi-view widget is a separate window, show as a tab otherwise.</string>
+             </property>
+             <property name="text">
+              <string>Multi-view widget is a separate window (restart is required)</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QCheckBox" name="hidezoom_checkBox">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -1185,6 +1201,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>scrollArea</tabstop>
   <tabstop>pt_doubleSpinBox</tabstop>
   <tabstop>si_doubleSpinBox</tabstop>
+  <tabstop>mvsep_checkBox</tabstop>
   <tabstop>hidezoom_checkBox</tabstop>
   <tabstop>textBrowser</tabstop>
   <tabstop>scrollArea_2</tabstop>

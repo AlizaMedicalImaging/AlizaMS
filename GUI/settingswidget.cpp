@@ -172,6 +172,7 @@ void SettingsWidget::set_default()
 	cp1251_checkBox->setChecked(false);
 	set_force_cp1251(false);
 	cp1251_checkBox->blockSignals(false);
+	mvsep_checkBox->setChecked(false);
 }
 
 void SettingsWidget::set_force_cp1251(bool b)
@@ -253,6 +254,7 @@ void SettingsWidget::readSettings()
 	const int tmp13 = settings.value(QString("hide_zoom"),       1).toInt();
 	const int tmp14 = settings.value(QString("force_cp1251"),    0).toInt();
 	const int tmp15 = settings.value(QString("apply_suppl"),     1).toInt();
+	const int tmp16 = settings.value(QString("mvsep"),           0).toInt();
 	settings.endGroup();
 	settings.beginGroup(QString("StyleDialog"));
 	saved_idx = settings.value(QString("saved_idx"), 0).toInt();
@@ -321,6 +323,7 @@ void SettingsWidget::readSettings()
 	cp1251_checkBox->setChecked(force_cp1251);
 	CodecUtils::set_force_cp1251(force_cp1251);
 	cp1251_checkBox->blockSignals(false);
+	mvsep_checkBox->setChecked((tmp16 == 1));
 }
 
 void SettingsWidget::writeSettings(QSettings & s)
@@ -342,6 +345,7 @@ void SettingsWidget::writeSettings(QSettings & s)
 	s.setValue(QString("apply_suppl"),   QVariant(supplut_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("clean_unused"),  QVariant(clean_unused_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("force_cp1251"),  QVariant(cp1251_checkBox->isChecked() ? 1 : 0));
+	s.setValue(QString("mvsep"),         QVariant(mvsep_checkBox->isChecked() ? 1 : 0));
 	if (enh_dim_skip_radioButton->isChecked())
 	{
 		s.setValue(QString("enh_strategy"), QVariant(4));

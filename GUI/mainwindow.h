@@ -129,6 +129,9 @@ private slots:
 	void set_zlock_one(bool);
 	void trigger_image_dicom_meta();
 	void ask_close();
+	void trigger_studyview();
+	void trigger_studyview_checked();
+	void trigger_studyview_empty();
 
 signals:
 	void quit_app();
@@ -158,6 +161,8 @@ private:
 	QPoint mainwindow_pos;
 	float  scale_icons;
 	float  adjust_scale_icons;
+	//
+	bool multiview_tab{};
 	//
 	Aliza             * aliza;
 	GLWidget          * glwidget;
@@ -195,6 +200,7 @@ private:
 	QMenu * metadata_menu;
 	QMenu * deidentify_menu;
 	QMenu * settings_menu;
+	QMenu * multiview_menu;
 	QToolBar * toolbar2;
 	QToolBar * toolbar3;
 	QToolBar * toolbar4;

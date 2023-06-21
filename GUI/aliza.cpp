@@ -854,7 +854,11 @@ void Aliza::clear_ram()
 	graphicswidget_y->clear_();
 	graphicswidget_x->clear_();
 	histogramview->clear__();
-	if (studyview) studyview->clear_();
+	if (studyview)
+	{
+		studyview->clear_();
+		if (studyview->get_in_tab()) studyview->calculate_grid(2);
+	}
 	imagesbox->listWidget->blockSignals(true);
 	disconnect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
 	disconnect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
@@ -946,7 +950,11 @@ void Aliza::delete_image()
 	if (studyview)
 	{
 		studyview->block_signals(false);
-		if (scene3dimages.empty()) studyview->clear_();
+		if (scene3dimages.empty())
+		{
+			studyview->clear_();
+			if (studyview->get_in_tab()) studyview->calculate_grid(2);
+		}
 	}
 quit__:
 	mutex0.unlock();
@@ -1727,9 +1735,6 @@ void Aliza::connect_slots()
 	connect(imagesbox->actionColor,          SIGNAL(triggered()), this, SLOT(trigger_image_color()));
 	connect(imagesbox->actionReloadHistogram,SIGNAL(triggered()), this, SLOT(trigger_reload_histogram()));
 	connect(imagesbox->actionROIInfo,        SIGNAL(triggered()), this, SLOT(trigger_show_roi_info()));
-	connect(imagesbox->actionStudy,          SIGNAL(triggered()), this, SLOT(trigger_studyview()));
-	connect(imagesbox->actionStudyChecked,   SIGNAL(triggered()), this, SLOT(trigger_studyview_checked()));
-	connect(imagesbox->actionStudyEmpty,     SIGNAL(triggered()), this, SLOT(trigger_studyview_empty()));
 	//
 	connect(imagesbox->contours_tableWidget, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(update_visible_rois(QTableWidgetItem*)));
 	//
@@ -4034,7 +4039,11 @@ void Aliza::delete_checked_unchecked(bool t)
 	if (studyview)
 	{
 		studyview->block_signals(false);
-		if (scene3dimages.empty()) studyview->clear_();
+		if (scene3dimages.empty())
+		{
+			studyview->clear_();
+			if (studyview->get_in_tab()) studyview->calculate_grid(2);
+		}
 	}
 	update_selection();
 	connect(imagesbox->listWidget,SIGNAL(itemSelectionChanged()),this,SLOT(update_selection()));
@@ -4101,7 +4110,11 @@ void Aliza::delete_group(const int group_id)
 	if (studyview)
 	{
 		studyview->block_signals(false);
-		if (scene3dimages.empty()) studyview->clear_();
+		if (scene3dimages.empty())
+		{
+			studyview->clear_();
+			if (studyview->get_in_tab()) studyview->calculate_grid(2);
+		}
 	}
 }
 
@@ -4382,10 +4395,19 @@ void Aliza::trigger_studyview()
 		return;
 	}
 	studyview->clear_();
-	studyview->show();
-	if (studyview->isMinimized()) studyview->showNormal();
-	studyview->activateWindow();
-	studyview->raise();
+	if (!studyview->get_in_tab())
+	{
+		if (studyview->isMinimized())
+		{
+			studyview->showNormal();
+		}
+		else
+		{
+			studyview->show();
+		}
+		studyview->activateWindow();
+		studyview->raise();
+	}
 	QList<ImageVariant*> l;
 	l.push_back(v);
 	QMap<int, ImageVariant*>::iterator it = scene3dimages.begin();
@@ -4412,7 +4434,6 @@ void Aliza::trigger_studyview()
 		++x;
 	}
 	check_slice_collisions2(studyview);
-	qApp->processEvents();
 	mutex0.unlock();
 }
 
@@ -4441,6 +4462,7 @@ void Aliza::trigger_studyview_checked()
 		{
 			if (v && (v1->id == v->id))
 			{
+				;
 			}
 			else
 			{
@@ -4456,10 +4478,19 @@ void Aliza::trigger_studyview_checked()
 		return;
 	}
 	studyview->clear_();
-	studyview->show();
-	if (studyview->isMinimized()) studyview->showNormal();
-	studyview->activateWindow();
-	studyview->raise();
+	if (!studyview->get_in_tab())
+	{
+		if (studyview->isMinimized())
+		{
+			studyview->showNormal();
+		}
+		else
+		{
+			studyview->show();
+		}
+		studyview->activateWindow();
+		studyview->raise();
+	}
 	studyview->calculate_grid(n);
 	int x = 0;
 	for (int j = 0; j < n; ++j)
@@ -4472,7 +4503,6 @@ void Aliza::trigger_studyview_checked()
 		++x;
 	}
 	check_slice_collisions2(studyview);
-	qApp->processEvents();
 	mutex0.unlock();
 }
 
@@ -4481,14 +4511,21 @@ void Aliza::trigger_studyview_empty()
 	if (!studyview) return;
 	const bool lock = mutex0.tryLock();
 	if (!lock) return;
-	const int n = 2;
 	studyview->clear_();
-	studyview->show();
-	if (studyview->isMinimized()) studyview->showNormal();
-	studyview->activateWindow();
-	studyview->raise();
-	studyview->calculate_grid(n);
-	qApp->processEvents();
+	if (!studyview->get_in_tab())
+	{
+		if (studyview->isMinimized())
+		{
+			studyview->showNormal();
+		}
+		else
+		{
+			studyview->show();
+		}
+		studyview->activateWindow();
+		studyview->raise();
+	}
+	studyview->calculate_grid(2);
 	mutex0.unlock();
 }
 
