@@ -18,59 +18,61 @@
 #include <iostream>
 #endif
 
-StudyViewWidget::StudyViewWidget(float si, bool vertical)
+StudyViewWidget::StudyViewWidget(bool vertical, bool tab, float si)
+	:
+	horizontal(!vertical),
+	in_tab(tab)
 {
 	setupUi(this);
-	horizontal = !vertical;
 	//
-	const QSize s1 = QSize(
-		static_cast<int>(18 * si),static_cast<int>(18 * si));
+	const QSize s1 = QSize(static_cast<int>(18 * si),static_cast<int>(18 * si));
 	lockon = QIcon(QString(":/bitmaps/lock.svg"));
 	lockoff = QIcon(QString(":/bitmaps/unlock.svg"));
 	resetlevel_pushButton->setIconSize(s1);
 	lock_pushButton->setIconSize(s1);
 	level1_frame->hide();
 	mbutton = new MatrixButton(si);
-	fitall_toolButton = new QToolButton(this);
-	fitall_toolButton->setIconSize(s1);
-	fitall_toolButton->setIcon(QIcon(QString(":/bitmaps/f2.svg")));
-	fitall_toolButton->setToolTip(QString("Fit to view"));
-	scouts_toolButton = new QToolButton(this);
-	scouts_toolButton->setCheckable(true);
-	scouts_toolButton->setChecked(true);
-	scouts_toolButton->setIconSize(s1);
-	scouts_toolButton->setIcon(QIcon(QString(":/bitmaps/collisions.svg")));
-	scouts_toolButton->setToolTip(QString("Show intersections"));
-	measure_toolButton = new QToolButton(this);
-	measure_toolButton->setCheckable(true);
-	measure_toolButton->setChecked(false);
-	measure_toolButton->setIconSize(s1);
-	measure_toolButton->setIcon(QIcon(QString(":/bitmaps/distance.svg")));
-	measure_toolButton->setToolTip(QString("Measurement"));
-	anchor_toolButton = new QToolButton(this);
-	anchor_toolButton->setCheckable(true);
-	anchor_toolButton->setChecked(false);
-	anchor_toolButton->setIconSize(s1);
-	anchor_toolButton->setIcon(QIcon(QString(":/bitmaps/anchor.svg")));
-	anchor_toolButton->setToolTip(QString("Anchor sliders for side-by-side view"));
-	close_toolButton = new QToolButton(this);
-	close_toolButton->setCheckable(false);
-	close_toolButton->setChecked(false);
-	close_toolButton->setIconSize(s1);
-	close_toolButton->setIcon(QIcon(QString(":/bitmaps/delete2.svg")));
-	close_toolButton->setToolTip(QString("Close"));
+	fitall_Action = new QAction(QIcon(QString(":/bitmaps/f2.svg")), QString("Fit to view"), this);
+	scouts_Action = new QAction(QIcon(QString(":/bitmaps/collisions.svg")), QString("Show intersections"), this);
+	scouts_Action->setCheckable(true);
+	scouts_Action->setChecked(true);
+	measure_Action = new QAction(QIcon(QString(":/bitmaps/distance.svg")), QString("Measurement"), this);
+	measure_Action->setCheckable(true);
+	anchor_Action = new QAction(QIcon(QString(":/bitmaps/anchor.svg")), QString("Anchor sliders for side-by-side view"), this);
+	anchor_Action->setCheckable(true);
+	if (in_tab)
+	{
+		close_Action = nullptr;
+	}
+	else
+	{
+		close_Action = new QAction(QIcon(QString(":/bitmaps/delete2.svg")), QString("Close"), this);
+	}
 	QWidget * spacer1 = new QWidget(this);
 	spacer1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	QToolBar * toolbar = new QToolBar(this);
+	toolbar->setOrientation(Qt::Horizontal);
+	toolbar->setIconSize(s1);
+	toolbar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	if (toolbar->layout())
+	{
+		toolbar->layout()->setContentsMargins(0, 0, 0, 0);
+		toolbar->layout()->setSpacing(0);
+	}
+	toolbar->addWidget(mbutton);
+	toolbar->addAction(fitall_Action);
+	toolbar->addAction(scouts_Action);
+	toolbar->addAction(measure_Action);
+	toolbar->addAction(anchor_Action);
+	toolbar->addWidget(spacer1);
+	if (!in_tab)
+	{
+		toolbar->addAction(close_Action);
+	}
 	QHBoxLayout * l1 = new QHBoxLayout(toolbar_frame);
 	l1->setContentsMargins(0, 0, 0, 0);
 	l1->setSpacing(4);
-	l1->addWidget(mbutton);
-	l1->addWidget(fitall_toolButton);
-	l1->addWidget(scouts_toolButton);
-	l1->addWidget(measure_toolButton);
-	l1->addWidget(anchor_toolButton);
-	l1->addWidget(spacer1);
-	l1->addWidget(close_toolButton);
+	l1->addWidget(toolbar);
 	lutwidget  = new LUTWidget(si);
 	lutwidget->add_items1();
 	QVBoxLayout * l2 = new QVBoxLayout(lut_frame);
@@ -80,16 +82,28 @@ StudyViewWidget::StudyViewWidget(float si, bool vertical)
 	QGridLayout * gridLayout = new QGridLayout(frame);
 	(void)gridLayout;
 	//
-	close_sc = new QShortcut(QKeySequence::Close, this, SLOT(check_close()));
-	close_sc->setAutoRepeat(false);
+	if (in_tab)
+	{
+		close_sc = nullptr;
 #ifdef __APPLE__
-	minimaze_sc = new QShortcut(QKeySequence("Ctrl+M"), this, SLOT(showMinimized()));
-	minimaze_sc->setAutoRepeat(false);
-	fullsceen_sc = new QShortcut(QKeySequence("Ctrl+Meta+F"),this,SLOT(showFullScreen()));
-	fullsceen_sc->setAutoRepeat(false);
-	normal_sc = new QShortcut(QKeySequence("Esc"),this,SLOT(showNormal()));
-	normal_sc->setAutoRepeat(false);
+		minimaze_sc = nullptr;
+		fullsceen_sc = nullptr;
+		normal_sc = nullptr;
 #endif
+	}
+	else
+	{
+		close_sc = new QShortcut(QKeySequence::Close, this, SLOT(check_close()));
+		close_sc->setAutoRepeat(false);
+#ifdef __APPLE__
+		minimaze_sc = new QShortcut(QKeySequence("Ctrl+M"), this, SLOT(showMinimized()));
+		minimaze_sc->setAutoRepeat(false);
+		fullsceen_sc = new QShortcut(QKeySequence("Ctrl+Meta+F"),this,SLOT(showFullScreen()));
+		fullsceen_sc->setAutoRepeat(false);
+		normal_sc = new QShortcut(QKeySequence("Esc"),this,SLOT(showNormal()));
+		normal_sc->setAutoRepeat(false);
+#endif
+	}
 	//
 	readSettings();
 }
@@ -153,22 +167,29 @@ void StudyViewWidget::init_(Aliza * a)
 		mbutton, SIGNAL(matrix_selected(int, int)),
 		this, SLOT(update_grid(int, int)));
 	connect(
-		fitall_toolButton, SIGNAL(clicked()),
+		fitall_Action, SIGNAL(triggered()),
 		this, SLOT(all_to_fit()));
 	connect(
-		scouts_toolButton, SIGNAL(toggled(bool)),
+		scouts_Action, SIGNAL(toggled(bool)),
 		this, SLOT(toggle_scouts(bool)));
 	connect(
-		measure_toolButton, SIGNAL(toggled(bool)),
+		measure_Action, SIGNAL(toggled(bool)),
 		this, SLOT(toggle_measure(bool)));
 #if MATRIX_BUTTON_CUSTOM_ACT == 1
 	connect(
 		mbutton->p_action, SIGNAL(triggered()),
 		this, SLOT(update_grid2()));
 #endif
-	connect(
-		close_toolButton, SIGNAL(clicked()),
-		this, SLOT(close()));
+	if (in_tab)
+	{
+		calculate_grid(2);
+	}
+	else
+	{
+		connect(
+			close_Action, SIGNAL(triggered()),
+			this, SLOT(close()));
+	}
 	connect_tools();
 }
 
@@ -222,9 +243,9 @@ void StudyViewWidget::clear_()
 	layout = new QGridLayout(frame);
 }
 
-void StudyViewWidget::set_horizontal(bool h)
+bool StudyViewWidget::get_in_tab() const
 {
-	horizontal = h;
+	return in_tab;
 }
 
 void StudyViewWidget::calculate_grid(int x)
@@ -513,7 +534,7 @@ void StudyViewWidget::set_active_id(int x)
 
 bool StudyViewWidget::get_scouts() const
 {
-	return scouts_toolButton->isChecked();
+	return scouts_Action->isChecked();
 }
 
 void StudyViewWidget::set_active_image(int id)
@@ -1028,7 +1049,7 @@ void StudyViewWidget::update_null()
 
 void StudyViewWidget::update_scouts()
 {
-	if (scouts_toolButton->isChecked())
+	if (scouts_Action->isChecked())
 	{
 		emit update_scouts_required();
 	}
@@ -1036,7 +1057,7 @@ void StudyViewWidget::update_scouts()
 
 bool StudyViewWidget::get_anchored_sliders() const
 {
-	return anchor_toolButton->isChecked();
+	return anchor_Action->isChecked();
 }
 
 void StudyViewWidget::update_all_sliders(int wid, int x, int dimz)

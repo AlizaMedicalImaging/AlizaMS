@@ -125,6 +125,9 @@ public:
 	void update_slice_from_animation(const ImageVariant*);
 	QString load_dicom_file(const QString&, QProgressDialog*);
 	void remove_from_studyview(int);
+	void trigger_studyview();
+	void trigger_studyview_checked();
+	void trigger_studyview_empty();
 
 public slots:
 	void delete_image();
@@ -163,9 +166,6 @@ public slots:
 	void trigger_image_color();
 	void toggle_lock_window(bool);
 	void trigger_show_roi_info();
-	void trigger_studyview();
-	void trigger_studyview_checked();
-	void trigger_studyview_empty();
 	void update_studyview_intersections();
 
 signals:
