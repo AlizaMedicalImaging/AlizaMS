@@ -1297,11 +1297,9 @@ void StudyGraphicsWidget::dropEvent(QDropEvent * e)
 		if (ivariant)
 		{
 			clear_();
+			studyview->set_active_image(-1);
 			set_image(ivariant, 1, true);
-			if (studyview) // not required
-			{
-				studyview->update_scouts();
-			}
+			studyview->update_scouts();
 		}
 	}
 }
