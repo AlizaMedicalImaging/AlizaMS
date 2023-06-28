@@ -4405,7 +4405,9 @@ void Aliza::trigger_studyview()
 		{
 			studyview->show();
 		}
+#if (defined(__APPLE__) || defined(_WIN32))
 		studyview->activateWindow();
+#endif
 		studyview->raise();
 	}
 	QList<ImageVariant*> l;
@@ -4488,7 +4490,9 @@ void Aliza::trigger_studyview_checked()
 		{
 			studyview->show();
 		}
+#if (defined(__APPLE__) || defined(_WIN32))
 		studyview->activateWindow();
+#endif
 		studyview->raise();
 	}
 	studyview->calculate_grid(n);
@@ -4522,7 +4526,9 @@ void Aliza::trigger_studyview_empty()
 		{
 			studyview->show();
 		}
+#if (defined(__APPLE__) || defined(_WIN32))
 		studyview->activateWindow();
+#endif
 		studyview->raise();
 	}
 	studyview->calculate_grid(2);
@@ -4786,7 +4792,9 @@ QString Aliza::process_dicom(
 						true);
 				sr->initSR(s1);
 				sr->show();
+#if (defined(__APPLE__) || defined(_WIN32))
 				sr->activateWindow();
+#endif
 				sr->raise();
 			}
 			catch (const mdcm::ParseException & pe)
