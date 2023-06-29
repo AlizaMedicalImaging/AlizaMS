@@ -44,6 +44,7 @@ public:
 	void set_single(int);
 	void restore_multi();
 	void writeSettings(QSettings&);
+	void update_background_color();
 	QAction * fitall_Action;
 	QAction * scouts_Action;
 	QAction * measure_Action;

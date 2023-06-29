@@ -2121,7 +2121,7 @@ void MainWindow::set_style(const QString & s)
 void MainWindow::change_style(const QString & s)
 {
 	if (s.isEmpty()) return;
-	if (s==QString("Dark Fusion"))
+	if (s == QString("Dark Fusion"))
 	{
 		QColor bg(0x53, 0x59, 0x60);
 		QColor tt(0x30, 0x39, 0x47);
@@ -2147,6 +2147,8 @@ void MainWindow::change_style(const QString & s)
 		QApplication::setStyle(QString("Plastique"));
 #endif
 		QApplication::setPalette(p);
+		//
+		imagesbox->update_background_color(true);
 	}
 	else
 	{
@@ -2159,21 +2161,21 @@ void MainWindow::change_style(const QString & s)
 			QApplication::setPalette(
 				QApplication::style()->standardPalette());
 		}
-	}
-	if (glwidget)         glwidget->update_clear_color();
-	if (graphicswidget_m) graphicswidget_m->update_background_color();
-	if (graphicswidget_y) graphicswidget_y->update_background_color();
-	if (graphicswidget_x) graphicswidget_x->update_background_color();
-	if (toolbox2D)        toolbox2D->set_style_sheet();
-	if (slider_m)         slider_m->set_style_sheet();
-	if (slider_y)         slider_y->set_style_sheet();
-	if (slider_x)         slider_x->set_style_sheet();
-	if (histogramview)    histogramview->update_bgcolor();
-	if (s == QString("Dark Fusion"))
-		imagesbox->update_background_color(true);
-	else
+		//
 		imagesbox->update_background_color(false);
+	}
+	if (glwidget) glwidget->update_clear_color();
+	graphicswidget_m->update_background_color();
+	graphicswidget_y->update_background_color();
+	graphicswidget_x->update_background_color();
+	toolbox2D->set_style_sheet();
+	slider_m->set_style_sheet();
+	slider_y->set_style_sheet();
+	slider_x->set_style_sheet();
+	histogramview->update_bgcolor();
+	studyview->update_background_color();
 	update_info_lines_bg();
+	update();
 }
 
 void MainWindow::check_3d_frame()

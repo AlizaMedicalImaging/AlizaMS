@@ -1215,3 +1215,14 @@ void StudyViewWidget::writeSettings(QSettings & settings)
 	settings.endGroup();
 }
 
+void StudyViewWidget::update_background_color()
+{
+	for (int x = 0; x < widgets.size(); ++x)
+	{
+		if (widgets.at(x) && widgets.at(x)->graphicswidget)
+		{
+			widgets[x]->graphicswidget->update_background_color();
+		}
+	}
+}
+
