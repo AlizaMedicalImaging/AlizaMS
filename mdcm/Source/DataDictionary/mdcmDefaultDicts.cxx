@@ -2633,6 +2633,37 @@ const DICT_ENTRY DICOMV3DataDict[] = {
     "TransducerApplicationCodeSequence",
     false },
   { 0x0018, 0x9810, VR::US_SS, VM::VM1, "Zero Velocity Pixel Value", "ZeroVelocityPixelValue", false },
+
+  ////////////////////////////////////////////////////////////////////
+  //
+  // Photoacustic (tmp, not yet released, will be in 2023c, added manually)
+  //
+  //
+  {0x0018, 0x9821, VR::SQ, VM::VM1, "Photoacoustic Excitation Characteristics Sequence", "PhotoacousticExcitationCharacteristicsSequence", false},
+  {0x0018, 0x9822, VR::FD, VM::VM1, "Excitation Spectral Width", "ExcitationSpectralWidth", false},
+  {0x0018, 0x9823, VR::FD, VM::VM1, "Excitation Energy", "ExcitationEnergy", false},
+  {0x0018, 0x9824, VR::FD, VM::VM1, "Excitation Pulse Duration", "ExcitationPulseDuration", false},
+  {0x0018, 0x9825, VR::SQ, VM::VM1, "Excitation Wavelength Sequence", "ExcitationWavelengthSequence", false},
+  {0x0018, 0x9826, VR::FD, VM::VM1, "Excitation Wavelength", "ExcitationWavelength", false},
+  {0x0018, 0x9828, VR::CS, VM::VM1, "Illumination Translation Flag", "IlluminationTranslationFlag", false},
+  {0x0018, 0x9829, VR::CS, VM::VM1, "Acoustic Coupling Medium Flag", "AcousticCouplingMediumFlag", false},
+  {0x0018, 0x982a, VR::SQ, VM::VM1, "Acoustic Coupling Medium Code Sequence", "AcousticCouplingMediumCodeSequence", false},
+  {0x0018, 0x982b, VR::FD, VM::VM1, "Acoustic Coupling Medium Temperature", "AcousticCouplingMediumTemperature", false},
+  {0x0018, 0x982c, VR::SQ, VM::VM1, "Transducer Response Sequence", "TransducerResponseSequence", false},
+  {0x0018, 0x982d, VR::FD, VM::VM1, "Center Frequency", "CenterFrequency", false},
+  {0x0018, 0x982e, VR::FD, VM::VM1, "Fractional Bandwidth", "FractionalBandwidth", false},
+  {0x0018, 0x982f, VR::FD, VM::VM1, "Lower Cutoff Frequency", "LowerCutoffFrequency", false},
+  {0x0018, 0x9830, VR::FD, VM::VM1, "Upper Cutoff Frequency", "UpperCutoffFrequency", false},
+  {0x0018, 0x9831, VR::SQ, VM::VM1, "Transducer Technology Sequence", "TransducerTechnologySequence", false},
+  {0x0018, 0x9832, VR::SQ, VM::VM1, "Sound Speed Correction Mechanism Code Sequence", "SoundSpeedCorrectionMechanismCodeSequence", false},
+  {0x0018, 0x9833, VR::FD, VM::VM1, "Object Sound Speed", "ObjectSoundSpeed", false},
+  {0x0018, 0x9834, VR::FD, VM::VM1, "Acoustic Coupling Medium Sound Speed", "AcousticCouplingMediumSoundSpeed", false},
+  {0x0018, 0x9835, VR::SQ, VM::VM1, "Photoacoustic Image Frame Type Sequence", "PhotoacousticImageFrameTypeSequence", false},
+  {0x0018, 0x9836, VR::SQ, VM::VM1, "Image Data Type Code Sequence", "ImageDataTypeCodeSequence", false},
+  //
+  //
+  ////////////////////////////////////////////////////////////////////
+
   { 0x0018, 0x9900, VR::LO, VM::VM1, "Reference Location Label", "ReferenceLocationLabel", false },
   { 0x0018, 0x9901, VR::UT, VM::VM1, "Reference Location Description", "ReferenceLocationDescription", false },
   { 0x0018, 0x9902, VR::SQ, VM::VM1, "Reference Basis Code Sequence", "ReferenceBasisCodeSequence", false },

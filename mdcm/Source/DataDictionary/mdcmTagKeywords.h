@@ -1511,6 +1511,38 @@ typedef mdcm::Attribute<0x0018, 0x980d> TransducerGeometryCodeSequence;
 typedef mdcm::Attribute<0x0018, 0x980e> TransducerBeamSteeringCodeSequence;
 typedef mdcm::Attribute<0x0018, 0x980f> TransducerApplicationCodeSequence;
 typedef mdcm::Attribute<0x0018, 0x9810> ZeroVelocityPixelValue;
+
+////////////////////////////////////////////////////////////////////
+//
+// Photoacustic (tmp, not yet released, will be in 2023c, added manually)
+//
+//
+typedef mdcm::Attribute<0x0018, 0x9821> PhotoacousticExcitationCharacteristicsSequence;
+typedef mdcm::Attribute<0x0018, 0x9822> ExcitationSpectralWidth;
+typedef mdcm::Attribute<0x0018, 0x9823> ExcitationEnergy;
+typedef mdcm::Attribute<0x0018, 0x9824> ExcitationPulseDuration;
+typedef mdcm::Attribute<0x0018, 0x9825> ExcitationWavelengthSequence;
+typedef mdcm::Attribute<0x0018, 0x9826> ExcitationWavelength;
+typedef mdcm::Attribute<0x0018, 0x9828> IlluminationTranslationFlag;
+typedef mdcm::Attribute<0x0018, 0x9829> AcousticCouplingMediumFlag;
+typedef mdcm::Attribute<0x0018, 0x982a> AcousticCouplingMediumCodeSequence;
+typedef mdcm::Attribute<0x0018, 0x982b> AcousticCouplingMediumTemperature;
+typedef mdcm::Attribute<0x0018, 0x982c> TransducerResponseSequence;
+typedef mdcm::Attribute<0x0018, 0x982d> CenterFrequency;
+typedef mdcm::Attribute<0x0018, 0x982e> FractionalBandwidth;
+typedef mdcm::Attribute<0x0018, 0x982f> LowerCutoffFrequency;
+typedef mdcm::Attribute<0x0018, 0x9830> UpperCutoffFrequency;
+typedef mdcm::Attribute<0x0018, 0x9831> TransducerTechnologySequence;
+typedef mdcm::Attribute<0x0018, 0x9832> SoundSpeedCorrectionMechanismCodeSequence;
+typedef mdcm::Attribute<0x0018, 0x9833> ObjectSoundSpeed;
+typedef mdcm::Attribute<0x0018, 0x9834> AcousticCouplingMediumSoundSpeed;
+typedef mdcm::Attribute<0x0018, 0x9835> PhotoacousticImageFrameTypeSequence;
+typedef mdcm::Attribute<0x0018, 0x9836> ImageDataTypeCodeSequence;
+//
+//
+//
+////////////////////////////////////////////////////////////////////
+
 typedef mdcm::Attribute<0x0018, 0x9900> ReferenceLocationLabel;
 typedef mdcm::Attribute<0x0018, 0x9901> ReferenceLocationDescription;
 typedef mdcm::Attribute<0x0018, 0x9902> ReferenceBasisCodeSequence;

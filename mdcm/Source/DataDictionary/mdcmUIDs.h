@@ -547,6 +547,15 @@ public:
 //
 /////////////////////////////////////////
 
+/////////////////////////////////////////
+//
+// Photoacoustic Image Storage (will be in the 2023c)
+//
+    uid_1_2_840_10008_5_1_4_1_1_6_3 = 479
+//
+//
+/////////////////////////////////////////
+
   } UIDType;
 
   typedef enum
@@ -1072,6 +1081,15 @@ public:
     VideoPhotographicImageRealTimeCommunication = 476,
     AudioWaveformRealTimeCommunication = 477,
     RenditionSelectionDocumentRealTimeCommunication = 478,
+//
+//
+/////////////////////////////////////////
+
+/////////////////////////////////////////
+//
+// Photoacoustic Image Storage (will be in the 2023c)
+//
+    PhotoacousticImageStorage = 479
 //
 //
 /////////////////////////////////////////

@@ -971,9 +971,11 @@ QString read_CommonCTMRImageDescriptionMacro(const mdcm::DataSet & ds)
 	return s;
 }
 
-#if 0
-QString read_PhotoacousticImage(const mdcm::DataSet & ds) // FIXME
+// TODO check again
+QString read_PhotoacousticImage(const mdcm::DataSet & ds)
 {
+// TODO image type? (was PA index or whatever)
+
 	QString s;
 
 	//////////////////////////////////////////////
@@ -982,13 +984,13 @@ QString read_PhotoacousticImage(const mdcm::DataSet & ds) // FIXME
 	//
 	//
 	{
-		const mdcm::Tag tExcitationWavelengthSequence(0x3401,0x1094);
-		const mdcm::Tag tExcitationWavelength(0x3441,0x1005);
-		const mdcm::Tag tIlluminationTypeCodeSequence(0x3401,0x1006);
-		const mdcm::Tag tIlluminationTranslationFlag(0x3401,0x1092);
-		const mdcm::Tag tAcousticCouplingMediumCodeSequence(0x3401,0x1007);
-		const mdcm::Tag tAcousticCouplingMediumFlag(0x3401,0x1099);
-		const mdcm::Tag tCouplingMediumTemperature(0x3401,0x1008);
+		const mdcm::Tag tExcitationWavelengthSequence(0x0018,0x9825);
+		const mdcm::Tag tExcitationWavelength(0x0018,0x9826);
+		const mdcm::Tag tIlluminationTypeCodeSequence(0x0022,0x0016);
+		const mdcm::Tag tIlluminationTranslationFlag(0x0018,0x9828);
+		const mdcm::Tag tAcousticCouplingMediumCodeSequence(0x0018,0x982a);
+		const mdcm::Tag tAcousticCouplingMediumFlag(0x0018,0x9829);
+		const mdcm::Tag tCouplingMediumTemperature(0x0018,0x982b);
 		const mdcm::Tag tPositionMeasuringDeviceUsed(0x0018,0x980c);
 		const mdcm::Tag tCodeMeaning(0x0008,0x0104);
 		QString s0;
@@ -1006,8 +1008,8 @@ QString read_PhotoacousticImage(const mdcm::DataSet & ds) // FIXME
 					const mdcm::DataSet & nds = item.GetNestedDataSet();
 					if (nds.FindDataElement(tExcitationWavelength))
 					{
-						float ExcitationWavelength;
-						if (DicomUtils::get_fl_value(
+						double ExcitationWavelength;
+						if (DicomUtils::get_fd_value(
 								nds,
 								tExcitationWavelength,
 								&ExcitationWavelength))
@@ -1142,8 +1144,7 @@ QString read_PhotoacousticImage(const mdcm::DataSet & ds) // FIXME
 		}
 		if (!s0.isEmpty())
 		{
-			s += QString("<span class='y7'>Photoacoustic Image Module</span><br />") +
-				s0;
+			s += QString("<span class='y7'>Photoacoustic Image Module</span><br />") + s0;
 		}
 	}
 	//
@@ -1157,12 +1158,12 @@ QString read_PhotoacousticImage(const mdcm::DataSet & ds) // FIXME
 	//
 	{
 		const mdcm::Tag tTransducerGeometryCodeSequence(0x0018,0x980d);
-		const mdcm::Tag tTransducerTechnologySequence(0x3401,0x1010);
-		const mdcm::Tag tTransducerResponseSequence(0x3401,0x1017);
-		const mdcm::Tag tUpperCutoffFrequency(0x3431,0x1095);
-		const mdcm::Tag tLowerCutoffFrequency(0x3431,0x1096);
-		const mdcm::Tag tFractionalBandwidth(0x3431,0x1097);
-		const mdcm::Tag tCenterFrequency(0x3431,0x1098);
+		const mdcm::Tag tTransducerTechnologySequence(0x0018,0x9831);
+		const mdcm::Tag tTransducerResponseSequence(0x0018,0x982c);
+		const mdcm::Tag tUpperCutoffFrequency(0x0018,0x9830);
+		const mdcm::Tag tLowerCutoffFrequency(0x0018,0x982f);
+		const mdcm::Tag tFractionalBandwidth(0x0018,0x982e);
+		const mdcm::Tag tCenterFrequency(0x0018,0x982d);
 		const mdcm::Tag tCodeMeaning(0x0008,0x0104);
 		QString s1;
 		if (ds.FindDataElement(tTransducerGeometryCodeSequence))
@@ -1235,44 +1236,44 @@ QString read_PhotoacousticImage(const mdcm::DataSet & ds) // FIXME
 					QString s2;
 					const mdcm::Item & item = sq->GetItem(1);
 					const mdcm::DataSet & nds = item.GetNestedDataSet();
-					float UpperCutoffFrequency;
-					float LowerCutoffFrequency;
-					float FractionalBandwidth;
-					float CenterFrequency;
-					if (DicomUtils::get_fl_value(
+					double UpperCutoffFrequency;
+					double LowerCutoffFrequency;
+					double FractionalBandwidth;
+					double CenterFrequency;
+					if (DicomUtils::get_fd_value(
 							nds,
 							tUpperCutoffFrequency,
 							&UpperCutoffFrequency))
 					{
 						s2 += QString("<span class='y8'>&#160;&#160;Upper Cutoff Frequency<br />&#160;&#160;") +
-							QVariant(static_cast<qreal>(UpperCutoffFrequency)).toString() +
+							QVariant(UpperCutoffFrequency).toString() +
 							QString("&#160;MHz</span><br />");
 					}
-					if (DicomUtils::get_fl_value(
+					if (DicomUtils::get_fd_value(
 							nds,
 							tLowerCutoffFrequency,
 							&LowerCutoffFrequency))
 					{
 						s2 += QString("<span class='y8'>&#160;&#160;Lower Cutoff Frequency&#160;") +
-							QVariant(static_cast<qreal>(LowerCutoffFrequency)).toString() +
+							QVariant(LowerCutoffFrequency).toString() +
 							QString("&#160;MHz</span><br />");
 					}
-					if (DicomUtils::get_fl_value(
+					if (DicomUtils::get_fd_value(
 							nds,
 							tFractionalBandwidth,
 							&FractionalBandwidth))
 					{
 						s2 += QString("<span class='y8'>&#160;&#160;Fractional Bandwidth&#160;") +
-							QVariant(static_cast<qreal>(FractionalBandwidth)).toString() +
+							QVariant(FractionalBandwidth).toString() +
 							QString("&#160;MHz</span><br />");
 					}
-					if (DicomUtils::get_fl_value(
+					if (DicomUtils::get_fd_value(
 							nds,
 							tCenterFrequency,
 							&CenterFrequency))
 					{
 						s2 += QString("<span class='y8'>&#160;&#160;Center Frequency&#160;") +
-							QVariant(static_cast<qreal>(CenterFrequency)).toString() +
+							QVariant(CenterFrequency).toString() +
 							QString("&#160;MHz</span><br />");
 					}
 					if (!s2.isEmpty())
@@ -1285,8 +1286,7 @@ QString read_PhotoacousticImage(const mdcm::DataSet & ds) // FIXME
 		}
 		if (!s1.isEmpty())
 		{
-			s += QString("<span class='y7'>Photoacoustic Transducer Module</span><br />") +
-				s1;
+			s += QString("<span class='y7'>Photoacoustic Transducer Module</span><br />") + s1;
 		}
 	}
 	//
@@ -1300,23 +1300,10 @@ QString read_PhotoacousticImage(const mdcm::DataSet & ds) // FIXME
 	//
 	{
 		QString s3;
-		const mdcm::Tag tSoundSpeedCorrectionMechanismCodeSequence(0x3401,0x1014);
-		const mdcm::Tag tObjectSoundSpeed(0x3421,0x1015);
-		const mdcm::Tag tCouplingMediumSoundSpeed(0x3421,0x1016);
-		const mdcm::Tag tPAReconstructionIndex(0x3401,0x1093);
+		const mdcm::Tag tSoundSpeedCorrectionMechanismCodeSequence(0x0018,0x9832);
+		const mdcm::Tag tObjectSoundSpeed(0x0018,0x9833);
+		const mdcm::Tag tCouplingMediumSoundSpeed(0x0018,0x9834);
 		const mdcm::Tag tCodeMeaning(0x0008,0x0104);
-		unsigned int PAReconstructionIndex;
-		if (DicomUtils::get_ul_value(
-				ds,
-				tPAReconstructionIndex,
-				&PAReconstructionIndex))
-		{
-			s3 += QString(
-					"<span class='y9'>PA Reconstruction Index</span><br />"
-					"<span class='y8'>&#160;&#160;") +
-				QVariant(PAReconstructionIndex).toString() +
-				QString("</span><br />");
-		}
 		if (ds.FindDataElement(tSoundSpeedCorrectionMechanismCodeSequence))
 		{
 			const mdcm::DataElement & e = ds.GetDataElement(tSoundSpeedCorrectionMechanismCodeSequence);
@@ -1329,8 +1316,8 @@ QString read_PhotoacousticImage(const mdcm::DataSet & ds) // FIXME
 					QString s4;
 					const mdcm::Item & item = sq->GetItem(1);
 					const mdcm::DataSet & nds = item.GetNestedDataSet();
-					float ObjectSoundSpeed;
-					float CouplingMediumSoundSpeed;
+					double ObjectSoundSpeed;
+					double CouplingMediumSoundSpeed;
 					if (nds.FindDataElement(tCodeMeaning))
 					{
 						QString CodeMeaning;
@@ -1344,22 +1331,22 @@ QString read_PhotoacousticImage(const mdcm::DataSet & ds) // FIXME
 								QString("</span><br />");
 						}
 					}
-					if (DicomUtils::get_fl_value(
+					if (DicomUtils::get_fd_value(
 							nds,
 							tObjectSoundSpeed,
 							&ObjectSoundSpeed))
 					{
 						s4 += QString("<span class='y8'>&#160;&#160;Object Sound Speed&#160;") +
-							QVariant(static_cast<qreal>(ObjectSoundSpeed)).toString() +
+							QVariant(ObjectSoundSpeed).toString() +
 							QString("&#160;m/s</span><br />");
 					}
-					if (DicomUtils::get_fl_value(
+					if (DicomUtils::get_fd_value(
 							nds,
 							tCouplingMediumSoundSpeed,
 							&CouplingMediumSoundSpeed))
 					{
 						s4 += QString("<span class='y8'>&#160;&#160;Coupling Medium Sound Speed&#160;") +
-							QVariant(static_cast<qreal>(CouplingMediumSoundSpeed)).toString() +
+							QVariant(CouplingMediumSoundSpeed).toString() +
 							QString("&#160;m/s</span><br />");
 					}
 					if (!s4.isEmpty())
@@ -1372,8 +1359,7 @@ QString read_PhotoacousticImage(const mdcm::DataSet & ds) // FIXME
 		}
 		if (!s3.isEmpty())
 		{
-			s += QString("<span class='y7'>Photoacoustic Reconstruction Module</span><br />") +
-				s3;
+			s += QString("<span class='y7'>Photoacoustic Reconstruction Module</span><br />") + s3;
 		}
 	}
 	//
@@ -1386,7 +1372,6 @@ QString read_PhotoacousticImage(const mdcm::DataSet & ds) // FIXME
 	}
 	return s;
 }
-#endif
 
 template <typename T, long long TVR>
 bool get_vm1_bin_value(
@@ -5924,7 +5909,9 @@ void DicomUtils::enhanced_get_indices(
 	int mr_frame_type_idx = -1;
 	int mr_eff_echo_idx   = -1;
 	int segment_idx       = -1;
-	int pa_index_idx      = -1;
+	int pa_datatype_idx   = -1;
+	int pa_excwave_idx    = -1;
+	int rec_alg_idx       = -1;
 	std::string dim_uid;
 	std::vector<std::string> dim_uids;
 	for (size_t x = 0; x < sq_size; ++x)
@@ -6049,6 +6036,49 @@ void DicomUtils::enhanced_get_indices(
 		{
 			datatype_idx = x;
 		}
+		//
+		//
+		// Photoacoustic
+		// TODO check again
+		//
+		// Photoacoustic seems to skip group pointer sometimes,
+		//  at least according to examples in sup229 (final)?
+		//
+		// Seems to be similar with the above one,
+		// but with index instead of group and group skipped?
+		else if (sq1.at(i).group_pointer == mdcm::Tag(0xffff,0xffff) &&
+			sq1.at(i).index_pointer == mdcm::Tag(0x0018,0x9807))
+		{
+			pa_datatype_idx = x;
+		}
+		else if ((sq1.at(i).group_pointer == mdcm::Tag(0xffff,0xffff) &&
+			sq1.at(i).index_pointer == mdcm::Tag(0x0018,0x9825)) // In the example in sup229 (final)
+			||
+			(sq1.at(i).group_pointer == mdcm::Tag(0x0018,0x9825) &&
+			sq1.at(i).index_pointer == mdcm::Tag(0x0018,0x9826)) // Trying to guess another possible
+			||
+			// In C.8.34.1.2 Photoacoustic Dimension Organization Type is
+			// mentioned that Excitation Characteristics Sequence (0018,9821),
+			// may be used as dimension, not clear with group pointer or without.
+			(sq1.at(i).group_pointer == mdcm::Tag(0xffff,0xffff) &&
+			sq1.at(i).index_pointer == mdcm::Tag(0x0018,0x9821))
+			||
+			(sq1.at(i).group_pointer == mdcm::Tag(0x0018,0x9821) &&
+			sq1.at(i).index_pointer == mdcm::Tag(0x0018,0x9826)))
+		{
+			pa_excwave_idx = x;
+		}
+		else if (sq1.at(i).group_pointer == mdcm::Tag(0xffff,0xffff) &&
+			sq1.at(i).index_pointer == mdcm::Tag(0x0018,0x993d)) // Just guessing
+		{
+			rec_alg_idx = x;
+		}
+		//
+		//
+		//
+		//
+		//
+		//
 		else if (sq1.at(i).group_pointer == mdcm::Tag(0x0018,0x9226) &&
 			sq1.at(i).index_pointer == mdcm::Tag(0x0008,0x9007))
 		{
@@ -6063,11 +6093,6 @@ void DicomUtils::enhanced_get_indices(
 			sq1.at(i).index_pointer == mdcm::Tag(0x0062,0x000b))
 		{
 			segment_idx = x;
-		}
-		else if (sq1.at(i).group_pointer == mdcm::Tag(0xffff,0xffff) &&
-			sq1.at(i).index_pointer == mdcm::Tag(0x3401,0x1093)) // FIXME
-		{
-			pa_index_idx = x;
 		}
 		// currently unused
 		(void)segment_idx;
@@ -6286,24 +6311,40 @@ void DicomUtils::enhanced_get_indices(
 		*dim3rd = in_stack_pos_idx;
 		*enh_id = 118;
 	}
-	// PA Index
+	// Photoacoustic (not sure)
 	else if (sq1_size == 3 &&
 		temporal_pos_idx >= 0 &&
 		plane_pos_idx >= 0 &&
-		pa_index_idx >= 0)
+		pa_datatype_idx >= 0)
 	{
-		*dim5th = pa_index_idx;
+		*dim5th = pa_datatype_idx;
 		*dim4th = temporal_pos_idx;
 		*dim3rd = plane_pos_idx;
 		*enh_id = 119;
 	}
-	else if (sq1_size == 2 &&
-		plane_pos_idx == 0 &&
-		pa_index_idx == 1)
+	else if (sq1_size == 4 &&
+		temporal_pos_idx >= 0 &&
+		plane_pos_idx >= 0 &&
+		pa_datatype_idx >= 0 &&
+		pa_excwave_idx >= 0)
 	{
-		*dim4th = pa_index_idx;
+		*dim6th = pa_excwave_idx;
+		*dim5th = pa_datatype_idx;
+		*dim4th = temporal_pos_idx;
 		*dim3rd = plane_pos_idx;
 		*enh_id = 120;
+	}
+	else if (sq1_size == 4 &&
+		temporal_pos_idx >= 0 &&
+		plane_pos_idx >= 0 &&
+		pa_datatype_idx >= 0 &&
+		rec_alg_idx >= 0)
+	{
+		*dim6th = rec_alg_idx;
+		*dim5th = pa_datatype_idx;
+		*dim4th = temporal_pos_idx;
+		*dim3rd = plane_pos_idx;
+		*enh_id = 121;
 	}
 	//
 	if (*enh_id < 0)
@@ -10655,12 +10696,10 @@ QString DicomUtils::read_enhanced_common(
 					{
 						ivariant->iinfo = read_enhct_info(ds);
 					}
-/*
-					else if (sop == QString("")) // FIXME
+					else if (sop == QString("1.2.840.10008.5.1.4.1.1.6.3"))
 					{
 						ivariant->iinfo = read_PhotoacousticImage(ds);
 					}
-*/
 					read_ivariant_info_tags(ds, ivariant);
 					read_window(ds, &window_center_tmp, &window_width_tmp, &lut_function_tmp);
 					instance_uid = read_instance_uid(ds);
