@@ -141,7 +141,7 @@ public:
     BreastProjectionXRayImageStorageForProcessing,
     HardcopyColorImageStorage,
     DCMTKUnknownStorage,
-	PhotoacousticImageStorage,
+    PhotoacousticImageStorage,
     MS_END
   } MSType;
 
