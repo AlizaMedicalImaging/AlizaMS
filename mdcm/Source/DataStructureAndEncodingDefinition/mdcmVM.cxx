@@ -1,3 +1,11 @@
+/*********************************************************
+ *
+ * MDCM
+ *
+ * Modifications github.com/issakomi
+ *
+ *********************************************************/
+
 /*=========================================================================
 
   Program: GDCM (Grassroots DICOM). A DICOM library
@@ -13,16 +21,10 @@
 =========================================================================*/
 
 #include "mdcmVM.h"
-#include <cstdlib>
-#include <cstring>
+#include <string>
 
 namespace mdcm
 {
-
-static const char * VMStrings[] = { "INVALID", "1",    "2",   "3",    "4",    "5",    "6",      "8",      "9",   "10",
-                                    "12",      "16",   "18",  "24",   "28",   "32",   "35",     "99",     "256", "1-2",
-                                    "1-3",     "1-4",  "1-5", "1-8",  "1-32", "1-99", "1-n",    "2-2n",   "2-n", "2-4",
-                                    "3-4",     "3-3n", "3-n", "4-4n", "6-6n", "7-7n", "30-30n", "47-47n", nullptr };
 
 unsigned int
 VM::GetLength() const
@@ -99,199 +101,70 @@ VM::GetLength() const
     case VM::VM3_4:
     case VM::VM3_3n:
     case VM::VM3_n:
+    case VM::VM4_5:
     case VM::VM4_4n:
     case VM::VM6_6n:
     case VM::VM7_7n:
     default:
       break;
   }
-  assert(len);
   return len;
 }
 
-unsigned int
-VM::GetIndex(VMType vm)
+// clang-format off
+std::string VM::GetVMString(VMType vm)
 {
-  assert(vm <= VM::VM_END);
-  unsigned int l = 0;
+  std::string r;
   switch (vm)
   {
-    case VM::VM0:
-      break;
-    case VM::VM1_2:
-      l = 19;
-      break;
-    case VM::VM1_3:
-      l = 20;
-      break;
-    case VM::VM1_4:
-      l = 21;
-      break;
-    case VM::VM1_5:
-      l = 22;
-      break;
-    case VM::VM1_8:
-      l = 23;
-      break;
-    case VM::VM1_32:
-      l = 24;
-      break;
-    case VM::VM1_99:
-      l = 25;
-      break;
-    case VM::VM1_n:
-      l = 26;
-      break;
-    case VM::VM2_2n:
-      l = 27;
-      break;
-    case VM::VM2_n:
-      l = 28;
-      break;
-    case VM::VM2_4:
-      l = 29;
-      break;
-    case VM::VM3_4:
-      l = 30;
-      break;
-    case VM::VM3_3n:
-      l = 31;
-      break;
-    case VM::VM3_n:
-      l = 32;
-      break;
-    case VM::VM4_4n:
-      l = 33;
-      break;
-    case VM::VM6_6n:
-      l = 34;
-      break;
-    case VM::VM7_7n:
-      l = 35;
-      break;
-    case VM::VM30_30n:
-      l = 36;
-      break;
-    case VM::VM47_47n:
-      l = 37;
-      break;
-    case VM::VM_END:
-      l = 38;
-      break;
-    default:
-    {
-      unsigned int a = static_cast<unsigned int>(vm);
-      for (; a > 1; ++l)
-        a >>= 1;
-      l++;
-    }
-    break;
-  }
-  return l;
-}
-
-const char *
-VM::GetVMString(VMType vm)
-{
-  unsigned int idx = GetIndex(vm);
-  assert(idx < sizeof(VMStrings) / sizeof(VMStrings[0]));
-  return VMStrings[idx];
-}
-
-VM::VMType
-VM::GetVMType(const char * vm)
-{
-  if (!vm)
-    return VM::VM_END;
-  if (!*vm)
-    return VM::VM0; // FIXME
-  for (int i = 0; VMStrings[i] != nullptr; ++i)
-  {
-    if (strcmp(VMStrings[i], vm) == 0)
-    {
-      return static_cast<VM::VMType>(i);
-    }
-  }
-  return VM::VM_END;
-}
-
-// FIXME IsValid will only work for VM defined in public dict
-bool
-VM::IsValid(int vm1, VMType vm2)
-{
-  bool r = false;
-  assert(vm1 >= 0);
-  switch (vm2)
-  {
-    case VM::VM1:
-      r = (vm1 == 1);
-      break;
-    case VM::VM2:
-      r = (vm1 == 2);
-      break;
-    case VM::VM3:
-      r = (vm1 == 3);
-      break;
-    case VM::VM4:
-      r = (vm1 == 4);
-      break;
-    case VM::VM5:
-      r = (vm1 == 5);
-      break;
-    case VM::VM6:
-      r = (vm1 == 6);
-      break;
-    case VM::VM8:
-      r = (vm1 == 8);
-      break;
-    case VM::VM16:
-      r = (vm1 == 16);
-      break;
-    case VM::VM24:
-      r = (vm1 == 24);
-      break;
-    case VM::VM1_2:
-      r = (vm1 == 1 || vm1 == 2);
-      break;
-    case VM::VM1_3:
-      r = (vm1 >= 1 && vm1 <= 3);
-      break;
-    case VM::VM2_4:
-      r = (vm1 >= 2 && vm1 <= 4);
-      break;
-    case VM::VM1_8:
-      r = (vm1 >= 1 && vm1 <= 8);
-      break;
-    case VM::VM1_32:
-      r = (vm1 >= 1 && vm1 <= 32);
-      break;
-    case VM::VM1_99:
-      r = (vm1 >= 1 && vm1 <= 99);
-      break;
-    case VM::VM1_n:
-      r = (vm1 >= 1);
-      break;
-    case VM::VM2_2n:
-      r = (vm1 >= 2 && !(vm1 % 2));
-      break;
-    case VM::VM2_n:
-      r = (vm1 >= 2);
-      break;
-    case VM::VM3_3n:
-      r = (vm1 >= 3 && !(vm1 % 3));
-      break;
-    case VM::VM3_n:
-      r = (vm1 >= 3);
-      break;
-    default:
-      assert(0);
-      break;
+    case VM::VM0:      r = std::string("INVALID"); break;
+    case VM::VM1:      r = std::string("1");       break;
+    case VM::VM2:      r = std::string("2");       break;
+    case VM::VM3:      r = std::string("3");       break;
+    case VM::VM4:      r = std::string("4");       break;
+    case VM::VM5:      r = std::string("5");       break;
+    case VM::VM6:      r = std::string("6");       break;
+    case VM::VM8:      r = std::string("8");       break;
+    case VM::VM9:      r = std::string("9");       break;
+    case VM::VM10:     r = std::string("10");      break;
+    case VM::VM12:     r = std::string("12");      break;
+    case VM::VM16:     r = std::string("16");      break;
+    case VM::VM18:     r = std::string("18");      break;
+    case VM::VM24:     r = std::string("24");      break;
+    case VM::VM28:     r = std::string("28");      break;
+    case VM::VM32:     r = std::string("32");      break;
+    case VM::VM35:     r = std::string("35");      break;
+    case VM::VM99:     r = std::string("99");      break;
+    case VM::VM256:    r = std::string("256");     break;
+    case VM::VM1_2:    r = std::string("1-2");     break;
+    case VM::VM1_3:    r = std::string("1-3");     break;
+    case VM::VM1_4:    r = std::string("1-4");     break;
+    case VM::VM1_5:    r = std::string("1-5");     break;
+    case VM::VM1_8:    r = std::string("1-8");     break;
+    case VM::VM1_32:   r = std::string("1-32");    break;
+    case VM::VM1_99:   r = std::string("1-99");    break;
+    case VM::VM1_n:    r = std::string("1-n");     break;
+    case VM::VM2_2n:   r = std::string("2-2n");    break;
+    case VM::VM2_n:    r = std::string("2-n");     break;
+    case VM::VM2_4:    r = std::string("2-4");     break;
+    case VM::VM3_4:    r = std::string("3-4");     break;
+    case VM::VM3_3n:   r = std::string("3-3n");    break;
+    case VM::VM3_n:    r = std::string("3-n");     break;
+    case VM::VM4_5:    r = std::string("4-5");     break;
+    case VM::VM4_4n:   r = std::string("4-4n");    break;
+    case VM::VM6_6n:   r = std::string("6-6n");    break;
+    case VM::VM6_n:    r = std::string("6-n");     break;
+    case VM::VM7_7n:   r = std::string("7-7n");    break;
+    case VM::VM30_30n: r = std::string("30-30n");  break;
+    case VM::VM47_47n: r = std::string("47-47n");  break;
+    default:           r = std::string("");        break;
   }
   return r;
 }
+// clang-format on
 
-// This function should not be used in production code.
-// Indeed this only return a 'guess' at the VM (ie. a lower bound)
+// This function should be used with caution or not at all,
+// this only return a 'guess' of the VM (a lower bound)
 VM::VMType
 VM::GetVMTypeFromLength(size_t length, unsigned int size)
 {
@@ -341,7 +214,6 @@ VM::GetNumberOfElementsFromArray(const char * array, size_t length)
     if (*parray == ' ')
     {
       ;
-      ;
     }
     else if (*parray == '\\')
     {
@@ -359,69 +231,6 @@ VM::GetNumberOfElementsFromArray(const char * array, size_t length)
   if (valuefound)
     ++c;
   return c;
-}
-
-bool
-VM::Compatible(VM const & vm) const
-{
-  if (VMField == VM::VM0)
-    return false;
-  if (vm == VM::VM0)
-    return true;
-  if (VMField == vm.VMField)
-    return true;
-  bool r = false;
-  switch (VMField)
-  {
-    case VM::VM1_2:
-      r = (vm.VMField >= VM::VM1 && vm.VMField <= VM::VM2);
-      break;
-    case VM::VM1_3:
-      r = (vm.VMField >= VM::VM1 && vm.VMField <= VM::VM3);
-      break;
-    case VM::VM1_8:
-      r = (vm.VMField >= VM::VM1 && vm.VMField <= VM::VM8);
-      break;
-    case VM::VM1_32:
-      r = (vm.VMField >= VM::VM1 && vm.VMField <= VM::VM32);
-      break;
-    case VM::VM1_99:
-      r = (vm.VMField >= VM::VM1 && vm.VMField <= VM::VM99);
-      break;
-    case VM::VM1_n:
-      r = (vm.VMField >= VM::VM1);
-      break;
-    case VM::VM2_2n:
-    {
-      if (vm == VM1_n)
-        r = true; // FIXME
-      else
-        r = vm.VMField >= VM::VM2 && !(vm.GetLength() % 2);
-    }
-    break;
-    case VM::VM2_n:
-      r = (vm.VMField >= VM::VM2);
-      break;
-    case VM::VM2_4:
-      r = (vm.VMField >= VM::VM2 && vm.VMField <= VM::VM4);
-      break;
-    case VM::VM3_4:
-      r = (vm.VMField == VM::VM3 || vm.VMField == VM::VM4);
-      break;
-    case VM::VM3_3n:
-      r = (vm.VMField >= VM::VM3 && !(vm.GetLength() % 3));
-      break;
-    case VM::VM3_n:
-      r = (vm.VMField >= VM::VM3);
-      break;
-    default:
-      r = (VMField == vm.VMField);
-  }
-  if (r)
-  {
-    assert(VMField & vm.VMField);
-  }
-  return r;
 }
 
 } // end namespace mdcm

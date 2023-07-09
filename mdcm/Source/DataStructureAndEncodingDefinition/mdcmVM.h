@@ -36,6 +36,7 @@ namespace mdcm
 class MDCM_EXPORT VM
 {
 public:
+
 // clang-format off
   typedef enum
   {
@@ -63,7 +64,6 @@ public:
     VM1_4 = VM1 | VM2 | VM3 | VM4,
     VM1_5 = VM1 | VM2 | VM3 | VM4 | VM5,
     VM1_8 = VM1 | VM2 | VM3 | VM4 | VM5 | VM6 | VM8,
-    // The following need some work
     VM1_32 = VM1 | VM2 | VM3 | VM4 | VM5 | VM6 | VM8 | VM9 | VM16 | VM24 | VM32,
     VM1_99 = VM1 | VM2 | VM3 | VM4 | VM5 | VM6 | VM8 | VM9 | VM16 | VM24 | VM32 | VM99,
     VM1_n  = VM1 | VM2 | VM3 | VM4 | VM5 | VM6 | VM8 | VM9 | VM16 | VM24 | VM32 | VM99 | VM256,
@@ -73,8 +73,9 @@ public:
     VM3_4  =             VM3 | VM4,
     VM3_3n =             VM3 |             VM6       | VM9        | VM24        | VM99 | VM256,
     VM3_n  =             VM3 | VM4 | VM5 | VM6 | VM8 | VM9 | VM16 | VM24 | VM32 | VM99 | VM256,
+    VM4_5  =                   VM4 | VM5,
     VM4_4n =                   VM4                         | VM16 | VM24 | VM32        | VM256,
-    VM6_6n =                               VM6             | VM12 | VM18 | VM24               ,
+    VM6_6n =                               VM6             | VM12 | VM18 | VM24,
     VM6_n  =                               VM6 | VM8 | VM9 | VM16 | VM24 | VM32 | VM99 | VM256,
     VM7_7n,
     VM30_30n,
@@ -83,34 +84,13 @@ public:
   } VMType;
 // clang-format on
 
-  static const char * GetVMString(VMType);
-  static VMType
-  GetVMType(const char *);
-  // Check if vm1 is valid compare to vm2, i.e vm1 is element of vm2
-  // vm1 is typically deduce from counting in a ValueField
-  static bool
-  IsValid(int vm1, VMType vm2);
-  // WARNING: Implementation deficiency
-  // The Compatible function is poorly implemented, the reference vm should be coming from
-  // the dictionary, while the passed in value is the value guess from the file.
-  bool
-  Compatible(VM const &) const;
-  static VMType
-  GetVMTypeFromLength(size_t length, unsigned int size);
-  static size_t
-  GetNumberOfElementsFromArray(const char * array, size_t length);
-  VM(VMType type = VM0)
-    : VMField(type)
-  {}
+  VM(VMType type = VM0) : VMField(type) {}
+  static std::string GetVMString(VMType);
+  static VMType GetVMTypeFromLength(size_t length, unsigned int size);
+  static size_t GetNumberOfElementsFromArray(const char * array, size_t length);
   operator VMType() const { return VMField; }
-  unsigned int
-  GetLength() const;
-  friend std::ostream &
-  operator<<(std::ostream &, const VM &);
-
-protected:
-  static unsigned int
-  GetIndex(VMType vm);
+  unsigned int GetLength() const;
+  friend std::ostream & operator<<(std::ostream &, const VM &);
 
 private:
   VMType VMField;
@@ -119,7 +99,6 @@ private:
 inline std::ostream &
 operator<<(std::ostream & _os, const VM & _val)
 {
-  assert(VM::GetVMString(_val));
   _os << VM::GetVMString(_val);
   return _os;
 }
@@ -155,7 +134,6 @@ TYPETOLENGTH(VM32,   32);
 TYPETOLENGTH(VM35,   35);
 TYPETOLENGTH(VM99,   99);
 TYPETOLENGTH(VM256, 256);
-
 // clang-format on
 
 } // end namespace mdcm

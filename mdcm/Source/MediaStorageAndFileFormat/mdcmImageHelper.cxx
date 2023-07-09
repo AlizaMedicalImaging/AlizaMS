@@ -40,6 +40,8 @@
 #include "mdcmSegmentedPaletteColorLookupTable.h"
 #include "mdcmByteValue.h"
 #include "mdcmUIDGenerator.h"
+#include "mdcmVR.h"
+#include "mdcmVM.h"
 #include <cmath>
 
 // To support bad Extended IODs, unfortunately many
@@ -1499,7 +1501,7 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
         }
         Item &                    item3 = sqMRImageFrameTypeSequence->GetItem(1);
         DataSet &                 subds3 = item3.GetNestedDataSet();
-        Attribute<0x0008, 0x9007> atFrameType;
+        Attribute<0x0008, 0x9007, VR::CS, VM::VM4> atFrameType;
         atFrameType.SetValue("DERIVED ", 0);
         atFrameType.SetValue("PRIMARY ", 1);
         atFrameType.SetValue("VOLUME", 2);
@@ -1543,7 +1545,7 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
         }
         Item &                    item3 = sqCTImageFrameTypeSequence->GetItem(1);
         DataSet &                 subds3 = item3.GetNestedDataSet();
-        Attribute<0x0008, 0x9007> atFrameType;
+        Attribute<0x0008, 0x9007, VR::CS, VM::VM4> atFrameType;
         atFrameType.SetValue("DERIVED ", 0);
         atFrameType.SetValue("PRIMARY ", 1);
         atFrameType.SetValue("VOLUME", 2);
@@ -1587,7 +1589,7 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
         }
         Item &                    item3 = sqPTImageFrameTypeSequence->GetItem(1);
         DataSet &                 subds3 = item3.GetNestedDataSet();
-        Attribute<0x0008, 0x9007> atFrameType;
+        Attribute<0x0008, 0x9007, VR::CS, VM::VM4> atFrameType;
         atFrameType.SetValue("DERIVED ", 0);
         atFrameType.SetValue("PRIMARY ", 1);
         atFrameType.SetValue("VOLUME", 2);

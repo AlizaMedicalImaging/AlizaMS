@@ -549,9 +549,30 @@ public:
 
 /////////////////////////////////////////
 //
-// Photoacoustic Image Storage (will be in the 2023c)
+// 2023c
 //
-    uid_1_2_840_10008_5_1_4_1_1_6_3 = 479
+    uid_1_2_840_10008_1_2_4_100_1 = 479,
+    uid_1_2_840_10008_1_2_4_101_1 = 480,
+    uid_1_2_840_10008_1_2_4_102_1 = 481,
+    uid_1_2_840_10008_1_2_4_103_1 = 482,
+    uid_1_2_840_10008_1_2_4_104_1 = 483,
+    uid_1_2_840_10008_1_2_4_105_1 = 484,
+    uid_1_2_840_10008_1_2_4_106_1 = 485,
+    uid_1_2_840_10008_2_16_17 = 486,
+    uid_1_2_840_10008_2_16_18 = 487,
+    uid_1_2_840_10008_5_1_4_1_1_6_3 = 488,
+    uid_1_2_840_10008_5_1_4_1_1_9_1_4 = 489,
+    uid_1_2_840_10008_5_1_4_1_1_11_12 = 490,
+    uid_1_2_840_10008_5_1_4_1_1_201_1 = 491,
+    uid_1_2_840_10008_5_1_4_1_1_201_2 = 492,
+    uid_1_2_840_10008_5_1_4_1_1_201_3 = 493,
+    uid_1_2_840_10008_5_1_4_1_1_201_4 = 494,
+    uid_1_2_840_10008_5_1_4_1_1_201_5 = 495,
+    uid_1_2_840_10008_5_1_4_1_1_201_6 = 496,
+    uid_1_2_840_10008_5_1_4_1_1_201_1_1 = 497,
+    uid_1_2_840_10008_5_1_4_1_1_481_23 = 498,
+    uid_1_2_840_10008_5_1_4_1_1_481_24 = 499,
+    uid_1_2_840_10008_5_1_4_1_1_481_25 = 500
 //
 //
 /////////////////////////////////////////
@@ -1087,9 +1108,30 @@ public:
 
 /////////////////////////////////////////
 //
-// Photoacoustic Image Storage (will be in the 2023c)
+// 2023c
 //
-    PhotoacousticImageStorage = 479
+    FragmentableMPEG2MainProfile_MainLevel = 479,
+    FragmentableMPEG2MainProfile_HighLevel = 480,
+    FragmentableMPEG_4AVC_H_264HighProfile_Level4_1 = 481,
+    FragmentableMPEG_4AVC_H_264BD_compatibleHighProfile_Level4_1 = 482,
+    FragmentableMPEG_4AVC_H_264HighProfile_Level4_2For2DVideo = 483,
+    FragmentableMPEG_4AVC_H_264HighProfile_Level4_2For3DVideo = 484,
+    FragmentableMPEG_4AVC_H_264StereoHighProfile_Level4_2 = 485,
+    UnifiedNumberingSystem_UNS_ForMetalsAndAlloys = 486,
+    ResearchResourceIdentification = 487,
+    PhotoacousticImageStorage = 488,
+    General32_bitECGWaveformStorage = 489,
+    VariableModalityLUTSoftcopyPresentationStateStorage = 490,
+    InventoryStorage = 491,
+    Inventory_FIND = 492,
+    Inventory_MOVE = 493,
+    Inventory_GET = 494,
+    InventoryCreation = 495,
+    RepositoryQuery = 496,
+    StorageManagementSOPInstance = 497,
+    EnhancedRTImageStorage = 498,
+    EnhancedContinuousRTImageStorage = 499,
+    RTPatientPositionAcquisitionInstructionStorage = 500
 //
 //
 /////////////////////////////////////////

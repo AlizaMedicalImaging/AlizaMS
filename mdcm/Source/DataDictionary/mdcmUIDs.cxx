@@ -549,9 +549,31 @@ const char * const UIDsStrings[][2] = {
 
   //////////////////////////////////////////////
   //
-  // Photoacoustic Image Storage (will be in the 2023c)
+  // 2023c
   //
+  { "1.2.840.10008.1.2.4.100.1", "Fragmentable MPEG2 Main Profile / Main Level" },
+  { "1.2.840.10008.1.2.4.101.1", "Fragmentable MPEG2 Main Profile / High Level" },
+  { "1.2.840.10008.1.2.4.102.1", "Fragmentable MPEG-4 AVC/H.264 High Profile / Level 4.1" },
+  { "1.2.840.10008.1.2.4.103.1", "Fragmentable MPEG-4 AVC/H.264 BD-compatible High Profile / Level 4.1" },
+  { "1.2.840.10008.1.2.4.104.1", "Fragmentable MPEG-4 AVC/H.264 High Profile / Level 4.2 For 2D Video" },
+  { "1.2.840.10008.1.2.4.105.1", "Fragmentable MPEG-4 AVC/H.264 High Profile / Level 4.2 For 3D Video" },
+  { "1.2.840.10008.1.2.4.106.1", "Fragmentable MPEG-4 AVC/H.264 Stereo High Profile / Level 4.2" },
+  { "1.2.840.10008.2.16.17", "Unified numbering system (UNS) for metals and alloys" },
+  { "1.2.840.10008.2.16.18", "Research Resource Identification" },
   { "1.2.840.10008.5.1.4.1.1.6.3", "Photoacoustic Image Storage" },
+  { "1.2.840.10008.5.1.4.1.1.9.1.4", "General 32-bit ECG Waveform Storage" },
+  { "1.2.840.10008.5.1.4.1.1.11.12", "Variable Modality LUT Softcopy Presentation State Storage" },
+  { "1.2.840.10008.5.1.4.1.1.201.1", "Inventory Storage" },
+  { "1.2.840.10008.5.1.4.1.1.201.2", "Inventory - FIND" },
+  { "1.2.840.10008.5.1.4.1.1.201.3", "Inventory - MOVE" },
+  { "1.2.840.10008.5.1.4.1.1.201.4", "Inventory - GET" },
+  { "1.2.840.10008.5.1.4.1.1.201.5", "Inventory Creation" },
+  { "1.2.840.10008.5.1.4.1.1.201.6", "Repository Query" },
+  { "1.2.840.10008.5.1.4.1.1.201.1.1", "Storage Management SOP Instance" },
+  { "1.2.840.10008.5.1.4.1.1.481.23", "Enhanced RT Image Storage" },
+  { "1.2.840.10008.5.1.4.1.1.481.24", "Enhanced Continuous RT Image Storage" },
+  { "1.2.840.10008.5.1.4.1.1.481.25", "RT Patient Position Acquisition Instruction Storage" },
+  //
   //
   //
   //////////////////////////////////////////////
