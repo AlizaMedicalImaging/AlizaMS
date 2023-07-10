@@ -26,8 +26,7 @@
 namespace mdcm
 {
 
-unsigned int
-VM::GetLength() const
+unsigned int VM::GetLength() const
 {
   unsigned int len = 0;
   switch (VMField)
@@ -86,25 +85,6 @@ VM::GetLength() const
     case VM::VM256:
       len = VMToLength<VM::VM256>::Length;
       break;
-    case VM::VM0:
-    case VM::VM1_2:
-    case VM::VM1_3:
-    case VM::VM1_4:
-    case VM::VM1_5:
-    case VM::VM1_8:
-    case VM::VM1_32:
-    case VM::VM1_99:
-    case VM::VM1_n:
-    case VM::VM2_2n:
-    case VM::VM2_n:
-    case VM::VM2_4:
-    case VM::VM3_4:
-    case VM::VM3_3n:
-    case VM::VM3_n:
-    case VM::VM4_5:
-    case VM::VM4_4n:
-    case VM::VM6_6n:
-    case VM::VM7_7n:
     default:
       break;
   }
@@ -157,18 +137,18 @@ std::string VM::GetVMString(VMType vm)
     case VM::VM7_7n:   r = std::string("7-7n");    break;
     case VM::VM30_30n: r = std::string("30-30n");  break;
     case VM::VM47_47n: r = std::string("47-47n");  break;
-    default:           r = std::string("");        break;
+    default:           r = std::string("UNKNOWN"); break;
   }
   return r;
 }
 // clang-format on
 
 // This function should be used with caution or not at all,
-// this only return a 'guess' of the VM (a lower bound)
+// this only return a 'guess' of the VM.
 VM::VMType
 VM::GetVMTypeFromLength(size_t length, unsigned int size)
 {
-  if (!length || length % size)
+  if (length == 0 || (length % size) != 0)
     return VM::VM0;
   const unsigned int ratio = static_cast<unsigned int>(length / size);
   switch (ratio)
@@ -203,9 +183,9 @@ VM::GetVMTypeFromLength(size_t length, unsigned int size)
 size_t
 VM::GetNumberOfElementsFromArray(const char * array, size_t length)
 {
-  size_t c = 0;
-  if (!length || !array)
+  if (!array || length == 0)
     return 0;
+  size_t       c = 0;
   const char * parray = array;
   const char * end = array + length;
   bool         valuefound = false;
