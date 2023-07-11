@@ -796,7 +796,6 @@ private:
   bool                           Save;
 };
 
-// Partial specialization for derivatives of 1-n : 2-n, 3-n
 template <long long TVR>
 class Element<TVR, VM::VM1_2> : public Element<TVR, VM::VM1_n>
 {
@@ -812,14 +811,84 @@ public:
 };
 
 template <long long TVR>
-class Element<TVR, VM::VM3_4> : public Element<TVR, VM::VM1_n>
+class Element<TVR, VM::VM1_3> : public Element<TVR, VM::VM1_n>
 {
 public:
   typedef Element<TVR, VM::VM1_n> Parent;
   void
   SetLength(int len)
   {
-    if (!(len >= 3 && len <= 4))
+    if (!(len >= 1 && len <= 3))
+      return;
+    Parent::SetLength(len);
+  }
+};
+
+template <long long TVR>
+class Element<TVR, VM::VM1_4> : public Element<TVR, VM::VM1_n>
+{
+public:
+  typedef Element<TVR, VM::VM1_n> Parent;
+  void
+  SetLength(int len)
+  {
+    if (!(len >= 1 && len <= 4))
+      return;
+    Parent::SetLength(len);
+  }
+};
+
+template <long long TVR>
+class Element<TVR, VM::VM1_5> : public Element<TVR, VM::VM1_n>
+{
+public:
+  typedef Element<TVR, VM::VM1_n> Parent;
+  void
+  SetLength(int len)
+  {
+    if (!(len >= 1 && len <= 5))
+      return;
+    Parent::SetLength(len);
+  }
+};
+
+template <long long TVR>
+class Element<TVR, VM::VM1_8> : public Element<TVR, VM::VM1_n>
+{
+public:
+  typedef Element<TVR, VM::VM1_n> Parent;
+  void
+  SetLength(int len)
+  {
+    if (!(len >= 1 && len <= 8))
+      return;
+    Parent::SetLength(len);
+  }
+};
+
+template <long long TVR>
+class Element<TVR, VM::VM1_32> : public Element<TVR, VM::VM1_n>
+{
+public:
+  typedef Element<TVR, VM::VM1_n> Parent;
+  void
+  SetLength(int len)
+  {
+    if (!(len >= 1 && len <= 32))
+      return;
+    Parent::SetLength(len);
+  }
+};
+
+template <long long TVR>
+class Element<TVR, VM::VM1_99> : public Element<TVR, VM::VM1_n>
+{
+public:
+  typedef Element<TVR, VM::VM1_n> Parent;
+  void
+  SetLength(int len)
+  {
+    if (!(len >= 1 && len <= 99))
       return;
     Parent::SetLength(len);
   }
@@ -840,6 +909,36 @@ public:
 };
 
 template <long long TVR>
+class Element<TVR, VM::VM3_4> : public Element<TVR, VM::VM1_n>
+{
+public:
+  typedef Element<TVR, VM::VM1_n> Parent;
+  void
+  SetLength(int len)
+  {
+    if (!(len >= 3 && len <= 4))
+      return;
+    Parent::SetLength(len);
+  }
+};
+
+template <long long TVR>
+class Element<TVR, VM::VM4_5> : public Element<TVR, VM::VM1_n>
+{
+public:
+  typedef Element<TVR, VM::VM1_n> Parent;
+  void
+  SetLength(int len)
+  {
+    if (!(len >= 4 && len <= 5))
+      return;
+    Parent::SetLength(len);
+  }
+};
+
+// Derivatives of 1-n
+
+template <long long TVR>
 class Element<TVR, VM::VM2_n> : public Element<TVR, VM::VM1_n>
 {
   enum
@@ -852,14 +951,14 @@ public:
   void
   SetLength(int len)
   {
-    if (len <= 1)
+    if (len < 2)
       return;
     Parent::SetLength(len);
   }
 };
 
 template <long long TVR>
-class Element<TVR, VM::VM2_2n> : public Element<TVR, VM::VM2_n>
+class Element<TVR, VM::VM2_2n> : public Element<TVR, VM::VM1_n>
 {
   enum
   {
@@ -867,11 +966,30 @@ class Element<TVR, VM::VM2_2n> : public Element<TVR, VM::VM2_n>
   };
 
 public:
-  typedef Element<TVR, VM::VM2_n> Parent;
+  typedef Element<TVR, VM::VM1_n> Parent;
   void
   SetLength(int len)
   {
-    if (len % 2)
+    if (!(len >= 2 && len % 2 == 0))
+      return;
+    Parent::SetLength(len);
+  }
+};
+
+template <long long TVR>
+class Element<TVR, VM::VM3_3n> : public Element<TVR, VM::VM1_n>
+{
+  enum
+  {
+    ElementDisableCombinationsCheck = sizeof(ElementDisableCombinations<TVR, VM::VM3_3n>)
+  };
+
+public:
+  typedef Element<TVR, VM::VM1_n> Parent;
+  void
+  SetLength(int len)
+  {
+    if (!(len >= 3 && len % 3 == 0))
       return;
     Parent::SetLength(len);
   }
@@ -890,53 +1008,70 @@ public:
   void
   SetLength(int len)
   {
-    if (len <= 2)
+    if (len < 3)
       return;
     Parent::SetLength(len);
   }
 };
 
 template <long long TVR>
-class Element<TVR, VM::VM3_3n> : public Element<TVR, VM::VM3_n>
+class Element<TVR, VM::VM4_4n> : public Element<TVR, VM::VM1_n>
 {
   enum
   {
-    ElementDisableCombinationsCheck = sizeof(ElementDisableCombinations<TVR, VM::VM3_3n>)
+    ElementDisableCombinationsCheck = sizeof(ElementDisableCombinations<TVR, VM::VM4_4n>)
   };
 
 public:
-  typedef Element<TVR, VM::VM3_n> Parent;
+  typedef Element<TVR, VM::VM1_n> Parent;
   void
   SetLength(int len)
   {
-    if (len % 3)
+    if (!(len >= 4 && len % 4 == 0))
       return;
     Parent::SetLength(len);
   }
 };
 
-template <>
-class Element<VR::AS, VM::VM5>
+template <long long TVR>
+class Element<TVR, VM::VM6_6n> : public Element<TVR, VM::VM1_n>
 {
   enum
   {
-    ElementDisableCombinationsCheck = sizeof(ElementDisableCombinations<VR::AS, VM::VM5>)
+    ElementDisableCombinationsCheck = sizeof(ElementDisableCombinations<TVR, VM::VM6_6n>)
   };
 
 public:
-  char Internal[VMToLength<VM::VM5>::Length * sizeof(VRToType<VR::AS>::Type)];
+  typedef Element<TVR, VM::VM1_n> Parent;
   void
-  Print(std::ostream & _os) const
+  SetLength(int len)
   {
-    _os << Internal;
-  }
-
-  unsigned long
-  GetLength() const
-  {
-    return VMToLength<VM::VM5>::Length;
+    if (!(len >= 6 && len % 6 == 0))
+      return;
+    Parent::SetLength(len);
   }
 };
+
+template <long long TVR>
+class Element<TVR, VM::VM6_n> : public Element<TVR, VM::VM1_n>
+{
+  enum
+  {
+    ElementDisableCombinationsCheck = sizeof(ElementDisableCombinations<TVR, VM::VM6_n>)
+  };
+
+public:
+  typedef Element<TVR, VM::VM1_n> Parent;
+  void
+  SetLength(int len)
+  {
+    if (len < 6)
+      return;
+    Parent::SetLength(len);
+  }
+};
+
+// Skipped VM7_7n, VM30_30n, VM47_47n, not in public dictionary
 
 template <>
 class Element<VR::OB, VM::VM1> : public Element<VR::OB, VM::VM1_n>
@@ -944,6 +1079,22 @@ class Element<VR::OB, VM::VM1> : public Element<VR::OB, VM::VM1_n>
 
 template <>
 class Element<VR::OW, VM::VM1> : public Element<VR::OW, VM::VM1_n>
+{};
+
+template <>
+class Element<VR::OL, VM::VM1> : public Element<VR::OL, VM::VM1_n>
+{};
+
+template <>
+class Element<VR::OD, VM::VM1> : public Element<VR::OD, VM::VM1_n>
+{};
+
+template <>
+class Element<VR::OF, VM::VM1> : public Element<VR::OF, VM::VM1_n>
+{};
+
+template <>
+class Element<VR::OV, VM::VM1> : public Element<VR::OV, VM::VM1_n>
 {};
 
 } // namespace mdcm

@@ -340,18 +340,14 @@ SegmentWriter::PrepareWrite()
       // Segment Algorithm Name (Type 1)
       Attribute<0x0062, 0x0009> segmentAlgorithmNameAt;
       const char * segmentAlgorithmName = segment->GetSegmentAlgorithmName();
-      if (segmentAlgorithmName)
+      if (segmentAlgorithmName && *segmentAlgorithmName)
       {
-        if (strcmp(segmentAlgorithmName, "") != 0)
-        {
-          mdcmWarningMacro("No segment algorithm name specified");
-        }
         segmentAlgorithmNameAt.SetValue(segmentAlgorithmName);
       }
       else
       {
-        mdcmWarningMacro("Segment algorithm name is null");
-        segmentAlgorithmNameAt.SetValue("");
+        mdcmWarningMacro("Segment algorithm name is null or empty, set to MANUAL");
+        segmentAlgorithmNameAt.SetValue("MANUAL");
       }
       segmentDS.Replace(segmentAlgorithmNameAt.GetAsDataElement());
     }
