@@ -177,7 +177,7 @@
               </sizepolicy>
              </property>
              <property name="title">
-              <string>Structured Report</string>
+              <string>Structured Report and Key Object Selection</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_10">
               <property name="margin">
@@ -214,7 +214,7 @@
                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show internals of Structured Report (displayed green)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="text">
-                 <string>Debug SR document</string>
+                 <string>Debug document</string>
                 </property>
                 <property name="checked">
                  <bool>false</bool>
@@ -235,7 +235,7 @@
                    <string>Set SR image maximum width (px)</string>
                   </property>
                   <property name="text">
-                   <string>SR image max. width</string>
+                   <string>Image max. width</string>
                   </property>
                  </widget>
                 </item>
@@ -297,7 +297,7 @@
                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Skip SR images&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="text">
-                 <string>Skip SR images</string>
+                 <string>Skip images</string>
                 </property>
                </widget>
               </item>
@@ -593,8 +593,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>989</width>
-            <height>587</height>
+            <width>393</width>
+            <height>208</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
