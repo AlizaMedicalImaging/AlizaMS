@@ -116,6 +116,7 @@ std::string VM::GetVMString(VMType vm)
     case VM::VM35:     r = std::string("35");      break;
     case VM::VM99:     r = std::string("99");      break;
     case VM::VM256:    r = std::string("256");     break;
+    case VM::VM1_n:    r = std::string("1-n");     break;
     case VM::VM1_2:    r = std::string("1-2");     break;
     case VM::VM1_3:    r = std::string("1-3");     break;
     case VM::VM1_4:    r = std::string("1-4");     break;
@@ -123,14 +124,13 @@ std::string VM::GetVMString(VMType vm)
     case VM::VM1_8:    r = std::string("1-8");     break;
     case VM::VM1_32:   r = std::string("1-32");    break;
     case VM::VM1_99:   r = std::string("1-99");    break;
-    case VM::VM1_n:    r = std::string("1-n");     break;
-    case VM::VM2_2n:   r = std::string("2-2n");    break;
-    case VM::VM2_n:    r = std::string("2-n");     break;
     case VM::VM2_4:    r = std::string("2-4");     break;
     case VM::VM3_4:    r = std::string("3-4");     break;
+    case VM::VM4_5:    r = std::string("4-5");     break;
+    case VM::VM2_2n:   r = std::string("2-2n");    break;
+    case VM::VM2_n:    r = std::string("2-n");     break;
     case VM::VM3_3n:   r = std::string("3-3n");    break;
     case VM::VM3_n:    r = std::string("3-n");     break;
-    case VM::VM4_5:    r = std::string("4-5");     break;
     case VM::VM4_4n:   r = std::string("4-4n");    break;
     case VM::VM6_6n:   r = std::string("6-6n");    break;
     case VM::VM6_n:    r = std::string("6-n");     break;
@@ -144,7 +144,7 @@ std::string VM::GetVMString(VMType vm)
 // clang-format on
 
 // This function should be used with caution or not at all,
-// this only return a 'guess' of the VM.
+// this only returns a 'guess' of the VM.
 VM::VMType
 VM::GetVMTypeFromLength(size_t length, unsigned int size)
 {

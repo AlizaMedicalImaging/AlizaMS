@@ -82,18 +82,18 @@ public:
 };
 #endif
 
-/**
+/*
  * Attribute class
  * This class use template metaprograming tricks to let the user know when the template
  * instanciation does not match the public dictionary.
  *
- * Typical example that compile is:
- * Attribute<0x0008,0x9007> a = {"ORIGINAL","PRIMARY","T1","NONE"};
+ * Attribute<0x0018, 0x1182, VR::IS, VM::VM1> fd1 = {}; // not enough parameters
+ * Attribute<0x0018, 0x1182, VR::IS, VM::VM2> fd2 = {0, 1, 2}; // too many initializers
  *
- * Examples that will NOT compile are:
+ * VR must be compatible with the public dictionary
  *
- * Attribute<0x0018,0x1182, VR::IS, VM::VM1> fd1 = {}; // not enough parameters
- * Attribute<0x0018,0x1182, VR::IS, VM::VM2> fd2 = {0,1,2}; // too many initializers
+ * VM validation is limited to attributes with fixed VM, TODO validate all VMs
+ *
  */
 
 template <uint16_t  Group,
@@ -110,11 +110,12 @@ public:
   };
 
   ArrayType Internal[VMToLength<TVM>::Length];
-  // VR/VM must be compatible with the public dictionary
+
   MDCM_STATIC_ASSERT(static_cast<bool>(static_cast<VR::VRType>(TVR) & static_cast<VR::VRType>(TagToType<Group, Element>::VRType)));
-  MDCM_STATIC_ASSERT(static_cast<bool>(static_cast<VM::VMType>(TVM) & static_cast<VM::VMType>(TagToType<Group, Element>::VMType)));
-  MDCM_STATIC_ASSERT(((static_cast<bool>(static_cast<VR::VRType>(TVR) & VR::VR_VM1) && (TVM == VM::VM1)) ||
-                      !static_cast<bool>(static_cast<VR::VRType>(TVR) & VR::VR_VM1)));
+  MDCM_STATIC_ASSERT(
+    (static_cast<unsigned int>(TagToType<Group, Element>::VMType) > static_cast<unsigned int>(VM::VM_FIXED_LENGTH)) ||
+    ((static_cast<unsigned int>(TagToType<Group, Element>::VMType) < static_cast<unsigned int>(VM::VM_FIXED_LENGTH)) &&
+    (TVM == static_cast<unsigned int>(TagToType<Group, Element>::VMType))));
 
   static Tag
   GetTag()
@@ -251,8 +252,8 @@ public:
   {
     assert(GetTag() == de.GetTag() || GetTag().GetGroup() == 0x6000 || GetTag().GetGroup() == 0x5000); // ?
     assert(GetVR() != VR::INVALID);
-    assert(GetVR().Compatible(de.GetVR()) ||
-           de.GetVR() == VR::INVALID); // In case of VR::INVALID cannot use the & operator
+    // In case of VR::INVALID cannot use the & operator
+    assert(GetVR().Compatible(de.GetVR()) || de.GetVR() == VR::INVALID);
     if (de.IsEmpty())
       return;
     const ByteValue * bv = de.GetByteValue();
@@ -321,18 +322,8 @@ public:
     VMType = VMToLength<VM::VM1>::Length
   };
   ArrayType Internal;
-  MDCM_STATIC_ASSERT(VMToLength<VM::VM1>::Length == 1);
-  // VR/VM must be compatible with the public dictionary
+
   MDCM_STATIC_ASSERT(static_cast<bool>(static_cast<VR::VRType>(TVR) & static_cast<VR::VRType>(TagToType<Group, Element>::VRType)));
-  MDCM_STATIC_ASSERT(static_cast<bool>(VM::VM1 & static_cast<VM::VMType>(TagToType<Group, Element>::VMType)));
-  MDCM_STATIC_ASSERT((static_cast<bool>(static_cast<VR::VRType>(TVR) & VR::VR_VM1) ||
-                      !static_cast<bool>(static_cast<VR::VRType>(TVR) & VR::VR_VM1)));
-  MDCM_STATIC_ASSERT(static_cast<VR::VRType>(TVR) != VR::OB);
-  MDCM_STATIC_ASSERT(static_cast<VR::VRType>(TVR) != VR::OW);
-  MDCM_STATIC_ASSERT(static_cast<VR::VRType>(TVR) != VR::OD);
-  MDCM_STATIC_ASSERT(static_cast<VR::VRType>(TVR) != VR::OF);
-  MDCM_STATIC_ASSERT(static_cast<VR::VRType>(TVR) != VR::OL);
-  MDCM_STATIC_ASSERT(static_cast<VR::VRType>(TVR) != VR::OV);
 
   static Tag
   GetTag()
@@ -352,9 +343,11 @@ public:
     return VM::VM1;
   }
 
-  // The following two methods do make sense only in case of public element,
-  // when the template is intanciated with private element the VR/VM are simply
-  // defaulted to allow everything (see mdcmTagToType.h default template for TagToType)
+  // The following two methods make sense only for public elements,
+  // if the template is intanciated with private element the VR/VM
+  // are defaulted to allow everything (VR::VRALL and VM::VM1_n),
+  // see mdcmTagToType.h default template.
+
   static VR
   GetDictVR()
   {
@@ -517,12 +510,8 @@ class Attribute<Group, Element, TVR, VM::VM1_n>
 {
 public:
   typedef typename VRToType<TVR>::Type ArrayType;
-  // VR/VM must be compatible with the public dictionary
+
   MDCM_STATIC_ASSERT(static_cast<bool>(static_cast<VR::VRType>(TVR) & static_cast<VR::VRType>(TagToType<Group, Element>::VRType)));
-  MDCM_STATIC_ASSERT(static_cast<bool>(VM::VM1_n & static_cast<VM::VMType>(TagToType<Group, Element>::VMType)));
-  MDCM_STATIC_ASSERT(((static_cast<bool>(static_cast<VR::VRType>(TVR) & VR::VR_VM1) &&
-                        (static_cast<VM::VMType>(TagToType<Group, Element>::VMType) == VM::VM1)) ||
-                      !static_cast<bool>(static_cast<VR::VRType>(TVR) & VR::VR_VM1)));
 
   static Tag
   GetTag()
@@ -752,6 +741,17 @@ private:
 };
 
 template <uint16_t Group, uint16_t Element, long long TVR>
+class Attribute<Group, Element, TVR, VM::VM1_2> : public Attribute<Group, Element, TVR, VM::VM1_n>
+{
+public:
+  VM
+  GetVM() const
+  {
+    return VM::VM1_2;
+  }
+};
+
+template <uint16_t Group, uint16_t Element, long long TVR>
 class Attribute<Group, Element, TVR, VM::VM1_3> : public Attribute<Group, Element, TVR, VM::VM1_n>
 {
 public:
@@ -759,6 +759,28 @@ public:
   GetVM() const
   {
     return VM::VM1_3;
+  }
+};
+
+template <uint16_t Group, uint16_t Element, long long TVR>
+class Attribute<Group, Element, TVR, VM::VM1_4> : public Attribute<Group, Element, TVR, VM::VM1_n>
+{
+public:
+  VM
+  GetVM() const
+  {
+    return VM::VM1_4;
+  }
+};
+
+template <uint16_t Group, uint16_t Element, long long TVR>
+class Attribute<Group, Element, TVR, VM::VM1_5> : public Attribute<Group, Element, TVR, VM::VM1_n>
+{
+public:
+  VM
+  GetVM() const
+  {
+    return VM::VM1_5;
   }
 };
 
@@ -774,6 +796,72 @@ public:
 };
 
 template <uint16_t Group, uint16_t Element, long long TVR>
+class Attribute<Group, Element, TVR, VM::VM1_32> : public Attribute<Group, Element, TVR, VM::VM1_n>
+{
+public:
+  VM
+  GetVM() const
+  {
+    return VM::VM1_32;
+  }
+};
+
+template <uint16_t Group, uint16_t Element, long long TVR>
+class Attribute<Group, Element, TVR, VM::VM1_99> : public Attribute<Group, Element, TVR, VM::VM1_n>
+{
+public:
+  VM
+  GetVM() const
+  {
+    return VM::VM1_99;
+  }
+};
+
+template <uint16_t Group, uint16_t Element, long long TVR>
+class Attribute<Group, Element, TVR, VM::VM2_4> : public Attribute<Group, Element, TVR, VM::VM1_n>
+{
+public:
+  VM
+  GetVM() const
+  {
+    return VM::VM2_4;
+  }
+};
+
+template <uint16_t Group, uint16_t Element, long long TVR>
+class Attribute<Group, Element, TVR, VM::VM3_4> : public Attribute<Group, Element, TVR, VM::VM1_n>
+{
+public:
+  VM
+  GetVM() const
+  {
+    return VM::VM3_4;
+  }
+};
+
+template <uint16_t Group, uint16_t Element, long long TVR>
+class Attribute<Group, Element, TVR, VM::VM4_5> : public Attribute<Group, Element, TVR, VM::VM1_n>
+{
+public:
+  VM
+  GetVM() const
+  {
+    return VM::VM4_5;
+  }
+};
+
+template <uint16_t Group, uint16_t Element, long long TVR>
+class Attribute<Group, Element, TVR, VM::VM2_2n> : public Attribute<Group, Element, TVR, VM::VM1_n>
+{
+public:
+  static VM
+  GetVM()
+  {
+    return VM::VM2_2n;
+  }
+};
+
+template <uint16_t Group, uint16_t Element, long long TVR>
 class Attribute<Group, Element, TVR, VM::VM2_n> : public Attribute<Group, Element, TVR, VM::VM1_n>
 {
 public:
@@ -785,13 +873,13 @@ public:
 };
 
 template <uint16_t Group, uint16_t Element, long long TVR>
-class Attribute<Group, Element, TVR, VM::VM2_2n> : public Attribute<Group, Element, TVR, VM::VM2_n>
+class Attribute<Group, Element, TVR, VM::VM3_3n> : public Attribute<Group, Element, TVR, VM::VM1_n>
 {
 public:
   static VM
   GetVM()
   {
-    return VM::VM2_2n;
+    return VM::VM3_3n;
   }
 };
 
@@ -807,13 +895,68 @@ public:
 };
 
 template <uint16_t Group, uint16_t Element, long long TVR>
-class Attribute<Group, Element, TVR, VM::VM3_3n> : public Attribute<Group, Element, TVR, VM::VM3_n>
+class Attribute<Group, Element, TVR, VM::VM4_4n> : public Attribute<Group, Element, TVR, VM::VM1_n>
 {
 public:
   static VM
   GetVM()
   {
-    return VM::VM3_3n;
+    return VM::VM4_4n;
+  }
+};
+
+template <uint16_t Group, uint16_t Element, long long TVR>
+class Attribute<Group, Element, TVR, VM::VM6_6n> : public Attribute<Group, Element, TVR, VM::VM1_n>
+{
+public:
+  static VM
+  GetVM()
+  {
+    return VM::VM6_6n;
+  }
+};
+
+template <uint16_t Group, uint16_t Element, long long TVR>
+class Attribute<Group, Element, TVR, VM::VM6_n> : public Attribute<Group, Element, TVR, VM::VM1_n>
+{
+public:
+  static VM
+  GetVM()
+  {
+    return VM::VM6_n;
+  }
+};
+
+template <uint16_t Group, uint16_t Element, long long TVR>
+class Attribute<Group, Element, TVR, VM::VM7_7n> : public Attribute<Group, Element, TVR, VM::VM1_n>
+{
+public:
+  static VM
+  GetVM()
+  {
+    return VM::VM7_7n;
+  }
+};
+
+template <uint16_t Group, uint16_t Element, long long TVR>
+class Attribute<Group, Element, TVR, VM::VM30_30n> : public Attribute<Group, Element, TVR, VM::VM1_n>
+{
+public:
+  static VM
+  GetVM()
+  {
+    return VM::VM30_30n;
+  }
+};
+
+template <uint16_t Group, uint16_t Element, long long TVR>
+class Attribute<Group, Element, TVR, VM::VM47_47n> : public Attribute<Group, Element, TVR, VM::VM1_n>
+{
+public:
+  static VM
+  GetVM()
+  {
+    return VM::VM30_30n;
   }
 };
 
