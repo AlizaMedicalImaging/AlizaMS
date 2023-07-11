@@ -94,10 +94,10 @@ template<typename T> SRImage li3(
 {
 	if (image.IsNull() || !ivariant) return SRImage();
 	const typename T::SpacingType spacing = image->GetSpacing();
-	const typename T::RegionType region   = image->GetLargestPossibleRegion();
-	const typename T::SizeType size       = region.GetSize();
-	const short lut = 0;
-	const int lut_function = 0;
+	const typename T::RegionType region = image->GetLargestPossibleRegion();
+	const typename T::SizeType size = region.GetSize();
+	const short lut{};
+	const int lut_function{};
 	const unsigned int p_size = 3 * size[0] * size[1];
 	//
 	unsigned char * p;
@@ -117,12 +117,12 @@ template<typename T> SRImage li3(
 	const double width  = ivariant->di->us_window_width;
 	if (tmp99 == 0)
 	{
-		unsigned int j = 0;
+		unsigned int j{};
 		for (int i = 0; i < num_threads; ++i)
 		{
 			const int size_0 = size[0];
 			const int size_1 = size[1] / num_threads;
-			const int index_0 = 0;
+			const int index_0{};
 			const int index_1 = i * size_1;
 			ProcessImageThreadLUT_<T> * t__ = new ProcessImageThreadLUT_<T>(
 						image,
@@ -138,8 +138,8 @@ template<typename T> SRImage li3(
 	}
 	else
 	{
-		unsigned int j = 0;
-		unsigned int block = 64;
+		unsigned int j{};
+		unsigned int block{64};
 		if (static_cast<float>(size[1]) / static_cast<float>(block) > 16.0f)
 		{
 			block = 128;
@@ -151,7 +151,7 @@ template<typename T> SRImage li3(
 			for (int i = 0; i < incr; ++i)
 			{
 				const int size_0 = size[0];
-				const int index_0 = 0;
+				const int index_0{};
 				const int index_1 = i * block;
 				ProcessImageThreadLUT_<T> * t__ = new ProcessImageThreadLUT_<T>(
 							image,
@@ -192,7 +192,7 @@ template<typename T> SRImage li3(
 	while (true)
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(2));
-		size_t b__ = 0;
+		size_t b__{};
 		for (size_t i = 0; i < threadsLUT_size; ++i)
 		{
 			if (threadsLUT_.at(i)->isFinished()) ++b__;
@@ -228,7 +228,7 @@ template<typename T> SRImage lrgb3(
 	const unsigned short bits_allocated = ivariant->di->bits_allocated;
 	const unsigned short bits_stored    = ivariant->di->bits_stored;
 	//
-	unsigned int j_ = 0;
+	unsigned int j_{};
 	unsigned char * p__;
 	try
 	{
@@ -259,7 +259,7 @@ template<typename T> SRImage lrgb3(
 		}
 		catch (const itk::ExceptionObject &)
 		{
-			;;
+			;
 		}
 	}
 	else
@@ -287,7 +287,7 @@ template<typename T> SRImage lrgb3(
 			}
 			catch (const itk::ExceptionObject &)
 			{
-				;;
+				;
 			}
 		}
 	}
@@ -308,20 +308,18 @@ bool scan_files_for_instance_uid2(
 	const QString & uid,
 	QString & file)
 {
-	if (p.isEmpty())   return false;
+	if (p.isEmpty()) return false;
 	if (uid.isEmpty()) return false;
 	QApplication::processEvents();
 	std::set<mdcm::Tag> tags;
 	mdcm::Tag tSOPInstanceUID(0x0008,0x0018);
 	tags.insert(tSOPInstanceUID);
 	QDir dir(p);
-	QStringList flist =
-		dir.entryList(QDir::Files|QDir::Readable, QDir::Name);
+	QStringList flist = dir.entryList(QDir::Files|QDir::Readable, QDir::Name);
 	for (int x = 0; x < flist.size(); ++x)
 	{
 		QApplication::processEvents();
-		const QString tmp0 =
-			dir.absolutePath() + QString("/") + flist.at(x);
+		const QString tmp0 = dir.absolutePath() + QString("/") + flist.at(x);
 		mdcm::Reader reader;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
@@ -336,8 +334,7 @@ bool scan_files_for_instance_uid2(
 		const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
 		QString uid_;
 		const bool ok = DicomUtils::get_string_value(ds, tSOPInstanceUID, uid_);
-		if (ok &&
-			uid.trimmed().remove(QChar('\0')) == uid_.trimmed().remove(QChar('\0')))
+		if (ok && uid.trimmed().remove(QChar('\0')) == uid_.trimmed().remove(QChar('\0')))
 		{
 			file = tmp0;
 			return true;
@@ -351,7 +348,7 @@ QString find_file_from_uid2(
 	const QString & uid)
 {
 	QString f;
-	if (p.isEmpty())   return f;
+	if (p.isEmpty()) return f;
 	if (uid.isEmpty()) return f;
 	bool ok = scan_files_for_instance_uid2(p, uid, f);
 	QApplication::processEvents();
@@ -389,41 +386,28 @@ void SRUtils::read_IMAGE(
 	QProgressDialog * pb)
 {
 	QString tmpfile;
-	const mdcm::DataElement & e8  =
-		ds.GetDataElement(mdcm::Tag(0x0008,0x1199));
-	mdcm::SmartPointer<mdcm::SequenceOfItems> sq8 =
-		e8.GetValueAsSQ();
+	const mdcm::DataElement & e8 = ds.GetDataElement(mdcm::Tag(0x0008,0x1199));
+	mdcm::SmartPointer<mdcm::SequenceOfItems> sq8 = e8.GetValueAsSQ();
 	if (!sq8) return;
-	const SettingsWidget * settings =
-		static_cast<const SettingsWidget*>(wsettings);
+	const SettingsWidget * settings = static_cast<const SettingsWidget*>(wsettings);
 	const bool skip_images = settings->get_sr_skip_images();
 	const unsigned int nitems8 = sq8->GetNumberOfItems();
-	for(unsigned int i8 = 0; i8 < nitems8; ++i8)
+	for (unsigned int i8 = 0; i8 < nitems8; ++i8)
 	{
-		const mdcm::Item & item8 = sq8->GetItem(i8+1);
-		const mdcm::DataSet & nds8 =
-			item8.GetNestedDataSet();
+		const mdcm::Item & item8 = sq8->GetItem(i8 + 1);
+		const mdcm::DataSet & nds8 = item8.GetNestedDataSet();
 		QString ReferencedSOPClassUID;
-		if (DicomUtils::get_string_value(
-				nds8,
-				mdcm::Tag(0x0008,0x1150),
-				ReferencedSOPClassUID))
+		if (DicomUtils::get_string_value(nds8, mdcm::Tag(0x0008,0x1150), ReferencedSOPClassUID))
 		{
 			mdcm::UIDs uid;
-			uid.SetFromUID(
-				ReferencedSOPClassUID
-					.toLatin1()
-					.constData());
-			QString uidname =
-				QString::fromLatin1(uid.GetName());
+			uid.SetFromUID(ReferencedSOPClassUID.toLatin1().constData());
+			QString uidname = QString::fromLatin1(uid.GetName());
 			if (!uidname.isEmpty())
 			{
 				uidname = uidname.trimmed();
 				if (info)
 				{
-					s += QString("<span class='y3'>IMAGE: ") +
-						uidname +
-						QString("</span><br />\n");
+					s += QString("<span class='y3'>IMAGE: ") + uidname + QString("</span><br />\n");
 				}
 			}
 			else
@@ -437,10 +421,7 @@ void SRUtils::read_IMAGE(
 			}
 		}
 		QString ReferencedSOPInstanceUID;
-		if (DicomUtils::get_string_value(
-				nds8,
-				mdcm::Tag(0x0008,0x1155),
-				ReferencedSOPInstanceUID))
+		if (DicomUtils::get_string_value(nds8, mdcm::Tag(0x0008,0x1155), ReferencedSOPInstanceUID))
 		{
 			if (info)
 			{
@@ -455,26 +436,26 @@ void SRUtils::read_IMAGE(
 					QString("</span><br />\n");
 			}
 			if (skip_images) continue;
-			int idx = 0;
-			std::vector<int> refframes;
-			if (DicomUtils::get_is_values(
-				nds8,
-				mdcm::Tag(0x0008,0x1160),
-				refframes))
+			std::vector<int> idxs;
 			{
-				if (refframes.size() == 1)
+				std::vector<int> refframes;
+				if (DicomUtils::get_is_values(nds8, mdcm::Tag(0x0008,0x1160), refframes))
 				{
-					const int refframe = refframes.at(0);
-					if (refframe >= 1) idx = refframe - 1;
+					for (size_t x5 = 0; x5 < refframes.size(); ++x5)
+					{
+						if (refframes.at(x5) >= 1) idxs.push_back(refframes.at(x5) - 1);
+					}
+				}
+				else
+				{
+					idxs.push_back(0);
 				}
 			}
 			if (pb)
 			{
 				pb->setLabelText(QString("Searching referenced files"));
 			}
-			QString sf = find_file_from_uid2(
-				QDir::toNativeSeparators(path),
-				ReferencedSOPInstanceUID);
+			QString sf = find_file_from_uid2(QDir::toNativeSeparators(path), ReferencedSOPInstanceUID);
 #ifndef USE_WORKSTATION_MODE
 			if (sf.isEmpty())
 			{
@@ -485,9 +466,7 @@ void SRUtils::read_IMAGE(
 					"../DICOM/"
 #endif
 					);
-				sf = find_file_from_uid2(
-					tmpp,
-					ReferencedSOPInstanceUID);
+				sf = find_file_from_uid2(tmpp, ReferencedSOPInstanceUID);
 			}
 #endif
 			if (sf.isEmpty())
@@ -502,11 +481,9 @@ void SRUtils::read_IMAGE(
 						"</body></html>");
 					QFileInfo fi22(path + QString("/.."));
 					if (pb) pb->hide();
-					FindRefDialog * d =
-						new FindRefDialog(settings->get_scale_icons());
+					FindRefDialog * d = new FindRefDialog(settings->get_scale_icons());
 					d->set_text(s22);
-					d->set_path(
-						QDir::toNativeSeparators(fi22.absoluteFilePath()));
+					d->set_path(QDir::toNativeSeparators(fi22.absoluteFilePath()));
 					if (d->exec() == QDialog::Accepted)
 					{
 						SRUtils_selected_path = d->get_path();
@@ -519,8 +496,7 @@ void SRUtils::read_IMAGE(
 					if (pb) pb->show();
 				}
 				QApplication::processEvents();
-				if (SRUtils_asked_for_path_once &&
-					(!SRUtils_selected_path.isEmpty()))
+				if (SRUtils_asked_for_path_once && (!SRUtils_selected_path.isEmpty()))
 				{
 					sf = find_file_from_uid2(
 						QDir::toNativeSeparators(SRUtils_selected_path),
@@ -533,16 +509,13 @@ void SRUtils::read_IMAGE(
 			}
 			if (info)
 			{
-				s += QString("<span class='y3'>Image file: ") +
-					QDir::toNativeSeparators(sf) +
-					QString("</span><br />\n");
+				s += QString("<span class='y3'>Image file: ") + QDir::toNativeSeparators(sf) + QString("</span><br />\n");
 			}
 			if (pb)
 			{
 				pb->setLabelText(QString("Loading ..."));
 			}
 			std::vector<ImageVariant*> ivariants;
-			std::vector<ImageVariant2D*> ivariants2;
 			QStringList dummy;
 			QString e_ = DicomUtils::read_dicom(
 				ivariants,
@@ -560,105 +533,112 @@ void SRUtils::read_IMAGE(
 			if (e_.isEmpty() && ivariants.size() == 1 && ivariants.at(0))
 			{
 				ImageVariant * v = ivariants[0];
-				ImageVariant2D * v2 = new ImageVariant2D();
-				CommonUtils::get_dimensions_(v);
-				CommonUtils::calculate_minmax_scalar(v);
-				switch (v->image_type)
+				const size_t idxs_size = idxs.size();
+				for (size_t x5 = 0; x5 < idxs_size; ++x5)
 				{
-				case 0:
-					e_ = gs3<ImageTypeSS, Image2DTypeSS>(v->pSS, v2->pSS, idx);
-					break;
-				case 1:
-					e_ = gs3<ImageTypeUS, Image2DTypeUS>(v->pUS, v2->pUS, idx);
-					break;
-				case 2:
-					e_ = gs3<ImageTypeSI, Image2DTypeSI>(v->pSI, v2->pSI, idx);
-					break;
-				case 3:
-					e_ = gs3<ImageTypeUI, Image2DTypeUI>(v->pUI, v2->pUI, idx);
-					break;
-				case 4:
-					e_ = gs3<ImageTypeUC, Image2DTypeUC>(v->pUC, v2->pUC, idx);
-					break;
-				case 5:
-					e_ = gs3<ImageTypeF, Image2DTypeF>(v->pF, v2->pF, idx);
-					break;
-				case 6:
-					e_ = gs3<ImageTypeD, Image2DTypeD>(v->pD, v2->pD, idx);
-					break;
-				case 7:
-					e_ = gs3<ImageTypeSLL, Image2DTypeSLL>(v->pSLL, v2->pSLL, idx);
-					break;
-				case 8:
-					e_ = gs3<ImageTypeULL, Image2DTypeULL>(v->pULL, v2->pULL, idx);
-					break;
-				case 10:
-					e_ = gs3<RGBImageTypeSS, RGBImage2DTypeSS>(v->pSS_rgb, v2->pSS_rgb, idx);
-					break;
-				case 11:
-					e_ = gs3<RGBImageTypeUS, RGBImage2DTypeUS>(v->pUS_rgb, v2->pUS_rgb, idx);
-					break;
-				case 12:
-					e_ = gs3<RGBImageTypeSI, RGBImage2DTypeSI>(v->pSI_rgb, v2->pSI_rgb, idx);
-					break;
-				case 13:
-					e_ = gs3<RGBImageTypeUI, RGBImage2DTypeUI>(v->pUI_rgb, v2->pUI_rgb, idx);
-					break;
-				case 14:
-					e_ = gs3<RGBImageTypeUC, RGBImage2DTypeUC>(v->pUC_rgb, v2->pUC_rgb, idx);
-					break;
-				case 15:
-					e_ = gs3<RGBImageTypeF, RGBImage2DTypeF>(v->pF_rgb, v2->pF_rgb, idx);
-					break;
-				case 16:
-					e_ = gs3<RGBImageTypeD, RGBImage2DTypeD>(v->pD_rgb, v2->pD_rgb, idx);
-					break;
-				default:
-					e_ = QString("image type not supported");
-					break;
-				}
-				ivariants2.push_back(v2);
-				if (e_.isEmpty())
-				{
-					v2->image_type = v->image_type;
-					SRImage pm;
-					switch (v2->image_type)
+					const int idx = idxs.at(x5);
+					if (info && idxs_size > 1)
 					{
-					case 0: pm = li3<Image2DTypeSS>(v2->pSS, v);
+						s += QString("<span class='y3'>Frame: ") + QVariant(idx + 1).toString() + QString("</span><br />\n");
+					}
+					ImageVariant2D * v2 = new ImageVariant2D();
+					CommonUtils::get_dimensions_(v);
+					CommonUtils::calculate_minmax_scalar(v);
+					switch (v->image_type)
+					{
+					case 0:
+						e_ = gs3<ImageTypeSS, Image2DTypeSS>(v->pSS, v2->pSS, idx);
 						break;
-					case 1: pm = li3<Image2DTypeUS>(v2->pUS, v);
+					case 1:
+						e_ = gs3<ImageTypeUS, Image2DTypeUS>(v->pUS, v2->pUS, idx);
 						break;
-					case 2: pm = li3<Image2DTypeSI>(v2->pSI, v);
+					case 2:
+						e_ = gs3<ImageTypeSI, Image2DTypeSI>(v->pSI, v2->pSI, idx);
 						break;
-					case 3: pm = li3<Image2DTypeUI>(v2->pUI, v);
+					case 3:
+						e_ = gs3<ImageTypeUI, Image2DTypeUI>(v->pUI, v2->pUI, idx);
 						break;
-					case 4: pm = li3<Image2DTypeUC>(v2->pUC, v);
+					case 4:
+						e_ = gs3<ImageTypeUC, Image2DTypeUC>(v->pUC, v2->pUC, idx);
 						break;
-					case 5: pm = li3<Image2DTypeF>(v2->pF, v);
+					case 5:
+						e_ = gs3<ImageTypeF, Image2DTypeF>(v->pF, v2->pF, idx);
 						break;
-					case 6: pm = li3<Image2DTypeD>(v2->pD, v);
+					case 6:
+						e_ = gs3<ImageTypeD, Image2DTypeD>(v->pD, v2->pD, idx);
 						break;
-					case 7: pm = li3<Image2DTypeSLL>(v2->pSLL, v);
+					case 7:
+						e_ = gs3<ImageTypeSLL, Image2DTypeSLL>(v->pSLL, v2->pSLL, idx);
 						break;
-					case 8: pm = li3<Image2DTypeULL>(v2->pULL, v);
+					case 8:
+						e_ = gs3<ImageTypeULL, Image2DTypeULL>(v->pULL, v2->pULL, idx);
 						break;
-					case 10: pm = lrgb3<RGBImage2DTypeSS>(v2->pSS_rgb, v);
+					case 10:
+						e_ = gs3<RGBImageTypeSS, RGBImage2DTypeSS>(v->pSS_rgb, v2->pSS_rgb, idx);
 						break;
-					case 11: pm = lrgb3<RGBImage2DTypeUS>(v2->pUS_rgb, v);
+					case 11:
+						e_ = gs3<RGBImageTypeUS, RGBImage2DTypeUS>(v->pUS_rgb, v2->pUS_rgb, idx);
 						break;
-					case 12: pm = lrgb3<RGBImage2DTypeSI>(v2->pSI_rgb, v);
+					case 12:
+						e_ = gs3<RGBImageTypeSI, RGBImage2DTypeSI>(v->pSI_rgb, v2->pSI_rgb, idx);
 						break;
-					case 13: pm = lrgb3<RGBImage2DTypeUI>(v2->pUI_rgb, v);
+					case 13:
+						e_ = gs3<RGBImageTypeUI, RGBImage2DTypeUI>(v->pUI_rgb, v2->pUI_rgb, idx);
 						break;
-					case 14: pm = lrgb3<RGBImage2DTypeUC>(v2->pUC_rgb, v);
+					case 14:
+						e_ = gs3<RGBImageTypeUC, RGBImage2DTypeUC>(v->pUC_rgb, v2->pUC_rgb, idx);
 						break;
-					case 15: pm = lrgb3<RGBImage2DTypeF>(v2->pF_rgb, v);
+					case 15:
+						e_ = gs3<RGBImageTypeF, RGBImage2DTypeF>(v->pF_rgb, v2->pF_rgb, idx);
 						break;
-					case 16: pm = lrgb3<RGBImage2DTypeD>(v2->pD_rgb, v);
+					case 16:
+						e_ = gs3<RGBImageTypeD, RGBImage2DTypeD>(v->pD_rgb, v2->pD_rgb, idx);
 						break;
 					default:
+						e_ = QString("image type not supported");
 						break;
 					}
+					if (e_.isEmpty())
+					{
+						v2->image_type = v->image_type;
+						SRImage pm;
+						switch (v2->image_type)
+						{
+						case 0: pm = li3<Image2DTypeSS>(v2->pSS, v);
+							break;
+						case 1: pm = li3<Image2DTypeUS>(v2->pUS, v);
+							break;
+						case 2: pm = li3<Image2DTypeSI>(v2->pSI, v);
+							break;
+						case 3: pm = li3<Image2DTypeUI>(v2->pUI, v);
+							break;
+						case 4: pm = li3<Image2DTypeUC>(v2->pUC, v);
+							break;
+						case 5: pm = li3<Image2DTypeF>(v2->pF, v);
+							break;
+						case 6: pm = li3<Image2DTypeD>(v2->pD, v);
+							break;
+						case 7: pm = li3<Image2DTypeSLL>(v2->pSLL, v);
+							break;
+						case 8: pm = li3<Image2DTypeULL>(v2->pULL, v);
+							break;
+						case 10: pm = lrgb3<RGBImage2DTypeSS>(v2->pSS_rgb, v);
+							break;
+						case 11: pm = lrgb3<RGBImage2DTypeUS>(v2->pUS_rgb, v);
+							break;
+						case 12: pm = lrgb3<RGBImage2DTypeSI>(v2->pSI_rgb, v);
+							break;
+						case 13: pm = lrgb3<RGBImage2DTypeUI>(v2->pUI_rgb, v);
+							break;
+						case 14: pm = lrgb3<RGBImage2DTypeUC>(v2->pUC_rgb, v);
+							break;
+						case 15: pm = lrgb3<RGBImage2DTypeF>(v2->pF_rgb, v);
+							break;
+						case 16: pm = lrgb3<RGBImage2DTypeD>(v2->pD_rgb, v);
+							break;
+						default:
+							break;
+						}
 /*
 POINT
 a single pixel denoted by a single (column,row) pair
@@ -682,239 +662,208 @@ the first two points specifying the endpoints of the
 major axis and the second two points specifying the
 endpoints of the minor axis of an ellipse
 */
-					if (!grobjects.empty())
-					{
-						QPen pen;
-						pen.setBrush(QBrush(QColor(255, 0, 0)));
-						QBrush brush(QColor(255, 0, 0));
-						brush.setStyle(Qt::SolidPattern);
-						for (size_t yy = 0; yy < grobjects.size(); ++yy)
+						if (!grobjects.empty())
 						{
-							const SRGraphic & sg = grobjects.at(yy);
-							const size_t gsize = sg.GraphicData.size();
-							if ((gsize < 2) || (gsize % 2 != 0)) continue;
-							if (sg.GraphicType == QString("POLYLINE"))
+							QPen pen;
+							pen.setBrush(QBrush(QColor(255, 0, 0)));
+							QBrush brush(QColor(255, 0, 0));
+							brush.setStyle(Qt::SolidPattern);
+							for (size_t yy = 0; yy < grobjects.size(); ++yy)
 							{
-#if 1
-								bool check_single_point = true;
-								double tmp__0 = sg.GraphicData.at(0);
-								double tmp__1 = sg.GraphicData.at(1);
-								for (size_t yyy = 2; yyy < gsize; yyy += 2)
+								const SRGraphic & sg = grobjects.at(yy);
+								const size_t gsize = sg.GraphicData.size();
+								if ((gsize < 2) || (gsize % 2 != 0)) continue;
+								if (sg.GraphicType == QString("POLYLINE"))
 								{
-									if (
-										(!itk::Math::FloatAlmostEqual<float>(
-											static_cast<float>(tmp__0),
-											static_cast<float>(sg.GraphicData.at(yyy)))) ||
-										(!itk::Math::FloatAlmostEqual<float>(
-											static_cast<float>(tmp__1),
-											static_cast<float>(sg.GraphicData.at(yyy + 1))))
-										)
+#if 1
+									bool check_single_point = true;
+									double tmp__0 = sg.GraphicData.at(0);
+									double tmp__1 = sg.GraphicData.at(1);
+									for (size_t yyy = 2; yyy < gsize; yyy += 2)
 									{
-										check_single_point = false;
-										break;
+										if ((!itk::Math::FloatAlmostEqual<float>(
+												static_cast<float>(tmp__0),
+												static_cast<float>(sg.GraphicData.at(yyy)))) ||
+											(!itk::Math::FloatAlmostEqual<float>(
+												static_cast<float>(tmp__1),
+												static_cast<float>(sg.GraphicData.at(yyy + 1)))))
+										{
+											check_single_point = false;
+											break;
+										}
+										tmp__0 = sg.GraphicData.at(yyy);
+										tmp__1 = sg.GraphicData.at(yyy + 1);
 									}
-									tmp__0 = sg.GraphicData.at(yyy);
-									tmp__1 = sg.GraphicData.at(yyy + 1);
+									// workaround error
+									if (gsize == 2 || check_single_point)
+									{
+										QPainter painter;
+										painter.begin(&(pm.i));
+										painter.setPen(QPen(Qt::NoPen));
+										painter.setBrush(brush);
+										painter.drawEllipse(sg.GraphicData.at(0) - 3, sg.GraphicData.at(1) - 3, 6, 6);
+										painter.end();
+									}
+									else
+#endif
+									{
+										QPainterPath pp;
+										pp.moveTo(sg.GraphicData.at(0), sg.GraphicData.at(1));
+										for (size_t yyy = 2; yyy < gsize; yyy += 2)
+										{
+											pp.lineTo(sg.GraphicData.at(yyy), sg.GraphicData.at(yyy + 1));
+										}
+										QPainter painter;
+										painter.begin(&(pm.i));
+										painter.setPen(pen);
+										painter.drawPath(pp);
+										painter.end();
+									}
 								}
-								// workaround error
-								if (gsize == 2 || check_single_point)
+								else if (sg.GraphicType == QString("POINT") || sg.GraphicType == QString("MULTIPOINT"))
 								{
 									QPainter painter;
 									painter.begin(&(pm.i));
 									painter.setPen(QPen(Qt::NoPen));
 									painter.setBrush(brush);
-									painter.drawEllipse(
-										sg.GraphicData.at(0) - 3,
-										sg.GraphicData.at(1) - 3,
-										6,
-										6);
+									for (size_t yyy = 0; yyy < gsize; yyy += 2)
+									{
+										painter.drawEllipse(
+											sg.GraphicData.at(yyy) - 3,
+											sg.GraphicData.at(yyy + 1) - 3,
+											6,
+											6);
+									}
 									painter.end();
 								}
-								else
-#endif
+								else if (sg.GraphicType == QString("CIRCLE"))
 								{
-									QPainterPath pp;
-									pp.moveTo(
-										sg.GraphicData.at(0),
-										sg.GraphicData.at(1));
-									for (size_t yyy = 2;
-										yyy < gsize;
-										yyy += 2)
-									{
-										pp.lineTo(
-											sg.GraphicData.at(yyy),
-											sg.GraphicData.at(yyy+1));
-									}
+									const double center_x = sg.GraphicData.at(0);
+									const double center_y = sg.GraphicData.at(1);
+									const double point_x  = sg.GraphicData.at(2);
+									const double point_y  = sg.GraphicData.at(3);
+									const double x__ = point_x - center_x;
+									const double y__ = point_y - center_y;
+									const double distance = sqrt(x__ * x__ + y__ * y__);
 									QPainter painter;
 									painter.begin(&(pm.i));
 									painter.setPen(pen);
-									painter.drawPath(pp);
+									painter.drawEllipse(center_x - distance, center_y - distance, 2.0 * distance, 2.0 * distance);
 									painter.end();
 								}
-							}
-							else if (sg.GraphicType == QString("POINT") ||
-								sg.GraphicType == QString("MULTIPOINT"))
-							{
-								QPainter painter;
-								painter.begin(&(pm.i));
-								painter.setPen(QPen(Qt::NoPen));
-								painter.setBrush(brush);
-								for (size_t yyy = 0; yyy < gsize; yyy+=2)
+								else if (sg.GraphicType == QString("ELLIPSE"))
 								{
-									painter.drawEllipse(
-										sg.GraphicData.at(yyy    ) - 3,
-										sg.GraphicData.at(yyy + 1) - 3,
-										6,
-										6);
+									const float  major0_x = sg.GraphicData.at(0);
+									const float  major0_y = sg.GraphicData.at(1);
+									const float  major1_x = sg.GraphicData.at(2);
+									const float  major1_y = sg.GraphicData.at(3);
+									const float  minor0_x = sg.GraphicData.at(4);
+									const float  minor0_y = sg.GraphicData.at(5);
+									const float  minor1_x = sg.GraphicData.at(6);
+									const float  minor1_y = sg.GraphicData.at(7);
+									const double mid_major_x = (major0_x + major1_x) * 0.5;
+									const double mid_major_y = (major0_y + major1_y) * 0.5;
+									const double x0__ = major1_x - major0_x;
+									const double y0__ = major1_y - major0_y;
+									const double x1__ = minor1_x - minor0_x;
+									const double y1__ = minor1_y - minor0_y;
+									const double d0   = sqrt(x0__ * x0__ + y0__ * y0__);
+									const double d1   = sqrt(x1__ * x1__ + y1__ * y1__);
+									const double ma_j = 1.0 / d0;
+									const double ma_nx = x0__ * ma_j;
+									const double ma_ny = y0__ * ma_j;
+									const double mi_j = 1.0 / d1;
+									const double mi_nx = x1__ * mi_j;
+									const double mi_ny = y1__ * mi_j;
+									const double start = 0.0;
+									const double span  = 360.0;
+									QPainter painter;
+									painter.begin(&(pm.i));
+									painter.setPen(pen);
+									{
+										painter.save();
+										painter.setBrush(Qt::NoBrush);
+										{
+											QTransform ttt;
+											ttt.translate(mid_major_x, mid_major_y);
+											painter.setTransform(ttt, true);
+										}
+										{
+											QTransform ttt;
+											ttt.setMatrix(ma_nx, ma_ny, 0, -mi_nx, -mi_ny, 0, 0, 0, 1);
+											painter.setTransform(ttt, true);
+										}
+										QRectF r___(-0.5 * d0, -0.5 * d1, d0, d1);
+										QPainterPath path0;
+										path0.arcMoveTo(r___, start);
+										path0.arcTo(r___, start, span);
+										painter.drawPath(path0);
+										painter.restore();
+									}
+									painter.end();
 								}
-								painter.end();
-							}
-							else if (sg.GraphicType == QString("CIRCLE"))
-							{
-								const double center_x = sg.GraphicData.at(0);
-								const double center_y = sg.GraphicData.at(1);
-								const double point_x  = sg.GraphicData.at(2);
-								const double point_y  = sg.GraphicData.at(3);
-								const double x__ = point_x - center_x;
-								const double y__ = point_y - center_y;
-								const double distance =
-									sqrt(x__ * x__ + y__ * y__);
-								QPainter painter;
-								painter.begin(&(pm.i));
-								painter.setPen(pen);
-								painter.drawEllipse(
-									center_x - distance,
-									center_y - distance,
-									2.0 * distance,
-									2.0 * distance);
-								painter.end();
-							}
-							else if (sg.GraphicType == QString("ELLIPSE"))
-							{
-								const float  major0_x = sg.GraphicData.at(0);
-								const float  major0_y = sg.GraphicData.at(1);
-								const float  major1_x = sg.GraphicData.at(2);
-								const float  major1_y = sg.GraphicData.at(3);
-								const float  minor0_x = sg.GraphicData.at(4);
-								const float  minor0_y = sg.GraphicData.at(5);
-								const float  minor1_x = sg.GraphicData.at(6);
-								const float  minor1_y = sg.GraphicData.at(7);
-								const double mid_major_x = (major0_x + major1_x) * 0.5;
-								const double mid_major_y = (major0_y + major1_y) * 0.5;
-								const double x0__ = major1_x - major0_x;
-								const double y0__ = major1_y - major0_y;
-								const double x1__ = minor1_x - minor0_x;
-								const double y1__ = minor1_y - minor0_y;
-								const double d0   = sqrt(x0__ * x0__ + y0__ * y0__);
-								const double d1   = sqrt(x1__ * x1__ + y1__ * y1__);
-								const double ma_j = 1.0 / d0;
-								const double ma_nx = x0__ * ma_j;
-								const double ma_ny = y0__ * ma_j;
-								const double mi_j = 1.0 / d1;
-								const double mi_nx = x1__ * mi_j;
-								const double mi_ny = y1__ * mi_j;
-								const double start = 0.0;
-								const double span  = 360.0;
-								QPainter painter;
-								painter.begin(&(pm.i));
-								painter.setPen(pen);
+								else // error
 								{
-									painter.save();
-									painter.setBrush(Qt::NoBrush);
-									{
-										QTransform ttt;
-										ttt.translate(mid_major_x, mid_major_y);
-										painter.setTransform(ttt, true);
-									}
-									{
-										QTransform ttt;
-										ttt.setMatrix(ma_nx, ma_ny, 0, -mi_nx, -mi_ny, 0, 0, 0, 1);
-										painter.setTransform(ttt, true);
-									}
-									QRectF r___(-0.5 * d0, -0.5 * d1, d0, d1);
-									QPainterPath path0;
-									path0.arcMoveTo(r___, start);
-									path0.arcTo(r___, start, span);
-									painter.drawPath(path0);
-									painter.restore();
+									s += QString("<span class='red2'>") + sg.GraphicType + QString("</span><br />\n");
 								}
-								painter.end();
-							}
-							else // error
-							{
-								s += QString("<span class='red2'>") +
-									sg.GraphicType +
-									QString("</span><br />\n");
 							}
 						}
-					}
-					if (!itk::Math::FloatAlmostEqual<float>(
-						static_cast<float>(pm.sx),
-						static_cast<float>(pm.sy)))
-					{
-						double coeff_size_0 = 1.0;
-						double coeff_size_1 = 1.0;
-						if (pm.sy > pm.sx) coeff_size_1 = pm.sy / pm.sx;
-						else               coeff_size_0 = pm.sx / pm.sy;
-						const double ix = pm.i.width()  * coeff_size_0;
-						const double iy = pm.i.height() * coeff_size_1;
-						QImage si = pm.i.scaled(
-							static_cast<int>(ix + 0.5),
-							static_cast<int>(iy + 0.5),
-							Qt::IgnoreAspectRatio,
-							Qt::SmoothTransformation);
-						pm.i = std::move(si);
-					}
-					const int max_width = settings->get_sr_image_width();
-					if (max_width >= 64 && pm.i.width() > max_width)
-					{
-						QImage si = pm.i.scaledToWidth(
-							max_width,
-							Qt::SmoothTransformation);
-						pm.i = std::move(si);
-					}
+						if (!itk::Math::FloatAlmostEqual<float>(static_cast<float>(pm.sx), static_cast<float>(pm.sy)))
+						{
+							double coeff_size_0 = 1.0;
+							double coeff_size_1 = 1.0;
+							if (pm.sy > pm.sx) coeff_size_1 = pm.sy / pm.sx;
+							else               coeff_size_0 = pm.sx / pm.sy;
+							const double ix = pm.i.width()  * coeff_size_0;
+							const double iy = pm.i.height() * coeff_size_1;
+							QImage si = pm.i.scaled(
+								static_cast<int>(ix + 0.5),
+								static_cast<int>(iy + 0.5),
+								Qt::IgnoreAspectRatio,
+								Qt::SmoothTransformation);
+							pm.i = std::move(si);
+						}
+						const int max_width = settings->get_sr_image_width();
+						if (max_width >= 64 && pm.i.width() > max_width)
+						{
+							QImage si = pm.i.scaledToWidth(max_width, Qt::SmoothTransformation);
+							pm.i = std::move(si);
+						}
 #ifdef TMP_IMAGE_IN_MEMORY
-					tmpfile =
-						QString("i")+
-						QVariant(
-							static_cast<qulonglong>(QDateTime::currentMSecsSinceEpoch()))
-								.toString();
-					textBrowser->document()->addResource(
-						QTextDocument::ImageResource,
-						QUrl(tmpfile),
-						pm.i);
-					srimages.push_back(pm);
+						tmpfile =
+							QString("i") +
+							QVariant(static_cast<qulonglong>(QDateTime::currentMSecsSinceEpoch())).toString();
+						textBrowser->document()->addResource(
+							QTextDocument::ImageResource,
+							QUrl(tmpfile),
+							pm.i);
+						srimages.push_back(pm);
 #else
-					tmpfile = QDir::toNativeSeparators(
-						QDir::tempPath() +
-						QString("/i")+
-						QVariant(
-							(qulonglong)
-								QDateTime::currentMSecsSinceEpoch())
-									.toString() +
-						QString(".png"));
-					pm.i.save(tmpfile);
-					tmpfiles.push_back(tmpfile);
+						tmpfile = QDir::toNativeSeparators(
+							QDir::tempPath() +
+							QString("/i") +
+							QVariant(static_cast<qulonglong>(QDateTime::currentMSecsSinceEpoch())).toString() +
+							QString(".png"));
+						pm.i.save(tmpfile);
+						tmpfiles.push_back(tmpfile);
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-					pm.i = QImage();
-					delete [] pm.p;
+						pm.i = QImage();
+						delete [] pm.p;
 #endif
 #endif
-					if (s.endsWith(QString("<br />\n"))) s.chop(7);
-					s += QString("<p style=\"margin-left: 0px\">") +
-						QString("<img src=\"") + tmpfile +
-						QString("\" /></p>\n");
-				}
-				else
-				{
-					s += QString("<span class='yy'>") +
-						QString("IMAGE: ") +
-						ReferencedSOPInstanceUID.trimmed().remove(QChar('\0')) +
-						QString(
-							"</span><br />\n<span class='red2'>"
-							"IMAGE: error (1) ") +
-						e_.trimmed() +
-						QString("</span><br />\n");
+						if (s.endsWith(QString("<br />\n"))) s.chop(7);
+						s += QString("<p style=\"margin-left: 0px\"><img src=\"") + tmpfile + QString("\" /></p>\n");
+					}
+					else
+					{
+						s += QString("<span class='yy'>") +
+							QString("IMAGE: ") +
+							ReferencedSOPInstanceUID.trimmed().remove(QChar('\0')) +
+							QString("</span><br />\n<span class='red2'>IMAGE: error (1) ") +
+							e_.trimmed() +
+							QString("</span><br />\n");
+					}
+					delete v2;
 				}
 			}
 			else
@@ -922,9 +871,7 @@ endpoints of the minor axis of an ellipse
 				s += QString("<span class='yy'>") +
 					QString("IMAGE: ") +
 					ReferencedSOPInstanceUID.trimmed().remove(QChar('\0')) +
-					QString(
-						"</span><br />\n<span class='red2'>"
-						"IMAGE: error (2) ") +
+					QString("</span><br />\n<span class='red2'>IMAGE: error (2) ") +
 					e_.trimmed() +
 					QString("</span><br />\n");
 			}
@@ -933,11 +880,6 @@ endpoints of the minor axis of an ellipse
 				delete ivariants[yy];
 			}
 			ivariants.clear();
-			for (size_t yy = 0; yy < ivariants2.size(); ++yy)
-			{
-				delete ivariants2[yy];
-			}
-			ivariants2.clear();
 		}
 	}
 }
@@ -954,91 +896,60 @@ bool SRUtils::read_SCOORD(
 	const QWidget * wsettings,
 	QProgressDialog * pb)
 {
-	const SettingsWidget * settings =
-		static_cast<const SettingsWidget*>(wsettings);
+	const SettingsWidget * settings = static_cast<const SettingsWidget*>(wsettings);
 	const bool skip_images = settings->get_sr_skip_images();
 	QString GraphicType;
-	if (DicomUtils::get_string_value(
-			ds,
-			mdcm::Tag(0x0070,0x0023),
-			GraphicType))
+	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x0070,0x0023), GraphicType))
 	{
 		GraphicType = GraphicType.trimmed();
-		s += QString("<span class='yy'>") +
-			GraphicType +
-			QString("</span><br />\n");
+		s += QString("<span class='yy'>") + GraphicType + QString("</span><br />\n");
 		if (info)
 		{
-			s += QString(
-					"<span class='y3'>"
-					"Graphic Type: ") +
-				GraphicType +
-				QString("</span><br />\n");
+			s += QString("<span class='y3'>Graphic Type: ") + GraphicType + QString("</span><br />\n");
 		}
 	}
 	std::vector<float> GraphicData;
-	DicomUtils::get_fl_values(
-		ds,
-		mdcm::Tag(0x0070,0x0022),
-		GraphicData);
+	DicomUtils::get_fl_values(ds, mdcm::Tag(0x0070,0x0022), GraphicData);
 	QString PixelOriginInterpretation;
-	if (DicomUtils::get_string_value(
-			ds,
-			mdcm::Tag(0x0048,0x0301),
-			PixelOriginInterpretation))
+	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x0048,0x0301), PixelOriginInterpretation))
 	{
-		PixelOriginInterpretation =
-			PixelOriginInterpretation
-				.trimmed();
+		PixelOriginInterpretation = PixelOriginInterpretation.trimmed();
 		if (info)
 		{
-			s += QString("<span class='y3'>") +
-				PixelOriginInterpretation +
-				QString("</span><br />\n");
+			s += QString("<span class='y3'>") + PixelOriginInterpretation + QString("</span><br />\n");
 		}
 	}
 	QString FiducialUID;
-	if (DicomUtils::get_string_value(
-			ds,
-			mdcm::Tag(0x0070,0x031A),
-			FiducialUID))
+	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x0070,0x031A), FiducialUID))
 	{
 		if (info)
 		{
-			s += QString("<span class='y3'>") +
-				FiducialUID.trimmed().remove(QChar('\0'))  +
-				QString("</span><br />\n");
+			s += QString("<span class='y3'>") + FiducialUID.trimmed().remove(QChar('\0'))  + QString("</span><br />\n");
 		}
 	}
-
-	size_t other_ = 0;
+	size_t other_{};
 	if (ds.FindDataElement(mdcm::Tag(0x0040,0xa730)))
 	{
-		const mdcm::DataElement & e  =
-			ds.GetDataElement(mdcm::Tag(0x0040,0xa730));
-		mdcm::SmartPointer<mdcm::SequenceOfItems> sq =
-			e.GetValueAsSQ();
+		const mdcm::DataElement & e = ds.GetDataElement(mdcm::Tag(0x0040,0xa730));
+		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
 		if (sq)
 		{
 			const unsigned int nitems = sq->GetNumberOfItems();
-			for(unsigned int i = 0; i < nitems; ++i)
+			for (unsigned int i = 0; i < nitems; ++i)
 			{
 				QString ValueType;
 				QString RelationshipType;
-				const mdcm::Item & item = sq->GetItem(i+1);
+				const mdcm::Item & item = sq->GetItem(i + 1);
 				const mdcm::DataSet & nds1 = item.GetNestedDataSet();
-				if (DicomUtils::get_string_value(
-					nds1, mdcm::Tag(0x0040,0xa040), ValueType))
+				if (DicomUtils::get_string_value(nds1, mdcm::Tag(0x0040,0xa040), ValueType))
 				{
 					ValueType = ValueType.trimmed().toUpper();
 				}
-				if (DicomUtils::get_string_value(
-					nds1, mdcm::Tag(0x0040,0xa010), RelationshipType))
+				if (DicomUtils::get_string_value(nds1, mdcm::Tag(0x0040,0xa010), RelationshipType))
 				{
 					RelationshipType = RelationshipType.trimmed().toUpper();
 				}
-				if (!skip_images &&
-					ValueType == QString("IMAGE")
+				if (!skip_images && ValueType == QString("IMAGE")
 #if 1
 					&& RelationshipType == QString("SELECTED FROM")
 #endif
@@ -1047,8 +958,7 @@ bool SRUtils::read_SCOORD(
 					std::vector<SRGraphic> tmp001;
 					SRGraphic sg;
 					sg.GraphicType = GraphicType;
-					sg.PixelOriginInterpretation =
-						PixelOriginInterpretation;
+					sg.PixelOriginInterpretation = PixelOriginInterpretation;
 					sg.FiducialUID = FiducialUID;
 					sg.GraphicData = GraphicData;
 					tmp001.push_back(sg);
@@ -1088,26 +998,14 @@ void SRUtils::read_PNAME(
 	const QString & charset,
 	QString & s)
 {
-	if(!ds.FindDataElement(mdcm::Tag(0x0040,0xa123)))
-		return;
-	const mdcm::DataElement & e2 =
-		ds.GetDataElement(mdcm::Tag(0x0040,0xa123));
-	if (
-		!e2.IsEmpty() &&
-		!e2.IsUndefinedLength() &&
-		e2.GetByteValue())
+	if(!ds.FindDataElement(mdcm::Tag(0x0040,0xa123))) return;
+	const mdcm::DataElement & e2 = ds.GetDataElement(mdcm::Tag(0x0040,0xa123));
+	if (!e2.IsEmpty() && !e2.IsUndefinedLength() && e2.GetByteValue())
 	{
-		QByteArray ba(
-			e2.GetByteValue()->GetPointer(),
-			e2.GetByteValue()->GetLength());
-		QString TextValue =
-			CodecUtils::toUTF8(
-				&ba,
-				charset.toLatin1().constData());
+		QByteArray ba(e2.GetByteValue()->GetPointer(), e2.GetByteValue()->GetLength());
+		QString TextValue = CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
 		TextValue = TextValue.trimmed();
-		s += QString("<span class='y'>") +
-			DicomUtils::convert_pn_value(TextValue) +
-			QString("</span><br />\n");
+		s += QString("<span class='y'>") + DicomUtils::convert_pn_value(TextValue) + QString("</span><br />\n");
 	}
 }
 
@@ -1116,24 +1014,13 @@ void SRUtils::read_TEXT(
 	const QString & charset,
 	QString & s)
 {
-	if(!ds.FindDataElement(mdcm::Tag(0x0040,0xa160)))
-		return;
-	const mdcm::DataElement & e2 =
-		ds.GetDataElement(mdcm::Tag(0x0040,0xa160));
-	if (
-		!e2.IsEmpty() &&
-		!e2.IsUndefinedLength() &&
-		e2.GetByteValue())
+	if(!ds.FindDataElement(mdcm::Tag(0x0040,0xa160))) return;
+	const mdcm::DataElement & e2 = ds.GetDataElement(mdcm::Tag(0x0040,0xa160));
+	if (!e2.IsEmpty() && !e2.IsUndefinedLength() && e2.GetByteValue())
 	{
-		QByteArray ba(
-			e2.GetByteValue()->GetPointer(),
-			e2.GetByteValue()->GetLength());
-		const QString TextValue =
-			CodecUtils::toUTF8(
-				&ba, charset.toLatin1().constData());
-		s += QString("<span class='y'>") +
-			TextValue.trimmed() +
-			QString("</span><br />\n");
+		QByteArray ba(e2.GetByteValue()->GetPointer(), e2.GetByteValue()->GetLength());
+		const QString TextValue = CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
+		s += QString("<span class='y'>") + TextValue.trimmed() + QString("</span><br />\n");
 	}
 }
 
@@ -1142,109 +1029,56 @@ void SRUtils::read_NUM(
 	const QString & charset,
 	QString & s)
 {
-	if (!ds.FindDataElement(mdcm::Tag(0x0040,0xa300)))
-		return;
-	const mdcm::DataElement & e3  =
-		ds.GetDataElement(mdcm::Tag(0x0040,0xa300));
-	mdcm::SmartPointer<mdcm::SequenceOfItems> sq3 =
-		e3.GetValueAsSQ();
+	if (!ds.FindDataElement(mdcm::Tag(0x0040,0xa300))) return;
+	const mdcm::DataElement & e3  = ds.GetDataElement(mdcm::Tag(0x0040,0xa300));
+	mdcm::SmartPointer<mdcm::SequenceOfItems> sq3 = e3.GetValueAsSQ();
 	if (!sq3) return;
-	for(unsigned int i3 = 0;
-		i3 < sq3->GetNumberOfItems();
-		++i3)
+	for (unsigned int i3 = 0; i3 < sq3->GetNumberOfItems(); ++i3)
 	{
-		const mdcm::Item & item3 = sq3->GetItem(i3+1);
-		const mdcm::DataSet & nds3 =
-			item3.GetNestedDataSet();
+		const mdcm::Item & item3 = sq3->GetItem(i3 + 1);
+		const mdcm::DataSet & nds3 = item3.GetNestedDataSet();
 		QString NumericValue;
-		if (DicomUtils::get_string_value(
-				nds3,
-				mdcm::Tag(0x0040,0xa30a),
-				NumericValue))
+		if (DicomUtils::get_string_value(nds3, mdcm::Tag(0x0040,0xa30a), NumericValue))
 		{
 			QString unit;
-			if (nds3.FindDataElement(
-					mdcm::Tag(0x0040,0x08ea)))
+			if (nds3.FindDataElement(mdcm::Tag(0x0040,0x08ea)))
 			{
-				const mdcm::DataElement & e5  =
-					nds3.GetDataElement(
-						mdcm::Tag(0x0040,0x08ea));
-				mdcm::SmartPointer<mdcm::SequenceOfItems>
-					sq5 =
-						e5.GetValueAsSQ();
+				const mdcm::DataElement & e5 = nds3.GetDataElement(mdcm::Tag(0x0040,0x08ea));
+				mdcm::SmartPointer<mdcm::SequenceOfItems> sq5 = e5.GetValueAsSQ();
 				if (sq5 && (sq5->GetNumberOfItems() == 1))
 				{
-					const mdcm::Item & item5 =
-						sq5->GetItem(1);
-					const mdcm::DataSet & nds5 =
-						item5.GetNestedDataSet();
-					if (nds5.FindDataElement(
-							mdcm::Tag(0x0008,0x0104)))
+					const mdcm::Item & item5 = sq5->GetItem(1);
+					const mdcm::DataSet & nds5 = item5.GetNestedDataSet();
+					if (nds5.FindDataElement(mdcm::Tag(0x0008,0x0104)))
 					{
-						const mdcm::DataElement & e7 =
-							nds5.GetDataElement(
-								mdcm::Tag(0x0008,0x0104));
-						if (!e7.IsEmpty() &&
-							!e7.IsUndefinedLength() &&
-							e7.GetByteValue())
+						const mdcm::DataElement & e7 = nds5.GetDataElement(mdcm::Tag(0x0008,0x0104));
+						if (!e7.IsEmpty() && !e7.IsUndefinedLength() && e7.GetByteValue())
 						{
-							QByteArray ba7(
-								e7.GetByteValue()->
-									GetPointer(),
-								e7.GetByteValue()->
-									GetLength());
-							const QString tmp5 =
-								CodecUtils::toUTF8(
-									&ba7,
-									charset
-										.toLatin1()
-										.constData());
-							unit = tmp5
-								.trimmed();
+							QByteArray ba7(e7.GetByteValue()->GetPointer(), e7.GetByteValue()->GetLength());
+							const QString tmp5 = CodecUtils::toUTF8(&ba7, charset.toLatin1().constData());
+							unit = tmp5.trimmed();
 						}
 					}
 					if (nds5.FindDataElement(
 							mdcm::Tag(0x0008,0x0100)))
 					{
-						const mdcm::DataElement & e7 =
-							nds5.GetDataElement(
-								mdcm::Tag(0x0008,0x0100));
-						if (
-							!e7.IsEmpty() &&
-							!e7.IsUndefinedLength() &&
-							e7.GetByteValue())
+						const mdcm::DataElement & e7 = nds5.GetDataElement(mdcm::Tag(0x0008,0x0100));
+						if (!e7.IsEmpty() && !e7.IsUndefinedLength() && e7.GetByteValue())
 						{
-							QByteArray ba7(
-								e7.GetByteValue()->
-									GetPointer(),
-								e7.GetByteValue()->
-									GetLength());
+							QByteArray ba7(e7.GetByteValue()->GetPointer(), e7.GetByteValue()->GetLength());
 							const QString tmp5 =
-								(CodecUtils::toUTF8(
-									&ba7,
-									charset
-										.toLatin1()
-										.constData())).trimmed();
-							if ((unit.trimmed().toUpper() !=
-									QString("NO UNITS")) &&
-								(!tmp5.isEmpty()) &&
-								(tmp5 != QString("1")))
+								(CodecUtils::toUTF8(&ba7, charset.toLatin1().constData())).trimmed();
+							if ((unit.trimmed().toUpper() != QString("NO UNITS")) &&
+								(!tmp5.isEmpty()) && (tmp5 != QString("1")))
 							{
-								unit += QString(" (") +
-									tmp5 + QString(")");
+								unit += QString(" (") + tmp5 + QString(")");
 							}
 						}
 					}
 				}
 			}
-			const QString u =
-				(unit.trimmed().toUpper() !=
-					QString("NO UNITS"))
-				? unit : QString("");
-			s += QString("<span class='y'>") +
-				NumericValue.trimmed() +
-				QString(" ") + u +
-				QString("</span><br />\n");
+			const QString u = (unit.trimmed().toUpper() != QString("NO UNITS")) ? unit : QString("");
+			s += QString("<span class='y'>") + NumericValue.trimmed() + QString(" ") + u + QString("</span><br />\n");
 		}
 	}
 }
@@ -1256,35 +1090,22 @@ void SRUtils::read_CODE(
 {
 	if (!ds.FindDataElement(mdcm::Tag(0x0040,0xa168))) return;
 	QString CodeMeaning2;
-	const mdcm::DataElement & e4  =
-		ds.GetDataElement(mdcm::Tag(0x0040,0xa168));
-	mdcm::SmartPointer<mdcm::SequenceOfItems> sq4 =
-		e4.GetValueAsSQ();
+	const mdcm::DataElement & e4  = ds.GetDataElement(mdcm::Tag(0x0040,0xa168));
+	mdcm::SmartPointer<mdcm::SequenceOfItems> sq4 = e4.GetValueAsSQ();
 	if (sq4)
 	{
 		const unsigned int nitems4 = sq4->GetNumberOfItems();
-		for(unsigned int i4 = 0; i4 < nitems4; ++i4)
+		for (unsigned int i4 = 0; i4 < nitems4; ++i4)
 		{
 			const mdcm::Item & item4 = sq4->GetItem(i4 + 1);
-			const mdcm::DataSet & nds4 =
-				item4.GetNestedDataSet();
+			const mdcm::DataSet & nds4 = item4.GetNestedDataSet();
 			if (nds4.FindDataElement(mdcm::Tag(0x0008,0x0104)))
 			{
-				const mdcm::DataElement & e5 =
-					nds4.GetDataElement(
-						mdcm::Tag(0x0008,0x0104));
-				if (
-					!e5.IsEmpty() &&
-					!e5.IsUndefinedLength() &&
-					e5.GetByteValue())
+				const mdcm::DataElement & e5 = nds4.GetDataElement(mdcm::Tag(0x0008,0x0104));
+				if (!e5.IsEmpty() && !e5.IsUndefinedLength() && e5.GetByteValue())
 				{
-					QByteArray ba5(
-						e5.GetByteValue()->GetPointer(),
-						e5.GetByteValue()->GetLength());
-					QString tmp5 =
-						CodecUtils::toUTF8(
-							&ba5,
-							charset.toLatin1().constData());
+					QByteArray ba5(e5.GetByteValue()->GetPointer(), e5.GetByteValue()->GetLength());
+					QString tmp5 = CodecUtils::toUTF8(&ba5, charset.toLatin1().constData());
 					if (!CodeMeaning2.isEmpty())
 					{
 						CodeMeaning2 += QString(" ");
@@ -1296,56 +1117,38 @@ void SRUtils::read_CODE(
 	}
 	if (!CodeMeaning2.isEmpty())
 	{
-		s += QString("<span class='y'>") +
-			CodeMeaning2 +
-			QString("</span><br />\n");
+		s += QString("<span class='y'>") + CodeMeaning2 + QString("</span><br />\n");
 	}
 }
 
 void SRUtils::read_DATE(const mdcm::DataSet & ds, QString & s)
 {
 	QString Date;
-	if (DicomUtils::get_string_value(
-			ds,
-			mdcm::Tag(0x0040,0xa121),
-			Date))
+	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x0040,0xa121), Date))
 	{
 		Date = Date.trimmed();
-		const QDate date_ =
-			QDate::fromString(Date, QString("yyyyMMdd"));
-		s += QString("<span class='y'>") +
-			date_.toString(QString("d MMM yyyy")) +
-			QString("</span><br />\n");
+		const QDate date_ = QDate::fromString(Date, QString("yyyyMMdd"));
+		s += QString("<span class='y'>") + date_.toString(QString("d MMM yyyy")) + QString("</span><br />\n");
 	}
 }
 
 void SRUtils::read_DATETIME(const mdcm::DataSet & ds, QString & s)
 {
 	QString DateTime;
-	if (!DicomUtils::get_string_value(
-			ds,
-			mdcm::Tag(0x0040,0xa120),
-			DateTime)) return;
+	if (!DicomUtils::get_string_value(ds, mdcm::Tag(0x0040,0xa120), DateTime)) return;
 	DateTime = DateTime.trimmed();
 	QString tmp0;
 	if (!DateTime.isEmpty())
 	{
-		const int point_idx =
-			DateTime.indexOf(QString("."));
+		const int point_idx = DateTime.indexOf(QString("."));
 		if (point_idx == 14 || point_idx == -1)
 		{
-			const QString time1_s =
-				DateTime.left(14);
-			const QDateTime time_ =
-				QDateTime::fromString(
-					time1_s,
-					QString("yyyyMMddHHmmss"));
-			tmp0 = time_.toString(
-				QString("d MMM yyyy HH:mm:ss"));
+			const QString time1_s = DateTime.left(14);
+			const QDateTime time_ = QDateTime::fromString(time1_s, QString("yyyyMMddHHmmss"));
+			tmp0 = time_.toString(QString("d MMM yyyy HH:mm:ss"));
 			if (point_idx == 14)
 			{
-				tmp0.append(QString(".") +
-					DateTime.right(DateTime.length() - 15));
+				tmp0.append(QString(".") + DateTime.right(DateTime.length() - 15));
 			}
 		}
 		else
@@ -1353,37 +1156,26 @@ void SRUtils::read_DATETIME(const mdcm::DataSet & ds, QString & s)
 			tmp0 = DateTime;
 		}
 	}
-	s += QString("<span class='y'>") +
-		tmp0 + QString("</span><br />\n");
+	s += QString("<span class='y'>") + tmp0 + QString("</span><br />\n");
 }
 
 void SRUtils::read_TIME(const mdcm::DataSet & ds, QString & s)
 {
 	QString Time;
-	if (!DicomUtils::get_string_value(
-			ds,
-			mdcm::Tag(0x0040,0xa122),
-			Time)) return;
+	if (!DicomUtils::get_string_value(ds, mdcm::Tag(0x0040,0xa122), Time)) return;
 	Time = Time.trimmed();
 	QString tmp0;
 	if (!Time.isEmpty())
 	{
-		const int point_idx =
-			Time.indexOf(QString("."));
+		const int point_idx = Time.indexOf(QString("."));
 		if (point_idx == 6 || point_idx == -1)
 		{
-			const QString time1_s =
-				Time.left(6);
-			const QDateTime time_ =
-				QDateTime::fromString(
-					time1_s,
-					QString("HHmmss"));
-			tmp0 = time_.toString(
-				QString("HH:mm:ss"));
+			const QString time1_s = Time.left(6);
+			const QDateTime time_ = QDateTime::fromString(time1_s, QString("HHmmss"));
+			tmp0 = time_.toString(QString("HH:mm:ss"));
 			if (point_idx == 6)
 			{
-				tmp0.append(QString(".") +
-					Time.right(Time.length() - 7));
+				tmp0.append(QString(".") + Time.right(Time.length() - 7));
 			}
 		}
 		else
@@ -1391,62 +1183,41 @@ void SRUtils::read_TIME(const mdcm::DataSet & ds, QString & s)
 			tmp0 = Time;
 		}
 	}
-	s += QString("<span class='y'>") +
-		tmp0 + QString("</span><br />\n");
+	s += QString("<span class='y'>") + tmp0 + QString("</span><br />\n");
 }
 
 void SRUtils::read_SCOORD3D(const mdcm::DataSet & ds, QString & s)
 {
 	// TODO
 	QString GraphicType;
-	if (DicomUtils::get_string_value(
-			ds,
-			mdcm::Tag(0x0070,0x0023),
-			GraphicType))
+	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x0070,0x0023), GraphicType))
 	{
 		GraphicType = GraphicType.trimmed();
-		s += QString("<span class='y'>") +
-			GraphicType +
-			QString("</span><br />\n");
+		s += QString("<span class='y'>") + GraphicType + QString("</span><br />\n");
 	}
 	std::vector<float> graphic_data;
-	DicomUtils::get_fl_values(
-		ds,
-		mdcm::Tag(0x0070,0x0022),
-		graphic_data);
+	DicomUtils::get_fl_values(ds, mdcm::Tag(0x0070,0x0022), graphic_data);
 	QString ReferencedFrameofReferenceUID;
-	if (DicomUtils::get_string_value(
-			ds,
-			mdcm::Tag(0x3006,0x0024),
-			ReferencedFrameofReferenceUID))
+	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x3006,0x0024), ReferencedFrameofReferenceUID))
 	{
 		s += QString("<span class='y'>") +
-		ReferencedFrameofReferenceUID.trimmed().remove(QChar('\0')) +
-			QString("</span><br />\n");
+		ReferencedFrameofReferenceUID.trimmed().remove(QChar('\0')) + QString("</span><br />\n");
 	}
 	QString FiducialUID;
-	if (DicomUtils::get_string_value(
-			ds,
-			mdcm::Tag(0x0070,0x031A),
-			FiducialUID))
+	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x0070,0x031A), FiducialUID))
 	{
-		s += QString("<span class='y'>") +
-			FiducialUID.trimmed().remove(QChar('\0')) +
-			QString("</span><br />\n");
+		s += QString("<span class='y'>") + FiducialUID.trimmed().remove(QChar('\0')) + QString("</span><br />\n");
 	}
 }
 
 QString SRUtils::read_UIDREF(const mdcm::DataSet & ds, QString & s)
 {
 	QString UID;
-	if (!DicomUtils::get_string_value(
-		ds, mdcm::Tag(0x0040,0xa124), UID))
+	if (!DicomUtils::get_string_value(ds, mdcm::Tag(0x0040,0xa124), UID))
 	{
 		return QString("");
 	}
-	s += QString("<span class='y'>") +
-		UID.trimmed().remove(QChar('\0')) +
-		QString("</span><br />\n");
+	s += QString("<span class='y'>") + UID.trimmed().remove(QChar('\0')) + QString("</span><br />\n");
 	return UID.trimmed();
 }
 
@@ -1457,20 +1228,13 @@ void SRUtils::read_TCOORD(
 {
 	// TODO
 	QString TemporalRangeType;
-	if (DicomUtils::get_string_value(
-			ds, mdcm::Tag(0x0040,0xa130), TemporalRangeType))
+	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x0040,0xa130), TemporalRangeType))
 	{
 		TemporalRangeType = TemporalRangeType.trimmed();
-		s += QString("<span class='yy'>") +
-			TemporalRangeType +
-			QString("</span><br />\n");
+		s += QString("<span class='yy'>") + TemporalRangeType + QString("</span><br />\n");
 		if (info)
 		{
-			s += QString(
-					"<span class='y3'>"
-					"Temporal Range Type: ") +
-				TemporalRangeType +
-				QString("</span><br />\n");
+			s += QString("<span class='y3'>Temporal Range Type: ") + TemporalRangeType + QString("</span><br />\n");
 		}
 	}
 /*
@@ -1516,19 +1280,14 @@ QString SRUtils::read_sr_title2(
 	const QString & charset)
 {
 	QString s;
-	if (ds.FindDataElement(
-		mdcm::Tag(0x0010,0x0010)))
+	if (ds.FindDataElement(mdcm::Tag(0x0010,0x0010)))
 	{
-		const QString pn =
-			DicomUtils::get_pn_value2(
-				ds,
-				mdcm::Tag(0x0010,0x0010),
-				charset.toLatin1().constData());
+		const QString pn = DicomUtils::get_pn_value2(ds, mdcm::Tag(0x0010,0x0010), charset.toLatin1().constData());
 		if (!pn.isEmpty())
 		{
 			s += QString(
-				"<h1 id=\"1\" align=\"center\">"
-				"<span class='t1'>") +
+					"<h1 id=\"1\" align=\"center\">"
+					"<span class='t1'>") +
 				pn +
 				QString("</span></h1>\n");
 		}
@@ -1541,78 +1300,42 @@ QString SRUtils::read_sr_title2(
 				"Anonymous</span></h1>\n");
 	}
 	QString d;
-	if (DicomUtils::get_string_value(
-			ds,
-			mdcm::Tag(0x0010,0x0030),
-			d))
+	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x0010,0x0030), d))
 	{
-		const QDate qd =
-			QDate::fromString(
-				d.trimmed(),
-				QString("yyyyMMdd"));
+		const QDate qd = QDate::fromString(d.trimmed(), QString("yyyyMMdd"));
 		s += QString("<p id=\"1a\" align=\"center\"><span class='t2'>") +
 			qd.toString(QString("d MMM yyyy")) +
 			QString("</span></p>\n");
 	}
 	s += QString("<span class='y'><ul>");
 	QString id;
-	if (DicomUtils::get_string_value(
-			ds,
-			mdcm::Tag(0x0010,0x0020),
-			id))
+	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x0010,0x0020), id))
 	{
-		s += QString("<li>Patient ID: ") +
-			id.trimmed() +
-			QString("</li>");
+		s += QString("<li>Patient ID: ") + id.trimmed() + QString("</li>");
 	}
 	QString StudyDate;
-	if (DicomUtils::get_string_value(
-			ds,
-			mdcm::Tag(0x0008,0x0020),
-			StudyDate))
+	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x0008,0x0020), StudyDate))
 	{
-		const QDate qd =
-			QDate::fromString(
-				StudyDate.trimmed(),
-				QString("yyyyMMdd"));
-		s += QString("<li>Study date: ") +
-			qd.toString(QString("d MMM yyyy")) +
-			QString("</li>");
+		const QDate qd = QDate::fromString(StudyDate.trimmed(), QString("yyyyMMdd"));
+		s += QString("<li>Study date: ") + qd.toString(QString("d MMM yyyy")) + QString("</li>");
 	}
-	if (ds.FindDataElement(
-		mdcm::Tag(0x0008,0x0090)))
+	if (ds.FindDataElement(mdcm::Tag(0x0008,0x0090)))
 	{
-		const QString tmp0 =
-			DicomUtils::get_pn_value2(
-				ds,
-				mdcm::Tag(0x0008,0x0090),
-				charset.toLatin1().constData());
+		const QString tmp0 = DicomUtils::get_pn_value2(ds, mdcm::Tag(0x0008,0x0090), charset.toLatin1().constData());
 		if (!tmp0.isEmpty())
 		{
-			s += QString("<li>Referring: ") +
-				tmp0 +
-				QString("</li>");
+			s += QString("<li>Referring: ") + tmp0 + QString("</li>");
 		}
 	}
 	QString CompletionFlag;
-	if (DicomUtils::get_string_value(
-			ds,
-			mdcm::Tag(0x0040,0xa491),
-			CompletionFlag))
+	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x0040,0xa491), CompletionFlag))
 	{
-		s += QString("<li>Completion: ") +
-			CompletionFlag.toLower() +
-			QString("</li>");
+		s += QString("<li>Completion: ") + CompletionFlag.toLower() + QString("</li>");
 	}
 	QString VerificationFlag;
-	if (DicomUtils::get_string_value(
-			ds,
-			mdcm::Tag(0x0040,0xa493),
-			VerificationFlag))
+	if (DicomUtils::get_string_value(ds, mdcm::Tag(0x0040,0xa493), VerificationFlag))
 	{
-		s += QString("<li>Verification: ") +
-			VerificationFlag.toLower() +
-			QString("</li>");
+		s += QString("<li>Verification: ") + VerificationFlag.toLower() + QString("</li>");
 	}
 	s += QString("</ul></span>\n");
 	return s;
@@ -1622,38 +1345,25 @@ QStringList SRUtils::read_referenced(
 	const mdcm::DataSet & nds,
 	QString & s)
 {
-	if (!nds.FindDataElement(mdcm::Tag(0x0008,0x1199)))
-		return QStringList();
-	const mdcm::DataElement & e8 =
-		nds.GetDataElement(mdcm::Tag(0x0008,0x1199));
-	mdcm::SmartPointer<mdcm::SequenceOfItems> sq8 =
-		e8.GetValueAsSQ();
+	if (!nds.FindDataElement(mdcm::Tag(0x0008,0x1199))) return QStringList();
+	const mdcm::DataElement & e8 = nds.GetDataElement(mdcm::Tag(0x0008,0x1199));
+	mdcm::SmartPointer<mdcm::SequenceOfItems> sq8 = e8.GetValueAsSQ();
 	if (!sq8) return QStringList();
 	QStringList l;
 	const unsigned int nitems8 = sq8->GetNumberOfItems();
-	for(unsigned int i8 = 0; i8 < nitems8; ++i8)
+	for (unsigned int i8 = 0; i8 < nitems8; ++i8)
 	{
 		const mdcm::Item & item8 = sq8->GetItem(i8+1);
-		const mdcm::DataSet & nds8 =
-			item8.GetNestedDataSet();
+		const mdcm::DataSet & nds8 = item8.GetNestedDataSet();
 		QString ReferencedSOPClassUID;
-		if (DicomUtils::get_string_value(
-				nds8,
-				mdcm::Tag(0x0008,0x1150),
-				ReferencedSOPClassUID))
+		if (DicomUtils::get_string_value(nds8, mdcm::Tag(0x0008,0x1150), ReferencedSOPClassUID))
 		{
 			mdcm::UIDs uid;
-			uid.SetFromUID(
-				ReferencedSOPClassUID
-					.toLatin1()
-					.constData());
-			QString uidname =
-				QString::fromLatin1(uid.GetName());
+			uid.SetFromUID(ReferencedSOPClassUID.toLatin1().constData());
+			QString uidname = QString::fromLatin1(uid.GetName());
 			if (!uidname.isEmpty())
 			{
-				s += QString("<span class='y'>") +
-					uidname +
-					QString("</span><br />\n");
+				s += QString("<span class='y'>") + uidname + QString("</span><br />\n");
 			}
 			else
 			{
@@ -1663,10 +1373,7 @@ QStringList SRUtils::read_referenced(
 			}
 		}
 		QString ReferencedSOPInstanceUID;
-		if (DicomUtils::get_string_value(
-				nds8,
-				mdcm::Tag(0x0008,0x1155),
-				ReferencedSOPInstanceUID))
+		if (DicomUtils::get_string_value(nds8, mdcm::Tag(0x0008,0x1155), ReferencedSOPInstanceUID))
 		{
 			l.push_back(ReferencedSOPInstanceUID);
 			s += QString("<span class='y'>") +
@@ -1674,21 +1381,14 @@ QStringList SRUtils::read_referenced(
 				QString("</span><br />\n");
 		}
 		std::vector<int> refframes;
-		if (DicomUtils::get_is_values(
-				nds8,
-				mdcm::Tag(0x0008,0x1160),
-				refframes))
+		if (DicomUtils::get_is_values(nds8, mdcm::Tag(0x0008,0x1160), refframes))
 		{
 			QString ff;
 			for (size_t k = 0; k < refframes.size(); ++k)
 			{
-				ff.append(
-					QVariant(refframes.at(k)).toString() +
-					QString(" "));
+				ff.append(QVariant(refframes.at(k)).toString() + QString(" "));
 			}
-			s += QString("<span class='y'>") +
-				ff.trimmed() +
-				QString("</span><br />\n");
+			s += QString("<span class='y'>") + ff.trimmed() + QString("</span><br />\n");
 		}
 	}
 	return l;
@@ -1701,33 +1401,22 @@ QString SRUtils::get_concept_code_meaning(
 	QString CodeMeaning;
 	if (ds.FindDataElement(mdcm::Tag(0x0040,0xa043)))
 	{
-		const mdcm::DataElement & e4  =
-			ds.GetDataElement(mdcm::Tag(0x0040,0xa043));
-		mdcm::SmartPointer<mdcm::SequenceOfItems> sq4 =
-			e4.GetValueAsSQ();
+		const mdcm::DataElement & e4 = ds.GetDataElement(mdcm::Tag(0x0040,0xa043));
+		mdcm::SmartPointer<mdcm::SequenceOfItems> sq4 = e4.GetValueAsSQ();
 		if (sq4)
 		{
 			const unsigned int nitems4 = sq4->GetNumberOfItems();
-			for(unsigned int i4 = 0; i4 < nitems4; ++i4)
+			for (unsigned int i4 = 0; i4 < nitems4; ++i4)
 			{
 				const mdcm::Item & item4 = sq4->GetItem(i4 + 1);
-				const mdcm::DataSet & nds4 =
-					item4.GetNestedDataSet();
+				const mdcm::DataSet & nds4 = item4.GetNestedDataSet();
 				if (nds4.FindDataElement(mdcm::Tag(0x0008,0x0104)))
 				{
-					const mdcm::DataElement & e5 =
-						nds4.GetDataElement(mdcm::Tag(0x0008,0x0104));
-					if (
-						!e5.IsEmpty() &&
-						!e5.IsUndefinedLength() &&
-						e5.GetByteValue())
+					const mdcm::DataElement & e5 = nds4.GetDataElement(mdcm::Tag(0x0008,0x0104));
+					if (!e5.IsEmpty() && !e5.IsUndefinedLength() && e5.GetByteValue())
 					{
-						QByteArray ba5(
-							e5.GetByteValue()->GetPointer(),
-							e5.GetByteValue()->GetLength());
-						QString tmp5 =
-							CodecUtils::toUTF8(
-								&ba5, charset.toLatin1().constData());
+						QByteArray ba5(e5.GetByteValue()->GetPointer(), e5.GetByteValue()->GetLength());
+						QString tmp5 = CodecUtils::toUTF8(&ba5, charset.toLatin1().constData());
 						if (!CodeMeaning.isEmpty())
 						{
 							CodeMeaning += QString(" ");
@@ -1755,126 +1444,105 @@ QString SRUtils::read_sr_content_sq(
 	const QString & chapter,
 	bool title)
 {
-	if (!ds.FindDataElement(mdcm::Tag(0x0040,0xa730)))
-		return QString("");
-	const mdcm::DataElement & e  =
-		ds.GetDataElement(mdcm::Tag(0x0040,0xa730));
-	mdcm::SmartPointer<mdcm::SequenceOfItems> sq =
-		e.GetValueAsSQ();
-	if (!sq) return QString("");
 	QString s;
 	if (title) s += read_sr_title2(ds, charset);
-	QString tmp_chapter;
-	const SettingsWidget * settings =
-		static_cast<const SettingsWidget*>(wsettings);
-	const bool print_chapters = settings->get_sr_chapters();
-	const unsigned int nitems = sq->GetNumberOfItems();
-	for(unsigned int i = 0; i < nitems; ++i)
+	if (ds.FindDataElement(mdcm::Tag(0x0040,0xa730)))
 	{
-		const QString cs =
-			(!chapter.isEmpty())
-			? (chapter + QString(".") + QVariant(i + 1).toString())
-			: (QVariant(i+1).toString());
-		//
-#if 1
-		s += QString("<p id=\"") +
-			cs +
-			QString("\" style=\"margin-left: ") +
-			QVariant(indent).toString() +
-			QString("px\">");
+		const mdcm::DataElement & e = ds.GetDataElement(mdcm::Tag(0x0040,0xa730));
+		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
+		if (sq)
+		{
+			QString tmp_chapter;
+			const SettingsWidget * settings = static_cast<const SettingsWidget*>(wsettings);
+			const bool print_chapters = settings->get_sr_chapters();
+			const unsigned int nitems = sq->GetNumberOfItems();
+			for (unsigned int i = 0; i < nitems; ++i)
+			{
+				const QString cs = (!chapter.isEmpty())
+					? (chapter + QString(".") + QVariant(i + 1).toString())
+					: (QVariant(i + 1).toString());
+				//
+#if	1
+				s += QString("<p id=\"") +
+					cs +
+					QString("\" style=\"margin-left: ") +
+					QVariant(indent).toString() +
+					QString("px\">");
 #else
-		s += QString("<a id=\"") +
-			cs +
-			QString("\"></a>");
-		s += QString("<p style=\"margin-left: ") +
-			QVariant(indent).toString() +
-			QString("px\">");
+				s += QString("<a id=\"") +
+					cs +
+					QString("\"></a>");
+				s += QString("<p style=\"margin-left: ") +
+					QVariant(indent).toString() +
+					QString("px\">");
 #endif
-		//
-		if (print_chapters)
-		{
-			s += QString("<span class='yy'>") +
-				cs + QString("</span><br />\n");
-		}
-		QString ValueType;
-		QString RelationshipType;
-		QString ContinuityOfContent;
-		QString CodeMeaning;
-		QString TemporalRangeType;
-		std::vector<unsigned int> ReferencedContentItemIdentifier;
-		//
-		const mdcm::Item & item = sq->GetItem(i + 1);
-		const mdcm::DataSet & nds =
-			item.GetNestedDataSet();
-		if (DicomUtils::get_string_value(
-				nds, mdcm::Tag(0x0040,0xa040), ValueType))
-		{
-			ValueType = ValueType.trimmed().toUpper();
-			if (info)
-			{
-				s += QString("<span class='y3'>Value Type: ") +
-					ValueType + QString("</span><br />\n");
-			}
-		}
-		if (DicomUtils::get_string_value(
-				nds, mdcm::Tag(0x0040,0xa010), RelationshipType))
-		{
-			RelationshipType = RelationshipType.trimmed().toUpper();
-			if (info)
-			{
-				s += QString("<span class='y3'>Relationship Type: ") +
-					RelationshipType + QString("</span><br />\n");
-			}
-		}
-		if (DicomUtils::get_string_value(
-				nds, mdcm::Tag(0x0040,0xa050), ContinuityOfContent))
-		{
-			// TODO
-			ContinuityOfContent = ContinuityOfContent.trimmed().toUpper();
-			if (info)
-			{
-				s += QString("<span class='y3'>Continuity Of Content: ") +
-					ContinuityOfContent + QString("</span><br />\n");
-			}
-		}
-		if (DicomUtils::get_ul_values(
-				nds,
-				mdcm::Tag(0x0040,0xdb73),
-				ReferencedContentItemIdentifier))
-		{
-			QString identifiers;
-			const size_t s___ =
-				ReferencedContentItemIdentifier.size();
-			for (unsigned int z = 0;
-				z < s___;
-				++z)
-			{
-				identifiers +=
-					QVariant(static_cast<int>
-						(ReferencedContentItemIdentifier.at(z)))
-							.toString();
-				if (z != (s___ - 1)) identifiers += QString(".");
-			}
-			s += QString(
-					"<span class='yy9'>"
-					"Referenced Content Item Identifier: "
-					"</span><span class='yy'><a href=\"#") +
-				identifiers +
-				QString("\" >") +
-				identifiers +
-				QString("</a></span><br />\n");
-		}
-		if (nds.FindDataElement(mdcm::Tag(0x0040,0xa043)))
-		{
-			const QString CodeMeaning1 =
-				get_concept_code_meaning(nds, charset);
-			if (!CodeMeaning1.isEmpty())
-			{
-				s += QString("<span class='y9'>") +
-					CodeMeaning1 +
-					QString("</span><span class='t1'> </span>");
-			}
-		}
+				//
+				if (print_chapters)
+				{
+					s += QString("<span class='yy'>") + cs + QString("</span><br />\n");
+				}
+				QString ValueType;
+				QString RelationshipType;
+				QString ContinuityOfContent;
+				QString CodeMeaning;
+				QString TemporalRangeType;
+				std::vector<unsigned int> ReferencedContentItemIdentifier;
+				//
+				const mdcm::Item & item = sq->GetItem(i + 1);
+				const mdcm::DataSet & nds = item.GetNestedDataSet();
+				if (DicomUtils::get_string_value(nds, mdcm::Tag(0x0040,0xa040), ValueType))
+				{
+					ValueType = ValueType.trimmed().toUpper();
+					if (info)
+					{
+						s += QString("<span class='y3'>Value Type: ") + ValueType + QString("</span><br />\n");
+					}
+				}
+				if (DicomUtils::get_string_value(nds, mdcm::Tag(0x0040,0xa010), RelationshipType))
+				{
+					RelationshipType = RelationshipType.trimmed().toUpper();
+					if (info)
+					{
+						s += QString("<span class='y3'>Relationship Type: ") + RelationshipType + QString("</span><br />\n");
+					}
+				}
+				if (DicomUtils::get_string_value(nds, mdcm::Tag(0x0040,0xa050), ContinuityOfContent))
+				{
+					// TODO
+					ContinuityOfContent = ContinuityOfContent.trimmed().toUpper();
+					if (info)
+					{
+						s += QString("<span class='y3'>Continuity Of Content: ") +
+							ContinuityOfContent +
+							QString("</span><br />\n");
+					}
+				}
+				if (DicomUtils::get_ul_values(nds, mdcm::Tag(0x0040,0xdb73), ReferencedContentItemIdentifier))
+				{
+					QString identifiers;
+					const size_t s___ = ReferencedContentItemIdentifier.size();
+					for (unsigned int z = 0; z < s___; ++z)
+					{
+						identifiers += QVariant(static_cast<int>(ReferencedContentItemIdentifier.at(z))).toString();
+						if (z != (s___ - 1)) identifiers += QString(".");
+					}
+					s += QString(
+							"<span class='yy9'>"
+							"Referenced Content Item Identifier: "
+							"</span><span class='yy'><a href=\"#") +
+						identifiers +
+						QString("\" >") +
+						identifiers +
+						QString("</a></span><br />\n");
+				}
+				if (nds.FindDataElement(mdcm::Tag(0x0040,0xa043)))
+				{
+					const QString CodeMeaning1 = get_concept_code_meaning(nds, charset);
+					if (!CodeMeaning1.isEmpty())
+					{
+						s += QString("<span class='y9'>") + CodeMeaning1 + QString("</span><span class='t1'> </span>");
+					}
+				}
 
 
 //////////////////////////////////////////////////////////////////
@@ -1883,125 +1551,188 @@ QString SRUtils::read_sr_content_sq(
 // Value
 //
 //
-		if (ValueType == QString("CONTAINER"))
-		{
-			;;
-		}
-		else if (ValueType == QString("PNAME"))
-		{
-			read_PNAME(nds, charset, s);
-		}
-		else if (ValueType == QString("TEXT"))
-		{
-			read_TEXT(nds, charset, s);
-		}
-		else if (ValueType == QString("UIDREF"))
-		{
-			const QString uidref = read_UIDREF(nds, s);
-		}
-		else if (ValueType == QString("NUM"))
-		{
-			read_NUM(nds, charset, s);
-		}
-		else if (ValueType == QString("CODE"))
-		{
-			read_CODE(nds, charset, s);
-		}
-		else if (ValueType == QString("DATE"))
-		{
-			read_DATE(nds, s);
-		}
-		else if (ValueType == QString("DATETIME"))
-		{
-			read_DATETIME(nds, s);
-		}
-		else if (ValueType == QString("TIME"))
-		{
-			read_TIME(nds, s);
-		}
-		else if (ValueType == QString("SCOORD"))
-		{
-			const bool continue_ = read_SCOORD(
-				nds,
-				charset,
-				path,
-				s,
-				tmpfiles,
-				srimages,
-				textBrowser,
-				info,
-				wsettings,
-				pb);
-			if (continue_)
-			{
-				//
-				//
+				if (ValueType == QString("CONTAINER"))
+				{
+					;
+				}
+				else if (ValueType == QString("PNAME"))
+				{
+					read_PNAME(nds, charset, s);
+				}
+				else if (ValueType == QString("TEXT"))
+				{
+					read_TEXT(nds, charset, s);
+				}
+				else if (ValueType == QString("UIDREF"))
+				{
+					const QString uidref = read_UIDREF(nds, s);
+				}
+				else if (ValueType == QString("NUM"))
+				{
+					read_NUM(nds, charset, s);
+				}
+				else if (ValueType == QString("CODE"))
+				{
+					read_CODE(nds, charset, s);
+				}
+				else if (ValueType == QString("DATE"))
+				{
+					read_DATE(nds, s);
+				}
+				else if (ValueType == QString("DATETIME"))
+				{
+					read_DATETIME(nds, s);
+				}
+				else if (ValueType == QString("TIME"))
+				{
+					read_TIME(nds, s);
+				}
+				else if (ValueType == QString("SCOORD"))
+				{
+					const bool continue_ = read_SCOORD(
+						nds,
+						charset,
+						path,
+						s,
+						tmpfiles,
+						srimages,
+						textBrowser,
+						info,
+						wsettings,
+						pb);
+					if (continue_)
+					{
+						//
+						//
+						if (s.endsWith(QString("<br />\n"))) s.chop(7);
+						s += QString("</p>\n");
+						//
+						//
+						continue;
+					}
+				}
+				else if (ValueType == QString("IMAGE"))
+				{
+					std::vector<SRGraphic> tmp001;
+					read_IMAGE(
+						nds,
+						charset,
+						path,
+						s,
+						tmpfiles,
+						srimages,
+						textBrowser,
+						tmp001,
+						info,
+						wsettings,
+						pb);
+				}
+				else if (ValueType == QString("COMPOSITE"))
+				{
+					// TODO
+					s += QString("<br />\n<span class='red2'>COMPOSITE</span><br />\n");
+					const QStringList & l = read_referenced(nds, s);
+					(void)l;
+				}
+				else if (ValueType == QString("WAVEFORM"))
+				{
+					// TODO
+					s += QString("<br />\n<span class='red2'>WAVEFORM</span><br />\n");
+					const QStringList & l = read_referenced(nds, s);
+					(void)l;
+				}
+				else if (ValueType == QString("SCOORD3D"))
+				{
+					// TODO
+					s += QString("<br />\n<span class='red2'>SCOORD3D</span><br />\n");
+					read_SCOORD3D(nds, s);
+				}
+				else if (ValueType == QString("TCOORD"))
+				{
+					// TODO
+					s += QString("<br />\n<span class='red2'>TCOORD</span><br />\n");
+					read_TCOORD(nds, s, info);
+				}
+				else
+				{
+					if (!ValueType.isEmpty())
+					{
+						s += QString("<br />\n<span class='red2'>Value ") + ValueType + QString("</span><br />\n");
+					}
+				}
 				if (s.endsWith(QString("<br />\n"))) s.chop(7);
 				s += QString("</p>\n");
-				//
-				//
-				continue;
-			}
-		}
-		else if (ValueType == QString("IMAGE"))
+//
+//
+//
+//
+//
+//////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////
+//
+// Current Requested Procedure Evidence Sequence for
+// Key Object Selection
+//
+//
+	if (indent == 0) // no recursion
+	{
+		bool is_key_object_selection{};
+		if (ds.FindDataElement(mdcm::Tag(0x0040,0xa375)))
 		{
-			std::vector<SRGraphic> tmp001;
-			read_IMAGE(
-				nds,
-				charset,
-				path,
-				s,
-				tmpfiles,
-				srimages,
-				textBrowser,
-				tmp001,
-				info,
-				wsettings,
-				pb);
-		}
-		else if (ValueType == QString("COMPOSITE"))
-		{
-			// TODO
-			s += QString(
-					"<br />\n<span class='red2'>COMPOSITE"
-					"</span><br />\n");
-			const QStringList & l = read_referenced(nds, s);
-			(void)l;
-		}
-		else if (ValueType == QString("WAVEFORM"))
-		{
-			// TODO
-			s += QString(
-					"<br />\n<span class='red2'>WAVEFORM"
-					"</span><br />\n");
-			const QStringList & l = read_referenced(nds, s);
-			(void)l;
-		}
-		else if (ValueType == QString("SCOORD3D"))
-		{
-			// TODO
-			s += QString(
-				"<br />\n<span class='red2'>SCOORD3D"
-				"</span><br />\n");
-			read_SCOORD3D(nds, s);
-		}
-		else if (ValueType == QString("TCOORD"))
-		{
-			// TODO
-			s += QString("<br />\n<span class='red2'>TCOORD</span><br />\n");
-			read_TCOORD(nds, s, info);
-		}
-		else
-		{
-			if (!ValueType.isEmpty())
+			QString sop;
+			const bool sop_ok = DicomUtils::get_string_value(ds, mdcm::Tag(0x0008,0x0016), sop);
+			if (sop_ok)
 			{
-				s += QString("<br />\n<span class='red2'>Value ") +
-					ValueType +
-					QString("</span><br />\n");
+				if (sop.trimmed().remove(QChar('\0')) == QString("1.2.840.10008.5.1.4.1.1.88.59"))
+				{
+					is_key_object_selection = true;
+				}
 			}
 		}
-		if (s.endsWith(QString("<br />\n"))) s.chop(7);
-		s += QString("</p>\n");
+		if (is_key_object_selection)
+		{
+			s += QString("<br /><span class='t2'>Current Requested Procedure Evidence Sequence</span><br />");
+			const mdcm::DataElement & e = ds.GetDataElement(mdcm::Tag(0x0040,0xa375));
+			mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
+			if (sq)
+			{
+				const unsigned int nitems = sq->GetNumberOfItems();
+				for (unsigned int i = 0; i < nitems; ++i)
+				{
+					const mdcm::Item & item = sq->GetItem(i + 1);
+					const mdcm::DataSet & nds = item.GetNestedDataSet();
+					if (nds.FindDataElement(mdcm::Tag(0x0008,0x1115)))
+					{
+						const mdcm::DataElement & e1 = nds.GetDataElement(mdcm::Tag(0x0008,0x1115));
+						mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 = e1.GetValueAsSQ();
+						if (sq1)
+						{
+							const unsigned int nitems1 = sq1->GetNumberOfItems();
+							for (unsigned int i1 = 0; i1 < nitems1; ++i1)
+							{
+								const mdcm::Item & item1 = sq1->GetItem(i1 + 1);
+								const mdcm::DataSet & nds1 = item1.GetNestedDataSet();
+								std::vector<SRGraphic> dummy;
+								read_IMAGE(
+									nds1,
+									charset,
+									path,
+									s,
+									tmpfiles,
+									srimages,
+									textBrowser,
+									dummy,
+									info,
+									wsettings,
+									pb);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 //
 //
 //
@@ -2015,29 +1746,32 @@ QString SRUtils::read_sr_content_sq(
 // Recursion
 //
 //
-		if (nds.FindDataElement(mdcm::Tag(0x0040,0xa730)))
-		{
-			const int x = indent + 16;
-			s += read_sr_content_sq(
-				nds,
-				charset,
-				path,
-				wsettings,
-				textBrowser,
-				pb,
-				tmpfiles,
-				srimages,
-				x,
-				info,
-				cs);
-		}
+				if (nds.FindDataElement(mdcm::Tag(0x0040,0xa730)))
+				{
+					const int x = indent + 16;
+					s += read_sr_content_sq(
+						nds,
+						charset,
+						path,
+						wsettings,
+						textBrowser,
+						pb,
+						tmpfiles,
+						srimages,
+						x,
+						info,
+						cs);
+				}
 //
 //
 //
 //
 //
 //////////////////////////////////////////////////////////////////
+			}
+		}
 	}
+
 	return s;
 }
 
