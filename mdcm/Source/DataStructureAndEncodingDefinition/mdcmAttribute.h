@@ -614,13 +614,13 @@ public:
   SetValue(unsigned int idx, ArrayType v)
   {
     assert(idx < GetNumberOfValues());
-    Internal[idx] = v;
+    Internal[idx] = std::move(v);
   }
 
   void
   SetValue(ArrayType v)
   {
-    SetValue(0, v);
+    SetValue(0, std::move(v));
   }
 
   void
