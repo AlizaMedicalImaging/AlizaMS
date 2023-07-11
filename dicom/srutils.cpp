@@ -1671,6 +1671,38 @@ QString SRUtils::read_sr_content_sq(
 
 //////////////////////////////////////////////////////////////////
 //
+//
+// Recursion
+//
+//
+				if (nds.FindDataElement(mdcm::Tag(0x0040,0xa730)))
+				{
+					const int x = indent + 16;
+					s += read_sr_content_sq(
+						nds,
+						charset,
+						path,
+						wsettings,
+						textBrowser,
+						pb,
+						tmpfiles,
+						srimages,
+						x,
+						info,
+						cs);
+				}
+//
+//
+//
+//
+//
+//////////////////////////////////////////////////////////////////
+			}
+		}
+	}
+
+//////////////////////////////////////////////////////////////////
+//
 // Current Requested Procedure Evidence Sequence for
 // Key Object Selection
 //
@@ -1739,38 +1771,6 @@ QString SRUtils::read_sr_content_sq(
 //
 //
 //////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////
-//
-//
-// Recursion
-//
-//
-				if (nds.FindDataElement(mdcm::Tag(0x0040,0xa730)))
-				{
-					const int x = indent + 16;
-					s += read_sr_content_sq(
-						nds,
-						charset,
-						path,
-						wsettings,
-						textBrowser,
-						pb,
-						tmpfiles,
-						srimages,
-						x,
-						info,
-						cs);
-				}
-//
-//
-//
-//
-//
-//////////////////////////////////////////////////////////////////
-			}
-		}
-	}
 
 	return s;
 }
