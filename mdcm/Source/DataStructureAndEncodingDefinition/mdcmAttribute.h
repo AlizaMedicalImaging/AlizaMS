@@ -33,6 +33,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <utility>
 
 namespace mdcm
 {
