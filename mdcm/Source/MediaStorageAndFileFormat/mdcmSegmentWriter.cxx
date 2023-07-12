@@ -337,17 +337,12 @@ SegmentWriter::PrepareWrite()
     }
     else
     {
-      // Segment Algorithm Name (Type 1)
-      Attribute<0x0062, 0x0009> segmentAlgorithmNameAt;
+      // Segment Algorithm Name (Type 1C)
+      Attribute<0x0062, 0x0009, VR::LO, VM::VM1> segmentAlgorithmNameAt = { "Unknown " };
       const char * segmentAlgorithmName = segment->GetSegmentAlgorithmName();
       if (segmentAlgorithmName && *segmentAlgorithmName)
       {
         segmentAlgorithmNameAt.SetValue(segmentAlgorithmName);
-      }
-      else
-      {
-        mdcmWarningMacro("Segment algorithm name is null or empty, set to MANUAL");
-        segmentAlgorithmNameAt.SetValue("MANUAL");
       }
       segmentDS.Replace(segmentAlgorithmNameAt.GetAsDataElement());
     }
