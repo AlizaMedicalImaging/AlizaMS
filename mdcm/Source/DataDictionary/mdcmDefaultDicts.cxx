@@ -4036,7 +4036,7 @@ const DICT_ENTRY DICOMV3DataDict [] =
   { 0x0400,0x0564,VR::LO,VM::VM1,"Source of Previous Values","SourceOfPreviousValues",false },
   { 0x0400,0x0565,VR::CS,VM::VM1,"Reason for the Attribute Modification","ReasonForTheAttributeModification",false },
   { 0x0400,0x0600,VR::CS,VM::VM1,"Instance Origin Status","InstanceOriginStatus",false },
-  { 0x1010,0x0000,VR::US,VM::VM1_n,"Zonal Map","ZonalMap",true },
+  //{ 0x1010,0x0000,VR::US,VM::VM1_n,"Zonal Map","ZonalMap",true },
   { 0x1010,0x0001,VR::US,VM::VM1_n,"Zonal Map","ZonalMap",true },
   { 0x1010,0x0002,VR::US,VM::VM1_n,"Zonal Map","ZonalMap",true },
   { 0x1010,0x0003,VR::US,VM::VM1_n,"Zonal Map","ZonalMap",true },
