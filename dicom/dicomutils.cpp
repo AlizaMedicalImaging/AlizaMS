@@ -971,12 +971,72 @@ QString read_CommonCTMRImageDescriptionMacro(const mdcm::DataSet & ds)
 	return s;
 }
 
-// TODO check again
 QString read_PhotoacousticImage(const mdcm::DataSet & ds)
 {
-// TODO image type? (was PA index or whatever)
+// TODO check again
 
 	QString s;
+
+	//////////////////////////////////////////////
+	//
+	// Photoacoustic Image Data Type
+	//
+	//
+	{
+		const mdcm::Tag tSharedFunctionalGroupsSequence(0x5200,0x9229);
+		const mdcm::Tag tImageDataTypeSequence(0x0018,0x9807);
+		const mdcm::Tag tImageDataTypeCodeSequence(0x0018,0x9836);
+		const mdcm::Tag tCodeMeaning(0x0008,0x0104);
+		QString s0;
+		if (ds.FindDataElement(tSharedFunctionalGroupsSequence))
+		{
+			const mdcm::DataElement & e = ds.GetDataElement(tSharedFunctionalGroupsSequence);
+			mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
+			if (sq && sq->GetNumberOfItems() == 1)
+			{
+				const mdcm::Item & item = sq->GetItem(1);
+				const mdcm::DataSet& nds = item.GetNestedDataSet();
+				if (nds.FindDataElement(tImageDataTypeSequence))
+				{
+					const mdcm::DataElement & e1 = nds.GetDataElement(tImageDataTypeSequence);
+					mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 = e1.GetValueAsSQ();
+					if (sq1 && sq1->GetNumberOfItems() == 1)
+					{
+						const mdcm::Item & item1 = sq1->GetItem(1);
+						const mdcm::DataSet& nds1 = item1.GetNestedDataSet();
+						if (nds1.FindDataElement(tImageDataTypeCodeSequence))
+						{
+							const mdcm::DataElement & e2 = nds1.GetDataElement(tImageDataTypeCodeSequence);
+							mdcm::SmartPointer<mdcm::SequenceOfItems> sq2 = e2.GetValueAsSQ();
+							if (sq2 && sq2->GetNumberOfItems() == 1)
+							{
+								const mdcm::Item & item2 = sq2->GetItem(1);
+								const mdcm::DataSet& nds2 = item2.GetNestedDataSet();
+								QString CodeMeaning;
+								if (DicomUtils::get_string_value(nds2, tCodeMeaning, CodeMeaning))
+								{
+									s0 += QString(
+											"<span class='y9'>Image Data Type</span><br />"
+											"<span class='y8'>&#160;&#160;") +
+										CodeMeaning +
+										QString("</span><br />");
+								}
+							}
+						}
+					}
+				}
+			}
+			if (!s0.isEmpty())
+			{
+				s += QString("<span class='y7'Photoacoustic Image Data Type</span><br />") + s0;
+			}
+		}
+	}
+	//
+	//
+	//
+	//
+	//////////////////////////////////////////////
 
 	//////////////////////////////////////////////
 	//
