@@ -6101,11 +6101,9 @@ void DicomUtils::enhanced_get_indices(
 		// Photoacoustic
 		// TODO check again
 		//
-		// Photoacoustic seems to skip group pointer sometimes,
-		//  at least according to examples in sup229 (final)?
+		// Photoacoustic seems to skip group pointer sometimes.
 		//
-		// Seems to be similar with the above one,
-		// but with index instead of group and group skipped?
+		// Seems to be similar with the above one.
 		else if (sq1.at(i).group_pointer == mdcm::Tag(0xffff,0xffff) &&
 			sq1.at(i).index_pointer == mdcm::Tag(0x0018,0x9807))
 		{
@@ -6129,7 +6127,7 @@ void DicomUtils::enhanced_get_indices(
 			pa_excwave_idx = x;
 		}
 		else if (sq1.at(i).group_pointer == mdcm::Tag(0xffff,0xffff) &&
-			sq1.at(i).index_pointer == mdcm::Tag(0x0018,0x993d)) // Just guessing
+			sq1.at(i).index_pointer == mdcm::Tag(0x0018,0x993d)) // Trying to guess
 		{
 			rec_alg_idx = x;
 		}
