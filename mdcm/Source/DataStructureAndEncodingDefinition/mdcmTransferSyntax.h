@@ -49,7 +49,17 @@ public:
     JPEGExtendedProcess3_5,
     JPEGSpectralSelectionProcess6_8,
     JPEGFullProgressionProcess10_12,
+    JPEGFullProgressionProcess11_13,
     JPEGLosslessProcess14,
+    JPEGLosslessProcess15,
+    JPEGExtendedProcess16_18,
+    JPEGExtendedProcess17_19,
+    JPEGSpectralSelectionProcess20_22,
+    JPEGSpectralSelectionProcess21_23,
+    JPEGFullProgressionProcess24_26,
+    JPEGFullProgressionProcess25_27,
+    JPEGLosslessProcess28,
+    JPEGLosslessProcess29,
     JPEGLosslessProcess14_1,
     JPEGLSLossless,
     JPEGLSNearLossless,
@@ -63,10 +73,26 @@ public:
     WeirdPapryus,
     CT_private_ELE,
     JPIPReferenced,
+    JPIPReferencedDeflate,
     MPEG2MainProfileHighLevel,
     MPEG4AVCH264HighProfileLevel4_1,
     MPEG4AVCH264BDcompatibleHighProfileLevel4_1,
     EncapsulatedUncompressedExplicitVRLittleEndian,
+    SMPTEST2110_20UncompressedProgressiveActiveVideo,
+    SMPTEST2110_20UncompressedInterlacedActiveVideo,
+    SMPTEST2110_30PCMDigitalAudio,
+    MPEG4AVCH264HighProfileLevel42For2DVideo,
+    MPEG4AVCH264HighProfileLevel42For3DVideo,
+    MPEG4AVCH264StereoHighProfileLevel42,
+    HEVCH265MainProfileLevel51,
+    HEVCH265Main10ProfileLevel51,
+    FragmentableMPEG2MainProfileMainLevel,
+    FragmentableMPEG2MainProfileHighLevel,
+    FragmentableMPEG4AVCH264HighProfileLevel4_1,
+    FragmentableMPEG4AVCH264BDcompatibleHighProfileLevel4_1,
+    FragmentableMPEG4AVCH264HighProfileLevel4_2For2DVideo,
+    FragmentableMPEG4AVCH264HighProfileLevel4_2For3DVideo,
+    FragmentableMPEG4AVCH264StereoHighProfileevel4_2,
     TS_END
   } TSType;
   static const char * GetTSString(TSType);
@@ -74,7 +100,7 @@ public:
   GetTSType(const char *);
   NegociatedType
   GetNegociatedType() const;
-  // Caution with the GE private syntax: the dataset is written
+  // Caution with the GE private syntax, the dataset is written
   // little-endian, but the pixel data is big-endian.
   SwapCode
   GetSwapCode() const;
