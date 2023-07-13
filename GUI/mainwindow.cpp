@@ -667,6 +667,7 @@ void MainWindow::close_app()
 {
 	if (init_done)
 	{
+		tabWidget->disconnect(SIGNAL(currentChanged(int)));
 		aliza->close_();
 		delete aliza;
 		aliza = nullptr;
