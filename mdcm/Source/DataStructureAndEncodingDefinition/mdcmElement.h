@@ -381,16 +381,17 @@ static void ds16print(char * buf, double f)
 {
   char * line = new char[400]; // overallocated
   memset(line, 0, 400);
-  int l = snprintf(line, 400, "%.17g", f);
+  int l = snprintf(line, 399, "%.17g", f);
   if (l > 16)
   {
     const int strl = static_cast<int>(strlen(line));
-    int prec = strl > 1 ? strl - 1 : 1; // not required, to be sure prec is positive
-    l = snprintf(line, 400, "%.*g", prec, f);
+    // not required, to be sure prec is positive
+    int prec = strl > 1 ? strl - 1 : 1;
+    l = snprintf(line, 399, "%.*g", prec, f);
     while (l > 16)
     {
       --prec;
-      l = snprintf(line, 400,"%.*g", prec, f);
+      l = snprintf(line, 399,"%.*g", prec, f);
     }
   }
   strcpy(buf, line);
