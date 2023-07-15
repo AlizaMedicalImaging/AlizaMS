@@ -1583,7 +1583,7 @@ void delta_decode_rgb(
 	const size_t plane_size = h * w;
 	const size_t outputlen = 3 * plane_size;
 	new_stream.resize(outputlen);
-	if(data_size == outputlen) return;
+	if (data_size == outputlen) return;
 	const unsigned char * src  = data_in;
 	unsigned char * dest = new_stream.data();
 	union
@@ -1716,7 +1716,7 @@ void delta_decode(
 		{
 			int repeat = static_cast<unsigned char>(inbuffer[i + 1]) + 1;
 			const char value = inbuffer[i + 2];
-			while(repeat > 0)
+			while (repeat > 0)
 			{
 				temp.push_back(value);
 				--repeat;
@@ -2444,7 +2444,7 @@ bool DicomUtils::get_ds_values(
 	const mdcm::Tag & t,
 	std::vector<double> & result)
 {
-	if(!ds.FindDataElement(t)) return false;
+	if (!ds.FindDataElement(t)) return false;
 	const mdcm::DataElement & e =
 		ds.GetDataElement(t);
 	if (e.IsEmpty()) return false;
@@ -2487,7 +2487,7 @@ bool DicomUtils::priv_get_ds_values(
 	const mdcm::PrivateTag & t,
 	std::vector<double> & result)
 {
-	if(!ds.FindDataElement(t)) return false;
+	if (!ds.FindDataElement(t)) return false;
 	const mdcm::DataElement & e =
 		ds.GetDataElement(t);
 	if (e.IsEmpty()) return false;
@@ -2561,7 +2561,7 @@ bool DicomUtils::get_is_values(
 	const mdcm::Tag & t,
 	std::vector<int> & result)
 {
-	if(!ds.FindDataElement(t)) return false;
+	if (!ds.FindDataElement(t)) return false;
 	const mdcm::DataElement & e =
 		ds.GetDataElement(t);
 	if (e.IsEmpty()) return false;
@@ -2599,7 +2599,7 @@ bool DicomUtils::get_at_value(
 	unsigned short * group,
 	unsigned short * element)
 {
-	if(!ds.FindDataElement(t)) return false;
+	if (!ds.FindDataElement(t)) return false;
 	const mdcm::DataElement & e =
 		ds.GetDataElement(t);
 	if (e.IsEmpty()) return false;
@@ -2631,7 +2631,7 @@ bool DicomUtils::get_string_value(
 	const mdcm::Tag & t,
 	QString & s)
 {
-	if(!ds.FindDataElement(t)) return false;
+	if (!ds.FindDataElement(t)) return false;
 	const mdcm::DataElement & e = ds.GetDataElement(t);
 	if (e.IsEmpty() || e.IsUndefinedLength())
 		return false;
@@ -2648,7 +2648,7 @@ bool DicomUtils::priv_get_string_value(
 	const mdcm::PrivateTag & t,
 	QString & s)
 {
-	if(!ds.FindDataElement(t)) return false;
+	if (!ds.FindDataElement(t)) return false;
 	const mdcm::DataElement & e = ds.GetDataElement(t);
 	if (e.IsEmpty() || e.IsUndefinedLength())
 		return false;
@@ -2766,7 +2766,7 @@ bool DicomUtils::has_supp_palette(const mdcm::DataSet & ds)
 
 bool DicomUtils::has_modality_lut_sq(const mdcm::DataSet & ds)
 {
-	if(ds.FindDataElement(mdcm::Tag(0x0028,0x3000)))
+	if (ds.FindDataElement(mdcm::Tag(0x0028,0x3000)))
 	{
 		const mdcm::DataElement& e =
 			ds.GetDataElement(mdcm::Tag(0x0028,0x3000));
@@ -3024,7 +3024,7 @@ void DicomUtils::load_contour(
 	if (!(ssqi && ssqi->GetNumberOfItems() > 0)) return;
 	// ROIContourSequence
 	const mdcm::Tag troicsq(0x3006,0x0039);
-	if(!ds.FindDataElement(troicsq)) return;
+	if (!ds.FindDataElement(troicsq)) return;
 	const mdcm::DataElement & roicsq =
 		ds.GetDataElement(troicsq);
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sqi =
@@ -4141,7 +4141,7 @@ bool DicomUtils::read_group_sq(
 	const mdcm::Tag tReferencedSegmentNumber(0x0062,0x000b);
 	if (!ds.FindDataElement(t)) return false;
 	QString charset;
-	if(ds.FindDataElement(tSpecificCharacterSet))
+	if (ds.FindDataElement(tSpecificCharacterSet))
 	{
 		const mdcm::DataElement & eSpecificCharacterSet =
 			ds.GetDataElement(tSpecificCharacterSet);
@@ -4776,7 +4776,7 @@ QString DicomUtils::read_anatomic_sq(const mdcm::DataSet & ds)
 	{
 		const mdcm::Tag tSpecificCharacterSet(0x0008,0x0005);
 		QString charset;
-		if(ds.FindDataElement(tSpecificCharacterSet))
+		if (ds.FindDataElement(tSpecificCharacterSet))
 		{
 			const mdcm::DataElement & eSpecificCharacterSet =
 				ds.GetDataElement(tSpecificCharacterSet);
@@ -4820,7 +4820,7 @@ QString DicomUtils::read_anatomic_sq(const mdcm::DataSet & ds)
 QString DicomUtils::read_series_laterality(const mdcm::DataSet & ds)
 {
 	const mdcm::Tag tlaterality(0x0020,0x0060);
-	if(ds.FindDataElement(tlaterality))
+	if (ds.FindDataElement(tlaterality))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tlaterality);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
@@ -4837,7 +4837,7 @@ QString DicomUtils::read_series_laterality(const mdcm::DataSet & ds)
 QString DicomUtils::read_image_laterality(const mdcm::DataSet & ds)
 {
 	const mdcm::Tag tilaterality(0x0020,0x0062);
-	if(ds.FindDataElement(tilaterality))
+	if (ds.FindDataElement(tilaterality))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tilaterality);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
@@ -4854,7 +4854,7 @@ QString DicomUtils::read_image_laterality(const mdcm::DataSet & ds)
 QString DicomUtils::read_body_part(const mdcm::DataSet & ds)
 {
 	const mdcm::Tag tbodypart(0x0018,0x0015);
-	if(ds.FindDataElement(tbodypart))
+	if (ds.FindDataElement(tbodypart))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tbodypart);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
@@ -4879,7 +4879,7 @@ void DicomUtils::read_acquisition_time(
 	bool acqdatetime_ok = false;
 	{
 		QString acquisitiondatetime;
-		if(get_string_value(
+		if (get_string_value(
 				ds,
 				tacquisitiondatetime,
 				acquisitiondatetime))
@@ -4897,7 +4897,7 @@ void DicomUtils::read_acquisition_time(
 	{
 		QString acquisitiondate_tmp;
 		QString acquisitiontime_tmp;
-		if(
+		if (
 			get_string_value(
 				ds,
 				tacquisitiondate,
@@ -4988,22 +4988,22 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 		ivariant->iod = QString::fromLatin1(uid.GetName());
 	}
 	QString studydate;
-	if(get_string_value(ds, tstudydate, studydate))
+	if (get_string_value(ds, tstudydate, studydate))
 		ivariant->study_date = studydate;
 	QString seriesdate;
-	if(get_string_value(ds, tseriesdate, seriesdate))
+	if (get_string_value(ds, tseriesdate, seriesdate))
 		ivariant->series_date = seriesdate;
 	QString studytime;
-	if(get_string_value(ds, tstudytime, studytime))
+	if (get_string_value(ds, tstudytime, studytime))
 		ivariant->study_time = studytime;
 	QString seriestime;
-	if(get_string_value(ds, tseriestime, seriestime))
+	if (get_string_value(ds, tseriestime, seriestime))
 		ivariant->series_time = seriestime;
 	//
 	QString modality;
 	if (get_string_value(ds, tmodality, modality))
 		ivariant->modality = modality.remove(QChar('\0'));
-	if(ds.FindDataElement(tmanufacturer))
+	if (ds.FindDataElement(tmanufacturer))
 	{
 		QString manufacturer_s;
 		QString model_s;
@@ -5019,7 +5019,7 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 			const QString tmp0 = CodecUtils::toUTF8(
 				&ba, charset.toLatin1().constData());
 			manufacturer_s = tmp0.trimmed().remove(QChar('\0'));
-			if(ds.FindDataElement(tmodel))
+			if (ds.FindDataElement(tmodel))
 			{
 				const mdcm::DataElement & e1 =
 					ds.GetDataElement(tmodel);
@@ -5046,7 +5046,7 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 		if (!manufacturer_s.isEmpty())
 			ivariant->hardware = manufacturer_s;
 	}
-	if(ds.FindDataElement(tinstituion))
+	if (ds.FindDataElement(tinstituion))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tinstituion);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
@@ -5056,7 +5056,7 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 			ivariant->institution = tmp0.trimmed().remove(QChar('\0'));
 		}
 	}
-	if(ds.FindDataElement(tstudydesc))
+	if (ds.FindDataElement(tstudydesc))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tstudydesc);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
@@ -5066,7 +5066,7 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 			ivariant->study_description = tmp0.trimmed().remove(QChar('\0'));
 		}
 	}
-	if(ds.FindDataElement(tseriesdesc))
+	if (ds.FindDataElement(tseriesdesc))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tseriesdesc);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
@@ -5076,7 +5076,7 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 			ivariant->series_description = tmp0.trimmed().remove(QChar('\0'));
 		}
 	}
-	if(ds.FindDataElement(tpatientname))
+	if (ds.FindDataElement(tpatientname))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tpatientname);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
@@ -5086,7 +5086,7 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 			if (!tmp0.isEmpty()) ivariant->pat_name = tmp0.trimmed().remove(QChar('\0'));
 		}
 	}
-	if(ds.FindDataElement(tpatientid))
+	if (ds.FindDataElement(tpatientid))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tpatientid);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
@@ -5154,7 +5154,7 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 	if (get_string_value(ds, tinterpretation, interpretation))
 		ivariant->interpretation =
 			interpretation.remove(QChar('\0'));
-	if(ds.FindDataElement(tprivcomment))
+	if (ds.FindDataElement(tprivcomment))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tprivcomment);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
@@ -5554,13 +5554,13 @@ bool DicomUtils::build_gems_dictionary(QMap<QString, int> & m, const mdcm::DataS
 	const mdcm::PrivateTag t1(0x7fe1,0x70,"GEMS_Ultrasound_MovieGroup_001");
 	const mdcm::PrivateTag t2(0x7fe1,0x71,"GEMS_Ultrasound_MovieGroup_001");
 	const mdcm::PrivateTag t3(0x7fe1,0x72,"GEMS_Ultrasound_MovieGroup_001");
-	if(!ds.FindDataElement(t0)) return false;
+	if (!ds.FindDataElement(t0)) return false;
 	const mdcm::DataElement& s0 = ds.GetDataElement(t0);
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sq0 = s0.GetValueAsSQ();
 	if (!(sq0 && sq0->GetNumberOfItems() == 1)) return false; // 1 item ?
 	mdcm::Item & i0 = sq0->GetItem(1);
 	mdcm::DataSet & subds0 = i0.GetNestedDataSet();
-	if(!subds0.FindDataElement(t1)) return false;
+	if (!subds0.FindDataElement(t1)) return false;
 	const mdcm::DataElement& s1 = subds0.GetDataElement(t1);
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 = s1.GetValueAsSQ();
 	if (!(sq1 && sq1->GetNumberOfItems() > 0)) return false;
@@ -5569,7 +5569,7 @@ bool DicomUtils::build_gems_dictionary(QMap<QString, int> & m, const mdcm::DataS
 	{
 		mdcm::Item & i = sq1->GetItem(x + 1);
 		mdcm::DataSet & s = i.GetNestedDataSet();
-		if(!s.FindDataElement(t2)||!s.FindDataElement(t3)) continue;
+		if (!s.FindDataElement(t2)||!s.FindDataElement(t3)) continue;
 		const mdcm::DataElement& index = s.GetDataElement(t2);
 		if (index.IsEmpty()) continue;
 		//
@@ -5633,7 +5633,7 @@ void DicomUtils::read_gems_params(
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 	if (!(sq && sq->GetNumberOfItems() > 0)) return;
 	const size_t n = sq->GetNumberOfItems();
-	for( size_t i = 1; i <= n; ++i )
+	for (size_t i = 1; i <= n; ++i)
 	{
 		mdcm::Item & item = sq->GetItem(i);
 		mdcm::DataSet & subds = item.GetNestedDataSet();
@@ -5678,7 +5678,7 @@ void DicomUtils::read_gems_params(
 			delete [] buffer0;
 			if (!result0.empty()) idx0 = result0[0];
 		}
-		if (idx0==-1) continue;
+		if (idx0 == -1) continue;
 		if (subds.FindDataElement(t_int))
 		{
 			const mdcm::DataElement & v = subds.GetDataElement(t_int);
@@ -5692,7 +5692,7 @@ void DicomUtils::read_gems_params(
 			p.values = l;
 			m[idx0] = p;
 		}
-		else if(subds.FindDataElement(t_float1))
+		else if (subds.FindDataElement(t_float1))
 		{
 			const mdcm::DataElement & v = subds.GetDataElement(t_float1);
 			mdcm::Element<mdcm::VR::FL, mdcm::VM::VM1> e;
@@ -5705,7 +5705,7 @@ void DicomUtils::read_gems_params(
 			p.values = l;
 			m[idx0] = p;
 		}
-		else if(subds.FindDataElement(t_float))
+		else if (subds.FindDataElement(t_float))
 		{
 			const mdcm::DataElement & v = subds.GetDataElement(t_float);
 			mdcm::Element<mdcm::VR::FD, mdcm::VM::VM1> e;
@@ -5731,7 +5731,7 @@ void DicomUtils::read_gems_params(
 			p.values = l;
 			m[idx0] = p;
 		}
-		else if(subds.FindDataElement(t_sl))
+		else if (subds.FindDataElement(t_sl))
 		{
 			const mdcm::DataElement & v = subds.GetDataElement(t_sl);
 			mdcm::Element<mdcm::VR::SL, mdcm::VM::VM1> e;
@@ -5744,7 +5744,7 @@ void DicomUtils::read_gems_params(
 			p.values = l;
 			m[idx0] = p;
 		}
-		else if(subds.FindDataElement(t_ob))
+		else if (subds.FindDataElement(t_ob))
 		{
 			const mdcm::DataElement & e = subds.GetDataElement(t_ob);
 			const mdcm::ByteValue * v = e.GetByteValue();
@@ -5765,7 +5765,7 @@ void DicomUtils::read_gems_params(
 				m[idx0] = p;
 			}
 		}
-		else if(subds.FindDataElement(t_text))
+		else if (subds.FindDataElement(t_text))
 		{
 			const mdcm::DataElement & e = subds.GetDataElement(t_text);
 			const mdcm::ByteValue * v = e.GetByteValue();
@@ -9067,7 +9067,7 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 		if (isrle)
 		{
 			// Create or replace pixel data element 0x7fe0, 0x0010
-			if(!ds.FindDataElement(tpixeldata))
+			if (!ds.FindDataElement(tpixeldata))
 			{
 				pixeldata = mdcm::DataElement(tpixeldata, 0, mdcm::VR::OW);
 			}
@@ -9084,7 +9084,7 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 			const size_t w = at1.GetValue();
 			const size_t h = at2.GetValue();
 			const size_t at1l =	w * h * sizeof(unsigned short);
-			if(bv2l == at1l)
+			if (bv2l == at1l)
 			{
 				std::cout << "Warning: Elscint data seems to be not compressed"
 					<< std::endl;
@@ -9103,7 +9103,7 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 		else if (isrgb)
 		{
 			// Create or replace pixel data element 0x7fe0, 0x0010
-			if(!ds.FindDataElement(tpixeldata))
+			if (!ds.FindDataElement(tpixeldata))
 			{
 				pixeldata = mdcm::DataElement(tpixeldata, 0, mdcm::VR::OW);
 			}
@@ -11853,7 +11853,7 @@ void DicomUtils::write_encapsulated(
 	if (!ok) return;
 	const mdcm::File & file = reader.GetFile();
 	const mdcm::DataSet & ds = file.GetDataSet();
-	if(!ds.FindDataElement(t)) return;
+	if (!ds.FindDataElement(t)) return;
 	const mdcm::DataElement & e = ds.GetDataElement(t);
 	if (e.IsEmpty()||e.IsUndefinedLength()) return;
 	const mdcm::ByteValue * bv = e.GetByteValue();
@@ -11926,11 +11926,11 @@ void DicomUtils::write_mpeg(
 	if (!ok) return;
 	const mdcm::File & file = reader.GetFile();
 	const mdcm::DataSet & ds = file.GetDataSet();
-	if(!ds.FindDataElement(t)) return;
+	if (!ds.FindDataElement(t)) return;
 	const mdcm::DataElement & e = ds.GetDataElement(t);
 	if (e.IsEmpty()) return;
 	const mdcm::SequenceOfFragments * sf = e.GetSequenceOfFragments();
-	if(!sf) return;
+	if (!sf) return;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
 	const std::wstring uncpath =
@@ -11955,20 +11955,20 @@ bool DicomUtils::is_dicom_file(const QString & f)
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
 	const std::wstring uncpath =
 		mdcm::System::ConvertToUtf16((QDir::toNativeSeparators(f)).toUtf8().constData());
-	fs.open(uncpath.c_str(), std::ios::in|std::ios::binary);
+	fs.open(uncpath.c_str(), std::ios::in | std::ios::binary);
 #else
-	fs.open((QDir::toNativeSeparators(f)).toLocal8Bit().constData(), std::ios::in|std::ios::binary);
+	fs.open((QDir::toNativeSeparators(f)).toLocal8Bit().constData(), std::ios::in | std::ios::binary);
 #endif
 #else
-	fs.open(f.toLocal8Bit().constData(), std::ios::in|std::ios::binary);
+	fs.open(f.toLocal8Bit().constData(), std::ios::in | std::ios::binary);
 #endif
 	for (long off = 128; off >= 0; off -= 128)
 	{
 		fs.seekg(off, std::ios_base::beg);
-		if(!fs.fail() && !fs.eof())
+		if (!fs.fail() && !fs.eof())
 		{
 			fs.read(b, 4);
-			if(!fs.fail())
+			if (!fs.fail())
 			{
 				if (b[0] == 'D' &&
 					b[1] == 'I' &&
@@ -11980,17 +11980,14 @@ bool DicomUtils::is_dicom_file(const QString & f)
 			}
 		}
 	}
-	if(!dicom)
+	if (!dicom)
 	{
 		unsigned short group_no;
 		fs.seekg(0, std::ios_base::beg);
 		if (!fs.fail() && !fs.eof())
 		{
-			fs.read(
-				reinterpret_cast<char *>(&group_no),
-				sizeof(unsigned short));
-			itk::ByteSwapper<unsigned short>::SwapFromSystemToLittleEndian(
-				&group_no);
+			fs.read(reinterpret_cast<char *>(&group_no), sizeof(unsigned short));
+			itk::ByteSwapper<unsigned short>::SwapFromSystemToLittleEndian(&group_no);
 			// 0x0003 and 0x0005 are illegal, but files exist
 			if (group_no == 0x0002 ||
 				group_no == 0x0003 ||
@@ -12011,7 +12008,7 @@ void DicomUtils::scan_dir_for_rtstruct_image(
 	if (p.isEmpty()) return;
 	scan_files_for_rtstruct_image(p, ref_files);
 	QDirIterator it(p, QDir::Dirs|QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-	while(it.hasNext())
+	while (it.hasNext())
 	{
 		scan_files_for_rtstruct_image(it.next(), ref_files);
 	}
@@ -12022,13 +12019,11 @@ void DicomUtils::scan_files_for_rtstruct_image(
 {
 	if (p.isEmpty()) return;
 	QDir dir(p);
-	QStringList flist =
-		dir.entryList(QDir::Files|QDir::Readable, QDir::Name);
+	QStringList flist = dir.entryList(QDir::Files | QDir::Readable, QDir::Name);
 	std::vector<std::string> filenames;
 	for (int x = 0; x < flist.size(); ++x)
 	{
-		const QString tmp0 =
-			dir.absolutePath() + QString("/") + flist.at(x);
+		const QString tmp0 = dir.absolutePath() + QString("/") + flist.at(x);
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
 		filenames.push_back(std::string((QDir::toNativeSeparators(tmp0)).toUtf8().constData()));
@@ -12370,7 +12365,7 @@ void DicomUtils::read_pr_ref(
 	mdcm::SmartPointer<mdcm::SequenceOfItems>
 		sqReferencedSeriesSequence =
 			eReferencedSeriesSequence.GetValueAsSQ();
-	if(!(sqReferencedSeriesSequence &&
+	if (!(sqReferencedSeriesSequence &&
 			sqReferencedSeriesSequence->GetNumberOfItems() > 0))
 		return;
 	for (unsigned int x = 0;
@@ -12392,7 +12387,7 @@ void DicomUtils::read_pr_ref(
 		mdcm::SmartPointer<mdcm::SequenceOfItems>
 			sqReferencedImageSequence =
 				eReferencedImageSequence.GetValueAsSQ();
-		if(!(sqReferencedImageSequence &&
+		if (!(sqReferencedImageSequence &&
 				sqReferencedImageSequence->GetNumberOfItems() > 0))
 			continue;
 		//
