@@ -11962,7 +11962,7 @@ bool DicomUtils::is_dicom_file(const QString & f)
 #else
 	fs.open(f.toLocal8Bit().constData(), std::ios::in | std::ios::binary);
 #endif
-	for (long off = 128; off >= 0; off -= 128)
+	for (std::streamoff off = 128; off >= 0; off -= 128)
 	{
 		fs.seekg(off, std::ios_base::beg);
 		if (!fs.fail() && !fs.eof())
@@ -11970,12 +11970,10 @@ bool DicomUtils::is_dicom_file(const QString & f)
 			fs.read(b, 4);
 			if (!fs.fail())
 			{
-				if (b[0] == 'D' &&
-					b[1] == 'I' &&
-					b[2] == 'C' &&
-					b[3] == 'M')
+				if (b[0] == 'D' && b[1] == 'I' && b[2] == 'C' && b[3] == 'M')
 				{
 					dicom = true;
+					break;
 				}
 			}
 		}
@@ -11989,10 +11987,7 @@ bool DicomUtils::is_dicom_file(const QString & f)
 			fs.read(reinterpret_cast<char *>(&group_no), sizeof(unsigned short));
 			itk::ByteSwapper<unsigned short>::SwapFromSystemToLittleEndian(&group_no);
 			// 0x0003 and 0x0005 are illegal, but files exist
-			if (group_no == 0x0002 ||
-				group_no == 0x0003 ||
-				group_no == 0x0005 ||
-				group_no == 0x0008)
+			if (group_no == 0x0002 || group_no == 0x0003 || group_no == 0x0005 || group_no == 0x0008)
 			{
 				dicom = true;
 			}
