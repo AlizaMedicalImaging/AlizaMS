@@ -126,8 +126,8 @@ template<typename Tin, typename Tout> QString apply_lut(
 	{
 		return QString("Not supported, bits = ") + QVariant(d2).toString();
 	}
-	int i1 = 0;
-	bool data_possible_negative = false;
+	int i1{};
+	bool data_possible_negative{};
 #if 1
 	if (pixel_signed)
 	{
@@ -189,7 +189,7 @@ template<typename Tin, typename Tout> QString apply_lut(
 		while (!iterator.IsAtEnd())
 		{
 			int idx = static_cast<int>(iterator.Get());
-			float out = 0.0f;
+			float out{};
 			if (i1 < 0)
 			{
 				idx += (-i1);
@@ -293,8 +293,8 @@ template<typename T> QString inverse_filter(
 	typedef itk::MinimumMaximumImageCalculator<T> MinMaxCalculator;
 	typedef itk::ShiftScaleImageFilter<T, T> ShiftScaleImageFilterType;
 	typename MinMaxCalculator::Pointer min_max_calculator = MinMaxCalculator::New();
-	double min_ = 0.0;
-	double max_ = 0.0;
+	double min_{};
+	double max_{};
 	try
 	{
 		min_max_calculator->SetImage(image);
@@ -384,7 +384,7 @@ template<typename T> bool is_signed(const typename T::Pointer & image)
 	if (image.IsNull()) return false;
 	typedef itk::MinimumMaximumImageCalculator<T> MinMaxCalculator;
 	typename MinMaxCalculator::Pointer min_max_calculator = MinMaxCalculator::New();
-	double min_ = 0.0;
+	double min_{};
 	try
 	{
 		min_max_calculator->SetImage(image);
@@ -432,15 +432,15 @@ void rotate_flip_points(
 	const int dx = ivariant->di->idimx;
 	const int dy = ivariant->di->idimy;
 	const int dz = ivariant->di->idimz;
-	bool tmp0 = false;
-	bool tmp1 = false;
-	bool tmp2 = false;
+	bool tmp0{};
+	bool tmp1{};
+	bool tmp2{};
 	for (int z = 0; z < dz; ++z)
 	{
-		int ax = 0;
-		int ay = 0;
-		int px = 0;
-		int py = 0;
+		int ax{};
+		int ay{};
+		int px{};
+		int py{};
 		double cx = dx / 2.0;
 		double cy = dy / 2.0;
 		if (ivariant->pr_display_areas.contains(z))
@@ -464,9 +464,9 @@ void rotate_flip_points(
 			ax = dx;
 			ay = dy;
 		}
-		int idx0 = -2;
-		int idx1 = -2;
-		int idx2 = -2;
+		int idx0{-2};
+		int idx1{-2};
+		int idx2{-2};
 		if (ivariant->pr_text_annotations.contains(z))
 		{
 			idx0 = z;
@@ -994,14 +994,14 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 		const QString error = extract_one_slice<T,T2d>(image, tmp0, z);
 		const int dx = (int)image->GetLargestPossibleRegion().GetSize()[0];
 		const int dy = (int)image->GetLargestPossibleRegion().GetSize()[1];
-		int ax = 0;
-		int ay = 0;
-		int px = 0;
-		int py = 0;
+		int ax{};
+		int ay{};
+		int px{};
+		int py{};
 		if (tmp0.IsNull()) return QString("tmp0.IsNull()");
 		if (error.isEmpty())
 		{
-			bool apply_display_area = false;
+			bool apply_display_area{};
 			if (ivariant->pr_display_areas.contains(z))
 			{
 				if (!(
@@ -1157,8 +1157,8 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 							it.SetDirection(0);
 							it.GoToBegin();
 							const int j__ = px + ax/2;
-							int x__ = 0;
-							int y__ = 0;
+							int x__{};
+							int y__{};
 							const int idimx = tmp1->GetLargestPossibleRegion().GetSize()[0];
 							while(!it.IsAtEnd())
 							{
@@ -1232,7 +1232,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 				SliceIterator it2(out_image, out_image->GetLargestPossibleRegion());
 				it2.SetFirstDirection(0);
 				it2.SetSecondDirection(1);
-				int j = 0;
+				int j{};
 				it0.GoToBegin();
 				it2.GoToBegin();
 				while(!it2.IsAtEnd())
@@ -1325,7 +1325,7 @@ QString voi_lut_slice_by_slice(
 			{
 				for (int x = 0; x < frames_tmp1.size(); ++x)
 				{
-					bool tmp99 = false;
+					bool tmp99{};
 					const int tmp98 = QVariant(frames_tmp1.at(x).trimmed().remove(QChar('\0'))).toInt(&tmp99);
 					if (tmp99 && tmp98 > 0)
 					{
@@ -1397,8 +1397,8 @@ QString voi_lut_slice_by_slice(
 										mapped_implicit, mapped_signed);
 									if (error.isEmpty() && tmp1.IsNotNull())
 									{
-										float min_value = 0.0f;
-										float max_value = 0.0f;
+										float min_value{};
+										float max_value{};
 										typedef itk::ImageSliceIteratorWithIndex<ImageTypeF> SliceIterator;
 										typedef itk::ImageLinearConstIteratorWithIndex<Image2DTypeF> ConstIterator;
 										try
@@ -1408,8 +1408,8 @@ QString voi_lut_slice_by_slice(
 											SliceIterator it2(v->pF, v->pF->GetLargestPossibleRegion());
 											it2.SetFirstDirection(0);
 											it2.SetSecondDirection(1);
-											int j = 0;
-											long long jj = 0;
+											int j{};
+											long long jj{};
 											it0.GoToBegin();
 											it2.GoToBegin();
 											while(!it2.IsAtEnd())
@@ -1537,7 +1537,7 @@ void areas_slice_by_slice(
 			{
 				for (int x = 0; x < frames_tmp1.size(); ++x)
 				{
-					bool tmp99 = false;
+					bool tmp99{};
 					const int tmp98 = QVariant(frames_tmp1.at(x).trimmed().remove(QChar('\0'))).toInt(&tmp99);
 					if (tmp99 && tmp98 > 0)
 					{
@@ -1660,7 +1660,7 @@ void text_slice_by_slice(
 			{
 				for (int x = 0; x < frames_tmp1.size(); ++x)
 				{
-					bool tmp99 = false;
+					bool tmp99{};
 					const int tmp98 = QVariant(frames_tmp1.at(x).trimmed().remove(QChar('\0'))).toInt(&tmp99);
 					if (tmp99 && tmp98 > 0)
 					{
@@ -1786,7 +1786,7 @@ void graphic_slice_by_slice(
 			{
 				for (int x = 0; x < frames_tmp1.size(); ++x)
 				{
-					bool tmp99 = false;
+					bool tmp99{};
 					const int tmp98 = QVariant(frames_tmp1.at(x).trimmed().remove(QChar('\0'))).toInt(&tmp99);
 					if (tmp99 && tmp98 > 0)
 					{
@@ -2030,7 +2030,7 @@ void PrConfigUtils::read_modality_lut(
 	//
 	std::vector<double> RescaleIntercept;
 	std::vector<double> RescaleSlope;
-	bool rescale_ok = false;
+	bool rescale_ok{};
 	if (DicomUtils::get_ds_values(ds,tRescaleIntercept,RescaleIntercept)
 		&&
 		DicomUtils::get_ds_values(ds,tRescaleSlope,RescaleSlope))
@@ -2050,8 +2050,8 @@ void PrConfigUtils::read_modality_lut(
 	{
 		QList<QVariant> lut_descriptor;
 		QList<QVariant> lut_data;
-		bool mapped_implicit = false;
-		bool mapped_signed = false;
+		bool mapped_implicit{};
+		bool mapped_signed{};
 		const bool lut_ok = DicomUtils::read_gray_lut(
 			ds, tModalityLUTSequence,
 			lut_descriptor, lut_data,
@@ -2138,8 +2138,8 @@ void PrConfigUtils::read_voi_lut(
 				c.values.push_back(QVariant(QString(""))); // 2
 				QList<QVariant> lut_descriptor;
 				QList<QVariant> lut_data;
-				bool mapped_implicit = false;
-				bool mapped_signed = false;
+				bool mapped_implicit{};
+				bool mapped_signed{};
 				const bool lut_ok = DicomUtils::read_gray_lut(
 					nestedds,
 					tVOILUTSequence, lut_descriptor, lut_data,
@@ -2260,13 +2260,13 @@ void PrConfigUtils::read_presentation_lut(
 	c.desc = QString("Presentation LUT");
 	//
 	//
-	bool no_lut_seq = false;
+	bool no_lut_seq{};
 	if (ds.FindDataElement(tPresentationLUTSequence))
 	{
 		QList<QVariant> lut_descriptor;
 		QList<QVariant> lut_data;
-		bool mapped_implicit = false;
-		bool mapped_signed = false;
+		bool mapped_implicit{};
+		bool mapped_signed{};
 		const bool lut_ok = DicomUtils::read_gray_lut(
 			ds,
 			tPresentationLUTSequence,
@@ -2494,7 +2494,7 @@ void PrConfigUtils::read_spatial_transformation(
 	// clockwise in degrees, 0 90 180 270
 	QString ImageHorizontalFlip;
 	const bool flip = DicomUtils::get_string_value(ds,tImageHorizontalFlip,ImageHorizontalFlip);
-	unsigned short ImageRotation = 0;
+	unsigned short ImageRotation{};
 	const bool rotation = DicomUtils::get_us_value(ds,tImageRotation,&ImageRotation);
 	if (rotation||flip)
 	{
@@ -3213,11 +3213,11 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 	}
 #endif
 	QString error;
-	short rotation = 0;
-	bool flip = false;
-	bool modality = false;
-	bool voi = false;
-	bool presentation = false;
+	short rotation{};
+	bool flip{};
+	bool modality{};
+	bool voi{};
+	bool presentation{};
 	const QList<PrConfig> l = ref.prconfig;
 	ImageVariant * v = new ImageVariant(
 		CommonUtils::get_next_id(),
@@ -3230,13 +3230,14 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 	// Modality LUT
 	//
 	{
-		bool rescale_found = false;
-		bool modality_lut_found = false;
-		double shift = 0.0, scale = 1.0;
+		bool rescale_found{};
+		bool modality_lut_found{};
+		double shift{};
+		double scale{1.0};
 		QList<QVariant> m_lut_descriptor;
 		QList<QVariant> m_lut_data;
-		bool mapped_implicit = false;
-		bool mapped_signed = false;
+		bool mapped_implicit{};
+		bool mapped_signed{};
 		for (int x = 0; x < l.size(); ++x)
 		{
 			if (l.at(x).id == 1)
@@ -3415,7 +3416,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		QMap<int, QVariant>    lut_datas;
 		QMap<int, bool>        mapped_implicits;
 		QMap<int, bool>        mapped_signeds;
-		int voi_luts = 0;
+		int voi_luts{};
 		for (int x = 0; x < l.size(); ++x)
 		{
 			const int values_size = l.at(x).values.size();
@@ -3472,9 +3473,9 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		QList<QVariant>  p_lut_descriptor;
 		QList<QVariant>  p_lut_data;
 		QString          p_shape;
-		bool pres_lut_found = false;
-		bool mapped_implicit = false;
-		bool mapped_signed = false;
+		bool pres_lut_found{};
+		bool mapped_implicit{};
+		bool mapped_signed{};
 		for (int x = 0; x < l.size(); ++x)
 		{
 			if (l.at(x).id == 8)
@@ -3574,7 +3575,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		QMap<int, double>      pixel_spacings0;
 		QMap<int, double>      pixel_spacings1;
 		QMap<int, QString>     size_modes;
-		int areas = 0;
+		int areas{};
 		for (int x = 0; x < l.size(); ++x)
 		{
 			const int values_size = l.at(x).values.size();
@@ -3661,7 +3662,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 			const double ax = aspect_ratios1.value(0);
 			const double ay = aspect_ratios0.value(0);
 			{
-				bool one_aspect = true;
+				bool one_aspect{true};
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 				QMap<int, double>::const_iterator it0 = aspect_ratios1.cbegin();
 				while (it0 != aspect_ratios1.cend())
@@ -3794,7 +3795,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		QMap<int, int>     ShadowColorCIELabValue_L;
 		QMap<int, int>     ShadowColorCIELabValue_a;
 		QMap<int, int>     ShadowColorCIELabValue_b;
-		int texts = 0;
+		int texts{};
 		for (int x = 0; x < l.size(); ++x)
 		{
 			const int values_size = l.at(x).values.size();
@@ -3960,7 +3961,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		//QMap<int, QString> TrackingID;
 		//QMap<int, QString> TrackingUID;
 		////std::vector<unsigned char> FillPattern;
-		int graphics = 0;
+		int graphics{};
 		for (int x = 0; x < l.size(); ++x)
 		{
 			const int values_size = l.at(x).values.size();

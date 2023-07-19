@@ -28,7 +28,7 @@ template <typename T> void calculate_uvt(
 	ImageVariant * ivariant)
 {
 	if (image.IsNull()) return;
-	unsigned int count = 0;
+	unsigned int count{};
 	for (int x = 0; x < ivariant->di->rois.size(); ++x)
 	{
 		QMap< int, Contour* >::iterator it =
@@ -39,8 +39,8 @@ template <typename T> void calculate_uvt(
 			Contour * c = it.value();
 			if (c)
 			{
-				bool planar = true;
-				int  tmp0 = -1;
+				bool planar{true};
+				int  tmp0{-1};
 				for (int k = 0; k < c->dpoints.size(); ++k)
 				{
 					itk::ContinuousIndex<float, 3> index;
@@ -103,8 +103,10 @@ long long ContourUtils::get_next_contour_tmpid()
 void ContourUtils::calculate_rois_center(ImageVariant * iv)
 {
 	if (!iv) return;
-	unsigned long long z = 0;
-	double tmpx = 0.0, tmpy = 0.0, tmpz = 0.0;
+	unsigned long long z{};
+	double tmpx{};
+	double tmpy{};
+	double tmpz{};
 	for (int x = 0; x < iv->di->rois.size(); ++x)
 	{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
@@ -142,7 +144,7 @@ void ContourUtils::calculate_rois_center(ImageVariant * iv)
 int ContourUtils::get_new_roi_id(const ImageVariant * ivariant)
 {
 	if (!ivariant) return -1;
-	int tmp0 = 0;
+	int tmp0{};
 	for (int x = 0; x < ivariant->di->rois.size(); ++x)
 	{
 		if (ivariant->di->rois.at(x).id >= tmp0)
@@ -163,7 +165,7 @@ void ContourUtils::generate_roi_vbos(
 		Contour * c = it.value();
 		if (c)
 		{
-			bool ok = true;
+			bool ok{true};
 			if (
 				GLWidget::get_max_vbos_65535() &&
 				GLWidget::get_count_vbos() >= 64000)
@@ -297,7 +299,7 @@ void ContourUtils::calculate_uvt_nonuniform(
 				z < static_cast<unsigned int>(ivariant->di->idimz);
 				++z)
 			{
-				bool in_slice = false;
+				bool in_slice{};
 				if (static_cast<int>(z) < slices_size)
 				{
 					const float px = ivariant->di->image_slices.at(z)->v[0];
@@ -526,7 +528,7 @@ void ContourUtils::map_contours_nonuniform(
 			<< std::endl;
 		return;
 	}
-	const float tolerance = 0.1f;
+	const float tolerance{0.1f};
 	for (int x = 0; x < ivariant->di->rois.size(); ++x)
 	{
 		if (ivariant->di->rois.at(x).id == roi_id)
@@ -544,7 +546,7 @@ void ContourUtils::map_contours_nonuniform(
 			{
 				const Contour * c = it.value();
 				if (!c) continue;
-				bool in_slice = false;
+				bool in_slice{};
 				QList<int> slices;
 				for (int z = 0; z < ivariant->di->idimz; ++z)
 				{

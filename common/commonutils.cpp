@@ -90,7 +90,8 @@ template<typename T> void calculate_min_max(
 		MinMaxCalculator::New();
 	typename UpdateQtCommand::Pointer update_qt_command =
 		UpdateQtCommand::New();
-	double cubemin = 0.0, cubemax = 0.0;
+	double cubemin{};
+	double cubemax{};
 	try
 	{
 		min_max_calculator->AddObserver(itk::ProgressEvent(), update_qt_command);
@@ -511,15 +512,16 @@ template<typename T> int generate_tex3d(
 	typedef itk::ResampleImageFilter<T, T> ScaleFilter;
 	typedef itk::ImageSliceConstIteratorWithIndex<T> SliceConstIteratorType;
 	std::string tt;
-	int error__ = 0;
-	GLuint glerror__ = 0;
-	double rmin = 0.0, rmax = 0.0;
-	float * float_buf = nullptr;
-	unsigned short * short_buf = nullptr;
-	GLubyte * ub_buf = nullptr;
+	int error__{};
+	GLuint glerror__{};
+	double rmin{};
+	double rmax{};
+	float * float_buf{};
+	unsigned short * short_buf{};
+	GLubyte * ub_buf{};
 	typename T::Pointer out_image;
-	bool scale = true;
-	short texture_type = -1;
+	bool scale{true};
+	short texture_type{-1};
 	const typename T::RegionType r__ = image->GetLargestPossibleRegion();
 	const typename T::SizeType original_size = r__.GetSize();
 	calculate_min_max<T>(image, ivariant);
@@ -699,7 +701,7 @@ template<typename T> int generate_tex3d(
 		inIterator.SetFirstDirection(0);  // X axis
 		inIterator.SetSecondDirection(1); // Y axis
 		inIterator.GoToBegin();
-		size_t j = 0;
+		size_t j{};
 		const double max_minus_min = (rmax-rmin > 0) ? rmax - rmin : 1e-9;
 		while (!inIterator.IsAtEnd())
 		{
@@ -1067,8 +1069,10 @@ template <typename T> bool reload_monochrome_image(
 	typename T::RegionType region;
 	typename T::SizeType size;
 	typename T::SpacingType spacing;
-	short count__ = 0;
-	double fx = 0.0, fy = 0.0, fz = 0.0;
+	short count__{};
+	double fx{};
+	double fy{};
+	double fz{};
 	ivariant->di->close(generate_slices);
 	region  = image->GetLargestPossibleRegion();
 	size    = region.GetSize();
@@ -1372,7 +1376,7 @@ template<typename T> QString process_dicom_monochrome_image1(
 		it.SetFirstDirection(0);
 		it.SetSecondDirection(1);
 		it.GoToBegin();
-		size_t j = 0;
+		size_t j{};
 		while(!it.IsAtEnd())
 		{
 			while (!it.IsAtEndOfSlice())
@@ -1713,7 +1717,7 @@ template<typename T> QString process_dicom_rgba_image1(
 		it.SetFirstDirection(0);
 		it.SetSecondDirection(1);
 		it.GoToBegin();
-		size_t j = 0;
+		size_t j{};
 		while(!it.IsAtEnd())
 		{
 			while (!it.IsAtEndOfSlice())
@@ -1941,7 +1945,7 @@ template<typename T> double get_value(
 	idx[0] = x;
 	idx[1] = y;
 	idx[2] = z;
-	double r = 0.0;
+	double r{};
 	try
 	{
 		r = static_cast<double>(image->GetPixel(idx));
@@ -2191,13 +2195,9 @@ double CommonUtils::set_digits(double i, int digits)
 
 QString CommonUtils::get_orientation2(const double * pat_orientation)
 {
-	const bool print_oblique = false;
+	constexpr bool print_oblique = false;
 	const char RAI_codes[3][2] = { {'R', 'L'}, {'A', 'P'}, {'I', 'S'} };
-	char rai[4];
-	rai[0] = 'x';
-	rai[1] = 'x';
-	rai[2] = 'x';
-	rai[3] = '\0';
+	char rai[4]{};
 	const double row_dircos_x = pat_orientation[0];
 	const double row_dircos_y = pat_orientation[1];
 	const double row_dircos_z = pat_orientation[2];
@@ -2207,7 +2207,7 @@ QString CommonUtils::get_orientation2(const double * pat_orientation)
 	const double nrm_dircos_x = row_dircos_y * col_dircos_z - row_dircos_z * col_dircos_y;
 	const double nrm_dircos_y = row_dircos_z * col_dircos_x - row_dircos_x * col_dircos_z;
 	const double nrm_dircos_z = row_dircos_x * col_dircos_y - row_dircos_y * col_dircos_x;
-	bool oblique = false;
+	bool oblique{};
 	for (unsigned int i = 0; i < 3; ++i)
 	{
 		double dcos[3]{};
@@ -2295,8 +2295,10 @@ void CommonUtils::calculate_center_notuniform(
 	const std::vector<ImageSlice*> & slices,
 	float * center_x, float * center_y, float * center_z)
 {
-	size_t j = 0;
-	double tmpx = 0.0, tmpy = 0.0, tmpz = 0.0;
+	size_t j{};
+	double tmpx{};
+	double tmpy{};
+	double tmpz{};
 	for (size_t k = 0; k < slices.size(); ++k)
 	{
 		const ImageSlice * cs = slices.at(k);
@@ -2320,8 +2322,10 @@ void CommonUtils::calculate_center_notuniform(
 	const std::vector<SpectroscopySlice*> & slices,
 	float * center_x, float * center_y, float * center_z)
 {
-	size_t j = 0;
-	double tmpx = 0.0, tmpy = 0.0, tmpz = 0.0;
+	size_t j{};
+	double tmpx{};
+	double tmpy{};
+	double tmpz{};
 	for (size_t k = 0; k < slices.size(); ++k)
 	{
 		const SpectroscopySlice * cs = slices.at(k);
@@ -2467,7 +2471,7 @@ void CommonUtils::generate_spectroscopyslice(
 				float dx = Xd/static_cast<float>(columns_ - 1);
 				float dy = Yd/static_cast<float>(rows_ - 1);
 				const sVector3 p = X1 + dx * Xn;
-				unsigned long j = 0;
+				unsigned long j{};
 				for (unsigned int x = 1; x < columns_ - 1; ++x)
 				{
 					const sVector3 from = X0 + (static_cast<float>(x) * dx) * Xn;
@@ -2647,7 +2651,7 @@ void CommonUtils::copy_slices(
 	const ImageVariant * source)
 {
 	if (!dest||!source) return;
-	bool break_ = false;
+	bool break_{};
 	for (unsigned int x = 0;
 		x < source->di->image_slices.size();
 		++x)
@@ -2707,7 +2711,8 @@ void CommonUtils::copy_slices(
 		}
 		else
 		{
-			break_ = true; break;
+			break_ = true;
+			break;
 		}
 	}
 	if (break_)
@@ -2819,7 +2824,7 @@ bool CommonUtils::reload_monochrome(
 	unsigned int size_y_)
 {
 	if (!ivariant) return false;
-	bool ok = false;
+	bool ok{};
 	if (ivariant->image_type == 0)
 	{
 		ok = reload_monochrome_image<ImageTypeSS>(
@@ -3456,7 +3461,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 	const size_t dimz = dimz_;
 	if (data_size < 1) return QString("data.size() < 1");
 	if (!data.at(0)) return QString("!data.at(0)");
-	short ybr = 0;
+	short ybr{};
 	if (!skip_ybr && !use_icc)
 	{
 		if (pi == mdcm::PhotometricInterpretation::YBR_FULL ||
@@ -3504,7 +3509,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						return QString("const std::bad_alloc");
 					}
 					if (!p__) return QString("p__ is null");
-					size_t inc = 0;
+					size_t inc{};
 					for (size_t z_ = 0; z_ < dimz; ++z_)
 					{
 						if (!data.at(z_))
@@ -3514,7 +3519,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 								QVariant(static_cast<unsigned long long>(z_)).toString() +
 								QString(")");
 						}
-						size_t inc_xy = 0;
+						size_t inc_xy{};
 						for (size_t y_ = 0; y_ < dimy; ++y_)
 						{
 							for (size_t x_ = 0; x_ < dimx; ++x_)
@@ -3538,7 +3543,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				{
 					p__ = &data[0][0];
 				}
-				bool bad_direction = true;
+				bool bad_direction{true};
 				error = process_dicom_monochrome_image1<ImageTypeSS>(
 					ok,
 					ivariant,
@@ -3585,7 +3590,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						return QString("const std::bad_alloc");
 					}
 					if (!p__) return QString("p__ is null");
-					size_t inc = 0;
+					size_t inc{};
 					for (size_t z_ = 0; z_ < dimz; ++z_)
 					{
 						if (!data.at(z_))
@@ -3595,7 +3600,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 								QVariant(static_cast<unsigned long long>(z_)).toString() +
 								QString(")");
 						}
-						size_t inc_xy = 0;
+						size_t inc_xy{};
 						for (size_t y_ = 0; y_ < dimy; ++y_)
 						{
 							for (size_t x_ = 0; x_ < dimx; ++x_)
@@ -3665,7 +3670,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						return QString("const std::bad_alloc");
 					}
 					if (!p__) return QString("p__ is null");
-					size_t inc = 0;
+					size_t inc{};
 					for (size_t z_ = 0; z_ < dimz; ++z_)
 					{
 						if (!data.at(z_))
@@ -3675,7 +3680,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 								QVariant(static_cast<unsigned long long>(z_)).toString() +
 								QString(")");
 						}
-						size_t inc_xy = 0;
+						size_t inc_xy{};
 						for (size_t y_ = 0; y_ < dimy; ++y_)
 						{
 							for (size_t x_ = 0; x_ < dimx; ++x_)
@@ -3745,7 +3750,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						return QString("const std::bad_alloc");
 					}
 					if (!p__) return QString("p__ is null");
-					size_t inc = 0;
+					size_t inc{};
 					for (unsigned int z_ = 0; z_ < dimz; ++z_)
 					{
 						if (!data.at(z_))
@@ -3755,7 +3760,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 								QVariant(static_cast<unsigned long long>(z_)).toString() +
 								QString(")");
 						}
-						size_t inc_xy = 0;
+						size_t inc_xy{};
 						for (size_t y_ = 0; y_ < dimy; ++y_)
 						{
 							for (size_t x_ = 0; x_ < dimx; ++x_)
@@ -3825,7 +3830,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						return QString("const std::bad_alloc");
 					}
 					if (!p__) return QString("p__ is null");
-					size_t inc = 0;
+					size_t inc{};
 					for (size_t z_ = 0; z_ < dimz; ++z_)
 					{
 						if (!data.at(z_))
@@ -3835,7 +3840,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 								QVariant(static_cast<unsigned long long>(z_)).toString() +
 								QString(")");
 						}
-						size_t inc_xy = 0;
+						size_t inc_xy{};
 						for (size_t y_ = 0; y_ < dimy; ++y_)
 						{
 							for (size_t x_ = 0; x_ < dimx; ++x_)
@@ -3905,7 +3910,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						return QString("const std::bad_alloc");
 					}
 					if (!p__) return QString("p__ is null");
-					size_t inc = 0;
+					size_t inc{};
 					for (size_t z_ = 0; z_ < dimz; ++z_)
 					{
 						if (!data.at(z_))
@@ -3915,7 +3920,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 								QVariant(static_cast<unsigned long long>(z_)).toString() +
 								QString(")");
 						}
-						size_t inc_xy = 0;
+						size_t inc_xy{};
 						for (size_t y_ = 0; y_ < dimy; ++y_)
 						{
 							for (size_t x_ = 0; x_ < dimx; ++x_)
@@ -3987,7 +3992,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						return QString("const std::bad_alloc");
 					}
 					if (!p__) return QString("p__ is null");
-					size_t inc = 0;
+					size_t inc{};
 					for (size_t z_ = 0; z_ < dimz; ++z_)
 					{
 						if (!data.at(z_))
@@ -3997,7 +4002,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 								QVariant(static_cast<unsigned long long>(z_)).toString() +
 								QString(")");
 						}
-						size_t inc_xy = 0;
+						size_t inc_xy{};
 						for (size_t y_ = 0; y_ < dimy; ++y_)
 						{
 							for (size_t x_ = 0; x_ < dimx; ++x_)
@@ -4068,7 +4073,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						return QString("const std::bad_alloc");
 					}
 					if (!p__) return QString("p__ is null");
-					size_t inc = 0;
+					size_t inc{};
 					for (size_t z_ = 0; z_ < dimz; ++z_)
 					{
 						if (!data.at(z_))
@@ -4078,7 +4083,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 								QVariant(static_cast<unsigned long long>(z_)).toString() +
 								QString(")");
 						}
-						size_t inc_xy = 0;
+						size_t inc_xy{};
 						for (size_t y_ = 0; y_ < dimy; ++y_)
 						{
 							for (size_t x_ = 0; x_ < dimx; ++x_)
@@ -4148,7 +4153,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 						return QString("const std::bad_alloc");
 					}
 					if (!p__) return QString("p__ is null");
-					size_t inc = 0;
+					size_t inc{};
 					for (size_t z_ = 0; z_ < dimz; ++z_)
 					{
 						if (!data.at(z_))
@@ -4158,7 +4163,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 								QVariant(static_cast<unsigned long long>(z_)).toString() +
 								QString(")");
 						}
-						size_t inc_xy = 0;
+						size_t inc_xy{};
 						for (size_t y_ = 0; y_ < dimy; ++y_)
 						{
 							for (size_t x_ = 0; x_ < dimx; ++x_)
@@ -4245,7 +4250,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					return QString("const std::bad_alloc");
 				}
 				if (!p__) return QString("p__ is null");
-				size_t inc = 0;
+				size_t inc{};
 				for (size_t z_ = 0; z_ < dimz; ++z_)
 				{
 					if (!data.at(z_))
@@ -4255,7 +4260,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 							QVariant(static_cast<unsigned long long>(z_)).toString() +
 							QString(")");
 					}
-					size_t inc_xy = 0;
+					size_t inc_xy{};
 					for (size_t y_ = 0; y_ < dimy; ++y_)
 					{
 						for (size_t x_ = 0; x_ < dimx; ++x_)
@@ -4333,7 +4338,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					return QString("const std::bad_alloc");
 				}
 				if (!p__) return QString("p__ is null");
-				size_t inc = 0;
+				size_t inc{};
 				for (size_t z_ = 0; z_ < dimz; ++z_)
 				{
 					if (!data.at(z_))
@@ -4343,7 +4348,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 							QVariant(static_cast<unsigned long long>(z_)).toString() +
 							QString(")");
 					}
-					size_t inc_xy = 0;
+					size_t inc_xy{};
 					for (size_t y_ = 0; y_ < dimy; ++y_)
 					{
 						for (size_t x_ = 0; x_ < dimx; ++x_)
@@ -4420,7 +4425,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					return QString("const std::bad_alloc");
 				}
 				if (!p__) return QString("p__ is null");
-				size_t inc = 0;
+				size_t inc{};
 				for (size_t z_ = 0; z_ < dimz; ++z_)
 				{
 					if (!data.at(z_))
@@ -4430,7 +4435,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 							QVariant(static_cast<unsigned long long>(z_)).toString() +
 							QString(")");
 					}
-					size_t inc_xy = 0;
+					size_t inc_xy{};
 					for (size_t y_ = 0; y_ < dimy; ++y_)
 					{
 						for (size_t x_ = 0; x_ < dimx; ++x_)
@@ -4505,7 +4510,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					return QString("const std::bad_alloc");
 				}
 				if (!p__) return QString("p__ is null");
-				size_t inc = 0;
+				size_t inc{};
 				for (size_t z_ = 0; z_ < dimz; ++z_)
 				{
 					if (!data.at(z_))
@@ -4515,7 +4520,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 							QVariant(static_cast<unsigned long long>(z_)).toString() +
 							QString(")");
 					}
-					size_t inc_xy = 0;
+					size_t inc_xy{};
 					for (size_t y_ = 0; y_ < dimy; ++y_)
 					{
 						for (size_t x_ = 0; x_ < dimx; ++x_)
@@ -4612,7 +4617,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					return QString("const std::bad_alloc");
 				}
 				if (!p__) return QString("p__ is null");
-				size_t inc = 0;
+				size_t inc{};
 				for (size_t z_ = 0; z_ < dimz; ++z_)
 				{
 					if (!data.at(z_))
@@ -4622,7 +4627,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 							QVariant(static_cast<unsigned long long>(z_)).toString() +
 							QString(")");
 					}
-					size_t inc_xy = 0;
+					size_t inc_xy{};
 					for (size_t y_ = 0; y_ < dimy; ++y_)
 					{
 						for (size_t x_ = 0; x_ < dimx; ++x_)
@@ -4783,7 +4788,7 @@ double CommonUtils::get_total_memory_saved()
 double CommonUtils::get_total_memory()
 {
 #ifdef USE_GET_TOTAL_MEM
-	double total_gb = 0.0;
+	double total_gb{};
 #if (defined _WIN32)
 	MEMORYSTATUSEX memory_status;
 	ZeroMemory(&memory_status, sizeof(MEMORYSTATUSEX));
@@ -4891,7 +4896,7 @@ QString CommonUtils::apply_per_slice_rescale(
 	if (!ivariant) return QString("!ivariant");
 	const short image_type = ivariant->image_type;
 	if (!(image_type >= 0 && image_type < 10)) return QString("");
-	bool float64 = false;
+	bool float64{};
 	const double float_max = (1 << FLT_MANT_DIG);
 	if (ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128.1") ||
 		ivariant->sop == QString(""))
@@ -5019,7 +5024,7 @@ void CommonUtils::get_pixel_values(
 	{
 		if (!images.at(i)) continue;
 		const short image_type = images.at(i)->image_type;
-		double d = 0;
+		double d{};
 		switch (image_type)
 		{
 		case 0:
@@ -5060,14 +5065,14 @@ void CommonUtils::get_pixel_values(
 double CommonUtils::calculate_max_delta(const ImageVariant * v)
 {
 	if (!v) return 1000.0;
-	double max_delta = 0;
+	double max_delta{};
 	if (v->image_type == 300)
 	{
 		max_delta = 1000.0;
 	}
 	else if (v->image_type == 100)
 	{
-		double tmp0 = 0;
+		double tmp0{};
 		for (int x = 0; x < v->di->rois.size(); ++x)
 		{
 			if (v->di->rois.at(x).max_delta > tmp0)
