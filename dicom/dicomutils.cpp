@@ -86,11 +86,11 @@ typedef Vectormath::Scalar::Matrix4 sMatrix4;
 
 typedef struct
 {
-	int rows;
-	int columns;
-	short allocated;
-	bool localizer;
-	bool icc;
+	int rows{-1};
+	int columns{-1};
+	short allocated{};
+	bool localizer{};
+	bool icc{};
 	QString file;
 	QString photometric;
 	QString sop;
@@ -115,7 +115,7 @@ struct less_than_ipp
 {
 	inline bool operator() (const IPPIOP & s1, const IPPIOP & s2)
 	{
-		const double t = 0.001;
+		const double t{0.001};
 		if (!(
 			((s1.iop0 + t) > s2.iop0) && ((s1.iop0 - t) < s2.iop0) &&
 			((s1.iop1 + t) > s2.iop1) && ((s1.iop1 - t) < s2.iop1) &&
@@ -128,7 +128,8 @@ struct less_than_ipp
 		normal[0] = (s1.iop1 * s1.iop5) - (s1.iop2 * s1.iop4);
 		normal[1] = (s1.iop2 * s1.iop3) - (s1.iop0 * s1.iop5);
 		normal[2] = (s1.iop0 * s1.iop4) - (s1.iop1 * s1.iop3);
-		double dist1 = 0, dist2 = 0;
+		double dist1{};
+		double dist2{};
 		dist1 += normal[0] * s1.ipp0;
 		dist2 += normal[0] * s2.ipp0;
 		dist1 += normal[1] * s1.ipp1;
@@ -147,7 +148,7 @@ bool sort_frames_ippiop(
 	const FrameGroupValues & values)
 {
 	if (in.empty()) return false;
-	bool ipv_iov = false;
+	bool ipv_iov{};
 	std::vector<IPPIOP> tmp0;
 	std::map< unsigned int, unsigned int, std::less<unsigned int> >::const_iterator it =
 		in.cbegin();
@@ -219,7 +220,7 @@ struct files_less_than_ipp
 {
 	inline bool operator() (const QString & f1, const QString & f2)
 	{
-		const double t = 0.001;
+		const double t{0.001};
 		mdcm::Tag ipp(0x0020,0x0032);
 		mdcm::Tag iop(0x0020,0x0037);
 		std::set<mdcm::Tag> tags;
@@ -281,7 +282,8 @@ struct files_less_than_ipp
 			normal[0] = (iop1[1] * iop1[5]) - (iop1[2] * iop1[4]);
 			normal[1] = (iop1[2] * iop1[3]) - (iop1[0] * iop1[5]);
 			normal[2] = (iop1[0] * iop1[4]) - (iop1[1] * iop1[3]);
-			double dist1 = 0, dist2 = 0;
+			double dist1{};
+			double dist2{};
 			for (int i = 0; i < 3; ++i) dist1 += normal[i] * ipp1[i];
 			for (int i = 0; i < 3; ++i) dist2 += normal[i] * ipp2[i];
 			const bool r = (dist1 < dist2);
@@ -1594,8 +1596,8 @@ void delta_decode_rgb(
 	pixel.rgb[0] = pixel.rgb[1] = pixel.rgb[2] = 0;
 	// Start in grayscale mode
 	bool graymode = true;
-	size_t dx = 1;
-	size_t dy = 3;
+	size_t dx{1};
+	size_t dy{3};
 	// Algorithm works with both planar configurations.
 	// It does produce surprising greenish background color for
 	// planar configuration is 0, while the nested Icon SQ display
@@ -1729,7 +1731,7 @@ void delta_decode(
 		}
 	}
 	// Delta encoding pass
-	unsigned short delta = 0;
+	unsigned short delta{};
 	for (size_t i = 0; i < temp.size(); ++i)
 	{
 		if (temp[i] == 0x5a)
@@ -1810,7 +1812,7 @@ template <typename T> QString supp_palette_grey_to_rgbUS_(
 			else
 			{
 				const double k = static_cast<double>(it1.Get());
-				unsigned short c = 0;
+				unsigned short c{};
 				if (k < static_cast<double>(red_subscript))
 				{
 					const double r = (k + (-wmin)) / div_;
@@ -1897,7 +1899,7 @@ template <typename T> QString supp_palette_grey_to_rgbUC_(
 			else
 			{
 				const double k = static_cast<double>(it1.Get());
-				unsigned char c = 0;
+				unsigned char c{};
 				if (k < static_cast<double>(red_subscript))
 				{
 					const double r = (k + (-wmin)) / div_;
@@ -2022,7 +2024,7 @@ unsigned int process_gsps(
 	std::vector<ImageVariant*> & ivariants,
 	QString & message_)
 {
-	unsigned int count = 0;
+	unsigned int count{};
 	const SettingsWidget * wsettings = static_cast<const SettingsWidget *>(settings);
 	for (int x = 0; x < grey_softcopy_pr_files.size(); ++x)
 	{
@@ -2062,7 +2064,7 @@ unsigned int process_gsps(
 					continue;
 				}
 				++count;
-				bool spatial_transform = false;
+				bool spatial_transform{};
 				ImageVariant * pr_image =
 					PrConfigUtils::make_pr_monochrome(
 						ref_ivariants.at(z),
@@ -2106,7 +2108,7 @@ unsigned int process_gsps(
 						pr_image->di->hide_orientation = true;
 						pr_image->di->filtering = 0;
 					}
-					bool pr_load_ok = false;
+					bool pr_load_ok{};
 					pr_load_ok = CommonUtils::reload_monochrome(
 						pr_image,
 						ok3d,
@@ -2470,7 +2472,7 @@ bool DicomUtils::get_ds_values(
 	if (tmp1.empty()) return false;
 	for (int x = 0; x < tmp1.size(); ++x)
 	{
-		bool ok = false;
+		bool ok{};
 		const double tmp3 =
 			QVariant(
 				tmp1.at(x).trimmed().
@@ -2513,7 +2515,7 @@ bool DicomUtils::priv_get_ds_values(
 	if (tmp1.empty()) return false;
 	for (int x = 0; x < tmp1.size(); ++x)
 	{
-		bool ok = false;
+		bool ok{};
 		const double tmp3 =
 			QVariant(
 				tmp1.at(x).trimmed().
@@ -2545,7 +2547,7 @@ bool DicomUtils::get_is_value(
 			bv->GetPointer(),
 			bv->GetLength()).trimmed().
 				remove(QChar('\0'));
-		bool ok = false;
+		bool ok{};
 		const int tmp1 = QVariant(tmp0).toInt(&ok);
 		if (ok)
 		{
@@ -2582,7 +2584,7 @@ bool DicomUtils::get_is_values(
 	if (tmp1.empty()) return false;
 	for (int x = 0; x < tmp1.size(); ++x)
 	{
-		bool ok = false;
+		bool ok{};
 		const int tmp3 = QVariant(
 			tmp1.at(x).
 				trimmed().
@@ -2805,7 +2807,7 @@ bool DicomUtils::is_multiframe(const mdcm::DataSet & ds)
 	if (get_string_value(ds, tnumframes, numframes))
 	{
 		const QVariant v(numframes.remove(QChar('\0')));
-		bool ok = false;
+		bool ok{};
 		const int k = v.toInt(&ok);
 		if (ok && k > 1) return true;
 	}
@@ -2976,7 +2978,7 @@ void DicomUtils::read_image_info_rtdose(const QString & f,
 		if (get_string_value(ds, tframes, numframes))
 		{
 			const QVariant v(numframes.remove(QChar('\0')));
-			bool ok = false;
+			bool ok{};
 			const int k = v.toInt(&ok);
 			if (ok && k > 0) *num_frames_ = static_cast<unsigned short>(k);
 		}
@@ -3054,7 +3056,7 @@ void DicomUtils::load_contour(
 			nestedds.GetDataElement(roinumber.GetTag()));
 		// Find structure_set_roi_sequence corresponding
 		// to roi_contour_sequence (by comparing id numbers)
-		unsigned int spd = 0;
+		unsigned int spd{};
 		mdcm::Item    sitem;
 		mdcm::DataSet snestedds;
 		mdcm::Attribute<0x3006,0x0022> sroinumber; // ROI Number
@@ -3149,9 +3151,9 @@ void DicomUtils::load_contour(
 #endif
 			}
 		}
-		int color_r = 255;
-		int color_g = 255;
-		int color_b = 255;
+		int color_r{255};
+		int color_g{255};
+		int color_b{255};
 		// ROI Display Color
 		const mdcm::Tag troidc(0x3006, 0x002a);
 		mdcm::Attribute<0x3006, 0x002a> color = {};
@@ -3367,7 +3369,7 @@ void DicomUtils::read_window(
 	short  * lut_function)
 {
 	if (ds.IsEmpty()) return;
-	short lut_function_ = 0;
+	short lut_function_{};
 	QString s;
 	if (get_string_value(ds, mdcm::Tag(0x0028,0x1056), s))
 	{
@@ -3413,14 +3415,18 @@ bool DicomUtils::read_slices(
 	float tolerance)
 {
 	if (!ivariant) return false;
-	bool ok = false;
-	bool failed = false;
+	bool ok{};
+	bool failed{};
 	const int unsigned size_z = filenames_.size();
 	std::vector<double*> values;
-	unsigned short rows    = 0;
-	unsigned short columns = 0;
-	double spacing_x = 0, spacing_y = 0, spacing_z = 0;
-	double origin_x  = 0, origin_y  = 0, origin_z  = 0;
+	unsigned short rows{};
+	unsigned short columns{};
+	double spacing_x{};
+	double spacing_y{};
+	double spacing_z{};
+	double origin_x{};
+	double origin_y{};
+	double origin_z{};
 	float
 		slices_dir_x,
 		slices_dir_y,
@@ -3438,7 +3444,8 @@ bool DicomUtils::read_slices(
 			pat_orient_s,
 			pix_spacing_s,
 			orientation_20_20;
-		unsigned short rows_ = 0, columns_ = 0;
+		unsigned short rows_{};
+		unsigned short columns_{};
 		read_image_info(
 			filenames_.at(i),
 			&rows_, &columns_,
@@ -3461,7 +3468,7 @@ bool DicomUtils::read_slices(
 			get_pixel_spacing(pix_spacing_s, pix_spacing);
 		if (ok_pos && ok_orient && pix_spacing_ok)
 		{
-			bool ok1 = true;
+			bool ok1{true};
 			if (i == 0)
 			{
 				rows = rows_;
@@ -3552,7 +3559,9 @@ bool DicomUtils::read_slices(
 		//
 		if (ivariant->equi == false)
 		{
-			float cx = 0.0f, cy = 0.0f, cz = 0.0f;
+			float cx{};
+			float cy{};
+			float cz{};
 			CommonUtils::calculate_center_notuniform(
 				ivariant->di->image_slices,&cx,&cy,&cz);
 			ivariant->di->default_center_x =
@@ -3591,7 +3600,7 @@ bool DicomUtils::read_slices_uihgrid(
 	//
 	const mdcm::PrivateTag tMRNumberOfSliceInVolume(
 		0x0065, 0x50, "Image Private Header");
-	int num_slices = 0;
+	int num_slices{};
 	if (ds.FindDataElement(tMRNumberOfSliceInVolume))
 	{
 		std::vector<double> result;
@@ -3619,8 +3628,10 @@ bool DicomUtils::read_slices_uihgrid(
 		if (pat_orient.size() != 6) return false;
 	}
 	//
-	double spacing_x = 0, spacing_y = 0, spacing_z = 0;
-	bool spacing_ok = false;
+	double spacing_x{};
+	double spacing_y{};
+	double spacing_z{};
+	bool spacing_ok{};
 	{
 		const mdcm::Tag tspacing0(0x0028,0x0030);
 		const mdcm::Tag tspacing1(0x0018,0x1164);
@@ -3777,15 +3788,18 @@ bool DicomUtils::read_slices_uihgrid(
 		}
 	}
 	//
-	double origin_x  = 0, origin_y  = 0, origin_z  = 0;
-	float
-		slices_dir_x,
-		slices_dir_y,
-		slices_dir_z,
-		up_dir_x,
-		up_dir_y,
-		up_dir_z;
-	float center_x, center_y, center_z;
+	double origin_x{};
+	double origin_y{};
+	double origin_z{};
+	float slices_dir_x;
+	float slices_dir_y;
+	float slices_dir_z;
+	float up_dir_x;
+	float up_dir_y;
+	float up_dir_z;
+	float center_x;
+	float center_y;
+	float center_z;
 	double dircos[9]{};
 	const bool ok = generate_geometry(
 			ivariant->di->image_slices,
@@ -3821,7 +3835,9 @@ bool DicomUtils::read_slices_uihgrid(
 		//
 		if (ivariant->equi == false)
 		{
-			float cx = 0.0f, cy = 0.0f, cz = 0.0f;
+			float cx{};
+			float cy{};
+			float cz{};
 			CommonUtils::calculate_center_notuniform(
 				ivariant->di->image_slices,&cx,&cy,&cz);
 			ivariant->di->default_center_x = ivariant->di->center_x = cx;
@@ -3851,11 +3867,11 @@ bool DicomUtils::read_slices_rtdose(
 {
 	if (!ivariant) return false;
 	//
-	bool ok = false;
+	bool ok{};
 	std::vector<double*> values;
-	unsigned short numframes = 0;
-	unsigned short rows      = 0;
-	unsigned short columns   = 0;
+	unsigned short numframes{};
+	unsigned short rows{};
+	unsigned short columns{};
 	std::vector<double> z_offsets;
 	double pat_pos[3];
 	double pat_orient[6];
@@ -3926,7 +3942,9 @@ bool DicomUtils::read_slices_rtdose(
 		//
 		if (ivariant->equi == false)
 		{
-			float cx = 0.0f, cy = 0.0f, cz = 0.0f;
+			float cx{};
+			float cy{};
+			float cz{};
 			CommonUtils::calculate_center_notuniform(ivariant->di->image_slices,&cx,&cy,&cz);
 			ivariant->di->default_center_x = ivariant->di->center_x = cx;
 			ivariant->di->default_center_y = ivariant->di->center_y = cy;
@@ -3983,7 +4001,10 @@ void DicomUtils::read_dimension_index_sq(
 				sqDimensionIndexSequence->GetItem(x + 1);
 			const mdcm::DataSet & nestedds =
 				item.GetNestedDataSet();
-			unsigned short group0 = 0, element0 = 0, group1 = 0, element1 = 0;
+			unsigned short group0{};
+			unsigned short element0{};
+			unsigned short group1{};
+			unsigned short element1{};
 			QString dim_uid;
 			const bool ok0 =
 				get_at_value(
@@ -4682,7 +4703,7 @@ void DicomUtils::read_frame_times(const mdcm::DataSet & ds, ImageVariant * ivari
 	const mdcm::Tag tframeincrementpointer(0x0028,0x0009);
 	const mdcm::Tag tframetime(0x0018,0x1063);
 	const mdcm::Tag tframetimes(0x0018,0x1065);
-	double frametime = 100.0;
+	double frametime{100.0};
 	//
 	if (ds.FindDataElement(tframeincrementpointer))
 	{
@@ -4876,7 +4897,7 @@ void DicomUtils::read_acquisition_time(
 	const mdcm::Tag tacquisitiondate(0x0008,0x0022);
 	const mdcm::Tag tacquisitiontime(0x0008,0x0032);
 	const mdcm::Tag tacquisitiondatetime(0x0008,0x002a);
-	bool acqdatetime_ok = false;
+	bool acqdatetime_ok{};
 	{
 		QString acquisitiondatetime;
 		if (get_string_value(
@@ -5110,7 +5131,7 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 	if (get_string_value(ds, tfieldstrength, fieldstrength))
 	{
 		fieldstrength = fieldstrength.trimmed();
-		bool conv_ok = false;
+		bool conv_ok{};
 		const double fieldstrength_ =
 			QVariant(fieldstrength).toDouble(&conv_ok);
 		if (conv_ok)
@@ -5199,7 +5220,7 @@ bool DicomUtils::get_patient_position(
 #endif
 	if (list.size() == 3)
 	{
-		bool ok = false;
+		bool ok{};
 		pp[0] = list.at(0).toDouble(&ok);
 		if (!ok) pp[0] = list.at(0).toInt(&ok);
 		if (!ok) return false;
@@ -5234,7 +5255,7 @@ bool DicomUtils::get_patient_orientation(
 #endif
 	if (list.size() == 6)
 	{
-		bool ok = false;
+		bool ok{};
 		po[0] = list.at(0).toDouble(&ok);
 		if (!ok) po[0] = list.at(0).toInt(&ok);
 		if (!ok) return false;
@@ -5270,7 +5291,7 @@ bool DicomUtils::get_pixel_spacing(
 	}
 	const QStringList list =
 		tmp0.split(QString("\\"));
-	bool ok = false;
+	bool ok{};
 	if (list.size()==1)
 	{
 		ps[0] = ps[1] = list.at(0).toDouble(&ok);
@@ -5313,14 +5334,18 @@ bool DicomUtils::generate_geometry(
 	sVector3 v1 = sVector3(0.0f, 0.0f, 0.0f);
 	sVector3 up = sVector3(0.0f, 0.0f, 0.0f);
 	QString tmp0;
-	bool tmp1 = true, tmp2 = true;
+	bool tmp1{true};
+	bool tmp2{true};
 	sVector3 tmp_p0 = sVector3(0.0f, 0.0f, 0.0f);
 	sVector3 tmp_p1 = sVector3(0.0f, 0.0f, 0.0f);
 	sVector3 tmp_p2 = sVector3(0.0f, 0.0f, 0.0f);
 	sVector3 tmp_p3 = sVector3(0.0f, 0.0f, 0.0f);
-	float tmp_length0 = 0.0f, tmp_length1 = 0.0f, tmp_length2 = 0.0f, tmp_length3 = 0.0f;
-	double spacing_z_ = 0;
-	bool invalidate_volume = false;
+	float tmp_length0{};
+	float tmp_length1{};
+	float tmp_length2{};
+	float tmp_length3{};
+	double spacing_z_{};
+	bool invalidate_volume{};
 	for (unsigned int i = 0; i < size_; ++i)
 	{
 		const double * ipp_iop = values.at(i);
@@ -5643,7 +5668,7 @@ void DicomUtils::read_gems_params(
 		const mdcm::ByteValue * bv0 = index.GetByteValue();
 		if (!bv0) continue;
 		const unsigned int l0 = bv0->GetLength();
-		int idx0 = -1;
+		int idx0{-1};
 		if (l0 % 8 == 0 && l0 >= 8)
 		{
 			std::vector<double> result0;
@@ -5955,23 +5980,23 @@ void DicomUtils::enhanced_get_indices(
 	}
 	const EnhancedIODLoadingType loading_type =
 		static_cast<EnhancedIODLoadingType>(enh_loading_type);
-	int stack_id_idx      = -1;
-	int in_stack_pos_idx  = -1;
-	int ipp_idx           = -1;
-	int temporal_pos_idx  = -1;
-	int temporal_off_idx  = -1;
-	int contrast_idx      = -1;
-	int b_value_idx       = -1;
-	int gradients_idx     = -1;
-	int lut_label_idx     = -1;
-	int plane_pos_idx     = -1;
-	int datatype_idx      = -1;
-	int mr_frame_type_idx = -1;
-	int mr_eff_echo_idx   = -1;
-	int segment_idx       = -1;
-	int pa_datatype_idx   = -1;
-	int pa_excwave_idx    = -1;
-	int rec_alg_idx       = -1;
+	int stack_id_idx{-1};
+	int in_stack_pos_idx{-1};
+	int ipp_idx{-1};
+	int temporal_pos_idx{-1};
+	int temporal_off_idx{-1};
+	int contrast_idx{-1};
+	int b_value_idx{-1};
+	int gradients_idx{-1};
+	int lut_label_idx{-1};
+	int plane_pos_idx{-1};
+	int datatype_idx{-1};
+	int mr_frame_type_idx{-1};
+	int mr_eff_echo_idx{-1};
+	int segment_idx{-1};
+	int pa_datatype_idx{-1};
+	int pa_excwave_idx{-1};
+	int rec_alg_idx{-1};
 	std::string dim_uid;
 	std::vector<std::string> dim_uids;
 	for (size_t x = 0; x < sq_size; ++x)
@@ -6411,7 +6436,7 @@ void DicomUtils::enhanced_get_indices(
 			stack_id_idx >= 0 &&
 			in_stack_pos_idx >= 0)
 		{
-			int dim5th_tmp = -1;
+			int dim5th_tmp{-1};
 			for (int x = 0; x < 3; ++x)
 			{
 				const size_t i = static_cast<size_t>(x);
@@ -6441,7 +6466,7 @@ void DicomUtils::enhanced_get_indices(
 			in_stack_pos_idx >= 0 &&
 			temporal_pos_idx >= 0)
 		{
-			int dim6th_tmp = -1;
+			int dim6th_tmp{-1};
 			for (int x = 0; x < 4; ++x)
 			{
 				const size_t i = static_cast<size_t>(x);
@@ -6477,7 +6502,7 @@ void DicomUtils::enhanced_get_indices(
 			in_stack_pos_idx >= 0 &&
 			temporal_off_idx >= 0)
 		{
-			int dim6th_tmp = -1;
+			int dim6th_tmp{-1};
 			for (int x = 0; x < 4; ++x)
 			{
 				const size_t i = static_cast<size_t>(x);
@@ -6566,15 +6591,15 @@ void DicomUtils::enhanced_process_values(
 	FrameGroupValues & values,
 	const FrameGroupValues & shared_values)
 {
-	bool vol_pos_miss     = false;
-	bool vol_orient_miss  = false;
-	bool pat_pos_miss     = false;
-	bool pat_orient_miss  = false;
-	bool pix_spacing_miss = false;
-	bool window_miss      = false;
-	bool laterality_miss  = false;
-	bool body_part_miss   = false;
-	bool rescale_miss     = false;
+	bool vol_pos_miss{};
+	bool vol_orient_miss{};
+	bool pat_pos_miss{};
+	bool pat_orient_miss{};
+	bool pix_spacing_miss{};
+	bool window_miss{};
+	bool laterality_miss{};
+	bool body_part_miss{};
+	bool rescale_miss{};
 	for (unsigned int x = 0; x < values.size(); ++x)
 	{
 		if (!values.at(x).vol_pos_ok) vol_pos_miss = true;
@@ -6673,8 +6698,8 @@ void DicomUtils::enhanced_process_values(
 	}
 	if (rescale_miss)
 	{
-		double  rescale_intercept = 0.0;
-		double  rescale_slope     = 1.0;
+		double  rescale_intercept{};
+		double  rescale_slope{1.0};
 		QString rescale_type;
 		if (shared_values.size() == 1 &&
 			shared_values.at(0).rescale_ok)
@@ -6699,7 +6724,7 @@ void DicomUtils::enhanced_check_rescale(
 	const mdcm::DataSet & ds,
 	FrameGroupValues & v)
 {
-	bool rescale_miss = false;
+	bool rescale_miss{};
 	for (unsigned int x = 0; x < v.size(); ++x)
 	{
 		if (!v.at(x).rescale_ok)
@@ -7089,11 +7114,11 @@ QString DicomUtils::read_enhanced(
 	ImageOverlays image_overlays;
 	mdcm::PhotometricInterpretation pi;
 	mdcm::PixelFormat pixelformat;
-	unsigned short rows_    = 0;
-	unsigned short columns_ = 0;
-	bool rows_ok            = false;
-	bool cols_ok            = false;
-	bool icc_ok             = false;
+	unsigned short rows_{};
+	unsigned short columns_{};
+	bool rows_ok{};
+	bool cols_ok{};
+	bool icc_ok{};
 	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
 	const bool pred6_bug = wsettings->get_predictor_workaround();
 	const bool cornell_bug = wsettings->get_cornell_workaround();
@@ -7176,7 +7201,8 @@ QString DicomUtils::read_enhanced(
 	unsigned int dimx_read, dimy_read, dimz_read;
 	double origin_x_read,  origin_y_read,  origin_z_read;
 	double spacing_x_read, spacing_y_read, spacing_z_read;
-	double unsused0 = 0.0, unsused1 = 1.0;
+	double unsused0{};
+	double unsused1{1.0};
 	AnatomyMap empty_;
 	message_ =
 		read_buffer(
@@ -7228,14 +7254,14 @@ QString DicomUtils::read_enhanced(
 	//
 	//
 	//
-	bool tmp17 = false;
-	int dim8th = -1;
-	int dim7th = -1;
-	int dim6th = -1;
-	int dim5th = -1;
-	int dim4th = -1;
-	int dim3rd = -1;
-	int enh_id = -1;
+	bool tmp17{};
+	int dim8th{-1};
+	int dim7th{-1};
+	int dim6th{-1};
+	int dim5th{-1};
+	int dim4th{-1};
+	int dim3rd{-1};
+	int enh_id{-1};
 	if (loading_type == EnhancedIODLoadingType::PreferUniformVolumes ||
 		loading_type == EnhancedIODLoadingType::StrictMultipleImages ||
 		loading_type == EnhancedIODLoadingType::StrictSingleImage)
@@ -7252,8 +7278,8 @@ QString DicomUtils::read_enhanced(
 		{
 			// stack id/position number without dimension organisation?
 			// try to re-build
-			bool idx_values_rebuild = false;
-			bool tmp12 = false;
+			bool idx_values_rebuild{};
+			bool tmp12{};
 			DimIndexValues idx_values_tmp;
 			const size_t values_size = values.size();
 			if (values_size == 2)
@@ -7411,12 +7437,12 @@ QString DicomUtils::read_enhanced_supp_palette(
 	mdcm::PhotometricInterpretation pi;
 	mdcm::PixelFormat pixelformat;
 	QString sop;
-	bool ok_f = false;
-	bool ok_g = false;
-	unsigned short rows_ = 0;
-	unsigned short columns_ = 0;
-	bool rows_ok = false;
-	bool cols_ok = false;
+	bool ok_f{};
+	bool ok_g{};
+	unsigned short rows_{};
+	unsigned short columns_{};
+	bool rows_ok{};
+	bool cols_ok{};
 	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
 	const bool pred6_bug = wsettings->get_predictor_workaround();
 	const bool cornell_bug = wsettings->get_cornell_workaround();
@@ -7496,12 +7522,19 @@ QString DicomUtils::read_enhanced_supp_palette(
 	enhanced_process_values(values, shared_values);
 	//
 	double dircos_read[6]{};
-	unsigned int dimx_read = 0, dimy_read = 0, dimz_read = 0;
-	double origin_x_read = 0, origin_y_read = 0, origin_z_read = 0;
-	double spacing_x_read = 0, spacing_y_read = 0, spacing_z_read = 0;
-	double unsused0 = 0.0, unsused1 = 1.0;
-	int red_subscript = INT_MIN;
-	bool icc_ok_dummy = false;
+	unsigned int dimx_read{};
+	unsigned int dimy_read{};
+	unsigned int dimz_read{};
+	double origin_x_read{};
+	double origin_y_read{};
+	double origin_z_read{};
+	double spacing_x_read{};
+	double spacing_y_read{};
+	double spacing_z_read{};
+	double unsused0{};
+	double unsused1{1.0};
+	int red_subscript{INT_MIN};
+	bool icc_ok_dummy{};
 	AnatomyMap empty_;
 	// do not use MDCM's rescale for enhanced
 	message_ =
@@ -7557,14 +7590,14 @@ QString DicomUtils::read_enhanced_supp_palette(
 	//
 	//
 	//
-	bool tmp17 = false;
-	int dim8th = -1;
-	int dim7th = -1;
-	int dim6th = -1;
-	int dim5th = -1;
-	int dim4th = -1;
-	int dim3rd = -1;
-	int enh_id = -1;
+	bool tmp17{};
+	int dim8th{-1};
+	int dim7th{-1};
+	int dim6th{-1};
+	int dim5th{-1};
+	int dim4th{-1};
+	int dim3rd{-1};
+	int enh_id{-1};
 	if (loading_type == EnhancedIODLoadingType::PreferUniformVolumes ||
 		loading_type == EnhancedIODLoadingType::StrictMultipleImages ||
 		loading_type == EnhancedIODLoadingType::StrictSingleImage)
@@ -7581,8 +7614,8 @@ QString DicomUtils::read_enhanced_supp_palette(
 		{
 			// stack id/position number without dimension organisation?
 			// try to re-build
-			bool idx_values_rebuild = false;
-			bool tmp12 = false;
+			bool idx_values_rebuild{};
+			bool tmp12{};
 			DimIndexValues idx_values_tmp;
 			const size_t values_size = values.size();
 			if (values_size == 2)
@@ -7732,16 +7765,22 @@ QString DicomUtils::read_ultrasound(
 	}
 	const SettingsWidget * wsettings =
 		static_cast<const SettingsWidget *>(settings);
-	unsigned int dimx = 0, dimy = 0, dimz = 0;
-	double origin_x  = 0.0, origin_y  = 0.0, origin_z  = 0.0;
-	double spacing_x = 0.0, spacing_y = 0.0, spacing_z = 0.0;
+	unsigned int dimx{};
+	unsigned int dimy{};
+	unsigned int dimz{};
+	double origin_x{};
+	double origin_y{};
+	double origin_z{};
+	double spacing_x{};
+	double spacing_y{};
+	double spacing_z{};
 	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
 	const bool pred6_bug = wsettings->get_predictor_workaround();
 	const bool cornell_bug = wsettings->get_cornell_workaround();
 	const bool fix_jpeg_prec = wsettings->get_try_fix_jpeg_prec();
 	const bool use_icc = wsettings->get_apply_icc();
 	const bool skip_too_large = wsettings->get_skip_too_large();
-	bool icc_ok = false;
+	bool icc_ok{};
 	std::vector<char*> data;
 	itk::Matrix<itk::SpacePrecisionType,3,3> direction;
 	mdcm::PixelFormat pixelformat;
@@ -7751,9 +7790,10 @@ QString DicomUtils::read_ultrasound(
 	const mdcm::PrivateTag tPhilipsVoxelSpacing(0x200d,0x03,"Philips US Imaging DD 036");
 	const bool overlays_enabled = wsettings->get_overlays();
 	const int overlays_idx = overlays_enabled ? 0 : -2;
-	int number_of_frames = 0;
-	double tmp_c = -999999.0, tmp_w = -999999.0;
-	short tmp_lut_function = 0;
+	int number_of_frames{};
+	double tmp_c{-999999.0};
+	double tmp_w{-999999.0};
+	short tmp_lut_function{};
 	//
 	{
 		mdcm::Reader reader;
@@ -7788,7 +7828,7 @@ QString DicomUtils::read_ultrasound(
 						e.GetByteValue()->GetLength());
 				const QVariant v(
 					numframes.trimmed().remove(QChar('\0')));
-				bool c_ok = false;
+				bool c_ok{};
 				const int k = v.toInt(&c_ok);
 				if (c_ok) number_of_frames = k;
 			}
@@ -7806,8 +7846,8 @@ QString DicomUtils::read_ultrasound(
 		//
 		if (overwrite_mdcm_spacing)
 		{
-			bool bPhilipsVoxelSpacing = false;
-			bool bPixelAspectRatio = false;
+			bool bPhilipsVoxelSpacing{};
+			bool bPixelAspectRatio{};
 			if (ds.FindDataElement(tPhilipsVoxelSpacing))
 			{
 				// Partial support Philips private 3D storage, only spacing,
@@ -7841,7 +7881,9 @@ QString DicomUtils::read_ultrasound(
 #endif
 							if (tmp1.size() == 3)
 							{
-								bool okx = false, oky = false, okz = false;
+								bool okx{};
+								bool oky{};
+								bool okz{};
 								const double tmp_spacing_x = QVariant(
 									tmp1.at(0).trimmed()).toDouble(&okx);
 								const double tmp_spacing_y = QVariant(
@@ -7891,7 +7933,8 @@ QString DicomUtils::read_ultrasound(
 	unsigned int dimx_, dimy_, dimz_;
 	double origin_x_, origin_y_, origin_z_;
 	double spacing_x_, spacing_y_, spacing_z_;
-	double shift_tmp = 0.0, scale_tmp = 1.0;
+	double shift_tmp{};
+	double scale_tmp{1.0};
 	QString buff_error;
 	buff_error = read_buffer(
 		ok,
@@ -8007,16 +8050,22 @@ QString DicomUtils::read_nuclear(
 	if (images_ipp.size() != 1) return QString("read_nuclear reads 1 image");
 	const SettingsWidget * wsettings =
 		static_cast<const SettingsWidget *>(settings);
-	unsigned int dimx = 0, dimy = 0, dimz = 0;
-	double origin_x  = 0.0, origin_y  = 0.0, origin_z  = 0.0;
-	double spacing_x = 0.0, spacing_y = 0.0, spacing_z = 0.0;
+	unsigned int dimx{};
+	unsigned int dimy{};
+	unsigned int dimz{};
+	double origin_x{};
+	double origin_y{};
+	double origin_z{};
+	double spacing_x{};
+	double spacing_y{};
+	double spacing_z{};
 	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
 	const bool pred6_bug = wsettings->get_predictor_workaround();
 	const bool cornell_bug = wsettings->get_cornell_workaround();
 	const bool fix_jpeg_prec = wsettings->get_try_fix_jpeg_prec();
 	const bool use_icc = wsettings->get_apply_icc();
 	const bool skip_too_large = wsettings->get_skip_too_large();
-	bool icc_ok = false;
+	bool icc_ok{};
 	std::vector<char*> data;
 	itk::Matrix<itk::SpacePrecisionType, 3, 3> direction;
 	mdcm::PixelFormat pixelformat;
@@ -8027,8 +8076,9 @@ QString DicomUtils::read_nuclear(
 #if 0
 	int number_of_frames = 0;
 #endif
-	double tmp_c = -999999.0, tmp_w = -999999.0;
-	short tmp_lut_function = 0;
+	double tmp_c{-999999.0};
+	double tmp_w{-999999.0};
+	short tmp_lut_function{};
 	//
 	{
 		mdcm::Reader reader;
@@ -8064,7 +8114,7 @@ QString DicomUtils::read_nuclear(
 						e.GetByteValue()->GetLength());
 				const QVariant v(
 					numframes.trimmed().remove(QChar('\0')));
-				bool c_ok = false;
+				bool c_ok{};
 				const int k = v.toInt(&c_ok);
 				if (c_ok) number_of_frames = k;
 			}
@@ -8086,7 +8136,8 @@ QString DicomUtils::read_nuclear(
 	unsigned int dimx_, dimy_, dimz_;
 	double origin_x_, origin_y_, origin_z_;
 	double spacing_x_, spacing_y_, spacing_z_;
-	double shift_tmp = 0.0, scale_tmp = 1.0;
+	double shift_tmp{};
+	double scale_tmp{1.0};
 	QString buff_error;
 	buff_error = read_buffer(
 		ok,
@@ -8218,23 +8269,29 @@ QString DicomUtils::read_series(
 	if (!ivariant) return QString("Image is null");
 	const SettingsWidget * wsettings =
 		static_cast<const SettingsWidget *>(settings);
-	unsigned int dimx = 0, dimy = 0, dimz = 0;
-	double origin_x  = 0.0, origin_y  = 0.0, origin_z  = 0.0;
-	double spacing_x = 0.0, spacing_y = 0.0, spacing_z = 0.0;
+	unsigned int dimx{};
+	unsigned int dimy{};
+	unsigned int dimz{};
+	double origin_x{};
+	double origin_y{};
+	double origin_z{};
+	double spacing_x{};
+	double spacing_y{};
+	double spacing_z{};
 	const bool clean_unused_bits = wsettings->get_clean_unused_bits();
 	const bool pred6_bug = wsettings->get_predictor_workaround();
 	const bool cornell_bug = wsettings->get_cornell_workaround();
 	const bool fix_jpeg_prec = wsettings->get_try_fix_jpeg_prec();
 	const bool use_icc = wsettings->get_apply_icc();
 	const bool skip_too_large = wsettings->get_skip_too_large();
-	bool icc_ok = false;
+	bool icc_ok{};
 	std::vector<char*> data;
 	itk::Matrix<itk::SpacePrecisionType,3,3> direction;
 	mdcm::PixelFormat pixelformat;
 	mdcm::PixelFormat previous_pixelformat;
 	mdcm::PhotometricInterpretation pi;
 	bool geometry_from_image = min_load;
-	bool slices_ok = false;
+	bool slices_ok{};
 	const mdcm::Tag tnumframes(0x0028, 0x0008);
 	const bool overlays_enabled = wsettings->get_overlays();
 	std::vector<double> levels_;
@@ -8250,7 +8307,7 @@ QString DicomUtils::read_series(
 	{
 		//
 		{
-			int number_of_frames = 0;
+			int number_of_frames{};
 			mdcm::Reader reader;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
@@ -8287,7 +8344,7 @@ QString DicomUtils::read_series(
 								e.GetByteValue()->GetPointer(),
 								e.GetByteValue()->GetLength());
 						const QVariant v(numframes.trimmed().remove(QChar('\0')));
-						bool c_ok = false;
+						bool c_ok{};
 						const int k = v.toInt(&c_ok);
 						if (c_ok) number_of_frames = k;
 					}
@@ -8421,9 +8478,9 @@ QString DicomUtils::read_series(
 			if (!min_load)
 			{
 				{
-					double tmp_c = -999999.0;
-					double tmp_w = -999999.0;
-					short lut_function = 0;
+					double tmp_c{-999999.0};
+					double tmp_w{-999999.0};
+					short lut_function{};
 					if (wsettings->get_level_for_PET() || !(
 						(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128")) ||
 						(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.130")) ||
@@ -8449,16 +8506,23 @@ QString DicomUtils::read_series(
 		}
 		//
 		double dircos_[6]{};
-		unsigned int dimx_ = 0, dimy_ = 0, dimz_ = 0;
-		double origin_x_ = 0.0, origin_y_ = 0.0, origin_z_ = 0.0;
-		double spacing_x_ = 0.0, spacing_y_ = 0.0, spacing_z_ = 0.0;
-		double shift_tmp = 0.0, scale_tmp = 1.0;
+		unsigned int dimx_{};
+		unsigned int dimy_{};
+		unsigned int dimz_{};
+		double origin_x_{};
+		double origin_y_{};
+		double origin_z_{};
+		double spacing_x_{};
+		double spacing_y_{};
+		double spacing_z_{};
+		double shift_tmp{};
+		double scale_tmp{1.0};
 		QString buff_error;
 		const int overlays_idx = overlays_enabled ? j : -2;
 		const bool rescale = (!apply_rescale) ? false : wsettings->get_rescale();
 		const bool force_double_pf =
 			(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128"));
-		unsigned long long buffers_size = 0;
+		unsigned long long buffers_size{};
 		std::vector<char*> data_;
 		if (images_ipp.size() > 1)
 		{
@@ -8587,7 +8651,7 @@ QString DicomUtils::read_series(
 			else dimz = images_ipp.size();
 			if (slices_ok)
 			{
-				bool invalidate = false;
+				bool invalidate{};
 				if (ivariant->equi)
 				{
 					const float tmp0_spacing_x = static_cast<float>(spacing_x_);
@@ -8841,8 +8905,8 @@ QString DicomUtils::read_series(
 		const size_t levels_size = levels_.size();
 		if (levels_size > 0)
 		{
-			bool one_level = true;
-			bool one_lut   = true;
+			bool one_level{true};
+			bool one_lut{true};
 			for (size_t x = 0; x < levels_size; ++x)
 			{
 				FrameLevel fl;
@@ -8956,7 +9020,7 @@ QString DicomUtils::read_series(
 			//
 			// Note: there are also attributes 'Series Date' / 'Series Time'.
 			//
-			const short use_acq_time = 0;
+			constexpr short use_acq_time = 0;
 			//
 			if (use_acq_time == 0)
 			{
@@ -9035,8 +9099,8 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 	const mdcm::ByteValue * bv = compressiontype.GetByteValue();
 	std::string comprle = "PMSCT_RLE1";
 	std::string comprgb = "PMSCT_RGB1";
-	bool isrle = false;
-	bool isrgb = false;
+	bool isrle{};
+	bool isrgb{};
 	if (strncmp(
 		bv->GetPointer(),
 		comprle.c_str(),
@@ -9324,35 +9388,35 @@ QString DicomUtils::read_buffer(
 	mdcm::ImageHelper::SetCleanUnusedBits(clean_unused_bits);
 	mdcm::ImageHelper::SetFixJpegBits(fix_jpeg_prec);
 	//
-	bool rescale_ = false;
-	unsigned long long rescaled_buffer_size = 0;
-	unsigned long long buffer_size = 0;
-	char * rescaled_buffer = nullptr;
-	char * not_rescaled_buffer = nullptr;
-	unsigned char * singlebit_buffer = nullptr;
-	char * buffer = nullptr;
-	bool singlebit = false;
-	unsigned int type_size = 0;
-	unsigned int samples_per_pix = 0;
-	double rescale_intercept = 0.0;
-	double rescale_slope     = 1.0;
-	unsigned long long dimx = 0;
-	unsigned long long dimy = 0;
-	unsigned long long dimz = 0;
+	bool rescale_{};
+	unsigned long long rescaled_buffer_size{};
+	unsigned long long buffer_size{};
+	char * rescaled_buffer{};
+	char * not_rescaled_buffer{};
+	unsigned char * singlebit_buffer{};
+	char * buffer{};
+	bool singlebit{};
+	unsigned int type_size{};
+	unsigned int samples_per_pix{};
+	double rescale_intercept{};
+	double rescale_slope{1.0};
+	unsigned long long dimx{};
+	unsigned long long dimy{};
+	unsigned long long dimz{};
 	mdcm::PixelFormat image_pixelformat = mdcm::PixelFormat::UNKNOWN;
-	unsigned long long image_buffer_length = 0;
+	unsigned long long image_buffer_length{};
 	QString elscf;
-	short icc_for_ybr = 0;
-	char * icc_profile = nullptr;
-	unsigned int icc_size = 0;
+	short icc_for_ybr{};
+	char * icc_profile{};
+	unsigned int icc_size{};
 	//
 	const mdcm::Tag tModalityLUTSequence(0x0028, 0x3000);
-	bool has_modality_lut = false;
+	bool has_modality_lut{};
 	QList<QVariant> lut_descriptor;
 	QList<QVariant> lut_data;
-	bool mapped_implicit = false;
-	bool mapped_signed = false;
-	bool modality_lut_ok = false;
+	bool mapped_implicit{};
+	bool mapped_signed{};
+	bool modality_lut_ok{};
 	//
 	{
 		mdcm::ImageReader image_reader;
@@ -9424,7 +9488,7 @@ QString DicomUtils::read_buffer(
 				const mdcm::File & ifile = image_reader.GetFile();
 				const mdcm::FileMetaInformation & iheader = ifile.GetHeader();
 				const mdcm::TransferSyntax & ts = iheader.GetDataSetTransferSyntax();
-				bool skip = true;
+				bool skip{true};
 				if (ts.IsEncapsulated())
 				{
 					if (sizeof(void*) >= 8)
@@ -9819,7 +9883,7 @@ QString DicomUtils::read_buffer(
 				}
 				r.SetTargetPixelType(pixelformat);
 				{
-					unsigned int rescale_type_size = 0;
+					unsigned int rescale_type_size{};
 					if ((pixelformat.GetBitsAllocated() % 8) != 0)
 					{
 						if (pixelformat.GetBitsAllocated() < 8)
@@ -9902,8 +9966,8 @@ QString DicomUtils::read_buffer(
 						const int d2 = lut_descriptor.at(2).toInt();
 						(void)d0;
 						(void)d2;
-						int i1 = 0;
-						bool data_possible_negative = false;
+						int i1{};
+						bool data_possible_negative{};
 #if 1
 						if (pixel_signed)
 						{
@@ -9966,7 +10030,7 @@ QString DicomUtils::read_buffer(
 							float * tmp_data = static_cast<float*>(vrescaled_buffer);
 							for (size_t x = 0; x < dimx * dimy * dimz; ++x)
 							{
-								float out = 0.0f;
+								float out{};
 								int idx = (pixel_signed)
 									? not_rescaled_buffer[x]
 									: static_cast<unsigned char>(not_rescaled_buffer[x]);
@@ -10027,7 +10091,7 @@ QString DicomUtils::read_buffer(
 							unsigned short * tmp_not_rescaled = static_cast<unsigned short*>(vnot_rescaled_buffer);
 							for (size_t x = 0; x < dimx * dimy * dimz; ++x)
 							{
-								float out = 0.0f;
+								float out{};
 								int idx = (pixel_signed)
 									? static_cast<signed short>(tmp_not_rescaled[x])
 									: tmp_not_rescaled[x];
@@ -10173,7 +10237,7 @@ QString DicomUtils::read_buffer(
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return QString("Buffer allocation error");
 		}
-		unsigned long long j = 0;
+		unsigned long long j{};
 		for (unsigned long long x = 0; x < image_buffer_length; ++x)
 		{
 			const unsigned char c = not_rescaled_buffer[x];
@@ -10225,7 +10289,7 @@ QString DicomUtils::read_buffer(
 #ifndef NDEBUG
 				std::cout << "Using ICC profile" << std::endl;
 #endif
-				char * icc_tmp = nullptr;
+				char * icc_tmp{};
 				char * icc_buffer;
 				try
 				{
@@ -10257,7 +10321,9 @@ QString DicomUtils::read_buffer(
 					for (size_t j = 0; j < image_buffer_length; j+=3)
 					{
 						// TODO the code is partially duplicated with commonutils.cpp
-						int R = 0, G = 0, B = 0;
+						int R{};
+						int G{};
+						int B{};
 						double Y        = static_cast<unsigned char>(not_rescaled_buffer[j]);
 						const double Cb = static_cast<unsigned char>(not_rescaled_buffer[j + 1]) - 128;
 						const double Cr = static_cast<unsigned char>(not_rescaled_buffer[j + 2]) - 128;
@@ -10369,7 +10435,7 @@ QString DicomUtils::read_buffer(
 	for (unsigned long long j = 0; j < dimz; ++j)
 	{
 		char * p__;
-		bool badalloc = false;
+		bool badalloc{};
 		try
 		{
 			p__ = new char[xy];
@@ -10444,7 +10510,7 @@ QString DicomUtils::read_enhanced_common(
 	std::cout << "common: red_subscript = " << red_subscript << std::endl;
 #endif
 	QString message;
-	bool error = false;
+	bool error{};
 	const SettingsWidget * wsettings =
 		static_cast<const SettingsWidget *>(settings);
 	//
@@ -10474,8 +10540,8 @@ QString DicomUtils::read_enhanced_common(
 	//
 	// Both variables just to be sure IPP/IOP and IPV/IOV
 	// are not mixed (it is impossible).
-	bool ipv_iov_found = false;
-	bool ipp_iop_found = false;
+	bool ipv_iov_found{};
+	bool ipp_iop_found{};
 	//
 	for (unsigned int x = 0; x < tmp0.size(); ++x)
 	{
@@ -10487,7 +10553,7 @@ QString DicomUtils::read_enhanced_common(
 		std::vector<double*> tmp4;
 		QStringList tmp5;
 		QList< QPair<double, double> > tmp6;
-		bool tmp4_ok = true;
+		bool tmp4_ok{true};
 		QStringList window_centers_l;
 		QStringList window_widths_l;
 		QStringList lut_functions_l;
@@ -10497,7 +10563,7 @@ QString DicomUtils::read_enhanced_common(
 		QStringList reference_datetimes;
 		ImageOverlays overlays;
 		QList<int> ref_segment_nums;
-		unsigned int j = 0;
+		unsigned int j{};
 #ifdef ENHANCED_PRINT_INFO
 		if (!min_load) std::cout << " Indices: ";
 #endif
@@ -10658,9 +10724,9 @@ QString DicomUtils::read_enhanced_common(
 #endif
 		if (!error)
 		{
-			bool   geom_ok = false;
-			bool   equi_ = false;
-			bool   one_direction_ = false;
+			bool   geom_ok{};
+			bool   equi_{};
+			bool   one_direction_{};
 			double origin_x_gen, origin_y_gen, origin_z_gen;
 			itk::Matrix<itk::SpacePrecisionType, 3, 3> direction;
 			double spacing_x, spacing_y, spacing_z;
@@ -10677,15 +10743,15 @@ QString DicomUtils::read_enhanced_common(
 				(min_load || !enable_gl || (sop == QString("1.2.840.10008.5.1.4.1.1.13.1.3")))
 				? true : !wsettings->get_3d();
 			const int new_id = min_load ? -1 : CommonUtils::get_next_id();
-			double window_center = -999999;
-			double window_width = -999999;
-			double window_center_tmp = -999999;
-			double window_width_tmp = -999999;
-			short lut_function = -1;
-			short lut_function_tmp = -1;
+			double window_center{-999999.0};
+			double window_width{-999999.0};
+			double window_center_tmp{-999999.0};
+			double window_width_tmp{-999999.0};
+			short lut_function{-1};
+			short lut_function_tmp{-1};
 			QString instance_uid;
-			int instance_number = -1;
-			int ref_segment_num = -1;
+			int instance_number{-1};
+			int ref_segment_num{-1};
 			//
 			if (!ref_segment_nums.empty())
 			{
@@ -10878,10 +10944,10 @@ QString DicomUtils::read_enhanced_common(
 				}
 			}
 			//
-			bool invalidate = false;
+			bool invalidate{};
 			double spacing_tmp0[2]{};
 			double spacing_tmp1[2]{};
-			bool spacing_ok = false;
+			bool spacing_ok{};
 			for (int i = 0; i < tmp5.size(); ++i)
 			{
 				spacing_ok = get_pixel_spacing(tmp5.at(i), spacing_tmp0);
@@ -11094,7 +11160,7 @@ QString DicomUtils::read_enhanced_common(
 				const int tmp1c_size = tmp1c.size();
 				if (tmp1c_size > 0)
 				{
-					bool tmp5468ok = true;
+					bool tmp5468ok{true};
 					for (int k = 0; k < tmp1c_size; ++k)
 					{
 						FrameLevel fl;
@@ -11175,7 +11241,7 @@ QString DicomUtils::read_enhanced_common(
 					if (*ok)
 					{
 						// check if not only 1 and 0
-						bool really_rescale = false;
+						bool really_rescale{};
 						for (int u = 0; u < tmp6.size(); ++u)
 						{
 							if (!(
@@ -11257,7 +11323,9 @@ QString DicomUtils::read_enhanced_common(
 					ivariant->di->up_direction_z = up_dir_z;
 					if (!ivariant->equi)
 					{
-						float cx = 0.0f, cy = 0.0f, cz = 0.0f;
+						float cx{};
+						float cy{};
+						float cz{};
 						CommonUtils::calculate_center_notuniform(
 							ivariant->di->image_slices, &cx, &cy, &cz);
 						ivariant->di->default_center_x = ivariant->di->center_x = cx;
@@ -11346,7 +11414,7 @@ bool DicomUtils::enhanced_process_indices(
 	const int dim8th, const int dim7th, const int dim6th, const int dim5th, const int dim4th, const int dim3rd,
 	const short enh_loading_type)
 {
-	bool error = false;
+	bool error{};
 	std::list<unsigned int> tmp1_1;
 	std::list<unsigned int> tmp1_2;
 	std::list<unsigned int> tmp1_3;
@@ -11435,8 +11503,8 @@ bool DicomUtils::enhanced_process_indices(
 		}
 #endif
 #ifdef ENHANCED_PRINT_INFO
-		bool warning0 = false;
-		bool info0 = false;
+		bool warning0{};
+		bool info0{};
 #endif
 		for (std::list<unsigned int>::const_iterator it1 = tmp1_1.cbegin();
 			it1 != tmp1_1.cend();
@@ -11591,7 +11659,7 @@ bool DicomUtils::enhanced_process_indices(
 		//
 		if (loading_type == EnhancedIODLoadingType::StrictSingleImage)
 		{
-			unsigned int j = 0;
+			unsigned int j{};
 			std::map< unsigned int, unsigned int, std::less<unsigned int> > tmp;
 			for (size_t x = 0; x < tmp0single.size(); ++x)
 			{
@@ -11718,7 +11786,7 @@ bool DicomUtils::is_not_interleaved(const QStringList & images)
 	mdcm::Tag tSlicePosition(0x0020,0x1041);
 	std::set<mdcm::Tag> tags;
 	tags.insert(tSlicePosition);
-	long long tmp0 = 0;
+	long long tmp0{};
 	for (int x = 0; x < images.size(); ++x)
 	{
 		mdcm::Reader reader;
@@ -11742,8 +11810,8 @@ bool DicomUtils::is_not_interleaved(const QStringList & images)
 				ds.GetDataElement(tSlicePosition);
 			if (!sp_.IsEmpty() && !sp_.IsUndefinedLength() && sp_.GetByteValue())
 			{
-				bool sp_ok = false;
-				long long tmp1 = 0;
+				bool sp_ok{};
+				long long tmp1{};
 				QString sp = QString::fromLatin1(
 					sp_.GetByteValue()->GetPointer(), sp_.GetByteValue()->GetLength());
 				if (sp.contains(QString(",")))
@@ -11948,8 +12016,8 @@ void DicomUtils::write_mpeg(
 
 bool DicomUtils::is_dicom_file(const QString & f)
 {
-	bool dicom = false;
-	char b[4];
+	bool dicom{};
+	char b[4]{};
 	std::ifstream fs;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
@@ -11980,7 +12048,7 @@ bool DicomUtils::is_dicom_file(const QString & f)
 	}
 	if (!dicom)
 	{
-		unsigned short group_no;
+		unsigned short group_no{};
 		fs.seekg(0, std::ios_base::beg);
 		if (!fs.fail() && !fs.eof())
 		{
@@ -12105,7 +12173,7 @@ bool DicomUtils::process_contrours_ref(
 	short enh_loading_type,
 	const QWidget * settings)
 {
-	unsigned short count_ = 0;
+	unsigned short count_{};
 	mdcm::Reader reader;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
@@ -12151,7 +12219,7 @@ bool DicomUtils::process_contrours_ref(
 	}
 	for (int z = 0; z < detected_files.size(); ++z)
 	{
-		bool referenced_slice_found = false;
+		bool referenced_slice_found{};
 		for (int k = 0; k < detected_files.at(z).size(); ++k)
 		{
 			QString sop_instance_uid;
@@ -12926,7 +12994,7 @@ mdcm::VR DicomUtils::get_vr(
 	const mdcm::Dicts & dicts)
 {
 	mdcm::VR vr = mdcm::VR::INVALID;
-	bool priv = false;
+	bool priv{};
 	if (t.IsIllegal())
 	{
 		return vr;
@@ -12971,7 +13039,7 @@ mdcm::VR DicomUtils::get_vr(
 	}
 	else
 	{
-		bool ok = false;
+		bool ok{};
 		if (!implicit)
 		{
 			vr = ds.GetDataElement(t).GetVR();
@@ -13170,7 +13238,7 @@ QString DicomUtils::read_dicom(
 	short load_type,
 	short enh_loading_type)
 {
-	bool ok = false;
+	bool ok{};
 	QString message_;
 	const mdcm::Tag tSOPClassUID(0x0008,0x0016);
 	const mdcm::Tag tSlicePosition(0x0020,0x1041);
@@ -13185,31 +13253,36 @@ QString DicomUtils::read_dicom(
 	QStringList xaxrf_softcopy_pr_files;
 	QStringList advanced_blending_softcopy_pr_files;
 	QVector<QStringList> extracted_images;
-	bool enhanced     = false;
-	bool supp_palette = false;
-	bool multiframe   = false;
-	bool mosaic       = false;
-	bool elscint      = false;
-	bool uihgrid      = false;
-	bool mixed        = false;
-	bool skip_volume  = false;
-	bool multiseries  = false;
-	bool ultrasound   = false;
-	bool nuclear      = false;
-	unsigned short rows_tmp0 = 0, rows_tmp1 = 0;
-	unsigned short columns_tmp0 = 0, columns_tmp1 = 0;
-	unsigned short ba_tmp0 = 0, ba_tmp1 = 0;
-	bool  localizer_tmp0 = false, localizer_tmp1 = false;
+	bool enhanced{};
+	bool supp_palette{};
+	bool multiframe{};
+	bool mosaic{};
+	bool elscint{};
+	bool uihgrid{};
+	bool mixed{};
+	bool skip_volume{};
+	bool multiseries{};
+	bool ultrasound{};
+	bool nuclear{};
+	unsigned short rows_tmp0{};
+	unsigned short rows_tmp1{};
+	unsigned short columns_tmp0{};
+	unsigned short columns_tmp1{};
+	unsigned short ba_tmp0{};
+	unsigned short ba_tmp1{};
+	bool localizer_tmp0{};
+	bool localizer_tmp1{};
 	QString sop_tmp0, sop_tmp1;
 	QString photometric_tmp0, photometric_tmp1;
-	bool icc_found_tmp0 = false, icc_found_tmp1 = false;
+	bool icc_found_tmp0{};
+	bool icc_found_tmp1{};
 	const SettingsWidget * const wsettings =
 		static_cast<const SettingsWidget * const>(settings);
 	std::map<unsigned int, SliceInstance> slice_pos_map;
 	std::list<long long> slice_pos_list;
-	const float tolerance = 0.01f;
-	int count_images = 0;
-	int count_uid_errors = 0;
+	const float tolerance{0.01f};
+	int count_images{};
+	int count_uid_errors{};
 	//
 	//
 	//
@@ -13219,11 +13292,14 @@ QString DicomUtils::read_dicom(
 	{
 		QString sop;
 		QString photometric;
-		bool icc_found = false;
-		unsigned short columns_ = 0, rows_ = 0;
-		unsigned short ba_ = 0, bs_ = 0, hb_ = 0;
-		short pr_ = -1;
-		bool localizer_ = false;
+		bool icc_found{};
+		unsigned short columns_{};
+		unsigned short rows_{};
+		unsigned short ba_{};
+		unsigned short bs_{};
+		unsigned short hb_{};
+		short pr_{-1};
+		bool localizer_{};
 		QFileInfo fi(filenames.at(x));
 		mdcm::Reader reader;
 #ifdef _WIN32
@@ -13454,7 +13530,7 @@ QString DicomUtils::read_dicom(
 					const mdcm::DataElement & sp_ = ds.GetDataElement(tSlicePosition);
 					if (!sp_.IsEmpty() && !sp_.IsUndefinedLength() && sp_.GetByteValue())
 					{
-						bool sp_ok = false;
+						bool sp_ok{};
 						QString sp = QString::fromLatin1(
 							sp_.GetByteValue()->GetPointer(),
 							sp_.GetByteValue()->GetLength());
@@ -13622,7 +13698,7 @@ QString DicomUtils::read_dicom(
 		if (multiseries)
 		{
 			// does every image have unique instance id?
-			bool unique_instance_nums = false;
+			bool unique_instance_nums{};
 			std::list<int> slices_instance_nums;
 			{
 				for (std::map<unsigned int, SliceInstance>::const_iterator it =
@@ -13666,7 +13742,7 @@ QString DicomUtils::read_dicom(
 					image_ids.push_back(it->second);
 				}
 				// is sequential or interleaved?
-				bool interleaved = false;
+				bool interleaved{};
 				for (unsigned int k = 0; k < image_ids.size(); k += size1)
 				{
 					QStringList images_tmp;
@@ -13711,7 +13787,7 @@ QString DicomUtils::read_dicom(
 					slices_pos_list2.unique();
 					const size_t unique_slice_pos_size =
 						slices_pos_list2.size();
-					unsigned int g = 0;
+					unsigned int g{};
 					// assign id for every unique slice postion
 					std::map<unsigned int, long long> slices_pos_ids;
 					for (std::list<long long>::const_iterator it =
@@ -14302,12 +14378,7 @@ QString DicomUtils::read_dicom(
 		for (int x = 0; x < images.size(); ++x)
 		{
 			MixedDicomSeriesInfo si;
-			si.rows      = -1;
-			si.columns   = -1;
-			si.allocated =  0;
-			si.localizer =  false;
-			si.icc       =  false;
-			si.file      =  QString(images.at(x));
+			si.file = QString(images.at(x));
 			mdcm::Reader reader;
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
@@ -14322,7 +14393,9 @@ QString DicomUtils::read_dicom(
 			const mdcm::File    & file = reader.GetFile();
 			const mdcm::DataSet & ds   = file.GetDataSet();
 			if (ds.IsEmpty()) continue;
-			unsigned short r = 0, c = 0, a = 0;
+			unsigned short r{};
+			unsigned short c{};
+			unsigned short a{};
 			if (get_us_value(ds, tr, &r))
 			{
 				si.rows = r;
@@ -14638,7 +14711,7 @@ QString DicomUtils::read_dicom(
 					ok3d,
 					1, // force sorted uniform
 					settings);
-			bool ref2_ok = false;
+			bool ref2_ok{};
 			if (ref_ok)
 			{
 				for (unsigned int y = 0;
