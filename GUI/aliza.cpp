@@ -24,7 +24,11 @@
 #include "studyframewidget.h"
 #include "studygraphicswidget.h"
 #include "srwidget.h"
+#ifdef ALIZA_LOAD_DCM_THREAD
+#include "loaddicom_t.h"
+#else
 #include "loaddicom.h"
+#endif
 #include <itkVersion.h>
 #include <itkImage.h>
 #include <itkIndex.h>
@@ -750,7 +754,8 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 		if (!item) continue;
 		if ((item->files.empty())) continue;
 		filenames = item->files;
-		LoadDicom * lt = new LoadDicom(
+#ifdef ALIZA_LOAD_DCM_THREAD
+		LoadDicom_T * lt = new LoadDicom_T(
 			root,
 			filenames,
 			ok3d,
@@ -764,6 +769,17 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 			qApp->processEvents();
 		}
+#else
+		LoadDicom * lt = new LoadDicom(
+			root,
+			filenames,
+			ok3d,
+			static_cast<const QWidget * const>(
+				const_cast<const SettingsWidget * const>(settingswidget)),
+			0,
+			settingswidget->get_enh_strategy());
+		lt->run();
+#endif
 		const QString message_ = lt->message;
 		if (!message_.isEmpty())
 		{
@@ -803,6 +819,12 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 		{
 			sr_files.push_back(lt->sr_files.at(k));
 		}
+#ifdef ALIZA_LOAD_DCM_THREAD
+#if 1
+		lt->quit();
+		lt->wait();
+#endif
+#endif
 		delete lt;
 	}
 	//
@@ -4087,7 +4109,8 @@ QString Aliza::load_dicom_file(
 		glwidget->set_skip_draw(true);
 	}
 	{
-		LoadDicom * lt = new LoadDicom(
+#ifdef ALIZA_LOAD_DCM_THREAD
+		LoadDicom_T * lt = new LoadDicom_T(
 			QString(""),
 			filenames,
 			ok3d,
@@ -4101,6 +4124,17 @@ QString Aliza::load_dicom_file(
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 			qApp->processEvents();
 		}
+#else
+		LoadDicom * lt = new LoadDicom(
+			QString(""),
+			filenames,
+			ok3d,
+			static_cast<const QWidget * const>(
+				const_cast<const SettingsWidget * const>(settingswidget)),
+			0,
+			settingswidget->get_enh_strategy());
+		lt->run();
+#endif
 		const QString message_ = lt->message;
 		if (!message_.isEmpty())
 		{
@@ -4140,6 +4174,12 @@ QString Aliza::load_dicom_file(
 		{
 			sr_files.push_back(lt->sr_files.at(k));
 		}
+#ifdef ALIZA_LOAD_DCM_THREAD
+#if 1
+		lt->quit();
+		lt->wait();
+#endif
+#endif
 		delete lt;
 	}
 	//

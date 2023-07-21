@@ -1,6 +1,8 @@
 #ifndef A_COMMONUTILS_H
 #define A_COMMONUTILS_H
 
+//#define ALIZA_LINUX_DEBUG_MEM
+
 #include <QStringList>
 #include <QString>
 #include <QByteArray>
@@ -116,6 +118,10 @@ public:
 		QList<double> &);
 	static double calculate_max_delta(const ImageVariant*);
 	static void random_RGB(float*, float*, float*);
+	static int get_reference_count(const ImageVariant*);
+#ifdef ALIZA_LINUX_DEBUG_MEM
+	static void linux_print_memusage(const std::string&);
+#endif
 };
 
 #endif

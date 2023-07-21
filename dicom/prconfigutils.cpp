@@ -37,6 +37,9 @@
 #include <itkImageDuplicator.h>
 #include <QMap>
 #include <QMultiMap>
+#ifndef ALIZA_LOAD_DCM_THREAD
+#include <QApplication>
+#endif
 #include <vector>
 #include <iostream>
 #include <mdcmDataElement.h>
@@ -3403,6 +3406,9 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				return nullptr;
 			}
 		}
+#ifndef ALIZA_LOAD_DCM_THREAD
+		QApplication::processEvents();
+#endif
 	}
 	//
 	// VOI LUT
@@ -3465,6 +3471,9 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 			}
 			voi = true;
 		}
+#ifndef ALIZA_LOAD_DCM_THREAD
+		QApplication::processEvents();
+#endif
 	}
 	//
 	// Presentation LUT
@@ -3545,6 +3554,9 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				}
 			}
 		}
+#ifndef ALIZA_LOAD_DCM_THREAD
+		QApplication::processEvents();
+#endif
 	}
 	//
 	//
@@ -3720,6 +3732,9 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				area_images,
 				ivariant->image_instance_uids);
 		}
+#ifndef ALIZA_LOAD_DCM_THREAD
+		QApplication::processEvents();
+#endif
 	}
 	//
 	// Spatial transform
@@ -3757,6 +3772,9 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				break;
 			}
 		}
+#ifndef ALIZA_LOAD_DCM_THREAD
+		QApplication::processEvents();
+#endif
 	}
 	CommonUtils::get_dimensions_(v);
 	//
@@ -3918,6 +3936,9 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 			}
 #endif
 		}
+#ifndef ALIZA_LOAD_DCM_THREAD
+		QApplication::processEvents();
+#endif
 	}
 	//
 	// Graphic annotations
@@ -4006,6 +4027,9 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 			}
 #endif
 		}
+#ifndef ALIZA_LOAD_DCM_THREAD
+		QApplication::processEvents();
+#endif
 	}
 	//
 	// Display shutter
@@ -4061,6 +4085,9 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 			}
 		}
 #endif
+#ifndef ALIZA_LOAD_DCM_THREAD
+		QApplication::processEvents();
+#endif
 	}
 	//
 	//
@@ -4097,6 +4124,9 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 			}
 		}
 	}
+#ifndef ALIZA_LOAD_DCM_THREAD
+	QApplication::processEvents();
+#endif
 	//
 	//
 	//

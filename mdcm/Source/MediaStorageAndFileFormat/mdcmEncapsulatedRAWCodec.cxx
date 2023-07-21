@@ -128,7 +128,7 @@ EncapsulatedRAWCodec::Decode2(DataElement const & in, char * out_buffer, unsigne
   memcpy(
     out_buffer,
     tmp1,
-    ((len < len2) ? out_len : len2));
+    ((out_len < len2) ? out_len : len2));
 #endif
   return true;
 }

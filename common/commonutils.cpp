@@ -48,6 +48,7 @@
 #include <chrono>
 #include <functional>
 #include <cfloat>
+#include <atomic>
 #include "dicomutils.h"
 #include "colorspace/colorspace.h"
 #ifdef USE_GET_TOTAL_MEM
@@ -58,6 +59,11 @@
 #endif
 #endif
 
+#ifdef ALIZA_LINUX_DEBUG_MEM
+#include <unistd.h>
+#include <ios>
+#include <fstream>
+#endif
 
 namespace
 {
@@ -1961,14 +1967,14 @@ template<typename T> double get_value(
 
 int CommonUtils::get_next_id()
 {
-	static int id___ = 0;
+	static std::atomic<int> id___{};
 	++id___;
 	return id___;
 }
 
 int CommonUtils::get_next_group_id()
 {
-	static int group_id___ = 0;
+	static std::atomic<int> group_id___{};
 	++group_id___;
 	return group_id___;
 }
@@ -3624,7 +3630,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				{
 					p__ = &data[0][0];
 				}
-				bool bad_direction = true;
+				bool bad_direction{true};
 				error = process_dicom_monochrome_image1<ImageTypeUS>(
 					ok,
 					ivariant,
@@ -3704,7 +3710,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				{
 					p__ = &data[0][0];
 				}
-				bool bad_direction = true;
+				bool bad_direction{true};
 				error = process_dicom_monochrome_image1<ImageTypeSI>(
 					ok,
 					ivariant,
@@ -3784,7 +3790,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				{
 					p__ = &data[0][0];
 				}
-				bool bad_direction = true;
+				bool bad_direction{true};
 				error = process_dicom_monochrome_image1<ImageTypeUI>(
 					ok,
 					ivariant,
@@ -3864,7 +3870,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				{
 					p__ = &data[0][0];
 				}
-				bool bad_direction = true;
+				bool bad_direction{true};
 				error = process_dicom_monochrome_image1<ImageTypeSLL>(
 					ok,
 					ivariant,
@@ -3944,7 +3950,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				{
 					p__ = &data[0][0];
 				}
-				bool bad_direction = true;
+				bool bad_direction{true};
 				error = process_dicom_monochrome_image1<ImageTypeULL>(
 					ok,
 					ivariant,
@@ -4027,7 +4033,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					p__ = &data[0][0];
 				}
 				ivariant->di->maxwindow = true;
-				bool bad_direction = true;
+				bool bad_direction{true};
 				error = process_dicom_monochrome_image1<ImageTypeUC>(
 					ok,
 					ivariant,
@@ -4107,7 +4113,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				{
 					p__ = &data[0][0];
 				}
-				bool bad_direction = true;
+				bool bad_direction{true};
 				error = process_dicom_monochrome_image1<ImageTypeF>(
 					ok,
 					ivariant,
@@ -4187,7 +4193,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 				{
 					p__ = &data[0][0];
 				}
-				bool bad_direction = true;
+				bool bad_direction{true};
 				error = process_dicom_monochrome_image1<ImageTypeD>(
 					ok,
 					ivariant,
@@ -4287,7 +4293,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 			{
 				p__ = &data[0][0];
 			}
-			bool bad_direction = true;
+			bool bad_direction{true};
 			error = process_dicom_rgb_image1<RGBImageTypeUC>(
 				ok,
 				ivariant,
@@ -4375,7 +4381,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 			{
 				p__ = &data[0][0];
 			}
-			bool bad_direction = true;
+			bool bad_direction{true};
 			error = process_dicom_rgb_image1<RGBImageTypeUS>(
 				ok,
 				ivariant,
@@ -4462,7 +4468,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 			{
 				p__ = &data[0][0];
 			}
-			bool bad_direction = true;
+			bool bad_direction{true};
 			error = process_dicom_rgb_image1<RGBImageTypeSS>(
 				ok,
 				ivariant,
@@ -4547,7 +4553,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 			{
 				p__ = &data[0][0];
 			}
-			bool bad_direction = true;
+			bool bad_direction{true};
 			error = process_dicom_rgb_image1<RGBImageTypeF>(
 				ok,
 				ivariant,
@@ -4654,7 +4660,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 			{
 				p__ = &data[0][0];
 			}
-			bool bad_direction = true;
+			bool bad_direction{true};
 			error = process_dicom_rgba_image1<RGBAImageTypeUC>(
 				ok,
 				ivariant,
@@ -5105,6 +5111,68 @@ void CommonUtils::random_RGB(float * R, float * G, float * B)
 	*G = static_cast<float>(G_);
 	*B = static_cast<float>(B_);
 }
+
+// clang-format off
+int CommonUtils::get_reference_count(const ImageVariant * v)
+{
+	if (!v)
+	{
+		std::cout << "Image is null (ref. count not possible)" << std::endl;
+		return -1;
+	}
+	int x{};
+	bool b{};
+	if (v->pSS.IsNotNull())      {                       x = v->pSS->GetReferenceCount();     }
+	if (v->pUS.IsNotNull())      {if (x > 0) {b = true;} x = v->pUS->GetReferenceCount();     }
+	if (v->pSI.IsNotNull())      {if (x > 0) {b = true;} x = v->pSI->GetReferenceCount();     }
+	if (v->pUI.IsNotNull())      {if (x > 0) {b = true;} x = v->pUI->GetReferenceCount();     }
+	if (v->pUC.IsNotNull())      {if (x > 0) {b = true;} x = v->pUC->GetReferenceCount();     }
+	if (v->pF.IsNotNull())       {if (x > 0) {b = true;} x = v->pF->GetReferenceCount();      }
+	if (v->pD.IsNotNull())       {if (x > 0) {b = true;} x = v->pD->GetReferenceCount();      }
+	if (v->pSLL.IsNotNull())     {if (x > 0) {b = true;} x = v->pSLL->GetReferenceCount();    }
+	if (v->pULL.IsNotNull())     {if (x > 0) {b = true;} x = v->pULL->GetReferenceCount();    }
+	if (v->pSS_rgb.IsNotNull())  {if (x > 0) {b = true;} x = v->pSS_rgb->GetReferenceCount(); }
+	if (v->pUS_rgb.IsNotNull())  {if (x > 0) {b = true;} x = v->pUS_rgb->GetReferenceCount(); }
+	if (v->pSI_rgb.IsNotNull())  {if (x > 0) {b = true;} x = v->pSI_rgb->GetReferenceCount(); }
+	if (v->pUI_rgb.IsNotNull())  {if (x > 0) {b = true;} x = v->pUI_rgb->GetReferenceCount(); }
+	if (v->pUC_rgb.IsNotNull())  {if (x > 0) {b = true;} x = v->pUC_rgb->GetReferenceCount(); }
+	if (v->pF_rgb.IsNotNull())   {if (x > 0) {b = true;} x = v->pF_rgb->GetReferenceCount();  }
+	if (v->pD_rgb.IsNotNull())   {if (x > 0) {b = true;} x = v->pD_rgb->GetReferenceCount();  }
+	if (v->pSS_rgba.IsNotNull()) {if (x > 0) {b = true;} x = v->pSS_rgba->GetReferenceCount();}
+	if (v->pUS_rgba.IsNotNull()) {if (x > 0) {b = true;} x = v->pUS_rgba->GetReferenceCount();}
+	if (v->pSI_rgba.IsNotNull()) {if (x > 0) {b = true;} x = v->pSI_rgba->GetReferenceCount();}
+	if (v->pUI_rgba.IsNotNull()) {if (x > 0) {b = true;} x = v->pUI_rgba->GetReferenceCount();}
+	if (v->pUC_rgba.IsNotNull()) {if (x > 0) {b = true;} x = v->pUC_rgba->GetReferenceCount();}
+	if (v->pF_rgba.IsNotNull())  {if (x > 0) {b = true;} x = v->pF_rgba->GetReferenceCount(); }
+	if (v->pD_rgba.IsNotNull())  {if (x > 0) {b = true;} x = v->pD_rgba->GetReferenceCount(); }
+	std::cout << "Ref. count = " << x << (b ? ", multiple images" : " ") << std::endl;
+	return x;
+}
+// clang-format on
+
+#ifdef ALIZA_LINUX_DEBUG_MEM
+void CommonUtils::linux_print_memusage(const std::string & s)
+{
+   std::ifstream stat_stream("/proc/self/stat", std::ios_base::in);
+   // Vars for leading unused entries
+   std::string pid, comm, state, ppid, pgrp, session, tty_nr;
+   std::string tpgid, flags, minflt, cminflt, majflt, cmajflt;
+   std::string utime, stime, cutime, cstime, priority, nice;
+   std::string O, itrealvalue, starttime;
+   // The two used fields
+   unsigned long long vsize;
+   long long rss;
+   stat_stream >> pid >> comm >> state >> ppid >> pgrp >> session >> tty_nr
+               >> tpgid >> flags >> minflt >> cminflt >> majflt >> cmajflt
+               >> utime >> stime >> cutime >> cstime >> priority >> nice
+               >> O >> itrealvalue >> starttime >> vsize >> rss; // don't care about the rest
+   stat_stream.close();
+   const unsigned long long page_size_kb = sysconf(_SC_PAGE_SIZE);
+   const long double vm_usage = vsize / 1073741824.0L;
+   const long double resident_set = (rss * page_size_kb) / 1073741824.0L;
+   std::cout << s << ": VM = " << vm_usage << " GB, RSS = " << resident_set << " GB " << std::endl;
+}
+#endif
 
 #ifdef USE_GET_TOTAL_MEM
 #undef USE_GET_TOTAL_MEM
