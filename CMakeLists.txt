@@ -106,6 +106,8 @@ endif()
 option(ALIZA_MEDIASTORAGE_MODE "Build for media storage" OFF)
 mark_as_advanced(ALIZA_MEDIASTORAGE_MODE)
 
+option(ALIZA_LOAD_DCM_THREAD "Load DICOM in separate thread" ON)
+
 # Temporary
 set(TMP_USE_53_SPATIAL_ENUMS TRUE)
 
@@ -197,6 +199,10 @@ if(NOT WIN32)
   endif()
 endif()
 message(STATUS "CXX flags: " ${CMAKE_CXX_FLAGS})
+
+if(ALIZA_LOAD_DCM_THREAD)
+  add_definitions(-DALIZA_LOAD_DCM_THREAD)
+endif()
 
 if(ALIZA_QT_VERSION STREQUAL "4")
   set(USE_QT_V_4 TRUE)
@@ -795,7 +801,6 @@ set(ALIZAMS_SRCS ${ALIZAMS_SRCS}
   ${CMAKE_CURRENT_SOURCE_DIR}/dicom/splituihgridfilter.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/dicom/spectroscopyutils.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/dicom/srutils.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/dicom/loaddicom.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/CG/camera.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/CG/glwidget.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/CG/testgl.cpp
@@ -838,6 +843,12 @@ set(ALIZAMS_SRCS ${ALIZAMS_SRCS}
   ${CMAKE_CURRENT_SOURCE_DIR}/browser/anonymazerwidget2.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/aliza.cpp)
 
+if(ALIZA_LOAD_DCM_THREAD)
+  set(ALIZAMS_SRCS ${ALIZAMS_SRCS} ${CMAKE_CURRENT_SOURCE_DIR}/dicom/loaddicom_t.cpp)
+else()
+  set(ALIZAMS_SRCS ${ALIZAMS_SRCS} ${CMAKE_CURRENT_SOURCE_DIR}/dicom/loaddicom.cpp)
+endif()
+
 if(NOT ALIZA_MEDIASTORAGE_MODE)
   set(ALIZAMS_SRCS ${ALIZAMS_SRCS} ${CMAKE_CURRENT_SOURCE_DIR}/browser/ctkdialog.cpp)
 endif()
@@ -858,7 +869,6 @@ set(ALIZAMS_MOC_HRDS
   ${CMAKE_CURRENT_SOURCE_DIR}/browser/browserwidget2.h
   ${CMAKE_CURRENT_SOURCE_DIR}/browser/helpwidget.h
   ${CMAKE_CURRENT_SOURCE_DIR}/browser/anonymazerwidget2.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/dicom/loaddicom.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/findrefdialog.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/infodialog.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/imageinfodialog.h
@@ -885,6 +895,10 @@ set(ALIZAMS_MOC_HRDS
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/aboutwidget.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/srwidget.h
   ${CMAKE_CURRENT_SOURCE_DIR}/GUI/aliza.h)
+
+if(ALIZA_LOAD_DCM_THREAD)
+  set(ALIZAMS_MOC_HRDS ${ALIZAMS_MOC_HRDS} ${CMAKE_CURRENT_SOURCE_DIR}/dicom/loaddicom_t.h)
+endif()
 
 if(APPLE)
   if(USE_QT_V_6)

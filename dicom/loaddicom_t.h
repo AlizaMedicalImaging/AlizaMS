@@ -1,6 +1,7 @@
-#ifndef A_LOADDICOM_H
-#define A_LOADDICOM_H
+#ifndef A_LOADDICOM_T_H
+#define A_LOADDICOM_T_H
 
+#include <QThread>
 #include <QWidget>
 #include <QString>
 #include <QStringList>
@@ -8,11 +9,12 @@
 
 class ImageVariant;
 
-class LoadDicom
+class LoadDicom_T : public QThread
 {
+Q_OBJECT
 
 public:
-	LoadDicom(
+	LoadDicom_T(
 		const QString root_,
 		const QStringList & filenames_,
 		const bool ok3d_,
@@ -26,7 +28,7 @@ public:
 		settingswidget(settingswidget_),
 		load_type(load_type_),
 		enh_type(enh_type_) {}
-	~LoadDicom() {}
+	virtual ~LoadDicom_T() {}
 	void run();
 	QString message;
 	std::vector<ImageVariant*> ivariants;

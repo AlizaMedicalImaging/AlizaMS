@@ -62,6 +62,9 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QDirIterator>
+#ifndef ALIZA_LOAD_DCM_THREAD
+#include <QApplication>
+#endif
 #include "settingswidget.h"
 #include "updateqtcommand.h"
 #include <iostream>
@@ -70,6 +73,7 @@
 #include <algorithm>
 #include <random>
 #include <chrono>
+#include <atomic>
 #include "vectormath/scalar/vectormath.h"
 #ifdef ALIZA_USE_SYSTEM_LCMS2
 #include <lcms2.h>
@@ -3001,6 +3005,9 @@ void DicomUtils::read_image_info_rtdose(const QString & f,
 		if (get_string_value(ds, tspacing, spacing_))
 			spacing = spacing_.remove(QChar('\0'));
 	}
+#ifndef ALIZA_LOAD_DCM_THREAD
+	QApplication::processEvents();
+#endif
 }
 
 //#define TMP_PRINT_LOAD_CONTOUR
@@ -3967,12 +3974,12 @@ quit_:
 	return ok;
 }
 
-static short force_suppllut = 0;
+static std::atomic<short> force_suppllut(0);
 void DicomUtils::global_force_suppllut(short x)
 {
 	// 1 force apply
 	// 2 force not apply
-	force_suppllut = x;
+	force_suppllut.store(x);
 }
 
 void DicomUtils::read_dimension_index_sq(
@@ -7095,6 +7102,9 @@ QString DicomUtils::read_enhanced(
 	const float tolerance,
 	const bool apply_rescale)
 {
+#ifdef ALIZA_LINUX_DEBUG_MEM
+	CommonUtils::linux_print_memusage("before read_enhanced()");
+#endif
 #ifdef ENHANCED_PRINT_INFO
 #if 1
 	std::cout << "EnhancedIODLoadingType = " << enh_loading_type << std::endl;
@@ -7147,6 +7157,9 @@ QString DicomUtils::read_enhanced(
 		{
 			return QString("ds.IsEmpty()");
 		}
+#ifndef ALIZA_LOAD_DCM_THREAD
+		QApplication::processEvents();
+#endif
 		const mdcm::Tag tRows(0x0028,0x0010);
 		const mdcm::Tag tColumns(0x0028,0x0011);
 		rows_ok = get_us_value(ds, tRows, &rows_);
@@ -7404,6 +7417,9 @@ QString DicomUtils::read_enhanced(
 		delete [] data[x];
 	}
 	data.clear();
+#ifdef ALIZA_LINUX_DEBUG_MEM
+	CommonUtils::linux_print_memusage("after read_enhanced()");
+#endif
 	return message_;
 }
 
@@ -7473,6 +7489,9 @@ QString DicomUtils::read_enhanced_supp_palette(
 		{
 			return QString("No Supplemental LUT");
 		}
+#ifndef ALIZA_LOAD_DCM_THREAD
+		QApplication::processEvents();
+#endif
 		const mdcm::Tag tRows(0x0028,0x0010);
 		const mdcm::Tag tColumns(0x0028,0x0011);
 		rows_ok = get_us_value(ds, tRows, &rows_);
@@ -7813,6 +7832,9 @@ QString DicomUtils::read_ultrasound(
 		}
 		const mdcm::File    & file = reader.GetFile();
 		const mdcm::DataSet & ds   = file.GetDataSet();
+#ifndef ALIZA_LOAD_DCM_THREAD
+		QApplication::processEvents();
+#endif
 		if (ds.FindDataElement(tnumframes))
 		{
 			const mdcm::DataElement & e =
@@ -7999,6 +8021,9 @@ QString DicomUtils::read_ultrasound(
 	direction[1][2] = nrm_dircos_y;
 	direction[2][2] = nrm_dircos_z;
 	//
+#ifdef ALIZA_LINUX_DEBUG_MEM
+	CommonUtils::linux_print_memusage("before gen_itk_image()");
+#endif
 	QString error = CommonUtils::gen_itk_image(ok,
 		data, true,
 		pixelformat, pi,
@@ -8022,6 +8047,9 @@ QString DicomUtils::read_ultrasound(
 		delete [] data[x];
 	}
 	data.clear();
+#ifdef ALIZA_LINUX_DEBUG_MEM
+	CommonUtils::linux_print_memusage("after gen_itk_image()");
+#endif
 	if (*ok == false)
 	{
 		return error;
@@ -8096,6 +8124,9 @@ QString DicomUtils::read_nuclear(
 		{
 			return (QString("can not read file ") + images_ipp.at(0));
 		}
+#ifndef ALIZA_LOAD_DCM_THREAD
+		QApplication::processEvents();
+#endif
 		const mdcm::File    & file = reader.GetFile();
 		const mdcm::DataSet & ds   = file.GetDataSet();
 #if 0
@@ -8219,6 +8250,9 @@ are stacked in front of the first slice. See Image Orientation
 	std::cout << "           " << direction[0][2] << " " << direction[1][2] << " " << direction[2][2] << std::endl;
 #endif
 	//
+#ifdef ALIZA_LINUX_DEBUG_MEM
+	CommonUtils::linux_print_memusage("before gen_itk_image()");
+#endif
 	QString error = CommonUtils::gen_itk_image(ok,
 		data, true,
 		pixelformat, pi,
@@ -8242,6 +8276,9 @@ are stacked in front of the first slice. See Image Orientation
 		delete [] data[x];
 	}
 	data.clear();
+#ifdef ALIZA_LINUX_DEBUG_MEM
+	CommonUtils::linux_print_memusage("after gen_itk_image()");
+#endif
 	if (*ok == false)
 	{
 		return error;
@@ -8328,6 +8365,9 @@ QString DicomUtils::read_series(
 				data.clear();
 				return (QString("can not read file ") + images_ipp.at(j));
 			}
+#ifndef ALIZA_LOAD_DCM_THREAD
+			QApplication::processEvents();
+#endif
 			const mdcm::File & file = reader.GetFile();
 			const mdcm::DataSet & ds = file.GetDataSet();
 			if (j == 0)
@@ -8946,6 +8986,9 @@ QString DicomUtils::read_series(
 		(apply_rescale)
 		? wsettings->get_rescale()
 		: true;
+#ifdef ALIZA_LINUX_DEBUG_MEM
+	CommonUtils::linux_print_memusage("before gen_itk_image()");
+#endif
 	QString error = CommonUtils::gen_itk_image(ok,
 		data, true,
 		pixelformat, pi,
@@ -8966,6 +9009,9 @@ QString DicomUtils::read_series(
 		delete [] data[x];
 	}
 	data.clear();
+#ifdef ALIZA_LINUX_DEBUG_MEM
+	CommonUtils::linux_print_memusage("after gen_itk_image()");
+#endif
 	if (*ok == false)
 	{
 		ivariant->anatomy.clear();
@@ -9082,6 +9128,9 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 	{
 		return false;
 	}
+#ifndef ALIZA_LOAD_DCM_THREAD
+	QApplication::processEvents();
+#endif
 	mdcm::File & rfile = reader.GetFile();
 	mdcm::DataSet & ds = rfile.GetDataSet();
 	mdcm::FileMetaInformation & header = rfile.GetHeader();
@@ -9381,6 +9430,9 @@ QString DicomUtils::read_buffer(
 	unsigned long long * buffers_size,
 	const bool use_icc, bool * has_icc)
 {
+#ifdef ALIZA_LINUX_DEBUG_MEM
+	CommonUtils::linux_print_memusage("read_buffer() begin");
+#endif
 	*ok = false;
 	mdcm::ImageHelper::SetForceRescaleInterceptSlope(true);
 	mdcm::ImageHelper::SetWorkaroundPredictorBug(pred6_bug);
@@ -9466,6 +9518,9 @@ QString DicomUtils::read_buffer(
 			if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 			return QString("!image_reader.Read()");
 		}
+#ifndef ALIZA_LOAD_DCM_THREAD
+		QApplication::processEvents();
+#endif
 		mdcm::Image & image = image_reader.GetImage();
 		{
 			const unsigned long long buffer_size_tmp = image.GetBufferLength();
@@ -10465,6 +10520,9 @@ QString DicomUtils::read_buffer(
 	delete [] icc_profile;
 	if (elscint && !elscf.isEmpty()) QFile::remove(elscf);
 	*ok = true;
+#ifdef ALIZA_LINUX_DEBUG_MEM
+	CommonUtils::linux_print_memusage("read_buffer() end");
+#endif
 	return QString("");
 }
 
@@ -10915,6 +10973,10 @@ QString DicomUtils::read_enhanced_common(
 				}
 			}
 			//
+#ifndef ALIZA_LOAD_DCM_THREAD
+			QApplication::processEvents();
+#endif
+			//
 			for (int i = 0; i < static_cast<int>(tmp1.size()); ++i)
 			{
 				AnatomyDesc anatomy_desc;
@@ -11214,6 +11276,9 @@ QString DicomUtils::read_enhanced_common(
 				const short saved_lut_function = ivariant->di->default_lut_function;
 				if (rescale_tmp)
 				{
+#ifdef ALIZA_LINUX_DEBUG_MEM
+					CommonUtils::linux_print_memusage("before gen_itk_image()");
+#endif
 					message_ = CommonUtils::gen_itk_image(ok,
 						tmp3,
 						false,
@@ -11238,6 +11303,9 @@ QString DicomUtils::read_enhanced_common(
 						no_warn_rescale,
 						use_icc,
 						false);
+#ifdef ALIZA_LINUX_DEBUG_MEM
+					CommonUtils::linux_print_memusage("after gen_itk_image()");
+#endif
 					if (*ok)
 					{
 						// check if not only 1 and 0
@@ -11279,6 +11347,9 @@ QString DicomUtils::read_enhanced_common(
 				}
 				else
 				{
+#ifdef ALIZA_LINUX_DEBUG_MEM
+					CommonUtils::linux_print_memusage("before gen_itk_image()");
+#endif
 					message_ = CommonUtils::gen_itk_image(ok,
 						tmp3,
 						false,
@@ -11303,6 +11374,9 @@ QString DicomUtils::read_enhanced_common(
 						no_warn_rescale,
 						use_icc,
 						false);
+#ifdef ALIZA_LINUX_DEBUG_MEM
+					CommonUtils::linux_print_memusage("after gen_itk_image()");
+#endif
 				}
 			}
 			if (*ok)
@@ -11801,6 +11875,9 @@ bool DicomUtils::is_not_interleaved(const QStringList & images)
 #endif
 		const bool f_ok = reader.ReadSelectedTags(tags);
 		if (!f_ok) return false;
+#ifndef ALIZA_LOAD_DCM_THREAD
+		QApplication::processEvents();
+#endif
 		const mdcm::File & file = reader.GetFile();
 		const mdcm::DataSet & ds = file.GetDataSet();
 		if (ds.IsEmpty()) return false;
@@ -11919,6 +11996,9 @@ void DicomUtils::write_encapsulated(
 #endif
 	const bool ok = reader.ReadSelectedTags(tags);
 	if (!ok) return;
+#ifndef ALIZA_LOAD_DCM_THREAD
+	QApplication::processEvents();
+#endif
 	const mdcm::File & file = reader.GetFile();
 	const mdcm::DataSet & ds = file.GetDataSet();
 	if (!ds.FindDataElement(t)) return;
@@ -11970,6 +12050,9 @@ QString DicomUtils::suffix_mpeg(const QString & f)
 			return QString(".mp4");
 		}
 	}
+#ifndef ALIZA_LOAD_DCM_THREAD
+	QApplication::processEvents();
+#endif
 	return QString(".bin");
 }
 
@@ -11992,6 +12075,9 @@ void DicomUtils::write_mpeg(
 #endif
 	const bool ok = reader.ReadSelectedTags(tags);
 	if (!ok) return;
+#ifndef ALIZA_LOAD_DCM_THREAD
+	QApplication::processEvents();
+#endif
 	const mdcm::File & file = reader.GetFile();
 	const mdcm::DataSet & ds = file.GetDataSet();
 	if (!ds.FindDataElement(t)) return;
@@ -12185,6 +12271,9 @@ bool DicomUtils::process_contrours_ref(
 	reader.SetFileName(f.toLocal8Bit().constData());
 #endif
 	if (!reader.Read()) return false;
+#ifndef ALIZA_LOAD_DCM_THREAD
+	QApplication::processEvents();
+#endif
 	const mdcm::File & file = reader.GetFile();
 	const mdcm::DataSet & ds = file.GetDataSet();
 	if (ds.IsEmpty()) return false;
@@ -12238,6 +12327,9 @@ bool DicomUtils::process_contrours_ref(
 #endif
 			const bool f_ok = reader1.ReadSelectedTags(tags);
 			if (!f_ok) continue;
+#ifndef ALIZA_LOAD_DCM_THREAD
+			QApplication::processEvents();
+#endif
 			const mdcm::DataSet & ds1 = reader1.GetFile().GetDataSet();
 			if (ds1.FindDataElement(tsopinstance))
 			{
@@ -12384,6 +12476,9 @@ bool DicomUtils::scan_files_for_instance_uid(
 		reader.SetFileName(tmp0.toLocal8Bit().constData());
 #endif
 		if (!reader.ReadSelectedTags(tags)) continue;
+#ifndef ALIZA_LOAD_DCM_THREAD
+		QApplication::processEvents();
+#endif
 		const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
 		QString uid_;
 		const bool ok = get_string_value(ds, tSOPInstanceUID, uid_);
@@ -12419,6 +12514,9 @@ void DicomUtils::read_pr_ref(
 	reader.SetFileName(f.toLocal8Bit().constData());
 #endif
 	if (!reader.Read()) return;
+#ifndef ALIZA_LOAD_DCM_THREAD
+	QApplication::processEvents();
+#endif
 	const mdcm::File & file = reader.GetFile();
 	const mdcm::DataSet & ds = file.GetDataSet();
 	if (ds.IsEmpty()) return;
@@ -13238,6 +13336,9 @@ QString DicomUtils::read_dicom(
 	short load_type,
 	short enh_loading_type)
 {
+#ifdef ALIZA_LINUX_DEBUG_MEM
+	CommonUtils::linux_print_memusage("read_dicom() begin");
+#endif
 	bool ok{};
 	QString message_;
 	const mdcm::Tag tSOPClassUID(0x0008,0x0016);
@@ -13290,6 +13391,9 @@ QString DicomUtils::read_dicom(
 	const QString filenames_num = QString(" / ") + QString::number(filenames_size);
 	for (int x = 0; x < filenames_size; ++x)
 	{
+#ifndef ALIZA_LOAD_DCM_THREAD
+		QApplication::processEvents();
+#endif
 		QString sop;
 		QString photometric;
 		bool icc_found{};
@@ -13312,6 +13416,9 @@ QString DicomUtils::read_dicom(
 		reader.SetFileName(filenames.at(x).toLocal8Bit().constData());
 #endif
 		if (!reader.Read()) continue;
+#ifndef ALIZA_LOAD_DCM_THREAD
+		QApplication::processEvents();
+#endif
 		const mdcm::File & file = reader.GetFile();
 		const mdcm::FileMetaInformation & header = file.GetHeader();
 		const mdcm::TransferSyntax & ts =
@@ -13321,6 +13428,9 @@ QString DicomUtils::read_dicom(
 		{
 			continue;
 		}
+#ifndef ALIZA_LOAD_DCM_THREAD
+		QApplication::processEvents();
+#endif
 		if (ds.FindDataElement(tSOPClassUID))
 		{
 			const mdcm::DataElement & sop_ =
@@ -13671,6 +13781,12 @@ QString DicomUtils::read_dicom(
 			localizer_tmp1 = localizer_tmp0;
 		}
 	}
+#ifdef ALIZA_LINUX_DEBUG_MEM
+	CommonUtils::linux_print_memusage("read_dicom() 1");
+#endif
+#ifndef ALIZA_LOAD_DCM_THREAD
+	QApplication::processEvents();
+#endif
 	//
 	//
 	//
@@ -13879,6 +13995,13 @@ QString DicomUtils::read_dicom(
 		}
 	}
 	//
+#ifndef ALIZA_LOAD_DCM_THREAD
+	QApplication::processEvents();
+#endif
+	//
+#ifdef ALIZA_LINUX_DEBUG_MEM
+	CommonUtils::linux_print_memusage("read_dicom() 2");
+#endif
 	if (ultrasound)
 	{
 		// TODO check PR
@@ -14390,6 +14513,9 @@ QString DicomUtils::read_dicom(
 			reader.SetFileName(images.at(x).toLocal8Bit().constData());
 #endif
 			if (!reader.ReadUpToTag(mdcm::Tag(0x0028,0x2000))) continue;
+#ifndef ALIZA_LOAD_DCM_THREAD
+			QApplication::processEvents();
+#endif
 			const mdcm::File    & file = reader.GetFile();
 			const mdcm::DataSet & ds   = file.GetDataSet();
 			if (ds.IsEmpty()) continue;
@@ -14687,6 +14813,9 @@ QString DicomUtils::read_dicom(
 			}
 		}
 	}
+#ifdef ALIZA_LINUX_DEBUG_MEM
+	CommonUtils::linux_print_memusage("read_dicom() 3");
+#endif
 	if (count_uid_errors > 0)
 	{
 		if (!message_.isEmpty()) message_.append(QChar('\n'));
@@ -14780,6 +14909,9 @@ QString DicomUtils::read_dicom(
 				reader.SetFileName(rtstruct_ref_search.at(x).toLocal8Bit().constData());
 #endif
 				const bool str_f_ok = reader.Read();
+#ifndef ALIZA_LOAD_DCM_THREAD
+				QApplication::processEvents();
+#endif
 				if (str_f_ok)
 				{
 					ImageVariant * ivariant = new ImageVariant(
@@ -14871,6 +15003,15 @@ QString DicomUtils::read_dicom(
 		}
 	}
 	//
+#if 0
+	for (size_t x = 0; x < ivariants.size(); ++x)
+	{
+		CommonUtils::get_reference_count(ivariants.at(x));
+	}
+#endif
+#ifdef ALIZA_LINUX_DEBUG_MEM
+	CommonUtils::linux_print_memusage("read_dicom() end");
+#endif
 	return message_;
 }
 
