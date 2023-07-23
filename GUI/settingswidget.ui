@@ -793,7 +793,7 @@
               </sizepolicy>
              </property>
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Loading DICOM in a separate thread has advantage that the GUI is always responsive and there is the option to break the operation at any point, Always recommended for &lt;span style=&quot; font-style:italic;&quot;&gt;Windows&lt;/span&gt; and &lt;span style=&quot; font-style:italic;&quot;&gt;macOS&lt;/span&gt;. May be set to &lt;span style=&quot; font-weight:600;&quot;&gt;Off&lt;/span&gt; on &lt;span style=&quot; font-style:italic;&quot;&gt;Linux&lt;/span&gt; in case of higher memory usage, specially for very large files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string/>
              </property>
              <property name="text">
               <string>Load DICOM files in separate thread</string>
