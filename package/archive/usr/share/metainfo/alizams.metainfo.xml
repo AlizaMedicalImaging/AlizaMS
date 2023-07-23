@@ -32,22 +32,22 @@
 
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.8.3/package/art/alizams_scr1.jpg</image>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.3/package/art/alizams_scr1.jpg</image>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.8.3/package/art/alizams_scr2.jpg</image>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.3/package/art/alizams_scr2.jpg</image>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.8.3/package/art/alizams_scr3.jpg</image>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.3/package/art/alizams_scr3.jpg</image>
     </screenshot>
   </screenshots>
 
   <releases>
-    <release version="1.9.1" date="2023-05-28">
+    <release version="1.9.3" date="2023-07-23">
       <description>
-        <p>Release 1.9.1</p>
+        <p>Release 1.9.3</p>
       </description>
-      <url>https://github.com/AlizaMedicalImaging/AlizaMS/releases/tag/v1.9.1</url>
+      <url>https://github.com/AlizaMedicalImaging/AlizaMS/releases/tag/v1.9.3</url>
     </release>
   </releases>
 
