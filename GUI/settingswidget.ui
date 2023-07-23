@@ -793,10 +793,10 @@
               </sizepolicy>
              </property>
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Loading DICOM in a separate thread has advantage that the GUI is always responsible and there is the option to break the operation at any point, but it seems that on &lt;span style=&quot; font-weight:600;&quot;&gt;Linux&lt;/span&gt; the application uses more memory, the memory should be released in case of memory shortage.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Loading DICOM in a separate thread has advantage that the GUI is always responsive and there is the option to break the operation at any point, Always recommended for &lt;span style=&quot; font-style:italic;&quot;&gt;Windows&lt;/span&gt; and &lt;span style=&quot; font-style:italic;&quot;&gt;macOS&lt;/span&gt;. Set to &lt;span style=&quot; font-weight:600;&quot;&gt;Off&lt;/span&gt; on &lt;span style=&quot; font-style:italic;&quot;&gt;Linux&lt;/span&gt; in case of higher memory usage, specially for very large files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
-              <string>Load DICOM in separate thread</string>
+              <string>Load DICOM files in separate thread</string>
              </property>
              <property name="checked">
               <bool>true</bool>
@@ -897,8 +897,8 @@ p, li { white-space: pre-wrap; }
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>419</width>
-            <height>203</height>
+            <width>989</width>
+            <height>587</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
