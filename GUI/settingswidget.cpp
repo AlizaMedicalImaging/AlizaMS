@@ -173,7 +173,11 @@ void SettingsWidget::set_default()
 	set_force_cp1251(false);
 	cp1251_checkBox->blockSignals(false);
 	mvsep_checkBox->setChecked(false);
+#if defined _WIN32 || defined __APPLE__
 	dcmthread_checkBox->setChecked(true);
+#else
+	dcmthread_checkBox->setChecked(false);
+#endif
 }
 
 void SettingsWidget::set_force_cp1251(bool b)
@@ -256,7 +260,11 @@ void SettingsWidget::readSettings()
 	const int tmp14 = settings.value(QString("force_cp1251"),    0).toInt();
 	const int tmp15 = settings.value(QString("apply_suppl"),     1).toInt();
 	const int tmp16 = settings.value(QString("mvsep"),           0).toInt();
+#if defined _WIN32 || defined __APPLE__
 	const int tmp17 = settings.value(QString("dcm_thread"),      1).toInt();
+#else
+	const int tmp17 = settings.value(QString("dcm_thread"),      0).toInt();
+#endif
 	settings.endGroup();
 	settings.beginGroup(QString("StyleDialog"));
 	saved_idx = settings.value(QString("saved_idx"), 0).toInt();
