@@ -553,6 +553,7 @@ void MainWindow::open_args(const QStringList & l)
 	QString message;
 	bool skip_next{};
 	QStringList l2;
+	const bool dcm_thread = settingswidget->get_dcm_thread();
 	for (int i = 0; i < l.size(); ++i)
 	{
 		if (!skip_next)
@@ -592,18 +593,22 @@ void MainWindow::open_args(const QStringList & l)
 		QList<QPushButton *> lb = pb->findChildren<QPushButton*>();
 		for (int x = 0; x < lb.size(); ++x) // one button
 		{
-#ifdef ALIZA_LOAD_DCM_THREAD
-			lb[x]->setStyleSheet("QPushButton { color: #8B0000; }");
-#else
-			lb[x]->hide();
-#endif
+			if (dcm_thread)
+			{
+				lb[x]->setStyleSheet("QPushButton { color: #8B0000; }");
+			}
+			else
+			{
+				lb[x]->hide();
+			}
 		}
 	}
 	pb->setModal(true);
 	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
-#ifdef ALIZA_LOAD_DCM_THREAD
-	connect(pb,SIGNAL(canceled()), this, SLOT(exit_null()));
-#endif
+	if (dcm_thread)
+	{
+		connect(pb,SIGNAL(canceled()), this, SLOT(exit_null()));
+	}
 	pb->setMinimumWidth(256);
 	pb->setRange(0, 0);
 	pb->setMinimumDuration(0);
@@ -650,9 +655,10 @@ void MainWindow::open_args(const QStringList & l)
 			}
 		}
 	}
-#ifdef ALIZA_LOAD_DCM_THREAD
-	disconnect(pb,SIGNAL(canceled()), this, SLOT(exit_null()));
-#endif
+	if (dcm_thread)
+	{
+		disconnect(pb,SIGNAL(canceled()), this, SLOT(exit_null()));
+	}
 	pb->close();
 	delete pb;
 	if (!message.isEmpty())
@@ -1403,6 +1409,7 @@ void MainWindow::dropEvent(QDropEvent * e)
 	const QMimeData * mimeData = e->mimeData();
 	QStringList l;
 	QString message;
+	const bool dcm_thread = settingswidget->get_dcm_thread();
 	if (mimeData && mimeData->hasUrls())
 	{
 		for (int i = 0; i < mimeData->urls().size(); ++i)
@@ -1436,18 +1443,22 @@ void MainWindow::dropEvent(QDropEvent * e)
 				QList<QPushButton *> lb = pb->findChildren<QPushButton*>();
 				for (int x = 0; x < lb.size(); ++x) // one button
 				{
-#ifdef ALIZA_LOAD_DCM_THREAD
-					lb[x]->setStyleSheet("QPushButton { color: #8B0000; }");
-#else
-					lb[x]->hide();
-#endif
+					if (dcm_thread)
+					{
+						lb[x]->setStyleSheet("QPushButton { color: #8B0000; }");
+					}
+					else
+					{
+						lb[x]->hide();
+					}
 				}
 			}
 			pb->setModal(true);
 			pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
-#ifdef ALIZA_LOAD_DCM_THREAD
-			connect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
-#endif
+			if (dcm_thread)
+			{
+				connect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
+			}
 			pb->setMinimumWidth(256);
 			pb->setRange(0, 0);
 			pb->setMinimumDuration(0);
@@ -1472,9 +1483,10 @@ void MainWindow::dropEvent(QDropEvent * e)
 					}
 				}
 			}
-#ifdef ALIZA_LOAD_DCM_THREAD
-			disconnect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
-#endif
+			if (dcm_thread)
+			{
+				disconnect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
+			}
 			pb->close();
 			delete pb;
 		}
@@ -1508,6 +1520,7 @@ void MainWindow::load_any()
 	bool lock = mutex.tryLock();
 	if (!lock) return;
 	QString message;
+	const bool dcm_thread = settingswidget->get_dcm_thread();
 	QStringList l = QFileDialog::getOpenFileNames(
 		this,
 		QString("Open Files"),
@@ -1522,16 +1535,20 @@ void MainWindow::load_any()
 		QList<QPushButton *> lb = pb->findChildren<QPushButton*>();
 		for (int x = 0; x < lb.size(); ++x) // one button
 		{
-#ifdef ALIZA_LOAD_DCM_THREAD
-			lb[x]->setStyleSheet("QPushButton { color: #8B0000; }");
-#else
-			lb[x]->hide();
-#endif
+			if (dcm_thread)
+			{
+				lb[x]->setStyleSheet("QPushButton { color: #8B0000; }");
+			}
+			else
+			{
+				lb[x]->hide();
+			}
 		}
 	}
-#ifdef ALIZA_LOAD_DCM_THREAD
-	connect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
-#endif
+	if (dcm_thread)
+	{
+		connect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
+	}
 	pb->setModal(true);
 	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
 	pb->setMinimumWidth(256);
@@ -1559,9 +1576,10 @@ void MainWindow::load_any()
 		}
 	}
 	l.clear();
-#ifdef ALIZA_LOAD_DCM_THREAD
-	disconnect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
-#endif
+	if (dcm_thread)
+	{
+		disconnect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
+	}
 	pb->close();
 	delete pb;
 	if (is_dicomdir)
@@ -1700,6 +1718,7 @@ void MainWindow::load_dicom_series2()
 {
 	const bool lock = mutex.tryLock();
 	if (!lock) return;
+	const bool dcm_thread = settingswidget->get_dcm_thread();
 	const bool selection =
 		browser2->tableWidget->selectionModel()->hasSelection();
 	if (!selection)
@@ -1714,16 +1733,20 @@ void MainWindow::load_dicom_series2()
 		QList<QPushButton *> lb = pb->findChildren<QPushButton*>();
 		for (int x = 0; x < lb.size(); ++x) // one button
 		{
-#ifdef ALIZA_LOAD_DCM_THREAD
-			lb[x]->setStyleSheet("QPushButton { color: #8B0000; }");
-#else
-			lb[x]->hide();
-#endif
+			if (dcm_thread)
+			{
+				lb[x]->setStyleSheet("QPushButton { color: #8B0000; }");
+			}
+			else
+			{
+				lb[x]->hide();
+			}
 		}
 	}
-#ifdef ALIZA_LOAD_DCM_THREAD
-	connect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
-#endif
+	if (dcm_thread)
+	{
+		connect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
+	}
 	pb->setModal(true);
 	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
 	pb->setMinimumWidth(256);
@@ -1735,9 +1758,10 @@ void MainWindow::load_dicom_series2()
 #endif
 	qApp->processEvents();
 	const QString message = aliza->load_dicom_series(pb);
-#ifdef ALIZA_LOAD_DCM_THREAD
-	disconnect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
-#endif
+	if (dcm_thread)
+	{
+		disconnect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
+	}
 	pb->close();
 	delete pb;
 	if (!message.isEmpty())

@@ -24,11 +24,8 @@
 #include "studyframewidget.h"
 #include "studygraphicswidget.h"
 #include "srwidget.h"
-#ifdef ALIZA_LOAD_DCM_THREAD
 #include "loaddicom_t.h"
-#else
 #include "loaddicom.h"
-#endif
 #include <itkVersion.h>
 #include <itkImage.h>
 #include <itkIndex.h>
@@ -732,6 +729,7 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 	{
 		glwidget->set_skip_draw(true);
 	}
+	const bool dcm_thread = settingswidget->get_dcm_thread();
 	const QModelIndexList selection =
 		browser2->tableWidget->selectionModel()->selectedRows();
 	for (int x = 0; x < selection.count(); ++x)
@@ -754,78 +752,119 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 		if (!item) continue;
 		if ((item->files.empty())) continue;
 		filenames = item->files;
-#ifdef ALIZA_LOAD_DCM_THREAD
-		LoadDicom_T * lt = new LoadDicom_T(
-			root,
-			filenames,
-			ok3d,
-			static_cast<const QWidget * const>(
-				const_cast<const SettingsWidget * const>(settingswidget)),
-			0,
-			settingswidget->get_enh_strategy());
-		lt->start();
-		while (!lt->isFinished())
+		if (dcm_thread)
 		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
-			qApp->processEvents();
-		}
-#else
-		LoadDicom * lt = new LoadDicom(
-			root,
-			filenames,
-			ok3d,
-			static_cast<const QWidget * const>(
-				const_cast<const SettingsWidget * const>(settingswidget)),
-			0,
-			settingswidget->get_enh_strategy());
-		lt->run();
-#endif
-		const QString message_ = lt->message;
-		if (!message_.isEmpty())
-		{
-			const int filenames_size = filenames.size();
-			if (!message.isEmpty()) message.append(QChar('\n'));
-			if (filenames_size == 1)
+			LoadDicom_T * lt = new LoadDicom_T(
+				root,
+				filenames,
+				ok3d,
+				static_cast<const QWidget * const>(
+					const_cast<const SettingsWidget * const>(settingswidget)),
+				0,
+				settingswidget->get_enh_strategy());
+			lt->start();
+			while (!lt->isFinished())
 			{
-				message.append(filenames.at(0) + QString(":\n    "));
+				std::this_thread::sleep_for(std::chrono::milliseconds(10));
+				qApp->processEvents();
 			}
-			else if (filenames_size >= 1)
+			const QString message_ = lt->message;
+			if (!message_.isEmpty())
 			{
-				message.append(filenames.at(0) + QString(" (1st file):\n    "));
+				const int filenames_size = filenames.size();
+				if (!message.isEmpty()) message.append(QChar('\n'));
+				if (filenames_size == 1)
+				{
+					message.append(filenames.at(0) + QString(":\n    "));
+				}
+				else if (filenames_size >= 1)
+				{
+					message.append(filenames.at(0) + QString(" (1st file):\n    "));
+				}
+				message.append(message_ + QString("\n\n"));
 			}
-			message.append(message_ + QString("\n\n"));
-		}
-		for (size_t k = 0; k < lt->ivariants.size(); ++k)
-		{
-			ivariants.push_back(lt->ivariants[k]);
-		}
-		for (int k = 0; k < lt->pdf_files.size(); ++k)
-		{
-			pdf_files.push_back(lt->pdf_files.at(k));
-		}
-		for (int k = 0; k < lt->stl_files.size(); ++k)
-		{
-			stl_files.push_back(lt->stl_files.at(k));
-		}
-		for (int k = 0; k < lt->video_files.size(); ++k)
-		{
-			video_files.push_back(lt->video_files.at(k));
-		}
-		for (int k = 0; k < lt->spectroscopy_files.size(); ++k)
-		{
-			spectroscopy_files.push_back(lt->spectroscopy_files.at(k));
-		}
-		for (int k = 0; k < lt->sr_files.size(); ++k)
-		{
-			sr_files.push_back(lt->sr_files.at(k));
-		}
-#ifdef ALIZA_LOAD_DCM_THREAD
+			for (size_t k = 0; k < lt->ivariants.size(); ++k)
+			{
+				ivariants.push_back(lt->ivariants[k]);
+			}
+			for (int k = 0; k < lt->pdf_files.size(); ++k)
+			{
+				pdf_files.push_back(lt->pdf_files.at(k));
+			}
+			for (int k = 0; k < lt->stl_files.size(); ++k)
+			{
+				stl_files.push_back(lt->stl_files.at(k));
+			}
+			for (int k = 0; k < lt->video_files.size(); ++k)
+			{
+				video_files.push_back(lt->video_files.at(k));
+			}
+			for (int k = 0; k < lt->spectroscopy_files.size(); ++k)
+			{
+				spectroscopy_files.push_back(lt->spectroscopy_files.at(k));
+			}
+			for (int k = 0; k < lt->sr_files.size(); ++k)
+			{
+				sr_files.push_back(lt->sr_files.at(k));
+			}
 #if 1
-		lt->quit();
-		lt->wait();
+			lt->quit();
+			lt->wait();
 #endif
-#endif
-		delete lt;
+			delete lt;
+		}
+		else
+		{
+			LoadDicom * lt = new LoadDicom(
+				root,
+				filenames,
+				ok3d,
+				static_cast<const QWidget * const>(
+					const_cast<const SettingsWidget * const>(settingswidget)),
+				0,
+				settingswidget->get_enh_strategy());
+			lt->run();
+			const QString message_ = lt->message;
+			if (!message_.isEmpty())
+			{
+				const int filenames_size = filenames.size();
+				if (!message.isEmpty()) message.append(QChar('\n'));
+				if (filenames_size == 1)
+				{
+					message.append(filenames.at(0) + QString(":\n    "));
+				}
+				else if (filenames_size >= 1)
+				{
+					message.append(filenames.at(0) + QString(" (1st file):\n    "));
+				}
+				message.append(message_ + QString("\n\n"));
+			}
+			for (size_t k = 0; k < lt->ivariants.size(); ++k)
+			{
+				ivariants.push_back(lt->ivariants[k]);
+			}
+			for (int k = 0; k < lt->pdf_files.size(); ++k)
+			{
+				pdf_files.push_back(lt->pdf_files.at(k));
+			}
+			for (int k = 0; k < lt->stl_files.size(); ++k)
+			{
+				stl_files.push_back(lt->stl_files.at(k));
+			}
+			for (int k = 0; k < lt->video_files.size(); ++k)
+			{
+				video_files.push_back(lt->video_files.at(k));
+			}
+			for (int k = 0; k < lt->spectroscopy_files.size(); ++k)
+			{
+				spectroscopy_files.push_back(lt->spectroscopy_files.at(k));
+			}
+			for (int k = 0; k < lt->sr_files.size(); ++k)
+			{
+				sr_files.push_back(lt->sr_files.at(k));
+			}
+			delete lt;
+		}
 	}
 	//
 	const QString message_ = process_dicom(
@@ -4108,8 +4147,9 @@ QString Aliza::load_dicom_file(
 	{
 		glwidget->set_skip_draw(true);
 	}
+	const bool dcm_thread = settingswidget->get_dcm_thread();
+	if (dcm_thread)
 	{
-#ifdef ALIZA_LOAD_DCM_THREAD
 		LoadDicom_T * lt = new LoadDicom_T(
 			QString(""),
 			filenames,
@@ -4124,17 +4164,6 @@ QString Aliza::load_dicom_file(
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 			qApp->processEvents();
 		}
-#else
-		LoadDicom * lt = new LoadDicom(
-			QString(""),
-			filenames,
-			ok3d,
-			static_cast<const QWidget * const>(
-				const_cast<const SettingsWidget * const>(settingswidget)),
-			0,
-			settingswidget->get_enh_strategy());
-		lt->run();
-#endif
 		const QString message_ = lt->message;
 		if (!message_.isEmpty())
 		{
@@ -4174,12 +4203,62 @@ QString Aliza::load_dicom_file(
 		{
 			sr_files.push_back(lt->sr_files.at(k));
 		}
-#ifdef ALIZA_LOAD_DCM_THREAD
 #if 1
 		lt->quit();
 		lt->wait();
 #endif
-#endif
+		delete lt;
+	}
+	else
+	{
+		LoadDicom * lt = new LoadDicom(
+			QString(""),
+			filenames,
+			ok3d,
+			static_cast<const QWidget * const>(
+				const_cast<const SettingsWidget * const>(settingswidget)),
+			0,
+			settingswidget->get_enh_strategy());
+		lt->run();
+		const QString message_ = lt->message;
+		if (!message_.isEmpty())
+		{
+			const int filenames_size = filenames.size();
+			if (!message.isEmpty()) message.append(QChar('\n'));
+			if (filenames_size == 1)
+			{
+				message.append(filenames.at(0) + QString(":\n    "));
+			}
+			else if (filenames_size >= 1)
+			{
+				message.append(filenames.at(0) + QString(" (1st file):\n    "));
+			}
+			message.append(message_ + QString("\n\n"));
+		}
+		for (size_t k = 0; k < lt->ivariants.size(); ++k)
+		{
+			ivariants.push_back(lt->ivariants[k]);
+		}
+		for (int k = 0; k < lt->pdf_files.size(); ++k)
+		{
+			pdf_files.push_back(lt->pdf_files.at(k));
+		}
+		for (int k = 0; k < lt->stl_files.size(); ++k)
+		{
+			stl_files.push_back(lt->stl_files.at(k));
+		}
+		for (int k = 0; k < lt->video_files.size(); ++k)
+		{
+			video_files.push_back(lt->video_files.at(k));
+		}
+		for (int k = 0; k < lt->spectroscopy_files.size(); ++k)
+		{
+			spectroscopy_files.push_back(lt->spectroscopy_files.at(k));
+		}
+		for (int k = 0; k < lt->sr_files.size(); ++k)
+		{
+			sr_files.push_back(lt->sr_files.at(k));
+		}
 		delete lt;
 	}
 	//

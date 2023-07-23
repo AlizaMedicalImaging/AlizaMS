@@ -7103,7 +7103,7 @@ QString DicomUtils::read_enhanced(
 	const bool apply_rescale)
 {
 #ifdef ALIZA_LINUX_DEBUG_MEM
-	CommonUtils::linux_print_memusage("before read_enhanced()");
+	CommonUtils::linux_print_memusage("read_enhanced() begin");
 #endif
 #ifdef ENHANCED_PRINT_INFO
 #if 1
@@ -7412,13 +7412,16 @@ QString DicomUtils::read_enhanced(
 			0);
 	}
 	*ok = tmp17;
+#ifdef ALIZA_LINUX_DEBUG_MEM
+	CommonUtils::linux_print_memusage("before delete[]");
+#endif
 	for (unsigned int x = 0; x < data.size(); ++x)
 	{
 		delete [] data[x];
 	}
 	data.clear();
 #ifdef ALIZA_LINUX_DEBUG_MEM
-	CommonUtils::linux_print_memusage("after read_enhanced()");
+	CommonUtils::linux_print_memusage("after delete[] / read_enhanced() end");
 #endif
 	return message_;
 }

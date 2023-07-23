@@ -593,8 +593,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>393</width>
-            <height>208</height>
+            <width>989</width>
+            <height>587</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -783,6 +783,25 @@
               </spacer>
              </item>
             </layout>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="dcmthread_checkBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Loading DICOM in a separate thread has advantage that the GUI is always responsible and there is the option to break the operation at any point, but it seems that on &lt;span style=&quot; font-weight:600;&quot;&gt;Linux&lt;/span&gt; the application uses more memory, the memory should be released in case of memory shortage.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Load DICOM in separate thread</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
            </item>
            <item>
             <widget class="QCheckBox" name="mvsep_checkBox">
@@ -1201,6 +1220,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>scrollArea</tabstop>
   <tabstop>pt_doubleSpinBox</tabstop>
   <tabstop>si_doubleSpinBox</tabstop>
+  <tabstop>dcmthread_checkBox</tabstop>
   <tabstop>mvsep_checkBox</tabstop>
   <tabstop>hidezoom_checkBox</tabstop>
   <tabstop>textBrowser</tabstop>

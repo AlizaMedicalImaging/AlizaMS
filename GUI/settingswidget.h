@@ -38,6 +38,7 @@ public:
 	short  get_enh_strategy() const;
 	bool   get_apply_supplemental_lut() const;
 	bool   get_skip_too_large() const;
+	bool   get_dcm_thread() const;
 
 private:
 	int   saved_idx{};
