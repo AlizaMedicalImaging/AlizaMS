@@ -123,10 +123,10 @@ typedef itk::Image<RGBAPixelUC, 2> RGBAImage2DTypeUC;
 typedef itk::Image<RGBAPixelF,  2> RGBAImage2DTypeF;
 typedef itk::Image<RGBAPixelD,  2> RGBAImage2DTypeD;
 
-typedef struct { float x, y, z, u, v; int t; } DPoint;
-typedef struct { float r, g, b; } ROIcolor;
-typedef struct { float r, g, b; } Contourcolor;
-typedef struct { float r, g, b; } Meshcolor;
+struct DPoint { float x, y, z, u, v; int t; };
+struct ROIcolor { float r, g, b; };
+struct Contourcolor { float r, g, b; };
+struct Meshcolor { float r, g, b; };
 typedef QList<DPoint> ListOfDPoints;
 
 class Contour
@@ -312,12 +312,12 @@ typedef QMap<int,QString> SOPInstanceUids;
 
 typedef QList<UltrasoundRegionData> USRegions;
 
-typedef struct
+struct SliceInstance
 {
 	unsigned int id;
 	int instance_number;
 	long long slice_position;
-} SliceInstance;
+};
 
 typedef std::vector<double> FrameTimes;
 

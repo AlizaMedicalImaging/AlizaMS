@@ -35,20 +35,20 @@ enum class DICOMLoadingType : short
 	RWVReference = 4
 };
 
-typedef struct
+struct DimIndex
 {
 	std::string uid;
 	mdcm::Tag index_pointer;
 	mdcm::Tag group_pointer;
-} DimIndex;
+};
 
 typedef std::vector<DimIndex> DimIndexSq;
 
-typedef struct
+struct DimIndexValue
 {
 	unsigned int id;
 	std::vector<unsigned int> idx;
-} DimIndexValue;
+};
 
 typedef std::vector<DimIndexValue> DimIndexValues;
 
@@ -93,11 +93,11 @@ public:
 
 typedef std::vector<FrameGroup> FrameGroupValues;
 
-typedef struct
+struct GEMSParam
 {
 	unsigned int type;
 	QList<QVariant> values;
-} GEMSParam;
+};
 
 class PrConfig
 {
