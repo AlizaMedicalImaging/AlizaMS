@@ -88,7 +88,7 @@ typedef Vectormath::Scalar::Vector3 sVector3;
 typedef Vectormath::Scalar::Vector4 sVector4;
 typedef Vectormath::Scalar::Matrix4 sMatrix4;
 
-typedef struct
+struct MixedDicomSeriesInfo
 {
 	int rows{-1};
 	int columns{-1};
@@ -98,7 +98,7 @@ typedef struct
 	QString file;
 	QString photometric;
 	QString sop;
-} MixedDicomSeriesInfo;
+};
 
 struct IPPIOP
 {
