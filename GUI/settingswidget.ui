@@ -796,7 +796,7 @@
               <string/>
              </property>
              <property name="text">
-              <string>Load DICOM files in separate thread</string>
+              <string>Load DICOM files in a separate thread</string>
              </property>
              <property name="checked">
               <bool>true</bool>
