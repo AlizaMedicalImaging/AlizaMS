@@ -1,35 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id type="desktop">alizams.desktop</id>
-
+  <id>alizams.desktop</id>
   <name>Aliza MS</name>
-  <summary>DICOM viewer</summary>
-
+  <summary>A DICOM viewer</summary>
   <metadata_license>FSFAP</metadata_license>
   <project_license>GPL-3.0-only</project_license>
-  <content_rating type="oars-1.1"/>
   <url type="homepage">https://github.com/AlizaMedicalImaging/AlizaMS</url>
-
+  <url type="bugtracker">https://github.com/AlizaMedicalImaging/AlizaMS/issues</url>
+  <categories>
+    <category>Graphics</category>
+    <category>Science</category>
+    <category>Education</category>
+  </categories>
   <description>
-    <p>2D and 3D views with many tools, 3D view also for non-uniform images, 
-      Volume Rendering, 
-      Multi-planar reconstruction (MPR), 
-      RTSTRUCT contours.
-    </p>
-    <p>DICOM Study multi-view with intersection lines.
-    </p>
-    <p>Consistently de-identify DICOM, maintain integrity.
-    </p>
-    <p>2D+t and 3D+t animations.
-    </p>
-    <p>DICOM metadata viewer.
-    </p>
-    <p>Most IODs are supported incl. enhanced, Structured Reports (SR), 
-      sequential and interleaved 4D Series, Grayscale Softcopy Presentation State (PR), 
-      Ultrasound with proper measurement in Calibrated Regions, etc.
-    </p>
+    <p>Aliza MS is a standalone medical DICOM viewer</p>
+    <ul>
+      <li>2D and 3D views with many tools</li>
+      <li>3D view also for non-uniform images</li>
+      <li>Volume Rendering</li>
+      <li>Multi-planar reconstruction (MPR)</li>
+      <li>RTSTRUCT contours</li>
+      <li>DICOM Study multi-view with intersection lines and side-by-side view</li>
+      <li>Proper measurement in Ultrasound Calibrated Regions</li>
+      <li>2D+t and 3D+t animations</li>
+      <li>Consistently de-identify DICOM, maintain integrity</li>
+      <li>DICOM metadata viewer</li>
+      <li>Most IODs are supported incl.Structured Reports, Key Objects Selection, Grayscale Softcopy Presentation State</li>
+    </ul>
   </description>
-
+  <content_rating type="oars-1.1">
+    <content_attribute id="drugs-alcohol">none</content_attribute>
+    <content_attribute id="drugs-narcotics">none</content_attribute>
+    <content_attribute id="drugs-tobacco">none</content_attribute>
+    <content_attribute id="language-discrimination">none</content_attribute>
+    <content_attribute id="language-humor">none</content_attribute>
+    <content_attribute id="language-profanity">none</content_attribute>
+    <content_attribute id="money-gambling">none</content_attribute>
+    <content_attribute id="money-purchasing">none</content_attribute>
+    <content_attribute id="sex-nudity">none</content_attribute>
+    <content_attribute id="sex-themes">none</content_attribute>
+    <content_attribute id="social-audio">none</content_attribute>
+    <content_attribute id="social-chat">none</content_attribute>
+    <content_attribute id="social-contacts">none</content_attribute>
+    <content_attribute id="social-info">none</content_attribute>
+    <content_attribute id="social-location">none</content_attribute>
+    <content_attribute id="violence-bloodshed">none</content_attribute>
+    <content_attribute id="violence-cartoon">none</content_attribute>
+    <content_attribute id="violence-desecration">none</content_attribute>
+    <content_attribute id="violence-fantasy">none</content_attribute>
+    <content_attribute id="violence-realistic">none</content_attribute>
+    <content_attribute id="violence-sexual">none</content_attribute>
+    <content_attribute id="violence-slavery">none</content_attribute>
+  </content_rating>
+  <launchable type="desktop-id">com.github.AlizaMedicalImaging.AlizaMS.desktop</launchable>
   <screenshots>
     <screenshot type="default">
       <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.3/package/art/alizams_scr1.jpg</image>
@@ -41,14 +64,15 @@
       <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.3/package/art/alizams_scr3.jpg</image>
     </screenshot>
   </screenshots>
-
   <releases>
-    <release version="1.9.3" date="2023-07-23">
+    <release date="2023-07-23" version="1.9.3">
       <description>
         <p>Release 1.9.3</p>
       </description>
       <url>https://github.com/AlizaMedicalImaging/AlizaMS/releases/tag/v1.9.3</url>
     </release>
+    <release date="2023-05-30" version="1.9.1"/>
+    <release date="2023-05-26" version="1.9.0"/>
+    <release date="2022-07-27" version="1.8.3"/>
   </releases>
-
 </component>
