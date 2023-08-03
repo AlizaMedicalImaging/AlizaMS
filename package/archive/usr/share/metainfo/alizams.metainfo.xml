@@ -52,7 +52,6 @@
     <content_attribute id="violence-sexual">none</content_attribute>
     <content_attribute id="violence-slavery">none</content_attribute>
   </content_rating>
-  <launchable type="desktop-id">com.github.AlizaMedicalImaging.AlizaMS.desktop</launchable>
   <screenshots>
     <screenshot type="default">
       <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.3/package/art/alizams_scr1.jpg</image>
