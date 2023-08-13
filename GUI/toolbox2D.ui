@@ -358,6 +358,11 @@
      </property>
      <item>
       <property name="text">
+       <string>Linear exact</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
        <string>Linear</string>
       </property>
      </item>

@@ -1381,15 +1381,7 @@ void Aliza::set_lut_function0(int x)
 {
 	ImageVariant * v = get_selected_image();
 	if (!v) return;
-	switch (x)
-	{
-	case 1:
-		v->di->lut_function = 2;
-		break;
-	default:
-		v->di->lut_function = 0;
-		break;
-	}
+	v->di->lut_function = x;
 }
 
 void Aliza::set_lut_function1(int x)
@@ -1623,7 +1615,7 @@ void Aliza::update_toolbox(const ImageVariant * v)
 	{
 		slicesAct->setEnabled(false);
 	}
-	toolbox2D->set_max_width(v->di->rmax-v->di->rmin);
+	toolbox2D->set_max_width(v->di->rmax - v->di->rmin + 1.0);
 	toolbox2D->set_window_upper(v->di->rmax);
 	toolbox2D->set_window_lower(v->di->rmin);
 	toolbox2D->toggle_locked_values(v->di->lock_level2D);
@@ -1674,22 +1666,12 @@ void Aliza::update_toolbox(const ImageVariant * v)
 	{
 		toolbox2D->center_horizontalSlider->setEnabled(true);
 		toolbox2D->width_horizontalSlider->setEnabled(true);
-		toolbox2D->center_horizontalSlider->setValue(
-			static_cast<int>(v->di->us_window_center));
-		toolbox2D->width_horizontalSlider->setValue(
-			static_cast<int>(v->di->us_window_width));
+		toolbox2D->center_horizontalSlider->setValue(static_cast<int>(v->di->us_window_center));
+		toolbox2D->width_horizontalSlider->setValue(static_cast<int>(v->di->us_window_width));
 	}
-	// FIXME
-	if (v->di->lut_function == 2)
-	{
-		toolbox2D->set_lut_function(1);
-		set_lut_function0(1);
-	}
-	else
-	{
-		toolbox2D->set_lut_function(0);
-		set_lut_function0(0);
-	}
+	//
+	toolbox2D->set_lut_function(v->di->lut_function);
+	set_lut_function0(v->di->lut_function);
 	//
 	const int tmpx = ((v->di->idimx - 1) < 0) ? 0 : (v->di->idimx - 1);
 	const int tmpy = ((v->di->idimy - 1) < 0) ? 0 : (v->di->idimy - 1);
@@ -1701,9 +1683,13 @@ void Aliza::update_toolbox(const ImageVariant * v)
 		oneAct->setEnabled(true);
 		v->di->from_slice = selected_z_frame;
 		if (v->di->lock_single)
+		{
 			v->di->to_slice = selected_z_frame;
+		}
 		else
+		{
 			v->di->to_slice = v->di->idimz > 1 ? v->di->idimz - 1 : 0;
+		}
 	}
 	else
 	{
@@ -1713,7 +1699,7 @@ void Aliza::update_toolbox(const ImageVariant * v)
 	}
 	oneAct->setChecked(v->di->lock_single);
 	zrangewidget->set_spanslider_max(tmpz);
-	zrangewidget->set_span(v->di->from_slice,v->di->to_slice);
+	zrangewidget->set_span(v->di->from_slice, v->di->to_slice);
 	zrangewidget->setEnabled(!v->di->lock_2Dview);
 	switch (graphicswidget_m->get_axis())
 	{
@@ -1758,9 +1744,13 @@ void Aliza::update_toolbox(const ImageVariant * v)
 		toolbox->alpha_doubleSpinBox->hide();
 	}
 	if (!v->frame_times.empty())
+	{
 		anim2Dwidget->frametime_spinBox->hide();
+	}
 	else
+	{
 		anim2Dwidget->frametime_spinBox->show();
+	}
 	connect_tools();
 	trans3DAct->blockSignals(false);
 	zlockAct->blockSignals(false);
@@ -2776,8 +2766,11 @@ void Aliza::reset_level()
 {
 	const ImageVariant * v = get_selected_image_const();
 	if (!v) return;
+	toolbox2D->blockSignals(true);
 	toolbox2D->set_center(v->di->default_us_window_center);
 	toolbox2D->set_width(v->di->default_us_window_width);
+	toolbox2D->blockSignals(false);
+	toolbox2D->set_lut_function(v->di->default_lut_function);
 }
 
 void Aliza::start_anim()
@@ -3588,7 +3581,7 @@ void Aliza::toggle_maxwindow(bool i)
 	histogramview->update__(v);
 	disconnect_tools();
 	toolbox2D->disconnect_sliders();
-	toolbox2D->set_max_width(v->di->rmax - v->di->rmin);
+	toolbox2D->set_max_width(v->di->rmax - v->di->rmin + 1.0);
 	toolbox2D->set_window_upper(v->di->rmax);
 	toolbox2D->set_window_lower(v->di->rmin);
 	toolbox2D->set_width(v->di->us_window_width);

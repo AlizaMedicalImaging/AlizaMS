@@ -275,6 +275,7 @@ template<typename T> void calculate_min_max(
 		{
 			iv->di->default_us_window_center = iv->di->us_window_center = 128.0;
 			iv->di->default_us_window_width  = iv->di->us_window_width  = 255.0;
+			iv->di->default_lut_function = iv->di->lut_function = 0;
 		}
 		else
 		{
@@ -290,6 +291,14 @@ template<typename T> void calculate_min_max(
 				iv->di->default_us_window_center = iv->di->us_window_center = 0.5 * iv->di->vmax;
 				iv->di->default_us_window_width  = iv->di->us_window_width  = fabs(iv->di->vmax);
 			}
+		}
+	}
+	//
+	if (iv->di->default_us_window_width <= 1.0 || ((iv->di->vmax - iv->di->vmin) <= 1.0))
+	{
+		if (iv->di->default_lut_function == 1)
+		{
+			iv->di->default_lut_function = iv->di->lut_function = 0;
 		}
 	}
 	//
@@ -315,7 +324,7 @@ template<typename T> void calculate_min_max(
 			FrameLevel fl;
 			fl.us_window_center = iv->di->default_us_window_center;
 			fl.us_window_width = iv->di->default_us_window_width;
-			fl.lut_function = 0;
+			fl.lut_function = iv->di->default_lut_function;
 			for (size_t x = 0; x < undef_windows.size(); ++x)
 			{
 				iv->frame_levels[undef_windows.at(x)] = fl;
@@ -323,8 +332,7 @@ template<typename T> void calculate_min_max(
 		}
 	}
 	//
-	iv->di->window_center =
-		(iv->di->us_window_center + (-iv->di->rmin)) / rmax_minus_rmin;
+	iv->di->window_center = (iv->di->us_window_center + (-iv->di->rmin)) / rmax_minus_rmin;
 	iv->di->window_width  = iv->di->us_window_width / rmax_minus_rmin;
 	if (iv->di->window_width  <= 0) iv->di->window_width  = 1e-6;
 	if (iv->di->window_width   > 1) iv->di->window_width  = 1.0;
