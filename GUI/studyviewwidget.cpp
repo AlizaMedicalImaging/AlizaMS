@@ -596,7 +596,7 @@ void StudyViewWidget::update_full(ImageContainer * c)
 	const ImageVariant * v = c->image3D;
 	if (!v) return; // not required
 	block_signals(true);
-	update_max_width(v->di->rmax-v->di->rmin);
+	update_max_width(v->di->rmax - v->di->rmin + 1.0);
 	update_window_upper(v->di->rmax);
 	update_window_lower(v->di->rmin);
 	update_locked_window(c->level_locked_ext);
@@ -637,8 +637,7 @@ void StudyViewWidget::update_full(ImageContainer * c)
 		width_horizontalSlider->setValue(
 			static_cast<int>(c->us_window_width_ext));
 	}
-	if (c->lut_function_ext == 2) update_lut_function(1);
-	else                          update_lut_function(0);
+	update_lut_function(c->lut_function_ext);
 	lutwidget->set_lut(c->selected_lut_ext);
 	block_signals(false);
 }
@@ -785,7 +784,6 @@ void StudyViewWidget::set_width_spinbox(double x)
 
 void StudyViewWidget::set_lut_function(int x)
 {
-	const short k = (x == 0) ? 1 : 2;
 	for (int i = 0; i < widgets.size(); ++i)
 	{
 		if (widgets.at(i))
@@ -796,7 +794,7 @@ void StudyViewWidget::set_lut_function(int x)
 				{
 					if (widgets.at(i)->graphicswidget->get_id() == active_id)
 					{
-						widgets[i]->graphicswidget->set_lut_function(k);
+						widgets[i]->graphicswidget->set_lut_function(x);
 					}
 				}
 			}
@@ -865,9 +863,10 @@ void StudyViewWidget::toggle_lock_window(bool t)
 void StudyViewWidget::reset_level()
 {
 	block_signals(true);
-	double c = 0, w = 1;
-	short l = 0;
-	bool once = false;
+	double c{};
+	double w{};
+	short l{};
+	bool once{};
 	for (int i = 0; i < widgets.size(); ++i)
 	{
 		if (widgets.at(i))
@@ -895,7 +894,7 @@ void StudyViewWidget::reset_level()
 	width_horizontalSlider->setValue(static_cast<int>(w));
 	center_doubleSpinBox->setValue(c);
 	width_doubleSpinBox->setValue(w);
-	comboBox->setCurrentIndex((l == 2) ? 1 : 0);
+	comboBox->setCurrentIndex(l);
 	block_signals(false);
 }
 

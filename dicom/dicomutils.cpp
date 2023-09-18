@@ -3376,13 +3376,19 @@ void DicomUtils::read_window(
 	short  * lut_function)
 {
 	if (ds.IsEmpty()) return;
-	short lut_function_{};
+	short lut_function_{1};
 	QString s;
 	if (get_string_value(ds, mdcm::Tag(0x0028,0x1056), s))
 	{
 		s = s.trimmed().toUpper().remove(QChar('\0'));
-		if (s == QString("LINEAR_EXACT")) lut_function_ = 1;
-		else if (s == QString("SIGMOID")) lut_function_ = 2;
+		if (s == QString("LINEAR_EXACT"))
+		{
+			lut_function_ = 0;
+		}
+		else if (s == QString("SIGMOID"))
+		{
+			lut_function_ = 2;
+		}
 	}
 	*lut_function = lut_function_;
 	std::vector<double> c;
@@ -3396,15 +3402,7 @@ void DicomUtils::read_window(
 		}
 		if (!w.empty())
 		{
-			const double k = w.at(0);
-			if ((lut_function_ <= 0) && k >= 2)
-			{
-				*width_ = k - 1;
-			}
-			else
-			{
-				*width_ = k;
-			}
+			*width_ = w.at(0);
 		}
 	}
 }
@@ -6675,7 +6673,7 @@ void DicomUtils::enhanced_process_values(
 		!shared_values.at(0).window_center.isEmpty() &&
 		!shared_values.at(0).window_width.isEmpty())
 	{
-		QString lut_function = QString("LINEAR");
+		QString lut_function("LINEAR");
 		if (!shared_values.at(0).lut_function.isEmpty())
 			lut_function = shared_values.at(0).lut_function;
 		for (unsigned int x = 0; x < values.size(); ++x)
@@ -10808,8 +10806,8 @@ QString DicomUtils::read_enhanced_common(
 			double window_width{-999999.0};
 			double window_center_tmp{-999999.0};
 			double window_width_tmp{-999999.0};
-			short lut_function{-1};
-			short lut_function_tmp{-1};
+			short lut_function{0};
+			short lut_function_tmp{0};
 			QString instance_uid;
 			int instance_number{-1};
 			int ref_segment_num{-1};
@@ -11199,7 +11197,7 @@ QString DicomUtils::read_enhanced_common(
 						if (ok_c && ok_w)
 						{
 							double tmp7890 = tmp_w;
-							short  tmp7891 = -1;
+							short  tmp7891{1};
 							const QString tmp7892 =
 								lut_functions_l.at(k).trimmed().toUpper();
 							if (tmp7892 == QString("SIGMOID"))
@@ -11208,12 +11206,7 @@ QString DicomUtils::read_enhanced_common(
 							}
 							else if (tmp7892 == QString("LINEAR_EXACT"))
 							{
-								tmp7891 = 1;
-							}
-							else
-							{
 								tmp7891 = 0;
-								if (tmp_w >= 2) --tmp7890;
 							}
 							tmp1c.push_back(tmp_c);
 							tmp1w.push_back(tmp7890);

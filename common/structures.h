@@ -554,12 +554,11 @@ public:
 	float up_direction_x{};
 	float up_direction_y{};
 	float up_direction_z{1.0f};
-	// -1 - not set,
-	// 0 - linear,
-	// 1 - linear_exact,
+	// 0 - linear_exact
+	// 1 - linear
 	// 2 - sigmoid
-	short lut_function{-1};
-	short default_lut_function{-1};
+	short lut_function{0};
+	short default_lut_function{0};
 	double us_window_center{-999999.0};
 	double us_window_width{-999999.0};
 	double default_us_window_center{-999999.0};

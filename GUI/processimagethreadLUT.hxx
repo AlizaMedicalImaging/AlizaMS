@@ -47,8 +47,8 @@ public:
 		index[0] = index_0;
 		index[1] = index_1;
 		const typename T::RegionType region(index, size);
-		const unsigned char * tmp_p1 = nullptr;
-		int tmp__size = 0;
+		const unsigned char * tmp_p1{};
+		int tmp__size{};
 		switch (lut)
 		{
 		case 0:
@@ -105,179 +105,180 @@ public:
 			return;
 		}
 		//
-		const double wmin = window_center - window_width * 0.5;
-		const double wmax = window_center + window_width * 0.5;
-		const double div_ = (window_width > 0.0) ? window_width : 0.00001;
+		short tmp_lut_function;
+		double wmin, wmax, div_;
+		double window_center_minus_0_point_5{}; // used only for LINEAR
+		const double window_width_minus_one = window_width - 1.0;
+		if (lut_function == 1)
+		{
+			// DICOM LINEAR works with window_width >= 1,
+			// fallback to LINEAR_EXACT otherwise,
+			// this should not happen, the proper LUT function should be set before.
+			window_center_minus_0_point_5 = window_center - 0.5;
+			if (window_width_minus_one > 0.0)
+			{
+				wmin = window_center_minus_0_point_5 - (window_width_minus_one * 0.5);
+				wmax = window_center_minus_0_point_5 + (window_width_minus_one * 0.5);
+				div_ = window_width_minus_one;
+				tmp_lut_function = 1;
+			}
+			else
+			{
+				wmin = window_center - window_width * 0.5;
+				wmax = window_center + window_width * 0.5;
+				div_ = (window_width > 0.0) ? window_width : 0.00001;
+				tmp_lut_function = 0;
+#if 0
+				std::cout << "Warning: forced LUT function to LINEAR_EXACT" << std::endl;
+#endif
+			}
+		}
+		else
+		{
+			wmin = window_center - window_width * 0.5;
+			wmax = window_center + window_width * 0.5;
+			div_ = (window_width > 0.0) ? window_width : 0.00001;
+			tmp_lut_function = lut_function;
+		}
 		//
 		typename itk::ImageRegionConstIterator<T> iterator(image, region);
 		iterator.GoToBegin();
 		while (!iterator.IsAtEnd())
 		{
 			const double v = iterator.Get();
-			if ((v >= wmin) && (v <= wmax))
+			if (v > wmin && v <= wmax)
 			{
-				if (lut_function == 2)
+				double r;
+				if (tmp_lut_function == 2) // SIGMOID
 				{
-					const double x = -6.0 * ((v - window_center) / div_);
-					const double r = 1.0 / (1.0 + exp(x));
-					switch (lut)
-					{
-					case 0:
-						{
-							const unsigned char c = static_cast<unsigned char>(UCHAR_MAX * r);
-							p[j]     = c;
-							p[j + 1] = c;
-							p[j + 2] = c;
-						}
-						break;
-					case 1:
-					case 2:
-					case 3:
-					case 4:
-					case 5:
-					case 6:
-					case 7:
-						{
-							int z = static_cast<int>(r * tmp__size);
-							if (z < 0) z = 0;
-							if (z > (tmp__size - 1)) z = tmp__size - 1;
-							p[j]     = tmp_p1[z * 3];
-							p[j + 1] = tmp_p1[z * 3 + 1];
-							p[j + 2] = tmp_p1[z * 3 + 2];
-						}
-						break;
-					case 8:
-						{
-							int z = static_cast<int>(v);
-							if (z < 0) z = 0;
-							if (z > (tmp__size - 1)) z = tmp__size - 1;
-							p[j + 0] = tmp_p1[z * 3];
-							p[j + 1] = tmp_p1[z * 3 + 1];
-							p[j + 2] = tmp_p1[z * 3 + 2];
-						}
-						break;
-					default:
-						break;
-					}
+					const double x = -4.0 * ((v - window_center) / div_);
+					r = 1.0 / (1.0 + exp(x));
 				}
-				else
+				else if (tmp_lut_function == 1) // LINEAR
 				{
-					const double r = (v - wmin) / div_;
-					switch (lut)
+					// if (x <= c - 0.5 - (w - 1) / 2), then y = ymin
+					// else if (x > c - 0.5 + (w - 1) / 2), then y = ymax
+					// else y = ((x - (c - 0.5)) / (w - 1) + 0.5) * (ymax - ymin) + ymin
+					r = (v - window_center_minus_0_point_5) / div_ + 0.5;
+				}
+				else // LINEAR_EXACT
+				{
+					// if (x <= c - w / 2), then y = ymin
+					// else if (x > c + w / 2), then y = ymax
+					// else y = ((x - c) / w + 0.5) * (ymax - ymin) + ymin
+					r = ((v - window_center) / div_) + 0.5;
+				}
+				switch (lut)
+				{
+				case 0:
 					{
-					case 0:
-						{
-							const unsigned char c = static_cast<unsigned char>(UCHAR_MAX * r);
-							p[j]     = c;
-							p[j + 1] = c;
-							p[j + 2] = c;
-						}
-						break;
-					case 1:
-					case 2:
-					case 3:
-					case 4:
-					case 5:
-					case 6:
-					case 7:
-						{
-							int z = static_cast<int>(r * tmp__size);
-							if (z < 0) z = 0;
-							if (z > (tmp__size - 1)) z = tmp__size - 1;
-							p[j]     = tmp_p1[z * 3];
-							p[j + 1] = tmp_p1[z * 3 + 1];
-							p[j + 2] = tmp_p1[z * 3 + 2];
-						}
-						break;
-					case 8:
-						{
-							int z = static_cast<int>(v);
-							if (z < 0) z = 0;
-							if (z > (tmp__size - 1)) z = tmp__size - 1;
-							p[j + 0] = tmp_p1[z * 3 + 0];
-							p[j + 1] = tmp_p1[z * 3 + 1];
-							p[j + 2] = tmp_p1[z * 3 + 2];
-						}
-						break;
-					default:
-						break;
+						const unsigned char c = static_cast<unsigned char>(UCHAR_MAX * r);
+						p[j]     = c;
+						p[j + 1] = c;
+						p[j + 2] = c;
 					}
+					break;
+				case 1:
+				case 2:
+				case 3:
+				case 4:
+				case 5:
+				case 6:
+				case 7:
+					{
+						int z = static_cast<int>(r * tmp__size);
+						if (z < 0) z = 0;
+						if (z > (tmp__size - 1)) z = tmp__size - 1;
+						p[j]     = tmp_p1[z * 3];
+						p[j + 1] = tmp_p1[z * 3 + 1];
+						p[j + 2] = tmp_p1[z * 3 + 2];
+					}
+					break;
+				case 8:
+					{
+						int z = static_cast<int>(v);
+						if (z < 0) z = 0;
+						if (z > (tmp__size - 1)) z = tmp__size - 1;
+						p[j + 0] = tmp_p1[z * 3];
+						p[j + 1] = tmp_p1[z * 3 + 1];
+						p[j + 2] = tmp_p1[z * 3 + 2];
+					}
+					break;
+				default:
+					break;
 				}
 			}
-			else
+			else if (v <= wmin)
 			{
-				if (v < wmin)
+				switch (lut)
 				{
-					switch (lut)
+				case 0:
 					{
-					case 0:
-						{
-							p[j]     = 0;
-							p[j + 1] = 0;
-							p[j + 2] = 0;
-						}
-						break;
-					case 1:
-					case 2:
-					case 3:
-					case 4:
-					case 5:
-					case 6:
-					case 7:
-					case 8:
-						{
-							p[j]     = tmp_p1[0];
-							p[j + 1] = tmp_p1[1];
-							p[j + 2] = tmp_p1[2];
-						}
-						break;
-					default:
-						break;
+						p[j]     = 0;
+						p[j + 1] = 0;
+						p[j + 2] = 0;
 					}
+					break;
+				case 1:
+				case 2:
+				case 3:
+				case 4:
+				case 5:
+				case 6:
+				case 7:
+				case 8:
+					{
+						p[j]     = tmp_p1[0];
+						p[j + 1] = tmp_p1[1];
+						p[j + 2] = tmp_p1[2];
+					}
+					break;
+				default:
+					break;
 				}
-				else if (v > wmax)
+			}
+			else if (v > wmax)
+			{
+				switch (lut)
 				{
-					switch (lut)
+				case 0:
+					if (alt_mode)
 					{
-					case 0:
-						if (alt_mode)
-						{
-							p[j]     = 0;
-							p[j + 1] = 0;
-							p[j + 2] = 0;
-						}
-						else
-						{
-							p[j]     = UCHAR_MAX;
-							p[j + 1] = UCHAR_MAX;
-							p[j + 2] = UCHAR_MAX;
-						}
-						break;
-					case 1:
-					case 2:
-					case 3:
-					case 4:
-					case 5:
-					case 6:
-					case 7:
-					case 8:
-						if (alt_mode)
-						{
-							p[j]     = tmp_p1[0];
-							p[j + 1] = tmp_p1[1];
-							p[j + 2] = tmp_p1[2];
-						}
-						else
-						{
-							const unsigned int z = tmp__size - 1;
-							p[j]     = tmp_p1[z * 3];
-							p[j + 1] = tmp_p1[z * 3 + 1];
-							p[j + 2] = tmp_p1[z * 3 + 2];
-						}
-						break;
-					default:
-						break;
+						p[j]     = 0;
+						p[j + 1] = 0;
+						p[j + 2] = 0;
 					}
+					else
+					{
+						p[j]     = UCHAR_MAX;
+						p[j + 1] = UCHAR_MAX;
+						p[j + 2] = UCHAR_MAX;
+					}
+					break;
+				case 1:
+				case 2:
+				case 3:
+				case 4:
+				case 5:
+				case 6:
+				case 7:
+				case 8:
+					if (alt_mode)
+					{
+						p[j]     = tmp_p1[0];
+						p[j + 1] = tmp_p1[1];
+						p[j + 2] = tmp_p1[2];
+					}
+					else
+					{
+						const unsigned int z = tmp__size - 1;
+						p[j]     = tmp_p1[z * 3];
+						p[j + 1] = tmp_p1[z * 3 + 1];
+						p[j + 2] = tmp_p1[z * 3 + 2];
+					}
+					break;
+				default:
+					break;
 				}
 			}
 			j += 3;
