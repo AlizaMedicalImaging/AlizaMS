@@ -1,5 +1,5 @@
 Name:    alizams
-Version: 1.9.3
+Version: 1.9.5
 Release: 1%{?dist}
 Summary: Aliza MS DICOM Viewer
 License: GPLv3

@@ -25,7 +25,7 @@
       <li>2D+t and 3D+t animations</li>
       <li>Consistently de-identify DICOM, maintain integrity</li>
       <li>DICOM metadata viewer</li>
-      <li>Most IODs are supported incl.Structured Reports, Key Objects Selection, Grayscale Softcopy Presentation State</li>
+      <li>Most IODs are supported incl. Structured Reports, Key Objects Selection, Grayscale Softcopy Presentation State</li>
     </ul>
   </description>
   <content_rating type="oars-1.1">
@@ -64,12 +64,13 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release date="2023-07-23" version="1.9.3">
+    <release date="2023-09-18" version="1.9.5">
       <description>
-        <p>Release 1.9.3</p>
+        <p>Release 1.9.5</p>
       </description>
-      <url>https://github.com/AlizaMedicalImaging/AlizaMS/releases/tag/v1.9.3</url>
+      <url>https://github.com/AlizaMedicalImaging/AlizaMS/releases/tag/v1.9.5</url>
     </release>
+    <release date="2023-07-23" version="1.9.3"/>
     <release date="2023-05-30" version="1.9.1"/>
     <release date="2023-05-26" version="1.9.0"/>
     <release date="2022-07-27" version="1.8.3"/>
