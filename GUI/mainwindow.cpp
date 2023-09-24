@@ -548,8 +548,8 @@ MainWindow::~MainWindow()
 void MainWindow::open_args(const QStringList & l)
 {
 	if (l.empty()) return;
-	bool lock = mutex.tryLock();
-	if (!lock) return;
+	if (lock0) return;
+	lock0 = true;
 	QString message;
 	bool skip_next{};
 	QStringList l2;
@@ -581,7 +581,7 @@ void MainWindow::open_args(const QStringList & l)
 	}
 	if (l2.size() == 0)
 	{
-		mutex.unlock();
+		lock0 = false;
 		return;
 	}
 	QProgressDialog * pb = new QProgressDialog(
@@ -667,7 +667,7 @@ void MainWindow::open_args(const QStringList & l)
 		info.set_text(message);
 		info.exec();
 	}
-	mutex.unlock();
+	lock0 = false;
 }
 
 /*
@@ -1404,8 +1404,8 @@ void MainWindow::toggle_animwidget2d(bool t)
 
 void MainWindow::dropEvent(QDropEvent * e)
 {
-	const bool lock = mutex.tryLock();
-	if (!lock) return;
+	if (lock0) return;
+	lock0 = true;
 	const QMimeData * mimeData = e->mimeData();
 	QStringList l;
 	QString message;
@@ -1497,7 +1497,7 @@ void MainWindow::dropEvent(QDropEvent * e)
 		info.set_text(message);
 		info.exec();
 	}
-	mutex.unlock();
+	lock0 = false;
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent * e)
@@ -1517,8 +1517,8 @@ void MainWindow::dragLeaveEvent(QDragLeaveEvent * e)
 
 void MainWindow::load_any()
 {
-	bool lock = mutex.tryLock();
-	if (!lock) return;
+	if (lock0) return;
+	lock0 = true;
 	QString message;
 	const bool dcm_thread = settingswidget->get_dcm_thread();
 	QStringList l = QFileDialog::getOpenFileNames(
@@ -1593,7 +1593,7 @@ void MainWindow::load_any()
 		info.set_text(message);
 		info.exec();
 	}
-	mutex.unlock();
+	lock0 = false;
 }
 
 void MainWindow::desktop_layout(int * width_, int * height_)
@@ -1716,14 +1716,14 @@ void MainWindow::set_ui()
 
 void MainWindow::load_dicom_series2()
 {
-	const bool lock = mutex.tryLock();
-	if (!lock) return;
+	if (lock0) return;
+	lock0 = true;
 	const bool dcm_thread = settingswidget->get_dcm_thread();
 	const bool selection =
 		browser2->tableWidget->selectionModel()->hasSelection();
 	if (!selection)
 	{
-		mutex.unlock();
+		lock0 = false;
 		return;
 	}
 	set_ui();
@@ -1770,7 +1770,7 @@ void MainWindow::load_dicom_series2()
 		info.set_text(message);
 		info.exec();
 	}
-	mutex.unlock();
+	lock0 = false;
 }
 
 QString MainWindow::load_any_file(

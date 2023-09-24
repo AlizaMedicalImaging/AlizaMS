@@ -1044,8 +1044,11 @@ void SQtree::closeEvent(QCloseEvent * e)
 void SQtree::read_file(const QString & f, const bool use_lock)
 {
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-	const bool lock = (use_lock) ? mutex.tryLock() : false;
-	if (use_lock && !lock) return;
+	if (use_lock)
+	{
+		if (lock0) return;
+		lock0 = true;
+	}
 #endif
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	clear_tree();
@@ -1076,7 +1079,7 @@ void SQtree::read_file(const QString & f, const bool use_lock)
 		{
 			ms_lineEdit->setText(QString("Error: can not process the file."));
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-			if (lock) mutex.unlock();
+			if (use_lock) lock0 = false;
 #endif
 			QApplication::restoreOverrideCursor();
 			return;
@@ -1191,7 +1194,7 @@ void SQtree::read_file(const QString & f, const bool use_lock)
 	}
 	treeWidget->expandToDepth(0);
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-	if (lock) mutex.unlock();
+	if (use_lock) lock0 = false;
 #endif
 	QApplication::restoreOverrideCursor();
 }
@@ -1199,8 +1202,11 @@ void SQtree::read_file(const QString & f, const bool use_lock)
 void SQtree::read_file_and_series(const QString & ff, const bool use_lock)
 {
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-	const bool lock = (use_lock) ? mutex.tryLock() : false;
-	if (use_lock && !lock) return;
+	if (use_lock)
+	{
+		if (lock0) return;
+		lock0 = true;
+	}
 #endif
 	QString f(ff);
 	QFileInfo fi(f);
@@ -1208,7 +1214,7 @@ void SQtree::read_file_and_series(const QString & ff, const bool use_lock)
 	{
 		clear_tree();
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-		if (lock) mutex.unlock();
+		if (use_lock) lock0 = false;
 #endif
 		return;
 	}
@@ -1292,7 +1298,7 @@ void SQtree::read_file_and_series(const QString & ff, const bool use_lock)
 	horizontalSlider->blockSignals(false);
 	read_file(f, false);
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-	if (lock) mutex.unlock();
+	if (use_lock) lock0 = false;
 #endif
 }
 
@@ -1900,8 +1906,8 @@ void SQtree::copy_to_clipboard()
 void SQtree::collapse_item()
 {
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-	const bool lock = mutex.tryLock();
-	if (!lock) return;
+	if (lock0) return;
+	lock0 = true;
 #endif
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	treeWidget->blockSignals(true);
@@ -1909,7 +1915,7 @@ void SQtree::collapse_item()
 	treeWidget->blockSignals(false);
 	QApplication::restoreOverrideCursor();
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-	mutex.unlock();
+	lock0 = false;
 #endif
 }
 
@@ -1917,8 +1923,8 @@ static int sqtree_expanded_items = 0;
 void SQtree::expand_item()
 {
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-	const bool lock = mutex.tryLock();
-	if (!lock) return;
+	if (lock0) return;
+	lock0 = true;
 #endif
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	treeWidget->blockSignals(true);
@@ -1927,7 +1933,7 @@ void SQtree::expand_item()
 	treeWidget->blockSignals(false);
 	QApplication::restoreOverrideCursor();
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-	mutex.unlock();
+	lock0 = false;
 #endif
 }
 
@@ -1986,8 +1992,8 @@ void SQtree::collapse_children(const QModelIndex & index)
 void SQtree::dropEvent(QDropEvent * e)
 {
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-	const bool lock = mutex.tryLock();
-	if (!lock) return;
+	if (lock0) return;
+	lock0 = true;
 #endif
 	QStringList l;
 	QList<QUrl> urls;
@@ -2016,7 +2022,7 @@ void SQtree::dropEvent(QDropEvent * e)
 		clear_tree();
 	}
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-	mutex.unlock();
+	lock0 = false;
 #endif
 }
 
@@ -2050,8 +2056,8 @@ void SQtree::clear_tree()
 void SQtree::open_file()
 {
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-	const bool lock = mutex.tryLock();
-	if (!lock) return;
+	if (lock0) return;
+	lock0 = true;
 #endif
 	clear_tree();
 	const QString f = QFileDialog::getOpenFileName(
@@ -2076,15 +2082,15 @@ void SQtree::open_file()
 		read_file(f, false);
 	}
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-	mutex.unlock();
+	lock0 = false;
 #endif
 }
 
 void SQtree::open_file_and_series()
 {
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-	const bool lock = mutex.tryLock();
-	if (!lock) return;
+	if (lock0) return;
+	lock0 = true;
 #endif
 	QString f = QFileDialog::getOpenFileName(
 		this,
@@ -2100,21 +2106,21 @@ void SQtree::open_file_and_series()
 	{
 		clear_tree();
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-		mutex.unlock();
+		lock0 = false;
 #endif
 		return;
 	}
 	read_file_and_series(f, false);
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-	mutex.unlock();
+	lock0 = false;
 #endif
 }
 
 void SQtree::set_list_of_files(const QStringList & l)
 {
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-	const bool lock = mutex.tryLock();
-	if (!lock) return;
+	if (lock0) return;
+	lock0 = true;
 #endif
 	list_of_files = QStringList(l);
 	const size_t x = list_of_files.size();
@@ -2126,7 +2132,7 @@ void SQtree::set_list_of_files(const QStringList & l)
 	else       horizontalSlider->hide();
 	horizontalSlider->blockSignals(false);
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-	mutex.unlock();
+	lock0 = false;
 #endif
 }
 

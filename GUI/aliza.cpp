@@ -689,7 +689,6 @@ void Aliza::close_()
 	if (ok3d) glwidget->set_skip_draw(true);
 	stop_anim();
 	stop_3D_anim();
-	if (!mutex0.tryLock(3000)) return;
 	disconnect_tools();
 	imagesbox->listWidget->clear();
 	graphicswidget_m->clear_();
@@ -709,12 +708,12 @@ void Aliza::close_()
 	}
 	if (ok3d) glwidget->close_();
 	g_close_physics();
-	mutex0.unlock();
 }
 
 QString Aliza::load_dicom_series(QProgressDialog * pb)
 {
-	if (!mutex0.tryLock()) return QString("");
+	if (lock0) return QString("");
+	lock0 = true;
 	QString message;
 	std::vector<ImageVariant*> ivariants;
 	QStringList pdf_files;
@@ -739,7 +738,7 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 	}
 	if (rows.empty())
 	{
-		mutex0.unlock();
+		lock0 = false;
 		return QString("");
 	}
 	const QString root = browser2->get_root();
@@ -879,7 +878,7 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 	{
 		message.append(message_);
 	}
-	mutex0.unlock();
+	lock0 = false;
 	return message;
 }
 
@@ -905,8 +904,8 @@ void Aliza::add_histogram(ImageVariant * v, QProgressDialog * pb, bool check_set
 
 void Aliza::clear_ram()
 {
-	const bool lock = mutex0.tryLock();
-	if (!lock) return;
+	if (lock0) return;
+	lock0 = true;
 	const bool ok3d = check_3d();
 	if (ok3d) glwidget->set_skip_draw(true);
 	graphicswidget_m->clear_();
@@ -940,7 +939,7 @@ void Aliza::clear_ram()
 	connect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
 	imagesbox->listWidget->blockSignals(false);
 	//
-	mutex0.unlock();
+	lock0 = false;
 	if (ok3d) glwidget->set_skip_draw(false);
 #ifdef ALIZA_PRINT_COUNT_GL_OBJ
 	std::cout << "Num VBOs " << GLWidget::get_count_vbos() << std::endl;
@@ -951,8 +950,8 @@ void Aliza::delete_image()
 {
 	ImageVariant * ivariant{};
 	QListWidgetItem * item__{};
-	const bool lock = mutex0.tryLock();
-	if (!lock) return;
+	if (lock0) return;
+	lock0 = true;
 	const bool ok3d = check_3d();
 	if (ok3d) glwidget->set_skip_draw(true);
 	if (imagesbox->listWidget->selectedItems().empty()) goto quit__;
@@ -1016,7 +1015,7 @@ void Aliza::delete_image()
 		}
 	}
 quit__:
-	mutex0.unlock();
+	lock0 = false;
 	if (ok3d) glwidget->set_skip_draw(false);
 #ifdef ALIZA_PRINT_COUNT_GL_OBJ
 	std::cout << "Num VBOs " << GLWidget::get_count_vbos() << std::endl;
@@ -2715,8 +2714,8 @@ void Aliza::clear_views()
 
 void Aliza::update_visible_rois(QTableWidgetItem * i)
 {
-	const bool lock = mutex0.tryLock();
-	if (!lock) return;
+	if (lock0) return;
+	lock0 = true;
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	qApp->processEvents();
 	ImageVariant * v = get_selected_image();
@@ -2742,7 +2741,7 @@ void Aliza::update_visible_rois(QTableWidgetItem * i)
 		if (ok3d) glwidget->set_skip_draw(false);
 	}
 	QApplication::restoreOverrideCursor();
-	mutex0.unlock();
+	lock0 = false;
 }
 
 void Aliza::reset_rect2()
@@ -2775,14 +2774,9 @@ void Aliza::reset_level()
 
 void Aliza::start_anim()
 {
-	bool lock = mutex2.tryLock();
-	if (!lock) return;
-	lock = mutex0.tryLock();
-	if (!lock)
-	{
-		mutex2.unlock();
-		return;
-	}
+	if (lock0 || lock2) return;
+	lock2 = true;
+	lock0 = true;
 	graphicswidget_m->run__ = true;
 	slider_m->slices_slider->setEnabled(false);
 	toolbox2D->resetlevel_pushButton->setEnabled(false);
@@ -2866,8 +2860,8 @@ void Aliza::stop_anim()
 	connect(
 		slider_m->slices_slider, SIGNAL(valueChanged(int)),
 		this, SLOT(set_selected_slice2D_m(int)));
-	mutex2.unlock();
-	mutex0.unlock();
+	lock2 = false;
+	lock0 = false;
 }
 
 void Aliza::zoom_plus_3d()
@@ -2925,8 +2919,8 @@ void Aliza::set_histogram_mode(bool t)
 
 void Aliza::trigger_reload_histogram()
 {
-	const bool lock = mutex0.tryLock();
-	if (!lock) return;
+	if (lock0) return;
+	lock0 = true;
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	qApp->processEvents();
 	ImageVariant * v = get_selected_image();
@@ -2936,7 +2930,7 @@ void Aliza::trigger_reload_histogram()
 		histogramview->update__(v);
 	}
 	QApplication::restoreOverrideCursor();
-	mutex0.unlock();
+	lock0 = false;
 }
 
 void Aliza::width_from_histogram_min(double x)
@@ -3064,11 +3058,19 @@ void Aliza::center_from_histogram(double x)
 	toolbox2D->connect_sliders();
 }
 
-QString Aliza::create_group_(bool * ok, bool lock_mutex)
+QString Aliza::create_group_(bool * ok, bool lock_)
 {
+	if (lock_)
+	{
+		if (lock0)
+		{
+			*ok = false;
+			return QString("");
+		}
+		lock0 = true;
+	}
 	QString message_;
 	bool ok_{};
-	bool lock{};
 	int group_id{-1};
 	int dimx{};
 	int dimy{};
@@ -3078,15 +3080,6 @@ QString Aliza::create_group_(bool * ok, bool lock_mutex)
 	QList<ImageVariant*> group_images;
 	ImageVariant * v;
 	QMap<int, ImageVariant*> map;
-	if (lock_mutex)
-	{
-		lock = mutex0.tryLock();
-		if (!lock)
-		{
-			*ok = false;
-			return QString("");
-		}
-	}
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	QMap<int, ImageVariant*>::const_iterator iv = scene3dimages.cbegin();
 #else
@@ -3205,7 +3198,7 @@ quit__:
 	group_images.clear();
 	map.clear();
 	*ok = ok_;
-	if (lock_mutex && lock) mutex0.unlock();
+	if (lock_) lock0 = false;
 	return message_;
 }
 
@@ -3225,12 +3218,12 @@ void Aliza::create_group()
 
 void Aliza::remove_group()
 {
-	const bool lock = mutex0.tryLock();
-	if (!lock) return;
+	if (lock0) return;
+	lock0 = true;
 	const ImageVariant * v = get_selected_image();
 	if (!v)
 	{
-		mutex0.unlock();
+		lock0 = false;;
 		return;
 	}
 	if (v->group_id < 0)
@@ -3289,19 +3282,14 @@ void Aliza::remove_group()
 		}
 	}
 	update_selection();
-	mutex0.unlock();
+	lock0 = false;
 }
 
 void Aliza::start_3D_anim()
 {
-	bool lock = mutex3.tryLock();
-	if (!lock) return;
-	lock = mutex0.tryLock();
-	if (!lock)
-	{
-		mutex3.unlock();
-		return;
-	}
+	if (lock0 || lock3) return;
+	lock3 = true;
+	lock0 = true;
 	run__ = true;
 	animation_images.clear();
 	anim3d_times.clear();
@@ -3393,8 +3381,8 @@ void Aliza::stop_3D_anim()
 	if (zlockAct->isChecked()) oneAct->setEnabled(true);
 	toolbox2D->maxwin_pushButton->show();
 	update_selection();
-	mutex3.unlock();
-	mutex0.unlock();
+	lock3 = false;
+	lock0 = false;
 	if (ok3d) glwidget->set_skip_draw(false);
 }
 
@@ -3461,16 +3449,7 @@ void Aliza::set_frametime_3D(int x)
 
 int Aliza::get_num_images() const
 {
-	const bool lock = mutex0.tryLock();
-	if (lock)
-	{
-		mutex0.unlock();
-		return scene3dimages.size();
-	}
-	else
-	{
-		return -1;
-	}
+	return scene3dimages.size();
 }
 
 void Aliza::update_group_width(const ImageVariant * v)
@@ -3561,11 +3540,11 @@ void Aliza::flipY()
 
 void Aliza::toggle_maxwindow(bool i)
 {
+	if (lock0) return;
+	lock0 = true;
 	ImageVariant * v{};
 	const bool ok3d = check_3d();
 	if (ok3d) glwidget->set_skip_draw(true);
-	const bool lock = mutex0.tryLock();
-	if (!lock) goto quit__;
 	v = get_selected_image();
 	if (!v) goto quit__;
 	if (!(v->image_type == 0 || v->image_type == 1))
@@ -3613,7 +3592,7 @@ void Aliza::toggle_maxwindow(bool i)
 	QApplication::restoreOverrideCursor();
 quit__:
 	if (ok3d) glwidget->set_skip_draw(false);
-	if (lock) mutex0.unlock();
+	lock0 = false;
 }
 
 void Aliza::reset_3d()
@@ -3926,8 +3905,8 @@ void Aliza::toggle_collisions(bool t)
 
 void Aliza::trigger_image_color() 
 {
-	const bool lock = mutex0.tryLock();
-	if (!lock) return;
+	if (lock0) return;
+	lock0 = true;
 	QColor old_color;
 	QColor new_color;
 	QList<QListWidgetItem*> l;
@@ -3978,16 +3957,16 @@ void Aliza::trigger_image_color()
 		}
 	}
 quit__:
-	mutex0.unlock();
 	if (ok3d) glwidget->set_skip_draw(false);
+	lock0 = false;
 }
 
 void Aliza::delete_checked_unchecked(bool t)
 {
 	QList<QListWidgetItem *> items;
 	QList<int> image_ids;
-	const bool lock = mutex0.tryLock();
-	if (!lock) return;
+	if (lock0) return;
+	lock0 = true;
 	const bool ok3d = check_3d();
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	qApp->processEvents();
@@ -4053,12 +4032,12 @@ void Aliza::delete_checked_unchecked(bool t)
 	connect(imagesbox->listWidget,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(update_selection()));
 	imagesbox->listWidget->blockSignals(false);
 quit__:
-	mutex0.unlock();
 	if (ok3d) glwidget->set_skip_draw(false);
 	QApplication::restoreOverrideCursor();
 #ifdef ALIZA_PRINT_COUNT_GL_OBJ
 	std::cout << "Num VBOs " << GLWidget::get_count_vbos() << std::endl;
 #endif
+	lock0 = false;
 }
 
 void Aliza::delete_group(const int group_id)
@@ -4125,7 +4104,8 @@ QString Aliza::load_dicom_file(
 	const QString & f,
 	QProgressDialog * pb)
 {
-	if (!mutex0.tryLock()) return QString("");
+	if (lock0) return QString("");
+	lock0 = true;
 	QString message;
 	std::vector<ImageVariant*> ivariants;
 	QStringList pdf_files;
@@ -4267,7 +4247,7 @@ QString Aliza::load_dicom_file(
 	{
 		message.append(message_);
 	}
-	mutex0.unlock();
+	lock0 = false;
 	return message;
 }
 
@@ -4320,19 +4300,19 @@ void Aliza::set_contourstable(const ImageVariant * v)
 
 void Aliza::trigger_show_roi_info()
 {
-	const bool lock = mutex0.tryLock();
-	if (!lock) return;
+	if (lock0) return;
+	lock0 = true;
 	const ImageVariant * v = get_selected_image_const();
 	if (!v)
 	{
-		mutex0.unlock();
+		lock0 = false;
 		return;
 	}
 	int tmp0{-1};
 	const int roi_id = imagesbox->get_selected_roi_id();
 	if (roi_id < 0)
 	{
-		mutex0.unlock();
+		lock0 = false;
 		return;
 	}
 	for (int x = 0; x < v->di->rois.size(); ++x)
@@ -4436,19 +4416,19 @@ void Aliza::trigger_show_roi_info()
 			mbox.exec();
 		}
 	}
-	mutex0.unlock();
+	lock0 = false;
 }
 
 void Aliza::trigger_studyview()
 {
 	if (!studyview) return;
-	const bool lock = mutex0.tryLock();
-	if (!lock) return;
+	if (lock0) return;
+	lock0 = true;
 	ImageVariant * v = get_selected_image();
 	if (!v)
 	{
 		QMessageBox::information(nullptr, QString("Information"), QString("Select image"));
-		mutex0.unlock();
+		lock0 = false;
 		return;
 	}
 	studyview->clear_();
@@ -4493,14 +4473,14 @@ void Aliza::trigger_studyview()
 		++x;
 	}
 	check_slice_collisions2(studyview);
-	mutex0.unlock();
+	lock0 = false;
 }
 
 void Aliza::trigger_studyview_checked()
 {
 	if (!studyview) return;
-	const bool lock = mutex0.tryLock();
-	if (!lock) return;
+	if (lock0) return;
+	lock0 = true;
 	QList<ImageVariant*> l;
 	ImageVariant * v = get_selected_image();
 	if (v) l.push_back(v);
@@ -4533,7 +4513,7 @@ void Aliza::trigger_studyview_checked()
 	if (n == 0)
 	{
 		QMessageBox::information(nullptr, QString("Information"), QString("Nothing selected"));
-		mutex0.unlock();
+		lock0 = false;
 		return;
 	}
 	studyview->clear_();
@@ -4564,14 +4544,14 @@ void Aliza::trigger_studyview_checked()
 		++x;
 	}
 	check_slice_collisions2(studyview);
-	mutex0.unlock();
+	lock0 = false;
 }
 
 void Aliza::trigger_studyview_empty()
 {
 	if (!studyview) return;
-	const bool lock = mutex0.tryLock();
-	if (!lock) return;
+	if (lock0) return;
+	lock0 = true;
 	studyview->clear_();
 	if (!studyview->get_in_tab())
 	{
@@ -4589,7 +4569,7 @@ void Aliza::trigger_studyview_empty()
 		studyview->raise();
 	}
 	studyview->calculate_grid(2);
-	mutex0.unlock();
+	lock0 = false;
 }
 
 void Aliza::update_studyview_intersections()

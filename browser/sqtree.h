@@ -6,7 +6,6 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QStringList>
-#include <QMutex>
 #include <QCloseEvent>
 #include <QDropEvent>
 #include <QDragEnterEvent>
@@ -68,7 +67,7 @@ private:
 	bool in_tabwidget;
 	QStringList list_of_files;
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-	mutable QMutex mutex;
+	bool lock0{};
 #endif
 };
 
