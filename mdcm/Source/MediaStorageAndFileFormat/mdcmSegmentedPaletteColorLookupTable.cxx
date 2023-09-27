@@ -225,8 +225,8 @@ SegmentedPaletteColorLookupTable::SetLUT(LookupTableType type, const unsigned ch
     {
       copy[x] = array[x];
     }
-    const void *          varray = static_cast<void*>(copy);
-    const uint16_t *      array16 = static_cast<const uint16_t *>(varray);
+    void *                varray = static_cast<void*>(copy);
+    uint16_t *            array16 = static_cast<uint16_t *>(varray);
     std::vector<uint16_t> palette;
     unsigned int          num_entries = GetLUTLength(type);
     palette.reserve(num_entries);
