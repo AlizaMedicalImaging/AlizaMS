@@ -207,13 +207,12 @@ Bitmap::GetBufferLength() const
   unsigned long long tmp0 = 1ull;
   if (PF == PixelFormat::SINGLEBIT)
   {
-#if 1
     if (PF.GetSamplesPerPixel() != 1u)
     {
       mdcmAlwaysWarnMacro("SINGLEBIT and SamplesPerPixel " << PF.GetSamplesPerPixel());
       return 0ull;
     }
-#endif
+#if 1
     unsigned long long size_bits = static_cast<unsigned long long>(Dimensions[0]) * Dimensions[1];
     if (GetTransferSyntax().IsEncapsulated())
     {
@@ -237,6 +236,16 @@ Bitmap::GetBufferLength() const
     {
       tmp0 = size_bits / 8ull;
     }
+#else
+    // Wrong, but may be used for some broken data?
+    unsigned long long size_bits = Dimensions[0] / 8ull + (Dimensions[0] % 8ull != 0 ? 1 : 0);
+    size_bits *= Dimensions[1];
+    if (NumberOfDimensions > 2u)
+    {
+      size_bits *= Dimensions[2];
+    }
+	tmp0 = size_bits;
+#endif
   }
   else
   {
