@@ -238,13 +238,13 @@ Bitmap::GetBufferLength() const
     }
 #else
     // Wrong, but may be used for some broken data?
-    unsigned long long size_bits = Dimensions[0] / 8ull + (Dimensions[0] % 8ull != 0 ? 1 : 0);
+    unsigned long long size_bits = Dimensions[0] / 8ull + (Dimensions[0] % 8 != 0 ? 1 : 0);
     size_bits *= Dimensions[1];
     if (NumberOfDimensions > 2u)
     {
       size_bits *= Dimensions[2];
     }
-	tmp0 = size_bits;
+    tmp0 = size_bits;
 #endif
   }
   else
