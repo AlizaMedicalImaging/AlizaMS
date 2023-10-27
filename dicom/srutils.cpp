@@ -97,7 +97,6 @@ template<typename T> SRImage li3(
 	const typename T::RegionType region = image->GetLargestPossibleRegion();
 	const typename T::SizeType size = region.GetSize();
 	const short lut{};
-	const int lut_function{};
 	const unsigned int p_size = 3 * size[0] * size[1];
 	//
 	unsigned char * p;
@@ -114,7 +113,8 @@ template<typename T> SRImage li3(
 	const int num_threads = QThread::idealThreadCount();
 	const int tmp99 = size[1] % num_threads;
 	const double center = ivariant->di->us_window_center;
-	const double width  = ivariant->di->us_window_width;
+	const double width = ivariant->di->us_window_width;
+	const short lut_function = ivariant->di->lut_function;
 	if (tmp99 == 0)
 	{
 		unsigned int j{};

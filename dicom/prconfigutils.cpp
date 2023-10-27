@@ -1361,20 +1361,18 @@ QString voi_lut_slice_by_slice(
 						{
 							FrameLevel fl;
 							fl.us_window_center = c;
+							fl.us_window_width = w;
 							if (lut_functions.value(k) == QString("SIGMOID"))
 							{
-								fl.us_window_width = w;
 								fl.lut_function = 2;
 							}
 							else if (lut_functions.value(k) == QString("LINEAR_EXACT"))
 							{
-								fl.us_window_width = w;
-								fl.lut_function = 1;
+								fl.lut_function = 0;
 							}
 							else
 							{
-								fl.us_window_width = (w >= 2) ? w - 1 : w;
-								fl.lut_function = 0;
+								fl.lut_function = 1;
 							}
 							v->frame_levels[idxs.at(x)] = fl;
 						}
