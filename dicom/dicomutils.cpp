@@ -6673,14 +6673,11 @@ void DicomUtils::enhanced_process_values(
 		!shared_values.at(0).window_center.isEmpty() &&
 		!shared_values.at(0).window_width.isEmpty())
 	{
-		QString lut_function("LINEAR");
-		if (!shared_values.at(0).lut_function.isEmpty())
-			lut_function = shared_values.at(0).lut_function;
 		for (unsigned int x = 0; x < values.size(); ++x)
 		{
 			values[x].window_center = shared_values.at(0).window_center;
 			values[x].window_width  = shared_values.at(0).window_width;
-			values[x].lut_function  = lut_function;
+			values[x].lut_function  = shared_values.at(0).lut_function;
 		}
 	}
 	if (laterality_miss &&
@@ -7813,7 +7810,7 @@ QString DicomUtils::read_ultrasound(
 	int number_of_frames{};
 	double tmp_c{-999999.0};
 	double tmp_w{-999999.0};
-	short tmp_lut_function{};
+	short tmp_lut_function{1};
 	//
 	{
 		mdcm::Reader reader;
@@ -7948,7 +7945,7 @@ QString DicomUtils::read_ultrasound(
 	ivariant->di->default_us_window_center =
 		ivariant->di->us_window_center = tmp_c;
 	ivariant->di->default_us_window_width =
-		ivariant->di->us_window_width  = tmp_w;
+		ivariant->di->us_window_width = tmp_w;
 	ivariant->di->default_lut_function =
 		ivariant->di->lut_function = tmp_lut_function;
 	//
@@ -8107,7 +8104,7 @@ QString DicomUtils::read_nuclear(
 #endif
 	double tmp_c{-999999.0};
 	double tmp_w{-999999.0};
-	short tmp_lut_function{};
+	short tmp_lut_function{1};
 	//
 	{
 		mdcm::Reader reader;
@@ -8160,7 +8157,7 @@ QString DicomUtils::read_nuclear(
 	ivariant->di->default_us_window_center =
 		ivariant->di->us_window_center = tmp_c;
 	ivariant->di->default_us_window_width =
-		ivariant->di->us_window_width  = tmp_w;
+		ivariant->di->us_window_width = tmp_w;
 	ivariant->di->default_lut_function =
 		ivariant->di->lut_function = tmp_lut_function;
 	//
@@ -8521,7 +8518,7 @@ QString DicomUtils::read_series(
 				{
 					double tmp_c{-999999.0};
 					double tmp_w{-999999.0};
-					short lut_function{};
+					short lut_function{1};
 					if (wsettings->get_level_for_PET() || !(
 						(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.128")) ||
 						(ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.130")) ||
@@ -10806,8 +10803,8 @@ QString DicomUtils::read_enhanced_common(
 			double window_width{-999999.0};
 			double window_center_tmp{-999999.0};
 			double window_width_tmp{-999999.0};
-			short lut_function{0};
-			short lut_function_tmp{0};
+			short lut_function{1};
+			short lut_function_tmp{1};
 			QString instance_uid;
 			int instance_number{-1};
 			int ref_segment_num{-1};

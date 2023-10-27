@@ -71,7 +71,7 @@ public:
 	QString slice_thick;
 	QString window_center;
 	QString window_width;
-	QString lut_function;
+	QString lut_function{"LINEAR"};
 	QString data_type;
 	QString frame_body_part;
 	QString frame_laterality;
