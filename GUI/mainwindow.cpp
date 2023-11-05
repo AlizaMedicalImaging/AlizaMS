@@ -2307,31 +2307,31 @@ void MainWindow::ask_close()
 
 void MainWindow::trigger_studyview()
 {
+	aliza->trigger_studyview();
 	if (multiview_tab)
 	{
 		if (tabWidget->currentIndex() != 1) tabWidget->setCurrentIndex(1);
 	}
-	if (aliza) aliza->trigger_studyview();
 	qApp->processEvents();
 }
 
 void MainWindow::trigger_studyview_checked()
 {
+	aliza->trigger_studyview_checked();
 	if (multiview_tab)
 	{
 		if (tabWidget->currentIndex() != 1) tabWidget->setCurrentIndex(1);
 	}
-	if (aliza) aliza->trigger_studyview_checked();
 	qApp->processEvents();
 }
 
 void MainWindow::trigger_studyview_empty()
 {
+	aliza->trigger_studyview_empty();
 	if (multiview_tab)
 	{
 		if (tabWidget->currentIndex() != 1) tabWidget->setCurrentIndex(1);
 	}
-	if (aliza) aliza->trigger_studyview_empty();
 	qApp->processEvents();
 }
 
