@@ -732,7 +732,7 @@ void ContourUtils::contours_build_path(
 						}
 					}
 				}
-				c->path = path;
+				c->path = std::move(path);
 				++it;
 			}
 			break;

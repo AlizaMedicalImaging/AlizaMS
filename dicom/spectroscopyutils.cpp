@@ -355,7 +355,7 @@ bool SpectroscopyUtils::Read(const mdcm::DataSet & ds, SpectroscopyData * s)
 	QString DataRepresentation;
 	if (DicomUtils::get_string_value(ds, tDataRepresentation, DataRepresentation))
 	{
-		s->m_DataRepresentation = DataRepresentation;
+		s->m_DataRepresentation = std::move(DataRepresentation);
 	}
 	else
 	{
@@ -386,7 +386,7 @@ bool SpectroscopyUtils::Read(const mdcm::DataSet & ds, SpectroscopyData * s)
 	QString SignalDomainRows;
 	if (DicomUtils::get_string_value(ds, tSignalDomainRows, SignalDomainRows))
 	{
-		s->m_SignalDomainRows = SignalDomainRows;
+		s->m_SignalDomainRows = std::move(SignalDomainRows);
 	}
 
 #if LOAD_SPECT_DATA

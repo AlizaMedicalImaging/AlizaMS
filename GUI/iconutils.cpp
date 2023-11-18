@@ -270,7 +270,7 @@ template<typename Tin, typename Tout> void extract_icon(
 		QPainter painter(&empty_);
 		painter.drawPixmap(QPointF(x__,y__), ivariant->icon);
 		painter.end();
-		ivariant->icon = empty_;
+		ivariant->icon = std::move(empty_);
 	}
 	//
 	if (!ivariant->icon.isNull() &&
@@ -525,7 +525,7 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 		QPainter painter(&empty_);
 		painter.drawPixmap(QPointF(x__, y__), ivariant->icon);
 		painter.end();
-		ivariant->icon = empty_;
+		ivariant->icon = std::move(empty_);
 	}
 	if (!ivariant->icon.isNull() &&
 		ivariant->equi &&
@@ -972,7 +972,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		QPainter painter(&empty_);
 		painter.drawPixmap(QPointF(x__, y__), ivariant->icon);
 		painter.end();
-		ivariant->icon = empty_;
+		ivariant->icon = std::move(empty_);
 	}
 	if (!ivariant->icon.isNull() &&
 		ivariant->equi &&

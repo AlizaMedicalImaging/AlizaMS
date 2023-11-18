@@ -3438,7 +3438,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				{
 					sl.push_back(l.at(x).values.at(z).toString());
 				}
-				if (sl.size() > 0) voi_lut_images[voi_luts] = sl;
+				if (sl.size() > 0) voi_lut_images[voi_luts] = std::move(sl);
 				++voi_luts;
 			}
 		}
@@ -3513,7 +3513,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				mapped_implicit, mapped_signed);
 			if (error.isEmpty())
 			{
-				v->pF = pres_tmp;
+				v->pF = std::move(pres_tmp);
 				presentation = true;
 			}
 			else
@@ -3541,7 +3541,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				error = inverse_filter<ImageTypeF>(v->pF, pres_tmp);
 				if (error.isEmpty())
 				{
-					v->pF = pres_tmp;
+					v->pF = std::move(pres_tmp);
 					presentation = true;
 				}
 				else
@@ -3607,7 +3607,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 					{
 						sl.push_back(l.at(x).values.at(z).toString());
 					}
-					if (sl.size() > 0) area_images[areas] = sl;
+					if (sl.size() > 0) area_images[areas] = std::move(sl);
 				}
 				++areas;
 			}
@@ -3877,7 +3877,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				{
 					sl.push_back(l.at(x).values.at(z).toString());
 				}
-				if (!sl.empty()) text_images[texts] = sl;
+				if (!sl.empty()) text_images[texts] = std::move(sl);
 				++texts;
 			}
 		}
@@ -3995,7 +3995,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				{
 					sl.push_back(l.at(x).values.at(z).toString());
 				}
-				if (!sl.empty()) graphic_images[graphics] = sl;
+				if (!sl.empty()) graphic_images[graphics] = std::move(sl);
 				++graphics;
 			}
 		}

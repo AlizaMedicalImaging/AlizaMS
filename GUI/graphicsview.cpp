@@ -27,7 +27,7 @@ GraphicsView::GraphicsView(GraphicsWidget * p) : parent(p)
 	setScene(scene_);
 	QColor bc = qApp->palette().color(QPalette::Window);
 	setBackgroundBrush(QBrush(bc));
-	shutter_color = bc;
+	shutter_color = std::move(bc);
 	//setCacheMode(CacheNone);
 	setRenderHints(QPainter::Antialiasing);//QPainter::SmoothPixmapTransform);
 #ifdef DELETE_GRAPHICSIMAGEITEM

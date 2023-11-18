@@ -268,7 +268,7 @@ template<typename T> QString calculate_histogramm_rgb(
 		painter.drawPath(p2);
 		painter.end();
 		//
-		v->histogram = pixmap;
+		v->histogram = std::move(pixmap);
 	}
 	//
 	return QString("");

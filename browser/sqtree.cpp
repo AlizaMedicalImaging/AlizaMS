@@ -529,7 +529,7 @@ void SQtree::process_element(
 	{
 		QString str_;
 		QString entry_qs;
-		QString keyword_qs = tname;
+		QString keyword_qs = std::move(tname);
 		std::string entry_s = tag.PrintAsPipeSeparatedString();
 		bool bin_label = false;
 		if (!entry_s.empty()) entry_qs = QString(entry_s.c_str());

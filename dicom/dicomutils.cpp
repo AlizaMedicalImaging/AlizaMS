@@ -4979,56 +4979,71 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 	QString charset_tmp;
 	if (get_string_value(ds, tcharset, charset_tmp))
 		charset = charset_tmp;
-	QString imagetype;
-	if (get_string_value(ds, timagetype, imagetype))
+	//
 	{
-		imagetype = imagetype.trimmed();
-		if (!imagetype.isEmpty())
+		QString imagetype;
+		if (get_string_value(ds, timagetype, imagetype))
 		{
-			QString imagetype_;
+			imagetype = imagetype.trimmed();
+			if (!imagetype.isEmpty())
+			{
+				QString imagetype_;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
-			const QStringList l = imagetype.toLower().split(
-				QString("\\"),
-				Qt::SkipEmptyParts);
+				const QStringList l = imagetype.toLower().split(
+					QString("\\"),
+					Qt::SkipEmptyParts);
 #else
-			const QStringList l = imagetype.toLower().split(
-				QString("\\"),
-				QString::SkipEmptyParts);
+				const QStringList l = imagetype.toLower().split(
+					QString("\\"),
+					QString::SkipEmptyParts);
 #endif
-			imagetype_.append(QString(
-				"<br /><span class='y7'>DICOM image type</span>"
-				"<br /><span class='y6'>"));
-			for (int x = 0; x < l.size(); ++x)
-				imagetype_.append(l.at(x) + QString("<br />"));
-			if (!l.empty())
-				imagetype_.append(QString("</span><br />"));
-			ivariant->imagetype = imagetype_;
+				imagetype_.append(QString(
+					"<br /><span class='y7'>DICOM image type</span>"
+					"<br /><span class='y6'>"));
+				for (int x = 0; x < l.size(); ++x)
+					imagetype_.append(l.at(x) + QString("<br />"));
+				if (!l.empty())
+					imagetype_.append(QString("</span><br />"));
+				ivariant->imagetype = imagetype_;
+			}
 		}
 	}
-	QString sop;
-	if (get_string_value(ds, tsop, sop))
 	{
-		ivariant->sop = sop.remove(QChar('\0'));
-		mdcm::UIDs uid;
-		uid.SetFromUID(ivariant->sop.toLatin1().constData());
-		ivariant->iod = QString::fromLatin1(uid.GetName());
+		QString sop;
+		if (get_string_value(ds, tsop, sop))
+		{
+			ivariant->sop = sop.remove(QChar('\0'));
+			mdcm::UIDs uid;
+			uid.SetFromUID(ivariant->sop.toLatin1().constData());
+			ivariant->iod = QString::fromLatin1(uid.GetName());
 	}
-	QString studydate;
-	if (get_string_value(ds, tstudydate, studydate))
-		ivariant->study_date = studydate;
-	QString seriesdate;
-	if (get_string_value(ds, tseriesdate, seriesdate))
-		ivariant->series_date = seriesdate;
-	QString studytime;
-	if (get_string_value(ds, tstudytime, studytime))
-		ivariant->study_time = studytime;
-	QString seriestime;
-	if (get_string_value(ds, tseriestime, seriestime))
-		ivariant->series_time = seriestime;
+	}
+	{
+		QString studydate;
+		if (get_string_value(ds, tstudydate, studydate))
+			ivariant->study_date = std::move(studydate);
+	}
+	{
+		QString seriesdate;
+		if (get_string_value(ds, tseriesdate, seriesdate))
+			ivariant->series_date = std::move(seriesdate);
+	}
+	{
+		QString studytime;
+		if (get_string_value(ds, tstudytime, studytime))
+			ivariant->study_time = std::move(studytime);
+	}
+	{
+		QString seriestime;
+		if (get_string_value(ds, tseriestime, seriestime))
+			ivariant->series_time = std::move(seriestime);
+	}
 	//
-	QString modality;
-	if (get_string_value(ds, tmodality, modality))
-		ivariant->modality = modality.remove(QChar('\0'));
+	{
+		QString modality;
+		if (get_string_value(ds, tmodality, modality))
+			ivariant->modality = modality.remove(QChar('\0'));
+	}
 	if (ds.FindDataElement(tmanufacturer))
 	{
 		QString manufacturer_s;
@@ -5070,7 +5085,7 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 			manufacturer_s.append(model_s);
 		}
 		if (!manufacturer_s.isEmpty())
-			ivariant->hardware = manufacturer_s;
+			ivariant->hardware = std::move(manufacturer_s);
 	}
 	if (ds.FindDataElement(tinstituion))
 	{
@@ -5122,44 +5137,59 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 			if (!tmp0.isEmpty()) ivariant->pat_id = tmp0.trimmed().remove(QChar('\0'));
 		}
 	}
-	QString birthdate;
-	if (get_string_value(ds, tbirthdate, birthdate))
-		ivariant->pat_birthdate =
-			birthdate.remove(QChar('\0'));
-	QString patweight;
-	if (get_string_value(ds, tpatweight, patweight))
-		ivariant->pat_weight = patweight;
-	QString sex;
-	if (get_string_value(ds, tsex, sex))
-		ivariant->pat_sex = sex.remove(QChar('\0'));
-	QString fieldstrength;
-	if (get_string_value(ds, tfieldstrength, fieldstrength))
 	{
-		fieldstrength = fieldstrength.trimmed();
-		bool conv_ok{};
-		const double fieldstrength_ =
-			QVariant(fieldstrength).toDouble(&conv_ok);
-		if (conv_ok)
+		QString birthdate;
+		if (get_string_value(ds, tbirthdate, birthdate))
+			ivariant->pat_birthdate = birthdate.remove(QChar('\0'));
+	}
+	{
+		QString patweight;
+		if (get_string_value(ds, tpatweight, patweight))
+			ivariant->pat_weight = std::move(patweight);
+	}
+	{
+		QString sex;
+		if (get_string_value(ds, tsex, sex))
+			ivariant->pat_sex = sex.remove(QChar('\0'));
+	}
+	{
+		QString fieldstrength;
+		if (get_string_value(ds, tfieldstrength, fieldstrength))
 		{
-			fieldstrength.prepend(
-				QString("Magnet field strength "));
-			if (fieldstrength_ < 50.0)
-				fieldstrength.append(QString(" T")); // FIXME
-			ivariant->hardware_info = fieldstrength;
+			fieldstrength = fieldstrength.trimmed();
+			bool conv_ok{};
+			const double fieldstrength_ =
+				QVariant(fieldstrength).toDouble(&conv_ok);
+			if (conv_ok)
+			{
+				fieldstrength.prepend(
+					QString("Magnet field strength "));
+				if (fieldstrength_ < 50.0)
+					fieldstrength.append(QString(" T")); // FIXME
+				ivariant->hardware_info = std::move(fieldstrength);
+			}
 		}
 	}
-	QString studyuid;
-	if (get_string_value(ds, tstudyuid, studyuid))
-		ivariant->study_uid = studyuid.remove(QChar('\0'));
-	QString seriesuid;
-	if (get_string_value(ds, tseriesuid, seriesuid))
-		ivariant->series_uid = seriesuid.remove(QChar('\0'));
-	QString studyid;
-	if (get_string_value(ds, tstudyid, studyid))
-		ivariant->study_id = studyid.remove(QChar('\0'));
-	QString frame_of_refuid;
-	if (get_string_value(ds, tframe_of_refuid, frame_of_refuid))
-		ivariant->frame_of_ref_uid = frame_of_refuid.remove(QChar('\0'));
+	{
+		QString studyuid;
+		if (get_string_value(ds, tstudyuid, studyuid))
+			ivariant->study_uid = studyuid.remove(QChar('\0'));
+	}
+	{
+		QString seriesuid;
+		if (get_string_value(ds, tseriesuid, seriesuid))
+			ivariant->series_uid = seriesuid.remove(QChar('\0'));
+	}
+	{
+		QString studyid;
+		if (get_string_value(ds, tstudyid, studyid))
+			ivariant->study_id = studyid.remove(QChar('\0'));
+	}
+	{
+		QString frame_of_refuid;
+		if (get_string_value(ds, tframe_of_refuid, frame_of_refuid))
+			ivariant->frame_of_ref_uid = frame_of_refuid.remove(QChar('\0'));
+	}
 	if (ds.FindDataElement(tcomment))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tcomment);
@@ -5176,10 +5206,11 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 			}
 		}
 	}
-	QString interpretation;
-	if (get_string_value(ds, tinterpretation, interpretation))
-		ivariant->interpretation =
-			interpretation.remove(QChar('\0'));
+	{
+		QString interpretation;
+		if (get_string_value(ds, tinterpretation, interpretation))
+			ivariant->interpretation = interpretation.remove(QChar('\0'));
+	}
 	if (ds.FindDataElement(tprivcomment))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tprivcomment);
@@ -5198,10 +5229,12 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 			}
 		}
 	}
-	unsigned short PixelRepresentation;
-	if (get_us_value(ds, tpixelrepresentation, &PixelRepresentation))
 	{
-		if (PixelRepresentation == 1) ivariant->dicom_pixel_signed = true;
+		unsigned short PixelRepresentation;
+		if (get_us_value(ds, tpixelrepresentation, &PixelRepresentation))
+		{
+			if (PixelRepresentation == 1) ivariant->dicom_pixel_signed = true;
+		}
 	}
 }
 
@@ -5719,7 +5752,7 @@ void DicomUtils::read_gems_params(
 			QList<QVariant> l;
 			l << QVariant(j);
 			p.type = 0x49;
-			p.values = l;
+			p.values = std::move(l);
 			m[idx0] = p;
 		}
 		else if (subds.FindDataElement(t_float1))
@@ -5732,7 +5765,7 @@ void DicomUtils::read_gems_params(
 			QList<QVariant> l;
 			l << QVariant(j);
 			p.type = 0x51;
-			p.values = l;
+			p.values = std::move(l);
 			m[idx0] = p;
 		}
 		else if (subds.FindDataElement(t_float))
@@ -5745,7 +5778,7 @@ void DicomUtils::read_gems_params(
 			QList<QVariant> l;
 			l << QVariant(j);
 			p.type = 0x52;
-			p.values = l;
+			p.values = std::move(l);
 			m[idx0] = p;
 		}
 		else if (subds.FindDataElement(t_ul))
@@ -5758,7 +5791,7 @@ void DicomUtils::read_gems_params(
 			QList<QVariant> l;
 			l << QVariant(j);
 			p.type = 0x53;
-			p.values = l;
+			p.values = std::move(l);
 			m[idx0] = p;
 		}
 		else if (subds.FindDataElement(t_sl))
@@ -5771,7 +5804,7 @@ void DicomUtils::read_gems_params(
 			QList<QVariant> l;
 			l << QVariant(j);
 			p.type = 0x54;
-			p.values = l;
+			p.values = std::move(l);
 			m[idx0] = p;
 		}
 		else if (subds.FindDataElement(t_ob))
@@ -5791,7 +5824,7 @@ void DicomUtils::read_gems_params(
 				l << QVariant(j);
 #endif
 				p.type = 0x55;
-				p.values = l;
+				p.values = std::move(l);
 				m[idx0] = p;
 			}
 		}
@@ -5810,7 +5843,7 @@ void DicomUtils::read_gems_params(
 			QList<QVariant> l;
 			l << QVariant(j);
 			p.type = 0x57;
-			p.values = l;
+			p.values = std::move(l);
 			m[idx0] = p;
 		}
 		else if (subds.FindDataElement(t_sl_n))
@@ -5826,7 +5859,7 @@ void DicomUtils::read_gems_params(
 				l << QVariant(j);
 			}
 			p.type = 0x79;
-			p.values = l;
+			p.values = std::move(l);
 			m[idx0] = p;
 		}
 		else if (subds.FindDataElement(t_sl4))
@@ -5844,7 +5877,7 @@ void DicomUtils::read_gems_params(
 					l << QVariant(j);
 				}
 				p.type = 0x86;
-				p.values = l;
+				p.values = std::move(l);
 				m[idx0] = p;
 			}
 		}
@@ -5861,7 +5894,7 @@ void DicomUtils::read_gems_params(
 				l << QVariant(j);
 			}
 			p.type = 0x77;
-			p.values = l;
+			p.values = std::move(l);
 			m[idx0] = p;
 		}
 		else if (subds.FindDataElement(t_fd_n))
@@ -5877,7 +5910,7 @@ void DicomUtils::read_gems_params(
 				l << QVariant(j);
 			}
 			p.type = 0x87;
-			p.values = l;
+			p.values = std::move(l);
 			m[idx0] = p;
 		}
 		else if (subds.FindDataElement(t_fd2))
@@ -5895,7 +5928,7 @@ void DicomUtils::read_gems_params(
 					l << QVariant(j);
 				}
 				p.type = 0x88;
-				p.values = l;
+				p.values = std::move(l);
 				m[idx0] = p;
 			}
 		}
@@ -5905,7 +5938,7 @@ void DicomUtils::read_gems_params(
 			QList<QVariant> l;
 			l << QVariant(QString("Unknown"));
 			p.type = 0;
-			p.values = l;
+			p.values = std::move(l);
 			m[idx0] = p;
 #if 0
 			std::cout << "Unknown !" << idx0 << std::endl;
@@ -12546,7 +12579,7 @@ void DicomUtils::read_pr_ref(
 			continue;
 		//
 		PrRefSeries series;
-		series.uid = s;
+		series.uid = std::move(s);
 		//
 		for (unsigned int y = 0;
 			y < sqReferencedImageSequence->GetNumberOfItems();
@@ -12561,7 +12594,7 @@ void DicomUtils::read_pr_ref(
 			if (ok0)
 			{
 				PrRefImage ref;
-				ref.uid = s0;
+				ref.uid = std::move(s0);
 				ref.file = find_file_from_uid(p, ref.uid);
 				if (ref.file.isEmpty()) continue;
 				std::vector<int> frames;
