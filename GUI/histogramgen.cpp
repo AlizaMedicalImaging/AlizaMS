@@ -129,7 +129,7 @@ template<typename T> QString calculate_histogramm(
 		painter.drawPath(p);
 		painter.end();
 		//
-		v->histogram = pixmap;
+		v->histogram = std::move(pixmap);
 	}
 	//
 	return QString("");

@@ -1064,7 +1064,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 										fpath.append(l2.at(x));
 										if (x != l2size - 1) fpath.append(QString("/"));
 									}
-									ed.file = fpath;
+									ed.file = std::move(fpath);
 								}
 							}
 						}

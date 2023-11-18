@@ -1145,7 +1145,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 					}
 					else
 					{
-						tmp1 = tmp0;
+						tmp1 = std::move(tmp0);
 					}
 					if (flip)
 					{
@@ -1220,7 +1220,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 				}
 				else
 				{
-					tmp1 = tmp0;
+					tmp1 = std::move(tmp0);
 				}
 			}
 			if (tmp1.IsNull()) return QString("tmp1.IsNull()");
@@ -1994,7 +1994,7 @@ void read_overlays(
 		SliceOverlays l2 = slice_overlays.values(idx);
 		if (!ref.image_overlays.all_overlays.contains(idx))
 		{
-			ref.image_overlays.all_overlays[idx] = l2;
+			ref.image_overlays.all_overlays[idx] = std::move(l2);
 		}
 		else
 		{
@@ -3757,7 +3757,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 						if (error.isEmpty())
 						{
 							if (v->pF.IsNotNull()) v->pF->DisconnectPipeline();
-							v->pF = tmp0;
+							v->pF = std::move(tmp0);
 						}
 					}
 					if (!error.isEmpty())

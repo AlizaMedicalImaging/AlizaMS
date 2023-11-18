@@ -23,7 +23,7 @@ StudyGraphicsView::StudyGraphicsView(StudyGraphicsWidget * p)
 	setScene(scene_);
 	QColor bc = qApp->palette().color(QPalette::Window);
 	setBackgroundBrush(QBrush(bc));
-	shutter_color = bc;
+	shutter_color = std::move(bc);
 	//setCacheMode(CacheNone);
 	setRenderHints(QPainter::Antialiasing);//QPainter::SmoothPixmapTransform);
 #ifdef DELETE_GRAPHICSIMAGEITEM
@@ -446,7 +446,7 @@ void StudyGraphicsView::update_background_color()
 {
 	QColor bc = qApp->palette().color(QPalette::Window);
 	setBackgroundBrush(QBrush(bc));
-	shutter_color = bc;
+	shutter_color = std::move(bc);
 }
 
 void StudyGraphicsView::draw_us_regions()

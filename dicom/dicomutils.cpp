@@ -3461,7 +3461,7 @@ bool DicomUtils::read_slices(
 			orientation_20_20);
 		ivariant->image_instance_uids[i] = sop_instance_uid;
 		if (!orientation_20_20.isEmpty())
-			ivariant->orientations_20_20[i] = orientation_20_20;
+			ivariant->orientations_20_20[i] = std::move(orientation_20_20);
 		double pat_pos[3];
 		double pat_orient[6];
 		double pix_spacing[2];
@@ -4272,23 +4272,27 @@ bool DicomUtils::read_group_sq(
 						fg.in_stack_pos_num = static_cast<int>(tmp678);
 					}
 				}
-				QString FrameAcquisitionDateTime;
-				if (get_string_value(
-						nestedds1,
-						tFrameAcquisitionDateTime,
-						FrameAcquisitionDateTime))
 				{
-					fg.frame_acquisition_datetime =
-						FrameAcquisitionDateTime;
+					QString FrameAcquisitionDateTime;
+					if (get_string_value(
+							nestedds1,
+							tFrameAcquisitionDateTime,
+							FrameAcquisitionDateTime))
+					{
+						fg.frame_acquisition_datetime =
+							std::move(FrameAcquisitionDateTime);
+					}
 				}
-				QString FrameReferenceDateTime;
-				if (get_string_value(
-						nestedds1,
-						tFrameReferenceDateTime,
-						FrameReferenceDateTime))
 				{
-					fg.frame_reference_datetime =
-						FrameReferenceDateTime;
+					QString FrameReferenceDateTime;
+					if (get_string_value(
+							nestedds1,
+							tFrameReferenceDateTime,
+							FrameReferenceDateTime))
+					{
+						fg.frame_reference_datetime =
+							std::move(FrameReferenceDateTime);
+					}
 				}
 			}
 		}
@@ -4661,7 +4665,7 @@ bool DicomUtils::read_group_sq(
 				QString tmp3;
 				if (get_string_value(nestedds1, tRescaleType, tmp3))
 				{
-					fg.rescale_type = tmp3;
+					fg.rescale_type = std::move(tmp3);
 				}
 			}
 		}
@@ -4976,10 +4980,11 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 	const mdcm::Tag tinterpretation(0x0028,0x0004);
 	const mdcm::Tag tpixelrepresentation(0x0028,0x0103);
 	const mdcm::PrivateTag tprivcomment(0x0067,0x01,"ALIZA 001");
-	QString charset_tmp;
-	if (get_string_value(ds, tcharset, charset_tmp))
-		charset = charset_tmp;
-	//
+	{
+		QString charset_tmp;
+		if (get_string_value(ds, tcharset, charset_tmp))
+			charset = std::move(charset_tmp);
+	}
 	{
 		QString imagetype;
 		if (get_string_value(ds, timagetype, imagetype))
@@ -5004,7 +5009,7 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 					imagetype_.append(l.at(x) + QString("<br />"));
 				if (!l.empty())
 					imagetype_.append(QString("</span><br />"));
-				ivariant->imagetype = imagetype_;
+				ivariant->imagetype = std::move(imagetype_);
 			}
 		}
 	}
@@ -5016,7 +5021,7 @@ void DicomUtils::read_ivariant_info_tags(const mdcm::DataSet & ds, ImageVariant 
 			mdcm::UIDs uid;
 			uid.SetFromUID(ivariant->sop.toLatin1().constData());
 			ivariant->iod = QString::fromLatin1(uid.GetName());
-	}
+		}
 	}
 	{
 		QString studydate;
@@ -5753,7 +5758,7 @@ void DicomUtils::read_gems_params(
 			l << QVariant(j);
 			p.type = 0x49;
 			p.values = std::move(l);
-			m[idx0] = p;
+			m[idx0] = std::move(p);
 		}
 		else if (subds.FindDataElement(t_float1))
 		{
@@ -5766,7 +5771,7 @@ void DicomUtils::read_gems_params(
 			l << QVariant(j);
 			p.type = 0x51;
 			p.values = std::move(l);
-			m[idx0] = p;
+			m[idx0] = std::move(p);
 		}
 		else if (subds.FindDataElement(t_float))
 		{
@@ -5779,7 +5784,7 @@ void DicomUtils::read_gems_params(
 			l << QVariant(j);
 			p.type = 0x52;
 			p.values = std::move(l);
-			m[idx0] = p;
+			m[idx0] = std::move(p);
 		}
 		else if (subds.FindDataElement(t_ul))
 		{
@@ -5792,7 +5797,7 @@ void DicomUtils::read_gems_params(
 			l << QVariant(j);
 			p.type = 0x53;
 			p.values = std::move(l);
-			m[idx0] = p;
+			m[idx0] = std::move(p);
 		}
 		else if (subds.FindDataElement(t_sl))
 		{
@@ -5805,7 +5810,7 @@ void DicomUtils::read_gems_params(
 			l << QVariant(j);
 			p.type = 0x54;
 			p.values = std::move(l);
-			m[idx0] = p;
+			m[idx0] = std::move(p);
 		}
 		else if (subds.FindDataElement(t_ob))
 		{
@@ -5825,7 +5830,7 @@ void DicomUtils::read_gems_params(
 #endif
 				p.type = 0x55;
 				p.values = std::move(l);
-				m[idx0] = p;
+				m[idx0] = std::move(p);
 			}
 		}
 		else if (subds.FindDataElement(t_text))
@@ -5844,7 +5849,7 @@ void DicomUtils::read_gems_params(
 			l << QVariant(j);
 			p.type = 0x57;
 			p.values = std::move(l);
-			m[idx0] = p;
+			m[idx0] = std::move(p);
 		}
 		else if (subds.FindDataElement(t_sl_n))
 		{
@@ -5860,7 +5865,7 @@ void DicomUtils::read_gems_params(
 			}
 			p.type = 0x79;
 			p.values = std::move(l);
-			m[idx0] = p;
+			m[idx0] = std::move(p);
 		}
 		else if (subds.FindDataElement(t_sl4))
 		{
@@ -5878,7 +5883,7 @@ void DicomUtils::read_gems_params(
 				}
 				p.type = 0x86;
 				p.values = std::move(l);
-				m[idx0] = p;
+				m[idx0] = std::move(p);
 			}
 		}
 		else if (subds.FindDataElement(t_fd_n1))
@@ -5895,7 +5900,7 @@ void DicomUtils::read_gems_params(
 			}
 			p.type = 0x77;
 			p.values = std::move(l);
-			m[idx0] = p;
+			m[idx0] = std::move(p);
 		}
 		else if (subds.FindDataElement(t_fd_n))
 		{
@@ -5911,7 +5916,7 @@ void DicomUtils::read_gems_params(
 			}
 			p.type = 0x87;
 			p.values = std::move(l);
-			m[idx0] = p;
+			m[idx0] = std::move(p);
 		}
 		else if (subds.FindDataElement(t_fd2))
 		{
@@ -5929,7 +5934,7 @@ void DicomUtils::read_gems_params(
 				}
 				p.type = 0x88;
 				p.values = std::move(l);
-				m[idx0] = p;
+				m[idx0] = std::move(p);
 			}
 		}
 		else
@@ -5939,7 +5944,7 @@ void DicomUtils::read_gems_params(
 			l << QVariant(QString("Unknown"));
 			p.type = 0;
 			p.values = std::move(l);
-			m[idx0] = p;
+			m[idx0] = std::move(p);
 #if 0
 			std::cout << "Unknown !" << idx0 << std::endl;
 #endif
@@ -9749,7 +9754,7 @@ QString DicomUtils::read_buffer(
 					SliceOverlays l2 = slice_overlays.values(idx);
 					if (!image_overlays.all_overlays.contains(idx))
 					{
-						image_overlays.all_overlays[idx] = l2;
+						image_overlays.all_overlays[idx] = std::move(l2);
 #if 0
 							std::cout << "image_overlays.all_overlays["
 								<< idx << "] = l2"
@@ -13646,7 +13651,7 @@ QString DicomUtils::read_dicom(
 			columns_tmp0 = columns_;
 			ba_tmp0 = ba_;
 			localizer_tmp0 = localizer_;
-			photometric_tmp0 = photometric;
+			photometric_tmp0 = std::move(photometric);
 			icc_found_tmp0 = icc_found;
 			if (sop == QString("1.2.840.10008.5.1.4.1.1.6.1") ||
 				sop == QString("1.2.840.10008.5.1.4.1.1.6")   ||
@@ -14760,7 +14765,7 @@ QString DicomUtils::read_dicom(
 					true);
 				if (ok)
 				{
-					ivariant->filenames = images_tmp;
+					ivariant->filenames = std::move(images_tmp);
 					{
 						QList<QString> l_uids =
 							ivariant->image_instance_uids.values();

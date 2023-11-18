@@ -362,14 +362,16 @@ bool SpectroscopyUtils::Read(const mdcm::DataSet & ds, SpectroscopyData * s)
 		return false;
 	}
 
-	QString SignalDomainColumns;
-	if (DicomUtils::get_string_value(ds, tSignalDomainColumns, SignalDomainColumns))
 	{
-		s->m_SignalDomainColumns = SignalDomainColumns;
-	}
-	else
-	{
-		return false;
+		QString SignalDomainColumns;
+		if (DicomUtils::get_string_value(ds, tSignalDomainColumns, SignalDomainColumns))
+		{
+			s->m_SignalDomainColumns = std::move(SignalDomainColumns);
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 #if LOAD_SPECT_DATA

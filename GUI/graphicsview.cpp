@@ -671,7 +671,7 @@ void GraphicsView::update_background_color()
 {
 	QColor bc = qApp->palette().color(QPalette::Window);
 	setBackgroundBrush(QBrush(bc));
-	shutter_color = bc;
+	shutter_color = std::move(bc);
 }
 
 void GraphicsView::draw_frames(short a)

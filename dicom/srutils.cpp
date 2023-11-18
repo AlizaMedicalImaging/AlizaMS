@@ -1077,7 +1077,7 @@ void SRUtils::read_NUM(
 					}
 				}
 			}
-			const QString u = (unit.trimmed().toUpper() != QString("NO UNITS")) ? unit : QString("");
+			const QString u = (unit.trimmed().toUpper() != QString("NO UNITS")) ? std::move(unit) : QString("");
 			s += QString("<span class='y'>") + NumericValue.trimmed() + QString(" ") + u + QString("</span><br />\n");
 		}
 	}
@@ -1153,7 +1153,7 @@ void SRUtils::read_DATETIME(const mdcm::DataSet & ds, QString & s)
 		}
 		else
 		{
-			tmp0 = DateTime;
+			tmp0 = std::move(DateTime);
 		}
 	}
 	s += QString("<span class='y'>") + tmp0 + QString("</span><br />\n");
@@ -1180,7 +1180,7 @@ void SRUtils::read_TIME(const mdcm::DataSet & ds, QString & s)
 		}
 		else
 		{
-			tmp0 = Time;
+			tmp0 = std::move(Time);
 		}
 	}
 	s += QString("<span class='y'>") + tmp0 + QString("</span><br />\n");

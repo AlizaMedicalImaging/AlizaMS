@@ -1283,7 +1283,7 @@ void SQtree::read_file_and_series(const QString & ff, const bool use_lock)
 	horizontalSlider->setMinimum(0);
 	if (idx >= 0)
 	{
-		list_of_files = files;
+		list_of_files = std::move(files);
 		horizontalSlider->setMaximum(files_size-1);
 		horizontalSlider->setValue(idx);
 		horizontalSlider->show();
