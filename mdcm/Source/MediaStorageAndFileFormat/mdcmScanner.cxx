@@ -105,7 +105,7 @@ Scanner::GetString(const DataElement & de, const DataSet & ds, const bool implic
       std::string s = std::string(bv->GetPointer(), bv->GetLength());
       // Remove trailing '\0', strlen is lower or equal to size()
       s.resize(std::min(s.size(), strlen(s.c_str())));
-      r = s;
+      r = std::move(s);
     }
   }
   else
@@ -126,7 +126,7 @@ Scanner::GetString(const DataElement & de, const DataSet & ds, const bool implic
       default:
         break;
     }
-    r = retvalue;
+    r = std::move(retvalue);
   }
   return r;
 }
