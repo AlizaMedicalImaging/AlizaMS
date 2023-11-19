@@ -1097,7 +1097,7 @@ template<typename T, typename T2d> QString rotate_flip_slice_by_slice(
 				}
 				else
 				{
-					tmp1 = tmp0;
+					tmp1 = std::move(tmp0);
 				}
 			}
 			else

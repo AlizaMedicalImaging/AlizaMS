@@ -3459,7 +3459,7 @@ bool DicomUtils::read_slices(
 			pix_spacing_s,
 			sop_instance_uid,
 			orientation_20_20);
-		ivariant->image_instance_uids[i] = sop_instance_uid;
+		ivariant->image_instance_uids[i] = std::move(sop_instance_uid);
 		if (!orientation_20_20.isEmpty())
 			ivariant->orientations_20_20[i] = std::move(orientation_20_20);
 		double pat_pos[3];
@@ -14053,7 +14053,7 @@ QString DicomUtils::read_dicom(
 				settings);
 			if (ok)
 			{
-				ivariant->filenames = images_tmp;
+				ivariant->filenames = std::move(images_tmp);
 				ivariants.push_back(ivariant);
 			}
 			else
@@ -14083,7 +14083,7 @@ QString DicomUtils::read_dicom(
 				settings);
 			if (ok)
 			{
-				ivariant->filenames = images_tmp;
+				ivariant->filenames = std::move(images_tmp);
 				ivariants.push_back(ivariant);
 			}
 			else
@@ -14120,7 +14120,7 @@ QString DicomUtils::read_dicom(
 					(load_type == 1) ? false : true);
 				if (ok)
 				{
-					ivariant->filenames = images_tmp;
+					ivariant->filenames = std::move(images_tmp);
 					ivariants.push_back(ivariant);
 				}
 				else
@@ -14175,7 +14175,7 @@ QString DicomUtils::read_dicom(
 					true);
 				if (ok)
 				{
-					ivariant->filenames = images_tmp;
+					ivariant->filenames = std::move(images_tmp);
 					ivariants.push_back(ivariant);
 				}
 				else
@@ -14403,7 +14403,7 @@ QString DicomUtils::read_dicom(
 				true);
 			if (ok)
 			{
-				ivariant->filenames = images_tmp;
+				ivariant->filenames = std::move(images_tmp);
 				ivariants.push_back(ivariant);
 			}
 			else
@@ -14440,7 +14440,7 @@ QString DicomUtils::read_dicom(
 				true);
 			if (ok)
 			{
-				ivariant->filenames = images_tmp;
+				ivariant->filenames = std::move(images_tmp);
 				ivariants.push_back(ivariant);
 			}
 			else
@@ -14478,7 +14478,7 @@ QString DicomUtils::read_dicom(
 					true);
 				if (ok)
 				{
-					ivariant->filenames = images_tmp;
+					ivariant->filenames = std::move(images_tmp);
 					ivariants.push_back(ivariant);
 				}
 				else
@@ -14509,7 +14509,7 @@ QString DicomUtils::read_dicom(
 					(load_type == 3));
 				if (ok)
 				{
-					ivariant->filenames = images_tmp;
+					ivariant->filenames = std::move(images_tmp);
 					ivariants.push_back(ivariant);
 				}
 				else
@@ -14678,7 +14678,7 @@ QString DicomUtils::read_dicom(
 					true);
 				if (ok)
 				{
-					ivariant->filenames = images_tmp;
+					ivariant->filenames = std::move(images_tmp);
 					ivariants.push_back(ivariant);
 				}
 				else
@@ -14709,7 +14709,7 @@ QString DicomUtils::read_dicom(
 					(load_type == 3));
 				if (ok)
 				{
-					ivariant->filenames = images_tmp;
+					ivariant->filenames = std::move(images_tmp);
 					ivariants.push_back(ivariant);
 				}
 				else
@@ -14815,7 +14815,8 @@ QString DicomUtils::read_dicom(
 					(load_type == 3));
 				if (ok)
 				{
-					ivariant->filenames = images_tmp;
+					ivariant->filenames = std::move(images_tmp);
+					//
 					{
 						QList<QString> l_uids =
 							ivariant->image_instance_uids.values();
@@ -14835,6 +14836,7 @@ QString DicomUtils::read_dicom(
 							}
 						}
 					}
+					//
 					ivariants.push_back(ivariant);
 				}
 				else
