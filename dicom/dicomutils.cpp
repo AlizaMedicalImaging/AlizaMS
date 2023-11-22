@@ -3518,16 +3518,6 @@ bool DicomUtils::read_slices(
 		{
 			failed = true;
 		}
-#if 0
-		if (i == 0) std::cout << std::endl;
-		std::cout << "read_slices() "
-			<< i
-			<< " " <<
-			sop_instance_uid.toStdString() << " "
-			<< filenames_.at(i).toStdString()
-			<< std::endl;
-		if (i == size_z - 1) std::cout << std::endl;
-#endif
 	}
 	if (failed) goto quit_;
 	ok = generate_geometry(
