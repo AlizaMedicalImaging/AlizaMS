@@ -304,7 +304,7 @@ void add_slice_collision_plane(
 void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 {
 #ifdef ALIZA_PERF_COLLISION
-	auto t0 = std::chrono::steady_clock::now();
+	const auto t0 = std::chrono::steady_clock::now();
 #endif
 	if (!w) return;
 	if (w->get_axis() != 2) return;
@@ -471,8 +471,8 @@ void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 		}
 	}
 #ifdef ALIZA_PERF_COLLISION
-	auto t1 = std::chrono::steady_clock::now();
-	auto ts = std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0);
+	const auto t1 = std::chrono::steady_clock::now();
+	const auto ts = std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0);
 	std::cout << ts.count() << " ns" << std::endl;
 #endif
 }
@@ -480,7 +480,7 @@ void check_slice_collisions(const ImageVariant * v, GraphicsWidget * w)
 void check_slice_collisions2(StudyViewWidget * w)
 {
 #ifdef ALIZA_PERF_COLLISION
-	auto t0 = std::chrono::steady_clock::now();
+	const auto t0 = std::chrono::steady_clock::now();
 #endif
 	if (!w) return;
 	if (!g_collisionWorld) return;
@@ -654,8 +654,8 @@ void check_slice_collisions2(StudyViewWidget * w)
 		}
 	}
 #ifdef ALIZA_PERF_COLLISION
-	auto t1 = std::chrono::steady_clock::now();
-	auto ts = std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0);
+	const auto t1 = std::chrono::steady_clock::now();
+	const auto ts = std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0);
 	std::cout << ts.count() << " ns" << std::endl;
 #endif
 }
