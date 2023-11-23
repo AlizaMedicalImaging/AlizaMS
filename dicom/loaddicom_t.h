@@ -29,7 +29,7 @@ public:
 		load_type(load_type_),
 		enh_type(enh_type_) {}
 	~LoadDicom_T() = default;
-	void run();
+	void run() override;
 	QString message;
 	std::vector<ImageVariant*> ivariants;
 	QStringList pdf_files;
