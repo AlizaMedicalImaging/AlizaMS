@@ -28,7 +28,7 @@ public:
 		settingswidget(settingswidget_),
 		load_type(load_type_),
 		enh_type(enh_type_) {}
-	virtual ~LoadDicom_T() {}
+	~LoadDicom_T() = default;
 	void run();
 	QString message;
 	std::vector<ImageVariant*> ivariants;
