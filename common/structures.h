@@ -279,7 +279,7 @@ public:
 			data.push_back(j.data.at(k));
 		}
 	}
-	~SliceOverlay() {}
+	~SliceOverlay() = default;
 	int dimx;
 	int dimy;
 	int x;
@@ -327,7 +327,7 @@ class PresentationStateObj
 {
 public:
 	PresentationStateObj() = default;
-	~PresentationStateObj() = default;
+	virtual ~PresentationStateObj() = default;
 	QString id;
 	QString layer_id;
 };
@@ -335,8 +335,8 @@ public:
 class PRDisplayArea : public PresentationStateObj
 {
 public:
-	PRDisplayArea() {}
-	virtual ~PRDisplayArea() {}
+	PRDisplayArea() = default;
+	~PRDisplayArea() = default;
 	int top_left_x{-1};
 	int top_left_y{-1};
 	int bottom_right_x{-1};
@@ -347,8 +347,8 @@ typedef QMap<int, PRDisplayArea> PRDisplayAreas;
 class PRTextAnnotation : public PresentationStateObj
 {
 public:
-	PRTextAnnotation() {}
-	virtual ~PRTextAnnotation() {}
+	PRTextAnnotation() = default;
+	~PRTextAnnotation() = default;
 	bool    has_bb{};
 	bool    has_anchor{};
 	bool    has_textstyle{};
@@ -391,7 +391,8 @@ typedef QMap< int, QList<PRTextAnnotation > > PRTextAnnotations;
 class PRGraphicObject : public PresentationStateObj
 {
 public:
-	PRGraphicObject() {}
+	PRGraphicObject() = default;
+	virtual PRGraphicObject() = default;
 	unsigned int NumberofGraphicPoints{};
 	int LinePatternOnColorCIELabValue_L{};
 	int LinePatternOnColorCIELabValue_a{};
@@ -436,8 +437,8 @@ typedef QMap< int, QList<PRGraphicObject > > PRGraphicObjects;
 class PRDisplayShutter : public PresentationStateObj
 {
 public:
-	PRDisplayShutter() {}
-	virtual ~PRDisplayShutter() {}
+	PRDisplayShutter() = default;
+	~PRDisplayShutter() = default;
 	int ShutterLeftVerticalEdge{-1};
 	int ShutterRightVerticalEdge{-1};
 	int ShutterUpperHorizontalEdge{-1};
