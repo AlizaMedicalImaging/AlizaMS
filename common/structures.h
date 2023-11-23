@@ -392,7 +392,7 @@ class PRGraphicObject : public PresentationStateObj
 {
 public:
 	PRGraphicObject() = default;
-	virtual ~PRGraphicObject() = default;
+	~PRGraphicObject() = default;
 	unsigned int NumberofGraphicPoints{};
 	int LinePatternOnColorCIELabValue_L{};
 	int LinePatternOnColorCIELabValue_a{};
