@@ -21,10 +21,6 @@ LUTWidget::LUTWidget(float si)
 	setToolTip(QString("LUT"));
 }
 
-LUTWidget::~LUTWidget()
-{
-}
-
 void LUTWidget::add_items1()
 {
     comboBox->addItem(QIcon(QString(":/bitmaps/grey0.png")), QString(""));

@@ -8,7 +8,7 @@ class ImageInfoDialog: public QDialog, public Ui::ImageInfoDialog
 Q_OBJECT
 public:
 	ImageInfoDialog();
-	~ImageInfoDialog();
+	~ImageInfoDialog() = default;
 	void set_label0(const QString&);
 	void set_label1(const QString&);
 	void set_text(const QString&);

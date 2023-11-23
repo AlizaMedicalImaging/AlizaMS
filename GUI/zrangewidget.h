@@ -8,7 +8,7 @@ class ZRangeWidget: public QWidget
 Q_OBJECT
 public:
 	ZRangeWidget();
-	~ZRangeWidget();
+	~ZRangeWidget() = default;
 	QxtSpanSlider * spanslider;
 
 public slots:

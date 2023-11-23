@@ -14,10 +14,6 @@ RectItem::RectItem(
 	set_pen1(pwidth);
 }
 
-RectItem::~RectItem()
-{
-}
-
 void RectItem::set_pen1(
 	qreal w,
 	unsigned int r,

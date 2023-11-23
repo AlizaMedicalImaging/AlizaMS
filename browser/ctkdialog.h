@@ -9,7 +9,7 @@ class CTKDialog: public QDialog, private Ui::CTKDialog
 Q_OBJECT
 public:
 	CTKDialog();
-	~CTKDialog() {}
+	~CTKDialog() = default;
 	QString get_dir() const;
 	QString get_pname() const;
 	QString get_pid() const;

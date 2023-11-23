@@ -8,7 +8,7 @@ class ToolBox: public QWidget, public Ui::ToolBox
 Q_OBJECT
 public:
 	ToolBox();
-	~ToolBox();
+	~ToolBox() = default;
 };
 
 #endif

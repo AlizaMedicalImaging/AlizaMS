@@ -14,10 +14,6 @@ HelpWidget::HelpWidget()
 #endif
 }
 
-HelpWidget::~HelpWidget()
-{
-}
-
 // clang-format off
 void HelpWidget::set_text()
 {

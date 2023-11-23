@@ -11,10 +11,6 @@ FindRefDialog::FindRefDialog(float si)
 	connect(toolButton, SIGNAL(clicked()), this, SLOT(select_dir()));
 }
 
-FindRefDialog::~FindRefDialog()
-{
-}
-
 void FindRefDialog::set_path(const QString & p)
 {
 	lineEdit->setText(p);

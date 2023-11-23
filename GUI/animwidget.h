@@ -8,7 +8,7 @@ class AnimWidget: public QWidget, public Ui::AnimWidget
 Q_OBJECT
 public:
 	AnimWidget(float);
-	~AnimWidget();
+	~AnimWidget() = default;
 };
 
 #endif

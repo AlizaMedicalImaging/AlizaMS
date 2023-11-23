@@ -21,10 +21,6 @@ ToolBox2D::ToolBox2D(float si)
 	connect_sliders();
 }
 
-ToolBox2D::~ToolBox2D()
-{
-}
-
 void ToolBox2D::set_style_sheet()
 {
 	const QString tmp0 = QString("QWidget{selection-background-color: #303947;}");

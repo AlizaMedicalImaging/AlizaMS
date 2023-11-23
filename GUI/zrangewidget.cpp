@@ -10,10 +10,6 @@ ZRangeWidget::ZRangeWidget()
 	l->addWidget(spanslider);
 }
 
-ZRangeWidget::~ZRangeWidget()
-{
-}
-
 void ZRangeWidget::set_spanslider_max(int i)
 {
 	spanslider->setMaximum(i);

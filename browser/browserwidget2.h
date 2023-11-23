@@ -45,8 +45,8 @@ public:
 class EntryDICOMDIR
 {
 public:
-	EntryDICOMDIR() {}
-	~EntryDICOMDIR() {}
+	EntryDICOMDIR() = default;
+	~EntryDICOMDIR() = default;
 	unsigned int offsetOfTheNextDirectoryRecord{};
 	unsigned int offsetOfReferencedLowerLevelDirectoryEntity{};
 	QString directoryRecordType;
@@ -63,8 +63,8 @@ public:
 class SeriesDICOMDIR
 {
 public:
-	SeriesDICOMDIR() {}
-	~SeriesDICOMDIR() {}
+	SeriesDICOMDIR() = default;
+	~SeriesDICOMDIR() = default;
 	bool    eye{};
 	bool    eye2{};
 	QString UID;
@@ -85,7 +85,7 @@ public:
 		: QTableWidgetItem(QTableWidgetItem::UserType + 1) {}
 	TableWidgetItem(const QString & s)
 		: QTableWidgetItem(s, QTableWidgetItem::UserType + 1) {}
-	~TableWidgetItem() {}
+	~TableWidgetItem() = default;
 	QStringList files;
 };
 
@@ -94,7 +94,7 @@ class BrowserWidget2: public QWidget, public Ui::BrowserWidget2
 Q_OBJECT
 public:
 	BrowserWidget2(float);
-	~BrowserWidget2();
+	~BrowserWidget2() = default;
 	bool          is_first_run() const;
 	const QString read_DICOMDIR(const QString&);
 	QStringList   get_files_of_1st();

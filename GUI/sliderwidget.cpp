@@ -6,10 +6,6 @@ SliderWidget::SliderWidget()
 	set_style_sheet();
 }
 
-SliderWidget::~SliderWidget()
-{
-}
-
 void SliderWidget::set_slice(int i)
 {
 	slices_slider->setValue(i);

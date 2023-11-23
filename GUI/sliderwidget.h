@@ -8,7 +8,7 @@ class SliderWidget: public QWidget, public Ui::SliderWidget
 Q_OBJECT
 public:
 	SliderWidget();
-	~SliderWidget();
+	~SliderWidget() = default;
 	void set_style_sheet();
 
 public slots:

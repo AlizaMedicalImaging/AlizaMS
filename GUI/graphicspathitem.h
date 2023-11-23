@@ -9,8 +9,8 @@
 class GraphicsPathItem : public QGraphicsPathItem
 {
 public:
-	GraphicsPathItem();
-	~GraphicsPathItem();
+	GraphicsPathItem() = default;
+	~GraphicsPathItem() = default;
 	int get_contour_id() const;
 	void set_contour_id(int);
 	int get_roi_id() const;

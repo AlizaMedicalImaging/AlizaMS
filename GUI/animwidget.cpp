@@ -14,7 +14,3 @@ AnimWidget::AnimWidget(float si)
 	acq_spinBox->clear();
 }
 
-AnimWidget::~AnimWidget()
-{
-}
-

@@ -24,7 +24,3 @@ ZoomWidget::ZoomWidget(float si)
 	l->addWidget(minus_pushButton);
 }
 
-ZoomWidget::~ZoomWidget()
-{
-}
-

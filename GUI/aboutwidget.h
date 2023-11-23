@@ -9,7 +9,7 @@ class AboutWidget : public QWidget, public Ui::AboutWidget
 Q_OBJECT
 public:
 	AboutWidget(int, int);
-	~AboutWidget();
+	~AboutWidget() = default;
 	bool has_opengl_info() const;
 	void set_opengl_info(const QString&);
 	void set_info();

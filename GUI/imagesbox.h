@@ -21,7 +21,7 @@ public:
 	ListWidgetItem2(const QIcon&, const QString&, QListWidget(*) = nullptr, int = Type);
 	ListWidgetItem2(int, ImageVariant*, const QIcon&, const QString&, QListWidget(*) = nullptr, int = Type);
 	ListWidgetItem2(int, ImageVariant*, QListWidget(*) = nullptr, int = Type);
-	~ListWidgetItem2();
+	~ListWidgetItem2() = default;
 	int get_id() const;
 	ImageVariant * get_image_from_item();
 	const ImageVariant * get_image_from_item_const() const;
@@ -36,7 +36,7 @@ class TableWidgetItem2 : public QTableWidgetItem
 public:
 	TableWidgetItem2()                  : QTableWidgetItem(QTableWidgetItem::UserType + 1) {}
 	TableWidgetItem2(const QString & s) : QTableWidgetItem(s, QTableWidgetItem::UserType + 1) {}
-	~TableWidgetItem2() {}
+	~TableWidgetItem2() = default;
 	void set_id(int);
 	int get_id() const;
 
@@ -49,7 +49,7 @@ class ImagesBox: public QWidget, public Ui::ImagesBox
 Q_OBJECT
 public:
 	ImagesBox(float);
-	~ImagesBox();
+	~ImagesBox() = default;
 	void add_image(int, ImageVariant*, QPixmap(*) = nullptr);
 	void set_html(const ImageVariant*);
 	void check_all();

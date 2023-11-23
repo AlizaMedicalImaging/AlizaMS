@@ -7,9 +7,35 @@
 #include <QTextBrowser>
 #include <QProgressDialog>
 #include <QStringList>
+#include <QImage>
 #include <vector>
 
-class SRImage;
+class SRImage
+{
+public:
+	SRImage() = default;
+	~SRImage() = default;
+	SRImage & operator=(const SRImage & j)
+	{
+		sx = j.sx;
+		sy = j.sy;
+		p  = j.p;
+		i  = j.i;
+		return *this;
+	}
+	SRImage & operator=(SRImage & j)
+	{
+		sx = j.sx;
+		sy = j.sy;
+		p  = j.p;
+		i  = j.i;
+		return *this;
+	}
+	double sx{1.0};
+	double sy{1.0};
+	unsigned char * p{};
+	QImage i;
+};
 
 class SRGraphic
 {

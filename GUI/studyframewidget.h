@@ -12,7 +12,7 @@ Q_OBJECT
 
 public:
 	StudyFrameWidget(StudyGraphicsWidget*);
-	~StudyFrameWidget();
+	~StudyFrameWidget() = default;
 	StudyGraphicsWidget * graphicswidget;
 };
 

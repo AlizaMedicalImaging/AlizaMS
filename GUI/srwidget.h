@@ -2,19 +2,18 @@
 #define A_SRWIDGET_H
 
 #include "ui_srwidget.h"
+#include "srutils.h"
 #include <QCloseEvent>
 #include <QStringList>
 #include <QPrinter>
 #include <QShortcut>
-
-class SRImage;
 
 class SRWidget: public QWidget, public Ui::SRWidget
 {
 Q_OBJECT
 public:
 	SRWidget(float);
-	~SRWidget();
+	~SRWidget() = default;
 	void initSR(const QString&);
 	QStringList tmpfiles;
 	std::vector<SRImage> srimages;

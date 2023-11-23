@@ -14,7 +14,7 @@ class RectItem : public QGraphicsRectItem
 public:
 	enum { Type = QGraphicsItem::UserType + 3 };
 	RectItem(qreal, qreal, qreal, qreal, QGraphicsItem(*) = nullptr);
-	~RectItem();
+	~RectItem() = default;
 	void set_pen1(
 		qreal,
 		unsigned int = 0xbc,

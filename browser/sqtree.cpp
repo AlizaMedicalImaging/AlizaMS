@@ -228,10 +228,6 @@ SQtree::SQtree(bool t) : in_tabwidget(t)
 	connect(horizontalSlider,SIGNAL(valueChanged(int)),this,SLOT(file_from_slider(int)));
 }
 
-SQtree::~SQtree()
-{
-}
-
 void SQtree::process_element(
 	const mdcm::DataSet & ds,
 	const mdcm::DataElement & e,

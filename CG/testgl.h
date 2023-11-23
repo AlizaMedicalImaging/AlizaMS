@@ -17,7 +17,7 @@ class TestGL : public QGLWidget
 {
 public:
 	TestGL();
-	~TestGL() {}
+	~TestGL() = default;
 	bool opengl_init_done{};
 	bool no_opengl3{true};
 

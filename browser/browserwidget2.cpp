@@ -157,10 +157,6 @@ BrowserWidget2::BrowserWidget2(float si)
 	refresh_sc->setAutoRepeat(false);
 }
 
-BrowserWidget2::~BrowserWidget2()
-{
-}
-
 void BrowserWidget2::closeEvent(QCloseEvent * e)
 {
 	e->accept();

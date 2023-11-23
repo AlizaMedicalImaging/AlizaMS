@@ -10,7 +10,7 @@ class InfoDialog: public QDialog, public Ui::InfoDialog
 Q_OBJECT
 public:
 	InfoDialog();
-	~InfoDialog();
+	~InfoDialog() = default;
 	void set_text(const QString&);
 };
 

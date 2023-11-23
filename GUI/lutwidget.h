@@ -9,7 +9,7 @@ class LUTWidget: public QWidget
 Q_OBJECT
 public:
 	LUTWidget(float);
-	~LUTWidget();
+	~LUTWidget() = default;
 	void add_items1();
 	int get_lut() const;
 	QComboBox * comboBox;

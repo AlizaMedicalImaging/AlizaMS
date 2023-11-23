@@ -1,4 +1,3 @@
-#include "structures.h"
 #include "srwidget.h"
 #include <QtGlobal>
 #include <QTextDocument>
@@ -45,10 +44,6 @@ SRWidget::SRWidget(float si)
 	normal_sc = new QShortcut(QKeySequence("Esc"),this,SLOT(showNormal()));
 	normal_sc->setAutoRepeat(false);
 #endif
-}
-
-SRWidget::~SRWidget()
-{
 }
 
 void SRWidget::initSR(const QString & s)

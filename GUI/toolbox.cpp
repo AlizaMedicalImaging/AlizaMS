@@ -5,7 +5,3 @@ ToolBox::ToolBox()
 	setupUi(this);
 }
 
-ToolBox::~ToolBox()
-{
-}
-

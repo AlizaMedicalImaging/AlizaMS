@@ -51,7 +51,7 @@ public:
 		bool /*3D*/,
 		bool /*hide zoom*/
 		);
-	~MainWindow();
+	~MainWindow() = default;
 	void open_args(const QStringList&);
 	void change_style(const QString &);
 	void check_3d_frame();

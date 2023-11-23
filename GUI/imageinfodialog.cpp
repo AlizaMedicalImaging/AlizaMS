@@ -5,10 +5,6 @@ ImageInfoDialog::ImageInfoDialog()
 	setupUi(this);
 }
 
-ImageInfoDialog::~ImageInfoDialog()
-{
-}
-
 void ImageInfoDialog::set_label0(const QString & t)
 {
 	label0->setText(QString("<b>") + t + QString("</b>"));

@@ -72,10 +72,6 @@ ListWidgetItem2::ListWidgetItem2(
 	setCheckState(Qt::Unchecked);
 }
 
-ListWidgetItem2::~ListWidgetItem2()
-{
-}
-
 int ListWidgetItem2::get_id() const
 {
 	return id;
@@ -288,10 +284,6 @@ ImagesBox::ImagesBox(float si)
 	//
 	connect(actionInfo, SIGNAL(toggled(bool)), this, SLOT(toggle_info(bool)));
 	connect(actionContours, SIGNAL(toggled(bool)), this, SLOT(toggle_contours(bool)));
-}
-
-ImagesBox::~ImagesBox()
-{
 }
 
 void ImagesBox::add_image(int id, ImageVariant * v, QPixmap * pixmap)

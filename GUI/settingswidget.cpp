@@ -44,10 +44,6 @@ SettingsWidget::SettingsWidget(float si) : scale_icons(si)
 	connect(cp1251_checkBox,   SIGNAL(toggled(bool)),       this, SLOT(set_force_cp1251(bool)));
 }
 
-SettingsWidget::~SettingsWidget()
-{
-}
-
 short SettingsWidget::get_filtering() const
 {
 	if      (f_no_radioButton->isChecked())       return 0;

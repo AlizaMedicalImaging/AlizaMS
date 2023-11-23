@@ -8,7 +8,7 @@ class FindRefDialog: public QDialog, private Ui::FindRefDialog
 Q_OBJECT
 public:
 	FindRefDialog(float);
-	~FindRefDialog();
+	~FindRefDialog() = default;
 	void set_path(const QString&);
 	QString get_path() const;
 	void set_text(const QString&);

@@ -30,10 +30,6 @@ AboutWidget::AboutWidget(int w, int h)
 	move(QPoint((w / 2) - (width() / 2), (h / 2) - (height() / 2)));
 }
 
-AboutWidget::~AboutWidget()
-{
-}
-
 void AboutWidget::mouseReleaseEvent(QMouseEvent * e)
 {
 	close();

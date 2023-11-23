@@ -9,7 +9,7 @@ class SettingsWidget: public QWidget, public Ui::SettingsWidget
 Q_OBJECT
 public:
 	SettingsWidget(float);
-	~SettingsWidget();
+	~SettingsWidget() = default;
 	short  get_filtering() const;
 	bool   get_resize() const;
 	int    get_size_x() const;

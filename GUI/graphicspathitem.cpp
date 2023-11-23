@@ -1,14 +1,6 @@
 #include "graphicspathitem.h"
 #include <QPainterPathStroker>
 
-GraphicsPathItem::GraphicsPathItem()
-{
-}
-
-GraphicsPathItem::~GraphicsPathItem()
-{
-}
-
 int GraphicsPathItem::get_contour_id() const
 {
 	return contour_id;

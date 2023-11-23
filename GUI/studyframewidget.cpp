@@ -12,7 +12,3 @@ StudyFrameWidget::StudyFrameWidget(StudyGraphicsWidget * g)
 	l->addWidget(graphicswidget);
 }
 
-StudyFrameWidget::~StudyFrameWidget()
-{
-}
-

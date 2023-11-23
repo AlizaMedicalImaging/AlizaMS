@@ -541,10 +541,6 @@ MainWindow::MainWindow(
 	init_done = true;
 }
 
-MainWindow::~MainWindow()
-{
-}
-
 void MainWindow::open_args(const QStringList & l)
 {
 	if (l.empty()) return;

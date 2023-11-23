@@ -9,7 +9,7 @@ class ZoomWidget : public QWidget
 Q_OBJECT
 public:
 	ZoomWidget(float);
-	~ZoomWidget();
+	~ZoomWidget() = default;
 	QPushButton * plus_pushButton;
 	QPushButton * minus_pushButton;
 };

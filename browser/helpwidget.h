@@ -12,7 +12,7 @@ class HelpWidget: public QWidget, private Ui::HelpWidget
 Q_OBJECT
 public:
 	HelpWidget();
-	~HelpWidget();
+	~HelpWidget() = default;
 
 private:
 	void set_text();
