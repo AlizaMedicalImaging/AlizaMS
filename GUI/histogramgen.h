@@ -7,7 +7,7 @@ class HistogramGen
 {
 public:
 	HistogramGen(ImageVariant * i) : ivariant(i) {}
-	~HistogramGen() {}
+	~HistogramGen() = default;
 	void run();
 	QString get_error() const;
 

@@ -14,8 +14,8 @@ class SRImage;
 class SRGraphic
 {
 public:
-	SRGraphic()  {}
-	~SRGraphic() {}
+	SRGraphic() = default;
+	~SRGraphic() = default;
 	QString GraphicType;
 	QString PixelOriginInterpretation;
 	QString FiducialUID;
@@ -25,8 +25,6 @@ public:
 class SRUtils
 {
 public:
-	SRUtils()  {}
-	~SRUtils() {}
 	static void set_asked_for_path_once(bool);
 	static void read_IMAGE(
 		const mdcm::DataSet&,

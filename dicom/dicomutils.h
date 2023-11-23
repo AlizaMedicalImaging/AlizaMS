@@ -55,8 +55,8 @@ typedef std::vector<DimIndexValue> DimIndexValues;
 class FrameGroup
 {
 public:
-	FrameGroup() {}
-	~FrameGroup() {}
+	FrameGroup() = default;
+	~FrameGroup() = default;
 	int    id{-1};
 	int    stack_id{-1};
 	int    in_stack_pos_num{-1};
@@ -102,8 +102,8 @@ struct GEMSParam
 class PrConfig
 {
 public:
-	PrConfig() {}
-	~PrConfig() {}
+	PrConfig() = default;
+	~PrConfig() = default;
 	int id{-1};
 	QString desc;
 	QList<QVariant> values;
@@ -112,8 +112,8 @@ public:
 class PrRefImage
 {
 public:
-	PrRefImage() {}
-	~PrRefImage() {}
+	PrRefImage() = default;
+	~PrRefImage() = default;
 	QString uid;
 	QString file;
 	QList<unsigned int> frames;
@@ -122,8 +122,8 @@ public:
 class PrRefSeries
 {
 public:
-	PrRefSeries()  {}
-	~PrRefSeries() {}
+	PrRefSeries() = default;
+	~PrRefSeries() = default;
 	QString uid;
 	QList<PrRefImage> images;
 	QList<PrConfig> prconfig;
@@ -133,8 +133,6 @@ public:
 class DicomUtils
 {
 public:
-	DicomUtils();
-	~DicomUtils();
 	static QString convert_pn_value(const QString&);
 	static QString get_pn_value2(
 		const mdcm::DataSet&,

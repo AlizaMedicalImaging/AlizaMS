@@ -25,11 +25,10 @@ class GLWidget;
 class ShaderObj;
 class ImageSlice;
 class SpectroscopySlice;
+
 class CommonUtils
 {
 public:
-	CommonUtils();
-	~CommonUtils();
 	static int get_next_id();
 	static int get_next_group_id();
 	static double random_range(double, double, unsigned long long);

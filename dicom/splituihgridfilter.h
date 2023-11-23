@@ -10,7 +10,7 @@ class SplitUihGridFilter
 {
 public:
   SplitUihGridFilter() : F(new File), I(new Image) {}
-  ~SplitUihGridFilter() {}
+  ~SplitUihGridFilter() = default;
   bool Split();
   bool ComputeUihGridDimensions(unsigned int*);
   bool ComputeUihGridSliceNormal(double*);
@@ -22,7 +22,7 @@ public:
   File & GetFile() { return *F; }
   const File & GetFile() const { return *F; }
 private:
-  SmartPointer<File>  F;
+  SmartPointer<File> F;
   SmartPointer<Image> I;
 };
 

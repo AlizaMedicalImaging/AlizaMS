@@ -8,8 +8,6 @@ class GLWidget;
 class ContourUtils
 {
 public:
-	ContourUtils();
-	~ContourUtils();
 	static float distance_to_plane(
 		float, float, float, float, float, float, float, float, float);
 	static long long get_next_contour_tmpid();

@@ -12,8 +12,6 @@ class SettingsWidget;
 class PrConfigUtils
 {
 public:
-	PrConfigUtils();
-	~PrConfigUtils();
 	static void read_modality_lut(const mdcm::DataSet &, PrRefSeries &);
 	static void read_voi_lut(const mdcm::DataSet &, PrRefSeries &);
 	static void read_presentation_lut(const mdcm::DataSet &, PrRefSeries &);

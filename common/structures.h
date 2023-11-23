@@ -132,8 +132,8 @@ typedef QList<DPoint> ListOfDPoints;
 class Contour
 {
 public:
-	Contour() {}
-	~Contour() {}
+	Contour() = default;
+	~Contour() = default;
 	int id{-1};
 	int roiid{-1};
 	quint32 vaoid{}; // GLuint
@@ -158,8 +158,8 @@ typedef QMultiMap<int,int> ContoursMap;
 class ROI
 {
 public:
-	ROI() {}
-	~ROI() {}
+	ROI() = default;
+	~ROI() = default;
 	int id{-1};
 	bool show{true};
 	bool random_color{};
@@ -176,8 +176,8 @@ typedef QList<ROI> ROIs;
 class TriMesh
 {
 public:
-	TriMesh() {}
-	~TriMesh() {}
+	TriMesh() = default;
+	~TriMesh() = default;
 	int id{-1};
 	bool visible{true};
 	qMeshData * qmesh{};
@@ -192,8 +192,8 @@ typedef QMap<int, TriMesh*> TriMeshes;
 class AnatomyDesc
 {
 public:
-	AnatomyDesc()  {}
-	~AnatomyDesc() {}
+	AnatomyDesc() = default;
+	~AnatomyDesc() = default;
 	QString laterality;
 	QString body_part;
 };
@@ -202,8 +202,8 @@ typedef QMap<int, AnatomyDesc> AnatomyMap;
 class SegmentationInfo
 {
 public:
-	SegmentationInfo() {}
-	~SegmentationInfo() {}
+	SegmentationInfo() = default;
+	~SegmentationInfo() = default;
 	int ref_segment_num{-1};
 	int R{};
 	int G{};
@@ -303,8 +303,8 @@ typedef QList<SliceOverlay> SliceOverlays;
 class ImageOverlays
 {
 public:
-	ImageOverlays(){}
-	~ImageOverlays(){}
+	ImageOverlays() = default;
+	~ImageOverlays() = default;
 	QMap<int,SliceOverlays> all_overlays;
 };
 
@@ -326,8 +326,8 @@ typedef QMap<int, QString> LabelsMap;
 class PresentationStateObj
 {
 public:
-	PresentationStateObj() {}
-	~PresentationStateObj() {}
+	PresentationStateObj() = default;
+	~PresentationStateObj() = default;
 	QString id;
 	QString layer_id;
 };
@@ -504,7 +504,7 @@ class DisplayInterface
 {
 public:
 	DisplayInterface(const int, const bool, bool, GLWidget*, int);
-	~DisplayInterface() {}
+	~DisplayInterface() = default;
 	void set_glwidget(GLWidget*);
 	const int id;
 	const bool opengl_ok;
@@ -598,7 +598,8 @@ public:
 class SRImage
 {
 public:
-	SRImage() {}
+	SRImage() = default;
+	~SRImage() = default;
 	double sx{1.0};
 	double sy{1.0};
 	unsigned char * p{};
@@ -722,7 +723,7 @@ public:
 class ImageVariant2D
 {
 public:
-	ImageVariant2D() {}
+	ImageVariant2D() = default;
 	~ImageVariant2D();
 	short image_type{-1};
 	unsigned int idimx{};
@@ -761,7 +762,7 @@ public:
 class ImageContainer
 {
 public:
-	ImageContainer() {}
+	ImageContainer() = default;
 	~ImageContainer()
 	{
 		if (image2D)

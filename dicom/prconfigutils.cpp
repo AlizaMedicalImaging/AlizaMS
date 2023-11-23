@@ -2009,14 +2009,6 @@ void read_overlays(
 
 }
 
-PrConfigUtils::PrConfigUtils()
-{
-}
-
-PrConfigUtils::~PrConfigUtils()
-{
-}
-
 void PrConfigUtils::read_modality_lut(
 	const mdcm::DataSet & ds,
 	PrRefSeries & ref)

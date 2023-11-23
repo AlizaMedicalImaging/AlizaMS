@@ -9,8 +9,6 @@ class ImageVariant;
 class GraphicsUtils
 {
 public:
-	GraphicsUtils();
-	~GraphicsUtils();
 	static QString flip_label(const QString&);
 	static void gen_labels(
 		const short,

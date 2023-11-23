@@ -13,8 +13,6 @@
 class ColorSpace_
 {
 public:
-	ColorSpace_()  {}
-	~ColorSpace_() {}
 	static void Rgb2Yuv(double *Y, double *U, double *V, double R, double G, double B);
 	static void Yuv2Rgb(double *R, double *G, double *B, double Y, double U, double V);
 	static void Rgb2Ycbcr(double *Y, double *Cb, double *Cr, double R, double G, double B);

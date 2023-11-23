@@ -8,8 +8,6 @@
 class UltrasoundRegionUtils
 {
 public:
-	UltrasoundRegionUtils() {}
-	~UltrasoundRegionUtils(){}
 	static void GetBitAlignedPositions(
 		const mdcm::DataSet&,
 		UltrasoundRegionData&);

@@ -6,8 +6,6 @@ class ImageVariant;
 class IconUtils
 {
 public:
-	IconUtils();
-	~IconUtils();
 	static void update_icon(ImageVariant*, const int);
 	static void icon(ImageVariant*);
 };

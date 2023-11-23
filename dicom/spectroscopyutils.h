@@ -12,8 +12,6 @@ class GLWidget;
 class SpectroscopyUtils
 {
 public:
-	SpectroscopyUtils() {}
-	~SpectroscopyUtils(){}
 	static bool Read(
 		const mdcm::DataSet&,
 		SpectroscopyData*);

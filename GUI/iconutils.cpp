@@ -994,10 +994,6 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 
 }
 
-IconUtils::IconUtils() {}
-
-IconUtils::~IconUtils() {}
-
 void IconUtils::update_icon(ImageVariant * v, const int isize)
 {
 	if (v->icon.isNull()) return;
