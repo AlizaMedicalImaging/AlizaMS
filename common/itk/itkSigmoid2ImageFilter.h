@@ -3,6 +3,7 @@
 
 #include <itkUnaryFunctorImageFilter.h>
 #include <itkMath.h>
+#include <itkVersion.h>
 
 namespace itk
 {
@@ -115,7 +116,11 @@ public:
   itkNewMacro(Self);
 
   /** Macro that provides the GetNameOfClass() method */
+#if ITK_VERSION_MAJOR > 5
+  itkOverrideGetNameOfClassMacro(Sigmoid2ImageFilter);
+#else
   itkTypeMacro(Sigmoid2ImageFilter, UnaryFunctorImageFilter);
+#endif
 
   void SetAlpha(double alpha)
   {
@@ -192,7 +197,11 @@ protected:
   virtual ~Sigmoid2ImageFilter() {}
 
 private:
+#if ITK_VERSION_MAJOR > 5
+  ITK_DISALLOW_COPY_AND_MOVE(Sigmoid2ImageFilter);
+#else
   ITK_DISALLOW_COPY_AND_ASSIGN(Sigmoid2ImageFilter);
+#endif
 };
 } // end namespace itk
 
