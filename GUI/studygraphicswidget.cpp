@@ -13,8 +13,6 @@
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <itkExtractImageFilter.h>
-#include <itkRegionOfInterestImageFilter.h>
-#include <itkImageRegionIterator.h>
 #include <itkImageRegionConstIterator.h>
 #include "processimagethreadLUT.hxx"
 #include "graphicsutils.h"

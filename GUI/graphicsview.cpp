@@ -9,9 +9,6 @@
 #include <QApplication>
 #include <QList>
 #include <QGraphicsDropShadowEffect>
-#include <itkImageRegionConstIterator.h>
-#include <itkIntensityWindowingImageFilter.h>
-#include <itkMath.h>
 #include "contourutils.h"
 #include "colorspace/colorspace.h"
 
@@ -1068,7 +1065,7 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 	}
 	else if (ivariant->pr_text_annotations.contains(-1))
 	{
-		;;
+		;
 	}
 	else
 	{
@@ -1137,7 +1134,7 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 			if (posx < bottom_right_posx &&
 				posy < bottom_right_posy)
 			{
-				;;
+				;
 			}
 			else if (posx > bottom_right_posx &&
 				posy > bottom_right_posy)
@@ -1337,7 +1334,7 @@ void GraphicsView::draw_prtexts(const ImageVariant * ivariant)
 			}
 			else if (l.at(x).ShadowStyle == QString("OUTLINED"))
 			{
-				;; // TODO
+				; // TODO
 			}
 		}
 		else
@@ -1374,7 +1371,7 @@ void GraphicsView::draw_prgraphics(const ImageVariant * ivariant)
 	}
 	else if (ivariant->pr_graphicobjects.contains(-1))
 	{
-		;;
+		;
 	}
 	else
 	{
@@ -1781,7 +1778,7 @@ void GraphicsView::draw_shutter(const ImageVariant * ivariant)
 	int idx = -1;
 	if (ivariant->pr_display_shutters.contains(-1))
 	{
-		;;
+		;
 	}
 	else
 	{

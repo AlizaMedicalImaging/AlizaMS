@@ -24,8 +24,8 @@
 #include <itkVersion.h>
 #include <itkIndex.h>
 #include <itkImageRegionIterator.h>
-#include <itkMapContainer.h>
 #include <itkSpatialOrientation.h>
+#include <itkSpatialOrientationAdapter.h>
 #include <itkMinimumMaximumImageCalculator.h>
 #include <itkNearestNeighborInterpolateImageFunction.h>
 #include <itkImageSliceConstIteratorWithIndex.h>
