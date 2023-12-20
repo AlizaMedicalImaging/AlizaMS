@@ -13,6 +13,8 @@
 #include <QDateTime>
 #include <string>
 #include <array>
+#include <chrono>
+#include <thread>
 #include "iconutils.h"
 #include "commonutils.h"
 #include "contourutils.h"
@@ -26,19 +28,14 @@
 #include "srwidget.h"
 #include "loaddicom_t.h"
 #include "loaddicom.h"
-#include <itkVersion.h>
-#include <itkImage.h>
-#include <itkIndex.h>
-#include <itkByteSwapper.h>
 #include <mdcmReader.h>
 #include <mdcmFile.h>
 #include <mdcmDataSet.h>
 #include <mdcmUIDGenerator.h>
 #include <mdcmParseException.h>
 #include "vectormath/scalar/vectormath.h"
+#include <itkVersion.h>
 #include <itkMath.h>
-#include <chrono>
-#include <thread>
 
 // These flags are used only for diagnostic build sometimes
 #ifndef _WIN32
