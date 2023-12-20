@@ -25,7 +25,6 @@
 #include "ultrasoundregiondata.h"
 #include "ultrasoundregionutils.h"
 #include "colorspace/colorspace.h"
-#include <itkImageSliceIteratorWithIndex.h>
 #include <itkImageRegionIterator.h>
 #include <itkImageRegionConstIterator.h>
 #include <itkByteSwapper.h>
