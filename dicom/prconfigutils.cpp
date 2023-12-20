@@ -20,7 +20,6 @@
 #include "commonutils.h"
 #include <itkShiftScaleImageFilter.h>
 #include <itkIntensityWindowingImageFilter.h>
-#include "itk/itkSigmoid2ImageFilter.h"
 #include <itkRescaleIntensityImageFilter.h>
 #include <itkExtractImageFilter.h>
 #include <itkImageSliceIteratorWithIndex.h>

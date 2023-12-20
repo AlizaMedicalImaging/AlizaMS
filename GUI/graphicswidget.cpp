@@ -17,7 +17,6 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QScrollBar>
-#include "itk/itkSigmoid2ImageFilter.h"
 #include <itkIntensityWindowingImageFilter.h>
 #include <itkExtractImageFilter.h>
 #include <itkRegionOfInterestImageFilter.h>
