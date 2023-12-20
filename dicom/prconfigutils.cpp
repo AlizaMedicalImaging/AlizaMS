@@ -19,15 +19,12 @@
 #include "codecutils.h"
 #include "commonutils.h"
 #include <itkShiftScaleImageFilter.h>
-#include <itkIntensityWindowingImageFilter.h>
-#include <itkRescaleIntensityImageFilter.h>
 #include <itkExtractImageFilter.h>
 #include <itkImageSliceIteratorWithIndex.h>
 #include <itkImageLinearConstIteratorWithIndex.h>
 #include <itkImageLinearIteratorWithIndex.h>
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionIterator.h>
-#include <itkCenteredEuler3DTransform.h>
 #include <itkResampleImageFilter.h>
 #include <itkFlipImageFilter.h>
 #include <itkAffineTransform.h>
