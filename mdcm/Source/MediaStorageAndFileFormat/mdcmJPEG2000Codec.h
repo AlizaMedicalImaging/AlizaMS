@@ -51,7 +51,7 @@ public:
   bool
   Code(DataElement const &, DataElement &) override;
   bool
-  GetHeaderInfo(std::istream &, TransferSyntax &) override;
+  GetHeaderInfo(std::istream &) override;
   void
   SetRate(unsigned int, double);
   double
@@ -104,7 +104,7 @@ private:
   bool
   CodeFrameIntoBuffer(char *, size_t, size_t &, const char *, size_t);
   bool
-  GetHeaderInfo(const char *, size_t, TransferSyntax &);
+  GetHeaderInfo(const char *, size_t);
   JPEG2000Internals * Internals;
 };
 

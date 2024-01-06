@@ -57,7 +57,9 @@ public:
   void
   ComputeOffsetTable(bool);
   virtual bool
-  GetHeaderInfo(std::istream &, TransferSyntax &) override;
+  GetHeaderInfo(std::istream &) override;
+  virtual bool
+  GetHeaderInfoAndTS(std::istream &, TransferSyntax &);
   void
   SetQuality(double);
   double

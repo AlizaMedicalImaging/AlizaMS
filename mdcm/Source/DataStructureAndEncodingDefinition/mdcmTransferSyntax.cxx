@@ -75,6 +75,11 @@ static const char * TSStrings[] = {
   "1.2.840.10008.1.2.4.104.1",  // Fragmentable MPEG-4 AVC/H.264 High Profile / Level 4.2 For 2D Video
   "1.2.840.10008.1.2.4.105.1",  // Fragmentable MPEG-4 AVC/H.264 High Profile / Level 4.2 For 3D Video
   "1.2.840.10008.1.2.4.106.1",  // Fragmentable MPEG-4 AVC/H.264 Stereo High Profile / Level 4.2
+  "1.2.840.10008.1.2.4.201",    // High-Throughput JPEG 2000 Image Compression (Lossless Only)
+  "1.2.840.10008.1.2.4.202",    // High-Throughput JPEG 2000 with RPCL Options Image Compression (Lossless Only)
+  "1.2.840.10008.1.2.4.203",    // High-Throughput JPEG 2000 Image Compression
+  "1.2.840.10008.1.2.4.204",    // JPIP HTJ2K Referenced
+  "1.2.840.10008.1.2.4.205",    // JPIP HTJ2K Referenced Deflate
   "Unknown Transfer Syntax",    // Unknown
   nullptr
 };
@@ -158,8 +163,7 @@ TransferSyntax::IsLossy() const
       TSField == JPEGLSNearLossless ||
       TSField == JPEG2000 ||
       TSField == JPEG2000Part2 ||
-      TSField == JPIPReferenced ||
-      TSField == JPIPReferencedDeflate ||
+      TSField == HTJPEG2000 ||
       TSField == MPEG2MainProfile ||
       TSField == MPEG2MainProfileHighLevel ||
       TSField == MPEG4AVCH264HighProfileLevel4_1 ||
@@ -178,7 +182,11 @@ TransferSyntax::IsLossy() const
       TSField == FragmentableMPEG4AVCH264BDcompatibleHighProfileLevel4_1 ||
       TSField == FragmentableMPEG4AVCH264HighProfileLevel4_2For2DVideo ||
       TSField == FragmentableMPEG4AVCH264HighProfileLevel4_2For3DVideo ||
-      TSField == FragmentableMPEG4AVCH264StereoHighProfileevel4_2)
+      TSField == FragmentableMPEG4AVCH264StereoHighProfileevel4_2 ||
+      TSField == JPIPReferenced ||
+      TSField == JPIPReferencedDeflate ||
+      TSField == JPIPHTReferenced ||
+      TSField == JPIPHTReferencedDeflate)
   {
     return true;
   }
@@ -268,8 +276,9 @@ TransferSyntax::IsEncapsulated() const
     case JPEG2000:
     case JPEG2000Part2Lossless:
     case JPEG2000Part2:
-    case JPIPReferenced:
-    case JPIPReferencedDeflate:
+    case HTJPEG2000Lossless:
+    case HTJPEG2000RPCLLossless:
+    case HTJPEG2000:
     case RLELossless:
     case MPEG2MainProfile:
     case MPEG2MainProfileHighLevel:
@@ -291,6 +300,10 @@ TransferSyntax::IsEncapsulated() const
     case FragmentableMPEG4AVCH264HighProfileLevel4_2For2DVideo:
     case FragmentableMPEG4AVCH264HighProfileLevel4_2For3DVideo:
     case FragmentableMPEG4AVCH264StereoHighProfileevel4_2:
+    case JPIPReferenced:
+    case JPIPReferencedDeflate:
+    case JPIPHTReferenced:
+    case JPIPHTReferencedDeflate:
       r = true;
       break;
     default:

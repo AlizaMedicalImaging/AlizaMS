@@ -578,6 +578,22 @@ const char * const UIDsStrings[][2] = {
   //
   //////////////////////////////////////////////
 
+  //////////////////////////////////////////////
+  //
+  // 2023e
+  //
+  { "1.2.840.10008.1.2.4.201", "High-Throughput JPEG 2000 Image Compression (Lossless Only)"},
+  { "1.2.840.10008.1.2.4.202", "High-Throughput JPEG 2000 with RPCL Options Image Compression (Lossless Only)"},
+  { "1.2.840.10008.1.2.4.203", "High-Throughput JPEG 2000 Image Compression"},
+  { "1.2.840.10008.1.2.4.204", "JPIP HTJ2K Referenced"},
+  { "1.2.840.10008.1.2.4.205", "JPIP HTJ2K Referenced Deflate"},
+  { "1.2.840.10008.5.1.4.1.1.77.1.8", "Confocal Microscopy Image Storage"},
+  { "1.2.840.10008.5.1.4.1.1.77.1.9", "Confocal Microscopy Tiled Pyramidal Image Storage"},
+  //
+  //
+  //
+  //////////////////////////////////////////////
+
   { nullptr, nullptr }
 };
 

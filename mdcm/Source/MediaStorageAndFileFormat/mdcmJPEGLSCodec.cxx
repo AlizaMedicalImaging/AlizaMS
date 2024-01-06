@@ -312,7 +312,7 @@ JPEGLSCodec::SetBufferLength(unsigned long long l)
 }
 
 bool
-JPEGLSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
+JPEGLSCodec::GetHeaderInfo(std::istream & is)
 {
   using namespace charls;
   is.seekg(0, std::ios::end);
@@ -367,6 +367,9 @@ JPEGLSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
   }
   // allowedlossyerror == 0 => Lossless
   LossyFlag = metadata.allowedLossyError != 0;
+  // Removed guessing transfer syntax by header (unused),
+  // commented for possible future implementation.
+  /*
   if (metadata.allowedLossyError == 0)
   {
     ts = TransferSyntax::JPEGLSLossless;
@@ -375,6 +378,7 @@ JPEGLSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
   {
     ts = TransferSyntax::JPEGLSNearLossless;
   }
+  */
   return true;
 }
 

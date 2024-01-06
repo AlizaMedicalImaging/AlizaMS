@@ -59,7 +59,7 @@ public:
   void
   SetBufferLength(unsigned long long);
   bool
-  GetHeaderInfo(std::istream &, TransferSyntax &) override;
+  GetHeaderInfo(std::istream &) override;
   void
   SetLength(unsigned long long);
 

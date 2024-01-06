@@ -276,7 +276,7 @@ IconImageFilter::ExtractIconImages()
       TransferSyntax jpegts;
       JPEGCodec      jpeg;
       jpeg.SetPixelFormat(pf1);
-      bool b = jpeg.GetHeaderInfo(is, jpegts);
+      bool b = jpeg.GetHeaderInfoAndTS(is, jpegts);
       if (!b)
       {
         assert(0);

@@ -43,7 +43,9 @@ public:
   bool
   InternalCode(const char *, size_t, std::ostream &) override;
   bool
-  GetHeaderInfo(std::istream &, TransferSyntax &) override;
+  GetHeaderInfo(std::istream &) override;
+  bool
+  GetHeaderInfoAndTS(std::istream &, TransferSyntax &);
 
 protected:
   bool

@@ -2900,6 +2900,10 @@ namespace Keywords {
     typedef mdcm::Attribute<0x0048, 0x0111> CondenserLensPower;
     typedef mdcm::Attribute<0x0048, 0x0112> ObjectiveLensPower;
     typedef mdcm::Attribute<0x0048, 0x0113> ObjectiveLensNumericalAperture;
+    typedef mdcm::Attribute<0x0048, 0x0114> ConfocalMode;
+    typedef mdcm::Attribute<0x0048, 0x0115> TissueLocation;
+    typedef mdcm::Attribute<0x0048, 0x0116> ConfocalMicroscopyImageFrameTypeSequence;
+    typedef mdcm::Attribute<0x0048, 0x0117> ImageAcquisitionDepth;
     typedef mdcm::Attribute<0x0048, 0x0120> PaletteColorLookupTableSequence;
     typedef mdcm::Attribute<0x0048, 0x0200> ReferencedImageNavigationSequence;
     typedef mdcm::Attribute<0x0048, 0x0201> TopLeftHandCornerOfLocalizerArea;
@@ -4657,6 +4661,7 @@ namespace Keywords {
     typedef mdcm::Attribute<0x300a, 0x0688> RTBeamModifierDefinitionDistance;
     typedef mdcm::Attribute<0x300a, 0x0689> BeamAreaLimitSequence;
     typedef mdcm::Attribute<0x300a, 0x068a> ReferencedRTPrescriptionSequence;
+    typedef mdcm::Attribute<0x300a, 0x068b> DoseValueInterpretation;
     typedef mdcm::Attribute<0x300a, 0x0700> TreatmentSessionUID;
     typedef mdcm::Attribute<0x300a, 0x0701> RTRadiationUsage;
     typedef mdcm::Attribute<0x300a, 0x0702> ReferencedRTRadiationSetSequence;
@@ -4775,6 +4780,7 @@ namespace Keywords {
     typedef mdcm::Attribute<0x300c, 0x0126> BeamHoldTransition;
     typedef mdcm::Attribute<0x300c, 0x0127> BeamHoldTransitionDateTime;
     typedef mdcm::Attribute<0x300c, 0x0128> BeamHoldOriginatingDeviceSequence;
+    typedef mdcm::Attribute<0x300c, 0x0129> BeamHoldTransitionTriggerSource;
     typedef mdcm::Attribute<0x300e, 0x0002> ApprovalStatus;
     typedef mdcm::Attribute<0x300e, 0x0004> ReviewDate;
     typedef mdcm::Attribute<0x300e, 0x0005> ReviewTime;

@@ -732,9 +732,15 @@ JPEG2000Codec::~JPEG2000Codec()
 bool
 JPEG2000Codec::CanDecode(TransferSyntax const & ts) const
 {
-  return (ts == TransferSyntax::JPEG2000Lossless || ts == TransferSyntax::JPEG2000 ||
-          ts == TransferSyntax::JPEG2000Part2Lossless || ts == TransferSyntax::JPEG2000Part2);
-  // Part 2 is not tested, TODO
+  return (ts == TransferSyntax::JPEG2000Lossless ||
+          ts == TransferSyntax::JPEG2000 ||
+          ts == TransferSyntax::HTJPEG2000Lossless ||
+          ts == TransferSyntax::HTJPEG2000RPCLLossless ||
+          ts == TransferSyntax::HTJPEG2000 ||
+          ts == TransferSyntax::JPEG2000Part2Lossless ||
+          ts == TransferSyntax::JPEG2000Part2);
+  // HT is not yet tested, TODO
+  // Part 2 is not tested, there are no examples available, TODO
 }
 
 bool
@@ -1077,7 +1083,7 @@ JPEG2000Codec::Code(DataElement const & in, DataElement & out)
 }
 
 bool
-JPEG2000Codec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
+JPEG2000Codec::GetHeaderInfo(std::istream & is)
 {
   is.seekg(0, std::ios::end);
   const size_t buf_size = is.tellg();
@@ -1092,7 +1098,7 @@ JPEG2000Codec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
   }
   is.seekg(0, std::ios::beg);
   is.read(dummy_buffer, buf_size);
-  const bool b = GetHeaderInfo(dummy_buffer, buf_size, ts);
+  const bool b = GetHeaderInfo(dummy_buffer, buf_size);
   delete[] dummy_buffer;
   return b;
 }
@@ -1853,7 +1859,7 @@ JPEG2000Codec::CodeFrameIntoBuffer(char *       outdata,
 }
 
 bool
-JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size, TransferSyntax & ts)
+JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size)
 {
   if (!dummy_buffer)
     return false;
@@ -2042,39 +2048,48 @@ JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size, Transfe
   }
 #endif
   assert(PI != PhotometricInterpretation::UNKNOWN);
-  const bool bmct = false; // TODO
+  // FIXME
+  //
+  //
+  // Guessing PhotometricInterpretation by header should be reviewed.
+  //
+  // Removed guessing transfer syntax by header (unused),
+  // commented for possible future implementation.
+  // HT must be taken into acout too.
+  /*
+  // const bool bmct = false;
   if (bmct)
   {
     if (reversible)
     {
-      ts = TransferSyntax::JPEG2000Part2Lossless;
+      //ts = TransferSyntax::JPEG2000Part2Lossless;
     }
     else
     {
-      ts = TransferSyntax::JPEG2000Part2;
+      //ts = TransferSyntax::JPEG2000Part2;
       if (PI == PhotometricInterpretation::YBR_RCT)
       {
-        // TODO
         PI = PhotometricInterpretation::YBR_ICT;
       }
     }
   }
   else
+  */
   {
     if (reversible)
     {
-      ts = TransferSyntax::JPEG2000Lossless;
+      //ts = TransferSyntax::JPEG2000Lossless;
     }
     else
     {
-      ts = TransferSyntax::JPEG2000;
+      //ts = TransferSyntax::JPEG2000;
       if (PI == PhotometricInterpretation::YBR_RCT)
       {
-        // TODO
         PI = PhotometricInterpretation::YBR_ICT;
       }
     }
   }
+  /*
   if (this->GetPhotometricInterpretation().IsLossy())
   {
     assert(ts.IsLossy());
@@ -2083,6 +2098,11 @@ JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size, Transfe
   {
     assert(this->GetPhotometricInterpretation().IsLossless());
   }
+  */
+  //
+  //
+  //
+
   // Close the byte stream
   opj_stream_destroy(cio);
   // Free remaining structures

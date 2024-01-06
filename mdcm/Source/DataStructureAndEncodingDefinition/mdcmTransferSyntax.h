@@ -93,6 +93,11 @@ public:
     FragmentableMPEG4AVCH264HighProfileLevel4_2For2DVideo,
     FragmentableMPEG4AVCH264HighProfileLevel4_2For3DVideo,
     FragmentableMPEG4AVCH264StereoHighProfileevel4_2,
+    HTJPEG2000Lossless,
+    HTJPEG2000RPCLLossless,
+    HTJPEG2000,
+    JPIPHTReferenced,
+    JPIPHTReferencedDeflate,
     TS_END
   } TSType;
   static const char * GetTSString(TSType);

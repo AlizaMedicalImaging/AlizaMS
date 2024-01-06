@@ -424,10 +424,19 @@ JPEGCodec::ComputeOffsetTable(bool)
 }
 
 bool
-JPEGCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
+JPEGCodec::GetHeaderInfo(std::istream & is)
 {
-  assert(Internal);
-  if (!Internal->GetHeaderInfo(is, ts))
+  TransferSyntax ts;
+  const bool r = GetHeaderInfoAndTS(is, ts);
+  (void) ts;
+  return r;
+}
+
+bool
+JPEGCodec::GetHeaderInfoAndTS(std::istream & is, TransferSyntax & ts)
+{
+  if (!Internal) return false;
+  if (!Internal->GetHeaderInfoAndTS(is, ts))
   {
     // check if this is one of those buggy lossless JPEG
     if (this->BitSample != Internal->BitSample)
@@ -436,7 +445,7 @@ JPEGCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
       // PHILIPS_Gyroscan-12-MONO2-Jpeg_Lossless.dcm
       is.seekg(0, std::ios::beg);
       SetupJPEGBitCodec(Internal->BitSample);
-      if (Internal && Internal->GetHeaderInfo(is, ts))
+      if (Internal && Internal->GetHeaderInfoAndTS(is, ts))
       {
         this->SetLossyFlag(Internal->GetLossyFlag());
         this->SetDimensions(Internal->GetDimensions());

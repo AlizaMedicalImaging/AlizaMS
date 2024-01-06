@@ -562,7 +562,6 @@ Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
   {
     if (codec.CanDecode(ts))
     {
-      TransferSyntax              ts2;
       const SequenceOfFragments * sf = PixelData.GetSequenceOfFragments();
       if (!sf)
       {
@@ -575,9 +574,9 @@ Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
       codec.SetPixelFormat(pf);
       std::stringstream ss;
       ss.write(bv2.GetPointer(), bv2.GetLength());
-      if (!codec.GetHeaderInfo(ss, ts2))
+      if (!codec.GetHeaderInfo(ss))
       {
-        mdcmAlwaysWarnMacro("JPEG: !codec.GetHeaderInfo(ss, ts2)");
+        mdcmAlwaysWarnMacro("JPEG: !codec.GetHeaderInfo(ss)");
         return false;
       }
       lossyflag = codec.IsLossy();
@@ -747,7 +746,6 @@ Bitmap::TryJPEGCodec3(char * buffer, bool & lossyflag) const
   {
     if (codec.CanDecode(ts))
     {
-      TransferSyntax              ts2;
       const SequenceOfFragments * sf = PixelData.GetSequenceOfFragments();
       if (!sf)
       {
@@ -760,9 +758,9 @@ Bitmap::TryJPEGCodec3(char * buffer, bool & lossyflag) const
       codec.SetPixelFormat(pf);
       std::stringstream ss;
       ss.write(bv2.GetPointer(), bv2.GetLength());
-      if (!codec.GetHeaderInfo(ss, ts2))
+      if (!codec.GetHeaderInfo(ss))
       {
-        mdcmAlwaysWarnMacro("JPEG: !codec.GetHeaderInfo(ss, ts2)");
+        mdcmAlwaysWarnMacro("JPEG: !codec.GetHeaderInfo(ss)");
         return false;
       }
       lossyflag = codec.IsLossy();
@@ -923,7 +921,6 @@ Bitmap::TryJPEGLSCodec(char * buffer, bool & lossyflag) const
   {
     if (codec.CanDecode(ts))
     {
-      TransferSyntax              ts2;
       const SequenceOfFragments * sf = PixelData.GetSequenceOfFragments();
       if (!sf)
         return false;
@@ -931,7 +928,7 @@ Bitmap::TryJPEGLSCodec(char * buffer, bool & lossyflag) const
       const ByteValue & bv2 = dynamic_cast<const ByteValue &>(frag.GetValue());
       std::stringstream ss;
       ss.write(bv2.GetPointer(), bv2.GetLength());
-      const bool b = codec.GetHeaderInfo(ss, ts2);
+      const bool b = codec.GetHeaderInfo(ss);
       if (!b)
         return false;
       lossyflag = codec.IsLossy();
@@ -983,7 +980,6 @@ Bitmap::TryJPEGLSCodec2(char * buffer, bool & lossyflag) const
   {
     if (codec.CanDecode(ts))
     {
-      TransferSyntax              ts2;
       const SequenceOfFragments * sf = PixelData.GetSequenceOfFragments();
       if (!sf)
         return false;
@@ -991,7 +987,7 @@ Bitmap::TryJPEGLSCodec2(char * buffer, bool & lossyflag) const
       const ByteValue & bv2 = dynamic_cast<const ByteValue &>(frag.GetValue());
       std::stringstream ss;
       ss.write(bv2.GetPointer(), bv2.GetLength());
-      const bool b = codec.GetHeaderInfo(ss, ts2);
+      const bool b = codec.GetHeaderInfo(ss);
       if (!b)
         return false;
       lossyflag = codec.IsLossy();
@@ -1032,13 +1028,12 @@ Bitmap::TryJPEG2000Codec(char * buffer, bool & lossyflag) const
   {
     if (codec.CanDecode(ts))
     {
-      TransferSyntax              ts2;
       const SequenceOfFragments * sf = PixelData.GetSequenceOfFragments();
       if (!sf)
         return false;
       const Fragment &  frag = sf->GetFragment(0);
       const ByteValue & bv2 = dynamic_cast<const ByteValue &>(frag.GetValue());
-      const bool        b = codec.GetHeaderInfo(bv2.GetPointer(), bv2.GetLength(), ts2);
+      const bool        b = codec.GetHeaderInfo(bv2.GetPointer(), bv2.GetLength());
       if (!b)
         return false;
       lossyflag = codec.IsLossy();
@@ -1158,13 +1153,12 @@ Bitmap::TryJPEG2000Codec3(char * buffer, bool & lossyflag) const
   {
     if (codec.CanDecode(ts))
     {
-      TransferSyntax              ts2;
       const SequenceOfFragments * sf = PixelData.GetSequenceOfFragments();
       if (!sf)
         return false;
       const Fragment &  frag = sf->GetFragment(0);
       const ByteValue & bv2 = dynamic_cast<const ByteValue &>(frag.GetValue());
-      const bool        b = codec.GetHeaderInfo(bv2.GetPointer(), bv2.GetLength(), ts2);
+      const bool        b = codec.GetHeaderInfo(bv2.GetPointer(), bv2.GetLength());
       if (!b)
         return false;
       lossyflag = codec.IsLossy();

@@ -699,9 +699,13 @@ RLECodec::SetBufferLength(unsigned long long l)
 }
 
 bool
-RLECodec::GetHeaderInfo(std::istream &, TransferSyntax & ts)
+RLECodec::GetHeaderInfo(std::istream &)
 {
+  // Removed guessing transfer syntax by header (unused),
+  // commented for possible future implementation.
+  /*
   ts = TransferSyntax::RLELossless;
+  */
   return true;
 }
 

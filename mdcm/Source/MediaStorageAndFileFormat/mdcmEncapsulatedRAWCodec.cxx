@@ -134,9 +134,13 @@ EncapsulatedRAWCodec::Decode2(DataElement const & in, char * out_buffer, unsigne
 }
 
 bool
-EncapsulatedRAWCodec::GetHeaderInfo(std::istream &, TransferSyntax & ts)
+EncapsulatedRAWCodec::GetHeaderInfo(std::istream &)
 {
+  // Removed guessing transfer syntax by header (unused),
+  // commented for possible future implementation.
+  /*
   ts = TransferSyntax::EncapsulatedUncompressedExplicitVRLittleEndian;
+  */
   return true;
 }
 

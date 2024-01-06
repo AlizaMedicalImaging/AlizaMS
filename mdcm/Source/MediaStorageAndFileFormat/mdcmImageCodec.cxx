@@ -92,7 +92,7 @@ ImageCodec::GetLossyFlag() const
 }
 
 bool
-ImageCodec::GetHeaderInfo(std::istream &, TransferSyntax &)
+ImageCodec::GetHeaderInfo(std::istream &)
 {
   assert(0);
   return false;

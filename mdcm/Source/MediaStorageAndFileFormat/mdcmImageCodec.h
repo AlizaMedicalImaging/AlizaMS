@@ -37,8 +37,6 @@ namespace mdcm
  */
 class MDCM_EXPORT ImageCodec
 {
-  friend class FileChangeTransferSyntax;
-
 public:
   ImageCodec();
   virtual ~ImageCodec();
@@ -57,7 +55,7 @@ public:
   bool
   GetLossyFlag() const;
   virtual bool
-  GetHeaderInfo(std::istream &, TransferSyntax &);
+  GetHeaderInfo(std::istream &);
   unsigned int
   GetPlanarConfiguration() const;
   void

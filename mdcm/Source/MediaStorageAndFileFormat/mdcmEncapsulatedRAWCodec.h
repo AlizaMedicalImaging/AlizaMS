@@ -30,7 +30,7 @@ public:
   bool
   Decode2(DataElement const &, char *, unsigned long long);
   bool
-  GetHeaderInfo(std::istream &, TransferSyntax &) override;
+  GetHeaderInfo(std::istream &) override;
   bool
   DecodeBytes(const char *, size_t, char *, size_t);
 

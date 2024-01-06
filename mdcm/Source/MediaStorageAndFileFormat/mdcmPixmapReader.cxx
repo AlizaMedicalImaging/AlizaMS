@@ -907,8 +907,7 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
         sqf->WriteBuffer(ss);
         PixelFormat jpegpf(PixelFormat::UINT8); // guess
         jpeg.SetPixelFormat(jpegpf);
-        TransferSyntax ts;
-        bool           b = jpeg.GetHeaderInfo(ss, ts);
+        const bool b = jpeg.GetHeaderInfo(ss);
         if (b)
         {
           std::vector<unsigned int> v(3);

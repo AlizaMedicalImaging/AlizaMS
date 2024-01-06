@@ -572,7 +572,22 @@ public:
     uid_1_2_840_10008_5_1_4_1_1_201_1_1 = 497,
     uid_1_2_840_10008_5_1_4_1_1_481_23 = 498,
     uid_1_2_840_10008_5_1_4_1_1_481_24 = 499,
-    uid_1_2_840_10008_5_1_4_1_1_481_25 = 500
+    uid_1_2_840_10008_5_1_4_1_1_481_25 = 500,
+//
+//
+/////////////////////////////////////////
+
+/////////////////////////////////////////
+//
+// 2023e
+//
+    uid_1_2_840_10008_1_2_4_201 = 501,
+    uid_1_2_840_10008_1_2_4_202 = 502,
+    uid_1_2_840_10008_1_2_4_203 = 503,
+    uid_1_2_840_10008_1_2_4_204 = 504,
+    uid_1_2_840_10008_1_2_4_205 = 505,
+    uid_1_2_840_10008_5_1_4_1_1_77_1_8 = 506,
+    uid_1_2_840_10008_5_1_4_1_1_77_1_9 = 507
 //
 //
 /////////////////////////////////////////
@@ -1131,7 +1146,22 @@ public:
     StorageManagementSOPInstance = 497,
     EnhancedRTImageStorage = 498,
     EnhancedContinuousRTImageStorage = 499,
-    RTPatientPositionAcquisitionInstructionStorage = 500
+    RTPatientPositionAcquisitionInstructionStorage = 500,
+//
+//
+/////////////////////////////////////////
+
+/////////////////////////////////////////
+//
+// 2023c
+//
+    HighThroughputJPEG2000ImageCompressionLossless = 501,
+    HighThroughputJPEG2000withRPCL_OptionsImageCompressionLossless = 502,
+    HighThroughputJPEG2000ImageCompression = 503,
+    JPIPHTJ2KReferenced = 504,
+    JPIPHTJ2KReferencedDeflate = 505,
+    ConfocalMicroscopyImageStorage = 506,
+    ConfocalMicroscopyTiledPyramidalImageStorage = 507
 //
 //
 /////////////////////////////////////////

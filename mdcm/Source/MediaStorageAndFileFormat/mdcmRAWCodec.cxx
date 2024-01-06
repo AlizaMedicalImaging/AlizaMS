@@ -154,13 +154,17 @@ RAWCodec::Decode(DataElement const & in, DataElement & out)
 }
 
 bool
-RAWCodec::GetHeaderInfo(std::istream &, TransferSyntax & ts)
+RAWCodec::GetHeaderInfo(std::istream &)
 {
+  // Removed guessing transfer syntax by header (unused),
+  // commented for possible future implementation.
+  /*
   ts = TransferSyntax::ExplicitVRLittleEndian;
   if (NeedByteSwap)
   {
     ts = TransferSyntax::ImplicitVRBigEndianPrivateGE;
   }
+  */
   return true;
 }
 

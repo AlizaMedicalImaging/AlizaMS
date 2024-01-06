@@ -440,7 +440,16 @@ JPEGBITSCodec::~JPEGBITSCodec()
 }
 
 bool
-JPEGBITSCodec::GetHeaderInfo(std::istream & is, TransferSyntax & ts)
+JPEGBITSCodec::GetHeaderInfo(std::istream & is)
+{
+  TransferSyntax ts;
+  const bool r = GetHeaderInfoAndTS(is, ts);
+  (void) ts;
+  return r;
+}
+
+bool
+JPEGBITSCodec::GetHeaderInfoAndTS(std::istream & is, TransferSyntax & ts)
 {
   /* This struct contains the JPEG decompression parameters and pointers to
    * working space (which is allocated as needed by the JPEG library).
