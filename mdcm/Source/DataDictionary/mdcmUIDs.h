@@ -1155,9 +1155,9 @@ public:
 //
 // 2023c
 //
-    HighThroughputJPEG2000ImageCompressionLossless = 501,
-    HighThroughputJPEG2000withRPCL_OptionsImageCompressionLossless = 502,
-    HighThroughputJPEG2000ImageCompression = 503,
+    HTJ2KLossless = 501,
+    HTJ2KLosslessRPCL = 502,
+    HTJ2K = 503,
     JPIPHTJ2KReferenced = 504,
     JPIPHTJ2KReferencedDeflate = 505,
     ConfocalMicroscopyImageStorage = 506,

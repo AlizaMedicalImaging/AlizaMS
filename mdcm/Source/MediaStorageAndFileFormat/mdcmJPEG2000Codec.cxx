@@ -734,9 +734,9 @@ JPEG2000Codec::CanDecode(TransferSyntax const & ts) const
 {
   return (ts == TransferSyntax::JPEG2000Lossless ||
           ts == TransferSyntax::JPEG2000 ||
-          ts == TransferSyntax::HTJPEG2000Lossless ||
-          ts == TransferSyntax::HTJPEG2000RPCLLossless ||
-          ts == TransferSyntax::HTJPEG2000 ||
+          ts == TransferSyntax::HTJ2KLossless ||
+          ts == TransferSyntax::HTJ2KLosslessRPCL ||
+          ts == TransferSyntax::HTJ2K ||
           ts == TransferSyntax::JPEG2000Part2Lossless ||
           ts == TransferSyntax::JPEG2000Part2);
   // HT is not yet tested, TODO

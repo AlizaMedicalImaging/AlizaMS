@@ -163,7 +163,7 @@ TransferSyntax::IsLossy() const
       TSField == JPEGLSNearLossless ||
       TSField == JPEG2000 ||
       TSField == JPEG2000Part2 ||
-      TSField == HTJPEG2000 ||
+      TSField == HTJ2K ||
       TSField == MPEG2MainProfile ||
       TSField == MPEG2MainProfileHighLevel ||
       TSField == MPEG4AVCH264HighProfileLevel4_1 ||
@@ -185,8 +185,8 @@ TransferSyntax::IsLossy() const
       TSField == FragmentableMPEG4AVCH264StereoHighProfileevel4_2 ||
       TSField == JPIPReferenced ||
       TSField == JPIPReferencedDeflate ||
-      TSField == JPIPHTReferenced ||
-      TSField == JPIPHTReferencedDeflate)
+      TSField == JPIPHTJ2KReferenced ||
+      TSField == JPIPHTJ2KReferencedDeflate)
   {
     return true;
   }
@@ -276,9 +276,9 @@ TransferSyntax::IsEncapsulated() const
     case JPEG2000:
     case JPEG2000Part2Lossless:
     case JPEG2000Part2:
-    case HTJPEG2000Lossless:
-    case HTJPEG2000RPCLLossless:
-    case HTJPEG2000:
+    case HTJ2KLossless:
+    case HTJ2KLosslessRPCL:
+    case HTJ2K:
     case RLELossless:
     case MPEG2MainProfile:
     case MPEG2MainProfileHighLevel:
@@ -302,8 +302,8 @@ TransferSyntax::IsEncapsulated() const
     case FragmentableMPEG4AVCH264StereoHighProfileevel4_2:
     case JPIPReferenced:
     case JPIPReferencedDeflate:
-    case JPIPHTReferenced:
-    case JPIPHTReferencedDeflate:
+    case JPIPHTJ2KReferenced:
+    case JPIPHTJ2KReferencedDeflate:
       r = true;
       break;
     default:
