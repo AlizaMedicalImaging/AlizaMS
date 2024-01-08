@@ -27,20 +27,19 @@ View short introductory videos on [Youtube Channel](https://www.youtube.com/chan
 Highlights
 ----------
 
- * Very fast directory scanner, DICOMDIR
  * 2D and 3D views with many tools
- * View uniform and non-uniform series in physical space
- * DICOM Study multi-view with intersection lines
- * Structured report
+ * 3D view also for non-uniform images
+ * Volume Rendering
+ * Multi-planar reconstruction (MPR)
+ * Fast directory scanner, DICOMDIR
+ * Consistently de-identify DICOM, maintain integrity
  * RTSTRUCT contours
+ * DICOM Study multi-view with intersection lines and side-by-side view
+ * Proper measurement in Ultrasound Calibrated Regions
  * 2D+t and 3D+t animations
- * Consistently de-identify DICOM
- * View DICOM metadata
- * Ultrasound incl. proper measurement in regions, cine
- * Grayscale softcopy presentation
- * Siemens mosaic format
- * United Imaging Healthcare (UIH) Grid / VFrame format
- * etc.
+ * DICOM metadata viewer, DICOM 2023e dictionary
+ * Encapsulated transfer syntaxes incl. HTJ2K
+ * Most IODs are supported incl. Structured Reports, Key Objects Selection, Grayscale Softcopy Presentation State</li>
 
 ![](https://github.com/AlizaMedicalImaging/AlizaMS/blob/master/package/art/alizams_scr1.jpg)
 
