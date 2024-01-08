@@ -136,21 +136,11 @@ protected:
   bool
   TryJPEGCodec(char *, bool &) const;
   bool
-  TryJPEGCodec2(std::ostream &) const;
-  bool
-  TryJPEGCodec3(char *, bool &) const;
-  bool
   TryPVRGCodec(char *, bool &) const;
   bool
   TryJPEGLSCodec(char *, bool &) const;
   bool
-  TryJPEGLSCodec2(char *, bool &) const;
-  bool
   TryJPEG2000Codec(char *, bool &) const;
-  bool
-  TryJPEG2000Codec2(std::ostream &) const;
-  bool
-  TryJPEG2000Codec3(char *, bool &) const;
   bool
   TryRLECodec(char *, bool &) const;
   unsigned int                      PlanarConfiguration;

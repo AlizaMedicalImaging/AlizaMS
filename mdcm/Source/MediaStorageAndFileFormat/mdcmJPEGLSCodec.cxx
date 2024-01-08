@@ -28,10 +28,14 @@
 #include <cstring>
 #include "mdcm_charls.h"
 
+#define MDCM_JPEGLS_USE_RDBUF
+
+/*
 #if defined(__GNUC__) && defined(GCC_VERSION) && GCC_VERSION < 50101
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #endif
+*/
 
 namespace mdcm
 {
@@ -250,10 +254,16 @@ JPEGLSCodec::Decode2(DataElement const & in, char * out_buffer, size_t len)
         memset(out_buffer, 0, len);
       }
     }
-    os.seekp(0, std::ios::beg);
-#if 1
+#ifdef MDCM_JPEGLS_USE_RDBUF
     std::stringbuf * pbuf = os.rdbuf();
-    pbuf->sgetn(out_buffer, ((len < len2) ? len : len2));
+    const long long sgetn_s = pbuf->sgetn(out_buffer, ((len < len2) ? len : len2));
+#if 0
+    std::cout << "JPEGLSCodec: sizes should be the equal: " << len << " " << len2 << " " << sgetn_s << std::endl;
+#endif
+    if (sgetn_s <= 0)
+    {
+      mdcmAlwaysWarnMacro("JPEGLSCodec: pbuf->sgetn returned " << sgetn_s);
+    }
 #else
     const std::string & tmp0 = os.str();
     const char * tmp1 = tmp0.data();

@@ -118,16 +118,21 @@ EncapsulatedRAWCodec::Decode2(DataElement const & in, char * out_buffer, unsigne
       memset(out_buffer, 0, out_len);
     }
   }
-  os.seekp(0, std::ios::beg);
 #if 1
   std::stringbuf * pbuf = os.rdbuf();
-  pbuf->sgetn(out_buffer, ((out_len < len2) ? out_len : len2));
+  const long long sgetn_s = pbuf->sgetn(out_buffer, ((out_len < len2) ? out_len : len2));
+#if 0
+  std::cout << "EncapsulatedRAWCodec: sizes should be the equal: " << out_len << " " << len2 << " " << sgetn_s << std::endl;
+#endif
+  if (sgetn_s <= 0)
+  {
+    mdcmAlwaysWarnMacro("EncapsulatedRAWCodec: pbuf->sgetn returned " << sgetn_s);
+  }
 #else
   const std::string & tmp0 = os.str();
-  const char * tmp1 = tmp0.data();
   memcpy(
     out_buffer,
-    tmp1,
+    tmp0.data(),
     ((out_len < len2) ? out_len : len2));
 #endif
   return true;

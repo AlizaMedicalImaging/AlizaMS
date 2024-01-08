@@ -930,7 +930,6 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
             mdcmDebugMacro("Fix photometric interpretation.");
             PixelData->SetPhotometricInterpretation(jpeg.GetPhotometricInterpretation());
           }
-          assert(PixelData->IsTransferSyntaxCompatible(ts));
         }
         else
         {

@@ -32,7 +32,8 @@
 #include <numeric>
 #include "mdcm_openjpeg.h"
 
-//#define MDCM_JPEG2000_VERBOSE
+#define MDCM_JPEG2000_USE_RDBUF
+#define MDCM_JPEG2000_VERBOSE
 
 namespace mdcm
 {
@@ -297,6 +298,9 @@ parsejp2_imp(const char * const stream, const size_t file_size, bool * lossless,
 #define CLRSPC_SYCC OPJ_CLRSPC_SYCC
 #define CLRSPC_UNKNOWN OPJ_CLRSPC_UNKNOWN
 #define CLRSPC_UNSPECIFIED OPJ_CLRSPC_UNSPECIFIED
+#define JP2_RFC3745_MAGIC "\x00\x00\x00\x0c\x6a\x50\x20\x20\x0d\x0a\x87\x0a"
+#define JP2_MAGIC "\x0d\x0a\x87\x0a"
+#define J2K_CODESTREAM_MAGIC "\xff\x4f\xff\x51"
 
 struct myfile
 {
@@ -687,6 +691,9 @@ check_comp_valid(opj_image_t * image)
     mdcmAlwaysWarnMacro("JPEG2000: precision not supported " << comp->prec);
     return false;
   }
+#ifdef MDCM_JPEG2000_VERBOSE
+  std::cout << "image->numcomps = " << image->numcomps << std::endl;
+#endif
   bool invalid = false;
   if (image->numcomps == 3)
   {
@@ -732,6 +739,7 @@ JPEG2000Codec::~JPEG2000Codec()
 bool
 JPEG2000Codec::CanDecode(TransferSyntax const & ts) const
 {
+  // JPEG2000Part2 and JPEG2000Part2Lossless are not tested (no example files).
   return (ts == TransferSyntax::JPEG2000Lossless ||
           ts == TransferSyntax::JPEG2000 ||
           ts == TransferSyntax::HTJ2KLossless ||
@@ -739,8 +747,6 @@ JPEG2000Codec::CanDecode(TransferSyntax const & ts) const
           ts == TransferSyntax::HTJ2K ||
           ts == TransferSyntax::JPEG2000Part2Lossless ||
           ts == TransferSyntax::JPEG2000Part2);
-  // HT is not yet tested, TODO
-  // Part 2 is not tested, there are no examples available, TODO
 }
 
 bool
@@ -751,7 +757,6 @@ JPEG2000Codec::CanCode(TransferSyntax const & ts) const
 
 /*
 A.4.4 JPEG 2000 image compression
-
   If the object allows multi-frame images in the pixel data field, then for these JPEG 2000 Part 1 Transfer
   Syntaxes, each frame shall be encoded separately. Each fragment shall contain encoded data from a
   single frame.
@@ -833,11 +838,11 @@ JPEG2000Codec::Decode(DataElement const & in, DataElement & out)
   }
   else if (NumberOfDimensions == 3)
   {
-    /* I cannot figure out how to use openjpeg to support multiframes
+    /* MM: I cannot figure out how to use openjpeg to support multiframes
      * as encoded in DICOM
      * MM: Hack. If we are lucky enough the number of encapsulated fragments actually match
      * the number of Z frames.
-     * MM: hopefully this is the standard so people are following it
+     * MM: Hopefully this is the standard so people are following it
      */
     const SequenceOfFragments * sf = in.GetSequenceOfFragments();
     if (!sf)
@@ -880,7 +885,7 @@ JPEG2000Codec::Decode(DataElement const & in, DataElement & out)
     const unsigned long long str_size = str.size();
     if (str_size >= 0xffffffff)
     {
-      mdcmAlwaysWarnMacro("JPEGLSCodec: value too big for ByteValue");
+      mdcmAlwaysWarnMacro("JPEG2000Codec: value too big for ByteValue");
       return false;
     }
     out.SetByteValue(str.data(), static_cast<uint32_t>(str_size));
@@ -901,7 +906,7 @@ JPEG2000Codec::Decode2(DataElement const & in, char * out_buffer, size_t len)
     SmartPointer<SequenceOfFragments> sf_bug = new SequenceOfFragments;
     if (j2kbv)
     {
-      mdcmWarningMacro("Pixel Data is not encapsulated correctly. Continuing anyway");
+      mdcmWarningMacro("JPEG2000Codec: Pixel Data is not encapsulated correctly, continuing");
       assert(!sf);
       std::stringstream is;
       const size_t      j2kbv_len = j2kbv->GetLength();
@@ -960,16 +965,22 @@ JPEG2000Codec::Decode2(DataElement const & in, char * out_buffer, size_t len)
         memset(out_buffer, 0, len);
       }
     }
-    os.seekp(0, std::ios::beg);
-#if 1
+    os.seekg(0, std::ios::beg);
+#ifdef MDCM_JPEG2000_USE_RDBUF
     std::stringbuf * pbuf = os.rdbuf();
-    pbuf->sgetn(out_buffer, ((len < len2) ? len : len2));
+    const long long sgetn_s = pbuf->sgetn(out_buffer, ((len < len2) ? len : len2));
+#if 0
+    std::cout << "JPEG2000Codec: sizes should be the equal: " << len << " " << len2 << " " << sgetn_s << std::endl;
+#endif
+    if (sgetn_s <= 0)
+    {
+      mdcmAlwaysWarnMacro("JPEG2000Codec: pbuf->sgetn returned " << sgetn_s);
+    }
 #else
     const std::string & tmp0 = os.str();
-    const char * tmp1 = tmp0.data();
     memcpy(
       out_buffer,
-      tmp1,
+      tmp0.data(),
       ((len < len2) ? len : len2));
 #endif
     return r;
@@ -1028,16 +1039,22 @@ JPEG2000Codec::Decode2(DataElement const & in, char * out_buffer, size_t len)
         memset(out_buffer, 0, len);
       }
     }
-    os.seekp(0, std::ios::beg);
-#if 1
+    os.seekg(0, std::ios::beg);
+#ifdef MDCM_JPEG2000_USE_RDBUF
     std::stringbuf * pbuf = os.rdbuf();
-    pbuf->sgetn(out_buffer, ((len < len2) ? len : len2));
+    const long long sgetn_s = pbuf->sgetn(out_buffer, ((len < len2) ? len : len2));
+#if 0
+    std::cout << "JPEG2000Codec: sizes should be the equal: " << len << " " << len2 << " " << sgetn_s << std::endl;
+#endif
+    if (sgetn_s <= 0)
+    {
+      mdcmAlwaysWarnMacro("JPEG2000Codec: pbuf->sgetn returned " << sgetn_s);
+    }
 #else
     const std::string & tmp0 = os.str();
-    const char * tmp1 = tmp0.data();
     memcpy(
       out_buffer,
-      tmp1,
+      tmp0.data(),
       ((len < len2) ? len : len2));
 #endif
     return true;
@@ -1263,7 +1280,7 @@ JPEG2000Codec::DecodeExtent(char *         buffer,
     // SC16BitsAllocated_8BitsStoredJ2K.dcm
     if (pf.GetSamplesPerPixel() != pf2.GetSamplesPerPixel() || pf.GetBitsAllocated() != pf2.GetBitsAllocated())
     {
-      mdcmErrorMacro("Invalid PixelFormat found (mismatch DICOM vs J2K)");
+      mdcmAlwaysWarnMacro("Invalid PixelFormat found (mismatch DICOM vs J2K)");
       return false;
     }
     char *       raw = raw_len.first;
@@ -1351,23 +1368,22 @@ JPEG2000Codec::DecodeExtent(char *         buffer,
 bool
 JPEG2000Codec::DecodeByStreams(std::istream & is, std::ostream & os)
 {
-  // TODO may be could be done better?
   is.seekg(0, std::ios::end);
   const size_t buf_size = is.tellg();
-  char *       dummy_buffer;
+  char *       buf;
   try
   {
-    dummy_buffer = new char[buf_size];
+    buf = new char[buf_size];
   }
   catch (const std::bad_alloc &)
   {
     return false;
   }
   is.seekg(0, std::ios::beg);
-  is.read(dummy_buffer, buf_size);
-  std::pair<char *, size_t> raw_len = this->DecodeByStreamsCommon(dummy_buffer, buf_size);
-  // Free the memory containing the code-stream
-  delete[] dummy_buffer;
+  is.read(buf, buf_size);
+  std::pair<char *, size_t> raw_len = this->DecodeByStreamsCommon(buf, buf_size);
+  delete[] buf;
+  buf = nullptr;
   if (!raw_len.first || !raw_len.second)
     return false;
   os.write(raw_len.first, raw_len.second);
@@ -1453,18 +1469,30 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
   }
   // Set decoding parameters to default values
   opj_set_default_decoder_parameters(&parameters);
-  const char jp2magic[] = "\x00\x00\x00\x0C\x6A\x50\x20\x20\x0D\x0A\x87\x0A";
-  if (memcmp(src, jp2magic, sizeof(jp2magic)) == 0)
+  if ((file_length >= 12) && (memcmp(src, JP2_RFC3745_MAGIC, 12) == 0)
+#if 0
+      || (file_length >= 4) && (memcmp(src, JP2_MAGIC, 4) == 0)
+#endif
+  )
   {
-    // JPEG-2000 compressed image data
     // mdcmData/ELSCINT1_JP2vsJ2K.dcm
-    // mdcmData/MAROTECH_CT_JP2Lossy.dcm
-    mdcmWarningMacro("J2K start like JPEG-2000 compressed image data instead of codestream");
+#ifdef MDCM_JPEG2000_VERBOSE
+    std::cout << "DecodeByStreamsCommon: JP2 magic number detected" << std::endl;
+#endif
     parameters.decod_format = JP2_CFMT;
   }
   else
   {
-    // JPEG-2000 codestream
+#ifdef MDCM_JPEG2000_VERBOSE
+    if ((file_length >= 4) && memcmp(src, J2K_CODESTREAM_MAGIC, 4) == 0)
+    {
+      std::cout << "DecodeByStreamsCommon: J2K codestream magic number detected" << std::endl;
+    }
+    else
+    {
+      std::cout << "DecodeByStreamsCommon: no magic number" << std::endl;
+    }
+#endif
     parameters.decod_format = J2K_CFMT;
   }
   parameters.cod_format = PGX_DFMT;
@@ -1558,7 +1586,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
   }
   else
   {
-    mdcmAlwaysWarnMacro("Unhandled parameters.decod_format");
+    mdcmAlwaysWarnMacro("JPEG2000Codec: unhandled parameters.decod_format");
   }
   if (b)
     reversible = lossless;
@@ -1594,7 +1622,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
   opj_stream_destroy(cio);
   const size_t len =
     static_cast<size_t>(Dimensions[0]) * Dimensions[1] * (PF.GetBitsAllocated() / 8) * image->numcomps;
-  char *       raw;
+  char * raw;
   try
   {
     raw = new char[len];
@@ -1635,7 +1663,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
     assert(PF.IsValid());
     if (comp->prec > 32)
     {
-      mdcmAlwaysWarnMacro("JPEG2000Codec: prec is not supported, " << comp->prec);
+      mdcmAlwaysWarnMacro("JPEG2000Codec: comp->prec = " << comp->prec << " is not supported");
       opj_destroy_codec(dinfo);
       opj_image_destroy(image);
       delete[] raw;
@@ -1705,11 +1733,7 @@ JPEG2000Codec::CodeFrameIntoBuffer(char *       outdata,
   const int            highbit = pf.GetHighBit();
   const int            sign = pf.GetPixelRepresentation();
   const int            quality = 100;
-  // Input_buffer is ONE image, fragment_size is the size of this image (fragment)
-#if 0
-  int numZ = 0;
-  (void)numZ;
-#endif
+  // Input_buffer is ONE image
   opj_cparameters_t parameters; // compression parameters
   opj_image_t *     image = nullptr;
   memcpy(&parameters, &(Internals->coder_param), sizeof(parameters));
@@ -1871,16 +1895,30 @@ JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size)
   const size_t          file_length = buf_size;
   // Set decoding parameters to default values
   opj_set_default_decoder_parameters(&parameters);
-  const char   jp2magic[] = "\x00\x00\x00\x0C\x6A\x50\x20\x20\x0D\x0A\x87\x0A";
-  const size_t jp2magic_size = sizeof(jp2magic);
-  if ((file_length >= jp2magic_size) && (memcmp(src, jp2magic, jp2magic_size) == 0))
+  if ((file_length >= 12) && (memcmp(src, JP2_RFC3745_MAGIC, 12) == 0)
+#if 0
+      || (file_length >= 4) && (memcmp(src, JP2_MAGIC, 4) == 0)
+#endif
+  )
   {
     // mdcmData/ELSCINT1_JP2vsJ2K.dcm
-    mdcmWarningMacro("J2K starts like JPEG2000 image data instead of codestream");
+#ifdef MDCM_JPEG2000_VERBOSE
+    std::cout << "GetHeaderInfo: JP2 magic number detected" << std::endl;
+#endif
     parameters.decod_format = JP2_CFMT;
   }
   else
   {
+#ifdef MDCM_JPEG2000_VERBOSE
+    if ((file_length >= 4) && memcmp(src, J2K_CODESTREAM_MAGIC, 4) == 0)
+    {
+      std::cout << "GetHeaderInfo: J2K codestream magic number detected" << std::endl;
+    }
+    else
+    {
+      std::cout << "GetHeaderInfo: no magic number" << std::endl;
+    }
+#endif
     parameters.decod_format = J2K_CFMT;
   }
   parameters.cod_format = PGX_DFMT;
@@ -1930,16 +1968,7 @@ JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size)
   {
     reversible = lossless;
     mct = mctb;
-#if 0
-    std::cout << "MCT " << static_cast<int>(mct) << ",reversible " << static_cast<int>(reversible) << std::endl;
-#endif
   }
-#if 0
-  else
-  {
-    std::cout << "parameters.decod_format " << parameters.decod_format << std::endl;
-  }
-#endif
   LossyFlag = !reversible;
   opj_image_comp_t * comp = &image->comps[0];
   if (!check_comp_valid(image))
@@ -1968,8 +1997,8 @@ JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size)
   {
     // usually we have codec only, but in some case we have a JP2 with
     // color space info:
-    // - mdcmData/MAROTECH_CT_JP2Lossy.dcm
-    // - mdcmData/D_CLUNIE_CT1_J2KI.dcm -> color_space = 32767
+    // - MAROTECH_CT_JP2Lossy.dcm
+    // - D_CLUNIE_CT1_J2KI.dcm -> color_space = 32767
     PI = PhotometricInterpretation::MONOCHROME2;
     this->PF.SetSamplesPerPixel(1);
   }
@@ -2018,7 +2047,7 @@ JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size)
     mdcmErrorMacro("Image has " << image->numcomps << " components, it is not supported in DICOM");
     return false;
   }
-#if 0
+#ifdef MDCM_JPEG2000_VERBOSE
   switch(image->color_space)
   {
   case CLRSPC_GRAY:
@@ -2043,7 +2072,7 @@ JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size)
     std::cout << "CLRSPC_UNSPECIFIED" << std::endl;
     break;
   default:
-    std::cout << "Colospace unknown: " << (unsigned int)image->color_space << std::endl;
+    std::cout << "Colospace unknown: " << static_cast<unsigned int>(image->color_space) << std::endl;
     break;
   }
 #endif
