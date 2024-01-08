@@ -33,7 +33,7 @@
 #include "mdcm_openjpeg.h"
 
 #define MDCM_JPEG2000_USE_RDBUF
-#define MDCM_JPEG2000_VERBOSE
+//#define MDCM_JPEG2000_VERBOSE
 
 namespace mdcm
 {
