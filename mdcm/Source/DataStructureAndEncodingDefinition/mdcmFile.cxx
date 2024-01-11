@@ -24,9 +24,6 @@
 namespace mdcm
 {
 
-File::File() {}
-File::~File() {}
-
 std::istream &
 File::Read(std::istream & is)
 {

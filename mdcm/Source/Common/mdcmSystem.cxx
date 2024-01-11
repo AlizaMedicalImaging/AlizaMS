@@ -215,6 +215,7 @@ System::ConvertToUtf16(const char * utf8path)
   std::wstring       uncpath = HandleMaxPath(uft16path);
   return uncpath;
 #else
+  (void)utf8path;
   return std::wstring();
 #endif
 }

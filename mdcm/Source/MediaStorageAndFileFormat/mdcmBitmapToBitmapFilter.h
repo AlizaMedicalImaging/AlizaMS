@@ -34,8 +34,8 @@ namespace mdcm
 class MDCM_EXPORT BitmapToBitmapFilter
 {
 public:
-  BitmapToBitmapFilter();
-  ~BitmapToBitmapFilter() {}
+  BitmapToBitmapFilter() = default;
+  virtual ~BitmapToBitmapFilter() = default;
   void
   SetInput(const Bitmap &);
   const Bitmap &

@@ -33,8 +33,8 @@ namespace mdcm
 class MDCM_EXPORT SegmentedPaletteColorLookupTable : public LookupTable
 {
 public:
-  SegmentedPaletteColorLookupTable();
-  ~SegmentedPaletteColorLookupTable();
+  SegmentedPaletteColorLookupTable() = default;
+  ~SegmentedPaletteColorLookupTable() = default;
   void
   Print(std::ostream &) const
   {}

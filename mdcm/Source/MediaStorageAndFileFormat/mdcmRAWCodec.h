@@ -32,8 +32,8 @@ class RAWInternals;
 class MDCM_EXPORT RAWCodec : public ImageCodec
 {
 public:
-  RAWCodec();
-  ~RAWCodec() override;
+  RAWCodec() = default;
+  ~RAWCodec() = default;
   bool
   CanCode(TransferSyntax const &) const override;
   bool

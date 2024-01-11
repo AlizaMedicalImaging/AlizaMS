@@ -39,7 +39,7 @@ class MDCM_EXPORT Pixmap : public Bitmap
 {
 public:
   Pixmap();
-  ~Pixmap();
+  ~Pixmap() = default;
   bool
   AreOverlaysInPixelData() const override;
   bool

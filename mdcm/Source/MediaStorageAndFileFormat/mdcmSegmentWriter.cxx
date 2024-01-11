@@ -26,10 +26,6 @@
 namespace mdcm
 {
 
-SegmentWriter::SegmentWriter() {}
-
-SegmentWriter::~SegmentWriter() {}
-
 unsigned int
 SegmentWriter::GetNumberOfSegments() const
 {

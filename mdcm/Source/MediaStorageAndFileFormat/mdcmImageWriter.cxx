@@ -43,8 +43,6 @@ ImageWriter::ImageWriter()
   PixelData = new Image;
 }
 
-ImageWriter::~ImageWriter() {}
-
 // It will overwrite anything Image infos found in DataSet
 // (see parent class to see how to pass dataset)
 const Image &

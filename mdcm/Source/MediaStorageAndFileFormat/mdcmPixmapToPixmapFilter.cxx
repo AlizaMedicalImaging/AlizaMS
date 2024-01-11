@@ -26,8 +26,6 @@
 namespace mdcm
 {
 
-PixmapToPixmapFilter::PixmapToPixmapFilter() {}
-
 Pixmap &
 PixmapToPixmapFilter::GetInput()
 {

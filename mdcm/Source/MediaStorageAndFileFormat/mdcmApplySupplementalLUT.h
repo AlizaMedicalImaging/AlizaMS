@@ -19,17 +19,15 @@ class DataElement;
 class MDCM_EXPORT ApplySupplementalLUT : public ImageToImageFilter
 {
 public:
-  ApplySupplementalLUT()
-    : m_RedSubscipt(0)
-  {}
-  ~ApplySupplementalLUT() {}
+  ApplySupplementalLUT() = default;
+  ~ApplySupplementalLUT() = default;
   bool
   Apply();
   int
   GetRedSubscript() const;
 
 private:
-  int m_RedSubscipt;
+  int m_RedSubscipt{};
 };
 
 } // end namespace mdcm

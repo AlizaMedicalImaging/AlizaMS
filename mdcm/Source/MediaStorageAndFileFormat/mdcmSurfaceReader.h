@@ -37,8 +37,8 @@ namespace mdcm
 class MDCM_EXPORT SurfaceReader : public SegmentReader
 {
 public:
-  SurfaceReader();
-  virtual ~SurfaceReader();
+  SurfaceReader() = default;
+  virtual ~SurfaceReader() = default;
   virtual bool
   Read();
   unsigned long

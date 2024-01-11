@@ -39,7 +39,7 @@ class MDCM_EXPORT ImageCodec
 {
 public:
   ImageCodec();
-  virtual ~ImageCodec();
+  virtual ~ImageCodec() = default;
   virtual bool
   CanDecode(TransferSyntax const &) const;
   virtual bool

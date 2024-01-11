@@ -94,8 +94,8 @@ private:
   size_t
                      DecodeFragment(Fragment const &, char *, size_t);
   RLEInternals *     Internals;
-  unsigned long long Length;
-  unsigned long long BufferLength;
+  unsigned long long Length{};
+  unsigned long long BufferLength{};
 };
 
 } // end namespace mdcm

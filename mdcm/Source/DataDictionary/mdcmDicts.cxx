@@ -33,13 +33,6 @@ static const DictEntry pe1("Private Element With Empty Private Creator",
                            VM::VM0,
                            false);
 
-Dicts::Dicts()
-  : PublicDict()
-  , ShadowDict()
-{}
-
-Dicts::~Dicts() {}
-
 const DictEntry &
 Dicts::GetDictEntry(const Tag & tag, const char * owner) const
 {

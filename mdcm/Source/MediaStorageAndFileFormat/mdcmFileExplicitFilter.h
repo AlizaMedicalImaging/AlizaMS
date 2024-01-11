@@ -39,7 +39,7 @@ public:
     , RecomputeItemLength(false)
     , RecomputeSequenceLength(false)
   {}
-  ~FileExplicitFilter() {}
+  ~FileExplicitFilter() = default;
   void
   SetChangePrivateTags(bool);
   void

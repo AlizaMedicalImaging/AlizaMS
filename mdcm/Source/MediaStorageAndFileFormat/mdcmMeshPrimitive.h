@@ -58,7 +58,7 @@ public:
   static MPType
   GetMPType(const char *);
   MeshPrimitive();
-  virtual ~MeshPrimitive();
+  virtual ~MeshPrimitive() = default;
   MPType
   GetPrimitiveType() const;
   void

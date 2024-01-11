@@ -51,8 +51,6 @@ Bitmap::Bitmap()
   , LossyFlag(false)
 {}
 
-Bitmap::~Bitmap() {}
-
 unsigned int
 Bitmap::GetNumberOfDimensions() const
 {

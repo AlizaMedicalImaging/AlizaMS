@@ -37,7 +37,7 @@ class MDCM_EXPORT DirectionCosines
 public:
   DirectionCosines();
   DirectionCosines(const double[6]);
-  ~DirectionCosines();
+  ~DirectionCosines() = default;
   bool
   IsValid() const;
   void

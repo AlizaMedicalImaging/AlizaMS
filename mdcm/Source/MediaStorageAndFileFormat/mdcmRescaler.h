@@ -33,16 +33,8 @@ namespace mdcm
 class MDCM_EXPORT Rescaler
 {
 public:
-  Rescaler()
-    : Intercept(0.0)
-    , Slope(1.0)
-    , PF(PixelFormat::UNKNOWN)
-    , TargetScalarType(PixelFormat::UNKNOWN)
-    , ScalarRangeMin(0.0)
-    , ScalarRangeMax(0.0)
-    , UseTargetPixelType(false)
-  {}
-  ~Rescaler() {}
+  Rescaler() = default;
+  ~Rescaler() = default;
   PixelFormat::ScalarType
   ComputeInterceptSlopePixelType();
   bool
@@ -79,13 +71,13 @@ protected:
   InverseRescaleFunctionIntoBestFit(char *, const TIn *, size_t);
 
 private:
-  double                  Intercept;
-  double                  Slope;
-  PixelFormat             PF;
-  PixelFormat::ScalarType TargetScalarType;
-  double                  ScalarRangeMin;
-  double                  ScalarRangeMax;
-  bool                    UseTargetPixelType;
+  double                  Intercept{0.0};
+  double                  Slope{1.0};
+  PixelFormat             PF{PixelFormat::UNKNOWN};
+  PixelFormat::ScalarType TargetScalarType{PixelFormat::UNKNOWN};
+  double                  ScalarRangeMin{};
+  double                  ScalarRangeMax{};
+  bool                    UseTargetPixelType{};
 };
 
 } // end namespace mdcm

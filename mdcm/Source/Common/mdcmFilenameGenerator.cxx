@@ -1,3 +1,11 @@
+/*********************************************************
+ *
+ * MDCM
+ *
+ * Modifications github.com/issakomi
+ *
+ *********************************************************/
+
 /*=========================================================================
 
   Program: GDCM (Grassroots DICOM). A DICOM library
@@ -11,6 +19,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+
 #include "mdcmFilenameGenerator.h"
 #include "mdcmTrace.h"
 #include <cstring>
@@ -19,21 +28,18 @@
 namespace mdcm
 {
 
-//-----------------------------------------------------------------------------
 FilenameGenerator::SizeType
 FilenameGenerator::GetNumberOfFilenames() const
 {
   return Filenames.size();
 }
 
-//-----------------------------------------------------------------------------
 void
 FilenameGenerator::SetNumberOfFilenames(SizeType nfiles)
 {
   Filenames.resize(nfiles);
 }
 
-//-----------------------------------------------------------------------------
 const char *
 FilenameGenerator::GetFilename(SizeType n) const
 {
@@ -42,7 +48,6 @@ FilenameGenerator::GetFilename(SizeType n) const
   return nullptr;
 }
 
-//-----------------------------------------------------------------------------
 bool
 FilenameGenerator::Generate()
 {

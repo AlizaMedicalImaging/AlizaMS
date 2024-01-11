@@ -46,7 +46,7 @@ class MDCM_EXPORT SplitMosaicFilter
 {
 public:
   SplitMosaicFilter();
-  ~SplitMosaicFilter();
+  ~SplitMosaicFilter() = default;
   bool
   Split();
   bool

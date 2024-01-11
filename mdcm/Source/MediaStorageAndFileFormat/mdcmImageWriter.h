@@ -39,7 +39,7 @@ class MDCM_EXPORT ImageWriter : public PixmapWriter
 {
 public:
   ImageWriter();
-  ~ImageWriter();
+  ~ImageWriter() = default;
   const Image &
   GetImage() const;
   Image &

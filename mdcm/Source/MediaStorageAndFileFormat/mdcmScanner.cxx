@@ -62,8 +62,6 @@ Scanner::Scanner()
   , Progress(0.0)
 {}
 
-Scanner::~Scanner() {}
-
 std::string
 Scanner::GetString(const DataElement & de, const DataSet & ds, const bool implicit, const Dict & dict) const
 {

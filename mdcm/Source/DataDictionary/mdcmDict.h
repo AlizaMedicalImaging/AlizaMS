@@ -27,6 +27,7 @@
 #include "mdcmPrivateTag.h"
 #include "mdcmDictEntry.h"
 #include "mdcmSystem.h"
+#include "mdcmMacro.h"
 #include <iostream>
 #include <iomanip>
 #include <map>
@@ -45,8 +46,10 @@ public:
   typedef std::map<Tag, DictEntry>     MapDictEntry;
   typedef MapDictEntry::iterator       Iterator;
   typedef MapDictEntry::const_iterator ConstIterator;
-  Dict()
-    : DictInternal()
+
+  MDCM_DISALLOW_COPY_AND_MOVE(Dict);
+
+  Dict() : DictInternal()
   {
     assert(DictInternal.empty());
   }
@@ -138,9 +141,6 @@ protected:
   LoadDefault();
 
 private:
-  Dict &
-  operator=(const Dict &); // purposely not implemented
-  Dict(const Dict &);      // purposely not implemented
   MapDictEntry DictInternal;
 };
 
@@ -168,8 +168,10 @@ class MDCM_EXPORT PrivateDict
   operator<<(std::ostream &, const PrivateDict &);
 
 public:
-  PrivateDict() {}
-  ~PrivateDict() {}
+  PrivateDict() = default;
+  ~PrivateDict() = default;
+  MDCM_DISALLOW_COPY_AND_MOVE(PrivateDict);
+
   void
   AddDictEntry(const PrivateTag & tag, const DictEntry & de)
   {
@@ -250,9 +252,6 @@ protected:
   LoadDefault();
 
 private:
-  PrivateDict &
-  operator=(const PrivateDict &);   // purposely not implemented
-  PrivateDict(const PrivateDict &); // purposely not implemented
   MapDictEntry DictInternal;
 };
 

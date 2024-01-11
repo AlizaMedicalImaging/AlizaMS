@@ -50,7 +50,7 @@ class MDCM_EXPORT Bitmap : public Object
 
 public:
   Bitmap();
-  ~Bitmap();
+  virtual ~Bitmap() = default;
   unsigned int
   GetNumberOfDimensions() const;
   void

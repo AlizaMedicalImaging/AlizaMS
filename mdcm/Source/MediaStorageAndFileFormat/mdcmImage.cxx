@@ -47,8 +47,6 @@ Image::Image()
   DirectionCosines[5] = 0;
 }
 
-Image::~Image() {}
-
 // Note: 3rd value can be an '1' when the spacing was not specified.
 // Warning: when the spacing is not specifier, a default '1' will be returned.
 const double *

@@ -19,8 +19,8 @@ class RAWInternals;
 class MDCM_EXPORT EncapsulatedRAWCodec : public ImageCodec
 {
 public:
-  EncapsulatedRAWCodec();
-  ~EncapsulatedRAWCodec() override;
+  EncapsulatedRAWCodec() = default;
+  ~EncapsulatedRAWCodec() = default;
   bool
   CanCode(TransferSyntax const &) const override;
   bool

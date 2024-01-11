@@ -36,8 +36,8 @@ class JPEGLSInternals;
 class MDCM_EXPORT JPEGLSCodec : public ImageCodec
 {
 public:
-  JPEGLSCodec();
-  ~JPEGLSCodec() override;
+  JPEGLSCodec() = default;
+  ~JPEGLSCodec() = default;
   bool
   CanDecode(TransferSyntax const &) const override;
   bool
@@ -90,8 +90,8 @@ private:
   DecodeByStreamsCommon2(const char *, size_t, char *, size_t);
   bool
   CodeFrameIntoBuffer(char *, size_t, size_t &, const char *, size_t);
-  unsigned long long BufferLength;
-  int                LossyError;
+  unsigned long long BufferLength{};
+  int                LossyError{};
 };
 
 } // end namespace mdcm

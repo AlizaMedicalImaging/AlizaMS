@@ -46,8 +46,6 @@ PixmapReader::PixmapReader()
   , m_ProcessCurves(false)
 {}
 
-PixmapReader::~PixmapReader() {}
-
 void
 PixmapReader::SetApplySupplementalLUT(bool t)
 {

@@ -55,7 +55,7 @@ public:
   GetALGOType(const char *);
 
   Segment();
-  virtual ~Segment() override;
+  virtual ~Segment() = default;
   unsigned short
   GetSegmentNumber() const;
   void

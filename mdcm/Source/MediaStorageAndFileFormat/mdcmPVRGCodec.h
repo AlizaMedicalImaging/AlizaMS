@@ -33,7 +33,7 @@ class PVRGCodec : public ImageCodec
 {
 public:
   PVRGCodec();
-  ~PVRGCodec() override;
+  ~PVRGCodec() = default;
   bool
   CanDecode(TransferSyntax const &) const override;
   bool

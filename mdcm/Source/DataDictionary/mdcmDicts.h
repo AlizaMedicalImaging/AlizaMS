@@ -34,8 +34,11 @@ namespace mdcm
 class MDCM_EXPORT Dicts
 {
 public:
-  Dicts();
-  ~Dicts();
+  Dicts() : PublicDict(), ShadowDict() {}
+  ~Dicts() = default;
+
+  MDCM_DISALLOW_COPY_AND_MOVE(Dicts);
+
   const DictEntry &
   GetDictEntry(const Tag &, const char(*) = nullptr) const;
   const DictEntry &
@@ -67,9 +70,6 @@ private:
   Dict          PublicDict;
   PrivateDict   ShadowDict;
   CSAHeaderDict CSADict;
-  Dicts &
-  operator=(const Dicts &); // purposely not implemented
-  Dicts(const Dicts &);     // purposely not implemented
 };
 
 } // end namespace mdcm

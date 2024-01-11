@@ -95,7 +95,6 @@ SplitMosaicFilter::SplitMosaicFilter()
   : F(new File)
   , I(new Image)
 {}
-SplitMosaicFilter::~SplitMosaicFilter() {}
 
 void
 SplitMosaicFilter::SetImage(const Image & image)

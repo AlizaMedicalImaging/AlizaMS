@@ -42,7 +42,7 @@ class MDCM_EXPORT ImageReader : public PixmapReader
 {
 public:
   ImageReader();
-  ~ImageReader();
+  ~ImageReader() = default;
   bool
   Read() override;
   const Image &

@@ -48,14 +48,8 @@ class ImageCodec;
 class MDCM_EXPORT ImageChangeTransferSyntax : public ImageToImageFilter
 {
 public:
-  ImageChangeTransferSyntax()
-    : TS(TransferSyntax::TS_END)
-    , Force(false)
-    , CompressIconImage(false)
-    , ForceYBRFull(false)
-    , UserCodec(nullptr)
-  {}
-  ~ImageChangeTransferSyntax() {}
+  ImageChangeTransferSyntax() = default;
+  ~ImageChangeTransferSyntax() = default;
   void
   SetTransferSyntax(const TransferSyntax &);
   const TransferSyntax &
@@ -86,11 +80,11 @@ protected:
   TryJPEG2000Codec(const DataElement &, Bitmap const &, Bitmap &);
 
 private:
-  TransferSyntax TS;
-  bool           Force;
-  bool           CompressIconImage;
-  bool           ForceYBRFull;
-  ImageCodec *   UserCodec;
+  TransferSyntax TS{TransferSyntax::TS_END};
+  bool           Force{};
+  bool           CompressIconImage{};
+  bool           ForceYBRFull{};
+  ImageCodec *   UserCodec{};
 };
 
 } // end namespace mdcm

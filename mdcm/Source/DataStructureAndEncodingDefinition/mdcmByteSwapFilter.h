@@ -35,7 +35,7 @@ class MDCM_EXPORT ByteSwapFilter
 {
 public:
   ByteSwapFilter(DataSet &);
-  ~ByteSwapFilter();
+  ~ByteSwapFilter() = default;
   bool
   ByteSwap();
   void
@@ -43,7 +43,7 @@ public:
 
 private:
   DataSet & DS;
-  bool      ByteSwapTag;
+  bool      ByteSwapTag{};
   ByteSwapFilter &
   operator=(const ByteSwapFilter &);
 };

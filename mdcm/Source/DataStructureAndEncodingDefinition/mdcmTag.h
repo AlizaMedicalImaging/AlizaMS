@@ -53,7 +53,6 @@ class MDCM_EXPORT Tag
 public:
   Tag(uint16_t, uint16_t);
   Tag(uint32_t = 0);
-  Tag(const Tag &);
 
   // Returns the Group or Element of the given Tag: 0 / 1
   const uint16_t & operator[](const unsigned int & _id) const
@@ -67,13 +66,6 @@ public:
   {
     assert(_id < 2);
     return ElementTag.tags[_id];
-  }
-
-  Tag &
-  operator=(const Tag & _val)
-  {
-    ElementTag.tag = _val.ElementTag.tag;
-    return *this;
   }
 
   bool

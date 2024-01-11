@@ -52,7 +52,7 @@ class MDCM_EXPORT Item : public DataElement
 {
 public:
   Item()
-    : DataElement(Tag(0xfffe, 0xe000), 0xFFFFFFFF)
+    : DataElement(Tag(0xfffe, 0xe000), 0xffffffff)
     , NestedDataSet()
   {}
   friend std::ostream &

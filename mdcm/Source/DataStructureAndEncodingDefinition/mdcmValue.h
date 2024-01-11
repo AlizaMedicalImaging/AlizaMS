@@ -40,8 +40,8 @@ namespace mdcm
 class MDCM_EXPORT Value : public Object
 {
 public:
-  Value() {}
-  ~Value() {}
+  Value() = default;
+  virtual ~Value() = default;
   virtual VL GetLength() const = 0;
   virtual void SetLength(VL) = 0;
   virtual void

@@ -27,10 +27,6 @@
 namespace mdcm
 {
 
-SurfaceReader::SurfaceReader() {}
-
-SurfaceReader::~SurfaceReader() {}
-
 unsigned long
 SurfaceReader::GetNumberOfSurfaces() const
 {

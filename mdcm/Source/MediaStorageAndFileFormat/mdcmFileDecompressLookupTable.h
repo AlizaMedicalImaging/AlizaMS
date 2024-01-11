@@ -42,8 +42,8 @@ class DataElement;
 class MDCM_EXPORT FileDecompressLookupTable : public Subject
 {
 public:
-  FileDecompressLookupTable() {}
-  ~FileDecompressLookupTable() {}
+  FileDecompressLookupTable() = default;
+  ~FileDecompressLookupTable() = default;
   bool
   Change();
   void

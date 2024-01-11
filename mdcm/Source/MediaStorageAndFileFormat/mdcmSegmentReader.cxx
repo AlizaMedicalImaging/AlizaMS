@@ -27,10 +27,6 @@
 namespace mdcm
 {
 
-SegmentReader::SegmentReader() {}
-
-SegmentReader::~SegmentReader() {}
-
 const SegmentReader::SegmentVector
 SegmentReader::GetSegments() const
 {

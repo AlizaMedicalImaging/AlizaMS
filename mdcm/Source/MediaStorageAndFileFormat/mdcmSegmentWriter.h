@@ -30,8 +30,8 @@ class MDCM_EXPORT SegmentWriter : public Writer
 {
 public:
   typedef std::vector<SmartPointer<Segment>> SegmentVector;
-  SegmentWriter();
-  virtual ~SegmentWriter() override;
+  SegmentWriter() = default;
+  virtual ~SegmentWriter() = default;
   bool
   Write() override;
   unsigned int

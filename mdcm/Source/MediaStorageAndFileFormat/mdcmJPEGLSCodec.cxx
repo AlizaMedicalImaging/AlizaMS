@@ -40,13 +40,6 @@
 namespace mdcm
 {
 
-JPEGLSCodec::JPEGLSCodec()
-  : BufferLength(0)
-  , LossyError(0)
-{}
-
-JPEGLSCodec::~JPEGLSCodec() {}
-
 bool
 JPEGLSCodec::CanDecode(TransferSyntax const & ts) const
 {

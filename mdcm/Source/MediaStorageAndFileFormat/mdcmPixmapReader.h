@@ -44,7 +44,7 @@ class MDCM_EXPORT PixmapReader : public Reader
 {
 public:
   PixmapReader();
-  virtual ~PixmapReader();
+  virtual ~PixmapReader() = default;
   void
   SetApplySupplementalLUT(bool);
   bool

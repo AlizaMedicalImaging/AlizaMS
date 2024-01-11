@@ -23,6 +23,7 @@
 #define MDCMCOMMAND_H
 
 #include "mdcmSubject.h"
+#include "mdcmMacro.h"
 
 namespace mdcm
 {
@@ -32,6 +33,8 @@ class Event;
 class MDCM_EXPORT Command : public Subject
 {
 public:
+  MDCM_DISALLOW_COPY_AND_MOVE(Command);
+
   virtual void
   Execute(Subject *, const Event &) = 0;
   virtual void
@@ -40,17 +43,14 @@ public:
 protected:
   Command(){};
   ~Command(){};
-
-private:
-  Command(const Command &); // purposely not implemented
-  void
-  operator=(const Command &); // purposely not implemented
 };
 
 template <class T>
 class MemberCommand : public Command
 {
 public:
+  MDCM_DISALLOW_COPY_AND_MOVE(MemberCommand);
+
   typedef void (T::*TMemberFunctionPointer)(Subject *, const Event &);
   typedef void (T::*TConstMemberFunctionPointer)(const Subject *, const Event &);
   typedef MemberCommand Self;
@@ -103,11 +103,6 @@ protected:
     , m_ConstMemberFunction(nullptr)
   {}
   virtual ~MemberCommand() {}
-
-private:
-  MemberCommand(const Self &); // purposely not implemented
-  void
-  operator=(const Self &); // purposely not implemented
 };
 
 
@@ -115,6 +110,8 @@ template <typename T>
 class SimpleMemberCommand : public Command
 {
 public:
+  MDCM_DISALLOW_COPY_AND_MOVE(SimpleMemberCommand);
+
   typedef void (T::*TMemberFunctionPointer)();
   typedef SimpleMemberCommand Self;
   static SmartPointer<SimpleMemberCommand>
@@ -156,11 +153,6 @@ protected:
     , m_MemberFunction(nullptr)
   {}
   virtual ~SimpleMemberCommand() {}
-
-private:
-  SimpleMemberCommand(const Self &); // purposely not implemented
-  void
-  operator=(const Self &); // purposely not implemented
 };
 
 } // end namespace mdcm

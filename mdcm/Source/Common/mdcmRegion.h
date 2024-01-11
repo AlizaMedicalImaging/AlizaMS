@@ -34,8 +34,8 @@ class BoxRegion;
 class MDCM_EXPORT Region
 {
 public:
-  Region();
-  virtual ~Region();
+  Region() = default;
+  virtual ~Region() = default;
   virtual void
   Print(std::ostream & os = std::cout) const;
   virtual bool

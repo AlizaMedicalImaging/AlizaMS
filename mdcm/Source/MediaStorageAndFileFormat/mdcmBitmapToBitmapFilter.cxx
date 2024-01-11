@@ -28,8 +28,6 @@
 namespace mdcm
 {
 
-BitmapToBitmapFilter::BitmapToBitmapFilter() {}
-
 void
 BitmapToBitmapFilter::SetInput(const Bitmap & image)
 {

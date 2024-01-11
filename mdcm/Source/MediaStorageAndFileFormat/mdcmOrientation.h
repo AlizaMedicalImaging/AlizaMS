@@ -36,8 +36,8 @@ class MDCM_EXPORT Orientation
   operator<<(std::ostream &, const Orientation &);
 
 public:
-  Orientation();
-  ~Orientation();
+  Orientation() = default;
+  ~Orientation() = default;
   typedef enum
   {
     UNKNOWN,

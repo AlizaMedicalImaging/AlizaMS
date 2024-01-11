@@ -63,7 +63,7 @@ public:
   };
 
   Scanner();
-  ~Scanner();
+  ~Scanner() = default;
   std::string
   GetString(const DataElement &, const DataSet &, const bool, const Dict &) const;
   // Map a filename to a value

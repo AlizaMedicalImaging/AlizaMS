@@ -67,7 +67,7 @@ public:
 
 private:
   void
-                  operator=(const Self &);
+  operator=(const Self &);
   const DataSet * m_DataSet;
 };
 

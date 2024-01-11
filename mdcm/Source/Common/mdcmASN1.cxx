@@ -37,10 +37,6 @@
 namespace mdcm
 {
 
-ASN1::ASN1() {}
-
-ASN1::~ASN1() {}
-
 bool
 ASN1::ParseDumpFile(const char * filename)
 {

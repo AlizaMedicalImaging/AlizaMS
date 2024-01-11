@@ -69,7 +69,6 @@ FileMetaInformation::FileMetaInformation()
   , MetaInformationTS(TransferSyntax::Unknown)
   , DataSetMS(MediaStorage::MS_END)
 {}
-FileMetaInformation::~FileMetaInformation() {}
 
 void
 FileMetaInformation::SetImplementationClassUID(const char * imp)

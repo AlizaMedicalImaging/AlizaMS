@@ -23,7 +23,6 @@
 #define MDCMSTRING_H
 
 #include "mdcmTypes.h"
-#include "mdcmStaticAssert.h"
 
 namespace mdcm
 {
@@ -33,7 +32,7 @@ template <char TDelimiter = '\\', unsigned int TMaxLength = 64, char TPadChar = 
 class String : public std::string
 {
   // VR UI used \0 for pad character, while ASCII space char
-  MDCM_STATIC_ASSERT(TPadChar == ' ' || TPadChar == 0);
+  static_assert(TPadChar == ' ' || TPadChar == 0, "");
 
 public:
   typedef std::string::value_type             value_type;

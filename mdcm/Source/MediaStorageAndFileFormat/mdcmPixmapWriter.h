@@ -48,7 +48,7 @@ class MDCM_EXPORT PixmapWriter : public Writer
 {
 public:
   PixmapWriter();
-  ~PixmapWriter();
+  ~PixmapWriter() = default;
   const Pixmap &
   GetPixmap() const;
   Pixmap &

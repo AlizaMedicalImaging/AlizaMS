@@ -35,10 +35,6 @@ static const char * OrientationStrings[] = { "UNKNOWN", "AXIAL", "CORONAL", "SAG
 // divided by 2 (oblique axes)
 double Orientation::ObliquityThresholdCosineValue = 0.8;
 
-Orientation::Orientation() {}
-
-Orientation::~Orientation() {}
-
 Orientation::OrientationType
 Orientation::GetType(const double dircos[6])
 {

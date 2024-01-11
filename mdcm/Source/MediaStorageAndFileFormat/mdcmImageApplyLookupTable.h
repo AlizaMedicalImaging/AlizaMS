@@ -36,8 +36,8 @@ class DataElement;
 class MDCM_EXPORT ImageApplyLookupTable : public ImageToImageFilter
 {
 public:
-  ImageApplyLookupTable() {}
-  ~ImageApplyLookupTable() {}
+  ImageApplyLookupTable() = default;
+  ~ImageApplyLookupTable() = default;
   bool
   Apply();
 };

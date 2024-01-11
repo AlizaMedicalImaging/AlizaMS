@@ -35,7 +35,7 @@ class MDCM_EXPORT UIDs
 {
 public:
   UIDs();
-  ~UIDs() {}
+  ~UIDs() = default;
 
   typedef enum
   {

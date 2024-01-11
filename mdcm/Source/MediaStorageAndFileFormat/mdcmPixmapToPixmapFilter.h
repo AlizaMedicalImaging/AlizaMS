@@ -35,8 +35,8 @@ class Pixmap;
 class MDCM_EXPORT PixmapToPixmapFilter : public BitmapToBitmapFilter
 {
 public:
-  PixmapToPixmapFilter();
-  ~PixmapToPixmapFilter() {}
+  PixmapToPixmapFilter() = default;
+  ~PixmapToPixmapFilter() = default;
   Pixmap &
   GetInput();
   const Pixmap &

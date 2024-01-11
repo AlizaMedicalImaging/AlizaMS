@@ -206,10 +206,6 @@ ExpandPalette(const EntryType * raw_values, uint32_t length, std::vector<EntryTy
   }
 }
 
-SegmentedPaletteColorLookupTable::SegmentedPaletteColorLookupTable() {}
-
-SegmentedPaletteColorLookupTable::~SegmentedPaletteColorLookupTable() {}
-
 void
 SegmentedPaletteColorLookupTable::SetLUT(LookupTableType type, const unsigned char * array, unsigned int length)
 {

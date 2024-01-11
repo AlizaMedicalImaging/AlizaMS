@@ -36,8 +36,6 @@ ImageReader::ImageReader()
   PixelData = new Image;
 }
 
-ImageReader::~ImageReader() {}
-
 const Image &
 ImageReader::GetImage() const
 {

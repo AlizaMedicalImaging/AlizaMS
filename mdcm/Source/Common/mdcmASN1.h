@@ -33,8 +33,8 @@ class ASN1Internals;
 class MDCM_EXPORT ASN1
 {
 public:
-  ASN1();
-  ~ASN1();
+  ASN1() = default;
+  ~ASN1() = default;
   static bool
   ParseDumpFile(const char *);
   static bool

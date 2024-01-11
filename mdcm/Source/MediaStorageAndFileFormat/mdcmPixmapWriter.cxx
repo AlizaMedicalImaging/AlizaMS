@@ -41,8 +41,6 @@ PixmapWriter::PixmapWriter()
   : PixelData(new Pixmap)
 {}
 
-PixmapWriter::~PixmapWriter() {}
-
 const Pixmap &
 PixmapWriter::GetPixmap() const
 {

@@ -35,8 +35,8 @@ namespace mdcm
 class MDCM_EXPORT File : public Object
 {
 public:
-  File();
-  ~File();
+  File() = default;
+  ~File() = default;
   friend std::ostream &
   operator<<(std::ostream & os, const File & val);
   std::istream &

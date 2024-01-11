@@ -31,9 +31,9 @@ namespace mdcm
 class MDCM_EXPORT Event
 {
 public:
-  Event();
-  Event(const Event &);
-  virtual ~Event();
+  Event() = default;
+  Event(const Event &) = default;
+  virtual ~Event() = default;
   virtual Event *
   MakeObject() const = 0;
   virtual void
@@ -61,8 +61,8 @@ operator<<(std::ostream & os, Event & e)
   public:                                                  \
     typedef classname Self;                                \
     typedef super Superclass;                              \
-    classname() {}                                         \
-    virtual ~classname() {}                                \
+    classname() = default;                                 \
+    virtual ~classname() = default;                        \
     virtual const char * GetEventName() const              \
     {                                                      \
       return #classname;                                   \

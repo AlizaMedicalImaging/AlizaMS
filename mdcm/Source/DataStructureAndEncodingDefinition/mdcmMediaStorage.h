@@ -222,7 +222,7 @@ inline std::ostream &
 operator<<(std::ostream & _os, const MediaStorage & ms)
 {
   const char * msstring = MediaStorage::GetMSString(ms);
-  _os << (msstring ? msstring : "INVALID MEDIA STORAGE");
+  _os << (msstring ? msstring : "Invalid media storage");
   return _os;
 }
 

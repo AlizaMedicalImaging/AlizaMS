@@ -98,7 +98,7 @@ public:
 
 private:
   double
-                  ComputeValueFromStartAndStep(unsigned int) const;
+  ComputeValueFromStartAndStep(unsigned int) const;
   CurveInternal * Internal;
 };
 

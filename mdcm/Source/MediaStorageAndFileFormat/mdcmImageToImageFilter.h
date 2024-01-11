@@ -36,7 +36,7 @@ class MDCM_EXPORT ImageToImageFilter : public PixmapToPixmapFilter
 {
 public:
   ImageToImageFilter();
-  ~ImageToImageFilter() {}
+  ~ImageToImageFilter() = default;
   Image &
   GetInput();
   const Image &

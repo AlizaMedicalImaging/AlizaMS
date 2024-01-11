@@ -47,8 +47,6 @@ ImageCodec::ImageCodec()
   LossyFlag = false;
 }
 
-ImageCodec::~ImageCodec() {}
-
 bool
 ImageCodec::CanDecode(TransferSyntax const &) const
 {

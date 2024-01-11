@@ -39,8 +39,8 @@ class MDCM_EXPORT SegmentReader : public Reader
 {
 public:
   typedef std::vector<SmartPointer<Segment>> SegmentVector;
-  SegmentReader();
-  virtual ~SegmentReader();
+  SegmentReader() = default;
+  virtual ~SegmentReader() = default;
   virtual bool
   Read();
   const SegmentVector

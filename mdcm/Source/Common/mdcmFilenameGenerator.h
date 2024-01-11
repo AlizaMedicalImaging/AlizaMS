@@ -49,7 +49,7 @@ public:
     , Prefix()
     , Filenames()
   {}
-  ~FilenameGenerator() {}
+  ~FilenameGenerator() = default;
   typedef std::string               FilenameType;
   typedef std::vector<FilenameType> FilenamesType;
   typedef FilenamesType::size_type  SizeType;

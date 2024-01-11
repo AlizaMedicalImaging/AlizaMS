@@ -36,10 +36,8 @@ class DataElement;
 class MDCM_EXPORT ImageChangePlanarConfiguration : public ImageToImageFilter
 {
 public:
-  ImageChangePlanarConfiguration()
-    : PlanarConfiguration(0)
-  {}
-  ~ImageChangePlanarConfiguration() {}
+  ImageChangePlanarConfiguration() = default;
+  ~ImageChangePlanarConfiguration() = default;
   void
   SetPlanarConfiguration(unsigned int pc)
   {
@@ -65,7 +63,7 @@ public:
   Change();
 
 private:
-  unsigned int PlanarConfiguration;
+  unsigned int PlanarConfiguration{};
 };
 
 template <typename T>

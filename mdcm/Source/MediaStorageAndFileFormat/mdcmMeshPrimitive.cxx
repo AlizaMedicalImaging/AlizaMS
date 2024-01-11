@@ -75,8 +75,6 @@ MeshPrimitive::MeshPrimitive()
   , PrimitiveData(1, DataElement())
 {}
 
-MeshPrimitive::~MeshPrimitive() {}
-
 MeshPrimitive::MPType
 MeshPrimitive::GetPrimitiveType() const
 {

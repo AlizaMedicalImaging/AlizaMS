@@ -37,11 +37,8 @@ class DataElement;
 class MDCM_EXPORT ImageFragmentSplitter : public ImageToImageFilter
 {
 public:
-  ImageFragmentSplitter()
-    : FragmentSizeMax(0)
-    , Force(false)
-  {}
-  ~ImageFragmentSplitter() {}
+  ImageFragmentSplitter() = default;
+  ~ImageFragmentSplitter() = default;
   bool
   Split();
   void
@@ -52,8 +49,8 @@ public:
   SetForce(bool);
 
 private:
-  unsigned int FragmentSizeMax;
-  bool         Force;
+  unsigned int FragmentSizeMax{};
+  bool         Force{};
 };
 
 } // end namespace mdcm

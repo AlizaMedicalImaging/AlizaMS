@@ -81,8 +81,6 @@ Segment::Segment()
   , Surfaces()
 {}
 
-Segment::~Segment() {}
-
 unsigned short
 Segment::GetSegmentNumber() const
 {

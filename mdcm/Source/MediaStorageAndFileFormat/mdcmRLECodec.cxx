@@ -330,8 +330,6 @@ private:
 RLECodec::RLECodec()
 {
   Internals = new RLEInternals;
-  Length = 0;
-  BufferLength = 0;
 }
 
 RLECodec::~RLECodec()

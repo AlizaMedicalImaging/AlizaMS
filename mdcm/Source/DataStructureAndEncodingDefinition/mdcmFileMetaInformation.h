@@ -48,7 +48,7 @@ class MDCM_EXPORT FileMetaInformation : public DataSet
 {
 public:
   FileMetaInformation();
-  ~FileMetaInformation();
+  ~FileMetaInformation() = default;
 
   friend std::ostream &
   operator<<(std::ostream & _os, const FileMetaInformation & _val);

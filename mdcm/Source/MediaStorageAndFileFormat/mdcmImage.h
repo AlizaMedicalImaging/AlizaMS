@@ -53,7 +53,7 @@ class MDCM_EXPORT Image : public Pixmap
 {
 public:
   Image();
-  ~Image();
+  ~Image() = default;
   const double *
   GetSpacing() const;
   double

@@ -103,8 +103,6 @@ PVRGCodec::PVRGCodec()
   NeedByteSwap = true;
 }
 
-PVRGCodec::~PVRGCodec() {}
-
 bool
 PVRGCodec::CanDecode(TransferSyntax const & ts) const
 {

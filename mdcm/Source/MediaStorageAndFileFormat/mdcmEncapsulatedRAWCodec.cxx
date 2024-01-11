@@ -18,10 +18,6 @@
 namespace mdcm
 {
 
-EncapsulatedRAWCodec::EncapsulatedRAWCodec() {}
-
-EncapsulatedRAWCodec::~EncapsulatedRAWCodec() {}
-
 bool
 EncapsulatedRAWCodec::CanCode(TransferSyntax const & ts) const
 {

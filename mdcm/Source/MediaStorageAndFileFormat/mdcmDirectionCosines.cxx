@@ -49,8 +49,6 @@ DirectionCosines::DirectionCosines(const double dircos[6])
   Values[5] = dircos[5];
 }
 
-DirectionCosines::~DirectionCosines() {}
-
 bool
 DirectionCosines::IsValid() const
 {

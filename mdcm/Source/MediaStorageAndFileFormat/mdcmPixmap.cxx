@@ -31,8 +31,6 @@ Pixmap::Pixmap()
   , Icon(new IconImage)
 {}
 
-Pixmap::~Pixmap() {}
-
 bool
 Pixmap::AreOverlaysInPixelData() const
 {

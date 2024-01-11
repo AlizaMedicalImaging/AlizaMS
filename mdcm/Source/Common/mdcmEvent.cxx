@@ -17,10 +17,6 @@
 namespace mdcm
 {
 
-Event::Event() {}
-Event::Event(const Event &) {}
-Event::~Event() {}
-
 void
 Event::Print(std::ostream & os) const
 {

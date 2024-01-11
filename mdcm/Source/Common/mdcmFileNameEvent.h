@@ -43,7 +43,7 @@ public:
   {}
   FileNameEvent(const Self & s)
     : AnyEvent(s) {}
-  ~FileNameEvent() {}
+  ~FileNameEvent() = default;
 
   const char *
   GetEventName() const override
@@ -77,7 +77,7 @@ public:
 
 private:
   void
-              operator=(const Self &);
+  operator=(const Self &);
   std::string m_FileName;
 };
 

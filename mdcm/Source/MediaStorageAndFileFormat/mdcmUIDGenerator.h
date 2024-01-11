@@ -30,9 +30,8 @@ namespace mdcm
 class MDCM_EXPORT UIDGenerator
 {
 public:
-  UIDGenerator()
-    : Unique()
-  {}
+  UIDGenerator() = default;
+  ~UIDGenerator() = default;
   static void
   SetRoot(const char *);
   static const char *
@@ -52,7 +51,7 @@ private:
   static const char  MDCM_UID[];
   static std::string Root;
   static std::string EncodedHardwareAddress;
-  std::string        Unique;
+  std::string        Unique{};
 };
 
 } // end namespace mdcm

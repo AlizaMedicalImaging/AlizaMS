@@ -29,7 +29,6 @@
 #include "mdcmElement.h"
 #include "mdcmDataElement.h"
 #include "mdcmDataSet.h"
-#include "mdcmStaticAssert.h"
 #include <string>
 #include <vector>
 #include <sstream>
@@ -112,11 +111,11 @@ public:
 
   ArrayType Internal[VMToLength<TVM>::Length];
 
-  MDCM_STATIC_ASSERT(static_cast<bool>(static_cast<VR::VRType>(TVR) & static_cast<VR::VRType>(TagToType<Group, Element>::VRType)));
-  MDCM_STATIC_ASSERT(
+  static_assert(static_cast<bool>(static_cast<VR::VRType>(TVR) & static_cast<VR::VRType>(TagToType<Group, Element>::VRType)), "");
+  static_assert(
     (static_cast<unsigned int>(TagToType<Group, Element>::VMType) > static_cast<unsigned int>(VM::VM_FIXED_LENGTH)) ||
     ((static_cast<unsigned int>(TagToType<Group, Element>::VMType) < static_cast<unsigned int>(VM::VM_FIXED_LENGTH)) &&
-    (TVM == static_cast<unsigned int>(TagToType<Group, Element>::VMType))));
+    (TVM == static_cast<unsigned int>(TagToType<Group, Element>::VMType))), "");
 
   static Tag
   GetTag()
@@ -324,7 +323,7 @@ public:
   };
   ArrayType Internal;
 
-  MDCM_STATIC_ASSERT(static_cast<bool>(static_cast<VR::VRType>(TVR) & static_cast<VR::VRType>(TagToType<Group, Element>::VRType)));
+  static_assert(static_cast<bool>(static_cast<VR::VRType>(TVR) & static_cast<VR::VRType>(TagToType<Group, Element>::VRType)), "");
 
   static Tag
   GetTag()
@@ -512,7 +511,7 @@ class Attribute<Group, Element, TVR, VM::VM1_n>
 public:
   typedef typename VRToType<TVR>::Type ArrayType;
 
-  MDCM_STATIC_ASSERT(static_cast<bool>(static_cast<VR::VRType>(TVR) & static_cast<VR::VRType>(TagToType<Group, Element>::VRType)));
+  static_assert(static_cast<bool>(static_cast<VR::VRType>(TVR) & static_cast<VR::VRType>(TagToType<Group, Element>::VRType)), "");
 
   static Tag
   GetTag()

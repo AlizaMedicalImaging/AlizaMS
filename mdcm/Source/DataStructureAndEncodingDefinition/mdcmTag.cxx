@@ -37,11 +37,6 @@ Tag::Tag(uint32_t tag)
   SetElementTag(tag);
 }
 
-Tag::Tag(const Tag & _val)
-{
-  ElementTag.tag = _val.ElementTag.tag;
-}
-
 uint16_t
 Tag::GetGroup() const
 {

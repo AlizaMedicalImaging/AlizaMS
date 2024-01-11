@@ -60,10 +60,6 @@ Unpack12Bits(char * out, const char * in, size_t n)
   return true;
 }
 
-RAWCodec::RAWCodec() {}
-
-RAWCodec::~RAWCodec() {}
-
 bool
 RAWCodec::CanCode(TransferSyntax const & ts) const
 {
