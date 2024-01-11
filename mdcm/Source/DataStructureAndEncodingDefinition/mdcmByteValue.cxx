@@ -46,9 +46,9 @@ ByteValue::ByteValue(std::vector<char> & v)
   , Length(static_cast<uint32_t>(v.size()))
 {}
 
-ByteValue::~ByteValue()
+ByteValue::ByteValue(ByteValue && other)
 {
-  Internal.clear();
+  *this = std::move(other);
 }
 
 void

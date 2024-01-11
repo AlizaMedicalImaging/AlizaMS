@@ -26,6 +26,7 @@
 #include "mdcmTypes.h"
 #include "mdcmTrace.h"
 #include <iostream>
+#include <atomic>
 
 namespace mdcm
 {
@@ -45,16 +46,35 @@ public:
     : ReferenceCount(0)
   {}
 
-  virtual ~Object() { assert(ReferenceCount == 0); }
-
   Object(const Object &)
     : ReferenceCount(0)
   {}
 
+  virtual ~Object()
+  {
+    assert(ReferenceCount == 0);
+  }
+
   // clang-format off
+
   // cppcheck-suppress operatorEqVarError
   void operator=(const Object &) {}
+
+  Object(Object &&) = delete;
+
+  Object & operator=(Object &&) = delete;
+
   // clang-format on
+
+  virtual void
+  Print(std::ostream & os) const
+  {
+#ifndef NDEBUG
+    os << "ReferenceCount = " << ReferenceCount << std::endl;
+#else
+    (void)os;
+#endif
+  }
 
 protected:
   void
@@ -75,18 +95,10 @@ protected:
     }
   }
 
-public:
-  virtual void
-  Print(std::ostream &) const
-  {}
-
 private:
-  long long ReferenceCount;
+  std::atomic<long long> ReferenceCount;
 };
 
-// Define in the base class the operator and use the member function
-// ->Print() to call the appropriate function.
-// All subclass of Object needs to implement the Print function
 inline std::ostream &
 operator<<(std::ostream & os, const Object & obj)
 {
