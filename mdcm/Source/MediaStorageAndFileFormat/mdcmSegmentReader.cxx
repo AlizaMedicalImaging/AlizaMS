@@ -304,7 +304,7 @@ SegmentReader::ReadSegment(const Item & segmentItem, const unsigned int idx)
     else
     {
       // Index the segment with item number
-      Segments[idx] = segment;
+      Segments[idx] = std::move(segment);
     }
   }
   else
@@ -314,7 +314,7 @@ SegmentReader::ReadSegment(const Item & segmentItem, const unsigned int idx)
     segmentAlgoName.SetFromDataSet(segmentDS);
     segment->SetSegmentAlgorithmName(segmentAlgoName.GetValue());
     // Index the segment with item number
-    Segments[idx] = segment;
+    Segments[idx] = std::move(segment);
   }
   return true;
 }

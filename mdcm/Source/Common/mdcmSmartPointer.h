@@ -23,6 +23,7 @@
 #define MDCMSMARTPOINTER_H
 
 #include "mdcmObject.h"
+#include <utility>
 
 namespace mdcm
 {
@@ -40,6 +41,7 @@ template <class ObjectType>
 class SmartPointer
 {
 public:
+
   SmartPointer()
     : Pointer(nullptr)
   {}
@@ -48,6 +50,11 @@ public:
   {
     Pointer = p.Pointer;
     Register();
+  }
+
+  SmartPointer(SmartPointer<ObjectType> && p)
+  {
+    *this = std::move(p);
   }
 
   SmartPointer(ObjectType * p)
@@ -85,6 +92,18 @@ public:
   operator=(const SmartPointer & r)
   {
     return operator=(r.Pointer);
+  }
+
+  // Move operator assignment.
+  SmartPointer &
+  operator=(SmartPointer<ObjectType> && r)
+  {
+    if (this != &r)
+    {
+      Pointer = r.Pointer;
+      r.Pointer = nullptr;
+    }
+    return *this;
   }
 
   // Overload operator assignment.

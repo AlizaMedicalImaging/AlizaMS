@@ -312,7 +312,7 @@ SurfaceReader::ReadSurface(const Item & surfaceItem, const unsigned long idx)
       SmartPointer<SequenceOfItems> sequence = surfacePrimitivesDS.GetDataElement(Tag(0x0066, 0x0026)).GetValueAsSQ();
       if (sequence->GetNumberOfItems() > 0)
       {
-        typedSQ = sequence;
+        typedSQ = std::move(sequence);
         meshPrimitive->SetPrimitiveType(MeshPrimitive::TRIANGLE_STRIP);
       }
     }
@@ -321,7 +321,7 @@ SurfaceReader::ReadSurface(const Item & surfaceItem, const unsigned long idx)
       SmartPointer<SequenceOfItems> sequence = surfacePrimitivesDS.GetDataElement(Tag(0x0066, 0x0027)).GetValueAsSQ();
       if (sequence->GetNumberOfItems() > 0)
       {
-        typedSQ = sequence;
+        typedSQ = std::move(sequence);
         meshPrimitive->SetPrimitiveType(MeshPrimitive::TRIANGLE_FAN);
       }
     }
@@ -330,7 +330,7 @@ SurfaceReader::ReadSurface(const Item & surfaceItem, const unsigned long idx)
       SmartPointer<SequenceOfItems> sequence = surfacePrimitivesDS.GetDataElement(Tag(0x0066, 0x0028)).GetValueAsSQ();
       if (sequence->GetNumberOfItems() > 0)
       {
-        typedSQ = sequence;
+        typedSQ = std::move(sequence);
         meshPrimitive->SetPrimitiveType(MeshPrimitive::LINE);
       }
     }
@@ -339,7 +339,7 @@ SurfaceReader::ReadSurface(const Item & surfaceItem, const unsigned long idx)
       SmartPointer<SequenceOfItems> sequence = surfacePrimitivesDS.GetDataElement(Tag(0x0066, 0x0034)).GetValueAsSQ();
       if (sequence->GetNumberOfItems() > 0)
       {
-        typedSQ = sequence;
+        typedSQ = std::move(sequence);
         meshPrimitive->SetPrimitiveType(MeshPrimitive::FACET);
       }
     }
@@ -476,7 +476,7 @@ SurfaceReader::ReadSurface(const Item & surfaceItem, const unsigned long idx)
   // Add a MeshPrimitive to the surface
   surface->SetMeshPrimitive(*meshPrimitive);
   // Add surface to the appropriated segment
-  segment->AddSurface(surface);
+  segment->AddSurface(std::move(surface));
   return true;
 }
 

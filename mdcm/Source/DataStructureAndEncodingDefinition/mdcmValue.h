@@ -26,11 +26,8 @@
 
 namespace mdcm
 {
-class VL;
-}
 
-namespace mdcm
-{
+class VL;
 
 /**
  * Class to represent the value of a Data Element.
