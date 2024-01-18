@@ -211,6 +211,7 @@ ComputeZSpacingFromIPP(const DataSet & ds, double & zspacing)
   double           normal[3];
   DirectionCosines dc(cosines.data());
   dc.Cross(normal);
+  DirectionCosines::Normalize(normal);
   std::vector<double> distances;
   std::vector<double> dircos_subds2;
   dircos_subds2.resize(6);
@@ -1918,6 +1919,7 @@ ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
     DirectionCosines          dc(cosines);
     double                    normal[3];
     dc.Cross(normal);
+    DirectionCosines::Normalize(normal);
     const Tag tConversionSourceAttributesSequence(0x0020, 0x9172);
     const Tag tUnassignedPerFrameConvertedAttributesSequence(0x0020, 0x9171);
     const Tag tSegmentIdentificationSequence(0x0062, 0x000a);
