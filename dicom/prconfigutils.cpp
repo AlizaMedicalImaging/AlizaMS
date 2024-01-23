@@ -1573,7 +1573,7 @@ void areas_slice_by_slice(
 						a.top_left_y     = areaTLy;
 						a.bottom_right_x = areaBRx;
 						a.bottom_right_y = areaBRy;
-						v->pr_display_areas[idxs.at(x)] = a;
+						v->pr_display_areas[idxs.at(x)] = std::move(a);
 					}
 				}
 			}

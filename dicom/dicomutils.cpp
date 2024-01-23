@@ -11009,7 +11009,7 @@ QString DicomUtils::read_enhanced_common(
 					(!lateralities.isEmpty()) ? lateralities.at(i) : QString("");
 				anatomy_desc.body_part =
 					(!body_parts.isEmpty()) ? body_parts.at(i) : QString("");
-				ivariant->anatomy[i] = anatomy_desc;
+				ivariant->anatomy[i] = std::move(anatomy_desc);
 			}
 			//
 			{

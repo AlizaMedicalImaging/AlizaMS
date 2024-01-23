@@ -20,6 +20,8 @@
 #include <QPainterPath>
 #include "dicom/ultrasoundregiondata.h"
 #include "dicom/spectroscopydata.h"
+#include <vector>
+#include <utility>
 
 // Not tested on big endian platroms (specially MDCM).
 
@@ -128,8 +130,6 @@ typedef QList<DPoint> ListOfDPoints;
 class Contour
 {
 public:
-	Contour() = default;
-	~Contour() = default;
 	int id{-1};
 	int roiid{-1};
 	quint32 vaoid{}; // GLuint
@@ -154,8 +154,6 @@ typedef QMultiMap<int,int> ContoursMap;
 class ROI
 {
 public:
-	ROI() = default;
-	~ROI() = default;
 	int id{-1};
 	bool show{true};
 	bool random_color{};
@@ -188,8 +186,6 @@ typedef QMap<int, TriMesh*> TriMeshes;
 class AnatomyDesc
 {
 public:
-	AnatomyDesc() = default;
-	~AnatomyDesc() = default;
 	QString laterality;
 	QString body_part;
 };
@@ -198,8 +194,6 @@ typedef QMap<int, AnatomyDesc> AnatomyMap;
 class SegmentationInfo
 {
 public:
-	SegmentationInfo() = default;
-	~SegmentationInfo() = default;
 	int ref_segment_num{-1};
 	int R{};
 	int G{};
@@ -299,9 +293,7 @@ typedef QList<SliceOverlay> SliceOverlays;
 class ImageOverlays
 {
 public:
-	ImageOverlays() = default;
-	~ImageOverlays() = default;
-	QMap<int,SliceOverlays> all_overlays;
+	QMap<int, SliceOverlays> all_overlays;
 };
 
 typedef QMap<int,QString> SOPInstanceUids;
@@ -322,8 +314,6 @@ typedef QMap<int, QString> LabelsMap;
 class PresentationStateObj
 {
 public:
-	PresentationStateObj() = default;
-	virtual ~PresentationStateObj() = default;
 	QString id;
 	QString layer_id;
 };
@@ -331,8 +321,6 @@ public:
 class PRDisplayArea : public PresentationStateObj
 {
 public:
-	PRDisplayArea() = default;
-	~PRDisplayArea() = default;
 	int top_left_x{-1};
 	int top_left_y{-1};
 	int bottom_right_x{-1};
@@ -343,8 +331,6 @@ typedef QMap<int, PRDisplayArea> PRDisplayAreas;
 class PRTextAnnotation : public PresentationStateObj
 {
 public:
-	PRTextAnnotation() = default;
-	~PRTextAnnotation() = default;
 	bool    has_bb{};
 	bool    has_anchor{};
 	bool    has_textstyle{};
@@ -387,8 +373,6 @@ typedef QMap< int, QList<PRTextAnnotation > > PRTextAnnotations;
 class PRGraphicObject : public PresentationStateObj
 {
 public:
-	PRGraphicObject() = default;
-	~PRGraphicObject() = default;
 	unsigned int NumberofGraphicPoints{};
 	int LinePatternOnColorCIELabValue_L{};
 	int LinePatternOnColorCIELabValue_a{};
@@ -433,8 +417,6 @@ typedef QMap< int, QList<PRGraphicObject > > PRGraphicObjects;
 class PRDisplayShutter : public PresentationStateObj
 {
 public:
-	PRDisplayShutter() = default;
-	~PRDisplayShutter() = default;
 	int ShutterLeftVerticalEdge{-1};
 	int ShutterRightVerticalEdge{-1};
 	int ShutterUpperHorizontalEdge{-1};

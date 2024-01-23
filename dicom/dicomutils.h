@@ -55,8 +55,6 @@ typedef std::vector<DimIndexValue> DimIndexValues;
 class FrameGroup
 {
 public:
-	FrameGroup() = default;
-	~FrameGroup() = default;
 	int    id{-1};
 	int    stack_id{-1};
 	int    in_stack_pos_num{-1};
@@ -102,8 +100,6 @@ struct GEMSParam
 class PrConfig
 {
 public:
-	PrConfig() = default;
-	~PrConfig() = default;
 	int id{-1};
 	QString desc;
 	QList<QVariant> values;
@@ -112,8 +108,6 @@ public:
 class PrRefImage
 {
 public:
-	PrRefImage() = default;
-	~PrRefImage() = default;
 	QString uid;
 	QString file;
 	QList<unsigned int> frames;
@@ -122,8 +116,6 @@ public:
 class PrRefSeries
 {
 public:
-	PrRefSeries() = default;
-	~PrRefSeries() = default;
 	QString uid;
 	QList<PrRefImage> images;
 	QList<PrConfig> prconfig;

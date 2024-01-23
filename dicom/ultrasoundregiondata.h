@@ -6,8 +6,6 @@
 class UltrasoundRegionData
 {
 public:
-	UltrasoundRegionData() = default;
-	~UltrasoundRegionData() = default;
 	unsigned short m_RegionSpatialFormat{};
 	unsigned short m_RegionDataType{};
 	bool           m_FlagsBool{};

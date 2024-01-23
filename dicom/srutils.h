@@ -40,8 +40,6 @@ public:
 class SRGraphic
 {
 public:
-	SRGraphic() = default;
-	~SRGraphic() = default;
 	QString GraphicType;
 	QString PixelOriginInterpretation;
 	QString FiducialUID;
