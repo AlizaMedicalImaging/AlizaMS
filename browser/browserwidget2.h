@@ -45,8 +45,6 @@ public:
 class EntryDICOMDIR
 {
 public:
-	EntryDICOMDIR() = default;
-	~EntryDICOMDIR() = default;
 	unsigned int offsetOfTheNextDirectoryRecord{};
 	unsigned int offsetOfReferencedLowerLevelDirectoryEntity{};
 	QString directoryRecordType;
@@ -63,8 +61,6 @@ public:
 class SeriesDICOMDIR
 {
 public:
-	SeriesDICOMDIR() = default;
-	~SeriesDICOMDIR() = default;
 	bool    eye{};
 	bool    eye2{};
 	QString UID;
