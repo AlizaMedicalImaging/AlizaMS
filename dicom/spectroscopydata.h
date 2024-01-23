@@ -7,8 +7,6 @@
 class SpectroscopyData
 {
 public:
-	SpectroscopyData() = default;
-	~SpectroscopyData() = default;
 	int            m_NumberOfFrames{1};
 	unsigned short m_Rows{};
 	unsigned short m_Columns{};
