@@ -34,8 +34,8 @@
 #include <mdcmUIDGenerator.h>
 #include <mdcmParseException.h>
 #include "vectormath/scalar/vectormath.h"
+#include "mmath.h"
 #include <itkVersion.h>
-#include <itkMath.h>
 
 // These flags are used only for diagnostic build sometimes
 #ifndef _WIN32
@@ -246,14 +246,14 @@ bool check_slices_parallel(
 	const Vectormath::Scalar::Vector3 n1 =
 		Vectormath::Scalar::normalize(Vectormath::Scalar::cross(v1v1, v1v2));
 	if ((
-		(itk::Math::FloatAlmostEqual(n0.getX(), n1.getX())) &&
-		(itk::Math::FloatAlmostEqual(n0.getY(), n1.getY())) &&
-		(itk::Math::FloatAlmostEqual(n0.getZ(), n1.getZ())))
+		(MMath::AlmostEqual(n0.getX(), n1.getX())) &&
+		(MMath::AlmostEqual(n0.getY(), n1.getY())) &&
+		(MMath::AlmostEqual(n0.getZ(), n1.getZ())))
 		||
 		(
-		(itk::Math::FloatAlmostEqual(n0.getX(), -n1.getX())) &&
-		(itk::Math::FloatAlmostEqual(n0.getY(), -n1.getY())) &&
-		(itk::Math::FloatAlmostEqual(n0.getZ(), -n1.getZ()))))
+		(MMath::AlmostEqual(n0.getX(), -n1.getX())) &&
+		(MMath::AlmostEqual(n0.getY(), -n1.getY())) &&
+		(MMath::AlmostEqual(n0.getZ(), -n1.getZ()))))
 	{
 		return true;
 	}

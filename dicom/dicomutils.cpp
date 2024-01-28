@@ -28,7 +28,6 @@
 #include <itkImageRegionIterator.h>
 #include <itkImageRegionConstIterator.h>
 #include <itkByteSwapper.h>
-#include <itkMath.h>
 #include <mdcmSystem.h>
 #include <mdcmReader.h>
 #include <mdcmFile.h>
@@ -79,6 +78,7 @@
 #else
 #include <alizalcms/lcms2.h>
 #endif
+#include "mmath.h"
 
 namespace
 {
@@ -8985,9 +8985,9 @@ QString DicomUtils::read_series(
 					const bool b3 = (luts_.at(x) == luts_.at(x - 1));
 					if (!b3) one_lut = false;
 					const bool b1 =
-						itk::Math::FloatAlmostEqual(levels_.at(x), levels_.at(x - 1));
+						MMath::AlmostEqual(levels_.at(x), levels_.at(x - 1));
 					const bool b2 =
-						itk::Math::FloatAlmostEqual(windows_.at(x), windows_.at(x - 1));
+						MMath::AlmostEqual(windows_.at(x), windows_.at(x - 1));
 					if (!b1 || !b2) one_level = false;
 				}
 			}
@@ -11254,8 +11254,8 @@ QString DicomUtils::read_enhanced_common(
 						if (k > 0)
 						{
 							if (!(
-								itk::Math::FloatAlmostEqual<double>(tmp1c.at(k), tmp1c.at(k - 1)) &&
-								itk::Math::FloatAlmostEqual<double>(tmp1w.at(k), tmp1w.at(k - 1))))
+								MMath::AlmostEqual(tmp1c.at(k), tmp1c.at(k - 1)) &&
+								MMath::AlmostEqual(tmp1w.at(k), tmp1w.at(k - 1))))
 							{
 								tmp5468ok = false;
 							}

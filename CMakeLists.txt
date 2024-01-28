@@ -654,7 +654,10 @@ if(WIN32)
   endif()
 endif()
 
-set(ALIZAMS_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/common/structures.cpp ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
+set(ALIZAMS_SRCS
+  ${CMAKE_CURRENT_SOURCE_DIR}/common/mmath.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/common/structures.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
 
 if(NOT ALIZA_USE_SYSTEM_BULLET)
   include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/b)

@@ -29,7 +29,7 @@
 #include "settingswidget.h"
 #include "findrefdialog.h"
 #include <itkExtractImageFilter.h>
-#include <itkMath.h>
+#include "mmath.h"
 #include <chrono>
 #include <thread>
 
@@ -681,10 +681,10 @@ endpoints of the minor axis of an ellipse
 									double tmp__1 = sg.GraphicData.at(1);
 									for (size_t yyy = 2; yyy < gsize; yyy += 2)
 									{
-										if ((!itk::Math::FloatAlmostEqual<float>(
+										if ((!MMath::AlmostEqual(
 												static_cast<float>(tmp__0),
 												static_cast<float>(sg.GraphicData.at(yyy)))) ||
-											(!itk::Math::FloatAlmostEqual<float>(
+											(!MMath::AlmostEqual(
 												static_cast<float>(tmp__1),
 												static_cast<float>(sg.GraphicData.at(yyy + 1)))))
 										{
@@ -808,7 +808,7 @@ endpoints of the minor axis of an ellipse
 								}
 							}
 						}
-						if (!itk::Math::FloatAlmostEqual<float>(static_cast<float>(pm.sx), static_cast<float>(pm.sy)))
+						if (!MMath::AlmostEqual(static_cast<float>(pm.sx), static_cast<float>(pm.sy)))
 						{
 							double coeff_size_0 = 1.0;
 							double coeff_size_1 = 1.0;
