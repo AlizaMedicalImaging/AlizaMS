@@ -7,12 +7,7 @@
 #include <iostream>
 #endif
 
-/*
- *
- * https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
- *
- * TODO: maybe std::isinf, std::isnan
- */
+// TODO maybe std::isinf, std::isnan
 
 bool MMath::AlmostEqual(
 	float A, float B,
@@ -106,7 +101,8 @@ bool MMath::AlmostEqual(
 	}
 	const long double uA = std::fabs(A);
 	const long double uB = std::fabs(B);
-	const long double diff2 = ((uB > uA) ? uB : uA) * std::numeric_limits<long double>::epsilon();
+	const long double diff2 =
+		((uB > uA) ? uB : uA) * std::numeric_limits<long double>::epsilon();
 #ifdef A_MMATH_DEBUG
 	std::cout
 		<< "(long double) A=" << A << ", B=" << B
@@ -122,30 +118,4 @@ bool MMath::AlmostEqual(
 #ifdef A_MMATH_DEBUG
 #undef A_MMATH_DEBUG
 #endif
-
-/*
-// test
-int main()
-{
-	std::cout
-		<< MMath::AlmostEqual(-0.0f, 0.0f) << '\n'
-		<< MMath::AlmostEqual(-0.0, 0.0) << '\n'
-		<< MMath::AlmostEqual(-0.0L, 0.0L) << '\n'
-		<< MMath::AlmostEqual(11111.00000000007, 11111.00000000008) << '\n'
-		<< MMath::AlmostEqual(11111111111111111.7f, 11111111111111111.8f) << '\n'
-		<< MMath::AlmostEqual(11111111111111111.7L, 11111111111111111.8L) << '\n'
-		<< MMath::AlmostEqual(
-			std::numeric_limits<long double>::max(),
-			std::numeric_limits<long double>::max() * 2.0L) << '\n'
-		<< MMath::AlmostEqual(
-			std::numeric_limits<long double>::epsilon() * 1e-7L,
-			std::numeric_limits<long double>::min() * 1e-6L) << '\n'
-		<< MMath::AlmostEqual(
-			std::numeric_limits<long double>::epsilon(),
-			std::numeric_limits<long double>::epsilon() - 1e-7) << '\n'
-		;
-	return 0;
-}
-*/
-
 
