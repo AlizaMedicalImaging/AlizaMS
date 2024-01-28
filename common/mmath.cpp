@@ -7,7 +7,7 @@
 
 /*
  *
- *https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
+ * https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
  *
  */
 
@@ -17,7 +17,7 @@ bool MMath::AlmostEqual(
 	int max_ulps_diff)
 {
 	static_assert(sizeof(float) == 4 && sizeof(int) == 4, "");
-	if (fabs(A - B) <= max_diff)
+	if (std::fabs(A - B) <= max_diff)
 	{
 		return true;
 	}
@@ -27,8 +27,8 @@ bool MMath::AlmostEqual(
 	}
 	int uA;
 	int uB;
-	memcpy(&uA, &A, 4);
-	memcpy(&uB, &B, 4);
+	std::memcpy(&uA, &A, 4);
+	std::memcpy(&uB, &B, 4);
 	const int ulps_diff = std::abs(uA - uB);
 #if 0
 	std::cout << "ulps_diff=" << ulps_diff << std::endl;
@@ -43,7 +43,7 @@ bool MMath::AlmostEqual(
 	long long max_ulps_diff)
 {
 	static_assert(sizeof(double) == 8 && sizeof(long long) == 8, "");
-	if (fabs(A - B) <= max_diff)
+	if (std::fabs(A - B) <= max_diff)
 	{
 		return true;
 	}
@@ -53,8 +53,8 @@ bool MMath::AlmostEqual(
 	}
 	long long uA;
 	long long uB;
-	memcpy(&uA, &A, 8);
-	memcpy(&uB, &B, 8);
+	std::memcpy(&uA, &A, 8);
+	std::memcpy(&uB, &B, 8);
 	const long long ulps_diff = std::abs(uA - uB);
 #if 0
 	std::cout << "ulps_diff=" << ulps_diff << std::endl;
@@ -63,17 +63,17 @@ bool MMath::AlmostEqual(
 	return false;
 }
 
-bool MMath:: AlmostEqual(
+bool MMath::AlmostEqual(
 	long double A, long double B,
 	long double max_diff)
 {
-	const long double diff = fabs(A - B);
+	const long double diff = std::fabs(A - B);
 	if (diff <= max_diff)
 	{
 		return true;
 	}
-	const long double uA = fabs(A);
-	const long double uB = fabs(B);
+	const long double uA = std::fabs(A);
+	const long double uB = std::fabs(B);
 	const long double largest = (uB > uA) ? uB : uA;
 	if (diff <= largest * std::numeric_limits<long double>::epsilon())
 	{
