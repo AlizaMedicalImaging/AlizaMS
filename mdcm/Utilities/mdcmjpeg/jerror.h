@@ -177,6 +177,7 @@ JMESSAGE(JWRN_MUST_DOWNSCALE, "Must downscale data from %d bits to %d")
 JMESSAGE(JWRN_MUST_RESYNC, "Corrupt JPEG data: found marker 0x%02x instead of RST%d")
 JMESSAGE(JWRN_NOT_SEQUENTIAL, "Invalid SOS parameters for sequential JPEG")
 JMESSAGE(JWRN_TOO_MUCH_DATA, "Application transferred too many scanlines")
+JMESSAGE(JTRC_UNOPT_HUFF_TABLE, "Symbol %d indicates un-optimized Huffman table")
 
 #ifdef JMAKE_ENUM_LIST
 

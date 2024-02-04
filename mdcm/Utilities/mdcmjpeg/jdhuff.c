@@ -155,7 +155,11 @@ jpeg_make_d_derived_tbl(j_decompress_ptr cinfo, boolean isDC, int tblno, d_deriv
     {
       int sym = htbl->huffval[i];
       if (sym < 0 || sym > 16)
+#if 0
         ERREXIT(cinfo, JERR_BAD_HUFF_TABLE);
+#else
+        TRACEMS1(cinfo, 1, JTRC_UNOPT_HUFF_TABLE, sym);
+#endif
     }
   }
 }
