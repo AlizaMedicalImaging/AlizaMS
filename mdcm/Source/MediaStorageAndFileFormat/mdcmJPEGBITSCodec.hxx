@@ -721,9 +721,9 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
    * Note that this struct must live as long as the main JPEG parameter
    * struct, to avoid dangling-pointer problems.
    */
-  my_error_mgr & jerr = Internals->jerr;
-  JSAMPARRAY     buffer;     /* Output row buffer */
-  size_t         row_stride; /* physical row width in output buffer */
+  my_error_mgr &      jerr = Internals->jerr;
+  volatile JSAMPARRAY buffer{};     /* Output row buffer */
+  volatile size_t     row_stride{}; /* physical row width in output buffer */
   if (Internals->StateSuspension == 0)
   {
     // Step 1: allocate and initialize JPEG decompression object
@@ -751,7 +751,7 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
   {
     // Initialize the JPEG decompression object.
     jpeg_create_decompress(&cinfo);
-    int workaround = 0;
+    volatile int workaround = 0;
     if (ImageHelper::GetWorkaroundPredictorBug())
       workaround |= WORKAROUND_PREDICTOR6OVERFLOW;
     if (ImageHelper::GetWorkaroundCornellBug())
@@ -794,7 +794,7 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
       }
       mdcmAlwaysWarnMacro("jerr.pub.num_warnings = " << jerr.pub.num_warnings);
     }
-    const unsigned int * dims = this->GetDimensions();
+    const volatile unsigned int * dims = this->GetDimensions();
     if (cinfo.image_width != dims[0] || cinfo.image_height != dims[1])
     {
       mdcmAlwaysWarnMacro("JPEG is " << cinfo.image_width << "x" << cinfo.image_height << ", DICOM " << dims[0] << "x"
@@ -975,15 +975,13 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
 bool
 JPEGBITSCodec::InternalCode(const char * input, size_t len, std::ostream & os)
 {
-  int quality = 100;
   (void)len;
-  (void)quality;
   void * vinput = const_cast<void*>(static_cast<const void*>(input));
   /* Points to large array of R,G,B-order data */
-  JSAMPLE *            image_buffer = static_cast<JSAMPLE *>(vinput);
-  const unsigned int * dims = this->GetDimensions();
-  const int            image_height = dims[1]; /* Number of rows in image */
-  const int            image_width = dims[0];  /* Number of columns in image */
+  JSAMPLE *                     image_buffer = static_cast<JSAMPLE *>(vinput);
+  const volatile unsigned int * dims = this->GetDimensions();
+  const volatile int            image_height = dims[1]; /* Number of rows in image */
+  const volatile int            image_width = dims[0];  /* Number of columns in image */
   /* This struct contains the JPEG compression parameters and pointers to
    * working space (which is allocated as needed by the JPEG library).
    * It is possible to have several such structures, representing multiple
@@ -1001,8 +999,8 @@ JPEGBITSCodec::InternalCode(const char * input, size_t len, std::ostream & os)
    */
   struct my_error_mgr jerr;
   std::ostream *      outfile = &os;
-  JSAMPROW            row_pointer[1]; /* pointer to JSAMPLE row[s] */
-  size_t              row_stride;     /* physical row width in image buffer */
+  JSAMPROW            row_pointer[1]{}; /* pointer to JSAMPLE row[s] */
+  volatile size_t     row_stride{};     /* physical row width in image buffer */
   /* Step 1: allocate and initialize JPEG compression object */
   /* We have to set up the error handler first, in case the initialization
    * step fails.  (Unlikely, but it could happen if you are out of memory.)
@@ -1122,9 +1120,9 @@ JPEGBITSCodec::InternalCode(const char * input, size_t len, std::ostream & os)
     /*
      * warning: Need to read C.7.6.3.1.3 Planar Configuration (see note about Planar Configuration dummy value)
      */
-    JSAMPLE * tempbuffer = (JSAMPLE *)malloc(row_stride * sizeof(JSAMPLE));
+    JSAMPLE * tempbuffer = static_cast<JSAMPLE *>(malloc(row_stride * sizeof(JSAMPLE)));
     row_pointer[0] = tempbuffer;
-    int offset = image_height * image_width;
+    volatile int offset = image_height * image_width;
     while (cinfo.next_scanline < cinfo.image_height)
     {
       assert(row_stride % 3 == 0);
@@ -1156,10 +1154,10 @@ JPEGBITSCodec::EncodeBuffer(std::ostream & os, const char * data, size_t datalen
   (void)datalen;
   void * vdata = const_cast<void*>(static_cast<const void*>(data));
   /* Points to large array of R,G,B-order data */
-  JSAMPLE *            image_buffer = static_cast<JSAMPLE *>(vdata);
-  const unsigned int * dims = this->GetDimensions();
-  const int            image_height = dims[1]; /* Number of rows in image */
-  const int            image_width = dims[0];  /* Number of columns in image */
+  JSAMPLE *                     image_buffer = static_cast<JSAMPLE *>(vdata);
+  const volatile unsigned int * dims = this->GetDimensions();
+  const volatile int            image_height = dims[1]; /* Number of rows in image */
+  const volatile int            image_width = dims[0];  /* Number of columns in image */
   /* This struct contains the JPEG compression parameters and pointers to
    * working space (which is allocated as needed by the JPEG library).
    * It is possible to have several such structures, representing multiple
@@ -1175,10 +1173,10 @@ JPEGBITSCodec::EncodeBuffer(std::ostream & os, const char * data, size_t datalen
    * Note that this struct must live as long as the main JPEG parameter
    * struct, to avoid dangling-pointer problems.
    */
-  my_error_mgr & jerr = Internals->jerr;
-  std::ostream * outfile = &os;
-  JSAMPROW       row_pointer[1]; /* pointer to JSAMPLE row[s] */
-  size_t         row_stride;     /* physical row width in image buffer */
+  my_error_mgr &  jerr = Internals->jerr;
+  std::ostream *  outfile = &os;
+  JSAMPROW        row_pointer[1]; /* pointer to JSAMPLE row[s] */
+  volatile size_t row_stride;     /* physical row width in image buffer */
   if (Internals->StateSuspension == 0)
   {
     /* Step 1: allocate and initialize JPEG compression object */
@@ -1314,10 +1312,13 @@ JPEGBITSCodec::EncodeBuffer(std::ostream & os, const char * data, size_t datalen
     assert(row_stride * sizeof(JSAMPLE) == datalen);
     {
       row_pointer[0] = &image_buffer[cinfo.next_scanline * row_stride * 0];
+#ifdef NDEBUG
+      (void)jpeg_write_scanlines(&cinfo, row_pointer, 1);
+#else
       const JDIMENSION nscanline = jpeg_write_scanlines(&cinfo, row_pointer, 1);
       assert(nscanline == 1);
-      (void)nscanline;
       assert(cinfo.next_scanline <= cinfo.image_height);
+#endif
     }
     if (cinfo.next_scanline == cinfo.image_height)
     {
