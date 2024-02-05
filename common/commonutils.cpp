@@ -259,7 +259,7 @@ template<typename T> void calculate_min_max(
 			}
 			break;
 		default:
-			break;
+			return;
 		}
 		iv->di->rmin = iv->di->vmin = cubemin;
 		iv->di->rmax = iv->di->vmax = cubemax;
