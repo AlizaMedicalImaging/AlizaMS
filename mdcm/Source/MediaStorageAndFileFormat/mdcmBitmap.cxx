@@ -25,7 +25,6 @@
 #include "mdcmRAWCodec.h"
 #include "mdcmEncapsulatedRAWCodec.h"
 #include "mdcmJPEGCodec.h"
-#include "mdcmPVRGCodec.h"
 #include "mdcmJPEGLSCodec.h"
 #include "mdcmJPEG2000Codec.h"
 #include "mdcmRLECodec.h"
@@ -850,48 +849,6 @@ Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
 #endif
 
 bool
-Bitmap::TryPVRGCodec(char * buffer, bool & lossyflag) const
-{
-  if (!buffer) return false;
-  const unsigned long long len = GetBufferLength();
-  if (len > 0xffffffff)
-  {
-    mdcmAlwaysWarnMacro("TryPVRGCodec: size " << len << " is not supported");
-    return false;
-  }
-  const TransferSyntax & ts = GetTransferSyntax();
-  PVRGCodec              codec;
-  if (codec.CanDecode(ts))
-  {
-    codec.SetPixelFormat(GetPixelFormat());
-    codec.SetPlanarConfiguration(GetPlanarConfiguration());
-    codec.SetPhotometricInterpretation(GetPhotometricInterpretation());
-    codec.SetNeedOverlayCleanup(AreOverlaysInPixelData() ||
-                                (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
-    codec.SetDimensions(GetDimensions());
-    DataElement out;
-    bool        r = codec.Decode(PixelData, out);
-    if (!r)
-      return false;
-    codec.SetLossyFlag(ts.IsLossy());
-    assert(r);
-    if (GetPlanarConfiguration() != codec.GetPlanarConfiguration())
-    {
-      Bitmap * i = const_cast<Bitmap *>(this);
-      i->PlanarConfiguration = codec.GetPlanarConfiguration();
-    }
-    const ByteValue * outbv = out.GetByteValue();
-    if (!outbv)
-      return false;
-    assert(len <= outbv->GetLength());
-    memcpy(buffer, outbv->GetPointer(), static_cast<size_t>(len));
-    lossyflag = codec.IsLossy();
-    return r;
-  }
-  return false;
-}
-
-bool
 Bitmap::TryJPEGLSCodec(char * buffer, bool & lossyflag) const
 #ifdef MDCM_DATA_MORE_THAN_4GB
 {
@@ -1230,10 +1187,6 @@ Bitmap::GetBufferInternal(char * buffer, bool & lossyflag) const
     success = TryJPEG2000Codec(buffer, lossyflag);
   if (!success)
     success = TryJPEGLSCodec(buffer, lossyflag);
-#ifdef MDCM_USE_PVRG
-  if (!success)
-    success = TryPVRGCodec(buffer, lossyflag);
-#endif
   if (!success)
     success = TryRLECodec(buffer, lossyflag);
   if (!success)

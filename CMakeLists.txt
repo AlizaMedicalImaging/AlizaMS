@@ -136,22 +136,6 @@ if(FALSE)
   option(MDCM_USE_SYSTEM_OPENSSL "Use system OpenSSL" OFF)
   mark_as_advanced(MDCM_USE_SYSTEM_OPENSSL)
   
-#
-# PVRG (broken JPEG library released by the Standford PVRG group)
-# support is rather bad, just a very bad implemented hack to write
-# to temp. file using some external binary. PVRG encoded DICOM files
-# are extremely rare nowadays.
-# Don't use!
-#
-  option(MDCM_USE_PVRG "Use PVRG" OFF)
-  mark_as_advanced(MDCM_USE_PVRG)
-  if(MDCM_USE_PVRG)
-    option(MDCM_USE_SYSTEM_PVRG "Use system PVRG" OFF)
-    mark_as_advanced(MDCM_USE_SYSTEM_PVRG)
-    if(MDCM_USE_SYSTEM_PVRG)
-      find_package(PVRGJPEG REQUIRED)
-    endif()
-  endif()
 endif()
 #
 #
@@ -519,7 +503,6 @@ set(MDCM_MSFF_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGLSCodec.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEG8Codec.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmJPEGCodec.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmPVRGCodec.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmRAWCodec.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmEncapsulatedRAWCodec.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/MediaStorageAndFileFormat/mdcmLookupTable.cxx

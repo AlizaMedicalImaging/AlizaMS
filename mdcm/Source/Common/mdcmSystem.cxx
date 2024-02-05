@@ -40,16 +40,6 @@
 #  include <windows.h>
 #endif
 
-#ifdef MDCM_USE_PVRG
-#  include <climits> // PATH_MAX
-#  ifdef MDCM_USE_COREFOUNDATION_LIBRARY
-#    include <CoreFoundation/CoreFoundation.h>
-#  endif
-#  ifndef PATH_MAX
-#    define PATH_MAX 4096
-#  endif
-#endif
-
 #if defined(_WIN32) && (defined(_MSC_VER) || defined(__WATCOMC__) || defined(__BORLANDC__) || defined(__MINGW32__))
 #  include <io.h>
 #  include <direct.h>
@@ -255,56 +245,6 @@ System::FileSize(const char * filename)
     return 0;
   return size2;
 }
-
-// TODO remove, only required for PVRG command
-#ifdef MDCM_USE_PVRG
-const char *
-System::GetCurrentProcessFileName()
-{
-#ifdef _WIN32
-  static char buf[MAX_PATH];
-  if (GetModuleFileNameA(0, buf, sizeof(buf))) // FIXME
-  {
-    return buf;
-  }
-#elif defined(MDCM_USE_COREFOUNDATION_LIBRARY)
-  static char buf[PATH_MAX];
-  Boolean     success = false;
-  CFURLRef    pathURL = CFBundleCopyExecutableURL(CFBundleGetMainBundle());
-  if (pathURL)
-  {
-    success = CFURLGetFileSystemRepresentation(pathURL, true /*resolveAgainstBase*/, reinterpret_cast<unsigned char *>(buf), PATH_MAX);
-    CFRelease(pathURL);
-  }
-  if (success)
-  {
-    return buf;
-  }
-#elif defined(__SVR4) && defined(__sun)
-  // solaris
-  const char * ret = getexecname();
-  if (ret)
-    return ret;
-#elif defined(__DragonFly__) || defined(__OpenBSD__) || defined(__FreeBSD__)
-  static char path[PATH_MAX];
-  if (readlink("/proc/curproc/file", path, sizeof(path)) > 0)
-  {
-    return path;
-  }
-#elif defined(__linux__)
-  static char path[PATH_MAX];
-  // Technically 0 is not an error, but that would mean
-  // 0 byte were copied ... thus considered it as an error
-  if (readlink("/proc/self/exe", path, sizeof(path)) > 0)
-  {
-    return path;
-  }
-#else
-  mdcmErrorMacro("Not implementated");
-#endif
-  return nullptr;
-}
-#endif
 
 #if defined(_WIN32) && !defined(MDCM_HAVE_GETTIMEOFDAY)
 

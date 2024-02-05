@@ -136,8 +136,6 @@ protected:
   bool
   TryJPEGCodec(char *, bool &) const;
   bool
-  TryPVRGCodec(char *, bool &) const;
-  bool
   TryJPEGLSCodec(char *, bool &) const;
   bool
   TryJPEG2000Codec(char *, bool &) const;
