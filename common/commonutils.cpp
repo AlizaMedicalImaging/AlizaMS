@@ -106,9 +106,9 @@ template<typename T> void calculate_min_max(
 		min_max_calculator->Compute();
 		const double cubemin_tmp = static_cast<double>(min_max_calculator->GetMinimum());
 		const double cubemax_tmp = static_cast<double>(min_max_calculator->GetMaximum());
+		// Default values of the filter 'min > max' for e.g. an empty image.
 		if (!(cubemin_tmp > cubemax_tmp))
 		{
-			// Empty image, default values of the filter 'min > max'
 			cubemin = cubemin_tmp;
 			cubemax = cubemax_tmp;
 		}
