@@ -109,7 +109,14 @@ template<typename T> void calculate_min_max(
 	}
 	catch (const itk::ExceptionObject & ex)
 	{
+#if 0
 		std::cout << ex.GetDescription() << std::endl;
+#endif
+		return;
+	}
+	if (cubemin > cubemax)
+	{
+		// Empty image, default values of the filter 'min > max'
 		return;
 	}
 	if (iv->di->maxwindow)
