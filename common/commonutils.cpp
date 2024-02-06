@@ -104,19 +104,20 @@ template<typename T> void calculate_min_max(
 		min_max_calculator->SetImage(image);
 		min_max_calculator->SetRegion(image->GetLargestPossibleRegion());
 		min_max_calculator->Compute();
-		cubemin = static_cast<double>(min_max_calculator->GetMinimum());
-		cubemax = static_cast<double>(min_max_calculator->GetMaximum());
+		const double cubemin_tmp = static_cast<double>(min_max_calculator->GetMinimum());
+		const double cubemax_tmp = static_cast<double>(min_max_calculator->GetMaximum());
+		if (!(cubemin_tmp > cubemax_tmp))
+		{
+			// Empty image, default values of the filter 'min > max'
+			cubemin = cubemin_tmp;
+			cubemax = cubemax_tmp;
+		}
 	}
 	catch (const itk::ExceptionObject & ex)
 	{
 #if 0
 		std::cout << ex.GetDescription() << std::endl;
 #endif
-		return;
-	}
-	if (cubemin > cubemax)
-	{
-		// Empty image, default values of the filter 'min > max'
 		return;
 	}
 	if (iv->di->maxwindow)
