@@ -25,12 +25,6 @@
 namespace mdcm
 {
 
-void
-Version::Print(std::ostream & os) const
-{
-  os << Version::GetVersion();
-}
-
 const char *
 Version::GetVersion()
 {

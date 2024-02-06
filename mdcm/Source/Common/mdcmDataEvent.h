@@ -36,7 +36,7 @@ public:
     : Bytes(bytes), Length(len) {}
   DataEvent(const Self & s)
     : AnyEvent(s), Bytes(nullptr), Length(0) {}
-  ~DataEvent() override {}
+  ~DataEvent() override = default;
   const char *
   GetEventName() const override
   {

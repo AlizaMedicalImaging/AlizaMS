@@ -41,8 +41,8 @@ public:
   Execute(const Subject *, const Event &) = 0;
 
 protected:
-  Command(){};
-  ~Command(){};
+  Command() = default;
+  ~Command() = default;
 };
 
 template <class T>
@@ -94,15 +94,11 @@ public:
   }
 
 protected:
-  T *                         m_This;
-  TMemberFunctionPointer      m_MemberFunction;
-  TConstMemberFunctionPointer m_ConstMemberFunction;
-  MemberCommand()
-    : m_This(nullptr)
-    , m_MemberFunction(nullptr)
-    , m_ConstMemberFunction(nullptr)
-  {}
-  virtual ~MemberCommand() {}
+  T *                         m_This{};
+  TMemberFunctionPointer      m_MemberFunction{nullptr};
+  TConstMemberFunctionPointer m_ConstMemberFunction{nullptr};
+  MemberCommand() = default;
+  virtual ~MemberCommand() = default;
 };
 
 
@@ -146,13 +142,10 @@ public:
   }
 
 protected:
-  T *                    m_This;
-  TMemberFunctionPointer m_MemberFunction;
-  SimpleMemberCommand()
-    : m_This(nullptr)
-    , m_MemberFunction(nullptr)
-  {}
-  virtual ~SimpleMemberCommand() {}
+  T *                    m_This{};
+  TMemberFunctionPointer m_MemberFunction{nullptr};
+  SimpleMemberCommand() = default;
+  virtual ~SimpleMemberCommand() = default;
 };
 
 } // end namespace mdcm

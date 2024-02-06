@@ -44,7 +44,7 @@ public:
   ProgressEvent(const Self & s)
     : AnyEvent(s), m_Progress(0.0)
   {}
-  ~ProgressEvent() {}
+  ~ProgressEvent() = default;
 
   const char *
   GetEventName() const override

@@ -24,21 +24,19 @@
 #define MDCMVERSION_H
 
 #include "mdcmTypes.h"
-#include <iostream>
 
 namespace mdcm
 {
 
-/**
+/*
  * Version
+ *
  * major/minor and build version
+ *
  */
 
 class MDCM_EXPORT Version
 {
-  friend std::ostream &
-  operator<<(std::ostream &, const Version &);
-
 public:
   static const char *
   GetVersion();
@@ -48,18 +46,7 @@ public:
   GetMinorVersion();
   static int
   GetBuildVersion();
-  Version(){};
-  ~Version(){};
-  void
-  Print(std::ostream & os = std::cout) const;
 };
-
-inline std::ostream &
-operator<<(std::ostream & os, const Version & v)
-{
-  v.Print(os);
-  return os;
-}
 
 } // end namespace mdcm
 
