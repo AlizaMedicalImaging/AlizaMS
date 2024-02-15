@@ -45,7 +45,7 @@ public:
   bool
   GetHeaderInfo(std::istream &) override;
   bool
-  GetHeaderInfoAndTS(std::istream &, TransferSyntax &);
+  GetHeaderInfoAndTS(std::istream &, TransferSyntax &) override;
 
 protected:
   bool

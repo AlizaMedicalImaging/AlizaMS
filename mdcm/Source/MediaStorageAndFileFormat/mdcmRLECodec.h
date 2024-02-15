@@ -65,15 +65,6 @@ public:
 
 protected:
   bool
-  DecodeExtent(char *,
-               unsigned int,
-               unsigned int,
-               unsigned int,
-               unsigned int,
-               unsigned int,
-               unsigned int,
-               std::istream &);
-  bool
   DecodeByStreams(std::istream &, std::ostream &) override;
   bool
   StartEncode(std::ostream &) override;
@@ -92,7 +83,7 @@ private:
   bool
   DecodeByStreamsCommon(std::istream &, std::ostream &);
   size_t
-                     DecodeFragment(Fragment const &, char *, size_t);
+  DecodeFragment(Fragment const &, char *, size_t);
   RLEInternals *     Internals;
   unsigned long long Length{};
   unsigned long long BufferLength{};

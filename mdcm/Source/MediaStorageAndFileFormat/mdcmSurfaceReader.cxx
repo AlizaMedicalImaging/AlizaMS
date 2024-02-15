@@ -30,7 +30,7 @@ namespace mdcm
 unsigned long
 SurfaceReader::GetNumberOfSurfaces() const
 {
-  return Segments.size();
+  return static_cast<unsigned long>(Segments.size());
 }
 
 bool

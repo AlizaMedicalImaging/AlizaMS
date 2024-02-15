@@ -76,15 +76,6 @@ protected:
   StartEncode(std::ostream &) override;
   bool
   StopEncode(std::ostream &) override;
-  bool
-  DecodeExtent(char *,
-               unsigned int,
-               unsigned int,
-               unsigned int,
-               unsigned int,
-               unsigned int,
-               unsigned int,
-               std::istream &);
   virtual bool
   DecodeByStreams(std::istream &, std::ostream &) override;
   virtual bool

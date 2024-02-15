@@ -47,14 +47,6 @@ class MDCM_EXPORT SplitMosaicFilter
 public:
   SplitMosaicFilter();
   ~SplitMosaicFilter() = default;
-  bool
-  Split();
-  bool
-  ComputeMOSAICDimensions(unsigned int[3]);
-  bool
-  ComputeMOSAICSliceNormal(double[3], bool &);
-  bool
-  ComputeMOSAICSlicePosition(double[3], bool);
   void
   SetImage(const Image &);
   const Image &
@@ -82,7 +74,22 @@ public:
   {
     return *F;
   }
-
+  bool
+  GetAcquisitionSize(unsigned int[2], const DataSet &);
+  bool
+  Split();
+  bool
+  ComputeMOSAICDimensions(unsigned int[3]);
+  bool
+  ComputeMOSAICSliceNormal(double[3], bool &);
+  void
+  ComputeMOSAICImagePositionPatient(double[3], 
+                                    const double[6],
+                                    const double[6],
+                                    const double[3],
+                                    const unsigned int[3],
+                                    const unsigned int[3],
+                                    bool);
 private:
   SmartPointer<File>  F;
   SmartPointer<Image> I;

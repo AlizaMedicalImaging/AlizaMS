@@ -10,7 +10,7 @@
 
   Program: GDCM (Grassroots DICOM). A DICOM library
 
-  Copyright (c) 2006-2011 Mathieu Malaterre
+  Copyright (c) 2006-2024 Mathieu Malaterre
   All rights reserved.
   See Copyright.txt or http://gdcm.sourceforge.net/Copyright.html for details.
 
@@ -46,8 +46,7 @@ reorganize_mosaic(const T *            input,
     {
       for (size_t z = 0; z < outputdims_2; ++z)
       {
-        const size_t outputidx =
-          x + y * outputdims_0 + z * outputdims_0 * outputdims_1;
+        const size_t outputidx = x + y * outputdims_0 + z * outputdims_0 * outputdims_1;
         const size_t inputidx =
           (x + (z % square) * outputdims_0) + (y + (z / square) * outputdims_1) * inputdims[0];
         output[outputidx] = input[inputidx];
@@ -57,7 +56,6 @@ reorganize_mosaic(const T *            input,
   return true;
 }
 
-#ifdef SNVINVERT
 template<typename T> bool
 reorganize_mosaic_invert(const T *            input,
                          const unsigned int * inputdims,
@@ -74,8 +72,7 @@ reorganize_mosaic_invert(const T *            input,
     {
       for (size_t z = 0; z < outputdims_2; ++z)
       {
-        const size_t outputidx =
-          x + y * outputdims_0 + (outputdims_2 - 1 - z) * outputdims_0 * outputdims_1;
+        const size_t outputidx = x + y * outputdims_0 + (outputdims_2 - 1 - z) * outputdims_0 * outputdims_1;
         const size_t inputidx =
           (x + (z % square) * outputdims_0) + (y + (z / square) * outputdims_1) * inputdims[0];
         output[outputidx] = input[inputidx];
@@ -84,7 +81,6 @@ reorganize_mosaic_invert(const T *            input,
   }
   return true;
 }
-#endif
 
 }
 
@@ -92,8 +88,7 @@ namespace mdcm
 {
 
 SplitMosaicFilter::SplitMosaicFilter()
-  : F(new File)
-  , I(new Image)
+  : F(new File), I(new Image)
 {}
 
 void
@@ -102,13 +97,46 @@ SplitMosaicFilter::SetImage(const Image & image)
   I = image;
 }
 
+bool SplitMosaicFilter::GetAcquisitionSize(unsigned int size[2], const DataSet & ds)
+{
+  // Dimensions of the acquired frequency and phase data before reconstruction:
+  // frequency rows \ frequency columns \ phase rows \ phase columns
+  Attribute<0x0018, 0x1310, VR::US, VM::VM4> acquisitionMatrix;
+  acquisitionMatrix.SetFromDataSet(ds);
+  const unsigned short * pMat = acquisitionMatrix.GetValues();
+  // Enumerated Values:
+  //   ROW -- phase encoded in rows
+  //   COL -- phase encoded in columns
+  Attribute<0x0018, 0x1312> inPlanePhaseEncodingDirection;
+  inPlanePhaseEncodingDirection.SetFromDataSet(ds);
+  const CSComp val = inPlanePhaseEncodingDirection.GetValue();
+  const std::string d = val.Trim();
+  if (d == "COL")
+  {
+    // columns, rows
+    size[0] = pMat[3];
+    size[1] = pMat[0];
+  }
+  else if (d == "ROW")
+  {
+    size[0] = pMat[1];
+    size[1] = pMat[2];
+  }
+  else
+  {
+    size[0] = 0;
+    size[1] = 0;
+  }
+  return (size[0] && size[1]);
+}
+
 bool
 SplitMosaicFilter::ComputeMOSAICDimensions(unsigned int dims[3])
 {
   CSAHeader          csa;
   DataSet &          ds = GetFile().GetDataSet();
   const PrivateTag & t1 = csa.GetCSAImageHeaderInfoTag();
-  int                numberOfImagesInMosaic = 0;
+  int                numberOfImagesInMosaic{};
   if (csa.LoadFromDataElement(ds.GetDataElement(t1)))
   {
     if (csa.FindCSAElementByName("NumberOfImagesInMosaic"))
@@ -122,10 +150,8 @@ SplitMosaicFilter::ComputeMOSAICDimensions(unsigned int dims[3])
       }
     }
   }
-  else
+  if (numberOfImagesInMosaic == 0)
   {
-    // Some weird anonymizer remove the private creator but leave the actual element.
-    // (0019,100a) US 72   # 2,1 NumberOfImagesInMosaic
     PrivateTag t2(0x0019, 0x0a, "SIEMENS MR HEADER");
     if (ds.FindDataElement(t2))
     {
@@ -141,18 +167,38 @@ SplitMosaicFilter::ComputeMOSAICDimensions(unsigned int dims[3])
       }
     }
   }
-  if (!numberOfImagesInMosaic)
+  //
+  const std::vector<unsigned int> col_row = ImageHelper::GetDimensionsValue(GetFile());
+  if (numberOfImagesInMosaic == 0)
+  {
+    unsigned int mosaic_size[2]{};
+    if (GetAcquisitionSize(mosaic_size, ds))
+    {
+      // May contain trailing empty slices.
+      if (col_row[0] % mosaic_size[0] == 0 && col_row[1] % mosaic_size[1] == 0)
+      {
+        numberOfImagesInMosaic = (col_row[0] / mosaic_size[0]) * (col_row[1] / mosaic_size[1]);
+      }
+    }
+  }
+  if (numberOfImagesInMosaic == 0)
   {
     mdcmErrorMacro("Could not find NumberOfImagesInMosaic");
     return false;
   }
-  std::vector<unsigned int> colrow = ImageHelper::GetDimensionsValue(GetFile());
-  dims[0] = colrow[0];
-  dims[1] = colrow[1];
+  dims[0] = col_row[0];
+  dims[1] = col_row[1];
   const unsigned int div = static_cast<unsigned int>(ceil(sqrt(static_cast<double>(numberOfImagesInMosaic))));
-  dims[0] /= div;
-  dims[1] /= div;
-  dims[2] = numberOfImagesInMosaic;
+  if (div > 0)
+  {
+    dims[0] /= div;
+    dims[1] /= div;
+    dims[2] = numberOfImagesInMosaic;
+  }
+  else
+  {
+    return false;
+  }
   return true;
 }
 
@@ -162,7 +208,7 @@ SplitMosaicFilter::ComputeMOSAICSliceNormal(double slicenormalvector[3], bool & 
   CSAHeader          csa;
   DataSet &          ds = GetFile().GetDataSet();
   double             normal[3];
-  bool               snvfound = false;
+  bool               snvfound{};
   const PrivateTag & t1 = csa.GetCSAImageHeaderInfoTag();
   static const char  snvstr[] = "SliceNormalVector";
   if (csa.LoadFromDataElement(ds.GetDataElement(t1)))
@@ -186,106 +232,145 @@ SplitMosaicFilter::ComputeMOSAICSliceNormal(double slicenormalvector[3], bool & 
   }
   if (snvfound)
   {
-    Attribute<0x20, 0x37> iop;
+    Attribute<0x0020, 0x0037> iop;
     iop.SetFromDataSet(ds);
     DirectionCosines dc(iop.GetValues());
     double           z[3];
     dc.Cross(z);
     const double snv_dot = dc.Dot(normal, z);
-    if ((1. - snv_dot) < 1e-6)
+    if ((1.0 - snv_dot) < 1e-6)
     {
-      mdcmDebugMacro("Same direction");
       inverted = false;
     }
-    else if ((-1. - snv_dot) < 1e-6)
+    else if ((-1.0 - snv_dot) < 1e-6)
     {
-      mdcmAlwaysWarnMacro("SliceNormalVector seems to be inverted");
+      // TODO find files to test
+#if 1
+      mdcmAlwaysWarnMacro("SplitMosaicFilter: seems to be inverted");
+#endif
       inverted = true;
     }
     else
     {
-      mdcmAlwaysWarnMacro("Unexpected normal for SliceNormalVector, dot is: " << snv_dot);
+      mdcmAlwaysWarnMacro("SplitMosaicFilter: unexpected normal for Mosaic image");
       return false;
     }
-    for (unsigned int i = 0; i < 3; ++i)
-    {
-      slicenormalvector[i] = normal[i];
-    }
+    slicenormalvector[0] = normal[0];
+    slicenormalvector[1] = normal[1];
+    slicenormalvector[2] = normal[2];
   }
   return snvfound;
 }
 
-bool
-SplitMosaicFilter::ComputeMOSAICSlicePosition(double pos[3], bool)
+void SplitMosaicFilter::ComputeMOSAICImagePositionPatient(double ret[3], 
+                                                          const double ipp[6],
+                                                          const double dircos[6],
+                                                          const double pixelspacing[3],
+                                                          const unsigned int image_dims[3],
+                                                          const unsigned int mosaic_dims[3],
+                                                          bool inverted)
 {
-  CSAHeader  csa;
-  DataSet &  ds = GetFile().GetDataSet();
+  // This is an attempt to calculate the origin, it may be wrong.
+  CSAHeader        csa;
+  DataSet &        ds = GetFile().GetDataSet();
+  DirectionCosines dc(dircos);
+  dc.Normalize();
+  const double * dircos_normalized = dc;
+  const double * x = dircos_normalized;
+  const double * y = dircos_normalized + 3;
+  double ipp_csa[3]{};
+  double ipp_dcm[3]{};
+  bool hasIppCsa{};
   MrProtocol mrprot;
-  if (!csa.GetMrProtocol(ds, mrprot))
+  if (csa.GetMrProtocol(ds, mrprot)) 
   {
-    return false;
-  }
-  MrProtocol::SliceArray sa;
-  const bool             b = mrprot.GetSliceArray(sa);
-  if (!b)
-  {
-    return false;
-  }
-  const size_t size = sa.Slices.size();
-  if (!size)
-  {
-    return false;
-  }
-/*
-  {
-    double z[3];
-    for(int i = 0; i < size; ++i)
+    // https://www.nmr.mgh.harvard.edu/~greve/dicom-unpack
+    //
+    // Mosaics - DICOM (20,32) is incorrect for mosaics. The value in
+    // this field gives where the origin of an image the size of the
+    // mosaic would have been had such an image been collected. This puts
+    // the origin outside of the scanner.  However, the center of a slice
+    // can be obtained from the ASCII header from lines of the form
+    // "sSliceArray.asSlice[N].sPosition.dAAA", where N is the slice
+    // number and AAA is Sag (x), Cor (y), and Tra (z). This may be off by
+    // half a voxel. Given this information, the direction cosines, the
+    // voxel size, and dimension, the origin can be computed.
+    MrProtocol::SliceArray sa;
+    const bool b = mrprot.GetSliceArray(sa);
+    if (b)
     {
-      MrProtocol::Slice & slice = sa.Slices[i];
-      MrProtocol::Vector3 & p = slice.Position;
-      z[0] = p.dSag;
-      z[1] = p.dCor;
-      z[2] = p.dTra;
-      const double snv_dot = DirectionCosines::Dot(slicenormalvector, z);
-      if((1. - snv_dot) < 1e-6)
+      const size_t s = sa.Slices.size();
+      if (s > 0 && s == mosaic_dims[2])
       {
-        mdcmErrorMacro("Invalid direction found");
-        return false;
+        const size_t                idx = inverted ? s - 1 : 0;
+        const MrProtocol::Slice &   slice = sa.Slices[idx];
+        const MrProtocol::Vector3 & p = slice.Position;
+        const double                pos[3]{p.dSag, p.dCor, p.dTra};
+        const double                tmp0 = mosaic_dims[0] / 2.0 * pixelspacing[0];
+        const double                tmp1 = mosaic_dims[1] / 2.0 * pixelspacing[1];
+        ipp_csa[0] = pos[0] - tmp0 * x[0] - tmp1 * y[0];
+        ipp_csa[1] = pos[1] - tmp0 * x[1] - tmp1 * y[1];
+        ipp_csa[2] = pos[2] - tmp0 * x[2] - tmp1 * y[2];
+        hasIppCsa = true;
+      }
+      else if (s == 1)
+      {
+        // TODO find files to test
+		//
+        // MM: there is a single SliceArray but multiple mosaics, assume
+        // this is exactly the center one
+        double z[3];
+        dc.Cross(z);
+        DirectionCosines::Normalize(z);
+        MrProtocol::Slice &   slice = sa.Slices[0];
+        MrProtocol::Vector3 & p = slice.Position;
+        const double          pos[3]{p.dSag, p.dCor, p.dTra};
+        const double          tmp0 = mosaic_dims[0] / 2.0 * pixelspacing[0];
+        const double          tmp1 = mosaic_dims[1] / 2.0 * pixelspacing[1];
+        const double          tmp3 = (mosaic_dims[2] - 1) / 2.0 * pixelspacing[2];
+        ipp_csa[0] = pos[0] - tmp0 * x[0] - tmp1 * y[0] - tmp3 * z[0];
+        ipp_csa[1] = pos[1] - tmp0 * x[1] - tmp1 * y[1] - tmp3 * z[1];
+        ipp_csa[2] = pos[2] - tmp0 * x[2] - tmp1 * y[2] - tmp3 * z[2];
+        hasIppCsa = true;
       }
     }
   }
-*/
-  const size_t          index = 0;
-  MrProtocol::Slice &   slice = sa.Slices[index];
-  MrProtocol::Vector3 & p = slice.Position;
-  pos[0] = p.dSag;
-  pos[1] = p.dCor;
-  pos[2] = p.dTra;
-  return true;
+  {
+    // https://nipy.org/nibabel/dicom/dicom_mosaic.html#dicom-mosaic
+    const double tmp0 = (image_dims[0] - mosaic_dims[0]) / 2.0 * pixelspacing[0];
+    const double tmp1 = (image_dims[1] - mosaic_dims[1]) / 2.0 * pixelspacing[1];
+    ipp_dcm[0] = ipp[0] + tmp0 * x[0] + tmp1 * y[0];
+    ipp_dcm[1] = ipp[1] + tmp0 * x[1] + tmp1 * y[1];
+    ipp_dcm[2] = ipp[2] + tmp0 * x[2] + tmp1 * y[2];
+  }
+  //
+  if (hasIppCsa)
+  {
+#if 1
+    const double d[3]{ipp_dcm[0] - ipp_csa[0], ipp_dcm[1] - ipp_csa[1], ipp_dcm[2] - ipp_csa[2]};
+    const double n = sqrt(d[0] * d[0] + d[1] * d[1] + d[2] * d[2]);
+    if (n > 1e-4)
+    {
+      mdcmAlwaysWarnMacro("SplitMosaicFilter: ImagePositionPatient\n from DCM: "
+                          << ipp_dcm[0] << " " << ipp_dcm[1] << " " << ipp_dcm[2] << "\n from CSA: "
+                          << ipp_csa[0] << " " << ipp_csa[1] << " " << ipp_csa[2]);
+    }
+#endif
+    ret[0] = ipp_csa[0];
+    ret[1] = ipp_csa[1];
+    ret[2] = ipp_csa[2];
+  }
+  else
+  {
+    ret[0] = ipp_dcm[0];
+    ret[1] = ipp_dcm[1];
+    ret[2] = ipp_dcm[2];
+  }
 }
 
 bool
 SplitMosaicFilter::Split()
 {
-  bool         success = true;
-  DataSet &    ds = GetFile().GetDataSet();
-  unsigned int dims[3] = { 0, 0, 0 };
-  if (!ComputeMOSAICDimensions(dims))
-  {
-    return false;
-  }
-  const unsigned int div = static_cast<unsigned int>(ceil(sqrt(static_cast<double>(dims[2]))));
-  bool               inverted;
-  double             normal[3];
-  if (!ComputeMOSAICSliceNormal(normal, inverted))
-  {
-    return false;
-  }
-  double origin[3];
-  if (!ComputeMOSAICSlicePosition(origin, inverted))
-  {
-    return false;
-  }
   const Image & inputimage = GetImage();
   unsigned long long l = inputimage.GetBufferLength();
   if (l >= 0xffffffff)
@@ -293,6 +378,27 @@ SplitMosaicFilter::Split()
     mdcmAlwaysWarnMacro("SplitMosaicFilter: buffer length = " << l);
     return false;
   }
+  DataSet &    ds = GetFile().GetDataSet();
+  unsigned int dims[3]{};
+  if (!ComputeMOSAICDimensions(dims))
+  {
+    return false;
+  }
+  const unsigned int div = static_cast<unsigned int>(ceil(sqrt(static_cast<double>(dims[2]))));
+  bool               inverted{};
+  double             normal[3];
+  if (!ComputeMOSAICSliceNormal(normal, inverted))
+  {
+    return false;
+  }
+  double origin[3]{};
+  ComputeMOSAICImagePositionPatient(origin,
+                                    inputimage.GetOrigin(),
+                                    inputimage.GetDirectionCosines(),
+                                    inputimage.GetSpacing(),
+                                    inputimage.GetDimensions(),
+                                    dims,
+                                    inverted);
   std::vector<char> buf;
   buf.resize(l);
   inputimage.GetBuffer(buf.data());
@@ -301,8 +407,7 @@ SplitMosaicFilter::Split()
   outbuf.resize(l);
   void * vbuf = static_cast<void*>(buf.data());
   void * voutbuf = static_cast<void*>(outbuf.data());
-  bool b = false;
-#ifdef SNVINVERT
+  bool b{};
   if (inverted)
   {
     if (inputimage.GetPixelFormat() == PixelFormat::UINT16)
@@ -339,12 +444,6 @@ SplitMosaicFilter::Split()
     }
   }
   else
-#else
-  if (inverted)
-  {
-    mdcmAlwaysWarnMacro("SplitMosaicFilter: slice normal may be inverted");
-  }
-#endif
   {
     if (inputimage.GetPixelFormat() == PixelFormat::UINT16)
     {
@@ -384,7 +483,7 @@ SplitMosaicFilter::Split()
   const unsigned long long outbuf_size = outbuf.size();
   if (outbuf_size >= 0xffffffff)
   {
-    mdcmAlwaysWarnMacro("outbuf_size=" << outbuf_size);
+    mdcmAlwaysWarnMacro("SplitMosaicFilter: output buffer size " << outbuf_size);
     return false;
   }
   pixeldata.SetByteValue(outbuf.data(), static_cast<VL::Type>(outbuf_size));
@@ -402,25 +501,25 @@ SplitMosaicFilter::Split()
   image.SetDimension(0, dims[0]);
   image.SetDimension(1, dims[1]);
   image.SetDimension(2, dims[2]);
-  // Fix origin (direction is ok since we reorganize the tiles):
   image.SetOrigin(origin);
   PhotometricInterpretation pi;
   pi = PhotometricInterpretation::MONOCHROME2;
   image.SetDataElement(pixeldata);
-  // Second part need to fix the Media Storage, now that this is not a single slice anymore
   MediaStorage ms = MediaStorage::SecondaryCaptureImageStorage;
   ms.SetFromFile(GetFile());
+#if 0
   if (ms != MediaStorage::MRImageStorage)
   {
-    mdcmAlwaysWarnMacro("SplitMosaicFilter: expected MR Image Storage");
+    mdcmWarningMacro("SplitMosaicFilter: expected MR Image Storage");
   }
-  DataElement de(Tag(0x0008, 0x0016));
+#endif
+  DataElement    de(Tag(0x0008, 0x0016));
   const char *   msstr = MediaStorage::GetMSString(ms);
   const VL::Type strlenMsstr = static_cast<VL::Type>(strlen(msstr));
   de.SetByteValue(msstr, strlenMsstr);
   de.SetVR(Attribute<0x0008, 0x0016>::GetVR());
   ds.Replace(de);
-  return success;
+  return true;
 }
 
-} // end namespace mdcm
+}

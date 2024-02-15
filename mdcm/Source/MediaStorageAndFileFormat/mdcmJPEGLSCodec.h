@@ -62,15 +62,6 @@ public:
   SetLossyError(int); // [0-3] generally
 protected:
   bool
-  DecodeExtent(char *,
-               unsigned int,
-               unsigned int,
-               unsigned int,
-               unsigned int,
-               unsigned int,
-               unsigned int,
-               std::istream &);
-  bool
   StartEncode(std::ostream &) override;
   bool
   IsRowEncoder() override;

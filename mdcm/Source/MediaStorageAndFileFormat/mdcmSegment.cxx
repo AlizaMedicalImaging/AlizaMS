@@ -247,7 +247,7 @@ Segment::SetSegmentAlgorithmName(const char * name)
 void
 Segment::ComputeSurfaceCount()
 {
-  SurfaceCount = Surfaces.size();
+  SurfaceCount = static_cast<unsigned long>(Surfaces.size());
 }
 
 unsigned long
