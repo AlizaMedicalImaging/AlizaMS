@@ -65,10 +65,18 @@
 #include <new>
 #endif
 
-#if (defined LOG_STDOUT_TO_FILE && LOG_STDOUT_TO_FILE==1)
 namespace
 {
 
+static_assert(
+	sizeof(char) == 1 &&
+	sizeof(short) == 2 &&
+	sizeof(int) == 4 &&
+	sizeof(long long) == 8 &&
+	sizeof(float) == 4 &&
+	sizeof(double) == 8, "");
+
+#if (defined LOG_STDOUT_TO_FILE && LOG_STDOUT_TO_FILE==1)
 void close_log()
 {
 	std::cout
@@ -99,9 +107,9 @@ void redirect_qdebug(
 	}
 }
 #endif
+#endif
 
 }
-#endif
 
 int main(int argc, char * argv[])
 {
