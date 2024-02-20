@@ -29,6 +29,7 @@
 #include "mdcm_charls.h"
 
 #define MDCM_JPEGLS_USE_RDBUF
+//#define MDCM_PRINT_JPEGLS_PARAMS
 
 namespace mdcm
 {
@@ -111,9 +112,20 @@ JPEGLSCodec::Decode(DataElement const & in, DataElement & out)
       JlsParameters params = {};
       if (JpegLsReadHeader(pbyteCompressed, cbyteCompressed, &params, nullptr) != ApiResult::OK)
       {
-        mdcmDebugMacro("Could not parse JPEG-LS header");
+        mdcmAlwaysWarnMacro("Could not parse JPEG-LS header");
         return false;
       }
+#ifdef MDCM_PRINT_JPEGLS_PARAMS
+      {
+        std::cout
+          << "\nwidth = " << params.width
+          << "\nheight = " << params.height
+          << "\nbitsPerSample = " << params.bitsPerSample
+          << "\nstride = " << params.stride
+          << "\ncomponents = " << params.components
+          << "\nallowedLossyError = " << params.allowedLossyError << std::endl;
+      }
+#endif
       // allowedlossyerror == 0 => Lossless
       LossyFlag = params.allowedLossyError != 0;
       std::vector<unsigned char> rgbyteOut;
@@ -124,6 +136,7 @@ JPEGLSCodec::Decode(DataElement const & in, DataElement & out)
       delete[] mybuffer;
       if (result != ApiResult::OK)
       {
+        mdcmAlwaysWarnMacro("Could not parse JPEG-LS header");
         return false;
       }
       os.write(reinterpret_cast<const char *>(rgbyteOut.data()), rgbyteOut.size());
@@ -205,9 +218,20 @@ JPEGLSCodec::Decode2(DataElement const & in, char * out_buffer, size_t len)
       JlsParameters params = {};
       if (JpegLsReadHeader(pbyteCompressed, cbyteCompressed, &params, nullptr) != ApiResult::OK)
       {
-        mdcmDebugMacro("Could not parse JPEG-LS header");
+        mdcmAlwaysWarnMacro("Could not parse JPEG-LS header");
         return false;
       }
+#ifdef MDCM_PRINT_JPEGLS_PARAMS
+      {
+        std::cout
+          << "\nwidth = " << params.width
+          << "\nheight = " << params.height
+          << "\nbitsPerSample = " << params.bitsPerSample
+          << "\nstride = " << params.stride
+          << "\ncomponents = " << params.components
+          << "\nallowedLossyError = " << params.allowedLossyError << std::endl;
+      }
+#endif
       // allowedlossyerror == 0 => Lossless
       LossyFlag = params.allowedLossyError != 0;
       const size_t tmp0_size =
@@ -226,6 +250,7 @@ JPEGLSCodec::Decode2(DataElement const & in, char * out_buffer, size_t len)
       delete[] mybuffer;
       if (result != ApiResult::OK)
       {
+        mdcmAlwaysWarnMacro("Could not parse JPEG-LS header");
         return false;
       }
       os.write(tmp0, tmp0_size);
@@ -329,16 +354,16 @@ JPEGLSCodec::GetHeaderInfo(std::istream & is)
   {
     return false;
   }
-#if 0
-      {
-        std::cout
-          << "\nwidth = " << metadata.width
-          << "\nheight = " << metadata.height
-          << "\nbitsPerSample = " << metadata.bitsPerSample
-          << "\nstride = " << metadata.stride
-          << "\ncomponents = " << metadata.components
-          << "\nallowedLossyError = " << metadata.allowedLossyError << std::endl;
-      }
+#ifdef MDCM_PRINT_JPEGLS_PARAMS
+  {
+    std::cout
+      << "\nwidth = " << metadata.width
+      << "\nheight = " << metadata.height
+      << "\nbitsPerSample = " << metadata.bitsPerSample
+      << "\nstride = " << metadata.stride
+      << "\ncomponents = " << metadata.components
+      << "\nallowedLossyError = " << metadata.allowedLossyError << std::endl;
+  }
 #endif
   delete[] dummy_buffer;
   this->Dimensions[0] = metadata.width;
@@ -440,8 +465,8 @@ JPEGLSCodec::AppendFrameEncode(std::ostream & out, const char * data, size_t dat
   assert(datalen == dimensions[0] * dimensions[1] * pf.GetPixelSize());
   std::vector<unsigned char> rgbyteCompressed;
   rgbyteCompressed.resize(static_cast<size_t>(dimensions[0]) *  dimensions[1] * 4);
-  size_t cbyteCompressed{};
-  const bool   b =
+  size_t     cbyteCompressed{};
+  const bool b =
     this->CodeFrameIntoBuffer(reinterpret_cast<char *>(rgbyteCompressed.data()),
                               rgbyteCompressed.size(),
                               cbyteCompressed,
@@ -468,9 +493,20 @@ JPEGLSCodec::DecodeByStreamsCommon(const char * buffer, size_t totalLen, std::ve
   JlsParameters         params = {};
   if (JpegLsReadHeader(pbyteCompressed, cbyteCompressed, &params, nullptr) != ApiResult::OK)
   {
-    mdcmDebugMacro("Could not parse JPEG-LS header");
+    mdcmAlwaysWarnMacro("Could not parse JPEG-LS header");
     return false;
   }
+#ifdef MDCM_PRINT_JPEGLS_PARAMS
+  {
+    std::cout
+      << "\nwidth = " << params.width
+      << "\nheight = " << params.height
+      << "\nbitsPerSample = " << params.bitsPerSample
+      << "\nstride = " << params.stride
+      << "\ncomponents = " << params.components
+      << "\nallowedLossyError = " << params.allowedLossyError << std::endl;
+  }
+#endif
   if (params.colorTransformation != ColorTransformation::None)
   {
     mdcmDebugMacro("JPEGLSCodec::DecodeByStreamsCommon: found color transformation "
@@ -484,7 +520,7 @@ JPEGLSCodec::DecodeByStreamsCommon(const char * buffer, size_t totalLen, std::ve
     JpegLsDecode(rgbyteOut.data(), rgbyteOut.size(), pbyteCompressed, cbyteCompressed, &params, nullptr);
   if (result != ApiResult::OK)
   {
-    mdcmErrorMacro("Could not decode JPEG-LS stream");
+    mdcmAlwaysWarnMacro("Could not decode JPEG-LS stream");
     return false;
   }
   return true;
@@ -499,9 +535,20 @@ JPEGLSCodec::DecodeByStreamsCommon2(const char * buffer, size_t totalLen, char *
   JlsParameters         params = {};
   if (JpegLsReadHeader(pbyteCompressed, cbyteCompressed, &params, nullptr) != ApiResult::OK)
   {
-    mdcmDebugMacro("Could not parse JPEG-LS header");
+    mdcmAlwaysWarnMacro("Could not parse JPEG-LS header");
     return false;
   }
+#ifdef MDCM_PRINT_JPEGLS_PARAMS
+  {
+    std::cout
+      << "\nwidth = " << params.width
+      << "\nheight = " << params.height
+      << "\nbitsPerSample = " << params.bitsPerSample
+      << "\nstride = " << params.stride
+      << "\ncomponents = " << params.components
+      << "\nallowedLossyError = " << params.allowedLossyError << std::endl;
+  }
+#endif
   if (params.colorTransformation != ColorTransformation::None)
   {
     mdcmDebugMacro("JPEGLSCodec::DecodeByStreamsCommon2: found color transformation "
@@ -523,7 +570,7 @@ JPEGLSCodec::DecodeByStreamsCommon2(const char * buffer, size_t totalLen, char *
                                   nullptr);
   if (result != ApiResult::OK)
   {
-    mdcmErrorMacro("Could not decode JPEG-LS stream");
+    mdcmAlwaysWarnMacro("Could not decode JPEG-LS stream");
     return false;
   }
   return true;
@@ -571,7 +618,7 @@ JPEGLSCodec::CodeFrameIntoBuffer(char * outdata, size_t outlen, size_t & complen
   ApiResult error = JpegLsEncode(outdata, outlen, &complen, indata, inlen, &params, nullptr);
   if (error != ApiResult::OK)
   {
-    mdcmErrorMacro("Error compressing: " << static_cast<int>(error));
+    mdcmAlwaysWarnMacro("Error compressing: " << static_cast<int>(error));
     return false;
   }
   assert(complen < outlen);
