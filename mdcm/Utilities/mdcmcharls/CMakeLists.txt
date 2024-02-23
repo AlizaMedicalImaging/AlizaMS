@@ -9,8 +9,6 @@ set(BUILD_SHARED_LIBS OFF)
 
 string(TOLOWER ${CHARLS_NAMESPACE} CHARLS_LIBRARY_NAME)
 
-add_definitions(-DCHARLS_NO_DEPRECATED_WARNING)
-
 add_library(${CHARLS_LIBRARY_NAME}
   "${CMAKE_CURRENT_LIST_DIR}/charls_jpegls_decoder.cpp"
   "${CMAKE_CURRENT_LIST_DIR}/charls_jpegls_encoder.cpp"
