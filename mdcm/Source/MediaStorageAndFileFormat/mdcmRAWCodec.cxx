@@ -219,7 +219,16 @@ RAWCodec::DecodeBytes(const char * inBytes, size_t inBufferLength, char * outByt
   }
   else
   {
-    memcpy(outBytes, str.c_str(), inOutBufferLength);
+    const size_t len = str.size();
+    if (inOutBufferLength <= len)
+    {
+      memcpy(outBytes, str.c_str(), inOutBufferLength);
+    }
+    else
+    {
+      mdcmAlwaysWarnMacro("RAWCodec::DecodeBytes: truncating" );
+      memcpy(outBytes, str.c_str(), len);
+    }
   }
   return r;
 }

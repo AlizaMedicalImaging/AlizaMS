@@ -46,7 +46,7 @@ ByteValue::ByteValue(std::vector<char> & v)
   , Length(static_cast<uint32_t>(v.size()))
 {}
 
-ByteValue::ByteValue(ByteValue && other)
+ByteValue::ByteValue(ByteValue && other) noexcept
 {
   *this = std::move(other);
 }

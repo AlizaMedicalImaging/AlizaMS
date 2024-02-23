@@ -276,7 +276,7 @@ public:
       return;
     while (_is >> std::ws >> data[length++] >> std::ws >> backslash)
     {
-      ;;
+      ;
     }
   }
 

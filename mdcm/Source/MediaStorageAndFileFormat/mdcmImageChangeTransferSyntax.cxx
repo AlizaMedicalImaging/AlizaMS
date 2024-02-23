@@ -124,7 +124,8 @@ ImageChangeTransferSyntax::Change()
     const bool b = Input->GetBuffer(const_cast<char *>(bv0->GetPointer()));
     if (!b)
     {
-      mdcmErrorMacro("Error in getting buffer from input image.");
+      mdcmErrorMacro("Can not get the buffer from an input image");
+      delete bv0;
       return false;
     }
     pixeldata.SetValue(*bv0);
@@ -167,6 +168,7 @@ ImageChangeTransferSyntax::Change()
         const bool bb = pixmap->GetIconImage().GetBuffer(const_cast<char *>(bv->GetPointer()));
         if (!bb)
         {
+          delete bv;
           return false;
         }
         iconpixeldata.SetValue(*bv);

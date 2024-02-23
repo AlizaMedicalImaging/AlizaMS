@@ -75,15 +75,11 @@ endif()
 set(ALIZA_QT_VERSION "QT_VERSION_NOT_SELECTED" CACHE STRING "Qt major version")
 set_property(CACHE ALIZA_QT_VERSION PROPERTY STRINGS "QT_VERSION_NOT_SELECTED" "4" "5" "6")
 
-# C++ standard "Not set" is usually safe and recommended, except e.g.:
-#   - C++11 is required for CCG 4.8
-#   - C++14 may be required to avoid warnings on Debian 10 with distro's ITK 4.12
-#   - testing
-#   - etc.
+# C++ standard "Not set" is usually safe and recommended
 # There is no guarantee that the option will work,
 # check "__cplusplus" (s. main.cpp PRINT_HOST_INFO define).
 set(ALIZA_CXX_STANDARD "Not set" CACHE STRING "Select C++ standard, usually not requied")
-set_property(CACHE ALIZA_CXX_STANDARD PROPERTY STRINGS "Not set" "11" "14" "17" "20")
+set_property(CACHE ALIZA_CXX_STANDARD PROPERTY STRINGS "Not set" "14" "17" "20" "23")
 
 # Force-disable SSE/SSE2.
 option(ALIZA_DISABLE_SIMDMATH "Disable SSE/SSE2" OFF)
@@ -243,11 +239,10 @@ if(MDCM_USE_SYSTEM_CHARLS)
   if(CHARLS_LOW)
     add_definitions(-DMDCM_CHARLS_LOW)
   endif()
-  # TODO update CharLS to be ready for future v3
-  add_definitions(-DCHARLS_NO_DEPRECATED_WARNING)
 else()
   set(MDCM_CHARLS_LIBRARIES mdcmcharls)
 endif()
+add_definitions(-DCHARLS_NO_DEPRECATED_WARNING)
 
 if(MDCM_USE_SYSTEM_OPENJPEG)
   find_package(OpenJPEG 2.0.0 REQUIRED)
@@ -305,8 +300,8 @@ endmacro()
 #
 
 set(MDCM_MAJOR_VERSION 1)
-set(MDCM_MINOR_VERSION 3)
-set(MDCM_BUILD_VERSION 8)
+set(MDCM_MINOR_VERSION 5)
+set(MDCM_BUILD_VERSION 0)
 set(MDCM_VERSION "${MDCM_MAJOR_VERSION}.${MDCM_MINOR_VERSION}.${MDCM_BUILD_VERSION}")
 set(MDCM_API_VERSION "${MDCM_MAJOR_VERSION}.${MDCM_MINOR_VERSION}")
 

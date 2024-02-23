@@ -1,0 +1,18 @@
+; Copyright (c) Team CharLS.
+; SPDX-License-Identifier: BSD-3-Clause
+
+; In x86 DLL builds, C functions can be exported with __declspec(dllexport) but will
+; have different names depending on the calling convention. The __stdcall uses by default a
+; decoration with @ and the number of bytes in the parameter list.
+; The legacy functions have however always been exported with undecorated names, to ensure
+; a stable ABI, explicit define the legacy exported functions here.
+; Note 1: new functions are exported with the default naming decoration as this will
+;         ensure incorrect linkage detection at runtime
+; Note 2: a x64 DLL build doesn't require a .def files as only 1 calling convention is used in x64 mode.
+
+LIBRARY
+EXPORTS
+    JpegLsEncode
+    JpegLsDecode
+    JpegLsDecodeRect
+    JpegLsReadHeader
