@@ -131,12 +131,14 @@ JPEGLSCodec::Decode(DataElement const & in, DataElement & out)
       std::vector<unsigned char> rgbyteOut;
       rgbyteOut.resize(
         static_cast<size_t>(params.height) * params.width * ((params.bitsPerSample + 7) / 8) * params.components);
+      char charls_error[256]{};
       ApiResult result =
-        JpegLsDecode(rgbyteOut.data(), rgbyteOut.size(), pbyteCompressed, cbyteCompressed, &params, nullptr);
+        JpegLsDecode(rgbyteOut.data(), rgbyteOut.size(), pbyteCompressed, cbyteCompressed, &params, charls_error);
       delete[] mybuffer;
       if (result != ApiResult::OK)
       {
-        mdcmAlwaysWarnMacro("Could not parse JPEG-LS header");
+        mdcmAlwaysWarnMacro("Could not decode JPEG-LS stream: " << static_cast<int>(result)
+                            << '\n' << charls_error);
         return false;
       }
       os.write(reinterpret_cast<const char *>(rgbyteOut.data()), rgbyteOut.size());
@@ -246,11 +248,13 @@ JPEGLSCodec::Decode2(DataElement const & in, char * out_buffer, size_t len)
         delete[] mybuffer;
         return false;
       }
-      ApiResult result = JpegLsDecode(tmp0, tmp0_size, pbyteCompressed, cbyteCompressed, &params, nullptr);
+      char charls_error[256]{};
+      ApiResult result = JpegLsDecode(tmp0, tmp0_size, pbyteCompressed, cbyteCompressed, &params, charls_error);
       delete[] mybuffer;
       if (result != ApiResult::OK)
       {
-        mdcmAlwaysWarnMacro("Could not parse JPEG-LS header");
+        mdcmAlwaysWarnMacro("Could not decode JPEG-LS stream: " << static_cast<int>(result)
+                            << '\n' << charls_error);
         return false;
       }
       os.write(tmp0, tmp0_size);
@@ -516,11 +520,13 @@ JPEGLSCodec::DecodeByStreamsCommon(const char * buffer, size_t totalLen, std::ve
   LossyFlag = params.allowedLossyError != 0;
   rgbyteOut.resize(
     static_cast<size_t>(params.height) * params.width * ((params.bitsPerSample + 7) / 8) * params.components);
+  char charls_error[256]{};
   ApiResult result =
-    JpegLsDecode(rgbyteOut.data(), rgbyteOut.size(), pbyteCompressed, cbyteCompressed, &params, nullptr);
+    JpegLsDecode(rgbyteOut.data(), rgbyteOut.size(), pbyteCompressed, cbyteCompressed, &params, charls_error);
   if (result != ApiResult::OK)
   {
-    mdcmAlwaysWarnMacro("Could not decode JPEG-LS stream");
+    mdcmAlwaysWarnMacro("Could not decode JPEG-LS stream: " << static_cast<int>(result)
+                        << '\n' << charls_error);
     return false;
   }
   return true;
@@ -562,15 +568,17 @@ JPEGLSCodec::DecodeByStreamsCommon2(const char * buffer, size_t totalLen, char *
   {
     mdcmAlwaysWarnMacro("DecodeByStreamsCommon2: out_size=" << out_size << " out_size2=" << out_size2);
   }
+  char charls_error[256]{};
   ApiResult result = JpegLsDecode(out,
                                   (out_size > out_size2 ? out_size : out_size2),
                                   pbyteCompressed,
                                   cbyteCompressed,
                                   &params,
-                                  nullptr);
+                                  charls_error);
   if (result != ApiResult::OK)
   {
-    mdcmAlwaysWarnMacro("Could not decode JPEG-LS stream");
+    mdcmAlwaysWarnMacro("Could not decode JPEG-LS stream: " << static_cast<int>(result)
+                        << '\n' << charls_error);
     return false;
   }
   return true;
@@ -615,10 +623,12 @@ JPEGLSCodec::CodeFrameIntoBuffer(char * outdata, size_t outlen, size_t & complen
     mdcmAlwaysWarnMacro("Not supported: samples per pixel " << samples_pixel);
     return false;
   }
-  ApiResult error = JpegLsEncode(outdata, outlen, &complen, indata, inlen, &params, nullptr);
+  char charls_error[256]{};
+  ApiResult error = JpegLsEncode(outdata, outlen, &complen, indata, inlen, &params, charls_error);
   if (error != ApiResult::OK)
   {
-    mdcmAlwaysWarnMacro("Error compressing: " << static_cast<int>(error));
+    mdcmAlwaysWarnMacro("Error JPEG-LS compressing: " << static_cast<int>(error)
+                        << '\n' << charls_error);
     return false;
   }
   assert(complen < outlen);
