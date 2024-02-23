@@ -40,7 +40,7 @@ class MDCM_EXPORT ByteValue : public Value
 public:
   ByteValue(const char * array = nullptr, const VL & vl = 0);
   ByteValue(std::vector<char> &);
-  ByteValue(ByteValue && val);
+  ByteValue(ByteValue && val) noexcept;
   ~ByteValue() = default;
 
   operator const std::vector<char> &() const { return Internal; }
@@ -54,7 +54,7 @@ public:
   }
 
   ByteValue &
-  operator=(ByteValue && other)
+  operator=(ByteValue && other) noexcept
   {
     if (this != &other)
     {

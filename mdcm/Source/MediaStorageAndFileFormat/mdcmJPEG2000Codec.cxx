@@ -1509,6 +1509,15 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
     int                w = image->comps[compno].w;
     int                wr = int_ceildivpow2(image->comps[compno].w, image->comps[compno].factor);
     int                hr = int_ceildivpow2(image->comps[compno].h, image->comps[compno].factor);
+    if (wr != Dimensions[0] || hr != Dimensions[1])
+    {
+      mdcmAlwaysWarnMacro("JPEG2000Codec: dimension is invalid\n  "
+                          << wr << ' ' << Dimensions[0] << "\n  " << hr << ' ' << Dimensions[1]);
+      opj_destroy_codec(dinfo);
+      opj_image_destroy(image);
+      delete[] raw;
+      return std::make_pair<char*, size_t>(nullptr, 0);
+    }
     // ELSCINT1_JP2vsJ2K.dcm
     // -> prec = 12, bpp = 0, sgnd = 0
     if (comp->sgnd != PF.GetPixelRepresentation())
@@ -1545,7 +1554,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
       uint8_t * data8 = static_cast<uint8_t *>(vraw) + compno;
       for (int i = 0; i < wr * hr; ++i)
       {
-        int v = image->comps[compno].data[i / wr * w + i % wr];
+        const int v = image->comps[compno].data[i / wr * w + i % wr];
         *data8 = static_cast<uint8_t>(v);
         data8 += image->numcomps;
       }
@@ -1556,7 +1565,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
       uint16_t * data16 = static_cast<uint16_t *>(vraw) + compno;
       for (int i = 0; i < wr * hr; ++i)
       {
-        int v = image->comps[compno].data[i / wr * w + i % wr];
+        const int v = image->comps[compno].data[i / wr * w + i % wr];
         *data16 = static_cast<uint16_t>(v);
         data16 += image->numcomps;
       }
@@ -1566,7 +1575,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
       uint32_t * data32 = static_cast<uint32_t *>(vraw) + compno;
       for (int i = 0; i < wr * hr; ++i)
       {
-        int v = image->comps[compno].data[i / wr * w + i % wr];
+        const int v = image->comps[compno].data[i / wr * w + i % wr];
         *data32 = static_cast<uint32_t>(v);
         data32 += image->numcomps;
       }
