@@ -340,7 +340,6 @@ if(MDCM_USE_SYSTEM_CHARLS)
 else()
   include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities/mdcmcharls")
 endif()
-add_definitions(-DCHARLS_NO_DEPRECATED_WARNING)
 
 if(MDCM_USE_SYSTEM_OPENJPEG)
   include_directories(${OPENJPEG_INCLUDE_DIRS})
