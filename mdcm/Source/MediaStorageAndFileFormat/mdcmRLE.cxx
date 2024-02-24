@@ -300,7 +300,8 @@ RLEEncoder::write_header(RLEDestination & d)
   rh.offset[0] = 64; // required
   for (unsigned int s = 1; s < nsegs; ++s)
   {
-    rh.offset[s] += rh.offset[s - 1] + comp_len[s - 1];
+    // TODO check again
+    rh.offset[s] += static_cast<unsigned int>(rh.offset[s - 1] + comp_len[s - 1]);
   }
   assert(check_header(rh, pt));
   d.write(reinterpret_cast<char *>(&rh), sizeof(rh));

@@ -192,8 +192,8 @@ public:
   Read(std::istream & is)
   {
     // header 64 bytes
-    static_assert(sizeof(unsigned int) * 16 == 64);
-    static_assert(sizeof(RLEHeader) == 64);
+    static_assert(sizeof(unsigned int) * 16 == 64, "");
+    static_assert(sizeof(RLEHeader) == 64, "");
     is.read(reinterpret_cast<char *>(&header), 64);
     SwapperNoOp::SwapArray(reinterpret_cast<unsigned int *>(&header), 16);
     unsigned int numSegments = header.num_segments;
