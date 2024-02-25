@@ -24,6 +24,7 @@
 #include <vector>
 #include <algorithm>
 #include <cstring>
+#include "mdcmTrace.h"
 
 namespace
 {
@@ -285,8 +286,8 @@ RLEEncoder::write_header(RLEDestination & d)
   size_t      buflen = internals->invalues.size();
   RLEHeader & rh = internals->rh;
   rh.num_segments = nsegs;
-  RLESource::streampos_t start = src->tell();  // remember start position
-  unsigned long long     comp_len[16]{}; // 15 is the max
+  std::streampos start = src->tell();  // remember start position
+  long long      comp_len[16]{}; // 15 is the max
   for (long long y = 0; y < h; ++y)
   {
     src->read_into_segments(buffer, buflen, internals->img);
@@ -300,12 +301,17 @@ RLEEncoder::write_header(RLEDestination & d)
   rh.offset[0] = 64; // required
   for (unsigned int s = 1; s < nsegs; ++s)
   {
-    // TODO check again
-    rh.offset[s] += static_cast<unsigned int>(rh.offset[s - 1] + comp_len[s - 1]);
+    const long long tmp0 = comp_len[s - 1] + rh.offset[s - 1];
+    if (tmp0 < 0 || tmp0 > 0xffffffff)
+    {
+      mdcmAlwaysWarnMacro("Overflow in RLEEncoder::write_header, " << tmp0);
+      return false;
+    }
+    rh.offset[s] += static_cast<unsigned int>(tmp0);
   }
   assert(check_header(rh, pt));
   d.write(reinterpret_cast<char *>(&rh), sizeof(rh));
-  unsigned int         comp_pos[16]{};
+  long long            comp_pos[16]{};
   const unsigned int * offsets = internals->rh.offset;
   for (unsigned int s = 0; s < nsegs; ++s)
   {
@@ -369,7 +375,7 @@ RLEEncoder::count_nonrepetitive_bytes(const char * start, long long len)
       {
         continue;
       }
-	    // 'count' can go negative
+      // 'count' can go negative
       --count;
       break;
     }
@@ -393,8 +399,8 @@ RLEEncoder::encode_row(RLEDestination & d)
   internals->invalues.resize(w * numsegs);
   internals->outvalues.resize(w * 2); // Worst possible case?
   src->read_into_segments(&internals->invalues[0], internals->invalues.size(), internals->img);
-  unsigned long long * comp_pos = internals->comp_pos;
-  long long            n{};
+  long long * comp_pos = internals->comp_pos;
+  long long   n{};
   for (long long s = 0; s < numsegs; ++s)
   {
     const long long ret =

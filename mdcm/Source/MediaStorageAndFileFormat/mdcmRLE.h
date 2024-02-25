@@ -26,6 +26,8 @@
 #include <stdexcept>
 #include <cassert>
 #include <vector>
+#include <iostream>
+#include "mdcmTypes.h"
 
 namespace mdcm
 {
@@ -155,8 +157,6 @@ private:
 class RLESource
 {
 public:
-  typedef unsigned long long streampos_t;
-
   // This function reads in 'len' bytes so that 'out' contains N pixel
   // spread into chunks.
   // E.g. for a RGB 8-bit input, 'out' will contain RRRRR ... GGGGG .... BBBBB.
@@ -208,19 +208,19 @@ public:
         {
           const size_t llen = len / numsegs;
           assert(ii.get_width() == llen);
-          unsigned int plane = ii.get_width() * ii.get_height();
-          streampos_t  pos = tell();
-          long long    nvalues = read(out + 0 * llen, llen);
+          std::streamoff plane = static_cast<std::streamoff>(ii.get_width()) * ii.get_height();
+          std::streampos pos = tell();
+          size_t         nvalues = read(out, llen);
           assert(nvalues == llen);
-          bool b = seek(pos + 1 * plane);
+          bool b = seek(pos + plane);
           assert(b);
-          nvalues = read(out + 1 * llen, llen);
+          nvalues = read(out + llen, llen);
           assert(nvalues == llen);
           b = seek(pos + 2 * plane);
           assert(b);
           nvalues = read(out + 2 * llen, llen);
           assert(nvalues == llen);
-          b = seek(pos + llen);
+          b = seek(pos + static_cast<std::streamoff>(llen));
           assert(b);
           (void)nvalues;
           (void)b;
@@ -237,11 +237,11 @@ public:
   virtual size_t
   read(char *, size_t) = 0;
 
-  virtual streampos_t
+  virtual std::streampos
   tell() = 0;
 
   virtual bool
-  seek(streampos_t) = 0;
+  seek(std::streampos) = 0;
 
   virtual bool
   eof() = 0;
@@ -255,25 +255,23 @@ public:
 class RLEDestination
 {
 public:
-  typedef unsigned long long streampos_t;
-
   virtual size_t
   write(const char *, size_t) = 0;
 
   virtual bool
-  seek(streampos_t) = 0;
+  seek(std::streampos) = 0;
   
   virtual ~RLEDestination() = default;
 };
 
 struct RLEEncoderInternal
 {
-  RLEImageInfo       img;
-  RLEHeader          rh;
-  RLESource *        src;
-  unsigned long long comp_pos[16];
-  std::vector<char>  invalues;
-  std::vector<char>  outvalues;
+  RLEImageInfo      img;
+  RLEHeader         rh;
+  RLESource *       src;
+  long long         comp_pos[16];
+  std::vector<char> invalues;
+  std::vector<char> outvalues;
 };
 
 struct RLEDecoderInternal

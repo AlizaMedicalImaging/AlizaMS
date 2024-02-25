@@ -230,14 +230,14 @@ public:
     assert(cur <= ptr + len);
     return l;
   }
-  streampos_t
+  std::streampos
   tell()
   {
     assert(cur <= ptr + len);
-    return static_cast<streampos_t>(cur - ptr);
+    return static_cast<std::streampos>(cur - ptr);
   }
   bool
-  seek(streampos_t pos)
+  seek(std::streampos pos)
   {
     cur = ptr + pos;
     assert(cur <= ptr + len && cur >= ptr);
@@ -277,7 +277,7 @@ public:
     return len;
   }
   bool
-  seek(streampos_t abs_pos)
+  seek(std::streampos abs_pos)
   {
     stream.seekp(abs_pos + start);
     return true;
@@ -719,7 +719,7 @@ RLECodec::DecodeByStreams(std::istream & is, std::ostream & os)
       // ACUSON-24-YBR_FULL-RLE.dcm
       // D_CLUNIE_CT1_RLE.dcm
       // This should be at most the \0 padding
-      std::streamoff check = frame.header.offset[i] - pos; // should it be a streampos or a uint32? mmr
+      std::streamoff check = frame.header.offset[i] - pos;
       // check == 2 for mdcmDataExtra/mdcmSampleData/US_DataSet/GE_US/2929J686-breaker
       // assert(check == 1 || check == 2);
       (void)check; // warning removal
