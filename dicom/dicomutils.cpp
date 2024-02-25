@@ -4712,11 +4712,11 @@ void DicomUtils::read_frame_times(const mdcm::DataSet & ds, ImageVariant * ivari
 		const mdcm::ByteValue * bv = e0.GetByteValue();
 		if (bv)
 		{
-			char * buffer = new char[4];
 			const unsigned long long length =
 				static_cast<unsigned long long>(bv->GetLength());
 			if (length == 4)
 			{
+				char * buffer = new char[4];
 				const bool ok0 = bv->GetBuffer(buffer, 4);
 				if (ok0)
 				{
@@ -4764,8 +4764,8 @@ void DicomUtils::read_frame_times(const mdcm::DataSet & ds, ImageVariant * ivari
 						}
 					}
 				}
+				delete [] buffer;
 			}
-			delete [] buffer;
 		}
 	}
 	else
