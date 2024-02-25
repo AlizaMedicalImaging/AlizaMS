@@ -170,7 +170,7 @@ public:
     const unsigned int npadded = bpp / 8U;
     if (numsegs == 1)
     {
-      const long long nvalues = read(out, len);
+      const size_t nvalues = read(out, len);
       assert(nvalues == len);
       (void)nvalues;
     }
@@ -181,22 +181,22 @@ public:
       {
         const size_t llen = len / numsegs;
         char *       sbuf[12]; // max possible is 12
-        for (unsigned int s = 0; s < numsegs; ++s)
+        for (size_t s = 0; s < numsegs; ++s)
         {
           sbuf[s] = out + s * llen;
         }
         char values[12];
         for (size_t l = 0; l < llen; ++l)
         {
-          const long long nvalues = read(values, numsegs);
+          const size_t nvalues = read(values, numsegs);
           assert(nvalues == numsegs);
           (void)nvalues;
-          for (unsigned int c = 0; c < nc; ++c)
+          for (size_t c = 0; c < nc; ++c)
           {
-            for (unsigned int p = 0; p < npadded; ++p)
+            for (size_t p = 0; p < npadded; ++p)
             {
-              const unsigned int i = p + c * npadded;
-              const unsigned int j = (npadded - 1 - p) + c * npadded; // little endian
+              const size_t i = p + c * npadded;
+              const size_t j = (npadded - 1 - p) + c * npadded; // little endian
               *sbuf[i]++ = values[j];
             }
           }

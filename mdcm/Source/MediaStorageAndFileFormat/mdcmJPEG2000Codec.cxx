@@ -1506,10 +1506,12 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
   for (unsigned int compno = 0; compno < image->numcomps; ++compno)
   {
     opj_image_comp_t * comp = &image->comps[compno];
-    int                w = image->comps[compno].w;
-    int                wr = int_ceildivpow2(image->comps[compno].w, image->comps[compno].factor);
-    int                hr = int_ceildivpow2(image->comps[compno].h, image->comps[compno].factor);
-    if (wr != Dimensions[0] || hr != Dimensions[1])
+    const int          w = image->comps[compno].w;
+    const int          wr = int_ceildivpow2(image->comps[compno].w, image->comps[compno].factor);
+    const int          hr = int_ceildivpow2(image->comps[compno].h, image->comps[compno].factor);
+    if (wr < 0 || hr < 0 ||
+        static_cast<unsigned int>(wr) != Dimensions[0] ||
+        static_cast<unsigned int>(hr) != Dimensions[1])
     {
       mdcmAlwaysWarnMacro("JPEG2000Codec: dimension is invalid\n  "
                           << wr << ' ' << Dimensions[0] << "\n  " << hr << ' ' << Dimensions[1]);
