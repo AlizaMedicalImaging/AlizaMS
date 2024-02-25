@@ -92,17 +92,33 @@ process_file(const char * filename, unsigned char * digest)
   }
   size_t read = fread(buffer, 1, file_size, file);
   if (read != file_size)
+  {
+    free(buffer);
+    fclose(file);
     return false;
+  }
   SHA_CTX ctx;
   int     ret = SHA1_Init(&ctx);
   if (!ret)
+  {
+    free(buffer);
+    fclose(file);
     return false;
+  }
   ret = SHA1_Update(&ctx, buffer, file_size);
   if (!ret)
+  {
+    free(buffer);
+    fclose(file);
     return false;
+  }
   ret = SHA1_Final(digest, &ctx);
   if (!ret)
+  {
+    free(buffer);
+    fclose(file);
     return false;
+  }
   free(buffer);
   fclose(file);
   return true;

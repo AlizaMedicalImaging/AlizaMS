@@ -536,7 +536,6 @@ CAPICryptographicMessageSyntax::LoadFile(const char * filename, BYTE *& buffer, 
   if (f == nullptr)
   {
     mdcmErrorMacro("Couldn't open the file: " << filename);
-    fclose(f);
     return false;
   }
   fseek(f, 0L, SEEK_END);

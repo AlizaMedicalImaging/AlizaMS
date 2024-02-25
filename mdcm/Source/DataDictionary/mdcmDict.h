@@ -122,17 +122,13 @@ public:
         if (strcmp(keyword, it->second.GetKeyword()) == 0)
         {
           tag = it->first;
-          break;
+          assert(DictInternal.count(tag) == 1);
+          return it->second;
         }
       }
     }
-    else
-    {
-      tag = Tag(0xffff, 0xffff);
-      return tagNotFound;
-    }
-    assert(DictInternal.count(tag) == 1);
-    return it->second;
+    tag = Tag(0xffff, 0xffff);
+    return tagNotFound;
   }
 
 protected:
