@@ -113,7 +113,7 @@ public:
 
   // Construct a FileMetaInformation from an already existing DataSet:
   void
-  FillFromDataSet(DataSet const & ds);
+  FillFromDataSet(const DataSet & ds);
 
   // Get Preamble
   const Preamble &

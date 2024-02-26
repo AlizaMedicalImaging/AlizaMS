@@ -73,7 +73,7 @@ Scanner::GetString(const DataElement & de, const DataSet & ds, const bool implic
     return r;
   if (t.IsIllegal() || t.IsPrivate() || t.IsPrivateCreator())
     return r;
-  VR                vr = mdcm::VR::INVALID;
+  VR                vr;
   const DictEntry & e = dict.GetDictEntry(t);
   if (!implicit)
   {

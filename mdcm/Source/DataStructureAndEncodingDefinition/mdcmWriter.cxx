@@ -70,8 +70,8 @@ Writer::Write()
     return false;
   }
   std::ostream &        os = *Stream;
-  FileMetaInformation & Header = F->GetHeader();
-  DataSet &             DS = F->GetDataSet();
+  const FileMetaInformation & Header = F->GetHeader();
+  const DataSet &             DS = F->GetDataSet();
   if (DS.IsEmpty())
   {
     mdcmErrorMacro("DS empty");

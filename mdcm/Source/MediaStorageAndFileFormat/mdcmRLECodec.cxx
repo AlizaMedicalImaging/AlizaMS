@@ -223,7 +223,7 @@ public:
     : ptr(data), cur(data), len(datalen)
   {}
   size_t
-  read(char * out, size_t l)
+  read(char * out, size_t l) override
   {
     memcpy(out, cur, l);
     cur += l;
@@ -231,26 +231,26 @@ public:
     return l;
   }
   std::streampos
-  tell()
+  tell() override
   {
     assert(cur <= ptr + len);
     return static_cast<std::streampos>(cur - ptr);
   }
   bool
-  seek(std::streampos pos)
+  seek(std::streampos pos) override
   {
     cur = ptr + pos;
     assert(cur <= ptr + len && cur >= ptr);
     return true;
   }
   bool
-  eof()
+  eof() override
   {
     assert(cur <= ptr + len);
     return cur == ptr + len;
   }
   MemSrc *
-  clone()
+  clone() override
   {
     MemSrc * ret = new MemSrc(ptr, len);
     return ret;
@@ -271,13 +271,13 @@ public:
     start = os.tellp();
   }
   size_t
-  write(const char * in, size_t len)
+  write(const char * in, size_t len) override
   {
     stream.write(in, len);
     return len;
   }
   bool
-  seek(std::streampos abs_pos)
+  seek(std::streampos abs_pos) override
   {
     stream.seekp(abs_pos + start);
     return true;
@@ -501,9 +501,8 @@ RLECodec::Code(DataElement const & in, DataElement & out)
       {
         DoInvertPlanarConfiguration<char>(bufferrgb, ptr_img, static_cast<long long>(image_len / sizeof(char)));
       }
-      else /* (GetPixelFormat().GetBitsAllocated() == 16) */
+      else if (GetPixelFormat().GetBitsAllocated() == 16)
       {
-        assert(GetPixelFormat().GetBitsAllocated() == 16);
         // should not happen right?
         void * vbufferrgb = static_cast<void*>(bufferrgb);
         const void * vptr_img = static_cast<const void*>(ptr_img);
@@ -511,6 +510,12 @@ RLECodec::Code(DataElement const & in, DataElement & out)
           static_cast<short *>(vbufferrgb),
           static_cast<const short *>(vptr_img),
           static_cast<long long>(image_len / sizeof(short)));
+      }
+      else
+      {
+        delete[] buffer;
+        delete[] bufferrgb;
+        return false;
       }
       ptr_img = bufferrgb;
     }
@@ -696,7 +701,7 @@ RLECodec::DecodeByStreams(std::istream & is, std::ostream & os)
     RequestPaddedCompositePixelCode = true;
   }
   assert(GetPixelFormat().GetSamplesPerPixel() == 3 || GetPixelFormat().GetSamplesPerPixel() == 1);
-  // A footnote:
+  // MM: A footnote:
   // RLE *by definition* with more than one component will have applied the
   // Planar Configuration because it simply does not make sense to do it
   // otherwise. So implicitely RLE is indeed PlanarConfiguration == 1. However
@@ -718,7 +723,7 @@ RLECodec::DecodeByStreams(std::istream & is, std::ostream & os)
     {
       // ACUSON-24-YBR_FULL-RLE.dcm
       // D_CLUNIE_CT1_RLE.dcm
-      // This should be at most the \0 padding
+      // MM: This should be at most the \0 padding
       std::streamoff check = frame.header.offset[i] - pos;
       // check == 2 for mdcmDataExtra/mdcmSampleData/US_DataSet/GE_US/2929J686-breaker
       // assert(check == 1 || check == 2);
@@ -727,7 +732,7 @@ RLECodec::DecodeByStreams(std::istream & is, std::ostream & os)
     }
     size_t      numOutBytes = 0;
     signed char byte;
-    // FIXME: ALOKA_SSD-8-MONO2-RLE-SQ.dcm I think the RLE decoder is off by
+    // MM: FIXME: ALOKA_SSD-8-MONO2-RLE-SQ.dcm I think the RLE decoder is off by
     // one, we are reading in 128001 byte, while only 128000 are present
     while (numOutBytes < length)
     {
@@ -738,14 +743,14 @@ RLECodec::DecodeByStreams(std::istream & is, std::ostream & os)
         return false;
       }
       numberOfReadBytes++;
-      if (byte >= 0 /*&& byte <= 127*/) /* 2nd is always true */
+      if (byte >= 0) // byte <= 127 is always true
       {
         is.read(dummy_buffer, byte + 1);
         numberOfReadBytes += byte + 1;
         numOutBytes += byte + 1;
         tmpos.write(dummy_buffer, byte + 1);
       }
-      else if (byte <= -1 && byte >= -127)
+      else if (byte >= -127)
       {
         char nextByte;
         is.read(&nextByte, 1);
@@ -754,10 +759,7 @@ RLECodec::DecodeByStreams(std::istream & is, std::ostream & os)
         numOutBytes += -byte + 1;
         tmpos.write(dummy_buffer, -byte + 1);
       }
-      else /* byte == -128 */
-      {
-        assert(byte == -128);
-      }
+      /* else  byte == -128 */
     }
     if (numOutBytes != length)
     {
@@ -843,12 +845,6 @@ RLECodec::StopEncode(std::ostream &)
   return true;
 }
 
-bool
-RLECodec::DecodeByStreamsCommon(std::istream &, std::ostream &)
-{
-  return false;
-}
-
 size_t
 RLECodec::DecodeFragment(Fragment const & frag, char * buffer, size_t llen)
 {
@@ -874,7 +870,26 @@ RLECodec::DecodeFragment(Fragment const & frag, char * buffer, size_t llen)
   {
     return 0;
   }
-  std::streampos               p = is.tellg();
+#if 0
+  std::streampos p = is.tellg();
+  // http://groups.google.com/group/microsoft.public.vc.stl/browse_thread/thread/96740930d0e4e6b8
+  if (!!is)
+  {
+    // MM: Indeed the length of the RLE stream has been padded with a \0
+    // which is discarded
+    std::streamoff check = bv.GetLength() - p;
+    // check == 2 for 2929J686-breaker
+    if (check)
+    {
+      mdcmDebugMacro("The offset detected between RLE segments: " << check);
+    }
+  }
+  else
+  {
+    // ALOKA_SSD-8-MONO2-RLE-SQ.dcm
+    mdcmWarningMacro("Bad RLE stream");
+  }
+#endif
   const std::string::size_type check = os.str().size();
   memcpy(buffer, os.str().c_str(), check);
   return check;

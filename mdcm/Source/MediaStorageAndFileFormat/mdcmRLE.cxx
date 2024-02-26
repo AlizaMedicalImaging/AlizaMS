@@ -132,21 +132,21 @@ skip_row_internal(mdcm::RLESource & s, const long long width)
   bool      re{}; // read error
   while (numOutBytes < width && !re && !s.eof())
   {
-    const long long check = s.read(&b, 1);
+    const size_t check = s.read(&b, 1);
     if (check != 1)
       re = true;
-    if (b >= 0 /*&& b <= 127*/) /* 2nd is always true */
+    if (b >= 0) // b <= 127 is always true
     {
-      char            buffer[128];
-      const long long nbytes = s.read(buffer, b + 1);
+      char         buffer[128];
+      const size_t nbytes = s.read(buffer, b + 1);
       if (nbytes != b + 1)
         re = true;
       numOutBytes += nbytes;
     }
-    else if (b <= -1 && b >= -127)
+    else if (b >= -127)
     {
-      char            nextByte;
-      const long long nbytes = s.read(&nextByte, 1);
+      char         nextByte;
+      const size_t nbytes = s.read(&nextByte, 1);
       if (nbytes != 1)
         re = true;
       numOutBytes += -b + 1;
@@ -201,7 +201,7 @@ decode_internal(char *            output,
     const size_t check = s.read(&b, 1);
     assert(check == 1);
     (void)check;
-    if (b >= 0 /*&& b <= 127*/) // 2nd is always true
+    if (b >= 0) // b <= 127 is always true
     {
       long long nbytes = s.read(buffer, b + 1);
       if (nbytes != b + 1)
@@ -214,7 +214,9 @@ decode_internal(char *            output,
       if (diff > 0) // handle row crossing artefacts
       {
         nbytes -= diff;
-        memcpy(cross_row, buffer + nbytes, diff); // actual memcpy
+        if (nbytes < 0)
+          return false;
+        memcpy(cross_row, buffer + nbytes, static_cast<size_t>(diff));
         nstorage = diff;
         assert(numOutBytes + nbytes == maxlen);
       }
@@ -222,7 +224,7 @@ decode_internal(char *            output,
       cur += nbytes * nstride;
       numOutBytes += nbytes;
     }
-    else if (b <= -1 && b >= -127)
+    else if (b >= -127)
     {
       char         nextByte;
       const size_t nbytes = s.read(&nextByte, 1);
@@ -235,7 +237,9 @@ decode_internal(char *            output,
       if (diff > 0)
       {
         nrep -= diff;
-        memcpy(cross_row, buffer + nrep, diff);
+        if (nrep < 0)
+          return false;
+        memcpy(cross_row, buffer + nrep, static_cast<size_t>(diff));
         nstorage = diff;
         assert(numOutBytes + nrep == maxlen);
       }
@@ -563,11 +567,11 @@ RLEDecoder::get_row_nbytes() const
 bool
 RLEDecoder::read_header(RLEPixelInfo & pi)
 {
-  RLEHeader &     rh = internals->rh;
-  const long long size = sizeof(rh);
-  RLESource *     s = internals->sources[0];
+  RLEHeader &  rh = internals->rh;
+  const size_t size = sizeof(rh);
+  RLESource *  s = internals->sources[0];
   assert(s);
-  const long long nbytes = s->read(reinterpret_cast<char *>(&rh), sizeof(rh));
+  const size_t nbytes = s->read(reinterpret_cast<char *>(&rh), sizeof(rh));
   // Positioned exactly at offset 64, to read the first segment
   if (nbytes != size)
     return false;

@@ -44,7 +44,7 @@ SegmentReader::GetSegments()
   {
     // Add first segment
     res.push_back(itMap->second);
-    itMap++;
+    ++itMap;
     // Search and add only different segments
     SegmentVector::const_iterator itVec;
     SegmentVector::const_iterator itVecEnd;
@@ -54,7 +54,7 @@ SegmentReader::GetSegments()
       itVecEnd = res.cend(); // if res is a list, remove this line
       while (itVec != itVecEnd && itMap->second != *itVec)
       {
-        itVec++;
+        ++itVec;
       }
       if (itVec == itVecEnd)
         res.push_back(itMap->second);
@@ -215,8 +215,8 @@ SegmentReader::ReadSegment(const Item & segmentItem, const unsigned int idx)
         mdcmWarningMacro("Only a single Item is permitted in Anatomic Region Sequence, other items will be ignored");
       }
       SmartPointer<SequenceOfItems> sequence = segmentDS.GetDataElement(Tag(0x0008, 0x2218)).GetValueAsSQ();
-      Item &                        item = sequence->GetItem(1);
-      DataSet &                     itemDataSet = item.GetNestedDataSet();
+      const Item &                  item = sequence->GetItem(1);
+      const DataSet &               itemDataSet = item.GetNestedDataSet();
       // Anatomic Region Modifier Sequence (Type 3)
       basicCodedEntries = readCodeSequenceMacroAttributes(Tag(0x0008, 0x2220), itemDataSet);
       if (!basicCodedEntries.empty())
@@ -252,8 +252,8 @@ SegmentReader::ReadSegment(const Item & segmentItem, const unsigned int idx)
           "Only a single Item shall be included in Segmented Property Type Code Sequence, other items will be ignored");
       }
       SmartPointer<SequenceOfItems> sequence = segmentDS.GetDataElement(Tag(0x0062, 0x000F)).GetValueAsSQ();
-      Item &                        item = sequence->GetItem(1);
-      DataSet &                     itemDataSet = item.GetNestedDataSet();
+      const Item &                  item = sequence->GetItem(1);
+      const DataSet &               itemDataSet = item.GetNestedDataSet();
       // Segmented Property Type Modifier Sequence (Type 3)
       basicCodedEntries = readCodeSequenceMacroAttributes(Tag(0x0062, 0x0011), itemDataSet);
       if (!basicCodedEntries.empty())

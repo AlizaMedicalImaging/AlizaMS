@@ -49,35 +49,35 @@ private:
 };
 
 inline std::ostream &
-operator<<(std::ostream & os, Event & e)
+operator<<(std::ostream & os, const Event & e)
 {
   e.Print(os);
   return os;
 }
 
-#define mdcmEventMacro(classname, super)                   \
-  class classname : public super                           \
-  {                                                        \
-  public:                                                  \
-    typedef classname Self;                                \
-    typedef super Superclass;                              \
-    classname() = default;                                 \
-    virtual ~classname() = default;                        \
-    virtual const char * GetEventName() const              \
-    {                                                      \
-      return #classname;                                   \
-    }                                                      \
-    virtual bool CheckEvent(const ::mdcm::Event * e) const \
-    {                                                      \
-      return dynamic_cast<const Self *>(e) ? true : false; \
-    }                                                      \
-    virtual ::mdcm::Event * MakeObject() const             \
-    {                                                      \
-      return new Self;                                     \
-    }                                                      \
-    classname(const Self & s) : super(s) {}                \
-  private:                                                 \
-    void operator=(const Self &);                          \
+#define mdcmEventMacro(classname, super)                            \
+  class classname : public super                                    \
+  {                                                                 \
+  public:                                                           \
+    typedef classname Self;                                         \
+    typedef super Superclass;                                       \
+    classname() = default;                                          \
+    virtual ~classname() = default;                                 \
+    virtual const char * GetEventName() const override              \
+    {                                                               \
+      return #classname;                                            \
+    }                                                               \
+    virtual bool CheckEvent(const ::mdcm::Event * e) const override \
+    {                                                               \
+      return dynamic_cast<const Self *>(e) ? true : false;          \
+    }                                                               \
+    virtual ::mdcm::Event * MakeObject() const override             \
+    {                                                               \
+      return new Self;                                              \
+    }                                                               \
+    classname(const Self & s) : super(s) {}                         \
+  private:                                                          \
+    void operator=(const Self &);                                   \
   }
 
 mdcmEventMacro(NoEvent, Event);

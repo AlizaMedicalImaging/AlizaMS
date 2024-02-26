@@ -180,7 +180,7 @@ ComputeZSpacingFromIPP(const DataSet & ds, double & zspacing)
   const Tag           t1(0x5200, 0x9229);
   const Tag           t2(0x5200, 0x9230);
   std::vector<double> cosines;
-  bool                b1 =
+  const bool          b1 =
     GetDirectionCosinesValueFromSequence(ds, t1, cosines) || GetDirectionCosinesValueFromSequence(ds, t2, cosines);
   if (!b1)
   {
@@ -189,7 +189,6 @@ ComputeZSpacingFromIPP(const DataSet & ds, double & zspacing)
     if (b2)
     {
       mdcmDebugMacro("Image Orientation (Patient) cannot be stored here! Continuing");
-      b1 = b2;
     }
     else
     {

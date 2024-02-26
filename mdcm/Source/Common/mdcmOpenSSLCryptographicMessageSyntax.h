@@ -60,10 +60,10 @@ private:
   //#else
   STACK_OF(X509) * recips;
   //#endif
-  ::EVP_PKEY *       pkey;
+  ::EVP_PKEY *       pkey{};
   const EVP_CIPHER * internalCipherType;
-  char *             password;
-  size_t             passwordLength;
+  char *             password{};
+  size_t             passwordLength{};
   CipherTypes        cipherType;
   OpenSSLCryptographicMessageSyntax(const OpenSSLCryptographicMessageSyntax &); // Not implemented.
   void

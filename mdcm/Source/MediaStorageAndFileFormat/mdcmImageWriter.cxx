@@ -227,12 +227,7 @@ ImageWriter::Write()
   else
   {
     const ByteValue * bv = ds.GetDataElement(Tag(0x0008, 0x0060)).GetByteValue();
-    std::string       modality2;
-    if (bv)
-    {
-      modality2 = std::string(bv->GetPointer(), bv->GetLength());
-    }
-    else
+    if (!bv)
     {
       // remove empty Modality, and set a new one
       ds.Remove(Tag(0x0008, 0x0060)); // Modality is Type 1

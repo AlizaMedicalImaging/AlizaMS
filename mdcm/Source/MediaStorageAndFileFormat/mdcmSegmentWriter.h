@@ -47,7 +47,7 @@ public:
   void
   AddSegment(SmartPointer<Segment> segment);
   void
-  SetSegments(SegmentVector & segments);
+  SetSegments(const SegmentVector & segments);
 
 protected:
   virtual bool

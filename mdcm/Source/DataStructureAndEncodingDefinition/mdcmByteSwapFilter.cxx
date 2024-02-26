@@ -92,7 +92,7 @@ ByteSwapFilter::ByteSwap()
     }
     else if (si)
     {
-      if (si && si->GetNumberOfItems() > 0)
+      if (si->GetNumberOfItems() > 0)
       {
         SequenceOfItems::ConstIterator it2 = si->Begin();
         for (; it2 != si->End(); ++it2)

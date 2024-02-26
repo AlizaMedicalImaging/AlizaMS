@@ -45,11 +45,6 @@ public:
   {
     LastElement = de;
   }
-  void
-  SetLastElement(DataElement & de)
-  {
-    LastElement = de;
-  }
   const DataElement &
   GetLastElement() const
   {

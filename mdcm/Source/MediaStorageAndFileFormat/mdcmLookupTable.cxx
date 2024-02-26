@@ -294,41 +294,6 @@ LookupTable::SetBlueLUT(const unsigned char * blue, unsigned int length)
   SetLUT(BLUE, blue, length);
 }
 
-namespace
-{
-
-typedef union
-{
-  uint8_t  rgb[4];
-  uint32_t I;
-} U8;
-
-typedef union
-{
-  uint16_t rgb[4];
-  uint64_t I;
-} U16;
-
-struct ltstr8
-{
-  bool
-  operator()(U8 u1, U8 u2) const
-  {
-    return u1.I < u2.I;
-  }
-};
-
-struct ltstr16
-{
-  bool
-  operator()(U16 u1, U16 u2) const
-  {
-    return u1.I < u2.I;
-  }
-};
-
-} // end namespace
-
 inline void
 printrgb(const unsigned char * rgb)
 {

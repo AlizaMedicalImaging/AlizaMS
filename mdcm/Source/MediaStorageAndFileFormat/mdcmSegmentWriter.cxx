@@ -64,7 +64,7 @@ SegmentWriter::AddSegment(SmartPointer<Segment> segment)
 }
 
 void
-SegmentWriter::SetSegments(SegmentVector & segments)
+SegmentWriter::SetSegments(const SegmentVector & segments)
 {
   Segments = segments;
 }
@@ -153,14 +153,13 @@ SegmentWriter::PrepareWrite()
   segmentsSQ = ds.GetDataElement(Tag(0x0062, 0x0002)).GetValueAsSQ();
   segmentsSQ->SetLengthToUndefined();
   {
-    const unsigned int numberOfSegments = this->GetNumberOfSegments();
+    const size_t numberOfSegments = this->GetNumberOfSegments();
     assert(numberOfSegments);
     const size_t nbItems = segmentsSQ->GetNumberOfItems();
     if (nbItems < numberOfSegments)
     {
       const size_t diff = numberOfSegments - nbItems;
-      const size_t nbOfItemToMake = (diff > 0 ? diff : 0);
-      for (unsigned int i = 1; i <= nbOfItemToMake; ++i)
+      for (size_t i = 1; i <= diff; ++i)
       {
         Item item;
         item.SetVLToUndefined();
@@ -284,8 +283,7 @@ SegmentWriter::PrepareWrite()
       if (nbItems < surfaceCount)
       {
         const size_t diff = surfaceCount - nbItems;
-        const size_t nbOfItemToMake = (diff > 0 ? diff : 0);
-        for (unsigned int i = 1; i <= nbOfItemToMake; ++i)
+        for (size_t i = 1; i <= diff; ++i)
         {
           Item item;
           item.SetVLToUndefined();

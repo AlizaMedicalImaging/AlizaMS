@@ -36,10 +36,8 @@ namespace mdcm
 {
 
 OpenSSLCryptographicMessageSyntax::OpenSSLCryptographicMessageSyntax()
-  : recips(sk_X509_new_null())
-  , pkey(nullptr)
-  , password(nullptr)
 {
+  recips = sk_X509_new_null();
   cipherType = AES128_CIPHER;
   internalCipherType = CreateCipher(cipherType);
 }

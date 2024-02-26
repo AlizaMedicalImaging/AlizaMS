@@ -104,10 +104,10 @@ public:
   }
 
   bool
-  operator<=(const Tag & t2) const
+  operator<=(const Tag & other) const
   {
-    const Tag & t1 = *this;
-    return t1 == t2 || t1 < t2;
+    const Tag & t = *this;
+    return t == other || t < other;
   }
 
   // Read a tag from binary representation

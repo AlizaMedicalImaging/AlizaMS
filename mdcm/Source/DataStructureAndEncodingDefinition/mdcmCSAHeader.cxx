@@ -170,17 +170,17 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
   InternalDataSet.Clear();
   mdcmDebugMacro("Entering print");
   InternalType = UNKNOWN; // reset
-  mdcm::Tag t1(0x0029, 0x0010);
-  mdcm::Tag t2(0x0029, 0x0020);
+  mdcm::Tag tt1(0x0029, 0x0010);
+  mdcm::Tag tt2(0x0029, 0x0020);
   uint16_t  v = static_cast<uint16_t>(de.GetTag().GetElement() << 8);
   uint16_t  v2 = static_cast<uint16_t>(v >> 8);
-  if (v2 == t1.GetElement())
+  if (v2 == tt1.GetElement())
   {
-    DataElementTag = t1;
+    DataElementTag = tt1;
   }
-  else if (v2 == t2.GetElement())
+  else if (v2 == tt2.GetElement())
   {
-    DataElementTag = t2;
+    DataElementTag = tt2;
   }
   else
   {
@@ -236,10 +236,10 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
       ss.seekg(0, std::ios::beg);
       // SIEMENS-JPEG-CorruptFragClean.dcm
       InternalType = DATASET_FORMAT;
-      DataSet &   ds = InternalDataSet;
-      DataElement xde;
       try
       {
+        DataElement xde;
+        DataSet & ds = InternalDataSet;
         while (xde.Read<ExplicitDataElement, SwapperNoOp>(ss))
         {
           ds.InsertDataElement(xde); // Cannot use Insert since Group = 0x0 (< 0x8)
@@ -363,13 +363,13 @@ void
 CSAHeader::Print(std::ostream & os) const
 {
   std::set<CSAElement>::const_iterator it = InternalCSADataSet.cbegin();
-  mdcm::Tag                            t1(0x0029, 0x0010);
-  mdcm::Tag                            t2(0x0029, 0x0020);
-  if (DataElementTag == t1)
+  mdcm::Tag                            tt1(0x0029, 0x0010);
+  mdcm::Tag                            tt2(0x0029, 0x0020);
+  if (DataElementTag == tt1)
   {
     os << "Image shadow data (0029|xx10)\n\n";
   }
-  else if (DataElementTag == t2)
+  else if (DataElementTag == tt2)
   {
     os << "Series shadow data (0029|xx20)\n\n";
   }

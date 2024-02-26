@@ -30,8 +30,8 @@ File::Read(std::istream & is)
   return is;
 }
 
-std::ostream const &
-File::Write(std::ostream & os) const
+const std::ostream &
+File::Write(const std::ostream & os) const
 {
   return os;
 }

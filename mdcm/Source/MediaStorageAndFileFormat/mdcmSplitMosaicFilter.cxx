@@ -322,12 +322,12 @@ void SplitMosaicFilter::ComputeMOSAICImagePositionPatient(double ret[3],
         double z[3];
         dc.Cross(z);
         DirectionCosines::Normalize(z);
-        MrProtocol::Slice &   slice = sa.Slices[0];
-        MrProtocol::Vector3 & p = slice.Position;
-        const double          pos[3]{p.dSag, p.dCor, p.dTra};
-        const double          tmp0 = mosaic_dims[0] / 2.0 * pixelspacing[0];
-        const double          tmp1 = mosaic_dims[1] / 2.0 * pixelspacing[1];
-        const double          tmp3 = (mosaic_dims[2] - 1) / 2.0 * pixelspacing[2];
+        const MrProtocol::Slice &   slice = sa.Slices[0];
+        const MrProtocol::Vector3 & p = slice.Position;
+        const double                pos[3]{p.dSag, p.dCor, p.dTra};
+        const double                tmp0 = mosaic_dims[0] / 2.0 * pixelspacing[0];
+        const double                tmp1 = mosaic_dims[1] / 2.0 * pixelspacing[1];
+        const double                tmp3 = (mosaic_dims[2] - 1) / 2.0 * pixelspacing[2];
         ipp_csa[0] = pos[0] - tmp0 * x[0] - tmp1 * y[0] - tmp3 * z[0];
         ipp_csa[1] = pos[1] - tmp0 * x[1] - tmp1 * y[1] - tmp3 * z[1];
         ipp_csa[2] = pos[2] - tmp0 * x[2] - tmp1 * y[2] - tmp3 * z[2];
@@ -502,8 +502,6 @@ SplitMosaicFilter::Split()
   image.SetDimension(1, dims[1]);
   image.SetDimension(2, dims[2]);
   image.SetOrigin(origin);
-  PhotometricInterpretation pi;
-  pi = PhotometricInterpretation::MONOCHROME2;
   image.SetDataElement(pixeldata);
   MediaStorage ms = MediaStorage::SecondaryCaptureImageStorage;
   ms.SetFromFile(GetFile());

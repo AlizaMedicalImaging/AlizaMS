@@ -48,12 +48,11 @@ Unpack12Bits(char * out, const char * in, size_t n)
   short *               q = static_cast<short *>(vout);
   const unsigned char * p = static_cast<const unsigned char *>(vin);
   const unsigned char * end = p + n;
-  unsigned char         b0, b1, b2;
   while (p != end)
   {
-    b0 = *p++;
-    b1 = *p++;
-    b2 = *p++;
+    const unsigned char b0 = *p++;
+    const unsigned char b1 = *p++;
+    const unsigned char b2 = *p++;
     *q++ = static_cast<short>(((b1 & 0xf) << 8) + b0);
     *q++ = static_cast<short>((b1 >> 4) + (b2 << 4));
   }

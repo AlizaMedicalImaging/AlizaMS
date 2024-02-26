@@ -80,8 +80,6 @@ protected:
   StopEncode(std::ostream &) override;
 
 private:
-  bool
-  DecodeByStreamsCommon(std::istream &, std::ostream &);
   size_t
   DecodeFragment(Fragment const &, char *, size_t);
   RLEInternals *     Internals;

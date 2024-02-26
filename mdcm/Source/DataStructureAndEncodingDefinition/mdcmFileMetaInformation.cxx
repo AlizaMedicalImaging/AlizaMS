@@ -133,7 +133,7 @@ FileMetaInformation::GetSourceApplicationEntityTitle()
 }
 
 void
-FileMetaInformation::FillFromDataSet(DataSet const & ds)
+FileMetaInformation::FillFromDataSet(const DataSet & ds)
 {
   DataElement xde;
   if (!FindDataElement(Tag(0x0002, 0x0001)))

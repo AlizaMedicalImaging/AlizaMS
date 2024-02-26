@@ -454,7 +454,6 @@ DoOverlays(const DataSet & ds, Pixmap & pixeldata)
       }
       std::ostringstream unpack;
       ov.Decompress(unpack);
-      std::string s = unpack.str();
       if (!ov.IsEmpty())
       {
         assert(ov.IsInPixelData() == false);
@@ -522,7 +521,6 @@ bool
 PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
 {
   const DataSet & ds = F->GetDataSet();
-  std::string     conversion;
   bool            isacrnema = false;
   const Tag       trecognitioncode(0x0008, 0x0010);
   const Tag       pixeldataf = Tag(0x7fe0, 0x0008);
@@ -982,7 +980,6 @@ PixmapReader::ReadACRNEMAImage()
 {
   const DataSet &   ds = F->GetDataSet();
   std::stringstream ss;
-  std::string       conversion;
   // Ok we have the dataset let's feed the Image (PixelData)
   // First find how many dimensions there is:
   // D 0028|0005 [SS] [Image Dimensions (RET)] [2]

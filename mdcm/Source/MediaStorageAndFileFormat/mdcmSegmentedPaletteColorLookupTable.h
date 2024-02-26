@@ -39,7 +39,7 @@ public:
   Print(std::ostream &) const
   {}
   void
-  SetLUT(LookupTableType, const unsigned char *, unsigned int);
+  SetLUT(LookupTableType, const unsigned char *, unsigned int) override;
 };
 
 } // end namespace mdcm

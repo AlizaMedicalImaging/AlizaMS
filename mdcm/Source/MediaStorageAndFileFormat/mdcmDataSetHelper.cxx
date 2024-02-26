@@ -149,7 +149,6 @@ DataSetHelper::ComputeVR(const File & file, const DataSet & ds, const Tag & t)
       else
       {
         mdcmWarningMacro("Unhandled");
-        vr = VR::INVALID;
       }
       if (at.GetValue() == 1)
       {

@@ -99,8 +99,7 @@ SurfaceWriter::PrepareWrite()
     if (nbItems < nbSurfaces)
     {
       const size_t diff = nbSurfaces - nbItems;
-      const size_t nbOfItemToMake = (diff > 0 ? diff : 0);
-      for (unsigned int i = 1; i <= nbOfItemToMake; ++i)
+      for (size_t i = 1; i <= diff; ++i)
       {
         Item item;
         item.SetVLToUndefined();

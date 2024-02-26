@@ -129,9 +129,7 @@ ImageChangeTransferSyntax::Change()
       return false;
     }
     pixeldata.SetValue(*bv0);
-    bool success = false;
-    if (!success)
-      success = TryRAWCodec(pixeldata, *Input, *Output);
+    bool success = TryRAWCodec(pixeldata, *Input, *Output);
     if (!success)
       success = TryJPEGCodec(pixeldata, *Input, *Output);
     if (!success)
@@ -172,9 +170,7 @@ ImageChangeTransferSyntax::Change()
           return false;
         }
         iconpixeldata.SetValue(*bv);
-        success = false;
-        if (!success)
-          success = TryRAWCodec(iconpixeldata, pixmap->GetIconImage(), outpixmap->GetIconImage());
+        success = TryRAWCodec(iconpixeldata, pixmap->GetIconImage(), outpixmap->GetIconImage());
         if (!success)
           success = TryJPEGCodec(iconpixeldata, pixmap->GetIconImage(), outpixmap->GetIconImage());
         if (!success)
@@ -196,9 +192,7 @@ ImageChangeTransferSyntax::Change()
     assert(Output->GetTransferSyntax() == TS);
     return success;
   }
-  bool success = false;
-  if (!success)
-    success = TryRAWCodec(Input->GetDataElement(), *Input, *Output);
+  bool success = TryRAWCodec(Input->GetDataElement(), *Input, *Output);
   if (!success)
     success = TryJPEGCodec(Input->GetDataElement(), *Input, *Output);
   if (!success)
@@ -223,10 +217,7 @@ ImageChangeTransferSyntax::Change()
       Pixmap * outpixmap = dynamic_cast<Pixmap *>(&outbitmap);
       if (!outpixmap)
         return false;
-      success = false;
-      if (!success)
-        success =
-          TryRAWCodec(pixmap->GetIconImage().GetDataElement(), pixmap->GetIconImage(), outpixmap->GetIconImage());
+      success = TryRAWCodec(pixmap->GetIconImage().GetDataElement(), pixmap->GetIconImage(), outpixmap->GetIconImage());
       if (!success)
         success =
           TryJPEGCodec(pixmap->GetIconImage().GetDataElement(), pixmap->GetIconImage(), outpixmap->GetIconImage());

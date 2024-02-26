@@ -41,8 +41,8 @@ public:
   operator<<(std::ostream & os, const File & val);
   std::istream &
   Read(std::istream & is);
-  std::ostream const &
-  Write(std::ostream & os) const;
+  const std::ostream &
+  Write(const std::ostream & os) const;
   const FileMetaInformation &
   GetHeader() const
   {

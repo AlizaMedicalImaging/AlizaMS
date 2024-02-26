@@ -121,8 +121,11 @@ public:
     }
     if (!TagField.Read<TSwap>(is))
     {
+#if 1
       throw std::logic_error("Should not happen (item)");
+#else
       return is;
+#endif
     }
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
     // MR_Philips_Intera_SwitchIndianess_noLgtSQItem_in_trueLgtSeq.dcm
