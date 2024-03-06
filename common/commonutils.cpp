@@ -86,6 +86,21 @@ double abs_max(double x, double y, double z)
 	return r;
 }
 
+bool check_direction_matrix(const itk::Matrix<itk::SpacePrecisionType, 3, 3> & d)
+{
+	const bool r =
+		d[0][0] > -0.000001 && d[0][0] < 0.000001 &&
+		d[1][0] > -0.000001 && d[1][0] < 0.000001 &&
+		d[2][0] > -0.000001 && d[2][0] < 0.000001 &&
+		d[0][1] > -0.000001 && d[0][1] < 0.000001 &&
+		d[1][1] > -0.000001 && d[1][1] < 0.000001 &&
+		d[2][1] > -0.000001 && d[2][1] < 0.000001 &&
+		d[0][2] > -0.000001 && d[0][2] < 0.000001 &&
+		d[1][2] > -0.000001 && d[1][2] < 0.000001 &&
+		d[2][2] > -0.000001 && d[2][2] < 0.000001;
+	return r;
+}
+
 template<typename T> void calculate_min_max(
 	const typename T::Pointer & image,
 	ImageVariant * iv)
@@ -1370,16 +1385,7 @@ template<typename T> QString process_dicom_monochrome_image1(
 	spacing[0] = spacing_x;
 	spacing[1] = spacing_y;
 	spacing[2] = spacing_z;
-	*bad_direction = (
-		direction[0][0] > -0.000001 && direction[0][0] < 0.000001 &&
-		direction[1][0] > -0.000001 && direction[1][0] < 0.000001 &&
-		direction[2][0] > -0.000001 && direction[2][0] < 0.000001 &&
-		direction[0][1] > -0.000001 && direction[0][1] < 0.000001 &&
-		direction[1][1] > -0.000001 && direction[1][1] < 0.000001 &&
-		direction[2][1] > -0.000001 && direction[2][1] < 0.000001 &&
-		direction[0][2] > -0.000001 && direction[0][2] < 0.000001 &&
-		direction[1][2] > -0.000001 && direction[1][2] < 0.000001 &&
-		direction[2][2] > -0.000001 && direction[2][2] < 0.000001);
+	*bad_direction = check_direction_matrix(direction);
 	try
 	{
 		image = T::New();
@@ -1513,16 +1519,7 @@ template<typename T> QString process_dicom_rgb_image1(
 	spacing[0] = spacing_x;
 	spacing[1] = spacing_y;
 	spacing[2] = spacing_z;
-	*bad_direction = (
-		direction[0][0] > -0.000001 && direction[0][0] < 0.000001 &&
-		direction[1][0] > -0.000001 && direction[1][0] < 0.000001 &&
-		direction[2][0] > -0.000001 && direction[2][0] < 0.000001 &&
-		direction[0][1] > -0.000001 && direction[0][1] < 0.000001 &&
-		direction[1][1] > -0.000001 && direction[1][1] < 0.000001 &&
-		direction[2][1] > -0.000001 && direction[2][1] < 0.000001 &&
-		direction[0][2] > -0.000001 && direction[0][2] < 0.000001 &&
-		direction[1][2] > -0.000001 && direction[1][2] < 0.000001 &&
-		direction[2][2] > -0.000001 && direction[2][2] < 0.000001);
+	*bad_direction = check_direction_matrix(direction);
 	try
 	{
 		image = T::New();
@@ -1711,16 +1708,7 @@ template<typename T> QString process_dicom_rgba_image1(
 	spacing[0] = spacing_x;
 	spacing[1] = spacing_y;
 	spacing[2] = spacing_z;
-	*bad_direction = (
-		direction[0][0] > -0.000001 && direction[0][0] < 0.000001 &&
-		direction[1][0] > -0.000001 && direction[1][0] < 0.000001 &&
-		direction[2][0] > -0.000001 && direction[2][0] < 0.000001 &&
-		direction[0][1] > -0.000001 && direction[0][1] < 0.000001 &&
-		direction[1][1] > -0.000001 && direction[1][1] < 0.000001 &&
-		direction[2][1] > -0.000001 && direction[2][1] < 0.000001 &&
-		direction[0][2] > -0.000001 && direction[0][2] < 0.000001 &&
-		direction[1][2] > -0.000001 && direction[1][2] < 0.000001 &&
-		direction[2][2] > -0.000001 && direction[2][2] < 0.000001);
+	*bad_direction = check_direction_matrix(direction);
 	try
 	{
 		image = T::New();
