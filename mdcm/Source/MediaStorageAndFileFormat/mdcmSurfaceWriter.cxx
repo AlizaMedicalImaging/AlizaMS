@@ -26,12 +26,6 @@
 namespace mdcm
 {
 
-SurfaceWriter::SurfaceWriter()
-  : NumberOfSurfaces(0)
-{}
-
-SurfaceWriter::~SurfaceWriter() {}
-
 void
 SurfaceWriter::ComputeNumberOfSurfaces()
 {
@@ -466,8 +460,7 @@ SurfaceWriter::PrepareWrite()
           if (nbItems < numberOfPrimitives)
           {
             const size_t diff = numberOfPrimitives - nbItems;
-            const size_t nbOfItemToMake = (diff > 0 ? diff : 0);
-            for (unsigned int i = 1; i <= nbOfItemToMake; ++i)
+            for (unsigned int i = 1; i <= diff; ++i)
             {
               Item item;
               item.SetVLToUndefined();

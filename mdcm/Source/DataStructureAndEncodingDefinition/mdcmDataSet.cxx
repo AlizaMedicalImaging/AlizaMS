@@ -66,10 +66,9 @@ DataSet::Clear()
 void
 DataSet::Print(std::ostream & os, std::string const & indent) const
 {
-  ConstIterator it = DES.cbegin();
-  for (; it != DES.cend(); ++it)
+  for (ConstIterator it = DES.cbegin(); it != DES.cend(); ++it)
   {
-    os << indent << *it << "\n";
+    os << indent << *it << '\n';
   }
 }
 

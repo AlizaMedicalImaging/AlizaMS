@@ -66,9 +66,7 @@ public:
   typedef InternalClass::reverse_iterator       reverse_iterator;
   typedef InternalClass::const_reverse_iterator const_reverse_iterator;
 
-  CodeString()
-    : Internal()
-  {}
+  CodeString() = default;
 
   CodeString(const value_type * s)
     : Internal(s)
@@ -111,7 +109,7 @@ protected:
   }
 
 private:
-  String<'\\', 16> Internal;
+  String<'\\', 16> Internal{};
 };
 
 inline std::ostream &

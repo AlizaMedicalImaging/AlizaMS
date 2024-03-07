@@ -50,29 +50,33 @@ public:
   typedef ItemVector::size_type      SizeType;
   typedef ItemVector::iterator       Iterator;
   typedef ItemVector::const_iterator ConstIterator;
+
+  SequenceOfItems() = default;
+
   Iterator
   Begin()
   {
     return Items.begin();
   }
+
   Iterator
   End()
   {
     return Items.end();
   }
+
   ConstIterator
   Begin() const
   {
     return Items.cbegin();
   }
+
   ConstIterator
   End() const
   {
     return Items.cend();
   }
-  SequenceOfItems()
-    : SequenceLengthField(0xFFFFFFFF)
-  {}
+
   VL
   GetLength() const override
   {
@@ -97,24 +101,31 @@ public:
   template <typename TDE>
   VL
   ComputeLength() const;
+
   void
   Clear() override;
+
   void
   AddItem(Item const &);
+
   Item &
   AddNewUndefinedLengthItem();
+
   bool
   RemoveItemByIndex(const SizeType);
+
   bool
   IsEmpty() const
   {
     return Items.empty();
   }
+
   SizeType
   GetNumberOfItems() const
   {
     return Items.size();
   }
+
   void
   SetNumberOfItems(SizeType n)
   {
@@ -253,17 +264,15 @@ public:
   Print(std::ostream & os) const override
   {
     os << "\t(" << SequenceLengthField << ")\n";
-    ItemVector::const_iterator it = Items.cbegin();
-    for (; it != Items.cend(); ++it)
+    for (ItemVector::const_iterator it = Items.cbegin(); it != Items.cend(); ++it)
     {
-      os << "  " << *it;
+      os << ' ' << *it;
     }
     if (SequenceLengthField.IsUndefined())
     {
       const Tag seqDelItem(0xfffe, 0xe0dd);
       VL        zero = 0;
-      os << seqDelItem;
-      os << "\t" << zero;
+      os << seqDelItem << '\t' << zero;
     }
   }
 
@@ -283,9 +292,9 @@ public:
     return (SequenceLengthField == sqi.SequenceLengthField && Items == sqi.Items);
   }
 
-  VL         SequenceLengthField;
-  ItemVector Items;
-  Item       empty;
+  VL         SequenceLengthField{0xffffffff};
+  ItemVector Items{};
+  Item       empty{};
 };
 
 } // end namespace mdcm

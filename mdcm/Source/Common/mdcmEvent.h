@@ -84,12 +84,12 @@ mdcmEventMacro(NoEvent, Event);
 mdcmEventMacro(AnyEvent, Event);
 mdcmEventMacro(StartEvent, AnyEvent);
 mdcmEventMacro(EndEvent, AnyEvent);
-mdcmEventMacro(ExitEvent, AnyEvent);
+//mdcmEventMacro(ExitEvent, AnyEvent);
 mdcmEventMacro(AbortEvent, AnyEvent);
-mdcmEventMacro(ModifiedEvent, AnyEvent);
-mdcmEventMacro(InitializeEvent, AnyEvent);
+//mdcmEventMacro(ModifiedEvent, AnyEvent);
+//mdcmEventMacro(InitializeEvent, AnyEvent);
 mdcmEventMacro(IterationEvent, AnyEvent);
-mdcmEventMacro(UserEvent, AnyEvent);
+//mdcmEventMacro(UserEvent, AnyEvent);
 
 } // end namespace mdcm
 

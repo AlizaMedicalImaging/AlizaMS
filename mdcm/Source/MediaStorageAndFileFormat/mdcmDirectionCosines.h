@@ -35,7 +35,7 @@ namespace mdcm
 class MDCM_EXPORT DirectionCosines
 {
 public:
-  DirectionCosines();
+  DirectionCosines() = default;
   DirectionCosines(const double[6]);
   ~DirectionCosines() = default;
   bool
@@ -61,7 +61,7 @@ public:
   operator const double *() const { return Values; }
 
 private:
-  double Values[6];
+  double Values[6]{1.0, 0.0, 0.0, 0.0, 1.0, 0.0};
 };
 
 } // end namespace mdcm

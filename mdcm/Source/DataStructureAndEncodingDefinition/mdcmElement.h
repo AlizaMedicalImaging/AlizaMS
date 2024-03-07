@@ -194,9 +194,9 @@ public:
     {
       if (GetVR() != VR::UI)
       {
-        if (os.str().size() % 2)
+        if (os.str().size() % 2 != 0)
         {
-          os << " ";
+          os << ' ';
         }
       }
     }
@@ -316,7 +316,7 @@ public:
     {
       for (unsigned long i = 1; i < length; ++i)
       {
-        _os << "\\" << data[i];
+        _os << '\\' << data[i];
       }
     }
   }
@@ -412,7 +412,7 @@ EncodingImplementation<VR::VRASCII>::Write(const double * data, unsigned long le
     if (i == 0)
       _os << buf;
     else
-      _os << "\\" << buf;
+      _os << '\\' << buf;
   }
 }
 
@@ -518,12 +518,7 @@ class Element<TVR, VM::VM1_n>
   };
 
 public:
-  explicit Element()
-  {
-    Internal = nullptr;
-    Length = 0;
-    Save = false;
-  }
+  Element() = default;
 
   ~Element()
   {
@@ -699,9 +694,9 @@ public:
     _os << Internal[0];
     if (Length > 1)
     {
-      const unsigned long length = Length < 25 ? Length : 25; //
-      for (unsigned long i = 1; i < length; ++i)
-        _os << "," << Internal[i];
+      const unsigned int l = Length < 25 ? Length : 25; //
+      for (unsigned int i = 1; i < l; ++i)
+        _os << ',' << Internal[i];
     }
   }
 
@@ -733,9 +728,9 @@ public:
       {
         if (GetVR() != VR::UI)
         {
-          if (os.str().size() % 2)
+          if (os.str().size() % 2 != 0)
           {
-            os << " ";
+            os << ' ';
           }
         }
       }
@@ -792,9 +787,9 @@ protected:
   }
 
 private:
-  typename VRToType<TVR>::Type * Internal;
-  unsigned long                  Length;
-  bool                           Save;
+  typename VRToType<TVR>::Type * Internal{};
+  unsigned long                  Length{};
+  bool                           Save{};
 };
 
 template <long long TVR>

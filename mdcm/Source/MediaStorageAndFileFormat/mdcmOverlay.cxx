@@ -33,47 +33,32 @@ namespace mdcm
 class OverlayInternal
 {
 public:
-  OverlayInternal()
-    : InPixelData(false)
-    , Group(0)
-    , // invalid default
-    Rows(0)
-    , Columns(0)
-    , NumberOfFrames(0)
-    , Description()
-    , Type()
-    , FrameOrigin(0)
-    , BitsAllocated(0)
-    , BitPosition(0)
-    , Data()
-  {
-    Origin[0] = Origin[1] = 0;
-  }
-  bool              InPixelData;
-  unsigned short    Group;
-  unsigned short    Rows;           // (6000,0010) US
-  unsigned short    Columns;        // (6000,0011) US
-  unsigned int      NumberOfFrames; // (6000,0015) IS
-  std::string       Description;    // (6000,0022) LO
-  std::string       Type;           // (6000,0040) CS
-  signed short      Origin[2];      // (6000,0050) SS
-  unsigned short    FrameOrigin;    // (6000,0051) US
-  unsigned short    BitsAllocated;  // (6000,0100) US
-  unsigned short    BitPosition;    // (6000,0102) US
-  std::vector<char> Data;           // data, no trailing padding '\0'
+  OverlayInternal() = default;
+  bool              InPixelData{};
+  unsigned short    Group{};
+  unsigned short    Rows{};           // (6000,0010) US
+  unsigned short    Columns{};        // (6000,0011) US
+  unsigned int      NumberOfFrames{}; // (6000,0015) IS
+  std::string       Description;      // (6000,0022) LO
+  std::string       Type;             // (6000,0040) CS
+  signed short      Origin[2]{};      // (6000,0050) SS
+  unsigned short    FrameOrigin{};    // (6000,0051) US
+  unsigned short    BitsAllocated{};  // (6000,0100) US
+  unsigned short    BitPosition{};    // (6000,0102) US
+  std::vector<char> Data{};           // data, no trailing padding '\0'
   void
   Print(std::ostream & os) const
   {
-    os << "Group           0x" << std::hex << Group << std::dec << std::endl;
-    os << "Rows            " << Rows << std::endl;
-    os << "Columns         " << Columns << std::endl;
-    os << "NumberOfFrames  " << NumberOfFrames << std::endl;
-    os << "Description     " << Description << std::endl;
-    os << "Type            " << Type << std::endl;
-    os << "Origin[2]       " << Origin[0] << "," << Origin[1] << std::endl;
-    os << "FrameOrigin     " << FrameOrigin << std::endl;
-    os << "BitsAllocated   " << BitsAllocated << std::endl;
-    os << "BitPosition     " << BitPosition << std::endl;
+    os << "Group           0x" << std::hex << Group << std::dec
+       << "\nRows            " << Rows
+       << "\nColumns         " << Columns
+       << "\nNumberOfFrames  " << NumberOfFrames
+       << "\nDescription     " << Description
+       << "\nType            " << Type
+       << "\nOrigin[2]       " << Origin[0] << ',' << Origin[1]
+       << "\nFrameOrigin     " << FrameOrigin
+       << "\nBitsAllocated   " << BitsAllocated
+       << "\nBitPosition     " << BitPosition << '\n';
   }
 };
 
@@ -138,7 +123,6 @@ Overlay::Update(const DataElement & de)
 
   if (de.GetTag().GetElement() == 0x0000) // OverlayGroupLength
   {
-    ;
     ;
   }
   else if (de.GetTag().GetElement() == 0x0010) // OverlayRows
@@ -487,8 +471,7 @@ Overlay::IsZero() const
 {
   if (IsEmpty())
     return false;
-  std::vector<char>::const_iterator it = Internal->Data.cbegin();
-  for (; it != Internal->Data.cend(); ++it)
+  for (std::vector<char>::const_iterator it = Internal->Data.cbegin(); it != Internal->Data.cend(); ++it)
   {
     if (*it)
       return true;

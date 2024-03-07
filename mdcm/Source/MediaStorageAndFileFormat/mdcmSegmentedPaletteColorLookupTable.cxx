@@ -77,7 +77,7 @@ class DiscreteSegment : public Segment<EntryType>
 {
 public:
   typedef typename Segment<EntryType>::SegmentMap SegmentMap;
-  DiscreteSegment(const EntryType * first)
+  explicit DiscreteSegment(const EntryType * first)
     : Segment<EntryType>(first, first + 2 + *(first + 1))
   {}
   virtual bool
@@ -94,7 +94,7 @@ class LinearSegment : public Segment<EntryType>
 {
 public:
   typedef typename Segment<EntryType>::SegmentMap SegmentMap;
-  LinearSegment(const EntryType * first)
+  explicit LinearSegment(const EntryType * first)
     : Segment<EntryType>(first, first + 3)
   {}
   virtual bool
@@ -124,7 +124,7 @@ class IndirectSegment : public Segment<EntryType>
 {
 public:
   typedef typename Segment<EntryType>::SegmentMap SegmentMap;
-  IndirectSegment(const EntryType * first)
+  explicit IndirectSegment(const EntryType * first)
     : Segment<EntryType>(first, first + 2 + 4 / sizeof(EntryType))
   {}
   virtual bool

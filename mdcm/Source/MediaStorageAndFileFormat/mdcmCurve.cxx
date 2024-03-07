@@ -31,48 +31,38 @@ namespace mdcm
 class CurveInternal
 {
 public:
-  CurveInternal()
-    : Group(0)
-    , Dimensions(0)
-    , NumberOfPoints(0)
-    , TypeOfData()
-    , CurveDescription()
-    , DataValueRepresentation(0)
-    , CoordinateStartValue(0)
-    , CoordinateStepValue(0)
-    , Data()
-  {}
-  unsigned short              Group;
-  unsigned short              Dimensions;
-  unsigned short              NumberOfPoints;
+  CurveInternal() = default;
+  unsigned short              Group{};
+  unsigned short              Dimensions{};
+  unsigned short              NumberOfPoints{};
   std::string                 TypeOfData;
   std::string                 CurveDescription;
-  unsigned short              DataValueRepresentation;
-  unsigned short              CoordinateStartValue;
-  unsigned short              CoordinateStepValue;
+  unsigned short              DataValueRepresentation{};
+  unsigned short              CoordinateStartValue{};
+  unsigned short              CoordinateStepValue{};
   std::vector<char>           Data;
   std::vector<unsigned short> CurveDataDescriptor;
   void
   Print(std::ostream & os) const
   {
-    os << "Group           0x" << std::hex << Group << std::dec << std::endl;
-    os << "Dimensions                         :" << Dimensions << std::endl;
-    os << "NumberOfPoints                     :" << NumberOfPoints << std::endl;
-    os << "TypeOfData                         :" << TypeOfData << std::endl;
-    os << "CurveDescription                   :" << CurveDescription << std::endl;
-    os << "DataValueRepresentation            :" << DataValueRepresentation << std::endl;
+    os << "Group           0x" << std::hex << Group << std::dec
+       << "\nDimensions              :" << Dimensions
+       << "\nNumberOfPoints          :" << NumberOfPoints
+       << "\nTypeOfData              :" << TypeOfData
+       << "\nCurveDescription        :" << CurveDescription
+       << "\nDataValueRepresentation :" << DataValueRepresentation << '\n';
     const void * dp = static_cast<const void*>(Data.data());
     const unsigned short * p = static_cast<const unsigned short *>(dp);
     for (int i = 0; i < NumberOfPoints; i += 2)
     {
-      os << p[i] << "," << p[i + 1] << std::endl;
+      os << p[i] << ',' << p[i + 1] << '\n';
     }
+    os << std::endl;
   }
 };
 
-Curve::Curve()
+Curve::Curve() : Internal(new CurveInternal)
 {
-  Internal = new CurveInternal;
 }
 
 Curve::Curve(Curve const & ov)
@@ -143,7 +133,6 @@ Curve::Update(const DataElement & de)
   }
   if (de.GetTag().GetElement() == 0x0000) // CurveGroupLength
   {
-    ;
     ;
   }
   else if (de.GetTag().GetElement() == 0x0005) // CurveDimensions
@@ -408,6 +397,8 @@ getsizeofrep(unsigned short dr)
       break;
     case 4:
       val = sizeof(int32_t);
+      break;
+    default:
       break;
   }
   return val;

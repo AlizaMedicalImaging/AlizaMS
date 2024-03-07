@@ -51,10 +51,10 @@ class DataSet;
 class MDCM_EXPORT Item : public DataElement
 {
 public:
-  Item()
-    : DataElement(Tag(0xfffe, 0xe000), 0xffffffff)
-    , NestedDataSet()
-  {}
+  Item() : DataElement(Tag(0xfffe, 0xe000), 0xffffffff)
+  {
+  }
+
   friend std::ostream &
   operator<<(std::ostream &, const Item &);
 
@@ -78,6 +78,7 @@ public:
       assert(0 && "InsertDataElement");
     }
   }
+
   const DataElement &
   GetDataElement(const Tag & t) const
   {
@@ -91,12 +92,14 @@ public:
   {
     NestedDataSet = nested;
   }
+
   // Return a const ref to the Nested Data Set
   const DataSet &
   GetNestedDataSet() const
   {
     return NestedDataSet;
   }
+
   DataSet &
   GetNestedDataSet()
   {
@@ -313,7 +316,7 @@ private:
    * May be nested recursively.
    * Only Data Elements with VR = SQ  may, themselves, contain Data Sets
    */
-  DataSet NestedDataSet;
+  DataSet NestedDataSet{};
 };
 
 inline std::ostream &

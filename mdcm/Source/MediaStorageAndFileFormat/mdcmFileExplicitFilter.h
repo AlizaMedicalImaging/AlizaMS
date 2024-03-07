@@ -32,13 +32,9 @@ class Dicts;
 class MDCM_EXPORT FileExplicitFilter
 {
 public:
-  FileExplicitFilter()
-    : F(new File)
-    , ChangePrivateTags(false)
-    , UseVRUN(true)
-    , RecomputeItemLength(false)
-    , RecomputeSequenceLength(false)
-  {}
+  FileExplicitFilter() : F(new File)
+  {
+  }
   ~FileExplicitFilter() = default;
   void
   SetChangePrivateTags(bool);
@@ -61,10 +57,10 @@ protected:
 
 private:
   SmartPointer<File> F;
-  bool               ChangePrivateTags;
-  bool               UseVRUN;
-  bool               RecomputeItemLength;
-  bool               RecomputeSequenceLength;
+  bool               ChangePrivateTags{};
+  bool               UseVRUN{true};
+  bool               RecomputeItemLength{};
+  bool               RecomputeSequenceLength{};
 };
 
 

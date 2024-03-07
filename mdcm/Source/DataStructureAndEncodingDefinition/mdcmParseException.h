@@ -31,20 +31,24 @@ namespace mdcm
 class ParseException : public std::logic_error
 {
 public:
-  explicit ParseException()
+  ParseException()
     : std::logic_error(std::string(""))
   {}
+
   explicit ParseException(const std::string & arg)
     : std::logic_error(arg)
   {}
+
   explicit ParseException(const char * arg)
     : std::logic_error(arg)
   {}
+
   void
   SetLastElement(const DataElement & de)
   {
     LastElement = de;
   }
+
   const DataElement &
   GetLastElement() const
   {

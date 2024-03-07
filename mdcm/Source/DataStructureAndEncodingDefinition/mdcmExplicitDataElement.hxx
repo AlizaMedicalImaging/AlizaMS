@@ -150,7 +150,7 @@ ExplicitDataElement::ReadPreValue(std::istream & is)
     if (ValueLengthField == 0x0006 && VRField == VR::UL && TagField.GetGroup() == 0x0009)
     {
       mdcmWarningMacro("Replacing VL=0x0006 with VL=0x0004, for Tag=" << TagField
-                                                                      << " in order to read a buggy DICOM file.");
+                       << " in order to read a buggy DICOM file.");
       ValueLengthField = 0x0004;
     }
 #endif
@@ -412,7 +412,7 @@ ExplicitDataElement::Write(std::ostream & os) const
       un.Write(os);
       if (ValueField && dynamic_cast<const SequenceOfItems *>(&*ValueField))
       {
-        VL vl = 0xFFFFFFFF;
+        VL vl = 0xffffffff;
         vl.Write<TSwap>(os);
       }
       else

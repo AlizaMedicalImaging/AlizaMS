@@ -211,60 +211,60 @@ public:
 
 private:
   // 0066 0003 UL 1 Surface Number
-  unsigned long SurfaceNumber;
+  unsigned long SurfaceNumber{};
   // 0066 0004 LT 1 Surface Comments
-  std::string SurfaceComments;
+  std::string SurfaceComments{};
   // 0066 0009 CS 1 Surface Processing
-  bool SurfaceProcessing;
+  bool SurfaceProcessing{};
   // 0066 000a FL 1 Surface Processing Ratio
-  float SurfaceProcessingRatio;
+  float SurfaceProcessingRatio{1.0f};
   // 0066 000b LO 1 Surface Processing Description
-  std::string SurfaceProcessingDescription;
+  std::string SurfaceProcessingDescription{};
   // Processing Algorithm Code
-  SegmentHelper::BasicCodedEntry ProcessingAlgorithm;
+  SegmentHelper::BasicCodedEntry ProcessingAlgorithm{};
   // 0062 000c US 1 Recommended Display Grayscale Value
-  unsigned short RecommendedDisplayGrayscaleValue;
+  unsigned short RecommendedDisplayGrayscaleValue{};
   // 0062 000d US 3 Recommended Display CIELab Value
-  unsigned short RecommendedDisplayCIELabValue[3];
+  unsigned short RecommendedDisplayCIELabValue[3]{};
   // 0066 000c FL 1 Recommended Presentation Opacity
-  float RecommendedPresentationOpacity;
+  float RecommendedPresentationOpacity{1.0f};
   // 0066 000d CS 1 Recommended Presentation Type
-  VIEWType RecommendedPresentationType;
+  VIEWType RecommendedPresentationType{SURFACE};
   // 0066 000e CS 1 Finite Volume
-  STATES FiniteVolume;
+  STATES FiniteVolume{UNKNOWN};
   // 0066 0010 CS 1 Manifold
-  STATES Manifold;
+  STATES Manifold{UNKNOWN};
   // Algorithm Family Code
-  SegmentHelper::BasicCodedEntry AlgorithmFamily;
+  SegmentHelper::BasicCodedEntry AlgorithmFamily{};
   // 0066 0031 LO 1 Algorithm Version
-  std::string AlgorithmVersion;
+  std::string AlgorithmVersion{};
   // 0066 0032 LT 1 Algorithm Parameters
   // 0066 0036 LO 1 Algorithm Name
-  std::string AlgorithmName;
+  std::string AlgorithmName{};
   // 0066 0015 UL 1 Number of Surface Points
-  unsigned long NumberOfSurfacePoints;
+  unsigned long NumberOfSurfacePoints{};
   // 0066 0016 OF 1 Point Coordinates Data
-  DataElement PointCoordinatesData;
+  DataElement PointCoordinatesData{};
   // 0066 0017 FL 3 Point Position Accuracy
-  float * PointPositionAccuracy;
+  float * PointPositionAccuracy{};
   // 0066 0018 FL 1 Mean Point Distance
-  float MeanPointDistance;
+  float MeanPointDistance{};
   // 0066 0019 FL 1 Maximum Point Distance
-  float MaximumPointDistance;
+  float MaximumPointDistance{};
   // 0066 001a FL 6 Points Bounding Box Coordinates
-  float * PointsBoundingBoxCoordinates;
+  float * PointsBoundingBoxCoordinates{};
   // 0066 001b FL 3 Axis of Rotation
-  float * AxisOfRotation;
+  float * AxisOfRotation{};
   // 0066 001c FL 3 Center of Rotation
-  float * CenterOfRotation;
+  float * CenterOfRotation{};
   // 0066 001e UL 1 Number of Vectors
-  unsigned long NumberOfVectors;
+  unsigned long NumberOfVectors{};
   // 0066 001f US 1 Vector Dimensionality
-  unsigned short VectorDimensionality;
+  unsigned short VectorDimensionality{};
   // 0066 0020 FL 1-n Vector Accuracy
-  float * VectorAccuracy;
+  float * VectorAccuracy{};
   // 0066 0021 OF 1 Vector Coordinate Data
-  DataElement                 VectorCoordinateData;
+  DataElement                 VectorCoordinateData{};
   SmartPointer<MeshPrimitive> Primitive;
 };
 

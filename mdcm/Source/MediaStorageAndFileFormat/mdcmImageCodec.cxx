@@ -33,18 +33,8 @@
 namespace mdcm
 {
 
-ImageCodec::ImageCodec()
+ImageCodec::ImageCodec() : LUT(new LookupTable)
 {
-  PlanarConfiguration = 0;
-  RequestPlanarConfiguration = false;
-  RequestPaddedCompositePixelCode = false;
-  PI = PhotometricInterpretation::UNKNOWN;
-  LUT = new LookupTable;
-  NeedByteSwap = false;
-  NeedOverlayCleanup = false;
-  Dimensions[0] = Dimensions[1] = Dimensions[2] = 0;
-  NumberOfDimensions = 0;
-  LossyFlag = false;
 }
 
 bool
@@ -180,19 +170,9 @@ ImageCodec::SetDimensions(const unsigned int d[3])
 void
 ImageCodec::SetDimensions(const std::vector<unsigned int> & d)
 {
-  const size_t s = d.size();
-  assert(s <= 3);
-  for (size_t i = 0; i < 3; ++i)
-  {
-    if (i < s)
-    {
-      Dimensions[i] = d[i];
-    }
-    else
-    {
-      Dimensions[i] = 1;
-    }
-  }
+  Dimensions[0] = d.at(0);
+  Dimensions[1] = d.at(1);
+  Dimensions[2] = d.at(2);
 }
 
 const unsigned int *

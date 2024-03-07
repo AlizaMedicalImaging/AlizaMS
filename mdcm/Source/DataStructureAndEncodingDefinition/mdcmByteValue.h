@@ -38,8 +38,9 @@ namespace mdcm
 class MDCM_EXPORT ByteValue : public Value
 {
 public:
-  ByteValue(const char * array = nullptr, const VL & vl = 0);
-  ByteValue(std::vector<char> &);
+  ByteValue() = default;
+  explicit ByteValue(const char *, const VL &);
+  explicit ByteValue(std::vector<char> &);
   ByteValue(ByteValue && val) noexcept;
   ~ByteValue() = default;
 
@@ -168,9 +169,9 @@ protected:
   void SetLengthOnly(VL) override;
 
 private:
-  std::vector<char> Internal;
+  std::vector<char> Internal{};
   // WARNING Length is not Internal.size()
-  VL Length;
+  VL Length{};
 };
 
 } // end namespace mdcm

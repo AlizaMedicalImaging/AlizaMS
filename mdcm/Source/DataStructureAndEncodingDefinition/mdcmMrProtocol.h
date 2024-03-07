@@ -19,24 +19,25 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+
 #ifndef MDCMMRPROTOCOL_H
 #define MDCMMRPROTOCOL_H
 
 #include "mdcmTypes.h"
-#include "mdcmDataSet.h"
+#include <vector>
+#include <map>
+#include <string>
 
 namespace mdcm
 {
 
 class ByteValue;
-/*
- * Everything done in this code is for the sole purpose of writing interoperable
- * software under Sect. 1201 (f) Reverse Engineering exception of the DMCA.
- */
 
-class DataElement;
 /**
  * Class for MrProtocol
+ *
+ * Everything done in this code is for the sole purpose of writing interoperable
+ * software under Sect. 1201 (f) Reverse Engineering exception of the DMCA.
  */
 class MDCM_EXPORT MrProtocol
 {
@@ -44,18 +45,7 @@ class MDCM_EXPORT MrProtocol
   operator<<(std::ostream &, const MrProtocol &);
 
 public:
-  MrProtocol();
-  ~MrProtocol();
-  bool
-  Load(const ByteValue *, const char *, int);
-  void
-  Print(std::ostream &) const;
-  int
-  GetVersion() const;
-  const char *
-  GetMrProtocolByName(const char *) const;
-  bool
-  FindMrProtocolByName(const char *) const;
+  typedef std::map<std::string, std::string> MyMapType;
 
   struct Vector3
   {
@@ -75,12 +65,38 @@ public:
     std::vector<Slice> Slices;
   };
 
+  struct Element{};
+
+  struct Internals
+  {
+    MyMapType   mymap;
+    std::string csastr;
+    int         version;
+  };
+
+  MrProtocol();
+
+  ~MrProtocol();
+
   bool
-  GetSliceArray(MrProtocol::SliceArray &) const;
+  Load(const ByteValue *, const char *, int);
+
+  void
+  Print(std::ostream &) const;
+
+  int
+  GetVersion() const;
+
+  const char *
+  GetMrProtocolByName(const char *) const;
+
+  bool
+  FindMrProtocolByName(const char *) const;
+
+  bool
+  GetSliceArray(SliceArray &) const;
 
 private:
-  struct Element;
-  struct Internals;
   Internals * Pimpl;
 };
 

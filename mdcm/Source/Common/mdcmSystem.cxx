@@ -255,7 +255,7 @@ System::FileSize(const char * filename)
 #  endif
 
 int
-gettimeofday(struct timeval * tv, struct timezone * tz)
+gettimeofday(struct timeval * tv, const struct timezone * tz)
 {
   /*
   The use of the timezone structure is obsolete; the tz  argument  should

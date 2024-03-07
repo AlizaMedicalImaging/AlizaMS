@@ -43,16 +43,16 @@ public:
   bool
   AreOverlaysInPixelData() const override;
   bool
-                UnusedBitsPresentInPixelData() const override;
+  UnusedBitsPresentInPixelData() const override;
   Curve &       GetCurve(size_t = 0);
   const Curve & GetCurve(size_t = 0) const;
   size_t
-                  GetNumberOfCurves() const;
+  GetNumberOfCurves() const;
   void            SetNumberOfCurves(size_t);
   Overlay &       GetOverlay(size_t = 0);
   const Overlay & GetOverlay(size_t = 0) const;
   size_t
-       GetNumberOfOverlays() const;
+  GetNumberOfOverlays() const;
   void SetNumberOfOverlays(size_t);
   void RemoveOverlay(size_t);
   const IconImage &

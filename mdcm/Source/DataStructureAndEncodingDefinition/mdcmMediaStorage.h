@@ -157,45 +157,63 @@ public:
     ObjectEnd
   } ObjectType;
 
+  MediaStorage() = default;
+
+  MediaStorage(MSType t) : MSField(t)
+  {}
+
   static const char * GetMSString(MSType);
+
   const char *
   GetString() const;
+
   static MSType
   GetMSType(const char *);
-  MediaStorage(MSType type = MS_END)
-    : MSField(type)
-  {}
+
   static bool
   IsImage(MSType ts);
+
   operator MSType() const { return MSField; }
+
   const char *
   GetModality() const;
+
   unsigned int
   GetModalityDimension() const;
+
   static unsigned int
   GetNumberOfMSType();
+
   static unsigned int
   GetNumberOfMSString();
+
   static unsigned int
   GetNumberOfModality();
+
   // Attempt to set the MediaStorage from a file:
   // WARNING: When no MediaStorage & Modality are found BUT a PixelData element is found
   // then MediaStorage is set to the default SecondaryCaptureImageStorage (return value is
   // false in this case)
   bool
   SetFromFile(File const & file);
+
   // Advanced user only (functions should be protected level)
   // Those function are lower level than SetFromFile
   bool
   SetFromDataSet(DataSet const & ds);
+
   bool
   SetFromHeader(FileMetaInformation const &);
+
   bool
   SetFromModality(DataSet const &);
+
   void
   GuessFromModality(const char * modality, unsigned int dimension = 2);
+
   friend std::ostream &
   operator<<(std::ostream &, const MediaStorage &);
+
   bool
   IsUndefined() const
   {
@@ -209,13 +227,17 @@ protected:
 private:
   bool
   SetFromDataSetOrHeader(DataSet const &, const Tag &);
+
   const char *
   GetFromDataSetOrHeader(DataSet const &, const Tag &, std::string &);
+
   const char *
   GetFromHeader(FileMetaInformation const &, std::string &);
+
   const char *
   GetFromDataSet(DataSet const &, std::string &);
-  MSType MSField;
+
+  MSType MSField{MS_END};
 };
 
 inline std::ostream &

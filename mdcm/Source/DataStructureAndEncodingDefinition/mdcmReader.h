@@ -99,8 +99,8 @@ private:
   InternalReadCommon(const T_Caller &);
   TransferSyntax
   GuessTransferSyntax();
-  std::istream *  Stream;
-  std::ifstream * Ifstream;
+  std::istream *  Stream{};
+  std::ifstream * Ifstream{};
 };
 
 } // end namespace mdcm

@@ -125,7 +125,7 @@ FileDecompressLookupTable::GetPixmap()
 }
 
 void
-FileDecompressLookupTable::SetPixmap(Pixmap const & img)
+FileDecompressLookupTable::SetPixmap(const Pixmap & img)
 {
   PixelData = img;
 }

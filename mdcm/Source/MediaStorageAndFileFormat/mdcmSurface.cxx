@@ -110,34 +110,8 @@ Surface::GetVIEWType(const char * type)
   return VIEWType_END;
 }
 
-Surface::Surface()
-  : SurfaceNumber(0)
-  , SurfaceProcessing(false)
-  , SurfaceProcessingRatio(1.)
-  , ProcessingAlgorithm()
-  , RecommendedDisplayGrayscaleValue(0)
-  , RecommendedPresentationOpacity(1)
-  , RecommendedPresentationType(SURFACE)
-  , FiniteVolume(UNKNOWN)
-  , Manifold(UNKNOWN)
-  , AlgorithmFamily()
-  , NumberOfSurfacePoints(0)
-  , PointCoordinatesData()
-  , PointPositionAccuracy(nullptr)
-  , MeanPointDistance(0)
-  , MaximumPointDistance(0)
-  , PointsBoundingBoxCoordinates(nullptr)
-  , AxisOfRotation(nullptr)
-  , CenterOfRotation(nullptr)
-  , NumberOfVectors(0)
-  , VectorDimensionality(0)
-  , VectorAccuracy(nullptr)
-  , VectorCoordinateData()
-  , Primitive(new MeshPrimitive)
+Surface::Surface() : Primitive(new MeshPrimitive)
 {
-  RecommendedDisplayCIELabValue[0] = 0;
-  RecommendedDisplayCIELabValue[1] = 0;
-  RecommendedDisplayCIELabValue[2] = 0;
 }
 
 Surface::~Surface()

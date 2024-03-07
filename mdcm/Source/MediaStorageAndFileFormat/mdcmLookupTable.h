@@ -26,11 +26,20 @@
 #include "mdcmTypes.h"
 #include "mdcmObject.h"
 #include <cstdlib>
+#include <vector>
 
 namespace mdcm
 {
 
-class LookupTableInternal;
+class LookupTableInternal
+{
+public:
+  LookupTableInternal() = default;
+  unsigned int               Length[3]{};
+  unsigned short             Subscript[3]{};
+  unsigned short             BitSize[3]{};
+  std::vector<unsigned char> RGB;
+};
 
 /**
  * LookupTable class
@@ -97,8 +106,8 @@ public:
 
 protected:
   LookupTableInternal * Internal;
-  unsigned short        BitSample;
-  bool                  IncompleteLUT;
+  unsigned short        BitSample{};
+  bool                  IncompleteLUT{};
 };
 
 } // end namespace mdcm

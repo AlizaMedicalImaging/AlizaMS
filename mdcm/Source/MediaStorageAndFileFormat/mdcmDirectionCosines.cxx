@@ -29,16 +29,6 @@
 namespace mdcm
 {
 
-DirectionCosines::DirectionCosines()
-{
-  Values[0] = 1;
-  Values[1] = 0;
-  Values[2] = 0;
-  Values[3] = 0;
-  Values[4] = 1;
-  Values[5] = 0;
-}
-
 DirectionCosines::DirectionCosines(const double dircos[6])
 {
   Values[0] = dircos[0];

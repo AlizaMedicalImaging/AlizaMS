@@ -32,14 +32,6 @@
 namespace mdcm
 {
 
-DataElement::DataElement(const DataElement & _val)
-{
-  if (this != &_val)
-  {
-    *this = _val;
-  }
-}
-
 const Tag &
 DataElement::GetTag() const
 {
@@ -304,12 +296,10 @@ DataElement::SetValueFieldLength(VL vl, bool readvalues)
 std::ostream &
 operator<<(std::ostream & os, const DataElement & val)
 {
-  os << val.TagField;
-  os << "\t" << val.VRField;
-  os << "\t" << val.ValueLengthField;
+  os << val.TagField << '\t' << val.VRField << '\t' << val.ValueLengthField;
   if (val.ValueField)
   {
-    val.ValueField->Print(os << "\t");
+    val.ValueField->Print(os << '\t');
   }
   return os;
 }

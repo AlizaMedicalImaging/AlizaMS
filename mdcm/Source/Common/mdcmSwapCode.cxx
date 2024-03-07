@@ -59,7 +59,7 @@ SwapCode::GetIndex(SwapCode const & sc)
 }
 
 const char *
-SwapCode::GetSwapCodeString(SwapCode const & sc)
+SwapCode::GetSwapCodeString(const SwapCode & sc)
 {
   int idx = GetIndex(sc);
   return SwapCodeStrings[idx];

@@ -187,7 +187,7 @@ IconImageFilter::ExtractIconImages()
           else
           {
             mdcmWarningMacro("Icon Sequence is incomplete.");
-            pixeldata.Clear();
+            pixeldata.ClearDimensions();
             return;
           }
         }
@@ -197,7 +197,7 @@ IconImageFilter::ExtractIconImages()
       if (!ds.FindDataElement(tpixeldata))
       {
         mdcmWarningMacro("Icon Sequence is incomplete. Giving up");
-        pixeldata.Clear();
+        pixeldata.ClearDimensions();
         return;
       }
       const DataElement & de = ds.GetDataElement(tpixeldata);

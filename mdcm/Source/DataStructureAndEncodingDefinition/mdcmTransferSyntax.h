@@ -100,39 +100,58 @@ public:
     JPIPHTJ2KReferencedDeflate,
     TS_END
   } TSType;
+
+  TransferSyntax() = default;
+
+  TransferSyntax(TSType type) : TSField(type)
+  {}
+
   static const char * GetTSString(TSType);
+
   static TSType
   GetTSType(const char *);
+
   NegociatedType
   GetNegociatedType() const;
+
   // Caution with the GE private syntax, the dataset is written
   // little-endian, but the pixel data is big-endian.
   SwapCode
   GetSwapCode() const;
+
   bool
   IsValid() const
   {
     return TSField != TS_END;
   }
-  operator TSType() const { return TSField; }
-  TransferSyntax(TSType type = ImplicitVRLittleEndian)
-    : TSField(type)
-  {}
+
+  operator TSType() const
+  {
+    return TSField;
+  }
+
+
   bool
   IsEncoded() const;
+
   bool
   IsImplicit() const;
+
   bool
   IsExplicit() const;
+
   bool
   IsEncapsulated() const;
+
   bool
   IsLossy() const;
+
   const char *
   GetString() const
   {
     return TransferSyntax::GetTSString(TSField);
   }
+
   friend std::ostream &
   operator<<(std::ostream &, const TransferSyntax &);
 
@@ -141,7 +160,7 @@ private:
   bool IsExplicit(TSType) const;
   bool IsLittleEndian(TSType) const;
   bool IsBigEndian(TSType) const;
-  TSType TSField;
+  TSType TSField{ImplicitVRLittleEndian};
 };
 
 inline std::ostream &

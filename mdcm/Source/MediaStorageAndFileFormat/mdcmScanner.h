@@ -62,7 +62,7 @@ public:
     }
   };
 
-  Scanner();
+  Scanner() = default;
   ~Scanner() = default;
   std::string
   GetString(const DataElement &, const DataSet &, const bool, const Dict &) const;
@@ -134,12 +134,12 @@ protected:
   ProcessPublicTag(const char *, const File &, const Dict &);
 
 private:
-  std::set<Tag>            Tags;
-  ValuesType               Values;
-  std::vector<std::string> Filenames;
-  MappingType              Mappings;
-  double                   Progress;
-  const TagToValue         NoOpTagToValue;
+  std::set<Tag>            Tags{};
+  ValuesType               Values{};
+  std::vector<std::string> Filenames{};
+  MappingType              Mappings{};
+  double                   Progress{};
+  const TagToValue         NoOpTagToValue{};
 };
 
 } // end namespace mdcm

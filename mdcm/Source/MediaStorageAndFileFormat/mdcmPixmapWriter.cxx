@@ -75,7 +75,7 @@ void
 PixmapWriter::DoIconImage(DataSet & rootds, Pixmap const & image)
 {
   const IconImage & icon = image.GetIconImage();
-  if (!icon.IsEmpty())
+  if (!icon.IsDimensionEmpty())
   {
     DataElement iconimagesq;
     iconimagesq.SetTag(Attribute<0x0088, 0x0200>::GetTag());

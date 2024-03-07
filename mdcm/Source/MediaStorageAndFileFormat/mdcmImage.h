@@ -52,7 +52,7 @@ namespace mdcm
 class MDCM_EXPORT Image : public Pixmap
 {
 public:
-  Image();
+  Image() = default;
   ~Image() = default;
   const double *
   GetSpacing() const;
@@ -67,9 +67,9 @@ public:
   double
   GetOrigin(unsigned int) const;
   void
-  SetOrigin(const float *);
+  SetOrigin(const float[3]);
   void
-  SetOrigin(const double *);
+  SetOrigin(const double[3]);
   void
   SetOrigin(unsigned int, double);
   const double *
@@ -77,9 +77,9 @@ public:
   double
   GetDirectionCosines(unsigned int) const;
   void
-  SetDirectionCosines(const float *);
+  SetDirectionCosines(const float[6]);
   void
-  SetDirectionCosines(const double *);
+  SetDirectionCosines(const double[6]);
   void
   SetDirectionCosines(unsigned int, double);
   void
@@ -106,12 +106,12 @@ public:
   Print(std::ostream &) const override;
 
 private:
-  SwapCode            SC;
-  double              Intercept;
-  double              Slope;
-  std::vector<double> Spacing;
-  std::vector<double> Origin;
-  std::vector<double> DirectionCosines;
+  SwapCode            SC{};
+  double              Intercept{};
+  double              Slope{1.0};
+  std::vector<double> Spacing{1.0, 1.0, 1.0};
+  std::vector<double> Origin{0.0, 0.0, 0.0};
+  std::vector<double> DirectionCosines{1.0, 0.0, 0.0, 0.0, 1.0, 0.0};
   std::string         WindowWidth;
   std::string         WindowCenter;
   std::string         WindowFunction;

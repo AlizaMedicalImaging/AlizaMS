@@ -55,13 +55,12 @@ public:
     UNKNOWN
   } ScalarType;
 
-  PixelFormat()
-    : PixelFormat(1, 8, 8, 7, 0)
-  {}
+  PixelFormat() = default;
+
   explicit PixelFormat(unsigned short samplesperpixel,
-                       unsigned short bitsallocated = 8,
-                       unsigned short bitsstored = 8,
-                       unsigned short highbit = 7,
+                       unsigned short bitsallocated,
+                       unsigned short bitsstored,
+                       unsigned short highbit,
                        unsigned short pixelrepresentation = 0)
     : SamplesPerPixel(samplesperpixel)
     , BitsAllocated(bitsallocated)
@@ -69,43 +68,63 @@ public:
     , HighBit(highbit)
     , PixelRepresentation(pixelrepresentation)
   {}
+
   PixelFormat(ScalarType);
+
   unsigned short
   GetSamplesPerPixel() const;
+
   void
   SetSamplesPerPixel(unsigned short);
+
   unsigned short
   GetBitsAllocated() const;
+
   void
   SetBitsAllocated(unsigned short);
+
   unsigned short
   GetBitsStored() const;
+
   void
   SetBitsStored(unsigned short);
+
   unsigned short
   GetHighBit() const;
+
   void
   SetHighBit(unsigned short);
+
   unsigned short
   GetPixelRepresentation() const;
+
   void
   SetPixelRepresentation(unsigned short);
+
   void
   SetScalarType(ScalarType st);
+
   ScalarType
   GetScalarType() const;
+
   const char *
   GetScalarTypeAsString() const;
+
   uint8_t
   GetPixelSize() const;
+
   double
   GetMin() const;
+
   double
   GetMax() const;
+
   bool
   IsValid() const;
+
   bool
   IsCompatible(const TransferSyntax &) const;
+
   void
   Print(std::ostream &) const;
 
@@ -142,11 +161,11 @@ protected:
   Validate();
 
 private:
-  unsigned short SamplesPerPixel;
-  unsigned short BitsAllocated;
-  unsigned short BitsStored;
-  unsigned short HighBit;
-  unsigned short PixelRepresentation;
+  unsigned short SamplesPerPixel{1};
+  unsigned short BitsAllocated{8};
+  unsigned short BitsStored{8};
+  unsigned short HighBit{7};
+  unsigned short PixelRepresentation{};
 };
 
 inline std::ostream &

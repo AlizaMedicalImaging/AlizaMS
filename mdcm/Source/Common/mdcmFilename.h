@@ -33,10 +33,9 @@ namespace mdcm
 class MDCM_EXPORT Filename
 {
 public:
-  Filename(const char * filename = "")
+  Filename() = default;
+  explicit Filename(const char * filename)
     : FileName(filename ? filename : "")
-    , Path()
-    , Conversion()
   {}
   const char *
   GetFileName() const;
@@ -59,9 +58,9 @@ public:
   EndWith(const char ending[]) const;
 
 private:
-  std::string FileName;
-  std::string Path;
-  std::string Conversion;
+  std::string FileName{};
+  std::string Path{};
+  std::string Conversion{};
 };
 
 } // end namespace mdcm

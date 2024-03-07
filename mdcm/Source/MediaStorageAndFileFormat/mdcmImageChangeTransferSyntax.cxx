@@ -153,7 +153,7 @@ ImageChangeTransferSyntax::Change()
       Pixmap * outpixmap = dynamic_cast<Pixmap *>(&outbitmap);
       if (!outpixmap)
         return false;
-      if (!pixmap->GetIconImage().IsEmpty())
+      if (!pixmap->GetIconImage().IsDimensionEmpty())
       {
         const unsigned long long len = pixmap->GetIconImage().GetBufferLength();
         if (len > 0xffffffff)
@@ -211,7 +211,7 @@ ImageChangeTransferSyntax::Change()
   Bitmap & bitmap = *Input;
   if (Pixmap * pixmap = dynamic_cast<Pixmap *>(&bitmap))
   {
-    if (!pixmap->GetIconImage().IsEmpty() && CompressIconImage)
+    if (!pixmap->GetIconImage().IsDimensionEmpty() && CompressIconImage)
     {
       Bitmap & outbitmap = *Output;
       Pixmap * outpixmap = dynamic_cast<Pixmap *>(&outbitmap);

@@ -39,14 +39,18 @@ class MDCM_EXPORT VL
 public:
   typedef uint32_t Type;
 
-  VL(uint32_t vl = 0)
+  VL() = default;
+
+  VL(uint32_t vl)
     : ValueLength(vl)
   {}
+
   static uint32_t
   GetVL32Max()
   {
     return 0xffffffff;
   }
+
   static uint16_t
   GetVL16Max()
   {
@@ -157,7 +161,7 @@ public:
   }
 
 private:
-  uint32_t ValueLength;
+  uint32_t ValueLength{};
 };
 
 inline std::ostream &
