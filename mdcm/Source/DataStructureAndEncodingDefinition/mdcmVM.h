@@ -87,16 +87,24 @@ public:
   } VMType;
 // clang-format on
 
-  VM(VMType type = VM0) : VMField(type) {}
+  VM() = default;
+
+  VM(VMType type) : VMField(type) {}
+
   static std::string GetVMString(VMType);
+
   static VMType GetVMTypeFromLength(size_t length, unsigned int size);
+
   static size_t GetNumberOfElementsFromArray(const char * array, size_t length);
+
   operator VMType() const { return VMField; }
+
   unsigned int GetLength() const;
+
   friend std::ostream & operator<<(std::ostream &, const VM &);
 
 private:
-  VMType VMField;
+  VMType VMField{VM0};
 };
 
 inline std::ostream &

@@ -48,7 +48,7 @@ public:
 class SubjectInternals
 {
 public:
-  SubjectInternals() { m_Count = 0; }
+  SubjectInternals() = default;
   ~SubjectInternals();
   unsigned long
   AddObserver(const Event & event, Command * cmd);
@@ -70,8 +70,8 @@ public:
   PrintObservers(std::ostream & os, std::string & indent) const;
 
 private:
-  std::list<Observer *> m_Observers;
-  unsigned long         m_Count;
+  std::list<Observer *> m_Observers{};
+  unsigned long         m_Count{};
 };
 
 SubjectInternals::~SubjectInternals()

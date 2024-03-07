@@ -25,10 +25,7 @@
 namespace mdcm
 {
 
-Pixmap::Pixmap()
-  : Overlays()
-  , Curves()
-  , Icon(new IconImage)
+Pixmap::Pixmap() : Icon(new IconImage)
 {}
 
 bool

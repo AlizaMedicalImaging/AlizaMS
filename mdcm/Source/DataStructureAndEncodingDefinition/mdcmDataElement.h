@@ -64,47 +64,68 @@ class MDCM_EXPORT DataElement
   operator<<(std::ostream &, const DataElement &);
 
 public:
-  DataElement(const Tag & t = Tag(0), const VL & vl = 0, const VR & vr = VR::INVALID)
-    : TagField(t)
-    , ValueLengthField(vl)
-    , VRField(vr)
-    , ValueField(nullptr)
+  DataElement() = default;
+
+  DataElement(const Tag & t, const VL & vl = 0, const VR & vr = VR::INVALID)
+    : TagField(t), ValueLengthField(vl), VRField(vr)
   {}
-  DataElement(const DataElement &);
+
+  DataElement(const DataElement & _val)
+  {
+    if (this != &_val)
+    {
+      *this = _val;
+    }
+  }
+
   const Tag &
   GetTag() const;
+
   Tag &
   GetTag();
+
   // Need to match Part 6
   void
   SetTag(const Tag &);
+
   const VL &
   GetVL() const;
+
   VL &
   GetVL();
+
   // Need to match Part 6, advanced user only
   void
   SetVL(const VL &);
+
   void
   SetVLToUndefined();
   // Do not set VR::SQ on bytevalue data element
   const VR &
   GetVR() const;
+
   // Set VR (not a dual one such as OB_OW)
   void
   SetVR(const VR &);
+
   const Value &
   GetValue() const;
+
   Value &
   GetValue();
+
   void
   SetValue(Value const &);
+
   bool
   IsEmpty() const;
+
   void
   Empty();
+
   void
   Clear();
+
   // Set the byte value
   // Warning: user need to read DICOM standard for an understanding of:
   //  - even padding
@@ -112,8 +133,10 @@ public:
   // By default even padding is achieved using \0 regardless of the of VR
   void
   SetByteValue(const char *, VL);
+
   const ByteValue *
   GetByteValue() const;
+
   // Interpret the Value stored in the DataElement. This is more robust (but also more
   // expensive) to call this function rather than the simpliest form: GetSequenceOfItems()
   // It also return nullptr when the Value is NOT of type SequenceOfItems
@@ -122,12 +145,15 @@ public:
   // SmartPointer<SequenceOfItems> sqi = de.GetValueAsSQ();
   SmartPointer<SequenceOfItems>
   GetValueAsSQ() const;
+
   // Return the Value of DataElement as a Sequence Of Fragments (if possible)
   // Warning: You need to check for nullptr return value
   const SequenceOfFragments *
   GetSequenceOfFragments() const;
+
   SequenceOfFragments *
   GetSequenceOfFragments();
+
   bool
   IsUndefinedLength() const;
 
@@ -234,14 +260,14 @@ public:
   }
 
 protected:
-  Tag TagField;
-  // This is the value read from the file, might be different from the length of ValueField
-  VL                          ValueLengthField; // Can be 0xFFFFFFFF
-  VR                          VRField;
-  typedef SmartPointer<Value> ValuePtr;
-  ValuePtr                    ValueField;
   void
   SetValueFieldLength(VL vl, bool readvalues);
+
+  Tag TagField{};
+  // This is the value read from the file, might be different from the length of ValueField
+  VL                  ValueLengthField{}; // Can be 0xFFFFFFFF
+  VR                  VRField{VR::INVALID};
+  SmartPointer<Value> ValueField{};
 };
 
 std::ostream &

@@ -22,7 +22,6 @@
 
 #include "mdcmLookupTable.h"
 #include "mdcmTrace.h"
-#include <vector>
 #include <set>
 #include <climits>
 #include <cstring>
@@ -31,27 +30,8 @@
 namespace mdcm
 {
 
-class LookupTableInternal
+LookupTable::LookupTable() : Internal(new LookupTableInternal)
 {
-public:
-  LookupTableInternal()
-    : RGB()
-  {
-    Length[0] = Length[1] = Length[2] = 0;
-    Subscript[0] = Subscript[1] = Subscript[2] = 0;
-    BitSize[0] = BitSize[1] = BitSize[2] = 0;
-  }
-  unsigned int               Length[3];
-  unsigned short             Subscript[3];
-  unsigned short             BitSize[3];
-  std::vector<unsigned char> RGB;
-};
-
-LookupTable::LookupTable()
-{
-  Internal = new LookupTableInternal;
-  BitSample = 0;
-  IncompleteLUT = false;
 }
 
 LookupTable::~LookupTable()

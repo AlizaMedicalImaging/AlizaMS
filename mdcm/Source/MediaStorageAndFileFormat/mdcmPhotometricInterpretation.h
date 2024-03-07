@@ -58,22 +58,33 @@ public:
     PI_END
   } PIType;
 
-  PhotometricInterpretation(PIType pi = UNKNOWN)
+  PhotometricInterpretation() = default;
+
+  PhotometricInterpretation(PIType pi)
     : PIField(pi)
   {}
+
   static const char * GetPIString(PIType);
+
   static PIType
   GetPIType(const char *);
+
   const char *
   GetString() const;
+
   unsigned short
   GetSamplesPerPixel() const;
+
   bool
   IsLossy() const;
+
   bool
-              IsLossless() const;
+  IsLossless() const;
+
   static bool IsRetired(PIType);
-              operator PIType() const { return PIField; }
+
+  operator PIType() const { return PIField; }
+  
   PIType
   GetType() const
   {
@@ -81,7 +92,7 @@ public:
   }
 
 private:
-  PIType PIField;
+  PIType PIField{UNKNOWN};
 };
 
 inline std::ostream &

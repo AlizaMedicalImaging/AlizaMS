@@ -23,7 +23,6 @@
 #define MDCMBASE64_H
 
 #include "mdcmTypes.h"
-#include "mdcmMacro.h"
 
 namespace mdcm
 {
@@ -31,7 +30,6 @@ namespace mdcm
 class MDCM_EXPORT Base64
 {
 public:
-  MDCM_DISALLOW_COPY_AND_MOVE(Base64);
   /**
    * Call this function to obtain the required buffer size
    */

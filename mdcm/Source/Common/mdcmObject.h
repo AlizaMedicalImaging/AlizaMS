@@ -42,13 +42,11 @@ class MDCM_EXPORT Object
   friend class SmartPointer;
 
 public:
-  Object()
-    : ReferenceCount(0)
-  {}
+  Object() = default;
 
-  Object(const Object &)
-    : ReferenceCount(0)
-  {}
+  Object(const Object &) {}
+
+  Object(Object &&) = delete;
 
   virtual ~Object()
   {
@@ -59,8 +57,6 @@ public:
 
   // cppcheck-suppress operatorEqVarError
   void operator=(const Object &) {}
-
-  Object(Object &&) = delete;
 
   Object & operator=(Object &&) = delete;
 
@@ -96,7 +92,7 @@ protected:
   }
 
 private:
-  std::atomic<long long> ReferenceCount;
+  std::atomic<long long> ReferenceCount{0LL};
 };
 
 inline std::ostream &

@@ -692,7 +692,7 @@ std::istream &
 FileMetaInformation::ReadCompatInternal(std::istream & is)
 {
   {
-    // Purposely not Re-use ReadVR since we can read VR_END
+    // Purposely don't re-use ReadVR, we can read VR_END
     char vr_str0[2];
     is.read(vr_str0, 2);
     if (VR::IsValid(vr_str0))
@@ -712,14 +712,14 @@ FileMetaInformation::ReadCompatInternal(std::istream & is)
         }
         Insert(xde);
       }
-      // find out the dataset transfer syntax
+      // Find out the dataset transfer syntax
       ComputeDataSetTransferSyntax();
     }
     else
     {
       MetaInformationTS = TransferSyntax::Implicit;
       mdcmWarningMacro("File Meta Information is implicit. VR will be explicitly added");
-      // might be an implicit encoded Meta File Information header
+      // Might be an implicit encoded Meta File Information header
       // GE_DLX-8-MONO2-PrivateSyntax.dcm
       is.seekg(-6, std::ios::cur); // Seek back
       ImplicitDataElement ide;
@@ -734,7 +734,7 @@ FileMetaInformation::ReadCompatInternal(std::istream & is)
           mdcmWarningMacro("Unknown element found in Meta Header: " << ide.GetTag());
         }
       }
-      // find out the dataset transfer syntax
+      // Find out the dataset transfer syntax
       try
       {
         ComputeDataSetTransferSyntax();
@@ -742,7 +742,7 @@ FileMetaInformation::ReadCompatInternal(std::istream & is)
       catch (const std::logic_error &)
       {
         // We were able to read some of the Meta Header, but failed to compute the DataSetTS
-        // technically MDCM is able to cope with any value here. But be kind and try to have a good guess
+        // technically MDCM is able to cope with any value here. Try to have a good guess.
         mdcmWarningMacro("Meta Header is bogus. Guessing DataSet TS.");
         Tag t;
         if (!t.Read<SwapperNoOp>(is))

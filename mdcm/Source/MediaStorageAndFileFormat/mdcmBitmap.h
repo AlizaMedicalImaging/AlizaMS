@@ -68,9 +68,9 @@ public:
   void
   SetPlanarConfiguration(unsigned int);
   void
-  Clear();
+  ClearDimensions();
   bool
-  IsEmpty() const;
+  IsDimensionEmpty() const;
   const PhotometricInterpretation &
   GetPhotometricInterpretation() const;
   void
@@ -141,21 +141,21 @@ protected:
   TryJPEG2000Codec(char *, bool &) const;
   bool
   TryRLECodec(char *, bool &) const;
-  unsigned int                      PlanarConfiguration;
-  unsigned int                      NumberOfDimensions;
-  TransferSyntax                    TS;
-  PixelFormat                       PF;
-  PhotometricInterpretation         PI;
-  std::vector<unsigned int>         Dimensions;
-  DataElement                       PixelData;
-  typedef SmartPointer<LookupTable> LUTPtr;
-  LUTPtr                            LUT;
-  bool                              NeedByteSwap;
-  bool                              LossyFlag;
+  unsigned int                      PlanarConfiguration{};
+  unsigned int                      NumberOfDimensions{2};
+  TransferSyntax                    TS{};
+  PixelFormat                       PF{};
+  PhotometricInterpretation         PI{};
+  std::vector<unsigned int>         Dimensions{0, 0, 1};
+  DataElement                       PixelData{};
+  SmartPointer<LookupTable>         LUT;
+  bool                              NeedByteSwap{};
+  bool                              LossyFlag{};
 
 private:
   bool
   GetBufferInternal(char *, bool &) const;
+
 };
 
 } // end namespace mdcm

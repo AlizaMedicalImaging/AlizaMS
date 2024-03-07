@@ -35,25 +35,15 @@ class String : public std::string
   static_assert(TPadChar == ' ' || TPadChar == 0, "");
 
 public:
-  typedef std::string::value_type             value_type;
-  typedef std::string::pointer                pointer;
-  typedef std::string::reference              reference;
-  typedef std::string::const_reference        const_reference;
-  typedef std::string::size_type              size_type;
-  typedef std::string::difference_type        difference_type;
-  typedef std::string::iterator               iterator;
-  typedef std::string::const_iterator         const_iterator;
-  typedef std::string::reverse_iterator       reverse_iterator;
-  typedef std::string::const_reverse_iterator const_reverse_iterator;
+  using std::string::value_type;
+  using std::string::size_type;
 
-  String()
-    : std::string()
-  {}
+  String() = default;
 
   String(const value_type * s)
     : std::string(s)
   {
-    if (size() % 2)
+    if (this->size() % 2 != 0)
     {
       push_back(TPadChar);
     }
@@ -63,29 +53,29 @@ public:
     : std::string(s, n)
   {
     // passed a const char* pointer, so s[n] == 0 (garanteed)
-    if (n % 2)
+    if (n % 2 != 0)
     {
       push_back(TPadChar);
     }
   }
 
-  String(const std::string & s, size_type pos = 0, size_type n = npos)
+  String(const std::string & s, size_type pos = 0, size_type n = std::string::npos)
     : std::string(s, pos, n)
   {
-    // FIXME some users might already have padded the string 's' with a trailing \0
-    if (size() % 2)
+    // Might already have been padded with a trailing \0
+    if (this->size() % 2 != 0)
     {
       push_back(TPadChar);
     }
   }
 
-  // Trailing \0 might be lost in this operation:
+  // Trailing \0 might be lost in this operation
   operator const char *() const { return this->c_str(); }
 
   bool
   IsValid() const
   {
-    size_type l = size();
+    const size_type l = this->size();
     if (l > TMaxLength)
       return false;
     return true;
@@ -104,9 +94,9 @@ public:
   std::string
   Trim() const
   {
-    std::string            str = *this;
-    std::string::size_type pos1 = str.find_first_not_of(' ');
-    std::string::size_type pos2 = str.find_last_not_of(' ');
+    std::string str = *this;
+    size_type   pos1 = str.find_first_not_of(' ');
+    size_type   pos2 = str.find_last_not_of(' ');
     str = str.substr((pos1 == std::string::npos) ? 0 : pos1,
                      (pos2 == std::string::npos) ? (str.size() - 1) : (pos2 - pos1 + 1));
     return str;
@@ -116,10 +106,10 @@ public:
   Trim(const char * input)
   {
     if (!input)
-      return "";
-    std::string            str = input;
-    std::string::size_type pos1 = str.find_first_not_of(' ');
-    std::string::size_type pos2 = str.find_last_not_of(' ');
+      return std::string("");
+    std::string str = input;
+    size_type   pos1 = str.find_first_not_of(' ');
+    size_type   pos2 = str.find_last_not_of(' ');
     str = str.substr((pos1 == std::string::npos) ? 0 : pos1,
                      (pos2 == std::string::npos) ? (str.size() - 1) : (pos2 - pos1 + 1));
     return str;

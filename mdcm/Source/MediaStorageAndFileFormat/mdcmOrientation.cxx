@@ -28,11 +28,6 @@ namespace mdcm
 
 static const char * OrientationStrings[] = { "UNKNOWN", "AXIAL", "CORONAL", "SAGITTAL", "OBLIQUE", nullptr };
 
-// http://public.kitware.com/pipermail/insight-users/2005-March/012246.html
-// 0.5477 would be the square root of 1 (unit vector sum of squares)
-// divided by 3 (oblique axes - a "double" oblique)
-// 0.7071 would be the square root of 1 (unit vector sum of squares)
-// divided by 2 (oblique axes)
 double Orientation::ObliquityThresholdCosineValue = 0.8;
 
 Orientation::OrientationType
@@ -84,19 +79,13 @@ Orientation::GetLabel(OrientationType type)
   return OrientationStrings[type];
 }
 
-void
-Orientation::Print(std::ostream & os) const
-{
-  os << "Obliquity threshold cosine value: " << ObliquityThresholdCosineValue;
-}
-
 char
 Orientation::GetMajorAxisFromPatientRelativeDirectionCosine(double x, double y, double z)
 {
   char         axis = 0;
-  const char   orientationX = x < 0 ? 'R' : 'L';
-  const char   orientationY = y < 0 ? 'A' : 'P';
-  const char   orientationZ = z < 0 ? 'F' : 'H';
+  const char   orientationX = x < 0.0 ? 'R' : 'L';
+  const char   orientationY = y < 0.0 ? 'A' : 'P';
+  const char   orientationZ = z < 0.0 ? 'F' : 'H';
   const double absX = std::fabs(x);
   const double absY = std::fabs(y);
   const double absZ = std::fabs(z);
@@ -117,7 +106,6 @@ Orientation::GetMajorAxisFromPatientRelativeDirectionCosine(double x, double y, 
   }
   else
   {
-    ;
     ;
   }
   return axis;

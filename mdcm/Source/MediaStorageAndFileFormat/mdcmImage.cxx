@@ -31,142 +31,112 @@
 namespace mdcm
 {
 
-Image::Image()
-  : SC()
-  , Intercept(0)
-  , Slope(1)
-{
-  Spacing.resize(3, 1);
-  Origin.resize(3, 0);
-  DirectionCosines.resize(6);
-  DirectionCosines[0] = 1;
-  DirectionCosines[1] = 0;
-  DirectionCosines[2] = 0;
-  DirectionCosines[3] = 0;
-  DirectionCosines[4] = 1;
-  DirectionCosines[5] = 0;
-}
-
-// Note: 3rd value can be an '1' when the spacing was not specified.
-// Warning: when the spacing is not specifier, a default '1' will be returned.
 const double *
 Image::GetSpacing() const
 {
-  assert(NumberOfDimensions);
   return Spacing.data();
 }
 
 double
 Image::GetSpacing(unsigned int idx) const
 {
-  assert(NumberOfDimensions);
   return Spacing[idx];
 }
 
 void
-Image::SetSpacing(const double * spacing)
+Image::SetSpacing(const double spacing[3])
 {
-  assert(NumberOfDimensions);
-  Spacing.assign(spacing, spacing + NumberOfDimensions);
+  Spacing[0] = spacing[0];
+  Spacing[1] = spacing[1];
+  if (NumberOfDimensions == 3)
+    Spacing[2] = spacing[2];
+  else
+    Spacing[2] = 1.0;
 }
 
 void
 Image::SetSpacing(unsigned int idx, double spacing)
 {
-  Spacing.resize(3);
-  Spacing[idx] = spacing;
+  if (idx < 3)
+    Spacing[idx] = spacing;
 }
 
-// Return (0,0,0) if the origin was not specified.
 const double *
 Image::GetOrigin() const
 {
-  assert(NumberOfDimensions);
-  if (!Origin.empty())
-    return Origin.data();
-  return nullptr;
+  return Origin.data();
 }
 
 double
 Image::GetOrigin(unsigned int idx) const
 {
-  assert(NumberOfDimensions);
-  if (idx < Origin.size())
-  {
+  if (idx < 3)
     return Origin[idx];
-  }
-  return 0;
+  return 0.0;
 }
 
 void
-Image::SetOrigin(const float * ori)
+Image::SetOrigin(const float ori[3])
 {
-  assert(NumberOfDimensions);
-  Origin.resize(NumberOfDimensions);
-  for (unsigned int i = 0; i < NumberOfDimensions; ++i)
+  for (unsigned int i = 0; i < 3; ++i)
   {
-    Origin[i] = static_cast<double>(ori[i]);
+    Origin[i] = ori[i];
   }
 }
 
 void
-Image::SetOrigin(const double * ori)
+Image::SetOrigin(const double ori[3])
 {
-  assert(NumberOfDimensions);
-  Origin.assign(ori, ori + NumberOfDimensions);
+  for (unsigned int i = 0; i < 3; ++i)
+  {
+    Origin[i] = ori[i];
+  }
 }
 
 void
 Image::SetOrigin(unsigned int idx, double ori)
 {
-  Origin.resize(idx + 1);
-  Origin[idx] = ori;
+  if (idx < 3)
+    Origin[idx] = ori;
 }
 
-// A default value of (1,0,0,0,1,0) will be return when the direction
-// cosines was not specified.
 const double *
 Image::GetDirectionCosines() const
 {
-  assert(NumberOfDimensions);
-  if (!DirectionCosines.empty())
-    return DirectionCosines.data();
-  return nullptr;
+  return DirectionCosines.data();
 }
+
 double
 Image::GetDirectionCosines(unsigned int idx) const
 {
-  assert(NumberOfDimensions);
-  if (idx < DirectionCosines.size())
-  {
+  if (idx < 6)
     return DirectionCosines[idx];
-  }
-  return 0;
+  return 0.0;
 }
 
 void
-Image::SetDirectionCosines(const float * dircos)
+Image::SetDirectionCosines(const float dircos[6])
 {
-  assert(NumberOfDimensions);
-  DirectionCosines.resize(6);
-  for (int i = 0; i < 6; ++i)
+  for (unsigned int i = 0; i < 6; ++i)
   {
-    DirectionCosines[i] = static_cast<double>(dircos[i]);
+    DirectionCosines[i] = dircos[i];
   }
 }
 
 void
-Image::SetDirectionCosines(const double * dircos)
+Image::SetDirectionCosines(const double dircos[6])
 {
-  assert(NumberOfDimensions);
-  DirectionCosines.assign(dircos, dircos + 6);
+  for (unsigned int i = 0; i < 6; ++i)
+  {
+    DirectionCosines[i] = dircos[i];
+  }
 }
 
 void
 Image::SetDirectionCosines(unsigned int idx, double dircos)
 {
-  DirectionCosines.resize(idx + 1);
-  DirectionCosines[idx] = dircos;
+  if (idx < 6)
+    DirectionCosines[idx] = dircos;
 }
 
 void
@@ -233,48 +203,31 @@ void
 Image::Print(std::ostream & os) const
 {
   Pixmap::Print(os);
-  if (NumberOfDimensions)
   {
+    os << "Origin: (";
+    for (std::vector<double>::const_iterator it = Origin.cbegin(); it != Origin.cend(); ++it)
     {
-      os << "Origin: (";
-      if (!Origin.empty())
-      {
-        std::vector<double>::const_iterator it = Origin.cbegin();
-        os << *it;
-        for (; it != Origin.cend(); ++it)
-        {
-          os << "," << *it;
-        }
-      }
-      os << ")\n";
+      os << ',' << *it;
     }
-    {
-      os << "Spacing: (";
-      std::vector<double>::const_iterator it = Spacing.cbegin();
-      os << *it;
-      for (; it != Spacing.cend(); ++it)
-      {
-        os << "," << *it;
-      }
-      os << ")\n";
-    }
-    {
-      os << "DirectionCosines: (";
-      if (!DirectionCosines.empty())
-      {
-        std::vector<double>::const_iterator it = DirectionCosines.cbegin();
-        os << *it;
-        for (; it != DirectionCosines.cend(); ++it)
-        {
-          os << "," << *it;
-        }
-      }
-      os << ")\n";
-    }
-    {
-      os << "Rescale Intercept/Slope: (" << Intercept << "," << Slope << ")\n";
-    }
+    os << ")\n";
   }
+  {
+    os << "Spacing: (";
+    for (std::vector<double>::const_iterator it = Spacing.cbegin(); it != Spacing.cend(); ++it)
+    {
+      os << ',' << *it;
+    }
+    os << ")\n";
+  }
+  {
+    os << "DirectionCosines: (";
+    for (std::vector<double>::const_iterator it = DirectionCosines.cbegin(); it != DirectionCosines.cend(); ++it)
+    {
+      os << ',' << *it;
+    }
+    os << ")\n";
+  }
+  os << "Rescale Intercept/Slope: (" << Intercept << ',' << Slope << ')' << std::endl;
 }
 
 } // end namespace mdcm

@@ -51,8 +51,11 @@ class MDCM_EXPORT Tag
   operator>>(std::istream & _is, Tag & _val);
 
 public:
+  Tag() = default;
+
   Tag(uint16_t, uint16_t);
-  Tag(uint32_t = 0);
+
+  Tag(uint32_t);
 
   // Returns the Group or Element of the given Tag: 0 / 1
   const uint16_t & operator[](const unsigned int & _id) const
@@ -80,14 +83,6 @@ public:
     return ElementTag.tag != _val.ElementTag.tag;
   }
 
-  // DICOM Standard expects the Data Element to be sorted by Tags
-  // All other comparison can be constructed from this one and
-  // operator ==
-  // FIXME
-  // Since we have control over who is group and who is element,
-  // we should reverse them in little endian and big endian case
-  // since what we really want is fast comparison and not garantee
-  // that group is in #0
   bool
   operator<(const Tag & _val) const
   {
@@ -98,7 +93,7 @@ public:
       return true;
     return false;
 #else
-    // Plain comparison is enough!
+    // Plain comparison is enough.
     return (ElementTag.tag < _val.ElementTag.tag);
 #endif
   }
@@ -135,12 +130,12 @@ public:
   uint16_t
   GetGroup() const;
   uint16_t
-       GetElement() const;
+  GetElement() const;
   void SetGroup(uint16_t);
   void SetElement(uint16_t);
   void SetElementTag(uint16_t, uint16_t);
   uint32_t
-       GetElementTag() const;
+  GetElementTag() const;
   void SetElementTag(uint32_t);
   uint32_t
   GetLength() const;
@@ -179,7 +174,7 @@ private:
     uint32_t tag;
     uint16_t tags[2];
     char     bytes[4];
-  } ElementTag;
+  } ElementTag{0U};
 };
 
 inline std::istream &

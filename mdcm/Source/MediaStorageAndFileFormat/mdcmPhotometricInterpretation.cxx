@@ -47,10 +47,26 @@ namespace mdcm
  *
  */
 
-const char * PIStrings[] = {
-  "UNKNOWN",  "MONOCHROME1 ", "MONOCHROME2 ",     "PALETTE COLOR ",   "RGB ",     "HSV ",     "ARGB", "CMYK",
-  "YBR_FULL", "YBR_FULL_422", "YBR_PARTIAL_422 ", "YBR_PARTIAL_420 ", "YBR_ICT ", "YBR_RCT ", nullptr
+// clang-format off
+const char * PIStrings[] =
+{
+  "UNKNOWN",
+  "MONOCHROME1 ",
+  "MONOCHROME2 ",
+  "PALETTE COLOR ",
+  "RGB ",
+  "HSV ",
+  "ARGB",
+  "CMYK",
+  "YBR_FULL",
+  "YBR_FULL_422",
+  "YBR_PARTIAL_422 ",
+  "YBR_PARTIAL_420 ",
+  "YBR_ICT ",
+  "YBR_RCT ",
+  nullptr
 };
+// clang-format on
 
 const char *
 PhotometricInterpretation::GetPIString(PIType pi)

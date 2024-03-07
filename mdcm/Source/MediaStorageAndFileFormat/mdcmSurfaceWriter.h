@@ -37,8 +37,8 @@ namespace mdcm
 class MDCM_EXPORT SurfaceWriter : public SegmentWriter
 {
 public:
-  SurfaceWriter();
-  virtual ~SurfaceWriter() override;
+  SurfaceWriter()= default;
+  virtual ~SurfaceWriter() override = default;
   bool
   Write() override;
   unsigned long
@@ -52,8 +52,8 @@ protected:
   void
   ComputeNumberOfSurfaces();
   bool
-                PrepareWritePointMacro(SmartPointer<Surface>, DataSet &, const TransferSyntax &);
-  unsigned long NumberOfSurfaces;
+  PrepareWritePointMacro(SmartPointer<Surface>, DataSet &, const TransferSyntax &);
+  unsigned long NumberOfSurfaces{};
 };
 
 } // namespace mdcm

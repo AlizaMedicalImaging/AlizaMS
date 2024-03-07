@@ -19,34 +19,39 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+
 #include "mdcmMrProtocol.h"
-#include <map>
-#include <string>
+#include "mdcmByteValue.h"
+#include "mdcmDataSet.h"
 
-namespace mdcm
+namespace
 {
 
-struct MrProtocol::Element
-{};
-
-typedef std::map<std::string, std::string> MyMapType;
-
-struct MrProtocol::Internals
-{
-  MyMapType   mymap;
-  std::string csastr;
-  int         version;
-};
-
-static inline bool
+bool
 starts_with(const std::string & s1, const std::string & s2)
 {
   return s2.size() <= s1.size() && s1.compare(0, s2.size(), s2) == 0;
 }
 
-MrProtocol::MrProtocol()
+std::string
+trim(std::string str)
 {
-  Pimpl = new MrProtocol::Internals;
+  str.erase(0, str.find_first_not_of('"'));
+  str.erase(str.find_last_not_of('"') + 1);
+  return str;
+}
+
+}
+
+namespace mdcm
+{
+
+MrProtocol::MrProtocol() : Pimpl(new Internals)
+{}
+
+MrProtocol::~MrProtocol()
+{
+  delete Pimpl;
 }
 
 bool
@@ -123,37 +128,22 @@ MrProtocol::Load(const ByteValue * bv, const char * csastr, int version)
   return true;
 }
 
-MrProtocol::~MrProtocol()
-{
-  delete Pimpl;
-}
-
 int
 MrProtocol::GetVersion() const
 {
   return Pimpl->version;
 }
 
-static inline std::string
-trim(std::string str)
-{
-  str.erase(0, str.find_first_not_of('"'));
-  str.erase(str.find_last_not_of('"') + 1);
-  return str;
-}
-
 void
 MrProtocol::Print(std::ostream & os) const
 {
+  os << Pimpl->csastr << " / Version: " << Pimpl->version << '\n';
+  const MyMapType & mymap = Pimpl->mymap;
+  for (MyMapType::const_iterator it = mymap.cbegin(); it != mymap.cend(); ++it)
   {
-    os << Pimpl->csastr << " / Version: " << Pimpl->version << std::endl;
-    os << std::endl;
-    const MyMapType & mymap = Pimpl->mymap;
-    for (MyMapType::const_iterator it = mymap.cbegin(); it != mymap.cend(); ++it)
-    {
-      os << it->first << " : " << trim(std::string(it->second)) << std::endl;
-    }
+    os << it->first << " : " << trim(std::string(it->second)) << '\n';
   }
+  os << std::endl;
 }
 
 const char *

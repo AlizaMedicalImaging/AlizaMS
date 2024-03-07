@@ -40,11 +40,8 @@
 namespace mdcm
 {
 
-Reader::Reader()
-  : F(new File)
+Reader::Reader() : F(new File)
 {
-  Stream = nullptr;
-  Ifstream = nullptr;
 }
 
 Reader::~Reader()

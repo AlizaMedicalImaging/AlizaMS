@@ -74,12 +74,12 @@ protected:
   virtual bool
   ReadImage(const MediaStorage &);
   virtual bool
-                       ReadACRNEMAImage();
+  ReadACRNEMAImage();
   SmartPointer<Pixmap> PixelData;
-  bool                 m_AlppySupplementalLUT;
-  bool                 m_ProcessOverlays;
-  bool                 m_ProcessIcons;
-  bool                 m_ProcessCurves;
+  bool                 m_AlppySupplementalLUT{};
+  bool                 m_ProcessOverlays{true};
+  bool                 m_ProcessIcons{};
+  bool                 m_ProcessCurves{};
 };
 
 } // end namespace mdcm

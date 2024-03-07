@@ -55,13 +55,6 @@
 namespace mdcm
 {
 
-Scanner::Scanner()
-  : Values()
-  , Filenames()
-  , Mappings()
-  , Progress(0.0)
-{}
-
 std::string
 Scanner::GetString(const DataElement & de, const DataSet & ds, const bool implicit, const Dict & dict) const
 {

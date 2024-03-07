@@ -83,7 +83,6 @@ GetVRFromDataSetFormatDict(const Tag & t)
 {
   static const unsigned int nentries = sizeof(DataSetFormatDict) / sizeof(*DataSetFormatDict);
   VR                        ret = VR::VR_END;
-  // static const Tag tend = Tag(0xffff,0xffff);
   for (unsigned int i = 0; i < nentries; ++i)
   {
     const DataSetFormatEntry & entry = DataSetFormatDict[i];
@@ -102,7 +101,7 @@ struct equ
   const char vr[2 + 1];
 };
 
-// Looks like there is mapping in between syngodt and vr...
+// Looks like there is mapping in between syngodt and vr
 //  O <=> UN
 //  3 <=> DS
 //  4 <=> FD
@@ -169,7 +168,7 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
   InternalCSADataSet.clear();
   InternalDataSet.Clear();
   mdcmDebugMacro("Entering print");
-  InternalType = UNKNOWN; // reset
+  InternalType = UNKNOWN; // Reset
   mdcm::Tag tt1(0x0029, 0x0010);
   mdcm::Tag tt2(0x0029, 0x0020);
   uint16_t  v = static_cast<uint16_t>(de.GetTag().GetElement() << 8);
@@ -210,11 +209,13 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
     ss.str(s);
     ss.read(signature, 4);
   }
-  // std::cout << signature << std::endl;
-  // 1. NEW FORMAT
-  // 2. OLD FORMAT
+#if 0
+  std::cout << signature << std::endl;
+#endif
+  // 1. New format
+  // 2. Old format
   // 3. Zero out
-  // 4. DATASET FORMAT (Explicit Little Endian), with group=0x0 elements:
+  // 4. Dataset format (Explicit Little Endian), with group=0x0 elements:
   if (strcmp(signature, "SV10") != 0)
   {
     if (checkallzero(ss))
@@ -232,7 +233,7 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
     {
       // Most often start with an element (0000,xxxx)
       // And ends with element:
-      // (ffff,ffff)  CS  10  END!
+      // (ffff,ffff)  CS  10  END
       ss.seekg(0, std::ios::beg);
       // SIEMENS-JPEG-CorruptFragClean.dcm
       InternalType = DATASET_FORMAT;
@@ -242,7 +243,7 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
         DataSet & ds = InternalDataSet;
         while (xde.Read<ExplicitDataElement, SwapperNoOp>(ss))
         {
-          ds.InsertDataElement(xde); // Cannot use Insert since Group = 0x0 (< 0x8)
+          ds.InsertDataElement(xde); // Can not use Insert since Group = 0x0 (< 0x8)
         }
         assert(ss.eof());
       }
@@ -263,7 +264,7 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
   }
   if (strcmp(signature, "SV10") == 0)
   {
-    // NEW FORMAT
+    // New format
     ss.read(signature, 4);
     assert(strcmp(signature, "\4\3\2\1") == 0);
     InternalType = SV10;
@@ -282,13 +283,13 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
     mdcmErrorMacro("Must be a new format. Giving up");
     return false;
   }
-  assert(unused == 77); // 'M' character...
+  assert(unused == 77); // 'M' character
   for (uint32_t i = 0; i < n; ++i)
   {
     CSAElement csael;
     csael.SetKey(i);
     char name[64 + 1];
-    name[64] = 0; // security
+    name[64] = 0; // secure
     ss.read(name, 64);
     csael.SetName(name);
     uint32_t vm;
@@ -337,9 +338,9 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
         {
           return false;
         }
-        val[len] = 0; // security
+        val[len] = 0; // secure
         ss.read(val, len);
-        // simply print the value as if it was IS/DS or LO (ASCII)
+        // Print the value as if it was IS/DS or LO (ASCII)
         if (j)
         {
           os << '\\';
@@ -362,22 +363,21 @@ CSAHeader::LoadFromDataElement(DataElement const & de)
 void
 CSAHeader::Print(std::ostream & os) const
 {
-  std::set<CSAElement>::const_iterator it = InternalCSADataSet.cbegin();
-  mdcm::Tag                            tt1(0x0029, 0x0010);
-  mdcm::Tag                            tt2(0x0029, 0x0020);
-  if (DataElementTag == tt1)
+  if (DataElementTag == mdcm::Tag(0x0029, 0x0010))
   {
     os << "Image shadow data (0029|xx10)\n\n";
   }
-  else if (DataElementTag == tt2)
+  else if (DataElementTag == mdcm::Tag(0x0029, 0x0020))
   {
     os << "Series shadow data (0029|xx20)\n\n";
   }
-  for (; it != InternalCSADataSet.cend(); ++it)
+  for (std::set<CSAElement>::const_iterator it = InternalCSADataSet.cbegin(); 
+       it != InternalCSADataSet.cend(); ++it)
   {
     if (!((*it).IsEmpty()))
-      os << *it << std::endl;
+      os << *it << '\n';
   }
+  os << std::endl;
 }
 
 const CSAElement &
@@ -385,12 +385,12 @@ CSAHeader::GetCSAElementByName(const char * name)
 {
   if (name)
   {
-    std::set<CSAElement>::const_iterator it = InternalCSADataSet.cbegin();
-    for (; it != InternalCSADataSet.cend(); ++it)
+    for (std::set<CSAElement>::const_iterator it = InternalCSADataSet.cbegin();
+         it != InternalCSADataSet.cend(); ++it)
     {
       const char * itname = it->GetName();
       assert(itname);
-      if (strcmp(name, itname) == 0)
+      if (itname && strcmp(name, itname) == 0)
       {
         return *it;
       }
@@ -404,12 +404,12 @@ CSAHeader::FindCSAElementByName(const char * name)
 {
   if (name)
   {
-    std::set<CSAElement>::const_iterator it = InternalCSADataSet.cbegin();
-    for (; it != InternalCSADataSet.cend(); ++it)
+    for (std::set<CSAElement>::const_iterator it = InternalCSADataSet.cbegin();
+         it != InternalCSADataSet.cend(); ++it)
     {
       const char * itname = it->GetName();
       assert(itname);
-      if (strcmp(name, itname) == 0)
+      if (itname && strcmp(name, itname) == 0)
       {
         return true;
       }
@@ -418,40 +418,37 @@ CSAHeader::FindCSAElementByName(const char * name)
   return false;
 }
 
-static const char             csaheader[] = "SIEMENS CSA HEADER";
-static const mdcm::PrivateTag t1(0x0029, 0x0010, csaheader); // CSA Image Header Info
-static const mdcm::PrivateTag t2(0x0029, 0x0020, csaheader); // CSA Series Header Info
-static const char             csanonimage[] = "SIEMENS CSA NON-IMAGE";
-static const mdcm::PrivateTag t3(0x0029, 0x0010, csanonimage); // CSA Data Info
-
 const PrivateTag &
 CSAHeader::GetCSAImageHeaderInfoTag()
 {
+  static const mdcm::PrivateTag t1(0x0029, 0x0010, "SIEMENS CSA HEADER"); // CSA Image Header Info
   return t1;
 }
 
 const PrivateTag &
 CSAHeader::GetCSASeriesHeaderInfoTag()
 {
+  static const mdcm::PrivateTag t2(0x0029, 0x0020, "SIEMENS CSA HEADER"); // CSA Series Header Info
   return t2;
 }
 
 const PrivateTag &
 CSAHeader::GetCSADataInfo()
 {
+  static const mdcm::PrivateTag t3(0x0029, 0x0010, "SIEMENS CSA NON-IMAGE"); // CSA Data Info
   return t3;
 }
 
 bool
 CSAHeader::GetMrProtocol(const DataSet & ds, MrProtocol & mrProtocol)
 {
-  if (!ds.FindDataElement(t2))
+  if (!ds.FindDataElement(mdcm::PrivateTag(0x0029, 0x0020, "SIEMENS CSA HEADER")))
     return false;
-  if (!LoadFromDataElement(ds.GetDataElement(t2)))
+  if (!LoadFromDataElement(ds.GetDataElement(mdcm::PrivateTag(0x0029, 0x0020, "SIEMENS CSA HEADER"))))
     return false;
 
   //  28 - 'MrProtocolVersion' VM 1, VR IS, SyngoDT 6, NoOfItems 6, Data '21710006'
-  int               mrprotocolversion = 0;
+  int               mrprotocolversion{};
   static const char version[] = "MrProtocolVersion";
   // This is not an error if we do not find the version:
   if (FindCSAElementByName(version))
@@ -466,11 +463,9 @@ CSAHeader::GetMrProtocol(const DataSet & ds, MrProtocol & mrProtocol)
     }
   }
 
-  static const char * candidates[] = { "MrProtocol", "MrPhoenixProtocol" };
-
-  static const int n = sizeof candidates / sizeof *candidates;
-  bool             found = false;
-  for (int i = 0; i < n; ++i)
+  static const char * candidates[] = { "MrProtocol", "MrPhoenixProtocol" }; // 2
+  bool                found{};
+  for (unsigned int i = 0; i < 2; ++i)
   {
     const char * candidate = candidates[i];
     if (FindCSAElementByName(candidate))

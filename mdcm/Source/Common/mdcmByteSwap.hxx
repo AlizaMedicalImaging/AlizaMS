@@ -37,6 +37,7 @@ ByteSwap<T>::SystemIsBigEndian()
 {
   return true;
 }
+
 template <class T>
 bool
 ByteSwap<T>::SystemIsLittleEndian()
@@ -50,6 +51,7 @@ ByteSwap<T>::SystemIsBigEndian()
 {
   return false;
 }
+
 template <class T>
 bool
 ByteSwap<T>::SystemIsLittleEndian()

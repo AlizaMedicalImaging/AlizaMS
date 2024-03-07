@@ -38,12 +38,8 @@
 
 namespace mdcm
 {
-PixmapReader::PixmapReader()
-  : PixelData(new Pixmap)
-  , m_AlppySupplementalLUT(false)
-  , m_ProcessOverlays(true)
-  , m_ProcessIcons(false)
-  , m_ProcessCurves(false)
+
+PixmapReader::PixmapReader() : PixelData(new Pixmap)
 {}
 
 void
@@ -295,7 +291,7 @@ DoIconImage(const DataSet & rootds, Pixmap & image)
         else
         {
           mdcmWarningMacro("Icon Sequence is incomplete. Giving up");
-          pixeldata.Clear();
+          pixeldata.ClearDimensions();
           return;
         }
       }
@@ -305,7 +301,7 @@ DoIconImage(const DataSet & rootds, Pixmap & image)
     if (!ds.FindDataElement(tpixeldata))
     {
       mdcmWarningMacro("Icon Sequence is incomplete. Giving up");
-      pixeldata.Clear();
+      pixeldata.ClearDimensions();
       return;
     }
     const DataElement & de = ds.GetDataElement(tpixeldata);
@@ -979,7 +975,6 @@ bool
 PixmapReader::ReadACRNEMAImage()
 {
   const DataSet &   ds = F->GetDataSet();
-  std::stringstream ss;
   // Ok we have the dataset let's feed the Image (PixelData)
   // First find how many dimensions there is:
   // D 0028|0005 [SS] [Image Dimensions (RET)] [2]

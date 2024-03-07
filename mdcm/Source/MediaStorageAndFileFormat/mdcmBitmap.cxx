@@ -37,17 +37,7 @@
 namespace mdcm
 {
 
-Bitmap::Bitmap()
-  : PlanarConfiguration(0)
-  , NumberOfDimensions(2)
-  , TS()
-  , PF()
-  , PI()
-  , Dimensions()
-  , PixelData()
-  , LUT(new LookupTable)
-  , NeedByteSwap(false)
-  , LossyFlag(false)
+Bitmap::Bitmap() : LUT(new LookupTable)
 {}
 
 unsigned int
@@ -59,62 +49,58 @@ Bitmap::GetNumberOfDimensions() const
 void
 Bitmap::SetNumberOfDimensions(unsigned int dim)
 {
-  NumberOfDimensions = dim;
-  assert(NumberOfDimensions);
-  Dimensions.resize(3);
-  assert(NumberOfDimensions == 2 || NumberOfDimensions == 3);
-  if (NumberOfDimensions == 2)
+  if (!(dim == 2 || dim == 3))
   {
-    Dimensions[2] = 1;
+    mdcmAlwaysWarnMacro("Internal error, NumberOfDimensions = " << dim);
+    NumberOfDimensions = 2;
+  }
+  NumberOfDimensions = dim;
+  if (NumberOfDimensions != 3u)
+  {
+    Dimensions[2] = 1u;
   }
 }
 
 const unsigned int *
 Bitmap::GetDimensions() const
 {
-  assert(NumberOfDimensions);
   return Dimensions.data();
 }
 
 unsigned int
 Bitmap::GetDimension(unsigned int idx) const
 {
-  assert(NumberOfDimensions);
-  return Dimensions[idx];
+  if (idx < 3)
+    return Dimensions[idx];
+  return 0u;
 }
 
 void
 Bitmap::SetDimensions(const unsigned int * dims)
 {
-  assert(NumberOfDimensions);
-  assert(Dimensions.size() == 3);
   Dimensions[0] = dims[0];
   Dimensions[1] = dims[1];
-  if (NumberOfDimensions == 2)
-    Dimensions[2] = 1;
-  else
+  if (NumberOfDimensions == 3)
     Dimensions[2] = dims[2];
+  else
+    Dimensions[2] = 1u;
 }
 
 void
 Bitmap::SetDimension(unsigned int idx, unsigned int dim)
 {
-  assert(NumberOfDimensions);
-  assert(idx < NumberOfDimensions);
-  Dimensions.resize(3);
-  Dimensions[idx] = dim;
-  if (NumberOfDimensions == 2)
-    Dimensions[2] = 1;
+  if (idx < 3)
+    Dimensions[idx] = dim;
 }
 
 unsigned int
 Bitmap::GetPlanarConfiguration() const
 {
-  if (PlanarConfiguration && PF.GetSamplesPerPixel() != 3)
+  if (PlanarConfiguration != 0 && PF.GetSamplesPerPixel() != 3)
   {
     assert(0);
     mdcmWarningMacro("Can't set PlanarConfiguration if SamplesPerPixel is not 3");
-    return 0;
+    return 0u;
   }
   return PlanarConfiguration;
 }
@@ -124,38 +110,53 @@ Bitmap::SetPlanarConfiguration(unsigned int pc)
 {
   assert(pc == 0 || pc == 1);
   PlanarConfiguration = pc;
-  if (pc)
+  if (pc != 0)
   {
     if (PF.GetSamplesPerPixel() != 3)
     {
-      mdcmWarningMacro("Cant have Planar Configuration in non RGB input. Discarding");
+      mdcmWarningMacro("Can not set Planar Configuration for the scalar image, discarding");
       PlanarConfiguration = 0;
     }
     const TransferSyntax & ts = GetTransferSyntax();
-    if (ts == TransferSyntax::JPEGBaselineProcess1 || ts == TransferSyntax::JPEGExtendedProcess2_4 ||
-        ts == TransferSyntax::JPEGExtendedProcess3_5 || ts == TransferSyntax::JPEGSpectralSelectionProcess6_8 ||
-        ts == TransferSyntax::JPEGFullProgressionProcess10_12 || ts == TransferSyntax::JPEGLosslessProcess14 ||
-        ts == TransferSyntax::JPEGLosslessProcess14_1 || ts == TransferSyntax::JPEGLSLossless ||
-        ts == TransferSyntax::JPEGLSNearLossless || ts == TransferSyntax::JPEG2000Lossless ||
-        ts == TransferSyntax::JPEG2000 || ts == TransferSyntax::JPIPReferenced)
+    if (ts == TransferSyntax::JPEGBaselineProcess1 ||
+        ts == TransferSyntax::JPEGExtendedProcess2_4 ||
+        ts == TransferSyntax::JPEGExtendedProcess3_5 ||
+        ts == TransferSyntax::JPEGSpectralSelectionProcess6_8 ||
+        ts == TransferSyntax::JPEGFullProgressionProcess10_12 ||
+        ts == TransferSyntax::JPEGLosslessProcess14 ||
+        ts == TransferSyntax::JPEGLosslessProcess14_1 ||
+        ts == TransferSyntax::JPEGLSLossless ||
+        ts == TransferSyntax::JPEGLSNearLossless ||
+        ts == TransferSyntax::JPEG2000Lossless ||
+        ts == TransferSyntax::JPEG2000 ||
+        ts == TransferSyntax::HTJ2K ||
+        ts == TransferSyntax::HTJ2KLossless ||
+        ts == TransferSyntax::HTJ2KLosslessRPCL ||
+        ts == TransferSyntax::JPIPReferenced ||
+        ts == TransferSyntax::JPIPHTJ2KReferenced ||
+        ts == TransferSyntax::JPIPHTJ2KReferencedDeflate)
     {
-      mdcmWarningMacro("Cant have Planar Configuration in JPEG/JPEG-LS/JPEG 2000. Discarding");
+      mdcmWarningMacro("Can not have Planar Configuration for the transfer syntax "
+                       << ts << ", discarding");
       PlanarConfiguration = 0;
     }
   }
-  assert(PlanarConfiguration == 0 || PlanarConfiguration == 1);
 }
 
 void
-Bitmap::Clear()
+Bitmap::ClearDimensions()
 {
-  Dimensions.clear();
+  Dimensions[0] = 0;
+  Dimensions[1] = 0;
+  Dimensions[2] = 1;
 }
 
 bool
-Bitmap::IsEmpty() const
+Bitmap::IsDimensionEmpty() const
 {
-  return (Dimensions.empty());
+  if (Dimensions.at(0) == 0 || Dimensions.at(1) == 0)
+    return true;
+  return false;
 }
 
 const PhotometricInterpretation &
@@ -193,14 +194,13 @@ Bitmap::GetBufferLength() const
     return 0ull;
   }
   {
-    const size_t dims_size = Dimensions.size();
-    if (NumberOfDimensions == 2 && dims_size == 3 && Dimensions[2] != 1)
+    if (NumberOfDimensions == 2 && Dimensions[2] != 1)
     {
-      mdcmAlwaysWarnMacro("NumberOfDimensions is 2, but Z dimension is " << Dimensions[2]);
+      mdcmAlwaysWarnMacro("NumberOfDimensions is 2, but 3rd dimension is " << Dimensions[2]);
     }
-    else if (NumberOfDimensions == 3 && dims_size < 3) // unreachable
+    else if (NumberOfDimensions == 3 && Dimensions[2] == 0)
     {
-      mdcmAlwaysWarnMacro("NumberOfDimensions is 3, but Dimensions.size() is " << dims_size);
+      mdcmAlwaysWarnMacro("NumberOfDimensions is 3, but Dimensions[2] is 0");
       return 0ull;
     }
   }
@@ -375,25 +375,25 @@ Bitmap::GetLUT()
 void
 Bitmap::SetColumns(unsigned int col)
 {
-  SetDimension(0, col);
+  Dimensions[0] = col;
 }
 
 unsigned int
 Bitmap::GetColumns() const
 {
-  return GetDimension(0);
+  return Dimensions[0];
 }
 
 void
 Bitmap::SetRows(unsigned int rows)
 {
-  SetDimension(1, rows);
+  Dimensions[1] = rows;
 }
 
 unsigned int
 Bitmap::GetRows() const
 {
-  return GetDimension(1);
+  return Dimensions[1];
 }
 
 const PixelFormat &
@@ -419,29 +419,12 @@ void
 Bitmap::Print(std::ostream & os) const
 {
   Object::Print(os);
-  if (!IsEmpty())
-  {
-    os << "NumberOfDimensions: " << NumberOfDimensions << '\n';
-    if (!Dimensions.empty())
-    {
-      os << "Dimensions: (";
-      std::vector<unsigned int>::const_iterator it = Dimensions.cbegin();
-      os << *it;
-      for (; it != Dimensions.cend(); ++it)
-      {
-        os << ", " << *it;
-      }
-      os << ")\n";
-    }
-    else
-    {
-      assert(0);
-    }
-    PF.Print(os);
-    os << "PhotometricInterpretation: " << PI << '\n';
-    os << "PlanarConfiguration: " << PlanarConfiguration << '\n';
-    os << "TransferSyntax: " << TS << '\n';
-  }
+  os << "NumberOfDimensions: " << NumberOfDimensions << "\nDimensions: ("
+     << Dimensions[0] << ", " << Dimensions[1] << ", " << Dimensions[2] << ")\n";
+  PF.Print(os);
+  os << "\nPhotometricInterpretation: " << PI
+     << "\nPlanarConfiguration: " << PlanarConfiguration
+     << "\nTransferSyntax: " << TS << '\n';
 }
 
 // Image can be lossy but in implicit little endian format
@@ -613,7 +596,7 @@ Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
         }
       }
 #endif
-      if (GetDimensions()[0] != codec.GetDimensions()[0] || GetDimensions()[1] != codec.GetDimensions()[1])
+      if (Dimensions[0] != codec.GetDimensions()[0] || Dimensions[1] != codec.GetDimensions()[1])
       {
         // JPEGNote_bogus.dcm
         mdcmAlwaysWarnMacro("TryJPEGCodec: dimension mismatch for JPEG");
@@ -749,7 +732,7 @@ Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
         }
       }
 #endif
-      if (GetDimensions()[0] != codec.GetDimensions()[0] || GetDimensions()[1] != codec.GetDimensions()[1])
+      if (Dimensions[0] != codec.GetDimensions()[0] || Dimensions[1] != codec.GetDimensions()[1])
       {
         mdcmAlwaysWarnMacro("TryJPEGCodec: dimension mismatch");
         (const_cast<Bitmap *>(this))->SetDimensions(codec.GetDimensions());

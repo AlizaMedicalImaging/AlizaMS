@@ -301,7 +301,7 @@ endmacro()
 
 set(MDCM_MAJOR_VERSION 1)
 set(MDCM_MINOR_VERSION 5)
-set(MDCM_BUILD_VERSION 0)
+set(MDCM_BUILD_VERSION 1)
 set(MDCM_VERSION "${MDCM_MAJOR_VERSION}.${MDCM_MINOR_VERSION}.${MDCM_BUILD_VERSION}")
 set(MDCM_API_VERSION "${MDCM_MAJOR_VERSION}.${MDCM_MINOR_VERSION}")
 
@@ -386,8 +386,6 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Utilities)
 
 set(MDCM_COMMON_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmVersion.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmRegion.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmBoxRegion.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmEvent.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmMD5.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmBase64.cxx
@@ -445,7 +443,6 @@ set(MDCM_DSED_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmSequenceOfItems.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmValue.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmTag.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmTagToVR.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmCodeString.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmByteSwapFilter.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmUNExplicitImplicitDataElement.cxx

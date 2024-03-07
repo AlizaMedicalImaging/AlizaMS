@@ -55,7 +55,7 @@ public:
   Pixmap &
   GetPixmap();
   void
-  SetPixmap(Pixmap const &);
+  SetPixmap(const Pixmap &);
 
 private:
   SmartPointer<File>   F;

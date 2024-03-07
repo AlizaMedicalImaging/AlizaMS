@@ -104,6 +104,7 @@ class Attribute
 {
 public:
   typedef typename VRToType<TVR>::Type ArrayType;
+
   enum
   {
     VMType = VMToLength<TVM>::Length
@@ -159,12 +160,12 @@ public:
   void
   Print(std::ostream & os) const
   {
-    os << GetTag() << " ";
-    os << TagToType<Group, Element>::GetVRString() << " ";
-    os << TagToType<Group, Element>::GetVMString() << " ";
-    os << Internal[0];
+    os << GetTag() << ' '
+       << TagToType<Group, Element>::GetVRString() << ' '
+       << TagToType<Group, Element>::GetVMString() << ' '
+       << Internal[0];
     for (unsigned int i = 1; i < GetNumberOfValues(); ++i)
-      os << "," << Internal[i];
+      os << ',' << Internal[i];
   }
 
   bool
@@ -238,7 +239,7 @@ public:
       {
         if (os.str().size() % 2)
         {
-          os << " ";
+          os << ' ';
         }
       }
     }
@@ -317,10 +318,12 @@ class Attribute<Group, Element, TVR, VM::VM1>
 {
 public:
   typedef typename VRToType<TVR>::Type ArrayType;
+
   enum
   {
     VMType = VMToLength<VM::VM1>::Length
   };
+
   ArrayType Internal;
 
   static_assert(static_cast<bool>(static_cast<VR::VRType>(TVR) & static_cast<VR::VRType>(TagToType<Group, Element>::VRType)), "");
@@ -369,10 +372,10 @@ public:
   void
   Print(std::ostream & os) const
   {
-    os << GetTag() << " ";
-    os << TagToType<Group, Element>::GetVRString() << " ";
-    os << TagToType<Group, Element>::GetVMString() << " ";
-    os << Internal;
+    os << GetTag() << ' '
+       << TagToType<Group, Element>::GetVRString() << ' '
+       << TagToType<Group, Element>::GetVMString() << ' '
+       << Internal;
   }
 
   bool
@@ -509,6 +512,17 @@ template <uint16_t Group, uint16_t Element, long long TVR>
 class Attribute<Group, Element, TVR, VM::VM1_n>
 {
 public:
+  Attribute() = default;
+
+  ~Attribute()
+  {
+    if (Own)
+    {
+      delete[] Internal;
+    }
+    Internal = nullptr;
+  }
+
   typedef typename VRToType<TVR>::Type ArrayType;
 
   static_assert(static_cast<bool>(static_cast<VR::VRType>(TVR) & static_cast<VR::VRType>(TagToType<Group, Element>::VRType)), "");
@@ -543,22 +557,6 @@ public:
     return GetVM();
   }
 
-  explicit Attribute()
-  {
-    Internal = nullptr;
-    Length = 0;
-    Own = true;
-  }
-
-  ~Attribute()
-  {
-    if (Own)
-    {
-      delete[] Internal;
-    }
-    Internal = nullptr;
-  }
-
   unsigned int
   GetNumberOfValues() const
   {
@@ -580,15 +578,13 @@ public:
   void
   Print(std::ostream & os) const
   {
-    os << GetTag() << " ";
-    os << GetVR() << " ";
-    os << GetVM() << " ";
+    os << GetTag() << ' ' << GetVR() << ' ' << GetVM() << ' ';
     if (Length > 0)
       os << Internal[0];
     if (Length > 1)
     {
       for (unsigned int i = 1; i < GetNumberOfValues(); ++i)
-        os << "," << Internal[i];
+        os << ',' << Internal[i];
     }
   }
 
@@ -735,9 +731,9 @@ protected:
   }
 
 private:
-  ArrayType *  Internal;
-  unsigned int Length;
-  bool         Own;
+  ArrayType *  Internal{};
+  unsigned int Length{};
+  bool         Own{true};
 };
 
 template <uint16_t Group, uint16_t Element, long long TVR>

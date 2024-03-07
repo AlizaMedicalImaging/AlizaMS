@@ -43,62 +43,77 @@ public:
   typedef FragmentVector::size_type      SizeType;
   typedef FragmentVector::iterator       Iterator;
   typedef FragmentVector::const_iterator ConstIterator;
+
+  SequenceOfFragments() = default;
+
   Iterator
   Begin()
   {
     return Fragments.begin();
   }
+
   Iterator
   End()
   {
     return Fragments.end();
   }
+
   ConstIterator
   Begin() const
   {
     return Fragments.begin();
   }
+
   ConstIterator
   End() const
   {
     return Fragments.end();
   }
-  SequenceOfFragments()
-    : Table()
-    , SequenceLengthField(0xffffffff)
-  {}
+
   VL
   GetLength() const override
   {
     return SequenceLengthField;
   }
+
   void
   SetLength(VL length) override
   {
     SequenceLengthField = length;
   }
+
   void
   Clear() override;
+
   void
   AddFragment(Fragment const &);
+
   unsigned long long
   ComputeByteLength() const;
+
   VL
   ComputeLength() const;
+
   bool
   GetBuffer(char *, unsigned long long) const;
+
   bool
   GetFragBuffer(unsigned int, char *, unsigned long long &) const;
+
   SizeType
   GetNumberOfFragments() const;
+
   const Fragment GetFragment(SizeType) const;
+
   bool
   WriteBuffer(std::ostream &) const;
+
   const BasicOffsetTable &
   GetTable() const
   {
     return Table;
   }
+
   BasicOffsetTable &
   GetTable()
   {
@@ -306,18 +321,16 @@ public:
   void
   Print(std::ostream & os) const override
   {
-    os << "SQ L= " << SequenceLengthField << "\n";
-    os << "Table:" << Table << "\n";
+    os << "SQ L= " << SequenceLengthField << "\nTable:\n" << Table << '\n';
     for (ConstIterator it = Begin(); it != End(); ++it)
     {
-      os << "  " << *it << "\n";
+      os << ' ' << *it << '\n';
     }
     assert(SequenceLengthField.IsUndefined());
     {
       const Tag seqDelItem(0xfffe, 0xe0dd);
       VL        zero = 0;
-      os << seqDelItem;
-      os << "\t" << zero;
+      os << seqDelItem << '\t' << zero;
     }
   }
 
@@ -329,11 +342,12 @@ public:
   }
 
 private:
-  BasicOffsetTable Table;
-  VL               SequenceLengthField;
-  FragmentVector   Fragments;
   bool
   FillFragmentWithJPEG(Fragment &, std::istream &);
+
+  BasicOffsetTable Table{};
+  VL               SequenceLengthField{0xffffffff};
+  FragmentVector   Fragments{};
 };
 
 } // end namespace mdcm

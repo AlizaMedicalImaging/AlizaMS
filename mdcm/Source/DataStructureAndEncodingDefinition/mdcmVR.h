@@ -113,13 +113,25 @@ public:
     VRALL    = VRASCII | VRBINARY
   } VRType;
 
+  VR() = default;
+
+  VR(VRType vr)
+    : VRField(vr)
+  {}
+
   static const char * GetVRString(VRType);
-  // This function will only look at the very first two chars nothing else
+
+  // This function will only look at the very first two chars
   static VRType GetVRTypeFromFile(const char *);
+
   static VRType GetVRType(const char *);
+
   static const char * GetVRStringFromFile(VRType);
+
   static bool IsValid(const char *);
+
   static bool IsValid(const char *, VRType);
+
   static bool IsSwap(const char *);
 
   unsigned int
@@ -140,13 +152,12 @@ public:
   }
 
   static bool IsBinary(VRType);
-  static bool IsASCII(VRType);
-  static bool IsBinary2(VRType);
-  static bool IsASCII2(VRType);
 
-  VR(VRType vr = INVALID)
-    : VRField(vr)
-  {}
+  static bool IsASCII(VRType);
+
+  static bool IsBinary2(VRType);
+
+  static bool IsASCII2(VRType);
 
   std::istream &
   Read(std::istream & is)
@@ -198,18 +209,23 @@ public:
   }
 
   operator VRType() const { return VRField; }
+
   unsigned int
   GetSize() const;
+
   bool
   Compatible(VR const &) const;
+
   bool
   IsVRFile() const;
+
   bool
   IsDual() const;
 
 private:
   static unsigned int GetIndex(VRType);
-  VRType              VRField;
+
+  VRType VRField{INVALID};
 };
 
 inline std::ostream &

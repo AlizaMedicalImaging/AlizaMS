@@ -77,7 +77,7 @@ public:
   HasObserver(const Event &) const;
 
 private:
-  SubjectInternals * Internals;
+  SubjectInternals * Internals{};
 };
 
 } // end namespace mdcm

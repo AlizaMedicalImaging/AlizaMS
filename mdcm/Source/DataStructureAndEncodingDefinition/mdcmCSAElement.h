@@ -39,10 +39,10 @@ class MDCM_EXPORT CSAElement
   operator<<(std::ostream &, const CSAElement &);
 
 public:
-  CSAElement(unsigned int kf = 0)
+  CSAElement() = default;
+
+  explicit CSAElement(unsigned int kf)
     : KeyField(kf)
-    , SyngoDTField(0)
-    , NoOfItemsField(0)
   {}
 
   unsigned int
@@ -118,20 +118,20 @@ public:
   }
 
   // Set/Get Value (bytes array, SQ of items, SQ of fragments):
-  Value const &
+  const Value &
   GetValue() const
   {
-    return *DataField;
+    return *DataField; // Always check IsEmpty() before!
   }
 
   Value &
   GetValue()
   {
-    return *DataField;
+    return *DataField; // Always check IsEmpty() before!
   }
 
   void
-  SetValue(Value const & vl)
+  SetValue(const Value & vl)
   {
     DataField = vl;
   }
@@ -186,14 +186,13 @@ public:
   }
 
 protected:
-  unsigned int                KeyField;
-  std::string                 NameField;
-  VM                          ValueMultiplicityField;
-  VR                          VRField;
-  unsigned int                SyngoDTField;
-  unsigned int                NoOfItemsField;
-  typedef SmartPointer<Value> DataPtr;
-  DataPtr                     DataField;
+  unsigned int                KeyField{};
+  std::string                 NameField{};
+  VM                          ValueMultiplicityField{};
+  VR                          VRField{};
+  unsigned int                SyngoDTField{};
+  unsigned int                NoOfItemsField{};
+  SmartPointer<Value>         DataField{};
 };
 
 inline std::ostream &

@@ -41,11 +41,12 @@ public:
   } SwapCodeType;
 
   operator SwapCode::SwapCodeType() const { return SwapCodeValue; }
-  SwapCode(SwapCodeType sc = Unknown)
+  SwapCode() = default;
+  SwapCode(SwapCodeType sc)
     : SwapCodeValue(sc)
   {}
   static const char *
-  GetSwapCodeString(SwapCode const & sc);
+  GetSwapCodeString(const SwapCode & sc);
   friend std::ostream &
   operator<<(std::ostream & os, const SwapCode & sc);
 
@@ -54,7 +55,7 @@ protected:
   GetIndex(SwapCode const & sc);
 
 private:
-  SwapCodeType SwapCodeValue;
+  SwapCodeType SwapCodeValue{Unknown};
 };
 
 inline std::ostream &

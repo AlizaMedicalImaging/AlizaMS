@@ -36,12 +36,11 @@ namespace mdcm
 class FileNameEvent : public AnyEvent
 {
 public:
-  typedef FileNameEvent Self;
-  typedef AnyEvent      Superclass;
-  FileNameEvent(const char * s = "")
+  FileNameEvent() = default;
+  FileNameEvent(const char * s)
     : m_FileName(s)
   {}
-  FileNameEvent(const Self & s)
+  FileNameEvent(const FileNameEvent & s)
     : AnyEvent(s) {}
   ~FileNameEvent() = default;
 
@@ -54,13 +53,13 @@ public:
   bool
   CheckEvent(const ::mdcm::Event * e) const override
   {
-    return dynamic_cast<const Self *>(e) ? true : false;
+    return dynamic_cast<const FileNameEvent *>(e) ? true : false;
   }
 
   ::mdcm::Event *
   MakeObject() const override
   {
-    return new Self;
+    return new FileNameEvent;
   }
 
   void
@@ -77,8 +76,8 @@ public:
 
 private:
   void
-  operator=(const Self &);
-  std::string m_FileName;
+  operator=(const FileNameEvent &);
+  std::string m_FileName{};
 };
 
 

@@ -30,11 +30,10 @@ namespace mdcm
 class DataEvent : public AnyEvent
 {
 public:
-  typedef DataEvent Self;
-  typedef AnyEvent  Superclass;
-  DataEvent(const char * bytes = nullptr, size_t len = 0)
+  DataEvent() = default;
+  DataEvent(const char * bytes, size_t len)
     : Bytes(bytes), Length(len) {}
-  DataEvent(const Self & s)
+  DataEvent(const DataEvent & s)
     : AnyEvent(s), Bytes(nullptr), Length(0) {}
   ~DataEvent() override = default;
   const char *
@@ -45,12 +44,12 @@ public:
   bool
   CheckEvent(const ::mdcm::Event * e) const override
   {
-    return (dynamic_cast<const Self *>(e) == nullptr ? false : true);
+    return (dynamic_cast<const DataEvent *>(e) == nullptr ? false : true);
   }
   ::mdcm::Event *
   MakeObject() const override
   {
-    return new Self;
+    return new DataEvent;
   }
   void
   SetData(const char * bytes, size_t len)
@@ -70,9 +69,9 @@ public:
   }
 
 private:
-  void operator=(const Self &);
-  const char * Bytes;
-  size_t       Length;
+  void operator=(const DataEvent &);
+  const char * Bytes{};
+  size_t       Length{};
 };
 
 } // end namespace mdcm
