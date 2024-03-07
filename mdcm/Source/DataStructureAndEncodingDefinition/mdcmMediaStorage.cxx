@@ -31,7 +31,8 @@
 namespace mdcm
 {
 
-static const char * MSStrings[] = {
+const char * const MSStrings[] =
+{
   "1.2.840.10008.1.3.10",
   "1.2.840.10008.5.1.4.1.1.1",
   "1.2.840.10008.5.1.4.1.1.1.1",
@@ -253,7 +254,7 @@ struct MSModalityType
   const bool          Retired;
 };
 
-static const MSModalityType MSModalityTypes[] = {
+const MSModalityType MSModalityTypes[] = {
   { "00", 0, false },       // MediaStorageDirectoryStorage,
   { "CR", 2, false },       // ComputedRadiographyImageStorage,
   { "DX", 2, false },       // DigitalXRayImageStorageForPresentation,
@@ -404,7 +405,7 @@ MediaStorage::GuessFromModality(const char * modality, unsigned int dim)
   // no default value is set, it is up to the user to decide initial value
   if (!modality || !dim)
     return;
-  int i = 0;
+  int i{};
   while (MSModalityTypes[i].Modality && (strcmp(modality, MSModalityTypes[i].Modality) != 0 ||
                                          MSModalityTypes[i].Retired || MSModalityTypes[i].Dimension < dim))
   {

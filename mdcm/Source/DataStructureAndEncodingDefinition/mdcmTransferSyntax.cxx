@@ -20,7 +20,8 @@
 namespace mdcm
 {
 
-static const char * TSStrings[] = {
+const char * const TSStrings[] =
+{
   "1.2.840.10008.1.2",          // Implicit VR Little Endian
   "1.2.840.113619.5.2",         // Implicit VR Big Endian DLX (G.E Private)
   "1.2.840.10008.1.2.1",        // Explicit VR Little Endian
@@ -250,7 +251,7 @@ TransferSyntax::IsEncoded() const
 bool
 TransferSyntax::IsEncapsulated() const
 {
-  bool r = false;
+  bool r{};
   switch (TSField)
   {
     case JPEGBaselineProcess1:

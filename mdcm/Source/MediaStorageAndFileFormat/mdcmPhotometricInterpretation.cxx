@@ -48,7 +48,7 @@ namespace mdcm
  */
 
 // clang-format off
-const char * PIStrings[] =
+const char * const PIStrings[] =
 {
   "UNKNOWN",
   "MONOCHROME1 ",
@@ -66,6 +66,7 @@ const char * PIStrings[] =
   "YBR_RCT ",
   nullptr
 };
+constexpr unsigned int PIStrings_size = 14U;
 // clang-format on
 
 const char *
@@ -79,29 +80,26 @@ PhotometricInterpretation::GetPIType(const char * inputpi)
 {
   if (!inputpi)
     return PI_END;
-  // Handle whitespace and invalid padding
-  CodeString   codestring = inputpi;
-  CSComp       cs = codestring.GetAsString();
-  const char * pi = cs.c_str();
-  for (unsigned int i = 1; PIStrings[i] != nullptr; ++i)
+  const CodeString codestring = inputpi;
+  const CSComp     cs = codestring.GetAsString();
+  const char *     pi = cs.c_str();
+  for (unsigned int i = 1; i < PIStrings_size; ++i)
   {
     if (strcmp(pi, PIStrings[i]) == 0)
     {
       return PIType(i);
     }
   }
-  // We did not find anything,
-  // warning this piece of code will do MONOCHROME -> MONOCHROME1
-  static const unsigned int n = sizeof(PIStrings) / sizeof(*PIStrings) - 1;
-  size_t                    len = strlen(pi);
+  // We did not find anything.
+  // Warning: this piece of code will do MONOCHROME -> MONOCHROME1
+  size_t len = strlen(pi);
   if (pi[len - 1] == ' ')
     len--;
-  for (unsigned int i = 1; i < n; ++i)
+  for (unsigned int i = 1; i < PIStrings_size; ++i)
   {
     if (strncmp(pi, PIStrings[i], len) == 0)
     {
-      mdcmDebugMacro("PhotometricInterpretation was found: [" << pi
-                                                              << "], but is invalid. It should be padded with a space");
+      mdcmDebugMacro("PhotometricInterpretation [" << pi << "] may be not valid.");
       return PIType(i);
     }
   }
@@ -153,7 +151,7 @@ PhotometricInterpretation::IsLossless() const
     case HSV:
     case ARGB:
     case CMYK:
-    case YBR_FULL: // FIXME
+    case YBR_FULL:
     case YBR_RCT:
       return true;
     case YBR_FULL_422:
@@ -170,7 +168,7 @@ PhotometricInterpretation::IsLossless() const
 bool
 PhotometricInterpretation::IsRetired(PIType pi)
 {
-  return pi == HSV || pi == ARGB || pi == CMYK;
+  return (pi == HSV || pi == ARGB || pi == CMYK || pi == YBR_PARTIAL_422);
 }
 
 } // namespace mdcm

@@ -51,7 +51,7 @@ public:
     CMYK,
     YBR_FULL,
     YBR_FULL_422,
-    YBR_PARTIAL_422, // retired
+    YBR_PARTIAL_422,
     YBR_PARTIAL_420,
     YBR_ICT,
     YBR_RCT,
