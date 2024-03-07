@@ -443,13 +443,15 @@ PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
       ds.Replace(at1.GetAsDataElement());
       if (ts_orig == TransferSyntax::JPEG2000)
       {
-        static const CSComp newvalues2[] = { "ISO_15444_1" };
+        const CSComp newvalues2[] = { "ISO_15444_1" };
         at3.SetValues(newvalues2, 1);
+        ds.Replace(at3.GetAsDataElement());
       }
       else if (ts_orig == TransferSyntax::JPEGLSNearLossless)
       {
-        static const CSComp newvalues2[] = { "ISO_14495_1" };
+        const CSComp newvalues2[] = { "ISO_14495_1" };
         at3.SetValues(newvalues2, 1);
+        ds.Replace(at3.GetAsDataElement());
       }
       else if (ts_orig == TransferSyntax::JPEGBaselineProcess1 ||
                ts_orig == TransferSyntax::JPEGExtendedProcess2_4 ||
@@ -457,15 +459,20 @@ PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
                ts_orig == TransferSyntax::JPEGSpectralSelectionProcess6_8 ||
                ts_orig == TransferSyntax::JPEGFullProgressionProcess10_12)
       {
-        static const CSComp newvalues2[] = { "ISO_10918_1" };
+        const CSComp newvalues2[] = { "ISO_10918_1" };
         at3.SetValues(newvalues2, 1);
+        ds.Replace(at3.GetAsDataElement());
+      }
+      else if (ts_orig == TransferSyntax::HTJ2K)
+      {
+        const CSComp newvalues2[] = { "ISO_15444_15" };
+        at3.SetValues(newvalues2, 1);
+        ds.Replace(at3.GetAsDataElement());
       }
       else
       {
-        mdcmAlwaysWarnMacro("Pixel Data is lossy but I cannot find the original transfer syntax");
-        return false;
+        mdcmAlwaysWarnMacro("PixelData is lossy but failed to find the original transfer syntax");
       }
-      ds.Replace(at3.GetAsDataElement());
     }
     else
     {
