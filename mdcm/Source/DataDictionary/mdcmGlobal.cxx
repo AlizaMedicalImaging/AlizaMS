@@ -26,7 +26,7 @@
 namespace mdcm
 {
 
-static unsigned long long GlobalCount = 0;
+static unsigned long long GlobalCount = 0ULL;
 
 class GlobalInternal
 {
