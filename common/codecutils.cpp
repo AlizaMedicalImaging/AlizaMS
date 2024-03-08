@@ -452,7 +452,7 @@ QString CodecUtils::toUTF8(const QByteArray* ba, const char* charset, bool * ok)
     else if (s.contains(QString("IR 6")))
     {
       if (ok) *ok = true;
-	  return QString::fromLatin1(ba->constData());
+      return QString::fromLatin1(ba->constData());
     }
     else if (!s.isEmpty())
     {
@@ -480,13 +480,13 @@ QByteArray CodecUtils::fromUTF8(const QString & i, const char * charset, bool * 
 {
   if (i.isEmpty())
   {
-    *ok = true;
+    if (ok) *ok = true;
     return QByteArray();
   }
   const QString cs = QString::fromLatin1(charset);
   if (cs.isEmpty())
   {
-    *ok = true;
+    if (ok) *ok = true;
     return i.toLatin1();
   }
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
@@ -522,13 +522,13 @@ QByteArray CodecUtils::fromUTF8(const QString & i, const char * charset, bool * 
     // ISO IR 100
     if (s.contains(QString("IR 100")))
     {
-      *ok = true;
+      if (ok) *ok = true;
       return i.toLatin1();
     }
     // ISO IR 192
     else if (s.contains(QString("IR 192")))
     {
-      *ok = true;
+      if (ok) *ok = true;
       return i.toUtf8();
     }
     // GB18030
@@ -598,7 +598,7 @@ QByteArray CodecUtils::fromUTF8(const QString & i, const char * charset, bool * 
     // ISO IR 6
     else if (s.contains(QString("IR 6")))
     {
-      *ok = true;
+      if (ok) *ok = true;
       return i.toLatin1();
     }
     else if (!s.isEmpty())
@@ -607,12 +607,12 @@ QByteArray CodecUtils::fromUTF8(const QString & i, const char * charset, bool * 
     }
     if (codec)
     {
-      *ok = true;
+      if (ok) *ok = true;
       return codec->fromUnicode(i);
     }
     else
     {
-      *ok = false;
+      if (ok) *ok = false;
 #if 0
       std::cout << "fromUTF8 failed for " << charset << std::endl;
 #endif
@@ -622,7 +622,7 @@ QByteArray CodecUtils::fromUTF8(const QString & i, const char * charset, bool * 
 #if 0
   std::cout << "Currently not supported" << std::endl;
 #endif
-  *ok = false;
+  if (ok) *ok = false;
   return i.toLatin1();
 }
 
