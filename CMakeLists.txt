@@ -5,6 +5,13 @@
 ####################################################################
 
 cmake_minimum_required(VERSION 3.11.0)
+# Note:
+# For C++20 version 3.12 is required.
+# For C++23 version 3.20 is required.
+# For C++26 version 3.25 is required.
+# Minimum is C++14.
+# C++17 is required for Qt6 and ITK 5.4.
+#
 
 ####################################################################
 #
@@ -75,11 +82,10 @@ endif()
 set(ALIZA_QT_VERSION "QT_VERSION_NOT_SELECTED" CACHE STRING "Qt major version")
 set_property(CACHE ALIZA_QT_VERSION PROPERTY STRINGS "QT_VERSION_NOT_SELECTED" "4" "5" "6")
 
-# C++ standard "Not set" is usually safe and recommended
 # There is no guarantee that the option will work,
 # check "__cplusplus" (s. main.cpp PRINT_HOST_INFO define).
 set(ALIZA_CXX_STANDARD "Not set" CACHE STRING "Select C++ standard, usually not requied")
-set_property(CACHE ALIZA_CXX_STANDARD PROPERTY STRINGS "Not set" "14" "17" "20" "23")
+set_property(CACHE ALIZA_CXX_STANDARD PROPERTY STRINGS "Not set" "14" "17" "20" "23" "26")
 
 # Force-disable SSE/SSE2.
 option(ALIZA_DISABLE_SIMDMATH "Disable SSE/SSE2" OFF)
@@ -193,10 +199,7 @@ endif()
 
 if(ALIZA_CXX_STANDARD STREQUAL "Not set")
 else()
-  if(ALIZA_CXX_STANDARD STREQUAL "11")
-    set(CMAKE_CXX_STANDARD 11)
-    message(STATUS "Tried to set C++11")
-  elseif(ALIZA_CXX_STANDARD STREQUAL "14")
+  if(ALIZA_CXX_STANDARD STREQUAL "14")
     set(CMAKE_CXX_STANDARD 14)
     message(STATUS "Tried to set C++14")
   elseif(ALIZA_CXX_STANDARD STREQUAL "17")
@@ -205,6 +208,12 @@ else()
   elseif(ALIZA_CXX_STANDARD STREQUAL "20")
     set(CMAKE_CXX_STANDARD 20)
     message(STATUS "Tried to set C++20")
+  elseif(ALIZA_CXX_STANDARD STREQUAL "23")
+    set(CMAKE_CXX_STANDARD 23)
+    message(STATUS "Tried to set C++23")
+  elseif(ALIZA_CXX_STANDARD STREQUAL "26")
+    set(CMAKE_CXX_STANDARD 26)
+    message(STATUS "Tried to set C++26")
   endif()
   set(CMAKE_CXX_STANDARD_REQUIRED ON)
 endif()
