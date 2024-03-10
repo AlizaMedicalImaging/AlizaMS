@@ -61,8 +61,8 @@ operator<<(std::ostream & os, const Event & e)
   public:                                                           \
     typedef classname Self;                                         \
     typedef super Superclass;                                       \
-    classname() {};                                                 \
-    virtual ~classname() {};                                        \
+    classname() {}                                                  \
+    virtual ~classname() {}                                         \
     virtual const char * GetEventName() const override              \
     {                                                               \
       return #classname;                                            \
