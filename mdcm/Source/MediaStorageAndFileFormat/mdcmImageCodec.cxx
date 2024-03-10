@@ -202,16 +202,13 @@ ImageCodec::CleanupUnusedBits(char * data8, size_t datalen)
   if (PF.GetBitsAllocated() == 16)
   {
     // pmask: to mask the 'unused bits' (may contain overlays)
-    uint16_t pmask = 0xffff;
-    pmask = pmask >> static_cast<uint16_t>(PF.GetBitsAllocated() - PF.GetBitsStored());
+    const uint16_t pmask = static_cast<uint16_t>(0xffffU >> (PF.GetBitsAllocated() - PF.GetBitsStored()));
     if (PF.GetPixelRepresentation())
     {
       // smask: to check the 'sign' when BitsStored != BitsAllocated
-      uint16_t smask = 0x0001;
-      smask = smask << static_cast<uint16_t>(16 - (PF.GetBitsAllocated() - PF.GetBitsStored() + 1));
+      const uint16_t smask = static_cast<uint16_t>(1U << (16 - (PF.GetBitsAllocated() - PF.GetBitsStored() + 1)));
       // nmask: to propagate sign bit on negative values
-      int16_t nmask = static_cast<int16_t>(0x8000);
-      nmask = nmask >> static_cast<int16_t>(PF.GetBitsAllocated() - PF.GetBitsStored() - 1);
+      const int16_t nmask = static_cast<int16_t>(0xffff8000U >> (PF.GetBitsAllocated() - PF.GetBitsStored() - 1));
       uint16_t * start = static_cast<uint16_t*>(data);
       for (uint16_t * p = start ; p != start + datalen / 2; ++p )
       {
@@ -693,16 +690,13 @@ ImageCodec::DoOverlayCleanup(std::istream & is, std::ostream & os)
   if (PF.GetBitsAllocated() == 16)
   {
     // pmask: to mask the 'unused bits' (may contain overlays)
-    uint16_t pmask = 0xffff;
-    pmask = static_cast<uint16_t>(pmask >> (PF.GetBitsAllocated() - PF.GetBitsStored()));
+    const uint16_t pmask = static_cast<uint16_t>(0xffffU >> (PF.GetBitsAllocated() - PF.GetBitsStored()));
     if (PF.GetPixelRepresentation())
     {
       // smask: to check the 'sign' when BitsStored != BitsAllocated
-      uint16_t smask = 0x0001;
-      smask = smask << static_cast<uint16_t>(16 - (PF.GetBitsAllocated() - PF.GetBitsStored() + 1));
+      const uint16_t smask = static_cast<uint16_t>(1U << (16 - (PF.GetBitsAllocated() - PF.GetBitsStored() + 1)));
       // nmask: to propagate sign bit on negative values
-      int16_t nmask = static_cast<int16_t>(0x8000);
-      nmask = nmask >> static_cast<int16_t>(PF.GetBitsAllocated() - PF.GetBitsStored() - 1);
+      const int16_t nmask = static_cast<int16_t>(0xffff8000U >> (PF.GetBitsAllocated() - PF.GetBitsStored() - 1));
       uint16_t c;
       while (is.read(reinterpret_cast<char*>(&c), 2))
       {

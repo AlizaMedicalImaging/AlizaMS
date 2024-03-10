@@ -425,17 +425,14 @@ rawtoimage_fill2(const T *     inputbuffer,
                  int           highbit,
                  int           sign)
 {
-  uint16_t pmask = 0xffff;
-  pmask = static_cast<uint16_t>(pmask >> (bitsallocated - bitsstored));
+  const uint16_t pmask = static_cast<uint16_t>(0xffffU >> (bitsallocated - bitsstored));
   const T * p = inputbuffer;
   if (sign)
   {
     // smask : to check the 'sign' when BitsStored != BitsAllocated
-    uint16_t smask = 0x0001;
-    smask = static_cast<uint16_t>(smask << (16 - (bitsallocated - bitsstored + 1)));
+    const uint16_t smask = static_cast<uint16_t>(1U << (16 - (bitsallocated - bitsstored + 1)));
     // nmask : to propagate sign bit on negative values
-    int16_t nmask = static_cast<int16_t>(0x8000);
-    nmask = static_cast<int16_t>(nmask >> (bitsallocated - bitsstored - 1));
+    const int16_t nmask = static_cast<int16_t>(0xffff8000U >> (bitsallocated - bitsstored - 1));
     if (pc)
     {
       for (int compno = 0; compno < numcomps; ++compno)
