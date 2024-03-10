@@ -755,9 +755,9 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
     jpeg_create_decompress(&cinfo);
     volatile int workaround = 0;
     if (ImageHelper::GetWorkaroundPredictorBug())
-      workaround |= WORKAROUND_PREDICTOR6OVERFLOW;
+      workaround = workaround | WORKAROUND_PREDICTOR6OVERFLOW;
     if (ImageHelper::GetWorkaroundCornellBug())
-      workaround |= WORKAROUND_BUGGY_CORNELL_16BIT_JPEG_ENCODER;
+      workaround = workaround | WORKAROUND_BUGGY_CORNELL_16BIT_JPEG_ENCODER;
     if (workaround != 0)
       cinfo.workaround_options = workaround;
     // Step 2: specify data source (e.g. a file)
@@ -909,7 +909,7 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
      */
     /* JSAMPLEs per row in output buffer */
     row_stride = cinfo.output_width * cinfo.output_components;
-    row_stride *= sizeof(JSAMPLE);
+    row_stride = row_stride * sizeof(JSAMPLE);
     /* Make a one-row-high sample array that will go away when done with image */
     buffer = (*cinfo.mem->alloc_sarray)((j_common_ptr)&cinfo, JPOOL_IMAGE, (JDIMENSION)row_stride, 1);
     /* Save the buffer in case of suspension to be able to reuse it later: */
@@ -919,7 +919,7 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
   {
     /* JSAMPLEs per row in output buffer */
     row_stride = cinfo.output_width * cinfo.output_components;
-    row_stride *= sizeof(JSAMPLE);
+    row_stride = row_stride * sizeof(JSAMPLE);
     /* Suspension: re-use the buffer: */
     buffer = (JSAMPARRAY)Internals->SampBuffer;
   }

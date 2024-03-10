@@ -36,7 +36,7 @@ public:
   SegmentedPaletteColorLookupTable() = default;
   ~SegmentedPaletteColorLookupTable() = default;
   void
-  Print(std::ostream &) const
+  Print(std::ostream &) const override
   {}
   void
   SetLUT(LookupTableType, const unsigned char *, unsigned int) override;
