@@ -5,12 +5,12 @@
 ####################################################################
 
 cmake_minimum_required(VERSION 3.11.0)
-# Note:
+#
+# Note, for CMAKE_CXX_STANDARD:
 # For C++20 version 3.12 is required.
 # For C++23 version 3.20 is required.
 # For C++26 version 3.25 is required.
-# Minimum is C++14.
-# C++17 is required for Qt6 and ITK 5.4.
+# A compiler should support at least C++14.
 #
 
 ####################################################################
