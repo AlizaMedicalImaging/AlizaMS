@@ -545,10 +545,12 @@ template<typename T> int generate_tex3d(
 	QProgressDialog * pb,
 	GLWidget * gl)
 {
-	if (image.IsNull() || !ivariant||!gl) return 1;
+	if (image.IsNull() || !ivariant || !gl) return 1;
 	if (size[0] < 1 || size[1] < 1)
 	{
+#if 0
 		std::cout << "(size[0] < 1||size[1] < 1)" << std::endl;
+#endif
 		return 1;
 	}
 	typedef itk::NearestNeighborInterpolateImageFunction<T, double> InterpolatorType;
@@ -675,7 +677,9 @@ template<typename T> int generate_tex3d(
 	}
 	else
 	{
+#if 0
 		std::cout << "out_image.IsNull()" << std::endl;
+#endif
 		return 1;
 	}
 	//
@@ -988,12 +992,9 @@ template<typename T> void calc_center_from_image(
 		static_cast<float>(origin[2]));
 	sVector3 v1 = sVector3(p[0], p[1], p[2]);
 	sVector3 cube_center = sVector3((v0 + v1) * 0.5f);
-	ivariant->di->default_center_x =
-		ivariant->di->center_x = cube_center.getX();
-	ivariant->di->default_center_y =
-		ivariant->di->center_y = cube_center.getY();
-	ivariant->di->default_center_z =
-		ivariant->di->center_z = cube_center.getZ();
+	ivariant->di->default_center_x = ivariant->di->center_x = cube_center.getX();
+	ivariant->di->default_center_y = ivariant->di->center_y = cube_center.getY();
+	ivariant->di->default_center_z = ivariant->di->center_z = cube_center.getZ();
 }
 
 template<typename T> void read_geometry_from_image(
