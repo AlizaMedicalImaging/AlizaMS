@@ -3760,7 +3760,7 @@ GLuint GLWidget::load_shader(GLenum shaderType, const char * pSource)
 						break;
 					}
 #ifdef ALWAYS_SHOW_GL_ERROR
-					std::cout << buf << "\n" << pSource << "\n" << std::endl;
+					std::cout << buf << '\n' << pSource << '\n' << std::endl;
 #endif
 					delete [] buf;
 				}
@@ -3812,7 +3812,7 @@ bool GLWidget::create_program(
 					glGetProgramInfoLog(program, bufLength, nullptr, buf);
 					std::cout << "Could not link program" << std::endl;
 #ifdef ALWAYS_SHOW_GL_ERROR
-					std::cout << buf << "\n" << vertex << "\n" << fragment << std::endl;
+					std::cout << buf << '\n' << vertex << '\n' << fragment << std::endl;
 #endif
 					delete [] buf;
 				}
