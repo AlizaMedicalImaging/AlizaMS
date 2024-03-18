@@ -435,39 +435,72 @@ ImageCodec::DoByteSwap(std::istream & is, std::ostream & os)
   assert(0 - start == 0);
   is.seekg(0, std::ios::end);
   const size_t buf_size = is.tellg();
-  char *       dummy_buffer;
+  char *       buffer;
   try
   {
-    dummy_buffer = new char[buf_size];
+    buffer = new char[buf_size];
   }
   catch (const std::bad_alloc &)
   {
     return false;
   }
   is.seekg(start, std::ios::beg);
-  is.read(dummy_buffer, buf_size);
+  is.read(buffer, buf_size);
   is.seekg(start, std::ios::beg);
-  assert(!(buf_size % 2));
 #ifdef MDCM_WORDS_BIGENDIAN
   if (PF.GetBitsAllocated() == 16)
   {
-    void * vdummy_buffer = static_cast<void*>(dummy_buffer);
-    ByteSwap<uint16_t>::SwapRangeFromSwapCodeIntoSystem(static_cast<uint16_t *>(vdummy_buffer),
+    if (buf_size % 2 != 0)
+    {
+      delete[] buffer;
+      return false;
+    }
+    void * vbuffer = static_cast<void*>(buffer);
+    ByteSwap<uint16_t>::SwapRangeFromSwapCodeIntoSystem(static_cast<uint16_t *>(vbuffer),
                                                         SwapCode::LittleEndian,
                                                         buf_size / 2);
+  }
+  else if (PF.GetBitsAllocated() == 32)
+  {
+    if (buf_size % 4 != 0)
+    {
+      delete[] buffer;
+      return false;
+    }
+    void * vbuffer = static_cast<void*>(buffer);
+    ByteSwap<uint32_t>::SwapRangeFromSwapCodeIntoSystem(static_cast<uint32_t *>(vbuffer),
+                                                        SwapCode::LittleEndian,
+                                                        buf_size / 4);
   }
 #else
   // GE_DLX-8-MONO2-PrivateSyntax.dcm is 8bits
   if (PF.GetBitsAllocated() == 16)
   {
-    void * vdummy_buffer = static_cast<void*>(dummy_buffer);
-    ByteSwap<uint16_t>::SwapRangeFromSwapCodeIntoSystem(static_cast<uint16_t *>(vdummy_buffer),
+    if (buf_size % 2 != 0)
+    {
+      delete[] buffer;
+      return false;
+    }
+    void * vbuffer = static_cast<void*>(buffer);
+    ByteSwap<uint16_t>::SwapRangeFromSwapCodeIntoSystem(static_cast<uint16_t *>(vbuffer),
                                                         SwapCode::BigEndian,
                                                         buf_size / 2);
   }
+  else if (PF.GetBitsAllocated() == 32)
+  {
+    if (buf_size % 4 != 0)
+    {
+      delete[] buffer;
+      return false;
+    }
+    void * vbuffer = static_cast<void*>(buffer);
+    ByteSwap<uint32_t>::SwapRangeFromSwapCodeIntoSystem(static_cast<uint32_t *>(vbuffer),
+                                                        SwapCode::BigEndian,
+                                                        buf_size / 4);
+  }
 #endif
-  os.write(dummy_buffer, buf_size);
-  delete[] dummy_buffer;
+  os.write(buffer, buf_size);
+  delete[] buffer;
   return true;
 }
 
@@ -592,7 +625,7 @@ ImageCodec::DoSimpleCopy(std::istream & is, std::ostream & os)
   os.write(dummy_buffer, buf_size);
   delete[] dummy_buffer;
 #else
-  // This code is ideal but is failing on an RLE image, need to figure out
+  // MM: This code is ideal but is failing on an RLE image, need to figure out
   // what is wrong to reactivate this code.
   os.rdbuf(is.rdbuf());
 #endif
@@ -675,13 +708,22 @@ ImageCodec::DoInvertMonochrome(std::istream & is, std::ostream & os)
     }
     else if (PF.GetBitsAllocated() == 16)
     {
-      assert(PF.GetBitsStored() != 12);
-      uint16_t smask16 = 65535;
+      const uint16_t smask16 = 0xffff;
       uint16_t c;
       while (is.read(reinterpret_cast<char *>(&c), 2))
       {
         c = smask16 - c;
         os.write(reinterpret_cast<char *>(&c), 2);
+      }
+    }
+    else if (PF.GetBitsAllocated() == 32)
+    {
+      const uint32_t smask32 = 0xffffffff;
+      uint32_t c;
+      while (is.read(reinterpret_cast<char *>(&c), 4))
+      {
+        c = smask32 - c;
+        os.write(reinterpret_cast<char *>(&c), 4);
       }
     }
   }
@@ -699,7 +741,7 @@ ImageCodec::DoInvertMonochrome(std::istream & is, std::ostream & os)
     else if (PF.GetBitsAllocated() == 16)
     {
       uint16_t mask = 1;
-      for (int j = 0; j < PF.GetBitsStored() - 1; ++j)
+      for (unsigned short j = 0; j < PF.GetBitsStored() - 1; ++j)
       {
         mask = (mask << 1) + 1; // will be 0x0fff when BitsStored = 12
       }
@@ -712,13 +754,35 @@ ImageCodec::DoInvertMonochrome(std::istream & is, std::ostream & os)
           // stores a 12bits JPEG stream with scalar value [0,1024], however
           // the DICOM header says the data are stored on 10bits [0,1023], thus this HACK:
           mdcmWarningMacro("Bogus max value: " << c << " max should be at most: " << mask
-                                               << " results will be truncated. Use at own risk");
+                           << " results will be truncated. Use at own risk");
           c = mask;
         }
         assert(c <= mask);
         c = mask - c;
         assert(c <= mask);
         os.write(reinterpret_cast<char *>(&c), 2);
+      }
+    }
+    else if (PF.GetBitsAllocated() == 32)
+    {
+      uint32_t mask = 1;
+      for (unsigned short j = 0; j < PF.GetBitsStored() - 1; ++j)
+      {
+        mask = (mask << 1) + 1; // will be 0x00000fff when BitsStored = 12
+      }
+      uint32_t c;
+      while (is.read(reinterpret_cast<char *>(&c), 4))
+      {
+        if (c > mask)
+        {
+          mdcmWarningMacro("Bogus max value: " << c << " max should be at most: " << mask
+                           << " results will be truncated. Use at own risk");
+          c = mask;
+        }
+        assert(c <= mask);
+        c = mask - c;
+        assert(c <= mask);
+        os.write(reinterpret_cast<char *>(&c), 4);
       }
     }
   }
@@ -760,9 +824,9 @@ ImageCodec::DoOverlayCleanup(std::istream & is, std::ostream & os)
       std::vector<uint16_t> buffer(bufferSize);
       while (is)
       {
-        is.read(reinterpret_cast<char *>(buffer.data()), bufferSize * sizeof(uint16_t));
+        is.read(reinterpret_cast<char *>(buffer.data()), bufferSize * 2);
         std::streamsize bytesRead = is.gcount();
-        std::vector<uint16_t>::iterator validBufferEnd = buffer.begin() + bytesRead / sizeof(uint16_t);
+        std::vector<uint16_t>::iterator validBufferEnd = buffer.begin() + bytesRead / 2;
         for (std::vector<uint16_t>::iterator it = buffer.begin(); it != validBufferEnd; ++it)
         {
           *it = ((*it >> (PF.GetBitsStored() - PF.GetHighBit() - 1)) & pmask);
@@ -803,9 +867,9 @@ ImageCodec::DoOverlayCleanup(std::istream & is, std::ostream & os)
       std::vector<uint32_t> buffer(bufferSize);
       while (is)
       {
-        is.read(reinterpret_cast<char *>(buffer.data()), bufferSize * sizeof(uint32_t));
+        is.read(reinterpret_cast<char *>(buffer.data()), bufferSize * 4);
         std::streamsize bytesRead = is.gcount();
-        std::vector<uint32_t>::iterator validBufferEnd = buffer.begin() + bytesRead / sizeof(uint32_t);
+        std::vector<uint32_t>::iterator validBufferEnd = buffer.begin() + bytesRead / 4;
         for (std::vector<uint32_t>::iterator it = buffer.begin(); it != validBufferEnd; ++it)
         {
           *it = ((*it >> (PF.GetBitsStored() - PF.GetHighBit() - 1)) & pmask);
