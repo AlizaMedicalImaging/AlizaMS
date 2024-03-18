@@ -231,14 +231,50 @@ ImageCodec::CleanupUnusedBits(char * data8, size_t datalen)
       for (uint16_t * p = start ; p != start + datalen / 2; ++p)
       {
         uint16_t c = *p;
-        c = (c >> static_cast<uint16_t>(PF.GetBitsStored() - PF.GetHighBit() - 1)) & pmask;
+        c = (c >> (PF.GetBitsStored() - PF.GetHighBit() - 1)) & pmask;
+        *p = c;
+      }
+    }
+  }
+  else if (PF.GetBitsAllocated() == 32)
+  {
+    // pmask: to mask the 'unused bits' (may contain overlays)
+    const uint32_t pmask = static_cast<uint32_t>(0xffffffffU >> (PF.GetBitsAllocated() - PF.GetBitsStored()));
+    if (PF.GetPixelRepresentation())
+    {
+      // smask: to check the 'sign' when BitsStored != BitsAllocated
+      const uint32_t smask = static_cast<uint32_t>(1U << (32 - (PF.GetBitsAllocated() - PF.GetBitsStored() + 1)));
+      // nmask: to propagate sign bit on negative values
+      const int32_t nmask = static_cast<int32_t>(0xffffffff80000000ULL >> (PF.GetBitsAllocated() - PF.GetBitsStored() - 1));
+      uint32_t * start = static_cast<uint32_t*>(data);
+      for (uint32_t * p = start ; p != start + datalen / 4; ++p )
+      {
+        uint32_t c = *p;
+        c = c >> static_cast<uint32_t>(PF.GetBitsStored() - PF.GetHighBit() - 1);
+        if (c & smask)
+        {
+          c = static_cast<uint32_t>(c | nmask);
+        }
+        else
+        {
+          c = c & pmask;
+        }
+        *p = c;
+      }
+    }
+    else
+    {
+      uint32_t * start = static_cast<uint32_t*>(data);
+      for (uint32_t * p = start ; p != start + datalen / 4; ++p)
+      {
+        uint32_t c = *p;
+        c = (c >> (PF.GetBitsStored() - PF.GetHighBit() - 1)) & pmask;
         *p = c;
       }
     }
   }
   else
   {
-    assert(0); // TODO
     return false;
   }
   return true;
@@ -309,6 +345,7 @@ ImageCodec::DecodeByStreams(std::istream & is, std::ostream & os)
   std::stringstream pi_os;   // PhotometricInterpretation
   std::stringstream pl_os;   // PlanarConf
   std::istream *    cur_is = &is;
+  bool res{};
   // Byte swap
   if (NeedByteSwap)
   {
@@ -371,19 +408,24 @@ ImageCodec::DecodeByStreams(std::istream & is, std::ostream & os)
   {
     if (NeedOverlayCleanup)
     {
-      DoOverlayCleanup(*cur_is, os);
+      res = DoOverlayCleanup(*cur_is, os);
+      if (!res)
+      {
+        mdcmAlwaysWarnMacro("ImageCodec::DecodeByStreams: fallback to simple copy, bits allocaled = "
+                            << PF.GetBitsAllocated() << ", bits stored = " << PF.GetBitsStored());
+        res = DoSimpleCopy(*cur_is, os);
+      }
     }
     else
     {
-      DoSimpleCopy(*cur_is, os);
+      res = DoSimpleCopy(*cur_is, os);
     }
   }
   else
   {
-    assert(PF.GetBitsAllocated() == PF.GetBitsStored());
-    DoSimpleCopy(*cur_is, os);
+    res = DoSimpleCopy(*cur_is, os);
   }
-  return true;
+  return res;
 }
 
 bool
@@ -686,7 +728,6 @@ ImageCodec::DoInvertMonochrome(std::istream & is, std::ostream & os)
 bool
 ImageCodec::DoOverlayCleanup(std::istream & is, std::ostream & os)
 {
-  assert( PF.GetBitsAllocated() > 8 );
   if (PF.GetBitsAllocated() == 16)
   {
     // pmask: to mask the 'unused bits' (may contain overlays)
@@ -700,7 +741,7 @@ ImageCodec::DoOverlayCleanup(std::istream & is, std::ostream & os)
       uint16_t c;
       while (is.read(reinterpret_cast<char*>(&c), 2))
       {
-        c = c >> static_cast<uint16_t>(PF.GetBitsStored() - PF.GetHighBit() - 1);
+        c = c >> (PF.GetBitsStored() - PF.GetHighBit() - 1);
         if (c & smask)
         {
           c = c | nmask;
@@ -730,9 +771,51 @@ ImageCodec::DoOverlayCleanup(std::istream & is, std::ostream & os)
       }
     }
   }
+  else if (PF.GetBitsAllocated() == 32)
+  {
+    // pmask: to mask the 'unused bits' (may contain overlays)
+    const uint32_t pmask = static_cast<uint32_t>(0xffffffffU >> (PF.GetBitsAllocated() - PF.GetBitsStored()));
+    if (PF.GetPixelRepresentation())
+    {
+      // smask: to check the 'sign' when BitsStored != BitsAllocated
+      const uint32_t smask = static_cast<uint32_t>(1U << (32 - (PF.GetBitsAllocated() - PF.GetBitsStored() + 1)));
+      // nmask: to propagate sign bit on negative values
+      const int32_t nmask = static_cast<int32_t>(0xffffffff80000000ULL >> (PF.GetBitsAllocated() - PF.GetBitsStored() - 1));
+      uint32_t c;
+      while (is.read(reinterpret_cast<char*>(&c), 4))
+      {
+        c = c >> (PF.GetBitsStored() - PF.GetHighBit() - 1);
+        if (c & smask)
+        {
+          c = c | nmask;
+        }
+        else
+        {
+          c = c & pmask;
+        }
+        os.write(reinterpret_cast<char*>(&c), 4);
+      }
+    }
+    else
+    {
+      // read/mask/write 1000 values at once.
+      const unsigned int bufferSize = 1000;
+      std::vector<uint32_t> buffer(bufferSize);
+      while (is)
+      {
+        is.read(reinterpret_cast<char *>(buffer.data()), bufferSize * sizeof(uint32_t));
+        std::streamsize bytesRead = is.gcount();
+        std::vector<uint32_t>::iterator validBufferEnd = buffer.begin() + bytesRead / sizeof(uint32_t);
+        for (std::vector<uint32_t>::iterator it = buffer.begin(); it != validBufferEnd; ++it)
+        {
+          *it = ((*it >> (PF.GetBitsStored() - PF.GetHighBit() - 1)) & pmask);
+        }
+        os.write(reinterpret_cast<char *>(buffer.data()), bytesRead);
+      }
+    }
+  }
   else
   {
-    assert(0); // TODO
     return false;
   }
   return true;
