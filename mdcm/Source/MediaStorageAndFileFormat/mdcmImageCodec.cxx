@@ -345,7 +345,6 @@ ImageCodec::DecodeByStreams(std::istream & is, std::ostream & os)
   std::stringstream pi_os;   // PhotometricInterpretation
   std::stringstream pl_os;   // PlanarConf
   std::istream *    cur_is = &is;
-  bool res{};
   // Byte swap
   if (NeedByteSwap)
   {
@@ -404,6 +403,7 @@ ImageCodec::DecodeByStreams(std::istream & is, std::ostream & os)
     cur_is = &pl_os;
   }
   // Overlay cleanup or cleanup the unused bits
+  bool res{};
   if (PF.GetBitsAllocated() != PF.GetBitsStored() && PF.GetBitsAllocated() != 8)
   {
     if (NeedOverlayCleanup)
