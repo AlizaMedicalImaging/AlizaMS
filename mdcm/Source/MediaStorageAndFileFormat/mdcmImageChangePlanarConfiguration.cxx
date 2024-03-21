@@ -39,11 +39,11 @@ namespace mdcm
 bool
 ImageChangePlanarConfiguration::Change()
 {
+  Output = Input;
   if (!(PlanarConfiguration == 0 || PlanarConfiguration == 1))
   {
     return false;
   }
-  Output = Input;
   if (Input->GetPixelFormat().GetSamplesPerPixel() != 3)
   {
     return true;
@@ -60,6 +60,12 @@ ImageChangePlanarConfiguration::Change()
     mdcmAlwaysWarnMacro("ImageChangePlanarConfiguration::Change(): can not set length " << len);
     return false;
   }
+  if (len % 3 != 0)
+  {
+    mdcmAlwaysWarnMacro("ImageChangePlanarConfiguration::Change(): wrong length " << len);
+    return false;
+  }
+  //
   char * p;
   try
   {
@@ -70,11 +76,13 @@ ImageChangePlanarConfiguration::Change()
     return false;
   }
   image.GetBuffer(p);
-  assert(len % 3 == 0);
-  PixelFormat  pf = Input->GetPixelFormat();
+  //
+  const PixelFormat pf = Input->GetPixelFormat();
+  const unsigned short bitsallocated = pf.GetBitsAllocated();
   const size_t ps = pf.GetPixelSize();
   const size_t framesize = dims[0] * dims[1] * ps;
   assert(framesize * dims[2] == len);
+  //
   char * copy;
   try
   {
@@ -82,9 +90,10 @@ ImageChangePlanarConfiguration::Change()
   }
   catch (const std::bad_alloc &)
   {
+    delete[] p;
     return false;
   }
-  size_t size = framesize / 3;
+  const size_t size = framesize / 3;
   if (PlanarConfiguration == 0)
   {
     for (unsigned int z = 0; z < dims[2]; ++z)
@@ -98,8 +107,23 @@ ImageChangePlanarConfiguration::Change()
       const void * vg = static_cast<const void*>(g);
       const void * vb = static_cast<const void*>(b);
       void *       vframecopy = static_cast<void*>(framecopy);
-      if (pf.GetBitsAllocated() == 16)
+      if (bitsallocated == 8)
       {
+        ImageChangePlanarConfiguration::RGBPlanesToRGBPixels<uint8_t>(
+          static_cast<uint8_t *>(vframecopy),
+          static_cast<const uint8_t *>(vr),
+          static_cast<const uint8_t *>(vg),
+          static_cast<const uint8_t *>(vb),
+          size);
+      }
+      else if (bitsallocated == 16)
+      {
+        if (size % 2 != 0)
+        {
+          delete[] p;
+          delete[] copy;
+          return false;
+        }
         ImageChangePlanarConfiguration::RGBPlanesToRGBPixels<uint16_t>(
           static_cast<uint16_t *>(vframecopy),
           static_cast<const uint16_t *>(vr),
@@ -107,14 +131,28 @@ ImageChangePlanarConfiguration::Change()
           static_cast<const uint16_t *>(vb),
           size / 2);
       }
-      else if (pf.GetBitsAllocated() == 8)
+      else if (bitsallocated == 32)
       {
-        ImageChangePlanarConfiguration::RGBPlanesToRGBPixels(
-          static_cast<uint8_t *>(vframecopy),
-          static_cast<const uint8_t *>(vr),
-          static_cast<const uint8_t *>(vg),
-          static_cast<const uint8_t *>(vb),
-          size);
+        if (size % 4 != 0)
+        {
+          delete[] p;
+          delete[] copy;
+          return false;
+        }
+        ImageChangePlanarConfiguration::RGBPlanesToRGBPixels<uint32_t>(
+          static_cast<uint32_t *>(vframecopy),
+          static_cast<const uint32_t *>(vr),
+          static_cast<const uint32_t *>(vg),
+          static_cast<const uint32_t *>(vb),
+          size / 4);
+      }
+      else
+      {
+        delete[] p;
+        delete[] copy;
+        mdcmAlwaysWarnMacro("ImageChangePlanarConfiguration::Change(): not supported BitsAllocated "
+                            << bitsallocated);
+        return false;
       }
     }
   }
@@ -131,23 +169,52 @@ ImageChangePlanarConfiguration::Change()
       void *       vg = static_cast<void*>(g);
       void *       vb = static_cast<void*>(b);
       const void * vframe = static_cast<const void*>(frame);
-      if (pf.GetBitsAllocated() == 16)
+      if (bitsallocated == 8)
       {
+        ImageChangePlanarConfiguration::RGBPixelsToRGBPlanes<uint8_t>(
+          static_cast<uint8_t *>(vr),
+          static_cast<uint8_t *>(vg),
+          static_cast<uint8_t *>(vb),
+          static_cast<const uint8_t *>(vframe),
+          size);
+      }
+      else if (bitsallocated == 16)
+      {
+        if (size % 2 != 0)
+        {
+          delete[] p;
+          delete[] copy;
+          return false;
+        }
         ImageChangePlanarConfiguration::RGBPixelsToRGBPlanes<uint16_t>(
           static_cast<uint16_t *>(vr),
-		  static_cast<uint16_t *>(vg),
-		  static_cast<uint16_t *>(vb),
-		  static_cast<const uint16_t *>(vframe),
-		  size / 2);
+          static_cast<uint16_t *>(vg),
+          static_cast<uint16_t *>(vb),
+          static_cast<const uint16_t *>(vframe),
+          size / 2);
       }
-      else if (pf.GetBitsAllocated() == 8)
+      else if (bitsallocated == 32)
       {
-        ImageChangePlanarConfiguration::RGBPixelsToRGBPlanes(
-          static_cast<uint8_t *>(vr),
-		  static_cast<uint8_t *>(vg),
-		  static_cast<uint8_t *>(vb),
-		  static_cast<const uint8_t *>(vframe),
-		  size);
+        if (size % 4 != 0)
+        {
+          delete[] p;
+          delete[] copy;
+          return false;
+        }
+        ImageChangePlanarConfiguration::RGBPixelsToRGBPlanes<uint32_t>(
+          static_cast<uint32_t *>(vr),
+          static_cast<uint32_t *>(vg),
+          static_cast<uint32_t *>(vb),
+          static_cast<const uint32_t *>(vframe),
+          size / 4);
+      }
+      else
+      {
+        delete[] p;
+        delete[] copy;
+        mdcmAlwaysWarnMacro("ImageChangePlanarConfiguration::Change(): not supported BitsAllocated "
+                            << bitsallocated);
+        return false;
       }
     }
   }

@@ -43,7 +43,7 @@
         os << el.GetValue();                                \
         for (unsigned int i = 1; i < el.GetLength(); ++i)   \
         {                                                   \
-          os << "\\" << el.GetValue(i);                     \
+          os << '\\' << el.GetValue(i);                     \
         }                                                   \
         retvalue = os.str();                                \
       }                                                     \
@@ -158,15 +158,15 @@ Scanner::Scan(const std::vector<std::string> & filenames, const Dict & dict)
       last = publiclast;
     }
     Progress = 0.0;
-    const double                             progresstick = (filenames_size > 0) ? 1.0 / static_cast<double>(filenames_size) : 0.0;
-    std::vector<std::string>::const_iterator it = Filenames.cbegin();
-    for (; it != Filenames.cend(); ++it)
+    const double progresstick =
+      (filenames_size > 0) ? 1.0 / static_cast<double>(filenames_size) : 0.0;
+    for (std::vector<std::string>::const_iterator it = Filenames.cbegin(); it != Filenames.cend(); ++it)
     {
       Reader       reader;
       const char * filename = it->c_str();
       assert(filename);
       reader.SetFileName(filename);
-      bool read = false;
+      bool read{};
       try
       {
         read = reader.ReadUpToTag(last);
@@ -212,9 +212,8 @@ Scanner::IsKey(const char * filename) const
 std::vector<std::string>
 Scanner::GetKeys() const
 {
-  std::vector<std::string>                 keys;
-  std::vector<std::string>::const_iterator file = Filenames.cbegin();
-  for (; file != Filenames.cend(); ++file)
+  std::vector<std::string> keys;
+  for (std::vector<std::string>::const_iterator file = Filenames.cbegin(); file != Filenames.cend(); ++file)
   {
     const char * filename = file->c_str();
     if (IsKey(filename))
@@ -248,9 +247,8 @@ Scanner::GetValues() const
 Scanner::ValuesType
 Scanner::GetValues(const Tag & t) const
 {
-  ValuesType                               vt;
-  std::vector<std::string>::const_iterator file = Filenames.cbegin();
-  for (; file != Filenames.cend(); ++file)
+  ValuesType vt;
+  for (std::vector<std::string>::const_iterator file = Filenames.cbegin(); file != Filenames.cend(); ++file)
   {
     const char *       filename = file->c_str();
     const TagToValue & ttv = GetMapping(filename);
@@ -265,9 +263,8 @@ Scanner::GetValues(const Tag & t) const
 std::vector<std::string>
 Scanner::GetOrderedValues(const Tag & t) const
 {
-  std::vector<std::string>                 theReturn;
-  std::vector<std::string>::const_iterator file = Filenames.cbegin();
-  for (; file != Filenames.cend(); ++file)
+  std::vector<std::string> theReturn;
+  for (std::vector<std::string>::const_iterator file = Filenames.cbegin(); file != Filenames.cend(); ++file)
   {
     const char *       filename = file->c_str();
     const TagToValue & ttv = GetMapping(filename);
@@ -303,16 +300,15 @@ Scanner::GetMapping(const char * filename) const
 const char *
 Scanner::GetFilenameFromTagToValue(const Tag & t, const char * valueref) const
 {
-  const char * filenameref = nullptr;
+  const char * filenameref{};
   if (valueref)
   {
-    std::vector<std::string>::const_iterator file = Filenames.cbegin();
-    size_t                                   len = strlen(valueref);
+    size_t len = strlen(valueref);
     if (len && valueref[len - 1] == ' ')
     {
       --len;
     }
-    for (; file != Filenames.cend() && !filenameref; ++file)
+    for (std::vector<std::string>::const_iterator file = Filenames.cbegin(); file != Filenames.cend() && !filenameref; ++file)
     {
       const char * filename = file->c_str();
       const char * value = GetValue(filename, t);
@@ -331,9 +327,8 @@ Scanner::GetAllFilenamesFromTagToValue(const Tag & t, const char * valueref) con
   std::vector<std::string> theReturn;
   if (valueref)
   {
-    const std::string                        valueref_str = String<>::Trim(valueref);
-    std::vector<std::string>::const_iterator file = Filenames.cbegin();
-    for (; file != Filenames.cend(); ++file)
+    const std::string valueref_str = String<>::Trim(valueref);
+    for (std::vector<std::string>::const_iterator file = Filenames.cbegin(); file != Filenames.cend(); ++file)
     {
       const char *      filename = file->c_str();
       const char *      value = GetValue(filename, t);
@@ -363,8 +358,7 @@ Scanner::ProcessPublicTag(const char * filename, const File & file, const Dict &
   const FileMetaInformation &  header = file.GetHeader();
   const mdcm::TransferSyntax & ts = header.GetDataSetTransferSyntax();
   const bool                   implicit = ts.IsImplicit();
-  TagsType::const_iterator     tag = Tags.cbegin();
-  for (; tag != Tags.cend(); ++tag)
+  for (TagsType::const_iterator tag = Tags.cbegin(); tag != Tags.cend(); ++tag)
   {
     if (tag->GetGroup() == 0x2)
     {
@@ -373,7 +367,7 @@ Scanner::ProcessPublicTag(const char * filename, const File & file, const Dict &
         const DataElement & de = header.GetDataElement(*tag);
         std::string         s(GetString(de, header, implicit, dict));
         Values.insert(s);
-        if (Values.find(s) != Values.end()) // to silence Synopsys Coverity detection
+        if (Values.find(s) != Values.end())
         {
           mapping.insert(TagToValue::value_type(*tag, Values.find(s)->c_str()));
         }
@@ -386,7 +380,7 @@ Scanner::ProcessPublicTag(const char * filename, const File & file, const Dict &
         const DataElement & de = ds.GetDataElement(*tag);
         std::string         s(GetString(de, ds, implicit, dict));
         Values.insert(s);
-        if (Values.find(s) != Values.end()) // to silence Synopsys Coverity detection
+        if (Values.find(s) != Values.end())
         {
           mapping.insert(TagToValue::value_type(*tag, Values.find(s)->c_str()));
         }
@@ -402,11 +396,10 @@ void Scanner::Print(std::ostream & os) const
   for(ValuesType::const_iterator it = Values.cbegin(); it != Values.cend();
     ++it)
   {
-    os << *it << "\n";
+    os << *it << '\n';
   }
   os << "Mapping:\n";
-  std::vector<std::string>::const_iterator file = Filenames.cbegin();
-  for(; file != Filenames.cend(); ++file)
+  for(std::vector<std::string>::const_iterator file = Filenames.cbegin(); file != Filenames.cend(); ++file)
   {
     const char * filename = file->c_str();
     assert(filename && *filename);

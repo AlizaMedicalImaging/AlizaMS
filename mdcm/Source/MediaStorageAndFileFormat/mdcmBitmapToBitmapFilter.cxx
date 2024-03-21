@@ -20,10 +20,7 @@
 
 =========================================================================*/
 #include "mdcmBitmapToBitmapFilter.h"
-
 #include "mdcmImage.h"
-#include <limits>
-#include <cstring>
 
 namespace mdcm
 {
