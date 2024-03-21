@@ -243,7 +243,7 @@ void opj_tcd_rateallocate_fixed(opj_tcd_t *tcd)
 /* ----------------------------------------------------------------------- */
 
 /** Returns OPJ_TRUE if the layer allocation is unchanged w.r.t to the previous
- * invokation with a different threshold */
+ * invocation with a different threshold */
 static
 OPJ_BOOL opj_tcd_makelayer(opj_tcd_t *tcd,
                            OPJ_UINT32 layno,
@@ -2315,6 +2315,9 @@ static OPJ_BOOL opj_tcd_dc_level_shift_decode(opj_tcd_t *p_tcd)
             l_max = (OPJ_INT32)((1U << l_img_comp->prec) - 1);
         }
 
+        if (l_width == 0 || l_height == 0) {
+            continue;
+        }
 
         if (l_tccp->qmfbid == 1) {
             for (j = 0; j < l_height; ++j) {
@@ -2330,7 +2333,7 @@ static OPJ_BOOL opj_tcd_dc_level_shift_decode(opj_tcd_t *p_tcd)
             for (j = 0; j < l_height; ++j) {
                 for (i = 0; i < l_width; ++i) {
                     OPJ_FLOAT32 l_value = *((OPJ_FLOAT32 *) l_current_ptr);
-                    if (l_value > INT_MAX) {
+                    if (l_value > (OPJ_FLOAT32)INT_MAX) {
                         *l_current_ptr = l_max;
                     } else if (l_value < INT_MIN) {
                         *l_current_ptr = l_min;
@@ -2858,12 +2861,12 @@ OPJ_BOOL opj_tcd_is_subband_area_of_interest(opj_tcd_t *tcd,
     return intersects;
 }
 
-/** Returns whether a tile componenent is fully decoded, taking into account
+/** Returns whether a tile component is fully decoded, taking into account
  * p_tcd->win_* members.
  *
  * @param p_tcd    TCD handle.
  * @param compno Component number
- * @return OPJ_TRUE whether the tile componenent is fully decoded
+ * @return OPJ_TRUE whether the tile component is fully decoded
  */
 static OPJ_BOOL opj_tcd_is_whole_tilecomp_decoding(opj_tcd_t *p_tcd,
         OPJ_UINT32 compno)

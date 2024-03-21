@@ -123,7 +123,7 @@ typedef float         OPJ_FLOAT32;
 typedef double        OPJ_FLOAT64;
 typedef unsigned char OPJ_BYTE;
 
-#include "opj_stdint.h"
+#include <stdint.h>
 
 typedef int8_t   OPJ_INT8;
 typedef uint8_t  OPJ_UINT8;
@@ -138,6 +138,8 @@ typedef int64_t  OPJ_OFF_T; /* 64-bit file offset type */
 
 #include <stdio.h>
 typedef size_t   OPJ_SIZE_T;
+
+#include "opj_config.h"
 
 /* Avoid compile-time warning because parameter is not used */
 #define OPJ_ARG_NOT_USED(x) (void)(x)
@@ -771,7 +773,7 @@ typedef struct opj_packet_info {
     OPJ_OFF_T end_ph_pos;
     /** packet end position */
     OPJ_OFF_T end_pos;
-    /** packet distorsion */
+    /** packet distortion */
     double disto;
 } opj_packet_info_t;
 
