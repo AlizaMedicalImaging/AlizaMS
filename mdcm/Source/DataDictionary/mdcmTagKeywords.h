@@ -248,6 +248,7 @@ namespace Keywords
   typedef mdcm::Attribute<0x0008, 0x1100> ReferencedResultsSequence;
   typedef mdcm::Attribute<0x0008, 0x1110> ReferencedStudySequence;
   typedef mdcm::Attribute<0x0008, 0x1111> ReferencedPerformedProcedureStepSequence;
+  typedef mdcm::Attribute<0x0008, 0x1112> ReferencedInstancesBySOPClassSequence;
   typedef mdcm::Attribute<0x0008, 0x1115> ReferencedSeriesSequence;
   typedef mdcm::Attribute<0x0008, 0x1120> ReferencedPatientSequence;
   typedef mdcm::Attribute<0x0008, 0x1125> ReferencedVisitSequence;
@@ -275,6 +276,7 @@ namespace Keywords
   typedef mdcm::Attribute<0x0008, 0x1198> FailedSOPSequence;
   typedef mdcm::Attribute<0x0008, 0x1199> ReferencedSOPSequence;
   typedef mdcm::Attribute<0x0008, 0x119a> OtherFailuresSequence;
+  typedef mdcm::Attribute<0x0008, 0x119b> FailedStudySequence;
   typedef mdcm::Attribute<0x0008, 0x1200> StudiesContainingOtherReferencedInstancesSequence;
   typedef mdcm::Attribute<0x0008, 0x1250> RelatedSeriesSequence;
   typedef mdcm::Attribute<0x0008, 0x2110> LossyImageCompressionRetired;
@@ -3977,6 +3979,8 @@ namespace Keywords
   typedef mdcm::Attribute<0x3006, 0x0028> ROIDescription;
   typedef mdcm::Attribute<0x3006, 0x002a> ROIDisplayColor;
   typedef mdcm::Attribute<0x3006, 0x002c> ROIVolume;
+  typedef mdcm::Attribute<0x3006, 0x002d> ROIDateTime;
+  typedef mdcm::Attribute<0x3006, 0x002e> ROIObservationDateTime;
   typedef mdcm::Attribute<0x3006, 0x0030> RTRelatedROISequence;
   typedef mdcm::Attribute<0x3006, 0x0033> RTROIRelationship;
   typedef mdcm::Attribute<0x3006, 0x0036> ROIGenerationAlgorithm;
@@ -3991,6 +3995,11 @@ namespace Keywords
   typedef mdcm::Attribute<0x3006, 0x0048> ContourNumber;
   typedef mdcm::Attribute<0x3006, 0x0049> AttachedContours;
   typedef mdcm::Attribute<0x3006, 0x004a> SourcePixelPlanesCharacteristicsSequence;
+  typedef mdcm::Attribute<0x3006, 0x004b> SourceSeriesSequence;
+  typedef mdcm::Attribute<0x3006, 0x004c> SourceSeriesInformationSequence;
+  typedef mdcm::Attribute<0x3006, 0x004d> ROICreatorSequence;
+  typedef mdcm::Attribute<0x3006, 0x004e> ROIInterpreterSequence;
+  typedef mdcm::Attribute<0x3006, 0x004f> ROIObservationContextCodeSequence;
   typedef mdcm::Attribute<0x3006, 0x0050> ContourData;
   typedef mdcm::Attribute<0x3006, 0x0080> RTROIObservationsSequence;
   typedef mdcm::Attribute<0x3006, 0x0082> ObservationNumber;
