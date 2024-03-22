@@ -601,7 +601,20 @@ rawtoimage(const char *        inputbuffer,
   memset(&cmptparm[0], 0, 3 * sizeof(opj_image_cmptparm_t));
   for (int i = 0; i < numcomps; ++i)
   {
-    cmptparm[i].prec = bitsallocated; // TODO check 'bitsstored'
+#if 1
+    // To allow compression of 32 BitsAllocated images,
+    // prec 1-31 seems to be supported with 2.5.2
+    if (bitsallocated == 32)
+    {
+      cmptparm[i].prec = bitsstored;
+    }
+    else
+    {
+      cmptparm[i].prec = bitsallocated;
+    }
+#else
+    cmptparm[i].prec = bitsallocated;
+#endif
 #if ((OPJ_VERSION_MAJOR == 2 && OPJ_VERSION_MINOR <= 3) || OPJ_VERSION_MAJOR < 2)
     cmptparm[i].bpp = bitsallocated;
 #endif

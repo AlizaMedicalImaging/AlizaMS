@@ -2982,6 +2982,13 @@ ImageHelper::ComputeMediaStorageFromModality(const char *                      m
       // Rescale Slope may be less than one, e.g., a Rescale Slope of 1.0/65535
       // would allow represent floating point values from 0 to 1.0.
     }
+    else if (dimension == 3 && pixeltype.GetSamplesPerPixel() == 1 && pi == PhotometricInterpretation::MONOCHROME2 &&
+             pixeltype.GetBitsAllocated() == 32 && pixeltype.GetBitsStored() <= 32 && pixeltype.GetBitsStored() >= 16 &&
+             pixeltype.GetHighBit() == pixeltype.GetBitsStored() - 1 &&
+             (pixeltype.GetPixelRepresentation() == 0 || pixeltype.GetPixelRepresentation() == 1))
+    {
+      ms = MediaStorage::MultiframeGrayscaleWordSecondaryCaptureImageStorage;
+    }
     else if (dimension == 3 && pixeltype.GetSamplesPerPixel() == 3 &&
              (pi == PhotometricInterpretation::RGB || pi == PhotometricInterpretation::YBR_RCT ||
               pi == PhotometricInterpretation::YBR_ICT || pi == PhotometricInterpretation::YBR_FULL ||
