@@ -76,7 +76,7 @@ Bitmap::GetDimension(unsigned int idx) const
 }
 
 void
-Bitmap::SetDimensions(const unsigned int * dims)
+Bitmap::SetDimensions(const unsigned int dims[3])
 {
   Dimensions[0] = dims[0];
   Dimensions[1] = dims[1];
