@@ -56,22 +56,23 @@
   </content_rating>
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.7/package/art/alizams_scr1.jpg</image>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.8/package/art/alizams_scr1.jpg</image>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.7/package/art/alizams_scr2.jpg</image>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.8/package/art/alizams_scr2.jpg</image>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.7/package/art/alizams_scr3.jpg</image>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.8/package/art/alizams_scr3.jpg</image>
     </screenshot>
   </screenshots>
   <releases>
-    <release date="2024-01-08" version="1.9.7">
+    <release date="2024-04-01" version="1.9.8">
       <description>
-        <p>Release 1.9.7</p>
+        <p>Release 1.9.8</p>
       </description>
-      <url>https://github.com/AlizaMedicalImaging/AlizaMS/releases/tag/v1.9.7</url>
+      <url>https://github.com/AlizaMedicalImaging/AlizaMS/releases/tag/v1.9.8</url>
     </release>
+    <release date="2024-01-08" version="1.9.7"/>
     <release date="2023-10-05" version="1.9.5"/>
     <release date="2023-07-23" version="1.9.3"/>
     <release date="2023-05-30" version="1.9.1"/>
