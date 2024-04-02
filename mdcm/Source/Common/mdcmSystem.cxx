@@ -30,11 +30,8 @@
 #include <cstring>
 #include <cerrno>
 #include <ctime>
+#include <chrono>
 #include <sys/stat.h>
-
-#ifdef MDCM_HAVE_SYS_TIME_H
-#  include <sys/time.h>
-#endif
 
 #ifdef _WIN32
 #  include <windows.h>
@@ -246,44 +243,6 @@ System::FileSize(const char * filename)
   return size2;
 }
 
-#if defined(_WIN32) && !defined(MDCM_HAVE_GETTIMEOFDAY)
-
-#  if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
-#    define DELTA_EPOCH_IN_MICROSECS 11644473600000000Ui64
-#  else
-#    define DELTA_EPOCH_IN_MICROSECS 11644473600000000ULL
-#  endif
-
-int
-gettimeofday(struct timeval * tv, const struct timezone * tz)
-{
-  /*
-  The use of the timezone structure is obsolete; the tz  argument  should
-  normally  be  specified  as  nullptr.  The tz_dsttime field has never been
-  used under Linux; it has not been and will not be supported by libc  or
-  glibc.   Each  and  every occurrence of this field in the kernel source
-  (other than the declaration) is a bug. Thus, the following is purely of
-  historic interest.
-  */
-  assert(tz == 0);
-  FILETIME         ft;
-  unsigned __int64 tmpres = 0;
-  if (nullptr != tv)
-  {
-    GetSystemTimeAsFileTime(&ft);
-    tmpres |= ft.dwHighDateTime;
-    tmpres <<= 32;
-    tmpres |= ft.dwLowDateTime;
-    // converting file time to unix epoch
-    tmpres /= 10; // convert into microseconds
-    tmpres -= DELTA_EPOCH_IN_MICROSECS;
-    tv->tv_sec = static_cast<long>(tmpres / 1000000UL);
-    tv->tv_usec = static_cast<long>(tmpres % 1000000UL);
-  }
-  return 0;
-}
-#endif
-
 /*
  Implementation note. We internally use mktime which seems to be quite relaxed when it
  comes to invalid date. It handles :
@@ -291,18 +250,16 @@ gettimeofday(struct timeval * tv, const struct timezone * tz)
  "19891714172557";
  "19890014172557";
  While the DICOM PS 3.5-2008 would prohibit them.
- I leave it this way so that we correctly read in /almost/ valid date. What we write out is
- always valid anyway which is what is important.
 */
 bool
 System::ParseDateTime(time_t & timep, const char date[22])
 {
-  long milliseconds;
-  return ParseDateTime(timep, milliseconds, date);
+  long microseconds{};
+  return ParseDateTime(timep, microseconds, date);
 }
 
 bool
-System::ParseDateTime(time_t & timep, long & milliseconds, const char date[22])
+System::ParseDateTime(time_t & timep, long & microseconds, const char date[22])
 {
   if (!date)
     return false;
@@ -372,14 +329,13 @@ System::ParseDateTime(time_t & timep, long & milliseconds, const char date[22])
   timep = mktime(&ptm);
   if (timep == static_cast<time_t>(-1))
     return false;
-  milliseconds = 0;
   if (len > 14)
   {
     const char * ptr = date + 14;
     if (*ptr != '.')
       return false;
     ++ptr;
-    if (!*ptr || sscanf(ptr, "%06ld", &milliseconds) != 1)
+    if (!*ptr || sscanf(ptr, "%06ld", &microseconds) != 1)
     {
       return false;
     }
@@ -388,12 +344,8 @@ System::ParseDateTime(time_t & timep, long & milliseconds, const char date[22])
 }
 
 bool
-System::FormatDateTime(char date[22], time_t timep, long milliseconds)
+System::FormatDateTime(char date[22], time_t timep, long microseconds)
 {
-  if (!(milliseconds >= 0 && milliseconds < 1000000))
-  {
-    return false;
-  }
   // YYYYMMDDHHMMSS.FFFFFF&ZZXX
   if (!date)
   {
@@ -408,17 +360,19 @@ System::FormatDateTime(char date[22], time_t timep, long milliseconds)
     return false;
   }
   // Format the date and time, down to a single second.
-  size_t ret = strftime(tmp, sizeof(tmp), "%Y%m%d%H%M%S", ptm);
+  const size_t ret = strftime(tmp, sizeof(tmp), "%Y%m%d%H%M%S", ptm);
   assert(ret == 14);
   if (ret == 0 || ret >= maxsize)
   {
     return false;
   }
-  // Add milliseconds
+  // Add microseconds
   const size_t maxsizall = 22;
-  const int    ret2 = snprintf(date, maxsizall, "%s.%06ld", tmp, milliseconds);
+  const int    ret2 = snprintf(date, maxsizall, "%s.%06ld", tmp, microseconds);
   if (ret2 < 0)
+  {
     return false;
+  }
   if (static_cast<size_t>(ret2) >= maxsizall)
   {
     return false;
@@ -429,51 +383,11 @@ System::FormatDateTime(char date[22], time_t timep, long milliseconds)
 bool
 System::GetCurrentDateTime(char date[22])
 {
-  long   milliseconds;
-  time_t timep;
-  /*
-  The functions gettimeofday() and settimeofday() can  get  and  set  the
-  time  as  well  as a timezone.  The tv argument is a struct timeval (as
-  specified  in <sys/time.h>):
-
-  struct timeval
-  {
-    time_t      tv_sec;     // seconds
-    suseconds_t tv_usec;    // microseconds
-  };
-
-  and gives the number of seconds and microseconds since the  Epoch  (see
-  time(2)).  The tz argument is a struct timezone:
-
-  struct timezone
-  {
-    int tz_minuteswest;     // minutes west of Greenwich
-    int tz_dsttime;         // type of DST correction
-  };
-
-  If  either  tv or tz is nullptr, the corresponding structure is not set or
-  returned.
-
-  The use of the timezone structure is obsolete; the tz  argument  should
-  normally  be  specified  as  nullptr.  The tz_dsttime field has never been
-  used under Linux; it has not been and will not be supported by libc  or
-  glibc.   Each  and  every occurrence of this field in the kernel source
-  (other than the declaration) is a bug. Thus, the following is purely of
-  historic interest.
-  */
-  struct timeval tv;
-  gettimeofday(&tv, nullptr);
-  timep = tv.tv_sec;
-  // A concatenated date-time character string in the format:
-  // YYYYMMDDHHMMSS.FFFFFF&ZZXX
-  // The components of this string, from left to right, are YYYY = Year, MM =
-  // Month, DD = Day, HH = Hour (range "00" - "23"), MM = Minute (range "00" -
-  // "59"), SS = Second (range "00" - "60").
-  // FFFFFF = Fractional Second contains a fractional part of a second as small
-  // as 1 millionth of a second (range 000000 - 999999).
-  assert(tv.tv_usec >= 0 && tv.tv_usec < 1000000);
-  milliseconds = tv.tv_usec;
-  return FormatDateTime(date, timep, milliseconds);
+  const auto tp = std::chrono::system_clock::now();
+  const auto s = std::chrono::time_point_cast<std::chrono::seconds>(tp);
+  const auto us = std::chrono::time_point_cast<std::chrono::microseconds>(tp) -
+                  std::chrono::time_point_cast<std::chrono::microseconds>(s);
+  return FormatDateTime(date, std::chrono::system_clock::to_time_t(s), static_cast<long>(us.count()));
 }
 
 } // end namespace mdcm

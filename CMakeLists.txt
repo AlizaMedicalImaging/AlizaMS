@@ -314,7 +314,6 @@ set(MDCM_BUILD_VERSION 1)
 set(MDCM_VERSION "${MDCM_MAJOR_VERSION}.${MDCM_MINOR_VERSION}.${MDCM_BUILD_VERSION}")
 set(MDCM_API_VERSION "${MDCM_MAJOR_VERSION}.${MDCM_MINOR_VERSION}")
 
-check_include_file_concat("sys/time.h" MDCM_HAVE_SYS_TIME_H)
 check_include_file_concat("byteswap.h" MDCM_HAVE_BYTESWAP_FILE_H)
 # s. GDCM bug #324
 if(MDCM_HAVE_BYTESWAP_FILE_H)
@@ -322,9 +321,6 @@ if(MDCM_HAVE_BYTESWAP_FILE_H)
   check_cxx_source_compiles("#include <byteswap.h>\nint main(){return bswap_32(42);}" MDCM_HAVE_BYTESWAP_H)
 endif()
 check_include_file("rpc.h" MDCM_HAVE_RPC_H)
-
-include(CheckFunctionExists)
-check_function_exists(gettimeofday MDCM_HAVE_GETTIMEOFDAY)
 
 include(CheckCXXSourceCompiles)
 check_cxx_source_compiles("int main(){const char *f =__FUNCTION__;return 0;}" MDCM_CXX_HAS_FUNCTION)

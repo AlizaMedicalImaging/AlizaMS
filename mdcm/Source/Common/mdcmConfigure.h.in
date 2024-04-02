@@ -55,12 +55,10 @@
 #cmakedefine MDCM_BUILD_SHARED_LIBS
 // MDCM uses __FUNCTION__ which is not ANSI C, but C99
 #cmakedefine MDCM_CXX_HAS_FUNCTION
-#cmakedefine MDCM_HAVE_SYS_TIME_H
 #cmakedefine MDCM_HAVE_BYTESWAP_H
 #cmakedefine MDCM_HAVE_RPC_H
 // CMS with PBE (added in OpenSSL 1.0.0 ~ Fri Nov 27 15:33:25 CET 2009)
 #cmakedefine MDCM_HAVE_CMS_RECIPIENT_PASSWORD
-#cmakedefine MDCM_HAVE_GETTIMEOFDAY
 
 #endif
 
