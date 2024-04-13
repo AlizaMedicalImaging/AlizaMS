@@ -37,6 +37,9 @@
 #include <iostream>
 #include "browser/sqtree.h"
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5,2,0))
+#include <QLoggingCategory>
+#endif
 #if (defined LOG_STDOUT_TO_FILE && LOG_STDOUT_TO_FILE==1)
 #if (QT_VERSION >= QT_VERSION_CHECK(5,0,0))
 #include <QMessageLogContext>
@@ -359,6 +362,9 @@ int main(int argc, char * argv[])
 	app.setOrganizationName(QString("Aliza"));
 	app.setOrganizationDomain(QString("aliza-dicom-viewer.com"));
 	app.setApplicationName(QString("AlizaMS"));
+#if QT_VERSION >= QT_VERSION_CHECK(5,2,0)
+	QLoggingCategory::setFilterRules(QString("*.debug=false\n*.warning=false\n*.info=false"));
+#endif
 	//
 	{
 		double app_font_pt = 0.0;
