@@ -806,7 +806,7 @@ Reader::SetFileName(const char * p)
   }
   else
   {
-    mdcmAlwaysWarnMacro("Reader failed (1)");
+    mdcmWarningMacro("Reader failed (1)");
   }
   if (Ifstream->is_open())
   {
@@ -815,7 +815,7 @@ Reader::SetFileName(const char * p)
   }
   else
   {
-    mdcmAlwaysWarnMacro("Reader failed (2)");
+    mdcmWarningMacro("Reader failed (2)");
     delete Ifstream;
     Ifstream = nullptr;
     Stream = nullptr;

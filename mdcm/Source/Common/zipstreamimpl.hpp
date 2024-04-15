@@ -599,7 +599,6 @@ basic_zip_istream<charT, traits>::basic_zip_istream(istream_reference istream,
   {
     int check = check_header();
     (void)check;
-    // std::cerr << "check_header:" << check << std::endl;
   }
 }
 

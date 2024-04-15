@@ -87,8 +87,8 @@ ByteSwap<T>::SwapFromSwapCodeIntoSystem(T & a, SwapCode const & swapcode)
       Swap8(a, swapcode);
       break;
     default:
-      std::cerr << "Impossible" << std::endl;
-      abort();
+      mdcmErrorMacro("Impossible");
+      break;
   }
 }
 
@@ -159,7 +159,8 @@ Swap8(T & a, SwapCode const & swapcode)
       a = (((a << 8) & 0xff00ff00) | ((a >> 8) & 0x00ff00ff));
       break;
     default:
-      std::cerr << "Unexpected swap code:" << swapcode;
+      mdcmErrorMacro("Unexpected swap code: " << swapcode);
+      break;
   }
 }
 
@@ -192,7 +193,8 @@ Swap8<uint16_t>(uint16_t & a, SwapCode const & swapcode)
       a = static_cast<uint16_t>(((a << 8) & 0xff00) | ((a >> 8) & 0x00ff));
       break;
     default:
-      std::cerr << "Unexpected swap code:" << swapcode;
+      mdcmErrorMacro("Unexpected swap code: " << swapcode);
+      break;
   }
 }
 
