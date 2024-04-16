@@ -584,6 +584,7 @@ ImageCodec::DoPlanarConfiguration(std::istream & is, std::ostream & os)
   }
   catch (const std::bad_alloc &)
   {
+    delete[] dummy_buffer;
     return false;
   }
   const char * r = dummy_buffer;
