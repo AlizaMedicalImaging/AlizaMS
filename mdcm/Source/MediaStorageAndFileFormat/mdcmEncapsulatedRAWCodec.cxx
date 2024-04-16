@@ -19,13 +19,13 @@ namespace mdcm
 {
 
 bool
-EncapsulatedRAWCodec::CanCode(TransferSyntax const & ts) const
+EncapsulatedRAWCodec::CanCode(const TransferSyntax & ts) const
 {
   return (ts == TransferSyntax::EncapsulatedUncompressedExplicitVRLittleEndian);
 }
 
 bool
-EncapsulatedRAWCodec::CanDecode(TransferSyntax const & ts) const
+EncapsulatedRAWCodec::CanDecode(const TransferSyntax & ts) const
 {
   return (ts == TransferSyntax::EncapsulatedUncompressedExplicitVRLittleEndian);
 }
@@ -77,7 +77,7 @@ EncapsulatedRAWCodec::Code(const char * in, unsigned long long len, DataElement 
 }
 
 bool
-EncapsulatedRAWCodec::Decode2(DataElement const & in, char * out_buffer, unsigned long long out_len)
+EncapsulatedRAWCodec::Decode2(const DataElement & in, char * out_buffer, unsigned long long out_len)
 {
   if (NeedByteSwap)
   {

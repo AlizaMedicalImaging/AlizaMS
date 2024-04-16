@@ -196,14 +196,14 @@ public:
 
   ArrayType & operator[](unsigned int idx) { return GetValue(idx); }
 
-  ArrayType const &
+  const ArrayType &
   GetValue(unsigned int idx = 0) const
   {
     assert(idx < GetNumberOfValues());
     return Internal[idx];
   }
 
-  ArrayType const & operator[](unsigned int idx) const { return GetValue(idx); }
+  const ArrayType & operator[](unsigned int idx) const { return GetValue(idx); }
 
   void
   SetValue(ArrayType v, unsigned int idx = 0)
@@ -249,7 +249,7 @@ public:
   }
 
   void
-  SetFromDataElement(DataElement const & de)
+  SetFromDataElement(const DataElement & de)
   {
     assert(GetTag() == de.GetTag() || GetTag().GetGroup() == 0x6000 || GetTag().GetGroup() == 0x5000); // ?
     assert(GetVR() != VR::INVALID);
@@ -273,13 +273,13 @@ public:
   }
 
   void
-  Set(DataSet const & ds)
+  Set(const DataSet & ds)
   {
     SetFromDataElement(ds.GetDataElement(GetTag()));
   }
 
   void
-  SetFromDataSet(DataSet const & ds)
+  SetFromDataSet(const DataSet & ds)
   {
     if (ds.FindDataElement(GetTag()) && !ds.GetDataElement(GetTag()).IsEmpty())
     {
@@ -403,7 +403,7 @@ public:
     return Internal;
   }
 
-  ArrayType const &
+  const ArrayType &
   GetValue() const
   {
     return Internal;
@@ -445,7 +445,7 @@ public:
   }
 
   void
-  SetFromDataElement(DataElement const & de)
+  SetFromDataElement(const DataElement & de)
   {
     assert(GetTag() == de.GetTag() || GetTag().GetGroup() == 0x6000 || GetTag().GetGroup() == 0x5000); // ?
     assert(GetVR() != VR::INVALID);
@@ -468,13 +468,13 @@ public:
   }
 
   void
-  Set(DataSet const & ds)
+  Set(const DataSet & ds)
   {
     SetFromDataElement(ds.GetDataElement(GetTag()));
   }
 
   void
-  SetFromDataSet(DataSet const & ds)
+  SetFromDataSet(const DataSet & ds)
   {
     if (ds.FindDataElement(GetTag()) && !ds.GetDataElement(GetTag()).IsEmpty())
     {
@@ -597,14 +597,14 @@ public:
 
   ArrayType & operator[](unsigned int idx) { return GetValue(idx); }
 
-  ArrayType const &
+  const ArrayType &
   GetValue(unsigned int idx = 0) const
   {
     assert(idx < GetNumberOfValues());
     return Internal[idx];
   }
 
-  ArrayType const & operator[](unsigned int idx) const { return GetValue(idx); }
+  const ArrayType & operator[](unsigned int idx) const { return GetValue(idx); }
 
   void
   SetValue(unsigned int idx, ArrayType v)
@@ -681,7 +681,7 @@ public:
   }
 
   void
-  SetFromDataElement(DataElement const & de)
+  SetFromDataElement(const DataElement & de)
   {
     assert(GetTag() == de.GetTag() || GetTag().GetGroup() == 0x6000 || GetTag().GetGroup() == 0x5000); // ?
     assert(GetVR().Compatible(de.GetVR()));
@@ -691,13 +691,13 @@ public:
   }
 
   void
-  Set(DataSet const & ds)
+  Set(const DataSet & ds)
   {
     SetFromDataElement(ds.GetDataElement(GetTag()));
   }
 
   void
-  SetFromDataSet(DataSet const & ds)
+  SetFromDataSet(const DataSet & ds)
   {
     if (ds.FindDataElement(GetTag()) && !ds.GetDataElement(GetTag()).IsEmpty())
     {

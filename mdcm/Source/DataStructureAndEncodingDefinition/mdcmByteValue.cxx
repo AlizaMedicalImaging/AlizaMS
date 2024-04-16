@@ -151,7 +151,7 @@ ByteValue::SetLength(VL vl)
 }
 
 void
-ByteValue::Append(ByteValue const & bv)
+ByteValue::Append(const ByteValue & bv)
 {
   Internal.insert(Internal.end(), bv.Internal.begin(), bv.Internal.end());
   Length += bv.Length;

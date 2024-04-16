@@ -26,7 +26,7 @@ namespace mdcm
 {
 
 void
-SequenceOfItems::AddItem(Item const & item)
+SequenceOfItems::AddItem(const Item & item)
 {
   Items.push_back(item);
   if (!SequenceLengthField.IsUndefined())

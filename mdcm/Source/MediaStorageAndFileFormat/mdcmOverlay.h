@@ -47,13 +47,13 @@ public:
 
   Overlay();
   ~Overlay() override;
-  Overlay(Overlay const &);
+  Overlay(const Overlay &);
   Overlay &
-  operator=(Overlay const &);
+  operator=(const Overlay &);
   void
   Update(const DataElement &);
   bool
-  GrabOverlayFromPixelData(DataSet const &);
+  GrabOverlayFromPixelData(const DataSet &);
   void
   SetGroup(unsigned short);
   unsigned short

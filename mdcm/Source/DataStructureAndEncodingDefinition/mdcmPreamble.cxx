@@ -80,7 +80,7 @@ Preamble::Remove()
   }
 }
 
-std::ostream const &
+const std::ostream &
 Preamble::Write(std::ostream & os) const
 {
   if (Internal)

@@ -24,9 +24,8 @@
 #define MDCMLOOKUPTABLE_H
 
 #include "mdcmTypes.h"
-#include "mdcmObject.h"
-#include <cstdlib>
 #include <vector>
+#include <istream>
 
 namespace mdcm
 {
@@ -34,7 +33,6 @@ namespace mdcm
 class LookupTableInternal
 {
 public:
-  LookupTableInternal() = default;
   unsigned int               Length[3]{};
   unsigned short             Subscript[3]{};
   unsigned short             BitSize[3]{};
@@ -44,7 +42,7 @@ public:
 /**
  * LookupTable class
  */
-class MDCM_EXPORT LookupTable : public Object
+class MDCM_EXPORT LookupTable
 {
 public:
   typedef enum
@@ -59,8 +57,6 @@ public:
     UNKNOWN
   } LookupTableType;
 
-  LookupTable();
-  ~LookupTable();
   bool
   Initialized() const;
   void
@@ -69,8 +65,10 @@ public:
   Allocate(unsigned short = 8 /*bitsample*/);
   void InitializeLUT(LookupTableType, unsigned short, unsigned short, unsigned short);
   unsigned int GetLUTLength(LookupTableType) const;
-  virtual void
+  void
   SetLUT(LookupTableType, const unsigned char *, unsigned int);
+  void
+  SetSegmentedLUT(LookupTableType, const unsigned char *, unsigned int);
   void
   GetLUT(LookupTableType, unsigned char *, unsigned int &) const;
   void
@@ -101,13 +99,11 @@ public:
   WriteBufferAsRGBA(const unsigned char *);
   unsigned short
   GetBitSample() const;
-  void
-  Print(std::ostream &) const override;
 
 protected:
-  LookupTableInternal * Internal;
-  unsigned short        BitSample{};
-  bool                  IncompleteLUT{};
+  LookupTableInternal Internal{};
+  unsigned short      BitSample{};
+  bool                IncompleteLUT{};
 };
 
 } // end namespace mdcm

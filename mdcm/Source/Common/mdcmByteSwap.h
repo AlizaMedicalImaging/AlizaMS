@@ -39,11 +39,11 @@ public:
   static void
   Swap(T &);
   static void
-  SwapFromSwapCodeIntoSystem(T &, SwapCode const &);
+  SwapFromSwapCodeIntoSystem(T &, const SwapCode &);
   static void
   SwapRange(T *, unsigned int);
   static void
-  SwapRangeFromSwapCodeIntoSystem(T *, SwapCode const &, std::streamoff);
+  SwapRangeFromSwapCodeIntoSystem(T *, const SwapCode &, std::streamoff);
 };
 
 } // end namespace mdcm

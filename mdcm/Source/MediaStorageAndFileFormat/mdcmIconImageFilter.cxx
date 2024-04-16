@@ -24,6 +24,7 @@
 #include "mdcmAttribute.h"
 #include "mdcmPrivateTag.h"
 #include "mdcmJPEGCodec.h"
+#include <utility>
 
 namespace mdcm
 {
@@ -145,25 +146,20 @@ IconImageFilter::ExtractIconImages()
       const ByteValue * photometricinterpretation = ds.GetDataElement(tphotometricinterpretation).GetByteValue();
       if (!photometricinterpretation)
         return;
-      std::string               photometricinterpretation_str(photometricinterpretation->GetPointer(),
+      std::string photometricinterpretation_str(photometricinterpretation->GetPointer(),
                                                 photometricinterpretation->GetLength());
       PhotometricInterpretation pi(PhotometricInterpretation::GetPIType(photometricinterpretation_str.c_str()));
       pixeldata.SetPhotometricInterpretation(pi);
       if (pi == PhotometricInterpretation::PALETTE_COLOR)
       {
-        SmartPointer<LookupTable> lut = new LookupTable;
-        const Tag                 testseglut(0x0028, (0x1221 + 0));
-        if (ds.FindDataElement(testseglut))
-        {
-          mdcmAlwaysWarnMacro("Please report this image (icon)");
-        }
-        lut->Allocate(pf.GetBitsAllocated());
+        LookupTable lut;
+        lut.Allocate(pf.GetBitsAllocated());
         for (int i = 0; i < 3; ++i)
         {
           const Tag                tdescriptor(0x0028, static_cast<uint16_t>(0x1101 + i));
           Element<VR::US, VM::VM3> el_us3;
           el_us3.SetFromDataElement(ds[tdescriptor]);
-          lut->InitializeLUT(LookupTable::LookupTableType(i), el_us3[0], el_us3[1], el_us3[2]);
+          lut.InitializeLUT(LookupTable::LookupTableType(i), el_us3[0], el_us3[1], el_us3[2]);
           const Tag tlut(0x0028, static_cast<uint16_t>(0x1201 + i));
           const Tag seglut(0x0028, static_cast<uint16_t>(0x1221 + i));
           if (ds.FindDataElement(tlut))
@@ -171,8 +167,10 @@ IconImageFilter::ExtractIconImages()
             const ByteValue * lut_raw = ds.GetDataElement(tlut).GetByteValue();
             if (lut_raw)
             {
-              lut->SetLUT(
-                LookupTable::LookupTableType(i), reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()), lut_raw->GetLength());
+              lut.SetLUT(
+                LookupTable::LookupTableType(i),
+                reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()),
+                lut_raw->GetLength());
             }
           }
           else if (ds.FindDataElement(seglut))
@@ -180,8 +178,10 @@ IconImageFilter::ExtractIconImages()
             const ByteValue * lut_raw = ds.GetDataElement(seglut).GetByteValue();
             if (lut_raw)
             {
-              lut->SetLUT(
-                LookupTable::LookupTableType(i), reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()), lut_raw->GetLength());
+              lut.SetSegmentedLUT(
+                LookupTable::LookupTableType(i),
+                reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()),
+                lut_raw->GetLength());
             }
           }
           else
@@ -191,7 +191,7 @@ IconImageFilter::ExtractIconImages()
             return;
           }
         }
-        pixeldata.SetLUT(*lut);
+        pixeldata.SetLUT(std::move(lut));
       }
       const Tag tpixeldata = Tag(0x7fe0, 0x0010);
       if (!ds.FindDataElement(tpixeldata))

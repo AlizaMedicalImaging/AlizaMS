@@ -85,7 +85,7 @@ public:
 
   // Decode the CSAHeader from element 'de'
   bool
-  LoadFromDataElement(DataElement const &);
+  LoadFromDataElement(const DataElement &);
 
   // Print the CSAHeader (use only if Format == SV10 or NOMAGIC)
   void

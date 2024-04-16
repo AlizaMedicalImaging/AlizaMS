@@ -23,6 +23,7 @@
 #include "mdcmMediaStorage.h"
 #include "mdcmAttribute.h"
 #include "mdcmString.h"
+#include <utility>
 
 namespace mdcm
 {

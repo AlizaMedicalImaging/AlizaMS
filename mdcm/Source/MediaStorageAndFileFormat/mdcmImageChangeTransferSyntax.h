@@ -67,17 +67,17 @@ public:
 
 protected:
   bool
-  TryRAWCodec(const DataElement &, Bitmap const &, Bitmap &);
+  TryRAWCodec(const DataElement &, const Bitmap &, Bitmap &);
   bool
-  TryEncapsulatedRAWCodec(const DataElement &, Bitmap const &, Bitmap &);
+  TryEncapsulatedRAWCodec(const DataElement &, const Bitmap &, Bitmap &);
   bool
-  TryRLECodec(const DataElement &, Bitmap const &, Bitmap &);
+  TryRLECodec(const DataElement &, const Bitmap &, Bitmap &);
   bool
-  TryJPEGCodec(const DataElement &, Bitmap const &, Bitmap &);
+  TryJPEGCodec(const DataElement &, const Bitmap &, Bitmap &);
   bool
-  TryJPEGLSCodec(const DataElement &, Bitmap const &, Bitmap &);
+  TryJPEGLSCodec(const DataElement &, const Bitmap &, Bitmap &);
   bool
-  TryJPEG2000Codec(const DataElement &, Bitmap const &, Bitmap &);
+  TryJPEG2000Codec(const DataElement &, const Bitmap &, Bitmap &);
 
 private:
   TransferSyntax TS{TransferSyntax::TS_END};

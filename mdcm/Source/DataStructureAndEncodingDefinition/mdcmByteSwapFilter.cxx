@@ -26,6 +26,7 @@
 #include "mdcmSequenceOfFragments.h"
 #include "mdcmSequenceOfItems.h"
 #include "mdcmSwapper.h"
+#include <utility>
 
 namespace mdcm
 {
@@ -40,7 +41,7 @@ ByteSwapFilter::ByteSwap()
   for (DataSet::ConstIterator it = DS.Begin(); it != DS.End(); ++it)
   {
     const DataElement &                       de = *it;
-    VR const &                                vr = de.GetVR();
+    const VR &                                vr = de.GetVR();
     ByteValue *                               bv = const_cast<ByteValue *>(de.GetByteValue());
     mdcm::SmartPointer<mdcm::SequenceOfItems> si = de.GetValueAsSQ();
     if (de.IsEmpty())

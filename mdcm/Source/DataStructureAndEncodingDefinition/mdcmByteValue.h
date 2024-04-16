@@ -115,7 +115,7 @@ public:
   }
 
   template <typename TSwap, typename TType>
-  std::ostream const &
+  const std::ostream &
   Write(std::ostream & os) const
   {
     assert(!(Internal.size() % 2));
@@ -129,7 +129,7 @@ public:
   }
 
   template <typename TSwap>
-  std::ostream const &
+  const std::ostream &
   Write(std::ostream & os) const
   {
     return Write<TSwap, uint8_t>(os);
@@ -149,7 +149,7 @@ public:
   ComputeLength() const;
   void SetLength(VL) override;
   void
-  Append(ByteValue const &);
+  Append(const ByteValue &);
   void
   Clear() override;
   const char *

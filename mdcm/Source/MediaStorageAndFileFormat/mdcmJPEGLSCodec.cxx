@@ -35,19 +35,19 @@ namespace mdcm
 {
 
 bool
-JPEGLSCodec::CanDecode(TransferSyntax const & ts) const
+JPEGLSCodec::CanDecode(const TransferSyntax & ts) const
 {
   return (ts == TransferSyntax::JPEGLSLossless || ts == TransferSyntax::JPEGLSNearLossless);
 }
 
 bool
-JPEGLSCodec::CanCode(TransferSyntax const & ts) const
+JPEGLSCodec::CanCode(const TransferSyntax & ts) const
 {
   return ts == TransferSyntax::JPEGLSLossless || ts == TransferSyntax::JPEGLSNearLossless;
 }
 
 bool
-JPEGLSCodec::Decode(DataElement const & in, DataElement & out)
+JPEGLSCodec::Decode(const DataElement & in, DataElement & out)
 {
   using namespace charls;
   if (NumberOfDimensions == 2)
@@ -158,7 +158,7 @@ JPEGLSCodec::Decode(DataElement const & in, DataElement & out)
 }
 
 bool
-JPEGLSCodec::Decode2(DataElement const & in, char * out_buffer, size_t len)
+JPEGLSCodec::Decode2(const DataElement & in, char * out_buffer, size_t len)
 {
   using namespace charls;
   if (NumberOfDimensions == 2)
@@ -293,7 +293,7 @@ JPEGLSCodec::Decode2(DataElement const & in, char * out_buffer, size_t len)
 }
 
 bool
-JPEGLSCodec::Code(DataElement const & in, DataElement & out)
+JPEGLSCodec::Code(const DataElement & in, DataElement & out)
 {
   out = in;
   SmartPointer<SequenceOfFragments> sq = new SequenceOfFragments;

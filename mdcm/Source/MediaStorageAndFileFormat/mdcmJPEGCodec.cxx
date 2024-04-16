@@ -47,7 +47,7 @@ JPEGCodec::~JPEGCodec()
 }
 
 bool
-JPEGCodec::CanDecode(TransferSyntax const & ts) const
+JPEGCodec::CanDecode(const TransferSyntax & ts) const
 {
   return ts == TransferSyntax::JPEGBaselineProcess1 || ts == TransferSyntax::JPEGExtendedProcess2_4 ||
          ts == TransferSyntax::JPEGExtendedProcess3_5 || ts == TransferSyntax::JPEGSpectralSelectionProcess6_8 ||
@@ -56,7 +56,7 @@ JPEGCodec::CanDecode(TransferSyntax const & ts) const
 }
 
 bool
-JPEGCodec::CanCode(TransferSyntax const & ts) const
+JPEGCodec::CanCode(const TransferSyntax & ts) const
 {
   return ts == TransferSyntax::JPEGBaselineProcess1 || ts == TransferSyntax::JPEGExtendedProcess2_4 ||
          ts == TransferSyntax::JPEGExtendedProcess3_5 || ts == TransferSyntax::JPEGSpectralSelectionProcess6_8 ||
@@ -65,7 +65,7 @@ JPEGCodec::CanCode(TransferSyntax const & ts) const
 }
 
 bool
-JPEGCodec::Decode(DataElement const & in, DataElement & out)
+JPEGCodec::Decode(const DataElement & in, DataElement & out)
 {
   assert(Internal);
   out = in;
@@ -227,7 +227,7 @@ JPEGCodec::Decode(DataElement const & in, DataElement & out)
 }
 
 bool
-JPEGCodec::Decode2(DataElement const & in, std::stringstream & os)
+JPEGCodec::Decode2(const DataElement & in, std::stringstream & os)
 {
   assert(Internal);
   const SequenceOfFragments * sf0 = in.GetSequenceOfFragments();
@@ -376,7 +376,7 @@ JPEGCodec::Decode2(DataElement const & in, std::stringstream & os)
 }
 
 bool
-JPEGCodec::Code(DataElement const & in, DataElement & out)
+JPEGCodec::Code(const DataElement & in, DataElement & out)
 {
   out = in;
   SmartPointer<SequenceOfFragments> sq = new SequenceOfFragments;
@@ -411,7 +411,7 @@ JPEGCodec::Code(DataElement const & in, DataElement & out)
 }
 
 void
-JPEGCodec::SetPixelFormat(PixelFormat const & pf)
+JPEGCodec::SetPixelFormat(const PixelFormat & pf)
 {
   ImageCodec::SetPixelFormat(pf);
   SetBitSample(pf.GetBitsStored()); //
@@ -565,7 +565,7 @@ JPEGCodec::InternalCode(const char *, size_t, std::ostream &)
 }
 
 bool
-JPEGCodec::IsValid(PhotometricInterpretation const & pi)
+JPEGCodec::IsValid(const PhotometricInterpretation & pi)
 {
   switch (pi)
   {

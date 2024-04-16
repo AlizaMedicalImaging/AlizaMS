@@ -40,7 +40,7 @@ SequenceOfFragments::GetNumberOfFragments() const
 }
 
 void
-SequenceOfFragments::AddFragment(Fragment const & item)
+SequenceOfFragments::AddFragment(const Fragment & item)
 {
   Fragments.push_back(item);
 }

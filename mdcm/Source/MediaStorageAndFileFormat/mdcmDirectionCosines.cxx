@@ -136,7 +136,7 @@ DirectionCosines::SetFromString(const char * s)
 }
 
 double
-DirectionCosines::CrossDot(DirectionCosines const & dc) const
+DirectionCosines::CrossDot(const DirectionCosines & dc) const
 {
   double z1[3];
   Cross(z1);

@@ -195,18 +195,18 @@ public:
   // then MediaStorage is set to the default SecondaryCaptureImageStorage (return value is
   // false in this case)
   bool
-  SetFromFile(File const & file);
+  SetFromFile(const File & file);
 
   // Advanced user only (functions should be protected level)
   // Those function are lower level than SetFromFile
   bool
-  SetFromDataSet(DataSet const & ds);
+  SetFromDataSet(const DataSet & ds);
 
   bool
-  SetFromHeader(FileMetaInformation const &);
+  SetFromHeader(const FileMetaInformation &);
 
   bool
-  SetFromModality(DataSet const &);
+  SetFromModality(const DataSet &);
 
   void
   GuessFromModality(const char * modality, unsigned int dimension = 2);
@@ -222,20 +222,20 @@ public:
 
 protected:
   void
-  SetFromSourceImageSequence(DataSet const &);
+  SetFromSourceImageSequence(const DataSet &);
 
 private:
   bool
-  SetFromDataSetOrHeader(DataSet const &, const Tag &);
+  SetFromDataSetOrHeader(const DataSet &, const Tag &);
 
   const char *
-  GetFromDataSetOrHeader(DataSet const &, const Tag &, std::string &);
+  GetFromDataSetOrHeader(const DataSet &, const Tag &, std::string &);
 
   const char *
-  GetFromHeader(FileMetaInformation const &, std::string &);
+  GetFromHeader(const FileMetaInformation &, std::string &);
 
   const char *
-  GetFromDataSet(DataSet const &, std::string &);
+  GetFromDataSet(const DataSet &, std::string &);
 
   MSType MSField{MS_END};
 };

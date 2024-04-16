@@ -115,7 +115,7 @@ public:
   GetValue();
 
   void
-  SetValue(Value const &);
+  SetValue(const Value &);
 
   bool
   IsEmpty() const;
@@ -215,7 +215,7 @@ public:
 
   template <typename TDE, typename TSwap>
   std::istream &
-  ReadOrSkip(std::istream & is, std::set<Tag> const & skiptags)
+  ReadOrSkip(std::istream & is, const std::set<Tag> & skiptags)
   {
     (void)skiptags;
     return static_cast<TDE *>(this)->template Read<TSwap>(is);
@@ -223,7 +223,7 @@ public:
 
   template <typename TDE, typename TSwap>
   std::istream &
-  ReadPreValue(std::istream & is, std::set<Tag> const & skiptags)
+  ReadPreValue(std::istream & is, const std::set<Tag> & skiptags)
   {
     (void)skiptags;
     return static_cast<TDE *>(this)->template ReadPreValue<TSwap>(is);
@@ -231,7 +231,7 @@ public:
 
   template <typename TDE, typename TSwap>
   std::istream &
-  ReadValue(std::istream & is, std::set<Tag> const & skiptags)
+  ReadValue(std::istream & is, const std::set<Tag> & skiptags)
   {
     (void)skiptags;
     return static_cast<TDE *>(this)->template ReadValue<TSwap>(is);
@@ -239,7 +239,7 @@ public:
 
   template <typename TDE, typename TSwap>
   std::istream &
-  ReadValueWithLength(std::istream & is, VL & length, std::set<Tag> const & skiptags)
+  ReadValueWithLength(std::istream & is, VL & length, const std::set<Tag> & skiptags)
   {
     (void)skiptags;
     return static_cast<TDE *>(this)->template ReadValueWithLength<TSwap>(is, length);

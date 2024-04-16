@@ -59,7 +59,7 @@ public:
   }
   DataSetEvent(const Self & s)
     : AnyEvent(s) {}
-  DataSet const &
+  const DataSet &
   GetDataSet() const
   {
     return *m_DataSet;

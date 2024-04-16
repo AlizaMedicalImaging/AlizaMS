@@ -65,7 +65,7 @@ Curve::Curve() : Internal(new CurveInternal)
 {
 }
 
-Curve::Curve(Curve const & ov)
+Curve::Curve(const Curve & ov)
   : Object(ov)
 {
   Internal = new CurveInternal;
@@ -78,7 +78,7 @@ Curve::~Curve()
 }
 
 unsigned int
-Curve::GetNumberOfCurves(DataSet const & ds)
+Curve::GetNumberOfCurves(const DataSet & ds)
 {
   Tag          overlay(0x5000, 0x0000); // first possible overlay
   bool         finished = false;
@@ -329,7 +329,7 @@ Curve::SetCurveDataDescriptor(const uint16_t * values, size_t num)
   Internal->CurveDataDescriptor = std::vector<uint16_t>(values, values + num);
 }
 
-std::vector<unsigned short> const &
+const std::vector<unsigned short> &
 Curve::GetCurveDataDescriptor() const
 {
   return Internal->CurveDataDescriptor;

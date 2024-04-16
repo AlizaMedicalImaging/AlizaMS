@@ -244,7 +244,7 @@ ImageChangeTransferSyntax::Change()
 }
 
 bool
-ImageChangeTransferSyntax::TryRAWCodec(const DataElement & pixelde, Bitmap const & input, Bitmap & output)
+ImageChangeTransferSyntax::TryRAWCodec(const DataElement & pixelde, const Bitmap & input, Bitmap & output)
 {
   const unsigned long long len = input.GetBufferLength();
   (void)len;
@@ -281,7 +281,7 @@ ImageChangeTransferSyntax::TryRAWCodec(const DataElement & pixelde, Bitmap const
 }
 
 bool
-ImageChangeTransferSyntax::TryEncapsulatedRAWCodec(const DataElement & pixelde, Bitmap const & input, Bitmap & output)
+ImageChangeTransferSyntax::TryEncapsulatedRAWCodec(const DataElement & pixelde, const Bitmap & input, Bitmap & output)
 {
   const ByteValue * bv = pixelde.GetByteValue();
   if (!bv)
@@ -320,7 +320,7 @@ ImageChangeTransferSyntax::TryEncapsulatedRAWCodec(const DataElement & pixelde, 
 }
 
 bool
-ImageChangeTransferSyntax::TryRLECodec(const DataElement & pixelde, Bitmap const & input, Bitmap & output)
+ImageChangeTransferSyntax::TryRLECodec(const DataElement & pixelde, const Bitmap & input, Bitmap & output)
 {
   const unsigned long long len = input.GetBufferLength();
   (void)len;
@@ -357,7 +357,7 @@ ImageChangeTransferSyntax::TryRLECodec(const DataElement & pixelde, Bitmap const
 }
 
 bool
-ImageChangeTransferSyntax::TryJPEGCodec(const DataElement & pixelde, Bitmap const & input, Bitmap & output)
+ImageChangeTransferSyntax::TryJPEGCodec(const DataElement & pixelde, const Bitmap & input, Bitmap & output)
 {
   const unsigned long long len = input.GetBufferLength();
   (void)len;
@@ -415,7 +415,7 @@ ImageChangeTransferSyntax::TryJPEGCodec(const DataElement & pixelde, Bitmap cons
 }
 
 bool
-ImageChangeTransferSyntax::TryJPEGLSCodec(const DataElement & pixelde, Bitmap const & input, Bitmap & output)
+ImageChangeTransferSyntax::TryJPEGLSCodec(const DataElement & pixelde, const Bitmap & input, Bitmap & output)
 {
   const unsigned long long len = input.GetBufferLength();
   (void)len;
@@ -476,7 +476,7 @@ ImageChangeTransferSyntax::TryJPEGLSCodec(const DataElement & pixelde, Bitmap co
 }
 
 bool
-ImageChangeTransferSyntax::TryJPEG2000Codec(const DataElement & pixelde, Bitmap const & input, Bitmap & output)
+ImageChangeTransferSyntax::TryJPEG2000Codec(const DataElement & pixelde, const Bitmap & input, Bitmap & output)
 {
   const unsigned long long len = input.GetBufferLength();
   (void)len;

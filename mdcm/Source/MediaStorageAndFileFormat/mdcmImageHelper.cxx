@@ -37,7 +37,6 @@
 #include "mdcmAttribute.h"
 #include "mdcmImage.h"
 #include "mdcmDirectionCosines.h"
-#include "mdcmSegmentedPaletteColorLookupTable.h"
 #include "mdcmByteValue.h"
 #include "mdcmUIDGenerator.h"
 #include "mdcmVR.h"
@@ -322,7 +321,7 @@ GetSpacingValueFromSequence(const DataSet & ds, const Tag & tfgs, std::vector<do
 }
 
 std::vector<double>
-ImageHelper::GetOriginValue(File const & f)
+ImageHelper::GetOriginValue(const File & f)
 {
   std::vector<double> ori;
   MediaStorage        ms;
@@ -406,7 +405,7 @@ ImageHelper::GetOriginValue(File const & f)
 }
 
 bool
-ImageHelper::GetDirectionCosinesFromDataSet(DataSet const & ds, std::vector<double> & dircos)
+ImageHelper::GetDirectionCosinesFromDataSet(const DataSet & ds, std::vector<double> & dircos)
 {
   // precondition: this dataset is not a secondary capture
   const Tag timageorientationpatient(0x0020, 0x0037);
@@ -442,7 +441,7 @@ ImageHelper::GetDirectionCosinesFromDataSet(DataSet const & ds, std::vector<doub
 }
 
 std::vector<double>
-ImageHelper::GetDirectionCosinesValue(File const & f)
+ImageHelper::GetDirectionCosinesValue(const File & f)
 {
   std::vector<double> dircos;
   MediaStorage        ms;
@@ -700,7 +699,7 @@ ImageHelper::GetPixelFormatValue(const File & f)
 std::vector<unsigned int>
 ImageHelper::GetDimensionsValue(const File & f)
 {
-  DataSet const & ds = f.GetDataSet();
+  const DataSet & ds = f.GetDataSet();
   MediaStorage    ms;
   ms.SetFromFile(f);
   std::vector<unsigned int> theReturn(3);
@@ -834,7 +833,7 @@ ImageHelper::SetDimensionsValue(File & f, const Pixmap & img)
 }
 
 std::vector<double>
-ImageHelper::GetRescaleInterceptSlopeValue(File const & f)
+ImageHelper::GetRescaleInterceptSlopeValue(const File & f)
 {
   std::vector<double> interceptslope;
   MediaStorage        ms;
@@ -935,7 +934,7 @@ ImageHelper::GetRescaleInterceptSlopeValue(File const & f)
 }
 
 Tag
-ImageHelper::GetSpacingTagFromMediaStorage(MediaStorage const & ms)
+ImageHelper::GetSpacingTagFromMediaStorage(const MediaStorage & ms)
 {
   Tag t;
   switch (ms)
@@ -1006,7 +1005,7 @@ ImageHelper::GetSpacingTagFromMediaStorage(MediaStorage const & ms)
 }
 
 Tag
-ImageHelper::GetZSpacingTagFromMediaStorage(MediaStorage const & ms)
+ImageHelper::GetZSpacingTagFromMediaStorage(const MediaStorage & ms)
 {
   Tag t;
   switch (ms)
@@ -1046,7 +1045,7 @@ static size_t count_backslashes(const std::string & s)
 }
 
 std::vector<double>
-ImageHelper::GetSpacingValue(File const & f)
+ImageHelper::GetSpacingValue(const File & f)
 {
   std::vector<double> sp;
   sp.reserve(3);
@@ -1808,7 +1807,7 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
 }
 
 static void
-SetDataElementInSQAsItemNumber(DataSet & ds, DataElement const & de, Tag const & sqtag, unsigned int itemidx)
+SetDataElementInSQAsItemNumber(DataSet & ds, const DataElement & de, const Tag & sqtag, unsigned int itemidx)
 {
   const Tag tfgs = sqtag;
   if (!ds.FindDataElement(tfgs))
@@ -2641,7 +2640,7 @@ ImageHelper::SetVOILUT(File & f, const Image & img)
 }
 
 bool
-ImageHelper::GetRealWorldValueMappingContent(File const & f, RealWorldValueMappingContent & ret)
+ImageHelper::GetRealWorldValueMappingContent(const File & f, RealWorldValueMappingContent & ret)
 {
   MediaStorage ms;
   ms.SetFromFile(f);
@@ -2698,7 +2697,7 @@ ImageHelper::GetRealWorldValueMappingContent(File const & f, RealWorldValueMappi
 }
 
 PhotometricInterpretation
-ImageHelper::GetPhotometricInterpretationValue(File const & f)
+ImageHelper::GetPhotometricInterpretationValue(const File & f)
 {
   PixelFormat       pf = GetPixelFormatValue(f);
   const Tag         tphotometricinterpretation(0x0028, 0x0004);
@@ -2761,7 +2760,7 @@ ImageHelper::GetPhotometricInterpretationValue(File const & f)
 }
 
 // returns the configuration of colors in a plane, either RGB RGB RGB or RRR GGG BBB
-// code is borrowed from mdcmPixmapReader::ReadImage(MediaStorage const &ms)
+// code is borrowed from mdcmPixmapReader::ReadImage(const MediaStorage &ms)
 unsigned int
 ImageHelper::GetPlanarConfigurationValue(const File & f)
 {
@@ -2772,7 +2771,7 @@ ImageHelper::GetPlanarConfigurationValue(const File & f)
   unsigned int pc = 0;
   // FIXME: Whatif planaconfiguration is send in a grayscale image... it would be empty...
   // well hopefully :(
-  DataSet const & ds = f.GetDataSet();
+  const DataSet & ds = f.GetDataSet();
   if (ds.FindDataElement(planarconfiguration) && !ds.GetDataElement(planarconfiguration).IsEmpty())
   {
     const DataElement &       de = ds.GetDataElement(planarconfiguration);
@@ -2788,11 +2787,10 @@ ImageHelper::GetPlanarConfigurationValue(const File & f)
   return pc;
 }
 
-// returns the lookup table of an image file
-SmartPointer<LookupTable>
-ImageHelper::GetLUT(File const & f)
+LookupTable
+ImageHelper::GetLUT(const File & f)
 {
-  DataSet const &           ds = f.GetDataSet();
+  const DataSet &           ds = f.GetDataSet();
   PixelFormat               pf = GetPixelFormatValue(f);
   PhotometricInterpretation pi = GetPhotometricInterpretationValue(f);
   // Do the Palette Color:
@@ -2845,13 +2843,8 @@ ImageHelper::GetLUT(File const & f)
       mdcmDebugMacro("Pixel Padding Value (0028,0120) is not handled. Image will not be displayed properly");
     }
   }
-  SmartPointer<LookupTable> lut = new LookupTable;
-  const Tag                 testseglut(0x0028, (0x1221 + 0));
-  if (ds.FindDataElement(testseglut))
-  {
-    lut = new SegmentedPaletteColorLookupTable;
-  }
-  lut->Allocate(pf.GetBitsAllocated());
+  LookupTable lut;
+  lut.Allocate(pf.GetBitsAllocated());
   // for each red, green, blue:
   for (int i = 0; i < 3; ++i)
   {
@@ -2863,7 +2856,7 @@ ImageHelper::GetLUT(File const & f)
     Element<VR::US, VM::VM3> el_us3 = { { 0, 0, 0 } };
     // Now pass the byte array to a DICOMizer:
     el_us3.SetFromDataElement(ds[tdescriptor]); //.GetValue());
-    lut->InitializeLUT(LookupTable::LookupTableType(i), el_us3[0], el_us3[1], el_us3[2]);
+    lut.InitializeLUT(LookupTable::LookupTableType(i), el_us3[0], el_us3[1], el_us3[2]);
     // (0028,1201) OW
     // (0028,1202) OW
     // (0028,1203) OW
@@ -2880,17 +2873,19 @@ ImageHelper::GetLUT(File const & f)
       if (lut_raw)
       {
         // LookupTableType::RED == 0
-        lut->SetLUT(
-          LookupTable::LookupTableType(i), reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()), lut_raw->GetLength());
+        lut.SetLUT(
+          LookupTable::LookupTableType(i),
+		  reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()),
+		  lut_raw->GetLength());
       }
       else
       {
-        lut->Clear();
+        lut.Clear();
       }
       const size_t tmp1 = el_us3.GetValue(0);
       const size_t tmp2 = el_us3.GetValue(2);
       const size_t tmp3 = (tmp1 ? tmp1 : 65536) * tmp2 / 8;
-      assert(!lut->Initialized() || tmp3 == lut_raw->GetLength());
+      assert(!lut.Initialized() || tmp3 == lut_raw->GetLength());
       (void)tmp3;
     }
     else if (ds.FindDataElement(seglut))
@@ -2898,12 +2893,14 @@ ImageHelper::GetLUT(File const & f)
       const ByteValue * lut_raw = ds.GetDataElement(seglut).GetByteValue();
       if (lut_raw)
       {
-        lut->SetLUT(
-          LookupTable::LookupTableType(i), reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()), lut_raw->GetLength());
+        lut.SetSegmentedLUT(
+          LookupTable::LookupTableType(i),
+		  reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()),
+		  lut_raw->GetLength());
       }
       else
       {
-        lut->Clear();
+        lut.Clear();
       }
     }
     else
@@ -2911,7 +2908,7 @@ ImageHelper::GetLUT(File const & f)
       assert(0);
     }
   }
-  if (!lut->Initialized())
+  if (!lut.Initialized())
   {
     mdcmDebugMacro("LUT was uninitialized!");
   }
@@ -2919,7 +2916,7 @@ ImageHelper::GetLUT(File const & f)
 }
 
 const ByteValue *
-ImageHelper::GetPointerFromElement(Tag const & tag, const File & inF)
+ImageHelper::GetPointerFromElement(const Tag & tag, const File & inF)
 {
   const DataSet & ds = inF.GetDataSet();
   if (ds.FindDataElement(tag))
@@ -2933,8 +2930,8 @@ ImageHelper::GetPointerFromElement(Tag const & tag, const File & inF)
 MediaStorage
 ImageHelper::ComputeMediaStorageFromModality(const char *                      modality,
                                              unsigned int                      dimension,
-                                             PixelFormat const &               pixeltype,
-                                             PhotometricInterpretation const & pi,
+                                             const PixelFormat &               pixeltype,
+                                             const PhotometricInterpretation & pi,
                                              double                            intercept,
                                              double                            slope)
 {

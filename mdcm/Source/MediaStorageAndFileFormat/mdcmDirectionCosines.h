@@ -53,7 +53,7 @@ public:
   bool
   SetFromString(const char *);
   double
-  CrossDot(DirectionCosines const &) const;
+  CrossDot(const DirectionCosines &) const;
   double
   ComputeDistAlongNormal(const double[3]) const;
   void

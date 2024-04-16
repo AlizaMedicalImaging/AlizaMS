@@ -105,7 +105,7 @@ base64_encode(unsigned char const * bytes_to_encode, size_t in_len)
 }
 
 static std::string
-base64_decode(std::string const & encoded_string)
+base64_decode(const std::string & encoded_string)
 {
   size_t        in_len = encoded_string.size();
   size_t        i = 0;

@@ -60,7 +60,7 @@ Unpack12Bits(char * out, const char * in, size_t n)
 }
 
 bool
-RAWCodec::CanCode(TransferSyntax const & ts) const
+RAWCodec::CanCode(const TransferSyntax & ts) const
 {
   return (ts == TransferSyntax::ImplicitVRLittleEndian || ts == TransferSyntax::ExplicitVRLittleEndian ||
           ts == TransferSyntax::ExplicitVRBigEndian || ts == TransferSyntax::ImplicitVRBigEndianPrivateGE ||
@@ -68,7 +68,7 @@ RAWCodec::CanCode(TransferSyntax const & ts) const
 }
 
 bool
-RAWCodec::CanDecode(TransferSyntax const & ts) const
+RAWCodec::CanDecode(const TransferSyntax & ts) const
 {
   return (ts == TransferSyntax::ImplicitVRLittleEndian || ts == TransferSyntax::ExplicitVRLittleEndian ||
           ts == TransferSyntax::ExplicitVRBigEndian || ts == TransferSyntax::ImplicitVRBigEndianPrivateGE ||
@@ -76,14 +76,14 @@ RAWCodec::CanDecode(TransferSyntax const & ts) const
 }
 
 bool
-RAWCodec::Code(DataElement const & in, DataElement & out)
+RAWCodec::Code(const DataElement & in, DataElement & out)
 {
   out = in;
   return true;
 }
 
 bool
-RAWCodec::Decode(DataElement const & in, DataElement & out)
+RAWCodec::Decode(const DataElement & in, DataElement & out)
 {
   if (!NeedByteSwap && !RequestPaddedCompositePixelCode && PI == PhotometricInterpretation::MONOCHROME2 &&
       !PlanarConfiguration && !RequestPlanarConfiguration && GetPixelFormat().GetBitsAllocated() != 12 &&

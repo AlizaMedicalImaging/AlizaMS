@@ -49,8 +49,8 @@ class MDCM_EXPORT CSAHeaderDictEntry
 
 public:
   CSAHeaderDictEntry(const char * name = "",
-                     VR const &   vr = VR::INVALID,
-                     VM const &   vm = VM::VM0,
+                     const VR &   vr = VR::INVALID,
+                     const VM &   vm = VM::VM0,
                      const char * desc = "")
     : Name(name)
     , ValueRepresentation(vr)
@@ -73,7 +73,7 @@ public:
     return ValueMultiplicity;
   }
   void
-  SetVM(VM const & vm)
+  SetVM(const VM & vm)
   {
     ValueMultiplicity = vm;
   }

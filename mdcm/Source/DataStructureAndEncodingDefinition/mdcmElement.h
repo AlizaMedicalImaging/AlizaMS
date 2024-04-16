@@ -163,7 +163,7 @@ public:
   }
 
   void
-  SetFromDataElement(DataElement const & de)
+  SetFromDataElement(const DataElement & de)
   {
     const ByteValue * bv = de.GetByteValue();
     if (!bv)
@@ -218,7 +218,7 @@ public:
   }
 
   void
-  Set(Value const & v)
+  Set(const Value & v)
   {
     const ByteValue * bv = dynamic_cast<const ByteValue *>(&v);
     if (!bv)
@@ -231,7 +231,7 @@ public:
 
 protected:
   void
-  SetNoSwap(Value const & v)
+  SetNoSwap(const Value & v)
   {
     const ByteValue * bv = dynamic_cast<const ByteValue *>(&v);
     if (!bv)
@@ -253,7 +253,7 @@ struct ignore_char
 ignore_char const backslash('\\');
 
 inline std::istream &
-operator>>(std::istream & in, ignore_char const & ic)
+operator>>(std::istream & in, const ignore_char & ic)
 {
   if (!in.eof())
     in.clear(in.rdstate() & ~std::ios_base::failbit);
@@ -635,7 +635,7 @@ public:
   }
 
   void
-  Set(Value const & v)
+  Set(const Value & v)
   {
     const ByteValue * bv = dynamic_cast<const ByteValue *>(&v);
     if (!bv)
@@ -659,7 +659,7 @@ public:
   }
 
   void
-  SetFromDataElement(DataElement const & de)
+  SetFromDataElement(const DataElement & de)
   {
     const ByteValue * bv = de.GetByteValue();
     if (!bv)
@@ -763,7 +763,7 @@ public:
 
 protected:
   void
-  SetNoSwap(Value const & v)
+  SetNoSwap(const Value & v)
   {
     const ByteValue * bv = dynamic_cast<const ByteValue *>(&v);
     if (!bv)

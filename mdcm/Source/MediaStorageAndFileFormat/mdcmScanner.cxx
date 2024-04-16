@@ -30,6 +30,7 @@
 #include "mdcmProgressEvent.h"
 #include "mdcmFileNameEvent.h"
 #include <algorithm>
+#include <utility>
 
 #define stringBinaryVR(type)                                \
   case VR::type:                                            \

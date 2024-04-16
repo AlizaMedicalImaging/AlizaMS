@@ -103,7 +103,7 @@ DataElement::GetValue()
 }
 
 void
-DataElement::SetValue(Value const & vl)
+DataElement::SetValue(const Value & vl)
 {
   ValueField = vl;
   ValueLengthField = vl.GetLength();

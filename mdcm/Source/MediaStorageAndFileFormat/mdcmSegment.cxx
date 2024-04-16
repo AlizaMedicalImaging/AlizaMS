@@ -117,7 +117,7 @@ Segment::SetSegmentDescription(const char * description)
   SegmentDescription = description;
 }
 
-SegmentHelper::BasicCodedEntry const &
+const SegmentHelper::BasicCodedEntry &
 Segment::GetAnatomicRegion() const
 {
   return AnatomicRegion;
@@ -130,14 +130,14 @@ Segment::GetAnatomicRegion()
 }
 
 void
-Segment::SetAnatomicRegion(SegmentHelper::BasicCodedEntry const & BSE)
+Segment::SetAnatomicRegion(const SegmentHelper::BasicCodedEntry & BSE)
 {
   AnatomicRegion.CV = BSE.CV;
   AnatomicRegion.CSD = BSE.CSD;
   AnatomicRegion.CM = BSE.CM;
 }
 
-Segment::BasicCodedEntryVector const &
+const Segment::BasicCodedEntryVector &
 Segment::GetAnatomicRegionModifiers() const
 {
   return AnatomicRegionModifiers;
@@ -150,12 +150,12 @@ Segment::GetAnatomicRegionModifiers()
 }
 
 void
-Segment::SetAnatomicRegionModifiers(BasicCodedEntryVector const & BSEV)
+Segment::SetAnatomicRegionModifiers(const BasicCodedEntryVector & BSEV)
 {
   AnatomicRegionModifiers = BSEV;
 }
 
-SegmentHelper::BasicCodedEntry const &
+const SegmentHelper::BasicCodedEntry &
 Segment::GetPropertyCategory() const
 {
   return PropertyCategory;
@@ -168,14 +168,14 @@ Segment::GetPropertyCategory()
 }
 
 void
-Segment::SetPropertyCategory(SegmentHelper::BasicCodedEntry const & BSE)
+Segment::SetPropertyCategory(const SegmentHelper::BasicCodedEntry & BSE)
 {
   PropertyCategory.CV = BSE.CV;
   PropertyCategory.CSD = BSE.CSD;
   PropertyCategory.CM = BSE.CM;
 }
 
-SegmentHelper::BasicCodedEntry const &
+const SegmentHelper::BasicCodedEntry &
 Segment::GetPropertyType() const
 {
   return PropertyType;
@@ -188,14 +188,14 @@ Segment::GetPropertyType()
 }
 
 void
-Segment::SetPropertyType(SegmentHelper::BasicCodedEntry const & BSE)
+Segment::SetPropertyType(const SegmentHelper::BasicCodedEntry & BSE)
 {
   PropertyType.CV = BSE.CV;
   PropertyType.CSD = BSE.CSD;
   PropertyType.CM = BSE.CM;
 }
 
-Segment::BasicCodedEntryVector const &
+const Segment::BasicCodedEntryVector &
 Segment::GetPropertyTypeModifiers() const
 {
   return PropertyTypeModifiers;
@@ -208,7 +208,7 @@ Segment::GetPropertyTypeModifiers()
 }
 
 void
-Segment::SetPropertyTypeModifiers(BasicCodedEntryVector const & BSEV)
+Segment::SetPropertyTypeModifiers(const BasicCodedEntryVector & BSEV)
 {
   PropertyTypeModifiers = BSEV;
 }
@@ -264,7 +264,7 @@ Segment::SetSurfaceCount(const unsigned long nb)
   SurfaceCount = nb;
 }
 
-Segment::SurfaceVector const &
+const Segment::SurfaceVector &
 Segment::GetSurfaces() const
 {
   return Surfaces;

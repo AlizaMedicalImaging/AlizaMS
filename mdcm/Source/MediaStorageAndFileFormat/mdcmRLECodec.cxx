@@ -299,19 +299,19 @@ RLECodec::~RLECodec()
 }
 
 bool
-RLECodec::CanCode(TransferSyntax const & ts) const
+RLECodec::CanCode(const TransferSyntax & ts) const
 {
   return ts == TransferSyntax::RLELossless;
 }
 
 bool
-RLECodec::CanDecode(TransferSyntax const & ts) const
+RLECodec::CanDecode(const TransferSyntax & ts) const
 {
   return ts == TransferSyntax::RLELossless;
 }
 
 bool
-RLECodec::Decode(DataElement const & in, DataElement & out)
+RLECodec::Decode(const DataElement & in, DataElement & out)
 {
   if (NumberOfDimensions == 2)
   {
@@ -404,7 +404,7 @@ RLECodec::Decode(DataElement const & in, DataElement & out)
 }
 
 bool
-RLECodec::Code(DataElement const & in, DataElement & out)
+RLECodec::Code(const DataElement & in, DataElement & out)
 {
   if (GetPhotometricInterpretation() == PhotometricInterpretation::YBR_FULL_422 ||
       GetPhotometricInterpretation() == PhotometricInterpretation::YBR_ICT ||
@@ -846,7 +846,7 @@ RLECodec::StopEncode(std::ostream &)
 }
 
 size_t
-RLECodec::DecodeFragment(Fragment const & frag, char * buffer, size_t llen)
+RLECodec::DecodeFragment(const Fragment & frag, char * buffer, size_t llen)
 {
   std::stringstream is;
   const ByteValue & bv = dynamic_cast<const ByteValue &>(frag.GetValue());

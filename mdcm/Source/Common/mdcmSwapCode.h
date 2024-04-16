@@ -52,7 +52,7 @@ public:
 
 protected:
   static int
-  GetIndex(SwapCode const & sc);
+  GetIndex(const SwapCode & sc);
 
 private:
   SwapCodeType SwapCodeValue{Unknown};

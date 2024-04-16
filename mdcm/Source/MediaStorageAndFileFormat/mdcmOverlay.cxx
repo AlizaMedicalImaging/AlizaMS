@@ -72,7 +72,7 @@ Overlay::~Overlay()
   delete Internal;
 }
 
-Overlay::Overlay(Overlay const & ov)
+Overlay::Overlay(const Overlay & ov)
   : Object(ov)
 {
   Internal = new OverlayInternal;
@@ -81,7 +81,7 @@ Overlay::Overlay(Overlay const & ov)
 }
 
 Overlay &
-Overlay::operator=(Overlay const & ov)
+Overlay::operator=(const Overlay & ov)
 {
   assert(Internal);
   *Internal = *ov.Internal;
@@ -226,7 +226,7 @@ Overlay::Update(const DataElement & de)
 }
 
 bool
-Overlay::GrabOverlayFromPixelData(DataSet const & ds)
+Overlay::GrabOverlayFromPixelData(const DataSet & ds)
 {
   if (!ds.FindDataElement(Tag(0x7fe0, 0x0010)))
     return false;

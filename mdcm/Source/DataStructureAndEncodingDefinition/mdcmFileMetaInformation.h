@@ -148,7 +148,7 @@ public:
   static const char *
   GetSourceApplicationEntityTitle();
 
-  FileMetaInformation(FileMetaInformation const & fmi)
+  FileMetaInformation(const FileMetaInformation & fmi)
     : DataSet(fmi)
   {
     DataSetTS = fmi.DataSetTS;

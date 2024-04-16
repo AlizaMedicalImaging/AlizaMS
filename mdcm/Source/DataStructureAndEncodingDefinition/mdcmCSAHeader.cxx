@@ -160,7 +160,7 @@ CSAHeader::GetFormat() const
 }
 
 bool
-CSAHeader::LoadFromDataElement(DataElement const & de)
+CSAHeader::LoadFromDataElement(const DataElement & de)
 {
   if (de.IsEmpty())
     return false;

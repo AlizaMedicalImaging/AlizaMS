@@ -47,13 +47,13 @@ public:
   RLECodec();
   ~RLECodec() override;
   bool
-  CanCode(TransferSyntax const &) const override;
+  CanCode(const TransferSyntax &) const override;
   bool
-  CanDecode(TransferSyntax const &) const override;
+  CanDecode(const TransferSyntax &) const override;
   bool
-  Decode(DataElement const &, DataElement &) override;
+  Decode(const DataElement &, DataElement &) override;
   bool
-  Code(DataElement const &, DataElement & out) override;
+  Code(const DataElement &, DataElement & out) override;
   unsigned long long
   GetBufferLength() const;
   void
@@ -81,7 +81,7 @@ protected:
 
 private:
   size_t
-  DecodeFragment(Fragment const &, char *, size_t);
+  DecodeFragment(const Fragment &, char *, size_t);
   RLEInternals *     Internals;
   unsigned long long Length{};
   unsigned long long BufferLength{};

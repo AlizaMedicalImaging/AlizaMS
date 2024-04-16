@@ -27,7 +27,6 @@
 #include "mdcmFileMetaInformation.h"
 #include "mdcmElement.h"
 #include "mdcmPhotometricInterpretation.h"
-#include "mdcmSegmentedPaletteColorLookupTable.h"
 #include "mdcmTransferSyntax.h"
 #include "mdcmLookupTable.h"
 #include "mdcmAttribute.h"
@@ -35,6 +34,7 @@
 #include "mdcmPrivateTag.h"
 #include "mdcmJPEGCodec.h"
 #include "mdcmImageHelper.h"
+#include <utility>
 
 namespace mdcm
 {
@@ -254,39 +254,38 @@ DoIconImage(const DataSet & rootds, Pixmap & image)
     pixeldata.SetPhotometricInterpretation(pi);
     if (pi == PhotometricInterpretation::PALETTE_COLOR)
     {
-      SmartPointer<LookupTable> lut = new LookupTable;
-      const Tag                 testseglut(0x0028, (0x1221 + 0));
-      if (ds.FindDataElement(testseglut))
-      {
-        assert(0 && "Please report this image");
-        lut = new SegmentedPaletteColorLookupTable;
-      }
-      lut->Allocate(pf.GetBitsAllocated());
+      LookupTable lut;
+      lut.Allocate(pf.GetBitsAllocated());
       for (int i = 0; i < 3; ++i)
       {
         const Tag                tdescriptor(0x0028, static_cast<uint16_t>(0x1101 + i));
         Element<VR::US, VM::VM3> el_us3;
         el_us3.SetFromDataElement(ds[tdescriptor]);
-        lut->InitializeLUT(LookupTable::LookupTableType(i), el_us3[0], el_us3[1], el_us3[2]);
+        lut.InitializeLUT(LookupTable::LookupTableType(i), el_us3[0], el_us3[1], el_us3[2]);
         const Tag tlut(0x0028, static_cast<uint16_t>(0x1201 + i));
         const Tag seglut(0x0028, static_cast<uint16_t>(0x1221 + i));
         if (ds.FindDataElement(tlut))
         {
           const ByteValue * lut_raw = ds.GetDataElement(tlut).GetByteValue();
-          assert(lut_raw);
-          lut->SetLUT(
-            LookupTable::LookupTableType(i), reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()), lut_raw->GetLength());
-          unsigned int check = (el_us3.GetValue(0) ? el_us3.GetValue(0) : 65536) * el_us3.GetValue(2) / 8;
-          assert(check == lut_raw->GetLength() || 2 * check == lut_raw->GetLength() ||
-                 check + 1 == lut_raw->GetLength());
-          (void)check;
+          if (lut_raw)
+          {
+            lut.SetLUT(
+              LookupTable::LookupTableType(i),
+              reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()),
+              lut_raw->GetLength());
+            unsigned int check = (el_us3.GetValue(0) ? el_us3.GetValue(0) : 65536) * el_us3.GetValue(2) / 8;
+            assert(check == lut_raw->GetLength() || 2 * check == lut_raw->GetLength() || check + 1 == lut_raw->GetLength());
+            (void)check;
+          }
         }
         else if (ds.FindDataElement(seglut))
         {
           const ByteValue * lut_raw = ds.GetDataElement(seglut).GetByteValue();
-          assert(lut_raw);
-          lut->SetLUT(
-            LookupTable::LookupTableType(i), reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()), lut_raw->GetLength());
+          if (lut_raw)
+          {
+            lut.SetSegmentedLUT(
+              LookupTable::LookupTableType(i), reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()), lut_raw->GetLength());
+          }
         }
         else
         {
@@ -295,7 +294,7 @@ DoIconImage(const DataSet & rootds, Pixmap & image)
           return;
         }
       }
-      pixeldata.SetLUT(*lut);
+      pixeldata.SetLUT(std::move(lut));
     }
     const Tag tpixeldata = Tag(0x7fe0, 0x0010);
     if (!ds.FindDataElement(tpixeldata))
@@ -360,7 +359,7 @@ DoCurves(const DataSet & ds, Pixmap & pixeldata)
 }
 
 static unsigned int
-GetNumberOfOverlaysInternal(DataSet const & ds, std::vector<uint16_t> & overlaylist)
+GetNumberOfOverlaysInternal(const DataSet & ds, std::vector<uint16_t> & overlaylist)
 {
   Tag          overlay(0x6000, 0x0000);
   bool         finished = false;
@@ -722,20 +721,15 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
   // Palette Color Lookup Table Descriptor
   if (pi == PhotometricInterpretation::PALETTE_COLOR)
   {
-    SmartPointer<LookupTable> lut = new LookupTable;
-    const Tag                 testseglut(0x0028, (0x1221 + 0));
-    if (ds.FindDataElement(testseglut))
-    {
-      lut = new SegmentedPaletteColorLookupTable;
-    }
-    lut->Allocate(pf.GetBitsAllocated());
+    LookupTable lut;
+    lut.Allocate(pf.GetBitsAllocated());
     for (int i = 0; i < 3; ++i)
     {
       const Tag                tdescriptor(0x0028, static_cast<uint16_t>(0x1101 + i));
       Element<VR::US, VM::VM3> el_us3 = { { 0, 0, 0 } };
       // Now pass the byte array to a DICOMizer
       el_us3.SetFromDataElement(ds[tdescriptor]);
-      lut->InitializeLUT(LookupTable::LookupTableType(i), el_us3[0], el_us3[1], el_us3[2]);
+      lut.InitializeLUT(LookupTable::LookupTableType(i), el_us3[0], el_us3[1], el_us3[2]);
       const Tag tlut(0x0028, static_cast<uint16_t>(0x1201 + i));
       const Tag seglut(0x0028, static_cast<uint16_t>(0x1221 + i));
       if (ds.FindDataElement(tlut))
@@ -743,15 +737,17 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
         const ByteValue * lut_raw = ds.GetDataElement(tlut).GetByteValue();
         if (lut_raw)
         {
-          lut->SetLUT(
-            LookupTable::LookupTableType(i), reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()), lut_raw->GetLength());
+          lut.SetLUT(
+            LookupTable::LookupTableType(i),
+            reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()),
+            lut_raw->GetLength());
           unsigned int check = (el_us3.GetValue(0) ? el_us3.GetValue(0) : 65536) * el_us3.GetValue(2) / 8;
-          assert(!lut->Initialized() || check == lut_raw->GetLength());
+          assert(!lut.Initialized() || check == lut_raw->GetLength());
           (void)check;
         }
         else
         {
-          lut->Clear();
+          lut.Clear();
         }
       }
       else if (ds.FindDataElement(seglut))
@@ -759,12 +755,14 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
         const ByteValue * lut_raw = ds.GetDataElement(seglut).GetByteValue();
         if (lut_raw)
         {
-          lut->SetLUT(
-            LookupTable::LookupTableType(i), reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()), lut_raw->GetLength());
+          lut.SetSegmentedLUT(
+            LookupTable::LookupTableType(i),
+            reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()),
+            lut_raw->GetLength());
         }
         else
         {
-          lut->Clear();
+          lut.Clear();
         }
       }
       else
@@ -772,20 +770,15 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
         return false;
       }
     }
-    if (!lut->Initialized())
+    if (!lut.Initialized())
       return false;
-    PixelData->SetLUT(*lut);
+    PixelData->SetLUT(std::move(lut));
   }
   // Supplemental LUT
   else if (pi == PhotometricInterpretation::MONOCHROME2 && m_AlppySupplementalLUT)
   {
-    SmartPointer<LookupTable> lut = new LookupTable;
-    const Tag                 testseglut(0x0028, (0x1221 + 0));
-    if (ds.FindDataElement(testseglut))
-    {
-      lut = new SegmentedPaletteColorLookupTable;
-    }
-    lut->Allocate(pf.GetBitsAllocated());
+    LookupTable lut;
+    lut.Allocate(pf.GetBitsAllocated());
     bool lut_ok = true;
     for (int i = 0; i < 3; ++i)
     {
@@ -793,7 +786,7 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
       Element<VR::US, VM::VM3> el_us3 = { { 0, 0, 0 } };
       // Now pass the byte array to a DICOMizer
       el_us3.SetFromDataElement(ds[tdescriptor]);
-      lut->InitializeLUT(LookupTable::LookupTableType(i), el_us3[0], el_us3[1], el_us3[2]);
+      lut.InitializeLUT(LookupTable::LookupTableType(i), el_us3[0], el_us3[1], el_us3[2]);
       const Tag tlut(0x0028, static_cast<uint16_t>(0x1201 + i));
       const Tag seglut(0x0028, static_cast<uint16_t>(0x1221 + i));
       if (ds.FindDataElement(tlut))
@@ -802,10 +795,12 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
         if (lut_raw)
         {
           // LookupTableType::SUPPLRED == 4
-          lut->SetLUT(
-            LookupTable::LookupTableType(i + 4), reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()), lut_raw->GetLength());
+          lut.SetLUT(
+            LookupTable::LookupTableType(i + 4),
+            reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()),
+            lut_raw->GetLength());
           unsigned int check = (el_us3.GetValue(0) ? el_us3.GetValue(0) : 65536) * el_us3.GetValue(2) / 8;
-          assert(!lut->Initialized() || check == lut_raw->GetLength());
+          assert(!lut.Initialized() || check == lut_raw->GetLength());
           (void)check;
         }
         else
@@ -819,8 +814,10 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
         const ByteValue * lut_raw = ds.GetDataElement(seglut).GetByteValue();
         if (lut_raw)
         {
-          lut->SetLUT(
-            LookupTable::LookupTableType(i + 4), reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()), lut_raw->GetLength());
+          lut.SetSegmentedLUT(
+            LookupTable::LookupTableType(i + 4),
+            reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()),
+            lut_raw->GetLength());
         }
         else
         {
@@ -834,13 +831,13 @@ PixmapReader::ReadImageInternal(const MediaStorage & ms, bool handlepixeldata)
         break;
       }
     }
-    if (lut_ok && lut->Initialized())
+    if (lut_ok && lut.Initialized())
     {
-      PixelData->SetLUT(*lut);
+      PixelData->SetLUT(std::move(lut));
     }
     else
     {
-      lut->Clear();
+      lut.Clear();
     }
   }
   // IconImage

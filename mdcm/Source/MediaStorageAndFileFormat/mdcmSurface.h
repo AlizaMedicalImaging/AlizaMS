@@ -90,12 +90,12 @@ public:
   GetSurfaceProcessingDescription() const;
   void
   SetSurfaceProcessingDescription(const char *);
-  SegmentHelper::BasicCodedEntry const &
+  const SegmentHelper::BasicCodedEntry &
   GetProcessingAlgorithm() const;
   SegmentHelper::BasicCodedEntry &
   GetProcessingAlgorithm();
   void
-  SetProcessingAlgorithm(SegmentHelper::BasicCodedEntry const &);
+  SetProcessingAlgorithm(const SegmentHelper::BasicCodedEntry &);
   unsigned short
   GetRecommendedDisplayGrayscaleValue() const;
   void
@@ -124,12 +124,12 @@ public:
   GetManifold() const;
   void
   SetManifold(STATES state);
-  SegmentHelper::BasicCodedEntry const &
+  const SegmentHelper::BasicCodedEntry &
   GetAlgorithmFamily() const;
   SegmentHelper::BasicCodedEntry &
   GetAlgorithmFamily();
   void
-  SetAlgorithmFamily(SegmentHelper::BasicCodedEntry const &);
+  SetAlgorithmFamily(const SegmentHelper::BasicCodedEntry &);
   const char *
   GetAlgorithmVersion() const;
   void
@@ -147,7 +147,7 @@ public:
   DataElement &
   GetPointCoordinatesData();
   void
-  SetPointCoordinatesData(DataElement const &);
+  SetPointCoordinatesData(const DataElement &);
   /**
    * Pointer is null if undefined
    */
@@ -201,8 +201,8 @@ public:
   DataElement &
   GetVectorCoordinateData();
   void
-  SetVectorCoordinateData(DataElement const &);
-  MeshPrimitive const &
+  SetVectorCoordinateData(const DataElement &);
+  const MeshPrimitive &
   GetMeshPrimitive() const;
   MeshPrimitive &
   GetMeshPrimitive();

@@ -82,7 +82,7 @@ public:
   GetNumberOfFilenames() const;
   const char *
   GetFilename(SizeType n) const;
-  FilenamesType const &
+  const FilenamesType &
   GetFilenames() const
   {
     assert(!Pattern.empty());

@@ -106,7 +106,7 @@ public:
   Clear() override;
 
   void
-  AddItem(Item const &);
+  AddItem(const Item &);
 
   Item &
   AddNewUndefinedLengthItem();
@@ -241,7 +241,7 @@ public:
   }
 
   template <typename TDE, typename TSwap>
-  std::ostream const &
+  const std::ostream &
   Write(std::ostream & os) const
   {
     typename ItemVector::const_iterator it = Items.cbegin();

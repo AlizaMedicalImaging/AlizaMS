@@ -37,7 +37,7 @@ namespace mdcm
 */
 
 VR
-ComputeVRImplicitLittleEndian(DataSet const & ds, const Tag & tag)
+ComputeVRImplicitLittleEndian(const DataSet & ds, const Tag & tag)
 {
   (void)ds;
   (void)tag;

@@ -76,7 +76,7 @@ public:
   }
 
   VL &
-  operator+=(VL const & vl)
+  operator+=(const VL & vl)
   {
     ValueLength += vl.ValueLength;
     return *this;

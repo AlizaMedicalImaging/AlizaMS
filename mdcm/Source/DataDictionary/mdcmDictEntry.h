@@ -38,8 +38,8 @@ class MDCM_EXPORT DictEntry
 public:
   DictEntry(const char * name = "",
             const char * keyword = "",
-            VR const &   vr = VR::INVALID,
-            VM const &   vm = VM::VM0,
+            const VR &   vr = VR::INVALID,
+            const VM &   vm = VM::VM0,
             bool         ret = false)
     : Name(name)
     , Keyword(keyword)
@@ -67,7 +67,7 @@ public:
     return ValueMultiplicity;
   }
   void
-  SetVM(VM const & vm)
+  SetVM(const VM & vm)
   {
     ValueMultiplicity = vm;
   }

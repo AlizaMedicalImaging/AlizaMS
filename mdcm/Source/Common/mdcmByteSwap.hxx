@@ -74,7 +74,7 @@ ByteSwap<T>::Swap(T & p)
 // Swaps the bytes so they agree with the processor order
 template <class T>
 void
-ByteSwap<T>::SwapFromSwapCodeIntoSystem(T & a, SwapCode const & swapcode)
+ByteSwap<T>::SwapFromSwapCodeIntoSystem(T & a, const SwapCode & swapcode)
 {
   switch (sizeof(T))
   {
@@ -104,7 +104,7 @@ ByteSwap<T>::SwapRange(T * p, unsigned int num)
 
 template <class T>
 void
-ByteSwap<T>::SwapRangeFromSwapCodeIntoSystem(T * p, SwapCode const & sc, std::streamoff num)
+ByteSwap<T>::SwapRangeFromSwapCodeIntoSystem(T * p, const SwapCode & sc, std::streamoff num)
 {
   for (std::streamoff i = 0; i < num; ++i)
   {
@@ -114,7 +114,7 @@ ByteSwap<T>::SwapRangeFromSwapCodeIntoSystem(T * p, SwapCode const & sc, std::st
 
 template <class T>
 void
-Swap4(T & a, SwapCode const & swapcode)
+Swap4(T & a, const SwapCode & swapcode)
 {
 #ifndef MDCM_WORDS_BIGENDIAN
   if (swapcode == 4321 || swapcode == 2143)
@@ -133,7 +133,7 @@ Swap4(T & a, SwapCode const & swapcode)
 // the inlining of the template class means that the specialization doesn't cause linker errors
 template <class T>
 inline void
-Swap8(T & a, SwapCode const & swapcode)
+Swap8(T & a, const SwapCode & swapcode)
 {
   switch (swapcode)
   {
@@ -166,7 +166,7 @@ Swap8(T & a, SwapCode const & swapcode)
 
 template <>
 inline void
-Swap8<uint16_t>(uint16_t & a, SwapCode const & swapcode)
+Swap8<uint16_t>(uint16_t & a, const SwapCode & swapcode)
 {
   switch (swapcode)
   {

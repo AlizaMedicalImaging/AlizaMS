@@ -54,7 +54,7 @@ PixmapWriter::GetPixmap() // FIXME
 }
 
 void
-PixmapWriter::SetPixmap(Pixmap const & img)
+PixmapWriter::SetPixmap(const Pixmap & img)
 {
   PixelData = img;
 }
@@ -72,7 +72,7 @@ PixmapWriter::GetImage() // FIXME
 }
 
 void
-PixmapWriter::DoIconImage(DataSet & rootds, Pixmap const & image)
+PixmapWriter::DoIconImage(DataSet & rootds, const Pixmap & image)
 {
   const IconImage & icon = image.GetIconImage();
   if (!icon.IsDimensionEmpty())
@@ -235,7 +235,7 @@ PixmapWriter::DoIconImage(DataSet & rootds, Pixmap const & image)
 }
 
 bool
-PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
+PixmapWriter::PrepareWrite(const MediaStorage & ref_ms)
 {
   File &                 file = GetFile();
   DataSet &              ds = file.GetDataSet();
@@ -691,7 +691,7 @@ PixmapWriter::PrepareWrite(MediaStorage const & ref_ms)
 }
 
 void
-PixmapWriter::SetImage(Pixmap const & img)
+PixmapWriter::SetImage(const Pixmap & img)
 {
   PixelData = img;
 }

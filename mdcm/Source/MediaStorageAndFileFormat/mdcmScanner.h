@@ -91,7 +91,7 @@ public:
   std::vector<std::string>
   GetKeys() const;
   const char *
-  GetValue(const char *, Tag const &) const;
+  GetValue(const char *, const Tag &) const;
   const ValuesType &
   GetValues() const;
   ValuesType
