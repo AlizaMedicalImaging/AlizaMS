@@ -94,7 +94,7 @@ FileExplicitFilter::Change()
 }
 
 bool
-FileExplicitFilter::ProcessDataSet(DataSet & ds, Dicts const & dicts)
+FileExplicitFilter::ProcessDataSet(DataSet & ds, const Dicts & dicts)
 {
   if (RecomputeSequenceLength || RecomputeItemLength)
   {

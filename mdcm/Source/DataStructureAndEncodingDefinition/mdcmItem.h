@@ -106,7 +106,7 @@ public:
     return NestedDataSet;
   }
 
-  Item(Item const & val)
+  Item(const Item & val)
     : DataElement(val)
   {
     NestedDataSet = val.NestedDataSet;

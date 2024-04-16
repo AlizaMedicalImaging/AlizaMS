@@ -121,7 +121,7 @@ Pixmap::GetIconImage()
 }
 
 void
-Pixmap::SetIconImage(IconImage const & ii)
+Pixmap::SetIconImage(const IconImage & ii)
 {
   Icon = ii;
 }

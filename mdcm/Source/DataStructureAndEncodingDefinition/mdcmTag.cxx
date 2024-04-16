@@ -123,7 +123,7 @@ Tag::GetPrivateCreator() const
 }
 
 void
-Tag::SetPrivateCreator(Tag const & t)
+Tag::SetPrivateCreator(const Tag & t)
 {
   // See PS 3.5 - 7.8.1 PRIVATE DATA ELEMENT TAGS
   // eg: 0x0123,0x0045 -> 0x0123,0x4567

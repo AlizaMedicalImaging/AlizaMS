@@ -238,10 +238,10 @@ class ReadUpToTagCaller
 private:
   DataSet &             m_dataSet;
   const Tag &           m_tag;
-  std::set<Tag> const & m_skipTags;
+  const std::set<Tag> & m_skipTags;
 
 public:
-  ReadUpToTagCaller(DataSet & ds, const Tag & tag, std::set<Tag> const & skiptags)
+  ReadUpToTagCaller(DataSet & ds, const Tag & tag, const std::set<Tag> & skiptags)
     : m_dataSet(ds)
     , m_tag(tag)
     , m_skipTags(skiptags)
@@ -270,11 +270,11 @@ class ReadSelectedTagsCaller
 {
 private:
   DataSet &             m_dataSet;
-  std::set<Tag> const & m_tags;
+  const std::set<Tag> & m_tags;
   bool                  m_readvalues;
 
 public:
-  ReadSelectedTagsCaller(DataSet & ds, std::set<Tag> const & tags, const bool readvalues)
+  ReadSelectedTagsCaller(DataSet & ds, const std::set<Tag> & tags, const bool readvalues)
     : m_dataSet(ds)
     , m_tags(tags)
     , m_readvalues(readvalues)
@@ -303,11 +303,11 @@ class ReadSelectedPrivateTagsCaller
 {
 private:
   DataSet &                    m_dataSet;
-  std::set<PrivateTag> const & m_groups;
+  const std::set<PrivateTag> & m_groups;
   bool                         m_readvalues;
 
 public:
-  ReadSelectedPrivateTagsCaller(DataSet & ds, std::set<PrivateTag> const & groups, const bool readvalues)
+  ReadSelectedPrivateTagsCaller(DataSet & ds, const std::set<PrivateTag> & groups, const bool readvalues)
     : m_dataSet(ds)
     , m_groups(groups)
     , m_readvalues(readvalues)
@@ -342,21 +342,21 @@ Reader::Read()
 }
 
 bool
-Reader::ReadUpToTag(const Tag & tag, std::set<Tag> const & skiptags)
+Reader::ReadUpToTag(const Tag & tag, const std::set<Tag> & skiptags)
 {
   details::ReadUpToTagCaller caller(F->GetDataSet(), tag, skiptags);
   return InternalReadCommon(caller);
 }
 
 bool
-Reader::ReadSelectedTags(std::set<Tag> const & selectedTags, bool readvalues)
+Reader::ReadSelectedTags(const std::set<Tag> & selectedTags, bool readvalues)
 {
   details::ReadSelectedTagsCaller caller(F->GetDataSet(), selectedTags, readvalues);
   return InternalReadCommon(caller);
 }
 
 bool
-Reader::ReadSelectedPrivateTags(std::set<PrivateTag> const & selectedPTags, bool readvalues)
+Reader::ReadSelectedPrivateTags(const std::set<PrivateTag> & selectedPTags, bool readvalues)
 {
   details::ReadSelectedPrivateTagsCaller caller(F->GetDataSet(), selectedPTags, readvalues);
   return InternalReadCommon(caller);

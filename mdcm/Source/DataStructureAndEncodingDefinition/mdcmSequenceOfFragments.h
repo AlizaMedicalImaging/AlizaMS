@@ -86,7 +86,7 @@ public:
   Clear() override;
 
   void
-  AddFragment(Fragment const &);
+  AddFragment(const Fragment &);
 
   unsigned long long
   ComputeByteLength() const;
@@ -292,7 +292,7 @@ public:
   }
 
   template <typename TSwap>
-  std::ostream const &
+  const std::ostream &
   Write(std::ostream & os) const
   {
     if (!Table.Write<TSwap>(os))

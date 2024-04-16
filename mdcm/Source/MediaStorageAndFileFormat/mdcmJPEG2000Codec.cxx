@@ -747,7 +747,7 @@ JPEG2000Codec::~JPEG2000Codec()
 }
 
 bool
-JPEG2000Codec::CanDecode(TransferSyntax const & ts) const
+JPEG2000Codec::CanDecode(const TransferSyntax & ts) const
 {
   // JPEG2000Part2 and JPEG2000Part2Lossless are not tested (no example files).
   return (ts == TransferSyntax::JPEG2000Lossless ||
@@ -760,7 +760,7 @@ JPEG2000Codec::CanDecode(TransferSyntax const & ts) const
 }
 
 bool
-JPEG2000Codec::CanCode(TransferSyntax const & ts) const
+JPEG2000Codec::CanCode(const TransferSyntax & ts) const
 {
   return (ts == TransferSyntax::JPEG2000Lossless || ts == TransferSyntax::JPEG2000);
 }
@@ -775,7 +775,7 @@ A.4.4 JPEG 2000 image compression
   defined in 15444-3 is not used.
 */
 bool
-JPEG2000Codec::Decode(DataElement const & in, DataElement & out)
+JPEG2000Codec::Decode(const DataElement & in, DataElement & out)
 {
   if (NumberOfDimensions == 2)
   {
@@ -905,7 +905,7 @@ JPEG2000Codec::Decode(DataElement const & in, DataElement & out)
 }
 
 bool
-JPEG2000Codec::Decode2(DataElement const & in, char * out_buffer, size_t len)
+JPEG2000Codec::Decode2(const DataElement & in, char * out_buffer, size_t len)
 {
   if (NumberOfDimensions == 2)
   {
@@ -1074,7 +1074,7 @@ JPEG2000Codec::Decode2(DataElement const & in, char * out_buffer, size_t len)
 
 // Compress into JPEG
 bool
-JPEG2000Codec::Code(DataElement const & in, DataElement & out)
+JPEG2000Codec::Code(const DataElement & in, DataElement & out)
 {
   out = in;
   // Create a Sequence Of Fragments
@@ -1723,6 +1723,7 @@ JPEG2000Codec::CodeFrameIntoBuffer(char *       outdata,
   cio = opj_stream_create_memory_stream(fsrc, OPJ_J2K_STREAM_CHUNK_SIZE, false);
   if (!cio)
   {
+    delete[] buffer_j2k;
     free(parameters.cp_comment);
     return false;
   }
@@ -1732,6 +1733,7 @@ JPEG2000Codec::CodeFrameIntoBuffer(char *       outdata,
   ok = ok && opj_end_compress(cinfo, cio);
   if (!ok)
   {
+    delete[] buffer_j2k;
     opj_stream_destroy(cio);
     free(parameters.cp_comment);
     return false;

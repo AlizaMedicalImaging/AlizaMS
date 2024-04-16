@@ -81,14 +81,14 @@ public:
     ValueMultiplicityField = vm;
   }
 
-  VR const &
+  const VR &
   GetVR() const
   {
     return VRField;
   }
 
   void
-  SetVR(VR const & vr)
+  SetVR(const VR & vr)
   {
     VRField = vr;
   }

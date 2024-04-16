@@ -30,7 +30,7 @@ static const char * SwapCodeStrings[] = { "Unknown",         "LittleEndian", "Bi
                                           "BadLittleEndian", "BadBigEndian", nullptr };
 
 int
-SwapCode::GetIndex(SwapCode const & sc)
+SwapCode::GetIndex(const SwapCode & sc)
 {
   int idx = 0;
   switch (sc)

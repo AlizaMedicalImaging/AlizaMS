@@ -146,7 +146,7 @@ public:
   Tag
   GetPrivateCreator() const;
   void
-  SetPrivateCreator(Tag const &);
+  SetPrivateCreator(const Tag &);
   bool
   IsPrivateCreator() const;
   bool

@@ -39,15 +39,15 @@ public:
   JPEGLSCodec() = default;
   ~JPEGLSCodec() = default;
   bool
-  CanDecode(TransferSyntax const &) const override;
+  CanDecode(const TransferSyntax &) const override;
   bool
-  CanCode(TransferSyntax const &) const override;
+  CanCode(const TransferSyntax &) const override;
   bool
-  Decode(DataElement const &, DataElement &) override;
+  Decode(const DataElement &, DataElement &) override;
   bool
-  Decode2(DataElement const &, char *, size_t);
+  Decode2(const DataElement &, char *, size_t);
   bool
-  Code(DataElement const &, DataElement &) override;
+  Code(const DataElement &, DataElement &) override;
   unsigned long long
   GetBufferLength() const;
   void

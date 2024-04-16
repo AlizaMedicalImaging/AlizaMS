@@ -22,13 +22,13 @@ public:
   EncapsulatedRAWCodec() = default;
   ~EncapsulatedRAWCodec() = default;
   bool
-  CanCode(TransferSyntax const &) const override;
+  CanCode(const TransferSyntax &) const override;
   bool
-  CanDecode(TransferSyntax const &) const override;
+  CanDecode(const TransferSyntax &) const override;
   bool
   Code(const char *, unsigned long long, DataElement &);
   bool
-  Decode2(DataElement const &, char *, unsigned long long);
+  Decode2(const DataElement &, char *, unsigned long long);
   bool
   GetHeaderInfo(std::istream &) override;
   bool

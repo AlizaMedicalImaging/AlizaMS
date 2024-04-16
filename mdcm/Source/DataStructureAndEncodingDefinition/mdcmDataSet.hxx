@@ -106,7 +106,7 @@ DataSet::ReadUpToTag(std::istream & is, const Tag & t, const std::set<Tag> & ski
 
 template <typename TDE, typename TSwap>
 std::istream &
-DataSet::ReadUpToTagWithLength(std::istream & is, const Tag & t, std::set<Tag> const & skiptags, VL & length)
+DataSet::ReadUpToTagWithLength(std::istream & is, const Tag & t, const std::set<Tag> & skiptags, VL & length)
 {
   DataElement de;
   while (!is.eof() && de.template ReadPreValue<TDE, TSwap>(is, skiptags))
@@ -486,7 +486,7 @@ DataSet::ReadWithLength(std::istream & is, VL & length)
 }
 
 template <typename TDE, typename TSwap>
-std::ostream const &
+const std::ostream &
 DataSet::Write(std::ostream & os) const
 {
   typename DataSet::ConstIterator it = DES.begin();

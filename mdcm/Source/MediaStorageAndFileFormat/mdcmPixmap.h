@@ -60,7 +60,7 @@ public:
   IconImage &
   GetIconImage();
   void
-  SetIconImage(IconImage const &);
+  SetIconImage(const IconImage &);
   void
   Print(std::ostream &) const override;
 

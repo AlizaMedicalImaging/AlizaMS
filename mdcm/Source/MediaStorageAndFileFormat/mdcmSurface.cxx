@@ -262,7 +262,7 @@ Surface::SetSurfaceProcessingDescription(const char * description)
   SurfaceProcessingDescription = description;
 }
 
-SegmentHelper::BasicCodedEntry const &
+const SegmentHelper::BasicCodedEntry &
 Surface::GetProcessingAlgorithm() const
 {
   return ProcessingAlgorithm;
@@ -275,7 +275,7 @@ Surface::GetProcessingAlgorithm()
 }
 
 void
-Surface::SetProcessingAlgorithm(SegmentHelper::BasicCodedEntry const & BSE)
+Surface::SetProcessingAlgorithm(const SegmentHelper::BasicCodedEntry & BSE)
 {
   ProcessingAlgorithm.CV = BSE.CV;
   ProcessingAlgorithm.CSD = BSE.CSD;
@@ -308,7 +308,7 @@ Surface::SetManifold(STATES state)
   Manifold = state;
 }
 
-SegmentHelper::BasicCodedEntry const &
+const SegmentHelper::BasicCodedEntry &
 Surface::GetAlgorithmFamily() const
 {
   return AlgorithmFamily;
@@ -321,7 +321,7 @@ Surface::GetAlgorithmFamily()
 }
 
 void
-Surface::SetAlgorithmFamily(SegmentHelper::BasicCodedEntry const & BSE)
+Surface::SetAlgorithmFamily(const SegmentHelper::BasicCodedEntry & BSE)
 {
   AlgorithmFamily.CV = BSE.CV;
   AlgorithmFamily.CSD = BSE.CSD;
@@ -377,7 +377,7 @@ Surface::GetPointCoordinatesData()
 }
 
 void
-Surface::SetPointCoordinatesData(DataElement const & de)
+Surface::SetPointCoordinatesData(const DataElement & de)
 {
   PointCoordinatesData = de;
 }
@@ -532,12 +532,12 @@ Surface::GetVectorCoordinateData()
 }
 
 void
-Surface::SetVectorCoordinateData(DataElement const & de)
+Surface::SetVectorCoordinateData(const DataElement & de)
 {
   VectorCoordinateData = de;
 }
 
-MeshPrimitive const &
+const MeshPrimitive &
 Surface::GetMeshPrimitive() const
 {
   return *Primitive;

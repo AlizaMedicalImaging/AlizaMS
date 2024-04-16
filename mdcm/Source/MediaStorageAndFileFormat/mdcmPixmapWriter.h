@@ -54,21 +54,21 @@ public:
   Pixmap &
   GetPixmap();
   void
-  SetPixmap(Pixmap const &);
+  SetPixmap(const Pixmap &);
   const Pixmap &
   GetImage() const;
   Pixmap &
   GetImage();
   void
-  SetImage(Pixmap const &);
+  SetImage(const Pixmap &);
   bool
   Write();
 
 protected:
   bool
-  PrepareWrite(MediaStorage const &);
+  PrepareWrite(const MediaStorage &);
   void
-  DoIconImage(DataSet &, Pixmap const &);
+  DoIconImage(DataSet &, const Pixmap &);
   SmartPointer<Pixmap> PixelData;
 
 private:

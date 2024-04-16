@@ -22,28 +22,206 @@
 
 #include "mdcmLookupTable.h"
 #include "mdcmTrace.h"
+#include "mdcmSwapper.h"
 #include <set>
 #include <climits>
 #include <cstring>
 #include <cstdint>
+#include <map>
+#include <algorithm>
+#include <iterator>
+#include <vector>
+#include <deque>
+#include <cmath>
+
+// http://blog.goo.ne.jp/satomi_takeo/e/3643e5249b2a9650f9e10ef1c830e8b8
+
+namespace
+{
+
+// abstract class for segment
+template <typename EntryType>
+class Segment
+{
+public:
+  virtual ~Segment() {}
+  typedef std::map<const EntryType *, const Segment *> SegmentMap;
+  virtual bool
+  Expand(const SegmentMap & instances, std::vector<EntryType> & expanded) const = 0;
+  const EntryType *
+  First() const
+  {
+    return first_;
+  }
+  const EntryType *
+  Last() const
+  {
+    return last_;
+  }
+  struct ToMap
+  {
+    std::pair<typename SegmentMap::key_type, typename SegmentMap::mapped_type>
+    operator()(const Segment * segment) const
+    {
+      return std::make_pair(segment->First(), segment);
+    }
+  };
+
+protected:
+  Segment(const EntryType * first, const EntryType * last)
+  {
+    first_ = first;
+    last_ = last;
+  }
+  const EntryType * first_;
+  const EntryType * last_;
+};
+
+// discrete segment (opcode = 0)
+template <typename EntryType>
+class DiscreteSegment : public Segment<EntryType>
+{
+public:
+  typedef typename Segment<EntryType>::SegmentMap SegmentMap;
+  explicit DiscreteSegment(const EntryType * first)
+    : Segment<EntryType>(first, first + 2 + *(first + 1))
+  {}
+  virtual bool
+  Expand(const SegmentMap &, std::vector<EntryType> & expanded) const
+  {
+    std::copy(this->first_ + 2, this->last_, std::back_inserter(expanded));
+    return true;
+  }
+};
+
+// linear segment (opcode = 1)
+template <typename EntryType>
+class LinearSegment : public Segment<EntryType>
+{
+public:
+  typedef typename Segment<EntryType>::SegmentMap SegmentMap;
+  explicit LinearSegment(const EntryType * first)
+    : Segment<EntryType>(first, first + 3)
+  {}
+  virtual bool
+  Expand(const SegmentMap &, std::vector<EntryType> & expanded) const
+  {
+    if (expanded.empty())
+    {
+      // linear segment can't be the first segment.
+      return false;
+    }
+    const EntryType length = *(this->first_ + 1);
+    const EntryType y0 = expanded.back();
+    const EntryType y1 = *(this->first_ + 2);
+    double    y01 = y1 - y0;
+    for (EntryType i = 0; i < length; ++i)
+    {
+      const double v = round(static_cast<double>(y0) + (static_cast<double>(i) / static_cast<double>(length)) * y01);
+      expanded.push_back(static_cast<EntryType>(v));
+    }
+    return true;
+  }
+};
+
+// indirect segment (opcode = 2)
+template <typename EntryType>
+class IndirectSegment : public Segment<EntryType>
+{
+public:
+  typedef typename Segment<EntryType>::SegmentMap SegmentMap;
+  explicit IndirectSegment(const EntryType * first)
+    : Segment<EntryType>(first, first + 2 + 4 / sizeof(EntryType))
+  {}
+  virtual bool
+  Expand(const SegmentMap & instances, std::vector<EntryType> & expanded) const
+  {
+    if (instances.empty())
+    {
+      // some other segments are required as references.
+      return false;
+    }
+    const EntryType *                   first_segment = instances.begin()->first;
+    const unsigned short *              pOffset = reinterpret_cast<const unsigned short *>(this->first_ + 2);
+    unsigned long                       offsetBytes = (*pOffset) | (static_cast<unsigned long>(*(pOffset + 1)) << 16);
+    const EntryType *                   copied_part_head = first_segment + offsetBytes / sizeof(EntryType);
+    typename SegmentMap::const_iterator ppHeadSeg = instances.find(copied_part_head);
+    if (ppHeadSeg == instances.cend())
+    {
+      // referred segment not found
+      return false;
+    }
+    EntryType                           nNumCopies = *(this->first_ + 1);
+    typename SegmentMap::const_iterator ppSeg = ppHeadSeg;
+    while (std::distance(ppHeadSeg, ppSeg) < nNumCopies)
+    {
+      assert(ppSeg != instances.cend());
+      ppSeg->second->Expand(instances, expanded);
+      ++ppSeg;
+    }
+    return true;
+  }
+};
+
+template <typename EntryType>
+void
+ExpandPalette(const EntryType * raw_values, uint32_t length, std::vector<EntryType> & palette)
+{
+  typedef std::deque<Segment<EntryType> *> SegmentList;
+  SegmentList                              segments;
+  const EntryType *                        raw_seg = raw_values;
+  while ((std::distance(raw_values, raw_seg) * sizeof(EntryType)) < length)
+  {
+    Segment<EntryType> * segment = nullptr;
+    if (*raw_seg == 0)
+    {
+      segment = new DiscreteSegment<EntryType>(raw_seg);
+    }
+    else if (*raw_seg == 1)
+    {
+      segment = new LinearSegment<EntryType>(raw_seg);
+    }
+    else if (*raw_seg == 2)
+    {
+      segment = new IndirectSegment<EntryType>(raw_seg);
+    }
+    if (segment)
+    {
+      segments.push_back(segment);
+      raw_seg = segment->Last();
+    }
+    else
+    {
+      // invalid opcode
+      break;
+    }
+  }
+  typename Segment<EntryType>::SegmentMap instances;
+  std::transform(
+    segments.begin(), segments.end(), std::inserter(instances, instances.end()), typename Segment<EntryType>::ToMap());
+  typename SegmentList::iterator ppSeg = segments.begin();
+  typename SegmentList::iterator endOfSegments = segments.end();
+  for (; ppSeg != endOfSegments; ++ppSeg)
+  {
+    (*ppSeg)->Expand(instances, palette);
+  }
+  ppSeg = segments.begin();
+  for (; ppSeg != endOfSegments; ++ppSeg)
+  {
+    delete *ppSeg;
+  }
+}
+
+}
 
 namespace mdcm
 {
 
-LookupTable::LookupTable() : Internal(new LookupTableInternal)
-{
-}
-
-LookupTable::~LookupTable()
-{
-  delete Internal;
-}
-
 bool
 LookupTable::Initialized() const
 {
-  bool b1 = BitSample != 0;
-  bool b2 = Internal->BitSize[0] != 0 && Internal->BitSize[1] != 0 && Internal->BitSize[2] != 0;
+  const bool b1 = BitSample != 0;
+  const bool b2 = Internal.BitSize[0] != 0 && Internal.BitSize[1] != 0 && Internal.BitSize[2] != 0;
   return b1 && b2;
 }
 
@@ -52,8 +230,16 @@ LookupTable::Clear()
 {
   BitSample = 0;
   IncompleteLUT = false;
-  delete Internal;
-  Internal = new LookupTableInternal;
+  Internal.Length[0] = 0U;
+  Internal.Length[1] = 0U;
+  Internal.Length[2] = 0U;
+  Internal.Subscript[0] = 0U;
+  Internal.Subscript[1] = 0U;
+  Internal.Subscript[2] = 0U;
+  Internal.BitSize[0] = 0U;
+  Internal.BitSize[1] = 0U;
+  Internal.BitSize[2] = 0U;
+  Internal.RGB.clear();
 }
 
 void
@@ -61,11 +247,11 @@ LookupTable::Allocate(unsigned short bitsample)
 {
   if (bitsample == 8)
   {
-    Internal->RGB.resize(256 * 3);
+    Internal.RGB.resize(256 * 3);
   }
   else if (bitsample == 16)
   {
-    Internal->RGB.resize(65536 * 2 * 3);
+    Internal.RGB.resize(65536 * 2 * 3);
   }
   else
   {
@@ -80,14 +266,18 @@ LookupTable::InitializeLUT(LookupTableType type,
                            unsigned short  subscript,
                            unsigned short  bitsize)
 {
+  if (!(static_cast<int>(type) >= 0 && static_cast<int>(type) <= 2))
+  {
+    mdcmWarningMacro("Error in InitializeLUT,  LookupTableType " << type);
+	return;
+  }
   if (bitsize != 8 && bitsize != 16)
   {
     return;
   }
-  assert(bitsize == 8 || bitsize == 16);
   if (length == 0)
   {
-    Internal->Length[type] = 65536;
+    Internal.Length[type] = 65536;
   }
   else
   {
@@ -95,16 +285,16 @@ LookupTable::InitializeLUT(LookupTableType type,
     {
       IncompleteLUT = true;
     }
-    Internal->Length[type] = length;
+    Internal.Length[type] = length;
   }
-  Internal->Subscript[type] = subscript;
-  Internal->BitSize[type] = bitsize;
+  Internal.Subscript[type] = subscript;
+  Internal.BitSize[type] = bitsize;
 }
 
 unsigned int
 LookupTable::GetLUTLength(LookupTableType type) const
 {
-  return Internal->Length[type];
+  return Internal.Length[type];
 }
 
 void
@@ -125,21 +315,26 @@ LookupTable::SetLUT(LookupTableType enhanced_type, const unsigned char * array, 
   {
     type = BLUE;
   }
-  if (!Internal->Length[type])
+  if (!(static_cast<int>(type) >= 0 && static_cast<int>(type) <= 2))
   {
-    mdcmDebugMacro("Need to set length first");
+    mdcmWarningMacro("Error in SetLUT,  LookupTableType " << enhanced_type);
+	return;
+  }
+  if (Internal.Length[type] == 0)
+  {
+    mdcmWarningMacro("Error in SetLUT, Length[" << type << "] is 0");
     return;
   }
   if (!IncompleteLUT)
   {
-    assert(Internal->RGB.size() == 3 * Internal->Length[type] * (BitSample / 8));
+    assert(Internal.RGB.size() == 3 * Internal.Length[type] * (BitSample / 8));
   }
   if (BitSample == 8)
   {
-    const unsigned int mult = Internal->BitSize[type] / 8;
-    const unsigned int mult2 = length / Internal->Length[type];
-    assert(Internal->Length[type] * mult2 == length);
-    if (Internal->Length[type] * mult == length || Internal->Length[type] * mult + 1 == length)
+    const unsigned int mult = Internal.BitSize[type] / 8;
+    const unsigned int mult2 = length / Internal.Length[type];
+    assert(Internal.Length[type] * mult2 == length);
+    if (Internal.Length[type] * mult == length || Internal.Length[type] * mult + 1 == length)
     {
       assert(mult2 == 1 || mult2 == 2);
       unsigned int offset = 0;
@@ -147,71 +342,128 @@ LookupTable::SetLUT(LookupTableType enhanced_type, const unsigned char * array, 
       {
         offset = 1;
       }
-      for (unsigned int i = 0; i < Internal->Length[type]; ++i)
+      for (unsigned int i = 0; i < Internal.Length[type]; ++i)
       {
         assert(i * mult + offset < length);
-        assert(3 * i + type < Internal->RGB.size());
-        Internal->RGB[3 * i + type] = array[i * mult + offset];
+        assert(3 * i + type < Internal.RGB.size());
+        Internal.RGB[3 * i + type] = array[i * mult + offset];
       }
     }
     else
     {
-      unsigned int offset = 0;
+      const unsigned int offset = 0;
       assert(mult2 == 2);
-      for (unsigned int i = 0; i < Internal->Length[type]; ++i)
+      for (unsigned int i = 0; i < Internal.Length[type]; ++i)
       {
         assert(i * mult2 + offset < length);
-        assert(3 * i + type < Internal->RGB.size());
-        Internal->RGB[3 * i + type] = array[i * mult2 + offset];
+        assert(3 * i + type < Internal.RGB.size());
+        Internal.RGB[3 * i + type] = array[i * mult2 + offset];
       }
     }
   }
   else if (BitSample == 16)
   {
-    assert(Internal->Length[type] * (BitSample / 8) == length);
-    void *           p = static_cast<void*>(Internal->RGB.data());
+    assert(Internal.Length[type] * (BitSample / 8) == length);
+    void *           p = static_cast<void*>(Internal.RGB.data());
     const void *     varray = static_cast<const void*>(array);
     uint16_t *       uchar16 = static_cast<uint16_t *>(p);
     const uint16_t * array16 = static_cast<const uint16_t *>(varray);
-    for (unsigned int i = 0; i < Internal->Length[type]; ++i)
+    for (unsigned int i = 0; i < Internal.Length[type]; ++i)
     {
       assert(2 * i < length);
-      assert(2 * (3 * i + type) < Internal->RGB.size());
+      assert(2 * (3 * i + type) < Internal.RGB.size());
       uchar16[3 * i + type] = array16[i];
     }
   }
 }
 
 void
-LookupTable::GetLUT(LookupTableType type, unsigned char * array, unsigned int & length) const
+LookupTable::SetSegmentedLUT(LookupTableType enhanced_type, const unsigned char * array, unsigned int length)
 {
+  // Supplemental SUPPLRED = 4
+  LookupTableType type = enhanced_type;
+  if (type == SUPPLRED)
+  {
+    type = RED;
+  }
+  else if (type == SUPPLGREEN)
+  {
+    type = GREEN;
+  }
+  else if (type == SUPPLBLUE)
+  {
+    type = BLUE;
+  }
+  if (!(static_cast<int>(type) >= 0 && static_cast<int>(type) <= 2))
+  {
+    mdcmWarningMacro("Error in SetSegmentedLUT, LookupTableType " << enhanced_type);
+	return;
+  }
+  if (Internal.Length[type] == 0)
+  {
+    mdcmWarningMacro("Error in SetSegmentedLUT, Length[" << type << "] is 0");
+    return;
+  }
   if (BitSample == 8)
   {
-    const unsigned int mult = Internal->BitSize[type] / 8;
-    length = Internal->Length[type] * mult;
+    assert(0); // TODO
+  }
+  else if (BitSample == 16)
+  {
+    assert(length % 2 == 0);
+    unsigned char * copy = new unsigned char[length];
+    for (size_t x = 0; x < length; ++x)
+    {
+      copy[x] = array[x];
+    }
+    void *                varray = static_cast<void*>(copy);
+    uint16_t *            array16 = static_cast<uint16_t *>(varray);
+    std::vector<uint16_t> palette;
+    unsigned int          num_entries = GetLUTLength(type);
+    palette.reserve(num_entries);
+    SwapperNoOp::SwapArray(array16, length / 2);
+    ExpandPalette(array16, length, palette);
+    const void * vpalette = static_cast<const void*>(palette.data());
+    SetLUT(enhanced_type, static_cast<const unsigned char *>(vpalette), static_cast<unsigned int>(palette.size() * 2));
+    delete [] copy;
+  }
+}
+
+void
+LookupTable::GetLUT(LookupTableType type, unsigned char * array, unsigned int & length) const
+{
+  if (!(static_cast<int>(type) >= 0 && static_cast<int>(type) <= 2))
+  {
+    mdcmWarningMacro("Error in GetLUT, LookupTableType " << type);
+	return;
+  }
+  if (BitSample == 8)
+  {
+    const unsigned int mult = Internal.BitSize[type] / 8;
+    length = Internal.Length[type] * mult;
     unsigned int offset = 0;
     if (mult == 2)
     {
       offset = 1;
     }
-    for (unsigned int i = 0; i < Internal->Length[type]; ++i)
+    for (unsigned int i = 0; i < Internal.Length[type]; ++i)
     {
       assert(i * mult + offset < length);
-      assert(3 * i + type < Internal->RGB.size());
-      array[i * mult + offset] = Internal->RGB[3 * i + type];
+      assert(3 * i + type < Internal.RGB.size());
+      array[i * mult + offset] = Internal.RGB[3 * i + type];
     }
   }
   else if (BitSample == 16)
   {
-    length = Internal->Length[type] * (BitSample / 8);
-    void *     p = static_cast<void*>(Internal->RGB.data());
-    void *     varray = static_cast<void*>(array);
-    uint16_t * uchar16 = static_cast<uint16_t *>(p);
-    uint16_t * array16 = static_cast<uint16_t *>(varray);
-    for (unsigned int i = 0; i < Internal->Length[type]; ++i)
+    length = Internal.Length[type] * (BitSample / 8);
+    const void *     p = static_cast<const void*>(Internal.RGB.data());
+    void *           varray = static_cast<void*>(array);
+    const uint16_t * uchar16 = static_cast<const uint16_t *>(p);
+    uint16_t *       array16 = static_cast<uint16_t *>(varray);
+    for (unsigned int i = 0; i < Internal.Length[type]; ++i)
     {
       assert(2 * i < length);
-      assert(2 * (3 * i + type) < Internal->RGB.size());
+      assert(2 * (3 * i + type) < Internal.RGB.size());
       array16[i] = uchar16[3 * i + type];
     }
   }
@@ -223,17 +475,21 @@ LookupTable::GetLUTDescriptor(LookupTableType  type,
                               unsigned short & subscript,
                               unsigned short & bitsize) const
 {
-  assert(type >= RED && type <= BLUE);
-  if (Internal->Length[type] == 65536)
+  if (!(static_cast<int>(type) >= 0 && static_cast<int>(type) <= 2))
+  {
+    mdcmWarningMacro("Error in GetLUTDescriptor, LookupTableType " << type);
+	return;
+  }
+  if (Internal.Length[type] == 65536)
   {
     length = 0;
   }
   else
   {
-    length = static_cast<unsigned short>(Internal->Length[type]);
+    length = static_cast<unsigned short>(Internal.Length[type]);
   }
-  subscript = Internal->Subscript[type];
-  bitsize = Internal->BitSize[type];
+  subscript = Internal.Subscript[type];
+  bitsize = Internal.BitSize[type];
   assert(subscript == 0);
   assert(bitsize == 8 || bitsize == 16);
 }
@@ -274,14 +530,6 @@ LookupTable::SetBlueLUT(const unsigned char * blue, unsigned int length)
   SetLUT(BLUE, blue, length);
 }
 
-inline void
-printrgb(const unsigned char * rgb)
-{
-  std::cout << static_cast<int>(rgb[0]) << ','
-            << static_cast<int>(rgb[1]) << ','
-            << static_cast<int>(rgb[2]);
-}
-
 void
 LookupTable::Decode(std::istream & is, std::ostream & os) const
 {
@@ -297,19 +545,19 @@ LookupTable::Decode(std::istream & is, std::ostream & os) const
         break;
       if (IncompleteLUT)
       {
-        assert(idx < Internal->Length[RED]);
-        assert(idx < Internal->Length[GREEN]);
-        assert(idx < Internal->Length[BLUE]);
+        assert(idx < Internal.Length[RED]);
+        assert(idx < Internal.Length[GREEN]);
+        assert(idx < Internal.Length[BLUE]);
       }
-      rgb[RED] = Internal->RGB[3 * idx + RED];
-      rgb[GREEN] = Internal->RGB[3 * idx + GREEN];
-      rgb[BLUE] = Internal->RGB[3 * idx + BLUE];
+      rgb[RED] = Internal.RGB[3 * idx + RED];
+      rgb[GREEN] = Internal.RGB[3 * idx + GREEN];
+      rgb[BLUE] = Internal.RGB[3 * idx + BLUE];
       os.write(reinterpret_cast<char *>(rgb), 3);
     }
   }
   else if (BitSample == 16)
   {
-    const void * p = static_cast<void*>(Internal->RGB.data());
+    const void * p = static_cast<const void*>(Internal.RGB.data());
     const uint16_t * rgb16 = static_cast<const uint16_t *>(p);
     while (!is.eof())
     {
@@ -322,9 +570,9 @@ LookupTable::Decode(std::istream & is, std::ostream & os) const
       }
       if (IncompleteLUT)
       {
-        assert(idx < Internal->Length[RED]);
-        assert(idx < Internal->Length[GREEN]);
-        assert(idx < Internal->Length[BLUE]);
+        assert(idx < Internal.Length[RED]);
+        assert(idx < Internal.Length[GREEN]);
+        assert(idx < Internal.Length[BLUE]);
       }
       rgb[RED] = rgb16[3 * idx + RED];
       rgb[GREEN] = rgb16[3 * idx + GREEN];
@@ -356,20 +604,20 @@ LookupTable::Decode(char * output, size_t outlen, const char * input, size_t inl
     {
       if (IncompleteLUT)
       {
-        assert(*idx < Internal->Length[RED]);
-        assert(*idx < Internal->Length[GREEN]);
-        assert(*idx < Internal->Length[BLUE]);
+        assert(*idx < Internal.Length[RED]);
+        assert(*idx < Internal.Length[GREEN]);
+        assert(*idx < Internal.Length[BLUE]);
       }
-      rgb[RED] = Internal->RGB[3 * (*idx) + RED];
-      rgb[GREEN] = Internal->RGB[3 * (*idx) + GREEN];
-      rgb[BLUE] = Internal->RGB[3 * (*idx) + BLUE];
+      rgb[RED] = Internal.RGB[3 * (*idx) + RED];
+      rgb[GREEN] = Internal.RGB[3 * (*idx) + GREEN];
+      rgb[BLUE] = Internal.RGB[3 * (*idx) + BLUE];
       rgb += 3;
     }
     success = true;
   }
   else if (BitSample == 16)
   {
-    const void * p = static_cast<void*>(Internal->RGB.data());
+    const void * p = static_cast<const void*>(Internal.RGB.data());
     const uint16_t * rgb16 = static_cast<const uint16_t *>(p);
     assert(inlen % 2 == 0);
     const void *     vinput = static_cast<const void*>(input);
@@ -380,9 +628,9 @@ LookupTable::Decode(char * output, size_t outlen, const char * input, size_t inl
     {
       if (IncompleteLUT)
       {
-        assert(*idx < Internal->Length[RED]);
-        assert(*idx < Internal->Length[GREEN]);
-        assert(*idx < Internal->Length[BLUE]);
+        assert(*idx < Internal.Length[RED]);
+        assert(*idx < Internal.Length[GREEN]);
+        assert(*idx < Internal.Length[BLUE]);
       }
       rgb[RED] = rgb16[3 * (*idx) + RED];
       rgb[GREEN] = rgb16[3 * (*idx) + GREEN];
@@ -415,11 +663,11 @@ LookupTable::DecodeSupplemental(char * output, size_t outlen, const char * input
     unsigned char *       rgb = static_cast<unsigned char *>(voutput);
     for (const unsigned char * idx = static_cast<const unsigned char *>(vinput); idx != end; ++idx)
     {
-      if (static_cast<unsigned char>(*idx) >= Internal->Subscript[RED])
+      if (static_cast<unsigned char>(*idx) >= Internal.Subscript[RED])
       {
-        rgb[RED] = Internal->RGB[3 * ((*idx) - Internal->Subscript[RED]) + RED];
-        rgb[GREEN] = Internal->RGB[3 * ((*idx) - Internal->Subscript[RED]) + GREEN];
-        rgb[BLUE] = Internal->RGB[3 * ((*idx) - Internal->Subscript[RED]) + BLUE];
+        rgb[RED] = Internal.RGB[3 * ((*idx) - Internal.Subscript[RED]) + RED];
+        rgb[GREEN] = Internal.RGB[3 * ((*idx) - Internal.Subscript[RED]) + GREEN];
+        rgb[BLUE] = Internal.RGB[3 * ((*idx) - Internal.Subscript[RED]) + BLUE];
       }
       else
       {
@@ -429,11 +677,11 @@ LookupTable::DecodeSupplemental(char * output, size_t outlen, const char * input
       }
       rgb += 3;
     }
-    return static_cast<int>(Internal->Subscript[RED]);
+    return static_cast<int>(Internal.Subscript[RED]);
   }
   else if (BitSample == 16)
   {
-    const void *     p = static_cast<void *>(Internal->RGB.data());
+    const void *     p = static_cast<const void *>(Internal.RGB.data());
     const void *     vinput = static_cast<const void*>(input);
     void *           voutput = static_cast<void*>(output);
     const uint16_t * rgb16 = static_cast<const uint16_t *>(p);
@@ -442,11 +690,11 @@ LookupTable::DecodeSupplemental(char * output, size_t outlen, const char * input
     uint16_t *       rgb = static_cast<uint16_t *>(voutput);
     for (const uint16_t * idx = static_cast<const uint16_t *>(vinput); idx != end; ++idx)
     {
-      if (static_cast<unsigned short>(*idx) >= Internal->Subscript[RED])
+      if (static_cast<unsigned short>(*idx) >= Internal.Subscript[RED])
       {
-        rgb[RED] = rgb16[3 * ((*idx) - Internal->Subscript[RED]) + RED];
-        rgb[GREEN] = rgb16[3 * ((*idx) - Internal->Subscript[RED]) + GREEN];
-        rgb[BLUE] = rgb16[3 * ((*idx) - Internal->Subscript[RED]) + BLUE];
+        rgb[RED] = rgb16[3 * ((*idx) - Internal.Subscript[RED]) + RED];
+        rgb[GREEN] = rgb16[3 * ((*idx) - Internal.Subscript[RED]) + GREEN];
+        rgb[BLUE] = rgb16[3 * ((*idx) - Internal.Subscript[RED]) + BLUE];
       }
       else
       {
@@ -456,7 +704,7 @@ LookupTable::DecodeSupplemental(char * output, size_t outlen, const char * input
       }
       rgb += 3;
     }
-    return static_cast<int>(Internal->Subscript[RED]);
+    return static_cast<int>(Internal.Subscript[RED]);
   }
   return INT_MIN;
 }
@@ -466,7 +714,7 @@ LookupTable::GetPointer() const
 {
   if (BitSample == 8)
   {
-    return Internal->RGB.data();
+    return Internal.RGB.data();
   }
   return nullptr;
 }
@@ -477,8 +725,8 @@ LookupTable::GetBufferAsRGBA(unsigned char * rgba) const
   bool ret = false;
   if (BitSample == 8)
   {
-    std::vector<unsigned char>::const_iterator it = Internal->RGB.cbegin();
-    for (; it != Internal->RGB.cend();)
+    std::vector<unsigned char>::const_iterator it = Internal.RGB.cbegin();
+    for (; it != Internal.RGB.cend();)
     {
       // RED
       *rgba++ = *it++;
@@ -493,14 +741,14 @@ LookupTable::GetBufferAsRGBA(unsigned char * rgba) const
   }
   else if (BitSample == 16)
   {
-    void *     p = static_cast<void*>(Internal->RGB.data());
-    void *     vrgba = static_cast<void*>(rgba);
-    uint16_t * uchar16 = static_cast<uint16_t *>(p);
-    uint16_t * rgba16 = static_cast<uint16_t *>(vrgba);
-    size_t     s = Internal->RGB.size();
+    const void *     p = static_cast<const void*>(Internal.RGB.data());
+    void *           vrgba = static_cast<void*>(rgba);
+    const uint16_t * uchar16 = static_cast<const uint16_t *>(p);
+    uint16_t *       rgba16 = static_cast<uint16_t *>(vrgba);
+    size_t           s = Internal.RGB.size();
     s /= 2;
     s /= 3;
-    memset(rgba, 0, Internal->RGB.size() * 4 / 3); // FIXME
+    memset(rgba, 0, Internal.RGB.size() * 4 / 3); // FIXME
     for (size_t i = 0; i < s; ++i)
     {
       // RED
@@ -523,8 +771,8 @@ LookupTable::WriteBufferAsRGBA(const unsigned char * rgba)
   bool ret = false;
   if (BitSample == 8)
   {
-    std::vector<unsigned char>::iterator it = Internal->RGB.begin();
-    for (; it != Internal->RGB.end();)
+    std::vector<unsigned char>::iterator it = Internal.RGB.begin();
+    for (; it != Internal.RGB.end();)
     {
       // RED
       *it++ = *rgba++;
@@ -539,11 +787,11 @@ LookupTable::WriteBufferAsRGBA(const unsigned char * rgba)
   }
   else if (BitSample == 16)
   {
-    void *           p = static_cast<void*>(Internal->RGB.data());
+    void *           p = static_cast<void*>(Internal.RGB.data());
     const void *     vrgba = static_cast<const void*>(rgba);
     uint16_t *       uchar16 = static_cast<uint16_t *>(p);
     const uint16_t * rgba16 = static_cast<const uint16_t *>(vrgba);
-    size_t           s = Internal->RGB.size();
+    size_t           s = Internal.RGB.size();
     s /= 2;
     s /= 3;
     assert(s == 65536);
@@ -568,9 +816,5 @@ LookupTable::GetBitSample() const
 {
   return BitSample;
 }
-
-void
-LookupTable::Print(std::ostream &) const
-{}
 
 } // end namespace mdcm

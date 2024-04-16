@@ -68,21 +68,21 @@ public:
   DataElement &
   GetPrimitiveData();
   void
-  SetPrimitiveData(DataElement const &);
+  SetPrimitiveData(const DataElement &);
   const PrimitivesData &
   GetPrimitivesData() const;
   PrimitivesData &
   GetPrimitivesData();
   void
-  SetPrimitivesData(PrimitivesData const &);
+  SetPrimitivesData(const PrimitivesData &);
   const DataElement &
   GetPrimitiveData(const unsigned int) const;
   DataElement &
   GetPrimitiveData(const unsigned int);
   void
-  SetPrimitiveData(const unsigned int, DataElement const &);
+  SetPrimitiveData(const unsigned int, const DataElement &);
   void
-  AddPrimitiveData(DataElement const &);
+  AddPrimitiveData(const DataElement &);
   unsigned int
   GetNumberOfPrimitivesData() const;
 

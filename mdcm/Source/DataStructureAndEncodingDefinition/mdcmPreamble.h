@@ -44,7 +44,7 @@ public:
   Remove();
   std::istream &
   Read(std::istream &);
-  std::ostream const &
+  const std::ostream &
   Write(std::ostream &) const;
   const char *
   GetInternal() const

@@ -94,48 +94,48 @@ public:
   static PixelFormat
   GetPixelFormatValue(const File &);
   static std::vector<double>
-  GetRescaleInterceptSlopeValue(File const &);
+  GetRescaleInterceptSlopeValue(const File &);
   static void
   SetRescaleInterceptSlopeValue(File &, const Image &);
   static void
   SetVOILUT(File &, const Image &);
   static bool
-  GetRealWorldValueMappingContent(File const &, RealWorldValueMappingContent &);
+  GetRealWorldValueMappingContent(const File &, RealWorldValueMappingContent &);
   static std::vector<double>
-  GetOriginValue(File const &);
+  GetOriginValue(const File &);
   static void
   SetOriginValue(DataSet &, const Image &);
   static std::vector<double>
-  GetDirectionCosinesValue(File const &);
+  GetDirectionCosinesValue(const File &);
   static void
   SetDirectionCosinesValue(DataSet &, const std::vector<double> &);
   static std::vector<double>
-  GetSpacingValue(File const &);
+  GetSpacingValue(const File &);
   static void
   SetSpacingValue(DataSet &, const std::vector<double> &);
   static bool
-  GetDirectionCosinesFromDataSet(DataSet const &, std::vector<double> &);
+  GetDirectionCosinesFromDataSet(const DataSet &, std::vector<double> &);
   static PhotometricInterpretation
-  GetPhotometricInterpretationValue(File const &);
+  GetPhotometricInterpretationValue(const File &);
   static unsigned int
   GetPlanarConfigurationValue(const File &);
-  static SmartPointer<LookupTable>
-  GetLUT(File const &);
+  LookupTable
+  GetLUT(const File &);
   static const ByteValue *
-  GetPointerFromElement(Tag const &, File const &);
+  GetPointerFromElement(const Tag &, const File &);
   static MediaStorage
   ComputeMediaStorageFromModality(const char *                      modality,
                                   unsigned int                      dimension = 2,
-                                  PixelFormat const &               pf = PixelFormat(),
-                                  PhotometricInterpretation const & pi = PhotometricInterpretation(),
+                                  const PixelFormat &               pf = PixelFormat(),
+                                  const PhotometricInterpretation & pi = PhotometricInterpretation(),
                                   double                            rescaleintercept = 0,
                                   double                            rescaleslope = 1);
 
 protected:
   static Tag
-  GetSpacingTagFromMediaStorage(MediaStorage const &);
+  GetSpacingTagFromMediaStorage(const MediaStorage &);
   static Tag
-  GetZSpacingTagFromMediaStorage(MediaStorage const &);
+  GetZSpacingTagFromMediaStorage(const MediaStorage &);
 
 private:
   static bool ForceRescaleInterceptSlope;

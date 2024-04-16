@@ -29,7 +29,6 @@
 #include "mdcmOverlay.h"
 #include "mdcmPhotometricInterpretation.h"
 #include "mdcmPixelFormat.h"
-#include "mdcmSmartPointer.h"
 #include "mdcmTransferSyntax.h"
 #include <vector>
 
@@ -49,7 +48,7 @@ class MDCM_EXPORT Bitmap : public Object
   friend class ImageChangeTransferSyntax;
 
 public:
-  Bitmap();
+  Bitmap() = default;
   virtual ~Bitmap() = default;
   unsigned int
   GetNumberOfDimensions() const;
@@ -74,7 +73,7 @@ public:
   const PhotometricInterpretation &
   GetPhotometricInterpretation() const;
   void
-  SetPhotometricInterpretation(PhotometricInterpretation const &);
+  SetPhotometricInterpretation(const PhotometricInterpretation &);
   bool
   IsLossy() const;
   void
@@ -92,19 +91,19 @@ public:
   void
   SetNeedByteSwap(bool);
   void
-  SetTransferSyntax(TransferSyntax const &);
+  SetTransferSyntax(const TransferSyntax &);
   const TransferSyntax &
   GetTransferSyntax() const;
   bool
-  IsTransferSyntaxCompatible(TransferSyntax const &) const;
+  IsTransferSyntaxCompatible(const TransferSyntax &) const;
   void
-  SetDataElement(DataElement const &);
+  SetDataElement(const DataElement &);
   const DataElement &
   GetDataElement() const;
   DataElement &
   GetDataElement();
   void
-  SetLUT(LookupTable const &);
+  SetLUT(const LookupTable &);
   const LookupTable &
   GetLUT() const;
   LookupTable &
@@ -122,7 +121,7 @@ public:
   PixelFormat &
   GetPixelFormat();
   void
-  SetPixelFormat(PixelFormat const &);
+  SetPixelFormat(const PixelFormat &);
   void
   Print(std::ostream &) const;
 
@@ -141,16 +140,16 @@ protected:
   TryJPEG2000Codec(char *, bool &) const;
   bool
   TryRLECodec(char *, bool &) const;
-  unsigned int                      PlanarConfiguration{};
-  unsigned int                      NumberOfDimensions{2};
-  TransferSyntax                    TS{};
-  PixelFormat                       PF{};
-  PhotometricInterpretation         PI{};
-  std::vector<unsigned int>         Dimensions{0, 0, 1};
-  DataElement                       PixelData{};
-  SmartPointer<LookupTable>         LUT;
-  bool                              NeedByteSwap{};
-  bool                              LossyFlag{};
+  unsigned int              PlanarConfiguration{};
+  unsigned int              NumberOfDimensions{2};
+  TransferSyntax            TS{};
+  PixelFormat               PF{};
+  PhotometricInterpretation PI{};
+  std::vector<unsigned int> Dimensions{0, 0, 1};
+  DataElement               PixelData{};
+  LookupTable               LUT{};
+  bool                      NeedByteSwap{};
+  bool                      LossyFlag{};
 
 private:
   bool

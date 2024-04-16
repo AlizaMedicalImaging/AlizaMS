@@ -418,7 +418,7 @@ MediaStorage::GuessFromModality(const char * modality, unsigned int dim)
 }
 
 const char *
-MediaStorage::GetFromDataSetOrHeader(DataSet const & ds, const Tag & tag, std::string & buf)
+MediaStorage::GetFromDataSetOrHeader(const DataSet & ds, const Tag & tag, std::string & buf)
 {
   if (ds.FindDataElement(tag))
   {
@@ -439,7 +439,7 @@ MediaStorage::GetFromDataSetOrHeader(DataSet const & ds, const Tag & tag, std::s
 }
 
 bool
-MediaStorage::SetFromDataSetOrHeader(DataSet const & ds, const Tag & tag)
+MediaStorage::SetFromDataSetOrHeader(const DataSet & ds, const Tag & tag)
 {
   std::string  buf;
   const char * ms_str = GetFromDataSetOrHeader(ds, tag, buf);
@@ -457,21 +457,21 @@ MediaStorage::SetFromDataSetOrHeader(DataSet const & ds, const Tag & tag)
 }
 
 const char *
-MediaStorage::GetFromHeader(FileMetaInformation const & fmi, std::string & buf)
+MediaStorage::GetFromHeader(const FileMetaInformation & fmi, std::string & buf)
 {
   const Tag tmediastoragesopclassuid(0x0002, 0x0002);
   return GetFromDataSetOrHeader(fmi, tmediastoragesopclassuid, buf);
 }
 
 bool
-MediaStorage::SetFromHeader(FileMetaInformation const & fmi)
+MediaStorage::SetFromHeader(const FileMetaInformation & fmi)
 {
   const Tag tmediastoragesopclassuid(0x0002, 0x0002);
   return SetFromDataSetOrHeader(fmi, tmediastoragesopclassuid);
 }
 
 const char *
-MediaStorage::GetFromDataSet(DataSet const & ds, std::string & buf)
+MediaStorage::GetFromDataSet(const DataSet & ds, std::string & buf)
 {
   const Tag tsopclassuid(0x0008, 0x0016);
   return GetFromDataSetOrHeader(ds, tsopclassuid, buf);
@@ -479,14 +479,14 @@ MediaStorage::GetFromDataSet(DataSet const & ds, std::string & buf)
 
 
 bool
-MediaStorage::SetFromDataSet(DataSet const & ds)
+MediaStorage::SetFromDataSet(const DataSet & ds)
 {
   const Tag tsopclassuid(0x0008, 0x0016);
   return SetFromDataSetOrHeader(ds, tsopclassuid);
 }
 
 void
-MediaStorage::SetFromSourceImageSequence(DataSet const & ds)
+MediaStorage::SetFromSourceImageSequence(const DataSet & ds)
 {
   const Tag sourceImageSequenceTag(0x0008, 0x2112);
   if (ds.FindDataElement(sourceImageSequenceTag))
@@ -520,7 +520,7 @@ MediaStorage::SetFromSourceImageSequence(DataSet const & ds)
 }
 
 bool
-MediaStorage::SetFromModality(DataSet const & ds)
+MediaStorage::SetFromModality(const DataSet & ds)
 {
   // Attempt to recover from the modality (0008,0060)
   if (ds.FindDataElement(Tag(0x0008, 0x0060)))
@@ -544,7 +544,7 @@ MediaStorage::SetFromModality(DataSet const & ds)
 }
 
 bool
-MediaStorage::SetFromFile(File const & file)
+MediaStorage::SetFromFile(const File & file)
 {
   /*
    * DICOMDIR usually have group 0002 present, but no 0008,0016 (doh!)

@@ -71,11 +71,11 @@ public:
     F = &file;
   }
   bool
-  ReadUpToTag(const Tag & tag, std::set<Tag> const & skiptags = std::set<Tag>());
+  ReadUpToTag(const Tag & tag, const std::set<Tag> & skiptags = std::set<Tag>());
   bool
-  ReadSelectedTags(std::set<Tag> const & tags, bool readvalues = true);
+  ReadSelectedTags(const std::set<Tag> & tags, bool readvalues = true);
   bool
-  ReadSelectedPrivateTags(std::set<PrivateTag> const & ptags, bool readvalues = true);
+  ReadSelectedPrivateTags(const std::set<PrivateTag> & ptags, bool readvalues = true);
   bool
   CanRead() const;
 #if 0

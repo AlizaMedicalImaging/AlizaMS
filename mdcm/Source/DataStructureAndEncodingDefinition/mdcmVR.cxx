@@ -491,7 +491,7 @@ VR::IsBinary2(VRType vr)
 }
 
 bool
-VR::Compatible(VR const & vr) const
+VR::Compatible(const VR & vr) const
 {
   if (vr.VRField == VR::INVALID)
     return true;

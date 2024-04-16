@@ -111,11 +111,11 @@ public:
     return DES.size();
   }
   void
-  Print(std::ostream &, std::string const & indent = "") const;
+  Print(std::ostream &, const std::string & indent = "") const;
 
   template <typename TDE>
   unsigned int
-  ComputeGroupLength(Tag const & tag) const
+  ComputeGroupLength(const Tag & tag) const
   {
     assert(tag.GetElement() == 0x0);
     const DataElement r(tag);
@@ -208,10 +208,10 @@ public:
   Read(std::istream &);
   template <typename TDE, typename TSwap>
   std::istream &
-  ReadUpToTag(std::istream &, const Tag &, std::set<Tag> const &);
+  ReadUpToTag(std::istream &, const Tag &, const std::set<Tag> &);
   template <typename TDE, typename TSwap>
   std::istream &
-  ReadUpToTagWithLength(std::istream &, const Tag &, std::set<Tag> const &, VL &);
+  ReadUpToTagWithLength(std::istream &, const Tag &, const std::set<Tag> &, VL &);
   template <typename TDE, typename TSwap>
   std::istream &
   ReadSelectedTags(std::istream &, const std::set<Tag> &, bool = true);
@@ -225,7 +225,7 @@ public:
   std::istream &
   ReadSelectedPrivateTagsWithLength(std::istream &, const std::set<PrivateTag> & tags, VL &, bool = true);
   template <typename TDE, typename TSwap>
-  std::ostream const &
+  const std::ostream &
   Write(std::ostream &) const;
   template <typename TDE, typename TSwap>
   std::istream &

@@ -43,17 +43,17 @@ public:
   JPEGCodec();
   virtual ~JPEGCodec() override;
   bool
-  CanDecode(TransferSyntax const &) const override;
+  CanDecode(const TransferSyntax &) const override;
   bool
-  CanCode(TransferSyntax const &) const override;
+  CanCode(const TransferSyntax &) const override;
   bool
-  Decode(DataElement const &, DataElement &) override;
+  Decode(const DataElement &, DataElement &) override;
   bool
-  Decode2(DataElement const &, std::stringstream &);
+  Decode2(const DataElement &, std::stringstream &);
   bool
-  Code(DataElement const &, DataElement &) override;
+  Code(const DataElement &, DataElement &) override;
   void
-  SetPixelFormat(PixelFormat const &) override;
+  SetPixelFormat(const PixelFormat &) override;
   void
   ComputeOffsetTable(bool);
   virtual bool
@@ -81,7 +81,7 @@ protected:
   virtual bool
   InternalCode(const char *, size_t, std::ostream &);
   bool
-  IsValid(PhotometricInterpretation const &) override;
+  IsValid(const PhotometricInterpretation &) override;
   bool
   IsRowEncoder() override;
   bool

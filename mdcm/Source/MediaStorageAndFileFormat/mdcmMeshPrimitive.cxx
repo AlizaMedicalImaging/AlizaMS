@@ -101,7 +101,7 @@ MeshPrimitive::GetPrimitiveData()
 }
 
 void
-MeshPrimitive::SetPrimitiveData(DataElement const & de)
+MeshPrimitive::SetPrimitiveData(const DataElement & de)
 {
   PrimitiveData.insert(PrimitiveData.begin(), de);
 }
@@ -119,19 +119,19 @@ MeshPrimitive::GetPrimitivesData()
 }
 
 void
-MeshPrimitive::SetPrimitivesData(PrimitivesData const & DEs)
+MeshPrimitive::SetPrimitivesData(const PrimitivesData & DEs)
 {
   PrimitiveData = DEs;
 }
 
 void
-MeshPrimitive::SetPrimitiveData(const unsigned int idx, DataElement const & de)
+MeshPrimitive::SetPrimitiveData(const unsigned int idx, const DataElement & de)
 {
   PrimitiveData.insert(PrimitiveData.begin() + idx, de);
 }
 
 void
-MeshPrimitive::AddPrimitiveData(DataElement const & de)
+MeshPrimitive::AddPrimitiveData(const DataElement & de)
 {
   PrimitiveData.push_back(de);
 }

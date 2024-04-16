@@ -68,36 +68,36 @@ public:
   GetSegmentDescription() const;
   void
   SetSegmentDescription(const char *);
-  SegmentHelper::BasicCodedEntry const &
+  const SegmentHelper::BasicCodedEntry &
   GetAnatomicRegion() const;
   SegmentHelper::BasicCodedEntry &
   GetAnatomicRegion();
   void
-  SetAnatomicRegion(SegmentHelper::BasicCodedEntry const &);
-  BasicCodedEntryVector const &
+  SetAnatomicRegion(const SegmentHelper::BasicCodedEntry &);
+  const BasicCodedEntryVector &
   GetAnatomicRegionModifiers() const;
   BasicCodedEntryVector &
   GetAnatomicRegionModifiers();
   void
-  SetAnatomicRegionModifiers(BasicCodedEntryVector const &);
-  SegmentHelper::BasicCodedEntry const &
+  SetAnatomicRegionModifiers(const BasicCodedEntryVector &);
+  const SegmentHelper::BasicCodedEntry &
   GetPropertyCategory() const;
   SegmentHelper::BasicCodedEntry &
   GetPropertyCategory();
   void
-  SetPropertyCategory(SegmentHelper::BasicCodedEntry const &);
-  SegmentHelper::BasicCodedEntry const &
+  SetPropertyCategory(const SegmentHelper::BasicCodedEntry &);
+  const SegmentHelper::BasicCodedEntry &
   GetPropertyType() const;
   SegmentHelper::BasicCodedEntry &
   GetPropertyType();
   void
-  SetPropertyType(SegmentHelper::BasicCodedEntry const &);
-  BasicCodedEntryVector const &
+  SetPropertyType(const SegmentHelper::BasicCodedEntry &);
+  const BasicCodedEntryVector &
   GetPropertyTypeModifiers() const;
   BasicCodedEntryVector &
   GetPropertyTypeModifiers();
   void
-  SetPropertyTypeModifiers(BasicCodedEntryVector const &);
+  SetPropertyTypeModifiers(const BasicCodedEntryVector &);
   ALGOType
        GetSegmentAlgorithmType() const;
   void SetSegmentAlgorithmType(ALGOType);
@@ -111,7 +111,7 @@ public:
   GetSurfaceCount();
   void
   SetSurfaceCount(const unsigned long);
-  SurfaceVector const &
+  const SurfaceVector &
   GetSurfaces() const;
   SurfaceVector &
   GetSurfaces();

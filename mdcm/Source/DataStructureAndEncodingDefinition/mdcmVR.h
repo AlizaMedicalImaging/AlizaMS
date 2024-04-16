@@ -214,7 +214,7 @@ public:
   GetSize() const;
 
   bool
-  Compatible(VR const &) const;
+  Compatible(const VR &) const;
 
   bool
   IsVRFile() const;

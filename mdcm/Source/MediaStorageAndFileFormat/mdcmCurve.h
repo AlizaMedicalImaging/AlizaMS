@@ -47,10 +47,10 @@ class MDCM_EXPORT Curve : public Object
 {
 public:
   Curve();
-  Curve(Curve const &);
+  Curve(const Curve &);
   ~Curve();
   static unsigned int
-  GetNumberOfCurves(DataSet const &);
+  GetNumberOfCurves(const DataSet &);
   void
   Update(const DataElement &);
   void
@@ -79,7 +79,7 @@ public:
   GetDataValueRepresentation() const;
   void
   SetCurveDataDescriptor(const uint16_t *, size_t);
-  std::vector<unsigned short> const &
+  const std::vector<unsigned short> &
   GetCurveDataDescriptor() const;
   void
   SetCoordinateStartValue(unsigned short);

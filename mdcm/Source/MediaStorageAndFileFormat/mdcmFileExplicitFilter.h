@@ -53,7 +53,7 @@ public:
 
 protected:
   bool
-  ProcessDataSet(DataSet &, Dicts const &);
+  ProcessDataSet(DataSet &, const Dicts &);
 
 private:
   SmartPointer<File> F;
