@@ -269,7 +269,7 @@ LookupTable::InitializeLUT(LookupTableType type,
   if (!(static_cast<int>(type) >= 0 && static_cast<int>(type) <= 2))
   {
     mdcmWarningMacro("Error in InitializeLUT,  LookupTableType " << type);
-	return;
+    return;
   }
   if (bitsize != 8 && bitsize != 16)
   {
@@ -300,7 +300,6 @@ LookupTable::GetLUTLength(LookupTableType type) const
 void
 LookupTable::SetLUT(LookupTableType enhanced_type, const unsigned char * array, unsigned int length)
 {
-  (void)length;
   // Supplemental SUPPLRED = 4
   LookupTableType type = enhanced_type;
   if (type == SUPPLRED)
@@ -318,7 +317,7 @@ LookupTable::SetLUT(LookupTableType enhanced_type, const unsigned char * array, 
   if (!(static_cast<int>(type) >= 0 && static_cast<int>(type) <= 2))
   {
     mdcmWarningMacro("Error in SetLUT,  LookupTableType " << enhanced_type);
-	return;
+    return;
   }
   if (Internal.Length[type] == 0)
   {
@@ -375,6 +374,7 @@ LookupTable::SetLUT(LookupTableType enhanced_type, const unsigned char * array, 
       uchar16[3 * i + type] = array16[i];
     }
   }
+  (void)length;
 }
 
 void
@@ -397,7 +397,7 @@ LookupTable::SetSegmentedLUT(LookupTableType enhanced_type, const unsigned char 
   if (!(static_cast<int>(type) >= 0 && static_cast<int>(type) <= 2))
   {
     mdcmWarningMacro("Error in SetSegmentedLUT, LookupTableType " << enhanced_type);
-	return;
+    return;
   }
   if (Internal.Length[type] == 0)
   {
@@ -406,7 +406,20 @@ LookupTable::SetSegmentedLUT(LookupTableType enhanced_type, const unsigned char 
   }
   if (BitSample == 8)
   {
-    assert(0); // TODO
+    unsigned char * copy = new unsigned char[length];
+    for (size_t x = 0; x < length; ++x)
+    {
+      copy[x] = array[x];
+    }
+    void *               varray = static_cast<void*>(copy);
+    uint8_t *            array8 = static_cast<uint8_t *>(varray);
+    std::vector<uint8_t> palette;
+    unsigned int         num_entries = GetLUTLength(type);
+    palette.reserve(num_entries);
+    ExpandPalette<uint8_t>(array8, length, palette);
+    const void * vpalette = static_cast<const void*>(palette.data());
+    SetLUT(enhanced_type, static_cast<const unsigned char *>(vpalette), static_cast<unsigned int>(palette.size()));
+    delete [] copy;
   }
   else if (BitSample == 16)
   {
@@ -422,9 +435,9 @@ LookupTable::SetSegmentedLUT(LookupTableType enhanced_type, const unsigned char 
     unsigned int          num_entries = GetLUTLength(type);
     palette.reserve(num_entries);
     SwapperNoOp::SwapArray(array16, length / 2);
-    ExpandPalette(array16, length, palette);
+    ExpandPalette<uint16_t>(array16, length, palette);
     const void * vpalette = static_cast<const void*>(palette.data());
-    SetLUT(enhanced_type, static_cast<const unsigned char *>(vpalette), static_cast<unsigned int>(palette.size() * 2));
+    SetLUT(enhanced_type, static_cast<const unsigned char *>(vpalette), 2U * static_cast<unsigned int>(palette.size()));
     delete [] copy;
   }
 }
@@ -435,7 +448,7 @@ LookupTable::GetLUT(LookupTableType type, unsigned char * array, unsigned int & 
   if (!(static_cast<int>(type) >= 0 && static_cast<int>(type) <= 2))
   {
     mdcmWarningMacro("Error in GetLUT, LookupTableType " << type);
-	return;
+    return;
   }
   if (BitSample == 8)
   {
@@ -478,7 +491,7 @@ LookupTable::GetLUTDescriptor(LookupTableType  type,
   if (!(static_cast<int>(type) >= 0 && static_cast<int>(type) <= 2))
   {
     mdcmWarningMacro("Error in GetLUTDescriptor, LookupTableType " << type);
-	return;
+    return;
   }
   if (Internal.Length[type] == 65536)
   {
@@ -719,6 +732,7 @@ LookupTable::GetPointer() const
   return nullptr;
 }
 
+#if 0
 bool
 LookupTable::GetBufferAsRGBA(unsigned char * rgba) const
 {
@@ -810,6 +824,7 @@ LookupTable::WriteBufferAsRGBA(const unsigned char * rgba)
   }
   return ret;
 }
+#endif
 
 unsigned short
 LookupTable::GetBitSample() const

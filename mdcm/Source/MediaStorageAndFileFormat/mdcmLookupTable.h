@@ -93,10 +93,12 @@ public:
   DecodeSupplemental(char *, size_t, const char *, size_t) const;
   const unsigned char *
   GetPointer() const;
+#if 0
   bool
   GetBufferAsRGBA(unsigned char *) const;
   bool
   WriteBufferAsRGBA(const unsigned char *);
+#endif
   unsigned short
   GetBitSample() const;
 
