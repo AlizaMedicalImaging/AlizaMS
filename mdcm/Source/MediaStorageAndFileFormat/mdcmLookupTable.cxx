@@ -316,19 +316,19 @@ LookupTable::SetLUT(LookupTableType enhanced_type, const unsigned char * array, 
   }
   if (!(static_cast<int>(type) >= 0 && static_cast<int>(type) <= 2))
   {
-    mdcmWarningMacro("Error in SetLUT,  LookupTableType " << enhanced_type);
+    mdcmWarningMacro("Error in SetLUT (1),  LookupTableType " << enhanced_type);
     return;
   }
   if (Internal.Length[type] == 0)
   {
-    mdcmWarningMacro("Error in SetLUT, Length[" << type << "] is 0");
+    mdcmWarningMacro("Error in SetLUT (2), Length[" << type << "] is 0");
     return;
   }
   if (!IncompleteLUT)
   {
     if (Internal.RGB.size() != 3 * Internal.Length[type] * (BitSample / 8))
     {
-      mdcmWarningMacro("Error in SetLUT");
+      mdcmWarningMacro("Error in SetLUT (3)");
       return;
     }
   }
@@ -336,7 +336,11 @@ LookupTable::SetLUT(LookupTableType enhanced_type, const unsigned char * array, 
   {
     const unsigned int mult = Internal.BitSize[type] / 8;
     const unsigned int mult2 = length / Internal.Length[type];
-    assert(Internal.Length[type] * mult2 == length);
+    if (Internal.Length[type] * mult2 != length)
+    {
+      mdcmWarningMacro("Error in SetLUT (4)");
+      return;
+    }
     if (Internal.Length[type] * mult == length || Internal.Length[type] * mult + 1 == length)
     {
       assert(mult2 == 1 || mult2 == 2);
@@ -366,7 +370,11 @@ LookupTable::SetLUT(LookupTableType enhanced_type, const unsigned char * array, 
   }
   else if (BitSample == 16)
   {
-    assert(Internal.Length[type] * (BitSample / 8) == length);
+    if (Internal.Length[type] * (BitSample / 8) != length)
+    {
+      mdcmWarningMacro("Error in SetLUT (5)");
+      return;
+    }
     void *           p = static_cast<void*>(Internal.RGB.data());
     const void *     varray = static_cast<const void*>(array);
     uint16_t *       uchar16 = static_cast<uint16_t *>(p);
@@ -378,7 +386,6 @@ LookupTable::SetLUT(LookupTableType enhanced_type, const unsigned char * array, 
       uchar16[3 * i + type] = array16[i];
     }
   }
-  (void)length;
 }
 
 void
@@ -562,9 +569,11 @@ LookupTable::Decode(std::istream & is, std::ostream & os) const
         break;
       if (IncompleteLUT)
       {
-        assert(idx < Internal.Length[RED]);
-        assert(idx < Internal.Length[GREEN]);
-        assert(idx < Internal.Length[BLUE]);
+        if (idx >= Internal.Length[RED] || idx >= Internal.Length[GREEN] || idx >= Internal.Length[BLUE])
+        {
+          mdcmWarningMacro("Error in Decode (3)");
+          return;
+        }
       }
       rgb[RED] = Internal.RGB[3 * idx + RED];
       rgb[GREEN] = Internal.RGB[3 * idx + GREEN];
@@ -587,9 +596,11 @@ LookupTable::Decode(std::istream & is, std::ostream & os) const
       }
       if (IncompleteLUT)
       {
-        assert(idx < Internal.Length[RED]);
-        assert(idx < Internal.Length[GREEN]);
-        assert(idx < Internal.Length[BLUE]);
+        if (idx >= Internal.Length[RED] || idx >= Internal.Length[GREEN] || idx >= Internal.Length[BLUE])
+        {
+          mdcmWarningMacro("Error in Decode (4)");
+          return;
+        }
       }
       rgb[RED] = rgb16[3 * idx + RED];
       rgb[GREEN] = rgb16[3 * idx + GREEN];
@@ -621,16 +632,17 @@ LookupTable::Decode(char * output, size_t outlen, const char * input, size_t inl
     {
       if (IncompleteLUT)
       {
-        assert(*idx < Internal.Length[RED]);
-        assert(*idx < Internal.Length[GREEN]);
-        assert(*idx < Internal.Length[BLUE]);
+        if (*idx >= Internal.Length[RED] || *idx >= Internal.Length[GREEN] || *idx >= Internal.Length[BLUE])
+        {
+          mdcmWarningMacro("Error in Decode (1)");
+          return false;
+        }
       }
       rgb[RED] = Internal.RGB[3 * (*idx) + RED];
       rgb[GREEN] = Internal.RGB[3 * (*idx) + GREEN];
       rgb[BLUE] = Internal.RGB[3 * (*idx) + BLUE];
       rgb += 3;
     }
-    success = true;
   }
   else if (BitSample == 16)
   {
@@ -645,18 +657,19 @@ LookupTable::Decode(char * output, size_t outlen, const char * input, size_t inl
     {
       if (IncompleteLUT)
       {
-        assert(*idx < Internal.Length[RED]);
-        assert(*idx < Internal.Length[GREEN]);
-        assert(*idx < Internal.Length[BLUE]);
+        if (*idx >= Internal.Length[RED] || *idx >= Internal.Length[GREEN] || *idx >= Internal.Length[BLUE])
+        {
+          mdcmWarningMacro("Error in Decode (2)");
+          return false;
+        }
       }
       rgb[RED] = rgb16[3 * (*idx) + RED];
       rgb[GREEN] = rgb16[3 * (*idx) + GREEN];
       rgb[BLUE] = rgb16[3 * (*idx) + BLUE];
       rgb += 3;
     }
-    success = true;
   }
-  return success;
+  return true;
 }
 
 int
