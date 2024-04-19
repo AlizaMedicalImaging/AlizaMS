@@ -326,7 +326,11 @@ LookupTable::SetLUT(LookupTableType enhanced_type, const unsigned char * array, 
   }
   if (!IncompleteLUT)
   {
-    assert(Internal.RGB.size() == 3 * Internal.Length[type] * (BitSample / 8));
+    if (Internal.RGB.size() != 3 * Internal.Length[type] * (BitSample / 8))
+    {
+      mdcmWarningMacro("Error in SetLUT");
+      return;
+    }
   }
   if (BitSample == 8)
   {
