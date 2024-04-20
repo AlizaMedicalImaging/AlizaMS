@@ -91,8 +91,6 @@ public:
   Decode(char *, size_t, const char *, size_t) const;
   int
   DecodeSupplemental(char *, size_t, const char *, size_t) const;
-  const unsigned char *
-  GetPointer() const;
 #if 0
   bool
   GetBufferAsRGBA(unsigned char *) const;
@@ -102,7 +100,7 @@ public:
   unsigned short
   GetBitSample() const;
 
-protected:
+private:
   LookupTableInternal Internal{};
   unsigned short      BitSample{};
   bool                IncompleteLUT{};

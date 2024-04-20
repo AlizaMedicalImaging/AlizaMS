@@ -613,7 +613,6 @@ LookupTable::Decode(std::istream & is, std::ostream & os) const
 bool
 LookupTable::Decode(char * output, size_t outlen, const char * input, size_t inlen) const
 {
-  bool success = false;
   if (outlen < 3 * inlen)
   {
     mdcmDebugMacro("Out buffer too small");
@@ -668,6 +667,10 @@ LookupTable::Decode(char * output, size_t outlen, const char * input, size_t inl
       rgb[BLUE] = rgb16[3 * (*idx) + BLUE];
       rgb += 3;
     }
+  }
+  else
+  {
+    return false;
   }
   return true;
 }
@@ -737,16 +740,6 @@ LookupTable::DecodeSupplemental(char * output, size_t outlen, const char * input
     return static_cast<int>(Internal.Subscript[RED]);
   }
   return INT_MIN;
-}
-
-const unsigned char *
-LookupTable::GetPointer() const
-{
-  if (BitSample == 8)
-  {
-    return Internal.RGB.data();
-  }
-  return nullptr;
 }
 
 #if 0
