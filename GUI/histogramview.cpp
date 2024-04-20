@@ -288,7 +288,9 @@ void HistogramView::get_screen()
 	}
 	if (p.isNull())
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << "could not grab screen" << std::endl;
+#endif
 		return;
 	}
 	const QString saved_dir = CommonUtils::get_screenshot_dir();

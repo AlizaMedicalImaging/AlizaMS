@@ -196,7 +196,9 @@ void ContourUtils::generate_roi_vbos(
 				}
 				if (ind != s)
 				{
+#ifdef ALIZA_VERBOSE
 					std::cout << "failed generating VBOs (contours)" << std::endl;
+#endif
 					delete [] v;
 					return;
 				}
@@ -450,9 +452,11 @@ void ContourUtils::map_contours_uniform(
 	if (ivariant->di->idimz !=
 			static_cast<int>(ivariant->di->image_slices.size()))
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << "ContourUtils::map_contours: dimz != slices size, "
 			<< ivariant->di->idimz << " != " << ivariant->di->image_slices.size()
 			<< std::endl;
+#endif
 		return;
 	}
 	const float tolerance = static_cast<float>(ivariant->di->iz_spacing) * 0.5f;
@@ -523,9 +527,11 @@ void ContourUtils::map_contours_nonuniform(
 	if (ivariant->di->idimz !=
 			static_cast<int>(ivariant->di->image_slices.size()))
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << "ContourUtils::map_contours: dimz != slices size, "
 			<< ivariant->di->idimz << " != " << ivariant->di->image_slices.size()
 			<< std::endl;
+#endif
 		return;
 	}
 	const float tolerance{0.1f};
@@ -810,7 +816,9 @@ bool ContourUtils::phys_space_from_slice(
 		col_dircos_y > -0.000001f && col_dircos_y < 0.000001f &&
 		col_dircos_z > -0.000001f && col_dircos_z < 0.000001f)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << "can not process direction cosines" << std::endl;
+#endif
 		return false;
 	}
 	ImageTypeUC::IndexType idx;
@@ -859,9 +867,12 @@ bool ContourUtils::phys_space_from_slice(
 	}
 	catch (const itk::ExceptionObject & ex)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << ex.GetDescription() << std::endl;
+#else
+		(void)ex;
+#endif
 		return false;
 	}
 	return true;
 }
-

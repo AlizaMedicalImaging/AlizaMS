@@ -2063,7 +2063,9 @@ unsigned int process_gsps(
 				const int ref_ivariant_type = ref_ivariants.at(z)->image_type;
 				if (!(ref_ivariant_type >= 0 && ref_ivariant_type < 10))
 				{
+#ifdef ALIZA_VERBOSE
 					std::cout << "Not a scalar image for GSPS, skipped" << std::endl;
+#endif
 					continue;
 				}
 				++count;
@@ -2971,10 +2973,16 @@ void DicomUtils::read_image_info_rtdose(const QString & f,
 	const bool b0 = get_us_value(ds, trows, rows_);
 	const bool b1 = get_us_value(ds, tcolumns, columns_);
 	const bool b2 = get_ds_values(ds, tframeoffset, z_offsets);
+#ifdef ALIZA_VERBOSE
 	if (!(b0 && b1 && b2))
 	{
 		std::cout << "read_image_info_rtdose warning (1)" << std::endl;
 	}
+#else
+	(void)b0;
+	(void)b1;
+	(void)b2;
+#endif
 	//
 	{
 		QString numframes;
@@ -3133,8 +3141,7 @@ void DicomUtils::load_contour(
 						erefframeofref.GetByteValue()->GetLength()).
 							trimmed().remove(QChar('\0'));
 #ifdef TMP_PRINT_LOAD_CONTOUR
-				std::cout <<
-					"0x3006,0x0024 Referenced Frame of Reference " <<
+				std::cout << "0x3006,0x0024 Referenced Frame of Reference " <<
 					roi.ref_frame_of_ref.toStdString() << std::endl;
 #endif
 			}
@@ -3296,8 +3303,7 @@ void DicomUtils::load_contour(
 										trimmed().remove(QChar('\0'));
 								contour->ref_sop_instance_uids << tmp688;
 #ifdef TMP_PRINT_LOAD_CONTOUR
-								std::cout <<
-									" 0x0008, 0x1155 Referenced SOP Instance UID " <<
+								std::cout << " 0x0008, 0x1155 Referenced SOP Instance UID " <<
 									n_imageseq << " " << tmp688.toStdString() << std::endl;
 #endif
 							}
@@ -5544,7 +5550,7 @@ bool DicomUtils::generate_geometry(
 				))
 			{
 				invalidate_volume = true;
-#if 1
+#ifdef ALIZA_VERBOSE
 				std::cout
 					<< "Warning:\n"
 					<< "Direction cosines defined in DICOM file: "
@@ -6039,8 +6045,7 @@ void DicomUtils::enhanced_get_indices(
 #ifdef ENHANCED_PRINT_INFO
 	if (dim_uids_set.size() > 1)
 	{
-		std::cout <<
-			"Warning: multiple dimension organization UIDs, using 1st"
+		std::cout << "Warning: multiple dimension organization UIDs, using 1st"
 				<< std::endl;
 	}
 #endif
@@ -6059,8 +6064,10 @@ void DicomUtils::enhanced_get_indices(
 	const int sq1_size = static_cast<int>(sq1.size());
 	if (sq1_size > 6)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << "Size of Dimension Organization > 6 "
 			<< "(" << sq1_size << ") is currently not supported" << std::endl;
+#endif
 		return;
 	}
 #ifdef ENHANCED_PRINT_INFO
@@ -6787,6 +6794,7 @@ void DicomUtils::enhanced_check_rescale(
 
 void DicomUtils::print_sq(const DimIndexSq & sq)
 {
+#ifdef ENHANCED_PRINT_INFO
 	if (!sq.empty())
 	{
 		std::cout << "Dimension Index Sequence:" << std::endl;
@@ -6878,10 +6886,12 @@ void DicomUtils::print_sq(const DimIndexSq & sq)
 		}
 		std::cout << " UID " << sq.at(i).uid << std::endl;
 	}
+#endif
 }
 
 void DicomUtils::print_func_group(const FrameGroupValues & values)
 {
+#ifdef ENHANCED_PRINT_GROUPS
 	for (unsigned int x = 0; x < values.size(); ++x)
 	{
 		std::cout << "ID=" << values.at(x).id << std::endl;
@@ -7010,6 +7020,7 @@ void DicomUtils::print_func_group(const FrameGroupValues & values)
 		}
 		std::cout << "-----------" << std::endl;
 	}
+#endif
 }
 
 bool DicomUtils::read_shutter(const mdcm::DataSet & ds, PRDisplayShutter & a)
@@ -8726,39 +8737,46 @@ QString DicomUtils::read_series(
 					const float tmp1_spacing_z = static_cast<float>(ivariant->di->iz_spacing);
 					if (tmp1_spacing_x <= 0)
 					{
-						std::cout << "ivariant->di->ix_spacing <= 0 "
-							<< std::endl;
+#ifdef ALIZA_VERBOSE
+						std::cout << "ivariant->di->ix_spacing <= 0 " << std::endl;
+#endif
 						invalidate = true;
 						ivariant->di->ix_spacing = 1.0;
 					}
 					if (tmp1_spacing_y <= 0)
 					{
-						std::cout << "ivariant->di->iy_spacing <= 0 "
-							<< std::endl;
+#ifdef ALIZA_VERBOSE
+						std::cout << "ivariant->di->iy_spacing <= 0 " << std::endl;
+#endif
 						invalidate = true;
 						ivariant->di->iy_spacing = 1.0;
 					}
 					if (tmp1_spacing_z <= 0)
 					{
-						std::cout << "ivariant->di->iz_spacing <= 0 "
-							<< std::endl;
+#ifdef ALIZA_VERBOSE
+						std::cout << "ivariant->di->iz_spacing <= 0 " << std::endl;
+#endif
 						invalidate = true;
 						ivariant->di->iz_spacing = 0.00001;
 					}
 					if ((tmp0_spacing_x + 0.001f) < tmp1_spacing_x ||
 						(tmp0_spacing_x - 0.001f) > tmp1_spacing_x)
 					{
+#ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_spacing_x != tmp1_spacing_x "
 							<< tmp0_spacing_x << " "
 							<< tmp1_spacing_x << std::endl;
+#endif
 						invalidate = true;
 					}
 					if ((tmp0_spacing_y + 0.001f) < tmp1_spacing_y ||
 						(tmp0_spacing_y - 0.001f) > tmp1_spacing_y)
 					{
+#ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_spacing_y != tmp1_spacing_y "
 							<< tmp0_spacing_y << " "
 							<< tmp1_spacing_y << std::endl;
+#endif
 						invalidate = true;
 					}
 					const float tmp0_origin_x = static_cast<float>(origin_x_);
@@ -8770,25 +8788,31 @@ QString DicomUtils::read_series(
 					if ((tmp0_origin_x + 0.001f) < tmp1_origin_x ||
 						(tmp0_origin_x - 0.001f) > tmp1_origin_x)
 					{
+#ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_origin_x != tmp1_origin_x "
 							<< tmp0_origin_x << " "
 							<< tmp1_origin_x << std::endl;
+#endif
 						invalidate = true;
 					}
 					if ((tmp0_origin_y + 0.001f) < tmp1_origin_y ||
 						(tmp0_origin_y - 0.001f) > tmp1_origin_y)
 					{
+#ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_origin_y != tmp1_origin_y "
 							<< tmp0_origin_y << " "
 							<< tmp1_origin_y << std::endl;
+#endif
 						invalidate = true;
 					}
 					if ((tmp0_origin_z + 0.001f) < tmp1_origin_z ||
 						(tmp0_origin_z - 0.001f) > tmp1_origin_z)
 					{
+#ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_origin_z != tmp1_origin_z "
 							<< tmp0_origin_z << " "
 							<< tmp1_origin_z << std::endl;
+#endif
 						invalidate = true;
 					}
 					const float tmp0_dircos_0 = static_cast<float>(dircos_[0]);
@@ -8806,49 +8830,61 @@ QString DicomUtils::read_series(
 					if ((tmp0_dircos_0 + 0.001f) < tmp1_dircos_0 ||
 						(tmp0_dircos_0 - 0.001f) > tmp1_dircos_0)
 					{
+#ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_dircos_0 != tmp1_dircos_0 "
 							<< tmp0_dircos_0 << " "
 							<< tmp1_dircos_0 << std::endl;
+#endif
 						invalidate = true;
 					}
 					if ((tmp0_dircos_1 + 0.001f) < tmp1_dircos_1 ||
 						(tmp0_dircos_1 - 0.001f) > tmp1_dircos_1)
 					{
+#ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_dircos_1 != tmp1_dircos_1 "
 							<< tmp0_dircos_1 << " "
 							<< tmp1_dircos_1 << std::endl;
+#endif
 						invalidate = true;
 					}
 					if ((tmp0_dircos_2 + 0.001f) < tmp1_dircos_2 ||
 						(tmp0_dircos_2 - 0.001f) > tmp1_dircos_2)
 					{
+#ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_dircos_2 != tmp1_dircos_2 "
 							<< tmp0_dircos_2 << " "
 							<< tmp1_dircos_2 << std::endl;
+#endif
 						invalidate = true;
 					}
 					if ((tmp0_dircos_3 + 0.001f) < tmp1_dircos_3 ||
 						(tmp0_dircos_3 - 0.001f) > tmp1_dircos_3)
 					{
+#ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_dircos_3 != tmp1_dircos_3 "
 							<< tmp0_dircos_3 << " "
 							<< tmp1_dircos_3 << std::endl;
+#endif
 						invalidate = true;
 					}
 					if ((tmp0_dircos_4 + 0.001f) < tmp1_dircos_4 ||
 						(tmp0_dircos_4 - 0.001f) > tmp1_dircos_4)
 					{
+#ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_dircos_4 != tmp1_dircos_4 "
 							<< tmp0_dircos_4 << " "
 							<< tmp1_dircos_4 << std::endl;
+#endif
 						invalidate = true;
 					}
 					if ((tmp0_dircos_5 + 0.001f) < tmp1_dircos_5 ||
 						(tmp0_dircos_5 - 0.001f) > tmp1_dircos_5)
 					{
+#ifdef ALIZA_VERBOSE
 						std::cout << "tmp0_dircos_5 != tmp1_dircos_5 "
 							<< tmp0_dircos_5 << " "
 							<< tmp1_dircos_5 << std::endl;
+#endif
 						invalidate = true;
 					}
 				}
@@ -8857,9 +8893,10 @@ QString DicomUtils::read_series(
 					ivariant->equi = false;
 					ivariant->orientation = 0;
 					ivariant->orientation_string = QString("");
-					std::cout
-						<< "warning: could not validate image, using as non-uniform"
+#ifdef ALIZA_VERBOSE
+					std::cout << "warning: could not validate image, using as non-uniform"
 						<< std::endl;
+#endif
 				}
 				spacing_x = ivariant->di->ix_spacing > 0 ?
 					ivariant->di->ix_spacing : 1;
@@ -9075,8 +9112,9 @@ QString DicomUtils::read_series(
 		}
 		else
 		{
-			std::cout << "Warning: instance UIDs mismatch, cleared UIDs"
-				<< std::endl;
+#ifdef ALIZA_VERBOSE
+			std::cout << "Warning: instance UIDs mismatch, cleared UIDs" << std::endl;
+#endif
 			ivariant->image_instance_uids.clear();
 		}
 	}
@@ -9224,8 +9262,9 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 			const size_t at1l =	w * h * sizeof(unsigned short);
 			if (bv2l == at1l)
 			{
-				std::cout << "Warning: Elscint data seems to be not compressed"
-					<< std::endl;
+#ifdef ALIZA_VERBOSE
+				std::cout << "Warning: Elscint data seems to be not compressed" << std::endl;
+#endif
 				pixeldata.SetByteValue(bv2->GetPointer(), bv2->GetLength());
 			}
 			else
@@ -9262,9 +9301,9 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 			const size_t outputlen = 3*h*w;
 			if (bv2l == outputlen)
 			{
-				std::cout
-					<< "Warning: Elscint data seems to be not compressed"
-					<< std::endl;
+#ifdef ALIZA_VERBOSE
+				std::cout << "Warning: Elscint data seems to be not compressed" << std::endl;
+#endif
 				pixeldata.SetByteValue(bv2->GetPointer(), bv2->GetLength());
 
 			}
@@ -9329,9 +9368,9 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 			const size_t at1l = w * h * sizeof(unsigned short);
 			if (bv2l == at1l)
 			{
-				std::cout
-					<< "Warning: Elscint data seems to be not compressed"
-					<< std::endl;
+#ifdef ALIZA_VERBOSE
+				std::cout << "Warning: Elscint data seems to be not compressed" << std::endl;
+#endif
 			}
 			else
 			{
@@ -9359,9 +9398,9 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 			const size_t outputlen = 3 * h * w;
 			if (bv2l == outputlen)
 			{
-				std::cout
-					<< "Warning: Elscint data seems to be not compressed"
-					<< std::endl;
+#ifdef ALIZA_VERBOSE
+				std::cout << "Warning: Elscint data seems to be not compressed" << std::endl;
+#endif
 			}
 			else
 			{
@@ -9420,9 +9459,9 @@ bool DicomUtils::convert_elscint(const QString f, const QString outf)
 #endif
 	if (!writer.Write())
 	{
-		std::cout << "Error: can not write Elscint file "
-			<< outf.toStdString()
-			<< std::endl;
+#ifdef ALIZA_VERBOSE
+		std::cout << "Error: can not write Elscint file " << outf.toStdString() << std::endl;
+#endif
 		return false;
 	}
 	return true;
@@ -9574,8 +9613,9 @@ QString DicomUtils::read_buffer(
 					if (sizeof(void*) >= 8)
 					{
 						skip = false;
-						std::cout << "Warning: GetBufferLength()="
-							<< buffer_size_tmp << std::endl;
+#ifdef ALIZA_VERBOSE
+						std::cout << "Warning: GetBufferLength()=" << buffer_size_tmp << std::endl;
+#endif
 					}
 				}
 				if (skip)
@@ -9680,10 +9720,11 @@ QString DicomUtils::read_buffer(
 								}
 								else
 								{
-									std::cout
-										<< "warning: read_buffer() jj="
+#ifdef ALIZA_VERBOSE
+									std::cout << "warning: read_buffer() jj="
 										<< jj << " obuffer_size"
 										<< obuffer_size << std::endl;
+#endif
 								}
 							}
 							slice_overlays.insert(idx - 1, overlay);
@@ -9833,8 +9874,9 @@ QString DicomUtils::read_buffer(
 			}
 			else
 			{
-				std::cout << "Error: failed to change Planar Configuration 1 to 0"
-					<< std::endl;
+#ifdef ALIZA_VERBOSE
+				std::cout << "Error: failed to change Planar Configuration 1 to 0" << std::endl;
+#endif
 			}
 		}
 		//
@@ -10020,7 +10062,9 @@ QString DicomUtils::read_buffer(
 					}
 					else
 					{
+#ifdef ALIZA_VERBOSE
 						std::cout << f.toStdString() << " : rescaling failed" << std::endl;
+#endif
 						pixelformat = image_pixelformat;
 						delete [] rescaled_buffer;
 						rescaled_buffer = nullptr;
@@ -10231,7 +10275,9 @@ QString DicomUtils::read_buffer(
 					}
 					else
 					{
+#ifdef ALIZA_VERBOSE
 						std::cout << "Warning: failed to apply modality LUT" << std::endl;
+#endif
 						pixelformat = image_pixelformat;
 					}
 				}
@@ -10366,7 +10412,7 @@ QString DicomUtils::read_buffer(
 			if (icc_size > 0 && icc_profile  && (type_size == 1 || type_size == 2) &&
 				samples_per_pix == 3)
 			{
-#ifndef NDEBUG
+#ifdef ALIZA_VERBOSE
 				std::cout << "Using ICC profile" << std::endl;
 #endif
 				char * icc_tmp{};
@@ -10850,10 +10896,10 @@ QString DicomUtils::read_enhanced_common(
 				}
 				else
 				{
-					std::cout <<
-						"Multiple \"Segment Number\" values for the image,\n"
-						"check Settings for Enhanced Multi-frame IODs."
-						<< std::endl;
+#ifdef ALIZA_VERBOSE
+					std::cout << "Multiple \"Segment Number\" values for the image,\n"
+						"check Settings for Enhanced Multi-frame IODs." << std::endl;
+#endif
 				}
 			}
 			//
@@ -11592,8 +11638,7 @@ bool DicomUtils::enhanced_process_indices(
 #ifdef ENHANCED_PRINT_INFO
 		if (idx_values_size < 1)
 		{
-			std::cout << "Internal error in enhanced_process_indices: idx_values_size < 1"
-				<< std::endl;
+			std::cout << "Internal error in enhanced_process_indices: idx_values_size < 1" << std::endl;
 		}
 #endif
 #ifdef ENHANCED_PRINT_INFO
@@ -11662,7 +11707,6 @@ bool DicomUtils::enhanced_process_indices(
 									else
 									{
 										unsigned int tmp2_pos = idx_values.at(x).idx.at(dim3rd);
-#if 1
 										// Indices must start with "1", but there are files in the wild
 										// with indices starting with "0".
 										if (tmp2_pos >= 1)
@@ -11671,11 +11715,12 @@ bool DicomUtils::enhanced_process_indices(
 										}
 										else
 										{
+#ifdef ALIZA_VERBOSE
 											std::cout << "Error: indices can not start with \"0\"" << std::endl;
+#endif
 											error = true;
 											break;
 										}
-#endif
 										tmp2[idx_values.at(x).id] = tmp2_pos;
 										tmp2_test.push_back(tmp2_pos);
 									}
@@ -11736,8 +11781,7 @@ bool DicomUtils::enhanced_process_indices(
 								if (!warning0)
 								{
 									warning0 = true;
-									std::cout << "Warning: indices may be not consistent"
-										<< std::endl;
+									std::cout << "Warning: indices may be not consistent" << std::endl;
 								}
 							}
 #endif
@@ -11987,8 +12031,7 @@ bool DicomUtils::is_elscint(const mdcm::DataSet & ds)
 			else if (s.toUpper() == QString("LOSSLESS RICE"))
 			{
 #if 0
-				std::cout << "LOSSLESS RICE is currentry not supported"
-					<< std::endl;
+				std::cout << "LOSSLESS RICE is currentry not supported" << std::endl;
 #endif
 				return false;
 			}
@@ -12417,16 +12460,16 @@ bool DicomUtils::process_contrours_ref(
 						settings,
 						2,
 						enh_loading_type);
+#ifdef ALIZA_VERBOSE
 				if (!message_.isEmpty())
 				{
 					std::cout << message_.toStdString() << std::endl;
 				}
+#endif
 #if 0
 				if (ivariants.size() > 1)
 				{
-					std::cout <<
-						"process_contrours_ref : ivariants.size() > 1"
-						<< std::endl;
+					std::cout << "process_contrours_ref : ivariants.size() > 1" << std::endl;
 				}
 #endif
 				for (unsigned int j = 0; j < ivariants.size(); ++j)
@@ -13750,11 +13793,12 @@ QString DicomUtils::read_dicom(
 				{
 					elscint = true;
 				}
+#ifdef ALIZA_VERBOSE
 				else if (ts == mdcm::TransferSyntax::CT_private_ELE)
 				{
-					std::cout << "Warning: transfer syntax CT-private-ELE"
-						<< std::endl;
+					std::cout << "Warning: transfer syntax CT-private-ELE" << std::endl;
 				}
+#endif
 				if (is_multiframe(ds))
 				{
 					multiframe = true;

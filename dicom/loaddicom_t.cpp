@@ -23,13 +23,21 @@ void LoadDicom_T::run()
 	}
 	catch (const mdcm::ParseException & pe)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << "mdcm::ParseException in LoadDicom_T::run()\n"
 			<< pe.GetLastElement().GetTag() << std::endl;
+#else
+		(void)pe;
+#endif
 	}
 	catch (const std::exception & ex)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << "Exception in LoadDicom_T::run()\n"
 			<< ex.what() << std::endl;
+#else
+		(void)ex;
+#endif
 	}
 }
 

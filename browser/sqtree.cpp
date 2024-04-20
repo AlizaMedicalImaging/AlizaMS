@@ -1178,15 +1178,23 @@ void SQtree::read_file(const QString & f, const bool use_lock)
 	}
 	catch (const mdcm::ParseException & pe)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << "mdcm::ParseException in SQtree::read_file("
 			<< f.toStdString() << ", " << use_lock << "):\n"
 			<< pe.GetLastElement().GetTag() << std::endl;
+#else
+		(void)pe;
+#endif
 	}
 	catch (const std::exception & ex)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << "Exception in SQtree::read_file("
 			<< f.toStdString() << ", " << use_lock << "):\n"
 			<< ex.what() << std::endl;
+#else
+		(void)ex;
+#endif
 	}
 	treeWidget->expandToDepth(0);
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
@@ -1251,14 +1259,22 @@ void SQtree::read_file_and_series(const QString & ff, const bool use_lock)
 	}
 	catch (const mdcm::ParseException & pe)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout
 			<< "mdcm::ParseException in SQtree::open_file_and_series:\n"
 			<< pe.GetLastElement().GetTag() << std::endl;
+#else
+		(void)pe;
+#endif
 	}
 	catch (const std::exception & ex)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << "Exception in SQtree::open_file_and_series:\n"
 			<< ex.what() << std::endl;
+#else
+		(void)ex;
+#endif
 	}
 	int idx = -1;
 	const int files_size = files.size();

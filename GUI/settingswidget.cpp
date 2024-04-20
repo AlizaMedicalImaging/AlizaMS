@@ -95,7 +95,6 @@ void SettingsWidget::set_gl_visible(bool t)
 
 void SettingsWidget::set_default()
 {
-#if 1
 	{
 		QSettings settings(
 			QSettings::IniFormat,
@@ -109,12 +108,12 @@ void SettingsWidget::set_default()
 			const bool ok = QFile::remove(p);
 			if (!ok)
 			{
-				std::cout << "Could not remove config file"
-					<< std::endl;
+#ifdef ALIZA_VERBOSE
+				std::cout << "Could not remove config file" << std::endl;
+#endif
 			}
 		}
 	}
-#endif
 	styleComboBox->setCurrentIndex(0);
 	gl3D_checkBox->setChecked(true);
 	si_doubleSpinBox->setValue(1.2);

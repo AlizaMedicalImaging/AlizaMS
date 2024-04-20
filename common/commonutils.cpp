@@ -130,7 +130,7 @@ template<typename T> void calculate_min_max(
 	}
 	catch (const itk::ExceptionObject & ex)
 	{
-#if 0
+#ifdef ALIZA_VERBOSE
 		std::cout << ex.GetDescription() << std::endl;
 #endif
 		return;
@@ -149,8 +149,10 @@ template<typename T> void calculate_min_max(
 					iv->di->rmax = tmp0 - 1;
 					if (cubemin < iv->di->rmin || cubemax > iv->di->rmax)
 					{
+#ifdef ALIZA_VERBOSE
 						std::cout << "Warning: bits stored = " << iv->di->bits_stored
 							<< " (ignored), min = " << cubemin << ", max = " << cubemax << std::endl;
+#endif
 						iv->di->rmin = SHRT_MIN;
 						iv->di->rmax = SHRT_MAX;
 						iv->di->bits_stored = iv->di->bits_allocated;
@@ -173,8 +175,10 @@ template<typename T> void calculate_min_max(
 					iv->di->rmax = pow(2, (iv->di->bits_stored)) - 1;
 					if (cubemax > iv->di->rmax)
 					{
+#ifdef ALIZA_VERBOSE
 						std::cout << "Warning: bits stored = " << iv->di->bits_stored
 							<< " (ignored), min = 0, max = " << cubemax << std::endl;
+#endif
 						iv->di->rmax = USHRT_MAX;
 						iv->di->bits_stored = iv->di->bits_allocated;
 						iv->di->high_bit = iv->di->bits_stored - 1;
@@ -196,8 +200,10 @@ template<typename T> void calculate_min_max(
 					iv->di->rmax = pow(2, (iv->di->bits_stored)) - 1;
 					if (cubemax > iv->di->rmax)
 					{
+#ifdef ALIZA_VERBOSE
 						std::cout << "Warning: bits stored = " << iv->di->bits_stored
 							<< " (ignored), min = 0, max = " << cubemax << std::endl;
+#endif
 						iv->di->rmax = UCHAR_MAX;
 						iv->di->bits_stored = iv->di->bits_allocated;
 						iv->di->high_bit = iv->di->bits_stored - 1;
@@ -241,8 +247,10 @@ template<typename T> void calculate_min_max(
 					const double rmax = tmp0 - 1;
 					if (cubemin < rmin || cubemax > rmax)
 					{
+#ifdef ALIZA_VERBOSE
 						std::cout << "Warning: bits stored = " << iv->di->bits_stored
 							<< " (ignored), min = " << cubemin << ", max = " << cubemax << std::endl;
+#endif
 						iv->di->bits_stored = iv->di->bits_allocated;
 						iv->di->high_bit = iv->di->bits_stored - 1;
 					}
@@ -257,8 +265,10 @@ template<typename T> void calculate_min_max(
 					const double rmax = pow(2, (iv->di->bits_stored)) - 1;
 					if (cubemax > rmax)
 					{
+#ifdef ALIZA_VERBOSE
 						std::cout << "Warning: bits stored = " << iv->di->bits_stored
 							<< " (ignored), min = 0, max = " << cubemax << std::endl;
+#endif
 						iv->di->bits_stored = iv->di->bits_allocated;
 						iv->di->high_bit = iv->di->bits_stored - 1;
 					}
@@ -273,8 +283,10 @@ template<typename T> void calculate_min_max(
 					const double rmax = pow(2, (iv->di->bits_stored)) - 1;
 					if (cubemax > rmax)
 					{
+#ifdef ALIZA_VERBOSE
 						std::cout << "Warning: bits stored = " << iv->di->bits_stored
 							<< " (ignored), min = 0, max = " << cubemax << std::endl;
+#endif
 						iv->di->bits_stored = iv->di->bits_allocated;
 						iv->di->high_bit = iv->di->bits_stored - 1;
 					}
@@ -405,7 +417,11 @@ template <typename T> void calculate_rgb_minmax_(
 	}
 	catch (const itk::ExceptionObject & ex)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << ex.GetDescription() << std::endl;
+#else
+		(void)ex;
+#endif
 	}
 	double min_ = std::numeric_limits<double>::max();
 	double mins[3];
@@ -466,7 +482,11 @@ template <typename T> void calculate_rgba_minmax_(
 	}
 	catch (const itk::ExceptionObject & ex)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << ex.GetDescription() << std::endl;
+#else
+		(void)ex;
+#endif
 	}
 	double min_ = std::numeric_limits<double>::max();
 	double mins[4];
@@ -510,7 +530,11 @@ template<typename T> void get_dimensions(
 	}
 	catch (const itk::ExceptionObject & ex)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << ex.GetDescription() << std::endl;
+#else
+		(void)ex;
+#endif
 		return;
 	}
 	*dimx = size[0];
@@ -548,7 +572,7 @@ template<typename T> int generate_tex3d(
 	if (image.IsNull() || !ivariant || !gl) return 1;
 	if (size[0] < 1 || size[1] < 1)
 	{
-#if 0
+#ifdef ALIZA_VERBOSE
 		std::cout << "(size[0] < 1||size[1] < 1)" << std::endl;
 #endif
 		return 1;
@@ -657,7 +681,11 @@ template<typename T> int generate_tex3d(
 		}
 		catch (const itk::ExceptionObject & ex)
 		{
+#ifdef ALIZA_VERBOSE
 			std::cout << ex.GetDescription() << std::endl;
+#else
+		 	(void)ex;
+#endif
 			return 1;
 		}
 		if (out_image.IsNotNull()) out_image->DisconnectPipeline();
@@ -677,7 +705,7 @@ template<typename T> int generate_tex3d(
 	}
 	else
 	{
-#if 0
+#ifdef ALIZA_VERBOSE
 		std::cout << "out_image.IsNull()" << std::endl;
 #endif
 		return 1;
@@ -780,7 +808,11 @@ template<typename T> int generate_tex3d(
 	}
 	catch (const itk::ExceptionObject & ex)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << ex.GetDescription() << std::endl;
+#else
+		(void)ex;
+#endif
 		error__ = 4;
 		goto quit__;
 	}
@@ -954,8 +986,10 @@ template<typename T> int generate_tex3d(
 	}
 	else if (glerror__ != 0)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << "warning : OpenGL error " << std::hex << glerror__
 			<< std::dec << std::endl;
+#endif
 	}
 quit__:
 	delete [] float_buf;
@@ -983,7 +1017,11 @@ template<typename T> void calc_center_from_image(
 	}
 	catch (const itk::ExceptionObject & ex)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << ex.GetDescription() << std::endl;
+#else
+		(void)ex;
+#endif
 		return;
 	}
 	sVector3 v0 = sVector3(
@@ -1040,7 +1078,11 @@ template<typename T> void read_geometry_from_image(
 		}
 		catch (const itk::ExceptionObject & ex)
 		{
+#ifdef ALIZA_VERBOSE
 			std::cout << ex.GetDescription() << std::endl;
+#else
+			(void)ex;
+#endif
 			continue;
 		}
 		float x0 = p0[0], y0 = p0[1], z0 = p0[2];
@@ -1125,7 +1167,7 @@ template <typename T> bool reload_monochrome_image(
 	//
 	if (max_3d_tex_size > 0 && max_3d_tex_size < static_cast<int>(size[2]))
 	{
-#if 1
+#ifdef ALIZA_VERBOSE
 		std::cout << "Warning: can not use 3D texture, Z dim = "
 			<< static_cast<int>(size[2])
 			<< ", 3D max texture size = " << max_3d_tex_size
@@ -1201,26 +1243,25 @@ template <typename T> bool reload_monochrome_image(
 			}
 			else
 			{
+#ifdef ALIZA_VERBOSE
 				if (error__ == 2)
 				{
-					std::cout <<
-							"memory error (system)    "
+					std::cout << "memory error (system)    "
 							"... reducing texture size"
 						<< std::endl;
 				}
 				else if (error__ == 3)
 				{
-					std::cout <<
-							"memory error (graphics)  "
+					std::cout << "memory error (graphics)  "
 							"... reducing texture size"
 						<< std::endl;
 				}
 				else
 				{
-					std::cout
-						<< "error " << error__
+					std::cout << "error " << error__
 						<< std::endl;
 				}
+#endif
 				isize[0] *= 0.5;
 				isize[1] *= 0.5;
 				dspacing[0] *= 2.0;
@@ -1228,12 +1269,14 @@ template <typename T> bool reload_monochrome_image(
 				ivariant->di->close(generate_slices);
 				if (count__ > 64)
 				{
+#ifdef ALIZA_VERBOSE
 					std::cout
 						<< "exit from loop after "
 						<< count__
 						<< " iterations, x = "
 						<< isize[0] << ", y = "
 						<< isize[1] << std::endl;
+#endif
 					break;
 				}
 			}
@@ -2266,10 +2309,12 @@ QString CommonUtils::get_orientation2(const double * pat_orientation)
 			}
 		}
 	}
+#ifdef ALIZA_VERBOSE
 	if (print_oblique && oblique)
 	{
 		std::cout << "Oblique, closest to " << rai << std::endl;
 	}
+#endif
 	QString s = QString::fromLatin1(rai);
 	s.remove(QChar('\0'));
 	return s;
@@ -3497,10 +3542,12 @@ QString CommonUtils::gen_itk_image(bool * ok,
 	const bool cmyk = (pi == mdcm::PhotometricInterpretation::CMYK);
 	const bool argb = (pi == mdcm::PhotometricInterpretation::ARGB);
 	const bool hsv  = (pi == mdcm::PhotometricInterpretation::HSV);
+#ifdef ALIZA_VERBOSE
 	if (argb)
 	{
 		std::cout << "DICOM ARGB can be opened incorrectly" << std::endl;
 	}
+#endif
 	const unsigned short bits_allocated = pixelformat.GetBitsAllocated();
 	const unsigned short bits_stored    = pixelformat.GetBitsStored();
 	const unsigned short high_bit       = pixelformat.GetHighBit();
@@ -5129,7 +5176,9 @@ int CommonUtils::get_reference_count(const ImageVariant * v)
 {
 	if (!v)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << "Image is null (ref. count not possible)" << std::endl;
+#endif
 		return -1;
 	}
 	int x{};
@@ -5157,7 +5206,9 @@ int CommonUtils::get_reference_count(const ImageVariant * v)
 	if (v->pUC_rgba.IsNotNull()) {if (x > 0) {b = true;} x = v->pUC_rgba->GetReferenceCount();}
 	if (v->pF_rgba.IsNotNull())  {if (x > 0) {b = true;} x = v->pF_rgba->GetReferenceCount(); }
 	if (v->pD_rgba.IsNotNull())  {if (x > 0) {b = true;} x = v->pD_rgba->GetReferenceCount(); }
+#ifdef ALIZA_VERBOSE
 	std::cout << "Ref. count = " << x << (b ? ", multiple images" : " ") << std::endl;
+#endif
 	return x;
 }
 // clang-format on
@@ -5193,4 +5244,3 @@ void CommonUtils::linux_print_memusage(const std::string & s)
 #ifdef TRY_SUPPORT_YBR_PARTIAL_422
 #undef TRY_SUPPORT_YBR_PARTIAL_422
 #endif
-

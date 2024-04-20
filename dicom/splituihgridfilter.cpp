@@ -11,10 +11,7 @@
 #include <cmath>
 #include <vector>
 #include "dicomutils.h"
-
-#define ALIZA_SPLITUIH_VERBOSE
-
-#ifdef ALIZA_SPLITUIH_VERBOSE
+#ifdef ALIZA_VERBOSE
 #include <iostream>
 #endif
 
@@ -196,7 +193,7 @@ bool SplitUihGridFilter::Split()
 	unsigned int dims[3]{};
 	if (!ComputeUihGridDimensions(dims))
 	{
-#ifdef ALIZA_SPLITUIH_VERBOSE
+#ifdef ALIZA_VERBOSE
 		std::cout << "!ComputeUihGridDimensions" << std::endl;
 #endif
 		return false;
@@ -206,7 +203,7 @@ bool SplitUihGridFilter::Split()
 	double normal[3];
 	if (!ComputeUihGridSliceNormal(normal))
 	{
-#ifdef ALIZA_SPLITUIH_VERBOSE
+#ifdef ALIZA_VERBOSE
 		std::cout << "!ComputeUihGridSliceNormal" << std::endl;
 #endif
 		return false;
@@ -215,7 +212,7 @@ bool SplitUihGridFilter::Split()
 	double origin[3];
 	if (!ComputeUihGridSlicePosition(origin))
 	{
-#ifdef ALIZA_SPLITUIH_VERBOSE
+#ifdef ALIZA_VERBOSE
 		std::cout << "!ComputeUihGridSlicePosition" << std::endl;
 #endif
 		return false;
@@ -265,7 +262,7 @@ bool SplitUihGridFilter::Split()
 	}
 	if (!b)
 	{
-#ifdef ALIZA_SPLITUIH_VERBOSE
+#ifdef ALIZA_VERBOSE
 		std::cout << "!reorganize_uih_grid" << std::endl;
 #endif
 		return false;

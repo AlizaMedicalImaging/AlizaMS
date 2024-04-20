@@ -1281,7 +1281,9 @@ void GLWidget::init_opengl(int w, int h)
 			&fbo_depth);
 	if (!ok)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << "create_fbos0() failed" << std::endl;
+#endif
 	}
 	create_program(fsquad_vs, fsquad_fs, &fsquad_shader);
 	fsquad_shader.location_sampler[0] = glGetUniformLocation(fsquad_shader.program, "sampler0");
@@ -1328,7 +1330,9 @@ void GLWidget::init_opengl(int w, int h)
 			&backface_depth);
 	if (!ok)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << "create_fbos1() failed (1)"<< std::endl;
+#endif
 	}
 	ok = create_fbos1(FBO_SIZE__1, FBO_SIZE__1,
 			&frontfacebuffer,
@@ -1336,7 +1340,9 @@ void GLWidget::init_opengl(int w, int h)
 			&frontface_depth);
 	if (!ok)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << "create_fbos1() failed (2)"<< std::endl;
+#endif
 	}
 	create_program(raycast_vs, raycast_fs_bb, &raycast_shader_bb);
 	raycast_shader_bb.location_mvp        = glGetUniformLocation(raycast_shader_bb.program, "mvp");
@@ -1454,7 +1460,9 @@ void GLWidget::init_opengl(int w, int h)
 		&cube_depth);
 	if (!ok)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << "create_fbos0() failed (cube)"<< std::endl;
+#endif
 	}
 	//
 	cube = new qMeshData;
@@ -2889,7 +2897,9 @@ void GLWidget::gen_lut_tex(const unsigned char * lut, const int size, GLuint * t
 	const int glerror = glGetError();
 	if (glerror != 0)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << "gen_lut_tex() : OpenGL Error " << glerror << std::endl;
+#endif
 	}
 }
 
@@ -3745,6 +3755,7 @@ GLuint GLWidget::load_shader(GLenum shaderType, const char * pSource)
 				}
 				if (buf)
 				{
+#ifdef ALWAYS_SHOW_GL_ERROR
 					glGetShaderInfoLog(shader, infoLen, nullptr, buf);
 					const int shaderType_int = static_cast<int>(shaderType);
 					switch (shaderType_int)
@@ -3759,7 +3770,6 @@ GLuint GLWidget::load_shader(GLenum shaderType, const char * pSource)
 						std::cout << "Could not compile shader (type " << shaderType_int << ")\n" << std::endl;
 						break;
 					}
-#ifdef ALWAYS_SHOW_GL_ERROR
 					std::cout << buf << '\n' << pSource << '\n' << std::endl;
 #endif
 					delete [] buf;
@@ -3809,9 +3819,9 @@ bool GLWidget::create_program(
 				}
 				if (buf)
 				{
+#ifdef ALWAYS_SHOW_GL_ERROR
 					glGetProgramInfoLog(program, bufLength, nullptr, buf);
 					std::cout << "Could not link program" << std::endl;
-#ifdef ALWAYS_SHOW_GL_ERROR
 					std::cout << buf << '\n' << vertex << '\n' << fragment << std::endl;
 #endif
 					delete [] buf;
