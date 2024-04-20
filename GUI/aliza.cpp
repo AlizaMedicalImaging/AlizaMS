@@ -1122,13 +1122,21 @@ static void process_elscint_dir(
 		}
 		catch (const mdcm::ParseException & pe)
 		{
+#ifdef ALIZA_VERBOSE
 			std::cout << "mdcm::ParseException in process_elscint_dir:\n"
 				<< pe.GetLastElement().GetTag() << std::endl;
+#else
+			(void)pe;
+#endif
 		}
 		catch (const std::exception & ex)
 		{
+#ifdef ALIZA_VERBOSE
 			std::cout << "Exception in process_elscint_dir:\n"
 				<< ex.what() << std::endl;
+#else
+			(void)ex;
+#endif
 		}
 	}
 	filenames.clear();
@@ -1224,7 +1232,9 @@ bool Aliza::load_3d(
 		!ivariant->di->skip_texture &&
 		(ivariant->di->idimz != static_cast<int>(ivariant->di->image_slices.size())))
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << "ivariant->di->idimz != ivariant->di->image_slices.size()" << std::endl;
+#endif
 		ivariant->di->close();
 		ivariant->di->skip_texture = true;
 	}
@@ -4661,11 +4671,19 @@ QString Aliza::process_dicom(
 			}
 			catch (const mdcm::ParseException & pe)
 			{
+#ifdef ALIZA_VERBOSE
 				std::cout << pe.GetLastElement().GetTag() << std::endl;
+#else
+				(void)pe;
+#endif
 			}
 			catch (const std::exception & ex)
 			{
+#ifdef ALIZA_VERBOSE
 				std::cout << ex.what() << std::endl;
+#else
+				(void)ex;
+#endif
 			}
 		}
 	}
@@ -4688,10 +4706,12 @@ QString Aliza::process_dicom(
 				ivariants.at(x)->di->idimz !=
 				static_cast<int>(ivariants.at(x)->di->image_slices.size())))
 		{
+#ifdef ALIZA_VERBOSE
 			std::cout
 				<< "ivariants.at(" << x
 				<< ")->di->idimz != ivariants.at(" << x
 				<< ")->di->image_slices.size()" << std::endl;
+#endif
 			ivariants[x]->di->close();
 			ivariants[x]->di->skip_texture = true;
 		}
@@ -4828,11 +4848,19 @@ QString Aliza::process_dicom(
 			}
 			catch (const mdcm::ParseException & pe)
 			{
+#ifdef ALIZA_VERBOSE
 				std::cout << pe.GetLastElement().GetTag() << std::endl;
+#else
+				(void)pe;
+#endif
 			}
 			catch (const std::exception & ex)
 			{
+#ifdef ALIZA_VERBOSE
 				std::cout << ex.what() << std::endl;
+#else
+				(void)ex;
+#endif
 			}
 		}
 	}
@@ -4864,11 +4892,19 @@ QString Aliza::process_dicom(
 				}
 				catch (const mdcm::ParseException & pe)
 				{
+#ifdef ALIZA_VERBOSE
 					std::cout << pe.GetLastElement().GetTag() << std::endl;
+#else
+					(void)pe;
+#endif
 				}
 				catch (const std::exception & ex)
 				{
+#ifdef ALIZA_VERBOSE
 					std::cout << ex.what() << std::endl;
+#else
+					(void)ex;
+#endif
 				}
 			}
 		}
@@ -4901,11 +4937,19 @@ QString Aliza::process_dicom(
 				}
 				catch (const mdcm::ParseException & pe)
 				{
+#ifdef ALIZA_VERBOSE
 					std::cout << pe.GetLastElement().GetTag() << std::endl;
+#else
+					(void)pe;
+#endif
 				}
 				catch (const std::exception & ex)
 				{
+#ifdef ALIZA_VERBOSE
 					std::cout << ex.what() << std::endl;
+#else
+					(void)ex;
+#endif
 				}
 			}
 		}
@@ -4941,11 +4985,19 @@ QString Aliza::process_dicom(
 				}
 				catch (const mdcm::ParseException & pe)
 				{
+#ifdef ALIZA_VERBOSE
 					std::cout << pe.GetLastElement().GetTag() << std::endl;
+#else
+					(void)pe;
+#endif
 				}
 				catch (const std::exception & ex)
 				{
+#ifdef ALIZA_VERBOSE
 					std::cout << ex.what() << std::endl;
+#else
+					(void)ex;
+#endif
 				}
 			}
 		}

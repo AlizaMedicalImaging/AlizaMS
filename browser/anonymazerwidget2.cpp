@@ -129,14 +129,17 @@ void replace__(
 	}
 	else // should not happen
 	{
+#ifdef ALIZA_VERBOSE
 		if (vl != 0)
 		{
-			mdcmAlwaysWarnMacro("Cannot replace non-ASCII " << t << " " << vr << ", set to empty");
+			std::cout << "Cannot replace non-ASCII " << t << " " << vr << ", set to empty" << std::endl;
+	
 		}
 		else
 		{
-			mdcmAlwaysWarnMacro("Set non-ASCII " << t << " " << vr << " to empty");
+			std::cout << "Set non-ASCII " << t << " " << vr << " to empty" << std::endl;
 		}
+#endif
 		mdcm::DataElement de(t);
 		if (!implicit)
 		{
@@ -161,8 +164,7 @@ void replace_uid_recurs__(
 	const bool implicit,
 	const mdcm::Dicts & dicts)
 {
-	mdcm::DataSet::Iterator it = ds.Begin();
-	for (; it != ds.End();)
+	for (mdcm::DataSet::Iterator it = ds.Begin(); it != ds.End();)
 	{
 		const mdcm::DataElement & de1 = *it;
 		mdcm::DataSet::Iterator dup = it;
@@ -222,8 +224,7 @@ void replace_pn_recurs__(
 	const QString & charset,
 	const mdcm::Dicts & dicts)
 {
-	mdcm::DataSet::Iterator it = ds.Begin();
-	for (; it != ds.End();)
+	for (mdcm::DataSet::Iterator it = ds.Begin(); it != ds.End();)
 	{
 		const mdcm::DataElement & de1 = *it;
 		mdcm::Tag t = de1.GetTag();
@@ -246,8 +247,9 @@ void replace_pn_recurs__(
 						&ok);
 					if (!ok)
 					{
-						std::cout << "Warning: provided Patient Name may be incorrectly encoded"
-							<< std::endl;
+#ifdef ALIZA_VERBOSE
+						std::cout << "Warning: provided Patient Name may be incorrectly encoded" << std::endl;
+#endif
 					}
 					replace__(ds, t, ba.constData(), ba.size(), implicit, dicts);
 				}
@@ -316,8 +318,7 @@ void replace_id_recurs__(
 	const QString & charset,
 	const mdcm::Dicts & dicts)
 {
-	mdcm::DataSet::Iterator it = ds.Begin();
-	for (; it != ds.End();)
+	for (mdcm::DataSet::Iterator it = ds.Begin(); it != ds.End();)
 	{
 		const mdcm::DataElement & de1 = *it;
 		mdcm::Tag t = de1.GetTag();
@@ -340,8 +341,9 @@ void replace_id_recurs__(
 						&ok);
 					if (!ok)
 					{
-						std::cout << "Warning: provided Patient ID may be incorrectly encoded"
-							<< std::endl;
+#ifdef ALIZA_VERBOSE
+						std::cout << "Warning: provided Patient ID may be incorrectly encoded" << std::endl;
+#endif
 					}
 					replace__(ds, t, ba.constData(), ba.size(), implicit, dicts);
 				}
@@ -406,8 +408,7 @@ void remove_recurs__(
 	const bool implicit,
 	const mdcm::Dicts & dicts)
 {
-	mdcm::DataSet::Iterator it = ds.Begin();
-	for (; it != ds.End();)
+	for (mdcm::DataSet::Iterator it = ds.Begin(); it != ds.End();)
 	{
 		const mdcm::DataElement & de1 = *it;
 		mdcm::Tag t = de1.GetTag();
@@ -448,8 +449,7 @@ void zero_sq_recurs__(
 	const bool implicit,
 	const mdcm::Dicts & dicts)
 {
-	mdcm::DataSet::Iterator it = ds.Begin();
-	for (; it != ds.End();)
+	for (mdcm::DataSet::Iterator it = ds.Begin(); it != ds.End();)
 	{
 		const mdcm::DataElement & de1 = *it;
 		mdcm::Tag t = de1.GetTag();
@@ -499,8 +499,7 @@ void remove_date_time_recurs__(
 	const bool implicit,
 	const mdcm::Dicts & dicts)
 {
-	mdcm::DataSet::Iterator it = ds.Begin();
-	for (; it != ds.End();)
+	for (mdcm::DataSet::Iterator it = ds.Begin(); it != ds.End();)
 	{
 		const mdcm::DataElement & de1 = *it;
 		mdcm::Tag t = de1.GetTag();
@@ -558,8 +557,7 @@ bool find_time_less_1h_recurs__(
 	const bool implicit,
 	const mdcm::Dicts & dicts)
 {
-	mdcm::DataSet::ConstIterator it = ds.Begin();
-	for (; it != ds.End();)
+	for (mdcm::DataSet::ConstIterator it = ds.Begin(); it != ds.End();)
 	{
 		const mdcm::DataElement & de1 = *it;
 		mdcm::Tag t = de1.GetTag();
@@ -656,8 +654,7 @@ void modify_date_time_recurs__(
 	const int d_off,
 	const int s_off)
 {
-	mdcm::DataSet::Iterator it = ds.Begin();
-	for (; it != ds.End();)
+	for (mdcm::DataSet::Iterator it = ds.Begin(); it != ds.End();)
 	{
 		const mdcm::DataElement & de1 = *it;
 		mdcm::Tag t = de1.GetTag();
@@ -773,7 +770,7 @@ void modify_date_time_recurs__(
 									{
 										if (tmp0 >= 0 && tmp1 >= 0)
 										{
-											;; // error
+											; // error
 										}
 										else if (tmp0 >= 4)
 										{
@@ -814,7 +811,7 @@ void modify_date_time_recurs__(
 										d = d.addDays(-d_off);
 										if (less1h)
 										{
-											;;
+											;
 										}
 										else
 										{
@@ -830,7 +827,7 @@ void modify_date_time_recurs__(
 										d = d.addDays(-d_off);
 										if (less1h)
 										{
-											;;
+											;
 										}
 										else
 										{
@@ -846,7 +843,7 @@ void modify_date_time_recurs__(
 										d = d.addDays(-d_off);
 										if (less1h)
 										{
-											;;
+											;
 										}
 										else
 										{
@@ -863,7 +860,7 @@ void modify_date_time_recurs__(
 										d = d.addDays(-d_off);
 										if (less1h)
 										{
-											;;
+											;
 										}
 										else
 										{
@@ -919,8 +916,7 @@ void empty_recurs__(
 	const bool implicit,
 	const mdcm::Dicts & dicts)
 {
-	mdcm::DataSet::Iterator it = ds.Begin();
-	for (; it != ds.End();)
+	for (mdcm::DataSet::Iterator it = ds.Begin(); it != ds.End();)
 	{
 		const mdcm::DataElement & de1 = *it;
 		mdcm::DataSet::Iterator dup = it;
@@ -960,8 +956,7 @@ void remove_private__(
 	const bool implicit,
 	const mdcm::Dicts & dicts)
 {
-	mdcm::DataSet::Iterator it = ds.Begin();
-	for (;it != ds.End();)
+	for (mdcm::DataSet::Iterator it = ds.Begin();it != ds.End();)
 	{
 		const mdcm::DataElement & de1 = *it;
 		mdcm::DataSet::Iterator dup = it;
@@ -1018,7 +1013,7 @@ bool check_overlay_in_pixeldata(const mdcm::DataSet & ds)
 			mdcm::Tag tOverlayBitpos(t.GetGroup(),0x0102);
 			if (ds.FindDataElement(tOverlayData))
 			{
-				;;
+				;
 			}
 			else if (ds.FindDataElement(tOverlayBitpos))
 			{
@@ -1034,8 +1029,7 @@ bool check_overlay_in_pixeldata(const mdcm::DataSet & ds)
 void remove_overlays__(mdcm::DataSet & ds)
 {
 	std::vector<mdcm::Tag> tmp0;
-	mdcm::DataSet::Iterator it = ds.Begin();
-	for (; it != ds.End(); ++it)
+	for (mdcm::DataSet::Iterator it = ds.Begin(); it != ds.End(); ++it)
 	{
 		const mdcm::DataElement & de = *it;
 		mdcm::Tag t = de.GetTag();
@@ -1050,9 +1044,8 @@ void remove_overlays__(mdcm::DataSet & ds)
 
 void remove_curves__(mdcm::DataSet & ds)
 {
-	mdcm::DataSet::Iterator it = ds.Begin();
 	std::vector<mdcm::Tag> tmp0;
-	for (; it != ds.End(); ++it)
+	for (mdcm::DataSet::Iterator it = ds.Begin(); it != ds.End(); ++it)
 	{
 		const mdcm::DataElement & de = *it;
 		mdcm::Tag t = de.GetTag();
@@ -1070,8 +1063,7 @@ void remove_group_length__(
 	const bool implicit,
 	const mdcm::Dicts & dicts)
 {
-	mdcm::DataSet::Iterator it = ds.Begin();
-	for (; it != ds.End();)
+	for (mdcm::DataSet::Iterator it = ds.Begin(); it != ds.End();)
 	{
 		const mdcm::DataElement & de1 = *it;
 		mdcm::DataSet::Iterator dup = it;
@@ -2191,13 +2183,19 @@ void build_maps(
 		}
 		catch (const mdcm::ParseException & pe)
 		{
-			std::cout << "mdcm::ParseException in build_maps:\n"
-				<< pe.GetLastElement().GetTag() << std::endl;
+#ifdef ALIZA_VERBOSE
+			std::cout << "mdcm::ParseException in build_maps:\n" << pe.GetLastElement().GetTag() << std::endl;
+#else
+			(void)pe;
+#endif
 		}
 		catch (const std::exception & ex)
 		{
-			std::cout << "Exception in build_maps:\n"
-				<< ex.what() << std::endl;
+#ifdef ALIZA_VERBOSE
+			std::cout << "Exception in build_maps:\n" << ex.what() << std::endl;
+#else
+			(void)ex;
+#endif
 		}
 	}
 // UIDs
@@ -2793,14 +2791,22 @@ void AnonymazerWidget2::run_()
 	}
 	catch (const mdcm::ParseException & pe)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout
 			<< "mdcm::ParseException in AnonymazerWidget2::run_\n"
 			<< pe.GetLastElement().GetTag() << std::endl;
+#else
+			(void)pe;
+#endif
 	}
 	catch (const std::exception & ex)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << "Exception in AnonymazerWidget2::run_\n"
 			<< ex.what() << std::endl;
+#else
+			(void)ex;
+#endif
 	}
 	QString message;
 	if (count_errors > 0)
@@ -3341,4 +3347,3 @@ void AnonymazerWidget2::init_profile()
 	dev_remove_tags     .insert(mdcm::Tag(0x0018,0x9373));// X-Ray Detector Label
 	dev_replace_tags    .insert(mdcm::Tag(0x0018,0x9367));// X-Ray Source ID
 }
-

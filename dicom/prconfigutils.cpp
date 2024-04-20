@@ -181,10 +181,12 @@ template<typename Tin, typename Tout> QString apply_lut(
 		iterator.GoToBegin();
 		out_iterator.GoToBegin();
 		const size_t data_s = data.size();
+#ifdef ALIZA_VERBOSE
 		if (static_cast<size_t>(d0) != data_s)
 		{
 			std::cout << "Warning: LUT descriptor[0]=" << d0 << " does not match LUT data size " << data_s << std::endl;
 		}
+#endif
 		while (!iterator.IsAtEnd())
 		{
 			int idx = static_cast<int>(iterator.Get());
@@ -393,7 +395,11 @@ template<typename T> bool is_signed(const typename T::Pointer & image)
 	}
 	catch (const itk::ExceptionObject & ex)
 	{
+#ifdef ALIZA_VERBOSE
 		std::cout << ex.GetDescription() << std::endl;
+#else
+		(void)ex;
+#endif
 		return false;
 	}
 	return (min_ < 0);
@@ -1334,8 +1340,10 @@ QString voi_lut_slice_by_slice(
 			}
 			if (idxs.empty())
 			{
+#ifdef ALIZA_VERBOSE
 				std::cout << "Warning: something went wrong (1)\n"
 					<< "    idxs.size() < 1, but k = " << k << " " << uid.toStdString() << std::endl;
+#endif
 				continue;
 			}
 			for (int x = 0; x < idxs.size(); ++x)
@@ -1443,7 +1451,9 @@ QString voi_lut_slice_by_slice(
 										}
 										catch (const itk::ExceptionObject & ex)
 										{
+#ifdef ALIZA_VERBOSE
 											std::cout << ex.GetDescription() << std::endl;
+#endif
 											continue;
 										}
 										FrameLevel fl;
@@ -1461,18 +1471,22 @@ QString voi_lut_slice_by_slice(
 								{
 									v->frame_levels[idxs.at(x)] = ivariant->frame_levels.value(idxs.at(x));
 								}
+#ifdef ALIZA_VERBOSE
 								else
 								{
 									std::cout << "Internal error, !ivariant->frame_levels.contains("
 										<< idxs.at(x) << ")" << std::endl;
 								}
+#endif
 							}
 #endif
 						}
 					}
 					else
 					{
+#ifdef ALIZA_VERBOSE
 						std::cout << "Internal error, k = " << k << std::endl;
+#endif
 					}
 				}
 			}
@@ -1544,8 +1558,10 @@ void areas_slice_by_slice(
 			}
 			if (idxs.empty())
 			{
+#ifdef ALIZA_VERBOSE
 				std::cout << "Warning: something went wrong (2)\n"
 					<< "    idxs.size() < 1, but k = " << k << " " << uid.toStdString() << std::endl;
+#endif
 				continue;
 			}
 			for (int x = 0; x < idxs.size(); ++x)
@@ -1667,8 +1683,10 @@ void text_slice_by_slice(
 			}
 			if (idxs.empty())
 			{
+#ifdef ALIZA_VERBOSE
 				std::cout << "Warning: something went wrong (3)\n"
 					<< "    idxs.size() < 1, but k = " << k << " " << uid.toStdString() << std::endl;
+#endif
 				continue;
 			}
 			for (int x = 0; x < idxs.size(); ++x)
@@ -1793,8 +1811,10 @@ void graphic_slice_by_slice(
 			}
 			if (idxs.empty())
 			{
+#ifdef ALIZA_VERBOSE
 				std::cout << "Warning: something went wrong (4)\n"
 					<< "    idxs.size() < 1, but k = " << k << " " << uid.toStdString() << std::endl;
+#endif
 				continue;
 			}
 			for (int x = 0; x < idxs.size(); ++x)
@@ -1938,10 +1958,12 @@ void read_overlays(
 					{
 						overlay.data.push_back(tmp0[jj]);
 					}
+#ifdef ALIZA_VERBOSE
 					else
 					{
 						std::cout << "warning: read_overlays() jj=" << jj << " obuffer_size" << obuffer_size << std::endl;
 					}
+#endif
 				}
 				slice_overlays.insert(idx - 1, overlay);
 #if 0
@@ -2166,7 +2188,9 @@ void PrConfigUtils::read_voi_lut(
 				const unsigned int number_of_items1 = sq1->GetNumberOfItems();
 				if (number_of_items1 < 1)
 				{
+#ifdef ALIZA_VERBOSE
 					std::cout << "Warning: empty ref. image sequence" << std::endl;
+#endif
 					c.values.push_back(QVariant(QString(""))); // 7+
 					c.values.push_back(QVariant(QString(""))); //
 				}
@@ -2191,7 +2215,9 @@ void PrConfigUtils::read_voi_lut(
 						}
 						else
 						{
+#ifdef ALIZA_VERBOSE
 							std::cout << "Warning: could not get ref. sop instance" << std::endl;
+#endif
 							c.values.push_back(QVariant(QString(""))); // 7+
 							c.values.push_back(QVariant(QString(""))); //
 						}
@@ -2203,7 +2229,9 @@ void PrConfigUtils::read_voi_lut(
 				const int ref_images_size = ref.images.size();
 				if (ref_images_size < 1)
 				{
+#ifdef ALIZA_VERBOSE
 					std::cout << "Warning: ref. images size is 0" << std::endl;
+#endif
 					c.values.push_back(QVariant(QString(""))); // 7+
 					c.values.push_back(QVariant(QString(""))); //
 				}
@@ -3341,7 +3369,9 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 			}
 			else
 			{
+#ifdef ALIZA_VERBOSE
 				std::cout << error.toStdString() << std::endl;
+#endif
 				delete v;
 				return nullptr;
 			}
@@ -3387,7 +3417,9 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 			}
 			else
 			{
+#ifdef ALIZA_VERBOSE
 				std::cout << error.toStdString() << std::endl;
+#endif
 				delete v;
 				return nullptr;
 			}
@@ -3451,7 +3483,9 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				signed_image);
 			if (!error.isEmpty())
 			{
+#ifdef ALIZA_VERBOSE
 				std::cout << error.toStdString() << std::endl;
+#endif
 				delete v;
 				return nullptr;
 			}
@@ -3506,7 +3540,9 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 			}
 			else
 			{
+#ifdef ALIZA_VERBOSE
 				std::cout << error.toStdString() << std::endl;
+#endif
 				delete v;
 				return nullptr;
 			}
@@ -3534,7 +3570,9 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 				}
 				else
 				{
+#ifdef ALIZA_VERBOSE
 					std::cout << error.toStdString() << std::endl;
+#endif
 					delete v;
 					return nullptr;
 				}
@@ -3651,10 +3689,12 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 						set_spacing<ImageTypeF>(v->pF, px, py);
 					}
 				}
+#ifdef ALIZA_VERBOSE
 				else
 				{
 					std::cout << "Warning: possible different spacing for slices in Display Areas, not supported" << std::endl;
 				}
+#endif
 			}
 			//
 			const double ax = aspect_ratios1.value(0);
@@ -3703,10 +3743,12 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 						set_asp_ratio<ImageTypeF>(v->pF, ax, ay);
 					}
 				}
+#ifdef ALIZA_VERBOSE
 				else
 				{
 					std::cout << "Warning: possible different aspect for slices in Display Areas, not supported" << std::endl;
 				}
+#endif
 			}
 			//
 			areas_slice_by_slice(
@@ -3750,7 +3792,9 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 					}
 					if (!error.isEmpty())
 					{
+#ifdef ALIZA_VERBOSE
 						std::cout << error.toStdString() << std::endl;
+#endif
 						delete v;
 						return nullptr;
 					}

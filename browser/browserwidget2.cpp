@@ -190,14 +190,20 @@ void BrowserWidget2::read_directory(const QString & p)
 	}
 	catch (const mdcm::ParseException & pe)
 	{
-		std::cout
-			<< "mdcm::ParseException in BrowserWidget2::read_directory:\n"
+#ifdef ALIZA_VERBOSE
+		std::cout << "mdcm::ParseException in BrowserWidget2::read_directory:\n"
 			<< pe.GetLastElement().GetTag() << std::endl;
+#else
+		(void)pe;
+#endif
 	}
 	catch (const std::exception & ex)
 	{
-		std::cout << "Exception in BrowserWidget2::read_directory:\n"
-			<< ex.what() << std::endl;
+#ifdef ALIZA_VERBOSE
+		std::cout << "Exception in BrowserWidget2::read_directory:\n" << ex.what() << std::endl;
+#else
+		(void)ex;
+#endif
 	}
 	pb->close();
 	delete pb;
@@ -458,14 +464,20 @@ void BrowserWidget2::open_DICOMDIR2(const QString & f)
 	}
 	catch (const mdcm::ParseException & pe)
 	{
-		std::cout
-			<< "mdcm::ParseException in BrowserWidget2::open_DICOMDIR2:\n"
+#ifdef ALIZA_VERBOSE
+		std::cout << "mdcm::ParseException in BrowserWidget2::open_DICOMDIR2:\n"
 			<< pe.GetLastElement().GetTag() << std::endl;
+#else
+		(void)pe;
+#endif
 	}
 	catch (const std::exception & ex)
 	{
-		std::cout << "Exception in BrowserWidget2::open_DICOMDIR2:\n"
-			<< ex.what() << std::endl;
+#ifdef ALIZA_VERBOSE
+		std::cout << "Exception in BrowserWidget2::open_DICOMDIR2:\n" << ex.what() << std::endl;
+#else
+		(void)ex;
+#endif
 	}
 	if (!warning.isEmpty())
 	{
@@ -577,14 +589,20 @@ void BrowserWidget2::reload_dir()
 			}
 			catch (const mdcm::ParseException & pe)
 			{
-				std::cout
-					<< "mdcm::ParseException in BrowserWidget2::reload_dir:\n"
+#ifdef ALIZA_VERBOSE
+				std::cout << "mdcm::ParseException in BrowserWidget2::reload_dir:\n"
 					<< pe.GetLastElement().GetTag() << std::endl;
+#else
+				(void)pe;
+#endif
 			}
 			catch (const std::exception & ex)
 			{
-				std::cout << "Exception in BrowserWidget2::reload_dir:\n"
-					<< ex.what() << std::endl;
+#ifdef ALIZA_VERBOSE
+				std::cout << "Exception in BrowserWidget2::reload_dir:\n" << ex.what() << std::endl;
+#else
+				(void)ex;
+#endif
 			}
 			if (!warning.isEmpty())
 			{
@@ -1936,7 +1954,7 @@ void BrowserWidget2::open_CTK_db()
 			if (!fi1.exists())
 			{
 				++count_missing_files;
-#if 1
+#if 0
 				std::cout << "File not found: " << f1.toStdString() << std::endl;
 #endif
 			}

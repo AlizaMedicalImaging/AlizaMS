@@ -232,7 +232,7 @@ bool generate_spectorscopy_geometry(
 				))
 			{
 				invalidate_volume = true;
-#if 1
+#ifdef ALIZA_VERBOSE
 				std::cout
 					<< "Warning:\n"
 					<< "Direction cosines defined in DICOM file: "
@@ -462,8 +462,7 @@ QString SpectroscopyUtils::ProcessData(
 			idx_values_tmp.clear();
 			idx_values_rebuild = true;
 #if 0
-			std::cout << "stack id and position without dim. org."
-				<< std::endl;
+			std::cout << "stack id and position without dim. org." << std::endl;
 #endif
 		}
 	}
@@ -507,7 +506,6 @@ QString SpectroscopyUtils::ProcessData(
 		<< " dim3rd=" << dim3rd
 		<< std::endl;
 #endif
-
 	std::vector <
 		std::map<
 			unsigned int,
@@ -517,8 +515,7 @@ QString SpectroscopyUtils::ProcessData(
 		tmp0, idx_values, values,
 		dim8th, dim7th, dim6th, dim5th, dim4th, dim3rd, false);
 #if 0
-	std::cout << "enhanced_process_indices = "
-		<< ok__ << std::endl;
+	std::cout << "enhanced_process_indices = " << ok__ << std::endl;
 #endif
 	if (!ok__)
 	{
@@ -578,8 +575,7 @@ QString SpectroscopyUtils::ProcessData(
 		if (tmp0.at(x).size() != tmp1.size())
 		{
 #if 1
-			std::cout << "tmp0.at(x).size() != tmp1.size()"
-				<< std::endl;
+			std::cout << "tmp0.at(x).size() != tmp1.size()" << std::endl;
 #endif
 			continue;
 		}
@@ -632,9 +628,8 @@ QString SpectroscopyUtils::ProcessData(
 					}
 					else
 					{
-#if 1
-						std::cout << "!(ok_o && ok_p)"
-							<< std::endl;
+#ifdef ALIZA_VERBOSE
+						std::cout << "!(ok_o && ok_p)" << std::endl;
 #endif
 						error = true;
 						break;
@@ -642,9 +637,8 @@ QString SpectroscopyUtils::ProcessData(
 				}
 				else
 				{
-#if 1
-					std::cout << "pat_pos / pat_orient empty"
-						<< std::endl;
+#ifdef ALIZA_VERBOSE
+					std::cout << "pat_pos / pat_orient empty" << std::endl;
 #endif
 					error = true;
 					break;
@@ -663,7 +657,7 @@ QString SpectroscopyUtils::ProcessData(
 			else
 			{
 				error = true;
-#if 1
+#ifdef ALIZA_VERBOSE
 				std::cout << "!(idx__<data.size() && data.at(idx__)"
 					" && idx__<values.size())" << std::endl;
 #endif
@@ -716,7 +710,7 @@ QString SpectroscopyUtils::ProcessData(
 			}
 			else
 			{
-#if 1
+#ifdef ALIZA_VERBOSE
 				std::cout << "!spacing_ok" << std::endl;
 #endif
 				continue;
@@ -736,14 +730,14 @@ QString SpectroscopyUtils::ProcessData(
 				0.01f);
 			if (!geom_ok)
 			{
-#if 1
+#ifdef ALIZA_VERBOSE
 				std::cout << "!geom_ok" << std::endl;
 #endif
 				continue;
 			}
 			if (slices.empty())
 			{
-#if 1
+#ifdef ALIZA_VERBOSE
 				std::cout << "slices.size()<1" << std::endl;
 #endif
 				continue;
