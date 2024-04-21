@@ -374,7 +374,7 @@ bool SpectroscopyUtils::Read(const mdcm::DataSet & ds, SpectroscopyData * s)
 		}
 	}
 
-#if LOAD_SPECT_DATA
+#ifdef LOAD_SPECT_DATA
 	if (!DicomUtils::get_fl_values(ds, tSpectroscopyData, s->m_SpectroscopyData))
 		return false;
 #endif
@@ -391,7 +391,7 @@ bool SpectroscopyUtils::Read(const mdcm::DataSet & ds, SpectroscopyData * s)
 		s->m_SignalDomainRows = std::move(SignalDomainRows);
 	}
 
-#if LOAD_SPECT_DATA
+#ifdef LOAD_SPECT_DATA
 	DicomUtils::get_fl_values(ds, tFirstOrderPhaseCorrectionAngle, s->m_FirstOrderPhaseCorrectionAngle);
 #endif
 
@@ -413,7 +413,7 @@ QString SpectroscopyUtils::ProcessData(
 	DimIndexValues idx_values;
 	FrameGroupValues values;
 	FrameGroupValues shared_values;
-#if LOAD_SPECT_DATA
+#ifdef LOAD_SPECT_DATA
 	std::vector<float*> data;
 #endif
 	DicomUtils::read_dimension_index_sq(ds, sq);
@@ -574,7 +574,7 @@ QString SpectroscopyUtils::ProcessData(
 		}
 		if (tmp0.at(x).size() != tmp1.size())
 		{
-#if 1
+#ifdef ALIZA_VERBOSE
 			std::cout << "tmp0.at(x).size() != tmp1.size()" << std::endl;
 #endif
 			continue;
@@ -622,7 +622,7 @@ QString SpectroscopyUtils::ProcessData(
 						ss[7] = pat_orient[4];
 						ss[8] = pat_orient[5];
 						tmp4.push_back(ss);
-#if LOAD_SPECT_DATA
+#ifdef LOAD_SPECT_DATA
 						tmp3.push_back(data.at(idx__));
 #endif
 					}
