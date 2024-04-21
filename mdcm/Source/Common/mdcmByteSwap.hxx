@@ -23,6 +23,7 @@
 #define MDCMBYTESWAP_TXX
 
 #include "mdcmByteSwap.h"
+#include "mdcmTrace.h"
 #include <iostream>
 #include <cstdlib>
 
