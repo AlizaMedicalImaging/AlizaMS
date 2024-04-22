@@ -79,7 +79,7 @@ StudyViewWidget::StudyViewWidget(bool vertical, bool tab, float si)
 	l2->setContentsMargins(0, 0, 0, 0);
 	l2->setSpacing(0);
 	l2->addWidget(lutwidget);
-	QGridLayout * gridLayout = new QGridLayout(frame);
+	QGridLayout * gridLayout = new QGridLayout(scrollAreaWidgetContents);
 	(void)gridLayout;
 	//
 	if (in_tab)
@@ -110,7 +110,7 @@ StudyViewWidget::StudyViewWidget(bool vertical, bool tab, float si)
 
 StudyViewWidget::~StudyViewWidget()
 {
-	QGridLayout * layout = static_cast<QGridLayout*>(frame->layout());
+	QGridLayout * layout = static_cast<QGridLayout*>(scrollAreaWidgetContents->layout());
 	if (layout)
 	{
 		const int r = layout->rowCount();
@@ -219,7 +219,7 @@ void StudyViewWidget::clear_()
 			}
 		}
 	}
-	QGridLayout * layout = static_cast<QGridLayout*>(frame->layout());
+	QGridLayout * layout = static_cast<QGridLayout*>(scrollAreaWidgetContents->layout());
 	if (!layout) return;
 	const int r = layout->rowCount();
 	const int c = layout->columnCount();
@@ -240,7 +240,7 @@ void StudyViewWidget::clear_()
 		}
 	}
 	delete layout;
-	layout = new QGridLayout(frame);
+	layout = new QGridLayout(scrollAreaWidgetContents);
 }
 
 bool StudyViewWidget::get_in_tab() const
@@ -457,7 +457,7 @@ void StudyViewWidget::update_grid(int r, int c)
 			}
 		}
 	}
-	QGridLayout * layout = static_cast<QGridLayout*>(frame->layout());
+	QGridLayout * layout = static_cast<QGridLayout*>(scrollAreaWidgetContents->layout());
 	if (layout)
 	{
 		const int ar = layout->rowCount();
@@ -481,7 +481,7 @@ void StudyViewWidget::update_grid(int r, int c)
 		delete layout;
 		layout = nullptr;
 	}
-	QGridLayout * gridLayout = new QGridLayout(frame);
+	QGridLayout * gridLayout = new QGridLayout(scrollAreaWidgetContents);
 	int j = 0;
 	for (int x = 0; x < r; ++x)
 	{
@@ -1086,7 +1086,7 @@ void StudyViewWidget::update_all_sliders(int wid, int x, int dimz)
 
 void StudyViewWidget::set_single(int wid)
 {
-	QGridLayout * layout = static_cast<QGridLayout*>(frame->layout());
+	QGridLayout * layout = static_cast<QGridLayout*>(scrollAreaWidgetContents->layout());
 	if (!layout)
 	{
 		// should never happen
@@ -1139,7 +1139,7 @@ void StudyViewWidget::set_single(int wid)
 	active_id = -1;
 	if (selected)
 	{
-		QGridLayout * gridLayout = new QGridLayout(frame);
+		QGridLayout * gridLayout = new QGridLayout(scrollAreaWidgetContents);
 		gridLayout->addWidget(selected, 0, 0);
 		selected->show();
 		if (selected->graphicswidget)

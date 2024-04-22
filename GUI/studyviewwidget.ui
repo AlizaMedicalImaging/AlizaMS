@@ -37,19 +37,26 @@
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="frame">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
+    <widget class="QScrollArea" name="scrollArea">
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
      <property name="frameShadow">
       <enum>QFrame::Plain</enum>
      </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>992</width>
+        <height>636</height>
+       </rect>
+      </property>
+     </widget>
     </widget>
    </item>
    <item>
@@ -522,6 +529,7 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>scrollArea</tabstop>
   <tabstop>lock_pushButton</tabstop>
   <tabstop>center_doubleSpinBox</tabstop>
   <tabstop>width_doubleSpinBox</tabstop>
