@@ -21,16 +21,15 @@
     <ul>
       <li>2D and 3D views with many tools</li>
       <li>3D view also for non-uniform images</li>
-      <li>Volume Rendering</li>
-      <li>Multi-planar reconstruction (MPR)</li>
-      <li>Fast directory scanner, DICOMDIR</li>
       <li>Consistently de-identify DICOM, maintain integrity</li>
-      <li>RTSTRUCT contours</li>
       <li>DICOM Study multi-view with intersection lines and side-by-side view</li>
-      <li>Proper measurement in Ultrasound Calibrated Regions</li>
+      <li>Volume Rendering, multi-planar reconstruction (MPR)</li>
       <li>2D+t and 3D+t animations</li>
       <li>DICOM metadata viewer, DICOM 2024b dictionary</li>
-      <li>Encapsulated transfer syntaxes incl. HTJ2K</li>
+      <li>Fast directory scanner, DICOMDIR</li>
+      <li>RTSTRUCT contours</li>
+      <li>Proper measurement in Ultrasound Calibrated Regions</li>
+      <li>Encapsulated transfer syntaxes incl. J2K and HTJ2K</li>
       <li>Most IODs are supported incl. Structured Reports, Key Objects Selection, Grayscale Softcopy Presentation State</li>
     </ul>
   </description>
@@ -61,24 +60,25 @@
   <screenshots>
     <screenshot type="default">
 	  <caption>Main Window</caption>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.8/package/art/alizams_scr1.jpg</image>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.9/package/art/alizams_scr1.jpg</image>
     </screenshot>
     <screenshot>
 	  <caption>Multi-view</caption>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.8/package/art/alizams_scr2.jpg</image>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.9/package/art/alizams_scr2.jpg</image>
     </screenshot>
     <screenshot>
 	  <caption>Metadata Viewer</caption>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.8/package/art/alizams_scr3.jpg</image>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.9/package/art/alizams_scr3.jpg</image>
     </screenshot>
   </screenshots>
   <releases>
-    <release date="2024-04-01" version="1.9.8">
+    <release date="2024-04-22" version="1.9.9">
       <description>
-        <p>Release 1.9.8</p>
+        <p>Release 1.9.9</p>
       </description>
-      <url>https://github.com/AlizaMedicalImaging/AlizaMS/releases/tag/v1.9.8</url>
+      <url>https://github.com/AlizaMedicalImaging/AlizaMS/releases/tag/v1.9.9</url>
     </release>
+    <release date="2024-04-01" version="1.9.8"/>
     <release date="2024-01-08" version="1.9.7"/>
     <release date="2023-10-05" version="1.9.5"/>
     <release date="2023-07-23" version="1.9.3"/>
