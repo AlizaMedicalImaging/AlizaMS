@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
   <id>alizams.desktop</id>
+  <launchable type="desktop-id">alizams.desktop</launchable>
   <name>Aliza MS</name>
+  <developer id="com.github.AlizaMedicalImaging">
+    <name>Aliza Medical Imaging Team</name>
+  </developer>
   <summary>A DICOM viewer</summary>
   <metadata_license>FSFAP</metadata_license>
   <project_license>GPL-3.0-only</project_license>
@@ -56,12 +60,15 @@
   </content_rating>
   <screenshots>
     <screenshot type="default">
+	  <caption>Main Window</caption>
       <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.8/package/art/alizams_scr1.jpg</image>
     </screenshot>
     <screenshot>
+	  <caption>Multi-view</caption>
       <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.8/package/art/alizams_scr2.jpg</image>
     </screenshot>
     <screenshot>
+	  <caption>Metadata Viewer</caption>
       <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.8/package/art/alizams_scr3.jpg</image>
     </screenshot>
   </screenshots>
