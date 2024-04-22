@@ -223,7 +223,7 @@ int main(int argc, char * argv[])
 		std::cout << "_M_X64 is defined\n";
 #endif
 #ifdef _M_IX86_FP
-		std::cout << "_M_IX86_FP is defined:" << _M_IX86_FP << '\n'
+		std::cout << "_M_IX86_FP is defined: " << _M_IX86_FP << '\n'
 #endif
 #ifdef _M_ARM
 		std::cout << "_M_ARM is defined\n";
@@ -605,5 +605,6 @@ int main(int argc, char * argv[])
 #undef USE_SPLASH_SCREEN
 #undef LOG_STDOUT_TO_FILE
 #undef PRINT_HOST_INFO
+#ifdef TMP_USE_GL_TEST
 #undef TMP_USE_GL_TEST
-
+#endif
