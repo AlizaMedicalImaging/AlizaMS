@@ -139,7 +139,7 @@ skip_row_internal(mdcm::RLESource & s, const long long width)
     {
       char         buffer[128];
       const size_t nbytes = s.read(buffer, b + 1);
-      if (nbytes != b + 1)
+      if (nbytes != static_cast<size_t>(b + 1))
         re = true;
       numOutBytes += nbytes;
     }
