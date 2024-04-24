@@ -1,0 +1,48 @@
+#!/bin/bash
+
+red="\e[1;31m"
+reset="\e[0m"
+green="\033[0;32m"
+
+echo -e "--------------- AlizaMS Debugger ---------------"
+
+sleep 2
+
+
+if [ -f "/usr/bin/alizams" ];then
+	echo -e "> Main File is $green [ OK ] $reset"
+else
+	echo -e "> Main File $red [ ERROR ] $reset"
+	echo -e "> No File Detected at /usr/bin"
+fi
+
+
+
+if [ -d "/usr/share/alizams" ];then
+	echo -e "> Datasets Directory is $green [ OK ] $reset"
+else
+	echo -e "> Datasets Directory is Not Detected $red [ ERROR ] $reset"
+fi
+
+
+check_files=`ls /usr/share/alizams/datasets/001US | wc -l`
+
+if [ "$check_files" == "2" ];then
+	echo -e "> Number of Datasets is $green [ OK ] $reset"
+else
+	echo -e "> Default Files count $red [ ERROR ] $reset"
+fi
+
+check_sha=`sha256sum /usr/bin/alizams | cut -d" " -f1`
+check_md5=`md5sum /usr/bin/alizams | cut -d" " -f1`
+
+if [ "$check_sha" == "b36e1fe532f98eb996059b9eb0d88265d2b7ad76ff5fc1e6dea095f886dd0230" ] && [ "$check_md5" == "aa4453e8cf9ff68d2bfcd4d7bc521e97" ];then
+	echo -e "> File Integrity check is $green [ OK ] $reset"
+else
+	echo -e "> File Integrity $red [ ERROR ] $reset"
+fi
+
+echo -e "------------------------------------------------"
+
+
+echo -e "alizams GitHub : https://github.com/AlizaMedicalImaging/AlizaMS"
