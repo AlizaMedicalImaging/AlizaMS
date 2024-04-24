@@ -13484,8 +13484,7 @@ QString DicomUtils::read_dicom(
 #endif
 		const mdcm::File & file = reader.GetFile();
 		const mdcm::FileMetaInformation & header = file.GetHeader();
-		const mdcm::TransferSyntax & ts =
-			header.GetDataSetTransferSyntax();
+		const mdcm::TransferSyntax & ts = header.GetDataSetTransferSyntax();
 		const mdcm::DataSet & ds = file.GetDataSet();
 		if (ds.IsEmpty())
 		{
@@ -13793,12 +13792,14 @@ QString DicomUtils::read_dicom(
 				{
 					elscint = true;
 				}
-#ifdef ALIZA_VERBOSE
 				else if (ts == mdcm::TransferSyntax::CT_private_ELE)
 				{
+#ifdef ALIZA_VERBOSE
 					std::cout << "Warning: transfer syntax CT-private-ELE" << std::endl;
-				}
+#else
+					(void)ts;
 #endif
+				}
 				if (is_multiframe(ds))
 				{
 					multiframe = true;

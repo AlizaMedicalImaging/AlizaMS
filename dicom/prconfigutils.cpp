@@ -186,6 +186,8 @@ template<typename Tin, typename Tout> QString apply_lut(
 		{
 			std::cout << "Warning: LUT descriptor[0]=" << d0 << " does not match LUT data size " << data_s << std::endl;
 		}
+#else
+		(void)d0;
 #endif
 		while (!iterator.IsAtEnd())
 		{

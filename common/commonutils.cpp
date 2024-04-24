@@ -2256,7 +2256,6 @@ double CommonUtils::set_digits(double i, int digits)
 
 QString CommonUtils::get_orientation2(const double * pat_orientation)
 {
-	constexpr bool print_oblique = false;
 	const char RAI_codes[3][2] = { {'R', 'L'}, {'A', 'P'}, {'I', 'S'} };
 	char rai[4]{};
 	const double row_dircos_x = pat_orientation[0];
@@ -2310,10 +2309,12 @@ QString CommonUtils::get_orientation2(const double * pat_orientation)
 		}
 	}
 #ifdef ALIZA_VERBOSE
-	if (print_oblique && oblique)
+	if (oblique)
 	{
 		std::cout << "Oblique, closest to " << rai << std::endl;
 	}
+#else
+	(void)oblique;
 #endif
 	QString s = QString::fromLatin1(rai);
 	s.remove(QChar('\0'));
@@ -5208,6 +5209,8 @@ int CommonUtils::get_reference_count(const ImageVariant * v)
 	if (v->pD_rgba.IsNotNull())  {if (x > 0) {b = true;} x = v->pD_rgba->GetReferenceCount(); }
 #ifdef ALIZA_VERBOSE
 	std::cout << "Ref. count = " << x << (b ? ", multiple images" : " ") << std::endl;
+#else
+	(void)b;
 #endif
 	return x;
 }
