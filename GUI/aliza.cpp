@@ -883,18 +883,31 @@ void Aliza::add_histogram(ImageVariant * v, QProgressDialog * pb, bool check_set
 {
 	if (!v) return;
 	if (v->image_type <  0) return;
-	if (v->image_type > 16) return; // disabled RGBA
-	if (check_settings) return; //
+	if (v->image_type > 16) return;
+	if (check_settings) return; // always 'false'
 	if (pb) pb->setLabelText(QString("Calculating histogram"));
-	qApp->processEvents();
 	HistogramGen * t = new HistogramGen(v);
-	t->run();
-#if 0
+	t->start();
+	while (!t->isFinished())
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(2));
+		qApp->processEvents();
+		if (pb && pb->wasCanceled())
+		{
+			t->exit(0);
+			lock0 = false;
+			exit(0);
+		}
+	}
+	t->gen_pixmap();
 	const QString tmp0 = t->get_error();
+#if 0
 	if (!tmp0.isEmpty())
 	{
 		std::cout << tmp0.toStdString() << std::endl;
 	}
+#else
+	(void)tmp0;
 #endif
 	delete t;
 }
