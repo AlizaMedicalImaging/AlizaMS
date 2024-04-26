@@ -890,7 +890,7 @@ void Aliza::add_histogram(ImageVariant * v, QProgressDialog * pb, bool check_set
 	t->start();
 	while (!t->isFinished())
 	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(2));
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		qApp->processEvents();
 		if (pb && pb->wasCanceled())
 		{
@@ -901,7 +901,7 @@ void Aliza::add_histogram(ImageVariant * v, QProgressDialog * pb, bool check_set
 	}
 	t->gen_pixmap();
 	const QString tmp0 = t->get_error();
-#if 0
+#ifdef ALIZA_VERBOSE
 	if (!tmp0.isEmpty())
 	{
 		std::cout << tmp0.toStdString() << std::endl;
