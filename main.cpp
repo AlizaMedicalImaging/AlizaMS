@@ -1,6 +1,7 @@
 #define USE_SPLASH_SCREEN 0
 #define LOG_STDOUT_TO_FILE 0
 #define PRINT_HOST_INFO 0
+#define SILENCE_QT_LOGGING
 #define TMP_USE_GL_TEST
 
 #include "alizams_version.h"
@@ -37,9 +38,10 @@
 #include <iostream>
 #include "browser/sqtree.h"
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5,2,0))
+#if (defined(SILENCE_QT_LOGGING) && QT_VERSION >= QT_VERSION_CHECK(5,2,0))
 #include <QLoggingCategory>
 #endif
+
 #if (defined LOG_STDOUT_TO_FILE && LOG_STDOUT_TO_FILE==1)
 #if (QT_VERSION >= QT_VERSION_CHECK(5,0,0))
 #include <QMessageLogContext>
@@ -110,6 +112,22 @@ void redirect_qdebug(
 	}
 }
 #endif
+#endif
+
+#if (defined(SILENCE_QT_LOGGING) && QT_VERSION < QT_VERSION_CHECK(5,2,0))
+void myMessageOutput(QtMsgType type, const char * msg)
+{
+	switch (type)
+	{
+	case QtDebugMsg:
+	case QtWarningMsg:
+	case QtCriticalMsg:
+		break;
+	case QtFatalMsg:
+		std::cout << "Fatal: " << msg << std::endl;
+		abort();
+	}
+}
 #endif
 
 }
@@ -307,7 +325,9 @@ int main(int argc, char * argv[])
 	}
 #endif
 // clang-format on
-	//
+#if (defined(SILENCE_QT_LOGGING) && (QT_VERSION < QT_VERSION_CHECK(5,2,0)))
+	qInstallMsgHandler(myMessageOutput);
+#endif
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 	if (!force_disable_opengl)
 	{
@@ -362,7 +382,7 @@ int main(int argc, char * argv[])
 	app.setOrganizationName(QString("Aliza"));
 	app.setOrganizationDomain(QString("aliza-dicom-viewer.com"));
 	app.setApplicationName(QString("AlizaMS"));
-#if QT_VERSION >= QT_VERSION_CHECK(5,2,0)
+#if (defined(SILENCE_QT_LOGGING) && QT_VERSION >= QT_VERSION_CHECK(5,2,0))
 	QLoggingCategory::setFilterRules(QString("*.debug=false\n*.warning=false\n*.info=false"));
 #endif
 	//
@@ -607,4 +627,7 @@ int main(int argc, char * argv[])
 #undef PRINT_HOST_INFO
 #ifdef TMP_USE_GL_TEST
 #undef TMP_USE_GL_TEST
+#endif
+#ifdef SILENCE_QT_LOGGING
+#undef SILENCE_QT_LOGGING
 #endif

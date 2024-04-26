@@ -31,9 +31,11 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QProcess>
+#include <QElapsedTimer>
 #include "commonutils.h"
 #include <cmath>
 #include <iostream>
+#include <chrono>
 #include "luts.h"
 #include <itkVersion.h>
 #include <itkSpatialOrientation.h>
@@ -54,6 +56,7 @@ using namespace Vectormath::Scalar;
 #else
 using namespace Vectormath::SSE;
 #endif
+
 
 ShaderObj::ShaderObj()
 {
@@ -145,6 +148,10 @@ static std::vector<GLuint>     vaoids;
 static std::vector<GLuint*>    textures;
 static std::vector<qMeshData*> qmeshes;
 //static btAlignedObjectArray<CollisionObject*>  collision_objects;
+
+static QElapsedTimer timer1;
+static constexpr qint64 timer1_min = 40; // milliseconds
+static qint64 timer1_adjust = timer1_min;
 
 struct MyRayResultCallback : public btCollisionWorld::AllHitsRayResultCallback
 {
@@ -301,7 +308,18 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
+	const auto t0 = std::chrono::steady_clock::now();
 	paint__();
+	const auto t1 = std::chrono::steady_clock::now();
+	const auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
+	// Note that for hardware-accelerated graphics this is NOT the time the application
+	// spent to render, it is possible that timer1_elapsed will be 0. It is mostly for
+	// software-accelerated graphics, to make it more usable for large volumes.
+	const long long timer1_elapsed = ts.count();
+	timer1_adjust = (timer1_elapsed < timer1_min) ? timer1_min : timer1_elapsed;
+#if 0
+	std::cout << "timer1_elapsed = " << timer1_elapsed << std::endl;
+#endif
 }
 
 void GLWidget::resizeGL(int width, int height)
@@ -314,6 +332,7 @@ void GLWidget::mousePressEvent(QMouseEvent * e)
 	if (e->buttons() & Qt::LeftButton)
 	{
 		lastPos = e->pos();
+		timer1.start();
 	}
 	else if (e->buttons() & Qt::MiddleButton)
 	{
@@ -332,12 +351,10 @@ void GLWidget::mousePressEvent(QMouseEvent * e)
 
 void GLWidget::mouseReleaseEvent(QMouseEvent * e)
 {
-#if 0
-	if (e->button() == Qt::RightButton)
+	if (e->button() == Qt::LeftButton)
 	{
-		;
+		timer1.invalidate();
 	}
-#endif
 	e->accept();
 }
 
@@ -346,11 +363,15 @@ void GLWidget::mouseMoveEvent(QMouseEvent * e)
 	bool update_ = false;
 	if (e->buttons() & Qt::LeftButton)
 	{
-		const QPoint p = e->pos();
-		set_win_old_position(lastPos.x(), lastPos.y());
-		set_win_new_position(p.x(), p.y());
-		lastPos = p;
-		update_ = true;
+		if (timer1.isValid() && timer1.elapsed() >= timer1_adjust)
+		{
+			const QPoint p = e->pos();
+			set_win_old_position(lastPos.x(), lastPos.y());
+			set_win_new_position(p.x(), p.y());
+			lastPos = p;
+			update_ = true;
+			timer1.start();
+		}
 	}
 	else if (e->buttons() & Qt::MiddleButton)
 	{
