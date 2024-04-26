@@ -150,8 +150,14 @@ static std::vector<qMeshData*> qmeshes;
 //static btAlignedObjectArray<CollisionObject*>  collision_objects;
 
 static QElapsedTimer timer1;
-static constexpr qint64 timer1_min = 40; // milliseconds
-static qint64 timer1_adjust = timer1_min;
+static constexpr long long timer1_min = 40; // milliseconds
+static constexpr long long timer1_max = 800; // milliseconds
+static long long timer1_adjust = timer1_min;
+
+long long clamp(long long v, long long lo, long long hi)
+{
+	return v < lo ? lo : (v > hi ? hi : v);
+}
 
 struct MyRayResultCallback : public btCollisionWorld::AllHitsRayResultCallback
 {
@@ -315,10 +321,11 @@ void GLWidget::paintGL()
 	// Note that for hardware-accelerated graphics this is NOT the time the application
 	// spent to render, it is possible that timer1_elapsed will be 0. It is mostly for
 	// software-accelerated graphics, to make it more usable for large volumes.
+	// 'timer1_adjust' is used only for rotation.
 	const long long timer1_elapsed = ts.count();
-	timer1_adjust = (timer1_elapsed < timer1_min) ? timer1_min : timer1_elapsed;
-#if 0
-	std::cout << "timer1_elapsed = " << timer1_elapsed << std::endl;
+	timer1_adjust = clamp(timer1_elapsed, timer1_min, timer1_max);
+#if 1
+	std::cout << "elapsed = " << timer1_elapsed << ", adjust = " << timer1_adjust << std::endl;
 #endif
 }
 
@@ -354,13 +361,13 @@ void GLWidget::mouseReleaseEvent(QMouseEvent * e)
 	if (e->button() == Qt::LeftButton)
 	{
 		timer1.invalidate();
+		timer1_adjust = timer1_min;
 	}
 	e->accept();
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent * e)
 {
-	bool update_ = false;
 	if (e->buttons() & Qt::LeftButton)
 	{
 		if (timer1.isValid() && timer1.elapsed() >= timer1_adjust)
@@ -369,8 +376,9 @@ void GLWidget::mouseMoveEvent(QMouseEvent * e)
 			set_win_old_position(lastPos.x(), lastPos.y());
 			set_win_new_position(p.x(), p.y());
 			lastPos = p;
-			update_ = true;
 			timer1.start();
+			e->accept();
+			updateGL();
 		}
 	}
 	else if (e->buttons() & Qt::MiddleButton)
@@ -380,7 +388,8 @@ void GLWidget::mouseMoveEvent(QMouseEvent * e)
 		const int deltay = p.y() - lastPanPos.y();
 		set_pan_delta(deltax, deltay);
 		lastPanPos = p;
-		update_ = true;
+		e->accept();
+		updateGL();
 	}
 	else if (e->buttons() & Qt::RightButton)
 	{
@@ -393,10 +402,13 @@ void GLWidget::mouseMoveEvent(QMouseEvent * e)
 		if (tmp1 < 0.001f) position_z = 0.001f;
 		else position_z = tmp1;
 		lastPosScale = p;
-		update_ = true;
+		e->accept();
+		updateGL();
 	}
-	e->accept();
-	if (update_) updateGL();
+	else
+	{
+		e->accept();
+	}
 }
 
 void GLWidget::wheelEvent(QWheelEvent * e)
