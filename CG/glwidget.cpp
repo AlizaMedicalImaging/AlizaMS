@@ -327,6 +327,7 @@ void GLWidget::mousePressEvent(QMouseEvent * e)
 		updateGL();
 #endif
 	}
+	e->accept();
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent * e)
@@ -337,6 +338,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent * e)
 		;
 	}
 #endif
+	e->accept();
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent * e)
@@ -372,6 +374,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent * e)
 		lastPosScale = p;
 		update_ = true;
 	}
+	e->accept();
 	if (update_) updateGL();
 }
 
@@ -407,6 +410,7 @@ void GLWidget::wheelEvent(QWheelEvent * e)
 	}
 	if (ortho_size < 0.001f) ortho_size = 0.001f;
 	if (position_z < 0.001f) position_z = 0.001f;
+	e->accept();
 	updateGL();
 }
 
