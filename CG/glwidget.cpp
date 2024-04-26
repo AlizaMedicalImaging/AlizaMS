@@ -331,10 +331,12 @@ void GLWidget::mousePressEvent(QMouseEvent * e)
 
 void GLWidget::mouseReleaseEvent(QMouseEvent * e)
 {
-	if (e->buttons() & Qt::RightButton)
+#if 0
+	if (e->button() == Qt::RightButton)
 	{
-		lastPosScale = e->pos();
+		;
 	}
+#endif
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent * e)
