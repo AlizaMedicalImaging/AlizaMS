@@ -593,8 +593,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>989</width>
-            <height>587</height>
+            <width>393</width>
+            <height>234</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -897,13 +897,16 @@ p, li { white-space: pre-wrap; }
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>419</width>
-            <height>203</height>
+            <width>989</width>
+            <height>587</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
+           <property name="spacing">
+            <number>4</number>
+           </property>
            <property name="margin">
-            <number>6</number>
+            <number>4</number>
            </property>
            <item>
             <widget class="QCheckBox" name="gl3D_checkBox">
@@ -943,10 +946,10 @@ p, li { white-space: pre-wrap; }
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_6">
               <property name="spacing">
-               <number>6</number>
+               <number>4</number>
               </property>
               <property name="margin">
-               <number>6</number>
+               <number>4</number>
               </property>
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -1107,10 +1110,10 @@ p, li { white-space: pre-wrap; }
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_12">
                  <property name="spacing">
-                  <number>6</number>
+                  <number>4</number>
                  </property>
                  <property name="margin">
-                  <number>6</number>
+                  <number>4</number>
                  </property>
                  <item>
                   <widget class="QRadioButton" name="f_no_radioButton">
@@ -1151,6 +1154,25 @@ p, li { white-space: pre-wrap; }
                   </widget>
                  </item>
                 </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="adjust_checkBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="toolTip">
+                 <string>May be helpful for slow graphics. On Linux seems to work better with Wayland.</string>
+                </property>
+                <property name="text">
+                 <string>Adjust rotation</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
              </layout>
@@ -1231,6 +1253,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>resample_radioButton</tabstop>
   <tabstop>f_no_radioButton</tabstop>
   <tabstop>f_bilinear_radioButton</tabstop>
+  <tabstop>adjust_checkBox</tabstop>
   <tabstop>reload_pushButton</tabstop>
  </tabstops>
  <resources>

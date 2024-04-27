@@ -315,9 +315,12 @@ void GLWidget::paintGL()
 		const auto t1 = std::chrono::steady_clock::now();
 		const auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
 		// Note that for hardware-accelerated graphics this is NOT the time the application
-		// spent to render, it is possible that timer1_elapsed will be 0. It is mostly for
+		// spent to render, it is possible that 'timer1_elapsed' will be 0. It is mostly for
 		// software-accelerated graphics, to make it more usable for large volumes.
-		// 'timer1_adjust' is used only for rotation.
+		// 'timer1_adjust' is used only for rotation. It seems to be a good idea for some
+		// configurations to limit mouse move events processing to some min interval (40 ms)
+		// and it seems to be OK for fast graphics too, there is the option in 'Settings'
+		// to disable this.
 		const long long timer1_elapsed = ts.count();
 		timer1_adjust = clamp(timer1_elapsed, timer1_min, timer1_max);
 #if 0
@@ -6961,6 +6964,9 @@ void GLWidget::set_adjust_rotation(bool t)
 	adjust_rotation = t;
 	if (timer1.isValid()) timer1.invalidate();
 	timer1_adjust = timer1_min;
+#if 0
+	std::cout << "set_adjust_rotation(" << (t ? "true)" : "false)") << std::endl;
+#endif
 }
 
 void GLWidget::disable_gl_and_restart()

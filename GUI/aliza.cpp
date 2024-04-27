@@ -1800,13 +1800,14 @@ void Aliza::connect_slots()
 	//
 	if (glwidget)
 	{
-		connect(toolbox->ortho_radioButton,   SIGNAL(toggled(bool)),        glwidget, SLOT(set_ortho(bool)));
-		connect(toolbox->fov_doubleSpinBox,   SIGNAL(valueChanged(double)), glwidget, SLOT(set_fov(double)));
-		connect(toolbox->far_doubleSpinBox,   SIGNAL(valueChanged(double)), glwidget, SLOT(set_far(double)));
-		connect(toolbox->alpha_doubleSpinBox, SIGNAL(valueChanged(double)), glwidget, SLOT(set_alpha(double)));
-		connect(toolbox->bright_doubleSpinBox,SIGNAL(valueChanged(double)), glwidget, SLOT(set_brightness(double)));
-		connect(toolbox->contours_checkBox,   SIGNAL(toggled(bool)),        glwidget, SLOT(set_display_contours(bool)));
-		connect(toolbox->cube_checkBox,       SIGNAL(toggled(bool)),        glwidget, SLOT(set_cube(bool)));
+		connect(toolbox->ortho_radioButton,      SIGNAL(toggled(bool)),        glwidget, SLOT(set_ortho(bool)));
+		connect(toolbox->fov_doubleSpinBox,      SIGNAL(valueChanged(double)), glwidget, SLOT(set_fov(double)));
+		connect(toolbox->far_doubleSpinBox,      SIGNAL(valueChanged(double)), glwidget, SLOT(set_far(double)));
+		connect(toolbox->alpha_doubleSpinBox,    SIGNAL(valueChanged(double)), glwidget, SLOT(set_alpha(double)));
+		connect(toolbox->bright_doubleSpinBox,   SIGNAL(valueChanged(double)), glwidget, SLOT(set_brightness(double)));
+		connect(toolbox->contours_checkBox,      SIGNAL(toggled(bool)),        glwidget, SLOT(set_display_contours(bool)));
+		connect(toolbox->cube_checkBox,          SIGNAL(toggled(bool)),        glwidget, SLOT(set_cube(bool)));
+		connect(settingswidget->adjust_checkBox, SIGNAL(toggled(bool)),        glwidget, SLOT(set_adjust_rotation(bool)));
 	}
 	connect(anim3Dwidget->frametime_spinBox,  SIGNAL(valueChanged(int)), this,             SLOT(set_frametime_3D(int)));
 	connect(anim3Dwidget->group_pushButton,   SIGNAL(clicked()),         this,             SLOT(create_group()));

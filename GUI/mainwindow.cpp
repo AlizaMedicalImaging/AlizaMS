@@ -322,6 +322,8 @@ MainWindow::MainWindow(
 		QVBoxLayout * vl2 = new QVBoxLayout(gl_frame);
 		vl2->setContentsMargins(0, 0, 0, 0);
 		vl2->addWidget(glwidget);
+		//
+		glwidget->set_adjust_rotation(settingswidget->get_adjust_rotation());
 	}
 	else
 	{
