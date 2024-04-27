@@ -457,8 +457,3 @@ bool SettingsWidget::get_dcm_thread() const
 {
 	return dcmthread_checkBox->isChecked();
 }
-
-bool SettingsWidget::get_adjust_rotation() const
-{
-	return adjust_checkBox->isChecked();
-}

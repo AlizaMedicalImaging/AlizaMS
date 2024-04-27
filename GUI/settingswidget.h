@@ -39,7 +39,6 @@ public:
 	bool   get_apply_supplemental_lut() const;
 	bool   get_skip_too_large() const;
 	bool   get_dcm_thread() const;
-	bool   get_adjust_rotation() const;
 
 private:
 	int   saved_idx{};
