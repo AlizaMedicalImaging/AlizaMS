@@ -31,7 +31,6 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QProcess>
-#include <QElapsedTimer>
 #include "commonutils.h"
 #include <cmath>
 #include <iostream>
@@ -148,11 +147,6 @@ static std::vector<GLuint>     vaoids;
 static std::vector<GLuint*>    textures;
 static std::vector<qMeshData*> qmeshes;
 //static btAlignedObjectArray<CollisionObject*>  collision_objects;
-
-static QElapsedTimer timer1;
-static constexpr long long timer1_min = 40; // milliseconds
-static constexpr long long timer1_max = 800; // milliseconds
-static long long timer1_adjust = timer1_min;
 
 long long clamp(long long v, long long lo, long long hi)
 {
@@ -314,19 +308,26 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
-	const auto t0 = std::chrono::steady_clock::now();
-	paint__();
-	const auto t1 = std::chrono::steady_clock::now();
-	const auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
-	// Note that for hardware-accelerated graphics this is NOT the time the application
-	// spent to render, it is possible that timer1_elapsed will be 0. It is mostly for
-	// software-accelerated graphics, to make it more usable for large volumes.
-	// 'timer1_adjust' is used only for rotation.
-	const long long timer1_elapsed = ts.count();
-	timer1_adjust = clamp(timer1_elapsed, timer1_min, timer1_max);
-#if 1
-	std::cout << "elapsed = " << timer1_elapsed << ", adjust = " << timer1_adjust << std::endl;
+	if (adjust_rotation)
+	{
+		const auto t0 = std::chrono::steady_clock::now();
+		paint__();
+		const auto t1 = std::chrono::steady_clock::now();
+		const auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
+		// Note that for hardware-accelerated graphics this is NOT the time the application
+		// spent to render, it is possible that timer1_elapsed will be 0. It is mostly for
+		// software-accelerated graphics, to make it more usable for large volumes.
+		// 'timer1_adjust' is used only for rotation.
+		const long long timer1_elapsed = ts.count();
+		timer1_adjust = clamp(timer1_elapsed, timer1_min, timer1_max);
+#if 0
+		std::cout << "elapsed = " << timer1_elapsed << ", adjust = " << timer1_adjust << std::endl;
 #endif
+	}
+	else
+	{
+		paint__();
+	}
 }
 
 void GLWidget::resizeGL(int width, int height)
@@ -339,7 +340,7 @@ void GLWidget::mousePressEvent(QMouseEvent * e)
 	if (e->buttons() & Qt::LeftButton)
 	{
 		lastPos = e->pos();
-		timer1.start();
+		if (adjust_rotation) timer1.start();
 	}
 	else if (e->buttons() & Qt::MiddleButton)
 	{
@@ -358,7 +359,7 @@ void GLWidget::mousePressEvent(QMouseEvent * e)
 
 void GLWidget::mouseReleaseEvent(QMouseEvent * e)
 {
-	if (e->button() == Qt::LeftButton)
+	if (adjust_rotation && e->button() == Qt::LeftButton)
 	{
 		timer1.invalidate();
 		timer1_adjust = timer1_min;
@@ -370,16 +371,25 @@ void GLWidget::mouseMoveEvent(QMouseEvent * e)
 {
 	if (e->buttons() & Qt::LeftButton)
 	{
-		if (timer1.isValid() && timer1.elapsed() >= timer1_adjust)
+		const QPoint p = e->pos();
+		if (adjust_rotation)
 		{
-			const QPoint p = e->pos();
+			if (timer1.isValid() && timer1.elapsed() >= timer1_adjust)
+			{
+				set_win_old_position(lastPos.x(), lastPos.y());
+				set_win_new_position(p.x(), p.y());
+				lastPos = p;
+				timer1.start();
+			}
+		}
+		else
+		{
 			set_win_old_position(lastPos.x(), lastPos.y());
 			set_win_new_position(p.x(), p.y());
 			lastPos = p;
-			timer1.start();
-			e->accept();
-			updateGL();
 		}
+		e->accept();
+		updateGL();
 	}
 	else if (e->buttons() & Qt::MiddleButton)
 	{
@@ -6944,6 +6954,13 @@ void GLWidget::d_mesh(
 	glUniform4fv(s->shader->location_K, 2, s->K);
 	glBindVertexArray(s->vaoid);
 	glDrawArrays(GL_TRIANGLES, 0, s->faces_size * 3);
+}
+
+void GLWidget::set_adjust_rotation(bool t)
+{
+	adjust_rotation = t;
+	if (timer1.isValid()) timer1.invalidate();
+	timer1_adjust = timer1_min;
 }
 
 void GLWidget::disable_gl_and_restart()

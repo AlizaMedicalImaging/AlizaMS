@@ -25,6 +25,7 @@
 #include <QKeyEvent>
 #include <QColor>
 #include <QString>
+#include <QElapsedTimer>
 
 #define SCENE_ORTHO_SIZE 150.0f
 #define SCENE_POS_Z 400.0f
@@ -463,8 +464,9 @@ public slots:
 #if 0
 	void set_contours_width(float);
 #endif
+	void set_adjust_rotation(bool);
 
-protected:
+private:
 	void initializeGL() override;
 	void paintGL() override;
 	void resizeGL(int, int) override;
@@ -473,12 +475,15 @@ protected:
 	void mouseMoveEvent(QMouseEvent*) override;
 	void wheelEvent(QWheelEvent*) override;
 	void keyPressEvent(QKeyEvent*) override;
+	void disable_gl_and_restart();
 	QPoint lastPos;
 	QPoint lastPanPos;
 	QPoint lastPosScale;
-
-private:
-	void disable_gl_and_restart();
+	QElapsedTimer timer1;
+	bool adjust_rotation{true};
+	long long timer1_adjust{40}; // milliseconds
+	const long long timer1_min{40};
+	const long long timer1_max{800};
 } VECTORMATH_ALIGNED_POST;
 
 #endif
