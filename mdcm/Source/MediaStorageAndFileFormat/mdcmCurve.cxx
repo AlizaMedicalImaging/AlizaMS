@@ -20,6 +20,7 @@
 
 =========================================================================*/
 #include "mdcmCurve.h"
+#include "mdcmByteValue.h"
 #include "mdcmDataElement.h"
 #include "mdcmDataSet.h"
 #include "mdcmAttribute.h"
@@ -27,55 +28,6 @@
 
 namespace mdcm
 {
-
-class CurveInternal
-{
-public:
-  CurveInternal() = default;
-  unsigned short              Group{};
-  unsigned short              Dimensions{};
-  unsigned short              NumberOfPoints{};
-  std::string                 TypeOfData;
-  std::string                 CurveDescription;
-  unsigned short              DataValueRepresentation{};
-  unsigned short              CoordinateStartValue{};
-  unsigned short              CoordinateStepValue{};
-  std::vector<char>           Data;
-  std::vector<unsigned short> CurveDataDescriptor;
-  void
-  Print(std::ostream & os) const
-  {
-    os << "Group           0x" << std::hex << Group << std::dec
-       << "\nDimensions              :" << Dimensions
-       << "\nNumberOfPoints          :" << NumberOfPoints
-       << "\nTypeOfData              :" << TypeOfData
-       << "\nCurveDescription        :" << CurveDescription
-       << "\nDataValueRepresentation :" << DataValueRepresentation << '\n';
-    const void * dp = static_cast<const void*>(Data.data());
-    const unsigned short * p = static_cast<const unsigned short *>(dp);
-    for (int i = 0; i < NumberOfPoints; i += 2)
-    {
-      os << p[i] << ',' << p[i + 1] << '\n';
-    }
-    os << std::endl;
-  }
-};
-
-Curve::Curve() : Internal(new CurveInternal)
-{
-}
-
-Curve::Curve(const Curve & ov)
-  : Object(ov)
-{
-  Internal = new CurveInternal;
-  *Internal = *ov.Internal;
-}
-
-Curve::~Curve()
-{
-  delete Internal;
-}
 
 unsigned int
 Curve::GetNumberOfCurves(const DataSet & ds)
@@ -224,50 +176,50 @@ Curve::Update(const DataElement & de)
 void
 Curve::SetGroup(unsigned short group)
 {
-  Internal->Group = group;
+  Internal.Group = group;
 }
 
 unsigned short
 Curve::GetGroup() const
 {
-  return Internal->Group;
+  return Internal.Group;
 }
 
 void
 Curve::SetDimensions(unsigned short dimensions)
 {
-  Internal->Dimensions = dimensions;
+  Internal.Dimensions = dimensions;
 }
 
 unsigned short
 Curve::GetDimensions() const
 {
-  return Internal->Dimensions;
+  return Internal.Dimensions;
 }
 
 void
 Curve::SetNumberOfPoints(unsigned short numberofpoints)
 {
-  Internal->NumberOfPoints = numberofpoints;
+  Internal.NumberOfPoints = numberofpoints;
 }
 
 unsigned short
 Curve::GetNumberOfPoints() const
 {
-  return Internal->NumberOfPoints;
+  return Internal.NumberOfPoints;
 }
 
 void
 Curve::SetTypeOfData(const char * typeofdata)
 {
   if (typeofdata)
-    Internal->TypeOfData = typeofdata;
+    Internal.TypeOfData = typeofdata;
 }
 
 const char *
 Curve::GetTypeOfData() const
 {
-  return Internal->TypeOfData.c_str();
+  return Internal.TypeOfData.c_str();
 }
 
 // See PS 3.3 - 2004 - C.10.2.1.1 Type of data
@@ -294,7 +246,7 @@ Curve::GetTypeOfDataDescription() const
   const char *              p = t[i][0];
   while (p)
   {
-    if (Internal->TypeOfData == p)
+    if (Internal.TypeOfData == p)
     {
       break;
     }
@@ -308,49 +260,49 @@ void
 Curve::SetCurveDescription(const char * curvedescription)
 {
   if (curvedescription)
-    Internal->CurveDescription = curvedescription;
+    Internal.CurveDescription = curvedescription;
 }
 
 void
 Curve::SetDataValueRepresentation(unsigned short datavaluerepresentation)
 {
-  Internal->DataValueRepresentation = datavaluerepresentation;
+  Internal.DataValueRepresentation = datavaluerepresentation;
 }
 
 unsigned short
 Curve::GetDataValueRepresentation() const
 {
-  return Internal->DataValueRepresentation;
+  return Internal.DataValueRepresentation;
 }
 
 void
 Curve::SetCurveDataDescriptor(const uint16_t * values, size_t num)
 {
-  Internal->CurveDataDescriptor = std::vector<uint16_t>(values, values + num);
+  Internal.CurveDataDescriptor = std::vector<uint16_t>(values, values + num);
 }
 
 const std::vector<unsigned short> &
 Curve::GetCurveDataDescriptor() const
 {
-  return Internal->CurveDataDescriptor;
+  return Internal.CurveDataDescriptor;
 }
 
 void
 Curve::SetCoordinateStartValue(unsigned short v)
 {
-  Internal->CoordinateStartValue = v;
+  Internal.CoordinateStartValue = v;
 }
 
 void
 Curve::SetCoordinateStepValue(unsigned short v)
 {
-  Internal->CoordinateStepValue = v;
+  Internal.CoordinateStepValue = v;
 }
 
 bool
 Curve::IsEmpty() const
 {
-  return Internal->Data.empty();
+  return Internal.Data.empty();
 }
 
 void
@@ -358,8 +310,8 @@ Curve::SetCurve(const char * array, unsigned int length)
 {
   if (!array || length == 0)
     return;
-  Internal->Data.resize(length);
-  std::copy(array, array + length, Internal->Data.begin());
+  Internal.Data.resize(length);
+  std::copy(array, array + length, Internal.Data.begin());
 }
 
 void
@@ -407,32 +359,32 @@ getsizeofrep(unsigned short dr)
 void
 Curve::GetAsPoints(float * array) const
 {
-  assert(getsizeofrep(Internal->DataValueRepresentation));
-  if (Internal->CurveDataDescriptor.empty())
+  assert(getsizeofrep(Internal.DataValueRepresentation));
+  if (Internal.CurveDataDescriptor.empty())
   {
-    assert(Internal->Data.size() ==
-           static_cast<uint32_t>(Internal->NumberOfPoints) * Internal->Dimensions * getsizeofrep(Internal->DataValueRepresentation));
+    assert(Internal.Data.size() ==
+           static_cast<uint32_t>(Internal.NumberOfPoints) * Internal.Dimensions * getsizeofrep(Internal.DataValueRepresentation));
   }
   else
   {
-    assert(Internal->Data.size() ==
-           static_cast<uint32_t>(Internal->NumberOfPoints) * 1 * getsizeofrep(Internal->DataValueRepresentation));
+    assert(Internal.Data.size() ==
+           static_cast<uint32_t>(Internal.NumberOfPoints) * 1 * getsizeofrep(Internal.DataValueRepresentation));
   }
-  assert(Internal->Dimensions == 1 || Internal->Dimensions == 2);
-  const int mult = Internal->Dimensions;
+  assert(Internal.Dimensions == 1 || Internal.Dimensions == 2);
+  const int mult = Internal.Dimensions;
   int       genidx = -1;
-  if (!Internal->CurveDataDescriptor.empty())
+  if (!Internal.CurveDataDescriptor.empty())
   {
-    assert(Internal->CurveDataDescriptor.size() == Internal->Dimensions);
-    assert(Internal->CurveDataDescriptor.size() == 2); // FIXME
-    if (Internal->CurveDataDescriptor[0] == 0)
+    assert(Internal.CurveDataDescriptor.size() == Internal.Dimensions);
+    assert(Internal.CurveDataDescriptor.size() == 2); // FIXME
+    if (Internal.CurveDataDescriptor[0] == 0)
     {
-      assert(Internal->CurveDataDescriptor[1] == 1);
+      assert(Internal.CurveDataDescriptor[1] == 1);
       genidx = 0;
     }
-    else if (Internal->CurveDataDescriptor[1] == 0)
+    else if (Internal.CurveDataDescriptor[1] == 0)
     {
-      assert(Internal->CurveDataDescriptor[0] == 1);
+      assert(Internal.CurveDataDescriptor[0] == 1);
       genidx = 1;
     }
     else
@@ -440,69 +392,69 @@ Curve::GetAsPoints(float * array) const
       assert(0 && "TODO");
     }
   }
-  const char * beg = &Internal->Data[0];
-  const char * end = beg + Internal->Data.size();
+  const char * beg = &Internal.Data[0];
+  const char * end = beg + Internal.Data.size();
   if (genidx == -1)
   {
-    assert(end == beg + 2 * Internal->NumberOfPoints);
+    assert(end == beg + 2 * Internal.NumberOfPoints);
     (void)beg;
     (void)end;
   }
   else
   {
-    assert(end == beg + mult * Internal->NumberOfPoints);
+    assert(end == beg + mult * Internal.NumberOfPoints);
     (void)beg;
     (void)end;
   }
-  void * vp = static_cast<void*>(&Internal->Data[0]);
-  if (Internal->DataValueRepresentation == 0)
+  const void * vp = static_cast<const void*>(Internal.Data.data());
+  if (Internal.DataValueRepresentation == 0)
   {
     // PS 3.3 - 2004
     // C.10.2.1.5 Curve data descriptor, coordinate start value, coordinate step value
-    uint16_t * p = static_cast<uint16_t *>(vp);
+    const uint16_t * p = static_cast<const uint16_t *>(vp);
     // X
     if (genidx == 0)
     {
-      for (int i = 0; i < Internal->NumberOfPoints; ++i)
+      for (int i = 0; i < Internal.NumberOfPoints; ++i)
         array[3 * i + 0] = static_cast<float>(ComputeValueFromStartAndStep(i));
     }
     else
     {
-      for (int i = 0; i < Internal->NumberOfPoints; ++i)
+      for (int i = 0; i < Internal.NumberOfPoints; ++i)
         array[3 * i + 0] = p[i + 0];
     }
     // Y
     if (genidx == 1)
     {
-      for (int i = 0; i < Internal->NumberOfPoints; ++i)
+      for (int i = 0; i < Internal.NumberOfPoints; ++i)
         array[3 * i + 1] = static_cast<float>(ComputeValueFromStartAndStep(i));
     }
     else
     {
       if (mult == 2 && genidx == -1)
       {
-        for (int i = 0; i < Internal->NumberOfPoints; ++i)
+        for (int i = 0; i < Internal.NumberOfPoints; ++i)
           array[3 * i + 1] = p[i + 1];
       }
       else if (mult == 2 && genidx == 0)
       {
-        for (int i = 0; i < Internal->NumberOfPoints; ++i)
+        for (int i = 0; i < Internal.NumberOfPoints; ++i)
           array[3 * i + 1] = p[i + 0];
       }
       else
       {
-        for (int i = 0; i < Internal->NumberOfPoints; ++i)
+        for (int i = 0; i < Internal.NumberOfPoints; ++i)
           array[3 * i + 1] = 0;
       }
     }
     // Z
-    for (int i = 0; i < Internal->NumberOfPoints; ++i)
+    for (int i = 0; i < Internal.NumberOfPoints; ++i)
       array[3 * i + 2] = 0;
   }
-  else if (Internal->DataValueRepresentation == 1)
+  else if (Internal.DataValueRepresentation == 1)
   {
-    int16_t * p = static_cast<int16_t *>(vp);
-    for (int i = 0; i < Internal->NumberOfPoints; ++i)
+    const int16_t * p = static_cast<const int16_t *>(vp);
+    for (int i = 0; i < Internal.NumberOfPoints; ++i)
     {
       array[3 * i + 0] = p[mult * i + 0];
       if (mult > 1)
@@ -512,10 +464,10 @@ Curve::GetAsPoints(float * array) const
       array[3 * i + 2] = 0;
     }
   }
-  else if (Internal->DataValueRepresentation == 2)
+  else if (Internal.DataValueRepresentation == 2)
   {
-    float * p = static_cast<float *>(vp);
-    for (int i = 0; i < Internal->NumberOfPoints; ++i)
+    const float * p = static_cast<const float *>(vp);
+    for (int i = 0; i < Internal.NumberOfPoints; ++i)
     {
       array[3 * i + 0] = p[mult * i + 0];
       if (mult > 1)
@@ -525,10 +477,10 @@ Curve::GetAsPoints(float * array) const
       array[3 * i + 2] = 0;
     }
   }
-  else if (Internal->DataValueRepresentation == 3)
+  else if (Internal.DataValueRepresentation == 3)
   {
-    double * p = static_cast<double *>(vp);
-    for (int i = 0; i < Internal->NumberOfPoints; ++i)
+    const double * p = static_cast<const double *>(vp);
+    for (int i = 0; i < Internal.NumberOfPoints; ++i)
     {
       array[3 * i + 0] = static_cast<float>(p[mult * i + 0]);
       if (mult > 1)
@@ -538,10 +490,10 @@ Curve::GetAsPoints(float * array) const
       array[3 * i + 2] = 0;
     }
   }
-  else if (Internal->DataValueRepresentation == 4)
+  else if (Internal.DataValueRepresentation == 4)
   {
-    int32_t * p = static_cast<int32_t *>(vp);
-    for (int i = 0; i < Internal->NumberOfPoints; ++i)
+    const int32_t * p = static_cast<const int32_t *>(vp);
+    for (int i = 0; i < Internal.NumberOfPoints; ++i)
     {
       array[3 * i + 0] = static_cast<float>(p[mult * i + 0]);
       if (mult > 1)
@@ -560,7 +512,19 @@ Curve::GetAsPoints(float * array) const
 void
 Curve::Print(std::ostream & os) const
 {
-  Internal->Print(os);
+  os << "Group           0x" << std::hex << Internal.Group << std::dec
+     << "\nDimensions              :" << Internal.Dimensions
+     << "\nNumberOfPoints          :" << Internal.NumberOfPoints
+     << "\nTypeOfData              :" << Internal.TypeOfData
+     << "\nCurveDescription        :" << Internal.CurveDescription
+     << "\nDataValueRepresentation :" << Internal.DataValueRepresentation << '\n';
+  const void * dp = static_cast<const void*>(Internal.Data.data());
+  const unsigned short * p = static_cast<const unsigned short *>(dp);
+  for (int i = 0; i < Internal.NumberOfPoints; i += 2)
+  {
+    os << p[i] << ',' << p[i + 1] << '\n';
+  }
+  os << std::endl;
 }
 
 /*
@@ -583,8 +547,8 @@ The data points of this dimension will be absent from Curve Data (50xx,3000).
 double
 Curve::ComputeValueFromStartAndStep(unsigned int idx) const
 {
-  assert(!Internal->CurveDataDescriptor.empty());
-  const double res = Internal->CoordinateStartValue + Internal->CoordinateStepValue * idx;
+  assert(!Internal.CurveDataDescriptor.empty());
+  const double res = Internal.CoordinateStartValue + Internal.CoordinateStepValue * idx;
   return res;
 }
 

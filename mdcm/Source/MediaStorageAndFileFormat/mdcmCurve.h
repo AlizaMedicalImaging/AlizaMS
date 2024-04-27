@@ -29,26 +29,38 @@
 namespace mdcm
 {
 
-class CurveInternal;
-class ByteValue;
 class DataSet;
 class DataElement;
+
+class CurveInternal
+{
+public:
+  unsigned short              Group{};
+  unsigned short              Dimensions{};
+  unsigned short              NumberOfPoints{};
+  std::string                 TypeOfData;
+  std::string                 CurveDescription;
+  unsigned short              DataValueRepresentation{};
+  unsigned short              CoordinateStartValue{};
+  unsigned short              CoordinateStepValue{};
+  std::vector<char>           Data;
+  std::vector<unsigned short> CurveDataDescriptor;
+};
+
 /**
  * Curve class to handle element 50xx,3000 Curve Data
- *  WARNING: This is deprecated and lastly defined in PS 3.3 - 2004
+ *  This is deprecated and last defined in PS 3.3 - 2004
  *
- *  Examples:
- *  - GE_DLX-8-MONO2-Multiframe-Jpeg_Lossless.dcm
- *  - GE_DLX-8-MONO2-Multiframe.dcm
- *  - mdcmSampleData/Philips_Medical_Images/integris_HV_5000/xa_integris.dcm
- *  - TOSHIBA-CurveData[1-3].dcm
  */
 class MDCM_EXPORT Curve : public Object
 {
 public:
-  Curve();
-  Curve(const Curve &);
-  ~Curve();
+  Curve() = default;
+  Curve(const Curve & o) : Object(o)
+  {
+    Internal = o.Internal;
+  }
+  ~Curve() = default;
   static unsigned int
   GetNumberOfCurves(const DataSet &);
   void
@@ -99,7 +111,7 @@ public:
 private:
   double
   ComputeValueFromStartAndStep(unsigned int) const;
-  CurveInternal * Internal;
+  CurveInternal Internal{};
 };
 
 } // end namespace mdcm
