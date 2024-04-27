@@ -40,6 +40,7 @@ MainWindow::MainWindow(
 	//
 	int swidth{};
 	int sheight{};
+	int adj_rot{};
 	desktop_layout(&swidth, &sheight);
 	//
 	{
@@ -52,6 +53,7 @@ MainWindow::MainWindow(
 		saved_style =
 			settings.value(QString("stylename"), QVariant(QString("Dark Fusion"))).toString();
 		const int mvsep = settings.value(QString("mvsep"), 0).toInt();
+		adj_rot = settings.value(QString("adj_rot"), 1).toInt();
 		settings.endGroup();
 		multiview_tab = (mvsep != 1);
 		const int w = static_cast<int>(static_cast<double>(swidth) * 0.7);
@@ -323,7 +325,7 @@ MainWindow::MainWindow(
 		vl2->setContentsMargins(0, 0, 0, 0);
 		vl2->addWidget(glwidget);
 		//
-		glwidget->set_adjust_rotation(settingswidget->get_adjust_rotation());
+		glwidget->set_adjust_rotation((adj_rot == 1));
 	}
 	else
 	{
