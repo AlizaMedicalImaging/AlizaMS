@@ -39,7 +39,7 @@ class File;
 class MDCM_EXPORT MediaStorage
 {
 public:
-  typedef enum
+  enum MSType
   {
     MediaStorageDirectoryStorage = 0,
     ComputedRadiographyImageStorage,
@@ -143,9 +143,9 @@ public:
     DCMTKUnknownStorage,
     PhotoacousticImageStorage,
     MS_END
-  } MSType;
+  };
 
-  typedef enum
+  enum ObjectType
   {
     NoObject = 0, // DICOMDIR
     Video,
@@ -155,7 +155,7 @@ public:
     URI,
     Segmentation,
     ObjectEnd
-  } ObjectType;
+  };
 
   MediaStorage() = default;
 

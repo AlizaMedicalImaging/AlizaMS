@@ -31,14 +31,14 @@ namespace mdcm
 class MDCM_EXPORT SwapCode
 {
 public:
-  typedef enum
+  enum SwapCodeType
   {
     Unknown = 0,
     LittleEndian = 1234,
     BigEndian = 4321,
     BadLittleEndian = 3412,
     BadBigEndian = 2143
-  } SwapCodeType;
+  };
 
   operator SwapCode::SwapCodeType() const { return SwapCodeValue; }
   SwapCode() = default;

@@ -42,13 +42,13 @@ class MDCM_EXPORT Segment : public Object
 public:
   typedef std::vector<SmartPointer<Surface>>          SurfaceVector;
   typedef std::vector<SegmentHelper::BasicCodedEntry> BasicCodedEntryVector;
-  typedef enum
+  enum ALGOType
   {
     AUTOMATIC = 0,
     SEMIAUTOMATIC,
     MANUAL,
     ALGOType_END
-  } ALGOType;
+  };
 
   static const char * GetALGOTypeString(ALGOType);
   static ALGOType

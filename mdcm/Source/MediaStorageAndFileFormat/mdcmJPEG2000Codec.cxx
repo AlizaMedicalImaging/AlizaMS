@@ -35,11 +35,45 @@
 #define MDCM_JPEG2000_USE_RDBUF
 //#define MDCM_JPEG2000_VERBOSE
 
-namespace mdcm
+#define J2K_CFMT 0
+#define JP2_CFMT 1
+#define JPT_CFMT 2
+#define PXM_DFMT 10
+#define PGX_DFMT 11
+#define BMP_DFMT 12
+#define YUV_DFMT 13
+#define TIF_DFMT 14
+#define RAW_DFMT 15
+#define TGA_DFMT 16
+#define PNG_DFMT 17
+#define CODEC_JP2 OPJ_CODEC_JP2
+#define CODEC_J2K OPJ_CODEC_J2K
+#define CLRSPC_GRAY OPJ_CLRSPC_GRAY
+#define CLRSPC_SRGB OPJ_CLRSPC_SRGB
+#define CLRSPC_CMYK OPJ_CLRSPC_CMYK
+#define CLRSPC_EYCC OPJ_CLRSPC_EYCC
+#define CLRSPC_SYCC OPJ_CLRSPC_SYCC
+#define CLRSPC_UNKNOWN OPJ_CLRSPC_UNKNOWN
+#define CLRSPC_UNSPECIFIED OPJ_CLRSPC_UNSPECIFIED
+#define JP2_RFC3745_MAGIC "\x00\x00\x00\x0c\x6a\x50\x20\x20\x0d\x0a\x87\x0a"
+#define JP2_MAGIC "\x0d\x0a\x87\x0a"
+#define J2K_CODESTREAM_MAGIC "\xff\x4f\xff\x51"
+
+extern "C"
+{
+
+void mdcm_error_callback(const char * msg, void *)
+{
+  fprintf(stdout, "%s", msg);
+}
+
+}
+
+namespace
 {
 
 /* Part 1  Table A.2 List of markers and marker segments */
-typedef enum
+enum MarkerType : uint16_t
 {
   FF30 = 0xff30,
   FF31 = 0xff31,
@@ -78,9 +112,21 @@ typedef enum
   EPH  = 0xff92,
   SOD  = 0xff93,
   EOC  = 0xffd9 // EOI in old jpeg
-} MarkerType;
+};
 
-typedef enum
+/*
+ * CPF = 0xff59
+ * Found in HTJ2K files, currently (2.5.2) 'opj_j2k_read_cpf' is empty implementation,
+ * returns OPJ_TRUE.
+ *
+ * "A CPF (Compatible Profile) marker segment is introduced to record the profile
+ * information of a compatible Part-1 code-stream, from which the HTJ2K code-
+ * stream might have been obtained by transcoding. The primary purpose of CPF is
+ * to allow profile information to be preserved during transcoding, so that it can be
+ * restored if the HTJ2K code-stream is transcoded to a Part-1 code-stream."
+ */
+
+enum OtherType
 {
   JP   = 0x6a502020,
   FTYP = 0x66747970,
@@ -94,10 +140,9 @@ typedef enum
   CMAP = 0x636D6170,
   PCLR = 0x70636c72,
   RES  = 0x72657320
-} OtherType;
+};
 
-static inline bool
-hasnolength(uint_fast16_t marker)
+bool hasnolength(uint16_t marker)
 {
   switch (marker)
   {
@@ -126,8 +171,7 @@ hasnolength(uint_fast16_t marker)
   return false;
 }
 
-static inline bool
-read16(const char ** input, size_t * len, uint16_t * ret)
+bool read16(const char ** input, size_t * len, uint16_t * ret)
 {
   if (*len >= 2)
   {
@@ -137,7 +181,7 @@ read16(const char ** input, size_t * len, uint16_t * ret)
       char     bytes[2];
     } u;
     memcpy(u.bytes, *input, 2);
-    *ret = SwapperDoOp::Swap(u.v);
+    *ret = mdcm::SwapperDoOp::Swap(u.v);
     *input += 2;
     *len -= 2;
     return true;
@@ -145,8 +189,7 @@ read16(const char ** input, size_t * len, uint16_t * ret)
   return false;
 }
 
-static inline bool
-read32(const char ** input, size_t * len, uint32_t * ret)
+bool read32(const char ** input, size_t * len, uint32_t * ret)
 {
   if (*len >= 4)
   {
@@ -156,7 +199,7 @@ read32(const char ** input, size_t * len, uint32_t * ret)
       char     bytes[4];
     } u;
     memcpy(u.bytes, *input, 4);
-    *ret = SwapperDoOp::Swap(u.v);
+    *ret = mdcm::SwapperDoOp::Swap(u.v);
     *input += 4;
     *len -= 4;
     return true;
@@ -164,8 +207,7 @@ read32(const char ** input, size_t * len, uint32_t * ret)
   return false;
 }
 
-static inline bool
-read64(const char ** input, size_t * len, uint64_t * ret)
+bool read64(const char ** input, size_t * len, uint64_t * ret)
 {
   if (*len >= 8)
   {
@@ -175,7 +217,7 @@ read64(const char ** input, size_t * len, uint64_t * ret)
       char     bytes[8];
     } u;
     memcpy(u.bytes, *input, 8);
-    *ret = SwapperDoOp::Swap(u.v);
+    *ret = mdcm::SwapperDoOp::Swap(u.v);
     *input += 8;
     *len -= 8;
     return true;
@@ -183,8 +225,7 @@ read64(const char ** input, size_t * len, uint64_t * ret)
   return false;
 }
 
-static bool
-parsej2k_imp(const char * const stream, const size_t file_size, bool * lossless, bool * mct)
+bool parsej2k_imp(const char * const stream, const size_t file_size, bool * lossless, bool * mct)
 {
   uint16_t     marker;
   size_t       lenmarker;
@@ -241,8 +282,7 @@ parsej2k_imp(const char * const stream, const size_t file_size, bool * lossless,
   return false;
 }
 
-static bool
-parsejp2_imp(const char * const stream, const size_t file_size, bool * lossless, bool * mct)
+bool parsejp2_imp(const char * const stream, const size_t file_size, bool * lossless, bool * mct)
 {
   uint32_t     marker;
   uint64_t     len64; // ref
@@ -278,30 +318,6 @@ parsejp2_imp(const char * const stream, const size_t file_size, bool * lossless,
   return false;
 }
 
-#define J2K_CFMT 0
-#define JP2_CFMT 1
-#define JPT_CFMT 2
-#define PXM_DFMT 10
-#define PGX_DFMT 11
-#define BMP_DFMT 12
-#define YUV_DFMT 13
-#define TIF_DFMT 14
-#define RAW_DFMT 15
-#define TGA_DFMT 16
-#define PNG_DFMT 17
-#define CODEC_JP2 OPJ_CODEC_JP2
-#define CODEC_J2K OPJ_CODEC_J2K
-#define CLRSPC_GRAY OPJ_CLRSPC_GRAY
-#define CLRSPC_SRGB OPJ_CLRSPC_SRGB
-#define CLRSPC_CMYK OPJ_CLRSPC_CMYK
-#define CLRSPC_EYCC OPJ_CLRSPC_EYCC
-#define CLRSPC_SYCC OPJ_CLRSPC_SYCC
-#define CLRSPC_UNKNOWN OPJ_CLRSPC_UNKNOWN
-#define CLRSPC_UNSPECIFIED OPJ_CLRSPC_UNSPECIFIED
-#define JP2_RFC3745_MAGIC "\x00\x00\x00\x0c\x6a\x50\x20\x20\x0d\x0a\x87\x0a"
-#define JP2_MAGIC "\x0d\x0a\x87\x0a"
-#define J2K_CODESTREAM_MAGIC "\xff\x4f\xff\x51"
-
 struct myfile
 {
   char * mem;
@@ -309,14 +325,7 @@ struct myfile
   size_t len;
 };
 
-void
-mdcm_error_callback(const char * msg, void *)
-{
-  fprintf(stderr, "%s", msg);
-}
-
-OPJ_SIZE_T
-opj_read_from_memory(void * p_buffer, OPJ_SIZE_T p_nb_bytes, myfile * p_file)
+OPJ_SIZE_T opj_read_from_memory(void * p_buffer, OPJ_SIZE_T p_nb_bytes, myfile * p_file)
 {
   OPJ_SIZE_T l_nb_read;
   if (p_file->cur + p_nb_bytes <= p_file->mem + p_file->len)
@@ -334,8 +343,7 @@ opj_read_from_memory(void * p_buffer, OPJ_SIZE_T p_nb_bytes, myfile * p_file)
   return ((l_nb_read) ? l_nb_read : (static_cast<OPJ_SIZE_T>(-1)));
 }
 
-OPJ_SIZE_T
-opj_write_from_memory(void * p_buffer, OPJ_SIZE_T p_nb_bytes, myfile * p_file)
+OPJ_SIZE_T opj_write_from_memory(void * p_buffer, OPJ_SIZE_T p_nb_bytes, myfile * p_file)
 {
   OPJ_SIZE_T l_nb_write;
   l_nb_write = 1 * p_nb_bytes;
@@ -345,8 +353,7 @@ opj_write_from_memory(void * p_buffer, OPJ_SIZE_T p_nb_bytes, myfile * p_file)
   return l_nb_write;
 }
 
-OPJ_OFF_T
-opj_skip_from_memory(OPJ_OFF_T p_nb_bytes, myfile * p_file)
+OPJ_OFF_T opj_skip_from_memory(OPJ_OFF_T p_nb_bytes, myfile * p_file)
 {
   if (p_file->cur + p_nb_bytes <= p_file->mem + p_file->len)
   {
@@ -357,8 +364,7 @@ opj_skip_from_memory(OPJ_OFF_T p_nb_bytes, myfile * p_file)
   return -1;
 }
 
-OPJ_BOOL
-opj_seek_from_memory(OPJ_OFF_T p_nb_bytes, myfile * p_file)
+OPJ_BOOL opj_seek_from_memory(OPJ_OFF_T p_nb_bytes, myfile * p_file)
 {
   assert(p_nb_bytes >= 0);
   if (static_cast<size_t>(p_nb_bytes) <= p_file->len)
@@ -393,11 +399,15 @@ opj_stream_t * OPJ_CALLCONV
  *
  * a divided by 2^b
  */
-inline int
-int_ceildivpow2(int a, int b)
+int int_ceildivpow2(int a, int b)
 {
   return ((a + (1 << b) - 1) >> b);
 }
+
+}
+
+namespace mdcm
+{
 
 class JPEG2000Internals
 {

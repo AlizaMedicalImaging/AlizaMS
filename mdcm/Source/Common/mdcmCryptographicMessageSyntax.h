@@ -32,13 +32,13 @@ class MDCM_EXPORT CryptographicMessageSyntax
 public:
   CryptographicMessageSyntax() {}
   virtual ~CryptographicMessageSyntax() {}
-  typedef enum
+  enum CipherTypes
   {
     DES3_CIPHER,   // Triple DES
     AES128_CIPHER, // CBC AES
     AES192_CIPHER, // '   '
     AES256_CIPHER  // '   '
-  } CipherTypes;
+  };
   // X.509
   virtual bool
   ParseCertificateFile(const char *) = 0;

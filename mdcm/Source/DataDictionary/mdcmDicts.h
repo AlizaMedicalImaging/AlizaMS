@@ -55,12 +55,12 @@ public:
   IsEmpty() const;
 
 protected:
-  typedef enum
+  enum ConstructorType
   {
     PHILIPS,
     GEMS,
     SIEMENS
-  } ConstructorType;
+  };
   static const char * GetConstructorString(ConstructorType);
   friend class Global;
   void

@@ -37,7 +37,7 @@ class MDCM_EXPORT PixelFormat
   operator<<(std::ostream &, const PixelFormat &);
 
 public:
-  typedef enum
+  enum ScalarType
   {
     UINT8,
     INT8,
@@ -53,7 +53,7 @@ public:
     FLOAT64,
     SINGLEBIT,
     UNKNOWN
-  } ScalarType;
+  };
 
   PixelFormat() = default;
 

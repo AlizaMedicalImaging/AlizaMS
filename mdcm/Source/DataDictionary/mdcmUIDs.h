@@ -37,7 +37,7 @@ public:
   UIDs();
   ~UIDs() = default;
 
-  typedef enum
+  enum UIDType
   {
     uid_0 = 0,
     uid_1_2_840_10008_1_1 = 1,      // Verification SOP Class
@@ -592,9 +592,9 @@ public:
 //
 /////////////////////////////////////////
 
-  } UIDType;
+  };
 
-  typedef enum
+  enum UIDName
   {
     NullUID = 0,
     VerificationSOPClass = 1, // Verification SOP Class
@@ -1166,7 +1166,7 @@ public:
 //
 /////////////////////////////////////////
 
-  } UIDName;
+  };
 
   typedef const char * const (*UIDsStringsType)[2];
   static UIDsStringsType

@@ -57,12 +57,12 @@ public:
 class MDCM_EXPORT Overlay : public Object
 {
 public:
-  typedef enum
+  enum OverlayType
   {
     Invalid = 0,
     Graphics = 1,
     ROI = 2
-  } OverlayType;
+  };
 
   Overlay() = default;
 

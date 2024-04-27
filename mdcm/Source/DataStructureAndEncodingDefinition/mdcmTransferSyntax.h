@@ -30,14 +30,14 @@ namespace mdcm
 class MDCM_EXPORT TransferSyntax
 {
 public:
-  typedef enum
+  enum NegociatedType
   {
     Unknown = 0,
     Explicit,
     Implicit
-  } NegociatedType;
+  };
 
-  typedef enum
+  enum TSType
   {
     ImplicitVRLittleEndian = 0,
     ImplicitVRBigEndianPrivateGE,
@@ -99,7 +99,7 @@ public:
     JPIPHTJ2KReferenced,
     JPIPHTJ2KReferencedDeflate,
     TS_END
-  } TSType;
+  };
 
   TransferSyntax() = default;
 

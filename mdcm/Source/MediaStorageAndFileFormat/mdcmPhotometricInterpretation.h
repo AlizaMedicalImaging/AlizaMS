@@ -39,7 +39,7 @@ class MDCM_EXPORT PhotometricInterpretation
   operator<<(std::ostream &, const PhotometricInterpretation &);
 
 public:
-  typedef enum
+  enum PIType
   {
     UNKNOWN = 0,
     MONOCHROME1,
@@ -56,7 +56,7 @@ public:
     YBR_ICT,
     YBR_RCT,
     PI_END
-  } PIType;
+  };
 
   PhotometricInterpretation() = default;
 
