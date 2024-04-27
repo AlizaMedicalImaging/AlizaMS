@@ -8,7 +8,9 @@
 #include <QPainterPath>
 #include <QApplication>
 #include <QPalette>
+#if 0
 #include "updateqtcommand.h"
+#endif
 
 namespace
 {
@@ -46,8 +48,9 @@ template<typename T> QString calculate_histogramm(
 		bins_size = 256;
 	}
 	//
-	typename UpdateQtCommand::Pointer update_qt_command =
-		UpdateQtCommand::New();
+#if 0
+	typename UpdateQtCommand::Pointer update_qt_command = UpdateQtCommand::New();
+#endif
 	try
 	{
 		histogram_generator->SetInput(image);
@@ -55,8 +58,9 @@ template<typename T> QString calculate_histogramm(
 		histogram_generator->SetAutoHistogramMinimumMaximum(false);
 		histogram_generator->SetHistogramMax(v->di->rmax);
 		histogram_generator->SetHistogramMin(v->di->rmin);
-		histogram_generator->AddObserver(
-			itk::ProgressEvent(), update_qt_command);
+#if 0
+		histogram_generator->AddObserver(itk::ProgressEvent(), update_qt_command);
+#endif
 		histogram_generator->Compute();
 	}
 	catch (const itk::ExceptionObject & ex)
@@ -106,7 +110,9 @@ template<typename T> QString calculate_histogramm_rgb(
 	bin_min[0] = bin_min[1] = bin_min[2] = 0;
 	bin_max[0] = bin_max[1] = bin_max[2] = 255;
 	//
+#if 0
 	UpdateQtCommand::Pointer update_qt_command = UpdateQtCommand::New();
+#endif
 	//
 	try
 	{
@@ -114,7 +120,9 @@ template<typename T> QString calculate_histogramm_rgb(
 		filter->SetHistogramBinMinimum(bin_min);
 		filter->SetHistogramBinMaximum(bin_max);
 		filter->SetInput(image);
+#if 0
 		filter->AddObserver(itk::ProgressEvent(), update_qt_command);
+#endif
 		filter->Update();
 	}
 	catch (const itk::ExceptionObject & ex)
@@ -239,6 +247,7 @@ QString HistogramGen::gen_pixmap_scalar()
 		return QString("pixmap.isNull()");
 	}
 	pixmap.fill(bgcolor);
+	qApp->processEvents();
 	//
 	painter.begin(&pixmap);
 	painter.setPen(pen);
@@ -263,11 +272,16 @@ QString HistogramGen::gen_pixmap_scalar()
 			p.lineTo(x_, pixmap_h - y_);
 		}
 		else p.lineTo(x_, pixmap_h - y_);
+		if (x % 64 == 0)
+		{
+			qApp->processEvents();
+		}
 	}
 	p.lineTo(last_x, pixmap_h);
 	p.lineTo(first_x, pixmap_h);
 	painter.drawPath(p);
 	painter.end();
+	qApp->processEvents();
 	//
 	ivariant->histogram = std::move(pixmap);
 	//
@@ -294,6 +308,7 @@ QString HistogramGen::gen_pixmap_rgb()
 		return QString("pixmap.isNull()");
 	}
 	pixmap.fill(bgcolor);
+	qApp->processEvents();
 	//
 	const double tmp100 = pixmap_w / (static_cast<double>(bins_size) * 3.0);
 	const double tmp101 = 2.0 * tmp100;
@@ -311,6 +326,10 @@ QString HistogramGen::gen_pixmap_rgb()
 		p1.lineTo(x_ + tmp100, pixmap_h - y1_);
 		p2.moveTo(x_ + tmp101, pixmap_h);
 		p2.lineTo(x_ + tmp101, pixmap_h - y2_);
+		if (x % 64 == 0)
+		{
+			qApp->processEvents();
+		}
 	}
 	pen0.setWidth(tmp103); pen0.setColor(Qt::red);
 	pen1.setWidth(tmp103); pen1.setColor(Qt::green);
@@ -324,6 +343,7 @@ QString HistogramGen::gen_pixmap_rgb()
 	painter.setPen(pen2);
 	painter.drawPath(p2);
 	painter.end();
+	qApp->processEvents();
 	//
 	ivariant->histogram = std::move(pixmap);
 	//
