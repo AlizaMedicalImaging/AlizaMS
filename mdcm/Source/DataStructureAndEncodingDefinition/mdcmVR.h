@@ -59,8 +59,7 @@ class MDCM_EXPORT VR
   operator<<(std::ostream &, const VR &);
 
 public:
-  typedef enum
-    : long long
+  enum VRType : long long
   {
     INVALID = 0,
     AE = 1,          // 2^0
@@ -111,7 +110,7 @@ public:
     VRBINARY = AT | FL | FD | OB | OD | OF | OL | OV | OW | SL | SQ | SS | SV | UL | UN | US | UV,
     VR_VM1   = AS | LT | ST | UT | SQ | OF | OL | OV | OD | OW | OB | UN,
     VRALL    = VRASCII | VRBINARY
-  } VRType;
+  };
 
   VR() = default;
 

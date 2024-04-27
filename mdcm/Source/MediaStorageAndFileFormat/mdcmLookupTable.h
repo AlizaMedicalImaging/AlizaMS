@@ -45,7 +45,7 @@ public:
 class MDCM_EXPORT LookupTable
 {
 public:
-  typedef enum
+  enum LookupTableType
   {
     RED = 0,
     GREEN = 1,
@@ -55,7 +55,7 @@ public:
     SUPPLGREEN = 5,
     SUPPLBLUE = 6,
     UNKNOWN
-  } LookupTableType;
+  };
 
   bool
   Initialized() const;

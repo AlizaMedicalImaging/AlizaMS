@@ -33,14 +33,14 @@ namespace mdcm
 class MDCM_EXPORT Orientation
 {
 public:
-  typedef enum
+  enum OrientationType
   {
     UNKNOWN,
     AXIAL,
     CORONAL,
     SAGITTAL,
     OBLIQUE
-  } OrientationType;
+  };
 
   static OrientationType
   GetType(const double[6]);

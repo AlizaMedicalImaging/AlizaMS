@@ -41,7 +41,7 @@ public:
    * This enumeration defines primitive types.
    * PS 3.3 C.27.4.1
    */
-  typedef enum
+  enum MPType
   {
     VERTEX = 0,
     EDGE,
@@ -51,7 +51,7 @@ public:
     LINE,
     FACET,
     MPType_END
-  } MPType;
+  };
 
   static const char *
   GetMPTypeString(const MPType);

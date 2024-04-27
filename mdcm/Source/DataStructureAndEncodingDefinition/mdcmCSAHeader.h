@@ -66,7 +66,7 @@ class MDCM_EXPORT CSAHeader
   operator<<(std::ostream &, const CSAHeader &);
 
 public:
-  typedef enum
+  enum CSAHeaderType
   {
     UNKNOWN = 0,
     SV10,
@@ -74,7 +74,7 @@ public:
     DATASET_FORMAT,
     INTERFILE,
     ZEROED_OUT
-  } CSAHeaderType;
+  };
 
   CSAHeader()
     : InternalDataSet()

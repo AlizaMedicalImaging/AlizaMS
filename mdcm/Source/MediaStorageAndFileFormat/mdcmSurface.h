@@ -39,13 +39,13 @@ namespace mdcm
 class MDCM_EXPORT Surface : public Object
 {
 public:
-  typedef enum
+  enum STATES
   {
     NO = 0,
     YES,
     UNKNOWN,
     STATES_END
-  } STATES;
+  } ;
 
   static const char * GetSTATESString(STATES);
   static STATES
@@ -56,13 +56,13 @@ public:
    *
    * Tag(0x0066, 0x000D) and PS 3.3 C.27.1.1.3
    */
-  typedef enum
+  enum VIEWType
   {
     SURFACE = 0,
     WIREFRAME,
     POINTS,
     VIEWType_END
-  } VIEWType;
+  };
 
   static const char * GetVIEWTypeString(VIEWType);
   static VIEWType

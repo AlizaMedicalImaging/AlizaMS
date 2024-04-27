@@ -40,7 +40,8 @@ class MDCM_EXPORT VM
 public:
 
 // clang-format off
-  typedef enum
+
+  enum VMType
   {
     VM0 = 0,
     VM1,
@@ -84,7 +85,8 @@ public:
     VM7_7n,
     VM30_30n,
     VM47_47n
-  } VMType;
+  };
+
 // clang-format on
 
   VM() = default;
