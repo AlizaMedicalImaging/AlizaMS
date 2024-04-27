@@ -161,9 +161,6 @@ public:
   IsEmpty() const;
 
   bool
-  IsZero() const;
-
-  bool
   IsInPixelData() const;
 
   void

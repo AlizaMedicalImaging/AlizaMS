@@ -409,19 +409,6 @@ Overlay::IsEmpty() const
 }
 
 bool
-Overlay::IsZero() const
-{
-  if (IsEmpty())
-    return false;
-  for (std::vector<char>::const_iterator it = Internal.Data.cbegin(); it != Internal.Data.cend(); ++it)
-  {
-    if (*it)
-      return true;
-  }
-  return false;
-}
-
-bool
 Overlay::IsInPixelData() const
 {
   return Internal.InPixelData;
