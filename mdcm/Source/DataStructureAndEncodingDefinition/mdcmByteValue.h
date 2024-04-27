@@ -40,7 +40,7 @@ class MDCM_EXPORT ByteValue : public Value
 public:
   ByteValue() = default;
   explicit ByteValue(const char *, const VL &);
-  explicit ByteValue(std::vector<char> &);
+  explicit ByteValue(const std::vector<char> &);
   ByteValue(ByteValue && val) noexcept;
   ~ByteValue() = default;
 

@@ -36,6 +36,335 @@
 #include "mdcmImageHelper.h"
 #include <utility>
 
+namespace
+{
+
+void
+DoIconImage(const mdcm::DataSet & rootds, mdcm::Pixmap & image)
+{
+  const mdcm::Tag   ticonimage(0x0088, 0x0200);
+  mdcm::IconImage & pixeldata = image.GetIconImage();
+  if (rootds.FindDataElement(ticonimage))
+  {
+    const mdcm::DataElement &                 iconimagesq = rootds.GetDataElement(ticonimage);
+    mdcm::SmartPointer<mdcm::SequenceOfItems> sq = iconimagesq.GetValueAsSQ();
+    if (!sq || sq->IsEmpty())
+      return;
+    mdcm::SequenceOfItems::ConstIterator it = sq->Begin();
+    const mdcm::DataSet &                ds = it->GetNestedDataSet();
+    {
+      mdcm::Attribute<0x0028, 0x0011> at = { 0 };
+      at.SetFromDataSet(ds);
+      pixeldata.SetDimension(0, at.GetValue());
+    }
+    {
+      mdcm::Attribute<0x0028, 0x0010> at = { 0 };
+      at.SetFromDataSet(ds);
+      pixeldata.SetDimension(1, at.GetValue());
+    }
+    mdcm::PixelFormat pf;
+    {
+      mdcm::Attribute<0x0028, 0x0100> at = { 0 };
+      at.SetFromDataSet(ds);
+      pf.SetBitsAllocated(at.GetValue());
+    }
+    {
+      mdcm::Attribute<0x0028, 0x0101> at = { 0 };
+      at.SetFromDataSet(ds);
+      pf.SetBitsStored(at.GetValue());
+    }
+    {
+      mdcm::Attribute<0x0028, 0x0102> at = { 0 };
+      at.SetFromDataSet(ds);
+      pf.SetHighBit(at.GetValue());
+    }
+    {
+      mdcm::Attribute<0x0028, 0x0103> at = { 0 };
+      at.SetFromDataSet(ds);
+      pf.SetPixelRepresentation(at.GetValue());
+    }
+    {
+      mdcm::Attribute<0x0028, 0x0002> at = { 1 };
+      at.SetFromDataSet(ds);
+      pf.SetSamplesPerPixel(at.GetValue());
+    }
+    pixeldata.SetPixelFormat(pf);
+    const mdcm::Tag                 tphotometricinterpretation(0x0028, 0x0004);
+    mdcm::PhotometricInterpretation pi = mdcm::PhotometricInterpretation::MONOCHROME2;
+    if (ds.FindDataElement(tphotometricinterpretation))
+    {
+      const mdcm::ByteValue * photometricinterpretation = ds.GetDataElement(tphotometricinterpretation).GetByteValue();
+      std::string             photometricinterpretation_str(
+        photometricinterpretation->GetPointer(),
+        photometricinterpretation->GetLength());
+      pi = mdcm::PhotometricInterpretation::GetPIType(photometricinterpretation_str.c_str());
+    }
+    assert(pi != mdcm::PhotometricInterpretation::UNKNOWN);
+    pixeldata.SetPhotometricInterpretation(pi);
+    if (pi == mdcm::PhotometricInterpretation::PALETTE_COLOR)
+    {
+      mdcm::LookupTable lut;
+      lut.Allocate(pf.GetBitsAllocated());
+      for (int i = 0; i < 3; ++i)
+      {
+        const mdcm::Tag                            tdescriptor(0x0028, static_cast<uint16_t>(0x1101 + i));
+        mdcm::Element<mdcm::VR::US, mdcm::VM::VM3> el_us3;
+        el_us3.SetFromDataElement(ds[tdescriptor]);
+        lut.InitializeLUT(mdcm::LookupTable::LookupTableType(i), el_us3[0], el_us3[1], el_us3[2]);
+        const mdcm::Tag tlut(0x0028, static_cast<uint16_t>(0x1201 + i));
+        const mdcm::Tag seglut(0x0028, static_cast<uint16_t>(0x1221 + i));
+        if (ds.FindDataElement(tlut))
+        {
+          const mdcm::ByteValue * lut_raw = ds.GetDataElement(tlut).GetByteValue();
+          if (lut_raw)
+          {
+            lut.SetLUT(
+              mdcm::LookupTable::LookupTableType(i),
+              reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()),
+              lut_raw->GetLength());
+            unsigned int check = (el_us3.GetValue(0) ? el_us3.GetValue(0) : 65536) * el_us3.GetValue(2) / 8;
+            assert(check == lut_raw->GetLength() || 2 * check == lut_raw->GetLength() || check + 1 == lut_raw->GetLength());
+            (void)check;
+          }
+        }
+        else if (ds.FindDataElement(seglut))
+        {
+          const mdcm::ByteValue * lut_raw = ds.GetDataElement(seglut).GetByteValue();
+          if (lut_raw)
+          {
+            lut.SetSegmentedLUT(
+              mdcm::LookupTable::LookupTableType(i),
+              reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()),
+              lut_raw->GetLength());
+          }
+        }
+        else
+        {
+          mdcmWarningMacro("Icon Sequence is incomplete. Giving up");
+          pixeldata.ClearDimensions();
+          return;
+        }
+      }
+      pixeldata.SetLUT(std::move(lut));
+    }
+    const mdcm::Tag tpixeldata = mdcm::Tag(0x7fe0, 0x0010);
+    if (!ds.FindDataElement(tpixeldata))
+    {
+      mdcmWarningMacro("Icon Sequence is incomplete. Giving up");
+      pixeldata.ClearDimensions();
+      return;
+    }
+    const mdcm::DataElement & de = ds.GetDataElement(tpixeldata);
+    pixeldata.SetDataElement(de);
+    // Pass TransferSyntax:
+    // Warning This is legal for the Icon to be uncompress in a compressed image
+    // We need to set the appropriate TS here
+    const mdcm::ByteValue * bv = de.GetByteValue();
+    if (bv)
+      pixeldata.SetTransferSyntax(mdcm::TransferSyntax::ImplicitVRLittleEndian);
+    else
+      pixeldata.SetTransferSyntax(image.GetTransferSyntax());
+  }
+}
+
+void
+DoCurves(const mdcm::DataSet & ds, mdcm::Pixmap & pixeldata)
+{
+  const unsigned int numcurves = mdcm::Curve::GetNumberOfCurves(ds);
+  if (numcurves > 0)
+  {
+    pixeldata.SetNumberOfCurves(numcurves);
+    mdcm::Tag    curve(0x5000, 0x0000);
+    bool         finished = false;
+    unsigned int idxcurves = 0;
+    while (!finished)
+    {
+      const mdcm::DataElement & de = ds.FindNextDataElement(curve);
+      if (de.GetTag().GetGroup() > 0x50FF)
+      {
+        finished = true;
+      }
+      else if (de.GetTag().IsPrivate()) // GEMS owns some 0x5003
+      {
+        curve.SetGroup(static_cast<uint16_t>(de.GetTag().GetGroup() + 1));
+        curve.SetElement(0);
+      }
+      else
+      {
+        mdcm::Curve & ov = pixeldata.GetCurve(idxcurves);
+        ++idxcurves;
+        curve = de.GetTag();
+        uint16_t currentcurve = curve.GetGroup();
+        assert(!(currentcurve % 2));
+        mdcm::DataElement de2 = de;
+        while (de2.GetTag().GetGroup() == currentcurve)
+        {
+          ov.Update(de2);
+          curve.SetElement(static_cast<uint16_t>(de2.GetTag().GetElement() + 1));
+          de2 = ds.FindNextDataElement(curve);
+        }
+      }
+    }
+    assert(idxcurves == numcurves);
+  }
+}
+
+unsigned int
+GetNumberOfOverlaysInternal(const mdcm::DataSet & ds, std::vector<uint16_t> & overlaylist)
+{
+  mdcm::Tag    overlay(0x6000, 0x0000);
+  bool         finished = false;
+  unsigned int numoverlays = 0;
+  while (!finished)
+  {
+    const mdcm::DataElement & de = ds.FindNextDataElement(overlay);
+    if (de.GetTag().GetGroup() > 0x60FF)
+    {
+      finished = true;
+    }
+    else if (de.GetTag().IsPrivate())
+    {
+      overlay.SetGroup(static_cast<uint16_t>(de.GetTag().GetGroup() + 1));
+      overlay.SetElement(0);
+    }
+    else
+    {
+      // Store found tag in overlay
+      overlay = de.GetTag();
+      mdcm::Tag toverlaydata(overlay.GetGroup(), 0x3000);
+      mdcm::Tag toverlayrows(overlay.GetGroup(), 0x0010);
+      mdcm::Tag toverlaycols(overlay.GetGroup(), 0x0011);
+      mdcm::Tag toverlaybitpos(overlay.GetGroup(), 0x0102);
+      if (ds.FindDataElement(toverlaydata))
+      {
+        const mdcm::DataElement & overlaydata = ds.GetDataElement(toverlaydata);
+        if (!overlaydata.IsEmpty())
+        {
+          ++numoverlays;
+          overlaylist.push_back(overlay.GetGroup());
+        }
+      }
+      else if (ds.FindDataElement(toverlayrows) && ds.FindDataElement(toverlaycols) &&
+               ds.FindDataElement(toverlaybitpos))
+      {
+        // Overlay pixel are in unused
+        assert(!ds.FindDataElement(toverlaydata));
+        const mdcm::DataElement & overlayrows = ds.GetDataElement(toverlayrows);
+        const mdcm::DataElement & overlaycols = ds.GetDataElement(toverlaycols);
+        assert(ds.FindDataElement(toverlaybitpos));
+        const mdcm::DataElement & overlaybitpos = ds.GetDataElement(toverlaybitpos);
+        if (!overlayrows.IsEmpty() && !overlaycols.IsEmpty() && !overlaybitpos.IsEmpty())
+        {
+          ++numoverlays;
+          overlaylist.push_back(overlay.GetGroup());
+        }
+      }
+      overlay.SetGroup(static_cast<uint16_t>(overlay.GetGroup() + 2));
+      overlay.SetElement(0);
+    }
+  }
+  assert(numoverlays < 0x00ff / 2);
+  // PS 3.3 - 2004:
+  // C.9.2 Overlay plane module
+  // Each Overlay Plane is one bit deep. Sixteen separate Overlay Planes may be associated with an
+  // Image or exist as Standalone Overlays in a Series
+  assert(numoverlays <= 16);
+  assert(numoverlays == overlaylist.size());
+  return numoverlays;
+}
+
+bool
+DoOverlays(const mdcm::DataSet & ds, mdcm::Pixmap & pixeldata)
+{
+  std::vector<uint16_t> overlaylist;
+  std::vector<bool>     updateoverlayinfo;
+  const unsigned int    numoverlays = GetNumberOfOverlaysInternal(ds, overlaylist);
+  if (numoverlays > 0)
+  {
+    updateoverlayinfo.resize(numoverlays, false);
+    pixeldata.SetNumberOfOverlays(numoverlays);
+    for (unsigned int idxoverlays = 0; idxoverlays < numoverlays; ++idxoverlays)
+    {
+      mdcm::Overlay & ov = pixeldata.GetOverlay(idxoverlays);
+      uint16_t  currentoverlay = overlaylist[idxoverlays];
+      mdcm::Tag overlay(0x6000, 0x0000);
+      overlay.SetGroup(currentoverlay);
+      const mdcm::DataElement & de = ds.FindNextDataElement(overlay);
+      assert(!(currentoverlay % 2));
+      mdcm::DataElement de2 = de;
+      while (de2.GetTag().GetGroup() == currentoverlay)
+      {
+        ov.Update(de2);
+        overlay.SetElement(static_cast<uint16_t>(de2.GetTag().GetElement() + 1));
+        de2 = ds.FindNextDataElement(overlay);
+      }
+      std::ostringstream unpack;
+      ov.Decompress(unpack);
+      if (!ov.IsEmpty())
+      {
+        assert(ov.IsInPixelData() == false);
+      }
+      else if (pixeldata.GetPixelFormat().GetSamplesPerPixel() == 1)
+      {
+        ov.IsInPixelData(true);
+        if (ov.GetBitsAllocated() != pixeldata.GetPixelFormat().GetBitsAllocated())
+        {
+          mdcmWarningMacro("Bits Allocated are wrong. Correcting.");
+          ov.SetBitsAllocated(pixeldata.GetPixelFormat().GetBitsAllocated());
+        }
+        if (!ov.GrabOverlayFromPixelData(ds))
+        {
+          mdcmWarningMacro("Could not extract overlay from pixel data (1)");
+        }
+        updateoverlayinfo[idxoverlays] = true;
+      }
+      else
+      {
+        mdcmWarningMacro("Could not extract overlay from pixel data (2)");
+      }
+    }
+  }
+  const mdcm::PixelFormat & pf = pixeldata.GetPixelFormat();
+  for (size_t ov_idx = pixeldata.GetNumberOfOverlays(); ov_idx != 0; --ov_idx)
+  {
+    size_t                ov = ov_idx - 1;
+    const mdcm::Overlay & o = pixeldata.GetOverlay(ov);
+    if (o.IsInPixelData())
+    {
+      unsigned short obp = o.GetBitPosition();
+      if (obp < pf.GetBitsStored())
+      {
+        pixeldata.RemoveOverlay(ov);
+        updateoverlayinfo.erase(updateoverlayinfo.begin() + ov);
+        mdcmWarningMacro("Invalid: " << obp << " < GetBitsStored()");
+      }
+      else if (obp > pf.GetBitsAllocated())
+      {
+        pixeldata.RemoveOverlay(ov);
+        updateoverlayinfo.erase(updateoverlayinfo.begin() + ov);
+        mdcmWarningMacro("Invalid: " << obp << " > GetBitsAllocated()");
+      }
+    }
+  }
+  for (size_t ov = 0; ov < pixeldata.GetNumberOfOverlays() && updateoverlayinfo[ov]; ++ov)
+  {
+    mdcm::Overlay & o = pixeldata.GetOverlay(ov);
+    if (o.GetBitsAllocated() == 16)
+    {
+      o.SetBitsAllocated(1);
+      o.SetBitPosition(0);
+    }
+    else
+    {
+      mdcmErrorMacro("Overlay #" << ov << " is not supported");
+      return false;
+    }
+  }
+  return true;
+}
+
+}
+
 namespace mdcm
 {
 
@@ -189,327 +518,6 @@ PixmapReader::Read()
     }
   }
   return res;
-}
-
-static void
-DoIconImage(const DataSet & rootds, Pixmap & image)
-{
-  const Tag   ticonimage(0x0088, 0x0200);
-  IconImage & pixeldata = image.GetIconImage();
-  if (rootds.FindDataElement(ticonimage))
-  {
-    const DataElement &           iconimagesq = rootds.GetDataElement(ticonimage);
-    SmartPointer<SequenceOfItems> sq = iconimagesq.GetValueAsSQ();
-    if (!sq || sq->IsEmpty())
-      return;
-    SequenceOfItems::ConstIterator it = sq->Begin();
-    const DataSet &                ds = it->GetNestedDataSet();
-    {
-      Attribute<0x0028, 0x0011> at = { 0 };
-      at.SetFromDataSet(ds);
-      pixeldata.SetDimension(0, at.GetValue());
-    }
-    {
-      Attribute<0x0028, 0x0010> at = { 0 };
-      at.SetFromDataSet(ds);
-      pixeldata.SetDimension(1, at.GetValue());
-    }
-    PixelFormat pf;
-    {
-      Attribute<0x0028, 0x0100> at = { 0 };
-      at.SetFromDataSet(ds);
-      pf.SetBitsAllocated(at.GetValue());
-    }
-    {
-      Attribute<0x0028, 0x0101> at = { 0 };
-      at.SetFromDataSet(ds);
-      pf.SetBitsStored(at.GetValue());
-    }
-    {
-      Attribute<0x0028, 0x0102> at = { 0 };
-      at.SetFromDataSet(ds);
-      pf.SetHighBit(at.GetValue());
-    }
-    {
-      Attribute<0x0028, 0x0103> at = { 0 };
-      at.SetFromDataSet(ds);
-      pf.SetPixelRepresentation(at.GetValue());
-    }
-    {
-      Attribute<0x0028, 0x0002> at = { 1 };
-      at.SetFromDataSet(ds);
-      pf.SetSamplesPerPixel(at.GetValue());
-    }
-    pixeldata.SetPixelFormat(pf);
-    const Tag                 tphotometricinterpretation(0x0028, 0x0004);
-    PhotometricInterpretation pi = PhotometricInterpretation::MONOCHROME2;
-    if (ds.FindDataElement(tphotometricinterpretation))
-    {
-      const ByteValue * photometricinterpretation = ds.GetDataElement(tphotometricinterpretation).GetByteValue();
-      std::string       photometricinterpretation_str(photometricinterpretation->GetPointer(),
-                                                photometricinterpretation->GetLength());
-      pi = PhotometricInterpretation::GetPIType(photometricinterpretation_str.c_str());
-    }
-    assert(pi != PhotometricInterpretation::UNKNOWN);
-    pixeldata.SetPhotometricInterpretation(pi);
-    if (pi == PhotometricInterpretation::PALETTE_COLOR)
-    {
-      LookupTable lut;
-      lut.Allocate(pf.GetBitsAllocated());
-      for (int i = 0; i < 3; ++i)
-      {
-        const Tag                tdescriptor(0x0028, static_cast<uint16_t>(0x1101 + i));
-        Element<VR::US, VM::VM3> el_us3;
-        el_us3.SetFromDataElement(ds[tdescriptor]);
-        lut.InitializeLUT(LookupTable::LookupTableType(i), el_us3[0], el_us3[1], el_us3[2]);
-        const Tag tlut(0x0028, static_cast<uint16_t>(0x1201 + i));
-        const Tag seglut(0x0028, static_cast<uint16_t>(0x1221 + i));
-        if (ds.FindDataElement(tlut))
-        {
-          const ByteValue * lut_raw = ds.GetDataElement(tlut).GetByteValue();
-          if (lut_raw)
-          {
-            lut.SetLUT(
-              LookupTable::LookupTableType(i),
-              reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()),
-              lut_raw->GetLength());
-            unsigned int check = (el_us3.GetValue(0) ? el_us3.GetValue(0) : 65536) * el_us3.GetValue(2) / 8;
-            assert(check == lut_raw->GetLength() || 2 * check == lut_raw->GetLength() || check + 1 == lut_raw->GetLength());
-            (void)check;
-          }
-        }
-        else if (ds.FindDataElement(seglut))
-        {
-          const ByteValue * lut_raw = ds.GetDataElement(seglut).GetByteValue();
-          if (lut_raw)
-          {
-            lut.SetSegmentedLUT(
-              LookupTable::LookupTableType(i), reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()), lut_raw->GetLength());
-          }
-        }
-        else
-        {
-          mdcmWarningMacro("Icon Sequence is incomplete. Giving up");
-          pixeldata.ClearDimensions();
-          return;
-        }
-      }
-      pixeldata.SetLUT(std::move(lut));
-    }
-    const Tag tpixeldata = Tag(0x7fe0, 0x0010);
-    if (!ds.FindDataElement(tpixeldata))
-    {
-      mdcmWarningMacro("Icon Sequence is incomplete. Giving up");
-      pixeldata.ClearDimensions();
-      return;
-    }
-    const DataElement & de = ds.GetDataElement(tpixeldata);
-    pixeldata.SetDataElement(de);
-    // Pass TransferSyntax:
-    // Warning This is legal for the Icon to be uncompress in a compressed image
-    // We need to set the appropriate TS here
-    const ByteValue * bv = de.GetByteValue();
-    if (bv)
-      pixeldata.SetTransferSyntax(TransferSyntax::ImplicitVRLittleEndian);
-    else
-      pixeldata.SetTransferSyntax(image.GetTransferSyntax());
-  }
-}
-
-static void
-DoCurves(const DataSet & ds, Pixmap & pixeldata)
-{
-  unsigned int numcurves;
-  if ((numcurves = Curve::GetNumberOfCurves(ds)))
-  {
-    pixeldata.SetNumberOfCurves(numcurves);
-    Tag          curve(0x5000, 0x0000);
-    bool         finished = false;
-    unsigned int idxcurves = 0;
-    while (!finished)
-    {
-      const DataElement & de = ds.FindNextDataElement(curve);
-      if (de.GetTag().GetGroup() > 0x50FF)
-      {
-        finished = true;
-      }
-      else if (de.GetTag().IsPrivate()) // GEMS owns some 0x5003
-      {
-        curve.SetGroup(static_cast<uint16_t>(de.GetTag().GetGroup() + 1));
-        curve.SetElement(0);
-      }
-      else
-      {
-        Curve & ov = pixeldata.GetCurve(idxcurves);
-        ++idxcurves;
-        curve = de.GetTag();
-        uint16_t currentcurve = curve.GetGroup();
-        assert(!(currentcurve % 2));
-        DataElement de2 = de;
-        while (de2.GetTag().GetGroup() == currentcurve)
-        {
-          ov.Update(de2);
-          curve.SetElement(static_cast<uint16_t>(de2.GetTag().GetElement() + 1));
-          de2 = ds.FindNextDataElement(curve);
-        }
-      }
-    }
-    assert(idxcurves == numcurves);
-  }
-}
-
-static unsigned int
-GetNumberOfOverlaysInternal(const DataSet & ds, std::vector<uint16_t> & overlaylist)
-{
-  Tag          overlay(0x6000, 0x0000);
-  bool         finished = false;
-  unsigned int numoverlays = 0;
-  while (!finished)
-  {
-    const DataElement & de = ds.FindNextDataElement(overlay);
-    if (de.GetTag().GetGroup() > 0x60FF)
-    {
-      finished = true;
-    }
-    else if (de.GetTag().IsPrivate())
-    {
-      overlay.SetGroup(static_cast<uint16_t>(de.GetTag().GetGroup() + 1));
-      overlay.SetElement(0);
-    }
-    else
-    {
-      // Store found tag in overlay
-      overlay = de.GetTag();
-      Tag toverlaydata(overlay.GetGroup(), 0x3000);
-      Tag toverlayrows(overlay.GetGroup(), 0x0010);
-      Tag toverlaycols(overlay.GetGroup(), 0x0011);
-      Tag toverlaybitpos(overlay.GetGroup(), 0x0102);
-      if (ds.FindDataElement(toverlaydata))
-      {
-        const DataElement & overlaydata = ds.GetDataElement(toverlaydata);
-        if (!overlaydata.IsEmpty())
-        {
-          ++numoverlays;
-          overlaylist.push_back(overlay.GetGroup());
-        }
-      }
-      else if (ds.FindDataElement(toverlayrows) && ds.FindDataElement(toverlaycols) &&
-               ds.FindDataElement(toverlaybitpos))
-      {
-        // Overlay pixel are in unused
-        assert(!ds.FindDataElement(toverlaydata));
-        const DataElement & overlayrows = ds.GetDataElement(toverlayrows);
-        const DataElement & overlaycols = ds.GetDataElement(toverlaycols);
-        assert(ds.FindDataElement(toverlaybitpos));
-        const DataElement & overlaybitpos = ds.GetDataElement(toverlaybitpos);
-        if (!overlayrows.IsEmpty() && !overlaycols.IsEmpty() && !overlaybitpos.IsEmpty())
-        {
-          ++numoverlays;
-          overlaylist.push_back(overlay.GetGroup());
-        }
-      }
-      overlay.SetGroup(static_cast<uint16_t>(overlay.GetGroup() + 2));
-      overlay.SetElement(0);
-    }
-  }
-  assert(numoverlays < 0x00ff / 2);
-  // PS 3.3 - 2004:
-  // C.9.2 Overlay plane module
-  // Each Overlay Plane is one bit deep. Sixteen separate Overlay Planes may be associated with an
-  // Image or exist as Standalone Overlays in a Series
-  assert(numoverlays <= 16);
-  assert(numoverlays == overlaylist.size());
-  return numoverlays;
-}
-
-static bool
-DoOverlays(const DataSet & ds, Pixmap & pixeldata)
-{
-  std::vector<uint16_t> overlaylist;
-  std::vector<bool>     updateoverlayinfo;
-  const unsigned int    numoverlays = GetNumberOfOverlaysInternal(ds, overlaylist);
-  if (numoverlays > 0)
-  {
-    updateoverlayinfo.resize(numoverlays, false);
-    pixeldata.SetNumberOfOverlays(numoverlays);
-    for (unsigned int idxoverlays = 0; idxoverlays < numoverlays; ++idxoverlays)
-    {
-      Overlay & ov = pixeldata.GetOverlay(idxoverlays);
-      uint16_t  currentoverlay = overlaylist[idxoverlays];
-      Tag       overlay(0x6000, 0x0000);
-      overlay.SetGroup(currentoverlay);
-      const DataElement & de = ds.FindNextDataElement(overlay);
-      assert(!(currentoverlay % 2));
-      DataElement de2 = de;
-      while (de2.GetTag().GetGroup() == currentoverlay)
-      {
-        ov.Update(de2);
-        overlay.SetElement(static_cast<uint16_t>(de2.GetTag().GetElement() + 1));
-        de2 = ds.FindNextDataElement(overlay);
-      }
-      std::ostringstream unpack;
-      ov.Decompress(unpack);
-      if (!ov.IsEmpty())
-      {
-        assert(ov.IsInPixelData() == false);
-      }
-      else if (pixeldata.GetPixelFormat().GetSamplesPerPixel() == 1)
-      {
-        ov.IsInPixelData(true);
-        if (ov.GetBitsAllocated() != pixeldata.GetPixelFormat().GetBitsAllocated())
-        {
-          mdcmWarningMacro("Bits Allocated are wrong. Correcting.");
-          ov.SetBitsAllocated(pixeldata.GetPixelFormat().GetBitsAllocated());
-        }
-        if (!ov.GrabOverlayFromPixelData(ds))
-        {
-          mdcmWarningMacro("Could not extract overlay from pixel data (1)");
-        }
-        updateoverlayinfo[idxoverlays] = true;
-      }
-      else
-      {
-        mdcmWarningMacro("Could not extract overlay from pixel data (2)");
-      }
-    }
-  }
-  const PixelFormat & pf = pixeldata.GetPixelFormat();
-  for (size_t ov_idx = pixeldata.GetNumberOfOverlays(); ov_idx != 0; --ov_idx)
-  {
-    size_t          ov = ov_idx - 1;
-    const Overlay & o = pixeldata.GetOverlay(ov);
-    if (o.IsInPixelData())
-    {
-      unsigned short obp = o.GetBitPosition();
-      if (obp < pf.GetBitsStored())
-      {
-        pixeldata.RemoveOverlay(ov);
-        updateoverlayinfo.erase(updateoverlayinfo.begin() + ov);
-        mdcmWarningMacro("Invalid: " << obp << " < GetBitsStored()");
-      }
-      else if (obp > pf.GetBitsAllocated())
-      {
-        pixeldata.RemoveOverlay(ov);
-        updateoverlayinfo.erase(updateoverlayinfo.begin() + ov);
-        mdcmWarningMacro("Invalid: " << obp << " > GetBitsAllocated()");
-      }
-    }
-  }
-  for (size_t ov = 0; ov < pixeldata.GetNumberOfOverlays() && updateoverlayinfo[ov]; ++ov)
-  {
-    Overlay & o = pixeldata.GetOverlay(ov);
-    if (o.GetBitsAllocated() == 16)
-    {
-      o.SetBitsAllocated(1);
-      o.SetBitPosition(0);
-    }
-    else
-    {
-      mdcmErrorMacro("Overlay #" << ov << " is not supported");
-      return false;
-    }
-  }
-  return true;
 }
 
 bool

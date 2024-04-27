@@ -31,13 +31,13 @@ Pixmap::Pixmap() : Icon(new IconImage)
 bool
 Pixmap::AreOverlaysInPixelData() const
 {
-  int                                  total = 0;
-  std::vector<Overlay>::const_iterator it = Overlays.begin();
-  for (; it != Overlays.end(); ++it)
+  for (std::vector<Overlay>::const_iterator it = Overlays.begin();
+       it != Overlays.end(); ++it)
   {
-    total += static_cast<int>(it->IsInPixelData());
+    if (it->IsInPixelData())
+      return true;
   }
-  return total != 0;
+  return false;
 }
 
 bool

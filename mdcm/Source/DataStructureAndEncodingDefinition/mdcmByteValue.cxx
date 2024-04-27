@@ -41,7 +41,7 @@ ByteValue::ByteValue(const char * array, const VL & vl)
   }
 }
 
-ByteValue::ByteValue(std::vector<char> & v)
+ByteValue::ByteValue(const std::vector<char> & v)
   : Internal(v)
   , Length(static_cast<uint32_t>(v.size()))
 {}
