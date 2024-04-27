@@ -593,8 +593,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>393</width>
-            <height>234</height>
+            <width>989</width>
+            <height>587</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -1165,7 +1165,7 @@ p, li { white-space: pre-wrap; }
                  </sizepolicy>
                 </property>
                 <property name="toolTip">
-                 <string>May be helpful for slow graphics. On Linux seems to work better with Wayland.</string>
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;May be useful for slow graphics. On Linux seems to work better with Wayland.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="text">
                  <string>Adjust rotation</string>
