@@ -468,7 +468,7 @@ public slots:
 #if 0
 	void set_contours_width(float);
 #endif
-	void set_adjust_rotation(bool);
+	void set_adjust(bool);
 
 private:
 	void initializeGL() override;
@@ -484,10 +484,8 @@ private:
 	QPoint lastPanPos;
 	QPoint lastPosScale;
 	QElapsedTimer timer1;
-	bool adjust_rotation{true};
-	long long timer1_adjust{40}; // milliseconds
-	const long long timer1_min{40};
-	const long long timer1_max{800};
+	bool adjust{true};
+	long long timer1_min{40}; // milliseconds
 } VECTORMATH_ALIGNED_POST;
 
 #endif

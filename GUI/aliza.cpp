@@ -1807,7 +1807,7 @@ void Aliza::connect_slots()
 		connect(toolbox->bright_doubleSpinBox,   SIGNAL(valueChanged(double)), glwidget, SLOT(set_brightness(double)));
 		connect(toolbox->contours_checkBox,      SIGNAL(toggled(bool)),        glwidget, SLOT(set_display_contours(bool)));
 		connect(toolbox->cube_checkBox,          SIGNAL(toggled(bool)),        glwidget, SLOT(set_cube(bool)));
-		connect(settingswidget->adjust_checkBox, SIGNAL(toggled(bool)),        glwidget, SLOT(set_adjust_rotation(bool)));
+		connect(settingswidget->adjust_checkBox, SIGNAL(toggled(bool)),        glwidget, SLOT(set_adjust(bool)));
 	}
 	connect(anim3Dwidget->frametime_spinBox,  SIGNAL(valueChanged(int)), this,             SLOT(set_frametime_3D(int)));
 	connect(anim3Dwidget->group_pushButton,   SIGNAL(clicked()),         this,             SLOT(create_group()));

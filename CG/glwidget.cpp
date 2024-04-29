@@ -308,29 +308,7 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
-	if (adjust_rotation)
-	{
-		const auto t0 = std::chrono::steady_clock::now();
-		paint__();
-		const auto t1 = std::chrono::steady_clock::now();
-		const auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
-		// Note that for hardware-accelerated graphics this is NOT the time the application
-		// spent to render, it is possible that 'timer1_elapsed' will be 0. It is mostly for
-		// software-accelerated graphics, to make it more usable for large volumes.
-		// 'timer1_adjust' is used only for rotation. It seems to be a good idea for some
-		// configurations to limit mouse move events processing to some min interval (40 ms)
-		// and it seems to be OK for fast graphics too, there is the option in 'Settings'
-		// to disable this.
-		const long long timer1_elapsed = ts.count();
-		timer1_adjust = clamp(timer1_elapsed, timer1_min, timer1_max);
-#if 0
-		std::cout << "elapsed = " << timer1_elapsed << ", adjust = " << timer1_adjust << std::endl;
-#endif
-	}
-	else
-	{
-		paint__();
-	}
+	paint__();
 }
 
 void GLWidget::resizeGL(int width, int height)
@@ -340,58 +318,52 @@ void GLWidget::resizeGL(int width, int height)
 
 void GLWidget::mousePressEvent(QMouseEvent * e)
 {
+	e->accept();
 	if (e->buttons() & Qt::LeftButton)
 	{
 		lastPos = e->pos();
-		if (adjust_rotation) timer1.start();
+		if (adjust) timer1.start();
 	}
 	else if (e->buttons() & Qt::MiddleButton)
 	{
 		lastPanPos = e->pos();
+		if (adjust) timer1.start();
 	}
 	else if (e->buttons() & Qt::RightButton)
 	{
 		lastPosScale = e->pos();
+		if (adjust) timer1.start();
 #if 0
 		send_ray0(e->x(), e->y());
 		updateGL();
 #endif
 	}
-	e->accept();
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent * e)
 {
-	if (adjust_rotation && e->button() == Qt::LeftButton)
+	e->accept();
+	if (adjust &&
+		(e->button() == Qt::LeftButton || e->button() == Qt::MiddleButton || e->button() == Qt::RightButton))
 	{
 		timer1.invalidate();
-		timer1_adjust = timer1_min;
 	}
-	e->accept();
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent * e)
 {
+	e->accept();
+	if (adjust && (timer1.isValid() && timer1.elapsed() < timer1_min))
+	{
+		return;
+	}
 	if (e->buttons() & Qt::LeftButton)
 	{
 		const QPoint p = e->pos();
-		if (adjust_rotation)
-		{
-			if (timer1.isValid() && timer1.elapsed() >= timer1_adjust)
-			{
-				set_win_old_position(lastPos.x(), lastPos.y());
-				set_win_new_position(p.x(), p.y());
-				lastPos = p;
-				timer1.start();
-			}
-		}
-		else
-		{
-			set_win_old_position(lastPos.x(), lastPos.y());
-			set_win_new_position(p.x(), p.y());
-			lastPos = p;
-		}
-		e->accept();
+		set_win_old_position(lastPos.x(), lastPos.y());
+		set_win_new_position(p.x(), p.y());
+		lastPos = p;
+		if (adjust) timer1.start();
 		updateGL();
 	}
 	else if (e->buttons() & Qt::MiddleButton)
@@ -401,7 +373,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent * e)
 		const int deltay = p.y() - lastPanPos.y();
 		set_pan_delta(deltax, deltay);
 		lastPanPos = p;
-		e->accept();
+		if (adjust) timer1.start();
 		updateGL();
 	}
 	else if (e->buttons() & Qt::RightButton)
@@ -415,17 +387,14 @@ void GLWidget::mouseMoveEvent(QMouseEvent * e)
 		if (tmp1 < 0.001f) position_z = 0.001f;
 		else position_z = tmp1;
 		lastPosScale = p;
-		e->accept();
+		if (adjust) timer1.start();
 		updateGL();
-	}
-	else
-	{
-		e->accept();
 	}
 }
 
 void GLWidget::wheelEvent(QWheelEvent * e)
 {
+	e->accept();
 	double incr = 4.0;
 	if (Qt::ControlModifier == QApplication::keyboardModifiers())
 	{
@@ -456,7 +425,6 @@ void GLWidget::wheelEvent(QWheelEvent * e)
 	}
 	if (ortho_size < 0.001f) ortho_size = 0.001f;
 	if (position_z < 0.001f) position_z = 0.001f;
-	e->accept();
 	updateGL();
 }
 
@@ -6959,13 +6927,12 @@ void GLWidget::d_mesh(
 	glDrawArrays(GL_TRIANGLES, 0, s->faces_size * 3);
 }
 
-void GLWidget::set_adjust_rotation(bool t)
+void GLWidget::set_adjust(bool t)
 {
-	adjust_rotation = t;
+	adjust = t;
 	if (timer1.isValid()) timer1.invalidate();
-	timer1_adjust = timer1_min;
 #if 0
-	std::cout << "set_adjust_rotation(" << (t ? "true)" : "false)") << std::endl;
+	std::cout << "set_adjust(" << (t ? "true)" : "false)") << std::endl;
 #endif
 }
 
