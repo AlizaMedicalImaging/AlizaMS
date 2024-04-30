@@ -465,7 +465,7 @@ public slots:
 #if 0
 	void set_contours_width(float);
 #endif
-	void set_adjust(bool);
+	void set_adjust(int);
 
 private:
 	void initializeGL() override;

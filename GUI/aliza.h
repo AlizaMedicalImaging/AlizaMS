@@ -166,6 +166,8 @@ public slots:
 	void toggle_lock_window(bool);
 	void trigger_show_roi_info();
 	void update_studyview_intersections();
+	void set_adjust_glwidget(bool);
+	void set_adjust_value_glwidget(int);
 
 signals:
 	void report_load_to_mainwin();

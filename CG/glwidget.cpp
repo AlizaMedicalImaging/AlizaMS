@@ -6927,12 +6927,20 @@ void GLWidget::d_mesh(
 	glDrawArrays(GL_TRIANGLES, 0, s->faces_size * 3);
 }
 
-void GLWidget::set_adjust(bool t)
+void GLWidget::set_adjust(int x)
 {
-	adjust = t;
+	if (x <= 0)
+	{
+		adjust = false;
+	}
+	else
+	{
+		adjust = true;
+		timer1_min = x;
+	}
 	if (timer1.isValid()) timer1.invalidate();
 #if 0
-	std::cout << "set_adjust(" << (t ? "true)" : "false)") << std::endl;
+	std::cout << "set_adjust(" << x << ')' << std::endl;
 #endif
 }
 

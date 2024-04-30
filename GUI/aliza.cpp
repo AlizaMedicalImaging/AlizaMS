@@ -1807,7 +1807,8 @@ void Aliza::connect_slots()
 		connect(toolbox->bright_doubleSpinBox,   SIGNAL(valueChanged(double)), glwidget, SLOT(set_brightness(double)));
 		connect(toolbox->contours_checkBox,      SIGNAL(toggled(bool)),        glwidget, SLOT(set_display_contours(bool)));
 		connect(toolbox->cube_checkBox,          SIGNAL(toggled(bool)),        glwidget, SLOT(set_cube(bool)));
-		connect(settingswidget->adjust_checkBox, SIGNAL(toggled(bool)),        glwidget, SLOT(set_adjust(bool)));
+		connect(settingswidget->adjust_checkBox, SIGNAL(toggled(bool)),        this, SLOT(set_adjust_glwidget(bool)));
+		connect(settingswidget->adjust_spinBox,  SIGNAL(valueChanged(int)),    this, SLOT(set_adjust_value_glwidget(int)));
 	}
 	connect(anim3Dwidget->frametime_spinBox,  SIGNAL(valueChanged(int)), this,             SLOT(set_frametime_3D(int)));
 	connect(anim3Dwidget->group_pushButton,   SIGNAL(clicked()),         this,             SLOT(create_group()));
@@ -5022,7 +5023,26 @@ QString Aliza::process_dicom(
 	return message;
 }
 
+void Aliza::set_adjust_glwidget(bool t)
+{
+	if (t)
+	{
+		glwidget->set_adjust(settingswidget->adjust_spinBox->value());
+	}
+	else
+	{
+		glwidget->set_adjust(0);
+	}
+}
+
+void Aliza::set_adjust_value_glwidget(int x)
+{
+	if (settingswidget->adjust_checkBox->isChecked())
+	{
+		glwidget->set_adjust(x);
+	}
+}
+
 #ifdef ALIZA_PRINT_COUNT_GL_OBJ
 #undef ALIZA_PRINT_COUNT_GL_OBJ
 #endif
-

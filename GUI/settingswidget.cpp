@@ -169,7 +169,8 @@ void SettingsWidget::set_default()
 	cp1251_checkBox->blockSignals(false);
 	mvsep_checkBox->setChecked(false);
 	dcmthread_checkBox->setChecked(true);
-	adjust_checkBox->setChecked(true);
+	adjust_spinBox->setValue(14);
+	adjust_checkBox->setChecked(false);
 }
 
 void SettingsWidget::set_force_cp1251(bool b)
@@ -253,7 +254,8 @@ void SettingsWidget::readSettings()
 	const int tmp15 = settings.value(QString("apply_suppl"),     1).toInt();
 	const int tmp16 = settings.value(QString("mvsep"),           0).toInt();
 	const int tmp17 = settings.value(QString("dcm_thread"),      1).toInt();
-	const int tmp18 = settings.value(QString("adj_fps"),         1).toInt();
+	const int tmp18 = settings.value(QString("adj_fps"),         0).toInt();
+	const int tmp19 = settings.value(QString("adj_fps_value"),   14).toInt();
 	settings.endGroup();
 	settings.beginGroup(QString("StyleDialog"));
 	saved_idx = settings.value(QString("saved_idx"), 0).toInt();
@@ -324,6 +326,7 @@ void SettingsWidget::readSettings()
 	cp1251_checkBox->blockSignals(false);
 	mvsep_checkBox->setChecked((tmp16 == 1));
 	dcmthread_checkBox->setChecked((tmp17 == 1));
+	adjust_spinBox->setValue(tmp19);
 	adjust_checkBox->setChecked((tmp18 == 1));
 }
 
@@ -349,6 +352,7 @@ void SettingsWidget::writeSettings(QSettings & s)
 	s.setValue(QString("mvsep"),         QVariant(mvsep_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("dcm_thread"),    QVariant(dcmthread_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("adj_fps"),       QVariant(adjust_checkBox->isChecked() ? 1 : 0));
+	s.setValue(QString("adj_fps_value"), QVariant(adjust_spinBox->value()));
 	if (enh_dim_skip_radioButton->isChecked())
 	{
 		s.setValue(QString("enh_strategy"), QVariant(4));

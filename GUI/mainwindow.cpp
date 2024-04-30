@@ -41,6 +41,7 @@ MainWindow::MainWindow(
 	int swidth{};
 	int sheight{};
 	int adj_fps{};
+	int adj_fps_value{};
 	desktop_layout(&swidth, &sheight);
 	//
 	{
@@ -53,7 +54,8 @@ MainWindow::MainWindow(
 		saved_style =
 			settings.value(QString("stylename"), QVariant(QString("Dark Fusion"))).toString();
 		const int mvsep = settings.value(QString("mvsep"), 0).toInt();
-		adj_fps = settings.value(QString("adj_fps"), 1).toInt();
+		adj_fps = settings.value(QString("adj_fps"), 0).toInt();
+		adj_fps_value = settings.value(QString("adj_fps_value"), 14).toInt();
 		settings.endGroup();
 		multiview_tab = (mvsep != 1);
 		const int w = static_cast<int>(static_cast<double>(swidth) * 0.7);
@@ -325,7 +327,14 @@ MainWindow::MainWindow(
 		vl2->setContentsMargins(0, 0, 0, 0);
 		vl2->addWidget(glwidget);
 		//
-		glwidget->set_adjust((adj_fps == 1));
+		if (adj_fps == 1)
+		{
+			glwidget->set_adjust(adj_fps_value);
+		}
+		else
+		{
+			glwidget->set_adjust(0);
+		}
 	}
 	else
 	{
