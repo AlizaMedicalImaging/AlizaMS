@@ -11631,16 +11631,20 @@ bool DicomUtils::enhanced_process_indices(
 		tmp1_5.push_back(1);
 	}
 	//
-	if (loading_type == EnhancedIODLoadingType::PreferUniformVolumes ||
+#ifdef ALIZA_VERBOSE
+	if (idx_values_size < 1 && (
+		loading_type == EnhancedIODLoadingType::PreferUniformVolumes ||
 		loading_type == EnhancedIODLoadingType::StrictMultipleImages ||
-		loading_type == EnhancedIODLoadingType::StrictSingleImage)
+		loading_type == EnhancedIODLoadingType::StrictSingleImage))
 	{
-#ifdef ENHANCED_PRINT_INFO
-		if (idx_values_size < 1)
-		{
-			std::cout << "Internal error in enhanced_process_indices: idx_values_size < 1" << std::endl;
-		}
+		std::cout << "Cannot process Dimension Organization: no indices" << std::endl;
+	}
 #endif
+	if (idx_values_size >= 1 && (
+		loading_type == EnhancedIODLoadingType::PreferUniformVolumes ||
+		loading_type == EnhancedIODLoadingType::StrictMultipleImages ||
+		loading_type == EnhancedIODLoadingType::StrictSingleImage))
+	{
 #ifdef ENHANCED_PRINT_INFO
 		bool warning0{};
 		bool info0{};
