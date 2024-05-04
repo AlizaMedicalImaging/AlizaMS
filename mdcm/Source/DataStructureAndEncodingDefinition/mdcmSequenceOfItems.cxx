@@ -22,6 +22,13 @@
 
 #include "mdcmSequenceOfItems.h"
 
+namespace
+{
+
+  static const mdcm::Item empty{};
+
+}
+
 namespace mdcm
 {
 
@@ -68,7 +75,8 @@ SequenceOfItems::GetItem(SizeType position)
   if (position < 1 || position > Items.size())
   {
     mdcmAlwaysWarnMacro("SQ: invalid index");
-    return empty;
+    error_fallback.Clear();
+    return error_fallback;
   }
   return Items[position - 1];
 }
@@ -81,7 +89,7 @@ SequenceOfItems::GetItem(SizeType position) const
     mdcmAlwaysWarnMacro("SQ: invalid index");
     return empty;
   }
-  return Items[position - 1];
+  return Items.at(position - 1);
 }
 
 void
@@ -93,9 +101,8 @@ SequenceOfItems::SetLengthToUndefined()
 bool
 SequenceOfItems::FindDataElement(const Tag & t) const
 {
-  ConstIterator it = Begin();
-  bool          found = false;
-  for (; it != End() && !found; ++it)
+  bool found = false;
+  for (ConstIterator it = Begin(); it != End() && !found; ++it)
   {
     const Item & item = *it;
     found = item.FindDataElement(t);

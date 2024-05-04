@@ -412,7 +412,7 @@ DataSet::ReadWithLength(std::istream & is, VL & length)
   {
     if (pe.GetLastElement().GetTag() == Tag(0xfffe, 0xe000))
     {
-      // mdcm-MR-PHILIPS-16-Multi-Seq.dcm
+      // gdcm-MR-PHILIPS-16-Multi-Seq.dcm
       // Philips engineer inserted 0xfffe,0x0000 instead of an item start element
       is.seekg(-6, std::ios::cur);
       length = locallength = l;
@@ -437,7 +437,7 @@ DataSet::ReadWithLength(std::istream & is, VL & length)
     }
     else
     {
-      // mdcmDataExtra/mdcmBreakers/BuggedDicomWorksImage_Hopeless.dcm
+      // gdcmDataExtra/gdcmBreakers/BuggedDicomWorksImage_Hopeless.dcm
       mdcmErrorMacro("Last Tag is : " << pe.GetLastElement().GetTag());
       throw std::logic_error("Unhandled");
     }

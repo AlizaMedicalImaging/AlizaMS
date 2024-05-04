@@ -232,8 +232,6 @@ public:
   ReadWithLength(std::istream &, VL &);
 
 protected:
-  const DataElement &
-  GetDEEnd() const;
   // This function is not safe, it does not check for the value of the tag
   // so depending whether we are getting called from a dataset or file meta header
   // the condition is different

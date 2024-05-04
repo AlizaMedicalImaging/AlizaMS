@@ -75,7 +75,7 @@ ImplicitDataElement::ReadValue(std::istream & is, bool readvalues)
   const Tag itemStartItem(0xfffe, 0xe000);
   assert(TagField != itemStartItem);
   /*
-   * Technically this should not be needed, but what if an implementor, forgot
+   * MM: Technically this should not be needed, but what if an implementor forgot
    * to set VL = 0, then we should make sure to exit early.
    */
   const Tag itemDelItem(0xfffe, 0xe00d);
@@ -95,7 +95,7 @@ ImplicitDataElement::ReadValue(std::istream & is, bool readvalues)
   }
   else if (ValueLengthField.IsUndefined())
   {
-    // FIXME what if I am reading the pixel data...
+    // MM: what if I am reading the pixel data ...
     // assert(TagField != Tag(0x7fe0,0x0010));
     if (TagField != Tag(0x7fe0, 0x0010))
     {
@@ -116,7 +116,7 @@ ImplicitDataElement::ReadValue(std::istream & is, bool readvalues)
     }
     else
     {
-      // In the following we read 4 more bytes in the Value field
+      // MM: In the following we read 4 more bytes in the Value field
       // to find out if this is a SQ or not
       // there is still work to do to handle the PMS featured SQ
       // where item Start is in fact 0xfeff, 0x00e0 ... sigh
@@ -140,7 +140,7 @@ ImplicitDataElement::ReadValue(std::istream & is, bool readvalues)
       {
         // MR_Philips_Intera_No_PrivateSequenceImplicitVR.dcm
         mdcmWarningMacro("Illegal Tag for Item starter: " << TagField << " should be: " << itemStart);
-        // TODO: We READ Explicit ok... but we store Implicit!
+        // MM: TODO: We READ Explicit ok... but we store Implicit!
         // Indeed when copying the VR will be saved.
         ValueField = new SequenceOfItems;
         ValueField->SetLength(ValueLengthField);
@@ -190,11 +190,11 @@ ImplicitDataElement::ReadValue(std::istream & is, bool readvalues)
     }
   }
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
-  // THE WORST BUG EVER. From GE Workstation
+  // MM: THE WORST BUG EVER. From GE Workstation
   if (ValueLengthField == 13)
   {
-    // Historically mdcm did not enforce proper length
-    // thus Theralys started writing illegal DICOM images:
+    // Historically gdcm did not enforce proper length
+    // thus Theralys started writing illegal DICOM images
     const Tag theralys1(0x0008, 0x0070);
     const Tag theralys2(0x0008, 0x0080);
     if (TagField != theralys1 && TagField != theralys2)
@@ -269,7 +269,7 @@ ImplicitDataElement::ReadValue(std::istream & is, bool readvalues)
       is.clear();
     }
     else
-#endif /* MDCM_SUPPORT_BROKEN_IMPLEMENTATION */
+#endif
     {
       throw std::logic_error("Should not happen (imp)");
     }
@@ -353,7 +353,7 @@ ImplicitDataElement::ReadValueWithLength(std::istream & is, VL & length, bool re
     }
     else
     {
-      // In the following we read 4 more bytes in the Value field
+      // MM: In the following we read 4 more bytes in the Value field
       // to find out if this is a SQ or not
       // there is still work to do to handle the PMS featured SQ
       // where item Start is in fact 0xfeff, 0x00e0 ... sigh
@@ -363,9 +363,7 @@ ImplicitDataElement::ReadValueWithLength(std::istream & is, VL & length, bool re
       const Tag itemPMSStart2(0x3f3f, 0x3f00);
 #endif
       Tag item;
-      // TODO FIXME why not `peek` directly ?
       item.Read<TSwap>(is);
-      // Maybe seek back is slow
       is.seekg(-4, std::ios::cur);
       if (item == itemStart)
       {
@@ -396,7 +394,6 @@ ImplicitDataElement::ReadValueWithLength(std::istream & is, VL & length, bool re
         {
           // MR_ELSCINT1_00e1_1042_SQ_feff_00e0_Item.dcm
           std::streampos current = is.tellg();
-          // could be bad, if the specific implementation does not support negative streamoff values.
           std::streamoff diff = start - current;
           is.seekg(diff, std::ios::cur);
           assert(diff == -14);
@@ -432,13 +429,13 @@ ImplicitDataElement::ReadValueWithLength(std::istream & is, VL & length, bool re
   // THE WORST BUG EVER. From GE Workstation.
   if (ValueLengthField == 13)
   {
-    // Historically mdcm did not enforce proper length
-    // thus Theralys started writing illegal DICOM images.
+    // Historically gdcm did not enforce proper length
+    // thus Theralys started writing illegal DICOM images
     const Tag theralys1(0x0008, 0x0070);
     const Tag theralys2(0x0008, 0x0080);
     if (TagField != theralys1 && TagField != theralys2)
     {
-      mdcmAlwaysWarnMacro(
+      mdcmWarningMacro(
         "GE,13: Replacing VL=0x000d with VL=0x000a, for Tag=" << TagField << " in order to read a buggy DICOM file");
       ValueLengthField = 10;
     }
@@ -448,7 +445,7 @@ ImplicitDataElement::ReadValueWithLength(std::istream & is, VL & length, bool re
   if (ValueLengthField == 0x31f031c && TagField == Tag(0x031e, 0x0324))
   {
     // TestImages/elbow.pap
-    mdcmAlwaysWarnMacro("Replacing a VL. To be able to read a supposively broken Payrus file");
+    mdcmWarningMacro("Replacing a VL. To be able to read a supposively broken Payrus file");
     ValueLengthField = 202; // 0xca
   }
 #endif
@@ -537,7 +534,7 @@ ImplicitDataElement::Write(std::ostream & os) const
   const SequenceOfItems * sqi = dynamic_cast<const SequenceOfItems *>(ValueField.GetPointer());
   if (sqi && !ValueLengthField.IsUndefined())
   {
-    // Hum, we might have to recompute the length:
+    // MM: Hum, we might have to recompute the length:
     // See TestWriter2, where an explicit SQ is converted to implicit SQ
     VL len = sqi->template ComputeLength<ImplicitDataElement>();
     // assert(len == ValueLengthField);

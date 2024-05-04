@@ -89,7 +89,7 @@ UNExplicitDataElement::ReadPreValue(std::istream & is)
   catch (const std::logic_error &)
   {
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
-    // mdcm-MR-PHILIPS-16-Multi-Seq.dcm
+    // gdcm-MR-PHILIPS-16-Multi-Seq.dcm
     // assert(TagField == Tag(0xfffe, 0xe000));
     // -> For some reason VR is written as {44,0} well I guess this is a VR...
     // Technically there is a second bug, dcmtk assume other things when reading this tag,

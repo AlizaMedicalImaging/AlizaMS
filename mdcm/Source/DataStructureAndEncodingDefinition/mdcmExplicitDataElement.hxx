@@ -48,7 +48,7 @@ ExplicitDataElement::ReadPreValue(std::istream & is)
   // See PS 3.5, Data Element Structure With Explicit VR
   if (!is)
   {
-    if (!is.eof()) // FIXME This should not be needed
+    if (!is.eof())
     {
       assert(0 && "Should not happen");
     }
@@ -72,9 +72,9 @@ ExplicitDataElement::ReadPreValue(std::istream & is)
     {
       mdcmDebugMacro("Item Delimitation Item has a length different from 0 and is: " << ValueLengthField);
     }
-    // Reset ValueLengthField to avoid user error
+    // Reset ValueLengthField
     ValueLengthField = 0;
-    // Set pointer to nullptr to avoid user error
+    // Set pointer to nullptr
     ValueField = nullptr;
     VRField = VR::INVALID;
     return is;
@@ -82,7 +82,7 @@ ExplicitDataElement::ReadPreValue(std::istream & is)
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
   if (TagField == Tag(0x00ff, 0x4aa5))
   {
-    // mdcmDataExtra/mdcmBreakers/DigitexAlpha_no_7FE0.dcm
+    // gdcmDataExtra/gdcmBreakers/DigitexAlpha_no_7FE0.dcm
     is.seekg(-4, std::ios::cur);
     TagField = Tag(0x7fe0, 0x0010);
     VRField = VR::OW;
@@ -112,7 +112,8 @@ ExplicitDataElement::ReadPreValue(std::istream & is)
   catch (const std::logic_error &)
   {
 #ifdef MDCM_SUPPORT_BROKEN_IMPLEMENTATION
-    // mdcm-MR-PHILIPS-16-Multi-Seq.dcm
+    // MM:
+    // gdcm-MR-PHILIPS-16-Multi-Seq.dcm
     // assert(TagField == Tag(0xfffe, 0xe000));
     // -> For some reason VR is written as {44,0} well I guess this is a VR...
     // Technically there is a second bug, dcmtk assume other things when reading this tag,
