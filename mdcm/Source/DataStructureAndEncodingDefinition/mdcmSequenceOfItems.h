@@ -244,8 +244,7 @@ public:
   const std::ostream &
   Write(std::ostream & os) const
   {
-    typename ItemVector::const_iterator it = Items.cbegin();
-    for (; it != Items.cend(); ++it)
+    for (typename ItemVector::const_iterator it = Items.cbegin(); it != Items.cend(); ++it)
     {
       it->Write<TDE, TSwap>(os);
     }
@@ -294,7 +293,7 @@ public:
 
   VL         SequenceLengthField{0xffffffff};
   ItemVector Items{};
-  Item       empty{};
+  Item       error_fallback{};
 };
 
 } // end namespace mdcm

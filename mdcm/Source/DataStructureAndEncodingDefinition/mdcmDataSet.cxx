@@ -51,6 +51,8 @@ int StrCaseCmp(const char * s1, const char * s2)
   return -1;
 }
 
+static const mdcm::DataElement empty = mdcm::DataElement(mdcm::Tag(0xffff, 0xffff));
+
 }
 
 namespace mdcm
@@ -60,7 +62,6 @@ void
 DataSet::Clear()
 {
   DES.clear();
-  assert(DES.empty());
 }
 
 void
@@ -76,13 +77,12 @@ void
 DataSet::Insert(const DataElement & de)
 {
   // FIXME: there is a special case where a dataset can have value < 0x8, see:
-  // $ mdcmdump --csa mdcmData/SIEMENS-JPEG-CorruptFrag.dcm
+  // $ gdcmdump --csa gdcmData/SIEMENS-JPEG-CorruptFrag.dcm
   if (de.GetTag().GetGroup() >= 0x0008 || de.GetTag().GetGroup() == 0x4)
   {
     // prevent user error
     if (de.GetTag() == Tag(0xfffe, 0xe00d) || de.GetTag() == Tag(0xfffe, 0xe0dd) || de.GetTag() == Tag(0xfffe, 0xe000))
     {
-      ;
       ;
     }
     else
@@ -102,12 +102,14 @@ DataSet::Replace(const DataElement & de)
   ConstIterator it = DES.find(de);
   if (it != DES.cend())
   {
+#if 0
     // detect loop
     if (!(&*it != &de)) // FIXME
     {
       mdcmAlwaysWarnMacro("DataSet::Replace: loop?");
       assert(0);
     }
+#endif
     DES.erase(it);
   }
   DES.insert(de);
@@ -119,12 +121,14 @@ DataSet::ReplaceEmpty(const DataElement & de)
   ConstIterator it = DES.find(de);
   if (it != DES.cend() && it->IsEmpty())
   {
+#if 0
     // detect loop
     if (!(&*it != &de)) // FIXME
     {
       mdcmAlwaysWarnMacro("DataSet::ReplaceEmpty: loop?");
       assert(0);
     }
+#endif
     DES.erase(it);
   }
   DES.insert(de);
@@ -137,7 +141,7 @@ DataSet::GetDataElement(const Tag & t) const
   ConstIterator     it = DES.find(r);
   if (it != DES.cend())
     return *it;
-  return GetDEEnd();
+  return empty;
 }
 
 const DataElement &
@@ -157,13 +161,13 @@ DataSet::GetPrivateCreator(const Tag & t) const
       const DataElement r(pc);
       ConstIterator     it = DES.find(r);
       if (it == DES.cend())
-        return "";
+        return std::string("");
       const DataElement & de = *it;
       if (de.IsEmpty())
-        return "";
+        return std::string("");
       const ByteValue * bv = de.GetByteValue();
       if (!bv)
-        return "";
+        return std::string("");
       std::string owner = std::string(bv->GetPointer(), bv->GetLength());
       while (!owner.empty() && owner[owner.size() - 1] == ' ')
       {
@@ -173,16 +177,13 @@ DataSet::GetPrivateCreator(const Tag & t) const
       return owner;
     }
   }
-  return "";
+  return std::string("");
 }
 
 bool
 DataSet::FindDataElement(const Tag & t) const
 {
-  const DataElement r(t);
-  if (DES.find(r) != DES.cend())
-    return true;
-  return false;
+  return (GetDataElement(t) != empty);
 }
 
 bool
@@ -198,7 +199,7 @@ DataSet::FindNextDataElement(const Tag & t) const
   ConstIterator     it = DES.lower_bound(r);
   if (it != DES.cend())
     return *it;
-  return GetDEEnd();
+  return empty;
 }
 
 bool
@@ -235,7 +236,7 @@ DataSet::GetMediaStorage() const
       return MediaStorage::MS_END;
     }
   }
-  // if last character of a VR=UI is space let's pretend this is a \0
+  // VR UI, if the last character of a ' ', replace with null
   if (ts.size())
   {
     char & last = ts[ts.size() - 1];
@@ -248,13 +249,6 @@ DataSet::GetMediaStorage() const
     mdcmWarningMacro("Media Storage Class UID: " << ts << " is unknown");
   }
   return ms;
-}
-
-static const DataElement DEEnd = DataElement(Tag(0xffff, 0xffff));
-const DataElement &
-DataSet::GetDEEnd() const
-{
-  return DEEnd;
 }
 
 void

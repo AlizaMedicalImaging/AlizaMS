@@ -195,7 +195,6 @@ DataElement::GetValueAsSQ() const
     catch (...)
     {
       ;
-      ;
     }
   }
   else if (GetVR() == VR::UN)
@@ -211,7 +210,6 @@ DataElement::GetValueAsSQ() const
     catch (...)
     {
       ;
-      ;
     }
     try
     {
@@ -224,7 +222,6 @@ DataElement::GetValueAsSQ() const
     catch (...)
     {
       ;
-      ;
     }
     try
     {
@@ -236,7 +233,6 @@ DataElement::GetValueAsSQ() const
     }
     catch (...)
     {
-      ;
       ;
     }
   }
@@ -253,7 +249,6 @@ DataElement::GetValueAsSQ() const
     }
     catch (...)
     {
-      ;
       ;
     }
   }

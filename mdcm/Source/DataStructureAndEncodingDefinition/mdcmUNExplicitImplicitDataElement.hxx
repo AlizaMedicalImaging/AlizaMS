@@ -47,7 +47,7 @@ std::istream &
 UNExplicitImplicitDataElement::ReadPreValue(std::istream & is)
 {
   assert(0);
-  // DataElement & de = *this;//unused de, fires a warning on macos
+  // DataElement & de = *this;
   // de.template ReadPreValue<UNExplicitDataElement,TSwap>(is);
   return is;
 }
@@ -66,7 +66,7 @@ UNExplicitImplicitDataElement::ReadValue(std::istream & is)
   }
   catch (const ParseException & ex)
   {
-    de.SetVR(VR::INVALID); // EXTREMELY IMPORTANT
+    de.SetVR(VR::INVALID); // Important
     if (ex.GetLastElement().GetTag() == Tag(0xfffe, 0xe0dd))
     {
       // We have never read the 2 bytes for the VR, since exception raised earlier

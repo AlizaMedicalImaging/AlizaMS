@@ -85,7 +85,8 @@ CP246ExplicitDataElement::ReadPreValue(std::istream & is)
   }
   catch (const std::exception &)
   {
-    // mdcm-MR-PHILIPS-16-Multi-Seq.dcm
+    // MM:
+    // gdcm-MR-PHILIPS-16-Multi-Seq.dcm
     // assert(TagField == Tag(0xfffe, 0xe000));
     // -> For some reason VR is written as {44,0} well I guess this is a VR...
     // Technically there is a second bug, dcmtk assume other things when reading this tag,
@@ -110,7 +111,7 @@ CP246ExplicitDataElement::ReadPreValue(std::istream & is)
     // 16bits only
     if (!ValueLengthField.template Read16<TSwap>(is))
     {
-      // The following is occurs with mdcm 2.0.17 when two
+      // The following is occurs with gdcm 2.0.17 when two
       // seq del item marker are found
       // See UnexpectedSequenceDelimiterInFixedLengthSequence.dcm
       throw std::logic_error("Should not happen, CP246");
@@ -133,7 +134,7 @@ CP246ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
   // Read the Value
   if (VRField == VR::SQ)
   {
-    // Check whether or not this is an undefined length sequence
+    // Check this is an undefined length sequence
     assert(TagField != Tag(0x7fe0, 0x0010));
     ValueField = new SequenceOfItems;
   }
@@ -141,7 +142,7 @@ CP246ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
   {
     if (VRField == VR::UN)
     {
-      // Support cp246 conforming file:
+      // MM: Support cp246 conforming file
       // Enhanced_MR_Image_Storage_PixelSpacingNotIn_0028_0030.dcm (illegal)
       // vs
       // undefined_length_un_vr.dcm
@@ -157,7 +158,7 @@ CP246ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
       }
       catch (const std::exception &)
       {
-        // Must be one of those non-cp246 file,
+        // MM: Must be one of those non-cp246 file,
         // but for some reason seekg back to previous offset + Read
         // as CP246Explicit does not work.
         ParseException pe;
@@ -168,7 +169,7 @@ CP246ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
     }
     else
     {
-      // Ok this is Pixel Data fragmented...
+      // Pixel Data
       assert(TagField == Tag(0x7fe0, 0x0010));
       assert(VRField & VR::OB_OW);
       ValueField = new SequenceOfFragments;
@@ -215,9 +216,8 @@ CP246ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
 
 template <typename TSwap>
 std::istream &
-CP246ExplicitDataElement::ReadWithLength(std::istream & is, VL & length)
+CP246ExplicitDataElement::ReadWithLength(std::istream & is, VL &)
 {
-  (void)length;
   return Read<TSwap>(is);
 }
 

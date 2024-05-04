@@ -34,7 +34,7 @@ ExplicitDataElement::GetLength() const
   {
     assert(ValueField->GetLength().IsUndefined());
     Value * p = ValueField;
-    // If this is a SQ we need to compute it's proper length
+    // If this is a SQ, compute the length
     SequenceOfItems * sq = dynamic_cast<SequenceOfItems *>(p);
     if (sq)
     {

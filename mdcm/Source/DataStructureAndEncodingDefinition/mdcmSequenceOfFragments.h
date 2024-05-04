@@ -97,13 +97,15 @@ public:
   bool
   GetBuffer(char *, unsigned long long) const;
 
+#if 0
   bool
   GetFragBuffer(unsigned int, char *, unsigned long long &) const;
+#endif
 
   SizeType
   GetNumberOfFragments() const;
 
-  const Fragment GetFragment(SizeType) const;
+  const Fragment & GetFragment(SizeType) const;
 
   bool
   WriteBuffer(std::ostream &) const;
