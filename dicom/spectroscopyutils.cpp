@@ -24,6 +24,7 @@
 #include "spectroscopydata.h"
 #include "commonutils.h"
 #include "dicomutils.h"
+#include <QProgressDialog>
 #include "vectormath/scalar/vectormath.h"
 
 //#define LOAD_SPECT_DATA
@@ -115,6 +116,7 @@ bool generate_spectorscopy_geometry(
 		std::cout << "x2=" << x2 << " y2=" << y2 << " z2=" << z2 << std::endl;
 		std::cout << "x3=" << x3 << " y3=" << y3 << " z3=" << z3 << std::endl;
 #endif
+		// FIXME the function 'get_orientation2' should be replaced
 		const QString orientation_string = CommonUtils::get_orientation2(&ipp_iop[3]);
 		if (i == 0)
 		{
@@ -269,7 +271,6 @@ bool generate_spectorscopy_geometry(
 					mbox.setText(z_inv_string);
 					mbox.exec();
 #endif
-
 			}
 		}
 		else
@@ -334,34 +335,35 @@ bool SpectroscopyUtils::Read(const mdcm::DataSet & ds, SpectroscopyData * s)
 	const mdcm::Tag tSignalDomainRows(0x0028,0x9235);
 	const mdcm::Tag tFirstOrderPhaseCorrectionAngle(0x5600,0x0010);
 	const mdcm::Tag tSpectroscopyData(0x5600,0x0020);
-
-	unsigned short Rows, Columns;
-	unsigned int   DataPointRows, DataPointColumns;
-	if (DicomUtils::get_us_value(ds, tRows, &Rows) &&
-		DicomUtils::get_us_value(ds, tColumns, &Columns) &&
-		DicomUtils::get_ul_value(ds, tDataPointRows, &DataPointRows) &&
-		DicomUtils::get_ul_value(ds, tDataPointColumns, &DataPointColumns))
 	{
-		s->m_Rows = Rows;
-		s->m_Columns = Columns;
-		s->m_DataPointRows = DataPointRows;
-		s->m_DataPointColumns = DataPointColumns;
+		unsigned short Rows, Columns;
+		unsigned int   DataPointRows, DataPointColumns;
+		if (DicomUtils::get_us_value(ds, tRows, &Rows) &&
+			DicomUtils::get_us_value(ds, tColumns, &Columns) &&
+			DicomUtils::get_ul_value(ds, tDataPointRows, &DataPointRows) &&
+			DicomUtils::get_ul_value(ds, tDataPointColumns, &DataPointColumns))
+		{
+			s->m_Rows = Rows;
+			s->m_Columns = Columns;
+			s->m_DataPointRows = DataPointRows;
+			s->m_DataPointColumns = DataPointColumns;
+		}
+		else
+		{
+			return false;
+		}
 	}
-	else
 	{
-		return false;
+		QString DataRepresentation;
+		if (DicomUtils::get_string_value(ds, tDataRepresentation, DataRepresentation))
+		{
+			s->m_DataRepresentation = std::move(DataRepresentation);
+		}
+		else
+		{
+			return false;
+		}
 	}
-
-	QString DataRepresentation;
-	if (DicomUtils::get_string_value(ds, tDataRepresentation, DataRepresentation))
-	{
-		s->m_DataRepresentation = std::move(DataRepresentation);
-	}
-	else
-	{
-		return false;
-	}
-
 	{
 		QString SignalDomainColumns;
 		if (DicomUtils::get_string_value(ds, tSignalDomainColumns, SignalDomainColumns))
@@ -373,28 +375,27 @@ bool SpectroscopyUtils::Read(const mdcm::DataSet & ds, SpectroscopyData * s)
 			return false;
 		}
 	}
-
 #ifdef LOAD_SPECT_DATA
 	if (!DicomUtils::get_fl_values(ds, tSpectroscopyData, s->m_SpectroscopyData))
 		return false;
 #endif
-
-	int NumberOfFrames;
-	if (DicomUtils::get_is_value(ds, tNumberOfFrames, &NumberOfFrames))
 	{
-		s->m_NumberOfFrames = NumberOfFrames;
+		int NumberOfFrames;
+		if (DicomUtils::get_is_value(ds, tNumberOfFrames, &NumberOfFrames))
+		{
+			s->m_NumberOfFrames = NumberOfFrames;
+		}
 	}
-
-	QString SignalDomainRows;
-	if (DicomUtils::get_string_value(ds, tSignalDomainRows, SignalDomainRows))
 	{
-		s->m_SignalDomainRows = std::move(SignalDomainRows);
+		QString SignalDomainRows;
+		if (DicomUtils::get_string_value(ds, tSignalDomainRows, SignalDomainRows))
+		{
+			s->m_SignalDomainRows = std::move(SignalDomainRows);
+		}
 	}
-
 #ifdef LOAD_SPECT_DATA
 	DicomUtils::get_fl_values(ds, tFirstOrderPhaseCorrectionAngle, s->m_FirstOrderPhaseCorrectionAngle);
 #endif
-
 	return true;
 }
 
@@ -426,9 +427,8 @@ QString SpectroscopyUtils::ProcessData(
 		tSharedFunctionalGroupsSequence,
 		sq, idx_values, shared_values);
 	if (!ok_f && !ok_g) return QString("!ok_f && !ok_g");
-
+	//
 	DicomUtils::enhanced_process_values(values, shared_values);
-
 	// stack id/position number without dimension organisation?
 	bool idx_values_rebuild = false;
 	if (idx_values.empty() && !values.empty())
@@ -466,15 +466,15 @@ QString SpectroscopyUtils::ProcessData(
 #endif
 		}
 	}
-
+	//
 	//DicomUtils::print_sq(sq);
 	//DicomUtils::print_func_group(values);
-
+	//
 	if (values.size() != static_cast<unsigned int>(s.m_NumberOfFrames))
 	{
 		return QString("values.size() != m_NumberOfFrames");
 	}
-
+	//
 	int dim8th = -1;
 	int dim7th = -1;
 	int dim6th = -1;
@@ -511,24 +511,9 @@ QString SpectroscopyUtils::ProcessData(
 			unsigned int,
 			unsigned int,
 			std::less<unsigned int> > > tmp0;
-	bool ok__ = DicomUtils::enhanced_process_indices(
+	DicomUtils::enhanced_process_indices(
 		tmp0, idx_values, values,
-		dim8th, dim7th, dim6th, dim5th, dim4th, dim3rd, false);
-#if 0
-	std::cout << "enhanced_process_indices = " << ok__ << std::endl;
-#endif
-	if (!ok__)
-	{
-		tmp0.clear();
-		ok__ = DicomUtils::enhanced_process_indices(
-			tmp0, idx_values, values,
-			-1, -1, -1, -1, -1, -1, false);
-	}
-	if (!ok__) tmp0.clear();
-	if (tmp0.empty())
-	{
-		return QString("tmp0.size() < 1");
-	}
+		dim8th, dim7th, dim6th, dim5th, dim4th, dim3rd, 1);
 	for (unsigned int x = 0; x < tmp0.size(); ++x)
 	{
 		if (tmp0.at(x).size() < 1)
@@ -539,7 +524,6 @@ QString SpectroscopyUtils::ProcessData(
 				QString(").size() < 1");
 		}
 	}
-
 #ifdef LOAD_SPECT_DATA
 	const unsigned long xy =
 		s.m_SpectroscopyData.size()/values.size();
@@ -550,7 +534,6 @@ QString SpectroscopyUtils::ProcessData(
 		data.push_back(p__);
 	}
 #endif
-
 	for (unsigned int x = 0; x < tmp0.size(); ++x)
 	{
 		bool error = false;
@@ -742,10 +725,8 @@ QString SpectroscopyUtils::ProcessData(
 #endif
 				continue;
 			}
-
-
+			//
 			// TODO process data for preview
-
 			//
 			{
 				ImageVariant * ivariant = new ImageVariant(
@@ -820,7 +801,6 @@ QString SpectroscopyUtils::ProcessData(
 		}
 		tmp4.clear();
 	}
-
 #ifdef LOAD_SPECT_DATA
 	for (unsigned int x = 0; x < data.size(); ++x)
 	{
@@ -834,4 +814,3 @@ QString SpectroscopyUtils::ProcessData(
 #ifdef LOAD_SPECT_DATA
 #undef LOAD_SPECT_DATA
 #endif
-

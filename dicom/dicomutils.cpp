@@ -7300,7 +7300,6 @@ QString DicomUtils::read_enhanced(
 	//
 	//
 	//
-	bool tmp17{};
 	int dim8th{-1};
 	int dim7th{-1};
 	int dim6th{-1};
@@ -7389,7 +7388,7 @@ QString DicomUtils::read_enhanced(
 	}
 #endif
 	message_ = read_enhanced_3d_8d(
-		&tmp17, ivariants, sop, f,
+		ok, ivariants, sop, f,
 		data,
 		image_overlays,
 		rows_, columns_, pixelformat, pi,
@@ -7411,40 +7410,6 @@ QString DicomUtils::read_enhanced(
 	if (!min_load && !message_.isEmpty())
 		std::cout << message_.toStdString() << std::endl;
 #endif
-	if (!tmp17 &&
-		!(
-			dim8th == -1 &&
-			dim7th == -1 &&
-			dim6th == -1 &&
-			dim5th == -1 &&
-			dim4th == -1 &&
-			dim3rd == -1))
-	{
-#ifdef ENHANCED_PRINT_INFO
-		if (!min_load)
-			std::cout << "  Fallback" << std::endl;
-#endif
-		message_ = read_enhanced_3d_8d(
-			&tmp17, ivariants, sop, f,
-			data,
-			image_overlays,
-			rows_, columns_, pixelformat, pi,
-			-1, -1, -1, -1, -1, -1,
-			idx_values, values,
-			ok3d,
-			min_load,
-			settings,
-			dircos_read,
-			INT_MIN,
-			spacing_x_read, spacing_y_read, spacing_z_read,
-			origin_x_read,  origin_y_read,  origin_z_read,
-			unsused0, unsused1,
-			apply_rescale,
-			(use_icc && icc_ok),
-			tolerance,
-			0);
-	}
-	*ok = tmp17;
 #ifdef ALIZA_LINUX_DEBUG_MEM
 	CommonUtils::linux_print_memusage("before delete[]");
 #endif
@@ -7645,7 +7610,6 @@ QString DicomUtils::read_enhanced_supp_palette(
 	//
 	//
 	//
-	bool tmp17{};
 	int dim8th{-1};
 	int dim7th{-1};
 	int dim6th{-1};
@@ -7734,7 +7698,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 	}
 #endif
 	message_ = read_enhanced_3d_8d(
-		&tmp17, ivariants, sop, f,
+		ok, ivariants, sop, f,
 		data,
 		image_overlays,
 		rows_, columns_, pixelformat, pi,
@@ -7758,42 +7722,6 @@ QString DicomUtils::read_enhanced_supp_palette(
 		std::cout << message_.toStdString() << std::endl;
 	}
 #endif
-	if (!tmp17 &&
-		!(
-			dim8th == -1 &&
-			dim7th == -1 &&
-			dim6th == -1 &&
-			dim5th == -1 &&
-			dim4th == -1 &&
-			dim3rd == -1))
-	{
-#ifdef ENHANCED_PRINT_INFO
-		if (!min_load)
-		{
-			std::cout << "  Fallback" << std::endl;
-		}
-#endif
-		message_ = read_enhanced_3d_8d(
-			&tmp17, ivariants, sop, f,
-			data,
-			image_overlays,
-			rows_, columns_, pixelformat, pi,
-			-1, -1, -1, -1, -1, -1,
-			idx_values, values,
-			ok3d,
-			min_load,
-			settings,
-			dircos_read,
-			red_subscript,
-			spacing_x_read, spacing_y_read, spacing_z_read,
-			origin_x_read,  origin_y_read,  origin_z_read,
-			unsused0, unsused1,
-			false,
-			false,
-			tolerance,
-			0);
-	}
-	*ok = tmp17;
 	for (unsigned int x = 0; x < data.size(); ++x)
 	{
 		delete [] data[x];
@@ -11548,7 +11476,7 @@ QString DicomUtils::read_enhanced_common(
 	return message;
 }
 
-bool DicomUtils::enhanced_process_indices(
+void DicomUtils::enhanced_process_indices(
 	std::vector< std::map< unsigned int, unsigned int, std::less<unsigned int> > > & tmp0,
 	const DimIndexValues & idx_values, const FrameGroupValues & values,
 	const int dim8th, const int dim7th, const int dim6th, const int dim5th, const int dim4th, const int dim3rd,
@@ -11560,8 +11488,7 @@ bool DicomUtils::enhanced_process_indices(
 	std::list<unsigned int> tmp1_3;
 	std::list<unsigned int> tmp1_4;
 	std::list<unsigned int> tmp1_5;
-	const EnhancedIODLoadingType loading_type =
-		static_cast<EnhancedIODLoadingType>(enh_loading_type);
+	const EnhancedIODLoadingType loading_type = static_cast<EnhancedIODLoadingType>(enh_loading_type);
 	const size_t idx_values_size = idx_values.size();
 	std::vector< std::map< unsigned int, unsigned int, std::less<unsigned int> > > tmp0single;
 	//
@@ -11631,23 +11558,24 @@ bool DicomUtils::enhanced_process_indices(
 		tmp1_5.push_back(1);
 	}
 	//
-#ifdef ALIZA_VERBOSE
 	if (idx_values_size < 1 && (
 		loading_type == EnhancedIODLoadingType::PreferUniformVolumes ||
 		loading_type == EnhancedIODLoadingType::StrictMultipleImages ||
 		loading_type == EnhancedIODLoadingType::StrictSingleImage))
 	{
+		error = true;
+#ifdef ALIZA_VERBOSE
 		std::cout << "Cannot process Dimension Organization: no indices" << std::endl;
-	}
 #endif
-	if (idx_values_size >= 1 && (
+	}
+	if (!error && (
 		loading_type == EnhancedIODLoadingType::PreferUniformVolumes ||
 		loading_type == EnhancedIODLoadingType::StrictMultipleImages ||
 		loading_type == EnhancedIODLoadingType::StrictSingleImage))
 	{
 #ifdef ENHANCED_PRINT_INFO
-		bool warning0{};
-		bool info0{};
+		bool warning0 = false;
+		bool info0 = false;
 #endif
 		for (std::list<unsigned int>::const_iterator it1 = tmp1_1.cbegin();
 			it1 != tmp1_1.cend();
@@ -11720,7 +11648,9 @@ bool DicomUtils::enhanced_process_indices(
 										else
 										{
 #ifdef ALIZA_VERBOSE
-											std::cout << "Error: indices can not start with \"0\"" << std::endl;
+											std::cout <<
+												"Error: indices can not start with \"0\","
+												"fallback to skip Dimension Organization" << std::endl;
 #endif
 											error = true;
 											break;
@@ -11799,7 +11729,7 @@ bool DicomUtils::enhanced_process_indices(
 			if (error) break;
 		}
 		//
-		if (loading_type == EnhancedIODLoadingType::StrictSingleImage)
+		if (!error && loading_type == EnhancedIODLoadingType::StrictSingleImage)
 		{
 			unsigned int j{};
 			std::map< unsigned int, unsigned int, std::less<unsigned int> > tmp;
@@ -11817,14 +11747,24 @@ bool DicomUtils::enhanced_process_indices(
 			tmp0.push_back(tmp);
 		}
 	}
-	else
+	//
+	if (error)
+	{
+		tmp0.clear();
+	}
+	//
+	if (loading_type == EnhancedIODLoadingType::SkipDimensionOrganization ||
+		loading_type == EnhancedIODLoadingType::NotDefined ||
+		error)
 	{
 		std::map< unsigned int, unsigned int, std::less<unsigned int> > tmp2;
 		for (unsigned int x = 0; x < values.size(); ++x)
 		{
 			tmp2[x] = x;
 		}
-		if (loading_type != EnhancedIODLoadingType::SkipDimensionOrganization)
+		if (!(
+			loading_type == EnhancedIODLoadingType::SkipDimensionOrganization ||
+			loading_type == EnhancedIODLoadingType::NotDefined))
 		{
 			std::map< unsigned int, unsigned int, std::less<unsigned int> > tmp3;
 			const bool ok_sort = sort_frames_ippiop(tmp2, tmp3, values);
@@ -11858,7 +11798,6 @@ bool DicomUtils::enhanced_process_indices(
 	}
 #endif
 #endif
-	return !error;
 }
 
 QString DicomUtils::read_enhanced_3d_8d(
@@ -11888,38 +11827,31 @@ QString DicomUtils::read_enhanced_3d_8d(
 {
 	QString message_ ;
 	std::vector< std::map< unsigned int, unsigned int, std::less<unsigned int> > > tmp0;
-	*ok = enhanced_process_indices(
+	enhanced_process_indices(
 		tmp0, idx_values, values,
 		dim8th, dim7th, dim6th, dim5th, dim4th, dim3rd, enh_loading_type);
-	if (*ok)
-	{
-		message_ = read_enhanced_common(
-			ok,
-			ivariants,
-			sop,
-			efilename,
-			data,
-			image_overlays,
-			rows_, columns_,
-			pixelformat, pi,
-			tmp0,
-			idx_values,  values,
-			ok3d,
-			min_load,
-			settings,
-			dircos_read,
-			red_subscript,
-			spacing_x_read, spacing_y_read, spacing_z_read,
-			origin_x_read, origin_y_read, origin_z_read,
-			shift_tmp, scale_tmp,
-			apply_rescale,
-			use_icc,
-			tolerance);
-	}
-	else
-	{
-		message_ = QString("Can not build indices for enhanced IOD");
-	}
+	message_ = read_enhanced_common(
+		ok,
+		ivariants,
+		sop,
+		efilename,
+		data,
+		image_overlays,
+		rows_, columns_,
+		pixelformat, pi,
+		tmp0,
+		idx_values,  values,
+		ok3d,
+		min_load,
+		settings,
+		dircos_read,
+		red_subscript,
+		spacing_x_read, spacing_y_read, spacing_z_read,
+		origin_x_read, origin_y_read, origin_z_read,
+		shift_tmp, scale_tmp,
+		apply_rescale,
+		use_icc,
+		tolerance);
 	return message_;
 }
 

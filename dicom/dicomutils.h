@@ -407,7 +407,7 @@ public:
 		const bool,
 		const bool,
 		const float);
-	static bool enhanced_process_indices(
+	static void enhanced_process_indices(
 		std::vector
 			< std::map
 				<
