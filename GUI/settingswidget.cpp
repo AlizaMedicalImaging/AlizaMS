@@ -168,7 +168,7 @@ void SettingsWidget::set_default()
 	set_force_cp1251(false);
 	cp1251_checkBox->blockSignals(false);
 	mvsep_checkBox->setChecked(false);
-	dcmthread_checkBox->setChecked(false);
+	dcmthread_checkBox->setChecked(true);
 	adjust_spinBox->setValue(14);
 	adjust_checkBox->setChecked(false);
 }
@@ -253,7 +253,7 @@ void SettingsWidget::readSettings()
 	const int tmp14 = settings.value(QString("force_cp1251"),    0).toInt();
 	const int tmp15 = settings.value(QString("apply_suppl"),     1).toInt();
 	const int tmp16 = settings.value(QString("mvsep"),           0).toInt();
-	const int tmp17 = settings.value(QString("dcm_thread2"),     0).toInt();
+	const int tmp17 = settings.value(QString("dcm_thread2"),     1).toInt();
 	const int tmp18 = settings.value(QString("adj_fps"),         0).toInt();
 	const int tmp19 = settings.value(QString("adj_fps_value"),   14).toInt();
 	settings.endGroup();
