@@ -106,35 +106,39 @@ ImageReader::ReadACRNEMAImage()
   const DataSet & ds = F->GetDataSet();
   Image &         pixeldata = GetImage();
   // Pixel Spacing
-  const Tag tpixelspacing(0x0028, 0x0030);
-  if (ds.FindDataElement(tpixelspacing))
   {
-    const DataElement &       de = ds.GetDataElement(tpixelspacing);
-    Attribute<0x0028, 0x0030> at;
-    at.SetFromDataElement(de);
-    pixeldata.SetSpacing(0, at.GetValue(0));
-    pixeldata.SetSpacing(1, at.GetValue(1));
-  }
-  // Origin
-  const Tag timageposition(0x0020, 0x0030);
-  if (ds.FindDataElement(timageposition))
-  {
-    const DataElement &       de = ds.GetDataElement(timageposition);
-    Attribute<0x0020, 0x0030> at = { {} };
-    at.SetFromDataElement(de);
-    pixeldata.SetOrigin(at.GetValues());
-    if (at.GetNumberOfValues() > pixeldata.GetNumberOfDimensions()) // HACK
+    const DataElement & de = ds.GetDataElement(Tag(0x0028, 0x0030));
+    if (!de.IsEmpty())
     {
-      pixeldata.SetOrigin(pixeldata.GetNumberOfDimensions(), at.GetValue(pixeldata.GetNumberOfDimensions()));
+      Attribute<0x0028, 0x0030> at;
+      at.SetFromDataElement(de);
+      pixeldata.SetSpacing(0, at.GetValue(0));
+      pixeldata.SetSpacing(1, at.GetValue(1));
     }
   }
-  const Tag timageorientation(0x0020, 0x0035);
-  if (ds.FindDataElement(timageorientation))
+  // Origin
   {
-    const DataElement &       de = ds.GetDataElement(timageorientation);
-    Attribute<0x0020, 0x0035> at = { { 1, 0, 0, 0, 1, 0 } };
-    at.SetFromDataElement(de);
-    pixeldata.SetDirectionCosines(at.GetValues());
+    const DataElement & de = ds.GetDataElement(Tag(0x0020, 0x0030));
+    if (!de.IsEmpty())
+    {
+      Attribute<0x0020, 0x0030> at = { {} };
+      at.SetFromDataElement(de);
+      pixeldata.SetOrigin(at.GetValues());
+      if (at.GetNumberOfValues() > pixeldata.GetNumberOfDimensions()) // MM: HACK
+      {
+        pixeldata.SetOrigin(pixeldata.GetNumberOfDimensions(), at.GetValue(pixeldata.GetNumberOfDimensions()));
+      }
+    }
+  }
+  // Direction
+  {
+    const DataElement & de = ds.GetDataElement(Tag(0x0020, 0x0035));
+    if (!de.IsEmpty())
+    {
+      Attribute<0x0020, 0x0035> at = { { 1, 0, 0, 0, 1, 0 } };
+      at.SetFromDataElement(de);
+      pixeldata.SetDirectionCosines(at.GetValues());
+    }
   }
   std::vector<double> is = ImageHelper::GetRescaleInterceptSlopeValue(*F);
   pixeldata.SetIntercept(is[0]);

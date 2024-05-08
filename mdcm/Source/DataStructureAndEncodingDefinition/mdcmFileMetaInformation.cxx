@@ -32,13 +32,13 @@
 namespace mdcm
 {
 
-const char  FileMetaInformation::MDCM_FILE_META_INFORMATION_VERSION[] = "\0\1";
+const char  FileMetaInformation::MDCM_FILE_META_INFORMATION_VERSION[2]{0x0,0x1};
 const char  FileMetaInformation::MDCM_IMPLEMENTATION_CLASS_UID[] = "1.2.826.0.1.3680043.10.135.1." MDCM_VERSION;
 const char  FileMetaInformation::MDCM_IMPLEMENTATION_VERSION_NAME[] = "MDCM " MDCM_VERSION;
 const char  FileMetaInformation::MDCM_SOURCE_APPLICATION_ENTITY_TITLE[] = "MDCM";
-std::string FileMetaInformation::ImplementationClassUID = GetMDCMImplementationClassUID();
-std::string FileMetaInformation::ImplementationVersionName = GetMDCMImplementationVersionName();
-std::string FileMetaInformation::SourceApplicationEntityTitle = GetMDCMSourceApplicationEntityTitle();
+std::string FileMetaInformation::ImplementationClassUID{MDCM_IMPLEMENTATION_CLASS_UID};
+std::string FileMetaInformation::ImplementationVersionName{MDCM_IMPLEMENTATION_VERSION_NAME};
+std::string FileMetaInformation::SourceApplicationEntityTitle{MDCM_SOURCE_APPLICATION_ENTITY_TITLE};
 
 const char *
 FileMetaInformation::GetFileMetaInformationVersion()
@@ -136,79 +136,75 @@ void
 FileMetaInformation::FillFromDataSet(const DataSet & ds)
 {
   DataElement xde;
-  if (!FindDataElement(Tag(0x0002, 0x0001)))
-  {
-    xde.SetTag(Tag(0x0002, 0x0001));
-    xde.SetVR(VR::OB);
-    const char * version = FileMetaInformation::GetFileMetaInformationVersion();
-    xde.SetByteValue(version, 2);
-    Insert(xde);
-  }
-  else
   {
     const DataElement & de = GetDataElement(Tag(0x0002, 0x0001));
-    const ByteValue *   bv = de.GetByteValue();
-    if (bv->GetLength() != 2 ||
-        (memcmp(bv->GetPointer(), FileMetaInformation::GetFileMetaInformationVersion(), 2) != 0))
+    if (de.IsEmpty())
     {
       xde.SetTag(Tag(0x0002, 0x0001));
       xde.SetVR(VR::OB);
       const char * version = FileMetaInformation::GetFileMetaInformationVersion();
       xde.SetByteValue(version, 2);
-      Replace(xde);
-    }
-  }
-  if (!FindDataElement(Tag(0x0002, 0x0002)) || GetDataElement(Tag(0x0002, 0x0002)).IsEmpty())
-  {
-    if (!ds.FindDataElement(Tag(0x0008, 0x0016)) || ds.GetDataElement(Tag(0x0008, 0x0016)).IsEmpty())
-    {
-      MediaStorage ms;
-      ms.SetFromModality(ds);
-      const char * msstr = ms.GetString();
-      if (msstr)
-      {
-        VL::Type strlenMsstr = static_cast<VL::Type>(strlen(msstr));
-        xde.SetByteValue(msstr, strlenMsstr);
-        xde.SetTag(Tag(0x0002, 0x0002));
-        {
-          xde.SetVR(VR::UI);
-        }
-        Insert(xde);
-      }
-      else
-      {
-        mdcmErrorMacro("Could not find MediaStorage");
-      }
+      Insert(xde);
     }
     else
     {
-      const DataElement & msclass = ds.GetDataElement(Tag(0x0008, 0x0016));
-      xde = msclass;
-      xde.SetTag(Tag(0x0002, 0x0002));
-      if (msclass.GetVR() == VR::UN || msclass.GetVR() == VR::INVALID)
+      const ByteValue * bv = de.GetByteValue();
+      if (bv->GetLength() != 2 ||
+          (memcmp(bv->GetPointer(), FileMetaInformation::GetFileMetaInformationVersion(), 2) != 0))
       {
-        xde.SetVR(VR::UI);
+        xde.SetTag(Tag(0x0002, 0x0001));
+        xde.SetVR(VR::OB);
+        const char * version = FileMetaInformation::GetFileMetaInformationVersion();
+        xde.SetByteValue(version, 2);
+        Replace(xde);
       }
-      Insert(xde);
     }
   }
-  else // There is a value in (0002,0002), see if it match (0008,0016)
   {
+    const DataElement & de_2_2 = GetDataElement(Tag(0x0002, 0x0002));
+    const DataElement & de_8_16 = ds.GetDataElement(Tag(0x0008, 0x0016));
+    if (de_2_2.IsEmpty())
     {
-      if (!ds.FindDataElement(Tag(0x0008, 0x0016)))
+      if (de_8_16.IsEmpty())
+      {
+        MediaStorage ms;
+        ms.SetFromModality(ds);
+        const char * s = ms.GetString();
+        if (s)
+        {
+          VL::Type l = static_cast<VL::Type>(strlen(s));
+          xde.SetByteValue(s, l);
+          xde.SetTag(Tag(0x0002, 0x0002));
+          xde.SetVR(VR::UI);
+          Insert(xde);
+        }
+        else
+        {
+          mdcmErrorMacro("Could not find MediaStorage");
+        }
+      }
+      else
+      {
+        xde = de_8_16;
+        xde.SetTag(Tag(0x0002, 0x0002));
+        xde.SetVR(VR::UI);
+        Insert(xde);
+      }
+    }
+    else // There is a value in (0002,0002), must match (0008,0016)
+    {
+      if (de_8_16.IsEmpty())
       {
         mdcmWarningMacro("Missing SOPClassUID in DataSet but found in FileMeta");
       }
       else
       {
-        const DataElement & sopclass = ds.GetDataElement(Tag(0x0008, 0x0016));
-        DataElement         mssopclass = GetDataElement(Tag(0x0002, 0x0002));
-        assert(!mssopclass.IsEmpty());
-        const ByteValue * bv = sopclass.GetByteValue();
+        DataElement       de = de_2_2;
+        const ByteValue * bv = de_8_16.GetByteValue();
         if (bv)
         {
-          mssopclass.SetByteValue(bv->GetPointer(), bv->GetLength());
-          Replace(mssopclass);
+          de.SetByteValue(bv->GetPointer(), bv->GetLength());
+          Replace(de);
         }
         else
         {
@@ -217,84 +213,90 @@ FileMetaInformation::FillFromDataSet(const DataSet & ds)
       }
     }
   }
-  // Media Storage SOP Instance UID (0002,0003), see (0008,0018)
-  const DataElement & dummy = GetDataElement(Tag(0x0002, 0x0003));
-  (void)dummy;
-  if (!FindDataElement(Tag(0x0002, 0x0003)) || GetDataElement(Tag(0x0002, 0x0003)).IsEmpty())
   {
-    if (ds.FindDataElement(Tag(0x0008, 0x0018)))
+    // Media Storage SOP Instance UID (0002,0003), see (0008,0018)
+    const DataElement & de_2_3 = GetDataElement(Tag(0x0002, 0x0003));
+    const DataElement & de_8_18 = ds.GetDataElement(Tag(0x0008, 0x0018));
+    if (de_2_3.IsEmpty())
     {
-      const DataElement & msinst = ds.GetDataElement(Tag(0x0008, 0x0018));
-      xde = msinst;
-      xde.SetTag(Tag(0x0002, 0x0003));
-      if (msinst.GetVR() == VR::UN || msinst.GetVR() == VR::INVALID)
+      if (!de_8_18.IsEmpty())
       {
-        xde.SetVR(VR::UI);
+        xde = de_8_18;
+        xde.SetTag(Tag(0x0002, 0x0003));
+        if (de_8_18.GetVR() == VR::UN || de_8_18.GetVR() == VR::INVALID)
+        {
+          xde.SetVR(VR::UI);
+        }
+        Replace(xde);
       }
-      Replace(xde);
+      else
+      {
+        throw std::logic_error("No (0x0002,0x0003) and (0x0008,0x0018) elements");
+      }
+    }
+    else // There is a value in (0002,0003), see if it match (0008,0018)
+    {
+      bool         dirrecsq = ds.FindDataElement(Tag(0x0004, 0x1220)); // Directory Record Sequence
+      MediaStorage ms;
+      ms.SetFromHeader(*this);
+      bool dicomdir = (ms == MediaStorage::MediaStorageDirectoryStorage && dirrecsq);
+      if (!dicomdir)
+      {
+        if (de_8_18.IsEmpty())
+        {
+          throw std::logic_error("No (0x0008,0x0018) element");
+        }
+        assert(!de_2_3.IsEmpty());
+        DataElement       mssopinst = de_2_3;
+        const ByteValue * bv = de_8_18.GetByteValue();
+        if (bv)
+        {
+          mssopinst.SetByteValue(bv->GetPointer(), bv->GetLength());
+          Replace(mssopinst);
+        }
+      }
+    }
+  }
+  {
+    const DataElement & de_2_10 = GetDataElement(Tag(0x0002, 0x0010));
+    if (!de_2_10.IsEmpty())
+    {
+      DataElement       tsuid = de_2_10;
+      const char *      datasetts = DataSetTS.GetString();
+      const ByteValue * bv = tsuid.GetByteValue();
+      assert(bv);
+      if (bv)
+      {
+        std::string currentts(bv->GetPointer(), bv->GetPointer() + bv->GetLength());
+        if (strlen(currentts.c_str()) != strlen(datasetts) || strcmp(currentts.c_str(), datasetts) != 0)
+        {
+          xde = tsuid;
+          VL::Type strlenDatasetts = static_cast<VL::Type>(strlen(datasetts));
+          xde.SetByteValue(datasetts, strlenDatasetts);
+          Replace(xde);
+        }
+        if (tsuid.GetVR() != VR::UI)
+        {
+          xde = tsuid;
+          xde.SetVR(VR::UI);
+          Replace(xde);
+        }
+      }
     }
     else
     {
-      throw std::logic_error("No (0x0002,0x0003) and (0x0008,0x0018) elements");
-    }
-  }
-  else // There is a value in (0002,0003), see if it match (0008,0018)
-  {
-    bool         dirrecsq = ds.FindDataElement(Tag(0x0004, 0x1220)); // Directory Record Sequence
-    MediaStorage ms;
-    ms.SetFromHeader(*this);
-    bool dicomdir = (ms == MediaStorage::MediaStorageDirectoryStorage && dirrecsq);
-    if (!dicomdir)
-    {
-      if (!ds.FindDataElement(Tag(0x0008, 0x0018)) || ds.GetDataElement(Tag(0x0008, 0x0018)).IsEmpty())
+      // Bad! Constuct from DataSetTS
+      if (DataSetTS == TransferSyntax::TS_END)
       {
-        throw std::logic_error("No (0x0008,0x0018) element");
+        throw std::logic_error("No TransferSyntax specified");
       }
-      const DataElement & sopinst = ds.GetDataElement(Tag(0x0008, 0x0018));
-      assert(!GetDataElement(Tag(0x0002, 0x0003)).IsEmpty());
-      DataElement       mssopinst = GetDataElement(Tag(0x0002, 0x0003));
-      const ByteValue * bv = sopinst.GetByteValue();
-      if (bv)
-      {
-        mssopinst.SetByteValue(bv->GetPointer(), bv->GetLength());
-        Replace(mssopinst);
-      }
-    }
-  }
-  if (FindDataElement(Tag(0x0002, 0x0010)) && !GetDataElement(Tag(0x0002, 0x0010)).IsEmpty())
-  {
-    DataElement       tsuid = GetDataElement(Tag(0x0002, 0x0010));
-    const char *      datasetts = DataSetTS.GetString();
-    const ByteValue * bv = tsuid.GetByteValue();
-    assert(bv);
-    std::string currentts(bv->GetPointer(), bv->GetPointer() + bv->GetLength());
-    if (strlen(currentts.c_str()) != strlen(datasetts) || strcmp(currentts.c_str(), datasetts) != 0)
-    {
-      xde = tsuid;
-      VL::Type strlenDatasetts = static_cast<VL::Type>(strlen(datasetts));
-      xde.SetByteValue(datasetts, strlenDatasetts);
-      Replace(xde);
-    }
-    if (tsuid.GetVR() != VR::UI)
-    {
-      xde = tsuid;
+      const char * str = TransferSyntax::GetTSString(DataSetTS);
+      VL::Type     strlenStr = static_cast<VL::Type>(strlen(str));
+      xde.SetByteValue(str, strlenStr);
       xde.SetVR(VR::UI);
-      Replace(xde);
+      xde.SetTag(Tag(0x0002, 0x0010));
+      Insert(xde);
     }
-  }
-  else
-  {
-    // Bad! Constuct from DataSetTS
-    if (DataSetTS == TransferSyntax::TS_END)
-    {
-      throw std::logic_error("No TransferSyntax specified");
-    }
-    const char * str = TransferSyntax::GetTSString(DataSetTS);
-    VL::Type     strlenStr = static_cast<VL::Type>(strlen(str));
-    xde.SetByteValue(str, strlenStr);
-    xde.SetVR(VR::UI);
-    xde.SetTag(Tag(0x0002, 0x0010));
-    Insert(xde);
   }
   if (!FindDataElement(Tag(0x0002, 0x0012)))
   {
@@ -323,14 +325,15 @@ FileMetaInformation::FillFromDataSet(const DataSet & ds)
     xde.SetByteValue(title, strlenTitle);
     Insert(xde);
   }
-  // (Meta) Group Length (0002,0000)
-  Attribute<0x0002, 0x0000> filemetagrouplength;
-  Remove(filemetagrouplength.GetTag());
-  unsigned int glen = GetLength<ExplicitDataElement>();
-  assert((glen % 2) == 0);
-  filemetagrouplength.SetValue(glen);
-  Insert(filemetagrouplength.GetAsDataElement());
-  assert(!IsEmpty());
+  {
+    // (Meta) Group Length (0002,0000)
+    Attribute<0x0002, 0x0000> filemetagrouplength;
+    Remove(filemetagrouplength.GetTag());
+    unsigned int glen = GetLength<ExplicitDataElement>();
+    assert((glen % 2) == 0);
+    filemetagrouplength.SetValue(glen);
+    Insert(filemetagrouplength.GetAsDataElement());
+  }
 }
 
 template <typename TSwap>
@@ -805,13 +808,12 @@ FileMetaInformation::GetMediaStorageAsString() const
   // D 0002|0002 [UI] [Media Storage SOP Class UID]
   // [1.2.840.10008.5.1.4.1.1.12.1]
   // ==>       [X-Ray Angiographic Image Storage]
-  const Tag t(0x0002, 0x0002);
-  if (!FindDataElement(t))
+  const DataElement & de = GetDataElement(Tag(0x0002, 0x0002));
+  if (de.IsEmpty())
   {
     return std::string("");
   }
-  const DataElement & de = GetDataElement(t);
-  std::string         ts;
+  std::string ts;
   {
     const ByteValue * bv = de.GetByteValue();
     if (bv && bv->GetPointer() && bv->GetLength())

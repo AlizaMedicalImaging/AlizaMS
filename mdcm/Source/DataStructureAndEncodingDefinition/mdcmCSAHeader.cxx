@@ -442,9 +442,8 @@ CSAHeader::GetCSADataInfo()
 bool
 CSAHeader::GetMrProtocol(const DataSet & ds, MrProtocol & mrProtocol)
 {
-  if (!ds.FindDataElement(mdcm::PrivateTag(0x0029, 0x0020, "SIEMENS CSA HEADER")))
-    return false;
-  if (!LoadFromDataElement(ds.GetDataElement(mdcm::PrivateTag(0x0029, 0x0020, "SIEMENS CSA HEADER"))))
+  const DataElement & de = ds.GetDataElement(mdcm::PrivateTag(0x0029, 0x0020, "SIEMENS CSA HEADER"));
+  if (!LoadFromDataElement(de))
     return false;
 
   //  28 - 'MrProtocolVersion' VM 1, VR IS, SyngoDT 6, NoOfItems 6, Data '21710006'

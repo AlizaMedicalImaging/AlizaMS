@@ -293,7 +293,6 @@ void SQtree::process_element(
 		private_tag = true;
 		const mdcm::PrivateDict & pdict = d.GetPrivateDict();
 		const mdcm::Tag private_creator_t = tag.GetPrivateCreator();
-		if(ds.FindDataElement(private_creator_t))
 		{
 			const mdcm::DataElement & private_creator_e =
 				ds.GetDataElement(private_creator_t);
@@ -1140,7 +1139,6 @@ void SQtree::read_file(const QString & f, const bool use_lock)
 			process_element(ds /* unused */, elem, dicts, i, "");
 		}
 		QString charset;
-		if (ds.FindDataElement(mdcm::Tag(0x0008,0x0005)))
 		{
 			const mdcm::DataElement & ce_ =
 				ds.GetDataElement(mdcm::Tag(0x0008,0x0005));
@@ -1320,42 +1318,39 @@ void SQtree::dump_csa(const mdcm::DataSet & ds)
 	QString csa_text;
 	const mdcm::PrivateTag t1 = csa1.GetCSAImageHeaderInfoTag();
 	const mdcm::PrivateTag t2 = csa2.GetCSASeriesHeaderInfoTag();
-	const bool f_t1 = ds.FindDataElement(t1);
-	const bool f_t2 = ds.FindDataElement(t2);
-	if (f_t1||f_t2)
+	const mdcm::DataElement & f_t1_de = ds.GetDataElement(t1);
+	const mdcm::DataElement & f_t2_de = ds.GetDataElement(t2);
+	if (!f_t1_de.IsEmpty())
 	{
-		if (f_t1)
+		csa1.LoadFromDataElement(f_t1_de);
+		if (csa1.GetFormat() == mdcm::CSAHeader::SV10 ||
+			csa1.GetFormat() == mdcm::CSAHeader::NOMAGIC)
 		{
-			csa1.LoadFromDataElement(ds.GetDataElement(t1));
-			if (csa1.GetFormat() == mdcm::CSAHeader::SV10 ||
-				csa1.GetFormat() == mdcm::CSAHeader::NOMAGIC)
-			{
-				std::ostringstream os1;
-				csa1.Print(os1);
-				csa_text.append(QString::fromStdString(os1.str()));
-			}
+			std::ostringstream os1;
+			csa1.Print(os1);
+			csa_text.append(QString::fromStdString(os1.str()));
 		}
-		if (f_t2)
+	}
+	if (!f_t2_de.IsEmpty())
+	{
+		csa2.LoadFromDataElement(f_t2_de);
+		if (csa2.GetFormat() == mdcm::CSAHeader::SV10 ||
+			csa2.GetFormat() == mdcm::CSAHeader::NOMAGIC)
 		{
-			csa2.LoadFromDataElement(ds.GetDataElement(t2));
-			if (csa2.GetFormat() == mdcm::CSAHeader::SV10 ||
-				csa2.GetFormat() == mdcm::CSAHeader::NOMAGIC)
-			{
-				std::ostringstream os2;
-				csa2.Print(os2);
-				csa_text.append(QString("\n\n") +
-					QString::fromStdString(os2.str()));
-			}
+			std::ostringstream os2;
+			csa2.Print(os2);
+			csa_text.append(QString("\n\n") +
+				QString::fromStdString(os2.str()));
 		}
-		if (!csa_text.isEmpty() && textEdit->document())
-		{
-			csa_text.prepend(QString("Siemens CSA\n\n"));
-			textEdit->document()->setPlainText(csa_text);
-			QTextCursor cursor = textEdit->textCursor();
-			cursor.setPosition(0);
-			textEdit->setTextCursor(cursor);
-			textEdit->show();
-		}
+	}
+	if (!csa_text.isEmpty() && textEdit->document())
+	{
+		csa_text.prepend(QString("Siemens CSA\n\n"));
+		textEdit->document()->setPlainText(csa_text);
+		QTextCursor cursor = textEdit->textCursor();
+		cursor.setPosition(0);
+		textEdit->setTextCursor(cursor);
+		textEdit->show();
 	}
 }
 
@@ -1363,8 +1358,8 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 {
 	const mdcm::PrivateTag tgems_us_movie(
 		0x7fe1,0x1,"GEMS_Ultrasound_MovieGroup_001");
-	if (!ds.FindDataElement(tgems_us_movie)) return;
 	const mdcm::DataElement & e1 = ds.GetDataElement(tgems_us_movie);
+	if (e1.IsEmpty()) return;
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 = e1.GetValueAsSQ();
 	if (!(sq1 && sq1->GetNumberOfItems() > 0)) return;
 	textEdit->document()->addResource(
@@ -1382,7 +1377,6 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 		const mdcm::PrivateTag tname2(
 			0x7fe1,0x2,"GEMS_Ultrasound_MovieGroup_001");
 		QString qs2;
-		if (subds1.FindDataElement(tname2))
 		{
 			const mdcm::DataElement & e2 =
 				subds1.GetDataElement(tname2);

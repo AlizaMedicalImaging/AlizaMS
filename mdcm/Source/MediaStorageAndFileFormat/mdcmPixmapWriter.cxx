@@ -592,7 +592,8 @@ PixmapWriter::PrepareWrite(const MediaStorage & ref_ms)
   if (!GetSkipUIDs())
   {
     UIDGenerator uid;
-    if (ds.FindDataElement(Tag(0x0008, 0x0018)) && false) // FIXME
+#if 0
+    if (false && ds.FindDataElement(Tag(0x0008, 0x0018))) // FIXME
     {
       // Reference
       const Tag                     tsourceImageSequence(0x0008, 0x2112);
@@ -631,6 +632,7 @@ PixmapWriter::PrepareWrite(const MediaStorage & ref_ms)
         ds.Insert(de);
       }
     }
+#endif
     {
       const char * sop = uid.Generate();
       DataElement  de(Tag(0x0008, 0x0018));

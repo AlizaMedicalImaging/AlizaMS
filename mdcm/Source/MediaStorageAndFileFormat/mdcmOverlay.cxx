@@ -170,14 +170,14 @@ Overlay::Update(const DataElement & de)
 bool
 Overlay::GrabOverlayFromPixelData(const DataSet & ds)
 {
-  if (!ds.FindDataElement(Tag(0x7fe0, 0x0010)))
-    return false;
   if (Internal.NumberOfFrames > 1)
+    return false;
+  const DataElement & pixeldata = ds.GetDataElement(Tag(0x7fe0, 0x0010));
+  if (pixeldata.IsEmpty())
     return false;
   const unsigned int s = Internal.Rows * Internal.Columns;
   const unsigned int ovlength = s / 8 + (s % 8 != 0 ? 1 : 0);
   Internal.Data.resize(ovlength, 0);
-  const DataElement & pixeldata = ds.GetDataElement(Tag(0x7fe0, 0x0010));
   const ByteValue *   bv = pixeldata.GetByteValue();
   if (!bv)
   {

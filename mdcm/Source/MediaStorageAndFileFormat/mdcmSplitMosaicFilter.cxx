@@ -139,24 +139,20 @@ SplitMosaicFilter::ComputeMOSAICDimensions(unsigned int dims[3])
   int                numberOfImagesInMosaic{};
   if (csa.LoadFromDataElement(ds.GetDataElement(t1)))
   {
-    if (csa.FindCSAElementByName("NumberOfImagesInMosaic"))
+    const CSAElement & csael4 = csa.GetCSAElementByName("NumberOfImagesInMosaic");
+    if (!csael4.IsEmpty())
     {
-      const CSAElement & csael4 = csa.GetCSAElementByName("NumberOfImagesInMosaic");
-      if (!csael4.IsEmpty())
-      {
-        Element<VR::IS, VM::VM1> el4 = { { 0 } };
-        el4.Set(csael4.GetValue());
-        numberOfImagesInMosaic = el4.GetValue();
-      }
+      Element<VR::IS, VM::VM1> el4 = { { 0 } };
+      el4.Set(csael4.GetValue());
+      numberOfImagesInMosaic = el4.GetValue();
     }
   }
   if (numberOfImagesInMosaic == 0)
   {
-    PrivateTag t2(0x0019, 0x0a, "SIEMENS MR HEADER");
-    if (ds.FindDataElement(t2))
+    const DataElement & de = ds.GetDataElement(PrivateTag(0x0019, 0x0a, "SIEMENS MR HEADER"));
+    if (!de.IsEmpty())
     {
-      const DataElement & de = ds.GetDataElement(t2);
-      const ByteValue *   bv = de.GetByteValue();
+      const ByteValue * bv = de.GetByteValue();
       if (bv)
       {
         Element<VR::US, VM::VM1> el1 = { { 0 } };
@@ -213,20 +209,17 @@ SplitMosaicFilter::ComputeMOSAICSliceNormal(double slicenormalvector[3], bool & 
   static const char  snvstr[] = "SliceNormalVector";
   if (csa.LoadFromDataElement(ds.GetDataElement(t1)))
   {
-    if (csa.FindCSAElementByName(snvstr))
+    const CSAElement & snv_csa = csa.GetCSAElementByName(snvstr);
+    if (!snv_csa.IsEmpty())
     {
-      const CSAElement & snv_csa = csa.GetCSAElementByName(snvstr);
-      if (!snv_csa.IsEmpty())
+      const ByteValue *  bv = snv_csa.GetByteValue();
+      const std::string  str(bv->GetPointer(), bv->GetLength());
+      std::istringstream is;
+      is.str(str);
+      char sep;
+      if (is >> normal[0] >> sep >> normal[1] >> sep >> normal[2])
       {
-        const ByteValue *  bv = snv_csa.GetByteValue();
-        const std::string  str(bv->GetPointer(), bv->GetLength());
-        std::istringstream is;
-        is.str(str);
-        char sep;
-        if (is >> normal[0] >> sep >> normal[1] >> sep >> normal[2])
-        {
-          snvfound = true;
-        }
+        snvfound = true;
       }
     }
   }

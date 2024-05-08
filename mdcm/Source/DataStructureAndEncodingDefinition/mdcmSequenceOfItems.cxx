@@ -101,13 +101,14 @@ SequenceOfItems::SetLengthToUndefined()
 bool
 SequenceOfItems::FindDataElement(const Tag & t) const
 {
-  bool found = false;
-  for (ConstIterator it = Begin(); it != End() && !found; ++it)
+  for (ConstIterator it = Begin(); it != End(); ++it)
   {
     const Item & item = *it;
-    found = item.FindDataElement(t);
+    const bool f = item.FindDataElement(t);
+    if (f)
+      return true;
   }
-  return found;
+  return false;
 }
 
 } // end namespace mdcm

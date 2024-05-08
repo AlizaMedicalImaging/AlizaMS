@@ -281,9 +281,10 @@ public:
   void
   SetFromDataSet(const DataSet & ds)
   {
-    if (ds.FindDataElement(GetTag()) && !ds.GetDataElement(GetTag()).IsEmpty())
+    const DataElement & de = ds.GetDataElement(GetTag());
+    if (!de.IsEmpty())
     {
-      SetFromDataElement(ds.GetDataElement(GetTag()));
+      SetFromDataElement(de);
     }
   }
 
@@ -476,9 +477,10 @@ public:
   void
   SetFromDataSet(const DataSet & ds)
   {
-    if (ds.FindDataElement(GetTag()) && !ds.GetDataElement(GetTag()).IsEmpty())
+    const DataElement & de = ds.GetDataElement(GetTag());
+    if (!de.IsEmpty())
     {
-      SetFromDataElement(ds.GetDataElement(GetTag()));
+      SetFromDataElement(de);
     }
   }
 
@@ -699,9 +701,10 @@ public:
   void
   SetFromDataSet(const DataSet & ds)
   {
-    if (ds.FindDataElement(GetTag()) && !ds.GetDataElement(GetTag()).IsEmpty())
+    const DataElement & de = ds.GetDataElement(GetTag());
+    if (!de.IsEmpty())
     {
-      SetFromDataElement(ds.GetDataElement(GetTag()));
+      SetFromDataElement(de);
     }
   }
 
