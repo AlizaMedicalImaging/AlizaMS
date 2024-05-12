@@ -37,6 +37,151 @@
 #endif
 #include <limits>
 
+namespace
+{
+
+bool isasciiupper(char c)
+{
+  return c >= 'A' && c <= 'Z';
+}
+
+class DefaultCaller
+{
+private:
+  mdcm::DataSet & m_dataSet;
+
+public:
+  DefaultCaller(mdcm::DataSet & ds)
+    : m_dataSet(ds)
+  {}
+  template <class T1, class T2>
+  void
+  ReadCommon(std::istream & is) const
+  {
+    m_dataSet.template Read<T1, T2>(is);
+  }
+
+  template <class T1, class T2>
+  void
+  ReadCommonWithLength(std::istream & is, mdcm::VL & length) const
+  {
+    m_dataSet.template ReadWithLength<T1, T2>(is, length);
+    // https://groups.google.com/forum/?fromgroups#!topic/comp.lang.c++/yTW4ESh1IL8
+    is.setstate(std::ios::eofbit);
+  }
+
+  static void
+  Check(bool b, std::istream & is)
+  {
+    if (b)
+    {
+      assert(is.eof());
+    }
+    (void)is;
+  }
+};
+
+class ReadUpToTagCaller
+{
+private:
+  mdcm::DataSet &             m_dataSet;
+  const mdcm::Tag &           m_tag;
+  const std::set<mdcm::Tag> & m_skipTags;
+
+public:
+  ReadUpToTagCaller(mdcm::DataSet & ds, const mdcm::Tag & tag, const std::set<mdcm::Tag> & skiptags)
+    : m_dataSet(ds)
+    , m_tag(tag)
+    , m_skipTags(skiptags)
+  {}
+
+  template <class T1, class T2>
+  void
+  ReadCommon(std::istream & is) const
+  {
+    m_dataSet.template ReadUpToTag<T1, T2>(is, m_tag, m_skipTags);
+  }
+
+  template <class T1, class T2>
+  void
+  ReadCommonWithLength(std::istream & is, mdcm::VL & length) const
+  {
+    m_dataSet.template ReadUpToTagWithLength<T1, T2>(is, m_tag, m_skipTags, length);
+  }
+
+  static void
+  Check(bool, std::istream &)
+  {}
+};
+
+class ReadSelectedTagsCaller
+{
+private:
+  mdcm::DataSet &             m_dataSet;
+  const std::set<mdcm::Tag> & m_tags;
+  bool                        m_readvalues;
+
+public:
+  ReadSelectedTagsCaller(mdcm::DataSet & ds, const std::set<mdcm::Tag> & tags, const bool readvalues)
+    : m_dataSet(ds)
+    , m_tags(tags)
+    , m_readvalues(readvalues)
+  {}
+
+  template <class T1, class T2>
+  void
+  ReadCommon(std::istream & is) const
+  {
+    m_dataSet.template ReadSelectedTags<T1, T2>(is, m_tags, m_readvalues);
+  }
+
+  template <class T1, class T2>
+  void
+  ReadCommonWithLength(std::istream & is, mdcm::VL & length) const
+  {
+    m_dataSet.template ReadSelectedTagsWithLength<T1, T2>(is, m_tags, length, m_readvalues);
+  }
+
+  static void
+  Check(bool, std::istream &)
+  {}
+};
+
+class ReadSelectedPrivateTagsCaller
+{
+private:
+  mdcm::DataSet &                    m_dataSet;
+  const std::set<mdcm::PrivateTag> & m_groups;
+  bool                               m_readvalues;
+
+public:
+  ReadSelectedPrivateTagsCaller(mdcm::DataSet & ds, const std::set<mdcm::PrivateTag> & groups, const bool readvalues)
+    : m_dataSet(ds)
+    , m_groups(groups)
+    , m_readvalues(readvalues)
+  {}
+
+  template <class T1, class T2>
+  void
+  ReadCommon(std::istream & is) const
+  {
+    m_dataSet.template ReadSelectedPrivateTags<T1, T2>(is, m_groups, m_readvalues);
+  }
+
+  template <class T1, class T2>
+  void
+  ReadCommonWithLength(std::istream & is, mdcm::VL & length) const
+  {
+    m_dataSet.template ReadSelectedPrivateTagsWithLength<T1, T2>(is, m_groups, length, m_readvalues);
+  }
+
+  static void
+  Check(bool, std::istream &)
+  {}
+};
+
+}
+
 namespace mdcm
 {
 
@@ -194,171 +339,31 @@ Reader::GuessTransferSyntax()
   return ts;
 }
 
-namespace details
-{
-
-class DefaultCaller
-{
-private:
-  DataSet & m_dataSet;
-
-public:
-  DefaultCaller(DataSet & ds)
-    : m_dataSet(ds)
-  {}
-  template <class T1, class T2>
-  void
-  ReadCommon(std::istream & is) const
-  {
-    m_dataSet.template Read<T1, T2>(is);
-  }
-
-  template <class T1, class T2>
-  void
-  ReadCommonWithLength(std::istream & is, VL & length) const
-  {
-    m_dataSet.template ReadWithLength<T1, T2>(is, length);
-    // https://groups.google.com/forum/?fromgroups#!topic/comp.lang.c++/yTW4ESh1IL8
-    is.setstate(std::ios::eofbit);
-  }
-
-  static void
-  Check(bool b, std::istream & is)
-  {
-    if (b)
-    {
-      assert(is.eof());
-    }
-    (void)is;
-  }
-};
-
-class ReadUpToTagCaller
-{
-private:
-  DataSet &             m_dataSet;
-  const Tag &           m_tag;
-  const std::set<Tag> & m_skipTags;
-
-public:
-  ReadUpToTagCaller(DataSet & ds, const Tag & tag, const std::set<Tag> & skiptags)
-    : m_dataSet(ds)
-    , m_tag(tag)
-    , m_skipTags(skiptags)
-  {}
-
-  template <class T1, class T2>
-  void
-  ReadCommon(std::istream & is) const
-  {
-    m_dataSet.template ReadUpToTag<T1, T2>(is, m_tag, m_skipTags);
-  }
-
-  template <class T1, class T2>
-  void
-  ReadCommonWithLength(std::istream & is, VL & length) const
-  {
-    m_dataSet.template ReadUpToTagWithLength<T1, T2>(is, m_tag, m_skipTags, length);
-  }
-
-  static void
-  Check(bool, std::istream &)
-  {}
-};
-
-class ReadSelectedTagsCaller
-{
-private:
-  DataSet &             m_dataSet;
-  const std::set<Tag> & m_tags;
-  bool                  m_readvalues;
-
-public:
-  ReadSelectedTagsCaller(DataSet & ds, const std::set<Tag> & tags, const bool readvalues)
-    : m_dataSet(ds)
-    , m_tags(tags)
-    , m_readvalues(readvalues)
-  {}
-
-  template <class T1, class T2>
-  void
-  ReadCommon(std::istream & is) const
-  {
-    m_dataSet.template ReadSelectedTags<T1, T2>(is, m_tags, m_readvalues);
-  }
-
-  template <class T1, class T2>
-  void
-  ReadCommonWithLength(std::istream & is, VL & length) const
-  {
-    m_dataSet.template ReadSelectedTagsWithLength<T1, T2>(is, m_tags, length, m_readvalues);
-  }
-
-  static void
-  Check(bool, std::istream &)
-  {}
-};
-
-class ReadSelectedPrivateTagsCaller
-{
-private:
-  DataSet &                    m_dataSet;
-  const std::set<PrivateTag> & m_groups;
-  bool                         m_readvalues;
-
-public:
-  ReadSelectedPrivateTagsCaller(DataSet & ds, const std::set<PrivateTag> & groups, const bool readvalues)
-    : m_dataSet(ds)
-    , m_groups(groups)
-    , m_readvalues(readvalues)
-  {}
-
-  template <class T1, class T2>
-  void
-  ReadCommon(std::istream & is) const
-  {
-    m_dataSet.template ReadSelectedPrivateTags<T1, T2>(is, m_groups, m_readvalues);
-  }
-
-  template <class T1, class T2>
-  void
-  ReadCommonWithLength(std::istream & is, VL & length) const
-  {
-    m_dataSet.template ReadSelectedPrivateTagsWithLength<T1, T2>(is, m_groups, length, m_readvalues);
-  }
-
-  static void
-  Check(bool, std::istream &)
-  {}
-};
-
-} // namespace details
-
 bool
 Reader::Read()
 {
-  details::DefaultCaller caller(F->GetDataSet());
+  DefaultCaller caller(F->GetDataSet());
   return InternalReadCommon(caller);
 }
 
 bool
 Reader::ReadUpToTag(const Tag & tag, const std::set<Tag> & skiptags)
 {
-  details::ReadUpToTagCaller caller(F->GetDataSet(), tag, skiptags);
+  ReadUpToTagCaller caller(F->GetDataSet(), tag, skiptags);
   return InternalReadCommon(caller);
 }
 
 bool
 Reader::ReadSelectedTags(const std::set<Tag> & selectedTags, bool readvalues)
 {
-  details::ReadSelectedTagsCaller caller(F->GetDataSet(), selectedTags, readvalues);
+  ReadSelectedTagsCaller caller(F->GetDataSet(), selectedTags, readvalues);
   return InternalReadCommon(caller);
 }
 
 bool
 Reader::ReadSelectedPrivateTags(const std::set<PrivateTag> & selectedPTags, bool readvalues)
 {
-  details::ReadSelectedPrivateTagsCaller caller(F->GetDataSet(), selectedPTags, readvalues);
+  ReadSelectedPrivateTagsCaller caller(F->GetDataSet(), selectedPTags, readvalues);
   return InternalReadCommon(caller);
 }
 
@@ -670,12 +675,6 @@ Reader::InternalReadCommon(const T_Caller & caller)
     success = false;
   }
   return success;
-}
-
-static inline bool
-isasciiupper(char c)
-{
-  return c >= 'A' && c <= 'Z';
 }
 
 // This function re-implements code from:

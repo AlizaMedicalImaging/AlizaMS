@@ -49,13 +49,10 @@ Curve::GetNumberOfCurves(const DataSet & ds)
     }
     else
     {
-      if (ds.FindDataElement(Tag(de.GetTag().GetGroup(), 0x3000)))
+      const DataElement & overlaydata = ds.GetDataElement(Tag(de.GetTag().GetGroup(), 0x3000));
+      if (!overlaydata.IsEmpty())
       {
-        const DataElement & overlaydata = ds.GetDataElement(Tag(de.GetTag().GetGroup(), 0x3000));
-        if (!overlaydata.IsEmpty())
-        {
-          ++numoverlays;
-        }
+        ++numoverlays;
       }
       // store found tag in overlay
       overlay = de.GetTag();

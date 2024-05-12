@@ -1455,6 +1455,8 @@ QString voi_lut_slice_by_slice(
 										{
 #ifdef ALIZA_VERBOSE
 											std::cout << ex.GetDescription() << std::endl;
+#else
+											(void)ex;
 #endif
 											continue;
 										}
@@ -1869,19 +1871,18 @@ void get_overlays(
 		}
 		else if (e.GetTag().IsPrivate())
 		{
-			t.SetGroup(static_cast<uint16_t>(e.GetTag().GetGroup()+1));
+			t.SetGroup(static_cast<uint16_t>(e.GetTag().GetGroup() + 1));
 			t.SetElement(0);
 		}
 		else
 		{
 			t = e.GetTag();
 			mdcm::Tag tOverlayData(t.GetGroup(), 0x3000);
-			if (ds.FindDataElement(tOverlayData))
 			{
 				const mdcm::DataElement & eOverlayData = ds.GetDataElement(tOverlayData);
 				if (!eOverlayData.IsEmpty()) l.push_back(t.GetGroup());
 			}
-			t.SetGroup(static_cast<uint16_t>(t.GetGroup()+2));
+			t.SetGroup(static_cast<uint16_t>(t.GetGroup() + 2));
 			t.SetElement(0);
 		}
 	}
@@ -2058,8 +2059,8 @@ void PrConfigUtils::read_modality_lut(
 		c.values.push_back(QVariant(1.0)); // 1
 	}
 	//
-	bool no_lut_seq = false;
-	if (!rescale_ok && ds.FindDataElement(tModalityLUTSequence))
+	bool no_lut_seq{};
+	if (!rescale_ok)
 	{
 		QList<QVariant> lut_descriptor;
 		QList<QVariant> lut_data;
@@ -2108,9 +2109,9 @@ void PrConfigUtils::read_voi_lut(
 	const mdcm::Tag tWindowCenter(0x0028,0x1050);
 	const mdcm::Tag tWindowWidth(0x0028,0x1051);
 	const mdcm::Tag tVOILUTFunction(0x0028,0x1056);
-	if (ds.FindDataElement(tSoftcopyVOILUTSequence))
+	const mdcm::DataElement & de = ds.GetDataElement(tSoftcopyVOILUTSequence);
+	if (!de.IsEmpty())
 	{
-		const mdcm::DataElement & de = ds.GetDataElement(tSoftcopyVOILUTSequence);
 		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 		if (!sq) return;
 		const unsigned int number_of_items = sq->GetNumberOfItems();
@@ -2182,9 +2183,9 @@ void PrConfigUtils::read_voi_lut(
 				c.values.push_back(QVariant(false));             // 5
 				c.values.push_back(QVariant(false));             // 6
 			}
-			if (nestedds.FindDataElement(tReferencedImageSequence))
+			const mdcm::DataElement & de1 = nestedds.GetDataElement(tReferencedImageSequence);
+			if (!de1.IsEmpty())
 			{
-				const mdcm::DataElement & de1 = nestedds.GetDataElement(tReferencedImageSequence);
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 = de1.GetValueAsSQ();
 				if (!sq1) continue;
 				const unsigned int number_of_items1 = sq1->GetNumberOfItems();
@@ -2280,7 +2281,6 @@ void PrConfigUtils::read_presentation_lut(
 	//
 	//
 	bool no_lut_seq{};
-	if (ds.FindDataElement(tPresentationLUTSequence))
 	{
 		QList<QVariant> lut_descriptor;
 		QList<QVariant> lut_data;
@@ -2302,10 +2302,6 @@ void PrConfigUtils::read_presentation_lut(
 		{
 			no_lut_seq = true;
 		}
-	}
-	else
-	{
-		no_lut_seq = true;
 	}
 	if (no_lut_seq)
 	{
@@ -2361,9 +2357,9 @@ void PrConfigUtils::read_display_areas(
 	const mdcm::Tag tReferencedImageSequence(0x0008,0x1140);
 	const mdcm::Tag tReferencedSOPInstanceUID(0x0008,0x1155);
 	const mdcm::Tag tReferencedFrameNumber(0x0008,0x1160);
-	if (ds.FindDataElement(tDisplayedAreaSelectionSequence))
+	const mdcm::DataElement & de = ds.GetDataElement(tDisplayedAreaSelectionSequence);
+	if (!de.IsEmpty())
 	{
-		const mdcm::DataElement & de = ds.GetDataElement(tDisplayedAreaSelectionSequence);
 		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 		if (!sq) return;
 		const unsigned int number_of_items = sq->GetNumberOfItems();
@@ -2444,9 +2440,9 @@ void PrConfigUtils::read_display_areas(
 				c.values.push_back(QVariant(1.0));
 			}
 			//
-			if (nestedds.FindDataElement(tReferencedImageSequence))
+			const mdcm::DataElement & de1 = nestedds.GetDataElement(tReferencedImageSequence);
+			if (!de1.IsEmpty())
 			{
-				const mdcm::DataElement & de1 = nestedds.GetDataElement(tReferencedImageSequence);
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 = de1.GetValueAsSQ();
 				if (!sq1) continue;
 				const unsigned int number_of_items1 = sq1->GetNumberOfItems();
@@ -2586,9 +2582,9 @@ void PrConfigUtils::read_graphic_objects(
 	QString t00080005;
 	const bool t00080005_ok = DicomUtils::get_string_value(ds, mdcm::Tag(0x0008,0x0005), t00080005);
 	(void)t00080005_ok;
-	if (ds.FindDataElement(tGraphicAnnotationSequence))
+	const mdcm::DataElement & de = ds.GetDataElement(tGraphicAnnotationSequence);
+	if (!de.IsEmpty())
 	{
-		const mdcm::DataElement & de = ds.GetDataElement(tGraphicAnnotationSequence);
 		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 		if (!sq) return;
 		const unsigned int number_of_items = sq->GetNumberOfItems();
@@ -2597,9 +2593,9 @@ void PrConfigUtils::read_graphic_objects(
 			const mdcm::Item & item = sq->GetItem(x + 1);
 			const mdcm::DataSet & nestedds = item.GetNestedDataSet();
 			QStringList ref_sop;
-			if (nestedds.FindDataElement(tReferencedImageSequence))
+			const mdcm::DataElement & de1 = nestedds.GetDataElement(tReferencedImageSequence);
+			if (!de1.IsEmpty())
 			{
-				const mdcm::DataElement & de1 = nestedds.GetDataElement(tReferencedImageSequence);
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 = de1.GetValueAsSQ();
 				if (!sq1) continue;
 				const unsigned int number_of_items1 = sq1->GetNumberOfItems();
@@ -2640,9 +2636,9 @@ void PrConfigUtils::read_graphic_objects(
 					}
 				}
 			}
-			if (nestedds.FindDataElement(tGraphicObjectSequence))
+			const mdcm::DataElement & de2 = nestedds.GetDataElement(tGraphicObjectSequence);
+			if (!de2.IsEmpty())
 			{
-				const mdcm::DataElement & de2 = nestedds.GetDataElement(tGraphicObjectSequence);
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq2 = de2.GetValueAsSQ();
 				if (!sq2) continue;
 				const unsigned int number_of_items2 = sq2->GetNumberOfItems();
@@ -2748,9 +2744,9 @@ void PrConfigUtils::read_text_annotations(
 	QString t00080005;
 	const bool t00080005_ok = DicomUtils::get_string_value(ds, mdcm::Tag(0x0008,0x0005), t00080005);
 	(void)t00080005_ok;
-	if (ds.FindDataElement(tGraphicAnnotationSequence))
+	const mdcm::DataElement & de = ds.GetDataElement(tGraphicAnnotationSequence);
+	if (!de.IsEmpty())
 	{
-		const mdcm::DataElement & de = ds.GetDataElement(tGraphicAnnotationSequence);
 		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = de.GetValueAsSQ();
 		if (!sq) return;
 		const unsigned int number_of_items = sq->GetNumberOfItems();
@@ -2759,9 +2755,9 @@ void PrConfigUtils::read_text_annotations(
 			const mdcm::Item & item = sq->GetItem(x + 1);
 			const mdcm::DataSet & nestedds = item.GetNestedDataSet();
 			QStringList ref_sop;
-			if (nestedds.FindDataElement(tReferencedImageSequence))
+			const mdcm::DataElement & de1 = nestedds.GetDataElement(tReferencedImageSequence);
+			if (!de1.IsEmpty())
 			{
-				const mdcm::DataElement & de1 = nestedds.GetDataElement(tReferencedImageSequence);
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 = de1.GetValueAsSQ();
 				if (!sq1) continue;
 				const unsigned int number_of_items1 = sq1->GetNumberOfItems();
@@ -2802,9 +2798,9 @@ void PrConfigUtils::read_text_annotations(
 					}
 				}
 			}
-			if (nestedds.FindDataElement(tTextObjectSequence))
+			const mdcm::DataElement & de2 = nestedds.GetDataElement(tTextObjectSequence);
+			if (!de2.IsEmpty())
 			{
-				const mdcm::DataElement & de2 = nestedds.GetDataElement(tTextObjectSequence);
 				mdcm::SmartPointer<mdcm::SequenceOfItems> sq2 = de2.GetValueAsSQ();
 				if (!sq2) continue;
 				const unsigned int number_of_items2 = sq2->GetNumberOfItems();
@@ -2884,7 +2880,6 @@ void PrConfigUtils::read_text_annotations(
 						c.values.push_back(QVariant(QString(""))); // 9
 						c.values.push_back(QVariant(QString(""))); //10
 					}
-					if (nestedds2.FindDataElement(tUnformattedTextValue))
 					{
 						const mdcm::DataElement & e5 = nestedds2.GetDataElement(tUnformattedTextValue);
 						if (!e5.IsEmpty() && !e5.IsUndefinedLength() && e5.GetByteValue())
@@ -2893,14 +2888,14 @@ void PrConfigUtils::read_text_annotations(
 							QString tmp5 = CodecUtils::toUTF8(&ba5, t00080005.toLatin1().constData());
 							c.values.push_back(tmp5); // 11
 						}
+						else
+						{
+							c.values.push_back(QVariant(QString(""))); // 11
+						}
 					}
-					else
+					const mdcm::DataElement & de3 = nestedds2.GetDataElement(tTextStyleSequence);
+					if (!de3.IsEmpty())
 					{
-						c.values.push_back(QVariant(QString(""))); // 11
-					}
-					if (nestedds2.FindDataElement(tTextStyleSequence))
-					{
-						const mdcm::DataElement & de3 = nestedds2.GetDataElement(tTextStyleSequence);
 						mdcm::SmartPointer<mdcm::SequenceOfItems> sq3 = de3.GetValueAsSQ();
 						if (sq3 && sq3->GetNumberOfItems() == 1)
 						{

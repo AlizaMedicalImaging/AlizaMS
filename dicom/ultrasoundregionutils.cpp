@@ -34,13 +34,10 @@ void UltrasoundRegionUtils::GetCodeSequenceLookUp(const mdcm::DataSet&, Ultrasou
 void UltrasoundRegionUtils::Read(const mdcm::DataSet & ds, QList<UltrasoundRegionData> & regions)
 {
 	if (ds.IsEmpty()) return;
-
 	const mdcm::Tag tSequenceOfUltrasoundRegions(0x0018,0x6011);
-
-	if (!ds.FindDataElement(tSequenceOfUltrasoundRegions)) return;
-
 	const mdcm::DataElement & deSequenceOfUltrasoundRegions	=
 		ds.GetDataElement(tSequenceOfUltrasoundRegions);
+	if (deSequenceOfUltrasoundRegions.IsEmpty()) return;
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sqSequenceOfUltrasoundRegions =
 		deSequenceOfUltrasoundRegions.GetValueAsSQ();
 	if (!sqSequenceOfUltrasoundRegions) return;

@@ -29,9 +29,9 @@
 #include "settingswidget.h"
 #include "findrefdialog.h"
 #include <itkExtractImageFilter.h>
-#include "mmath.h"
 #include <chrono>
 #include <thread>
+#include "mmath.h"
 
 namespace
 {
@@ -928,7 +928,6 @@ bool SRUtils::read_SCOORD(
 		}
 	}
 	size_t other_{};
-	if (ds.FindDataElement(mdcm::Tag(0x0040,0xa730)))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(mdcm::Tag(0x0040,0xa730));
 		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
@@ -998,7 +997,6 @@ void SRUtils::read_PNAME(
 	const QString & charset,
 	QString & s)
 {
-	if(!ds.FindDataElement(mdcm::Tag(0x0040,0xa123))) return;
 	const mdcm::DataElement & e2 = ds.GetDataElement(mdcm::Tag(0x0040,0xa123));
 	if (!e2.IsEmpty() && !e2.IsUndefinedLength() && e2.GetByteValue())
 	{
@@ -1014,7 +1012,6 @@ void SRUtils::read_TEXT(
 	const QString & charset,
 	QString & s)
 {
-	if(!ds.FindDataElement(mdcm::Tag(0x0040,0xa160))) return;
 	const mdcm::DataElement & e2 = ds.GetDataElement(mdcm::Tag(0x0040,0xa160));
 	if (!e2.IsEmpty() && !e2.IsUndefinedLength() && e2.GetByteValue())
 	{
@@ -1029,8 +1026,7 @@ void SRUtils::read_NUM(
 	const QString & charset,
 	QString & s)
 {
-	if (!ds.FindDataElement(mdcm::Tag(0x0040,0xa300))) return;
-	const mdcm::DataElement & e3  = ds.GetDataElement(mdcm::Tag(0x0040,0xa300));
+	const mdcm::DataElement & e3 = ds.GetDataElement(mdcm::Tag(0x0040,0xa300));
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sq3 = e3.GetValueAsSQ();
 	if (!sq3) return;
 	for (unsigned int i3 = 0; i3 < sq3->GetNumberOfItems(); ++i3)
@@ -1041,38 +1037,32 @@ void SRUtils::read_NUM(
 		if (DicomUtils::get_string_value(nds3, mdcm::Tag(0x0040,0xa30a), NumericValue))
 		{
 			QString unit;
-			if (nds3.FindDataElement(mdcm::Tag(0x0040,0x08ea)))
+			const mdcm::DataElement & e5 = nds3.GetDataElement(mdcm::Tag(0x0040,0x08ea));
+			mdcm::SmartPointer<mdcm::SequenceOfItems> sq5 = e5.GetValueAsSQ();
+			if (sq5 && (sq5->GetNumberOfItems() == 1))
 			{
-				const mdcm::DataElement & e5 = nds3.GetDataElement(mdcm::Tag(0x0040,0x08ea));
-				mdcm::SmartPointer<mdcm::SequenceOfItems> sq5 = e5.GetValueAsSQ();
-				if (sq5 && (sq5->GetNumberOfItems() == 1))
+				const mdcm::Item & item5 = sq5->GetItem(1);
+				const mdcm::DataSet & nds5 = item5.GetNestedDataSet();
 				{
-					const mdcm::Item & item5 = sq5->GetItem(1);
-					const mdcm::DataSet & nds5 = item5.GetNestedDataSet();
-					if (nds5.FindDataElement(mdcm::Tag(0x0008,0x0104)))
+					const mdcm::DataElement & e7 = nds5.GetDataElement(mdcm::Tag(0x0008,0x0104));
+					if (!e7.IsEmpty() && !e7.IsUndefinedLength() && e7.GetByteValue())
 					{
-						const mdcm::DataElement & e7 = nds5.GetDataElement(mdcm::Tag(0x0008,0x0104));
-						if (!e7.IsEmpty() && !e7.IsUndefinedLength() && e7.GetByteValue())
-						{
-							QByteArray ba7(e7.GetByteValue()->GetPointer(), e7.GetByteValue()->GetLength());
-							const QString tmp5 = CodecUtils::toUTF8(&ba7, charset.toLatin1().constData());
-							unit = tmp5.trimmed();
-						}
+						QByteArray ba7(e7.GetByteValue()->GetPointer(), e7.GetByteValue()->GetLength());
+						const QString tmp5 = CodecUtils::toUTF8(&ba7, charset.toLatin1().constData());
+						unit = tmp5.trimmed();
 					}
-					if (nds5.FindDataElement(
-							mdcm::Tag(0x0008,0x0100)))
+				}
+				{
+					const mdcm::DataElement & e7 = nds5.GetDataElement(mdcm::Tag(0x0008,0x0100));
+					if (!e7.IsEmpty() && !e7.IsUndefinedLength() && e7.GetByteValue())
 					{
-						const mdcm::DataElement & e7 = nds5.GetDataElement(mdcm::Tag(0x0008,0x0100));
-						if (!e7.IsEmpty() && !e7.IsUndefinedLength() && e7.GetByteValue())
+						QByteArray ba7(e7.GetByteValue()->GetPointer(), e7.GetByteValue()->GetLength());
+						const QString tmp5 =
+							(CodecUtils::toUTF8(&ba7, charset.toLatin1().constData())).trimmed();
+						if ((unit.trimmed().toUpper() != QString("NO UNITS")) &&
+							(!tmp5.isEmpty()) && (tmp5 != QString("1")))
 						{
-							QByteArray ba7(e7.GetByteValue()->GetPointer(), e7.GetByteValue()->GetLength());
-							const QString tmp5 =
-								(CodecUtils::toUTF8(&ba7, charset.toLatin1().constData())).trimmed();
-							if ((unit.trimmed().toUpper() != QString("NO UNITS")) &&
-								(!tmp5.isEmpty()) && (tmp5 != QString("1")))
-							{
-								unit += QString(" (") + tmp5 + QString(")");
-							}
+							unit += QString(" (") + tmp5 + QString(")");
 						}
 					}
 				}
@@ -1088,9 +1078,8 @@ void SRUtils::read_CODE(
 	const QString & charset,
 	QString & s)
 {
-	if (!ds.FindDataElement(mdcm::Tag(0x0040,0xa168))) return;
 	QString CodeMeaning2;
-	const mdcm::DataElement & e4  = ds.GetDataElement(mdcm::Tag(0x0040,0xa168));
+	const mdcm::DataElement & e4 = ds.GetDataElement(mdcm::Tag(0x0040,0xa168));
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sq4 = e4.GetValueAsSQ();
 	if (sq4)
 	{
@@ -1099,19 +1088,16 @@ void SRUtils::read_CODE(
 		{
 			const mdcm::Item & item4 = sq4->GetItem(i4 + 1);
 			const mdcm::DataSet & nds4 = item4.GetNestedDataSet();
-			if (nds4.FindDataElement(mdcm::Tag(0x0008,0x0104)))
+			const mdcm::DataElement & e5 = nds4.GetDataElement(mdcm::Tag(0x0008,0x0104));
+			if (!e5.IsEmpty() && !e5.IsUndefinedLength() && e5.GetByteValue())
 			{
-				const mdcm::DataElement & e5 = nds4.GetDataElement(mdcm::Tag(0x0008,0x0104));
-				if (!e5.IsEmpty() && !e5.IsUndefinedLength() && e5.GetByteValue())
+				QByteArray ba5(e5.GetByteValue()->GetPointer(), e5.GetByteValue()->GetLength());
+				QString tmp5 = CodecUtils::toUTF8(&ba5, charset.toLatin1().constData());
+				if (!CodeMeaning2.isEmpty())
 				{
-					QByteArray ba5(e5.GetByteValue()->GetPointer(), e5.GetByteValue()->GetLength());
-					QString tmp5 = CodecUtils::toUTF8(&ba5, charset.toLatin1().constData());
-					if (!CodeMeaning2.isEmpty())
-					{
-						CodeMeaning2 += QString(" ");
-					}
-					CodeMeaning2 += tmp5.trimmed();
+					CodeMeaning2 += QString(" ");
 				}
+				CodeMeaning2 += tmp5.trimmed();
 			}
 		}
 	}
@@ -1280,7 +1266,6 @@ QString SRUtils::read_sr_title2(
 	const QString & charset)
 {
 	QString s;
-	if (ds.FindDataElement(mdcm::Tag(0x0010,0x0010)))
 	{
 		const QString pn = DicomUtils::get_pn_value2(ds, mdcm::Tag(0x0010,0x0010), charset.toLatin1().constData());
 		if (!pn.isEmpty())
@@ -1319,7 +1304,6 @@ QString SRUtils::read_sr_title2(
 		const QDate qd = QDate::fromString(StudyDate.trimmed(), QString("yyyyMMdd"));
 		s += QString("<li>Study date: ") + qd.toString(QString("d MMM yyyy")) + QString("</li>");
 	}
-	if (ds.FindDataElement(mdcm::Tag(0x0008,0x0090)))
 	{
 		const QString tmp0 = DicomUtils::get_pn_value2(ds, mdcm::Tag(0x0008,0x0090), charset.toLatin1().constData());
 		if (!tmp0.isEmpty())
@@ -1345,7 +1329,6 @@ QStringList SRUtils::read_referenced(
 	const mdcm::DataSet & nds,
 	QString & s)
 {
-	if (!nds.FindDataElement(mdcm::Tag(0x0008,0x1199))) return QStringList();
 	const mdcm::DataElement & e8 = nds.GetDataElement(mdcm::Tag(0x0008,0x1199));
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sq8 = e8.GetValueAsSQ();
 	if (!sq8) return QStringList();
@@ -1399,31 +1382,25 @@ QString SRUtils::get_concept_code_meaning(
 	const QString & charset)
 {
 	QString CodeMeaning;
-	if (ds.FindDataElement(mdcm::Tag(0x0040,0xa043)))
+	const mdcm::DataElement & e4 = ds.GetDataElement(mdcm::Tag(0x0040,0xa043));
+	mdcm::SmartPointer<mdcm::SequenceOfItems> sq4 = e4.GetValueAsSQ();
+	if (sq4)
 	{
-		const mdcm::DataElement & e4 = ds.GetDataElement(mdcm::Tag(0x0040,0xa043));
-		mdcm::SmartPointer<mdcm::SequenceOfItems> sq4 = e4.GetValueAsSQ();
-		if (sq4)
+		const unsigned int nitems4 = sq4->GetNumberOfItems();
+		for (unsigned int i4 = 0; i4 < nitems4; ++i4)
 		{
-			const unsigned int nitems4 = sq4->GetNumberOfItems();
-			for (unsigned int i4 = 0; i4 < nitems4; ++i4)
+			const mdcm::Item & item4 = sq4->GetItem(i4 + 1);
+			const mdcm::DataSet & nds4 = item4.GetNestedDataSet();
+			const mdcm::DataElement & e5 = nds4.GetDataElement(mdcm::Tag(0x0008,0x0104));
+			if (!e5.IsEmpty() && !e5.IsUndefinedLength() && e5.GetByteValue())
 			{
-				const mdcm::Item & item4 = sq4->GetItem(i4 + 1);
-				const mdcm::DataSet & nds4 = item4.GetNestedDataSet();
-				if (nds4.FindDataElement(mdcm::Tag(0x0008,0x0104)))
+				QByteArray ba5(e5.GetByteValue()->GetPointer(), e5.GetByteValue()->GetLength());
+				QString tmp5 = CodecUtils::toUTF8(&ba5, charset.toLatin1().constData());
+				if (!CodeMeaning.isEmpty())
 				{
-					const mdcm::DataElement & e5 = nds4.GetDataElement(mdcm::Tag(0x0008,0x0104));
-					if (!e5.IsEmpty() && !e5.IsUndefinedLength() && e5.GetByteValue())
-					{
-						QByteArray ba5(e5.GetByteValue()->GetPointer(), e5.GetByteValue()->GetLength());
-						QString tmp5 = CodecUtils::toUTF8(&ba5, charset.toLatin1().constData());
-						if (!CodeMeaning.isEmpty())
-						{
-							CodeMeaning += QString(" ");
-						}
-						CodeMeaning += tmp5.trimmed();
-					}
+					CodeMeaning += QString(" ");
 				}
+				CodeMeaning += tmp5.trimmed();
 			}
 		}
 	}
@@ -1446,7 +1423,7 @@ QString SRUtils::read_sr_content_sq(
 {
 	QString s;
 	if (title) s += read_sr_title2(ds, charset);
-	if (ds.FindDataElement(mdcm::Tag(0x0040,0xa730)))
+	//
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(mdcm::Tag(0x0040,0xa730));
 		mdcm::SmartPointer<mdcm::SequenceOfItems> sq = e.GetValueAsSQ();
@@ -1535,7 +1512,6 @@ QString SRUtils::read_sr_content_sq(
 						identifiers +
 						QString("</a></span><br />\n");
 				}
-				if (nds.FindDataElement(mdcm::Tag(0x0040,0xa043)))
 				{
 					const QString CodeMeaning1 = get_concept_code_meaning(nds, charset);
 					if (!CodeMeaning1.isEmpty())
@@ -1543,7 +1519,6 @@ QString SRUtils::read_sr_content_sq(
 						s += QString("<span class='y9'>") + CodeMeaning1 + QString("</span><span class='t1'> </span>");
 					}
 				}
-
 
 //////////////////////////////////////////////////////////////////
 //
@@ -1734,31 +1709,28 @@ QString SRUtils::read_sr_content_sq(
 				{
 					const mdcm::Item & item = sq->GetItem(i + 1);
 					const mdcm::DataSet & nds = item.GetNestedDataSet();
-					if (nds.FindDataElement(mdcm::Tag(0x0008,0x1115)))
+					const mdcm::DataElement & e1 = nds.GetDataElement(mdcm::Tag(0x0008,0x1115));
+					mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 = e1.GetValueAsSQ();
+					if (sq1)
 					{
-						const mdcm::DataElement & e1 = nds.GetDataElement(mdcm::Tag(0x0008,0x1115));
-						mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 = e1.GetValueAsSQ();
-						if (sq1)
+						const unsigned int nitems1 = sq1->GetNumberOfItems();
+						for (unsigned int i1 = 0; i1 < nitems1; ++i1)
 						{
-							const unsigned int nitems1 = sq1->GetNumberOfItems();
-							for (unsigned int i1 = 0; i1 < nitems1; ++i1)
-							{
-								const mdcm::Item & item1 = sq1->GetItem(i1 + 1);
-								const mdcm::DataSet & nds1 = item1.GetNestedDataSet();
-								std::vector<SRGraphic> dummy;
-								read_IMAGE(
-									nds1,
-									charset,
-									path,
-									s,
-									tmpfiles,
-									srimages,
-									textBrowser,
-									dummy,
-									info,
-									wsettings,
-									pb);
-							}
+							const mdcm::Item & item1 = sq1->GetItem(i1 + 1);
+							const mdcm::DataSet & nds1 = item1.GetNestedDataSet();
+							std::vector<SRGraphic> dummy;
+							read_IMAGE(
+								nds1,
+								charset,
+								path,
+								s,
+								tmpfiles,
+								srimages,
+								textBrowser,
+								dummy,
+								info,
+								wsettings,
+								pb);
 						}
 					}
 				}

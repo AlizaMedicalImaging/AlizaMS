@@ -1288,13 +1288,9 @@ void anonymize_file__(
 	}
 	//
 	QString charset;
-	if (ds.FindDataElement(mdcm::Tag(0x0008,0x0005)))
 	{
-		const mdcm::DataElement & ce_ =
-			ds.GetDataElement(mdcm::Tag(0x0008,0x0005));
-		if (!ce_.IsEmpty() &&
-			!ce_.IsUndefinedLength() &&
-			ce_.GetByteValue())
+		const mdcm::DataElement & ce_ = ds.GetDataElement(mdcm::Tag(0x0008,0x0005));
+		if (!ce_.IsEmpty() && !ce_.IsUndefinedLength() && ce_.GetByteValue())
 		{
 			charset = QString::fromLatin1(
 				ce_.GetByteValue()->GetPointer(),

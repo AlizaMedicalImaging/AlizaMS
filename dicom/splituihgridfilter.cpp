@@ -24,8 +24,7 @@ template<typename T> bool reorganize_uih_grid(
 	const unsigned int * outdims,
 	T * output)
 {
-	const unsigned int div =
-		static_cast<unsigned int>(ceil(sqrt(static_cast<double>(outdims[2]))));
+	const unsigned int div = static_cast<unsigned int>(ceil(sqrt(static_cast<double>(outdims[2]))));
 	if (!(div > 0)) return false;
 	const size_t insize  = indims[0] * indims[1] * indims[2];
 	const size_t outsize = outdims[0] * outdims[1] * outdims[2];
@@ -35,11 +34,8 @@ template<typename T> bool reorganize_uih_grid(
 		{
 			for (unsigned int z = 0; z < outdims[2]; ++z)
 			{
-				const size_t outidx =
-					x + y * outdims[0] + z * outdims[0] * outdims[1];
-				const size_t inidx =
-					(x + (z % div) * outdims[0]) +
-					(y + (z / div) * outdims[1]) * indims[0];
+				const size_t outidx = x + y * outdims[0] + z * outdims[0] * outdims[1];
+				const size_t inidx = (x + (z % div) * outdims[0]) + (y + (z / div) * outdims[1]) * indims[0];
 				if (!(outidx < outsize && inidx < insize))
 					return false;
 				output[outidx] = input[inidx];
@@ -54,8 +50,7 @@ template<typename T> bool reorganize_uih_grid(
 namespace mdcm
 {
 
-void SplitUihGridFilter::SetImage(
-	const Image & image)
+void SplitUihGridFilter::SetImage(const Image & image)
 {
 	I = image;
 }
@@ -63,43 +58,34 @@ void SplitUihGridFilter::SetImage(
 bool SplitUihGridFilter::ComputeUihGridDimensions(
 	unsigned int * dims)
 {
-	const PrivateTag tMRNumberOfSliceInVolume(
-		0x0065, 0x50, "Image Private Header");
-	int z = 0;
+	const PrivateTag tMRNumberOfSliceInVolume(0x0065, 0x50, "Image Private Header");
+	int z{};
 	const DataSet & ds = GetFile().GetDataSet();
-	if (ds.FindDataElement(tMRNumberOfSliceInVolume))
+	std::vector<double> result;
+	bool ok = DicomUtils::priv_get_ds_values(ds, tMRNumberOfSliceInVolume, result);
+	if (ok)
 	{
-		std::vector<double> result;
-		if (DicomUtils::priv_get_ds_values(
-				ds,tMRNumberOfSliceInVolume,result))
-			z = static_cast<int>(result[0]);
-	}
-	else if (ds.FindDataElement(Tag(0x0065,0x1050)))
-	{
-		std::vector<double> result;
-		if (DicomUtils::get_ds_values(
-				ds,Tag(0x0065,0x1050),result))
-			z = static_cast<int>(result[0]);
+		z = static_cast<int>(result[0]);
 	}
 	else
 	{
-		return false;
+		result.clear();
+		ok = DicomUtils::get_ds_values(ds, Tag(0x0065,0x1050), result);
+		if (ok)
+		{
+			z = static_cast<int>(result[0]);
+		}
 	}
 	if (z < 1) return false;
-	std::vector<unsigned int> idims =
-		ImageHelper::GetDimensionsValue(GetFile());
-	const unsigned int x =
-		(idims[0] >= idims[1])
-		?
-		idims[0] / ceil(sqrt(z))
-		:
-		idims[1] / ceil(sqrt(z));
+	std::vector<unsigned int> idims = ImageHelper::GetDimensionsValue(GetFile());
+	const unsigned int x = (idims[0] >= idims[1]) ?  idims[0] / ceil(sqrt(z)) : idims[1] / ceil(sqrt(z));
 	dims[0] = x;
 	dims[1] = x;
 	dims[2] = static_cast<unsigned int>(z);
-	if (dims[0] * dims[1] * dims[2] >
-			idims[0] * idims[1] * idims[2])
+	if (dims[0] * dims[1] * dims[2] > idims[0] * idims[1] * idims[2])
+	{
 		return false;
+	}
 	return true;
 }
 
@@ -107,28 +93,22 @@ bool SplitUihGridFilter::ComputeUihGridSliceNormal(
 	double * n)
 {
 	const DataSet & ds = GetFile().GetDataSet();
-	const PrivateTag tSliceNormalVector(
-		0x0065,0x14,"Image Private Header");
-	if (ds.FindDataElement(tSliceNormalVector))
+	const PrivateTag tSliceNormalVector(0x0065,0x14,"Image Private Header");
+	std::vector<double> result;
+	if (DicomUtils::priv_get_ds_values(ds, tSliceNormalVector, result))
 	{
-		std::vector<double> result;
-		if (DicomUtils::priv_get_ds_values(
-			ds,tSliceNormalVector,result))
+		if (result.size() == 3)
 		{
-			if (result.size() == 3)
-			{
-				n[0] = result[0];
-				n[1] = result[1];
-				n[2] = result[2];
-				return true;
-			}
+			n[0] = result[0];
+			n[1] = result[1];
+			n[2] = result[2];
+			return true;
 		}
 	}
-	else if (ds.FindDataElement(Tag(0x0065,0x1014)))
+	else
 	{
-		std::vector<double> result;
-		if (DicomUtils::get_ds_values(
-				ds,Tag(0x0065,0x1014),result))
+		result.clear();
+		if (DicomUtils::get_ds_values(ds, Tag(0x0065,0x1014), result))
 		{
 			if (result.size() == 3)
 			{
@@ -146,36 +126,31 @@ bool SplitUihGridFilter::ComputeUihGridSlicePosition(
 	double * pos)
 {
 	DataSet & ds = GetFile().GetDataSet();
-	const PrivateTag tMRVFrameSequence(
-		0x0065,0x51,"Image Private Header");
+	const PrivateTag tMRVFrameSequence(0x0065,0x51,"Image Private Header");
 	SmartPointer<SequenceOfItems> sq;
-	if (ds.FindDataElement(tMRVFrameSequence))
 	{
-		const DataElement & e =
-			ds.GetDataElement(tMRVFrameSequence);
-		sq = e.GetValueAsSQ();
-		if (!(sq && sq->GetNumberOfItems()>0))
-			return false;
+		const DataElement & e = ds.GetDataElement(tMRVFrameSequence);
+		if (!e.IsEmpty())
+		{
+			sq = e.GetValueAsSQ();
+		}
+		else
+		{
+			const DataElement & e1 = ds.GetDataElement(Tag(0x0065,0x1051));
+			if (!e1.IsEmpty())
+			{
+				sq = e1.GetValueAsSQ();
+			}
+		}
 	}
-	else if (ds.FindDataElement(Tag(0x0065,0x1051)))
-	{
-		const DataElement & e =
-			ds.GetDataElement(Tag(0x0065,0x1051));
-		sq = e.GetValueAsSQ();
-		if (!(sq && sq->GetNumberOfItems()>0))
-			return false;
-	}
-	else
-	{
+	if (!(sq && sq->GetNumberOfItems() > 0))
 		return false;
-	}
 	// position of the first frame
 	const Item & item = sq->GetItem(1);
 	const DataSet & nds = item.GetNestedDataSet();
 	const Tag tImagePositionPatient(0x0020,0x0032);
 	std::vector<double> result;
-	if (DicomUtils::get_ds_values(
-			nds,tImagePositionPatient,result))
+	if (DicomUtils::get_ds_values(nds, tImagePositionPatient, result))
 	{
 		if (result.size() == 3)
 		{
@@ -269,16 +244,14 @@ bool SplitUihGridFilter::Split()
 	}
 	pixeldata.SetByteValue(outbuf.data(), static_cast<VL::Type>(outbuf.size()));
 	Image & image = GetImage();
-	const TransferSyntax &ts = image.GetTransferSyntax();
+	const TransferSyntax & ts = image.GetTransferSyntax();
 	if (ts.IsExplicit())
 	{
-		image.SetTransferSyntax(
-			TransferSyntax::ExplicitVRLittleEndian);
+		image.SetTransferSyntax(TransferSyntax::ExplicitVRLittleEndian);
 	}
 	else
 	{
-		image.SetTransferSyntax(
-			TransferSyntax::ImplicitVRLittleEndian);
+		image.SetTransferSyntax(TransferSyntax::ImplicitVRLittleEndian);
 	}
 	image.SetNumberOfDimensions(3);
 	image.SetDimension(0, dims[0]);
@@ -290,4 +263,3 @@ bool SplitUihGridFilter::Split()
 }
 
 }
-

@@ -88,26 +88,28 @@ ComputeVRImplicitLittleEndian(const DataSet & ds, const Tag & tag)
 VR
 DataSetHelper::ComputeVR(const File & file, const DataSet & ds, const Tag & t)
 {
-  if (ds.FindDataElement(t))
   {
     const DataElement & de = ds.GetDataElement(t);
-    const VR & devr = de.GetVR();
-    if (devr != VR::INVALID && devr != VR::UN)
+    if (de != DataElement(Tag(0xffff, 0xffff)))
     {
-      return devr;
-    }
+      const VR & devr = de.GetVR();
+      if (devr != VR::INVALID && devr != VR::UN)
+      {
+        return devr;
+      }
 #if 1
-    // CP-246
-    if (devr == VR::UN && de.IsUndefinedLength())
-    {
-      return VR::SQ;
-    }
+      // CP-246
+      if (devr == VR::UN && de.IsUndefinedLength())
+      {
+        return VR::SQ;
+      }
 #endif
+    }
   }
   const Global & g = GlobalInstance;
   const Dicts &  dicts = g.GetDicts();
   std::string    strowner;
-  const char *   owner = nullptr;
+  const char *   owner{};
   if (t.IsPrivate() && !t.IsPrivateCreator())
   {
     strowner = ds.GetPrivateCreator(t);
@@ -135,20 +137,25 @@ DataSetHelper::ComputeVR(const File & file, const DataSet & ds, const Tag & t)
       // 0028,3002, so we cannot look up element in current dataset, but have to get the root dataset
       // to loop up.
       //
-      // MM: mdcmDataExtra/mdcmSampleData/ImagesPapyrus/TestImages/wristb.pap
+      // MM: gdcmDataExtra/gdcmSampleData/ImagesPapyrus/TestImages/wristb.pap
       // It's the contrary: root dataset does not have a Pixel Representation, but each SQ does.
       //
-      if (ds.FindDataElement(pixelrep))
+      const DataElement & de1 = ds.GetDataElement(pixelrep);
+      if (de1 != DataElement(Tag(0xffff, 0xffff)))
       {
-        at.SetFromDataElement(ds.GetDataElement(pixelrep));
-      }
-      else if (rootds.FindDataElement(pixelrep))
-      {
-        at.SetFromDataElement(rootds.GetDataElement(pixelrep));
+        at.SetFromDataElement(de1);
       }
       else
       {
-        mdcmWarningMacro("Unhandled");
+        const DataElement & de2 = rootds.GetDataElement(pixelrep);
+        if (de2 != DataElement(Tag(0xffff, 0xffff)))
+        {
+          at.SetFromDataElement(de2);
+        }
+        else
+        {
+          mdcmWarningMacro("Unhandled");
+        }
       }
       if (at.GetValue() == 1)
       {
@@ -179,26 +186,31 @@ DataSetHelper::ComputeVR(const File & file, const DataSet & ds, const Tag & t)
     int v = -1;
     if (waveformdata == t || waveformpaddingvalue == t)
     {
+#if 0 // TODO
       Tag waveformbitsallocated(0x5400, 0x1004);
       assert(ds.FindDataElement(waveformbitsallocated));
       Attribute<0x5400, 0x1004> at;
       at.SetFromDataElement(ds.GetDataElement(waveformbitsallocated));
       v = at.GetValue();
+#endif
     }
     else
     {
-      if (!ds.FindDataElement(bitsallocated))
+      const DataElement & bitsallocated_de = ds.GetDataElement(bitsallocated);
+      if (bitsallocated_de.IsEmpty())
         return VR::UN;
+#if 0 // TODO
       Attribute<0x0028, 0x0100> at;
-      at.SetFromDataElement(ds.GetDataElement(bitsallocated));
+      at.SetFromDataElement(bitsallocated_de);
+#endif
     }
     (void)v;
     if (pixeldata == t || t.IsGroupXX(overlaydata))
     {
       vr = VR::OW;
-      if (ds.FindDataElement(t))
+      const DataElement & de = ds.GetDataElement(t);
+      if (de != DataElement(0xffff, 0xffff))
       {
-        const DataElement &               de = ds.GetDataElement(t);
         const mdcm::SequenceOfFragments * sqf = de.GetSequenceOfFragments();
         if (sqf)
           vr = VR::OB;

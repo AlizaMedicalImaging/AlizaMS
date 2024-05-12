@@ -43,10 +43,6 @@
 #include "mdcmVM.h"
 #include <cmath>
 
-// To support bad Extended IODs, unfortunately many
-// SC and other images in the wild.
-#define MDCM_ALWAYS_ALLOW_IPPIOP
-
 namespace mdcm
 {
 
@@ -69,26 +65,26 @@ SetNDigits(double x, int n)
 static bool
 GetOriginValueFromSequence(const DataSet & ds, const Tag & tfgs, std::vector<double> & ori)
 {
-  if (!ds.FindDataElement(tfgs))
+  const DataElement & ds1 = ds.GetDataElement(tfgs);
+  if (ds1.IsEmpty())
     return false;
-  SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
+  SmartPointer<SequenceOfItems> sqi = ds1.GetValueAsSQ();
   if (!(sqi && sqi->GetNumberOfItems() > 0))
     return false;
   const Item &    item = sqi->GetItem(1);
   const DataSet & subds = item.GetNestedDataSet();
   // Plane position Sequence
-  const Tag tpms(0x0020, 0x9113);
-  if (!subds.FindDataElement(tpms))
+  const DataElement & de2 = subds.GetDataElement(Tag(0x0020, 0x9113));
+  if (de2.IsEmpty())
     return false;
-  SmartPointer<SequenceOfItems> sqi2 = subds.GetDataElement(tpms).GetValueAsSQ();
+  SmartPointer<SequenceOfItems> sqi2 = de2.GetValueAsSQ();
   if (sqi2 && !sqi2->IsEmpty())
   {
-    const Item &    item2 = sqi2->GetItem(1);
-    const DataSet & subds2 = item2.GetNestedDataSet();
-    const Tag       tps(0x0020, 0x0032);
-    if (!subds2.FindDataElement(tps))
+    const Item &        item2 = sqi2->GetItem(1);
+    const DataSet &     subds2 = item2.GetNestedDataSet();
+    const DataElement & de = subds2.GetDataElement(Tag(0x0020, 0x0032));
+    if (de.IsEmpty())
       return false;
-    const DataElement &       de = subds2.GetDataElement(tps);
     Attribute<0x0020, 0x0032> at;
     at.SetFromDataElement(de);
     ori.push_back(at.GetValue(0));
@@ -102,26 +98,26 @@ GetOriginValueFromSequence(const DataSet & ds, const Tag & tfgs, std::vector<dou
 static bool
 GetDirectionCosinesValueFromSequence(const DataSet & ds, const Tag & tfgs, std::vector<double> & dircos)
 {
-  if (!ds.FindDataElement(tfgs))
+  const DataElement & de1 = ds.GetDataElement(tfgs);
+  if (de1.IsEmpty())
     return false;
-  SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
+  SmartPointer<SequenceOfItems> sqi = de1.GetValueAsSQ();
   if (!(sqi && sqi->GetNumberOfItems() > 0))
     return false;
   const Item &    item = sqi->GetItem(1);
   const DataSet & subds = item.GetNestedDataSet();
   // Plane position Sequence
-  const Tag tpms(0x0020, 0x9116);
-  if (!subds.FindDataElement(tpms))
+  const DataElement & de2 = subds.GetDataElement(Tag(0x0020, 0x9116));
+  if (de2.IsEmpty())
     return false;
-  SmartPointer<SequenceOfItems> sqi2 = subds.GetDataElement(tpms).GetValueAsSQ();
+  SmartPointer<SequenceOfItems> sqi2 = de2.GetValueAsSQ();
   if (!(sqi2 && sqi2->GetNumberOfItems() > 0))
     return false;
-  const Item &    item2 = sqi2->GetItem(1);
-  const DataSet & subds2 = item2.GetNestedDataSet();
-  const Tag       tps(0x0020, 0x0037);
-  if (!subds2.FindDataElement(tps))
+  const Item &        item2 = sqi2->GetItem(1);
+  const DataSet &     subds2 = item2.GetNestedDataSet();
+  const DataElement & de = subds2.GetDataElement(Tag(0x0020, 0x0037));
+  if (de.IsEmpty())
     return false;
-  const DataElement &       de = subds2.GetDataElement(tps);
   Attribute<0x0020, 0x0037> at;
   at.SetFromDataElement(de);
   dircos.push_back(at.GetValue(0));
@@ -136,35 +132,34 @@ GetDirectionCosinesValueFromSequence(const DataSet & ds, const Tag & tfgs, std::
 static bool
 GetInterceptSlopeValueFromSequence(const DataSet & ds, const Tag & tfgs, std::vector<double> & intslope)
 {
-  if (!ds.FindDataElement(tfgs))
+  const DataElement & de1 = ds.GetDataElement(tfgs);
+  if (de1.IsEmpty())
     return false;
-  SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
+  SmartPointer<SequenceOfItems> sqi = de1.GetValueAsSQ();
   if (!(sqi && sqi->GetNumberOfItems() > 0))
     return false;
-  const Item &    item = sqi->GetItem(1);
-  const DataSet & subds = item.GetNestedDataSet();
-  const Tag       tpms(0x0028, 0x9145);
-  if (!subds.FindDataElement(tpms))
+  const Item &        item = sqi->GetItem(1);
+  const DataSet &     subds = item.GetNestedDataSet();
+  const DataElement & de2 = subds.GetDataElement(Tag(0x0028, 0x9145));
+  if (de2.IsEmpty())
     return false;
-  SmartPointer<SequenceOfItems> sqi2 = subds.GetDataElement(tpms).GetValueAsSQ();
+  SmartPointer<SequenceOfItems> sqi2 = de2.GetValueAsSQ();
   if (!(sqi2 && sqi2->GetNumberOfItems() > 0))
     return false;
   const Item &    item2 = sqi2->GetItem(1);
   const DataSet & subds2 = item2.GetNestedDataSet();
   {
-    const Tag tps(0x0028, 0x1052);
-    if (!subds2.FindDataElement(tps))
+    const DataElement & de = subds2.GetDataElement(Tag(0x0028, 0x1052));
+    if (de.IsEmpty())
       return false;
-    const DataElement &       de = subds2.GetDataElement(tps);
     Attribute<0x0028, 0x1052> at;
     at.SetFromDataElement(de);
     intslope.push_back(at.GetValue());
   }
   {
-    const Tag tps(0x0028, 0x1053);
-    if (!subds2.FindDataElement(tps))
+    const DataElement & de = subds2.GetDataElement(Tag(0x0028, 0x1053));
+    if (de.IsEmpty())
       return false;
-    const DataElement &       de = subds2.GetDataElement(tps);
     Attribute<0x0028, 0x1053> at;
     at.SetFromDataElement(de);
     intslope.push_back(at.GetValue());
@@ -200,10 +195,10 @@ ComputeZSpacingFromIPP(const DataSet & ds, double & zspacing)
       cosines[5] = 0;
     }
   }
-  const Tag tfgs(0x5200, 0x9230);
-  if (!ds.FindDataElement(tfgs))
+  const DataElement & de1 = ds.GetDataElement(Tag(0x5200, 0x9230));
+  if (de1.IsEmpty())
     return false;
-  SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
+  SmartPointer<SequenceOfItems> sqi = de1.GetValueAsSQ();
   if (!(sqi && sqi->GetNumberOfItems() > 0))
     return false;
   double           normal[3];
@@ -218,10 +213,10 @@ ComputeZSpacingFromIPP(const DataSet & ds, double & zspacing)
   {
     const Item &    item = sqi->GetItem(i0);
     const DataSet & subds = item.GetNestedDataSet();
-    const Tag       tpms(0x0020, 0x9113);
-    if (!subds.FindDataElement(tpms))
+    const DataElement & de2 = subds.GetDataElement(Tag(0x0020, 0x9113));
+    if (de2.IsEmpty())
       return false;
-    SmartPointer<SequenceOfItems> sqi2 = subds.GetDataElement(tpms).GetValueAsSQ();
+    SmartPointer<SequenceOfItems> sqi2 = de2.GetValueAsSQ();
     if (!(sqi2 && sqi2->GetNumberOfItems() > 0))
       return false;
     const Item &    item2 = sqi2->GetItem(1);
@@ -230,10 +225,9 @@ ComputeZSpacingFromIPP(const DataSet & ds, double & zspacing)
     {
       assert(dircos_subds2 == cosines);
     }
-    const Tag tps(0x0020, 0x0032);
-    if (!subds2.FindDataElement(tps))
+    const DataElement & de = subds2.GetDataElement(Tag(0x0020, 0x0032));
+    if (de.IsEmpty())
       return false;
-    const DataElement &       de = subds2.GetDataElement(tps);
     Attribute<0x0020, 0x0032> ipp;
     ipp.SetFromDataElement(de);
     double dist = 0;
@@ -285,25 +279,25 @@ ComputeZSpacingFromIPP(const DataSet & ds, double & zspacing)
 static bool
 GetSpacingValueFromSequence(const DataSet & ds, const Tag & tfgs, std::vector<double> & sp)
 {
-  if (!ds.FindDataElement(tfgs))
+  const DataElement & de1 = ds.GetDataElement(tfgs);
+  if (de1.IsEmpty())
     return false;
-  SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
+  SmartPointer<SequenceOfItems> sqi = de1.GetValueAsSQ();
   if (!(sqi && sqi->GetNumberOfItems() > 0))
     return false;
-  const Item &    item = sqi->GetItem(1);
-  const DataSet & subds = item.GetNestedDataSet();
-  const Tag       tpms(0x0028, 0x9110);
-  if (!subds.FindDataElement(tpms))
+  const Item &        item = sqi->GetItem(1);
+  const DataSet &     subds = item.GetNestedDataSet();
+  const DataElement & de2 = subds.GetDataElement(Tag(0x0028, 0x9110));
+  if (de2.IsEmpty())
     return false;
-  SmartPointer<SequenceOfItems> sqi2 = subds.GetDataElement(tpms).GetValueAsSQ();
+  SmartPointer<SequenceOfItems> sqi2 = de2.GetValueAsSQ();
   if (!(sqi2 && sqi2->GetNumberOfItems() > 0))
     return false;
-  const Item &    item2 = sqi2->GetItem(1);
-  const DataSet & subds2 = item2.GetNestedDataSet();
-  const Tag       tps(0x0028, 0x0030);
-  if (!subds2.FindDataElement(tps))
+  const Item &        item2 = sqi2->GetItem(1);
+  const DataSet &     subds2 = item2.GetNestedDataSet();
+  const DataElement & de = subds2.GetDataElement(Tag(0x0028, 0x0030));
+  if (de.IsEmpty())
     return false;
-  const DataElement &       de = subds2.GetDataElement(tps);
   Attribute<0x0028, 0x0030> at;
   at.SetFromDataElement(de);
   sp.push_back(at.GetValue(1));
@@ -342,9 +336,8 @@ ImageHelper::GetOriginValue(const File & f)
       ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage ||
       ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
   {
-    const Tag t1(0x5200, 0x9229);
-    const Tag t2(0x5200, 0x9230);
-    if (GetOriginValueFromSequence(ds, t1, ori) || GetOriginValueFromSequence(ds, t2, ori))
+    if (GetOriginValueFromSequence(ds, Tag(0x5200, 0x9229), ori) ||
+        GetOriginValueFromSequence(ds, Tag(0x5200, 0x9230), ori))
     {
       assert(ori.size() == 3);
       return ori;
@@ -355,16 +348,15 @@ ImageHelper::GetOriginValue(const File & f)
   }
   if (ms == MediaStorage::NuclearMedicineImageStorage)
   {
-    const Tag t1(0x0054, 0x0022);
-    if (ds.FindDataElement(t1))
+    const DataElement & de = ds.GetDataElement(Tag(0x0054, 0x0022));
+    if (!de.IsEmpty())
     {
-      SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(t1).GetValueAsSQ();
+      SmartPointer<SequenceOfItems> sqi = de.GetValueAsSQ();
       if (sqi && sqi->GetNumberOfItems() > 0)
       {
         const Item &    item = sqi->GetItem(1);
         const DataSet & subds = item.GetNestedDataSet();
         const Tag       timagepositionpatient(0x0020, 0x0032);
-        assert(subds.FindDataElement(timagepositionpatient));
         Attribute<0x0020, 0x0032> at = { { 0, 0, 0 } };
         at.SetFromDataSet(subds);
         ori.resize(at.GetNumberOfValues());
@@ -380,26 +372,23 @@ ImageHelper::GetOriginValue(const File & f)
     return ori;
   }
   ori.resize(3);
-  const Tag timagepositionpatient(0x0020, 0x0032);
-  if (
-#ifndef MDCM_ALWAYS_ALLOW_IPPIOP
-      ms != MediaStorage::SecondaryCaptureImageStorage &&
-#endif
-      ds.FindDataElement(timagepositionpatient))
   {
-    const DataElement &       de = ds.GetDataElement(timagepositionpatient);
-    Attribute<0x0020, 0x0032> at = { { 0, 0, 0 } }; // default value if empty
-    at.SetFromDataElement(de);
-    for (unsigned int i = 0; i < at.GetNumberOfValues(); ++i)
+    const DataElement & imagepositionpatient_de = ds.GetDataElement(Tag(0x0020, 0x0032));
+    if (!imagepositionpatient_de.IsEmpty())
     {
-      ori[i] = at.GetValue(i);
+      Attribute<0x0020, 0x0032> at = { { 0, 0, 0 } };
+      at.SetFromDataElement(imagepositionpatient_de);
+      for (unsigned int i = 0; i < at.GetNumberOfValues(); ++i)
+      {
+        ori[i] = at.GetValue(i);
+      }
     }
-  }
-  else
-  {
-    ori[0] = 0;
-    ori[1] = 0;
-    ori[2] = 0;
+    else
+    {
+      ori[0] = 0;
+      ori[1] = 0;
+      ori[2] = 0;
+    }
   }
   return ori;
 }
@@ -407,11 +396,9 @@ ImageHelper::GetOriginValue(const File & f)
 bool
 ImageHelper::GetDirectionCosinesFromDataSet(const DataSet & ds, std::vector<double> & dircos)
 {
-  // precondition: this dataset is not a secondary capture
-  const Tag timageorientationpatient(0x0020, 0x0037);
-  if (ds.FindDataElement(timageorientationpatient))
+  const DataElement & de = ds.GetDataElement(Tag(0x0020, 0x0037));
+  if (!de.IsEmpty())
   {
-    const DataElement &       de = ds.GetDataElement(timageorientationpatient);
     Attribute<0x0020, 0x0037> at = { { 1, 0, 0, 0, 1, 0 } };
     at.SetFromDataElement(de);
     for (unsigned int i = 0; i < at.GetNumberOfValues(); ++i)
@@ -424,14 +411,14 @@ ImageHelper::GetDirectionCosinesFromDataSet(const DataSet & ds, std::vector<doub
       dc.Normalize();
       if (dc.IsValid())
       {
-        mdcmWarningMacro("DirectionCosines was not normalized. Fixed");
+        mdcmWarningMacro("DirectionCosines were not normalized, fixed");
         const double * p = dc;
         dircos = std::vector<double>(p, p + 6);
       }
       else
       {
         // PAPYRUS_CR_InvalidIOP.dcm
-        mdcmWarningMacro("Could not get DirectionCosines. Will be set to unit vector.");
+        mdcmWarningMacro("Could not get DirectionCosines");
         return false;
       }
     }
@@ -461,9 +448,8 @@ ImageHelper::GetDirectionCosinesValue(const File & f)
       ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage ||
       ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
   {
-    const Tag t1(0x5200, 0x9229);
-    const Tag t2(0x5200, 0x9230);
-    if (GetDirectionCosinesValueFromSequence(ds, t1, dircos) || GetDirectionCosinesValueFromSequence(ds, t2, dircos))
+    if (GetDirectionCosinesValueFromSequence(ds, Tag(0x5200, 0x9229), dircos) ||
+        GetDirectionCosinesValueFromSequence(ds, Tag(0x5200, 0x9230), dircos))
     {
       assert(dircos.size() == 6);
       return dircos;
@@ -471,7 +457,7 @@ ImageHelper::GetDirectionCosinesValue(const File & f)
     else
     {
       dircos.resize(6);
-      bool b2 = ImageHelper::GetDirectionCosinesFromDataSet(ds, dircos);
+      const bool b2 = ImageHelper::GetDirectionCosinesFromDataSet(ds, dircos);
       if (b2)
       {
         mdcmWarningMacro("Image Orientation (Patient) cannot be stored here!. Continuing");
@@ -491,10 +477,10 @@ ImageHelper::GetDirectionCosinesValue(const File & f)
   }
   if (ms == MediaStorage::NuclearMedicineImageStorage)
   {
-    const Tag t1(0x0054, 0x0022);
-    if (ds.FindDataElement(t1))
+    const DataElement & de = ds.GetDataElement(Tag(0x0054, 0x0022));
+    if (!de.IsEmpty())
     {
-      SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(t1).GetValueAsSQ();
+      SmartPointer<SequenceOfItems> sqi = de.GetValueAsSQ();
       if (sqi && sqi->GetNumberOfItems() > 0)
       {
         const Item &    item = sqi->GetItem(1);
@@ -516,11 +502,7 @@ ImageHelper::GetDirectionCosinesValue(const File & f)
     }
   }
   dircos.resize(6);
-  if (
-#ifndef MDCM_ALWAYS_ALLOW_IPPIOP
-      ms == MediaStorage::SecondaryCaptureImageStorage ||
-#endif
-      !GetDirectionCosinesFromDataSet(ds, dircos))
+  if (!GetDirectionCosinesFromDataSet(ds, dircos))
   {
     dircos[0] = 1;
     dircos[1] = 0;
@@ -631,29 +613,25 @@ ImageHelper::GetFixJpegBits()
 bool
 GetRescaleInterceptSlopeValueFromDataSet(const DataSet & ds, std::vector<double> & interceptslope)
 {
-  Attribute<0x0028, 0x1052> at1;
-  bool                      intercept = ds.FindDataElement(at1.GetTag());
+  const DataElement & intercept_de = ds.GetDataElement(Tag(0x0028, 0x1052));
+  const bool          intercept = !intercept_de.IsEmpty();
   if (intercept)
   {
-    if (!ds.GetDataElement(at1.GetTag()).IsEmpty())
-    {
-      at1.SetFromDataElement(ds.GetDataElement(at1.GetTag()));
-      interceptslope[0] = at1.GetValue();
-    }
+    Attribute<0x0028, 0x1052> at1;
+    at1.SetFromDataElement(intercept_de);
+    interceptslope[0] = at1.GetValue();
   }
-  Attribute<0x0028, 0x1053> at2;
-  bool                      slope = ds.FindDataElement(at2.GetTag());
+  const DataElement & slope_de = ds.GetDataElement(Tag(0x0028, 0x1053));
+  const bool          slope = !slope_de.IsEmpty();
   if (slope)
   {
-    if (!ds.GetDataElement(at2.GetTag()).IsEmpty())
+    Attribute<0x0028, 0x1053> at2;
+    at2.SetFromDataElement(slope_de);
+    interceptslope[1] = at2.GetValue();
+    if (interceptslope[1] == 0)
     {
-      at2.SetFromDataElement(ds.GetDataElement(at2.GetTag()));
-      interceptslope[1] = at2.GetValue();
-      if (interceptslope[1] == 0)
-      {
-        mdcmDebugMacro("Cannot have slope == 0. Defaulting to 1.0 instead");
-        interceptslope[1] = 1;
-      }
+      mdcmDebugMacro("Cannot have slope == 0, defaulting to 1.0");
+      interceptslope[1] = 1.0;
     }
   }
   return (intercept || slope);
@@ -726,14 +704,14 @@ ImageHelper::GetDimensionsValue(const File & f)
   // ACR-NEMA legacy
   {
     Attribute<0x0028, 0x0005> at = { 0 };
-    if (ds.FindDataElement(at.GetTag()))
+    const DataElement & de = ds.GetDataElement(Tag(0x0028, 0x0005));
+    if (!de.IsEmpty())
     {
-      const DataElement & de = ds.GetDataElement(at.GetTag());
       // SIEMENS_MAGNETOM-12-MONO2-Uncompressed.dcm picks VR::SS instead
       if (at.GetVR().Compatible(de.GetVR()))
       {
         at.SetFromDataSet(ds);
-        int imagedimensions = at.GetValue();
+        const int imagedimensions = at.GetValue();
         if (imagedimensions == 3)
         {
           Attribute<0x0028, 0x0012> at2 = { 0 };
@@ -743,7 +721,7 @@ ImageHelper::GetDimensionsValue(const File & f)
       }
       else
       {
-        mdcmWarningMacro("Sorry cant read attribute (wrong VR): " << at.GetTag());
+        mdcmWarningMacro("Cannot read attribute, wrong VR: " << at.GetTag());
       }
     }
   }
@@ -810,10 +788,9 @@ ImageHelper::SetDimensionsValue(File & f, const Pixmap & img)
       ms == MediaStorage::LegacyConvertedEnhancedCTImageStorage ||
       ms == MediaStorage::LegacyConvertedEnhancedPETImageStorage)
   {
-    const Tag t(0x5200, 0x9230);
-    if (ds.FindDataElement(t))
+    const DataElement & de = ds.GetDataElement(Tag(0x5200, 0x9230));
+    if (!de.IsEmpty())
     {
-      const DataElement & de = ds.GetDataElement(t);
       SmartPointer<SequenceOfItems> sqi = de.GetValueAsSQ();
       if (sqi)
       {
@@ -822,7 +799,7 @@ ImageHelper::SetDimensionsValue(File & f, const Pixmap & img)
           sqi->SetNumberOfItems(dims[2]);
         }
         // undefined length to avoid recomputation
-        DataElement dup(de.GetTag());
+        DataElement dup(Tag(0x5200, 0x9230));
         dup.SetVR(VR::SQ);
         dup.SetValue(*sqi);
         dup.SetVLToUndefined();
@@ -880,17 +857,17 @@ ImageHelper::GetRescaleInterceptSlopeValue(const File & f)
     // in particular this paper:
     // Errors in Quantitative Image Analysis due to Platform-Dependent Image Scaling
     // http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3998685/
-    const PrivateTag tpriv_rescaleintercept(0x2005, 0x09, "Philips MR Imaging DD 005");
-    const PrivateTag tpriv_rescaleslope(0x2005, 0x0a, "Philips MR Imaging DD 005");
-    if (ds.FindDataElement(tpriv_rescaleintercept) && ds.FindDataElement(tpriv_rescaleslope))
+    const PrivateTag    tpriv_rescaleintercept(0x2005, 0x09, "Philips MR Imaging DD 005");
+    const PrivateTag    tpriv_rescaleslope(0x2005, 0x0a, "Philips MR Imaging DD 005");
+    const DataElement & priv_rescaleintercept = ds.GetDataElement(tpriv_rescaleintercept);
+    const DataElement & priv_rescaleslope = ds.GetDataElement(tpriv_rescaleslope);
+    if (!priv_rescaleintercept.IsEmpty() && !priv_rescaleslope.IsEmpty())
     {
       // The following will work out of the box for Philips whether or not
       // "Combine MR Rescaling" was set:
       // PMS DICOM CS states that Modality LUT for MR Image Storage is to be
       // used for image processing. VOI LUT are always recomputed, so output
       // may not look right for display.
-      const DataElement &      priv_rescaleintercept = ds.GetDataElement(tpriv_rescaleintercept);
-      const DataElement &      priv_rescaleslope = ds.GetDataElement(tpriv_rescaleslope);
       Element<VR::DS, VM::VM1> el_ri = { { 0 } };
       el_ri.SetFromDataElement(priv_rescaleintercept);
       Element<VR::DS, VM::VM1> el_rs = { { 1 } };
@@ -901,7 +878,7 @@ ImageHelper::GetRescaleInterceptSlopeValue(const File & f)
         interceptslope[1] = el_rs.GetValue();
         if (interceptslope[1] == 0)
         {
-          interceptslope[1] = 1;
+          interceptslope[1] = 1.0;
           mdcmWarningMacro("Can not use slope 0, set to 1");
         }
         mdcmAlwaysWarnMacro("Philips private Modality LUT, intercept " 
@@ -1084,188 +1061,199 @@ ImageHelper::GetSpacingValue(const File & f)
     return sp;
   }
   Tag spacingtag = GetSpacingTagFromMediaStorage(ms);
-  if (ForcePixelSpacing && ds.FindDataElement(Tag(0x0028, 0x0030)) && !ds.GetDataElement(Tag(0x0028, 0x0030)).IsEmpty())
+  const DataElement & de_28_30 = ds.GetDataElement(Tag(0x0028, 0x0030));
+  if (ForcePixelSpacing && !de_28_30.IsEmpty())
   {
     spacingtag = Tag(0x0028, 0x0030);
   }
   mdcmDebugMacro("spacingtag " << spacingtag);
   //
   {
-    if (spacingtag != Tag(0xffff, 0xffff) && ds.FindDataElement(spacingtag) && !ds.GetDataElement(spacingtag).IsEmpty())
+    if (spacingtag != Tag(0xffff, 0xffff))
     {
-      const DataElement & de = ds.GetDataElement(spacingtag);
-      const Global &      g = GlobalInstance;
-      const Dicts &       dicts = g.GetDicts();
-      const DictEntry &   entry = dicts.GetDictEntry(de.GetTag());
-      const VR &          vr = entry.GetVR();
-      assert(vr.Compatible(de.GetVR()));
-      switch (vr)
+      const DataElement & spacing_de = ds.GetDataElement(spacingtag);
+      if (!spacing_de.IsEmpty())
       {
-        case VR::DS:
+        const Global &     g = GlobalInstance;
+        const Dicts &      dicts = g.GetDicts();
+        const DictEntry &  entry = dicts.GetDictEntry(spacing_de.GetTag());
+        const VR &         vr = entry.GetVR();
+        assert(vr.Compatible(spacing_de.GetVR()));
+        switch (vr)
         {
-          Element<VR::DS, VM::VM1_n> el;
-          std::stringstream          ss;
-          const ByteValue *          bv = de.GetByteValue();
-          assert(bv);
-          std::string s = std::string(bv->GetPointer(), bv->GetLength());
-          ss.str(s);
-          const size_t found = count_backslashes(s);
-          if (found == 1)
+          case VR::DS:
           {
-            el.SetLength(entry.GetVR().GetSizeof() * 2);
-            el.Read(ss);
-            mdcmDebugMacro("DS el.GetLength() " << el.GetLength());
-            assert(el.GetLength() == 2);
-            for (unsigned int i = 0; i < 2; ++i)
+            Element<VR::DS, VM::VM1_n> el;
+            std::stringstream          ss;
+            const ByteValue *          bv = spacing_de.GetByteValue();
+            assert(bv);
+            std::string s = std::string(bv->GetPointer(), bv->GetLength());
+            ss.str(s);
+            const size_t found = count_backslashes(s);
+            if (found == 1)
             {
-              if (el.GetValue(i))
+              el.SetLength(entry.GetVR().GetSizeof() * 2);
+              el.Read(ss);
+              mdcmDebugMacro("DS el.GetLength() " << el.GetLength());
+              assert(el.GetLength() == 2);
+              for (unsigned int i = 0; i < 2; ++i)
               {
-                sp.push_back(el.GetValue(i));
-              }
-              else
-              {
-                mdcmAlwaysWarnMacro("Spacing is broken, value is 0, forced to 1/1");
-                sp.clear();
-                sp.push_back(1.0);
-                sp.push_back(1.0);
-                break;
-              }
-            }
-            std::swap(sp[0], sp[1]);
-          }
-          else if (found == 0)
-          {
-            el.SetLength(entry.GetVR().GetSizeof());
-            el.Read(ss);
-            mdcmDebugMacro("DS el.GetLength() " << el.GetLength());
-            mdcmAlwaysWarnMacro("Spacing is broken, single value, set two");
-            double singleval;
-            ss >> singleval;
-            if (singleval == 0.0)
-              singleval = 1.0;
-            sp.push_back(singleval);
-            sp.push_back(singleval);
-          }
-          else
-          {
-            el.SetLength(entry.GetVR().GetSizeof() * (static_cast<unsigned int>(found) + 1));
-            el.Read(ss);
-            mdcmDebugMacro("DS el.GetLength() " << el.GetLength());
-            mdcmAlwaysWarnMacro("Spacing is broken, too many values");
-            int count = 0;
-            for (unsigned int i = 0; i < el.GetLength(); ++i)
-            {
-              mdcmDebugMacro("i = " << el.GetValue(i));
-              if (el.GetValue(i) != 0)
-              {
-                sp.push_back(el.GetValue(i));
-                ++count;
-                if (count == 2)
+                if (el.GetValue(i))
                 {
+                  sp.push_back(el.GetValue(i));
+                }
+                else
+                {
+                  mdcmAlwaysWarnMacro("Spacing is broken, value is 0, forced to 1/1");
+                  sp.clear();
+                  sp.push_back(1.0);
+                  sp.push_back(1.0);
                   break;
                 }
               }
+              std::swap(sp[0], sp[1]);
             }
-            if (sp.size() != 2)
+            else if (found == 0)
             {
-              mdcmAlwaysWarnMacro("Spacing is broken, forced to 1/1");
-              sp.clear();
-              sp.push_back(1.0);
-              sp.push_back(1.0);
+              el.SetLength(entry.GetVR().GetSizeof());
+              el.Read(ss);
+              mdcmDebugMacro("DS el.GetLength() " << el.GetLength());
+              mdcmAlwaysWarnMacro("Spacing is broken, single value, set two");
+              double singleval;
+              ss >> singleval;
+              if (singleval == 0.0)
+                singleval = 1.0;
+              sp.push_back(singleval);
+              sp.push_back(singleval);
             }
             else
             {
-              std::swap(sp[0], sp[1]);
-            }
-          }
-        }
-        break;
-        case VR::IS:
-        {
-          Element<VR::IS, VM::VM1_n> el;
-          std::stringstream          ss;
-          const ByteValue *          bv = de.GetByteValue();
-          assert(bv);
-          std::string s = std::string(bv->GetPointer(), bv->GetLength());
-          ss.str(s);
-          const size_t found = count_backslashes(s);
-          if (found == 1)
-          {
-            el.SetLength(entry.GetVR().GetSizeof() * 2);
-            el.Read(ss);
-            mdcmDebugMacro("IS el.GetLength() " << el.GetLength());
-            assert(el.GetLength() == 2);
-            for (unsigned int i = 0; i < 2; ++i)
-            {
-              if (el.GetValue(i))
+              el.SetLength(entry.GetVR().GetSizeof() * (static_cast<unsigned int>(found) + 1));
+              el.Read(ss);
+              mdcmDebugMacro("DS el.GetLength() " << el.GetLength());
+              mdcmAlwaysWarnMacro("Spacing is broken, too many values");
+              int count = 0;
+              for (unsigned int i = 0; i < el.GetLength(); ++i)
               {
-                sp.push_back(el.GetValue(i));
+                mdcmDebugMacro("i = " << el.GetValue(i));
+                if (el.GetValue(i) != 0)
+                {
+                  sp.push_back(el.GetValue(i));
+                  ++count;
+                  if (count == 2)
+                  {
+                    break;
+                  }
+                }
               }
-              else
+              if (sp.size() != 2)
               {
-                mdcmAlwaysWarnMacro("Spacing is broken, value is 0, forced to 1/1");
+                mdcmAlwaysWarnMacro("Spacing is broken, forced to 1/1");
                 sp.clear();
                 sp.push_back(1.0);
                 sp.push_back(1.0);
-                break;
               }
-            }
-            std::swap(sp[0], sp[1]);
-          }
-          else if (found == 0)
-          {
-            el.SetLength(entry.GetVR().GetSizeof());
-            el.Read(ss);
-            mdcmDebugMacro("IS el.GetLength() " << el.GetLength());
-            mdcmAlwaysWarnMacro("Spacing is broken, single value, set two");
-            double singleval;
-            ss >> singleval;
-            if (singleval == 0.0)
-              singleval = 1.0;
-            sp.push_back(singleval);
-            sp.push_back(singleval);
-          }
-          else
-          {
-            el.SetLength(entry.GetVR().GetSizeof() * (static_cast<unsigned int>(found) + 1));
-            el.Read(ss);
-            mdcmDebugMacro("IS el.GetLength() " << el.GetLength());
-            mdcmAlwaysWarnMacro("Spacing is broken, too many values");
-            int count = 0;
-            for (unsigned int i = 0; i < el.GetLength(); ++i)
-            {
-              mdcmDebugMacro("i = " << el.GetValue(i));
-              if (el.GetValue(i) != 0)
+              else
               {
-                sp.push_back(el.GetValue(i));
-                ++count;
-                if (count == 2)
-                {
-                  break;
-                }
+                std::swap(sp[0], sp[1]);
               }
             }
-            if (sp.size() != 2)
-            {
-              mdcmAlwaysWarnMacro("Spacing is broken, forced to 1/1");
-              sp.clear();
-              sp.push_back(1.0);
-              sp.push_back(1.0);
-            }
-            else
-            {
-              std::swap(sp[0], sp[1]);
-            }
           }
-        }
-        break;
-        default:
-          assert(0);
           break;
+          case VR::IS:
+          {
+            Element<VR::IS, VM::VM1_n> el;
+            std::stringstream          ss;
+            const ByteValue *          bv = spacing_de.GetByteValue();
+            assert(bv);
+            std::string s = std::string(bv->GetPointer(), bv->GetLength());
+            ss.str(s);
+            const size_t found = count_backslashes(s);
+            if (found == 1)
+            {
+              el.SetLength(entry.GetVR().GetSizeof() * 2);
+              el.Read(ss);
+              mdcmDebugMacro("IS el.GetLength() " << el.GetLength());
+              assert(el.GetLength() == 2);
+              for (unsigned int i = 0; i < 2; ++i)
+              {
+                if (el.GetValue(i))
+                {
+                  sp.push_back(el.GetValue(i));
+                }
+                else
+                {
+                  mdcmAlwaysWarnMacro("Spacing is broken, value is 0, forced to 1/1");
+                  sp.clear();
+                  sp.push_back(1.0);
+                  sp.push_back(1.0);
+                  break;
+                }
+              }
+              std::swap(sp[0], sp[1]);
+            }
+            else if (found == 0)
+            {
+              el.SetLength(entry.GetVR().GetSizeof());
+              el.Read(ss);
+              mdcmDebugMacro("IS el.GetLength() " << el.GetLength());
+              mdcmAlwaysWarnMacro("Spacing is broken, single value, set two");
+              double singleval;
+              ss >> singleval;
+              if (singleval == 0.0)
+                singleval = 1.0;
+              sp.push_back(singleval);
+              sp.push_back(singleval);
+            }
+            else
+            {
+              el.SetLength(entry.GetVR().GetSizeof() * (static_cast<unsigned int>(found) + 1));
+              el.Read(ss);
+              mdcmDebugMacro("IS el.GetLength() " << el.GetLength());
+              mdcmAlwaysWarnMacro("Spacing is broken, too many values");
+              int count = 0;
+              for (unsigned int i = 0; i < el.GetLength(); ++i)
+              {
+                mdcmDebugMacro("i = " << el.GetValue(i));
+                if (el.GetValue(i) != 0)
+                {
+                  sp.push_back(el.GetValue(i));
+                  ++count;
+                  if (count == 2)
+                  {
+                    break;
+                  }
+                }
+              }
+              if (sp.size() != 2)
+              {
+                mdcmAlwaysWarnMacro("Spacing is broken, forced to 1/1");
+                sp.clear();
+                sp.push_back(1.0);
+                sp.push_back(1.0);
+              }
+              else
+              {
+                std::swap(sp[0], sp[1]);
+              }
+            }
+          }
+          break;
+          default:
+            assert(0);
+            break;
+        }
+      }
+      else
+      {
+        sp.clear();
+        sp.push_back(1.0);
+        sp.push_back(1.0);
       }
     }
     else
     {
+      sp.clear();
       sp.push_back(1.0);
       sp.push_back(1.0);
     }
@@ -1275,7 +1263,7 @@ ImageHelper::GetSpacingValue(const File & f)
   std::vector<unsigned int> dims = ImageHelper::GetDimensionsValue(f);
   // Z
   Tag zspacingtag = ImageHelper::GetZSpacingTagFromMediaStorage(ms);
-  if (zspacingtag != Tag(0xffff, 0xffff) && ds.FindDataElement(zspacingtag))
+  if (zspacingtag != Tag(0xffff, 0xffff))
   {
     const DataElement & de = ds.GetDataElement(zspacingtag);
     if (de.IsEmpty())
@@ -1336,6 +1324,7 @@ ImageHelper::GetSpacingValue(const File & f)
       }
     }
   }
+#if 0
   else if (ds.FindDataElement(Tag(0x0028, 0x0009))) // Frame Increment Pointer
   {
     const DataElement &                        de = ds.GetDataElement(Tag(0x0028, 0x0009));
@@ -1355,9 +1344,9 @@ ImageHelper::GetSpacingValue(const File & f)
         }
         else
         {
-          if (at2.GetValue() != 0.)
+          if (at2.GetValue() != 0.0)
           {
-            mdcmErrorMacro("Number of Frame should be equal to 0");
+            mdcmErrorMacro("Number of Frames should be equal to 0");
             sp.push_back(0.0);
           }
           else
@@ -1374,20 +1363,20 @@ ImageHelper::GetSpacingValue(const File & f)
     }
     else
     {
-      mdcmErrorMacro("Tag: " << at.GetTag()
-                             << " was found to point to missing"
-                                "Tag: "
-                             << at.GetValue() << " default to 1.0.");
+      mdcmErrorMacro("Tag " << at.GetTag()
+                            << " was found to point to the missing Tag: "
+                            << at.GetValue() << ", default to 1.0.");
       sp.push_back(1.0);
     }
   }
+#endif
   else
   {
     sp.push_back(1.0);
   }
   assert(sp.size() == 3);
-  assert(sp[0] != 0.);
-  assert(sp[1] != 0.);
+  assert(sp[0] != 0.0);
+  assert(sp[1] != 0.0);
   return sp;
 }
 
@@ -1655,10 +1644,10 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
     }
     // Cleanup per frame
     {
-      const Tag tfgs(0x5200, 0x9230);
-      if (ds.FindDataElement(tfgs))
+      const DataElement & de_5200_9230 = ds.GetDataElement(Tag(0x5200, 0x9230));
+      if (!de_5200_9230.IsEmpty())
       {
-        SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
+        SmartPointer<SequenceOfItems> sqi = de_5200_9230.GetValueAsSQ();
         if (!sqi)
           return;
         const SequenceOfItems::SizeType nitems = sqi->GetNumberOfItems();
@@ -1767,34 +1756,31 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
       }
       else if (de.GetTag() == Tag(0x3004, 0x000c))
       {
-        if (ds.FindDataElement(Tag(0x0028, 0x0008)))
+        const DataElement & de1 = ds.GetDataElement(Tag(0x0028, 0x0008));
+        if (!de1.IsEmpty() && !de1.IsUndefinedLength() && de1.GetByteValue())
         {
-          const DataElement & de1 = ds.GetDataElement(Tag(0x0028, 0x0008));
-          if (!de1.IsEmpty() && !de1.IsUndefinedLength() && de1.GetByteValue())
+          const ByteValue * tmp0 = de1.GetByteValue();
+          const std::string tmp1 = std::string(tmp0->GetPointer(), tmp0->GetLength());
+          const int         number_of_frames = std::stoi(tmp1);
+          if (number_of_frames > 0 && number_of_frames < 65536)
           {
-            const ByteValue * tmp0 = de1.GetByteValue();
-            const std::string tmp1 = std::string(tmp0->GetPointer(), tmp0->GetLength());
-            const int         number_of_frames = std::stoi(tmp1);
-            if (number_of_frames > 0 && number_of_frames < 65536)
+            Element<VR::DS, VM::VM2_n> el;
+            el.SetLength(number_of_frames * vr.GetSizeof());
+            double spacing_start = 0.0;
+            for (unsigned int i = 0; i < static_cast<unsigned int>(number_of_frames); ++i)
             {
-              Element<VR::DS, VM::VM2_n> el;
-              el.SetLength(number_of_frames * vr.GetSizeof());
-              double spacing_start = 0.0;
-              for (unsigned int i = 0; i < static_cast<unsigned int>(number_of_frames); ++i)
-              {
-                el.SetValue(spacing_start, i);
-                spacing_start += spacing[2];
-              }
-              std::stringstream os;
-              el.Write(os);
-              de.SetVR(VR::DS);
-              if (os.str().size() % 2)
-                os << " ";
-              VL::Type osStrSize = static_cast<VL::Type>(os.str().size());
-              de.SetByteValue(os.str().c_str(), osStrSize);
-              ds.Replace(de);
-              mdcmDebugMacro("(0x3004, 0x000c) = " << os.str());
+              el.SetValue(spacing_start, i);
+              spacing_start += spacing[2];
             }
+            std::stringstream os;
+            el.Write(os);
+            de.SetVR(VR::DS);
+            if (os.str().size() % 2)
+              os << " ";
+            VL::Type osStrSize = static_cast<VL::Type>(os.str().size());
+            de.SetByteValue(os.str().c_str(), osStrSize);
+            ds.Replace(de);
+            mdcmDebugMacro("(0x3004, 0x000c) = " << os.str());
           }
         }
       }
@@ -2123,10 +2109,10 @@ ImageHelper::SetOriginValue(DataSet & ds, const Image & image)
     }
     // Sleanup the sharedgroup
     {
-      const Tag tfgs0(0x5200, 0x9229);
-      if (ds.FindDataElement(tfgs0))
+      const DataElement & de_5200_9229 = ds.GetDataElement(Tag(0x5200, 0x9229));
+      if (!de_5200_9229.IsEmpty())
       {
-        SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs0).GetValueAsSQ();
+        SmartPointer<SequenceOfItems> sqi = de_5200_9229.GetValueAsSQ();
         if (!sqi)
         {
           mdcmAlwaysWarnMacro("!sqi");
@@ -2287,10 +2273,10 @@ ImageHelper::SetDirectionCosinesValue(DataSet & ds, const std::vector<double> & 
     }
     // Cleanup per-frame
     {
-      const Tag tfgs(0x5200, 0x9230);
-      if (ds.FindDataElement(tfgs))
+      const DataElement & de_5200_9230 = ds.GetDataElement(Tag(0x5200, 0x9230));
+      if (!de_5200_9230.IsEmpty())
       {
-        SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
+        SmartPointer<SequenceOfItems> sqi = de_5200_9230.GetValueAsSQ();
         if (!sqi)
         {
           mdcmAlwaysWarnMacro("!sqi2");
@@ -2301,15 +2287,13 @@ ImageHelper::SetDirectionCosinesValue(DataSet & ds, const std::vector<double> & 
         {
           Item &    item = sqi->GetItem(i0);
           DataSet & subds = item.GetNestedDataSet();
-          const Tag tpms(0x0020, 0x9116);
-          subds.Remove(tpms);
+          subds.Remove(Tag(0x0020, 0x9116));
         }
       }
     }
     // Cleanup root level
     {
-      const Tag tiop(0x0020, 0x0037);
-      ds.Remove(tiop);
+      ds.Remove(Tag(0x0020, 0x0037));
     }
     return;
   }
@@ -2420,10 +2404,10 @@ ImageHelper::SetRescaleInterceptSlopeValue(File & f, const Image & img)
     }
     // cleanup per-frame
     {
-      const Tag tfgs(0x5200, 0x9230);
-      if (ds.FindDataElement(tfgs))
+      const DataElement & de_5200_9230 = ds.GetDataElement(Tag(0x5200, 0x9230));
+      if (!de_5200_9230.IsEmpty())
       {
-        SmartPointer<SequenceOfItems> sqi = ds.GetDataElement(tfgs).GetValueAsSQ();
+        SmartPointer<SequenceOfItems> sqi = de_5200_9230.GetValueAsSQ();
         if (!sqi)
         {
           mdcmAlwaysWarnMacro("!sqi");
@@ -2440,12 +2424,9 @@ ImageHelper::SetRescaleInterceptSlopeValue(File & f, const Image & img)
     }
     // Cleanup root (famous MR -> EMR case)
     {
-      const Tag t1(0x0028, 0x1052);
-      ds.Remove(t1);
-      const Tag t2(0x0028, 0x1053);
-      ds.Remove(t2);
-      const Tag t3(0x0028, 0x1053);
-      ds.Remove(t3);
+      ds.Remove(Tag(0x0028, 0x1052));
+      ds.Remove(Tag(0x0028, 0x1053));
+      ds.Remove(Tag(0x0028, 0x1053));
     }
     return;
   }
@@ -2645,14 +2626,15 @@ ImageHelper::GetRealWorldValueMappingContent(const File & f, RealWorldValueMappi
   MediaStorage ms;
   ms.SetFromFile(f);
   const DataSet & ds = f.GetDataSet();
-  const Tag trwvms(0x0040, 0x9096); // Real World Value Mapping Sequence
-  if (ds.FindDataElement(trwvms))
+  // Real World Value Mapping Sequence
+  const DataElement & de_40_9096 = ds.GetDataElement(Tag(0x0040, 0x9096));
+  if (!de_40_9096.IsEmpty())
   {
-    SmartPointer<SequenceOfItems> sqi0 = ds.GetDataElement(trwvms).GetValueAsSQ();
+    SmartPointer<SequenceOfItems> sqi0 = de_40_9096.GetValueAsSQ();
     if (sqi0 && sqi0->GetNumberOfItems() > 0)
     {
-      const Tag trwvlutd(0x0040, 0x9212); // Real World Value LUT Data
-      if (ds.FindDataElement(trwvlutd))
+      // Real World Value LUT Data
+      if (ds.FindDataElement(Tag(0x0040, 0x9212)))
       {
         mdcmAlwaysWarnMacro("Not supported (RWV LUT Data)");
         return false;
@@ -2664,8 +2646,8 @@ ImageHelper::GetRealWorldValueMappingContent(const File & f, RealWorldValueMappi
       }
       const Item &    item0 = sqi0->GetItem(1);
       const DataSet & subds0 = item0.GetNestedDataSet();
-      // const Tag trwvi(0x0040,0x9224); // Real World Value Intercept
-      // const Tag trwvs(0x0040,0x9225); // Real World Value Slope
+      // 0x0040,0x9224 // Real World Value Intercept
+      // 0x0040,0x9225 // Real World Value Slope
       {
         Attribute<0x0040, 0x9224> at1 = { 0 };
         at1.SetFromDataSet(subds0);
@@ -2674,10 +2656,11 @@ ImageHelper::GetRealWorldValueMappingContent(const File & f, RealWorldValueMappi
         ret.RealWorldValueIntercept = at1.GetValue();
         ret.RealWorldValueSlope = at2.GetValue();
       }
-      const Tag tmucs(0x0040, 0x08ea); // Measurement Units Code Sequence
-      if (subds0.FindDataElement(tmucs))
+      // Measurement Units Code Sequence
+      const DataElement & de_40_8ea = subds0.GetDataElement(Tag(0x0040, 0x08ea));
+      if (!de_40_8ea.IsEmpty())
       {
-        SmartPointer<SequenceOfItems> sqi = subds0.GetDataElement(tmucs).GetValueAsSQ();
+        SmartPointer<SequenceOfItems> sqi = de_40_8ea.GetValueAsSQ();
         if (sqi && sqi->GetNumberOfItems() == 1)
         {
           const Item &              item = sqi->GetItem(1);
@@ -2729,8 +2712,9 @@ ImageHelper::GetPhotometricInterpretationValue(const File & f)
   }
   bool      isacrnema = false;
   DataSet   ds = f.GetDataSet();
-  const Tag trecognitioncode(0x0008, 0x0010);
-  if (ds.FindDataElement(trecognitioncode) && !ds.GetDataElement(trecognitioncode).IsEmpty())
+  // recognition code
+  const DataElement & de_8_10 = ds.GetDataElement(Tag(0x0008, 0x0010));
+  if (!de_8_10.IsEmpty())
   {
     // PHILIPS_Gyroscan-12-MONO2-Jpeg_Lossless.dcm
     // PHILIPS_Gyroscan-12-Jpeg_Extended_Process_2_4.dcm
@@ -2766,17 +2750,14 @@ ImageHelper::GetPlanarConfigurationValue(const File & f)
 {
   // 4. Planar Configuration
   // D 0028|0006 [US] [Planar Configuration] [1]
-  const Tag    planarconfiguration = Tag(0x0028, 0x0006);
   PixelFormat  pf = GetPixelFormatValue(f);
   unsigned int pc = 0;
-  // FIXME: Whatif planaconfiguration is send in a grayscale image... it would be empty...
-  // well hopefully :(
   const DataSet & ds = f.GetDataSet();
-  if (ds.FindDataElement(planarconfiguration) && !ds.GetDataElement(planarconfiguration).IsEmpty())
+  const DataElement & de_28_6 = ds.GetDataElement(Tag(0x0028, 0x0006));
+  if (!de_28_6.IsEmpty())
   {
-    const DataElement &       de = ds.GetDataElement(planarconfiguration);
     Attribute<0x0028, 0x0006> at = { 0 };
-    at.SetFromDataElement(de);
+    at.SetFromDataElement(de_28_6);
     pc = at.GetValue();
     if (pc && pf.GetSamplesPerPixel() != 3)
     {
@@ -2795,7 +2776,7 @@ ImageHelper::GetLUT(const File & f)
   PhotometricInterpretation pi = GetPhotometricInterpretationValue(f);
   // Do the Palette Color:
   // 1. Modality LUT Sequence
-  bool modlut = ds.FindDataElement(Tag(0x0028, 0x3000));
+  const bool modlut = ds.FindDataElement(Tag(0x0028, 0x3000));
   if (modlut)
   {
     mdcmWarningMacro("Modality LUT (0028,3000) are not handled. Image will not be displayed properly");
@@ -2803,13 +2784,13 @@ ImageHelper::GetLUT(const File & f)
   // 2. LUTData (0028,3006)
   // technically I do not need to warn about LUTData since either modality lut XOR VOI LUT need to
   // be sent to require a LUT Data...
-  bool lutdata = ds.FindDataElement(Tag(0x0028, 0x3006));
+  const bool lutdata = ds.FindDataElement(Tag(0x0028, 0x3006));
   if (lutdata)
   {
     mdcmWarningMacro("LUT Data (0028,3006) are not handled. Image will not be displayed properly");
   }
   // 3. VOILUTSequence (0028,3010)
-  bool voilut = ds.FindDataElement(Tag(0x0028, 0x3010));
+  const bool voilut = ds.FindDataElement(Tag(0x0028, 0x3010));
   if (voilut)
   {
     mdcmWarningMacro("VOI LUT (0028,3010) are not handled. Image will not be displayed properly");
@@ -2854,29 +2835,23 @@ ImageHelper::GetLUT(const File & f)
     const Tag tdescriptor(0x0028, static_cast<uint16_t>(0x1101 + i));
     // const Tag tdescriptor(0x0028, 0x3002);
     Element<VR::US, VM::VM3> el_us3 = { { 0, 0, 0 } };
-    // Now pass the byte array to a DICOMizer:
-    el_us3.SetFromDataElement(ds[tdescriptor]); //.GetValue());
+    el_us3.SetFromDataElement(ds[tdescriptor]);
     lut.InitializeLUT(LookupTable::LookupTableType(i), el_us3[0], el_us3[1], el_us3[2]);
     // (0028,1201) OW
     // (0028,1202) OW
     // (0028,1203) OW
     const Tag tlut(0x0028, static_cast<uint16_t>(0x1201 + i));
-    // const Tag tlut(0x0028, 0x3006);
-    // Segmented LUT
-    // (0028,1221) OW
-    // (0028,1222) OW
-    // (0028,1223) OW
-    const Tag seglut(0x0028, static_cast<uint16_t>(0x1221 + i));
-    if (ds.FindDataElement(tlut))
+    const DataElement & lut_de = ds.GetDataElement(tlut);
+    if (!lut_de.IsEmpty())
     {
-      const ByteValue * lut_raw = ds.GetDataElement(tlut).GetByteValue();
+      const ByteValue * lut_raw = lut_de.GetByteValue();
       if (lut_raw)
       {
         // LookupTableType::RED == 0
         lut.SetLUT(
           LookupTable::LookupTableType(i),
-		  reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()),
-		  lut_raw->GetLength());
+          reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()),
+          lut_raw->GetLength());
       }
       else
       {
@@ -2888,24 +2863,33 @@ ImageHelper::GetLUT(const File & f)
       assert(!lut.Initialized() || tmp3 == lut_raw->GetLength());
       (void)tmp3;
     }
-    else if (ds.FindDataElement(seglut))
+    else
     {
-      const ByteValue * lut_raw = ds.GetDataElement(seglut).GetByteValue();
-      if (lut_raw)
+      // Segmented LUT
+      // (0028,1221) OW
+      // (0028,1222) OW
+      // (0028,1223) OW
+      const Tag seglut(0x0028, static_cast<uint16_t>(0x1221 + i));
+      const DataElement & seglut_de = ds.GetDataElement(seglut);
+      if (!seglut_de.IsEmpty())
       {
-        lut.SetSegmentedLUT(
-          LookupTable::LookupTableType(i),
-		  reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()),
-		  lut_raw->GetLength());
+        const ByteValue * lut_raw = seglut_de.GetByteValue();
+        if (lut_raw)
+        {
+          lut.SetSegmentedLUT(
+            LookupTable::LookupTableType(i),
+            reinterpret_cast<const unsigned char *>(lut_raw->GetPointer()),
+            lut_raw->GetLength());
+        }
+        else
+        {
+          lut.Clear();
+        }
       }
       else
       {
         lut.Clear();
       }
-    }
-    else
-    {
-      assert(0);
     }
   }
   if (!lut.Initialized())
@@ -2919,9 +2903,9 @@ const ByteValue *
 ImageHelper::GetPointerFromElement(const Tag & tag, const File & inF)
 {
   const DataSet & ds = inF.GetDataSet();
-  if (ds.FindDataElement(tag))
+  const DataElement & de = ds.GetDataElement(tag);
+  if (de != DataElement(Tag(0xffff, 0xffff)))
   {
-    const DataElement & de = ds.GetDataElement(tag);
     return de.GetByteValue();
   }
   return nullptr;

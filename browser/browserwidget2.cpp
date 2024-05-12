@@ -86,10 +86,7 @@ mdcm::VL BrowserWidget2::compute_offset0(const mdcm::DataSet & ds)
 	return len;
 }
 
-void BrowserWidget2::compute_offsets(
-	const mdcm::SequenceOfItems * sq,
-	mdcm::VL start,
-	std::vector<unsigned int> & offsets)
+void BrowserWidget2::compute_offsets(const mdcm::SequenceOfItems * sq, mdcm::VL start, std::vector<unsigned int> & offsets)
 {
 	const unsigned int n = sq->GetNumberOfItems();
 	offsets.resize(n);
@@ -97,18 +94,16 @@ void BrowserWidget2::compute_offsets(
 	for (unsigned int i = 1; i < n; ++i)
 	{
 		const mdcm::Item & item = sq->GetItem(i);
-		offsets[i] =
-			offsets[i - 1] +
-			static_cast<unsigned int>(item.GetLength<mdcm::ExplicitDataElement>());
+		offsets[i] = offsets[i - 1] + static_cast<unsigned int>(item.GetLength<mdcm::ExplicitDataElement>());
 	}
 }
 
 BrowserWidget2::BrowserWidget2(float si)
 {
-	eye_icon  = QIcon(QString(":/bitmaps/eye.svg"));
+	eye_icon = QIcon(QString(":/bitmaps/eye.svg"));
 	eye2_icon = QIcon(QString(":/bitmaps/eye2.svg"));
 	setupUi(this);
-	const QSize s = QSize(static_cast<int>(24 * si),static_cast<int>(24 * si));
+	const QSize s = QSize(static_cast<int>(24 * si), static_cast<int>(24 * si));
 	opendir1_pushButton->setIconSize(s);
 	dicomdir_pushButton->setIconSize(s);
 	ctk_pushButton->setIconSize(s);
@@ -167,18 +162,14 @@ void BrowserWidget2::read_directory(const QString & p)
 	if (!once) once = true;
 	tableWidget->clearContents();
 	tableWidget->setRowCount(0);
-	QProgressDialog * pb = new QProgressDialog(
-		QString("Recursive scan"),
-		QString("Stop"),
-		0,
-		0);
-	pb->setModal(true);
-	pb->setWindowFlags(pb->windowFlags() ^ Qt::WindowContextHelpButtonHint);
-	pb->setRange(0, 0);
-	pb->setMinimumDuration(0);
-	pb->setValue(0);
+	QProgressDialog * pd = new QProgressDialog(QString("Recursive scan"), QString("Stop"), 0, 0);
+	pd->setModal(true);
+	pd->setWindowFlags(pd->windowFlags() ^ Qt::WindowContextHelpButtonHint);
+	pd->setRange(0, 0);
+	pd->setMinimumDuration(0);
+	pd->setValue(0);
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-	pb->show();
+	pd->show();
 #endif
 	qApp->processEvents();
 	try
@@ -186,10 +177,12 @@ void BrowserWidget2::read_directory(const QString & p)
 		const mdcm::Global & g = mdcm::GlobalInstance;
 		const mdcm::Dicts & dicts = g.GetDicts();
 		const mdcm::Dict & dict = dicts.GetPublicDict();
-		process_directory(p, dict, pb);
+		process_directory(p, dict, pd);
 	}
 	catch (const mdcm::ParseException & pe)
 	{
+		pd->close();
+		delete pd;
 #ifdef ALIZA_VERBOSE
 		std::cout << "mdcm::ParseException in BrowserWidget2::read_directory:\n"
 			<< pe.GetLastElement().GetTag() << std::endl;
@@ -199,20 +192,19 @@ void BrowserWidget2::read_directory(const QString & p)
 	}
 	catch (const std::exception & ex)
 	{
+		pd->close();
+		delete pd;
 #ifdef ALIZA_VERBOSE
 		std::cout << "Exception in BrowserWidget2::read_directory:\n" << ex.what() << std::endl;
 #else
 		(void)ex;
 #endif
 	}
-	pb->close();
-	delete pb;
+	pd->close();
+	delete pd;
 }
 
-void BrowserWidget2::process_directory(
-	const QString & p,
-	const mdcm::Dict & dict,
-	QProgressDialog * pb)
+void BrowserWidget2::process_directory(const QString & p, const mdcm::Dict & dict, QProgressDialog * pd)
 {
 	if (p.isEmpty()) return;
 	QDir dir(p);
@@ -223,7 +215,7 @@ void BrowserWidget2::process_directory(
 	for (int x = 0; x < flist.size(); ++x)
 	{
 		qApp->processEvents();
-		if (pb->wasCanceled()) return;
+		if (pd->wasCanceled()) return;
 		const QString tmp0 = dir.absolutePath() + QString("/") + flist.at(x);
 		{
 			mdcm::Reader reader;
@@ -266,10 +258,9 @@ void BrowserWidget2::process_directory(
 		ScannerWatcher sw(&s0);
 		s0.AddTag(tSeriesInstanceUID);
 		s0.Scan(filenames, dict);
-		if (pb->wasCanceled()) return;
+		if (pd->wasCanceled()) return;
 		mdcm::Scanner::ValuesType v = s0.GetValues();
-		mdcm::Scanner::ValuesType::iterator vi = v.begin();
-		for (; vi != v.end(); ++vi)
+		for (mdcm::Scanner::ValuesType::iterator vi = v.begin(); vi != v.end(); ++vi)
 		{
 			QString modality;
 			QString name;
@@ -278,8 +269,8 @@ void BrowserWidget2::process_directory(
 			QString study_date;
 			QString series;
 			QString series_date;
-			bool is_image = false;
-			bool is_softcopy = false;
+			bool is_image{};
+			bool is_softcopy{};
 			const int idx = tableWidget->rowCount();
 			QString idxs;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
@@ -288,9 +279,7 @@ void BrowserWidget2::process_directory(
 			idxs.sprintf("%010d", idx);
 #endif
 			TableWidgetItem * i = new TableWidgetItem(idxs);
-			std::vector<std::string> files__(
-				s0.GetAllFilenamesFromTagToValue(
-					tSeriesInstanceUID, (*vi).c_str()));
+			std::vector<std::string> files__(s0.GetAllFilenamesFromTagToValue(tSeriesInstanceUID, (*vi).c_str()));
 			for (unsigned int z = 0; z < files__.size(); ++z)
 			{
 
@@ -314,20 +303,18 @@ void BrowserWidget2::process_directory(
 					&is_image,&is_softcopy);
 			}
 			qApp->processEvents();
-			if (pb->wasCanceled()) return;
+			if (pd->wasCanceled()) return;
 			//
 			if (!is_image && series_size > 1)
 			{
-				size_t series_idx = 0;
+				size_t series_idx{};
 				do
 				{
 					++series_idx;
 					qApp->processEvents();
-					if (pb->wasCanceled()) return;
-					bool is_image_tmp = false;
-					read_tags_short_(
-						i->files.at(series_idx),
-						&is_image_tmp,&is_softcopy);
+					if (pd->wasCanceled()) return;
+					bool is_image_tmp{};
+					read_tags_short_(i->files.at(series_idx), &is_image_tmp, &is_softcopy);
 					if (is_image_tmp)
 					{
 						is_image = true;
@@ -352,8 +339,7 @@ void BrowserWidget2::process_directory(
 				tableWidget->setItem(idx, 1, new QTableWidgetItem(eye2_icon, QString("")));
 			}
 			tableWidget->setItem(idx, 2, new QTableWidgetItem(modality));
-			tableWidget->setItem(idx, 3, new QTableWidgetItem(
-				DicomUtils::convert_pn_value(name.remove(QChar('\0')))));
+			tableWidget->setItem(idx, 3, new QTableWidgetItem(DicomUtils::convert_pn_value(name.remove(QChar('\0')))));
 			tableWidget->setItem(idx, 4, new QTableWidgetItem(birthdate));
 			tableWidget->setItem(idx, 5, new QTableWidgetItem(study.remove(QChar('\0'))));
 			tableWidget->setItem(idx, 6, new QTableWidgetItem(study_date));
@@ -362,7 +348,7 @@ void BrowserWidget2::process_directory(
 			tableWidget->setItem(idx, 9, new QTableWidgetItem(QVariant(i->files.size()).toString()));
 			//
 			qApp->processEvents();
-			if (pb->wasCanceled()) return;
+			if (pd->wasCanceled()) return;
 		}
 	}
 	//
@@ -376,8 +362,8 @@ void BrowserWidget2::process_directory(
 		QString study_date;
 		QString series;
 		QString series_date;
-		bool is_image = false;
-		bool is_softcopy = false;
+		bool is_image{};
+		bool is_softcopy{};
 		const int idx = tableWidget->rowCount();
 		QString ids;
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
@@ -405,8 +391,7 @@ void BrowserWidget2::process_directory(
 			tableWidget->setItem(idx, 1, new QTableWidgetItem(eye2_icon, QString("")));
 		}
 		tableWidget->setItem(idx, 2, new QTableWidgetItem(modality));
-		tableWidget->setItem(idx, 3, new QTableWidgetItem(
-			DicomUtils::convert_pn_value(name.remove(QChar('\0')))));
+		tableWidget->setItem(idx, 3, new QTableWidgetItem(DicomUtils::convert_pn_value(name.remove(QChar('\0')))));
 		tableWidget->setItem(idx, 4, new QTableWidgetItem(birthdate));
 		tableWidget->setItem(idx, 5, new QTableWidgetItem(study.remove(QChar('\0'))));
 		tableWidget->setItem(idx, 6, new QTableWidgetItem(study_date));
@@ -414,19 +399,19 @@ void BrowserWidget2::process_directory(
 		tableWidget->setItem(idx, 8, new QTableWidgetItem(series_date));
 		tableWidget->setItem(idx, 9, new QTableWidgetItem(QString("1")));
 		qApp->processEvents();
-		if (pb->wasCanceled()) return;
+		if (pd->wasCanceled()) return;
 	}
 	filenames.clear();
 	filenames_no_series_uid.clear();
 	//
-	if (!pb->wasCanceled())
+	if (!pd->wasCanceled())
 	{
 		for (int j = 0; j < dlist.size(); ++j)
 		{
 			process_directory(
 				dir.absolutePath() + QString("/") + dlist.at(j),
 				dict,
-				pb);
+				pd);
 		}
 	}
 	dlist.clear();
@@ -485,9 +470,9 @@ void BrowserWidget2::open_DICOMDIR2(const QString & f)
 		mbox.setIcon(QMessageBox::Information);
 		mbox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 		mbox.setDefaultButton(QMessageBox::Yes);
-		mbox.setText(warning+QString("\nScan directory?"));
+		mbox.setText(warning + QString("\nScan directory?"));
 		const int r = mbox.exec();
-		bool scan = false;
+		bool scan{};
 		switch (r)
 		{
 		case QMessageBox::No:
@@ -501,8 +486,7 @@ void BrowserWidget2::open_DICOMDIR2(const QString & f)
 		if (scan)
 		{
 			QFileInfo fi(f);
-			directory_lineEdit->setText(
-				QDir::toNativeSeparators(fi.absolutePath()));
+			directory_lineEdit->setText(QDir::toNativeSeparators(fi.absolutePath()));
 			reload_dir();
 		}
 	}
@@ -529,8 +513,7 @@ void BrowserWidget2::dropEvent(QDropEvent * e)
 		{
 			open_dicom_dir2(f);
 		}
-		else if (fi.isFile() &&
-			(fi.fileName().toUpper() == QString("DICOMDIR")))
+		else if (fi.isFile() && (fi.fileName().toUpper() == QString("DICOMDIR")))
 		{
 			open_DICOMDIR2(f);
 		}
@@ -564,12 +547,10 @@ bool BrowserWidget2::is_first_run() const
 
 void BrowserWidget2::reload_dir()
 {
-	QFileInfo fi(QDir::fromNativeSeparators(
-		directory_lineEdit->text()));
+	QFileInfo fi(QDir::fromNativeSeparators(directory_lineEdit->text()));
 	if (fi.isDir())
 	{
-		read_directory(QDir::fromNativeSeparators(
-			directory_lineEdit->text()));
+		read_directory(QDir::fromNativeSeparators(directory_lineEdit->text()));
 	}
 	else if (fi.isFile())
 	{
@@ -584,8 +565,7 @@ void BrowserWidget2::reload_dir()
 			QString warning;
 			try
 			{
-				warning = read_DICOMDIR(QDir::fromNativeSeparators(
-							directory_lineEdit->text()));
+				warning = read_DICOMDIR(QDir::fromNativeSeparators(directory_lineEdit->text()));
 			}
 			catch (const mdcm::ParseException & pe)
 			{
@@ -608,12 +588,11 @@ void BrowserWidget2::reload_dir()
 			{
 				QMessageBox mbox;
 				mbox.setIcon(QMessageBox::Information);
-				mbox.setStandardButtons(
-					QMessageBox::Yes | QMessageBox::No);
+				mbox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 				mbox.setDefaultButton(QMessageBox::Yes);
 				mbox.setText(warning + QString("\nScan directory?"));
 				const int r = mbox.exec();
-				bool scan = false;
+				bool scan{};
 				switch (r)
 				{
 				case QMessageBox::No:
@@ -626,8 +605,7 @@ void BrowserWidget2::reload_dir()
 				}
 				if (scan)
 				{
-					directory_lineEdit->setText(
-						QDir::toNativeSeparators(fi.absolutePath()));
+					directory_lineEdit->setText(QDir::toNativeSeparators(fi.absolutePath()));
 					reload_dir();
 				}
 			}
@@ -642,14 +620,12 @@ void BrowserWidget2::reload_dir()
 
 QStringList BrowserWidget2::get_files_of_1st()
 {
-	const QList<QTableWidgetItem *> selected_items =
-		tableWidget->selectedItems();
+	const QList<QTableWidgetItem *> selected_items = tableWidget->selectedItems();
 	if (selected_items.empty()) return QStringList();
-	if (!selected_items.at(0))  return QStringList();
+	if (!selected_items.at(0)) return QStringList();
 	const int current_row = selected_items.at(0)->row();
 	if (current_row < 0) return QStringList();
-	const TableWidgetItem * current_item =
-		static_cast<TableWidgetItem *>(tableWidget->item(current_row, 0));
+	const TableWidgetItem * current_item = static_cast<TableWidgetItem *>(tableWidget->item(current_row, 0));
 	if (!current_item) return QStringList();
 	if (current_item->files.empty()) return QStringList();
 	return current_item->files;
@@ -678,8 +654,7 @@ void BrowserWidget2::copy_files()
 {
 	static unsigned long long count2 = 0;
 	std::vector<int> rows;
-	QModelIndexList selection =
-		tableWidget->selectionModel()->selectedRows();
+	QModelIndexList selection = tableWidget->selectionModel()->selectedRows();
 	for(int x = 0; x < selection.count(); ++x)
 	{
 		const QModelIndex index = selection.at(x);
@@ -700,8 +675,7 @@ void BrowserWidget2::copy_files()
 	{
 		const int row = rows.at(x);
 		if (row < 0) continue;
-		const TableWidgetItem * item =
-			static_cast<TableWidgetItem *>(tableWidget->item(row, 0));
+		const TableWidgetItem * item = static_cast<TableWidgetItem *>(tableWidget->item(row, 0));
 		if (!item) continue;
 		if ((item->files.empty())) continue;
 		files << item->files;
@@ -710,14 +684,10 @@ void BrowserWidget2::copy_files()
 	{
 		++count2;
 		const QString tmp1 =
-			QDateTime::currentDateTime()
-				.toString(QString("yyyyMMddhhmmsszzz")) +
+			QDateTime::currentDateTime().toString(QString("yyyyMMddhhmmsszzz")) +
 			QString("-") +
 			QVariant(count2).toString();
-		const QString dir1 =
-			dirname +
-			QString("/") +
-			tmp1;
+		const QString dir1 = dirname + QString("/") + tmp1;
 		QFileInfo fi2(dir1);
 		if (!fi2.exists())
 		{
@@ -730,11 +700,9 @@ void BrowserWidget2::copy_files()
 			QFileInfo fi(f);
 			if (fi.exists())
 			{
-				const QString f1 =
-					dir1 +
-					QString("/") +
-					fi.fileName();
+				const QString f1 = dir1 + QString("/") + fi.fileName();
 				QFile::copy(f, f1);
+				qApp->processEvents();
 			}
 		}
 	}
@@ -744,8 +712,7 @@ void BrowserWidget2::copy_files()
 void BrowserWidget2::open_DICOMDIR()
 {
 	QFileInfo fi(directory_lineEdit->text());
-	const QString d__ =
-		fi.isFile() ? fi.absolutePath() : directory_lineEdit->text();
+	const QString d__ = fi.isFile() ? fi.absolutePath() : directory_lineEdit->text();
 	const QString f = QFileDialog::getOpenFileName(
 		this,
 		QString("Open DICOMDIR"),
@@ -766,7 +733,7 @@ void BrowserWidget2::open_DICOMDIR()
 		mbox.setDefaultButton(QMessageBox::Yes);
 		mbox.setText(warning + QString("\nScan directory?"));
 		const int r = mbox.exec();
-		bool scan = false;
+		bool scan{};
 		switch (r)
 		{
 		case QMessageBox::No:
@@ -780,8 +747,7 @@ void BrowserWidget2::open_DICOMDIR()
 		if (scan)
 		{
 			QFileInfo fi1(f);
-			directory_lineEdit->setText(
-				QDir::toNativeSeparators(fi1.absolutePath()));
+			directory_lineEdit->setText(QDir::toNativeSeparators(fi1.absolutePath()));
 			reload_dir();
 		}
 	}
@@ -803,7 +769,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 #else
 	reader.SetFileName(f.toLocal8Bit().constData());
 #endif
-	if(!reader.Read())
+	if (!reader.Read())
 	{
 		QApplication::restoreOverrideCursor();
 		return QString("Can not read DICOMDIR file.");
@@ -811,7 +777,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 	const mdcm::File & file = reader.GetFile();
 	mdcm::MediaStorage ms;
 	ms.SetFromFile(file);
-	if(ms != mdcm::MediaStorage::MediaStorageDirectoryStorage)
+	if (ms != mdcm::MediaStorage::MediaStorageDirectoryStorage)
 	{
 		QApplication::restoreOverrideCursor();
 		return QString("Not Media Storage Directory Storage.");
@@ -824,16 +790,14 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 	const mdcm::FileMetaInformation & header = file.GetHeader();
 	const mdcm::DataSet & ds = file.GetDataSet();
 	//
-	if (!ds.FindDataElement(tDirectoryRecordSequence))
+	const mdcm::DataElement & eDirectoryRecordSequence = ds.GetDataElement(tDirectoryRecordSequence);
+	if (eDirectoryRecordSequence.IsEmpty())
 	{
 		QApplication::restoreOverrideCursor();
-		return QString("Can not find Directory Record Sequence.");
+		return QString("Can not read Directory Record Sequence.");
 	}
-	const mdcm::DataElement & eDirectoryRecordSequence =
-		ds.GetDataElement(tDirectoryRecordSequence);
-	mdcm::SmartPointer<mdcm::SequenceOfItems> sqDirectoryRecordSequence =
-		eDirectoryRecordSequence.GetValueAsSQ();
-	if(!(sqDirectoryRecordSequence && sqDirectoryRecordSequence->GetNumberOfItems() > 0))
+	mdcm::SmartPointer<mdcm::SequenceOfItems> sqDirectoryRecordSequence = eDirectoryRecordSequence.GetValueAsSQ();
+	if (!(sqDirectoryRecordSequence && sqDirectoryRecordSequence->GetNumberOfItems() > 0))
 	{
 		QApplication::restoreOverrideCursor();
 		return QString("Directory Record Sequence is empty.");
@@ -843,17 +807,13 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 	std::vector<unsigned int> offsets;
 	compute_offsets(sqDirectoryRecordSequence,start,offsets);
 	//
-	bool not_patient_study_series_model = false;
-	bool ok_first_root_off = false;
-	unsigned int first_root_off = 0;
-	if (ds.FindDataElement(tOffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity))
-	{
-		ok_first_root_off =
-			DicomUtils::get_ul_value(
-				ds,
-				tOffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity,
-				&first_root_off);
-	}
+	bool not_patient_study_series_model{};
+	unsigned int first_root_off{};
+	const bool ok_first_root_off =
+		DicomUtils::get_ul_value(
+			ds,
+			tOffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity,
+			&first_root_off);
 	//
 	std::set<mdcm::DataElement>::const_iterator it = ds.GetDES().cbegin();
 	while (it != ds.GetDES().cend())
@@ -866,13 +826,10 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 			{
 				const mdcm::Item & item = sqi->GetItem(i + 1);
 				const mdcm::DataSet & nds  = item.GetNestedDataSet();
-
 				EntryDICOMDIR ed;
-				if (nds.FindDataElement(tOffsetOfTheNextDirectoryRecord))
 				{
-					unsigned int off1 = 0;
-					const bool ok_off1 =
-						DicomUtils::get_ul_value(nds,tOffsetOfTheNextDirectoryRecord, &off1);
+					unsigned int off1{};
+					const bool ok_off1 = DicomUtils::get_ul_value(nds, tOffsetOfTheNextDirectoryRecord, &off1);
 					if (ok_off1)
 					{
 						ed.offsetOfTheNextDirectoryRecord = off1;
@@ -880,17 +837,12 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 					else
 					{
 						QApplication::restoreOverrideCursor();
-						return QString(
-							"Error reading \"Offset of the Next Directory Record\".");
+						return QString("Error reading \"Offset of the Next Directory Record\".");
 					}
 				}
-				if (nds.FindDataElement(tOffsetOfReferencedLowerLevelDirectoryEntity))
 				{
-					unsigned int off2 = 0;
-					const bool ok_off2 =
-						DicomUtils::get_ul_value(
-							nds,tOffsetOfReferencedLowerLevelDirectoryEntity,
-							&off2);
+					unsigned int off2{};
+					const bool ok_off2 = DicomUtils::get_ul_value(nds,tOffsetOfReferencedLowerLevelDirectoryEntity, &off2);
 					if (ok_off2)
 					{
 						ed.offsetOfReferencedLowerLevelDirectoryEntity = off2;
@@ -898,11 +850,9 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 					else
 					{
 						QApplication::restoreOverrideCursor();
-						return QString(
-							"Error reading \"Offset of Referenced Lower Level Directory Entity\".");
+						return QString("Error reading \"Offset of Referenced Lower Level Directory Entity\".");
 					}
 				}
-				if (nds.FindDataElement(tDirectoryRecordType))
 				{
 					const mdcm::DataElement & e = nds.GetDataElement(tDirectoryRecordType);
 					if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
@@ -915,29 +865,23 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 						if (directory_record_type == QString("PATIENT"))
 						{
 							QString charset;
-							if (nds.FindDataElement(tSpecificCharacterSet))
 							{
 								const mdcm::DataElement & e1 = nds.GetDataElement(tSpecificCharacterSet);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
 								{
 									charset = QString::fromLatin1(
-										e1.GetByteValue()->GetPointer(),e1.GetByteValue()->GetLength());
+										e1.GetByteValue()->GetPointer(), e1.GetByteValue()->GetLength());
 								}
 							}
-							if (nds.FindDataElement(tPatientsName))
 							{
 								const mdcm::DataElement & e1 = nds.GetDataElement(tPatientsName);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
 								{
-									QByteArray ba(
-										e1.GetByteValue()->GetPointer(),
-										e1.GetByteValue()->GetLength());
-									const QString tmp0 =
-										CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
+									QByteArray ba(e1.GetByteValue()->GetPointer(), e1.GetByteValue()->GetLength());
+									const QString tmp0 = CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
 									ed.patient = tmp0.trimmed().remove(QChar('\0'));
 								}
 							}
-							if (nds.FindDataElement(tPatientsBirthDate))
 							{
 								const mdcm::DataElement & e1 = nds.GetDataElement(tPatientsBirthDate);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
@@ -953,7 +897,6 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 						else if (directory_record_type == QString("STUDY"))
 						{
 							QString charset;
-							if (nds.FindDataElement(tSpecificCharacterSet))
 							{
 								const mdcm::DataElement & e1 = nds.GetDataElement(tSpecificCharacterSet);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
@@ -963,7 +906,6 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 										e1.GetByteValue()->GetLength());
 								}
 							}
-							if (nds.FindDataElement(tStudyDate))
 							{
 								const mdcm::DataElement & e1 = nds.GetDataElement(tStudyDate);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
@@ -975,16 +917,12 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 									ed.study_date = qd.toString(QString("d MMM yyyy")) + QString("\n");
 								}
 							}
-							if (nds.FindDataElement(tStudyDescription))
 							{
 								const mdcm::DataElement & e1 = nds.GetDataElement(tStudyDescription);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
 								{
-									QByteArray ba(
-										e1.GetByteValue()->GetPointer(),
-										e1.GetByteValue()->GetLength());
-									const QString tmp0 =
-										CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
+									QByteArray ba(e1.GetByteValue()->GetPointer(), e1.GetByteValue()->GetLength());
+									const QString tmp0 = CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
 									ed.study_desc = tmp0.trimmed().remove(QChar('\0'));
 								}
 							}
@@ -992,10 +930,8 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 						else if (directory_record_type == QString("SERIES"))
 						{
 							QString charset;
-							if (nds.FindDataElement(tSpecificCharacterSet))
 							{
-								const mdcm::DataElement & e1 =
-									nds.GetDataElement(tSpecificCharacterSet);
+								const mdcm::DataElement & e1 = nds.GetDataElement(tSpecificCharacterSet);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
 								{
 									charset = QString::fromLatin1(
@@ -1003,10 +939,8 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 										e1.GetByteValue()->GetLength());
 								}
 							}
-							if (nds.FindDataElement(tModality))
 							{
-								const mdcm::DataElement & e1 =
-									nds.GetDataElement(tModality);
+								const mdcm::DataElement & e1 = nds.GetDataElement(tModality);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
 								{
 									const QString tmp0 = QString::fromLatin1(
@@ -1015,8 +949,6 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 									ed.modality = tmp0.trimmed();
 								}
 							}
-
-							if (nds.FindDataElement(tSeriesDate))
 							{
 								const mdcm::DataElement & e1 = nds.GetDataElement(tSeriesDate);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
@@ -1028,16 +960,12 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 									ed.series_date = qd.toString(QString("d MMM yyyy")) + QString("\n");
 								}
 							}
-							if (nds.FindDataElement(tSeriesDescription))
 							{
 								const mdcm::DataElement & e1 = nds.GetDataElement(tSeriesDescription);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
 								{
-									QByteArray ba(
-										e1.GetByteValue()->GetPointer(),
-										e1.GetByteValue()->GetLength());
-									const QString tmp0 =
-										CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
+									QByteArray ba(e1.GetByteValue()->GetPointer(), e1.GetByteValue()->GetLength());
+									const QString tmp0 = CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
 									ed.series_desc = tmp0.trimmed().remove(QChar('\0'));
 								}
 							}
@@ -1049,10 +977,8 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 								not_patient_study_series_model = true;
 							}
 							QString charset;
-							if (nds.FindDataElement(tSpecificCharacterSet))
 							{
-								const mdcm::DataElement & e1 =
-									nds.GetDataElement(tSpecificCharacterSet);
+								const mdcm::DataElement & e1 = nds.GetDataElement(tSpecificCharacterSet);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
 								{
 									charset = QString::fromLatin1(
@@ -1060,16 +986,12 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 										e1.GetByteValue()->GetLength());
 								}
 							}
-							if (nds.FindDataElement(tReferencedFileID))
 							{
 								const mdcm::DataElement & e1 = nds.GetDataElement(tReferencedFileID);
 								if (!e1.IsEmpty() && !e1.IsUndefinedLength() && e1.GetByteValue())
 								{
-									QByteArray ba(
-										e1.GetByteValue()->GetPointer(),
-										e1.GetByteValue()->GetLength());
-									const QString tmp0 =
-										CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
+									QByteArray ba(e1.GetByteValue()->GetPointer(), e1.GetByteValue()->GetLength());
+									const QString tmp0 = CodecUtils::toUTF8(&ba, charset.toLatin1().constData());
 									const QStringList l2 = tmp0.trimmed().split(QString("\\"));
 									const int l2size = l2.size();
 									QString fpath;
@@ -1095,12 +1017,10 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 	QList<SeriesDICOMDIR> series;
 	if (ok_first_root_off)
 	{
-		unsigned int offset_next =
-			add_roots(m, first_root_off, series, &not_patient_study_series_model);
+		unsigned int offset_next = add_roots(m, first_root_off, series, &not_patient_study_series_model);
 		while (offset_next > 0)
 		{
-			offset_next =
-				add_roots(m, offset_next, series, &not_patient_study_series_model);
+			offset_next = add_roots(m, offset_next, series, &not_patient_study_series_model);
 		}
 	}
 	else
@@ -1153,7 +1073,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 	//
 	for (int x = 0; x < series.size(); ++x)
 	{
-		bool break__ = false;
+		bool break__{};
 		for (int z = 0; z < series.at(x).files.size(); ++z)
 		{
 			QFileInfo fi(dir_ + QString("/") + series.at(x).files.at(z));
@@ -1267,8 +1187,7 @@ unsigned int BrowserWidget2::add_study(
 			warn);
 		while (offset_next > 0)
 		{
-			offset_next =
-				add_series(m,offset_next,l,patient,birthdate,study_desc,study_date,warn);
+			offset_next = add_series(m,offset_next,l,patient,birthdate,study_desc,study_date,warn);
 		}
 	}
 	else
@@ -1330,7 +1249,8 @@ unsigned int BrowserWidget2::add_file(
 	{
 		s.eye = true;
 	}
-	else if(e.directoryRecordType == QString("PRESENTATION") ||
+	else if(
+		e.directoryRecordType == QString("PRESENTATION") ||
 		e.directoryRecordType == QString("SR DOCUMENT"))
 	{
 		s.eye2 = true;
@@ -1368,7 +1288,6 @@ void BrowserWidget2::read_tags_(
 	QString charset;
 	QString sop;
 	//
-	if (ds.FindDataElement(tSpecificCharacterSet))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tSpecificCharacterSet);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
@@ -1378,7 +1297,6 @@ void BrowserWidget2::read_tags_(
 		}
 	}
 	//
-	if (ds.FindDataElement(tSOPClassUID))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tSOPClassUID);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
@@ -1389,7 +1307,6 @@ void BrowserWidget2::read_tags_(
 		}
 	}
 	//
-	if (ds.FindDataElement(tStudyDate))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tStudyDate);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
@@ -1402,7 +1319,6 @@ void BrowserWidget2::read_tags_(
 		}
 	}
 	//
-	if (ds.FindDataElement(tModality))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tModality);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
@@ -1412,7 +1328,6 @@ void BrowserWidget2::read_tags_(
 		}
 	}
 	//
-	if (ds.FindDataElement(tStudyDescription))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tStudyDescription);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
@@ -1423,7 +1338,6 @@ void BrowserWidget2::read_tags_(
 		}
 	}
 	//
-	if (ds.FindDataElement(tSeriesDescription))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tSeriesDescription);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
@@ -1434,7 +1348,6 @@ void BrowserWidget2::read_tags_(
 		}
 	}
 	//
-	if (ds.FindDataElement(tSeriesDate))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tSeriesDate);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
@@ -1447,7 +1360,6 @@ void BrowserWidget2::read_tags_(
 		}
 	}
 	//
-	if (ds.FindDataElement(tPatientsName))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tPatientsName);
 		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
@@ -1458,7 +1370,6 @@ void BrowserWidget2::read_tags_(
 		}
 	}
 	//
-	if (ds.FindDataElement(tPatientsBirthDate))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tPatientsBirthDate);
 		std::stringstream ss;
@@ -1472,20 +1383,17 @@ void BrowserWidget2::read_tags_(
 		}
 	}
 	//
-	bool has_rows         = false;
-	bool has_colums       = false;
-	bool has_bitallocated = false;
-	if (ds.FindDataElement(tRows))
+	bool has_rows{};
+	bool has_colums{};
+	bool has_bitallocated{};
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tRows);
 		if (!e.IsEmpty()) has_rows = true;
 	}
-	if (ds.FindDataElement(tColumns))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tColumns);
 		if (!e.IsEmpty()) has_colums = true;
 	}
-	if (ds.FindDataElement(tBitsAllocated))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tBitsAllocated);
 		if (!e.IsEmpty()) has_bitallocated = true;
@@ -1558,26 +1466,22 @@ void BrowserWidget2::read_tags_short_(
 	if (!f_ok) return;
 	const mdcm::DataSet & ds = reader.GetFile().GetDataSet();
 	if (ds.IsEmpty()) return;
-	bool has_rows         = false;
-	bool has_colums       = false;
-	bool has_bitallocated = false;
-	bool has_pixelrepres  = false;
-	if (ds.FindDataElement(tRows))
+	bool has_rows{};
+	bool has_colums{};
+	bool has_bitallocated{};
+	bool has_pixelrepres{};
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tRows);
 		if (!e.IsEmpty()) has_rows = true;
 	}
-	if (ds.FindDataElement(tColumns))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tColumns);
 		if (!e.IsEmpty()) has_colums = true;
 	}
-	if (ds.FindDataElement(tBitsAllocated))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tBitsAllocated);
 		if (!e.IsEmpty()) has_bitallocated = true;
 	}
-	if (ds.FindDataElement(tPixelRepresentation))
 	{
 		const mdcm::DataElement & e = ds.GetDataElement(tPixelRepresentation);
 		if (!e.IsEmpty()) has_pixelrepres = true;
@@ -1585,26 +1489,24 @@ void BrowserWidget2::read_tags_short_(
 	bool is_image_tmp = has_rows && has_colums && has_bitallocated && has_pixelrepres;
 	if (!is_image_tmp)
 	{
-		if (ds.FindDataElement(tSOPClassUID))
+		const mdcm::DataElement & e = ds.GetDataElement(tSOPClassUID);
+		if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
 		{
-			const mdcm::DataElement & e = ds.GetDataElement(tSOPClassUID);
-			if (!e.IsEmpty() && !e.IsUndefinedLength() && e.GetByteValue())
+			const QString sop =
+				QString::fromLatin1(
+					e.GetByteValue()->GetPointer(),
+					e.GetByteValue()->GetLength()).trimmed().remove(QChar('\0'));
+			// RTSTRUCT
+			if (sop == QString("1.2.840.10008.5.1.4.1.1.481.3"))
 			{
-				const QString sop =
-					QString::fromLatin1(
-						e.GetByteValue()->GetPointer(),
-						e.GetByteValue()->GetLength()).trimmed().remove(QChar('\0'));
-				// RTSTRUCT
-				if (sop == QString("1.2.840.10008.5.1.4.1.1.481.3"))
-				{
-					is_image_tmp = true;
-				}
-				// Softcopy
-				else if (sop == QString("1.2.840.10008.5.1.4.1.1.11.1") ||
-					sop == QString("1.2.840.10008.5.1.4.1.1.11.2"))
-				{
-					*is_softcopy = true;
-				}
+				is_image_tmp = true;
+			}
+			// Softcopy
+			else if (
+				sop == QString("1.2.840.10008.5.1.4.1.1.11.1") ||
+				sop == QString("1.2.840.10008.5.1.4.1.1.11.2"))
+			{
+				*is_softcopy = true;
 			}
 		}
 	}
@@ -1615,17 +1517,13 @@ void BrowserWidget2::writeSettings(QSettings & settings)
 {
 #ifdef USE_WORKSTATION_MODE
 	settings.beginGroup(QString("BrowserWidget2"));
-	settings.setValue(
-		QString("saved_user_dir"),
-		QVariant(directory_lineEdit->text()));
+	settings.setValue(QString("saved_user_dir"), QVariant(directory_lineEdit->text()));
 	settings.setValue(QString("ctk_dir"),   ctk_dir);
 	settings.setValue(QString("ctk_pname"), ctk_pname);
 	settings.setValue(QString("ctk_pid"),   ctk_pid);
 	settings.setValue(QString("ctk_from"),  ctk_from);
 	settings.setValue(QString("ctk_to"),    ctk_to);
-	settings.value(
-		QString("ctk_apply_range"),
-		(ctk_apply_range ? QString("Y") : QString("N")));
+	settings.value(QString("ctk_apply_range"), (ctk_apply_range ? QString("Y") : QString("N")));
 	settings.endGroup();
 #endif
 }
@@ -1645,44 +1543,37 @@ void BrowserWidget2::readSettings()
 	const QString d("/Applications/AlizaMS.app/Contents/Resources/DICOM");
 #else
 #ifdef ALIZAMS_ARCHIVE_DISTRO
-	const QString d =
-		QApplication::applicationDirPath() + QString("/../DICOM");
+	const QString d = QApplication::applicationDirPath() + QString("/../DICOM");
 #else
 	const QString d("/usr/share/alizams/datasets");
 #endif
 #endif
 	settings.beginGroup(QString("BrowserWidget2"));
-	directory_lineEdit->setText(
-		settings.value(QString("saved_user_dir"), QDir::toNativeSeparators(d)).toString());
+	directory_lineEdit->setText(settings.value(QString("saved_user_dir"), QDir::toNativeSeparators(d)).toString());
 	ctk_dir   = settings.value(QString("ctk_dir"),   QString("")).toString();
 	ctk_pname = settings.value(QString("ctk_pname"), QString("")).toString();
 	ctk_pid   = settings.value(QString("ctk_pid"),   QString("")).toString();
 	ctk_from  = settings.value(QString("ctk_from"),  QString("")).toString();
 	ctk_to    = settings.value(QString("ctk_to"),    QString("")).toString();
-	const QString r =
-		settings.value(QString("ctk_apply_range"), QString("N")).toString();
+	const QString r = settings.value(QString("ctk_apply_range"), QString("N")).toString();
 	settings.endGroup();
 	if (r == QString("Y")) ctk_apply_range = true;
 	else                   ctk_apply_range = false;
 #else
 	{
-		const QString f1_ =
-			QApplication::applicationDirPath() + QString("/../DICOMDIR");
+		const QString f1_ = QApplication::applicationDirPath() + QString("/../DICOMDIR");
 		QFileInfo fi1 = QFileInfo(f1_);
 		if (fi1.exists() && fi1.isFile())
 		{
-			directory_lineEdit->setText(
-				QDir::toNativeSeparators(fi1.absoluteFilePath()));
+			directory_lineEdit->setText(QDir::toNativeSeparators(fi1.absoluteFilePath()));
 		}
 		else
 		{
-			const QString f2_ =
-				QApplication::applicationDirPath() + QString("/../DICOM");
+			const QString f2_ = QApplication::applicationDirPath() + QString("/../DICOM");
 			QFileInfo fi2 = QFileInfo(f2_);
 			if (fi2.exists() && fi2.isDir())
 			{
-				directory_lineEdit->setText(
-					QDir::toNativeSeparators(fi2.absoluteFilePath()));
+				directory_lineEdit->setText(QDir::toNativeSeparators(fi2.absoluteFilePath()));
 			}
 			else
 			{
@@ -1701,7 +1592,7 @@ void BrowserWidget2::open_CTK_db()
 	tableWidget->setRowCount(0);
 	directory_lineEdit->clear();
 	QString warning;
-	bool ok = false;
+	bool ok{};
 	QList<SeriesDICOMDIR> series;
 	QSqlDatabase db;
 	QString dbfile;
@@ -1715,8 +1606,8 @@ void BrowserWidget2::open_CTK_db()
 	QString ss;
 	QSet<int> ids;
 	QSet<int>::const_iterator it0;
-	size_t ids_count = 0;
-	size_t count_missing_files = 0;
+	size_t ids_count{};
+	size_t count_missing_files{};
 	QStringList ctk_studies;
 	QStringList ctk_series;
 	if (ctk_from.isEmpty() || ctk_to.isEmpty())
@@ -1747,10 +1638,7 @@ void BrowserWidget2::open_CTK_db()
 	delete d;
 	if (!ok) return;
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-	dbfile =
-		ctk_dir +
-		QString("/") +
-		QString("ctkDICOM.sql");
+	dbfile = ctk_dir + QString("/") + QString("ctkDICOM.sql");
 	if (QSqlDatabase::contains(QString("CTKdb")))
 	{
 		db = QSqlDatabase::database("CTKdb");
@@ -1794,8 +1682,7 @@ void BrowserWidget2::open_CTK_db()
 		p1 = QString("select StudyInstanceUID from Studies");
 		if (ctk_apply_range)
 		{
-			p1.append(QString(" where StudyDate between ") + ctk_from +
-				QString(" and ") + ctk_to);
+			p1.append(QString(" where StudyDate between ") + ctk_from + QString(" and ") + ctk_to);
 		}
 	}
 	else
@@ -1820,8 +1707,7 @@ void BrowserWidget2::open_CTK_db()
 		p1.append(QString(")"));
 		if (ctk_apply_range)
 		{
-			p1.append(QString("and StudyDate between ") + ctk_from +
-				QString(" and ") + ctk_to);
+			p1.append(QString("and StudyDate between ") + ctk_from + QString(" and ") + ctk_to);
 		}
 	}
 	p1Query = QSqlQuery(p1, db);
@@ -1859,10 +1745,7 @@ void BrowserWidget2::open_CTK_db()
 			if (m.next())
 			{
 				series0.modality = m.value(0).toString().trimmed();
-				const QDate tmp1 =
-					QDate::fromString(
-						m.value(1).toString(),
-						QString("yyyy-MM-dd"));
+				const QDate tmp1 = QDate::fromString(m.value(1).toString(), QString("yyyy-MM-dd"));
 				series0.series = m.value(2).toString().trimmed();
 				sid = m.value(3).toString();
 				series0.series_date = tmp1.toString(QString("d MMM yyyy"));
@@ -1881,10 +1764,7 @@ void BrowserWidget2::open_CTK_db()
 			if (m.next())
 			{
 				p0id = m.value(0).toString().trimmed();
-				const QDate tmp1 =
-					QDate::fromString(
-						m.value(1).toString(),
-						QString("yyyyMMdd"));
+				const QDate tmp1 = QDate::fromString(m.value(1).toString(), QString("yyyyMMdd"));
 				series0.study_date = tmp1.toString(QString("d MMM yyyy"));
 				series0.study = m.value(2).toString().trimmed();
 			}
@@ -1899,19 +1779,14 @@ void BrowserWidget2::open_CTK_db()
 			if (m.next())
 			{
 				series0.patient = m.value(0).toString().trimmed();
-				const QDate tmp1 =
-					QDate::fromString(
-						m.value(1).toString(),
-						QString("yyyy-MM-dd"));
+				const QDate tmp1 = QDate::fromString(m.value(1).toString(), QString("yyyy-MM-dd"));
 				series0.birthdate = tmp1.toString(QString("d MMM yyyy"));
 			}
 			m.clear();
 		}
 		{
 			const QString s =
-				QString(
-					"select Filename"
-					" from Images where SeriesInstanceUID = \"") +
+				QString("select Filename from Images where SeriesInstanceUID = \"") +
 				series0.UID + QString("\"");
 			QSqlQuery m = QSqlQuery(s, db);
 			while (m.next())
@@ -1964,9 +1839,13 @@ void BrowserWidget2::open_CTK_db()
 		tableWidget->setItem(idx, 0, static_cast<QTableWidgetItem*>(i));
 #if 0
 		if (series.at(x).eye)
+		{
 			tableWidget->setItem(idx, 1, new QTableWidgetItem(eye_icon, QString("")));
+		}
 		else if (series.at(x).eye2)
+		{
 			tableWidget->setItem(idx, 1, new QTableWidgetItem(eye2_icon, QString("")));
+		}
 #endif
 		tableWidget->setItem(idx, 2, new QTableWidgetItem(series.at(x).modality));
 		tableWidget->setItem(idx, 3, new QTableWidgetItem(series.at(x).patient));
@@ -1989,4 +1868,3 @@ quit__:
 	}
 }
 #endif
-

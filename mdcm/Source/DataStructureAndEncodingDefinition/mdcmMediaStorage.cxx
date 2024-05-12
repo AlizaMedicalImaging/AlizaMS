@@ -420,9 +420,10 @@ MediaStorage::GuessFromModality(const char * modality, unsigned int dim)
 const char *
 MediaStorage::GetFromDataSetOrHeader(const DataSet & ds, const Tag & tag, std::string & buf)
 {
-  if (ds.FindDataElement(tag))
+  const DataElement & de = ds.GetDataElement(tag);
+  if (!de.IsEmpty())
   {
-    const ByteValue * sopclassuid = ds.GetDataElement(tag).GetByteValue();
+    const ByteValue * sopclassuid = de.GetByteValue();
     if (!sopclassuid || !sopclassuid->GetPointer())
       return nullptr;
     std::string sopclassuid_str(sopclassuid->GetPointer(), sopclassuid->GetLength());
@@ -488,20 +489,19 @@ MediaStorage::SetFromDataSet(const DataSet & ds)
 void
 MediaStorage::SetFromSourceImageSequence(const DataSet & ds)
 {
-  const Tag sourceImageSequenceTag(0x0008, 0x2112);
-  if (ds.FindDataElement(sourceImageSequenceTag))
+  const DataElement & sourceImageSequencesq = ds.GetDataElement(Tag(0x0008, 0x2112));
+  if (!sourceImageSequencesq.IsEmpty())
   {
-    const DataElement &           sourceImageSequencesq = ds.GetDataElement(sourceImageSequenceTag);
     SmartPointer<SequenceOfItems> sq = sourceImageSequencesq.GetValueAsSQ();
     if (!(sq && sq->GetNumberOfItems() > 0))
       return;
     SequenceOfItems::ConstIterator it = sq->Begin();
     const DataSet &                subds = it->GetNestedDataSet();
     const Tag                      referencedSOPClassUIDTag(0x0008, 0x1150);
-    if (subds.FindDataElement(referencedSOPClassUIDTag))
+	const DataElement &            de = subds.GetDataElement(referencedSOPClassUIDTag);
+    if (!de.IsEmpty())
     {
-      const DataElement & de = subds.GetDataElement(referencedSOPClassUIDTag);
-      const ByteValue *   sopclassuid = de.GetByteValue();
+      const ByteValue * sopclassuid = de.GetByteValue();
       if (sopclassuid)
       {
         std::string sopclassuid_str(sopclassuid->GetPointer(), sopclassuid->GetLength());
@@ -523,10 +523,11 @@ bool
 MediaStorage::SetFromModality(const DataSet & ds)
 {
   // Attempt to recover from the modality (0008,0060)
-  if (ds.FindDataElement(Tag(0x0008, 0x0060)))
+  const DataElement & de = ds.GetDataElement(Tag(0x0008, 0x0060));
+  if (!de.IsEmpty())
   {
     // mdcm-CR-DCMTK-16-NonSamplePerPix.dcm
-    const ByteValue * bv = ds.GetDataElement(Tag(0x0008, 0x0060)).GetByteValue();
+    const ByteValue * bv = de.GetByteValue();
     if (bv)
     {
       std::string modality = std::string(bv->GetPointer(), bv->GetLength());
