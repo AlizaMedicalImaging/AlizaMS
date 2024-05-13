@@ -28,6 +28,7 @@
 #include <climits>
 #include <chrono>
 #include <thread>
+#include <utility>
 
 //#define A_TMP_BENCHMARK
 
@@ -593,7 +594,11 @@ template<typename T> void load_rgb_image(
 			GraphicsUtils::draw_cross_out(tmpi);
 	}
 	//
+#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
 	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(tmpi));
+#else
+	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(std::move(tmpi)));
+#endif
 	//
 	GraphicsUtils::gen_labels(
 		axis, hide_orientation,
@@ -872,7 +877,11 @@ template<typename T> void load_rgba_image(
 			GraphicsUtils::draw_cross_out(tmpi);
 	}
 	//
+#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
 	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(tmpi));
+#else
+	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(std::move(tmpi)));
+#endif
 	//
 	GraphicsUtils::gen_labels(
 		axis, hide_orientation,
@@ -1006,7 +1015,11 @@ template<typename T> void load_rgb_char_image(
 			GraphicsUtils::draw_cross_out(tmpi);
 	}
 	//
+#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
 	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(tmpi));
+#else
+	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(std::move(tmpi)));
+#endif
 	//
 	const bool hide_orientation = ivariant->di->hide_orientation;
 	GraphicsUtils::gen_labels(
@@ -1173,7 +1186,11 @@ template<typename T> void load_rgba_char_image(
 			GraphicsUtils::draw_cross_out(tmpi);
 	}
 	//
+#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
 	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(tmpi));
+#else
+	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(std::move(tmpi)));
+#endif
 	//
 	const bool hide_orientation = ivariant->di->hide_orientation;
 	GraphicsUtils::gen_labels(
@@ -1457,7 +1474,11 @@ template<typename T> void load_image(
 		scale__ = widget->graphicsview->m_scale;
 	}
 	//
+#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
 	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(tmpi));
+#else
+	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(std::move(tmpi)));
+#endif
 	QTransform t = QTransform();
 	if (spacing[1] != spacing[0]) t = t.scale(coeff_size_0, coeff_size_1);
 	t = t.scale(scale__, scale__);
