@@ -148,10 +148,12 @@ static std::vector<GLuint*>    textures;
 static std::vector<qMeshData*> qmeshes;
 //static btAlignedObjectArray<CollisionObject*>  collision_objects;
 
+#if 0
 long long clamp(long long v, long long lo, long long hi)
 {
 	return v < lo ? lo : (v > hi ? hi : v);
 }
+#endif
 
 struct MyRayResultCallback : public btCollisionWorld::AllHitsRayResultCallback
 {
