@@ -7467,7 +7467,7 @@ QString DicomUtils::read_ultrasound(
 	CommonUtils::linux_print_memusage("before gen_itk_image()");
 #endif
 	QString error = CommonUtils::gen_itk_image(ok,
-		data, true,
+		data,
 		pixelformat, pi,
 		ivariant,
 		direction,
@@ -7685,7 +7685,7 @@ are stacked in front of the first slice. See Image Orientation
 	CommonUtils::linux_print_memusage("before gen_itk_image()");
 #endif
 	QString error = CommonUtils::gen_itk_image(ok,
-		data, true,
+		data,
 		pixelformat, pi,
 		ivariant,
 		direction,
@@ -8416,7 +8416,7 @@ QString DicomUtils::read_series(
 	CommonUtils::linux_print_memusage("before gen_itk_image()");
 #endif
 	QString error = CommonUtils::gen_itk_image(ok,
-		data, true,
+		data,
 		pixelformat, pi,
 		ivariant,
 		direction,
@@ -10670,7 +10670,6 @@ QString DicomUtils::read_enhanced_common(
 #endif
 					message_ = CommonUtils::gen_itk_image(ok,
 						tmp3,
-						false,
 						pixelformat,
 						pi,
 						ivariant,
@@ -10737,7 +10736,6 @@ QString DicomUtils::read_enhanced_common(
 #endif
 					message_ = CommonUtils::gen_itk_image(ok,
 						tmp3,
-						false,
 						pixelformat,
 						pi,
 						ivariant,

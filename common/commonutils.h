@@ -80,7 +80,7 @@ public:
 		const ImageVariant*, unsigned int*);
 	static QString gen_itk_image(
 		bool*,
-		std::vector<char*> &, bool,
+		const std::vector<char*> &,
 		const mdcm::PixelFormat&,
 		const mdcm::PhotometricInterpretation&,
 		ImageVariant*,
