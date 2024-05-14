@@ -1432,8 +1432,6 @@ template<typename T> QString process_dicom_monochrome_image1(
 		return QString(ex.GetDescription());
 	}
 	//
-	ivariant->image_type = image_type;
-	//
 	try
 	{
 		size_t idx_z{};
@@ -1574,8 +1572,6 @@ template<typename T> QString process_dicom_rgb_image1(
 		*ok = false;
 		return QString(ex.GetDescription());
 	}
-	//
-	ivariant->image_type = image_type;
 	//
 	try
 	{
@@ -1771,8 +1767,6 @@ template<typename T> QString process_dicom_rgba_image1(
 		*ok = false;
 		return QString(ex.GetDescription());
 	}
-	//
-	ivariant->image_type = image_type;
 	//
 	try
 	{
