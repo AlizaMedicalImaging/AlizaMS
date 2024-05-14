@@ -389,8 +389,7 @@ template <typename T> void calculate_rgb_minmax_(
 	ImageVariant * ivariant)
 {
 	if (image.IsNull()) return;
-	const typename T::RegionType region =
-		image->GetLargestPossibleRegion();
+	const typename T::RegionType region = image->GetLargestPossibleRegion();
 	double max_r = std::numeric_limits<double>::min();
 	double max_g = std::numeric_limits<double>::min();
 	double max_b = std::numeric_limits<double>::min();
@@ -649,9 +648,7 @@ template<typename T> int generate_tex3d(
 	}
 	qApp->processEvents();
 	//
-	if (size[0] == original_size[0] &&
-		size[1] == original_size[1] &&
-		size[2] == original_size[2])
+	if (size[0] == original_size[0] && size[1] == original_size[1] && size[2] == original_size[2])
 	{
 		scale = false;
 	}
@@ -787,17 +784,18 @@ template<typename T> int generate_tex3d(
 				{
 					const typename T::PixelType v = inIterator.Get();
 					const double f = v;
-					// GL_R16F
-					if (texture_type == 0)
+					if (texture_type == 0) // GL_R16F
+					{
 						float_buf[j] = static_cast<float>((f + (-rmin)) / max_minus_min);
-					// GL_R16
-					else if(texture_type == 1)
-						short_buf[j] = static_cast<unsigned short>(
-							USHRT_MAX * ((f + (-rmin)) / max_minus_min));
-					// GL_R8
-					else if(texture_type == 2)
-						ub_buf[j] = static_cast<GLubyte>(
-							UCHAR_MAX * ((f + (-rmin)) / max_minus_min));
+					}
+					else if(texture_type == 1) // GL_R16
+					{
+						short_buf[j] = static_cast<unsigned short>(USHRT_MAX * ((f + (-rmin)) / max_minus_min));
+					}
+					else if(texture_type == 2) // GL_R8
+					{
+						ub_buf[j] = static_cast<GLubyte>(UCHAR_MAX * ((f + (-rmin)) / max_minus_min));
+					}
 					++j;
 					++inIterator;
 				}
@@ -1136,10 +1134,8 @@ template <typename T> bool reload_monochrome_image(
 	bool disable_gen_slices = false)
 {
 	if (!ivariant || image.IsNull()) return false;
-	const bool generate_slices =
-		(!disable_gen_slices && !ivariant->di->slices_generated);
-	const bool calc_center =
-		(!disable_gen_slices && !ivariant->di->slices_generated);
+	const bool generate_slices = (!disable_gen_slices && !ivariant->di->slices_generated);
+	const bool calc_center = (!disable_gen_slices && !ivariant->di->slices_generated);
 	get_dimensions<T>(image,
 		&(ivariant->di->idimx),
 		&(ivariant->di->idimy),
@@ -1180,10 +1176,7 @@ template <typename T> bool reload_monochrome_image(
 		ivariant->di->skip_texture = true;
 	}
 	const bool ok3d =
-		(max_3d_tex_size > 0 &&
-		!ivariant->di->skip_texture &&
-		ivariant->di->opengl_ok
-		&& gl);
+		(max_3d_tex_size > 0 && !ivariant->di->skip_texture && ivariant->di->opengl_ok && gl);
 	//
 	if (generate_slices)
 	{
@@ -1247,19 +1240,16 @@ template <typename T> bool reload_monochrome_image(
 				if (error__ == 2)
 				{
 					std::cout << "memory error (system)    "
-							"... reducing texture size"
-						<< std::endl;
+							"... reducing texture size" << std::endl;
 				}
 				else if (error__ == 3)
 				{
 					std::cout << "memory error (graphics)  "
-							"... reducing texture size"
-						<< std::endl;
+							"... reducing texture size" << std::endl;
 				}
 				else
 				{
-					std::cout << "error " << error__
-						<< std::endl;
+					std::cout << "error " << error__ << std::endl;
 				}
 #endif
 				isize[0] *= 0.5;
@@ -1297,9 +1287,7 @@ template <typename T> bool reload_monochrome_image(
 		ivariant->orientation = 0;
 		ivariant->orientation_string = QString("");
 	}
-	if (ivariant->equi &&
-		ivariant->orientation > 0 &&
-		!ivariant->orientation_string.isEmpty())
+	if (ivariant->equi && ivariant->orientation > 0 && !ivariant->orientation_string.isEmpty())
 	{
 		ivariant->di->origin[0] = ivariant->di->ix_origin;
 		ivariant->di->origin[1] = ivariant->di->iy_origin;
@@ -1314,7 +1302,7 @@ template<typename T> bool reload_rgb_image(
 	ImageVariant * ivariant,
 	bool disable_gen_slices = false)
 {
-	if (!ivariant||image.IsNull()) return false;
+	if (!ivariant || image.IsNull()) return false;
 	ivariant->di->skip_texture = true;
 	const bool generate_slices =
 		(!disable_gen_slices && !ivariant->di->slices_generated);
@@ -1382,8 +1370,7 @@ template<typename T> bool reload_rgba_image(
 	calculate_rgba_minmax_<T>(image, ivariant);
 	if (ivariant->equi)
 	{
-		ivariant->orientation_string = get_orientation<T>(
-			image, &ivariant->orientation);
+		ivariant->orientation_string = get_orientation<T>(image, &ivariant->orientation);
 	}
 	else
 	{
@@ -1460,6 +1447,15 @@ template<typename T> QString process_dicom_monochrome_image1(
 			while (!it.IsAtEndOfSlice())
 			{
 				const void * vbuffer = static_cast<void*>(data.at(idx_z));
+#if 1
+				if (vbuffer == nullptr)
+				{
+					*ok = false;
+					return (QString("Error, data at ") +
+						QVariant(static_cast<unsigned long long>(idx_z)).toString() +
+						QString(" is null"));
+				}
+#endif
 				const typename T::PixelType * p__ = static_cast<const typename T::PixelType*>(vbuffer);
 				while (!it.IsAtEndOfLine())
 				{
@@ -1594,16 +1590,16 @@ template<typename T> QString process_dicom_rgb_image1(
 			while (!it.IsAtEndOfSlice())
 			{
 				const void * vbuffer = static_cast<void*>(data.at(idx_z));
-				const typename T::PixelType::ValueType * p__ = static_cast<const typename T::PixelType::ValueType*>(vbuffer);
 #if 1
-				if (p__ == nullptr)
+				if (vbuffer == nullptr)
 				{
 					*ok = false;
 					return (QString("Error, data at ") +
 						QVariant(static_cast<unsigned long long>(idx_z)).toString() +
-						QString(" is null")); 
+						QString(" is null"));
 				}
 #endif
+				const typename T::PixelType::ValueType * p__ = static_cast<const typename T::PixelType::ValueType*>(vbuffer);
 				while (!it.IsAtEndOfLine())
 				{
 					typename T::PixelType p;
@@ -1798,7 +1794,7 @@ template<typename T> QString process_dicom_rgba_image1(
 					*ok = false;
 					return (QString("Error, data at ") +
 						QVariant(static_cast<unsigned long long>(idx_z)).toString() +
-						QString(" is null")); 
+						QString(" is null"));
 				}
 #endif
 				while (!it.IsAtEndOfLine())
@@ -3520,7 +3516,6 @@ QString CommonUtils::gen_itk_image(bool * ok,
 	const size_t dimy = dimy_;
 	const size_t dimz = dimz_;
 	if (data.size() < 1) return QString("data.size() < 1");
-	if (!data.at(0)) return QString("!data.at(0)");
 	short ybr{};
 	if (!skip_ybr && !use_icc)
 	{
