@@ -897,8 +897,8 @@ p, li { white-space: pre-wrap; }
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>415</width>
-            <height>208</height>
+            <width>989</width>
+            <height>587</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1000,13 +1000,6 @@ p, li { white-space: pre-wrap; }
                    </widget>
                   </item>
                   <item>
-                   <widget class="Line" name="line_5">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
                    <widget class="QLabel" name="x_label">
                     <property name="enabled">
                      <bool>false</bool>
@@ -1018,7 +1011,10 @@ p, li { white-space: pre-wrap; }
                      </sizepolicy>
                     </property>
                     <property name="text">
-                     <string>X:</string>
+                     <string> X:</string>
+                    </property>
+                    <property name="textFormat">
+                     <enum>Qt::PlainText</enum>
                     </property>
                    </widget>
                   </item>
@@ -1042,13 +1038,6 @@ p, li { white-space: pre-wrap; }
                    </widget>
                   </item>
                   <item>
-                   <widget class="Line" name="line">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
                    <widget class="QLabel" name="y_label">
                     <property name="enabled">
                      <bool>false</bool>
@@ -1060,7 +1049,10 @@ p, li { white-space: pre-wrap; }
                      </sizepolicy>
                     </property>
                     <property name="text">
-                     <string>Y:</string>
+                     <string> Y:</string>
+                    </property>
+                    <property name="textFormat">
+                     <enum>Qt::PlainText</enum>
                     </property>
                    </widget>
                   </item>
