@@ -1316,7 +1316,9 @@ template<typename T> void load_image(
 #if 0
 	std::cout << num_threads << " threads" << std::endl;
 #endif
+#if 0
 	const auto start2{ now() };
+#endif
 #endif
 	if (tmp99 == 0)
 	{
@@ -1403,8 +1405,10 @@ template<typename T> void load_image(
 		if (b__ == threadsLUT_size) break;
 	}
 #ifdef A_TMP_BENCHMARK
+#if 0
 	const std::chrono::duration<double, std::milli> elapsed2{ now() - start2 };
-	std::cout << "spent for image " << elapsed2.count() << " ms, w_times = " << w_times << std::endl;
+	std::cout << "spent for image " << elapsed2.count() << " ms" << std::endl;
+#endif
 #endif
 	for (size_t i = 0; i < threadsLUT_size; ++i)
 	{
