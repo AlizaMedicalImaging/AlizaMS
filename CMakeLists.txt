@@ -407,7 +407,8 @@ set(MDCM_COMMON_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmFilename.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmFilenameGenerator.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmSwapCode.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmSystem.cxx)
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmSystem.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/Common/mdcmUnpacker12Bits.cxx)
 
 if(WIN32)
   set(MDCM_COMMON_SRCS ${MDCM_COMMON_SRCS}
