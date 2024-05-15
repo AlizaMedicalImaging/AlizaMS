@@ -3543,13 +3543,10 @@ QString CommonUtils::gen_itk_image(bool * ok,
 	// monochrome
 	if (pixelformat.GetSamplesPerPixel() == 1)
 	{
-		// INT12 and UINT12 can work only with some buggy encapsulated files,
-		// otherwise should not reach this point.
+		// INT12 and UINT12 should be already converted or don't reach this point
 		switch (pixelformat)
 		{
-#if 1
 		case mdcm::PixelFormat::INT12:
-#endif
 		case mdcm::PixelFormat::INT16:
 			{
 				bool bad_direction{true};
@@ -3572,9 +3569,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					bad_direction);
 			}
 			break;
-#if 1
 		case mdcm::PixelFormat::UINT12:
-#endif
 		case mdcm::PixelFormat::UINT16:
 			{
 				bool bad_direction{true};
