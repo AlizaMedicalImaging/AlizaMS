@@ -1279,8 +1279,7 @@ template <typename T> bool reload_monochrome_image(
 	}
 	if (ivariant->equi)
 	{
-		ivariant->orientation_string = get_orientation<T>(
-			image, &ivariant->orientation);
+		ivariant->orientation_string = get_orientation<T>(image, &ivariant->orientation);
 	}
 	else
 	{
@@ -1304,10 +1303,8 @@ template<typename T> bool reload_rgb_image(
 {
 	if (!ivariant || image.IsNull()) return false;
 	ivariant->di->skip_texture = true;
-	const bool generate_slices =
-		(!disable_gen_slices && !ivariant->di->slices_generated);
-	const bool calc_center =
-		(!disable_gen_slices && !ivariant->di->slices_generated);
+	const bool generate_slices = (!disable_gen_slices && !ivariant->di->slices_generated);
+	const bool calc_center = (!disable_gen_slices && !ivariant->di->slices_generated);
 	get_dimensions<T>(
 		image,
 		&(ivariant->di->idimx),
@@ -1328,8 +1325,7 @@ template<typename T> bool reload_rgb_image(
 	calculate_rgb_minmax_<T>(image, ivariant);
 	if (ivariant->equi)
 	{
-		ivariant->orientation_string = get_orientation<T>(
-			image, &ivariant->orientation);
+		ivariant->orientation_string = get_orientation<T>(image, &ivariant->orientation);
 	}
 	else
 	{
@@ -1346,10 +1342,8 @@ template<typename T> bool reload_rgba_image(
 {
 	if (!ivariant||image.IsNull()) return false;
 	ivariant->di->skip_texture = true;
-	const bool generate_slices =
-		(!disable_gen_slices && !ivariant->di->slices_generated);
-	const bool calc_center =
-		(!disable_gen_slices && !ivariant->di->slices_generated);
+	const bool generate_slices = (!disable_gen_slices && !ivariant->di->slices_generated);
+	const bool calc_center = (!disable_gen_slices && !ivariant->di->slices_generated);
 	get_dimensions<T>(
 		image,
 		&(ivariant->di->idimx),
@@ -1378,6 +1372,13 @@ template<typename T> bool reload_rgba_image(
 		ivariant->orientation_string = QString("");
 	}
 	return true;
+}
+
+QString print_idx_z_error(size_t idx_z)
+{
+	return (QString("Error, data at ") +
+		QVariant(static_cast<unsigned long long>(idx_z)).toString() +
+		QString(" is null"));
 }
 
 template<typename T> QString process_dicom_monochrome_image1(
@@ -1450,9 +1451,7 @@ template<typename T> QString process_dicom_monochrome_image1(
 				if (vbuffer == nullptr)
 				{
 					*ok = false;
-					return (QString("Error, data at ") +
-						QVariant(static_cast<unsigned long long>(idx_z)).toString() +
-						QString(" is null"));
+					return print_idx_z_error(idx_z);
 				}
 #endif
 				const typename T::PixelType * p__ = static_cast<const typename T::PixelType*>(vbuffer);
@@ -1592,9 +1591,7 @@ template<typename T> QString process_dicom_rgb_image1(
 				if (vbuffer == nullptr)
 				{
 					*ok = false;
-					return (QString("Error, data at ") +
-						QVariant(static_cast<unsigned long long>(idx_z)).toString() +
-						QString(" is null"));
+					return print_idx_z_error(idx_z);
 				}
 #endif
 				const typename T::PixelType::ValueType * p__ = static_cast<const typename T::PixelType::ValueType*>(vbuffer);
@@ -1789,9 +1786,7 @@ template<typename T> QString process_dicom_rgba_image1(
 				if (p__ == nullptr)
 				{
 					*ok = false;
-					return (QString("Error, data at ") +
-						QVariant(static_cast<unsigned long long>(idx_z)).toString() +
-						QString(" is null"));
+					return print_idx_z_error(idx_z);
 				}
 #endif
 				while (!it.IsAtEndOfLine())
@@ -1848,10 +1843,10 @@ template<typename T> QString process_dicom_rgba_image1(
 						const float tmp_max = 255.0f;
 						const float alpha = static_cast<float>(p__[j + 3]) / tmp_max;
 						const float one_minus_alpha = 1.0f - alpha;
-						const float tmp_oth = one_minus_alpha*0;
-						const float tmp_red = tmp_oth + alpha*static_cast<float>(p__[j]);
-						const float tmp_gre = tmp_oth + alpha*static_cast<float>(p__[j + 1]);
-						const float tmp_blu = tmp_oth + alpha*static_cast<float>(p__[j + 2]);
+						const float tmp_oth = one_minus_alpha * 0.0f;
+						const float tmp_red = tmp_oth + alpha * static_cast<float>(p__[j]);
+						const float tmp_gre = tmp_oth + alpha * static_cast<float>(p__[j + 1]);
+						const float tmp_blu = tmp_oth + alpha * static_cast<float>(p__[j + 2]);
 						p[0] = static_cast<typename T::PixelType::ValueType>((tmp_red / tmp_max) * 255.0f);
 						p[1] = static_cast<typename T::PixelType::ValueType>((tmp_gre / tmp_max) * 255.0f);
 						p[2] = static_cast<typename T::PixelType::ValueType>((tmp_blu / tmp_max) * 255.0f);
@@ -2003,7 +1998,7 @@ template<typename T> double get_value(
 	const int y,
 	const int z)
 {
-	if (image.IsNull()) return 0;
+	if (image.IsNull()) return 0.0;
 	typename T::IndexType idx;
 	idx[0] = x;
 	idx[1] = y;
