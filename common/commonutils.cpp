@@ -1444,16 +1444,16 @@ template<typename T> QString process_dicom_monochrome_image1(
 		it.GoToBegin();
 		while (!it.IsAtEnd())
 		{
+			const void * vbuffer = static_cast<void*>(data.at(idx_z));
+#if 1
+			if (vbuffer == nullptr)
+			{
+				*ok = false;
+				return print_idx_z_error(idx_z);
+			}
+#endif
 			while (!it.IsAtEndOfSlice())
 			{
-				const void * vbuffer = static_cast<void*>(data.at(idx_z));
-#if 1
-				if (vbuffer == nullptr)
-				{
-					*ok = false;
-					return print_idx_z_error(idx_z);
-				}
-#endif
 				const typename T::PixelType * p__ = static_cast<const typename T::PixelType*>(vbuffer);
 				while (!it.IsAtEndOfLine())
 				{
@@ -1584,17 +1584,18 @@ template<typename T> QString process_dicom_rgb_image1(
 		it.GoToBegin();
 		while (!it.IsAtEnd())
 		{
+			const void * vbuffer = static_cast<void*>(data.at(idx_z));
+#if 1
+			if (vbuffer == nullptr)
+			{
+				*ok = false;
+				return print_idx_z_error(idx_z);
+			}
+#endif
+			const typename T::PixelType::ValueType * p__ =
+				static_cast<const typename T::PixelType::ValueType*>(vbuffer);
 			while (!it.IsAtEndOfSlice())
 			{
-				const void * vbuffer = static_cast<void*>(data.at(idx_z));
-#if 1
-				if (vbuffer == nullptr)
-				{
-					*ok = false;
-					return print_idx_z_error(idx_z);
-				}
-#endif
-				const typename T::PixelType::ValueType * p__ = static_cast<const typename T::PixelType::ValueType*>(vbuffer);
 				while (!it.IsAtEndOfLine())
 				{
 					typename T::PixelType p;
@@ -1778,17 +1779,17 @@ template<typename T> QString process_dicom_rgba_image1(
 		it.GoToBegin();
 		while (!it.IsAtEnd())
 		{
+			const typename T::PixelType::ValueType * p__ =
+				reinterpret_cast<typename T::PixelType::ValueType*>(data.at(idx_z));
+#if 1
+			if (p__ == nullptr)
+			{
+				*ok = false;
+				return print_idx_z_error(idx_z);
+			}
+#endif
 			while (!it.IsAtEndOfSlice())
 			{
-				const typename T::PixelType::ValueType * p__ =
-					reinterpret_cast<typename T::PixelType::ValueType*>(data.at(idx_z));
-#if 1
-				if (p__ == nullptr)
-				{
-					*ok = false;
-					return print_idx_z_error(idx_z);
-				}
-#endif
 				while (!it.IsAtEndOfLine())
 				{
 					typename T::PixelType p;
@@ -1863,10 +1864,10 @@ template<typename T> QString process_dicom_rgba_image1(
 					j += 4;
 					++it;
 				}
-				j = 0;
-				++idx_z;
 				it.NextLine();
 			}
+			j = 0;
+			++idx_z;
 			it.NextSlice();
 		}
 	}
