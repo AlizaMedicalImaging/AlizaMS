@@ -25,19 +25,19 @@
 namespace mdcm
 {
 
+// http://groups.google.com/group/comp.lang.c/msg/572bc9b085c717f3
 bool Unpacker12Bits::Unpack(char * out, const char * in, size_t n)
 {
   if (n % 3 != 0)
     return false; // 3 bytes are actually 2 words
-  // http://groups.google.com/group/comp.lang.c/msg/572bc9b085c717f3
   short * q = static_cast<short*>(static_cast<void*>(out));
   const unsigned char * p = reinterpret_cast<const unsigned char*>(in);
   const unsigned char * end = p + n;
   while (p != end)
   {
-    unsigned char b0 = *p++;
-    unsigned char b1 = *p++;
-    unsigned char b2 = *p++;
+    const unsigned char b0 = *p++;
+    const unsigned char b1 = *p++;
+    const unsigned char b2 = *p++;
     *q++ = static_cast<short>(((b1 & 0xf) << 8) + b0);
     *q++ = static_cast<short>((b1 >> 4) + (b2 << 4));
   }
@@ -53,8 +53,8 @@ bool Unpacker12Bits::Pack(char * out, const char * in, size_t n)
   const unsigned short * end = static_cast<const unsigned short*>(static_cast<const void*>(in + n));
   while (p != end)
   {
-    unsigned short b0 = *p++;
-    unsigned short b1 = *p++;
+    const unsigned short b0 = *p++;
+    const unsigned short b1 = *p++;
     *q++ = static_cast<unsigned char>(b0 & 0xff);
     *q++ = static_cast<unsigned char>((b0 >> 8) + ((b1 & 0xf) << 4));
     *q++ = static_cast<unsigned char>(b1 >> 4);
