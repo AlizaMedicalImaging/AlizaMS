@@ -24,40 +24,13 @@
 #include "mdcmByteSwap.h"
 #include "mdcmDataElement.h"
 #include "mdcmSequenceOfFragments.h"
+#include "mdcmUnpacker12Bits.h"
 #include <limits>
 #include <sstream>
 #include <cstring>
 
 namespace mdcm
 {
-
-// Unpack an array of 'packed' 12bits data into a more conventional 16bits
-// array. n is the length in bytes of array in, out will be a 16bits
-// array of size (n / 3) * 2
-static bool
-Unpack12Bits(char * out, const char * in, size_t n)
-{
-  // 3 bytes = 2 words
-  // http://groups.google.com/group/comp.lang.c/msg/572bc9b085c717f3
-  if (n % 3)
-  {
-    return false;
-  }
-  void *                vout = static_cast<void*>(out);
-  const void *          vin = static_cast<const void*>(in);
-  short *               q = static_cast<short *>(vout);
-  const unsigned char * p = static_cast<const unsigned char *>(vin);
-  const unsigned char * end = p + n;
-  while (p != end)
-  {
-    const unsigned char b0 = *p++;
-    const unsigned char b1 = *p++;
-    const unsigned char b2 = *p++;
-    *q++ = static_cast<short>(((b1 & 0xf) << 8) + b0);
-    *q++ = static_cast<short>((b1 >> 4) + (b2 << 4));
-  }
-  return true;
-}
 
 bool
 RAWCodec::CanCode(const TransferSyntax & ts) const
@@ -124,7 +97,7 @@ RAWCodec::Decode(const DataElement & in, DataElement & out)
     {
       return false;
     }
-    const bool b = Unpack12Bits(copy, str.data(), str.size());
+    const bool b = Unpacker12Bits::Unpack(copy, str.data(), str.size());
     if (!b)
     {
       delete[] copy;
@@ -206,7 +179,7 @@ RAWCodec::DecodeBytes(const char * inBytes, size_t inBufferLength, char * outByt
     {
       return false;
     }
-    const bool b = Unpack12Bits(copy, str.data(), str.size());
+    const bool b = Unpacker12Bits::Unpack(copy, str.data(), str.size());
     if (!b)
     {
       delete[] copy;
