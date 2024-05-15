@@ -3505,10 +3505,11 @@ QString CommonUtils::gen_itk_image(bool * ok,
 {
 	*ok = false;
 	QString error;
+	const QString not_supported("Pixel format is not supported");
 	const size_t dimx = dimx_;
 	const size_t dimy = dimy_;
 	const size_t dimz = dimz_;
-	if (data.size() < 1) return QString("data.size() < 1");
+	if (data.size() < 1) return QString("Invalid data");
 	short ybr{};
 	if (!skip_ybr && !use_icc)
 	{
@@ -3530,7 +3531,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 #ifdef ALIZA_VERBOSE
 	if (argb)
 	{
-		std::cout << "DICOM ARGB can be opened incorrectly" << std::endl;
+		std::cout << "DICOM ARGB will be opened incorrectly" << std::endl;
 	}
 #endif
 	const unsigned short bits_allocated = pixelformat.GetBitsAllocated();
@@ -3542,9 +3543,13 @@ QString CommonUtils::gen_itk_image(bool * ok,
 	// monochrome
 	if (pixelformat.GetSamplesPerPixel() == 1)
 	{
+		// INT12 and UINT12 can work only with some buggy encapsulated files,
+		// otherwise should not reach this point.
 		switch (pixelformat)
 		{
+#if 1
 		case mdcm::PixelFormat::INT12:
+#endif
 		case mdcm::PixelFormat::INT16:
 			{
 				bool bad_direction{true};
@@ -3567,7 +3572,9 @@ QString CommonUtils::gen_itk_image(bool * ok,
 					bad_direction);
 			}
 			break;
+#if 1
 		case mdcm::PixelFormat::UINT12:
+#endif
 		case mdcm::PixelFormat::UINT16:
 			{
 				bool bad_direction{true};
@@ -3748,6 +3755,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 			}
 			break;
 		default:
+			error = not_supported;
 			break;
 		}
 	}
@@ -3761,112 +3769,114 @@ QString CommonUtils::gen_itk_image(bool * ok,
 	//
 	else if (pixelformat.GetSamplesPerPixel() == 3)
 	{
-		if (pixelformat == mdcm::PixelFormat::UINT8 ||
-			pixelformat == mdcm::PixelFormat::INT8)
+		switch (pixelformat)
 		{
-			const int bitsstored = pixelformat.GetBitsStored();
-			bool bad_direction{true};
-			error = process_dicom_rgb_image1<RGBImageTypeUC>(
-				ok,
-				ivariant,
-				ivariant->pUC_rgb,
-				data,
-				direction,
-				dimx, dimy, dimz,
-				origin_x, origin_y, origin_z,
-				spacing_x, spacing_y, spacing_z,
-				14,
-				ybr,
-				hsv,
-				bitsstored,
-				&bad_direction);
-			if (!error.isEmpty()) return error;
-			process_dicom_rgb_image2<RGBImageTypeUC>(
-				ivariant,
-				ivariant->pUC_rgb,
-				geometry_from_image,
-				bad_direction);
-		}
-		else if (
-			pixelformat == mdcm::PixelFormat::UINT16 ||
-			pixelformat == mdcm::PixelFormat::UINT12)
-		{
-			const int bitsstored = pixelformat.GetBitsStored();
-			bool bad_direction{true};
-			error = process_dicom_rgb_image1<RGBImageTypeUS>(
-				ok,
-				ivariant,
-				ivariant->pUS_rgb,
-				data,
-				direction,
-				dimx, dimy, dimz,
-				origin_x, origin_y, origin_z,
-				spacing_x, spacing_y, spacing_z,
-				11,
-				ybr,
-				false,
-				bitsstored,
-				&bad_direction);
-			if (!error.isEmpty()) return error;
-			process_dicom_rgb_image2<RGBImageTypeUS>(
-				ivariant,
-				ivariant->pUS_rgb,
-				geometry_from_image,
-				bad_direction);
-		}
-		else if (
-			pixelformat == mdcm::PixelFormat::INT16 ||
-			pixelformat == mdcm::PixelFormat::INT12)
-		{
-			bool bad_direction{true};
-			error = process_dicom_rgb_image1<RGBImageTypeSS>(
-				ok,
-				ivariant,
-				ivariant->pSS_rgb,
-				data,
-				direction,
-				dimx, dimy, dimz,
-				origin_x, origin_y, origin_z,
-				spacing_x, spacing_y, spacing_z,
-				10,
-				false,
-				false,
-				0,
-				&bad_direction);
-			if (!error.isEmpty()) return error;
-			process_dicom_rgb_image2<RGBImageTypeSS>(
-				ivariant,
-				ivariant->pSS_rgb,
-				geometry_from_image,
-				bad_direction);
-		}
-		else if (pixelformat == mdcm::PixelFormat::FLOAT32)
-		{
-			bool bad_direction{true};
-			error = process_dicom_rgb_image1<RGBImageTypeF>(
-				ok,
-				ivariant,
-				ivariant->pF_rgb,
-				data,
-				direction,
-				dimx, dimy, dimz,
-				origin_x, origin_y, origin_z,
-				spacing_x, spacing_y, spacing_z,
-				15,
-				false,
-				false,
-				0,
-				&bad_direction);
-			if (!error.isEmpty()) return error;
-			process_dicom_rgb_image2<RGBImageTypeF>(
-				ivariant,
-				ivariant->pF_rgb,
-				geometry_from_image,
-				bad_direction);
-		}
-		else
-		{
-			error = QString("pixelformat not supported");
+		case mdcm::PixelFormat::UINT8:
+		case mdcm::PixelFormat::INT8:
+			{
+				const int bitsstored = pixelformat.GetBitsStored();
+				bool bad_direction{true};
+				error = process_dicom_rgb_image1<RGBImageTypeUC>(
+					ok,
+					ivariant,
+					ivariant->pUC_rgb,
+					data,
+					direction,
+					dimx, dimy, dimz,
+					origin_x, origin_y, origin_z,
+					spacing_x, spacing_y, spacing_z,
+					14,
+					ybr,
+					hsv,
+					bitsstored,
+					&bad_direction);
+				if (!error.isEmpty()) return error;
+				process_dicom_rgb_image2<RGBImageTypeUC>(
+					ivariant,
+					ivariant->pUC_rgb,
+					geometry_from_image,
+					bad_direction);
+			}
+			break;
+		case mdcm::PixelFormat::UINT16:
+			{
+				const int bitsstored = pixelformat.GetBitsStored();
+				bool bad_direction{true};
+				error = process_dicom_rgb_image1<RGBImageTypeUS>(
+					ok,
+					ivariant,
+					ivariant->pUS_rgb,
+					data,
+					direction,
+					dimx, dimy, dimz,
+					origin_x, origin_y, origin_z,
+					spacing_x, spacing_y, spacing_z,
+					11,
+					ybr,
+					false,
+					bitsstored,
+					&bad_direction);
+				if (!error.isEmpty()) return error;
+				process_dicom_rgb_image2<RGBImageTypeUS>(
+					ivariant,
+					ivariant->pUS_rgb,
+					geometry_from_image,
+					bad_direction);
+			}
+			break;
+		case mdcm::PixelFormat::INT16:
+			{
+				bool bad_direction{true};
+				error = process_dicom_rgb_image1<RGBImageTypeSS>(
+					ok,
+					ivariant,
+					ivariant->pSS_rgb,
+					data,
+					direction,
+					dimx, dimy, dimz,
+					origin_x, origin_y, origin_z,
+					spacing_x, spacing_y, spacing_z,
+					10,
+					false,
+					false,
+					0,
+					&bad_direction);
+				if (!error.isEmpty()) return error;
+				process_dicom_rgb_image2<RGBImageTypeSS>(
+					ivariant,
+					ivariant->pSS_rgb,
+					geometry_from_image,
+					bad_direction);
+			}
+			break;
+		case mdcm::PixelFormat::FLOAT32:
+			{
+				bool bad_direction{true};
+				error = process_dicom_rgb_image1<RGBImageTypeF>(
+					ok,
+					ivariant,
+					ivariant->pF_rgb,
+					data,
+					direction,
+					dimx, dimy, dimz,
+					origin_x, origin_y, origin_z,
+					spacing_x, spacing_y, spacing_z,
+					15,
+					false,
+					false,
+					0,
+					&bad_direction);
+				if (!error.isEmpty()) return error;
+				process_dicom_rgb_image2<RGBImageTypeF>(
+					ivariant,
+					ivariant->pF_rgb,
+					geometry_from_image,
+					bad_direction);
+			}
+			break;
+		default:
+			error = not_supported;
+			break;
 		}
 		if (error.isEmpty() && skip_ybr &&
 			(pi == mdcm::PhotometricInterpretation::YBR_FULL_422 ||
@@ -3883,43 +3893,45 @@ QString CommonUtils::gen_itk_image(bool * ok,
 	// available.
 	else if (pixelformat.GetSamplesPerPixel() == 4)
 	{
-#define USE_4SAMPLES_PER_PIXEL
-#ifdef USE_4SAMPLES_PER_PIXEL
-		if (pixelformat == mdcm::PixelFormat::UINT8 ||
-			pixelformat == mdcm::PixelFormat::INT8)
+#if 1
+		switch (pixelformat)
 		{
-			bool bad_direction{true};
-			error = process_dicom_rgba_image1<RGBAImageTypeUC>(
-				ok,
-				ivariant,
-				ivariant->pUC_rgba,
-				data,
-				direction,
-				dimx, dimy, dimz,
-				origin_x, origin_y, origin_z,
-				spacing_x, spacing_y, spacing_z,
-				24,
-				cmyk,
-				argb,
-				&bad_direction);
-			if (!error.isEmpty()) return error;
-			process_dicom_rgba_image2<RGBAImageTypeUC>(
-				ivariant,
-				ivariant->pUC_rgba,
-				geometry_from_image,
-				bad_direction);
-		}
-		else
-		{
-			error = QString("pixelformat not supported");
+		case mdcm::PixelFormat::UINT8:
+		case mdcm::PixelFormat::INT8:
+			{
+				bool bad_direction{true};
+				error = process_dicom_rgba_image1<RGBAImageTypeUC>(
+					ok,
+					ivariant,
+					ivariant->pUC_rgba,
+					data,
+					direction,
+					dimx, dimy, dimz,
+					origin_x, origin_y, origin_z,
+					spacing_x, spacing_y, spacing_z,
+					24,
+					cmyk,
+					argb,
+					&bad_direction);
+				if (!error.isEmpty()) return error;
+				process_dicom_rgba_image2<RGBAImageTypeUC>(
+					ivariant,
+					ivariant->pUC_rgba,
+					geometry_from_image,
+					bad_direction);
+			}
+			break;
+		default:
+			error = not_supported;
+			break;
 		}
 #else
-		error = QString("4 samples per pixel disabled for DICOM files");
+		error = not_supported;
 #endif
 	}
 	else
 	{
-		error = QString("pixelformat not supported");
+		error = not_supported;
 	}
 	//
 	// overtwrite orientation, it may be default and wrong
@@ -3928,8 +3940,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 		ivariant->orientation = 0;
 		ivariant->orientation_string = QString("");
 	}
-	if (ivariant->image_type >= 0 && ivariant->image_type < 10 &&
-		!no_warn_rescale)
+	if (ivariant->image_type >= 0 && ivariant->image_type < 10 && !no_warn_rescale)
 	{
 		ivariant->rescale_disabled = true;
 	}
@@ -3937,7 +3948,7 @@ QString CommonUtils::gen_itk_image(bool * ok,
 	{
 		ivariant->di->hide_orientation = false;
 	}
-	if (error.isEmpty()) *ok = true; // TODO remove "ok"
+	if (error.isEmpty()) *ok = true;
 	return error;
 }
 
