@@ -564,9 +564,9 @@ template<typename T> void load_rgb_image(
 					const double b = iterator.Get().GetBlue();
 					const double g = iterator.Get().GetGreen();
 					const double r = iterator.Get().GetRed();
-					p__[j_ + 2] = static_cast<unsigned char>(255.0 *((b + (-vmin)) / vrange));
-					p__[j_ + 1] = static_cast<unsigned char>(255.0 *((g + (-vmin)) / vrange));
-					p__[j_ + 0] = static_cast<unsigned char>(255.0 *((r + (-vmin)) / vrange));
+					p__[j_ + 2] = static_cast<unsigned char>(255.0 * ((b + (-vmin)) / vrange));
+					p__[j_ + 1] = static_cast<unsigned char>(255.0 * ((g + (-vmin)) / vrange));
+					p__[j_ + 0] = static_cast<unsigned char>(255.0 * ((r + (-vmin)) / vrange));
 					j_ += 3;
 					++iterator;
 				}
@@ -577,28 +577,37 @@ template<typename T> void load_rgb_image(
 			}
 		}
 	}
+	//
+	{
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	QImage tmpi(p__, size[0], size[1], 3 * size[0], QImage::Format_RGB888, gImageCleanupHandler, p__);
+		QImage tmpi(p__, size[0], size[1], 3 * size[0], QImage::Format_RGB888, gImageCleanupHandler, p__);
 #else
-	QImage tmpi(p__, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
+		QImage tmpi(p__, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
 #endif
-	//
-	if (axis == 2)
-	{
-		if (widget->get_enable_overlays())
-			GraphicsUtils::draw_overlays(ivariant, tmpi);
-	}
-	else
-	{
-		if (!ivariant->equi||ivariant->orientation_string.isEmpty())
-			GraphicsUtils::draw_cross_out(tmpi);
-	}
-	//
+		if (axis == 2)
+		{
+			if (widget->get_enable_overlays())
+				GraphicsUtils::draw_overlays(ivariant, tmpi);
+		}
+		else
+		{
+			if (!ivariant->equi || ivariant->orientation_string.isEmpty())
+				GraphicsUtils::draw_cross_out(tmpi);
+		}
 #if QT_VERSION < QT_VERSION_CHECK(5,3,0)
-	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(tmpi));
+		widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(tmpi));
 #else
-	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(std::move(tmpi)));
+		widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(std::move(tmpi)));
 #endif
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+		tmpi = QImage();
+		if (p__)
+		{
+			delete [] p__;
+			p__ = nullptr;
+		}
+#endif
+	}
 	//
 	GraphicsUtils::gen_labels(
 		axis, hide_orientation,
@@ -629,15 +638,6 @@ template<typename T> void load_rgb_image(
 	widget->set_top_label_text(top_string);
 	widget->set_left_label_text(left_string);
 	widget->graphicsview->setTransform(t);
-	//
-#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-	tmpi = QImage();
-	if (p__)
-	{
-		delete [] p__;
-		p__ = nullptr;
-	}
-#endif
 }
 
 template<typename T> void load_rgba_image(
@@ -701,68 +701,38 @@ template<typename T> void load_rgba_image(
 	{
 		scale__ = widget->graphicsview->m_scale;
 	}
+	const bool hide_orientation = ivariant->di->hide_orientation;
 	//
-	const unsigned short bits_allocated   = ivariant->di->bits_allocated;
-	const unsigned short bits_stored      = ivariant->di->bits_stored;
-	const bool           hide_orientation = ivariant->di->hide_orientation;
-	//
-	unsigned long long j_ = 0;
-	unsigned char * p__;
+	{
+		const unsigned short bits_allocated = ivariant->di->bits_allocated;
+		const unsigned short bits_stored    = ivariant->di->bits_stored;
+		unsigned long long j_ = 0;
+		unsigned char * p__;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	try
-	{
-		p__ = new unsigned char[size[0] * size[1] * 4];
-	}
-	catch (const std::bad_alloc&)
-	{
-		return;
-	}
-	if (image_type == 21)
-	{
-		const double tmp_max =
-			(bits_allocated > 0 && bits_stored > 0 && bits_stored < bits_allocated)
-				? pow(2, bits_stored) - 1
-				: static_cast<double>(USHRT_MAX);
 		try
 		{
-			itk::ImageRegionConstIterator<T> iterator(image, region);
-			iterator.GoToBegin();
-			while (!iterator.IsAtEnd())
-			{
-				p__[j_ + 3] = static_cast<unsigned char>((iterator.Get().GetAlpha() / tmp_max) * 255.0);
-				p__[j_ + 2] = static_cast<unsigned char>((iterator.Get().GetBlue()  / tmp_max) * 255.0);
-				p__[j_ + 1] = static_cast<unsigned char>((iterator.Get().GetGreen() / tmp_max) * 255.0);
-				p__[j_ + 0] = static_cast<unsigned char>((iterator.Get().GetRed()   / tmp_max) * 255.0);
-				j_ += 4;
-				++iterator;
-			}
+			p__ = new unsigned char[size[0] * size[1] * 4];
 		}
-		catch (const itk::ExceptionObject &)
+		catch (const std::bad_alloc&)
 		{
-			;
+			return;
 		}
-	}
-	else
-	{
-		const double vmin = ivariant->di->vmin;
-		const double vmax = ivariant->di->vmax;
-		const double vrange = vmax - vmin;
-		if (vrange > 0.0)
+		if (image_type == 21)
 		{
+			const double tmp_max =
+				(bits_allocated > 0 && bits_stored > 0 && bits_stored < bits_allocated)
+					? pow(2, bits_stored) - 1
+					: static_cast<double>(USHRT_MAX);
 			try
 			{
 				itk::ImageRegionConstIterator<T> iterator(image, region);
 				iterator.GoToBegin();
-				while(!iterator.IsAtEnd())
+				while (!iterator.IsAtEnd())
 				{
-					const double a = iterator.Get().GetAlpha();
-					const double b = iterator.Get().GetBlue();
-					const double g = iterator.Get().GetGreen();
-					const double r = iterator.Get().GetRed();
-					p__[j_ + 3] = static_cast<unsigned char>(255.0 * ((a + (-vmin)) / vrange));
-					p__[j_ + 2] = static_cast<unsigned char>(255.0 * ((b + (-vmin)) / vrange));
-					p__[j_ + 1] = static_cast<unsigned char>(255.0 * ((g + (-vmin)) / vrange));
-					p__[j_ + 0] = static_cast<unsigned char>(255.0 * ((r + (-vmin)) / vrange));
+					p__[j_ + 3] = static_cast<unsigned char>((iterator.Get().GetAlpha() / tmp_max) * 255.0);
+					p__[j_ + 2] = static_cast<unsigned char>((iterator.Get().GetBlue()  / tmp_max) * 255.0);
+					p__[j_ + 1] = static_cast<unsigned char>((iterator.Get().GetGreen() / tmp_max) * 255.0);
+					p__[j_ + 0] = static_cast<unsigned char>((iterator.Get().GetRed()   / tmp_max) * 255.0);
 					j_ += 4;
 					++iterator;
 				}
@@ -772,80 +742,70 @@ template<typename T> void load_rgba_image(
 				;
 			}
 		}
-	}
-	QImage tmpi(p__, size[0], size[1], 4 * size[0], QImage::Format_RGBA8888, gImageCleanupHandler, p__);
-#else
-	try
-	{
-		p__ = new unsigned char[size[0] * size[1] * 3];
-	}
-	catch (const std::bad_alloc&)
-	{
-		return;
-	}
-	if (image_type == 21)
-	{
-		const double tmp_max =
-			(bits_allocated > 0 && bits_stored > 0 && bits_stored < bits_allocated)
-				? pow(2, bits_stored) - 1
-				: static_cast<double>(USHRT_MAX);
-		try
+		else
 		{
-			itk::ImageRegionConstIterator<T> iterator(image, region);
-			iterator.GoToBegin();
-			while (!iterator.IsAtEnd())
+			const double vmin = ivariant->di->vmin;
+			const double vmax = ivariant->di->vmax;
+			const double vrange = vmax - vmin;
+			if (vrange > 0.0)
 			{
-				if (iterator.Get().GetAlpha() > 0)
+				try
 				{
-					const double alpha = iterator.Get().GetAlpha() / tmp_max;
-					const double one_minus_alpha = 1.0 - alpha;
-					const double tmp_whi = one_minus_alpha * USHRT_MAX;
-					const double tmp_red = tmp_whi + alpha * iterator.Get().GetRed();
-					const double tmp_gre = tmp_whi + alpha * iterator.Get().GetGreen();
-					const double tmp_blu = tmp_whi + alpha * iterator.Get().GetBlue();
-					p__[j_ + 2] = static_cast<unsigned char>((tmp_blu / tmp_max) * 255.0);
-					p__[j_ + 1] = static_cast<unsigned char>((tmp_gre / tmp_max) * 255.0);
-					p__[j_ + 0] = static_cast<unsigned char>((tmp_red / tmp_max) * 255.0);
+					itk::ImageRegionConstIterator<T> iterator(image, region);
+					iterator.GoToBegin();
+					while(!iterator.IsAtEnd())
+					{
+						const double a = iterator.Get().GetAlpha();
+						const double b = iterator.Get().GetBlue();
+						const double g = iterator.Get().GetGreen();
+						const double r = iterator.Get().GetRed();
+						p__[j_ + 3] = static_cast<unsigned char>(255.0 * ((a + (-vmin)) / vrange));
+						p__[j_ + 2] = static_cast<unsigned char>(255.0 * ((b + (-vmin)) / vrange));
+						p__[j_ + 1] = static_cast<unsigned char>(255.0 * ((g + (-vmin)) / vrange));
+						p__[j_ + 0] = static_cast<unsigned char>(255.0 * ((r + (-vmin)) / vrange));
+						j_ += 4;
+						++iterator;
+					}
 				}
-				else
+				catch (const itk::ExceptionObject &)
 				{
-					p__[j_ + 2] = 255;
-					p__[j_ + 1] = 255;
-					p__[j_ + 0] = 255;
+					;
 				}
-				j_ += 3;
-				++iterator;
 			}
 		}
-		catch (const itk::ExceptionObject &)
+		QImage tmpi(p__, size[0], size[1], 4 * size[0], QImage::Format_RGBA8888, gImageCleanupHandler, p__);
+#else
+		try
 		{
-			;
+			p__ = new unsigned char[size[0] * size[1] * 3];
 		}
-	}
-	else
-	{
-		const double vmin = ivariant->di->vmin;
-		const double vmax = ivariant->di->vmax;
-		const double vrange = vmax - vmin;
-		if (vrange > 0.0)
+		catch (const std::bad_alloc&)
 		{
+			return;
+		}
+		if (image_type == 21)
+		{
+			const double tmp_max =
+				(bits_allocated > 0 && bits_stored > 0 && bits_stored < bits_allocated)
+					? pow(2, bits_stored) - 1
+					: static_cast<double>(USHRT_MAX);
 			try
 			{
 				itk::ImageRegionConstIterator<T> iterator(image, region);
 				iterator.GoToBegin();
-				while(!iterator.IsAtEnd())
+				while (!iterator.IsAtEnd())
 				{
-					const double alpha = iterator.Get().GetAlpha() / vrange;
-					const double one_minus_alpha = 1.0 - alpha;
-					const double tmp_whi = one_minus_alpha * vrange;
-					const double tmp_red = tmp_whi + alpha*iterator.Get().GetRed();
-					const double tmp_gre = tmp_whi + alpha*iterator.Get().GetGreen();
-					const double tmp_blu = tmp_whi + alpha*iterator.Get().GetBlue();
-					if (alpha > 0)
+					if (iterator.Get().GetAlpha() > 0)
 					{
-						p__[j_ + 2] = static_cast<unsigned char>((tmp_blu / vrange) * 255.0);
-						p__[j_ + 1] = static_cast<unsigned char>((tmp_gre / vrange) * 255.0);
-						p__[j_ + 0] = static_cast<unsigned char>((tmp_red / vrange) * 255.0);
+						const double alpha = iterator.Get().GetAlpha() / tmp_max;
+						const double one_minus_alpha = 1.0 - alpha;
+						const double tmp_whi = one_minus_alpha * USHRT_MAX;
+						const double tmp_red = tmp_whi + alpha * iterator.Get().GetRed();
+						const double tmp_gre = tmp_whi + alpha * iterator.Get().GetGreen();
+						const double tmp_blu = tmp_whi + alpha * iterator.Get().GetBlue();
+						p__[j_ + 2] = static_cast<unsigned char>((tmp_blu / tmp_max) * 255.0);
+						p__[j_ + 1] = static_cast<unsigned char>((tmp_gre / tmp_max) * 255.0);
+						p__[j_ + 0] = static_cast<unsigned char>((tmp_red / tmp_max) * 255.0);
 					}
 					else
 					{
@@ -862,26 +822,73 @@ template<typename T> void load_rgba_image(
 				;
 			}
 		}
-	}
-	QImage tmpi(p__, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
+		else
+		{
+			const double vmin = ivariant->di->vmin;
+			const double vmax = ivariant->di->vmax;
+			const double vrange = vmax - vmin;
+			if (vrange > 0.0)
+			{
+				try
+				{
+					itk::ImageRegionConstIterator<T> iterator(image, region);
+					iterator.GoToBegin();
+					while(!iterator.IsAtEnd())
+					{
+						const double alpha = iterator.Get().GetAlpha() / vrange;
+						const double one_minus_alpha = 1.0 - alpha;
+						const double tmp_whi = one_minus_alpha * vrange;
+						const double tmp_red = tmp_whi + alpha*iterator.Get().GetRed();
+						const double tmp_gre = tmp_whi + alpha*iterator.Get().GetGreen();
+						const double tmp_blu = tmp_whi + alpha*iterator.Get().GetBlue();
+						if (alpha > 0)
+						{
+							p__[j_ + 2] = static_cast<unsigned char>((tmp_blu / vrange) * 255.0);
+							p__[j_ + 1] = static_cast<unsigned char>((tmp_gre / vrange) * 255.0);
+							p__[j_ + 0] = static_cast<unsigned char>((tmp_red / vrange) * 255.0);
+						}
+						else
+						{
+							p__[j_ + 2] = 255;
+							p__[j_ + 1] = 255;
+							p__[j_ + 0] = 255;
+						}
+						j_ += 3;
+						++iterator;
+					}
+				}
+				catch (const itk::ExceptionObject &)
+				{
+					;
+				}
+			}
+		}
+		QImage tmpi(p__, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
 #endif
-	//
-	if (axis == 2)
-	{
-		if (widget->get_enable_overlays())
-			GraphicsUtils::draw_overlays(ivariant, tmpi);
-	}
-	else
-	{
-		if (!ivariant->equi||ivariant->orientation_string.isEmpty())
-			GraphicsUtils::draw_cross_out(tmpi);
-	}
-	//
+		if (axis == 2)
+		{
+			if (widget->get_enable_overlays())
+				GraphicsUtils::draw_overlays(ivariant, tmpi);
+		}
+		else
+		{
+			if (!ivariant->equi || ivariant->orientation_string.isEmpty())
+				GraphicsUtils::draw_cross_out(tmpi);
+		}
 #if QT_VERSION < QT_VERSION_CHECK(5,3,0)
-	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(tmpi));
+		widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(tmpi));
 #else
-	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(std::move(tmpi)));
+		widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(std::move(tmpi)));
 #endif
+	#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+		tmpi = QImage();
+		if (p__)
+		{
+			delete [] p__;
+			p__ = nullptr;
+		}
+#endif
+	}
 	//
 	GraphicsUtils::gen_labels(
 		axis, hide_orientation,
@@ -913,15 +920,6 @@ template<typename T> void load_rgba_image(
 	widget->set_top_label_text(top_string);
 	widget->set_left_label_text(left_string);
 	widget->graphicsview->setTransform(t);
-	//
-#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-	tmpi = QImage();
-	if (p__)
-	{
-		delete [] p__;
-		p__ = nullptr;
-	}
-#endif
 }
 
 template<typename T> void load_rgb_char_image(
@@ -1002,24 +1000,24 @@ template<typename T> void load_rgb_char_image(
 		scale__ = widget->graphicsview->m_scale;
 	}
 	//
-	QImage tmpi = QImage(p, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
-	//
-	if (axis == 2)
 	{
-		if (widget->get_enable_overlays())
-			GraphicsUtils::draw_overlays(ivariant, tmpi);
-	}
-	else
-	{
-		if (!ivariant->equi||ivariant->orientation_string.isEmpty())
-			GraphicsUtils::draw_cross_out(tmpi);
-	}
-	//
+		QImage tmpi = QImage(p, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
+		if (axis == 2)
+		{
+			if (widget->get_enable_overlays())
+				GraphicsUtils::draw_overlays(ivariant, tmpi);
+		}
+		else
+		{
+			if (!ivariant->equi || ivariant->orientation_string.isEmpty())
+				GraphicsUtils::draw_cross_out(tmpi);
+		}
 #if QT_VERSION < QT_VERSION_CHECK(5,3,0)
-	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(tmpi));
+		widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(tmpi));
 #else
-	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(std::move(tmpi)));
+		widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(std::move(tmpi)));
 #endif
+	}
 	//
 	const bool hide_orientation = ivariant->di->hide_orientation;
 	GraphicsUtils::gen_labels(
@@ -1117,80 +1115,88 @@ template<typename T> void load_rgba_char_image(
 		scale__ = widget->graphicsview->m_scale;
 	}
 	//
-	QImage tmpi;
-	unsigned char * p;
+	{
+		QImage tmpi;
+		unsigned char * p;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	try
-	{
-		p = reinterpret_cast<unsigned char *>(image->GetBufferPointer());
-	}
-	catch (const itk::ExceptionObject &)
-	{
-		return;
-	}
-	if (!p) return;
-	tmpi = QImage(p, size[0], size[1], 4 * size[0], QImage::Format_RGBA8888);
-#else
-	try
-	{
-		p = new unsigned char[size[0] * size[1] * 3];
-	}
-	catch (const std::bad_alloc&)
-	{
-		return;
-	}
-	try
-	{
-		unsigned long long j_ = 0;
-		itk::ImageRegionConstIterator<T> iterator(image, region);
-		iterator.GoToBegin();
-		while (!iterator.IsAtEnd())
+		try
 		{
-			if (iterator.Get().GetAlpha() > 0)
-			{
-				const double alpha = iterator.Get().GetAlpha() / 255.0;
-				const double one_minus_alpha = 1.0 - alpha;
-				const double tmp_whi = one_minus_alpha * 255.0;
-				const double tmp_red = tmp_whi + alpha * iterator.Get().GetRed();
-				const double tmp_gre = tmp_whi + alpha * iterator.Get().GetGreen();
-				const double tmp_blu = tmp_whi + alpha * iterator.Get().GetBlue();
-				p[j_ + 2] = static_cast<unsigned char>(tmp_blu);
-				p[j_ + 1] = static_cast<unsigned char>(tmp_gre);
-				p[j_ + 0] = static_cast<unsigned char>(tmp_red);
-			}
-			else
-			{
-				p[j_ + 2] = 255;
-				p[j_ + 1] = 255;
-				p[j_ + 0] = 255;
-			}
-			j_ += 3;
-			++iterator;
+			p = reinterpret_cast<unsigned char *>(image->GetBufferPointer());
 		}
-	}
-	catch (const itk::ExceptionObject &)
-	{
-		;
-	}
-	tmpi = QImage(p, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
-#endif
-	//
-	if (axis == 2)
-	{
-		if (widget->get_enable_overlays())
-			GraphicsUtils::draw_overlays(ivariant, tmpi);
-	}
-	else
-	{
-		if (!ivariant->equi||ivariant->orientation_string.isEmpty())
-			GraphicsUtils::draw_cross_out(tmpi);
-	}
-	//
-#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
-	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(tmpi));
+		catch (const itk::ExceptionObject &)
+		{
+			return;
+		}
+		if (!p) return;
+		tmpi = QImage(p, size[0], size[1], 4 * size[0], QImage::Format_RGBA8888);
 #else
-	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(std::move(tmpi)));
+		try
+		{
+			p = new unsigned char[size[0] * size[1] * 3];
+		}
+		catch (const std::bad_alloc&)
+		{
+			return;
+		}
+		try
+		{
+			unsigned long long j_ = 0;
+			itk::ImageRegionConstIterator<T> iterator(image, region);
+			iterator.GoToBegin();
+			while (!iterator.IsAtEnd())
+			{
+				if (iterator.Get().GetAlpha() > 0)
+				{
+					const double alpha = iterator.Get().GetAlpha() / 255.0;
+					const double one_minus_alpha = 1.0 - alpha;
+					const double tmp_whi = one_minus_alpha * 255.0;
+					const double tmp_red = tmp_whi + alpha * iterator.Get().GetRed();
+					const double tmp_gre = tmp_whi + alpha * iterator.Get().GetGreen();
+					const double tmp_blu = tmp_whi + alpha * iterator.Get().GetBlue();
+					p[j_ + 2] = static_cast<unsigned char>(tmp_blu);
+					p[j_ + 1] = static_cast<unsigned char>(tmp_gre);
+					p[j_ + 0] = static_cast<unsigned char>(tmp_red);
+				}
+				else
+				{
+					p[j_ + 2] = 255;
+					p[j_ + 1] = 255;
+					p[j_ + 0] = 255;
+				}
+				j_ += 3;
+				++iterator;
+			}
+		}
+		catch (const itk::ExceptionObject &)
+		{
+			;
+		}
+		tmpi = QImage(p, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
 #endif
+		if (axis == 2)
+		{
+			if (widget->get_enable_overlays())
+				GraphicsUtils::draw_overlays(ivariant, tmpi);
+		}
+		else
+		{
+			if (!ivariant->equi || ivariant->orientation_string.isEmpty())
+				GraphicsUtils::draw_cross_out(tmpi);
+		}
+#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
+		widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(tmpi));
+#else
+		widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(std::move(tmpi)));
+#endif
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+		tmpi = QImage();
+		if (p)
+		{
+			delete [] p;
+			p = nullptr;
+		}
+#endif
+	}
 	//
 	const bool hide_orientation = ivariant->di->hide_orientation;
 	GraphicsUtils::gen_labels(
@@ -1222,15 +1228,6 @@ template<typename T> void load_rgba_char_image(
 	widget->set_top_label_text(top_string);
 	widget->set_left_label_text(left_string);
 	widget->graphicsview->setTransform(t);
-	//
-#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-	tmpi = QImage();
-	if (p)
-	{
-		delete [] p;
-		p = nullptr;
-	}
-#endif
 }
 
 template<typename T> void load_image(
@@ -1449,21 +1446,36 @@ template<typename T> void load_image(
 	widget->graphicsview->image_item->setZValue(-1.0);
 	widget->graphicsview->scene()->addItem(widget->graphicsview->image_item);
 #endif
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	QImage tmpi(p, size[0], size[1], 3 * size[0], QImage::Format_RGB888, gImageCleanupHandler, p);
-#else
-	QImage tmpi(p, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
-#endif
 	//
-	if (axis == 2)
 	{
-		if (widget->get_enable_overlays())
-			GraphicsUtils::draw_overlays(ivariant, tmpi);
-	}
-	else
-	{
-		if (!ivariant->equi||ivariant->orientation_string.isEmpty())
-			GraphicsUtils::draw_cross_out(tmpi);
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+		QImage tmpi(p, size[0], size[1], 3 * size[0], QImage::Format_RGB888, gImageCleanupHandler, p);
+#else
+		QImage tmpi(p, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
+#endif
+		if (axis == 2)
+		{
+			if (widget->get_enable_overlays())
+				GraphicsUtils::draw_overlays(ivariant, tmpi);
+		}
+		else
+		{
+			if (!ivariant->equi || ivariant->orientation_string.isEmpty())
+				GraphicsUtils::draw_cross_out(tmpi);
+		}
+#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
+		widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(tmpi));
+#else
+		widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(std::move(tmpi)));
+#endif
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+		tmpi = QImage();
+		if (p)
+		{
+			delete [] p;
+			p = nullptr;
+		}
+#endif
 	}
 	//
 	const double xratio = widget->graphicsview->width()  / (size[0] * coeff_size_0);
@@ -1478,11 +1490,6 @@ template<typename T> void load_image(
 		scale__ = widget->graphicsview->m_scale;
 	}
 	//
-#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
-	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(tmpi));
-#else
-	widget->graphicsview->image_item->setPixmap(QPixmap::fromImage(std::move(tmpi)));
-#endif
 	QTransform t = QTransform();
 	if (spacing[1] != spacing[0]) t = t.scale(coeff_size_0, coeff_size_1);
 	t = t.scale(scale__, scale__);
@@ -1507,7 +1514,7 @@ template<typename T> void load_image(
 	widget->set_top_label_text(top_string);
 	widget->set_left_label_text(left_string);
 	//
-	if (redraw_contours && axis==2)
+	if (redraw_contours && axis == 2)
 		draw_contours(ivariant, widget);
 	//
 	widget->graphicsview->draw_shutter(ivariant);
@@ -1516,14 +1523,6 @@ template<typename T> void load_image(
 	//
 	widget->graphicsview->setTransform(t);
 	//
-#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-	tmpi = QImage();
-	if (p)
-	{
-		delete [] p;
-		p = nullptr;
-	}
-#endif
 #ifdef A_TMP_BENCHMARK
 	const std::chrono::duration<double, std::milli> elapsed1{ now() - start1 };
 	std::cout << "spent total " << elapsed1.count() << " ms" << std::endl;
