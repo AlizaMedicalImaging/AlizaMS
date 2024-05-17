@@ -45,8 +45,7 @@ template<typename Tin, typename Tout> QString get_slice2_(
 		return QString("get_slice2_<>() : image.IsNull()");
 	}
 	typedef itk::ExtractImageFilter<Tin, Tout> FilterType;
-	const typename Tin::RegionType inRegion =
-		image->GetLargestPossibleRegion();
+	const typename Tin::RegionType inRegion = image->GetLargestPossibleRegion();
 	const typename Tin::SizeType size = inRegion.GetSize();
 	typename Tin::IndexType index = inRegion.GetIndex();
 	typename Tin::RegionType outRegion;
@@ -123,22 +122,24 @@ template<typename T> void load_rgb_image2(
 	if (!widget->graphicsview->image_item) return;
 #endif
 	const typename T::RegionType region = image->GetLargestPossibleRegion();
-	const typename T::SizeType   size   = region.GetSize();
+	const typename T::SizeType   size = region.GetSize();
 	const typename T::SpacingType spacing = image->GetSpacing();
 	const bool global_flip_x = widget->graphicsview->global_flip_x;
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
 	//
 	QString top_string, left_string;
-	bool flip_x = false, flip_y = false;
-	double scale__;
-	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
+	bool flip_x{};
+	bool flip_y{};
+	double coeff_size_0{1.0};
+	double coeff_size_1{1.0};
 	if (spacing[0] != spacing[1])
 	{
-		if (spacing[1]>spacing[0]) coeff_size_1 = spacing[1] / spacing[0];
-		else                       coeff_size_0 = spacing[0] / spacing[1];
+		if (spacing[1] > spacing[0]) coeff_size_1 = spacing[1] / spacing[0];
+		else                         coeff_size_0 = spacing[0] / spacing[1];
 	}
 	const double xratio = widget->graphicsview->width()  / (size[0] * coeff_size_0);
 	const double yratio = widget->graphicsview->height() / (size[1] * coeff_size_1);
+	double scale__;
 	if (fit == 1)
 	{
 		scale__ = qMin(xratio, yratio);
@@ -153,7 +154,7 @@ template<typename T> void load_rgb_image2(
 	const unsigned short bits_stored      = ivariant->di->bits_stored;
 	const bool           hide_orientation = ivariant->di->hide_orientation;
 	//
-	unsigned int j_ = 0;
+	unsigned int j_{};
 	unsigned char * p__;
 	try
 	{
@@ -168,8 +169,8 @@ template<typename T> void load_rgb_image2(
 	{
 		const double tmp_max =
 			(bits_allocated > 0 && bits_stored > 0 && bits_stored < bits_allocated)
-				? pow(2, bits_stored) - 1
-				: static_cast<double>(USHRT_MAX);
+			? pow(2, bits_stored) - 1
+			: static_cast<double>(USHRT_MAX);
 		try
 		{
 			itk::ImageRegionConstIterator<T> iterator(image, region);
@@ -307,9 +308,10 @@ template<typename T> void load_rgba_image2(
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
 	//
 	QString top_string, left_string;
-	bool flip_x = false, flip_y = false;
-	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
-	double scale__;
+	bool flip_x{};
+	bool flip_y{};
+	double coeff_size_0{1.0};
+	double coeff_size_1{1.0};
 	if (spacing[0] != spacing[1])
 	{
 		if (spacing[1] > spacing[0]) coeff_size_1 = spacing[1] / spacing[0];
@@ -317,6 +319,7 @@ template<typename T> void load_rgba_image2(
 	}
 	const double xratio = widget->graphicsview->width()  / (size[0] * coeff_size_0);
 	const double yratio = widget->graphicsview->height() / (size[1] * coeff_size_1);
+	double scale__;
 	if (fit == 1)
 	{
 		scale__ = qMin(xratio, yratio);
@@ -331,7 +334,7 @@ template<typename T> void load_rgba_image2(
 	{
 		const unsigned short bits_allocated = ivariant->di->bits_allocated;
 		const unsigned short bits_stored    = ivariant->di->bits_stored;
-		unsigned long long j_ = 0;
+		unsigned long long j_{};
 		unsigned char * p__;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		try
@@ -346,8 +349,8 @@ template<typename T> void load_rgba_image2(
 		{
 			const double tmp_max =
 				(bits_allocated > 0 && bits_stored > 0 && bits_stored < bits_allocated)
-					? pow(2, bits_stored) - 1
-					: static_cast<double>(USHRT_MAX);
+				? pow(2, bits_stored) - 1
+				: static_cast<double>(USHRT_MAX);
 			try
 			{
 				itk::ImageRegionConstIterator<T> iterator(image, region);
@@ -412,8 +415,8 @@ template<typename T> void load_rgba_image2(
 		{
 			const double tmp_max =
 				(bits_allocated > 0 && bits_stored > 0 && bits_stored < bits_allocated)
-					? pow(2, bits_stored) - 1
-					: static_cast<double>(USHRT_MAX);
+				? pow(2, bits_stored) - 1
+				: static_cast<double>(USHRT_MAX);
 			try
 			{
 				itk::ImageRegionConstIterator<T> iterator(image, region);
@@ -577,9 +580,10 @@ template<typename T> void load_rgb_char_image2(
 	const typename T::SizeType    size    = region.GetSize();
 	const typename T::SpacingType spacing = image->GetSpacing();
 	QString top_string, left_string;
-	bool flip_x = false, flip_y = false;
-	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
-	double scale__;
+	bool flip_x{};
+	bool flip_y{};
+	double coeff_size_0{1.0};
+	double coeff_size_1{1.0};
 	const bool global_flip_x = widget->graphicsview->global_flip_x;
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
 	//
@@ -601,6 +605,7 @@ template<typename T> void load_rgb_char_image2(
 	}
 	const double xratio = widget->graphicsview->width()  / (size[0] * coeff_size_0);
 	const double yratio = widget->graphicsview->height() / (size[1] * coeff_size_1);
+	double scale__;
 	if (fit == 1)
 	{
 		scale__ = qMin(xratio, yratio);
@@ -689,9 +694,10 @@ template<typename T> void load_rgba_char_image2(
 	const typename T::SizeType   size     = region.GetSize();
 	const typename T::SpacingType spacing = image->GetSpacing();
 	QString top_string, left_string;
-	bool flip_x = false, flip_y = false;
-	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
-	double scale__;
+	bool flip_x{};
+	bool flip_y{};
+	double coeff_size_0{1.0};
+	double coeff_size_1{1.0};
 	const bool global_flip_x = widget->graphicsview->global_flip_x;
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
 	//
@@ -702,6 +708,7 @@ template<typename T> void load_rgba_char_image2(
 	}
 	const double xratio = widget->graphicsview->width()  / (size[0] * coeff_size_0);
 	const double yratio = widget->graphicsview->height() / (size[1] * coeff_size_1);
+	double scale__;
 	if (fit == 1)
 	{
 		scale__ = qMin(xratio, yratio);
@@ -737,12 +744,12 @@ template<typename T> void load_rgba_char_image2(
 		}
 		try
 		{
-			unsigned long long j_ = 0;
+			unsigned long long j_{};
 			itk::ImageRegionConstIterator<T> iterator(image, region);
 			iterator.GoToBegin();
 			while (!iterator.IsAtEnd())
 			{
-				if (iterator.Get().GetAlpha()>0)
+				if (iterator.Get().GetAlpha() > 0)
 				{
 					const double alpha = iterator.Get().GetAlpha() / 255.0;
 					const double one_minus_alpha = 1.0 - alpha;
@@ -854,8 +861,7 @@ template<typename T> void load_image2(
 	{
 		if (ivariant->frame_levels.contains(image_container.selected_z_slice_ext))
 		{
-			const FrameLevel & fl =
-				ivariant->frame_levels.value(image_container.selected_z_slice_ext);
+			const FrameLevel & fl = ivariant->frame_levels.value(image_container.selected_z_slice_ext);
 			window_center = fl.us_window_center;
 			window_width = fl.us_window_width;
 			lut_function = fl.lut_function;
@@ -989,16 +995,17 @@ template<typename T> void load_image2(
 	}
 	threadsLUT_.clear();
 	//
-	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
+	bool flip_x{};
+	bool flip_y{};
+	double coeff_size_0{1.0};
+	double coeff_size_1{1.0};
 	const QRectF rectf(0, 0, size[0], size[1]);
-	double scale__;
 	if (spacing[0] != spacing[1])
 	{
 		if (spacing[1] > spacing[0]) coeff_size_1 = spacing[1] / spacing[0];
 		else                         coeff_size_0 = spacing[0] / spacing[1];
 	}
 	QString top_string, left_string;
-	bool flip_y = false, flip_x = false;
 	//
 	widget->graphicsview->scene()->setSceneRect(rectf);
 #ifdef DELETE_STUDYGRAPHICSIMAGEITEM
@@ -1046,6 +1053,7 @@ template<typename T> void load_image2(
 	//
 	const double xratio = widget->graphicsview->width()  / (size[0]*coeff_size_0);
 	const double yratio = widget->graphicsview->height() / (size[1]*coeff_size_1);
+	double scale__;
 	if (fit == 1)
 	{
 		scale__ = qMin(xratio, yratio);
@@ -1104,9 +1112,9 @@ template<typename T> double get_distance3(
 	const double x1, const double y1,
 	unsigned int z)
 {
-	if (image.IsNull()) return -1;
-	if (!ivariant)      return -1;
-	if (x0 < 0 || y0 < 0 || x1 < 0 || y1 < 0) return -1;
+	if (image.IsNull()) return -1.0;
+	if (!ivariant)      return -1.0;
+	if (x0 < 0.0 || y0 < 0.0 || x1 < 0.0 || y1 < 0.0) return -1;
 	itk::ContinuousIndex<float, 3> idx0;
 	itk::ContinuousIndex<float, 3> idx1;
 	itk::Point<float, 3> j0;
@@ -1115,8 +1123,8 @@ template<typename T> double get_distance3(
 	const float y0_ = static_cast<float>(y0);
 	const float x1_ = static_cast<float>(x1);
 	const float y1_ = static_cast<float>(y1);
-	double d = -1;
-	bool ok = false;
+	double d{-1.0};
+	bool ok{};
 	//
 	if (x0_ < ivariant->di->idimx &&
 		x1_ < ivariant->di->idimx &&
@@ -1260,12 +1268,9 @@ void StudyGraphicsWidget::reset_level()
 {
 	if (image_container.image3D)
 	{
-		image_container.us_window_center_ext =
-			image_container.image3D->di->default_us_window_center;
-		image_container.us_window_width_ext =
-			image_container.image3D->di->default_us_window_width;
-		image_container.lut_function_ext =
-			image_container.image3D->di->default_lut_function;
+		image_container.us_window_center_ext = image_container.image3D->di->default_us_window_center;
+		image_container.us_window_width_ext = image_container.image3D->di->default_us_window_width;
+		image_container.lut_function_ext = image_container.image3D->di->default_lut_function;
 		update_image(0);
 	}
 }
@@ -1315,8 +1320,7 @@ void StudyGraphicsWidget::dropEvent(QDropEvent * e)
 				const ImagesBox * imagesbox = aliza->get_imagesbox();
 				if (imagesbox)
 				{
-					const ListWidgetItem2 * item =
-						static_cast<const ListWidgetItem2*>(imagesbox->listWidget->item(r));
+					const ListWidgetItem2 * item = static_cast<const ListWidgetItem2*>(imagesbox->listWidget->item(r));
 					if (item)
 					{
 						i = item->get_id();
@@ -1360,18 +1364,10 @@ void StudyGraphicsWidget::update_pr_area()
 	const int idx = image_container.selected_z_slice_ext;
 	if (image_container.image3D->pr_display_areas.contains(idx))
 	{
-		const int tl_x =
-			image_container.image3D->
-				pr_display_areas.value(idx).top_left_x - 1;
-		const int tl_y =
-			image_container.image3D->
-				pr_display_areas.value(idx).top_left_y - 1;
-		const int s_x =
-			image_container.image3D->
-				pr_display_areas.value(idx).bottom_right_x - tl_x;
-		const int s_y =
-			image_container.image3D->
-				pr_display_areas.value(idx).bottom_right_y - tl_y;
+		const int tl_x = image_container.image3D->pr_display_areas.value(idx).top_left_x - 1;
+		const int tl_y = image_container.image3D->pr_display_areas.value(idx).top_left_y - 1;
+		const int s_x = image_container.image3D->pr_display_areas.value(idx).bottom_right_x - tl_x;
+		const int s_y = image_container.image3D->pr_display_areas.value(idx).bottom_right_y - tl_y;
 		QRectF r = QRectF(QPointF(tl_x, tl_y), QSize(s_x, s_y));
 		graphicsview->pr_area->resetTransform();
 		graphicsview->pr_area->setRect(r);
@@ -1732,7 +1728,7 @@ void StudyGraphicsWidget::set_image(
 		return;
 	}
 	//
-	int x = 0;
+	int x{};
 	QString error_;
 	//
 	image_container.image3D = v;
@@ -2409,7 +2405,7 @@ void StudyGraphicsWidget::update_measurement(
 				x1 <= ivariant->usregions.at(x).m_X1 &&
 				y1 <= ivariant->usregions.at(x).m_Y1)
 			{
-				if (!ivariant->usregions.at(x).m_UnitXString.isEmpty()||
+				if (!ivariant->usregions.at(x).m_UnitXString.isEmpty() ||
 					!ivariant->usregions.at(x).m_UnitYString.isEmpty())
 					ids.push_back(x);
 				ids2.push_back(x);
@@ -2419,8 +2415,7 @@ void StudyGraphicsWidget::update_measurement(
 		{
 			if (ivariant->usregions.at(ids.at(x)).m_FlagsBool)
 			{
-				const unsigned int flags =
-					ivariant->usregions.at(ids.at(x)).m_RegionFlags;
+				const unsigned int flags = ivariant->usregions.at(ids.at(x)).m_RegionFlags;
 				if ((flags & 1) == 0)
 				{
 					high_priority_regions.push_back(ids.at(x));
@@ -2434,8 +2429,7 @@ void StudyGraphicsWidget::update_measurement(
 			if (!ivariant->usregions.at(
 					ids2.at(x)).m_DataTypeString.isEmpty())
 			{
-				data_type.append(
-					ivariant->usregions.at(ids2.at(x)).m_DataTypeString);
+				data_type.append(ivariant->usregions.at(ids2.at(x)).m_DataTypeString);
 			}
 			if (ids2.size() > 1 && x != ids2.size() - 1 && !data_type.isEmpty())
 			{
@@ -2445,26 +2439,21 @@ void StudyGraphicsWidget::update_measurement(
 		//
 		if (!ids.empty())
 		{
-			bool tmp1x = false;
-			bool tmp1y = false;
+			bool tmp1x{};
+			bool tmp1y{};
 			const unsigned int i =
 				(high_priority_regions.size() == 1)
 				? high_priority_regions.at(0)
 				: ids.at(0);
-			const double dx =
-				ivariant->usregions.at(i).m_PhysicalDeltaX;
-			const double dy =
-				ivariant->usregions.at(i).m_PhysicalDeltaY;
+			const double dx = ivariant->usregions.at(i).m_PhysicalDeltaX;
+			const double dy = ivariant->usregions.at(i).m_PhysicalDeltaY;
 			const double x0_ = x0 * dx;
 			const double y0_ = y0 * dy;
 			const double x1_ = x1 * dx;
 			const double y1_ = y1 * dy;
-			const QString measure_textx =
-				ivariant->usregions.at(i).m_UnitXString;
-			const QString measure_texty =
-				ivariant->usregions.at(i).m_UnitYString;
-			const unsigned short spatial =
-				ivariant->usregions.at(i).m_RegionSpatialFormat;
+			const QString measure_textx = ivariant->usregions.at(i).m_UnitXString;
+			const QString measure_texty = ivariant->usregions.at(i).m_UnitYString;
+			const unsigned short spatial = ivariant->usregions.at(i).m_RegionSpatialFormat;
 			QColor color(Qt::cyan);
 			switch (spatial)
 			{
@@ -2489,7 +2478,7 @@ void StudyGraphicsWidget::update_measurement(
 			}
 			if (measure_textx == measure_texty)
 			{
-				const double d   = get_distance4(x0_, y0_, x1_, y1_);
+				const double d = get_distance4(x0_, y0_, x1_, y1_);
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
 				tmp0 = QString::asprintf("%.3f", d);
 #else
@@ -2509,11 +2498,7 @@ void StudyGraphicsWidget::update_measurement(
 #else
 					tmp0x.sprintf("%.3f", d0);
 #endif
-					tmp0.append(
-						QString("X: ") +
-						tmp0x +
-						QString(" ") +
-						measure_textx);
+					tmp0.append(QString("X: ") + tmp0x + QString(" ") + measure_textx);
 				}
 				if (!measure_textx.isEmpty() && !measure_texty.isEmpty())
 				{
@@ -2529,11 +2514,7 @@ void StudyGraphicsWidget::update_measurement(
 #else
 					tmp0y.sprintf("%.3f", d1);
 #endif
-					tmp0.append(
-						QString("Y: ") +
-						tmp0y +
-						QString(" ") +
-						measure_texty);
+					tmp0.append(QString("Y: ") + tmp0y + QString(" ") + measure_texty);
 				}
 			}
 			//
@@ -2542,7 +2523,7 @@ void StudyGraphicsWidget::update_measurement(
 			pen.setBrush(QBrush(color));
 			pen.setWidth(0);
 			graphicsview->measurment_line->setPen(pen);
-			if (tmp1x||tmp1y)
+			if (tmp1x || tmp1y)
 			{
 				if (tmp1x)
 				{
@@ -2588,7 +2569,7 @@ void StudyGraphicsWidget::update_measurement(
 	}
 	else
 	{
-		double d = -1;
+		double d{-1.0};
 		switch (ivariant->image_type)
 		{
 		case 0:
@@ -2683,4 +2664,3 @@ void StudyGraphicsWidget::update_measurement(
 		set_measure_text(tmp0);
 	}
 }
-
