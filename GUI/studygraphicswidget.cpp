@@ -21,7 +21,6 @@
 #include "updateqtcommand.h"
 #include "imagesbox.h"
 #include <climits>
-#include <chrono>
 #include <utility>
 
 namespace

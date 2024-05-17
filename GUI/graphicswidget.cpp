@@ -1,3 +1,5 @@
+//#define A_TMP_BENCHMARK
+
 #include "graphicswidget.h"
 #include <QtGlobal>
 #include <QVBoxLayout>
@@ -27,10 +29,10 @@
 #include "aliza.h"
 #include "updateqtcommand.h"
 #include <climits>
-#include <chrono>
 #include <utility>
-
-//#define A_TMP_BENCHMARK
+#ifdef A_TMP_BENCHMARK
+#include <chrono>
+#endif
 
 namespace
 {
