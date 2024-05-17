@@ -44,6 +44,7 @@ inline auto now() noexcept
 }
 #endif
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 void gImageCleanupHandler(void * info)
 {
 	if (!info) return;
@@ -51,6 +52,7 @@ void gImageCleanupHandler(void * info)
 	delete [] p;
 	info = nullptr;
 }
+#endif
 
 void draw_contours(
 	const ImageVariant * ivariant,
@@ -59,8 +61,7 @@ void draw_contours(
 	widget->graphicsview->scene()->clearSelection();
 	widget->graphicsview->clear_paths();
 	const short axis = widget->get_axis();
-	const bool editable =
-		(widget->get_mouse_modus() == 3) ? true : false;
+	const bool editable = (widget->get_mouse_modus() == 3) ? true : false;
 	if (axis != 2) return;
 	const int idx = ivariant->di->selected_z_slice;
 	for (int x = 0; x < ivariant->di->rois.size(); ++x)
@@ -81,9 +82,7 @@ void draw_contours(
 			}
 			for (int z = 0; z < indices.size(); ++z)
 			{
-				const Contour * c =
-					ivariant->di->rois.at(x)
-						.contours.value(indices.at(z));
+				const Contour * c = ivariant->di->rois.at(x).contours.value(indices.at(z));
 				if (c)
 				{
 					QBrush brush;
@@ -104,13 +103,10 @@ void draw_contours(
 					if (c->type == 1 || c->type == 2 || c->type == 5)
 					{
 						pen.setWidthF(widget->get_contours_width());
-						GraphicsPathItem * pi_ =
-							new GraphicsPathItem();
+						GraphicsPathItem * pi_ = new GraphicsPathItem();
 						pi_->set_roi_id(ivariant->di->rois.at(x).id);
 						pi_->set_contour_id(c->id);
-						pi_->setFlag(
-							QGraphicsItem::ItemIsSelectable,
-							editable);
+						pi_->setFlag(QGraphicsItem::ItemIsSelectable, editable);
 						if (editable)
 						{
 							pi_->set_axis(2);
@@ -119,21 +115,17 @@ void draw_contours(
 						}
 						pi_->setPen(pen);
 						pi_->setPath(c->path);
-						widget->graphicsview->scene()->addItem(
-							static_cast<QGraphicsItem*>(pi_));
+						widget->graphicsview->scene()->addItem(static_cast<QGraphicsItem*>(pi_));
 						widget->graphicsview->paths.push_back(pi_);
 					}
 					else if (c->type == 4)
 					{
 						const double cw_ = widget->get_contours_width();
 						pen.setWidthF(cw_ < 1.0 ? 1.0 : cw_);
-						GraphicsPathItem * pi_ =
-							new GraphicsPathItem();
+						GraphicsPathItem * pi_ = new GraphicsPathItem();
 						pi_->set_roi_id(ivariant->di->rois.at(x).id);
 						pi_->set_contour_id(c->id);
-						pi_->setFlag(
-							QGraphicsItem::ItemIsSelectable,
-							editable);
+						pi_->setFlag(QGraphicsItem::ItemIsSelectable, editable);
 						if (editable)
 						{
 							pi_->set_axis(2);
@@ -144,11 +136,7 @@ void draw_contours(
 						for (int y = 0; y < c->dpoints.size(); ++y)
 						{
 							if (c->dpoints.at(y).t == idx)
-								p.addRect(
-									c->dpoints.at(y).u,
-									c->dpoints.at(y).v,
-									1.0,
-									1.0);
+								p.addRect(c->dpoints.at(y).u, c->dpoints.at(y).v, 1.0, 1.0);
 						}
 						pi_->setPen(pen);
 						pi_->setPath(p);
@@ -159,13 +147,10 @@ void draw_contours(
 					else
 					{
 						pen.setWidthF(widget->get_contours_width());
-						GraphicsPathItem * pi_ =
-							new GraphicsPathItem();
+						GraphicsPathItem * pi_ = new GraphicsPathItem();
 						pi_->set_roi_id(ivariant->di->rois.at(x).id);
 						pi_->set_contour_id(c->id);
-						pi_->setFlag(
-							QGraphicsItem::ItemIsSelectable,
-							editable);
+						pi_->setFlag(QGraphicsItem::ItemIsSelectable, editable);
 						if (editable)
 						{
 							pi_->setCursor(Qt::PointingHandCursor);
@@ -174,16 +159,11 @@ void draw_contours(
 						for (int y = 0; y < c->dpoints.size(); ++y)
 						{
 							if (c->dpoints.at(y).t == idx)
-								p.addRect(
-									c->dpoints.at(y).u,
-									c->dpoints.at(y).v,
-									1.0,
-									1.0);
+								p.addRect(c->dpoints.at(y).u, c->dpoints.at(y).v, 1.0, 1.0);
 						}
 						pi_->setPen(pen);
 						pi_->setPath(p);
-						widget->graphicsview->scene()->addItem(
-							static_cast<QGraphicsItem*>(pi_));
+						widget->graphicsview->scene()->addItem(static_cast<QGraphicsItem*>(pi_));
 						widget->graphicsview->paths.push_back(pi_);
 					}
 				}
@@ -204,10 +184,9 @@ template<typename Tin, typename Tout> QString get_slice_(
 		return QString("get_slice_<>() : image.IsNull()");
 	}
 	typedef itk::ExtractImageFilter<Tin, Tout> FilterType;
-	const typename Tin::RegionType inRegion =
-		image->GetLargestPossibleRegion();
+	const typename Tin::RegionType inRegion = image->GetLargestPossibleRegion();
 	const typename Tin::SizeType size = inRegion.GetSize();
-	typename Tin::IndexType index     = inRegion.GetIndex();
+	typename Tin::IndexType index = inRegion.GetIndex();
 	typename Tin::RegionType outRegion;
 	typename Tin::SizeType out_size;
 	typename FilterType::Pointer filter = FilterType::New();
@@ -289,7 +268,7 @@ template<typename T> QString contour_from_path(
 		const Contour * z = it.value();
 		if (z) tmp0.push_back(z->id);
 	}
-	int a = 0;
+	int a{};
 	for (int j = 0; j < tmp0.size(); ++j)
 	{
 		if (tmp0.at(j) >= a) a = tmp0.at(j);
@@ -402,7 +381,7 @@ QString contour_from_path_nonuniform(
 		const Contour * z = it.value();
 		if (z) tmp0.push_back(z->id);
 	}
-	int a = 0;
+	int a{};
 	for (int j = 0; j < tmp0.size(); ++j)
 	{
 		if (tmp0.at(j) >= a) a = tmp0.at(j);
@@ -492,9 +471,10 @@ template<typename T> void load_rgb_image(
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
 	//
 	QString top_string, left_string;
-	bool flip_x = false, flip_y = false;
-	double scale__;
-	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
+	bool flip_x{};
+	bool flip_y{};
+	double coeff_size_0{1.0};
+	double coeff_size_1{1.0};
 	if (spacing[0] != spacing[1])
 	{
 		if (spacing[1] > spacing[0]) coeff_size_1 = spacing[1] / spacing[0];
@@ -502,6 +482,7 @@ template<typename T> void load_rgb_image(
 	}
 	const double xratio = widget->graphicsview->width()  / (size[0] * coeff_size_0);
 	const double yratio = widget->graphicsview->height() / (size[1] * coeff_size_1);
+	double scale__;
 	if (fit == 1)
 	{
 		scale__ = qMin(xratio, yratio);
@@ -516,7 +497,7 @@ template<typename T> void load_rgb_image(
 	const unsigned short bits_stored      = ivariant->di->bits_stored;
 	const bool           hide_orientation = ivariant->di->hide_orientation;
 	//
-	unsigned int j_ = 0;
+	unsigned int j_{};
 	unsigned char * p__;
 	try
 	{
@@ -530,8 +511,8 @@ template<typename T> void load_rgb_image(
 	{
 		const double tmp_max =
 			(bits_allocated > 0 && bits_stored > 0 && bits_stored < bits_allocated)
-				? pow(2, bits_stored) - 1
-				: static_cast<double>(USHRT_MAX);
+			? pow(2, bits_stored) - 1
+			: static_cast<double>(USHRT_MAX);
 		try
 		{
 			itk::ImageRegionConstIterator<T> iterator(image, region);
@@ -684,9 +665,10 @@ template<typename T> void load_rgba_image(
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
 	//
 	QString top_string, left_string;
-	bool flip_x = false, flip_y = false;
-	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
-	double scale__;
+	bool flip_x{};
+	bool flip_y{};
+	double coeff_size_0{1.0};
+	double coeff_size_1{1.0};
 	if (spacing[0] != spacing[1])
 	{
 		if (spacing[1] > spacing[0]) coeff_size_1 = spacing[1] / spacing[0];
@@ -694,6 +676,7 @@ template<typename T> void load_rgba_image(
 	}
 	const double xratio = widget->graphicsview->width()  / (size[0] * coeff_size_0);
 	const double yratio = widget->graphicsview->height() / (size[1] * coeff_size_1);
+	double scale__;
 	if (fit == 1)
 	{
 		scale__ = qMin(xratio, yratio);
@@ -708,7 +691,7 @@ template<typename T> void load_rgba_image(
 	{
 		const unsigned short bits_allocated = ivariant->di->bits_allocated;
 		const unsigned short bits_stored    = ivariant->di->bits_stored;
-		unsigned long long j_ = 0;
+		unsigned long long j_{};
 		unsigned char * p__;
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 		try
@@ -723,8 +706,8 @@ template<typename T> void load_rgba_image(
 		{
 			const double tmp_max =
 				(bits_allocated > 0 && bits_stored > 0 && bits_stored < bits_allocated)
-					? pow(2, bits_stored) - 1
-					: static_cast<double>(USHRT_MAX);
+				? pow(2, bits_stored) - 1
+				: static_cast<double>(USHRT_MAX);
 			try
 			{
 				itk::ImageRegionConstIterator<T> iterator(image, region);
@@ -789,8 +772,8 @@ template<typename T> void load_rgba_image(
 		{
 			const double tmp_max =
 				(bits_allocated > 0 && bits_stored > 0 && bits_stored < bits_allocated)
-					? pow(2, bits_stored) - 1
-					: static_cast<double>(USHRT_MAX);
+				? pow(2, bits_stored) - 1
+				: static_cast<double>(USHRT_MAX);
 			try
 			{
 				itk::ImageRegionConstIterator<T> iterator(image, region);
@@ -967,9 +950,10 @@ template<typename T> void load_rgb_char_image(
 	const typename T::SizeType    size    = region.GetSize();
 	const typename T::SpacingType spacing = image->GetSpacing();
 	QString top_string, left_string;
-	bool flip_x = false, flip_y = false;
-	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
-	double scale__;
+	bool flip_x{};
+	bool flip_y{};
+	double coeff_size_0{1.0};
+	double coeff_size_1{1.0};
 	const short axis = widget->get_axis();
 	const bool global_flip_x = widget->graphicsview->global_flip_x;
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
@@ -992,6 +976,7 @@ template<typename T> void load_rgb_char_image(
 	}
 	const double xratio = widget->graphicsview->width()  / (size[0] * coeff_size_0);
 	const double yratio = widget->graphicsview->height() / (size[1] * coeff_size_1);
+	double scale__;
 	if (fit == 1)
 	{
 		scale__ = qMin(xratio, yratio);
@@ -1093,9 +1078,10 @@ template<typename T> void load_rgba_char_image(
 	const typename T::SizeType   size     = region.GetSize();
 	const typename T::SpacingType spacing = image->GetSpacing();
 	QString top_string, left_string;
-	bool flip_x = false, flip_y = false;
-	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
-	double scale__;
+	bool flip_x{};
+	bool flip_y{};
+	double coeff_size_0{1.0};
+	double coeff_size_1{1.0};
 	const short axis = widget->get_axis();
 	const bool global_flip_x = widget->graphicsview->global_flip_x;
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
@@ -1107,6 +1093,7 @@ template<typename T> void load_rgba_char_image(
 	}
 	const double xratio = widget->graphicsview->width()  / (size[0] * coeff_size_0);
 	const double yratio = widget->graphicsview->height() / (size[1] * coeff_size_1);
+	double scale__;
 	if (fit == 1)
 	{
 		scale__ = qMin(xratio, yratio);
@@ -1142,7 +1129,7 @@ template<typename T> void load_rgba_char_image(
 		}
 		try
 		{
-			unsigned long long j_ = 0;
+			unsigned long long j_{};
 			itk::ImageRegionConstIterator<T> iterator(image, region);
 			iterator.GoToBegin();
 			while (!iterator.IsAtEnd())
@@ -1327,7 +1314,7 @@ template<typename T> void load_image(
 #endif
 	if (tmp99 == 0)
 	{
-		unsigned int j = 0;
+		unsigned int j{};
 		for (int i = 0; i < num_threads; ++i)
 		{
 			const int size_0 = size[0];
@@ -1348,8 +1335,8 @@ template<typename T> void load_image(
 	}
 	else
 	{
-		unsigned int j = 0;
-		unsigned int block = 64;
+		unsigned int j{};
+		unsigned int block{64};
 		if (static_cast<float>(size[1]) / static_cast<float>(block) > 16.0f)
 		{
 			block = 128;
@@ -1457,7 +1444,10 @@ template<typename T> void load_image(
 	}
 	threadsLUT_.clear();
 	//
-	double coeff_size_0 = 1.0, coeff_size_1 = 1.0;
+	bool flip_x{};
+	bool flip_y{};
+	double coeff_size_0{1.0};
+	double coeff_size_1{1.0};
 	const QRectF rectf(0, 0, size[0], size[1]);
 	double scale__;
 	if (spacing[0] != spacing[1])
@@ -1466,7 +1456,6 @@ template<typename T> void load_image(
 		else                         coeff_size_0 = spacing[0] / spacing[1];
 	}
 	QString top_string, left_string;
-	bool flip_y = false, flip_x = false;
 	//
 	widget->graphicsview->scene()->setSceneRect(rectf);
 #ifdef DELETE_GRAPHICSIMAGEITEM
@@ -1590,9 +1579,9 @@ template<typename T> double get_distance(
 	const double x0, const double y0,
 	const double x1, const double y1)
 {
-	if (image.IsNull()) return -1;
-	if (!ivariant)      return -1;
-	if (x0 < 0 || y0 < 0 || x1 < 0 || y1 < 0) return -1;
+	if (image.IsNull()) return -1.0;
+	if (!ivariant)      return -1.0;
+	if (x0 < 0.0 || y0 < 0.0 || x1 < 0.0 || y1 < 0.0) return -1.0;
 	itk::ContinuousIndex<float, 3> idx0;
 	itk::ContinuousIndex<float, 3> idx1;
 	itk::Point<float, 3> j0;
@@ -1601,8 +1590,8 @@ template<typename T> double get_distance(
 	const float y0_ = static_cast<float>(y0);
 	const float x1_ = static_cast<float>(x1);
 	const float y1_ = static_cast<float>(y1);
-	double d = -1;
-	bool ok = false;
+	double d{-1.0};
+	bool ok{};
 	//
 	switch (axis)
 	{
@@ -2163,7 +2152,7 @@ void GraphicsWidget::clear_()
 
 float GraphicsWidget::get_offset_x()
 {
-	float offset_x = 0.0f;
+	float offset_x{};
 	switch (axis)
 	{
 	case 0:
@@ -2200,7 +2189,7 @@ float GraphicsWidget::get_offset_x()
 
 float GraphicsWidget::get_offset_y()
 {
-	float offset_y = 0.0f;
+	float offset_y{};
 	switch (axis)
 	{
 	case 0:
@@ -2259,7 +2248,7 @@ void GraphicsWidget::set_slice_2D(
 	image_container.orientation_20_20 = QString("");
 	//
 	if (!v) return;
-	int x = 0;
+	int x{};
 	QString error_;
 	//
 	image_container.image3D = v;
@@ -2625,10 +2614,10 @@ void GraphicsWidget::stop_animation()
 
 void GraphicsWidget::animate_()
 {
-	int k = 0;
+	int k{};
 	if (!run__) return;
 	double requested_time = frametime_2D;
-	bool time_defined = false;
+	bool time_defined{};
 	if (!image_container.image3D) return;
 	const qint64 t0 = QDateTime::currentMSecsSinceEpoch();
 	switch (axis)
@@ -2823,7 +2812,7 @@ void GraphicsWidget::update_measurement(
 				x1 <= ivariant->usregions.at(x).m_X1 &&
 				y1 <= ivariant->usregions.at(x).m_Y1)
 			{
-				if (!ivariant->usregions.at(x).m_UnitXString.isEmpty()||
+				if (!ivariant->usregions.at(x).m_UnitXString.isEmpty() ||
 					!ivariant->usregions.at(x).m_UnitYString.isEmpty())
 					ids.push_back(x);
 				ids2.push_back(x);
@@ -2833,8 +2822,7 @@ void GraphicsWidget::update_measurement(
 		{
 			if (ivariant->usregions.at(ids.at(x)).m_FlagsBool)
 			{
-				const unsigned int flags =
-					ivariant->usregions.at(ids.at(x)).m_RegionFlags;
+				const unsigned int flags = ivariant->usregions.at(ids.at(x)).m_RegionFlags;
 				if ((flags & 1) == 0)
 					high_priority_regions.push_back(ids.at(x));
 			}
@@ -2843,37 +2831,29 @@ void GraphicsWidget::update_measurement(
 		QString data_type;
 		for (int x = 0; x < ids2.size(); ++x)
 		{
-			if (
-				!ivariant->usregions.at(
-					ids2.at(x)).m_DataTypeString.isEmpty())
-				data_type.append(
-					ivariant->usregions.at(ids2.at(x)).m_DataTypeString);
+			if (!ivariant->usregions.at(ids2.at(x)).m_DataTypeString.isEmpty())
+				data_type.append(ivariant->usregions.at(ids2.at(x)).m_DataTypeString);
 			if (ids2.size() > 1 && x != ids2.size() - 1 && !data_type.isEmpty())
 				data_type.append(QString("/"));
 		}
 		//
 		if (!ids.empty())
 		{
-			bool tmp1x = false;
-			bool tmp1y = false;
+			bool tmp1x{};
+			bool tmp1y{};
 			const unsigned int id =
 				(high_priority_regions.size() == 1)
 				? high_priority_regions.at(0)
 				: ids.at(0);
-			const double dx  =
-				ivariant->usregions.at(id).m_PhysicalDeltaX;
-			const double dy  =
-				ivariant->usregions.at(id).m_PhysicalDeltaY;
+			const double dx  = ivariant->usregions.at(id).m_PhysicalDeltaX;
+			const double dy  = ivariant->usregions.at(id).m_PhysicalDeltaY;
 			const double x0_ = x0 * dx;
 			const double y0_ = y0 * dy;
 			const double x1_ = x1 * dx;
 			const double y1_ = y1 * dy;
-			const QString measure_textx  =
-				ivariant->usregions.at(id).m_UnitXString;
-			const QString measure_texty  =
-				ivariant->usregions.at(id).m_UnitYString;
-			const unsigned short spatial =
-				ivariant->usregions.at(id).m_RegionSpatialFormat;
+			const QString measure_textx  = ivariant->usregions.at(id).m_UnitXString;
+			const QString measure_texty  = ivariant->usregions.at(id).m_UnitYString;
+			const unsigned short spatial = ivariant->usregions.at(id).m_RegionSpatialFormat;
 			QColor color(Qt::cyan);
 			switch (spatial)
 			{
@@ -2918,11 +2898,7 @@ void GraphicsWidget::update_measurement(
 #else
 					tmp0x.sprintf("%.3f", d0);
 #endif
-					tmp0.append(
-						QString("X: ") +
-						tmp0x +
-						QString(" ") +
-						measure_textx);
+					tmp0.append(QString("X: ") + tmp0x + QString(" ") + measure_textx);
 				}
 				if (!measure_textx.isEmpty() && !measure_texty.isEmpty())
 				{
@@ -2938,11 +2914,7 @@ void GraphicsWidget::update_measurement(
 #else
 					tmp0y.sprintf("%.3f", d1);
 #endif
-					tmp0.append(
-						QString("Y: ") +
-						tmp0y +
-						QString(" ") +
-						measure_texty);
+					tmp0.append(QString("Y: ") + tmp0y + QString(" ") + measure_texty);
 				}
 			}
 			//
@@ -2951,7 +2923,7 @@ void GraphicsWidget::update_measurement(
 			pen.setBrush(QBrush(color));
 			pen.setWidth(0);
 			graphicsview->measurment_line->setPen(pen);
-			if (tmp1x||tmp1y)
+			if (tmp1x || tmp1y)
 			{
 				if (tmp1x)
 				{
@@ -2995,7 +2967,7 @@ void GraphicsWidget::update_measurement(
 	}
 	else
 	{
-		double d = -1;
+		double d{-1.0};
 		switch (ivariant->image_type)
 		{
 		case 0:
@@ -3099,14 +3071,12 @@ void GraphicsWidget::set_mouse_modus(short m, bool us_regions)
 	{
 	case 1: // set slices
 		{
-			graphicsview->setTransformationAnchor(
-				QGraphicsView::AnchorUnderMouse);
+			graphicsview->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 			graphicsview->setDragMode(QGraphicsView::NoDrag);
 			graphicsview->setCursor(Qt::CrossCursor);
 			if (main)
 			{
-				graphicsview->handle_rect->set_pen2(
-					3.0 / graphicsview->m_scale);
+				graphicsview->handle_rect->set_pen2(3.0 / graphicsview->m_scale);
 				graphicsview->set_handleitems_cursors(false);
 			}
 			graphicsview->measurment_line->hide();
@@ -3120,14 +3090,12 @@ void GraphicsWidget::set_mouse_modus(short m, bool us_regions)
 		break;
 	case 2: // measure distance
 		{
-			graphicsview->setTransformationAnchor(
-				QGraphicsView::AnchorUnderMouse);
+			graphicsview->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 			graphicsview->setDragMode(QGraphicsView::NoDrag);
 			graphicsview->setCursor(Qt::ArrowCursor);
 			if (main)
 			{
-				graphicsview->handle_rect->set_pen2(
-					3.0 / graphicsview->m_scale);
+				graphicsview->handle_rect->set_pen2(3.0 / graphicsview->m_scale);
 				graphicsview->set_handleitems_cursors(false);
 			}
 			graphicsview->measurment_line->show();
@@ -3145,15 +3113,13 @@ void GraphicsWidget::set_mouse_modus(short m, bool us_regions)
 	case 0: // default
 	default:
 		{
-			graphicsview->setTransformationAnchor(
-				QGraphicsView::AnchorUnderMouse);
+			graphicsview->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 			graphicsview->setCursor(Qt::OpenHandCursor);
 			graphicsview->setDragMode(QGraphicsView::ScrollHandDrag);
 			//graphicsview->unsetCursor();
 			if (main)
 			{
-				graphicsview->handle_rect->set_pen1(
-					3.0 / graphicsview->m_scale);
+				graphicsview->handle_rect->set_pen1(3.0 / graphicsview->m_scale);
 				graphicsview->set_handleitems_cursors(true);
 			}
 			graphicsview->measurment_line->hide();
@@ -3186,7 +3152,7 @@ bool GraphicsWidget::get_show_cursor() const
 
 void GraphicsWidget::update_pixel_value(double x, double  y)
 {
-	if (x < 0 || y < 0 || !image_container.image3D)
+	if (x < 0.0 || y < 0.0 || !image_container.image3D)
 	{
 		info_line->setText("");
 		return;
@@ -3199,32 +3165,20 @@ void GraphicsWidget::update_pixel_value(double x, double  y)
 	if (lookup_id >= 0)
 	{
 		const ImageVariant * v = aliza->get_image(lookup_id);
-		if (
-			v &&
+		if (v &&
 			v->equi &&
-			(v->di->idimx ==
-				image_container.image3D->di->idimx) &&
-			(v->di->idimy ==
-				image_container.image3D->di->idimy) &&
-			(v->di->idimz ==
-				image_container.image3D->di->idimz) &&
-			(v->orientation ==
-				image_container.image3D->orientation) &&
-			(v->di->ix_origin + 0.001 >
-				image_container.image3D->di->ix_origin) &&
-			(v->di->ix_origin - 0.001 <
-				image_container.image3D->di->ix_origin) &&
-			(v->di->iy_origin + 0.001 >
-				image_container.image3D->di->iy_origin) &&
-			(v->di->iy_origin - 0.001 <
-				image_container.image3D->di->iy_origin) &&
-			(v->di->iz_origin + 0.001 >
-				image_container.image3D->di->iz_origin) &&
-			(v->di->iz_origin - 0.001 <
-				image_container.image3D->di->iz_origin))
+			(v->di->idimx == image_container.image3D->di->idimx) &&
+			(v->di->idimy == image_container.image3D->di->idimy) &&
+			(v->di->idimz == image_container.image3D->di->idimz) &&
+			(v->orientation == image_container.image3D->orientation) &&
+			(v->di->ix_origin + 0.001 > image_container.image3D->di->ix_origin) &&
+			(v->di->ix_origin - 0.001 < image_container.image3D->di->ix_origin) &&
+			(v->di->iy_origin + 0.001 > image_container.image3D->di->iy_origin) &&
+			(v->di->iy_origin - 0.001 < image_container.image3D->di->iy_origin) &&
+			(v->di->iz_origin + 0.001 > image_container.image3D->di->iz_origin) &&
+			(v->di->iz_origin - 0.001 < image_container.image3D->di->iz_origin))
 		{
-			const QString d = GraphicsUtils::get_scalar_pixel_value(
-				v, a, x, y, sx, sy, sz, false);
+			const QString d = GraphicsUtils::get_scalar_pixel_value(v, a, x, y, sx, sy, sz, false);
 			info_line->setText(d);
 		}
 		else
@@ -3245,8 +3199,7 @@ void GraphicsWidget::update_pixel_value(double x, double  y)
 	case 6:
 	case 7:
 	case 8:
-		d = GraphicsUtils::get_scalar_pixel_value(
-			image_container.image3D, a, x, y, sx, sy, sz, false);
+		d = GraphicsUtils::get_scalar_pixel_value(image_container.image3D, a, x, y, sx, sy, sz, false);
 		break;
 	case 10:
 	case 11:
@@ -3255,8 +3208,7 @@ void GraphicsWidget::update_pixel_value(double x, double  y)
 	case 14:
 	case 15:
 	case 16:
-		d = GraphicsUtils::get_rgb_pixel_value(
-			image_container.image3D, a, x, y, sx, sy, sz);
+		d = GraphicsUtils::get_rgb_pixel_value(image_container.image3D, a, x, y, sx, sy, sz);
 		break;
 	case 20:
 	case 21:
@@ -3265,8 +3217,7 @@ void GraphicsWidget::update_pixel_value(double x, double  y)
 	case 24:
 	case 25:
 	case 26:
-		d = GraphicsUtils::get_rgba_pixel_value(
-			image_container.image3D, a, x, y, sx, sy, sz);
+		d = GraphicsUtils::get_rgba_pixel_value(image_container.image3D, a, x, y, sx, sy, sz);
 		break;
 	default :
 		break;
@@ -3276,7 +3227,7 @@ void GraphicsWidget::update_pixel_value(double x, double  y)
 
 void GraphicsWidget::update_pixel_value2(double x, double y)
 {
-	if (x < 0 || y < 0 || !image_container.image3D)
+	if (x < 0.0 || y < 0.0 || !image_container.image3D)
 	{
 		info_line->setText("");
 		return;
@@ -3297,8 +3248,7 @@ void GraphicsWidget::update_pixel_value2(double x, double y)
 	case 6:
 	case 7:
 	case 8:
-		d = GraphicsUtils::get_scalar_pixel_value(
-			image_container.image3D, a, x, y, sx, sy, sz, true);
+		d = GraphicsUtils::get_scalar_pixel_value(image_container.image3D, a, x, y, sx, sy, sz, true);
 		break;
 	case 10:
 	case 11:
@@ -3307,8 +3257,7 @@ void GraphicsWidget::update_pixel_value2(double x, double y)
 	case 14:
 	case 15:
 	case 16:
-		d = GraphicsUtils::get_rgb_pixel_value(
-			image_container.image3D, a, x, y, sx, sy, sz);
+		d = GraphicsUtils::get_rgb_pixel_value(image_container.image3D, a, x, y, sx, sy, sz);
 		break;
 	case 20:
 	case 21:
@@ -3317,8 +3266,7 @@ void GraphicsWidget::update_pixel_value2(double x, double y)
 	case 24:
 	case 25:
 	case 26:
-		d = GraphicsUtils::get_rgba_pixel_value(
-			image_container.image3D, a, x, y, sx, sy, sz);
+		d = GraphicsUtils::get_rgba_pixel_value(image_container.image3D, a, x, y, sx, sy, sz);
 		break;
 	default :
 		break;
@@ -3350,7 +3298,7 @@ QString GraphicsWidget::contours_from_selected_paths(
 	if (!ivariant) return QString("Image is null");
 	if (!roi)      return QString("ROI is null");
 	QString message;
-	int selected_items_size = 0;
+	int selected_items_size{};
 	QList<long long> tmp_ids;
 	QList<QGraphicsItem*> selected_items;
 	selected_items = graphicsview->scene()->selectedItems();
