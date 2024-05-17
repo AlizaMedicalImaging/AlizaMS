@@ -12,7 +12,6 @@
 #include <QMap>
 #include <QListWidget>
 #include <QListWidgetItem>
-#include <QElapsedTimer>
 #include <itkExtractImageFilter.h>
 #include <itkImageRegionConstIterator.h>
 #include "processimagethreadLUT.hxx"
@@ -967,33 +966,18 @@ template<typename T> void load_image2(
 	}
 	//
 	const size_t threadsLUT_size = threadsLUT_.size();
-	//
-	{
-		QElapsedTimer etimer;
-		etimer.start();
-		while (true)
-		{
-			if (etimer.elapsed() > 1)
-			{
-				size_t b__{};
-				for (size_t i = 0; i < threadsLUT_size; ++i)
-				{
-					if (threadsLUT_.at(i)->isFinished()) ++b__;
-				}
-				if (b__ == threadsLUT_size)
-				{
-					break;
-				}
-				else
-				{
-					etimer.start();
-				}
-			}
-		}
-	}
-	//
 	for (size_t i = 0; i < threadsLUT_size; ++i)
 	{
+		threadsLUT_[i]->wait(10000);
+	}
+	for (size_t i = 0; i < threadsLUT_size; ++i)
+	{
+		if (threadsLUT_.at(i)->isRunning())
+		{
+			// should never happen
+			threadsLUT_[i]->terminate();
+			threadsLUT_[i]->wait();
+		}
 		delete threadsLUT_[i];
 		threadsLUT_[i] = nullptr;
 	}

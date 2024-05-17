@@ -19,7 +19,6 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QScrollBar>
-#include <QElapsedTimer>
 #include <itkExtractImageFilter.h>
 #include <itkImageRegionConstIterator.h>
 #include "processimagethreadLUT.hxx"
@@ -1388,59 +1387,18 @@ template<typename T> void load_image(
 	}
 	//
 	const size_t threadsLUT_size = threadsLUT_.size();
-	//
-	{
-#ifdef A_TMP_BENCHMARK
-		unsigned long long ecount1{};
-		unsigned long long ecount2{};
-		unsigned long long ecount3{};
-#endif
-		QElapsedTimer etimer;
-		etimer.start();
-		while (true)
-		{
-#ifdef A_TMP_BENCHMARK
-			++ecount1;
-#endif
-			if (etimer.elapsed() > 1)
-			{
-#ifdef A_TMP_BENCHMARK
-				++ecount2;
-#endif
-				size_t b__{};
-				for (size_t i = 0; i < threadsLUT_size; ++i)
-				{
-					if (threadsLUT_.at(i)->isFinished()) ++b__;
-				}
-				if (b__ == threadsLUT_size)
-				{
-					break;
-				}
-				else
-				{
-#ifdef A_TMP_BENCHMARK
-					++ecount3;
-#endif
-					etimer.start();
-				}
-			}
-		}
-#ifdef A_TMP_BENCHMARK
-		std::cout
-			<< "while loop run " << ecount1
-			<< " times, checked " << ecount2
-			<< " times, restarted " << ecount3 << " times\n";
-#endif
-	}
-	//
-#ifdef A_TMP_BENCHMARK
-#if 0
-	const std::chrono::duration<double, std::milli> elapsed2{ now() - start2 };
-	std::cout << "spent for image " << elapsed2.count() << " ms" << std::endl;
-#endif
-#endif
 	for (size_t i = 0; i < threadsLUT_size; ++i)
 	{
+		threadsLUT_[i]->wait(10000);
+	}
+	for (size_t i = 0; i < threadsLUT_size; ++i)
+	{
+		if (threadsLUT_.at(i)->isRunning())
+		{
+			// should never happen
+			threadsLUT_[i]->terminate();
+			threadsLUT_[i]->wait();
+		}
 		delete threadsLUT_[i];
 		threadsLUT_[i] = nullptr;
 	}
