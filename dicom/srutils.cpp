@@ -24,13 +24,12 @@
 #include <QPainterPath>
 #include <QPen>
 #include <QBrush>
+#include <QElapsedTimer>
 #include <QApplication>
 #include "processimagethreadLUT.hxx"
 #include "settingswidget.h"
 #include "findrefdialog.h"
 #include <itkExtractImageFilter.h>
-#include <chrono>
-#include <thread>
 #include "mmath.h"
 
 namespace
@@ -110,7 +109,11 @@ template<typename T> SRImage li3(
 	}
 	//
 	std::vector<QThread*> threadsLUT_;
-	const int num_threads = QThread::idealThreadCount();
+	int num_threads = QThread::idealThreadCount();
+	if (num_threads > 1)
+	{
+		--num_threads;
+	}
 	const int tmp99 = size[1] % num_threads;
 	const double center = ivariant->di->us_window_center;
 	const double width = ivariant->di->us_window_width;
@@ -189,15 +192,28 @@ template<typename T> SRImage li3(
 	}
 	//
 	const size_t threadsLUT_size = threadsLUT_.size();
-	while (true)
 	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(2));
-		size_t b__{};
-		for (size_t i = 0; i < threadsLUT_size; ++i)
+		QElapsedTimer etimer;
+		etimer.start();
+		while (true)
 		{
-			if (threadsLUT_.at(i)->isFinished()) ++b__;
+			if (etimer.elapsed() > 1)
+			{
+				size_t b__{};
+				for (size_t i = 0; i < threadsLUT_size; ++i)
+				{
+					if (threadsLUT_.at(i)->isFinished()) ++b__;
+				}
+				if (b__ == threadsLUT_size)
+				{
+					break;
+				}
+				else
+				{
+					etimer.start();
+				}
+			}
 		}
-		if (b__ == threadsLUT_size) break;
 	}
 	for (size_t i = 0; i < threadsLUT_size; ++i)
 	{
