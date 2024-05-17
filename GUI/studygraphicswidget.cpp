@@ -12,6 +12,7 @@
 #include <QMap>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <QElapsedTimer>
 #include <itkExtractImageFilter.h>
 #include <itkImageRegionConstIterator.h>
 #include "processimagethreadLUT.hxx"
@@ -21,7 +22,6 @@
 #include "imagesbox.h"
 #include <climits>
 #include <chrono>
-#include <thread>
 #include <utility>
 
 namespace
@@ -877,7 +877,11 @@ template<typename T> void load_image2(
 	//
 	const bool global_flip_x = widget->graphicsview->global_flip_x;
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
-	const int num_threads = QThread::idealThreadCount();
+	int num_threads = QThread::idealThreadCount();
+	if (num_threads > 1)
+	{
+		--num_threads;
+	}
 	const int tmp99 = size[1] % num_threads;
 	std::vector<QThread*> threadsLUT_;
 	if (tmp99 == 0)
@@ -954,16 +958,31 @@ template<typename T> void load_image2(
 	}
 	//
 	const size_t threadsLUT_size = threadsLUT_.size();
-	while (true)
+	//
 	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(2));
-		size_t b__ = 0;
-		for (size_t i = 0; i < threadsLUT_size; ++i)
+		QElapsedTimer etimer;
+		etimer.start();
+		while (true)
 		{
-			if (threadsLUT_.at(i)->isFinished()) ++b__;
+			if (etimer.elapsed() > 1)
+			{
+				size_t b__{};
+				for (size_t i = 0; i < threadsLUT_size; ++i)
+				{
+					if (threadsLUT_.at(i)->isFinished()) ++b__;
+				}
+				if (b__ == threadsLUT_size)
+				{
+					break;
+				}
+				else
+				{
+					etimer.start();
+				}
+			}
 		}
-		if (b__ == threadsLUT_size) break;
 	}
+	//
 	for (size_t i = 0; i < threadsLUT_size; ++i)
 	{
 		delete threadsLUT_[i];

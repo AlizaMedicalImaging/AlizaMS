@@ -17,6 +17,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QScrollBar>
+#include <QElapsedTimer>
 #include <itkExtractImageFilter.h>
 #include <itkImageRegionConstIterator.h>
 #include "processimagethreadLUT.hxx"
@@ -27,7 +28,6 @@
 #include "updateqtcommand.h"
 #include <climits>
 #include <chrono>
-#include <thread>
 #include <utility>
 
 //#define A_TMP_BENCHMARK
@@ -1306,7 +1306,13 @@ template<typename T> void load_image(
 	//
 	const bool global_flip_x = widget->graphicsview->global_flip_x;
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
-	const int num_threads = QThread::idealThreadCount();
+	int num_threads = QThread::idealThreadCount();
+#if 1
+	if (num_threads > 1)
+	{
+		--num_threads;
+	}
+#endif
 	const int tmp99 = size[1] % num_threads;
 	std::vector<QThread*> threadsLUT_;
 #ifdef A_TMP_BENCHMARK
@@ -1391,16 +1397,44 @@ template<typename T> void load_image(
 	}
 	//
 	const size_t threadsLUT_size = threadsLUT_.size();
-	while (true)
+	//
 	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(2));
-		size_t b__ = 0;
-		for (size_t i = 0; i < threadsLUT_size; ++i)
+#ifdef A_TMP_BENCHMARK
+		unsigned long long ecount1{};
+		unsigned long long ecount2{};
+#endif
+		QElapsedTimer etimer;
+		etimer.start();
+		while (true)
 		{
-			if (threadsLUT_.at(i)->isFinished()) ++b__;
+#ifdef A_TMP_BENCHMARK
+			++ecount1;
+#endif
+			if (etimer.elapsed() > 1)
+			{
+#ifdef A_TMP_BENCHMARK
+				++ecount2;
+#endif
+				size_t b__{};
+				for (size_t i = 0; i < threadsLUT_size; ++i)
+				{
+					if (threadsLUT_.at(i)->isFinished()) ++b__;
+				}
+				if (b__ == threadsLUT_size)
+				{
+					break;
+				}
+				else
+				{
+					etimer.start();
+				}
+			}
 		}
-		if (b__ == threadsLUT_size) break;
+#ifdef A_TMP_BENCHMARK
+		std::cout << "while loop run " << ecount1 << " times, checked " << ecount2 << " times\n";
+#endif
 	}
+	//
 #ifdef A_TMP_BENCHMARK
 #if 0
 	const std::chrono::duration<double, std::milli> elapsed2{ now() - start2 };
