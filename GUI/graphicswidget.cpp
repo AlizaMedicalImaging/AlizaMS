@@ -1402,6 +1402,7 @@ template<typename T> void load_image(
 #ifdef A_TMP_BENCHMARK
 		unsigned long long ecount1{};
 		unsigned long long ecount2{};
+		unsigned long long ecount3{};
 #endif
 		QElapsedTimer etimer;
 		etimer.start();
@@ -1426,12 +1427,18 @@ template<typename T> void load_image(
 				}
 				else
 				{
+#ifdef A_TMP_BENCHMARK
+					++ecount3;
+#endif
 					etimer.start();
 				}
 			}
 		}
 #ifdef A_TMP_BENCHMARK
-		std::cout << "while loop run " << ecount1 << " times, checked " << ecount2 << " times\n";
+		std::cout
+			<< "while loop run " << ecount1
+			<< " times, checked " << ecount2
+			<< " times, restarted " << ecount3 << " times\n";
 #endif
 	}
 	//
