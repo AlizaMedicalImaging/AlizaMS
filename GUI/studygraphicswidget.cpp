@@ -882,11 +882,15 @@ template<typename T> void load_image2(
 	//
 	const bool global_flip_x = widget->graphicsview->global_flip_x;
 	const bool global_flip_y = widget->graphicsview->global_flip_y;
+#if 1
+	const int num_threads = QThread::idealThreadCount();
+#else
 	int num_threads = QThread::idealThreadCount();
 	if (num_threads > 1)
 	{
 		--num_threads;
 	}
+#endif
 	const int tmp99 = size[1] % num_threads;
 	std::vector<QThread*> threadsLUT_;
 	if (tmp99 == 0)
