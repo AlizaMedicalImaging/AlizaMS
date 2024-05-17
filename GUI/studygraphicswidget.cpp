@@ -1114,7 +1114,7 @@ template<typename T> double get_distance3(
 {
 	if (image.IsNull()) return -1.0;
 	if (!ivariant)      return -1.0;
-	if (x0 < 0.0 || y0 < 0.0 || x1 < 0.0 || y1 < 0.0) return -1;
+	if (x0 < 0.0 || y0 < 0.0 || x1 < 0.0 || y1 < 0.0) return -1.0;
 	itk::ContinuousIndex<float, 3> idx0;
 	itk::ContinuousIndex<float, 3> idx1;
 	itk::Point<float, 3> j0;
