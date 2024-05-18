@@ -143,12 +143,12 @@ int main(int argc, char * argv[])
 #endif
 #endif
 #endif
-	bool force_disable_opengl = false;
-	bool metadata_only = false;
-	bool metadata_series_only = false;
-	int count = 1;
-	bool ok3d = false;
-	bool hide_zoom = false;
+	bool force_disable_opengl{};
+	bool metadata_only{};
+	bool metadata_series_only{};
+	int count{1};
+	bool ok3d{};
+	bool hide_zoom{};
 	while (count < argc)
 	{
 		if (!strcmp(argv[count], "-nogl"))
@@ -199,7 +199,7 @@ int main(int argc, char * argv[])
 // clang-format off
 #if (defined PRINT_HOST_INFO && PRINT_HOST_INFO==1)
 	{
-		const unsigned int endian = 1;
+		const unsigned int endian{1};
 		if (*((const unsigned char*)&endian) == 0)
 		{
 			std::cout << "System is big-endian\n";
@@ -387,7 +387,7 @@ int main(int argc, char * argv[])
 #endif
 	//
 	{
-		double app_font_pt = 0.0;
+		double app_font_pt{};
 		QSettings settings(
 			QSettings::IniFormat,
 			QSettings::UserScope,
@@ -518,8 +518,7 @@ int main(int argc, char * argv[])
 		QString::fromLatin1(
 			QVariant(ALIZAMS_VERSION).toByteArray().constData()) +
 		QString("\n\n");
-	QSplashScreen * splash =
-		new QSplashScreen(QPixmap(":/bitmaps/empty_splash.png"));
+	QSplashScreen * splash = new QSplashScreen(QPixmap(":/bitmaps/empty_splash.png"));
 	splash->setWindowFlags(Qt::SplashScreen|Qt::WindowStaysOnTopHint);
 	splash->setAttribute(Qt::WA_DeleteOnClose);
 	splash->show();
