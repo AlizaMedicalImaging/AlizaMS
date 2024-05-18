@@ -11,10 +11,12 @@
 #include <QDir>
 #include <QColorDialog>
 #include <QDateTime>
+#include <QEventLoop>
 #include <string>
 #include <array>
+#ifdef ALIZA_PERF_COLLISION
 #include <chrono>
-#include <thread>
+#endif
 #include "iconutils.h"
 #include "commonutils.h"
 #include "contourutils.h"
@@ -66,6 +68,15 @@ static btDbvtBroadphase                * g_broadphase = nullptr;
 static btCollisionWorld                * g_collisionWorld = nullptr;
 static btAlignedObjectArray<btCollisionShape*> g_collision_shapes;
 static bool show_all_study_collisions = true;
+
+inline void delay1(int ms) // milliseconds
+{
+	QEventLoop loop;
+	QTimer t;
+	t.connect(&t, SIGNAL(timeout()), &loop, SLOT(quit()));
+	t.start(ms);
+	loop.exec();
+}
 
 struct ClosestRayResultCallback1 : public btCollisionWorld::ClosestRayResultCallback
 {
@@ -761,8 +772,7 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 			lt->start();
 			while (!lt->isFinished())
 			{
-				std::this_thread::sleep_for(std::chrono::milliseconds(10));
-				qApp->processEvents();
+				delay1(10);
 			}
 			const QString message_ = lt->message;
 			if (!message_.isEmpty())
@@ -890,8 +900,7 @@ void Aliza::add_histogram(ImageVariant * v, QProgressDialog * pb, bool check_set
 	t->start();
 	while (!t->isFinished())
 	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-		qApp->processEvents();
+		delay1(10);
 		if (pb && pb->wasCanceled())
 		{
 			t->exit(0);
@@ -4156,8 +4165,7 @@ QString Aliza::load_dicom_file(
 		lt->start();
 		while (!lt->isFinished())
 		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
-			qApp->processEvents();
+			delay1(10);
 		}
 		const QString message_ = lt->message;
 		if (!message_.isEmpty())
