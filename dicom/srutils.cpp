@@ -24,7 +24,6 @@
 #include <QPainterPath>
 #include <QPen>
 #include <QBrush>
-#include <QElapsedTimer>
 #include <QApplication>
 #include "processimagethreadLUT.hxx"
 #include "settingswidget.h"
@@ -196,32 +195,20 @@ template<typename T> SRImage li3(
 	}
 	//
 	const size_t threadsLUT_size = threadsLUT_.size();
+	for (size_t i = 0; i < threadsLUT_size; ++i)
 	{
-		QElapsedTimer etimer;
-		etimer.start();
-		while (true)
-		{
-			if (etimer.elapsed() > 1)
-			{
-				size_t b__{};
-				for (size_t i = 0; i < threadsLUT_size; ++i)
-				{
-					if (threadsLUT_.at(i)->isFinished()) ++b__;
-				}
-				if (b__ == threadsLUT_size)
-				{
-					break;
-				}
-				else
-				{
-					etimer.start();
-				}
-			}
-		}
+		threadsLUT_[i]->wait(10000);
 	}
 	for (size_t i = 0; i < threadsLUT_size; ++i)
 	{
+		if (threadsLUT_.at(i)->isRunning())
+		{
+			// should never happen
+			threadsLUT_[i]->terminate();
+			threadsLUT_[i]->wait();
+		}
 		delete threadsLUT_[i];
+		threadsLUT_[i] = nullptr;
 	}
 	threadsLUT_.clear();
 	//
