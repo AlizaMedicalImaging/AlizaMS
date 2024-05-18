@@ -772,7 +772,7 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 			lt->start();
 			while (!lt->isFinished())
 			{
-				delay1(10);
+				delay1(100);
 			}
 			const QString message_ = lt->message;
 			if (!message_.isEmpty())
@@ -4165,7 +4165,7 @@ QString Aliza::load_dicom_file(
 		lt->start();
 		while (!lt->isFinished())
 		{
-			delay1(10);
+			delay1(100);
 		}
 		const QString message_ = lt->message;
 		if (!message_.isEmpty())
