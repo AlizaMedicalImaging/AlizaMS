@@ -7,8 +7,6 @@
 #include <QColor>
 #include <QThread>
 #include <vector>
-#include <chrono>
-#include <thread>
 
 class ProcessImageThread_ : public QThread
 {
@@ -149,7 +147,7 @@ template<typename Tin, typename Tout> void extract_icon(
 	std::vector<ProcessImageThread_*> icon_threads;
 	if (tmp99 == 0)
 	{
-		unsigned int j = 0;
+		unsigned int j{};
 		for (int i = 0; i < num_threads; ++i)
 		{
 			const int size_0 = size_x;
@@ -167,8 +165,8 @@ template<typename Tin, typename Tout> void extract_icon(
 	}
 	else
 	{
-		unsigned int j = 0;
-		unsigned int block = 64;
+		unsigned int j{};
+		unsigned int block{64};
 		if (static_cast<float>(size_y) / static_cast<float>(block) > 16.0f)
 		{
 			block = 128;
@@ -180,7 +178,7 @@ template<typename Tin, typename Tout> void extract_icon(
 			for (int i = 0; i < incr; ++i)
 			{
 				const int size_0  = size_x;
-				const int index_0 = 0;
+				const int index_0{};
 				const int index_1 = i * block;
 				ProcessImageThread_ * t__ = new ProcessImageThread_(tmp1,
 							p,
@@ -208,16 +206,11 @@ template<typename Tin, typename Tout> void extract_icon(
 		}
 
 	}
+	//
 	const size_t threads_size = icon_threads.size();
-	while (true)
+	for (size_t i = 0; i < threads_size; ++i)
 	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
-		size_t b__ = 0;
-		for (size_t i = 0; i < threads_size; ++i)
-		{
-			if (icon_threads.at(i)->isFinished()) ++b__;
-		}
-		if (b__ == threads_size) break;
+		icon_threads[i]->wait();
 	}
 	for (size_t i = 0; i < threads_size; ++i)
 	{
@@ -227,7 +220,8 @@ template<typename Tin, typename Tout> void extract_icon(
 	icon_threads.clear();
 	//
 	QImage tmpi(p, size_x, size_y, 3 * size_x, QImage::Format_RGB888);
-	bool flip_x = false, flip_y = false;
+	bool flip_x{};
+	bool flip_y{};
 	if (!ivariant->orientation_string.isEmpty() && ivariant->orientation_string.size() >= 3)
 	{
 		if (ivariant->orientation_string.at(1) == QChar('I') ||
@@ -335,7 +329,8 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 	if (tmp0.IsNull()) return;
 	else tmp0->DisconnectPipeline();
 	//
-	bool flip_x = false, flip_y = false;
+	bool flip_x{};
+	bool flip_y{};
 	if (!ivariant->orientation_string.isEmpty() && ivariant->orientation_string.size() >= 3)
 	{
 		if (ivariant->orientation_string.at(1) == QChar('I') ||
@@ -375,7 +370,7 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 		}
 		try
 		{
-			unsigned long j_ = 0;
+			unsigned long j_{};
 			itk::ImageRegionConstIterator<Tout> iterator(tmp0, region);
 			iterator.GoToBegin();
 			while (!iterator.IsAtEnd())
@@ -392,7 +387,7 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 		}
 		catch (const itk::ExceptionObject &)
 		{
-			;;
+			;
 		}
 		QImage tmpi(p, size_[0], size_[1], 3 * size_[0], QImage::Format_RGB888);
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true, true);
@@ -476,7 +471,7 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 		}
 		try
 		{
-			unsigned long j_ = 0;
+			unsigned long j_{};
 			itk::ImageRegionConstIterator<Tout> iterator(tmp0, region);
 			iterator.GoToBegin();
 			while(!iterator.IsAtEnd())
@@ -493,7 +488,7 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 		}
 		catch (const itk::ExceptionObject &)
 		{
-			;;
+			;
 		}
 		QImage tmpi(p, size_[0], size_[1], 3 * size_[0], QImage::Format_RGB888);
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true, true);
@@ -586,7 +581,8 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 	}
 	if (tmp0.IsNull()) return;
 	//
-	bool flip_x = false, flip_y = false;
+	bool flip_x{};
+	bool flip_y{};
 	if (!ivariant->orientation_string.isEmpty() && ivariant->orientation_string.size() >= 3)
 	{
 		if (ivariant->orientation_string.at(1) == QChar('I') ||
@@ -627,7 +623,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		}
 		try
 		{
-			unsigned long j_ = 0;
+			unsigned long j_{};
 			itk::ImageRegionConstIterator<Tout> iterator(tmp0, region);
 			iterator.GoToBegin();
 			while (!iterator.IsAtEnd())
@@ -646,7 +642,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		}
 		catch (const itk::ExceptionObject &)
 		{
-			;;
+			;
 		}
 		QImage tmpi(p, size_[0], size_[1], 4 * size_[0], QImage::Format_RGBA8888);
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true, true);
@@ -679,7 +675,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		}
 		try
 		{
-			unsigned long j_ = 0;
+			unsigned long j_{};
 			itk::ImageRegionConstIterator<Tout> iterator(tmp0, region);
 			iterator.GoToBegin();
 			while (!iterator.IsAtEnd())
@@ -711,7 +707,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		}
 		catch (const itk::ExceptionObject &)
 		{
-			;;
+			;
 		}
 		QImage tmpi(p, size_[0], size_[1], 3 * size_[0], QImage::Format_RGB888);
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true, true);
@@ -784,7 +780,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		}
 		try
 		{
-			unsigned long j_ = 0;
+			unsigned long j_{};
 			itk::ImageRegionConstIterator<Tout> iterator(tmp0, region);
 			iterator.GoToBegin();
 			while (!iterator.IsAtEnd())
@@ -816,7 +812,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		}
 		catch (const itk::ExceptionObject &)
 		{
-			;;
+			;
 		}
 		QImage tmpi(p, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true, true);
@@ -864,7 +860,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		}
 		try
 		{
-			unsigned long j_ = 0;
+			unsigned long j_{};
 			itk::ImageRegionConstIterator<Tout> iterator(tmp0, region);
 			iterator.GoToBegin();
 			while(!iterator.IsAtEnd())
@@ -883,7 +879,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		}
 		catch (const itk::ExceptionObject &)
 		{
-			;;
+			;
 		}
 		QImage tmpi(p, size[0], size[1], 4 * size[0], QImage::Format_RGBA8888);
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true, true);
@@ -916,7 +912,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		}
 		try
 		{
-			unsigned long j_ = 0;
+			unsigned long j_{};
 			itk::ImageRegionConstIterator<Tout> iterator(tmp0, region);
 			iterator.GoToBegin();
 			while(!iterator.IsAtEnd())
@@ -939,7 +935,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		}
 		catch (const itk::ExceptionObject &)
 		{
-			;;
+			;
 		}
 		QImage tmpi(p, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true, true);

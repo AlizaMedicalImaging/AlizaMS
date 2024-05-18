@@ -68,7 +68,7 @@ template<typename T> QString calculate_histogramm(
 		return QString(ex.GetDescription());
 	}
 	//
-	int tmp0 = 1;
+	int tmp0{1};
 	const HistogramType * h = histogram_generator->GetOutput();
 	for (unsigned int x = 0; x < bins_size; ++x)
 	{
@@ -144,7 +144,7 @@ template<typename T> QString calculate_histogramm_rgb(
 		return QString("bins_size > histogram->GetSize()[2]");
 	}
 	//
-	int tmp0 = 1;
+	int tmp0{1};
 	for (unsigned int x = 0; x < bins_size; ++x)
 	{
 		const int f0 = histogram->GetFrequency(x, 0);
@@ -240,7 +240,7 @@ QString HistogramGen::gen_pixmap_scalar()
 	QPen pen; pen.setColor(fgcolor);
 	pen.setWidth(3);
 	const unsigned int pixmap_w = bins_size < 2048 ? 2048 : bins_size;
-	const unsigned int pixmap_h = 1024;
+	const unsigned int pixmap_h{1024u};
 	pixmap = QPixmap(pixmap_w, pixmap_h);
 	if (pixmap.isNull())
 	{
@@ -252,8 +252,8 @@ QString HistogramGen::gen_pixmap_scalar()
 	painter.begin(&pixmap);
 	painter.setPen(pen);
 	painter.setBrush(brush);
-	double first_x = 0.0;
-	double last_x  = 0.0;
+	double first_x{};
+	double last_x{};
 	for (unsigned int x = 0; x < bins_size; ++x)
 	{
 		const double x_ = pixmap_w * x / static_cast<double>(bins_size);
@@ -301,7 +301,7 @@ QString HistogramGen::gen_pixmap_rgb()
 	const unsigned long pixmap_w = (bins_size * 3 < 2048)
 		? 2048
 		: bins_size * 3; // curr. always 256 bins
-	const unsigned long pixmap_h = 1024;
+	const unsigned long pixmap_h{1024u};
 	pixmap = QPixmap(pixmap_w, pixmap_h);
 	if (pixmap.isNull())
 	{

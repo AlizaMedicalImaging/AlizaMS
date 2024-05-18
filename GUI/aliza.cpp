@@ -900,7 +900,7 @@ void Aliza::add_histogram(ImageVariant * v, QProgressDialog * pb, bool check_set
 	t->start();
 	while (!t->isFinished())
 	{
-		delay1(10);
+		delay1(100);
 		if (pb && pb->wasCanceled())
 		{
 			t->exit(0);
