@@ -901,12 +901,6 @@ void Aliza::add_histogram(ImageVariant * v, QProgressDialog * pb, bool check_set
 	while (!t->isFinished())
 	{
 		delay1(100);
-		if (pb && pb->wasCanceled())
-		{
-			t->exit(0);
-			lock0 = false;
-			exit(0);
-		}
 	}
 	t->gen_pixmap();
 	const QString tmp0 = t->get_error();

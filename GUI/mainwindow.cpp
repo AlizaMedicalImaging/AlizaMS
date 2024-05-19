@@ -1494,7 +1494,7 @@ void MainWindow::dropEvent(QDropEvent * e)
 			}
 			if (dcm_thread)
 			{
-				disconnect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
+				disconnect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
 			}
 			pb->close();
 			delete pb;
@@ -1587,7 +1587,7 @@ void MainWindow::load_any()
 	l.clear();
 	if (dcm_thread)
 	{
-		disconnect(pb,SIGNAL(canceled()),this,SLOT(exit_null()));
+		disconnect(pb, SIGNAL(canceled()), this, SLOT(exit_null()));
 	}
 	pb->close();
 	delete pb;
