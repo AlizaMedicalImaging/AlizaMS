@@ -813,10 +813,6 @@ QString Aliza::load_dicom_series(QProgressDialog * pb)
 			{
 				sr_files.push_back(lt->sr_files.at(k));
 			}
-#if 0
-			lt->quit();
-			lt->wait();
-#endif
 			delete lt;
 		}
 		else
