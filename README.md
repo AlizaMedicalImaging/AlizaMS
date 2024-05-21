@@ -37,7 +37,7 @@ Highlights
  * DICOM Study multi-view with intersection lines and side-by-side view
  * Proper measurement in Ultrasound Calibrated Regions
  * 2D+t and 3D+t animations
- * DICOM metadata viewer, DICOM 2024a dictionary
+ * DICOM metadata viewer, DICOM 2024b dictionary
  * Encapsulated transfer syntaxes incl. HTJ2K
  * Most IODs are supported incl. Structured Reports, Key Objects Selection, Grayscale Softcopy Presentation State</li>
 
