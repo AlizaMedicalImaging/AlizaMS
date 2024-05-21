@@ -2645,7 +2645,7 @@ void Aliza::update_selection_common2(QListWidgetItem * s)
 	ImageVariant * v = k->get_image_from_item();
 	if (v)
 	{
- 		selected_images.push_back(v);
+		selected_images.push_back(v);
 		if (v->image_type == 300) spect_images.push_back(v);
 		else tmp_images.push_back(k->get_image_from_item_const());
 		if (ok3d) deltas.push_back(CommonUtils::calculate_max_delta(v));
@@ -2662,7 +2662,7 @@ void Aliza::update_selection_common2(QListWidgetItem * s)
 				ImageVariant * v1 = k1->get_image_from_item();
 				if (v1)
 				{
- 					selected_images.push_back(v1);
+					selected_images.push_back(v1);
 					if (v1->image_type == 300) spect_images.push_back(v1);
 					else tmp_images.push_back(k1->get_image_from_item_const());
 					if (ok3d) deltas.push_back(CommonUtils::calculate_max_delta(v1));
