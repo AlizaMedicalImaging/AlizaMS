@@ -49,6 +49,7 @@
 #include "codecutils.h"
 #include "dicomutils.h"
 #include "commonutils.h"
+#include "aliza.h"
 #include <exception>
 
 namespace
@@ -2001,32 +2002,90 @@ void SQtree::dropEvent(QDropEvent * e)
 	if (lock0) return;
 	lock0 = true;
 #endif
-	QStringList l;
-	QList<QUrl> urls;
+	qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
 	const QMimeData * mimeData = e->mimeData();
-	if (mimeData && mimeData->hasUrls())
+	if (mimeData)
 	{
-		urls = mimeData->urls();
-		for (int i = 0; i < urls.size(); ++i)
+		if (mimeData->hasUrls())
 		{
-			l.push_back(urls.at(i).toLocalFile());
+			QStringList l;
+			const QList<QUrl> urls = mimeData->urls();
+			for (int i = 0; i < urls.size(); ++i)
+			{
+				l.push_back(urls.at(i).toLocalFile());
+			}
+			if (!l.empty())
+			{
+				list_of_files = QStringList(l.at(0));
+				horizontalSlider->blockSignals(true);
+				horizontalSlider->setMinimum(0);
+				horizontalSlider->setMaximum(0);
+				horizontalSlider->setValue(0);
+				horizontalSlider->hide();
+				horizontalSlider->blockSignals(false);
+				read_file(l.at(0), false);
+			}
+			else
+			{
+				clear_tree();
+			}
 		}
-		if (!l.empty())
+		// TODO distinguish other Qt apps?
+		else if (mimeData->hasFormat("application/x-qabstractitemmodeldatalist"))
 		{
-			list_of_files = QStringList(l.at(0));
-			horizontalSlider->blockSignals(true);
-			horizontalSlider->setMinimum(0);
-			horizontalSlider->setMaximum(0);
-			horizontalSlider->setValue(0);
-			horizontalSlider->hide();
-			horizontalSlider->blockSignals(false);
-			read_file(l.at(0), false);
+			QStringList l;
+			QByteArray encoded = mimeData->data("application/x-qabstractitemmodeldatalist");
+			QDataStream stream(&encoded, QIODevice::ReadOnly);
+			while (!stream.atEnd())
+			{
+				int r{-1};
+				int c{-1};
+				QMap<int, QVariant> role;
+				stream >> r >> c >> role;
+	#if 0
+				std::cout << "row = " << r << ", column = " << c << std::endl;
+	#endif
+				(void)c;
+				(void)role;
+				if (aliza)
+				{
+					const ImagesBox * imagesbox = aliza->get_imagesbox();
+					if (imagesbox)
+					{
+						const ListWidgetItem2 * item = static_cast<const ListWidgetItem2*>(imagesbox->listWidget->item(r));
+						if (item)
+						{
+							const int i = item->get_id();
+							const ImageVariant * v = aliza->get_image(i);
+							if (v)
+							{
+								l = v->filenames;
+							}
+						}
+					}
+				}
+				break;
+			}
+			if (!l.empty())
+			{
+				set_list_of_files(l, false);
+				read_file(l.at(0), false);
+			}
+			else
+			{
+				clear_tree();
+			}
+		}
+		else
+		{
+			clear_tree();
 		}
 	}
 	else
 	{
 		clear_tree();
 	}
+	qApp->restoreOverrideCursor();
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
 	lock0 = false;
 #endif
@@ -2122,11 +2181,14 @@ void SQtree::open_file_and_series()
 #endif
 }
 
-void SQtree::set_list_of_files(const QStringList & l)
+void SQtree::set_list_of_files(const QStringList & l, const bool use_lock)
 {
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-	if (lock0) return;
-	lock0 = true;
+	if (use_lock)
+	{
+		if (lock0) return;
+		lock0 = true;
+	}
 #endif
 	list_of_files = QStringList(l);
 	const size_t x = list_of_files.size();
@@ -2138,7 +2200,10 @@ void SQtree::set_list_of_files(const QStringList & l)
 	else       horizontalSlider->hide();
 	horizontalSlider->blockSignals(false);
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-	lock0 = false;
+	if (use_lock)
+	{
+		lock0 = false;
+	}
 #endif
 }
 
@@ -2148,3 +2213,7 @@ void SQtree::file_from_slider(int x)
 	read_file(list_of_files.at(x), true);
 }
 
+void SQtree::set_aliza(Aliza * a)
+{
+	aliza = a;
+}
