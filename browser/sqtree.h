@@ -19,6 +19,8 @@
 
 #define SQTREE_LOCK_TREE 1
 
+class Aliza;
+
 class SQtree: public QWidget, private Ui::SQtree
 {
 Q_OBJECT
@@ -28,7 +30,8 @@ public:
 	void read_file(const QString&, const bool);
 	void read_file_and_series(const QString&, const bool);
 	void clear_tree();
-	void set_list_of_files(const QStringList&);
+	void set_list_of_files(const QStringList&, const bool);
+	void set_aliza(Aliza*);
 
 public slots:
 	void open_file();
@@ -64,6 +67,7 @@ private:
 	QAction * copyAct;
 	QAction * collapseAct;
 	QAction * expandAct;
+	Aliza * aliza{};
 	bool in_tabwidget;
 	QStringList list_of_files;
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)

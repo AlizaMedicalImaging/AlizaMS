@@ -413,6 +413,7 @@ MainWindow::MainWindow(
 	graphicswidget_y->set_aliza(aliza);
 	//
 	studyview->init_(aliza);
+	sqtree->set_aliza(aliza);
 	//
 	histogramview = new HistogramView(
 		this, static_cast<QObject*>(aliza), multi_frame, false);
@@ -1370,7 +1371,7 @@ void MainWindow::toggle_meta2()
 	if (l.empty()) return;
 	qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
 	const int t = (multiview_tab) ? 3 : 2;
-	sqtree->set_list_of_files(l);
+	sqtree->set_list_of_files(l, true);
 	sqtree->read_file(l.at(0), true);
 	tabWidget->setCurrentIndex(t);
 	qApp->restoreOverrideCursor();
@@ -2277,7 +2278,7 @@ void MainWindow::trigger_image_dicom_meta()
 	}
 	qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
 	qApp->processEvents();
-	sqtree->set_list_of_files(l);
+	sqtree->set_list_of_files(l, true);
 	sqtree->read_file(l.at(0), true);
 	const int t = (multiview_tab) ? 3 : 2;
 	tabWidget->setCurrentIndex(t);

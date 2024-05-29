@@ -1273,7 +1273,8 @@ void StudyGraphicsWidget::dropEvent(QDropEvent * e)
 {
 	int i{-1};
 	const QMimeData * mimeData = e->mimeData();
-	if (mimeData && mimeData->hasFormat("application/x-qabstractitemmodeldatalist")) // FIXME
+	// TODO distinguish other Qt apps?
+	if (mimeData && mimeData->hasFormat("application/x-qabstractitemmodeldatalist"))
 	{
 		QByteArray encoded = mimeData->data("application/x-qabstractitemmodeldatalist");
 		QDataStream stream(&encoded, QIODevice::ReadOnly);
@@ -1298,10 +1299,10 @@ void StudyGraphicsWidget::dropEvent(QDropEvent * e)
 					if (item)
 					{
 						i = item->get_id();
-						break; // not really required, single selection
 					}
 				}
 			}
+			break;
 		}
 	}
 	if (i >= 0)
