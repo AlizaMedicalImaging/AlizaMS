@@ -2010,9 +2010,9 @@ void SQtree::dropEvent(QDropEvent * e)
 		{
 			QStringList l;
 			const QList<QUrl> urls = mimeData->urls();
-			for (int i = 0; i < urls.size(); ++i)
+			if (!urls.empty())
 			{
-				l.push_back(urls.at(i).toLocalFile());
+				l.push_back(urls.at(0).toLocalFile());
 			}
 			if (!l.empty())
 			{
