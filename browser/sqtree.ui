@@ -87,23 +87,6 @@
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QToolButton" name="options_toolButton">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="../alizams.qrc">
-         <normaloff>:/bitmaps/tool.svg</normaloff>:/bitmaps/tool.svg</iconset>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
    <item>
@@ -214,7 +197,6 @@
   <tabstop>pushButton</tabstop>
   <tabstop>scan_pushButton</tabstop>
   <tabstop>lineEdit</tabstop>
-  <tabstop>options_toolButton</tabstop>
   <tabstop>horizontalSlider</tabstop>
   <tabstop>ms_lineEdit</tabstop>
   <tabstop>ts_lineEdit</tabstop>

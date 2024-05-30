@@ -194,9 +194,6 @@ SQtree::SQtree(bool t) : in_tabwidget(t)
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	textEdit->hide();
 	horizontalSlider->hide();
-#if 1
-	options_toolButton->hide();
-#endif
 	copyAct     = new QAction(QString("Copy selected text"),   this);
 	expandAct   = new QAction(QString("Expand child items"),   this);
 	collapseAct = new QAction(QString("Collapse child items"), this);
