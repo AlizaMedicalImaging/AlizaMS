@@ -60,8 +60,7 @@ const QString css1 =
 		"span.y4 { color:#050505; font-size: medium; font-weight: bold;}\n"
 		"span.y5 { color:#0d0d76; font-size: medium; font-weight: bold;}\n"
 		"span.y  { color:#0d0d76; font-size: large;  font-weight: bold; font-style: italic }");
-const QString head = QString(
-	"<html><head><link rel='stylesheet' type='text/css' href='format.css'></head><body>");
+const QString head = QString("<html><head><link rel='stylesheet' type='text/css' href='format.css'></head><body>");
 const QString foot = QString("</body></html>");
 
 template <typename T, long long TVR>
@@ -73,8 +72,7 @@ void get_bin_values(
 		return;
 	const mdcm::ByteValue * bv = v.GetByteValue();
 	if (!bv) return;
-	if ((bv->GetLength() < sizeof(T)) ||
-		((bv->GetLength() % sizeof(T)) != 0))
+	if ((bv->GetLength() < sizeof(T)) || ((bv->GetLength() % sizeof(T)) != 0))
 		return;
 	mdcm::Element<TVR, mdcm::VM::VM1_n> e;
 	e.SetFromDataElement(v);
@@ -236,14 +234,14 @@ void SQtree::process_element(
 {
 	const mdcm::Tag & tag = e.GetTag();
 	QString tname;
-	bool invalid_vr          = false;
-	bool unknown_vr          = false;
-	bool private_tag         = false;
-	bool private_creator_tag = false;
-	bool illegal_tag         = false;
-	bool skipped             = false;
-	bool hdr                 = false;
-	bool bad_vr              = false;
+	bool invalid_vr{};
+	bool unknown_vr{};
+	bool private_tag{};
+	bool private_creator_tag{};
+	bool illegal_tag{};
+	bool skipped{};
+	bool hdr{};
+	bool bad_vr{};
 	if (tag.GetGroup() == 0x0002) hdr = true;
 	mdcm::VR vr = e.GetVR();
 	if (vr == mdcm::VR::INVALID) invalid_vr = true;
@@ -259,7 +257,7 @@ void SQtree::process_element(
 		tname = QString("Private Creator");
 		if (vr == mdcm::VR::LO)
 		{
-			;;
+			;
 		}
 		else if (invalid_vr)
 		{
@@ -275,7 +273,7 @@ void SQtree::process_element(
 		tname = QString("Generic Group Length");
 		if (vr == mdcm::VR::UL)
 		{
-			;;
+			;
 		}
 		else if (invalid_vr)
 		{
@@ -292,8 +290,7 @@ void SQtree::process_element(
 		const mdcm::PrivateDict & pdict = d.GetPrivateDict();
 		const mdcm::Tag private_creator_t = tag.GetPrivateCreator();
 		{
-			const mdcm::DataElement & private_creator_e =
-				ds.GetDataElement(private_creator_t);
+			const mdcm::DataElement & private_creator_e = ds.GetDataElement(private_creator_t);
 			if (!private_creator_e.IsEmpty() &&
 				!private_creator_e.IsUndefinedLength() &&
 				private_creator_e.GetByteValue())
@@ -306,18 +303,16 @@ void SQtree::process_element(
 					tag.GetGroup(),
 					tag.GetElement(),
 					private_creator.toLatin1().constData());
-				const mdcm::DictEntry & pentry =
-					pdict.GetDictEntry(ptag);
+				const mdcm::DictEntry & pentry = pdict.GetDictEntry(ptag);
 				tname = QString(pentry.GetName()).trimmed();
 				const mdcm::VR tmp_vr = pentry.GetVR();
-				if (invalid_vr||unknown_vr)
+				if (invalid_vr || unknown_vr)
 				{
 					vr = tmp_vr;
 				}
 				else
 				{
-					if (!(tmp_vr == mdcm::VR::UN ||
-							tmp_vr == mdcm::VR::INVALID) &&
+					if (!(tmp_vr == mdcm::VR::UN || tmp_vr == mdcm::VR::INVALID) &&
 						vr != tmp_vr)
 					{
 						if (tmp_vr.IsDual())
@@ -338,11 +333,10 @@ void SQtree::process_element(
 	}
 	else
 	{
-		const mdcm::DictEntry & entry =
-			d.GetDictEntry(tag, nullptr);
+		const mdcm::DictEntry & entry = d.GetDictEntry(tag, nullptr);
 		const mdcm::VR tmp_vr = entry.GetVR();
 		tname = QString(entry.GetName());
-		if (invalid_vr||unknown_vr)
+		if (invalid_vr || unknown_vr)
 		{
 			vr = tmp_vr;
 		}
@@ -372,8 +366,7 @@ void SQtree::process_element(
 	const QBrush brush7(QColor::fromRgbF(0.5, 0.5, 0.5));
 	if (vr == mdcm::VR::SQ)
 	{
-		mdcm::SmartPointer<mdcm::SequenceOfItems> sqi =
-			e.GetValueAsSQ();
+		mdcm::SmartPointer<mdcm::SequenceOfItems> sqi = e.GetValueAsSQ();
 		if (!(sqi && sqi->GetNumberOfItems() > 0))
 		{
 			QStringList l2;
@@ -407,10 +400,7 @@ void SQtree::process_element(
 			<< tname
 			<< QString("SQ")
 			<< sq_length
-			<< QString(" [") +
-				QVariant(static_cast<unsigned int>(
-					sqi->GetNumberOfItems())).toString() +
-					QString("]");
+			<< QString(" [") + QVariant(static_cast<unsigned int>(sqi->GetNumberOfItems())).toString() + QString("]");
 		QTreeWidgetItem * ci = new QTreeWidgetItem(l);
 		ci->setForeground(4, brush2); // binary
 		if (invalid_vr)  ci->setBackground(2, brush5);
@@ -425,11 +415,8 @@ void SQtree::process_element(
 		{
 			QStringList l1;
 			l1 << QString("Item")
-				<< QVariant(static_cast<int>(i + 1)).toString()
-				<< QString("")
-				<< QString("")
-				<< QString("");
-			const mdcm::Item    & item = sqi->GetItem(i + 1);
+				<< QVariant(static_cast<int>(i + 1)).toString() << QString("") << QString("") << QString("");
+			const mdcm::Item & item = sqi->GetItem(i + 1);
 			const mdcm::DataSet & nds  = item.GetNestedDataSet();
 			QTreeWidgetItem * twitem = new QTreeWidgetItem(l1);
 			twitem->setForeground(0, brush2);
@@ -437,12 +424,10 @@ void SQtree::process_element(
 			if (duplicated) twitem->setForeground(0, brush6);
 			ci->addChild(twitem);
 			mdcm::DataElement tmp_tag;
-			size_t ce = 0;
-			for (mdcm::DataSet::ConstIterator it = nds.Begin();
-				it != nds.End();
-				++it)
+			size_t ce{};
+			for (mdcm::DataSet::ConstIterator it = nds.Begin(); it != nds.End(); ++it)
 			{
-				bool duplicated_ = false;
+				bool duplicated_{};
 				const mdcm::DataElement & elem = *it;
 				if (ce > 0 && tmp_tag == elem.GetTag()) duplicated_ = true;
 				process_element(nds, elem, d, twitem, charset, duplicated_);
@@ -461,15 +446,12 @@ void SQtree::process_element(
 			<< tname
 			<< QString(mdcm::VR::GetVRString(vr))
 			<< QString("")
-			<< QString(" [") +
-				QVariant(static_cast<unsigned int>(
-					nf1)).toString() +
-					QString("]");
+			<< QString(" [") + QVariant(static_cast<unsigned int>(nf1)).toString() + QString("]");
 		QTreeWidgetItem * ci = new QTreeWidgetItem(l);
 		ci->setForeground(4, brush2); // binary
-		if (invalid_vr)  ci->setBackground(2, brush5);
-		if (unknown_vr)  ci->setBackground(2, brush4);
-		if (duplicated)  ci->setForeground(0, brush6);
+		if (invalid_vr) ci->setBackground(2, brush5);
+		if (unknown_vr) ci->setBackground(2, brush4);
+		if (duplicated) ci->setForeground(0, brush6);
 		wi->addChild(ci);
 		if (sqf)
 		{
@@ -477,23 +459,16 @@ void SQtree::process_element(
 			QString bof_s;
 			{
 				std::vector<unsigned int> values;
-				get_bin_values<unsigned int, mdcm::VR::UL>(
-					bof, values);
+				get_bin_values<unsigned int, mdcm::VR::UL>(bof, values);
 				for (unsigned long j = 0; j < values.size(); ++j)
 				{
-					bof_s.append(
-						QVariant(values[j]).toString() +
-						QString(" "));
+					bof_s.append(QVariant(values[j]).toString() + QString(" "));
 				}
 			}
 			const unsigned int bof_length = bof.GetVL();
 			const QString bof_tmp1 = print_length(bof_length);
 			QStringList lt;
-			lt << QString("Basic Offset Table")
-				<< QString("")
-				<< QString("")
-				<< QString(bof_tmp1)
-				<< bof_s;
+			lt << QString("Basic Offset Table") << QString("") << QString("") << QString(bof_tmp1) << bof_s;
 			QTreeWidgetItem * cbof = new QTreeWidgetItem(lt);
 			cbof->setForeground(0, brush2);
 			cbof->setForeground(1, brush2);
@@ -524,16 +499,12 @@ void SQtree::process_element(
 		QString entry_qs;
 		QString keyword_qs = std::move(tname);
 		std::string entry_s = tag.PrintAsPipeSeparatedString();
-		bool bin_label = false;
+		bool bin_label{};
 		if (!entry_s.empty()) entry_qs = QString(entry_s.c_str());
 		if (e.IsEmpty())
 		{
 			QStringList l;
-			l << entry_qs
-				<< keyword_qs
-				<< QString(mdcm::VR::GetVRString(vr))
-				<< QString("")
-				<< QString("empty");
+			l << entry_qs << keyword_qs << QString(mdcm::VR::GetVRString(vr)) << QString("") << QString("empty");
 			QTreeWidgetItem * ii = new QTreeWidgetItem(l);
 			ii->setForeground(4, brush2); // binary
 			if (invalid_vr)  ii->setBackground(2, brush5);
@@ -549,11 +520,7 @@ void SQtree::process_element(
 		else if (e.IsUndefinedLength())
 		{
 			QStringList l;
-			l << entry_qs
-				<< keyword_qs
-				<< QString(mdcm::VR::GetVRString(vr))
-				<< QString("")
-				<< QString("undefined length");
+			l << entry_qs << keyword_qs << QString(mdcm::VR::GetVRString(vr)) << QString("") << QString("undefined length");
 			QTreeWidgetItem * ii = new QTreeWidgetItem(l);
 			ii->setForeground(4, brush2); // binary
 			if (invalid_vr)  ii->setBackground(2, brush5);
@@ -580,99 +547,73 @@ void SQtree::process_element(
 					if (vr == mdcm::VR::US)
 					{
 						std::vector<unsigned short> values;
-						get_bin_values<unsigned short, mdcm::VR::US>(
-							e, values);
+						get_bin_values<unsigned short, mdcm::VR::US>(e, values);
 						for (unsigned long j = 0; j < values.size(); ++j)
 						{
-							str_.append(
-								QVariant(
-									static_cast<int>(values[j])).toString() +
-								QString(" "));
+							str_.append(QVariant(static_cast<int>(values[j])).toString() + QString(" "));
 						}
 					}
 					else if (vr == mdcm::VR::SS)
 					{
 						std::vector<signed short> values;
-						get_bin_values<signed short, mdcm::VR::SS>(
-							e, values);
+						get_bin_values<signed short, mdcm::VR::SS>(e, values);
 						for (unsigned long j = 0; j < values.size(); ++j)
 						{
-							str_.append(
-								QVariant(
-									static_cast<int>(values[j])).toString() +
-								QString(" "));
+							str_.append(QVariant(static_cast<int>(values[j])).toString() + QString(" "));
 						}
 					}
 					else if (vr == mdcm::VR::FL)
 					{
 						std::vector<float> values;
-						get_bin_values<float, mdcm::VR::FL>(
-							e, values);
+						get_bin_values<float, mdcm::VR::FL>(e, values);
 						for (unsigned long j = 0; j < values.size(); ++j)
 						{
-							str_.append(
-								QVariant(values[j]).toString() +
-								QString(" "));
+							str_.append(QVariant(values[j]).toString() + QString(" "));
 						}
 					}
 					else if (vr == mdcm::VR::FD)
 					{
 						std::vector<double> values;
-						get_bin_values<double, mdcm::VR::FD>(
-							e, values);
+						get_bin_values<double, mdcm::VR::FD>(e, values);
 						for (unsigned long j = 0; j < values.size(); ++j)
 						{
-							str_.append(
-								QVariant(values[j]).toString() +
-								QString(" "));
+							str_.append(QVariant(values[j]).toString() + QString(" "));
 						}
 					}
 					else if (vr == mdcm::VR::UL)
 					{
 						std::vector<unsigned int> values;
-						get_bin_values<unsigned int, mdcm::VR::UL>(
-							e, values);
+						get_bin_values<unsigned int, mdcm::VR::UL>(e, values);
 						for (unsigned long j = 0; j < values.size(); ++j)
 						{
-							str_.append(
-								QVariant(values[j]).toString() +
-								QString(" "));
+							str_.append(QVariant(values[j]).toString() + QString(" "));
 						}
 					}
 					else if (vr == mdcm::VR::SL)
 					{
 						std::vector<signed int> values;
-						get_bin_values<signed int, mdcm::VR::SL>(
-							e, values);
+						get_bin_values<signed int, mdcm::VR::SL>(e, values);
 						for (unsigned long j = 0; j < values.size(); ++j)
 						{
-							str_.append(
-								QVariant(values[j]).toString() +
-								QString(" "));
+							str_.append(QVariant(values[j]).toString() + QString(" "));
 						}
 					}
 					else if (vr == mdcm::VR::SV)
 					{
 						std::vector<signed long long> values;
-						get_bin_values<signed long long, mdcm::VR::SV>(
-							e, values);
+						get_bin_values<signed long long, mdcm::VR::SV>(e, values);
 						for (unsigned long j = 0; j < values.size(); ++j)
 						{
-							str_.append(
-								QVariant(values[j]).toString() +
-								QString(" "));
+							str_.append(QVariant(values[j]).toString() + QString(" "));
 						}
 					}
 					else if (vr == mdcm::VR::UV)
 					{
 						std::vector<unsigned long long> values;
-						get_bin_values<unsigned long long, mdcm::VR::UV>(
-							e, values);
+						get_bin_values<unsigned long long, mdcm::VR::UV>(e, values);
 						for (unsigned long j = 0; j < values.size(); ++j)
 						{
-							str_.append(
-								QVariant(values[j]).toString() +
-								QString(" "));
+							str_.append(QVariant(values[j]).toString() + QString(" "));
 						}
 					}
 					else if (vr == mdcm::VR::AT)
@@ -765,11 +706,7 @@ void SQtree::process_element(
 						skipped = true;
 					}
 					QStringList l;
-					l << entry_qs
-						<< keyword_qs
-						<< QString(mdcm::VR::GetVRString(vr))
-						<< length_s
-						<< str_;
+					l << entry_qs << keyword_qs << QString(mdcm::VR::GetVRString(vr)) << length_s << str_;
 					QTreeWidgetItem * ii =  new QTreeWidgetItem(l);
 					if (invalid_vr)  ii->setBackground(2, brush5);
 					if (unknown_vr)  ii->setBackground(2, brush4);
@@ -787,11 +724,7 @@ void SQtree::process_element(
 				else if (vr == mdcm::VR::INVALID || vr >= mdcm::VR::VR_END)
 				{
 					QStringList l;
-					l << entry_qs
-						<< keyword_qs
-						<< QString(mdcm::VR::GetVRString(vr)).
-							remove(QChar('\0'))
-						<< length_s
+					l << entry_qs << keyword_qs << QString(mdcm::VR::GetVRString(vr)).remove(QChar('\0')) << length_s
 						<< QString("unknown");
 					QTreeWidgetItem * ii =  new QTreeWidgetItem(l);
 					if (invalid_vr)  ii->setBackground(2, brush5);
@@ -808,9 +741,7 @@ void SQtree::process_element(
 				}
 				else if (vr == mdcm::VR::UI)
 				{
-					QString tmp0 = QString::fromLatin1(
-						bv->GetPointer(),
-						bv->GetLength());
+					QString tmp0 = QString::fromLatin1(bv->GetPointer(), bv->GetLength());
 					mdcm::UIDs uid;
 					uid.SetFromUID(tmp0.toLatin1().constData());
 					const QString tmp1 =
@@ -818,11 +749,9 @@ void SQtree::process_element(
 					QStringList l;
 					l << entry_qs
 						<< keyword_qs
-						<< QString(mdcm::VR::GetVRString(vr)).
-							remove(QChar('\0'))
+						<< QString(mdcm::VR::GetVRString(vr)).remove(QChar('\0'))
 						<< length_s
-						<< ((tmp1.isEmpty())
-							? tmp0.remove(QChar('\0')) : tmp1);
+						<< ((tmp1.isEmpty()) ? tmp0.remove(QChar('\0')) : tmp1);
 					QTreeWidgetItem * ii =  new QTreeWidgetItem(l);
 					if (!tmp1.isEmpty()) ii->setForeground(4, brush2);
 					if (invalid_vr)      ii->setBackground(2, brush5);
@@ -837,7 +766,7 @@ void SQtree::process_element(
 				}
 				else // ASCII
 				{
-					bool date_time = false;
+					bool date_time{};
 					QStringList l;
 					QString tmp0;
 					if (vr == mdcm::VR::DA)
@@ -847,11 +776,8 @@ void SQtree::process_element(
 							bv->GetLength()).trimmed().remove(QChar('\0'));
 						if (date_s.length() == 8)
 						{
-							const QDate date_ =
-								QDate::fromString(
-									date_s, QString("yyyyMMdd"));
-							tmp0 = date_.toString(
-								QString("d MMM yyyy"));
+							const QDate date_ = QDate::fromString(date_s, QString("yyyyMMdd"));
+							tmp0 = date_.toString(QString("d MMM yyyy"));
 							date_time = true;
 						}
 						else
@@ -863,33 +789,22 @@ void SQtree::process_element(
 					{
 						const QString time0_s = QString::fromLatin1(
 							bv->GetPointer(),
-							bv->GetLength()).
-								trimmed().remove(QChar('\0'));
+							bv->GetLength()).trimmed().remove(QChar('\0'));
 						if (!time0_s.isEmpty())
 						{
-							const int range_idx =
-								time0_s.indexOf(QString("-"));
-							const int multi_idx =
-								time0_s.indexOf(QString("\\"));
+							const int range_idx = time0_s.indexOf(QString("-"));
+							const int multi_idx = time0_s.indexOf(QString("\\"));
 							if (range_idx == -1 && multi_idx == -1)
 							{
-								const int point_idx =
-									time0_s.indexOf(QString("."));
+								const int point_idx = time0_s.indexOf(QString("."));
 								if (point_idx == 6 || point_idx == -1)
 								{
-									const QString time1_s =
-										time0_s.left(6);
-									const QDateTime time_ =
-										QDateTime::fromString(
-											time1_s,
-											QString("HHmmss"));
-									tmp0 = time_.toString(
-										QString("HH:mm:ss"));
+									const QString time1_s = time0_s.left(6);
+									const QDateTime time_ = QDateTime::fromString(time1_s, QString("HHmmss"));
+									tmp0 = time_.toString(QString("HH:mm:ss"));
 									if (point_idx == 6)
 									{
-										tmp0.append(QString(".") +
-											time0_s.right(
-												time0_s.length() - 7));
+										tmp0.append(QString(".") + time0_s.right(time0_s.length() - 7));
 									}
 									date_time = true;
 								}
@@ -908,30 +823,22 @@ void SQtree::process_element(
 					{
 						const QString time0_s = QString::fromLatin1(
 							bv->GetPointer(),
-							bv->GetLength()).
-								trimmed().remove(QChar('\0'));
+							bv->GetLength()).trimmed().remove(QChar('\0'));
 						if (!time0_s.isEmpty())
 						{
-							if (time0_s.length() >= 14 &&
-									time0_s.length() <= 26)
+							if (time0_s.length() >= 14 && time0_s.length() <= 26)
 							{
-								const int point_idx =
-									time0_s.indexOf(QString("."));
+								const int point_idx = time0_s.indexOf(QString("."));
 								if (point_idx == 14 || point_idx == -1)
 								{
-									const QString time1_s =
-										time0_s.left(14);
-									const QDateTime time_ =
-										QDateTime::fromString(
-											time1_s,
-											QString("yyyyMMddHHmmss"));
-									tmp0 = time_.toString(
-										QString("d MMM yyyy HH:mm:ss"));
+									const QString time1_s = time0_s.left(14);
+									const QDateTime time_ = QDateTime::fromString(
+										time1_s,
+										QString("yyyyMMddHHmmss"));
+									tmp0 = time_.toString(QString("d MMM yyyy HH:mm:ss"));
 									if (point_idx == 14)
 									{
-										tmp0.append(QString(".") +
-											time0_s.right(
-												time0_s.length() - 15));
+										tmp0.append(QString(".") + time0_s.right(time0_s.length() - 15));
 									}
 									date_time = true;
 								}
@@ -955,9 +862,7 @@ void SQtree::process_element(
 							vr==mdcm::VR::ST ||
 							vr==mdcm::VR::UT)
 						{
-							QByteArray ba(
-								bv->GetPointer(),
-								bv->GetLength());
+							QByteArray ba(bv->GetPointer(), bv->GetLength());
 							tmp0 = CodecUtils::toUTF8(&ba, charset);
 							ba.clear();
 						}
@@ -965,15 +870,12 @@ void SQtree::process_element(
 						{
 							if (tag == mdcm::Tag(0x3006,0x0050))
 							{
-								tmp0 = QString(
-									"<skipped, save to file>");
+								tmp0 = QString("<skipped, save to file>");
 								skipped = true;
 							}
 							else
 							{
-								tmp0 = QString::fromLatin1(
-									bv->GetPointer(),
-									bv->GetLength());
+								tmp0 = QString::fromLatin1(bv->GetPointer(), bv->GetLength());
 							}
 						}
 						tmp0 = tmp0.remove(QChar('\0'));
@@ -986,8 +888,7 @@ void SQtree::process_element(
 					}
 					l << entry_qs
 						<< keyword_qs
-						<< QString(mdcm::VR::GetVRString(vr)).
-								remove(QChar('\0'))
+						<< QString(mdcm::VR::GetVRString(vr)).remove(QChar('\0'))
 						<< length_s
 						<< tmp0;
 					QTreeWidgetItem * ii =  new QTreeWidgetItem(l);
@@ -1008,11 +909,7 @@ void SQtree::process_element(
 			else
 			{
 				QStringList l;
-				l << entry_qs
-					<< keyword_qs
-					<< QString(mdcm::VR::GetVRString(vr))
-					<< QString("")
-					<< QString("null");
+				l << entry_qs << keyword_qs << QString(mdcm::VR::GetVRString(vr)) << QString("") << QString("null");
 				QTreeWidgetItem * ii = new QTreeWidgetItem(l);
 				ii->setForeground(4, brush2);
 				if (invalid_vr)  ii->setBackground(2, brush5);
@@ -1049,15 +946,14 @@ void SQtree::read_file(const QString & f, const bool use_lock)
 	saved_dir = fi.absoluteDir().absolutePath();
 	lineEdit->setText(QDir::toNativeSeparators(f));
 	QStringList l;
-	l << QString("") << QString("") <<
-		QString("") << QString("") << QString("");
+	l << QString("") << QString("") << QString("") << QString("") << QString("");
 	QTreeWidgetItem * i = new QTreeWidgetItem(l);
 	treeWidget->addTopLevelItem(i);
 	try
 	{
 		mdcm::Reader reader;
 		const mdcm::File & file = reader.GetFile();
-		bool ok = false;
+		bool ok{};
 #ifdef _WIN32
 #if (defined(_MSC_VER) && defined(MDCM_WIN32_UNC))
 		reader.SetFileName(QDir::toNativeSeparators(f).toUtf8().constData());
@@ -1083,8 +979,7 @@ void SQtree::read_file(const QString & f, const bool use_lock)
 		const mdcm::FileMetaInformation & header = file.GetHeader();
 		//
 		QString tmp1;
-		QString ms0_ = QString::fromStdString(
-			header.GetMediaStorageAsString());
+		QString ms0_ = QString::fromStdString(header.GetMediaStorageAsString());
 		if (!ms0_.isEmpty())
 		{
 			mdcm::UIDs uid;
@@ -1103,8 +998,7 @@ void SQtree::read_file(const QString & f, const bool use_lock)
 		else
 		{
 			QString tmp0;
-			if (DicomUtils::get_string_value(
-					ds, mdcm::Tag(0x0008,0x0016), tmp0))
+			if (DicomUtils::get_string_value(ds, mdcm::Tag(0x0008,0x0016), tmp0))
 			{
 				mdcm::UIDs uid;
 				uid.SetFromUID(tmp0.toLatin1().constData());
@@ -1122,46 +1016,35 @@ void SQtree::read_file(const QString & f, const bool use_lock)
 		}
 		ms_lineEdit->setText(tmp1);
 		//
-		const mdcm::TransferSyntax & ts =
-			header.GetDataSetTransferSyntax();
+		const mdcm::TransferSyntax & ts = header.GetDataSetTransferSyntax();
 		mdcm::UIDs uid;
 		uid.SetFromUID(ts.GetString());
 		const QString ts_string = QString::fromLatin1(uid.GetName());
 		ts_lineEdit->setText(ts_string);
 		//
-		for (mdcm::FileMetaInformation::ConstIterator it = header.Begin();
-			it!=header.End();
-			++it)
+		for (mdcm::FileMetaInformation::ConstIterator it = header.Begin(); it != header.End(); ++it)
 		{
 			const mdcm::DataElement & elem = *it;
 			process_element(ds /* unused */, elem, dicts, i, "");
 		}
 		QString charset;
 		{
-			const mdcm::DataElement & ce_ =
-				ds.GetDataElement(mdcm::Tag(0x0008,0x0005));
-			if (!ce_.IsEmpty() &&
-				!ce_.IsUndefinedLength() &&
-				ce_.GetByteValue())
+			const mdcm::DataElement & ce_ = ds.GetDataElement(mdcm::Tag(0x0008,0x0005));
+			if (!ce_.IsEmpty() && !ce_.IsUndefinedLength() && ce_.GetByteValue())
 			{
-				charset = QString::fromLatin1(
-					ce_.GetByteValue()->GetPointer(),
-					ce_.GetByteValue()->GetLength());
+				charset = QString::fromLatin1(ce_.GetByteValue()->GetPointer(), ce_.GetByteValue()->GetLength());
 			}
 		}
 		//
 		{
 			mdcm::Tag tmp_tag;
-			size_t ce = 0;
-			for (mdcm::DataSet::ConstIterator it = ds.Begin();
-				it != ds.End();
-				++it)
+			size_t ce{};
+			for (mdcm::DataSet::ConstIterator it = ds.Begin(); it != ds.End(); ++it)
 			{
-				bool duplicated = false;
+				bool duplicated{};
 				const mdcm::DataElement & elem = *it;
 				if (ce > 0 && tmp_tag == elem.GetTag()) duplicated = true;
-				process_element(
-					ds, elem, dicts, i, charset.toLatin1().constData(), duplicated);
+				process_element(ds, elem, dicts, i, charset.toLatin1().constData(), duplicated);
 				tmp_tag = elem.GetTag();
 				++ce;
 			}
@@ -1213,6 +1096,7 @@ void SQtree::read_file_and_series(const QString & ff, const bool use_lock)
 	if (!fi.isFile())
 	{
 		clear_tree();
+		set_list_of_files(QStringList(), 0, false);
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
 		if (use_lock) lock0 = false;
 #endif
@@ -1221,7 +1105,7 @@ void SQtree::read_file_and_series(const QString & ff, const bool use_lock)
 	f = fi.absoluteFilePath();
 	QString series_uid;
 	QStringList files;
-	bool series_uid_ok = false;
+	bool series_uid_ok{};
 	try
 	{
 		{
@@ -1241,11 +1125,7 @@ void SQtree::read_file_and_series(const QString & ff, const bool use_lock)
 			{
 				const mdcm::File & file = reader.GetFile();
 				const mdcm::DataSet & ds = file.GetDataSet();
-				series_uid_ok =
-					DicomUtils::get_string_value(
-						ds,
-						mdcm::Tag(0x0020,0x000e),
-						series_uid);
+				series_uid_ok = DicomUtils::get_string_value(ds, mdcm::Tag(0x0020,0x000e), series_uid);
 			}
 		}
 		if (series_uid_ok)
@@ -1266,13 +1146,12 @@ void SQtree::read_file_and_series(const QString & ff, const bool use_lock)
 	catch (const std::exception & ex)
 	{
 #ifdef ALIZA_VERBOSE
-		std::cout << "Exception in SQtree::open_file_and_series:\n"
-			<< ex.what() << std::endl;
+		std::cout << "Exception in SQtree::open_file_and_series:\n" << ex.what() << std::endl;
 #else
 		(void)ex;
 #endif
 	}
-	int idx = -1;
+	int idx{-1};
 	const int files_size = files.size();
 	if (files_size > 1)
 	{
@@ -1287,23 +1166,14 @@ void SQtree::read_file_and_series(const QString & ff, const bool use_lock)
 		}
 	}
 	//
-	horizontalSlider->blockSignals(true);
-	horizontalSlider->setMinimum(0);
 	if (idx >= 0)
 	{
-		list_of_files = std::move(files);
-		horizontalSlider->setMaximum(files_size-1);
-		horizontalSlider->setValue(idx);
-		horizontalSlider->show();
+		set_list_of_files(files, idx, false);
 	}
 	else
 	{
-		list_of_files = QStringList(f);
-		horizontalSlider->setMaximum(0);
-		horizontalSlider->setValue(0);
-		horizontalSlider->hide();
+		set_list_of_files(QStringList(f), 0, false);
 	}
-	horizontalSlider->blockSignals(false);
 	read_file(f, false);
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
 	if (use_lock) lock0 = false;
@@ -1321,8 +1191,7 @@ void SQtree::dump_csa(const mdcm::DataSet & ds)
 	if (!f_t1_de.IsEmpty())
 	{
 		csa1.LoadFromDataElement(f_t1_de);
-		if (csa1.GetFormat() == mdcm::CSAHeader::SV10 ||
-			csa1.GetFormat() == mdcm::CSAHeader::NOMAGIC)
+		if (csa1.GetFormat() == mdcm::CSAHeader::SV10 || csa1.GetFormat() == mdcm::CSAHeader::NOMAGIC)
 		{
 			std::ostringstream os1;
 			csa1.Print(os1);
@@ -1332,13 +1201,11 @@ void SQtree::dump_csa(const mdcm::DataSet & ds)
 	if (!f_t2_de.IsEmpty())
 	{
 		csa2.LoadFromDataElement(f_t2_de);
-		if (csa2.GetFormat() == mdcm::CSAHeader::SV10 ||
-			csa2.GetFormat() == mdcm::CSAHeader::NOMAGIC)
+		if (csa2.GetFormat() == mdcm::CSAHeader::SV10 || csa2.GetFormat() == mdcm::CSAHeader::NOMAGIC)
 		{
 			std::ostringstream os2;
 			csa2.Print(os2);
-			csa_text.append(QString("\n\n") +
-				QString::fromStdString(os2.str()));
+			csa_text.append(QString("\n\n") + QString::fromStdString(os2.str()));
 		}
 	}
 	if (!csa_text.isEmpty() && textEdit->document())
@@ -1354,41 +1221,33 @@ void SQtree::dump_csa(const mdcm::DataSet & ds)
 
 void SQtree::dump_gems(const mdcm::DataSet & ds)
 {
-	const mdcm::PrivateTag tgems_us_movie(
-		0x7fe1,0x1,"GEMS_Ultrasound_MovieGroup_001");
+	const mdcm::PrivateTag tgems_us_movie(0x7fe1,0x1,"GEMS_Ultrasound_MovieGroup_001");
 	const mdcm::DataElement & e1 = ds.GetDataElement(tgems_us_movie);
 	if (e1.IsEmpty()) return;
 	mdcm::SmartPointer<mdcm::SequenceOfItems> sq1 = e1.GetValueAsSQ();
 	if (!(sq1 && sq1->GetNumberOfItems() > 0)) return;
-	textEdit->document()->addResource(
-		QTextDocument::StyleSheetResource, QUrl("format.css"), css1);
+	textEdit->document()->addResource(QTextDocument::StyleSheetResource, QUrl("format.css"), css1);
 	QString gems_us_text = QString(head);
 	const size_t n1 = sq1->GetNumberOfItems();
 	for (size_t x = 0; x < n1; ++x)
 	{
-		gems_us_text.append(
-			"<span class = 'y'>GEMS Ultrasound MovieGroup</span><br/>");
+		gems_us_text.append("<span class = 'y'>GEMS Ultrasound MovieGroup</span><br/>");
 		QMap<QString,int> gdict;
 		if (!DicomUtils::build_gems_dictionary(gdict,ds)) continue;
 		const mdcm::Item & item1 = sq1->GetItem(x + 1);
 		const mdcm::DataSet & subds1 = item1.GetNestedDataSet();
-		const mdcm::PrivateTag tname2(
-			0x7fe1,0x2,"GEMS_Ultrasound_MovieGroup_001");
+		const mdcm::PrivateTag tname2(0x7fe1,0x2,"GEMS_Ultrasound_MovieGroup_001");
 		QString qs2;
 		{
-			const mdcm::DataElement & e2 =
-				subds1.GetDataElement(tname2);
+			const mdcm::DataElement & e2 = subds1.GetDataElement(tname2);
 			if (!e2.IsEmpty() && !e2.IsUndefinedLength())
 			{
 				const mdcm::ByteValue * v2 = e2.GetByteValue();
 				if (v2)
 				{
 					const char * b2 = v2->GetPointer();
-					const unsigned int s2   = v2->GetLength();
-					qs2 =
-						QString::fromLatin1(b2, s2).
-							trimmed().remove(QChar('\0')) +
-						QString("&#160;");
+					const unsigned int s2 = v2->GetLength();
+					qs2 = QString::fromLatin1(b2, s2).trimmed().remove(QChar('\0')) + QString("&#160;");
 				}
 			}
 		}
@@ -1396,18 +1255,14 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 			QString("<span class = 'y5'>") + qs2 +
 			QString("</span><span class = 'y4'>(SQ 0x1)") +
 			QString("</span><br/>"));
-		const mdcm::PrivateTag t8(
-			0x7fe1,0x8,"GEMS_Ultrasound_MovieGroup_001");
+		const mdcm::PrivateTag t8(0x7fe1,0x8,"GEMS_Ultrasound_MovieGroup_001");
 		if (subds1.FindDataElement(t8))
 		{
 			const mdcm::DataElement & e8 = subds1.GetDataElement(t8);
 			QMap<int,GEMSParam> m8;
 			DicomUtils::read_gems_params(m8, e8, gdict);
 			QMapIterator<QString, int> itmd(gdict);
-			gems_us_text.append(
-				QString("<span class = 'y4'>") +
-				QString("SQ 0x8:") +
-				QString("</span><br/>"));
+			gems_us_text.append(QString("<span class = 'y4'>SQ 0x8:") + QString("</span><br/>"));
 			while (itmd.hasNext())
 			{
 				itmd.next();
@@ -1422,60 +1277,45 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 				}
 			}
 		}
-		const mdcm::PrivateTag t10(
-			0x7fe1,0x10,"GEMS_Ultrasound_MovieGroup_001");
+		const mdcm::PrivateTag t10(0x7fe1,0x10,"GEMS_Ultrasound_MovieGroup_001");
 		if (subds1.FindDataElement(t10))
 		{
 			const mdcm::DataElement & e10 = subds1.GetDataElement(t10);
-			mdcm::SmartPointer<mdcm::SequenceOfItems> sq10 =
-				e10.GetValueAsSQ();
+			mdcm::SmartPointer<mdcm::SequenceOfItems> sq10 = e10.GetValueAsSQ();
 			if (sq10 && sq10->GetNumberOfItems() > 0)
 			{
 				const size_t n10 = sq10->GetNumberOfItems();
 				for (size_t x10 = 0; x10 < n10; ++x10)
 				{
 					mdcm::Item & item10 = sq10->GetItem(x10 + 1);
-					mdcm::DataSet & subds10 =
-						item10.GetNestedDataSet();
-					const mdcm::PrivateTag tname12(
-						0x7fe1,0x12,"GEMS_Ultrasound_MovieGroup_001");
+					mdcm::DataSet & subds10 = item10.GetNestedDataSet();
+					const mdcm::PrivateTag tname12(0x7fe1,0x12,"GEMS_Ultrasound_MovieGroup_001");
 					QString qs12;
 					if (subds10.FindDataElement(tname12))
 					{
-						const mdcm::DataElement & e12 =
-							subds10.GetDataElement(tname12);
-						if (!e12.IsEmpty() &&
-							!e12.IsUndefinedLength())
+						const mdcm::DataElement & e12 = subds10.GetDataElement(tname12);
+						if (!e12.IsEmpty() && !e12.IsUndefinedLength())
 						{
-							const mdcm::ByteValue * v12 =
-								e12.GetByteValue();
+							const mdcm::ByteValue * v12 = e12.GetByteValue();
 							if (v12)
 							{
 								const char * b12 = v12->GetPointer();
 								const unsigned int s12 = v12->GetLength();
-								qs12 = QString::fromLatin1(b12, s12).
-									trimmed().remove(QChar('\0')) +
-									QString("&#160;");
+								qs12 = QString::fromLatin1(b12, s12).trimmed().remove(QChar('\0')) + QString("&#160;");
 							}
 						}
 					}
 					gems_us_text.append(
 						QString("<span class = 'y5'>&#160;") + qs12 +
-						QString("</span><span class = 'y4'>(SQ 0x10)") +
-						QString("</span><br/>"));
-					const mdcm::PrivateTag t18(
-						0x7fe1,0x18,"GEMS_Ultrasound_MovieGroup_001");
+						QString("</span><span class = 'y4'>(SQ 0x10)</span><br/>"));
+					const mdcm::PrivateTag t18(0x7fe1,0x18,"GEMS_Ultrasound_MovieGroup_001");
 					if (subds10.FindDataElement(t18))
 					{
-						const mdcm::DataElement & e18 =
-							subds10.GetDataElement(t18);
+						const mdcm::DataElement & e18 = subds10.GetDataElement(t18);
 						QMap<int,GEMSParam> m18;
 						DicomUtils::read_gems_params(m18, e18, gdict);
 						QMapIterator<QString, int> itmd(gdict);
-						gems_us_text.append(
-							QString("<span class = 'y4'>&#160;") +
-							QString("SQ 0x18:") +
-							QString("</span><br/>"));
+						gems_us_text.append(QString("<span class = 'y4'>&#160;SQ 0x18:</span><br/>"));
 						while (itmd.hasNext())
 						{
 							itmd.next();
@@ -1484,73 +1324,46 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 								const GEMSParam & gp = m18.value(itmd.value());
 								const QList<QVariant> & l18 = gp.values;
 								QString tmp18;
-								for (int x18 = 0;
-									x18 < l18.size();
-									++x18)
-									tmp18.append(
-										l18.at(x18).toString() +
-										QString(" "));
+								for (int x18 = 0; x18 < l18.size(); ++x18)
+									tmp18.append(l18.at(x18).toString() + QString(" "));
 								gems_us_text.append(
-									QString("&#160;") +
-									itmd.key() +
-									QString(": ") +
-									tmp18 + QString("<br/>"));
+									QString("&#160;") + itmd.key() + QString(": ") + tmp18 + QString("<br/>"));
 							}
 						}
 					}
-					const mdcm::PrivateTag t20(
-						0x7fe1,0x20,"GEMS_Ultrasound_MovieGroup_001");
+					const mdcm::PrivateTag t20(0x7fe1,0x20,"GEMS_Ultrasound_MovieGroup_001");
 					if (subds10.FindDataElement(t20))
 					{
-						const mdcm::DataElement & e20 =
-							subds10.GetDataElement(t20);
-						mdcm::SmartPointer<mdcm::SequenceOfItems>
-							sq20 = e20.GetValueAsSQ();
+						const mdcm::DataElement & e20 = subds10.GetDataElement(t20);
+						mdcm::SmartPointer<mdcm::SequenceOfItems> sq20 = e20.GetValueAsSQ();
 						if (sq20 && sq20->GetNumberOfItems() > 0)
 						{
-							const size_t n20 =
-								sq20->GetNumberOfItems();
+							const size_t n20 = sq20->GetNumberOfItems();
 							for (size_t x20 = 0; x20 < n20; ++x20)
 							{
-								mdcm::Item & item20 =
-									sq20->GetItem(x20 + 1);
-								mdcm::DataSet & subds20 =
-									item20.GetNestedDataSet();
-								const mdcm::PrivateTag tname24(
-									0x7fe1,
-									0x24,
-									"GEMS_Ultrasound_MovieGroup_001");
+								mdcm::Item & item20 = sq20->GetItem(x20 + 1);
+								mdcm::DataSet & subds20 = item20.GetNestedDataSet();
+								const mdcm::PrivateTag tname24(0x7fe1,0x24,"GEMS_Ultrasound_MovieGroup_001");
 								QString qs24;
 								if (subds20.FindDataElement(tname24))
 								{
-									const mdcm::DataElement & e24 =
-										subds20.GetDataElement(
-											tname24);
-									if (!e24.IsEmpty() &&
-										!e24.IsUndefinedLength())
+									const mdcm::DataElement & e24 = subds20.GetDataElement(tname24);
+									if (!e24.IsEmpty() && !e24.IsUndefinedLength())
 									{
-										const mdcm::ByteValue * v24 =
-											e24.GetByteValue();
+										const mdcm::ByteValue * v24 = e24.GetByteValue();
 										if (v24)
 										{
-											const char * b24 =
-												v24->GetPointer();
-											const unsigned int s24 =
-												v24->GetLength();
+											const char * b24 = v24->GetPointer();
+											const unsigned int s24 = v24->GetLength();
 											qs24 =
-												QString::fromLatin1(
-													b24, s24).
-														trimmed().
-														remove(
-															QChar('\0')) +
+												QString::fromLatin1(b24, s24).trimmed().remove(QChar('\0')) +
 												QString("&#160;");
 										}
 									}
 								}
 								gems_us_text.append(
 									QString("<span class = 'y5'>&#160;&#160;&#160;&#160;") +
-									qs24 + QString("</span><span class = 'y4'>(SQ 0x20)") +
-									QString("</span><br/>"));
+									qs24 + QString("</span><span class = 'y4'>(SQ 0x20)</span><br/>"));
 								const mdcm::PrivateTag t26(0x7fe1,0x26,"GEMS_Ultrasound_MovieGroup_001");
 								if (subds20.FindDataElement(t26))
 								{
@@ -1559,8 +1372,7 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 									DicomUtils::read_gems_params(m26, e26, gdict);
 									QMapIterator<QString, int> itmd(gdict);
 									gems_us_text.append(
-										QString("<span class = 'y4'>&#160;&#160;&#160;&#160;") +
-										QString("SQ 0x26:") + QString("</span><br/>"));
+										QString("<span class = 'y4'>&#160;&#160;&#160;&#160;SQ 0x26:</span><br/>"));
 									while (itmd.hasNext())
 									{
 										itmd.next();
@@ -1641,15 +1453,14 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 													{
 														const char * b84 = v84->GetPointer();
 														const unsigned int s84 = v84->GetLength();
-														qs84 = QString::fromLatin1(b84, s84)
-															.trimmed().remove(QChar('\0')) + QString("&#160;");
+														qs84 = QString::fromLatin1(b84, s84).trimmed().remove(QChar('\0')) +
+															QString("&#160;");
 													}
 												}
 											}
 											gems_us_text.append(
 												QString("<span class = 'y5'>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;") +
-												qs84 + QString("</span><span class = 'y4'>(SQ 0x83)") +
-												QString("</span><br/>"));
+												qs84 + QString("</span><span class = 'y4'>(SQ 0x83)</span><br/>"));
 											const mdcm::PrivateTag t85(0x7fe1,0x85,"GEMS_Ultrasound_MovieGroup_001");
 											if (subds83.FindDataElement(t85))
 											{
@@ -1657,10 +1468,9 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 												QMap<int,GEMSParam> m85;
 												DicomUtils::read_gems_params(m85, e85, gdict);
 												QMapIterator<QString, int> itmd(gdict);
-												gems_us_text.append(
-													QString(
-														"<span class = 'y4'>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;") +
-													QString("SQ 0x85:") + QString("</span><br/>"));
+												gems_us_text.append(QString(
+													"<span class = 'y4'>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;"
+													"SQ 0x85:</span><br/>"));
 												while (itmd.hasNext())
 												{
 													itmd.next();
@@ -1685,106 +1495,59 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 							}
 						}
 					}
-					const mdcm::PrivateTag t83(
-						0x7fe1,
-						0x83,
-						"GEMS_Ultrasound_MovieGroup_001");
+					const mdcm::PrivateTag t83(0x7fe1,0x83,"GEMS_Ultrasound_MovieGroup_001");
 					if (subds10.FindDataElement(t83))
 					{
-						const mdcm::DataElement & e83 =
-							subds10.GetDataElement(t83);
-						mdcm::SmartPointer<mdcm::SequenceOfItems>
-							sq83 = e83.GetValueAsSQ();
+						const mdcm::DataElement & e83 = subds10.GetDataElement(t83);
+						mdcm::SmartPointer<mdcm::SequenceOfItems> sq83 = e83.GetValueAsSQ();
 						if (sq83 && sq83->GetNumberOfItems() > 0)
 						{
-							const size_t n83 =
-								sq83->GetNumberOfItems();
+							const size_t n83 = sq83->GetNumberOfItems();
 							for (size_t x83 = 0; x83 < n83; ++x83)
 							{
-								mdcm::Item & item83 =
-									sq83->GetItem(x83 + 1);
-								mdcm::DataSet & subds83 =
-									item83.GetNestedDataSet();
-								const mdcm::PrivateTag tname84(
-									0x7fe1,
-									0x84,
-									"GEMS_Ultrasound_MovieGroup_001");
+								mdcm::Item & item83 = sq83->GetItem(x83 + 1);
+								mdcm::DataSet & subds83 = item83.GetNestedDataSet();
+								const mdcm::PrivateTag tname84(0x7fe1,0x84,"GEMS_Ultrasound_MovieGroup_001");
 								QString qs84;
 								if (subds83.FindDataElement(tname84))
 								{
-									const mdcm::DataElement& e84 =
-										subds83.GetDataElement(
-											tname84);
-									if (!e84.IsEmpty() &&
-										!e84.IsUndefinedLength())
+									const mdcm::DataElement& e84 = subds83.GetDataElement(tname84);
+									if (!e84.IsEmpty() && !e84.IsUndefinedLength())
 									{
-										const mdcm::ByteValue * v84 =
-											e84.GetByteValue();
+										const mdcm::ByteValue * v84 = e84.GetByteValue();
 										if (v84)
 										{
-											const char * b84 =
-												v84->GetPointer();
-											const unsigned int s84 =
-												v84->GetLength();
+											const char * b84 = v84->GetPointer();
+											const unsigned int s84 = v84->GetLength();
 											qs84 =
-												QString::fromLatin1(
-													b84,
-													s84).
-													trimmed().
-													remove(QChar('\0')) +
+												QString::fromLatin1(b84, s84).trimmed().remove(QChar('\0')) +
 												QString("&#160;");
 										}
 									}
 								}
-								gems_us_text.append(QString(
-									"<span class = 'y5'>&#160;") +
+								gems_us_text.append(QString("<span class = 'y5'>&#160;") +
 									qs84 +
-									QString(
-										"</span><span class = 'y4'>"
-										"(SQ 0x83)</span><br/>"));
-								const mdcm::PrivateTag t85(
-									0x7fe1,
-									0x85,
-									"GEMS_Ultrasound_MovieGroup_001");
+									QString("</span><span class = 'y4'>(SQ 0x83)</span><br/>"));
+								const mdcm::PrivateTag t85(0x7fe1,0x85,"GEMS_Ultrasound_MovieGroup_001");
 								if (subds83.FindDataElement(t85))
 								{
-									const mdcm::DataElement & e85 =
-										subds83.GetDataElement(t85);
+									const mdcm::DataElement & e85 = subds83.GetDataElement(t85);
 									QMap<int,GEMSParam> m85;
-									DicomUtils::read_gems_params(
-										m85, e85, gdict);
-									QMapIterator<QString, int>
-										itmd(gdict);
-									gems_us_text.append(QString(
-										"<span class = 'y4'>&#160;") +
-										QString("SQ 0x85:") +
-										QString("</span><br/>"));
+									DicomUtils::read_gems_params(m85, e85, gdict);
+									QMapIterator<QString, int> itmd(gdict);
+									gems_us_text.append(QString("<span class = 'y4'>&#160;SQ 0x85:</span><br/>"));
 									while (itmd.hasNext())
 									{
 										itmd.next();
-										if (m85.contains(
-											itmd.value()))
+										if (m85.contains(itmd.value()))
 										{
-											const GEMSParam & gp =
-												m85.value(
-													itmd.value());
-											const QList<QVariant> &
-												l85 = gp.values;
+											const GEMSParam & gp = m85.value(itmd.value());
+											const QList<QVariant> & l85 = gp.values;
 											QString tmp85;
-											for (int x85 = 0;
-												x85 < l85.size();
-												++x85)
-												tmp85.append(
-													l85.at(x85).
-														toString() +
-													QString(" "));
+											for (int x85 = 0; x85 < l85.size(); ++x85)
+												tmp85.append(l85.at(x85).toString() + QString(" "));
 											gems_us_text.append(
-												QString(
-													"&#160;") +
-												itmd.key() +
-												QString(": ") +
-												tmp85 +
-												QString("<br/>"));
+												QString("&#160;") + itmd.key() + QString(": ") + tmp85 + QString("<br/>"));
 										}
 									}
 								}
@@ -1794,90 +1557,57 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 				}
 			}
 		}
-		const mdcm::PrivateTag t73(
-			0x7fe1,
-			0x73,
-			"GEMS_Ultrasound_MovieGroup_001");
+		const mdcm::PrivateTag t73(0x7fe1,0x73,"GEMS_Ultrasound_MovieGroup_001");
 		if (subds1.FindDataElement(t73))
 		{
-			const mdcm::DataElement & e73 =
-				subds1.GetDataElement(t73);
-			mdcm::SmartPointer<mdcm::SequenceOfItems>
-				sq73 = e73.GetValueAsSQ();
+			const mdcm::DataElement & e73 = subds1.GetDataElement(t73);
+			mdcm::SmartPointer<mdcm::SequenceOfItems> sq73 = e73.GetValueAsSQ();
 			if (sq73 && sq73->GetNumberOfItems() > 0)
 			{
 				const size_t n73 = sq73->GetNumberOfItems();
 				for (size_t x73 = 0; x73 < n73; ++x73)
 				{
 					mdcm::Item & item73 = sq73->GetItem(x73 + 1);
-					mdcm::DataSet & subds73 =
-						item73.GetNestedDataSet();
-					const mdcm::PrivateTag tname74(
-						0x7fe1,
-						0x74,
-						"GEMS_Ultrasound_MovieGroup_001");
+					mdcm::DataSet & subds73 = item73.GetNestedDataSet();
+					const mdcm::PrivateTag tname74(0x7fe1,0x74,"GEMS_Ultrasound_MovieGroup_001");
 					QString qs74;
 					if (subds73.FindDataElement(tname74))
 					{
-						const mdcm::DataElement & e74 =
-							subds73.GetDataElement(tname74);
-						if (!e74.IsEmpty() &&
-							!e74.IsUndefinedLength())
+						const mdcm::DataElement & e74 = subds73.GetDataElement(tname74);
+						if (!e74.IsEmpty() && !e74.IsUndefinedLength())
 						{
-							const mdcm::ByteValue * v74 =
-								e74.GetByteValue();
+							const mdcm::ByteValue * v74 = e74.GetByteValue();
 							if (v74)
 							{
 								const char * b74 = v74->GetPointer();
-								const unsigned int s74   = v74->GetLength();
-								qs74 = QString::fromLatin1(
-									b74, s74).
-										trimmed().remove(QChar('\0')) +
-									QString("&#160;");
+								const unsigned int s74 = v74->GetLength();
+								qs74 = QString::fromLatin1(b74, s74).trimmed().remove(QChar('\0')) + QString("&#160;");
 							}
 						}
 					}
 					gems_us_text.append(
 						QString("<span class = 'y5'>") +
 						qs74 +
-						QString(
-							"</span><span class = 'y4'>"
-							"(SQ 0x73)</span><br/>"));
-					const mdcm::PrivateTag t75(
-						0x7fe1,
-						0x75,
-						"GEMS_Ultrasound_MovieGroup_001");
+						QString("</span><span class = 'y4'>(SQ 0x73)</span><br/>"));
+					const mdcm::PrivateTag t75(0x7fe1,0x75,"GEMS_Ultrasound_MovieGroup_001");
 					if (subds73.FindDataElement(t75))
 					{
-						const mdcm::DataElement & e75 =
-							subds73.GetDataElement(t75);
+						const mdcm::DataElement & e75 = subds73.GetDataElement(t75);
 						QMap<int,GEMSParam> m75;
 						DicomUtils::read_gems_params(m75, e75, gdict);
 						QMapIterator<QString, int> itmd(gdict);
-						gems_us_text.append(
-							QString("<span class = 'y4'>") +
-							QString("SQ 0x75:") +
-							QString("</span><br/>"));
+						gems_us_text.append(QString("<span class = 'y4'>SQ 0x75:</span><br/>"));
 						while (itmd.hasNext())
 						{
 							itmd.next();
 							if (m75.contains(itmd.value()))
 							{
-								const GEMSParam & gp =
-									m75.value(itmd.value());
+								const GEMSParam & gp = m75.value(itmd.value());
 								const QList<QVariant> & l75 = gp.values;
 								QString tmp75;
-								for (int x75 = 0;
-									x75 < l75.size();
-									++x75)
-									tmp75.append(
-										l75.at(x75).toString() +
-										QString(" "));
-								gems_us_text.append(
-									itmd.key() +
-									QString(": ") +
-									tmp75 +
-									QString("<br/>"));
+								for (int x75 = 0; x75 < l75.size(); ++x75)
+									tmp75.append(l75.at(x75).toString() + QString(" "));
+								gems_us_text.append(itmd.key() + QString(": ") + tmp75 + QString("<br/>"));
 							}
 						}
 					}
@@ -1898,12 +1628,10 @@ void SQtree::dump_gems(const mdcm::DataSet & ds)
 
 void SQtree::copy_to_clipboard()
 {
-	const QTreeWidgetItem * item =
-		treeWidget->currentItem();
+	const QTreeWidgetItem * item = treeWidget->currentItem();
 	if (item && QApplication::clipboard())
 	{
-		QApplication::clipboard()->setText(
-			item->text(treeWidget->currentColumn()));
+		QApplication::clipboard()->setText(item->text(treeWidget->currentColumn()));
 	}
 }
 
@@ -2013,18 +1741,13 @@ void SQtree::dropEvent(QDropEvent * e)
 			}
 			if (!l.empty())
 			{
-				list_of_files = QStringList(l.at(0));
-				horizontalSlider->blockSignals(true);
-				horizontalSlider->setMinimum(0);
-				horizontalSlider->setMaximum(0);
-				horizontalSlider->setValue(0);
-				horizontalSlider->hide();
-				horizontalSlider->blockSignals(false);
+				set_list_of_files(l, 0, false);
 				read_file(l.at(0), false);
 			}
 			else
 			{
 				clear_tree();
+				set_list_of_files(QStringList(), 0, false);
 			}
 		}
 		// TODO distinguish other Qt apps?
@@ -2065,22 +1788,25 @@ void SQtree::dropEvent(QDropEvent * e)
 			}
 			if (!l.empty())
 			{
-				set_list_of_files(l, false);
+				set_list_of_files(l, 0, false);
 				read_file(l.at(0), false);
 			}
 			else
 			{
 				clear_tree();
+				set_list_of_files(QStringList(), 0, false);
 			}
 		}
 		else
 		{
 			clear_tree();
+			set_list_of_files(QStringList(), 0, false);
 		}
 	}
 	else
 	{
 		clear_tree();
+		set_list_of_files(QStringList(), 0, false);
 	}
 	qApp->restoreOverrideCursor();
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
@@ -2122,6 +1848,7 @@ void SQtree::open_file()
 	lock0 = true;
 #endif
 	clear_tree();
+	set_list_of_files(QStringList(), 0, false);
 	const QString f = QFileDialog::getOpenFileName(
 		this,
 		QString("Open File"),
@@ -2134,13 +1861,7 @@ void SQtree::open_file()
 	QFileInfo fi(f);
 	if (fi.isFile())
 	{
-		list_of_files = QStringList(f);
-		horizontalSlider->blockSignals(true);
-		horizontalSlider->setMinimum(0);
-		horizontalSlider->setMaximum(0);
-		horizontalSlider->setValue(0);
-		horizontalSlider->hide();
-		horizontalSlider->blockSignals(false);
+		set_list_of_files(QStringList(f), 0, false);
 		read_file(f, false);
 	}
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
@@ -2154,6 +1875,8 @@ void SQtree::open_file_and_series()
 	if (lock0) return;
 	lock0 = true;
 #endif
+	clear_tree();
+	set_list_of_files(QStringList(), 0, false);
 	QString f = QFileDialog::getOpenFileName(
 		this,
 		QString("Open file and scan series"),
@@ -2164,21 +1887,16 @@ void SQtree::open_file_and_series()
 		/*| QFileDialog::DontUseNativeDialog*/
 		));
 	QFileInfo fi(f);
-	if (!fi.isFile())
+	if (fi.isFile())
 	{
-		clear_tree();
-#if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-		lock0 = false;
-#endif
-		return;
+		read_file_and_series(f, false);
 	}
-	read_file_and_series(f, false);
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
 	lock0 = false;
 #endif
 }
 
-void SQtree::set_list_of_files(const QStringList & l, const bool use_lock)
+void SQtree::set_list_of_files(const QStringList & l, const int idx, const bool use_lock)
 {
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
 	if (use_lock)
@@ -2187,12 +1905,12 @@ void SQtree::set_list_of_files(const QStringList & l, const bool use_lock)
 		lock0 = true;
 	}
 #endif
-	list_of_files = QStringList(l);
+	list_of_files = l;
 	const size_t x = list_of_files.size();
 	horizontalSlider->blockSignals(true);
 	horizontalSlider->setMinimum(0);
 	horizontalSlider->setMaximum(x > 0 ? x - 1 : 0);
-	horizontalSlider->setValue(0);
+	horizontalSlider->setValue(idx);
 	if (x > 1) horizontalSlider->show();
 	else       horizontalSlider->hide();
 	horizontalSlider->blockSignals(false);
