@@ -1371,7 +1371,7 @@ void MainWindow::toggle_meta2()
 	if (l.empty()) return;
 	qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
 	const int t = (multiview_tab) ? 3 : 2;
-	sqtree->set_list_of_files(l, true);
+	sqtree->set_list_of_files(l, 0, true);
 	sqtree->read_file(l.at(0), true);
 	tabWidget->setCurrentIndex(t);
 	qApp->restoreOverrideCursor();
@@ -2278,7 +2278,7 @@ void MainWindow::trigger_image_dicom_meta()
 	}
 	qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
 	qApp->processEvents();
-	sqtree->set_list_of_files(l, true);
+	sqtree->set_list_of_files(l, 0, true);
 	sqtree->read_file(l.at(0), true);
 	const int t = (multiview_tab) ? 3 : 2;
 	tabWidget->setCurrentIndex(t);

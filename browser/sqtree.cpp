@@ -1096,6 +1096,7 @@ void SQtree::read_file_and_series(const QString & ff, const bool use_lock)
 	if (!fi.isFile())
 	{
 		clear_tree();
+		set_list_of_files(QStringList(), 0, false);
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
 		if (use_lock) lock0 = false;
 #endif
@@ -1165,23 +1166,14 @@ void SQtree::read_file_and_series(const QString & ff, const bool use_lock)
 		}
 	}
 	//
-	horizontalSlider->blockSignals(true);
-	horizontalSlider->setMinimum(0);
 	if (idx >= 0)
 	{
-		list_of_files = std::move(files);
-		horizontalSlider->setMaximum(files_size-1);
-		horizontalSlider->setValue(idx);
-		horizontalSlider->show();
+		set_list_of_files(files, idx, false);
 	}
 	else
 	{
-		list_of_files = QStringList(f);
-		horizontalSlider->setMaximum(0);
-		horizontalSlider->setValue(0);
-		horizontalSlider->hide();
+		set_list_of_files(QStringList(f), 0, false);
 	}
-	horizontalSlider->blockSignals(false);
 	read_file(f, false);
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
 	if (use_lock) lock0 = false;
@@ -1749,18 +1741,13 @@ void SQtree::dropEvent(QDropEvent * e)
 			}
 			if (!l.empty())
 			{
-				list_of_files = QStringList(l.at(0));
-				horizontalSlider->blockSignals(true);
-				horizontalSlider->setMinimum(0);
-				horizontalSlider->setMaximum(0);
-				horizontalSlider->setValue(0);
-				horizontalSlider->hide();
-				horizontalSlider->blockSignals(false);
+				set_list_of_files(l, 0, false);
 				read_file(l.at(0), false);
 			}
 			else
 			{
 				clear_tree();
+				set_list_of_files(QStringList(), 0, false);
 			}
 		}
 		// TODO distinguish other Qt apps?
@@ -1801,22 +1788,25 @@ void SQtree::dropEvent(QDropEvent * e)
 			}
 			if (!l.empty())
 			{
-				set_list_of_files(l, false);
+				set_list_of_files(l, 0, false);
 				read_file(l.at(0), false);
 			}
 			else
 			{
 				clear_tree();
+				set_list_of_files(QStringList(), 0, false);
 			}
 		}
 		else
 		{
 			clear_tree();
+			set_list_of_files(QStringList(), 0, false);
 		}
 	}
 	else
 	{
 		clear_tree();
+		set_list_of_files(QStringList(), 0, false);
 	}
 	qApp->restoreOverrideCursor();
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
@@ -1858,6 +1848,7 @@ void SQtree::open_file()
 	lock0 = true;
 #endif
 	clear_tree();
+	set_list_of_files(QStringList(), 0, false);
 	const QString f = QFileDialog::getOpenFileName(
 		this,
 		QString("Open File"),
@@ -1870,13 +1861,7 @@ void SQtree::open_file()
 	QFileInfo fi(f);
 	if (fi.isFile())
 	{
-		list_of_files = QStringList(f);
-		horizontalSlider->blockSignals(true);
-		horizontalSlider->setMinimum(0);
-		horizontalSlider->setMaximum(0);
-		horizontalSlider->setValue(0);
-		horizontalSlider->hide();
-		horizontalSlider->blockSignals(false);
+		set_list_of_files(QStringList(f), 0, false);
 		read_file(f, false);
 	}
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
@@ -1890,6 +1875,8 @@ void SQtree::open_file_and_series()
 	if (lock0) return;
 	lock0 = true;
 #endif
+	clear_tree();
+	set_list_of_files(QStringList(), 0, false);
 	QString f = QFileDialog::getOpenFileName(
 		this,
 		QString("Open file and scan series"),
@@ -1900,21 +1887,16 @@ void SQtree::open_file_and_series()
 		/*| QFileDialog::DontUseNativeDialog*/
 		));
 	QFileInfo fi(f);
-	if (!fi.isFile())
+	if (fi.isFile())
 	{
-		clear_tree();
-#if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
-		lock0 = false;
-#endif
-		return;
+		read_file_and_series(f, false);
 	}
-	read_file_and_series(f, false);
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
 	lock0 = false;
 #endif
 }
 
-void SQtree::set_list_of_files(const QStringList & l, const bool use_lock)
+void SQtree::set_list_of_files(const QStringList & l, const int idx, const bool use_lock)
 {
 #if (defined SQTREE_LOCK_TREE && SQTREE_LOCK_TREE==1)
 	if (use_lock)
@@ -1923,12 +1905,12 @@ void SQtree::set_list_of_files(const QStringList & l, const bool use_lock)
 		lock0 = true;
 	}
 #endif
-	list_of_files = QStringList(l);
+	list_of_files = l;
 	const size_t x = list_of_files.size();
 	horizontalSlider->blockSignals(true);
 	horizontalSlider->setMinimum(0);
 	horizontalSlider->setMaximum(x > 0 ? x - 1 : 0);
-	horizontalSlider->setValue(0);
+	horizontalSlider->setValue(idx);
 	if (x > 1) horizontalSlider->show();
 	else       horizontalSlider->hide();
 	horizontalSlider->blockSignals(false);

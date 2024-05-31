@@ -30,7 +30,7 @@ public:
 	void read_file(const QString&, const bool);
 	void read_file_and_series(const QString&, const bool);
 	void clear_tree();
-	void set_list_of_files(const QStringList&, const bool);
+	void set_list_of_files(const QStringList&, const int, const bool);
 	void set_aliza(Aliza*);
 
 public slots:
