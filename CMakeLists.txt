@@ -139,7 +139,6 @@ if(FALSE)
 #
   option(MDCM_USE_SYSTEM_OPENSSL "Use system OpenSSL" OFF)
   mark_as_advanced(MDCM_USE_SYSTEM_OPENSSL)
-  
 endif()
 #
 #
@@ -149,7 +148,8 @@ endif()
 #
 ####################################################################
 
-message(STATUS "CPU: " ${CMAKE_SYSTEM_PROCESSOR})
+message(STATUS "System processor: " ${CMAKE_SYSTEM_PROCESSOR})
+message(STATUS "System name: " ${CMAKE_SYSTEM_NAME})
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
