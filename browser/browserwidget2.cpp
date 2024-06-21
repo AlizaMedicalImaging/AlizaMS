@@ -890,7 +890,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 										e1.GetByteValue()->GetPointer(),
 										e1.GetByteValue()->GetLength()).trimmed();
 									const QDate qd = QDate::fromString(birthdate_s, QString("yyyyMMdd"));
-									ed.birthdate = qd.toString(QString("d MMM yyyy")) + QString("\n");
+									ed.birthdate = qd.toString(QString("d MMM yyyy"));
 								}
 							}
 						}
@@ -914,7 +914,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 										e1.GetByteValue()->GetPointer(),
 										e1.GetByteValue()->GetLength()).trimmed();
 									const QDate qd = QDate::fromString(date_s, QString("yyyyMMdd"));
-									ed.study_date = qd.toString(QString("d MMM yyyy")) + QString("\n");
+									ed.study_date = qd.toString(QString("d MMM yyyy"));
 								}
 							}
 							{
@@ -957,7 +957,7 @@ const QString BrowserWidget2::read_DICOMDIR(const QString & f)
 										e1.GetByteValue()->GetPointer(),
 										e1.GetByteValue()->GetLength()).trimmed();
 									const QDate qd = QDate::fromString(date_s, QString("yyyyMMdd"));
-									ed.series_date = qd.toString(QString("d MMM yyyy")) + QString("\n");
+									ed.series_date = qd.toString(QString("d MMM yyyy"));
 								}
 							}
 							{
@@ -1315,7 +1315,7 @@ void BrowserWidget2::read_tags_(
 				QString::fromLatin1(e.GetByteValue()->GetPointer(),
 									e.GetByteValue()->GetLength()).trimmed();
 			const QDate qd = QDate::fromString(date_s, QString("yyyyMMdd"));
-			study_date_ = qd.toString(QString("d MMM yyyy")) + QString("\n");
+			study_date_ = qd.toString(QString("d MMM yyyy"));
 		}
 	}
 	//
@@ -1356,7 +1356,7 @@ void BrowserWidget2::read_tags_(
 				e.GetByteValue()->GetPointer(),
 				e.GetByteValue()->GetLength()).trimmed();
 			const QDate qd = QDate::fromString(date_s, QString("yyyyMMdd"));
-			series_date_ = qd.toString(QString("d MMM yyyy")) + QString("\n");
+			series_date_ = qd.toString(QString("d MMM yyyy"));
 		}
 	}
 	//
@@ -1379,7 +1379,7 @@ void BrowserWidget2::read_tags_(
 				e.GetByteValue()->GetPointer(),
 				e.GetByteValue()->GetLength()).trimmed();
 			const QDate qd = QDate::fromString(birthdate_s, QString("yyyyMMdd"));
-			birthdate_ = qd.toString(QString("d MMM yyyy")) + QString("\n");
+			birthdate_ = qd.toString(QString("d MMM yyyy"));
 		}
 	}
 	//
