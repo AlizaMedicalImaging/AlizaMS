@@ -563,7 +563,17 @@ void ImagesBox::set_html(const ImageVariant * v)
 			!v->di->hide_orientation &&
 			!v->orientation_string.isEmpty())
 		{
-			html.append(QString("<span class='y2'>RAI-Code: </span>"));
+			html.append(QString("<span class='y2'>LPS-Code (to): </span>"));
+			if (v->iod_supported && v->di->slices_from_dicom)
+				html.append(
+					QString("<span class='yl1'>") +
+					CommonUtils::convert_orientation_flag_rai_to_lps(v->orientation_string) + QString("</span>"));
+			else
+				html.append(
+					QString("<span class='yl2'>") +
+					CommonUtils::convert_orientation_flag_rai_to_lps(v->orientation_string) + QString("</span>"));
+			//
+			html.append(QString("<br /><span class='y2'>RAI-Code (from): </span>"));
 			if (v->iod_supported && v->di->slices_from_dicom)
 				html.append(
 					QString("<span class='yl1'>") +
