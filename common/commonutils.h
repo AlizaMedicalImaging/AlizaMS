@@ -33,6 +33,7 @@ public:
 	static int get_next_group_id();
 	static double random_range(double, double, unsigned long long);
 	static QString convert_orientation_flag(unsigned int);
+	static QString convert_orientation_flag_rai_to_lps(const QString &);
 	static double set_digits(double, int);
 	static QString get_orientation2(const double*);
 	static void get_orientation3(char*, float, float, float);

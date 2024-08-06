@@ -2246,6 +2246,108 @@ QString CommonUtils::convert_orientation_flag(unsigned int in)
 	return QString("");
 }
 
+// ITK is going to make a breaking change in spatial adapter, orientation enums
+// are poorly documented and there are problems with understanding related
+// to "from" and "towards" notation. So we shall stay clear and add both notations:
+// "RAI-Code" and "LPS-Code" and always additionally a clear explantation "from ... to ...".
+QString CommonUtils::convert_orientation_flag_rai_to_lps(const QString & rai)
+{
+	if (rai.length() < 3)
+	{
+#if 0
+		std::cout << "Invalid RAI: " << rai.toStdString() << std::endl;
+#endif
+		return QString("");
+	}
+	const QChar rai0 = rai[0];
+	const QChar rai1 = rai[1];
+	const QChar rai2 = rai[2];
+	QString lps("");
+	if (rai0 == QChar('L'))
+	{
+		lps.append(QChar('R'));
+	}
+	else if (rai0 == QChar('R'))
+	{
+		lps.append(QChar('L'));
+	}
+	else if (rai0 == QChar('I'))
+	{
+		lps.append(QChar('S'));
+	}
+	else if (rai0 == QChar('S'))
+	{
+		lps.append(QChar('I'));
+	}
+	else if (rai0 == QChar('A'))
+	{
+		lps.append(QChar('P'));
+	}
+	else if (rai0 == QChar('P'))
+	{
+		lps.append(QChar('A'));
+	}
+	if (rai1 == QChar('L'))
+	{
+		lps.append(QChar('R'));
+	}
+	else if (rai1 == QChar('R'))
+	{
+		lps.append(QChar('L'));
+	}
+	else if (rai1 == QChar('I'))
+	{
+		lps.append(QChar('S'));
+	}
+	else if (rai1 == QChar('S'))
+	{
+		lps.append(QChar('I'));
+	}
+	else if (rai1 == QChar('A'))
+	{
+		lps.append(QChar('P'));
+	}
+	else if (rai1 == QChar('P'))
+	{
+		lps.append(QChar('A'));
+	}
+	if (rai2 == QChar('L'))
+	{
+		lps.append(QChar('R'));
+	}
+	else if (rai2 == QChar('R'))
+	{
+		lps.append(QChar('L'));
+	}
+	else if (rai2 == QChar('I'))
+	{
+		lps.append(QChar('S'));
+	}
+	else if (rai2 == QChar('S'))
+	{
+		lps.append(QChar('I'));
+	}
+	else if (rai2 == QChar('A'))
+	{
+		lps.append(QChar('P'));
+	}
+	else if (rai2 == QChar('P'))
+	{
+		lps.append(QChar('A'));
+	}
+	if (lps.length() == 3)
+	{
+		return lps;
+	}
+#if 0
+	else
+	{
+		std::cout << "Invalid LPS: " << lps.toStdString() << std::endl;
+	}
+#endif
+	return QString("");
+}
+
 double CommonUtils::set_digits(double i, int digits)
 {
 	const double t = pow(10.0, digits);
