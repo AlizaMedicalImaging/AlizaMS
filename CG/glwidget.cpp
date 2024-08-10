@@ -1353,7 +1353,7 @@ void GLWidget::init_opengl(int w, int h)
 	if (!ok)
 	{
 #ifdef ALIZA_VERBOSE
-		std::cout << "create_fbos1() failed (1)"<< std::endl;
+		std::cout << "create_fbos1() failed (1)" << std::endl;
 #endif
 	}
 	ok = create_fbos1(FBO_SIZE__1, FBO_SIZE__1,
@@ -1363,7 +1363,7 @@ void GLWidget::init_opengl(int w, int h)
 	if (!ok)
 	{
 #ifdef ALIZA_VERBOSE
-		std::cout << "create_fbos1() failed (2)"<< std::endl;
+		std::cout << "create_fbos1() failed (2)" << std::endl;
 #endif
 	}
 	create_program(raycast_vs, raycast_fs_bb, &raycast_shader_bb);
@@ -1483,7 +1483,7 @@ void GLWidget::init_opengl(int w, int h)
 	if (!ok)
 	{
 #ifdef ALIZA_VERBOSE
-		std::cout << "create_fbos0() failed (cube)"<< std::endl;
+		std::cout << "create_fbos0() failed (cube)" << std::endl;
 #endif
 	}
 	//
@@ -3783,13 +3783,13 @@ GLuint GLWidget::load_shader(GLenum shaderType, const char * pSource)
 					switch (shaderType_int)
 					{
 					case static_cast<int>(GL_VERTEX_SHADER):
-						std::cout << "Could not compile vertex shader\n" << std::endl;
+						std::cout << "Could not compile vertex shader\n\n";
 						break;
 					case static_cast<int>(GL_FRAGMENT_SHADER):
-						std::cout << "Could not compile fragment shader\n" << std::endl;
+						std::cout << "Could not compile fragment shader\n\n";
 						break;
 					default:
-						std::cout << "Could not compile shader (type " << shaderType_int << ")\n" << std::endl;
+						std::cout << "Could not compile shader (type " << shaderType_int << ")\n\n";
 						break;
 					}
 					std::cout << buf << '\n' << pSource << '\n' << std::endl;
@@ -3843,8 +3843,8 @@ bool GLWidget::create_program(
 				{
 #ifdef ALWAYS_SHOW_GL_ERROR
 					glGetProgramInfoLog(program, bufLength, nullptr, buf);
-					std::cout << "Could not link program" << std::endl;
-					std::cout << buf << '\n' << vertex << '\n' << fragment << std::endl;
+					std::cout << "Could not link program\n" << buf << '\n'
+						<< vertex << '\n' << fragment << std::endl;
 #endif
 					delete [] buf;
 				}
