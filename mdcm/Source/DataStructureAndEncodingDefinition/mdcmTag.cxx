@@ -206,7 +206,7 @@ Tag::ReadFromContinuousString(const char * str)
   return true;
 }
 
-// Read from a pipe separated string (MDCM 1.x compat only).
+// Read from a pipe separated string (GDCM 1.x compat only).
 // Do not use in newer code
 bool
 Tag::ReadFromPipeSeparatedString(const char * str)
@@ -249,7 +249,7 @@ Tag::PrintAsContinuousUpperCaseString() const
   return os.str();
 }
 
-// Print as a pipe separated string (MDCM 1.x compat only).
+// Print as a pipe separated string (GDCM 1.x compat only).
 // Do not use in newer code
 std::string
 Tag::PrintAsPipeSeparatedString() const
