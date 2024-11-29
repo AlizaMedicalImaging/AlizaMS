@@ -491,7 +491,10 @@ Overlay::GetUnpackBuffer(char * buffer, size_t len) const
         *unpackedbytes = 255;
       }
       ++unpackedbytes;
-      mask <<= 1;
+      if (i < 7)  // To avoid overflow on last iteration (and Coverity defect), 'mask' is unused for 'i = 7'.
+      {
+        mask <<= 1;
+      }
     }
   }
   assert(unpackedbytes <= begin + len);
