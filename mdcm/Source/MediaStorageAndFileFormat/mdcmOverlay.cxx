@@ -475,14 +475,24 @@ Overlay::GetUnpackBuffer(char * buffer, size_t len) const
     return false;
   unsigned char *       unpackedbytes = reinterpret_cast<unsigned char *>(buffer);
   const unsigned char * begin = unpackedbytes;
+  const unsigned char   masks[8] =
+    {
+      1,  // 00000001
+      2,  // 00000010
+      4,  // 00000100
+      8,  // 00001000
+      16, // 00010000
+      32, // 00100000
+      64, // 01000000
+      128 // 10000000
+    };
   for (std::vector<char>::const_iterator it = Internal.Data.cbegin(); it != Internal.Data.cend(); ++it)
   {
     assert(unpackedbytes <= begin + len);
     unsigned char packedbytes = static_cast<unsigned char>(*it);
-    unsigned char mask = 1;
     for (unsigned int i = 0; i < 8 && unpackedbytes < begin + len; ++i)
     {
-      if ((packedbytes & mask) == 0)
+      if ((packedbytes & masks[i]) == 0)
       {
         *unpackedbytes = 0;
       }
@@ -491,10 +501,6 @@ Overlay::GetUnpackBuffer(char * buffer, size_t len) const
         *unpackedbytes = 255;
       }
       ++unpackedbytes;
-      if (i < 7)  // To avoid overflow on last iteration (and Coverity defect), 'mask' is unused for 'i = 7'.
-      {
-        mask <<= 1;
-      }
     }
   }
   assert(unpackedbytes <= begin + len);
@@ -504,25 +510,30 @@ Overlay::GetUnpackBuffer(char * buffer, size_t len) const
 void
 Overlay::Decompress(std::ostream & os) const
 {
-  const size_t  unpacklen = GetUnpackBufferLength();
-  unsigned char unpackedbytes[8];
-  size_t        curlen = 0;
+  const size_t        unpacklen = GetUnpackBufferLength();
+  size_t              curlen = 0;
+  const unsigned char masks[8] =
+    {
+      1,  // 00000001
+      2,  // 00000010
+      4,  // 00000100
+      8,  // 00001000
+      16, // 00010000
+      32, // 00100000
+      64, // 01000000
+      128 // 10000000
+    };
   for (std::vector<char>::const_iterator it = Internal.Data.cbegin(); it != Internal.Data.cend(); ++it)
   {
-    unsigned char packedbytes = *it;
-    unsigned char mask = 1;
+    unsigned char packedbytes = static_cast<unsigned char>(*it);
+    unsigned char unpackedbytes[8]{}; // zero-initialized
     unsigned int  i = 0;
     for (; i < 8 && curlen < unpacklen; ++i)
     {
-      if ((packedbytes & mask) == 0)
-      {
-        unpackedbytes[i] = 0;
-      }
-      else
+      if ((packedbytes & masks[i]) != 0)
       {
         unpackedbytes[i] = 255;
       }
-      mask <<= 1;
       ++curlen;
     }
     os.write(reinterpret_cast<char *>(unpackedbytes), i);
