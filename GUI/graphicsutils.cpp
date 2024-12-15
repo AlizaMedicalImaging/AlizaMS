@@ -1,5 +1,6 @@
 #include "structures.h"
 #include "graphicsutils.h"
+#include "commonutils.h"
 #include <QtGlobal>
 #include <QPainter>
 #include <QPixmap>
@@ -691,7 +692,9 @@ void GraphicsUtils::print_image_info(
 			: "\n");
 	if (!v->orientation_string.isEmpty())
 	{
-		s1.append(QString("Orient.:  ") +
+		s1.append(QString("Orient. LPS-Code (to):  ") +
+			CommonUtils::convert_orientation_flag_rai_to_lps(v->orientation_string) + QString("\n"));
+		s1.append(QString("Orient. RAI-Code (from):  ") +
 			v->orientation_string + QString("\n"));
 	}
 	if (!v->interpretation.isEmpty())
