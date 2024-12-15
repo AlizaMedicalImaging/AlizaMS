@@ -372,7 +372,8 @@ decode_mcu_DC_first(j_decompress_ptr cinfo, JBLOCKROW * MCU_data)
   }
 
   /* Account for restart interval (no-op if not using restarts) */
-  entropy->restarts_to_go--;
+  if (entropy->restarts_to_go > 0)
+    entropy->restarts_to_go--;
 
   return TRUE;
 }
@@ -469,7 +470,8 @@ decode_mcu_AC_first(j_decompress_ptr cinfo, JBLOCKROW * MCU_data)
   }
 
   /* Account for restart interval (no-op if not using restarts) */
-  entropy->restarts_to_go--;
+  if (entropy->restarts_to_go > 0)
+    entropy->restarts_to_go--;
 
   return TRUE;
 }
@@ -523,7 +525,8 @@ decode_mcu_DC_refine(j_decompress_ptr cinfo, JBLOCKROW * MCU_data)
   BITREAD_SAVE_STATE(cinfo, entropy->bitstate);
 
   /* Account for restart interval (no-op if not using restarts) */
-  entropy->restarts_to_go--;
+  if (entropy->restarts_to_go > 0)
+    entropy->restarts_to_go--;
 
   return TRUE;
 }
@@ -689,7 +692,8 @@ decode_mcu_AC_refine(j_decompress_ptr cinfo, JBLOCKROW * MCU_data)
   }
 
   /* Account for restart interval (no-op if not using restarts) */
-  entropy->restarts_to_go--;
+  if (entropy->restarts_to_go > 0)
+    entropy->restarts_to_go--;
 
   return TRUE;
 

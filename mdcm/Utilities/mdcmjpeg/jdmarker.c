@@ -141,19 +141,27 @@ typedef my_marker_reader * my_marker_ptr;
       action;                                                                                                          \
     }                                                                                                                  \
     INPUT_RELOAD(cinfo);                                                                                               \
+    if (bytes_in_buffer == 0)                                                                                          \
+    {                                                                                                                  \
+      action;                                                                                                          \
+    }                                                                                                                  \
   }
 
 /* Read a byte into variable V.
  * If must suspend, take the specified action (typically "return FALSE").
  */
 #define INPUT_BYTE(cinfo, V, action)                                                                                   \
-  MAKESTMT(MAKE_BYTE_AVAIL(cinfo, action); bytes_in_buffer--; V = GETJOCTET(*next_input_byte++);)
+  MAKESTMT(MAKE_BYTE_AVAIL(cinfo, action);                                                                             \
+           bytes_in_buffer--;                                                                                          \
+           V = GETJOCTET(*next_input_byte++);)
 
 /* As above, but read two bytes interpreted as an unsigned 16-bit integer.
  * V should be declared unsigned int or perhaps IJG_INT.
  */
 #define INPUT_2BYTES(cinfo, V, action)                                                                                 \
-  MAKESTMT(MAKE_BYTE_AVAIL(cinfo, action); bytes_in_buffer--; V = ((unsigned int)GETJOCTET(*next_input_byte++)) << 8;  \
+  MAKESTMT(MAKE_BYTE_AVAIL(cinfo, action);                                                                             \
+           bytes_in_buffer--;                                                                                          \
+           V = ((unsigned int)GETJOCTET(*next_input_byte++)) << 8;                                                     \
            MAKE_BYTE_AVAIL(cinfo, action);                                                                             \
            bytes_in_buffer--;                                                                                          \
            V += GETJOCTET(*next_input_byte++);)

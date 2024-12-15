@@ -31,13 +31,12 @@ CodeString::IsValid() const
   if (!Internal.IsValid())
     return false;
   /*
-   * Uppercase characters, 0-9, the SPACE character, and underscore _, of the
+   * Uppercase characters, 0-9, space character, underscore _, of the
    * Default Character Repertoire
    */
-  const_iterator it = Internal.cbegin();
-  for (; it != Internal.cend(); ++it)
+  for (const_iterator it = Internal.cbegin(); it != Internal.cend(); ++it)
   {
-    int c = *it;
+    const int c = *it;
     if (!isupper(c) && !isdigit(c) && c != ' ' && c != '_')
     {
       return false;
@@ -46,4 +45,4 @@ CodeString::IsValid() const
   return true;
 }
 
-} // end namespace mdcm
+}
