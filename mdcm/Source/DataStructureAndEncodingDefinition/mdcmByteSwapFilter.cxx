@@ -117,9 +117,8 @@ ByteSwapFilter::ByteSwap()
   }
   if (ByteSwapTag)
   {
-    DataSet                copy;
-    DataSet::ConstIterator it = DS.Begin();
-    for (; it != DS.End(); ++it)
+    DataSet copy;
+    for (DataSet::ConstIterator it = DS.Begin(); it != DS.End(); ++it)
     {
       DataElement de = *it;
       const Tag & tag = de.GetTag();
