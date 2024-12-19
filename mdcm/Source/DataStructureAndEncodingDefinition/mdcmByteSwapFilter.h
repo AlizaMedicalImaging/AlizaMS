@@ -34,7 +34,7 @@ namespace mdcm
 class MDCM_EXPORT ByteSwapFilter
 {
 public:
-  ByteSwapFilter(DataSet &);
+  ByteSwapFilter(DataSet & ds) : DS(ds) {}
   ~ByteSwapFilter() = default;
   bool
   ByteSwap();

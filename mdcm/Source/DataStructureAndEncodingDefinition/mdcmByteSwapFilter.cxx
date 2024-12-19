@@ -31,10 +31,6 @@
 namespace mdcm
 {
 
-ByteSwapFilter::ByteSwapFilter(DataSet & ds)
-  : DS(ds)
-{}
-
 bool
 ByteSwapFilter::ByteSwap()
 {
@@ -46,7 +42,6 @@ ByteSwapFilter::ByteSwap()
     mdcm::SmartPointer<mdcm::SequenceOfItems> si = de.GetValueAsSQ();
     if (de.IsEmpty())
     {
-      ;
       ;
     }
     else if (bv && !si)
@@ -95,8 +90,7 @@ ByteSwapFilter::ByteSwap()
     {
       if (si->GetNumberOfItems() > 0)
       {
-        SequenceOfItems::ConstIterator it2 = si->Begin();
-        for (; it2 != si->End(); ++it2)
+        for (SequenceOfItems::ConstIterator it2 = si->Begin(); it2 != si->End(); ++it2)
         {
           const Item &   item = *it2;
           DataSet &      ds = const_cast<DataSet &>(item.GetNestedDataSet());
