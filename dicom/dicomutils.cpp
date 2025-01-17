@@ -12763,7 +12763,7 @@ QString DicomUtils::read_dicom(
 			// VL Whole Slide Microscopy Image Storage
 			if (load_type == 0)
 			{
-				if (!message_.isEmpty()) message_ += QChar('\0');
+				if (!message_.isEmpty()) message_ += QChar('\n');
 				message_ += QString("VL Whole Slide Microscopy Image Storage");
 			}
 			continue;
