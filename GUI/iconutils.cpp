@@ -350,7 +350,7 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 		const unsigned short bits_stored    = ivariant->di->bits_stored;
 		const double tmp_max =
 			(bits_allocated > 0 && bits_stored > 0 && bits_stored < bits_allocated)
-				? pow(2, bits_stored) - 1
+				? pow(2.0, static_cast<double>(bits_stored)) - 1.0
 				: static_cast<double>(USHRT_MAX);
 		const typename Tout::RegionType region = tmp0->GetLargestPossibleRegion();
 		const typename Tout::SizeType size_ = region.GetSize();
@@ -602,7 +602,7 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		const unsigned short bits_stored    = ivariant->di->bits_stored;
 		const double tmp_max =
 			(bits_allocated > 0 && bits_stored > 0 && bits_stored < bits_allocated)
-				? pow(2, bits_stored) - 1
+				? pow(2.0, static_cast<double>(bits_stored)) - 1.0
 				: static_cast<double>(USHRT_MAX);
 		const typename Tout::RegionType region = tmp0->GetLargestPossibleRegion();
 		const typename Tout::SizeType size_ = region.GetSize();

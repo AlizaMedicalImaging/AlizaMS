@@ -510,7 +510,7 @@ template<typename T> void load_rgb_image(
 	{
 		const double tmp_max =
 			(bits_allocated > 0 && bits_stored > 0 && bits_stored < bits_allocated)
-			? pow(2, bits_stored) - 1
+			? pow(2.0, static_cast<double>(bits_stored)) - 1.0
 			: static_cast<double>(USHRT_MAX);
 		try
 		{
@@ -705,7 +705,7 @@ template<typename T> void load_rgba_image(
 		{
 			const double tmp_max =
 				(bits_allocated > 0 && bits_stored > 0 && bits_stored < bits_allocated)
-				? pow(2, bits_stored) - 1
+				? pow(2.0, static_cast<double>(bits_stored)) - 1.0
 				: static_cast<double>(USHRT_MAX);
 			try
 			{
@@ -771,7 +771,7 @@ template<typename T> void load_rgba_image(
 		{
 			const double tmp_max =
 				(bits_allocated > 0 && bits_stored > 0 && bits_stored < bits_allocated)
-				? pow(2, bits_stored) - 1
+				? pow(2.0, static_cast<double>(bits_stored)) - 1.0
 				: static_cast<double>(USHRT_MAX);
 			try
 			{

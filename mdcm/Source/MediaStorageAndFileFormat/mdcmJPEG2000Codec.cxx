@@ -1082,7 +1082,7 @@ JPEG2000Codec::Decode2(const DataElement & in, char * out_buffer, size_t len)
   return false;
 }
 
-// Compress into JPEG
+// Compress into JPEG2000
 bool
 JPEG2000Codec::Code(const DataElement & in, DataElement & out)
 {
@@ -1678,7 +1678,7 @@ JPEG2000Codec::CodeFrameIntoBuffer(char *       outdata,
   unsigned int th = image_height >> 1;
   while (tw && th)
   {
-    numberOfResolutions++;
+    ++numberOfResolutions;
     tw >>= 1;
     th >>= 1;
   }

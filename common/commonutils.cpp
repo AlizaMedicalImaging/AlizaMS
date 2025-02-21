@@ -144,9 +144,9 @@ template<typename T> void calculate_min_max(
 				if (iv->di->bits_allocated > 0 && iv->di->bits_stored > 0 &&
 					(iv->di->bits_stored < iv->di->bits_allocated))
 				{
-					const double tmp0 = pow(2, (iv->di->bits_stored - 1));
+					const double tmp0 = pow(2.0, static_cast<double>(iv->di->bits_stored - 1));
 					iv->di->rmin = -tmp0;
-					iv->di->rmax = tmp0 - 1;
+					iv->di->rmax = tmp0 - 1.0;
 					if (cubemin < iv->di->rmin || cubemax > iv->di->rmax)
 					{
 #ifdef ALIZA_VERBOSE
@@ -171,8 +171,8 @@ template<typename T> void calculate_min_max(
 				if (iv->di->bits_allocated > 0 && iv->di->bits_stored > 0 &&
 					(iv->di->bits_stored < iv->di->bits_allocated))
 				{
-					iv->di->rmin = 0;
-					iv->di->rmax = pow(2, (iv->di->bits_stored)) - 1;
+					iv->di->rmin = 0.0;
+					iv->di->rmax = pow(2.0, static_cast<double>(iv->di->bits_stored)) - 1.0;
 					if (cubemax > iv->di->rmax)
 					{
 #ifdef ALIZA_VERBOSE
@@ -197,7 +197,7 @@ template<typename T> void calculate_min_max(
 					(iv->di->bits_stored < iv->di->bits_allocated))
 				{
 					iv->di->rmin = 0.0;
-					iv->di->rmax = pow(2, (iv->di->bits_stored)) - 1;
+					iv->di->rmax = pow(2.0, static_cast<double>(iv->di->bits_stored)) - 1.0;
 					if (cubemax > iv->di->rmax)
 					{
 #ifdef ALIZA_VERBOSE
@@ -242,9 +242,9 @@ template<typename T> void calculate_min_max(
 				if (iv->di->bits_allocated > 0 && iv->di->bits_stored > 0 &&
 					(iv->di->bits_stored < iv->di->bits_allocated))
 				{
-					const double tmp0 = pow(2, (iv->di->bits_stored - 1));
+					const double tmp0 = pow(2.0, static_cast<double>(iv->di->bits_stored - 1));
 					const double rmin = -tmp0;
-					const double rmax = tmp0 - 1;
+					const double rmax = tmp0 - 1.0;
 					if (cubemin < rmin || cubemax > rmax)
 					{
 #ifdef ALIZA_VERBOSE
@@ -262,7 +262,7 @@ template<typename T> void calculate_min_max(
 				if (iv->di->bits_allocated > 0 && iv->di->bits_stored > 0 &&
 					(iv->di->bits_stored < iv->di->bits_allocated))
 				{
-					const double rmax = pow(2, (iv->di->bits_stored)) - 1;
+					const double rmax = pow(2.0, static_cast<double>(iv->di->bits_stored)) - 1.0;
 					if (cubemax > rmax)
 					{
 #ifdef ALIZA_VERBOSE
@@ -280,7 +280,7 @@ template<typename T> void calculate_min_max(
 				if (iv->di->bits_allocated > 0 && iv->di->bits_stored > 0 &&
 					(iv->di->bits_stored < iv->di->bits_allocated))
 				{
-					const double rmax = pow(2, (iv->di->bits_stored)) - 1;
+					const double rmax = pow(2.0, static_cast<double>(iv->di->bits_stored)) - 1.0;
 					if (cubemax > rmax)
 					{
 #ifdef ALIZA_VERBOSE
@@ -321,8 +321,8 @@ template<typename T> void calculate_min_max(
 		}
 		else
 		{
-			const double tmp110 = (vmax_minus_vmin > 0) ? vmax_minus_vmin : rmax_minus_rmin;
-			const double tmp111 = (vmax_minus_vmin > 0) ? iv->di->vmin    : iv->di->rmin;
+			const double tmp110 = (vmax_minus_vmin > 0.0) ? vmax_minus_vmin : rmax_minus_rmin;
+			const double tmp111 = (vmax_minus_vmin > 0.0) ? iv->di->vmin    : iv->di->rmin;
 			if (tmp110 > 0)
 			{
 				iv->di->default_us_window_center = iv->di->us_window_center = ((tmp110 / 2.0) - (-tmp111));
@@ -2350,7 +2350,7 @@ QString CommonUtils::convert_orientation_flag_rai_to_lps(const QString & rai)
 
 double CommonUtils::set_digits(double i, int digits)
 {
-	const double t = pow(10.0, digits);
+	const double t = pow(10.0, static_cast<double>(digits));
 	return floor(i * t) / t;
 }
 
