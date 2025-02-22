@@ -4125,7 +4125,7 @@ double CommonUtils::get_total_memory()
 	memory_status.dwLength = sizeof(MEMORYSTATUSEX);
 	if (GlobalMemoryStatusEx(&memory_status))
 	{
-		total_gb = static_cast<double>(memory_status.ullTotalPhys) / 1073741824.0;
+		total_gb = static_cast<double>(static_cast<long double>(memory_status.ullTotalPhys) / 1073741824.0L);
 	}
 #elif (defined __FreeBSD__ || defined __APPLE__)
 	unsigned long long ctlvalue;
@@ -4138,11 +4138,11 @@ double CommonUtils::get_total_memory()
 	mib[1] = HW_MEMSIZE;
 #endif
 	sysctl(mib, 2, &ctlvalue, &len, nullptr, 0);
-	total_gb = static_cast<double>(ctlvalue) / 1073741824.0;
+	total_gb = static_cast<double>(static_cast<long double>(ctlvalue) / 1073741824.0L);
 #elif (defined  __GNUC__)
 	struct sysinfo i;
 	sysinfo(&i);
-	total_gb = static_cast<double>(i.totalram) / 1073741824.0;
+	total_gb = static_cast<double>(static_cast<long double>(i.totalram) / 1073741824.0L);
 #endif
 	return total_gb;
 #else
