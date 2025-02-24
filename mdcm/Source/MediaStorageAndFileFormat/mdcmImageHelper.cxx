@@ -1761,7 +1761,19 @@ ImageHelper::SetSpacingValue(DataSet & ds, const std::vector<double> & spacing)
         {
           const ByteValue * tmp0 = de1.GetByteValue();
           const std::string tmp1 = std::string(tmp0->GetPointer(), tmp0->GetLength());
-          const int         number_of_frames = std::stoi(tmp1);
+          int               number_of_frames{};
+          try
+          {
+            number_of_frames = std::stoi(tmp1);
+          }
+          catch (const std::invalid_argument &)
+          {
+            ;
+          }
+          catch (const std::out_of_range &)
+          {
+            ;
+          }
           if (number_of_frames > 0 && number_of_frames < 65536)
           {
             Element<VR::DS, VM::VM2_n> el;

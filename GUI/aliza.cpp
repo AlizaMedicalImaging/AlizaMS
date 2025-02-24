@@ -3735,7 +3735,19 @@ void Aliza::sort_4d(
 #if 0
 			std::cout << "t1s = " << t1s.toStdString() << std::endl;
 #endif
-			const long double t1 = std::stold(t1s.toStdString());
+			long double t1{};
+			try
+			{
+				t1 = std::stold(t1s.toStdString());
+			}
+			catch (const std::invalid_argument &)
+			{
+				;
+			}
+			catch (const std::out_of_range &)
+			{
+				;
+			}
 			if (tmp5 > 0 && t1 > 0.0L)
 			{
 				const long double tdld = (t1 - t0) * 1000.0L;
