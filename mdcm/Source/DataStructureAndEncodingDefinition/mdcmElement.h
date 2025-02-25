@@ -343,40 +343,7 @@ public:
   }
 };
 
-/*
-//
-// Test for 'ds16print', usually one step.
-//
-#include <cstring>
-#include <cstdio>
-int main(int, char**)
-{
-    double f = -5558888888889999.345784574857485788888888888888888899999;
-    char buf[400];
-    memset(buf, 0, 400);
-    char line[400];
-    int l = snprintf(line, sizeof(line), "%.17g", f);
-    printf("1) l = %d\n", l);
-    if (l > 16)
-    {
-        const int strl = strlen(line);
-        int prec = strl > 1 ? strl - 1 : 1; // not required, to be sure prec is positive
-        l = snprintf(line, sizeof(line), "%.*g", prec, f);
-        printf("2) l = %d\nprec = %d\nline = %s\n", l, prec, line);
-        int count = 2;
-        while(l > 16)
-        {
-            ++count;
-            --prec;
-            l = snprintf(line, sizeof(line), "%.*g", prec, f);
-            printf("%d) l = %d\nprec = %d\nline = %s\n", count, l, prec, line);
-        }
-    }
-    strcpy(buf, line);
-    printf("buf  = %s\n", buf);
-    return 0;
-}*/
-
+// S. https://gist.github.com/issakomi/0bcd25b4e373e2e40b6f073431835f4a
 static void ds16print(char * buf, double f)
 {
   char * line = new char[400]; // overallocated
@@ -385,8 +352,7 @@ static void ds16print(char * buf, double f)
   if (l > 16)
   {
     const int strl = static_cast<int>(strlen(line));
-    // not required, to be sure prec is positive
-    int prec = strl > 1 ? strl - 1 : 1;
+    int prec = strl > 1 ? strl - 1 : 1; // not required
     l = snprintf(line, 399, "%.*g", prec, f);
     while (l > 16)
     {
