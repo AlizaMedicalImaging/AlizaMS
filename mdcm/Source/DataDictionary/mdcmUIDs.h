@@ -587,11 +587,29 @@ public:
     uid_1_2_840_10008_1_2_4_204 = 504,
     uid_1_2_840_10008_1_2_4_205 = 505,
     uid_1_2_840_10008_5_1_4_1_1_77_1_8 = 506,
-    uid_1_2_840_10008_5_1_4_1_1_77_1_9 = 507
+    uid_1_2_840_10008_5_1_4_1_1_77_1_9 = 507,
 //
 //
 /////////////////////////////////////////
 
+/////////////////////////////////////////
+//
+// 2025a
+//
+    uid_1_2_840_10008_1_2_4_110 = 508,
+    uid_1_2_840_10008_1_2_4_111 = 509,
+    uid_1_2_840_10008_1_2_4_112 = 510,
+    uid_1_2_840_10008_1_2_8_1 = 511,
+    uid_1_2_840_10008_5_1_4_1_1_9_100_1 = 512,
+    uid_1_2_840_10008_5_1_4_1_1_9_100_2 = 513,
+    uid_1_2_840_10008_5_1_4_1_1_66_7 = 514,
+    uid_1_2_840_10008_5_1_4_1_1_66_8 = 515,
+    uid_1_2_840_10008_5_1_4_1_1_88_77 = 516,
+    uid_1_2_840_10008_5_1_4_1_1_601_3 = 517,
+    uid_1_2_840_10008_5_1_4_1_1_601_4 = 518
+//
+//
+/////////////////////////////////////////
   };
 
   enum UIDName
@@ -1161,7 +1179,26 @@ public:
     JPIPHTJ2KReferenced = 504,
     JPIPHTJ2KReferencedDeflate = 505,
     ConfocalMicroscopyImageStorage = 506,
-    ConfocalMicroscopyTiledPyramidalImageStorage = 507
+    ConfocalMicroscopyTiledPyramidalImageStorage = 507,
+//
+//
+/////////////////////////////////////////
+
+/////////////////////////////////////////
+//
+// 2025a
+//
+  JPEGXLLossless = 508,
+  JPEGXLJPEGRecompression = 509,
+  JPEGXL = 510,
+  DeflatedImageFrameCompression = 511,
+  WaveformPresentationStateStorage = 512,
+  WaveformAcquisitionPresentationStateStorage = 513,
+  LabelMapSegmentationStorage = 514,
+  HeightMapSegmentationStorage = 515,
+  WaveformAnnotationSRStorage = 516,
+  ThermographyImageStorage = 517,
+  ThermographyMultiframeImageStorage = 518
 //
 //
 /////////////////////////////////////////
