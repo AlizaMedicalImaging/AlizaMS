@@ -594,6 +594,26 @@ const char * const UIDsStrings[][2] = {
   //
   //////////////////////////////////////////////
 
+  //////////////////////////////////////////////
+  //
+  // 2025a
+  //
+  { "1.2.840.10008.1.2.4.110", "JPEG XL Lossless" },
+  { "1.2.840.10008.1.2.4.111", "JPEG XL JPEG Recompression" },
+  { "1.2.840.10008.1.2.4.112", "JPEG XL" },
+  { "1.2.840.10008.1.2.8.1", "Deflated Image Frame Compression" },
+  { "1.2.840.10008.5.1.4.1.1.9.100.1", "Waveform Presentation State Storage" },
+  { "1.2.840.10008.5.1.4.1.1.9.100.2", "Waveform Acquisition Presentation State Storage" },
+  { "1.2.840.10008.5.1.4.1.1.66.7", "Label Map Segmentation Storage" },
+  { "1.2.840.10008.5.1.4.1.1.66.8", "Height Map Segmentation Storage" },
+  { "1.2.840.10008.5.1.4.1.1.88.77", "Waveform Annotation SR Storage" },
+  { "1.2.840.10008.5.1.4.1.1.601.3", "Thermography Image Storage" },
+  { "1.2.840.10008.5.1.4.1.1.601.4", "Thermography Multi-frame Image Storage" },
+  //
+  //
+  //
+  //////////////////////////////////////////////
+
   { nullptr, nullptr }
 };
 
