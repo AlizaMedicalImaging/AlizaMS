@@ -64,9 +64,10 @@ const char * const PIStrings[] =
   "YBR_PARTIAL_420 ",
   "YBR_ICT ",
   "YBR_RCT ",
+  "XYB ",
   nullptr
 };
-constexpr unsigned int PIStrings_size = 14U;
+constexpr unsigned int PIStrings_size = 15U;
 // clang-format on
 
 const char *
@@ -131,38 +132,6 @@ PhotometricInterpretation::GetSamplesPerPixel() const
   {
     return 3;
   }
-}
-
-bool
-PhotometricInterpretation::IsLossy() const
-{
-  return !IsLossless();
-}
-
-bool
-PhotometricInterpretation::IsLossless() const
-{
-  switch (PIField)
-  {
-    case MONOCHROME1:
-    case MONOCHROME2:
-    case PALETTE_COLOR:
-    case RGB:
-    case HSV:
-    case ARGB:
-    case CMYK:
-    case YBR_FULL:
-    case YBR_RCT:
-      return true;
-    case YBR_FULL_422:
-    case YBR_PARTIAL_422:
-    case YBR_PARTIAL_420:
-    case YBR_ICT:
-      return false;
-    default:
-      return false;
-  }
-  return false;
 }
 
 bool
