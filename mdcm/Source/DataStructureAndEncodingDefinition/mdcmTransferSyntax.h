@@ -98,6 +98,9 @@ public:
     HTJ2K,
     JPIPHTJ2KReferenced,
     JPIPHTJ2KReferencedDeflate,
+    JPEGXLLossless,
+    JPEGXLJPEGRecompression,
+    JPEGXL,
     TS_END
   };
 

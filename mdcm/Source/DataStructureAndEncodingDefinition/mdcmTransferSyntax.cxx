@@ -81,6 +81,9 @@ const char * const TSStrings[] =
   "1.2.840.10008.1.2.4.203",    // High-Throughput JPEG 2000 Image Compression
   "1.2.840.10008.1.2.4.204",    // JPIP HTJ2K Referenced
   "1.2.840.10008.1.2.4.205",    // JPIP HTJ2K Referenced Deflate
+  "1.2.840.10008.1.2.4.110",    // JPEG XL Lossless
+  "1.2.840.10008.1.2.4.111",    // JPEG XL JPEG Recompression
+  "1.2.840.10008.1.2.4.112",    // JPEG XL
   "Unknown Transfer Syntax",    // Unknown
   nullptr
 };
@@ -146,6 +149,9 @@ TransferSyntax::IsExplicit() const
 }
 
 // clang-format off
+//
+// TODO Avoid this function, some cases e.g. JPEG2000, HTJ2K, JPEGXL it is not clear
+//
 bool
 TransferSyntax::IsLossy() const
 {
@@ -187,7 +193,9 @@ TransferSyntax::IsLossy() const
       TSField == JPIPReferenced ||
       TSField == JPIPReferencedDeflate ||
       TSField == JPIPHTJ2KReferenced ||
-      TSField == JPIPHTJ2KReferencedDeflate)
+      TSField == JPIPHTJ2KReferencedDeflate ||
+      TSField == JPEGXLJPEGRecompression ||
+      TSField == JPEGXL)
   {
     return true;
   }
@@ -305,6 +313,9 @@ TransferSyntax::IsEncapsulated() const
     case JPIPReferencedDeflate:
     case JPIPHTJ2KReferenced:
     case JPIPHTJ2KReferencedDeflate:
+    case JPEGXLLossless:
+    case JPEGXLJPEGRecompression:
+    case JPEGXL:
       r = true;
       break;
     default:

@@ -55,6 +55,7 @@ public:
     YBR_PARTIAL_420,
     YBR_ICT,
     YBR_RCT,
+    XYB,
     PI_END
   };
 
@@ -74,12 +75,6 @@ public:
 
   unsigned short
   GetSamplesPerPixel() const;
-
-  bool
-  IsLossy() const;
-
-  bool
-  IsLossless() const;
 
   static bool IsRetired(PIType);
 
