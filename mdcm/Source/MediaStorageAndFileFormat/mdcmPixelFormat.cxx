@@ -460,12 +460,14 @@ PixelFormat::Validate()
 void
 PixelFormat::Print(std::ostream & os) const
 {
-  os << "SamplesPerPixel    :" << SamplesPerPixel << "\n";
-  os << "BitsAllocated      :" << BitsAllocated << "\n";
-  os << "BitsStored         :" << BitsStored << "\n";
-  os << "HighBit            :" << HighBit << "\n";
-  os << "PixelRepresentation:" << PixelRepresentation << "\n";
-  os << "ScalarType found   :" << GetScalarTypeAsString() << "\n";
+// clang-format off
+  os << "SamplesPerPixel: " << SamplesPerPixel
+     << "\nBitsAllocated: " << BitsAllocated
+     << "\nBitsStored: " << BitsStored
+     << "\nHighBit: " << HighBit
+     << "\nPixelRepresentation: " << PixelRepresentation
+     << "\nScalar type found: " << GetScalarTypeAsString() << std::endl;
+// clang-format on
 }
 
 } // end namespace mdcm
