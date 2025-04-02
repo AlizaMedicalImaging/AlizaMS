@@ -30,9 +30,23 @@
 namespace mdcm
 {
 
-static const char * ScalarTypeStrings[] = {
-  "UINT8",  "INT8",  "UINT12",  "INT12",   "UINT16",  "INT16",     "UINT32",  "INT32",
-  "UINT64", "INT64", "FLOAT32", "FLOAT64", "SINGLEBIT", "UNKNOWN", nullptr,
+static const char * ScalarTypeStrings[] =
+{
+  "UINT8",
+  "INT8",
+  "UINT12",
+  "INT12",
+  "UINT16",
+  "INT16",
+  "UINT32",
+  "INT32",
+  "UINT64",
+  "INT64",
+  "FLOAT32",
+  "FLOAT64",
+  "SINGLEBIT",
+  "UNKNOWN",
+  nullptr
 };
 
 PixelFormat::PixelFormat(ScalarType st)
@@ -282,7 +296,6 @@ PixelFormat::GetScalarType() const
     if (PixelRepresentation == 0)
     {
       ;
-      ;
     }
     else if (PixelRepresentation == 1)
     {
@@ -345,13 +358,13 @@ PixelFormat::GetMin() const
     {
       return static_cast<double>(static_cast<int64_t>(~(((1ULL << BitsStored) - 1) >> 1)));
     }
-    else if (PixelRepresentation == 3)
-    {
-      return -static_cast<double>(std::numeric_limits<float>::max());
-    }
     else if (PixelRepresentation == 0)
     {
       return 0;
+    }
+    else if (PixelRepresentation == 3) // internal for 'float'
+    {
+      return -static_cast<double>(std::numeric_limits<float>::max());
     }
   }
   else if (BitsStored == 64)
@@ -360,13 +373,13 @@ PixelFormat::GetMin() const
     {
       return static_cast<double>(std::numeric_limits<signed long long>::min());
     }
-    else if (PixelRepresentation == 4)
-    {
-      return -std::numeric_limits<double>::max();
-    }
     else if (PixelRepresentation == 0)
     {
       return 0;
+    }
+    else if (PixelRepresentation == 4) // internal for 'double'
+    {
+      return -std::numeric_limits<double>::max();
     }
   }
   return 0;
@@ -375,20 +388,19 @@ PixelFormat::GetMin() const
 double
 PixelFormat::GetMax() const
 {
-  assert(BitsAllocated);
   if (BitsStored < 64)
   {
     if (PixelRepresentation == 1)
     {
       return static_cast<double>(static_cast<int64_t>((((1ULL << BitsStored) - 1) >> 1)));
     }
-    else if (PixelRepresentation == 3)
-    {
-      return static_cast<double>(std::numeric_limits<float>::max());
-    }
     else if (PixelRepresentation == 0)
     {
       return static_cast<double>(static_cast<int64_t>((1ULL << BitsStored) - 1));
+    }
+    else if (PixelRepresentation == 3) // internal for 'float'
+    {
+      return static_cast<double>(std::numeric_limits<float>::max());
     }
   }
   else if (BitsStored == 64)
@@ -397,13 +409,13 @@ PixelFormat::GetMax() const
     {
       return static_cast<double>(std::numeric_limits<signed long long>::max());
     }
-    else if (PixelRepresentation == 4)
-    {
-      return std::numeric_limits<double>::max();
-    }
     else if (PixelRepresentation == 0)
     {
       return static_cast<double>(std::numeric_limits<unsigned long long>::max());
+    }
+    else if (PixelRepresentation == 4) // internal for 'double'
+    {
+      return std::numeric_limits<double>::max();
     }
   }
   return 0;
@@ -438,12 +450,13 @@ PixelFormat::Validate()
   assert(SamplesPerPixel == 1 || SamplesPerPixel == 3 || SamplesPerPixel == 4);
   if (BitsStored == 0)
   {
-    mdcmDebugMacro("Bits Stored is 0. Setting is to max value");
+    mdcmDebugMacro("Bits Stored is 0, setting is to max value");
     BitsStored = BitsAllocated;
   }
+  // FIXME JPEG2000, HTJ2K and JPEG XL can theoretically also have 24 bits allocated
   if (BitsAllocated == 24)
   {
-    mdcmDebugMacro("ACR-NEMA way of storing RGB data. Updating");
+    mdcmDebugMacro("ACR-NEMA way of storing RGB data");
     if (BitsStored == 24 && HighBit == 23 && SamplesPerPixel == 1)
     {
       BitsAllocated = 8;
