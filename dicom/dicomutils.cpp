@@ -1671,13 +1671,13 @@ void delta_decode(
 	std::vector<unsigned short> & output)
 {
 	// RLE pass
-	std::vector<char> temp;
+	std::vector<signed char> temp;
 	for (size_t i = 0; i < length; ++i)
 	{
 		if (static_cast<unsigned char>(inbuffer[i]) == 0xa5)
 		{
 			int repeat = static_cast<unsigned char>(inbuffer[i + 1]) + 1;
-			const char value = inbuffer[i + 2];
+			const signed char value = static_cast<signed char>(inbuffer[i + 2]);
 			while (repeat > 0)
 			{
 				temp.push_back(value);
@@ -1710,7 +1710,7 @@ void delta_decode(
 			delta = value;
 		}
 	}
-	if (output.size() % 2)
+	if (output.size() % 2 != 0)
 	{
 		output.resize(output.size() - 1);
 	}
