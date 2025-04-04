@@ -1687,14 +1687,14 @@ void delta_decode(
 		}
 		else
 		{
-			temp.push_back(inbuffer[i]);
+			temp.push_back(static_cast<unsigned char>(inbuffer[i]));
 		}
 	}
 	// Delta encoding pass
 	unsigned short delta{};
 	for (size_t i = 0; i < temp.size(); ++i)
 	{
-		if (temp[i] == 0x5a)
+		if (static_cast<unsigned char>(temp[i]) == 0x5a)
 		{
 			const unsigned char v1 = static_cast<unsigned char>(temp[i + 1]);
 			const unsigned char v2 = static_cast<unsigned char>(temp[i + 2]);

@@ -67,6 +67,7 @@
 #include <climits>
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
 #include <new>
 #endif
 
@@ -199,19 +200,19 @@ int main(int argc, char * argv[])
 // clang-format off
 #if (defined PRINT_HOST_INFO && PRINT_HOST_INFO==1)
 	{
-		const unsigned int endian{1};
+		const unsigned int endian = 1;
 		if (*((const unsigned char*)&endian) == 0)
 		{
-			std::cout << "System is big-endian\n";
+			std::cout << "System is big-endian\n\n";
 		}
 		else
 		{
-			std::cout << "System is little-endian\n";
+			std::cout << "System is little-endian\n\n";
 		}
 #ifdef __cplusplus
-		std::cout << "__cplusplus is defined: " << __cplusplus << '\n';
+		std::cout << "__cplusplus is defined: " << __cplusplus << "\n\n";
 #else
-		std::cout << "__cplusplus is not defined\n";
+		std::cout << "__cplusplus is not defined\n\n";
 #endif
 #ifdef __x86_64__
 		std::cout << "__x86_64__ is defined\n";
@@ -241,7 +242,7 @@ int main(int argc, char * argv[])
 		std::cout << "_M_X64 is defined\n";
 #endif
 #ifdef _M_IX86_FP
-		std::cout << "_M_IX86_FP is defined: " << _M_IX86_FP << '\n'
+		std::cout << "_M_IX86_FP is defined:" << _M_IX86_FP << '\n'
 #endif
 #ifdef _M_ARM
 		std::cout << "_M_ARM is defined\n";
@@ -250,7 +251,7 @@ int main(int argc, char * argv[])
 		std::cout << "_M_ARM64EC is defined\n";
 #endif
 #if 1
-		std::cout << "alignof(std::max_align_t) = " << alignof(std::max_align_t)
+		std::cout << "\nalignof(std::max_align_t) = " << alignof(std::max_align_t)
 			<< "\n";
 #ifdef __STDCPP_DEFAULT_NEW_ALIGNMENT__
 		std::cout << "__STDCPP_DEFAULT_NEW_ALIGNMENT__ = "
@@ -260,10 +261,10 @@ int main(int argc, char * argv[])
 #endif
 #endif
 #ifdef __cpp_lib_hardware_interference_size
-		std::cout << "__cpp_lib_hardware_interference_size is defined, "
+		std::cout << "\n__cpp_lib_hardware_interference_size is defined, "
 			<< std::hardware_constructive_interference_size << '\n';
 #else
-		std::cout << "__cpp_lib_hardware_interference_size is not defined\n";
+		std::cout << "\n__cpp_lib_hardware_interference_size is not defined\n";
 #endif
 #ifdef _WIN32
 #ifdef UNICODE
@@ -283,6 +284,7 @@ int main(int argc, char * argv[])
 		}
 #endif
 #endif
+		std::cout << "\nchar is " << (std::is_signed<char>() ? "signed\n" : "unsigned\n");
 		enum { Va = (short)SHRT_MAX                } Ea;
 		enum { V0 = (unsigned short)USHRT_MAX      } E0;
 		enum { V1 = (int)INT_MAX                   } E1;
@@ -324,6 +326,7 @@ int main(int argc, char * argv[])
 			<< std::endl;
 	}
 #endif
+
 // clang-format on
 #if (defined(SILENCE_QT_LOGGING) && (QT_VERSION < QT_VERSION_CHECK(5,2,0)))
 	qInstallMsgHandler(myMessageOutput);
