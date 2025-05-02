@@ -705,17 +705,26 @@ rawtoimage(const char *        inputbuffer,
 static inline bool
 check_comp_valid(opj_image_t * image)
 {
+  if (!image)
+  {
+    return false;
+  }
+  if (!image->comps)
+  {
+    return false;
+  }
   opj_image_comp_t * comp = &image->comps[0];
   if (comp->prec > 32)
   {
     mdcmAlwaysWarnMacro("JPEG2000: precision not supported " << comp->prec);
     return false;
   }
-#ifdef MDCM_JPEG2000_VERBOSE
-  std::cout << "image->numcomps = " << image->numcomps << std::endl;
-#endif
   bool invalid = false;
-  if (image->numcomps == 3)
+  if (image->numcomps == 1)
+  {
+    ;
+  }
+  else if (image->numcomps == 3)
   {
     opj_image_comp_t * comp1 = &image->comps[1];
     opj_image_comp_t * comp2 = &image->comps[2];
@@ -735,6 +744,11 @@ check_comp_valid(opj_image_t * image)
       invalid = true;
     if (comp->w != comp2->w)
       invalid = true;
+  }
+  else
+  {
+    mdcmAlwaysWarnMacro("JPEG2000: " << image->numcomps << " components, not supported");
+    invalid = true;
   }
   return !invalid;
 }
@@ -1450,16 +1464,14 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
   {
     opj_destroy_codec(dinfo);
     opj_stream_destroy(cio);
-    mdcmErrorMacro("opj_decode failed");
     return std::make_pair<char *, size_t>(nullptr, 0);
   }
   bResult = bResult && (image != nullptr);
   bResult = bResult && opj_end_decompress(dinfo, cio);
-  if (!image || !check_comp_valid(image))
+  if (!check_comp_valid(image))
   {
     opj_destroy_codec(dinfo);
     opj_stream_destroy(cio);
-    mdcmErrorMacro("opj_decode failed");
     return std::make_pair<char *, size_t>(nullptr, 0);
   }
   bool reversible = false;
@@ -1603,7 +1615,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
       }
     }
   }
-  // Free
+  //
   opj_destroy_codec(dinfo);
   opj_image_destroy(image);
   return std::make_pair(raw, len);
@@ -1856,6 +1868,7 @@ JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size)
   if (!bResult)
   {
     opj_stream_destroy(cio);
+    opj_destroy_codec(dinfo);
     return false;
   }
   bool reversible = false;
@@ -1873,14 +1886,18 @@ JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size)
     mct = mctb;
   }
   LossyFlag = !reversible;
-  opj_image_comp_t * comp = &image->comps[0];
   if (!check_comp_valid(image))
   {
     mdcmErrorMacro("Validation failed");
+    opj_stream_destroy(cio);
+    opj_destroy_codec(dinfo);
+    opj_image_destroy(image);
     return false;
   }
+  opj_image_comp_t * comp = &image->comps[0];
   this->Dimensions[0] = comp->w;
   this->Dimensions[1] = comp->h;
+  // Precision '> 32' already checked by 'check_comp_valid'
   if (comp->prec <= 8)
   {
     this->PF = PixelFormat(PixelFormat::UINT8);
@@ -1896,6 +1913,7 @@ JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size)
   this->PF.SetBitsStored(static_cast<unsigned short>(comp->prec));
   this->PF.SetHighBit(static_cast<unsigned short>(comp->prec - 1));
   this->PF.SetPixelRepresentation(static_cast<unsigned short>(comp->sgnd));
+  // number of components already checked by 'check_comp_valid'
   if (image->numcomps == 1)
   {
     // usually we have codec only, but in some case we have a JP2 with
@@ -1936,20 +1954,6 @@ JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size)
       PI = PhotometricInterpretation::RGB;
     this->PF.SetSamplesPerPixel(3);
   }
-  else if (image->numcomps == 4)
-  {
-    // http://www.crc.ricoh.com/~gormish/jpeg2000conformance/
-    // jpeg2000testimages/Part4TestStreams/codestreams_profile0/p0_06.j2k
-    mdcmErrorMacro("Image has 4 components, it is not supported in DICOM (ARGB is retired)");
-    return false;
-  }
-  else
-  {
-    // http://www.crc.ricoh.com/~gormish/jpeg2000conformance/
-    // jpeg2000testimages/Part4TestStreams/codestreams_profile0/p0_13.j2k
-    mdcmErrorMacro("Image has " << image->numcomps << " components, it is not supported in DICOM");
-    return false;
-  }
 #ifdef MDCM_JPEG2000_VERBOSE
   switch(image->color_space)
   {
@@ -1975,7 +1979,7 @@ JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size)
     std::cout << "CLRSPC_UNSPECIFIED" << std::endl;
     break;
   default:
-    std::cout << "Colospace unknown: " << static_cast<unsigned int>(image->color_space) << std::endl;
+    std::cout << "Colospace unknown: " << static_cast<int>(image->color_space) << std::endl;
     break;
   }
 #endif
@@ -2021,28 +2025,11 @@ JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size)
       }
     }
   }
-  /*
-  if (this->GetPhotometricInterpretation().IsLossy())
-  {
-    assert(ts.IsLossy());
-  }
-  if (!ts.IsLossy())
-  {
-    assert(this->GetPhotometricInterpretation().IsLossless());
-  }
-  */
   //
   //
   //
-
-  // Close the byte stream
   opj_stream_destroy(cio);
-  // Free remaining structures
-  if (dinfo)
-  {
-    opj_destroy_codec(dinfo);
-  }
-  // Free image data structure
+  opj_destroy_codec(dinfo);
   opj_image_destroy(image);
   return true;
 }
