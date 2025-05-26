@@ -3760,7 +3760,7 @@ void DicomUtils::read_dimension_index_sq(
 				idx.uid = dim_uid.trimmed().remove(QChar('\0')).toStdString();
 				idx.index_pointer = mdcm::Tag(group0, element0);
 				idx.group_pointer = mdcm::Tag(group1, element1);
-				sq.push_back(idx);
+				sq.push_back(std::move(idx));
 			}
 			else if (ok0)
 			{
@@ -3768,7 +3768,7 @@ void DicomUtils::read_dimension_index_sq(
 				idx.uid = dim_uid.trimmed().remove(QChar('\0')).toStdString();
 				idx.index_pointer = mdcm::Tag(group0, element0);
 				idx.group_pointer = mdcm::Tag(0xffff,0xffff);
-				sq.push_back(idx);
+				sq.push_back(std::move(idx));
 			}
 		}
 	}
@@ -3818,7 +3818,7 @@ bool DicomUtils::read_dimension_index_values(
 								index_value.idx);
 							if (ok && index_value.idx.size() == idx_sq_size)
 							{
-								values.push_back(index_value);
+								values.push_back(std::move(index_value));
 							}
 							else
 							{
@@ -3929,7 +3929,7 @@ bool DicomUtils::read_group_sq(
 						}
 						std::cout << " (id = " << index_value.id << ")" << std::endl;
 #endif
-						dim_idx_values.push_back(index_value);
+						dim_idx_values.push_back(std::move(index_value));
 					}
 #ifdef ENHANCED_PRINT_INFO
 					else
@@ -6856,7 +6856,7 @@ QString DicomUtils::read_enhanced(
 					tmp13.id = values.at(x).id;
 					tmp13.idx.push_back(values.at(x).stack_id);
 					tmp13.idx.push_back(values.at(x).in_stack_pos_num);
-					idx_values_tmp.push_back(tmp13);
+					idx_values_tmp.push_back(std::move(tmp13));
 				}
 				for (unsigned int x = 0; x < idx_values_tmp.size(); ++x)
 				{
@@ -7160,7 +7160,7 @@ QString DicomUtils::read_enhanced_supp_palette(
 					tmp13.id = values.at(x).id;
 					tmp13.idx.push_back(values.at(x).stack_id);
 					tmp13.idx.push_back(values.at(x).in_stack_pos_num);
-					idx_values_tmp.push_back(tmp13);
+					idx_values_tmp.push_back(std::move(tmp13));
 				}
 				for (unsigned int x = 0; x < idx_values_tmp.size(); ++x)
 				{
@@ -11065,11 +11065,11 @@ void DicomUtils::enhanced_process_indices(
 									const bool ok_sort = sort_frames_ippiop(tmp2, tmp3, values);
 									if (ok_sort)
 									{
-										tmp0.push_back(tmp3);
+										tmp0.push_back(std::move(tmp3));
 									}
 									else
 									{
-										tmp0.push_back(tmp2);
+										tmp0.push_back(std::move(tmp2));
 									}
 #ifdef ENHANCED_PRINT_INFO
 									if (!info0)
@@ -11090,11 +11090,11 @@ void DicomUtils::enhanced_process_indices(
 								}
 								else if (loading_type == EnhancedIODLoadingType::StrictMultipleImages)
 								{
-									tmp0.push_back(tmp2);
+									tmp0.push_back(std::move(tmp2));
 								}
 								else if (loading_type == EnhancedIODLoadingType::StrictSingleImage)
 								{
-									tmp0single.push_back(tmp2);
+									tmp0single.push_back(std::move(tmp2));
 								}
 							}
 #ifdef ENHANCED_PRINT_INFO
@@ -11132,7 +11132,7 @@ void DicomUtils::enhanced_process_indices(
 					++it;
 				}
 			}
-			tmp0.push_back(tmp);
+			tmp0.push_back(std::move(tmp));
 		}
 	}
 	//
@@ -11158,16 +11158,16 @@ void DicomUtils::enhanced_process_indices(
 			const bool ok_sort = sort_frames_ippiop(tmp2, tmp3, values);
 			if (ok_sort)
 			{
-				tmp0.push_back(tmp3);
+				tmp0.push_back(std::move(tmp3));
 			}
 			else
 			{
-				tmp0.push_back(tmp2);
+				tmp0.push_back(std::move(tmp2));
 			}
 		}
 		else
 		{
-			tmp0.push_back(tmp2);
+			tmp0.push_back(std::move(tmp2));
 		}
 	}
 #ifdef ENHANCED_PRINT_INFO
@@ -13235,9 +13235,9 @@ QString DicomUtils::read_dicom(
 								tmp_list.push_back(it2->first);
 							}
 						}
-						slices_.push_back(tmp_list);
+						slices_.push_back(std::move(tmp_list));
 					}
-					if (images.size()%unique_slice_pos_size != 0)
+					if (images.size() % unique_slice_pos_size != 0)
 					{
 						multiseries = false;
 					}
@@ -13248,7 +13248,7 @@ QString DicomUtils::read_dicom(
 							QStringList images_tmp;
 							for (unsigned int k = 0; k < unique_slice_pos_size; ++k)
 							{
-								if (k<slices_.size() && j<slices_.at(k).size())
+								if (k < slices_.size() && j < slices_.at(k).size())
 								{
 									const unsigned int id_0_ = slices_.at(k).at(j);
 									if (slices_instance_map.count(id_0_) > 0)

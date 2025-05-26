@@ -953,7 +953,7 @@ bool SRUtils::read_SCOORD(
 					sg.PixelOriginInterpretation = PixelOriginInterpretation;
 					sg.FiducialUID = FiducialUID;
 					sg.GraphicData = GraphicData;
-					tmp001.push_back(sg);
+					tmp001.push_back(std::move(sg));
 					read_IMAGE(
 						nds1,
 						charset,

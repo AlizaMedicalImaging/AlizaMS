@@ -159,7 +159,7 @@ readCodeSequenceMacroAttributes(const Tag & tag, const DataSet & dataset)
       Attribute<0x0008, 0x0104> codeMeaningAttribute;
       codeMeaningAttribute.SetFromDataSet(itemDataSet);
       entry.CM = codeMeaningAttribute.GetValue();
-      result.push_back(entry);
+      result.push_back(std::move(entry));
     }
   }
   return result;

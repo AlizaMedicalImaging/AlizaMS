@@ -275,7 +275,7 @@ Scanner::GetOrderedValues(const Tag & t) const
       std::string theVal = std::string(ttv.find(t)->second);
       if (std::find(theReturn.begin(), theReturn.end(), theVal) == theReturn.end())
       {
-        theReturn.push_back(theVal); // only add new tags to the list
+        theReturn.push_back(std::move(theVal)); // only add new tags to the list
       }
     }
   }

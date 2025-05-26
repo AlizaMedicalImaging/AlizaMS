@@ -453,7 +453,7 @@ QString SpectroscopyUtils::ProcessData(
 				tmp13.id = values.at(x).id;
 				tmp13.idx.push_back(values.at(x).stack_id);
 				tmp13.idx.push_back(values.at(x).in_stack_pos_num);
-				idx_values_tmp.push_back(tmp13);
+				idx_values_tmp.push_back(std::move(tmp13));
 			}
 			for (unsigned int x = 0; x < idx_values_tmp.size(); ++x)
 			{
