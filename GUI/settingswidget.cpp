@@ -170,7 +170,18 @@ void SettingsWidget::set_default()
 	mvsep_checkBox->setChecked(false);
 	dcmthread_checkBox->setChecked(true);
 	adjust_spinBox->setValue(14);
+#if defined(Q_OS_LINUX)
+	if (QApplication::platformName() == QString("wayland"))
+	{
+		adjust_checkBox->setChecked(true);
+	}
+	else
+	{
+		adjust_checkBox->setChecked(false);
+	}
+#else
 	adjust_checkBox->setChecked(false);
+#endif
 }
 
 void SettingsWidget::set_force_cp1251(bool b)
@@ -254,8 +265,20 @@ void SettingsWidget::readSettings()
 	const int tmp15 = settings.value(QString("apply_suppl"),     1).toInt();
 	const int tmp16 = settings.value(QString("mvsep"),           0).toInt();
 	const int tmp17 = settings.value(QString("dcm_thread2"),     1).toInt();
-	const int tmp18 = settings.value(QString("adj_fps"),         0).toInt();
-	const int tmp19 = settings.value(QString("adj_fps_value"),   14).toInt();
+#if defined(Q_OS_LINUX)
+	int tmp18;
+	if (QApplication::platformName() == QString("wayland"))
+	{
+		tmp18 = settings.value(QString("adj_fps2"), 1).toInt();
+	}
+	else
+	{
+		tmp18 = settings.value(QString("adj_fps2"), 0).toInt();
+	}
+#else
+	const int tmp18 = settings.value(QString("adj_fps2"), 0).toInt();
+#endif
+	const int tmp19 = settings.value(QString("adj_fps_value"), 14).toInt();
 	settings.endGroup();
 	settings.beginGroup(QString("StyleDialog"));
 	saved_idx = settings.value(QString("saved_idx"), 0).toInt();
@@ -351,7 +374,7 @@ void SettingsWidget::writeSettings(QSettings & s)
 	s.setValue(QString("force_cp1251"),  QVariant(cp1251_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("mvsep"),         QVariant(mvsep_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("dcm_thread2"),   QVariant(dcmthread_checkBox->isChecked() ? 1 : 0));
-	s.setValue(QString("adj_fps"),       QVariant(adjust_checkBox->isChecked() ? 1 : 0));
+	s.setValue(QString("adj_fps2"),      QVariant(adjust_checkBox->isChecked() ? 1 : 0));
 	s.setValue(QString("adj_fps_value"), QVariant(adjust_spinBox->value()));
 	if (enh_dim_skip_radioButton->isChecked())
 	{
