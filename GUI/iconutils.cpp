@@ -234,9 +234,19 @@ template<typename Tin, typename Tout> void extract_icon(
 			flip_x = true;
 		}
 	}
+#if QT_VERSION >= QT_VERSION_CHECK(6,9,0)
+	if (flip_x && flip_y) tmpi.flip(Qt::Horizontal | Qt::Vertical);
+	else if (flip_y)      tmpi.flip(Qt::Vertical);
+	else if (flip_x)      tmpi.flip(Qt::Horizontal);
+#elif QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+	if (flip_x && flip_y) tmpi.mirror(true, true);
+	else if (flip_y)      tmpi.mirror(false, true);
+	else if (flip_x)      tmpi.mirror(true, false);
+#else
 	if (flip_x && flip_y) tmpi = tmpi.mirrored(true, true);
 	else if (flip_y)      tmpi = tmpi.mirrored(false, true);
 	else if (flip_x)      tmpi = tmpi.mirrored(true, false);
+#endif
 	//
 	if (spacing_x == spacing_y)
 	{
@@ -390,9 +400,19 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 			;
 		}
 		QImage tmpi(p, size_[0], size_[1], 3 * size_[0], QImage::Format_RGB888);
+#if QT_VERSION >= QT_VERSION_CHECK(6,9,0)
+		if (flip_x && flip_y) tmpi.flip(Qt::Horizontal | Qt::Vertical);
+		else if (flip_y)      tmpi.flip(Qt::Vertical);
+		else if (flip_x)      tmpi.flip(Qt::Horizontal);
+#elif QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+		if (flip_x && flip_y) tmpi.mirror(true, true);
+		else if (flip_y)      tmpi.mirror(false, true);
+		else if (flip_x)      tmpi.mirror(true, false);
+#else
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true, true);
 		else if (flip_y)      tmpi = tmpi.mirrored(false, true);
 		else if (flip_x)      tmpi = tmpi.mirrored(true, false);
+#endif
 		if (spacing_x == spacing_y)
 		{
 			ivariant->icon = QPixmap::fromImage(tmpi)
@@ -429,9 +449,19 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 		size_x = size_[0];
 		size_y = size_[1];
 		QImage tmpi(p_, size_[0], size_[1], 3 * size_[0], QImage::Format_RGB888);
+#if QT_VERSION >= QT_VERSION_CHECK(6,9,0)
+		if (flip_x && flip_y) tmpi.flip(Qt::Horizontal | Qt::Vertical);
+		else if (flip_y)      tmpi.flip(Qt::Vertical);
+		else if (flip_x)      tmpi.flip(Qt::Horizontal);
+#elif QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+		if (flip_x && flip_y) tmpi.mirror(true, true);
+		else if (flip_y)      tmpi.mirror(false, true);
+		else if (flip_x)      tmpi.mirror(true, false);
+#else
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true, true);
 		else if (flip_y)      tmpi = tmpi.mirrored(false, true);
 		else if (flip_x)      tmpi = tmpi.mirrored(true, false);
+#endif
 		if (spacing_x == spacing_y)
 		{
 			ivariant->icon = QPixmap::fromImage(tmpi)
@@ -491,9 +521,19 @@ template<typename Tin, typename Tout> void extract_icon_rgb(
 			;
 		}
 		QImage tmpi(p, size_[0], size_[1], 3 * size_[0], QImage::Format_RGB888);
+#if QT_VERSION >= QT_VERSION_CHECK(6,9,0)
+		if (flip_x && flip_y) tmpi.flip(Qt::Horizontal | Qt::Vertical);
+		else if (flip_y)      tmpi.flip(Qt::Vertical);
+		else if (flip_x)      tmpi.flip(Qt::Horizontal);
+#elif QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+		if (flip_x && flip_y) tmpi.mirror(true, true);
+		else if (flip_y)      tmpi.mirror(false, true);
+		else if (flip_x)      tmpi.mirror(true, false);
+#else
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true, true);
 		else if (flip_y)      tmpi = tmpi.mirrored(false, true);
 		else if (flip_x)      tmpi = tmpi.mirrored(true, false);
+#endif
 		if (spacing_x == spacing_y)
 		{
 			ivariant->icon = QPixmap::fromImage(tmpi)
@@ -645,9 +685,19 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 			;
 		}
 		QImage tmpi(p, size_[0], size_[1], 4 * size_[0], QImage::Format_RGBA8888);
+#if QT_VERSION >= QT_VERSION_CHECK(6,9,0)
+		if (flip_x && flip_y) tmpi.flip(Qt::Horizontal | Qt::Vertical);
+		else if (flip_y)      tmpi.flip(Qt::Vertical);
+		else if (flip_x)      tmpi.flip(Qt::Horizontal);
+#elif QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+		if (flip_x && flip_y) tmpi.mirror(true, true);
+		else if (flip_y)      tmpi.mirror(false, true);
+		else if (flip_x)      tmpi.mirror(true, false);
+#else
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true, true);
 		else if (flip_y)      tmpi = tmpi.mirrored(false, true);
 		else if (flip_x)      tmpi = tmpi.mirrored(true, false);
+#endif
 		if (spacing_x == spacing_y)
 		{
 			ivariant->icon = QPixmap::fromImage(tmpi)
@@ -710,9 +760,19 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 			;
 		}
 		QImage tmpi(p, size_[0], size_[1], 3 * size_[0], QImage::Format_RGB888);
+#if QT_VERSION >= QT_VERSION_CHECK(6,9,0)
+		if (flip_x && flip_y) tmpi.flip(Qt::Horizontal | Qt::Vertical);
+		else if (flip_y)      tmpi.flip(Qt::Vertical);
+		else if (flip_x)      tmpi.flip(Qt::Horizontal);
+#elif QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+		if (flip_x && flip_y) tmpi.mirror(true, true);
+		else if (flip_y)      tmpi.mirror(false, true);
+		else if (flip_x)      tmpi.mirror(true, false);
+#else
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true, true);
 		else if (flip_y)      tmpi = tmpi.mirrored(false, true);
 		else if (flip_x)      tmpi = tmpi.mirrored(true, false);
+#endif
 		if (spacing_x == spacing_y)
 		{
 			ivariant->icon = QPixmap::fromImage(tmpi)
@@ -751,9 +811,19 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 		}
 		if (!p_) return;
 		QImage tmpi(p_, size_[0], size_[1], 4 * size_[0], QImage::Format_RGBA8888);
+#if QT_VERSION >= QT_VERSION_CHECK(6,9,0)
+		if (flip_x && flip_y) tmpi.flip(Qt::Horizontal | Qt::Vertical);
+		else if (flip_y)      tmpi.flip(Qt::Vertical);
+		else if (flip_x)      tmpi.flip(Qt::Horizontal);
+#elif QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+		if (flip_x && flip_y) tmpi.mirror(true, true);
+		else if (flip_y)      tmpi.mirror(false, true);
+		else if (flip_x)      tmpi.mirror(true, false);
+#else
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true, true);
 		else if (flip_y)      tmpi = tmpi.mirrored(false, true);
 		else if (flip_x)      tmpi = tmpi.mirrored(true, false);
+#endif
 		if (spacing_x == spacing_y)
 		{
 			ivariant->icon = QPixmap::fromImage(tmpi)
@@ -815,9 +885,19 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 			;
 		}
 		QImage tmpi(p, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
+#if QT_VERSION >= QT_VERSION_CHECK(6,9,0)
+		if (flip_x && flip_y) tmpi.flip(Qt::Horizontal | Qt::Vertical);
+		else if (flip_y)      tmpi.flip(Qt::Vertical);
+		else if (flip_x)      tmpi.flip(Qt::Horizontal);
+#elif QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+		if (flip_x && flip_y) tmpi.mirror(true, true);
+		else if (flip_y)      tmpi.mirror(false, true);
+		else if (flip_x)      tmpi.mirror(true, false);
+#else
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true, true);
 		else if (flip_y)      tmpi = tmpi.mirrored(false, true);
 		else if (flip_x)      tmpi = tmpi.mirrored(true, false);
+#endif
 		if (spacing_x == spacing_y)
 		{
 			ivariant->icon = QPixmap::fromImage(tmpi)
@@ -882,9 +962,19 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 			;
 		}
 		QImage tmpi(p, size[0], size[1], 4 * size[0], QImage::Format_RGBA8888);
+#if QT_VERSION >= QT_VERSION_CHECK(6,9,0)
+		if (flip_x && flip_y) tmpi.flip(Qt::Horizontal | Qt::Vertical);
+		else if (flip_y)      tmpi.flip(Qt::Vertical);
+		else if (flip_x)      tmpi.flip(Qt::Horizontal);
+#elif QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+		if (flip_x && flip_y) tmpi.mirror(true, true);
+		else if (flip_y)      tmpi.mirror(false, true);
+		else if (flip_x)      tmpi.mirror(true, false);
+#else
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true, true);
 		else if (flip_y)      tmpi = tmpi.mirrored(false, true);
 		else if (flip_x)      tmpi = tmpi.mirrored(true, false);
+#endif
 		if (spacing_x == spacing_y)
 		{
 			ivariant->icon = QPixmap::fromImage(tmpi)
@@ -938,9 +1028,19 @@ template<typename Tin, typename Tout> void extract_icon_rgba(
 			;
 		}
 		QImage tmpi(p, size[0], size[1], 3 * size[0], QImage::Format_RGB888);
+#if QT_VERSION >= QT_VERSION_CHECK(6,9,0)
+		if (flip_x && flip_y) tmpi.flip(Qt::Horizontal | Qt::Vertical);
+		else if (flip_y)      tmpi.flip(Qt::Vertical);
+		else if (flip_x)      tmpi.flip(Qt::Horizontal);
+#elif QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+		if (flip_x && flip_y) tmpi.mirror(true, true);
+		else if (flip_y)      tmpi.mirror(false, true);
+		else if (flip_x)      tmpi.mirror(true, false);
+#else
 		if (flip_x && flip_y) tmpi = tmpi.mirrored(true, true);
 		else if (flip_y)      tmpi = tmpi.mirrored(false, true);
 		else if (flip_x)      tmpi = tmpi.mirrored(true, false);
+#endif
 		if (spacing_x == spacing_y)
 		{
 			ivariant->icon = QPixmap::fromImage(tmpi)
