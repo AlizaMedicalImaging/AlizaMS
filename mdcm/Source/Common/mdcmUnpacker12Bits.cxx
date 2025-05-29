@@ -44,6 +44,7 @@ bool Unpacker12Bits::Unpack(char * out, const char * in, size_t n)
   return true;
 }
 
+#if 0
 bool Unpacker12Bits::Pack(char * out, const char * in, size_t n)
 {
   if (n % 4 != 0)
@@ -61,5 +62,6 @@ bool Unpacker12Bits::Pack(char * out, const char * in, size_t n)
   }
   return true;
 }
+#endif
 
 }

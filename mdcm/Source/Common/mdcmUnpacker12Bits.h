@@ -36,15 +36,17 @@ namespace mdcm
 class MDCM_EXPORT Unpacker12Bits
 {
 public:
-  // Pack an array of 16 bits where all values are 12 bits into a pack form.
-  // n is the length in bytes of array in, out will be a fake 8 bits array of size
-  // (n / 2) * 3
-  static bool Pack(char *, const char *, size_t);
-
   // Unpack an array of 'packed' 12 bits data into a more conventional 16bits
   // array. n is the length in bytes of array in, out will be a 16 bits array of
   // size (n / 3) * 2
   static bool Unpack(char *, const char *, size_t);
+
+#if 0
+  // Pack an array of 16 bits where all values are 12 bits into a pack form.
+  // n is the length in bytes of array in, out will be a fake 8 bits array of size
+  // (n / 2) * 3
+  static bool Pack(char *, const char *, size_t);
+#endif
 };
 
 }
