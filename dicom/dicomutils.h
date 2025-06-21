@@ -237,15 +237,12 @@ public:
 		ImageVariant*);
 	static bool read_slices(
 		const QStringList&, ImageVariant*,
-		const bool, const bool,
 		float);
 	static bool read_slices_uihgrid(
 		const mdcm::DataSet&, ImageVariant*,
-		const bool,
 		float);
 	static bool read_slices_rtdose(
 		const QString&, ImageVariant*,
-		const bool,
 		float);
 	static void read_dimension_index_sq(
 		const mdcm::DataSet&, DimIndexSq&);

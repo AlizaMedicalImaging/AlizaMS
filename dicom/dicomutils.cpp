@@ -96,6 +96,7 @@ struct MixedDicomSeriesInfo
 	bool icc{};
 	QString file;
 	QString photometric;
+	QString spacing;
 	QString sop;
 };
 
@@ -3185,7 +3186,6 @@ void DicomUtils::read_us_regions(
 
 bool DicomUtils::read_slices(
 	const QStringList & filenames_, ImageVariant * ivariant,
-	const bool ok3d, const bool skip_texture,
 	float tolerance)
 {
 	if (!ivariant) return false;
@@ -3347,7 +3347,6 @@ quit_:
 
 bool DicomUtils::read_slices_uihgrid(
 	const mdcm::DataSet & ds, ImageVariant * ivariant,
-	const bool ok3d,
 	float tolerance)
 {
 	if (!ivariant) return false;
@@ -3595,7 +3594,6 @@ bool DicomUtils::read_slices_uihgrid(
 
 bool DicomUtils::read_slices_rtdose(
 	const QString & filename_, ImageVariant * ivariant,
-	const bool ok3d,
 	float tolerance)
 {
 	if (!ivariant) return false;
@@ -7838,10 +7836,15 @@ QString DicomUtils::read_series(
 						slices_ok =	read_slices_uihgrid(
 							ds,
 							ivariant,
-							ok3d,
 							tolerance);
-						if (slices_ok) ivariant->iod_supported = true;
-						else geometry_from_image = true;
+						if (slices_ok)
+						{
+							ivariant->iod_supported = true;
+						}
+						else
+						{
+							geometry_from_image = true;
+						}
 					}
 				}
 				else
@@ -7855,11 +7858,15 @@ QString DicomUtils::read_series(
 							slices_ok =	read_slices(
 								images_ipp,
 								ivariant,
-								ok3d,
-								ivariant->di->skip_texture,
 								tolerance);
-							if (slices_ok) ivariant->iod_supported = true;
-							else geometry_from_image = true;
+							if (slices_ok)
+							{
+								ivariant->iod_supported = true;
+							}
+							else
+							{
+								geometry_from_image = true;
+							}
 							ivariant->unit_str = QString(" mm");
 						}
 					}
@@ -7870,7 +7877,6 @@ QString DicomUtils::read_series(
 							slices_ok =	read_slices_rtdose(
 								images_ipp.at(j),
 								ivariant,
-								ok3d,
 								0.01f);
 							if (slices_ok)
 							{
@@ -7890,8 +7896,6 @@ QString DicomUtils::read_series(
 							slices_ok =	read_slices(
 								images_ipp,
 								ivariant,
-								ok3d,
-								ivariant->di->skip_texture,
 								tolerance);
 							if (!slices_ok)
 							{
@@ -12652,6 +12656,7 @@ QString DicomUtils::read_dicom(
 	const mdcm::Tag tSOPClassUID(0x0008,0x0016);
 	const mdcm::Tag tSlicePosition(0x0020,0x1041);
 	const mdcm::Tag tPhotometricInterpretation(0x0028,0x0004);
+	const mdcm::Tag tPixelSpacing(0x0028,0x0030);
 	QStringList images;
 	QStringList rtstruct_ref_search;
 	QString     rtstruct_ref_search_path;
@@ -12683,6 +12688,7 @@ QString DicomUtils::read_dicom(
 	bool localizer_tmp1{};
 	QString sop_tmp0, sop_tmp1;
 	QString photometric_tmp0, photometric_tmp1;
+	QString pspacing_tmp0, pspacing_tmp1;
 	bool icc_found_tmp0{};
 	bool icc_found_tmp1{};
 	const SettingsWidget * const wsettings =
@@ -12704,6 +12710,7 @@ QString DicomUtils::read_dicom(
 #endif
 		QString sop;
 		QString photometric;
+		QString pspacing;
 		bool icc_found{};
 		unsigned short columns_{};
 		unsigned short rows_{};
@@ -12750,6 +12757,9 @@ QString DicomUtils::read_dicom(
 		const bool tPhotometricInterpretation_ok =
 			DicomUtils::get_string_value(ds, tPhotometricInterpretation, photometric);
 		(void)tPhotometricInterpretation_ok;
+		const bool tPixelSpacing_ok = DicomUtils::get_string_value(
+			ds, tPixelSpacing, pspacing);
+		(void)tPixelSpacing_ok;
 		if (wsettings->get_apply_icc() && ds.FindDataElement(mdcm::Tag(0x0028,0x2000)))
 		{
 			icc_found = true;
@@ -12922,6 +12932,7 @@ QString DicomUtils::read_dicom(
 			ba_tmp0 = ba_;
 			localizer_tmp0 = localizer_;
 			photometric_tmp0 = std::move(photometric);
+			pspacing_tmp0 = std::move(pspacing);
 			icc_found_tmp0 = icc_found;
 			if (sop == QString("1.2.840.10008.5.1.4.1.1.6.1") ||
 				sop == QString("1.2.840.10008.5.1.4.1.1.6")   ||
@@ -13049,10 +13060,14 @@ QString DicomUtils::read_dicom(
 					ba_tmp1          != ba_tmp0          ||
 					sop_tmp1         != sop_tmp0         ||
 					photometric_tmp1 != photometric_tmp0 ||
+					pspacing_tmp1    != pspacing_tmp0    ||
 					icc_found_tmp1   != icc_found_tmp0   ||
 					localizer_tmp1   != localizer_tmp0))
 				{
 					mixed = true;
+#if 0
+					std::cout << "Mixed series" << std::endl;
+#endif
 				}
 				if (
 #if 0
@@ -13081,6 +13096,7 @@ QString DicomUtils::read_dicom(
 			columns_tmp1 = columns_tmp0;
 			ba_tmp1 = ba_tmp0;
 			photometric_tmp1 = photometric_tmp0;
+			pspacing_tmp1 = pspacing_tmp0;
 			icc_found_tmp1 = icc_found_tmp0;
 			localizer_tmp1 = localizer_tmp0;
 		}
@@ -13799,6 +13815,7 @@ QString DicomUtils::read_dicom(
 		const mdcm::Tag ph(0x0028,0x0004);
 		const mdcm::Tag tr(0x0028,0x0010);
 		const mdcm::Tag tc(0x0028,0x0011);
+		const mdcm::Tag ps(0x0028,0x0030);
 		const mdcm::Tag ta(0x0028,0x0100);
 		const mdcm::Tag cc(0x0028,0x2000);
 		std::vector<MixedDicomSeriesInfo> msi;
@@ -13838,19 +13855,40 @@ QString DicomUtils::read_dicom(
 			{
 				si.allocated = a;
 			}
-			QString s;
-			if (get_string_value(ds, tt, s))
 			{
-				if (s.toUpper().contains(QString("LOCALIZER")))
-					si.localizer = true;
+				QString s;
+				if (get_string_value(ds, tt, s))
+				{
+					if (s.toUpper().contains(QString("LOCALIZER")))
+						si.localizer = true;
+				}
 			}
-			QString s1;
-			get_string_value(ds, ph, s1);
-			si.photometric = s1.trimmed().remove(QChar('\0'));
-			QString s2;
-			get_string_value(ds, sc, s2);
-			si.sop = s2.trimmed().remove(QChar('\0'));
-			if (ds.FindDataElement(cc)) si.icc = true;
+			{
+				QString s1;
+				get_string_value(ds, ph, s1);
+				si.photometric = s1.trimmed().remove(QChar('\0'));
+			}
+			{
+				QString s2;
+				get_string_value(ds, sc, s2);
+				si.sop = s2.trimmed().remove(QChar('\0'));
+			}
+			{
+				QString s3;
+				std::vector<double> v3;
+				if (get_ds_values(ds, ps, v3))
+				{
+					if (v3.size() == 2)
+					{
+						s3 = QString::asprintf("%.4f-%.4f", v3.at(0), v3.at(1));
+					}
+				}
+				si.spacing = s3;
+			}
+			if (ds.FindDataElement(cc))
+			{
+				si.icc = true;
+			}
 			msi.push_back(si);
 		}
 		QMultiMap<QString, QString> l0;
@@ -13868,6 +13906,7 @@ QString DicomUtils::read_dicom(
 					(i.localizer ? QString("L") : QString("")) +
 					QString("-") + i.sop +
 					QString("-") + i.photometric + QString("-") +
+					QString("-") + i.spacing + QString("-") +
 					(i.icc ? QString("icc") : QString(""));
 				l0.insert(k1, i.file);
 			}
