@@ -7843,7 +7843,10 @@ QString DicomUtils::read_series(
 						}
 						else
 						{
+							ivariant->di->skip_texture = true;
+#ifdef TMP_ALWAYS_GEOM_FROM_IMAGE
 							geometry_from_image = true;
+#endif
 						}
 					}
 				}
@@ -7862,12 +7865,15 @@ QString DicomUtils::read_series(
 							if (slices_ok)
 							{
 								ivariant->iod_supported = true;
+								ivariant->unit_str = QString(" mm");
 							}
 							else
 							{
+								ivariant->di->skip_texture = true;
+#ifdef TMP_ALWAYS_GEOM_FROM_IMAGE
 								geometry_from_image = true;
+#endif
 							}
-							ivariant->unit_str = QString(" mm");
 						}
 					}
 					else if (ivariant->sop == QString("1.2.840.10008.5.1.4.1.1.481.2")) // RTDOSE
@@ -7885,7 +7891,10 @@ QString DicomUtils::read_series(
 							}
 							else
 							{
+								ivariant->di->skip_texture = true;
+#ifdef TMP_ALWAYS_GEOM_FROM_IMAGE
 								geometry_from_image = true;
+#endif
 							}
 						}
 					}
