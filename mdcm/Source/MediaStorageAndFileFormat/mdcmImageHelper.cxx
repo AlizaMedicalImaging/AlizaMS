@@ -1061,14 +1061,30 @@ ImageHelper::GetSpacingValue(const File & f)
     return sp;
   }
   Tag spacingtag = GetSpacingTagFromMediaStorage(ms);
-  const DataElement & de_28_30 = ds.GetDataElement(Tag(0x0028, 0x0030));
-  if (ForcePixelSpacing && !de_28_30.IsEmpty())
   {
-    spacingtag = Tag(0x0028, 0x0030);
-  }
-  mdcmDebugMacro("spacingtag " << spacingtag);
-  //
-  {
+    bool spacingtag_not_found = false;
+    if (spacingtag != Tag(0xffff, 0xffff))
+    {
+      const DataElement & spacing_de = ds.GetDataElement(spacingtag);
+      if (spacing_de.IsEmpty())
+      {
+        spacingtag_not_found = true;
+      }
+    }
+    if (ForcePixelSpacing && (spacingtag == Tag(0xffff, 0xffff) || spacingtag_not_found))
+    {
+      const DataElement & de_28_30 = ds.GetDataElement(Tag(0x0028, 0x0030));
+      const DataElement & de_28_34 = ds.GetDataElement(Tag(0x0028, 0x0034)); 
+      if (!de_28_30.IsEmpty())
+      {
+        spacingtag = Tag(0x0028, 0x0030);
+      }
+      else if (!de_28_34.IsEmpty())
+      {
+        spacingtag = Tag(0x0028, 0x0034);
+      }
+    }
+    mdcmDebugMacro("Spacing tag: " << spacingtag);
     if (spacingtag != Tag(0xffff, 0xffff))
     {
       const DataElement & spacing_de = ds.GetDataElement(spacingtag);
