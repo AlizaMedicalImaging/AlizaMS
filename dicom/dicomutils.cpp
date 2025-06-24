@@ -2689,8 +2689,6 @@ void DicomUtils::read_image_info(
 	mdcm::Tag tcolumns(0x0028,0x0011);     tags.insert(tcolumns);
 	// Pixel Spacing
 	mdcm::Tag tspacing0(0x0028,0x0030);    tags.insert(tspacing0);
-	// Pixel Aspect Ratio
-	mdcm::Tag tspacing3(0x0028,0x0034);    tags.insert(tspacing3);
 	// Patient Orientation
 	mdcm::Tag t2020(0x0020,0x0020);        tags.insert(t2020);
 	//
@@ -2745,8 +2743,6 @@ void DicomUtils::read_image_info(
 		else if (get_string_value(ds, tspacing1, spacing_))
 			spacing = spacing_.remove(QChar('\0'));
 		else if (get_string_value(ds, tspacing2, spacing_))
-			spacing = spacing_.remove(QChar('\0'));
-		else if (get_string_value(ds, tspacing3, spacing_))
 			spacing = spacing_.remove(QChar('\0'));
 	}
 	//
@@ -4889,6 +4885,7 @@ bool DicomUtils::get_pixel_spacing(
 	const QString & s,
 	double * ps)
 {
+	if (s.isEmpty()) return false;
 	QString tmp0 = s.trimmed().remove(QChar('\0'));
 	if (tmp0.contains(QString(",")))
 	{
