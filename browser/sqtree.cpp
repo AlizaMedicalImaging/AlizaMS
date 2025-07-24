@@ -643,8 +643,8 @@ void SQtree::process_element(
 #else
 									tmp4.sprintf("%04x", element);
 #endif
-									str_.append(tmp3 + QString("|") + tmp4);
-									if (at_x != length - 4) str_.append(QString(", "));
+									str_.append(tmp3 + QString(",") + tmp4);
+									if (at_x != length - 4) str_.append(QString(" "));
 								}
 							}
 							delete [] buffer;

@@ -111,7 +111,7 @@ mark_as_advanced(ALIZA_MEDIASTORAGE_MODE)
 option(ALIZA_VERBOSE "Print messages to std::cout" OFF)
 
 # Temporary
-set(TMP_USE_53_SPATIAL_ENUMS TRUE)
+set(TMP_USE_53_SPATIAL_ENUMS FALSE)
 
 #
 #
