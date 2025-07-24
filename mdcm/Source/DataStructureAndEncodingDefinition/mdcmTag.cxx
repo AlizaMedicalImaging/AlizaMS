@@ -171,10 +171,7 @@ Tag::IsGroupXX(const Tag & t) const
 }
 
 // Read from a comma separated string.
-// This is a highly user oriented function, the string should be
-// formated as: 1234,5678 to specify the tag (0x1234,0x5678)
-// The notation comes from the DICOM standard, and is handy to use
-// from a command line program
+// The string should be formated as: 1234,5678 to specify the tag (0x1234,0x5678)
 bool
 Tag::ReadFromCommaSeparatedString(const char * str)
 {
@@ -190,8 +187,7 @@ Tag::ReadFromCommaSeparatedString(const char * str)
 }
 
 // Read From XML formatted tag value eg. tag = "12345678"
-// It comes in useful when reading tag values from XML file
-// (in NativeDICOMModel)
+// It is useful when reading tag values from XML file (in NativeDICOMModel)
 bool
 Tag::ReadFromContinuousString(const char * str)
 {
@@ -206,8 +202,7 @@ Tag::ReadFromContinuousString(const char * str)
   return true;
 }
 
-// Read from a pipe separated string (GDCM 1.x compat only).
-// Do not use in newer code
+// Read from a pipe separated string (GDCM 1.x compat).
 bool
 Tag::ReadFromPipeSeparatedString(const char * str)
 {
@@ -223,21 +218,18 @@ Tag::ReadFromPipeSeparatedString(const char * str)
 }
 
 // Print tag value with no separating comma: eg. tag = "12345678"
-// It comes in useful when reading tag values from XML file
-// (in NativeDICOMModel)
+// It is useful when reading tag values from XML file (in NativeDICOMModel)
 std::string
 Tag::PrintAsContinuousString() const
 {
   std::ostringstream os;
   const Tag &        val = *this;
   os.setf(std::ios::right);
-  os << std::hex << std::setw(4) << std::setfill('0') << val[0] << std::setw(4) << std::setfill('0') << val[1]
-     << std::setfill(' ') << std::dec;
+  os << std::hex << std::setw(4) << std::setfill('0') << val[0] << std::setw(4) << std::setfill('0') << val[1];
   return os.str();
 }
 
-// Same as PrintAsContinuousString, but hexadecimal [a-f]
-// are printed using upper case
+// Same as PrintAsContinuousString, but hexadecimals are printed using upper case
 std::string
 Tag::PrintAsContinuousUpperCaseString() const
 {
@@ -245,20 +237,28 @@ Tag::PrintAsContinuousUpperCaseString() const
   const Tag &        val = *this;
   os.setf(std::ios::right);
   os << std::uppercase << std::hex << std::setw(4) << std::setfill('0') << val[0] << std::setw(4) << std::setfill('0')
-     << val[1] << std::setfill(' ') << std::dec;
+     << val[1];
   return os.str();
 }
 
-// Print as a pipe separated string (GDCM 1.x compat only).
-// Do not use in newer code
+// Print as a pipe separated string (GDCM 1.x compat).
 std::string
 Tag::PrintAsPipeSeparatedString() const
 {
-  std::ostringstream _os;
   const Tag &        _val = *this;
+  std::ostringstream _os;
   _os.setf(std::ios::right);
-  _os << std::hex << std::setw(4) << std::setfill('0') << _val[0] << '|' << std::setw(4) << std::setfill('0') << _val[1]
-      << std::setfill(' ') << std::dec;
+  _os << std::hex << std::setw(4) << std::setfill('0') << _val[0] << '|' << std::setw(4) << std::setfill('0') << _val[1];
+  return _os.str();
+}
+
+std::string
+Tag::PrintAsCommaSeparatedString() const
+{
+  const Tag &        _val = *this;
+  std::ostringstream _os;
+  _os.setf(std::ios::right);
+  _os << std::hex << std::setw(4) << std::setfill('0') << _val[0] << ',' << std::setw(4) << std::setfill('0') << _val[1];
   return _os.str();
 }
 

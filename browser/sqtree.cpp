@@ -370,7 +370,7 @@ void SQtree::process_element(
 		if (!(sqi && sqi->GetNumberOfItems() > 0))
 		{
 			QStringList l2;
-			l2 << QString(tag.PrintAsPipeSeparatedString().c_str())
+			l2 << QString(tag.PrintAsCommaSeparatedString().c_str())
 				<< tname
 				<< QString("SQ")
 				<< QString("")
@@ -396,7 +396,7 @@ void SQtree::process_element(
 		}
 		//
 		QStringList l;
-		l << QString(tag.PrintAsPipeSeparatedString().c_str())
+		l << QString(tag.PrintAsCommaSeparatedString().c_str())
 			<< tname
 			<< QString("SQ")
 			<< sq_length
@@ -442,7 +442,7 @@ void SQtree::process_element(
 		const size_t nf = sqf ? sqf->GetNumberOfFragments() : 0;
 		const size_t nf1 = (nf > 0) ? nf + 1 : 0;
 		QStringList l;
-		l << QString(tag.PrintAsPipeSeparatedString().c_str())
+		l << QString(tag.PrintAsCommaSeparatedString().c_str())
 			<< tname
 			<< QString(mdcm::VR::GetVRString(vr))
 			<< QString("")
@@ -498,7 +498,7 @@ void SQtree::process_element(
 		QString str_;
 		QString entry_qs;
 		QString keyword_qs = std::move(tname);
-		std::string entry_s = tag.PrintAsPipeSeparatedString();
+		std::string entry_s = tag.PrintAsCommaSeparatedString();
 		bool bin_label{};
 		if (!entry_s.empty()) entry_qs = QString(entry_s.c_str());
 		if (e.IsEmpty())

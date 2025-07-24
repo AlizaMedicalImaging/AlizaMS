@@ -167,6 +167,8 @@ public:
   PrintAsContinuousUpperCaseString() const;
   std::string
   PrintAsPipeSeparatedString() const;
+  std::string
+  PrintAsCommaSeparatedString() const;
 
 private:
   union
