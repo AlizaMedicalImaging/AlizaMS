@@ -190,20 +190,26 @@ public:
       // fragments (eof was reached so we need to clear error bit).
       if (frag.GetTag() == Tag(0xfffe, 0xe000))
       {
-        mdcmAlwaysWarnMacro("PixelData fragment could be corrupted, use the file at your own risk");
+        mdcmDebugMacro("PixelData fragment could be corrupted, use the file at your own risk");
         Fragments.push_back(frag);
         is.clear();
       }
       // GENESIS_SIGNA-JPEG-CorruptFrag.dcm
       else if (frag.GetTag() == Tag(0xddff, 0x00e0))
       {
-        assert(Fragments.size() == 1);
-        const ByteValue * bv = Fragments[0].GetByteValue();
-        assert(static_cast<unsigned char>(bv->GetPointer()[bv->GetLength() - 1]) == 0xfe);
-        // MM: Yes this is an extra copy, this is a bug anyway.
-        Fragments[0].SetByteValue(bv->GetPointer(), bv->GetLength() - 1);
-        mdcmAlwaysWarnMacro("Fragment length was declared with an extra byte at the end, stripped");
-        is.clear();
+        if (Fragments.size() > 0)
+        {
+          assert(Fragments.size() == 1);
+          const ByteValue * bv = Fragments[0].GetByteValue();
+          if (bv && bv->GetLength() >= 1)
+          {
+            assert(static_cast<unsigned char>(bv->GetPointer()[bv->GetLength() - 1]) == 0xfe);
+            // MM: Yes this is an extra copy, this is a bug anyway.
+            Fragments[0].SetByteValue(bv->GetPointer(), bv->GetLength() - 1);
+            mdcmDebugMacro("Fragment length was declared with an extra byte at the end, stripped");
+            is.clear();
+          }
+        }
       }
       // LEICA/WSI
       else if ((frag.GetTag().GetGroup() == 0x00ff) && ((frag.GetTag().GetElement() & 0x00ff) == 0xe0))
@@ -213,22 +219,32 @@ public:
         // ReadBacktrack function which in turn may backtrack up to 10 bytes
         // backward. This appears to be working on a set of DICOM/WSI files from
         // LEICA.
-        mdcmAlwaysWarnMacro("Fragment: odd value length, fixed (1)");
-        assert(Fragments.size());
-        const size_t      lastf = Fragments.size() - 1;
-        const ByteValue * bv = Fragments[lastf].GetByteValue();
-        const char *      a = bv->GetPointer();
-        assert(static_cast<unsigned char>(a[bv->GetLength() - 1]) == 0xfe);
-        (void)a;
-        Fragments[lastf].SetByteValue(bv->GetPointer(), bv->GetLength() - 1);
-        is.seekg(-9, std::ios::cur);
-        assert(is.good());
-        while (frag.ReadBacktrack<TSwap>(is) && frag.GetTag() != seqDelItem)
+        const size_t f_size = Fragments.size();
+        if (f_size > 0)
         {
-          mdcmDebugMacro("Fragment: " << frag);
-          Fragments.push_back(frag);
+          mdcmDebugMacro("Fragment: fixed (1)");
+          const size_t      lastf = f_size - 1;
+          const ByteValue * bv = Fragments[lastf].GetByteValue();
+          if (bv && bv->GetLength() >= 1)
+          {
+            const char *  a = bv->GetPointer();
+            assert(static_cast<unsigned char>(a[bv->GetLength() - 1]) == 0xfe);
+            (void)a;
+            Fragments[lastf].SetByteValue(bv->GetPointer(), bv->GetLength() - 1);
+            is.seekg(-9, std::ios::cur);
+            assert(is.good());
+            while (frag.ReadBacktrack<TSwap>(is) && frag.GetTag() != seqDelItem)
+            {
+              mdcmDebugMacro("Fragment: " << frag);
+              Fragments.push_back(frag);
+            }
+            assert(frag.GetTag() == seqDelItem && frag.GetVL() == 0);
+          }
         }
-        assert(frag.GetTag() == seqDelItem && frag.GetVL() == 0);
+        else
+        {
+          mdcmDebugMacro("Fragment: failed to fix (1)");
+        }
       }
       // LEICA/WSI (bis)
       else if (frag.GetTag().GetGroup() == 0xe000)
@@ -238,22 +254,32 @@ public:
         // ReadBacktrack function which in turn may backtrack up to 10 bytes
         // backward. This appears to be working on a set of DICOM/WSI files from
         // LEICA.
-        mdcmAlwaysWarnMacro("Fragment: odd value length, fixed (2)");
-        assert(Fragments.size());
-        const size_t      lastf = Fragments.size() - 1;
-        const ByteValue * bv = Fragments[lastf].GetByteValue();
-        const char *      a = bv->GetPointer();
-        assert(static_cast<unsigned char>(a[bv->GetLength() - 2]) == 0xfe);
-        (void)a;
-        Fragments[lastf].SetByteValue(bv->GetPointer(), bv->GetLength() - 2);
-        is.seekg(-10, std::ios::cur);
-        assert(is.good());
-        while (frag.ReadBacktrack<TSwap>(is) && frag.GetTag() != seqDelItem)
+        const size_t f_size = Fragments.size();
+        if (f_size > 0)
         {
-          mdcmDebugMacro("Fragment: " << frag);
-          Fragments.push_back(frag);
+          mdcmDebugMacro("Fragment: fixed (2)");
+          const size_t      lastf = f_size - 1;
+          const ByteValue * bv = Fragments[lastf].GetByteValue();
+          if (bv && bv->GetLength() >= 2)
+          {
+            const char * a = bv->GetPointer();
+            assert(static_cast<unsigned char>(a[bv->GetLength() - 2]) == 0xfe);
+            (void)a;
+            Fragments[lastf].SetByteValue(bv->GetPointer(), bv->GetLength() - 2);
+            is.seekg(-10, std::ios::cur);
+            assert(is.good());
+            while (frag.ReadBacktrack<TSwap>(is) && frag.GetTag() != seqDelItem)
+            {
+              mdcmDebugMacro("Fragment: " << frag);
+              Fragments.push_back(frag);
+            }
+            assert(frag.GetTag() == seqDelItem && frag.GetVL() == 0);
+          }
         }
-        assert(frag.GetTag() == seqDelItem && frag.GetVL() == 0);
+        else
+        {
+          mdcmDebugMacro("Fragment: failed to fix (2)");
+        }
       }
       // LEICA/WSI (ter)
       else if ((frag.GetTag().GetGroup() & 0x00ff) == 0x00e0 &&
@@ -264,29 +290,39 @@ public:
         // ReadBacktrack function which in turn may backtrack up to 10 bytes
         // backward. This appears to be working on a set of DICOM/WSI files from
         // LEICA.
-        mdcmAlwaysWarnMacro("Fragment: odd value length, fixed (3)");
-        assert(Fragments.size());
-        const size_t      lastf = Fragments.size() - 1;
-        const ByteValue * bv = Fragments[lastf].GetByteValue();
-        const char *      a = bv->GetPointer();
-        assert(static_cast<unsigned char>(a[bv->GetLength() - 3]) == 0xfe);
-        (void)a;
-        Fragments[lastf].SetByteValue(bv->GetPointer(), bv->GetLength() - 3);
-        is.seekg(-11, std::ios::cur);
-        assert(is.good());
-        while (frag.ReadBacktrack<TSwap>(is) && frag.GetTag() != seqDelItem)
+        const size_t f_size = Fragments.size();
+        if (f_size > 0)
         {
-          mdcmDebugMacro("Fragment: " << frag);
-          Fragments.push_back(frag);
+          mdcmDebugMacro("Fragment: fixed (3)");
+          const size_t      lastf = f_size - 1;
+          const ByteValue * bv = Fragments[lastf].GetByteValue();
+          if (bv && bv->GetLength() >= 3)
+          {
+            const char * a = bv->GetPointer();
+            assert(static_cast<unsigned char>(a[bv->GetLength() - 3]) == 0xfe);
+            (void)a;
+            Fragments[lastf].SetByteValue(bv->GetPointer(), bv->GetLength() - 3);
+            is.seekg(-11, std::ios::cur);
+            assert(is.good());
+            while (frag.ReadBacktrack<TSwap>(is) && frag.GetTag() != seqDelItem)
+            {
+              mdcmDebugMacro("Fragment: " << frag);
+              Fragments.push_back(frag);
+            }
+            assert(frag.GetTag() == seqDelItem && frag.GetVL() == 0);
+          }
         }
-        assert(frag.GetTag() == seqDelItem && frag.GetVL() == 0);
+        else
+        {
+          mdcmDebugMacro("Fragment: failed to fix (3)");
+        }
       }
       else
       {
         // MM: mdcm-JPEG-LossLess3a.dcm: easy case, an extra tag was found
         // instead of terminator (eof is the next char)
-        mdcmAlwaysWarnMacro("Failed at " << frag.GetTag() << " Index #" << Fragments.size()
-                            << " Offset " << is.tellg() << '\n' << ex.what());
+        mdcmDebugMacro("Fragment: failed at " << frag.GetTag() << " Offset "
+                       << is.tellg() << '\n' << ex.what());
       }
 #endif /* MDCM_SUPPORT_BROKEN_IMPLEMENTATION */
     }

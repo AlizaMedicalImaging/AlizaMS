@@ -166,7 +166,9 @@ PixelFormat::SetHighBit(unsigned short hb)
     default:
       break;
   }
-  if (hb < BitsStored)
+  if (BitsStored > 1 && hb == 0)
+    HighBit = BitsStored - 1;
+  else if (hb < BitsStored)
     HighBit = hb;
 }
 
@@ -450,13 +452,20 @@ PixelFormat::Validate()
   assert(SamplesPerPixel == 1 || SamplesPerPixel == 3 || SamplesPerPixel == 4);
   if (BitsStored == 0)
   {
-    mdcmDebugMacro("Bits Stored is 0, setting is to max value");
+    mdcmAlwaysWarnMacro("BitsStored was 0, set to max value");
     BitsStored = BitsAllocated;
   }
-  // FIXME JPEG2000, HTJ2K and JPEG XL can theoretically also have 24 bits allocated
+  // Workaroung broken
+  if (HighBit == 0 && BitsStored > 1)
+  {
+    mdcmAlwaysWarnMacro("HighBit was 0, set to BitStored - 1");
+    HighBit = BitsStored - 1;
+  }
+  // FIXME
+  // JPEG2000, HTJ2K and JPEG XL can theoretically also have 24 bits allocated
   if (BitsAllocated == 24)
   {
-    mdcmDebugMacro("ACR-NEMA way of storing RGB data");
+    mdcmDebugMacro("Assuming ACR-NEMA way of storing RGB data");
     if (BitsStored == 24 && HighBit == 23 && SamplesPerPixel == 1)
     {
       BitsAllocated = 8;
