@@ -172,10 +172,11 @@ RAWCodec::DecodeBytes(const char * inBytes, size_t inBufferLength, char * outByt
     const size_t len = str.size() * 16 / 12;
     if (inOutBufferLength != len)
     {
-      mdcmDebugMacro("inOutBufferLength = " << inOutBufferLength << ", inBufferLength = " << inBufferLength << ", len = " << len)
+      mdcmDebugMacro("inOutBufferLength = " << inOutBufferLength
+                     << ", inBufferLength = " << inBufferLength << ", len = " << len)
       return false;
     }
-    char *       copy;
+    char * copy;
     try
     {
       copy = new char[len];
