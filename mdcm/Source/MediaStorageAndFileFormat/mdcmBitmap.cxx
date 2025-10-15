@@ -479,10 +479,12 @@ Bitmap::TryRAWCodec(char * buffer, bool & lossyflag) const
       Bitmap * i = const_cast<Bitmap *>(this);
       i->SetNeedByteSwap(false);
     }
+#if 0
     if (len != bv->GetLength())
     {
       mdcmDebugMacro("Pixel Length " << bv->GetLength() << " is different from computed value " << len);
     }
+#endif
     return r;
   }
   return false;

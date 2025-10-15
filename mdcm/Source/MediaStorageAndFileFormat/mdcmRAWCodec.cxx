@@ -170,6 +170,11 @@ RAWCodec::DecodeBytes(const char * inBytes, size_t inBufferLength, char * outByt
   if (this->GetPixelFormat() == PixelFormat::UINT12 || this->GetPixelFormat() == PixelFormat::INT12)
   {
     const size_t len = str.size() * 16 / 12;
+    if (inOutBufferLength != len)
+    {
+      mdcmDebugMacro("inOutBufferLength = " << inOutBufferLength << ", inBufferLength = " << inBufferLength << ", len = " << len)
+      return false;
+    }
     char *       copy;
     try
     {
