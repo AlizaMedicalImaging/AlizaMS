@@ -40,6 +40,8 @@ public:
   CanDecode(const TransferSyntax &) const override;
   bool
   Code(const DataElement &, DataElement &) override;
+  // The 'Decode' function is probably not used and can be removed,
+  // with 'DecodeBytes' used instead.
   bool
   Decode(const DataElement &, DataElement &) override;
   bool

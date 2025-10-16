@@ -55,6 +55,7 @@ RAWCodec::Code(const DataElement & in, DataElement & out)
   return true;
 }
 
+// This function is probably not used and could be removed
 bool
 RAWCodec::Decode(const DataElement & in, DataElement & out)
 {
