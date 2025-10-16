@@ -174,7 +174,7 @@ RAWCodec::DecodeBytes(const char * inBytes, size_t inBufferLength, char * outByt
     if (inOutBufferLength != len)
     {
       mdcmDebugMacro("inOutBufferLength = " << inOutBufferLength
-                     << ", inBufferLength = " << inBufferLength << ", len = " << len)
+                     << ", inBufferLength = " << inBufferLength << ", len = " << len);
       return false;
     }
     char * copy;
