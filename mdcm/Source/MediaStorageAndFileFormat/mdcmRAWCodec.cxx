@@ -162,19 +162,19 @@ RAWCodec::DecodeBytes(const char * inBytes, size_t inBufferLength, char * outByt
   std::stringstream is;
   is.write(inBytes, inBufferLength);
   std::stringstream os;
-  const bool        r = DecodeByStreams(is, os);
-  if (!r)
+  if (!DecodeByStreams(is, os))
   {
     return false;
   }
   std::string str = os.str();
-  if (this->GetPixelFormat() == PixelFormat::UINT12 || this->GetPixelFormat() == PixelFormat::INT12)
+  if (this->GetPixelFormat() == PixelFormat::UINT12 ||
+      this->GetPixelFormat() == PixelFormat::INT12)
   {
     const size_t len = str.size() * 16 / 12;
     if (inOutBufferLength != len)
     {
-      mdcmDebugMacro("inOutBufferLength = " << inOutBufferLength
-                     << ", inBufferLength = " << inBufferLength << ", len = " << len);
+      mdcmDebugMacro("RAWCodec::DecodeBytes: error: inOutBufferLength = "
+                     << inOutBufferLength ", len = " << len);
       return false;
     }
     char * copy;
@@ -209,7 +209,7 @@ RAWCodec::DecodeBytes(const char * inBytes, size_t inBufferLength, char * outByt
       memcpy(outBytes, str.c_str(), len);
     }
   }
-  return r;
+  return true;
 }
 
 bool
