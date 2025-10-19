@@ -469,13 +469,11 @@ Bitmap::TryRAWCodec(char * buffer, bool & lossyflag) const
     codec.SetNeedOverlayCleanup(AreOverlaysInPixelData() ||
                                 (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
     DataElement out;
-    const bool  r = codec.DecodeBytes(bv->GetPointer(), bv->GetLength(), buffer, len);
-    if (!r)
+    if (!codec.DecodeBytes(bv->GetPointer(), bv->GetLength(), buffer, len))
       return false;
     if (GetNeedByteSwap())
     {
-      // Internally DecodeBytes always does the byte-swapping step,
-      // so remove internal flag
+      // Internally DecodeBytes always does the byte-swapping step, so remove internal flag
       Bitmap * i = const_cast<Bitmap *>(this);
       i->SetNeedByteSwap(false);
     }
@@ -485,7 +483,7 @@ Bitmap::TryRAWCodec(char * buffer, bool & lossyflag) const
       mdcmDebugMacro("Pixel Length " << bv->GetLength() << " is different from computed value " << len);
     }
 #endif
-    return r;
+    return true;
   }
   return false;
 }
@@ -522,8 +520,7 @@ Bitmap::TryEncapsulatedRAWCodec(char * buffer, bool & lossyflag) const
     codec.SetNeedOverlayCleanup(AreOverlaysInPixelData() ||
                                 (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
     DataElement out;
-    const bool  r = codec.Decode2(PixelData, buffer, len);
-    if (!r)
+    if (!codec.Decode2(PixelData, buffer, len))
       return false;
     if (GetNeedByteSwap())
     {
@@ -622,11 +619,13 @@ Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
       mdcmWarningMacro("JPEGCodec: !codec.Decode2(PixelData, os)");
       return false;
     }
+#if 0
     if (GetPlanarConfiguration() != codec.GetPlanarConfiguration())
     {
       Bitmap * i = const_cast<Bitmap *>(this);
       (void)i;
     }
+#endif
     const PixelFormat & cpf = codec.GetPixelFormat();
     const PixelFormat & pf = GetPixelFormat();
     if (pf != cpf)
@@ -663,10 +662,7 @@ Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
     }
 #else
     const std::string & tmp0 = os.str();
-    memcpy(
-      buffer,
-      tmp0.data(),
-      ((len < len2) ? len : len2));
+    memcpy(buffer, tmp0.data(), ((len < len2) ? len : len2));
 #endif
     lossyflag = codec.IsLossy();
     return true;
@@ -762,11 +758,13 @@ Bitmap::TryJPEGCodec(char * buffer, bool & lossyflag) const
       mdcmWarningMacro("JPEG: !codec.Decode(PixelData, out)");
       return false;
     }
+#if 0
     if (GetPlanarConfiguration() != codec.GetPlanarConfiguration())
     {
       Bitmap * i = const_cast<Bitmap *>(this);
       (void)i;
     }
+#endif
 #if 1
     const PixelFormat & cpf = codec.GetPixelFormat();
     const PixelFormat & pf = GetPixelFormat();
@@ -847,8 +845,7 @@ Bitmap::TryJPEGLSCodec(char * buffer, bool & lossyflag) const
       const ByteValue & bv2 = dynamic_cast<const ByteValue &>(frag.GetValue());
       std::stringstream ss;
       ss.write(bv2.GetPointer(), bv2.GetLength());
-      const bool b = codec.GetHeaderInfo(ss);
-      if (!b)
+      if (!codec.GetHeaderInfo(ss))
         return false;
       lossyflag = codec.IsLossy();
       return true;
@@ -866,15 +863,14 @@ Bitmap::TryJPEGLSCodec(char * buffer, bool & lossyflag) const
     codec.SetNeedOverlayCleanup(AreOverlaysInPixelData() ||
                                 (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
     codec.SetDimensions(GetDimensions());
-    const bool r = codec.Decode2(PixelData, buffer, len);
-    if (!r)
+    if (!codec.Decode2(PixelData, buffer, len))
       return false;
     lossyflag = codec.IsLossy();
     if (codec.IsLossy() != ts.IsLossy())
     {
       mdcmErrorMacro("Declared as lossless but is in fact lossy.");
     }
-    return r;
+    return true;
   }
   return false;
 }
@@ -893,8 +889,7 @@ Bitmap::TryJPEGLSCodec(char * buffer, bool & lossyflag) const
       const ByteValue & bv2 = dynamic_cast<const ByteValue &>(frag.GetValue());
       std::stringstream ss;
       ss.write(bv2.GetPointer(), bv2.GetLength());
-      const bool b = codec.GetHeaderInfo(ss);
-      if (!b)
+      if (!codec.GetHeaderInfo(ss))
         return false;
       lossyflag = codec.IsLossy();
       return true;
@@ -918,8 +913,7 @@ Bitmap::TryJPEGLSCodec(char * buffer, bool & lossyflag) const
                                 (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
     codec.SetDimensions(GetDimensions());
     DataElement out;
-    const bool  r = codec.Decode(PixelData, out);
-    if (!r)
+    if (!codec.Decode(PixelData, out))
       return false;
     const ByteValue * outbv = out.GetByteValue();
     if (!outbv)
@@ -931,7 +925,7 @@ Bitmap::TryJPEGLSCodec(char * buffer, bool & lossyflag) const
     {
       mdcmErrorMacro("Declared as lossless but is in fact lossy.");
     }
-    return r;
+    return true;
   }
   return false;
 }
@@ -953,8 +947,7 @@ Bitmap::TryJPEG2000Codec(char * buffer, bool & lossyflag) const
         return false;
       const Fragment &  frag = sf->GetFragment(0);
       const ByteValue & bv2 = dynamic_cast<const ByteValue &>(frag.GetValue());
-      const bool        b = codec.GetHeaderInfo(bv2.GetPointer(), bv2.GetLength());
-      if (!b)
+      if (!codec.GetHeaderInfo(bv2.GetPointer(), bv2.GetLength()))
         return false;
       lossyflag = codec.IsLossy();
       const PixelFormat & cpf = codec.GetPixelFormat();
@@ -994,8 +987,7 @@ Bitmap::TryJPEG2000Codec(char * buffer, bool & lossyflag) const
     codec.SetNeedOverlayCleanup(AreOverlaysInPixelData() ||
                                 (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
     codec.SetDimensions(GetDimensions());
-    const bool r = codec.Decode2(PixelData, buffer, len);
-    if (!r)
+    if (!codec.Decode2(PixelData, buffer, len))
       return false;
     lossyflag = codec.IsLossy();
     if (codec.IsLossy() && !ts.IsLossy())
@@ -1021,7 +1013,7 @@ Bitmap::TryJPEG2000Codec(char * buffer, bool & lossyflag) const
         }
       }
     }
-    return r;
+    return true;
   }
   return false;
 }
@@ -1038,8 +1030,7 @@ Bitmap::TryJPEG2000Codec(char * buffer, bool & lossyflag) const
         return false;
       const Fragment &  frag = sf->GetFragment(0);
       const ByteValue & bv2 = dynamic_cast<const ByteValue &>(frag.GetValue());
-      const bool        b = codec.GetHeaderInfo(bv2.GetPointer(), bv2.GetLength());
-      if (!b)
+      if (!codec.GetHeaderInfo(bv2.GetPointer(), bv2.GetLength()))
         return false;
       lossyflag = codec.IsLossy();
       const PixelFormat & cpf = codec.GetPixelFormat();
@@ -1085,8 +1076,7 @@ Bitmap::TryJPEG2000Codec(char * buffer, bool & lossyflag) const
                                 (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
     codec.SetDimensions(GetDimensions());
     DataElement out;
-    bool        r = codec.Decode(PixelData, out);
-    if (!r)
+    if (!codec.Decode(PixelData, out))
       return false;
     const ByteValue * outbv = out.GetByteValue();
     if (!outbv)
@@ -1117,7 +1107,7 @@ Bitmap::TryJPEG2000Codec(char * buffer, bool & lossyflag) const
         }
       }
     }
-    return r;
+    return true;
   }
   return false;
 }
@@ -1147,8 +1137,7 @@ Bitmap::TryRLECodec(char * buffer, bool & lossyflag) const
                                 (ImageHelper::GetCleanUnusedBits() && UnusedBitsPresentInPixelData()));
     codec.SetBufferLength(len);
     DataElement out;
-    const bool  r = codec.Decode(PixelData, out);
-    if (!r)
+    if (!codec.Decode(PixelData, out))
       return false;
     const ByteValue * outbv = out.GetByteValue();
     assert(len <= outbv->GetLength());
