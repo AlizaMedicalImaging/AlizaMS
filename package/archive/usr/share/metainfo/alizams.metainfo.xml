@@ -87,4 +87,9 @@
     <release date="2023-05-26" version="1.9.0"/>
     <release date="2022-07-27" version="1.8.3"/>
   </releases>
+  <keywords>
+    <keyword>dicom viewer</keyword>
+    <keyword>medical imaging software</keyword>
+    <keyword>dcm editor</keyword>
+  </keywords>
 </component>
