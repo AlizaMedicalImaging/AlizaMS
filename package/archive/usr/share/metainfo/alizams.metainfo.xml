@@ -25,7 +25,7 @@
       <li>DICOM Study multi-view with intersection lines and side-by-side view</li>
       <li>Volume Rendering, multi-planar reconstruction (MPR)</li>
       <li>2D+t and 3D+t animations</li>
-      <li>DICOM metadata viewer, DICOM 2024b dictionary</li>
+      <li>DICOM metadata viewer, DICOM 2025e dictionary</li>
       <li>Fast directory scanner, DICOMDIR</li>
       <li>RTSTRUCT contours</li>
       <li>Proper measurement in Ultrasound Calibrated Regions</li>
@@ -72,12 +72,13 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release date="2024-05-20" version="1.9.10">
+    <release date="2026-01-17" version="1.9.11">
       <description>
-        <p>Release 1.9.10</p>
+        <p>Release 1.9.11</p>
       </description>
-      <url>https://github.com/AlizaMedicalImaging/AlizaMS/releases/tag/v1.9.10</url>
+      <url>https://github.com/AlizaMedicalImaging/AlizaMS/releases/tag/v1.9.11</url>
     </release>
+    <release date="2024-05-24" version="1.9.10"/>
     <release date="2024-04-22" version="1.9.9"/>
     <release date="2024-04-01" version="1.9.8"/>
     <release date="2024-01-08" version="1.9.7"/>

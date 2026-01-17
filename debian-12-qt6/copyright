@@ -5,7 +5,7 @@ Source: https://github.com/AlizaMedicalImaging/AlizaMS
 
 Files: *
 Copyright:
-  2018-2022 Mikhail Isakov
+  2018-2026 Mikhail Isakov
 License: GLPv3
   On Debian systems, the text of the GNU GPL can be found in
   /usr/share/common-licenses/GPL.
@@ -57,7 +57,7 @@ License: BSD
 
 Files: mdcm/*
 Copyright:
-  2018-2022 Mikhail Isakov
+  2018-2026 Mikhail Isakov
   2006-2016 Mathieu Malaterre
   1993-2005 CREATIS
 License: BSD-3-clause-alike-CREATIS
