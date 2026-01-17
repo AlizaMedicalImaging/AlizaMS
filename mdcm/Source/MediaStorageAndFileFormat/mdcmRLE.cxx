@@ -549,7 +549,7 @@ RLEDecoder::decode_frame(RLEDestination & d)
   for (long long i = 0; i < internals->nsources; ++i)
   {
     RLESource * s = internals->sources[i];
-    assert(s->tell() == internals->rh.offset[i]);
+    assert(s->tell() == internals->rh.GetOffset(i));
     (void)s;
   }
   long long       numOutBytesFull = 0;
@@ -588,7 +588,7 @@ RLEDecoder::read_header(RLEPixelInfo & pi)
   if (!check_header(rh, pi))
     return false;
   // Initialize all sources
-  assert(internals->nsources == static_cast<long long>(internals->rh.num_segments));
+  assert(internals->nsources == static_cast<long long>(internals->rh.GetNumSegments()));
   for (long long i = 1; i < internals->nsources; ++i)
   {
     internals->sources[i] = s->clone();
