@@ -26,16 +26,84 @@
 #include <stdexcept>
 #include <cassert>
 #include <vector>
+#include <cstring>
+#include <algorithm>
 #include <iostream>
 #include "mdcmTypes.h"
+#include "mdcmTrace.h"
+#include "mdcmSwapper.h"
 
 namespace mdcm
 {
 
-struct RLEHeader
+// https://talosintelligence.com/vulnerability_reports/TALOS-2025-2214
+class RLEHeader
 {
-  unsigned int num_segments;
-  unsigned int offset[15];
+private:
+  uint32_t num_segments{};
+  uint32_t offset[15]{};
+
+public:
+  uint32_t GetNumSegments() const
+  {
+    return num_segments;
+  }
+
+  bool SetNumSegments(uint32_t num) 
+  { 
+    if (num > 15) 
+    {
+      mdcmErrorMacro("Number of segments > 15");
+      return false;
+    }
+    num_segments = num;
+    return true;
+  }
+
+  bool SetOffset(size_t index, uint32_t value)
+  {
+    if (index >= 15)
+      return false;
+    offset[index] = value;
+    return true;
+  }
+
+  uint32_t GetOffset(size_t index) const 
+  {
+    if (index < 15)
+      return offset[index];
+    return 0;
+  }
+
+  bool Read(std::istream & is) 
+  {
+    uint32_t buffer[16]{};
+    is.read(reinterpret_cast<char *>(buffer), 64);
+    if (static_cast<size_t>(is.gcount()) != 64) 
+    {
+      mdcmErrorMacro("RLE Header truncated: expected 64 bytes, got " << is.gcount());
+      return false;
+    }
+    SwapperNoOp::SwapArray(reinterpret_cast<uint32_t *>(buffer), 16);
+    if (!SetNumSegments(buffer[0])) return false;
+    std::memcpy(offset, &buffer[1], sizeof(uint32_t) * 15);
+    if (num_segments >= 1)
+    {
+      if (offset[0] != 64)
+        return false;
+    }
+    // Proper position 'start + 64'
+    return true;
+  }
+
+  void Print(std::ostream & os) 
+  {
+    os << "num_segments:" << num_segments << '\n';
+    for (unsigned short i = 0; i < 15; ++i)
+    {
+      os << i << "offset[" << i << "]:" << offset[i] << '\n';
+    }
+  }
 };
 
 // 1 or 3 components and bpp being 8, 16 or 32

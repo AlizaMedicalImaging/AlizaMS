@@ -108,14 +108,18 @@ template <typename T>
 bool
 DoInvertPlanarConfiguration(T * output, const T * input, size_t inputlength)
 {
-  const T * r = input;
-  const T * g = input + 1;
-  const T * b = input + 2;
-  size_t    length = (inputlength / 3) * 3; // remove the 0 padding
-  assert(length == inputlength || length == inputlength - 1);
-  assert(length % 3 == 0);
-  size_t plane_length = length / 3;
-  T *    pout = output;
+  if (!output || !input)
+    return false;
+  const        T * r = input;
+  const        T * g = input + 1;
+  const        T * b = input + 2;
+  const size_t length = (inputlength / 3) * 3; // remove the 0 padding
+  if (!(length == inputlength || length == inputlength - 1))
+    return false;
+  if (length % 3 != 0)
+    return false;
+  const size_t plane_length = length / 3;
+  T *          pout = output;
   // copy red plane
   while (pout != output + plane_length * 1)
   {
@@ -191,19 +195,8 @@ public:
   bool
   Read(std::istream & is)
   {
-    // header 64 bytes
-    static_assert(sizeof(unsigned int) * 16 == 64, "");
     static_assert(sizeof(RLEHeader) == 64, "");
-    is.read(reinterpret_cast<char *>(&header), 64);
-    SwapperNoOp::SwapArray(reinterpret_cast<unsigned int *>(&header), 16);
-    unsigned int numSegments = header.num_segments;
-    if (numSegments >= 1)
-    {
-      if (header.offset[0] != 64)
-        return false;
-    }
-    // Check that we are indeed at the proper position 'start + 64'
-    return true;
+    return header.Read(is);
   }
   RLEHeader         header;
   std::vector<char> bytes;
@@ -414,9 +407,9 @@ RLECodec::Code(const DataElement & in, DataElement & out)
   {
     return false;
   }
-  const unsigned int * dims = this->GetDimensions();
-  const size_t         n = 256 * 256;
-  char *               outbuf;
+  const uint32_t * dims = this->GetDimensions();
+  const size_t     n = 256 * 256;
+  char *           outbuf;
   // At most we are encoding a single row at a time, so we would be very unlucky
   // if the row *after* compression would not fit in 256*256 bytes
   char small_buffer[n];
@@ -459,7 +452,7 @@ RLECodec::Code(const DataElement & in, DataElement & out)
       return false;
     }
   }
-  unsigned int MaxNumSegments{1};
+  uint32_t MaxNumSegments{1};
   if (GetPixelFormat().GetBitsAllocated() == 8)
   {
     MaxNumSegments *= 1;
@@ -487,9 +480,16 @@ RLECodec::Code(const DataElement & in, DataElement & out)
   {
     assert(MaxNumSegments % 3 == 0);
   }
-  RLEHeader header = { MaxNumSegments, { 64 } };
+  RLEHeader header;
+  header.SetNumSegments(MaxNumSegments);
+  if (!header.SetOffset(0, 64))
+  {
+    delete[] buffer;
+    delete[] bufferrgb;
+    return false;
+  }
   // Create a RLE Frame for each frame
-  for (unsigned int dim = 0; dim < dims[2]; ++dim)
+  for (uint32_t dim = 0; dim < dims[2]; ++dim)
   {
     // Within each frame, create the RLE Segments:
     // lets' try a simple scheme where each Segments is given an equal portion
@@ -499,17 +499,28 @@ RLECodec::Code(const DataElement & in, DataElement & out)
     {
       if (GetPixelFormat().GetBitsAllocated() == 8)
       {
-        DoInvertPlanarConfiguration<char>(bufferrgb, ptr_img, static_cast<long long>(image_len / sizeof(char)));
+        if (!DoInvertPlanarConfiguration<char>(
+          bufferrgb, ptr_img, static_cast<long long>(image_len / sizeof(char))))
+		{
+          delete[] buffer;
+          delete[] bufferrgb;
+          return false;
+		}
       }
       else if (GetPixelFormat().GetBitsAllocated() == 16)
       {
         // should not happen right?
         void * vbufferrgb = static_cast<void*>(bufferrgb);
         const void * vptr_img = static_cast<const void*>(ptr_img);
-        DoInvertPlanarConfiguration<short>(
+        if (!DoInvertPlanarConfiguration<short>(
           static_cast<short *>(vbufferrgb),
           static_cast<const short *>(vptr_img),
-          static_cast<long long>(image_len / sizeof(short)));
+          static_cast<long long>(image_len / sizeof(short))))
+        {
+          delete[] buffer;
+          delete[] bufferrgb;
+          return false;
+        }
       }
       else
       {
@@ -522,8 +533,8 @@ RLECodec::Code(const DataElement & in, DataElement & out)
     if (GetPixelFormat().GetBitsAllocated() == 32)
     {
       assert(!(image_len % 4));
-      unsigned int div = GetPixelFormat().GetSamplesPerPixel();
-      for (unsigned int j = 0; j < div; ++j)
+      uint32_t div = GetPixelFormat().GetSamplesPerPixel();
+      for (uint32_t j = 0; j < div; ++j)
       {
         size_t       iimage_len = image_len / div;
         char *       ibuffer = buffer + j * iimage_len;
@@ -567,8 +578,8 @@ RLECodec::Code(const DataElement & in, DataElement & out)
     else if (GetPixelFormat().GetBitsAllocated() == 16)
     {
       assert(!(image_len % 2));
-      unsigned int div = GetPixelFormat().GetSamplesPerPixel();
-      for (unsigned int j = 0; j < div; ++j)
+      uint32_t div = GetPixelFormat().GetSamplesPerPixel();
+      for (uint32_t j = 0; j < div; ++j)
       {
         size_t       iimage_len = image_len / div;
         char *       ibuffer = buffer + j * iimage_len;
@@ -596,7 +607,7 @@ RLECodec::Code(const DataElement & in, DataElement & out)
     assert(image_len % MaxNumSegments == 0);
     const size_t input_seg_length = image_len / MaxNumSegments;
     std::string  datastr;
-    for (unsigned int seg = 0; seg < MaxNumSegments; ++seg)
+    for (uint32_t seg = 0; seg < MaxNumSegments; ++seg)
     {
       size_t       partition = input_seg_length;
       const char * ptr = ptr_img + seg * input_seg_length;
@@ -611,7 +622,7 @@ RLECodec::Code(const DataElement & in, DataElement & out)
       assert(partition % dims[1] == 0);
       size_t length = 0;
       // do not cross row boundary
-      for (unsigned int y = 0; y < dims[1]; ++y)
+      for (uint32_t y = 0; y < dims[1]; ++y)
       {
         ptrdiff_t llength = rle_encode(outbuf, n, ptr + y * dims[0], partition / dims[1]);
         if (llength < 0)
@@ -626,11 +637,22 @@ RLECodec::Code(const DataElement & in, DataElement & out)
         length += llength;
       }
       // update header
-      header.offset[1 + seg] = static_cast<uint32_t>(header.offset[seg] + length);
+	  const uint32_t off_seg = header.GetOffset(seg);
+      if (!header.SetOffset(1 + seg, static_cast<uint32_t>(off_seg + length))) // TODO check integer overflow?
+      {
+        delete[] buffer;
+        delete[] bufferrgb;
+        return false;
+      }
       assert(data.str().size() == length);
       datastr += data.str();
     }
-    header.offset[MaxNumSegments] = 0;
+    if (!header.SetOffset(MaxNumSegments, 0))
+	{
+        delete[] buffer;
+        delete[] bufferrgb;
+        return false;
+	}
     std::stringstream os;
     os.write(reinterpret_cast<char *>(&header), sizeof(header));
     const std::string str = os.str() + datastr;
@@ -690,11 +712,12 @@ RLECodec::DecodeByStreams(std::istream & is, std::ostream & os)
   {
     return false;
   }
-  size_t numSegments = frame.header.num_segments;
+  size_t numSegments = frame.header.GetNumSegments();
   size_t length = Length;
   assert(length);
   // Special case
-  assert(GetPixelFormat().GetBitsAllocated() == 32 || GetPixelFormat().GetBitsAllocated() == 16 ||
+  assert(GetPixelFormat().GetBitsAllocated() == 32 ||
+         GetPixelFormat().GetBitsAllocated() == 16 ||
          GetPixelFormat().GetBitsAllocated() == 8);
   if (GetPixelFormat().GetBitsAllocated() > 8)
   {
@@ -719,16 +742,24 @@ RLECodec::DecodeByStreams(std::istream & is, std::ostream & os)
   {
     size_t         numberOfReadBytes = 0;
     std::streampos pos = is.tellg() - start;
-    if (frame.header.offset[i] - pos != 0)
+    //
+    // https://talosintelligence.com/vulnerability_reports/TALOS-2025-2214
+    if (frame.header.GetOffset(i) > BufferLength) 
+    {
+      mdcmErrorMacro("Offset is bigger then buffer length");
+      return false;
+    }
+    //
+    if (frame.header.GetOffset(i) - pos != 0)
     {
       // ACUSON-24-YBR_FULL-RLE.dcm
       // D_CLUNIE_CT1_RLE.dcm
       // MM: This should be at most the \0 padding
-      std::streamoff check = frame.header.offset[i] - pos;
+      std::streamoff check = frame.header.GetOffset(i) - pos;
       // check == 2 for mdcmDataExtra/mdcmSampleData/US_DataSet/GE_US/2929J686-breaker
       // assert(check == 1 || check == 2);
       (void)check; // warning removal
-      is.seekg(frame.header.offset[i] + start, std::ios::beg);
+      is.seekg(frame.header.GetOffset(i) + start, std::ios::beg);
     }
     size_t      numOutBytes = 0;
     signed char byte;

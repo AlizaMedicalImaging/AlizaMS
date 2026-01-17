@@ -316,18 +316,62 @@ DoOverlays(const mdcm::DataSet & ds, mdcm::Pixmap & pixeldata)
         ov.IsInPixelData(true);
         if (ov.GetBitsAllocated() != pixeldata.GetPixelFormat().GetBitsAllocated())
         {
-          mdcmWarningMacro("Bits Allocated are wrong. Correcting.");
+          mdcmWarningMacro("Bits Allocated is wrong, correcting");
           ov.SetBitsAllocated(pixeldata.GetPixelFormat().GetBitsAllocated());
         }
+#if 1
+        // https://talosintelligence.com/vulnerability_reports/TALOS-2025-2211
+        {
+          const mdcm::DataElement & de3 = ds.GetDataElement(mdcm::Tag(0x7fe0, 0x0010));
+          const mdcm::ByteValue *   bv = de3.GetByteValue();
+          if (!bv)
+          {
+            mdcmWarningMacro("Overlay from an encapsulated stream is not supported");
+            continue;
+          }
+          const unsigned long long dims =
+            static_cast<unsigned long long>(pixeldata.GetDimension(0)) * pixeldata.GetDimension(1);
+          const uint8_t            pixel_size = pixeldata.GetPixelFormat().GetPixelSize();
+          if (pixel_size == 0 || (dims > static_cast<unsigned long long>(bv->GetLength()) / pixel_size))
+          {
+            mdcmWarningMacro("Could not extract overlay #" << idxoverlays << " from pixel data (1)");
+            continue;
+          }
+          const long long ov_origin_0 = ov.GetOrigin()[0];
+          const long long ov_origin_1 = ov.GetOrigin()[1];
+          const long long start_pixel = (ov_origin_1 - 1LL) + (ov_origin_0 - 1LL) * pixeldata.GetDimension(0);
+          if (start_pixel < 0 || static_cast<unsigned long long>(start_pixel) >= dims)
+          {
+            mdcmWarningMacro(
+              "Could not extract overlay #" << idxoverlays << ", origin is not in the image buffer");
+            continue;
+          }
+          if (!(ov.GetRows() > 0 && ov.GetColumns() > 0))
+          {
+            mdcmWarningMacro(
+              "Could not extract overlay #" << idxoverlays << ", wrong rows or columns");
+            continue;
+          }
+          const unsigned long long last_pixel =
+            start_pixel +
+            static_cast<unsigned long long>(ov.GetRows() - 1) * pixeldata.GetDimension(0) + (ov.GetColumns() - 1);
+          if (last_pixel >= dims)
+          {
+            mdcmWarningMacro(
+              "Could not extract overlay #" << idxoverlays << ", overlay doesn't fit into the image buffer");
+            continue;
+          }
+        }
+#endif
         if (!ov.GrabOverlayFromPixelData(ds))
         {
-          mdcmWarningMacro("Could not extract overlay from pixel data (1)");
+          mdcmWarningMacro("Could not extract overlay from pixel data (2)");
         }
         updateoverlayinfo[idxoverlays] = true;
       }
       else
       {
-        mdcmWarningMacro("Could not extract overlay from pixel data (2)");
+        mdcmWarningMacro("Could not extract overlay from pixel data (3)");
       }
     }
   }

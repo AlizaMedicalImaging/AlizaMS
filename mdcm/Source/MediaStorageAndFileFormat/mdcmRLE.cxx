@@ -29,7 +29,7 @@
 namespace
 {
 
-constexpr unsigned int max_number_offset = 15U;
+constexpr uint32_t max_number_offset = 15U;
 
 // check_header behavior is twofold:
 //  - on first pass it will detect if user input was found to be invalid and
@@ -41,14 +41,15 @@ bool
 check_header(const mdcm::RLEHeader & rh, mdcm::RLEPixelInfo & pt)
 {
   // first operation is to update RLEPixelInfo from the header
-  const unsigned int ns = pt.compute_num_segments();
-  const bool         ok = ns == rh.num_segments;
+  const uint32_t ns = pt.compute_num_segments();
+  const uint32_t hns = rh.GetNumSegments();
+  const bool     ok = ns == hns;
   if (!ok)
   {
     // in case num segments is valid, update pt from the derived info
-    if (mdcm::RLEPixelInfo::check_num_segments(rh.num_segments))
+    if (mdcm::RLEPixelInfo::check_num_segments(hns))
     {
-      unsigned int nc, bpp;
+      uint32_t nc, bpp;
       if (ns % 3 == 0)
       {
         nc = 3U;
@@ -65,18 +66,18 @@ check_header(const mdcm::RLEHeader & rh, mdcm::RLEPixelInfo & pt)
   }
   // at least one offset is required. By convention in DICOM, it should not be
   // padded (no extra blank space), thus value is offset 64
-  if (rh.offset[0] != 64)
+  if (rh.GetOffset(0) != 64)
     return false;
-  for (unsigned int i = 1; i < rh.num_segments; ++i)
+  for (uint32_t i = 1; i < hns; ++i)
   {
     // basic error checking
-    if (rh.offset[i - 1] >= rh.offset[i])
+    if (rh.GetOffset(i - 1) >= rh.GetOffset(i))
       return false;
   }
   // DICOM mandates all unused segments to have their offsets be 0
-  for (unsigned int i = rh.num_segments; i < max_number_offset; ++i)
+  for (uint32_t i = hns; i < max_number_offset; ++i)
   {
-    if (rh.offset[i] != 0)
+    if (rh.GetOffset(i) != 0)
       return false;
   }
   return true;
@@ -281,45 +282,51 @@ bool
 RLEEncoder::write_header(RLEDestination & d)
 {
   RLESource *        src = internals->src;
-  const unsigned int w = internals->img.get_width();
-  const unsigned int h = internals->img.get_height();
-  RLEPixelInfo       pt = internals->img.get_RLEPixelInfo();
-  const unsigned int nsegs = pt.compute_num_segments();
+  const uint32_t w = internals->img.get_width();
+  const uint32_t h = internals->img.get_height();
+  RLEPixelInfo   pt = internals->img.get_RLEPixelInfo();
+  const uint32_t nsegs = pt.compute_num_segments();
   internals->invalues.resize(w * nsegs);
   char *      buffer = &internals->invalues[0];
   size_t      buflen = internals->invalues.size();
   RLEHeader & rh = internals->rh;
-  rh.num_segments = nsegs;
+  rh.SetNumSegments(nsegs);
   std::streampos start = src->tell();  // remember start position
   long long      comp_len[16]{}; // 15 is the max
   for (long long y = 0; y < h; ++y)
   {
     src->read_into_segments(buffer, buflen, internals->img);
-    for (unsigned int s = 0; s < nsegs; ++s)
+    for (uint32_t s = 0; s < nsegs; ++s)
     {
       const long long ret = compute_compressed_length(buffer + s * w, w);
       assert(ret > 0);
       comp_len[s] += ret;
     }
   }
-  rh.offset[0] = 64; // required
-  for (unsigned int s = 1; s < nsegs; ++s)
+  if (!rh.SetOffset(0, 64))
   {
-    const long long tmp0 = comp_len[s - 1] + rh.offset[s - 1];
+    return false;
+  }
+  for (uint32_t s = 1; s < nsegs; ++s)
+  {
+    const long long tmp0 = comp_len[s - 1] + rh.GetOffset(s - 1);
     if (tmp0 < 0 || tmp0 > 0xffffffff)
     {
       mdcmAlwaysWarnMacro("Overflow in RLEEncoder::write_header, " << tmp0);
       return false;
     }
-    rh.offset[s] += static_cast<unsigned int>(tmp0);
+	const uint32_t tmp1 = rh.GetOffset(s);
+    if (!rh.SetOffset(s, tmp1 + static_cast<uint32_t>(tmp0)))
+	{
+      return false;
+	}
   }
   assert(check_header(rh, pt));
   d.write(reinterpret_cast<char *>(&rh), sizeof(rh));
-  long long            comp_pos[16]{};
-  const unsigned int * offsets = internals->rh.offset;
-  for (unsigned int s = 0; s < nsegs; ++s)
+  long long comp_pos[16]{};
+  for (uint32_t s = 0; s < nsegs; ++s)
   {
-    comp_pos[s] = offsets[s];
+    comp_pos[s] = internals->rh.GetOffset(s);
   }
   memcpy(internals->comp_pos, comp_pos, sizeof(comp_pos));
   src->seek(start); // go back to start position
@@ -396,7 +403,7 @@ RLEEncoder::encode_row(RLEDestination & d)
   const RLEPixelInfo & pt = internals->img.get_RLEPixelInfo();
   const long long      nc = pt.get_number_of_components();
   const long long      bpp = pt.get_number_of_bits_per_pixel();
-  const long long      numsegs = internals->rh.num_segments;
+  const long long      numsegs = internals->rh.GetNumSegments();
   assert(numsegs == (bpp / 8) * nc);
   (void)bpp;
   (void)nc;
@@ -468,13 +475,13 @@ RLEDecoder::RLEDecoder(RLESource & s, const RLEImageInfo & ii)
   internals = new RLEDecoderInternal;
   memset(reinterpret_cast<char *>(&internals->rh), 0, sizeof(RLEHeader));
   internals->img = ii;
-  const unsigned int ns = ii.get_RLEPixelInfo().compute_num_segments();
+  const uint32_t ns = ii.get_RLEPixelInfo().compute_num_segments();
   internals->sources = new RLESource *[ns];
   internals->sources[0] = s.clone(); // Only one for now (minimum for read_header)
-  for (unsigned int i = 1; i < ns; ++i)
+  for (uint32_t i = 1; i < ns; ++i)
     internals->sources[i] = nullptr;
   internals->nsources = ns;
-  for (unsigned int i = 0; i < 16; ++i)
+  for (uint32_t i = 0; i < 16; ++i)
     internals->nstorage[i] = 0;
 }
 
@@ -585,7 +592,7 @@ RLEDecoder::read_header(RLEPixelInfo & pi)
   for (long long i = 1; i < internals->nsources; ++i)
   {
     internals->sources[i] = s->clone();
-    internals->sources[i]->seek(internals->rh.offset[i]);
+    internals->sources[i]->seek(internals->rh.GetOffset(i));
   }
   return true;
 }

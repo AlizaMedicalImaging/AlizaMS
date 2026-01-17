@@ -977,13 +977,22 @@ JPEGBITSCodec::DecodeByStreams(std::istream & is, std::ostream & os)
 bool
 JPEGBITSCodec::InternalCode(const char * input, size_t len, std::ostream & os)
 {
-  (void)len;
   void * vinput = const_cast<void*>(static_cast<const void*>(input));
   /* Points to large array of R,G,B-order data */
   JSAMPLE *                     image_buffer = static_cast<JSAMPLE *>(vinput);
   const volatile unsigned int * dims = this->GetDimensions();
   const volatile int            image_height = dims[1]; /* Number of rows in image */
   const volatile int            image_width = dims[0];  /* Number of columns in image */
+#if 1
+  // https://talosintelligence.com/vulnerability_reports/TALOS-2025-2210
+  const volatile size_t expected_size =
+    static_cast<size_t>(image_width) * image_height * this->GetPixelFormat().GetPixelSize();
+  if (len != expected_size)
+  {
+    mdcmErrorMacro("Frame size doesn't match");
+    return false;
+  }
+#endif
   /* This struct contains the JPEG compression parameters and pointers to
    * working space (which is allocated as needed by the JPEG library).
    * It is possible to have several such structures, representing multiple
