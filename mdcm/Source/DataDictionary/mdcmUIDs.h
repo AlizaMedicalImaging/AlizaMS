@@ -606,7 +606,16 @@ public:
     uid_1_2_840_10008_5_1_4_1_1_66_8 = 515,
     uid_1_2_840_10008_5_1_4_1_1_88_77 = 516,
     uid_1_2_840_10008_5_1_4_1_1_601_3 = 517,
-    uid_1_2_840_10008_5_1_4_1_1_601_4 = 518
+    uid_1_2_840_10008_5_1_4_1_1_601_4 = 518,
+//
+//
+/////////////////////////////////////////
+
+/////////////////////////////////////////
+//
+// 2025e
+//
+  uid_1_2_840_10008_5_1_4_1_1_601_5 = 519
 //
 //
 /////////////////////////////////////////
@@ -1198,11 +1207,19 @@ public:
   HeightMapSegmentationStorage = 515,
   WaveformAnnotationSRStorage = 516,
   ThermographyImageStorage = 517,
-  ThermographyMultiframeImageStorage = 518
+  ThermographyMultiframeImageStorage = 518,
 //
 //
 /////////////////////////////////////////
 
+/////////////////////////////////////////
+//
+// 2025e
+//
+  UltrasoundWaveformStorage = 519 // Ultrasound Waveform Storage
+//
+//
+/////////////////////////////////////////
   };
 
   typedef const char * const (*UIDsStringsType)[2];
