@@ -1216,7 +1216,7 @@ public:
 //
 // 2025e
 //
-  UltrasoundWaveformStorage = 519 // Ultrasound Waveform Storage
+  UltrasoundWaveformStorage = 519
 //
 //
 /////////////////////////////////////////
