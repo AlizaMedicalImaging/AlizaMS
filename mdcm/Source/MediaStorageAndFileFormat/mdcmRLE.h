@@ -96,6 +96,7 @@ public:
     return true;
   }
 
+#if 0
   void Print(std::ostream & os) 
   {
     os << "num_segments:" << num_segments << '\n';
@@ -104,6 +105,8 @@ public:
       os << i << "offset[" << i << "]:" << offset[i] << '\n';
     }
   }
+#endif
+
 };
 
 // 1 or 3 components and bpp being 8, 16 or 32
