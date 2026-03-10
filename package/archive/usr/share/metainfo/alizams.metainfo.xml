@@ -10,6 +10,7 @@
   <metadata_license>FSFAP</metadata_license>
   <project_license>GPL-3.0-only</project_license>
   <url type="homepage">https://github.com/AlizaMedicalImaging/AlizaMS</url>
+  <url type="vcs-browser">https://github.com/AlizaMedicalImaging/AlizaMS</url>
   <url type="bugtracker">https://github.com/AlizaMedicalImaging/AlizaMS/issues</url>
   <categories>
     <category>Graphics</category>
@@ -59,16 +60,16 @@
   </content_rating>
   <screenshots>
     <screenshot type="default">
-	  <caption>Main Window</caption>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.10/package/art/alizams_scr1.jpg</image>
+      <caption>Main Window</caption>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.11/package/art/alizams_scr1.jpg</image>
     </screenshot>
     <screenshot>
-	  <caption>Multi-view</caption>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.10/package/art/alizams_scr2.jpg</image>
+      <caption>Multi-view</caption>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.11/package/art/alizams_scr2.jpg</image>
     </screenshot>
     <screenshot>
-	  <caption>Metadata Viewer</caption>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.10/package/art/alizams_scr3.jpg</image>
+      <caption>Metadata Viewer</caption>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.11/package/art/alizams_scr3.jpg</image>
     </screenshot>
   </screenshots>
   <releases>
@@ -91,6 +92,6 @@
   <keywords>
     <keyword>dicom viewer</keyword>
     <keyword>medical imaging software</keyword>
-    <keyword>dcm editor</keyword>
+    <keyword>dcm viewer</keyword>
   </keywords>
 </component>
