@@ -748,7 +748,12 @@ if(NOT ALIZA_USE_SYSTEM_BULLET)
     ${CMAKE_CURRENT_SOURCE_DIR}/b/BulletCollision/NarrowPhaseCollision/btPolyhedralContactClipping.cpp)
   set(ALIZAMS_SRCS ${ALIZAMS_SRCS} ${BULLET_SRCS})
 else()
-  include_directories("/usr/include/bullet")
+  find_package(Bullet REQUIRED COMPONENTS LinearMath BulletCollision)
+  message(STATUS "Bullet libraries: ${BULLET_LIBRARIES}")
+  message(STATUS "Bullet include dir: ${BULLET_INCLUDE_DIR}")
+  message(STATUS "Bullet definitions: ${BULLET_DEFINITIONS}")
+  add_definitions(${BULLET_DEFINITIONS})
+  include_directories(BEFORE ${BULLET_INCLUDE_DIR})
 endif()
 
 #
@@ -985,7 +990,7 @@ else()
 endif()
 
 if(ALIZA_USE_SYSTEM_BULLET)
-  set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} libLinearMath.so libBulletCollision.so)
+  set(ALIZAMS_LINK_LIBRARIES ${ALIZAMS_LINK_LIBRARIES} ${BULLET_LIBRARIES})
 endif()
 
 if(ALIZA_USE_SYSTEM_LCMS2)
