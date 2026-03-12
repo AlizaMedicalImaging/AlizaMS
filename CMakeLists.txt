@@ -753,7 +753,7 @@ else()
   message(STATUS "Bullet include dir: ${BULLET_INCLUDE_DIR}")
   message(STATUS "Bullet definitions: ${BULLET_DEFINITIONS}")
   add_definitions(${BULLET_DEFINITIONS})
-  include_directories(BEFORE ${BULLET_INCLUDE_DIR})
+  include_directories(${BULLET_INCLUDE_DIR})
 endif()
 
 #
