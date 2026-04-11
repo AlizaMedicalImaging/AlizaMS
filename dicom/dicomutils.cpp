@@ -8409,6 +8409,13 @@ QString DicomUtils::read_series(
 				ivariant->di->default_us_window_width  =
 					ivariant->di->us_window_width = windows_.at(0);
 			}
+			else
+			{
+				if (levels_size > 1)
+				{
+					ivariant->di->lock_level2D = true;
+				}
+			}
 			if (one_lut)
 			{
 				ivariant->di->default_lut_function =
@@ -10645,6 +10652,13 @@ QString DicomUtils::read_enhanced_common(
 						window_center = tmp1c.at(0);
 						window_width  = tmp1w.at(0);
 						lut_function  = tmp1l.at(0);
+					}
+					else
+					{
+						if (tmp1c_size > 1)
+						{
+							ivariant->di->lock_level2D = true;
+						}
 					}
 				}
 			}

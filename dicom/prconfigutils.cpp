@@ -3593,6 +3593,7 @@ ImageVariant * PrConfigUtils::make_pr_monochrome(
 		}
 #endif
 		CommonUtils::calculate_minmax_scalar(v);
+		v->di->lock_level2D = CommonUtils::check_multiple_levels(v);
 	}
 	//
 	// Display areas

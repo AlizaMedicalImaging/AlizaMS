@@ -122,6 +122,7 @@ public:
 #ifdef ALIZA_LINUX_DEBUG_MEM
 	static void linux_print_memusage(const std::string&);
 #endif
+	static bool check_multiple_levels(const ImageVariant *);
 };
 
 #endif
