@@ -51,6 +51,7 @@
 #include <atomic>
 #include "dicomutils.h"
 #include "colorspace/colorspace.h"
+#include "mmath.h"
 #ifdef USE_GET_TOTAL_MEM
 #if (defined  __FreeBSD__ || defined __APPLE__)
 #include <sys/sysctl.h>
@@ -4501,6 +4502,36 @@ void CommonUtils::linux_print_memusage(const std::string & s)
    std::cout << s << ": VM = " << vm_usage << " GB, RSS = " << resident_set << " GB " << std::endl;
 }
 #endif
+
+bool CommonUtils::check_multiple_levels(const ImageVariant * v)
+{
+	if (v->frame_levels.size() <= 1)
+	{
+		return false;
+	}
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+	FrameLevels::const_iterator it = v->frame_levels.cbegin();
+#else
+	FrameLevels::const_iterator it = v->frame_levels.constBegin();
+#endif
+	const FrameLevel & first_fl = it.value();
+	++it;
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+	while (it != v->frame_levels.cend())
+#else
+	while (it != v->frame_levels.constEnd())
+#endif
+	{
+		const FrameLevel & fl = it.value();
+		if (!(MMath::AlmostEqual(fl.us_window_width, first_fl.us_window_width) &&
+			 (MMath::AlmostEqual(fl.us_window_center,first_fl.us_window_center))))
+		{
+			return true;
+		}
+		++it;
+	}
+	return false;
+}
 
 #ifdef USE_GET_TOTAL_MEM
 #undef USE_GET_TOTAL_MEM

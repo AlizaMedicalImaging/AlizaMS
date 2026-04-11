@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>964</width>
-    <height>53</height>
+    <height>58</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -181,7 +181,7 @@
         </property>
         <property name="icon">
          <iconset resource="../alizams.qrc">
-          <normaloff>:/bitmaps/lock2.svg</normaloff>:/bitmaps/lock2.svg</iconset>
+          <normaloff>:/bitmaps/unlock2.svg</normaloff>:/bitmaps/unlock2.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -193,7 +193,7 @@
          <bool>true</bool>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
        </widget>
       </item>

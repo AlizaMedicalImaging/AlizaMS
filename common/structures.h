@@ -498,7 +498,7 @@ public:
 	bool transparency{true};
 	bool lock_2Dview{};
 	bool lock_single{};
-	bool lock_level2D{true};
+	bool lock_level2D{};
 	quint32 cube_3dtex{};
 	float origin[3]{};
 	bool origin_ok{};
