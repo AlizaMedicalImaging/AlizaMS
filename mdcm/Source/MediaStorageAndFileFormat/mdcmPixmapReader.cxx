@@ -367,7 +367,10 @@ DoOverlays(const mdcm::DataSet & ds, mdcm::Pixmap & pixeldata)
         {
           mdcmWarningMacro("Could not extract overlay from pixel data (2)");
         }
-        updateoverlayinfo[idxoverlays] = true;
+        else
+        {
+          updateoverlayinfo[idxoverlays] = true;
+        }
       }
       else
       {
@@ -389,7 +392,16 @@ DoOverlays(const mdcm::DataSet & ds, mdcm::Pixmap & pixeldata)
         updateoverlayinfo.erase(updateoverlayinfo.begin() + ov);
         mdcmWarningMacro("Invalid: " << obp << " < GetBitsStored()");
       }
-      else if (obp > pf.GetBitsAllocated())
+    }
+  }
+  for (size_t ov_idx = pixeldata.GetNumberOfOverlays(); ov_idx != 0; --ov_idx)
+  {
+    size_t                ov = ov_idx - 1;
+    const mdcm::Overlay & o = pixeldata.GetOverlay(ov);
+    if (o.IsInPixelData())
+    {
+      unsigned short obp = o.GetBitPosition();
+      if (obp > pf.GetBitsAllocated())
       {
         pixeldata.RemoveOverlay(ov);
         updateoverlayinfo.erase(updateoverlayinfo.begin() + ov);
@@ -397,10 +409,29 @@ DoOverlays(const mdcm::DataSet & ds, mdcm::Pixmap & pixeldata)
       }
     }
   }
+#if 1
+  // related to to the TALOS-2025-2211 code above
+  for (size_t ov_idx = pixeldata.GetNumberOfOverlays(); ov_idx != 0; --ov_idx)
+  {
+    size_t                ov = ov_idx - 1;
+    const mdcm::Overlay & o = pixeldata.GetOverlay(ov);
+    if (o.IsInPixelData())
+    {
+      if (!updateoverlayinfo[ov])
+      {
+	    pixeldata.RemoveOverlay(ov);
+        // Not requied, 'updateoverlayinfo' will be destroyed, but nevertheless,
+		// for possible refactoring in the future.
+	    updateoverlayinfo.erase(updateoverlayinfo.begin() + ov); 
+	    mdcmWarningMacro("Removed overlay #" << ov);
+      }
+    }
+  }
+#endif
   for (size_t ov = 0; ov < pixeldata.GetNumberOfOverlays() && updateoverlayinfo[ov]; ++ov)
   {
     mdcm::Overlay & o = pixeldata.GetOverlay(ov);
-    if (o.GetBitsAllocated() == 16)
+    if (o.GetBitsAllocated() == 16 || o.GetBitsAllocated() == 8)
     {
       o.SetBitsAllocated(1);
       o.SetBitPosition(0);

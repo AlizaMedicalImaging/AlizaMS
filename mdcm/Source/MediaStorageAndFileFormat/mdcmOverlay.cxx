@@ -178,11 +178,11 @@ Overlay::GrabOverlayFromPixelData(const DataSet & ds)
   const unsigned int s = Internal.Rows * Internal.Columns;
   const unsigned int ovlength = s / 8 + (s % 8 != 0 ? 1 : 0);
   Internal.Data.resize(ovlength, 0);
-  const ByteValue *   bv = pixeldata.GetByteValue();
+  const ByteValue * bv = pixeldata.GetByteValue();
   if (!bv)
   {
     // XA_GE_JPEG_02_with_Overlays.dcm TODO
-    mdcmWarningMacro("Could not extract overlay from an encapsulated stream");
+    mdcmWarningMacro("Could not extract overlay; encapsulated stream?");
     return false;
   }
   const void * array = bv->GetVoidPointer();
@@ -191,12 +191,22 @@ Overlay::GrabOverlayFromPixelData(const DataSet & ds)
   if (Internal.BitsAllocated == 8)
   {
     const unsigned int length = ovlength * 8;
-    const uint8_t *    p = static_cast<const uint8_t *>(array);
-    const uint8_t *    end = reinterpret_cast<const uint8_t*>(reinterpret_cast<uintptr_t>(p) + length);
-    void *             vp = static_cast<void*>(Internal.Data.data());
-    unsigned char *    overlay = static_cast<unsigned char *>(vp);
-    int                c = 0;
-    uint8_t            pmask = static_cast<uint8_t>(1 << Internal.BitPosition);
+#if 1
+    if (length > bv->GetLength())
+    {
+      // This is usually not required, check is already done
+      // in mdcmPixmapReader DoOverlays before calling this function.
+      mdcmWarningMacro(
+        "GrabOverlayFromPixelData: length > bv->GetLength(), " << length << " > " << bv->GetLength());
+      return false;
+    }
+#endif
+    const uint8_t * p = static_cast<const uint8_t *>(array);
+    const uint8_t * end = reinterpret_cast<const uint8_t*>(reinterpret_cast<uintptr_t>(p) + length);
+    void *          vp = static_cast<void*>(Internal.Data.data());
+    unsigned char * overlay = static_cast<unsigned char *>(vp);
+    int             c = 0;
+    uint8_t         pmask = static_cast<uint8_t>(1 << Internal.BitPosition);
     while (p != end)
     {
       const uint8_t val = *p & pmask;
@@ -213,12 +223,22 @@ Overlay::GrabOverlayFromPixelData(const DataSet & ds)
   else if (Internal.BitsAllocated == 16)
   {
     const unsigned int length = ovlength * 16;
-    const uint16_t *   p = static_cast<const uint16_t *>(array);
-    const uint16_t *   end = reinterpret_cast<const uint16_t*>(reinterpret_cast<uintptr_t>(p) + length);
-    void *             vp = static_cast<void*>(Internal.Data.data());
-    unsigned char *    overlay = static_cast<unsigned char *>(vp);
-    int                c = 0;
-    uint16_t           pmask = static_cast<uint16_t>(1 << Internal.BitPosition);
+#if 1
+    if (length > bv->GetLength())
+    {
+      // This is usually not required, check is already done
+      // in mdcmPixmapReader DoOverlays before calling this function.
+      mdcmWarningMacro(
+        "GrabOverlayFromPixelData: length > bv->GetLength(), " << length << " > " << bv->GetLength());
+      return false;
+    }
+#endif
+    const uint16_t * p = static_cast<const uint16_t *>(array);
+    const uint16_t * end = reinterpret_cast<const uint16_t*>(reinterpret_cast<uintptr_t>(p) + length);
+    void *           vp = static_cast<void*>(Internal.Data.data());
+    unsigned char *  overlay = static_cast<unsigned char *>(vp);
+    int              c = 0;
+    uint16_t         pmask = static_cast<uint16_t>(1 << Internal.BitPosition);
     while (p != end)
     {
       const uint16_t val = *p & pmask;

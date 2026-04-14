@@ -274,6 +274,8 @@ public:
     length = 0;
     if (!data)
       return;
+    if (!_is)
+      return;
     while (_is >> std::ws >> data[length++] >> std::ws >> backslash)
     {
       ;
@@ -285,6 +287,8 @@ public:
   Read(T * data, unsigned long length, std::istream & _is)
   {
     if (!data || length < 1)
+      return;
+    if (!_is)
       return;
     _is >> std::ws >> data[0];
     if (length > 1)
@@ -325,6 +329,8 @@ public:
   static inline void
   ReadOne(T & data, unsigned long, std::istream & _is)
   {
+    if (!_is)
+      return;
     _is >> std::ws >> data;
   }
 
@@ -399,7 +405,8 @@ public:
     length /= type_size;
     for (unsigned long i = 0; i < length; ++i)
     {
-      _is.read(reinterpret_cast<char *>(data + i), type_size);
+      if (_is)
+        _is.read(reinterpret_cast<char *>(data + i), type_size);
     }
   }
 
@@ -412,7 +419,8 @@ public:
     const unsigned int type_size = sizeof(T);
     for (unsigned long i = 0; i < length; ++i)
     {
-      _is.read(reinterpret_cast<char *>(data + i), type_size);
+      if (_is)
+        _is.read(reinterpret_cast<char *>(data + i), type_size);
     }
   }
 
@@ -425,7 +433,8 @@ public:
     const unsigned int type_size = sizeof(T);
     for (unsigned long i = 0; i < length; ++i)
     {
-      _is.read(reinterpret_cast<char *>(data + i), type_size);
+      if (_is)
+        _is.read(reinterpret_cast<char *>(data + i), type_size);
     }
     SwapperNoOp::SwapArray(data, length);
   }
@@ -450,18 +459,22 @@ public:
   {
     const unsigned int type_size = sizeof(T);
     char * cdata = reinterpret_cast<char *>(&data);
-    _is.read(cdata, type_size);
+    if (_is)
+      _is.read(cdata, type_size);
   }
 
   template <typename T>
   static inline void
   ReadOne(T & data, unsigned long, std::istream & _is)
   {
-    const unsigned int type_size = sizeof(T);
-    char * cdata = reinterpret_cast<char *>(&data);
-    _is.read(cdata, type_size);
-    void * vdata = static_cast<void*>(cdata);
-    SwapperNoOp::SwapArray(static_cast<T*>(vdata), 1);
+    if (_is)
+    {
+      const unsigned int type_size = sizeof(T);
+      char * cdata = reinterpret_cast<char *>(&data);
+      _is.read(cdata, type_size);
+      void * vdata = static_cast<void*>(cdata);
+      SwapperNoOp::SwapArray(static_cast<T*>(vdata), 1);
+    }
   }
 
   template <typename T>
