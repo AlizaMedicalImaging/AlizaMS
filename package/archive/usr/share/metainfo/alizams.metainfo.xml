@@ -61,24 +61,25 @@
   <screenshots>
     <screenshot type="default">
       <caption>Main Window</caption>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.11/package/art/alizams_scr1.jpg</image>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.12/package/art/alizams_scr1.jpg</image>
     </screenshot>
     <screenshot>
       <caption>Multi-view</caption>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.11/package/art/alizams_scr2.jpg</image>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.12/package/art/alizams_scr2.jpg</image>
     </screenshot>
     <screenshot>
       <caption>Metadata Viewer</caption>
-      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.11/package/art/alizams_scr3.jpg</image>
+      <image>https://raw.githubusercontent.com/AlizaMedicalImaging/AlizaMS/v1.9.12/package/art/alizams_scr3.jpg</image>
     </screenshot>
   </screenshots>
   <releases>
-    <release date="2026-01-17" version="1.9.11">
+    <release date="2026-04-16" version="1.9.12">
       <description>
-        <p>Release 1.9.11</p>
+        <p>Release 1.9.12</p>
       </description>
-      <url>https://github.com/AlizaMedicalImaging/AlizaMS/releases/tag/v1.9.11</url>
+      <url>https://github.com/AlizaMedicalImaging/AlizaMS/releases/tag/v1.9.12</url>
     </release>
+    <release date="2026-01-17" version="1.9.11"/>
     <release date="2024-05-24" version="1.9.10"/>
     <release date="2024-04-22" version="1.9.9"/>
     <release date="2024-04-01" version="1.9.8"/>
