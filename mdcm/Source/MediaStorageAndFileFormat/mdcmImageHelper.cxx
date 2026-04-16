@@ -42,6 +42,7 @@
 #include "mdcmVR.h"
 #include "mdcmVM.h"
 #include <cmath>
+#include <string>
 
 namespace mdcm
 {
@@ -1134,9 +1135,8 @@ ImageHelper::GetSpacingValue(const File & f)
               el.SetLength(entry.GetVR().GetSizeof());
               el.Read(ss);
               mdcmDebugMacro("DS el.GetLength() " << el.GetLength());
-              mdcmAlwaysWarnMacro("Spacing is broken, single value, set two");
-              double singleval;
-              ss >> singleval;
+              mdcmAlwaysWarnMacro("Spacing is broken, single value");
+              double singleval = std::stod(ss.str());
               if (singleval == 0.0)
                 singleval = 1.0;
               sp.push_back(singleval);
@@ -1213,9 +1213,8 @@ ImageHelper::GetSpacingValue(const File & f)
               el.SetLength(entry.GetVR().GetSizeof());
               el.Read(ss);
               mdcmDebugMacro("IS el.GetLength() " << el.GetLength());
-              mdcmAlwaysWarnMacro("Spacing is broken, single value, set two");
-              double singleval;
-              ss >> singleval;
+              mdcmAlwaysWarnMacro("Spacing is broken, single value");
+              int singleval = std::stoi(ss.str());
               if (singleval == 0.0)
                 singleval = 1.0;
               sp.push_back(singleval);
