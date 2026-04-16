@@ -36,9 +36,7 @@ namespace mdcm
  *    VR would not be known, this would only happen in some very
  *    rare cases.
  *
- * MDCM could handle bug #1 or #2 exclusively, this class can now
- * handle file which have both issues.
- * See TheralysMDCM120Bug.dcm
+ * See TheralysGDCM120Bug.dcm
  */
 class MDCM_EXPORT UNExplicitImplicitDataElement : public DataElement
 {

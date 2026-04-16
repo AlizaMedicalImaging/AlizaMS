@@ -86,6 +86,21 @@ public:
   ReadValue(std::istream & is)
   {
     SmartPointer<ByteValue> bv = new ByteValue;
+#if 1
+    // CVE-2026-3650
+    const std::streampos cur = is.tellg();
+    if (cur != std::streampos(-1))
+    {
+      is.seekg(0, std::ios::end);
+      const std::streampos end = is.tellg();
+      is.seekg(cur);
+      if (end != std::streampos(-1) && is.good() &&
+          static_cast<uint64_t>(end - cur) < static_cast<uint32_t>(ValueLengthField) )
+      {
+        throw ParseException("Fragment Value Length exceeds remaining stream size");
+      }
+    }
+#endif
     bv->SetLength(ValueLengthField);
     if (!bv->Read<TSwap>(is))
     {

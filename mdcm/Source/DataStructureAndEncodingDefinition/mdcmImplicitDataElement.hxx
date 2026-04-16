@@ -25,6 +25,7 @@
 #include "mdcmSequenceOfItems.h"
 #include "mdcmValueIO.h"
 #include "mdcmSwapper.h"
+#include "mdcmParseException.h"
 #ifdef MDCM_WORDS_BIGENDIAN
 #  include "mdcmTagToVR.h"
 #endif
@@ -72,6 +73,9 @@ ImplicitDataElement::ReadValue(std::istream & is, bool readvalues)
 {
   if (is.eof())
     return is;
+#if 0
+  std::cout << "ValueLengthField = " << ValueLengthField << std::endl;
+#endif
   const Tag itemStartItem(0xfffe, 0xe000);
   assert(TagField != itemStartItem);
   /*
@@ -212,6 +216,29 @@ ImplicitDataElement::ReadValue(std::istream & is, bool readvalues)
     mdcmWarningMacro("Replacing a VL to be able to read a supposively "
                      "broken Papyrus file");
     ValueLengthField = 202; // 0xca
+  }
+#endif
+#if 1
+  // CVE-2026-3650
+  if (!ValueLengthField.IsUndefined() && readvalues)
+  {
+    const std::streampos cur = is.tellg();
+    if (cur != std::streampos(-1))
+    {
+      is.seekg(0, std::ios::end);
+      const std::streampos end = is.tellg();
+      is.seekg(cur);
+      if (end != std::streampos(-1) && is.good() &&
+          static_cast<uint64_t>(end - cur) < static_cast<uint32_t>(ValueLengthField))
+      {
+        mdcmWarningMacro(
+         "Value Length " << ValueLengthField <<
+         " exceeds remaining stream size for tag " << TagField);
+        ParseException pe;
+        pe.SetLastElement(*this);
+        throw pe;
+      }
+    }
   }
 #endif
   // We have the length we should be able to read the value

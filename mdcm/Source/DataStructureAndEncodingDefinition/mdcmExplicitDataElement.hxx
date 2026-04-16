@@ -179,6 +179,9 @@ ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
 {
   if (is.eof())
     return is;
+#if 0
+  std::cout << "ValueLengthField = " << ValueLengthField << std::endl;
+#endif
   if (ValueLengthField == 0)
   {
     ValueField = nullptr;
@@ -230,6 +233,29 @@ ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
   else
   {
     ValueField = new ByteValue;
+#if 1
+    // CVE-2026-3650
+    if (readvalues)
+    {
+      const std::streampos cur = is.tellg();
+      if (cur != std::streampos(-1))
+      {
+        is.seekg(0, std::ios::end);
+        const std::streampos end = is.tellg();
+        is.seekg(cur);
+        if (end != std::streampos(-1) && is.good() &&
+            static_cast<uint64_t>(end - cur) < static_cast<uint32_t>(ValueLengthField))
+        {
+          mdcmWarningMacro(
+            "Value Length " << ValueLengthField <<
+            " exceeds remaining stream size for tag " << TagField);
+          ParseException pe;
+          pe.SetLastElement(*this);
+          throw pe;
+        }
+      }
+    }
+#endif
   }
   // We have the length we should be able to read the value
   this->SetValueFieldLength(ValueLengthField, readvalues);
