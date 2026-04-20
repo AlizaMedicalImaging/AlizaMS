@@ -315,11 +315,11 @@ RLEEncoder::write_header(RLEDestination & d)
       mdcmAlwaysWarnMacro("Overflow in RLEEncoder::write_header, " << tmp0);
       return false;
     }
-	const uint32_t tmp1 = rh.GetOffset(s);
+    const uint32_t tmp1 = rh.GetOffset(s);
     if (!rh.SetOffset(s, tmp1 + static_cast<uint32_t>(tmp0)))
-	{
+    {
       return false;
-	}
+    }
   }
   assert(check_header(rh, pt));
   d.write(reinterpret_cast<char *>(&rh), sizeof(rh));

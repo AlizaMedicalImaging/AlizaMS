@@ -501,11 +501,11 @@ RLECodec::Code(const DataElement & in, DataElement & out)
       {
         if (!DoInvertPlanarConfiguration<char>(
           bufferrgb, ptr_img, static_cast<long long>(image_len / sizeof(char))))
-		{
+        {
           delete[] buffer;
           delete[] bufferrgb;
           return false;
-		}
+        }
       }
       else if (GetPixelFormat().GetBitsAllocated() == 16)
       {
@@ -637,7 +637,7 @@ RLECodec::Code(const DataElement & in, DataElement & out)
         length += llength;
       }
       // update header
-	  const uint32_t off_seg = header.GetOffset(seg);
+      const uint32_t off_seg = header.GetOffset(seg);
       if (!header.SetOffset(1 + seg, static_cast<uint32_t>(off_seg + length))) // TODO check integer overflow?
       {
         delete[] buffer;
@@ -648,11 +648,11 @@ RLECodec::Code(const DataElement & in, DataElement & out)
       datastr += data.str();
     }
     if (!header.SetOffset(MaxNumSegments, 0))
-	{
+    {
         delete[] buffer;
         delete[] bufferrgb;
         return false;
-	}
+    }
     std::stringstream os;
     os.write(reinterpret_cast<char *>(&header), sizeof(header));
     const std::string str = os.str() + datastr;
