@@ -65,7 +65,7 @@ Writer::Write()
   //
   if (!Stream || !*Stream)
   {
-    mdcmErrorMacro("No Filename");
+    mdcmErrorMacro("No filename?");
     std::locale::global(current_locale);
     return false;
   }
@@ -74,7 +74,7 @@ Writer::Write()
   const DataSet &             DS = F->GetDataSet();
   if (DS.IsEmpty())
   {
-    mdcmErrorMacro("DS empty");
+    mdcmErrorMacro("Dataset is empty");
     std::locale::global(current_locale);
     return false;
   }
@@ -90,7 +90,7 @@ Writer::Write()
       }
       catch (const std::logic_error & ex)
       {
-        mdcmAlwaysWarnMacro("Could not recreate the File Meta Header, please report:" << ex.what());
+        mdcmAlwaysWarnMacro("Could not recreate the File Meta Header:\n" << ex.what());
         std::locale::global(current_locale);
         return false;
       }
@@ -104,7 +104,7 @@ Writer::Write()
   const TransferSyntax & ts = Header.GetDataSetTransferSyntax();
   if (!ts.IsValid())
   {
-    mdcmErrorMacro("Invalid Transfer Syntax");
+    mdcmErrorMacro("Invalid transfer syntax");
     std::locale::global(current_locale);
     return false;
   }
@@ -202,7 +202,7 @@ Writer::SetFileName(const char * p)
   }
   else
   {
-    mdcmAlwaysWarnMacro("Reader failed (1)");
+    mdcmAlwaysWarnMacro("Writer failed (1)");
   }
   Stream = Ofstream;
 }

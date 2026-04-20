@@ -197,9 +197,7 @@ CP246ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
           mdcmWarningMacro(
            "Value Length " << ValueLengthField <<
            " exceeds remaining stream size for tag " << TagField);
-          ParseException pe;
-          pe.SetLastElement(*this);
-          throw pe;
+          throw std::logic_error("Value Length exceeds remaining stream size for tag");
         }
       }
     }

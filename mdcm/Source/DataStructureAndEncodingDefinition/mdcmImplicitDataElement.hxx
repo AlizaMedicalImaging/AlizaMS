@@ -61,7 +61,7 @@ ImplicitDataElement::ReadPreValue(std::istream & is)
   // Read Value Length
   if (!ValueLengthField.Read<TSwap>(is))
   {
-    mdcmAlwaysWarnMacro("Impossible ValueLengthField " << TagField);
+    mdcmWarningMacro("Impossible ValueLengthField " << TagField);
     throw std::logic_error("Impossible ValueLengthField");
   }
   return is;
@@ -234,9 +234,7 @@ ImplicitDataElement::ReadValue(std::istream & is, bool readvalues)
         mdcmWarningMacro(
          "Value Length " << ValueLengthField <<
          " exceeds remaining stream size for tag " << TagField);
-        ParseException pe;
-        pe.SetLastElement(*this);
-        throw pe;
+        throw std::logic_error("Value Length exceeds remaining stream size for tag");
       }
     }
   }

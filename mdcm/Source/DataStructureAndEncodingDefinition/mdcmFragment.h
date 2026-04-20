@@ -97,7 +97,9 @@ public:
       if (end != std::streampos(-1) && is.good() &&
           static_cast<uint64_t>(end - cur) < static_cast<uint32_t>(ValueLengthField) )
       {
-        throw ParseException("Fragment Value Length exceeds remaining stream size");
+        mdcmWarningMacro(
+         "Fragment Value Length " << ValueLengthField << " exceeds remaining stream size");
+        throw std::logic_error("Fragment Value Length exceeds remaining stream size");
       }
     }
 #endif
