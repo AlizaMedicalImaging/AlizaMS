@@ -456,7 +456,6 @@ set(MDCM_DSED_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmTag.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmCodeString.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmByteSwapFilter.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmUNExplicitImplicitDataElement.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmWriter.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmCSAHeader.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/mdcm/Source/DataStructureAndEncodingDefinition/mdcmMrProtocol.cxx

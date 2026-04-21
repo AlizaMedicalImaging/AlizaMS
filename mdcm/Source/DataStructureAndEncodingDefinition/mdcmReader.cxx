@@ -32,7 +32,6 @@
 #  include "mdcmUNExplicitDataElement.h"
 #  include "mdcmCP246ExplicitDataElement.h"
 #  include "mdcmExplicitImplicitDataElement.h"
-#  include "mdcmUNExplicitImplicitDataElement.h"
 #  include "mdcmVR16ExplicitDataElement.h"
 #endif
 #include <limits>
@@ -620,10 +619,12 @@ Reader::InternalReadCommon(const T_Caller & caller)
             catch (const std::exception &)
             {
               // MM: UNExplicitImplicitDataElement does not seems to be used anymore to read
-              // mdcmData/TheralysMDCM120Bug.dcm, instead the code path goes into
+              // mdcmData/TheralysGDCM120Bug.dcm, instead the code path goes into
               // ExplicitImplicitDataElement class instead.
               // Simply rethrow the exception for now.
-              throw std::logic_error("Exception in Reader.cxx (1)"); // TODO
+			  //
+			  // MDCM: 2026.04.21 Removed UNExplicitImplicitDataElement
+              throw std::logic_error("Exception in Reader.cxx (1)");
             }
           }
         }

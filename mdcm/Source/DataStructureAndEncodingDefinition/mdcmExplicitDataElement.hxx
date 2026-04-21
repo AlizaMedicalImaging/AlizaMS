@@ -197,10 +197,18 @@ ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
   {
     if (TagField == Tag(0x7fe0, 0x0010))
     {
-      // Ok this is Pixel Data fragmented...
+      // Pixel Data
       assert(VRField & VR::OB_OW || VRField == VR::UN);
       ValueField = new SequenceOfFragments;
     }
+#if 1
+    else if (TagField == Tag(0x7fe1, 0x1060) && VRField == VR::OB)
+    {
+      // GEMS_Ultrasound_MovieGroup_001
+      mdcmWarningMacro("Private Pixel Sequence (7fe1, 1060)");
+      ValueField = new SequenceOfFragments;
+    }
+#endif
     else
     {
       // Support cp246 conforming file:
@@ -210,7 +218,7 @@ ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
       assert(TagField != Tag(0x7fe0, 0x0010));
       assert(VRField == VR::UN);
       ValueField = new SequenceOfItems;
-      ValueField->SetLength(ValueLengthField); // perform realloc
+      ValueField->SetLength(ValueLengthField);
       try
       {
         if (!ValueIO<ImplicitDataElement, TSwap>::Read(is, *ValueField, readvalues)) // cp246 compliant
@@ -247,8 +255,8 @@ ExplicitDataElement::ReadValue(std::istream & is, bool readvalues)
             static_cast<uint64_t>(end - cur) < static_cast<uint32_t>(ValueLengthField))
         {
           mdcmWarningMacro(
-           "Value Length " << ValueLengthField <<
-           " exceeds remaining stream size for tag " << TagField);
+            "Value Length " << ValueLengthField <<
+            " exceeds remaining stream size for tag " << TagField);
           throw std::logic_error("Value Length exceeds remaining stream size for tag");
         }
       }

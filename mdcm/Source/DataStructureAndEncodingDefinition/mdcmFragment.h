@@ -98,7 +98,7 @@ public:
           static_cast<uint64_t>(end - cur) < static_cast<uint32_t>(ValueLengthField) )
       {
         mdcmWarningMacro(
-         "Fragment Value Length " << ValueLengthField << " exceeds remaining stream size");
+          "Fragment Value Length " << ValueLengthField << " exceeds remaining stream size");
         throw std::logic_error("Fragment Value Length exceeds remaining stream size");
       }
     }

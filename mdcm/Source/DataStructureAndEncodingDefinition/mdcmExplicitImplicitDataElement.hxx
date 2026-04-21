@@ -392,8 +392,8 @@ ExplicitImplicitDataElement::ReadValue(std::istream & is, bool readvalues)
             static_cast<uint64_t>(end - cur) < static_cast<uint32_t>(ValueLengthField))
         {
           mdcmWarningMacro(
-           "Value Length " << ValueLengthField <<
-           " exceeds remaining stream size for tag " << TagField);
+            "Value Length " << ValueLengthField <<
+            " exceeds remaining stream size for tag " << TagField);
           throw std::logic_error("Value Length exceeds remaining stream size for tag");
         }
       }

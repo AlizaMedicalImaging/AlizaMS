@@ -31,8 +31,6 @@ class VL;
 
 /**
  * Class to represent the value of a Data Element.
- * VALUE: A component of a Value Field. A Value Field may consist of one
- * or more of these components.
  */
 class MDCM_EXPORT Value : public Object
 {
@@ -41,10 +39,8 @@ public:
   virtual ~Value() = default;
   virtual VL GetLength() const = 0;
   virtual void SetLength(VL) = 0;
-  virtual void
-  Clear() = 0;
-  virtual bool
-  operator==(const Value &) const = 0;
+  virtual void Clear() = 0;
+  virtual bool operator==(const Value &) const = 0;
 
 protected:
   friend class DataElement;
