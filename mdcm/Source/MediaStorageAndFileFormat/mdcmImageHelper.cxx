@@ -1136,7 +1136,19 @@ ImageHelper::GetSpacingValue(const File & f)
               el.Read(ss);
               mdcmDebugMacro("DS el.GetLength() " << el.GetLength());
               mdcmAlwaysWarnMacro("Spacing is broken, single value");
-              double singleval = std::stod(ss.str());
+              double singleval{};
+              try
+              {
+                singleval = std::stod(ss.str());
+              }
+              catch (const std::invalid_argument &)
+              {
+                ;
+              }
+              catch (const std::out_of_range &)
+              {
+                ;
+              }
               if (singleval == 0.0)
                 singleval = 1.0;
               sp.push_back(singleval);
@@ -1214,7 +1226,19 @@ ImageHelper::GetSpacingValue(const File & f)
               el.Read(ss);
               mdcmDebugMacro("IS el.GetLength() " << el.GetLength());
               mdcmAlwaysWarnMacro("Spacing is broken, single value");
-              int singleval = std::stoi(ss.str());
+              int singleval{};
+              try
+              {
+                singleval = std::stoi(ss.str());
+              }
+              catch (const std::invalid_argument &)
+              {
+                ;
+              }
+              catch (const std::out_of_range &)
+              {
+                ;
+              }
               if (singleval == 0.0)
                 singleval = 1.0;
               sp.push_back(singleval);
