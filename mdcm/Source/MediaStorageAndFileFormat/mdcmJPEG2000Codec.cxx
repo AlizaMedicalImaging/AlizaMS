@@ -1356,7 +1356,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
   // so we need to make sure to remove it.
   // See for example: DX_J2K_0Padding.dcm, D_CLUNIE_CT1_J2KR.dcm
   // Marker 0xffd9 EOI End of Image (JPEG 2000 EOC End of codestream).
-  // mdcmData/D_CLUNIE_CT1_J2KR.dcm contains a trailing 0xFF which apparently is OK.
+  // D_CLUNIE_CT1_J2KR.dcm contains a trailing 0xFF which apparently is OK.
   while (file_length > 0 && src[file_length - 1] != 0xd9)
   {
     --file_length;
@@ -1377,7 +1377,7 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
 #endif
   )
   {
-    // mdcmData/ELSCINT1_JP2vsJ2K.dcm
+    // ELSCINT1_JP2vsJ2K.dcm
 #ifdef MDCM_JPEG2000_VERBOSE
     std::cout << "DecodeByStreamsCommon: JP2 magic number detected" << std::endl;
 #endif
@@ -1816,7 +1816,7 @@ JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size)
 #endif
   )
   {
-    // mdcmData/ELSCINT1_JP2vsJ2K.dcm
+    // ELSCINT1_JP2vsJ2K.dcm
 #ifdef MDCM_JPEG2000_VERBOSE
     std::cout << "GetHeaderInfo: JP2 magic number detected" << std::endl;
 #endif

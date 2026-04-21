@@ -610,7 +610,7 @@ Reader::InternalReadCommon(const T_Caller & caller)
                 header.Read(is);
               }
               // Explicit/Implicit
-              // mdcmData/c_vf1001.dcm falls into that category, while in fact the fmi could simply
+              // c_vf1001.dcm falls into that category, while in fact the fmi could simply
               // be inverted and all would be perfect
               mdcmWarningMacro("Attempt to read file with explicit/implicit");
               F->GetDataSet().Clear();
@@ -619,7 +619,7 @@ Reader::InternalReadCommon(const T_Caller & caller)
             catch (const std::exception &)
             {
               // MM: UNExplicitImplicitDataElement does not seems to be used anymore to read
-              // mdcmData/TheralysGDCM120Bug.dcm, instead the code path goes into
+              // TheralysGDCM120Bug.dcm, instead the code path goes into
               // ExplicitImplicitDataElement class instead.
               // Simply rethrow the exception for now.
 			  //

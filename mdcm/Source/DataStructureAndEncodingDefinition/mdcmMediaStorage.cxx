@@ -555,7 +555,7 @@ MediaStorage::SetFromFile(const File & file)
    * this is why we check 0008,0016, and to preserve compat with ACR-NEMA
    * we also check Modality element to guess a fake Media Storage UID
    * file such as:
-   * mdcmData/SIEMENS-MR-RGB-16Bits.dcm are a pain to handle
+   * SIEMENS-MR-RGB-16Bits.dcm are a pain to handle
    */
   const FileMetaInformation & header = file.GetHeader();
   std::string                 b1;

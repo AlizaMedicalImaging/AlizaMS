@@ -756,7 +756,7 @@ RLECodec::DecodeByStreams(std::istream & is, std::ostream & os)
       // D_CLUNIE_CT1_RLE.dcm
       // MM: This should be at most the \0 padding
       std::streamoff check = frame.header.GetOffset(i) - pos;
-      // check == 2 for mdcmDataExtra/mdcmSampleData/US_DataSet/GE_US/2929J686-breaker
+      // check == 2 for US_DataSet/GE_US/2929J686-breaker
       // assert(check == 1 || check == 2);
       (void)check; // warning removal
       is.seekg(frame.header.GetOffset(i) + start, std::ios::beg);
