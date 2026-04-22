@@ -3742,11 +3742,13 @@ void Aliza::sort_4d(
 			}
 			catch (const std::invalid_argument &)
 			{
-				;
+				acqtimes_valid = false;
+				break;
 			}
 			catch (const std::out_of_range &)
 			{
-				;
+				acqtimes_valid = false;
+				break;
 			}
 			if (tmp5 > 0 && t1 > 0.0L)
 			{
