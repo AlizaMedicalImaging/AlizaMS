@@ -69,7 +69,7 @@ public:
         const std::streampos end = is.tellg();
         is.seekg(cur);
         if (end != std::streampos(-1) && is.good() &&
-            static_cast<uint64_t>(end - cur) < static_cast<uint32_t>(ValueLengthField) )
+            static_cast<uint64_t>(end - cur) < static_cast<uint32_t>(ValueLengthField))
         {
           mdcmWarningMacro(
             "Basic Offset Table Value Length " << ValueLengthField << " exceeds remaining stream size");
