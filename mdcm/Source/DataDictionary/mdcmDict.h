@@ -53,18 +53,22 @@ public:
   {
     assert(DictInternal.empty());
   }
+
   friend std::ostream &
   operator<<(std::ostream &, const Dict &);
+
   ConstIterator
   Begin() const
   {
     return DictInternal.cbegin();
   }
+
   ConstIterator
   End() const
   {
     return DictInternal.cend();
   }
+
   bool
   IsEmpty() const
   {
@@ -114,10 +118,9 @@ public:
   const DictEntry &
   GetDictEntryByKeyword(const char * keyword, Tag & tag) const
   {
-    MapDictEntry::const_iterator it = DictInternal.cbegin();
     if (keyword)
     {
-      for (; it != DictInternal.cend(); ++it)
+      for (MapDictEntry::const_iterator it = DictInternal.cbegin(); it != DictInternal.cend(); ++it)
       {
         if (strcmp(keyword, it->second.GetKeyword()) == 0)
         {
@@ -133,8 +136,7 @@ public:
 
 protected:
   friend class Dicts;
-  void
-  LoadDefault();
+  void LoadDefault();
 
 private:
   MapDictEntry DictInternal;
@@ -143,14 +145,12 @@ private:
 inline std::ostream &
 operator<<(std::ostream & os, const Dict & val)
 {
-  Dict::MapDictEntry::const_iterator it = val.DictInternal.cbegin();
-  for (; it != val.DictInternal.cend(); ++it)
+  for (Dict::MapDictEntry::const_iterator it = val.DictInternal.cbegin(); it != val.DictInternal.cend(); ++it)
   {
     const Tag &       t = it->first;
     const DictEntry & de = it->second;
     os << t << " " << de << '\n';
   }
-
   return os;
 }
 
@@ -166,6 +166,7 @@ class MDCM_EXPORT PrivateDict
 public:
   PrivateDict() = default;
   ~PrivateDict() = default;
+
   MDCM_DISALLOW_COPY_AND_MOVE(PrivateDict);
 
   void
@@ -211,12 +212,12 @@ public:
     return it->second;
   }
 
+#if 0
   void
   PrintXML() const
   {
-    MapDictEntry::const_iterator it = DictInternal.cbegin();
     std::cout << "<dict edition=\"2008\">\n";
-    for (; it != DictInternal.cend(); ++it)
+    for (MapDictEntry::const_iterator it = DictInternal.cbegin(); it != DictInternal.cend(); ++it)
     {
       const PrivateTag & t = it->first;
       const DictEntry &  de = it->second;
@@ -235,6 +236,7 @@ public:
     }
     std::cout << "</dict>\n";
   }
+#endif
 
   bool
   IsEmpty() const
@@ -244,8 +246,7 @@ public:
 
 protected:
   friend class Dicts;
-  void
-  LoadDefault();
+  void LoadDefault();
 
 private:
   MapDictEntry DictInternal;
@@ -254,8 +255,7 @@ private:
 inline std::ostream &
 operator<<(std::ostream & os, const PrivateDict & val)
 {
-  PrivateDict::MapDictEntry::const_iterator it = val.DictInternal.cbegin();
-  for (; it != val.DictInternal.cend(); ++it)
+  for (PrivateDict::MapDictEntry::const_iterator it = val.DictInternal.cbegin(); it != val.DictInternal.cend(); ++it)
   {
     const PrivateTag & t = it->first;
     const DictEntry &  de = it->second;
