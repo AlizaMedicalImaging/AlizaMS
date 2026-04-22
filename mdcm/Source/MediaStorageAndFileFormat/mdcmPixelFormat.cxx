@@ -286,9 +286,23 @@ PixelFormat::GetScalarType() const
       type = PixelFormat::UINT64;
       break;
     case 24:
-      mdcmDebugMacro("Illegal in DICOM, assuming a RGB image");
+      // FIXME
+      // Unfortunately, current DICOM standart allows BitsAllocated 24
+      // and 40 for e.g. scalars for e.g. JPEG2000 TS.
+      // https://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_8.2.4.html#table_8.2.4-1
+      // AFAIK, there are no example files or idea how to work with them.
+#if 1
+      mdcmDebugMacro("Assuming an old ACR-NEMA RGB image");
       type = PixelFormat::UINT8;
+#else
+      type = PixelFormat::UINT32;
+#endif
       break;
+#if 0
+    case 40:
+      type = PixelFormat::UINT64;
+      break;
+#endif
     default:
       mdcmErrorMacro("BitsAllocated " << BitsAllocated);
       type = PixelFormat::UNKNOWN;
@@ -305,6 +319,8 @@ PixelFormat::GetScalarType() const
       // Order properly type in ScalarType
       type = ScalarType(static_cast<int>(type) + 1);
     }
+    // PixelRepresentation 3 or 4 is just an internal hack in MDCM
+    // to support float DICOM data (Parametric Map).
     else if (PixelRepresentation == 3)
     {
       assert(BitsAllocated == 32);
