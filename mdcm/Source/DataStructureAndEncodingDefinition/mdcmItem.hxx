@@ -55,10 +55,7 @@ Item::GetLength() const
     // related to each other
     // assert( ValueLengthField == nestedlen );
     assert(nestedlen % 2 == 0);
-    return TagField.GetLength() /* 4 */ +
-           ValueLengthField.GetLength() /* 4 */
-           //+ ValueLengthField;
-           + nestedlen;
+    return TagField.GetLength() /* 4 */ + ValueLengthField.GetLength() /* 4 */ + nestedlen;
   }
 }
 

@@ -380,23 +380,23 @@ DataSet::ReadWithLength(std::istream & is, VL & length)
       const VL oflen = de.GetLength<TDE>();
       l += oflen;
       const std::streampos curpos = is.tellg();
-      // Bug_Philips_ItemTag_3F3F (0x2005, 0x1080): for some reason computation of fails
+      // Bug_Philips_ItemTag_3F3F (0x2005, 0x1080): for some reason computation fails
       if (l == 70 && locallength == 63)
       {
-        mdcmWarningMacro("PMS: Super bad hack. Changing length");
+        mdcmWarningMacro("PMS: Super bad hack, changing length");
         length = locallength = 140;
       }
       if ((curpos - startpos) + 1 == l)
       {
-        throw std::logic_error("Papyrus odd padding");
+        throw std::logic_error("Papyrus odd padding"); // Don't change this string
       }
       if (l > locallength)
       {
         if ((curpos - startpos) == locallength)
         {
-          // this means that something went wrong somewhere, and upon recomputing the length
-          // we found a discrepandy with own vendor made its layout.
-          // update the length directly
+          // This means that something went wrong somewhere, and upon recomputing the length
+          // we found a discrepancy with own vendor made its layout.
+          // Update the length directly
           locallength = length = l;
           throw std::logic_error("Changed Length");
         }
