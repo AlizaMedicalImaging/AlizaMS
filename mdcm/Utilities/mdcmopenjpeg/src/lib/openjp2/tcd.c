@@ -1845,20 +1845,20 @@ OPJ_BOOL opj_tcd_update_tile_data(opj_tcd_t *p_tcd,
 
         switch (l_size_comp) {
         case 1: {
-            OPJ_CHAR * l_dest_ptr = (OPJ_CHAR *) p_dest;
+            OPJ_INT8 * l_dest_ptr = (OPJ_INT8 *) p_dest;
             const OPJ_INT32 * l_src_ptr = l_src_data;
 
             if (l_img_comp->sgnd) {
                 for (j = 0; j < l_height; ++j) {
                     for (k = 0; k < l_width; ++k) {
-                        *(l_dest_ptr++) = (OPJ_CHAR)(*(l_src_ptr++));
+                        *(l_dest_ptr++) = (OPJ_INT8)(*(l_src_ptr++));
                     }
                     l_src_ptr += l_stride;
                 }
             } else {
                 for (j = 0; j < l_height; ++j) {
                     for (k = 0; k < l_width; ++k) {
-                        *(l_dest_ptr++) = (OPJ_CHAR)((*(l_src_ptr++)) & 0xff);
+                        *(l_dest_ptr++) = (OPJ_INT8)((*(l_src_ptr++)) & 0xff);
                     }
                     l_src_ptr += l_stride;
                 }
@@ -2722,7 +2722,7 @@ OPJ_BOOL opj_tcd_copy_tile_data(opj_tcd_t *p_tcd,
 
         switch (l_size_comp) {
         case 1: {
-            OPJ_CHAR * l_src_ptr = (OPJ_CHAR *) p_src;
+            OPJ_INT8 * l_src_ptr = (OPJ_INT8 *) p_src;
             OPJ_INT32 * l_dest_ptr = l_tilec->data;
 
             if (l_img_comp->sgnd) {

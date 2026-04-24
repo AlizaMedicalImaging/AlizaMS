@@ -497,6 +497,9 @@ ImageChangeTransferSyntax::TryJPEG2000Codec(const DataElement & pixelde, const B
     mct = j2kcodec.GetMCT();
     reversible = j2kcodec.GetReversible();
   }
+#if 0
+  std::cout << "reversible = " << reversible << std::endl;
+#endif
   if (codec->CanCode(ts))
   {
     codec->SetDimensions(input.GetDimensions());
@@ -506,7 +509,7 @@ ImageChangeTransferSyntax::TryJPEG2000Codec(const DataElement & pixelde, const B
     codec->SetPhotometricInterpretation(input.GetPhotometricInterpretation());
     codec->SetNeedOverlayCleanup(input.AreOverlaysInPixelData() || input.UnusedBitsPresentInPixelData());
     DataElement out;
-    const bool  r = codec->Code(pixelde, out);
+    const bool r = codec->Code(pixelde, out);
     output.SetPlanarConfiguration(0);
     if (input.GetPixelFormat().GetSamplesPerPixel() == 3)
     {

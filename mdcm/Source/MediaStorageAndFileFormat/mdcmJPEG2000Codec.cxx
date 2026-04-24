@@ -435,94 +435,286 @@ rawtoimage_fill2(const T *     inputbuffer,
                  int           highbit,
                  int           sign)
 {
-  const uint16_t pmask = static_cast<uint16_t>(0xffffU >> (bitsallocated - bitsstored));
-  const T * p = inputbuffer;
-  if (sign)
+  if (bitsallocated == 16)
   {
-    // smask : to check the 'sign' when BitsStored != BitsAllocated
-    const uint16_t smask = static_cast<uint16_t>(1U << (16 - (bitsallocated - bitsstored + 1)));
-    // nmask : to propagate sign bit on negative values
-    const int16_t nmask = static_cast<int16_t>(0xffff8000U >> (bitsallocated - bitsstored - 1));
-    if (pc)
+    const uint16_t pmask = static_cast<uint16_t>(0xffffU >> (bitsallocated - bitsstored));
+    const T * p = inputbuffer;
+    if (sign)
     {
-      for (int compno = 0; compno < numcomps; ++compno)
+      // smask : to check the 'sign' when BitsStored != BitsAllocated
+      const uint16_t smask = static_cast<uint16_t>(1U << (16 - (bitsallocated - bitsstored + 1)));
+      // nmask : to propagate sign bit on negative values
+      const int16_t nmask = static_cast<int16_t>(0xffff8000U >> (bitsallocated - bitsstored - 1));
+      if (pc)
+      {
+        for (int compno = 0; compno < numcomps; ++compno)
+        {
+          for (int i = 0; i < w * h; ++i)
+          {
+            // compno : 0 = GREY, (0, 1, 2) = (R, G, B)
+            uint16_t c = *p;
+            c = static_cast<uint16_t>(c >> (bitsstored - highbit - 1));
+            if (c & smask)
+            {
+              c = static_cast<uint16_t>(c | nmask);
+            }
+            else
+            {
+              c = c & pmask;
+            }
+            int16_t fix;
+            memcpy(&fix, &c, sizeof(fix));
+            image->comps[compno].data[i] = fix;
+            ++p;
+          }
+        }
+      }
+      else
       {
         for (int i = 0; i < w * h; ++i)
         {
-          // compno : 0 = GREY, (0, 1, 2) = (R, G, B)
-          uint16_t c = *p;
-          c = static_cast<uint16_t>(c >> (bitsstored - highbit - 1));
-          if (c & smask)
+          for (int compno = 0; compno < numcomps; ++compno)
           {
-            c = static_cast<uint16_t>(c | nmask);
+            // compno : 0 = GREY, (0, 1, 2) = (R, G, B)
+            uint16_t c = *p;
+            c = static_cast<uint16_t>(c >> (bitsstored - highbit - 1));
+            if (c & smask)
+            {
+              c = c | nmask;
+            }
+            else
+            {
+              c = c & pmask;
+            }
+            int16_t fix;
+            memcpy(&fix, &c, sizeof(fix));
+            image->comps[compno].data[i] = fix;
+            ++p;
           }
-          else
-          {
-            c = c & pmask;
-          }
-          int16_t fix;
-          memcpy(&fix, &c, sizeof(fix));
-          image->comps[compno].data[i] = fix;
-          ++p;
         }
       }
     }
     else
     {
-      for (int i = 0; i < w * h; ++i)
+      if (pc)
       {
         for (int compno = 0; compno < numcomps; ++compno)
         {
-          // compno : 0 = GREY, (0, 1, 2) = (R, G, B)
-          uint16_t c = *p;
-          c = static_cast<uint16_t>(c >> (bitsstored - highbit - 1));
-          if (c & smask)
+          for (int i = 0; i < w * h; ++i)
           {
-            c = c | nmask;
+            // compno : 0 = GREY, (0, 1, 2) = (R, G, B)
+            uint16_t c = *p;
+            c = static_cast<uint16_t>((c >> (bitsstored - highbit - 1)) & pmask);
+            image->comps[compno].data[i] = c;
+            ++p;
           }
-          else
+        }
+      }
+      else
+      {
+        for (int i = 0; i < w * h; ++i)
+        {
+          for (int compno = 0; compno < numcomps; ++compno)
           {
-            c = c & pmask;
+            // compno : 0 = GREY, (0, 1, 2) = (R, G, B)
+            uint16_t c = *p;
+            c = static_cast<uint16_t>((c >> (bitsstored - highbit - 1)) & pmask);
+            image->comps[compno].data[i] = c;
+            ++p;
           }
-          int16_t fix;
-          memcpy(&fix, &c, sizeof(fix));
-          image->comps[compno].data[i] = fix;
-          ++p;
         }
       }
     }
   }
-  else
+#if 1
+  // BitsAllocated 24 is allowed by DICOM, currently not supported, may be later.
+  else if ((bitsallocated == 32 /* || bitsallocated == 24 */) && (bitsstored <= bitsallocated) && (bitsstored <= 31))
   {
-    if (pc)
+    const uint32_t pmask = static_cast<uint32_t>(0xffffffffULL >> (bitsallocated - bitsstored));
+    const T * p = inputbuffer;
+    if (sign)
     {
-      for (int compno = 0; compno < numcomps; ++compno)
+      // smask : to check the 'sign' when BitsStored != BitsAllocated
+      const uint32_t smask = static_cast<uint32_t>(1ULL << (32 - (bitsallocated - bitsstored + 1)));
+      // nmask : to propagate sign bit on negative values
+      const int32_t nmask = static_cast<int32_t>(0xffffffff80000000ULL >> (bitsallocated - bitsstored - 1));
+      if (pc)
+      {
+        for (int compno = 0; compno < numcomps; ++compno)
+        {
+          for (int i = 0; i < w * h; ++i)
+          {
+            // compno : 0 = GREY, (0, 1, 2) = (R, G, B)
+            uint32_t c = *p;
+            c = static_cast<uint32_t>(c >> (bitsstored - highbit - 1));
+            if (c & smask)
+            {
+              c = static_cast<uint32_t>(c | nmask);
+            }
+            else
+            {
+              c = c & pmask;
+            }
+            int32_t fix;
+            memcpy(&fix, &c, sizeof(fix));
+            image->comps[compno].data[i] = fix;
+            ++p;
+          }
+        }
+      }
+      else
       {
         for (int i = 0; i < w * h; ++i)
         {
-          // compno : 0 = GREY, (0, 1, 2) = (R, G, B)
-          uint16_t c = *p;
-          c = static_cast<uint16_t>((c >> (bitsstored - highbit - 1)) & pmask);
-          image->comps[compno].data[i] = c;
-          ++p;
+          for (int compno = 0; compno < numcomps; ++compno)
+          {
+            // compno : 0 = GREY, (0, 1, 2) = (R, G, B)
+            uint32_t c = *p;
+            c = static_cast<uint32_t>(c >> (bitsstored - highbit - 1));
+            if (c & smask)
+            {
+              c = c | nmask;
+            }
+            else
+            {
+              c = c & pmask;
+            }
+            int32_t fix;
+            memcpy(&fix, &c, sizeof(fix));
+            image->comps[compno].data[i] = fix;
+            ++p;
+          }
         }
       }
     }
     else
     {
-      for (int i = 0; i < w * h; ++i)
+      if (pc)
       {
         for (int compno = 0; compno < numcomps; ++compno)
         {
-          // compno : 0 = GREY, (0, 1, 2) = (R, G, B)
-          uint16_t c = *p;
-          c = static_cast<uint16_t>((c >> (bitsstored - highbit - 1)) & pmask);
-          image->comps[compno].data[i] = c;
-          ++p;
+          for (int i = 0; i < w * h; ++i)
+          {
+            // compno : 0 = GREY, (0, 1, 2) = (R, G, B)
+            uint32_t c = *p;
+            c = static_cast<uint32_t>((c >> (bitsstored - highbit - 1)) & pmask);
+            image->comps[compno].data[i] = c;
+            ++p;
+          }
+        }
+      }
+      else
+      {
+        for (int i = 0; i < w * h; ++i)
+        {
+          for (int compno = 0; compno < numcomps; ++compno)
+          {
+            // compno : 0 = GREY, (0, 1, 2) = (R, G, B)
+            uint32_t c = *p;
+            c = static_cast<uint32_t>((c >> (bitsstored - highbit - 1)) & pmask);
+            image->comps[compno].data[i] = c;
+            ++p;
+          }
         }
       }
     }
   }
+/*
+  // BitsAllocated 40 is allowed by DICOM, currently not supported and
+  // OpenJPEG can currently work with max. prec. 31.
+  else if (bitsallocated == 40 && bitsstored <= 31)
+  {
+    const uint64_t pmask = static_cast<uint64_t>(0xffffffffffffffffULL >> (bitsallocated - bitsstored));
+    const T * p = inputbuffer;
+    if (sign)
+    {
+      // smask : to check the 'sign' when BitsStored != BitsAllocated
+      const uint64_t smask = static_cast<uint64_t>(1ULL << (64 - (bitsallocated - bitsstored + 1)));
+      // nmask : to propagate sign bit on negative values
+      const int64_t nmask = static_cast<int64_t>(0x8000000000000000ULL >> (bitsallocated - bitsstored - 1));
+      if (pc)
+      {
+        for (int compno = 0; compno < numcomps; ++compno)
+        {
+          for (int i = 0; i < w * h; ++i)
+          {
+            // compno : 0 = GREY, (0, 1, 2) = (R, G, B)
+            uint64_t c = *p;
+            c = static_cast<uint64_t>(c >> (bitsstored - highbit - 1));
+            if (c & smask)
+            {
+              c = static_cast<uint64_t>(c | nmask);
+            }
+            else
+            {
+              c = c & pmask;
+            }
+            int64_t fix;
+            memcpy(&fix, &c, sizeof(fix));
+            image->comps[compno].data[i] = fix;
+            ++p;
+          }
+        }
+      }
+      else
+      {
+        for (int i = 0; i < w * h; ++i)
+        {
+          for (int compno = 0; compno < numcomps; ++compno)
+          {
+            // compno : 0 = GREY, (0, 1, 2) = (R, G, B)
+            uint64_t c = *p;
+            c = static_cast<uint64_t>(c >> (bitsstored - highbit - 1));
+            if (c & smask)
+            {
+              c = c | nmask;
+            }
+            else
+            {
+              c = c & pmask;
+            }
+            int64_t fix;
+            memcpy(&fix, &c, sizeof(fix));
+            image->comps[compno].data[i] = fix;
+            ++p;
+          }
+        }
+      }
+    }
+    else
+    {
+      if (pc)
+      {
+        for (int compno = 0; compno < numcomps; ++compno)
+        {
+          for (int i = 0; i < w * h; ++i)
+          {
+            // compno : 0 = GREY, (0, 1, 2) = (R, G, B)
+            uint64_t c = *p;
+            c = static_cast<uint64_t>((c >> (bitsstored - highbit - 1)) & pmask);
+            image->comps[compno].data[i] = c;
+            ++p;
+          }
+        }
+      }
+      else
+      {
+        for (int i = 0; i < w * h; ++i)
+        {
+          for (int compno = 0; compno < numcomps; ++compno)
+          {
+            // compno : 0 = GREY, (0, 1, 2) = (R, G, B)
+            uint64_t c = *p;
+            c = static_cast<uint64_t>((c >> (bitsstored - highbit - 1)) & pmask);
+            image->comps[compno].data[i] = c;
+            ++p;
+          }
+        }
+      }
+    }
+  }
+*/
+#endif
 }
 
 template <typename T>
@@ -587,7 +779,7 @@ rawtoimage(const char *        inputbuffer,
   {
     numcomps = 3;
     color_space = CLRSPC_SRGB;
-    // TODO Does OpenJPEG support CLRSPC_SYCC?
+    // Does OpenJPEG support CLRSPC_SYCC?
   }
   else
   {
@@ -611,9 +803,8 @@ rawtoimage(const char *        inputbuffer,
   memset(&cmptparm[0], 0, 3 * sizeof(opj_image_cmptparm_t));
   for (int i = 0; i < numcomps; ++i)
   {
-#if 1
-    // To allow compression of 32 BitsAllocated images,
-    // prec 1-31 seems to be supported with 2.5.2
+    // Allow compression of 32 BitsAllocated images,
+    // prec 1-31 is supported with OpenJPEG 2.5.2
     if (bitsallocated == 32)
     {
       cmptparm[i].prec = bitsstored;
@@ -622,9 +813,6 @@ rawtoimage(const char *        inputbuffer,
     {
       cmptparm[i].prec = bitsallocated;
     }
-#else
-    cmptparm[i].prec = bitsallocated;
-#endif
 #if ((OPJ_VERSION_MAJOR == 2 && OPJ_VERSION_MINOR <= 3) || OPJ_VERSION_MAJOR < 2)
     cmptparm[i].bpp = bitsallocated;
 #endif
@@ -684,18 +872,44 @@ rawtoimage(const char *        inputbuffer,
   }
   else if (bitsallocated <= 32)
   {
-    if (sign)
+    if (bitsallocated != bitsstored)
     {
-      rawtoimage_fill<int32_t>(static_cast<const int32_t *>(vinputbuffer), w, h, numcomps, image, pc);
+      // For bitsallocated 32 this should be always true,
+      // max prec. is 31 for OpenJPEG.
+      // BitsAllocated 24 and 40 are allowed by DICOM,
+      // but currently not supported.
+#if 0
+      std::cout << "Trying to encode OpenJPEG with Bits Allocated " << bitsallocated
+                << ", Bits Stored " << bitsstored
+                << ", High Bit " << highbit
+                << ", Pixel Representation " << sign << std::endl;
+#endif
+      if (sign)
+      {
+        rawtoimage_fill2<int32_t>(
+          static_cast<const int32_t *>(vinputbuffer), w, h, numcomps, image, pc, bitsallocated, bitsstored, highbit, sign);
+      }
+      else
+      {
+        rawtoimage_fill2<uint32_t>(
+          static_cast<const uint32_t *>(vinputbuffer), w, h, numcomps, image, pc, bitsallocated, bitsstored, highbit, sign);
+      }
     }
-    else
+    else // This code should be unreachable now, may be later for BitAllocated 24.
     {
-      rawtoimage_fill<uint32_t>(static_cast<const uint32_t *>(vinputbuffer), w, h, numcomps, image, pc);
+      if (sign)
+      {
+        rawtoimage_fill<int32_t>(static_cast<const int32_t *>(vinputbuffer), w, h, numcomps, image, pc);
+      }
+      else
+      {
+        rawtoimage_fill<uint32_t>(static_cast<const uint32_t *>(vinputbuffer), w, h, numcomps, image, pc);
+      }
     }
   }
   else
   {
-    mdcmAlwaysWarnMacro("JPEG2000: Bits Allocated not supported " << bitsallocated);
+    mdcmAlwaysWarnMacro("JPEG2000: Bits Allocated " << bitsallocated << ", not supported");
     opj_image_destroy(image);
     return nullptr;
   }
@@ -714,10 +928,13 @@ check_comp_valid(opj_image_t * image)
     return false;
   }
   opj_image_comp_t * comp = &image->comps[0];
-  if (comp->prec > 32)
+  if (comp->prec > 31)
   {
     mdcmAlwaysWarnMacro("JPEG2000: precision not supported " << comp->prec);
-    return false;
+    if (comp->prec > 32) // in fact 31 is max for current OpenJPEG version
+    {
+      return false;
+    }
   }
   bool invalid = false;
   if (image->numcomps == 1)
@@ -1568,13 +1785,13 @@ JPEG2000Codec::DecodeByStreamsCommon(char * dummy_buffer, size_t buf_size)
         PF.SetBitsAllocated(8);
       else if (comp->prec <= 16)
         PF.SetBitsAllocated(16);
-      else if (comp->prec <= 32)
+      else if (comp->prec <= 32) // max. 31
         PF.SetBitsAllocated(32);
       PF.SetBitsStored(static_cast<unsigned short>(comp->prec));
       PF.SetHighBit(static_cast<unsigned short>(comp->prec - 1));
     }
     assert(PF.IsValid());
-    if (comp->prec > 32)
+    if (comp->prec > 31)
     {
       mdcmAlwaysWarnMacro("JPEG2000Codec: comp->prec = " << comp->prec << " is not supported");
       opj_destroy_codec(dinfo);
@@ -1898,17 +2115,35 @@ JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size)
   this->Dimensions[0] = comp->w;
   this->Dimensions[1] = comp->h;
   // Precision '> 32' already checked by 'check_comp_valid'
-  if (comp->prec <= 8)
+  if (static_cast<unsigned short>(comp->sgnd) == 0)
   {
-    this->PF = PixelFormat(PixelFormat::UINT8);
+    if (comp->prec <= 8)
+    {
+      this->PF = PixelFormat(PixelFormat::UINT8);
+    }
+    else if (comp->prec <= 16)
+    {
+      this->PF = PixelFormat(PixelFormat::UINT16);
+    }
+    else if (comp->prec <= 32)
+    {
+      this->PF = PixelFormat(PixelFormat::UINT32);
+    }
   }
-  else if (comp->prec <= 16)
+  else
   {
-    this->PF = PixelFormat(PixelFormat::UINT16);
-  }
-  else if (comp->prec <= 32)
-  {
-    this->PF = PixelFormat(PixelFormat::UINT32);
+    if (comp->prec <= 8)
+    {
+      this->PF = PixelFormat(PixelFormat::INT8);
+    }
+    else if (comp->prec <= 16)
+    {
+      this->PF = PixelFormat(PixelFormat::INT16);
+    }
+    else if (comp->prec <= 32)
+    {
+      this->PF = PixelFormat(PixelFormat::INT32);
+    }
   }
   this->PF.SetBitsStored(static_cast<unsigned short>(comp->prec));
   this->PF.SetHighBit(static_cast<unsigned short>(comp->prec - 1));
