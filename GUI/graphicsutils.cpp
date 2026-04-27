@@ -104,7 +104,7 @@ template<typename T> QString get_scalar_pixel_value__(
 		case 3:
 		case 4:
 		// For Aliza MS (DICOM files only) 'int64' (case 7) and 'uint64' (case 8) types
-		// are currently not really possible.
+		// are currently not really possible (theoretically only with 'rescale').
 		case 7:
 			{
 				const long long tmp0 = static_cast<long long>(p);
@@ -114,7 +114,7 @@ template<typename T> QString get_scalar_pixel_value__(
 			break;
 		case 8:
 			{
-				const unsigned long long tmp0 = static_cast<long long>(p);
+				const unsigned long long tmp0 = static_cast<unsigned long long>(p);
 				// Integer overflow can happen here, but it doesn't matter for labels,
 				// labels are supported in 'int' range only.
 				*label = static_cast<long long>(tmp0);
