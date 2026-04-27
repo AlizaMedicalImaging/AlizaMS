@@ -38,14 +38,21 @@ template<typename T> QString calculate_histogramm(
 	{
 		return QString("range < 0");
 	}
-	bins_size = static_cast<unsigned int>(range) + 1;
-	if (bins_size > 2048)
+	else if (range >= 4294967295.0)
 	{
 		bins_size = 2048;
 	}
-	else if (bins_size < 256 && (v->image_type == 5 || v->image_type == 6))
+	else
 	{
-		bins_size = 256;
+		bins_size = static_cast<unsigned int>(range) + 1;
+		if (bins_size > 2048)
+		{
+			bins_size = 2048;
+		}
+		else if (bins_size < 256 && (v->image_type == 5 || v->image_type == 6))
+		{
+			bins_size = 256;
+		}
 	}
 	//
 #if 0
