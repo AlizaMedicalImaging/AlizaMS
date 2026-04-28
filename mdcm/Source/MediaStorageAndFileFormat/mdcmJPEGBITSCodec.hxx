@@ -67,7 +67,10 @@ METHODDEF(boolean) fill_input_buffer(j_decompress_ptr cinfo)
   src->infile->seekg(pos, std::ios::beg);
   if (end == pos)
   {
-    // gdcm-JPEG-LossLessThoravision.dcm
+#if 0
+    std::cout << "fill_input_buffer: return FALSE" << std::endl;
+#endif
+    // S. comment in 'skip_input_data'
     return FALSE;
   }
   if ((end - pos) < INPUT_BUF_SIZE)
@@ -81,6 +84,9 @@ METHODDEF(boolean) fill_input_buffer(j_decompress_ptr cinfo)
   std::streamsize gcount = src->infile->gcount();
   if (gcount <= 0)
   {
+#if 0
+    std::cout << "fill_input_buffer: gcount <= 0" << std::endl;
+#endif
     if (src->start_of_file)
     {
       ERREXIT(cinfo, JERR_INPUT_EMPTY);
@@ -109,9 +115,25 @@ METHODDEF(void) skip_input_data(j_decompress_ptr cinfo, IJG_LONG num_bytes)
     while (num_bytes > (IJG_LONG)src->pub.bytes_in_buffer)
     {
       num_bytes -= (IJG_LONG)src->pub.bytes_in_buffer;
-      // GDCM comment states that is assumed that 'fill_input_buffer'
-      // never return FALSE, but it happens with gdcm-JPEG-LossLessThoravision.dcm
-      // and seems to work.
+      // The comment in GDCM states that 'fill_input_buffer'
+      // is supposed to "never return FALSE".
+      // But it does, and everything seems to work fine.
+      //
+      // Example files from 'gdcmData'
+      // https://sourceforge.net/p/gdcm/gdcmdata/ci/master/tree/
+      //
+      // gdcm-JPEG-LossLessThoravision.dcm
+      // D_CLUNIE_CT1_JPLL.dcm
+      // D_CLUNIE_MR1_JPLY.dcm
+      // D_CLUNIE_RG1_JPLL.dcm
+      // D_CLUNIE_RG2_JPLY.dcm
+      // D_CLUNIE_RG3_JPLY.dcm
+      // D_CLUNIE_SC1_JPLY.dcm
+      // GE_RHAPSODE-16-MONO2-JPEG-Fragments.dcm
+      // and probaly more.
+      //
+      // The files seem to have a single slice encoded in
+      // multiple fragments.
       (void)fill_input_buffer(cinfo);
     }
     src->pub.next_input_byte += (size_t)num_bytes;
